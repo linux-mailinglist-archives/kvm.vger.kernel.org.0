@@ -2,137 +2,67 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4E396218E33
-	for <lists+kvm@lfdr.de>; Wed,  8 Jul 2020 19:27:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 97540218F95
+	for <lists+kvm@lfdr.de>; Wed,  8 Jul 2020 20:19:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726340AbgGHR1f (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 8 Jul 2020 13:27:35 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:58943 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1725810AbgGHR1f (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 8 Jul 2020 13:27:35 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1594229254;
-        h=from:from:reply-to:reply-to:subject:subject:date:date:
-         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-         content-type:content-type:in-reply-to:in-reply-to:  references:references;
-        bh=ZyzIDNY4Nu4V8KRrDsUwGSVG/honpTANn9xBf5AA7bA=;
-        b=JqNY95cIu7BLRleQTCxOux7AOktuwvOsEdJtwD0IcEjNBfgDyP8SpV8T3cl/sPjfTdmvrf
-        WqCoWB1rRl6qqzWW/ebTVXi6Ei1S70BbsYo3mYFdgMM431b9O5ExitN5g8bl7P2n+XJHVT
-        GFHorgKXdKqsnHEWZaGosibrb/0BOCQ=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-411-TleON2iKOAab0dmPomP5JQ-1; Wed, 08 Jul 2020 13:27:13 -0400
-X-MC-Unique: TleON2iKOAab0dmPomP5JQ-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 001EC107B7C4;
-        Wed,  8 Jul 2020 17:27:12 +0000 (UTC)
-Received: from redhat.com (unknown [10.36.110.36])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 7EE5C724A0;
-        Wed,  8 Jul 2020 17:26:56 +0000 (UTC)
-Date:   Wed, 8 Jul 2020 18:26:53 +0100
-From:   Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To:     Eduardo Habkost <ehabkost@redhat.com>
-Cc:     Mohammed Gamal <mgamal@redhat.com>,
-        "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
-        Pedro Principeza <pedro.principeza@canonical.com>,
-        Dann Frazier <dann.frazier@canonical.com>,
-        Guilherme Piccoli <gpiccoli@canonical.com>,
-        qemu-devel@nongnu.org,
-        Christian Ehrhardt <christian.ehrhardt@canonical.com>,
-        Gerd Hoffmann <kraxel@redhat.com>,
-        Laszlo Ersek <lersek@redhat.com>, fw@gpiccoli.net,
-        pbonzini@redhat.com, mtosatti@redhat.com, rth@twiddle.net,
-        kvm@vger.kernel.org, libvir-list@redhat.com
-Subject: Re: [PATCH 2/2] x86/cpu: Handle GUEST_MAXPHYADDR < HOST_MAXPHYADDR
- for hosts that don't support it
-Message-ID: <20200708172653.GL3229307@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20200619155344.79579-1-mgamal@redhat.com>
- <20200619155344.79579-3-mgamal@redhat.com>
- <20200708171621.GA780932@habkost.net>
+        id S1726338AbgGHSTw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 8 Jul 2020 14:19:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57702 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726184AbgGHSTs (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 8 Jul 2020 14:19:48 -0400
+Received: from mail-il1-x143.google.com (mail-il1-x143.google.com [IPv6:2607:f8b0:4864:20::143])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 51565C061A0B
+        for <kvm@vger.kernel.org>; Wed,  8 Jul 2020 11:19:47 -0700 (PDT)
+Received: by mail-il1-x143.google.com with SMTP id i18so39916096ilk.10
+        for <kvm@vger.kernel.org>; Wed, 08 Jul 2020 11:19:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=2AmuLZJMHQPQccZytV7kXET82/Y66cEHC380oWy4s+g=;
+        b=HvTkT3Yzc+0sTy17VDvyFLHX9Wj+cV76L6dXw4jSkrFRuyw3gSp896FKevhO1L3c9R
+         fHd36gJSizxoIEumauz8Wy3XzIsdXqsUbcdJZI5WkFVKo/cXMjDyF8/jSVuSsRB3nKbH
+         6APHT/fZlZXTW2VneKfsRJ2kROoeMk2gGZPWyQCYP8sRmcl5SabIsQv7dVyxposgyuf0
+         Obbkl92Nv+E1gH5NztzVcHLOxShYy+UxUJegvH0CLI0kNI8SW5RNSZzT9S+UXixj0Bep
+         d6S6Ue4thjNfSVM7mM1NadWauaUT4GLq5mZv3q2c64MfGzdxqgXVG3UJAlm1CGVnqBIx
+         2nDg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=2AmuLZJMHQPQccZytV7kXET82/Y66cEHC380oWy4s+g=;
+        b=ZjlAAHF1wkKHqo+JzEHH+YEfUZ0l0RNlS7w5pBPqqqxlWWqoOXc4NL+otP3F10rcL3
+         vYtKTpz/gZR3Zq1/+rsYJ9+BWmjwcq9cFamQfjsO0D0Rb/F/7pcgVqkD4YNGajbJtbmb
+         B+GVmuYLoHCLIqXDoZNcjwDyQqmNTMJ3ssCiL2+duc+7ESqqwmYNCwSWP88k4PSOuZyo
+         J80Dp9iA41s+ckRRqTxD43KMEE8pI7afKHLlw5aCWPW789yY96Obwp9yroC4tutJpkxT
+         nnfXQU6FIXALHwRloQ04BGD4fu62C28N8taPOO/GambabnhhCGQlFvfarOSeSjFmcvgX
+         19jQ==
+X-Gm-Message-State: AOAM531sGqF64OYTIb5v2x61x6HCSjyYuxXuMPMcquFqxXM7z7HboJT7
+        CqLqNHnqiNROHkuaLw6i1zLs+Bcz/F/woZV4zq9wdQ==
+X-Google-Smtp-Source: ABdhPJyfCtMLGGsfTHzFRlVI1nhUOBxQmw2RuTyIuZQncCXntViBnqgrCAyRcBfK6wBySUQVUCLe5suQwBXZAhsHuJM=
+X-Received: by 2002:a92:b685:: with SMTP id m5mr43222431ill.118.1594232386468;
+ Wed, 08 Jul 2020 11:19:46 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20200708171621.GA780932@habkost.net>
-User-Agent: Mutt/1.14.3 (2020-06-14)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+References: <20200708110350.848997-1-pbonzini@redhat.com>
+In-Reply-To: <20200708110350.848997-1-pbonzini@redhat.com>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Wed, 8 Jul 2020 11:19:35 -0700
+Message-ID: <CALMp9eQGgDJE9kYA6vGM67iCdtfgYqPHxBXGSCGfEtqo858pmw@mail.gmail.com>
+Subject: Re: [PATCH] KVM: x86: Make CR4.VMXE reserved for the guest
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     LKML <linux-kernel@vger.kernel.org>, kvm list <kvm@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jul 08, 2020 at 01:16:21PM -0400, Eduardo Habkost wrote:
-> (CCing libvir-list, and people who were included in the OVMF
-> thread[1])
-> 
-> [1] https://lore.kernel.org/qemu-devel/99779e9c-f05f-501b-b4be-ff719f140a88@canonical.com/
-> 
-> On Fri, Jun 19, 2020 at 05:53:44PM +0200, Mohammed Gamal wrote:
-> > If the CPU doesn't support GUEST_MAXPHYADDR < HOST_MAXPHYADDR we
-> > let QEMU choose to use the host MAXPHYADDR and print a warning to the
-> > user.
-> > 
-> > Signed-off-by: Mohammed Gamal <mgamal@redhat.com>
-> > ---
-> >  target/i386/cpu.c | 11 +++++++++++
-> >  1 file changed, 11 insertions(+)
-> > 
-> > diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-> > index b1b311baa2..91c57117ce 100644
-> > --- a/target/i386/cpu.c
-> > +++ b/target/i386/cpu.c
-> > @@ -6589,6 +6589,17 @@ static void x86_cpu_realizefn(DeviceState *dev, Error **errp)
-> >              uint32_t host_phys_bits = x86_host_phys_bits();
-> >              static bool warned;
-> >  
-> > +	    /*
-> > +	     * If host doesn't support setting physical bits on the guest,
-> > +	     * report it and return
-> > +	     */
-> > +	    if (cpu->phys_bits < host_phys_bits &&
-> > +		!kvm_has_smaller_maxphyaddr()) {
-> > +		warn_report("Host doesn't support setting smaller phys-bits."
-> > +			    " Using host phys-bits\n");
-> > +		cpu->phys_bits = host_phys_bits;
-> > +	    }
-> > +
-> 
-> This looks like a regression from existing behavior.  Today,
-> using smaller phys-bits doesn't crash most guests, and still
-> allows live migration to smaller hosts.  I agree using the host
-> phys-bits is probably a better default, but we shouldn't override
-> options set explicitly in the command line.
-
-Yeah, this looks like it would cause a behaviour change / regression
-so looks questionable.
-
-> Also, it's important that we work with libvirt and management
-> software to ensure they have appropriate APIs to choose what to
-> do when a cluster has hosts with different MAXPHYADDR.
-
-There's been so many complex discussions that it is hard to have any
-understanding of what we should be doing going forward. There's enough
-problems wrt phys bits, that I think we would benefit from a doc that
-outlines the big picture expectation for how to handle this in the
-virt stack.
-
-As mentioned in the thread quoted above, using host_phys_bits is a
-obvious thing to do when the user requested "-cpu host".
-
-The harder issue is how to handle other CPU models. I had suggested
-we should try associating a phys bits value with them, which would
-probably involve creating Client/Server variants for all our CPU
-models which don't currently have it. I still think that's worth
-exploring as a strategy and with versioned CPU models we should
-be ok wrt back compatibility with that approach.
-
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
-
+On Wed, Jul 8, 2020 at 4:04 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
+>
+> CR4.VMXE is reserved unless the VMX CPUID bit is set.  On Intel,
+> it is also tested by vmx_set_cr4, but AMD relies on kvm_valid_cr4,
+> so fix it.
+>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+Reviewed-by: Jim Mattson <jmattson@google.com>
