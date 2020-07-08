@@ -2,90 +2,249 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id F1266218427
-	for <lists+kvm@lfdr.de>; Wed,  8 Jul 2020 11:48:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A983E2184B2
+	for <lists+kvm@lfdr.de>; Wed,  8 Jul 2020 12:11:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728169AbgGHJse (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 8 Jul 2020 05:48:34 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:20293 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726445AbgGHJse (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 8 Jul 2020 05:48:34 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1594201713;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=s7qKIvefs+Nswt+yThb+00wqIjYx3wKhVFohWCds6UY=;
-        b=MRHAeiTWB6/DtBPZqRIj1zsvji7RBVPFly0RArrkXYx0s9DkETsOVJTWvYYacBJ2IWb/M3
-        gYqwJ6P/1NsVWjPvc3fJuOM7g2aPL6PFCJ62J4yZTQBa9y4aXIGUi7pADY4pdX82mxdtFU
-        LaHgChYWLVudXmkkJi6LiuR5yFj4CUQ=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-181-jj-fm0w7PLaycrRX7CwCAQ-1; Wed, 08 Jul 2020 05:48:27 -0400
-X-MC-Unique: jj-fm0w7PLaycrRX7CwCAQ-1
-Received: by mail-wm1-f71.google.com with SMTP id f68so3970943wmf.1
-        for <kvm@vger.kernel.org>; Wed, 08 Jul 2020 02:48:27 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=s7qKIvefs+Nswt+yThb+00wqIjYx3wKhVFohWCds6UY=;
-        b=TG7fBeHphNbtFAT9f7dFTBvcu5tJXPak2Zyhgi5BA7LQPIf7Y23EArjmyWDs+krJ+b
-         xTHzz5GjCkO3UxS2BNq4o+SKaOAYFkVyFK+lgF/Bx4go0zgNxXYam9E/HFtP1RAUvHB0
-         FelFVFz2onTBSBDKbzaRtqZx7ZGhXOQikoSt4NvEGcTobSTeqKtrsqJdL19qsvJF2obW
-         y3lLE383knzYeD31NaBibl8GmZQXP+gVSRjBfzUGMfCgP1XXmUAYuSHZ9VVH518GR36Z
-         SSIsA6ef+dvuurP4yDtl1H9XPE9KLXwbHadOOv4p9qTLn4a9/aPJm3K34EiWx3BKEW/0
-         xpjA==
-X-Gm-Message-State: AOAM533SDrpZmwmiqVjMpLSwjKSTySpPXfCtKo3zmc2lKszS4GlaZ1Pl
-        rU1AmW4BmX1rdyRVMxOJcTlX0BTkLgMoaL+YR15UIFtX4Aaw76ulNWdO4NZFzRdrMNqKeMvY2va
-        lpLXzZDEpmXPw
-X-Received: by 2002:a1c:964d:: with SMTP id y74mr8764299wmd.80.1594201706341;
-        Wed, 08 Jul 2020 02:48:26 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyfj7LMLC/Cy4bxGx7mFvcgmL+5lgb9l1+cTx9oY+aTy0fSYGL5yHj313enjlCjUhgdghsXgg==
-X-Received: by 2002:a1c:964d:: with SMTP id y74mr8764290wmd.80.1594201706166;
-        Wed, 08 Jul 2020 02:48:26 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:9541:9439:cb0f:89c? ([2001:b07:6468:f312:9541:9439:cb0f:89c])
-        by smtp.gmail.com with ESMTPSA id q4sm4974931wmc.1.2020.07.08.02.48.25
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 08 Jul 2020 02:48:25 -0700 (PDT)
-Subject: Re: [PATCH 1/3 v4] KVM: x86: Create mask for guest CR4 reserved bits
- in kvm_update_cpuid()
-To:     Krish Sadhukhan <krish.sadhukhan@oracle.com>, kvm@vger.kernel.org
-References: <1594168797-29444-1-git-send-email-krish.sadhukhan@oracle.com>
- <1594168797-29444-2-git-send-email-krish.sadhukhan@oracle.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <bd3f1410-bd14-6791-0d3f-ce2ec329967a@redhat.com>
-Date:   Wed, 8 Jul 2020 11:48:25 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.9.0
+        id S1726445AbgGHKLQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 8 Jul 2020 06:11:16 -0400
+Received: from mga05.intel.com ([192.55.52.43]:43601 "EHLO mga05.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725810AbgGHKLQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 8 Jul 2020 06:11:16 -0400
+IronPort-SDR: IsLi9Pw3Z6v4t8Gotda2cmRtQrDDiZLQAbKU3vjrfmoBO8BZYEQdP1H+1+8Ss5jL5djTt38ynU
+ DNiDamDoy3vA==
+X-IronPort-AV: E=McAfee;i="6000,8403,9675"; a="232630355"
+X-IronPort-AV: E=Sophos;i="5.75,327,1589266800"; 
+   d="asc'?scan'208";a="232630355"
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Jul 2020 03:11:11 -0700
+IronPort-SDR: 4/UQ6DIl/YT719hpkwXRIcpiDUMEFWgGnWANCNoYVp3wNWcNxKlLm3HOA+h9JY4aROiRX65OXV
+ mVfclXO2b51w==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.75,327,1589266800"; 
+   d="asc'?scan'208";a="358059438"
+Received: from zhen-hp.sh.intel.com (HELO zhen-hp) ([10.239.160.147])
+  by orsmga001.jf.intel.com with ESMTP; 08 Jul 2020 03:11:10 -0700
+Date:   Wed, 8 Jul 2020 17:54:18 +0800
+From:   Zhenyu Wang <zhenyuw@linux.intel.com>
+To:     "Tian, Kevin" <kevin.tian@intel.com>
+Cc:     Alex Williamson <alex.williamson@redhat.com>,
+        Zhenyu Wang <zhenyuw@linux.intel.com>,
+        "intel-gvt-dev@lists.freedesktop.org" 
+        <intel-gvt-dev@lists.freedesktop.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "Zhao, Yan Y" <yan.y.zhao@intel.com>
+Subject: Re: [PATCH v3 0/2] VFIO mdev aggregated resources handling
+Message-ID: <20200708095418.GQ27035@zhen-hp.sh.intel.com>
+Reply-To: Zhenyu Wang <zhenyuw@linux.intel.com>
+References: <20200326054136.2543-1-zhenyuw@linux.intel.com>
+ <20200408055824.2378-1-zhenyuw@linux.intel.com>
+ <MWHPR11MB1645CC388BF45FD2E6309C3C8C660@MWHPR11MB1645.namprd11.prod.outlook.com>
+ <20200707190634.4d9055fe@x1.home>
+ <MWHPR11MB16454BF5C1BF4D5D22F0B2B38C670@MWHPR11MB1645.namprd11.prod.outlook.com>
 MIME-Version: 1.0
-In-Reply-To: <1594168797-29444-2-git-send-email-krish.sadhukhan@oracle.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/signed; micalg=pgp-sha1;
+        protocol="application/pgp-signature"; boundary="bi5JUZtvcfApsciF"
+Content-Disposition: inline
+In-Reply-To: <MWHPR11MB16454BF5C1BF4D5D22F0B2B38C670@MWHPR11MB1645.namprd11.prod.outlook.com>
+User-Agent: Mutt/1.10.0 (2018-05-17)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 08/07/20 02:39, Krish Sadhukhan wrote:
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 88c593f..f0335bc 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -97,6 +97,7 @@
->  #endif
->  
->  static u64 __read_mostly cr4_reserved_bits = CR4_RESERVED_BITS;
-> +u64 __guest_cr4_reserved_bits;
->  
->  #define KVM_X2APIC_API_VALID_FLAGS (KVM_X2APIC_API_USE_32BIT_IDS | \
->                                      KVM_X2APIC_API_DISABLE_BROADCAST_QUIRK)
 
-Stray line.
+--bi5JUZtvcfApsciF
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Paolo
+On 2020.07.08 06:31:00 +0000, Tian, Kevin wrote:
+> > From: Alex Williamson <alex.williamson@redhat.com>
+> > Sent: Wednesday, July 8, 2020 9:07 AM
+> >=20
+> > On Tue, 7 Jul 2020 23:28:39 +0000
+> > "Tian, Kevin" <kevin.tian@intel.com> wrote:
+> >=20
+> > > Hi, Alex,
+> > >
+> > > Gentle ping... Please let us know whether this version looks good.
+> >=20
+> > I figured this is entangled with the versioning scheme.  There are
+> > unanswered questions about how something that assumes a device of a
+> > given type is software compatible to another device of the same type
+> > handles aggregation and how the type class would indicate compatibility
+> > with an aggregated instance.  Thanks,
+> >=20
+>=20
+> Yes, this open is an interesting topic. I didn't closely follow the versi=
+oning
+> scheme discussion. Below is some preliminary thought in my mind:
+>=20
+> --
+> First, let's consider migrating an aggregated instance:
+>=20
+> A conservative policy is to check whether the compatible type is supporte=
+d=20
+> on target device and whether available instances under that type can affo=
+rd=20
+> the ask of the aggregated instance. Compatibility check in this scheme is=
+=20
+> separated from aggregation check, then no change is required to the curre=
+nt=20
+> versioning interface.
 
+In last mdev's aggregation series, no aggregation info is exposed in mdev t=
+ype
+until instance creates, so that would cause possible conflict w/o that info=
+, e.g
+type might have avail instances but not actually provide aggregation. Then =
+=66rom
+that point of view, either require to add new flag because current 'descrip=
+tion'
+is useless or change versioning interface or require to be different type..
+
+>=20
+> Then there comes a case where the target device doesn't handle aggregation
+> but support a different type which however provides compatible capabiliti=
+es=20
+> and same resource size as the aggregated instance expects. I guess this is
+> one puzzle how to check compatibility between such types. One possible
+> extension is to introduce a non_aggregated_list  to indicate compatible=
+=20
+> non-aggregated types for each aggregated instance. Then mgmt.. stack=20
+> just loop the compatible list if the conservative policy fails.  I didn't=
+ think=20
+> carefully about what format is reasonable here. But if we agree that an
+> separate interface is required to support such usage, then this may come
+> later after the basic migration_version interface is completed.
+> --
+>=20
+> Another scenario is about migrating a non-aggregated instance to a device
+> handling aggregation. Then there is an open whether an aggregated type=20
+> can be used to back the non-aggregated instance in case of no available=
+=20
+> instance under the original type claimed by non-aggregated instance.=20
+> This won't happen in KVMGT, because all vGPU types share the same=20
+> resource pool. Allocating instance under one type also decrement availabl=
+e=20
+> instances under other types. So if we fail to find available instance und=
+er=20
+> type-A (with 4x resource of type-B), then we will also fail to create an
+>  aggregated instance (aggregate=3D4) under type-B. therefore, we just=20
+> need stick to basic type compatibility check for non-aggregated instance.=
+=20
+> And I feel this assumption can be applied to other devices handling=20
+> aggregation. It doesn't make sense for two types to claim compatibility=
+=20
+> (only with resource size difference) when their resources are allocated
+> from different pools (which usually implies different capability or QOS/
+> SLA difference). With this assumption, we don't need provide another
+> interface to indicate compatible aggregated types for non-aggregated
+> interface.
+> --
+>=20
+> I may definitely overlook something here, but if above analysis sounds
+> reasonable, then this series could be decoupled from the versioning=20
+> scheme discussion based on conservative policy for now. :)
+>=20
+> Thanks
+> Kevin
+>=20
+> >=20
+> >=20
+> > > > From: Zhenyu Wang <zhenyuw@linux.intel.com>
+> > > > Sent: Wednesday, April 8, 2020 1:58 PM
+> > > >
+> > > > Hi,
+> > > >
+> > > > This is a refresh on previous series:
+> > > > https://patchwork.kernel.org/cover/11208279/
+> > > > and https://patchwork.freedesktop.org/series/70425/
+> > > >
+> > > > Current mdev device create interface depends on fixed mdev type, wh=
+ich
+> > > > get uuid from user to create instance of mdev device. If user wants=
+ to
+> > > > use customized number of resource for mdev device, then only can
+> > > > create new mdev type for that which may not be flexible. This
+> > > > requirement comes not only from to be able to allocate flexible
+> > > > resources for KVMGT, but also from Intel scalable IO virtualization
+> > > > which would use vfio/mdev to be able to allocate arbitrary resources
+> > > > on mdev instance. More info on [1] [2] [3].
+> > > >
+> > > > As we agreed that for current opaque mdev device type, we'd still
+> > > > explore management interface based on mdev sysfs definition. And th=
+is
+> > > > one tries to follow Alex's previous suggestion to create generic
+> > > > parameters under 'mdev' directory for each device, so vendor driver
+> > > > could provide support like as other defined mdev sysfs entries.
+> > > >
+> > > > For mdev type with aggregation support, files as "aggregated_instan=
+ces"
+> > > > and "max_aggregation" should be created under 'mdev' directory. E.g
+> > > >
+> > > > /sys/devices/pci0000:00/0000:00:02.0/<UUID>/mdev/
+> > > >    |-- aggregated_instances
+> > > >    |-- max_aggregation
+> > > >
+> > > > "aggregated_instances" is used to set or return current number of
+> > > > instances for aggregation, which can not be larger than
+> > "max_aggregation".
+> > > >
+> > > > The first patch is to update the document for new mdev parameter
+> > directory.
+> > > > The second one is to add aggregation support in GVT driver.
+> > > >
+> > > > References:
+> > > > [1] https://software.intel.com/en-us/download/intel-virtualization-
+> > > > technology-for-directed-io-architecture-specification
+> > > > [2] https://software.intel.com/en-us/download/intel-scalable-io-
+> > > > virtualization-technical-specification
+> > > > [3] https://schd.ws/hosted_files/lc32018/00/LC3-SIOV-final.pdf
+> > > >
+> > > > Changelog:
+> > > > v3:
+> > > > - add more description for sysfs entries
+> > > > - rebase GVT support
+> > > > - rename accounting function
+> > > >
+> > > > Zhenyu Wang (2):
+> > > >   Documentation/driver-api/vfio-mediated-device.rst: update for
+> > > >     aggregation support
+> > > >   drm/i915/gvt: mdev aggregation type
+> > > >
+> > > >  .../driver-api/vfio-mediated-device.rst       |  22 +++
+> > > >  drivers/gpu/drm/i915/gvt/aperture_gm.c        |  44 +++--
+> > > >  drivers/gpu/drm/i915/gvt/gtt.c                |   9 +-
+> > > >  drivers/gpu/drm/i915/gvt/gvt.c                |   7 +-
+> > > >  drivers/gpu/drm/i915/gvt/gvt.h                |  42 +++--
+> > > >  drivers/gpu/drm/i915/gvt/kvmgt.c              | 115 +++++++++++-
+> > > >  drivers/gpu/drm/i915/gvt/vgpu.c               | 172 ++++++++++++--=
+----
+> > > >  7 files changed, 317 insertions(+), 94 deletions(-)
+> > > >
+> > > > --
+> > > > 2.25.1
+> > >
+>=20
+
+--=20
+Open Source Technology Center, Intel ltd.
+
+$gpg --keyserver wwwkeys.pgp.net --recv-keys 4D781827
+
+--bi5JUZtvcfApsciF
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iF0EARECAB0WIQTXuabgHDW6LPt9CICxBBozTXgYJwUCXwWXygAKCRCxBBozTXgY
+Jya1AJ4rDVFRBZlB3WZbLyWHAj00K4b6TACgnguG+w6uFVuP7RkU05w7A8RBRx0=
+=XnZZ
+-----END PGP SIGNATURE-----
+
+--bi5JUZtvcfApsciF--
