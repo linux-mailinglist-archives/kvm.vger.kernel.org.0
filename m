@@ -2,303 +2,462 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E677B218C9F
-	for <lists+kvm@lfdr.de>; Wed,  8 Jul 2020 18:11:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 32BFB218D15
+	for <lists+kvm@lfdr.de>; Wed,  8 Jul 2020 18:38:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730093AbgGHQLF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 8 Jul 2020 12:11:05 -0400
-Received: from lhrrgout.huawei.com ([185.176.76.210]:2447 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1730606AbgGHQLE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 8 Jul 2020 12:11:04 -0400
-Received: from lhreml705-chm.china.huawei.com (unknown [172.18.7.106])
-        by Forcepoint Email with ESMTP id 2989D24F88769A3EB7C9;
-        Wed,  8 Jul 2020 17:11:02 +0100 (IST)
-Received: from lhreml703-chm.china.huawei.com (10.201.108.52) by
- lhreml705-chm.china.huawei.com (10.201.108.54) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
- 15.1.1913.5; Wed, 8 Jul 2020 17:11:01 +0100
-Received: from lhreml703-chm.china.huawei.com ([10.201.68.198]) by
- lhreml703-chm.china.huawei.com ([10.201.68.198]) with mapi id 15.01.1913.007;
- Wed, 8 Jul 2020 17:11:01 +0100
-From:   Salil Mehta <salil.mehta@huawei.com>
-To:     James Morse <james.morse@arm.com>
-CC:     "linux-arm-kernel@lists.infradead.org" 
-        <linux-arm-kernel@lists.infradead.org>,
-        "maz@kernel.org" <maz@kernel.org>,
-        "will@kernel.org" <will@kernel.org>,
-        "catalin.marinas@arm.com" <catalin.marinas@arm.com>,
-        "christoffer.dall@arm.com" <christoffer.dall@arm.com>,
-        "andre.przywara@arm.com" <andre.przywara@arm.com>,
-        "mark.rutland@arm.com" <mark.rutland@arm.com>,
-        "lorenzo.pieralisi@arm.com" <lorenzo.pieralisi@arm.com>,
-        "sudeep.holla@arm.com" <sudeep.holla@arm.com>,
-        "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>,
-        "peter.maydell@linaro.org" <peter.maydell@linaro.org>,
-        "richard.henderson@linaro.org" <richard.henderson@linaro.org>,
-        "imammedo@redhat.com" <imammedo@redhat.com>,
-        "mst@redhat.com" <mst@redhat.com>,
-        "drjones@redhat.com" <drjones@redhat.com>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "eric.auger@redhat.com" <eric.auger@redhat.com>,
-        "gshan@redhat.com" <gshan@redhat.com>,
-        "david@redhat.com" <david@redhat.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Linuxarm <linuxarm@huawei.com>,
-        "mehta.salil.lnk@gmail.com" <mehta.salil.lnk@gmail.com>
-Subject: RE: [PATCH RFC 0/4] Changes to Support *Virtual* CPU Hotplug for
- ARM64
-Thread-Topic: [PATCH RFC 0/4] Changes to Support *Virtual* CPU Hotplug for
- ARM64
-Thread-Index: AQHWSvaqb7PlQuQ2I0aISfnbFH95/aj77kPggAGx9oCAABE8sA==
-Date:   Wed, 8 Jul 2020 16:11:01 +0000
-Message-ID: <63562d33e06840adb48c4a23a76f7ec5@huawei.com>
-References: <20200625133757.22332-1-salil.mehta@huawei.com>
- <8efc4efe284641eda3ffeb2301fcca43@huawei.com>
- <cbaa6d68-6143-e010-5f3c-ec62f879ad95@arm.com>
-In-Reply-To: <cbaa6d68-6143-e010-5f3c-ec62f879ad95@arm.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.47.79.233]
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+        id S1730438AbgGHQie (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 8 Jul 2020 12:38:34 -0400
+Received: from foss.arm.com ([217.140.110.172]:51054 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1730385AbgGHQie (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 8 Jul 2020 12:38:34 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C493931B;
+        Wed,  8 Jul 2020 09:38:32 -0700 (PDT)
+Received: from [192.168.0.110] (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 7F0E03F68F;
+        Wed,  8 Jul 2020 09:38:30 -0700 (PDT)
+Subject: Re: [PATCH v3 17/17] KVM: arm64: timers: Move timer registers to the
+ sys_regs file
+To:     Marc Zyngier <maz@kernel.org>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org
+Cc:     Andre Przywara <andre.przywara@arm.com>,
+        Christoffer Dall <christoffer.dall@arm.com>,
+        Dave Martin <Dave.Martin@arm.com>,
+        Jintack Lim <jintack@cs.columbia.edu>,
+        George Cherian <gcherian@marvell.com>,
+        "Zengtao (B)" <prime.zeng@hisilicon.com>,
+        Andrew Scull <ascull@google.com>,
+        Will Deacon <will@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        kernel-team@android.com
+References: <20200706125425.1671020-1-maz@kernel.org>
+ <20200706125425.1671020-18-maz@kernel.org>
+From:   Alexandru Elisei <alexandru.elisei@arm.com>
+Message-ID: <56a06ee3-279e-0ee9-6664-c1d21ee8e936@arm.com>
+Date:   Wed, 8 Jul 2020 17:39:08 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-X-CFilter-Loop: Reflected
+In-Reply-To: <20200706125425.1671020-18-maz@kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-SGkgSmFtZXMsDQpUaGFua3MgZm9yIHRha2luZyB0aW1lIHRvIHJlc3BvbmQuIFBsZWFzZSBmaW5k
-IG15IHJlcGxpZXMgaW5saW5lDQoNClRoYW5rcw0KDQo+IEZyb206IEphbWVzIE1vcnNlIFttYWls
-dG86amFtZXMubW9yc2VAYXJtLmNvbV0NCj4gU2VudDogV2VkbmVzZGF5LCBKdWx5IDgsIDIwMjAg
-MTozMCBQTQ0KPiBUbzogU2FsaWwgTWVodGEgPHNhbGlsLm1laHRhQGh1YXdlaS5jb20+DQo+IA0K
-PiBIaSBTYWxpbCwNCj4gDQo+IE9uIDA3LzA3LzIwMjAgMTA6NTIsIFNhbGlsIE1laHRhIHdyb3Rl
-Og0KPiA+PiBGcm9tOiBTYWxpbCBNZWh0YQ0KPiANCj4gDQo+IERpc2FtYmlndWF0aW9uOiBieSBj
-cHUtaG90cGx1ZyBoZXJlLCB5b3UgZG9uJ3QgbWVhbg0KPiBDT05GSUdfSE9UUExVR19DUFUgYmFj
-a2VkIGJ5IFBTQ0ksIHdoaWNoIGlzIGNvbW1vbmx5IHdoYXQgd2UgbWVhbiBpbiB0aGUgYXJtDQo+
-IHdvcmxkLiBZb3UNCj4gbWVhbjogcGFja2FnZSBob3QtYWRkLiBBIGJ1bmNoIG9mIENQVXMgKGFu
-ZCBtYXliZSBtb3JlKSB0aGF0IHdlcmVuJ3QgcHJlc2VudA0KPiBhdCBib290IGhhdmUNCj4gdHVy
-bmVkIHVwLg0KDQoNCkV4YWN0bHksIGFuZCBoZW5jZSB0aGUgdGVybWlub2xvZ3kgb2YgdGhlIHBv
-c3NpYmxlLCBwcmVzZW50IGFuZCBkaXNhYmxlZCBjb21lcw0KZnJvbSB0aGVyZS4NCg0KUHJlc2Vu
-dCAgOiB3aGljaCBhcmUgcHJlc2VudCBhdCBib290IHRpbWUgb2YgdGhlIGd1ZXN0IGFuZCB3ZXJl
-IHByZXNlbnRlZCBhcw0KICAgICAgICAgICAgJ0VOQUJMRUQnKHNldCBpbiB0aGUgZmxhZykgaW4g
-dGhlIEFDUEkgTUFEVCBUYWJsZSBjcHUgaW50ZXJmYWNlIGVudHJ5DQogICAgICAgICAgICAgYnkg
-UUVNVQ0KRGlzYWJsZWQgOiB3aGljaCB3ZXJlIG5vdC1wcmVzZW50IGF0IGJvb3QgdGltZSBvZiB0
-aGUgZ3Vlc3QgYW5kIHdlcmUgcHJlc2VudGVkDQogICAgICAgICAgICBhcyAnRElTQUJMRUQnKG5v
-dCBzZXQgaW4gdGhlIGZsYWcpIGluIHRoZSBBQ1BJIE1BRFQgVGFibGUgY3B1IGludGVyZmFjZQ0K
-ICAgICAgICAgICAgZW50cnkgYnkgUUVNVSAgICANClBvc3NpYmxlIDogKFByZXNlbnQgKyBEaXNh
-YmxlZCkNCg0KVGhpcyBzZXJpZXMgaXMgbWVhbnQgdG8gc3VwcG9ydCBpbmZyYXN0cnVjdHVyZSB0
-byBob3QtKHVuKXBsdWcgb2YgdmlydHVhbCBjcHVzDQphdCBRRU1VIGxldmVsLiBJdCBkb2VzIG5v
-dCBhc3N1bWVzIGFueSBIYXJkd2FyZSBjcHUgaG90cGx1ZyBzdXBwb3J0IHByZXNlbnQgYXQNCnRo
-ZSBob3N0IG1hY2hpbmUgcmF0aGVyIGl0IGlzIGFuIGF0dGVtcHQgdG8gbWFrZSB2aXJ0dWFsIGNw
-dSBob3RwbHVnIHN1cHBvcnQNCmZhaXJseSBpbmRlcGVuZGVudCBvZiB0aGUgaGFyZHdhcmUuDQoN
-Cg0KPiA+PiBDaGFuZ2VzIHRvIHN1cHBvcnQgdmlydHVhbCBjcHUgaG90cGx1ZyBpbiBRRU1VWzFd
-IGhhdmUgYmVlbiBpbnRyb2R1Y2VkIHRvIHRoZQ0KPiA+PiBjb21tdW5pdHkgYXMgUkZDLiBUaGVz
-ZSBhcmUgdW5kZXIgcmV2aWV3Lg0KPiA+Pg0KPiA+PiBUbyBzdXBwb3J0IHZpcnR1YWwgY3B1IGhv
-dHBsdWcgZ3Vlc3Qga2VybmVsIG11c3Q6DQo+IA0KPiBTdXJlbHkgbnVtYmVyIDEgaXM6IGtub3cg
-aXRzIGEgdmlydHVhbCBtYWNoaW5lLCBhbmQgdGhhdCB3aGF0ZXZlciBuZWVkcw0KPiBkb2luZy9k
-ZXNjcmliaW5nDQo+IG9uIGEgcmVhbCBtYWNoaW5lLCBkb2Vzbid0IG5lZWQgZG9pbmcgb3IgZGVz
-Y3JpYmluZyBoZXJlLi4uDQo+IA0KPiBXZSBhZGQgc3VwcG9ydCBmb3IgdmlydHVhbCBtYWNoaW5l
-cyBhZnRlciBzdXBwb3J0IGZvciB0aGUgcGh5c2ljYWwgbWFjaGluZS4gSXMNCj4gYW55b25lIGJ1
-aWxkaW5nIGhhcmR3YXJlIHRoYXQgc3VwcG9ydHMgdGhpcz8NCg0KDQpEbyB3ZSByZWFsbHkgY2Fy
-ZSBhYm91dCBpdCBpZiB3ZSBjb3VsZCBtYWtlIHZpcnR1YWwgbGF5ZXIgaW5kZXBlbmRlbnQgb2Yg
-dGhlDQpIYXJkd2FyZSBieSBwcmUtc2l6aW5nIHRoZSByZXNvdXJjZXModmNwdXMsIEdJQyBldGMu
-KSBhdCBRRU1VIGxldmVsPyA6KQ0KDQpBRkFJSywgcmlnaHQgbm93IHRoZXJlIGlzICpubyoga25v
-d24gcmVhbCBiZW5lZml0IG9mIHRoZSAgcGh5c2ljYWwgY3B1IGhvdHBsdWcNCmV4Y2VwdCBmb3Ig
-c29tZSBvZiB0aGUgY2FzZXMgd2hpY2ggYXJlIHJlYWxseSBoYXJkIHRvIHNvbHZlICpwaHlzaWNh
-bGx5KiBhbmQNCnBlcmhhcHMgcmVxdWlyZSBtb3JlIGNvbXByZWhlbnNpdmUgc3lzdGVtIGFyY2hp
-dGVjdHVyZSBkZWZpbmVkLCBsaWtlDQoNCjEuIFNjYWxhYmxlIHNlcnZlcnMsIHdoZXJlIGNhcmRz
-IGNvdWxkIGJlIHB1cmNoYXNlZCB0byBhZGQgcmVzb3VyY2VzIGFuZCBjb21wdXRlDQogICBvbiBk
-ZW1hbmQuIFRoaXMgbWlnaHQgYmUgdXNlZnVsIGZvciBzbWFsbCB0byBtZWRpdW0gZW50ZXJwcmlz
-ZXMgd2hvIHdvdWxkDQogICBsaWtlIHRvIHN0YXJ0IHdpdGggc29tZXRoaW5nIHNtYWxsIGJ1dCB3
-b3VsZCB3YW50IHRvIHNjYWxlIHVwIGluIHRpbWUgYXMgdGhlaXINCiAgIGJ1c2luZXNzIGdyb3dz
-LiBZb3Ugd291bGQgd2FudCB0byBrZWVwIHNvbWUgcmVzb3VyY2VzIGNsb3NlbHkgY291cGxlZCBi
-ZWNhdXNlDQogICBvZiAnTicgcmVhc29ucyANCjIuIERpZS9Tb0MgSG90cGx1Zywgc2ltaWxhciB0
-byBhYm92ZSBidXQgbW9yZSBncmFudWxhci4gVGhpcyBjb3VsZCBiZSB1c2VkIGZvcg0KICAgc2F2
-aW5nIHBvd2VyIGFzIHdlbGwuDQoNCkFnYWluIGFueSBvZiBhYm92ZSBsb29rcyB0byBiZSBhIGZh
-ci1mZXRjaGVkIGlkZWEgcmlnaHQgbm93LiANCg0KQnV0IHRoZXJlIGFyZSBkZWZpbml0ZSBiZW5l
-Zml0cyBhbmQgdXNlLWNhc2VzKGFzIGRlc2NyaWJlZCBpbiBRRU1VIHBhdGNoZXMpIHRvDQpzdXBw
-b3J0ICp2aXJ0dWFsKiBjcHUgaG90cGx1Zy4gUGx1cywgd2UgbmVlZCB0byBrZWVwIHRoZSB3YXkg
-d2Ugc3VwcG9ydCBob3RwbHVnDQpjb25zaXN0ZW50IHdpdGggeDg2LiBZZXMsIHRoZXJlIGFyZSBz
-b21lIGluaGVyZW50IGRpZmZlcmVuY2VzIGJldHdlZW4gQVBJQyBvZiB4ODYNCmFuZCBHSUMgb2Yg
-QVJNIGJ1dCB0aG9zZSB3b3JrYXJvdW5kIGFyZSBpbiB0aGUgUUVNVSBhbmQgdGhlIGd1ZXN0IGtl
-cm5lbCBpcw0KYWdub3N0aWMgYWJvdXQgdGhlbSBhbmQgc28gaXMgdGhlIGhvc3Qga2VybmVsLiBX
-aHkgbm90IGxldCB2aXJ0dWFsaXplciBkZWFsDQp3aXRoIHRoaXM/DQoNCkJUVywgaWYgeW91IGFy
-ZSBhd2FyZSBvZiBhbnkgcGh5c2ljYWwgY3B1IGhvdHBsdWcgaW1wbGVtZW50YXRpb25zIHRoZW4g
-cGxlYXNlDQpkbyBsZXQgdXMga25vdy4NCg0KDQo+IFdlIGNhbiBhc3N1bWUgc29tZSB3aWxsIGV4
-aXN0IGR1cmluZyB0aGUgbGlmZXRpbWUgb2YgYSBzdGFibGUta2VybmVsLiBUaGUNCj4gc3RhYmxl
-LWtlcm5lbA0KPiB3aWxsIGNsYWltIHRvIHN1cHBvcnQgdGhpcywgYnV0IGluIHJlYWxpdHkgaXQg
-d2lsbCBjcmFzaCBhbmQgYnVybiBpbiBleGNpdGluZw0KPiB3YXlzLg0KPiAoZS5nLiBwYXJ0cyBv
-ZiB0aGUgaW50ZXJydXB0IGNvbnRyb2xsZXIgaW4gdGhlIGhvdC1hZGRlZCBwYWNrYWdlIHdvdWxk
-IG5lZWQNCj4gY29uZmlndXJpbmcuDQo+IFdlJ2QgZWl0aGVyIGxvY2sgdXAgZHVyaW5nIGJvb3Qg
-d2hlbiB3ZSB0cnksIGJ1dCBpdHMgbm90IHRoZXJlIC4uLiBvciBub3QgZG8NCj4gaXQgd2hlbiB0
-aGUNCj4gcGFja2FnZSBpcyBhZGRlZCBiZWNhdXNlIHdlIGFzc3VtZWQgdGhpcyB3YXMgYSBWTSkN
-Cg0KDQpTdXJlLCBidXQgcmlnaHQgbm93IHdlIGFyZSBub3QgZXZlbiBhd2FyZSBvZiB0aGUgcGh5
-c2ljYWwgY3B1IGhvdHBsdWcgcmVxdWlyZW1lbnRzDQooYW5kIGxvb2sgdG8gYmUgZmFyLWZldGNo
-ZWQpIGJ1dCAqdmlydHVhbCogY3B1IGhvdHBsdWcgcmVxdWlyZW1lbnQgYXJlIHZlcnkgY2xlYXIu
-DQoNCkFzIGZhciBhcyBJIGNhbiB0ZWxsLCB0aGUgY2hhbmdlcyBiZWluZyBwcmVzZW50ZWQgYXJl
-IG5vbi1pbnRydXNpdmUgdG8gdGhlIGhvc3QNCmFuZCBndWVzdCBrZXJuZWwgYnV0IGlmIHRoZXJl
-IGFyZSBhbnkgYXNwZWN0cyBvZiB0aGUgcGF0Y2hlcyB3aGljaCBtYWtlIHlvdSBmZWVsDQpvdGhl
-cndpc2UgdGhlbiBwbGVhc2UgZG8gY2xhcmlmeSBvYmplY3RpdmVseSB0aGF0IGl0IHdpbGwgbWFr
-ZSBvdXIgbGlmZSBlYXNpZXIuDQoNCkFzIHN1Y2gsIGJyb2FkbHkgMiB0eXBlcyBvZiBjaGFuZ2Vz
-IGFyZSBiZWluZyBwcmVzZW50ZWQgaW4gdGhlIHBhdGNoOg0KMS4gQXJjaCBzcGVjaWZpYw0KICAg
-YS4gUmVzaHVmZmxpbmcgb2YgdGhlIGNvZGUgd2hlcmUgYW5kIGhvdyB0aGUgcHJlc2VudC9kaXNh
-YmxlZCBjcHVzIGFyZSBiZWluZw0KICAgICAgY291bnRlZCBhbmQgdGhlaXIgY29ycmVzcG9uZGlu
-ZyBtYXNrIHNldC4NCiAgIGIuIFRoZWlyIGNwdSBvcGVyYXRpb25zDQoyLiBHZW5lcmljIEFDUEkg
-Q1BVIGhvdHBsdWcgaG9va3Mgd2hpY2ggbGFuZHMgaW4gYXJjaCBzcGVjaWZpYyBjb2RlLiBUaGVz
-ZSBtdXN0DQogICBiZSBpbXBsZW1lbnRlZCBpbiBhbnkgY2FzZS4gIA0KDQpDaGFuZ2VzIGluIDFh
-LiBhbmQgMWIuKHBhcnQgb2YgcGF0Y2hlcyAwMS8wNCwgMDIvMDQsIDAzLzA0KSBhcmUgbWVyZSBy
-ZXNodWZmbGluZw0KdG8gYmUgZnJhbmsuIEFuZCByZXN0IGNoYW5nZXMgaW4gMi4gYXJlIHRoZSBo
-b29rcyBiZWluZyBjYWxsZWQgYnkgaG90cGx1Zw0Kc3BlY2lmaWMgZnJhbWV3b3JrLiANCg0KIA0K
-PiBJIGRvbid0IHRoaW5rIGxpbnV4IGNhbiBzdXBwb3J0IHRoaXMgZm9yIHZpcnR1YWwgbWFjaGlu
-ZXMgdW50aWwgaXQgd29ya3MgZm9yDQo+IHJlYWwgbWFjaGluZXMNCj4gdG9vLiBXZSBkb24ndCBo
-YXZlIGEgcmVsaWFibGUgd2F5IG9mIGRldGVybWluaW5nIHdlIGFyZSBydW5uaW5nIGluIGEgVk0u
-DQoNCg0KeDg2IHN1cHBvcnRzIGJvdGggcGh5c2ljYWwgYW5kIHZjcHUgaG90cGx1Zy4gQW5kIEkg
-Y291bGQgbm90IHNlZSBhbnkgY29kZSBmb3INCng4NiBjcHUgaG90cGx1ZyBzdXBwb3J0IGluc2lk
-ZSBrZXJuZWwgd2hpY2ggYXNzdW1lcyB0aGlzLiBOZWl0aGVyIGRvZXMgdGhpcyBjb2RlDQp1bmRl
-ciByZXZpZXcuDQoNCklNSE8sIHRoZSBjaGFuZ2VzIHNob3VsZCBiZSBzdWNoIHRoYXQgd2Ugc2hv
-dWxkIG5vdCByZXF1aXJlIHRoYXQgZGlzdGluY3Rpb24uDQpUaGlzIHBhdGNoLXNldCBoYXMgY2hh
-bmdlcyB3aGljaCBhcmUgcXVpdGUgZ2VuZXJpYy4NCg0KDQo+IFRoaXMgYXQgbGVhc3QgbmVlZHMg
-dGhlIEFDUEkgc3BlYyB1cGRhdGluZyB0byBkZXNjcmliZSB3aGF0IHdvcmsgdGhlIE9TIGhhcyB0
-bw0KPiBkbyB3aGVuIGENCj4gcGFja2FnZSBjb21lcyBvbmxpbmUsIGFuZCB3aGF0IGl0IGNhbid0
-IHRvdWNoIHVudGlsIHRoZW4uDQo+IEkgZG9uJ3QgdGhpbmsgdGhpcyB3b3JrIHdvdWxkIGhhcHBl
-biB3aXRob3V0IHNvbWVvbmUgYnVpbGRpbmcgc3VjaCBhIHN5c3RlbS4NCg0KDQpGYWlyIGVub3Vn
-aCwgSSB1bmRlcnN0YW5kIHRoaXMgcG9pbnQuIEJ1dCBkbyB5b3UgdGhpbmsgdGhpcyByZWFzb24g
-aXMgZ29vZA0KZW5vdWdoIHRvIGJsb2NrIGEgKnJlYWwqIHVzZSBjYXNlICh3aGljaCBpcyBpbiBk
-ZW1hbmQgYmVjYXVzZSBpdCBoZWxwcyB0aGUNCmJ1c2luZXNzIHBhcnQpIGZvciB0aGUgb25lIHdo
-aWNoIG1pZ2h0IGFjdHVhbGx5IG5ldmVyIGhhcHBlbj8gOikNCg0KTm90IGhhdmluZyAqdmlydHVh
-bCogY3B1IGhvdHBsdWcgZmVhdHVyZSBzdXBwb3J0IGRvZXMgaW1wYWN0cyB1c2UgY2FzZXMgb2YN
-CnRoZSBidXNpbmVzcyBhbmQgdGhlIGRlcGxveW1lbnQuIEFuZCB3aGVuIHlvdSBjb3VsZCBzZWUg
-eDg2IGhhcyBhIHdvbmRlcmZ1bCB3YXkNCnRvIHJlYWxpemUgdGhvc2UgdXNlLWNhc2VzIGJ1dCBB
-Uk0gY2Fubm90IHN1cHBvcnQgaXQganVzdCBiZWNhdXNlIGl0cyBzeXN0ZW0NCmFyY2hpdGVjdHVy
-ZSBkb2VzIG5vdCBzdXBwb3J0cyBpdC4gSXQgbWVhbnMgd2UgYXJlIGRlYWRsb2NrZWQ/DQoNCkFs
-dGhvdWdoIEkgZG8gdW5kZXJzdGFuZCB5b3VyIHBvaW50IGFuZCB0aGF0IHdlIG5lZWQgbW9yZSB0
-aG91Z2h0IG9uIHRoaXMNCnBhcnQgYXMgd2VsbCBidXQgaXQgaXMgaW1wb3J0YW50IHRoYXQgd2Ug
-bWF0Y2ggdGhlIHg4NiBzZXJ2ZXIgZmVhdHVyZXMgYW5kDQphYm92ZSBkZWFkbG9jayBpcyBibG9j
-a2luZyB0aGUgcmVhbCB1c2VmdWwgY2FzZXMgd2hpY2ggYXJlIGJlaW5nIGRlbWFuZGVkIGJ5DQpj
-dXN0b21lcnMuIFRoZXkgZG9u4oCZdCB3YW50IHRvIGdldCBhd2F5IGZyb20gdGhlIGxvb2stYW5k
-LWZlZWwgb2YgdGhlIHg4NiBpbg0KdGVybXMgb2YgdGhlIHdheSB0aGV5IGFyZSB1c2VkIGFuZCBj
-b25maWd1cmVkIGJ1dCBhY3R1YWxseSB3YW50IHRvIHVzZSBBUk0NCnNlcnZlcnMuDQoNCiANCj4g
-Pj4gMS4gSWRlbnRpZnkgZGlzYWJsZWQvcHJlc2VudCB2Y3B1cyBhbmQgc2V0L3Vuc2V0IHRoZSBw
-cmVzZW50IG1hc2sgb2YgdGhlIHZjcHUNCj4gPj4gICAgZHVyaW5nIGluaXRpYWxpemF0aW9uIGFu
-ZCBob3RwbHVnIGV2ZW50LiBJdCBtdXN0IGFsc28gc2V0IHRoZSBwb3NzaWJsZSBtYXNrDQo+ID4+
-ICAgICh3aGljaCBpbmNsdWRlcyBkaXNhYmxlZCB2Y3B1cykgZHVyaW5nIGluaXQgb2YgZ3Vlc3Qg
-a2VybmVsLg0KPiA+PiAyLiBQcm92aWRlIGFyY2hpdGVjdHVyZSBzcGVjaWZpYyBBQ1BJIGhvb2tz
-LCBmb3IgZXhhbXBsZSB0byBtYXAvdW5tYXAgdGhlDQo+ID4+ICAgIGxvZ2ljYWwgY3B1aWQgdG8g
-aHdpZHMvTVBJRFIuIExpbnV4IGtlcm5lbCBhbHJlYWR5IGhhcyBnZW5lcmljIEFDUEkgY3B1DQo+
-ID4+ICAgIGhvdHBsdWcgZnJhbWV3b3JrIHN1cHBvcnQuDQo+IA0KPiA+PiBDaGFuZ2VzIGludHJv
-ZHVjZWQgaW4gdGhpcyBwYXRjaC1zZXQgYWxzbyBlbnN1cmVzIHRoYXQgaW5pdGlhbGl6YXRpb24g
-b2YgdGhlDQo+ID4+IGNwdXMgd2hlbiB2aXJ0dWFsIGNwdSBob3RwbHVnIGlzIG5vdCBzdXBwb3J0
-ZWQgcmVtYWlucyB1bi1hZmZlY3RlZC4NCj4gDQo+IEJ1dCBvbiBhIHBsYXRmb3JtIHdpdGggcGh5
-c2ljYWwgY3B1IGhvdHBsdWcsIHJlYWxseS1iYWQtdGhpbmdzIHdpbGwgaGFwcGVuLg0KDQoNCk9r
-LiBCdXQgdGhlbiBpZiB3ZSBoYXZlIHBoeXNpY2FsIGhvdHBsdWcgc3VwcG9ydCB0aGVuIHdlIHdp
-bGwgKmV4YWN0bHkqIGtub3cNCmhvdyBpdCBpcyBkaWZmZXJlbnQgdGhhbiB0aGUgeDg2IGluIHRl
-cm1zIG9mIHVzaW5nIHRoZSBnZW5lcmljIEFDUEkgY3B1IGhvdHBsdWcNCmZyYW1ld29yayBhbmQg
-YWxzbyBpbiB0ZXJtcyBvZiBhbnkgY2hhbmdlcyB3aGljaCBtaWdodCByZXF1aXJlIGF0IHRoZSBh
-cmNoaXRlY3R1cmUNCnNwZWNpZmljIGNvZGUgdGhhbiB0aGUgb25lcyB3aGljaCBoYXZlIGJlZW4g
-c3VnZ2VzdGVkIGhlcmUuIENhbid0IHdlIGRlYWwgdGhhdA0KZ3JleSBub3Qgc28gY2xlYXIgcGFy
-dCBsYXRlcj8NCg0KIA0KPiBUaGVyZSBpcyBubyBkZXNjcmlwdGlvbiBoZXJlIG9mIHdoYXQgcHJv
-YmxlbSB5b3UgYXJlIHRyeWluZyB0byBzb2x2ZS4gSSBkb24ndA0KPiBiZWxpZXZlICdjcHUgaG90
-bHB1ZycgaXMgYW4gZW5kIGluIGl0c2VsZi4NCj4gDQo+IH4NCj4gDQo+IEFoYSwgaXRzIGluIHRo
-ZSBxZW11IGNvdmVyIGxldHRlcjoNCj4gfCBUaGlzIGFsbG93cyBzY2FsaW5nIHRoZSBndWVzdCBW
-TSBjb21wdXRlIGNhcGFjaXR5IG9uLWRlbWFuZCB3aGljaCB3b3VsZCBiZQ0KPiB8IHVzZWZ1bCBm
-b3IgdGhlIGZvbGxvd2luZyBleGFtcGxlIHNjZW5hcmlvcywNCj4gfCAxLiBWZXJ0aWNhbCBQb2Qg
-QXV0b3NjYWxpbmdbM11bNF0gaW4gdGhlIGNsb3VkOiBQYXJ0IG9mIHRoZSBvcmNoZXN0cmF0aW9u
-DQo+IHwgICBmcmFtZXdvcmsgd2hpY2ggY291bGQgYWRqdXN0IHJlc291cmNlIHJlcXVlc3RzIChD
-UFUgYW5kIE1lbSByZXF1ZXN0cykgZm9yDQo+IHwgICB0aGUgY29udGFpbmVycyBpbiBhIHBvZCwg
-YmFzZWQgb24gdXNhZ2UuDQo+IHwyLiBQYXktYXMteW91LWdyb3cgQnVzaW5lc3MgTW9kZWw6IElu
-ZnJhc3RydWN0dXJlIHByb3ZpZGVyIGNvdWxkIGFsbG9jYXRlIGFuZA0KPiB8ICAgcmVzdHJpY3Qg
-dGhlIHRvdGFsIG51bWJlciBvZiBjb21wdXRlIHJlc291cmNlcyBhdmFpbGFibGUgdG8gdGhlIGd1
-ZXN0IFZNDQo+IHwgICBhY2NvcmRpbmcgdG8gdGhlIFNMQShTZXJ2aWNlIExldmVsIEFncmVlbWVu
-dCkuIFZNIG93bmVyIGNvdWxkIHJlcXVlc3QgZm9yDQo+IHwgICBtb3JlIGNvbXB1dGUgdG8gYmUg
-aG90LXBsdWdnZWQgZm9yIHNvbWUgY29zdC4NCj4gDQo+IENvbnRyb2xsaW5nIENQVSB0aW1lIG1h
-a2VzIHBlcmZlY3Qgc2Vuc2UuIEJ1dCBkb2Vzbid0IGNncm91cCBhbHJlYWR5IGRvIGV4YWN0bHkN
-Cj4gdGhpcz8NCg0KDQpJIGFtIG5vdCBzdXJlIEkgY2xlYXJseSB1bmRlcnN0b29kIHdoYXQgeW91
-IG1lYW4gYnkgJ2NwdSB0aW1lJyBoZXJlPw0KDQpCdXQgZmV3IHBvaW50czoNCjEuIFdlIGNhbm5v
-dCBhY2hpZXZlIDIuIGJ5IGFueSB3YXkgaWYgeW91IGRvbuKAmXQgaGF2ZSBhY3R1YWwgc3VwcG9y
-dCBvZiBjcHUgaG90cGx1Zy4NCiAgIFVzZXIgd2FudHMgeDg2IGtpbmQgb2YgaW5mcmFzdHJ1Y3R1
-cmUgd2hlcmUgaGlzIGV4aXN0aW5nIGZyYW1ld29yayBvciBzY3JpcHRzDQogICBmb3IgTGlidmly
-dCBldGMgY291bGQgd29yayBldmVuIHdpdGggQVJNIHBsYXRmb3Jtcy4gDQoyLiBXZSB3YW50IHRv
-IHB1c2ggIGFkbWluIG9mIHZjcHUgYW5kIGl0cyByZXNvdXJjZSBhbGxvY2F0aW9uIGRvd24gdG8g
-dGhlIGxheWVyDQogICB3aGVyZSBpdCBzaG91bGQgYmVsb25nIGkuZS4gUUVNVSBhbmQgbm90IHRo
-ZSBndWVzdCBpdHNlbGYuIFRoZXJlIGNvdWxkIGJlIGNhc2VzDQogICB3aGVuIHVzZXIgd291bGQg
-bm90IHdhbnQgZXZlbiBhZG1pbiB0byBlbnRlciBoaXMgVk0gYW5kIHVzZSBndWVzdCBjb21tYW5k
-IGxpbmUNCiAgIHRvIGNvbmZpZ3VyZSB0aGUgbWFjaGluZS4gQW5kIHVzaW5nIGEgcHJpdmlsZWdl
-ZCBtb2RlIG9mIHRoZSBndWVzdCB0byByZXN0cmljdA0KICAgdGhlIHVzZXIgaGltc2VsZiB0byBw
-ZXJmb3JtIHRoZSBzYW1lIG9wZXJhdGlvbiBmcm9tIGhpcyBjb21tYW5kIGxpbmUgaXMNCiAgIGlu
-aGVyZW50bHkgaW5zZWN1cmUgYW5kIG5vdCBhbiBpZGVhbCBzb2x1dGlvbi4gDQoNCg0KPiBJZiBh
-IFZNIGlzIHJlc3RyaWN0ZWQgdG8gMXhDUFUgb2YgY3B1LXRpbWUsIGl0IGNhbiBvbmxpbmUgYXMg
-bWFueSB2Y3B1IGFzIGl0DQo+IGxpa2VzLCBpdHMNCj4gbm90IGdvaW5nIHRvIGdldCBtb3JlIHRo
-YW4gMXhDUFUgb2YgY3B1LXRpbWUuDQoNCg0KRm9yZ2l2ZSBtZSwgaWYgSSBhbSBtaXNzaW5nIHNv
-bWV0aGluZyB0ZXJyaWJseSBzaW1wbGUgaGVyZSBidXQgY291bGQgeW91IHBsZWFzZQ0KY2xhcmlm
-eSBtb3JlLiBJIGFtIG5vdCBhYmxlIHRvIGNhdGNoIHdoYXQgeW91IG1lYW4gaGVyZSBieSBjcHUt
-dGltZT8NCg0KDQo+IEkgdW5kZXJzdGFuZCB0aGF0IHRoaXMgaXMgaG93IGt1YmVybmV0ZXMgcmVj
-b25maWd1cmVzIGEgVk0gb24geDg2LCBidXQgSSdtIGZhaXJseQ0KPiBzdXJlIHg4Ng0KPiBoYWQg
-cGh5c2ljYWwgY3B1IGhvdHBsdWcgYmVmb3JlLCBzbyB0aGUgZmlybXdhcmUvT1MgcmVzcG9uc2li
-aWxpdGllcyB3ZXJlIHdlbGwNCj4gdW5kZXJzdG9vZC4NCg0KDQpPbiB0aGUgbGFzdCBwYXJ0LCB5
-ZXMgcGh5c2ljYWwgY3B1IGhvdHBsdWcgaXMgc3VwcG9ydGVkIGluIHg4NiBidXQgaWYgeW91IHNl
-ZSB0aGUNClFFTVUgY29kZSwgY2xlYXJseSB0aGUgb25seSBkaWZmZXJlbmNlIGlzIHRoZSBMb2Nh
-bCBBUElDIHdoaWNoIGlzIHBlciB2Y3B1IGFuZCBjYW4NCmJlIGRlZmVycmVkIHJlYWxpemVkIHRp
-bGwgdGhlIHRpbWUgdGhlIHZjcHUgaXMgaG90cGx1Z2dlZC4gVGhpcyBpcyB0aGUga2V5IGRpZmZl
-cmVuY2UNCndpdGggQVJNIEdJQyB3aGljaCByZXF1aXJlcyBpdHMgcmVkaXN0cmlidXRvcnMgYW5k
-IENQVSBpbnRlcmZhY2VzIGFsbCB0byBiZSBwcmVzZW50DQphbmQgcmVhbGl6ZWQgYXQgdGhlIHRp
-bWUgb2YgR0lDIGluaXQgdGltZS4gIFdlIHNvbHZlIHRoaXMgcHJvYmxlbSBieSBwcmUtc2l6aW5n
-IHRoZQ0KdmdpYyB3aXRoIHRoZSBwb3NzaWJsZSB2Y3B1cyBhdCBRRU1VLg0KDQoNCj4gDQo+IA0K
-PiBJIHRoaW5rIHRoaXMgc2VyaWVzIGNyZWF0ZXMgYSBzdXBwb3J0IG5pZ2h0bWFyZSBmb3IgdGhl
-IGZ1dHVyZS4NCg0KDQpDb3VsZCB5b3UgYmUgbW9yZSBzcGVjaWZpYyBwbGVhc2UgaW4gcG9pbnRp
-bmcgaW4gdGhlIHBhdGNoZXMgd2hpY2ggcGFydCBvciBhc3N1bXB0aW9uDQpJcyBvYmplY3Rpb25h
-YmxlPw0KDQoNCj4gVGhpcyBoYXMgY29tZSB1cCBiZWZvcmU6DQo+IGh0dHBzOi8vbG9yZS5rZXJu
-ZWwub3JnL2t2bWFybS84Mjg3OTI1OC00NmE3LWE2ZTktZWU1NC1mYzM2OTJjMWNkYzNAYXJtLmNv
-bQ0KPiAvDQoNCg0KWWVzLCB3ZSBhcmUgYXdhcmUgb2YgdGhhdC4gUGxlYXNlIGNoZWNrIHRoZSBS
-ZWZlcmVuY2UgWzJdIG9mIHRoaXMgcGF0Y2gtc2V0IEkgaGF2ZQ0KbWVudGlvbmVkIHRoYXQgZGlz
-Y3Vzc2lvbi4gVGhpcyBwYXRjaC1zZXQgaGFzIGNoYW5nZWQgdGhlIGltcGxlbWVudGF0aW9uIGFu
-ZCBpcw0Kbm93IHdvcmtpbmcgd2l0aCBkaWZmZXJlbnQgc2V0IG9mIFFFTVUgY2hhbmdlcyBiYXNl
-ZCB1cG9uIE1hcmMncyBzdWdnZXN0aW9ucy4NClNvIGJvdGggUUVNVSBhbmQga2VybmVsIHBhcnQg
-aGFzIGJlZW4gcmUtd3JpdHRlbiBpbiB0aGUgcGFzdCA2IG1vbnRocy4NCg0KTGluazogaHR0cHM6
-Ly9saXN0cy5jcy5jb2x1bWJpYS5lZHUvcGlwZXJtYWlsL2t2bWFybS8yMDE4LUp1bHkvMDMyMzE2
-Lmh0bWwNCg0KDQoNCg0KVGhhbmtzLA0KU2FsaWwNCg0KDQo+IFRoYW5rcywNCj4gDQo+IEphbWVz
-DQo+IA0KPiANCj4gPj4gUmVwb3NpdG9yeToNCj4gPj4gKCopIEtlcm5lbCBjaGFuZ2VzIGFyZSBh
-dCwNCj4gPj4gICAgICBodHRwczovL2dpdGh1Yi5jb20vc2FsaWwtbWVodGEvbGludXguZ2l0IHZp
-cnQtY3B1aHAtYXJtNjQvcmZjLXYxDQo+ID4+ICgqKSBRRU1VIGNoYW5nZXMgZm9yIHZjcHUgaG90
-cGx1ZyBjb3VsZCBiZSBjbG9uZWQgZnJvbSBiZWxvdyBzaXRlLA0KPiA+PiAgICAgIGh0dHBzOi8v
-Z2l0aHViLmNvbS9zYWxpbC1tZWh0YS9xZW11LmdpdCB2aXJ0LWNwdWhwLWFybXY4L3JmYy12MQ0K
-PiA+Pg0KPiA+Pg0KPiA+PiBUSElOR1MgVE8gRE86DQo+ID4+IDEuIEhhbmRsaW5nIG9mIHBlci1j
-cHUgdmFyaWFibGVzIGVzcGVjaWFsbHkgdGhlIGZpcnN0LWNodW5rIGFsbG9jYXRpb25zDQo+ID4+
-ICAgICh3aGljaCBhcmUgTlVNQSBhd2FyZSkgd2hlbiB0aGUgdmNwdSBpcyBob3RwbHVnZ2VkIG5l
-ZWRzIGZ1cnRoZXIgYXR0ZW50aW9uDQo+ID4+ICAgIGFuZCByZXZpZXcuDQo+ID4+IDIuIE5VTUEg
-cmVsYXRlZCBzdHVmZiBoYXMgbm90IGJlZW4gZnVsbHkgdGVzdGVkIGJvdGggaW4gUUVNVSBhbmQg
-a2VybmVsLg0KPiA+PiAzLiBDb21wcmVoZW5zaXZlIFRlc3RpbmcgaW5jbHVkaW5nIHdoZW4gY3B1
-IGhvdHBsdWcgaXMgbm90IHN1cHBvcnRlZC4NCj4gPj4gNC4gRG9jcw0KPiA+Pg0KPiA+PiBESVND
-TEFJTUVSOg0KPiA+PiBUaGlzIGlzIG5vdCBhIGNvbXBsZXRlIHdvcmsgYnV0IGFuIGVmZm9ydCB0
-byBwcmVzZW50IHRoZSBhcm0gdmNwdSBob3RwbHVnDQo+ID4+IGltcGxlbWVudGF0aW9uIHRvIHRo
-ZSBjb21tdW5pdHkuIFRoaXMgUkZDIGlzIGJlaW5nIHVzZWQgYXMgYSB3YXkgdG8gdmVyaWZ5DQo+
-ID4+IHRoZSBpZGVhIG1lbnRpb25lZCBhYm92ZSBhbmQgdG8gc3VwcG9ydCBjaGFuZ2VzIHByZXNl
-bnRlZCBmb3IgUUVNVVsxXSB0bw0KPiA+PiBzdXBwb3J0IHZjcHUgaG90cGx1Zy4gQXMgb2Ygbm93
-IHRoaXMgaXMgKm5vdCogYSBwcm9kdWN0aW9uIGxldmVsIGNvZGUgYW5kDQo+IG1pZ2h0DQo+ID4+
-IGhhdmUgYnVncy4gT25seSBhIGJhc2ljIHRlc3RpbmcgaGFzIGJlZW4gZG9uZSBvbiBIaVNpbGlj
-b24gS3VucGVuZzkyMCBBUk02NA0KPiA+PiBiYXNlZCBTb0MgZm9yIFNlcnZlcnMgdG8gdmVyaWZ5
-IHRoZSBwcm9vZi1vZi1jb25jZXB0IHRoYXQgaGFzIGJlZW4gZm91bmQNCj4gd29ya2luZyENCj4g
-Pj4NCj4gPj4gQmVzdCByZWdhcmRzDQo+ID4+IFNhbGlsLg0KPiA+Pg0KPiA+PiBSRUZFUkVOQ0VT
-Og0KPiA+PiBbMV0gaHR0cHM6Ly93d3cubWFpbC1hcmNoaXZlLmNvbS9xZW11LWRldmVsQG5vbmdu
-dS5vcmcvbXNnNzEyMDEwLmh0bWwNCj4gPj4gWzJdIGh0dHBzOi8vbGttbC5vcmcvbGttbC8yMDE5
-LzYvMjgvMTE1Nw0KPiA+PiBbM10gaHR0cHM6Ly9saXN0cy5jcy5jb2x1bWJpYS5lZHUvcGlwZXJt
-YWlsL2t2bWFybS8yMDE4LUp1bHkvMDMyMzE2Lmh0bWwNCj4gPj4NCj4gPj4gT3JnYW5pemF0aW9u
-IG9mIFBhdGNoZXM6DQo+ID4+IFtQYXRjaCAxLTNdDQo+ID4+ICgqKSBDaGFuZ2VzIHJlcXVpcmVk
-IGR1cmluZyBndWVzdCBib290IHRpbWUgdG8gc3VwcG9ydCB2Y3B1IGhvdHBsdWcNCj4gPj4gKCop
-IE1heCBjcHUgb3ZlcmZsb3cgY2hlY2tzDQo+ID4+ICgqKSBDaGFuZ2VzIHJlcXVpcmVkIHRvIHBy
-ZS1zZXR1cCBjcHUtb3BlcmF0aW9ucyBldmVuIGZvciBkaXNhYmxlZCBjcHVzDQo+ID4+IFtQYXRj
-aCA0XQ0KPiA+PiAoKikgQXJjaCBjaGFuZ2VzIHJlcXVpcmVkIGJ5IGd1ZXN0IGtlcm5lbCBBQ1BJ
-IENQVSBIb3RwbHVnIGZyYW1ld29yay4NCj4gPj4NCj4gPj4NCj4gPj4gU2FsaWwgTWVodGEgKDQp
-Og0KPiA+PiAgIGFybTY0OiBrZXJuZWw6IEhhbmRsZSBkaXNhYmxlZFsoKylwcmVzZW50XSBjcHVz
-IGluIE1BRFQvR0lDQyBkdXJpbmcNCj4gPj4gICAgIGluaXQNCj4gPj4gICBhcm02NDoga2VybmVs
-OiBCb3VuZCB0aGUgdG90YWwocHJlc2VudCtkaXNhYmxlZCkgY3B1cyB3aXRoIG5yX2NwdV9pZHMN
-Cj4gPj4gICBhcm02NDoga2VybmVsOiBJbml0IGNwdSBvcGVyYXRpb25zIGZvciBhbGwgcG9zc2li
-bGUgdmNwdXMNCj4gPj4gICBhcm02NDoga2VybmVsOiBBcmNoIHNwZWNpZmljIEFDUEkgaG9va3Mo
-bGlrZSBsb2dpY2FsIGNwdWlkPC0+aHdpZA0KPiA+PiAgICAgZXRjLikNCj4gPj4NCj4gPj4gIGFy
-Y2gvYXJtNjQva2VybmVsL3NtcC5jIHwgMTUzICsrKysrKysrKysrKysrKysrKysrKysrKysrKysr
-KysrLS0tLS0tLS0NCj4gPj4gIDEgZmlsZSBjaGFuZ2VkLCAxMjMgaW5zZXJ0aW9ucygrKSwgMzAg
-ZGVsZXRpb25zKC0pDQo+ID4+DQo+ID4+IC0tDQo+ID4+IDIuMTcuMQ0KPiA+Pg0KPiA+DQoNCg==
+Hi Marc,
+
+At first I was a bit apprehensive about adding yet another layer of indirection to
+the arch timer. But after spending some time trying to figure out if there's a
+better way to do it, I came to the conclusion that the patch is actually an
+improvement because it makes it obvious what timers we are emulating today, and
+the registers associated with each of them.
+
+On 7/6/20 1:54 PM, Marc Zyngier wrote:
+> Move the timer gsisters to the sysreg file. This will further help when
+
+s/gsisters/registers
+
+> they are directly changed by a nesting hypervisor in the VNCR page.
+>
+> This requires moving the initialisation of the timer struct so that some
+> of the helpers (such as arch_timer_ctx_index) can work correctly at an
+> early stage.
+>
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  arch/arm64/include/asm/kvm_host.h |   6 ++
+>  arch/arm64/kvm/arch_timer.c       | 155 +++++++++++++++++++++++-------
+>  arch/arm64/kvm/trace_arm.h        |   8 +-
+>  include/kvm/arm_arch_timer.h      |  11 +--
+>  4 files changed, 136 insertions(+), 44 deletions(-)
+>
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index 91b1adb6789c..e1a32c0707bb 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -189,6 +189,12 @@ enum vcpu_sysreg {
+>  	SP_EL1,
+>  	SPSR_EL1,
+>  
+> +	CNTVOFF_EL2,
+> +	CNTV_CVAL_EL0,
+> +	CNTV_CTL_EL0,
+> +	CNTP_CVAL_EL0,
+> +	CNTP_CTL_EL0,
+> +
+>  	/* 32bit specific registers. Keep them at the end of the range */
+>  	DACR32_EL2,	/* Domain Access Control Register */
+>  	IFSR32_EL2,	/* Instruction Fault Status Register */
+> diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
+> index 33d85a504720..32ba6fbc3814 100644
+> --- a/arch/arm64/kvm/arch_timer.c
+> +++ b/arch/arm64/kvm/arch_timer.c
+> @@ -51,6 +51,93 @@ static u64 kvm_arm_timer_read(struct kvm_vcpu *vcpu,
+>  			      struct arch_timer_context *timer,
+>  			      enum kvm_arch_timer_regs treg);
+>  
+> +u32 timer_get_ctl(struct arch_timer_context *ctxt)
+> +{
+> +	struct kvm_vcpu *vcpu = ctxt->vcpu;
+> +
+> +	switch(arch_timer_ctx_index(ctxt)) {
+> +	case TIMER_VTIMER:
+> +		return __vcpu_sys_reg(vcpu, CNTV_CTL_EL0);
+> +	case TIMER_PTIMER:
+> +		return __vcpu_sys_reg(vcpu, CNTP_CTL_EL0);
+> +	default:
+> +		WARN_ON(1);
+> +		return 0;
+> +	}
+> +}
+> +
+> +u64 timer_get_cval(struct arch_timer_context *ctxt)
+> +{
+> +	struct kvm_vcpu *vcpu = ctxt->vcpu;
+> +
+> +	switch(arch_timer_ctx_index(ctxt)) {
+> +	case TIMER_VTIMER:
+> +		return __vcpu_sys_reg(vcpu, CNTV_CVAL_EL0);
+> +	case TIMER_PTIMER:
+> +		return __vcpu_sys_reg(vcpu, CNTP_CVAL_EL0);
+> +	default:
+> +		WARN_ON(1);
+> +		return 0;
+> +	}
+> +}
+> +
+> +static u64 timer_get_offset(struct arch_timer_context *ctxt)
+> +{
+> +	struct kvm_vcpu *vcpu = ctxt->vcpu;
+> +
+> +	switch(arch_timer_ctx_index(ctxt)) {
+> +	case TIMER_VTIMER:
+> +		return __vcpu_sys_reg(vcpu, CNTVOFF_EL2);
+> +	default:
+> +		return 0;
+
+How about adding a TIMER_PTIMER case that returns 0, and adding a warning to the
+default case?
+
+> +	}
+> +}
+> +
+> +static void timer_set_ctl(struct arch_timer_context *ctxt, u32 ctl)
+> +{
+> +	struct kvm_vcpu *vcpu = ctxt->vcpu;
+> +
+> +	switch(arch_timer_ctx_index(ctxt)) {
+> +	case TIMER_VTIMER:
+> +		__vcpu_sys_reg(vcpu, CNTV_CTL_EL0) = ctl;
+> +		break;
+> +	case TIMER_PTIMER:
+> +		__vcpu_sys_reg(vcpu, CNTP_CTL_EL0) = ctl;
+> +		break;
+> +	default:
+> +		WARN_ON(1);
+> +	}
+> +}
+> +
+> +static void timer_set_cval(struct arch_timer_context *ctxt, u64 cval)
+> +{
+> +	struct kvm_vcpu *vcpu = ctxt->vcpu;
+> +
+> +	switch(arch_timer_ctx_index(ctxt)) {
+> +	case TIMER_VTIMER:
+> +		__vcpu_sys_reg(vcpu, CNTV_CVAL_EL0) = cval;
+> +		break;
+> +	case TIMER_PTIMER:
+> +		__vcpu_sys_reg(vcpu, CNTP_CVAL_EL0) = cval;
+> +		break;
+> +	default:
+> +		WARN_ON(1);
+> +	}
+> +}
+> +
+> +static void timer_set_offset(struct arch_timer_context *ctxt, u64 offset)
+> +{
+> +	struct kvm_vcpu *vcpu = ctxt->vcpu;
+> +
+> +	switch(arch_timer_ctx_index(ctxt)) {
+> +	case TIMER_VTIMER:
+> +		__vcpu_sys_reg(vcpu, CNTVOFF_EL2) = offset;
+> +		break;
+> +	default:
+> +		WARN(offset, "timer %ld\n", arch_timer_ctx_index(ctxt));
+
+Hmm.. looks to me like the warning isn't triggered when the offset is
+TIMER_PTIMER, which is 0.
+
+A more general remark about the accessors. They only access the copy in memory,
+perhaps it's worth adding a WARN_ON(ctxt->loaded) to catch future errors.
+
+I've checked the rest of the patch, and the changes look semantically equivalent
+to me.
+
+Thanks,
+Alex
+> +	}
+> +}
+> +
+>  u64 kvm_phys_timer_read(void)
+>  {
+>  	return timecounter->cc->read(timecounter->cc);
+> @@ -124,8 +211,8 @@ static u64 kvm_timer_compute_delta(struct arch_timer_context *timer_ctx)
+>  {
+>  	u64 cval, now;
+>  
+> -	cval = timer_ctx->cnt_cval;
+> -	now = kvm_phys_timer_read() - timer_ctx->cntvoff;
+> +	cval = timer_get_cval(timer_ctx);
+> +	now = kvm_phys_timer_read() - timer_get_offset(timer_ctx);
+>  
+>  	if (now < cval) {
+>  		u64 ns;
+> @@ -144,8 +231,8 @@ static bool kvm_timer_irq_can_fire(struct arch_timer_context *timer_ctx)
+>  {
+>  	WARN_ON(timer_ctx && timer_ctx->loaded);
+>  	return timer_ctx &&
+> -	       !(timer_ctx->cnt_ctl & ARCH_TIMER_CTRL_IT_MASK) &&
+> -		(timer_ctx->cnt_ctl & ARCH_TIMER_CTRL_ENABLE);
+> +		((timer_get_ctl(timer_ctx) &
+> +		  (ARCH_TIMER_CTRL_IT_MASK | ARCH_TIMER_CTRL_ENABLE)) == ARCH_TIMER_CTRL_ENABLE);
+>  }
+>  
+>  /*
+> @@ -256,8 +343,8 @@ static bool kvm_timer_should_fire(struct arch_timer_context *timer_ctx)
+>  	if (!kvm_timer_irq_can_fire(timer_ctx))
+>  		return false;
+>  
+> -	cval = timer_ctx->cnt_cval;
+> -	now = kvm_phys_timer_read() - timer_ctx->cntvoff;
+> +	cval = timer_get_cval(timer_ctx);
+> +	now = kvm_phys_timer_read() - timer_get_offset(timer_ctx);
+>  
+>  	return cval <= now;
+>  }
+> @@ -350,8 +437,8 @@ static void timer_save_state(struct arch_timer_context *ctx)
+>  
+>  	switch (index) {
+>  	case TIMER_VTIMER:
+> -		ctx->cnt_ctl = read_sysreg_el0(SYS_CNTV_CTL);
+> -		ctx->cnt_cval = read_sysreg_el0(SYS_CNTV_CVAL);
+> +		timer_set_ctl(ctx, read_sysreg_el0(SYS_CNTV_CTL));
+> +		timer_set_cval(ctx, read_sysreg_el0(SYS_CNTV_CVAL));
+>  
+>  		/* Disable the timer */
+>  		write_sysreg_el0(0, SYS_CNTV_CTL);
+> @@ -359,8 +446,8 @@ static void timer_save_state(struct arch_timer_context *ctx)
+>  
+>  		break;
+>  	case TIMER_PTIMER:
+> -		ctx->cnt_ctl = read_sysreg_el0(SYS_CNTP_CTL);
+> -		ctx->cnt_cval = read_sysreg_el0(SYS_CNTP_CVAL);
+> +		timer_set_ctl(ctx, read_sysreg_el0(SYS_CNTP_CTL));
+> +		timer_set_cval(ctx, read_sysreg_el0(SYS_CNTP_CVAL));
+>  
+>  		/* Disable the timer */
+>  		write_sysreg_el0(0, SYS_CNTP_CTL);
+> @@ -429,14 +516,14 @@ static void timer_restore_state(struct arch_timer_context *ctx)
+>  
+>  	switch (index) {
+>  	case TIMER_VTIMER:
+> -		write_sysreg_el0(ctx->cnt_cval, SYS_CNTV_CVAL);
+> +		write_sysreg_el0(timer_get_cval(ctx), SYS_CNTV_CVAL);
+>  		isb();
+> -		write_sysreg_el0(ctx->cnt_ctl, SYS_CNTV_CTL);
+> +		write_sysreg_el0(timer_get_ctl(ctx), SYS_CNTV_CTL);
+>  		break;
+>  	case TIMER_PTIMER:
+> -		write_sysreg_el0(ctx->cnt_cval, SYS_CNTP_CVAL);
+> +		write_sysreg_el0(timer_get_cval(ctx), SYS_CNTP_CVAL);
+>  		isb();
+> -		write_sysreg_el0(ctx->cnt_ctl, SYS_CNTP_CTL);
+> +		write_sysreg_el0(timer_get_ctl(ctx), SYS_CNTP_CTL);
+>  		break;
+>  	case NR_KVM_TIMERS:
+>  		BUG();
+> @@ -528,7 +615,7 @@ void kvm_timer_vcpu_load(struct kvm_vcpu *vcpu)
+>  		kvm_timer_vcpu_load_nogic(vcpu);
+>  	}
+>  
+> -	set_cntvoff(map.direct_vtimer->cntvoff);
+> +	set_cntvoff(timer_get_offset(map.direct_vtimer));
+>  
+>  	kvm_timer_unblocking(vcpu);
+>  
+> @@ -639,8 +726,8 @@ int kvm_timer_vcpu_reset(struct kvm_vcpu *vcpu)
+>  	 * resets the timer to be disabled and unmasked and is compliant with
+>  	 * the ARMv7 architecture.
+>  	 */
+> -	vcpu_vtimer(vcpu)->cnt_ctl = 0;
+> -	vcpu_ptimer(vcpu)->cnt_ctl = 0;
+> +	timer_set_ctl(vcpu_vtimer(vcpu), 0);
+> +	timer_set_ctl(vcpu_ptimer(vcpu), 0);
+>  
+>  	if (timer->enabled) {
+>  		kvm_timer_update_irq(vcpu, false, vcpu_vtimer(vcpu));
+> @@ -668,13 +755,13 @@ static void update_vtimer_cntvoff(struct kvm_vcpu *vcpu, u64 cntvoff)
+>  
+>  	mutex_lock(&kvm->lock);
+>  	kvm_for_each_vcpu(i, tmp, kvm)
+> -		vcpu_vtimer(tmp)->cntvoff = cntvoff;
+> +		timer_set_offset(vcpu_vtimer(tmp), cntvoff);
+>  
+>  	/*
+>  	 * When called from the vcpu create path, the CPU being created is not
+>  	 * included in the loop above, so we just set it here as well.
+>  	 */
+> -	vcpu_vtimer(vcpu)->cntvoff = cntvoff;
+> +	timer_set_offset(vcpu_vtimer(vcpu), cntvoff);
+>  	mutex_unlock(&kvm->lock);
+>  }
+>  
+> @@ -684,9 +771,12 @@ void kvm_timer_vcpu_init(struct kvm_vcpu *vcpu)
+>  	struct arch_timer_context *vtimer = vcpu_vtimer(vcpu);
+>  	struct arch_timer_context *ptimer = vcpu_ptimer(vcpu);
+>  
+> +	vtimer->vcpu = vcpu;
+> +	ptimer->vcpu = vcpu;
+> +
+>  	/* Synchronize cntvoff across all vtimers of a VM. */
+>  	update_vtimer_cntvoff(vcpu, kvm_phys_timer_read());
+> -	ptimer->cntvoff = 0;
+> +	timer_set_offset(ptimer, 0);
+>  
+>  	hrtimer_init(&timer->bg_timer, CLOCK_MONOTONIC, HRTIMER_MODE_ABS_HARD);
+>  	timer->bg_timer.function = kvm_bg_timer_expire;
+> @@ -704,9 +794,6 @@ void kvm_timer_vcpu_init(struct kvm_vcpu *vcpu)
+>  
+>  	vtimer->host_timer_irq_flags = host_vtimer_irq_flags;
+>  	ptimer->host_timer_irq_flags = host_ptimer_irq_flags;
+> -
+> -	vtimer->vcpu = vcpu;
+> -	ptimer->vcpu = vcpu;
+>  }
+>  
+>  static void kvm_timer_init_interrupt(void *info)
+> @@ -756,10 +843,12 @@ static u64 read_timer_ctl(struct arch_timer_context *timer)
+>  	 * UNKNOWN when ENABLE bit is 0, so we chose to set ISTATUS bit
+>  	 * regardless of ENABLE bit for our implementation convenience.
+>  	 */
+> +	u32 ctl = timer_get_ctl(timer);
+> +
+>  	if (!kvm_timer_compute_delta(timer))
+> -		return timer->cnt_ctl | ARCH_TIMER_CTRL_IT_STAT;
+> -	else
+> -		return timer->cnt_ctl;
+> +		ctl |= ARCH_TIMER_CTRL_IT_STAT;
+> +
+> +	return ctl;
+>  }
+>  
+>  u64 kvm_arm_timer_get_reg(struct kvm_vcpu *vcpu, u64 regid)
+> @@ -795,8 +884,8 @@ static u64 kvm_arm_timer_read(struct kvm_vcpu *vcpu,
+>  
+>  	switch (treg) {
+>  	case TIMER_REG_TVAL:
+> -		val = timer->cnt_cval - kvm_phys_timer_read() + timer->cntvoff;
+> -		val &= lower_32_bits(val);
+> +		val = timer_get_cval(timer) - kvm_phys_timer_read() + timer_get_offset(timer);
+> +		val = lower_32_bits(val);
+>  		break;
+>  
+>  	case TIMER_REG_CTL:
+> @@ -804,11 +893,11 @@ static u64 kvm_arm_timer_read(struct kvm_vcpu *vcpu,
+>  		break;
+>  
+>  	case TIMER_REG_CVAL:
+> -		val = timer->cnt_cval;
+> +		val = timer_get_cval(timer);
+>  		break;
+>  
+>  	case TIMER_REG_CNT:
+> -		val = kvm_phys_timer_read() - timer->cntvoff;
+> +		val = kvm_phys_timer_read() - timer_get_offset(timer);
+>  		break;
+>  
+>  	default:
+> @@ -842,15 +931,15 @@ static void kvm_arm_timer_write(struct kvm_vcpu *vcpu,
+>  {
+>  	switch (treg) {
+>  	case TIMER_REG_TVAL:
+> -		timer->cnt_cval = kvm_phys_timer_read() - timer->cntvoff + (s32)val;
+> +		timer_set_cval(timer, kvm_phys_timer_read() - timer_get_offset(timer) + (s32)val);
+>  		break;
+>  
+>  	case TIMER_REG_CTL:
+> -		timer->cnt_ctl = val & ~ARCH_TIMER_CTRL_IT_STAT;
+> +		timer_set_ctl(timer, val & ~ARCH_TIMER_CTRL_IT_STAT);
+>  		break;
+>  
+>  	case TIMER_REG_CVAL:
+> -		timer->cnt_cval = val;
+> +		timer_set_cval(timer, val);
+>  		break;
+>  
+>  	default:
+> diff --git a/arch/arm64/kvm/trace_arm.h b/arch/arm64/kvm/trace_arm.h
+> index 4c71270cc097..4691053c5ee4 100644
+> --- a/arch/arm64/kvm/trace_arm.h
+> +++ b/arch/arm64/kvm/trace_arm.h
+> @@ -301,8 +301,8 @@ TRACE_EVENT(kvm_timer_save_state,
+>  	),
+>  
+>  	TP_fast_assign(
+> -		__entry->ctl			= ctx->cnt_ctl;
+> -		__entry->cval			= ctx->cnt_cval;
+> +		__entry->ctl			= timer_get_ctl(ctx);
+> +		__entry->cval			= timer_get_cval(ctx);
+>  		__entry->timer_idx		= arch_timer_ctx_index(ctx);
+>  	),
+>  
+> @@ -323,8 +323,8 @@ TRACE_EVENT(kvm_timer_restore_state,
+>  	),
+>  
+>  	TP_fast_assign(
+> -		__entry->ctl			= ctx->cnt_ctl;
+> -		__entry->cval			= ctx->cnt_cval;
+> +		__entry->ctl			= timer_get_ctl(ctx);
+> +		__entry->cval			= timer_get_cval(ctx);
+>  		__entry->timer_idx		= arch_timer_ctx_index(ctx);
+>  	),
+>  
+> diff --git a/include/kvm/arm_arch_timer.h b/include/kvm/arm_arch_timer.h
+> index a821dd1df0cf..51c19381108c 100644
+> --- a/include/kvm/arm_arch_timer.h
+> +++ b/include/kvm/arm_arch_timer.h
+> @@ -26,16 +26,9 @@ enum kvm_arch_timer_regs {
+>  struct arch_timer_context {
+>  	struct kvm_vcpu			*vcpu;
+>  
+> -	/* Registers: control register, timer value */
+> -	u32				cnt_ctl;
+> -	u64				cnt_cval;
+> -
+>  	/* Timer IRQ */
+>  	struct kvm_irq_level		irq;
+>  
+> -	/* Virtual offset */
+> -	u64				cntvoff;
+> -
+>  	/* Emulated Timer (may be unused) */
+>  	struct hrtimer			hrtimer;
+>  
+> @@ -109,4 +102,8 @@ void kvm_arm_timer_write_sysreg(struct kvm_vcpu *vcpu,
+>  				enum kvm_arch_timer_regs treg,
+>  				u64 val);
+>  
+> +/* Needed for tracing */
+> +u32 timer_get_ctl(struct arch_timer_context *ctxt);
+> +u64 timer_get_cval(struct arch_timer_context *ctxt);
+> +
+>  #endif
