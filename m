@@ -2,89 +2,90 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 272D521859A
-	for <lists+kvm@lfdr.de>; Wed,  8 Jul 2020 13:09:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C0F962185A5
+	for <lists+kvm@lfdr.de>; Wed,  8 Jul 2020 13:10:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728588AbgGHLJb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 8 Jul 2020 07:09:31 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:41025 "EHLO
+        id S1728828AbgGHLKJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 8 Jul 2020 07:10:09 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:60328 "EHLO
         us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1728700AbgGHLJa (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 8 Jul 2020 07:09:30 -0400
+        with ESMTP id S1728655AbgGHLKI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 8 Jul 2020 07:10:08 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1594206569;
+        s=mimecast20190719; t=1594206607;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=bkp2vvF47JADWAniwd4t8Rm/0+rP5emrFqHByZTUt54=;
-        b=StYjhirtsLQqlhFVdZ8GkMH9aodhE1n6ilCXos6pSGyNAyrMMOJBrHKbOo8STWOxDZ/h18
-        P6i1ebEDlE9BGrTVjQhCRD+73PYdq6wsL8rgXjQpHB0NgijmqjZNH1DKs8SCZrTXCIYgur
-        bZo8nJmgExJ5K9veGzGbqqMuEcOa1Ws=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-308-T8T6vPfHMJyk5MLv_jq1xQ-1; Wed, 08 Jul 2020 07:09:25 -0400
-X-MC-Unique: T8T6vPfHMJyk5MLv_jq1xQ-1
-Received: by mail-wm1-f72.google.com with SMTP id c124so2553793wme.0
-        for <kvm@vger.kernel.org>; Wed, 08 Jul 2020 04:09:25 -0700 (PDT)
+        bh=14f1mTpd7HVDpOyXYxD6GElv4scdvE+XkzizMQMoy8M=;
+        b=JBWuSHlDHc6tlqTDU9X4CaPApIaLAIzczwe7ZqgY0DTzN6hwDHD1nkOVuPcLi+BNNSO5j3
+        A9dhUlM5EECF61MS3AXqDzBEvAAKa2Rx5k6lMe4KNLVIws5HzHsrTGqls/AxPx26Y4ygbO
+        npScT5N33loz6wqxDRdblYF7+AeUtmA=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-113-ODcGdN1VOvKSeguBLKifIQ-1; Wed, 08 Jul 2020 07:10:05 -0400
+X-MC-Unique: ODcGdN1VOvKSeguBLKifIQ-1
+Received: by mail-wm1-f70.google.com with SMTP id t18so2525068wmj.5
+        for <kvm@vger.kernel.org>; Wed, 08 Jul 2020 04:10:05 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=bkp2vvF47JADWAniwd4t8Rm/0+rP5emrFqHByZTUt54=;
-        b=UwiLu89mYmH5IGHUtIdnsBF6KB7b7oSXJ5OSlV3pSXs+0H/qnTnOnxyF4vzvnxtMTf
-         fZbBhWFzGTG0SLhj2PJ4kgEV4TLzAzaK48vNY+9h2WmSfCz96r6wn5ZbREoUF3cnis1f
-         n4It9rE4DRDoYf58db/A3f3JDwKFIX3VE1VWZgPBK5iYIHifWuvmzH8RfyIfV4d0Ar9m
-         SpwPM253oyRD+30QriZAvplObneTd+YOcqxKwJzFvyTTt4tZZyEvVaT4ZgJAwAwxWs3G
-         T5L/ANCKWFbXZtFnizqlTau4pm+jmA/8YhkdhTvdZrNAnW2CWopo2S1d3jWV9vZeFXAN
-         0OnQ==
-X-Gm-Message-State: AOAM532EQiYFlhqJAJNWNvKimLzVvpyxHzqNHedkWq0zrPhYSrPDieQZ
-        e4mk4uKMcv/KW2WwG/KLslSy0y50fJCbI4UDRN02ZIkwHcVoFyOBXBW42xdyD5w+mONdfS+mFhW
-        oj96Q8rPUKIl0
-X-Received: by 2002:a7b:c3c7:: with SMTP id t7mr8321925wmj.97.1594206564111;
-        Wed, 08 Jul 2020 04:09:24 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxEEcsBpZcVOq/4PfVzjw7iAbK1Fw0+BulW9EE6scukH0TtmplhsJ9rA4gyk4IoPTBaC2Dx+g==
-X-Received: by 2002:a7b:c3c7:: with SMTP id t7mr8321904wmj.97.1594206563845;
-        Wed, 08 Jul 2020 04:09:23 -0700 (PDT)
+        bh=14f1mTpd7HVDpOyXYxD6GElv4scdvE+XkzizMQMoy8M=;
+        b=Vg0qvuwxk31iMLR4X9gjlqqnIM5VN0uqhIhRlVYh22gV2HaRwyPk7tNxddURGqRuwV
+         tzKq/aTDGr9/sDVQ8qZnhsQKlXhAfYk/QlqCeFso/YhL8fdcc1n8s8c3wPM1/SqBqCG5
+         9ow4CA0zus3PjKYKV/2ccJm+EvRG4RASDnVKzYb7Bfny1nclfqf+YmAnBaaY30d7WofA
+         gl74PFLcpICr0yRFeYr+vDDBWeHdlsPbRVIYlIcE2geITtjAWNLBq+SXmSsmNuqjLwJ0
+         ysEwAY2/3XV//PlZPP/n/j7fV5U1QUIsKP6U8POFvAmQfF+JP6MrZUnKZrNVztLGwEc+
+         UFmg==
+X-Gm-Message-State: AOAM532V2j+Pgtj7/DeeaskLvIDgEinCS8K2eiEtRcNvtTi9vdKnKk6r
+        u/hU8X/u6fBl+Af0xw4IhAttWqqPaEOkYwJsbbmU2hoNk2CPaVA6uirWMy1myRGhc+lv27D56JG
+        K000CE9RCNHAq
+X-Received: by 2002:a05:6000:10c4:: with SMTP id b4mr54529521wrx.50.1594206604361;
+        Wed, 08 Jul 2020 04:10:04 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyS9IXWXY8AsLX9C3rrryHKZ4q/47XveQNN7O/2+yEMRnuw24+Agts1i9nEHB/Ycwubh37ATw==
+X-Received: by 2002:a05:6000:10c4:: with SMTP id b4mr54529504wrx.50.1594206604189;
+        Wed, 08 Jul 2020 04:10:04 -0700 (PDT)
 Received: from ?IPv6:2001:b07:6468:f312:9541:9439:cb0f:89c? ([2001:b07:6468:f312:9541:9439:cb0f:89c])
-        by smtp.gmail.com with ESMTPSA id f15sm5181481wmj.44.2020.07.08.04.09.23
+        by smtp.gmail.com with ESMTPSA id j6sm5766924wma.25.2020.07.08.04.10.03
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 08 Jul 2020 04:09:23 -0700 (PDT)
-Subject: Re: [PATCH] kvm: x86: limit the maximum number of vPMU fixed counters
- to 3
-To:     like.xu@intel.com, Like Xu <like.xu@linux.intel.com>,
-        kvm@vger.kernel.org
-Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, linux-kernel@vger.kernel.org
-References: <20200624015928.118614-1-like.xu@linux.intel.com>
- <8de3f450-7efd-96ab-fdf8-169b3327e5ac@intel.com>
+        Wed, 08 Jul 2020 04:10:03 -0700 (PDT)
+Subject: Re: [PATCH 1/2] KVM: SVM: avoid infinite loop on NPF from bad address
+To:     Wanpeng Li <kernellwp@gmail.com>
+Cc:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        "# v3 . 10+" <stable@vger.kernel.org>
+References: <20200417163843.71624-1-pbonzini@redhat.com>
+ <20200417163843.71624-2-pbonzini@redhat.com>
+ <CANRm+CyWKbSU9FZkGoPx2nff-Se3Qcfn1TXXw8exy-6nuZrirg@mail.gmail.com>
+ <57a405b3-6836-83f0-ed97-79f637f7b456@redhat.com>
+ <CANRm+CzpFt5SwnQzJjRGp3T_Q=Ws3OWBx4FPmMK79qOx1v3NBQ@mail.gmail.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <9b50db05-759e-c95c-35b2-99fba50e6997@redhat.com>
-Date:   Wed, 8 Jul 2020 13:09:22 +0200
+Message-ID: <7507de6a-799e-4f71-012d-ddaa39178284@redhat.com>
+Date:   Wed, 8 Jul 2020 13:10:03 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.9.0
 MIME-Version: 1.0
-In-Reply-To: <8de3f450-7efd-96ab-fdf8-169b3327e5ac@intel.com>
+In-Reply-To: <CANRm+CzpFt5SwnQzJjRGp3T_Q=Ws3OWBx4FPmMK79qOx1v3NBQ@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 08/07/20 09:51, Xu, Like wrote:
-> Kindly ping.
-> 
-> I think we may need this patch, as we limit the maximum vPMU version to 2:
->     eax.split.version_id = min(cap.version, 2);
+On 08/07/20 11:08, Wanpeng Li wrote:
+>>>> +EXPORT_SYMBOL_GPL(kvm_vcpu_gfn_to_memslot);
+>>> This commit incurs the linux guest fails to boot once add --overcommit
+>>> cpu-pm=on or not intercept hlt instruction, any thoughts?
+>> Can you write a selftest?
+> Actually I don't know what's happening here(why not intercept hlt
+> instruction has associated with this commit), otherwise, it has
+> already been fixed. :)
 
-I don't think this is a problem.  Are you planning to add support for
-the fourth counter?
+I don't understand, what has been fixed and where?
 
 Paolo
 
