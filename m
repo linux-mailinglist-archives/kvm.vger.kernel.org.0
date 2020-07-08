@@ -2,123 +2,190 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B2C1421864B
-	for <lists+kvm@lfdr.de>; Wed,  8 Jul 2020 13:38:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 97199218663
+	for <lists+kvm@lfdr.de>; Wed,  8 Jul 2020 13:50:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728733AbgGHLi5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 8 Jul 2020 07:38:57 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:40978 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1728592AbgGHLi4 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 8 Jul 2020 07:38:56 -0400
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 068BVr9O177902;
-        Wed, 8 Jul 2020 07:38:55 -0400
-Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com [149.81.74.108])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3259yx6k3k-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 08 Jul 2020 07:38:55 -0400
-Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
-        by ppma05fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 068BFDdL009682;
-        Wed, 8 Jul 2020 11:33:53 GMT
-Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
-        by ppma05fra.de.ibm.com with ESMTP id 3251w8ga9e-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 08 Jul 2020 11:33:53 +0000
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
-        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 068BXojT38273066
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 8 Jul 2020 11:33:50 GMT
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 420B1AE04D;
-        Wed,  8 Jul 2020 11:33:50 +0000 (GMT)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id E8825AE045;
-        Wed,  8 Jul 2020 11:33:49 +0000 (GMT)
-Received: from oc7455500831.ibm.com (unknown [9.145.16.21])
-        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Wed,  8 Jul 2020 11:33:49 +0000 (GMT)
-Subject: "KVM: s390: reduce number of IO pins to 1" for stable
-References: <20200706171523.12441-1-pbonzini@redhat.com>
-To:     stable@vger.kernel.org
-Cc:     kvm list <kvm@vger.kernel.org>,
-        Janosch Frank <frankja@linux.ibm.com>
-From:   Christian Borntraeger <borntraeger@de.ibm.com>
-Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
- 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
- nS4h0HDFPrrp1C2EMVYIQrMokWvlFZbCpsdYbBI=
-X-Forwarded-Message-Id: <20200706171523.12441-1-pbonzini@redhat.com>
-Message-ID: <41c4e9e5-441f-3777-e399-70c82a2633e5@de.ibm.com>
-Date:   Wed, 8 Jul 2020 13:33:49 +0200
+        id S1728863AbgGHLuC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 8 Jul 2020 07:50:02 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:40306 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1728757AbgGHLuC (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 8 Jul 2020 07:50:02 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1594209000;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=xM3KNO4zTe2DwnAsh9jy5dc/gc1QWSrQFG/k46eKNXU=;
+        b=RPPqgFfxBK/AetqXiSZq2+A5Y71UgIUyeDF8JKMCui1d5Xxj3Mp/xNO3f89IUzjuqznuwR
+        6siqhRHRsyWV7jT9GBNCsdFxlDTlENDiNLBJItR1XOSASAFjO9qUMEyEGV4mMkWP7agbh6
+        GJewrY+Okc4oE3Ki7RKWHyww6Fnrl6w=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-492-pPXSHbQEPY2M76HLGTgkQw-1; Wed, 08 Jul 2020 07:49:58 -0400
+X-MC-Unique: pPXSHbQEPY2M76HLGTgkQw-1
+Received: by mail-wm1-f70.google.com with SMTP id e15so2635273wme.8
+        for <kvm@vger.kernel.org>; Wed, 08 Jul 2020 04:49:58 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=xM3KNO4zTe2DwnAsh9jy5dc/gc1QWSrQFG/k46eKNXU=;
+        b=suHpEnyx+o251JNm5Ep1ZzUgG8KtklwTbJu2qdTScmk9Qd9FQtr2wvQOTsplD2MuuQ
+         RJ5S/Nnhlv+IToLoKQBTz+SOMdo3GAlfETIjVEP7N622mupe4P3BnG0M3RAlFvNlUons
+         QlAc2jnXPBvHMpliSWGIgEkyiy0HDFQxb5Kdi0aLElypBjkPOiTZ5Sm5IhuOXowWhZSc
+         hhDm5HNlwDeOs9dPBrdSF9gFs1wNJxeXU9MuV2DoBHmztsu4nNjHYucd7z1VCtsSd6ew
+         5BZqX6/jJGRujZ2yNjm5uxP2bHmXmbE9tXAoGTLjJ615Fc4uM+oPLw7vZXU1Q/AWvwcz
+         XkeQ==
+X-Gm-Message-State: AOAM533eoA14WKEDXmtM7Lbp2ax2U4yWLZcwcGUd7S0J12d6/p2AzsCt
+        IXCPeDwDMds5rhf8Pe8PVU2o1KtBUK+SBNzXKrUEmn2j0brFQZCnSDKEpaxyA2uy/b/OaU37+OZ
+        UDqlCH+X2rhQb
+X-Received: by 2002:adf:f34e:: with SMTP id e14mr57807330wrp.299.1594208997410;
+        Wed, 08 Jul 2020 04:49:57 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyugNuqxN5rzVdPBX5slxGKgyferLOH3BJsa69EiZC8VmURNSyq7nrqd1rqYUrnGgu/1A3QIg==
+X-Received: by 2002:adf:f34e:: with SMTP id e14mr57807317wrp.299.1594208997184;
+        Wed, 08 Jul 2020 04:49:57 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:9541:9439:cb0f:89c? ([2001:b07:6468:f312:9541:9439:cb0f:89c])
+        by smtp.gmail.com with ESMTPSA id 22sm6269944wmb.11.2020.07.08.04.49.56
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 08 Jul 2020 04:49:56 -0700 (PDT)
+Subject: Re: [PATCH v2 2/3] KVM: nSVM: properly call kvm_mmu_new_pgd() upon
+ switching to guest
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org
+Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Junaid Shahid <junaids@google.com>,
+        linux-kernel@vger.kernel.org
+References: <20200708093611.1453618-1-vkuznets@redhat.com>
+ <20200708093611.1453618-3-vkuznets@redhat.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <b7989497-562e-c9a1-3f62-dd5afb9fd3d5@redhat.com>
+Date:   Wed, 8 Jul 2020 13:49:55 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.9.0
 MIME-Version: 1.0
-In-Reply-To: <20200706171523.12441-1-pbonzini@redhat.com>
-Content-Type: text/plain; charset=windows-1252
+In-Reply-To: <20200708093611.1453618-3-vkuznets@redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
- definitions=2020-07-08_08:2020-07-08,2020-07-08 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- adultscore=0 impostorscore=0 clxscore=1011 phishscore=0 mlxlogscore=485
- bulkscore=0 spamscore=0 priorityscore=1501 mlxscore=0 cotscore=-2147483648
- malwarescore=0 suspectscore=13 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2004280000 definitions=main-2007080080
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-stable team,
+On 08/07/20 11:36, Vitaly Kuznetsov wrote:
+> Undesired triple fault gets injected to L1 guest on SVM when L2 is
+> launched with certain CR3 values. #TF is raised by mmu_check_root()
+> check in fast_pgd_switch() and the root cause is that when
+> kvm_set_cr3() is called from nested_prepare_vmcb_save() with NPT
+> enabled CR3 points to a nGPA so we can't check it with
+> kvm_is_visible_gfn().
+> 
+> Calling kvm_mmu_new_pgd() with L2's CR3 idea when NPT is in use
+> seems to be wrong, an acceptable place for it seems to be
+> kvm_init_shadow_npt_mmu(). This also matches nVMX code.
+> 
+> Fixes: 7c390d350f8b ("kvm: x86: Add fast CR3 switch code path")
+> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+> ---
+>  arch/x86/include/asm/kvm_host.h | 7 ++++++-
+>  arch/x86/kvm/mmu/mmu.c          | 2 ++
+>  arch/x86/kvm/svm/nested.c       | 2 +-
+>  arch/x86/kvm/x86.c              | 8 +++++---
+>  4 files changed, 14 insertions(+), 5 deletions(-)
+> 
+> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> index be5363b21540..49b62f024f51 100644
+> --- a/arch/x86/include/asm/kvm_host.h
+> +++ b/arch/x86/include/asm/kvm_host.h
+> @@ -1459,7 +1459,12 @@ int kvm_task_switch(struct kvm_vcpu *vcpu, u16 tss_selector, int idt_index,
+>  		    int reason, bool has_error_code, u32 error_code);
+>  
+>  int kvm_set_cr0(struct kvm_vcpu *vcpu, unsigned long cr0);
+> -int kvm_set_cr3(struct kvm_vcpu *vcpu, unsigned long cr3);
+> +int __kvm_set_cr3(struct kvm_vcpu *vcpu, unsigned long cr3, bool cr3_is_nested);
+> +static inline int kvm_set_cr3(struct kvm_vcpu *vcpu, unsigned long cr3)
+> +{
+> +	return __kvm_set_cr3(vcpu, cr3, false);
+> +}
+> +
+>  int kvm_set_cr4(struct kvm_vcpu *vcpu, unsigned long cr4);
+>  int kvm_set_cr8(struct kvm_vcpu *vcpu, unsigned long cr8);
+>  int kvm_set_dr(struct kvm_vcpu *vcpu, int dr, unsigned long val);
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index 167d12ab957a..ebf0cb3f1ce0 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -4987,6 +4987,8 @@ void kvm_init_shadow_npt_mmu(struct kvm_vcpu *vcpu, u32 cr0, u32 cr4, u32 efer,
+>  	union kvm_mmu_role new_role =
+>  		kvm_calc_shadow_mmu_root_page_role(vcpu, false);
+>  
+> +	__kvm_mmu_new_pgd(vcpu, nested_cr3, new_role.base, true, true);
+> +
+>  	if (new_role.as_u64 != context->mmu_role.as_u64)
+>  		shadow_mmu_init_context(vcpu, cr0, cr4, efer, new_role);
+>  }
+> diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
+> index e424bce13e6c..b467917a9784 100644
+> --- a/arch/x86/kvm/svm/nested.c
+> +++ b/arch/x86/kvm/svm/nested.c
+> @@ -324,7 +324,7 @@ static void nested_prepare_vmcb_save(struct vcpu_svm *svm, struct vmcb *nested_v
+>  	svm_set_efer(&svm->vcpu, nested_vmcb->save.efer);
+>  	svm_set_cr0(&svm->vcpu, nested_vmcb->save.cr0);
+>  	svm_set_cr4(&svm->vcpu, nested_vmcb->save.cr4);
+> -	(void)kvm_set_cr3(&svm->vcpu, nested_vmcb->save.cr3);
+> +	(void)__kvm_set_cr3(&svm->vcpu, nested_vmcb->save.cr3, npt_enabled);
+>  
+>  	svm->vmcb->save.cr2 = svm->vcpu.arch.cr2 = nested_vmcb->save.cr2;
+>  	kvm_rax_write(&svm->vcpu, nested_vmcb->save.rax);
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 3b92db412335..3761135eb052 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -1004,7 +1004,7 @@ int kvm_set_cr4(struct kvm_vcpu *vcpu, unsigned long cr4)
+>  }
+>  EXPORT_SYMBOL_GPL(kvm_set_cr4);
+>  
+> -int kvm_set_cr3(struct kvm_vcpu *vcpu, unsigned long cr3)
+> +int __kvm_set_cr3(struct kvm_vcpu *vcpu, unsigned long cr3, bool cr3_is_nested)
+>  {
+>  	bool skip_tlb_flush = false;
+>  #ifdef CONFIG_X86_64
+> @@ -1031,13 +1031,15 @@ int kvm_set_cr3(struct kvm_vcpu *vcpu, unsigned long cr3)
+>  		 !load_pdptrs(vcpu, vcpu->arch.walk_mmu, cr3))
+>  		return 1;
+>  
+> -	kvm_mmu_new_pgd(vcpu, cr3, skip_tlb_flush, skip_tlb_flush);
+> +	if (!cr3_is_nested)
+> +		kvm_mmu_new_pgd(vcpu, cr3, skip_tlb_flush, skip_tlb_flush);
+> +
+>  	vcpu->arch.cr3 = cr3;
+>  	kvm_register_mark_available(vcpu, VCPU_EXREG_CR3);
+>  
+>  	return 0;
+>  }
+> -EXPORT_SYMBOL_GPL(kvm_set_cr3);
+> +EXPORT_SYMBOL_GPL(__kvm_set_cr3);
+>  
+>  int kvm_set_cr8(struct kvm_vcpu *vcpu, unsigned long cr8)
+>  {
+> 
 
+Instead of the new argument (which is not really named right since it's
+never true for !NPT) you could perhaps check vcpu->arch.mmu.  But also,
+for NPT=1 the kvm_mmu_new_pgd is also unnecessary on vmexit, because the
+old roots are still valid (or has been invalidated otherwise) while L2
+was running.
 
-Please consider commit 774911290c58 ("KVM: s390: reduce number of IO pins to 1")
-for stable. This can avoid OOM killer activity on highly fragmented memory
-even when swap and memory is available. 
+I'm also not sure if skip_tlb_flush can use X86_CR3_PCID_NOFLUSH the way
+kvm_set_cr3 does, so I wouldn't mind duplicating the code completely as
+is already the case for nested_vmx_load_cr3.  It would introduce some
+code duplication, but overall the code would be better.  For now, there
+need not be an equivalent to nested_vmx_transition_mmu_sync, ASID
+handling can be left for later.
 
-We decided too late that this is stable material, so sorry for not marking it
-correctly. 
-
-Christian
+Paolo
 
