@@ -2,66 +2,67 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6A320218413
-	for <lists+kvm@lfdr.de>; Wed,  8 Jul 2020 11:45:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F1266218427
+	for <lists+kvm@lfdr.de>; Wed,  8 Jul 2020 11:48:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728266AbgGHJpo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 8 Jul 2020 05:45:44 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:34985 "EHLO
+        id S1728169AbgGHJse (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 8 Jul 2020 05:48:34 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:20293 "EHLO
         us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726302AbgGHJpo (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 8 Jul 2020 05:45:44 -0400
+        with ESMTP id S1726445AbgGHJse (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 8 Jul 2020 05:48:34 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1594201542;
+        s=mimecast20190719; t=1594201713;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         to:to:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=1BdUfU6m5HeEnRh3wmTDiTCHKPgV2EE4GiK0/uOui0Q=;
-        b=gSO6qhsX5fVtIZawlld6lWjJUAAoWVzEGlhKDrzsJodR14hUSqITM2LLb5fxRzs5P04qkk
-        /6Xqd4Ud1H7Y8QoXD+xWB9BvCW0HXr630RRAWgaTO5CnKZ6l7usLlAFGWsom3ZYT/1bTBl
-        5LPfPTXU5VQBD2fYUyLMlFjbsmC2kT0=
+        bh=s7qKIvefs+Nswt+yThb+00wqIjYx3wKhVFohWCds6UY=;
+        b=MRHAeiTWB6/DtBPZqRIj1zsvji7RBVPFly0RArrkXYx0s9DkETsOVJTWvYYacBJ2IWb/M3
+        gYqwJ6P/1NsVWjPvc3fJuOM7g2aPL6PFCJ62J4yZTQBa9y4aXIGUi7pADY4pdX82mxdtFU
+        LaHgChYWLVudXmkkJi6LiuR5yFj4CUQ=
 Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
  [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-348-URmtmy1KMCOGYzNkX8LYlA-1; Wed, 08 Jul 2020 05:45:37 -0400
-X-MC-Unique: URmtmy1KMCOGYzNkX8LYlA-1
-Received: by mail-wm1-f71.google.com with SMTP id g138so2270938wme.7
-        for <kvm@vger.kernel.org>; Wed, 08 Jul 2020 02:45:37 -0700 (PDT)
+ us-mta-181-jj-fm0w7PLaycrRX7CwCAQ-1; Wed, 08 Jul 2020 05:48:27 -0400
+X-MC-Unique: jj-fm0w7PLaycrRX7CwCAQ-1
+Received: by mail-wm1-f71.google.com with SMTP id f68so3970943wmf.1
+        for <kvm@vger.kernel.org>; Wed, 08 Jul 2020 02:48:27 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+        h=x-gm-message-state:subject:to:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=1BdUfU6m5HeEnRh3wmTDiTCHKPgV2EE4GiK0/uOui0Q=;
-        b=FCmli6EjQ/N0kOiRdpa9qII2tu1L37U71ipbKvrvW5wV9cAkPE1d80GnWfjQZg5axW
-         jMCXNdaAqEJ4z6BLRd+SHYbR0TDxTn6wSeyIufmlYR6haCpcsS1df9NhQGLrLRmaAFrM
-         KiOY/bn+DRuME4IUbPCIynaR/rhEm3H13KMy5RGbdgTVI4zc93EwPGOkJ7BkNmGhAmv7
-         AaQP6x1srauXqBABiDRJns3xmFkE+RbsFUJ7qRQKPCjJGvtrNqcFgTGzrbtZMFiqunNl
-         ErHgnyXl5TQ6zOH+fjVpvEMFzYQE1z9+n3GHMyYzuKj9srB1ofxSyaURfmstrN7FHG+i
-         Otkg==
-X-Gm-Message-State: AOAM533XgTXb+aE3TkMlZw6WkbeGqXS7QlIHQOSAFK+T6mgsGVSPN2i3
-        gINPg4pozC+N+oP99fafhmCaU9N1Nxy23yyIALQaJT36bZqSo+lxjxpsLIetXsVwkQwLTaIoWzb
-        kBfqBJu7i/00J
-X-Received: by 2002:a1c:b686:: with SMTP id g128mr8778632wmf.145.1594201536324;
-        Wed, 08 Jul 2020 02:45:36 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxDBku9x1YC9fQdtg8T9bS5u6jo0bpoFEuDr9mwmMSNX88rmd++ZqZ54uewAYHU6Nz4IHzOUw==
-X-Received: by 2002:a1c:b686:: with SMTP id g128mr8778609wmf.145.1594201536074;
-        Wed, 08 Jul 2020 02:45:36 -0700 (PDT)
+        bh=s7qKIvefs+Nswt+yThb+00wqIjYx3wKhVFohWCds6UY=;
+        b=TG7fBeHphNbtFAT9f7dFTBvcu5tJXPak2Zyhgi5BA7LQPIf7Y23EArjmyWDs+krJ+b
+         xTHzz5GjCkO3UxS2BNq4o+SKaOAYFkVyFK+lgF/Bx4go0zgNxXYam9E/HFtP1RAUvHB0
+         FelFVFz2onTBSBDKbzaRtqZx7ZGhXOQikoSt4NvEGcTobSTeqKtrsqJdL19qsvJF2obW
+         y3lLE383knzYeD31NaBibl8GmZQXP+gVSRjBfzUGMfCgP1XXmUAYuSHZ9VVH518GR36Z
+         SSIsA6ef+dvuurP4yDtl1H9XPE9KLXwbHadOOv4p9qTLn4a9/aPJm3K34EiWx3BKEW/0
+         xpjA==
+X-Gm-Message-State: AOAM533SDrpZmwmiqVjMpLSwjKSTySpPXfCtKo3zmc2lKszS4GlaZ1Pl
+        rU1AmW4BmX1rdyRVMxOJcTlX0BTkLgMoaL+YR15UIFtX4Aaw76ulNWdO4NZFzRdrMNqKeMvY2va
+        lpLXzZDEpmXPw
+X-Received: by 2002:a1c:964d:: with SMTP id y74mr8764299wmd.80.1594201706341;
+        Wed, 08 Jul 2020 02:48:26 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyfj7LMLC/Cy4bxGx7mFvcgmL+5lgb9l1+cTx9oY+aTy0fSYGL5yHj313enjlCjUhgdghsXgg==
+X-Received: by 2002:a1c:964d:: with SMTP id y74mr8764290wmd.80.1594201706166;
+        Wed, 08 Jul 2020 02:48:26 -0700 (PDT)
 Received: from ?IPv6:2001:b07:6468:f312:9541:9439:cb0f:89c? ([2001:b07:6468:f312:9541:9439:cb0f:89c])
-        by smtp.gmail.com with ESMTPSA id k18sm4999839wrx.34.2020.07.08.02.45.35
+        by smtp.gmail.com with ESMTPSA id q4sm4974931wmc.1.2020.07.08.02.48.25
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 08 Jul 2020 02:45:35 -0700 (PDT)
-Subject: Re: [PATCH] kvm: x86: Read PDPTEs on CR0.CD and CR0.NW changes
-To:     Jim Mattson <jmattson@google.com>, kvm@vger.kernel.org
-Cc:     Oliver Upton <oupton@google.com>, Peter Shier <pshier@google.com>
-References: <20200707223630.336700-1-jmattson@google.com>
+        Wed, 08 Jul 2020 02:48:25 -0700 (PDT)
+Subject: Re: [PATCH 1/3 v4] KVM: x86: Create mask for guest CR4 reserved bits
+ in kvm_update_cpuid()
+To:     Krish Sadhukhan <krish.sadhukhan@oracle.com>, kvm@vger.kernel.org
+References: <1594168797-29444-1-git-send-email-krish.sadhukhan@oracle.com>
+ <1594168797-29444-2-git-send-email-krish.sadhukhan@oracle.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <c8f73f4c-59e2-1a57-164c-d9d4e11ce486@redhat.com>
-Date:   Wed, 8 Jul 2020 11:45:34 +0200
+Message-ID: <bd3f1410-bd14-6791-0d3f-ce2ec329967a@redhat.com>
+Date:   Wed, 8 Jul 2020 11:48:25 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.9.0
 MIME-Version: 1.0
-In-Reply-To: <20200707223630.336700-1-jmattson@google.com>
+In-Reply-To: <1594168797-29444-2-git-send-email-krish.sadhukhan@oracle.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -70,58 +71,21 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 08/07/20 00:36, Jim Mattson wrote:
-> According to the SDM, when PAE paging would be in use following a
-> MOV-to-CR0 that modifies any of CR0.CD, CR0.NW, or CR0.PG, then the
-> PDPTEs are loaded from the address in CR3. Previously, kvm only loaded
-> the PDPTEs when PAE paging would be in use following a MOV-to-CR0 that
-> modified CR0.PG.
-> 
-> Signed-off-by: Jim Mattson <jmattson@google.com>
-> Reviewed-by: Oliver Upton <oupton@google.com>
-> Reviewed-by: Peter Shier <pshier@google.com>
-> ---
->  arch/x86/kvm/x86.c | 9 +++++----
->  1 file changed, 5 insertions(+), 4 deletions(-)
-> 
+On 08/07/20 02:39, Krish Sadhukhan wrote:
 > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 88c593f83b28..5a91c975487d 100644
+> index 88c593f..f0335bc 100644
 > --- a/arch/x86/kvm/x86.c
 > +++ b/arch/x86/kvm/x86.c
-> @@ -775,6 +775,7 @@ EXPORT_SYMBOL_GPL(pdptrs_changed);
->  int kvm_set_cr0(struct kvm_vcpu *vcpu, unsigned long cr0)
->  {
->  	unsigned long old_cr0 = kvm_read_cr0(vcpu);
-> +	unsigned long pdptr_bits = X86_CR0_CD | X86_CR0_NW | X86_CR0_PG;
->  	unsigned long update_bits = X86_CR0_PG | X86_CR0_WP;
->  
->  	cr0 |= X86_CR0_ET;
-> @@ -792,9 +793,9 @@ int kvm_set_cr0(struct kvm_vcpu *vcpu, unsigned long cr0)
->  	if ((cr0 & X86_CR0_PG) && !(cr0 & X86_CR0_PE))
->  		return 1;
->  
-> -	if (!is_paging(vcpu) && (cr0 & X86_CR0_PG)) {
-> +	if (cr0 & X86_CR0_PG) {
->  #ifdef CONFIG_X86_64
-> -		if ((vcpu->arch.efer & EFER_LME)) {
-> +		if (!is_paging(vcpu) && (vcpu->arch.efer & EFER_LME)) {
->  			int cs_db, cs_l;
->  
->  			if (!is_pae(vcpu))
-> @@ -804,8 +805,8 @@ int kvm_set_cr0(struct kvm_vcpu *vcpu, unsigned long cr0)
->  				return 1;
->  		} else
+> @@ -97,6 +97,7 @@
 >  #endif
-> -		if (is_pae(vcpu) && !load_pdptrs(vcpu, vcpu->arch.walk_mmu,
-> -						 kvm_read_cr3(vcpu)))
-> +		if (is_pae(vcpu) && ((cr0 ^ old_cr0) & pdptr_bits) &&
-> +		    !load_pdptrs(vcpu, vcpu->arch.walk_mmu, kvm_read_cr3(vcpu)))
->  			return 1;
->  	}
 >  
-> 
+>  static u64 __read_mostly cr4_reserved_bits = CR4_RESERVED_BITS;
+> +u64 __guest_cr4_reserved_bits;
+>  
+>  #define KVM_X2APIC_API_VALID_FLAGS (KVM_X2APIC_API_USE_32BIT_IDS | \
+>                                      KVM_X2APIC_API_DISABLE_BROADCAST_QUIRK)
 
-Queued, thanks.
+Stray line.
 
 Paolo
 
