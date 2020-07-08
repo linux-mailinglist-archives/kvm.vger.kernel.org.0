@@ -2,208 +2,94 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 47753218751
-	for <lists+kvm@lfdr.de>; Wed,  8 Jul 2020 14:30:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A3BE9218755
+	for <lists+kvm@lfdr.de>; Wed,  8 Jul 2020 14:31:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729012AbgGHMaD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 8 Jul 2020 08:30:03 -0400
-Received: from foss.arm.com ([217.140.110.172]:37120 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728941AbgGHMaC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 8 Jul 2020 08:30:02 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 38B841FB;
-        Wed,  8 Jul 2020 05:30:02 -0700 (PDT)
-Received: from [192.168.0.14] (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 344EE3F68F;
-        Wed,  8 Jul 2020 05:29:59 -0700 (PDT)
-Subject: Re: [PATCH RFC 0/4] Changes to Support *Virtual* CPU Hotplug for
- ARM64
-To:     Salil Mehta <salil.mehta@huawei.com>
-Cc:     "linux-arm-kernel@lists.infradead.org" 
-        <linux-arm-kernel@lists.infradead.org>,
-        "maz@kernel.org" <maz@kernel.org>,
-        "will@kernel.org" <will@kernel.org>,
-        "catalin.marinas@arm.com" <catalin.marinas@arm.com>,
-        "christoffer.dall@arm.com" <christoffer.dall@arm.com>,
-        "andre.przywara@arm.com" <andre.przywara@arm.com>,
-        "mark.rutland@arm.com" <mark.rutland@arm.com>,
-        "lorenzo.pieralisi@arm.com" <lorenzo.pieralisi@arm.com>,
-        "sudeep.holla@arm.com" <sudeep.holla@arm.com>,
-        "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>,
-        "peter.maydell@linaro.org" <peter.maydell@linaro.org>,
-        "richard.henderson@linaro.org" <richard.henderson@linaro.org>,
-        "imammedo@redhat.com" <imammedo@redhat.com>,
-        "mst@redhat.com" <mst@redhat.com>,
-        "drjones@redhat.com" <drjones@redhat.com>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "eric.auger@redhat.com" <eric.auger@redhat.com>,
-        "gshan@redhat.com" <gshan@redhat.com>,
-        "david@redhat.com" <david@redhat.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Linuxarm <linuxarm@huawei.com>,
-        "mehta.salil.lnk@gmail.com" <mehta.salil.lnk@gmail.com>
-References: <20200625133757.22332-1-salil.mehta@huawei.com>
- <8efc4efe284641eda3ffeb2301fcca43@huawei.com>
-From:   James Morse <james.morse@arm.com>
-Message-ID: <cbaa6d68-6143-e010-5f3c-ec62f879ad95@arm.com>
-Date:   Wed, 8 Jul 2020 13:29:43 +0100
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+        id S1728998AbgGHMbN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 8 Jul 2020 08:31:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59890 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728969AbgGHMbM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 8 Jul 2020 08:31:12 -0400
+Received: from mail-io1-xd42.google.com (mail-io1-xd42.google.com [IPv6:2607:f8b0:4864:20::d42])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B7367C08E6DC
+        for <kvm@vger.kernel.org>; Wed,  8 Jul 2020 05:31:12 -0700 (PDT)
+Received: by mail-io1-xd42.google.com with SMTP id l1so4810101ioh.5
+        for <kvm@vger.kernel.org>; Wed, 08 Jul 2020 05:31:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:reply-to:from:date:message-id:subject:to
+         :content-transfer-encoding;
+        bh=/vBVbAxvijag95IA6OM26aTa2bKDnUtimRlc1mZm/7M=;
+        b=n3Rfi0Yx55UFE+w5He+aJHAl4yzUzSAwQNvG+FVyPzwuTrfr2l5IY97B1btO0szxxT
+         FSh/ZXua0XUlS+GWMPkTBnvfwn6oOYDR1Ed/bXhWwnH7Wx0AHnEtTOfk4PWmi2A+AfM1
+         U0vYO+VtNThdczbYPvOrnSLH07J6FeIALNj71iJLIdV70J0P0rp0FT60ftwIQHZZ8M1F
+         JFUIHyaDjSr6eBh1BRXtDfBfY1ojSb3ysLj4We1VEx06I6AKYSMzTEHcUdzM7ILIsNm/
+         TddqUBWRpG/83sSOz8kFOjLXZKO4gGchVNyLI38CtbjIaScTeheBYlhib2NWqsavNTIj
+         MaZQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:reply-to:from:date:message-id
+         :subject:to:content-transfer-encoding;
+        bh=/vBVbAxvijag95IA6OM26aTa2bKDnUtimRlc1mZm/7M=;
+        b=YqpLJ51GR9vNjepuDksznc9HMjrxtgHE2Ilcy13A+kCXN1PN71VQwaqf1Et+ePCgZo
+         1g9b+27a7FqLv6YjxJtQIMiSjt8zDUfvtUGxvxz7bgZ4atWn09OdT1bzlcodDDlS+86A
+         3ckNga0zWWlip3QLc+Vk1jrBT86OPDFNup45mmDG5ZXYnEyE4VG7LpTrLMBqOFYBGRCo
+         po8I6fJz5pnH8Vn0eXsMGnZmi7Bf3FffNfoH1Vv4NfhfJlnWGK++fP6SVMCHwbuJ4IHj
+         9mUXHhBlr0N1drv78//+/DrI2C5bI/sTTHC/iKIo6kVR7sSIGkaAhXvFWOQsHRekEf7O
+         HeXw==
+X-Gm-Message-State: AOAM531YUrt97B15yCLL78KFDROuBvwYHEN1YB8D4SWdLq1w03/rronN
+        +t1/w3N+ILzglTYZlimz3dSK7HmAXYbWRTBGMgY=
+X-Google-Smtp-Source: ABdhPJz81frHYn+OzT4UXA1MDGzrA+srDj29FYarYGKTd+AWY8zKpa99vbdlSytV/h/xC+qEjWC3Cksp9UmpCOa6Ajs=
+X-Received: by 2002:a5d:9c0e:: with SMTP id 14mr36876519ioe.109.1594211470176;
+ Wed, 08 Jul 2020 05:31:10 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <8efc4efe284641eda3ffeb2301fcca43@huawei.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-GB
-Content-Transfer-Encoding: 7bit
+Received: by 2002:a92:9886:0:0:0:0:0 with HTTP; Wed, 8 Jul 2020 05:31:09 -0700 (PDT)
+Reply-To: mmsafiatou057@gmail.com
+From:   "Mrs. Safitaou Zoungrana" <s.alireza1972@gmail.com>
+Date:   Wed, 8 Jul 2020 12:31:09 +0000
+Message-ID: <CAPGBjpwPwm-gJmdO58mUNPZHtm=q-TV63pAg3Etzkaj0tq+pxg@mail.gmail.com>
+Subject: My Dear Beloved One,
+To:     undisclosed-recipients:;
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Salil,
+My Dear Beloved One,
 
-On 07/07/2020 10:52, Salil Mehta wrote:
->> From: Salil Mehta
+I greet you in the name of God almighty the givers of all good things
+in life. Please kindly pardon me for any inconvenience this letter may
+cost you because I know it may come to you as a surprise as we have no
+previous correspondence.  I sent this mail praying for it to reach you
+in good health, since I myself are in a very critical health condition
+in which I sleep every night without knowing if I may be alive to see
+the next day.
 
+I am Mrs. Safiatou Zoungrana,  the wife of late Engineer Ralph
+Alphonso Zoungrana from Paris France but based here in Burkina Faso
+West Africa since eight years ago as a business woman dealing with
+gold exportation and Sales. We have been married for years before his
+sudden death although we were childless. I have been diagnosed with
+ovarian cancer and I have been battling with the sickness when my late
+lovely husband of a blessed memory was alive. May his soul rest in
+peace, Amen.
 
-Disambiguation: by cpu-hotplug here, you don't mean
-CONFIG_HOTPLUG_CPU backed by PSCI, which is commonly what we mean in the arm world. You
-mean: package hot-add. A bunch of CPUs (and maybe more) that weren't present at boot have
-turned up.
+My late Husband left the sum of =E2=82=AC7.900.000.00 Seven Million Nine
+Hundred Thousand Euros in a fix/suspense account in one of the prime
+bank here in Burkina Faso. Recently, my Doctor told me that I have few
+days to live due to the cancer problem. The one that disturbs me most
+is my blood pressure sickness.
 
+Having known my health condition I decided to seek for your kind
+assistance to transfer this fund into your account and you will use it
+to establish an orphanage home in my name. I will give you more
+details about the project as soon as I receive your reply in my
+private email (mmsafiatou057@gmail.com) to handle this project because
+I do not want to state all here until I see your reply, desire and
+commitment to handle this project.
 
->> Changes to support virtual cpu hotplug in QEMU[1] have been introduced to the
->> community as RFC. These are under review.
->>
->> To support virtual cpu hotplug guest kernel must:
-
-Surely number 1 is: know its a virtual machine, and that whatever needs doing/describing
-on a real machine, doesn't need doing or describing here...
-
-We add support for virtual machines after support for the physical machine. Is anyone
-building hardware that supports this?
-
-We can assume some will exist during the lifetime of a stable-kernel. The stable-kernel
-will claim to support this, but in reality it will crash and burn in exciting ways.
-
-(e.g. parts of the interrupt controller in the hot-added package would need configuring.
-We'd either lock up during boot when we try, but its not there ... or not do it when the
-package is added because we assumed this was a VM)
-
-
-I don't think linux can support this for virtual machines until it works for real machines
-too. We don't have a reliable way of determining we are running in a VM.
-
-This at least needs the ACPI spec updating to describe what work the OS has to do when a
-package comes online, and what it can't touch until then.
-I don't think this work would happen without someone building such a system.
-
-
->> 1. Identify disabled/present vcpus and set/unset the present mask of the vcpu
->>    during initialization and hotplug event. It must also set the possible mask
->>    (which includes disabled vcpus) during init of guest kernel.
->> 2. Provide architecture specific ACPI hooks, for example to map/unmap the
->>    logical cpuid to hwids/MPIDR. Linux kernel already has generic ACPI cpu
->>    hotplug framework support.
-
->> Changes introduced in this patch-set also ensures that initialization of the
->> cpus when virtual cpu hotplug is not supported remains un-affected.
-
-But on a platform with physical cpu hotplug, really-bad-things will happen.
-
-
-There is no description here of what problem you are trying to solve. I don't believe 'cpu
-hotlpug' is an end in itself.
-
-~
-
-Aha, its in the qemu cover letter:
-| This allows scaling the guest VM compute capacity on-demand which would be
-| useful for the following example scenarios,
-| 1. Vertical Pod Autoscaling[3][4] in the cloud: Part of the orchestration
-|   framework which could adjust resource requests (CPU and Mem requests) for
-|   the containers in a pod, based on usage.
-|2. Pay-as-you-grow Business Model: Infrastructure provider could allocate and
-|   restrict the total number of compute resources available to the guest VM
-|   according to the SLA(Service Level Agreement). VM owner could request for
-|   more compute to be hot-plugged for some cost.
-
-Controlling CPU time makes perfect sense. But doesn't cgroup already do exactly this?
-
-If a VM is restricted to 1xCPU of cpu-time, it can online as many vcpu as it likes, its
-not going to get more than 1xCPU of cpu-time.
-
-
-I understand that this is how kubernetes reconfigures a VM on x86, but I'm fairly sure x86
-had physical cpu hotplug before, so the firmware/OS responsibilities were well understood.
-
-
-I think this series creates a support nightmare for the future.
-
-
-This has come up before:
-https://lore.kernel.org/kvmarm/82879258-46a7-a6e9-ee54-fc3692c1cdc3@arm.com/
-
-
-Thanks,
-
-James
-
-
->> Repository:
->> (*) Kernel changes are at,
->>      https://github.com/salil-mehta/linux.git virt-cpuhp-arm64/rfc-v1
->> (*) QEMU changes for vcpu hotplug could be cloned from below site,
->>      https://github.com/salil-mehta/qemu.git virt-cpuhp-armv8/rfc-v1
->>
->>
->> THINGS TO DO:
->> 1. Handling of per-cpu variables especially the first-chunk allocations
->>    (which are NUMA aware) when the vcpu is hotplugged needs further attention
->>    and review.
->> 2. NUMA related stuff has not been fully tested both in QEMU and kernel.
->> 3. Comprehensive Testing including when cpu hotplug is not supported.
->> 4. Docs
->>
->> DISCLAIMER:
->> This is not a complete work but an effort to present the arm vcpu hotplug
->> implementation to the community. This RFC is being used as a way to verify
->> the idea mentioned above and to support changes presented for QEMU[1] to
->> support vcpu hotplug. As of now this is *not* a production level code and might
->> have bugs. Only a basic testing has been done on HiSilicon Kunpeng920 ARM64
->> based SoC for Servers to verify the proof-of-concept that has been found working!
->>
->> Best regards
->> Salil.
->>
->> REFERENCES:
->> [1] https://www.mail-archive.com/qemu-devel@nongnu.org/msg712010.html
->> [2] https://lkml.org/lkml/2019/6/28/1157
->> [3] https://lists.cs.columbia.edu/pipermail/kvmarm/2018-July/032316.html
->>
->> Organization of Patches:
->> [Patch 1-3]
->> (*) Changes required during guest boot time to support vcpu hotplug
->> (*) Max cpu overflow checks
->> (*) Changes required to pre-setup cpu-operations even for disabled cpus
->> [Patch 4]
->> (*) Arch changes required by guest kernel ACPI CPU Hotplug framework.
->>
->>
->> Salil Mehta (4):
->>   arm64: kernel: Handle disabled[(+)present] cpus in MADT/GICC during
->>     init
->>   arm64: kernel: Bound the total(present+disabled) cpus with nr_cpu_ids
->>   arm64: kernel: Init cpu operations for all possible vcpus
->>   arm64: kernel: Arch specific ACPI hooks(like logical cpuid<->hwid
->>     etc.)
->>
->>  arch/arm64/kernel/smp.c | 153 ++++++++++++++++++++++++++++++++--------
->>  1 file changed, 123 insertions(+), 30 deletions(-)
->>
->> --
->> 2.17.1
->>
-> 
-
+My Regards to your family.
+Mrs. Safiatou Zoungrana.
