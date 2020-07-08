@@ -2,151 +2,119 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BA81E217D3F
-	for <lists+kvm@lfdr.de>; Wed,  8 Jul 2020 04:57:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5B622217DBD
+	for <lists+kvm@lfdr.de>; Wed,  8 Jul 2020 05:49:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728657AbgGHC5p (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 7 Jul 2020 22:57:45 -0400
-Received: from mga01.intel.com ([192.55.52.88]:49034 "EHLO mga01.intel.com"
+        id S1729485AbgGHDtj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 7 Jul 2020 23:49:39 -0400
+Received: from mga03.intel.com ([134.134.136.65]:60573 "EHLO mga03.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728298AbgGHC5p (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 7 Jul 2020 22:57:45 -0400
-IronPort-SDR: OKbL1/TCwglT8Q9ZG4G+pz0je+FL7LktRmZhpap1dBCNrT0DeSDZXLIOF0pc0qQQ0lsj0gS09E
- N4yHcOi2NS/w==
-X-IronPort-AV: E=McAfee;i="6000,8403,9675"; a="165802807"
+        id S1728369AbgGHDtj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 7 Jul 2020 23:49:39 -0400
+IronPort-SDR: rcSMqIbHYADQMGg7i7SM92vw4kADQ1O8GVGdjlYOJ/Tmu+ZP9izrX+bUWvD/y1R4EcIB6wIved
+ d7jms/mJpWHg==
+X-IronPort-AV: E=McAfee;i="6000,8403,9675"; a="147740710"
 X-IronPort-AV: E=Sophos;i="5.75,326,1589266800"; 
-   d="scan'208";a="165802807"
+   d="scan'208";a="147740710"
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Jul 2020 19:57:44 -0700
-IronPort-SDR: NWBGavxXZ0Y2OEfeOpa5yL3dbxWEkLftrQJ1t6KHDS/S4/wLSkPMlMJ/7R0rlPEJGtpdkhJq4B
- C2UnIQJWPqPw==
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Jul 2020 20:49:38 -0700
+IronPort-SDR: ED0kLdDbgT5Umbh0ovHrUHXgJ7OjjtOYtlyuFZOoad60pnHIMEzu1T0y8kedt2dYbez1U1BBpx
+ YMQjmFrKUbUw==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.75,326,1589266800"; 
-   d="scan'208";a="457339798"
-Received: from allen-box.sh.intel.com (HELO [10.239.159.139]) ([10.239.159.139])
-  by orsmga005.jf.intel.com with ESMTP; 07 Jul 2020 19:57:41 -0700
-Cc:     baolu.lu@linux.intel.com, Joerg Roedel <joro@8bytes.org>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Kevin Tian <kevin.tian@intel.com>,
-        Ashok Raj <ashok.raj@intel.com>,
-        Dave Jiang <dave.jiang@intel.com>,
-        Liu Yi L <yi.l.liu@intel.com>,
-        iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Subject: Re: [PATCH v2 1/2] iommu: iommu_aux_at(de)tach_device() extension
-To:     Alex Williamson <alex.williamson@redhat.com>
-References: <20200707013957.23672-1-baolu.lu@linux.intel.com>
- <20200707013957.23672-2-baolu.lu@linux.intel.com>
- <20200707150408.474d81f1@x1.home>
-From:   Lu Baolu <baolu.lu@linux.intel.com>
-Message-ID: <dc98a109-7121-36b7-0854-f899b09692a4@linux.intel.com>
-Date:   Wed, 8 Jul 2020 10:53:12 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
+   d="scan'208";a="305894597"
+Received: from joy-optiplex-7040.sh.intel.com (HELO joy-OptiPlex-7040) ([10.239.13.16])
+  by fmsmga004.fm.intel.com with ESMTP; 07 Jul 2020 20:49:36 -0700
+Date:   Wed, 8 Jul 2020 11:38:46 +0800
+From:   Yan Zhao <yan.y.zhao@intel.com>
+To:     Zhenyu Wang <zhenyuw@linux.intel.com>
+Cc:     Alex Williamson <alex.williamson@redhat.com>,
+        "Tian, Kevin" <kevin.tian@intel.com>,
+        "intel-gvt-dev@lists.freedesktop.org" 
+        <intel-gvt-dev@lists.freedesktop.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Subject: Re: [PATCH v3 0/2] VFIO mdev aggregated resources handling
+Message-ID: <20200708033845.GB20022@joy-OptiPlex-7040>
+Reply-To: Yan Zhao <yan.y.zhao@intel.com>
+References: <20200326054136.2543-1-zhenyuw@linux.intel.com>
+ <20200408055824.2378-1-zhenyuw@linux.intel.com>
+ <MWHPR11MB1645CC388BF45FD2E6309C3C8C660@MWHPR11MB1645.namprd11.prod.outlook.com>
+ <20200707190634.4d9055fe@x1.home>
+ <20200708015419.GM27035@zhen-hp.sh.intel.com>
 MIME-Version: 1.0
-In-Reply-To: <20200707150408.474d81f1@x1.home>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200708015419.GM27035@zhen-hp.sh.intel.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Alex,
-
-Thanks a lot for your comments. Please check my reply inline.
-
-On 7/8/20 5:04 AM, Alex Williamson wrote:
-> On Tue,  7 Jul 2020 09:39:56 +0800
-> Lu Baolu<baolu.lu@linux.intel.com>  wrote:
+On Wed, Jul 08, 2020 at 09:54:19AM +0800, Zhenyu Wang wrote:
+> On 2020.07.07 19:06:34 -0600, Alex Williamson wrote:
+> > On Tue, 7 Jul 2020 23:28:39 +0000
+> > "Tian, Kevin" <kevin.tian@intel.com> wrote:
+> > 
+> > > Hi, Alex, 
+> > > 
+> > > Gentle ping... Please let us know whether this version looks good.
+> > 
+> > I figured this is entangled with the versioning scheme.  There are
+> > unanswered questions about how something that assumes a device of a
+> > given type is software compatible to another device of the same type
+> > handles aggregation and how the type class would indicate compatibility
+> > with an aggregated instance.  Thanks,
+> > 
 > 
->> The hardware assistant vfio mediated device is a use case of iommu
->> aux-domain. The interactions between vfio/mdev and iommu during mdev
->> creation and passthr are:
->>
->> - Create a group for mdev with iommu_group_alloc();
->> - Add the device to the group with
->>          group = iommu_group_alloc();
->>          if (IS_ERR(group))
->>                  return PTR_ERR(group);
->>
->>          ret = iommu_group_add_device(group, &mdev->dev);
->>          if (!ret)
->>                  dev_info(&mdev->dev, "MDEV: group_id = %d\n",
->>                           iommu_group_id(group));
->> - Allocate an aux-domain
->>          iommu_domain_alloc()
->> - Attach the aux-domain to the physical device from which the mdev is
->>    created.
->>          iommu_aux_attach_device()
->>
->> In the whole process, an iommu group was allocated for the mdev and an
->> iommu domain was attached to the group, but the group->domain leaves
->> NULL. As the result, iommu_get_domain_for_dev() doesn't work anymore.
->>
->> The iommu_get_domain_for_dev() is a necessary interface for device
->> drivers that want to support aux-domain. For example,
->>
->>          struct iommu_domain *domain;
->>          struct device *dev = mdev_dev(mdev);
->>          unsigned long pasid;
->>
->>          domain = iommu_get_domain_for_dev(dev);
->>          if (!domain)
->>                  return -ENODEV;
->>
->>          pasid = iommu_aux_get_pasid(domain, dev->parent);
-> How did we know this was an aux domain? ie. How did we know we could
-> use it with iommu_aux_get_pasid()?
-
-Yes. It's a bit confusing if iommu_get_domain_for_dev() is reused here
-for aux-domain.
-
+> +Yan
 > 
-> Why did we assume the parent device is the iommu device for the aux
-> domain?  Should that level of detail be already known by the aux domain?
+> Alex, If no concern on aggregated resources info for instance that would
+> be vendor's behavior to determine what type of resources would be aggregated,
+> then I'll check with Yan to see how to fulfill this during migration.
 > 
-> Nits - The iomu device of an mdev device is found via
-> mdev_get_iommu_device(dev), it should not be assumed to be the parent.
-> The parent of an mdev device is found via mdev_parent_dev(mdev).
+> Thanks
+>
 
-My bad. The driver should use mdev_get_iommu_device() instead.
+hi zhenyu and Alex
+currently in this series, it looks that aggregated instances are created
+in this way:
+    echo "<uuid>,aggregate=10" > create
 
-> 
-> The leaps in logic here make me wonder if we should instead be exposing
-> more of an aux domain API rather than blurring the differences between
-> these domains.  Thanks,
+Is that possible that we change it like that:
+1. provide a separate attribute named "aggregator" under mdev type.
+  |- [parent physical device]
+  |--- Vendor-specific-attributes [optional]
+  |--- [mdev_supported_types]
+  |     |--- [<type-id>]
+  |     |   |--- create
++ |     |   |--- aggregator
+  |     |   |--- name
+  |     |   |--- available_instances
+  |     |   |--- device_api
+  |     |   |--- description
+  |     |   |--- [devices]
 
-How about add below API?
+normally, the aggregator is read as 0.
 
-/**
-  * iommu_aux_get_domain_for_dev - get aux domain for a device
-  * @dev: the accessory device
-  *
-  * The caller should pass a valid @dev to iommu_aux_attach_device() before
-  * calling this api. Return an attached aux-domain, or NULL otherwise.
-  */
-struct iommu_domain *iommu_aux_get_domain_for_dev(struct device *dev)
-{
-         struct iommu_domain *domain = NULL;
-         struct iommu_group *group;
 
-         group = iommu_group_get(dev);
-         if (!group)
-                 return NULL;
+2. when we want to create an aggregated instance, we first echo the count
+into the aggregator attribute. e.g.
+   echo 10 > aggregator
+It will switch the mdev type to 10 x original_type. And then,
+available_instances and description would be updated accordingly.
 
-         if (group->aux_domain_attached)
-                 domain = group->domain;
+3. do the real mdev creation.
+   echo <uuid> > create
 
-         iommu_group_put(group);
 
-         return domain;
-}
-EXPORT_SYMBOL_GPL(iommu_aux_get_domain_for_dev);
+In this way, before any instance is created, we can use the
+migration_version attribute to test if two aggregation mdevs are
+migration compatible.
 
-Best regards,
-baolu
+Thanks
+Yan
+
+
