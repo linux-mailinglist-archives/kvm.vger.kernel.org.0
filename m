@@ -2,942 +2,537 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id EF2A42187F6
-	for <lists+kvm@lfdr.de>; Wed,  8 Jul 2020 14:47:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 76CE92188A6
+	for <lists+kvm@lfdr.de>; Wed,  8 Jul 2020 15:14:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729169AbgGHMrU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 8 Jul 2020 08:47:20 -0400
-Received: from smtp-fw-4101.amazon.com ([72.21.198.25]:42513 "EHLO
-        smtp-fw-4101.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728941AbgGHMrT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 8 Jul 2020 08:47:19 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1594212432; x=1625748432;
-  h=subject:to:cc:references:from:message-id:date:
-   mime-version:in-reply-to:content-transfer-encoding;
-  bh=btrDV7aPAqvlElbvwAkFQmMKkQBqBqJee/b+p+KItns=;
-  b=BTMibEBM7clfhfQcE58lc2X15T8a/0DnAHxuwxqvfdImA9EubWQF3DkV
-   8+baYGBwfakQUMoJvZgxMD5pApWEd5ATnr7QWIXgH5dZIaGYqchWfz09u
-   0T5Q7sidcfA0D/QLalOjvvKI3S/38jJZ4FCmr9P9z8tNaW0z469k5VY8p
-   s=;
-IronPort-SDR: WJyvA9mxqWowPK4+4DsGJk+1HdBnbhVPJuiWD4G58/KQ3uZWq44DaSP03TEWT9MJZ1FAOshrG9
- c/fx7KUis/nw==
-X-IronPort-AV: E=Sophos;i="5.75,327,1589241600"; 
-   d="scan'208";a="40844025"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-1d-38ae4ad2.us-east-1.amazon.com) ([10.43.8.6])
-  by smtp-border-fw-out-4101.iad4.amazon.com with ESMTP; 08 Jul 2020 12:47:11 +0000
-Received: from EX13MTAUEA002.ant.amazon.com (iad55-ws-svc-p15-lb9-vlan3.iad.amazon.com [10.40.159.166])
-        by email-inbound-relay-1d-38ae4ad2.us-east-1.amazon.com (Postfix) with ESMTPS id 0DDCDA26D6;
-        Wed,  8 Jul 2020 12:47:09 +0000 (UTC)
-Received: from EX13D16EUB001.ant.amazon.com (10.43.166.28) by
- EX13MTAUEA002.ant.amazon.com (10.43.61.77) with Microsoft SMTP Server (TLS)
- id 15.0.1497.2; Wed, 8 Jul 2020 12:47:08 +0000
-Received: from 38f9d34ed3b1.ant.amazon.com (10.43.160.65) by
- EX13D16EUB001.ant.amazon.com (10.43.166.28) with Microsoft SMTP Server (TLS)
- id 15.0.1497.2; Wed, 8 Jul 2020 12:46:58 +0000
-Subject: Re: [PATCH v4 09/18] nitro_enclaves: Add logic for enclave vcpu
- creation
-To:     Alexander Graf <graf@amazon.de>, <linux-kernel@vger.kernel.org>
-CC:     Anthony Liguori <aliguori@amazon.com>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Colm MacCarthaigh <colmmacc@amazon.com>,
-        "Bjoern Doebel" <doebel@amazon.de>,
-        David Woodhouse <dwmw@amazon.co.uk>,
-        "Frank van der Linden" <fllinden@amazon.com>,
-        Greg KH <gregkh@linuxfoundation.org>,
-        Martin Pohlack <mpohlack@amazon.de>,
-        Matt Wilson <msw@amazon.com>,
-        "Paolo Bonzini" <pbonzini@redhat.com>,
-        Balbir Singh <sblbir@amazon.com>,
-        "Stefano Garzarella" <sgarzare@redhat.com>,
+        id S1729216AbgGHNOH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 8 Jul 2020 09:14:07 -0400
+Received: from fllv0016.ext.ti.com ([198.47.19.142]:55880 "EHLO
+        fllv0016.ext.ti.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729120AbgGHNOG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 8 Jul 2020 09:14:06 -0400
+Received: from fllv0035.itg.ti.com ([10.64.41.0])
+        by fllv0016.ext.ti.com (8.15.2/8.15.2) with ESMTP id 068DDq2V001827;
+        Wed, 8 Jul 2020 08:13:52 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+        s=ti-com-17Q1; t=1594214032;
+        bh=cMLoWmdcg4irl9f/FFKTtPsVPTDsmTG7EG8MXulcUu8=;
+        h=Subject:To:CC:References:From:Date:In-Reply-To;
+        b=ioi9XFoTzA3Rh3elMROullAUjwotQC0NYCqPw9fqSiXYu0x4pDuJigjp7wvppKAxl
+         r6kOKNX92ERfcKZ45xzfOUylm/qUmqzb4naYyu2NETxeJ/WJNYHOaKh7tMe7pvuqsG
+         weFsB9WyBSENwidvZPiykDqkKAnHDe7R0hfZCLJo=
+Received: from DFLE108.ent.ti.com (dfle108.ent.ti.com [10.64.6.29])
+        by fllv0035.itg.ti.com (8.15.2/8.15.2) with ESMTP id 068DDqWD073626;
+        Wed, 8 Jul 2020 08:13:52 -0500
+Received: from DFLE108.ent.ti.com (10.64.6.29) by DFLE108.ent.ti.com
+ (10.64.6.29) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.1979.3; Wed, 8 Jul
+ 2020 08:13:52 -0500
+Received: from fllv0039.itg.ti.com (10.64.41.19) by DFLE108.ent.ti.com
+ (10.64.6.29) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.1979.3 via
+ Frontend Transport; Wed, 8 Jul 2020 08:13:52 -0500
+Received: from [10.250.233.85] (ileax41-snat.itg.ti.com [10.172.224.153])
+        by fllv0039.itg.ti.com (8.15.2/8.15.2) with ESMTP id 068DDk2a100845;
+        Wed, 8 Jul 2020 08:13:46 -0500
+Subject: Re: [RFC PATCH 00/22] Enhance VHOST to enable SoC-to-SoC
+ communication
+To:     Jason Wang <jasowang@redhat.com>
+CC:     "Michael S. Tsirkin" <mst@redhat.com>,
+        Ohad Ben-Cohen <ohad@wizery.com>,
+        Bjorn Andersson <bjorn.andersson@linaro.org>,
+        Jon Mason <jdmason@kudzu.us>,
+        Dave Jiang <dave.jiang@intel.com>,
+        Allen Hubbe <allenbh@gmail.com>,
+        Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>,
+        Bjorn Helgaas <bhelgaas@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
         Stefan Hajnoczi <stefanha@redhat.com>,
-        Stewart Smith <trawets@amazon.com>,
-        Uwe Dannowski <uwed@amazon.de>, <kvm@vger.kernel.org>,
-        <ne-devel-upstream@amazon.com>
-References: <20200622200329.52996-1-andraprs@amazon.com>
- <20200622200329.52996-10-andraprs@amazon.com>
- <52e916fc-8fe3-f9bc-009e-ca84ab7dd650@amazon.de>
-From:   "Paraschiv, Andra-Irina" <andraprs@amazon.com>
-Message-ID: <c56a653f-31ab-6c7f-6b30-6651e4c23d77@amazon.com>
-Date:   Wed, 8 Jul 2020 15:46:44 +0300
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:68.0)
- Gecko/20100101 Thunderbird/68.10.0
+        Stefano Garzarella <sgarzare@redhat.com>,
+        <linux-doc@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <linux-remoteproc@vger.kernel.org>, <linux-ntb@googlegroups.com>,
+        <linux-pci@vger.kernel.org>, <kvm@vger.kernel.org>,
+        <virtualization@lists.linux-foundation.org>,
+        <netdev@vger.kernel.org>
+References: <20200702082143.25259-1-kishon@ti.com>
+ <20200702055026-mutt-send-email-mst@kernel.org>
+ <603970f5-3289-cd53-82a9-aa62b292c552@redhat.com>
+ <14c6cad7-9361-7fa4-e1c6-715ccc7e5f6b@ti.com>
+ <59fd6a0b-8566-44b7-3dae-bb52b468219b@redhat.com>
+ <ce9eb6a5-cd3a-a390-5684-525827b30f64@ti.com>
+ <da2b671c-b05d-a57f-7bdf-8b1043a41240@redhat.com>
+ <fee8a0fb-f862-03bd-5ede-8f105b6af529@ti.com>
+ <b2178e1d-2f5c-e8a3-72fb-70f2f8d6aa45@redhat.com>
+From:   Kishon Vijay Abraham I <kishon@ti.com>
+Message-ID: <45a8a97c-2061-13ee-5da8-9877a4a3b8aa@ti.com>
+Date:   Wed, 8 Jul 2020 18:43:45 +0530
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <52e916fc-8fe3-f9bc-009e-ca84ab7dd650@amazon.de>
+In-Reply-To: <b2178e1d-2f5c-e8a3-72fb-70f2f8d6aa45@redhat.com>
+Content-Type: text/plain; charset="utf-8"
 Content-Language: en-US
-X-Originating-IP: [10.43.160.65]
-X-ClientProxiedBy: EX13D28UWC004.ant.amazon.com (10.43.162.24) To
- EX13D16EUB001.ant.amazon.com (10.43.166.28)
-Content-Type: text/plain; charset="windows-1252"; format="flowed"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Hi Jason,
 
-
-On 06/07/2020 13:12, Alexander Graf wrote:
->
->
-> On 22.06.20 22:03, Andra Paraschiv wrote:
->> An enclave, before being started, has its resources set. One of its
->> resources is CPU.
+On 7/8/2020 4:52 PM, Jason Wang wrote:
+> 
+> On 2020/7/7 下午10:45, Kishon Vijay Abraham I wrote:
+>> Hi Jason,
 >>
->> The NE CPU pool is set for choosing CPUs for enclaves from it. Offline
->> the CPUs from the NE CPU pool during the pool setup and online them back
->> during the NE CPU pool teardown.
+>> On 7/7/2020 3:17 PM, Jason Wang wrote:
+>>> On 2020/7/6 下午5:32, Kishon Vijay Abraham I wrote:
+>>>> Hi Jason,
+>>>>
+>>>> On 7/3/2020 12:46 PM, Jason Wang wrote:
+>>>>> On 2020/7/2 下午9:35, Kishon Vijay Abraham I wrote:
+>>>>>> Hi Jason,
+>>>>>>
+>>>>>> On 7/2/2020 3:40 PM, Jason Wang wrote:
+>>>>>>> On 2020/7/2 下午5:51, Michael S. Tsirkin wrote:
+>>>>>>>> On Thu, Jul 02, 2020 at 01:51:21PM +0530, Kishon Vijay Abraham I wrote:
+>>>>>>>>> This series enhances Linux Vhost support to enable SoC-to-SoC
+>>>>>>>>> communication over MMIO. This series enables rpmsg communication between
+>>>>>>>>> two SoCs using both PCIe RC<->EP and HOST1-NTB-HOST2
+>>>>>>>>>
+>>>>>>>>> 1) Modify vhost to use standard Linux driver model
+>>>>>>>>> 2) Add support in vring to access virtqueue over MMIO
+>>>>>>>>> 3) Add vhost client driver for rpmsg
+>>>>>>>>> 4) Add PCIe RC driver (uses virtio) and PCIe EP driver (uses vhost) for
+>>>>>>>>>        rpmsg communication between two SoCs connected to each other
+>>>>>>>>> 5) Add NTB Virtio driver and NTB Vhost driver for rpmsg communication
+>>>>>>>>>        between two SoCs connected via NTB
+>>>>>>>>> 6) Add configfs to configure the components
+>>>>>>>>>
+>>>>>>>>> UseCase1 :
+>>>>>>>>>
+>>>>>>>>>      VHOST RPMSG                     VIRTIO RPMSG
+>>>>>>>>>           +                               +
+>>>>>>>>>           |                               |
+>>>>>>>>>           |                               |
+>>>>>>>>>           |                               |
+>>>>>>>>>           |                               |
+>>>>>>>>> +-----v------+                 +------v-------+
+>>>>>>>>> |   Linux    |                 |     Linux    |
+>>>>>>>>> |  Endpoint  |                 | Root Complex |
+>>>>>>>>> |            <----------------->              |
+>>>>>>>>> |            |                 |              |
+>>>>>>>>> |    SOC1    |                 |     SOC2     |
+>>>>>>>>> +------------+                 +--------------+
+>>>>>>>>>
+>>>>>>>>> UseCase 2:
+>>>>>>>>>
+>>>>>>>>>          VHOST RPMSG                                      VIRTIO RPMSG
+>>>>>>>>>               +                                                 +
+>>>>>>>>>               |                                                 |
+>>>>>>>>>               |                                                 |
+>>>>>>>>>               |                                                 |
+>>>>>>>>>               |                                                 |
+>>>>>>>>>        +------v------+                                   +------v------+
+>>>>>>>>>        |             |                                   |             |
+>>>>>>>>>        |    HOST1    |                                   |    HOST2    |
+>>>>>>>>>        |             |                                   |             |
+>>>>>>>>>        +------^------+                                   +------^------+
+>>>>>>>>>               |                                                 |
+>>>>>>>>>               |                                                 |
+>>>>>>>>> +---------------------------------------------------------------------+
+>>>>>>>>> |  +------v------+                                   +------v------+  |
+>>>>>>>>> |  |             |                                   |             |  |
+>>>>>>>>> |  |     EP      |                                   |     EP      |  |
+>>>>>>>>> |  | CONTROLLER1 |                                   | CONTROLLER2 |  |
+>>>>>>>>> |  |             <----------------------------------->             |  |
+>>>>>>>>> |  |             |                                   |             |  |
+>>>>>>>>> |  |             |                                   |             |  |
+>>>>>>>>> |  |             |  SoC With Multiple EP Instances   |             |  |
+>>>>>>>>> |  |             |  (Configured using NTB Function)  |             |  |
+>>>>>>>>> |  +-------------+                                   +-------------+  |
+>>>>>>>>> +---------------------------------------------------------------------+
+>>>>>>>>>
+>>>>>>>>> Software Layering:
+>>>>>>>>>
+>>>>>>>>> The high-level SW layering should look something like below. This series
+>>>>>>>>> adds support only for RPMSG VHOST, however something similar should be
+>>>>>>>>> done for net and scsi. With that any vhost device (PCI, NTB, Platform
+>>>>>>>>> device, user) can use any of the vhost client driver.
+>>>>>>>>>
+>>>>>>>>>
+>>>>>>>>>         +----------------+  +-----------+  +------------+  +----------+
+>>>>>>>>>         |  RPMSG VHOST   |  | NET VHOST |  | SCSI VHOST |  |    X     |
+>>>>>>>>>         +-------^--------+  +-----^-----+  +-----^------+  +----^-----+
+>>>>>>>>>                 |                 |              |              |
+>>>>>>>>>                 |                 |              |              |
+>>>>>>>>>                 |                 |              |              |
+>>>>>>>>> +-----------v-----------------v--------------v--------------v----------+
+>>>>>>>>> |                            VHOST CORE                                |
+>>>>>>>>> +--------^---------------^--------------------^------------------^-----+
+>>>>>>>>>              |               |                    |                  |
+>>>>>>>>>              |               |                    |                  |
+>>>>>>>>>              |               |                    |                  |
+>>>>>>>>> +--------v-------+  +----v------+  +----------v----------+  +----v-----+
+>>>>>>>>> |  PCI EPF VHOST |  | NTB VHOST |  |PLATFORM DEVICE VHOST|  |    X     |
+>>>>>>>>> +----------------+  +-----------+  +---------------------+  +----------+
+>>>>>>>>>
+>>>>>>>>> This was initially proposed here [1]
+>>>>>>>>>
+>>>>>>>>> [1] ->
+>>>>>>>>> https://lore.kernel.org/r/2cf00ec4-1ed6-f66e-6897-006d1a5b6390@ti.com
+>>>>>>>> I find this very interesting. A huge patchset so will take a bit
+>>>>>>>> to review, but I certainly plan to do that. Thanks!
+>>>>>>> Yes, it would be better if there's a git branch for us to have a look.
+>>>>>> I've pushed the branch
+>>>>>> https://github.com/kishon/linux-wip.git vhost_rpmsg_pci_ntb_rfc
+>>>>> Thanks
+>>>>>
+>>>>>
+>>>>>>> Btw, I'm not sure I get the big picture, but I vaguely feel some of the
+>>>>>>> work is
+>>>>>>> duplicated with vDPA (e.g the epf transport or vhost bus).
+>>>>>> This is about connecting two different HW systems both running Linux and
+>>>>>> doesn't necessarily involve virtualization.
+>>>>> Right, this is something similar to VOP
+>>>>> (Documentation/misc-devices/mic/mic_overview.rst). The different is the
+>>>>> hardware I guess and VOP use userspace application to implement the device.
+>>>> I'd also like to point out, this series tries to have communication between
+>>>> two
+>>>> SoCs in vendor agnostic way. Since this series solves for 2 usecases (PCIe
+>>>> RC<->EP and NTB), for the NTB case it directly plugs into NTB framework and
+>>>> any
+>>>> of the HW in NTB below should be able to use a virtio-vhost communication
+>>>>
+>>>> #ls drivers/ntb/hw/
+>>>> amd  epf  idt  intel  mscc
+>>>>
+>>>> And similarly for the PCIe RC<->EP communication, this adds a generic endpoint
+>>>> function driver and hence any SoC that supports configurable PCIe endpoint can
+>>>> use virtio-vhost communication
+>>>>
+>>>> # ls drivers/pci/controller/dwc/*ep*
+>>>> drivers/pci/controller/dwc/pcie-designware-ep.c
+>>>> drivers/pci/controller/dwc/pcie-uniphier-ep.c
+>>>> drivers/pci/controller/dwc/pci-layerscape-ep.c
+>>>
+>>> Thanks for those backgrounds.
+>>>
+>>>
+>>>>>>     So there is no guest or host as in
+>>>>>> virtualization but two entirely different systems connected via PCIe cable,
+>>>>>> one
+>>>>>> acting as guest and one as host. So one system will provide virtio
+>>>>>> functionality reserving memory for virtqueues and the other provides vhost
+>>>>>> functionality providing a way to access the virtqueues in virtio memory.
+>>>>>> One is
+>>>>>> source and the other is sink and there is no intermediate entity. (vhost was
+>>>>>> probably intermediate entity in virtualization?)
+>>>>> (Not a native English speaker) but "vhost" could introduce some confusion for
+>>>>> me since it was use for implementing virtio backend for userspace drivers. I
+>>>>> guess "vringh" could be better.
+>>>> Initially I had named this vringh but later decided to choose vhost instead of
+>>>> vringh. vhost is still a virtio backend (not necessarily userspace) though it
+>>>> now resides in an entirely different system. Whatever virtio is for a frontend
+>>>> system, vhost can be that for a backend system. vring can be for accessing
+>>>> virtqueue and can be used either in frontend or backend.
+>>>
+>>> Ok.
+>>>
+>>>
+>>>>>>> Have you considered to implement these through vDPA?
+>>>>>> IIUC vDPA only provides an interface to userspace and an in-kernel rpmsg
+>>>>>> driver
+>>>>>> or vhost net driver is not provided.
+>>>>>>
+>>>>>> The HW connection looks something like https://pasteboard.co/JfMVVHC.jpg
+>>>>>> (usecase2 above),
+>>>>> I see.
+>>>>>
+>>>>>
+>>>>>>     all the boards run Linux. The middle board provides NTB
+>>>>>> functionality and board on either side provides virtio/vhost
+>>>>>> functionality and
+>>>>>> transfer data using rpmsg.
+>>>>> So I wonder whether it's worthwhile for a new bus. Can we use the existed
+>>>>> virtio-bus/drivers? It might work as, except for the epf transport, we can
+>>>>> introduce a epf "vhost" transport driver.
+>>>> IMHO we'll need two buses one for frontend and other for backend because the
+>>>> two components can then co-operate/interact with each other to provide a
+>>>> functionality. Though both will seemingly provide similar callbacks, they are
+>>>> both provide symmetrical or complimentary funcitonality and need not be
+>>>> same or
+>>>> identical.
+>>>>
+>>>> Having the same bus can also create sequencing issues.
+>>>>
+>>>> If you look at virtio_dev_probe() of virtio_bus
+>>>>
+>>>> device_features = dev->config->get_features(dev);
+>>>>
+>>>> Now if we use same bus for both front-end and back-end, both will try to
+>>>> get_features when there has been no set_features. Ideally vhost device should
+>>>> be initialized first with the set of features it supports. Vhost and virtio
+>>>> should use "status" and "features" complimentarily and not identically.
+>>>
+>>> Yes, but there's no need for doing status/features passthrough in epf vhost
+>>> drivers.b
+>>>
+>>>
+>>>> virtio device (or frontend) cannot be initialized before vhost device (or
+>>>> backend) gets initialized with data such as features. Similarly vhost
+>>>> (backend)
+>>>> cannot access virqueues or buffers before virtio (frontend) sets
+>>>> VIRTIO_CONFIG_S_DRIVER_OK whereas that requirement is not there for virtio as
+>>>> the physical memory for virtqueues are created by virtio (frontend).
+>>>
+>>> epf vhost drivers need to implement two devices: vhost(vringh) device and
+>>> virtio device (which is a mediated device). The vhost(vringh) device is doing
+>>> feature negotiation with the virtio device via RC/EP or NTB. The virtio device
+>>> is doing feature negotiation with local virtio drivers. If there're feature
+>>> mismatch, epf vhost drivers and do mediation between them.
+>> Here epf vhost should be initialized with a set of features for it to negotiate
+>> either as vhost device or virtio device no? Where should the initial feature
+>> set for epf vhost come from?
+> 
+> 
+> I think it can work as:
+> 
+> 1) Having an initial features (hard coded in the code) set X in epf vhost
+> 2) Using this X for both virtio device and vhost(vringh) device
+> 3) local virtio driver will negotiate with virtio device with feature set Y
+> 4) remote virtio driver will negotiate with vringh device with feature set Z
+> 5) mediate between feature Y and feature Z since both Y and Z are a subset of X
+> 
+> 
+
+okay. I'm also thinking if we could have configfs for configuring this. Anyways
+we could find different approaches of configuring this.
+>>>
+>>>>> It will have virtqueues but only used for the communication between itself
+>>>>> and
+>>>>> uppter virtio driver. And it will have vringh queues which will be probe by
+>>>>> virtio epf transport drivers. And it needs to do datacopy between
+>>>>> virtqueue and
+>>>>> vringh queues.
+>>>>>
+>>>>> It works like:
+>>>>>
+>>>>> virtio drivers <- virtqueue/virtio-bus -> epf vhost drivers <- vringh
+>>>>> queue/epf>
+>>>>>
+>>>>> The advantages is that there's no need for writing new buses and drivers.
+>>>> I think this will work however there is an addtional copy between vringh queue
+>>>> and virtqueue,
+>>>
+>>> I think not? E.g in use case 1), if we stick to virtio bus, we will have:
+>>>
+>>> virtio-rpmsg (EP) <- virtio ring(1) -> epf vhost driver (EP) <- virtio ring(2)
+>>> -> virtio pci (RC) <-> virtio rpmsg (RC)
+>> IIUC epf vhost driver (EP) will access virtio ring(2) using vringh?
+> 
+> 
+> Yes.
+> 
+> 
+>> And virtio
+>> ring(2) is created by virtio pci (RC).
+> 
+> 
+> Yes.
+> 
+> 
+>>> What epf vhost driver did is to read from virtio ring(1) about the buffer len
+>>> and addr and them DMA to Linux(RC)?
+>> okay, I made some optimization here where vhost-rpmsg using a helper writes a
+>> buffer from rpmsg's upper layer directly to remote Linux (RC) as against here
+>> were it has to be first written to virtio ring (1).
 >>
->> The enclave CPUs need to be full cores and from the same NUMA node. CPU
->> 0 and its siblings have to remain available to the primary / parent VM.
+>> Thinking how this would look for NTB
+>> virtio-rpmsg (HOST1) <- virtio ring(1) -> NTB(HOST1) <-> NTB(HOST2)  <- virtio
+>> ring(2) -> virtio-rpmsg (HOST2)
 >>
->> Add ioctl command logic for enclave vCPU creation. Return as result a
->> file descriptor that is associated with the enclave vCPU.
+>> Here the NTB(HOST1) will access the virtio ring(2) using vringh?
+> 
+> 
+> Yes, I think so it needs to use vring to access virtio ring (1) as well.
+
+NTB(HOST1) and virtio ring(1) will be in the same system. So it doesn't have to
+use vring. virtio ring(1) is by the virtio device the NTB(HOST1) creates.
+> 
+> 
 >>
->> Signed-off-by: Alexandru Vasile <lexnv@amazon.com>
->> Signed-off-by: Andra Paraschiv <andraprs@amazon.com>
->> ---
->> Changelog
+>> Do you also think this will work seamlessly with virtio_net.c, virtio_blk.c?
+> 
+> 
+> Yes.
+
+okay, I haven't looked at this but the backend of virtio_blk should access an
+actual storage device no?
+> 
+> 
 >>
->> v3 -> v4
+>> I'd like to get clarity on two things in the approach you suggested, one is
+>> features (since epf vhost should ideally be transparent to any virtio driver)
+> 
+> 
+> We can have have an array of pre-defined features indexed by virtio device id
+> in the code.
+> 
+> 
+>> and the other is how certain inputs to virtio device such as number of buffers
+>> be determined.
+> 
+> 
+> We can start from hard coded the value like 256, or introduce some API for user
+> to change the value.
+> 
+> 
 >>
->> * Setup the NE CPU pool at runtime via a sysfs file for the kernel
->> =A0=A0 parameter.
->> * Check enclave CPUs to be from the same NUMA node.
->> * Use dev_err instead of custom NE log pattern.
->> * Update the NE ioctl call to match the decoupling from the KVM API.
+>> Thanks again for your suggestions!
+> 
+> 
+> You're welcome.
+> 
+> Note that I just want to check whether or not we can reuse the virtio
+> bus/driver. It's something similar to what you proposed in Software Layering
+> but we just replace "vhost core" with "virtio bus" and move the vhost core
+> below epf/ntb/platform transport.
+
+Got it. My initial design was based on my understanding of your comments [1].
+
+I'll try to create something based on your proposed design here.
+
+Regards
+Kishon
+
+[1] ->
+https://lore.kernel.org/linux-pci/59982499-0fc1-2e39-9ff9-993fb4dd7dcc@redhat.com/
+> 
+> Thanks
+> 
+> 
 >>
->> v2 -> v3
+>> Regards
+>> Kishon
 >>
->> * Remove the WARN_ON calls.
->> * Update static calls sanity checks.
->> * Update kzfree() calls to kfree().
->> * Remove file ops that do nothing for now - open, ioctl and release.
->>
->> v1 -> v2
->>
->> * Add log pattern for NE.
->> * Update goto labels to match their purpose.
->> * Remove the BUG_ON calls.
->> * Check if enclave state is init when setting enclave vcpu.
->> ---
->> =A0 drivers/virt/nitro_enclaves/ne_misc_dev.c | 491 ++++++++++++++++++++=
-++
->> =A0 1 file changed, 491 insertions(+)
->>
->> diff --git a/drivers/virt/nitro_enclaves/ne_misc_dev.c =
-
->> b/drivers/virt/nitro_enclaves/ne_misc_dev.c
->> index f70496813033..d6777008f685 100644
->> --- a/drivers/virt/nitro_enclaves/ne_misc_dev.c
->> +++ b/drivers/virt/nitro_enclaves/ne_misc_dev.c
->> @@ -39,7 +39,11 @@
->> =A0=A0 * TODO: Update logic to create new sysfs entries instead of using
->> =A0=A0 * a kernel parameter e.g. if multiple sysfs files needed.
->> =A0=A0 */
->> +static int ne_set_kernel_param(const char *val, const struct =
-
->> kernel_param *kp);
->> +
->> =A0 static const struct kernel_param_ops ne_cpu_pool_ops =3D {
->> +=A0=A0=A0 .get =3D param_get_string,
->> +=A0=A0=A0 .set =3D ne_set_kernel_param,
->> =A0 };
->> =A0 =A0 static char ne_cpus[PAGE_SIZE];
->> @@ -60,6 +64,485 @@ struct ne_cpu_pool {
->> =A0 =A0 static struct ne_cpu_pool ne_cpu_pool;
->> =A0 +static const struct file_operations ne_enclave_vcpu_fops =3D {
->> +=A0=A0=A0 .owner=A0=A0=A0=A0=A0=A0=A0 =3D THIS_MODULE,
->> +=A0=A0=A0 .llseek=A0=A0=A0=A0=A0=A0=A0 =3D noop_llseek,
->> +};
->
-> Do we really need an fd for an object without operations? I think the =
-
-> general flow to add CPUs from the pool to the VM is very sensible. But =
-
-> I don't think we really need an fd as return value from that operation.
-
-Not particularly now, I kept it here for any potential further use cases =
-
-where will need one and to make sure we take into account a stable =
-
-interface and possibility for extensions.
-
-As we've discussed that we can have as option for further extensions to =
-
-add another ioctl which returns an fd, will update the current ioctl to =
-
-keep the logic of adding a vCPU w/o generating an fd.
-
->
->> +
->> +/**
->> + * ne_check_enclaves_created - Verify if at least one enclave has =
-
->> been created.
->> + *
->> + * @pdev: PCI device used for enclave lifetime management.
->> + *
->> + * @returns: true if at least one enclave is created, false otherwise.
->> + */
->> +static bool ne_check_enclaves_created(struct pci_dev *pdev)
->> +{
->> +=A0=A0=A0 struct ne_pci_dev *ne_pci_dev =3D pci_get_drvdata(pdev);
->> +
->> +=A0=A0=A0 if (!ne_pci_dev)
->> +=A0=A0=A0=A0=A0=A0=A0 return false;
->
-> Please pass in the ne_pci_dev into this function directly.
-
-Updated the function signature.
-
->
->
->> +
->> +=A0=A0=A0 mutex_lock(&ne_pci_dev->enclaves_list_mutex);
->> +
->> +=A0=A0=A0 if (list_empty(&ne_pci_dev->enclaves_list)) {
->> +=A0=A0=A0=A0=A0=A0=A0 mutex_unlock(&ne_pci_dev->enclaves_list_mutex);
->> +
->> +=A0=A0=A0=A0=A0=A0=A0 return false;
->
-> If you make this a return variable, you save on the unlock duplication.
-
-Updated the logic to use a ret var.
-
->
->> +=A0=A0=A0 }
->> +
->> +=A0=A0=A0 mutex_unlock(&ne_pci_dev->enclaves_list_mutex);
->> +
->> +=A0=A0=A0 return true;
->> +}
->> +
->> +/**
->> + * ne_setup_cpu_pool - Set the NE CPU pool after handling sanity =
-
->> checks such as
->> + * not sharing CPU cores with the primary / parent VM or not using =
-
->> CPU 0, which
->> + * should remain available for the primary / parent VM. Offline the =
-
->> CPUs from
->> + * the pool after the checks passed.
->> + *
->> + * @pdev: PCI device used for enclave lifetime management.
->> + * @ne_cpu_list: the CPU list used for setting NE CPU pool.
->> + *
->> + * @returns: 0 on success, negative return value on failure.
->> + */
->> +static int ne_setup_cpu_pool(struct pci_dev *pdev, const char =
-
->> *ne_cpu_list)
->> +{
->> +=A0=A0=A0 unsigned int cpu =3D 0;
->> +=A0=A0=A0 unsigned int cpu_sibling =3D 0;
->> +=A0=A0=A0 int numa_node =3D -1;
->> +=A0=A0=A0 int rc =3D -EINVAL;
->> +
->> +=A0=A0=A0 if (!capable(CAP_SYS_ADMIN)) {
->> +=A0=A0=A0=A0=A0=A0=A0 dev_err(&pdev->dev, "No admin capability for CPU =
-pool =
-
->> setup\n");
->
-> No need to print anything here. It only gives non-admin users a chance =
-
-> to spill the kernel log. If non-admin users can write at all? Can they?
->
-> Also, isn't this at the wrong abstraction level? I would expect such a =
-
-> check to happen on the file write function, not here.
-
-Removed the log. Non-admin users don't have the permission to write, =
-
-that's the default file permission set. I wanted to guard the offline / =
-
-online of the CPUs anyway with this check.
-
-True, I already moved the check when writing (setting) the cpu list in =
-
-the file when I started to work on v5.
-
->
->> +
->> +=A0=A0=A0=A0=A0=A0=A0 return -EPERM;
->> +=A0=A0=A0 }
->> +
->> +=A0=A0=A0 if (!ne_cpu_list)
->> +=A0=A0=A0=A0=A0=A0=A0 return 0;
->> +
->> +=A0=A0=A0 if (ne_check_enclaves_created(pdev)) {
->> +=A0=A0=A0=A0=A0=A0=A0 dev_err(&pdev->dev, "The CPU pool is used, enclav=
-es =
-
->> created\n");
->> +
->> +=A0=A0=A0=A0=A0=A0=A0 return -EINVAL;
->> +=A0=A0=A0 }
->> +
->> +=A0=A0=A0 mutex_lock(&ne_cpu_pool.mutex);
->> +
->> +=A0=A0=A0 rc =3D cpulist_parse(ne_cpu_list, ne_cpu_pool.avail);
->> +=A0=A0=A0 if (rc < 0) {
->> +=A0=A0=A0=A0=A0=A0=A0 dev_err(&pdev->dev,
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 "Error in cpulist parse [rc=3D%d]\n",=
- rc);
->> +
->> +=A0=A0=A0=A0=A0=A0=A0 goto unlock_mutex;
->> +=A0=A0=A0 }
->> +
->> +=A0=A0=A0 /*
->> +=A0=A0=A0=A0 * Check if CPU 0 and its siblings are included in the prov=
-ided =
-
->> CPU pool
->> +=A0=A0=A0=A0 * They should remain available for the primary / parent VM.
->> +=A0=A0=A0=A0 */
->> +=A0=A0=A0 if (cpumask_test_cpu(0, ne_cpu_pool.avail)) {
->> +
->> +=A0=A0=A0=A0=A0=A0=A0 dev_err(&pdev->dev,
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 "CPU 0 has to remain available for th=
-e primary VM\n");
->
-> Shouldn't this also change the read value of the sysfs file?
-
-Yes, I already updated the logic in v5 to set an empty string for sysfs =
-
-file value when there are failures in setting the CPU pool.
-
->
->> +
->> +=A0=A0=A0=A0=A0=A0=A0 rc =3D -EINVAL;
->> +
->> +=A0=A0=A0=A0=A0=A0=A0 goto unlock_mutex;
->> +=A0=A0=A0 }
->> +
->> +=A0=A0=A0 for_each_cpu(cpu_sibling, topology_sibling_cpumask(0)) {
->> +=A0=A0=A0=A0=A0=A0=A0 if (cpumask_test_cpu(cpu_sibling, ne_cpu_pool.ava=
-il)) {
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 dev_err(&pdev->dev,
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 "CPU sibling %d of CPU 0 =
-is in the CPU pool\n",
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 cpu_sibling);
->
-> Same here. I would expect the sysfs file to reflect either the =
-
-> previous state or <empty> because failures mean no CPUs are donated =
-
-> anymore.
->
-> Can we somehow implement the get function of the param as something =
-
-> that gets generated dynamically?
-
-I already updated the logic to set the string value of the CPU pool to =
-
-an empty string and clear our internal data structure, the cpumask. This =
-
-way, an empty sysfs file means no CPUs are set and all the CPUs are =
-
-onlined back.
-
-The CPU pool sysfs file value setup in v5 includes an early exit check - =
-
-if enclaves are available, the CPU pool cannot be changed anymore.
-
-Sure, we could have a custom get function, but I just haven't seen for =
-
-now a need to have one replacing the current (default) implementation =
-
-provided by the kernel.
-
->
->> +
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 rc =3D -EINVAL;
->> +
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 goto unlock_mutex;
->> +=A0=A0=A0=A0=A0=A0=A0 }
->> +=A0=A0=A0 }
->> +
->> +=A0=A0=A0 /*
->> +=A0=A0=A0=A0 * Check if CPU siblings are included in the provided CPU p=
-ool. The
->> +=A0=A0=A0=A0 * expectation is that CPU cores are made available in the =
-CPU =
-
->> pool for
->> +=A0=A0=A0=A0 * enclaves.
->> +=A0=A0=A0=A0 */
->> +=A0=A0=A0 for_each_cpu(cpu, ne_cpu_pool.avail) {
->> +=A0=A0=A0=A0=A0=A0=A0 for_each_cpu(cpu_sibling, topology_sibling_cpumas=
-k(cpu)) {
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 if (!cpumask_test_cpu(cpu_sibling, ne=
-_cpu_pool.avail)) {
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 dev_err(&pdev->dev,
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 "CPU %d is no=
-t in the CPU pool\n",
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 cpu_sibling);
->> +
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 rc =3D -EINVAL;
->> +
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 goto unlock_mutex;
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 }
->> +=A0=A0=A0=A0=A0=A0=A0 }
->> +=A0=A0=A0 }
->> +
->> +=A0=A0=A0 /*
->> +=A0=A0=A0=A0 * Check if the CPUs from the NE CPU pool are from the same=
- NUMA =
-
->> node.
->> +=A0=A0=A0=A0 */
->> +=A0=A0=A0 for_each_cpu(cpu, ne_cpu_pool.avail) {
->> +=A0=A0=A0=A0=A0=A0=A0 if (numa_node < 0) {
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 numa_node =3D cpu_to_node(cpu);
->> +
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 if (numa_node < 0) {
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 dev_err(&pdev->dev,
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 "Invalid NUMA=
- node %d\n", numa_node);
->> +
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 rc =3D -EINVAL;
->> +
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 goto unlock_mutex;
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 }
->> +=A0=A0=A0=A0=A0=A0=A0 } else {
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 if (numa_node !=3D cpu_to_node(cpu)) {
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 dev_err(&pdev->dev,
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 "CPUs are fro=
-m different NUMA nodes\n");
->> +
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 rc =3D -EINVAL;
->> +
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 goto unlock_mutex;
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 }
->> +=A0=A0=A0=A0=A0=A0=A0 }
->> +=A0=A0=A0 }
->> +
->
-> There should be a comment here that describes the why:
->
-> /*
-> =A0* CPUs that are donated to enclaves should not be considered online
-> =A0* by Linux anymore, as the hypervisor will degrade them to floating.
-> =A0*
-> =A0* We offline them here, to not degrade performance and expose correct
-> =A0* topology to Linux and user space.
-> =A0*/
-
-Good point. Added here and also included in the commit message the =
-
-motivation for offlining / onlining the CPUs from the pool.
-
->
->> +=A0=A0=A0 for_each_cpu(cpu, ne_cpu_pool.avail) {
->> +=A0=A0=A0=A0=A0=A0=A0 rc =3D remove_cpu(cpu);
->> +=A0=A0=A0=A0=A0=A0=A0 if (rc !=3D 0) {
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 dev_err(&pdev->dev,
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 "CPU %d is not offlined [=
-rc=3D%d]\n", cpu, rc);
->> +
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 goto online_cpus;
->> +=A0=A0=A0=A0=A0=A0=A0 }
->> +=A0=A0=A0 }
->> +
->> +=A0=A0=A0 mutex_unlock(&ne_cpu_pool.mutex);
->> +
->> +=A0=A0=A0 return 0;
->> +
->> +online_cpus:
->> +=A0=A0=A0 for_each_cpu(cpu, ne_cpu_pool.avail)
->> +=A0=A0=A0=A0=A0=A0=A0 add_cpu(cpu);
->> +unlock_mutex:
->> +=A0=A0=A0 mutex_unlock(&ne_cpu_pool.mutex);
->> +
->> +=A0=A0=A0 return rc;
->> +}
->> +
->> +/**
->> + * ne_teardown_cpu_pool - Online the CPUs from the NE CPU pool and =
-
->> cleanup the
->> + * CPU pool.
->> + *
->> + * @pdev: PCI device used for enclave lifetime management.
->> + */
->> +static void ne_teardown_cpu_pool(struct pci_dev *pdev)
->> +{
->> +=A0=A0=A0 unsigned int cpu =3D 0;
->> +=A0=A0=A0 int rc =3D -EINVAL;
->> +
->> +=A0=A0=A0 if (!capable(CAP_SYS_ADMIN)) {
->> +=A0=A0=A0=A0=A0=A0=A0 dev_err(&pdev->dev, "No admin capability for CPU =
-pool =
-
->> setup\n");
->> +
->> +=A0=A0=A0=A0=A0=A0=A0 return;
->> +=A0=A0=A0 }
->> +
->> +=A0=A0=A0 if (!ne_cpu_pool.avail)
->> +=A0=A0=A0=A0=A0=A0=A0 return;
->> +
->> +=A0=A0=A0 if (ne_check_enclaves_created(pdev)) {
->> +=A0=A0=A0=A0=A0=A0=A0 dev_err(&pdev->dev, "The CPU pool is used, enclav=
-es =
-
->> created\n");
->> +
->> +=A0=A0=A0=A0=A0=A0=A0 return;
->> +=A0=A0=A0 }
->> +
->> +=A0=A0=A0 mutex_lock(&ne_cpu_pool.mutex);
->> +
->> +=A0=A0=A0 for_each_cpu(cpu, ne_cpu_pool.avail) {
->> +=A0=A0=A0=A0=A0=A0=A0 rc =3D add_cpu(cpu);
->> +=A0=A0=A0=A0=A0=A0=A0 if (rc !=3D 0)
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 dev_err(&pdev->dev,
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 "CPU %d is not onlined [r=
-c=3D%d]\n", cpu, rc);
->> +=A0=A0=A0 }
->> +
->> +=A0=A0=A0 cpumask_clear(ne_cpu_pool.avail);
->> +
->> +=A0=A0=A0 mutex_unlock(&ne_cpu_pool.mutex);
->> +}
->> +
->> +static int ne_set_kernel_param(const char *val, const struct =
-
->> kernel_param *kp)
->> +{
->> +=A0=A0=A0 const char *ne_cpu_list =3D val;
->> +=A0=A0=A0 struct pci_dev *pdev =3D pci_get_device(PCI_VENDOR_ID_AMAZON,
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
-=A0=A0 PCI_DEVICE_ID_NE, NULL);
->
-> Isn't there a better way?
-
-Yeah, I'm looking for options to update the logic to not use the =
-
-pci_get_device() call where it appears in the patch series. Also pointed =
-
-out in the discussion I've had before with Greg on a patch from the =
-
-current version.
-
->
->> +=A0=A0=A0 int rc =3D -EINVAL;
->> +
->> +=A0=A0=A0 if (!pdev)
->> +=A0=A0=A0=A0=A0=A0=A0 return -ENODEV;
->> +
->> +=A0=A0=A0 ne_teardown_cpu_pool(pdev);
->> +
->> +=A0=A0=A0 rc =3D ne_setup_cpu_pool(pdev, ne_cpu_list);
->> +=A0=A0=A0 if (rc < 0) {
->> +=A0=A0=A0=A0=A0=A0=A0 dev_err(&pdev->dev, "Error in setup CPU pool [rc=
-=3D%d]\n", rc);
->> +
->> +=A0=A0=A0=A0=A0=A0=A0 return rc;
->> +=A0=A0=A0 }
->> +
->> +=A0=A0=A0 return param_set_copystring(val, kp);
->> +}
->> +
->> +/**
->> + * ne_get_cpu_from_cpu_pool - Get a CPU from the CPU pool. If the =
-
->> vCPU id is 0,
->> + * the CPU is autogenerated and chosen from the NE CPU pool.
->> + *
->> + * This function gets called with the ne_enclave mutex held.
->> + *
->> + * @ne_enclave: private data associated with the current enclave.
->> + * @vcpu_id: id of the CPU to be associated with the given slot, =
-
->> apic id on x86.
->> + *
->> + * @returns: 0 on success, negative return value on failure.
->> + */
->> +static int ne_get_cpu_from_cpu_pool(struct ne_enclave *ne_enclave, =
-
->> u32 *vcpu_id)
->
-> That's a very awkward API. Can you instead just pass by-value and =
-
-> return the resulting CPU ID?
-
-I separated the whole logic in 2 functions, one for getting a CPU from =
-
-the pool and one for checking a given CPU is in the pool.
-
->
->> +{
->> +=A0=A0=A0 unsigned int cpu =3D 0;
->> +=A0=A0=A0 unsigned int cpu_sibling =3D 0;
->> +
->> +=A0=A0=A0 if (*vcpu_id !=3D 0) {
->> +=A0=A0=A0=A0=A0=A0=A0 if (cpumask_test_cpu(*vcpu_id, ne_enclave->cpu_si=
-blings)) {
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 cpumask_clear_cpu(*vcpu_id, ne_enclav=
-e->cpu_siblings);
->> +
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 return 0;
->> +=A0=A0=A0=A0=A0=A0=A0 }
->> +
->> +=A0=A0=A0=A0=A0=A0=A0 mutex_lock(&ne_cpu_pool.mutex);
->> +
->> +=A0=A0=A0=A0=A0=A0=A0 if (!cpumask_test_cpu(*vcpu_id, ne_cpu_pool.avail=
-)) {
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 dev_err_ratelimited(ne_misc_dev.this_=
-device,
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 "=
-CPU %d is not in NE CPU pool\n",
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 *=
-vcpu_id);
->> +
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 mutex_unlock(&ne_cpu_pool.mutex);
->> +
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 return -EINVAL;
->
-> I think you're better off making the return value explicit for the =
-
-> error, so that user space can print the error message rather than us.
-
-Yup, will update the patch series to use NE specific errors in cases =
-
-where necessary like this one.
-
->
->> +=A0=A0=A0=A0=A0=A0=A0 }
->> +
->> +=A0=A0=A0=A0=A0=A0=A0 cpumask_clear_cpu(*vcpu_id, ne_cpu_pool.avail);
->> +
->> +=A0=A0=A0=A0=A0=A0=A0 /*
->> +=A0=A0=A0=A0=A0=A0=A0=A0 * Make sure the CPU siblings are not marked as=
- available
->> +=A0=A0=A0=A0=A0=A0=A0=A0 * anymore.
->> +=A0=A0=A0=A0=A0=A0=A0=A0 */
->> +=A0=A0=A0=A0=A0=A0=A0 for_each_cpu(cpu_sibling, topology_sibling_cpumas=
-k(*vcpu_id)) {
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 if (cpu_sibling !=3D *vcpu_id) {
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 cpumask_clear_cpu(cpu_sib=
-ling,
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
-=A0=A0 ne_cpu_pool.avail);
->> +
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 cpumask_set_cpu(cpu_sibli=
-ng,
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 n=
-e_enclave->cpu_siblings);
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 }
->> +=A0=A0=A0=A0=A0=A0=A0 }
->> +
->> +=A0=A0=A0=A0=A0=A0=A0 mutex_unlock(&ne_cpu_pool.mutex);
->> +
->> +=A0=A0=A0=A0=A0=A0=A0 return 0;
->> +=A0=A0=A0 }
->> +
->> +=A0=A0=A0 /* There are CPU siblings available to choose from. */
->> +=A0=A0=A0 cpu =3D cpumask_any(ne_enclave->cpu_siblings);
->> +=A0=A0=A0 if (cpu < nr_cpu_ids) {
->> +=A0=A0=A0=A0=A0=A0=A0 cpumask_clear_cpu(cpu, ne_enclave->cpu_siblings);
->> +
->> +=A0=A0=A0=A0=A0=A0=A0 *vcpu_id =3D cpu;
->> +
->> +=A0=A0=A0=A0=A0=A0=A0 return 0;
->> +=A0=A0=A0 }
->> +
->> +=A0=A0=A0 mutex_lock(&ne_cpu_pool.mutex);
->> +
->> +=A0=A0=A0 /* Choose any CPU from the available CPU pool. */
->> +=A0=A0=A0 cpu =3D cpumask_any(ne_cpu_pool.avail);
->> +=A0=A0=A0 if (cpu >=3D nr_cpu_ids) {
->> +=A0=A0=A0=A0=A0=A0=A0 dev_err_ratelimited(ne_misc_dev.this_device,
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 "No CPUs avai=
-lable in CPU pool\n");
->> +
->> +=A0=A0=A0=A0=A0=A0=A0 mutex_unlock(&ne_cpu_pool.mutex);
->> +
->> +=A0=A0=A0=A0=A0=A0=A0 return -EINVAL;
->
-> I think you're better off making the return value explicit for the =
-
-> error, so that user space can print the error message rather than us.
->
->> +=A0=A0=A0 }
->> +
->> +=A0=A0=A0 cpumask_clear_cpu(cpu, ne_cpu_pool.avail);
->> +
->> +=A0=A0=A0 /* Make sure the CPU siblings are not marked as available =
-
->> anymore. */
->> +=A0=A0=A0 for_each_cpu(cpu_sibling, topology_sibling_cpumask(cpu)) {
->> +=A0=A0=A0=A0=A0=A0=A0 if (cpu_sibling !=3D cpu) {
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 cpumask_clear_cpu(cpu_sibling, ne_cpu=
-_pool.avail);
->> +
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 cpumask_set_cpu(cpu_sibling, ne_encla=
-ve->cpu_siblings);
->> +=A0=A0=A0=A0=A0=A0=A0 }
->> +=A0=A0=A0 }
->> +
->> +=A0=A0=A0 mutex_unlock(&ne_cpu_pool.mutex);
->
-> I find the function slightly confusingly structured. Why can't we do =
-
-> something like
->
->
-> =A0 if (!vcpu_id) {
-> =A0=A0=A0 vcpu_id =3D find_next_free_vcpu_id();
-> =A0=A0=A0 if (vcpu_id < 0)
-> =A0=A0=A0=A0=A0=A0=A0 return -ENOSPC;
-> =A0 }
->
-> =A0 [logic to handle an explicit vcpu id]
->
-> I think that would be much more readable.
-
-The logic is now separated in 2 functions, one for checking the CPU is =
-
-in the pool and one for getting a CPU from the pool.
-
->
->> +
->> +=A0=A0=A0 *vcpu_id =3D cpu;
->> +
->> +=A0=A0=A0 return 0;
->> +}
->> +
->> +/**
->> + * ne_create_vcpu_ioctl - Add vCPU to the slot associated with the =
-
->> current
->> + * enclave. Create vCPU file descriptor to be further used for CPU =
-
->> handling.
->> + *
->> + * This function gets called with the ne_enclave mutex held.
->> + *
->> + * @ne_enclave: private data associated with the current enclave.
->> + * @vcpu_id: id of the CPU to be associated with the given slot, =
-
->> apic id on x86.
->> + *
->> + * @returns: vCPU fd on success, negative return value on failure.
->> + */
->> +static int ne_create_vcpu_ioctl(struct ne_enclave *ne_enclave, u32 =
-
->> vcpu_id)
->> +{
->> +=A0=A0=A0 struct ne_pci_dev_cmd_reply cmd_reply =3D {};
->> +=A0=A0=A0 int fd =3D 0;
->> +=A0=A0=A0 struct file *file =3D NULL;
->> +=A0=A0=A0 struct ne_vcpu_id *ne_vcpu_id =3D NULL;
->> +=A0=A0=A0 int rc =3D -EINVAL;
->> +=A0=A0=A0 struct slot_add_vcpu_req slot_add_vcpu_req =3D {};
->> +
->> +=A0=A0=A0 if (ne_enclave->mm !=3D current->mm)
->> +=A0=A0=A0=A0=A0=A0=A0 return -EIO;
->> +
->> +=A0=A0=A0 ne_vcpu_id =3D kzalloc(sizeof(*ne_vcpu_id), GFP_KERNEL);
->> +=A0=A0=A0 if (!ne_vcpu_id)
->> +=A0=A0=A0=A0=A0=A0=A0 return -ENOMEM;
->> +
->> +=A0=A0=A0 fd =3D get_unused_fd_flags(O_CLOEXEC);
->> +=A0=A0=A0 if (fd < 0) {
->> +=A0=A0=A0=A0=A0=A0=A0 rc =3D fd;
->> +
->> +=A0=A0=A0=A0=A0=A0=A0 dev_err_ratelimited(ne_misc_dev.this_device,
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 "Error in get=
-ting unused fd [rc=3D%d]\n", rc);
->> +
->> +=A0=A0=A0=A0=A0=A0=A0 goto free_ne_vcpu_id;
->> +=A0=A0=A0 }
->> +
->> +=A0=A0=A0 /* TODO: Include (vcpu) id in the ne-vm-vcpu naming. */
->> +=A0=A0=A0 file =3D anon_inode_getfile("ne-vm-vcpu", &ne_enclave_vcpu_fo=
-ps,
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 ne_enclave, O_RDWR);
->> +=A0=A0=A0 if (IS_ERR(file)) {
->> +=A0=A0=A0=A0=A0=A0=A0 rc =3D PTR_ERR(file);
->> +
->> +=A0=A0=A0=A0=A0=A0=A0 dev_err_ratelimited(ne_misc_dev.this_device,
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 "Error in ano=
-n inode get file [rc=3D%d]\n",
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 rc);
->> +
->> +=A0=A0=A0=A0=A0=A0=A0 goto put_fd;
->> +=A0=A0=A0 }
->> +
->> +=A0=A0=A0 slot_add_vcpu_req.slot_uid =3D ne_enclave->slot_uid;
->> +=A0=A0=A0 slot_add_vcpu_req.vcpu_id =3D vcpu_id;
->> +
->> +=A0=A0=A0 rc =3D ne_do_request(ne_enclave->pdev, SLOT_ADD_VCPU, =
-
->> &slot_add_vcpu_req,
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 sizeof(slot_add_vcpu_req), &=
-cmd_reply,
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 sizeof(cmd_reply));
->> +=A0=A0=A0 if (rc < 0) {
->> +=A0=A0=A0=A0=A0=A0=A0 dev_err_ratelimited(ne_misc_dev.this_device,
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 "Error in slo=
-t add vcpu [rc=3D%d]\n", rc);
->> +
->> +=A0=A0=A0=A0=A0=A0=A0 goto put_file;
->> +=A0=A0=A0 }
->> +
->> +=A0=A0=A0 ne_vcpu_id->vcpu_id =3D vcpu_id;
->> +
->> +=A0=A0=A0 list_add(&ne_vcpu_id->vcpu_id_list_entry, =
-
->> &ne_enclave->vcpu_ids_list);
->> +
->> +=A0=A0=A0 ne_enclave->nr_vcpus++;
->> +
->> +=A0=A0=A0 fd_install(fd, file);
->> +
->> +=A0=A0=A0 return fd;
->> +
->> +put_file:
->> +=A0=A0=A0 fput(file);
->> +put_fd:
->> +=A0=A0=A0 put_unused_fd(fd);
->> +free_ne_vcpu_id:
->> +=A0=A0=A0 kfree(ne_vcpu_id);
->> +
->> +=A0=A0=A0 return rc;
->> +}
->> +
->> +static long ne_enclave_ioctl(struct file *file, unsigned int cmd,
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 unsigned long arg)
->> +{
->> +=A0=A0=A0 struct ne_enclave *ne_enclave =3D file->private_data;
->> +
->> +=A0=A0=A0 if (!ne_enclave || !ne_enclave->pdev)
->> +=A0=A0=A0=A0=A0=A0=A0 return -EINVAL;
->> +
->> +=A0=A0=A0 switch (cmd) {
->> +=A0=A0=A0 case NE_CREATE_VCPU: {
->
-> Can this be an ADD_VCPU rather than CREATE? We don't really need a =
-
-> vcpu fd after all ...
-
-I updated the ioctl call.
-
-Thanks for review.
-
-Andra
-
->
->> +=A0=A0=A0=A0=A0=A0=A0 int rc =3D -EINVAL;
->> +=A0=A0=A0=A0=A0=A0=A0 u32 vcpu_id =3D 0;
->> +
->> +=A0=A0=A0=A0=A0=A0=A0 if (copy_from_user(&vcpu_id, (void *)arg, sizeof(=
-vcpu_id))) {
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 dev_err_ratelimited(ne_misc_dev.this_=
-device,
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 "=
-Error in copy from user\n");
->> +
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 return -EFAULT;
->> +=A0=A0=A0=A0=A0=A0=A0 }
->> +
->> +=A0=A0=A0=A0=A0=A0=A0 mutex_lock(&ne_enclave->enclave_info_mutex);
->> +
->> +=A0=A0=A0=A0=A0=A0=A0 if (ne_enclave->state !=3D NE_STATE_INIT) {
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 dev_err_ratelimited(ne_misc_dev.this_=
-device,
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 "=
-Enclave isn't in init state\n");
->> +
->> + mutex_unlock(&ne_enclave->enclave_info_mutex);
->> +
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 return -EINVAL;
->> +=A0=A0=A0=A0=A0=A0=A0 }
->> +
->> +=A0=A0=A0=A0=A0=A0=A0 /* Use the CPU pool for choosing a CPU for the en=
-clave. */
->> +=A0=A0=A0=A0=A0=A0=A0 rc =3D ne_get_cpu_from_cpu_pool(ne_enclave, &vcpu=
-_id);
->> +=A0=A0=A0=A0=A0=A0=A0 if (rc < 0) {
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 dev_err_ratelimited(ne_misc_dev.this_=
-device,
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 "=
-Error in get CPU from pool\n");
->> +
->> + mutex_unlock(&ne_enclave->enclave_info_mutex);
->> +
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 return -EINVAL;
->> +=A0=A0=A0=A0=A0=A0=A0 }
->> +
->> +=A0=A0=A0=A0=A0=A0=A0 rc =3D ne_create_vcpu_ioctl(ne_enclave, vcpu_id);
->> +
->> +=A0=A0=A0=A0=A0=A0=A0 /* Put back the CPU in enclave cpu pool, if add v=
-cpu error. */
->> +=A0=A0=A0=A0=A0=A0=A0 if (rc < 0)
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 cpumask_set_cpu(vcpu_id, ne_enclave->=
-cpu_siblings);
->> +
->> +=A0=A0=A0=A0=A0=A0=A0 mutex_unlock(&ne_enclave->enclave_info_mutex);
->> +
->> +=A0=A0=A0=A0=A0=A0=A0 if (copy_to_user((void *)arg, &vcpu_id, sizeof(vc=
-pu_id))) {
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 dev_err_ratelimited(ne_misc_dev.this_=
-device,
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 "=
-Error in copy to user\n");
->> +
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 return -EFAULT;
->> +=A0=A0=A0=A0=A0=A0=A0 }
->> +
->> +=A0=A0=A0=A0=A0=A0=A0 return rc;
->> +=A0=A0=A0 }
->> +
->> +=A0=A0=A0 default:
->> +=A0=A0=A0=A0=A0=A0=A0 return -ENOTTY;
->> +=A0=A0=A0 }
->> +
->> +=A0=A0=A0 return 0;
->> +}
->> +
->> =A0 static __poll_t ne_enclave_poll(struct file *file, poll_table *wait)
->> =A0 {
->> =A0=A0=A0=A0=A0 __poll_t mask =3D 0;
->> @@ -79,6 +562,7 @@ static const struct file_operations =
-
->> ne_enclave_fops =3D {
->> =A0=A0=A0=A0=A0 .owner=A0=A0=A0=A0=A0=A0=A0 =3D THIS_MODULE,
->> =A0=A0=A0=A0=A0 .llseek=A0=A0=A0=A0=A0=A0=A0 =3D noop_llseek,
->> =A0=A0=A0=A0=A0 .poll=A0=A0=A0=A0=A0=A0=A0 =3D ne_enclave_poll,
->> +=A0=A0=A0 .unlocked_ioctl=A0=A0=A0 =3D ne_enclave_ioctl,
->> =A0 };
->> =A0 =A0 /**
->> @@ -286,8 +770,15 @@ static int __init ne_init(void)
->> =A0 =A0 static void __exit ne_exit(void)
->> =A0 {
->> +=A0=A0=A0 struct pci_dev *pdev =3D pci_get_device(PCI_VENDOR_ID_AMAZON,
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
-=A0=A0 PCI_DEVICE_ID_NE, NULL);
->> +=A0=A0=A0 if (!pdev)
->> +=A0=A0=A0=A0=A0=A0=A0 return;
->> +
->> =A0=A0=A0=A0=A0 pci_unregister_driver(&ne_pci_driver);
->> =A0 +=A0=A0=A0 ne_teardown_cpu_pool(pdev);
->> +
->> =A0=A0=A0=A0=A0 free_cpumask_var(ne_cpu_pool.avail);
->> =A0 }
->>
-
-
-
-
-Amazon Development Center (Romania) S.R.L. registered office: 27A Sf. Lazar=
- Street, UBC5, floor 2, Iasi, Iasi County, 700045, Romania. Registered in R=
-omania. Registration number J22/2621/2005.
-
+>>>
+>>>> in some cases adds latency because of forwarding interrupts
+>>>> between vhost and virtio driver, vhost drivers providing features (which means
+>>>> it has to be aware of which virtio driver will be connected).
+>>>> virtio drivers (front end) generally access the buffers from it's local memory
+>>>> but when in backend it can access over MMIO (like PCI EPF or NTB) or
+>>>> userspace.
+>>>>> Does this make sense?
+>>>> Two copies in my opinion is an issue but lets get others opinions as well.
+>>>
+>>> Sure.
+>>>
+>>>
+>>>> Thanks for your suggestions!
+>>>
+>>> You're welcome.
+>>>
+>>> Thanks
+>>>
+>>>
+>>>> Regards
+>>>> Kishon
+>>>>
+>>>>> Thanks
+>>>>>
+>>>>>
+>>>>>> Thanks
+>>>>>> Kishon
+>>>>>>
+>>>>>>> Thanks
+>>>>>>>
+>>>>>>>
+>>>>>>>>> Kishon Vijay Abraham I (22):
+>>>>>>>>>       vhost: Make _feature_ bits a property of vhost device
+>>>>>>>>>       vhost: Introduce standard Linux driver model in VHOST
+>>>>>>>>>       vhost: Add ops for the VHOST driver to configure VHOST device
+>>>>>>>>>       vringh: Add helpers to access vring in MMIO
+>>>>>>>>>       vhost: Add MMIO helpers for operations on vhost virtqueue
+>>>>>>>>>       vhost: Introduce configfs entry for configuring VHOST
+>>>>>>>>>       virtio_pci: Use request_threaded_irq() instead of request_irq()
+>>>>>>>>>       rpmsg: virtio_rpmsg_bus: Disable receive virtqueue callback when
+>>>>>>>>>         reading messages
+>>>>>>>>>       rpmsg: Introduce configfs entry for configuring rpmsg
+>>>>>>>>>       rpmsg: virtio_rpmsg_bus: Add Address Service Notification support
+>>>>>>>>>       rpmsg: virtio_rpmsg_bus: Move generic rpmsg structure to
+>>>>>>>>>         rpmsg_internal.h
+>>>>>>>>>       virtio: Add ops to allocate and free buffer
+>>>>>>>>>       rpmsg: virtio_rpmsg_bus: Use virtio_alloc_buffer() and
+>>>>>>>>>         virtio_free_buffer()
+>>>>>>>>>       rpmsg: Add VHOST based remote processor messaging bus
+>>>>>>>>>       samples/rpmsg: Setup delayed work to send message
+>>>>>>>>>       samples/rpmsg: Wait for address to be bound to rpdev for sending
+>>>>>>>>>         message
+>>>>>>>>>       rpmsg.txt: Add Documentation to configure rpmsg using configfs
+>>>>>>>>>       virtio_pci: Add VIRTIO driver for VHOST on Configurable PCIe
+>>>>>>>>> Endpoint
+>>>>>>>>>         device
+>>>>>>>>>       PCI: endpoint: Add EP function driver to provide VHOST interface
+>>>>>>>>>       NTB: Add a new NTB client driver to implement VIRTIO functionality
+>>>>>>>>>       NTB: Add a new NTB client driver to implement VHOST functionality
+>>>>>>>>>       NTB: Describe the ntb_virtio and ntb_vhost client in the
+>>>>>>>>> documentation
+>>>>>>>>>
+>>>>>>>>>      Documentation/driver-api/ntb.rst              |   11 +
+>>>>>>>>>      Documentation/rpmsg.txt                       |   56 +
+>>>>>>>>>      drivers/ntb/Kconfig                           |   18 +
+>>>>>>>>>      drivers/ntb/Makefile                          |    2 +
+>>>>>>>>>      drivers/ntb/ntb_vhost.c                       |  776 +++++++++++
+>>>>>>>>>      drivers/ntb/ntb_virtio.c                      |  853 ++++++++++++
+>>>>>>>>>      drivers/ntb/ntb_virtio.h                      |   56 +
+>>>>>>>>>      drivers/pci/endpoint/functions/Kconfig        |   11 +
+>>>>>>>>>      drivers/pci/endpoint/functions/Makefile       |    1 +
+>>>>>>>>>      .../pci/endpoint/functions/pci-epf-vhost.c    | 1144
+>>>>>>>>> ++++++++++++++++
+>>>>>>>>>      drivers/rpmsg/Kconfig                         |   10 +
+>>>>>>>>>      drivers/rpmsg/Makefile                        |    3 +-
+>>>>>>>>>      drivers/rpmsg/rpmsg_cfs.c                     |  394 ++++++
+>>>>>>>>>      drivers/rpmsg/rpmsg_core.c                    |    7 +
+>>>>>>>>>      drivers/rpmsg/rpmsg_internal.h                |  136 ++
+>>>>>>>>>      drivers/rpmsg/vhost_rpmsg_bus.c               | 1151
+>>>>>>>>> +++++++++++++++++
+>>>>>>>>>      drivers/rpmsg/virtio_rpmsg_bus.c              |  184 ++-
+>>>>>>>>>      drivers/vhost/Kconfig                         |    1 +
+>>>>>>>>>      drivers/vhost/Makefile                        |    2 +-
+>>>>>>>>>      drivers/vhost/net.c                           |   10 +-
+>>>>>>>>>      drivers/vhost/scsi.c                          |   24 +-
+>>>>>>>>>      drivers/vhost/test.c                          |   17 +-
+>>>>>>>>>      drivers/vhost/vdpa.c                          |    2 +-
+>>>>>>>>>      drivers/vhost/vhost.c                         |  730 ++++++++++-
+>>>>>>>>>      drivers/vhost/vhost_cfs.c                     |  341 +++++
+>>>>>>>>>      drivers/vhost/vringh.c                        |  332 +++++
+>>>>>>>>>      drivers/vhost/vsock.c                         |   20 +-
+>>>>>>>>>      drivers/virtio/Kconfig                        |    9 +
+>>>>>>>>>      drivers/virtio/Makefile                       |    1 +
+>>>>>>>>>      drivers/virtio/virtio_pci_common.c            |   25 +-
+>>>>>>>>>      drivers/virtio/virtio_pci_epf.c               |  670 ++++++++++
+>>>>>>>>>      include/linux/mod_devicetable.h               |    6 +
+>>>>>>>>>      include/linux/rpmsg.h                         |    6 +
+>>>>>>>>>      {drivers/vhost => include/linux}/vhost.h      |  132 +-
+>>>>>>>>>      include/linux/virtio.h                        |    3 +
+>>>>>>>>>      include/linux/virtio_config.h                 |   42 +
+>>>>>>>>>      include/linux/vringh.h                        |   46 +
+>>>>>>>>>      samples/rpmsg/rpmsg_client_sample.c           |   32 +-
+>>>>>>>>>      tools/virtio/virtio_test.c                    |    2 +-
+>>>>>>>>>      39 files changed, 7083 insertions(+), 183 deletions(-)
+>>>>>>>>>      create mode 100644 drivers/ntb/ntb_vhost.c
+>>>>>>>>>      create mode 100644 drivers/ntb/ntb_virtio.c
+>>>>>>>>>      create mode 100644 drivers/ntb/ntb_virtio.h
+>>>>>>>>>      create mode 100644 drivers/pci/endpoint/functions/pci-epf-vhost.c
+>>>>>>>>>      create mode 100644 drivers/rpmsg/rpmsg_cfs.c
+>>>>>>>>>      create mode 100644 drivers/rpmsg/vhost_rpmsg_bus.c
+>>>>>>>>>      create mode 100644 drivers/vhost/vhost_cfs.c
+>>>>>>>>>      create mode 100644 drivers/virtio/virtio_pci_epf.c
+>>>>>>>>>      rename {drivers/vhost => include/linux}/vhost.h (66%)
+>>>>>>>>>
+>>>>>>>>> -- 
+>>>>>>>>> 2.17.1
+>>>>>>>>>
+> 
