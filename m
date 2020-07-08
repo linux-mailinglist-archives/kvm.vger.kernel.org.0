@@ -2,36 +2,39 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 132A9219109
-	for <lists+kvm@lfdr.de>; Wed,  8 Jul 2020 21:54:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6F2B52190FC
+	for <lists+kvm@lfdr.de>; Wed,  8 Jul 2020 21:53:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726356AbgGHTxn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        id S1726410AbgGHTxn (ORCPT <rfc822;lists+kvm@lfdr.de>);
         Wed, 8 Jul 2020 15:53:43 -0400
-Received: from Galois.linutronix.de ([193.142.43.55]:53434 "EHLO
-        galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725446AbgGHTxm (ORCPT <rfc822;kvm@vger.kernel.org>);
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43990 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726340AbgGHTxm (ORCPT <rfc822;kvm@vger.kernel.org>);
         Wed, 8 Jul 2020 15:53:42 -0400
-Message-Id: <20200708195321.822002354@linutronix.de>
+Received: from galois.linutronix.de (Galois.linutronix.de [IPv6:2a0a:51c0:0:12e:550::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 70798C08C5C1;
+        Wed,  8 Jul 2020 12:53:42 -0700 (PDT)
+Message-Id: <20200708195321.934715094@linutronix.de>
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020; t=1594238019;
+        s=2020; t=1594238021;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:  references:references;
-        bh=O37pX8HCMturL+rhqBaE0iWzy5y3hehqvpiNhW/ZQz0=;
-        b=spuQzcY+mFKo78t/CNljjZWO5/ivf9wUU/Lav18NYybvdo1ZlU1x74CJhp0Z9stGohgc9M
-        rBK4Et5MlndlRoHO8o4o66Y0alJgqJjvbCAsMkEGLcMlRkxKqL7HrlBcgOuhBVvVeguR3+
-        13oHqGkIsFyxHCa1tM62mzj3x4NLisLVfv8ZD9GTCBvdo0Lz4xVBp93ZlkFYJCYo9y/EO+
-        BYZB12YSjiwx5pp/AZfX2snSzDGZFQSVCi54vcabFeuBBaRdudlH7S6CMS6imDbdSXU8eF
-        MTp6lcP6JHpq1VIBHaQZPqgrvMyUZudXDaud0zji0JsomwEcB3JZTuFxQMv8GQ==
+        bh=Q/0rxpdoDSIfJysNnP2MHVMd9KS2WUtgcO1VSsks6s0=;
+        b=BUEasXMHi1inxAAg7UdnSdkB+/oZxDC4PTmqfPEP5LXAP39tqZM2OT0iQiDS37YEF95xe4
+        8eXy5vpXI3rDWY9mVhohf5y0lUn4SNATtzfcLcfCNDRcTwvzIp7hKcCEyg/U1iaaZd5j9t
+        PSDu4mQ1pXp6fVYplPR+g+uE/DMpWO0JcWyKYu2CYT+vIGf8VZNzv+wtVpKHy54RZMIaHh
+        3B0CE2ouuFfR6veh8KWoEj/AoDl561E6rgoiJkKY/L++qsJdGY2Ie0wy072rMHoyMEAFQU
+        0R7c00DzFP+zTIKvF75CFai3x19q3QpLOluEytyGWOqqItirENI0oRaa7Nb+4Q==
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020e; t=1594238019;
+        s=2020e; t=1594238021;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:  references:references;
-        bh=O37pX8HCMturL+rhqBaE0iWzy5y3hehqvpiNhW/ZQz0=;
-        b=SawKJOaJBHxztqPVVNApI0Gorktq1IGQCGry/58TZQK/L5PprosVYw6t6YjgBlG/3eVGJb
-        M/8yr3e0XhW4MKBA==
-Date:   Wed, 08 Jul 2020 21:51:55 +0200
+        bh=Q/0rxpdoDSIfJysNnP2MHVMd9KS2WUtgcO1VSsks6s0=;
+        b=Dwo6IQCn5b8l/Ds8gc0rN7tVH3Vg2GJjbNAMjiJajjRyc+KgR5SIvXF+VZE30izfjoX+8A
+        /mMEkm0JwV0M7LBA==
+Date:   Wed, 08 Jul 2020 21:51:56 +0200
 From:   Thomas Gleixner <tglx@linutronix.de>
 To:     LKML <linux-kernel@vger.kernel.org>
 Cc:     x86@kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
@@ -39,7 +42,7 @@ Cc:     x86@kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
         Alexandre Chartre <alexandre.chartre@oracle.com>,
         Peter Zijlstra <peterz@infradead.org>,
         Juergen Gross <jgross@suse.com>
-Subject: [patch V2 2/7] x86/kvm/vmx: Add hardirq tracing to guest enter/exit
+Subject: [patch V2 3/7] x86/kvm/svm: Add hardirq tracing on guest enter/exit
 References: <20200708195153.746357686@linutronix.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
@@ -76,16 +79,19 @@ Acked-by: Paolo Bonzini <pbonzini@redhat.com>
 
 
 ---
- arch/x86/kvm/vmx/vmx.c |   27 +++++++++++++++++++++++++--
- 1 file changed, 25 insertions(+), 2 deletions(-)
+ arch/x86/kvm/svm/svm.c |   27 ++++++++++++++++++++++-----
+ 1 file changed, 22 insertions(+), 5 deletions(-)
 
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -6729,9 +6729,21 @@ static fastpath_t vmx_vcpu_run(struct kv
- 	x86_spec_ctrl_set_guest(vmx->spec_ctrl, 0);
+--- a/arch/x86/kvm/svm/svm.c
++++ b/arch/x86/kvm/svm/svm.c
+@@ -3400,12 +3400,21 @@ static __no_kcsan fastpath_t svm_vcpu_ru
+ 	x86_spec_ctrl_set_guest(svm->spec_ctrl, svm->virt_spec_ctrl);
  
  	/*
--	 * Tell context tracking that this CPU is about to enter guest mode.
+-	 * Tell context tracking that this CPU is about to enter guest
+-	 * mode. This has to be after x86_spec_ctrl_set_guest() because
+-	 * that can take locks (lockdep needs RCU) and calls into world and
+-	 * some more.
 +	 * VMENTER enables interrupts (host state), but the kernel state is
 +	 * interrupts disabled when this is invoked. Also tell RCU about
 +	 * it. This is the same logic as for exit_to_user_mode().
@@ -102,11 +108,13 @@ Acked-by: Paolo Bonzini <pbonzini@redhat.com>
  	guest_enter_irqoff();
 +	lockdep_hardirqs_on(CALLER_ADDR0);
  
- 	/* L1D Flush includes CPU buffer clear to mitigate MDS */
- 	if (static_branch_unlikely(&vmx_l1d_should_flush))
-@@ -6748,9 +6760,20 @@ static fastpath_t vmx_vcpu_run(struct kv
- 	vcpu->arch.cr2 = read_cr2();
+ 	__svm_vcpu_run(svm->vmcb_pa, (unsigned long *)&svm->vcpu.arch.regs);
  
+@@ -3417,14 +3426,22 @@ static __no_kcsan fastpath_t svm_vcpu_ru
+ 	loadsegment(gs, svm->host.gs);
+ #endif
+ #endif
++
  	/*
 -	 * Tell context tracking that this CPU is back.
 +	 * VMEXIT disables interrupts (host state), but tracing and lockdep
@@ -115,10 +123,10 @@ Acked-by: Paolo Bonzini <pbonzini@redhat.com>
 +	 *
 +	 * guest_exit_irqoff() restores host context and reinstates RCU if
 +	 * enabled and required.
-+	 *
-+	 * This needs to be done before the below as native_read_msr()
-+	 * contains a tracepoint and x86_spec_ctrl_restore_host() calls
-+	 * into world and some more.
+ 	 *
+ 	 * This needs to be done before the below as native_read_msr()
+ 	 * contains a tracepoint and x86_spec_ctrl_restore_host() calls
+ 	 * into world and some more.
  	 */
 +	lockdep_hardirqs_off(CALLER_ADDR0);
  	guest_exit_irqoff();
