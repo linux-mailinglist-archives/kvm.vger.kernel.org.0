@@ -2,249 +2,154 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A983E2184B2
-	for <lists+kvm@lfdr.de>; Wed,  8 Jul 2020 12:11:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B47CF218499
+	for <lists+kvm@lfdr.de>; Wed,  8 Jul 2020 12:03:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726445AbgGHKLQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 8 Jul 2020 06:11:16 -0400
-Received: from mga05.intel.com ([192.55.52.43]:43601 "EHLO mga05.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725810AbgGHKLQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 8 Jul 2020 06:11:16 -0400
-IronPort-SDR: IsLi9Pw3Z6v4t8Gotda2cmRtQrDDiZLQAbKU3vjrfmoBO8BZYEQdP1H+1+8Ss5jL5djTt38ynU
- DNiDamDoy3vA==
-X-IronPort-AV: E=McAfee;i="6000,8403,9675"; a="232630355"
-X-IronPort-AV: E=Sophos;i="5.75,327,1589266800"; 
-   d="asc'?scan'208";a="232630355"
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Jul 2020 03:11:11 -0700
-IronPort-SDR: 4/UQ6DIl/YT719hpkwXRIcpiDUMEFWgGnWANCNoYVp3wNWcNxKlLm3HOA+h9JY4aROiRX65OXV
- mVfclXO2b51w==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.75,327,1589266800"; 
-   d="asc'?scan'208";a="358059438"
-Received: from zhen-hp.sh.intel.com (HELO zhen-hp) ([10.239.160.147])
-  by orsmga001.jf.intel.com with ESMTP; 08 Jul 2020 03:11:10 -0700
-Date:   Wed, 8 Jul 2020 17:54:18 +0800
-From:   Zhenyu Wang <zhenyuw@linux.intel.com>
-To:     "Tian, Kevin" <kevin.tian@intel.com>
-Cc:     Alex Williamson <alex.williamson@redhat.com>,
-        Zhenyu Wang <zhenyuw@linux.intel.com>,
-        "intel-gvt-dev@lists.freedesktop.org" 
-        <intel-gvt-dev@lists.freedesktop.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "Zhao, Yan Y" <yan.y.zhao@intel.com>
-Subject: Re: [PATCH v3 0/2] VFIO mdev aggregated resources handling
-Message-ID: <20200708095418.GQ27035@zhen-hp.sh.intel.com>
-Reply-To: Zhenyu Wang <zhenyuw@linux.intel.com>
-References: <20200326054136.2543-1-zhenyuw@linux.intel.com>
- <20200408055824.2378-1-zhenyuw@linux.intel.com>
- <MWHPR11MB1645CC388BF45FD2E6309C3C8C660@MWHPR11MB1645.namprd11.prod.outlook.com>
- <20200707190634.4d9055fe@x1.home>
- <MWHPR11MB16454BF5C1BF4D5D22F0B2B38C670@MWHPR11MB1645.namprd11.prod.outlook.com>
+        id S1728132AbgGHKDq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 8 Jul 2020 06:03:46 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:43599 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726196AbgGHKDp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 8 Jul 2020 06:03:45 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1594202623;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=ss9qJI2p1V/pw0FYJQ0mqsrCEJLHA4WfDlP5Y0PS6OI=;
+        b=AIe8Pvkd9FWbxttuN58CyPpugB8Fa0Ing2m4WvFbpEgMmvTuvduz1siJAN5rlAGFVGIOKQ
+        vRC2zPPi55I/A0CLgfDUSCQ/gO9Y+Sca2urUtPcVvhEAMgMZQQvR2yKq8Fw5wYFYObXOHg
+        Rj1kFlDt0P/YtHDXRjXPpQt9Sf7Kkjc=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-200-_viBK7_7N-a_wmTcAdINTg-1; Wed, 08 Jul 2020 06:03:42 -0400
+X-MC-Unique: _viBK7_7N-a_wmTcAdINTg-1
+Received: by mail-wr1-f72.google.com with SMTP id j16so46146826wrw.3
+        for <kvm@vger.kernel.org>; Wed, 08 Jul 2020 03:03:41 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=ss9qJI2p1V/pw0FYJQ0mqsrCEJLHA4WfDlP5Y0PS6OI=;
+        b=r6rGPFe+UTeG++4UlKlDWf6j2iPyr2TzUgMDN2XTv9khG1sJRCynugeb3+P7+U2RY6
+         LOYwDl28UpIU3RHOPV2T2BoMJL54rfnR3ZrWqx9d5WAkD+RZc6R17V/D0lYDFqAmolzx
+         ypbE/TBmHCktdt/e8I93KQLV+yWxzLwa8L565lfjySd+r9A0XH1GDXbHd3HGioLbmQf5
+         ma85YUEcICT5mQXMsxSf1yjfLH9FchdAtN6JPgXHV0Ir4Fp/ne4glaPsbq4HmXSiTo9w
+         DtIZLMs7GQp52dfhZVXXj18g9asrg2GZR4n4hZHrr/I7NZNNo50d5n7RMXf9KcHB+yCP
+         +XcA==
+X-Gm-Message-State: AOAM530RlPhmKvOI/B/1Ax2AY2k3qrVPHmm4H8ilWM7VbjBTMZaMR37X
+        CptQzlZFHRIhpXyRFv/jz+WbglOj+8mj9Ly7aWQhztMaMy2HxhoF5CiW7lzxD4rZXGJZLgkvrcT
+        AzBUgAq0T99s0
+X-Received: by 2002:a7b:c394:: with SMTP id s20mr8972737wmj.31.1594202620755;
+        Wed, 08 Jul 2020 03:03:40 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwFcLIb9RtyG4T93864hU8kWCUGyznaC5YGHlyxZABGmPDTAq4KMsLd5hZj8zjvZuWJZ2odYA==
+X-Received: by 2002:a7b:c394:: with SMTP id s20mr8972722wmj.31.1594202620548;
+        Wed, 08 Jul 2020 03:03:40 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:9541:9439:cb0f:89c? ([2001:b07:6468:f312:9541:9439:cb0f:89c])
+        by smtp.gmail.com with ESMTPSA id 1sm5116787wmf.21.2020.07.08.03.03.39
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 08 Jul 2020 03:03:39 -0700 (PDT)
+Subject: Re: [PATCH 2/3 v4] KVM: nSVM: Check that MBZ bits in CR3 and CR4 are
+ not set on vmrun of nested guests
+To:     Krish Sadhukhan <krish.sadhukhan@oracle.com>, kvm@vger.kernel.org
+References: <1594168797-29444-1-git-send-email-krish.sadhukhan@oracle.com>
+ <1594168797-29444-3-git-send-email-krish.sadhukhan@oracle.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <699b4ea4-d8df-e098-8f5c-3abe8e4c138c@redhat.com>
+Date:   Wed, 8 Jul 2020 12:03:39 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.9.0
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-        protocol="application/pgp-signature"; boundary="bi5JUZtvcfApsciF"
-Content-Disposition: inline
-In-Reply-To: <MWHPR11MB16454BF5C1BF4D5D22F0B2B38C670@MWHPR11MB1645.namprd11.prod.outlook.com>
-User-Agent: Mutt/1.10.0 (2018-05-17)
+In-Reply-To: <1594168797-29444-3-git-send-email-krish.sadhukhan@oracle.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On 08/07/20 02:39, Krish Sadhukhan wrote:
+> +extern int kvm_valid_cr4(struct kvm_vcpu *vcpu, unsigned long cr4);
+> +
 
---bi5JUZtvcfApsciF
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+This should be added in x86.h, not here.
 
-On 2020.07.08 06:31:00 +0000, Tian, Kevin wrote:
-> > From: Alex Williamson <alex.williamson@redhat.com>
-> > Sent: Wednesday, July 8, 2020 9:07 AM
-> >=20
-> > On Tue, 7 Jul 2020 23:28:39 +0000
-> > "Tian, Kevin" <kevin.tian@intel.com> wrote:
-> >=20
-> > > Hi, Alex,
-> > >
-> > > Gentle ping... Please let us know whether this version looks good.
-> >=20
-> > I figured this is entangled with the versioning scheme.  There are
-> > unanswered questions about how something that assumes a device of a
-> > given type is software compatible to another device of the same type
-> > handles aggregation and how the type class would indicate compatibility
-> > with an aggregated instance.  Thanks,
-> >=20
->=20
-> Yes, this open is an interesting topic. I didn't closely follow the versi=
-oning
-> scheme discussion. Below is some preliminary thought in my mind:
->=20
-> --
-> First, let's consider migrating an aggregated instance:
->=20
-> A conservative policy is to check whether the compatible type is supporte=
-d=20
-> on target device and whether available instances under that type can affo=
-rd=20
-> the ask of the aggregated instance. Compatibility check in this scheme is=
-=20
-> separated from aggregation check, then no change is required to the curre=
-nt=20
-> versioning interface.
+> +static bool nested_vmcb_checks(struct vcpu_svm *svm, struct vmcb *vmcb)
+>  {
+>  	if ((vmcb->save.efer & EFER_SVME) == 0)
+>  		return false;
+> @@ -231,6 +233,22 @@ static bool nested_vmcb_checks(struct vmcb *vmcb)
+>  	    (vmcb->save.cr0 & X86_CR0_NW))
+>  		return false;
+>  
+> +	if (!is_long_mode(&(svm->vcpu))) {
+> +		if (vmcb->save.cr4 & X86_CR4_PAE) {
+> +			if (vmcb->save.cr3 & MSR_CR3_LEGACY_PAE_RESERVED_MASK)
+> +				return false;
+> +		} else {
+> +			if (vmcb->save.cr3 & MSR_CR3_LEGACY_RESERVED_MASK)
+> +				return false;
+> +		}
+> +	} else {
+> +		if ((vmcb->save.cr4 & X86_CR4_PAE) &&
+> +		    (vmcb->save.cr3 & MSR_CR3_LONG_RESERVED_MASK))
+> +			return false;
+> +	}
 
-In last mdev's aggregation series, no aggregation info is exposed in mdev t=
-ype
-until instance creates, so that would cause possible conflict w/o that info=
-, e.g
-type might have avail instances but not actually provide aggregation. Then =
-=66rom
-that point of view, either require to add new flag because current 'descrip=
-tion'
-is useless or change versioning interface or require to be different type..
+is_long_mode here is wrong, as it refers to the host.
 
->=20
-> Then there comes a case where the target device doesn't handle aggregation
-> but support a different type which however provides compatible capabiliti=
-es=20
-> and same resource size as the aggregated instance expects. I guess this is
-> one puzzle how to check compatibility between such types. One possible
-> extension is to introduce a non_aggregated_list  to indicate compatible=
-=20
-> non-aggregated types for each aggregated instance. Then mgmt.. stack=20
-> just loop the compatible list if the conservative policy fails.  I didn't=
- think=20
-> carefully about what format is reasonable here. But if we agree that an
-> separate interface is required to support such usage, then this may come
-> later after the basic migration_version interface is completed.
-> --
->=20
-> Another scenario is about migrating a non-aggregated instance to a device
-> handling aggregation. Then there is an open whether an aggregated type=20
-> can be used to back the non-aggregated instance in case of no available=
-=20
-> instance under the original type claimed by non-aggregated instance.=20
-> This won't happen in KVMGT, because all vGPU types share the same=20
-> resource pool. Allocating instance under one type also decrement availabl=
-e=20
-> instances under other types. So if we fail to find available instance und=
-er=20
-> type-A (with 4x resource of type-B), then we will also fail to create an
->  aggregated instance (aggregate=3D4) under type-B. therefore, we just=20
-> need stick to basic type compatibility check for non-aggregated instance.=
-=20
-> And I feel this assumption can be applied to other devices handling=20
-> aggregation. It doesn't make sense for two types to claim compatibility=
-=20
-> (only with resource size difference) when their resources are allocated
-> from different pools (which usually implies different capability or QOS/
-> SLA difference). With this assumption, we don't need provide another
-> interface to indicate compatible aggregated types for non-aggregated
-> interface.
-> --
->=20
-> I may definitely overlook something here, but if above analysis sounds
-> reasonable, then this series could be decoupled from the versioning=20
-> scheme discussion based on conservative policy for now. :)
->=20
-> Thanks
-> Kevin
->=20
-> >=20
-> >=20
-> > > > From: Zhenyu Wang <zhenyuw@linux.intel.com>
-> > > > Sent: Wednesday, April 8, 2020 1:58 PM
-> > > >
-> > > > Hi,
-> > > >
-> > > > This is a refresh on previous series:
-> > > > https://patchwork.kernel.org/cover/11208279/
-> > > > and https://patchwork.freedesktop.org/series/70425/
-> > > >
-> > > > Current mdev device create interface depends on fixed mdev type, wh=
-ich
-> > > > get uuid from user to create instance of mdev device. If user wants=
- to
-> > > > use customized number of resource for mdev device, then only can
-> > > > create new mdev type for that which may not be flexible. This
-> > > > requirement comes not only from to be able to allocate flexible
-> > > > resources for KVMGT, but also from Intel scalable IO virtualization
-> > > > which would use vfio/mdev to be able to allocate arbitrary resources
-> > > > on mdev instance. More info on [1] [2] [3].
-> > > >
-> > > > As we agreed that for current opaque mdev device type, we'd still
-> > > > explore management interface based on mdev sysfs definition. And th=
-is
-> > > > one tries to follow Alex's previous suggestion to create generic
-> > > > parameters under 'mdev' directory for each device, so vendor driver
-> > > > could provide support like as other defined mdev sysfs entries.
-> > > >
-> > > > For mdev type with aggregation support, files as "aggregated_instan=
-ces"
-> > > > and "max_aggregation" should be created under 'mdev' directory. E.g
-> > > >
-> > > > /sys/devices/pci0000:00/0000:00:02.0/<UUID>/mdev/
-> > > >    |-- aggregated_instances
-> > > >    |-- max_aggregation
-> > > >
-> > > > "aggregated_instances" is used to set or return current number of
-> > > > instances for aggregation, which can not be larger than
-> > "max_aggregation".
-> > > >
-> > > > The first patch is to update the document for new mdev parameter
-> > directory.
-> > > > The second one is to add aggregation support in GVT driver.
-> > > >
-> > > > References:
-> > > > [1] https://software.intel.com/en-us/download/intel-virtualization-
-> > > > technology-for-directed-io-architecture-specification
-> > > > [2] https://software.intel.com/en-us/download/intel-scalable-io-
-> > > > virtualization-technical-specification
-> > > > [3] https://schd.ws/hosted_files/lc32018/00/LC3-SIOV-final.pdf
-> > > >
-> > > > Changelog:
-> > > > v3:
-> > > > - add more description for sysfs entries
-> > > > - rebase GVT support
-> > > > - rename accounting function
-> > > >
-> > > > Zhenyu Wang (2):
-> > > >   Documentation/driver-api/vfio-mediated-device.rst: update for
-> > > >     aggregation support
-> > > >   drm/i915/gvt: mdev aggregation type
-> > > >
-> > > >  .../driver-api/vfio-mediated-device.rst       |  22 +++
-> > > >  drivers/gpu/drm/i915/gvt/aperture_gm.c        |  44 +++--
-> > > >  drivers/gpu/drm/i915/gvt/gtt.c                |   9 +-
-> > > >  drivers/gpu/drm/i915/gvt/gvt.c                |   7 +-
-> > > >  drivers/gpu/drm/i915/gvt/gvt.h                |  42 +++--
-> > > >  drivers/gpu/drm/i915/gvt/kvmgt.c              | 115 +++++++++++-
-> > > >  drivers/gpu/drm/i915/gvt/vgpu.c               | 172 ++++++++++++--=
-----
-> > > >  7 files changed, 317 insertions(+), 94 deletions(-)
-> > > >
-> > > > --
-> > > > 2.25.1
-> > >
->=20
+You need to do something like this:
 
---=20
-Open Source Technology Center, Intel ltd.
+diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
+index 385461496cf5..cbbab83f19cc 100644
+--- a/arch/x86/kvm/svm/nested.c
++++ b/arch/x86/kvm/svm/nested.c
+@@ -222,8 +222,9 @@ static bool nested_vmcb_check_controls(struct vmcb_control_area *control)
+ 	return true;
+ }
+ 
+-static bool nested_vmcb_checks(struct vmcb *vmcb)
++static bool nested_vmcb_checks(struct vcpu_svm *svm, struct vmcb *vmcb)
+ {
++	bool nested_vmcb_lma;
+ 	if ((vmcb->save.efer & EFER_SVME) == 0)
+ 		return false;
+ 
+@@ -234,6 +237,27 @@ static bool nested_vmcb_checks(struct vmcb *vmcb)
+ 	if (!kvm_dr6_valid(vmcb->save.dr6) || !kvm_dr7_valid(vmcb->save.dr7))
+ 		return false;
+ 
++	nested_vmcb_lma = 
++	        (vmcb->save.efer & EFER_LME) &&
++                (vmcb->save.cr0 & X86_CR0_PG);
++
++	if (!nested_vmcb_lma) {
++		if (vmcb->save.cr4 & X86_CR4_PAE) {
++			if (vmcb->save.cr3 & MSR_CR3_LEGACY_PAE_RESERVED_MASK)
++				return false;
++		} else {
++			if (vmcb->save.cr3 & MSR_CR3_LEGACY_RESERVED_MASK)
++				return false;
++		}
++	} else {
++		if (!(vmcb->save.cr4 & X86_CR4_PAE) ||
++		    !(vmcb->save.cr0 & X86_CR0_PE) ||
++		    (vmcb->save.cr3 & MSR_CR3_LONG_RESERVED_MASK))
++			return false;
++	}
++	if (kvm_valid_cr4(&(svm->vcpu), vmcb->save.cr4))
++		return false;
++
+ 	return nested_vmcb_check_controls(&vmcb->control);
+ }
+ 
+which also takes care of other CR0/CR4 checks in the APM.
 
-$gpg --keyserver wwwkeys.pgp.net --recv-keys 4D781827
+I'll test this a bit more and queue it.  Are you also going to add
+more checks in svm_set_nested_state?
 
---bi5JUZtvcfApsciF
-Content-Type: application/pgp-signature; name="signature.asc"
+Paolo
 
------BEGIN PGP SIGNATURE-----
-
-iF0EARECAB0WIQTXuabgHDW6LPt9CICxBBozTXgYJwUCXwWXygAKCRCxBBozTXgY
-Jya1AJ4rDVFRBZlB3WZbLyWHAj00K4b6TACgnguG+w6uFVuP7RkU05w7A8RBRx0=
-=XnZZ
------END PGP SIGNATURE-----
-
---bi5JUZtvcfApsciF--
