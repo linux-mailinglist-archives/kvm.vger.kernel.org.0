@@ -2,190 +2,203 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 76F21218A4A
-	for <lists+kvm@lfdr.de>; Wed,  8 Jul 2020 16:39:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E7F5E218AA5
+	for <lists+kvm@lfdr.de>; Wed,  8 Jul 2020 17:01:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729810AbgGHOjX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 8 Jul 2020 10:39:23 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:23796 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1729468AbgGHOjV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 8 Jul 2020 10:39:21 -0400
+        id S1730074AbgGHPBD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 8 Jul 2020 11:01:03 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:52853 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1729863AbgGHPBD (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 8 Jul 2020 11:01:03 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1594219159;
+        s=mimecast20190719; t=1594220461;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=5kAbKh4gT6sckOUOu13UxFIyniT4oyc+Q75JU+xCpvM=;
-        b=HhmNaXGCFaDdmokVYcfOpaBgqfdBEtiZUaYmNRx6r4/FoiaL1PNVu3Gf5qXve7LgCRlkcT
-        PSN4xGiDG+IAutGxpXSgpeQ/J+xZEzkzoOszCq0L1H3897Mbots5se2AUkK4oJKn8w7je4
-        l0CkfAhY62SijesEStQJoDPZoY3dTCY=
-Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
- [209.85.218.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-443-oD2AWhj8Mi-L0xilBKVIKQ-1; Wed, 08 Jul 2020 10:39:17 -0400
-X-MC-Unique: oD2AWhj8Mi-L0xilBKVIKQ-1
-Received: by mail-ej1-f72.google.com with SMTP id yh3so37302359ejb.16
-        for <kvm@vger.kernel.org>; Wed, 08 Jul 2020 07:39:17 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=5kAbKh4gT6sckOUOu13UxFIyniT4oyc+Q75JU+xCpvM=;
-        b=UuiiuG9519M1EIgrCIKJaGyWmng8NO5Vbc7eUX8R2z/ZJSM0hJetHmq6B8kS0YxY2P
-         ajC/WEc82YICtni6sbgEZbIfLo09yi5Nop85OlF42YHmL+gJP+0gXcM/cOauGiWcQpOl
-         aCGMfoPtlT0s62wlLtBaQax2u1x5FGoqdYvMBTGBUQ+zUaH/8GE3U4KAbu1l9K4LX8fm
-         MF1FoQ/sWGjUaVv3710CE8PcEp0wpBvnnNZOhRlFaLcuLGR2Trvp2qk4WB1aoQIAuU7O
-         HX4B98QSNCMsJBCa0jLls1CPadbvDzIbp/+Nj58MOxuEnq3qJO2C40unDr5oaz3clV8+
-         l3eQ==
-X-Gm-Message-State: AOAM530jmZAoP3V4YcVYUXVWviHgLWjNJDBHUw4uXXsY0c14VHboKVeg
-        0Th3BwQbna7A2ZEFA7t7LeHZFK9u/M3jzDVTz+UNrECZo3EpiJ0vWPAICIJ8yOkdoywVs/z2cej
-        rOqUaJh9B/laV
-X-Received: by 2002:a17:906:dbe5:: with SMTP id yd5mr52676073ejb.328.1594219156577;
-        Wed, 08 Jul 2020 07:39:16 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwIx3r6gC9MR8WQxYaKP1dcyHPBhsGUyPQRqWiSjReS9r0fzHOSnBWVo07r5QzzbcLhV1fN6w==
-X-Received: by 2002:a17:906:dbe5:: with SMTP id yd5mr52676047ejb.328.1594219156284;
-        Wed, 08 Jul 2020 07:39:16 -0700 (PDT)
-Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id t25sm2077440ejc.34.2020.07.08.07.39.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 08 Jul 2020 07:39:15 -0700 (PDT)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
-Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Junaid Shahid <junaids@google.com>,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 2/3] KVM: nSVM: properly call kvm_mmu_new_pgd() upon switching to guest
-In-Reply-To: <b7989497-562e-c9a1-3f62-dd5afb9fd3d5@redhat.com>
-References: <20200708093611.1453618-1-vkuznets@redhat.com> <20200708093611.1453618-3-vkuznets@redhat.com> <b7989497-562e-c9a1-3f62-dd5afb9fd3d5@redhat.com>
-Date:   Wed, 08 Jul 2020 16:39:14 +0200
-Message-ID: <87eepmul4d.fsf@vitty.brq.redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain
+         to:to:cc:cc; bh=xyg56AEaWg6EcPRPyzmB7YBwfS46RhbTFTWb5hVryyY=;
+        b=DjrQhtU0+PdysxvU+UeNBExngRKp5+qFBT8adVZn0AwpYeix2aDf7FoJSSJZ0OOb9Fqnhd
+        toi8pwb9syJlCEFgbKHtItUEcc69E7kYCQ8elf0W9nlkn9TzpkaVQpj025JcYZWeSjeISL
+        FsMenuiesZyvWFz/RlAAxWK/3X5YmY4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-193-aMk1_cTXM1-f_24Y2BcanQ-1; Wed, 08 Jul 2020 11:00:59 -0400
+X-MC-Unique: aMk1_cTXM1-f_24Y2BcanQ-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5F8E2189E55F;
+        Wed,  8 Jul 2020 15:00:32 +0000 (UTC)
+Received: from thuth.com (ovpn-114-90.ams2.redhat.com [10.36.114.90])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id B85A05BAC3;
+        Wed,  8 Jul 2020 15:00:27 +0000 (UTC)
+From:   Thomas Huth <thuth@redhat.com>
+To:     Janosch Frank <frankja@linux.ibm.com>, david@redhat.com,
+        kvm@vger.kernel.org
+Cc:     Cornelia Huck <cohuck@redhat.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>
+Subject: [kvm-unit-tests v3 PATCH] s390x/cpumodel: The missing DFP facility on TCG is expected
+Date:   Wed,  8 Jul 2020 17:00:25 +0200
+Message-Id: <20200708150025.20631-1-thuth@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Paolo Bonzini <pbonzini@redhat.com> writes:
+When running the kvm-unit-tests with TCG on s390x, the cpumodel test
+always reports the error about the missing DFP (decimal floating point)
+facility. This is kind of expected, since DFP is not required for
+running Linux and thus nobody is really interested in implementing
+this facility in TCG. Thus let's mark this as an expected error instead,
+so that we can run the kvm-unit-tests also with TCG without getting
+test failures that we do not care about.
 
-> On 08/07/20 11:36, Vitaly Kuznetsov wrote:
->> Undesired triple fault gets injected to L1 guest on SVM when L2 is
->> launched with certain CR3 values. #TF is raised by mmu_check_root()
->> check in fast_pgd_switch() and the root cause is that when
->> kvm_set_cr3() is called from nested_prepare_vmcb_save() with NPT
->> enabled CR3 points to a nGPA so we can't check it with
->> kvm_is_visible_gfn().
->> 
->> Calling kvm_mmu_new_pgd() with L2's CR3 idea when NPT is in use
->> seems to be wrong, an acceptable place for it seems to be
->> kvm_init_shadow_npt_mmu(). This also matches nVMX code.
->> 
->> Fixes: 7c390d350f8b ("kvm: x86: Add fast CR3 switch code path")
->> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
->> ---
->>  arch/x86/include/asm/kvm_host.h | 7 ++++++-
->>  arch/x86/kvm/mmu/mmu.c          | 2 ++
->>  arch/x86/kvm/svm/nested.c       | 2 +-
->>  arch/x86/kvm/x86.c              | 8 +++++---
->>  4 files changed, 14 insertions(+), 5 deletions(-)
->> 
->> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
->> index be5363b21540..49b62f024f51 100644
->> --- a/arch/x86/include/asm/kvm_host.h
->> +++ b/arch/x86/include/asm/kvm_host.h
->> @@ -1459,7 +1459,12 @@ int kvm_task_switch(struct kvm_vcpu *vcpu, u16 tss_selector, int idt_index,
->>  		    int reason, bool has_error_code, u32 error_code);
->>  
->>  int kvm_set_cr0(struct kvm_vcpu *vcpu, unsigned long cr0);
->> -int kvm_set_cr3(struct kvm_vcpu *vcpu, unsigned long cr3);
->> +int __kvm_set_cr3(struct kvm_vcpu *vcpu, unsigned long cr3, bool cr3_is_nested);
->> +static inline int kvm_set_cr3(struct kvm_vcpu *vcpu, unsigned long cr3)
->> +{
->> +	return __kvm_set_cr3(vcpu, cr3, false);
->> +}
->> +
->>  int kvm_set_cr4(struct kvm_vcpu *vcpu, unsigned long cr4);
->>  int kvm_set_cr8(struct kvm_vcpu *vcpu, unsigned long cr8);
->>  int kvm_set_dr(struct kvm_vcpu *vcpu, int dr, unsigned long val);
->> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
->> index 167d12ab957a..ebf0cb3f1ce0 100644
->> --- a/arch/x86/kvm/mmu/mmu.c
->> +++ b/arch/x86/kvm/mmu/mmu.c
->> @@ -4987,6 +4987,8 @@ void kvm_init_shadow_npt_mmu(struct kvm_vcpu *vcpu, u32 cr0, u32 cr4, u32 efer,
->>  	union kvm_mmu_role new_role =
->>  		kvm_calc_shadow_mmu_root_page_role(vcpu, false);
->>  
->> +	__kvm_mmu_new_pgd(vcpu, nested_cr3, new_role.base, true, true);
->> +
->>  	if (new_role.as_u64 != context->mmu_role.as_u64)
->>  		shadow_mmu_init_context(vcpu, cr0, cr4, efer, new_role);
->>  }
->> diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
->> index e424bce13e6c..b467917a9784 100644
->> --- a/arch/x86/kvm/svm/nested.c
->> +++ b/arch/x86/kvm/svm/nested.c
->> @@ -324,7 +324,7 @@ static void nested_prepare_vmcb_save(struct vcpu_svm *svm, struct vmcb *nested_v
->>  	svm_set_efer(&svm->vcpu, nested_vmcb->save.efer);
->>  	svm_set_cr0(&svm->vcpu, nested_vmcb->save.cr0);
->>  	svm_set_cr4(&svm->vcpu, nested_vmcb->save.cr4);
->> -	(void)kvm_set_cr3(&svm->vcpu, nested_vmcb->save.cr3);
->> +	(void)__kvm_set_cr3(&svm->vcpu, nested_vmcb->save.cr3, npt_enabled);
->>  
->>  	svm->vmcb->save.cr2 = svm->vcpu.arch.cr2 = nested_vmcb->save.cr2;
->>  	kvm_rax_write(&svm->vcpu, nested_vmcb->save.rax);
->> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
->> index 3b92db412335..3761135eb052 100644
->> --- a/arch/x86/kvm/x86.c
->> +++ b/arch/x86/kvm/x86.c
->> @@ -1004,7 +1004,7 @@ int kvm_set_cr4(struct kvm_vcpu *vcpu, unsigned long cr4)
->>  }
->>  EXPORT_SYMBOL_GPL(kvm_set_cr4);
->>  
->> -int kvm_set_cr3(struct kvm_vcpu *vcpu, unsigned long cr3)
->> +int __kvm_set_cr3(struct kvm_vcpu *vcpu, unsigned long cr3, bool cr3_is_nested)
->>  {
->>  	bool skip_tlb_flush = false;
->>  #ifdef CONFIG_X86_64
->> @@ -1031,13 +1031,15 @@ int kvm_set_cr3(struct kvm_vcpu *vcpu, unsigned long cr3)
->>  		 !load_pdptrs(vcpu, vcpu->arch.walk_mmu, cr3))
->>  		return 1;
->>  
->> -	kvm_mmu_new_pgd(vcpu, cr3, skip_tlb_flush, skip_tlb_flush);
->> +	if (!cr3_is_nested)
->> +		kvm_mmu_new_pgd(vcpu, cr3, skip_tlb_flush, skip_tlb_flush);
->> +
->>  	vcpu->arch.cr3 = cr3;
->>  	kvm_register_mark_available(vcpu, VCPU_EXREG_CR3);
->>  
->>  	return 0;
->>  }
->> -EXPORT_SYMBOL_GPL(kvm_set_cr3);
->> +EXPORT_SYMBOL_GPL(__kvm_set_cr3);
->>  
->>  int kvm_set_cr8(struct kvm_vcpu *vcpu, unsigned long cr8)
->>  {
->> 
->
-> Instead of the new argument (which is not really named right since it's
-> never true for !NPT) you could perhaps check vcpu->arch.mmu.  But also,
-> for NPT=1 the kvm_mmu_new_pgd is also unnecessary on vmexit, because the
-> old roots are still valid (or has been invalidated otherwise) while L2
-> was running.
->
-> I'm also not sure if skip_tlb_flush can use X86_CR3_PCID_NOFLUSH the way
-> kvm_set_cr3 does, so I wouldn't mind duplicating the code completely as
-> is already the case for nested_vmx_load_cr3.  It would introduce some
-> code duplication, but overall the code would be better.  For now, there
-> need not be an equivalent to nested_vmx_transition_mmu_sync, ASID
-> handling can be left for later.
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ v3:
+ - Moved the is_tcg() function to the library so that it can be used
+   later by other tests, too
+ - Make sure to call alloc_page() and stsi() only once
 
-Sounds reasonable,
+ v2:
+ - Rewrote the logic, introduced expected_tcg_fail flag
+ - Use manufacturer string instead of VM name to detect TCG
 
-let's introduce nested_svm_load_cr3() to not mix these two concepts
-together. I'll be back with v3 shortly, thanks!
+ lib/s390x/vm.c   | 46 ++++++++++++++++++++++++++++++++++++++++++++++
+ lib/s390x/vm.h   | 14 ++++++++++++++
+ s390x/Makefile   |  1 +
+ s390x/cpumodel.c | 19 +++++++++++++------
+ 4 files changed, 74 insertions(+), 6 deletions(-)
+ create mode 100644 lib/s390x/vm.c
+ create mode 100644 lib/s390x/vm.h
 
+diff --git a/lib/s390x/vm.c b/lib/s390x/vm.c
+new file mode 100644
+index 0000000..c852713
+--- /dev/null
++++ b/lib/s390x/vm.c
+@@ -0,0 +1,46 @@
++/*
++ * Functions to retrieve VM-specific information
++ *
++ * Copyright (c) 2020 Red Hat Inc
++ *
++ * Authors:
++ *  Thomas Huth <thuth@redhat.com>
++ *
++ * SPDX-License-Identifier: LGPL-2.1-or-later
++ */
++
++#include <libcflat.h>
++#include <alloc_page.h>
++#include <asm/arch_def.h>
++#include "vm.h"
++
++/**
++ * Detect whether we are running with TCG (instead of KVM)
++ */
++bool vm_is_tcg(void)
++{
++	const char qemu_ebcdic[] = { 0xd8, 0xc5, 0xd4, 0xe4 };
++	static bool initialized = false;
++	static bool is_tcg = false;
++	uint8_t *buf;
++
++	if (initialized)
++		return is_tcg;
++
++	buf = alloc_page();
++	if (!buf)
++		return false;
++
++	if (stsi(buf, 1, 1, 1))
++		goto out;
++
++	/*
++	 * If the manufacturer string is "QEMU" in EBCDIC, then we
++	 * are on TCG (otherwise the string is "IBM" in EBCDIC)
++	 */
++	is_tcg = !memcmp(&buf[32], qemu_ebcdic, sizeof(qemu_ebcdic));
++	initialized = true;
++out:
++	free_page(buf);
++	return is_tcg;
++}
+diff --git a/lib/s390x/vm.h b/lib/s390x/vm.h
+new file mode 100644
+index 0000000..33008d8
+--- /dev/null
++++ b/lib/s390x/vm.h
+@@ -0,0 +1,14 @@
++/*
++ * Functions to retrieve VM-specific information
++ *
++ * Copyright (c) 2020 Red Hat Inc
++ *
++ * SPDX-License-Identifier: LGPL-2.1-or-later
++ */
++
++#ifndef S390X_VM_H
++#define S390X_VM_H
++
++bool vm_is_tcg(void);
++
++#endif  /* S390X_VM_H */
+diff --git a/s390x/Makefile b/s390x/Makefile
+index ddb4b48..98ac29e 100644
+--- a/s390x/Makefile
++++ b/s390x/Makefile
+@@ -51,6 +51,7 @@ cflatobjs += lib/s390x/sclp-console.o
+ cflatobjs += lib/s390x/interrupt.o
+ cflatobjs += lib/s390x/mmu.o
+ cflatobjs += lib/s390x/smp.o
++cflatobjs += lib/s390x/vm.o
+ 
+ OBJDIRS += lib/s390x
+ 
+diff --git a/s390x/cpumodel.c b/s390x/cpumodel.c
+index 5d232c6..116a966 100644
+--- a/s390x/cpumodel.c
++++ b/s390x/cpumodel.c
+@@ -11,14 +11,19 @@
+  */
+ 
+ #include <asm/facility.h>
++#include <vm.h>
+ 
+-static int dep[][2] = {
++static struct {
++	int facility;
++	int implied;
++	bool expected_tcg_fail;
++} dep[] = {
+ 	/* from SA22-7832-11 4-98 facility indications */
+ 	{   4,   3 },
+ 	{   5,   3 },
+ 	{   5,   4 },
+ 	{  19,  18 },
+-	{  37,  42 },
++	{  37,  42, true },  /* TCG does not have DFP and won't get it soon */
+ 	{  43,  42 },
+ 	{  73,  49 },
+ 	{ 134, 129 },
+@@ -46,11 +51,13 @@ int main(void)
+ 
+ 	report_prefix_push("dependency");
+ 	for (i = 0; i < ARRAY_SIZE(dep); i++) {
+-		if (test_facility(dep[i][0])) {
+-			report(test_facility(dep[i][1]), "%d implies %d",
+-				dep[i][0], dep[i][1]);
++		if (test_facility(dep[i].facility)) {
++			report_xfail(dep[i].expected_tcg_fail && vm_is_tcg(),
++				     test_facility(dep[i].implied),
++				     "%d implies %d",
++				     dep[i].facility, dep[i].implied);
+ 		} else {
+-			report_skip("facility %d not present", dep[i][0]);
++			report_skip("facility %d not present", dep[i].facility);
+ 		}
+ 	}
+ 	report_prefix_pop();
 -- 
-Vitaly
+2.18.1
 
