@@ -2,67 +2,71 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 19D6221858F
-	for <lists+kvm@lfdr.de>; Wed,  8 Jul 2020 13:07:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 43CF6218594
+	for <lists+kvm@lfdr.de>; Wed,  8 Jul 2020 13:08:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728701AbgGHLHj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 8 Jul 2020 07:07:39 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:43479 "EHLO
+        id S1728763AbgGHLIe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 8 Jul 2020 07:08:34 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:28576 "EHLO
         us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1728466AbgGHLHi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 8 Jul 2020 07:07:38 -0400
+        with ESMTP id S1728717AbgGHLId (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 8 Jul 2020 07:08:33 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1594206456;
+        s=mimecast20190719; t=1594206512;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:mime-version:mime-version:content-type:content-type:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=2Mg3KTgGZpPeTKVRCYhvE/CZ0kHGinEb1CFfAmtiXJg=;
-        b=RW5sSojtiOS7LdyIBC2Ma7bKaoPE9zkvFoow9FaiYlwIJlhViA9ds5+zzpdXtti+TgFTW3
-        eD4U35kXml8zqy8cSo3jkaxiSzF8FSGfO96zWptplb+XCcTPUH4ERxzWJf8Zj1vJH1JlnP
-        hxZ/cng/JBDxJSLDSZ0hoZpQXRXyQgw=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-41-FDnpXfXfNuOU66Yh89bfcA-1; Wed, 08 Jul 2020 07:07:34 -0400
-X-MC-Unique: FDnpXfXfNuOU66Yh89bfcA-1
-Received: by mail-wm1-f69.google.com with SMTP id u68so2528927wmu.3
-        for <kvm@vger.kernel.org>; Wed, 08 Jul 2020 04:07:34 -0700 (PDT)
+        bh=UsTH2g5Srh8ZxaMtl2dCP3xACw/aEbSOpSitaM2tt8A=;
+        b=dfuebEZ69Nl8u7couTN5mm/RTDEhc2SqsiKHx3p574k1YF1CtlZnSUeDqz7ZzjT5oSwfJ6
+        7mwHhtBoO3GKNt8OPLQa2qi3VmyNww79RaEXP/qwchJt8A1sSWDLCpnOW9+9YmXUoxrKmU
+        T/yYaSWBTtXtgdE066jkEQPAlTu16GY=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-369-2gPzu692NmeWs4hU2xFXvw-1; Wed, 08 Jul 2020 07:08:30 -0400
+X-MC-Unique: 2gPzu692NmeWs4hU2xFXvw-1
+Received: by mail-wr1-f69.google.com with SMTP id b14so51764523wrp.0
+        for <kvm@vger.kernel.org>; Wed, 08 Jul 2020 04:08:30 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:references:from:message-id:date
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=2Mg3KTgGZpPeTKVRCYhvE/CZ0kHGinEb1CFfAmtiXJg=;
-        b=cEkWwns3dkAse5mVEOtqMRx5Eu9JIjZj2L8TVzt48YWblHqCEJqGLKQI4f4hSu9Uw5
-         1xcIScr5HJxbIgjMCwmGI3ejHTJDXV6RZwm3NJYMAqL88VbFWzHZWP9VKTRCrcdQdSL0
-         JMLwvj9qmQWzNL+xKyBMnPU6A2hZHdb65SUez0vAbTz2zJYFqvCz6eXw+QQT6s0eaiIK
-         O0JjseMWrCqEU9mMsokntYKEERyQQTF9Kv87Ts3jRyBtXqwpKrrmGHsxHcfs7nJ0gfzJ
-         4Lnuk3nmYTuxr1yUSZ0obrmSAMRvWWnnTdZRntioZnCJ8rNLH+0lvHMGYxAih/bygaZs
-         zibw==
-X-Gm-Message-State: AOAM533vqv68rRYoXqFMlhmEtTukHWZXxwFQ2SqOStk1TwbroVa81qvv
-        CIaNq6KzPYzrw0cnfe26J3gvq4mYlUN/V3pHKvHXMjH23ZhJO0/UqzdmQ0QjV+U31/efIspRSSe
-        hPWsw4B3DFkms
-X-Received: by 2002:adf:f18c:: with SMTP id h12mr55696168wro.375.1594206452692;
-        Wed, 08 Jul 2020 04:07:32 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxG5Ha4c5FoQwSb/+ltd5k490NxlwoBf9wfjBJlSwA+vOdli+TkugcGdsbVS/nQRXy+o4iKiA==
-X-Received: by 2002:adf:f18c:: with SMTP id h12mr55696142wro.375.1594206452385;
-        Wed, 08 Jul 2020 04:07:32 -0700 (PDT)
+        bh=UsTH2g5Srh8ZxaMtl2dCP3xACw/aEbSOpSitaM2tt8A=;
+        b=VO1HNK7nh4f4Y34al0f3JHQJHjqnLA3XsmasB66hTPX6zMwkKXzV9ih4MgDBVZwEaA
+         UFu1y4BtTfMsh+lyZrlNzbumogC22CFpRtWHusrW95zPjzsX6BTpzNU/fLbEk5gG4Ukf
+         pDbmtBiiRxjpkMqAKjr/cFNVNkB5CkFNs7UVd9dfV/wsJx2g1Npe7MUqbT7e8DZB27Qq
+         zMH2V0xwTHA5YPzENSb0N2vUVNkLqrIuUC2Q0eLIywZ6+LjoEadZLOylogxcTTqZf4xT
+         uqQZeXWaGuZUESgYuRT9pAOhGA3fcPb49CaJcK1qixa3otC16kfS3MuM9gBBc6W6PljZ
+         aVXw==
+X-Gm-Message-State: AOAM531T8XfV/KdThb/k6x6x/FVE0kMCuXWZzylIp5Lg6ZCDEQLyTppf
+        WlTKVldM02/V95MADIuKno80esZtVBCoSGSHv/blKkRCkVIOwsfPKvvzarz8TJDbSmDTUUyvkcz
+        3BnE8RiaR5Rsb
+X-Received: by 2002:a1c:9e84:: with SMTP id h126mr8405466wme.61.1594206509465;
+        Wed, 08 Jul 2020 04:08:29 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyfhETRvUhtCmEHWo63nXGRqkOPlkqmDpTb+2sESQBbbdmRxlhpOu5S/wmhPtZ2fWEh5Is7Nw==
+X-Received: by 2002:a1c:9e84:: with SMTP id h126mr8405427wme.61.1594206509215;
+        Wed, 08 Jul 2020 04:08:29 -0700 (PDT)
 Received: from ?IPv6:2001:b07:6468:f312:9541:9439:cb0f:89c? ([2001:b07:6468:f312:9541:9439:cb0f:89c])
-        by smtp.gmail.com with ESMTPSA id p17sm5068618wma.47.2020.07.08.04.07.31
+        by smtp.gmail.com with ESMTPSA id c136sm5923589wmd.10.2020.07.08.04.08.28
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 08 Jul 2020 04:07:31 -0700 (PDT)
-Subject: Re: [PATCH 3/3 v4] kvm-unit-tests: nSVM: Test that MBZ bits in CR3
- and CR4 are not set on vmrun of nested guests
-To:     Krish Sadhukhan <krish.sadhukhan@oracle.com>, kvm@vger.kernel.org
-References: <1594168797-29444-1-git-send-email-krish.sadhukhan@oracle.com>
- <1594168797-29444-4-git-send-email-krish.sadhukhan@oracle.com>
+        Wed, 08 Jul 2020 04:08:28 -0700 (PDT)
+Subject: Re: [PATCH] kvm: x86: limit the maximum number of vPMU fixed counters
+ to 3
+To:     Like Xu <like.xu@linux.intel.com>, kvm@vger.kernel.org
+Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, linux-kernel@vger.kernel.org
+References: <20200624015928.118614-1-like.xu@linux.intel.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <80ff1de6-f8db-5a09-b67f-ee81937d0dc6@redhat.com>
-Date:   Wed, 8 Jul 2020 13:07:31 +0200
+Message-ID: <cd56533f-3dd5-70c3-c124-78c0d8950496@redhat.com>
+Date:   Wed, 8 Jul 2020 13:08:28 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.9.0
 MIME-Version: 1.0
-In-Reply-To: <1594168797-29444-4-git-send-email-krish.sadhukhan@oracle.com>
+In-Reply-To: <20200624015928.118614-1-like.xu@linux.intel.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -71,83 +75,50 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 08/07/20 02:39, Krish Sadhukhan wrote:
-> +	SVM_TEST_CR_RESERVED_BITS(0, 2, 1, 3, cr3_saved,
-> +	    SVM_CR3_LEGACY_PAE_RESERVED_MASK);
+On 24/06/20 03:59, Like Xu wrote:
+> Some new Intel platforms (such as TGL) already have the
+> fourth fixed counter TOPDOWN.SLOTS, but it has not been
+> fully enabled on KVM and the host.
+> 
+> Therefore, we limit edx.split.num_counters_fixed to 3,
+> so that it does not break the kvm-unit-tests PMU test
+> case and bad-handled userspace.
+> 
+> Signed-off-by: Like Xu <like.xu@linux.intel.com>
+> ---
+>  arch/x86/kvm/cpuid.c | 2 +-
+>  arch/x86/kvm/pmu.h   | 2 ++
+>  2 files changed, 3 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+> index 8a294f9747aa..0a2c6d2b4650 100644
+> --- a/arch/x86/kvm/cpuid.c
+> +++ b/arch/x86/kvm/cpuid.c
+> @@ -604,7 +604,7 @@ static inline int __do_cpuid_func(struct kvm_cpuid_array *array, u32 function)
+>  		eax.split.bit_width = cap.bit_width_gp;
+>  		eax.split.mask_length = cap.events_mask_len;
+>  
+> -		edx.split.num_counters_fixed = cap.num_counters_fixed;
+> +		edx.split.num_counters_fixed = min(cap.num_counters_fixed, MAX_FIXED_COUNTERS);
+>  		edx.split.bit_width_fixed = cap.bit_width_fixed;
+>  		edx.split.reserved = 0;
+>  
+> diff --git a/arch/x86/kvm/pmu.h b/arch/x86/kvm/pmu.h
+> index ab85eed8a6cc..067fef51760c 100644
+> --- a/arch/x86/kvm/pmu.h
+> +++ b/arch/x86/kvm/pmu.h
+> @@ -15,6 +15,8 @@
+>  #define VMWARE_BACKDOOR_PMC_REAL_TIME		0x10001
+>  #define VMWARE_BACKDOOR_PMC_APPARENT_TIME	0x10002
+>  
+> +#define MAX_FIXED_COUNTERS	3
 > +
-> +	cr4 = cr4_saved & ~X86_CR4_PAE;
-> +	vmcb->save.cr4 = cr4;
-> +	SVM_TEST_CR_RESERVED_BITS(0, 11, 2, 3, cr3_saved,
-> +	    SVM_CR3_LEGACY_RESERVED_MASK);
-> +
-> +	cr4 |= X86_CR4_PAE;
-> +	vmcb->save.cr4 = cr4;
-> +	efer |= EFER_LMA;
-> +	vmcb->save.efer = efer;
-> +	SVM_TEST_CR_RESERVED_BITS(0, 63, 2, 3, cr3_saved,
-> +	    SVM_CR3_LONG_RESERVED_MASK);
+>  struct kvm_event_hw_type_mapping {
+>  	u8 eventsel;
+>  	u8 unit_mask;
+> 
 
-The test is not covering *non*-reserved bits, so it doesn't catch that 
-in both cases KVM is checking against long-mode bits.  Doing this would 
-require setting up the VMCB for immediate VMEXIT (for example, injecting 
-an event while the IDT limit is zero), so it can be done later.
-
-Instead, you need to set/clear EFER_LME.  Please be more careful to 
-check that the test is covering what you expect.
-
-Also, the tests show
-
-PASS: Test CR3 2:0: 641001
-PASS: Test CR3 2:0: 2
-PASS: Test CR3 2:0: 4
-PASS: Test CR3 11:0: 1
-PASS: Test CR3 11:0: 4
-PASS: Test CR3 11:0: 40
-PASS: Test CR3 11:0: 100
-PASS: Test CR3 11:0: 400
-PASS: Test CR3 63:0: 1
-PASS: Test CR3 63:0: 4
-PASS: Test CR3 63:0: 40
-PASS: Test CR3 63:0: 100
-PASS: Test CR3 63:0: 400
-PASS: Test CR3 63:0: 10000000000000
-PASS: Test CR3 63:0: 40000000000000
-PASS: Test CR3 63:0: 100000000000000
-PASS: Test CR3 63:0: 400000000000000
-PASS: Test CR3 63:0: 1000000000000000
-PASS: Test CR3 63:0: 4000000000000000
-PASS: Test CR4 31:12: 0
-PASS: Test CR4 31:12: 0
-
-and then exits.  There is an issue with compiler optimization for which 
-I've sent a patch, but even after fixing it the premature exit is a 
-problem: it is caused by a problem in __cr4_reserved_bits and a typo in 
-the tests:
-
-diff --git a/x86/svm.h b/x86/svm.h
-index f6b9a31..58c9069 100644
---- a/x86/svm.h
-+++ b/x86/svm.h
-@@ -328,8 +328,8 @@ struct __attribute__ ((__packed__)) vmcb {
- #define	SVM_CR3_LEGACY_RESERVED_MASK		0xfe7U
- #define	SVM_CR3_LEGACY_PAE_RESERVED_MASK	0x7U
- #define	SVM_CR3_LONG_RESERVED_MASK		0xfff0000000000fe7U
--#define	SVM_CR4_LEGACY_RESERVED_MASK		0xffbaf000U
--#define	SVM_CR4_RESERVED_MASK			0xffffffffffbaf000U
-+#define	SVM_CR4_LEGACY_RESERVED_MASK		0xffcaf000U
-+#define	SVM_CR4_RESERVED_MASK			0xffffffffffcaf000U
- #define	SVM_DR6_RESERVED_MASK			0xffffffffffff1ff0U
- #define	SVM_DR7_RESERVED_MASK			0xffffffff0000cc00U
- #define	SVM_EFER_RESERVED_MASK			0xffffffffffff0200U
-
-(Also, this kind of problem is made harder to notice by only testing
-even bits, which may make sense for high order bits, but certainly not
-for low-order ones).
-
-All in all, fixing this series has taken me almost 2 hours.  Since I have
-done the work I'm queuing but, but I wonder: the compiler optimization
-issue could depend on register allocation, but did all of these issues
-really happen only on my machine?
+Queued, thanks.
 
 Paolo
 
