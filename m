@@ -2,138 +2,95 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D3BCC218216
-	for <lists+kvm@lfdr.de>; Wed,  8 Jul 2020 10:18:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8DF4521828F
+	for <lists+kvm@lfdr.de>; Wed,  8 Jul 2020 10:34:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727802AbgGHISD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 8 Jul 2020 04:18:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48602 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725747AbgGHISD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 8 Jul 2020 04:18:03 -0400
-Received: from mail-oi1-x243.google.com (mail-oi1-x243.google.com [IPv6:2607:f8b0:4864:20::243])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C6A97C08C5DC;
-        Wed,  8 Jul 2020 01:18:02 -0700 (PDT)
-Received: by mail-oi1-x243.google.com with SMTP id r8so37125056oij.5;
-        Wed, 08 Jul 2020 01:18:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=/qD1naS8wsd2EhVt/M+vsUBKc2VxlIMTUtCT5APBmb8=;
-        b=SymsVca5pFQCCFaUMvCW+p8zXKoPW57/AifVo6loHj3G3ZMuNEdPndUSr67k3LQD6O
-         IONuzo1dRqgSK2pmyDmlbqpVHGMAdsbsKkDSUXaLMcAca1HvYtgK1fVgF0u1ao4srH3L
-         9eMZf/UYwCL2bEpTdphwhk/g7eflRo8nH9TacBib2eMBARWQRkBcB/H/tVX0S2a1kvqN
-         81Ha4VnR7EuXeeVcoc4F7NmucsKwaWxkZy6uI5v9JRt92cwO091o9CfBZr2P15NlMBdS
-         0iZYVPYAs2CBP90xbu5S+1y4Egp1hO53wrfSwx/q5SA47/I1aA4JOMtJVIgnRMnvft0U
-         IvkQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=/qD1naS8wsd2EhVt/M+vsUBKc2VxlIMTUtCT5APBmb8=;
-        b=b2PjG90NFVSSpgHcIynHEXKglrJETPB1ClBQOK1Y4I0pEw3w5sTTSeH614LR0mv0Xx
-         phjgVOUUwIAtbPQUoV0ccdmBb+c/2FQ/nyjm8+n6quZAHISb8etek8xFvVAqasaEfG/j
-         n3ve90SKImO6tOEA1wt/Z/p3x3reljEGX9FEFUsHro+xAgxmT/0MmJwvqHfKhi8KjmbY
-         0JuNdxoFwc3U/DJxGl6ZFy6Aezr32iiHiMJ6gcvVFc5fSanT2aASiM88WRzUKSt/Mg8o
-         l+XJgQL6b4k7svxf4D9Rt+/VvQ5j5tpg1dhlVjG78K0B84Eg+EJ3xAS4lQep2pHhTLmg
-         Z3Xg==
-X-Gm-Message-State: AOAM533QroOWtehpFOBU+MWM/26PiYlry/Ehyduveba11MlOlZvvBJ8W
-        jZZkRSzm8Z6ePbJq2OMpE2z2wjd1eiAQYFcRKqk=
-X-Google-Smtp-Source: ABdhPJw/tiA3BCQR7zpDMd7jSoB9EFjDAwhK4Vb03FQ74u/mEXX7r77cGZ+tStwn8KI+qeHVppi8LmNYOypyLJ7MQAY=
-X-Received: by 2002:aca:d643:: with SMTP id n64mr6264105oig.33.1594196282195;
- Wed, 08 Jul 2020 01:18:02 -0700 (PDT)
+        id S1727870AbgGHIdh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 8 Jul 2020 04:33:37 -0400
+Received: from mga02.intel.com ([134.134.136.20]:64457 "EHLO mga02.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725747AbgGHIdg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 8 Jul 2020 04:33:36 -0400
+IronPort-SDR: HoY8vpWQECYOnt/SCqoVPXz22h3k+dpGOFYWviLFrNBUu21c7N+l0uf/JJwiVoEXSOkn7hYwxu
+ HpyZwHkBR4YA==
+X-IronPort-AV: E=McAfee;i="6000,8403,9675"; a="135992104"
+X-IronPort-AV: E=Sophos;i="5.75,327,1589266800"; 
+   d="scan'208";a="135992104"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Jul 2020 01:33:36 -0700
+IronPort-SDR: ww1u6wUho2hrOo6VESFNIqGEjfdxdnumbHu5dNDSFnWsXuxUo/0pTRhBQptcoeRCucYwCiF5R6
+ 5hcOiswz5ycA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.75,327,1589266800"; 
+   d="scan'208";a="358040221"
+Received: from zhangj4-mobl1.ccr.corp.intel.com (HELO [10.249.171.75]) ([10.249.171.75])
+  by orsmga001.jf.intel.com with ESMTP; 08 Jul 2020 01:33:30 -0700
+Subject: Re: [PATCH v2 2/4] x86/cpufeatures: Enumerate TSX suspend load
+ address tracking instructions
+To:     Greg KH <gregkh@linuxfoundation.org>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org, x86@kernel.org,
+        pbonzini@redhat.com, sean.j.christopherson@intel.com,
+        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
+        joro@8bytes.org, tglx@linutronix.de, mingo@redhat.com,
+        bp@alien8.de, hpa@zytor.com, ricardo.neri-calderon@linux.intel.com,
+        kyung.min.park@intel.com, jpoimboe@redhat.com, ak@linux.intel.com,
+        dave.hansen@intel.com, tony.luck@intel.com,
+        ravi.v.shankar@intel.com
+References: <1594088183-7187-1-git-send-email-cathy.zhang@intel.com>
+ <1594088183-7187-3-git-send-email-cathy.zhang@intel.com>
+ <20200707094019.GA2639362@kroah.com>
+From:   "Zhang, Cathy" <cathy.zhang@intel.com>
+Message-ID: <78a3edfe-0a6b-4b23-f41d-cebe7dce67cf@intel.com>
+Date:   Wed, 8 Jul 2020 16:33:29 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-References: <20200417163843.71624-1-pbonzini@redhat.com> <20200417163843.71624-2-pbonzini@redhat.com>
-In-Reply-To: <20200417163843.71624-2-pbonzini@redhat.com>
-From:   Wanpeng Li <kernellwp@gmail.com>
-Date:   Wed, 8 Jul 2020 16:17:51 +0800
-Message-ID: <CANRm+CyWKbSU9FZkGoPx2nff-Se3Qcfn1TXXw8exy-6nuZrirg@mail.gmail.com>
-Subject: Re: [PATCH 1/2] KVM: SVM: avoid infinite loop on NPF from bad address
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        "# v3 . 10+" <stable@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20200707094019.GA2639362@kroah.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, 18 Apr 2020 at 00:39, Paolo Bonzini <pbonzini@redhat.com> wrote:
+On 7/7/2020 5:40 PM, Greg KH wrote:
+> On Tue, Jul 07, 2020 at 10:16:21AM +0800, Cathy Zhang wrote:
+>> Intel TSX suspend load tracking instructions aim to give a way to
+>> choose which memory accesses do not need to be tracked in the TSX
+>> read set. Add TSX suspend load tracking CPUID feature flag TSXLDTRK
+>> for enumeration.
+>>
+>> A processor supports Intel TSX suspend load address tracking if
+>> CPUID.0x07.0x0:EDX[16] is present. Two instructions XSUSLDTRK, XRESLDTRK
+>> are available when this feature is present.
+>>
+>> The CPU feature flag is shown as "tsxldtrk" in /proc/cpuinfo.
+>>
+>> Detailed information on the instructions and CPUID feature flag TSXLDTRK
+>> can be found in the latest Intel Architecture Instruction Set Extensions
+>> and Future Features Programming Reference and Intel 64 and IA-32
+>> Architectures Software Developer's Manual.
+>>
+>> Signed-off-by: Kyung Min Park <kyung.min.park@intel.com>
+>> Signed-off-by: Cathy Zhang <cathy.zhang@intel.com>
+>> ---
+>>   arch/x86/include/asm/cpufeatures.h | 1 +
+>>   1 file changed, 1 insertion(+)
+>>
+>> diff --git a/arch/x86/include/asm/cpufeatures.h b/arch/x86/include/asm/cpufeatures.h
+>> index adf45cf..34b66d7 100644
+>> --- a/arch/x86/include/asm/cpufeatures.h
+>> +++ b/arch/x86/include/asm/cpufeatures.h
+>> @@ -366,6 +366,7 @@
+>>   #define X86_FEATURE_MD_CLEAR		(18*32+10) /* VERW clears CPU buffers */
+>>   #define X86_FEATURE_TSX_FORCE_ABORT	(18*32+13) /* "" TSX_FORCE_ABORT */
+>>   #define X86_FEATURE_SERIALIZE		(18*32+14) /* SERIALIZE instruction */
+>> +#define X86_FEATURE_TSX_LDTRK           (18*32+16) /* TSX Suspend Load Address Tracking */
+> No tabs?
 >
-> When a nested page fault is taken from an address that does not have
-> a memslot associated to it, kvm_mmu_do_page_fault returns RET_PF_EMULATE
-> (via mmu_set_spte) and kvm_mmu_page_fault then invokes svm_need_emulation_on_page_fault.
->
-> The default answer there is to return false, but in this case this just
-> causes the page fault to be retried ad libitum.  Since this is not a
-> fast path, and the only other case where it is taken is an erratum,
-> just stick a kvm_vcpu_gfn_to_memslot check in there to detect the
-> common case where the erratum is not happening.
->
-> This fixes an infinite loop in the new set_memory_region_test.
->
-> Fixes: 05d5a4863525 ("KVM: SVM: Workaround errata#1096 (insn_len maybe zero on SMAP violation)")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
->  arch/x86/kvm/svm/svm.c | 7 +++++++
->  virt/kvm/kvm_main.c    | 1 +
->  2 files changed, 8 insertions(+)
->
-> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-> index a91e397d6750..c86f7278509b 100644
-> --- a/arch/x86/kvm/svm/svm.c
-> +++ b/arch/x86/kvm/svm/svm.c
-> @@ -3837,6 +3837,13 @@ static bool svm_need_emulation_on_page_fault(struct kvm_vcpu *vcpu)
->         bool smap = cr4 & X86_CR4_SMAP;
->         bool is_user = svm_get_cpl(vcpu) == 3;
->
-> +       /*
-> +        * If RIP is invalid, go ahead with emulation which will cause an
-> +        * internal error exit.
-> +        */
-> +       if (!kvm_vcpu_gfn_to_memslot(vcpu, kvm_rip_read(vcpu) >> PAGE_SHIFT))
-> +               return true;
-> +
->         /*
->          * Detect and workaround Errata 1096 Fam_17h_00_0Fh.
->          *
-> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index e2f60e313c87..e7436d054305 100644
-> --- a/virt/kvm/kvm_main.c
-> +++ b/virt/kvm/kvm_main.c
-> @@ -1602,6 +1602,7 @@ struct kvm_memory_slot *kvm_vcpu_gfn_to_memslot(struct kvm_vcpu *vcpu, gfn_t gfn
->  {
->         return __gfn_to_memslot(kvm_vcpu_memslots(vcpu), gfn);
->  }
-> +EXPORT_SYMBOL_GPL(kvm_vcpu_gfn_to_memslot);
-
-This commit incurs the linux guest fails to boot once add --overcommit
-cpu-pm=on or not intercept hlt instruction, any thoughts?
-
-<...>-35787 [038] ....  2825.959082: kvm_exit: vcpu 1 reason npf rip
-0xfd11d info 100000014 fd000
-<...>-35788 [037] ....  2825.959082: kvm_exit: vcpu 2 reason npf rip
-0xfd11d info 100000014 fd000
-<...>-35789 [036] ....  2825.959082: kvm_exit: vcpu 3 reason npf rip
-0xfd11d info 100000014 fd000
-<...>-35788 [037] ....  2825.959082: kvm_page_fault: address fd000 error_code 14
-<...>-35789 [036] ....  2825.959082: kvm_page_fault: address fd000 error_code 14
-<...>-35787 [038] ....  2825.959083: kvm_page_fault: address fd000 error_code 14
-<...>-35788 [037] ....  2825.959086: kvm_emulate_insn: 0:fd11d: (prot32)
-<...>-35788 [037] ....  2825.959086: kvm_emulate_insn: 0:fd11d: (prot32) failed
-<...>-35789 [036] ....  2825.959087: kvm_emulate_insn: 0:fd11d: (prot32)
-<...>-35789 [036] ....  2825.959087: kvm_emulate_insn: 0:fd11d: (prot32) failed
-<...>-35788 [037] ....  2825.959087: kvm_fpu: unload
-<...>-35787 [038] ....  2825.959087: kvm_emulate_insn: 0:fd11d: (prot32)
-<...>-35787 [038] ....  2825.959087: kvm_emulate_insn: 0:fd11d: (prot32) failed
-<...>-35789 [036] ....  2825.959087: kvm_fpu: unload
-<...>-35787 [038] ....  2825.959088: kvm_fpu: unload
-<...>-35788 [037] ....  2825.959088: kvm_userspace_exit: reason
-KVM_EXIT_INTERNAL_ERROR (17)
-<...>-35789 [036] ....  2825.959089: kvm_userspace_exit: reason
-KVM_EXIT_INTERNAL_ERROR (17)
-<...>-35787 [038] ....  2825.959089: kvm_userspace_exit: reason
-KVM_EXIT_INTERNAL_ERROR (17)
+> :(
+Sorry, it's my fault. I wrongly pick up an older kernel patch version, 
+the latest one has no such issue. It will be addressed in next version.
