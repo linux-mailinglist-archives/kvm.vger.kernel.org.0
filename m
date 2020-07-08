@@ -2,141 +2,106 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6EB2C21910B
-	for <lists+kvm@lfdr.de>; Wed,  8 Jul 2020 21:55:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EA35421917E
+	for <lists+kvm@lfdr.de>; Wed,  8 Jul 2020 22:29:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726283AbgGHTz2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 8 Jul 2020 15:55:28 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:36779 "EHLO
+        id S1726118AbgGHU26 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 8 Jul 2020 16:28:58 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:29592 "EHLO
         us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1725903AbgGHTz2 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 8 Jul 2020 15:55:28 -0400
+        by vger.kernel.org with ESMTP id S1725848AbgGHU25 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 8 Jul 2020 16:28:57 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1594238126;
+        s=mimecast20190719; t=1594240136;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=k4zYLdQwkBISSt97sZJVBWHYyMqX21StTgcEywwSVHM=;
-        b=fi54/RK7YG4KV8Z+hF1d78z964SS9VdGhAlcgi+87U/h94QvF5Kj+NwJifHmmnREADTLTq
-        AOgcC5Rm2KEhVG3dDnb0rj3jgamPQFqkF50hD+R4qzZ8PhvHaMYHYZ277XJrQepDvfqM4W
-        Qe9zs66+Vg95zBkI68CIN8dgSI5hJTE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-356-7z3WF3iqMRmKuVNARq36Gw-1; Wed, 08 Jul 2020 15:55:22 -0400
-X-MC-Unique: 7z3WF3iqMRmKuVNARq36Gw-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0E18580BCC7;
-        Wed,  8 Jul 2020 19:55:17 +0000 (UTC)
-Received: from x1.home (ovpn-112-71.phx2.redhat.com [10.3.112.71])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id A5D246FEC4;
-        Wed,  8 Jul 2020 19:54:44 +0000 (UTC)
-Date:   Wed, 8 Jul 2020 13:54:44 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     "Liu, Yi L" <yi.l.liu@intel.com>
-Cc:     "eric.auger@redhat.com" <eric.auger@redhat.com>,
-        "baolu.lu@linux.intel.com" <baolu.lu@linux.intel.com>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "Tian, Kevin" <kevin.tian@intel.com>,
-        "jacob.jun.pan@linux.intel.com" <jacob.jun.pan@linux.intel.com>,
-        "Raj, Ashok" <ashok.raj@intel.com>,
-        "Tian, Jun J" <jun.j.tian@intel.com>,
-        "Sun, Yi Y" <yi.y.sun@intel.com>,
-        "jean-philippe@linaro.org" <jean-philippe@linaro.org>,
-        "peterx@redhat.com" <peterx@redhat.com>,
-        "Wu, Hao" <hao.wu@intel.com>,
-        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v3 06/14] vfio/type1: Add VFIO_IOMMU_PASID_REQUEST
- (alloc/free)
-Message-ID: <20200708135444.4eac48a4@x1.home>
-In-Reply-To: <DM5PR11MB1435B159DA10C8301B89A6F0C3670@DM5PR11MB1435.namprd11.prod.outlook.com>
-References: <1592988927-48009-1-git-send-email-yi.l.liu@intel.com>
-        <1592988927-48009-7-git-send-email-yi.l.liu@intel.com>
-        <20200702151832.048b44d1@x1.home>
-        <CY4PR11MB1432DD97F44EB8AA5CCC87D8C36A0@CY4PR11MB1432.namprd11.prod.outlook.com>
-        <DM5PR11MB1435B159DA10C8301B89A6F0C3670@DM5PR11MB1435.namprd11.prod.outlook.com>
-Organization: Red Hat
+        bh=tKlR3ZjSGkU94hKtcspH+LSF41vCI5eSTGDezrwB8ao=;
+        b=MNK+SaOC30eAULtpDFpBdLFgVQQHkfFwzwUwaMifWg5GTvFF7BlIr6nXi4HXGnPR1EejzI
+        IMP/zAoMa4La/7C5MCbEy7lLEKsRrukMpU4mUKPDD7jZVXm4bCvTDohnflNaAcpTxkSkSa
+        9mxI949fNhGZAObRuOyAihkzDlz49D8=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-494-Iqw3zoWAPEO4VhhsahJVWQ-1; Wed, 08 Jul 2020 16:28:54 -0400
+X-MC-Unique: Iqw3zoWAPEO4VhhsahJVWQ-1
+Received: by mail-wr1-f70.google.com with SMTP id v3so23389071wrq.10
+        for <kvm@vger.kernel.org>; Wed, 08 Jul 2020 13:28:54 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=tKlR3ZjSGkU94hKtcspH+LSF41vCI5eSTGDezrwB8ao=;
+        b=L8DX71sGz7s7V6d1kTGmg6xHjSLTIr1g8uSsx/5E9JdmsepchJBKA/w03iC2yHLjXg
+         hVlz4MlKfwmKQ6uOHEjsnM0ds6JQjzePw/C4a/iHZSSXtMNf8LSdT9rtJXfpPyfMQxVU
+         +l57LzUEmizTCV36J2MUkElU5AvfeQrZhMkzlHlUmTuQV4bPuOE/hsBddYplzOgic6Oi
+         7XcCYX4nxv2TGPoM0Ek1u6Va/1Dd/kA+PN5lSaTosKRlii8Yakr8Yke1hGBp42qURZQ6
+         0zyBlYzmRNu5Kq7OkUyyXfpZ8UXa6v7hyHp90eHD+aAT88NqhHVgD48/GmdhxRH+xcyD
+         FxaQ==
+X-Gm-Message-State: AOAM5327AVy/fvgphY27TV0MF204MB0lu81fzf2zoBAl8WsU0ZiKNpnX
+        w1vlAXwRq28VgPAaCc0Dg9d1ykWEZX30i/o3GnIiu2/vfxlK+pXFspZOCqzXSVVeWXP4XAt82BZ
+        BBeQvSvlAyjvr
+X-Received: by 2002:a05:6000:1206:: with SMTP id e6mr29803848wrx.346.1594240133652;
+        Wed, 08 Jul 2020 13:28:53 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJymxGVgiM5r72XA6vzEjzcO7z2KzQpDxACkB5nl5lRy9YvNMCQdsG72gOmEThXjiJuxHh5pBw==
+X-Received: by 2002:a05:6000:1206:: with SMTP id e6mr29803834wrx.346.1594240133412;
+        Wed, 08 Jul 2020 13:28:53 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:ef:39d9:1ecb:6054? ([2001:b07:6468:f312:ef:39d9:1ecb:6054])
+        by smtp.gmail.com with ESMTPSA id v3sm1664758wrq.57.2020.07.08.13.28.52
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 08 Jul 2020 13:28:52 -0700 (PDT)
+Subject: Re: [patch V2 0/7] x86/kvm: RCU/context tracking and instrumentation
+ protections
+To:     Thomas Gleixner <tglx@linutronix.de>,
+        LKML <linux-kernel@vger.kernel.org>
+Cc:     x86@kernel.org, kvm@vger.kernel.org,
+        Alexandre Chartre <alexandre.chartre@oracle.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Juergen Gross <jgross@suse.com>
+References: <20200708195153.746357686@linutronix.de>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <1b17c3ed-e53c-2e20-2880-882fdc84f622@redhat.com>
+Date:   Wed, 8 Jul 2020 22:28:51 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.9.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <20200708195153.746357686@linutronix.de>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 8 Jul 2020 08:16:16 +0000
-"Liu, Yi L" <yi.l.liu@intel.com> wrote:
-
-> Hi Alex,
+On 08/07/20 21:51, Thomas Gleixner wrote:
+> Folks,
 > 
-> > From: Liu, Yi L < yi.l.liu@intel.com>
-> > Sent: Friday, July 3, 2020 2:28 PM
-> > 
-> > Hi Alex,
-> >   
-> > > From: Alex Williamson <alex.williamson@redhat.com>
-> > > Sent: Friday, July 3, 2020 5:19 AM
-> > >
-> > > On Wed, 24 Jun 2020 01:55:19 -0700
-> > > Liu Yi L <yi.l.liu@intel.com> wrote:
-> > >  
-> > > > This patch allows user space to request PASID allocation/free, e.g.
-> > > > when serving the request from the guest.
-> > > >
-> > > > PASIDs that are not freed by userspace are automatically freed when
-> > > > the IOASID set is destroyed when process exits.  
-> [...]
-> > > > +static int vfio_iommu_type1_pasid_request(struct vfio_iommu *iommu,
-> > > > +					  unsigned long arg)
-> > > > +{
-> > > > +	struct vfio_iommu_type1_pasid_request req;
-> > > > +	unsigned long minsz;
-> > > > +
-> > > > +	minsz = offsetofend(struct vfio_iommu_type1_pasid_request, range);
-> > > > +
-> > > > +	if (copy_from_user(&req, (void __user *)arg, minsz))
-> > > > +		return -EFAULT;
-> > > > +
-> > > > +	if (req.argsz < minsz || (req.flags & ~VFIO_PASID_REQUEST_MASK))
-> > > > +		return -EINVAL;
-> > > > +
-> > > > +	if (req.range.min > req.range.max)  
-> > >
-> > > Is it exploitable that a user can spin the kernel for a long time in
-> > > the case of a free by calling this with [0, MAX_UINT] regardless of their actual  
-> > allocations?
-> > 
-> > IOASID can ensure that user can only free the PASIDs allocated to the user. but
-> > it's true, kernel needs to loop all the PASIDs within the range provided by user. it
-> > may take a long time. is there anything we can do? one thing may limit the range
-> > provided by user?  
+> this is a rebased and adopted version of the original series which is
+> available here:
 > 
-> thought about it more, we have per-VM pasid quota (say 1000), so even if
-> user passed down [0, MAX_UNIT], kernel will only loop the 1000 pasids at
-> most. do you think we still need to do something on it?
+>      https://lore.kernel.org/r/20200519203128.773151484@linutronix.de
+>  
+> It deals with the RCU and context tracking state and the protection against
+> instrumentation in sensitive places:
+> 
+>   - Placing the guest_enter/exit() calls at the correct place
+> 
+>   - Moving the sensitive VMENTER/EXIT code into the non-instrumentable code
+>     section.
+> 
+>   - Fixup the tracing code to comply with the non-instrumentation rules
+> 
+>   - Use native functions to access CR2 and the GS base MSR in the critical
+>     code pathes to prevent them from being instrumented.
+> 
+> Thanks,
+> 
+> 	tglx
+> 
 
-How do you figure that?  vfio_iommu_type1_pasid_request() accepts the
-user's min/max so long as (max > min) and passes that to
-vfio_iommu_type1_pasid_free(), then to vfio_pasid_free_range()  which
-loops as:
+Queued, thanks.
 
-	ioasid_t pasid = min;
-	for (; pasid <= max; pasid++)
-		ioasid_free(pasid);
-
-A user might only be able to allocate 1000 pasids, but apparently they
-can ask to free all they want.
-
-It's also not obvious to me that calling ioasid_free() is only allowing
-the user to free their own passid.  Does it?  It would be a pretty
-gaping hole if a user could free arbitrary pasids.  A r-b tree of
-passids might help both for security and to bound spinning in a loop.
-Thanks,
-
-Alex
+Paolo
 
