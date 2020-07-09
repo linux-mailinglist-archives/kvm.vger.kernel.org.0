@@ -2,139 +2,96 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 06EA421A988
-	for <lists+kvm@lfdr.de>; Thu,  9 Jul 2020 23:09:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C8D1C21A990
+	for <lists+kvm@lfdr.de>; Thu,  9 Jul 2020 23:12:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726261AbgGIVJ1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 Jul 2020 17:09:27 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:52852 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726193AbgGIVJ0 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 9 Jul 2020 17:09:26 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1594328964;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=/5qJhIS3vYBRwpwDz6NnUQ7JwhKdspJwMVlrORtRFsI=;
-        b=bS9FCHInaHcVs5ht+tLqVVqbXZs6dS1Di8y6DpfSuDtWHKs5Qi/TJ4bkoRbTCFGyYdvnb/
-        cSFyjumBVJwH8P+pK3egJiLDx6Gj4oTwUnw/2w54nDkyHr2efXbGj59zfVlNh32OfcETJF
-        ovW05OChZNiCUYKiyAFw9Mnoj0Yj5fA=
-Received: from mail-qt1-f200.google.com (mail-qt1-f200.google.com
- [209.85.160.200]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-490-QfgqFsSoNiS2oMFkp0ytDA-1; Thu, 09 Jul 2020 17:09:23 -0400
-X-MC-Unique: QfgqFsSoNiS2oMFkp0ytDA-1
-Received: by mail-qt1-f200.google.com with SMTP id e4so2599443qtd.13
-        for <kvm@vger.kernel.org>; Thu, 09 Jul 2020 14:09:23 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=/5qJhIS3vYBRwpwDz6NnUQ7JwhKdspJwMVlrORtRFsI=;
-        b=JrkKy0BjjFpAMuMZ6iYkZeW3zYM0dQkojyA4NMI23zyqffEt9dx7Wpv1fYte2DXxtj
-         yBr9y9fysKpxn+fqzU1j3otoZgMwk57HE8/jXTlO01ZLlsAhaxaY/KWbg3objuJkwuoH
-         qoDV/g4uEdaxd9VlmbXJcJz41kaDbhqjmgY7lp+dYpw4tMB4ElFdMc7eToXA0qk5x/fQ
-         ++u+YqO4Bjv8a4xN51zHqeT94b6KBX/cZeXZoz+ZCMCUYWN13nnruz6uGmLxRL6MCbSG
-         rpd2TjxvdEQUjPhbWoOtnV4Ulf8Anr+499Wb0f4sk/0+iwmIl7LaDMZucmb60IvMB/8A
-         mlFA==
-X-Gm-Message-State: AOAM531dS7ErHp1nDmDKyqeR70nsZdri8H/pONbIBOTCQAHcHRpF4k8H
-        ZWTuL76JEQW7fssMbZq2veEN8Xz6cNhJ6lpYxUtRMaIzc512fqhTxjRJMSM1k4KxFHEUaYJYllD
-        yuS+8sVr54Ufx
-X-Received: by 2002:ae9:eb15:: with SMTP id b21mr63498662qkg.25.1594328962680;
-        Thu, 09 Jul 2020 14:09:22 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJytMp4FZzlKADFTWMxlQgjTokjC1UG3cuT4XI3dTItP34+1t2ioJ/GoIHAk+kuY72jpqFDM/w==
-X-Received: by 2002:ae9:eb15:: with SMTP id b21mr63498631qkg.25.1594328962287;
-        Thu, 09 Jul 2020 14:09:22 -0700 (PDT)
-Received: from xz-x1 ([2607:9880:19c8:6f::1f4f])
-        by smtp.gmail.com with ESMTPSA id k194sm4993332qke.100.2020.07.09.14.09.20
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 09 Jul 2020 14:09:21 -0700 (PDT)
-Date:   Thu, 9 Jul 2020 17:09:19 -0400
-From:   Peter Xu <peterx@redhat.com>
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, Vitaly Kuznetsov <vkuznets@redhat.com>
-Subject: Re: [PATCH 1/2] KVM: X86: Move ignore_msrs handling upper the stack
-Message-ID: <20200709210919.GI199122@xz-x1>
-References: <20200622220442.21998-2-peterx@redhat.com>
- <20200625061544.GC2141@linux.intel.com>
- <1cebc562-89e9-3806-bb3c-771946fc64f3@redhat.com>
- <20200625162540.GC3437@linux.intel.com>
- <20200626180732.GB175520@xz-x1>
- <20200626181820.GG6583@linux.intel.com>
- <47b90b77-cf03-6087-b25f-fcd2fd313165@redhat.com>
- <20200630154726.GD7733@linux.intel.com>
- <20200709182220.GG199122@xz-x1>
- <20200709192440.GD24919@linux.intel.com>
+        id S1726581AbgGIVMz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 Jul 2020 17:12:55 -0400
+Received: from mga14.intel.com ([192.55.52.115]:48641 "EHLO mga14.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726193AbgGIVMy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 9 Jul 2020 17:12:54 -0400
+IronPort-SDR: zYmXNkegbqZW8ttBVqW+Fb9OPMitK+9NJngz/+TbgxgVnoU3D8mdRsJjjFX5DF5hHeWbfAUSwC
+ L4phwt6RBvPQ==
+X-IronPort-AV: E=McAfee;i="6000,8403,9677"; a="147200600"
+X-IronPort-AV: E=Sophos;i="5.75,332,1589266800"; 
+   d="scan'208";a="147200600"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Jul 2020 14:12:53 -0700
+IronPort-SDR: HL1NxPNKrlVgGsyiHBtUvZOy7JZ9ONOwA/QDyK5kyklSsh/Edk5Q8Scsc3DgwBI0El5KtpVVxg
+ uqD2y2SHHsOg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.75,332,1589266800"; 
+   d="scan'208";a="358569577"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.152])
+  by orsmga001.jf.intel.com with ESMTP; 09 Jul 2020 14:12:53 -0700
+Date:   Thu, 9 Jul 2020 14:12:53 -0700
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Xiong Zhang <xiong.y.zhang@intel.com>,
+        Wayne Boyer <wayne.boyer@intel.com>,
+        Zhenyu Wang <zhenyuw@linux.intel.com>,
+        Jun Nakajima <jun.nakajima@intel.com>
+Subject: Re: [PATCH] KVM: x86/mmu: Add capability to zap only sptes for the
+ affected memslot
+Message-ID: <20200709211253.GW24919@linux.intel.com>
+References: <20200703025047.13987-1-sean.j.christopherson@intel.com>
+ <51637a13-f23b-8b76-c93a-76346b4cc982@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200709192440.GD24919@linux.intel.com>
+In-Reply-To: <51637a13-f23b-8b76-c93a-76346b4cc982@redhat.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jul 09, 2020 at 12:24:40PM -0700, Sean Christopherson wrote:
-> On Thu, Jul 09, 2020 at 02:22:20PM -0400, Peter Xu wrote:
-> > On Tue, Jun 30, 2020 at 08:47:26AM -0700, Sean Christopherson wrote:
-> > > On Sat, Jun 27, 2020 at 04:24:34PM +0200, Paolo Bonzini wrote:
-> > > > On 26/06/20 20:18, Sean Christopherson wrote:
-> > > > >> Btw, would it be more staightforward to check "vcpu->arch.arch_capabilities &
-> > > > >> ARCH_CAP_TSX_CTRL_MSR" rather than "*ebx | (F(RTM) | F(HLE))" even if we want
-> > > > >> to have such a fix?
-> > > > > Not really, That ends up duplicating the check in vmx_get_msr().  From an
-> > > > > emulation perspective, this really is a "guest" access to the MSR, in the
-> > > > > sense that it the virtual CPU is in the guest domain, i.e. not a god-like
-> > > > > entity that gets to break the rules of emulation.
-> > > > 
-> > > > But if you wrote a guest that wants to read MSR_IA32_TSX_CTRL, there are
-> > > > two choices:
-> > > > 
-> > > > 1) check ARCH_CAPABILITIES first
-> > > > 
-> > > > 2) blindly access it and default to 0.
-> > > > 
-> > > > Both are fine, because we know MSR_IA32_TSX_CTRL has no
-> > > > reserved/must-be-one bits.  Calling __kvm_get_msr and checking for an
-> > > > invalid MSR through the return value is not breaking the rules of
-> > > > emulation, it is "faking" a #GP handler.
-> > > 
-> > > "guest" was the wrong choice of word.  My point was that, IMO, emulation
-> > > should never set host_initiated=true.
-> > > 
-> > > To me, accessing MSRs with host_initiated is the equivalent of loading a
-> > > ucode patch, i.e. it's super duper special stuff that deliberately turns
-> > > off all safeguards and can change the fundamental behavior of the (virtual)
-> > > CPU.
+On Wed, Jul 08, 2020 at 06:08:24PM +0200, Paolo Bonzini wrote:
+> On 03/07/20 04:50, Sean Christopherson wrote:
+> > Introduce a new capability, KVM_CAP_MEMSLOT_ZAP_CONTROL, to allow
+> > userspace to control the memslot zapping behavior on a per-VM basis.
+> > x86's default behavior is to zap all SPTEs, including the root shadow
+> > page, across all memslots.  While effective, the nuke and pave approach
+> > isn't exactly performant, especially for large VMs and/or VMs that
+> > heavily utilize RO memslots for MMIO devices, e.g. option ROMs.
 > > 
-> > This seems to be an orthogonal change against what this series tried to do.  We
-> > use host_initiated=true in current code, and this series won't change that fact
-> > either.  As I mentioned in the other thread, at least the rdmsr warning is
-> > ambiguous when it's not initiated from the guest if without this patchset, and
-> > this series could address that.
-> 
-> My argument is that using host_initiated=true is wrong.  
-> 
-> > > > So I think Peter's patch is fine, but (possibly on top as a third patch)
-> > > > __must_check should be added to MSR getters and setters.  Also one
-> > > > possibility is to return -EINVAL for invalid MSRs.
+> > On a vanilla VM with 6gb of RAM, the targeted zap reduces the number of
+> > EPT violations during boot by ~14% with THP enabled in the host, and by
+> > ~7% with THP disabled in the host.  On a much more custom VM with 32gb
+> > and a significant amount of memslot zapping, this can reduce the number
+> > of EPT violations by 50% during guest boot, and improve boot time by
+> > as much as 25%.
 > > 
-> > Yeah I can add another patch for that.  Also if to repost, I tend to also
-> > introduce KVM_MSR_RET_[OK|ERROR] too, which seems to be cleaner when we had
-> > KVM_MSR_RET_INVALID.
+> > Keep the current x86 memslot zapping behavior as the default, as there's
+> > an unresolved bug that pops up when zapping only the affected memslot,
+> > and the exact conditions that trigger the bug are not fully known.  See
+> > https://patchwork.kernel.org/patch/10798453 for details.
 > > 
-> > Any objections before I repost?
+> > Implement the capability as a set of flags so that other architectures
+> > might be able to use the capability without having to conform to x86's
+> > semantics.
 > 
-> Heh, or perhaps "Any objections that haven't been overruled before I repost?" :-D
+> It's bad that we have no clue what's causing the bad behavior, but I
+> don't think it's wise to have a bug that is known to happen when you
+> enable the capability. :/
 
-Again, using host_initiated or not should be a different issue?  Frankly
-speaking, I don't know whether it's an issue or not, but it's different from
-what this series wants to do, because it'll be the same before/after this
-series. Am I right?
+I don't necessarily disagree, but at the same time it's entirely possible
+it's a Qemu bug.  If the bad behavior doesn't occur with other VMMs, those
+other VMMs shouldn't be penalized because we can't figure out what Qemu is
+getting wrong.
 
-Or, please explain what's the "overruled objection" that you're talking about..
+Even if this is a kernel bug, I'm fairly confident at this point that it's
+not a KVM bug.  Or rather, if it's a KVM "bug", then there's a fundamental
+dependency in memslot management that needs to be rooted out and documented.
 
--- 
-Peter Xu
-
+And we're kind of in a catch-22; it'll be extremely difficult to narrow down
+exactly who is breaking what without being able to easily test the optimized
+zapping with other VMMs and/or setups.
