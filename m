@@ -2,175 +2,177 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 90D0C219FC4
-	for <lists+kvm@lfdr.de>; Thu,  9 Jul 2020 14:14:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 87AB8219FCD
+	for <lists+kvm@lfdr.de>; Thu,  9 Jul 2020 14:14:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726907AbgGIMOD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 Jul 2020 08:14:03 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:38321 "EHLO
+        id S1727866AbgGIMOi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 Jul 2020 08:14:38 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:24897 "EHLO
         us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726767AbgGIMOC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 9 Jul 2020 08:14:02 -0400
+        with ESMTP id S1727814AbgGIMOh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 9 Jul 2020 08:14:37 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1594296841;
+        s=mimecast20190719; t=1594296875;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=2asj5z6GDxcxejvOPd+jW3fsNBthnd9siyOya9HivOI=;
-        b=G/znWEqChMcn6AUJXwNK7k7jnu7FE9v/e/TCxcBgt7kiSS4gjKIDf3yfamb7TjMr3r7bjl
-        Bkcrj9/hLEh/6APO1HD5NlwDpqQAWS+b7tNy4EHxcEa4kzgng2SYfFLs9uhGvYKm+2DyGE
-        vRKY8xpJzd2nnkS5yISjNhHE/zv/FHY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-79-YPfsv5fvPGiyh-eViCfsGw-1; Thu, 09 Jul 2020 08:13:57 -0400
-X-MC-Unique: YPfsv5fvPGiyh-eViCfsGw-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 68D171080;
-        Thu,  9 Jul 2020 12:13:56 +0000 (UTC)
-Received: from gondolin (ovpn-113-62.ams2.redhat.com [10.36.113.62])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id A35826FEC2;
-        Thu,  9 Jul 2020 12:13:51 +0000 (UTC)
-Date:   Thu, 9 Jul 2020 14:13:48 +0200
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Pierre Morel <pmorel@linux.ibm.com>
-Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
-        frankja@linux.ibm.com, david@redhat.com, thuth@redhat.com,
-        drjones@redhat.com
-Subject: Re: [kvm-unit-tests PATCH v11 9/9] s390x: css: ssch/tsch with sense
- and interrupt
-Message-ID: <20200709141348.6ae5ff18.cohuck@redhat.com>
-In-Reply-To: <1594282068-11054-10-git-send-email-pmorel@linux.ibm.com>
-References: <1594282068-11054-1-git-send-email-pmorel@linux.ibm.com>
-        <1594282068-11054-10-git-send-email-pmorel@linux.ibm.com>
-Organization: Red Hat GmbH
+        bh=kwRIPXQdD58+F7cV0LER43YEzOAqv3hHNiA5thj41Io=;
+        b=cVCQOvTzQLiJEVpyUbxvPhbSQpUxzVZtXyKqyeYGFbAN1T+iquSqMwtHHLMK9ZXJn66KL0
+        R2r1FthKbm4bqAcEtLpDYzcUmf5heC0teSOwpu0c+1IVQz1DXoQV8/JHKo23+d6/1xQWRv
+        vBIcsF3xLG+hbv/lB65P2Esaue7994U=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-17-BkgrZ-hoNkKuF-NrXxBhIw-1; Thu, 09 Jul 2020 08:14:32 -0400
+X-MC-Unique: BkgrZ-hoNkKuF-NrXxBhIw-1
+Received: by mail-wr1-f72.google.com with SMTP id a18so1746031wrm.14
+        for <kvm@vger.kernel.org>; Thu, 09 Jul 2020 05:14:32 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=kwRIPXQdD58+F7cV0LER43YEzOAqv3hHNiA5thj41Io=;
+        b=dikCV9Cau0hAoFlA77i2cXh7KAR5jhlTux5oaGichS0we4oh3sRwFQ5G6VupB11v6n
+         4gi7YWi33VO/Te147MVJzSbuFpkHr39fxMV22fJa0cookblj3qtr1s3+oJrD91SuHmuo
+         Upesw4GL3+V3hzumu8L+5aSBg8t9aXpK9ACoFkayXLPRLYwuwZzNSJO5mRg2Rr105AmR
+         kY6vunOO2SJyBvi15mSmYwGJLgqfrAGX9HVRQmomf6My1/zDdKzgUmfmhkxw6HgVpEyg
+         vp2KOc0N7ewaNOkWpamxYIBCNJxPk3hqocudM23uRto1t/tB/TZnN9OfTTA2NPcLuYDg
+         iVhA==
+X-Gm-Message-State: AOAM533edRQqhlLhLinmnYHYkdeqG58AZMd6+YKzSL8IjKtSPloieETO
+        uAVTkadUKJ4Rp3bI7rTy2DaeIgrnWsaKh810UkXy1jE7KHdsbXgqzxAd7hVFZCXpGajwR+CXdBt
+        ZjEHrKd6N6HmO
+X-Received: by 2002:a7b:c92e:: with SMTP id h14mr13361795wml.36.1594296871531;
+        Thu, 09 Jul 2020 05:14:31 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwRhPo7g5kUipBnsOFe+3r9VY5ESGX0vtcsJ/9+mosHc1rT3gI7GlSh2CG+AM/UAt8pI6ZlHQ==
+X-Received: by 2002:a7b:c92e:: with SMTP id h14mr13361761wml.36.1594296871306;
+        Thu, 09 Jul 2020 05:14:31 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:9541:9439:cb0f:89c? ([2001:b07:6468:f312:9541:9439:cb0f:89c])
+        by smtp.gmail.com with ESMTPSA id c206sm4897543wmf.36.2020.07.09.05.14.29
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 09 Jul 2020 05:14:30 -0700 (PDT)
+Subject: Re: [PATCH v3 00/21] KVM: Cleanup and unify kvm_mmu_memory_cache
+ usage
+To:     Sean Christopherson <sean.j.christopherson@intel.com>,
+        Marc Zyngier <maz@kernel.org>, Arnd Bergmann <arnd@arndb.de>
+Cc:     James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        linux-mips@vger.kernel.org, kvm@vger.kernel.org,
+        linux-arch@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Ben Gardon <bgardon@google.com>,
+        Peter Feiner <pfeiner@google.com>,
+        Peter Shier <pshier@google.com>,
+        Junaid Shahid <junaids@google.com>,
+        Christoffer Dall <christoffer.dall@arm.com>
+References: <20200703023545.8771-1-sean.j.christopherson@intel.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <9cce79d8-bc8a-8a3a-060a-c9a882dd7e07@redhat.com>
+Date:   Thu, 9 Jul 2020 14:14:28 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.9.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <20200703023545.8771-1-sean.j.christopherson@intel.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu,  9 Jul 2020 10:07:48 +0200
-Pierre Morel <pmorel@linux.ibm.com> wrote:
-
-> After a channel is enabled we start a SENSE_ID command using
-> the SSCH instruction to recognize the control unit and device.
+On 03/07/20 04:35, Sean Christopherson wrote:
+> The only interesting delta from v2 is that patch 18 is updated to handle
+> a conflict with arm64's p4d rework.  Resolution was straightforward
+> (famous last words).
 > 
-> This tests the success of SSCH, the I/O interruption and the TSCH
-> instructions.
 > 
-> The SENSE_ID command response is tested to report 0xff inside
-> its reserved field and to report the same control unit type
-> as the cu_type kernel argument.
+> This series resurrects Christoffer Dall's series[1] to provide a common
+> MMU memory cache implementation that can be shared by x86, arm64 and MIPS.
 > 
-> Without the cu_type kernel argument, the test expects a device
-> with a default control unit type of 0x3832, a.k.a virtio-net-ccw.
+> It also picks up a suggested change from Ben Gardon[2] to clear shadow
+> page tables during initial allocation so as to avoid clearing entire
+> pages while holding mmu_lock.
 > 
-> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
-> ---
->  lib/s390x/asm/arch_def.h |   1 +
->  lib/s390x/css.h          |  35 ++++++++
->  lib/s390x/css_lib.c      | 183 +++++++++++++++++++++++++++++++++++++++
->  s390x/css.c              |  80 +++++++++++++++++
->  4 files changed, 299 insertions(+)
+> The front half of the patches do house cleaning on x86's memory cache
+> implementation in preparation for moving it to common code, along with a
+> fair bit of cleanup on the usage.  The middle chunk moves the patches to
+> common KVM, and the last two chunks convert arm64 and MIPS to the common
+> implementation.
+> 
+> Fully tested on x86 only.  Compile tested patches 14-21 on arm64, MIPS,
+> s390 and PowerPC.
 
-(...)
+Queued, thanks.
 
-> diff --git a/lib/s390x/css_lib.c b/lib/s390x/css_lib.c
-> index eda68a4..c64edd5 100644
-> --- a/lib/s390x/css_lib.c
-> +++ b/lib/s390x/css_lib.c
-> @@ -16,6 +16,7 @@
->  #include <interrupt.h>
->  #include <asm/arch_def.h>
->  #include <asm/time.h>
-> +#include <asm/arch_def.h>
->  
->  #include <css.h>
->  
-> @@ -103,6 +104,9 @@ retry:
->  	/* Update the SCHIB to enable the channel and set the ISC */
->  	pmcw->flags |= flags;
->  
-> +	/* Set Interruption Subclass to IO_SCH_ISC */
-> +	pmcw->flags |= (isc << PMCW_ISC_SHIFT);
+Paolo
 
-But isn't the isc already contained in 'flags'? I think you should just
-delete these two lines.
-
-> +
->  	/* Tell the CSS we want to modify the subchannel */
->  	cc = msch(schid, &schib);
->  	if (cc) {
-
-(...)
-
-> +/* wait_and_check_io_completion:
-> + * @schid: the subchannel ID
-> + *
-> + * Makes the most common check to validate a successful I/O
-> + * completion.
-> + * Only report failures.
-> + */
-> +int wait_and_check_io_completion(int schid)
-> +{
-> +	int ret = 0;
-> +
-> +	wait_for_interrupt(PSW_MASK_IO);
-> +
-> +	report_prefix_push("check I/O completion");
-> +
-> +	if (lowcore_ptr->io_int_param != schid) {
-> +		report(0, "interrupt parameter: expected %08x got %08x",
-> +		       schid, lowcore_ptr->io_int_param);
-> +		ret = -1;
-> +		goto end;
-> +	}
-> +
-> +	/* Verify that device status is valid */
-> +	if (!(irb.scsw.ctrl & SCSW_SC_PENDING)) {
-> +		report(0, "No status pending after interrupt. Subch Ctrl: %08x",
-> +		       irb.scsw.ctrl);
-> +		ret = -1;
-> +		goto end;
-> +	}
-> +
-> +	if (!(irb.scsw.ctrl & (SCSW_SC_SECONDARY | SCSW_SC_PRIMARY))) {
-> +		report(0, "Primary or secondary status missing. Subch Ctrl: %08x",
-> +		       irb.scsw.ctrl);
-> +		ret = -1;
-> +		goto end;
-> +	}
-> +
-> +	if (!(irb.scsw.dev_stat & (SCSW_DEVS_DEV_END | SCSW_DEVS_SCH_END))) {
-> +		report(0, "No device end nor sch end. Dev. status: %02x",
-
-s/nor/or/ ?
-
-> +		       irb.scsw.dev_stat);
-> +		ret = -1;
-> +		goto end;
-> +	}
-> +
-> +	if (irb.scsw.sch_stat & !(SCSW_SCHS_PCI | SCSW_SCHS_IL)) {
-
-Did you mean ~(SCSW_SCHS_PCI | SCSW_SCHS_IL)?
-
-If yes, why do think a PCI may show up?
-
-> +		report_info("Unexpected Subch. status %02x", irb.scsw.sch_stat);
-> +		ret = -1;
-> +		goto end;
-> +	}
-> +
-> +end:
-> +	report_prefix_pop();
-> +	return ret;
-
-(...)
+> v3:
+>   - Rebased to kvm/queue, commit a037ff353ba6 ("Merge ... into HEAD")
+>   - Collect more review tags. [Ben]
+> 
+> v2:
+>   - Rebase to kvm-5.8-2, commit 49b3deaad345 ("Merge tag ...").
+>   - Use an asm-generic kvm_types.h for s390 and PowerPC instead of an
+>     empty arch-specific file. [Marc]
+>   - Explicit document "GFP_PGTABLE_USER == GFP_KERNEL_ACCOUNT | GFP_ZERO"
+>     in the arm64 conversion patch. [Marc]
+>   - Collect review tags. [Ben]
+> 
+> Sean Christopherson (21):
+>   KVM: x86/mmu: Track the associated kmem_cache in the MMU caches
+>   KVM: x86/mmu: Consolidate "page" variant of memory cache helpers
+>   KVM: x86/mmu: Use consistent "mc" name for kvm_mmu_memory_cache locals
+>   KVM: x86/mmu: Remove superfluous gotos from mmu_topup_memory_caches()
+>   KVM: x86/mmu: Try to avoid crashing KVM if a MMU memory cache is empty
+>   KVM: x86/mmu: Move fast_page_fault() call above
+>     mmu_topup_memory_caches()
+>   KVM: x86/mmu: Topup memory caches after walking GVA->GPA
+>   KVM: x86/mmu: Clean up the gorilla math in mmu_topup_memory_caches()
+>   KVM: x86/mmu: Separate the memory caches for shadow pages and gfn
+>     arrays
+>   KVM: x86/mmu: Make __GFP_ZERO a property of the memory cache
+>   KVM: x86/mmu: Zero allocate shadow pages (outside of mmu_lock)
+>   KVM: x86/mmu: Skip filling the gfn cache for guaranteed direct MMU
+>     topups
+>   KVM: x86/mmu: Prepend "kvm_" to memory cache helpers that will be
+>     global
+>   KVM: Move x86's version of struct kvm_mmu_memory_cache to common code
+>   KVM: Move x86's MMU memory cache helpers to common KVM code
+>   KVM: arm64: Drop @max param from mmu_topup_memory_cache()
+>   KVM: arm64: Use common code's approach for __GFP_ZERO with memory
+>     caches
+>   KVM: arm64: Use common KVM implementation of MMU memory caches
+>   KVM: MIPS: Drop @max param from mmu_topup_memory_cache()
+>   KVM: MIPS: Account pages used for GPA page tables
+>   KVM: MIPS: Use common KVM implementation of MMU memory caches
+> 
+>  arch/arm64/include/asm/kvm_host.h  |  11 ---
+>  arch/arm64/include/asm/kvm_types.h |   8 ++
+>  arch/arm64/kvm/arm.c               |   2 +
+>  arch/arm64/kvm/mmu.c               |  56 +++----------
+>  arch/mips/include/asm/kvm_host.h   |  11 ---
+>  arch/mips/include/asm/kvm_types.h  |   7 ++
+>  arch/mips/kvm/mmu.c                |  44 ++--------
+>  arch/powerpc/include/asm/Kbuild    |   1 +
+>  arch/s390/include/asm/Kbuild       |   1 +
+>  arch/x86/include/asm/kvm_host.h    |  14 +---
+>  arch/x86/include/asm/kvm_types.h   |   7 ++
+>  arch/x86/kvm/mmu/mmu.c             | 129 +++++++++--------------------
+>  arch/x86/kvm/mmu/paging_tmpl.h     |  10 +--
+>  include/asm-generic/kvm_types.h    |   5 ++
+>  include/linux/kvm_host.h           |   7 ++
+>  include/linux/kvm_types.h          |  19 +++++
+>  virt/kvm/kvm_main.c                |  55 ++++++++++++
+>  17 files changed, 176 insertions(+), 211 deletions(-)
+>  create mode 100644 arch/arm64/include/asm/kvm_types.h
+>  create mode 100644 arch/mips/include/asm/kvm_types.h
+>  create mode 100644 arch/x86/include/asm/kvm_types.h
+>  create mode 100644 include/asm-generic/kvm_types.h
+> 
 
