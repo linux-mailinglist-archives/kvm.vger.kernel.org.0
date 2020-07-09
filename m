@@ -2,132 +2,104 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id EA9B9219C86
-	for <lists+kvm@lfdr.de>; Thu,  9 Jul 2020 11:44:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 28D61219CA5
+	for <lists+kvm@lfdr.de>; Thu,  9 Jul 2020 11:55:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726675AbgGIJo3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 Jul 2020 05:44:29 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:34119 "EHLO
+        id S1726599AbgGIJzd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 Jul 2020 05:55:33 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:23764 "EHLO
         us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726302AbgGIJo2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 9 Jul 2020 05:44:28 -0400
+        with ESMTP id S1726302AbgGIJzc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 9 Jul 2020 05:55:32 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1594287867;
+        s=mimecast20190719; t=1594288531;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=SnATE0G1PqttW5QnC8ZFkmxQkqAwAlSy2AfyfqCXdOQ=;
-        b=jFHnnGjJYjmPMETFCeO5q1CQo/9Ynyf/L/QhRn0NDic5ht7sS/mjJUi+dWBD1k2JlvOIhj
-        rtSk81kAetAHl9fD74V3zRa+Hux+dJtBa4aoe9Pnyl2jvtDc8IiAwSpvP3o1HgmwZwYENn
-        h5D584bXhhdcn81yClnRoQjYYOt6Xc8=
+         to:to:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=+QkB6q0IleNCeMNuLc6HQc2fnr/8fIqlOT0WR/KosmA=;
+        b=HcqfDFfBs6tycicHFbwh5Xe+dvRIOnT6x5yrg/hLMjPTJy6WHilDFtq2TtmUan5AT5ut2O
+        QizsXsg46o5InGUTs8pODg7yoxW26KRZK+YzV/QvMaNlQwH1otvg2ZFe+azMsFF0laKDtl
+        ZkOETvcXqQf5MGBAqghzI5xmQap2G7E=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-513-jyELxRd3NJGTnRO3WbQN5A-1; Thu, 09 Jul 2020 05:44:23 -0400
-X-MC-Unique: jyELxRd3NJGTnRO3WbQN5A-1
+ us-mta-335-kJuyZFEHNp-ZFuzIv0Ac1w-1; Thu, 09 Jul 2020 05:55:27 -0400
+X-MC-Unique: kJuyZFEHNp-ZFuzIv0Ac1w-1
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5569A800401;
-        Thu,  9 Jul 2020 09:44:22 +0000 (UTC)
-Received: from sirius.home.kraxel.org (ovpn-112-200.ams2.redhat.com [10.36.112.200])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 513AD10640E1;
-        Thu,  9 Jul 2020 09:44:16 +0000 (UTC)
-Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
-        id 40F52187; Thu,  9 Jul 2020 11:44:15 +0200 (CEST)
-Date:   Thu, 9 Jul 2020 11:44:15 +0200
-From:   Gerd Hoffmann <kraxel@redhat.com>
-To:     Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc:     Eduardo Habkost <ehabkost@redhat.com>, mtosatti@redhat.com,
-        Pedro Principeza <pedro.principeza@canonical.com>,
-        kvm@vger.kernel.org, libvir-list@redhat.com,
-        Dann Frazier <dann.frazier@canonical.com>,
-        Guilherme Piccoli <gpiccoli@canonical.com>,
-        "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
-        Christian Ehrhardt <christian.ehrhardt@canonical.com>,
-        qemu-devel@nongnu.org, pbonzini@redhat.com,
-        Mohammed Gamal <mgamal@redhat.com>,
-        Laszlo Ersek <lersek@redhat.com>, fw@gpiccoli.net,
-        rth@twiddle.net
-Subject: Re: [PATCH 2/2] x86/cpu: Handle GUEST_MAXPHYADDR < HOST_MAXPHYADDR
- for hosts that don't support it
-Message-ID: <20200709094415.yvdh6hsfukqqeadp@sirius.home.kraxel.org>
-References: <20200619155344.79579-1-mgamal@redhat.com>
- <20200619155344.79579-3-mgamal@redhat.com>
- <20200708171621.GA780932@habkost.net>
- <20200708172653.GL3229307@redhat.com>
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E979B1083;
+        Thu,  9 Jul 2020 09:55:26 +0000 (UTC)
+Received: from virtlab511.virt.lab.eng.bos.redhat.com (virtlab511.virt.lab.eng.bos.redhat.com [10.19.152.198])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 965B210013D0;
+        Thu,  9 Jul 2020 09:55:26 +0000 (UTC)
+From:   Paolo Bonzini <pbonzini@redhat.com>
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Subject: [PATCH] KVM: nSVM: vmentry ignores EFER.LMA and possibly RFLAGS.VM
+Date:   Thu,  9 Jul 2020 05:55:25 -0400
+Message-Id: <20200709095525.907771-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200708172653.GL3229307@redhat.com>
+Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-  Hi,
+AMD doesn't specify (unlike Intel) that EFER.LME, CR0.PG and
+EFER.LMA must be consistent, and for SMM state restore they say that
+"The EFER.LMA register bit is set to the value obtained by logically
+ANDing the SMRAM values of EFER.LME, CR0.PG, and CR4.PAE".  It turns
+out that this is also true for vmentry: the EFER.LMA value in the VMCB
+is completely ignored, and so is EFLAGS.VM if the processor is in
+long mode or real mode.
 
-> > (CCing libvir-list, and people who were included in the OVMF
-> > thread[1])
-> > 
-> > [1] https://lore.kernel.org/qemu-devel/99779e9c-f05f-501b-b4be-ff719f140a88@canonical.com/
+Implement these quirks; the EFER.LMA part is needed because svm_set_efer
+looks at the LMA bit in order to support EFER.NX=0, while the EFLAGS.VM
+part is just because we can.
 
-> > Also, it's important that we work with libvirt and management
-> > software to ensure they have appropriate APIs to choose what to
-> > do when a cluster has hosts with different MAXPHYADDR.
-> 
-> There's been so many complex discussions that it is hard to have any
-> understanding of what we should be doing going forward. There's enough
-> problems wrt phys bits, that I think we would benefit from a doc that
-> outlines the big picture expectation for how to handle this in the
-> virt stack.
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ arch/x86/kvm/svm/nested.c | 20 +++++++++++++++++++-
+ 1 file changed, 19 insertions(+), 1 deletion(-)
 
-Well, the fundamental issue is not that hard actually.  We have three
-cases:
-
-(1) GUEST_MAXPHYADDR == HOST_MAXPHYADDR
-
-    Everything is fine ;)
-
-(2) GUEST_MAXPHYADDR < HOST_MAXPHYADDR
-
-    Mostly fine.  Some edge cases, like different page fault errors for
-    addresses above GUEST_MAXPHYADDR and below HOST_MAXPHYADDR.  Which I
-    think Mohammed fixed in the kernel recently.
-
-(3) GUEST_MAXPHYADDR > HOST_MAXPHYADDR
-
-    Broken.  If the guest uses addresses above HOST_MAXPHYADDR everything
-    goes south.
-
-The (2) case isn't much of a problem.  We only need to figure whenever
-we want qemu allow this unconditionally (current state) or only in case
-the kernel fixes are present (state with this patch applied if I read it
-correctly).
-
-The (3) case is the reason why guest firmware never ever uses
-GUEST_MAXPHYADDR and goes with very conservative heuristics instead,
-which in turn leads to the consequences discussed at length in the
-OVMF thread linked above.
-
-Ideally we would simply outlaw (3), but it's hard for backward
-compatibility reasons.  Second best solution is a flag somewhere
-(msr, cpuid, ...) telling the guest firmware "you can use
-GUEST_MAXPHYADDR, we guarantee it is <= HOST_MAXPHYADDR".
-
-> As mentioned in the thread quoted above, using host_phys_bits is a
-> obvious thing to do when the user requested "-cpu host".
-> 
-> The harder issue is how to handle other CPU models. I had suggested
-> we should try associating a phys bits value with them, which would
-> probably involve creating Client/Server variants for all our CPU
-> models which don't currently have it. I still think that's worth
-> exploring as a strategy and with versioned CPU models we should
-> be ok wrt back compatibility with that approach.
-
-Yep, better defaults for GUEST_MAXPHYADDR would be good too, but that
-is a separate (although related) discussion.
-
-take care,
-  Gerd
+diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
+index 402ea5b412f0..1c82a1789e0e 100644
+--- a/arch/x86/kvm/svm/nested.c
++++ b/arch/x86/kvm/svm/nested.c
+@@ -337,6 +337,24 @@ static void nested_vmcb_save_pending_event(struct vcpu_svm *svm,
+ 
+ static void nested_prepare_vmcb_save(struct vcpu_svm *svm, struct vmcb *nested_vmcb)
+ {
++	u64 efer = nested_vmcb->save.efer;
++
++	/* The processor ignores EFER.LMA, but svm_set_efer needs it.  */
++	efer &= ~EFER_LMA;
++	if ((nested_vmcb->save.cr0 & X86_CR0_PG)
++	    && (nested_vmcb->save.cr4 & X86_CR4_PAE)
++	    && (efer & EFER_LME))
++		efer |= EFER_LMA;
++
++	/*
++	 * Likewise RFLAGS.VM is cleared if inconsistent with other processor
++	 * state.  This is sort-of documented in "10.4 Leaving SMM" but applies
++	 * to SVM as well.
++	 */
++	if (!(nested_vmcb->save.cr0 & X86_CR0_PE)
++	    || (efer & EFER_LMA))
++		nested_vmcb->save.rflags &= ~X86_EFLAGS_VM;
++
+ 	/* Load the nested guest state */
+ 	svm->vmcb->save.es = nested_vmcb->save.es;
+ 	svm->vmcb->save.cs = nested_vmcb->save.cs;
+@@ -345,7 +363,7 @@ static void nested_prepare_vmcb_save(struct vcpu_svm *svm, struct vmcb *nested_v
+ 	svm->vmcb->save.gdtr = nested_vmcb->save.gdtr;
+ 	svm->vmcb->save.idtr = nested_vmcb->save.idtr;
+ 	kvm_set_rflags(&svm->vcpu, nested_vmcb->save.rflags);
+-	svm_set_efer(&svm->vcpu, nested_vmcb->save.efer);
++	svm_set_efer(&svm->vcpu, efer);
+ 	svm_set_cr0(&svm->vcpu, nested_vmcb->save.cr0);
+ 	svm_set_cr4(&svm->vcpu, nested_vmcb->save.cr4);
+ 	(void)kvm_set_cr3(&svm->vcpu, nested_vmcb->save.cr3);
+-- 
+2.26.2
 
