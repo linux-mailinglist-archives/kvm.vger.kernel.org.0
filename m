@@ -2,118 +2,127 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 24FE021A3B1
-	for <lists+kvm@lfdr.de>; Thu,  9 Jul 2020 17:27:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CA29B21A3FB
+	for <lists+kvm@lfdr.de>; Thu,  9 Jul 2020 17:47:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727005AbgGIP1g (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 Jul 2020 11:27:36 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:21607 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726600AbgGIP1g (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 9 Jul 2020 11:27:36 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1594308455;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=/yW3Ujipt1cXpCvwHNc8RTMeCj5iXxAimZbTAAqxPOo=;
-        b=P1NclusiPp54IDBJmEq8SAyHyGedCD9kCavZRyj1exrfPIgYgVVQfk8zVhFsBEA6xa1Uft
-        J4Cpko1U2L4kw+jJtGhtWZDSnYw2xfm2sq6nwR0rSpY7YTYA1HPm2USTK7MN6wJ6yv6HFN
-        vMjGUgR4urQ5E5BDLXjDv9VbuHQMmZ8=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-479-In2duZ5mOpmTcrlNOena2w-1; Thu, 09 Jul 2020 11:27:33 -0400
-X-MC-Unique: In2duZ5mOpmTcrlNOena2w-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A0DA180BCA1;
-        Thu,  9 Jul 2020 15:27:31 +0000 (UTC)
-Received: from x1.home (ovpn-112-71.phx2.redhat.com [10.3.112.71])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 1A1026FEC2;
-        Thu,  9 Jul 2020 15:27:31 +0000 (UTC)
-Date:   Thu, 9 Jul 2020 09:27:30 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Fred Gao <fred.gao@intel.com>
-Cc:     kvm@vger.kernel.org, intel-gfx@lists.freedesktop.org,
-        Zhenyu Wang <zhenyuw@linux.intel.com>,
-        Xiong Zhang <xiong.y.zhang@intel.com>,
-        Hang Yuan <hang.yuan@linux.intel.com>,
-        Stuart Summers <stuart.summers@intel.com>,
-        Lucas De Marchi <lucas.demarchi@intel.com>
-Subject: Re: [PATCH v1] vfio/pci: Refine Intel IGD OpRegion support
-Message-ID: <20200709092730.01128671@x1.home>
-In-Reply-To: <20200709173707.29808-1-fred.gao@intel.com>
-References: <20200709173707.29808-1-fred.gao@intel.com>
-Organization: Red Hat
+        id S1727999AbgGIPrt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 Jul 2020 11:47:49 -0400
+Received: from mga07.intel.com ([134.134.136.100]:65354 "EHLO mga07.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726519AbgGIPrt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 9 Jul 2020 11:47:49 -0400
+IronPort-SDR: zWcAl1CBz8ho4wdzuI0K6pR9lYnbxKDPvdNE0k6B8RqIeHIsgDdrlRdwRftVfw8gnYRXjShmqN
+ Gun1BpHFSIIw==
+X-IronPort-AV: E=McAfee;i="6000,8403,9677"; a="212931531"
+X-IronPort-AV: E=Sophos;i="5.75,331,1589266800"; 
+   d="scan'208";a="212931531"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Jul 2020 08:47:48 -0700
+IronPort-SDR: cE9JhtxvrZXc4jXdrrCsehjy1soh2GYV/VEffc4pqCe90cpz7eO/WgThxiLkUkSOt1RsCnX3pA
+ iA1cbdX19Rog==
+X-IronPort-AV: E=Sophos;i="5.75,331,1589266800"; 
+   d="scan'208";a="324261360"
+Received: from otcsectest.jf.intel.com (HELO 64c96d3be97b) ([10.54.30.81])
+  by orsmga007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Jul 2020 08:47:48 -0700
+Date:   Thu, 9 Jul 2020 15:44:12 +0000
+From:   "Andersen, John" <john.s.andersen@intel.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Dave Hansen <dave.hansen@intel.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        corbet@lwn.net, tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
+        x86@kernel.org, hpa@zytor.com, shuah@kernel.org,
+        liran.alon@oracle.com, drjones@redhat.com,
+        rick.p.edgecombe@intel.com, kristen@linux.intel.com,
+        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
+        joro@8bytes.org, mchehab+huawei@kernel.org,
+        gregkh@linuxfoundation.org, paulmck@kernel.org,
+        pawan.kumar.gupta@linux.intel.com, jgross@suse.com,
+        mike.kravetz@oracle.com, oneukum@suse.com, luto@kernel.org,
+        peterz@infradead.org, fenghua.yu@intel.com,
+        reinette.chatre@intel.com, vineela.tummalapalli@intel.com,
+        dave.hansen@linux.intel.com, arjan@linux.intel.com,
+        caoj.fnst@cn.fujitsu.com, bhe@redhat.com, nivedita@alum.mit.edu,
+        keescook@chromium.org, dan.j.williams@intel.com,
+        eric.auger@redhat.com, aaronlewis@google.com, peterx@redhat.com,
+        makarandsonare@google.com, linux-doc@vger.kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-kselftest@vger.kernel.org,
+        kernel-hardening@lists.openwall.com
+Subject: Re: [PATCH 2/4] KVM: x86: Introduce paravirt feature CR0/CR4 pinning
+Message-ID: <20200709154412.GA25@64c96d3be97b>
+References: <20200617190757.27081-1-john.s.andersen@intel.com>
+ <20200617190757.27081-3-john.s.andersen@intel.com>
+ <0fa9682e-59d4-75f7-366f-103d6b8e71b8@intel.com>
+ <20200618144314.GB23@258ff54ff3c0>
+ <124a59a3-a603-701b-e3bb-61e83d70b20d@intel.com>
+ <20200707211244.GN20096@linux.intel.com>
+ <19b97891-bbb0-1061-5971-549a386f7cfb@intel.com>
+ <31eb5b00-9e2a-aa10-0f20-4abc3cd35112@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <31eb5b00-9e2a-aa10-0f20-4abc3cd35112@redhat.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 10 Jul 2020 01:37:07 +0800
-Fred Gao <fred.gao@intel.com> wrote:
-
-> Bypass the IGD initialization for Intel's dgfx devices with own expansion
-> ROM and the host/LPC bridge config space are no longer accessed.
+On Tue, Jul 07, 2020 at 11:51:54PM +0200, Paolo Bonzini wrote:
+> On 07/07/20 23:48, Dave Hansen wrote:
+> > On 7/7/20 2:12 PM, Sean Christopherson wrote:
+> >>>>> Let's say Intel loses its marbles and adds a CR4 bit that lets userspace
+> >>>>> write to kernel memory.  Linux won't set it, but an attacker would go
+> >>>>> after it, first thing.
+> >> That's an orthogonal to pinning.  KVM never lets the guest set CR4 bits that
+> >> are unknown to KVM.  Supporting CR4.NO_MARBLES would require an explicit KVM
+> >> change to allow it to be set by the guest, and would also require a userspace
+> >> VMM to expose NO_MARBLES to the guest.
+> >>
+> >> That being said, this series should supporting pinning as much as possible,
+> >> i.e. if the bit can be exposed to the guest and doesn't require special
+> >> handling in KVM, allow it to be pinned.  E.g. TS is a special case because
+> >> pinning would require additional emulator support and IMO isn't interesting
+> >> enough to justify the extra complexity.  At a glance, I don't see anything
+> >> that would prevent pinning FSGSBASE.
+> > 
+> > Thanks for filling in the KVM picture.
+> > 
+> > If we're supporting as much pinning as possible, can we also add
+> > something to make it inconvenient for someone to both make a CR4 bit
+> > known to KVM *and* ignore the pinning aspects?
+> > 
+> > We should really make folks think about it.  Something like:
+> > 
+> > #define KVM_CR4_KNOWN 0xff
+> > #define KVM_CR4_PIN_ALLOWED 0xf0
+> > #define KVM_CR4_PIN_NOT_ALLOWED 0x0f
+> > 
+> > BUILD_BUG_ON(KVM_CR4_KNOWN !=
+> >              (KVM_CR4_PIN_ALLOWED|KVM_CR4_PIN_NOT_ALLOWED));
+> > 
+> > So someone *MUST* make an active declaration about new bits being pinned
+> > or not?
 > 
-> Cc: Zhenyu Wang <zhenyuw@linux.intel.com>
-> Cc: Xiong Zhang <xiong.y.zhang@intel.com>
-> Cc: Hang Yuan <hang.yuan@linux.intel.com>
-> Cc: Stuart Summers <stuart.summers@intel.com>
-> Signed-off-by: Lucas De Marchi <lucas.demarchi@intel.com>
-> Signed-off-by: Fred Gao <fred.gao@intel.com>
-> ---
->  drivers/vfio/pci/vfio_pci.c | 11 ++++++++++-
->  1 file changed, 10 insertions(+), 1 deletion(-)
+> I would just make all unknown bits pinnable (or perhaps all CR4 bits in
+> general).
 > 
-> diff --git a/drivers/vfio/pci/vfio_pci.c b/drivers/vfio/pci/vfio_pci.c
-> index f634c81998bb..0f4a34849836 100644
-> --- a/drivers/vfio/pci/vfio_pci.c
-> +++ b/drivers/vfio/pci/vfio_pci.c
-> @@ -28,6 +28,8 @@
->  #include <linux/nospec.h>
->  #include <linux/sched/mm.h>
->  
-> +#include <drm/i915_pciids.h>
-> +
->  #include "vfio_pci_private.h"
->  
->  #define DRIVER_VERSION  "0.2"
-> @@ -60,6 +62,12 @@ module_param(enable_sriov, bool, 0644);
->  MODULE_PARM_DESC(enable_sriov, "Enable support for SR-IOV configuration.  Enabling SR-IOV on a PF typically requires support of the userspace PF driver, enabling VFs without such support may result in non-functional VFs or PF.");
->  #endif
->  
-> +/* Intel's dgfx is not IGD, so don't handle them the same way */
-> +static const struct pci_device_id intel_dgfx_pciids[] = {
-> +	INTEL_DG1_IDS(0),
-> +	{ }
-> +};
-> +
->  static inline bool vfio_vga_disabled(void)
->  {
->  #ifdef CONFIG_VFIO_PCI_VGA
-> @@ -339,7 +347,8 @@ static int vfio_pci_enable(struct vfio_pci_device *vdev)
->  
->  	if (vfio_pci_is_vga(pdev) &&
->  	    pdev->vendor == PCI_VENDOR_ID_INTEL &&
-> -	    IS_ENABLED(CONFIG_VFIO_PCI_IGD)) {
-> +	    IS_ENABLED(CONFIG_VFIO_PCI_IGD) &&
-> +	    !pci_match_id(intel_dgfx_pciids, pdev)) {
->  		ret = vfio_pci_igd_init(vdev);
->  		if (ret) {
->  			pci_warn(pdev, "Failed to setup Intel IGD regions\n");
 
+Sounds good. I'll make it this way in the next revision. I'll do the same for
+CR0 (unless I hear otherwise). I've added the last paragraph here under the
+ALLOWED MSRs data section.
 
-Do we need to maintain specific IDs or could we simply test whether the
-device is on the root bus to determine if it is integrated or discrete?
-A discrete device should be connected to a downstream port rather than
-appear on the root bus.  Thanks,
+data:
+        Bits which may be pinned.
 
-Alex
+        Attempting to pin bits other than these will result in a failure when
+        writing to the respective CR pinned MSR.
 
+        Bits which are allowed to be pinned default to WP for CR0 and SMEP,
+        SMAP, and UMIP for CR4.
+
+        The host VMM may modify the set of allowed bits. However, only the above
+        have been tested to work. Allowing the guest to pin other bits may or
+        may not be compatible with KVM.
