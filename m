@@ -2,160 +2,250 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5633421AAB0
-	for <lists+kvm@lfdr.de>; Fri, 10 Jul 2020 00:43:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9A74921AAB1
+	for <lists+kvm@lfdr.de>; Fri, 10 Jul 2020 00:44:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726482AbgGIWnX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 Jul 2020 18:43:23 -0400
-Received: from mga01.intel.com ([192.55.52.88]:16869 "EHLO mga01.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726213AbgGIWnW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 9 Jul 2020 18:43:22 -0400
-IronPort-SDR: W254WfSYLz9y3snHU1ThpiJ4HHSL1SWGswMBrhwaX/uTbTbXdsJ40qJ8evdk4TUbMJK0e/Z92q
- eoz/QynY+0Dw==
-X-IronPort-AV: E=McAfee;i="6000,8403,9677"; a="166211008"
-X-IronPort-AV: E=Sophos;i="5.75,332,1589266800"; 
-   d="scan'208";a="166211008"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga007.fm.intel.com ([10.253.24.52])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Jul 2020 15:43:20 -0700
-IronPort-SDR: XnG1/K4S8johhaed4MZaJxAY9dVPUcsKf/c+9XPpsZbSCq6wllfw9WrpJHAZbDIYlbrM8JCbuj
- iToHPDTAiL0Q==
-X-IronPort-AV: E=Sophos;i="5.75,332,1589266800"; 
-   d="scan'208";a="267535283"
-Received: from smtp.ostc.intel.com ([10.54.29.231])
-  by fmsmga007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Jul 2020 15:43:20 -0700
-Received: from localhost (mtg-dev.jf.intel.com [10.54.74.10])
-        by smtp.ostc.intel.com (Postfix) with ESMTP id 95AC46177;
-        Thu,  9 Jul 2020 15:43:19 -0700 (PDT)
-Date:   Thu, 9 Jul 2020 15:43:19 -0700
-From:   mark gross <mgross@linux.intel.com>
-To:     Doug Anderson <dianders@chromium.org>
-Cc:     Thomas Gleixner <tglx@linutronix.de>,
-        Abhishek Bhardwaj <abhishekbh@google.com>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Anthony Steinhauser <asteinhauser@google.com>,
-        Borislav Petkov <bp@alien8.de>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Josh Poimboeuf <jpoimboe@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Tony Luck <tony.luck@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Waiman Long <longman@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>, kvm@vger.kernel.org,
-        x86 <x86@kernel.org>
-Subject: Re: [PATCH v5] x86/speculation/l1tf: Add KConfig for setting the L1D
- cache flush mode
-Message-ID: <20200709224319.GC12345@mtg-dev.jf.intel.com>
-Reply-To: mgross@linux.intel.com
-References: <20200708194715.4073300-1-abhishekbh@google.com>
- <87y2ntotah.fsf@nanos.tec.linutronix.de>
- <CAD=FV=WCu7o41iyn27vNBWo4f_X_XVy+PPPjBKc+70g5jd5+8w@mail.gmail.com>
+        id S1726867AbgGIWoN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 Jul 2020 18:44:13 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:30295 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726821AbgGIWoN (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 9 Jul 2020 18:44:13 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1594334651;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=0pRvRbjVFo2K1Flclf5DF7wx+UyM877Wq0TJd7EOegs=;
+        b=X2SawVNZXgt0l+shZr5ZkpOtioGP6N0DWoIz9EqNYHhh8MJEMwVSLc1BZ4MwPWQCJlH0cc
+        y8bj/oKtqRPbWEXrBjci8k7B8DcQtNukiIP0XJgW/B3IxvfyI4W/xtZCTXtFPglowXQbI3
+        3tJXvK/clq5SkBXg85sQF74mlj55TtM=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-187-44xQFelVOIG0wKywaBWRbA-1; Thu, 09 Jul 2020 18:44:08 -0400
+X-MC-Unique: 44xQFelVOIG0wKywaBWRbA-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D4269107ACCA;
+        Thu,  9 Jul 2020 22:44:06 +0000 (UTC)
+Received: from x1.home (ovpn-112-71.phx2.redhat.com [10.3.112.71])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 594D66FEE7;
+        Thu,  9 Jul 2020 22:44:06 +0000 (UTC)
+Date:   Thu, 9 Jul 2020 16:44:03 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Diana Craciun <diana.craciun@oss.nxp.com>
+Cc:     kvm@vger.kernel.org, bharatb.linux@gmail.com,
+        linux-kernel@vger.kernel.org, laurentiu.tudor@nxp.com,
+        Bharat Bhushan <Bharat.Bhushan@nxp.com>
+Subject: Re: [PATCH v3 2/9] vfio/fsl-mc: Scan DPRC objects on vfio-fsl-mc
+ driver bind
+Message-ID: <20200709164403.18659708@x1.home>
+In-Reply-To: <20200706154153.11477-3-diana.craciun@oss.nxp.com>
+References: <20200706154153.11477-1-diana.craciun@oss.nxp.com>
+        <20200706154153.11477-3-diana.craciun@oss.nxp.com>
+Organization: Red Hat
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAD=FV=WCu7o41iyn27vNBWo4f_X_XVy+PPPjBKc+70g5jd5+8w@mail.gmail.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jul 09, 2020 at 12:42:57PM -0700, Doug Anderson wrote:
-> Hi,
-> 
-> On Thu, Jul 9, 2020 at 3:51 AM Thomas Gleixner <tglx@linutronix.de> wrote:
-> >
-> > Abhishek Bhardwaj <abhishekbh@google.com> writes:
-> > > This change adds a new kernel configuration that sets the l1d cache
-> > > flush setting at compile time rather than at run time.
-> > >
-> > > The reasons for this change are as follows -
-> > >
-> > >  - Kernel command line arguments are getting unwieldy. These parameters
-> > >  are not a scalable way to set the kernel config. They're intended as a
-> > >  super limited way for the bootloader to pass info to the kernel and
-> > >  also as a way for end users who are not compiling the kernel themselves
-> > >  to tweak the kernel behavior.
-> > >
-> > >  - Also, if a user wants this setting from the start. It's a definite
-> > >  smell that it deserves to be a compile time thing rather than adding
-> > >  extra code plus whatever miniscule time at runtime to pass an
-> > >  extra argument.
-> > >
-> > >  - Finally, it doesn't preclude the runtime / kernel command line way.
-> > >  Users are free to use those as well.
-> >
-> > TBH, I don't see why this is a good idea.
-> >
-> >  1) I'm not following your argumentation that the command line option is
-> >     a poor Kconfig replacement. The L1TF mode is a boot time (module
-> >     load time) decision and the command line parameter is there to
-> >     override the carefully chosen and sensible default behaviour.
-> 
-> When you say that the default behavior is carefully chosen and
-> sensible, are you saying that (in your opinion) there would never be a
-> good reason for someone distributing a kernel to others to change the
-> default?  Certainly I agree that having the kernel command line
-> parameter is nice to allow someone to override whatever the person
-> building the kernel chose, but IMO it's not a good way to change the
-> default built-in to the kernel.
-> 
-> The current plan (as I understand it) is that we'd like to ship
-> Chromebook kernels with this option changed from the default that's
-> there now.  In your opinion, is that a sane thing to do?
-> 
-> 
-> >  2) You can add the desired mode to the compiled in (partial) kernel
-> >     command line today.
-> 
-> This might be easier on x86 than it is on ARM.  ARM (and ARM64)
-> kernels only have two modes: kernel provides cmdline and bootloader
-> provides cmdline.  There are out-of-mainline ANDROID patches to
-> address this but nothing in mainline.
-> 
-> The patch we're discussing now is x86-only so it's not such a huge
-> deal, but the fact that combining the kernel and bootloader
-> commandline never landed in mainline for arm/arm64 means that this
-> isn't a super common/expected thing to do.
-> 
-> 
-> >  3) Boot loaders are well capable of handling large kernel command lines
-> >     and the extra time spend for reading the parameter does not matter
-> >     at all.
-> 
-> Long command lines can still be a bit of a chore for humans to deal
-> with.  Many times I've needed to look at "/proc/cmdline" and make
-> sense of it.  The longer the command line is and the more cruft
-> stuffed into it the more of a chore it is.  Yes, this is just one
-> thing to put in the command line, but if 10 different drivers all have
-> their "one thing" to put there it gets really long.  If 100 different
-> drivers all want their one config option there it gets really really
-> long.  IMO the command line should be a last resort place to put
-> things and should just contain:
+On Mon,  6 Jul 2020 18:41:46 +0300
+Diana Craciun <diana.craciun@oss.nxp.com> wrote:
 
-This takes me back to my years doing android kernel work for Intel, I'm glad
-those are over.  Yes, the android kernel command lines got hideous, I think we
-even had patches to make the cmdline buffer bigger than the default was.
+> The DPRC (Data Path Resource Container) device is a bus device and has
+> child devices attached to it. When the vfio-fsl-mc driver is probed
+> the DPRC is scanned and the child devices discovered and initialized.
+> 
+> Signed-off-by: Bharat Bhushan <Bharat.Bhushan@nxp.com>
+> Signed-off-by: Diana Craciun <diana.craciun@oss.nxp.com>
+> ---
+>  drivers/vfio/fsl-mc/vfio_fsl_mc.c         | 106 ++++++++++++++++++++++
+>  drivers/vfio/fsl-mc/vfio_fsl_mc_private.h |   1 +
+>  2 files changed, 107 insertions(+)
+> 
+> diff --git a/drivers/vfio/fsl-mc/vfio_fsl_mc.c b/drivers/vfio/fsl-mc/vfio_fsl_mc.c
+> index 8b53c2a25b32..ad8d06cceb71 100644
+> --- a/drivers/vfio/fsl-mc/vfio_fsl_mc.c
+> +++ b/drivers/vfio/fsl-mc/vfio_fsl_mc.c
+> @@ -15,6 +15,8 @@
+>  
+>  #include "vfio_fsl_mc_private.h"
+>  
+> +static struct fsl_mc_driver vfio_fsl_mc_driver;
+> +
+>  static int vfio_fsl_mc_open(void *device_data)
+>  {
+>  	if (!try_module_get(THIS_MODULE))
+> @@ -84,6 +86,69 @@ static const struct vfio_device_ops vfio_fsl_mc_ops = {
+>  	.mmap		= vfio_fsl_mc_mmap,
+>  };
+>  
+> +static int vfio_fsl_mc_bus_notifier(struct notifier_block *nb,
+> +				    unsigned long action, void *data)
+> +{
+> +	struct vfio_fsl_mc_device *vdev = container_of(nb,
+> +					struct vfio_fsl_mc_device, nb);
+> +	struct device *dev = data;
+> +	struct fsl_mc_device *mc_dev = to_fsl_mc_device(dev);
+> +	struct fsl_mc_device *mc_cont = to_fsl_mc_device(mc_dev->dev.parent);
+> +
+> +	if (action == BUS_NOTIFY_ADD_DEVICE &&
+> +	    vdev->mc_dev == mc_cont) {
+> +		mc_dev->driver_override = kasprintf(GFP_KERNEL, "%s",
+> +						    vfio_fsl_mc_ops.name);
 
-From a practical point of view the command line was part of the boot image and
-cryptography protected so it was a handy way to securely communicate parameters
-from the platform to the kernel, drivers and even just user mode.  It got
-pretty ugly but, it worked (mostly).
+I notice the vfio-pci code that this is modeled from also doesn't check
+this allocation for NULL.  Maybe both should print a dev_warn on the
+ultra slim chance it would fail.
 
-What I don't get is why pick on l1tf in isolation?  There are a bunch of
-command line parameters similar to l1tf.  Would a more general option make
-sense?
+> +		dev_info(dev, "Setting driver override for device in dprc %s\n",
+> +			 dev_name(&mc_cont->dev));
+> +	} else if (action == BUS_NOTIFY_BOUND_DRIVER &&
+> +		vdev->mc_dev == mc_cont) {
+> +		struct fsl_mc_driver *mc_drv = to_fsl_mc_driver(dev->driver);
+> +
+> +		if (mc_drv && mc_drv != &vfio_fsl_mc_driver)
+> +			dev_warn(dev, "Object %s bound to driver %s while DPRC bound to vfio-fsl-mc\n",
+> +				 dev_name(dev), mc_drv->driver.name);
+> +		}
 
-Anyway, I think there is a higher level issue you are poking at that might be
-better addressed by talking about it directly.
+Nit, } is over-indented, should be aligned to the previous 'else if'.
 
---mark
+> +
+> +	return 0;
+> +}
+> +
+> +static int vfio_fsl_mc_init_device(struct vfio_fsl_mc_device *vdev)
+> +{
+> +	struct fsl_mc_device *mc_dev = vdev->mc_dev;
+> +	int ret;
+> +
+> +	/* Non-dprc devices share mc_io from parent */
+> +	if (!is_fsl_mc_bus_dprc(mc_dev)) {
+> +		struct fsl_mc_device *mc_cont = to_fsl_mc_device(mc_dev->dev.parent);
+> +
+> +		mc_dev->mc_io = mc_cont->mc_io;
+> +		return 0;
+> +	}
+> +
+> +	vdev->nb.notifier_call = vfio_fsl_mc_bus_notifier;
+> +	ret = bus_register_notifier(&fsl_mc_bus_type, &vdev->nb);
+> +	if (ret)
+> +		return ret;
+> +
+> +	/* open DPRC, allocate a MC portal */
+> +	ret = dprc_setup(mc_dev);
+> +	if (ret < 0) {
+> +		dev_err(&mc_dev->dev, "Failed to setup DPRC (error = %d)\n", ret);
+> +		bus_unregister_notifier(&fsl_mc_bus_type, &vdev->nb);
+> +		return ret;
+> +	}
+> +
+> +	ret = dprc_scan_container(mc_dev, false);
+> +	if (ret < 0) {
+> +		dev_err(&mc_dev->dev, "Container scanning failed: %d\n", ret);
+> +		bus_unregister_notifier(&fsl_mc_bus_type, &vdev->nb);
+> +		dprc_cleanup(mc_dev);
 
+All else being equal, should these be reversed to mirror the setup?
+
+> +	}
+> +
+> +	return ret;
+> +}
+> +
+>  static int vfio_fsl_mc_probe(struct fsl_mc_device *mc_dev)
+>  {
+>  	struct iommu_group *group;
+> @@ -112,9 +177,42 @@ static int vfio_fsl_mc_probe(struct fsl_mc_device *mc_dev)
+>  		return ret;
+>  	}
+>  
+> +	ret = vfio_fsl_mc_init_device(vdev);
+> +	if (ret < 0) {
+> +		vfio_iommu_group_put(group, dev);
+> +		return ret;
+> +	}
+> +
+>  	return ret;
+>  }
+>  
+> +static int vfio_fsl_mc_device_remove(struct device *dev, void *data)
+> +{
+> +	struct fsl_mc_device *mc_dev;
+> +
+> +	WARN_ON(!dev);
+> +	mc_dev = to_fsl_mc_device(dev);
+> +	if (WARN_ON(!mc_dev))
+> +		return -ENODEV;
+> +
+> +	kfree(mc_dev->driver_override);
+> +	mc_dev->driver_override = NULL;
+
+This is out of scope, all other buses that support a driver_override
+free this is the bus driver code.  Why isn't it sufficient that it's
+done in fsl_mc_device_remove()?
+
+> +
+> +	/*
+> +	 * The device-specific remove callback will get invoked by device_del()
+> +	 */
+> +	device_del(&mc_dev->dev);
+> +	put_device(&mc_dev->dev);
+
+In fact, why are we doing any of this?  I think these devices were
+created via dprc_scan_container(), so shouldn't there be a dprc
+callback to remove them?  What happens if one of them did get bound to
+another driver, haven't we just deleted the device out from under them?
+In vfio-pci for instance, we call pci_disable_sriov() to remove any
+vfs.  Thanks,
+
+Alex
+
+> +
+> +	return 0;
+> +}
+> +
+> +static void vfio_fsl_mc_cleanup_dprc(struct fsl_mc_device *mc_dev)
+> +{
+> +	device_for_each_child(&mc_dev->dev, NULL, vfio_fsl_mc_device_remove);
+> +	dprc_cleanup(mc_dev);
+> +}
+> +
+>  static int vfio_fsl_mc_remove(struct fsl_mc_device *mc_dev)
+>  {
+>  	struct vfio_fsl_mc_device *vdev;
+> @@ -124,6 +222,14 @@ static int vfio_fsl_mc_remove(struct fsl_mc_device *mc_dev)
+>  	if (!vdev)
+>  		return -EINVAL;
+>  
+> +	if (vdev->nb.notifier_call)
+> +		bus_unregister_notifier(&fsl_mc_bus_type, &vdev->nb);
+> +
+> +	if (is_fsl_mc_bus_dprc(mc_dev))
+> +		vfio_fsl_mc_cleanup_dprc(vdev->mc_dev);
+> +
+> +	mc_dev->mc_io = NULL;
+> +
+>  	vfio_iommu_group_put(mc_dev->dev.iommu_group, dev);
+>  
+>  	return 0;
+> diff --git a/drivers/vfio/fsl-mc/vfio_fsl_mc_private.h b/drivers/vfio/fsl-mc/vfio_fsl_mc_private.h
+> index e79cc116f6b8..37d61eaa58c8 100644
+> --- a/drivers/vfio/fsl-mc/vfio_fsl_mc_private.h
+> +++ b/drivers/vfio/fsl-mc/vfio_fsl_mc_private.h
+> @@ -9,6 +9,7 @@
+>  
+>  struct vfio_fsl_mc_device {
+>  	struct fsl_mc_device		*mc_dev;
+> +	struct notifier_block        nb;
+>  };
+>  
+>  #endif /* VFIO_FSL_MC_PRIVATE_H */
 
