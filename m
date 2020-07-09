@@ -2,131 +2,108 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 974F421A9E7
-	for <lists+kvm@lfdr.de>; Thu,  9 Jul 2020 23:51:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 84F1021AA38
+	for <lists+kvm@lfdr.de>; Fri, 10 Jul 2020 00:03:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726496AbgGIVvD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 Jul 2020 17:51:03 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:56876 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726196AbgGIVvC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 9 Jul 2020 17:51:02 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1594331460;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=7G6B2009DX8rgdJqYq+U2U+PjSYBEAPjrZTKPAYQ4X0=;
-        b=PAU9ugY7osnzwoaIvFE1TXfjafUAkS+W3b4YQk+lb6rePmEen97Xu3cZNPoxnleYRkBk+H
-        esTkWG/cJQzRgziFPkT9Y3JArWhAP8VHE7zGJDt6Gc1KPq0hEQl8FH2TSSfYUXCI+2P5HZ
-        +6ydIq0G3kPky0/QL74qKzC97IoBZVY=
-Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com
- [209.85.222.198]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-479-JtDDdBZrMuqan_rm2M5H3A-1; Thu, 09 Jul 2020 17:50:58 -0400
-X-MC-Unique: JtDDdBZrMuqan_rm2M5H3A-1
-Received: by mail-qk1-f198.google.com with SMTP id s5so2897406qkj.1
-        for <kvm@vger.kernel.org>; Thu, 09 Jul 2020 14:50:58 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=7G6B2009DX8rgdJqYq+U2U+PjSYBEAPjrZTKPAYQ4X0=;
-        b=D+gRTQdmQ6LpbpvXDdbSICp5vLtoutYKwIjlcg5SBXiKACY+Kr6pWcy9vZnuk+SXBJ
-         E9FZQcHJDJM6MmCp5BQozfsqfi3Ks/+OCv7RzeyBDVCYTyQB/OJE5BUgTmvus2TQwMyH
-         505NuZ7pwLWUQQY1dLiCtQ1VRLo/ewY02gEJbydo1YgR0t1u6lP34WeZhb2xgzw/EAf7
-         3Pg1lFXGI77hcQ+LBKOOQdRaRNYMWrfJJJ3zGAUSkijrNpuVJqwPmUn36XXdEZKIuxYr
-         LzmWDK5BPTyVU6Z5o+brjO0Wpj+ajIMEOZUNZ+McFiragKhSg9JsgxrFI3o4F0il00B6
-         w1QQ==
-X-Gm-Message-State: AOAM530wKOtPLnE5DIKgDT4awviYczEKSiJyCzK99JFYXJMr9ULdmAx7
-        paDnB7GIsDy8Xx5yghLl3MPcQZ7CzHrMliH8n5kr9NLihvOKbDVhJ7azQjq68QrBY6mxURd/bay
-        Rcs6lwHm56CNy
-X-Received: by 2002:a05:620a:1233:: with SMTP id v19mr50454227qkj.119.1594331458062;
-        Thu, 09 Jul 2020 14:50:58 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJw6LZYRhshzZyYbH12rRvHvRkx/eD2Ird8z6I0EFHOCtFnypYj0i/SxXRObCM34za83auq0+g==
-X-Received: by 2002:a05:620a:1233:: with SMTP id v19mr50454212qkj.119.1594331457733;
-        Thu, 09 Jul 2020 14:50:57 -0700 (PDT)
-Received: from xz-x1 ([2607:9880:19c8:6f::1f4f])
-        by smtp.gmail.com with ESMTPSA id t9sm5350125qke.68.2020.07.09.14.50.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 09 Jul 2020 14:50:56 -0700 (PDT)
-Date:   Thu, 9 Jul 2020 17:50:46 -0400
-From:   Peter Xu <peterx@redhat.com>
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, Vitaly Kuznetsov <vkuznets@redhat.com>
-Subject: Re: [PATCH 1/2] KVM: X86: Move ignore_msrs handling upper the stack
-Message-ID: <20200709215046.GJ199122@xz-x1>
-References: <1cebc562-89e9-3806-bb3c-771946fc64f3@redhat.com>
- <20200625162540.GC3437@linux.intel.com>
- <20200626180732.GB175520@xz-x1>
- <20200626181820.GG6583@linux.intel.com>
- <47b90b77-cf03-6087-b25f-fcd2fd313165@redhat.com>
- <20200630154726.GD7733@linux.intel.com>
- <20200709182220.GG199122@xz-x1>
- <20200709192440.GD24919@linux.intel.com>
- <20200709210919.GI199122@xz-x1>
- <20200709212652.GX24919@linux.intel.com>
+        id S1726816AbgGIWD1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 Jul 2020 18:03:27 -0400
+Received: from mail.kernel.org ([198.145.29.99]:47220 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726268AbgGIWD1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 9 Jul 2020 18:03:27 -0400
+Received: from localhost (mobile-166-175-191-139.mycingular.net [166.175.191.139])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 6606620672;
+        Thu,  9 Jul 2020 22:03:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1594332206;
+        bh=qy6RYLxqUEQ6tzvfiO87oBuVPOTZPSC78p+1YdZ+m8Y=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:From;
+        b=Tcyqn0001/W4HSpVVMSttjxDGnbeW2AW4UFrt2dv9KeR8l3GI1CNv3E1OHZyRDYww
+         nPF5FmDipFiLiTXZi3tdzLy8HqYsW6W+H/KHb1GKEEFLNVGHMx/UecWCJx4qqylvOc
+         MjUPRFX1u7sNHGVNdbKqkncEBB+t2PT8KTLpkfkw=
+Date:   Thu, 9 Jul 2020 17:03:24 -0500
+From:   Bjorn Helgaas <helgaas@kernel.org>
+To:     Huacai Chen <chenhc@lemote.com>
+Cc:     Bjorn Helgaas <bhelgaas@google.com>, linux-pci@vger.kernel.org,
+        Dave Airlie <airlied@redhat.com>,
+        Gerd Hoffmann <kraxel@redhat.com>,
+        Jiri Pirko <jiri@resnulli.us>,
+        Huacai Chen <chenhuacai@gmail.com>,
+        Jiaxun Yang <jiaxun.yang@flygoat.com>,
+        Kirti Wankhede <kwankhede@nvidia.com>, kvm@vger.kernel.org,
+        Alex Williamson <alex.williamson@redhat.com>
+Subject: Re: [PATCH] PCI: Move PCI_VENDOR_ID_REDHAT definition to pci_ids.h
+Message-ID: <20200709220324.GA21641@bjorn-Precision-5520>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200709212652.GX24919@linux.intel.com>
+In-Reply-To: <1594195170-11119-1-git-send-email-chenhc@lemote.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jul 09, 2020 at 02:26:52PM -0700, Sean Christopherson wrote:
-> On Thu, Jul 09, 2020 at 05:09:19PM -0400, Peter Xu wrote:
-> > Again, using host_initiated or not should be a different issue?  Frankly
-> > speaking, I don't know whether it's an issue or not, but it's different from
-> > what this series wants to do, because it'll be the same before/after this
-> > series. Am I right?
-> 
-> I'm arguing that the TSX thing should be
-> 
-> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-> index 5eb618dbf211..e1fd5ac0df96 100644
-> --- a/arch/x86/kvm/cpuid.c
-> +++ b/arch/x86/kvm/cpuid.c
-> @@ -1015,7 +1015,7 @@ bool kvm_cpuid(struct kvm_vcpu *vcpu, u32 *eax, u32 *ebx,
->                 *edx = entry->edx;
->                 if (function == 7 && index == 0) {
->                         u64 data;
-> -                       if (!__kvm_get_msr(vcpu, MSR_IA32_TSX_CTRL, &data, true) &&
-> +                       if (!kvm_get_msr(vcpu, MSR_IA32_TSX_CTRL, &data) &&
->                             (data & TSX_CTRL_CPUID_CLEAR))
->                                 *ebx &= ~(F(RTM) | F(HLE));
->                 }
-> 
-> At which point hoisting the ignored message up a few levels is pointless
-> because the only users of __kvm_*et_msr() will do the explicit ignored_check.
-> And I'm also arguing that KVM should never use __kvm_get_msr() for its own
-> actions, as host_initiated=true should only be used for host VMM accesses and
-> host_initiated=false actions should go through the proper checks and never
-> get to the ignored_msrs logic (assuming no KVM bug).
-> 
-> > Or, please explain what's the "overruled objection" that you're talking about..
-> 
-> Sean: Objection your honor.
-> Paolo: Overruled, you're wrong.
-> Sean: Phooey.
-> 
-> My point is that even though I still object to this series, Paolo has final
-> say.
+[+cc Kirti, Alex, kvm]
 
-I could be wrong, but I feel like Paolo was really respecting your input, as
-always. It's just as simple as a 2:1 vote, isn't it? (I can still count myself
-in for the vote, right? :)
+On Wed, Jul 08, 2020 at 03:59:30PM +0800, Huacai Chen wrote:
+> Instead of duplicating the PCI_VENDOR_ID_REDHAT definition everywhere,
+> move it to include/linux/pci_ids.h is better.
+> 
+> Signed-off-by: Huacai Chen <chenhc@lemote.com>
 
-Btw, you didn't reply to my other email:
+Applied with Gerd's ack to pci/misc for v5.9, thanks!
 
-  https://lore.kernel.org/kvm/20200626191118.GC175520@xz-x1/
+I also updated this in samples/vfio-mdev/mdpy-defs.h:
 
-Let me change the question a bit - Do you think e.g. we should never use
-rdmsr*_safe() in the Linux kernel as long as the MSR has a bit somewhere
-telling whether the MSR exists (so we should never trigger #GP on these MSRs)?
-I think it's a similar question that we're discussing here..
+  -#define MDPY_PCI_VENDOR_ID     0x1b36 /* redhat */
+  +#define MDPY_PCI_VENDOR_ID     PCI_VENDOR_ID_REDHAT
 
--- 
-Peter Xu
-
+> ---
+>  drivers/gpu/drm/qxl/qxl_dev.h           | 2 --
+>  drivers/net/ethernet/rocker/rocker_hw.h | 1 -
+>  include/linux/pci_ids.h                 | 2 ++
+>  3 files changed, 2 insertions(+), 3 deletions(-)
+> 
+> diff --git a/drivers/gpu/drm/qxl/qxl_dev.h b/drivers/gpu/drm/qxl/qxl_dev.h
+> index a0ee416..a7bc31f 100644
+> --- a/drivers/gpu/drm/qxl/qxl_dev.h
+> +++ b/drivers/gpu/drm/qxl/qxl_dev.h
+> @@ -131,8 +131,6 @@ enum SpiceCursorType {
+>  
+>  #pragma pack(push, 1)
+>  
+> -#define REDHAT_PCI_VENDOR_ID 0x1b36
+> -
+>  /* 0x100-0x11f reserved for spice, 0x1ff used for unstable work */
+>  #define QXL_DEVICE_ID_STABLE 0x0100
+>  
+> diff --git a/drivers/net/ethernet/rocker/rocker_hw.h b/drivers/net/ethernet/rocker/rocker_hw.h
+> index 59f1f8b..62fd84c 100644
+> --- a/drivers/net/ethernet/rocker/rocker_hw.h
+> +++ b/drivers/net/ethernet/rocker/rocker_hw.h
+> @@ -25,7 +25,6 @@ enum {
+>  
+>  #define ROCKER_FP_PORTS_MAX 62
+>  
+> -#define PCI_VENDOR_ID_REDHAT		0x1b36
+>  #define PCI_DEVICE_ID_REDHAT_ROCKER	0x0006
+>  
+>  #define ROCKER_PCI_BAR0_SIZE		0x2000
+> diff --git a/include/linux/pci_ids.h b/include/linux/pci_ids.h
+> index 0ad5769..5c709a1 100644
+> --- a/include/linux/pci_ids.h
+> +++ b/include/linux/pci_ids.h
+> @@ -2585,6 +2585,8 @@
+>  
+>  #define PCI_VENDOR_ID_ASMEDIA		0x1b21
+>  
+> +#define PCI_VENDOR_ID_REDHAT		0x1b36
+> +
+>  #define PCI_VENDOR_ID_AMAZON_ANNAPURNA_LABS	0x1c36
+>  
+>  #define PCI_VENDOR_ID_CIRCUITCO		0x1cc8
+> -- 
+> 2.7.0
+> 
