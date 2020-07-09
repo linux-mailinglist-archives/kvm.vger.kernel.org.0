@@ -2,94 +2,126 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 44ACB21A674
-	for <lists+kvm@lfdr.de>; Thu,  9 Jul 2020 19:58:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C817C21A6C7
+	for <lists+kvm@lfdr.de>; Thu,  9 Jul 2020 20:22:30 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728592AbgGIR6g (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 Jul 2020 13:58:36 -0400
-Received: from mga03.intel.com ([134.134.136.65]:23876 "EHLO mga03.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726615AbgGIR6f (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 9 Jul 2020 13:58:35 -0400
-IronPort-SDR: aS+QJROa/Ug7rUY1ifeOg6srILqk04JhVAOwOIwPhOb1JA42rIeaU5wTADepgKSm45RfgNA/pZ
- fJJF8bGXGyaw==
-X-IronPort-AV: E=McAfee;i="6000,8403,9677"; a="148055029"
-X-IronPort-AV: E=Sophos;i="5.75,332,1589266800"; 
-   d="scan'208";a="148055029"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Jul 2020 10:58:34 -0700
-IronPort-SDR: Vb+OfmhMj2iAtUuI5rG8sMS5Hw7OJUYKMj5Ms5QowwyyY9kueZtN3L7Pqgob/yZounxzyaJcHu
- zwZP6SaQ5daw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.75,332,1589266800"; 
-   d="scan'208";a="457995504"
-Received: from jacob-builder.jf.intel.com (HELO jacob-builder) ([10.7.199.155])
-  by orsmga005.jf.intel.com with ESMTP; 09 Jul 2020 10:58:34 -0700
-Date:   Thu, 9 Jul 2020 11:05:13 -0700
-From:   Jacob Pan <jacob.jun.pan@linux.intel.com>
-To:     Alex Williamson <alex.williamson@redhat.com>
-Cc:     "Liu, Yi L" <yi.l.liu@intel.com>,
-        "Tian, Kevin" <kevin.tian@intel.com>,
-        "eric.auger@redhat.com" <eric.auger@redhat.com>,
-        "baolu.lu@linux.intel.com" <baolu.lu@linux.intel.com>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "Raj, Ashok" <ashok.raj@intel.com>,
-        "Tian, Jun J" <jun.j.tian@intel.com>,
-        "Sun, Yi Y" <yi.y.sun@intel.com>,
-        "jean-philippe@linaro.org" <jean-philippe@linaro.org>,
-        "peterx@redhat.com" <peterx@redhat.com>,
-        "Wu, Hao" <hao.wu@intel.com>,
-        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        jacob.jun.pan@linux.intel.com
-Subject: Re: [PATCH v3 06/14] vfio/type1: Add VFIO_IOMMU_PASID_REQUEST
- (alloc/free)
-Message-ID: <20200709110513.3ff50f99@jacob-builder>
-In-Reply-To: <20200709082751.320742ab@x1.home>
-References: <1592988927-48009-1-git-send-email-yi.l.liu@intel.com>
-        <1592988927-48009-7-git-send-email-yi.l.liu@intel.com>
-        <20200702151832.048b44d1@x1.home>
-        <CY4PR11MB1432DD97F44EB8AA5CCC87D8C36A0@CY4PR11MB1432.namprd11.prod.outlook.com>
-        <DM5PR11MB1435B159DA10C8301B89A6F0C3670@DM5PR11MB1435.namprd11.prod.outlook.com>
-        <20200708135444.4eac48a4@x1.home>
-        <DM5PR11MB14358A8797E3C02E50B37FFEC3640@DM5PR11MB1435.namprd11.prod.outlook.com>
-        <MWHPR11MB16456D12135AA36BA16CE4208C640@MWHPR11MB1645.namprd11.prod.outlook.com>
-        <DM5PR11MB14357DC99EFCDE7E02944E2EC3640@DM5PR11MB1435.namprd11.prod.outlook.com>
-        <MWHPR11MB1645F822D9267005AE5BCE528C640@MWHPR11MB1645.namprd11.prod.outlook.com>
-        <DM5PR11MB143577F0C21EDB82B82EEB35C3640@DM5PR11MB1435.namprd11.prod.outlook.com>
-        <DM5PR11MB143584D5A0AAE13E0D2D04B7C3640@DM5PR11MB1435.namprd11.prod.outlook.com>
-        <20200709082751.320742ab@x1.home>
-Organization: OTC
-X-Mailer: Claws Mail 3.13.2 (GTK+ 2.24.30; x86_64-pc-linux-gnu)
+        id S1726409AbgGISW2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 Jul 2020 14:22:28 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:22947 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726290AbgGISW1 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 9 Jul 2020 14:22:27 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1594318945;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=aPXiyCrH7oXeBX9QLi0so8nbm8S4tmPS8K/PlqOIwFU=;
+        b=i3i/GC0FddMzUEOol9uWfQJ64H9CEGBs1NWR308YhbaMChJ5yfJBh7IO62UcVIP1Mkv/P+
+        vbhgmEjuh+cshR33I1eu9NK3ROyk00KUrt1zwA6+T2WSen+H9REOc7aL9BqX2PyWVqz18j
+        pOpy9b/H1giPyazgsKwNyWF7KsI8GKY=
+Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com
+ [209.85.222.197]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-278-PL_GtNAdMu-IT1PJx8qKlQ-1; Thu, 09 Jul 2020 14:22:24 -0400
+X-MC-Unique: PL_GtNAdMu-IT1PJx8qKlQ-1
+Received: by mail-qk1-f197.google.com with SMTP id i145so2451045qke.2
+        for <kvm@vger.kernel.org>; Thu, 09 Jul 2020 11:22:23 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=aPXiyCrH7oXeBX9QLi0so8nbm8S4tmPS8K/PlqOIwFU=;
+        b=j4jqoOXL6A99sL1lKe9tNO+gIEd6OoMO+ipwIbypNVqug7oosQNI/73cf8G9DE1SKW
+         yWo12rqqxP5Zf44IJqIg+AuCG7+wIc8Q3De6VY4tz6iD4RN5gb2LIALJTWA7e7Pa9YXP
+         ZoRE+St8a6PtZ345JUQH8DyyhDW4GNLdyWseRU98O6W98zADMlEbWG6gLfaTmEI0fSVJ
+         v98nQGrCjQ8piaKvzzSlSFHpGk34DymztOfPaxLRbqDFRqMNXY6v+Zp4k9IdtZanFCS8
+         5aOyNYuSs73QZjjbTUCEmgItT6kC+9htOHxRuMrt2sIuC/8ex3Ullnxk0sGyxDmSzU82
+         R8Qg==
+X-Gm-Message-State: AOAM533jf7GCP6qo7i/yUqEsHWV8Zhu1p+MbBRyL7zHwTX35lgfSfMf7
+        WoJDkGbeoGiLGEdV1/ZeDDy2+TgMy78G6LUZO2fb+wGSFYJMYzxMdyShS8u7to5bQ4HCGo32SMc
+        kNRipHrnRIDfb
+X-Received: by 2002:aed:2a36:: with SMTP id c51mr39636231qtd.264.1594318943269;
+        Thu, 09 Jul 2020 11:22:23 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxqsYywhmXTQRogPqAPHeaEeyc9RZJ23AF7MNu+3uBKa8vxZOosdZtq4sQ4TcPk5Z1Polevwg==
+X-Received: by 2002:aed:2a36:: with SMTP id c51mr39636203qtd.264.1594318942990;
+        Thu, 09 Jul 2020 11:22:22 -0700 (PDT)
+Received: from xz-x1 ([2607:9880:19c8:6f::1f4f])
+        by smtp.gmail.com with ESMTPSA id y40sm4756253qtc.29.2020.07.09.11.22.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 09 Jul 2020 11:22:22 -0700 (PDT)
+Date:   Thu, 9 Jul 2020 14:22:20 -0400
+From:   Peter Xu <peterx@redhat.com>
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, Vitaly Kuznetsov <vkuznets@redhat.com>
+Subject: Re: [PATCH 1/2] KVM: X86: Move ignore_msrs handling upper the stack
+Message-ID: <20200709182220.GG199122@xz-x1>
+References: <20200622220442.21998-1-peterx@redhat.com>
+ <20200622220442.21998-2-peterx@redhat.com>
+ <20200625061544.GC2141@linux.intel.com>
+ <1cebc562-89e9-3806-bb3c-771946fc64f3@redhat.com>
+ <20200625162540.GC3437@linux.intel.com>
+ <20200626180732.GB175520@xz-x1>
+ <20200626181820.GG6583@linux.intel.com>
+ <47b90b77-cf03-6087-b25f-fcd2fd313165@redhat.com>
+ <20200630154726.GD7733@linux.intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20200630154726.GD7733@linux.intel.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 9 Jul 2020 08:27:51 -0600
-Alex Williamson <alex.williamson@redhat.com> wrote:
-
-> > So I'm wondering can we fall back to prior proposal which only free
-> > one PASID for a free request. how about your opinion?  
+On Tue, Jun 30, 2020 at 08:47:26AM -0700, Sean Christopherson wrote:
+> On Sat, Jun 27, 2020 at 04:24:34PM +0200, Paolo Bonzini wrote:
+> > On 26/06/20 20:18, Sean Christopherson wrote:
+> > >> Btw, would it be more staightforward to check "vcpu->arch.arch_capabilities &
+> > >> ARCH_CAP_TSX_CTRL_MSR" rather than "*ebx | (F(RTM) | F(HLE))" even if we want
+> > >> to have such a fix?
+> > > Not really, That ends up duplicating the check in vmx_get_msr().  From an
+> > > emulation perspective, this really is a "guest" access to the MSR, in the
+> > > sense that it the virtual CPU is in the guest domain, i.e. not a god-like
+> > > entity that gets to break the rules of emulation.
+> > 
+> > But if you wrote a guest that wants to read MSR_IA32_TSX_CTRL, there are
+> > two choices:
+> > 
+> > 1) check ARCH_CAPABILITIES first
+> > 
+> > 2) blindly access it and default to 0.
+> > 
+> > Both are fine, because we know MSR_IA32_TSX_CTRL has no
+> > reserved/must-be-one bits.  Calling __kvm_get_msr and checking for an
+> > invalid MSR through the return value is not breaking the rules of
+> > emulation, it is "faking" a #GP handler.
 > 
-> Doesn't it still seem like it would be a useful user interface to have
-> a mechanism to free all pasids, by calling with exactly [0, MAX_UINT]?
-> I'm not sure if there's another use case for this given than the user
-> doesn't have strict control of the pasid values they get.  Thanks,
+> "guest" was the wrong choice of word.  My point was that, IMO, emulation
+> should never set host_initiated=true.
+> 
+> To me, accessing MSRs with host_initiated is the equivalent of loading a
+> ucode patch, i.e. it's super duper special stuff that deliberately turns
+> off all safeguards and can change the fundamental behavior of the (virtual)
+> CPU.
 
-Yes, I agree free all pasids of a guest is a useful interface. Since all
-PASIDs under one VM is already tracked by an IOASID set with its XArray,
-I don't see a need to track again in VFIO.
+This seems to be an orthogonal change against what this series tried to do.  We
+use host_initiated=true in current code, and this series won't change that fact
+either.  As I mentioned in the other thread, at least the rdmsr warning is
+ambiguous when it's not initiated from the guest if without this patchset, and
+this series could address that.
 
-Shall we only free one & free all? IMHO, free range isn't that useful
-and not really symmetric to PASID allocation in that allocation is one
-at a time.
+> 
+> > So I think Peter's patch is fine, but (possibly on top as a third patch)
+> > __must_check should be added to MSR getters and setters.  Also one
+> > possibility is to return -EINVAL for invalid MSRs.
 
-Can we just add a new flag, e.g.  VFIO_IOMMU_FREE_ALL_PASID, and
-ignored th range in free?
+Yeah I can add another patch for that.  Also if to repost, I tend to also
+introduce KVM_MSR_RET_[OK|ERROR] too, which seems to be cleaner when we had
+KVM_MSR_RET_INVALID.
+
+Any objections before I repost?
+
+-- 
+Peter Xu
+
