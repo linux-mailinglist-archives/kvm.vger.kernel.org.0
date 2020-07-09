@@ -2,268 +2,164 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 13CCC21A053
-	for <lists+kvm@lfdr.de>; Thu,  9 Jul 2020 14:54:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A6B9B21A08C
+	for <lists+kvm@lfdr.de>; Thu,  9 Jul 2020 15:12:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726908AbgGIMyy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 Jul 2020 08:54:54 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:56245 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726471AbgGIMyx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 9 Jul 2020 08:54:53 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1594299291;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type;
-        bh=Hq4oPiiTwiHyTHGICkYN64XjAj5RigbTr2qxmRvB+t8=;
-        b=AYjZKOpoqGDH2ZcRYp6KyejU1isLJ1BQOxaEyDGUr9ECOKYD7VrNBnxR6zHb56ycsj5CmX
-        WqeEBQdn3LTSo+DHOV10xzY9QRwu1aLGg+wFr7hslVpliuAaNE82ztjw2s5wxF2BCqkJ41
-        V1IEWXqRBw5RP142LBwq8eU3+H4AE98=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-200-v_eDUcFROluT8bYxVM2glA-1; Thu, 09 Jul 2020 08:54:47 -0400
-X-MC-Unique: v_eDUcFROluT8bYxVM2glA-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6891080BCA1;
-        Thu,  9 Jul 2020 12:54:46 +0000 (UTC)
-Received: from horse.redhat.com (ovpn-115-114.rdu2.redhat.com [10.10.115.114])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 627032C24F;
-        Thu,  9 Jul 2020 12:54:43 +0000 (UTC)
-Received: by horse.redhat.com (Postfix, from userid 10451)
-        id DC029220689; Thu,  9 Jul 2020 08:54:42 -0400 (EDT)
-Date:   Thu, 9 Jul 2020 08:54:42 -0400
-From:   Vivek Goyal <vgoyal@redhat.com>
-To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc:     virtio-fs-list <virtio-fs@redhat.com>, vkuznets@redhat.com,
-        pbonzini@redhat.com, sean.j.christopherson@intel.com
-Subject: [PATCH v3] kvm,x86: Exit to user space in case of page fault error
-Message-ID: <20200709125442.GA150543@redhat.com>
+        id S1726769AbgGINMM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 Jul 2020 09:12:12 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:57170 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726480AbgGINMM (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 9 Jul 2020 09:12:12 -0400
+Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 069D4vYR177793;
+        Thu, 9 Jul 2020 09:12:11 -0400
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 325r2ch442-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 09 Jul 2020 09:12:10 -0400
+Received: from m0098414.ppops.net (m0098414.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 069DCA1Z009487;
+        Thu, 9 Jul 2020 09:12:10 -0400
+Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 325r2ch436-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 09 Jul 2020 09:12:10 -0400
+Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
+        by ppma03fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 069DBMIV019141;
+        Thu, 9 Jul 2020 13:12:08 GMT
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
+        by ppma03fra.de.ibm.com with ESMTP id 325k2c0fy5-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 09 Jul 2020 13:12:08 +0000
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
+        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 069DC6EY37421284
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 9 Jul 2020 13:12:06 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 5F5E5AE055;
+        Thu,  9 Jul 2020 13:12:06 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id E4C04AE051;
+        Thu,  9 Jul 2020 13:12:05 +0000 (GMT)
+Received: from oc3016276355.ibm.com (unknown [9.145.34.67])
+        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Thu,  9 Jul 2020 13:12:05 +0000 (GMT)
+Subject: Re: [kvm-unit-tests PATCH v11 8/9] s390x: css: msch, enable test
+To:     Cornelia Huck <cohuck@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
+        frankja@linux.ibm.com, david@redhat.com, thuth@redhat.com,
+        drjones@redhat.com
+References: <1594282068-11054-1-git-send-email-pmorel@linux.ibm.com>
+ <1594282068-11054-9-git-send-email-pmorel@linux.ibm.com>
+ <20200709134056.0d267b6c.cohuck@redhat.com>
+From:   Pierre Morel <pmorel@linux.ibm.com>
+Message-ID: <d55c3e5b-8adf-8f7f-2b97-c270fb6598b4@linux.ibm.com>
+Date:   Thu, 9 Jul 2020 15:12:05 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.9.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+In-Reply-To: <20200709134056.0d267b6c.cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
+ definitions=2020-07-09_07:2020-07-09,2020-07-09 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 bulkscore=0
+ priorityscore=1501 impostorscore=0 spamscore=0 phishscore=0 adultscore=0
+ lowpriorityscore=0 malwarescore=0 clxscore=1015 mlxlogscore=999
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2006250000 definitions=main-2007090100
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Page fault error handling behavior in kvm seems little inconsistent when
-page fault reports error. If we are doing fault synchronously
-then we capture error (-EFAULT) returned by __gfn_to_pfn_memslot() and
-exit to user space and qemu reports error, "error: kvm run failed Bad address".
 
-But if we are doing async page fault, then async_pf_execute() will simply
-ignore the error reported by get_user_pages_remote() or
-by kvm_mmu_do_page_fault(). It is assumed that page fault was successful
-and either a page ready event is injected in guest or guest is brought
-out of artificial halt state and run again. In both the cases when guest
-retries the instruction, it takes exit again as page fault was not
-successful in previous attempt. And then this infinite loop continues
-forever.
 
-Trying fault in a loop will make sense if error is temporary and will
-be resolved on retry. But I don't see any intention in the code to
-determine if error is temporary or not.  Whether to do fault synchronously
-or asynchronously, depends on so many variables but none of the varibales
-is whether error is temporary or not. (kvm_can_do_async_pf()).
+On 2020-07-09 13:40, Cornelia Huck wrote:
+> On Thu,  9 Jul 2020 10:07:47 +0200
+> Pierre Morel <pmorel@linux.ibm.com> wrote:
+> 
+>> A second step when testing the channel subsystem is to prepare a channel
+>> for use.
+>> This includes:
+>> - Get the current subchannel Information Block (SCHIB) using STSCH
+>> - Update it in memory to set the ENABLE bit and the specified ISC
+>> - Tell the CSS that the SCHIB has been modified using MSCH
+>> - Get the SCHIB from the CSS again to verify that the subchannel is
+>>    enabled and uses the specified ISC.
+>> - If the command succeeds but subchannel is not enabled or the ISC
+>>    field is not as expected, retry a predefined retries count.
+>> - If the command fails, report the failure and do not retry, even
+>>    if cc indicates a busy/status pending as we do not expect this.
+>>
+>> This tests the MSCH instruction to enable a channel successfully.
+>> Retries are done and in case of error, and if the retries count
+>> is exceeded, a report is made.
+>>
+>> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+>> Acked-by: Thomas Huth <thuth@redhat.com>
+>> Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+>> ---
+>>   lib/s390x/css.h     |  8 +++--
+>>   lib/s390x/css_lib.c | 72 +++++++++++++++++++++++++++++++++++++++++++++
+>>   s390x/css.c         | 15 ++++++++++
+>>   3 files changed, 92 insertions(+), 3 deletions(-)
+> 
+> (...)
+> 
+>> +/*
+>> + * css_msch: enable subchannel and set with specified ISC
+> 
+> "css_enable: enable the subchannel with the specified ISC"
+> 
+> ?
+> 
+>> + * @schid: Subchannel Identifier
+>> + * @isc  : number of the interruption subclass to use
+>> + * Return value:
+>> + *   On success: 0
+>> + *   On error the CC of the faulty instruction
+>> + *      or -1 if the retry count is exceeded.
+>> + */
+>> +int css_enable(int schid, int isc)
+>> +{
+>> +	struct pmcw *pmcw = &schib.pmcw;
+>> +	int retry_count = 0;
+>> +	uint16_t flags;
+>> +	int cc;
+>> +
+>> +	/* Read the SCHIB for this subchannel */
+>> +	cc = stsch(schid, &schib);
+>> +	if (cc) {
+>> +		report_info("stsch: sch %08x failed with cc=%d", schid, cc);
+>> +		return cc;
+>> +	}
+>> +
+>> +	flags = PMCW_ENABLE | (isc << PMCW_ISC_SHIFT);
+>> +	if ((pmcw->flags & flags) == flags) {
+> 
+> I think you want (pmcw->flags & PMCW_ENABLE) == PMCW_ENABLE -- this
+> catches the case of "subchannel has been enabled before, but with a
+> different isc".
 
-And that makes it very inconsistent or unpredictable to figure out whether
-kvm will exit to qemu with error or it will just retry and go into an
-infinite loop.
+If with a different ISC, we need to modify the ISC.
+Don't we ?
 
-This patch tries to make this behavior consistent. That is instead of
-getting into infinite loop of retrying page fault, exit to user space
-and stop VM if page fault error happens.
+> 
+>> +		report_info("stsch: sch %08x already enabled", schid);
+>> +		return 0;
+>> +	}
 
-In future this can be improved by injecting errors into guest. As of
-now we don't have any race free method to inject errors in guest.
 
-When page fault error happens in async path save that pfn and when next
-time guest retries, do a sync fault instead of async fault. So that if error
-is encountered, we exit to qemu and avoid infinite loop.
 
-We maintain a cache of error gfns and force sync fault if a gfn is
-found in cache of error gfn. There is a small possibility that we
-miss an error gfn (as it got overwritten by a new error gfn). But
-its just a hint and sooner or later some error pfn will match
-and we will force sync fault and exit to user space.
+> 
+> (...)
+> 
 
-Change from v2:
-- Fixed a warning by converting kvm_find_error_gfn() static.
 
-Change from v1:
-- Maintain a cache of error gfns, instead of single gfn. (Vitaly)
-
-Signed-off-by: Vivek Goyal <vgoyal@redhat.com>
----
- arch/x86/include/asm/kvm_host.h |  2 ++
- arch/x86/kvm/mmu.h              |  2 +-
- arch/x86/kvm/mmu/mmu.c          |  2 +-
- arch/x86/kvm/x86.c              | 61 +++++++++++++++++++++++++++++++--
- 4 files changed, 62 insertions(+), 5 deletions(-)
-
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index be5363b21540..e6f8d3f1a377 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -137,6 +137,7 @@ static inline gfn_t gfn_to_index(gfn_t gfn, gfn_t base_gfn, int level)
- #define KVM_NR_VAR_MTRR 8
- 
- #define ASYNC_PF_PER_VCPU 64
-+#define ERROR_GFN_PER_VCPU 64
- 
- enum kvm_reg {
- 	VCPU_REGS_RAX = __VCPU_REGS_RAX,
-@@ -778,6 +779,7 @@ struct kvm_vcpu_arch {
- 		unsigned long nested_apf_token;
- 		bool delivery_as_pf_vmexit;
- 		bool pageready_pending;
-+		gfn_t error_gfns[ERROR_GFN_PER_VCPU];
- 	} apf;
- 
- 	/* OSVW MSRs (AMD only) */
-diff --git a/arch/x86/kvm/mmu.h b/arch/x86/kvm/mmu.h
-index 444bb9c54548..d0a2a12c7bb6 100644
---- a/arch/x86/kvm/mmu.h
-+++ b/arch/x86/kvm/mmu.h
-@@ -60,7 +60,7 @@ void kvm_init_mmu(struct kvm_vcpu *vcpu, bool reset_roots);
- void kvm_init_shadow_mmu(struct kvm_vcpu *vcpu, u32 cr0, u32 cr4, u32 efer);
- void kvm_init_shadow_ept_mmu(struct kvm_vcpu *vcpu, bool execonly,
- 			     bool accessed_dirty, gpa_t new_eptp);
--bool kvm_can_do_async_pf(struct kvm_vcpu *vcpu);
-+bool kvm_can_do_async_pf(struct kvm_vcpu *vcpu, gfn_t gfn);
- int kvm_handle_page_fault(struct kvm_vcpu *vcpu, u64 error_code,
- 				u64 fault_address, char *insn, int insn_len);
- 
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 6d6a0ae7800c..a0e6283e872d 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -4078,7 +4078,7 @@ static bool try_async_pf(struct kvm_vcpu *vcpu, bool prefault, gfn_t gfn,
- 	if (!async)
- 		return false; /* *pfn has correct page already */
- 
--	if (!prefault && kvm_can_do_async_pf(vcpu)) {
-+	if (!prefault && kvm_can_do_async_pf(vcpu, cr2_or_gpa >> PAGE_SHIFT)) {
- 		trace_kvm_try_async_get_page(cr2_or_gpa, gfn);
- 		if (kvm_find_async_pf_gfn(vcpu, gfn)) {
- 			trace_kvm_async_pf_doublefault(cr2_or_gpa, gfn);
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 88c593f83b28..c4d4dab3ccde 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -263,6 +263,13 @@ static inline void kvm_async_pf_hash_reset(struct kvm_vcpu *vcpu)
- 		vcpu->arch.apf.gfns[i] = ~0;
- }
- 
-+static inline void kvm_error_gfn_hash_reset(struct kvm_vcpu *vcpu)
-+{
-+	int i;
-+	for (i = 0; i < ERROR_GFN_PER_VCPU; i++)
-+		vcpu->arch.apf.error_gfns[i] = ~0;
-+}
-+
- static void kvm_on_user_return(struct user_return_notifier *urn)
- {
- 	unsigned slot;
-@@ -9484,6 +9491,7 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
- 	vcpu->arch.pat = MSR_IA32_CR_PAT_DEFAULT;
- 
- 	kvm_async_pf_hash_reset(vcpu);
-+	kvm_error_gfn_hash_reset(vcpu);
- 	kvm_pmu_init(vcpu);
- 
- 	vcpu->arch.pending_external_vector = -1;
-@@ -9608,6 +9616,7 @@ void kvm_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
- 
- 	kvm_clear_async_pf_completion_queue(vcpu);
- 	kvm_async_pf_hash_reset(vcpu);
-+	kvm_error_gfn_hash_reset(vcpu);
- 	vcpu->arch.apf.halted = false;
- 
- 	if (kvm_mpx_supported()) {
-@@ -10369,6 +10378,41 @@ void kvm_set_rflags(struct kvm_vcpu *vcpu, unsigned long rflags)
- }
- EXPORT_SYMBOL_GPL(kvm_set_rflags);
- 
-+static inline u32 kvm_error_gfn_hash_fn(gfn_t gfn)
-+{
-+	BUILD_BUG_ON(!is_power_of_2(ERROR_GFN_PER_VCPU));
-+
-+	return hash_32(gfn & 0xffffffff, order_base_2(ERROR_GFN_PER_VCPU));
-+}
-+
-+static void kvm_add_error_gfn(struct kvm_vcpu *vcpu, gfn_t gfn)
-+{
-+	u32 key = kvm_error_gfn_hash_fn(gfn);
-+
-+	/*
-+	 * Overwrite the previous gfn. This is just a hint to do
-+	 * sync page fault.
-+	 */
-+	vcpu->arch.apf.error_gfns[key] = gfn;
-+}
-+
-+static void kvm_del_error_gfn(struct kvm_vcpu *vcpu, gfn_t gfn)
-+{
-+	u32 key = kvm_error_gfn_hash_fn(gfn);
-+
-+	if (WARN_ON_ONCE(vcpu->arch.apf.error_gfns[key] != gfn))
-+		return;
-+
-+	vcpu->arch.apf.error_gfns[key] = ~0;
-+}
-+
-+static bool kvm_find_error_gfn(struct kvm_vcpu *vcpu, gfn_t gfn)
-+{
-+	u32 key = kvm_error_gfn_hash_fn(gfn);
-+
-+	return vcpu->arch.apf.error_gfns[key] == gfn;
-+}
-+
- void kvm_arch_async_page_ready(struct kvm_vcpu *vcpu, struct kvm_async_pf *work)
- {
- 	int r;
-@@ -10385,7 +10429,9 @@ void kvm_arch_async_page_ready(struct kvm_vcpu *vcpu, struct kvm_async_pf *work)
- 	      work->arch.cr3 != vcpu->arch.mmu->get_guest_pgd(vcpu))
- 		return;
- 
--	kvm_mmu_do_page_fault(vcpu, work->cr2_or_gpa, 0, true);
-+	r = kvm_mmu_do_page_fault(vcpu, work->cr2_or_gpa, 0, true);
-+	if (r < 0)
-+		kvm_add_error_gfn(vcpu, gpa_to_gfn(work->cr2_or_gpa));
- }
- 
- static inline u32 kvm_async_pf_hash_fn(gfn_t gfn)
-@@ -10495,7 +10541,7 @@ static bool kvm_can_deliver_async_pf(struct kvm_vcpu *vcpu)
- 	return true;
- }
- 
--bool kvm_can_do_async_pf(struct kvm_vcpu *vcpu)
-+bool kvm_can_do_async_pf(struct kvm_vcpu *vcpu, gfn_t gfn)
- {
- 	if (unlikely(!lapic_in_kernel(vcpu) ||
- 		     kvm_event_needs_reinjection(vcpu) ||
-@@ -10509,7 +10555,16 @@ bool kvm_can_do_async_pf(struct kvm_vcpu *vcpu)
- 	 * If interrupts are off we cannot even use an artificial
- 	 * halt state.
- 	 */
--	return kvm_arch_interrupt_allowed(vcpu);
-+	if (!kvm_arch_interrupt_allowed(vcpu))
-+		return false;
-+
-+	/* Found gfn in error gfn cache. Force sync fault */
-+	if (kvm_find_error_gfn(vcpu, gfn)) {
-+		kvm_del_error_gfn(vcpu, gfn);
-+		return false;
-+	}
-+
-+	return true;
- }
- 
- bool kvm_arch_async_page_not_present(struct kvm_vcpu *vcpu,
 -- 
-2.25.4
-
+Pierre Morel
+IBM Lab Boeblingen
