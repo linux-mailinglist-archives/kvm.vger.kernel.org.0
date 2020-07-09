@@ -2,319 +2,626 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 789B1219A08
-	for <lists+kvm@lfdr.de>; Thu,  9 Jul 2020 09:33:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 04AEE219A1F
+	for <lists+kvm@lfdr.de>; Thu,  9 Jul 2020 09:37:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726299AbgGIHdi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 Jul 2020 03:33:38 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:29154 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726006AbgGIHdi (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 9 Jul 2020 03:33:38 -0400
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 0697XWB6014245
-        for <kvm@vger.kernel.org>; Thu, 9 Jul 2020 03:33:37 -0400
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 325rh2rm3t-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Thu, 09 Jul 2020 03:33:36 -0400
-Received: from m0098393.ppops.net (m0098393.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 0697XZP8014448
-        for <kvm@vger.kernel.org>; Thu, 9 Jul 2020 03:33:35 -0400
-Received: from ppma06fra.de.ibm.com (48.49.7a9f.ip4.static.sl-reverse.com [159.122.73.72])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 325rh2rkme-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 09 Jul 2020 03:33:35 -0400
-Received: from pps.filterd (ppma06fra.de.ibm.com [127.0.0.1])
-        by ppma06fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 0697VroQ003434;
-        Thu, 9 Jul 2020 07:32:49 GMT
-Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
-        by ppma06fra.de.ibm.com with ESMTP id 325k2qr8u2-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 09 Jul 2020 07:32:49 +0000
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
-        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 0697WkjL10617144
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 9 Jul 2020 07:32:46 GMT
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id A9D63AE053;
-        Thu,  9 Jul 2020 07:32:46 +0000 (GMT)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 54C2CAE055;
-        Thu,  9 Jul 2020 07:32:46 +0000 (GMT)
-Received: from localhost.localdomain (unknown [9.145.181.70])
-        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu,  9 Jul 2020 07:32:46 +0000 (GMT)
-Subject: Re: [kvm-unit-tests v3 PATCH] s390x/cpumodel: The missing DFP
- facility on TCG is expected
-To:     Thomas Huth <thuth@redhat.com>, david@redhat.com,
-        kvm@vger.kernel.org
-Cc:     Cornelia Huck <cohuck@redhat.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>
-References: <20200708150025.20631-1-thuth@redhat.com>
-From:   Janosch Frank <frankja@linux.ibm.com>
-Autocrypt: addr=frankja@linux.ibm.com; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <bcf3172a-ee75-f5c5-f8b9-076cfc549d6e@linux.ibm.com>
-Date:   Thu, 9 Jul 2020 09:32:45 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
+        id S1726362AbgGIHhR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 Jul 2020 03:37:17 -0400
+Received: from smtp-fw-33001.amazon.com ([207.171.190.10]:1635 "EHLO
+        smtp-fw-33001.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726183AbgGIHhQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 9 Jul 2020 03:37:16 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1594280233; x=1625816233;
+  h=subject:to:cc:references:from:message-id:date:
+   mime-version:in-reply-to:content-transfer-encoding;
+  bh=td70l1YK+2ggHr5XbLEJo/BgF3dPPCkFscm3fpFN8VU=;
+  b=nz+teg8oOZAv2lsPhnJwA3k0Xh3/8tGEwWemaiDFlZ2qb4952YjcPtSF
+   uov5HiawoaFWWXqaX5XDFYWiBA5Kg079ddOr4VmiACtmm/h+/7B5qFDGJ
+   7IxV7KnIk/7wgvIw+f6dYa4BL15gS0SOris9QTKMPCOeoBre3jyumfiZz
+   8=;
+IronPort-SDR: 0zwBclE1w2FCuzUmi2zMQYwx3h3sfvx9U4uw+XWEZ8gXofN9kZqtrejBbuDzK+saaIuJkeRSAS
+ qrEGWJWqPr+w==
+X-IronPort-AV: E=Sophos;i="5.75,331,1589241600"; 
+   d="scan'208";a="57249437"
+Received: from sea32-co-svc-lb4-vlan3.sea.corp.amazon.com (HELO email-inbound-relay-1d-38ae4ad2.us-east-1.amazon.com) ([10.47.23.38])
+  by smtp-border-fw-out-33001.sea14.amazon.com with ESMTP; 09 Jul 2020 07:37:09 +0000
+Received: from EX13MTAUEA002.ant.amazon.com (iad55-ws-svc-p15-lb9-vlan3.iad.amazon.com [10.40.159.166])
+        by email-inbound-relay-1d-38ae4ad2.us-east-1.amazon.com (Postfix) with ESMTPS id 1A174A2595;
+        Thu,  9 Jul 2020 07:37:07 +0000 (UTC)
+Received: from EX13D16EUB001.ant.amazon.com (10.43.166.28) by
+ EX13MTAUEA002.ant.amazon.com (10.43.61.77) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.2; Thu, 9 Jul 2020 07:37:06 +0000
+Received: from 38f9d34ed3b1.ant.amazon.com (10.43.162.73) by
+ EX13D16EUB001.ant.amazon.com (10.43.166.28) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.2; Thu, 9 Jul 2020 07:36:57 +0000
+Subject: Re: [PATCH v4 11/18] nitro_enclaves: Add logic for enclave memory
+ region set
+To:     Alexander Graf <graf@amazon.de>, <linux-kernel@vger.kernel.org>
+CC:     Anthony Liguori <aliguori@amazon.com>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Colm MacCarthaigh <colmmacc@amazon.com>,
+        "Bjoern Doebel" <doebel@amazon.de>,
+        David Woodhouse <dwmw@amazon.co.uk>,
+        "Frank van der Linden" <fllinden@amazon.com>,
+        Greg KH <gregkh@linuxfoundation.org>,
+        Martin Pohlack <mpohlack@amazon.de>,
+        Matt Wilson <msw@amazon.com>,
+        "Paolo Bonzini" <pbonzini@redhat.com>,
+        Balbir Singh <sblbir@amazon.com>,
+        "Stefano Garzarella" <sgarzare@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Stewart Smith <trawets@amazon.com>,
+        Uwe Dannowski <uwed@amazon.de>, <kvm@vger.kernel.org>,
+        <ne-devel-upstream@amazon.com>
+References: <20200622200329.52996-1-andraprs@amazon.com>
+ <20200622200329.52996-12-andraprs@amazon.com>
+ <798dbb9f-0fe4-9fd9-2e64-f6f2bc740abf@amazon.de>
+From:   "Paraschiv, Andra-Irina" <andraprs@amazon.com>
+Message-ID: <b7b7691c-595f-531e-9db3-c8e3fc21f983@amazon.com>
+Date:   Thu, 9 Jul 2020 10:36:47 +0300
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:68.0)
+ Gecko/20100101 Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <20200708150025.20631-1-thuth@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="ZbdyaMjxHMJXLXazAXq4rMxbgkksddybB"
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
- definitions=2020-07-09_04:2020-07-08,2020-07-09 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 adultscore=0
- lowpriorityscore=0 mlxscore=0 clxscore=1015 bulkscore=0 phishscore=0
- mlxlogscore=999 priorityscore=1501 spamscore=0 suspectscore=2
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2006250000 definitions=main-2007090059
+In-Reply-To: <798dbb9f-0fe4-9fd9-2e64-f6f2bc740abf@amazon.de>
+Content-Language: en-US
+X-Originating-IP: [10.43.162.73]
+X-ClientProxiedBy: EX13D06UWA001.ant.amazon.com (10.43.160.220) To
+ EX13D16EUB001.ant.amazon.com (10.43.166.28)
+Content-Type: text/plain; charset="windows-1252"; format="flowed"
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---ZbdyaMjxHMJXLXazAXq4rMxbgkksddybB
-Content-Type: multipart/mixed; boundary="up2sVpqzFjw1sx7omejNCvgSN8Dm98QWS"
-
---up2sVpqzFjw1sx7omejNCvgSN8Dm98QWS
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-
-On 7/8/20 5:00 PM, Thomas Huth wrote:
-> When running the kvm-unit-tests with TCG on s390x, the cpumodel test
-> always reports the error about the missing DFP (decimal floating point)=
-
-> facility. This is kind of expected, since DFP is not required for
-> running Linux and thus nobody is really interested in implementing
-> this facility in TCG. Thus let's mark this as an expected error instead=
-,
-> so that we can run the kvm-unit-tests also with TCG without getting
-> test failures that we do not care about.
->=20
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-
-Acked-by: Janosch Frank <frankja@linux.ibm.com>
-
-> ---
->  v3:
->  - Moved the is_tcg() function to the library so that it can be used
->    later by other tests, too
->  - Make sure to call alloc_page() and stsi() only once
->=20
->  v2:
->  - Rewrote the logic, introduced expected_tcg_fail flag
->  - Use manufacturer string instead of VM name to detect TCG
->=20
->  lib/s390x/vm.c   | 46 ++++++++++++++++++++++++++++++++++++++++++++++
->  lib/s390x/vm.h   | 14 ++++++++++++++
->  s390x/Makefile   |  1 +
->  s390x/cpumodel.c | 19 +++++++++++++------
->  4 files changed, 74 insertions(+), 6 deletions(-)
->  create mode 100644 lib/s390x/vm.c
->  create mode 100644 lib/s390x/vm.h
->=20
-> diff --git a/lib/s390x/vm.c b/lib/s390x/vm.c
-> new file mode 100644
-> index 0000000..c852713
-> --- /dev/null
-> +++ b/lib/s390x/vm.c
-> @@ -0,0 +1,46 @@
-> +/*
-> + * Functions to retrieve VM-specific information
-> + *
-> + * Copyright (c) 2020 Red Hat Inc
-> + *
-> + * Authors:
-> + *  Thomas Huth <thuth@redhat.com>
-> + *
-> + * SPDX-License-Identifier: LGPL-2.1-or-later
-> + */
-> +
-> +#include <libcflat.h>
-> +#include <alloc_page.h>
-> +#include <asm/arch_def.h>
-> +#include "vm.h"
-> +
-> +/**
-> + * Detect whether we are running with TCG (instead of KVM)
-> + */
-> +bool vm_is_tcg(void)
-> +{
-> +	const char qemu_ebcdic[] =3D { 0xd8, 0xc5, 0xd4, 0xe4 };
-> +	static bool initialized =3D false;
-> +	static bool is_tcg =3D false;
-> +	uint8_t *buf;
-> +
-> +	if (initialized)
-> +		return is_tcg;
-> +
-> +	buf =3D alloc_page();
-> +	if (!buf)
-> +		return false;
-> +
-> +	if (stsi(buf, 1, 1, 1))
-> +		goto out;
-> +
-> +	/*
-> +	 * If the manufacturer string is "QEMU" in EBCDIC, then we
-> +	 * are on TCG (otherwise the string is "IBM" in EBCDIC)
-> +	 */
-> +	is_tcg =3D !memcmp(&buf[32], qemu_ebcdic, sizeof(qemu_ebcdic));
-> +	initialized =3D true;
-> +out:
-> +	free_page(buf);
-> +	return is_tcg;
-> +}
-> diff --git a/lib/s390x/vm.h b/lib/s390x/vm.h
-> new file mode 100644
-> index 0000000..33008d8
-> --- /dev/null
-> +++ b/lib/s390x/vm.h
-> @@ -0,0 +1,14 @@
-> +/*
-> + * Functions to retrieve VM-specific information
-> + *
-> + * Copyright (c) 2020 Red Hat Inc
-> + *
-> + * SPDX-License-Identifier: LGPL-2.1-or-later
-> + */
-> +
-> +#ifndef S390X_VM_H
-> +#define S390X_VM_H
-> +
-> +bool vm_is_tcg(void);
-> +
-> +#endif  /* S390X_VM_H */
-> diff --git a/s390x/Makefile b/s390x/Makefile
-> index ddb4b48..98ac29e 100644
-> --- a/s390x/Makefile
-> +++ b/s390x/Makefile
-> @@ -51,6 +51,7 @@ cflatobjs +=3D lib/s390x/sclp-console.o
->  cflatobjs +=3D lib/s390x/interrupt.o
->  cflatobjs +=3D lib/s390x/mmu.o
->  cflatobjs +=3D lib/s390x/smp.o
-> +cflatobjs +=3D lib/s390x/vm.o
-> =20
->  OBJDIRS +=3D lib/s390x
-> =20
-> diff --git a/s390x/cpumodel.c b/s390x/cpumodel.c
-> index 5d232c6..116a966 100644
-> --- a/s390x/cpumodel.c
-> +++ b/s390x/cpumodel.c
-> @@ -11,14 +11,19 @@
->   */
-> =20
->  #include <asm/facility.h>
-> +#include <vm.h>
-> =20
-> -static int dep[][2] =3D {
-> +static struct {
-> +	int facility;
-> +	int implied;
-> +	bool expected_tcg_fail;
-> +} dep[] =3D {
->  	/* from SA22-7832-11 4-98 facility indications */
->  	{   4,   3 },
->  	{   5,   3 },
->  	{   5,   4 },
->  	{  19,  18 },
-> -	{  37,  42 },
-> +	{  37,  42, true },  /* TCG does not have DFP and won't get it soon *=
-/
->  	{  43,  42 },
->  	{  73,  49 },
->  	{ 134, 129 },
-> @@ -46,11 +51,13 @@ int main(void)
-> =20
->  	report_prefix_push("dependency");
->  	for (i =3D 0; i < ARRAY_SIZE(dep); i++) {
-> -		if (test_facility(dep[i][0])) {
-> -			report(test_facility(dep[i][1]), "%d implies %d",
-> -				dep[i][0], dep[i][1]);
-> +		if (test_facility(dep[i].facility)) {
-> +			report_xfail(dep[i].expected_tcg_fail && vm_is_tcg(),
-> +				     test_facility(dep[i].implied),
-> +				     "%d implies %d",
-> +				     dep[i].facility, dep[i].implied);
->  		} else {
-> -			report_skip("facility %d not present", dep[i][0]);
-> +			report_skip("facility %d not present", dep[i].facility);
->  		}
->  	}
->  	report_prefix_pop();
->=20
 
 
+On 06/07/2020 13:46, Alexander Graf wrote:
+>
+>
+> On 22.06.20 22:03, Andra Paraschiv wrote:
+>> Another resource that is being set for an enclave is memory. User space
+>> memory regions, that need to be backed by contiguous memory regions,
+>> are associated with the enclave.
+>>
+>> One solution for allocating / reserving contiguous memory regions, that
+>> is used for integration, is hugetlbfs. The user space process that is
+>> associated with the enclave passes to the driver these memory regions.
+>>
+>> The enclave memory regions need to be from the same NUMA node as the
+>> enclave CPUs.
+>>
+>> Add ioctl command logic for setting user space memory region for an
+>> enclave.
+>>
+>> Signed-off-by: Alexandru Vasile <lexnv@amazon.com>
+>> Signed-off-by: Andra Paraschiv <andraprs@amazon.com>
+>> ---
+>> Changelog
+>>
+>> v3 -> v4
+>>
+>> * Check enclave memory regions are from the same NUMA node as the
+>> =A0=A0 enclave CPUs.
+>> * Use dev_err instead of custom NE log pattern.
+>> * Update the NE ioctl call to match the decoupling from the KVM API.
+>>
+>> v2 -> v3
+>>
+>> * Remove the WARN_ON calls.
+>> * Update static calls sanity checks.
+>> * Update kzfree() calls to kfree().
+>>
+>> v1 -> v2
+>>
+>> * Add log pattern for NE.
+>> * Update goto labels to match their purpose.
+>> * Remove the BUG_ON calls.
+>> * Check if enclave max memory regions is reached when setting an enclave
+>> =A0=A0 memory region.
+>> * Check if enclave state is init when setting an enclave memory region.
+>> ---
+>> =A0 drivers/virt/nitro_enclaves/ne_misc_dev.c | 257 ++++++++++++++++++++=
+++
+>> =A0 1 file changed, 257 insertions(+)
+>>
+>> diff --git a/drivers/virt/nitro_enclaves/ne_misc_dev.c =
 
---up2sVpqzFjw1sx7omejNCvgSN8Dm98QWS--
+>> b/drivers/virt/nitro_enclaves/ne_misc_dev.c
+>> index cfdefa52ed2a..17ccb6cdbd75 100644
+>> --- a/drivers/virt/nitro_enclaves/ne_misc_dev.c
+>> +++ b/drivers/virt/nitro_enclaves/ne_misc_dev.c
+>> @@ -476,6 +476,233 @@ static int ne_create_vcpu_ioctl(struct =
 
---ZbdyaMjxHMJXLXazAXq4rMxbgkksddybB
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+>> ne_enclave *ne_enclave, u32 vcpu_id)
+>> =A0=A0=A0=A0=A0 return rc;
+>> =A0 }
+>> =A0 +/**
+>> + * ne_sanity_check_user_mem_region - Sanity check the userspace memory
+>> + * region received during the set user memory region ioctl call.
+>> + *
+>> + * This function gets called with the ne_enclave mutex held.
+>> + *
+>> + * @ne_enclave: private data associated with the current enclave.
+>> + * @mem_region: user space memory region to be sanity checked.
+>> + *
+>> + * @returns: 0 on success, negative return value on failure.
+>> + */
+>> +static int ne_sanity_check_user_mem_region(struct ne_enclave =
 
------BEGIN PGP SIGNATURE-----
+>> *ne_enclave,
+>> +=A0=A0=A0 struct ne_user_memory_region *mem_region)
+>> +{
+>> +=A0=A0=A0 if (ne_enclave->mm !=3D current->mm)
+>> +=A0=A0=A0=A0=A0=A0=A0 return -EIO;
+>> +
+>> +=A0=A0=A0 if ((mem_region->memory_size % NE_MIN_MEM_REGION_SIZE) !=3D 0=
+) {
+>> +=A0=A0=A0=A0=A0=A0=A0 dev_err_ratelimited(ne_misc_dev.this_device,
+>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 "Mem size not=
+ multiple of 2 MiB\n");
+>> +
+>> +=A0=A0=A0=A0=A0=A0=A0 return -EINVAL;
+>
+> Can we make this an error that gets propagated to user space =
 
-iQIzBAEBCAAdFiEEwGNS88vfc9+v45Yq41TmuOI4ufgFAl8GyB0ACgkQ41TmuOI4
-ufiLsRAAiVZL03V84jEW9KNKSMicFWLF3TDF7sLu+Y8N7pk4fgPZKr48NerKXrfV
-kUs1BtiH1sMYH03W8+LQu4l8SAplXtsI3O1lWw2FWcbV0e7nHnP8IiL3zGTQQg6V
-lU47Fjp6ba6wwnVJcX0QORYixTADHNzdd6rAMq7ztVRB6G5w7VMjNfk512J5Wxeu
-iR4SSIOJfRph/SmVxfORtZbSQ1NsMRGeN+N5s6lOFEq0Y539VP7DkMvxhb7v1z44
-ouE+Cbo8Zv6f4TByi/Um+NI+4VeGxMJ7OhIGe/GKw4jUTiWFRYtpnMgYugv3EmjQ
-TytfJRPtMPJLcogcer35qnM4xuKo3FaubrSDfZxSUOqXPTXU6QkKRdwey+sKF+3V
-hG31qEDdUNQ8af2Edd9img7JQGB8E2OnHDBIqBc9h/rTlkKt9l8zhrAltL2Unc84
-9GvC3sM0VSjxE4Z+QVhYrJghX5n8oWbqQEfTrm+wkFyDaMYPHfiVHh70qKc3UkW0
-W6CqUhQT02fVU0eOHYHcuLY08HO+qV0iCYZGYs00N1WsjuKoTQmVmTcMDwP0Bs3A
-elhwmTt4s8OcDdbpbQKCcYMxm5Vym7+2ZlkyKcuCK+DaRwoqAT4AZE1YUPi/+Kqg
-fyRhIsrmzS3pdArbRWyCisKrA6udAyQa8gGR3bnoJTopA5aQ/E4=
-=RraF
------END PGP SIGNATURE-----
+> explicitly? I'd rather have a clear error return value of this =
 
---ZbdyaMjxHMJXLXazAXq4rMxbgkksddybB--
+> function than a random message in dmesg.
+
+We can make this, will add memory checks specific NE error codes, as for =
+
+the other call paths in the series e.g. enclave CPU(s) setup.
+
+>
+>> +=A0=A0=A0 }
+>> +
+>> +=A0=A0=A0 if ((mem_region->userspace_addr & (NE_MIN_MEM_REGION_SIZE - 1=
+)) ||
+>
+> This logic already relies on the fact that NE_MIN_MEM_REGION_SIZE is a =
+
+> power of two. Can you do the same above on the memory_size check?
+
+Done.
+
+>
+>> +=A0=A0=A0=A0=A0=A0=A0 !access_ok((void __user *)(unsigned =
+
+>> long)mem_region->userspace_addr,
+>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 mem_region->memory_size)) {
+>> +=A0=A0=A0=A0=A0=A0=A0 dev_err_ratelimited(ne_misc_dev.this_device,
+>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 "Invalid user=
+ space addr range\n");
+>> +
+>> +=A0=A0=A0=A0=A0=A0=A0 return -EINVAL;
+>
+> Same comment again. Return different errors for different conditions, =
+
+> so that user space has a chance to print proper errors to its users.
+>
+> Also, don't we have to check alignment of userspace_addr as well?
+>
+
+Would need an alignment check for 2 MiB at least, yes.
+
+>> +=A0=A0=A0 }
+>> +
+>> +=A0=A0=A0 return 0;
+>> +}
+>> +
+>> +/**
+>> + * ne_set_user_memory_region_ioctl - Add user space memory region to =
+
+>> the slot
+>> + * associated with the current enclave.
+>> + *
+>> + * This function gets called with the ne_enclave mutex held.
+>> + *
+>> + * @ne_enclave: private data associated with the current enclave.
+>> + * @mem_region: user space memory region to be associated with the =
+
+>> given slot.
+>> + *
+>> + * @returns: 0 on success, negative return value on failure.
+>> + */
+>> +static int ne_set_user_memory_region_ioctl(struct ne_enclave =
+
+>> *ne_enclave,
+>> +=A0=A0=A0 struct ne_user_memory_region *mem_region)
+>> +{
+>> +=A0=A0=A0 struct ne_pci_dev_cmd_reply cmd_reply =3D {};
+>> +=A0=A0=A0 long gup_rc =3D 0;
+>> +=A0=A0=A0 unsigned long i =3D 0;
+>> +=A0=A0=A0 struct ne_mem_region *ne_mem_region =3D NULL;
+>> +=A0=A0=A0 unsigned long nr_phys_contig_mem_regions =3D 0;
+>> +=A0=A0=A0 unsigned long nr_pinned_pages =3D 0;
+>> +=A0=A0=A0 struct page **phys_contig_mem_regions =3D NULL;
+>> +=A0=A0=A0 int rc =3D -EINVAL;
+>> +=A0=A0=A0 struct slot_add_mem_req slot_add_mem_req =3D {};
+>> +
+>> +=A0=A0=A0 rc =3D ne_sanity_check_user_mem_region(ne_enclave, mem_region=
+);
+>> +=A0=A0=A0 if (rc < 0)
+>> +=A0=A0=A0=A0=A0=A0=A0 return rc;
+>> +
+>> +=A0=A0=A0 ne_mem_region =3D kzalloc(sizeof(*ne_mem_region), GFP_KERNEL);
+>> +=A0=A0=A0 if (!ne_mem_region)
+>> +=A0=A0=A0=A0=A0=A0=A0 return -ENOMEM;
+>> +
+>> +=A0=A0=A0 /*
+>> +=A0=A0=A0=A0 * TODO: Update nr_pages value to handle contiguous virtual=
+ address
+>> +=A0=A0=A0=A0 * ranges mapped to non-contiguous physical regions. Hugetl=
+bfs =
+
+>> can give
+>> +=A0=A0=A0=A0 * 2 MiB / 1 GiB contiguous physical regions.
+>> +=A0=A0=A0=A0 */
+>> +=A0=A0=A0 ne_mem_region->nr_pages =3D mem_region->memory_size /
+>> +=A0=A0=A0=A0=A0=A0=A0 NE_MIN_MEM_REGION_SIZE;
+>> +
+>> +=A0=A0=A0 ne_mem_region->pages =3D kcalloc(ne_mem_region->nr_pages,
+>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 size=
+of(*ne_mem_region->pages),
+>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 GFP_=
+KERNEL);
+>> +=A0=A0=A0 if (!ne_mem_region->pages) {
+>> +=A0=A0=A0=A0=A0=A0=A0 kfree(ne_mem_region);
+>> +
+>> +=A0=A0=A0=A0=A0=A0=A0 return -ENOMEM;
+>
+> kfree(NULL) is a nop, so you can just set rc and goto free_mem_region =
+
+> here and below.
+
+Updated both return paths.
+
+>
+>> +=A0=A0=A0 }
+>> +
+>> +=A0=A0=A0 phys_contig_mem_regions =3D kcalloc(ne_mem_region->nr_pages,
+>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 sizeof(=
+*phys_contig_mem_regions),
+>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 GFP_KER=
+NEL);
+>> +=A0=A0=A0 if (!phys_contig_mem_regions) {
+>> +=A0=A0=A0=A0=A0=A0=A0 kfree(ne_mem_region->pages);
+>> +=A0=A0=A0=A0=A0=A0=A0 kfree(ne_mem_region);
+>> +
+>> +=A0=A0=A0=A0=A0=A0=A0 return -ENOMEM;
+>> +=A0=A0=A0 }
+>> +
+>> +=A0=A0=A0 /*
+>> +=A0=A0=A0=A0 * TODO: Handle non-contiguous memory regions received from=
+ user =
+
+>> space.
+>> +=A0=A0=A0=A0 * Hugetlbfs can give 2 MiB / 1 GiB contiguous physical reg=
+ions. =
+
+>> The
+>> +=A0=A0=A0=A0 * virtual address space can be seen as contiguous, althoug=
+h it is
+>> +=A0=A0=A0=A0 * mapped underneath to 2 MiB / 1 GiB physical regions e.g.=
+ 8 MiB
+>> +=A0=A0=A0=A0 * virtual address space mapped to 4 physically contiguous =
+
+>> regions of 2
+>> +=A0=A0=A0=A0 * MiB.
+>> +=A0=A0=A0=A0 */
+>> +=A0=A0=A0 do {
+>> +=A0=A0=A0=A0=A0=A0=A0 unsigned long tmp_nr_pages =3D ne_mem_region->nr_=
+pages -
+>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 nr_pinned_pages;
+>> +=A0=A0=A0=A0=A0=A0=A0 struct page **tmp_pages =3D ne_mem_region->pages +
+>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 nr_pinned_pages;
+>> +=A0=A0=A0=A0=A0=A0=A0 u64 tmp_userspace_addr =3D mem_region->userspace_=
+addr +
+>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 nr_pinned_pages * NE_MIN_MEM_REGION_S=
+IZE;
+>> +
+>> +=A0=A0=A0=A0=A0=A0=A0 gup_rc =3D get_user_pages(tmp_userspace_addr, tmp=
+_nr_pages,
+>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 FOLL_GET, tmp=
+_pages, NULL);
+>> +=A0=A0=A0=A0=A0=A0=A0 if (gup_rc < 0) {
+>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 rc =3D gup_rc;
+>> +
+>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 dev_err_ratelimited(ne_misc_dev.this_=
+device,
+>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 "=
+Error in gup [rc=3D%d]\n", rc);
+>> +
+>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 unpin_user_pages(ne_mem_region->pages=
+, nr_pinned_pages);
+>> +
+>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 goto free_mem_region;
+>> +=A0=A0=A0=A0=A0=A0=A0 }
+>> +
+>> +=A0=A0=A0=A0=A0=A0=A0 nr_pinned_pages +=3D gup_rc;
+>> +
+>> +=A0=A0=A0 } while (nr_pinned_pages < ne_mem_region->nr_pages);
+>
+> Can this deadlock the kernel? Shouldn't we rather return an error when =
+
+> we can't pin all pages?
+
+It shouldn't cause a deadlock, based on the return values:
+
+ > Returns either number of pages pinned (which may be less than the
+ > number requested), or an error. Details about the return value:
+ >
+ > -- If nr_pages is 0, returns 0.
+ > -- If nr_pages is >0, but no pages were pinned, returns -errno.
+ > -- If nr_pages is >0, and some pages were pinned, returns the number of
+ > pages pinned. Again, this may be less than nr_pages.
+
+
+But I can update the logic to have all or nothing.
+
+>
+>> +
+>> +=A0=A0=A0 /*
+>> +=A0=A0=A0=A0 * TODO: Update checks once physically contiguous regions a=
+re =
+
+>> collected
+>> +=A0=A0=A0=A0 * based on the user space address and get_user_pages() res=
+ults.
+>> +=A0=A0=A0=A0 */
+>> +=A0=A0=A0 for (i =3D 0; i < ne_mem_region->nr_pages; i++) {
+>> +=A0=A0=A0=A0=A0=A0=A0 if (!PageHuge(ne_mem_region->pages[i])) {
+>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 dev_err_ratelimited(ne_misc_dev.this_=
+device,
+>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 "=
+Not a hugetlbfs page\n");
+>> +
+>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 goto unpin_pages;
+>> +=A0=A0=A0=A0=A0=A0=A0 }
+>> +
+>> +=A0=A0=A0=A0=A0=A0=A0 if (huge_page_size(page_hstate(ne_mem_region->pag=
+es[i])) !=3D
+>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 NE_MIN_MEM_REGION_SIZE) {
+>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 dev_err_ratelimited(ne_misc_dev.this_=
+device,
+>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 "=
+Page size isn't 2 MiB\n");
+>
+> Why is a huge page size of >2MB a problem? Can't we just make =
+
+> huge_page_size() the ne mem slot size?
+
+It's not a problem, actually this is part of the TODO(s) from the =
+
+current function, to support contiguous regions larger than 2 MiB. It's =
+
+just that we started with 2 MiB. :)
+
+>
+>> +
+>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 goto unpin_pages;
+>> +=A0=A0=A0=A0=A0=A0=A0 }
+>> +
+>> +=A0=A0=A0=A0=A0=A0=A0 if (ne_enclave->numa_node !=3D
+>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 page_to_nid(ne_mem_region->pages[i]))=
+ {
+>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 dev_err_ratelimited(ne_misc_dev.this_=
+device,
+>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 "=
+Page isn't from NUMA node %d\n",
+>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 n=
+e_enclave->numa_node);
+>> +
+>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 goto unpin_pages;
+>
+> Is there a way to give user space hints on *why* things are going wrong?
+
+Yes, one option for the user space to have more insights is to have the =
+
+specific NE error codes you mentioned, so that we can improve the =
+
+experience even further.
+
+>
+>> +=A0=A0=A0=A0=A0=A0=A0 }
+>> +
+>> +=A0=A0=A0=A0=A0=A0=A0 /*
+>> +=A0=A0=A0=A0=A0=A0=A0=A0 * TODO: Update once handled non-contiguous mem=
+ory regions
+>> +=A0=A0=A0=A0=A0=A0=A0=A0 * received from user space.
+>> +=A0=A0=A0=A0=A0=A0=A0=A0 */
+>> +=A0=A0=A0=A0=A0=A0=A0 phys_contig_mem_regions[i] =3D ne_mem_region->pag=
+es[i];
+>> +=A0=A0=A0 }
+>> +
+>> +=A0=A0=A0 /*
+>> +=A0=A0=A0=A0 * TODO: Update once handled non-contiguous memory regions =
+received
+>> +=A0=A0=A0=A0 * from user space.
+>> +=A0=A0=A0=A0 */
+>> +=A0=A0=A0 nr_phys_contig_mem_regions =3D ne_mem_region->nr_pages;
+>> +
+>> +=A0=A0=A0 if ((ne_enclave->nr_mem_regions + nr_phys_contig_mem_regions)=
+ >
+>> +=A0=A0=A0=A0=A0=A0=A0 ne_enclave->max_mem_regions) {
+>> +=A0=A0=A0=A0=A0=A0=A0 dev_err_ratelimited(ne_misc_dev.this_device,
+>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 "Reached max =
+memory regions %lld\n",
+>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 ne_enclave->m=
+ax_mem_regions);
+>> +
+>> +=A0=A0=A0=A0=A0=A0=A0 goto unpin_pages;
+>> +=A0=A0=A0 }
+>> +
+>> +=A0=A0=A0 for (i =3D 0; i < nr_phys_contig_mem_regions; i++) {
+>> +=A0=A0=A0=A0=A0=A0=A0 u64 phys_addr =3D page_to_phys(phys_contig_mem_re=
+gions[i]);
+>> +
+>> +=A0=A0=A0=A0=A0=A0=A0 slot_add_mem_req.slot_uid =3D ne_enclave->slot_ui=
+d;
+>> +=A0=A0=A0=A0=A0=A0=A0 slot_add_mem_req.paddr =3D phys_addr;
+>> +=A0=A0=A0=A0=A0=A0=A0 /*
+>> +=A0=A0=A0=A0=A0=A0=A0=A0 * TODO: Update memory size of physical contigu=
+ous memory
+>> +=A0=A0=A0=A0=A0=A0=A0=A0 * region, in case of non-contiguous memory reg=
+ions received
+>> +=A0=A0=A0=A0=A0=A0=A0=A0 * from user space.
+>> +=A0=A0=A0=A0=A0=A0=A0=A0 */
+>> +=A0=A0=A0=A0=A0=A0=A0 slot_add_mem_req.size =3D NE_MIN_MEM_REGION_SIZE;
+>
+> Yeah, for now, just make it huge_page_size()! :)
+
+Yup, I'll handle this in order to have the option for other sizes, in =
+
+addition to 2 MiB e.g. 1 GiB for hugetlbfs.
+
+>
+>> +
+>> +=A0=A0=A0=A0=A0=A0=A0 rc =3D ne_do_request(ne_enclave->pdev, SLOT_ADD_M=
+EM,
+>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 &slot_add_mem_re=
+q, sizeof(slot_add_mem_req),
+>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 &cmd_reply, size=
+of(cmd_reply));
+>> +=A0=A0=A0=A0=A0=A0=A0 if (rc < 0) {
+>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 dev_err_ratelimited(ne_misc_dev.this_=
+device,
+>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 "=
+Error in slot add mem [rc=3D%d]\n",
+>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 r=
+c);
+>> +
+>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 /* TODO: Only unpin memory regions no=
+t added. */
+>
+> Are we sure we're not creating an unusable system here?
+
+The way the requests to the PCI device are structured is that we cannot =
+
+get back a memory region / CPU, once added, till the enclave is =
+
+terminated. Let's say there is an error in the remaining logic from the =
+
+ioctl, after the region is successfully added, then the memory region =
+
+can be given back to the primary / parent VM once the enclave =
+
+termination (including slot free) is done.
+
+We can either have the logic handle one contiguous region per ioctl call =
+
+(user space gives a memory region that is backed by a single contiguous =
+
+physical memory region) or have a for loop to go through all contiguous =
+
+regions (user space gives a memory region that is backed by a set of =
+
+(smaller) contiguous physical memory regions). In the second case, if a =
+
+request to the NE PCI device fails, already added memory regions can be =
+
+given back only on slot free, triggered by the enclave termination, when =
+
+closing the enclave fd.
+
+>
+>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 goto unpin_pages;
+>> +=A0=A0=A0=A0=A0=A0=A0 }
+>> +
+>> +=A0=A0=A0=A0=A0=A0=A0 ne_enclave->mem_size +=3D slot_add_mem_req.size;
+>> +=A0=A0=A0=A0=A0=A0=A0 ne_enclave->nr_mem_regions++;
+>> +
+>> +=A0=A0=A0=A0=A0=A0=A0 memset(&slot_add_mem_req, 0, sizeof(slot_add_mem_=
+req));
+>> +=A0=A0=A0=A0=A0=A0=A0 memset(&cmd_reply, 0, sizeof(cmd_reply));
+>
+> If you define the variables in the for loop scope, you don't need to =
+
+> manually zero them again.
+
+Updated to have the variables in the loop instead.
+
+Thank you.
+
+Andra
+
+>
+>> +=A0=A0=A0 }
+>> +
+>> +=A0=A0=A0 list_add(&ne_mem_region->mem_region_list_entry,
+>> +=A0=A0=A0=A0=A0=A0=A0=A0 &ne_enclave->mem_regions_list);
+>> +
+>> +=A0=A0=A0 kfree(phys_contig_mem_regions);
+>> +
+>> +=A0=A0=A0 return 0;
+>> +
+>> +unpin_pages:
+>> +=A0=A0=A0 unpin_user_pages(ne_mem_region->pages, ne_mem_region->nr_page=
+s);
+>> +free_mem_region:
+>> +=A0=A0=A0 kfree(phys_contig_mem_regions);
+>> +=A0=A0=A0 kfree(ne_mem_region->pages);
+>> +=A0=A0=A0 kfree(ne_mem_region);
+>> +
+>> +=A0=A0=A0 return rc;
+>> +}
+>> +
+>> =A0 static long ne_enclave_ioctl(struct file *file, unsigned int cmd,
+>> =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 unsigned long arg)
+>> =A0 {
+>> @@ -561,6 +788,36 @@ static long ne_enclave_ioctl(struct file *file, =
+
+>> unsigned int cmd,
+>> =A0=A0=A0=A0=A0=A0=A0=A0=A0 return 0;
+>> =A0=A0=A0=A0=A0 }
+>> =A0 +=A0=A0=A0 case NE_SET_USER_MEMORY_REGION: {
+>> +=A0=A0=A0=A0=A0=A0=A0 struct ne_user_memory_region mem_region =3D {};
+>> +=A0=A0=A0=A0=A0=A0=A0 int rc =3D -EINVAL;
+>> +
+>> +=A0=A0=A0=A0=A0=A0=A0 if (copy_from_user(&mem_region, (void *)arg,
+>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 sizeof(mem_regio=
+n))) {
+>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 dev_err_ratelimited(ne_misc_dev.this_=
+device,
+>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 "=
+Error in copy from user\n");
+>> +
+>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 return -EFAULT;
+>> +=A0=A0=A0=A0=A0=A0=A0 }
+>> +
+>> +=A0=A0=A0=A0=A0=A0=A0 mutex_lock(&ne_enclave->enclave_info_mutex);
+>> +
+>> +=A0=A0=A0=A0=A0=A0=A0 if (ne_enclave->state !=3D NE_STATE_INIT) {
+>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 dev_err_ratelimited(ne_misc_dev.this_=
+device,
+>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 "=
+Enclave isn't in init state\n");
+>> +
+>> + mutex_unlock(&ne_enclave->enclave_info_mutex);
+>> +
+>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 return -EINVAL;
+>> +=A0=A0=A0=A0=A0=A0=A0 }
+>> +
+>> +=A0=A0=A0=A0=A0=A0=A0 rc =3D ne_set_user_memory_region_ioctl(ne_enclave=
+, &mem_region);
+>> +
+>> +=A0=A0=A0=A0=A0=A0=A0 mutex_unlock(&ne_enclave->enclave_info_mutex);
+>> +
+>> +=A0=A0=A0=A0=A0=A0=A0 return rc;
+>> +=A0=A0=A0 }
+>> +
+>> =A0=A0=A0=A0=A0 default:
+>> =A0=A0=A0=A0=A0=A0=A0=A0=A0 return -ENOTTY;
+>> =A0=A0=A0=A0=A0 }
+>>
+
+
+
+
+Amazon Development Center (Romania) S.R.L. registered office: 27A Sf. Lazar=
+ Street, UBC5, floor 2, Iasi, Iasi County, 700045, Romania. Registered in R=
+omania. Registration number J22/2621/2005.
 
