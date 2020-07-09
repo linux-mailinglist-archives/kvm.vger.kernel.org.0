@@ -2,323 +2,265 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DC58421963E
-	for <lists+kvm@lfdr.de>; Thu,  9 Jul 2020 04:26:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A436421965A
+	for <lists+kvm@lfdr.de>; Thu,  9 Jul 2020 04:53:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726196AbgGIC0o (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 8 Jul 2020 22:26:44 -0400
-Received: from mga12.intel.com ([192.55.52.136]:41429 "EHLO mga12.intel.com"
+        id S1726124AbgGICxM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 8 Jul 2020 22:53:12 -0400
+Received: from mga11.intel.com ([192.55.52.93]:4811 "EHLO mga11.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726082AbgGIC0n (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 8 Jul 2020 22:26:43 -0400
-IronPort-SDR: w3pgnTQuUb2vQg0YWdYtjBWwhJfK19cs5OW+ftLwQr7csngVrBvVhoZKahPT2m4ek6zyFHSt7q
- 69rxw/9PcHag==
-X-IronPort-AV: E=McAfee;i="6000,8403,9676"; a="127514365"
+        id S1726117AbgGICxL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 8 Jul 2020 22:53:11 -0400
+IronPort-SDR: 42ujUCZGzT/g6WvCP0n9ghTdzlz+si6GaBOYwOOmBVXPWIySY3LzaZlPZxo2+7yEHFtWDJSMfX
+ sE5X6NqqD7YQ==
+X-IronPort-AV: E=McAfee;i="6000,8403,9676"; a="146022053"
 X-IronPort-AV: E=Sophos;i="5.75,330,1589266800"; 
-   d="scan'208";a="127514365"
+   d="scan'208";a="146022053"
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Jul 2020 19:26:30 -0700
-IronPort-SDR: gwuSn3Pwpce2WIOHzygJlWmUvO2/0+xcqFtQT9jpyen83ODtbIg5VNePPXeJW3AgEihJzI7cLR
- 5tuYptC5D54A==
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Jul 2020 19:53:07 -0700
+IronPort-SDR: gzZb+MULQfP+oC0oX9xK2pU2/2NpBH5mU2jpK8m4U4G+uZYliRR41PSDl5qbmsQr5IBbR8eiv4
+ UCGbcIt4mDmA==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.75,330,1589266800"; 
-   d="scan'208";a="280136501"
-Received: from orsmsx110.amr.corp.intel.com ([10.22.240.8])
-  by orsmga003.jf.intel.com with ESMTP; 08 Jul 2020 19:26:29 -0700
-Received: from ORSEDG002.ED.cps.intel.com (10.7.248.5) by
- ORSMSX110.amr.corp.intel.com (10.22.240.8) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Wed, 8 Jul 2020 19:26:29 -0700
-Received: from NAM04-BN3-obe.outbound.protection.outlook.com (104.47.46.55) by
- edgegateway.intel.com (134.134.137.101) with Microsoft SMTP Server (TLS) id
- 14.3.439.0; Wed, 8 Jul 2020 19:26:29 -0700
+   d="scan'208";a="358292758"
+Received: from orsmsx101.amr.corp.intel.com ([10.22.225.128])
+  by orsmga001.jf.intel.com with ESMTP; 08 Jul 2020 19:53:07 -0700
+Received: from ORSEDG001.ED.cps.intel.com (10.7.248.4) by
+ ORSMSX101.amr.corp.intel.com (10.22.225.128) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Wed, 8 Jul 2020 19:53:07 -0700
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (104.47.57.171)
+ by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Wed, 8 Jul 2020 19:53:07 -0700
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=dG0vpOs/+iOBev509u/BKO1TcM6QJ1VIv2sLFQYz7DHmyByZwzEmVaxQlu90kbVPn89Ny10LXcV3WIDybeXlRo13W+pqV5ievzt4uas8LjUP1r/nCpL/B30elV9ZM7ASGAXOpghx1pvaCBvX3GDz2qzovirR90rnVoqWajw0euzppkzoKMYuFufyC3jdrqLh6OJUVIIViYS9NVQ1iYUyDbNChkI4hLO5WUciYiaDoEEKgAUgrSM0nOdO9WkXH5jQyk+e5sdSSGlJmeoDgv1AjUudY9097D4knt90p6lgj96ROvZDYqDJuEBZ67ib6OrUUx6B3FlFtyYwEQZ6ZORaww==
+ b=HWLMz1d21Vq+QaqRA8qtmjzDp77Wg2xGDzqx+ijgH8dBJYQJ0pxy5QEY7MKa+cfPJhFUThzmIP1eTAAkCgd3crBLXeutEqR+zC5sPuQjursaT6RguTTCsZUec7W+E2/RdXS7/+zzlHy03DvRNjLkl8e77MS2IjH1B7Vz9S2J9KaNxdVe+N9PgDV46vt6t5ROCI83fBkiopkc1HXK51GzVyAgM0xR+f0XlDlAjfMkEpR5zkLJ+b8RqDMuSlNKtkpVRAcG+FxshFGQUNf7CcHWLs7IMvMvKHi9mbSb4/Ls6hgFRfyX3mfcceJFczhl9K3WM325J2jAbaK2oE53JZKriA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=y66Vvd4b91mstNByeV2FEknLewHNVUkeNcCHHOszvHs=;
- b=bET5C0qs04TsCkjI8zuz4DYMUmTKL9ZwvGTvWY/ESB4yQgcVCvI0Ljk+rRMqR3SOGtPp7euvAHZAftnn7D9NVAy35w/qL4pa2uiq3+8PzZOlbQcWPanv20nHH4+mkeRhMnB+sF9DsO4GyOcR/NclNQUtcnFwrX4Ob1LhZoiOS6Rf4ANNsB5qnAAu8/ERYiz6PP6DUTCRM4mlqKamE2nvjFWXuOg2IfqJPKdMMI8IoWcPUnd4cKkiKrT8oe19dchdDeCGiWsKlnrnEYInzXqLRaUQeK0TNomzOTuf7cakpj3RPiVuBLwNkvhJF06XoTuH35z6GMNLqFEbWEdlS/7VzQ==
+ bh=vovaR95VfklXkBAQrt0sd5pFvJt2GpTSdXRvIrgyKos=;
+ b=TLkiJODM32xb8ojozaES4+YwJqYEsGJLrd/XGu6GW9r1faEpfdN5JYClrLHL5cyQJz0uU4EX0wN89qC+DKVv6e4lV7gZEHbExn3E7U2il3yDiRxFgZwNKOgDEWlUH1EmFPwVD+AK7aCgi/Oo3ExH3VviWhVjzAf2XmaoVWzVac42YdQhGdMFVUNgMUYnNbBHh4puPNG5wGNyHyazE7mPrgVx3J7cz2FFfYhlgWJI/3Z3KKlZYItp+TclcqNDUr/PaBmyKyOkJ7xFXvIqFKvLXWvHlPnx3edAIZUA2i0YJvN2mCAj8B0/rr8xHrXG0Y6XkQGo3/1NqxBw7tu+BxKoGw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
  dkim=pass header.d=intel.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=intel.onmicrosoft.com;
  s=selector2-intel-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=y66Vvd4b91mstNByeV2FEknLewHNVUkeNcCHHOszvHs=;
- b=bByA7ZYIUA91xUJe/OFwwTt+SaMvxUULiO7MH/CQHd6CoC+mTqv2AtJbQ+LqihbosNYuCLAdVXmHSpHlMB59xYnK1MXkYGBkRmDFy6wgaMYhlzWYVZYmTCNRm0ap5EtAQU3ptbj/pKfRMLPhJBcTNQ8DhlULEn9lAbKTQuvzG/U=
-Received: from DM5PR11MB1435.namprd11.prod.outlook.com (2603:10b6:4:7::18) by
- DM6PR11MB3994.namprd11.prod.outlook.com (2603:10b6:5:193::19) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.3153.20; Thu, 9 Jul 2020 02:26:27 +0000
-Received: from DM5PR11MB1435.namprd11.prod.outlook.com
- ([fe80::9002:97a2:d8c0:8364]) by DM5PR11MB1435.namprd11.prod.outlook.com
- ([fe80::9002:97a2:d8c0:8364%10]) with mapi id 15.20.3174.021; Thu, 9 Jul 2020
- 02:26:27 +0000
-From:   "Liu, Yi L" <yi.l.liu@intel.com>
-To:     "Tian, Kevin" <kevin.tian@intel.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        "jacob.jun.pan@linux.intel.com" <jacob.jun.pan@linux.intel.com>
-CC:     "eric.auger@redhat.com" <eric.auger@redhat.com>,
-        "baolu.lu@linux.intel.com" <baolu.lu@linux.intel.com>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "Raj, Ashok" <ashok.raj@intel.com>,
-        "Tian, Jun J" <jun.j.tian@intel.com>,
-        "Sun, Yi Y" <yi.y.sun@intel.com>,
-        "jean-philippe@linaro.org" <jean-philippe@linaro.org>,
-        "peterx@redhat.com" <peterx@redhat.com>,
-        "Wu, Hao" <hao.wu@intel.com>,
-        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: RE: [PATCH v3 06/14] vfio/type1: Add VFIO_IOMMU_PASID_REQUEST
- (alloc/free)
-Thread-Topic: [PATCH v3 06/14] vfio/type1: Add VFIO_IOMMU_PASID_REQUEST
- (alloc/free)
-Thread-Index: AQHWSgRRzB2G/Oy5QEmxCHQWFS0FB6j02KQAgACUCyCAB/5SUIAAxDYAgABLnwCAABmKAIAAAO4wgAAFFYCAAAD78A==
-Date:   Thu, 9 Jul 2020 02:26:27 +0000
-Message-ID: <DM5PR11MB143577F0C21EDB82B82EEB35C3640@DM5PR11MB1435.namprd11.prod.outlook.com>
-References: <1592988927-48009-1-git-send-email-yi.l.liu@intel.com>
-        <1592988927-48009-7-git-send-email-yi.l.liu@intel.com>
-        <20200702151832.048b44d1@x1.home>
-        <CY4PR11MB1432DD97F44EB8AA5CCC87D8C36A0@CY4PR11MB1432.namprd11.prod.outlook.com>
-        <DM5PR11MB1435B159DA10C8301B89A6F0C3670@DM5PR11MB1435.namprd11.prod.outlook.com>
- <20200708135444.4eac48a4@x1.home>
- <DM5PR11MB14358A8797E3C02E50B37FFEC3640@DM5PR11MB1435.namprd11.prod.outlook.com>
- <MWHPR11MB16456D12135AA36BA16CE4208C640@MWHPR11MB1645.namprd11.prod.outlook.com>
- <DM5PR11MB14357DC99EFCDE7E02944E2EC3640@DM5PR11MB1435.namprd11.prod.outlook.com>
- <MWHPR11MB1645F822D9267005AE5BCE528C640@MWHPR11MB1645.namprd11.prod.outlook.com>
-In-Reply-To: <MWHPR11MB1645F822D9267005AE5BCE528C640@MWHPR11MB1645.namprd11.prod.outlook.com>
+ bh=vovaR95VfklXkBAQrt0sd5pFvJt2GpTSdXRvIrgyKos=;
+ b=wkryGZ4FQd0dbG+pn+eCvO0lnpBdg0O2TkSp80mjKEnUvlOChILwMS1PL13pOvPXuOHHd3qwMOaZgpCs1HUPwMN/kw5uFRbzdVNwt1JurXB7gl+/9RVkjk9tse8ciTAWpB1lFblk/TP4+BRucfO8VvrfI1KK1M3KYegXNNGm0pc=
+Received: from MWHPR11MB1645.namprd11.prod.outlook.com (2603:10b6:301:b::12)
+ by MW3PR11MB4523.namprd11.prod.outlook.com (2603:10b6:303:5b::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3153.22; Thu, 9 Jul
+ 2020 02:53:05 +0000
+Received: from MWHPR11MB1645.namprd11.prod.outlook.com
+ ([fe80::9864:e0cb:af36:6feb]) by MWHPR11MB1645.namprd11.prod.outlook.com
+ ([fe80::9864:e0cb:af36:6feb%5]) with mapi id 15.20.3174.022; Thu, 9 Jul 2020
+ 02:53:05 +0000
+From:   "Tian, Kevin" <kevin.tian@intel.com>
+To:     Alex Williamson <alex.williamson@redhat.com>
+CC:     Zhenyu Wang <zhenyuw@linux.intel.com>,
+        "intel-gvt-dev@lists.freedesktop.org" 
+        <intel-gvt-dev@lists.freedesktop.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Subject: RE: [PATCH v3 0/2] VFIO mdev aggregated resources handling
+Thread-Topic: [PATCH v3 0/2] VFIO mdev aggregated resources handling
+Thread-Index: AQHWDWq7bB5+TEBrpEWwuv/xNBM+XKj9T7IAgAAdgwCAAEhYIIAA4D8AgAB97VA=
+Date:   Thu, 9 Jul 2020 02:53:05 +0000
+Message-ID: <MWHPR11MB1645C5033CB813EBD72CE4FD8C640@MWHPR11MB1645.namprd11.prod.outlook.com>
+References: <20200326054136.2543-1-zhenyuw@linux.intel.com>
+        <20200408055824.2378-1-zhenyuw@linux.intel.com>
+        <MWHPR11MB1645CC388BF45FD2E6309C3C8C660@MWHPR11MB1645.namprd11.prod.outlook.com>
+        <20200707190634.4d9055fe@x1.home>
+        <MWHPR11MB16454BF5C1BF4D5D22F0B2B38C670@MWHPR11MB1645.namprd11.prod.outlook.com>
+ <20200708124806.058e33d9@x1.home>
+In-Reply-To: <20200708124806.058e33d9@x1.home>
 Accept-Language: en-US
 Content-Language: en-US
 X-MS-Has-Attach: 
 X-MS-TNEF-Correlator: 
-dlp-reaction: no-action
 dlp-version: 11.2.0.6
 dlp-product: dlpe-windows
-authentication-results: intel.com; dkim=none (message not signed)
- header.d=none;intel.com; dmarc=none action=none header.from=intel.com;
-x-originating-ip: [117.169.230.114]
+dlp-reaction: no-action
+authentication-results: redhat.com; dkim=none (message not signed)
+ header.d=none;redhat.com; dmarc=none action=none header.from=intel.com;
+x-originating-ip: [192.198.147.196]
 x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: a815442c-2bb1-429a-c856-08d823af7b98
-x-ms-traffictypediagnostic: DM6PR11MB3994:
-x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <DM6PR11MB399494EEEAA835DDA3C621B6C3640@DM6PR11MB3994.namprd11.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:9508;
+x-ms-office365-filtering-correlation-id: 2ca3cd5b-83ca-46a0-f923-08d823b33454
+x-ms-traffictypediagnostic: MW3PR11MB4523:
+x-microsoft-antispam-prvs: <MW3PR11MB45237EE58F6BF7B4486F94838C640@MW3PR11MB4523.namprd11.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:7691;
 x-forefront-prvs: 04599F3534
 x-ms-exchange-senderadcheck: 1
 x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: 0jbnRle7eYJNc6jl2UuENzvCmEHtSa+tbaroimVUz0nEGO1eQ9s43OXPQW00my/FftwqbTb6KYPno37XtzeEGB+C1u5aDaps2VPBXQTj73OFSp+pkBCQloVT2yd1XOGnGb0GkKckmim/z/WpS5P6TFrnkkDp11WCIvg9FHBToCVagTEoGxjpnaFlO3mi0aKpuMCIWZHmA7XiOXkBm3DLavHU56qeTiNdyPKs8O6blLbaiAkPAklwUMfFynZ2kufB9eJHUvNSwRbI4k1k5p/7DDMeI+21Uf6/6SP5RVT9eyeobRg/WFsZQNJqGpjn7X6zTidDLv04ViCPY/IqF3tf3w==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM5PR11MB1435.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFTY:;SFS:(4636009)(136003)(366004)(396003)(39860400002)(346002)(376002)(4326008)(186003)(54906003)(86362001)(110136005)(2906002)(8936002)(8676002)(9686003)(55016002)(316002)(7416002)(76116006)(33656002)(6506007)(26005)(478600001)(83380400001)(66556008)(64756008)(7696005)(66476007)(71200400001)(52536014)(66946007)(5660300002)(66446008);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata: rUU6cAC1nCz6+2K/cNWtzZ+DOCYL7zTgVMgyE+cuNWYDUT/yMSz7NRGgywbX0Iq/0IGPRWdDCDoN8u+p0YzQRg8jsq/3KT8gDiGt4DCs26SmuPr6yLG/UoCut72qHHpGrNPMxeQPOVojz07Od511QIDh2e7naBxAt3Wr/OqQPgUEL6rZ/cYcU6AmlWM9armi5b0dFAfh58mdH+h062ycKfhfL2Q5/rEfStD/0/VPkio0Khl4S4eVDSbSwjUHiski+m31pr3X5RzLJTxhfQQkTyQ6KGQwlI0X51OadRhsQdfAFhmk974lc6iBAxXLHF8VWU9hczYU4fcq0SB0+LmF0OJuT/Xj7bdDstvEDEJhnuf1PqsRnsADQPwhVH1MqeGOKBsvBbwiyYLRcycCLR1X7z1jve5H3f1yhd3wkwrb7GPlked5kbWRKpW8D03mzL8jh3b+gFRmMpMH/YmQDm6A+7/iwn7BUjW3+n1yXUtYWoF3ss1Nj7LhG+4Hshpg2rIl
+x-microsoft-antispam-message-info: QoWQupW0c5KuqIPSvR1JFnXV5ASv+EjwHqg7dv45kMupZtCTVZBI7a4vszw2rpoV7rnSzB683F5tYsRTbs4FD3sB4+H76Soprj7gBq/CurcxXFogltn7g166Xd/oEGqCxMK5OUBBuQeRFm+y0gW1A6l4R2hZVg7ZfoYMqExn+Umv4HR6Fc8yCZPn1m5IAYMA+C+pR4zN5bRmWLLlNY5zgQXjRkTvZrvPjGoYQc2VDUVAj97qG+PXeY5lpyOcFSI/UaUwaRF28rGidX7RxXI7gvR5brdnqS/xiauxuAU/9rPXyTZjY9KQ5C2VA/ij1g+EbLH33jU3qz7u1GXxogQm4A==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MWHPR11MB1645.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFTY:;SFS:(4636009)(396003)(39860400002)(136003)(376002)(346002)(366004)(66476007)(6506007)(8676002)(52536014)(76116006)(7696005)(55016002)(9686003)(2906002)(6916009)(64756008)(71200400001)(66446008)(186003)(66556008)(66946007)(26005)(86362001)(83380400001)(478600001)(4326008)(8936002)(316002)(54906003)(5660300002)(33656002);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata: II91g3UkVaoTr/rUNcBimXhYwv3zziFR3IZFFjZmrEJ5tu0Gws/kHg92bVFdYRTCuTMy5aRHuWh3yKD0HvJw0U5Nm4YqfpMBacJ1AeJcLUKE5bAxZfZkl89d2hsIqMvkkkjAxxjwfy6wff1jvbg/WipvhL4UTN7cSO3282wQ08hMOoOithr4NBE4Kqg/cGgEfoj6u2bBXY82+mZF1V+wqZZxqp7qtIqz2Xy+GpiA+I5kW4bgl0x8TYsZsAhi9ZO/EFMP+abycJts92p/a8y6mSuM2eim1jz78wmrbit+cIhW+AKZZmVvCwX1MFmyxtTQTItnvwuiCXNi+zj3r1vzjwWX2eS3MqQDSf2qDvJ0mLDTT3U4YTpj+eSeM/SGoSyCfzbvsOQYB72iKZJFDMidGAlV+csiEHGnYaO/FbF2eU/QFVU8JPyOnW8d2qS466SmAvVRC3UgLXkQ0nfOLq7uHQHETZXqnPigEq5QdGzOkagXStYbfjXyblNeizRLlQFT
+x-ms-exchange-transport-forked: True
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: DM5PR11MB1435.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: a815442c-2bb1-429a-c856-08d823af7b98
-X-MS-Exchange-CrossTenant-originalarrivaltime: 09 Jul 2020 02:26:27.1385
+X-MS-Exchange-CrossTenant-AuthSource: MWHPR11MB1645.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 2ca3cd5b-83ca-46a0-f923-08d823b33454
+X-MS-Exchange-CrossTenant-originalarrivaltime: 09 Jul 2020 02:53:05.5078
  (UTC)
 X-MS-Exchange-CrossTenant-fromentityheader: Hosted
 X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
 X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: HiZrSvREyEPajJdFQTWEpvlxpZF4V2Z30oshBkGOiDcEIB5r9FUSjcpbqwNYG/2rLi216inLB/bMwik5+jagcQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR11MB3994
+X-MS-Exchange-CrossTenant-userprincipalname: 29COO4KPWZiWXmINSy8eaJSB4EQ15cxkow2mjuAla52jZJGv2VxMj5Zv23o3mzOizNy1IcbGJYR1dFm0n3MODg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW3PR11MB4523
 X-OriginatorOrg: intel.com
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Kevin,
-
-> From: Tian, Kevin <kevin.tian@intel.com>
-> Sent: Thursday, July 9, 2020 10:18 AM
+> From: Alex Williamson <alex.williamson@redhat.com>
+> Sent: Thursday, July 9, 2020 2:48 AM
 >=20
-> > From: Liu, Yi L <yi.l.liu@intel.com>
-> > Sent: Thursday, July 9, 2020 10:08 AM
-> >
-> > Hi Kevin,
-> >
-> > > From: Tian, Kevin <kevin.tian@intel.com>
-> > > Sent: Thursday, July 9, 2020 9:57 AM
-> > >
-> > > > From: Liu, Yi L <yi.l.liu@intel.com>
-> > > > Sent: Thursday, July 9, 2020 8:32 AM
-> > > >
-> > > > Hi Alex,
-> > > >
-> > > > > Alex Williamson <alex.williamson@redhat.com>
-> > > > > Sent: Thursday, July 9, 2020 3:55 AM
-> > > > >
-> > > > > On Wed, 8 Jul 2020 08:16:16 +0000
-> > > > > "Liu, Yi L" <yi.l.liu@intel.com> wrote:
-> > > > >
-> > > > > > Hi Alex,
-> > > > > >
-> > > > > > > From: Liu, Yi L < yi.l.liu@intel.com>
-> > > > > > > Sent: Friday, July 3, 2020 2:28 PM
-> > > > > > >
-> > > > > > > Hi Alex,
-> > > > > > >
-> > > > > > > > From: Alex Williamson <alex.williamson@redhat.com>
-> > > > > > > > Sent: Friday, July 3, 2020 5:19 AM
-> > > > > > > >
-> > > > > > > > On Wed, 24 Jun 2020 01:55:19 -0700 Liu Yi L
-> > > > > > > > <yi.l.liu@intel.com> wrote:
-> > > > > > > >
-> > > > > > > > > This patch allows user space to request PASID allocation/=
-free,
-> > e.g.
-> > > > > > > > > when serving the request from the guest.
-> > > > > > > > >
-> > > > > > > > > PASIDs that are not freed by userspace are automatically
-> > > > > > > > > freed
-> > > > when
-> > > > > > > > > the IOASID set is destroyed when process exits.
-> > > > > > [...]
-> > > > > > > > > +static int vfio_iommu_type1_pasid_request(struct vfio_io=
-mmu
-> > > > *iommu,
-> > > > > > > > > +					  unsigned long arg)
-> > > > > > > > > +{
-> > > > > > > > > +	struct vfio_iommu_type1_pasid_request req;
-> > > > > > > > > +	unsigned long minsz;
-> > > > > > > > > +
-> > > > > > > > > +	minsz =3D offsetofend(struct
-> vfio_iommu_type1_pasid_request,
-> > > > > range);
-> > > > > > > > > +
-> > > > > > > > > +	if (copy_from_user(&req, (void __user *)arg, minsz))
-> > > > > > > > > +		return -EFAULT;
-> > > > > > > > > +
-> > > > > > > > > +	if (req.argsz < minsz || (req.flags &
-> > > > > ~VFIO_PASID_REQUEST_MASK))
-> > > > > > > > > +		return -EINVAL;
-> > > > > > > > > +
-> > > > > > > > > +	if (req.range.min > req.range.max)
-> > > > > > > >
-> > > > > > > > Is it exploitable that a user can spin the kernel for a lon=
-g
-> > > > > > > > time in the case of a free by calling this with [0, MAX_UIN=
-T]
-> > > > > > > > regardless of their
-> > > > > actual
-> > > > > > > allocations?
-> > > > > > >
-> > > > > > > IOASID can ensure that user can only free the PASIDs allocate=
-d
-> > > > > > > to the
-> > > > user.
-> > > > > but
-> > > > > > > it's true, kernel needs to loop all the PASIDs within the ran=
-ge
-> > > > > > > provided by user.
-> > > > > it
-> > > > > > > may take a long time. is there anything we can do? one thing =
-may
-> > > > > > > limit
-> > > > the
-> > > > > range
-> > > > > > > provided by user?
-> > > > > >
-> > > > > > thought about it more, we have per-VM pasid quota (say 1000), s=
-o
-> > > > > > even if user passed down [0, MAX_UNIT], kernel will only loop t=
-he
-> > > > > > 1000 pasids at most. do you think we still need to do something=
- on it?
-> > > > >
-> > > > > How do you figure that?  vfio_iommu_type1_pasid_request() accepts
-> > > > > the user's min/max so long as (max > min) and passes that to
-> > > > > vfio_iommu_type1_pasid_free(), then to vfio_pasid_free_range()
-> > > > > which loops as:
-> > > > >
-> > > > > 	ioasid_t pasid =3D min;
-> > > > > 	for (; pasid <=3D max; pasid++)
-> > > > > 		ioasid_free(pasid);
-> > > > >
-> > > > > A user might only be able to allocate 1000 pasids, but apparently
-> > > > > they can ask to free all they want.
-> > > > >
-> > > > > It's also not obvious to me that calling ioasid_free() is only
-> > > > > allowing the user to free their own passid.  Does it?  It would b=
-e a
-> > > > > pretty
-> > >
-> > > Agree. I thought ioasid_free should at least carry a token since the =
-user
-> > space is
-> > > only allowed to manage PASIDs in its own set...
-> > >
-> > > > > gaping hole if a user could free arbitrary pasids.  A r-b tree of
-> > > > > passids might help both for security and to bound spinning in a l=
-oop.
-> > > >
-> > > > oh, yes. BTW. instead of r-b tree in VFIO, maybe we can add an
-> > > > ioasid_set parameter for ioasid_free(), thus to prevent the user fr=
-om
-> > > > freeing PASIDs that doesn't belong to it. I remember Jacob mentione=
-d it
-> > before.
-> > > >
-> > >
-> > > check current ioasid_free:
-> > >
-> > >         spin_lock(&ioasid_allocator_lock);
-> > >         ioasid_data =3D xa_load(&active_allocator->xa, ioasid);
-> > >         if (!ioasid_data) {
-> > >                 pr_err("Trying to free unknown IOASID %u\n", ioasid);
-> > >                 goto exit_unlock;
-> > >         }
-> > >
-> > > Allow an user to trigger above lock paths with MAX_UINT times might s=
-till
-> > be bad.
-> >
-> > yeah, how about the below two options:
-> >
-> > - comparing the max - min with the quota before calling ioasid_free().
-> >   If max - min > current quota of the user, then should fail it. If
-> >   max - min < quota, then call ioasid_free() one by one. still trigger
-> >   the above lock path with quota times.
+> On Wed, 8 Jul 2020 06:31:00 +0000
+> "Tian, Kevin" <kevin.tian@intel.com> wrote:
 >=20
-> This is definitely wrong. [min, max] is about the range of the PASID valu=
-e,
-> while quota is about the number of allocated PASIDs. It's a bit weird to
-> mix two together.
-
-got it.
-
-> btw what is the main purpose of allowing batch PASID
-> free requests? Can we just simplify to allow one PASID in each free just
-> like how is it done in allocation path?
-
-it's an intention to reuse the [min, max] range as allocation path. current=
-ly,
-we don't have such request as far as I can see.
-
+> > > From: Alex Williamson <alex.williamson@redhat.com>
+> > > Sent: Wednesday, July 8, 2020 9:07 AM
+> > >
+> > > On Tue, 7 Jul 2020 23:28:39 +0000
+> > > "Tian, Kevin" <kevin.tian@intel.com> wrote:
+> > >
+> > > > Hi, Alex,
+> > > >
+> > > > Gentle ping... Please let us know whether this version looks good.
+> > >
+> > > I figured this is entangled with the versioning scheme.  There are
+> > > unanswered questions about how something that assumes a device of a
+> > > given type is software compatible to another device of the same type
+> > > handles aggregation and how the type class would indicate compatibili=
+ty
+> > > with an aggregated instance.  Thanks,
+> > >
 > >
-> > - pass the max and min to ioasid_free(), let ioasid_free() decide. shou=
-ld
-> >   be able to avoid trigger the lock multiple times, and ioasid has have=
- a
-> >   track on how may PASIDs have been allocated, if max - min is larger t=
-han
-> >   the allocated number, should fail anyway.
+> > Yes, this open is an interesting topic. I didn't closely follow the ver=
+sioning
+> > scheme discussion. Below is some preliminary thought in my mind:
+> >
+> > --
+> > First, let's consider migrating an aggregated instance:
+> >
+> > A conservative policy is to check whether the compatible type is suppor=
+ted
+> > on target device and whether available instances under that type can
+> afford
+> > the ask of the aggregated instance. Compatibility check in this scheme =
+is
+> > separated from aggregation check, then no change is required to the
+> current
+> > versioning interface.
 >=20
-> What about Alex's r-b tree suggestion? Is there any downside in you mind?
+> How many features, across how many attributes is an administrative tool
+> supposed to check for compatibility?  ie. if we add an 'aggregation'
+> feature now and 'translucency' feature next year, with new sysfs
+> attributes and creation options, won't that break this scheme?  I'm not
+> willing to assume aggregation is the sole new feature we will ever add,
+> therefore we don't get to make it a special case without a plan for how
+> the next special case will be integrated.
 
-no downside, I was just wanting to reuse the tracks in ioasid_set. I can ad=
-d
-a r-b for allocated PASIDs and find the PASIDs in the r-b tree only do free
-for the PASIDs found in r-b tree, others in the range would be ignored.
-does it look good?
+Got you. I thought aggregation is special since it is purely about linear
+resource adjustment w/o changing the feature set of the instance, thus
+reasonable to get special handling in management stack which needs
+to understand this attribute anyway. But I agree that it's difficult to=20
+predict the future and other special cases...
 
-Regards,
-Yi Liu
+>=20
+> We also can't even seem to agree that type is a necessary requirement
+> for compatibility.  Your discussion below of a type-A, which is
+> equivalent to a type-B w/ aggregation set to some value is an example
+> of this.  We might also have physical devices with extensions to
+> support migration.  These could possibly be compatible with full mdev
+> devices.  We have no idea how an administrative tool would discover
+> this other than an exhaustive search across every possible target.
+> That's ugly but feasible when considering a single target host, but
+> completely untenable when considering a datacenter.
 
+If exhaustive search can be done just one-off to build the compatibility
+database for all assignable devices on each node, then it might be
+still tenable in datacenter?
+
+>=20
+>=20
+> > Then there comes a case where the target device doesn't handle
+> aggregation
+> > but support a different type which however provides compatible
+> capabilities
+> > and same resource size as the aggregated instance expects. I guess this=
+ is
+> > one puzzle how to check compatibility between such types. One possible
+> > extension is to introduce a non_aggregated_list  to indicate compatible
+> > non-aggregated types for each aggregated instance. Then mgmt.. stack
+> > just loop the compatible list if the conservative policy fails.  I didn=
+'t think
+> > carefully about what format is reasonable here. But if we agree that an
+> > separate interface is required to support such usage, then this may com=
+e
+> > later after the basic migration_version interface is completed.
+>=20
+> ...and then a non_translucency_list and then a non_brilliance_list and
+> then a non_whatever_list... no.  Additionally it's been shown difficult
+> to predict the future, if a new device is developed to be compatible
+> with an existing device it would require updates to the existing device
+> to learn about that compatibility.
+
+I suppose a compatibility list like this doesn't require the existing devic=
+e
+to update. It should be new device's compatibility to claim compatibility
+to the types carried in existing list.=20
+
+>=20
+> > --
+> >
+> > Another scenario is about migrating a non-aggregated instance to a devi=
+ce
+> > handling aggregation. Then there is an open whether an aggregated type
+> > can be used to back the non-aggregated instance in case of no available
+> > instance under the original type claimed by non-aggregated instance.
+> > This won't happen in KVMGT, because all vGPU types share the same
+> > resource pool. Allocating instance under one type also decrement availa=
+ble
+> > instances under other types. So if we fail to find available instance u=
+nder
+> > type-A (with 4x resource of type-B), then we will also fail to create a=
+n
+> >  aggregated instance (aggregate=3D4) under type-B. therefore, we just
+> > need stick to basic type compatibility check for non-aggregated instanc=
+e.
+> > And I feel this assumption can be applied to other devices handling
+> > aggregation. It doesn't make sense for two types to claim compatibility
+> > (only with resource size difference) when their resources are allocated
+> > from different pools (which usually implies different capability or QOS=
+/
+> > SLA difference). With this assumption, we don't need provide another
+> > interface to indicate compatible aggregated types for non-aggregated
+> > interface.
+> > --
+> >
+> > I may definitely overlook something here, but if above analysis sounds
+> > reasonable, then this series could be decoupled from the versioning
+> > scheme discussion based on conservative policy for now. :)
+>=20
+> The only potential I see for decoupling the discussions would be to do
+> aggregation via a vendor attribute.  Those already provide a mechanism
+> to manipulate a device after creation and something that we'll already
+> need to solve in determining migration compatibility.  So in that
+> sense, it seems like it at least doesn't make the problem worse.
 > Thanks,
-> Kevin
+>=20
+
+This makes some sense, since anyway 'aggregation' still changes how the
+instance looks like. But let me understand clearly. Are you proposing=20
+actually moving 'aggregation' to be a vendor attribute (i.e. removing
+the 'mdev' sub-directy in this patch), or more about a policy of treating
+it as a vendor attribute? If the former, is there any problem of having
+Libvirt manage this attribute given that it becomes vendor specific now?
+
+Thanks
+Kevin
