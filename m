@@ -2,102 +2,102 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4CD73219D1D
-	for <lists+kvm@lfdr.de>; Thu,  9 Jul 2020 12:11:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1ADDC219E2F
+	for <lists+kvm@lfdr.de>; Thu,  9 Jul 2020 12:48:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726320AbgGIKLs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 Jul 2020 06:11:48 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:57817 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726140AbgGIKLs (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 9 Jul 2020 06:11:48 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1594289507;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=L3LOABQZfanvD1gLTv79zBx1EWnFuqzfDG4sVWnQIEA=;
-        b=IEv7eKIeg6iogFwgFm816n8HYVYy2MMplWq8N+CB+eGvlio5vaNzLvx35om/XCUgzdPgM5
-        jau1ssug0SjS5bm8U7zm8xgGWbFrRTNLvF4Iv3mootI3mZMkoeOBVLq6FeT+V/BS2JR/DD
-        kFQtNfb4FAxjmsfwUqN0PRpXtSPeLCw=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-264-ufEFgvunN8Sy6SGWNkfKnQ-1; Thu, 09 Jul 2020 06:11:46 -0400
-X-MC-Unique: ufEFgvunN8Sy6SGWNkfKnQ-1
-Received: by mail-wm1-f71.google.com with SMTP id u68so1788612wmu.3
-        for <kvm@vger.kernel.org>; Thu, 09 Jul 2020 03:11:45 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=L3LOABQZfanvD1gLTv79zBx1EWnFuqzfDG4sVWnQIEA=;
-        b=kxouTXrEjxyHZ4eJv3uR5ZyFetduSsLELKL+cwI0w1qTOQHZ+1u5Id3nlxrYEk2v5Q
-         ZXrOcoM2vquJbGYyggr1iU4Ii2ZdQTFnTYes+FGBvIS+4UdsNxsA/fESRoD1OZjAW2KM
-         kdnVsSo5D0nES07XWiT9bFk4huqOeVVTed2Y1FovwDExWZGtlQRzWCHPMg+LucX1a0XQ
-         culCEfOS9wWgBRay8FId7PkUmVV01cNpdpCBdvTKYFxA/tDylI10eDHUVGSnMQchYeRq
-         qSNY60Gcqm5k86x3QQwNsku0r4RMH/Mg7RKhWB1gva019QtxjPAySxnitM0vcwWRNeQZ
-         3v0Q==
-X-Gm-Message-State: AOAM532QQQ924+W+vVoodWpFADBAW/AVXmFeJ2YQ5QUs/o7JcJAFONZB
-        okAcYUN3nk9w6n/c3+2DYQo0/jqj/02e3mLg8H8tEKCp6WR16H9Q/B1VcNn+SC2T83JzOhyuj5n
-        FvkJElWg2oKR0
-X-Received: by 2002:adf:ecc8:: with SMTP id s8mr63561673wro.317.1594289504597;
-        Thu, 09 Jul 2020 03:11:44 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyGPWAhbR1dQfzcHSvUvPl+es2gcwjD/rPtFt+Q4iK/eWDgs8nAz8mGGQ6YFGC802OkBVyVlw==
-X-Received: by 2002:adf:ecc8:: with SMTP id s8mr63561644wro.317.1594289504399;
-        Thu, 09 Jul 2020 03:11:44 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:9541:9439:cb0f:89c? ([2001:b07:6468:f312:9541:9439:cb0f:89c])
-        by smtp.gmail.com with ESMTPSA id z1sm4893109wru.30.2020.07.09.03.11.42
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 09 Jul 2020 03:11:42 -0700 (PDT)
-Subject: Re: [PATCH 2/2] x86/cpu: Handle GUEST_MAXPHYADDR < HOST_MAXPHYADDR
- for hosts that don't support it
-To:     Mohammed Gamal <mgamal@redhat.com>,
-        Gerd Hoffmann <kraxel@redhat.com>,
-        =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>
-Cc:     Eduardo Habkost <ehabkost@redhat.com>, mtosatti@redhat.com,
-        Pedro Principeza <pedro.principeza@canonical.com>,
-        kvm@vger.kernel.org, libvir-list@redhat.com,
-        Dann Frazier <dann.frazier@canonical.com>,
-        Guilherme Piccoli <gpiccoli@canonical.com>,
-        "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
-        Christian Ehrhardt <christian.ehrhardt@canonical.com>,
-        qemu-devel@nongnu.org, Laszlo Ersek <lersek@redhat.com>,
-        fw@gpiccoli.net, rth@twiddle.net
-References: <20200619155344.79579-1-mgamal@redhat.com>
- <20200619155344.79579-3-mgamal@redhat.com>
- <20200708171621.GA780932@habkost.net> <20200708172653.GL3229307@redhat.com>
- <20200709094415.yvdh6hsfukqqeadp@sirius.home.kraxel.org>
- <8ed00a46daec6b41e7369123e807342e0ecfe751.camel@redhat.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <2c9ec76e-7cfc-f613-ef9b-cb1e7cc54ade@redhat.com>
-Date:   Thu, 9 Jul 2020 12:11:41 +0200
+        id S1726832AbgGIKsz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 Jul 2020 06:48:55 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:53136 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726302AbgGIKsy (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 9 Jul 2020 06:48:54 -0400
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 069AWwnO027530;
+        Thu, 9 Jul 2020 06:48:45 -0400
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 325rh2x9j9-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 09 Jul 2020 06:48:45 -0400
+Received: from m0098393.ppops.net (m0098393.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 069AXAsu028348;
+        Thu, 9 Jul 2020 06:48:45 -0400
+Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 325rh2x9hk-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 09 Jul 2020 06:48:45 -0400
+Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
+        by ppma04ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 069AjbIw001975;
+        Thu, 9 Jul 2020 10:48:42 GMT
+Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
+        by ppma04ams.nl.ibm.com with ESMTP id 325u410eru-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 09 Jul 2020 10:48:42 +0000
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
+        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 069AmdrM27787370
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 9 Jul 2020 10:48:39 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id C0F37AE057;
+        Thu,  9 Jul 2020 10:48:39 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id F1C8CAE051;
+        Thu,  9 Jul 2020 10:48:38 +0000 (GMT)
+Received: from oc3016276355.ibm.com (unknown [9.145.34.67])
+        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Thu,  9 Jul 2020 10:48:38 +0000 (GMT)
+Subject: Re: [PATCH v5 1/2] virtio: let arch validate VIRTIO features
+To:     Halil Pasic <pasic@linux.ibm.com>
+Cc:     linux-kernel@vger.kernel.org, borntraeger@de.ibm.com,
+        frankja@linux.ibm.com, mst@redhat.com, jasowang@redhat.com,
+        cohuck@redhat.com, kvm@vger.kernel.org, linux-s390@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, thomas.lendacky@amd.com,
+        david@gibson.dropbear.id.au, linuxram@us.ibm.com,
+        heiko.carstens@de.ibm.com, gor@linux.ibm.com
+References: <1594283959-13742-1-git-send-email-pmorel@linux.ibm.com>
+ <1594283959-13742-2-git-send-email-pmorel@linux.ibm.com>
+ <20200709115800.7a6e93c8.pasic@linux.ibm.com>
+From:   Pierre Morel <pmorel@linux.ibm.com>
+Message-ID: <d385b15b-6d5d-bea8-8824-b5595dcfbe81@linux.ibm.com>
+Date:   Thu, 9 Jul 2020 12:48:38 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.9.0
 MIME-Version: 1.0
-In-Reply-To: <8ed00a46daec6b41e7369123e807342e0ecfe751.camel@redhat.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20200709115800.7a6e93c8.pasic@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
+ definitions=2020-07-09_05:2020-07-09,2020-07-09 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 adultscore=0
+ lowpriorityscore=0 mlxscore=0 clxscore=1015 bulkscore=0 phishscore=0
+ mlxlogscore=948 priorityscore=1501 spamscore=0 suspectscore=0
+ malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2006250000 definitions=main-2007090084
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 09/07/20 11:55, Mohammed Gamal wrote:
->> Ideally we would simply outlaw (3), but it's hard for backward
->> compatibility reasons.  Second best solution is a flag somewhere
->> (msr, cpuid, ...) telling the guest firmware "you can use
->> GUEST_MAXPHYADDR, we guarantee it is <= HOST_MAXPHYADDR".
-> Problem is GUEST_MAXPHYADDR > HOST_MAXPHYADDR is actually a supported
-> configuration on some setups. Namely when memory encryption is enabled
-> on AMD CPUs[1].
+
+
+On 2020-07-09 11:58, Halil Pasic wrote:
+> On Thu,  9 Jul 2020 10:39:18 +0200
+> Pierre Morel <pmorel@linux.ibm.com> wrote:
 > 
+>> An architecture may need to validate the VIRTIO devices features
+>> based on architecture specifics.
+>>
+>> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+>> Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+>> Acked-by: Christian Borntraeger <borntraeger@de.ibm.com>
+> 
+> Acked-by: Halil Pasic <pasic@linux.ibm.com>
 
-It's not that bad since there's two MAXPHYADDRs, the one in CPUID and
-the one computed internally by the kernel.  GUEST_MAXPHYADDR greater
-than the host CPUID maxphyaddr is never supported.
 
-Paolo
+Thanks,
+Pierre
 
+-- 
+Pierre Morel
+IBM Lab Boeblingen
