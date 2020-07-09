@@ -2,207 +2,150 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 96B8921A09E
-	for <lists+kvm@lfdr.de>; Thu,  9 Jul 2020 15:18:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 51E1621A0EB
+	for <lists+kvm@lfdr.de>; Thu,  9 Jul 2020 15:31:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726757AbgGINSc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 Jul 2020 09:18:32 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:11252 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726376AbgGINSb (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 9 Jul 2020 09:18:31 -0400
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 069D21Y9125719;
-        Thu, 9 Jul 2020 09:18:31 -0400
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 32637w9jxb-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 09 Jul 2020 09:18:31 -0400
-Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 069D2WLb127986;
-        Thu, 9 Jul 2020 09:18:30 -0400
-Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com [149.81.74.108])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 32637w9jws-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 09 Jul 2020 09:18:30 -0400
-Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
-        by ppma05fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 069DEXno011694;
-        Thu, 9 Jul 2020 13:18:28 GMT
-Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
-        by ppma05fra.de.ibm.com with ESMTP id 325k230frh-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 09 Jul 2020 13:18:28 +0000
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
-        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 069DH42V55181590
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 9 Jul 2020 13:17:04 GMT
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 1C81BAE053;
-        Thu,  9 Jul 2020 13:18:26 +0000 (GMT)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id A2EA8AE045;
-        Thu,  9 Jul 2020 13:18:25 +0000 (GMT)
-Received: from oc3016276355.ibm.com (unknown [9.145.34.67])
-        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu,  9 Jul 2020 13:18:25 +0000 (GMT)
-Subject: Re: [kvm-unit-tests PATCH v11 9/9] s390x: css: ssch/tsch with sense
- and interrupt
-To:     Cornelia Huck <cohuck@redhat.com>
+        id S1726831AbgGINbH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 Jul 2020 09:31:07 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:57920 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726410AbgGINbG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 9 Jul 2020 09:31:06 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1594301465;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=5ZV046C9FlHRH3RTZDZ6h6ABB8tB0CGYUWgmvEylPwk=;
+        b=NRLpwAV0MgRfTKRyKMQRysG5+T8HYcPSKyrwOyz578sF8osQy6qXuCGiEooeK3mKoIXPli
+        4GDzwg2O16y5zAaGHK7/TWCqBGT79kozUziRNe1/jNlstW/HlFzX7Xeqwwl38zlIX81uJR
+        KoAKFTWuiOk6ZT7/2s4w5pn1dVHTAfI=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-121-O1bBZozZOOi4rh1E1kj1NQ-1; Thu, 09 Jul 2020 09:31:01 -0400
+X-MC-Unique: O1bBZozZOOi4rh1E1kj1NQ-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 56112E91C;
+        Thu,  9 Jul 2020 13:31:00 +0000 (UTC)
+Received: from gondolin (ovpn-113-62.ams2.redhat.com [10.36.113.62])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id B9E321A888;
+        Thu,  9 Jul 2020 13:30:58 +0000 (UTC)
+Date:   Thu, 9 Jul 2020 15:30:55 +0200
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Pierre Morel <pmorel@linux.ibm.com>
 Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
         frankja@linux.ibm.com, david@redhat.com, thuth@redhat.com,
         drjones@redhat.com
+Subject: Re: [kvm-unit-tests PATCH v11 8/9] s390x: css: msch, enable test
+Message-ID: <20200709153055.6f2b5e59.cohuck@redhat.com>
+In-Reply-To: <d55c3e5b-8adf-8f7f-2b97-c270fb6598b4@linux.ibm.com>
 References: <1594282068-11054-1-git-send-email-pmorel@linux.ibm.com>
- <1594282068-11054-10-git-send-email-pmorel@linux.ibm.com>
- <20200709141348.6ae5ff18.cohuck@redhat.com>
-From:   Pierre Morel <pmorel@linux.ibm.com>
-Message-ID: <9aba6196-edd4-4eb0-1e1c-e6410291863b@linux.ibm.com>
-Date:   Thu, 9 Jul 2020 15:18:25 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.9.0
+        <1594282068-11054-9-git-send-email-pmorel@linux.ibm.com>
+        <20200709134056.0d267b6c.cohuck@redhat.com>
+        <d55c3e5b-8adf-8f7f-2b97-c270fb6598b4@linux.ibm.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-In-Reply-To: <20200709141348.6ae5ff18.cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
- definitions=2020-07-09_07:2020-07-09,2020-07-09 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- adultscore=0 mlxlogscore=999 clxscore=1015 malwarescore=0
- priorityscore=1501 spamscore=0 suspectscore=0 phishscore=0 mlxscore=0
- impostorscore=0 bulkscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2006250000 definitions=main-2007090097
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Thu, 9 Jul 2020 15:12:05 +0200
+Pierre Morel <pmorel@linux.ibm.com> wrote:
 
+> On 2020-07-09 13:40, Cornelia Huck wrote:
+> > On Thu,  9 Jul 2020 10:07:47 +0200
+> > Pierre Morel <pmorel@linux.ibm.com> wrote:
+> >   
+> >> A second step when testing the channel subsystem is to prepare a channel
+> >> for use.
+> >> This includes:
+> >> - Get the current subchannel Information Block (SCHIB) using STSCH
+> >> - Update it in memory to set the ENABLE bit and the specified ISC
+> >> - Tell the CSS that the SCHIB has been modified using MSCH
+> >> - Get the SCHIB from the CSS again to verify that the subchannel is
+> >>    enabled and uses the specified ISC.
+> >> - If the command succeeds but subchannel is not enabled or the ISC
+> >>    field is not as expected, retry a predefined retries count.
+> >> - If the command fails, report the failure and do not retry, even
+> >>    if cc indicates a busy/status pending as we do not expect this.
+> >>
+> >> This tests the MSCH instruction to enable a channel successfully.
+> >> Retries are done and in case of error, and if the retries count
+> >> is exceeded, a report is made.
+> >>
+> >> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+> >> Acked-by: Thomas Huth <thuth@redhat.com>
+> >> Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+> >> ---
+> >>   lib/s390x/css.h     |  8 +++--
+> >>   lib/s390x/css_lib.c | 72 +++++++++++++++++++++++++++++++++++++++++++++
+> >>   s390x/css.c         | 15 ++++++++++
+> >>   3 files changed, 92 insertions(+), 3 deletions(-)  
+> > 
+> > (...)
+> >   
+> >> +/*
+> >> + * css_msch: enable subchannel and set with specified ISC  
+> > 
+> > "css_enable: enable the subchannel with the specified ISC"
+> > 
+> > ?
+> >   
+> >> + * @schid: Subchannel Identifier
+> >> + * @isc  : number of the interruption subclass to use
+> >> + * Return value:
+> >> + *   On success: 0
+> >> + *   On error the CC of the faulty instruction
+> >> + *      or -1 if the retry count is exceeded.
+> >> + */
+> >> +int css_enable(int schid, int isc)
+> >> +{
+> >> +	struct pmcw *pmcw = &schib.pmcw;
+> >> +	int retry_count = 0;
+> >> +	uint16_t flags;
+> >> +	int cc;
+> >> +
+> >> +	/* Read the SCHIB for this subchannel */
+> >> +	cc = stsch(schid, &schib);
+> >> +	if (cc) {
+> >> +		report_info("stsch: sch %08x failed with cc=%d", schid, cc);
+> >> +		return cc;
+> >> +	}
+> >> +
+> >> +	flags = PMCW_ENABLE | (isc << PMCW_ISC_SHIFT);
+> >> +	if ((pmcw->flags & flags) == flags) {  
+> > 
+> > I think you want (pmcw->flags & PMCW_ENABLE) == PMCW_ENABLE -- this
+> > catches the case of "subchannel has been enabled before, but with a
+> > different isc".  
+> 
+> If with a different ISC, we need to modify the ISC.
+> Don't we ?
 
-On 2020-07-09 14:13, Cornelia Huck wrote:
-> On Thu,  9 Jul 2020 10:07:48 +0200
-> Pierre Morel <pmorel@linux.ibm.com> wrote:
-> 
->> After a channel is enabled we start a SENSE_ID command using
->> the SSCH instruction to recognize the control unit and device.
->>
->> This tests the success of SSCH, the I/O interruption and the TSCH
->> instructions.
->>
->> The SENSE_ID command response is tested to report 0xff inside
->> its reserved field and to report the same control unit type
->> as the cu_type kernel argument.
->>
->> Without the cu_type kernel argument, the test expects a device
->> with a default control unit type of 0x3832, a.k.a virtio-net-ccw.
->>
->> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
->> ---
->>   lib/s390x/asm/arch_def.h |   1 +
->>   lib/s390x/css.h          |  35 ++++++++
->>   lib/s390x/css_lib.c      | 183 +++++++++++++++++++++++++++++++++++++++
->>   s390x/css.c              |  80 +++++++++++++++++
->>   4 files changed, 299 insertions(+)
-> 
-> (...)
-> 
->> diff --git a/lib/s390x/css_lib.c b/lib/s390x/css_lib.c
->> index eda68a4..c64edd5 100644
->> --- a/lib/s390x/css_lib.c
->> +++ b/lib/s390x/css_lib.c
->> @@ -16,6 +16,7 @@
->>   #include <interrupt.h>
->>   #include <asm/arch_def.h>
->>   #include <asm/time.h>
->> +#include <asm/arch_def.h>
->>   
->>   #include <css.h>
->>   
->> @@ -103,6 +104,9 @@ retry:
->>   	/* Update the SCHIB to enable the channel and set the ISC */
->>   	pmcw->flags |= flags;
->>   
->> +	/* Set Interruption Subclass to IO_SCH_ISC */
->> +	pmcw->flags |= (isc << PMCW_ISC_SHIFT);
-> 
-> But isn't the isc already contained in 'flags'? I think you should just
-> delete these two lines.
+I think that's a policy decision (I would probably fail and require a
+disable before setting another isc, but that's a matter of taste).
 
-right.
-
-> 
->> +
->>   	/* Tell the CSS we want to modify the subchannel */
->>   	cc = msch(schid, &schib);
->>   	if (cc) {
-> 
-> (...)
-> 
->> +/* wait_and_check_io_completion:
->> + * @schid: the subchannel ID
->> + *
->> + * Makes the most common check to validate a successful I/O
->> + * completion.
->> + * Only report failures.
->> + */
->> +int wait_and_check_io_completion(int schid)
->> +{
->> +	int ret = 0;
->> +
->> +	wait_for_interrupt(PSW_MASK_IO);
->> +
->> +	report_prefix_push("check I/O completion");
->> +
->> +	if (lowcore_ptr->io_int_param != schid) {
->> +		report(0, "interrupt parameter: expected %08x got %08x",
->> +		       schid, lowcore_ptr->io_int_param);
->> +		ret = -1;
->> +		goto end;
->> +	}
->> +
->> +	/* Verify that device status is valid */
->> +	if (!(irb.scsw.ctrl & SCSW_SC_PENDING)) {
->> +		report(0, "No status pending after interrupt. Subch Ctrl: %08x",
->> +		       irb.scsw.ctrl);
->> +		ret = -1;
->> +		goto end;
->> +	}
->> +
->> +	if (!(irb.scsw.ctrl & (SCSW_SC_SECONDARY | SCSW_SC_PRIMARY))) {
->> +		report(0, "Primary or secondary status missing. Subch Ctrl: %08x",
->> +		       irb.scsw.ctrl);
->> +		ret = -1;
->> +		goto end;
->> +	}
->> +
->> +	if (!(irb.scsw.dev_stat & (SCSW_DEVS_DEV_END | SCSW_DEVS_SCH_END))) {
->> +		report(0, "No device end nor sch end. Dev. status: %02x",
-> 
-> s/nor/or/ ?
-
-OK
+Regardless, I think the current check doesn't even catch the 'different
+isc' case?
 
 > 
->> +		       irb.scsw.dev_stat);
->> +		ret = -1;
->> +		goto end;
->> +	}
->> +
->> +	if (irb.scsw.sch_stat & !(SCSW_SCHS_PCI | SCSW_SCHS_IL)) {
+> >   
+> >> +		report_info("stsch: sch %08x already enabled", schid);
+> >> +		return 0;
+> >> +	}  
 > 
-> Did you mean ~(SCSW_SCHS_PCI | SCSW_SCHS_IL)?
-
-grrr... yes, thanks.
-
 > 
-> If yes, why do think a PCI may show up?
+> 
+> > 
+> > (...)
+> >   
+> 
+> 
 
-Should not in the current implementation.
-I thought I can add it as a general test.
-
-Regards,
-Pierre
-
--- 
-Pierre Morel
-IBM Lab Boeblingen
