@@ -2,114 +2,160 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id AAFA021AA66
-	for <lists+kvm@lfdr.de>; Fri, 10 Jul 2020 00:18:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5633421AAB0
+	for <lists+kvm@lfdr.de>; Fri, 10 Jul 2020 00:43:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726867AbgGIWSY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 Jul 2020 18:18:24 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:56197 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726546AbgGIWSX (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 9 Jul 2020 18:18:23 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1594333102;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=JhIiSAhu+eKDD4LqE1U44H9+yD3bGyMgOiR/v2Po9pA=;
-        b=U8z58mnii8nIescmg7q95Dp0dwuHK7jGLePxZ28NNO94qw3tIu6neToJXVvh5l1SWItdnH
-        u04EIfaUS4C+ARPJGKcmX45bUNhWf3qA4UtHiq1yq+7inkt6KcI5aaLckriXh9dV0a6S8Z
-        2q/DDf+ZrJTCligJeI8b0lmpCHBZLNI=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-41-NOeY35bLOmukzUrICe2tbw-1; Thu, 09 Jul 2020 18:18:20 -0400
-X-MC-Unique: NOeY35bLOmukzUrICe2tbw-1
-Received: by mail-wm1-f70.google.com with SMTP id u68so3717183wmu.3
-        for <kvm@vger.kernel.org>; Thu, 09 Jul 2020 15:18:20 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=JhIiSAhu+eKDD4LqE1U44H9+yD3bGyMgOiR/v2Po9pA=;
-        b=VYeICQt5AoTnHwlYx6Fw0VPpM+ZO8OwzKbaYPui5J6Hl96Xv5c/RrP/XLXcEnDFyTf
-         RBGVkzX8txjGEze+k+ODg4GPG/ijSjaUAuauDcKuSRtiWB7SCSeWZrxMrolsUaEk5JCl
-         RloeZgMoNX5FLABfg9+igNmxvYx/8tj7pp3pQP8JrCcecGpEYlDM3wgg92zUsRpYO5o3
-         qhK/GRxjSBQADGgO7iHUYs2T5Eh8unQyRhJVAtEI8vHhucmjJAXRdi3roGaA00mvJ/hB
-         H+CDSn5qD1YEfC8mal6uBtPYqppx0ERZKtbOBga80rnL7yx7wMiTM/zAXzhit6a2AYf4
-         DvrA==
-X-Gm-Message-State: AOAM531kfQmPKfna7apUMU6DxtfYsu0vIb8e1ZDrs3/P0iJkh+NatpLq
-        rb8r9UJsw0XfmHXEed/z5rseCPt5bVDCo/2xqQWubq3B5mAFt21TFBiqcqONZSfsrgM5LqwKfE1
-        hfiy0D93WGRpu
-X-Received: by 2002:adf:ed8c:: with SMTP id c12mr31545645wro.359.1594333099432;
-        Thu, 09 Jul 2020 15:18:19 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwGDqzx+gzniXiWP2qzH4hqdbNZTAc8mphaCAqFZQ27IjOnlswG36D7Q/CTjmFXJVOhbGtqMg==
-X-Received: by 2002:adf:ed8c:: with SMTP id c12mr31545633wro.359.1594333099223;
-        Thu, 09 Jul 2020 15:18:19 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:9541:9439:cb0f:89c? ([2001:b07:6468:f312:9541:9439:cb0f:89c])
-        by smtp.gmail.com with ESMTPSA id j4sm7501523wrp.51.2020.07.09.15.18.18
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 09 Jul 2020 15:18:18 -0700 (PDT)
-Subject: Re: [PATCH] KVM: x86/mmu: Add capability to zap only sptes for the
- affected memslot
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
+        id S1726482AbgGIWnX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 Jul 2020 18:43:23 -0400
+Received: from mga01.intel.com ([192.55.52.88]:16869 "EHLO mga01.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726213AbgGIWnW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 9 Jul 2020 18:43:22 -0400
+IronPort-SDR: W254WfSYLz9y3snHU1ThpiJ4HHSL1SWGswMBrhwaX/uTbTbXdsJ40qJ8evdk4TUbMJK0e/Z92q
+ eoz/QynY+0Dw==
+X-IronPort-AV: E=McAfee;i="6000,8403,9677"; a="166211008"
+X-IronPort-AV: E=Sophos;i="5.75,332,1589266800"; 
+   d="scan'208";a="166211008"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga007.fm.intel.com ([10.253.24.52])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Jul 2020 15:43:20 -0700
+IronPort-SDR: XnG1/K4S8johhaed4MZaJxAY9dVPUcsKf/c+9XPpsZbSCq6wllfw9WrpJHAZbDIYlbrM8JCbuj
+ iToHPDTAiL0Q==
+X-IronPort-AV: E=Sophos;i="5.75,332,1589266800"; 
+   d="scan'208";a="267535283"
+Received: from smtp.ostc.intel.com ([10.54.29.231])
+  by fmsmga007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Jul 2020 15:43:20 -0700
+Received: from localhost (mtg-dev.jf.intel.com [10.54.74.10])
+        by smtp.ostc.intel.com (Postfix) with ESMTP id 95AC46177;
+        Thu,  9 Jul 2020 15:43:19 -0700 (PDT)
+Date:   Thu, 9 Jul 2020 15:43:19 -0700
+From:   mark gross <mgross@linux.intel.com>
+To:     Doug Anderson <dianders@chromium.org>
+Cc:     Thomas Gleixner <tglx@linutronix.de>,
+        Abhishek Bhardwaj <abhishekbh@google.com>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Anthony Steinhauser <asteinhauser@google.com>,
+        Borislav Petkov <bp@alien8.de>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Xiong Zhang <xiong.y.zhang@intel.com>,
-        Wayne Boyer <wayne.boyer@intel.com>,
-        Zhenyu Wang <zhenyuw@linux.intel.com>,
-        Jun Nakajima <jun.nakajima@intel.com>
-References: <20200703025047.13987-1-sean.j.christopherson@intel.com>
- <51637a13-f23b-8b76-c93a-76346b4cc982@redhat.com>
- <20200709211253.GW24919@linux.intel.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <49c7907a-3ab4-b5db-ccb4-190b990c8be3@redhat.com>
-Date:   Fri, 10 Jul 2020 00:18:17 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.9.0
+        Joerg Roedel <joro@8bytes.org>,
+        Josh Poimboeuf <jpoimboe@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Tony Luck <tony.luck@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Waiman Long <longman@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>, kvm@vger.kernel.org,
+        x86 <x86@kernel.org>
+Subject: Re: [PATCH v5] x86/speculation/l1tf: Add KConfig for setting the L1D
+ cache flush mode
+Message-ID: <20200709224319.GC12345@mtg-dev.jf.intel.com>
+Reply-To: mgross@linux.intel.com
+References: <20200708194715.4073300-1-abhishekbh@google.com>
+ <87y2ntotah.fsf@nanos.tec.linutronix.de>
+ <CAD=FV=WCu7o41iyn27vNBWo4f_X_XVy+PPPjBKc+70g5jd5+8w@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20200709211253.GW24919@linux.intel.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAD=FV=WCu7o41iyn27vNBWo4f_X_XVy+PPPjBKc+70g5jd5+8w@mail.gmail.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 09/07/20 23:12, Sean Christopherson wrote:
->> It's bad that we have no clue what's causing the bad behavior, but I
->> don't think it's wise to have a bug that is known to happen when you
->> enable the capability. :/
+On Thu, Jul 09, 2020 at 12:42:57PM -0700, Doug Anderson wrote:
+> Hi,
+> 
+> On Thu, Jul 9, 2020 at 3:51 AM Thomas Gleixner <tglx@linutronix.de> wrote:
+> >
+> > Abhishek Bhardwaj <abhishekbh@google.com> writes:
+> > > This change adds a new kernel configuration that sets the l1d cache
+> > > flush setting at compile time rather than at run time.
+> > >
+> > > The reasons for this change are as follows -
+> > >
+> > >  - Kernel command line arguments are getting unwieldy. These parameters
+> > >  are not a scalable way to set the kernel config. They're intended as a
+> > >  super limited way for the bootloader to pass info to the kernel and
+> > >  also as a way for end users who are not compiling the kernel themselves
+> > >  to tweak the kernel behavior.
+> > >
+> > >  - Also, if a user wants this setting from the start. It's a definite
+> > >  smell that it deserves to be a compile time thing rather than adding
+> > >  extra code plus whatever miniscule time at runtime to pass an
+> > >  extra argument.
+> > >
+> > >  - Finally, it doesn't preclude the runtime / kernel command line way.
+> > >  Users are free to use those as well.
+> >
+> > TBH, I don't see why this is a good idea.
+> >
+> >  1) I'm not following your argumentation that the command line option is
+> >     a poor Kconfig replacement. The L1TF mode is a boot time (module
+> >     load time) decision and the command line parameter is there to
+> >     override the carefully chosen and sensible default behaviour.
+> 
+> When you say that the default behavior is carefully chosen and
+> sensible, are you saying that (in your opinion) there would never be a
+> good reason for someone distributing a kernel to others to change the
+> default?  Certainly I agree that having the kernel command line
+> parameter is nice to allow someone to override whatever the person
+> building the kernel chose, but IMO it's not a good way to change the
+> default built-in to the kernel.
+> 
+> The current plan (as I understand it) is that we'd like to ship
+> Chromebook kernels with this option changed from the default that's
+> there now.  In your opinion, is that a sane thing to do?
+> 
+> 
+> >  2) You can add the desired mode to the compiled in (partial) kernel
+> >     command line today.
+> 
+> This might be easier on x86 than it is on ARM.  ARM (and ARM64)
+> kernels only have two modes: kernel provides cmdline and bootloader
+> provides cmdline.  There are out-of-mainline ANDROID patches to
+> address this but nothing in mainline.
+> 
+> The patch we're discussing now is x86-only so it's not such a huge
+> deal, but the fact that combining the kernel and bootloader
+> commandline never landed in mainline for arm/arm64 means that this
+> isn't a super common/expected thing to do.
+> 
+> 
+> >  3) Boot loaders are well capable of handling large kernel command lines
+> >     and the extra time spend for reading the parameter does not matter
+> >     at all.
+> 
+> Long command lines can still be a bit of a chore for humans to deal
+> with.  Many times I've needed to look at "/proc/cmdline" and make
+> sense of it.  The longer the command line is and the more cruft
+> stuffed into it the more of a chore it is.  Yes, this is just one
+> thing to put in the command line, but if 10 different drivers all have
+> their "one thing" to put there it gets really long.  If 100 different
+> drivers all want their one config option there it gets really really
+> long.  IMO the command line should be a last resort place to put
+> things and should just contain:
 
-(Note that this wasn't a NACK, though subtly so).
+This takes me back to my years doing android kernel work for Intel, I'm glad
+those are over.  Yes, the android kernel command lines got hideous, I think we
+even had patches to make the cmdline buffer bigger than the default was.
 
-> I don't necessarily disagree, but at the same time it's entirely possible
-> it's a Qemu bug.
+From a practical point of view the command line was part of the boot image and
+cryptography protected so it was a handy way to securely communicate parameters
+from the platform to the kernel, drivers and even just user mode.  It got
+pretty ugly but, it worked (mostly).
 
-No, it cannot be.  QEMU is not doing anything but
-KVM_SET_USER_MEMORY_REGION, and it's doing that synchronously with
-writes to the PCI configuration space BARs.
+What I don't get is why pick on l1tf in isolation?  There are a bunch of
+command line parameters similar to l1tf.  Would a more general option make
+sense?
 
-> Even if this is a kernel bug, I'm fairly confident at this point that it's
-> not a KVM bug.  Or rather, if it's a KVM "bug", then there's a fundamental
-> dependency in memslot management that needs to be rooted out and documented.
+Anyway, I think there is a higher level issue you are poking at that might be
+better addressed by talking about it directly.
 
-Heh, here my surmise is that  it cannot be anything but a KVM bug,
-because  Memslots are not used by anything outside KVM...  But maybe I'm
-missing something.
+--mark
 
-> And we're kind of in a catch-22; it'll be extremely difficult to narrow down
-> exactly who is breaking what without being able to easily test the optimized
-> zapping with other VMMs and/or setups.
-
-I agree with this, and we could have a config symbol that depends on
-BROKEN and enables it unconditionally.  However a capability is the
-wrong tool.
-
-Paolo
 
