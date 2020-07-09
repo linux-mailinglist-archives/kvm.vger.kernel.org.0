@@ -2,85 +2,144 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3450921A29E
-	for <lists+kvm@lfdr.de>; Thu,  9 Jul 2020 16:55:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C0CCD21A2FE
+	for <lists+kvm@lfdr.de>; Thu,  9 Jul 2020 17:07:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728162AbgGIOyi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 Jul 2020 10:54:38 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:27938 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1728140AbgGIOyi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 9 Jul 2020 10:54:38 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1594306476;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=06tlQ8QpIRZ+yS43+a7D753UcPzHai4pEXCL8XU5TZY=;
-        b=JLd1KfRkwwJgrM3akzKGgyUFr9j+alSEjxcfhl9f55icOOPLx61vkn6rjt3esjrHpuc8oX
-        sh1RE+P04TbBBu4cAUDXN19Op8CuvDnhblfNaSa4f14u4ds1a+9NLj1mICNIcKH3QtstpR
-        uAiKwYMERJy1z+BUiJeiBWYGpOrXn3s=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-240-_48O8jI3MYKQ5ZkdODc1ig-1; Thu, 09 Jul 2020 10:54:35 -0400
-X-MC-Unique: _48O8jI3MYKQ5ZkdODc1ig-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9CB6B1080;
-        Thu,  9 Jul 2020 14:54:33 +0000 (UTC)
-Received: from vitty.brq.redhat.com (unknown [10.40.195.35])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 8B61960C80;
-        Thu,  9 Jul 2020 14:54:31 +0000 (UTC)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Junaid Shahid <junaids@google.com>,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH v3 9/9] KVM: x86: drop superfluous mmu_check_root() from fast_pgd_switch()
-Date:   Thu,  9 Jul 2020 16:53:58 +0200
-Message-Id: <20200709145358.1560330-10-vkuznets@redhat.com>
-In-Reply-To: <20200709145358.1560330-1-vkuznets@redhat.com>
-References: <20200709145358.1560330-1-vkuznets@redhat.com>
+        id S1726863AbgGIPHX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 Jul 2020 11:07:23 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:8328 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726615AbgGIPHX (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 9 Jul 2020 11:07:23 -0400
+Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 069F3WmU001750;
+        Thu, 9 Jul 2020 11:07:15 -0400
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 325r2cm6kb-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 09 Jul 2020 11:07:14 -0400
+Received: from m0098414.ppops.net (m0098414.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 069F3thV004462;
+        Thu, 9 Jul 2020 11:07:13 -0400
+Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 325r2cm6j6-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 09 Jul 2020 11:07:13 -0400
+Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
+        by ppma04ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 069F17MF021314;
+        Thu, 9 Jul 2020 15:07:11 GMT
+Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
+        by ppma04ams.nl.ibm.com with ESMTP id 325u410ntv-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 09 Jul 2020 15:07:11 +0000
+Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
+        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 069F78sO65208640
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 9 Jul 2020 15:07:08 GMT
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id C36DB4C063;
+        Thu,  9 Jul 2020 15:07:08 +0000 (GMT)
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 060C34C044;
+        Thu,  9 Jul 2020 15:07:08 +0000 (GMT)
+Received: from oc2783563651 (unknown [9.145.152.61])
+        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Thu,  9 Jul 2020 15:07:07 +0000 (GMT)
+Date:   Thu, 9 Jul 2020 17:06:15 +0200
+From:   Halil Pasic <pasic@linux.ibm.com>
+To:     Pierre Morel <pmorel@linux.ibm.com>
+Cc:     Cornelia Huck <cohuck@redhat.com>, linux-kernel@vger.kernel.org,
+        borntraeger@de.ibm.com, frankja@linux.ibm.com, mst@redhat.com,
+        jasowang@redhat.com, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, thomas.lendacky@amd.com,
+        david@gibson.dropbear.id.au, linuxram@us.ibm.com,
+        heiko.carstens@de.ibm.com, gor@linux.ibm.com
+Subject: Re: [PATCH v5 2/2] s390: virtio: PV needs VIRTIO I/O device
+ protection
+Message-ID: <20200709170615.468236da.pasic@linux.ibm.com>
+In-Reply-To: <c9be019f-236e-5e44-64b6-0875cd40ab11@linux.ibm.com>
+References: <1594283959-13742-1-git-send-email-pmorel@linux.ibm.com>
+        <1594283959-13742-3-git-send-email-pmorel@linux.ibm.com>
+        <20200709105733.6d68fa53.cohuck@redhat.com>
+        <270d8674-0f73-0a38-a2a7-fbc1caa44301@linux.ibm.com>
+        <20200709164700.09a83069.pasic@linux.ibm.com>
+        <c9be019f-236e-5e44-64b6-0875cd40ab11@linux.ibm.com>
+Organization: IBM
+X-Mailer: Claws Mail 3.11.1 (GTK+ 2.24.31; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
+ definitions=2020-07-09_08:2020-07-09,2020-07-09 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 bulkscore=0
+ priorityscore=1501 impostorscore=0 spamscore=0 phishscore=0 adultscore=0
+ lowpriorityscore=0 malwarescore=0 clxscore=1015 mlxlogscore=999
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2006250000 definitions=main-2007090112
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The mmu_check_root() check in fast_pgd_switch() seems to be
-superfluous: when GPA is outside of the visible range
-cached_root_available() will fail for non-direct roots
-(as we can't have a matching one on the list) and we don't
-seem to care for direct ones.
+On Thu, 9 Jul 2020 16:51:04 +0200
+Pierre Morel <pmorel@linux.ibm.com> wrote:
 
-Also, raising #TF immediately when a non-existent GFN is written to CR3
-doesn't seem to mach architectural behavior. Drop the check.
+> 
+> 
+> On 2020-07-09 16:47, Halil Pasic wrote:
+> > On Thu, 9 Jul 2020 12:51:58 +0200
+> > Pierre Morel <pmorel@linux.ibm.com> wrote:
+> > 
+> >>>> +int arch_validate_virtio_features(struct virtio_device *dev)
+> >>>> +{
+> >>>> +	if (!is_prot_virt_guest())
+> >>>> +		return 0;
+> >>>> +
+> >>>> +	if (!virtio_has_feature(dev, VIRTIO_F_VERSION_1)) {
+> >>>> +		dev_warn(&dev->dev, "device must provide VIRTIO_F_VERSION_1\n");
+> >>>
+> >>> I'd probably use "legacy virtio not supported with protected
+> >>> virtualization".
+> >>>    
+> >>>> +		return -ENODEV;
+> >>>> +	}
+> >>>> +
+> >>>> +	if (!virtio_has_feature(dev, VIRTIO_F_IOMMU_PLATFORM)) {
+> >>>> +		dev_warn(&dev->dev,
+> >>>> +			 "device must provide VIRTIO_F_IOMMU_PLATFORM\n");
+> >>>
+> >>> "support for limited memory access required for protected
+> >>> virtualization"
+> >>>
+> >>> ?
+> >>>
+> >>> Mentioning the feature flag is shorter in both cases, though.
+> >>
+> >> And I think easier to look for in case of debugging purpose.
+> >> I change it if there is more demands.
+> > 
+> > Not all our end users are kernel and/or qemu developers. I find the
+> > messages from v4 less technical, more informative, and way better.
+> > 
+> > Regards,
+> > Halil
+> > 
+> 
+> Can you please tell me the messages you are speaking of, because for me 
+> the warning's messages are exactly the same in v4 and v5!?
+> 
+> I checked many times, but may be I still missed something.
+> 
 
-Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
----
- arch/x86/kvm/mmu/mmu.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+Sorry, my bad. My brain is over-generating. The messages where discussed
+at v3 and Connie made a very similar proposal to the one above which I
+seconded (for reference look at Message-ID:
+<833c71f2-0057-896a-5e21-2c6263834402@linux.ibm.com>). I was under the
+impression that it got implemented in v4, but it was not. That's why I
+ended up talking bs.
 
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 1c3a231f825b..c004ef9caf8f 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -4277,8 +4277,7 @@ static bool fast_pgd_switch(struct kvm_vcpu *vcpu, gpa_t new_pgd,
- 	 */
- 	if (mmu->shadow_root_level >= PT64_ROOT_4LEVEL &&
- 	    mmu->root_level >= PT64_ROOT_4LEVEL)
--		return !mmu_check_root(vcpu, new_pgd >> PAGE_SHIFT) &&
--		       cached_root_available(vcpu, new_pgd, new_role);
-+		return cached_root_available(vcpu, new_pgd, new_role);
- 
- 	return false;
- }
--- 
-2.25.4
+Regards,
+Halil
 
