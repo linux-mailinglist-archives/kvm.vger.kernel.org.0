@@ -2,94 +2,84 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id AA87321A71F
-	for <lists+kvm@lfdr.de>; Thu,  9 Jul 2020 20:35:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 16D7C21A729
+	for <lists+kvm@lfdr.de>; Thu,  9 Jul 2020 20:41:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726768AbgGISfC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 Jul 2020 14:35:02 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:59461 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726163AbgGISfB (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 9 Jul 2020 14:35:01 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1594319699;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=EU1/67mbdfMyDlz60KRLq5w/dPZq2hK6rVBVl3uxrNI=;
-        b=SqUgwGFIlS21egAsr8ihKsfGOehH0jj5E1Q91cP7Yc+Da/kkmIOutit4aMzMdOsY1mY3Zc
-        TEo5ALactnPwpQRFPwdsL7fs1eEzdY8VoRGWs4PzVayXJkUSye9vmaNqTuYKajJX6PFCnP
-        PuTbbj1nId5pVeHneswTbKcSCg1tsNY=
-Received: from mail-qt1-f198.google.com (mail-qt1-f198.google.com
- [209.85.160.198]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-511-VIpn1Im1PB2_1hGKFjFlNw-1; Thu, 09 Jul 2020 14:34:58 -0400
-X-MC-Unique: VIpn1Im1PB2_1hGKFjFlNw-1
-Received: by mail-qt1-f198.google.com with SMTP id g6so2306714qtr.0
-        for <kvm@vger.kernel.org>; Thu, 09 Jul 2020 11:34:58 -0700 (PDT)
+        id S1726228AbgGISlG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 Jul 2020 14:41:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57540 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726183AbgGISlF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 9 Jul 2020 14:41:05 -0400
+Received: from mail-il1-x144.google.com (mail-il1-x144.google.com [IPv6:2607:f8b0:4864:20::144])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BBFBDC08C5DC
+        for <kvm@vger.kernel.org>; Thu,  9 Jul 2020 11:41:05 -0700 (PDT)
+Received: by mail-il1-x144.google.com with SMTP id r12so2918264ilh.4
+        for <kvm@vger.kernel.org>; Thu, 09 Jul 2020 11:41:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=SJQldr4+VKrEQsjFpeywG2H0CUaXEr03YCsdEkG+QHU=;
+        b=sLHHvMcaaw8F8Vc2qUuZTPf0IOPqoaIrg15SnfkoSsQmKU1+z+Xx3tk6XwpKmXSnaj
+         W1BEXXfegRmyrI7K/2oTAPrzFILjPz3KB7Tqr54DRPZxyGQs3JbShF2FYSxh30PJVIqm
+         Ty8WWF6+Ucg9fMASWJszsePs+ghbxuknkGkVkfITDrRs4rNfHofSslmeUjTT4XFeZFDZ
+         dbkU/YKhBu1a3I+POGNOjJPmTJaA4gbyV3+QANd1agBsHBPmp+VJ2D3TDedQgfSWnx1M
+         wm3y9hAHi3kKcadop2Dy/D9nbKdtz+KS3woGn9ItvMWJRZl9zaj9oObwlRII/3MjIWwG
+         w5eQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=EU1/67mbdfMyDlz60KRLq5w/dPZq2hK6rVBVl3uxrNI=;
-        b=soiyRvPx40VSC/D9edDJ11PnMCXKfpzr7PuKpz7s5aDoAmzVL29g5ht6TvWnaFYYqa
-         L/4xsI4dSiezwQgarsduAmiH4NwATdLk3mfRa4FwmIq0pVtGjRgXpPjZtfY1qKytXq3Y
-         eKLK8U5dMQmL4jYfhSVbn3repvT0iOZGlJ5fr2176YKKtkRScWuQExuuyYsaeuLK6p7R
-         vdGqug3a3jrDJOsvh0YucTXSSaUynjbqRF6PCLgdG4hTXgxdL1xucVRUy/yTB77v8p38
-         iUuXxIiNG0pZKIAydhYLx8YVS4lUnP+SlA15SzKAfMAeRtwHL79F43oastp8B6y0hprI
-         sBBw==
-X-Gm-Message-State: AOAM532ffl1pmsMIMUXuljrNyA16s0iaz8o9Rrn9KjHiQK3bOOwSvcjB
-        ikhD9F27+NQcpwL8hx+uOqZMaxq6r5OimIyZNG+6xUnWsoQo37yYeKDs48RGhubPrlNrIZJtSdF
-        IdnRDWfRjuCKZ
-X-Received: by 2002:a05:620a:1659:: with SMTP id c25mr64295815qko.501.1594319697346;
-        Thu, 09 Jul 2020 11:34:57 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwvWvjoZ4lE7qQwT0Y7t3XSgFiCSmcOFc3Gqd8/zvCLCogqnE8+8DR/VbohjLVbxFl3mNlcWw==
-X-Received: by 2002:a05:620a:1659:: with SMTP id c25mr64295796qko.501.1594319697150;
-        Thu, 09 Jul 2020 11:34:57 -0700 (PDT)
-Received: from xz-x1 ([2607:9880:19c8:6f::1f4f])
-        by smtp.gmail.com with ESMTPSA id x23sm4388205qki.6.2020.07.09.11.34.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 09 Jul 2020 11:34:56 -0700 (PDT)
-Date:   Thu, 9 Jul 2020 14:34:54 -0400
-From:   Peter Xu <peterx@redhat.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Vitaly Kuznetsov <vkuznets@redhat.com>
-Subject: Re: [PATCH 1/2] KVM: X86: Move ignore_msrs handling upper the stack
-Message-ID: <20200709183454.GH199122@xz-x1>
-References: <20200622220442.21998-2-peterx@redhat.com>
- <20200625061544.GC2141@linux.intel.com>
- <1cebc562-89e9-3806-bb3c-771946fc64f3@redhat.com>
- <20200625162540.GC3437@linux.intel.com>
- <20200626180732.GB175520@xz-x1>
- <20200626181820.GG6583@linux.intel.com>
- <47b90b77-cf03-6087-b25f-fcd2fd313165@redhat.com>
- <20200630154726.GD7733@linux.intel.com>
- <20200709182220.GG199122@xz-x1>
- <7aa46e68-5780-2698-67f5-425693478fe1@redhat.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=SJQldr4+VKrEQsjFpeywG2H0CUaXEr03YCsdEkG+QHU=;
+        b=YkZTrjZnVOKRPk6YY9F+sV46GynHN3F620nBa5uDrWpHkiGbmsWSbCK6FKK6bW3Hh/
+         8XBtaHz+4pUOwM3nZowy2SCk3gnrrXQyGVIOmA4vxDjGhDwLnkJubENUZwqN1JBJCj+4
+         GK5/HVsdiDtnFNwwvuzoiv7diiAkJFQYvB5GeJOq5HqSg3clvlgTvqR++WO52Rny01Sy
+         jeSqZ4vq3+id/6vD7vjLlMVxxXdJTmLfTClAZayLJehePtsNqYT36WKe+0WhDXqdrJp6
+         cdncwG6fmEBdukMjt4GGLxSR39knlRZu5C21YTFx4IChud2HGyMdKRTcbpZ2VjS+8Tm1
+         89Qw==
+X-Gm-Message-State: AOAM532Bkqd2UNigpiWZharblPkCsGyKqJedYJsRj28yK38UrcaY9Xo0
+        5cHSqu3Br0LGj4uU4SSt49UUOqx4JNaZddbpy+RfPg==
+X-Google-Smtp-Source: ABdhPJxUhfmTOSdMHniBtR0MgiiEHBwdV0hZSBl2vpyCS+aoz3HFiQw7kcr/bpfFq9jTLI/nJrrymrJQSdKsbrYwHxw=
+X-Received: by 2002:a05:6e02:de6:: with SMTP id m6mr47488213ilj.296.1594320064774;
+ Thu, 09 Jul 2020 11:41:04 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <7aa46e68-5780-2698-67f5-425693478fe1@redhat.com>
+References: <20200709095525.907771-1-pbonzini@redhat.com> <CALMp9eREY4e7kb22CxReNV83HwR7D_tBkn2i5LUbGLGe_yw5nQ@mail.gmail.com>
+ <782fdf92-38f8-c081-9796-5344ab3050d5@redhat.com> <CALMp9eRSvdx+UHggLbvFPms3Li2KY-RjZhjGjcQ3=GbSB1YyyA@mail.gmail.com>
+ <717a1b5d-1bf3-5f72-147a-faccd4611b87@redhat.com>
+In-Reply-To: <717a1b5d-1bf3-5f72-147a-faccd4611b87@redhat.com>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Thu, 9 Jul 2020 11:40:53 -0700
+Message-ID: <CALMp9eThSjLY92-WURobbJBHRKLxGuYPLBWMnq+=FxxYHquTiw@mail.gmail.com>
+Subject: Re: [PATCH] KVM: nSVM: vmentry ignores EFER.LMA and possibly RFLAGS.VM
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     LKML <linux-kernel@vger.kernel.org>,
+        kvm list <kvm@vger.kernel.org>,
+        Maxim Levitsky <mlevitsk@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jul 09, 2020 at 08:24:03PM +0200, Paolo Bonzini wrote:
-> On 09/07/20 20:22, Peter Xu wrote:
-> >>> So I think Peter's patch is fine, but (possibly on top as a third patch)
-> >>> __must_check should be added to MSR getters and setters.  Also one
-> >>> possibility is to return -EINVAL for invalid MSRs.
-> > Yeah I can add another patch for that.  Also if to repost, I tend to also
-> > introduce KVM_MSR_RET_[OK|ERROR] too, which seems to be cleaner when we had
-> > KVM_MSR_RET_INVALID.
-> 
-> You can use either that or 0/1/-EINVAL.  I would be fine with that to
-> keep the patch small.
+On Thu, Jul 9, 2020 at 11:31 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
+>
+> On 09/07/20 20:28, Jim Mattson wrote:
+> >> That said, the VMCB here is guest memory and it can change under our
+> >> feet between nested_vmcb_checks and nested_prepare_vmcb_save.  Copying
+> >> the whole save area is overkill, but we probably should copy at least
+> >> EFER/CR0/CR3/CR4 in a struct at the beginning of nested_svm_vmrun; this
+> >> way there'd be no TOC/TOU issues between nested_vmcb_checks and
+> >> nested_svm_vmrun.  This would also make it easier to reuse the checks in
+> >> svm_set_nested_state.  Maybe Maxim can look at it while I'm on vacation,
+> >> as he's eager to do more nSVM stuff. :D
+> >
+> > I fear that nested SVM is rife with TOCTTOU issues.
+>
+> I am pretty sure about that, actually. :)
+>
+> Another possibility to stomp them in a more efficient manner could be to
+> rely on the dirty flags, and use them to set up an in-memory copy of the
+> VMCB.
 
-Yeah -EINVAL looks good.  Then, do you want me to s/1/-EFAULT/ altogether?
-
--- 
-Peter Xu
-
+That sounds like a great idea! Is Maxim going to look into that?
