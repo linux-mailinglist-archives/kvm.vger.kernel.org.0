@@ -2,137 +2,89 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9164721A27F
-	for <lists+kvm@lfdr.de>; Thu,  9 Jul 2020 16:51:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3707321A290
+	for <lists+kvm@lfdr.de>; Thu,  9 Jul 2020 16:54:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727819AbgGIOvU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 Jul 2020 10:51:20 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:18396 "EHLO
-        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726353AbgGIOvU (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 9 Jul 2020 10:51:20 -0400
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 069EWgTj008126;
-        Thu, 9 Jul 2020 10:51:12 -0400
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 325n5xtvef-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 09 Jul 2020 10:51:12 -0400
-Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 069EWv6i009579;
-        Thu, 9 Jul 2020 10:51:11 -0400
-Received: from ppma06fra.de.ibm.com (48.49.7a9f.ip4.static.sl-reverse.com [159.122.73.72])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 325n5xtvd3-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 09 Jul 2020 10:51:11 -0400
-Received: from pps.filterd (ppma06fra.de.ibm.com [127.0.0.1])
-        by ppma06fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 069Efn2w009788;
-        Thu, 9 Jul 2020 14:51:09 GMT
-Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
-        by ppma06fra.de.ibm.com with ESMTP id 325k2qrfxa-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 09 Jul 2020 14:51:09 +0000
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
-        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 069Ep5MW10551578
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 9 Jul 2020 14:51:06 GMT
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id C6E23AE05F;
-        Thu,  9 Jul 2020 14:51:05 +0000 (GMT)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id F3EDBAE051;
-        Thu,  9 Jul 2020 14:51:04 +0000 (GMT)
-Received: from oc3016276355.ibm.com (unknown [9.145.34.67])
-        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu,  9 Jul 2020 14:51:04 +0000 (GMT)
-Subject: Re: [PATCH v5 2/2] s390: virtio: PV needs VIRTIO I/O device
- protection
-To:     Halil Pasic <pasic@linux.ibm.com>
-Cc:     Cornelia Huck <cohuck@redhat.com>, linux-kernel@vger.kernel.org,
-        borntraeger@de.ibm.com, frankja@linux.ibm.com, mst@redhat.com,
-        jasowang@redhat.com, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, thomas.lendacky@amd.com,
-        david@gibson.dropbear.id.au, linuxram@us.ibm.com,
-        heiko.carstens@de.ibm.com, gor@linux.ibm.com
-References: <1594283959-13742-1-git-send-email-pmorel@linux.ibm.com>
- <1594283959-13742-3-git-send-email-pmorel@linux.ibm.com>
- <20200709105733.6d68fa53.cohuck@redhat.com>
- <270d8674-0f73-0a38-a2a7-fbc1caa44301@linux.ibm.com>
- <20200709164700.09a83069.pasic@linux.ibm.com>
-From:   Pierre Morel <pmorel@linux.ibm.com>
-Message-ID: <c9be019f-236e-5e44-64b6-0875cd40ab11@linux.ibm.com>
-Date:   Thu, 9 Jul 2020 16:51:04 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.9.0
+        id S1726923AbgGIOyJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 Jul 2020 10:54:09 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:37129 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726371AbgGIOyI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 9 Jul 2020 10:54:08 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1594306447;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=h49iUghddx6q/28Q3GpO3NfUnwfKQascXywErp2c0+8=;
+        b=dgbeH73gAd1T9wAGptB5rKeU3K6M3CytHccI1PACMX9SH9tvn+obROtUp/Z5GV5W5mQH2c
+        d68AnLno8tkhD4OWL/yimLXvLIJOIjk+eXdcgVTSmuUazcvIRymACPhhJyeMTOhPB5Ky/r
+        1XqgXrHrtnswlvrBO/EUtJbtmwFZG9I=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-92-lKFlz2d7PPKoAmMNMXLf5w-1; Thu, 09 Jul 2020 10:54:06 -0400
+X-MC-Unique: lKFlz2d7PPKoAmMNMXLf5w-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D8EC18005B0;
+        Thu,  9 Jul 2020 14:54:04 +0000 (UTC)
+Received: from vitty.brq.redhat.com (unknown [10.40.195.35])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 01C1E6106A;
+        Thu,  9 Jul 2020 14:53:59 +0000 (UTC)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Junaid Shahid <junaids@google.com>,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH v3 0/9] KVM: nSVM: fixes for CR3/MMU switch upon nested guest entry/exit
+Date:   Thu,  9 Jul 2020 16:53:49 +0200
+Message-Id: <20200709145358.1560330-1-vkuznets@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200709164700.09a83069.pasic@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
- definitions=2020-07-09_08:2020-07-09,2020-07-09 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- suspectscore=0 bulkscore=0 impostorscore=0 malwarescore=0
- lowpriorityscore=0 mlxlogscore=999 clxscore=1015 phishscore=0 spamscore=0
- mlxscore=0 adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2006250000 definitions=main-2007090104
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+This is a successor of "[PATCH v2 0/3] KVM: nSVM: fix #TF from CR3 switch
+when entering guest" and "[PATCH] KVM: x86: drop erroneous mmu_check_root()
+from fast_pgd_switch()".
 
+The snowball is growing fast! It all started with an intention to fix
+the particular 'tripple fault' issue (now fixed by PATCH7) but now we
+also get rid of unconditional kvm_mmu_reset_context() upon nested guest
+entry/exit and make the code resemble nVMX. There is still a huge room
+for further improvement (proper error propagation, removing unconditional
+MMU sync/TLB flush,...) but at least we're making some progress.
 
-On 2020-07-09 16:47, Halil Pasic wrote:
-> On Thu, 9 Jul 2020 12:51:58 +0200
-> Pierre Morel <pmorel@linux.ibm.com> wrote:
-> 
->>>> +int arch_validate_virtio_features(struct virtio_device *dev)
->>>> +{
->>>> +	if (!is_prot_virt_guest())
->>>> +		return 0;
->>>> +
->>>> +	if (!virtio_has_feature(dev, VIRTIO_F_VERSION_1)) {
->>>> +		dev_warn(&dev->dev, "device must provide VIRTIO_F_VERSION_1\n");
->>>
->>> I'd probably use "legacy virtio not supported with protected
->>> virtualization".
->>>    
->>>> +		return -ENODEV;
->>>> +	}
->>>> +
->>>> +	if (!virtio_has_feature(dev, VIRTIO_F_IOMMU_PLATFORM)) {
->>>> +		dev_warn(&dev->dev,
->>>> +			 "device must provide VIRTIO_F_IOMMU_PLATFORM\n");
->>>
->>> "support for limited memory access required for protected
->>> virtualization"
->>>
->>> ?
->>>
->>> Mentioning the feature flag is shorter in both cases, though.
->>
->> And I think easier to look for in case of debugging purpose.
->> I change it if there is more demands.
-> 
-> Not all our end users are kernel and/or qemu developers. I find the
-> messages from v4 less technical, more informative, and way better.
-> 
-> Regards,
-> Halil
-> 
+Tested with kvm selftests/kvm-unit-tests and by running nested Hyper-V
+on KVM. The series doesn't seem to introduce any new issues.
 
-Can you please tell me the messages you are speaking of, because for me 
-the warning's messages are exactly the same in v4 and v5!?
+Vitaly Kuznetsov (9):
+  KVM: nSVM: split kvm_init_shadow_npt_mmu() from kvm_init_shadow_mmu()
+  KVM: nSVM: stop dereferencing vcpu->arch.mmu to get the context in
+    kvm_init_shadow{,_npt}_mmu()
+  KVM: nSVM: reset nested_run_pending upon nested_svm_vmrun_msrpm()
+    failure
+  KVM: nSVM: prepare to handle errors from enter_svm_guest_mode()
+  KVM: nSVM: introduce nested_svm_load_cr3()
+  KVM: nSVM: move kvm_set_cr3() after nested_svm_uninit_mmu_context()
+  KVM: nSVM: implement nested_svm_load_cr3() and use it for host->guest
+    switch
+  KVM: nSVM: use nested_svm_load_cr3() on guest->host switch
+  KVM: x86: drop superfluous mmu_check_root() from fast_pgd_switch()
 
-I checked many times, but may be I still missed something.
-
-Regards,
-Pierre
-
+ arch/x86/kvm/mmu.h        |   3 +-
+ arch/x86/kvm/mmu/mmu.c    |  39 ++++++++++----
+ arch/x86/kvm/svm/nested.c | 108 ++++++++++++++++++++++++++++----------
+ arch/x86/kvm/svm/svm.c    |   6 ++-
+ arch/x86/kvm/svm/svm.h    |   4 +-
+ 5 files changed, 116 insertions(+), 44 deletions(-)
 
 -- 
-Pierre Morel
-IBM Lab Boeblingen
+2.25.4
+
