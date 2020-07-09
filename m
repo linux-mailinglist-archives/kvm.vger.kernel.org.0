@@ -2,104 +2,155 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C3635219C63
-	for <lists+kvm@lfdr.de>; Thu,  9 Jul 2020 11:36:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 64DBA219C6C
+	for <lists+kvm@lfdr.de>; Thu,  9 Jul 2020 11:37:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726340AbgGIJgg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 Jul 2020 05:36:36 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:45480 "EHLO
+        id S1726533AbgGIJhr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 Jul 2020 05:37:47 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:60672 "EHLO
         us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726343AbgGIJgf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 9 Jul 2020 05:36:35 -0400
+        with ESMTP id S1726353AbgGIJhr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 9 Jul 2020 05:37:47 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1594287393;
+        s=mimecast20190719; t=1594287465;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=CtOSVWjGIJKi9/oO387KsYV6nN71WYUQnc1/rUIVcCQ=;
-        b=UOFFEb9kDldq6A/Ibk2A2lDn7Y71QQBlpaI4tPAOsm4iBpwRox+2n4BKRwdKGNySQBz3VP
-        9+B0VPSUeND9unRDzIH0+VTsDLo6vx7C4ylLNQKXPCqIZQKZW6GNsrFTchJmO2Vv0j9Rsy
-        11GoKawE/ontdX2yrZp5NCjG0XdGQaM=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-371-Yn8TH2lgN1yQ_PbokLDVnA-1; Thu, 09 Jul 2020 05:36:29 -0400
-X-MC-Unique: Yn8TH2lgN1yQ_PbokLDVnA-1
-Received: by mail-wm1-f70.google.com with SMTP id g138so1736629wme.7
-        for <kvm@vger.kernel.org>; Thu, 09 Jul 2020 02:36:29 -0700 (PDT)
+        bh=vZkZGfD7uhGw3aCbwlHuBrGlMvsJLTE0nJJY8zr08K0=;
+        b=SMk6ildCunFJCiPiFFX3qziPINhGsl97vDnSB1Tja2Y3YRl3NgMunGta8b1unLB9VWPXY2
+        tzQKpQM51Ob0l5Q9KogS59xHhoxtZpggHz1S3QJvyeBcioUFmclXfBbapgjN8jcrlSgXIt
+        oT/VOmKAH5o+MYzavNjM9+BmVlxChOA=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-101-iemPLGOWOfGceumXAifKEQ-1; Thu, 09 Jul 2020 05:37:43 -0400
+X-MC-Unique: iemPLGOWOfGceumXAifKEQ-1
+Received: by mail-wr1-f72.google.com with SMTP id y16so1516930wrr.20
+        for <kvm@vger.kernel.org>; Thu, 09 Jul 2020 02:37:43 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=CtOSVWjGIJKi9/oO387KsYV6nN71WYUQnc1/rUIVcCQ=;
-        b=Uv5wSFcd3uSxrbvlbK7/6dlOwcEwugko8J1TRbMmAfim1wLXIScOy6BOXW8+FUDlqR
-         /YPG0y3IZR2Oc1LRtpFKIGfvB2QNgJ63q+fBIn1p5ntoBHWbXSGkHykpiCCZEke7PQLn
-         ur2aT1CWgCvOeeoNZ7sYevP8RHCCi7+NQKNax6rTi0gHl1AgEk1uappX6sEA7szWOWMD
-         LbTUAgpdt/hHTm0sA8gQPgZ0hTvWYrM+O/4zTaebxy3Cz6WczhLyzVizdjPkXcyCmHxd
-         qf3bAWTx+pbjNcI6byZfsriQRzcarB00l75HmIbAlVnBJVRhYeiT3YLKQSDt3yso0iVI
-         NHgQ==
-X-Gm-Message-State: AOAM532XvSfqbH9B2+BU/eechOPJJKGbZ14uksJpdgQtdIAg6oZ6BN3E
-        BVkwLtheAlRO+Ym/Aznjg0Cb+tAqSugl9xiePbKEqqAXyPTsrqoQ1RpEVlLyf1+r4ENW1if1tPF
-        qfFNdkSISGgR4
-X-Received: by 2002:adf:8444:: with SMTP id 62mr59594556wrf.278.1594287387920;
-        Thu, 09 Jul 2020 02:36:27 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxF+/9SCj0U6GXVf8JwpX3nYzuOn1m0oxzuCcXP3M+psZPR6wlzkntLRIF5WbnZXVyW0XesCg==
-X-Received: by 2002:adf:8444:: with SMTP id 62mr59594536wrf.278.1594287387675;
-        Thu, 09 Jul 2020 02:36:27 -0700 (PDT)
+        bh=vZkZGfD7uhGw3aCbwlHuBrGlMvsJLTE0nJJY8zr08K0=;
+        b=sx4wZF0K2a7S2U4J4nvIB2wyHqDej24NvVBA2V1usp94UGPLLIku98UD8Ye6p4oh/l
+         OPHU22TLwB+Ouque7Ope7H5jpTteTwmO7O/cOZLymDMlb+iXKS//iqBBVI21ZnQGWeX9
+         YY9CovTsipbuHYup2Xd0JH4yQdw/RLmgDFInwvupGqM1/8HWFZpAnjoRFsO0AhzaUABV
+         orAzPzumn5sJVRGvwRJtRLntFQjf1Yz+J+Eutd7lzDtFpu4XwxQSq1SLZj+78A+CDYqe
+         uIxzruP1zqSHQd2uNdY/jdRf5RufqHAbn/znzkykJDFPdTe2FbBrQtEhyrj5UFa3MGv0
+         tGzQ==
+X-Gm-Message-State: AOAM530K/iAhlXQAJRhxUrxppaX7bSeQK7aXazAw3jM+Gglo8mNj1QNi
+        ZHYigrlS0VGL6JL2/m20FQPYe9SXkFCSha88nhB6tTQQH62y/PP0lXCunqV2gKwzgHDOHuAare9
+        bJGY8Su1BLgpv
+X-Received: by 2002:adf:fd8e:: with SMTP id d14mr62388103wrr.202.1594287462641;
+        Thu, 09 Jul 2020 02:37:42 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwsB7+szqf5rMRlotUrNNWYyOY5QqqyygFQfXJIgIgWNl9g8ybRGwWmy9MiscFM9mSBYt3iVg==
+X-Received: by 2002:adf:fd8e:: with SMTP id d14mr62388080wrr.202.1594287462420;
+        Thu, 09 Jul 2020 02:37:42 -0700 (PDT)
 Received: from ?IPv6:2001:b07:6468:f312:9541:9439:cb0f:89c? ([2001:b07:6468:f312:9541:9439:cb0f:89c])
-        by smtp.gmail.com with ESMTPSA id j15sm4559275wrx.69.2020.07.09.02.36.26
+        by smtp.gmail.com with ESMTPSA id a4sm5012609wrg.80.2020.07.09.02.37.41
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 09 Jul 2020 02:36:27 -0700 (PDT)
-Subject: Re: [PATCH 2/3 v4] KVM: nSVM: Check that MBZ bits in CR3 and CR4 are
- not set on vmrun of nested guests
-To:     Jim Mattson <jmattson@google.com>,
-        Krish Sadhukhan <krish.sadhukhan@oracle.com>
-Cc:     kvm list <kvm@vger.kernel.org>
-References: <1594168797-29444-1-git-send-email-krish.sadhukhan@oracle.com>
- <1594168797-29444-3-git-send-email-krish.sadhukhan@oracle.com>
- <699b4ea4-d8df-e098-8f5c-3abe8e4c138c@redhat.com>
- <ed07cbc2-991f-1f9e-9a4d-ef9b4294b373@oracle.com>
- <CALMp9eQRgRX4nnLHp52SY1emjjs7VO90pGKpV3Y0JJvf-bjNFQ@mail.gmail.com>
+        Thu, 09 Jul 2020 02:37:41 -0700 (PDT)
+Subject: Re: [PATCH v3 0/8] Refactor handling flow of KVM_SET_CPUID*
+To:     Xiaoyao Li <xiaoyao.li@intel.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Jim Mattson <jmattson@google.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-doc@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Joerg Roedel <joro@8bytes.org>
+References: <20200708065054.19713-1-xiaoyao.li@intel.com>
+ <55ce27bc-7ff7-3552-0e2d-ce69c66fd68e@redhat.com>
+ <e6432b0d-c509-28e0-7720-a4a0e22ea4d9@intel.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <c7fb2ca9-1663-c305-741d-5a184ca02850@redhat.com>
-Date:   Thu, 9 Jul 2020 11:36:25 +0200
+Message-ID: <a5c0b6dc-518a-8963-0c0e-ad55189bd356@redhat.com>
+Date:   Thu, 9 Jul 2020 11:37:41 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.9.0
 MIME-Version: 1.0
-In-Reply-To: <CALMp9eQRgRX4nnLHp52SY1emjjs7VO90pGKpV3Y0JJvf-bjNFQ@mail.gmail.com>
+In-Reply-To: <e6432b0d-c509-28e0-7720-a4a0e22ea4d9@intel.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 09/07/20 01:07, Jim Mattson wrote:
->> Just curious about using LME instead of LMA. According to APM,
+On 09/07/20 06:27, Xiaoyao Li wrote:
+> On 7/8/2020 8:10 PM, Paolo Bonzini wrote:
+>> On 08/07/20 08:50, Xiaoyao Li wrote:
+>>> This serial is the extended version of
+>>> https://lkml.kernel.org/r/20200528151927.14346-1-xiaoyao.li@intel.com
+>>>
+>>> First two patches are bug fixing, and the others aim to refactor the
+>>> flow
+>>> of SET_CPUID* as:
+>>>
+>>> 1. cpuid check: check if userspace provides legal CPUID settings;
+>>>
+>>> 2. cpuid update: Update some special CPUID bits based on current vcpu
+>>>                   state, e.g., OSXSAVE, OSPKE, ...
+>>>
+>>> 3. update vcpu model: Update vcpu model (settings) based on the final
+>>> CPUID
+>>>                        settings.
+>>>
+>>> v3:
+>>>   - Add a note in KVM api doc to state the previous CPUID configuration
+>>>     is not reliable if current KVM_SET_CPUID* fails [Jim]
+>>>   - Adjust Patch 2 to reduce code churn [Sean]
+>>>   - Commit message refine to add more justification [Sean]
+>>>   - Add a new patch (7)
+>>>
+>>> v2:
+>>> https://lkml.kernel.org/r/20200623115816.24132-1-xiaoyao.li@intel.com
+>>>   - rebase to kvm/queue: a037ff353ba6 ("Merge branch 'kvm-master'
+>>> into HEAD")
+>>>   - change the name of kvm_update_state_based_on_cpuid() to
+>>>     kvm_update_vcpu_model() [Sean]
+>>>   - Add patch 5 to rename kvm_x86_ops.cpuid_date() to
+>>>     kvm_x86_ops.update_vcpu_model()
+>>>
+>>> v1:
+>>> https://lkml.kernel.org/r/20200529085545.29242-1-xiaoyao.li@intel.com
+>>>
+>>> Xiaoyao Li (8):
+>>>    KVM: X86: Reset vcpu->arch.cpuid_nent to 0 if SET_CPUID* fails
+>>>    KVM: X86: Go on updating other CPUID leaves when leaf 1 is absent
+>>>    KVM: X86: Introduce kvm_check_cpuid()
+>>>    KVM: X86: Split kvm_update_cpuid()
+>>>    KVM: X86: Rename cpuid_update() to update_vcpu_model()
+>>>    KVM: X86: Move kvm_x86_ops.update_vcpu_model() into
+>>>      kvm_update_vcpu_model()
+>>>    KVM: lapic: Use guest_cpuid_has() in kvm_apic_set_version()
+>>>    KVM: X86: Move kvm_apic_set_version() to kvm_update_vcpu_model()
+>>>
+>>>   Documentation/virt/kvm/api.rst  |   4 ++
+>>>   arch/x86/include/asm/kvm_host.h |   2 +-
+>>>   arch/x86/kvm/cpuid.c            | 107 ++++++++++++++++++++------------
+>>>   arch/x86/kvm/cpuid.h            |   3 +-
+>>>   arch/x86/kvm/lapic.c            |   4 +-
+>>>   arch/x86/kvm/svm/svm.c          |   4 +-
+>>>   arch/x86/kvm/vmx/nested.c       |   2 +-
+>>>   arch/x86/kvm/vmx/vmx.c          |   4 +-
+>>>   arch/x86/kvm/x86.c              |   1 +
+>>>   9 files changed, 81 insertions(+), 50 deletions(-)
+>>>
 >>
->>      " The processor behaves as a 32-bit x86 processor in all respects
->> until long mode is activated, even if long mode is enabled. None of the
->> new 64-bit data sizes, addressing, or system aspects available in long
->> mode can be used until EFER.LMA=1."
->>
->>
->> Is it possible that L1 sets LME, but not LMA, in L2's  VMCS and this
->> code will execute even if the processor is not in long-mode ?
->
-> No. EFER.LMA is not modifiable through software. It is always
-> "EFER.LME != 0 && CR0.PG != 0."
+>> Queued patches 1/2/3/7/8, thanks.
+> 
+> Paolo,
+> 
+> I notice that you queued patch 8 into kvm/queue branch as
+> commit 84dd4897524e "KVM: X86: Move kvm_apic_set_version() to
+> kvm_update_vcpu_model()"
+> 
+> Can you change the subject of that commit to "KVM: X86: Move
+> kvm_apic_set_version() to kvm_update_cpuid()" ?
 
-In fact, AMD doesn't specify (unlike Intel) that EFER.LME, CR0.PG and
-EFER.LMA must be consistent, and for SMM state restore they say that
-"The EFER.LMA register bit is set to the value obtained by logically
-ANDing the SMRAM values of EFER.LME, CR0.PG, and CR4.PAE".  So it is
-plausible that they ignore completely EFER.LMA in the VMCB.
-
-I quickly tried hacking svm_set_efer to set or reset it, and it works
-either way.  EFLAGS.VM from the VMCB is also ignored if the processor is
-in long mode just like the APM says in "10.4 Leaving SMM"!
+Good catch, thanks.
 
 Paolo
 
