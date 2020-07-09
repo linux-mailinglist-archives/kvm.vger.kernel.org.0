@@ -2,140 +2,127 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E2688219ED7
-	for <lists+kvm@lfdr.de>; Thu,  9 Jul 2020 13:08:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 944DE219F2C
+	for <lists+kvm@lfdr.de>; Thu,  9 Jul 2020 13:41:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727867AbgGILIn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 Jul 2020 07:08:43 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:51593 "EHLO
+        id S1726782AbgGILlK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 Jul 2020 07:41:10 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:54872 "EHLO
         us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726965AbgGILIm (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 9 Jul 2020 07:08:42 -0400
+        by vger.kernel.org with ESMTP id S1726541AbgGILlJ (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 9 Jul 2020 07:41:09 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1594292920;
+        s=mimecast20190719; t=1594294868;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=/VQ/bbKphw/VMeQL/b68UkYDq7JQp1wzTsPmr8cUuhg=;
-        b=Tb7S7YvMyKbMQefnOWgVFfTA7XlyXLqLbmGSh4G35nLMCvJISFMaGpVcTj54Z5dypBqJgw
-        /ZM24EGWN8pDj+t5wBiM6vsCWztREI75X/I7UQ5KrrJi06OS0+sAvzqu0hoAzZUqihSFBa
-        NI4aFoIWpUg7MauduOMQ+OwF5f9jxZE=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-428-9l6Fs8IHMXar2qpnRqRfaw-1; Thu, 09 Jul 2020 07:08:37 -0400
-X-MC-Unique: 9l6Fs8IHMXar2qpnRqRfaw-1
-Received: by mail-wr1-f72.google.com with SMTP id w4so1649691wrm.5
-        for <kvm@vger.kernel.org>; Thu, 09 Jul 2020 04:08:37 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=/VQ/bbKphw/VMeQL/b68UkYDq7JQp1wzTsPmr8cUuhg=;
-        b=d4OZvxEKYa+lqVtXArsfX97PXO+IUO1ZpuZsr4kI137PiTK2MylEHLDk6MvZw10VJy
-         rjuBCfWnWy1ufETplQ8TOuodOD0XSZ30a3aQMGbVvdZKrdHIxsD+SkPBprxxA8P6X4BV
-         g2lFg5K0lg2EnwcaOvTlNLEeonX1mq23M++SvM/rNJTtrjiHvTV0jIvX4WH1InaZHS5v
-         s1AEI2E80E2HOus2k/Wf2RV7xpYhtCdXml4oaYt6rJSfFuJN8PJeBjuxp2sccRbV7KWJ
-         mJoGl2K3RvS2nfJe31lQvvjcGJvcnaHE8t9HhMJY1/o84RzLhPysAYt0TBSGoc0gx+Bm
-         A1PA==
-X-Gm-Message-State: AOAM532YY59k1MPDfpIyYi8cRW01Hon/9dLb6n34KUdbOzRcHpLJGRCY
-        d+fHPKdSxh8qsbo7scE8u+aUmJ10/LeJYSnT92s1a7E9Cs4TWNbpWnNfcu3A+cUQb1vuWD3k1Jx
-        61WXreZnOHpDb
-X-Received: by 2002:a05:600c:2dc1:: with SMTP id e1mr12896156wmh.108.1594292915872;
-        Thu, 09 Jul 2020 04:08:35 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJw5KP0WqaysJjvrDs462rnOxXBxhY7HW8t+OBDNH5uf4ec8HztZjYBRTlo2jYdog4oXLc4CRQ==
-X-Received: by 2002:a05:600c:2dc1:: with SMTP id e1mr12896128wmh.108.1594292915485;
-        Thu, 09 Jul 2020 04:08:35 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:9541:9439:cb0f:89c? ([2001:b07:6468:f312:9541:9439:cb0f:89c])
-        by smtp.gmail.com with ESMTPSA id w14sm5051815wrt.55.2020.07.09.04.08.33
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 09 Jul 2020 04:08:34 -0700 (PDT)
-Subject: Re: [PATCH v4 0/5] Refactor handling flow of KVM_SET_CPUID*
-To:     Xiaoyao Li <xiaoyao.li@intel.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20200709043426.92712-1-xiaoyao.li@intel.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <f2814b87-5b15-e165-9042-a650e0acf9e1@redhat.com>
-Date:   Thu, 9 Jul 2020 13:08:33 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.9.0
+        bh=9FS4nq3l74NvUGdG33Vk2HiCPbybnGoivD3bAOH9YxY=;
+        b=ZHBYEEORaA6mct9PfYNcrIh3VmH/WInHbvFiafGuDvBSTrlzWeED2CNJRJnNO6mldwkjbb
+        BZsfU7H0EYe2BbDQvaAGpglw/YEbi5ReA1B+fZ2sIG7A9qXZ3FkDLgKMzwPVR4Lj1wQPAn
+        zaSVNKwBFi/YlHdcx3IAK08NX7Dqb98=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-447-tu2v7dA0MZ-0rLggUiWMFQ-1; Thu, 09 Jul 2020 07:41:06 -0400
+X-MC-Unique: tu2v7dA0MZ-0rLggUiWMFQ-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2E7AD107ACF2;
+        Thu,  9 Jul 2020 11:41:05 +0000 (UTC)
+Received: from gondolin (ovpn-113-62.ams2.redhat.com [10.36.113.62])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 867BB7F8BF;
+        Thu,  9 Jul 2020 11:40:59 +0000 (UTC)
+Date:   Thu, 9 Jul 2020 13:40:56 +0200
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Pierre Morel <pmorel@linux.ibm.com>
+Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
+        frankja@linux.ibm.com, david@redhat.com, thuth@redhat.com,
+        drjones@redhat.com
+Subject: Re: [kvm-unit-tests PATCH v11 8/9] s390x: css: msch, enable test
+Message-ID: <20200709134056.0d267b6c.cohuck@redhat.com>
+In-Reply-To: <1594282068-11054-9-git-send-email-pmorel@linux.ibm.com>
+References: <1594282068-11054-1-git-send-email-pmorel@linux.ibm.com>
+        <1594282068-11054-9-git-send-email-pmorel@linux.ibm.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-In-Reply-To: <20200709043426.92712-1-xiaoyao.li@intel.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 09/07/20 06:34, Xiaoyao Li wrote:
-> 4 Patches of v3 has been queued into kvm/queue branch. This v4 contains
-> the rest to refactor the flow of KVM_SET_CPUID* as:
-> 
-> 1. cpuid check: check if userspace provides legal CPUID settings;
-> 
-> 2. cpuid update: Update userspace provided CPUID settings. It currently
->    only contains kvm_update_cpuid_runtime, which updates special CPUID
->    bits based on the vcpu state, e.g., OSXSAVE, OSPKE. In the future, we
->    can re-introduce kvm_update_cpuid() if KVM needs to force on/off some
->    bits.
-> 
-> 3. update vcpu states: Update vcpu states/settings based on the final updated
->    CPUID settings. 
-> 
-> v4:
->  - remove 4 queued patches
->  - rebased to kvm/queue: c16ced9cc67a "x86/kvm/vmx: Use native read/write_cr2()"
->  - fix one bug in v3 to call kvfree(cpuid_entries) in kvm_vcpu_ioctl_set_cpuid()
->  - rename "update_vcpu_model" to "vcpu_after_set_cpuid" [Paolo]	
->  - Add a new patch to extrace kvm_update_cpuid_runtime()
-> 
-> v3:
-> https://lkml.kernel.org/r/20200708065054.19713-1-xiaoyao.li@intel.com
->  - Add a note in KVM api doc to state the previous CPUID configuration
->    is not reliable if current KVM_SET_CPUID* fails [Jim]
->  - Adjust Patch 2 to reduce code churn [Sean]
->  - Commit message refine to add more justification [Sean]
->  - Add a new patch 7
-> 
-> v2:
-> https://lkml.kernel.org/r/20200623115816.24132-1-xiaoyao.li@intel.com
->  - rebase to kvm/queue: a037ff353ba6 ("Merge branch 'kvm-master' into HEAD")
->  - change the name of kvm_update_state_based_on_cpuid() to
->    kvm_update_vcpu_model() [Sean]
->  - Add patch 5 to rename kvm_x86_ops.cpuid_date() to
->    kvm_x86_ops.update_vcpu_model()
-> 
-> v1:
-> https://lkml.kernel.org/r/20200529085545.29242-1-xiaoyao.li@intel.com
-> 
-> Xiaoyao Li (5):
->   KVM: x86: Introduce kvm_check_cpuid()
->   KVM: x86: Extract kvm_update_cpuid_runtime() from kvm_update_cpuid()
->   KVM: x86: Rename kvm_update_cpuid() to kvm_vcpu_after_set_cpuid()
->   KVM: x86: Rename cpuid_update() callback to vcpu_after_set_cpuid()
->   KVM: x86: Move kvm_x86_ops.vcpu_after_set_cpuid() into
->     kvm_vcpu_after_set_cpuid()
-> 
->  arch/x86/include/asm/kvm_host.h |  2 +-
->  arch/x86/kvm/cpuid.c            | 99 +++++++++++++++++++++------------
->  arch/x86/kvm/cpuid.h            |  2 +-
->  arch/x86/kvm/lapic.c            |  2 +-
->  arch/x86/kvm/svm/svm.c          |  4 +-
->  arch/x86/kvm/vmx/nested.c       |  3 +-
->  arch/x86/kvm/vmx/vmx.c          |  4 +-
->  arch/x86/kvm/x86.c              | 10 ++--
->  8 files changed, 76 insertions(+), 50 deletions(-)
-> 
+On Thu,  9 Jul 2020 10:07:47 +0200
+Pierre Morel <pmorel@linux.ibm.com> wrote:
 
-Queued, thanks.
+> A second step when testing the channel subsystem is to prepare a channel
+> for use.
+> This includes:
+> - Get the current subchannel Information Block (SCHIB) using STSCH
+> - Update it in memory to set the ENABLE bit and the specified ISC
+> - Tell the CSS that the SCHIB has been modified using MSCH
+> - Get the SCHIB from the CSS again to verify that the subchannel is
+>   enabled and uses the specified ISC.
+> - If the command succeeds but subchannel is not enabled or the ISC
+>   field is not as expected, retry a predefined retries count.
+> - If the command fails, report the failure and do not retry, even
+>   if cc indicates a busy/status pending as we do not expect this.
+> 
+> This tests the MSCH instruction to enable a channel successfully.
+> Retries are done and in case of error, and if the retries count
+> is exceeded, a report is made.
+> 
+> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+> Acked-by: Thomas Huth <thuth@redhat.com>
+> Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+> ---
+>  lib/s390x/css.h     |  8 +++--
+>  lib/s390x/css_lib.c | 72 +++++++++++++++++++++++++++++++++++++++++++++
+>  s390x/css.c         | 15 ++++++++++
+>  3 files changed, 92 insertions(+), 3 deletions(-)
 
-Paolo
+(...)
+
+> +/*
+> + * css_msch: enable subchannel and set with specified ISC
+
+"css_enable: enable the subchannel with the specified ISC"
+
+?
+
+> + * @schid: Subchannel Identifier
+> + * @isc  : number of the interruption subclass to use
+> + * Return value:
+> + *   On success: 0
+> + *   On error the CC of the faulty instruction
+> + *      or -1 if the retry count is exceeded.
+> + */
+> +int css_enable(int schid, int isc)
+> +{
+> +	struct pmcw *pmcw = &schib.pmcw;
+> +	int retry_count = 0;
+> +	uint16_t flags;
+> +	int cc;
+> +
+> +	/* Read the SCHIB for this subchannel */
+> +	cc = stsch(schid, &schib);
+> +	if (cc) {
+> +		report_info("stsch: sch %08x failed with cc=%d", schid, cc);
+> +		return cc;
+> +	}
+> +
+> +	flags = PMCW_ENABLE | (isc << PMCW_ISC_SHIFT);
+> +	if ((pmcw->flags & flags) == flags) {
+
+I think you want (pmcw->flags & PMCW_ENABLE) == PMCW_ENABLE -- this
+catches the case of "subchannel has been enabled before, but with a
+different isc".
+
+> +		report_info("stsch: sch %08x already enabled", schid);
+> +		return 0;
+> +	}
+
+(...)
 
