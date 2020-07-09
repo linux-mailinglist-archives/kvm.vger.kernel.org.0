@@ -2,136 +2,100 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0628021A593
-	for <lists+kvm@lfdr.de>; Thu,  9 Jul 2020 19:13:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3D06121A597
+	for <lists+kvm@lfdr.de>; Thu,  9 Jul 2020 19:15:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728054AbgGIRND (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 Jul 2020 13:13:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43770 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727104AbgGIRNC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 9 Jul 2020 13:13:02 -0400
-Received: from mail-il1-x142.google.com (mail-il1-x142.google.com [IPv6:2607:f8b0:4864:20::142])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 63746C08C5CE
-        for <kvm@vger.kernel.org>; Thu,  9 Jul 2020 10:13:02 -0700 (PDT)
-Received: by mail-il1-x142.google.com with SMTP id a11so2698900ilk.0
-        for <kvm@vger.kernel.org>; Thu, 09 Jul 2020 10:13:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=QO9IvrvbdFbIKVhCbtd7ASpLnMxeM4m98MgJitQIbbM=;
-        b=gSQofJDz/xtC3LY7CHzehbvYXFf8x2QKBUjKyVSTLKCjJLkgB0FkC7RWx2bpt7S9yF
-         nZRhB1Sf/zjf4V4rI0AgecBncWsepMGOCtF2RkK7eYiTfmVY63TuujpmbHzfWwoC8K2Q
-         slRXybq4eTpBGXaGeRP1mF/pKXKK4hCQby2KJYK51GTq8PxDflwr1419KwYCSL5R2M+t
-         3BX73E/XD/fheLb7KhX9lvzGwqnPnoUXZXaFFmpHXA0VF+knCT9MlLeZBsPqRN0x4Wug
-         FXzoGeD1e3r2Px6IoEhBniy9/bkBGVB01lLqKuLwb4iAd6s2JzmCfGel8wtU9H1GNGBQ
-         0dfw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=QO9IvrvbdFbIKVhCbtd7ASpLnMxeM4m98MgJitQIbbM=;
-        b=AguQCaOyKk/JN7CgjAwWGB+sFZk6F+u17LOypjVKFwCXqlD8zgndWnSl7aWfgqgbSL
-         I9GY8lHAaVrAbY47RPly0eD2crkEF4PeXgU3whDje0FiQDeQzyFlpvDAoq6w26z7+O75
-         3rNRI3Oo6Cm2IVn+HWJ4h/gyXIbkGQilaBSyA7XcON+7lU1cYpstMR9Raw9HbPl1jG9J
-         GjhGvHuCOmjdtdBEPyxwdSGqkgHdjGtXcYQIRPU2azDphtD0lJ+K55ZvFRL9q05rC5d7
-         dC95FMyuvG4r4dWimyg+zjE320aAAmdhHs4kFuWoz2R+sfqDz75yRM65fRFqnweocG/N
-         kz1A==
-X-Gm-Message-State: AOAM533rS2xqA5i9XY39vZPvf7tZflaQy7amKb9N8md1NRr2D68PqznG
-        tTr0/3ZvpiPGQ8kL1e2doB09RUK319no0Th4rBViT7c4kbQHVQ==
-X-Google-Smtp-Source: ABdhPJxa4dFEbhQpI8FUCI9c4RTZ/KqESl+J/S5E5+jrfkm0yt9foFGwK9W9gn7Ks2MUKg5pWO1OYTddy9xukrw/XGo=
-X-Received: by 2002:a05:6e02:de6:: with SMTP id m6mr47104980ilj.296.1594314781244;
- Thu, 09 Jul 2020 10:13:01 -0700 (PDT)
+        id S1728048AbgGIRPS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 Jul 2020 13:15:18 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:60336 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726758AbgGIRPR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 9 Jul 2020 13:15:17 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1594314916;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=rxmyluFqhYgjlE8gknBB9LIu9DuavODGBVATYaytN8k=;
+        b=Fw/KKrPXCsMBCym8yze/fJOhxcpIMJKHYTrB6z+1zIyHX3Mfu1ugE6fCGPKQnWVAlifgmn
+        Da0Uo9E9ZoWgjpL+hjiYD+HDE30eXtn9QCst2gAoiJhJAM8p9MBcPfMVdvmQXlp0H0WtB7
+        9Yf1a5OBOoiD7LiGOY01Uf7GySszTDg=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-157-yE6sFXMCM8qmyFHsuVY5lw-1; Thu, 09 Jul 2020 13:15:14 -0400
+X-MC-Unique: yE6sFXMCM8qmyFHsuVY5lw-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2C3E810059A2;
+        Thu,  9 Jul 2020 17:15:13 +0000 (UTC)
+Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id C4CF8610F2;
+        Thu,  9 Jul 2020 17:15:08 +0000 (UTC)
+From:   Paolo Bonzini <pbonzini@redhat.com>
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     bsd@redhat.com, Makarand Sonare <makarandsonare@google.com>
+Subject: [PATCH] KVM: nVMX: fixes for preemption timer migration
+Date:   Thu,  9 Jul 2020 13:15:07 -0400
+Message-Id: <20200709171507.1819-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-References: <20200709095525.907771-1-pbonzini@redhat.com>
-In-Reply-To: <20200709095525.907771-1-pbonzini@redhat.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Thu, 9 Jul 2020 10:12:50 -0700
-Message-ID: <CALMp9eREY4e7kb22CxReNV83HwR7D_tBkn2i5LUbGLGe_yw5nQ@mail.gmail.com>
-Subject: Re: [PATCH] KVM: nSVM: vmentry ignores EFER.LMA and possibly RFLAGS.VM
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     LKML <linux-kernel@vger.kernel.org>, kvm list <kvm@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jul 9, 2020 at 2:55 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
->
-> AMD doesn't specify (unlike Intel) that EFER.LME, CR0.PG and
-> EFER.LMA must be consistent, and for SMM state restore they say that
-> "The EFER.LMA register bit is set to the value obtained by logically
-> ANDing the SMRAM values of EFER.LME, CR0.PG, and CR4.PAE".  It turns
-> out that this is also true for vmentry: the EFER.LMA value in the VMCB
-> is completely ignored, and so is EFLAGS.VM if the processor is in
-> long mode or real mode.
->
-> Implement these quirks; the EFER.LMA part is needed because svm_set_efer
-> looks at the LMA bit in order to support EFER.NX=0, while the EFLAGS.VM
-> part is just because we can.
->
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
->  arch/x86/kvm/svm/nested.c | 20 +++++++++++++++++++-
->  1 file changed, 19 insertions(+), 1 deletion(-)
->
-> diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
-> index 402ea5b412f0..1c82a1789e0e 100644
-> --- a/arch/x86/kvm/svm/nested.c
-> +++ b/arch/x86/kvm/svm/nested.c
-> @@ -337,6 +337,24 @@ static void nested_vmcb_save_pending_event(struct vcpu_svm *svm,
->
->  static void nested_prepare_vmcb_save(struct vcpu_svm *svm, struct vmcb *nested_vmcb)
->  {
-> +       u64 efer = nested_vmcb->save.efer;
-> +
-> +       /* The processor ignores EFER.LMA, but svm_set_efer needs it.  */
-> +       efer &= ~EFER_LMA;
-> +       if ((nested_vmcb->save.cr0 & X86_CR0_PG)
-> +           && (nested_vmcb->save.cr4 & X86_CR4_PAE)
-> +           && (efer & EFER_LME))
-> +               efer |= EFER_LMA;
+Commit 850448f35aaf ("KVM: nVMX: Fix VMX preemption timer migration",
+2020-06-01) accidentally broke nVMX live migration from older version
+by changing the userspace ABI.  Restore it and, while at it, ensure
+that vmx->nested.has_preemption_timer_deadline is always initialized
+according to the KVM_STATE_VMX_PREEMPTION_TIMER_DEADLINE flag.
 
-The CR4.PAE check is unnecessary, isn't it? The combination CR0.PG=1,
-EFER.LMA=1, and CR4.PAE=0 is not a legal processor state.
+Cc: Makarand Sonare <makarandsonare@google.com>
+Fixes: 850448f35aaf ("KVM: nVMX: Fix VMX preemption timer migration")
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ arch/x86/include/uapi/asm/kvm.h | 5 +++--
+ arch/x86/kvm/vmx/nested.c       | 3 ++-
+ 2 files changed, 5 insertions(+), 3 deletions(-)
 
-According to the SDM,
+diff --git a/arch/x86/include/uapi/asm/kvm.h b/arch/x86/include/uapi/asm/kvm.h
+index 17c5a038f42d..0780f97c1850 100644
+--- a/arch/x86/include/uapi/asm/kvm.h
++++ b/arch/x86/include/uapi/asm/kvm.h
+@@ -408,14 +408,15 @@ struct kvm_vmx_nested_state_data {
+ };
+ 
+ struct kvm_vmx_nested_state_hdr {
+-	__u32 flags;
+ 	__u64 vmxon_pa;
+ 	__u64 vmcs12_pa;
+-	__u64 preemption_timer_deadline;
+ 
+ 	struct {
+ 		__u16 flags;
+ 	} smm;
++
++	__u32 flags;
++	__u64 preemption_timer_deadline;
+ };
+ 
+ struct kvm_svm_nested_state_data {
+diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+index b26655104d4a..3fc2411edc92 100644
+--- a/arch/x86/kvm/vmx/nested.c
++++ b/arch/x86/kvm/vmx/nested.c
+@@ -6180,7 +6180,8 @@ static int vmx_set_nested_state(struct kvm_vcpu *vcpu,
+ 		vmx->nested.has_preemption_timer_deadline = true;
+ 		vmx->nested.preemption_timer_deadline =
+ 			kvm_state->hdr.vmx.preemption_timer_deadline;
+-	}
++	} else
++		vmx->nested.has_preemption_timer_deadline = false;
+ 
+ 	if (nested_vmx_check_controls(vcpu, vmcs12) ||
+ 	    nested_vmx_check_host_state(vcpu, vmcs12) ||
+-- 
+2.26.2
 
-* IA32_EFER.LME cannot be modified while paging is enabled (CR0.PG =
-1). Attempts to do so using WRMSR cause a general-protection exception
-(#GP(0)).
-* Paging cannot be enabled (by setting CR0.PG to 1) while CR4.PAE = 0
-and IA32_EFER.LME = 1. Attempts to do so using MOV to CR0 cause a
-general-protection exception (#GP(0)).
-* CR4.PAE and CR4.LA57 cannot be modified while either 4-level paging
-or 5-level paging is in use (when CR0.PG = 1 and IA32_EFER.LME = 1).
-Attempts to do so using MOV to CR4 cause a general-protection
-exception (#GP(0)).
-
-> +
-> +       /*
-> +        * Likewise RFLAGS.VM is cleared if inconsistent with other processor
-> +        * state.  This is sort-of documented in "10.4 Leaving SMM" but applies
-> +        * to SVM as well.
-> +        */
-> +       if (!(nested_vmcb->save.cr0 & X86_CR0_PE)
-> +           || (efer & EFER_LMA))
-> +               nested_vmcb->save.rflags &= ~X86_EFLAGS_VM;
-> +
->         /* Load the nested guest state */
->         svm->vmcb->save.es = nested_vmcb->save.es;
->         svm->vmcb->save.cs = nested_vmcb->save.cs;
-> @@ -345,7 +363,7 @@ static void nested_prepare_vmcb_save(struct vcpu_svm *svm, struct vmcb *nested_v
->         svm->vmcb->save.gdtr = nested_vmcb->save.gdtr;
->         svm->vmcb->save.idtr = nested_vmcb->save.idtr;
->         kvm_set_rflags(&svm->vcpu, nested_vmcb->save.rflags);
-> -       svm_set_efer(&svm->vcpu, nested_vmcb->save.efer);
-> +       svm_set_efer(&svm->vcpu, efer);
->         svm_set_cr0(&svm->vcpu, nested_vmcb->save.cr0);
->         svm_set_cr4(&svm->vcpu, nested_vmcb->save.cr4);
->         (void)kvm_set_cr3(&svm->vcpu, nested_vmcb->save.cr3);
-> --
-> 2.26.2
->
