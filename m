@@ -2,626 +2,372 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 04AEE219A1F
-	for <lists+kvm@lfdr.de>; Thu,  9 Jul 2020 09:37:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 788D7219A76
+	for <lists+kvm@lfdr.de>; Thu,  9 Jul 2020 10:07:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726362AbgGIHhR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 Jul 2020 03:37:17 -0400
-Received: from smtp-fw-33001.amazon.com ([207.171.190.10]:1635 "EHLO
-        smtp-fw-33001.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726183AbgGIHhQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 9 Jul 2020 03:37:16 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1594280233; x=1625816233;
-  h=subject:to:cc:references:from:message-id:date:
-   mime-version:in-reply-to:content-transfer-encoding;
-  bh=td70l1YK+2ggHr5XbLEJo/BgF3dPPCkFscm3fpFN8VU=;
-  b=nz+teg8oOZAv2lsPhnJwA3k0Xh3/8tGEwWemaiDFlZ2qb4952YjcPtSF
-   uov5HiawoaFWWXqaX5XDFYWiBA5Kg079ddOr4VmiACtmm/h+/7B5qFDGJ
-   7IxV7KnIk/7wgvIw+f6dYa4BL15gS0SOris9QTKMPCOeoBre3jyumfiZz
-   8=;
-IronPort-SDR: 0zwBclE1w2FCuzUmi2zMQYwx3h3sfvx9U4uw+XWEZ8gXofN9kZqtrejBbuDzK+saaIuJkeRSAS
- qrEGWJWqPr+w==
-X-IronPort-AV: E=Sophos;i="5.75,331,1589241600"; 
-   d="scan'208";a="57249437"
-Received: from sea32-co-svc-lb4-vlan3.sea.corp.amazon.com (HELO email-inbound-relay-1d-38ae4ad2.us-east-1.amazon.com) ([10.47.23.38])
-  by smtp-border-fw-out-33001.sea14.amazon.com with ESMTP; 09 Jul 2020 07:37:09 +0000
-Received: from EX13MTAUEA002.ant.amazon.com (iad55-ws-svc-p15-lb9-vlan3.iad.amazon.com [10.40.159.166])
-        by email-inbound-relay-1d-38ae4ad2.us-east-1.amazon.com (Postfix) with ESMTPS id 1A174A2595;
-        Thu,  9 Jul 2020 07:37:07 +0000 (UTC)
-Received: from EX13D16EUB001.ant.amazon.com (10.43.166.28) by
- EX13MTAUEA002.ant.amazon.com (10.43.61.77) with Microsoft SMTP Server (TLS)
- id 15.0.1497.2; Thu, 9 Jul 2020 07:37:06 +0000
-Received: from 38f9d34ed3b1.ant.amazon.com (10.43.162.73) by
- EX13D16EUB001.ant.amazon.com (10.43.166.28) with Microsoft SMTP Server (TLS)
- id 15.0.1497.2; Thu, 9 Jul 2020 07:36:57 +0000
-Subject: Re: [PATCH v4 11/18] nitro_enclaves: Add logic for enclave memory
- region set
-To:     Alexander Graf <graf@amazon.de>, <linux-kernel@vger.kernel.org>
-CC:     Anthony Liguori <aliguori@amazon.com>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Colm MacCarthaigh <colmmacc@amazon.com>,
-        "Bjoern Doebel" <doebel@amazon.de>,
-        David Woodhouse <dwmw@amazon.co.uk>,
-        "Frank van der Linden" <fllinden@amazon.com>,
-        Greg KH <gregkh@linuxfoundation.org>,
-        Martin Pohlack <mpohlack@amazon.de>,
-        Matt Wilson <msw@amazon.com>,
-        "Paolo Bonzini" <pbonzini@redhat.com>,
-        Balbir Singh <sblbir@amazon.com>,
-        "Stefano Garzarella" <sgarzare@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Stewart Smith <trawets@amazon.com>,
-        Uwe Dannowski <uwed@amazon.de>, <kvm@vger.kernel.org>,
-        <ne-devel-upstream@amazon.com>
-References: <20200622200329.52996-1-andraprs@amazon.com>
- <20200622200329.52996-12-andraprs@amazon.com>
- <798dbb9f-0fe4-9fd9-2e64-f6f2bc740abf@amazon.de>
-From:   "Paraschiv, Andra-Irina" <andraprs@amazon.com>
-Message-ID: <b7b7691c-595f-531e-9db3-c8e3fc21f983@amazon.com>
-Date:   Thu, 9 Jul 2020 10:36:47 +0300
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:68.0)
- Gecko/20100101 Thunderbird/68.10.0
-MIME-Version: 1.0
-In-Reply-To: <798dbb9f-0fe4-9fd9-2e64-f6f2bc740abf@amazon.de>
-Content-Language: en-US
-X-Originating-IP: [10.43.162.73]
-X-ClientProxiedBy: EX13D06UWA001.ant.amazon.com (10.43.160.220) To
- EX13D16EUB001.ant.amazon.com (10.43.166.28)
-Content-Type: text/plain; charset="windows-1252"; format="flowed"
-Content-Transfer-Encoding: quoted-printable
+        id S1726502AbgGIIH5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 Jul 2020 04:07:57 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:23764 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726124AbgGIIH4 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 9 Jul 2020 04:07:56 -0400
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 069834iB121001;
+        Thu, 9 Jul 2020 04:07:55 -0400
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 325s241bmu-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 09 Jul 2020 04:07:55 -0400
+Received: from m0098409.ppops.net (m0098409.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 06983ENV121675;
+        Thu, 9 Jul 2020 04:07:54 -0400
+Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 325s241bkp-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 09 Jul 2020 04:07:54 -0400
+Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
+        by ppma06ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 0698707K025598;
+        Thu, 9 Jul 2020 08:07:52 GMT
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
+        by ppma06ams.nl.ibm.com with ESMTP id 325k0crkct-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 09 Jul 2020 08:07:52 +0000
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
+        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 06987oFb58327262
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 9 Jul 2020 08:07:50 GMT
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 1A1EEA405B;
+        Thu,  9 Jul 2020 08:07:50 +0000 (GMT)
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 98F9EA4054;
+        Thu,  9 Jul 2020 08:07:49 +0000 (GMT)
+Received: from oc3016276355.ibm.com (unknown [9.145.34.67])
+        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Thu,  9 Jul 2020 08:07:49 +0000 (GMT)
+From:   Pierre Morel <pmorel@linux.ibm.com>
+To:     kvm@vger.kernel.org
+Cc:     linux-s390@vger.kernel.org, frankja@linux.ibm.com,
+        david@redhat.com, thuth@redhat.com, cohuck@redhat.com,
+        drjones@redhat.com
+Subject: [kvm-unit-tests PATCH v11 0/9] s390x: Testing the Channel Subsystem I/O
+Date:   Thu,  9 Jul 2020 10:07:39 +0200
+Message-Id: <1594282068-11054-1-git-send-email-pmorel@linux.ibm.com>
+X-Mailer: git-send-email 1.8.3.1
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
+ definitions=2020-07-09_04:2020-07-08,2020-07-09 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 mlxlogscore=999
+ bulkscore=0 impostorscore=0 phishscore=0 lowpriorityscore=0 mlxscore=0
+ spamscore=0 suspectscore=1 adultscore=0 priorityscore=1501 malwarescore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
+ definitions=main-2007090059
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Hi All,
+
+This new respin of the series add modifications to
+- patches 8: s390x: css: msch, enable test
+- and mostly to patch 9: s390x: css: ssch/tsch with sense and interrupt
+Other patches did not change.
+
+Recall:
+
+Goal of the series is to have a framework to test Channel-Subsystem I/O with
+QEMU/KVM.
+  
+To be able to support interrupt for CSS I/O and for SCLP we need to modify
+the interrupt framework to allow re-entrant interruptions.
+  
+We add a registration for IRQ callbacks to the test program to define its own
+interrupt handler. We need to do special work under interrupt like acknowledging
+the interrupt.
+  
+This series presents three tests:
+- Enumeration:
+        The CSS is enumerated using the STSCH instruction recursively on all
+        potentially existing channels.
+        Keeping the first channel found as a reference for future use.
+        Checks STSCH
+ 
+- Enable:
+        If the enumeration succeeded the tests enables the reference
+        channel with MSCH and verifies with STSCH that the channel is
+        effectively enabled, retrying a predefined count on failure
+	to enable the channel
+        Checks MSCH       
+ 
+- Sense:
+        If the channel is enabled this test sends a SENSE_ID command
+        to the reference channel, analyzing the answer and expecting
+        the Control unit type being 0x3832, a.k.a. virtio-ccw.
+        Checks SSCH(READ) and IO-IRQ
+
+Note:
+- The following 5 patches are general usage and may be pulled first:
+  s390x: saving regs for interrupts
+  s390x: I/O interrupt registration
+  s390x: export the clock get_clock_ms() utility
+  s390x: clock and delays calculations
+  s390x: define function to wait for interrupt
+
+- These 4 patches are really I/O oriented:
+  s390x: Library resources for CSS tests
+  s390x: css: stsch, enumeration test
+  s390x: css: msch, enable test
+  s390x: css: ssch/tsch with sense and interrupt
+
+Regards,
+Pierre
+
+Pierre Morel (9):
+  s390x: saving regs for interrupts
+  s390x: I/O interrupt registration
+  s390x: export the clock get_clock_ms() utility
+  s390x: clock and delays calculations
+  s390x: define function to wait for interrupt
+  s390x: Library resources for CSS tests
+  s390x: css: stsch, enumeration test
+  s390x: css: msch, enable test
+  s390x: css: ssch/tsch with sense and interrupt
+
+ lib/s390x/asm/arch_def.h |  14 ++
+ lib/s390x/asm/time.h     |  50 ++++++
+ lib/s390x/css.h          | 293 +++++++++++++++++++++++++++++++++++
+ lib/s390x/css_dump.c     | 152 ++++++++++++++++++
+ lib/s390x/css_lib.c      | 325 +++++++++++++++++++++++++++++++++++++++
+ lib/s390x/interrupt.c    |  23 ++-
+ lib/s390x/interrupt.h    |   8 +
+ s390x/Makefile           |   3 +
+ s390x/css.c              | 150 ++++++++++++++++++
+ s390x/cstart64.S         |  41 ++++-
+ s390x/intercept.c        |  11 +-
+ s390x/unittests.cfg      |   4 +
+ 12 files changed, 1061 insertions(+), 13 deletions(-)
+ create mode 100644 lib/s390x/asm/time.h
+ create mode 100644 lib/s390x/css.h
+ create mode 100644 lib/s390x/css_dump.c
+ create mode 100644 lib/s390x/css_lib.c
+ create mode 100644 lib/s390x/interrupt.h
+ create mode 100644 s390x/css.c
+
+-- 
+2.25.1
+
+from v10 to v11:
+
+- p8: added ISC to css_enable()
+  (Connie)
+
+- p9: rework css_residual_count()
+  suppress report_info, change label
+  (Connie)
+
+- p9: added wait_and_check_io_completion()
+  (after comment from Connie to test for completion)
 
+- p9: reworked the reports, mostly keeping the sentenses
+  but better use of report_prefix_...()
 
-On 06/07/2020 13:46, Alexander Graf wrote:
->
->
-> On 22.06.20 22:03, Andra Paraschiv wrote:
->> Another resource that is being set for an enclave is memory. User space
->> memory regions, that need to be backed by contiguous memory regions,
->> are associated with the enclave.
->>
->> One solution for allocating / reserving contiguous memory regions, that
->> is used for integration, is hugetlbfs. The user space process that is
->> associated with the enclave passes to the driver these memory regions.
->>
->> The enclave memory regions need to be from the same NUMA node as the
->> enclave CPUs.
->>
->> Add ioctl command logic for setting user space memory region for an
->> enclave.
->>
->> Signed-off-by: Alexandru Vasile <lexnv@amazon.com>
->> Signed-off-by: Andra Paraschiv <andraprs@amazon.com>
->> ---
->> Changelog
->>
->> v3 -> v4
->>
->> * Check enclave memory regions are from the same NUMA node as the
->> =A0=A0 enclave CPUs.
->> * Use dev_err instead of custom NE log pattern.
->> * Update the NE ioctl call to match the decoupling from the KVM API.
->>
->> v2 -> v3
->>
->> * Remove the WARN_ON calls.
->> * Update static calls sanity checks.
->> * Update kzfree() calls to kfree().
->>
->> v1 -> v2
->>
->> * Add log pattern for NE.
->> * Update goto labels to match their purpose.
->> * Remove the BUG_ON calls.
->> * Check if enclave max memory regions is reached when setting an enclave
->> =A0=A0 memory region.
->> * Check if enclave state is init when setting an enclave memory region.
->> ---
->> =A0 drivers/virt/nitro_enclaves/ne_misc_dev.c | 257 ++++++++++++++++++++=
-++
->> =A0 1 file changed, 257 insertions(+)
->>
->> diff --git a/drivers/virt/nitro_enclaves/ne_misc_dev.c =
-
->> b/drivers/virt/nitro_enclaves/ne_misc_dev.c
->> index cfdefa52ed2a..17ccb6cdbd75 100644
->> --- a/drivers/virt/nitro_enclaves/ne_misc_dev.c
->> +++ b/drivers/virt/nitro_enclaves/ne_misc_dev.c
->> @@ -476,6 +476,233 @@ static int ne_create_vcpu_ioctl(struct =
-
->> ne_enclave *ne_enclave, u32 vcpu_id)
->> =A0=A0=A0=A0=A0 return rc;
->> =A0 }
->> =A0 +/**
->> + * ne_sanity_check_user_mem_region - Sanity check the userspace memory
->> + * region received during the set user memory region ioctl call.
->> + *
->> + * This function gets called with the ne_enclave mutex held.
->> + *
->> + * @ne_enclave: private data associated with the current enclave.
->> + * @mem_region: user space memory region to be sanity checked.
->> + *
->> + * @returns: 0 on success, negative return value on failure.
->> + */
->> +static int ne_sanity_check_user_mem_region(struct ne_enclave =
-
->> *ne_enclave,
->> +=A0=A0=A0 struct ne_user_memory_region *mem_region)
->> +{
->> +=A0=A0=A0 if (ne_enclave->mm !=3D current->mm)
->> +=A0=A0=A0=A0=A0=A0=A0 return -EIO;
->> +
->> +=A0=A0=A0 if ((mem_region->memory_size % NE_MIN_MEM_REGION_SIZE) !=3D 0=
-) {
->> +=A0=A0=A0=A0=A0=A0=A0 dev_err_ratelimited(ne_misc_dev.this_device,
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 "Mem size not=
- multiple of 2 MiB\n");
->> +
->> +=A0=A0=A0=A0=A0=A0=A0 return -EINVAL;
->
-> Can we make this an error that gets propagated to user space =
-
-> explicitly? I'd rather have a clear error return value of this =
-
-> function than a random message in dmesg.
-
-We can make this, will add memory checks specific NE error codes, as for =
-
-the other call paths in the series e.g. enclave CPU(s) setup.
-
->
->> +=A0=A0=A0 }
->> +
->> +=A0=A0=A0 if ((mem_region->userspace_addr & (NE_MIN_MEM_REGION_SIZE - 1=
-)) ||
->
-> This logic already relies on the fact that NE_MIN_MEM_REGION_SIZE is a =
-
-> power of two. Can you do the same above on the memory_size check?
-
-Done.
-
->
->> +=A0=A0=A0=A0=A0=A0=A0 !access_ok((void __user *)(unsigned =
-
->> long)mem_region->userspace_addr,
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 mem_region->memory_size)) {
->> +=A0=A0=A0=A0=A0=A0=A0 dev_err_ratelimited(ne_misc_dev.this_device,
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 "Invalid user=
- space addr range\n");
->> +
->> +=A0=A0=A0=A0=A0=A0=A0 return -EINVAL;
->
-> Same comment again. Return different errors for different conditions, =
-
-> so that user space has a chance to print proper errors to its users.
->
-> Also, don't we have to check alignment of userspace_addr as well?
->
-
-Would need an alignment check for 2 MiB at least, yes.
-
->> +=A0=A0=A0 }
->> +
->> +=A0=A0=A0 return 0;
->> +}
->> +
->> +/**
->> + * ne_set_user_memory_region_ioctl - Add user space memory region to =
-
->> the slot
->> + * associated with the current enclave.
->> + *
->> + * This function gets called with the ne_enclave mutex held.
->> + *
->> + * @ne_enclave: private data associated with the current enclave.
->> + * @mem_region: user space memory region to be associated with the =
-
->> given slot.
->> + *
->> + * @returns: 0 on success, negative return value on failure.
->> + */
->> +static int ne_set_user_memory_region_ioctl(struct ne_enclave =
-
->> *ne_enclave,
->> +=A0=A0=A0 struct ne_user_memory_region *mem_region)
->> +{
->> +=A0=A0=A0 struct ne_pci_dev_cmd_reply cmd_reply =3D {};
->> +=A0=A0=A0 long gup_rc =3D 0;
->> +=A0=A0=A0 unsigned long i =3D 0;
->> +=A0=A0=A0 struct ne_mem_region *ne_mem_region =3D NULL;
->> +=A0=A0=A0 unsigned long nr_phys_contig_mem_regions =3D 0;
->> +=A0=A0=A0 unsigned long nr_pinned_pages =3D 0;
->> +=A0=A0=A0 struct page **phys_contig_mem_regions =3D NULL;
->> +=A0=A0=A0 int rc =3D -EINVAL;
->> +=A0=A0=A0 struct slot_add_mem_req slot_add_mem_req =3D {};
->> +
->> +=A0=A0=A0 rc =3D ne_sanity_check_user_mem_region(ne_enclave, mem_region=
-);
->> +=A0=A0=A0 if (rc < 0)
->> +=A0=A0=A0=A0=A0=A0=A0 return rc;
->> +
->> +=A0=A0=A0 ne_mem_region =3D kzalloc(sizeof(*ne_mem_region), GFP_KERNEL);
->> +=A0=A0=A0 if (!ne_mem_region)
->> +=A0=A0=A0=A0=A0=A0=A0 return -ENOMEM;
->> +
->> +=A0=A0=A0 /*
->> +=A0=A0=A0=A0 * TODO: Update nr_pages value to handle contiguous virtual=
- address
->> +=A0=A0=A0=A0 * ranges mapped to non-contiguous physical regions. Hugetl=
-bfs =
-
->> can give
->> +=A0=A0=A0=A0 * 2 MiB / 1 GiB contiguous physical regions.
->> +=A0=A0=A0=A0 */
->> +=A0=A0=A0 ne_mem_region->nr_pages =3D mem_region->memory_size /
->> +=A0=A0=A0=A0=A0=A0=A0 NE_MIN_MEM_REGION_SIZE;
->> +
->> +=A0=A0=A0 ne_mem_region->pages =3D kcalloc(ne_mem_region->nr_pages,
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 size=
-of(*ne_mem_region->pages),
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 GFP_=
-KERNEL);
->> +=A0=A0=A0 if (!ne_mem_region->pages) {
->> +=A0=A0=A0=A0=A0=A0=A0 kfree(ne_mem_region);
->> +
->> +=A0=A0=A0=A0=A0=A0=A0 return -ENOMEM;
->
-> kfree(NULL) is a nop, so you can just set rc and goto free_mem_region =
-
-> here and below.
-
-Updated both return paths.
-
->
->> +=A0=A0=A0 }
->> +
->> +=A0=A0=A0 phys_contig_mem_regions =3D kcalloc(ne_mem_region->nr_pages,
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 sizeof(=
-*phys_contig_mem_regions),
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 GFP_KER=
-NEL);
->> +=A0=A0=A0 if (!phys_contig_mem_regions) {
->> +=A0=A0=A0=A0=A0=A0=A0 kfree(ne_mem_region->pages);
->> +=A0=A0=A0=A0=A0=A0=A0 kfree(ne_mem_region);
->> +
->> +=A0=A0=A0=A0=A0=A0=A0 return -ENOMEM;
->> +=A0=A0=A0 }
->> +
->> +=A0=A0=A0 /*
->> +=A0=A0=A0=A0 * TODO: Handle non-contiguous memory regions received from=
- user =
-
->> space.
->> +=A0=A0=A0=A0 * Hugetlbfs can give 2 MiB / 1 GiB contiguous physical reg=
-ions. =
-
->> The
->> +=A0=A0=A0=A0 * virtual address space can be seen as contiguous, althoug=
-h it is
->> +=A0=A0=A0=A0 * mapped underneath to 2 MiB / 1 GiB physical regions e.g.=
- 8 MiB
->> +=A0=A0=A0=A0 * virtual address space mapped to 4 physically contiguous =
-
->> regions of 2
->> +=A0=A0=A0=A0 * MiB.
->> +=A0=A0=A0=A0 */
->> +=A0=A0=A0 do {
->> +=A0=A0=A0=A0=A0=A0=A0 unsigned long tmp_nr_pages =3D ne_mem_region->nr_=
-pages -
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 nr_pinned_pages;
->> +=A0=A0=A0=A0=A0=A0=A0 struct page **tmp_pages =3D ne_mem_region->pages +
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 nr_pinned_pages;
->> +=A0=A0=A0=A0=A0=A0=A0 u64 tmp_userspace_addr =3D mem_region->userspace_=
-addr +
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 nr_pinned_pages * NE_MIN_MEM_REGION_S=
-IZE;
->> +
->> +=A0=A0=A0=A0=A0=A0=A0 gup_rc =3D get_user_pages(tmp_userspace_addr, tmp=
-_nr_pages,
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 FOLL_GET, tmp=
-_pages, NULL);
->> +=A0=A0=A0=A0=A0=A0=A0 if (gup_rc < 0) {
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 rc =3D gup_rc;
->> +
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 dev_err_ratelimited(ne_misc_dev.this_=
-device,
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 "=
-Error in gup [rc=3D%d]\n", rc);
->> +
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 unpin_user_pages(ne_mem_region->pages=
-, nr_pinned_pages);
->> +
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 goto free_mem_region;
->> +=A0=A0=A0=A0=A0=A0=A0 }
->> +
->> +=A0=A0=A0=A0=A0=A0=A0 nr_pinned_pages +=3D gup_rc;
->> +
->> +=A0=A0=A0 } while (nr_pinned_pages < ne_mem_region->nr_pages);
->
-> Can this deadlock the kernel? Shouldn't we rather return an error when =
-
-> we can't pin all pages?
-
-It shouldn't cause a deadlock, based on the return values:
-
- > Returns either number of pages pinned (which may be less than the
- > number requested), or an error. Details about the return value:
- >
- > -- If nr_pages is 0, returns 0.
- > -- If nr_pages is >0, but no pages were pinned, returns -errno.
- > -- If nr_pages is >0, and some pages were pinned, returns the number of
- > pages pinned. Again, this may be less than nr_pages.
-
-
-But I can update the logic to have all or nothing.
-
->
->> +
->> +=A0=A0=A0 /*
->> +=A0=A0=A0=A0 * TODO: Update checks once physically contiguous regions a=
-re =
-
->> collected
->> +=A0=A0=A0=A0 * based on the user space address and get_user_pages() res=
-ults.
->> +=A0=A0=A0=A0 */
->> +=A0=A0=A0 for (i =3D 0; i < ne_mem_region->nr_pages; i++) {
->> +=A0=A0=A0=A0=A0=A0=A0 if (!PageHuge(ne_mem_region->pages[i])) {
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 dev_err_ratelimited(ne_misc_dev.this_=
-device,
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 "=
-Not a hugetlbfs page\n");
->> +
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 goto unpin_pages;
->> +=A0=A0=A0=A0=A0=A0=A0 }
->> +
->> +=A0=A0=A0=A0=A0=A0=A0 if (huge_page_size(page_hstate(ne_mem_region->pag=
-es[i])) !=3D
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 NE_MIN_MEM_REGION_SIZE) {
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 dev_err_ratelimited(ne_misc_dev.this_=
-device,
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 "=
-Page size isn't 2 MiB\n");
->
-> Why is a huge page size of >2MB a problem? Can't we just make =
-
-> huge_page_size() the ne mem slot size?
-
-It's not a problem, actually this is part of the TODO(s) from the =
-
-current function, to support contiguous regions larger than 2 MiB. It's =
-
-just that we started with 2 MiB. :)
-
->
->> +
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 goto unpin_pages;
->> +=A0=A0=A0=A0=A0=A0=A0 }
->> +
->> +=A0=A0=A0=A0=A0=A0=A0 if (ne_enclave->numa_node !=3D
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 page_to_nid(ne_mem_region->pages[i]))=
- {
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 dev_err_ratelimited(ne_misc_dev.this_=
-device,
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 "=
-Page isn't from NUMA node %d\n",
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 n=
-e_enclave->numa_node);
->> +
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 goto unpin_pages;
->
-> Is there a way to give user space hints on *why* things are going wrong?
-
-Yes, one option for the user space to have more insights is to have the =
-
-specific NE error codes you mentioned, so that we can improve the =
-
-experience even further.
-
->
->> +=A0=A0=A0=A0=A0=A0=A0 }
->> +
->> +=A0=A0=A0=A0=A0=A0=A0 /*
->> +=A0=A0=A0=A0=A0=A0=A0=A0 * TODO: Update once handled non-contiguous mem=
-ory regions
->> +=A0=A0=A0=A0=A0=A0=A0=A0 * received from user space.
->> +=A0=A0=A0=A0=A0=A0=A0=A0 */
->> +=A0=A0=A0=A0=A0=A0=A0 phys_contig_mem_regions[i] =3D ne_mem_region->pag=
-es[i];
->> +=A0=A0=A0 }
->> +
->> +=A0=A0=A0 /*
->> +=A0=A0=A0=A0 * TODO: Update once handled non-contiguous memory regions =
-received
->> +=A0=A0=A0=A0 * from user space.
->> +=A0=A0=A0=A0 */
->> +=A0=A0=A0 nr_phys_contig_mem_regions =3D ne_mem_region->nr_pages;
->> +
->> +=A0=A0=A0 if ((ne_enclave->nr_mem_regions + nr_phys_contig_mem_regions)=
- >
->> +=A0=A0=A0=A0=A0=A0=A0 ne_enclave->max_mem_regions) {
->> +=A0=A0=A0=A0=A0=A0=A0 dev_err_ratelimited(ne_misc_dev.this_device,
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 "Reached max =
-memory regions %lld\n",
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 ne_enclave->m=
-ax_mem_regions);
->> +
->> +=A0=A0=A0=A0=A0=A0=A0 goto unpin_pages;
->> +=A0=A0=A0 }
->> +
->> +=A0=A0=A0 for (i =3D 0; i < nr_phys_contig_mem_regions; i++) {
->> +=A0=A0=A0=A0=A0=A0=A0 u64 phys_addr =3D page_to_phys(phys_contig_mem_re=
-gions[i]);
->> +
->> +=A0=A0=A0=A0=A0=A0=A0 slot_add_mem_req.slot_uid =3D ne_enclave->slot_ui=
-d;
->> +=A0=A0=A0=A0=A0=A0=A0 slot_add_mem_req.paddr =3D phys_addr;
->> +=A0=A0=A0=A0=A0=A0=A0 /*
->> +=A0=A0=A0=A0=A0=A0=A0=A0 * TODO: Update memory size of physical contigu=
-ous memory
->> +=A0=A0=A0=A0=A0=A0=A0=A0 * region, in case of non-contiguous memory reg=
-ions received
->> +=A0=A0=A0=A0=A0=A0=A0=A0 * from user space.
->> +=A0=A0=A0=A0=A0=A0=A0=A0 */
->> +=A0=A0=A0=A0=A0=A0=A0 slot_add_mem_req.size =3D NE_MIN_MEM_REGION_SIZE;
->
-> Yeah, for now, just make it huge_page_size()! :)
-
-Yup, I'll handle this in order to have the option for other sizes, in =
-
-addition to 2 MiB e.g. 1 GiB for hugetlbfs.
-
->
->> +
->> +=A0=A0=A0=A0=A0=A0=A0 rc =3D ne_do_request(ne_enclave->pdev, SLOT_ADD_M=
-EM,
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 &slot_add_mem_re=
-q, sizeof(slot_add_mem_req),
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 &cmd_reply, size=
-of(cmd_reply));
->> +=A0=A0=A0=A0=A0=A0=A0 if (rc < 0) {
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 dev_err_ratelimited(ne_misc_dev.this_=
-device,
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 "=
-Error in slot add mem [rc=3D%d]\n",
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 r=
-c);
->> +
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 /* TODO: Only unpin memory regions no=
-t added. */
->
-> Are we sure we're not creating an unusable system here?
-
-The way the requests to the PCI device are structured is that we cannot =
-
-get back a memory region / CPU, once added, till the enclave is =
-
-terminated. Let's say there is an error in the remaining logic from the =
-
-ioctl, after the region is successfully added, then the memory region =
-
-can be given back to the primary / parent VM once the enclave =
-
-termination (including slot free) is done.
-
-We can either have the logic handle one contiguous region per ioctl call =
-
-(user space gives a memory region that is backed by a single contiguous =
-
-physical memory region) or have a for loop to go through all contiguous =
-
-regions (user space gives a memory region that is backed by a set of =
-
-(smaller) contiguous physical memory regions). In the second case, if a =
-
-request to the NE PCI device fails, already added memory regions can be =
-
-given back only on slot free, triggered by the enclave termination, when =
-
-closing the enclave fd.
-
->
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 goto unpin_pages;
->> +=A0=A0=A0=A0=A0=A0=A0 }
->> +
->> +=A0=A0=A0=A0=A0=A0=A0 ne_enclave->mem_size +=3D slot_add_mem_req.size;
->> +=A0=A0=A0=A0=A0=A0=A0 ne_enclave->nr_mem_regions++;
->> +
->> +=A0=A0=A0=A0=A0=A0=A0 memset(&slot_add_mem_req, 0, sizeof(slot_add_mem_=
-req));
->> +=A0=A0=A0=A0=A0=A0=A0 memset(&cmd_reply, 0, sizeof(cmd_reply));
->
-> If you define the variables in the for loop scope, you don't need to =
-
-> manually zero them again.
-
-Updated to have the variables in the loop instead.
-
-Thank you.
-
-Andra
-
->
->> +=A0=A0=A0 }
->> +
->> +=A0=A0=A0 list_add(&ne_mem_region->mem_region_list_entry,
->> +=A0=A0=A0=A0=A0=A0=A0=A0 &ne_enclave->mem_regions_list);
->> +
->> +=A0=A0=A0 kfree(phys_contig_mem_regions);
->> +
->> +=A0=A0=A0 return 0;
->> +
->> +unpin_pages:
->> +=A0=A0=A0 unpin_user_pages(ne_mem_region->pages, ne_mem_region->nr_page=
-s);
->> +free_mem_region:
->> +=A0=A0=A0 kfree(phys_contig_mem_regions);
->> +=A0=A0=A0 kfree(ne_mem_region->pages);
->> +=A0=A0=A0 kfree(ne_mem_region);
->> +
->> +=A0=A0=A0 return rc;
->> +}
->> +
->> =A0 static long ne_enclave_ioctl(struct file *file, unsigned int cmd,
->> =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 unsigned long arg)
->> =A0 {
->> @@ -561,6 +788,36 @@ static long ne_enclave_ioctl(struct file *file, =
-
->> unsigned int cmd,
->> =A0=A0=A0=A0=A0=A0=A0=A0=A0 return 0;
->> =A0=A0=A0=A0=A0 }
->> =A0 +=A0=A0=A0 case NE_SET_USER_MEMORY_REGION: {
->> +=A0=A0=A0=A0=A0=A0=A0 struct ne_user_memory_region mem_region =3D {};
->> +=A0=A0=A0=A0=A0=A0=A0 int rc =3D -EINVAL;
->> +
->> +=A0=A0=A0=A0=A0=A0=A0 if (copy_from_user(&mem_region, (void *)arg,
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 sizeof(mem_regio=
-n))) {
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 dev_err_ratelimited(ne_misc_dev.this_=
-device,
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 "=
-Error in copy from user\n");
->> +
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 return -EFAULT;
->> +=A0=A0=A0=A0=A0=A0=A0 }
->> +
->> +=A0=A0=A0=A0=A0=A0=A0 mutex_lock(&ne_enclave->enclave_info_mutex);
->> +
->> +=A0=A0=A0=A0=A0=A0=A0 if (ne_enclave->state !=3D NE_STATE_INIT) {
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 dev_err_ratelimited(ne_misc_dev.this_=
-device,
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 "=
-Enclave isn't in init state\n");
->> +
->> + mutex_unlock(&ne_enclave->enclave_info_mutex);
->> +
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 return -EINVAL;
->> +=A0=A0=A0=A0=A0=A0=A0 }
->> +
->> +=A0=A0=A0=A0=A0=A0=A0 rc =3D ne_set_user_memory_region_ioctl(ne_enclave=
-, &mem_region);
->> +
->> +=A0=A0=A0=A0=A0=A0=A0 mutex_unlock(&ne_enclave->enclave_info_mutex);
->> +
->> +=A0=A0=A0=A0=A0=A0=A0 return rc;
->> +=A0=A0=A0 }
->> +
->> =A0=A0=A0=A0=A0 default:
->> =A0=A0=A0=A0=A0=A0=A0=A0=A0 return -ENOTTY;
->> =A0=A0=A0=A0=A0 }
->>
-
-
-
-
-Amazon Development Center (Romania) S.R.L. registered office: 27A Sf. Lazar=
- Street, UBC5, floor 2, Iasi, Iasi County, 700045, Romania. Registered in R=
-omania. Registration number J22/2621/2005.
+from v9 to v10:
+
+- postpone and removed from series 
+  - s390x: Use PSW bits definitions in cstart
+  - s390x: Move control register bit definitions and add AFP to them
+  reason: gcc compiler for RedHat-7 does not allow UL suffix for
+          macro declarations.
+  (Thomas)
+
+- postpone and removed from series 
+  -s390x-retrieve-decimal-and-hexadecimal-kernel-par.patch
+  reason: must be reworked and since we can do without an argument
+          I prefer to separate it from this series.
+  (Janosch, Andrew)
+
+- several word spelling, better comments
+  (Connie, Thomas)
+
+- Extensively reworked ssch/tsch with sense and interrupt
+  - added a dedicated ISC to the channel subsystem test
+    when enabling a channel
+  - reworked the ISC enabling in CR6
+  - reworked the test on residual count
+  - moved the IRQ handler and the start function inside the
+    library to share with following CSS tests.
+  - added more report_info to the IRQ handler
+  - rename some functions, start_single_ccw, css_irq_io,
+    css_residual_count
+  (Connie, Pierre)
+
+from v8 to v9:
+
+- rename PSW_EXCEPTION_MASK to PSW_MASK_ON_EXCEPTION
+  (Thomas)
+
+- changed false max microseconds in delay calculation
+  (Thomas)
+
+- fix bug in decimal parameter calculation
+  (Thomas)
+
+- fix bug in msch inline assembly
+  (Thomas)
+
+- add report_abort() for unprobable result of tsch
+  in I/O IRQ
+  (Thomas)
+
+- use of existing lctlg() wrapper instead of new function
+  (Thomas)
+
+from v7 to v8
+
+* Suppress ccw-pong specific remote device
+  (Thomas, Janosch)
+
+* use virtio-net-ccw as device instead of a specific
+  device: no more need for QEMU patch
+  (Connie)
+
+* Add kernel parameter to access a different device.
+  (Connie)
+
+* Add tests on subschannel reading, length, garbage.
+  (Connie)
+
+* Several naming changes and reorganizations of definitions.
+  (Connie)
+
+* Take wrapping into account for delay calculation
+
+* Align CCW1 on 8 bytes boundary
+
+* Reorganize the first three patches
+  (Janosch)
+
+from v6 to v7
+
+* s390x: saving regs for interrupts
+- macro name modificatio for SAVE_REGS_STACK
+  (David)
+- saving the FPC
+  (David)
+
+* s390x: Use PSW bits definitions in cstart
+- suppress definition for PSW_RESET_MASK
+  use PSW_EXCEPTION_MASK | PSW_MASK_SHORT_PSW
+  (David)
+
+* s390x: Library resources for CSS tests
+* s390x: css: stsch, enumeration test
+  move library definitions from stsch patche
+  to the Library patch
+  add the library to the s390 Makefile here
+  (Janosch)
+  
+* s390x: css: msch, enable test
+  Add retries when enable fails
+  (Connie)
+  Re-introduce the patches for delay implementation
+  to add a delay between retries
+
+* s390x: define function to wait for interrupt
+  Changed name from wfi to wait_for_interrupt
+  (Janosch)
+
+* s390x: css: ssch/tsch with sense and interrupt
+  add a flag parameter to ssch and use it to add
+  SLI (Suppress Length Indication) flag for SENSE_ID
+  (Connie)
+
+
+from v5 to v6
+- Added comments for IRQ handling in
+  s390x: saving regs for interrupts
+  (Janosch) 
+
+- fixed BUG on reset_psw, added PSW_MASK_PSW_SHORT
+  and PSW_RESET_MASK
+
+- fixed several lines over 80 chars
+
+- fixed licenses, use GPL V2 (no more LGPL)
+
+- replacing delay() with wfi() (Wait For Interrupt)
+  during the css tests
+  (suggested by Connie's comments)
+
+- suppressing delay() induces suppressing the patch
+  "s390x: export the clock get_clock_ms() utility"
+  which is already reviewed but can be picked from
+  the v5 series.
+
+- changed the logic of the tests, the 4 css tests
+  are always run one after the other so no need to 
+  re-run enumeration and enabling at the begining
+  of each tests, it has alredy been done.
+  This makes code simpler.
+
+from v4 to v5
+- add a patch to explicitely define the initial_cr0
+  value
+  (Janosch)
+- add RB from Janosh on interrupt registration
+- several formating, typo correction and removing
+  unnecessary initialization in "linrary resources..."
+  (Janosch)
+- several formating and typo corrections on
+  "stsch enumeration test"
+  (Connie)
+- reworking the msch test
+  (Connie)
+- reworking of ssch test, pack the sense-id structure
+  (Connie)
+
+from v3 to v4
+- add RB from David and Thomas for patchs 
+  (3) irq registration and (4) clock export
+- rework the PSW bit definitions
+  (Thomas)
+- Suppress undef DEBUG from css_dump
+  (Thomas)
+- rework report() functions using new scheme
+  (Thomas)
+- suppress un-necessary report_info()
+- more spelling corrections
+- add a loop around enable bit testing
+  (Connie)
+- rework IRQ testing
+  (Connie)
+- Test data addresses to be under 2G
+  (Connie)
+
+from v2 to v3:
+- Rework spelling
+  (Connie)
+- More descriptions
+  (Connie)
+- use __ASSEMBLER__ preprocessing to keep
+  bits definitions and C structures in the same file
+  (David)
+- rename the new file clock.h as time.h
+  (Janosch, David?)
+- use registration for the IO interruption
+  (David, Thomas)
+- test the SCHIB to verify it has really be modified
+  (Connie)
+- Lot of simplifications in the tests
+  (Connie)
+
+from v1 to v2:
+- saving floating point registers (David, Janosh)
+- suppress unused PSW bits defintions (Janosh)
+- added Thomas reviewed-by
+- style and comments modifications (Connie, Janosh)
+- moved get_clock_ms() into headers and use it (Thomas)
+- separate header and library utility from tests
+- Suppress traces, separate tests, make better usage of reports
 
