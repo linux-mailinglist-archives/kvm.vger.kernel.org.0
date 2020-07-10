@@ -2,74 +2,68 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E950021BAD1
-	for <lists+kvm@lfdr.de>; Fri, 10 Jul 2020 18:25:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B2C5C21BAE1
+	for <lists+kvm@lfdr.de>; Fri, 10 Jul 2020 18:28:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728251AbgGJQZN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 10 Jul 2020 12:25:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33654 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726942AbgGJQZN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 10 Jul 2020 12:25:13 -0400
-Received: from mail-il1-x141.google.com (mail-il1-x141.google.com [IPv6:2607:f8b0:4864:20::141])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 18171C08C5DC
-        for <kvm@vger.kernel.org>; Fri, 10 Jul 2020 09:25:13 -0700 (PDT)
-Received: by mail-il1-x141.google.com with SMTP id a6so5521139ilq.13
-        for <kvm@vger.kernel.org>; Fri, 10 Jul 2020 09:25:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=IcDMEhTSKKMXTowJquzFDFHW0B9rJZphvCEGihxlBug=;
-        b=lLxKHjlVieE8CR/C5FWlzc7Uis/0nuwWMvc4hUOICx3oO4m/PttpooF9Mfku50uTuz
-         pbnZevuDsAvUwVhSH2i1Nd6lpOBQzVB6TDXzhXu8318gMbmyO/OjdyNHdHnbz5kvy/J+
-         3FS0W7SMo3hcsVmFYEmHhG+8eUXCsBoAm3xnKtZw9P1CTJEQqC0YKOviRG6ubCfAaxaf
-         RO6zqusol8TO1/uZctwduaG05iNaFYJVhnwMn/wBO4+QJdzfFFkSWfHUK87pb8boRXkH
-         nP760DKxd+QNElhvMSp65xXZazGWiaN06ArD8BtuDLN0k2OEsNupQGnE1O05yXSKjYEx
-         ob4w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=IcDMEhTSKKMXTowJquzFDFHW0B9rJZphvCEGihxlBug=;
-        b=pA9fQrMAHmQil4muBLQi7wMTLGTqUoadgVUdfcoq5sC1/aWGXO4gvCEZJFUSZjLK5N
-         MKZ+4TnonNEFKUYfyCUgHZgvBfVNkBo4OWqddEwAIA8Oh0polema6u10u+h8Hm1eT+42
-         zYGsNZhfJFTSUUQBYfGHe4UmCXelYM/nnGUJ18UvL6S/pt4rI3XOF/aZAtcov98MGQL8
-         oO+ROY/b3pS0ZiyJZSKmCr+xt61WrjJjqxLiuR6y+F7d7FVs6lvj8eJaVCrtNaUreAhl
-         L4Vmwze6QK05/uYcjD19SIQ0V1Ya6ltlI/74Jxvx+pAFTR5+gOXwfsBoCSw7CTLP6v3N
-         640Q==
-X-Gm-Message-State: AOAM531F8haqtRRXffaq//m5y6VpzE5C+eJzRMUC70PXT8GZ+XoSGGqB
-        T5N3ARyhPd/Q/G3zMS1ExeEDm7LrtFCm3o/ujFsm+LR0
-X-Google-Smtp-Source: ABdhPJx9kxVePErlat1+e+tKLypo+bvNuYSB4wDq+i1m1pqY+SMTsBHy1h3u6qRFuDiZ87hhCu416AWVwxklMXbnREo=
-X-Received: by 2002:a92:aac8:: with SMTP id p69mr54333019ill.26.1594398312271;
- Fri, 10 Jul 2020 09:25:12 -0700 (PDT)
-MIME-Version: 1.0
-References: <20200710154811.418214-1-mgamal@redhat.com> <20200710154811.418214-6-mgamal@redhat.com>
-In-Reply-To: <20200710154811.418214-6-mgamal@redhat.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Fri, 10 Jul 2020 09:25:01 -0700
-Message-ID: <CALMp9eRXZmtZ5zZ91q3Q0i7Yg5XUNAyLxWaX91okZ_ogNikKqQ@mail.gmail.com>
-Subject: Re: [PATCH v3 5/9] KVM: x86: update exception bitmap on CPUID changes
-To:     Mohammed Gamal <mgamal@redhat.com>
-Cc:     kvm list <kvm@vger.kernel.org>,
+        id S1727999AbgGJQ2Z (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 10 Jul 2020 12:28:25 -0400
+Received: from mga14.intel.com ([192.55.52.115]:25693 "EHLO mga14.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726896AbgGJQ2Z (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 10 Jul 2020 12:28:25 -0400
+IronPort-SDR: AcpXix8XKZrbNzJLzrbc4ApEhVWof5VEpqwRK0eg7spL4FbVr+VKgkCFlWmijCKjb4JvTHPXWV
+ mEwIMW5c4HOQ==
+X-IronPort-AV: E=McAfee;i="6000,8403,9678"; a="147341884"
+X-IronPort-AV: E=Sophos;i="5.75,336,1589266800"; 
+   d="scan'208";a="147341884"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Jul 2020 09:28:22 -0700
+IronPort-SDR: jNSta/rj/b6HojzQ2Vt4c9e27f53Vtt08K6Z/1hxpWryNwBeZMALkBgyV6R3IhR+Gp3br40JJ2
+ u+y/rOen/2sg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.75,336,1589266800"; 
+   d="scan'208";a="428610403"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.152])
+  by orsmga004.jf.intel.com with ESMTP; 10 Jul 2020 09:28:20 -0700
+Date:   Fri, 10 Jul 2020 09:28:19 -0700
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     "Xu, Like" <like.xu@intel.com>
+Cc:     Xiaoyao Li <xiaoyao.li@intel.com>,
+        Like Xu <like.xu@linux.intel.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        LKML <linux-kernel@vger.kernel.org>,
+        Peter Zijlstra <peterz@infradead.org>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
         Wanpeng Li <wanpengli@tencent.com>,
-        Joerg Roedel <joro@8bytes.org>
-Content-Type: text/plain; charset="UTF-8"
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, ak@linux.intel.com,
+        wei.w.wang@intel.com, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+Subject: Re: [PATCH v12 07/11] KVM: vmx/pmu: Unmask LBR fields in the
+ MSR_IA32_DEBUGCTLMSR emualtion
+Message-ID: <20200710162819.GF1749@linux.intel.com>
+References: <20200613080958.132489-1-like.xu@linux.intel.com>
+ <20200613080958.132489-8-like.xu@linux.intel.com>
+ <654d931c-a724-ed69-6501-52ce195a6f44@intel.com>
+ <ea424570-c93f-2624-3e85-d7255b609da4@intel.com>
+ <20200707202155.GL20096@linux.intel.com>
+ <a162343f-74be-c72e-ff65-323c1415c1e3@intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <a162343f-74be-c72e-ff65-323c1415c1e3@intel.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jul 10, 2020 at 8:48 AM Mohammed Gamal <mgamal@redhat.com> wrote:
->
-> From: Paolo Bonzini <pbonzini@redhat.com>
->
-> Allow vendor code to observe changes to MAXPHYADDR and start/stop
-> intercepting page faults.
->
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-Reviewed-by: Jim Mattson <jmattson@google.com>
+On Wed, Jul 08, 2020 at 03:06:57PM +0800, Xu, Like wrote:
+> Hi Sean,
+> 
+> First of all, are you going to queue the LBR patch series in your tree
+> considering the host perf patches have already queued in Peter's tree ?
+
+No, I'll let Paolo take 'em directly, I'm nowhere near knowledgeable enough
+with respect to the PMU to feel comfortable taking them.
