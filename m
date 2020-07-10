@@ -2,62 +2,62 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E16E621B1DF
-	for <lists+kvm@lfdr.de>; Fri, 10 Jul 2020 11:01:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6FA8B21B1E2
+	for <lists+kvm@lfdr.de>; Fri, 10 Jul 2020 11:01:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727983AbgGJJB0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 10 Jul 2020 05:01:26 -0400
+        id S1727998AbgGJJBa (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 10 Jul 2020 05:01:30 -0400
 Received: from esa1.hgst.iphmx.com ([68.232.141.245]:30305 "EHLO
         esa1.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726962AbgGJJB0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 10 Jul 2020 05:01:26 -0400
+        with ESMTP id S1727972AbgGJJB3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 10 Jul 2020 05:01:29 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1594371685; x=1625907685;
+  t=1594371688; x=1625907688;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:content-transfer-encoding:mime-version;
-  bh=BQZ1Za9H9U0aUcvgBReFX+tUxwlb3hEC3mtu5JmRPXg=;
-  b=I9KaE1ae4DBWJKB9JnI6udQIU892Debl3THPGS1LATBTALJW6CtSeTdU
-   ngNWm7kuqNtHAmY0KmkAC22miNpY/lbakcPpfkvFYBH2oJeVDHZ7pqXYc
-   1IrhEZ1nLzBcKoetRzCm4uvlB2Q+xUdVLaETW4eMIPyAWwhAiXGu/Yz7o
-   bPC6RpgptIyO82m3922YIr4+Qc/P+McmLRow0Bt83hdGUq11M/nlFx8Pr
-   XTzI64fTcKh6plfTlWnJPUJTylhs1faTmDtKYU0Kvtb3V1zLmdjcaPw3g
-   GgtwqhVktCTeb1Sn0Ri91NpKnITJSgov3kd+oskZLW2lq6kgc42QiSwTE
-   g==;
-IronPort-SDR: Mr/4aPUSd3mEx34eyKT/iNwRfAwNH+OvrjyjI7oYbssWu1u2iVWCwthJdcZmLaxSwhl2YGv/1R
- cXHPIaM5vH6Y/Bu55TR+wII7p2G/oHgeOBqR785T1ZsZdqg5CT3qZLF5Qh7KieviMfR7QmZVA5
- Oyoj3Y/RjUX0fxr6To2/1AR0T1huPUAjaaHCPkQ4ZvhmDGlGfib2yiFbHFAt+xviHcDvqi+voh
- iPlfFle5pO+zC8T5QiC5g0v4LDyE4HwV8lxYb5lRVdFQJVn8Gg7lGSqEV4Fq04MQAaao1cwvoO
- qUQ=
+  bh=/0T5Ki2Lj1DFnjbgmjys4xMNGjRVHw8B2nUHI9CqhtM=;
+  b=H87+SZStSPoJvIT3q4LjV1q6ucHXDEM2bSaCbeRaqEUI9jV8ZOVUs4lf
+   3DD+dAhGYT4Obx/O27Jzic5q+RmADWm0tdoeuaYtd9XP3r0/LR47qarbi
+   vnUzEfZLwkfta2lR+WxO2LEum294F+ICIC/RAcr3VkhZf+gtQDLh1rJL5
+   gOb7VUylEKDr0IgDxQjlMymRQTZJkWtaVRrD2+1mOJdsgC9xFRbIAwPfp
+   2VgIio6wnBmLok/AO+fCQIQdZx6M0zbmpa7gGeNR/ro7j2O9d8sJ0/h+7
+   tDIM8MbiwXkbSczJ5KvaZ2lkffvTgWV4mKmn0yrJwnzmCAjkwswjLDZhl
+   w==;
+IronPort-SDR: 2wZSNuralpHWtG9oHi3q0vXmCRtCIbQ4EFznGgR6Oazp8yTLdgOTIC8Fv3wrjzp+Mm7cGEt/wM
+ ECf+jIEI+kwBD+LChadcOhkIdL8C2ylYFMfNYKptlB3Xm1mzspVKHVhkYBi25lacFwVaUXVc7A
+ LGVCIrFb/HVuZPDlyryDJ+EEW8g4cuSd/JrQo4tYkuJ3tOX+75L9Tp8+KQllg5t5krmgB0Atib
+ ZmVGuEAl0fWdI0dhBAY3ni3V+xJmM7AkokXVJLPydKpAg8hc+KFA7kqL0QWeAVmKuGStUPcymD
+ SSM=
 X-IronPort-AV: E=Sophos;i="5.75,335,1589212800"; 
-   d="scan'208";a="251358887"
-Received: from mail-bn8nam12lp2168.outbound.protection.outlook.com (HELO NAM12-BN8-obe.outbound.protection.outlook.com) ([104.47.55.168])
-  by ob1.hgst.iphmx.com with ESMTP; 10 Jul 2020 17:01:24 +0800
+   d="scan'208";a="251358892"
+Received: from mail-bn8nam12lp2172.outbound.protection.outlook.com (HELO NAM12-BN8-obe.outbound.protection.outlook.com) ([104.47.55.172])
+  by ob1.hgst.iphmx.com with ESMTP; 10 Jul 2020 17:01:28 +0800
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=GDdfFVx6drvXilmKwqUSVHVnTObaA3WGUBmpzWjN7k+7/gMDiJF7Vc/PG9k6cE3J0L8tjZgLn59civXhjUKFvangk8egkIowi6m5V20vA85omoahE/noHNwGKOBxXrVbhpeVbnwL8HObAcBKsW9wb9enyN9K7a3zZXOMuoaGMXenu4WKi/pW9VkAZj/OKO+IxdqqrSxj1v46Nb8f1qT4LA8rj/pvhpk9hjaa8A2eBaySilj3C6NoslGkYa2F3vwO1UvfnF1FB05tOKEBOsaEtdWOpweKM2QpwQ4jkvQFiGNeWJDYhJM3ak+hxICbScDLVyOpuqew3e492eE/3tBTVQ==
+ b=POCXbwquyGTkyGSI1xiK+51yiEvzcODBZ+pi4eZVkKkyxIZOBp8FkxVW92EM4/+fTMhfOjrYcjkCyNlarr41EAfwotFxHeAV7+ad6L0Tl8rh2H6tOU5BV7ylfZrczsE6kntNidmbS+XNx5T2i1GoZr7G38gkzswHLuT7x/BU97Gf4n9YYC2XLyne64j4/42D1+gPHSP2qo6ZEkqTAjqLICQgkWWuB47kcd/83a5LLPiL8jkkNyLtVbQ182LIL0yg/uA47jC++LWMaGiuC+PehlpCvNYXPAp2GxXV5EyntaZc+gQ2qEU2k+VHlcTQX+UvHPKFG/V+l/cUApcnmGl8EA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=/IR3wBcbUaY52UvbQXJeYgkLVfOx+Vj1u/MVm22uS1s=;
- b=DCk7/1zz4wPEoCFSSQthVmJy9kc4fAHtcJsBmAZnD3w1KsgTTxDczzLNI36KaPmnu6DLk+jh5ccJiJsPklTtezpUJ2t6gkpNdLvQkjuv/XgKWTgUipuSJwbT6T3c2fk728ZpuZj62GKfU+8ai06/3miGyU8vClVCASrLvanYcr1iiuAtV6Kk2ojMf1XMjq8b5ta/6ToPCNP9ELB+DXohkFfnlSeE+Gooq9+pyVlxgeYxx936ZnEQMZy54FdHt9pvwg0CGy3uNeIPeiTk7Zf0hOttbpFXrZggeJB2UEo9NazcF2L1Ut9qp86blvOUpV1zyrRIzzwfcxGHnNutP17yGA==
+ bh=eGmImHprEx3Lq9WiCNm9xR5RxDS+H3xDJZW2fdOX5Ho=;
+ b=EgiNJmerT4lOANIWi28Y3naHxZsylfuep/VBfaRYmRepGAaL3+xCaKRh7J1z7YK4qGb+2IpPFpFGcH/Ijag3bbB54089ZDNH4omv2ukZuS5E4wBTbjkJ0IkW1wieimWelQ8RRCkAJxa4edF+5k1qbXtrBxdcMfl1aaQsvCh7o2LtzyLygr85tt3u34cgf8ActA0Kc8ZxuOYIHWll7RCQ8fVl6UfC75y/Yk4N4/wz+pol1CP9f0ZVadafuI4EoKFPEyLh+rvA6vLu7MLJhYOfPzSNeFuYwpLhqPFtoUoPDLkTXRAfMY06IC+sDRAaj455CvKKMZhrGfkqF97bFcpo5A==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
  header.d=wdc.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=/IR3wBcbUaY52UvbQXJeYgkLVfOx+Vj1u/MVm22uS1s=;
- b=yRLcUm0WcvTzkTW/0cQWAaF64FGGweNeoV5LHVmtxNDU9ZJyFOLr403j2ORnML6uG8YgTJKYGC//HzuXMpYeBSbiBtFxw3s3rFxu/cHg+jyh3fwpqw60G4brvkaUf5wJRGCIW2m5lN8daIiGXmaNpSUXIy/eBlux5L6nXGCp6rw=
+ bh=eGmImHprEx3Lq9WiCNm9xR5RxDS+H3xDJZW2fdOX5Ho=;
+ b=ajBUWTT2Vg7QmvzJaSI3pUqJ3sXh60G1TLvz9HNCt/zIdC7MEgD6GXlc8pEA69uJrtEIc4XeAOU5I9e5ETxg8RleWrpDrY8OLTfvnGoeW0td0rZTZFktNr3StKdNPAY8BMn01mmmTUYEilv5adNvwuqsMVGr3+2EUA/gadXwhsU=
 Authentication-Results: kernel.org; dkim=none (message not signed)
  header.d=none;kernel.org; dmarc=none action=none header.from=wdc.com;
 Received: from DM6PR04MB6201.namprd04.prod.outlook.com (2603:10b6:5:127::32)
  by DM5PR04MB0346.namprd04.prod.outlook.com (2603:10b6:3:6f::7) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.3174.21; Fri, 10 Jul 2020 09:01:23 +0000
+ 15.20.3174.21; Fri, 10 Jul 2020 09:01:27 +0000
 Received: from DM6PR04MB6201.namprd04.prod.outlook.com
  ([fe80::e0a4:aa82:1847:dea5]) by DM6PR04MB6201.namprd04.prod.outlook.com
  ([fe80::e0a4:aa82:1847:dea5%7]) with mapi id 15.20.3174.023; Fri, 10 Jul 2020
- 09:01:22 +0000
+ 09:01:26 +0000
 From:   Anup Patel <anup.patel@wdc.com>
 To:     Will Deacon <will@kernel.org>
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
@@ -65,9 +65,9 @@ Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Alistair Francis <Alistair.Francis@wdc.com>,
         Anup Patel <anup@brainfault.org>, kvm@vger.kernel.org,
         kvm-riscv@lists.infradead.org, Anup Patel <anup.patel@wdc.com>
-Subject: [RFC PATCH v4 4/8] riscv: Implement Guest/VM VCPU arch functions
-Date:   Fri, 10 Jul 2020 14:30:31 +0530
-Message-Id: <20200710090035.123941-5-anup.patel@wdc.com>
+Subject: [RFC PATCH v4 5/8] riscv: Add PLIC device emulation
+Date:   Fri, 10 Jul 2020 14:30:32 +0530
+Message-Id: <20200710090035.123941-6-anup.patel@wdc.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20200710090035.123941-1-anup.patel@wdc.com>
 References: <20200710090035.123941-1-anup.patel@wdc.com>
@@ -78,504 +78,612 @@ X-ClientProxiedBy: PN1PR0101CA0029.INDPRD01.PROD.OUTLOOK.COM
  (2603:10b6:5:127::32)
 MIME-Version: 1.0
 X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from wdc.com (103.15.57.207) by PN1PR0101CA0029.INDPRD01.PROD.OUTLOOK.COM (2603:1096:c00:c::15) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3174.21 via Frontend Transport; Fri, 10 Jul 2020 09:01:11 +0000
+Received: from wdc.com (103.15.57.207) by PN1PR0101CA0029.INDPRD01.PROD.OUTLOOK.COM (2603:1096:c00:c::15) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3174.21 via Frontend Transport; Fri, 10 Jul 2020 09:01:23 +0000
 X-Mailer: git-send-email 2.25.1
 X-Originating-IP: [103.15.57.207]
 X-MS-PublicTrafficType: Email
 X-MS-Office365-Filtering-HT: Tenant
-X-MS-Office365-Filtering-Correlation-Id: b3552280-06c2-43d6-bd42-08d824afcc9a
+X-MS-Office365-Filtering-Correlation-Id: e1891a43-93fc-4bc0-94c4-08d824afd3c6
 X-MS-TrafficTypeDiagnostic: DM5PR04MB0346:
 X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <DM5PR04MB03463E72638EBF3FB3F1FFEE8D650@DM5PR04MB0346.namprd04.prod.outlook.com>
+X-Microsoft-Antispam-PRVS: <DM5PR04MB03468A9E4A65C9849090B4DD8D650@DM5PR04MB0346.namprd04.prod.outlook.com>
 WDCIPOUTBOUND: EOP-TRUE
-X-MS-Oob-TLC-OOBClassifiers: OLM:6790;
+X-MS-Oob-TLC-OOBClassifiers: OLM:5236;
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: SoAOG0u1d6RoYBsbT9i/Frrs0IiOWGPLRy5uf3anvdpHNPMCpOpE0RtcN3CqoDqY3xDJ9wcDQ1+zQCvSDiGXqPvZtRrl4JF+N2bV3+e5mi2BzSRXVVrbvlmTAjpNGGnbAWKM0/jmr/t4LSNqDx/McfN4ybL6YNl8sK/6kwjCiNMEwFSDd4LywJJ1Qlm7AC+S/UjLQox3zQb5fA5/M2JtBKktNN5sbHFLcuL2sr7/2QHgqgcpc6zJJeKc9XGJFmWLu+JmOCytT/CXgNfcKAPqihGG1VwJlOsMosSd/KXgFh9O+dggNJ/KrmoEWDeW3ivUZo6G4UgUA1Kxce0ILnPDOg==
+X-Microsoft-Antispam-Message-Info: FSyLlAKMTc5+9vYi2C3c6xGpkk2JDbdjd3js5pJH8xb8L58jR5YXT42SnFH6PKGmAEooFl0BoUu4XkK2CEqEIEWRyvX4RtlEfuhgxYwSKnvLDR8buA2J4s9nvvwol4aYIJcN4Pc9dynksDWT2jDnkJxZQMOcroecoJAmSVyCPo3bFh3uvT2jA0VNxSKpF+jBLkaJyaytjdhUtEX+sMxnU4mEX5rtlL2hiHjuFibClchw/SYtJwrLEYjV0hjkJ0hz4NpMCLIlesHLmzCnnAw3TsTtooRzsabop3v/VkFWyG26uBbtJDR3VDvbNIuZZ76X
 X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR04MB6201.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFTY:;SFS:(4636009)(396003)(346002)(136003)(366004)(376002)(39860400002)(66476007)(186003)(66556008)(16526019)(6666004)(30864003)(52116002)(8886007)(1076003)(6916009)(86362001)(7696005)(36756003)(26005)(66946007)(4326008)(5660300002)(8936002)(956004)(2906002)(2616005)(83380400001)(55016002)(478600001)(316002)(44832011)(8676002)(54906003);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData: b3hACVH3wOQ8tIK7121OvK+tDsiCrjebOESP6cBqyU6GHGNgqFJh+Twa/55bMYPpQvuML6ghMlNv5INKEtghh/zRWBaTHvE1nfMlbFnUgBw1maQXEnq8C6cCsmDXpfqp6oD4KeC0fmuMdBR9IbhulOliBvMyAo25h1bmmaY13I94wKLVnayzbwvwYkg0HARx76fVgkZLXvWJBUjmDwQD+0mkkHEk5BuIRgdV1aTq9slj6GgJhUt2VVk+P6YBYBIGBhK/gTzdXbMS9OWMyQRUFvjsEzw6LNLNoWiM80s/x3ojC72pldzeYKgILTcy/rwngjzFZ1bVoD80p1wWNSiuCFVM3dn74/O3xv+nxdMdCqXJA6FUgrBmr3d7sNqVxNOkRMPLYVFNhe8pd0N5eMnKCAF+M3fCCbR0QrKIxUJVV3BJhpqsZDxgQU3xc/pIpRcHnDAVVZGW+2RQBM4dty5CaARqMqdCs2DY9mTd5R633i8=
+X-MS-Exchange-AntiSpam-MessageData: fYqTan2t4uWZmRQV2IS/8bBcdLIufkOQPgfTj71ansDNhpVoYQ3dQldFlltDAsEHVxz7wcOhwGL+yjhWdi68YXAE/RBLoS8UNZepXZRpsNMd9t7hcAEshQdFp+SbGQnNzdTt4Tdp+hb19TtYtxLnT8xY4IURDakYF9NId+91QuIMAs6rSSDbO8Crq0dOBw1m3hvyKzg5L4udwk7nCund1kptbyTmxCQAvXwk28tFi2jBYPoX6Ajb2zg9Y02oOHRvFfW3FdLuRp+LDsVNEteythXYsm1HoJC5UsNG68ZJCQhEukx31hLTtYPXieQr/d18tpEG0CcdU3xkUwC7OxwGEogxWLs10LPmnwgn+eqdLWDRmR/6XZ070ecqM42dCXVwDGYplafjQ0+xDQBCS9nhcNlYjASq9ex3teJDFi2/J/oqqtvgB83gI7RFDIveQsiMc4dLckDk/8hBfUaPQ8sHG5sRzobOrhkbbXwJ8cL+WSo=
 X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: b3552280-06c2-43d6-bd42-08d824afcc9a
+X-MS-Exchange-CrossTenant-Network-Message-Id: e1891a43-93fc-4bc0-94c4-08d824afd3c6
 X-MS-Exchange-CrossTenant-AuthSource: DM6PR04MB6201.namprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Jul 2020 09:01:22.8091
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Jul 2020 09:01:26.7956
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: b61c8803-16f3-4c35-9b17-6f65f441df86
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: +cPEDK4bX1PY7poYMsLAgXeQrGBxpqraK+ZOjCIIRAjNvCqmJ1fH4zyuT91iNTKtZ7AaOJb0aOk6Dny1M7BmYQ==
+X-MS-Exchange-CrossTenant-UserPrincipalName: u5Gbf4argVN8BqtPe3Ed2qQcw0y723xiodl2jO2dSS9GZ+/SyYMdH0Sp3E1A6d/Zxk9xL+bN+2DwXUAJIe5WFw==
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM5PR04MB0346
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This patch implements kvm_cpu__<xyz> Guest/VM VCPU arch functions.
+The PLIC (platform level interrupt controller) manages peripheral
+interrupts in RISC-V world. The per-CPU interrupts are managed
+using CPU CSRs hence virtualized in-kernel by KVM RISC-V.
 
-These functions mostly deal with:
-1. VCPU allocation and initialization
-2. VCPU reset
-3. VCPU show/dump code
-4. VCPU show/dump registers
+This patch adds PLIC device emulation for KVMTOOL RISC-V.
 
-We also save RISC-V ISA, XLEN, and TIMEBASE frequency for each VCPU
-so that it can be later used for generating Guest/VM FDT.
-
-Signed-off-by: Atish Patra <atish.patra@wdc.com>
 Signed-off-by: Anup Patel <anup.patel@wdc.com>
 ---
- riscv/include/kvm/kvm-cpu-arch.h |   4 +
- riscv/kvm-cpu.c                  | 393 ++++++++++++++++++++++++++++++-
- 2 files changed, 390 insertions(+), 7 deletions(-)
+ Makefile                     |   1 +
+ riscv/include/kvm/kvm-arch.h |   2 +
+ riscv/irq.c                  |   4 +-
+ riscv/plic.c                 | 513 +++++++++++++++++++++++++++++++++++
+ 4 files changed, 518 insertions(+), 2 deletions(-)
+ create mode 100644 riscv/plic.c
 
-diff --git a/riscv/include/kvm/kvm-cpu-arch.h b/riscv/include/kvm/kvm-cpu-arch.h
-index ae6ae0a..78fcd01 100644
---- a/riscv/include/kvm/kvm-cpu-arch.h
-+++ b/riscv/include/kvm/kvm-cpu-arch.h
-@@ -12,6 +12,10 @@ struct kvm_cpu {
+diff --git a/Makefile b/Makefile
+index 1782cb7..e2dd39d 100644
+--- a/Makefile
++++ b/Makefile
+@@ -203,6 +203,7 @@ ifeq ($(ARCH),riscv)
+ 	OBJS		+= riscv/irq.o
+ 	OBJS		+= riscv/kvm.o
+ 	OBJS		+= riscv/kvm-cpu.o
++	OBJS		+= riscv/plic.o
+ 	ifeq ($(RISCV_XLEN),32)
+ 		CFLAGS	+= -mabi=ilp32d -march=rv32gc
+ 	endif
+diff --git a/riscv/include/kvm/kvm-arch.h b/riscv/include/kvm/kvm-arch.h
+index 26816f4..bb6d99d 100644
+--- a/riscv/include/kvm/kvm-arch.h
++++ b/riscv/include/kvm/kvm-arch.h
+@@ -76,4 +76,6 @@ static inline bool riscv_addr_in_ioport_region(u64 phys_addr)
  
- 	unsigned long   cpu_id;
+ enum irq_type;
  
-+	unsigned long	riscv_xlen;
-+	unsigned long	riscv_isa;
-+	unsigned long	riscv_timebase;
++void plic__irq_trig(struct kvm *kvm, int irq, int level, bool edge);
 +
- 	struct kvm	*kvm;
- 	int		vcpu_fd;
- 	struct kvm_run	*kvm_run;
-diff --git a/riscv/kvm-cpu.c b/riscv/kvm-cpu.c
-index e4b8fa5..8adaddd 100644
---- a/riscv/kvm-cpu.c
-+++ b/riscv/kvm-cpu.c
-@@ -17,10 +17,88 @@ int kvm_cpu__get_debug_fd(void)
- 	return debug_fd;
+ #endif /* KVM__KVM_ARCH_H */
+diff --git a/riscv/irq.c b/riscv/irq.c
+index 8e605ef..78a582d 100644
+--- a/riscv/irq.c
++++ b/riscv/irq.c
+@@ -4,10 +4,10 @@
+ 
+ void kvm__irq_line(struct kvm *kvm, int irq, int level)
+ {
+-	/* TODO: */
++	plic__irq_trig(kvm, irq, level, false);
  }
  
-+static __u64 __kvm_reg_id(__u64 type, __u64 idx, __u64  size)
+ void kvm__irq_trigger(struct kvm *kvm, int irq)
+ {
+-	/* TODO: */
++	plic__irq_trig(kvm, irq, 1, true);
+ }
+diff --git a/riscv/plic.c b/riscv/plic.c
+new file mode 100644
+index 0000000..1faa1d5
+--- /dev/null
++++ b/riscv/plic.c
+@@ -0,0 +1,513 @@
++
++#include "kvm/devices.h"
++#include "kvm/ioeventfd.h"
++#include "kvm/ioport.h"
++#include "kvm/kvm.h"
++#include "kvm/kvm-cpu.h"
++#include "kvm/irq.h"
++#include "kvm/mutex.h"
++
++#include <linux/byteorder.h>
++#include <linux/kernel.h>
++#include <linux/kvm.h>
++#include <linux/sizes.h>
++
++/*
++ * From the RISC-V Privlidged Spec v1.10:
++ *
++ * Global interrupt sources are assigned small unsigned integer identifiers,
++ * beginning at the value 1.  An interrupt ID of 0 is reserved to mean no
++ * interrupt.  Interrupt identifiers are also used to break ties when two or
++ * more interrupt sources have the same assigned priority. Smaller values of
++ * interrupt ID take precedence over larger values of interrupt ID.
++ *
++ * While the RISC-V supervisor spec doesn't define the maximum number of
++ * devices supported by the PLIC, the largest number supported by devices
++ * marked as 'riscv,plic0' (which is the only device type this driver supports,
++ * and is the only extant PLIC as of now) is 1024.  As mentioned above, device
++ * 0 is defined to be non-existant so this device really only supports 1023
++ * devices.
++ */
++
++#define MAX_DEVICES	1024
++#define MAX_CONTEXTS	15872
++
++/*
++ * The PLIC consists of memory-mapped control registers, with a memory map as
++ * follows:
++ *
++ * base + 0x000000: Reserved (interrupt source 0 does not exist)
++ * base + 0x000004: Interrupt source 1 priority
++ * base + 0x000008: Interrupt source 2 priority
++ * ...
++ * base + 0x000FFC: Interrupt source 1023 priority
++ * base + 0x001000: Pending 0
++ * base + 0x001FFF: Pending
++ * base + 0x002000: Enable bits for sources 0-31 on context 0
++ * base + 0x002004: Enable bits for sources 32-63 on context 0
++ * ...
++ * base + 0x0020FC: Enable bits for sources 992-1023 on context 0
++ * base + 0x002080: Enable bits for sources 0-31 on context 1
++ * ...
++ * base + 0x002100: Enable bits for sources 0-31 on context 2
++ * ...
++ * base + 0x1F1F80: Enable bits for sources 992-1023 on context 15871
++ * base + 0x1F1F84: Reserved
++ * ...		    (higher context IDs would fit here, but wouldn't fit
++ *		     inside the per-context priority vector)
++ * base + 0x1FFFFC: Reserved
++ * base + 0x200000: Priority threshold for context 0
++ * base + 0x200004: Claim/complete for context 0
++ * base + 0x200008: Reserved
++ * ...
++ * base + 0x200FFC: Reserved
++ * base + 0x201000: Priority threshold for context 1
++ * base + 0x201004: Claim/complete for context 1
++ * ...
++ * base + 0xFFE000: Priority threshold for context 15871
++ * base + 0xFFE004: Claim/complete for context 15871
++ * base + 0xFFE008: Reserved
++ * ...
++ * base + 0xFFFFFC: Reserved
++ */
++
++/* Each interrupt source has a priority register associated with it. */
++#define PRIORITY_BASE		0
++#define PRIORITY_PER_ID		4
++
++/*
++ * Each hart context has a vector of interupt enable bits associated with it.
++ * There's one bit for each interrupt source.
++ */
++#define ENABLE_BASE		0x2000
++#define ENABLE_PER_HART		0x80
++
++/*
++ * Each hart context has a set of control registers associated with it.  Right
++ * now there's only two: a source priority threshold over which the hart will
++ * take an interrupt, and a register to claim interrupts.
++ */
++#define CONTEXT_BASE		0x200000
++#define CONTEXT_PER_HART	0x1000
++#define CONTEXT_THRESHOLD	0
++#define CONTEXT_CLAIM		4
++
++#define REG_SIZE		0x1000000
++
++struct plic_state;
++
++struct plic_context {
++	/* State to which this belongs */
++	struct plic_state *s;
++
++	/* Static Configuration */
++	u32 num;
++	struct kvm_cpu *vcpu;
++
++	/* Local IRQ state */
++	struct mutex irq_lock;
++	u8 irq_priority_threshold;
++	u32 irq_enable[MAX_DEVICES/32];
++	u32 irq_pending[MAX_DEVICES/32];
++	u8 irq_pending_priority[MAX_DEVICES];
++	u32 irq_claimed[MAX_DEVICES/32];
++	u32 irq_autoclear[MAX_DEVICES/32];
++};
++
++struct plic_state {
++	bool ready;
++	struct kvm *kvm;
++	struct device_header dev_hdr;
++
++	/* Static Configuration */
++	u32 num_irq;
++	u32 num_irq_word;
++	u32 max_prio;
++
++	/* Context Array */
++	u32 num_context;
++	struct plic_context *contexts;
++
++	/* Global IRQ state */
++	struct mutex irq_lock;
++	u8 irq_priority[MAX_DEVICES];
++	u32 irq_level[MAX_DEVICES/32];
++};
++
++static struct plic_state plic;
++
++/* Note: Must be called with c->irq_lock held */
++static u32 __plic_context_best_pending_irq(struct plic_state *s,
++					   struct plic_context *c)
 +{
-+	return KVM_REG_RISCV | type | idx | size;
++	u8 best_irq_prio = 0;
++	u32 i, j, irq, best_irq = 0;
++
++	for (i = 0; i < s->num_irq_word; i++) {
++		if (!c->irq_pending[i])
++			continue;
++
++		for (j = 0; j < 32; j++) {
++			irq = i * 32 + j;
++			if ((s->num_irq <= irq) ||
++			    !(c->irq_pending[i] & (1 << j)) ||
++			    (c->irq_claimed[i] & (1 << j)))
++				continue;
++
++			if (!best_irq ||
++			    (best_irq_prio < c->irq_pending_priority[irq])) {
++				best_irq = irq;
++				best_irq_prio = c->irq_pending_priority[irq];
++			}
++		}
++	}
++
++	return best_irq;
 +}
 +
-+#if __riscv_xlen == 64
-+#define KVM_REG_SIZE_ULONG	KVM_REG_SIZE_U64
-+#else
-+#define KVM_REG_SIZE_ULONG	KVM_REG_SIZE_U32
-+#endif
++/* Note: Must be called with c->irq_lock held */
++static void __plic_context_irq_update(struct plic_state *s,
++				      struct plic_context *c)
++{
++	u32 best_irq = __plic_context_best_pending_irq(s, c);
++	u32 virq = (best_irq) ? KVM_INTERRUPT_SET : KVM_INTERRUPT_UNSET;
 +
-+#define RISCV_CONFIG_REG(name)	__kvm_reg_id(KVM_REG_RISCV_CONFIG, \
-+					     KVM_REG_RISCV_CONFIG_REG(name), \
-+					     KVM_REG_SIZE_ULONG)
++	if (ioctl(c->vcpu->vcpu_fd, KVM_INTERRUPT, &virq) < 0)
++		pr_warning("KVM_INTERRUPT failed");
++}
 +
-+#define RISCV_CORE_REG(name)	__kvm_reg_id(KVM_REG_RISCV_CORE, \
-+					     KVM_REG_RISCV_CORE_REG(name), \
-+					     KVM_REG_SIZE_ULONG)
++/* Note: Must be called with c->irq_lock held */
++static u32 __plic_context_irq_claim(struct plic_state *s,
++				    struct plic_context *c)
++{
++	u32 virq = KVM_INTERRUPT_UNSET;
++	u32 best_irq = __plic_context_best_pending_irq(s, c);
++	u32 best_irq_word = best_irq / 32;
++	u32 best_irq_mask = (1 << (best_irq % 32));
 +
-+#define RISCV_CSR_REG(name)	__kvm_reg_id(KVM_REG_RISCV_CSR, \
-+					     KVM_REG_RISCV_CSR_REG(name), \
-+					     KVM_REG_SIZE_ULONG)
++	if (ioctl(c->vcpu->vcpu_fd, KVM_INTERRUPT, &virq) < 0)
++		pr_warning("KVM_INTERRUPT failed");
 +
-+#define RISCV_TIMER_REG(name)	__kvm_reg_id(KVM_REG_RISCV_TIMER, \
-+					     KVM_REG_RISCV_TIMER_REG(name), \
-+					     KVM_REG_SIZE_U64)
++	if (best_irq) {
++		if (c->irq_autoclear[best_irq_word] & best_irq_mask) {
++			c->irq_pending[best_irq_word] &= ~best_irq_mask;
++			c->irq_pending_priority[best_irq] = 0;
++			c->irq_claimed[best_irq_word] &= ~best_irq_mask;
++			c->irq_autoclear[best_irq_word] &= ~best_irq_mask;
++		} else
++			c->irq_claimed[best_irq_word] |= best_irq_mask;
++	}
 +
- struct kvm_cpu *kvm_cpu__arch_init(struct kvm *kvm, unsigned long cpu_id)
- {
--	/* TODO: */
--	return NULL;
-+	struct kvm_cpu *vcpu;
-+	u64 timebase = 0;
-+	unsigned long isa = 0;
-+	int coalesced_offset, mmap_size;
-+	struct kvm_one_reg reg;
++	__plic_context_irq_update(s, c);
 +
-+	vcpu = calloc(1, sizeof(struct kvm_cpu));
-+	if (!vcpu)
-+		return NULL;
++	return best_irq;
++}
 +
-+	vcpu->vcpu_fd = ioctl(kvm->vm_fd, KVM_CREATE_VCPU, cpu_id);
-+	if (vcpu->vcpu_fd < 0)
-+		die_perror("KVM_CREATE_VCPU ioctl");
++void plic__irq_trig(struct kvm *kvm, int irq, int level, bool edge)
++{
++	bool irq_marked = false;
++	u8 i, irq_prio, irq_word;
++	u32 irq_mask;
++	struct plic_context *c = NULL;
++	struct plic_state *s = &plic;
 +
-+	reg.id = RISCV_CONFIG_REG(isa);
-+	reg.addr = (unsigned long)&isa;
-+	if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
-+		die("KVM_GET_ONE_REG failed (config.isa)");
-+
-+	reg.id = RISCV_TIMER_REG(frequency);
-+	reg.addr = (unsigned long)&timebase;
-+	if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
-+		die("KVM_GET_ONE_REG failed (timer.frequency)");
-+
-+	mmap_size = ioctl(kvm->sys_fd, KVM_GET_VCPU_MMAP_SIZE, 0);
-+	if (mmap_size < 0)
-+		die_perror("KVM_GET_VCPU_MMAP_SIZE ioctl");
-+
-+	vcpu->kvm_run = mmap(NULL, mmap_size, PROT_RW, MAP_SHARED,
-+			     vcpu->vcpu_fd, 0);
-+	if (vcpu->kvm_run == MAP_FAILED)
-+		die("unable to mmap vcpu fd");
-+
-+	coalesced_offset = ioctl(kvm->sys_fd, KVM_CHECK_EXTENSION,
-+				 KVM_CAP_COALESCED_MMIO);
-+	if (coalesced_offset)
-+		vcpu->ring = (void *)vcpu->kvm_run +
-+			     (coalesced_offset * PAGE_SIZE);
-+
-+	reg.id = RISCV_CONFIG_REG(isa);
-+	reg.addr = (unsigned long)&isa;
-+	if (ioctl(vcpu->vcpu_fd, KVM_SET_ONE_REG, &reg) < 0)
-+		die("KVM_SET_ONE_REG failed (config.isa)");
-+
-+	/* Populate the vcpu structure. */
-+	vcpu->kvm		= kvm;
-+	vcpu->cpu_id		= cpu_id;
-+	vcpu->riscv_isa		= isa;
-+	vcpu->riscv_xlen	= __riscv_xlen;
-+	vcpu->riscv_timebase	= timebase;
-+	vcpu->is_running	= true;
-+
-+	return vcpu;
- }
- 
- void kvm_cpu__arch_nmi(struct kvm_cpu *cpu)
-@@ -29,7 +107,7 @@ void kvm_cpu__arch_nmi(struct kvm_cpu *cpu)
- 
- void kvm_cpu__delete(struct kvm_cpu *vcpu)
- {
--	/* TODO: */
-+	free(vcpu);
- }
- 
- bool kvm_cpu__handle_exit(struct kvm_cpu *vcpu)
-@@ -40,12 +118,43 @@ bool kvm_cpu__handle_exit(struct kvm_cpu *vcpu)
- 
- void kvm_cpu__show_page_tables(struct kvm_cpu *vcpu)
- {
--	/* TODO: */
- }
- 
- void kvm_cpu__reset_vcpu(struct kvm_cpu *vcpu)
- {
--	/* TODO: */
-+	struct kvm *kvm = vcpu->kvm;
-+	struct kvm_mp_state mp_state;
-+	struct kvm_one_reg reg;
-+	unsigned long data;
-+
-+	if (ioctl(vcpu->vcpu_fd, KVM_GET_MP_STATE, &mp_state) < 0)
-+		die_perror("KVM_GET_MP_STATE failed");
-+
-+	/*
-+	 * If MP state is stopped then it means Linux KVM RISC-V emulates
-+	 * SBI v0.2 (or higher) with HART power managment and give VCPU
-+	 * will power-up at boot-time by boot VCPU. For such VCPU, we
-+	 * don't update PC, A0 and A1 here.
-+	 */
-+	if (mp_state.mp_state == KVM_MP_STATE_STOPPED)
++	if (!s->ready)
 +		return;
 +
-+	reg.addr = (unsigned long)&data;
++	if (irq <= 0 || s->num_irq <= (u32)irq)
++		goto done;
 +
-+	data	= kvm->arch.kern_guest_start;
-+	reg.id	= RISCV_CORE_REG(regs.pc);
-+	if (ioctl(vcpu->vcpu_fd, KVM_SET_ONE_REG, &reg) < 0)
-+		die_perror("KVM_SET_ONE_REG failed (pc)");
++	mutex_lock(&s->irq_lock);
 +
-+	data	= vcpu->cpu_id;
-+	reg.id	= RISCV_CORE_REG(regs.a0);
-+	if (ioctl(vcpu->vcpu_fd, KVM_SET_ONE_REG, &reg) < 0)
-+		die_perror("KVM_SET_ONE_REG failed (a0)");
++	irq_prio = s->irq_priority[irq];
++	irq_word = irq / 32;
++	irq_mask = 1 << (irq % 32);
 +
-+	data	= kvm->arch.dtb_guest_start;
-+	reg.id	= RISCV_CORE_REG(regs.a1);
-+	if (ioctl(vcpu->vcpu_fd, KVM_SET_ONE_REG, &reg) < 0)
-+		die_perror("KVM_SET_ONE_REG failed (a1)");
- }
- 
- int kvm_cpu__get_endianness(struct kvm_cpu *vcpu)
-@@ -55,10 +164,280 @@ int kvm_cpu__get_endianness(struct kvm_cpu *vcpu)
- 
- void kvm_cpu__show_code(struct kvm_cpu *vcpu)
- {
--	/* TODO: */
-+	struct kvm_one_reg reg;
-+	unsigned long data;
-+	int debug_fd = kvm_cpu__get_debug_fd();
++	if (level)
++		s->irq_level[irq_word] |= irq_mask;
++	else
++		s->irq_level[irq_word] &= ~irq_mask;
 +
-+	reg.addr = (unsigned long)&data;
++	/*
++	 * Note: PLIC interrupts are level-triggered. As of now,
++	 * there is no notion of edge-triggered interrupts. To
++	 * handle this we auto-clear edge-triggered interrupts
++	 * when PLIC context CLAIM register is read.
++	 */
++	for (i = 0; i < s->num_context; i++) {
++		c = &s->contexts[i];
 +
-+	dprintf(debug_fd, "\n*PC:\n");
-+	reg.id = RISCV_CORE_REG(regs.pc);
-+	if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
-+		die("KVM_GET_ONE_REG failed (show_code @ PC)");
++		mutex_lock(&c->irq_lock);
++		if (c->irq_enable[irq_word] & irq_mask) {
++			if (level) {
++				c->irq_pending[irq_word] |= irq_mask;
++				c->irq_pending_priority[irq] = irq_prio;
++				if (edge)
++					c->irq_autoclear[irq_word] |= irq_mask;
++			} else {
++				c->irq_pending[irq_word] &= ~irq_mask;
++				c->irq_pending_priority[irq] = 0;
++				c->irq_claimed[irq_word] &= ~irq_mask;
++				c->irq_autoclear[irq_word] &= ~irq_mask;
++			}
++			__plic_context_irq_update(s, c);
++			irq_marked = true;
++		}
++		mutex_unlock(&c->irq_lock);
 +
-+	kvm__dump_mem(vcpu->kvm, data, 32, debug_fd);
++		if (irq_marked)
++			break;
++	}
 +
-+	dprintf(debug_fd, "\n*RA:\n");
-+	reg.id = RISCV_CORE_REG(regs.ra);
-+	if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
-+		die("KVM_GET_ONE_REG failed (show_code @ RA)");
-+
-+	kvm__dump_mem(vcpu->kvm, data, 32, debug_fd);
++done:
++	mutex_unlock(&s->irq_lock);
 +}
 +
-+static void kvm_cpu__show_csrs(struct kvm_cpu *vcpu)
++static void plic__priority_read(struct plic_state *s,
++				u64 offset, void *data)
 +{
-+	struct kvm_one_reg reg;
-+	struct kvm_riscv_csr csr;
-+	unsigned long data;
-+	int debug_fd = kvm_cpu__get_debug_fd();
++	u32 irq = (offset >> 2);
 +
-+	reg.addr = (unsigned long)&data;
-+	dprintf(debug_fd, "\n Control Status Registers:\n");
-+	dprintf(debug_fd,   " ------------------------\n");
++	if (irq == 0 || irq >= s->num_irq)
++		return;
 +
-+	reg.id		= RISCV_CSR_REG(sstatus);
-+	if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
-+		die("KVM_GET_ONE_REG failed (sstatus)");
-+	csr.sstatus = data;
++	mutex_lock(&s->irq_lock);
++	ioport__write32(data, s->irq_priority[irq]);
++	mutex_unlock(&s->irq_lock);
++}
 +
-+	reg.id		= RISCV_CSR_REG(sie);
-+	if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
-+		die("KVM_GET_ONE_REG failed (sie)");
-+	csr.sie = data;
++static void plic__priority_write(struct plic_state *s,
++				 u64 offset, void *data)
++{
++	u32 val, irq = (offset >> 2);
 +
-+	reg.id		= RISCV_CSR_REG(stvec);
-+	if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
-+		die("KVM_GET_ONE_REG failed (stvec)");
-+	csr.stvec = data;
++	if (irq == 0 || irq >= s->num_irq)
++		return;
 +
-+	reg.id		= RISCV_CSR_REG(sip);
-+	if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
-+		die("KVM_GET_ONE_REG failed (sip)");
-+	csr.sip = data;
++	mutex_lock(&s->irq_lock);
++	val = ioport__read32(data);
++	val &= ((1 << PRIORITY_PER_ID) - 1);
++	s->irq_priority[irq] = val;
++	mutex_unlock(&s->irq_lock);
++}
 +
-+	reg.id		= RISCV_CSR_REG(satp);
-+	if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
-+		die("KVM_GET_ONE_REG failed (satp)");
-+	csr.satp = data;
++static void plic__context_enable_read(struct plic_state *s,
++				      struct plic_context *c,
++				      u64 offset, void *data)
++{
++	u32 irq_word = offset >> 2;
 +
-+	reg.id		= RISCV_CSR_REG(stval);
-+	if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
-+		die("KVM_GET_ONE_REG failed (stval)");
-+	csr.stval = data;
++	if (s->num_irq_word < irq_word)
++		return;
 +
-+	reg.id		= RISCV_CSR_REG(scause);
-+	if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
-+		die("KVM_GET_ONE_REG failed (SCAUSE)");
-+	csr.scause = data;
++	mutex_lock(&c->irq_lock);
++	ioport__write32(data, c->irq_enable[irq_word]);
++	mutex_unlock(&c->irq_lock);
++}
 +
-+	reg.id		= RISCV_CSR_REG(sscratch);
-+	if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
-+		die("KVM_GET_ONE_REG failed (sscartch)");
-+	csr.sscratch = data;
-+	dprintf(debug_fd, " SSTATUS:  0x%016lx\n", csr.sstatus);
-+	dprintf(debug_fd, " SIE:      0x%016lx\n", csr.sie);
-+	dprintf(debug_fd, " STVEC:    0x%016lx\n", csr.stvec);
-+	dprintf(debug_fd, " SIP:      0x%016lx\n", csr.sip);
-+	dprintf(debug_fd, " SATP:     0x%016lx\n", csr.satp);
-+	dprintf(debug_fd, " STVAL:    0x%016lx\n", csr.stval);
-+	dprintf(debug_fd, " SCAUSE:   0x%016lx\n", csr.scause);
-+	dprintf(debug_fd, " SSCRATCH: 0x%016lx\n", csr.sscratch);
- }
- 
- void kvm_cpu__show_registers(struct kvm_cpu *vcpu)
- {
--	/* TODO: */
-+	struct kvm_one_reg reg;
-+	unsigned long data;
-+	int debug_fd = kvm_cpu__get_debug_fd();
-+	struct kvm_riscv_core core;
++static void plic__context_enable_write(struct plic_state *s,
++				       struct plic_context *c,
++				       u64 offset, void *data)
++{
++	u8 irq_prio;
++	u32 i, irq, irq_mask;
++	u32 irq_word = offset >> 2;
++	u32 old_val, new_val, xor_val;
 +
-+	reg.addr = (unsigned long)&data;
++	if (s->num_irq_word < irq_word)
++		return;
 +
-+	reg.id		= RISCV_CORE_REG(mode);
-+	if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
-+		die("KVM_GET_ONE_REG failed (mode)");
-+	core.mode = data;
++	mutex_lock(&s->irq_lock);
 +
-+	reg.id		= RISCV_CORE_REG(regs.pc);
-+	if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
-+		die("KVM_GET_ONE_REG failed (pc)");
-+	core.regs.pc = data;
++	mutex_lock(&c->irq_lock);
 +
-+	reg.id		= RISCV_CORE_REG(regs.ra);
-+	if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
-+		die("KVM_GET_ONE_REG failed (ra)");
-+	core.regs.ra = data;
++	old_val = c->irq_enable[irq_word];
++	new_val = ioport__read32(data);
 +
-+	reg.id		= RISCV_CORE_REG(regs.sp);
-+	if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
-+		die("KVM_GET_ONE_REG failed (sp)");
-+	core.regs.sp = data;
++	if (irq_word == 0)
++		new_val &= ~0x1;
 +
-+	reg.id		= RISCV_CORE_REG(regs.gp);
-+	if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
-+		die("KVM_GET_ONE_REG failed (gp)");
-+	core.regs.gp = data;
++	c->irq_enable[irq_word] = new_val;
 +
-+	reg.id		= RISCV_CORE_REG(regs.tp);
-+	if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
-+		die("KVM_GET_ONE_REG failed (tp)");
-+	core.regs.tp = data;
++	xor_val = old_val ^ new_val;
++	for (i = 0; i < 32; i++) {
++		irq = irq_word * 32 + i;
++		irq_mask = 1 << i;
++		irq_prio = s->irq_priority[irq];
++		if (!(xor_val & irq_mask))
++			continue;
++		if ((new_val & irq_mask) &&
++		    (s->irq_level[irq_word] & irq_mask)) {
++			c->irq_pending[irq_word] |= irq_mask;
++			c->irq_pending_priority[irq] = irq_prio;
++		} else if (!(new_val & irq_mask)) {
++			c->irq_pending[irq_word] &= ~irq_mask;
++			c->irq_pending_priority[irq] = 0;
++			c->irq_claimed[irq_word] &= ~irq_mask;
++		}
++	}
 +
-+	reg.id		= RISCV_CORE_REG(regs.t0);
-+	if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
-+		die("KVM_GET_ONE_REG failed (t0)");
-+	core.regs.t0 = data;
++	__plic_context_irq_update(s, c);
 +
-+	reg.id		= RISCV_CORE_REG(regs.t1);
-+	if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
-+		die("KVM_GET_ONE_REG failed (t1)");
-+	core.regs.t1 = data;
++	mutex_unlock(&c->irq_lock);
 +
-+	reg.id		= RISCV_CORE_REG(regs.t2);
-+	if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
-+		die("KVM_GET_ONE_REG failed (t2)");
-+	core.regs.t2 = data;
++	mutex_unlock(&s->irq_lock);
++}
 +
-+	reg.id		= RISCV_CORE_REG(regs.s0);
-+	if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
-+		die("KVM_GET_ONE_REG failed (s0)");
-+	core.regs.s0 = data;
++static void plic__context_read(struct plic_state *s,
++			       struct plic_context *c,
++			       u64 offset, void *data)
++{
++	mutex_lock(&c->irq_lock);
 +
-+	reg.id		= RISCV_CORE_REG(regs.s1);
-+	if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
-+		die("KVM_GET_ONE_REG failed (s1)");
-+	core.regs.s1 = data;
++	switch (offset) {
++	case CONTEXT_THRESHOLD:
++		ioport__write32(data, c->irq_priority_threshold);
++		break;
++	case CONTEXT_CLAIM:
++		ioport__write32(data, __plic_context_irq_claim(s, c));
++		break;
++	default:
++		break;
++	};
 +
-+	reg.id		= RISCV_CORE_REG(regs.a0);
-+	if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
-+		die("KVM_GET_ONE_REG failed (a0)");
-+	core.regs.a0 = data;
++	mutex_unlock(&c->irq_lock);
++}
 +
-+	reg.id		= RISCV_CORE_REG(regs.a1);
-+	if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
-+		die("KVM_GET_ONE_REG failed (a1)");
-+	core.regs.a1 = data;
++static void plic__context_write(struct plic_state *s,
++				struct plic_context *c,
++				u64 offset, void *data)
++{
++	u32 val;
++	bool irq_update = false;
 +
-+	reg.id		= RISCV_CORE_REG(regs.a2);
-+	if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
-+		die("KVM_GET_ONE_REG failed (a2)");
-+	core.regs.a2 = data;
++	mutex_lock(&c->irq_lock);
 +
-+	reg.id		= RISCV_CORE_REG(regs.a3);
-+	if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
-+		die("KVM_GET_ONE_REG failed (a3)");
-+	core.regs.a3 = data;
++	switch (offset) {
++	case CONTEXT_THRESHOLD:
++		val = ioport__read32(data);
++		val &= ((1 << PRIORITY_PER_ID) - 1);
++		if (val <= s->max_prio)
++			c->irq_priority_threshold = val;
++		else
++			irq_update = true;
++		break;
++	case CONTEXT_CLAIM:
++		break;
++	default:
++		irq_update = true;
++		break;
++	};
 +
-+	reg.id		= RISCV_CORE_REG(regs.a4);
-+	if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
-+		die("KVM_GET_ONE_REG failed (a4)");
-+	core.regs.a4 = data;
++	if (irq_update)
++		__plic_context_irq_update(s, c);
 +
-+	reg.id		= RISCV_CORE_REG(regs.a5);
-+	if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
-+		die("KVM_GET_ONE_REG failed (a5)");
-+	core.regs.a5 = data;
++	mutex_unlock(&c->irq_lock);
++}
 +
-+	reg.id		= RISCV_CORE_REG(regs.a6);
-+	if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
-+		die("KVM_GET_ONE_REG failed (a6)");
-+	core.regs.a6 = data;
++static void plic__mmio_callback(struct kvm_cpu *vcpu,
++				u64 addr, u8 *data, u32 len,
++				u8 is_write, void *ptr)
++{
++	u32 cntx;
++	struct plic_state *s = ptr;
 +
-+	reg.id		= RISCV_CORE_REG(regs.a7);
-+	if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
-+		die("KVM_GET_ONE_REG failed (a7)");
-+	core.regs.a7 = data;
++	if (len != 4)
++		die("plic: invalid len=%d", len);
 +
-+	reg.id		= RISCV_CORE_REG(regs.s2);
-+	if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
-+		die("KVM_GET_ONE_REG failed (s2)");
-+	core.regs.s2 = data;
++	addr &= ~0x3;
++	addr -= RISCV_PLIC;
 +
-+	reg.id		= RISCV_CORE_REG(regs.s3);
-+	if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
-+		die("KVM_GET_ONE_REG failed (s3)");
-+	core.regs.s3 = data;
++	if (is_write) {
++		if (PRIORITY_BASE <= addr && addr < ENABLE_BASE) {
++			plic__priority_write(s, addr, data);
++		} else if (ENABLE_BASE <= addr && addr < CONTEXT_BASE) {
++			cntx = (addr - ENABLE_BASE) / ENABLE_PER_HART;
++			addr -= cntx * ENABLE_PER_HART + ENABLE_BASE;
++			if (cntx < s->num_context)
++				plic__context_enable_write(s,
++							   &s->contexts[cntx],
++							   addr, data);
++		} else if (CONTEXT_BASE <= addr && addr < REG_SIZE) {
++			cntx = (addr - CONTEXT_BASE) / CONTEXT_PER_HART;
++			addr -= cntx * CONTEXT_PER_HART + CONTEXT_BASE;
++			if (cntx < s->num_context)
++				plic__context_write(s, &s->contexts[cntx],
++						    addr, data);
++		}
++	} else {
++		if (PRIORITY_BASE <= addr && addr < ENABLE_BASE) {
++			plic__priority_read(s, addr, data);
++		} else if (ENABLE_BASE <= addr && addr < CONTEXT_BASE) {
++			cntx = (addr - ENABLE_BASE) / ENABLE_PER_HART;
++			addr -= cntx * ENABLE_PER_HART + ENABLE_BASE;
++			if (cntx < s->num_context)
++				plic__context_enable_read(s,
++							  &s->contexts[cntx],
++							  addr, data);
++		} else if (CONTEXT_BASE <= addr && addr < REG_SIZE) {
++			cntx = (addr - CONTEXT_BASE) / CONTEXT_PER_HART;
++			addr -= cntx * CONTEXT_PER_HART + CONTEXT_BASE;
++			if (cntx < s->num_context)
++				plic__context_read(s, &s->contexts[cntx],
++						   addr, data);
++		}
++	}
++}
 +
-+	reg.id		= RISCV_CORE_REG(regs.s4);
-+	if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
-+		die("KVM_GET_ONE_REG failed (s4)");
-+	core.regs.s4 = data;
++static int plic__init(struct kvm *kvm)
++{
++	u32 i;
++	int ret;
++	struct plic_context *c;
 +
-+	reg.id		= RISCV_CORE_REG(regs.s5);
-+	if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
-+		die("KVM_GET_ONE_REG failed (s5)");
-+	core.regs.s5 = data;
++	plic.kvm = kvm;
++	plic.dev_hdr = (struct device_header) {
++		.bus_type	= DEVICE_BUS_MMIO,
++	};
 +
-+	reg.id		= RISCV_CORE_REG(regs.s6);
-+	if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
-+		die("KVM_GET_ONE_REG failed (s6)");
-+	core.regs.s6 = data;
++	plic.num_irq = MAX_DEVICES;
++	plic.num_irq_word = plic.num_irq / 32;
++	if ((plic.num_irq_word * 32) < plic.num_irq)
++		plic.num_irq_word++;
++	plic.max_prio = (1UL << PRIORITY_PER_ID) - 1;
 +
-+	reg.id		= RISCV_CORE_REG(regs.s7);
-+	if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
-+		die("KVM_GET_ONE_REG failed (s7)");
-+	core.regs.s7 = data;
++	plic.num_context = kvm->nrcpus * 2;
++	plic.contexts = calloc(plic.num_context, sizeof(struct plic_context));
++	if (!plic.contexts)
++		return -ENOMEM;
++	for (i = 0; i < plic.num_context; i++) {
++		c = &plic.contexts[i];
++		c->s = &plic;
++		c->num = i;
++		c->vcpu = kvm->cpus[i / 2];
++		mutex_init(&c->irq_lock);
++	}
 +
-+	reg.id		= RISCV_CORE_REG(regs.s8);
-+	if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
-+		die("KVM_GET_ONE_REG failed (s8)");
-+	core.regs.s8 = data;
++	mutex_init(&plic.irq_lock);
 +
-+	reg.id		= RISCV_CORE_REG(regs.s9);
-+	if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
-+		die("KVM_GET_ONE_REG failed (s9)");
-+	core.regs.s9 = data;
++	ret = kvm__register_mmio(kvm, RISCV_PLIC, RISCV_PLIC_SIZE,
++				 false, plic__mmio_callback, &plic);
++	if (ret)
++		return ret;
 +
-+	reg.id		= RISCV_CORE_REG(regs.s10);
-+	if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
-+		die("KVM_GET_ONE_REG failed (s10)");
-+	core.regs.s10 = data;
++	ret = device__register(&plic.dev_hdr);
++	if (ret)
++		return ret;
 +
-+	reg.id		= RISCV_CORE_REG(regs.s11);
-+	if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
-+		die("KVM_GET_ONE_REG failed (s11)");
-+	core.regs.s11 = data;
++	plic.ready = true;
 +
-+	reg.id		= RISCV_CORE_REG(regs.t3);
-+	if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
-+		die("KVM_GET_ONE_REG failed (t3)");
-+	core.regs.t3 = data;
++	return 0;
 +
-+	reg.id		= RISCV_CORE_REG(regs.t4);
-+	if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
-+		die("KVM_GET_ONE_REG failed (t4)");
-+	core.regs.t4 = data;
++}
++dev_init(plic__init);
 +
-+	reg.id		= RISCV_CORE_REG(regs.t5);
-+	if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
-+		die("KVM_GET_ONE_REG failed (t5)");
-+	core.regs.t5 = data;
++static int plic__exit(struct kvm *kvm)
++{
++	plic.ready = false;
++	kvm__deregister_mmio(kvm, RISCV_PLIC);
++	free(plic.contexts);
 +
-+	reg.id		= RISCV_CORE_REG(regs.t6);
-+	if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
-+		die("KVM_GET_ONE_REG failed (t6)");
-+	core.regs.t6 = data;
-+
-+	dprintf(debug_fd, "\n General Purpose Registers:\n");
-+	dprintf(debug_fd,   " -------------------------\n");
-+	dprintf(debug_fd, " MODE:  0x%lx\n", data);
-+	dprintf(debug_fd, " PC: 0x%016lx   RA: 0x%016lx SP: 0x%016lx GP: 0x%016lx\n",
-+		core.regs.pc, core.regs.ra, core.regs.sp, core.regs.gp);
-+	dprintf(debug_fd, " TP: 0x%016lx   T0: 0x%016lx T1: 0x%016lx T2: 0x%016lx\n",
-+		core.regs.tp, core.regs.t0, core.regs.t1, core.regs.t2);
-+	dprintf(debug_fd, " S0: 0x%016lx   S1: 0x%016lx A0: 0x%016lx A1: 0x%016lx\n",
-+		core.regs.s0, core.regs.s1, core.regs.a0, core.regs.a1);
-+	dprintf(debug_fd, " A2: 0x%016lx   A3: 0x%016lx A4: 0x%016lx A5: 0x%016lx\n",
-+		core.regs.a2, core.regs.a3, core.regs.a4, core.regs.a5);
-+	dprintf(debug_fd, " A6: 0x%016lx   A7: 0x%016lx S2: 0x%016lx S3: 0x%016lx\n",
-+		core.regs.a6, core.regs.a7, core.regs.s2, core.regs.s3);
-+	dprintf(debug_fd, " S4: 0x%016lx   S5: 0x%016lx S6: 0x%016lx S7: 0x%016lx\n",
-+		core.regs.s4, core.regs.s5, core.regs.s6, core.regs.s7);
-+	dprintf(debug_fd, " S8: 0x%016lx   S9: 0x%016lx S10: 0x%016lx S11: 0x%016lx\n",
-+		core.regs.s8, core.regs.s9, core.regs.s10, core.regs.s11);
-+	dprintf(debug_fd, " T3: 0x%016lx   T4: 0x%016lx T5: 0x%016lx T6: 0x%016lx\n",
-+		core.regs.t3, core.regs.t4, core.regs.t5, core.regs.t6);
-+
-+	kvm_cpu__show_csrs(vcpu);
- }
++	return 0;
++}
++dev_exit(plic__exit);
 -- 
 2.25.1
 
