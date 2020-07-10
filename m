@@ -2,37 +2,37 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E651421B7EF
-	for <lists+kvm@lfdr.de>; Fri, 10 Jul 2020 16:12:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0D7D121B7F0
+	for <lists+kvm@lfdr.de>; Fri, 10 Jul 2020 16:12:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728146AbgGJOMN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 10 Jul 2020 10:12:13 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:20074 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726496AbgGJOML (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 10 Jul 2020 10:12:11 -0400
+        id S1728179AbgGJOMO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 10 Jul 2020 10:12:14 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:25635 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1728130AbgGJOMM (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 10 Jul 2020 10:12:12 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1594390329;
+        s=mimecast20190719; t=1594390331;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=vHoUdqcWmCYR4qi3PrugHYTP3M3+EpRb12azAQ/0uIU=;
-        b=GQc5MiPaICaz6vu2vP3fDJIAtegwNEGHc1SzY4Odzl1Si5V77c7Hy2ERNAjGMMFHHa6tII
-        Q31VpUMUwLPSfvVZ6fByK5nkFU1y7Xv3b2aPkKkCgf1Ej+llAXF3Rb8Y+LjdxglIe1REB0
-        b5Y0L2dETlN0eGof216UvvF/IEeY/KA=
+        bh=+OkhWN9XI/HC21/2OiJMRv96UCzqp2quwlazUkUpR+k=;
+        b=UvPNDKJ73/5wa04Qd3/3vgmR1Wu1Jo8s7a4TdSUzH8hdAUjuCUR2L9G2GGMnhrrXz0tQfL
+        4zC/A7iIMwXTKQ9OUrtaE19VMUMJn8PoHWk2wI1JuODUCSGEobxocsF7MfhSdJflt0Ojen
+        b6Xabd6xP5Yx4v3imc4Dx3VtMDPZ09s=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-36-D9o55wPwNruu77r6tc_XZA-1; Fri, 10 Jul 2020 10:12:07 -0400
-X-MC-Unique: D9o55wPwNruu77r6tc_XZA-1
+ us-mta-39-Hmleuwc1PdKcmqh_TQrP5Q-1; Fri, 10 Jul 2020 10:12:10 -0400
+X-MC-Unique: Hmleuwc1PdKcmqh_TQrP5Q-1
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 928F5100CCC2;
-        Fri, 10 Jul 2020 14:12:06 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 09E888014D7;
+        Fri, 10 Jul 2020 14:12:09 +0000 (UTC)
 Received: from vitty.brq.redhat.com (unknown [10.40.195.35])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 642C774F52;
-        Fri, 10 Jul 2020 14:12:04 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id EC0A81CA;
+        Fri, 10 Jul 2020 14:12:06 +0000 (UTC)
 From:   Vitaly Kuznetsov <vkuznets@redhat.com>
 To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
@@ -40,9 +40,9 @@ Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
         Jim Mattson <jmattson@google.com>,
         Junaid Shahid <junaids@google.com>,
         linux-kernel@vger.kernel.org
-Subject: [PATCH v4 2/9] KVM: MMU: stop dereferencing vcpu->arch.mmu to get the context for MMU init
-Date:   Fri, 10 Jul 2020 16:11:50 +0200
-Message-Id: <20200710141157.1640173-3-vkuznets@redhat.com>
+Subject: [PATCH v4 3/9] KVM: nSVM: reset nested_run_pending upon nested_svm_vmrun_msrpm() failure
+Date:   Fri, 10 Jul 2020 16:11:51 +0200
+Message-Id: <20200710141157.1640173-4-vkuznets@redhat.com>
 In-Reply-To: <20200710141157.1640173-1-vkuznets@redhat.com>
 References: <20200710141157.1640173-1-vkuznets@redhat.com>
 MIME-Version: 1.0
@@ -53,95 +53,28 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Paolo Bonzini <pbonzini@redhat.com>
+WARN_ON_ONCE(svm->nested.nested_run_pending) in nested_svm_vmexit()
+will fire if nested_run_pending remains '1' but it doesn't really
+need to, we are already failing and not going to run nested guest.
 
-kvm_init_shadow_mmu() was actually the only function that could be called
-with different vcpu->arch.mmu values.  Now that kvm_init_shadow_npt_mmu()
-is separated from kvm_init_shadow_mmu(), we always know the MMU context
-we need to use and there is no need to dereference vcpu->arch.mmu pointer.
-
-Based on a patch by Vitaly Kuznetsov <vkuznets@redhat.com>.
-
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
 ---
- arch/x86/kvm/mmu/mmu.c | 21 ++++++++++-----------
- 1 file changed, 10 insertions(+), 11 deletions(-)
+ arch/x86/kvm/svm/nested.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 93f18e5fa8b5..3a306ab1a9c9 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -4884,7 +4884,7 @@ kvm_calc_tdp_mmu_root_page_role(struct kvm_vcpu *vcpu, bool base_only)
+diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
+index e424bce13e6c..1cc8592b1820 100644
+--- a/arch/x86/kvm/svm/nested.c
++++ b/arch/x86/kvm/svm/nested.c
+@@ -468,6 +468,8 @@ int nested_svm_vmrun(struct vcpu_svm *svm)
+ 	enter_svm_guest_mode(svm, vmcb_gpa, nested_vmcb);
  
- static void init_kvm_tdp_mmu(struct kvm_vcpu *vcpu)
- {
--	struct kvm_mmu *context = vcpu->arch.mmu;
-+	struct kvm_mmu *context = &vcpu->arch.root_mmu;
- 	union kvm_mmu_role new_role =
- 		kvm_calc_tdp_mmu_root_page_role(vcpu, false);
- 
-@@ -4952,11 +4952,10 @@ kvm_calc_shadow_mmu_root_page_role(struct kvm_vcpu *vcpu, bool base_only)
- 	return role;
- }
- 
--static void shadow_mmu_init_context(struct kvm_vcpu *vcpu, u32 cr0, u32 cr4,
--				    u32 efer, union kvm_mmu_role new_role)
-+static void shadow_mmu_init_context(struct kvm_vcpu *vcpu, struct kvm_mmu *context,
-+				    u32 cr0, u32 cr4, u32 efer,
-+				    union kvm_mmu_role new_role)
- {
--	struct kvm_mmu *context = vcpu->arch.mmu;
--
- 	if (!(cr0 & X86_CR0_PG))
- 		nonpaging_init_context(vcpu, context);
- 	else if (efer & EFER_LMA)
-@@ -4972,23 +4971,23 @@ static void shadow_mmu_init_context(struct kvm_vcpu *vcpu, u32 cr0, u32 cr4,
- 
- static void kvm_init_shadow_mmu(struct kvm_vcpu *vcpu, u32 cr0, u32 cr4, u32 efer)
- {
--	struct kvm_mmu *context = vcpu->arch.mmu;
-+	struct kvm_mmu *context = &vcpu->arch.root_mmu;
- 	union kvm_mmu_role new_role =
- 		kvm_calc_shadow_mmu_root_page_role(vcpu, false);
- 
- 	if (new_role.as_u64 != context->mmu_role.as_u64)
--		shadow_mmu_init_context(vcpu, cr0, cr4, efer, new_role);
-+		shadow_mmu_init_context(vcpu, context, cr0, cr4, efer, new_role);
- }
- 
- void kvm_init_shadow_npt_mmu(struct kvm_vcpu *vcpu, u32 cr0, u32 cr4, u32 efer,
- 			     gpa_t nested_cr3)
- {
--	struct kvm_mmu *context = vcpu->arch.mmu;
-+	struct kvm_mmu *context = &vcpu->arch.guest_mmu;
- 	union kvm_mmu_role new_role =
- 		kvm_calc_shadow_mmu_root_page_role(vcpu, false);
- 
- 	if (new_role.as_u64 != context->mmu_role.as_u64)
--		shadow_mmu_init_context(vcpu, cr0, cr4, efer, new_role);
-+		shadow_mmu_init_context(vcpu, context, cr0, cr4, efer, new_role);
- }
- EXPORT_SYMBOL_GPL(kvm_init_shadow_npt_mmu);
- 
-@@ -5024,7 +5023,7 @@ kvm_calc_shadow_ept_root_page_role(struct kvm_vcpu *vcpu, bool accessed_dirty,
- void kvm_init_shadow_ept_mmu(struct kvm_vcpu *vcpu, bool execonly,
- 			     bool accessed_dirty, gpa_t new_eptp)
- {
--	struct kvm_mmu *context = vcpu->arch.mmu;
-+	struct kvm_mmu *context = &vcpu->arch.guest_mmu;
- 	u8 level = vmx_eptp_page_walk_level(new_eptp);
- 	union kvm_mmu_role new_role =
- 		kvm_calc_shadow_ept_root_page_role(vcpu, accessed_dirty,
-@@ -5058,7 +5057,7 @@ EXPORT_SYMBOL_GPL(kvm_init_shadow_ept_mmu);
- 
- static void init_kvm_softmmu(struct kvm_vcpu *vcpu)
- {
--	struct kvm_mmu *context = vcpu->arch.mmu;
-+	struct kvm_mmu *context = &vcpu->arch.root_mmu;
- 
- 	kvm_init_shadow_mmu(vcpu,
- 			    kvm_read_cr0_bits(vcpu, X86_CR0_PG),
+ 	if (!nested_svm_vmrun_msrpm(svm)) {
++		svm->nested.nested_run_pending = 0;
++
+ 		svm->vmcb->control.exit_code    = SVM_EXIT_ERR;
+ 		svm->vmcb->control.exit_code_hi = 0;
+ 		svm->vmcb->control.exit_info_1  = 0;
 -- 
 2.25.4
 
