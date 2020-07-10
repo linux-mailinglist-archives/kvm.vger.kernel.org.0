@@ -2,23 +2,60 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C402B21B039
-	for <lists+kvm@lfdr.de>; Fri, 10 Jul 2020 09:32:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CCC0E21B087
+	for <lists+kvm@lfdr.de>; Fri, 10 Jul 2020 09:48:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726820AbgGJHcg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 10 Jul 2020 03:32:36 -0400
-Received: from out30-42.freemail.mail.aliyun.com ([115.124.30.42]:54267 "EHLO
-        out30-42.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725851AbgGJHcf (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 10 Jul 2020 03:32:35 -0400
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R201e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01f04427;MF=tianjia.zhang@linux.alibaba.com;NM=1;PH=DS;RN=37;SR=0;TI=SMTPD_---0U2Gmw93_1594366344;
-Received: from 30.27.116.248(mailfrom:tianjia.zhang@linux.alibaba.com fp:SMTPD_---0U2Gmw93_1594366344)
-          by smtp.aliyun-inc.com(127.0.0.1);
-          Fri, 10 Jul 2020 15:32:26 +0800
-Subject: Re: [PATCH v6 0/5] clean up redundant 'kvm_run' parameters
-To:     pbonzini@redhat.com, tsbogend@alpha.franken.de, paulus@ozlabs.org,
-        mpe@ellerman.id.au, benh@kernel.crashing.org,
-        borntraeger@de.ibm.com, frankja@linux.ibm.com, david@redhat.com,
+        id S1727019AbgGJHsl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 10 Jul 2020 03:48:41 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:27249 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726933AbgGJHsk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 10 Jul 2020 03:48:40 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1594367318;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=w3lPi8IIyg6JHok2MkrSRXRUKV+20Z+zeyOlBbulHrA=;
+        b=UIwwVZezTDq6vUmce3Y1ef+Ehzm4G3VyUPnegLqxtIOw4MahNujDj9DYBiQ22AT1KosoRF
+        whFbgfxVdWntveU+CGH47c3k7ucYNEYnp0AWblCtvNadzsmUVivZCaOe7p63ePL4M9GI9d
+        yyiK71vwBliW02CQo2kSbPhg2o6llng=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-360-orlsw6b2MduC9x1uIMPLMg-1; Fri, 10 Jul 2020 03:48:36 -0400
+X-MC-Unique: orlsw6b2MduC9x1uIMPLMg-1
+Received: by mail-wr1-f70.google.com with SMTP id o12so5026418wrj.23
+        for <kvm@vger.kernel.org>; Fri, 10 Jul 2020 00:48:36 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=w3lPi8IIyg6JHok2MkrSRXRUKV+20Z+zeyOlBbulHrA=;
+        b=cR6fEUgInxEU7EPGSpWUXaCOvBhGV+SNfrd0URPLTnWgbU7KmcMirOdI45WXLRjCEv
+         rIL6T4EDJjvb9U51p+N0+RtP7BH0cUANd/HS/UhW4FBvOwQGUgwKJxqEHayWdivNZHam
+         3u09P+hFXCJBlePO6V3+iz1RcirgUqNCw0wlGKfY28rgXmQg0ZZbdfkn0NqgSdJ5b6Gm
+         6nZPDEtjNPcC7PeoCcfEW8IfsbwOVjbAOWiUEADQr9XdkJ1XlUdwLRbvaWGPMVfa6X7l
+         4sqX7nXy6tTWzm65xlwRRK8KnY0VUDg9RfOfFWNl2ssKBo3ycX+nGRcBOKSOQ167yq4i
+         q5VA==
+X-Gm-Message-State: AOAM532IEz3sJBiT7oVY5NfEBCvcaVGS3mps5SDw42p5F3EcC7Tv8p57
+        zed9NgArIe9L/GjaajMcQq57qQ4e3y5bQzhMw7qJcxzy/yID0XX3b+UwpWb+LJ4w35tIn/qdfYW
+        UHzudWqP9M71Z
+X-Received: by 2002:a7b:c952:: with SMTP id i18mr4118701wml.65.1594367315233;
+        Fri, 10 Jul 2020 00:48:35 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzoVcmgycalDG2NxxBpe/F1Ip5MhErG5G/6zxHhUH+uoCv6KdhugBz3NZfr470zRIHVmrw60A==
+X-Received: by 2002:a7b:c952:: with SMTP id i18mr4118689wml.65.1594367315031;
+        Fri, 10 Jul 2020 00:48:35 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:9541:9439:cb0f:89c? ([2001:b07:6468:f312:9541:9439:cb0f:89c])
+        by smtp.gmail.com with ESMTPSA id o9sm8786762wrs.1.2020.07.10.00.48.32
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 10 Jul 2020 00:48:34 -0700 (PDT)
+Subject: Re: [PATCH v6 1/5] KVM: s390: clean up redundant 'kvm_run' parameters
+To:     Christian Borntraeger <borntraeger@de.ibm.com>,
+        Tianjia Zhang <tianjia.zhang@linux.alibaba.com>,
+        tsbogend@alpha.franken.de, paulus@ozlabs.org, mpe@ellerman.id.au,
+        benh@kernel.crashing.org, frankja@linux.ibm.com, david@redhat.com,
         cohuck@redhat.com, heiko.carstens@de.ibm.com, gor@linux.ibm.com,
         sean.j.christopherson@intel.com, vkuznets@redhat.com,
         wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org,
@@ -32,84 +69,36 @@ Cc:     kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
         kvm-ppc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
         linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org
 References: <20200623131418.31473-1-tianjia.zhang@linux.alibaba.com>
-From:   Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
-Message-ID: <6604e273-d7b1-5007-8721-75c4a4dec68e@linux.alibaba.com>
-Date:   Fri, 10 Jul 2020 15:32:24 +0800
-User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+ <20200623131418.31473-2-tianjia.zhang@linux.alibaba.com>
+ <c49f8814-c7ea-6884-91c5-3dcd40c6509f@de.ibm.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <2e986527-1585-e1b4-1251-ef36ac3bd233@redhat.com>
+Date:   Fri, 10 Jul 2020 09:48:31 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.9.0
 MIME-Version: 1.0
-In-Reply-To: <20200623131418.31473-1-tianjia.zhang@linux.alibaba.com>
-Content-Type: text/plain; charset=gbk; format=flowed
+In-Reply-To: <c49f8814-c7ea-6884-91c5-3dcd40c6509f@de.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Paolo,
+On 23/06/20 17:31, Christian Borntraeger wrote:
+> 
+> I have trouble seeing value in this particular patch. We add LOCs
+> without providing any noticable benefit. All other patches in this series at
+> least reduce the amount of code. So I would defer this to Paolo if he prefers
+> to have this way across all architectures. 
 
-Any opinion on this series patches? Can I help with this patchset ?
+Yes, it adds lines of code but they're just
 
-Thanks and best,
-Tianjia
++	struct kvm_run *kvm_run = vcpu->run;
 
-On 2020/6/23 21:14, Tianjia Zhang wrote:
-> In the current kvm version, 'kvm_run' has been included in the 'kvm_vcpu'
-> structure. For historical reasons, many kvm-related function parameters
-> retain the 'kvm_run' and 'kvm_vcpu' parameters at the same time. This
-> patch does a unified cleanup of these remaining redundant parameters.
-> 
-> This series of patches has completely cleaned the architecture of
-> arm64, mips, ppc, and s390 (no such redundant code on x86). Due to
-> the large number of modified codes, a separate patch is made for each
-> platform. On the ppc platform, there is also a redundant structure
-> pointer of 'kvm_run' in 'vcpu_arch', which has also been cleaned
-> separately.
-> 
-> ---
-> v6 changes:
->    Rearrange patch sets, only keep the unmerged patch.
->    rebase on mainline.
-> 
-> v5 change:
->    ppc: fix for review.
-> 
-> v4 change:
->    mips: fixes two errors in entry.c.
-> 
-> v3 change:
->    Keep the existing `vcpu->run` in the function body unchanged.
-> 
-> v2 change:
->    s390 retains the original variable name and minimizes modification.
-> 
-> Tianjia Zhang (5):
->    KVM: s390: clean up redundant 'kvm_run' parameters
->    KVM: arm64: clean up redundant 'kvm_run' parameters
->    KVM: PPC: clean up redundant kvm_run parameters in assembly
->    KVM: MIPS: clean up redundant 'kvm_run' parameters
->    KVM: MIPS: clean up redundant kvm_run parameters in assembly
-> 
->   arch/arm64/include/asm/kvm_coproc.h   |  12 +--
->   arch/arm64/include/asm/kvm_host.h     |  11 +--
->   arch/arm64/include/asm/kvm_mmu.h      |   2 +-
->   arch/arm64/kvm/arm.c                  |   6 +-
->   arch/arm64/kvm/handle_exit.c          |  36 ++++----
->   arch/arm64/kvm/mmio.c                 |  11 +--
->   arch/arm64/kvm/mmu.c                  |   5 +-
->   arch/arm64/kvm/sys_regs.c             |  13 ++-
->   arch/mips/include/asm/kvm_host.h      |  32 ++------
->   arch/mips/kvm/emulate.c               |  59 +++++--------
->   arch/mips/kvm/entry.c                 |  21 ++---
->   arch/mips/kvm/mips.c                  |  14 ++--
->   arch/mips/kvm/trap_emul.c             | 114 +++++++++++---------------
->   arch/mips/kvm/vz.c                    |  26 +++---
->   arch/powerpc/include/asm/kvm_ppc.h    |   2 +-
->   arch/powerpc/kvm/book3s_interrupts.S  |  22 +++--
->   arch/powerpc/kvm/book3s_pr.c          |   9 +-
->   arch/powerpc/kvm/booke.c              |   9 +-
->   arch/powerpc/kvm/booke_interrupts.S   |   9 +-
->   arch/powerpc/kvm/bookehv_interrupts.S |  10 +--
->   arch/s390/kvm/kvm-s390.c              |  23 ++++--
->   21 files changed, 188 insertions(+), 258 deletions(-)
-> 
+You could avoid the LoC increase by repeating vcpu->run over and over,
+but I think the code overall is clearer.
+
+Paolo
+
