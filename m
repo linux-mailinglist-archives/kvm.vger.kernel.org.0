@@ -2,77 +2,106 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BDAAD21B9C0
-	for <lists+kvm@lfdr.de>; Fri, 10 Jul 2020 17:44:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6411C21B9D4
+	for <lists+kvm@lfdr.de>; Fri, 10 Jul 2020 17:48:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726965AbgGJPog (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 10 Jul 2020 11:44:36 -0400
-Received: from mail.kernel.org ([198.145.29.99]:57790 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726820AbgGJPog (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 10 Jul 2020 11:44:36 -0400
-Received: from localhost (mobile-166-175-191-139.mycingular.net [166.175.191.139])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        id S1727978AbgGJPsX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 10 Jul 2020 11:48:23 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:30709 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726965AbgGJPsX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 10 Jul 2020 11:48:23 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1594396102;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=qnq1BGapFhMZc1AmRLOzTnZddFrUvqx4x+MyFf6t4sA=;
+        b=F6tn6DCuvzmcyA4Pd8CrjWORmtyIQh4Bqmg/Z63WqnTA3sV6IRTtn0nh5xagpqycDzoZDY
+        6TPvhHGLNmAM0gku4UV7Hzgo+fS7YLY3elTJUdsnX64yhsgL4LDeAowV+Kg3XSQge8H4Ad
+        iSmh5XvYglD+5ygyhWypKuf7HuUh2tI=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-447-kURzJpZRPQyy5obrA0h2yA-1; Fri, 10 Jul 2020 11:48:20 -0400
+X-MC-Unique: kURzJpZRPQyy5obrA0h2yA-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 175E8207BB;
-        Fri, 10 Jul 2020 15:44:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1594395875;
-        bh=X8c/R3Qn9kobWNREt9IFObBlN5vW/pJr0E9nZBeLL5c=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:From;
-        b=t+xYKzI/czGn6BDQy40JKkZQWywkgDpu3a4ZCx7PSN6Naq90Jagdi4C8ZH7Loii47
-         Eweef2nPyidMPZ1df+5a7t/C9dLXA8B4o0BoaR3nZ/diQVEMu/QF+d1576F6kMKZ4o
-         mDqP+fhKj2Y685Ph994PFZ07pdcJh2ogNH3MaIag=
-Date:   Fri, 10 Jul 2020 10:44:33 -0500
-From:   Bjorn Helgaas <helgaas@kernel.org>
-To:     Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-Cc:     alex.williamson@redhat.com, herbert@gondor.apana.org.au,
-        cohuck@redhat.com, nhorman@redhat.com, vdronov@redhat.com,
-        bhelgaas@google.com, mark.a.chambers@intel.com,
-        gordon.mcfadden@intel.com, ahsan.atta@intel.com,
-        qat-linux@intel.com, kvm@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-pci@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 3/5] vfio/pci: add qat devices to blocklist
-Message-ID: <20200710154433.GA62583@bjorn-Precision-5520>
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 516A68015F3;
+        Fri, 10 Jul 2020 15:48:19 +0000 (UTC)
+Received: from localhost.localdomain.com (ovpn-114-235.ams2.redhat.com [10.36.114.235])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id BFA8C7EFA3;
+        Fri, 10 Jul 2020 15:48:13 +0000 (UTC)
+From:   Mohammed Gamal <mgamal@redhat.com>
+To:     kvm@vger.kernel.org, pbonzini@redhat.com
+Cc:     linux-kernel@vger.kernel.org, vkuznets@redhat.com,
+        sean.j.christopherson@intel.com, wanpengli@tencent.com,
+        jmattson@google.com, joro@8bytes.org,
+        Mohammed Gamal <mgamal@redhat.com>
+Subject: [PATCH v3 0/9] KVM: Support guest MAXPHYADDR < host MAXPHYADDR
+Date:   Fri, 10 Jul 2020 17:48:02 +0200
+Message-Id: <20200710154811.418214-1-mgamal@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20200710153742.GA61966@bjorn-Precision-5520>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jul 10, 2020 at 10:37:45AM -0500, Bjorn Helgaas wrote:
-> On Fri, Jul 10, 2020 at 04:08:19PM +0100, Giovanni Cabiddu wrote:
-> > On Wed, Jul 01, 2020 at 04:28:12PM -0500, Bjorn Helgaas wrote:
-> > > On Wed, Jul 01, 2020 at 12:03:00PM +0100, Giovanni Cabiddu wrote:
-> > > > The current generation of Intel® QuickAssist Technology devices
-> > > > are not designed to run in an untrusted environment because of the
-> > > > following issues reported in the release notes in
-> > > > https://01.org/intel-quickassist-technology:
-> > > 
-> > > It would be nice if this link were directly clickable, e.g., if there
-> > > were no trailing ":" or something.
-> > > 
-> > > And it would be even better if it went to a specific doc that
-> > > described these issues.  I assume these are errata, and it's not easy
-> > > to figure out which doc mentions them.
-> > Sure. I will fix the commit message in the next revision and point to the
-> > actual document:
-> > https://01.org/sites/default/files/downloads/336211-015-qatsoftwareforlinux-rn-hwv1.7-final.pdf
-> 
-> Since URLs tend to go stale, please also include the Intel document
-> number and title.
+When EPT is enabled, KVM does not really look at guest physical
+address size. Address bits above maximum physical memory size are reserved.
+Because KVM does not look at these guest physical addresses, it currently
+effectively supports guest physical address sizes equal to the host.
 
-Oh, and is "01.org" really the right place for that?  It looks like an
-Intel document, so I'd expect it to be somewhere on intel.com.
+This can be problem when having a mixed setup of machines with 5-level page
+tables and machines with 4-level page tables, as live migration can change
+MAXPHYADDR while the guest runs, which can theoretically introduce bugs.
 
-I'm still a little confused.  That doc seems to be about *software*
-and Linux software in particular.  But when you said these "devices
-are not designed to run in an untrusted environment", I thought you
-meant there was some *hardware* design issue that caused a problem.
+In this patch series we add checks on guest physical addresses in EPT
+violation/misconfig and NPF vmexits and if needed inject the proper
+page faults in the guest.
 
-Bjorn
+A more subtle issue is when the host MAXPHYADDR is larger than that of the
+guest. Page faults caused by reserved bits on the guest won't cause an EPT
+violation/NPF and hence we also check guest MAXPHYADDR and add PFERR_RSVD_MASK
+error code to the page fault if needed.
+
+----
+
+Changes from v2:
+- Drop support for this feature on AMD processors after discussion with AMD
+
+
+Mohammed Gamal (5):
+  KVM: x86: Add helper functions for illegal GPA checking and page fault
+    injection
+  KVM: x86: mmu: Move translate_gpa() to mmu.c
+  KVM: x86: mmu: Add guest physical address check in translate_gpa()
+  KVM: VMX: Add guest physical address check in EPT violation and
+    misconfig
+  KVM: x86: SVM: VMX: Make GUEST_MAXPHYADDR < HOST_MAXPHYADDR support
+    configurable
+
+Paolo Bonzini (4):
+  KVM: x86: rename update_bp_intercept to update_exception_bitmap
+  KVM: x86: update exception bitmap on CPUID changes
+  KVM: VMX: introduce vmx_need_pf_intercept
+  KVM: VMX: optimize #PF injection when MAXPHYADDR does not match
+
+ arch/x86/include/asm/kvm_host.h | 10 ++------
+ arch/x86/kvm/cpuid.c            |  2 ++
+ arch/x86/kvm/mmu.h              |  6 +++++
+ arch/x86/kvm/mmu/mmu.c          | 12 +++++++++
+ arch/x86/kvm/svm/svm.c          | 22 +++++++++++++---
+ arch/x86/kvm/vmx/nested.c       | 28 ++++++++++++--------
+ arch/x86/kvm/vmx/vmx.c          | 45 +++++++++++++++++++++++++++++----
+ arch/x86/kvm/vmx/vmx.h          |  6 +++++
+ arch/x86/kvm/x86.c              | 29 ++++++++++++++++++++-
+ arch/x86/kvm/x86.h              |  1 +
+ include/uapi/linux/kvm.h        |  1 +
+ 11 files changed, 133 insertions(+), 29 deletions(-)
+
+-- 
+2.26.2
+
