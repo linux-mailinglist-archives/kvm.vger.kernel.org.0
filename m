@@ -2,77 +2,102 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id AF8A021B5D5
-	for <lists+kvm@lfdr.de>; Fri, 10 Jul 2020 15:07:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9474921B800
+	for <lists+kvm@lfdr.de>; Fri, 10 Jul 2020 16:13:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727865AbgGJNHF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 10 Jul 2020 09:07:05 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:47897 "EHLO
+        id S1728042AbgGJOMJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 10 Jul 2020 10:12:09 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:22836 "EHLO
         us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1727046AbgGJNHE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 10 Jul 2020 09:07:04 -0400
+        with ESMTP id S1727861AbgGJOMI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 10 Jul 2020 10:12:08 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1594386423;
+        s=mimecast20190719; t=1594390327;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding;
-        bh=IrQ2y6oqMFzcLSC+a+hsU9IW+yAmZRwX9zeWYh8Q/Zs=;
-        b=OXqrH9wgjUlSoD44ewjpXRKRekdoaEgeLzQc2eKLARQte/uxv1MYLA3tyMNoFtAQUSy0bp
-        uzDi+qkp/oJOpQL2Tf2dOyVqLfYIT9OQ4Q5jRBK8WunodQ4ADbwathuK8L0DPhvomDvOLv
-        GMplmINDvmklw/GCA76q7BbPXyV/MN0=
+        bh=tC/RDuBXGV/0eBPfyMsRxhpj4+FXW/fTZ0b83kArGak=;
+        b=i+rSYatf8DuJcr6S6MR9boPxcOpW8fI4vMGGLt6kCpibNhGHiQddatCesT6IbXb9Ifa6OU
+        qJTWnJfTQqFtsPHCTQ0YMyuRZiQFDmthojnlnwRRHf4PFof6bAMMmmtcIM3BxU12k9kJmC
+        S1dlwtPfYggU6N6QPD7pVKFIQOEubnc=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-40-3v4nffOSP_-9xvqzVJ-YQw-1; Fri, 10 Jul 2020 09:07:01 -0400
-X-MC-Unique: 3v4nffOSP_-9xvqzVJ-YQw-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+ us-mta-20-8WEcPZc2OI29-Fy4J8_xCg-1; Fri, 10 Jul 2020 10:12:03 -0400
+X-MC-Unique: 8WEcPZc2OI29-Fy4J8_xCg-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8B21C100960F;
-        Fri, 10 Jul 2020 13:07:00 +0000 (UTC)
-Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 2878D724A4;
-        Fri, 10 Jul 2020 13:07:00 +0000 (UTC)
-From:   Paolo Bonzini <pbonzini@redhat.com>
-To:     torvalds@linux-foundation.org
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Subject: [GIT PULL] Second batch of KVM changes for Linux 5.8-rc5
-Date:   Fri, 10 Jul 2020 09:06:59 -0400
-Message-Id: <20200710130659.10507-1-pbonzini@redhat.com>
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8B2B8186A8E3;
+        Fri, 10 Jul 2020 14:12:01 +0000 (UTC)
+Received: from vitty.brq.redhat.com (unknown [10.40.195.35])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id EF53774F5E;
+        Fri, 10 Jul 2020 14:11:58 +0000 (UTC)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Junaid Shahid <junaids@google.com>,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH v4 0/9] KVM: nSVM: fixes for CR3/MMU switch upon nested guest entry/exit
+Date:   Fri, 10 Jul 2020 16:11:48 +0200
+Message-Id: <20200710141157.1640173-1-vkuznets@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Linus,
+Changes since v3:
+- Swapped my "KVM: nSVM: stop dereferencing vcpu->arch.mmu to get the
+ context in kvm_init_shadow{,_npt}_mmu()" with Paolo's "KVM: MMU: stop
+ dereferencing vcpu->arch.mmu to get the context for MMU init".
+- keeping nested_svm_init_mmu_context() in nested_prepare_vmcb_control()
+ as this is also used from svm_set_nested_state() [Paolo],
+ nested_svm_load_cr3() becomes a separate step in enter_svm_guest_mode().
+- nested_prepare_vmcb_save() remains 'void' [Paolo]
 
-The following changes since commit 8038a922cf9af5266eaff29ce996a0d1b788fc0d:
+Original description:
 
-  Merge tag 'kvmarm-fixes-5.8-3' of git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm into kvm-master (2020-07-06 13:05:38 -0400)
+This is a successor of "[PATCH v2 0/3] KVM: nSVM: fix #TF from CR3 switch
+when entering guest" and "[PATCH] KVM: x86: drop erroneous mmu_check_root()
+from fast_pgd_switch()".
 
-are available in the Git repository at:
+The snowball is growing fast! It all started with an intention to fix
+the particular 'tripple fault' issue (now fixed by PATCH7) but now we
+also get rid of unconditional kvm_mmu_reset_context() upon nested guest
+entry/exit and make the code resemble nVMX. There is still a huge room
+for further improvement (proper error propagation, removing unconditional
+MMU sync/TLB flush,...) but at least we're making some progress.
 
-  https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus
-
-for you to fetch changes up to 3d9fdc252b52023260de1d12399cb3157ed28c07:
-
-  KVM: MIPS: Fix build errors for 32bit kernel (2020-07-10 06:15:38 -0400)
-
-----------------------------------------------------------------
-Two simple but important bugfixes.
-
-----------------------------------------------------------------
-Huacai Chen (1):
-      KVM: MIPS: Fix build errors for 32bit kernel
+Tested with kvm selftests/kvm-unit-tests and by running nested Hyper-V
+on KVM. The series doesn't seem to introduce any new issues.
 
 Paolo Bonzini (1):
-      KVM: nVMX: fixes for preemption timer migration
+  KVM: MMU: stop dereferencing vcpu->arch.mmu to get the context for MMU
+    init
 
- Documentation/virt/kvm/api.rst  | 5 +++--
- arch/mips/kvm/emulate.c         | 4 ++++
- arch/x86/include/uapi/asm/kvm.h | 5 +++--
- arch/x86/kvm/vmx/nested.c       | 1 +
- 4 files changed, 11 insertions(+), 4 deletions(-)
+Vitaly Kuznetsov (8):
+  KVM: nSVM: split kvm_init_shadow_npt_mmu() from kvm_init_shadow_mmu()
+  KVM: nSVM: reset nested_run_pending upon nested_svm_vmrun_msrpm()
+    failure
+  KVM: nSVM: prepare to handle errors from enter_svm_guest_mode()
+  KVM: nSVM: introduce nested_svm_load_cr3()/nested_npt_enabled()
+  KVM: nSVM: move kvm_set_cr3() after nested_svm_uninit_mmu_context()
+  KVM: nSVM: implement nested_svm_load_cr3() and use it for host->guest
+    switch
+  KVM: nSVM: use nested_svm_load_cr3() on guest->host switch
+  KVM: x86: drop superfluous mmu_check_root() from fast_pgd_switch()
+
+ arch/x86/kvm/mmu.h        |  3 +-
+ arch/x86/kvm/mmu/mmu.c    | 45 ++++++++++++------
+ arch/x86/kvm/svm/nested.c | 97 ++++++++++++++++++++++++++++-----------
+ arch/x86/kvm/svm/svm.c    |  6 ++-
+ arch/x86/kvm/svm/svm.h    |  4 +-
+ 5 files changed, 110 insertions(+), 45 deletions(-)
+
+-- 
+2.25.4
 
