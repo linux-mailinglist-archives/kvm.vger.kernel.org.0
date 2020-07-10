@@ -2,94 +2,82 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 399F321BBD1
-	for <lists+kvm@lfdr.de>; Fri, 10 Jul 2020 19:07:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 31F4C21BBF8
+	for <lists+kvm@lfdr.de>; Fri, 10 Jul 2020 19:13:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728272AbgGJRGL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 10 Jul 2020 13:06:11 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:51529 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1728209AbgGJRGK (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 10 Jul 2020 13:06:10 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1594400769;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=NTZ1nOQ1nCOHsG301mu1C00Qszsv989jBZgL2Q/fhp0=;
-        b=FbydY3mXxHGGkNqCE2oOnqIGPFsSwU92QiCUKNZO9RvhkW7OrPA9ZXlJLPYewUtisqn51/
-        eWqhn8BxjDB7PdDZhaJuCe3rqq7mr2i2D8haZhi/xsYtpqejaBwTOL2krBZV9lVcDBLWWV
-        HQTOUUmWzlRhghFhAwAEk/WZFB4N5aA=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-361-558EH4VOPsaW89VvWfdfsA-1; Fri, 10 Jul 2020 13:06:07 -0400
-X-MC-Unique: 558EH4VOPsaW89VvWfdfsA-1
-Received: by mail-wr1-f70.google.com with SMTP id j16so6654872wrw.3
-        for <kvm@vger.kernel.org>; Fri, 10 Jul 2020 10:06:07 -0700 (PDT)
+        id S1728002AbgGJRNU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 10 Jul 2020 13:13:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41088 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727065AbgGJRNT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 10 Jul 2020 13:13:19 -0400
+Received: from mail-il1-x141.google.com (mail-il1-x141.google.com [IPv6:2607:f8b0:4864:20::141])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 40FC4C08C5DD
+        for <kvm@vger.kernel.org>; Fri, 10 Jul 2020 10:13:19 -0700 (PDT)
+Received: by mail-il1-x141.google.com with SMTP id a6so5651804ilq.13
+        for <kvm@vger.kernel.org>; Fri, 10 Jul 2020 10:13:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=84ZXCV8hDQ+R5ezHGlVeKRrDnq+BIKMBqF4O35I2mAU=;
+        b=uXRgs8RXS68b0Quf5QIP7lY7g8JASh2hxqEYYRrQeMoIGtj9erXk5JTXrFVc6cFhyr
+         bG1/VNQVX9SeKZvwO0E5XiApXK7A5wmbjBDhXvBFfah+DKBdg1KxeAeS5ihfy8M6F+Uj
+         Oj/Ax225XjIZ+NeX7sgaKdlOYfov+ZZh+RHNd71U6LWc6Ysql3GrCDci50+q3cnR4Xa9
+         6QKuV7m2//VmHl/sZ7UYy0YYpZZtmUFNMVLwZ0I0WQfROWKprUXb0gtaeFvUyV5wIZrx
+         v4OjT3xJta1onx8eUwTX7N9vq0bJwF/RoYaP6As9k7AhiYr6YgcBn2Gb9Z3GYtbeS5Qs
+         leLA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=NTZ1nOQ1nCOHsG301mu1C00Qszsv989jBZgL2Q/fhp0=;
-        b=cRqkN4VaYqc9Z7dJ0kbKahOugjIITzyaeEAwPd/nEAdRi3PxRAA4Q2WqAwy993zXDi
-         aQksUnMWuHq3MKdrQjdA/pf9t7U+dHQzzyWbXJ9l8QZYlGsbVt0el/zwq2oGyT1MkJNI
-         GxxDUT8bh67r5Vmr3iZ45p6PFg5FvzRJp3bG6jxB0ACWjoMguWO1Yg5N3oMm6lWkW8Tg
-         A6NgnUPTJO6TgHNeBJy/7uEw06e4Y6kWBd8WsVvKYvDMPGz+UxyR9gJJ4/mmtXd297uj
-         egPObP+zyFYGTCOjNhWOoqag20jYVg2IH1y17QFoJ5I4CowmlhIIUA6vFmgu/qrwVBFz
-         P88Q==
-X-Gm-Message-State: AOAM530YBv+wNcnWr6h0FjweebhCk/1QXWk5FNN2tyn1iELG5ODZNAVB
-        SALfRL37o/zgWndwElvfEqL7MVeLGDQsi0kh3MLG4tKropml+gli2QL9OAXKGN3gcnha9JtDh/P
-        Gy2JkgIFAhhD6
-X-Received: by 2002:a1c:49d7:: with SMTP id w206mr6344804wma.181.1594400766851;
-        Fri, 10 Jul 2020 10:06:06 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxsM1AjQwejEwx6n+VewBHVbmmNXDaP6/ZzlHUjfU1w35i1uhnXyXxhWGn5e9sCA6yod3+NlQ==
-X-Received: by 2002:a1c:49d7:: with SMTP id w206mr6344782wma.181.1594400766627;
-        Fri, 10 Jul 2020 10:06:06 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:9541:9439:cb0f:89c? ([2001:b07:6468:f312:9541:9439:cb0f:89c])
-        by smtp.gmail.com with ESMTPSA id r28sm10152940wrr.20.2020.07.10.10.06.05
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 10 Jul 2020 10:06:06 -0700 (PDT)
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=84ZXCV8hDQ+R5ezHGlVeKRrDnq+BIKMBqF4O35I2mAU=;
+        b=N9MLQv0UPzpLty7/PQleSpRhBF+3UUIQtagSsD6sAiIrz2VI7igufcKVEjtIB6OKyH
+         L/4voClGxUEe2xoEpLSdcUlBSffuurF/n/eAJNAlVlegXCTUmgKbtP01fxf2piLIdlh2
+         REYx1GQ39Vu3iDR/PaTOPbdy2iBt4+aT/Uu8ASwSA02NK3mcYlqdkYVzbsWQhvKgVDCK
+         72Zyv/vphUdGpeACt1V0hxxDm9bI+3s682hUHZXin0+2r5L0xHC7vR+DMDZfNmBbq4nb
+         kER0pcriUwulsag2UyuuFCxQl2kiv3wTmHIOMJuXd859bIwZZQ1h8d5tBgi3dO1qZh+4
+         nSzQ==
+X-Gm-Message-State: AOAM533sxRK5uKKr0Q1T0p+SnZjsjZE8q1tMpDD8EQsgLAfSNxFB1Oek
+        8993AK+MRT8LvFf8LhBiPBreMZGVJKzirn7h5sxZM4mL
+X-Google-Smtp-Source: ABdhPJwBA5AirBckpFqBud4uPWIU+hnJlSHn3ByjqzmJ47BokabuqeNOCy1OQrj33SMvU88+SIo9y9H1TzuxucnwE7o=
+X-Received: by 2002:a92:b60a:: with SMTP id s10mr49715934ili.119.1594401198223;
+ Fri, 10 Jul 2020 10:13:18 -0700 (PDT)
+MIME-Version: 1.0
+References: <20200710154811.418214-1-mgamal@redhat.com> <CALMp9eRfZ50iyrED0-LU75VWhHu_kVoB2Qw55VzEFzZ=0QCGow@mail.gmail.com>
+ <0c892b1e-6fe6-2aa7-602e-f5fadc54c257@redhat.com>
+In-Reply-To: <0c892b1e-6fe6-2aa7-602e-f5fadc54c257@redhat.com>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Fri, 10 Jul 2020 10:13:07 -0700
+Message-ID: <CALMp9eQXHGnXo4ACX2-qYww4XdRODMn-O6CAvhupib67Li9S2w@mail.gmail.com>
 Subject: Re: [PATCH v3 0/9] KVM: Support guest MAXPHYADDR < host MAXPHYADDR
-To:     Jim Mattson <jmattson@google.com>,
-        Mohammed Gamal <mgamal@redhat.com>
-Cc:     kvm list <kvm@vger.kernel.org>,
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Mohammed Gamal <mgamal@redhat.com>, kvm list <kvm@vger.kernel.org>,
         LKML <linux-kernel@vger.kernel.org>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Sean Christopherson <sean.j.christopherson@intel.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Joerg Roedel <joro@8bytes.org>
-References: <20200710154811.418214-1-mgamal@redhat.com>
- <CALMp9eRfZ50iyrED0-LU75VWhHu_kVoB2Qw55VzEFzZ=0QCGow@mail.gmail.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <0c892b1e-6fe6-2aa7-602e-f5fadc54c257@redhat.com>
-Date:   Fri, 10 Jul 2020 19:06:05 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.9.0
-MIME-Version: 1.0
-In-Reply-To: <CALMp9eRfZ50iyrED0-LU75VWhHu_kVoB2Qw55VzEFzZ=0QCGow@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 10/07/20 18:30, Jim Mattson wrote:
->>
->> This can be problem when having a mixed setup of machines with 5-level page
->> tables and machines with 4-level page tables, as live migration can change
->> MAXPHYADDR while the guest runs, which can theoretically introduce bugs.
+On Fri, Jul 10, 2020 at 10:06 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
 >
-> Huh? Changing MAXPHYADDR while the guest runs should be illegal. Or
-> have I missed some peculiarity of LA57 that makes MAXPHYADDR a dynamic
-> CPUID information field?
+> On 10/07/20 18:30, Jim Mattson wrote:
+> >>
+> >> This can be problem when having a mixed setup of machines with 5-level page
+> >> tables and machines with 4-level page tables, as live migration can change
+> >> MAXPHYADDR while the guest runs, which can theoretically introduce bugs.
+> >
+> > Huh? Changing MAXPHYADDR while the guest runs should be illegal. Or
+> > have I missed some peculiarity of LA57 that makes MAXPHYADDR a dynamic
+> > CPUID information field?
+>
+> Changing _host_ MAXPHYADDR while the guest runs, such as if you migrate
+> from a host-maxphyaddr==46 to a host-maxphyaddr==52 machine (while
+> keeping guest-maxphyaddr==46).
 
-Changing _host_ MAXPHYADDR while the guest runs, such as if you migrate
-from a host-maxphyaddr==46 to a host-maxphyaddr==52 machine (while
-keeping guest-maxphyaddr==46).
-
-Paolo
-
+Ah, but what does that have to do with LA57?
