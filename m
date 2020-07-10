@@ -2,79 +2,109 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8A6C121BA94
-	for <lists+kvm@lfdr.de>; Fri, 10 Jul 2020 18:16:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id ACF0F21BABF
+	for <lists+kvm@lfdr.de>; Fri, 10 Jul 2020 18:22:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728337AbgGJQPP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 10 Jul 2020 12:15:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60342 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728140AbgGJQPP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 10 Jul 2020 12:15:15 -0400
-Received: from mail-io1-xd43.google.com (mail-io1-xd43.google.com [IPv6:2607:f8b0:4864:20::d43])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D0A9DC08C5DC
-        for <kvm@vger.kernel.org>; Fri, 10 Jul 2020 09:15:14 -0700 (PDT)
-Received: by mail-io1-xd43.google.com with SMTP id o5so6560053iow.8
-        for <kvm@vger.kernel.org>; Fri, 10 Jul 2020 09:15:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=jy29C0jNBJlzPOntslbWG5zVMkbK/yCb3aOwp+ZNwYQ=;
-        b=VMGo3Bn8jtrCU+jVB8BPfXtWepk5wI4UguXdxtGp2vCwmkxmxlCWOLXYgkD4/HeoGp
-         hx8nINnh2BamY0kE6CXrytvTzUpOfx4QD4f7FMQDXJKJKhieUAuCghzenALmHYBx7SvV
-         zEAY9CIpiNItp9oosFkXO5UGq6T9p0aywHfzHIT2oN+mSij6BlkQ4dPop6stX+sgY5ZQ
-         JQxB/9wkf/pes7TBL18mq4uepSSntWvSuS7KcjLSJ7BHGVLkCUYVaPT4Ir0Oe/+AZlYK
-         quhIm+JVra13JhtSc5g8MHQDxebmlfi/Ft9rm+PGclPYBbbss7UQoEypVCPhLRqQpFx1
-         QoGg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=jy29C0jNBJlzPOntslbWG5zVMkbK/yCb3aOwp+ZNwYQ=;
-        b=qaZ1RqnwZhihTnz/hGpw7kx9fM6air3AtxtTFrd+4g1Rvmux00dByS6cXA3wT74Yx1
-         wHQCTgZWbzzm6MIJaWanWj2gg5LWlzI9TuJdyWQEOhSsZ/XkPSAltGrqkSfYJS8xTcsF
-         Ozk9uNoBKpPDBW4y0aVXt3ymhUkmKYxDkW+1vrP+cVb/9g3vFWpg5JtoXeFf5alIbhsf
-         JodNJeyXfmExlu1D4NCnEYtIWoqnFf9ny/0Ny7IHDoKiIB3e7vVXQOQ/rJGwU4UDHmw3
-         Gz7804V51trNhjhZTh7dx0j7TtwNCyjb7Pu5bS9Gc42YlWjjn2ZzDMUXRlLEW9xGFso4
-         33FA==
-X-Gm-Message-State: AOAM531AybB74NlXQrWK85hGSuJEAG59FUEqW24/S+q6Vi5CzTGXJSb3
-        1DICmt6AdO/sYJRi2c0PcYq44p1GgsUb2QQvRn5G6A==
-X-Google-Smtp-Source: ABdhPJxQKn3C8Viy7cFZE/IciSW+3FlyvnpS95Jsc7xj299u1lHgLuAwhOWErmRh70KTECwiY6wtsPiTkjoRQuOMLDA=
-X-Received: by 2002:a05:6602:2e0e:: with SMTP id o14mr47771057iow.164.1594397713805;
- Fri, 10 Jul 2020 09:15:13 -0700 (PDT)
+        id S1728097AbgGJQWz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 10 Jul 2020 12:22:55 -0400
+Received: from mga09.intel.com ([134.134.136.24]:45306 "EHLO mga09.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726896AbgGJQWz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 10 Jul 2020 12:22:55 -0400
+IronPort-SDR: 630kz3R7Mdu711O0mZEXxHcdkOg95KiLNB/2EBCD2fNCNE4zcHJWVYKm8SzZKqNNtjbsO6ZlV8
+ mJq7eGSfuMxg==
+X-IronPort-AV: E=McAfee;i="6000,8403,9678"; a="149713789"
+X-IronPort-AV: E=Sophos;i="5.75,336,1589266800"; 
+   d="scan'208";a="149713789"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Jul 2020 09:22:54 -0700
+IronPort-SDR: Itm8YZK2yEyphbxvHGwAapnbac7UFxrcKPcFy1HhAKV8QpYyd06n/caWRVn4ZG/I2DgJyUBizZ
+ Hy5YSxFuvCvA==
+X-IronPort-AV: E=Sophos;i="5.75,336,1589266800"; 
+   d="scan'208";a="458327266"
+Received: from silpixa00400314.ir.intel.com (HELO silpixa00400314) ([10.237.222.51])
+  by orsmga005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Jul 2020 09:22:51 -0700
+Date:   Fri, 10 Jul 2020 17:22:44 +0100
+From:   Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+To:     Alex Williamson <alex.williamson@redhat.com>
+Cc:     Bjorn Helgaas <helgaas@kernel.org>, herbert@gondor.apana.org.au,
+        cohuck@redhat.com, nhorman@redhat.com, vdronov@redhat.com,
+        bhelgaas@google.com, mark.a.chambers@intel.com,
+        gordon.mcfadden@intel.com, ahsan.atta@intel.com,
+        qat-linux@intel.com, kvm@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-pci@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 3/5] vfio/pci: add qat devices to blocklist
+Message-ID: <20200710162244.GA411420@silpixa00400314>
+References: <20200710153742.GA61966@bjorn-Precision-5520>
+ <20200710154433.GA62583@bjorn-Precision-5520>
+ <20200710101034.5a8c1be5@x1.home>
 MIME-Version: 1.0
-References: <20200710154811.418214-1-mgamal@redhat.com> <20200710154811.418214-5-mgamal@redhat.com>
-In-Reply-To: <20200710154811.418214-5-mgamal@redhat.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Fri, 10 Jul 2020 09:15:02 -0700
-Message-ID: <CALMp9eS7MmS7G0YfXA7Wxwwxbx67LVWZ57z_ZCbpJv4euiNnAw@mail.gmail.com>
-Subject: Re: [PATCH v3 4/9] KVM: x86: rename update_bp_intercept to update_exception_bitmap
-To:     Mohammed Gamal <mgamal@redhat.com>
-Cc:     kvm list <kvm@vger.kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Joerg Roedel <joro@8bytes.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20200710101034.5a8c1be5@x1.home>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jul 10, 2020 at 8:48 AM Mohammed Gamal <mgamal@redhat.com> wrote:
->
-> From: Paolo Bonzini <pbonzini@redhat.com>
->
-> We would like to introduce a callback to update the #PF intercept
-> when CPUID changes.  Just reuse update_bp_intercept since VMX is
-> already using update_exception_bitmap instead of a bespoke function.
->
-> While at it, remove an unnecessary assignment in the SVM version,
-> which is already done in the caller (kvm_arch_vcpu_ioctl_set_guest_debug)
-> and has nothing to do with the exception bitmap.
->
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-Reviewed-by: Jim Mattson <jmattson@google.com>
+On Fri, Jul 10, 2020 at 10:10:34AM -0600, Alex Williamson wrote:
+> On Fri, 10 Jul 2020 10:44:33 -0500
+> Bjorn Helgaas <helgaas@kernel.org> wrote:
+> 
+> > On Fri, Jul 10, 2020 at 10:37:45AM -0500, Bjorn Helgaas wrote:
+> > > On Fri, Jul 10, 2020 at 04:08:19PM +0100, Giovanni Cabiddu wrote:  
+> > > > On Wed, Jul 01, 2020 at 04:28:12PM -0500, Bjorn Helgaas wrote:  
+> > > > > On Wed, Jul 01, 2020 at 12:03:00PM +0100, Giovanni Cabiddu wrote:  
+> > > > > > The current generation of Intel® QuickAssist Technology devices
+> > > > > > are not designed to run in an untrusted environment because of the
+> > > > > > following issues reported in the release notes in
+> > > > > > https://01.org/intel-quickassist-technology:  
+> > > > > 
+> > > > > It would be nice if this link were directly clickable, e.g., if there
+> > > > > were no trailing ":" or something.
+> > > > > 
+> > > > > And it would be even better if it went to a specific doc that
+> > > > > described these issues.  I assume these are errata, and it's not easy
+> > > > > to figure out which doc mentions them.  
+> > > > Sure. I will fix the commit message in the next revision and point to the
+> > > > actual document:
+> > > > https://01.org/sites/default/files/downloads/336211-015-qatsoftwareforlinux-rn-hwv1.7-final.pdf  
+> > > 
+> > > Since URLs tend to go stale, please also include the Intel document
+> > > number and title.  
+> > 
+> > Oh, and is "01.org" really the right place for that?  It looks like an
+> > Intel document, so I'd expect it to be somewhere on intel.com.
+> > 
+> > I'm still a little confused.  That doc seems to be about *software*
+> > and Linux software in particular.  But when you said these "devices
+> > are not designed to run in an untrusted environment", I thought you
+> > meant there was some *hardware* design issue that caused a problem.
+Yes, the problem is in hardware.
+
+> There seems to be a fair bit of hardware errata in the doc too, see:
+> 
+> 3.1.2 QATE-7495 - GEN - An incorrectly formatted request to Intel® QAT can
+> hang the entire Intel® QAT Endpoint
+> 
+> 3.1.9 QATE-39220 - GEN - QAT API submissions with bad addresses that
+> trigger DMA to invalid or unmapped addresses can cause a platform
+> hang
+> 
+> 3.1.17 QATE-52389 - SR-IOV -Huge pages may not be compatible with QAT
+> VF usage
+> 
+> 3.1.19 QATE-60953 - GEN – Intel® QAT API submissions with bad addresses
+> that trigger DMA to invalid or unmapped addresses can impact QAT
+> service availability
+Correct, that document contains errata for both the QAT HW and the
+current software.
+
+Regards,
+
+-- 
+Giovanni
