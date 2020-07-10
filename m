@@ -2,88 +2,119 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4FC3B21BA3D
-	for <lists+kvm@lfdr.de>; Fri, 10 Jul 2020 18:02:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A12D421BA63
+	for <lists+kvm@lfdr.de>; Fri, 10 Jul 2020 18:11:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727901AbgGJQCm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 10 Jul 2020 12:02:42 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:56634 "EHLO
+        id S1727910AbgGJQLI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 10 Jul 2020 12:11:08 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:34368 "EHLO
         us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726820AbgGJQCm (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 10 Jul 2020 12:02:42 -0400
+        by vger.kernel.org with ESMTP id S1726496AbgGJQLF (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 10 Jul 2020 12:11:05 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1594396961;
+        s=mimecast20190719; t=1594397464;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=zl45dVHmDZx6IEfEZafVPCqEImSVzPw+lTIq9OVS82A=;
-        b=FHPQyvg5CkBJfOpKRBadqCr4dTbK/AZXgpqsrhMBUcxlG478uHTjxms9YQP4uXpbnCRtSb
-        Smik2zkj0whhVDsFiLSd/HLgFctpeZXKQKwtVHW0qA6XW2HmZebeTkpcY+ld/x3azhK2il
-        vbpznpTyoS12R23xrpfr6FO+emzTcrE=
+        bh=4WRdRX06OBfTzPGHNG+U6NKjLgvHWpzwYgjehUMy8e0=;
+        b=AON+ubUW9s7QcASXBhJh2E0NLtcdgz2R/ZFK756Bs1AqEVJ9Mcs2VYzr4VvnGFXXmaXIs6
+        QE3f3GNb1LUy9TMKZTlvPzz1rfvZlEhaFXyp/HRcsoUERsBI4LtO3Oh/nu2Fu3lWlXHUPA
+        CNUPDNqoLEWYNRNm8icqnKh1EFrdReM=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-120-PwVCdYqgM2SKbaDCfeWZqw-1; Fri, 10 Jul 2020 12:02:34 -0400
-X-MC-Unique: PwVCdYqgM2SKbaDCfeWZqw-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+ us-mta-166-hD_JHk6iMOeXnTRYh98IeQ-1; Fri, 10 Jul 2020 12:10:40 -0400
+X-MC-Unique: hD_JHk6iMOeXnTRYh98IeQ-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A0B44800FF1;
-        Fri, 10 Jul 2020 16:02:32 +0000 (UTC)
-Received: from localhost (ovpn-116-140.rdu2.redhat.com [10.10.116.140])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 93AD81002382;
-        Fri, 10 Jul 2020 16:02:20 +0000 (UTC)
-Date:   Fri, 10 Jul 2020 12:02:19 -0400
-From:   Eduardo Habkost <ehabkost@redhat.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Jim Mattson <jmattson@google.com>,
-        Gerd Hoffmann <kraxel@redhat.com>,
-        Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
-        mtosatti@redhat.com,
-        Pedro Principeza <pedro.principeza@canonical.com>,
-        kvm list <kvm@vger.kernel.org>, libvir-list@redhat.com,
-        Dann Frazier <dann.frazier@canonical.com>,
-        Guilherme Piccoli <gpiccoli@canonical.com>,
-        "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
-        Christian Ehrhardt <christian.ehrhardt@canonical.com>,
-        qemu-devel@nongnu.org, Mohammed Gamal <mgamal@redhat.com>,
-        Laszlo Ersek <lersek@redhat.com>, fw@gpiccoli.net,
-        rth@twiddle.net
-Subject: Re: [PATCH 2/2] x86/cpu: Handle GUEST_MAXPHYADDR < HOST_MAXPHYADDR
- for hosts that don't support it
-Message-ID: <20200710160219.GQ780932@habkost.net>
-References: <20200619155344.79579-1-mgamal@redhat.com>
- <20200619155344.79579-3-mgamal@redhat.com>
- <20200708171621.GA780932@habkost.net>
- <20200708172653.GL3229307@redhat.com>
- <20200709094415.yvdh6hsfukqqeadp@sirius.home.kraxel.org>
- <CALMp9eQnrdu-9sZhW3aXpK4pizOW=8G=bj1wkumSgHVNfG=CbQ@mail.gmail.com>
- <20200709191307.GH780932@habkost.net>
- <79aa7955-6bc1-d8b2-fed0-48a0990d9dea@redhat.com>
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0DB9919057A7;
+        Fri, 10 Jul 2020 16:10:39 +0000 (UTC)
+Received: from x1.home (ovpn-112-71.phx2.redhat.com [10.3.112.71])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id EFC1171676;
+        Fri, 10 Jul 2020 16:10:34 +0000 (UTC)
+Date:   Fri, 10 Jul 2020 10:10:34 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Bjorn Helgaas <helgaas@kernel.org>
+Cc:     Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
+        herbert@gondor.apana.org.au, cohuck@redhat.com, nhorman@redhat.com,
+        vdronov@redhat.com, bhelgaas@google.com, mark.a.chambers@intel.com,
+        gordon.mcfadden@intel.com, ahsan.atta@intel.com,
+        qat-linux@intel.com, kvm@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-pci@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 3/5] vfio/pci: add qat devices to blocklist
+Message-ID: <20200710101034.5a8c1be5@x1.home>
+In-Reply-To: <20200710154433.GA62583@bjorn-Precision-5520>
+References: <20200710153742.GA61966@bjorn-Precision-5520>
+        <20200710154433.GA62583@bjorn-Precision-5520>
+Organization: Red Hat
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <79aa7955-6bc1-d8b2-fed0-48a0990d9dea@redhat.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jul 10, 2020 at 09:22:42AM +0200, Paolo Bonzini wrote:
-> On 09/07/20 21:13, Eduardo Habkost wrote:
-> >> Doesn't this require intercepting MOV-to-CR3 when the guest is in PAE
-> >> mode, so that the hypervisor can validate the high bits in the PDPTEs?
-> > If the fix has additional overhead, is the additional overhead
-> > bad enough to warrant making it optional?  Most existing
-> > GUEST_MAXPHYADDR < HOST_MAXPHYADDR guests already work today
-> > without the fix.
-> 
-> The problematic case is when host maxphyaddr is 52.  That case wouldn't
-> work at all without the fix.
+On Fri, 10 Jul 2020 10:44:33 -0500
+Bjorn Helgaas <helgaas@kernel.org> wrote:
 
-What can QEMU do to do differentiate "can't work at all without
-the fix" from "not the best idea, but will probably work"?
+> On Fri, Jul 10, 2020 at 10:37:45AM -0500, Bjorn Helgaas wrote:
+> > On Fri, Jul 10, 2020 at 04:08:19PM +0100, Giovanni Cabiddu wrote: =20
+> > > On Wed, Jul 01, 2020 at 04:28:12PM -0500, Bjorn Helgaas wrote: =20
+> > > > On Wed, Jul 01, 2020 at 12:03:00PM +0100, Giovanni Cabiddu wrote: =
+=20
+> > > > > The current generation of Intel=C2=AE QuickAssist Technology devi=
+ces
+> > > > > are not designed to run in an untrusted environment because of the
+> > > > > following issues reported in the release notes in
+> > > > > https://01.org/intel-quickassist-technology: =20
+> > > >=20
+> > > > It would be nice if this link were directly clickable, e.g., if the=
+re
+> > > > were no trailing ":" or something.
+> > > >=20
+> > > > And it would be even better if it went to a specific doc that
+> > > > described these issues.  I assume these are errata, and it's not ea=
+sy
+> > > > to figure out which doc mentions them. =20
+> > > Sure. I will fix the commit message in the next revision and point to=
+ the
+> > > actual document:
+> > > https://01.org/sites/default/files/downloads/336211-015-qatsoftwarefo=
+rlinux-rn-hwv1.7-final.pdf =20
+> >=20
+> > Since URLs tend to go stale, please also include the Intel document
+> > number and title. =20
+>=20
+> Oh, and is "01.org" really the right place for that?  It looks like an
+> Intel document, so I'd expect it to be somewhere on intel.com.
+>=20
+> I'm still a little confused.  That doc seems to be about *software*
+> and Linux software in particular.  But when you said these "devices
+> are not designed to run in an untrusted environment", I thought you
+> meant there was some *hardware* design issue that caused a problem.
 
--- 
-Eduardo
+There seems to be a fair bit of hardware errata in the doc too, see:
+
+3.1.2 QATE-7495 - GEN - An incorrectly formatted request to Intel=C2=AE QAT=
+ can
+hang the entire Intel=C2=AE QAT Endpoint
+
+3.1.9 QATE-39220 - GEN - QAT API submissions with bad addresses that
+trigger DMA to invalid or unmapped addresses can cause a platform
+hang
+
+3.1.17 QATE-52389 - SR-IOV -Huge pages may not be compatible with QAT
+VF usage
+
+3.1.19 QATE-60953 - GEN =E2=80=93 Intel=C2=AE QAT API submissions with bad =
+addresses
+that trigger DMA to invalid or unmapped addresses can impact QAT
+service availability
+
+Thanks,
+Alex
 
