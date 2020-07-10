@@ -2,131 +2,165 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 46E7A21B8A7
-	for <lists+kvm@lfdr.de>; Fri, 10 Jul 2020 16:29:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7E10821B903
+	for <lists+kvm@lfdr.de>; Fri, 10 Jul 2020 17:00:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727840AbgGJO3m (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 10 Jul 2020 10:29:42 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:47097 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726925AbgGJO3m (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 10 Jul 2020 10:29:42 -0400
+        id S1726962AbgGJPAR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 10 Jul 2020 11:00:17 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:45781 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726725AbgGJPAQ (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 10 Jul 2020 11:00:16 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1594391380;
+        s=mimecast20190719; t=1594393214;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=tX5iNdDkKREb5eC682c495Xdf8tAVwyuaAtEmkGgwUw=;
-        b=EszR1O9JMy37hRTqyQo3OCv/xZMejiW3URc/bzHTwHuZZiiK9iyiWf/g5W5IE1Ryyi5MPw
-        ariaPVFF0uQMtx15FQ+NXZ8Ql0+x/eZxI3zEYqQAvbB72MdNtkQJbURxetkUp51gWPUSVr
-        Gg4NmuvfSQjCEFM+LGb0CLTkVDphwyg=
+        bh=YJfhn9B1bYFnC3Y/JSBqdnMPJGOHPhcn5xhBwk9IA0E=;
+        b=LxzF9YOyWMqSKQBcqg0YyC345MeCiNBMcUErGrULBgBSIJeqA7w2/LWmCryWD1M0OJhrr6
+        AhQ7DPUQ34+ueCEvisNlkEcbhK/t8dcz7WbBXaeRqjeDxBmjP4Yarg4mIklZ41NOxsPehg
+        B5XrL++lZ7bL/8FgNl3FjTrQ4MURYWQ=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-210-R9jDj9pwMjaAZtxLZtrCeA-1; Fri, 10 Jul 2020 10:29:38 -0400
-X-MC-Unique: R9jDj9pwMjaAZtxLZtrCeA-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+ us-mta-463-3LDdNsVvPVGZh6lOL4gMYg-1; Fri, 10 Jul 2020 11:00:07 -0400
+X-MC-Unique: 3LDdNsVvPVGZh6lOL4gMYg-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 501501082;
-        Fri, 10 Jul 2020 14:29:37 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 899F9800597;
+        Fri, 10 Jul 2020 15:00:06 +0000 (UTC)
 Received: from x1.home (ovpn-112-71.phx2.redhat.com [10.3.112.71])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 611CF10016DA;
-        Fri, 10 Jul 2020 14:29:33 +0000 (UTC)
-Date:   Fri, 10 Jul 2020 08:29:32 -0600
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 100AF74F59;
+        Fri, 10 Jul 2020 15:00:05 +0000 (UTC)
+Date:   Fri, 10 Jul 2020 09:00:03 -0600
 From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Bjorn Helgaas <helgaas@kernel.org>
-Cc:     Huacai Chen <chenhc@lemote.com>,
-        Bjorn Helgaas <bhelgaas@google.com>, linux-pci@vger.kernel.org,
-        Dave Airlie <airlied@redhat.com>,
-        Gerd Hoffmann <kraxel@redhat.com>,
-        Jiri Pirko <jiri@resnulli.us>,
-        Huacai Chen <chenhuacai@gmail.com>,
-        Jiaxun Yang <jiaxun.yang@flygoat.com>,
-        Kirti Wankhede <kwankhede@nvidia.com>, kvm@vger.kernel.org
-Subject: Re: [PATCH] PCI: Move PCI_VENDOR_ID_REDHAT definition to pci_ids.h
-Message-ID: <20200710082932.65984c88@x1.home>
-In-Reply-To: <20200709220324.GA21641@bjorn-Precision-5520>
-References: <1594195170-11119-1-git-send-email-chenhc@lemote.com>
-        <20200709220324.GA21641@bjorn-Precision-5520>
+To:     Yan Zhao <yan.y.zhao@intel.com>
+Cc:     "Tian, Kevin" <kevin.tian@intel.com>,
+        "intel-gvt-dev@lists.freedesktop.org" 
+        <intel-gvt-dev@lists.freedesktop.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        Zhenyu Wang <zhenyuw@linux.intel.com>
+Subject: Re: [PATCH v3 0/2] VFIO mdev aggregated resources handling
+Message-ID: <20200710090003.32dd24cb@x1.home>
+In-Reply-To: <20200710015849.GA29271@joy-OptiPlex-7040>
+References: <20200326054136.2543-1-zhenyuw@linux.intel.com>
+        <20200408055824.2378-1-zhenyuw@linux.intel.com>
+        <MWHPR11MB1645CC388BF45FD2E6309C3C8C660@MWHPR11MB1645.namprd11.prod.outlook.com>
+        <20200707190634.4d9055fe@x1.home>
+        <MWHPR11MB16454BF5C1BF4D5D22F0B2B38C670@MWHPR11MB1645.namprd11.prod.outlook.com>
+        <20200708124806.058e33d9@x1.home>
+        <MWHPR11MB1645C5033CB813EBD72CE4FD8C640@MWHPR11MB1645.namprd11.prod.outlook.com>
+        <20200709072334.GA26155@joy-OptiPlex-7040>
+        <20200709142226.5194a4f4@x1.home>
+        <20200710015849.GA29271@joy-OptiPlex-7040>
 Organization: Red Hat
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 9 Jul 2020 17:03:24 -0500
-Bjorn Helgaas <helgaas@kernel.org> wrote:
+On Fri, 10 Jul 2020 09:58:49 +0800
+Yan Zhao <yan.y.zhao@intel.com> wrote:
 
-> [+cc Kirti, Alex, kvm]
-> 
-> On Wed, Jul 08, 2020 at 03:59:30PM +0800, Huacai Chen wrote:
-> > Instead of duplicating the PCI_VENDOR_ID_REDHAT definition everywhere,
-> > move it to include/linux/pci_ids.h is better.
+> On Thu, Jul 09, 2020 at 02:22:26PM -0600, Alex Williamson wrote:
+> > On Thu, 9 Jul 2020 15:23:34 +0800
+> > Yan Zhao <yan.y.zhao@intel.com> wrote:
+> >   
+> > > On Thu, Jul 09, 2020 at 02:53:05AM +0000, Tian, Kevin wrote:
+> > > 
+> > > <...>  
+> > > > > We also can't even seem to agree that type is a necessary requirement
+> > > > > for compatibility.  Your discussion below of a type-A, which is
+> > > > > equivalent to a type-B w/ aggregation set to some value is an example
+> > > > > of this.  We might also have physical devices with extensions to
+> > > > > support migration.  These could possibly be compatible with full mdev
+> > > > > devices.  We have no idea how an administrative tool would discover
+> > > > > this other than an exhaustive search across every possible target.
+> > > > > That's ugly but feasible when considering a single target host, but
+> > > > > completely untenable when considering a datacenter.    
+> > > > 
+> > > > If exhaustive search can be done just one-off to build the compatibility
+> > > > database for all assignable devices on each node, then it might be
+> > > > still tenable in datacenter?    
+> > > yes, Alex, do you think below behavior to build compatibility database is
+> > > acceptable?
+> > > 
+> > > management stack could do the exhaustive search in one shot to build the
+> > > compatibility database for all devices in every node. Meanwhile, it caches
+> > > migration version strings for all tested devices.
+> > > when there's a newly created/attached device, management stack could write
+> > > every cached strings to migration version attribute of the newly
+> > > created/attached device in order to update the migration compatibility
+> > > database. Then it caches the migration version string of the newly
+> > > created/attached device as well.
+> > > once a device attribute is modified, e.g. after changing its aggregation
+> > > count or updating its parent driver, update its cached migration version
+> > > string and update the compatibility database by testing against migration
+> > > version attribute of this device.  
 > > 
-> > Signed-off-by: Huacai Chen <chenhc@lemote.com>  
+> > This is exactly the scenario that I think is untenable.  You're asking
+> > a management application to keep a live database of the opaque version
+> > string of every device type and likely every instance of a device,
+> > which it's not allowed to compare on its own, it can only pipe them  
+> if management stack is allowed to compare on its own, then the migration
+> version strings have to be standardized.
 > 
-> Applied with Gerd's ack to pci/misc for v5.9, thanks!
+> But it's a little hard to do it.
+> e.g. 
+> for GVT, string format can be
+> "parent device PCI ID" + "version of gvt driver" + "mdev type" +
+> "aggregator count".
 > 
-> I also updated this in samples/vfio-mdev/mdpy-defs.h:
+> for an NVMe VF connecting to a remote storage. it is
+> "PCI ID" + "driver version" + "configured remote storage URL"
 > 
->   -#define MDPY_PCI_VENDOR_ID     0x1b36 /* redhat */
->   +#define MDPY_PCI_VENDOR_ID     PCI_VENDOR_ID_REDHAT
+> for a QAT VF, it's
+> "PCI ID" + "driver version" + "supported encryption set".
+> 
+> The management stack also needs to understand how to compare those
+> strings, which is also hard. e.g.
+> two device with different PCI IDs are incompatible initially, but later
+> because of software upgrade, they are compatible again.
 
-Thanks, Bjorn!
+You're rehashing all the reasons we decided to make the string opaque.
+Your examples include driver version information, but different driver
+versions don't necessarily imply incompatibility.  Therefore the only
+means that a consumer of the version string really has for determining
+compatibility is to push that version string back into the driver and
+ask whether it it's compatible.  The absolute only test that a
+management tool could do on its own would be a simple strcmp(), but
+clearly that can't support different driver versions or parent device
+IDs, or any other field of the proposed version string.  These examples
+are also extremely PCI biased, we need a solution that supports any
+type of device.
+
+> > through to every other device across the datacenter to determine which
+> > are comparable.  It would need to respond to not only devices being
+> > added and removed, but bound and unbound from drivers, and entire nodes
+> > being added and removed.  That seems like a lot of overhead, in  
+> those responses are also required if the management stack wants to
+> compare on its own, right?
+
+I think there needs to be an efficient mechanism to ask, given this
+source device, does a target system have a compatible device, or
+resources and capacity to create one.  The proposals we're discussing
+fail that efficiency qualification in my mind.
+ 
+> > addition to the effect of essentially fuzzing the version interface
+> > across all vendors and types.  We need a better solution or we need
+> > someone from openstack and ovirt to agree that this is more viable than
+> > I suspect. Thanks  
+> before we have a better solution, do you think it's good to ask people
+> from openstack and ovirt first? what if the problem is not as complicated
+> as we thought?
+
+That's exactly what I just suggested here and in the other fork of this
+thread.  Thanks,
 
 Alex
-
-> > ---
-> >  drivers/gpu/drm/qxl/qxl_dev.h           | 2 --
-> >  drivers/net/ethernet/rocker/rocker_hw.h | 1 -
-> >  include/linux/pci_ids.h                 | 2 ++
-> >  3 files changed, 2 insertions(+), 3 deletions(-)
-> > 
-> > diff --git a/drivers/gpu/drm/qxl/qxl_dev.h b/drivers/gpu/drm/qxl/qxl_dev.h
-> > index a0ee416..a7bc31f 100644
-> > --- a/drivers/gpu/drm/qxl/qxl_dev.h
-> > +++ b/drivers/gpu/drm/qxl/qxl_dev.h
-> > @@ -131,8 +131,6 @@ enum SpiceCursorType {
-> >  
-> >  #pragma pack(push, 1)
-> >  
-> > -#define REDHAT_PCI_VENDOR_ID 0x1b36
-> > -
-> >  /* 0x100-0x11f reserved for spice, 0x1ff used for unstable work */
-> >  #define QXL_DEVICE_ID_STABLE 0x0100
-> >  
-> > diff --git a/drivers/net/ethernet/rocker/rocker_hw.h b/drivers/net/ethernet/rocker/rocker_hw.h
-> > index 59f1f8b..62fd84c 100644
-> > --- a/drivers/net/ethernet/rocker/rocker_hw.h
-> > +++ b/drivers/net/ethernet/rocker/rocker_hw.h
-> > @@ -25,7 +25,6 @@ enum {
-> >  
-> >  #define ROCKER_FP_PORTS_MAX 62
-> >  
-> > -#define PCI_VENDOR_ID_REDHAT		0x1b36
-> >  #define PCI_DEVICE_ID_REDHAT_ROCKER	0x0006
-> >  
-> >  #define ROCKER_PCI_BAR0_SIZE		0x2000
-> > diff --git a/include/linux/pci_ids.h b/include/linux/pci_ids.h
-> > index 0ad5769..5c709a1 100644
-> > --- a/include/linux/pci_ids.h
-> > +++ b/include/linux/pci_ids.h
-> > @@ -2585,6 +2585,8 @@
-> >  
-> >  #define PCI_VENDOR_ID_ASMEDIA		0x1b21
-> >  
-> > +#define PCI_VENDOR_ID_REDHAT		0x1b36
-> > +
-> >  #define PCI_VENDOR_ID_AMAZON_ANNAPURNA_LABS	0x1c36
-> >  
-> >  #define PCI_VENDOR_ID_CIRCUITCO		0x1cc8
-> > -- 
-> > 2.7.0
-> >   
-> 
 
