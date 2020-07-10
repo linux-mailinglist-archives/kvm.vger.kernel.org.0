@@ -2,97 +2,102 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7973421B36C
-	for <lists+kvm@lfdr.de>; Fri, 10 Jul 2020 12:49:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0680621B42E
+	for <lists+kvm@lfdr.de>; Fri, 10 Jul 2020 13:40:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727955AbgGJKs7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 10 Jul 2020 06:48:59 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:43632 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1727943AbgGJKs6 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 10 Jul 2020 06:48:58 -0400
+        id S1727932AbgGJLkp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 10 Jul 2020 07:40:45 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:23447 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726757AbgGJLko (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 10 Jul 2020 07:40:44 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1594378136;
+        s=mimecast20190719; t=1594381242;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type;
-        bh=zH+SoJc9FA+IxVxr5cux+vmHnM4kK2aczPlNcB2fA0g=;
-        b=GVnyIem8Rc/LebOyLDXJmWiZQrlDorG1nSYF4iG1Ku+EsaODON8fC6GBM3gFkqcHoJ5cA5
-        ETuRqtgRyowzQRY0GCdbKcQ2hQPG8mtq40BIPBAtQzic0hY0mahw/gymxYmEQ6UtXHtO1F
-        ppjEDPnO22gFpSxTnmSRCH6/LJxNcPY=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-47-_G5YgMRyNxKkAiSjn0HnUw-1; Fri, 10 Jul 2020 06:48:55 -0400
-X-MC-Unique: _G5YgMRyNxKkAiSjn0HnUw-1
-Received: by mail-wm1-f70.google.com with SMTP id g138so6251258wme.7
-        for <kvm@vger.kernel.org>; Fri, 10 Jul 2020 03:48:54 -0700 (PDT)
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=VHkgHsP2LMXiJzMuU12W+yp4KrE8aOeFbQ7+oDie8jo=;
+        b=bN7cFop6vK2Uokdc33+xClDEDX6y37vbnqFJaBqz1GZ7wUCtaQysfdDMHLPHOB1wVz6Luc
+        QHE3G0G1z3hQ1E9KWqi2UMrv5htVALfmz9ZDbINuZBr2QDbbg8hesShw/cgIwsuamR9yWY
+        vN8U3hvuFf8+DF+5sLjKk6aDeZrKBws=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-196-7roEM9ujN621F5hsmDgUag-1; Fri, 10 Jul 2020 07:40:41 -0400
+X-MC-Unique: 7roEM9ujN621F5hsmDgUag-1
+Received: by mail-wm1-f71.google.com with SMTP id v11so6530959wmb.1
+        for <kvm@vger.kernel.org>; Fri, 10 Jul 2020 04:40:40 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:mime-version
-         :content-disposition;
-        bh=zH+SoJc9FA+IxVxr5cux+vmHnM4kK2aczPlNcB2fA0g=;
-        b=G84nq29x4I5R81MZuU4Idsr10n7kwKLQT9A5vmSJcz+zQA91QuSVVrbiPwvbySZoNJ
-         WqP5Slcjg+UfoKFwgIUK3VLW81H4T2/1MjDHekI8GgOIyYTkEGjnfFBRNKqrgBjusXMi
-         MJj2QgOtzrtWA+gyHq2iVX20KJD+lsRY6xDOUmO6nkplyp3w17iGddP/IXcMnngVMtK4
-         I8QxL4AFbPuKxqsUXLGpN18CqioyqJv/XELElIegZorrdw/L+T6lO1/FHMTk4hzKrPEt
-         kwfYimfrMjCRd/Out8roYa464G1w/gKFS2W1mQhXGYNwYo+FpFOXyXUdJy4MA+J86vZH
-         Tv4A==
-X-Gm-Message-State: AOAM531uS9bHs4+oS2RQ2lerPmjzR94dvC+wvKe1iRGig7fEksVXbw02
-        JBapp0jPE7c4EOrNVTgx10vkcVbRMhMR+hFxW07rfPVdzvYN/2gcWKLvYwdg92b7gAbFprHKg/m
-        sTrJAcge+te9C
-X-Received: by 2002:a05:6000:1143:: with SMTP id d3mr55214236wrx.235.1594378134132;
-        Fri, 10 Jul 2020 03:48:54 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyw4fIgUrx6Lb8RIpTWJ39EeNc2fRHHzE0+AdkrVCaNR8Aj75HUF42WJR8yehI/TNv6QqsbOQ==
-X-Received: by 2002:a05:6000:1143:: with SMTP id d3mr55214221wrx.235.1594378133933;
-        Fri, 10 Jul 2020 03:48:53 -0700 (PDT)
-Received: from redhat.com (bzq-79-182-31-92.red.bezeqint.net. [79.182.31.92])
-        by smtp.gmail.com with ESMTPSA id 68sm8898710wmz.40.2020.07.10.03.48.52
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=VHkgHsP2LMXiJzMuU12W+yp4KrE8aOeFbQ7+oDie8jo=;
+        b=q3heYDy2G7e4iOVAKzhJVUd51wgafRnHfsnlSxSbuQ8hTk5GUBj0YI6jjGwf7yCpxi
+         mAAN7D9V60gg+MIemT0HOtYpu6r5es7GoxmPsfRzMyupmkIyzmu86nMU8P8ZWsQLf8DU
+         YMCCaXGxaVosINNBJlH/ey529rHeiDoB48lNvyxSiaiKe0DuVBruBCrd8tImW5FVcLKS
+         Ig18vcLiSeHxrw+B7u17vxXuHOR3CKCFVyAHsntNPzGkRREpkqU08tKT1iNkDJ/0vGtz
+         o5Ms3ySFkIUosh85t09FNS7zk4VBcYls8MhjW7Pujn0Y7wwQJOjMpsTejbZx4YiPY8LB
+         Lzrg==
+X-Gm-Message-State: AOAM533c9dvlmDfJHSO2oizBOImTduFtJ7SKDf5xgA8HnXQmc7Am3jED
+        OLKII+4wZsu2MVt9rAd2z58uZuenBoLiHbrOsSEbVeMwnsBVNHyzfQIFJGgQjdhAIIVd7oCWP8T
+        h7ConqqdW/Oak
+X-Received: by 2002:a1c:4846:: with SMTP id v67mr5008220wma.175.1594381239904;
+        Fri, 10 Jul 2020 04:40:39 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzexHDpMo1ULLtIMbhLiWf3L2m1aZ1l+TwAjQ9GHUa2QztMKPPmHnEuaReNPKxs3BoWz2+j/w==
+X-Received: by 2002:a1c:4846:: with SMTP id v67mr5008197wma.175.1594381239727;
+        Fri, 10 Jul 2020 04:40:39 -0700 (PDT)
+Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
+        by smtp.gmail.com with ESMTPSA id t2sm9040491wma.43.2020.07.10.04.40.38
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 10 Jul 2020 03:48:53 -0700 (PDT)
-Date:   Fri, 10 Jul 2020 06:48:51 -0400
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     linux-kernel@vger.kernel.org
-Cc:     stable@vger.kernel.org, Jason Wang <jasowang@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
-        netdev@vger.kernel.org
-Subject: [PATCH] vhost/scsi: fix up req type endian-ness
-Message-ID: <20200710104849.406023-1-mst@redhat.com>
+        Fri, 10 Jul 2020 04:40:39 -0700 (PDT)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
+Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Junaid Shahid <junaids@google.com>,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v3 7/9] KVM: nSVM: implement nested_svm_load_cr3() and use it for host->guest switch
+In-Reply-To: <c7c65e0e-0c8f-106b-6249-ac706e702259@redhat.com>
+References: <20200709145358.1560330-1-vkuznets@redhat.com> <20200709145358.1560330-8-vkuznets@redhat.com> <4d3f5b01-72d9-c2c5-08e8-c2b1e0046e5e@redhat.com> <c7c65e0e-0c8f-106b-6249-ac706e702259@redhat.com>
+Date:   Fri, 10 Jul 2020 13:40:37 +0200
+Message-ID: <87blknvbre.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-X-Mailer: git-send-email 2.27.0.106.g8ac3dc51b1
-X-Mutt-Fcc: =sent
+Content-Type: text/plain
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-vhost/scsi doesn't handle type conversion correctly
-for request type when using virtio 1.0 and up for BE,
-or cross-endian platforms.
+Paolo Bonzini <pbonzini@redhat.com> writes:
 
-Fix it up using vhost_32_to_cpu.
+> On 09/07/20 19:57, Paolo Bonzini wrote:
+>> On 09/07/20 16:53, Vitaly Kuznetsov wrote:
+>>> +	if (nested_npt_enabled(svm))
+>>> +		nested_svm_init_mmu_context(&svm->vcpu);
+>>> +
+>>>  	ret = nested_svm_load_cr3(&svm->vcpu, nested_vmcb->save.cr3,
+>>>  				  nested_npt_enabled(svm));
+>> 
+>> This needs to be done in svm_set_nested_state, so my suggestion is that
+>> the previous patch includes a call to nested_svm_load_cr3 in
+>> svm_set_nested_state, and this one adds the "if" inside
+>> nested_svm_load_cr3 itself.
+>
+> Actually no, that doesn't work after the next patch.  So the best option
+> is probably to extract nested_svm_init_mmu as a separate step in
+> enter_svm_guest_mode.  This also leaves nested_prepare_vmcb_save as a
+> void function.
+>
 
-Cc: stable@vger.kernel.org
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
----
- drivers/vhost/scsi.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Hm, it seems I missed svm_set_nested_state() path
+completely. Surprisingly, state_test didn't fail)
 
-diff --git a/drivers/vhost/scsi.c b/drivers/vhost/scsi.c
-index 6fb4d7ecfa19..b22adf03f584 100644
---- a/drivers/vhost/scsi.c
-+++ b/drivers/vhost/scsi.c
-@@ -1215,7 +1215,7 @@ vhost_scsi_ctl_handle_vq(struct vhost_scsi *vs, struct vhost_virtqueue *vq)
- 			continue;
- 		}
- 
--		switch (v_req.type) {
-+		switch (vhost32_to_cpu(vq, v_req.type)) {
- 		case VIRTIO_SCSI_T_TMF:
- 			vc.req = &v_req.tmf;
- 			vc.req_size = sizeof(struct virtio_scsi_ctrl_tmf_req);
+I'm struggling a bit to understand why we don't have kvm_set_cr3() on
+svm_set_nested_state() path: enter_svm_guest_mode() does it through
+nested_prepare_vmcb_save() but it is skipped in svm_set_nested_state().
+Don't we need it at least for !npt_enabled case? We'll have to extract
+nested_cr3 from nested_vmcb then.
+
 -- 
-MST
+Vitaly
 
