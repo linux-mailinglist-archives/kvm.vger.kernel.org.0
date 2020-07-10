@@ -2,62 +2,62 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 54C4721B1E3
-	for <lists+kvm@lfdr.de>; Fri, 10 Jul 2020 11:01:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D9E0321B1E4
+	for <lists+kvm@lfdr.de>; Fri, 10 Jul 2020 11:01:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728012AbgGJJBd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 10 Jul 2020 05:01:33 -0400
+        id S1728033AbgGJJBg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 10 Jul 2020 05:01:36 -0400
 Received: from esa1.hgst.iphmx.com ([68.232.141.245]:30305 "EHLO
         esa1.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728003AbgGJJBc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 10 Jul 2020 05:01:32 -0400
+        with ESMTP id S1726768AbgGJJBg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 10 Jul 2020 05:01:36 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1594371692; x=1625907692;
+  t=1594371695; x=1625907695;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:content-transfer-encoding:mime-version;
-  bh=YnXhNVx2riz72/YbI6PEmnKneq9/uZelooUUirU4FUc=;
-  b=QwWUjUmDkrBxXB3xF1RQKIubJ2e22NZDTGZmJOiqkuj7aj6dPbsTy/KT
-   e0vdlz/93jZuZIN5Q7tMUih+Mff0hVwl41Yf3v/CqupqJX6Z9vgp/9ZAU
-   0mKtV5O6vKkdotj/xROzyYf3j3K0fUjgtXSRpHo3czZRikFZzyBGyheJ0
-   GVEZv598oqinOZWd+eX/3Dz4vcAotVmctRgJswiaBuOStfsFpmhSmwAoA
-   VffD12xRuyr//poJNtcnlnltEgkmkawAovxw7xs9nQ8vTCgDvjG9pVZRG
-   WFpUnqHDtv7rImkNT/g9tYJFwf2T49QY6mx/tvLJhFYrKy24F5E688ZtJ
-   A==;
-IronPort-SDR: VfCX9Y+0cVF8vxjA9ntLoib3QI3PgwpirFO+ZtFAc/oiDrmDAQxB6ORmgtfSYgjf9AJkH40Dew
- CSTUBW9gXQEe3Xz2OkSWYjFj8DfV1qWrFXTz2uHQ+FBH+F1dqP+WwqgSfc84kWqZTYqVTry3hD
- QRQvFSCUyiirb1XmbDWyap/R5TjiYN40dRJ4Rsjab0sPgbBDXt/CwA8Hey1XxytrK7nrpGAkth
- Mgf2yXr/+ja1VToJCbLqM1b3k3K9R8DgeEEqffQhUjsfXCrs1iBL7U1dfuxL3qHHEzax5AIdOo
- Vns=
+  bh=lDq+FKo7RmMLlDr7OA4J8sRiNlAUgKGsONyvb6DEe/M=;
+  b=Ly/g6qEsJJ8e0BcMHjFUH/W/cIv4Xi3tAmlKgnKMaui/RsNCXt0eC7CE
+   dalm3mB0xv5erKInAhxCI98gjxJimnfkU6C4ka1XE8j2sWBnMM/KzE5ft
+   P9wjGgGpn7PvEHda+wHc+mwvDSbryADsvpmpFdY0rCXybcu5ydf5XKrcT
+   sp06WEAtsDUEVxUVX+izOw43eEzcRdKmoQ/9i6ZmwBOOt3vOKd6vXhrvV
+   3+vKYHzInnpn0OpArX+HyHfZVKtA8osIZdMsYLDg4U8jl4pF+MiBKoIko
+   gOp23Oy0TXUGGJLq+kJfnzfDUjfIf9XuRZavE+oyuAwhgJa4OKVCPnEJv
+   g==;
+IronPort-SDR: QtCVdxqHV3uGoAkhoEvuSj6tpzW5UmN86ey6q8Gjvv+M+tY1YGDD1vYlRC9HFUvFBBh/u13DgV
+ WtdDYKVJtzcAEg3ywaEroUhoxw8u4SE5zC3xtkWoYGFUH80gcu6rQefP+nW9kYV4YIsxyC+kbo
+ 60FVN3R7d2DcVf/EDO2GuKhBuDsG53tbfU9P9HxiC0D8m7+Ub4n4Ao19tkyLfkpX4CNbSb/TvD
+ lV7FNOaUXu+YSPxkV+6CpXjEW9dXnc28H6iv6RbRCHHwV8fzQyJ2ns1w4JF6NSk3dOHHKmwXk9
+ 2Tk=
 X-IronPort-AV: E=Sophos;i="5.75,335,1589212800"; 
-   d="scan'208";a="251358896"
-Received: from mail-bn8nam12lp2173.outbound.protection.outlook.com (HELO NAM12-BN8-obe.outbound.protection.outlook.com) ([104.47.55.173])
-  by ob1.hgst.iphmx.com with ESMTP; 10 Jul 2020 17:01:31 +0800
+   d="scan'208";a="251358899"
+Received: from mail-bn8nam12lp2174.outbound.protection.outlook.com (HELO NAM12-BN8-obe.outbound.protection.outlook.com) ([104.47.55.174])
+  by ob1.hgst.iphmx.com with ESMTP; 10 Jul 2020 17:01:35 +0800
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Ov1Xfhgk1WWDlvidHVfVD7ddxoln8ufmgzUM7cmpfuB6FfYknstC2xXROYA20I35pu/kThic4XDzulve9qacWFTexx0uDXy+cOXebxEGH9JrqWXv1A1fGAjWJxM/aTVmtQz+MHO9roZfu4LPBzmrvbDqG38eHs4ws5YSt7KA9/3IAuwZ7PGTYPLOHd1KfEz67XBXmIdvpSXuOhKrf8Kjuf1BIPf5QLMGrsLV8dtFYJJdACpn5sjIE7NhpVRKPiHTTyxAYh3hcRl9uAybOHXYLDcJC1hf3JxfhsR4oB0VJgFxwgCyN/hYsFqMQaFYPJ8F/JXp7yVZDl4rawbizumBgw==
+ b=khzNEDKculPgREbGKLV2/PH4UVM0hnUqLTc9NzB5CPwSMWQTKAwn3miq10ZEC62wAyhGje2/AI6Qz4dtA4aOLGG6UMmAush85Z+pQ6C6O6zbBazxeRJax0/Z7SR7wAbwaHF98i7L5JDocdfspbqKFje3A2Nfcs91OFcYJ6DB7cfPCWWMmuWFOPB66ZeQ6CO9cj2eWp8+spcmumRY9pZLZa+grO9vvHKFCxHIPiKOhGJZ/Ggcd6e+D83ECl6nl9of44PP7/jLKLRUH+6sbx0gAPC/Q8KKqoss12iQhzVVeXZTkD2SN5Fd5I9hGHBq5Wg7Ir3nzRhC/UylMx0h7O2wKA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=gCpZfgqtVjz4zTxqDEfZnDSbOHypl1AAPuOb1l9RIos=;
- b=FkTN2sU3GfksfpzBD021MmjIPl8I+7TTtqwq4DutlqoeXLXAx3rlnfJql7+VMMsLnH2Fr6a1O8VIFGEzQbhkp71ZX8eluGulQS+MrudD0YhpjykuWTPhbX2wzLWQOOI9gWmD2aEkhtULnvIKmxVRQsi1BIkwm4OjMC5AcaUvXx7zuNlIDrfrA31ipEi5axYykd6CPLU1so5WRTCrMLaFb0Upx5p5zHiHNfzmDGyKsSAzsRxZDZsPun9Idl7ipFzTJDbAI64NjoxkpJe6bZaUxWFgIaYLsdF/T6MeTl3q9VOXEQkZSntwSlDcWd3pZRWYL1qIvF7/LuKFCeMARr8cBg==
+ bh=yrurI0CrHyGTFt1VaTothhQZAEntRUm1BYM8Wyf5F+M=;
+ b=JAqUfsTnRNL5BGiAIv/RMbILUzb1v3di6H76Q0VkKwo44aGQAP75/fqGKqdSt+H26p2V2YCt4YC2JSxcNjUO0zLrkbWtykBlaabd2IX7yTOz4PFlMkiJ/di88Zbo3H54tNeSD5rA5Ahl9W0lhXAuxotiRo5dPRi0yjqQeYni2/9w+oLx9JRU0cdaRj0UgU78Xft18TEQu7fhIqzLcKeDjh5p/Iuk0uHqTJzBLz47HprZtSM5TXeFmXz1R69mqq7S2U1LolGf2ppfdzS8zBqJoGACmv+mJr55WK4AIwOEi/02PJcgBzJL135GCWjM1AAQ1lMMy1LyRW2FnyhPNpOL3w==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
  header.d=wdc.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=gCpZfgqtVjz4zTxqDEfZnDSbOHypl1AAPuOb1l9RIos=;
- b=ggygVvyLbHtcrj6WTYI3FbiUTflX+Q4CGj/2jwh7pAqnDv6N6VJhA8gc8lR91/OTiqNmW3bPslOP36U/RsdrRzotuCJs1Fpc36OZiVUlONW14qNDCipV3JW5m1pZZ/YkgWqiYURTjbKkzhEPt8Fp8+IgqPJm8ymoEmHS6r6pmhc=
+ bh=yrurI0CrHyGTFt1VaTothhQZAEntRUm1BYM8Wyf5F+M=;
+ b=PSv/4vwR1l1ERlFrP1nY5nuVzp80ewInNNSkmgAeH4PaB0o6Mt0G9ipEhKdU+sGkSZ9nBJ9LfsqaWEODXex2r937DAvGr7afeQ4ub9hZ1/X5ZDuS6l7vi1/VQmDYKV9NqAqCDkWDg2/JHt8l9fsYFZYqln6fwzGm+yUwv3NHd8M=
 Authentication-Results: kernel.org; dkim=none (message not signed)
  header.d=none;kernel.org; dmarc=none action=none header.from=wdc.com;
 Received: from DM6PR04MB6201.namprd04.prod.outlook.com (2603:10b6:5:127::32)
  by DM5PR04MB0346.namprd04.prod.outlook.com (2603:10b6:3:6f::7) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.3174.21; Fri, 10 Jul 2020 09:01:30 +0000
+ 15.20.3174.21; Fri, 10 Jul 2020 09:01:34 +0000
 Received: from DM6PR04MB6201.namprd04.prod.outlook.com
  ([fe80::e0a4:aa82:1847:dea5]) by DM6PR04MB6201.namprd04.prod.outlook.com
  ([fe80::e0a4:aa82:1847:dea5%7]) with mapi id 15.20.3174.023; Fri, 10 Jul 2020
- 09:01:30 +0000
+ 09:01:34 +0000
 From:   Anup Patel <anup.patel@wdc.com>
 To:     Will Deacon <will@kernel.org>
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
@@ -65,9 +65,9 @@ Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Alistair Francis <Alistair.Francis@wdc.com>,
         Anup Patel <anup@brainfault.org>, kvm@vger.kernel.org,
         kvm-riscv@lists.infradead.org, Anup Patel <anup.patel@wdc.com>
-Subject: [RFC PATCH v4 6/8] riscv: Generate FDT at runtime for Guest/VM
-Date:   Fri, 10 Jul 2020 14:30:33 +0530
-Message-Id: <20200710090035.123941-7-anup.patel@wdc.com>
+Subject: [RFC PATCH v4 7/8] riscv: Handle SBI calls forwarded to user space
+Date:   Fri, 10 Jul 2020 14:30:34 +0530
+Message-Id: <20200710090035.123941-8-anup.patel@wdc.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20200710090035.123941-1-anup.patel@wdc.com>
 References: <20200710090035.123941-1-anup.patel@wdc.com>
@@ -78,383 +78,177 @@ X-ClientProxiedBy: PN1PR0101CA0029.INDPRD01.PROD.OUTLOOK.COM
  (2603:10b6:5:127::32)
 MIME-Version: 1.0
 X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from wdc.com (103.15.57.207) by PN1PR0101CA0029.INDPRD01.PROD.OUTLOOK.COM (2603:1096:c00:c::15) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3174.21 via Frontend Transport; Fri, 10 Jul 2020 09:01:27 +0000
+Received: from wdc.com (103.15.57.207) by PN1PR0101CA0029.INDPRD01.PROD.OUTLOOK.COM (2603:1096:c00:c::15) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3174.21 via Frontend Transport; Fri, 10 Jul 2020 09:01:31 +0000
 X-Mailer: git-send-email 2.25.1
 X-Originating-IP: [103.15.57.207]
 X-MS-PublicTrafficType: Email
 X-MS-Office365-Filtering-HT: Tenant
-X-MS-Office365-Filtering-Correlation-Id: 6fbba672-0135-4493-4613-08d824afd5f9
+X-MS-Office365-Filtering-Correlation-Id: c0e69e39-6944-402e-2221-08d824afd833
 X-MS-TrafficTypeDiagnostic: DM5PR04MB0346:
 X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <DM5PR04MB034699931884E11AA5CE96ED8D650@DM5PR04MB0346.namprd04.prod.outlook.com>
+X-Microsoft-Antispam-PRVS: <DM5PR04MB03466EBBC05EE20F2D3CE4D78D650@DM5PR04MB0346.namprd04.prod.outlook.com>
 WDCIPOUTBOUND: EOP-TRUE
-X-MS-Oob-TLC-OOBClassifiers: OLM:31;
+X-MS-Oob-TLC-OOBClassifiers: OLM:2803;
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: ub6J1291aADceNzDpjfV2weksQdf3fXjqMniA/2m4rEtHua9GHfAVAIFSFgiquBjCMuSYklLNN/NkqOmWe+zskaK3MSHf+LZN6lAgWwl3x0S0ci9/6Om58uZqGu+LqV9prS3+gB3TZH2I5g+RKCwIt6HH2WG73E4WRMpl6xy1JaZmeKyrPNYxymDMZP9CkNvoiQ9KWPMlhYUh53Xw8iim+8FAtZiunuN+RpO8EcRliEQcsmrZKY1tv5y8yjl8Ynh0LDK+QMti0a6qj3nX3N/CYhe4K0jYbkkwoceKKsyK3k3tCGHEJD/VASH+gpvOOoTQB/SSSuIxphLAafx3T8bBw==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR04MB6201.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFTY:;SFS:(4636009)(396003)(346002)(136003)(366004)(376002)(39860400002)(66476007)(186003)(66556008)(16526019)(6666004)(30864003)(52116002)(8886007)(1076003)(6916009)(86362001)(7696005)(36756003)(26005)(66946007)(4326008)(5660300002)(8936002)(956004)(2906002)(2616005)(83380400001)(55016002)(478600001)(316002)(44832011)(8676002)(54906003);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData: RPVIjcqEbW2WsjsY6g3Oi3tXF/7++jeSjH6r7HhUmgPk1pNCdDF6uPWqM6VP9sqEHZi0bNq5V5+PfsVjP6GifYMHKY0Yu5A1nm6rpuiAbkyPxR8klOay5KGhqVjHYc5F76XWaH0vphxEt5UoKojOY8WRi4W6gXfZUVdTGkGqV+SePiUk+ssmzmnH+EZaXyHzB8uTBuQSfHm+i8a4gi7G5QwQ2XouPIo2NRHwFLmXZ1ZsRwI0CGQnmeN1Abp70Iyf52EHJWnu+AFmtvpywikaosJCWB6JvsSLMGZ98gP6sdbwiutrkAl/nVtG/5F1naeE8uNGcFy8U4VwMt3iTRmTiMgmAOieFo5pJgxdwLqVFCBOP49cuUkoqoB0cD/3iqbz3gvdD4zhBD/SWHPct+jIHRwPaWN4lvq0H0cGwbNkjxydunQODHJ5BZkiwT/zAoHURM+kJ0Jic+Qlj3ovVjuL8Y8Z4TTVmUtsJSQz9whmRrg=
+X-Microsoft-Antispam-Message-Info: n3o9cLuG0OY8+al7s7plwVBwaArXfpSdczlxd0/UYCtzlV11/DyUlPJYspCicZSGocUyt1uYwccXlg5HEDVkj2cQC0uekTnrYg5KGR3PXLF5tMwDdg3m4KThr32MnkufoIZNG4mRlIr8CwPDVPlN9hPekMbq1EmYePlOJVx2YaqqZ1Et6yFYBAQWo6U/TmEoZeSeQNMmUiuA3CDYvzsIBK19ILYzWpb/JTeiIffld1p//fxBJ4hlZ4UZSbA32Uw/54Cq+/IB3ItxhCri+ViKsfXHFwVjOHzukb1p/fh6Bnss4kCVruzR9ItINTxMZyW3
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR04MB6201.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFTY:;SFS:(4636009)(396003)(346002)(136003)(366004)(376002)(39860400002)(66476007)(186003)(66556008)(16526019)(52116002)(8886007)(1076003)(6916009)(86362001)(7696005)(36756003)(26005)(66946007)(4326008)(5660300002)(8936002)(956004)(2906002)(2616005)(83380400001)(55016002)(478600001)(316002)(44832011)(8676002)(54906003);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData: qQfC+x/v4OIyD/kngUx1+KepocigmoNK7C3KguEah3IqbGmb/Y+uxV7bDyYtDkknPXYa2hCgmCc2HnbPZ9bYSzUjwfcr3Bjh+uTs2xJ12Sdqx+buqMewt0quurJ+OMg2th6zR9XIQPSDTI49kh071eODwFu3exRhhxcKG8ejBX70S4oZ+vnkdj4KdcaXfXAs/9TjKeR/DhRB2SNCHnIkPUnVtso/wXvRnq8qreOpc/mmck3qtx7Vv701U3TpP41bQdG3OwkUedNs6yNYl4puu3vKzYmpsJ4CwU/HYu1DmxYPz0so1nMUwNJ/z2zTXap6h7y21ESR9r+vX0A0wBGS7/X/3Uc9d/3oyB/HRI6oX4po9goYtrZC8nSkvxF0G+df5gUXduReQwWfiqRmFevXA+8CHzHIqU1xItI+UdBmv4VLAfqrkl/GsvLKE9uLpOO4WTcgouo/St4t4RFxspuOVRmWMFZpyX1VF2a9R1+UJcc=
 X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6fbba672-0135-4493-4613-08d824afd5f9
+X-MS-Exchange-CrossTenant-Network-Message-Id: c0e69e39-6944-402e-2221-08d824afd833
 X-MS-Exchange-CrossTenant-AuthSource: DM6PR04MB6201.namprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Jul 2020 09:01:30.4812
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Jul 2020 09:01:33.9130
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: b61c8803-16f3-4c35-9b17-6f65f441df86
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: EAIqawByzNbXq0G8cz+waHmqooNfPHDMibS/SHMgGEh7gkyZp43l0f31UY/WA1QpFGdC8+VFwuXHoTI9/0DwYg==
+X-MS-Exchange-CrossTenant-UserPrincipalName: 4BvUFBKlc7T8mV0SckAnNl4BuLmRahUStKZ4pn6GNhiwVgaDfpayv6VD2kUJ5+eT/u9qlmkA4vHJVXoRYO/LlQ==
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM5PR04MB0346
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-We generate FDT at runtime for RISC-V Guest/VM so that KVMTOOL users
-don't have to pass FDT separately via command-line parameters.
+The kernel KVM RISC-V module will forward certain SBI calls
+to user space. These forwared SBI calls will usually be the
+SBI calls which cannot be emulated in kernel space such as
+PUTCHAR and GETCHAR calls.
 
-Also, we provide "--dump-dtb <filename>" command-line option to dump
-generated FDT into a file for debugging purpose.
+This patch extends kvm_cpu__handle_exit() to handle SBI calls
+forwarded to user space.
 
 Signed-off-by: Atish Patra <atish.patra@wdc.com>
 Signed-off-by: Anup Patel <anup.patel@wdc.com>
 ---
- Makefile                            |   1 +
- riscv/fdt.c                         | 192 ++++++++++++++++++++++++++++
- riscv/include/kvm/fdt-arch.h        |   4 +
- riscv/include/kvm/kvm-arch.h        |   2 +
- riscv/include/kvm/kvm-config-arch.h |   6 +
- riscv/plic.c                        |  50 ++++++++
- 6 files changed, 255 insertions(+)
- create mode 100644 riscv/fdt.c
+ riscv/include/kvm/sbi.h | 48 ++++++++++++++++++++++++++++++++++++++++
+ riscv/kvm-cpu.c         | 49 ++++++++++++++++++++++++++++++++++++++++-
+ 2 files changed, 96 insertions(+), 1 deletion(-)
+ create mode 100644 riscv/include/kvm/sbi.h
 
-diff --git a/Makefile b/Makefile
-index e2dd39d..6042c1c 100644
---- a/Makefile
-+++ b/Makefile
-@@ -199,6 +199,7 @@ endif
- ifeq ($(ARCH),riscv)
- 	DEFINES		+= -DCONFIG_RISCV
- 	ARCH_INCLUDE	:= riscv/include
-+	OBJS		+= riscv/fdt.o
- 	OBJS		+= riscv/ioport.o
- 	OBJS		+= riscv/irq.o
- 	OBJS		+= riscv/kvm.o
-diff --git a/riscv/fdt.c b/riscv/fdt.c
+diff --git a/riscv/include/kvm/sbi.h b/riscv/include/kvm/sbi.h
 new file mode 100644
-index 0000000..6527ef7
+index 0000000..f4b4182
 --- /dev/null
-+++ b/riscv/fdt.c
-@@ -0,0 +1,192 @@
-+#include "kvm/devices.h"
-+#include "kvm/fdt.h"
-+#include "kvm/kvm.h"
-+#include "kvm/kvm-cpu.h"
++++ b/riscv/include/kvm/sbi.h
+@@ -0,0 +1,48 @@
++/* SPDX-License-Identifier: GPL-2.0-only */
++/*
++ * Common SBI related defines and macros to be used by RISC-V kernel,
++ * RISC-V KVM and userspace.
++ *
++ * Copyright (c) 2019 Western Digital Corporation or its affiliates.
++ */
 +
-+#include <stdbool.h>
++#ifndef __RISCV_SBI_H__
++#define __RISCV_SBI_H__
 +
-+#include <linux/byteorder.h>
-+#include <linux/kernel.h>
-+#include <linux/sizes.h>
++enum sbi_ext_id {
++	SBI_EXT_0_1_SET_TIMER = 0x0,
++	SBI_EXT_0_1_CONSOLE_PUTCHAR = 0x1,
++	SBI_EXT_0_1_CONSOLE_GETCHAR = 0x2,
++	SBI_EXT_0_1_CLEAR_IPI = 0x3,
++	SBI_EXT_0_1_SEND_IPI = 0x4,
++	SBI_EXT_0_1_REMOTE_FENCE_I = 0x5,
++	SBI_EXT_0_1_REMOTE_SFENCE_VMA = 0x6,
++	SBI_EXT_0_1_REMOTE_SFENCE_VMA_ASID = 0x7,
++	SBI_EXT_0_1_SHUTDOWN = 0x8,
++	SBI_EXT_BASE = 0x10,
++};
 +
-+static void dump_fdt(const char *dtb_file, void *fdt)
-+{
-+	int count, fd;
++enum sbi_ext_base_fid {
++	SBI_BASE_GET_SPEC_VERSION = 0,
++	SBI_BASE_GET_IMP_ID,
++	SBI_BASE_GET_IMP_VERSION,
++	SBI_BASE_PROBE_EXT,
++	SBI_BASE_GET_MVENDORID,
++	SBI_BASE_GET_MARCHID,
++	SBI_BASE_GET_MIMPID,
++};
 +
-+	fd = open(dtb_file, O_CREAT | O_TRUNC | O_RDWR, 0666);
-+	if (fd < 0)
-+		die("Failed to write dtb to %s", dtb_file);
++#define SBI_SPEC_VERSION_DEFAULT	0x1
++#define SBI_SPEC_VERSION_MAJOR_OFFSET	24
++#define SBI_SPEC_VERSION_MAJOR_MASK	0x7f
++#define SBI_SPEC_VERSION_MINOR_MASK	0xffffff
 +
-+	count = write(fd, fdt, FDT_MAX_SIZE);
-+	if (count < 0)
-+		die_perror("Failed to dump dtb");
++/* SBI return error codes */
++#define SBI_SUCCESS		0
++#define SBI_ERR_FAILURE		-1
++#define SBI_ERR_NOT_SUPPORTED	-2
++#define SBI_ERR_INVALID_PARAM   -3
++#define SBI_ERR_DENIED		-4
++#define SBI_ERR_INVALID_ADDRESS -5
 +
-+	pr_debug("Wrote %d bytes to dtb %s", count, dtb_file);
-+	close(fd);
-+}
-+
-+#define CPU_NAME_MAX_LEN 15
-+#define CPU_ISA_MAX_LEN 128
-+static void generate_cpu_nodes(void *fdt, struct kvm *kvm)
-+{
-+	int cpu, pos, i, index, valid_isa_len;
-+	const char *valid_isa_order = "IEMAFDQCLBJTPVNSUHKORWXYZG";
-+
-+	_FDT(fdt_begin_node(fdt, "cpus"));
-+	_FDT(fdt_property_cell(fdt, "#address-cells", 0x1));
-+	_FDT(fdt_property_cell(fdt, "#size-cells", 0x0));
-+	_FDT(fdt_property_cell(fdt, "timebase-frequency",
-+				kvm->cpus[0]->riscv_timebase));
-+
-+	for (cpu = 0; cpu < kvm->nrcpus; ++cpu) {
-+		char cpu_name[CPU_NAME_MAX_LEN];
-+		char cpu_isa[CPU_ISA_MAX_LEN];
-+		struct kvm_cpu *vcpu = kvm->cpus[cpu];
-+
-+		snprintf(cpu_name, CPU_NAME_MAX_LEN, "cpu@%x", cpu);
-+
-+		snprintf(cpu_isa, CPU_ISA_MAX_LEN, "rv%ld", vcpu->riscv_xlen);
-+		pos = strlen(cpu_isa);
-+		valid_isa_len = strlen(valid_isa_order);
-+		for (i = 0; i < valid_isa_len; i++) {
-+			index = valid_isa_order[i] - 'A';
-+			if (vcpu->riscv_isa & (1 << (index)))
-+				cpu_isa[pos++] = 'a' + index;
-+		}
-+		cpu_isa[pos] = '\0';
-+
-+		_FDT(fdt_begin_node(fdt, cpu_name));
-+		_FDT(fdt_property_string(fdt, "device_type", "cpu"));
-+		_FDT(fdt_property_string(fdt, "compatible", "riscv"));
-+		if (vcpu->riscv_xlen == 64)
-+			_FDT(fdt_property_string(fdt, "mmu-type",
-+						 "riscv,sv48"));
-+		else
-+			_FDT(fdt_property_string(fdt, "mmu-type",
-+						 "riscv,sv32"));
-+		_FDT(fdt_property_string(fdt, "riscv,isa", cpu_isa));
-+		_FDT(fdt_property_cell(fdt, "reg", cpu));
-+		_FDT(fdt_property_string(fdt, "status", "okay"));
-+
-+		_FDT(fdt_begin_node(fdt, "interrupt-controller"));
-+		_FDT(fdt_property_string(fdt, "compatible", "riscv,cpu-intc"));
-+		_FDT(fdt_property_cell(fdt, "#interrupt-cells", 1));
-+		_FDT(fdt_property(fdt, "interrupt-controller", NULL, 0));
-+		_FDT(fdt_property_cell(fdt, "phandle",
-+					PHANDLE_CPU_INTC_BASE + cpu));
-+		_FDT(fdt_end_node(fdt));
-+
-+		_FDT(fdt_end_node(fdt));
-+	}
-+
-+	_FDT(fdt_end_node(fdt));
-+}
-+
-+static int setup_fdt(struct kvm *kvm)
-+{
-+	struct device_header *dev_hdr;
-+	u8 staging_fdt[FDT_MAX_SIZE];
-+	u64 mem_reg_prop[]	= {
-+		cpu_to_fdt64(kvm->arch.memory_guest_start),
-+		cpu_to_fdt64(kvm->ram_size),
-+	};
-+	void *fdt		= staging_fdt;
-+	void *fdt_dest		= guest_flat_to_host(kvm,
-+						     kvm->arch.dtb_guest_start);
-+	void (*generate_mmio_fdt_nodes)(void *, struct device_header *,
-+					void (*)(void *, u8, enum irq_type));
-+
-+	/* Create new tree without a reserve map */
-+	_FDT(fdt_create(fdt, FDT_MAX_SIZE));
-+	_FDT(fdt_finish_reservemap(fdt));
-+
-+	/* Header */
-+	_FDT(fdt_begin_node(fdt, ""));
-+	_FDT(fdt_property_string(fdt, "compatible", "linux,dummy-virt"));
-+	_FDT(fdt_property_cell(fdt, "#address-cells", 0x2));
-+	_FDT(fdt_property_cell(fdt, "#size-cells", 0x2));
-+
-+	/* /chosen */
-+	_FDT(fdt_begin_node(fdt, "chosen"));
-+
-+	/* Pass on our amended command line to a Linux kernel only. */
-+	if (kvm->cfg.firmware_filename) {
-+		if (kvm->cfg.kernel_cmdline)
-+			_FDT(fdt_property_string(fdt, "bootargs",
-+						 kvm->cfg.kernel_cmdline));
-+	} else
-+		_FDT(fdt_property_string(fdt, "bootargs",
-+					 kvm->cfg.real_cmdline));
-+
-+	_FDT(fdt_property_string(fdt, "stdout-path", "serial0"));
-+
-+	/* Initrd */
-+	if (kvm->arch.initrd_size != 0) {
-+		u64 ird_st_prop = cpu_to_fdt64(kvm->arch.initrd_guest_start);
-+		u64 ird_end_prop = cpu_to_fdt64(kvm->arch.initrd_guest_start +
-+					       kvm->arch.initrd_size);
-+
-+		_FDT(fdt_property(fdt, "linux,initrd-start",
-+				   &ird_st_prop, sizeof(ird_st_prop)));
-+		_FDT(fdt_property(fdt, "linux,initrd-end",
-+				   &ird_end_prop, sizeof(ird_end_prop)));
-+	}
-+
-+	_FDT(fdt_end_node(fdt));
-+
-+	/* Memory */
-+	_FDT(fdt_begin_node(fdt, "memory"));
-+	_FDT(fdt_property_string(fdt, "device_type", "memory"));
-+	_FDT(fdt_property(fdt, "reg", mem_reg_prop, sizeof(mem_reg_prop)));
-+	_FDT(fdt_end_node(fdt));
-+
-+	/* CPUs */
-+	generate_cpu_nodes(fdt, kvm);
-+
-+	/* Simple Bus */
-+	_FDT(fdt_begin_node(fdt, "smb"));
-+	_FDT(fdt_property_string(fdt, "compatible", "simple-bus"));
-+	_FDT(fdt_property_cell(fdt, "#address-cells", 0x2));
-+	_FDT(fdt_property_cell(fdt, "#size-cells", 0x2));
-+	_FDT(fdt_property_cell(fdt, "interrupt-parent", PHANDLE_PLIC));
-+	_FDT(fdt_property(fdt, "ranges", NULL, 0));
-+
-+	/* Virtio MMIO devices */
-+	dev_hdr = device__first_dev(DEVICE_BUS_MMIO);
-+	while (dev_hdr) {
-+		generate_mmio_fdt_nodes = dev_hdr->data;
-+		generate_mmio_fdt_nodes(fdt, dev_hdr, plic__generate_irq_prop);
-+		dev_hdr = device__next_dev(dev_hdr);
-+	}
-+
-+	/* IOPORT devices */
-+	dev_hdr = device__first_dev(DEVICE_BUS_IOPORT);
-+	while (dev_hdr) {
-+		generate_mmio_fdt_nodes = dev_hdr->data;
-+		generate_mmio_fdt_nodes(fdt, dev_hdr, plic__generate_irq_prop);
-+		dev_hdr = device__next_dev(dev_hdr);
-+	}
-+
-+	_FDT(fdt_end_node(fdt));
-+
-+	if (fdt_stdout_path) {
-+		_FDT(fdt_begin_node(fdt, "aliases"));
-+		_FDT(fdt_property_string(fdt, "serial0", fdt_stdout_path));
-+		_FDT(fdt_end_node(fdt));
-+
-+		free(fdt_stdout_path);
-+		fdt_stdout_path = NULL;
-+	}
-+
-+	/* Finalise. */
-+	_FDT(fdt_end_node(fdt));
-+	_FDT(fdt_finish(fdt));
-+
-+	_FDT(fdt_open_into(fdt, fdt_dest, FDT_MAX_SIZE));
-+	_FDT(fdt_pack(fdt_dest));
-+
-+	if (kvm->cfg.arch.dump_dtb_filename)
-+		dump_fdt(kvm->cfg.arch.dump_dtb_filename, fdt_dest);
-+	return 0;
-+}
-+late_init(setup_fdt);
-diff --git a/riscv/include/kvm/fdt-arch.h b/riscv/include/kvm/fdt-arch.h
-index 9450fc5..f7548e8 100644
---- a/riscv/include/kvm/fdt-arch.h
-+++ b/riscv/include/kvm/fdt-arch.h
-@@ -1,4 +1,8 @@
- #ifndef KVM__KVM_FDT_H
- #define KVM__KVM_FDT_H
- 
-+enum phandles {PHANDLE_RESERVED = 0, PHANDLE_PLIC, PHANDLES_MAX};
-+
-+#define PHANDLE_CPU_INTC_BASE	PHANDLES_MAX
-+
- #endif /* KVM__KVM_FDT_H */
-diff --git a/riscv/include/kvm/kvm-arch.h b/riscv/include/kvm/kvm-arch.h
-index bb6d99d..02825cd 100644
---- a/riscv/include/kvm/kvm-arch.h
-+++ b/riscv/include/kvm/kvm-arch.h
-@@ -76,6 +76,8 @@ static inline bool riscv_addr_in_ioport_region(u64 phys_addr)
- 
- enum irq_type;
- 
-+void plic__generate_irq_prop(void *fdt, u8 irq, enum irq_type irq_type);
-+
- void plic__irq_trig(struct kvm *kvm, int irq, int level, bool edge);
- 
- #endif /* KVM__KVM_ARCH_H */
-diff --git a/riscv/include/kvm/kvm-config-arch.h b/riscv/include/kvm/kvm-config-arch.h
-index 60c7333..526fca2 100644
---- a/riscv/include/kvm/kvm-config-arch.h
-+++ b/riscv/include/kvm/kvm-config-arch.h
-@@ -4,6 +4,12 @@
- #include "kvm/parse-options.h"
- 
- struct kvm_config_arch {
-+	const char	*dump_dtb_filename;
- };
- 
-+#define OPT_ARCH_RUN(pfx, cfg)						\
-+	pfx,								\
-+	OPT_STRING('\0', "dump-dtb", &(cfg)->dump_dtb_filename,		\
-+		   ".dtb file", "Dump generated .dtb to specified file"),
-+
- #endif /* KVM__KVM_CONFIG_ARCH_H */
-diff --git a/riscv/plic.c b/riscv/plic.c
-index 1faa1d5..07cadc7 100644
---- a/riscv/plic.c
-+++ b/riscv/plic.c
-@@ -1,5 +1,6 @@
- 
- #include "kvm/devices.h"
-+#include "kvm/fdt.h"
- #include "kvm/ioeventfd.h"
- #include "kvm/ioport.h"
++#endif
+diff --git a/riscv/kvm-cpu.c b/riscv/kvm-cpu.c
+index 8adaddd..df90c7b 100644
+--- a/riscv/kvm-cpu.c
++++ b/riscv/kvm-cpu.c
+@@ -1,6 +1,7 @@
+ #include "kvm/kvm-cpu.h"
  #include "kvm/kvm.h"
-@@ -455,6 +456,54 @@ static void plic__mmio_callback(struct kvm_cpu *vcpu,
- 	}
+ #include "kvm/virtio.h"
++#include "kvm/sbi.h"
+ #include "kvm/term.h"
+ 
+ #include <asm/ptrace.h>
+@@ -110,9 +111,55 @@ void kvm_cpu__delete(struct kvm_cpu *vcpu)
+ 	free(vcpu);
  }
  
-+void plic__generate_irq_prop(void *fdt, u8 irq, enum irq_type irq_type)
++static bool kvm_cpu_riscv_sbi(struct kvm_cpu *vcpu)
 +{
-+	u32 irq_prop[] = {
-+		cpu_to_fdt32(irq)
++	char ch;
++	bool ret = true;
++	int dfd = kvm_cpu__get_debug_fd();
++
++	switch (vcpu->kvm_run->riscv_sbi.extension_id) {
++	case SBI_EXT_0_1_CONSOLE_PUTCHAR:
++		ch = vcpu->kvm_run->riscv_sbi.args[0];
++		term_putc(&ch, 1, 0);
++		vcpu->kvm_run->riscv_sbi.ret[0] = 0;
++		break;
++	case SBI_EXT_0_1_CONSOLE_GETCHAR:
++		if (term_readable(0))
++			vcpu->kvm_run->riscv_sbi.ret[0] =
++					term_getc(vcpu->kvm, 0);
++		else
++			vcpu->kvm_run->riscv_sbi.ret[0] = SBI_ERR_FAILURE;
++		break;
++	default:
++		dprintf(dfd, "Unhandled SBI call\n");
++		dprintf(dfd, "extension_id=0x%lx function_id=0x%lx\n",
++			vcpu->kvm_run->riscv_sbi.extension_id,
++			vcpu->kvm_run->riscv_sbi.function_id);
++		dprintf(dfd, "args[0]=0x%lx args[1]=0x%lx\n",
++			vcpu->kvm_run->riscv_sbi.args[0],
++			vcpu->kvm_run->riscv_sbi.args[1]);
++		dprintf(dfd, "args[2]=0x%lx args[3]=0x%lx\n",
++			vcpu->kvm_run->riscv_sbi.args[2],
++			vcpu->kvm_run->riscv_sbi.args[3]);
++		dprintf(dfd, "args[4]=0x%lx args[5]=0x%lx\n",
++			vcpu->kvm_run->riscv_sbi.args[4],
++			vcpu->kvm_run->riscv_sbi.args[5]);
++		ret = false;
++		break;
 +	};
 +
-+	_FDT(fdt_property(fdt, "interrupts", irq_prop, sizeof(irq_prop)));
++	return ret;
 +}
 +
-+static void plic__generate_fdt_node(void *fdt,
-+				    struct device_header *dev_hdr,
-+				    void (*generate_irq_prop)(void *fdt,
-+							      u8 irq,
-+							      enum irq_type))
-+{
-+	u32 i;
-+	u32 reg_cells[4], *irq_cells;
-+
-+	reg_cells[0] = 0;
-+	reg_cells[1] = cpu_to_fdt32(RISCV_PLIC);
-+	reg_cells[2] = 0;
-+	reg_cells[3] = cpu_to_fdt32(RISCV_PLIC_SIZE);
-+
-+	irq_cells = calloc(plic.num_context * 2, sizeof(u32));
-+	if (!irq_cells)
-+		die("Failed to alloc irq_cells");
-+
-+	_FDT(fdt_begin_node(fdt, "interrupt-controller@0c000000"));
-+	_FDT(fdt_property_string(fdt, "compatible", "riscv,plic0"));
-+	_FDT(fdt_property(fdt, "reg", reg_cells, sizeof(reg_cells)));
-+	_FDT(fdt_property_cell(fdt, "#interrupt-cells", 1));
-+	_FDT(fdt_property(fdt, "interrupt-controller", NULL, 0));
-+	_FDT(fdt_property_cell(fdt, "riscv,max-priority", plic.max_prio));
-+	_FDT(fdt_property_cell(fdt, "riscv,ndev", MAX_DEVICES));
-+	_FDT(fdt_property_cell(fdt, "phandle", PHANDLE_PLIC));
-+	for (i = 0; i < (plic.num_context / 2); i++) {
-+		irq_cells[4*i + 0] = cpu_to_fdt32(PHANDLE_CPU_INTC_BASE + i);
-+		irq_cells[4*i + 1] = cpu_to_fdt32(0xffffffff);
-+		irq_cells[4*i + 2] = cpu_to_fdt32(PHANDLE_CPU_INTC_BASE + i);
-+		irq_cells[4*i + 3] = cpu_to_fdt32(9);
-+	}
-+	_FDT(fdt_property(fdt, "interrupts-extended", irq_cells,
-+			  sizeof(u32) * plic.num_context * 2));
-+	_FDT(fdt_end_node(fdt));
-+
-+	free(irq_cells);
-+}
-+
- static int plic__init(struct kvm *kvm)
+ bool kvm_cpu__handle_exit(struct kvm_cpu *vcpu)
  {
- 	u32 i;
-@@ -464,6 +513,7 @@ static int plic__init(struct kvm *kvm)
- 	plic.kvm = kvm;
- 	plic.dev_hdr = (struct device_header) {
- 		.bus_type	= DEVICE_BUS_MMIO,
-+		.data		= plic__generate_fdt_node,
- 	};
+-	/* TODO: */
++	switch (vcpu->kvm_run->exit_reason) {
++	case KVM_EXIT_RISCV_SBI:
++		return kvm_cpu_riscv_sbi(vcpu);
++	default:
++		break;
++	};
++
+ 	return false;
+ }
  
- 	plic.num_irq = MAX_DEVICES;
 -- 
 2.25.1
 
