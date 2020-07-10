@@ -2,102 +2,146 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 12F4521B012
-	for <lists+kvm@lfdr.de>; Fri, 10 Jul 2020 09:22:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2682021AFFC
+	for <lists+kvm@lfdr.de>; Fri, 10 Jul 2020 09:21:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727785AbgGJHWt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 10 Jul 2020 03:22:49 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:20994 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1725851AbgGJHWt (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 10 Jul 2020 03:22:49 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1594365767;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=1LP15d34TouyszSVQjRJOSuUkVhVo3nqKacLbUvCJx0=;
-        b=Qx41BLG0Nm9gemivRX69161axI4mzWyjapcGeJ7Xl0JkOG34nlYOE5+tJ5feAzyvncyo2F
-        7BgclXkuWEOsZ3zAuRsKQe4EjPk27BGaCdCmSdda6253DmnzhDhPCxJi/8YlZji0e8aJRu
-        WX/zd0JqdnIIGMsyDJmGrclkK5syiOk=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-143-QL6Q1MIdOmeh2yDZl111lQ-1; Fri, 10 Jul 2020 03:22:46 -0400
-X-MC-Unique: QL6Q1MIdOmeh2yDZl111lQ-1
-Received: by mail-wm1-f70.google.com with SMTP id y204so5603576wmd.2
-        for <kvm@vger.kernel.org>; Fri, 10 Jul 2020 00:22:45 -0700 (PDT)
+        id S1727061AbgGJHVR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 10 Jul 2020 03:21:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34066 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725966AbgGJHVQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 10 Jul 2020 03:21:16 -0400
+Received: from mail-pl1-x642.google.com (mail-pl1-x642.google.com [IPv6:2607:f8b0:4864:20::642])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8DFF5C08C5CE;
+        Fri, 10 Jul 2020 00:21:16 -0700 (PDT)
+Received: by mail-pl1-x642.google.com with SMTP id q17so1883287pls.9;
+        Fri, 10 Jul 2020 00:21:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=sender:from:to:cc:subject:date:message-id;
+        bh=lKn1gJPWAF3xCGoJfzCQprGwxZKYhV13Di2vFMkiPwU=;
+        b=Cdth6s5BDzvWIcTFQtl1GiJab7NvY2MWI7cSZO0DzMZZI6Yso3NDBEdHJO1UBJN6sW
+         YWk7trE3R0c4U4T+zkGiQoubhS5G6YpoghznjD0MDyijU57SLEZCPeqDPWZojicFQdzF
+         bgXEC5Qv45JDSSY/3ofqMZlHi51pYTxJuiF2WNGX5J+stKKwQ97WS1YGlOWsQYUj/h6K
+         dHJBCq0OVztahA8gtmzXT1/aSjK7SI5qhE2hBJJXeAANwL18SsJAs+5H8xv3HsWEf+U5
+         sSW0ZEZ41iQeCGRDGCNpzXCC72fBqbm5ovuacRFDqyykH8bzxo5sLdGIiTUHEM+3JIZn
+         ZwYA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=1LP15d34TouyszSVQjRJOSuUkVhVo3nqKacLbUvCJx0=;
-        b=CgjAEZv3V6xZHmHg1q+uU6eMLAJ+U2UagRPxfGY+ns5E0MB78MpH4UvpWveC7vWRKE
-         g9sYW6Qz4Ef/0mViYKXaKr1SFp3FlkPQccVUWADz5jD/FGJlM/tCvQAXGddvbIZOgYoG
-         KVyerSnXd3SYDqTF29H87tQw8SbwYsN69F6bIAR0W+HdkYAEsr8cVGTxwSCoE2o8fMaf
-         Dw1isYdrAPaPvLDhQOnKlSrtWqiBtRYbD2++F61lk/Cz22/tnzV+u8/kyzpto+jIBLCJ
-         tkjMVOwWqSUavnB7wnIJHvtb0Eoq0ZIwKO8MvY810c3/eve/ALa0xC0b/SKj7QMKomYp
-         XDsg==
-X-Gm-Message-State: AOAM532c22U4XLZ0zSaDFK7cQhyVuU/BtekhQci/z2mEZu5kNHIZjPFX
-        sN3uNweF8AmxS6+FEySRBaB0VDRbPYpdIB9ci4JcisIlSLzekvBMHL2GutHJxynYBGfmkFOp5tV
-        gQcfOg4PBrumk
-X-Received: by 2002:a1c:5418:: with SMTP id i24mr3615697wmb.47.1594365765014;
-        Fri, 10 Jul 2020 00:22:45 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyJDfpsWJATF3x2k0/kUpiedr1e5eRuZK3mH9pswy5ELHGWFABftH17kpJ0ccpVvxQfTUOiuQ==
-X-Received: by 2002:a1c:5418:: with SMTP id i24mr3615668wmb.47.1594365764803;
-        Fri, 10 Jul 2020 00:22:44 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:9541:9439:cb0f:89c? ([2001:b07:6468:f312:9541:9439:cb0f:89c])
-        by smtp.gmail.com with ESMTPSA id g14sm9517815wrw.83.2020.07.10.00.22.43
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 10 Jul 2020 00:22:44 -0700 (PDT)
-Subject: Re: [PATCH 2/2] x86/cpu: Handle GUEST_MAXPHYADDR < HOST_MAXPHYADDR
- for hosts that don't support it
-To:     Eduardo Habkost <ehabkost@redhat.com>,
-        Jim Mattson <jmattson@google.com>
-Cc:     Gerd Hoffmann <kraxel@redhat.com>,
-        =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
-        mtosatti@redhat.com,
-        Pedro Principeza <pedro.principeza@canonical.com>,
-        kvm list <kvm@vger.kernel.org>, libvir-list@redhat.com,
-        Dann Frazier <dann.frazier@canonical.com>,
-        Guilherme Piccoli <gpiccoli@canonical.com>,
-        "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
-        Christian Ehrhardt <christian.ehrhardt@canonical.com>,
-        qemu-devel@nongnu.org, Mohammed Gamal <mgamal@redhat.com>,
-        Laszlo Ersek <lersek@redhat.com>, fw@gpiccoli.net,
-        rth@twiddle.net
-References: <20200619155344.79579-1-mgamal@redhat.com>
- <20200619155344.79579-3-mgamal@redhat.com>
- <20200708171621.GA780932@habkost.net> <20200708172653.GL3229307@redhat.com>
- <20200709094415.yvdh6hsfukqqeadp@sirius.home.kraxel.org>
- <CALMp9eQnrdu-9sZhW3aXpK4pizOW=8G=bj1wkumSgHVNfG=CbQ@mail.gmail.com>
- <20200709191307.GH780932@habkost.net>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <79aa7955-6bc1-d8b2-fed0-48a0990d9dea@redhat.com>
-Date:   Fri, 10 Jul 2020 09:22:42 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.9.0
-MIME-Version: 1.0
-In-Reply-To: <20200709191307.GH780932@habkost.net>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+        h=x-gm-message-state:sender:from:to:cc:subject:date:message-id;
+        bh=lKn1gJPWAF3xCGoJfzCQprGwxZKYhV13Di2vFMkiPwU=;
+        b=bBojgyZNkLAT41t36mk86Ja/Vv4YAQgCDR1svJUVfYMOfHGIVr6ZAdFrEJ/gpCBU7p
+         LB1kh5BqOP81wqn21icUF8KZo4kjFAhDITZbC45mHeaHM3XFWBqGg6zqu7b+M9N0Fy7F
+         UZxFZ6x0f8jTBdPNVhWmMY3k3aH32ZXoe3eNNtsC+W5WC1cQDaoK2K3t+5i3RWL2TeuW
+         V+G6b+ofHqArImrXsc+mRyy4Sr62R1gCxuKzijd03EPtMe/ma2InmxHZ+InEZH7QK/Xo
+         5PCCm15tNGwXypi9ZKYn4YxoYErLqujg+YdxN3Wl/RclaO4jmCv3ILUlRZihvqD1obqN
+         ypAA==
+X-Gm-Message-State: AOAM533UC1m/OknBBIeaCVqGlth1P5SulDqAm6RK3wSQD6XVQZ2jGSap
+        8bHaJAe+pXtxVqeAeh9SAlC2HLBc1jj1xg==
+X-Google-Smtp-Source: ABdhPJxT8JqIehWkOMptuYE0fjcRDwBcxZZEW2ZhyEExBpOeSwALsjELvi4Z7Vf+1yq9vjK9WpNAxQ==
+X-Received: by 2002:a17:902:b705:: with SMTP id d5mr47019814pls.118.1594365676112;
+        Fri, 10 Jul 2020 00:21:16 -0700 (PDT)
+Received: from software.domain.org (28.144.92.34.bc.googleusercontent.com. [34.92.144.28])
+        by smtp.gmail.com with ESMTPSA id q10sm5411635pfk.86.2020.07.10.00.21.12
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Fri, 10 Jul 2020 00:21:15 -0700 (PDT)
+From:   Huacai Chen <chenhc@lemote.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
+Cc:     kvm@vger.kernel.org, linux-mips@vger.kernel.org,
+        Fuxin Zhang <zhangfx@lemote.com>,
+        Huacai Chen <chenhuacai@gmail.com>,
+        Jiaxun Yang <jiaxun.yang@flygoat.com>,
+        Huacai Chen <chenhc@lemote.com>
+Subject: [PATCH] KVM: MIPS: Fix build errors for 32bit kernel
+Date:   Fri, 10 Jul 2020 15:23:17 +0800
+Message-Id: <1594365797-536-1-git-send-email-chenhc@lemote.com>
+X-Mailer: git-send-email 2.7.0
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 09/07/20 21:13, Eduardo Habkost wrote:
->> Doesn't this require intercepting MOV-to-CR3 when the guest is in PAE
->> mode, so that the hypervisor can validate the high bits in the PDPTEs?
-> If the fix has additional overhead, is the additional overhead
-> bad enough to warrant making it optional?  Most existing
-> GUEST_MAXPHYADDR < HOST_MAXPHYADDR guests already work today
-> without the fix.
+Commit dc6d95b153e78ed70b1b2c04a ("KVM: MIPS: Add more MMIO load/store
+instructions emulation") introduced some 64bit load/store instructions
+emulation which are unavailable on 32bit platform, and it causes build
+errors:
 
-The problematic case is when host maxphyaddr is 52.  That case wouldn't
-work at all without the fix.
+arch/mips/kvm/emulate.c: In function 'kvm_mips_emulate_store':
+arch/mips/kvm/emulate.c:1734:6: error: right shift count >= width of type [-Werror]
+      ((vcpu->arch.gprs[rt] >> 56) & 0xff);
+      ^
+arch/mips/kvm/emulate.c:1738:6: error: right shift count >= width of type [-Werror]
+      ((vcpu->arch.gprs[rt] >> 48) & 0xffff);
+      ^
+arch/mips/kvm/emulate.c:1742:6: error: right shift count >= width of type [-Werror]
+      ((vcpu->arch.gprs[rt] >> 40) & 0xffffff);
+      ^
+arch/mips/kvm/emulate.c:1746:6: error: right shift count >= width of type [-Werror]
+      ((vcpu->arch.gprs[rt] >> 32) & 0xffffffff);
+      ^
+arch/mips/kvm/emulate.c:1796:6: error: left shift count >= width of type [-Werror]
+      (vcpu->arch.gprs[rt] << 32);
+      ^
+arch/mips/kvm/emulate.c:1800:6: error: left shift count >= width of type [-Werror]
+      (vcpu->arch.gprs[rt] << 40);
+      ^
+arch/mips/kvm/emulate.c:1804:6: error: left shift count >= width of type [-Werror]
+      (vcpu->arch.gprs[rt] << 48);
+      ^
+arch/mips/kvm/emulate.c:1808:6: error: left shift count >= width of type [-Werror]
+      (vcpu->arch.gprs[rt] << 56);
+      ^
+cc1: all warnings being treated as errors
+make[3]: *** [arch/mips/kvm/emulate.o] Error 1
 
-Paolo
+So, use #if defined(CONFIG_64BIT) && defined(CONFIG_KVM_MIPS_VZ) to
+guard the 64bit load/store instructions emulation.
+
+Reported-by: kernel test robot <lkp@intel.com>
+Fixes: dc6d95b153e78ed70b1b2c04a ("KVM: MIPS: Add more MMIO load/store instructions emulation")
+Signed-off-by: Huacai Chen <chenhc@lemote.com>
+---
+ arch/mips/kvm/emulate.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/arch/mips/kvm/emulate.c b/arch/mips/kvm/emulate.c
+index 5ae82d9..d242300c 100644
+--- a/arch/mips/kvm/emulate.c
++++ b/arch/mips/kvm/emulate.c
+@@ -1722,6 +1722,7 @@ enum emulation_result kvm_mips_emulate_store(union mips_instruction inst,
+ 			  vcpu->arch.gprs[rt], *(u32 *)data);
+ 		break;
+ 
++#if defined(CONFIG_64BIT) && defined(CONFIG_KVM_MIPS_VZ)
+ 	case sdl_op:
+ 		run->mmio.phys_addr = kvm_mips_callbacks->gva_to_gpa(
+ 					vcpu->arch.host_cp0_badvaddr) & (~0x7);
+@@ -1815,6 +1816,7 @@ enum emulation_result kvm_mips_emulate_store(union mips_instruction inst,
+ 			  vcpu->arch.pc, vcpu->arch.host_cp0_badvaddr,
+ 			  vcpu->arch.gprs[rt], *(u64 *)data);
+ 		break;
++#endif
+ 
+ #ifdef CONFIG_CPU_LOONGSON64
+ 	case sdc2_op:
+@@ -2002,6 +2004,7 @@ enum emulation_result kvm_mips_emulate_load(union mips_instruction inst,
+ 		}
+ 		break;
+ 
++#if defined(CONFIG_64BIT) && defined(CONFIG_KVM_MIPS_VZ)
+ 	case ldl_op:
+ 		run->mmio.phys_addr = kvm_mips_callbacks->gva_to_gpa(
+ 					vcpu->arch.host_cp0_badvaddr) & (~0x7);
+@@ -2073,6 +2076,7 @@ enum emulation_result kvm_mips_emulate_load(union mips_instruction inst,
+ 			break;
+ 		}
+ 		break;
++#endif
+ 
+ #ifdef CONFIG_CPU_LOONGSON64
+ 	case ldc2_op:
+-- 
+2.7.0
 
