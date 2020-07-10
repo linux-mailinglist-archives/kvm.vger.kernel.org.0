@@ -2,94 +2,104 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E50E821C004
-	for <lists+kvm@lfdr.de>; Sat, 11 Jul 2020 00:40:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 42A3A21C0CD
+	for <lists+kvm@lfdr.de>; Sat, 11 Jul 2020 01:36:02 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726661AbgGJWkz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 10 Jul 2020 18:40:55 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:40591 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726588AbgGJWkz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 10 Jul 2020 18:40:55 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1594420854;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=6kXSGvxmjXAElBrTZSgjzZPkpnuWLKdwi49fRDvDKG8=;
-        b=h2rA6VDrdY57wyBpxczO7quhVBJW5Gpc1nBpxS6MaGWOHnG6RYDFgMNms2Gz8RgkEBxOmi
-        KC5MT32k0t+8r8WOtEpdCC8nCChYU1UNlkDBsqIhKBjjgId9xQPgn7xNW1LMjZQQbHx4gc
-        I0mXT+YMYoAPqULewhiAbqwHgZ0MIGY=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-286-HzFQdwmjOJ2ylqes8uht4Q-1; Fri, 10 Jul 2020 18:40:50 -0400
-X-MC-Unique: HzFQdwmjOJ2ylqes8uht4Q-1
-Received: by mail-wm1-f70.google.com with SMTP id u68so8253198wmu.3
-        for <kvm@vger.kernel.org>; Fri, 10 Jul 2020 15:40:50 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=6kXSGvxmjXAElBrTZSgjzZPkpnuWLKdwi49fRDvDKG8=;
-        b=ZHu0rf5mgHjTZtIx04X/EifkCrlPv1T1mBSOZlZ7SFPWwl451hUtDEwz/R5JMP2TFZ
-         XLf1kXyxRs/UnI/2dWKdXe6DZA2OF62lnO2kenVrRQ3jVbTdn6L0bxg3NTmhpXZMYFXj
-         LzZmX0ZrAI55QGLXh8CUZknMCqyOdZ7rJnrXaxhoh4Wvf6vYVilKkib3ve8ombSkJdH2
-         JJ2b9/jUK5Cby5abRwpsnUzG7i0g1XKXIoQN1IeBikyemaLOYq57N78aAEs5qdctyj0k
-         aMH8IV9SFBLobqppceQVrR2k1klrk5uj+jOA0QHoIOD3FuM80CugrYkhnR9r4JOQci/4
-         GLDA==
-X-Gm-Message-State: AOAM533hyf++Bv8Bl+MnMADLFuTWhWVm+aJHS8Hq7oDexPsb+VhxhuDd
-        IxyI8gPNoSi8Y4yT6mlQwUTMcyl8EhQW6sUJQh/02nReKtBjzgZAy8cA2CF7r9y3Bt2/+mQmLZs
-        qDOG3IUwGXNrC
-X-Received: by 2002:a05:600c:2295:: with SMTP id 21mr6956466wmf.29.1594420849418;
-        Fri, 10 Jul 2020 15:40:49 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzmVJZUPBUzG5MEIOnz/sc3j7x2we1u6N+BGCek/uv6VvBPC9wIf8Loz5HgKE+Wc6qz+QkOxg==
-X-Received: by 2002:a05:600c:2295:: with SMTP id 21mr6956449wmf.29.1594420849212;
-        Fri, 10 Jul 2020 15:40:49 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:ef:39d9:1ecb:6054? ([2001:b07:6468:f312:ef:39d9:1ecb:6054])
-        by smtp.gmail.com with ESMTPSA id r8sm11620509wrp.40.2020.07.10.15.40.48
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 10 Jul 2020 15:40:48 -0700 (PDT)
-Subject: Re: [PATCH 1/4] kvm: x86: add KVM_{GET,SET}_TSC_OFFSET ioctls
-To:     Jim Mattson <jmattson@google.com>
-Cc:     Oliver Upton <oupton@google.com>, kvm list <kvm@vger.kernel.org>,
-        Peter Shier <pshier@google.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Peter Hornyack <peterhornyack@google.com>
-References: <20200710200743.3992127-1-oupton@google.com>
- <61da813b-f74b-8227-d004-ccd17c72da70@redhat.com>
- <CALMp9eS1NB25OjVmAOLPEHu7eEMSJFy1FpYbXLSSKwp0iDs_QA@mail.gmail.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <35f1f26a-3d50-26b1-9c83-478da9017d59@redhat.com>
-Date:   Sat, 11 Jul 2020 00:40:46 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.9.0
-MIME-Version: 1.0
-In-Reply-To: <CALMp9eS1NB25OjVmAOLPEHu7eEMSJFy1FpYbXLSSKwp0iDs_QA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
+        id S1726523AbgGJXgA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 10 Jul 2020 19:36:00 -0400
+Received: from mail-dm6nam11on2046.outbound.protection.outlook.com ([40.107.223.46]:47457
+        "EHLO NAM11-DM6-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726328AbgGJXgA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 10 Jul 2020 19:36:00 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=d+ra4oGK0EwxrSivO32JXQiWzUNZ9zP63cepwo93Fp5M10zYT0Ks2u9VViXWc0Tv6OcfnqoaQHyAx5JSd4l5D8Fm4awVG9eca2EhBur2AbOW9qDIrTW3b2cCcwwbMIgFUazO3EzQpBNUJoUTohjlDvtnKDa6JzG92VbBISWDbriSj8AbeA3bWlnZfYzSoS2vCH5buEYRLufk/aMNYdcU4PWolh24wayfglYM8fZkjZUKFM5ZQbGHZqYpp+kpNSIUtTUwlj2ZMIFiEv4rlqRTZ4BhLkjvkWpJgJ74dVoDJ1Kp2kn2O5N+wFqcjfOOScrRjbKsPnOYxR0EHRn/XzInlA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Wu5s8bDr0pwy+NncqHRhFkJDYVVjeNJL9rZFSQdlR2I=;
+ b=JNl8Coeok2ph0z/5oxo1jz4Jp5ahrvogGFi+kfJysNn/ynyCm6dP/DoZt/fhtJF97y/POjZHNdSdP0FcAcW3Mks6zpDmhzqaND+GKvkwAhev62PZ2qZi32fnx5X4qJV4jHsLkfC+AzEsW81GIHyLqxiPHyfIX2RRsT26FQePmF26KTXTauZ5Fb5SeGvQWb4Oc7wnuncDsUTowslOeNUnPas2ak5cS41QQ+GtxkJ5XZusgru1TrpS5/rpVxOeURavFHoIe+VIhoXsx7ECerHYCc9ORTo8AvZx1FpknMVfFBU4c3dwbwO/4zzmhdpDNA7xP1VCaVWgTXL4I9W52xHmYQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=vmware.com; dmarc=pass action=none header.from=vmware.com;
+ dkim=pass header.d=vmware.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=vmware.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Wu5s8bDr0pwy+NncqHRhFkJDYVVjeNJL9rZFSQdlR2I=;
+ b=HqB47EC47qovOtF3tDdJV3pX1A2jlw9LFL1cqZztUvfV7Z9hWoNr6Axv7wAwuWHk28eEi6Ee6NQ1k88rUcZqRKkmL/nUhIB6kc5YKwzaYy2l3OZnk2sWmgkvkKWuHftR3foZhUbtm0T/jHDUqcr7MVbEZLPlKBfjdCWRc9S0odk=
+Received: from BYAPR05MB4776.namprd05.prod.outlook.com (2603:10b6:a03:4a::18)
+ by BYAPR05MB5512.namprd05.prod.outlook.com (2603:10b6:a03:1d::23) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3174.8; Fri, 10 Jul
+ 2020 23:35:57 +0000
+Received: from BYAPR05MB4776.namprd05.prod.outlook.com
+ ([fe80::d563:57:2c78:7f]) by BYAPR05MB4776.namprd05.prod.outlook.com
+ ([fe80::d563:57:2c78:7f%4]) with mapi id 15.20.3195.009; Fri, 10 Jul 2020
+ 23:35:57 +0000
+From:   Nadav Amit <namit@vmware.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+CC:     kvm <kvm@vger.kernel.org>
+Subject: Re: [kvm-unit-tests PATCH 4/4] x86: Allow to limit maximum RAM
+ address
+Thread-Topic: [kvm-unit-tests PATCH 4/4] x86: Allow to limit maximum RAM
+ address
+Thread-Index: AQHWVujuqjvx/Xdif0211QRqEBXQ6KkBd+UA
+Date:   Fri, 10 Jul 2020 23:35:57 +0000
+Message-ID: <818B848C-9D69-42C7-AC69-CDC73F9A29FD@vmware.com>
+References: <20200710183320.27266-1-namit@vmware.com>
+ <20200710183320.27266-5-namit@vmware.com>
+In-Reply-To: <20200710183320.27266-5-namit@vmware.com>
+Accept-Language: en-US
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: redhat.com; dkim=none (message not signed)
+ header.d=none;redhat.com; dmarc=none action=none header.from=vmware.com;
+x-originating-ip: [2601:647:4700:9b2:48f0:f214:d1f2:ad5b]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: d21abe32-810a-46af-665d-08d82529ff05
+x-ms-traffictypediagnostic: BYAPR05MB5512:
+x-microsoft-antispam-prvs: <BYAPR05MB5512A84F87FA5149E5EB6393D0650@BYAPR05MB5512.namprd05.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:8882;
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: r/V//YFBh+fYNMD3k/MH9H7Dhs1tn7RdCR6Q4fnTano2qpbA8dklz03CSlM/3KnENhMR5zKc/FeOSeROPB7mYXqCuw0oTE+u4hsjyTPsMyZHBa2zrOyCsxgIOcKmShRyl5k4KwOWn7+GALddxZHT3EBrDwoqVF3T9BpnPmBvPdnzBaX/9xyPBVRO11tC+z9QSOnDWkncAKPkkwmRDr7zhw7oNq31n8+e5LW0Af/DgZeplhW72aFJZdL3WW5pV2AzUs5S2WkZ7M7PZaOqTGD6T9wHVcKWM0nMeM1GW7ehTGEOfyqsSSIFqAMW25zmLtwEHxTyL4BUp/ogSBvOEhfoYA==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR05MB4776.namprd05.prod.outlook.com;PTR:;CAT:NONE;SFTY:;SFS:(4636009)(136003)(366004)(376002)(346002)(39860400002)(396003)(478600001)(76116006)(316002)(53546011)(6506007)(33656002)(66946007)(66476007)(6486002)(64756008)(83380400001)(66556008)(186003)(2616005)(66446008)(4744005)(6512007)(71200400001)(5660300002)(8676002)(86362001)(8936002)(36756003)(6916009)(2906002)(4326008);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata: Eta3lUntPn3Cw1AOEjMtYH9b9IHjVJ018tLpvFn+LDBpweUEBuwAH4rZHtyJEV6ULknIgDf5C25IKL2eit6zoWpvuDW8goo7MuqfTUwj1JoL3qRp45EIBxjsKswXQZJTSyLBiOm+mKnTE9GHs8JCsVrxvvoxrBm6DN/4d+wZG4IpsdGCvHYqXfXWXBGjj3qN72d2LexVYAighTNPscsOgQD0716PqXobUREM6bjzIN5Q2WPDTH5XNKyN7z5DzEmyYlCMbWlZ42LhyR6BngBQRB/Hf2WWmLaAWRw5LPMm3WYzSXjyAsYGyD5M6XFFnIcuAdoN2FWOCYqSQvhTGXapxjO/moJmqIad+/03dgqbIQuDqA4F3C5bseouVDEscU0LhmncYOAzboXZrL2J4HOJ5qhNlAxRxZtOj8jvXxsVw2reV1S8uVjOuXmaoCbXdTCpTQD8IK53o4cKZMHV21n+l3XN57yJgTIJ2JI7DweSXQyBKHg0gdTOCE1FrQdWFAn7zqLvfVKlxwhS17retrQx8morBLWVzJiY0TMFzYnqoPA=
+x-ms-exchange-transport-forked: True
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <088FFFD4C378FF40B28A211E81358EDC@namprd05.prod.outlook.com>
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+X-OriginatorOrg: vmware.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BYAPR05MB4776.namprd05.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: d21abe32-810a-46af-665d-08d82529ff05
+X-MS-Exchange-CrossTenant-originalarrivaltime: 10 Jul 2020 23:35:57.3157
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: b39138ca-3cee-4b4a-a4d6-cd83d9dd62f0
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: x0Uep2taUvob7+vP30UT/jbmJxmwn0OesXdl3RhbB9pUsoZQHftajbq2SqaV05ZUmoGLVzD/a7bxbWJL8VfdmQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR05MB5512
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 11/07/20 00:09, Jim Mattson wrote:
->>  But I have a fundamental question that isn't answered by either the
->> test or the documentation: how should KVM_SET_TSC_OFFSET be used _in
->> practice_ by a VMM?
->
-> One could either omit IA32_TIME_STAMP_COUNTER from KVM_SET_MSRS, or
-> one could call KVM_SET_TSC_OFFSET after KVM_SET_MSRS. We do the
-> former.
+> On Jul 10, 2020, at 11:33 AM, Nadav Amit <namit@vmware.com> wrote:
+>=20
+> While there is a feature to limit RAM memory, we should also be able to
+> limit the maximum RAM address. Specifically, svm can only work when the
+> maximum RAM address is lower than 4G, as it does not map the rest of the
+> memory into the NPT.
+>=20
+> Allow to do so using the firmware, when in fact the expected use-case is
+> to provide this infomation on bare-metal using the MEMLIMIT parameter in
+> initrd.
 
-Other questions:
+Sorry for my clumsiness/laziness in rechecking. This patch was broken. I
+will send an update soon.
 
-1) how do you handle non-synchronized TSC between source and destination?
-
-2) how is KVM_REQ_MASTERCLOCK_UPDATE triggered, since that's the main
-function of the various heuristics?
-
-Paolo
-
+Anyhow, the latest SVM tests pass as well (excluding this screw-up of mine)=
+.
