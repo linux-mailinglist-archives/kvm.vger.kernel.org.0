@@ -2,72 +2,70 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id CD5F321BC75
-	for <lists+kvm@lfdr.de>; Fri, 10 Jul 2020 19:41:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id ACAE721BC77
+	for <lists+kvm@lfdr.de>; Fri, 10 Jul 2020 19:41:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728374AbgGJRkz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 10 Jul 2020 13:40:55 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:56397 "EHLO
+        id S1728410AbgGJRlc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 10 Jul 2020 13:41:32 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:25540 "EHLO
         us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1727065AbgGJRkv (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 10 Jul 2020 13:40:51 -0400
+        by vger.kernel.org with ESMTP id S1728269AbgGJRlb (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 10 Jul 2020 13:41:31 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1594402850;
+        s=mimecast20190719; t=1594402890;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=d5YCjh7Ir73wQYt476RH2SlBQc/3pjz78qQVd8aGWVE=;
-        b=etbZJ7uuJxaqjHUKR4ULyPvbSDSBR3le64aw8W2OcrZi9ZeIGpbKs17VV0tFHYvjawLnpz
-        EMzgo88JTdYPb54nOgU735DH6gdT1ZV4Xm5MvhT24US5zTJNlxOe/OTn6T2PeS+Wq8QRuq
-        Y9MY9NqiUjHMlx8wHpBSYr8cxbq69LA=
+        bh=7T4TcT2qNwd8q//O8oeeKh44NiN7UalnMtay1RITTRY=;
+        b=gqZnUZmjM2Fe/lT5G3swUzgeTIQsfDOiRI/HRNfwlY6opG0Q9ftbQvZunTZmajzvnGr/VD
+        gHSqnY+2AYA2+CbONUypNhqEIHuCr3qS9yUjZuekwwI7rDtO78f4znfTKOpD9KPLK7iMxc
+        BVbocoi4KfhfHuqFwvqU7FHlAdEUBTU=
 Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
  [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-136-CmvS6husP1um65jLpRyb9g-1; Fri, 10 Jul 2020 13:40:48 -0400
-X-MC-Unique: CmvS6husP1um65jLpRyb9g-1
-Received: by mail-wr1-f72.google.com with SMTP id e11so6743830wrs.2
-        for <kvm@vger.kernel.org>; Fri, 10 Jul 2020 10:40:47 -0700 (PDT)
+ us-mta-310-5unx3Ol-Ne2ltdexCHnN7w-1; Fri, 10 Jul 2020 13:41:28 -0400
+X-MC-Unique: 5unx3Ol-Ne2ltdexCHnN7w-1
+Received: by mail-wr1-f72.google.com with SMTP id v3so6720832wrq.10
+        for <kvm@vger.kernel.org>; Fri, 10 Jul 2020 10:41:28 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=d5YCjh7Ir73wQYt476RH2SlBQc/3pjz78qQVd8aGWVE=;
-        b=lehDLl30Rg+3U69WV5iPv5SQ9C4pdyHPjtVJWyd3o9cAWm7uPxY+FqU4bVAySsdJiW
-         pfmXfXGzVxMV7XRwigN8g4vq2/SvIXtStjJt2FN+e1DD/DZJIGfgorkOYGjXPIVQqQTF
-         DmLafLK0NuncRzCBHKUjdZbhu+pdegysSEf33biK89ro9SV/7/ntvNu646mz9O2CIEyh
-         8Hxv8/Lav1vmJJIMiScEWRbO/y7+RXxQZROp0PjjwnYlXq1cKfXOPwQ2YUJrQtRPIbGK
-         9UJH64FwIUwcppDpC5hBJ0Pl5zTztUQuM3A1Cx4FER449GKDUMarSJERkziV2a51W3JD
-         inwA==
-X-Gm-Message-State: AOAM533HyVtfq8yuF/t4Fk8iyo5d48s7MO6Eo5+bk8IBovMcU4Vu63ob
-        k6mwILsZsKuzj0xRix1hGTEruDw0okQIjcVafpL2vckr32g2MQkEJM2AwC/6kYcnYSky28+GbIQ
-        lsJ00001ndLFT
-X-Received: by 2002:adf:ec88:: with SMTP id z8mr68672311wrn.395.1594402846969;
-        Fri, 10 Jul 2020 10:40:46 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwAyJuA0aVT6OCO/QR9ECKytqX2ohs3nnhcAp0+m2w0tDW3u6NMegvOnDIlWBMqLatUMq+seQ==
-X-Received: by 2002:adf:ec88:: with SMTP id z8mr68672292wrn.395.1594402846714;
-        Fri, 10 Jul 2020 10:40:46 -0700 (PDT)
+        bh=7T4TcT2qNwd8q//O8oeeKh44NiN7UalnMtay1RITTRY=;
+        b=FuzNaYqYcnMPtVrBQ4UQWPday1DyFm95X+AzWsqDPxQgB9/9yUTanZHPRvd65DBiPo
+         aUlp2GvNUVQHYpOQLVdKMlhROjCmy6TRP/LktJNHIgX3XNqqFmovx3GdHjHmV2hSlKnt
+         cgSoVwb78IaYlUqVmHyU9UDZBrYrfz2CuPWMBeIJG7+0UK18j2OzpFvlkPcHahzpC2L6
+         TLF6T1fbWH5uFgWpGf+Nff1XrKhTXpgl5oQ67wD4nhZDlCEQwVczy6t6RBZMAUNxYfIu
+         p/MRmWdulN47h3d2d7tnHE6EHDl+fK7SQocy9gDuT/Pft3ufWImFpN9Z3BuaeNNFxKvA
+         fyFw==
+X-Gm-Message-State: AOAM530csi3RYYuA54O3COOirfyyTocniXPYD86PC7H8sn5DDh6SNGe3
+        nFy+zAsT1NJ3HOBKK54/QFCA/yTTWm5cKe3XXVmm2/xjaXHXhcKrxyb5Gp7NKdq+O2GyMEQ7TTv
+        jztbArBvYGSnm
+X-Received: by 2002:adf:ded2:: with SMTP id i18mr69328394wrn.109.1594402887029;
+        Fri, 10 Jul 2020 10:41:27 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzwrtPwmb9f55CL4HZe2X7qWuIbLQhQOjCKYpZfEsOm39uG7VPPyBFZshHpOp8qjLfKKI0zQQ==
+X-Received: by 2002:adf:ded2:: with SMTP id i18mr69328381wrn.109.1594402886824;
+        Fri, 10 Jul 2020 10:41:26 -0700 (PDT)
 Received: from ?IPv6:2001:b07:6468:f312:9541:9439:cb0f:89c? ([2001:b07:6468:f312:9541:9439:cb0f:89c])
-        by smtp.gmail.com with ESMTPSA id d13sm10875974wrn.61.2020.07.10.10.40.45
+        by smtp.gmail.com with ESMTPSA id j14sm11250889wrs.75.2020.07.10.10.41.25
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 10 Jul 2020 10:40:46 -0700 (PDT)
-Subject: Re: [PATCH v3 9/9] KVM: x86: SVM: VMX: Make GUEST_MAXPHYADDR <
- HOST_MAXPHYADDR support configurable
+        Fri, 10 Jul 2020 10:41:26 -0700 (PDT)
+Subject: Re: [PATCH v3 3/9] KVM: x86: mmu: Add guest physical address check in
+ translate_gpa()
 To:     Mohammed Gamal <mgamal@redhat.com>, kvm@vger.kernel.org
 Cc:     linux-kernel@vger.kernel.org, vkuznets@redhat.com,
         sean.j.christopherson@intel.com, wanpengli@tencent.com,
-        jmattson@google.com, joro@8bytes.org,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Babu Moger <babu.moger@amd.com>
+        jmattson@google.com, joro@8bytes.org
 References: <20200710154811.418214-1-mgamal@redhat.com>
- <20200710154811.418214-10-mgamal@redhat.com>
+ <20200710154811.418214-4-mgamal@redhat.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <c01fb991-8352-53be-3aab-8de808ead5ea@redhat.com>
-Date:   Fri, 10 Jul 2020 19:40:45 +0200
+Message-ID: <2cb33bf8-f4f9-6a5b-ca72-d2dbcafc436d@redhat.com>
+Date:   Fri, 10 Jul 2020 19:41:25 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.9.0
 MIME-Version: 1.0
-In-Reply-To: <20200710154811.418214-10-mgamal@redhat.com>
+In-Reply-To: <20200710154811.418214-4-mgamal@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -77,75 +75,44 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On 10/07/20 17:48, Mohammed Gamal wrote:
-> The reason behind including this patch is unexpected behaviour we see
-> with NPT vmexit handling in AMD processor.
+> In case of running a guest with 4-level page tables on a 5-level page
+> table host, it might happen that a guest might have a physical address
+> with reserved bits set, but the host won't see that and trap it.
 > 
-> With previous patch ("KVM: SVM: Add guest physical address check in
-> NPF/PF interception") we see the followning error multiple times in
-> the 'access' test in kvm-unit-tests:
+> Hence, we need to check page faults' physical addresses against the guest's
+> maximum physical memory and if it's exceeded, we need to add
+> the PFERR_RSVD_MASK bits to the PF's error code.
 > 
->             test pte.p pte.36 pde.p: FAIL: pte 2000021 expected 2000001
->             Dump mapping: address: 0x123400000000
->             ------L4: 24c3027
->             ------L3: 24c4027
->             ------L2: 24c5021
->             ------L1: 1002000021
+> Also make sure the error code isn't overwritten by the page table walker.
 > 
-> This shows that the PTE's accessed bit is apparently being set by
-> the CPU hardware before the NPF vmexit. This completely handled by
-> hardware and can not be fixed in software.
-> 
-> This patch introduces a workaround. We add a boolean variable:
-> 'allow_smaller_maxphyaddr'
-> Which is set individually by VMX and SVM init routines. On VMX it's
-> always set to true, on SVM it's only set to true when NPT is not
-> enabled.
-> 
-> We also add a new capability KVM_CAP_SMALLER_MAXPHYADDR which
-> allows userspace to query if the underlying architecture would
-> support GUEST_MAXPHYADDR < HOST_MAXPHYADDR and hence act accordingly
-> (e.g. qemu can decide if it would ignore the -cpu ..,phys-bits=X)
-> 
-> CC: Tom Lendacky <thomas.lendacky@amd.com>
-> CC: Babu Moger <babu.moger@amd.com>
-> Signed-off-by: Mohammed Gamal <mgamal@redhat.com>
 
-Slightly rewritten commit message:
+New commit message:
 
-    KVM: x86: Add a capability for GUEST_MAXPHYADDR < HOST_MAXPHYADDR support
+
+    KVM: x86: mmu: Add guest physical address check in translate_gpa()
     
-    This patch adds a new capability KVM_CAP_SMALLER_MAXPHYADDR which
-    allows userspace to query if the underlying architecture would
-    support GUEST_MAXPHYADDR < HOST_MAXPHYADDR and hence act accordingly
-    (e.g. qemu can decide if it should warn for -cpu ..,phys-bits=X)
+    Intel processors of various generations have supported 36, 39, 46 or 52
+    bits for physical addresses.  Until IceLake introduced MAXPHYADDR==52,
+    running on a machine with higher MAXPHYADDR than the guest more or less
+    worked, because software that relied on reserved address bits (like KVM)
+    generally used bit 51 as a marker and therefore the page faults where
+    generated anyway.
     
-    The complications in this patch are due to unexpected (but documented)
-    behaviour we see with NPF vmexit handling in AMD processor.  If
-    SVM is modified to add guest physical address checks in the NPF
-    and guest #PF paths, we see the followning error multiple times in
-    the 'access' test in kvm-unit-tests:
+    Unfortunately this is not true anymore if the host MAXPHYADDR is 52,
+    and this can cause problems when migrating from a MAXPHYADDR<52
+    machine to one with MAXPHYADDR==52.  Typically, the latter are machines
+    that support 5-level page tables, so they can be identified easily from
+    the LA57 CPUID bit.
     
-                test pte.p pte.36 pde.p: FAIL: pte 2000021 expected 2000001
-                Dump mapping: address: 0x123400000000
-                ------L4: 24c3027
-                ------L3: 24c4027
-                ------L2: 24c5021
-                ------L1: 1002000021
+    When that happens, the guest might have a physical address with reserved
+    bits set, but the host won't see that and trap it.  Hence, we need
+    to check page faults' physical addresses against the guest's maximum
+    physical memory and if it's exceeded, we need to add the PFERR_RSVD_MASK
+    bits to the page fault error code.
     
-    This is because the PTE's accessed bit is set by the CPU hardware before
-    the NPF vmexit. This is handled completely by hardware and cannot be fixed
-    in software.
-    
-    Therefore, availability of the new capability depends on a boolean variable
-    allow_smaller_maxphyaddr which is set individually by VMX and SVM init
-    routines. On VMX it's always set to true, on SVM it's only set to true
-    when NPT is not enabled.
-    
-    CC: Tom Lendacky <thomas.lendacky@amd.com>
-    CC: Babu Moger <babu.moger@amd.com>
-    Signed-off-by: Mohammed Gamal <mgamal@redhat.com>
-    Message-Id: <20200710154811.418214-10-mgamal@redhat.com>
-    Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+    This patch does this for the MMU's page walks.  The next patches will
+    ensure that the correct exception and error code is produced whenever
+    no host-reserved bits are set in page table entries.
 
 Paolo
 
