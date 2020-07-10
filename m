@@ -2,85 +2,131 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3E5AE21B7F8
-	for <lists+kvm@lfdr.de>; Fri, 10 Jul 2020 16:12:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 46E7A21B8A7
+	for <lists+kvm@lfdr.de>; Fri, 10 Jul 2020 16:29:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728329AbgGJOMi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 10 Jul 2020 10:12:38 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:40652 "EHLO
+        id S1727840AbgGJO3m (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 10 Jul 2020 10:29:42 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:47097 "EHLO
         us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1728284AbgGJOMa (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 10 Jul 2020 10:12:30 -0400
+        with ESMTP id S1726925AbgGJO3m (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 10 Jul 2020 10:29:42 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1594390349;
+        s=mimecast20190719; t=1594391380;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=VOceSolOcCnL8nnokzwJbOsFELxGoSPw4yCTbFrccdo=;
-        b=OgkSC8/bZB5e3rUGG0hmHQmeqq5nLGMzCV5tCZY131cdB9QwxLT/fDkMM3J5ZebH7Ssglo
-        cF1foNbJV+S35QrVz98T0gIroglYvGC9J+O4NWDQD7PnE3lCedTN2jzzs6U5wuZbTKuqcU
-        9Re7skjfXY1nli2eogLm7DCwbhSqVJU=
+        bh=tX5iNdDkKREb5eC682c495Xdf8tAVwyuaAtEmkGgwUw=;
+        b=EszR1O9JMy37hRTqyQo3OCv/xZMejiW3URc/bzHTwHuZZiiK9iyiWf/g5W5IE1Ryyi5MPw
+        ariaPVFF0uQMtx15FQ+NXZ8Ql0+x/eZxI3zEYqQAvbB72MdNtkQJbURxetkUp51gWPUSVr
+        Gg4NmuvfSQjCEFM+LGb0CLTkVDphwyg=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-404-Ur86T0lJPLSe1nDsqltjyA-1; Fri, 10 Jul 2020 10:12:27 -0400
-X-MC-Unique: Ur86T0lJPLSe1nDsqltjyA-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+ us-mta-210-R9jDj9pwMjaAZtxLZtrCeA-1; Fri, 10 Jul 2020 10:29:38 -0400
+X-MC-Unique: R9jDj9pwMjaAZtxLZtrCeA-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 569CB1083;
-        Fri, 10 Jul 2020 14:12:26 +0000 (UTC)
-Received: from vitty.brq.redhat.com (unknown [10.40.195.35])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 2992374F52;
-        Fri, 10 Jul 2020 14:12:23 +0000 (UTC)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Junaid Shahid <junaids@google.com>,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH v4 9/9] KVM: x86: drop superfluous mmu_check_root() from fast_pgd_switch()
-Date:   Fri, 10 Jul 2020 16:11:57 +0200
-Message-Id: <20200710141157.1640173-10-vkuznets@redhat.com>
-In-Reply-To: <20200710141157.1640173-1-vkuznets@redhat.com>
-References: <20200710141157.1640173-1-vkuznets@redhat.com>
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 501501082;
+        Fri, 10 Jul 2020 14:29:37 +0000 (UTC)
+Received: from x1.home (ovpn-112-71.phx2.redhat.com [10.3.112.71])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 611CF10016DA;
+        Fri, 10 Jul 2020 14:29:33 +0000 (UTC)
+Date:   Fri, 10 Jul 2020 08:29:32 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Bjorn Helgaas <helgaas@kernel.org>
+Cc:     Huacai Chen <chenhc@lemote.com>,
+        Bjorn Helgaas <bhelgaas@google.com>, linux-pci@vger.kernel.org,
+        Dave Airlie <airlied@redhat.com>,
+        Gerd Hoffmann <kraxel@redhat.com>,
+        Jiri Pirko <jiri@resnulli.us>,
+        Huacai Chen <chenhuacai@gmail.com>,
+        Jiaxun Yang <jiaxun.yang@flygoat.com>,
+        Kirti Wankhede <kwankhede@nvidia.com>, kvm@vger.kernel.org
+Subject: Re: [PATCH] PCI: Move PCI_VENDOR_ID_REDHAT definition to pci_ids.h
+Message-ID: <20200710082932.65984c88@x1.home>
+In-Reply-To: <20200709220324.GA21641@bjorn-Precision-5520>
+References: <1594195170-11119-1-git-send-email-chenhc@lemote.com>
+        <20200709220324.GA21641@bjorn-Precision-5520>
+Organization: Red Hat
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The mmu_check_root() check in fast_pgd_switch() seems to be
-superfluous: when GPA is outside of the visible range
-cached_root_available() will fail for non-direct roots
-(as we can't have a matching one on the list) and we don't
-seem to care for direct ones.
+On Thu, 9 Jul 2020 17:03:24 -0500
+Bjorn Helgaas <helgaas@kernel.org> wrote:
 
-Also, raising #TF immediately when a non-existent GFN is written to CR3
-doesn't seem to mach architectural behavior. Drop the check.
+> [+cc Kirti, Alex, kvm]
+> 
+> On Wed, Jul 08, 2020 at 03:59:30PM +0800, Huacai Chen wrote:
+> > Instead of duplicating the PCI_VENDOR_ID_REDHAT definition everywhere,
+> > move it to include/linux/pci_ids.h is better.
+> > 
+> > Signed-off-by: Huacai Chen <chenhc@lemote.com>  
+> 
+> Applied with Gerd's ack to pci/misc for v5.9, thanks!
+> 
+> I also updated this in samples/vfio-mdev/mdpy-defs.h:
+> 
+>   -#define MDPY_PCI_VENDOR_ID     0x1b36 /* redhat */
+>   +#define MDPY_PCI_VENDOR_ID     PCI_VENDOR_ID_REDHAT
 
-Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
----
- arch/x86/kvm/mmu/mmu.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+Thanks, Bjorn!
 
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 13ec3c30eda2..50a923696bf1 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -4277,8 +4277,7 @@ static bool fast_pgd_switch(struct kvm_vcpu *vcpu, gpa_t new_pgd,
- 	 */
- 	if (mmu->shadow_root_level >= PT64_ROOT_4LEVEL &&
- 	    mmu->root_level >= PT64_ROOT_4LEVEL)
--		return !mmu_check_root(vcpu, new_pgd >> PAGE_SHIFT) &&
--		       cached_root_available(vcpu, new_pgd, new_role);
-+		return cached_root_available(vcpu, new_pgd, new_role);
- 
- 	return false;
- }
--- 
-2.25.4
+Alex
+
+> > ---
+> >  drivers/gpu/drm/qxl/qxl_dev.h           | 2 --
+> >  drivers/net/ethernet/rocker/rocker_hw.h | 1 -
+> >  include/linux/pci_ids.h                 | 2 ++
+> >  3 files changed, 2 insertions(+), 3 deletions(-)
+> > 
+> > diff --git a/drivers/gpu/drm/qxl/qxl_dev.h b/drivers/gpu/drm/qxl/qxl_dev.h
+> > index a0ee416..a7bc31f 100644
+> > --- a/drivers/gpu/drm/qxl/qxl_dev.h
+> > +++ b/drivers/gpu/drm/qxl/qxl_dev.h
+> > @@ -131,8 +131,6 @@ enum SpiceCursorType {
+> >  
+> >  #pragma pack(push, 1)
+> >  
+> > -#define REDHAT_PCI_VENDOR_ID 0x1b36
+> > -
+> >  /* 0x100-0x11f reserved for spice, 0x1ff used for unstable work */
+> >  #define QXL_DEVICE_ID_STABLE 0x0100
+> >  
+> > diff --git a/drivers/net/ethernet/rocker/rocker_hw.h b/drivers/net/ethernet/rocker/rocker_hw.h
+> > index 59f1f8b..62fd84c 100644
+> > --- a/drivers/net/ethernet/rocker/rocker_hw.h
+> > +++ b/drivers/net/ethernet/rocker/rocker_hw.h
+> > @@ -25,7 +25,6 @@ enum {
+> >  
+> >  #define ROCKER_FP_PORTS_MAX 62
+> >  
+> > -#define PCI_VENDOR_ID_REDHAT		0x1b36
+> >  #define PCI_DEVICE_ID_REDHAT_ROCKER	0x0006
+> >  
+> >  #define ROCKER_PCI_BAR0_SIZE		0x2000
+> > diff --git a/include/linux/pci_ids.h b/include/linux/pci_ids.h
+> > index 0ad5769..5c709a1 100644
+> > --- a/include/linux/pci_ids.h
+> > +++ b/include/linux/pci_ids.h
+> > @@ -2585,6 +2585,8 @@
+> >  
+> >  #define PCI_VENDOR_ID_ASMEDIA		0x1b21
+> >  
+> > +#define PCI_VENDOR_ID_REDHAT		0x1b36
+> > +
+> >  #define PCI_VENDOR_ID_AMAZON_ANNAPURNA_LABS	0x1c36
+> >  
+> >  #define PCI_VENDOR_ID_CIRCUITCO		0x1cc8
+> > -- 
+> > 2.7.0
+> >   
+> 
 
