@@ -2,98 +2,105 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 20F2221AF0F
-	for <lists+kvm@lfdr.de>; Fri, 10 Jul 2020 07:58:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3A1AC21AF97
+	for <lists+kvm@lfdr.de>; Fri, 10 Jul 2020 08:40:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726912AbgGJF6b (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 10 Jul 2020 01:58:31 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:21837 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726328AbgGJF63 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 10 Jul 2020 01:58:29 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1594360708;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=C4LnrvqT9+DNx24YkEZw2+SXe1o6FKiLlzwpTypzG8A=;
-        b=Y+XxOvBjEbl9F7XdtOTWEY97JVlA/4JP9m1OmOM/D/jNmDESGG8eUGLrkYTpi8iDjHO65f
-        DcJzt/9EtJvnxVr49HXpyCfTyPviqACGraWwl9LAp+nvbzYOwfs3ZJ/2BEaJ1Ey//5I0mk
-        Ry4yH4AO8/XNtQnB4TbTvmqSHnhav1M=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-466-b5FYKlSdOc-CmMJbE3eodQ-1; Fri, 10 Jul 2020 01:58:26 -0400
-X-MC-Unique: b5FYKlSdOc-CmMJbE3eodQ-1
-Received: by mail-wm1-f72.google.com with SMTP id g124so5273471wmg.6
-        for <kvm@vger.kernel.org>; Thu, 09 Jul 2020 22:58:26 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=C4LnrvqT9+DNx24YkEZw2+SXe1o6FKiLlzwpTypzG8A=;
-        b=aySgtHVg7vCScZc1BNKVyTi1Otg3CQRgKa/Oku8f1TXohxxS3IbxUH7X1aFABmVFZQ
-         Rf0W59xyybhhbMiWokKzdCD2aemvdKpeFkPxVPxMnoD/nWw7oC6RC1hWFZOdkSz0r+cl
-         Ld9czIhqg2gHrJGdoK5p26Wt5MLzzyCain/IX5Y0mU/3FBxfeU3x3MvSmBoi/dcoTa3H
-         /JeB4VHBbVVNTeP2qxm4QZP77thxtNaF7ek7ipXcjB5k0enjQNkWCUwNd5coUVDTcg/K
-         8IsfDTCkMYiiTSjcfu9aduw3UBSxcgPSHi7DB81+oXChLL/Pj03lvO5B5rQPKoTfki+u
-         gVYQ==
-X-Gm-Message-State: AOAM530HmJTrvlKn6gWOOcUEwKrNfPdsadznCG0cnLONwqSbtdPBeU7L
-        TL1eUGzi/KvOe0gtjdmp1Q1a028gXAyBk74j5BTzFP48u50wg0pYMGuFGohwhqNtP48GUbv51aT
-        pruMxtjsCdGJr
-X-Received: by 2002:a7b:c38f:: with SMTP id s15mr3394774wmj.152.1594360705633;
-        Thu, 09 Jul 2020 22:58:25 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwLn6mDVLNvrd8u4soiaqjHIlkFvr4sTxn75hYjrWzq/00SA7DFxiythkthHZ5njp79o9gOug==
-X-Received: by 2002:a7b:c38f:: with SMTP id s15mr3394766wmj.152.1594360705488;
-        Thu, 09 Jul 2020 22:58:25 -0700 (PDT)
-Received: from redhat.com (bzq-79-182-31-92.red.bezeqint.net. [79.182.31.92])
-        by smtp.gmail.com with ESMTPSA id j15sm8366155wrx.69.2020.07.09.22.58.23
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 09 Jul 2020 22:58:24 -0700 (PDT)
-Date:   Fri, 10 Jul 2020 01:58:21 -0400
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Eugenio Perez Martin <eperezma@redhat.com>
-Cc:     Jason Wang <jasowang@redhat.com>,
-        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        linux-kernel@vger.kernel.org, kvm list <kvm@vger.kernel.org>,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org
-Subject: Re: [PATCH RFC v8 02/11] vhost: use batched get_vq_desc version
-Message-ID: <20200710015615-mutt-send-email-mst@kernel.org>
-References: <20200622122546-mutt-send-email-mst@kernel.org>
- <CAJaqyWfbouY4kEXkc6sYsbdCAEk0UNsS5xjqEdHTD7bcTn40Ow@mail.gmail.com>
- <CAJaqyWefMHPguj8ZGCuccTn0uyKxF9ZTEi2ASLtDSjGNb1Vwsg@mail.gmail.com>
- <419cc689-adae-7ba4-fe22-577b3986688c@redhat.com>
- <CAJaqyWedEg9TBkH1MxGP1AecYHD-e-=ugJ6XUN+CWb=rQGf49g@mail.gmail.com>
- <0a83aa03-8e3c-1271-82f5-4c07931edea3@redhat.com>
- <CAJaqyWeqF-KjFnXDWXJ2M3Hw3eQeCEE2-7p1KMLmMetMTm22DQ@mail.gmail.com>
- <20200709133438-mutt-send-email-mst@kernel.org>
- <7dec8cc2-152c-83f4-aa45-8ef9c6aca56d@redhat.com>
- <CAJaqyWdLOH2EceTUduKYXCQUUNo1XQ1tLgjYHTBGhtdhBPHn_Q@mail.gmail.com>
+        id S1726773AbgGJGkx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 10 Jul 2020 02:40:53 -0400
+Received: from mga09.intel.com ([134.134.136.24]:36220 "EHLO mga09.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725851AbgGJGkx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 10 Jul 2020 02:40:53 -0400
+IronPort-SDR: g3DW2NzzFKvpx66l6PXZ58k5PKiBEa/IySb2B+DIj3dlc3tfNAi5eNM7Lu6keMaB/5ejc0IW4q
+ xhPO0V9yTe+w==
+X-IronPort-AV: E=McAfee;i="6000,8403,9677"; a="149628733"
+X-IronPort-AV: E=Sophos;i="5.75,334,1589266800"; 
+   d="scan'208";a="149628733"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Jul 2020 23:40:53 -0700
+IronPort-SDR: oi2KdGfv4Crpz5dB94Wt/eZfH5hW2ZtpBwtzTldxB+RkwIJFr0zGQAGcsEKiWFmV7/3ELGMnwS
+ K93uP0OmC9dA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.75,334,1589266800"; 
+   d="scan'208";a="428478262"
+Received: from joy-optiplex-7040.sh.intel.com (HELO joy-OptiPlex-7040) ([10.239.13.16])
+  by orsmga004.jf.intel.com with ESMTP; 09 Jul 2020 23:40:50 -0700
+Date:   Fri, 10 Jul 2020 14:29:59 +0800
+From:   Yan Zhao <yan.y.zhao@intel.com>
+To:     "Tian, Kevin" <kevin.tian@intel.com>
+Cc:     Alex Williamson <alex.williamson@redhat.com>,
+        "intel-gvt-dev@lists.freedesktop.org" 
+        <intel-gvt-dev@lists.freedesktop.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        Zhenyu Wang <zhenyuw@linux.intel.com>
+Subject: Re: [PATCH v3 0/2] VFIO mdev aggregated resources handling
+Message-ID: <20200710062958.GB29271@joy-OptiPlex-7040>
+Reply-To: Yan Zhao <yan.y.zhao@intel.com>
+References: <20200326054136.2543-1-zhenyuw@linux.intel.com>
+ <20200408055824.2378-1-zhenyuw@linux.intel.com>
+ <MWHPR11MB1645CC388BF45FD2E6309C3C8C660@MWHPR11MB1645.namprd11.prod.outlook.com>
+ <20200707190634.4d9055fe@x1.home>
+ <MWHPR11MB16454BF5C1BF4D5D22F0B2B38C670@MWHPR11MB1645.namprd11.prod.outlook.com>
+ <20200708124806.058e33d9@x1.home>
+ <MWHPR11MB1645C5033CB813EBD72CE4FD8C640@MWHPR11MB1645.namprd11.prod.outlook.com>
+ <20200709112810.6085b7f6@x1.home>
+ <MWHPR11MB1645D3E53C055461AB5E8E3C8C650@MWHPR11MB1645.namprd11.prod.outlook.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAJaqyWdLOH2EceTUduKYXCQUUNo1XQ1tLgjYHTBGhtdhBPHn_Q@mail.gmail.com>
+In-Reply-To: <MWHPR11MB1645D3E53C055461AB5E8E3C8C650@MWHPR11MB1645.namprd11.prod.outlook.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jul 10, 2020 at 07:39:26AM +0200, Eugenio Perez Martin wrote:
-> > > How about playing with the batch size? Make it a mod parameter instead
-> > > of the hard coded 64, and measure for all values 1 to 64 ...
-> >
-> >
-> > Right, according to the test result, 64 seems to be too aggressive in
-> > the case of TX.
-> >
+On Fri, Jul 10, 2020 at 02:09:06AM +0000, Tian, Kevin wrote:
+<...>
+> > > > We also can't even seem to agree that type is a necessary requirement
+> > > > for compatibility.  Your discussion below of a type-A, which is
+> > > > equivalent to a type-B w/ aggregation set to some value is an example
+> > > > of this.  We might also have physical devices with extensions to
+> > > > support migration.  These could possibly be compatible with full mdev
+> > > > devices.  We have no idea how an administrative tool would discover
+> > > > this other than an exhaustive search across every possible target.
+> > > > That's ugly but feasible when considering a single target host, but
+> > > > completely untenable when considering a datacenter.
+> > >
+> > > If exhaustive search can be done just one-off to build the compatibility
+> > > database for all assignable devices on each node, then it might be
+> > > still tenable in datacenter?
+> > 
+> > 
+> > I'm not sure what "one-off" means relative to this discussion.  Is this
+> > trying to argue that if it's a disturbingly heavyweight operation, but
+> > a management tool only needs to do it once, it's ok?  We should really
 > 
-> Got it, thanks both!
+> yes
+> 
+> > be including openstack and ovirt folks in any discussion about what
+> > might be acceptable across a datacenter.  I can sometimes get away with
+> > representing what might be feasible for libvirt, but this is the sort
+> > of knowledge and policy decision that would occur above libvirt.
+> 
+> Agree. and since this is more about general migration compatibility,
+> let's start new thread and involve openstack/ovirt guys. Yan, can you
+> initiate this?
+>
+sure.
+hi Alex,
+I'm not sure if below mailling lists are enough and accurate,
+do you know what extra people and lists I need to involve in?
 
-In particular I wonder whether with batch size 1
-we get same performance as without batching
-(would indicate 64 is too aggressive)
-or not (would indicate one of the code changes
-affects performance in an unexpected way).
+devel@ovirt.org, openstack-discuss@lists.openstack.org,
+libvir-list@redhat.com
 
--- 
-MST
+
+BTW, I found a page about live migration of SRIOV devices in openstack.
+https://specs.openstack.org/openstack/nova-specs/specs/stein/approved/libvirt-neutron-sriov-livemigration.html
+
+Thanks
+Yan
 
