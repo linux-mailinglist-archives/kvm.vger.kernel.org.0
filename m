@@ -2,123 +2,97 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 70DF921B23B
-	for <lists+kvm@lfdr.de>; Fri, 10 Jul 2020 11:29:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7973421B36C
+	for <lists+kvm@lfdr.de>; Fri, 10 Jul 2020 12:49:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728047AbgGJJ1s (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 10 Jul 2020 05:27:48 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:27130 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1728034AbgGJJ1r (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 10 Jul 2020 05:27:47 -0400
+        id S1727955AbgGJKs7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 10 Jul 2020 06:48:59 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:43632 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1727943AbgGJKs6 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 10 Jul 2020 06:48:58 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1594373265;
+        s=mimecast20190719; t=1594378136;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=/KCNOjvhcmN9tHZIJ5geCf/PPeLc9q3ydsQmHFPRwbs=;
-        b=C1vmIKp+0eE9a2C9h8KMEcTC7bgZ8gfm63FFTKCVRQ+vpOYuWX8UbBFL8qPiqGfADtbFyF
-        lO76561LIOVgEhoPx7z1n/pZTOyZjEKUSEFV48+NF+7Ve8rRze8vYQVRFaPtQ1M0Tokbs6
-        LmFX975EtoFjqSS5nVLPDM+6YydvUKE=
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type;
+        bh=zH+SoJc9FA+IxVxr5cux+vmHnM4kK2aczPlNcB2fA0g=;
+        b=GVnyIem8Rc/LebOyLDXJmWiZQrlDorG1nSYF4iG1Ku+EsaODON8fC6GBM3gFkqcHoJ5cA5
+        ETuRqtgRyowzQRY0GCdbKcQ2hQPG8mtq40BIPBAtQzic0hY0mahw/gymxYmEQ6UtXHtO1F
+        ppjEDPnO22gFpSxTnmSRCH6/LJxNcPY=
 Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
  [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-159-QtPxEEtSOIuRj_y-xzjXDQ-1; Fri, 10 Jul 2020 05:27:44 -0400
-X-MC-Unique: QtPxEEtSOIuRj_y-xzjXDQ-1
-Received: by mail-wm1-f70.google.com with SMTP id 65so5982709wmd.8
-        for <kvm@vger.kernel.org>; Fri, 10 Jul 2020 02:27:43 -0700 (PDT)
+ us-mta-47-_G5YgMRyNxKkAiSjn0HnUw-1; Fri, 10 Jul 2020 06:48:55 -0400
+X-MC-Unique: _G5YgMRyNxKkAiSjn0HnUw-1
+Received: by mail-wm1-f70.google.com with SMTP id g138so6251258wme.7
+        for <kvm@vger.kernel.org>; Fri, 10 Jul 2020 03:48:54 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=/KCNOjvhcmN9tHZIJ5geCf/PPeLc9q3ydsQmHFPRwbs=;
-        b=CrS/nk4gk6FBlpt6YpbFN1W4RrReKKFTdvsBb4m2OYqKlNhYLMSfQy5fGh5bEF+3Iu
-         QpqouhiEIVxC4El0W0hYlgYaIKU2JTP3JkknRJ1tKQLk3t48ilADgXgGwp6EhRTdLoUF
-         5vJkWKR9ruTRt9iww9XeFlfJsVgFKrT6mOTmPRaMz521iwfP8SmnJBw7mKV9TRgsqv7x
-         EscRnQhcMWnvLYDrO71zh2Ndqtx6iSCvgPNNUftLX5U+56RrGFxj7KpgJvyy60RSyQbx
-         mWsCiv57QAZ52pCSFvPcPL0AjgKul5XoEbqOBjZytrnN9POA/7X/fc7wzk5GZH9wTQms
-         g3Tw==
-X-Gm-Message-State: AOAM533AW+vy/qMJk76Kc+4c46/bGUxM6nxuL3AtqCAcUHC8ZNCDnKCg
-        l/Fro3RCiDqeiTj3+Eh+rUxcq7Jfo5velGiTM1cuByyhy1gpiT8XX+KfYV3y4Js0WH8N34ERjdR
-        LQIx0064Jj78z
-X-Received: by 2002:a1c:4804:: with SMTP id v4mr4247193wma.139.1594373262594;
-        Fri, 10 Jul 2020 02:27:42 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyPF0u9Z6v9ZPKyb3nZ/etss6BBCtK5QCsw/TY8+VEZaQcKuN1hFqj++yJ+ryUN2sEckplufg==
-X-Received: by 2002:a1c:4804:: with SMTP id v4mr4247185wma.139.1594373262370;
-        Fri, 10 Jul 2020 02:27:42 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:9541:9439:cb0f:89c? ([2001:b07:6468:f312:9541:9439:cb0f:89c])
-        by smtp.gmail.com with ESMTPSA id t4sm9089741wmf.4.2020.07.10.02.27.41
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 10 Jul 2020 02:27:41 -0700 (PDT)
-Subject: Re: [PATCH v2] KVM: nVMX: fixes for preemption timer migration
-To:     Stefano Garzarella <sgarzare@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Makarand Sonare <makarandsonare@google.com>,
-        Jim Mattson <jmattson@google.com>
-References: <20200709172801.2697-1-pbonzini@redhat.com>
- <20200710090530.evy5ezrhnskywbt2@steredhat>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <311c1b21-82fb-396b-382e-d4caca0cb691@redhat.com>
-Date:   Fri, 10 Jul 2020 11:27:41 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.9.0
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:mime-version
+         :content-disposition;
+        bh=zH+SoJc9FA+IxVxr5cux+vmHnM4kK2aczPlNcB2fA0g=;
+        b=G84nq29x4I5R81MZuU4Idsr10n7kwKLQT9A5vmSJcz+zQA91QuSVVrbiPwvbySZoNJ
+         WqP5Slcjg+UfoKFwgIUK3VLW81H4T2/1MjDHekI8GgOIyYTkEGjnfFBRNKqrgBjusXMi
+         MJj2QgOtzrtWA+gyHq2iVX20KJD+lsRY6xDOUmO6nkplyp3w17iGddP/IXcMnngVMtK4
+         I8QxL4AFbPuKxqsUXLGpN18CqioyqJv/XELElIegZorrdw/L+T6lO1/FHMTk4hzKrPEt
+         kwfYimfrMjCRd/Out8roYa464G1w/gKFS2W1mQhXGYNwYo+FpFOXyXUdJy4MA+J86vZH
+         Tv4A==
+X-Gm-Message-State: AOAM531uS9bHs4+oS2RQ2lerPmjzR94dvC+wvKe1iRGig7fEksVXbw02
+        JBapp0jPE7c4EOrNVTgx10vkcVbRMhMR+hFxW07rfPVdzvYN/2gcWKLvYwdg92b7gAbFprHKg/m
+        sTrJAcge+te9C
+X-Received: by 2002:a05:6000:1143:: with SMTP id d3mr55214236wrx.235.1594378134132;
+        Fri, 10 Jul 2020 03:48:54 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyw4fIgUrx6Lb8RIpTWJ39EeNc2fRHHzE0+AdkrVCaNR8Aj75HUF42WJR8yehI/TNv6QqsbOQ==
+X-Received: by 2002:a05:6000:1143:: with SMTP id d3mr55214221wrx.235.1594378133933;
+        Fri, 10 Jul 2020 03:48:53 -0700 (PDT)
+Received: from redhat.com (bzq-79-182-31-92.red.bezeqint.net. [79.182.31.92])
+        by smtp.gmail.com with ESMTPSA id 68sm8898710wmz.40.2020.07.10.03.48.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 10 Jul 2020 03:48:53 -0700 (PDT)
+Date:   Fri, 10 Jul 2020 06:48:51 -0400
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     linux-kernel@vger.kernel.org
+Cc:     stable@vger.kernel.org, Jason Wang <jasowang@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
+        netdev@vger.kernel.org
+Subject: [PATCH] vhost/scsi: fix up req type endian-ness
+Message-ID: <20200710104849.406023-1-mst@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200710090530.evy5ezrhnskywbt2@steredhat>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+X-Mailer: git-send-email 2.27.0.106.g8ac3dc51b1
+X-Mutt-Fcc: =sent
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 10/07/20 11:05, Stefano Garzarella wrote:
-> Hi Paolo,
-> 
-> On Thu, Jul 09, 2020 at 01:28:01PM -0400, Paolo Bonzini wrote:
->> Commit 850448f35aaf ("KVM: nVMX: Fix VMX preemption timer migration",
->> 2020-06-01) accidentally broke nVMX live migration from older version
->> by changing the userspace ABI.  Restore it and, while at it, ensure
->> that vmx->nested.has_preemption_timer_deadline is always initialized
->> according to the KVM_STATE_VMX_PREEMPTION_TIMER_DEADLINE flag.
->>
->> Cc: Makarand Sonare <makarandsonare@google.com>
->> Fixes: 850448f35aaf ("KVM: nVMX: Fix VMX preemption timer migration")
->> Reviewed-by: Jim Mattson <jmattson@google.com>
->> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
->> ---
->> v1->v2: coding style [Jim]
->>
->>  arch/x86/include/uapi/asm/kvm.h | 5 +++--
->>  arch/x86/kvm/vmx/nested.c       | 1 +
->>  2 files changed, 4 insertions(+), 2 deletions(-)
->>
->> diff --git a/arch/x86/include/uapi/asm/kvm.h b/arch/x86/include/uapi/asm/kvm.h
->> index 17c5a038f42d..0780f97c1850 100644
->> --- a/arch/x86/include/uapi/asm/kvm.h
->> +++ b/arch/x86/include/uapi/asm/kvm.h
->> @@ -408,14 +408,15 @@ struct kvm_vmx_nested_state_data {
->>  };
->>  
->>  struct kvm_vmx_nested_state_hdr {
->> -	__u32 flags;
->>  	__u64 vmxon_pa;
->>  	__u64 vmcs12_pa;
->> -	__u64 preemption_timer_deadline;
->>  
->>  	struct {
->>  		__u16 flags;
->>  	} smm;
->> +
->> +	__u32 flags;
->> +	__u64 preemption_timer_deadline;
->>  };
->>  
-> 
-> Should we update also Documentation/virt/kvm/api.rst to be consistent?
+vhost/scsi doesn't handle type conversion correctly
+for request type when using virtio 1.0 and up for BE,
+or cross-endian platforms.
 
-Yes, of course.  Thanks for pointing it out.
+Fix it up using vhost_32_to_cpu.
 
-Paolo
+Cc: stable@vger.kernel.org
+Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+---
+ drivers/vhost/scsi.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/vhost/scsi.c b/drivers/vhost/scsi.c
+index 6fb4d7ecfa19..b22adf03f584 100644
+--- a/drivers/vhost/scsi.c
++++ b/drivers/vhost/scsi.c
+@@ -1215,7 +1215,7 @@ vhost_scsi_ctl_handle_vq(struct vhost_scsi *vs, struct vhost_virtqueue *vq)
+ 			continue;
+ 		}
+ 
+-		switch (v_req.type) {
++		switch (vhost32_to_cpu(vq, v_req.type)) {
+ 		case VIRTIO_SCSI_T_TMF:
+ 			vc.req = &v_req.tmf;
+ 			vc.req_size = sizeof(struct virtio_scsi_ctrl_tmf_req);
+-- 
+MST
 
