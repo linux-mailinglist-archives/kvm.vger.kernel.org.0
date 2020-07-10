@@ -2,88 +2,113 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 41D9621BAF1
-	for <lists+kvm@lfdr.de>; Fri, 10 Jul 2020 18:31:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 63C2A21BB4E
+	for <lists+kvm@lfdr.de>; Fri, 10 Jul 2020 18:49:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728249AbgGJQbJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 10 Jul 2020 12:31:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34560 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726965AbgGJQbH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 10 Jul 2020 12:31:07 -0400
-Received: from mail-io1-xd44.google.com (mail-io1-xd44.google.com [IPv6:2607:f8b0:4864:20::d44])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E279FC08C5DC
-        for <kvm@vger.kernel.org>; Fri, 10 Jul 2020 09:31:07 -0700 (PDT)
-Received: by mail-io1-xd44.google.com with SMTP id v6so6663575iob.4
-        for <kvm@vger.kernel.org>; Fri, 10 Jul 2020 09:31:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=L5x+RXQcTKt3brgLCNXmzu/Q4sL3Ui6tQW0Y7yTVLkY=;
-        b=B6/Y2AU3K+d29kPJXoL4LW3xcHmtRXC6hGouqLD94eTzfrcaV3Fglva7FhbL4FBWcn
-         7CNit1lq96RQZfb339mk7OObuhLv9SvsOopZ5KKDqxtyUP5OkUl3So/xWJuSYxFPAnD0
-         M+cC9gw93b5yvVZkCiPNJBcka2dTkqqMjjpN1B8/fJ/d2uYNUOhQbv2l2wjmIHMZJiV7
-         JKgQOz8OPcH4mfjfFUrRPX+wgE/dFIBA7R+ynDnnOb99sDUc/8fY2mu0lZJMQGXNi5SM
-         mdf35MSYI92URNmkPnr9bRMUTfCVa5SC6EUlRv+V61BsDiSWajXEiDX+k1gstuu/tsOB
-         p2hA==
+        id S1728278AbgGJQtj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 10 Jul 2020 12:49:39 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:34005 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1727826AbgGJQtj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 10 Jul 2020 12:49:39 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1594399777;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=RWQVFvxzHaI3cpGgJR2RIec5xz3c/DX2/Rl3zeUvHvs=;
+        b=ioyZOd/2zRxfhrCq66NPVidazHeDQt91oqT7FLMIEX/uNe1iD4bRkblz2JdyxsJA5/ou8V
+        UHBg/afQQ6BmthxYx77mU5ozaNcO8M4jTD7n4Bc3e8OUUGjw+3HyJWJKKMnORr4JoeUYod
+        pgT9SydeZO9OFQKz8IPYfVhx4oFD1qo=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-160-ngaQxcwZMFWvv8ztEZnGTA-1; Fri, 10 Jul 2020 12:49:35 -0400
+X-MC-Unique: ngaQxcwZMFWvv8ztEZnGTA-1
+Received: by mail-wr1-f71.google.com with SMTP id 89so6552971wrr.15
+        for <kvm@vger.kernel.org>; Fri, 10 Jul 2020 09:49:35 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=L5x+RXQcTKt3brgLCNXmzu/Q4sL3Ui6tQW0Y7yTVLkY=;
-        b=hyp7y4Hf3oMrZ8lnQgRMMhPcT93idw9QJsZWJtZmw23yahIz6EBm4/x8HJG5IQilUf
-         z1X+Q6sTiQTtpD4QKQvSrtYOi8iBN0D40gs93wHrhc8UxMwP1XWPh3MennFsv1nq04DP
-         HGGe0hF36LWWEW+xtEwjj5Abelyax7Wr+CNzzmxFv4yw9GWk7k8sufeE/FmOxnYekJUT
-         KMzb2CQcYVnkOOYwP1kOBfP16aVeGDqd0CPWta7fERKEZnnI0SabH/xF5ggaxCAxeL2M
-         2TE/98EAbJ1fTkfpcFESMqYTU31/Tc6tDpUwQ8LZf4H9yUF+4SnrxzykwMMPLmBVPfhC
-         gQ2g==
-X-Gm-Message-State: AOAM532+PnPImgtXcILy9h7f0MJF6Mc4CthA/xeJNk2IXV23RaHLLO10
-        fpkKIpELBhoRxdRBaVPcZKiEG83UgUx1inqDOMDcPQ==
-X-Google-Smtp-Source: ABdhPJz4f+wmTdCN8HsvGt2xu/V0GtBoahjoaJjauggHLbwoRMsmtNf5nAOu00p52lQl8ZVL2r2qaIf0UU+lXGLR09U=
-X-Received: by 2002:a5e:c311:: with SMTP id a17mr18924402iok.12.1594398666301;
- Fri, 10 Jul 2020 09:31:06 -0700 (PDT)
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=RWQVFvxzHaI3cpGgJR2RIec5xz3c/DX2/Rl3zeUvHvs=;
+        b=OugmwfOEcasM3oyuyqwf6sNjkcRwAM4D2mJJ4jFphCUu/Pm5MhLbSu2DOzBRviv+b0
+         JGWadyr5DNKxt0hBx8Vjw2ugL4JX/2icP7CwGkMdo09TRdntvKzW4tNcVPGyy9mCSTtn
+         RoV8v3ewGpm9ONxtP3ktvPCAqiCZEfeotIx1B2a2ol+WIU6uO8wQu5T5INxnQ9M8H9d2
+         8Q3PrjITD1aDGeeap8puN0xkqihUAKAVQXdG0YG06Jruq4H3kD+FrqMWWn9Ih/wUb1HZ
+         dbhiDxQ7NbjZCxM+Woh2kWqwtVN0Ubl4fjhd39rTrHdLvgskbH62dHv/gf/LZBTjw1Ft
+         2mJg==
+X-Gm-Message-State: AOAM531a+5OX0m5mG7kCeyNBeDS30NJcIB+aov71Ivc+2k5ECTHXMF+p
+        ULl9ICMXv7DBd0revLAKKfUpY/GNuF/it8Vm06eRvaYPkjkDVXHAadjPBQytXMiCZoSHbNeXkIT
+        70l7oaUtJPD+U
+X-Received: by 2002:a05:600c:218f:: with SMTP id e15mr5804734wme.187.1594399774646;
+        Fri, 10 Jul 2020 09:49:34 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyjo6cziBz4llXoygguBXC0MmjK/n5HwnK7mOi14NIUnh3IbVLS5JnI830gbTxvPqvRGFQvhw==
+X-Received: by 2002:a05:600c:218f:: with SMTP id e15mr5804708wme.187.1594399774384;
+        Fri, 10 Jul 2020 09:49:34 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:9541:9439:cb0f:89c? ([2001:b07:6468:f312:9541:9439:cb0f:89c])
+        by smtp.gmail.com with ESMTPSA id d28sm10364646wrc.50.2020.07.10.09.49.33
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 10 Jul 2020 09:49:33 -0700 (PDT)
+Subject: Re: [PATCH 2/2] x86/cpu: Handle GUEST_MAXPHYADDR < HOST_MAXPHYADDR
+ for hosts that don't support it
+To:     Eduardo Habkost <ehabkost@redhat.com>
+Cc:     Jim Mattson <jmattson@google.com>,
+        Gerd Hoffmann <kraxel@redhat.com>,
+        =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
+        mtosatti@redhat.com,
+        Pedro Principeza <pedro.principeza@canonical.com>,
+        kvm list <kvm@vger.kernel.org>, libvir-list@redhat.com,
+        Dann Frazier <dann.frazier@canonical.com>,
+        Guilherme Piccoli <gpiccoli@canonical.com>,
+        "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+        Christian Ehrhardt <christian.ehrhardt@canonical.com>,
+        qemu-devel@nongnu.org, Mohammed Gamal <mgamal@redhat.com>,
+        Laszlo Ersek <lersek@redhat.com>, fw@gpiccoli.net,
+        rth@twiddle.net
+References: <20200619155344.79579-1-mgamal@redhat.com>
+ <20200619155344.79579-3-mgamal@redhat.com>
+ <20200708171621.GA780932@habkost.net> <20200708172653.GL3229307@redhat.com>
+ <20200709094415.yvdh6hsfukqqeadp@sirius.home.kraxel.org>
+ <CALMp9eQnrdu-9sZhW3aXpK4pizOW=8G=bj1wkumSgHVNfG=CbQ@mail.gmail.com>
+ <20200709191307.GH780932@habkost.net>
+ <79aa7955-6bc1-d8b2-fed0-48a0990d9dea@redhat.com>
+ <20200710160219.GQ780932@habkost.net>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <654ac020-5f6b-9d71-a84f-9c435f5aa0cf@redhat.com>
+Date:   Fri, 10 Jul 2020 18:49:31 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.9.0
 MIME-Version: 1.0
-References: <20200710154811.418214-1-mgamal@redhat.com>
-In-Reply-To: <20200710154811.418214-1-mgamal@redhat.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Fri, 10 Jul 2020 09:30:55 -0700
-Message-ID: <CALMp9eRfZ50iyrED0-LU75VWhHu_kVoB2Qw55VzEFzZ=0QCGow@mail.gmail.com>
-Subject: Re: [PATCH v3 0/9] KVM: Support guest MAXPHYADDR < host MAXPHYADDR
-To:     Mohammed Gamal <mgamal@redhat.com>
-Cc:     kvm list <kvm@vger.kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Joerg Roedel <joro@8bytes.org>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20200710160219.GQ780932@habkost.net>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jul 10, 2020 at 8:48 AM Mohammed Gamal <mgamal@redhat.com> wrote:
->
-> When EPT is enabled, KVM does not really look at guest physical
-> address size. Address bits above maximum physical memory size are reserved.
-> Because KVM does not look at these guest physical addresses, it currently
-> effectively supports guest physical address sizes equal to the host.
->
-> This can be problem when having a mixed setup of machines with 5-level page
-> tables and machines with 4-level page tables, as live migration can change
-> MAXPHYADDR while the guest runs, which can theoretically introduce bugs.
+On 10/07/20 18:02, Eduardo Habkost wrote:
+> On Fri, Jul 10, 2020 at 09:22:42AM +0200, Paolo Bonzini wrote:
+>> On 09/07/20 21:13, Eduardo Habkost wrote:
+>>>> Doesn't this require intercepting MOV-to-CR3 when the guest is in PAE
+>>>> mode, so that the hypervisor can validate the high bits in the PDPTEs?
+>>> If the fix has additional overhead, is the additional overhead
+>>> bad enough to warrant making it optional?  Most existing
+>>> GUEST_MAXPHYADDR < HOST_MAXPHYADDR guests already work today
+>>> without the fix.
+>>
+>> The problematic case is when host maxphyaddr is 52.  That case wouldn't
+>> work at all without the fix.
+> 
+> What can QEMU do to do differentiate "can't work at all without
+> the fix" from "not the best idea, but will probably work"?
 
-Huh? Changing MAXPHYADDR while the guest runs should be illegal. Or
-have I missed some peculiarity of LA57 that makes MAXPHYADDR a dynamic
-CPUID information field?
+Blocking guest_maxphyaddr < host_maxphyaddr if maxphyaddr==52 would be a
+good start.  However it would block the default configuration on IceLake
+processors (which is why Mohammed looked at this thing in the first place).
 
-> In this patch series we add checks on guest physical addresses in EPT
-> violation/misconfig and NPF vmexits and if needed inject the proper
-> page faults in the guest.
->
-> A more subtle issue is when the host MAXPHYADDR is larger than that of the
-> guest. Page faults caused by reserved bits on the guest won't cause an EPT
-> violation/NPF and hence we also check guest MAXPHYADDR and add PFERR_RSVD_MASK
-> error code to the page fault if needed.
+Paolo
+
