@@ -2,98 +2,102 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3891121BC2D
-	for <lists+kvm@lfdr.de>; Fri, 10 Jul 2020 19:26:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 39A9721BC6D
+	for <lists+kvm@lfdr.de>; Fri, 10 Jul 2020 19:40:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728197AbgGJR0x (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 10 Jul 2020 13:26:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43170 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728116AbgGJR0w (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 10 Jul 2020 13:26:52 -0400
-Received: from mail-il1-x141.google.com (mail-il1-x141.google.com [IPv6:2607:f8b0:4864:20::141])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 20C3DC08C5DC
-        for <kvm@vger.kernel.org>; Fri, 10 Jul 2020 10:26:52 -0700 (PDT)
-Received: by mail-il1-x141.google.com with SMTP id k6so5730627ili.6
-        for <kvm@vger.kernel.org>; Fri, 10 Jul 2020 10:26:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=CqJnoWCCHedrq/sE7xptu8e2ktVbhXZt758ObhyN/DU=;
-        b=pYEPfjqtWC03FcbjU/vEyI2Jvj2Cb+4dFJ/rm83f9F0tVa8/blrrwdEUgp3cbYB8N5
-         HWfrtZkVga6TgVkLCIw+THtL6JYGn1jt/kUPIAYT8ss/SXt4NkopRFDH0i2RChiRHvJ9
-         R55Mw9NYvpS0DVGIKhSE7hIXLRGpMZT5FEFLxgGuan+vg6TAFuh1SFHgQeWOzSg3qyXl
-         o77Pwecu6eTEdXbw5VU1gszypRoJDiZBitxlUPSqgD+qtLaCP17oThyYNor1oT9OyeYD
-         7TEMmClSqhcUpmLEgFI/wQe3v/OsJG1Yeinb7tz399sGHmP/Gg3ZvPHhOAT5SJpEZw+H
-         OAmg==
+        id S1728312AbgGJRkP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 10 Jul 2020 13:40:15 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:39361 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1727038AbgGJRkP (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 10 Jul 2020 13:40:15 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1594402813;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=/IkQPdXSHaUMhvBTo4/ZFo40yEF0ln1C5QCttyzLIBw=;
+        b=bHiPWiXMrqPPkzIMvizKgKmxc9Bj0mZmW/F6e3wTctqISoZ+NE43aUQHNHS0kdeBqsVP0e
+        y8frQcsI7AdrNpl7m4/Sh/OP8Esz1+wAQ4GfkxEVK04At9lfpe2PDcGCE5flzz0rYSYs1z
+        DoS0OZilBZSMuHI7x9D+RuJBh75V+z0=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-348-35iUq_cEPHeFSCXnConv6g-1; Fri, 10 Jul 2020 13:40:12 -0400
+X-MC-Unique: 35iUq_cEPHeFSCXnConv6g-1
+Received: by mail-wm1-f69.google.com with SMTP id c81so7412116wmd.2
+        for <kvm@vger.kernel.org>; Fri, 10 Jul 2020 10:40:12 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=CqJnoWCCHedrq/sE7xptu8e2ktVbhXZt758ObhyN/DU=;
-        b=i5tEuqpx+4jT9wFZLYkF0treFNWo8odPfJSdH0VwyEbqinR2P/sajuXUtjAlX1S1OI
-         vQH4uBUNUpP7V8Nh2WvkrKAXw0t5i4mk4TsPprdik8wSFJEdoVoiTVQ2+EK9bUFlJwit
-         XaJYyI4kLlSqoMJLFLqdW+R2XPT19CtSWQrx1sP8cgLknCfOsuza/NGabaZfaq1lIM0X
-         tzCVK2otmJD+m4gzGeevM1GGJtCXFL2Z2gJj9KszJb8LpCtASnpFaZD7tF+GXaab6VZ8
-         532iBbQqv/17W8D3D0H0mlaosj8aqYM2tpyC/CGg72ASJhREiIeq3PmOIGwM1jrxQNw0
-         h5EQ==
-X-Gm-Message-State: AOAM532S7N0fNg2rBqraWnkTagFTvlOjlAHbu4E3QsdBrPQSSLCGeW/Y
-        mwL1+vdzm3CPp1D+kKhlvcqkgCCc6VvZ4fIDcFg8NA==
-X-Google-Smtp-Source: ABdhPJzVe0a9jszJB19e1xo/iSDPtoEHSBeXIWF2pykmj4cfJKn+W3IarW3EmlujvPOweLPlaRRs1dxg51l/elCSVLw=
-X-Received: by 2002:a92:b685:: with SMTP id m5mr53354561ill.118.1594402011252;
- Fri, 10 Jul 2020 10:26:51 -0700 (PDT)
-MIME-Version: 1.0
-References: <20200710154811.418214-1-mgamal@redhat.com> <CALMp9eRfZ50iyrED0-LU75VWhHu_kVoB2Qw55VzEFzZ=0QCGow@mail.gmail.com>
- <0c892b1e-6fe6-2aa7-602e-f5fadc54c257@redhat.com> <CALMp9eQXHGnXo4ACX2-qYww4XdRODMn-O6CAvhupib67Li9S2w@mail.gmail.com>
- <9e784c62-15ee-63b7-4942-474493bac536@redhat.com>
-In-Reply-To: <9e784c62-15ee-63b7-4942-474493bac536@redhat.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Fri, 10 Jul 2020 10:26:40 -0700
-Message-ID: <CALMp9eRGTedw-wNL4HcrJOpAQBa_Qsqcir0BtJ-dEO6EhvWGqA@mail.gmail.com>
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=/IkQPdXSHaUMhvBTo4/ZFo40yEF0ln1C5QCttyzLIBw=;
+        b=WVLuGFed2MXhvTaCPNcfUrimnz0mS9VKBvaWOkE3ON+Um3Mo9tgJW88OqDzXYK9geR
+         ilsETVYREgDnDr4qekhbG8F6/9NCv9hblo8JwJBkRjIHuk4bvtHEv0x9D7AwelDJzPDo
+         2LjzKE7xL54EIxKa8Nn6qdO74RSMYr2uCIPdzhJqgwV70kQdB31l/Fz08skAxCuZuHMi
+         1jispF224MucE9mtKN1TNykT9VnFY2dECZS62aAEKBYHRQ/DQiZH5khOD/1V7qkXHQye
+         1XMRGpNTjmLRLbSZpER6nXA6tIpmLhYe/fEO5Zi/qET5Ec2OeeKKxjD6aDrKBQVYcj4y
+         x65g==
+X-Gm-Message-State: AOAM530I5H48DSCl7vDweRZwtvxg58V0eX+iJTqJXAUBgQAhAKQkJQ8T
+        L8u0jlVlNOE+qW9JZg0u2UgEo8nFNvPiwyQQEnKoOD8zajCWzMs3/ilThb5zXyE7r6ZNeI4a2MJ
+        U/qK3L49PtYzU
+X-Received: by 2002:adf:f209:: with SMTP id p9mr65624123wro.86.1594402811226;
+        Fri, 10 Jul 2020 10:40:11 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwgdBFsI6NpM0cOEYE9Zd0CxeHVbzpJqrUECEdskVqorMpkRotRA6xd/OKf7+5nsRvVTo8ujA==
+X-Received: by 2002:adf:f209:: with SMTP id p9mr65624106wro.86.1594402811022;
+        Fri, 10 Jul 2020 10:40:11 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:9541:9439:cb0f:89c? ([2001:b07:6468:f312:9541:9439:cb0f:89c])
+        by smtp.gmail.com with ESMTPSA id c15sm10333052wme.23.2020.07.10.10.40.09
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 10 Jul 2020 10:40:10 -0700 (PDT)
 Subject: Re: [PATCH v3 0/9] KVM: Support guest MAXPHYADDR < host MAXPHYADDR
-To:     Paolo Bonzini <pbonzini@redhat.com>
+To:     Jim Mattson <jmattson@google.com>
 Cc:     Mohammed Gamal <mgamal@redhat.com>, kvm list <kvm@vger.kernel.org>,
         LKML <linux-kernel@vger.kernel.org>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Sean Christopherson <sean.j.christopherson@intel.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Joerg Roedel <joro@8bytes.org>
-Content-Type: text/plain; charset="UTF-8"
+References: <20200710154811.418214-1-mgamal@redhat.com>
+ <CALMp9eRfZ50iyrED0-LU75VWhHu_kVoB2Qw55VzEFzZ=0QCGow@mail.gmail.com>
+ <0c892b1e-6fe6-2aa7-602e-f5fadc54c257@redhat.com>
+ <CALMp9eQXHGnXo4ACX2-qYww4XdRODMn-O6CAvhupib67Li9S2w@mail.gmail.com>
+ <9e784c62-15ee-63b7-4942-474493bac536@redhat.com>
+ <CALMp9eRGTedw-wNL4HcrJOpAQBa_Qsqcir0BtJ-dEO6EhvWGqA@mail.gmail.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <5d9e2483-81ba-1d94-5324-08245ced7d0e@redhat.com>
+Date:   Fri, 10 Jul 2020 19:40:08 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.9.0
+MIME-Version: 1.0
+In-Reply-To: <CALMp9eRGTedw-wNL4HcrJOpAQBa_Qsqcir0BtJ-dEO6EhvWGqA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jul 10, 2020 at 10:16 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
->
-> On 10/07/20 19:13, Jim Mattson wrote:
-> > On Fri, Jul 10, 2020 at 10:06 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
-> >>
-> >> On 10/07/20 18:30, Jim Mattson wrote:
-> >>>>
-> >>>> This can be problem when having a mixed setup of machines with 5-level page
-> >>>> tables and machines with 4-level page tables, as live migration can change
-> >>>> MAXPHYADDR while the guest runs, which can theoretically introduce bugs.
-> >>>
-> >>> Huh? Changing MAXPHYADDR while the guest runs should be illegal. Or
-> >>> have I missed some peculiarity of LA57 that makes MAXPHYADDR a dynamic
-> >>> CPUID information field?
-> >>
-> >> Changing _host_ MAXPHYADDR while the guest runs, such as if you migrate
-> >> from a host-maxphyaddr==46 to a host-maxphyaddr==52 machine (while
-> >> keeping guest-maxphyaddr==46).
-> >
-> > Ah, but what does that have to do with LA57?
->
-> Intel only has MAXPHYADDR > 46 on LA57 machines (because in general OSes
-> like to have a physical 1:1 map into the kernel part of the virtual
-> address space, so having a higher MAXPHYADDR would be of limited use
-> with 48-bit linear addresses).
+On 10/07/20 19:26, Jim Mattson wrote:
+>> Intel only has MAXPHYADDR > 46 on LA57 machines (because in general OSes
+>> like to have a physical 1:1 map into the kernel part of the virtual
+>> address space, so having a higher MAXPHYADDR would be of limited use
+>> with 48-bit linear addresses).
+> We all know that the direct map is evil. :-)
+> 
+> Sorry it took me so long to get there. I didn't realize that Linux was
+> incapable of using more physical memory than it could map into the
+> kernel's virtual address space. (Wasn't that the whole point of PAE
+> originally?)
 
-We all know that the direct map is evil. :-)
+Yes, but it's so slow that Linux preferred not to go that way for 64-bit
+kernels.
 
-Sorry it took me so long to get there. I didn't realize that Linux was
-incapable of using more physical memory than it could map into the
-kernel's virtual address space. (Wasn't that the whole point of PAE
-originally?)
+That said, that justification for MAXPHYADDR==46 came from Intel
+processor architects, and when they say "OSes" they usually refer to a
+certain vendor from the Pacific north-west.
+
+Paolo
+
