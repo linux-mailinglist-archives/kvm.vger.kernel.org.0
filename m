@@ -2,37 +2,37 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2CBDD21B7FA
-	for <lists+kvm@lfdr.de>; Fri, 10 Jul 2020 16:12:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3E5AE21B7F8
+	for <lists+kvm@lfdr.de>; Fri, 10 Jul 2020 16:12:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726965AbgGJOMn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 10 Jul 2020 10:12:43 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:44344 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1728283AbgGJOMa (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 10 Jul 2020 10:12:30 -0400
+        id S1728329AbgGJOMi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 10 Jul 2020 10:12:38 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:40652 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1728284AbgGJOMa (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 10 Jul 2020 10:12:30 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1594390348;
+        s=mimecast20190719; t=1594390349;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=XmvusRmRBvAWHNl6x2vdSNs3ESLbQ79QZieDa9NwqUw=;
-        b=SqvGH9DInChS9dgQTCmuhIxClUETR7fBVrqpO3mZdjTxFv3+EYsxomKlkeCZ+zFGlws1UY
-        GeeGUFat38GzgwYRNxh2J2QqpQfuacjmfbndOs0EzzWu4nNpp+PNavMjSyO414X34jc4ro
-        ls7/eJ21S8fchWtikv8EKrI6ZYfSNB8=
+        bh=VOceSolOcCnL8nnokzwJbOsFELxGoSPw4yCTbFrccdo=;
+        b=OgkSC8/bZB5e3rUGG0hmHQmeqq5nLGMzCV5tCZY131cdB9QwxLT/fDkMM3J5ZebH7Ssglo
+        cF1foNbJV+S35QrVz98T0gIroglYvGC9J+O4NWDQD7PnE3lCedTN2jzzs6U5wuZbTKuqcU
+        9Re7skjfXY1nli2eogLm7DCwbhSqVJU=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-99-sh3p7GSJOGCcPKFg0z6B8w-1; Fri, 10 Jul 2020 10:12:25 -0400
-X-MC-Unique: sh3p7GSJOGCcPKFg0z6B8w-1
+ us-mta-404-Ur86T0lJPLSe1nDsqltjyA-1; Fri, 10 Jul 2020 10:12:27 -0400
+X-MC-Unique: Ur86T0lJPLSe1nDsqltjyA-1
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C48251080;
-        Fri, 10 Jul 2020 14:12:23 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 569CB1083;
+        Fri, 10 Jul 2020 14:12:26 +0000 (UTC)
 Received: from vitty.brq.redhat.com (unknown [10.40.195.35])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id D4AC81CA;
-        Fri, 10 Jul 2020 14:12:19 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 2992374F52;
+        Fri, 10 Jul 2020 14:12:23 +0000 (UTC)
 From:   Vitaly Kuznetsov <vkuznets@redhat.com>
 To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
@@ -40,9 +40,9 @@ Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
         Jim Mattson <jmattson@google.com>,
         Junaid Shahid <junaids@google.com>,
         linux-kernel@vger.kernel.org
-Subject: [PATCH v4 8/9] KVM: nSVM: use nested_svm_load_cr3() on guest->host switch
-Date:   Fri, 10 Jul 2020 16:11:56 +0200
-Message-Id: <20200710141157.1640173-9-vkuznets@redhat.com>
+Subject: [PATCH v4 9/9] KVM: x86: drop superfluous mmu_check_root() from fast_pgd_switch()
+Date:   Fri, 10 Jul 2020 16:11:57 +0200
+Message-Id: <20200710141157.1640173-10-vkuznets@redhat.com>
 In-Reply-To: <20200710141157.1640173-1-vkuznets@redhat.com>
 References: <20200710141157.1640173-1-vkuznets@redhat.com>
 MIME-Version: 1.0
@@ -53,55 +53,34 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Make nSVM code resemble nVMX where nested_vmx_load_cr3() is used on
-both guest->host and host->guest transitions. Also, we can now
-eliminate unconditional kvm_mmu_reset_context() and speed things up.
+The mmu_check_root() check in fast_pgd_switch() seems to be
+superfluous: when GPA is outside of the visible range
+cached_root_available() will fail for non-direct roots
+(as we can't have a matching one on the list) and we don't
+seem to care for direct ones.
 
-Note, nVMX has two different paths: load_vmcs12_host_state() and
-nested_vmx_restore_host_state() and the later is used to restore from
-'partial' switch to L2, it always uses kvm_mmu_reset_context().
-nSVM doesn't have this yet. Also, nested_svm_vmexit()'s return value
-is almost always ignored nowadays.
+Also, raising #TF immediately when a non-existent GFN is written to CR3
+doesn't seem to mach architectural behavior. Drop the check.
 
 Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
 ---
- arch/x86/kvm/svm/nested.c | 15 ++++++---------
- 1 file changed, 6 insertions(+), 9 deletions(-)
+ arch/x86/kvm/mmu/mmu.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
-index 219871752dc5..434e527096b7 100644
---- a/arch/x86/kvm/svm/nested.c
-+++ b/arch/x86/kvm/svm/nested.c
-@@ -317,7 +317,7 @@ static inline bool nested_npt_enabled(struct vcpu_svm *svm)
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index 13ec3c30eda2..50a923696bf1 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -4277,8 +4277,7 @@ static bool fast_pgd_switch(struct kvm_vcpu *vcpu, gpa_t new_pgd,
+ 	 */
+ 	if (mmu->shadow_root_level >= PT64_ROOT_4LEVEL &&
+ 	    mmu->root_level >= PT64_ROOT_4LEVEL)
+-		return !mmu_check_root(vcpu, new_pgd >> PAGE_SHIFT) &&
+-		       cached_root_available(vcpu, new_pgd, new_role);
++		return cached_root_available(vcpu, new_pgd, new_role);
+ 
+ 	return false;
  }
- 
- /*
-- * Load guest's cr3 at nested entry. @nested_npt is true if we are
-+ * Load guest's/host's cr3 at nested entry. @nested_npt is true if we are
-  * emulating VM-Entry into a guest with NPT enabled.
-  */
- static int nested_svm_load_cr3(struct kvm_vcpu *vcpu, unsigned long cr3,
-@@ -651,15 +651,12 @@ int nested_svm_vmexit(struct vcpu_svm *svm)
- 
- 	nested_svm_uninit_mmu_context(&svm->vcpu);
- 
--	if (npt_enabled) {
--		svm->vmcb->save.cr3 = hsave->save.cr3;
--		svm->vcpu.arch.cr3 = hsave->save.cr3;
--	} else {
--		(void)kvm_set_cr3(&svm->vcpu, hsave->save.cr3);
--	}
-+	rc = nested_svm_load_cr3(&svm->vcpu, hsave->save.cr3, false);
-+	if (rc)
-+		return 1;
- 
--	kvm_mmu_reset_context(&svm->vcpu);
--	kvm_mmu_load(&svm->vcpu);
-+	if (npt_enabled)
-+		svm->vmcb->save.cr3 = hsave->save.cr3;
- 
- 	/*
- 	 * Drop what we picked up for L2 via svm_complete_interrupts() so it
 -- 
 2.25.4
 
