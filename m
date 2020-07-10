@@ -2,72 +2,133 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 61AED21B91D
-	for <lists+kvm@lfdr.de>; Fri, 10 Jul 2020 17:08:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5004221B927
+	for <lists+kvm@lfdr.de>; Fri, 10 Jul 2020 17:13:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727780AbgGJPIc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 10 Jul 2020 11:08:32 -0400
-Received: from mga18.intel.com ([134.134.136.126]:55695 "EHLO mga18.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726820AbgGJPIb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 10 Jul 2020 11:08:31 -0400
-IronPort-SDR: ksmHbg8/zo1NVsusScuhPmNzpPnTNLgfLqHyHyuykhQ7UDZBExU3oO39skk+R2Gp99ssDlP5EZ
- H0LVO3AU0DsQ==
-X-IronPort-AV: E=McAfee;i="6000,8403,9678"; a="135681424"
-X-IronPort-AV: E=Sophos;i="5.75,336,1589266800"; 
-   d="scan'208";a="135681424"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Jul 2020 08:08:30 -0700
-IronPort-SDR: xkMc2PrqbaCHlbLNF6MsrwSJ4wwVWBDytoob7EgX7TXV+TedX7dsq5a4HkWDLYmDR+m8zyj+DG
- lh9MO8d05ALQ==
-X-IronPort-AV: E=Sophos;i="5.75,336,1589266800"; 
-   d="scan'208";a="458308290"
-Received: from silpixa00400314.ir.intel.com (HELO silpixa00400314) ([10.237.222.51])
-  by orsmga005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Jul 2020 08:08:27 -0700
-Date:   Fri, 10 Jul 2020 16:08:19 +0100
-From:   Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-To:     Bjorn Helgaas <helgaas@kernel.org>
-Cc:     alex.williamson@redhat.com, herbert@gondor.apana.org.au,
-        cohuck@redhat.com, nhorman@redhat.com, vdronov@redhat.com,
-        bhelgaas@google.com, mark.a.chambers@intel.com,
-        gordon.mcfadden@intel.com, ahsan.atta@intel.com,
-        qat-linux@intel.com, kvm@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-pci@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 3/5] vfio/pci: add qat devices to blocklist
-Message-ID: <20200710150819.GA410874@silpixa00400314>
-References: <20200701110302.75199-4-giovanni.cabiddu@intel.com>
- <20200701212812.GA3661715@bjorn-Precision-5520>
+        id S1727101AbgGJPNI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 10 Jul 2020 11:13:08 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:57504 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1727941AbgGJPMe (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 10 Jul 2020 11:12:34 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1594393946;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=kMGVZSRXo7baW8lGtzLkE8JQNic6/IT/q58/50/MWpA=;
+        b=eyG92M6R1kj3SAtF9RZFhKOhKTTjtZQ8KYtbZQvOI8Ly6l+bXoXD7N1UZ6W/mhN2LcGC15
+        eLdAY+RshXdilGBjXVDCcFt28W823iRxWB9aZnIFI1IkIrXt51ovU88YkfdD+QL4Bex8yu
+        Cm1pr+GS3ADw6w/j4JC+8+5qtqVa5zM=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-456-KXqCn5DjOe6xAnO8huHGwQ-1; Fri, 10 Jul 2020 11:12:20 -0400
+X-MC-Unique: KXqCn5DjOe6xAnO8huHGwQ-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 32B7A100AA2A;
+        Fri, 10 Jul 2020 15:12:19 +0000 (UTC)
+Received: from x1.home (ovpn-112-71.phx2.redhat.com [10.3.112.71])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id AD7415C662;
+        Fri, 10 Jul 2020 15:12:18 +0000 (UTC)
+Date:   Fri, 10 Jul 2020 09:12:17 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Yan Zhao <yan.y.zhao@intel.com>
+Cc:     "Tian, Kevin" <kevin.tian@intel.com>,
+        "intel-gvt-dev@lists.freedesktop.org" 
+        <intel-gvt-dev@lists.freedesktop.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        Zhenyu Wang <zhenyuw@linux.intel.com>
+Subject: Re: [PATCH v3 0/2] VFIO mdev aggregated resources handling
+Message-ID: <20200710091217.7a62b4cc@x1.home>
+In-Reply-To: <20200710062958.GB29271@joy-OptiPlex-7040>
+References: <20200326054136.2543-1-zhenyuw@linux.intel.com>
+        <20200408055824.2378-1-zhenyuw@linux.intel.com>
+        <MWHPR11MB1645CC388BF45FD2E6309C3C8C660@MWHPR11MB1645.namprd11.prod.outlook.com>
+        <20200707190634.4d9055fe@x1.home>
+        <MWHPR11MB16454BF5C1BF4D5D22F0B2B38C670@MWHPR11MB1645.namprd11.prod.outlook.com>
+        <20200708124806.058e33d9@x1.home>
+        <MWHPR11MB1645C5033CB813EBD72CE4FD8C640@MWHPR11MB1645.namprd11.prod.outlook.com>
+        <20200709112810.6085b7f6@x1.home>
+        <MWHPR11MB1645D3E53C055461AB5E8E3C8C650@MWHPR11MB1645.namprd11.prod.outlook.com>
+        <20200710062958.GB29271@joy-OptiPlex-7040>
+Organization: Red Hat
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20200701212812.GA3661715@bjorn-Precision-5520>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jul 01, 2020 at 04:28:12PM -0500, Bjorn Helgaas wrote:
-> On Wed, Jul 01, 2020 at 12:03:00PM +0100, Giovanni Cabiddu wrote:
-> > The current generation of Intel® QuickAssist Technology devices
-> > are not designed to run in an untrusted environment because of the
-> > following issues reported in the release notes in
-> > https://01.org/intel-quickassist-technology:
-> 
-> It would be nice if this link were directly clickable, e.g., if there
-> were no trailing ":" or something.
-> 
-> And it would be even better if it went to a specific doc that
-> described these issues.  I assume these are errata, and it's not easy
-> to figure out which doc mentions them.
-Sure. I will fix the commit message in the next revision and point to the
-actual document:
-https://01.org/sites/default/files/downloads/336211-015-qatsoftwareforlinux-rn-hwv1.7-final.pdf
+On Fri, 10 Jul 2020 14:29:59 +0800
+Yan Zhao <yan.y.zhao@intel.com> wrote:
 
-Regards,
+> On Fri, Jul 10, 2020 at 02:09:06AM +0000, Tian, Kevin wrote:
+> <...>
+> > > > > We also can't even seem to agree that type is a necessary require=
+ment
+> > > > > for compatibility.  Your discussion below of a type-A, which is
+> > > > > equivalent to a type-B w/ aggregation set to some value is an exa=
+mple
+> > > > > of this.  We might also have physical devices with extensions to
+> > > > > support migration.  These could possibly be compatible with full =
+mdev
+> > > > > devices.  We have no idea how an administrative tool would discov=
+er
+> > > > > this other than an exhaustive search across every possible target.
+> > > > > That's ugly but feasible when considering a single target host, b=
+ut
+> > > > > completely untenable when considering a datacenter. =20
+> > > >
+> > > > If exhaustive search can be done just one-off to build the compatib=
+ility
+> > > > database for all assignable devices on each node, then it might be
+> > > > still tenable in datacenter? =20
+> > >=20
+> > >=20
+> > > I'm not sure what "one-off" means relative to this discussion.  Is th=
+is
+> > > trying to argue that if it's a disturbingly heavyweight operation, but
+> > > a management tool only needs to do it once, it's ok?  We should reall=
+y =20
+> >=20
+> > yes
+> >  =20
+> > > be including openstack and ovirt folks in any discussion about what
+> > > might be acceptable across a datacenter.  I can sometimes get away wi=
+th
+> > > representing what might be feasible for libvirt, but this is the sort
+> > > of knowledge and policy decision that would occur above libvirt. =20
+> >=20
+> > Agree. and since this is more about general migration compatibility,
+> > let's start new thread and involve openstack/ovirt guys. Yan, can you
+> > initiate this?
+> > =20
+> sure.
+> hi Alex,
+> I'm not sure if below mailling lists are enough and accurate,
+> do you know what extra people and lists I need to involve in?
+>=20
+> devel@ovirt.org, openstack-discuss@lists.openstack.org,
+> libvir-list@redhat.com
 
--- 
-Giovanni
+You could also include
+
+Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+Sean Mooney <smooney@redhat.com>
+
+=20
+> BTW, I found a page about live migration of SRIOV devices in openstack.
+> https://specs.openstack.org/openstack/nova-specs/specs/stein/approved/lib=
+virt-neutron-sriov-livemigration.html
+
+Sean, above, is involved with that specification.  AFAIK the only
+current live migration of SR-IOV devices involve failover and hotplug
+trickery.  Thanks,
+
+Alex
+
