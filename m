@@ -2,133 +2,106 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5004221B927
-	for <lists+kvm@lfdr.de>; Fri, 10 Jul 2020 17:13:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1500621B95A
+	for <lists+kvm@lfdr.de>; Fri, 10 Jul 2020 17:24:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727101AbgGJPNI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 10 Jul 2020 11:13:08 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:57504 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1727941AbgGJPMe (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 10 Jul 2020 11:12:34 -0400
+        id S1727819AbgGJPXJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 10 Jul 2020 11:23:09 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:21070 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726962AbgGJPXI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 10 Jul 2020 11:23:08 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1594393946;
+        s=mimecast20190719; t=1594394586;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=kMGVZSRXo7baW8lGtzLkE8JQNic6/IT/q58/50/MWpA=;
-        b=eyG92M6R1kj3SAtF9RZFhKOhKTTjtZQ8KYtbZQvOI8Ly6l+bXoXD7N1UZ6W/mhN2LcGC15
-        eLdAY+RshXdilGBjXVDCcFt28W823iRxWB9aZnIFI1IkIrXt51ovU88YkfdD+QL4Bex8yu
-        Cm1pr+GS3ADw6w/j4JC+8+5qtqVa5zM=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-456-KXqCn5DjOe6xAnO8huHGwQ-1; Fri, 10 Jul 2020 11:12:20 -0400
-X-MC-Unique: KXqCn5DjOe6xAnO8huHGwQ-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 32B7A100AA2A;
-        Fri, 10 Jul 2020 15:12:19 +0000 (UTC)
-Received: from x1.home (ovpn-112-71.phx2.redhat.com [10.3.112.71])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id AD7415C662;
-        Fri, 10 Jul 2020 15:12:18 +0000 (UTC)
-Date:   Fri, 10 Jul 2020 09:12:17 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Yan Zhao <yan.y.zhao@intel.com>
-Cc:     "Tian, Kevin" <kevin.tian@intel.com>,
-        "intel-gvt-dev@lists.freedesktop.org" 
-        <intel-gvt-dev@lists.freedesktop.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        Zhenyu Wang <zhenyuw@linux.intel.com>
-Subject: Re: [PATCH v3 0/2] VFIO mdev aggregated resources handling
-Message-ID: <20200710091217.7a62b4cc@x1.home>
-In-Reply-To: <20200710062958.GB29271@joy-OptiPlex-7040>
-References: <20200326054136.2543-1-zhenyuw@linux.intel.com>
-        <20200408055824.2378-1-zhenyuw@linux.intel.com>
-        <MWHPR11MB1645CC388BF45FD2E6309C3C8C660@MWHPR11MB1645.namprd11.prod.outlook.com>
-        <20200707190634.4d9055fe@x1.home>
-        <MWHPR11MB16454BF5C1BF4D5D22F0B2B38C670@MWHPR11MB1645.namprd11.prod.outlook.com>
-        <20200708124806.058e33d9@x1.home>
-        <MWHPR11MB1645C5033CB813EBD72CE4FD8C640@MWHPR11MB1645.namprd11.prod.outlook.com>
-        <20200709112810.6085b7f6@x1.home>
-        <MWHPR11MB1645D3E53C055461AB5E8E3C8C650@MWHPR11MB1645.namprd11.prod.outlook.com>
-        <20200710062958.GB29271@joy-OptiPlex-7040>
-Organization: Red Hat
+        bh=hVCnQ8dSz5bzqPfVKUA5yGVKNr0A/IBOxZrAZfXjfV4=;
+        b=NAeMY/d+jJ5JqEy0p6riS+7XhmmTJcxWSUxdWP4rwrzLJbi3NJ4PdU61Xmh2mLtp/fjGMY
+        PA6vQbiT9gOV/7uBfC575Ntt7oTiXuvFh8J6gKCUDlVf/Xxb1lNSWcaIne8JS1bMqQJTh7
+        6rzi9GJXB2Z7RhFQSs8CiyG4/Pl3KWs=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-281-q_s_lyW7M7ug0wqEdPhRpw-1; Fri, 10 Jul 2020 11:23:04 -0400
+X-MC-Unique: q_s_lyW7M7ug0wqEdPhRpw-1
+Received: by mail-wm1-f69.google.com with SMTP id c124so7039527wme.0
+        for <kvm@vger.kernel.org>; Fri, 10 Jul 2020 08:23:04 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=hVCnQ8dSz5bzqPfVKUA5yGVKNr0A/IBOxZrAZfXjfV4=;
+        b=hxnMid2YX1CwSWpn7MZBESG4sOvE2BwyCvAhusieJ7CMgC+NSXPXGpDZgs7LKqoke4
+         F72pNZRHrNTBRK8OCjc3g63GGLtE8VqHbydYMTqPQCyzTzS+Pk6y5UwJdC8l+LbOVO8y
+         Uh0l6GiqucpzwVDNmVIxMkwjwgOTB5SmJYSrW4GGN79eYcJ2xtvcpviVVCZmLt8bw/S/
+         7Bg+l89QGcn+wGsaeZLMMOR7BdHjiqW9vqomJAbgF5vrheppZKEvahTAQue6+DoJGR5T
+         LDBw6+yQmy+wTYoviH7eGGxlyv+vvpk4OBtckg8v73LDiBnLxkFjjlkpVS9xUaW3NHrQ
+         QoFQ==
+X-Gm-Message-State: AOAM5322lu2lvPCkNf/dME7fWvX1iWUmASN/dYBoE3jpzx7i4dnIBrJv
+        KUYVdM7aBB07J3vijkWZ/pXS2Xtb5kmaIINfVR4Xq2rYBZTlISUnwyZjyPDPsdHZhEkKkUUAET9
+        majNGPIn3kqrq
+X-Received: by 2002:a5d:538e:: with SMTP id d14mr68529932wrv.21.1594394583423;
+        Fri, 10 Jul 2020 08:23:03 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJw9ptpqdTBcz0hnt0FWLyQCyrYqXHcZfxjoO54Ukv+e5iAty/J9EaAh2L7CGpLawRB/P9R/Hw==
+X-Received: by 2002:a5d:538e:: with SMTP id d14mr68529912wrv.21.1594394583169;
+        Fri, 10 Jul 2020 08:23:03 -0700 (PDT)
+Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
+        by smtp.gmail.com with ESMTPSA id 69sm10490303wma.16.2020.07.10.08.23.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 10 Jul 2020 08:23:02 -0700 (PDT)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
+Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Like Xu <like.xu@linux.intel.com>, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2] KVM: SVM: emulate MSR_IA32_PERF_CAPABILITIES
+In-Reply-To: <8e3b2eef-b4f1-01cc-e033-c1ece70bd7db@redhat.com>
+References: <20200618111328.429931-1-vkuznets@redhat.com> <adc8b307-4ec4-575f-ff94-c9b820189fb1@redhat.com> <87ftash6ui.fsf@vitty.brq.redhat.com> <8e3b2eef-b4f1-01cc-e033-c1ece70bd7db@redhat.com>
+Date:   Fri, 10 Jul 2020 17:23:01 +0200
+Message-ID: <875zavv1gq.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Content-Type: text/plain
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 10 Jul 2020 14:29:59 +0800
-Yan Zhao <yan.y.zhao@intel.com> wrote:
+Paolo Bonzini <pbonzini@redhat.com> writes:
 
-> On Fri, Jul 10, 2020 at 02:09:06AM +0000, Tian, Kevin wrote:
-> <...>
-> > > > > We also can't even seem to agree that type is a necessary require=
-ment
-> > > > > for compatibility.  Your discussion below of a type-A, which is
-> > > > > equivalent to a type-B w/ aggregation set to some value is an exa=
-mple
-> > > > > of this.  We might also have physical devices with extensions to
-> > > > > support migration.  These could possibly be compatible with full =
-mdev
-> > > > > devices.  We have no idea how an administrative tool would discov=
-er
-> > > > > this other than an exhaustive search across every possible target.
-> > > > > That's ugly but feasible when considering a single target host, b=
-ut
-> > > > > completely untenable when considering a datacenter. =20
-> > > >
-> > > > If exhaustive search can be done just one-off to build the compatib=
-ility
-> > > > database for all assignable devices on each node, then it might be
-> > > > still tenable in datacenter? =20
-> > >=20
-> > >=20
-> > > I'm not sure what "one-off" means relative to this discussion.  Is th=
-is
-> > > trying to argue that if it's a disturbingly heavyweight operation, but
-> > > a management tool only needs to do it once, it's ok?  We should reall=
-y =20
-> >=20
-> > yes
-> >  =20
-> > > be including openstack and ovirt folks in any discussion about what
-> > > might be acceptable across a datacenter.  I can sometimes get away wi=
-th
-> > > representing what might be feasible for libvirt, but this is the sort
-> > > of knowledge and policy decision that would occur above libvirt. =20
-> >=20
-> > Agree. and since this is more about general migration compatibility,
-> > let's start new thread and involve openstack/ovirt guys. Yan, can you
-> > initiate this?
-> > =20
-> sure.
-> hi Alex,
-> I'm not sure if below mailling lists are enough and accurate,
-> do you know what extra people and lists I need to involve in?
->=20
-> devel@ovirt.org, openstack-discuss@lists.openstack.org,
-> libvir-list@redhat.com
+> On 18/06/20 14:54, Vitaly Kuznetsov wrote:
+>> Paolo Bonzini <pbonzini@redhat.com> writes:
+>> 
+>>> On 18/06/20 13:13, Vitaly Kuznetsov wrote:
+>>>> state_test/smm_test selftests are failing on AMD with:
+>>>> "Unexpected result from KVM_GET_MSRS, r: 51 (failed MSR was 0x345)"
+>>>>
+>>>> MSR_IA32_PERF_CAPABILITIES is an emulated MSR on Intel but it is not
+>>>> known to AMD code, emulate it there too (by returning 0 and allowing
+>>>> userspace to write 0). This way the code is better prepared to the
+>>>> eventual appearance of the feature in AMD hardware.
+>>>>
+>>>> Fixes: 27461da31089 ("KVM: x86/pmu: Support full width counting")
+>>>> Suggested-by: Jim Mattson <jmattson@google.com>
+>>>> Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
+>>>> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+>>>> ---
+>>>>  arch/x86/kvm/svm/pmu.c | 29 ++++++++++++++++++++++++++++-
+>>>>  1 file changed, 28 insertions(+), 1 deletion(-)
+>>> This is okay and I'll apply it, but it would be even better to move the
+>>> whole handling of the MSR to common x86 code.
+>> I thought about that but intel_pmu_set_msr() looks at
+>> vmx_get_perf_capabilities(), we'll need to abstract this somehow.
+>
+> Indeed, you could use kvm_get_msr_feature for that.
+>
 
-You could also include
+Turns out I completely forgot about this patch and just stumbled about
+the same issue again. The suggestion to move this to common x86 code
+makes perfect sense, I'll be sending v3 shortly.
 
-Daniel P. Berrang=C3=A9 <berrange@redhat.com>
-Sean Mooney <smooney@redhat.com>
+Thanks!
 
-=20
-> BTW, I found a page about live migration of SRIOV devices in openstack.
-> https://specs.openstack.org/openstack/nova-specs/specs/stein/approved/lib=
-virt-neutron-sriov-livemigration.html
-
-Sean, above, is involved with that specification.  AFAIK the only
-current live migration of SR-IOV devices involve failover and hotplug
-trickery.  Thanks,
-
-Alex
+-- 
+Vitaly
 
