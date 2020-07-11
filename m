@@ -2,43 +2,43 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 89B2A21C372
+	by mail.lfdr.de (Postfix) with ESMTP id E569021C373
 	for <lists+kvm@lfdr.de>; Sat, 11 Jul 2020 12:04:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726480AbgGKKEq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        id S1726496AbgGKKEq (ORCPT <rfc822;lists+kvm@lfdr.de>);
         Sat, 11 Jul 2020 06:04:46 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:50489 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726208AbgGKKEp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 11 Jul 2020 06:04:45 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:47194 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726367AbgGKKEp (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Sat, 11 Jul 2020 06:04:45 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
         s=mimecast20190719; t=1594461884;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=W+UmIX9bjp1SsTNPgtJx0GFQxPx7B6KTaPKfrg10fpU=;
-        b=jDc2COYMRS+PqXB5tQFln31AOne/CgSW1KBxDFzbbDvmtbAv8FiENo2lKO1g1nlgZGb5Fy
-        ci8eXt2wHuGhdbgjZ0KspDooArHCSDjFzB5Wt76MV5hXnkQ46j9XZilXcXE70Y/Y4bopw9
-        m1ngueaXejzOtj1NVEAtjNO4miMaCKc=
+        bh=aSv5IXYYxd1NQmBH+MOSA+b9yG3TWpxn7m1nNIW/CVc=;
+        b=JntBp8QkjmvBs7+VQaDr0ibV4ESicHL+GLrVyeKIQiSqqhVCuto2un0jBsnC6CFD+PZoN/
+        bC9zorU+wA0CtMCX92OR3rNHLEWs+mT82eIEEfppUdvW+hxoTOEXlF44abFe6tsEymyzQq
+        mtUAPXudPVaNnvxKDVUOS/5LgTykRjc=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-287-LzASmirmOQ2Eg7629F0cTw-1; Sat, 11 Jul 2020 06:04:40 -0400
-X-MC-Unique: LzASmirmOQ2Eg7629F0cTw-1
+ us-mta-122-wJHDSJtkMC-mYWyIQerywg-1; Sat, 11 Jul 2020 06:04:42 -0400
+X-MC-Unique: wJHDSJtkMC-mYWyIQerywg-1
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 980F780183C;
-        Sat, 11 Jul 2020 10:04:39 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A5569102C7ED;
+        Sat, 11 Jul 2020 10:04:41 +0000 (UTC)
 Received: from kamzik.brq.redhat.com (unknown [10.40.192.42])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id EA87619D61;
-        Sat, 11 Jul 2020 10:04:37 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 022E719D61;
+        Sat, 11 Jul 2020 10:04:39 +0000 (UTC)
 From:   Andrew Jones <drjones@redhat.com>
 To:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
 Cc:     pbonzini@redhat.com, maz@kernel.org, steven.price@arm.com
-Subject: [PATCH 1/5] KVM: arm64: pvtime: steal-time is only supported when configured
-Date:   Sat, 11 Jul 2020 12:04:30 +0200
-Message-Id: <20200711100434.46660-2-drjones@redhat.com>
+Subject: [PATCH 2/5] KVM: arm64: pvtime: Fix potential loss of stolen time
+Date:   Sat, 11 Jul 2020 12:04:31 +0200
+Message-Id: <20200711100434.46660-3-drjones@redhat.com>
 In-Reply-To: <20200711100434.46660-1-drjones@redhat.com>
 References: <20200711100434.46660-1-drjones@redhat.com>
 MIME-Version: 1.0
@@ -49,32 +49,38 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Don't confuse the guest by saying steal-time is supported when
-it hasn't been configured by userspace and won't work.
+We should only check current->sched_info.run_delay once when
+updating stolen time. Otherwise there's a chance there could
+be a change between checks that we miss (preemption disabling
+comes after vcpu request checks).
 
 Signed-off-by: Andrew Jones <drjones@redhat.com>
 ---
- arch/arm64/kvm/pvtime.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+ arch/arm64/kvm/pvtime.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
 diff --git a/arch/arm64/kvm/pvtime.c b/arch/arm64/kvm/pvtime.c
-index f7b52ce1557e..2b22214909be 100644
+index 2b22214909be..db5ef097a166 100644
 --- a/arch/arm64/kvm/pvtime.c
 +++ b/arch/arm64/kvm/pvtime.c
-@@ -42,9 +42,12 @@ long kvm_hypercall_pv_features(struct kvm_vcpu *vcpu)
+@@ -13,6 +13,7 @@
+ void kvm_update_stolen_time(struct kvm_vcpu *vcpu)
+ {
+ 	struct kvm *kvm = vcpu->kvm;
++	u64 last_steal = vcpu->arch.steal.last_steal;
+ 	u64 steal;
+ 	__le64 steal_le;
+ 	u64 offset;
+@@ -24,8 +25,8 @@ void kvm_update_stolen_time(struct kvm_vcpu *vcpu)
  
- 	switch (feature) {
- 	case ARM_SMCCC_HV_PV_TIME_FEATURES:
--	case ARM_SMCCC_HV_PV_TIME_ST:
- 		val = SMCCC_RET_SUCCESS;
- 		break;
-+	case ARM_SMCCC_HV_PV_TIME_ST:
-+		if (vcpu->arch.steal.base != GPA_INVALID)
-+			val = SMCCC_RET_SUCCESS;
-+		break;
- 	}
+ 	/* Let's do the local bookkeeping */
+ 	steal = vcpu->arch.steal.steal;
+-	steal += current->sched_info.run_delay - vcpu->arch.steal.last_steal;
+ 	vcpu->arch.steal.last_steal = current->sched_info.run_delay;
++	steal += vcpu->arch.steal.last_steal - last_steal;
+ 	vcpu->arch.steal.steal = steal;
  
- 	return val;
+ 	steal_le = cpu_to_le64(steal);
 -- 
 2.25.4
 
