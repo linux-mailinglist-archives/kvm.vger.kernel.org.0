@@ -2,218 +2,167 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D9BC421C8F3
-	for <lists+kvm@lfdr.de>; Sun, 12 Jul 2020 13:20:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8D98921C959
+	for <lists+kvm@lfdr.de>; Sun, 12 Jul 2020 15:10:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728827AbgGLLUO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 12 Jul 2020 07:20:14 -0400
-Received: from mga03.intel.com ([134.134.136.65]:51224 "EHLO mga03.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728967AbgGLLT6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 12 Jul 2020 07:19:58 -0400
-IronPort-SDR: 7mLzU9h5aNgNsihuhMaBqZpCc5JZBjXJHEVtP0Qsr66SCUDim4K5Wikzg24xt25/Cp2BF5yNKI
- ZmZY9qe3xKtg==
-X-IronPort-AV: E=McAfee;i="6000,8403,9679"; a="148490205"
-X-IronPort-AV: E=Sophos;i="5.75,343,1589266800"; 
-   d="scan'208";a="148490205"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Jul 2020 04:19:56 -0700
-IronPort-SDR: uTsXBBHeVketl5+9iAuEVtbB1yUlYyVt+grYOAidblNm2nazWt2lTKIxfsCYgtI5Uu1KQGgddm
- yehsf/7ZuCCg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.75,343,1589266800"; 
-   d="scan'208";a="307121492"
-Received: from jacob-builder.jf.intel.com ([10.7.199.155])
-  by fmsmga004.fm.intel.com with ESMTP; 12 Jul 2020 04:19:55 -0700
-From:   Liu Yi L <yi.l.liu@intel.com>
-To:     qemu-devel@nongnu.org, alex.williamson@redhat.com,
-        peterx@redhat.com
-Cc:     mst@redhat.com, pbonzini@redhat.com, eric.auger@redhat.com,
-        david@gibson.dropbear.id.au, jean-philippe@linaro.org,
-        kevin.tian@intel.com, yi.l.liu@intel.com, jun.j.tian@intel.com,
-        yi.y.sun@intel.com, hao.wu@intel.com, kvm@vger.kernel.org,
-        jasowang@redhat.com, Jacob Pan <jacob.jun.pan@linux.intel.com>,
-        Yi Sun <yi.y.sun@linux.intel.com>,
-        Richard Henderson <rth@twiddle.net>,
-        Eduardo Habkost <ehabkost@redhat.com>
-Subject: [RFC v8 25/25] intel_iommu: modify x-scalable-mode to be string option
-Date:   Sun, 12 Jul 2020 04:26:21 -0700
-Message-Id: <1594553181-55810-26-git-send-email-yi.l.liu@intel.com>
-X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1594553181-55810-1-git-send-email-yi.l.liu@intel.com>
-References: <1594553181-55810-1-git-send-email-yi.l.liu@intel.com>
+        id S1728847AbgGLNKX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 12 Jul 2020 09:10:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49278 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728686AbgGLNKV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 12 Jul 2020 09:10:21 -0400
+Received: from mail-pf1-x442.google.com (mail-pf1-x442.google.com [IPv6:2607:f8b0:4864:20::442])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 32A2AC061794;
+        Sun, 12 Jul 2020 06:10:21 -0700 (PDT)
+Received: by mail-pf1-x442.google.com with SMTP id z3so4763833pfn.12;
+        Sun, 12 Jul 2020 06:10:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id;
+        bh=NRP39QoMA7cboQj2MMbTyFFjYJ67xWA6XbsSY/jB4dA=;
+        b=JhlgiLXkD5O4zUGxXccVQPXMT+O9o31DADprV5OMtKmgXgwlyQDyU6AHHqfQhE5WDR
+         gh5b7kg1tMcyp7AboKcI3mVUn5/qm89WJOEiNibftq/jOQEKkxQzTk37RfP+SpFJJd9L
+         4TjLUq1DlQ19yLYAdhUXnAvimn3qmIX7ObMY5J2FOxASotv4BtIullWP63iJy4HsroOj
+         U65y23wASAoSP20WQ6BwLVSu8J3+lE8szV/mSTbI3FCCUX9/L/nBKqwJsdlrs8NbFA1A
+         ugtQV82lcIzXRaUNqb/D4kPjsUKXNmCZ5CTHMUXJ7R74r0HW9eEvKuqZUawq1z60LL84
+         IqZQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=NRP39QoMA7cboQj2MMbTyFFjYJ67xWA6XbsSY/jB4dA=;
+        b=d7PiObanZmbBIQ961R1LOM/mBvtnhEwtoK3Dj+wlkwr6Qu4ZXXF/oXspO8ao3k2R4e
+         bSEMrAzIz2DRCxk7lTbbWi39jqVV02VnfFZzGX7J9r41OzCXG6+wWxobOFGIf4AQX9Yj
+         ir59KuwdP39gJKanSAvM5J137RiwAqx5uxOyor6Bi3BWrtD9oHxMne3qHdydnCaINyGY
+         HzOICjSu1i8zLFBpqTCmdedXNJDBnoBiefOc9qxFIy6Yv9MtQugpj/WDs2jyEVN9aHuO
+         sVEYZqUqsOlNGU42kZkE9twbrcF7vxCuuam3F/igfc0ZaoLm+kzu599ICi8n1RF9/goq
+         BUPQ==
+X-Gm-Message-State: AOAM530JUACt+jbcqxdsK/NZvlJgGxcRY76OVkEl4vuezjjuTTvBgo1b
+        uuELXNo0tZVeQu+p4w386A==
+X-Google-Smtp-Source: ABdhPJyrr3l21D86j8HF4DyLsuHvOdUtkQkflxGYyEfr832mw/NrHe0iwr46Z+tErL/jQPKe027rGQ==
+X-Received: by 2002:a05:6a00:2286:: with SMTP id f6mr68025222pfe.303.1594559420452;
+        Sun, 12 Jul 2020 06:10:20 -0700 (PDT)
+Received: from localhost.localdomain ([2409:4071:200a:9520:4919:edd3:5dbd:ffec])
+        by smtp.gmail.com with ESMTPSA id q24sm12093014pfg.95.2020.07.12.06.10.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 12 Jul 2020 06:10:19 -0700 (PDT)
+From:   madhuparnabhowmik10@gmail.com
+To:     paulmck@kernel.org, josh@joshtriplett.org, joel@joelfernandes.org,
+        pbonzini@redhat.com
+Cc:     rcu@vger.kernel.org, linux-kernel@vger.kernel.org, x86@kernel.org,
+        kvm@vger.kernel.org, frextrite@gmail.com,
+        Madhuparna Bhowmik <madhuparnabhowmik10@gmail.com>
+Subject: [PATCH 1/2] rculist : Introduce list/hlist_for_each_entry_srcu() macros
+Date:   Sun, 12 Jul 2020 18:40:02 +0530
+Message-Id: <20200712131003.23271-1-madhuparnabhowmik10@gmail.com>
+X-Mailer: git-send-email 2.17.1
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Intel VT-d 3.0 introduces scalable mode, and it has a bunch of capabilities
-related to scalable mode translation, thus there are multiple combinations.
-While this vIOMMU implementation wants simplify it for user by providing
-typical combinations. User could config it by "x-scalable-mode" option. The
-usage is as below:
+From: Madhuparna Bhowmik <madhuparnabhowmik10@gmail.com>
 
-"-device intel-iommu,x-scalable-mode=["legacy"|"modern"|"off"]"
+list/hlist_for_each_entry_rcu() provides an optional cond argument
+to specify the lock held in the updater side.
+However for SRCU read side, not providing the cond argument results
+into false positive as whether srcu_read_lock is held or not is not
+checked implicitly. Therefore, on read side the lockdep expression
+srcu_read_lock_held(srcu struct) can solve this issue.
 
- - "legacy": gives support for SL page table
- - "modern": gives support for FL page table, pasid, virtual command
- - "off": no scalable mode support
- -  if not configured, means no scalable mode support, if not proper
-    configured, will throw error
+However, the function still fails to check the cases where srcu
+protected list is traversed with rcu_read_lock() instead of
+srcu_read_lock(). Therefore, to remove the false negative,
+this patch introduces two new list traversal primitives :
+list_for_each_entry_srcu() and hlist_for_each_entry_srcu().
 
-Note: this patch is supposed to be merged when the whole vSVA patch series
-were merged.
+Both of the functions have non-optional cond argument
+as it is required for both read and update side, and simply checks
+if the cond is true. For regular read side the lockdep expression
+srcu_read_lock_head() can be passed as the cond argument to
+list/hlist_for_each_entry_srcu().
 
-Cc: Kevin Tian <kevin.tian@intel.com>
-Cc: Jacob Pan <jacob.jun.pan@linux.intel.com>
-Cc: Peter Xu <peterx@redhat.com>
-Cc: Yi Sun <yi.y.sun@linux.intel.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Richard Henderson <rth@twiddle.net>
-Cc: Eduardo Habkost <ehabkost@redhat.com>
-Reviewed-by: Peter Xu <peterx@redhat.com>
-Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
-Signed-off-by: Yi Sun <yi.y.sun@linux.intel.com>
+Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
+Signed-off-by: Madhuparna Bhowmik <madhuparnabhowmik10@gmail.com>
 ---
-rfcv5 (v2) -> rfcv6:
-*) reports want_nested to VFIO;
-*) assert iommu_set/unset_iommu_context() if vIOMMU is not scalable modern.
----
- hw/i386/intel_iommu.c          | 39 +++++++++++++++++++++++++++++++++++----
- hw/i386/intel_iommu_internal.h |  3 +++
- include/hw/i386/intel_iommu.h  |  2 ++
- 3 files changed, 40 insertions(+), 4 deletions(-)
+ include/linux/rculist.h | 48 +++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 48 insertions(+)
 
-diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
-index 2bbb4b1..d807484 100644
---- a/hw/i386/intel_iommu.c
-+++ b/hw/i386/intel_iommu.c
-@@ -4050,7 +4050,7 @@ static Property vtd_properties[] = {
-     DEFINE_PROP_UINT8("aw-bits", IntelIOMMUState, aw_bits,
-                       VTD_HOST_ADDRESS_WIDTH),
-     DEFINE_PROP_BOOL("caching-mode", IntelIOMMUState, caching_mode, FALSE),
--    DEFINE_PROP_BOOL("x-scalable-mode", IntelIOMMUState, scalable_mode, FALSE),
-+    DEFINE_PROP_STRING("x-scalable-mode", IntelIOMMUState, scalable_mode_str),
-     DEFINE_PROP_BOOL("dma-drain", IntelIOMMUState, dma_drain, true),
-     DEFINE_PROP_END_OF_LIST(),
- };
-@@ -4420,6 +4420,7 @@ VTDAddressSpace *vtd_find_add_as(IntelIOMMUState *s, PCIBus *bus, int devfn)
- static int vtd_dev_get_iommu_attr(PCIBus *bus, void *opaque, int32_t devfn,
-                                    IOMMUAttr attr, void *data)
- {
-+    IntelIOMMUState *s = opaque;
-     int ret = 0;
- 
-     assert(0 <= devfn && devfn < PCI_DEVFN_MAX);
-@@ -4429,8 +4430,7 @@ static int vtd_dev_get_iommu_attr(PCIBus *bus, void *opaque, int32_t devfn,
-     {
-         bool *pdata = data;
- 
--        /* return false until vSVA is ready */
--        *pdata = false;
-+        *pdata = s->scalable_modern ? true : false;
-         break;
-     }
-     default:
-@@ -4526,6 +4526,8 @@ static int vtd_dev_set_iommu_context(PCIBus *bus, void *opaque,
-     VTDHostIOMMUContext *vtd_dev_icx;
- 
-     assert(0 <= devfn && devfn < PCI_DEVFN_MAX);
-+    /* only modern scalable supports set_ioimmu_context */
-+    assert(s->scalable_modern);
- 
-     vtd_bus = vtd_find_add_bus(s, bus);
- 
-@@ -4560,6 +4562,8 @@ static void vtd_dev_unset_iommu_context(PCIBus *bus, void *opaque, int devfn)
-     VTDHostIOMMUContext *vtd_dev_icx;
- 
-     assert(0 <= devfn && devfn < PCI_DEVFN_MAX);
-+    /* only modern scalable supports unset_ioimmu_context */
-+    assert(s->scalable_modern);
- 
-     vtd_bus = vtd_find_add_bus(s, bus);
- 
-@@ -4787,8 +4791,13 @@ static void vtd_init(IntelIOMMUState *s)
-     }
- 
-     /* TODO: read cap/ecap from host to decide which cap to be exposed. */
--    if (s->scalable_mode) {
-+    if (s->scalable_mode && !s->scalable_modern) {
-         s->ecap |= VTD_ECAP_SMTS | VTD_ECAP_SRS | VTD_ECAP_SLTS;
-+    } else if (s->scalable_mode && s->scalable_modern) {
-+        s->ecap |= VTD_ECAP_SMTS | VTD_ECAP_SRS | VTD_ECAP_PASID |
-+                   VTD_ECAP_FLTS | VTD_ECAP_PSS(VTD_PASID_SS) |
-+                   VTD_ECAP_VCS;
-+        s->vccap |= VTD_VCCAP_PAS;
-     }
- 
-     if (!s->cap_finalized) {
-@@ -4929,6 +4938,28 @@ static bool vtd_decide_config(IntelIOMMUState *s, Error **errp)
-         return false;
-     }
- 
-+    if (s->scalable_mode_str &&
-+        (strcmp(s->scalable_mode_str, "off") &&
-+         strcmp(s->scalable_mode_str, "modern") &&
-+         strcmp(s->scalable_mode_str, "legacy"))) {
-+        error_setg(errp, "Invalid x-scalable-mode config,"
-+                         "Please use \"modern\", \"legacy\" or \"off\"");
-+        return false;
-+    }
+diff --git a/include/linux/rculist.h b/include/linux/rculist.h
+index df587d181844..516b4feb2682 100644
+--- a/include/linux/rculist.h
++++ b/include/linux/rculist.h
+@@ -63,9 +63,17 @@ static inline void INIT_LIST_HEAD_RCU(struct list_head *list)
+ 	RCU_LOCKDEP_WARN(!(cond) && !rcu_read_lock_any_held(),		\
+ 			 "RCU-list traversed in non-reader section!");	\
+ 	})
 +
-+    if (s->scalable_mode_str &&
-+        !strcmp(s->scalable_mode_str, "legacy")) {
-+        s->scalable_mode = true;
-+        s->scalable_modern = false;
-+    } else if (s->scalable_mode_str &&
-+        !strcmp(s->scalable_mode_str, "modern")) {
-+        s->scalable_mode = true;
-+        s->scalable_modern = true;
-+    } else {
-+        s->scalable_mode = false;
-+        s->scalable_modern = false;
-+    }
++#define __list_check_srcu(cond)					 \
++	({								 \
++	RCU_LOCKDEP_WARN(!(cond),					 \
++		"RCU-list traversed without holding the required lock!");\
++	})
+ #else
+ #define __list_check_rcu(dummy, cond, extra...)				\
+ 	({ check_arg_count_one(extra); })
 +
-     return true;
- }
++#define __list_check_srcu(cond)
+ #endif
  
-diff --git a/hw/i386/intel_iommu_internal.h b/hw/i386/intel_iommu_internal.h
-index 9b4fc67..afb4c6a 100644
---- a/hw/i386/intel_iommu_internal.h
-+++ b/hw/i386/intel_iommu_internal.h
-@@ -197,7 +197,9 @@
- #define VTD_ECAP_MHMV               (15ULL << 20)
- #define VTD_ECAP_SRS                (1ULL << 31)
- #define VTD_ECAP_SMTS               (1ULL << 43)
-+#define VTD_ECAP_VCS                (1ULL << 44)
- #define VTD_ECAP_SLTS               (1ULL << 46)
-+#define VTD_ECAP_FLTS               (1ULL << 47)
+ /*
+@@ -383,6 +391,25 @@ static inline void list_splice_tail_init_rcu(struct list_head *list,
+ 		&pos->member != (head);					\
+ 		pos = list_entry_rcu(pos->member.next, typeof(*pos), member))
  
- /* 1st level related caps */
- #define VTD_CAP_FL1GP               (1ULL << 56)
-@@ -209,6 +211,7 @@
- #define VTD_ECAP_PSS(val)           (((val) & 0x1fULL) << 35)
- #define VTD_ECAP_PASID              (1ULL << 40)
++/**
++ * list_for_each_entry_srcu	-	iterate over rcu list of given type
++ * @pos:	the type * to use as a loop cursor.
++ * @head:	the head for your list.
++ * @member:	the name of the list_head within the struct.
++ * @cond:	lockdep expression for the lock required to traverse the list.
++ *
++ * This list-traversal primitive may safely run concurrently with
++ * the _rcu list-mutation primitives such as list_add_rcu()
++ * as long as the traversal is guarded by srcu_read_lock().
++ * The lockdep expression srcu_read_lock_held() can be passed as the
++ * cond argument from read side.
++ */
++#define list_for_each_entry_srcu(pos, head, member, cond)		\
++	for (__list_check_srcu(cond),					\
++	     pos = list_entry_rcu((head)->next, typeof(*pos), member);	\
++		&pos->member != (head);					\
++		pos = list_entry_rcu(pos->member.next, typeof(*pos), member))
++
+ /**
+  * list_entry_lockless - get the struct for this entry
+  * @ptr:        the &struct list_head pointer.
+@@ -681,6 +708,27 @@ static inline void hlist_add_behind_rcu(struct hlist_node *n,
+ 		pos = hlist_entry_safe(rcu_dereference_raw(hlist_next_rcu(\
+ 			&(pos)->member)), typeof(*(pos)), member))
  
-+#define VTD_PASID_SS                (19)
- #define VTD_GET_PSS(val)            (((val) >> 35) & 0x1f)
- #define VTD_ECAP_PSS_MASK           (0x1fULL << 35)
- 
-diff --git a/include/hw/i386/intel_iommu.h b/include/hw/i386/intel_iommu.h
-index 1aab882..fd64364 100644
---- a/include/hw/i386/intel_iommu.h
-+++ b/include/hw/i386/intel_iommu.h
-@@ -263,6 +263,8 @@ struct IntelIOMMUState {
- 
-     bool caching_mode;              /* RO - is cap CM enabled? */
-     bool scalable_mode;             /* RO - is Scalable Mode supported? */
-+    char *scalable_mode_str;        /* RO - admin's Scalable Mode config */
-+    bool scalable_modern;           /* RO - is modern SM supported? */
- 
-     dma_addr_t root;                /* Current root table pointer */
-     bool root_scalable;             /* Type of root table (scalable or not) */
++/**
++ * hlist_for_each_entry_srcu - iterate over rcu list of given type
++ * @pos:	the type * to use as a loop cursor.
++ * @head:	the head for your list.
++ * @member:	the name of the hlist_node within the struct.
++ * @cond:	lockdep expression for the lock required to traverse the list.
++ *
++ * This list-traversal primitive may safely run concurrently with
++ * the _rcu list-mutation primitives such as hlist_add_head_rcu()
++ * as long as the traversal is guarded by srcu_read_lock().
++ * The lockdep expression srcu_read_lock_held() can be passed as the
++ * cond argument from read side.
++ */
++#define hlist_for_each_entry_srcu(pos, head, member, cond)		\
++	for (__list_check_srcu(cond),					\
++	     pos = hlist_entry_safe(rcu_dereference_raw(hlist_first_rcu(head)),\
++			typeof(*(pos)), member);			\
++		pos;							\
++		pos = hlist_entry_safe(rcu_dereference_raw(hlist_next_rcu(\
++			&(pos)->member)), typeof(*(pos)), member))
++
+ /**
+  * hlist_for_each_entry_rcu_notrace - iterate over rcu list of given type (for tracing)
+  * @pos:	the type * to use as a loop cursor.
 -- 
-2.7.4
+2.17.1
 
