@@ -2,104 +2,87 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 054BB21C95A
-	for <lists+kvm@lfdr.de>; Sun, 12 Jul 2020 15:10:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D2C6221C9E5
+	for <lists+kvm@lfdr.de>; Sun, 12 Jul 2020 16:56:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728862AbgGLNK3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 12 Jul 2020 09:10:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49296 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728857AbgGLNK1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 12 Jul 2020 09:10:27 -0400
-Received: from mail-pf1-x442.google.com (mail-pf1-x442.google.com [IPv6:2607:f8b0:4864:20::442])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A36DCC061794;
-        Sun, 12 Jul 2020 06:10:27 -0700 (PDT)
-Received: by mail-pf1-x442.google.com with SMTP id x72so4784506pfc.6;
-        Sun, 12 Jul 2020 06:10:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=QlHdcq1NMFZUiVr/PWZTQMUwB+nApvKctneHSUoV9JI=;
-        b=CDx8EbSNzRbyCNhyw7LW1mm97sOqmMXjqAFWs4mxTiPuHBDb0GM1lk1UwKagomOVR5
-         pFVN5rAHmjjq0wHMbWdUctDF6J0OpGVsK21gv74z/DHVdqRe5Cv0V4OkzuaqOKRu0VDc
-         3tUtThRmTJNUYnY/olbPHMAUcalI2BDfArzx0sfEk26J8q21cHTwII/j0FwMwPCBNZyy
-         7ACuD6Ua+HhLe4dh9NmV0YWtHilYo+WvHMXXGIr8Lu3Sy7gHi1RC4Q8ehTMGvQ3DJq6+
-         hMcnS9E7DoQ/qiqvzI58Ye1eQ5fc2U3FyqXTfIRE+TQCDhRH6S7kaOUDIz8tmxyAaN2k
-         yCkw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references;
-        bh=QlHdcq1NMFZUiVr/PWZTQMUwB+nApvKctneHSUoV9JI=;
-        b=BXGEm/TW7bWqZ8wZO/nYWXPy420IVu7s/mFp0HvEiYg8W4omPnY06C5Ps72oJ9CUI0
-         Qbqw8zvFEerjLWDJ6ansvx4vRa2Tj4mEJLI9Modox69LvmM3Dpix/ZiXlQuyFAtcz1Ve
-         izCZIg2C/1s4ATsIx+s28gdkaSiPe1N/c+8/IJIigfKD6UWcbzvVNb+GvUIk6bf2WWjj
-         AYv98ymZtz8vLYAJ4Ab+nDCtCl8ZdsGGo4fZcAktKo8d5HfoK6qoEJhI3HSitXHEoHM7
-         IDZIeMGgBwYv/svo8bgNv/Iwk06L2yQ2vyX4zO+g8xF9//UxenBv3sGi0ubzIIMZaUtQ
-         Z/eQ==
-X-Gm-Message-State: AOAM533DkuRoVrjx+dISyVlzc67zyclnv77C9Dhk6tTYipDNDhyqDmy9
-        5BaYaZNrNzFawgf5nabfzg==
-X-Google-Smtp-Source: ABdhPJzGCWqeGrl0pmni+0aENWLJwun+oPUDiRCIjS3IwjlN3XTVOCk6hJo4EVWSlnu21qMCqiR/Cg==
-X-Received: by 2002:a62:b413:: with SMTP id h19mr17778687pfn.142.1594559427253;
-        Sun, 12 Jul 2020 06:10:27 -0700 (PDT)
-Received: from localhost.localdomain ([2409:4071:200a:9520:4919:edd3:5dbd:ffec])
-        by smtp.gmail.com with ESMTPSA id q24sm12093014pfg.95.2020.07.12.06.10.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 12 Jul 2020 06:10:26 -0700 (PDT)
-From:   madhuparnabhowmik10@gmail.com
-To:     paulmck@kernel.org, josh@joshtriplett.org, joel@joelfernandes.org,
-        pbonzini@redhat.com
-Cc:     rcu@vger.kernel.org, linux-kernel@vger.kernel.org, x86@kernel.org,
-        kvm@vger.kernel.org, frextrite@gmail.com,
-        Madhuparna Bhowmik <madhuparnabhowmik10@gmail.com>
-Subject: [PATCH 2/2] kvm: mmu: page_track: Fix RCU list API usage
-Date:   Sun, 12 Jul 2020 18:40:03 +0530
-Message-Id: <20200712131003.23271-2-madhuparnabhowmik10@gmail.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20200712131003.23271-1-madhuparnabhowmik10@gmail.com>
-References: <20200712131003.23271-1-madhuparnabhowmik10@gmail.com>
+        id S1729033AbgGLOzr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 12 Jul 2020 10:55:47 -0400
+Received: from mga07.intel.com ([134.134.136.100]:60123 "EHLO mga07.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728826AbgGLOzr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 12 Jul 2020 10:55:47 -0400
+IronPort-SDR: yCrpzf0qMUXqg2i2NTUwpah9v1fYbVJJXuwmgZBB+q976M1ZmLSEr0Cc5ctEdpHNZ+LkqdQVyy
+ 4WUcB7YsVGEA==
+X-IronPort-AV: E=McAfee;i="6000,8403,9680"; a="213353168"
+X-IronPort-AV: E=Sophos;i="5.75,344,1589266800"; 
+   d="scan'208";a="213353168"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Jul 2020 07:55:45 -0700
+IronPort-SDR: gJUXCmTd5tVBqS1SWc31K3wrUNzDbB8JPFF94ZwPVZGGFmccLuA+fmw8xBgYMHJv5pZgTaYA7e
+ ui5+SOPZuJUQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.75,343,1589266800"; 
+   d="scan'208";a="458977463"
+Received: from unknown (HELO localhost.localdomain.bj.intel.com) ([10.240.192.131])
+  by orsmga005.jf.intel.com with ESMTP; 12 Jul 2020 07:55:42 -0700
+From:   Zhu Lingshan <lingshan.zhu@intel.com>
+To:     mst@redhat.com, jasowang@redhat.com, alex.williamson@redhat.com,
+        pbonzini@redhat.com, sean.j.christopherson@intel.com,
+        wanpengli@tencent.com
+Cc:     virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
+        netdev@vger.kernel.org, dan.daly@intel.com,
+        Zhu Lingshan <lingshan.zhu@intel.com>
+Subject: [PATCH 0/7] *** IRQ offloading for vDPA ***
+Date:   Sun, 12 Jul 2020 22:52:04 +0800
+Message-Id: <1594565524-3394-1-git-send-email-lingshan.zhu@intel.com>
+X-Mailer: git-send-email 1.8.3.1
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Madhuparna Bhowmik <madhuparnabhowmik10@gmail.com>
+Hi All,
 
-Use hlist_for_each_entry_srcu() instead of hlist_for_each_entry_rcu()
-as it also checkes if the right lock is held.
-Using hlist_for_each_entry_rcu() with a condition argument will not
-report the cases where a SRCU protected list is traversed using
-rcu_read_lock(). Hence, use hlist_for_each_entry_srcu().
+This series intends to implement IRQ offloading for
+vhost_vdpa.
 
-Signed-off-by: Madhuparna Bhowmik <madhuparnabhowmik10@gmail.com>
----
- arch/x86/kvm/mmu/page_track.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+By the feat of irq forwarding facilities like posted
+interrupt on X86, irq bypass can  help deliver
+interrupts to vCPU directly.
 
-diff --git a/arch/x86/kvm/mmu/page_track.c b/arch/x86/kvm/mmu/page_track.c
-index a7bcde34d1f2..a9cd17625950 100644
---- a/arch/x86/kvm/mmu/page_track.c
-+++ b/arch/x86/kvm/mmu/page_track.c
-@@ -229,7 +229,8 @@ void kvm_page_track_write(struct kvm_vcpu *vcpu, gpa_t gpa, const u8 *new,
- 		return;
- 
- 	idx = srcu_read_lock(&head->track_srcu);
--	hlist_for_each_entry_rcu(n, &head->track_notifier_list, node)
-+	hlist_for_each_entry_srcu(n, &head->track_notifier_list, node,
-+				srcu_read_lock_held(&head->track_srcu))
- 		if (n->track_write)
- 			n->track_write(vcpu, gpa, new, bytes, n);
- 	srcu_read_unlock(&head->track_srcu, idx);
-@@ -254,7 +255,8 @@ void kvm_page_track_flush_slot(struct kvm *kvm, struct kvm_memory_slot *slot)
- 		return;
- 
- 	idx = srcu_read_lock(&head->track_srcu);
--	hlist_for_each_entry_rcu(n, &head->track_notifier_list, node)
-+	hlist_for_each_entry_srcu(n, &head->track_notifier_list, node,
-+				srcu_read_lock_held(&head->track_srcu))
- 		if (n->track_flush_slot)
- 			n->track_flush_slot(kvm, slot, n);
- 	srcu_read_unlock(&head->track_srcu, idx);
+vDPA devices have dedicated hardware backends like VFIO
+pass-throughed devices. So it would be possible to setup
+irq offloading(irq bypass) for vDPA devices and gain
+performance improvements.
+
+In my testing, with this feature, we can save 0.1ms
+in a ping between two VFs on average.
+
+
+Zhu Lingshan (7):
+  vhost: introduce vhost_call_ctx
+  kvm/vfio: detect assigned device via irqbypass manager
+  vhost_vdpa: implement IRQ offloading functions in vhost_vdpa
+  vDPA: implement IRQ offloading helpers in vDPA core
+  virtio_vdpa: init IRQ offloading function pointers to NULL.
+  ifcvf: replace irq_request/free with helpers in vDPA core.
+  irqbypass: do not start consumer or producer when failed to connect
+
+ arch/x86/kvm/x86.c              | 10 ++++--
+ drivers/vdpa/ifcvf/ifcvf_main.c | 11 +++---
+ drivers/vdpa/vdpa.c             | 46 +++++++++++++++++++++++++
+ drivers/vhost/Kconfig           |  1 +
+ drivers/vhost/vdpa.c            | 75 +++++++++++++++++++++++++++++++++++++++--
+ drivers/vhost/vhost.c           | 22 ++++++++----
+ drivers/vhost/vhost.h           |  9 ++++-
+ drivers/virtio/virtio_vdpa.c    |  2 ++
+ include/linux/vdpa.h            | 11 ++++++
+ virt/kvm/vfio.c                 |  2 --
+ virt/lib/irqbypass.c            | 16 +++++----
+ 11 files changed, 181 insertions(+), 24 deletions(-)
+
 -- 
-2.17.1
+1.8.3.1
 
