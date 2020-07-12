@@ -2,129 +2,95 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5A9A221C9FB
-	for <lists+kvm@lfdr.de>; Sun, 12 Jul 2020 17:29:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EF92721CA19
+	for <lists+kvm@lfdr.de>; Sun, 12 Jul 2020 18:09:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729050AbgGLP3M (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 12 Jul 2020 11:29:12 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:60449 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1728840AbgGLP3M (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 12 Jul 2020 11:29:12 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1594567751;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=CFrF3EbQ76BoanXtBOwfOHtU1KUbzMZo9fz3ulVTvys=;
-        b=Q9oPzVta3cYMa+XV7GXfktJ9eER/vf+XnIjrln19107rFF66DIFJxAUmXgxDvszfxkmGSb
-        B8S4+gLVdEBix9gbQkbultifnTfAelsaktona+NNg4dbNq4r1qNQZM3XectKko1UvCzEOm
-        qeQ0axAO26BkT9pbkWA0Ft66dPRMK2w=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-164-YgHa_-TAM9C7v0U8PDB5Zg-1; Sun, 12 Jul 2020 11:29:09 -0400
-X-MC-Unique: YgHa_-TAM9C7v0U8PDB5Zg-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        id S1729012AbgGLQI5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 12 Jul 2020 12:08:57 -0400
+Received: from mail.kernel.org ([198.145.29.99]:49994 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728844AbgGLQI4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 12 Jul 2020 12:08:56 -0400
+Received: from paulmck-ThinkPad-P72.home (50-39-111-31.bvtn.or.frontiernet.net [50.39.111.31])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9A35418FF67E;
-        Sun, 12 Jul 2020 15:29:07 +0000 (UTC)
-Received: from x1.home (ovpn-112-71.phx2.redhat.com [10.3.112.71])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 9BB9F74F4D;
-        Sun, 12 Jul 2020 15:29:03 +0000 (UTC)
-Date:   Sun, 12 Jul 2020 09:29:02 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Zhu Lingshan <lingshan.zhu@intel.com>
-Cc:     mst@redhat.com, jasowang@redhat.com, pbonzini@redhat.com,
-        sean.j.christopherson@intel.com, wanpengli@tencent.com,
-        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
-        netdev@vger.kernel.org, dan.daly@intel.com
-Subject: Re: [PATCH 2/7] kvm/vfio: detect assigned device via irqbypass
- manager
-Message-ID: <20200712092902.5960f340@x1.home>
-In-Reply-To: <1594565366-3195-2-git-send-email-lingshan.zhu@intel.com>
-References: <1594565366-3195-1-git-send-email-lingshan.zhu@intel.com>
-        <1594565366-3195-2-git-send-email-lingshan.zhu@intel.com>
-Organization: Red Hat
+        by mail.kernel.org (Postfix) with ESMTPSA id 3176820702;
+        Sun, 12 Jul 2020 16:08:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1594570136;
+        bh=IjxKA104PBTV6rYMTFQjKnY3pbyLHFYG4ujpSbcRzzM=;
+        h=Date:From:To:Cc:Subject:Reply-To:References:In-Reply-To:From;
+        b=PP9B2G7OaMHY9x0QwoC8yRG5NYPF0b+HiNfn4yoO7QJL9aNOrpN3gVHmBDKGys1xj
+         aFEB3n1dMxVoqWZTg74k6j+2i+MRjdavFrMwxE3fK+vpLilB/nP034ZbVqjts96dXK
+         R6O9Lfaga6TGbp6+Wht6LXiZGWrEH0g8r4tPQ45g=
+Received: by paulmck-ThinkPad-P72.home (Postfix, from userid 1000)
+        id 1753E3522A6D; Sun, 12 Jul 2020 09:08:56 -0700 (PDT)
+Date:   Sun, 12 Jul 2020 09:08:56 -0700
+From:   "Paul E. McKenney" <paulmck@kernel.org>
+To:     madhuparnabhowmik10@gmail.com
+Cc:     josh@joshtriplett.org, joel@joelfernandes.org, pbonzini@redhat.com,
+        rcu@vger.kernel.org, linux-kernel@vger.kernel.org, x86@kernel.org,
+        kvm@vger.kernel.org, frextrite@gmail.com
+Subject: Re: [PATCH 2/2] kvm: mmu: page_track: Fix RCU list API usage
+Message-ID: <20200712160856.GW9247@paulmck-ThinkPad-P72>
+Reply-To: paulmck@kernel.org
+References: <20200712131003.23271-1-madhuparnabhowmik10@gmail.com>
+ <20200712131003.23271-2-madhuparnabhowmik10@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200712131003.23271-2-madhuparnabhowmik10@gmail.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sun, 12 Jul 2020 22:49:21 +0800
-Zhu Lingshan <lingshan.zhu@intel.com> wrote:
-
-> We used to detect assigned device via VFIO manipulated device
-> conters. This is less flexible consider VFIO is not the only
-> interface for assigned device. vDPA devices has dedicated
-> backed hardware as well. So this patch tries to detect
-> the assigned device via irqbypass manager.
+On Sun, Jul 12, 2020 at 06:40:03PM +0530, madhuparnabhowmik10@gmail.com wrote:
+> From: Madhuparna Bhowmik <madhuparnabhowmik10@gmail.com>
 > 
-> We will increase/decrease the assigned device counter in kvm/x86.
-> Both vDPA and VFIO would go through this code path.
+> Use hlist_for_each_entry_srcu() instead of hlist_for_each_entry_rcu()
+> as it also checkes if the right lock is held.
+> Using hlist_for_each_entry_rcu() with a condition argument will not
+> report the cases where a SRCU protected list is traversed using
+> rcu_read_lock(). Hence, use hlist_for_each_entry_srcu().
 > 
-> This code path only affect x86 for now.
+> Signed-off-by: Madhuparna Bhowmik <madhuparnabhowmik10@gmail.com>
 
-No it doesn't, it only adds VFIO support to x86, but it removes it from
-architecture neutral code.  Also a VFIO device does not necessarily
-make use of the irqbypass manager, this depends on platform support and
-enablement of this feature.   Therefore, NAK.  Thanks,
+I queued both for testing and review, thank you!
 
-Alex
- 
-> Signed-off-by: Zhu Lingshan <lingshan.zhu@intel.com>
+In particular, this one needs an ack by the maintainer.
+
+							Thanx, Paul
+
 > ---
->  arch/x86/kvm/x86.c | 10 ++++++++--
->  virt/kvm/vfio.c    |  2 --
->  2 files changed, 8 insertions(+), 4 deletions(-)
+>  arch/x86/kvm/mmu/page_track.c | 6 ++++--
+>  1 file changed, 4 insertions(+), 2 deletions(-)
 > 
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 00c88c2..20c07d3 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -10624,11 +10624,17 @@ int kvm_arch_irq_bypass_add_producer(struct irq_bypass_consumer *cons,
->  {
->  	struct kvm_kernel_irqfd *irqfd =
->  		container_of(cons, struct kvm_kernel_irqfd, consumer);
-> +	int ret;
+> diff --git a/arch/x86/kvm/mmu/page_track.c b/arch/x86/kvm/mmu/page_track.c
+> index a7bcde34d1f2..a9cd17625950 100644
+> --- a/arch/x86/kvm/mmu/page_track.c
+> +++ b/arch/x86/kvm/mmu/page_track.c
+> @@ -229,7 +229,8 @@ void kvm_page_track_write(struct kvm_vcpu *vcpu, gpa_t gpa, const u8 *new,
+>  		return;
 >  
->  	irqfd->producer = prod;
-> +	kvm_arch_start_assignment(irqfd->kvm);
-> +	ret = kvm_x86_ops.update_pi_irte(irqfd->kvm,
-> +					 prod->irq, irqfd->gsi, 1);
-> +
-> +	if (ret)
-> +		kvm_arch_end_assignment(irqfd->kvm);
+>  	idx = srcu_read_lock(&head->track_srcu);
+> -	hlist_for_each_entry_rcu(n, &head->track_notifier_list, node)
+> +	hlist_for_each_entry_srcu(n, &head->track_notifier_list, node,
+> +				srcu_read_lock_held(&head->track_srcu))
+>  		if (n->track_write)
+>  			n->track_write(vcpu, gpa, new, bytes, n);
+>  	srcu_read_unlock(&head->track_srcu, idx);
+> @@ -254,7 +255,8 @@ void kvm_page_track_flush_slot(struct kvm *kvm, struct kvm_memory_slot *slot)
+>  		return;
 >  
-> -	return kvm_x86_ops.update_pi_irte(irqfd->kvm,
-> -					   prod->irq, irqfd->gsi, 1);
-> +	return ret;
->  }
->  
->  void kvm_arch_irq_bypass_del_producer(struct irq_bypass_consumer *cons,
-> diff --git a/virt/kvm/vfio.c b/virt/kvm/vfio.c
-> index 8fcbc50..111da52 100644
-> --- a/virt/kvm/vfio.c
-> +++ b/virt/kvm/vfio.c
-> @@ -226,7 +226,6 @@ static int kvm_vfio_set_group(struct kvm_device *dev, long attr, u64 arg)
->  		list_add_tail(&kvg->node, &kv->group_list);
->  		kvg->vfio_group = vfio_group;
->  
-> -		kvm_arch_start_assignment(dev->kvm);
->  
->  		mutex_unlock(&kv->lock);
->  
-> @@ -254,7 +253,6 @@ static int kvm_vfio_set_group(struct kvm_device *dev, long attr, u64 arg)
->  				continue;
->  
->  			list_del(&kvg->node);
-> -			kvm_arch_end_assignment(dev->kvm);
->  #ifdef CONFIG_SPAPR_TCE_IOMMU
->  			kvm_spapr_tce_release_vfio_group(dev->kvm,
->  							 kvg->vfio_group);
-
+>  	idx = srcu_read_lock(&head->track_srcu);
+> -	hlist_for_each_entry_rcu(n, &head->track_notifier_list, node)
+> +	hlist_for_each_entry_srcu(n, &head->track_notifier_list, node,
+> +				srcu_read_lock_held(&head->track_srcu))
+>  		if (n->track_flush_slot)
+>  			n->track_flush_slot(kvm, slot, n);
+>  	srcu_read_unlock(&head->track_srcu, idx);
+> -- 
+> 2.17.1
+> 
