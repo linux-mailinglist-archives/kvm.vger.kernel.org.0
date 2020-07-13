@@ -2,105 +2,150 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B6FC821D68D
-	for <lists+kvm@lfdr.de>; Mon, 13 Jul 2020 15:15:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C6B1421D83F
+	for <lists+kvm@lfdr.de>; Mon, 13 Jul 2020 16:20:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729751AbgGMNPB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 13 Jul 2020 09:15:01 -0400
-Received: from mail.kernel.org ([198.145.29.99]:57056 "EHLO mail.kernel.org"
+        id S1730099AbgGMOUg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 13 Jul 2020 10:20:36 -0400
+Received: from mail.kernel.org ([198.145.29.99]:41998 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729523AbgGMNPB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 13 Jul 2020 09:15:01 -0400
-Received: from willie-the-truck (236.31.169.217.in-addr.arpa [217.169.31.236])
+        id S1729659AbgGMOUf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 13 Jul 2020 10:20:35 -0400
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id DF34D206F0;
-        Mon, 13 Jul 2020 13:14:57 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id CDA3B2065F;
+        Mon, 13 Jul 2020 14:20:34 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1594646100;
-        bh=vsfrQkQHuwH4Y1vXh/4DmCZ6tKypfE6qSWFzh+Q1CxI=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=TwkkICUs4b3I5XsQCZ7NO0M3cnFT6s/5dWcTpCmKe+uCGj+BCDhAyzY9QAqbHuGFb
-         CKYDfi+beNX2Cxevmjuhay0f5WcEEfX0KSrJFnDh06AEKGNQOd1Ncu48GrSps1DD5Y
-         8px6YzdOOCHDGSYWOPvvAFmzP/UfGbRI/OhrpNNc=
-Date:   Mon, 13 Jul 2020 14:14:54 +0100
-From:   Will Deacon <will@kernel.org>
-To:     Liu Yi L <yi.l.liu@intel.com>
-Cc:     alex.williamson@redhat.com, eric.auger@redhat.com,
-        baolu.lu@linux.intel.com, joro@8bytes.org, kevin.tian@intel.com,
-        jacob.jun.pan@linux.intel.com, ashok.raj@intel.com,
-        jun.j.tian@intel.com, yi.y.sun@intel.com, jean-philippe@linaro.org,
-        peterx@redhat.com, hao.wu@intel.com, stefanha@gmail.com,
-        iommu@lists.linux-foundation.org, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Robin Murphy <robin.murphy@arm.com>
-Subject: Re: [PATCH v5 03/15] iommu/smmu: Report empty domain nesting info
-Message-ID: <20200713131454.GA2739@willie-the-truck>
-References: <1594552870-55687-1-git-send-email-yi.l.liu@intel.com>
- <1594552870-55687-4-git-send-email-yi.l.liu@intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1594552870-55687-4-git-send-email-yi.l.liu@intel.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+        s=default; t=1594650034;
+        bh=zUwoNoCrggFRdIInMLNsTGvOlBIbjNqvOW3tq9C2+8E=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=2qb5AmGPVv2DSYwXg/6nux5vau7Gc4iRBzfGQKrjW/3cszhCJQijNp0xXaX5ZKTrR
+         Kv4B5sLCIEB2iIK2a7ep6RvDfX6Qf4CKrEAYUKDEfXlQ7xlYE961iTelRBSgd2sMSi
+         lZ971y6X/r5uGw/ELHkUKr4jFJQedIVf0wmPpqZQ=
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=wait-a-minute.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+        (Exim 4.92)
+        (envelope-from <maz@kernel.org>)
+        id 1juzJp-00BNAJ-7R; Mon, 13 Jul 2020 15:20:33 +0100
+Date:   Mon, 13 Jul 2020 15:20:31 +0100
+Message-ID: <87o8ojxzrk.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Andrew Scull <ascull@google.com>
+Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, Andre Przywara <andre.przywara@arm.com>,
+        Christoffer Dall <christoffer.dall@arm.com>,
+        Dave Martin <Dave.Martin@arm.com>,
+        Jintack Lim <jintack@cs.columbia.edu>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        George Cherian <gcherian@marvell.com>,
+        "Zengtao (B)" <prime.zeng@hisilicon.com>,
+        Will Deacon <will@kernel.org>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Mark Rutland <mark.rutland@arm.com>,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        kernel-team@android.com
+Subject: Re: [PATCH v2 01/17] KVM: arm64: Factor out stage 2 page table data from struct kvm
+In-Reply-To: <20200713094749.GA1705612@google.com>
+References: <20200615132719.1932408-1-maz@kernel.org>
+        <20200615132719.1932408-2-maz@kernel.org>
+        <20200713094749.GA1705612@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL/10.8 EasyPG/1.0.0 Emacs/26.3
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: ascull@google.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, andre.przywara@arm.com, christoffer.dall@arm.com, Dave.Martin@arm.com, jintack@cs.columbia.edu, alexandru.elisei@arm.com, gcherian@marvell.com, prime.zeng@hisilicon.com, will@kernel.org, catalin.marinas@arm.com, mark.rutland@arm.com, james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, kernel-team@android.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sun, Jul 12, 2020 at 04:20:58AM -0700, Liu Yi L wrote:
-> This patch is added as instead of returning a boolean for DOMAIN_ATTR_NESTING,
-> iommu_domain_get_attr() should return an iommu_nesting_info handle.
-> 
-> Cc: Will Deacon <will@kernel.org>
-> Cc: Robin Murphy <robin.murphy@arm.com>
-> Cc: Eric Auger <eric.auger@redhat.com>
-> Cc: Jean-Philippe Brucker <jean-philippe@linaro.org>
-> Suggested-by: Jean-Philippe Brucker <jean-philippe@linaro.org>
-> Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
-> Signed-off-by: Jacob Pan <jacob.jun.pan@linux.intel.com>
-> ---
-> v4 -> v5:
-> *) address comments from Eric Auger.
-> ---
->  drivers/iommu/arm-smmu-v3.c | 29 +++++++++++++++++++++++++++--
->  drivers/iommu/arm-smmu.c    | 29 +++++++++++++++++++++++++++--
->  2 files changed, 54 insertions(+), 4 deletions(-)
-> 
-> diff --git a/drivers/iommu/arm-smmu-v3.c b/drivers/iommu/arm-smmu-v3.c
-> index f578677..ec815d7 100644
-> --- a/drivers/iommu/arm-smmu-v3.c
-> +++ b/drivers/iommu/arm-smmu-v3.c
-> @@ -3019,6 +3019,32 @@ static struct iommu_group *arm_smmu_device_group(struct device *dev)
->  	return group;
->  }
->  
-> +static int arm_smmu_domain_nesting_info(struct arm_smmu_domain *smmu_domain,
-> +					void *data)
-> +{
-> +	struct iommu_nesting_info *info = (struct iommu_nesting_info *)data;
-> +	unsigned int size;
-> +
-> +	if (!info || smmu_domain->stage != ARM_SMMU_DOMAIN_NESTED)
-> +		return -ENODEV;
-> +
-> +	size = sizeof(struct iommu_nesting_info);
-> +
-> +	/*
-> +	 * if provided buffer size is smaller than expected, should
-> +	 * return 0 and also the expected buffer size to caller.
-> +	 */
-> +	if (info->size < size) {
-> +		info->size = size;
-> +		return 0;
-> +	}
-> +
-> +	/* report an empty iommu_nesting_info for now */
-> +	memset(info, 0x0, size);
-> +	info->size = size;
-> +	return 0;
-> +}
+On Mon, 13 Jul 2020 10:47:49 +0100,
+Andrew Scull <ascull@google.com> wrote:
+>=20
+> On Mon, Jun 15, 2020 at 02:27:03PM +0100, Marc Zyngier wrote:
+> > -static void __hyp_text __tlb_switch_to_guest_nvhe(struct kvm *kvm,
+> > +static void __hyp_text __tlb_switch_to_guest_nvhe(struct kvm_s2_mmu *m=
+mu,
+> >  						  struct tlb_inv_context *cxt)
+> >  {
+> >  	if (cpus_have_final_cap(ARM64_WORKAROUND_SPECULATIVE_AT)) {
+> > @@ -79,22 +79,19 @@ static void __hyp_text __tlb_switch_to_guest_nvhe(s=
+truct kvm *kvm,
+> >  		isb();
+> >  	}
+> > =20
+> > -	/* __load_guest_stage2() includes an ISB for the workaround. */
+> > -	__load_guest_stage2(kvm);
+> > -	asm(ALTERNATIVE("isb", "nop", ARM64_WORKAROUND_SPECULATIVE_AT));
+> > +	__load_guest_stage2(mmu);
+> >  }
+>=20
+> Just noticed that this drops the ISB when the speculative AT workaround
+> is not active.
+>=20
+> This alternative is 'backwards' to avoid a double ISB as there is one in
+> __load_guest_stage2 when the workaround is active. I hope to address
+> this smell in an upcoming series but, for now, we should at least have
+> an ISB.
 
-Have you verified that this doesn't break the existing usage of
-DOMAIN_ATTR_NESTING in drivers/vfio/vfio_iommu_type1.c?
+Indeed. I must have messed up a conflict resolution here. I'll stick
+this fix on top.
 
-Will
+Thanks,
+
+	M.
+
+=46rom 997c17ffe879dcad40b49a0c844c39f5d071dee9 Mon Sep 17 00:00:00 2001
+From: Marc Zyngier <maz@kernel.org>
+Date: Mon, 13 Jul 2020 15:15:14 +0100
+Subject: [PATCH] KVM: arm64: Restore missing ISB on nVHE __tlb_switch_to_gu=
+est
+
+Commit a0e50aa3f4a8 ("KVM: arm64: Factor out stage 2 page table
+data from struct kvm") dropped the ISB after __load_guest_stage2(),
+only leaving the one that is required when the speculative AT
+workaround is in effect.
+
+As Andrew points it: "This alternative is 'backwards' to avoid a
+double ISB as there is one in __load_guest_stage2 when the workaround
+is active."
+
+Restore the missing ISB, conditionned on the AT workaround not being
+active.
+
+Fixes: a0e50aa3f4a8 ("KVM: arm64: Factor out stage 2 page table data from s=
+truct kvm")
+Reported-by: Andrew Scull <ascull@google.com>
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+---
+ arch/arm64/kvm/hyp/nvhe/tlb.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/arch/arm64/kvm/hyp/nvhe/tlb.c b/arch/arm64/kvm/hyp/nvhe/tlb.c
+index 69eae608d670..f31185272b50 100644
+--- a/arch/arm64/kvm/hyp/nvhe/tlb.c
++++ b/arch/arm64/kvm/hyp/nvhe/tlb.c
+@@ -31,7 +31,9 @@ static void __tlb_switch_to_guest(struct kvm_s2_mmu *mmu,
+ 		isb();
+ 	}
+=20
++	/* __load_guest_stage2() includes an ISB for the workaround. */
+ 	__load_guest_stage2(mmu);
++	asm(ALTERNATIVE("isb", "nop", ARM64_WORKAROUND_SPECULATIVE_AT));
+ }
+=20
+ static void __tlb_switch_to_host(struct tlb_inv_context *cxt)
+--=20
+2.27.0
+
+
+--=20
+Without deviation from the norm, progress is not possible.
