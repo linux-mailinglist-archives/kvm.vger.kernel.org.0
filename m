@@ -2,113 +2,149 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 78F5921CE68
-	for <lists+kvm@lfdr.de>; Mon, 13 Jul 2020 06:50:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3FF2B21D101
+	for <lists+kvm@lfdr.de>; Mon, 13 Jul 2020 09:57:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726491AbgGMEuL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 13 Jul 2020 00:50:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51394 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725767AbgGMEuK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 13 Jul 2020 00:50:10 -0400
-Received: from ozlabs.org (ozlabs.org [IPv6:2401:3900:2:1::2])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8F928C061794;
-        Sun, 12 Jul 2020 21:50:10 -0700 (PDT)
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        id S1729053AbgGMH5c (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 13 Jul 2020 03:57:32 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:29190 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1725818AbgGMH5c (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 13 Jul 2020 03:57:32 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1594627050;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=e8+mCJV4j7mQFYuPIcpNajGziGnJ6PiL6r+PVquQvQU=;
+        b=D3E8hYJ4+N7OP0Uxl7Sv8QnXSYGP19Y+aJ705ijX382tXBrGyeFzRUIlbbExMk66FKGELF
+        jnPDjwSHPZNGz5wOua2CGtrf3cWUTzFgGqProKrr6L62ZLz6wsGjTIpSkLA5mfa7q2OHOQ
+        RVVahlVy8uIYgcmEvalOlbpVuB/kC08=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-76-AP-3qTOXPDmfFQS-Y8kvsQ-1; Mon, 13 Jul 2020 03:57:27 -0400
+X-MC-Unique: AP-3qTOXPDmfFQS-Y8kvsQ-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mail.ozlabs.org (Postfix) with ESMTPSA id 4B4rmc1xSHz9sRW;
-        Mon, 13 Jul 2020 14:50:07 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=canb.auug.org.au;
-        s=201702; t=1594615808;
-        bh=vD4a5aVxi8ud4WRzptuIQbiMT2/JMG1qfDJO/MwTYVg=;
-        h=Date:From:To:Cc:Subject:From;
-        b=ugFlKEggYDY9ZnCIRnGHwIQdHESNjAXYRZ5XFSx+SiFjUiTKX+jtlZZa4LR78cWv+
-         Pk9Q5D7eCoZofTBZv2XksiBNZWQ7S0vuO9NsbEVFJVpABTituAnpD6tgyrJKs2EwEw
-         sBXJjy0tBCUMkzdVBrbDc8vclsx6pcY6qFibToNbM7HT2Tj7ljq+nFwAH+6QUJX9pj
-         uCbFy2r/2ECFi7DKnRKP74Le1EIDcHoWGA5T/uJHhPWENGVkZdRt4Z6Q4sfeGg1X5m
-         fbXtySpttdtxcoO+bF+88LHIw0nlxEPPgDY7TL6UC60Wzr1cUCuMRgmsc37I4EyYI7
-         OG1djXADpJXlw==
-Date:   Mon, 13 Jul 2020 14:50:07 +1000
-From:   Stephen Rothwell <sfr@canb.auug.org.au>
-To:     Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, KVM <kvm@vger.kernel.org>
-Cc:     Linux Next Mailing List <linux-next@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Jim Mattson <jmattson@google.com>,
-        Collin Walling <walling@linux.ibm.com>
-Subject: linux-next: manual merge of the kvms390 tree with the kvm tree
-Message-ID: <20200713145007.26acf3fb@canb.auug.org.au>
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B5DD318FF680;
+        Mon, 13 Jul 2020 07:57:25 +0000 (UTC)
+Received: from [10.72.13.177] (ovpn-13-177.pek2.redhat.com [10.72.13.177])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 93FBD78A43;
+        Mon, 13 Jul 2020 07:57:16 +0000 (UTC)
+Subject: Re: [PATCH 2/7] kvm/vfio: detect assigned device via irqbypass
+ manager
+To:     Alex Williamson <alex.williamson@redhat.com>,
+        Zhu Lingshan <lingshan.zhu@intel.com>
+Cc:     mst@redhat.com, pbonzini@redhat.com,
+        sean.j.christopherson@intel.com, wanpengli@tencent.com,
+        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
+        netdev@vger.kernel.org, dan.daly@intel.com
+References: <1594565366-3195-1-git-send-email-lingshan.zhu@intel.com>
+ <1594565366-3195-2-git-send-email-lingshan.zhu@intel.com>
+ <20200712092902.5960f340@x1.home>
+From:   Jason Wang <jasowang@redhat.com>
+Message-ID: <4890e4da-f011-159c-31ec-0ddbbe20bab1@redhat.com>
+Date:   Mon, 13 Jul 2020 15:57:14 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/271y1+tT.CFkT.HuXE1J7Id";
- protocol="application/pgp-signature"; micalg=pgp-sha256
+In-Reply-To: <20200712092902.5960f340@x1.home>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
---Sig_/271y1+tT.CFkT.HuXE1J7Id
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
 
-Hi all,
+On 2020/7/12 下午11:29, Alex Williamson wrote:
+> On Sun, 12 Jul 2020 22:49:21 +0800
+> Zhu Lingshan <lingshan.zhu@intel.com> wrote:
+>
+>> We used to detect assigned device via VFIO manipulated device
+>> conters. This is less flexible consider VFIO is not the only
+>> interface for assigned device. vDPA devices has dedicated
+>> backed hardware as well. So this patch tries to detect
+>> the assigned device via irqbypass manager.
+>>
+>> We will increase/decrease the assigned device counter in kvm/x86.
+>> Both vDPA and VFIO would go through this code path.
+>>
+>> This code path only affect x86 for now.
+> No it doesn't, it only adds VFIO support to x86, but it removes it from
+> architecture neutral code.
 
-Today's linux-next merge of the kvms390 tree got a conflict in:
 
-  include/uapi/linux/kvm.h
+Do you mean we should introduce a kvm_irq_bypass_add_producer and do 
+kvm_arch_start_assignment( ) there?
 
-between commit:
 
-  1aa561b1a4c0 ("kvm: x86: Add "last CPU" to some KVM_EXIT information")
+> Also a VFIO device does not necessarily
+> make use of the irqbypass manager, this depends on platform support and
+> enablement of this feature.
 
-from the kvm tree and commit:
 
-  23a60f834406 ("s390/kvm: diagnose 0x318 sync and reset")
+Yes, we should keep the VFIO part unchanged.
 
-from the kvms390 tree.
+Thanks
 
-I fixed it up (see below) and can carry the fix as necessary. This
-is now fixed as far as linux-next is concerned, but any non trivial
-conflicts should be mentioned to your upstream maintainer when your tree
-is submitted for merging.  You may also want to consider cooperating
-with the maintainer of the conflicting tree to minimise any particularly
-complex conflicts.
 
---=20
-Cheers,
-Stephen Rothwell
+>    Therefore, NAK.  Thanks,
+>
+> Alex
+>   
+>> Signed-off-by: Zhu Lingshan <lingshan.zhu@intel.com>
+>> ---
+>>   arch/x86/kvm/x86.c | 10 ++++++++--
+>>   virt/kvm/vfio.c    |  2 --
+>>   2 files changed, 8 insertions(+), 4 deletions(-)
+>>
+>> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+>> index 00c88c2..20c07d3 100644
+>> --- a/arch/x86/kvm/x86.c
+>> +++ b/arch/x86/kvm/x86.c
+>> @@ -10624,11 +10624,17 @@ int kvm_arch_irq_bypass_add_producer(struct irq_bypass_consumer *cons,
+>>   {
+>>   	struct kvm_kernel_irqfd *irqfd =
+>>   		container_of(cons, struct kvm_kernel_irqfd, consumer);
+>> +	int ret;
+>>   
+>>   	irqfd->producer = prod;
+>> +	kvm_arch_start_assignment(irqfd->kvm);
+>> +	ret = kvm_x86_ops.update_pi_irte(irqfd->kvm,
+>> +					 prod->irq, irqfd->gsi, 1);
+>> +
+>> +	if (ret)
+>> +		kvm_arch_end_assignment(irqfd->kvm);
+>>   
+>> -	return kvm_x86_ops.update_pi_irte(irqfd->kvm,
+>> -					   prod->irq, irqfd->gsi, 1);
+>> +	return ret;
+>>   }
+>>   
+>>   void kvm_arch_irq_bypass_del_producer(struct irq_bypass_consumer *cons,
+>> diff --git a/virt/kvm/vfio.c b/virt/kvm/vfio.c
+>> index 8fcbc50..111da52 100644
+>> --- a/virt/kvm/vfio.c
+>> +++ b/virt/kvm/vfio.c
+>> @@ -226,7 +226,6 @@ static int kvm_vfio_set_group(struct kvm_device *dev, long attr, u64 arg)
+>>   		list_add_tail(&kvg->node, &kv->group_list);
+>>   		kvg->vfio_group = vfio_group;
+>>   
+>> -		kvm_arch_start_assignment(dev->kvm);
+>>   
+>>   		mutex_unlock(&kv->lock);
+>>   
+>> @@ -254,7 +253,6 @@ static int kvm_vfio_set_group(struct kvm_device *dev, long attr, u64 arg)
+>>   				continue;
+>>   
+>>   			list_del(&kvg->node);
+>> -			kvm_arch_end_assignment(dev->kvm);
+>>   #ifdef CONFIG_SPAPR_TCE_IOMMU
+>>   			kvm_spapr_tce_release_vfio_group(dev->kvm,
+>>   							 kvg->vfio_group);
 
-diff --cc include/uapi/linux/kvm.h
-index ff9b335620d0,35cdb4307904..000000000000
---- a/include/uapi/linux/kvm.h
-+++ b/include/uapi/linux/kvm.h
-@@@ -1032,7 -1031,7 +1032,8 @@@ struct kvm_ppc_resize_hpt=20
-  #define KVM_CAP_PPC_SECURE_GUEST 181
-  #define KVM_CAP_HALT_POLL 182
-  #define KVM_CAP_ASYNC_PF_INT 183
- -#define KVM_CAP_S390_DIAG318 184
- +#define KVM_CAP_LAST_CPU 184
-++#define KVM_CAP_S390_DIAG318 185
- =20
-  #ifdef KVM_CAP_IRQ_ROUTING
- =20
-
---Sig_/271y1+tT.CFkT.HuXE1J7Id
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAl8L5/8ACgkQAVBC80lX
-0GyKLQf+Lqj8KOEXiT2CAYfJgVYRKUtBCOM6LoCUsF4NPCC8phf94IO1IOet/6+T
-4sOZDqXYiHCXFix0Qlqw3Xex3yKcoBEllrIN4V7tjPr9E3aywBpqsKDTFUX7zy0j
-h5WsSVtgc3iRdm35FuDWlVYmV6848S7PSe1CEQkWkIRWf7O2p7TjkuRKCMR0TaUk
-gl4XmJPCHb+Yj2tTjTEwYYStYVhzmyaDPjBXj7OblCeJQUO979+ZgWWp0S2NoVZ5
-mdiTgSBiyTpt7tPuGNUkoHtgv7fEklYf/4j4tQ9h+13ynN/NnIChHzrBuf2FHNf/
-QthQaVGupphinkQMeh8IapOgfnRJug==
-=sbvW
------END PGP SIGNATURE-----
-
---Sig_/271y1+tT.CFkT.HuXE1J7Id--
