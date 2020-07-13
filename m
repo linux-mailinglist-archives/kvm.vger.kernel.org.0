@@ -2,73 +2,99 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 656A421DF6B
-	for <lists+kvm@lfdr.de>; Mon, 13 Jul 2020 20:13:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CADCA21DF7E
+	for <lists+kvm@lfdr.de>; Mon, 13 Jul 2020 20:22:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730402AbgGMSN2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 13 Jul 2020 14:13:28 -0400
-Received: from mga03.intel.com ([134.134.136.65]:6122 "EHLO mga03.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729687AbgGMSN2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 13 Jul 2020 14:13:28 -0400
-IronPort-SDR: R2xRdxz1m1sS00SvpfTfPgsuxzKDyrPanOBlewZhF5AzV6gt0wS2ONONbSoRy7XNvGIuIOCJPp
- sJp8wFcv4C3Q==
-X-IronPort-AV: E=McAfee;i="6000,8403,9681"; a="148688639"
-X-IronPort-AV: E=Sophos;i="5.75,348,1589266800"; 
-   d="scan'208";a="148688639"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Jul 2020 11:13:27 -0700
-IronPort-SDR: r+qLI/6ZnsIf5qrW4sEmosy4IYMrsya7VCmF8S5EaMHbmJoeturrVrsX4dhHZrMlx6k5JkvWKt
- iBLCuKrflSZQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.75,348,1589266800"; 
-   d="scan'208";a="316134668"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.152])
-  by orsmga008.jf.intel.com with ESMTP; 13 Jul 2020 11:13:26 -0700
-Date:   Mon, 13 Jul 2020 11:13:26 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Yang Weijiang <weijiang.yang@intel.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        pbonzini@redhat.com, jmattson@google.com,
-        yu.c.zhang@linux.intel.com
-Subject: Re: [PATCH v13 00/11] Introduce support for guest CET feature
-Message-ID: <20200713181326.GC29725@linux.intel.com>
-References: <20200701080411.5802-1-weijiang.yang@intel.com>
+        id S1726437AbgGMSWj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 13 Jul 2020 14:22:39 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:50714 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726364AbgGMSWg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 13 Jul 2020 14:22:36 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1594664555;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=2oYyaWcgfJiqLq1WHDsrJOK0cX6P8HhkN2BpaAn4h60=;
+        b=FrzRlFCHQdb5Hw42f8+H7cFYifIUVRFimBU/StV1RBlCPp2J//9wN16a7gclepcAnrGNnX
+        IpmMsNB9fazkR6SAF7/+OELcshtw/fI+KwZymAZNf19jMNXSrVVTG6c7kcT9yv0Mv8I8Cw
+        ocYZO4rGBoUjdpZovrBj5bw6mTKHUbw=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-347-WZBatit_NiGP-1IXs3KhyA-1; Mon, 13 Jul 2020 14:22:31 -0400
+X-MC-Unique: WZBatit_NiGP-1IXs3KhyA-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 023648014D4;
+        Mon, 13 Jul 2020 18:22:30 +0000 (UTC)
+Received: from x1.home (ovpn-112-71.phx2.redhat.com [10.3.112.71])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id AD65779222;
+        Mon, 13 Jul 2020 18:22:28 +0000 (UTC)
+Date:   Mon, 13 Jul 2020 12:22:26 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Xiong Zhang <xiong.y.zhang@intel.com>,
+        Wayne Boyer <wayne.boyer@intel.com>,
+        Zhenyu Wang <zhenyuw@linux.intel.com>,
+        Jun Nakajima <jun.nakajima@intel.com>
+Subject: Re: [PATCH] KVM: x86/mmu: Add capability to zap only sptes for the
+ affected memslot
+Message-ID: <20200713122226.28188f93@x1.home>
+In-Reply-To: <20200710042922.GA24919@linux.intel.com>
+References: <20200703025047.13987-1-sean.j.christopherson@intel.com>
+        <51637a13-f23b-8b76-c93a-76346b4cc982@redhat.com>
+        <20200709211253.GW24919@linux.intel.com>
+        <49c7907a-3ab4-b5db-ccb4-190b990c8be3@redhat.com>
+        <20200710042922.GA24919@linux.intel.com>
+Organization: Red Hat
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200701080411.5802-1-weijiang.yang@intel.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jul 01, 2020 at 04:04:00PM +0800, Yang Weijiang wrote:
-> Control-flow Enforcement Technology (CET) provides protection against
-> Return/Jump-Oriented Programming (ROP/JOP) attack. There're two CET
-> sub-features: Shadow Stack (SHSTK) and Indirect Branch Tracking (IBT).
-> SHSTK is to prevent ROP programming and IBT is to prevent JOP programming.
-> 
-> Several parts in KVM have been updated to provide VM CET support, including:
-> CPUID/XSAVES config, MSR pass-through, user space MSR access interface, 
-> vmentry/vmexit config, nested VM etc. These patches have dependency on CET
-> kernel patches for xsaves support and CET definitions, e.g., MSR and related
-> feature flags.
-> 
-> CET kernel patches are here:
-> https://lkml.kernel.org/r/20200429220732.31602-1-yu-cheng.yu@intel.com
-> 
-> v13:
-> - Added CET definitions as a separate patch to facilitate KVM test.
-> - Disabled CET support in KVM if unrestricted_guest is turned off since
->   in this case CET related instructions/infrastructure cannot be emulated
->   well.
+On Thu, 9 Jul 2020 21:29:22 -0700
+Sean Christopherson <sean.j.christopherson@intel.com> wrote:
 
-This needs to be rebased, I can't get it to apply on any kvm branch nor on
-any 5.8 rc.  And when you send series, especially large series that touch
-lots of code, please explicitly state what commit the series is based on to
-make it easy for reviewers to apply the patches, even if the series needs a
-rebase.
+> +Alex, whom I completely spaced on Cc'ing.
+> 
+> Alex, this is related to the dreaded VFIO memslot zapping issue from last
+> year.  Start of thread: https://patchwork.kernel.org/patch/11640719/.
+> 
+> The TL;DR of below: can you try the attached patch with your reproducer
+> from the original bug[*]?  I honestly don't know whether it has a legitimate
+> chance of working, but it's the one thing in all of this that I know was
+> definitely a bug.  I'd like to test it out if only to sate my curiosity.
+> Absolutely no rush.
+
+Mixed results, maybe you can provide some guidance.  Running this
+against v5.8-rc4, I haven't reproduced the glitch.  But it's been a
+long time since I tested this previously, so I went back to v5.3-rc5 to
+make sure I still have a recipe to trigger it.  I can still get the
+failure there as the selective flush commit was reverted in rc6.  Then
+I wondered, can I take broken v5.3-rc5 and apply this fix to prove that
+it works?  No, v5.3-rc5 + this patch still glitches.  So I thought
+maybe I could make v5.8-rc4 break by s/true/false/ in this patch.
+Nope.  Then I applied the original patch from[1] to try to break it.
+Nope.  So if anything, I think the evidence suggests this was broken
+elsewhere and is now fixed, or maybe it is a timing issue that I can't
+trigger on newer kernels.  If the reproducer wasn't so touchy and time
+consuming, I'd try to bisect, but I don't have that sort of bandwidth.
+Thanks,
+
+Alex
+
+[1] https://patchwork.kernel.org/patch/10798453/
+
