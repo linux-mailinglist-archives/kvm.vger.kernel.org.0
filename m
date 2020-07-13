@@ -2,89 +2,106 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9E9AC21CDC1
-	for <lists+kvm@lfdr.de>; Mon, 13 Jul 2020 05:31:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 80ED721CE5B
+	for <lists+kvm@lfdr.de>; Mon, 13 Jul 2020 06:41:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728252AbgGMDb5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 12 Jul 2020 23:31:57 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:26038 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726491AbgGMDb5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 12 Jul 2020 23:31:57 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1594611115;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=fyZHuYtJrGj2meth1Sm/wJxgmzcWzcHt3+2ZKG1/cLQ=;
-        b=XF3QMf+muv5yotT7/6cgxZY8MNQqIYNvEydMw/6ywJovgBMnw7U52H+VAEEXOkXSIG90wx
-        wj7KSZhGmMcE8pdhZmsQFxvPf2fZJGGX4AsidDNrWYCF6ajcBu7oVCk2WKB1nQE3ZZ9vPS
-        +LvwrYZ7/UQZVtdyj0dom+hhlZYj6/4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-145-nd3WMGC_Mj-Yat-odoEbZw-1; Sun, 12 Jul 2020 23:31:54 -0400
-X-MC-Unique: nd3WMGC_Mj-Yat-odoEbZw-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C5A41800597;
-        Mon, 13 Jul 2020 03:31:52 +0000 (UTC)
-Received: from [10.72.13.177] (ovpn-13-177.pek2.redhat.com [10.72.13.177])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 5EDFF5C6C0;
-        Mon, 13 Jul 2020 03:31:44 +0000 (UTC)
-Subject: Re: [PATCH] vhost/scsi: fix up req type endian-ness
-To:     "Michael S. Tsirkin" <mst@redhat.com>, linux-kernel@vger.kernel.org
-Cc:     stable@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
-        netdev@vger.kernel.org
-References: <20200710104849.406023-1-mst@redhat.com>
-From:   Jason Wang <jasowang@redhat.com>
-Message-ID: <8acbce23-275a-141a-0bfb-1535c6edcbb4@redhat.com>
-Date:   Mon, 13 Jul 2020 11:31:42 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        id S1728599AbgGMElq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 13 Jul 2020 00:41:46 -0400
+Received: from ex13-edg-ou-001.vmware.com ([208.91.0.189]:34358 "EHLO
+        EX13-EDG-OU-001.vmware.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1725830AbgGMElq (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 13 Jul 2020 00:41:46 -0400
+Received: from sc9-mailhost2.vmware.com (10.113.161.72) by
+ EX13-EDG-OU-001.vmware.com (10.113.208.155) with Microsoft SMTP Server id
+ 15.0.1156.6; Sun, 12 Jul 2020 21:41:45 -0700
+Received: from sc2-haas01-esx0118.eng.vmware.com (sc2-haas01-esx0118.eng.vmware.com [10.172.44.118])
+        by sc9-mailhost2.vmware.com (Postfix) with ESMTP id 86F26B1F07;
+        Mon, 13 Jul 2020 00:41:45 -0400 (EDT)
+From:   Nadav Amit <namit@vmware.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+CC:     <kvm@vger.kernel.org>, Nadav Amit <namit@vmware.com>
+Subject: [kvm-unit-tests PATCH] x86: svm: low CR3 bits are not MBZ
+Date:   Sun, 12 Jul 2020 21:39:08 -0700
+Message-ID: <20200713043908.39605-1-namit@vmware.com>
+X-Mailer: git-send-email 2.17.1
 MIME-Version: 1.0
-In-Reply-To: <20200710104849.406023-1-mst@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Content-Type: text/plain
+Received-SPF: None (EX13-EDG-OU-001.vmware.com: namit@vmware.com does not
+ designate permitted sender hosts)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+The low CR3 bits are reserved but not MBZ according to tha APM. The
+tests should therefore not check that they cause failed VM-entry. Tests
+on bare-metal show they do not.
 
-On 2020/7/10 下午6:48, Michael S. Tsirkin wrote:
-> vhost/scsi doesn't handle type conversion correctly
-> for request type when using virtio 1.0 and up for BE,
-> or cross-endian platforms.
->
-> Fix it up using vhost_32_to_cpu.
->
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-> ---
->   drivers/vhost/scsi.c | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/drivers/vhost/scsi.c b/drivers/vhost/scsi.c
-> index 6fb4d7ecfa19..b22adf03f584 100644
-> --- a/drivers/vhost/scsi.c
-> +++ b/drivers/vhost/scsi.c
-> @@ -1215,7 +1215,7 @@ vhost_scsi_ctl_handle_vq(struct vhost_scsi *vs, struct vhost_virtqueue *vq)
->   			continue;
->   		}
->   
-> -		switch (v_req.type) {
-> +		switch (vhost32_to_cpu(vq, v_req.type)) {
->   		case VIRTIO_SCSI_T_TMF:
->   			vc.req = &v_req.tmf;
->   			vc.req_size = sizeof(struct virtio_scsi_ctrl_tmf_req);
+Signed-off-by: Nadav Amit <namit@vmware.com>
+---
+ x86/svm.h       |  4 +---
+ x86/svm_tests.c | 26 +-------------------------
+ 2 files changed, 2 insertions(+), 28 deletions(-)
 
-
-Acked-by: Jason Wang <jasowang@redhat.com>
-
+diff --git a/x86/svm.h b/x86/svm.h
+index f8e7429..15e0f18 100644
+--- a/x86/svm.h
++++ b/x86/svm.h
+@@ -325,9 +325,7 @@ struct __attribute__ ((__packed__)) vmcb {
+ #define SVM_CR0_SELECTIVE_MASK (X86_CR0_TS | X86_CR0_MP)
+ 
+ #define	SVM_CR0_RESERVED_MASK			0xffffffff00000000U
+-#define	SVM_CR3_LEGACY_RESERVED_MASK		0xfe7U
+-#define	SVM_CR3_LEGACY_PAE_RESERVED_MASK	0x7U
+-#define	SVM_CR3_LONG_RESERVED_MASK		0xfff0000000000fe7U
++#define	SVM_CR3_LONG_RESERVED_MASK		0xfff0000000000000U
+ #define	SVM_CR4_LEGACY_RESERVED_MASK		0xff88f000U
+ #define	SVM_CR4_RESERVED_MASK			0xffffffffff88f000U
+ #define	SVM_DR6_RESERVED_MASK			0xffffffffffff1ff0U
+diff --git a/x86/svm_tests.c b/x86/svm_tests.c
+index 3b0d019..1908c7c 100644
+--- a/x86/svm_tests.c
++++ b/x86/svm_tests.c
+@@ -2007,38 +2007,14 @@ static void test_cr3(void)
+ {
+ 	/*
+ 	 * CR3 MBZ bits based on different modes:
+-	 *   [2:0]		    - legacy PAE
+-	 *   [2:0], [11:5]	    - legacy non-PAE
+-	 *   [2:0], [11:5], [63:52] - long mode
++	 *   [63:52] - long mode
+ 	 */
+ 	u64 cr3_saved = vmcb->save.cr3;
+-	u64 cr4_saved = vmcb->save.cr4;
+-	u64 cr4 = cr4_saved;
+-	u64 efer_saved = vmcb->save.efer;
+-	u64 efer = efer_saved;
+ 
+-	efer &= ~EFER_LME;
+-	vmcb->save.efer = efer;
+-	cr4 |= X86_CR4_PAE;
+-	vmcb->save.cr4 = cr4;
+-	SVM_TEST_CR_RESERVED_BITS(0, 2, 1, 3, cr3_saved,
+-	    SVM_CR3_LEGACY_PAE_RESERVED_MASK);
+-
+-	cr4 = cr4_saved & ~X86_CR4_PAE;
+-	vmcb->save.cr4 = cr4;
+-	SVM_TEST_CR_RESERVED_BITS(0, 11, 1, 3, cr3_saved,
+-	    SVM_CR3_LEGACY_RESERVED_MASK);
+-
+-	cr4 |= X86_CR4_PAE;
+-	vmcb->save.cr4 = cr4;
+-	efer |= EFER_LME;
+-	vmcb->save.efer = efer;
+ 	SVM_TEST_CR_RESERVED_BITS(0, 63, 1, 3, cr3_saved,
+ 	    SVM_CR3_LONG_RESERVED_MASK);
+ 
+-	vmcb->save.cr4 = cr4_saved;
+ 	vmcb->save.cr3 = cr3_saved;
+-	vmcb->save.efer = efer_saved;
+ }
+ 
+ static void test_cr4(void)
+-- 
+2.25.1
 
