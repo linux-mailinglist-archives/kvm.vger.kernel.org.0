@@ -2,87 +2,91 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 36C3121D1B4
-	for <lists+kvm@lfdr.de>; Mon, 13 Jul 2020 10:28:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 464F321D1B7
+	for <lists+kvm@lfdr.de>; Mon, 13 Jul 2020 10:29:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729198AbgGMI2b (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 13 Jul 2020 04:28:31 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:59989 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1725818AbgGMI2b (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 13 Jul 2020 04:28:31 -0400
+        id S1728990AbgGMI3U (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 13 Jul 2020 04:29:20 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:45610 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1725830AbgGMI3U (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 13 Jul 2020 04:29:20 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1594628910;
+        s=mimecast20190719; t=1594628958;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=cIVJYQhIpifvTCGZmpKQQdeFjrTfPoBTFkOF8KrjRCM=;
-        b=DLU84uJd1fi7UvCrIuinp9rDBNCTyTk/BF+6oR2WM8JviCXFGYCNYRh5an/naTbmPXEtHS
-        Orr0dBVlqqReSvKj+9Hl7J1YSfHYptd8xc4jTrkGpsYvXorTIdqbYBPp81fEVCrjM8vTn6
-        q6TNT3aYi00XKR5VyHTy+vbOb7Yi0EY=
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=2EP1wYFVmWWtdehI67MqaS4RP11/+pSykSlwf0ANA6o=;
+        b=Ocwk+DM38+hVCzzzZ9yvmntBNR8pqwNd/iwERbQV14RYiMlGHa8xFt18dkixdy86GF16vH
+        oDs9rm1xVBcPAJMp2V/QfQZGwKcuQzpaiUydjSIaCThJjeNqw41Rgqnq5BXgdHn5SJ2mBx
+        inNxXIkucz0THqSjV6WvHvkwTVREipA=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-505-IKgZPjexM-WDI03LeWkHQg-1; Mon, 13 Jul 2020 04:28:28 -0400
-X-MC-Unique: IKgZPjexM-WDI03LeWkHQg-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+ us-mta-389-4g4OQ4hlOxG33hYQB2ee9g-1; Mon, 13 Jul 2020 04:29:15 -0400
+X-MC-Unique: 4g4OQ4hlOxG33hYQB2ee9g-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 88EE01902EA8;
-        Mon, 13 Jul 2020 08:28:27 +0000 (UTC)
-Received: from vitty.brq.redhat.com (unknown [10.40.194.161])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id A991D60C84;
-        Mon, 13 Jul 2020 08:28:25 +0000 (UTC)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>, linux-kernel@vger.kernel.org
-Subject: [PATCH] KVM: nVMX: properly pad struct kvm_vmx_nested_state_hdr
-Date:   Mon, 13 Jul 2020 10:28:24 +0200
-Message-Id: <20200713082824.1728868-1-vkuznets@redhat.com>
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BDFF61080;
+        Mon, 13 Jul 2020 08:29:13 +0000 (UTC)
+Received: from [10.72.13.177] (ovpn-13-177.pek2.redhat.com [10.72.13.177])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 0F84C6FEF3;
+        Mon, 13 Jul 2020 08:28:58 +0000 (UTC)
+Subject: Re: [PATCH 5/7] virtio_vdpa: init IRQ offloading function pointers to
+ NULL.
+To:     Zhu Lingshan <lingshan.zhu@intel.com>, mst@redhat.com,
+        alex.williamson@redhat.com, pbonzini@redhat.com,
+        sean.j.christopherson@intel.com, wanpengli@tencent.com
+Cc:     virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
+        netdev@vger.kernel.org, dan.daly@intel.com
+References: <1594565366-3195-1-git-send-email-lingshan.zhu@intel.com>
+ <1594565366-3195-5-git-send-email-lingshan.zhu@intel.com>
+From:   Jason Wang <jasowang@redhat.com>
+Message-ID: <276bf939-8e12-e28a-64f7-1767851e0db5@redhat.com>
+Date:   Mon, 13 Jul 2020 16:28:57 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
+In-Reply-To: <1594565366-3195-5-git-send-email-lingshan.zhu@intel.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Holes in structs which are userspace ABI are undesireable.
 
-Fixes: 83d31e5271ac ("KVM: nVMX: fixes for preemption timer migration")
-Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
----
- Documentation/virt/kvm/api.rst  | 2 +-
- arch/x86/include/uapi/asm/kvm.h | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+On 2020/7/12 下午10:49, Zhu Lingshan wrote:
+> This commit initialize IRQ offloading function pointers in
+> virtio_vdpa_driver to NULL. Becasue irq offloading only focus
+> on VMs for vhost_vdpa.
+>
+> Signed-off-by: Zhu Lingshan <lingshan.zhu@intel.com>
+> ---
+>   drivers/virtio/virtio_vdpa.c | 2 ++
+>   1 file changed, 2 insertions(+)
+>
+> diff --git a/drivers/virtio/virtio_vdpa.c b/drivers/virtio/virtio_vdpa.c
+> index c30eb55..1e8acb9 100644
+> --- a/drivers/virtio/virtio_vdpa.c
+> +++ b/drivers/virtio/virtio_vdpa.c
+> @@ -386,6 +386,8 @@ static void virtio_vdpa_remove(struct vdpa_device *vdpa)
+>   	},
+>   	.probe	= virtio_vdpa_probe,
+>   	.remove = virtio_vdpa_remove,
+> +	.setup_vq_irq = NULL,
+> +	.unsetup_vq_irq = NULL,
+>   };
 
-diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-index 320788f81a05..7beccda11978 100644
---- a/Documentation/virt/kvm/api.rst
-+++ b/Documentation/virt/kvm/api.rst
-@@ -4345,7 +4345,7 @@ Errors:
- 	struct {
- 		__u16 flags;
- 	} smm;
--
-+	__u16 pad;
- 	__u32 flags;
- 	__u64 preemption_timer_deadline;
-   };
-diff --git a/arch/x86/include/uapi/asm/kvm.h b/arch/x86/include/uapi/asm/kvm.h
-index 0780f97c1850..aae3df1cbd01 100644
---- a/arch/x86/include/uapi/asm/kvm.h
-+++ b/arch/x86/include/uapi/asm/kvm.h
-@@ -414,7 +414,7 @@ struct kvm_vmx_nested_state_hdr {
- 	struct {
- 		__u16 flags;
- 	} smm;
--
-+	__u16 pad;
- 	__u32 flags;
- 	__u64 preemption_timer_deadline;
- };
--- 
-2.25.4
+
+Is this really needed consider the it's static?
+
+Thanks
+
+
+>   
+>   module_vdpa_driver(virtio_vdpa_driver);
 
