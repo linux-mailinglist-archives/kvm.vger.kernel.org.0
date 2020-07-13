@@ -2,103 +2,160 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C9D3E21D31F
-	for <lists+kvm@lfdr.de>; Mon, 13 Jul 2020 11:47:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BE5F721D400
+	for <lists+kvm@lfdr.de>; Mon, 13 Jul 2020 12:53:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728714AbgGMJr5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 13 Jul 2020 05:47:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40832 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727035AbgGMJr4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 13 Jul 2020 05:47:56 -0400
-Received: from mail-wm1-x344.google.com (mail-wm1-x344.google.com [IPv6:2a00:1450:4864:20::344])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A7F79C061755
-        for <kvm@vger.kernel.org>; Mon, 13 Jul 2020 02:47:56 -0700 (PDT)
-Received: by mail-wm1-x344.google.com with SMTP id o2so12530438wmh.2
-        for <kvm@vger.kernel.org>; Mon, 13 Jul 2020 02:47:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=wU36Y0dkg3gAVd6d1AcAnpID0ooqTkwf12/Wn37dSh8=;
-        b=A7ZsCQpbegT8axsNvUlyF9UT89ZbeiGiZkLrgxw1YmwTLxFMJeSBX5PVPDvwemiCQf
-         +xdOx4uXQ04sxIVCK4z4DHESzUOUwvxMl1Pbr2+u1DqVXylIXHlVdC9tQ8cu4q2bMAkp
-         3wcfRjrV8MULjMq8vbKugMS7E27X5BQMVf3Gk7wUolkk8AQHn380jLXMJcIFP+iHcONA
-         wF86WUEtjwWADcagCLRleHr0e33uzB5lqVIMz3Q7LzU4PjbEaF6qRmFAEMcxtiKTvCaW
-         lbrWyFdP56eeGYvwuHdtddQQo1T2XJL+8FS5TzY3Ak5EL5I/kkTT71VshclQHeN7BbpE
-         25RQ==
+        id S1729618AbgGMKxE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 13 Jul 2020 06:53:04 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:50717 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1729607AbgGMKxD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 13 Jul 2020 06:53:03 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1594637581;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=K2BTuXqkytux8nGd8zFoddd/yDMYv3cynNJyiItMdOQ=;
+        b=jCrRr9q92dBsIFecYLlMJY00xeqeh54mc4RWzMFF5c7W0jEvWWiPKHTu8mOWxCFMGlEb2P
+        PZFmP/XnNx6fM/JTsWOdY0QIJisAajVCP4Amnvv81EKUz8JmfxMGzBTGXhM/flk+EQ+cHp
+        1WQsocl6UwHeXi0N0hXx046lWaW7YF0=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-351-7zV7UjmDMTiMom4mbqlwvQ-1; Mon, 13 Jul 2020 06:52:58 -0400
+X-MC-Unique: 7zV7UjmDMTiMom4mbqlwvQ-1
+Received: by mail-wm1-f71.google.com with SMTP id b13so18138803wme.9
+        for <kvm@vger.kernel.org>; Mon, 13 Jul 2020 03:52:57 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=wU36Y0dkg3gAVd6d1AcAnpID0ooqTkwf12/Wn37dSh8=;
-        b=aAPeff7pgs9RFn1Iil2bzGol4rU9lCY1WystWNoK5btNunujCG3YcsoMLAtfV8bjSY
-         viPcveh+hL0QHP3dLYMxODtjFUJJ6lJjcVgLXEbhMCPTbqZstkhXrph515i2tjCd6J6O
-         cUYBfBre93N1wyDW9BuiNJcA5HkMLzswuQGwuBHuHqI3D485TMsu0mldIeugzwjmHmoL
-         EchHSBfzJJkVk+ccPbdxksMJftHaV4F+nMnAah4OWzIp3Z+IrSDA44DKRh7sehvXyx6+
-         HvCIU4XM8C8uMx2TbI9l+VQGtX4fHtS5CKWRhDILZNnbFvrqzfiJwXrt0cWM+CKW8x4r
-         tspA==
-X-Gm-Message-State: AOAM530dSfuROQJCfwVlVN5Byj7qznX5QTUQOTAmIhZSy9SZNxLXDAmb
-        6rZN+dQ9xQZqisI4ZqDVWMt0nrOt39Q=
-X-Google-Smtp-Source: ABdhPJwyciHJulV8GXvdtkPxOyujpSo+cQuGQ3mGaHjDjrbR5btQ2IIFf/d0BtLDW6TxzTCNb06wKA==
-X-Received: by 2002:a1c:c387:: with SMTP id t129mr17858571wmf.27.1594633675285;
-        Mon, 13 Jul 2020 02:47:55 -0700 (PDT)
-Received: from google.com ([2a00:79e0:d:109:4a0f:cfff:fe4a:6363])
-        by smtp.gmail.com with ESMTPSA id z6sm19636364wmf.33.2020.07.13.02.47.53
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=K2BTuXqkytux8nGd8zFoddd/yDMYv3cynNJyiItMdOQ=;
+        b=Vp1Sm28I0vHDEMl5mFI35KtBm9IMauli57Sz4z89OoxaZCFKpDBUo/uyeCHhRAPEuz
+         icbNXlrN8tpR3l60Bw/p9FUuC4MjMrfvvs14QRO6AkiitTQosRfUFQpX7Cv7h+tRIZdA
+         qGiNFTXS6QEyekHgvzT8j1K7PxRyR1Qp7wWoGPD/uHQDna+SxI3sGG2GKDii6X1zwyIr
+         wC1Xskgd4ULrB7LLnVJbeCHxPMbl72APT1s4ixITBP1o+il7HyBlb93Q1KEuLtwJ4Sy5
+         cVm+ywW1hynxFyjS6l8h2pZuAVTRrBN282N3SD5OrkA85PsFzIVuV7MpxQ6HPSSwVLg5
+         B/iw==
+X-Gm-Message-State: AOAM530Tdf/dEo/nn1C+M+2VnjYeHpTTbbLBUqMgrP9OQRQ5wHrnaxO2
+        z2MWpcEEbjxPLlA358VNcVnB9jxEaAdg108tjHHq/zUw8DUTx+UF717CpS41j+VaNdSgrVQbx4Q
+        J4NV+UNV5lS7J
+X-Received: by 2002:a5d:4591:: with SMTP id p17mr79419831wrq.343.1594637577040;
+        Mon, 13 Jul 2020 03:52:57 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwVrPQrZLdPMoFP6Y7+3Bf29Fby18L0+X5fsE636sDnhwo/yCifhnwCRzf6ZJqCB//RlrCvBA==
+X-Received: by 2002:a5d:4591:: with SMTP id p17mr79419819wrq.343.1594637576842;
+        Mon, 13 Jul 2020 03:52:56 -0700 (PDT)
+Received: from redhat.com (bzq-79-180-10-140.red.bezeqint.net. [79.180.10.140])
+        by smtp.gmail.com with ESMTPSA id i6sm11748360wrp.92.2020.07.13.03.52.54
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 13 Jul 2020 02:47:54 -0700 (PDT)
-Date:   Mon, 13 Jul 2020 10:47:49 +0100
-From:   Andrew Scull <ascull@google.com>
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org, Andre Przywara <andre.przywara@arm.com>,
-        Christoffer Dall <christoffer.dall@arm.com>,
-        Dave Martin <Dave.Martin@arm.com>,
-        Jintack Lim <jintack@cs.columbia.edu>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        George Cherian <gcherian@marvell.com>,
-        "Zengtao (B)" <prime.zeng@hisilicon.com>,
-        Will Deacon <will@kernel.org>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Mark Rutland <mark.rutland@arm.com>,
-        James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        kernel-team@android.com
-Subject: Re: [PATCH v2 01/17] KVM: arm64: Factor out stage 2 page table data
- from struct kvm
-Message-ID: <20200713094749.GA1705612@google.com>
-References: <20200615132719.1932408-1-maz@kernel.org>
- <20200615132719.1932408-2-maz@kernel.org>
+        Mon, 13 Jul 2020 03:52:56 -0700 (PDT)
+Date:   Mon, 13 Jul 2020 06:52:52 -0400
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Jason Wang <jasowang@redhat.com>
+Cc:     Zhu Lingshan <lingshan.zhu@intel.com>, alex.williamson@redhat.com,
+        pbonzini@redhat.com, sean.j.christopherson@intel.com,
+        wanpengli@tencent.com, virtualization@lists.linux-foundation.org,
+        kvm@vger.kernel.org, netdev@vger.kernel.org, dan.daly@intel.com
+Subject: Re: [PATCH 2/7] kvm/vfio: detect assigned device via irqbypass
+ manager
+Message-ID: <20200713065222-mutt-send-email-mst@kernel.org>
+References: <1594565366-3195-1-git-send-email-lingshan.zhu@intel.com>
+ <1594565366-3195-2-git-send-email-lingshan.zhu@intel.com>
+ <20200712170518-mutt-send-email-mst@kernel.org>
+ <bcb03e95-d8b9-6e19-5b0e-0119d3f43d6d@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20200615132719.1932408-2-maz@kernel.org>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <bcb03e95-d8b9-6e19-5b0e-0119d3f43d6d@redhat.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jun 15, 2020 at 02:27:03PM +0100, Marc Zyngier wrote:
-> -static void __hyp_text __tlb_switch_to_guest_nvhe(struct kvm *kvm,
-> +static void __hyp_text __tlb_switch_to_guest_nvhe(struct kvm_s2_mmu *mmu,
->  						  struct tlb_inv_context *cxt)
->  {
->  	if (cpus_have_final_cap(ARM64_WORKAROUND_SPECULATIVE_AT)) {
-> @@ -79,22 +79,19 @@ static void __hyp_text __tlb_switch_to_guest_nvhe(struct kvm *kvm,
->  		isb();
->  	}
->  
-> -	/* __load_guest_stage2() includes an ISB for the workaround. */
-> -	__load_guest_stage2(kvm);
-> -	asm(ALTERNATIVE("isb", "nop", ARM64_WORKAROUND_SPECULATIVE_AT));
-> +	__load_guest_stage2(mmu);
->  }
+On Mon, Jul 13, 2020 at 04:13:35PM +0800, Jason Wang wrote:
+> 
+> On 2020/7/13 上午5:06, Michael S. Tsirkin wrote:
+> > On Sun, Jul 12, 2020 at 10:49:21PM +0800, Zhu Lingshan wrote:
+> > > We used to detect assigned device via VFIO manipulated device
+> > > conters. This is less flexible consider VFIO is not the only
+> > > interface for assigned device. vDPA devices has dedicated
+> > > backed hardware as well. So this patch tries to detect
+> > > the assigned device via irqbypass manager.
+> > > 
+> > > We will increase/decrease the assigned device counter in kvm/x86.
+> > > Both vDPA and VFIO would go through this code path.
+> > > 
+> > > This code path only affect x86 for now.
+> > > 
+> > > Signed-off-by: Zhu Lingshan <lingshan.zhu@intel.com>
+> > 
+> > I think it's best to leave VFIO alone. Add appropriate APIs for VDPA,
+> > worry about converting existing users later.
+> 
+> 
+> 
+> Just to make sure I understand, did you mean:
+> 
+> 1) introduce another bridge for vDPA
+> 
+> or
+> 
+> 2) only detect vDPA via bypass manager? (we can leave VFIO code as is, then
+> the assigned device counter may increase/decrease twice if VFIO use irq
+> bypass manager which should be no harm).
+> 
+> Thanks
 
-Just noticed that this drops the ISB when the speculative AT workaround
-is not active.
+2 is probably easier to justify. 1 would depend on the specific bridge
+proposed.
 
-This alternative is 'backwards' to avoid a double ISB as there is one in
-__load_guest_stage2 when the workaround is active. I hope to address
-this smell in an upcoming series but, for now, we should at least have
-an ISB.
+> 
+> > 
+> > > ---
+> > >   arch/x86/kvm/x86.c | 10 ++++++++--
+> > >   virt/kvm/vfio.c    |  2 --
+> > >   2 files changed, 8 insertions(+), 4 deletions(-)
+> > > 
+> > > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> > > index 00c88c2..20c07d3 100644
+> > > --- a/arch/x86/kvm/x86.c
+> > > +++ b/arch/x86/kvm/x86.c
+> > > @@ -10624,11 +10624,17 @@ int kvm_arch_irq_bypass_add_producer(struct irq_bypass_consumer *cons,
+> > >   {
+> > >   	struct kvm_kernel_irqfd *irqfd =
+> > >   		container_of(cons, struct kvm_kernel_irqfd, consumer);
+> > > +	int ret;
+> > >   	irqfd->producer = prod;
+> > > +	kvm_arch_start_assignment(irqfd->kvm);
+> > > +	ret = kvm_x86_ops.update_pi_irte(irqfd->kvm,
+> > > +					 prod->irq, irqfd->gsi, 1);
+> > > +
+> > > +	if (ret)
+> > > +		kvm_arch_end_assignment(irqfd->kvm);
+> > > -	return kvm_x86_ops.update_pi_irte(irqfd->kvm,
+> > > -					   prod->irq, irqfd->gsi, 1);
+> > > +	return ret;
+> > >   }
+> > >   void kvm_arch_irq_bypass_del_producer(struct irq_bypass_consumer *cons,
+> > > diff --git a/virt/kvm/vfio.c b/virt/kvm/vfio.c
+> > > index 8fcbc50..111da52 100644
+> > > --- a/virt/kvm/vfio.c
+> > > +++ b/virt/kvm/vfio.c
+> > > @@ -226,7 +226,6 @@ static int kvm_vfio_set_group(struct kvm_device *dev, long attr, u64 arg)
+> > >   		list_add_tail(&kvg->node, &kv->group_list);
+> > >   		kvg->vfio_group = vfio_group;
+> > > -		kvm_arch_start_assignment(dev->kvm);
+> > >   		mutex_unlock(&kv->lock);
+> > > @@ -254,7 +253,6 @@ static int kvm_vfio_set_group(struct kvm_device *dev, long attr, u64 arg)
+> > >   				continue;
+> > >   			list_del(&kvg->node);
+> > > -			kvm_arch_end_assignment(dev->kvm);
+> > >   #ifdef CONFIG_SPAPR_TCE_IOMMU
+> > >   			kvm_spapr_tce_release_vfio_group(dev->kvm,
+> > >   							 kvg->vfio_group);
+> > > -- 
+> > > 1.8.3.1
+
