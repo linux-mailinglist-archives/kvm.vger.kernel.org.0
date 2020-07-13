@@ -2,149 +2,83 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id EFD8621D9F3
-	for <lists+kvm@lfdr.de>; Mon, 13 Jul 2020 17:18:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D8B8521D9FD
+	for <lists+kvm@lfdr.de>; Mon, 13 Jul 2020 17:23:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729959AbgGMPSJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 13 Jul 2020 11:18:09 -0400
-Received: from mga18.intel.com ([134.134.136.126]:27119 "EHLO mga18.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729027AbgGMPSJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 13 Jul 2020 11:18:09 -0400
-IronPort-SDR: 7t4lzylVkLdbMHlSFjmooUpdyvAbijZ8IpvBUYiwBa8UZvNs7ZRkHU9b+D4eLYrIuWg30C6tCr
- l+BBUPo1tkoA==
-X-IronPort-AV: E=McAfee;i="6000,8403,9681"; a="136104685"
-X-IronPort-AV: E=Sophos;i="5.75,347,1589266800"; 
-   d="scan'208";a="136104685"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Jul 2020 08:17:50 -0700
-IronPort-SDR: k+LArToREmmC7e4v1zUnIxNuRxpCtVuMqz0gR8g4Q8HZELz/BEFpKHVPkyOZ0YXfaARAhLJzoy
- jiIZFE/0qDfA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.75,347,1589266800"; 
-   d="scan'208";a="429420888"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.152])
-  by orsmga004.jf.intel.com with ESMTP; 13 Jul 2020 08:17:50 -0700
-Date:   Mon, 13 Jul 2020 08:17:50 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] KVM: nVMX: properly pad struct kvm_vmx_nested_state_hdr
-Message-ID: <20200713151750.GA29901@linux.intel.com>
-References: <20200713082824.1728868-1-vkuznets@redhat.com>
+        id S1729581AbgGMPXV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 13 Jul 2020 11:23:21 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:22016 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1729027AbgGMPXV (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 13 Jul 2020 11:23:21 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1594653800;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references:openpgp:openpgp;
+        bh=7ajBPh1qmyCh5SZCEXU80uesDCoVozHqIKx5UkBXBwc=;
+        b=F4js00WCNsrM9HPHeukzP81/gkbEr2ZPcN0G/7IfhpVeXKPzRs0YTIyYlbwcj6r0AgwGNK
+        TZSBPngQTMaCcGphPT9SxCXM9KnU8p+DH+u5E7L72dnzRd0zggiicABL8BHCJ0Am11a9c8
+        XrrYRcfBMlF6t6l3P/1S0wJyFf5YJbs=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-210-9nRBJpFVOSqdfKHxm2NmFA-1; Mon, 13 Jul 2020 11:23:17 -0400
+X-MC-Unique: 9nRBJpFVOSqdfKHxm2NmFA-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 451EA800685;
+        Mon, 13 Jul 2020 15:23:16 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-112-125.ams2.redhat.com [10.36.112.125])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 6C41C5C1BB;
+        Mon, 13 Jul 2020 15:23:15 +0000 (UTC)
+Subject: Re: [kvm-unit-tests PATCH] x86: reverse FW_CFG_MAX_ENTRY and
+ FW_CFG_MAX_RAM
+To:     Nadav Amit <namit@vmware.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc:     kvm@vger.kernel.org
+References: <20200711161432.32862-1-namit@vmware.com>
+From:   Thomas Huth <thuth@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <5fb8b8c6-bb1d-ba97-6ecf-770959199bff@redhat.com>
+Date:   Mon, 13 Jul 2020 17:23:13 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200713082824.1728868-1-vkuznets@redhat.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+In-Reply-To: <20200711161432.32862-1-namit@vmware.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jul 13, 2020 at 10:28:24AM +0200, Vitaly Kuznetsov wrote:
-> Holes in structs which are userspace ABI are undesireable.
+On 11/07/2020 18.14, Nadav Amit wrote:
+> FW_CFG_MAX_ENTRY should obviously be the last entry.
 > 
-> Fixes: 83d31e5271ac ("KVM: nVMX: fixes for preemption timer migration")
-> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+> Signed-off-by: Nadav Amit <namit@vmware.com>
 > ---
->  Documentation/virt/kvm/api.rst  | 2 +-
->  arch/x86/include/uapi/asm/kvm.h | 2 +-
->  2 files changed, 2 insertions(+), 2 deletions(-)
+>  lib/x86/fwcfg.h | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
 > 
-> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-> index 320788f81a05..7beccda11978 100644
-> --- a/Documentation/virt/kvm/api.rst
-> +++ b/Documentation/virt/kvm/api.rst
-> @@ -4345,7 +4345,7 @@ Errors:
->  	struct {
->  		__u16 flags;
->  	} smm;
-> -
-> +	__u16 pad;
+> diff --git a/lib/x86/fwcfg.h b/lib/x86/fwcfg.h
+> index 64d4c6e..8095d8a 100644
+> --- a/lib/x86/fwcfg.h
+> +++ b/lib/x86/fwcfg.h
+> @@ -20,8 +20,8 @@
+>  #define FW_CFG_NUMA             0x0d
+>  #define FW_CFG_BOOT_MENU        0x0e
+>  #define FW_CFG_MAX_CPUS         0x0f
+> -#define FW_CFG_MAX_ENTRY        0x10
+> -#define FW_CFG_MAX_RAM		0x11
+> +#define FW_CFG_MAX_RAM		0x10
+> +#define FW_CFG_MAX_ENTRY        0x11
 
-I don't think this is sufficient.  Before 83d31e5271ac, the struct was:
+That should hopefully also fix the problem with Clang that I've just seen:
 
-	struct kvm_vmx_nested_state_hdr {
-		__u64 vmxon_pa;
-		__u64 vmcs12_pa;
+ https://gitlab.com/huth/kvm-unit-tests/-/jobs/635782173#L1372
 
-		struct {
-			__u16 flags;
-		} smm;
-	};
+Reviewed-by: Thomas Huth <thuth@redhat.com>
 
-which most/all compilers will pad out to 24 bytes on a 64-bit system.  And
-although smm.flags is padded to 8 bytes, it's initialized as a 2 byte value.
-
-714             struct kvm_vmx_nested_state_hdr boo;
-715             u64 val;
-716
-717             BUILD_BUG_ON(sizeof(boo) != 3*8);
-718             boo.smm.flags = 0;
-   0xffffffff810148a9 <+41>:    xor    %eax,%eax
-   0xffffffff810148ab <+43>:    mov    %ax,0x18(%rsp)
-
-719
-720             val = *((volatile u64 *)(&boo.smm.flags));
-   0xffffffff810148b0 <+48>:    mov    0x18(%rsp),%rax
-
-
-Which means that userspace built for the old kernel will potentially send in
-garbage for the new 'flags' field due to it being uninitialized stack data,
-even with the layout after this patch.
-
-	struct kvm_vmx_nested_state_hdr {
-		__u64 vmxon_pa;
-		__u64 vmcs12_pa;
-
-		struct {
-			__u16 flags;
-		} smm;
-		__u16 pad;
-		__u32 flags;
-		__u64 preemption_timer_deadline;
-	};
-
-So to be backwards compatible I believe we need to add a __u32 pad as well,
-and to not cause internal padding issues, either make the new 'flags' a
-__u64 or pad that as well (or add and check a reserved __32).  Making flags
-a __64 seems like the least wasteful approach, e.g.
-
-	struct kvm_vmx_nested_state_hdr {
-		__u64 vmxon_pa;
-		__u64 vmcs12_pa;
-
-		struct {
-			__u16 flags;
-		} smm;
-		__u16 pad16;
-		__u32 pad32;
-		__u64 flags;
-		__u64 preemption_timer_deadline;
-	};
-
-
->  	__u32 flags;
->  	__u64 preemption_timer_deadline;
->    };
-> diff --git a/arch/x86/include/uapi/asm/kvm.h b/arch/x86/include/uapi/asm/kvm.h
-> index 0780f97c1850..aae3df1cbd01 100644
-> --- a/arch/x86/include/uapi/asm/kvm.h
-> +++ b/arch/x86/include/uapi/asm/kvm.h
-> @@ -414,7 +414,7 @@ struct kvm_vmx_nested_state_hdr {
->  	struct {
->  		__u16 flags;
->  	} smm;
-> -
-> +	__u16 pad;
->  	__u32 flags;
->  	__u64 preemption_timer_deadline;
->  };
-> -- 
-> 2.25.4
-> 
