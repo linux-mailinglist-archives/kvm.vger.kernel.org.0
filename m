@@ -2,74 +2,68 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6F21521CE55
-	for <lists+kvm@lfdr.de>; Mon, 13 Jul 2020 06:39:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5D88121CE5A
+	for <lists+kvm@lfdr.de>; Mon, 13 Jul 2020 06:40:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727107AbgGMEjm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 13 Jul 2020 00:39:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49798 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725804AbgGMEjm (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 13 Jul 2020 00:39:42 -0400
-Received: from ozlabs.org (ozlabs.org [IPv6:2401:3900:2:1::2])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B060AC061794;
-        Sun, 12 Jul 2020 21:39:41 -0700 (PDT)
+        id S1728540AbgGMEkl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 13 Jul 2020 00:40:41 -0400
+Received: from bilbo.ozlabs.org ([203.11.71.1]:32959 "EHLO ozlabs.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725818AbgGMEkk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 13 Jul 2020 00:40:40 -0400
 Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
         (No client certificate requested)
-        by mail.ozlabs.org (Postfix) with ESMTPSA id 4B4rXS3ndgz9sDX;
-        Mon, 13 Jul 2020 14:39:35 +1000 (AEST)
+        by mail.ozlabs.org (Postfix) with ESMTPSA id 4B4rYf07ttz9sRW;
+        Mon, 13 Jul 2020 14:40:37 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=canb.auug.org.au;
-        s=201702; t=1594615178;
-        bh=v/MgjPrqiPe4ZuBU4tfWPEezuWjdEPIyi5/ryEXFJ20=;
+        s=201702; t=1594615238;
+        bh=X2Wud9eqHa5P5dnFzfs5isEGcPND8sa4/jcFZQA1klE=;
         h=Date:From:To:Cc:Subject:From;
-        b=P3rtYUhcPvPZOTsyIvefv/IuitUkCrDUyk1g8GlwotOhWW2079csyInalZwUVs7om
-         gmGUnTAdAyTazMrmdM0SJvBPXkpFvKucxP7C87o4Uc6zzeIk3zbbh/icfTRtHoibq3
-         DIn6xyZbCO/MuZN6DGc5qXSuMn0qVc2pzYeM8R7tMV+xwg8+IbyqD/jURj6E5r70yJ
-         qfoLc/yoP/c7S4+KB2oTgDFG6uan1oOHaz5fNIIqJmarI2QakEoqBDLLXH8t13AbpF
-         PPt3x1dHZzG4YIIIFqyE04kGLgPB//CdxOwmnF8EZksd1JI3QU1eYjtPbGudRLXC3X
-         uSoN4QCd1HZCQ==
-Date:   Mon, 13 Jul 2020 14:39:35 +1000
+        b=Ds5dBXJl5n4w6dclItOfUPmw15D2n+JAC129r9bWBPsMz/uh15Fxi8c5MFAnp8Cio
+         K98Zh72fNFvw8uqDFNvSomRchfGwJijVQPGYgkomYSnTrtZy+ZDEVlQ7otsDLah15X
+         NpGb1/rLXwBPhIg4fr6LNN1ak1hEGvIFpToKXlh3Im0k7+0xph1xqKRXgx2oC6bkae
+         f62YOFWl/Rzs6WX6U1gQQApLfFuoLb4Kp2RS8vj9R2ObGFa7PVprmmLONIbX1sQIyl
+         7HOQOkhpnML6HLNbj0FNmZq4VwxHG12iC2Wz4puaPLNQr4db3wnvwfsc9dKW5nZcUj
+         WfDJCiMHxs7bg==
+Date:   Mon, 13 Jul 2020 14:40:36 +1000
 From:   Stephen Rothwell <sfr@canb.auug.org.au>
 To:     Christoffer Dall <cdall@cs.columbia.edu>,
         Marc Zyngier <maz@kernel.org>,
         Paolo Bonzini <pbonzini@redhat.com>, KVM <kvm@vger.kernel.org>
 Cc:     Linux Next Mailing List <linux-next@vger.kernel.org>,
         Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Tianjia Zhang <tianjia.zhang@linux.alibaba.com>,
-        James Morse <james.morse@arm.com>,
-        Gavin Shan <gshan@redhat.com>
+        Sean Christopherson <sean.j.christopherson@intel.com>
 Subject: linux-next: manual merge of the kvm-arm tree with the kvm tree
-Message-ID: <20200713143935.799861b9@canb.auug.org.au>
+Message-ID: <20200713144036.7afe4e76@canb.auug.org.au>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/mGnpMwZ8P.+TqiQs4kELvSQ";
+Content-Type: multipart/signed; boundary="Sig_/E=RS7Cw=NiZB95zv0VwjT.i";
  protocol="application/pgp-signature"; micalg=pgp-sha256
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
---Sig_/mGnpMwZ8P.+TqiQs4kELvSQ
+--Sig_/E=RS7Cw=NiZB95zv0VwjT.i
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 
 Hi all,
 
-Today's linux-next merge of the kvm-arm tree got conflicts in:
+Today's linux-next merge of the kvm-arm tree got a conflict in:
 
-  arch/arm64/include/asm/kvm_coproc.h
-  arch/arm64/kvm/handle_exit.c
+  arch/arm64/kvm/mmu.c
 
 between commit:
 
-  74cc7e0c35c1 ("KVM: arm64: clean up redundant 'kvm_run' parameters")
+  c1a33aebe91d ("KVM: arm64: Use common KVM implementation of MMU memory ca=
+ches")
 
-from the kvm tree and commits:
+from the kvm tree and commit:
 
-  6b33e0d64f85 ("KVM: arm64: Drop the target_table[] indirection")
-  750ed5669380 ("KVM: arm64: Remove the target table")
-  3a949f4c9354 ("KVM: arm64: Rename HSR to ESR")
+  a0e50aa3f4a8 ("KVM: arm64: Factor out stage 2 page table data from struct=
+ kvm")
 
 from the kvm-arm tree.
 
@@ -84,120 +78,74 @@ complex conflicts.
 Cheers,
 Stephen Rothwell
 
-diff --cc arch/arm64/include/asm/kvm_coproc.h
-index 454373704b8a,147f3a77e6a5..000000000000
---- a/arch/arm64/include/asm/kvm_coproc.h
-+++ b/arch/arm64/include/asm/kvm_coproc.h
-@@@ -19,20 -19,12 +19,12 @@@ struct kvm_sys_reg_table=20
-  	size_t num;
-  };
- =20
-- struct kvm_sys_reg_target_table {
-- 	struct kvm_sys_reg_table table64;
-- 	struct kvm_sys_reg_table table32;
-- };
--=20
-- void kvm_register_target_sys_reg_table(unsigned int target,
-- 				       struct kvm_sys_reg_target_table *table);
--=20
- -int kvm_handle_cp14_load_store(struct kvm_vcpu *vcpu, struct kvm_run *run=
-);
- -int kvm_handle_cp14_32(struct kvm_vcpu *vcpu, struct kvm_run *run);
- -int kvm_handle_cp14_64(struct kvm_vcpu *vcpu, struct kvm_run *run);
- -int kvm_handle_cp15_32(struct kvm_vcpu *vcpu, struct kvm_run *run);
- -int kvm_handle_cp15_64(struct kvm_vcpu *vcpu, struct kvm_run *run);
- -int kvm_handle_sys_reg(struct kvm_vcpu *vcpu, struct kvm_run *run);
- +int kvm_handle_cp14_load_store(struct kvm_vcpu *vcpu);
- +int kvm_handle_cp14_32(struct kvm_vcpu *vcpu);
- +int kvm_handle_cp14_64(struct kvm_vcpu *vcpu);
- +int kvm_handle_cp15_32(struct kvm_vcpu *vcpu);
- +int kvm_handle_cp15_64(struct kvm_vcpu *vcpu);
- +int kvm_handle_sys_reg(struct kvm_vcpu *vcpu);
- =20
-  #define kvm_coproc_table_init kvm_sys_reg_table_init
-  void kvm_sys_reg_table_init(void);
-diff --cc arch/arm64/kvm/handle_exit.c
-index 1df3beafd73f,98ab33139982..000000000000
---- a/arch/arm64/kvm/handle_exit.c
-+++ b/arch/arm64/kvm/handle_exit.c
-@@@ -87,9 -87,9 +87,9 @@@ static int handle_no_fpsimd(struct kvm_
-   * world-switches and schedule other host processes until there is an
-   * incoming IRQ or FIQ to the VM.
-   */
- -static int kvm_handle_wfx(struct kvm_vcpu *vcpu, struct kvm_run *run)
- +static int kvm_handle_wfx(struct kvm_vcpu *vcpu)
-  {
-- 	if (kvm_vcpu_get_hsr(vcpu) & ESR_ELx_WFx_ISS_WFE) {
-+ 	if (kvm_vcpu_get_esr(vcpu) & ESR_ELx_WFx_ISS_WFE) {
-  		trace_kvm_wfx_arm64(*vcpu_pc(vcpu), true);
-  		vcpu->stat.wfe_exit_stat++;
-  		kvm_vcpu_on_spin(vcpu, vcpu_mode_priv(vcpu));
-@@@ -114,12 -115,11 +114,12 @@@
-   * guest and host are using the same debug facilities it will be up to
-   * userspace to re-inject the correct exception for guest delivery.
-   *
- - * @return: 0 (while setting run->exit_reason), -1 for error
- + * @return: 0 (while setting vcpu->run->exit_reason), -1 for error
-   */
- -static int kvm_handle_guest_debug(struct kvm_vcpu *vcpu, struct kvm_run *=
-run)
- +static int kvm_handle_guest_debug(struct kvm_vcpu *vcpu)
-  {
- +	struct kvm_run *run =3D vcpu->run;
-- 	u32 hsr =3D kvm_vcpu_get_hsr(vcpu);
-+ 	u32 esr =3D kvm_vcpu_get_esr(vcpu);
-  	int ret =3D 0;
- =20
-  	run->exit_reason =3D KVM_EXIT_DEBUG;
-@@@ -144,12 -144,12 +144,12 @@@
-  	return ret;
+diff --cc arch/arm64/kvm/mmu.c
+index 838aad520f1c,cd14c831d56f..000000000000
+--- a/arch/arm64/kvm/mmu.c
++++ b/arch/arm64/kvm/mmu.c
+@@@ -124,11 -127,44 +127,12 @@@ static void stage2_dissolve_pud(struct=20
+  	put_page(virt_to_page(pudp));
   }
  =20
- -static int kvm_handle_unknown_ec(struct kvm_vcpu *vcpu, struct kvm_run *r=
-un)
- +static int kvm_handle_unknown_ec(struct kvm_vcpu *vcpu)
+- static void clear_stage2_pgd_entry(struct kvm *kvm, pgd_t *pgd, phys_addr=
+_t addr)
+ -static int mmu_topup_memory_cache(struct kvm_mmu_memory_cache *cache,
+ -				  int min, int max)
+ -{
+ -	void *page;
+ -
+ -	BUG_ON(max > KVM_NR_MEM_OBJS);
+ -	if (cache->nobjs >=3D min)
+ -		return 0;
+ -	while (cache->nobjs < max) {
+ -		page =3D (void *)__get_free_page(GFP_PGTABLE_USER);
+ -		if (!page)
+ -			return -ENOMEM;
+ -		cache->objects[cache->nobjs++] =3D page;
+ -	}
+ -	return 0;
+ -}
+ -
+ -static void mmu_free_memory_cache(struct kvm_mmu_memory_cache *mc)
+ -{
+ -	while (mc->nobjs)
+ -		free_page((unsigned long)mc->objects[--mc->nobjs]);
+ -}
+ -
+ -static void *mmu_memory_cache_alloc(struct kvm_mmu_memory_cache *mc)
+ -{
+ -	void *p;
+ -
+ -	BUG_ON(!mc || !mc->nobjs);
+ -	p =3D mc->objects[--mc->nobjs];
+ -	return p;
+ -}
+ -
++ static void clear_stage2_pgd_entry(struct kvm_s2_mmu *mmu, pgd_t *pgd, ph=
+ys_addr_t addr)
   {
-- 	u32 hsr =3D kvm_vcpu_get_hsr(vcpu);
-+ 	u32 esr =3D kvm_vcpu_get_esr(vcpu);
- =20
-- 	kvm_pr_unimpl("Unknown exception class: hsr: %#08x -- %s\n",
-- 		      hsr, esr_get_class_string(hsr));
-+ 	kvm_pr_unimpl("Unknown exception class: esr: %#08x -- %s\n",
-+ 		      esr, esr_get_class_string(esr));
- =20
-  	kvm_inject_undefined(vcpu);
-  	return 1;
-@@@ -237,12 -237,11 +237,12 @@@ static int handle_trap_exceptions(struc
-   * Return > 0 to return to guest, < 0 on error, 0 (and set exit_reason) on
-   * proper exit to userspace.
-   */
- -int handle_exit(struct kvm_vcpu *vcpu, struct kvm_run *run,
- -		       int exception_index)
- +int handle_exit(struct kvm_vcpu *vcpu, int exception_index)
-  {
- +	struct kvm_run *run =3D vcpu->run;
- +
-  	if (ARM_SERROR_PENDING(exception_index)) {
-- 		u8 hsr_ec =3D ESR_ELx_EC(kvm_vcpu_get_hsr(vcpu));
-+ 		u8 esr_ec =3D ESR_ELx_EC(kvm_vcpu_get_esr(vcpu));
- =20
-  		/*
-  		 * HVC/SMC already have an adjusted PC, which we need
++ 	struct kvm *kvm =3D mmu->kvm;
+  	p4d_t *p4d_table __maybe_unused =3D stage2_p4d_offset(kvm, pgd, 0UL);
+  	stage2_pgd_clear(kvm, pgd);
+- 	kvm_tlb_flush_vmid_ipa(kvm, addr);
++ 	kvm_tlb_flush_vmid_ipa(mmu, addr, S2_NO_LEVEL_HINT);
+  	stage2_p4d_free(kvm, p4d_table);
+  	put_page(virt_to_page(pgd));
+  }
 
---Sig_/mGnpMwZ8P.+TqiQs4kELvSQ
+--Sig_/E=RS7Cw=NiZB95zv0VwjT.i
 Content-Type: application/pgp-signature
 Content-Description: OpenPGP digital signature
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAl8L5YcACgkQAVBC80lX
-0Gxuhgf/cFDQ0wfIGNx/nFEnhCoKM11C5xyKwgAmkBa5nE8zrjJCI6qpJLcLU0n6
-1AHTcocjSeXAanxA9NXdnRo8LNiQ91zgQnzh2WruQGIkARrxO8DjKSJNg/9yB6tJ
-aQBizgLk+Kd64ZfzC7b4QgZDYZuNLanjrXc7Rp+8byVKprUS1tokdqYLdYdjfZbu
-Eg5Z2SETfSj9f+ms82uHswv59uakDB2vOj38vs25eCRTN4e31q9PjhqXxD9odWit
-kTE9AeF7G0sNwoGaDPJvjij95VxYkL48/6UmLT0e2fGVhgJ2ahUUqWcV5s5PFhKy
-zmlnXo15+3CVh9X1QbiNj4zlaVdrWA==
-=0UEf
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAl8L5cQACgkQAVBC80lX
+0GzzxAf/dwrPFrD9cNWtYSFdCDM7I3ln2fYbXIo3OFAq/qFczwbvH2Ae5KS8Uw+h
+nbNrZ0tPhBNEj74hcSqvIH+D9kHs9s0kjncO5tDoFTRfTB+o8cqkKbuYc0ft8lW4
+uoEDfzI4Jut/gPYxN7pkotVcSnto3TT/BJAnFycdjj8LaYsGEBjvhmSAxwZmTs1Z
+yYFcWz5CIZtTN26ADkxPV1hZ2ezcYsIojP2qWBJL60QCWqn+NsNbYoz/ID80CAfW
++3uFCwZOqoMbq58Xf0J8nbHCqOITFGbgjrZSH2o2PA3OVau5qCbPK3MBuEfbyKzh
+NtWH2fCVZ57FbFiwzqOSml7clZcb1Q==
+=BDCb
 -----END PGP SIGNATURE-----
 
---Sig_/mGnpMwZ8P.+TqiQs4kELvSQ--
+--Sig_/E=RS7Cw=NiZB95zv0VwjT.i--
