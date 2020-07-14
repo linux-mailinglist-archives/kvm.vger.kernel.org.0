@@ -2,27 +2,27 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id F282521F548
-	for <lists+kvm@lfdr.de>; Tue, 14 Jul 2020 16:45:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2777021F51F
+	for <lists+kvm@lfdr.de>; Tue, 14 Jul 2020 16:44:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728505AbgGNOi4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 14 Jul 2020 10:38:56 -0400
-Received: from mail.kernel.org ([198.145.29.99]:54104 "EHLO mail.kernel.org"
+        id S1729320AbgGNOob (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 14 Jul 2020 10:44:31 -0400
+Received: from mail.kernel.org ([198.145.29.99]:54594 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726964AbgGNOiz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 14 Jul 2020 10:38:55 -0400
+        id S1728903AbgGNOjT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 14 Jul 2020 10:39:19 -0400
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 4560F22519;
-        Tue, 14 Jul 2020 14:38:53 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id E47EA2253A;
+        Tue, 14 Jul 2020 14:39:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1594737534;
-        bh=YQI3JFO0/IRGd0ndbGFLjzwEN80zHIU6ULPZ524xL9A=;
+        s=default; t=1594737558;
+        bh=QoEuy0hJIJikJq+yXPq8PDA+ZuxirAj2PA6pqi5aF04=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=LQLAynTjldbvw/BddaWMNMxoExHdd4te8/t9qxpSuNhImyyAXyj3UzNiM4Ns7v1cP
-         MaMynGSQrFRVdaAga6yElO3pd7W9wb6DnmyeXKD5clNo2Zb4f1KgMwKHhAj8X07owE
-         cZAqFvKCX659wtGKyhlr609MOx8zO1TZw9q4Eqa8=
+        b=UAKck29qGHrWok7TAjuCazyaaYhECVZmGLTj+Vs7h9ARRO3dAz8u1LZqowLRX8K+x
+         hOidSXp4ACVpPvnAD1cSt9FqJfF3bbIw1ETeavkzHgr8NVjpdb3b0nF+bhN+/zfd9z
+         JBW8r2RQDRQ31PPZ1vsZBUf9uV8xkiEM6Do599CM=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Christian Borntraeger <borntraeger@de.ibm.com>,
@@ -30,12 +30,12 @@ Cc:     Christian Borntraeger <borntraeger@de.ibm.com>,
         David Hildenbrand <david@redhat.com>,
         Sasha Levin <sashal@kernel.org>, kvm@vger.kernel.org,
         linux-s390@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.7 03/19] KVM: s390: reduce number of IO pins to 1
-Date:   Tue, 14 Jul 2020 10:38:33 -0400
-Message-Id: <20200714143849.4035283-3-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.4 03/18] KVM: s390: reduce number of IO pins to 1
+Date:   Tue, 14 Jul 2020 10:38:59 -0400
+Message-Id: <20200714143914.4035489-3-sashal@kernel.org>
 X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20200714143849.4035283-1-sashal@kernel.org>
-References: <20200714143849.4035283-1-sashal@kernel.org>
+In-Reply-To: <20200714143914.4035489-1-sashal@kernel.org>
+References: <20200714143914.4035489-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -90,7 +90,7 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 4 insertions(+), 4 deletions(-)
 
 diff --git a/arch/s390/include/asm/kvm_host.h b/arch/s390/include/asm/kvm_host.h
-index d6bcd34f3ec32..ec65bc2bd084e 100644
+index abe60268335d2..0fe5600a037e4 100644
 --- a/arch/s390/include/asm/kvm_host.h
 +++ b/arch/s390/include/asm/kvm_host.h
 @@ -31,12 +31,12 @@
