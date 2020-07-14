@@ -2,92 +2,105 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D580921FB89
-	for <lists+kvm@lfdr.de>; Tue, 14 Jul 2020 21:02:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 11C3121FD42
+	for <lists+kvm@lfdr.de>; Tue, 14 Jul 2020 21:24:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730836AbgGNTCb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 14 Jul 2020 15:02:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40838 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729917AbgGNTC0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 14 Jul 2020 15:02:26 -0400
-Received: from mail-io1-xd42.google.com (mail-io1-xd42.google.com [IPv6:2607:f8b0:4864:20::d42])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5EA56C061794
-        for <kvm@vger.kernel.org>; Tue, 14 Jul 2020 12:02:26 -0700 (PDT)
-Received: by mail-io1-xd42.google.com with SMTP id p205so9919804iod.8
-        for <kvm@vger.kernel.org>; Tue, 14 Jul 2020 12:02:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=kqKWO3uScp+YPNttG3GkeP2e/9cRZhWYEGoF0VDURzw=;
-        b=AaNf3yx15t9Una3u1zecHN3oGQdqwauyNPjc7RpagX1o8tbTlSRhLSAUKwHK4qoHks
-         ORfBwr32F1g31B7lp7WysJysZhkTIc/e+bwiwTbviJyu7pxiuSjrNW7Rbj+RFIo/njVM
-         HnvJtypq7cIjn1krtKvlR9b9sVt0mkAH78AP5o4Mwo6BjJDtEZ51XsytfqnpwMfqHLeb
-         /c5iFQig0SipYNXd9GsYR9NLz6/cpocAPBi777kiOFI82Enm81jKr9/scO9eqNh0SOPF
-         f3O7nrTTfV5fN+6InnYrSxHxzKzSMJDX1NVYetAPtHMrV2mUiALUZFawW+ZlfmKxLQKm
-         96Mw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=kqKWO3uScp+YPNttG3GkeP2e/9cRZhWYEGoF0VDURzw=;
-        b=guYtmoLj1tjHVnderi/QGr3UHk/D+/Djae19SLK3TqR5HjoN2sG3JzbtLW+tJUVuOe
-         mQC4q2hIvVpUVfgS3oVanOgDjxBnJRXeuXvGaL+HAuLghXFqw5LDwm8ssZy0Elg2HEOV
-         5RcvyUt+lLIGSag3+X651OViFCBLaBRYMwNxvQV35fkt+uPWvOZNd2C+YSM/ktMkXuhM
-         NqN6rNoEC2yiGbMDnHYC0YcwIoRpg+VTvF+WtymmKonkeZHufdlcXJvDCkqYsmwjWi65
-         qFfaTCsmqXVrQpQlH9rhsoo3R6MYHgp/3VXWBSTAFbKNVvn4r/9QSjcOwvF1Sn7wlxV9
-         vjpw==
-X-Gm-Message-State: AOAM531lrCZYF4RZBNo544f6C1bVn8mk5K+ZZcu283+7DoyAGa1xJxDJ
-        nBatLJCsu8T2IVdhTJ0maKxLfGWbw9CUjjO/VAsQKQ==
-X-Google-Smtp-Source: ABdhPJzUM3ZaAmcJWC7hc63F6HxyG0D7UOVj/xVSU2LQkXToXSztscjS/kFLcwM0K40Dog4ENU23gAxQqcSoSi7gnQo=
-X-Received: by 2002:a05:6638:118:: with SMTP id x24mr7643093jao.48.1594753345471;
- Tue, 14 Jul 2020 12:02:25 -0700 (PDT)
-MIME-Version: 1.0
-References: <20200714015732.32426-1-sean.j.christopherson@intel.com>
- <CALMp9eQ1-6GEiSh55-NXgjuq3EOwP9VWNMeriH_J64p9JMjN0g@mail.gmail.com> <20200714185853.GC14404@linux.intel.com>
-In-Reply-To: <20200714185853.GC14404@linux.intel.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Tue, 14 Jul 2020 12:02:14 -0700
-Message-ID: <CALMp9eQrCcwZutCmo8mQsBrhyupdniBoN962Ex8dfDQKorh-6Q@mail.gmail.com>
-Subject: Re: [PATCH] KVM: x86: Don't attempt to load PDPTRs when 64-bit mode
- is enabled
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        id S1729403AbgGNTXw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 14 Jul 2020 15:23:52 -0400
+Received: from mga11.intel.com ([192.55.52.93]:9953 "EHLO mga11.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727930AbgGNTXv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 14 Jul 2020 15:23:51 -0400
+IronPort-SDR: kWL5vu8lEG7WbOubWKGL/AZAtgk69fWGkm5J/r8kIHlbETWF6vuzdAM2f9cugRn5M62Fv6l55R
+ 7X235GhGpYAQ==
+X-IronPort-AV: E=McAfee;i="6000,8403,9682"; a="147022483"
+X-IronPort-AV: E=Sophos;i="5.75,352,1589266800"; 
+   d="scan'208";a="147022483"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga006.jf.intel.com ([10.7.209.51])
+  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Jul 2020 12:23:51 -0700
+IronPort-SDR: PCMjJ49O7HM1ZDukmb0/xSV3g6OqD7Hs4Q4nkyKXVCpxH8AQYuOK6cDIyzUqcC1dWE+GGzGVQL
+ DKKPOK90aDlg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.75,352,1589266800"; 
+   d="scan'208";a="285859255"
+Received: from guptapadev.jf.intel.com (HELO guptapadev.amr) ([10.54.74.188])
+  by orsmga006.jf.intel.com with ESMTP; 14 Jul 2020 12:23:51 -0700
+Date:   Tue, 14 Jul 2020 12:17:59 -0700
+From:   Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
+To:     Dave Hansen <dave.hansen@intel.com>
+Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, x86@kernel.org,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm list <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Oliver Upton <oupton@google.com>,
-        Peter Shier <pshier@google.com>
-Content-Type: text/plain; charset="UTF-8"
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Tony Luck <tony.luck@intel.com>,
+        "Gomez Iglesias, Antonio" <antonio.gomez.iglesias@intel.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Fenghua Yu <fenghua.yu@intel.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Vincenzo Frascino <vincenzo.frascino@arm.com>,
+        Josh Poimboeuf <jpoimboe@redhat.com>,
+        Anthony Steinhauser <asteinhauser@google.com>,
+        Mike Rapoport <rppt@linux.ibm.com>,
+        Mark Gross <mgross@linux.intel.com>,
+        Waiman Long <longman@redhat.com>, linux-doc@vger.kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        Jonathan Corbet <corbet@lwn.net>
+Subject: Re: [PATCH] x86/bugs/multihit: Fix mitigation reporting when KVM is
+ not in use
+Message-ID: <20200714191759.GA7116@guptapadev.amr>
+References: <267631f4db4fd7e9f7ca789c2efaeab44103f68e.1594689154.git.pawan.kumar.gupta@linux.intel.com>
+ <20200714014540.GH29725@linux.intel.com>
+ <099d6985-9e9f-1d9f-7098-58a9e26e4450@intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <099d6985-9e9f-1d9f-7098-58a9e26e4450@intel.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jul 14, 2020 at 11:59 AM Sean Christopherson
-<sean.j.christopherson@intel.com> wrote:
->
-> On Tue, Jul 14, 2020 at 11:55:45AM -0700, Jim Mattson wrote:
-> > On Mon, Jul 13, 2020 at 6:57 PM Sean Christopherson
-> > <sean.j.christopherson@intel.com> wrote:
-> > >
-> > > Don't attempt to load PDPTRs if EFER.LME=1, i.e. if 64-bit mode is
-> > > enabled.  A recent change to reload the PDTPRs when CR0.CD or CR0.NW is
-> > > toggled botched the EFER.LME handling and sends KVM down the PDTPR path
-> > > when is_paging() is true, i.e. when the guest toggles CD/NW in 64-bit
-> > > mode.
-> >
-> > Oops!
-> >
-> > I don't think "is_paging()" is relevant here, so much as "EFER.LME=1."
-> > As you note below, KVM *should* go down the PDPTR path when
-> > is_paging() is true and EFER.LME=0.
->
-> It's relevant for the EFER.LME=1 case as it's used to detect CR0.PG 0->1.
->
-> Though maybe we're in violent agreement?
+On Tue, Jul 14, 2020 at 07:57:53AM -0700, Dave Hansen wrote:
+> Let's stick to things which are at least static per reboot.  Checking
+> for X86_FEATURE_VMX or even CONFIG_KVM_INTEL seems like a good stopping
+> point.  "Could this kernel run a naughty guest?"  If so, report
+> "Vulnerable".  It's the same as Meltdown: "Could this kernel run
+> untrusted code?"  If so, report "Vulnerable".
 
-We're in agreement conceptually, but I find your original text lacking
-in clarity. :-)
+Thanks, These are good inputs. So what I need to add is a boot time
+check for VMX feature and report "Vulnerable" or "Not
+affected(VMX disabled)".
+
+Are you suggesting to not change the reporting when KVM deploys the
+"Split huge pages" mitigation? Is this because VMX can still be used by
+other VMMs?
+
+The current mitigation reporting is very specific to KVM:
+
+	- "KVM: Vulnerable"
+	- "KVM: Mitigation: Split huge pages"
+
+As the kernel doesn't know about the mitigation state of out-of-tree
+VMMs can we add VMX reporting to always say vulnerable when VMX is
+enabled:
+
+	- "VMX: Vulnerable, KVM: Vulnerable"
+	- "VMX: Vulnerable, KVM: Mitigation: Split huge pages"
+
+And if VMX is disabled report:
+
+	- "VMX: Not affected(VMX disabled)"
+
+or something like that.
+
+Thanks,
+Pawan
