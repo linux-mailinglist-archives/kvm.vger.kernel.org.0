@@ -2,19 +2,19 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2ABBF21F062
-	for <lists+kvm@lfdr.de>; Tue, 14 Jul 2020 14:12:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 59F3C21F05C
+	for <lists+kvm@lfdr.de>; Tue, 14 Jul 2020 14:11:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728691AbgGNML7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 14 Jul 2020 08:11:59 -0400
-Received: from 8bytes.org ([81.169.241.247]:54694 "EHLO theia.8bytes.org"
+        id S1728683AbgGNMLn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 14 Jul 2020 08:11:43 -0400
+Received: from 8bytes.org ([81.169.241.247]:54824 "EHLO theia.8bytes.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728594AbgGNMLV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 14 Jul 2020 08:11:21 -0400
+        id S1728502AbgGNMLW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 14 Jul 2020 08:11:22 -0400
 Received: from cap.home.8bytes.org (p5b006776.dip0.t-ipconnect.de [91.0.103.118])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
         (No client certificate requested)
-        by theia.8bytes.org (Postfix) with ESMTPSA id 41641FEE;
+        by theia.8bytes.org (Postfix) with ESMTPSA id C4FB6FF1;
         Tue, 14 Jul 2020 14:11:12 +0200 (CEST)
 From:   Joerg Roedel <joro@8bytes.org>
 To:     x86@kernel.org
@@ -36,9 +36,9 @@ Cc:     Joerg Roedel <joro@8bytes.org>, Joerg Roedel <jroedel@suse.de>,
         Martin Radev <martin.b.radev@gmail.com>,
         linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         virtualization@lists.linux-foundation.org
-Subject: [PATCH v4 71/75] x86/head/64: Rename start_cpu0
-Date:   Tue, 14 Jul 2020 14:09:13 +0200
-Message-Id: <20200714120917.11253-72-joro@8bytes.org>
+Subject: [PATCH v4 72/75] x86/sev-es: Support CPU offline/online
+Date:   Tue, 14 Jul 2020 14:09:14 +0200
+Message-Id: <20200714120917.11253-73-joro@8bytes.org>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20200714120917.11253-1-joro@8bytes.org>
 References: <20200714120917.11253-1-joro@8bytes.org>
@@ -51,94 +51,118 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Joerg Roedel <jroedel@suse.de>
 
-For SEV-ES this entry point will be used for restarting APs after they
-have been offlined. Remove the '0' from the name to reflect that.
+Add a play_dead handler when running under SEV-ES. This is needed
+because the hypervisor can't deliver an SIPI request to restart the AP.
+Instead the kernel has to issue a VMGEXIT to halt the VCPU until the
+hypervisor wakes it up again.
 
 Signed-off-by: Joerg Roedel <jroedel@suse.de>
 ---
- arch/x86/include/asm/cpu.h | 2 +-
- arch/x86/kernel/head_32.S  | 4 ++--
- arch/x86/kernel/head_64.S  | 6 +++---
- arch/x86/kernel/smpboot.c  | 4 ++--
- 4 files changed, 8 insertions(+), 8 deletions(-)
+ arch/x86/include/uapi/asm/svm.h |  1 +
+ arch/x86/kernel/sev-es.c        | 64 +++++++++++++++++++++++++++++++++
+ 2 files changed, 65 insertions(+)
 
-diff --git a/arch/x86/include/asm/cpu.h b/arch/x86/include/asm/cpu.h
-index da78ccbd493b..1536b607971f 100644
---- a/arch/x86/include/asm/cpu.h
-+++ b/arch/x86/include/asm/cpu.h
-@@ -29,7 +29,7 @@ struct x86_cpu {
- #ifdef CONFIG_HOTPLUG_CPU
- extern int arch_register_cpu(int num);
- extern void arch_unregister_cpu(int);
--extern void start_cpu0(void);
-+extern void start_cpu(void);
- #ifdef CONFIG_DEBUG_HOTPLUG_CPU0
- extern int _debug_hotplug_cpu(int cpu, int action);
- #endif
-diff --git a/arch/x86/kernel/head_32.S b/arch/x86/kernel/head_32.S
-index f66a6b90f954..aad62c677486 100644
---- a/arch/x86/kernel/head_32.S
-+++ b/arch/x86/kernel/head_32.S
-@@ -174,12 +174,12 @@ SYM_CODE_END(startup_32)
-  * up already except stack. We just set up stack here. Then call
-  * start_secondary().
-  */
--SYM_FUNC_START(start_cpu0)
-+SYM_FUNC_START(start_cpu)
- 	movl initial_stack, %ecx
- 	movl %ecx, %esp
- 	call *(initial_code)
- 1:	jmp 1b
--SYM_FUNC_END(start_cpu0)
-+SYM_FUNC_END(start_cpu)
- #endif
+diff --git a/arch/x86/include/uapi/asm/svm.h b/arch/x86/include/uapi/asm/svm.h
+index a19ce9681ec2..20a05839dd9a 100644
+--- a/arch/x86/include/uapi/asm/svm.h
++++ b/arch/x86/include/uapi/asm/svm.h
+@@ -84,6 +84,7 @@
+ /* SEV-ES software-defined VMGEXIT events */
+ #define SVM_VMGEXIT_MMIO_READ			0x80000001
+ #define SVM_VMGEXIT_MMIO_WRITE			0x80000002
++#define SVM_VMGEXIT_AP_HLT_LOOP			0x80000004
+ #define SVM_VMGEXIT_AP_JUMP_TABLE		0x80000005
+ #define		SVM_VMGEXIT_SET_AP_JUMP_TABLE			0
+ #define		SVM_VMGEXIT_GET_AP_JUMP_TABLE			1
+diff --git a/arch/x86/kernel/sev-es.c b/arch/x86/kernel/sev-es.c
+index 370cf9bf2c88..b147d97856c3 100644
+--- a/arch/x86/kernel/sev-es.c
++++ b/arch/x86/kernel/sev-es.c
+@@ -29,6 +29,8 @@
+ #include <asm/processor.h>
+ #include <asm/traps.h>
+ #include <asm/svm.h>
++#include <asm/smp.h>
++#include <asm/cpu.h>
  
- /*
-diff --git a/arch/x86/kernel/head_64.S b/arch/x86/kernel/head_64.S
-index 8b43ed0592e8..12d1e407461c 100644
---- a/arch/x86/kernel/head_64.S
-+++ b/arch/x86/kernel/head_64.S
-@@ -319,15 +319,15 @@ SYM_CODE_END(secondary_startup_64)
+ #define DR7_RESET_VALUE        0x400
  
- #ifdef CONFIG_HOTPLUG_CPU
- /*
-- * Boot CPU0 entry point. It's called from play_dead(). Everything has been set
-+ * CPU entry point. It's called from play_dead(). Everything has been set
-  * up already except stack. We just set up stack here. Then call
-  * start_secondary() via .Ljump_to_C_code.
-  */
--SYM_CODE_START(start_cpu0)
-+SYM_CODE_START(start_cpu)
- 	UNWIND_HINT_EMPTY
- 	movq	initial_stack(%rip), %rsp
- 	jmp	.Ljump_to_C_code
--SYM_CODE_END(start_cpu0)
-+SYM_CODE_END(start_cpu)
- #endif
- 
- 	/* Both SMP bootup and ACPI suspend change these variables */
-diff --git a/arch/x86/kernel/smpboot.c b/arch/x86/kernel/smpboot.c
-index ffbd9a3d78d8..5a173459759d 100644
---- a/arch/x86/kernel/smpboot.c
-+++ b/arch/x86/kernel/smpboot.c
-@@ -1729,7 +1729,7 @@ static inline void mwait_play_dead(void)
- 		 * If NMI wants to wake up CPU0, start CPU0.
- 		 */
- 		if (wakeup_cpu0())
--			start_cpu0();
-+			start_cpu();
- 	}
+@@ -531,6 +533,66 @@ static bool __init sev_es_setup_ghcb(void)
+ 	return true;
  }
  
-@@ -1744,7 +1744,7 @@ void hlt_play_dead(void)
- 		 * If NMI wants to wake up CPU0, start CPU0.
- 		 */
- 		if (wakeup_cpu0())
--			start_cpu0();
-+			start_cpu();
++#ifdef CONFIG_HOTPLUG_CPU
++static void sev_es_ap_hlt_loop(void)
++{
++	struct ghcb_state state;
++	struct ghcb *ghcb;
++
++	ghcb = sev_es_get_ghcb(&state);
++
++	while (true) {
++		vc_ghcb_invalidate(ghcb);
++		ghcb_set_sw_exit_code(ghcb, SVM_VMGEXIT_AP_HLT_LOOP);
++		ghcb_set_sw_exit_info_1(ghcb, 0);
++		ghcb_set_sw_exit_info_2(ghcb, 0);
++
++		sev_es_wr_ghcb_msr(__pa(ghcb));
++		VMGEXIT();
++
++		/* Wakeup signal? */
++		if (ghcb_is_valid_sw_exit_info_2(ghcb) &&
++		    ghcb->save.sw_exit_info_2)
++			break;
++	}
++
++	sev_es_put_ghcb(&state);
++}
++
++/*
++ * Play_dead handler when running under SEV-ES. This is needed because
++ * the hypervisor can't deliver an SIPI request to restart the AP.
++ * Instead the kernel has to issue a VMGEXIT to halt the VCPU until the
++ * hypervisor wakes it up again.
++ */
++static void sev_es_play_dead(void)
++{
++	play_dead_common();
++
++	/* IRQs now disabled */
++
++	sev_es_ap_hlt_loop();
++
++	/*
++	 * If we get here, the VCPU was woken up again. Jump to CPU
++	 * startup code to get it back online.
++	 */
++
++	start_cpu();
++}
++#else  /* CONFIG_HOTPLUG_CPU */
++#define sev_es_play_dead	native_play_dead
++#endif /* CONFIG_HOTPLUG_CPU */
++
++#ifdef CONFIG_SMP
++static void __init sev_es_setup_play_dead(void)
++{
++	smp_ops.play_dead = sev_es_play_dead;
++}
++#else
++static inline void sev_es_setup_play_dead(void) { }
++#endif
++
+ static void __init sev_es_alloc_runtime_data(int cpu)
+ {
+ 	struct sev_es_runtime_data *data;
+@@ -575,6 +637,8 @@ void __init sev_es_init_vc_handling(void)
+ 		sev_es_init_ghcb(cpu);
+ 		sev_es_setup_vc_stacks(cpu);
  	}
++
++	sev_es_setup_play_dead();
  }
  
+ static void __init vc_early_forward_exception(struct es_em_ctxt *ctxt)
 -- 
 2.27.0
 
