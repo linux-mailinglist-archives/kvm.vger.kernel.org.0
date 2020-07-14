@@ -2,161 +2,118 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C0EA121F38D
-	for <lists+kvm@lfdr.de>; Tue, 14 Jul 2020 16:12:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9C3B121F391
+	for <lists+kvm@lfdr.de>; Tue, 14 Jul 2020 16:12:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728118AbgGNOLn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 14 Jul 2020 10:11:43 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:45988 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1725821AbgGNOLm (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 14 Jul 2020 10:11:42 -0400
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 06EE27CF099445;
-        Tue, 14 Jul 2020 10:11:40 -0400
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 329dhw1nff-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 14 Jul 2020 10:11:40 -0400
-Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 06EE3WSJ105727;
-        Tue, 14 Jul 2020 10:11:39 -0400
-Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 329dhw1nen-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 14 Jul 2020 10:11:39 -0400
-Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
-        by ppma03fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 06EEBcCe004086;
-        Tue, 14 Jul 2020 14:11:38 GMT
-Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
-        by ppma03fra.de.ibm.com with ESMTP id 327527hqqg-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 14 Jul 2020 14:11:38 +0000
-Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
-        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 06EEBZG563242542
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 14 Jul 2020 14:11:35 GMT
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id ABD6942041;
-        Tue, 14 Jul 2020 14:11:35 +0000 (GMT)
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 22ED642068;
-        Tue, 14 Jul 2020 14:11:35 +0000 (GMT)
-Received: from ibm-vm (unknown [9.145.7.230])
-        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Tue, 14 Jul 2020 14:11:35 +0000 (GMT)
-Date:   Tue, 14 Jul 2020 16:11:33 +0200
-From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
+        id S1728268AbgGNOMG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 14 Jul 2020 10:12:06 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:22271 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1725925AbgGNOMG (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 14 Jul 2020 10:12:06 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1594735924;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=ZlccC2VgtZKkvdcQsdEfleuqF4KQO54hAbgkXaUNTPI=;
+        b=DVOYgKl1Cd58d/WLTa/Y3bvghMxFHHG5z1uyDpIEfv8MT3LytUMMCRB2/Lvv3U7l6rcZ00
+        jdSg85RZqLU7oW/s3SHFFkQ3Qk4COqFBZjdrN6fCRolwkNmja3okwnvuQv9GAPGrRfyao2
+        geYNNH0wztrifJ6flMfKvOrZocwJV3s=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-499-wi-ghHxpPtqS_nH9OxJ1TA-1; Tue, 14 Jul 2020 10:11:56 -0400
+X-MC-Unique: wi-ghHxpPtqS_nH9OxJ1TA-1
+Received: by mail-wr1-f72.google.com with SMTP id j3so21960310wrq.9
+        for <kvm@vger.kernel.org>; Tue, 14 Jul 2020 07:11:55 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=ZlccC2VgtZKkvdcQsdEfleuqF4KQO54hAbgkXaUNTPI=;
+        b=amgidzHGx8JvLCEskRPcl8/wpqRW+IpLUD8BLo1/rj223UEBZ2PvBtwjtU5ZUW+4nh
+         M4HKmOb9oa3Ww/dpwZTtHLaiP4S6AkVxGkzGnxgHvUrWEuulbOPmvuzYInGLODL1nxh1
+         yAp2dLYHxByg2dPRvW5K/C0oc0ZBmRLd+l7eEGYYTLqC3Xfd/dOZwxig/TUH/kXehEEr
+         /DbCZJw3QiMuV5GoIhDfYBjOjMtEnG7HZGvL3OfSwEakmkAGIhzkr8GIDKBUCjFcbBd+
+         0QQNuMjhc4whHhWfN8uuBWSk2ALXLO97PiSvCS5pdvKb8i2scPRzCMm/q3UwpDNzSC54
+         33Ag==
+X-Gm-Message-State: AOAM532z1DRQkL0sDHIZUNKf8DJzmw0OHEmih5bYXdNPbk3vVM484saR
+        ibXcGHaiisuUigGj26le1uDLqrR0YCNqYDPAgGriCIuOK6pExqvr+T8gsyNz5mrsCFbKV3RbnMI
+        LZTks8nmGKRcm
+X-Received: by 2002:a5d:4d0b:: with SMTP id z11mr5778513wrt.24.1594735914910;
+        Tue, 14 Jul 2020 07:11:54 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxFEojZs2OzIsVnCpzb4g8z6CrvtNNpI2dcvnB21QDx6c3aUW+k3CIoXw7UXlBiYhbfOkNOJw==
+X-Received: by 2002:a5d:4d0b:: with SMTP id z11mr5778479wrt.24.1594735914657;
+        Tue, 14 Jul 2020 07:11:54 -0700 (PDT)
+Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
+        by smtp.gmail.com with ESMTPSA id b23sm5028357wmd.37.2020.07.14.07.11.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 14 Jul 2020 07:11:52 -0700 (PDT)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
 To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     Thomas Huth <thuth@redhat.com>, kvm@vger.kernel.org,
-        pbonzini@redhat.com, frankja@linux.ibm.com, david@redhat.com,
-        drjones@redhat.com, jmattson@google.com
-Subject: Re: [kvm-unit-tests PATCH v1 2/2] lib/alloc_page: Fix compilation
- issue on 32bit archs
-Message-ID: <20200714161133.32f4d1e7@ibm-vm>
-In-Reply-To: <20200714140534.GB14404@linux.intel.com>
-References: <20200714110919.50724-1-imbrenda@linux.ibm.com>
-        <20200714110919.50724-3-imbrenda@linux.ibm.com>
-        <866d79a4-0205-5d49-d407-4e3415b63762@redhat.com>
-        <20200714134123.022b3117@ibm-vm>
-        <20200714140534.GB14404@linux.intel.com>
-Organization: IBM
-X-Mailer: Claws Mail 3.17.5 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+Cc:     Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Oliver Upton <oupton@google.com>,
+        Peter Shier <pshier@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH] KVM: x86: Don't attempt to load PDPTRs when 64-bit mode is enabled
+In-Reply-To: <20200714132120.GA14404@linux.intel.com>
+References: <20200714015732.32426-1-sean.j.christopherson@intel.com> <87wo36s3wb.fsf@vitty.brq.redhat.com> <20200714132120.GA14404@linux.intel.com>
+Date:   Tue, 14 Jul 2020 16:11:50 +0200
+Message-ID: <87tuyarxsp.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
- definitions=2020-07-14_04:2020-07-14,2020-07-14 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 phishscore=0
- malwarescore=0 mlxscore=0 suspectscore=2 impostorscore=0 spamscore=0
- lowpriorityscore=0 mlxlogscore=999 clxscore=1015 adultscore=0
- priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2006250000 definitions=main-2007140104
+Content-Type: text/plain
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 14 Jul 2020 07:05:34 -0700
-Sean Christopherson <sean.j.christopherson@intel.com> wrote:
+Sean Christopherson <sean.j.christopherson@intel.com> writes:
 
-> On Tue, Jul 14, 2020 at 01:41:23PM +0200, Claudio Imbrenda wrote:
-> > On Tue, 14 Jul 2020 13:20:16 +0200
-> > Thomas Huth <thuth@redhat.com> wrote:
-> >   
-> > > On 14/07/2020 13.09, Claudio Imbrenda wrote:  
-> > > > The assert in lib/alloc_page is hardcoded to long, and size_t is
-> > > > just an int on 32 bit architectures.
-> > > > 
-> > > > Adding a cast makes the compiler happy.
-> > > > 
-> > > > Fixes: 73f4b202beb39 ("lib/alloc_page: change some parameter
-> > > > types") Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
-> > > > ---
-> > > >  lib/alloc_page.c | 5 +++--
-> > > >  1 file changed, 3 insertions(+), 2 deletions(-)
-> > > > 
-> > > > diff --git a/lib/alloc_page.c b/lib/alloc_page.c
-> > > > index fa3c527..617b003 100644
-> > > > --- a/lib/alloc_page.c
-> > > > +++ b/lib/alloc_page.c
-> > > > @@ -29,11 +29,12 @@ void free_pages(void *mem, size_t size)
-> > > >  	assert_msg((unsigned long) mem % PAGE_SIZE == 0,
-> > > >  		   "mem not page aligned: %p", mem);
-> > > >  
-> > > > -	assert_msg(size % PAGE_SIZE == 0, "size not page
-> > > > aligned: %#lx", size);
-> > > > +	assert_msg(size % PAGE_SIZE == 0, "size not page
-> > > > aligned: %#lx",
-> > > > +		(unsigned long)size);
-> > > >  
-> > > >  	assert_msg(size == 0 || (uintptr_t)mem == -size ||
-> > > >  		   (uintptr_t)mem + size > (uintptr_t)mem,
-> > > > -		   "mem + size overflow: %p + %#lx", mem,
-> > > > size);
-> > > > +		   "mem + size overflow: %p + %#lx", mem,
-> > > > (unsigned long)size);    
-> > > 
-> > > Looking at lib/printf.c, it seems like it also supports %z ...
-> > > have you tried?  
-> > 
-> > no, but in hindsight I should have. It's probably a much cleaner
-> > solution. I'll try and respin.  
-> 
-> I'm not opposed to using size_t, but if we go that route then the
-> entirety of alloc_page.c should be converted to size_t.  As is, there
-> is code like:
-> 
-> 	void free_pages_by_order(void *mem, unsigned int order)
-> 	{
->         	free_pages(mem, 1ul << (order + PAGE_SHIFT));
-> 	}
-> 
-> and
-> 
-> 	void *alloc_pages(unsigned int order)
-> 	{
-> 		...
-> 
-> 		/* Looking for a run of length (1 << order). */
-> 		unsigned long run = 0;
-> 		const unsigned long n = 1ul << order;
-> 		const unsigned long align_mask = (n << PAGE_SHIFT) -
-> 1; void *run_start = NULL;
-> 		void *run_prev = NULL;
-> 		unsigned long run_next_pa = 0;
-> 		unsigned long pa;
-> 
-> 		assert(order < sizeof(unsigned long) * 8);
-> 
-> 		...
-> 	}
-> 
-> that very explicitly uses 'unsigned long' for the size.
+> On Tue, Jul 14, 2020 at 02:00:04PM +0200, Vitaly Kuznetsov wrote:
+>> Sean Christopherson <sean.j.christopherson@intel.com> writes:
+>> > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+>> > index 95ef629228691..5f526d94c33f3 100644
+>> > --- a/arch/x86/kvm/x86.c
+>> > +++ b/arch/x86/kvm/x86.c
+>> > @@ -819,22 +819,22 @@ int kvm_set_cr0(struct kvm_vcpu *vcpu, unsigned long cr0)
+>> >  	if ((cr0 & X86_CR0_PG) && !(cr0 & X86_CR0_PE))
+>> >  		return 1;
+>> >  
+>> > -	if (cr0 & X86_CR0_PG) {
+>> >  #ifdef CONFIG_X86_64
+>> > -		if (!is_paging(vcpu) && (vcpu->arch.efer & EFER_LME)) {
+>> > -			int cs_db, cs_l;
+>> > +	if ((vcpu->arch.efer & EFER_LME) && !is_paging(vcpu) &&
+>> > +	    (cr0 & X86_CR0_PG)) {
+>> 
+>> it seems we have more than one occurance of "if (vcpu->arch.efer &
+>> EFER_LME)" under "#ifdef CONFIG_X86_64" and we alredy have 
+>> 
+>> static inline int is_long_mode(struct kvm_vcpu *vcpu)
+>> {
+>> #ifdef CONFIG_X86_64
+>>      return vcpu->arch.efer & EFER_LMA;
+>> #else
+>>      return 0;
+>> #endif
+>> }
+>> 
+>> so if we use this instead, the compilers will just throw away the
+>> non-reachable blocks when !(#ifdef CONFIG_X86_64), right?
+>
+> EFER.LME vs. EFER.LMA.  The kvm_set_cr0() check is specifically looking at
+> the case where EFER.LME=1, EFER.LMA=0, and CR0.PG is being toggled on, i.e.
+> long mode is being enabled.  EFER_LMA won't be set until vmx_set_cr0() does
+> enter_lmode().
 
-don't worry, those won't stay there for long :)
+Oops, shame on me :-(
 
-once this patch series has stabilized, I'm going to send a more radical
-rewrite of the allocators
+Would it make sense to introduce something like is_long_mode()
+(e.g. is_efer_lme()) for LME and #ifdef CONFIG_X86_64? I see the
+same checks in vmx_set_cr0()/svm_set_cr0())?
+
+-- 
+Vitaly
 
