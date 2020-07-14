@@ -2,31 +2,31 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 01D4521E845
-	for <lists+kvm@lfdr.de>; Tue, 14 Jul 2020 08:36:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 470B621E85C
+	for <lists+kvm@lfdr.de>; Tue, 14 Jul 2020 08:37:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726786AbgGNGgq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 14 Jul 2020 02:36:46 -0400
-Received: from mga07.intel.com ([134.134.136.100]:33942 "EHLO mga07.intel.com"
+        id S1726960AbgGNGgv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 14 Jul 2020 02:36:51 -0400
+Received: from mga06.intel.com ([134.134.136.31]:13263 "EHLO mga06.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725306AbgGNGgp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 14 Jul 2020 02:36:45 -0400
-IronPort-SDR: 4nFB9RidGD7Uz0m6cDLSUCduwtpBoHxGYDsvrCeH0A9mbOvdAFLpvY67nMyb71JlOTZQT/2iX2
- zWN/D9g1hG1g==
-X-IronPort-AV: E=McAfee;i="6000,8403,9681"; a="213632484"
+        id S1726942AbgGNGgu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 14 Jul 2020 02:36:50 -0400
+IronPort-SDR: asnV7qex4pWT+nEBhN7DvVhRQmdW/PvtB3hWahBxBqBaoZKk3X1PSfXRy1we6e4cYcbXDphSk2
+ gn7DZC7xSLBw==
+X-IronPort-AV: E=McAfee;i="6000,8403,9681"; a="210355838"
 X-IronPort-AV: E=Sophos;i="5.75,350,1589266800"; 
-   d="scan'208";a="213632484"
+   d="scan'208";a="210355838"
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Jul 2020 23:36:44 -0700
-IronPort-SDR: I4HnTb5tyE8mAIwm6iR2na6s+YT52WCITvWOOvWkwf3Ls+3pP/oQYcrFJPMLlvi2DgiEpTlbw6
- XmGqWL7XUtJQ==
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Jul 2020 23:36:49 -0700
+IronPort-SDR: 8iJ3H4LEE9axovPwmLmrxX1dmgjtemI62YSFo+gPmAmRAiE0okjkL2R7TM/n6q9kEO+pb9U3dQ
+ 71+PEbWiQG4A==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.75,350,1589266800"; 
-   d="scan'208";a="299435533"
+   d="scan'208";a="299435545"
 Received: from silpixa00400314.ir.intel.com (HELO silpixa00400314.ger.corp.intel.com) ([10.237.222.51])
-  by orsmga002.jf.intel.com with ESMTP; 13 Jul 2020 23:36:41 -0700
+  by orsmga002.jf.intel.com with ESMTP; 13 Jul 2020 23:36:44 -0700
 From:   Giovanni Cabiddu <giovanni.cabiddu@intel.com>
 To:     alex.williamson@redhat.com, herbert@gondor.apana.org.au
 Cc:     cohuck@redhat.com, nhorman@redhat.com, vdronov@redhat.com,
@@ -36,9 +36,9 @@ Cc:     cohuck@redhat.com, nhorman@redhat.com, vdronov@redhat.com,
         linux-crypto@vger.kernel.org, linux-pci@vger.kernel.org,
         linux-kernel@vger.kernel.org,
         Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-Subject: [PATCH v2 1/5] PCI: Add Intel QuickAssist device IDs
-Date:   Tue, 14 Jul 2020 07:36:06 +0100
-Message-Id: <20200714063610.849858-2-giovanni.cabiddu@intel.com>
+Subject: [PATCH v2 2/5] vfio/pci: Add device blocklist
+Date:   Tue, 14 Jul 2020 07:36:07 +0100
+Message-Id: <20200714063610.849858-3-giovanni.cabiddu@intel.com>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200714063610.849858-1-giovanni.cabiddu@intel.com>
 References: <20200714063610.849858-1-giovanni.cabiddu@intel.com>
@@ -49,48 +49,83 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add device IDs for the following Intel QuickAssist devices: DH895XCC,
-C3XXX and C62X.
+Add blocklist of devices that by default are not probed by vfio-pci.
+Devices in this list may be susceptible to untrusted application, even
+if the IOMMU is enabled. To be accessed via vfio-pci, the user has to
+explicitly disable the blocklist.
 
-The defines in this patch are going to be referenced in two independent
-drivers, qat and vfio-pci.
+The blocklist can be disabled via the module parameter disable_blocklist.
 
 Signed-off-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
 ---
- include/linux/pci_ids.h | 6 ++++++
- 1 file changed, 6 insertions(+)
+ drivers/vfio/pci/vfio_pci.c | 33 +++++++++++++++++++++++++++++++++
+ 1 file changed, 33 insertions(+)
 
-diff --git a/include/linux/pci_ids.h b/include/linux/pci_ids.h
-index 0ad57693f392..f3166b1425ca 100644
---- a/include/linux/pci_ids.h
-+++ b/include/linux/pci_ids.h
-@@ -2659,6 +2659,8 @@
- #define PCI_DEVICE_ID_INTEL_80332_1	0x0332
- #define PCI_DEVICE_ID_INTEL_80333_0	0x0370
- #define PCI_DEVICE_ID_INTEL_80333_1	0x0372
-+#define PCI_DEVICE_ID_INTEL_QAT_DH895XCC	0x0435
-+#define PCI_DEVICE_ID_INTEL_QAT_DH895XCC_VF	0x0443
- #define PCI_DEVICE_ID_INTEL_82375	0x0482
- #define PCI_DEVICE_ID_INTEL_82424	0x0483
- #define PCI_DEVICE_ID_INTEL_82378	0x0484
-@@ -2708,6 +2710,8 @@
- #define PCI_DEVICE_ID_INTEL_ALPINE_RIDGE_4C_NHI     0x1577
- #define PCI_DEVICE_ID_INTEL_ALPINE_RIDGE_4C_BRIDGE  0x1578
- #define PCI_DEVICE_ID_INTEL_80960_RP	0x1960
-+#define PCI_DEVICE_ID_INTEL_QAT_C3XXX	0x19e2
-+#define PCI_DEVICE_ID_INTEL_QAT_C3XXX_VF	0x19e3
- #define PCI_DEVICE_ID_INTEL_82840_HB	0x1a21
- #define PCI_DEVICE_ID_INTEL_82845_HB	0x1a30
- #define PCI_DEVICE_ID_INTEL_IOAT	0x1a38
-@@ -2924,6 +2928,8 @@
- #define PCI_DEVICE_ID_INTEL_IOAT_JSF7	0x3717
- #define PCI_DEVICE_ID_INTEL_IOAT_JSF8	0x3718
- #define PCI_DEVICE_ID_INTEL_IOAT_JSF9	0x3719
-+#define PCI_DEVICE_ID_INTEL_QAT_C62X	0x37c8
-+#define PCI_DEVICE_ID_INTEL_QAT_C62X_VF	0x37c9
- #define PCI_DEVICE_ID_INTEL_ICH10_0	0x3a14
- #define PCI_DEVICE_ID_INTEL_ICH10_1	0x3a16
- #define PCI_DEVICE_ID_INTEL_ICH10_2	0x3a18
+diff --git a/drivers/vfio/pci/vfio_pci.c b/drivers/vfio/pci/vfio_pci.c
+index 7c0779018b1b..ea5904ca6cbf 100644
+--- a/drivers/vfio/pci/vfio_pci.c
++++ b/drivers/vfio/pci/vfio_pci.c
+@@ -60,6 +60,10 @@ module_param(enable_sriov, bool, 0644);
+ MODULE_PARM_DESC(enable_sriov, "Enable support for SR-IOV configuration.  Enabling SR-IOV on a PF typically requires support of the userspace PF driver, enabling VFs without such support may result in non-functional VFs or PF.");
+ #endif
+ 
++static bool disable_blocklist;
++module_param(disable_blocklist, bool, 0444);
++MODULE_PARM_DESC(disable_blocklist, "Disable device blocklist. If set, i.e. blocklist disabled, then blocklisted devices are allowed to be probed by vfio-pci.");
++
+ static inline bool vfio_vga_disabled(void)
+ {
+ #ifdef CONFIG_VFIO_PCI_VGA
+@@ -69,6 +73,29 @@ static inline bool vfio_vga_disabled(void)
+ #endif
+ }
+ 
++static bool vfio_pci_dev_in_blocklist(struct pci_dev *pdev)
++{
++	return false;
++}
++
++static bool vfio_pci_is_blocklisted(struct pci_dev *pdev)
++{
++	if (!vfio_pci_dev_in_blocklist(pdev))
++		return false;
++
++	if (disable_blocklist) {
++		pci_warn(pdev,
++			 "device blocklist disabled - allowing device %04x:%04x.\n",
++			 pdev->vendor, pdev->device);
++		return false;
++	}
++
++	pci_warn(pdev, "%04x:%04x is blocklisted - probe will fail.\n",
++		 pdev->vendor, pdev->device);
++
++	return true;
++}
++
+ /*
+  * Our VGA arbiter participation is limited since we don't know anything
+  * about the device itself.  However, if the device is the only VGA device
+@@ -1847,6 +1874,9 @@ static int vfio_pci_probe(struct pci_dev *pdev, const struct pci_device_id *id)
+ 	struct iommu_group *group;
+ 	int ret;
+ 
++	if (vfio_pci_is_blocklisted(pdev))
++		return -EINVAL;
++
+ 	if (pdev->hdr_type != PCI_HEADER_TYPE_NORMAL)
+ 		return -EINVAL;
+ 
+@@ -2336,6 +2366,9 @@ static int __init vfio_pci_init(void)
+ 
+ 	vfio_pci_fill_ids();
+ 
++	if (disable_blocklist)
++		pr_warn("device blocklist disabled.\n");
++
+ 	return 0;
+ 
+ out_driver:
 -- 
 2.26.2
 
