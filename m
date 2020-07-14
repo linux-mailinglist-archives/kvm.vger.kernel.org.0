@@ -2,29 +2,29 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2A5E521F02C
-	for <lists+kvm@lfdr.de>; Tue, 14 Jul 2020 14:10:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AFB1121F0B9
+	for <lists+kvm@lfdr.de>; Tue, 14 Jul 2020 14:16:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728303AbgGNMKw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 14 Jul 2020 08:10:52 -0400
-Received: from 8bytes.org ([81.169.241.247]:52886 "EHLO theia.8bytes.org"
+        id S1728809AbgGNMQE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 14 Jul 2020 08:16:04 -0400
+Received: from 8bytes.org ([81.169.241.247]:53184 "EHLO theia.8bytes.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728263AbgGNMKt (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 14 Jul 2020 08:10:49 -0400
+        id S1728268AbgGNMKu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 14 Jul 2020 08:10:50 -0400
 Received: from cap.home.8bytes.org (p5b006776.dip0.t-ipconnect.de [91.0.103.118])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
         (No client certificate requested)
-        by theia.8bytes.org (Postfix) with ESMTPSA id 10C829CE;
+        by theia.8bytes.org (Postfix) with ESMTPSA id 9CA87B2D;
         Tue, 14 Jul 2020 14:10:47 +0200 (CEST)
 From:   Joerg Roedel <joro@8bytes.org>
 To:     x86@kernel.org
 Cc:     Joerg Roedel <joro@8bytes.org>, Joerg Roedel <jroedel@suse.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>, hpa@zytor.com,
-        Andy Lutomirski <luto@kernel.org>,
+        hpa@zytor.com, Andy Lutomirski <luto@kernel.org>,
         Dave Hansen <dave.hansen@linux.intel.com>,
         Peter Zijlstra <peterz@infradead.org>,
         Jiri Slaby <jslaby@suse.cz>,
         Dan Williams <dan.j.williams@intel.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
         Juergen Gross <jgross@suse.com>,
         Kees Cook <keescook@chromium.org>,
         David Rientjes <rientjes@google.com>,
@@ -36,9 +36,9 @@ Cc:     Joerg Roedel <joro@8bytes.org>, Joerg Roedel <jroedel@suse.de>,
         Martin Radev <martin.b.radev@gmail.com>,
         linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         virtualization@lists.linux-foundation.org
-Subject: [PATCH v4 26/75] x86/sev-es: Add CPUID handling to #VC handler
-Date:   Tue, 14 Jul 2020 14:08:28 +0200
-Message-Id: <20200714120917.11253-27-joro@8bytes.org>
+Subject: [PATCH v4 27/75] x86/idt: Move IDT to data segment
+Date:   Tue, 14 Jul 2020 14:08:29 +0200
+Message-Id: <20200714120917.11253-28-joro@8bytes.org>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20200714120917.11253-1-joro@8bytes.org>
 References: <20200714120917.11253-1-joro@8bytes.org>
@@ -49,85 +49,30 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Tom Lendacky <thomas.lendacky@amd.com>
+From: Joerg Roedel <jroedel@suse.de>
 
-Handle #VC exceptions caused by CPUID instructions. These happen in
-early boot code when the KASLR code checks for RDTSC.
+With SEV-ES, exception handling is needed very early, even before the
+kernel has cleared the bss segment. In order to prevent clearing the
+currently used IDT, move the IDT to the data segment.
 
-Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
-[ jroedel@suse.de: Adapt to #VC handling framework ]
-Co-developed-by: Joerg Roedel <jroedel@suse.de>
 Signed-off-by: Joerg Roedel <jroedel@suse.de>
 ---
- arch/x86/boot/compressed/sev-es.c |  4 ++++
- arch/x86/kernel/sev-es-shared.c   | 35 +++++++++++++++++++++++++++++++
- 2 files changed, 39 insertions(+)
+ arch/x86/kernel/idt.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/arch/x86/boot/compressed/sev-es.c b/arch/x86/boot/compressed/sev-es.c
-index 4f2fc7a85c2f..851d7af29d79 100644
---- a/arch/x86/boot/compressed/sev-es.c
-+++ b/arch/x86/boot/compressed/sev-es.c
-@@ -16,6 +16,7 @@
- #include <asm/trapnr.h>
- #include <asm/trap_pf.h>
- #include <asm/msr-index.h>
-+#include <asm/fpu/xcr.h>
- #include <asm/ptrace.h>
- #include <asm/svm.h>
+diff --git a/arch/x86/kernel/idt.c b/arch/x86/kernel/idt.c
+index 0db21206f2f3..b920f2352df5 100644
+--- a/arch/x86/kernel/idt.c
++++ b/arch/x86/kernel/idt.c
+@@ -158,7 +158,7 @@ static const __initconst struct idt_data apic_idts[] = {
+ };
  
-@@ -183,6 +184,9 @@ void do_boot_stage2_vc(struct pt_regs *regs, unsigned long exit_code)
- 	case SVM_EXIT_IOIO:
- 		result = vc_handle_ioio(boot_ghcb, &ctxt);
- 		break;
-+	case SVM_EXIT_CPUID:
-+		result = vc_handle_cpuid(boot_ghcb, &ctxt);
-+		break;
- 	default:
- 		result = ES_UNSUPPORTED;
- 		break;
-diff --git a/arch/x86/kernel/sev-es-shared.c b/arch/x86/kernel/sev-es-shared.c
-index 66d60e34eba0..59884926fae5 100644
---- a/arch/x86/kernel/sev-es-shared.c
-+++ b/arch/x86/kernel/sev-es-shared.c
-@@ -432,3 +432,38 @@ static enum es_result vc_handle_ioio(struct ghcb *ghcb, struct es_em_ctxt *ctxt)
+ /* Must be page-aligned because the real IDT is used in the cpu entry area */
+-static gate_desc idt_table[IDT_ENTRIES] __page_aligned_bss;
++static gate_desc idt_table[IDT_ENTRIES] __page_aligned_data;
  
- 	return ret;
- }
-+
-+static enum es_result vc_handle_cpuid(struct ghcb *ghcb,
-+				      struct es_em_ctxt *ctxt)
-+{
-+	struct pt_regs *regs = ctxt->regs;
-+	u32 cr4 = native_read_cr4();
-+	enum es_result ret;
-+
-+	ghcb_set_rax(ghcb, regs->ax);
-+	ghcb_set_rcx(ghcb, regs->cx);
-+
-+	if (cr4 & X86_CR4_OSXSAVE)
-+		/* Safe to read xcr0 */
-+		ghcb_set_xcr0(ghcb, xgetbv(XCR_XFEATURE_ENABLED_MASK));
-+	else
-+		/* xgetbv will cause #GP - use reset value for xcr0 */
-+		ghcb_set_xcr0(ghcb, 1);
-+
-+	ret = sev_es_ghcb_hv_call(ghcb, ctxt, SVM_EXIT_CPUID, 0, 0);
-+	if (ret != ES_OK)
-+		return ret;
-+
-+	if (!(ghcb_is_valid_rax(ghcb) &&
-+	      ghcb_is_valid_rbx(ghcb) &&
-+	      ghcb_is_valid_rcx(ghcb) &&
-+	      ghcb_is_valid_rdx(ghcb)))
-+		return ES_VMM_ERROR;
-+
-+	regs->ax = ghcb->save.rax;
-+	regs->bx = ghcb->save.rbx;
-+	regs->cx = ghcb->save.rcx;
-+	regs->dx = ghcb->save.rdx;
-+
-+	return ES_OK;
-+}
+ struct desc_ptr idt_descr __ro_after_init = {
+ 	.size		= IDT_TABLE_SIZE - 1,
 -- 
 2.27.0
 
