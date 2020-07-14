@@ -2,80 +2,95 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D8BA621E7C4
-	for <lists+kvm@lfdr.de>; Tue, 14 Jul 2020 08:01:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B582821E85D
+	for <lists+kvm@lfdr.de>; Tue, 14 Jul 2020 08:37:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726472AbgGNGBA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 14 Jul 2020 02:01:00 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:51284 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1725306AbgGNGA7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 14 Jul 2020 02:00:59 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1594706458;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=xA+AGEEDIXYwXJAHC9PpCVfllA/Q9UsGCwd9OJ0DYbM=;
-        b=TK0hO9ptlWPBF04AxQCfiF7eywyJbz42RBgDrdpbVtf6GlL6706vk7ouPuD2/CU1esaC6Y
-        KaBpZOe3O+9aX74Tb65ix0o8hkah4lP/jh4UGLj8sG058oRgNNBDw4vHtmR4i0XJrMkBIs
-        rY/TddhxKC9aijUmL+yM3el0oxMrnD4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-514-QlTnBVpuP1eP33xEmbi10Q-1; Tue, 14 Jul 2020 02:00:55 -0400
-X-MC-Unique: QlTnBVpuP1eP33xEmbi10Q-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9758BD1C40;
-        Tue, 14 Jul 2020 06:00:54 +0000 (UTC)
-Received: from kamzik.brq.redhat.com (unknown [10.40.192.163])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 1E65460BEC;
-        Tue, 14 Jul 2020 06:00:52 +0000 (UTC)
-Date:   Tue, 14 Jul 2020 08:00:50 +0200
-From:   Andrew Jones <drjones@redhat.com>
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Jim Mattson <jmattson@google.com>
-Subject: Re: [kvm-unit-tests PATCH] lib/alloc_page: Revert to 'unsigned long'
- for @size params
-Message-ID: <20200714060050.sn7ic4xasbx7ejuf@kamzik.brq.redhat.com>
-References: <20200714042046.13419-1-sean.j.christopherson@intel.com>
+        id S1726472AbgGNGgm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 14 Jul 2020 02:36:42 -0400
+Received: from mga07.intel.com ([134.134.136.100]:33942 "EHLO mga07.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725306AbgGNGgm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 14 Jul 2020 02:36:42 -0400
+IronPort-SDR: y/WZAvLRwj8hPQ+uwCxcEZnM8nPjeoUjN0QSyUOC0xJVFeLuCni7Mn36Ds8+2DTaG5TYrrPIls
+ Rlfl6sJCaKYA==
+X-IronPort-AV: E=McAfee;i="6000,8403,9681"; a="213632478"
+X-IronPort-AV: E=Sophos;i="5.75,350,1589266800"; 
+   d="scan'208";a="213632478"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Jul 2020 23:36:41 -0700
+IronPort-SDR: mzMEla1h7jyhnOmhfJhtbCX9CSn3eWsOlv1WrB9YA3MDDahiUzdA5d9zO3xruCKSGyNDa55twr
+ fDZmejJ2Owcw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.75,350,1589266800"; 
+   d="scan'208";a="299435523"
+Received: from silpixa00400314.ir.intel.com (HELO silpixa00400314.ger.corp.intel.com) ([10.237.222.51])
+  by orsmga002.jf.intel.com with ESMTP; 13 Jul 2020 23:36:38 -0700
+From:   Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+To:     alex.williamson@redhat.com, herbert@gondor.apana.org.au
+Cc:     cohuck@redhat.com, nhorman@redhat.com, vdronov@redhat.com,
+        bhelgaas@google.com, mark.a.chambers@intel.com,
+        gordon.mcfadden@intel.com, ahsan.atta@intel.com,
+        qat-linux@intel.com, kvm@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-pci@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+Subject: [PATCH v2 0/5] vfio/pci: add blocklist and disable qat
+Date:   Tue, 14 Jul 2020 07:36:05 +0100
+Message-Id: <20200714063610.849858-1-giovanni.cabiddu@intel.com>
+X-Mailer: git-send-email 2.26.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200714042046.13419-1-sean.j.christopherson@intel.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jul 13, 2020 at 09:20:46PM -0700, Sean Christopherson wrote:
-> Revert to using 'unsigned long' instead of 'size_t' for free_pages() and
-> get_order().  The recent change to size_t for free_pages() breaks i386
-> with -Werror as the assert_msg() formats expect unsigned longs, whereas
-> size_t is an 'unsigned int' on i386 (though both longs and ints are 4
-> bytes).
-> 
-> Message formatting aside, unsigned long is the correct choice given the
-> current code base as alloc_pages() and free_pages_by_order() explicitly
-> expect, work on, and/or assert on the size being an unsigned long.
-> 
-> Fixes: 73f4b202beb39 ("lib/alloc_page: change some parameter types")
-> Cc: Claudio Imbrenda <imbrenda@linux.ibm.com>
-> Cc: Andrew Jones <drjones@redhat.com>
-> Cc: Jim Mattson <jmattson@google.com>
-> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
-> ---
->  lib/alloc_page.c | 2 +-
->  lib/alloc_page.h | 2 +-
->  lib/bitops.h     | 2 +-
->  3 files changed, 3 insertions(+), 3 deletions(-)
->
+This patchset defines a blocklist of devices in the vfio-pci module and adds
+the current generation of Intel(R) QuickAssist devices to it as they are
+not designed to run in an untrusted environment.
 
-Fixes compilation on arm32.
+By default, if a device is in the blocklist, the probe of vfio-pci fails.
+If a user wants to use a device in the blocklist, he needs to disable the
+full blocklist providing the option disable_blocklist=1 at the load of
+vfio-pci or specifying that parameter in a config file in /etc/modprobe.d.
 
-Reviewed-by: Andrew Jones <drjones@redhat.com>
+This series also moves the device ids definitions present in the qat driver
+to linux/pci_ids.h since they will be shared between the vfio-pci and the qat
+drivers and replaces the custom ADF_SYSTEM_DEVICE macro with PCI_VDEVICE.
+
+The series is applicable to Herbert's tree. Patches 1 to 3 apply also to
+Alex's tree. Patches 4 and 5 are optional and can be applied at a later stage.
+
+Changes from v1:
+ - Reworked commit messages:
+   Patches #1, #2 and #3: capitalized first character after column to comply to
+   subject line convention
+   Patch #3: Capitalized QAT acronym and added link and doc number for
+   document "Intel® QuickAssist Technology (Intel® QAT) Software for Linux"
+
+Giovanni Cabiddu (5):
+  PCI: Add Intel QuickAssist device IDs
+  vfio/pci: Add device blocklist
+  vfio/pci: Add QAT devices to blocklist
+  crypto: qat - replace device ids defines
+  crypto: qat - use PCI_VDEVICE
+
+ drivers/crypto/qat/qat_c3xxx/adf_drv.c        | 11 ++---
+ drivers/crypto/qat/qat_c3xxxvf/adf_drv.c      | 11 ++---
+ drivers/crypto/qat/qat_c62x/adf_drv.c         | 11 ++---
+ drivers/crypto/qat/qat_c62xvf/adf_drv.c       | 11 ++---
+ .../crypto/qat/qat_common/adf_accel_devices.h |  6 ---
+ drivers/crypto/qat/qat_common/qat_hal.c       |  7 +--
+ drivers/crypto/qat/qat_common/qat_uclo.c      |  9 ++--
+ drivers/crypto/qat/qat_dh895xcc/adf_drv.c     | 11 ++---
+ drivers/crypto/qat/qat_dh895xccvf/adf_drv.c   | 11 ++---
+ drivers/vfio/pci/vfio_pci.c                   | 48 +++++++++++++++++++
+ include/linux/pci_ids.h                       |  6 +++
+ 11 files changed, 87 insertions(+), 55 deletions(-)
+
+-- 
+2.26.2
 
