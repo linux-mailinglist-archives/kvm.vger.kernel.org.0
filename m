@@ -2,228 +2,168 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4967421F75E
-	for <lists+kvm@lfdr.de>; Tue, 14 Jul 2020 18:34:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A146421F79F
+	for <lists+kvm@lfdr.de>; Tue, 14 Jul 2020 18:48:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726818AbgGNQct (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 14 Jul 2020 12:32:49 -0400
-Received: from mga03.intel.com ([134.134.136.65]:63516 "EHLO mga03.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726062AbgGNQct (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 14 Jul 2020 12:32:49 -0400
-IronPort-SDR: TBhSCOYiAfpQiyktt+PWuzmEWTFArAYRyBIgxuMsJCl6PciaDARBnS/FRbJYuLsHGFHmbGcJfQ
- myKhi0rwQ0ww==
-X-IronPort-AV: E=McAfee;i="6000,8403,9681"; a="148957026"
-X-IronPort-AV: E=Sophos;i="5.75,352,1589266800"; 
-   d="scan'208";a="148957026"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Jul 2020 09:32:48 -0700
-IronPort-SDR: VIIs1ZhnFb2/oR+R9r078i98dlsTEFvH/PoGIlyJf5/fUblIkEDHEi6vJ4Rx8zhuKXqvbKt5+I
- Cscr8DBfInkQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.75,352,1589266800"; 
-   d="scan'208";a="317775607"
-Received: from jacob-builder.jf.intel.com (HELO jacob-builder) ([10.7.199.155])
-  by fmsmga002.fm.intel.com with ESMTP; 14 Jul 2020 09:32:47 -0700
-Date:   Tue, 14 Jul 2020 09:39:09 -0700
-From:   Jacob Pan <jacob.jun.pan@linux.intel.com>
-To:     Lu Baolu <baolu.lu@linux.intel.com>
-Cc:     Joerg Roedel <joro@8bytes.org>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Jean-Philippe Brucker <jean-philippe@linaro.org>,
-        Kevin Tian <kevin.tian@intel.com>,
-        Dave Jiang <dave.jiang@intel.com>,
-        Ashok Raj <ashok.raj@intel.com>, kvm@vger.kernel.org,
-        Cornelia Huck <cohuck@redhat.com>,
-        linux-kernel@vger.kernel.org, iommu@lists.linux-foundation.org,
-        Robin Murphy <robin.murphy@arm.com>,
-        jacob.jun.pan@linux.intel.com
-Subject: Re: [PATCH v3 2/4] iommu: Add iommu_aux_at(de)tach_group()
-Message-ID: <20200714093909.1ab93c9e@jacob-builder>
-In-Reply-To: <20200714055703.5510-3-baolu.lu@linux.intel.com>
-References: <20200714055703.5510-1-baolu.lu@linux.intel.com>
-        <20200714055703.5510-3-baolu.lu@linux.intel.com>
-Organization: OTC
-X-Mailer: Claws Mail 3.13.2 (GTK+ 2.24.30; x86_64-pc-linux-gnu)
+        id S1728296AbgGNQsM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 14 Jul 2020 12:48:12 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:33103 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726062AbgGNQsL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 14 Jul 2020 12:48:11 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1594745290;
+        h=from:from:reply-to:reply-to:subject:subject:date:date:
+         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+         content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=T2JyUvXm344iGgCnax4ZsyF6v+hYO+iw65yyDRl2VeI=;
+        b=DScZmE8oSQQgUMqibEK80Yb0zlsQhGejqi5hKVymvyomaCbjQC4rZ0KoBDtXuHRATdOvUw
+        EeLhW8DdTMOQPbBspBsVQAvb2T3zWQNJaqVd0sBnGflvQVYGIKZiRFwiPe0yOlj14kJUKv
+        80arJWRbNeOUp3ST3gEZCJOPU7T2kiE=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-434-HJPZdL5PN0ieLWFL52Csnw-1; Tue, 14 Jul 2020 12:47:42 -0400
+X-MC-Unique: HJPZdL5PN0ieLWFL52Csnw-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D510D102CC38;
+        Tue, 14 Jul 2020 16:47:39 +0000 (UTC)
+Received: from redhat.com (unknown [10.36.110.42])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 97C815D9C5;
+        Tue, 14 Jul 2020 16:47:25 +0000 (UTC)
+Date:   Tue, 14 Jul 2020 17:47:22 +0100
+From:   Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To:     Alex Williamson <alex.williamson@redhat.com>
+Cc:     Yan Zhao <yan.y.zhao@intel.com>, devel@ovirt.org,
+        openstack-discuss@lists.openstack.org, libvir-list@redhat.com,
+        intel-gvt-dev@lists.freedesktop.org, kvm@vger.kernel.org,
+        qemu-devel@nongnu.org, smooney@redhat.com, eskultet@redhat.com,
+        cohuck@redhat.com, dinechin@redhat.com, corbet@lwn.net,
+        kwankhede@nvidia.com, dgilbert@redhat.com, eauger@redhat.com,
+        jian-feng.ding@intel.com, hejie.xu@intel.com, kevin.tian@intel.com,
+        zhenyuw@linux.intel.com, bao.yumeng@zte.com.cn,
+        xin-ran.wang@intel.com, shaohe.feng@intel.com
+Subject: Re: device compatibility interface for live migration with assigned
+ devices
+Message-ID: <20200714164722.GL25187@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20200713232957.GD5955@joy-OptiPlex-7040>
+ <20200714102129.GD25187@redhat.com>
+ <20200714101616.5d3a9e75@x1.home>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20200714101616.5d3a9e75@x1.home>
+User-Agent: Mutt/1.14.5 (2020-06-23)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 14 Jul 2020 13:57:01 +0800
-Lu Baolu <baolu.lu@linux.intel.com> wrote:
+On Tue, Jul 14, 2020 at 10:16:16AM -0600, Alex Williamson wrote:
+> On Tue, 14 Jul 2020 11:21:29 +0100
+> Daniel P. Berrangé <berrange@redhat.com> wrote:
+> 
+> > On Tue, Jul 14, 2020 at 07:29:57AM +0800, Yan Zhao wrote:
+> > > 
+> > > The string read from migration_version attribute is defined by device vendor
+> > > driver and is completely opaque to the userspace.
+> > > for a Intel vGPU, string format can be defined like
+> > > "parent device PCI ID" + "version of gvt driver" + "mdev type" + "aggregator count".
+> > > 
+> > > for an NVMe VF connecting to a remote storage. it could be
+> > > "PCI ID" + "driver version" + "configured remote storage URL"
+> > > 
+> > > for a QAT VF, it may be
+> > > "PCI ID" + "driver version" + "supported encryption set".
+> > > 
+> > > (to avoid namespace confliction from each vendor, we may prefix a driver name to
+> > > each migration_version string. e.g. i915-v1-8086-591d-i915-GVTg_V5_8-1)
+> 
+> It's very strange to define it as opaque and then proceed to describe
+> the contents of that opaque string.  The point is that its contents
+> are defined by the vendor driver to describe the device, driver version,
+> and possibly metadata about the configuration of the device.  One
+> instance of a device might generate a different string from another.
+> The string that a device produces is not necessarily the only string
+> the vendor driver will accept, for example the driver might support
+> backwards compatible migrations.
 
-> This adds two new aux-domain APIs for a use case like vfio/mdev where
-> sub-devices derived from an aux-domain capable device are created and
-> put in an iommu_group.
-> 
-> /**
->  * iommu_aux_attach_group - attach an aux-domain to an iommu_group
-> which
->  *                          contains sub-devices (for example mdevs)
-> derived
->  *                          from @dev.
->  * @domain: an aux-domain;
->  * @group:  an iommu_group which contains sub-devices derived from
-> @dev;
->  * @dev:    the physical device which supports IOMMU_DEV_FEAT_AUX.
->  *
->  * Returns 0 on success, or an error value.
->  */
-> int iommu_aux_attach_group(struct iommu_domain *domain,
->                            struct iommu_group *group,
->                            struct device *dev)
-> 
-> /**
->  * iommu_aux_detach_group - detach an aux-domain from an iommu_group
->  *
->  * @domain: an aux-domain;
->  * @group:  an iommu_group which contains sub-devices derived from
-> @dev;
->  * @dev:    the physical device which supports IOMMU_DEV_FEAT_AUX.
->  *
->  * @domain must have been attached to @group via
-> iommu_aux_attach_group(). */
-> void iommu_aux_detach_group(struct iommu_domain *domain,
->                             struct iommu_group *group,
->                             struct device *dev)
-> 
-> It also adds a flag in the iommu_group data structure to identify
-> an iommu_group with aux-domain attached from those normal ones.
-> 
-> Signed-off-by: Lu Baolu <baolu.lu@linux.intel.com>
-> ---
->  drivers/iommu/iommu.c | 58
-> +++++++++++++++++++++++++++++++++++++++++++ include/linux/iommu.h |
-> 17 +++++++++++++ 2 files changed, 75 insertions(+)
-> 
-> diff --git a/drivers/iommu/iommu.c b/drivers/iommu/iommu.c
-> index e1fdd3531d65..cad5a19ebf22 100644
-> --- a/drivers/iommu/iommu.c
-> +++ b/drivers/iommu/iommu.c
-> @@ -45,6 +45,7 @@ struct iommu_group {
->  	struct iommu_domain *default_domain;
->  	struct iommu_domain *domain;
->  	struct list_head entry;
-> +	unsigned int aux_domain_attached:1;
->  };
->  
->  struct group_device {
-> @@ -2759,6 +2760,63 @@ int iommu_aux_get_pasid(struct iommu_domain
-> *domain, struct device *dev) }
->  EXPORT_SYMBOL_GPL(iommu_aux_get_pasid);
->  
-> +/**
-> + * iommu_aux_attach_group - attach an aux-domain to an iommu_group
-> which
-> + *                          contains sub-devices (for example mdevs)
-> derived
-> + *                          from @dev.
-> + * @domain: an aux-domain;
-> + * @group:  an iommu_group which contains sub-devices derived from
-> @dev;
-> + * @dev:    the physical device which supports IOMMU_DEV_FEAT_AUX.
-> + *
-> + * Returns 0 on success, or an error value.
-> + */
-> +int iommu_aux_attach_group(struct iommu_domain *domain,
-> +			   struct iommu_group *group, struct device
-> *dev) +{
-> +	int ret = -EBUSY;
-> +
-> +	mutex_lock(&group->mutex);
-> +	if (group->domain)
-> +		goto out_unlock;
-> +
-Perhaps I missed something but are we assuming only one mdev per mdev
-group? That seems to change the logic where vfio does:
-iommu_group_for_each_dev()
-	iommu_aux_attach_device()
 
-> +	ret = iommu_aux_attach_device(domain, dev);
-> +	if (!ret) {
-> +		group->domain = domain;
-> +		group->aux_domain_attached = true;
-> +	}
-> +
-> +out_unlock:
-> +	mutex_unlock(&group->mutex);
-> +	return ret;
-> +}
-> +EXPORT_SYMBOL_GPL(iommu_aux_attach_group);
-> +
-> +/**
-> + * iommu_aux_detach_group - detach an aux-domain from an iommu_group
-> + *
-> + * @domain: an aux-domain;
-> + * @group:  an iommu_group which contains sub-devices derived from
-> @dev;
-> + * @dev:    the physical device which supports IOMMU_DEV_FEAT_AUX.
-> + *
-> + * @domain must have been attached to @group via
-> iommu_aux_attach_group().
-> + */
-> +void iommu_aux_detach_group(struct iommu_domain *domain,
-> +			    struct iommu_group *group, struct device
-> *dev) +{
-> +	mutex_lock(&group->mutex);
-> +
-> +	if (WARN_ON(!group->aux_domain_attached || group->domain !=
-> domain))
-> +		goto out_unlock;
-> +
-> +	iommu_aux_detach_device(domain, dev);
-> +	group->aux_domain_attached = false;
-> +	group->domain = NULL;
-> +
-> +out_unlock:
-> +	mutex_unlock(&group->mutex);
-> +}
-> +EXPORT_SYMBOL_GPL(iommu_aux_detach_group);
-> +
->  /**
->   * iommu_sva_bind_device() - Bind a process address space to a device
->   * @dev: the device
-> diff --git a/include/linux/iommu.h b/include/linux/iommu.h
-> index 5657d4fef9f2..9506551139ab 100644
-> --- a/include/linux/iommu.h
-> +++ b/include/linux/iommu.h
-> @@ -635,6 +635,10 @@ bool iommu_dev_feature_enabled(struct device
-> *dev, enum iommu_dev_features f); int iommu_aux_attach_device(struct
-> iommu_domain *domain, struct device *dev); void
-> iommu_aux_detach_device(struct iommu_domain *domain, struct device
-> *dev); int iommu_aux_get_pasid(struct iommu_domain *domain, struct
-> device *dev); +int iommu_aux_attach_group(struct iommu_domain *domain,
-> +			   struct iommu_group *group, struct device
-> *dev); +void iommu_aux_detach_group(struct iommu_domain *domain,
-> +			   struct iommu_group *group, struct device
-> *dev); 
->  struct iommu_sva *iommu_sva_bind_device(struct device *dev,
->  					struct mm_struct *mm,
-> @@ -1023,6 +1027,19 @@ iommu_aux_get_pasid(struct iommu_domain
-> *domain, struct device *dev) return -ENODEV;
->  }
->  
-> +static inline int
-> +iommu_aux_attach_group(struct iommu_domain *domain,
-> +		       struct iommu_group *group, struct device *dev)
-> +{
-> +	return -ENODEV;
-> +}
-> +
-> +static inline void
-> +iommu_aux_detach_group(struct iommu_domain *domain,
-> +		       struct iommu_group *group, struct device *dev)
-> +{
-> +}
-> +
->  static inline struct iommu_sva *
->  iommu_sva_bind_device(struct device *dev, struct mm_struct *mm, void
-> *drvdata) {
+> > IMHO there needs to be a mechanism for the kernel to report via sysfs
+> > what versions are supported on a given device. This puts the job of
+> > reporting compatible versions directly under the responsibility of the
+> > vendor who writes the kernel driver for it. They are the ones with the
+> > best knowledge of the hardware they've built and the rules around its
+> > compatibility.
+> 
+> The version string discussed previously is the version string that
+> represents a given device, possibly including driver information,
+> configuration, etc.  I think what you're asking for here is an
+> enumeration of every possible version string that a given device could
+> accept as an incoming migration stream.  If we consider the string as
+> opaque, that means the vendor driver needs to generate a separate
+> string for every possible version it could accept, for every possible
+> configuration option.  That potentially becomes an excessive amount of
+> data to either generate or manage.
+> 
+> Am I overestimating how vendors intend to use the version string?
 
-[Jacob Pan]
+If I'm interpreting your reply & the quoted text orrectly, the version
+string isn't really a version string in any normal sense of the word
+"version".
+
+Instead it sounds like string encoding a set of features in some arbitrary
+vendor specific format, which they parse and do compatibility checks on
+individual pieces ? One or more parts may contain a version number, but
+its much more than just a version.
+
+If that's correct, then I'd prefer we didn't call it a version string,
+instead call it a "capability string" to make it clear it is expressing
+a much more general concept, but...
+
+> We'd also need to consider devices that we could create, for instance
+> providing the same interface enumeration prior to creating an mdev
+> device to have a confidence level that the new device would be a valid
+> target.
+> 
+> We defined the string as opaque to allow vendor flexibility and because
+> defining a common format is hard.  Do we need to revisit this part of
+> the discussion to define the version string as non-opaque with parsing
+> rules, probably with separate incoming vs outgoing interfaces?  Thanks,
+
+..even if the huge amount of flexibility is technically relevant from the
+POV of the hardware/drivers, we should consider whether management apps
+actually want, or can use, that level of flexibility.
+
+The task of picking which host to place a VM on has alot of factors to
+consider, and when there are a large number of hosts, the total amount
+of information to check gets correspondingly large.  The placement
+process is also fairly performance critical.
+
+Running complex algorithmic logic to check compatibility of devices
+based on a arbitrary set of rules is likely to be a performance
+challenge. A flat list of supported strings is a much simpler
+thing to check as it reduces down to a simple set membership test.
+
+IOW, even if there's some complex set of device type / vendor specific
+rules to check for compatibility, I fear apps will ignore them and
+just define a very simplified list of compatible string, and ignore
+all the extra flexibility.
+
+I'm sure OpenStack maintainers can speak to this more, as they've put
+alot of work into their scheduling engine to optimize the way it places
+VMs largely driven from simple structured data reported from hosts.
+
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+
