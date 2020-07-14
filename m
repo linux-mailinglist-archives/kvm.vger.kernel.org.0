@@ -2,147 +2,171 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E247121E7A9
-	for <lists+kvm@lfdr.de>; Tue, 14 Jul 2020 07:43:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 16BDE21E7C6
+	for <lists+kvm@lfdr.de>; Tue, 14 Jul 2020 08:01:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726729AbgGNFnK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 14 Jul 2020 01:43:10 -0400
-Received: from mga05.intel.com ([192.55.52.43]:56275 "EHLO mga05.intel.com"
+        id S1726720AbgGNGBu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 14 Jul 2020 02:01:50 -0400
+Received: from mga03.intel.com ([134.134.136.65]:3745 "EHLO mga03.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725306AbgGNFnJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 14 Jul 2020 01:43:09 -0400
-IronPort-SDR: uhQTP7KOU/pcJ6TYeJU6keO8b1WHUW8JP6FxH9RNRDrmUhssOiiNxi8J6Lr4lYKOSBtJYu7+sh
- f3EuN3bqwPlQ==
-X-IronPort-AV: E=McAfee;i="6000,8403,9681"; a="233665963"
+        id S1725876AbgGNGBu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 14 Jul 2020 02:01:50 -0400
+IronPort-SDR: JK1OIVarX7VOZEW3b054SYeQaxDDZmjgLk5gKPrat9gAWbynrbgjylCG8f2wtNOr/i71Ky020s
+ VRqeQZ7uJi8w==
+X-IronPort-AV: E=McAfee;i="6000,8403,9681"; a="148812764"
 X-IronPort-AV: E=Sophos;i="5.75,350,1589266800"; 
-   d="scan'208";a="233665963"
+   d="scan'208";a="148812764"
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Jul 2020 22:43:08 -0700
-IronPort-SDR: MizPN2CBTzimOsR+xSUT+e+4WVuCCDUceoaUG09wR/Om3zkkAzUomzdwbif514QuCYev3LbEyA
- G70hNQxP+5QQ==
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Jul 2020 23:01:49 -0700
+IronPort-SDR: u2rOXLUD4zPX7KeVSUbGaRpkDi/6hY+rBkZZg12ehlSof92QkBVN7lmLGCwb1fPoEpQbnumjwn
+ 6h6Xv+RtzM6g==
+X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.75,350,1589266800"; 
-   d="scan'208";a="316281009"
-Received: from otcsectest.jf.intel.com (HELO 760745902f30) ([10.54.30.81])
-  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Jul 2020 22:43:08 -0700
-Date:   Tue, 14 Jul 2020 05:39:30 +0000
-From:   "Andersen, John" <john.s.andersen@intel.com>
-To:     Andy Lutomirski <luto@kernel.org>,
-        Arvind Sankar <nivedita@alum.mit.edu>
-Cc:     Dave Hansen <dave.hansen@intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        X86 ML <x86@kernel.org>, "H. Peter Anvin" <hpa@zytor.com>,
-        Shuah Khan <shuah@kernel.org>,
-        Liran Alon <liran.alon@oracle.com>,
-        Andrew Jones <drjones@redhat.com>,
-        Rick Edgecombe <rick.p.edgecombe@intel.com>,
-        Kristen Carlson Accardi <kristen@linux.intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Mauro Carvalho Chehab <mchehab+huawei@kernel.org>,
-        Greg KH <gregkh@linuxfoundation.org>,
-        "Paul E. McKenney" <paulmck@kernel.org>,
-        Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
-        Juergen Gross <jgross@suse.com>,
-        Mike Kravetz <mike.kravetz@oracle.com>,
-        Oliver Neukum <oneukum@suse.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Fenghua Yu <fenghua.yu@intel.com>, reinette.chatre@intel.com,
-        vineela.tummalapalli@intel.com,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Arjan van de Ven <arjan@linux.intel.com>,
-        caoj.fnst@cn.fujitsu.com, Baoquan He <bhe@redhat.com>,
-        Kees Cook <keescook@chromium.org>,
-        Dan Williams <dan.j.williams@intel.com>, eric.auger@redhat.com,
-        aaronlewis@google.com, Peter Xu <peterx@redhat.com>,
-        makarandsonare@google.com,
-        "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        kvm list <kvm@vger.kernel.org>,
-        "open list:KERNEL SELFTEST FRAMEWORK" 
-        <linux-kselftest@vger.kernel.org>,
-        Kernel Hardening <kernel-hardening@lists.openwall.com>
-Subject: Re: [PATCH 2/4] KVM: x86: Introduce paravirt feature CR0/CR4 pinning
-Message-ID: <20200714053930.GC25@760745902f30>
-References: <20200618144314.GB23@258ff54ff3c0>
- <124a59a3-a603-701b-e3bb-61e83d70b20d@intel.com>
- <20200707211244.GN20096@linux.intel.com>
- <19b97891-bbb0-1061-5971-549a386f7cfb@intel.com>
- <31eb5b00-9e2a-aa10-0f20-4abc3cd35112@redhat.com>
- <20200709154412.GA25@64c96d3be97b>
- <af6ac772-318d-aab0-ce5f-55cf92f6e96d@intel.com>
- <CALCETrWxt0CHUoonWX1fgbM46ydJPQZhj8Q=G+45EG4wW3wZqQ@mail.gmail.com>
- <6040c3b3-cac9-cc0e-f0de-baaa274920a2@intel.com>
- <CALCETrUHcpqjDfAM9SbrZUM7xcS2wkVm=r1Nb1JmxV7A-KAeUQ@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CALCETrUHcpqjDfAM9SbrZUM7xcS2wkVm=r1Nb1JmxV7A-KAeUQ@mail.gmail.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+   d="scan'208";a="324450162"
+Received: from allen-box.sh.intel.com ([10.239.159.139])
+  by FMSMGA003.fm.intel.com with ESMTP; 13 Jul 2020 23:01:46 -0700
+From:   Lu Baolu <baolu.lu@linux.intel.com>
+To:     Joerg Roedel <joro@8bytes.org>,
+        Alex Williamson <alex.williamson@redhat.com>
+Cc:     Robin Murphy <robin.murphy@arm.com>,
+        Jean-Philippe Brucker <jean-philippe@linaro.org>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Kevin Tian <kevin.tian@intel.com>,
+        Ashok Raj <ashok.raj@intel.com>,
+        Dave Jiang <dave.jiang@intel.com>,
+        Liu Yi L <yi.l.liu@intel.com>,
+        iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, Lu Baolu <baolu.lu@linux.intel.com>
+Subject: [PATCH v3 0/4] iommu aux-domain APIs extensions
+Date:   Tue, 14 Jul 2020 13:56:59 +0800
+Message-Id: <20200714055703.5510-1-baolu.lu@linux.intel.com>
+X-Mailer: git-send-email 2.17.1
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jul 09, 2020 at 09:27:43AM -0700, Andy Lutomirski wrote:
-> On Thu, Jul 9, 2020 at 9:22 AM Dave Hansen <dave.hansen@intel.com> wrote:
-> >
-> > On 7/9/20 9:07 AM, Andy Lutomirski wrote:
-> > > On Thu, Jul 9, 2020 at 8:56 AM Dave Hansen <dave.hansen@intel.com> wrote:
-> > >> On 7/9/20 8:44 AM, Andersen, John wrote:
-> > >>>         Bits which are allowed to be pinned default to WP for CR0 and SMEP,
-> > >>>         SMAP, and UMIP for CR4.
-> > >> I think it also makes sense to have FSGSBASE in this set.
-> > >>
-> > >> I know it hasn't been tested, but I think we should do the legwork to
-> > >> test it.  If not in this set, can we agree that it's a logical next step?
-> > > I have no objection to pinning FSGSBASE, but is there a clear
-> > > description of the threat model that this whole series is meant to
-> > > address?  The idea is to provide a degree of protection against an
-> > > attacker who is able to convince a guest kernel to write something
-> > > inappropriate to CR4, right?  How realistic is this?
-> >
-> > If a quick search can find this:
-> >
-> > > https://googleprojectzero.blogspot.com/2017/05/exploiting-linux-kernel-via-packet.html
-> >
-> > I'd pretty confident that the guys doing actual bad things have it in
-> > their toolbox too.
-> >
-> 
-> True, but we have the existing software CR4 pinning.  I suppose the
-> virtualization version is stronger.
-> 
+This series aims to extend the IOMMU aux-domain API set so that it
+could be more friendly to vfio/mdev usage. The interactions between
+vfio/mdev and iommu during mdev creation and passthr are:
 
-Yes, as Kees said this will be stronger because it stops ROP and other gadget
-based techniques which avoid the use of native_write_cr0/4().
+1. Create a group for mdev with iommu_group_alloc();
+2. Add the device to the group with
 
-With regards to what should be done in this patchset and what in other
-patchsets. I have a fix for kexec thanks to Arvind's note about
-TRAMPOLINE_32BIT_CODE_SIZE. The physical host boots fine now and the virtual
-one can kexec fine.
+       group = iommu_group_alloc();
+       if (IS_ERR(group))
+               return PTR_ERR(group);
 
-What remains to be done on that front is to add some identifying information to
-the kernel image to declare that it supports paravirtualized control register
-pinning or not.
+       ret = iommu_group_add_device(group, &mdev->dev);
+       if (!ret)
+               dev_info(&mdev->dev, "MDEV: group_id = %d\n",
+                        iommu_group_id(group));
 
-Liran suggested adding a section to the built image acting as a flag to signify
-support for being kexec'd by a kernel with pinning enabled. If anyone has any
-opinions on how they'd like to see this implemented please let me know.
-Otherwise I'll just take a stab at it and you'll all see it hopefully in the
-next version.
+3. Allocate an aux-domain with iommu_domain_alloc();
+4. Attach the aux-domain to the iommu_group.
 
-With regards to FSGSBASE, are we open to validating and adding that to the
-DEFAULT set as a part of a separate patchset? This patchset is focused on
-replicating the functionality we already have natively.
+       iommu_group_for_each_dev {
+               if (iommu_dev_feature_enabled(iommu_device, IOMMU_DEV_FEAT_AUX))
+                       return iommu_aux_attach_device(domain, iommu_device);
+               else
+                       return iommu_attach_device(domain, iommu_device);
+        }
 
+   where, iommu_device is the aux-domain-capable device. The mdev's in
+   the group are all derived from it.
 
-(If anyone got this email twice, sorry I messed up the From: field the first
-time around)
+In the whole process, an iommu group was allocated for the mdev and an
+iommu domain was attached to the group, but the group->domain leaves
+NULL. As the result, iommu_get_domain_for_dev() (or other similar
+interfaces) doesn't work anymore.
+
+The iommu_get_domain_for_dev() is a necessary interface for device
+drivers that want to support vfio/mdev based aux-domain. For example,
+
+        unsigned long pasid;
+        struct iommu_domain *domain;
+        struct device *dev = mdev_dev(mdev);
+        struct device *iommu_device = vfio_mdev_get_iommu_device(dev);
+
+        domain = iommu_get_domain_for_dev(dev);
+        if (!domain)
+                return -ENODEV;
+
+        pasid = iommu_aux_get_pasid(domain, iommu_device);
+        if (pasid <= 0)
+                return -EINVAL;
+
+         /* Program the device context */
+         ....
+
+We tried to address this by extending iommu_aux_at(de)tach_device() so that
+the users could pass in an optional device pointer (for example vfio/mdev).
+(v2 of this series)
+
+https://lore.kernel.org/linux-iommu/20200707013957.23672-1-baolu.lu@linux.intel.com/
+
+But that will cause a lock issue as group->mutex has been applied in
+iommu_group_for_each_dev(), but has to be reapplied again in the
+iommu_aux_attach_device().
+
+This version tries to address this by introducing two new APIs into the
+aux-domain API set:
+
+/**
+ * iommu_aux_attach_group - attach an aux-domain to an iommu_group which
+ *                          contains sub-devices (for example mdevs)
+ *                          derived from @dev.
+ * @domain: an aux-domain;
+ * @group:  an iommu_group which contains sub-devices derived from @dev;
+ * @dev:    the physical device which supports IOMMU_DEV_FEAT_AUX.
+ *
+ * Returns 0 on success, or an error value.
+ */
+int iommu_aux_attach_group(struct iommu_domain *domain,
+                           struct iommu_group *group, struct device *dev)
+
+/**
+ * iommu_aux_detach_group - detach an aux-domain from an iommu_group
+ *
+ * @domain: an aux-domain;
+ * @group:  an iommu_group which contains sub-devices derived from @dev;
+ * @dev:    the physical device which supports IOMMU_DEV_FEAT_AUX.
+ *
+ * @domain must have been attached to @group via
+ * iommu_aux_attach_group().
+ */
+void iommu_aux_detach_group(struct iommu_domain *domain,
+                            struct iommu_group *group, struct device *dev)
+
+This version is evolved according to feedbacks from Robin(v1) and
+Alex(v2). Your comments are very appreciated.
+
+Best regards,
+baolu
+
+---
+Change log:
+ - v1->v2:
+   - https://lore.kernel.org/linux-iommu/20200627031532.28046-1-baolu.lu@linux.intel.com/
+   - Suggested by Robin.
+
+ - v2->v3:
+   - https://lore.kernel.org/linux-iommu/20200707013957.23672-1-baolu.lu@linux.intel.com/
+   - Suggested by Alex
+
+Lu Baolu (4):
+  iommu: Check IOMMU_DEV_FEAT_AUX feature in aux api's
+  iommu: Add iommu_aux_at(de)tach_group()
+  iommu: Add iommu_aux_get_domain_for_dev()
+  vfio/type1: Use iommu_aux_at(de)tach_group() APIs
+
+ drivers/iommu/iommu.c           | 92 ++++++++++++++++++++++++++++++---
+ drivers/vfio/vfio_iommu_type1.c | 44 +++-------------
+ include/linux/iommu.h           | 24 +++++++++
+ 3 files changed, 116 insertions(+), 44 deletions(-)
+
+-- 
+2.17.1
+
