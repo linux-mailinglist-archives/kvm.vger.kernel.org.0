@@ -2,76 +2,100 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id CB69B21E704
-	for <lists+kvm@lfdr.de>; Tue, 14 Jul 2020 06:37:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DDA3221E712
+	for <lists+kvm@lfdr.de>; Tue, 14 Jul 2020 06:41:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725883AbgGNEh0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 14 Jul 2020 00:37:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47328 "EHLO
+        id S1725906AbgGNEl1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 14 Jul 2020 00:41:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47940 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725781AbgGNEh0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 14 Jul 2020 00:37:26 -0400
-Received: from mail-pl1-x643.google.com (mail-pl1-x643.google.com [IPv6:2607:f8b0:4864:20::643])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 03832C061755
-        for <kvm@vger.kernel.org>; Mon, 13 Jul 2020 21:37:25 -0700 (PDT)
-Received: by mail-pl1-x643.google.com with SMTP id t6so3337262plo.3
-        for <kvm@vger.kernel.org>; Mon, 13 Jul 2020 21:37:25 -0700 (PDT)
+        with ESMTP id S1725306AbgGNEl1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 14 Jul 2020 00:41:27 -0400
+Received: from mail-lf1-x141.google.com (mail-lf1-x141.google.com [IPv6:2a00:1450:4864:20::141])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A1DBCC061755
+        for <kvm@vger.kernel.org>; Mon, 13 Jul 2020 21:41:26 -0700 (PDT)
+Received: by mail-lf1-x141.google.com with SMTP id m26so10574045lfo.13
+        for <kvm@vger.kernel.org>; Mon, 13 Jul 2020 21:41:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=0qdqXaqZyPmuL903QQCWfrJTGFMRDZfw3756dMo+QfU=;
-        b=JRiJdPHUo9vGJ+xPfld5Km6Dgh60r4reryXmAb5MVAGSuHIbR14HUxYlgPr26TRUPL
-         68OIbEqjhlmqmQmf65/vD88yCBsqmuRRAk9LaXZcVSOxRq4ffNm7cBC+a3JiZ8rY+1D8
-         7zyPfTjdloHE/6VvykDBarLVIaRQGNm/BM3sGeHhwRYUxfP2BDDAiQQAiSO2yOpN1PWQ
-         e6ATFeppZkRwIiSdPidAPILAE5FMJO7AYmFW7MpO/xTcdW3xiBKiM7RfW9fkgp7xlv6R
-         2IW8m4CfBfp5CpK4XzaYL/TPRpdkn5itC9gaOsubkRfscMTenfREvxpt+Ta0j9bH0UD+
-         AOAw==
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=7YVDgrJdHzM8uoyNTq9BgOe1+GZ11KZO3hdKYo2QdCc=;
+        b=sUXZoTzjDls8yRvCgGsdck8hAHfsv05P8NLqWEbkSpeX5SlTik2hmDmnWK10Aaxbzp
+         5R0ChZPCeeJ+AJ0Z8QTQpBCEuXdlivaoRdK7RUX8snzcy4QGWLSP+/wJ493tjPkSYTQn
+         CYPuyqbOBJ2opxUytpNYSJ0h0belr6GW3gmmPl9qK0p9MJ3I1nl3jxZsUAt8GK/6+0Bt
+         oPSzJGchmIWe1qNwyazUAfh9YIKnhuEMJP715OsNUOVa7ytBHhVTXcjHuNNDMoeyQlT5
+         LCec6fxy0V9sE3O2zhNdD9fLxKrulxbgjqeYwBV2bqGp2fq3XhlSPgBi09GP4xCLh41d
+         hXwQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=0qdqXaqZyPmuL903QQCWfrJTGFMRDZfw3756dMo+QfU=;
-        b=mNLNi0gPW5oA8BminnIWTc+gNVhiSQq83Tjr7Hw6xngFxp/6G+wGwQljCJTyaOEPhT
-         uFXL9wzDfm8L3pmbtbKy/bokrah3KR5j16wQl47OJOmMRThVQLJySetXviXAJn4625FQ
-         xjjgBjAN5ig+mdfXaSYoQiDkCYh0I5c0p7hGb14mV3TXsC2bXe5YQ4UJjHilsFuH8uFF
-         /4gHeCN6AG3Rs2r39nDdkvrLolcAHv3AwIgeU4Ztjc89V1vxUceySv+eGlA4X2tRXOGR
-         0Y0WhvVq9cidkE+KO7rURxmcYdDnhRfXsthZvqNxsBStrnG48XZKfjz2pGUdwxQrTshO
-         TkBw==
-X-Gm-Message-State: AOAM530ZzZYipb7HDlc2VzZSmrcYIV4+YiCcusbvSN2ByEJQp+OlLj6N
-        Xf7DQ1UE00HZhwAaYbdt/SA=
-X-Google-Smtp-Source: ABdhPJx7oYf86wBIM6WfWVTcYatdly907/fBsOt3ALFUo4yfZt9DlvNpUOylyyvATrXXWh1XqgZDYw==
-X-Received: by 2002:a17:90b:33c5:: with SMTP id lk5mr2714104pjb.181.1594701445282;
-        Mon, 13 Jul 2020 21:37:25 -0700 (PDT)
-Received: from ?IPv6:2601:647:4700:9b2:c93b:d519:464b:6d2e? ([2601:647:4700:9b2:c93b:d519:464b:6d2e])
-        by smtp.gmail.com with ESMTPSA id 16sm982370pjb.48.2020.07.13.21.37.24
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 13 Jul 2020 21:37:24 -0700 (PDT)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 13.4 \(3608.80.23.2.2\))
-Subject: Re: [kvm-unit-tests PATCH] cstart: Fix typo in i386's cstart assembly
-From:   Nadav Amit <nadav.amit@gmail.com>
-In-Reply-To: <20200714041905.12848-1-sean.j.christopherson@intel.com>
-Date:   Mon, 13 Jul 2020 21:37:22 -0700
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <AB5EF337-A271-4440-B716-BEB4AF70F5FB@gmail.com>
-References: <20200714041905.12848-1-sean.j.christopherson@intel.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=7YVDgrJdHzM8uoyNTq9BgOe1+GZ11KZO3hdKYo2QdCc=;
+        b=PPVUnbRkXs39rYVHzUmh0JJA++CIslsB8gfZgtCVS2rdwv2zs4rcLv2sLSK9UUE1MA
+         /n2KIRszXYTqD8EGcdLbfJTk0YuTANzt4sADgpquQB7L/KTyoZ5+3twmfLHuJfU8hz3C
+         yorV2H8jHlKliQr0f8QM5WqdV9d6O4cEnHktDJZOQB87yCajwofIBOlea3WPoXl5DdX9
+         hJbdBx23wrs7hRnwVq32oxLu3RsiAFvXasv6SnCNryCXMRRqFnCws5ZXsO/RAS/q8Gzl
+         iPzD47v764MH8nSlCNsKJSZEs1QEkLcoz1ue31hpOlOpPfvIGjdFGeGu3+8xIQ/sWgXv
+         Cp6A==
+X-Gm-Message-State: AOAM532kHP7dbxK2S96ur2QLzNJhkDPhLN/bn2fJibFhtHdHMecL42V4
+        h6+CQWkpkB1rNgd1Wjs7k1iyhNr1ewMkhWvRmncCUg==
+X-Google-Smtp-Source: ABdhPJyqyGXhcZA48fv4iirhHpjrFw9JphAtThKpGNfMb88W1oe8IHuMg20ZXegU2A0QLwOKgRdNR+pxs7Q4tk3H22E=
+X-Received: by 2002:a19:8253:: with SMTP id e80mr1239733lfd.199.1594701684604;
+ Mon, 13 Jul 2020 21:41:24 -0700 (PDT)
+MIME-Version: 1.0
+References: <20200714002355.538-1-sean.j.christopherson@intel.com> <20200714002355.538-3-sean.j.christopherson@intel.com>
+In-Reply-To: <20200714002355.538-3-sean.j.christopherson@intel.com>
+From:   Oliver Upton <oupton@google.com>
+Date:   Mon, 13 Jul 2020 21:41:13 -0700
+Message-ID: <CAOQ_QsiUPnD3BAefMm=D8tusJc9a7Rp1xC31RQJSWmqYLEPa6Q@mail.gmail.com>
+Subject: Re: [kvm-unit-tests PATCH 2/2] nVMX: Use the standard non-canonical
+ value in test_mtf3
 To:     Sean Christopherson <sean.j.christopherson@intel.com>
-X-Mailer: Apple Mail (2.3608.80.23.2.2)
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        kvm list <kvm@vger.kernel.org>,
+        Krish Sadhukhan <krish.sadhukhan@oracle.com>,
+        Karl Heubaum <karl.heubaum@oracle.com>,
+        Jim Mattson <jmattson@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> On Jul 13, 2020, at 9:19 PM, Sean Christopherson =
+On Mon, Jul 13, 2020 at 5:24 PM Sean Christopherson
 <sean.j.christopherson@intel.com> wrote:
->=20
-> Replace a '%' with a '$' to encode a literal in when initializing CR4.
-> This fixes the build on i386 as gcc complains about a non-existent
-> register.
+>
+> Use the standard non-canonical value of repeating 'a' instead of a
+> custom (1 << 63) value in test_mtf3.  When PCID is enabled, bit 63 is
+> a flag that controls TLB swithching on MOV CR3 and is not included in
+> the canonical check of CR3, i.e. if CR4.PCIDE=1 then the test will load
+> 0 into CR3 and all manner of confusion things happen.
+>
+> Fixes: 46cc038c6afb8 ("x86: VMX: Add tests for monitor trap flag")
+> Cc: Oliver Upton <oupton@google.com>
+> Cc: Jim Mattson <jmattson@google.com>
+> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
 
-Reviewed-by: Nadav Amit <namit@vmware.com>
+Reviewed-by: Oliver Upton <oupton@google.com>
 
-( I should have noticed it before )=
+> ---
+>  x86/vmx_tests.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/x86/vmx_tests.c b/x86/vmx_tests.c
+> index cb42a2d..32e3d4f 100644
+> --- a/x86/vmx_tests.c
+> +++ b/x86/vmx_tests.c
+> @@ -5107,7 +5107,7 @@ static void test_mtf_guest(void)
+>               * MOV RAX is done before the VMCALL such that MTF is only enabled
+>               * for the instruction under test.
+>               */
+> -            "mov $0x8000000000000000, %rax;\n\t"
+> +            "mov $0xaaaaaaaaaaaaaaaa, %rax;\n\t"
+>              "vmcall;\n\t"
+>              "mov %rax, %cr3;\n\t"
+>              "test_mtf3:\n\t"
+> --
+> 2.26.0
+>
