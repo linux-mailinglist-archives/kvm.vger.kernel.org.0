@@ -2,108 +2,76 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 407DA21E6C7
-	for <lists+kvm@lfdr.de>; Tue, 14 Jul 2020 06:20:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CB69B21E704
+	for <lists+kvm@lfdr.de>; Tue, 14 Jul 2020 06:37:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725836AbgGNEUr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 14 Jul 2020 00:20:47 -0400
-Received: from mga14.intel.com ([192.55.52.115]:36617 "EHLO mga14.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725497AbgGNEUr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 14 Jul 2020 00:20:47 -0400
-IronPort-SDR: WC5FvcJyh5a9a1jbh+hU61p8BZ1Yq0h84DoGKuQeWRhSFCOybTkAOhgajO/5E5yk18TQo7fHd9
- WIvR8nU8pMaQ==
-X-IronPort-AV: E=McAfee;i="6000,8403,9681"; a="147933846"
-X-IronPort-AV: E=Sophos;i="5.75,350,1589266800"; 
-   d="scan'208";a="147933846"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga007.fm.intel.com ([10.253.24.52])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Jul 2020 21:20:47 -0700
-IronPort-SDR: f+TaMNHxkuirtQ3ImzLoVq2T847Pq4JhWcbXOci3WFLPT2F30cG6/92BgYp6hDNrZ1mMiZjys+
- hN+kWk7bVVOA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.75,350,1589266800"; 
-   d="scan'208";a="268545172"
-Received: from sjchrist-coffee.jf.intel.com ([10.54.74.152])
-  by fmsmga007.fm.intel.com with ESMTP; 13 Jul 2020 21:20:47 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     kvm@vger.kernel.org, Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Andrew Jones <drjones@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>
-Subject: [kvm-unit-tests PATCH] lib/alloc_page: Revert to 'unsigned long' for @size params
-Date:   Mon, 13 Jul 2020 21:20:46 -0700
-Message-Id: <20200714042046.13419-1-sean.j.christopherson@intel.com>
-X-Mailer: git-send-email 2.26.0
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+        id S1725883AbgGNEh0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 14 Jul 2020 00:37:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47328 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725781AbgGNEh0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 14 Jul 2020 00:37:26 -0400
+Received: from mail-pl1-x643.google.com (mail-pl1-x643.google.com [IPv6:2607:f8b0:4864:20::643])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 03832C061755
+        for <kvm@vger.kernel.org>; Mon, 13 Jul 2020 21:37:25 -0700 (PDT)
+Received: by mail-pl1-x643.google.com with SMTP id t6so3337262plo.3
+        for <kvm@vger.kernel.org>; Mon, 13 Jul 2020 21:37:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:subject:from:in-reply-to:date:cc
+         :content-transfer-encoding:message-id:references:to;
+        bh=0qdqXaqZyPmuL903QQCWfrJTGFMRDZfw3756dMo+QfU=;
+        b=JRiJdPHUo9vGJ+xPfld5Km6Dgh60r4reryXmAb5MVAGSuHIbR14HUxYlgPr26TRUPL
+         68OIbEqjhlmqmQmf65/vD88yCBsqmuRRAk9LaXZcVSOxRq4ffNm7cBC+a3JiZ8rY+1D8
+         7zyPfTjdloHE/6VvykDBarLVIaRQGNm/BM3sGeHhwRYUxfP2BDDAiQQAiSO2yOpN1PWQ
+         e6ATFeppZkRwIiSdPidAPILAE5FMJO7AYmFW7MpO/xTcdW3xiBKiM7RfW9fkgp7xlv6R
+         2IW8m4CfBfp5CpK4XzaYL/TPRpdkn5itC9gaOsubkRfscMTenfREvxpt+Ta0j9bH0UD+
+         AOAw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
+         :content-transfer-encoding:message-id:references:to;
+        bh=0qdqXaqZyPmuL903QQCWfrJTGFMRDZfw3756dMo+QfU=;
+        b=mNLNi0gPW5oA8BminnIWTc+gNVhiSQq83Tjr7Hw6xngFxp/6G+wGwQljCJTyaOEPhT
+         uFXL9wzDfm8L3pmbtbKy/bokrah3KR5j16wQl47OJOmMRThVQLJySetXviXAJn4625FQ
+         xjjgBjAN5ig+mdfXaSYoQiDkCYh0I5c0p7hGb14mV3TXsC2bXe5YQ4UJjHilsFuH8uFF
+         /4gHeCN6AG3Rs2r39nDdkvrLolcAHv3AwIgeU4Ztjc89V1vxUceySv+eGlA4X2tRXOGR
+         0Y0WhvVq9cidkE+KO7rURxmcYdDnhRfXsthZvqNxsBStrnG48XZKfjz2pGUdwxQrTshO
+         TkBw==
+X-Gm-Message-State: AOAM530ZzZYipb7HDlc2VzZSmrcYIV4+YiCcusbvSN2ByEJQp+OlLj6N
+        Xf7DQ1UE00HZhwAaYbdt/SA=
+X-Google-Smtp-Source: ABdhPJx7oYf86wBIM6WfWVTcYatdly907/fBsOt3ALFUo4yfZt9DlvNpUOylyyvATrXXWh1XqgZDYw==
+X-Received: by 2002:a17:90b:33c5:: with SMTP id lk5mr2714104pjb.181.1594701445282;
+        Mon, 13 Jul 2020 21:37:25 -0700 (PDT)
+Received: from ?IPv6:2601:647:4700:9b2:c93b:d519:464b:6d2e? ([2601:647:4700:9b2:c93b:d519:464b:6d2e])
+        by smtp.gmail.com with ESMTPSA id 16sm982370pjb.48.2020.07.13.21.37.24
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Mon, 13 Jul 2020 21:37:24 -0700 (PDT)
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 13.4 \(3608.80.23.2.2\))
+Subject: Re: [kvm-unit-tests PATCH] cstart: Fix typo in i386's cstart assembly
+From:   Nadav Amit <nadav.amit@gmail.com>
+In-Reply-To: <20200714041905.12848-1-sean.j.christopherson@intel.com>
+Date:   Mon, 13 Jul 2020 21:37:22 -0700
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <AB5EF337-A271-4440-B716-BEB4AF70F5FB@gmail.com>
+References: <20200714041905.12848-1-sean.j.christopherson@intel.com>
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+X-Mailer: Apple Mail (2.3608.80.23.2.2)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Revert to using 'unsigned long' instead of 'size_t' for free_pages() and
-get_order().  The recent change to size_t for free_pages() breaks i386
-with -Werror as the assert_msg() formats expect unsigned longs, whereas
-size_t is an 'unsigned int' on i386 (though both longs and ints are 4
-bytes).
+> On Jul 13, 2020, at 9:19 PM, Sean Christopherson =
+<sean.j.christopherson@intel.com> wrote:
+>=20
+> Replace a '%' with a '$' to encode a literal in when initializing CR4.
+> This fixes the build on i386 as gcc complains about a non-existent
+> register.
 
-Message formatting aside, unsigned long is the correct choice given the
-current code base as alloc_pages() and free_pages_by_order() explicitly
-expect, work on, and/or assert on the size being an unsigned long.
+Reviewed-by: Nadav Amit <namit@vmware.com>
 
-Fixes: 73f4b202beb39 ("lib/alloc_page: change some parameter types")
-Cc: Claudio Imbrenda <imbrenda@linux.ibm.com>
-Cc: Andrew Jones <drjones@redhat.com>
-Cc: Jim Mattson <jmattson@google.com>
-Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
----
- lib/alloc_page.c | 2 +-
- lib/alloc_page.h | 2 +-
- lib/bitops.h     | 2 +-
- 3 files changed, 3 insertions(+), 3 deletions(-)
-
-diff --git a/lib/alloc_page.c b/lib/alloc_page.c
-index fa3c527..aa98981 100644
---- a/lib/alloc_page.c
-+++ b/lib/alloc_page.c
-@@ -21,7 +21,7 @@ bool page_alloc_initialized(void)
- 	return freelist != 0;
- }
- 
--void free_pages(void *mem, size_t size)
-+void free_pages(void *mem, unsigned long size)
- {
- 	void *old_freelist;
- 	void *end;
-diff --git a/lib/alloc_page.h b/lib/alloc_page.h
-index 88540d1..80eded7 100644
---- a/lib/alloc_page.h
-+++ b/lib/alloc_page.h
-@@ -13,7 +13,7 @@ void page_alloc_ops_enable(void);
- void *alloc_page(void);
- void *alloc_pages(unsigned int order);
- void free_page(void *page);
--void free_pages(void *mem, size_t size);
-+void free_pages(void *mem, unsigned long size);
- void free_pages_by_order(void *mem, unsigned int order);
- 
- #endif
-diff --git a/lib/bitops.h b/lib/bitops.h
-index 308aa86..dd015e8 100644
---- a/lib/bitops.h
-+++ b/lib/bitops.h
-@@ -79,7 +79,7 @@ static inline bool is_power_of_2(unsigned long n)
- 	return n && !(n & (n - 1));
- }
- 
--static inline unsigned int get_order(size_t size)
-+static inline unsigned int get_order(unsigned long size)
- {
- 	return size ? fls(size) + !is_power_of_2(size) : 0;
- }
--- 
-2.26.0
-
+( I should have noticed it before )=
