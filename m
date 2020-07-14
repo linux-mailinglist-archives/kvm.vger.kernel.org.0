@@ -2,55 +2,55 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DDA3221E712
-	for <lists+kvm@lfdr.de>; Tue, 14 Jul 2020 06:41:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 931EA21E714
+	for <lists+kvm@lfdr.de>; Tue, 14 Jul 2020 06:43:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725906AbgGNEl1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 14 Jul 2020 00:41:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47940 "EHLO
+        id S1725816AbgGNEnk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 14 Jul 2020 00:43:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48282 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725306AbgGNEl1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 14 Jul 2020 00:41:27 -0400
-Received: from mail-lf1-x141.google.com (mail-lf1-x141.google.com [IPv6:2a00:1450:4864:20::141])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A1DBCC061755
-        for <kvm@vger.kernel.org>; Mon, 13 Jul 2020 21:41:26 -0700 (PDT)
-Received: by mail-lf1-x141.google.com with SMTP id m26so10574045lfo.13
-        for <kvm@vger.kernel.org>; Mon, 13 Jul 2020 21:41:26 -0700 (PDT)
+        with ESMTP id S1725306AbgGNEnk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 14 Jul 2020 00:43:40 -0400
+Received: from mail-lf1-x144.google.com (mail-lf1-x144.google.com [IPv6:2a00:1450:4864:20::144])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E1A56C061755
+        for <kvm@vger.kernel.org>; Mon, 13 Jul 2020 21:43:39 -0700 (PDT)
+Received: by mail-lf1-x144.google.com with SMTP id t74so10569960lff.2
+        for <kvm@vger.kernel.org>; Mon, 13 Jul 2020 21:43:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=7YVDgrJdHzM8uoyNTq9BgOe1+GZ11KZO3hdKYo2QdCc=;
-        b=sUXZoTzjDls8yRvCgGsdck8hAHfsv05P8NLqWEbkSpeX5SlTik2hmDmnWK10Aaxbzp
-         5R0ChZPCeeJ+AJ0Z8QTQpBCEuXdlivaoRdK7RUX8snzcy4QGWLSP+/wJ493tjPkSYTQn
-         CYPuyqbOBJ2opxUytpNYSJ0h0belr6GW3gmmPl9qK0p9MJ3I1nl3jxZsUAt8GK/6+0Bt
-         oPSzJGchmIWe1qNwyazUAfh9YIKnhuEMJP715OsNUOVa7ytBHhVTXcjHuNNDMoeyQlT5
-         LCec6fxy0V9sE3O2zhNdD9fLxKrulxbgjqeYwBV2bqGp2fq3XhlSPgBi09GP4xCLh41d
-         hXwQ==
+        bh=qEP+SeQ8Nan2aFjB5HWY6BOGbALAKhAs4bQzQ/wO6bs=;
+        b=klN2+h2h57/N5kUwIxmCpK5L0jVCoVernvR4xYScVgBwMnTB07Dlok2pShnerwZTrX
+         8cQzIqiPuv4anEWYHImh0XKkDSD3tzMBpRbKSvHXhK6DxcDPkl8WjZD4tTjiEBHDO1B6
+         dBV5q9sRkQ5lcHZxH6o8I3VnTgb/lyUCFLOokBQw95VotXZsIsP95kVMuYWQxaiLkQnL
+         RvkWF+ItCLfv+yukQSZNRneHDnJCK/y0P/gl1TiY9/fIaOXN3AW8aNn+fZlUITF5jZEM
+         OaU2INFQMAALCc5bFQW7oK0LPnDmFk9ajBszcJgx+H5x2sR5KY30oLM9yIJNxhtF7CtZ
+         y0qg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=7YVDgrJdHzM8uoyNTq9BgOe1+GZ11KZO3hdKYo2QdCc=;
-        b=PPVUnbRkXs39rYVHzUmh0JJA++CIslsB8gfZgtCVS2rdwv2zs4rcLv2sLSK9UUE1MA
-         /n2KIRszXYTqD8EGcdLbfJTk0YuTANzt4sADgpquQB7L/KTyoZ5+3twmfLHuJfU8hz3C
-         yorV2H8jHlKliQr0f8QM5WqdV9d6O4cEnHktDJZOQB87yCajwofIBOlea3WPoXl5DdX9
-         hJbdBx23wrs7hRnwVq32oxLu3RsiAFvXasv6SnCNryCXMRRqFnCws5ZXsO/RAS/q8Gzl
-         iPzD47v764MH8nSlCNsKJSZEs1QEkLcoz1ue31hpOlOpPfvIGjdFGeGu3+8xIQ/sWgXv
-         Cp6A==
-X-Gm-Message-State: AOAM532kHP7dbxK2S96ur2QLzNJhkDPhLN/bn2fJibFhtHdHMecL42V4
-        h6+CQWkpkB1rNgd1Wjs7k1iyhNr1ewMkhWvRmncCUg==
-X-Google-Smtp-Source: ABdhPJyqyGXhcZA48fv4iirhHpjrFw9JphAtThKpGNfMb88W1oe8IHuMg20ZXegU2A0QLwOKgRdNR+pxs7Q4tk3H22E=
-X-Received: by 2002:a19:8253:: with SMTP id e80mr1239733lfd.199.1594701684604;
- Mon, 13 Jul 2020 21:41:24 -0700 (PDT)
+        bh=qEP+SeQ8Nan2aFjB5HWY6BOGbALAKhAs4bQzQ/wO6bs=;
+        b=SDUNYTJIrP1G+64AuLlHArHv6LRMh5c3feg3Ii3qmpGc8HtkFjI85IO2D3OJaDrqP5
+         ZLV+FzFMxevxZWBGJHq4bUS8ijnGQO92PFkaasHsoPd22Yfysc1e+NmRWQvIt8CWARUO
+         ksC01SbAmcT4hoRtquWtX3SEYEtvg5ZCzm08byEJ6wuk1Z6QZDknL5vcgT6+NhSfe9l8
+         bicEAKbGQNfhtD4hAO+gqF5KL1KY4wUay1V68BuNCfIfxfblGJKufn6skX/Q22YmGB7j
+         nig7OtcV2ZR1ymj0L6sdk/1t9mD0nsSo9Q25wUcpUJHTt3j48SHvqLVXjZlJIKSM5K+N
+         kMzA==
+X-Gm-Message-State: AOAM532ZcfIe+NknCMgI3FxnoERp5mQUtfWd6QJf+jXJskBnZHi8oYqQ
+        dpVN+pACGRJNcqYitUU3uGGCegEaYNU+QTue5AjR2Q==
+X-Google-Smtp-Source: ABdhPJzlCP1H3GjoMk5wm4MBXaitCOGbzsZc6U0zrQI7Lqk7WCNFDdw2YqNWjEjMoTVBtUHtV+l0W2bZ2cMu5DhVy1c=
+X-Received: by 2002:a19:e93:: with SMTP id 141mr1205791lfo.107.1594701817783;
+ Mon, 13 Jul 2020 21:43:37 -0700 (PDT)
 MIME-Version: 1.0
-References: <20200714002355.538-1-sean.j.christopherson@intel.com> <20200714002355.538-3-sean.j.christopherson@intel.com>
-In-Reply-To: <20200714002355.538-3-sean.j.christopherson@intel.com>
+References: <20200714002355.538-1-sean.j.christopherson@intel.com> <20200714002355.538-2-sean.j.christopherson@intel.com>
+In-Reply-To: <20200714002355.538-2-sean.j.christopherson@intel.com>
 From:   Oliver Upton <oupton@google.com>
-Date:   Mon, 13 Jul 2020 21:41:13 -0700
-Message-ID: <CAOQ_QsiUPnD3BAefMm=D8tusJc9a7Rp1xC31RQJSWmqYLEPa6Q@mail.gmail.com>
-Subject: Re: [kvm-unit-tests PATCH 2/2] nVMX: Use the standard non-canonical
- value in test_mtf3
+Date:   Mon, 13 Jul 2020 21:43:26 -0700
+Message-ID: <CAOQ_QshGiwLmm5Sun8TOMJNwx3GFPB=YEMPkzwqczqV4aDYmsg@mail.gmail.com>
+Subject: Re: [kvm-unit-tests PATCH 1/2] nVMX: Restore active host RIP/CR4
+ after test_host_addr_size()
 To:     Sean Christopherson <sean.j.christopherson@intel.com>
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         kvm list <kvm@vger.kernel.org>,
@@ -63,39 +63,42 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jul 13, 2020 at 5:24 PM Sean Christopherson
+On Mon, Jul 13, 2020 at 5:23 PM Sean Christopherson
 <sean.j.christopherson@intel.com> wrote:
 >
-> Use the standard non-canonical value of repeating 'a' instead of a
-> custom (1 << 63) value in test_mtf3.  When PCID is enabled, bit 63 is
-> a flag that controls TLB swithching on MOV CR3 and is not included in
-> the canonical check of CR3, i.e. if CR4.PCIDE=1 then the test will load
-> 0 into CR3 and all manner of confusion things happen.
+> Perform one last VMX transition to actually load the host's RIP and CR4
+> at the end of test_host_addr_size().  Simply writing the VMCS doesn't
+> restore the values in hardware, e.g. as is, CR4.PCIDE can be left set,
+> which causes spectacularly confusing explosions when other misguided
+> tests assume setting bit 63 in CR3 will cause a non-canonical #GP.
 >
-> Fixes: 46cc038c6afb8 ("x86: VMX: Add tests for monitor trap flag")
-> Cc: Oliver Upton <oupton@google.com>
-> Cc: Jim Mattson <jmattson@google.com>
+> Fixes: 0786c0316ac05 ("kvm-unit-test: nVMX: Check Host Address Space Size on vmentry of nested guests")
+> Cc: Krish Sadhukhan <krish.sadhukhan@oracle.com>
+> Cc: Karl Heubaum <karl.heubaum@oracle.com>
 > Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
 
 Reviewed-by: Oliver Upton <oupton@google.com>
 
 > ---
->  x86/vmx_tests.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  x86/vmx_tests.c | 5 +++++
+>  1 file changed, 5 insertions(+)
 >
 > diff --git a/x86/vmx_tests.c b/x86/vmx_tests.c
-> index cb42a2d..32e3d4f 100644
+> index 29f3d0e..cb42a2d 100644
 > --- a/x86/vmx_tests.c
 > +++ b/x86/vmx_tests.c
-> @@ -5107,7 +5107,7 @@ static void test_mtf_guest(void)
->               * MOV RAX is done before the VMCALL such that MTF is only enabled
->               * for the instruction under test.
->               */
-> -            "mov $0x8000000000000000, %rax;\n\t"
-> +            "mov $0xaaaaaaaaaaaaaaaa, %rax;\n\t"
->              "vmcall;\n\t"
->              "mov %rax, %cr3;\n\t"
->              "test_mtf3:\n\t"
+> @@ -7673,6 +7673,11 @@ static void test_host_addr_size(void)
+>                 vmcs_write(ENT_CONTROLS, entry_ctrl_saved | ENT_GUEST_64);
+>                 vmcs_write(HOST_RIP, rip_saved);
+>                 vmcs_write(HOST_CR4, cr4_saved);
+> +
+> +               /* Restore host's active RIP and CR4 values. */
+> +               report_prefix_pushf("restore host state");
+> +               test_vmx_vmlaunch(0);
+> +               report_prefix_pop();
+>         }
+>  }
+>
 > --
 > 2.26.0
 >
