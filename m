@@ -2,19 +2,19 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C2F8621F098
-	for <lists+kvm@lfdr.de>; Tue, 14 Jul 2020 14:14:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 32F7721F097
+	for <lists+kvm@lfdr.de>; Tue, 14 Jul 2020 14:14:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728255AbgGNMOQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 14 Jul 2020 08:14:16 -0400
-Received: from 8bytes.org ([81.169.241.247]:53652 "EHLO theia.8bytes.org"
+        id S1728548AbgGNMOR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 14 Jul 2020 08:14:17 -0400
+Received: from 8bytes.org ([81.169.241.247]:52918 "EHLO theia.8bytes.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728385AbgGNMLA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        id S1728376AbgGNMLA (ORCPT <rfc822;kvm@vger.kernel.org>);
         Tue, 14 Jul 2020 08:11:00 -0400
 Received: from cap.home.8bytes.org (p5b006776.dip0.t-ipconnect.de [91.0.103.118])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
         (No client certificate requested)
-        by theia.8bytes.org (Postfix) with ESMTPSA id 6604AF8E;
+        by theia.8bytes.org (Postfix) with ESMTPSA id E55FFF8C;
         Tue, 14 Jul 2020 14:10:56 +0200 (CEST)
 From:   Joerg Roedel <joro@8bytes.org>
 To:     x86@kernel.org
@@ -36,9 +36,9 @@ Cc:     Joerg Roedel <joro@8bytes.org>, Joerg Roedel <jroedel@suse.de>,
         Martin Radev <martin.b.radev@gmail.com>,
         linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         virtualization@lists.linux-foundation.org
-Subject: [PATCH v4 43/75] x86/sev-es: Allocate and Map stacks for #VC handler
-Date:   Tue, 14 Jul 2020 14:08:45 +0200
-Message-Id: <20200714120917.11253-44-joro@8bytes.org>
+Subject: [PATCH v4 44/75] x86/sev-es: Allocate and setup IST entry for #VC
+Date:   Tue, 14 Jul 2020 14:08:46 +0200
+Message-Id: <20200714120917.11253-45-joro@8bytes.org>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20200714120917.11253-1-joro@8bytes.org>
 References: <20200714120917.11253-1-joro@8bytes.org>
@@ -51,185 +51,57 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Joerg Roedel <jroedel@suse.de>
 
-Allocate and map an IST stack and a fall-back stack for the #VC handler.
-The memory for the stacks is allocated only when SEV-ES is active.
-
-The #VC handler needs to use an IST stack because it could be raised
-from kernel space with unsafe stack, e.g. in the SYSCALL entry path.
-
-Since the #VC exception can be nested, the #VC handler switches back to
-the interrupted stack when entered from kernel space. If switching back
-is not possible the fall-back stack will be used.
+Allocate IST entry number 4 for the #VC handler and setup it up in the
+per-cpu TSS. This will setup the TSS for all CPUs before they even
+start, so that the boot-code for secondary CPUs can handle #VC
+exceptions.
 
 Signed-off-by: Joerg Roedel <jroedel@suse.de>
 ---
- arch/x86/include/asm/cpu_entry_area.h | 33 +++++++++++++++++----------
- arch/x86/kernel/dumpstack_64.c        |  8 +++++--
- arch/x86/kernel/sev-es.c              | 33 +++++++++++++++++++++++++++
- 3 files changed, 60 insertions(+), 14 deletions(-)
+ arch/x86/include/asm/page_64_types.h | 1 +
+ arch/x86/kernel/sev-es.c             | 5 +++++
+ 2 files changed, 6 insertions(+)
 
-diff --git a/arch/x86/include/asm/cpu_entry_area.h b/arch/x86/include/asm/cpu_entry_area.h
-index 8902fdb7de13..f87e4c0c16f4 100644
---- a/arch/x86/include/asm/cpu_entry_area.h
-+++ b/arch/x86/include/asm/cpu_entry_area.h
-@@ -11,25 +11,29 @@
- #ifdef CONFIG_X86_64
- 
- /* Macro to enforce the same ordering and stack sizes */
--#define ESTACKS_MEMBERS(guardsize)		\
--	char	DF_stack_guard[guardsize];	\
--	char	DF_stack[EXCEPTION_STKSZ];	\
--	char	NMI_stack_guard[guardsize];	\
--	char	NMI_stack[EXCEPTION_STKSZ];	\
--	char	DB_stack_guard[guardsize];	\
--	char	DB_stack[EXCEPTION_STKSZ];	\
--	char	MCE_stack_guard[guardsize];	\
--	char	MCE_stack[EXCEPTION_STKSZ];	\
--	char	IST_top_guard[guardsize];	\
-+#define ESTACKS_MEMBERS(guardsize, optional_stack_size)		\
-+	char	DF_stack_guard[guardsize];			\
-+	char	DF_stack[EXCEPTION_STKSZ];			\
-+	char	NMI_stack_guard[guardsize];			\
-+	char	NMI_stack[EXCEPTION_STKSZ];			\
-+	char	DB_stack_guard[guardsize];			\
-+	char	DB_stack[EXCEPTION_STKSZ];			\
-+	char	MCE_stack_guard[guardsize];			\
-+	char	MCE_stack[EXCEPTION_STKSZ];			\
-+	char	VC_stack_guard[guardsize];			\
-+	char	VC_stack[optional_stack_size];			\
-+	char	VC2_stack_guard[guardsize];			\
-+	char	VC2_stack[optional_stack_size];			\
-+	char	IST_top_guard[guardsize];			\
- 
- /* The exception stacks' physical storage. No guard pages required */
- struct exception_stacks {
--	ESTACKS_MEMBERS(0)
-+	ESTACKS_MEMBERS(0, 0)
- };
- 
- /* The effective cpu entry area mapping with guard pages. */
- struct cea_exception_stacks {
--	ESTACKS_MEMBERS(PAGE_SIZE)
-+	ESTACKS_MEMBERS(PAGE_SIZE, EXCEPTION_STKSZ)
- };
+diff --git a/arch/x86/include/asm/page_64_types.h b/arch/x86/include/asm/page_64_types.h
+index 288b065955b7..d0c6c10c18a0 100644
+--- a/arch/x86/include/asm/page_64_types.h
++++ b/arch/x86/include/asm/page_64_types.h
+@@ -28,6 +28,7 @@
+ #define	IST_INDEX_NMI		1
+ #define	IST_INDEX_DB		2
+ #define	IST_INDEX_MCE		3
++#define	IST_INDEX_VC		4
  
  /*
-@@ -40,6 +44,8 @@ enum exception_stack_ordering {
- 	ESTACK_NMI,
- 	ESTACK_DB,
- 	ESTACK_MCE,
-+	ESTACK_VC,
-+	ESTACK_VC2,
- 	N_EXCEPTION_STACKS
- };
- 
-@@ -139,4 +145,7 @@ static inline struct entry_stack *cpu_entry_stack(int cpu)
- #define __this_cpu_ist_top_va(name)					\
- 	CEA_ESTACK_TOP(__this_cpu_read(cea_exception_stacks), name)
- 
-+#define __this_cpu_ist_bot_va(name)					\
-+	CEA_ESTACK_BOT(__this_cpu_read(cea_exception_stacks), name)
-+
- #endif
-diff --git a/arch/x86/kernel/dumpstack_64.c b/arch/x86/kernel/dumpstack_64.c
-index 4a94d38cd141..c49cf594714b 100644
---- a/arch/x86/kernel/dumpstack_64.c
-+++ b/arch/x86/kernel/dumpstack_64.c
-@@ -24,11 +24,13 @@ static const char * const exception_stack_names[] = {
- 		[ ESTACK_NMI	]	= "NMI",
- 		[ ESTACK_DB	]	= "#DB",
- 		[ ESTACK_MCE	]	= "#MC",
-+		[ ESTACK_VC	]	= "#VC",
-+		[ ESTACK_VC2	]	= "#VC2",
- };
- 
- const char *stack_type_name(enum stack_type type)
- {
--	BUILD_BUG_ON(N_EXCEPTION_STACKS != 4);
-+	BUILD_BUG_ON(N_EXCEPTION_STACKS != 6);
- 
- 	if (type == STACK_TYPE_IRQ)
- 		return "IRQ";
-@@ -79,6 +81,8 @@ struct estack_pages estack_pages[CEA_ESTACK_PAGES] ____cacheline_aligned = {
- 	EPAGERANGE(NMI),
- 	EPAGERANGE(DB),
- 	EPAGERANGE(MCE),
-+	EPAGERANGE(VC),
-+	EPAGERANGE(VC2),
- };
- 
- static bool in_exception_stack(unsigned long *stack, struct stack_info *info)
-@@ -88,7 +92,7 @@ static bool in_exception_stack(unsigned long *stack, struct stack_info *info)
- 	struct pt_regs *regs;
- 	unsigned int k;
- 
--	BUILD_BUG_ON(N_EXCEPTION_STACKS != 4);
-+	BUILD_BUG_ON(N_EXCEPTION_STACKS != 6);
- 
- 	begin = (unsigned long)__this_cpu_read(cea_exception_stacks);
- 	/*
+  * Set __PAGE_OFFSET to the most negative possible address +
 diff --git a/arch/x86/kernel/sev-es.c b/arch/x86/kernel/sev-es.c
-index 734afaee378d..64002d86a237 100644
+index 64002d86a237..d415368f16ec 100644
 --- a/arch/x86/kernel/sev-es.c
 +++ b/arch/x86/kernel/sev-es.c
-@@ -17,6 +17,7 @@
- #include <linux/kernel.h>
- #include <linux/mm.h>
+@@ -56,11 +56,13 @@ static void __init sev_es_setup_vc_stacks(int cpu)
+ {
+ 	struct sev_es_runtime_data *data;
+ 	struct cpu_entry_area *cea;
++	struct tss_struct *tss;
+ 	unsigned long vaddr;
+ 	phys_addr_t pa;
  
-+#include <asm/cpu_entry_area.h>
- #include <asm/sev-es.h>
- #include <asm/insn-eval.h>
- #include <asm/fpu/internal.h>
-@@ -37,10 +38,41 @@ static struct ghcb __initdata *boot_ghcb;
- /* #VC handler runtime per-cpu data */
- struct sev_es_runtime_data {
- 	struct ghcb ghcb_page;
-+
-+	/* Physical storage for the per-cpu IST stack of the #VC handler */
-+	char ist_stack[EXCEPTION_STKSZ] __aligned(PAGE_SIZE);
-+
-+	/*
-+	 * Physical storage for the per-cpu fall-back stack of the #VC handler.
-+	 * The fall-back stack is used when it is not safe to switch back to the
-+	 * interrupted stack in the #VC entry code.
-+	 */
-+	char fallback_stack[EXCEPTION_STKSZ] __aligned(PAGE_SIZE);
- };
+ 	data = per_cpu(runtime_data, cpu);
+ 	cea  = get_cpu_entry_area(cpu);
++	tss  = per_cpu_ptr(&cpu_tss_rw, cpu);
  
- static DEFINE_PER_CPU(struct sev_es_runtime_data*, runtime_data);
- 
-+static void __init sev_es_setup_vc_stacks(int cpu)
-+{
-+	struct sev_es_runtime_data *data;
-+	struct cpu_entry_area *cea;
-+	unsigned long vaddr;
-+	phys_addr_t pa;
+ 	/* Map #VC IST stack */
+ 	vaddr = CEA_ESTACK_BOT(&cea->estacks, VC);
+@@ -71,6 +73,9 @@ static void __init sev_es_setup_vc_stacks(int cpu)
+ 	vaddr = CEA_ESTACK_BOT(&cea->estacks, VC2);
+ 	pa    = __pa(data->fallback_stack);
+ 	cea_set_pte((void *)vaddr, pa, PAGE_KERNEL);
 +
-+	data = per_cpu(runtime_data, cpu);
-+	cea  = get_cpu_entry_area(cpu);
-+
-+	/* Map #VC IST stack */
-+	vaddr = CEA_ESTACK_BOT(&cea->estacks, VC);
-+	pa    = __pa(data->ist_stack);
-+	cea_set_pte((void *)vaddr, pa, PAGE_KERNEL);
-+
-+	/* Map VC fall-back stack */
-+	vaddr = CEA_ESTACK_BOT(&cea->estacks, VC2);
-+	pa    = __pa(data->fallback_stack);
-+	cea_set_pte((void *)vaddr, pa, PAGE_KERNEL);
-+}
-+
- /* Needed in vc_early_forward_exception */
- void do_early_exception(struct pt_regs *regs, int trapnr);
- 
-@@ -249,6 +281,7 @@ void __init sev_es_init_vc_handling(void)
- 	for_each_possible_cpu(cpu) {
- 		sev_es_alloc_runtime_data(cpu);
- 		sev_es_init_ghcb(cpu);
-+		sev_es_setup_vc_stacks(cpu);
- 	}
++	/* Set IST entry in TSS */
++	tss->x86_tss.ist[IST_INDEX_VC] = CEA_ESTACK_TOP(&cea->estacks, VC);
  }
  
+ /* Needed in vc_early_forward_exception */
 -- 
 2.27.0
 
