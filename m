@@ -2,180 +2,100 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7149421E84D
-	for <lists+kvm@lfdr.de>; Tue, 14 Jul 2020 08:37:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D3E1721E9BB
+	for <lists+kvm@lfdr.de>; Tue, 14 Jul 2020 09:13:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727068AbgGNGhB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 14 Jul 2020 02:37:01 -0400
-Received: from mga06.intel.com ([134.134.136.31]:13263 "EHLO mga06.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727049AbgGNGhA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 14 Jul 2020 02:37:00 -0400
-IronPort-SDR: nNBMfrlxa7/jZm5mbrDH5UcvIKtAg/A5BIz+t1AXjXVPwxzHNXGpIYIVdd8RiG6/A21asmcNjZ
- EQ9utvaJ1mDg==
-X-IronPort-AV: E=McAfee;i="6000,8403,9681"; a="210355854"
-X-IronPort-AV: E=Sophos;i="5.75,350,1589266800"; 
-   d="scan'208";a="210355854"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Jul 2020 23:37:00 -0700
-IronPort-SDR: X3VJoRwKlecuM927C3LobPEYIu+COs3PUs3wDIfCoX79xngEsRZJ5vZBnevAkEIrWWkMYE/jHo
- qGd2IUUdZO8A==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.75,350,1589266800"; 
-   d="scan'208";a="299435571"
-Received: from silpixa00400314.ir.intel.com (HELO silpixa00400314.ger.corp.intel.com) ([10.237.222.51])
-  by orsmga002.jf.intel.com with ESMTP; 13 Jul 2020 23:36:56 -0700
-From:   Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-To:     alex.williamson@redhat.com, herbert@gondor.apana.org.au
-Cc:     cohuck@redhat.com, nhorman@redhat.com, vdronov@redhat.com,
-        bhelgaas@google.com, mark.a.chambers@intel.com,
-        gordon.mcfadden@intel.com, ahsan.atta@intel.com,
-        qat-linux@intel.com, kvm@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-pci@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-Subject: [PATCH v2 5/5] crypto: qat - use PCI_VDEVICE
-Date:   Tue, 14 Jul 2020 07:36:10 +0100
-Message-Id: <20200714063610.849858-6-giovanni.cabiddu@intel.com>
-X-Mailer: git-send-email 2.26.2
-In-Reply-To: <20200714063610.849858-1-giovanni.cabiddu@intel.com>
-References: <20200714063610.849858-1-giovanni.cabiddu@intel.com>
+        id S1726798AbgGNHNA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 14 Jul 2020 03:13:00 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:24347 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1725788AbgGNHM7 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 14 Jul 2020 03:12:59 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1594710778;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references:openpgp:openpgp;
+        bh=0I1exq5fUv2DolWCQRV14bmH5NSujtohALF9ojcYl+I=;
+        b=VYzApNEm65QGQdlolVLCY5c+R2qcNbjGJB24rfl9w9v4Cnsst+vQMCkBOotw/izyVe+DDG
+        +FM+YUcbNLlBQ1QTrffNiiJd2Xa0LTtlKtiUpmPpuTEzWVvC7gAgZk96MoemP6XeXAfE5L
+        DRH4UPRWfeJwysUVpY0WLbGkU2myKSc=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-324-oCwLfHFtO5eJamJlWU_Ntg-1; Tue, 14 Jul 2020 03:12:56 -0400
+X-MC-Unique: oCwLfHFtO5eJamJlWU_Ntg-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DD5081800D42;
+        Tue, 14 Jul 2020 07:12:55 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-112-11.ams2.redhat.com [10.36.112.11])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 7AA3F5D9DC;
+        Tue, 14 Jul 2020 07:12:54 +0000 (UTC)
+Subject: Re: [kvm-unit-tests PATCH] lib/alloc_page: Revert to 'unsigned long'
+ for @size params
+To:     Sean Christopherson <sean.j.christopherson@intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     kvm@vger.kernel.org, Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Andrew Jones <drjones@redhat.com>,
+        Jim Mattson <jmattson@google.com>
+References: <20200714042046.13419-1-sean.j.christopherson@intel.com>
+From:   Thomas Huth <thuth@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <db6d8b2d-147b-d732-b638-b78a3fd980d2@redhat.com>
+Date:   Tue, 14 Jul 2020 09:12:52 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20200714042046.13419-1-sean.j.christopherson@intel.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Build pci_device_id structure using the PCI_VDEVICE macro.
-This removes any references to the ADF_SYSTEM_DEVICE macro.
+On 14/07/2020 06.20, Sean Christopherson wrote:
+> Revert to using 'unsigned long' instead of 'size_t' for free_pages() and
+> get_order().  The recent change to size_t for free_pages() breaks i386
+> with -Werror as the assert_msg() formats expect unsigned longs, whereas
+> size_t is an 'unsigned int' on i386 (though both longs and ints are 4
+> bytes).
+> 
+> Message formatting aside, unsigned long is the correct choice given the
+> current code base as alloc_pages() and free_pages_by_order() explicitly
+> expect, work on, and/or assert on the size being an unsigned long.
+> 
+> Fixes: 73f4b202beb39 ("lib/alloc_page: change some parameter types")
+> Cc: Claudio Imbrenda <imbrenda@linux.ibm.com>
+> Cc: Andrew Jones <drjones@redhat.com>
+> Cc: Jim Mattson <jmattson@google.com>
+> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+> ---
+[...]
+> diff --git a/lib/bitops.h b/lib/bitops.h
+> index 308aa86..dd015e8 100644
+> --- a/lib/bitops.h
+> +++ b/lib/bitops.h
+> @@ -79,7 +79,7 @@ static inline bool is_power_of_2(unsigned long n)
+>  	return n && !(n & (n - 1));
+>  }
+>  
+> -static inline unsigned int get_order(size_t size)
+> +static inline unsigned int get_order(unsigned long size)
+>  {
+>  	return size ? fls(size) + !is_power_of_2(size) : 0;
+>  }
+> 
 
-Signed-off-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
----
- drivers/crypto/qat/qat_c3xxx/adf_drv.c      | 7 ++-----
- drivers/crypto/qat/qat_c3xxxvf/adf_drv.c    | 7 ++-----
- drivers/crypto/qat/qat_c62x/adf_drv.c       | 7 ++-----
- drivers/crypto/qat/qat_c62xvf/adf_drv.c     | 7 ++-----
- drivers/crypto/qat/qat_dh895xcc/adf_drv.c   | 7 ++-----
- drivers/crypto/qat/qat_dh895xccvf/adf_drv.c | 7 ++-----
- 6 files changed, 12 insertions(+), 30 deletions(-)
+get_order() already used size_t when it was introduced in commit
+f22e527df02ffaba ... is it necessary to switch it to unsigned long now?
 
-diff --git a/drivers/crypto/qat/qat_c3xxx/adf_drv.c b/drivers/crypto/qat/qat_c3xxx/adf_drv.c
-index bba0f142f7f6..43929d70c41d 100644
---- a/drivers/crypto/qat/qat_c3xxx/adf_drv.c
-+++ b/drivers/crypto/qat/qat_c3xxx/adf_drv.c
-@@ -18,12 +18,9 @@
- #include <adf_cfg.h>
- #include "adf_c3xxx_hw_data.h"
- 
--#define ADF_SYSTEM_DEVICE(device_id) \
--	{PCI_DEVICE(PCI_VENDOR_ID_INTEL, device_id)}
--
- static const struct pci_device_id adf_pci_tbl[] = {
--	ADF_SYSTEM_DEVICE(PCI_DEVICE_ID_INTEL_QAT_C3XXX),
--	{0,}
-+	{ PCI_VDEVICE(INTEL, PCI_DEVICE_ID_INTEL_QAT_C3XXX), },
-+	{ }
- };
- MODULE_DEVICE_TABLE(pci, adf_pci_tbl);
- 
-diff --git a/drivers/crypto/qat/qat_c3xxxvf/adf_drv.c b/drivers/crypto/qat/qat_c3xxxvf/adf_drv.c
-index b77a58886599..dca52de22e8d 100644
---- a/drivers/crypto/qat/qat_c3xxxvf/adf_drv.c
-+++ b/drivers/crypto/qat/qat_c3xxxvf/adf_drv.c
-@@ -18,12 +18,9 @@
- #include <adf_cfg.h>
- #include "adf_c3xxxvf_hw_data.h"
- 
--#define ADF_SYSTEM_DEVICE(device_id) \
--	{PCI_DEVICE(PCI_VENDOR_ID_INTEL, device_id)}
--
- static const struct pci_device_id adf_pci_tbl[] = {
--	ADF_SYSTEM_DEVICE(PCI_DEVICE_ID_INTEL_QAT_C3XXX_VF),
--	{0,}
-+	{ PCI_VDEVICE(INTEL, PCI_DEVICE_ID_INTEL_QAT_C3XXX_VF), },
-+	{ }
- };
- MODULE_DEVICE_TABLE(pci, adf_pci_tbl);
- 
-diff --git a/drivers/crypto/qat/qat_c62x/adf_drv.c b/drivers/crypto/qat/qat_c62x/adf_drv.c
-index 722838ff03be..f104c9d1195d 100644
---- a/drivers/crypto/qat/qat_c62x/adf_drv.c
-+++ b/drivers/crypto/qat/qat_c62x/adf_drv.c
-@@ -18,12 +18,9 @@
- #include <adf_cfg.h>
- #include "adf_c62x_hw_data.h"
- 
--#define ADF_SYSTEM_DEVICE(device_id) \
--	{PCI_DEVICE(PCI_VENDOR_ID_INTEL, device_id)}
--
- static const struct pci_device_id adf_pci_tbl[] = {
--	ADF_SYSTEM_DEVICE(PCI_DEVICE_ID_INTEL_QAT_C62X),
--	{0,}
-+	{ PCI_VDEVICE(INTEL, PCI_DEVICE_ID_INTEL_QAT_C62X), },
-+	{ }
- };
- MODULE_DEVICE_TABLE(pci, adf_pci_tbl);
- 
-diff --git a/drivers/crypto/qat/qat_c62xvf/adf_drv.c b/drivers/crypto/qat/qat_c62xvf/adf_drv.c
-index a766cc18aae9..e0b909e70712 100644
---- a/drivers/crypto/qat/qat_c62xvf/adf_drv.c
-+++ b/drivers/crypto/qat/qat_c62xvf/adf_drv.c
-@@ -18,12 +18,9 @@
- #include <adf_cfg.h>
- #include "adf_c62xvf_hw_data.h"
- 
--#define ADF_SYSTEM_DEVICE(device_id) \
--	{PCI_DEVICE(PCI_VENDOR_ID_INTEL, device_id)}
--
- static const struct pci_device_id adf_pci_tbl[] = {
--	ADF_SYSTEM_DEVICE(PCI_DEVICE_ID_INTEL_QAT_C62X_VF),
--	{0,}
-+	{ PCI_VDEVICE(INTEL, PCI_DEVICE_ID_INTEL_QAT_C62X_VF), },
-+	{ }
- };
- MODULE_DEVICE_TABLE(pci, adf_pci_tbl);
- 
-diff --git a/drivers/crypto/qat/qat_dh895xcc/adf_drv.c b/drivers/crypto/qat/qat_dh895xcc/adf_drv.c
-index 4c3aea07f444..857aa4c8595f 100644
---- a/drivers/crypto/qat/qat_dh895xcc/adf_drv.c
-+++ b/drivers/crypto/qat/qat_dh895xcc/adf_drv.c
-@@ -18,12 +18,9 @@
- #include <adf_cfg.h>
- #include "adf_dh895xcc_hw_data.h"
- 
--#define ADF_SYSTEM_DEVICE(device_id) \
--	{PCI_DEVICE(PCI_VENDOR_ID_INTEL, device_id)}
--
- static const struct pci_device_id adf_pci_tbl[] = {
--	ADF_SYSTEM_DEVICE(PCI_DEVICE_ID_INTEL_QAT_DH895XCC),
--	{0,}
-+	{ PCI_VDEVICE(INTEL, PCI_DEVICE_ID_INTEL_QAT_DH895XCC), },
-+	{ }
- };
- MODULE_DEVICE_TABLE(pci, adf_pci_tbl);
- 
-diff --git a/drivers/crypto/qat/qat_dh895xccvf/adf_drv.c b/drivers/crypto/qat/qat_dh895xccvf/adf_drv.c
-index 673348ca5dea..2987855a70dc 100644
---- a/drivers/crypto/qat/qat_dh895xccvf/adf_drv.c
-+++ b/drivers/crypto/qat/qat_dh895xccvf/adf_drv.c
-@@ -18,12 +18,9 @@
- #include <adf_cfg.h>
- #include "adf_dh895xccvf_hw_data.h"
- 
--#define ADF_SYSTEM_DEVICE(device_id) \
--	{PCI_DEVICE(PCI_VENDOR_ID_INTEL, device_id)}
--
- static const struct pci_device_id adf_pci_tbl[] = {
--	ADF_SYSTEM_DEVICE(PCI_DEVICE_ID_INTEL_QAT_DH895XCC_VF),
--	{0,}
-+	{ PCI_VDEVICE(INTEL, PCI_DEVICE_ID_INTEL_QAT_DH895XCC_VF), },
-+	{ }
- };
- MODULE_DEVICE_TABLE(pci, adf_pci_tbl);
- 
--- 
-2.26.2
+Apart from that, this patch fixes the compilation problems, indeed, I
+just checked it in the travis-CI.
+
+Tested-by: Thomas Huth <thuth@redhat.com>
 
