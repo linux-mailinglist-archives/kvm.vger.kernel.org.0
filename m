@@ -2,204 +2,90 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C05AC21EDCF
-	for <lists+kvm@lfdr.de>; Tue, 14 Jul 2020 12:22:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A925321EEC2
+	for <lists+kvm@lfdr.de>; Tue, 14 Jul 2020 13:10:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726789AbgGNKWE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 14 Jul 2020 06:22:04 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:49654 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1725841AbgGNKWD (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 14 Jul 2020 06:22:03 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1594722121;
-        h=from:from:reply-to:reply-to:subject:subject:date:date:
-         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-         content-type:content-type:in-reply-to:in-reply-to:  references:references;
-        bh=9DSX05+68uv6zmOhHnKkH5fM6ROz5UyBxekKN+QVPUM=;
-        b=A66rFIyMy/slnJLBomUx3BIYwruWcspXqLa1x5+n7jFp2pby5H9+GczHdNjx6rV3Q8O9qK
-        fMdd6Hd6S4j+0JySlFlIKyYqqtKQh8FVBpnCN826wy9D1qGipqzYkzadjjwORAEr7kkBFl
-        W4Tc8vspDHbCzkSIvrvphJVFAynKSE8=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-376-Op6OYhoLM56Ia5-745wFjQ-1; Tue, 14 Jul 2020 06:21:55 -0400
-X-MC-Unique: Op6OYhoLM56Ia5-745wFjQ-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7BD1F1DE0;
-        Tue, 14 Jul 2020 10:21:53 +0000 (UTC)
-Received: from redhat.com (unknown [10.36.110.42])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 373032B6F1;
-        Tue, 14 Jul 2020 10:21:31 +0000 (UTC)
-Date:   Tue, 14 Jul 2020 11:21:29 +0100
-From:   Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To:     Yan Zhao <yan.y.zhao@intel.com>
-Cc:     devel@ovirt.org, openstack-discuss@lists.openstack.org,
-        libvir-list@redhat.com, intel-gvt-dev@lists.freedesktop.org,
-        kvm@vger.kernel.org, qemu-devel@nongnu.org, smooney@redhat.com,
-        eskultet@redhat.com, alex.williamson@redhat.com, cohuck@redhat.com,
-        dinechin@redhat.com, corbet@lwn.net, kwankhede@nvidia.com,
-        dgilbert@redhat.com, eauger@redhat.com, jian-feng.ding@intel.com,
-        hejie.xu@intel.com, kevin.tian@intel.com, zhenyuw@linux.intel.com,
-        bao.yumeng@zte.com.cn, xin-ran.wang@intel.com,
-        shaohe.feng@intel.com
-Subject: Re: device compatibility interface for live migration with assigned
- devices
-Message-ID: <20200714102129.GD25187@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20200713232957.GD5955@joy-OptiPlex-7040>
+        id S1727047AbgGNLKK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 14 Jul 2020 07:10:10 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:9248 "EHLO
+        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726252AbgGNLKJ (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 14 Jul 2020 07:10:09 -0400
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 06EB2M0i095775;
+        Tue, 14 Jul 2020 07:10:07 -0400
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3279du4acu-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 14 Jul 2020 07:10:06 -0400
+Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 06EB2PE9096112;
+        Tue, 14 Jul 2020 07:09:59 -0400
+Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3279du4a4a-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 14 Jul 2020 07:09:58 -0400
+Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
+        by ppma06ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 06EB7HI2004500;
+        Tue, 14 Jul 2020 11:09:23 GMT
+Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
+        by ppma06ams.nl.ibm.com with ESMTP id 3274pgu62a-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 14 Jul 2020 11:09:22 +0000
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
+        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 06EB9Kmo34340874
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 14 Jul 2020 11:09:20 GMT
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id B1758A4066;
+        Tue, 14 Jul 2020 11:09:20 +0000 (GMT)
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 2F416A405F;
+        Tue, 14 Jul 2020 11:09:20 +0000 (GMT)
+Received: from ibm-vm.ibmuc.com (unknown [9.145.7.230])
+        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Tue, 14 Jul 2020 11:09:20 +0000 (GMT)
+From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
+To:     kvm@vger.kernel.org, pbonzini@redhat.com
+Cc:     frankja@linux.ibm.com, thuth@redhat.com, david@redhat.com,
+        drjones@redhat.com, jmattson@google.com,
+        sean.j.christopherson@intel.com
+Subject: [kvm-unit-tests PATCH v1 0/2] Fix some compilation issues on 32bit
+Date:   Tue, 14 Jul 2020 13:09:17 +0200
+Message-Id: <20200714110919.50724-1-imbrenda@linux.ibm.com>
+X-Mailer: git-send-email 2.26.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20200713232957.GD5955@joy-OptiPlex-7040>
-User-Agent: Mutt/1.14.5 (2020-06-23)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
+ definitions=2020-07-14_02:2020-07-14,2020-07-14 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=741
+ lowpriorityscore=0 clxscore=1015 phishscore=0 mlxscore=0 adultscore=0
+ bulkscore=0 spamscore=0 malwarescore=0 priorityscore=1501 suspectscore=0
+ impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2006250000 definitions=main-2007140081
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jul 14, 2020 at 07:29:57AM +0800, Yan Zhao wrote:
-> hi folks,
-> we are defining a device migration compatibility interface that helps upper
-> layer stack like openstack/ovirt/libvirt to check if two devices are
-> live migration compatible.
-> The "devices" here could be MDEVs, physical devices, or hybrid of the two.
-> e.g. we could use it to check whether
-> - a src MDEV can migrate to a target MDEV,
-> - a src VF in SRIOV can migrate to a target VF in SRIOV,
-> - a src MDEV can migration to a target VF in SRIOV.
->   (e.g. SIOV/SRIOV backward compatibility case)
-> 
-> The upper layer stack could use this interface as the last step to check
-> if one device is able to migrate to another device before triggering a real
-> live migration procedure.
-> we are not sure if this interface is of value or help to you. please don't
-> hesitate to drop your valuable comments.
-> 
-> 
-> (1) interface definition
-> The interface is defined in below way:
-> 
->              __    userspace
->               /\              \
->              /                 \write
->             / read              \
->    ________/__________       ___\|/_____________
->   | migration_version |     | migration_version |-->check migration
->   ---------------------     ---------------------   compatibility
->      device A                    device B
-> 
-> 
-> a device attribute named migration_version is defined under each device's
-> sysfs node. e.g. (/sys/bus/pci/devices/0000\:00\:02.0/$mdev_UUID/migration_version).
-> userspace tools read the migration_version as a string from the source device,
-> and write it to the migration_version sysfs attribute in the target device.
-> 
-> The userspace should treat ANY of below conditions as two devices not compatible:
-> - any one of the two devices does not have a migration_version attribute
-> - error when reading from migration_version attribute of one device
-> - error when writing migration_version string of one device to
->   migration_version attribute of the other device
-> 
-> The string read from migration_version attribute is defined by device vendor
-> driver and is completely opaque to the userspace.
-> for a Intel vGPU, string format can be defined like
-> "parent device PCI ID" + "version of gvt driver" + "mdev type" + "aggregator count".
-> 
-> for an NVMe VF connecting to a remote storage. it could be
-> "PCI ID" + "driver version" + "configured remote storage URL"
-> 
-> for a QAT VF, it may be
-> "PCI ID" + "driver version" + "supported encryption set".
-> 
-> (to avoid namespace confliction from each vendor, we may prefix a driver name to
-> each migration_version string. e.g. i915-v1-8086-591d-i915-GVTg_V5_8-1)
-> 
-> 
-> (2) backgrounds
-> 
-> The reason we hope the migration_version string is opaque to the userspace
-> is that it is hard to generalize standard comparing fields and comparing
-> methods for different devices from different vendors.
-> Though userspace now could still do a simple string compare to check if
-> two devices are compatible, and result should also be right, it's still
-> too limited as it excludes the possible candidate whose migration_version
-> string fails to be equal.
-> e.g. an MDEV with mdev_type_1, aggregator count 3 is probably compatible
-> with another MDEV with mdev_type_3, aggregator count 1, even their
-> migration_version strings are not equal.
-> (assumed mdev_type_3 is of 3 times equal resources of mdev_type_1).
-> 
-> besides that, driver version + configured resources are all elements demanding
-> to take into account.
-> 
-> So, we hope leaving the freedom to vendor driver and let it make the final decision
-> in a simple reading from source side and writing for test in the target side way.
-> 
-> 
-> we then think the device compatibility issues for live migration with assigned
-> devices can be divided into two steps:
-> a. management tools filter out possible migration target devices.
->    Tags could be created according to info from product specification.
->    we think openstack/ovirt may have vendor proprietary components to create
->    those customized tags for each product from each vendor.
+Two small patches to fix compilation issues on 32bit:
 
->    for Intel vGPU, with a vGPU(a MDEV device) in source side, the tags to
->    search target vGPU are like:
->    a tag for compatible parent PCI IDs,
->    a tag for a range of gvt driver versions,
->    a tag for a range of mdev type + aggregator count
-> 
->    for NVMe VF, the tags to search target VF may be like:
->    a tag for compatible PCI IDs,
->    a tag for a range of driver versions,
->    a tag for URL of configured remote storage.
+one for a typo in x86/cstart
 
-Requiring management application developers to figure out this possible
-compatibility based on prod specs is really unrealistic. Product specs
-are typically as clear as mud, and with the suggestion we consider
-different rules for different types of devices, add up to a huge amount
-of complexity. This isn't something app developers should have to spend
-their time figuring out.
+one for a thinko in lib/alloc_page
 
-The suggestion that we make use of vendor proprietary helper components
-is totally unacceptable. We need to be able to build a solution that
-works with exclusively an open source software stack.
+notice that there is another patch for the lib/alloc_page issue floating
+around, this patch is an alternative to that one
 
-IMHO there needs to be a mechanism for the kernel to report via sysfs
-what versions are supported on a given device. This puts the job of
-reporting compatible versions directly under the responsibility of the
-vendor who writes the kernel driver for it. They are the ones with the
-best knowledge of the hardware they've built and the rules around its
-compatibility.
+Claudio Imbrenda (2):
+  x86/cstart: Fix compilation issue in 32 bit mode
+  lib/alloc_page: Fix compilation issue on 32bit archs
 
-> b. with the output from step a, openstack/ovirt/libvirt could use our proposed
->    device migration compatibility interface to make sure the two devices are
->    indeed live migration compatible before launching the real live migration
->    process to start stream copying, src device stopping and target device
->    resuming.
->    It is supposed that this step would not bring any performance penalty as
->    -in kernel it's just a simple string decoding and comparing
->    -in openstack/ovirt, it could be done by extending current function
->     check_can_live_migrate_destination, along side claiming target resources.[1]
+ lib/alloc_page.c | 5 +++--
+ x86/cstart.S     | 2 +-
+ 2 files changed, 4 insertions(+), 3 deletions(-)
 
-
-
-
-> 
-> 
-> [1] https://specs.openstack.org/openstack/nova-specs/specs/stein/approved/libvirt-neutron-sriov-livemigration.html
-> 
-> Thanks
-> Yan
-> 
-
-Regards,
-Daniel
 -- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+2.26.2
 
