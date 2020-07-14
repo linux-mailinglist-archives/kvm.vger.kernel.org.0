@@ -2,114 +2,137 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2777021F51F
-	for <lists+kvm@lfdr.de>; Tue, 14 Jul 2020 16:44:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2956D21F592
+	for <lists+kvm@lfdr.de>; Tue, 14 Jul 2020 16:58:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729320AbgGNOob (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 14 Jul 2020 10:44:31 -0400
-Received: from mail.kernel.org ([198.145.29.99]:54594 "EHLO mail.kernel.org"
+        id S1728591AbgGNO6E (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 14 Jul 2020 10:58:04 -0400
+Received: from mga07.intel.com ([134.134.136.100]:12857 "EHLO mga07.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728903AbgGNOjT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 14 Jul 2020 10:39:19 -0400
-Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id E47EA2253A;
-        Tue, 14 Jul 2020 14:39:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1594737558;
-        bh=QoEuy0hJIJikJq+yXPq8PDA+ZuxirAj2PA6pqi5aF04=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=UAKck29qGHrWok7TAjuCazyaaYhECVZmGLTj+Vs7h9ARRO3dAz8u1LZqowLRX8K+x
-         hOidSXp4ACVpPvnAD1cSt9FqJfF3bbIw1ETeavkzHgr8NVjpdb3b0nF+bhN+/zfd9z
-         JBW8r2RQDRQ31PPZ1vsZBUf9uV8xkiEM6Do599CM=
-From:   Sasha Levin <sashal@kernel.org>
-To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Christian Borntraeger <borntraeger@de.ibm.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        David Hildenbrand <david@redhat.com>,
-        Sasha Levin <sashal@kernel.org>, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.4 03/18] KVM: s390: reduce number of IO pins to 1
-Date:   Tue, 14 Jul 2020 10:38:59 -0400
-Message-Id: <20200714143914.4035489-3-sashal@kernel.org>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20200714143914.4035489-1-sashal@kernel.org>
-References: <20200714143914.4035489-1-sashal@kernel.org>
+        id S1725945AbgGNO6D (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 14 Jul 2020 10:58:03 -0400
+IronPort-SDR: UUPSdPv43zKVP5916ES/uPyZy4rSBsBZtu+ICvW//hLKNzAwnRLv07lfcwTZ+JC5jqCGGDalFa
+ 4fnufEDV3iuw==
+X-IronPort-AV: E=McAfee;i="6000,8403,9681"; a="213712377"
+X-IronPort-AV: E=Sophos;i="5.75,350,1589266800"; 
+   d="scan'208";a="213712377"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Jul 2020 07:58:02 -0700
+IronPort-SDR: euC00WWucM+6SDerOYDfTxj3LTS6S73U3L2AvfF07guM39z2RLQ5a2YKqXFXka4Kg9BbXbZJx1
+ N+OsmY7ARHNw==
+X-IronPort-AV: E=Sophos;i="5.75,350,1589266800"; 
+   d="scan'208";a="459714902"
+Received: from calinapo-mobl.amr.corp.intel.com (HELO [10.255.6.204]) ([10.255.6.204])
+  by orsmga005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Jul 2020 07:57:54 -0700
+Subject: Re: [PATCH] x86/bugs/multihit: Fix mitigation reporting when KVM is
+ not in use
+To:     Sean Christopherson <sean.j.christopherson@intel.com>,
+        Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
+Cc:     Borislav Petkov <bp@alien8.de>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, x86@kernel.org,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Tony Luck <tony.luck@intel.com>,
+        "Gomez Iglesias, Antonio" <antonio.gomez.iglesias@intel.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Fenghua Yu <fenghua.yu@intel.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Vincenzo Frascino <vincenzo.frascino@arm.com>,
+        Josh Poimboeuf <jpoimboe@redhat.com>,
+        Anthony Steinhauser <asteinhauser@google.com>,
+        Mike Rapoport <rppt@linux.ibm.com>,
+        Mark Gross <mgross@linux.intel.com>,
+        Waiman Long <longman@redhat.com>, linux-doc@vger.kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        Jonathan Corbet <corbet@lwn.net>
+References: <267631f4db4fd7e9f7ca789c2efaeab44103f68e.1594689154.git.pawan.kumar.gupta@linux.intel.com>
+ <20200714014540.GH29725@linux.intel.com>
+From:   Dave Hansen <dave.hansen@intel.com>
+Autocrypt: addr=dave.hansen@intel.com; keydata=
+ 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
+ z5cecg==
+Message-ID: <099d6985-9e9f-1d9f-7098-58a9e26e4450@intel.com>
+Date:   Tue, 14 Jul 2020 07:57:53 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.0
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
+In-Reply-To: <20200714014540.GH29725@linux.intel.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Christian Borntraeger <borntraeger@de.ibm.com>
+On 7/13/20 6:45 PM, Sean Christopherson wrote:
+> This is all kinds of backwards.  Virtualization being disabled in hardware
+> is very, very different than KVM not being loaded.  One requires at the
+> very least a kernel reboot to change, the other does not.
 
-[ Upstream commit 774911290c589e98e3638e73b24b0a4d4530e97c ]
+That's a very good point.
 
-The current number of KVM_IRQCHIP_NUM_PINS results in an order 3
-allocation (32kb) for each guest start/restart. This can result in OOM
-killer activity even with free swap when the memory is fragmented
-enough:
+It's a pretty slippery slope if we go trying to figure out at runtime
+what our vulnerabilities are.  We could, for instance, claim that we're
+not vulnerable to Meltdown until we run non-root code, or something else
+equally silly.
 
-kernel: qemu-system-s39 invoked oom-killer: gfp_mask=0x440dc0(GFP_KERNEL_ACCOUNT|__GFP_COMP|__GFP_ZERO), order=3, oom_score_adj=0
-kernel: CPU: 1 PID: 357274 Comm: qemu-system-s39 Kdump: loaded Not tainted 5.4.0-29-generic #33-Ubuntu
-kernel: Hardware name: IBM 8562 T02 Z06 (LPAR)
-kernel: Call Trace:
-kernel: ([<00000001f848fe2a>] show_stack+0x7a/0xc0)
-kernel:  [<00000001f8d3437a>] dump_stack+0x8a/0xc0
-kernel:  [<00000001f8687032>] dump_header+0x62/0x258
-kernel:  [<00000001f8686122>] oom_kill_process+0x172/0x180
-kernel:  [<00000001f8686abe>] out_of_memory+0xee/0x580
-kernel:  [<00000001f86e66b8>] __alloc_pages_slowpath+0xd18/0xe90
-kernel:  [<00000001f86e6ad4>] __alloc_pages_nodemask+0x2a4/0x320
-kernel:  [<00000001f86b1ab4>] kmalloc_order+0x34/0xb0
-kernel:  [<00000001f86b1b62>] kmalloc_order_trace+0x32/0xe0
-kernel:  [<00000001f84bb806>] kvm_set_irq_routing+0xa6/0x2e0
-kernel:  [<00000001f84c99a4>] kvm_arch_vm_ioctl+0x544/0x9e0
-kernel:  [<00000001f84b8936>] kvm_vm_ioctl+0x396/0x760
-kernel:  [<00000001f875df66>] do_vfs_ioctl+0x376/0x690
-kernel:  [<00000001f875e304>] ksys_ioctl+0x84/0xb0
-kernel:  [<00000001f875e39a>] __s390x_sys_ioctl+0x2a/0x40
-kernel:  [<00000001f8d55424>] system_call+0xd8/0x2c8
+Let's stick to things which are at least static per reboot.  Checking
+for X86_FEATURE_VMX or even CONFIG_KVM_INTEL seems like a good stopping
+point.  "Could this kernel run a naughty guest?"  If so, report
+"Vulnerable".  It's the same as Meltdown: "Could this kernel run
+untrusted code?"  If so, report "Vulnerable".
 
-As far as I can tell s390x does not use the iopins as we bail our for
-anything other than KVM_IRQ_ROUTING_S390_ADAPTER and the chip/pin is
-only used for KVM_IRQ_ROUTING_IRQCHIP. So let us use a small number to
-reduce the memory footprint.
-
-Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
-Reviewed-by: Cornelia Huck <cohuck@redhat.com>
-Reviewed-by: David Hildenbrand <david@redhat.com>
-Link: https://lore.kernel.org/r/20200617083620.5409-1-borntraeger@de.ibm.com
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- arch/s390/include/asm/kvm_host.h | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
-
-diff --git a/arch/s390/include/asm/kvm_host.h b/arch/s390/include/asm/kvm_host.h
-index abe60268335d2..0fe5600a037e4 100644
---- a/arch/s390/include/asm/kvm_host.h
-+++ b/arch/s390/include/asm/kvm_host.h
-@@ -31,12 +31,12 @@
- #define KVM_USER_MEM_SLOTS 32
- 
- /*
-- * These seem to be used for allocating ->chip in the routing table,
-- * which we don't use. 4096 is an out-of-thin-air value. If we need
-- * to look at ->chip later on, we'll need to revisit this.
-+ * These seem to be used for allocating ->chip in the routing table, which we
-+ * don't use. 1 is as small as we can get to reduce the needed memory. If we
-+ * need to look at ->chip later on, we'll need to revisit this.
-  */
- #define KVM_NR_IRQCHIPS 1
--#define KVM_IRQCHIP_NUM_PINS 4096
-+#define KVM_IRQCHIP_NUM_PINS 1
- #define KVM_HALT_POLL_NS_DEFAULT 50000
- 
- /* s390-specific vcpu->requests bit members */
--- 
-2.25.1
-
+I don't think we should care about random kernel modules flipping CR4
+bits.  They can do much more harm than expose a system to an issue like
+this.  If we care about reporting mitigation status once that happens,
+maybe out-of-tree modules loads should just flip *all* these cpu bugs
+from Mitigated->Vulerable. :)
