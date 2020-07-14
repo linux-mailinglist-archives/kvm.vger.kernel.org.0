@@ -2,19 +2,19 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id ACA8521F0AC
-	for <lists+kvm@lfdr.de>; Tue, 14 Jul 2020 14:16:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C951F21F0A8
+	for <lists+kvm@lfdr.de>; Tue, 14 Jul 2020 14:16:02 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728674AbgGNMP0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 14 Jul 2020 08:15:26 -0400
-Received: from 8bytes.org ([81.169.241.247]:53376 "EHLO theia.8bytes.org"
+        id S1728740AbgGNMPM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 14 Jul 2020 08:15:12 -0400
+Received: from 8bytes.org ([81.169.241.247]:53652 "EHLO theia.8bytes.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728310AbgGNMKx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 14 Jul 2020 08:10:53 -0400
+        id S1728324AbgGNMKz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 14 Jul 2020 08:10:55 -0400
 Received: from cap.home.8bytes.org (p5b006776.dip0.t-ipconnect.de [91.0.103.118])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
         (No client certificate requested)
-        by theia.8bytes.org (Postfix) with ESMTPSA id 470F0E6D;
+        by theia.8bytes.org (Postfix) with ESMTPSA id CB707F3C;
         Tue, 14 Jul 2020 14:10:51 +0200 (CEST)
 From:   Joerg Roedel <joro@8bytes.org>
 To:     x86@kernel.org
@@ -36,9 +36,9 @@ Cc:     Joerg Roedel <joro@8bytes.org>, Joerg Roedel <jroedel@suse.de>,
         Martin Radev <martin.b.radev@gmail.com>,
         linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         virtualization@lists.linux-foundation.org
-Subject: [PATCH v4 34/75] x86/head/64: Build k/head64.c with -fno-stack-protector
-Date:   Tue, 14 Jul 2020 14:08:36 +0200
-Message-Id: <20200714120917.11253-35-joro@8bytes.org>
+Subject: [PATCH v4 35/75] x86/head/64: Load IDT earlier
+Date:   Tue, 14 Jul 2020 14:08:37 +0200
+Message-Id: <20200714120917.11253-36-joro@8bytes.org>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20200714120917.11253-1-joro@8bytes.org>
 References: <20200714120917.11253-1-joro@8bytes.org>
@@ -51,31 +51,108 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Joerg Roedel <jroedel@suse.de>
 
-The code inserted by the stack protector does not work in the early
-boot environment because it uses the GS segment, at least with memory
-encryption enabled. Make sure the early code is compiled without this
-feature enabled.
+Load the IDT right after switching to virtual addresses in head_64.S
+so that the kernel can handle #VC exceptions.
 
 Signed-off-by: Joerg Roedel <jroedel@suse.de>
 ---
- arch/x86/kernel/Makefile | 4 ++++
- 1 file changed, 4 insertions(+)
+ arch/x86/include/asm/setup.h |  2 ++
+ arch/x86/kernel/head64.c     | 18 ++++++++++++++++++
+ arch/x86/kernel/head_64.S    | 28 ++++++++++++++++++++++++++++
+ 3 files changed, 48 insertions(+)
 
-diff --git a/arch/x86/kernel/Makefile b/arch/x86/kernel/Makefile
-index e77261db2391..1b166b866059 100644
---- a/arch/x86/kernel/Makefile
-+++ b/arch/x86/kernel/Makefile
-@@ -39,6 +39,10 @@ ifdef CONFIG_FRAME_POINTER
- OBJECT_FILES_NON_STANDARD_ftrace_$(BITS).o		:= y
- endif
+diff --git a/arch/x86/include/asm/setup.h b/arch/x86/include/asm/setup.h
+index 84b645cc8bc9..19ccb1211004 100644
+--- a/arch/x86/include/asm/setup.h
++++ b/arch/x86/include/asm/setup.h
+@@ -39,6 +39,7 @@ void vsmp_init(void);
+ static inline void vsmp_init(void) { }
+ #endif
  
-+# make sure head64.c is built without stack protector
-+nostackp := $(call cc-option, -fno-stack-protector)
-+CFLAGS_head64.o		:= $(nostackp)
 +
- # If instrumentation of this dir is enabled, boot hangs during first second.
- # Probably could be more selective here, but note that files related to irqs,
- # boot, dumpstack/stacktrace, etc are either non-interesting or can lead to
+ void setup_bios_corruption_check(void);
+ void early_platform_quirks(void);
+ 
+@@ -49,6 +50,7 @@ extern void i386_reserve_resources(void);
+ extern unsigned long __startup_64(unsigned long physaddr, struct boot_params *bp);
+ extern unsigned long __startup_secondary_64(void);
+ extern int early_make_pgtable(unsigned long address);
++extern void early_idt_setup_early_handler(unsigned long descr_addr, unsigned long physaddr);
+ 
+ #ifdef CONFIG_X86_INTEL_MID
+ extern void x86_intel_mid_early_setup(void);
+diff --git a/arch/x86/kernel/head64.c b/arch/x86/kernel/head64.c
+index 51059bfd4b99..3598c091ff24 100644
+--- a/arch/x86/kernel/head64.c
++++ b/arch/x86/kernel/head64.c
+@@ -508,3 +508,21 @@ void __init x86_64_start_reservations(char *real_mode_data)
+ 
+ 	start_kernel();
+ }
++
++void __head early_idt_setup_early_handler(unsigned long descr_addr, unsigned long physaddr)
++{
++	struct desc_ptr *descr = (struct desc_ptr *)descr_addr;
++	gate_desc *idt = (gate_desc *)descr->address;
++	int i;
++
++	idt = fixup_pointer(idt, physaddr);
++
++	for (i = 0; i < NUM_EXCEPTION_VECTORS; i++) {
++		struct idt_data data;
++		gate_desc desc;
++
++		init_idt_data(&data, i, early_idt_handler_array[i]);
++		idt_init_desc(&desc, &data);
++		native_write_idt_entry(idt, i, &desc);
++	}
++}
+diff --git a/arch/x86/kernel/head_64.S b/arch/x86/kernel/head_64.S
+index fcaa5dbd728a..8f9548071e84 100644
+--- a/arch/x86/kernel/head_64.S
++++ b/arch/x86/kernel/head_64.S
+@@ -105,6 +105,31 @@ SYM_CODE_START_NOALIGN(startup_64)
+ 	leaq	_text(%rip), %rdi
+ 	pushq	%rsi
+ 	call	__startup_64
++	/* Save return value */
++	pushq	%rax
++
++	/*
++	 * Load IDT with early handlers - needed for SEV-ES
++	 * Do this here because this must only happen on the boot CPU
++	 * and the code below is shared with secondary CPU bringup.
++	 */
++
++	/* IDT descriptor with pointer to IDT table as first parameter */
++	leaq	idt_descr(%rip), %rdi
++
++	/* Kernel _text offset as second parameter */
++	leaq	_text(%rip), %rsi
++
++	/*
++	 * Setup IDT with early entries - The entries already use virtual
++	 * addresses, so the IDT can't be used until the kernel switched to
++	 * virtual addresses too.
++	 */
++	call	early_idt_setup_early_handler
++
++	/* Restore __startup_64 return value*/
++	popq	%rax
++	/* Restore pointer to real_mode_data */
+ 	popq	%rsi
+ 
+ 	/* Form the CR3 value being sure to include the CR3 modifier */
+@@ -201,6 +226,9 @@ SYM_CODE_START(secondary_startup_64)
+ 	 */
+ 	movq initial_stack(%rip), %rsp
+ 
++	/* Load IDT */
++	lidt	idt_descr(%rip)
++
+ 	/* Check if nx is implemented */
+ 	movl	$0x80000001, %eax
+ 	cpuid
 -- 
 2.27.0
 
