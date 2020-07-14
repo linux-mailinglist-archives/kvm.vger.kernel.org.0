@@ -2,103 +2,143 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 931EA21E714
-	for <lists+kvm@lfdr.de>; Tue, 14 Jul 2020 06:43:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B98C521E79E
+	for <lists+kvm@lfdr.de>; Tue, 14 Jul 2020 07:40:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725816AbgGNEnk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 14 Jul 2020 00:43:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48282 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725306AbgGNEnk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 14 Jul 2020 00:43:40 -0400
-Received: from mail-lf1-x144.google.com (mail-lf1-x144.google.com [IPv6:2a00:1450:4864:20::144])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E1A56C061755
-        for <kvm@vger.kernel.org>; Mon, 13 Jul 2020 21:43:39 -0700 (PDT)
-Received: by mail-lf1-x144.google.com with SMTP id t74so10569960lff.2
-        for <kvm@vger.kernel.org>; Mon, 13 Jul 2020 21:43:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=qEP+SeQ8Nan2aFjB5HWY6BOGbALAKhAs4bQzQ/wO6bs=;
-        b=klN2+h2h57/N5kUwIxmCpK5L0jVCoVernvR4xYScVgBwMnTB07Dlok2pShnerwZTrX
-         8cQzIqiPuv4anEWYHImh0XKkDSD3tzMBpRbKSvHXhK6DxcDPkl8WjZD4tTjiEBHDO1B6
-         dBV5q9sRkQ5lcHZxH6o8I3VnTgb/lyUCFLOokBQw95VotXZsIsP95kVMuYWQxaiLkQnL
-         RvkWF+ItCLfv+yukQSZNRneHDnJCK/y0P/gl1TiY9/fIaOXN3AW8aNn+fZlUITF5jZEM
-         OaU2INFQMAALCc5bFQW7oK0LPnDmFk9ajBszcJgx+H5x2sR5KY30oLM9yIJNxhtF7CtZ
-         y0qg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=qEP+SeQ8Nan2aFjB5HWY6BOGbALAKhAs4bQzQ/wO6bs=;
-        b=SDUNYTJIrP1G+64AuLlHArHv6LRMh5c3feg3Ii3qmpGc8HtkFjI85IO2D3OJaDrqP5
-         ZLV+FzFMxevxZWBGJHq4bUS8ijnGQO92PFkaasHsoPd22Yfysc1e+NmRWQvIt8CWARUO
-         ksC01SbAmcT4hoRtquWtX3SEYEtvg5ZCzm08byEJ6wuk1Z6QZDknL5vcgT6+NhSfe9l8
-         bicEAKbGQNfhtD4hAO+gqF5KL1KY4wUay1V68BuNCfIfxfblGJKufn6skX/Q22YmGB7j
-         nig7OtcV2ZR1ymj0L6sdk/1t9mD0nsSo9Q25wUcpUJHTt3j48SHvqLVXjZlJIKSM5K+N
-         kMzA==
-X-Gm-Message-State: AOAM532ZcfIe+NknCMgI3FxnoERp5mQUtfWd6QJf+jXJskBnZHi8oYqQ
-        dpVN+pACGRJNcqYitUU3uGGCegEaYNU+QTue5AjR2Q==
-X-Google-Smtp-Source: ABdhPJzlCP1H3GjoMk5wm4MBXaitCOGbzsZc6U0zrQI7Lqk7WCNFDdw2YqNWjEjMoTVBtUHtV+l0W2bZ2cMu5DhVy1c=
-X-Received: by 2002:a19:e93:: with SMTP id 141mr1205791lfo.107.1594701817783;
- Mon, 13 Jul 2020 21:43:37 -0700 (PDT)
-MIME-Version: 1.0
-References: <20200714002355.538-1-sean.j.christopherson@intel.com> <20200714002355.538-2-sean.j.christopherson@intel.com>
-In-Reply-To: <20200714002355.538-2-sean.j.christopherson@intel.com>
-From:   Oliver Upton <oupton@google.com>
-Date:   Mon, 13 Jul 2020 21:43:26 -0700
-Message-ID: <CAOQ_QshGiwLmm5Sun8TOMJNwx3GFPB=YEMPkzwqczqV4aDYmsg@mail.gmail.com>
-Subject: Re: [kvm-unit-tests PATCH 1/2] nVMX: Restore active host RIP/CR4
- after test_host_addr_size()
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        id S1726375AbgGNFkO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 14 Jul 2020 01:40:14 -0400
+Received: from mga07.intel.com ([134.134.136.100]:29411 "EHLO mga07.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725306AbgGNFkO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 14 Jul 2020 01:40:14 -0400
+IronPort-SDR: 9P7nAcsnhmnqLDaTYOnxbFNxZ7+0vQJLs/Dn7P9ryN6qCT64IwTWR+MtV/XbHw2O0RSvGtULCA
+ BbJ3UbGSRuMA==
+X-IronPort-AV: E=McAfee;i="6000,8403,9681"; a="213622006"
+X-IronPort-AV: E=Sophos;i="5.75,350,1589266800"; 
+   d="scan'208";a="213622006"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Jul 2020 22:40:13 -0700
+IronPort-SDR: 8O3V/it4p0N6j+N7QEPzWNuCQ5U/VyDf2kVsZZjpwRZculpB/yqsVZ6ChpHCkWM+k6CU/n5I6/
+ JVf3sEmYaXEw==
+X-IronPort-AV: E=Sophos;i="5.75,350,1589266800"; 
+   d="scan'208";a="269919030"
+Received: from otcsectest.jf.intel.com (HELO 760745902f30) ([10.54.30.81])
+  by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Jul 2020 22:40:12 -0700
+Date:   Tue, 14 Jul 2020 05:36:33 +0000
+From:   "Andersen, John" <john.s.andersen@intel.com>,
+        Arvind Sankar <nivedita@alum.mit.edu>
+To:     Andy Lutomirski <luto@kernel.org>
+Cc:     Dave Hansen <dave.hansen@intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        X86 ML <x86@kernel.org>, "H. Peter Anvin" <hpa@zytor.com>,
+        Shuah Khan <shuah@kernel.org>,
+        Liran Alon <liran.alon@oracle.com>,
+        Andrew Jones <drjones@redhat.com>,
+        Rick Edgecombe <rick.p.edgecombe@intel.com>,
+        Kristen Carlson Accardi <kristen@linux.intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Mauro Carvalho Chehab <mchehab+huawei@kernel.org>,
+        Greg KH <gregkh@linuxfoundation.org>,
+        "Paul E. McKenney" <paulmck@kernel.org>,
+        Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
+        Juergen Gross <jgross@suse.com>,
+        Mike Kravetz <mike.kravetz@oracle.com>,
+        Oliver Neukum <oneukum@suse.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Fenghua Yu <fenghua.yu@intel.com>, reinette.chatre@intel.com,
+        vineela.tummalapalli@intel.com,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Arjan van de Ven <arjan@linux.intel.com>,
+        caoj.fnst@cn.fujitsu.com, Baoquan He <bhe@redhat.com>,
+        Kees Cook <keescook@chromium.org>,
+        Dan Williams <dan.j.williams@intel.com>, eric.auger@redhat.com,
+        aaronlewis@google.com, Peter Xu <peterx@redhat.com>,
+        makarandsonare@google.com,
+        "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
         kvm list <kvm@vger.kernel.org>,
-        Krish Sadhukhan <krish.sadhukhan@oracle.com>,
-        Karl Heubaum <karl.heubaum@oracle.com>,
-        Jim Mattson <jmattson@google.com>
-Content-Type: text/plain; charset="UTF-8"
+        "open list:KERNEL SELFTEST FRAMEWORK" 
+        <linux-kselftest@vger.kernel.org>,
+        Kernel Hardening <kernel-hardening@lists.openwall.com>
+Subject: Re: [PATCH 2/4] KVM: x86: Introduce paravirt feature CR0/CR4 pinning
+Message-ID: <20200714053633.GB25@760745902f30>
+References: <20200618144314.GB23@258ff54ff3c0>
+ <124a59a3-a603-701b-e3bb-61e83d70b20d@intel.com>
+ <20200707211244.GN20096@linux.intel.com>
+ <19b97891-bbb0-1061-5971-549a386f7cfb@intel.com>
+ <31eb5b00-9e2a-aa10-0f20-4abc3cd35112@redhat.com>
+ <20200709154412.GA25@64c96d3be97b>
+ <af6ac772-318d-aab0-ce5f-55cf92f6e96d@intel.com>
+ <CALCETrWxt0CHUoonWX1fgbM46ydJPQZhj8Q=G+45EG4wW3wZqQ@mail.gmail.com>
+ <6040c3b3-cac9-cc0e-f0de-baaa274920a2@intel.com>
+ <CALCETrUHcpqjDfAM9SbrZUM7xcS2wkVm=r1Nb1JmxV7A-KAeUQ@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CALCETrUHcpqjDfAM9SbrZUM7xcS2wkVm=r1Nb1JmxV7A-KAeUQ@mail.gmail.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jul 13, 2020 at 5:23 PM Sean Christopherson
-<sean.j.christopherson@intel.com> wrote:
->
-> Perform one last VMX transition to actually load the host's RIP and CR4
-> at the end of test_host_addr_size().  Simply writing the VMCS doesn't
-> restore the values in hardware, e.g. as is, CR4.PCIDE can be left set,
-> which causes spectacularly confusing explosions when other misguided
-> tests assume setting bit 63 in CR3 will cause a non-canonical #GP.
->
-> Fixes: 0786c0316ac05 ("kvm-unit-test: nVMX: Check Host Address Space Size on vmentry of nested guests")
-> Cc: Krish Sadhukhan <krish.sadhukhan@oracle.com>
-> Cc: Karl Heubaum <karl.heubaum@oracle.com>
-> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+On Thu, Jul 09, 2020 at 09:27:43AM -0700, Andy Lutomirski wrote:
+> On Thu, Jul 9, 2020 at 9:22 AM Dave Hansen <dave.hansen@intel.com> wrote:
+> >
+> > On 7/9/20 9:07 AM, Andy Lutomirski wrote:
+> > > On Thu, Jul 9, 2020 at 8:56 AM Dave Hansen <dave.hansen@intel.com> wrote:
+> > >> On 7/9/20 8:44 AM, Andersen, John wrote:
+> > >>>         Bits which are allowed to be pinned default to WP for CR0 and SMEP,
+> > >>>         SMAP, and UMIP for CR4.
+> > >> I think it also makes sense to have FSGSBASE in this set.
+> > >>
+> > >> I know it hasn't been tested, but I think we should do the legwork to
+> > >> test it.  If not in this set, can we agree that it's a logical next step?
+> > > I have no objection to pinning FSGSBASE, but is there a clear
+> > > description of the threat model that this whole series is meant to
+> > > address?  The idea is to provide a degree of protection against an
+> > > attacker who is able to convince a guest kernel to write something
+> > > inappropriate to CR4, right?  How realistic is this?
+> >
+> > If a quick search can find this:
+> >
+> > > https://googleprojectzero.blogspot.com/2017/05/exploiting-linux-kernel-via-packet.html
+> >
+> > I'd pretty confident that the guys doing actual bad things have it in
+> > their toolbox too.
+> >
+> 
+> True, but we have the existing software CR4 pinning.  I suppose the
+> virtualization version is stronger.
+> 
 
-Reviewed-by: Oliver Upton <oupton@google.com>
+Yes, as Kees said this will be stronger because it stops ROP and other gadget
+based techniques which avoid the use of native_write_cr0/4().
 
-> ---
->  x86/vmx_tests.c | 5 +++++
->  1 file changed, 5 insertions(+)
->
-> diff --git a/x86/vmx_tests.c b/x86/vmx_tests.c
-> index 29f3d0e..cb42a2d 100644
-> --- a/x86/vmx_tests.c
-> +++ b/x86/vmx_tests.c
-> @@ -7673,6 +7673,11 @@ static void test_host_addr_size(void)
->                 vmcs_write(ENT_CONTROLS, entry_ctrl_saved | ENT_GUEST_64);
->                 vmcs_write(HOST_RIP, rip_saved);
->                 vmcs_write(HOST_CR4, cr4_saved);
-> +
-> +               /* Restore host's active RIP and CR4 values. */
-> +               report_prefix_pushf("restore host state");
-> +               test_vmx_vmlaunch(0);
-> +               report_prefix_pop();
->         }
->  }
->
-> --
-> 2.26.0
->
+With regards to what should be done in this patchset and what in other
+patchsets. I have a fix for kexec thanks to Arvind's note about
+TRAMPOLINE_32BIT_CODE_SIZE. The physical host boots fine now and the virtual
+one can kexec fine.
+
+What remains to be done on that front is to add some identifying information to
+the kernel image to declare that it supports paravirtualized control register
+pinning or not.
+
+Liran suggested adding a section to the built image acting as a flag to signify
+support for being kexec'd by a kernel with pinning enabled. If anyone has any
+opinions on how they'd like to see this implemented please let me know.
+Otherwise I'll just take a stab at it and you'll all see it hopefully in the
+next version.
+
+With regards to FSGSBASE, are we open to validating and adding that to the
+DEFAULT set as a part of a separate patchset? This patchset is focused on
+replicating the functionality we already have natively.
