@@ -2,165 +2,60 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D659921E3BF
-	for <lists+kvm@lfdr.de>; Tue, 14 Jul 2020 01:40:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 05A5121E474
+	for <lists+kvm@lfdr.de>; Tue, 14 Jul 2020 02:23:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727052AbgGMXk5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 13 Jul 2020 19:40:57 -0400
-Received: from mga04.intel.com ([192.55.52.120]:11402 "EHLO mga04.intel.com"
+        id S1726374AbgGNAX5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 13 Jul 2020 20:23:57 -0400
+Received: from mga02.intel.com ([134.134.136.20]:36936 "EHLO mga02.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726914AbgGMXk4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 13 Jul 2020 19:40:56 -0400
-IronPort-SDR: LIcDGhfSoMiPZNdEq9Nv5qYcLJqVy6evB/32/9nPHgCxpDvZUmXidGOZz5qwZmq8czseTnUpT6
- t9KXY9wrVqTQ==
-X-IronPort-AV: E=McAfee;i="6000,8403,9681"; a="146232234"
+        id S1726345AbgGNAX5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 13 Jul 2020 20:23:57 -0400
+IronPort-SDR: oaOpJek9+Xia9ukedJ0paIbkoDgs3X7zv55BcmrTYj9SNJjErysOcS2j5cxISwf5XI3La3zxvB
+ HNhuVfau1inQ==
+X-IronPort-AV: E=McAfee;i="6000,8403,9681"; a="136910632"
 X-IronPort-AV: E=Sophos;i="5.75,349,1589266800"; 
-   d="scan'208";a="146232234"
+   d="scan'208";a="136910632"
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Jul 2020 16:40:55 -0700
-IronPort-SDR: 1h4vH42+Z+z04lQiJsHsZ/SrGC+OgsckHNxN2wpcL/TuqQCZFhkeb9V8EMvow3MFHWYQN5Jmel
- VTJOyInCWhbg==
+Received: from fmsmga007.fm.intel.com ([10.253.24.52])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Jul 2020 17:23:56 -0700
+IronPort-SDR: VlxafKPUXAubB0RJv5cEr74nJWQzIhtv3shcyhfJhPRunX7PwGH3GDzrPahdf0xbLkgav8te1y
+ sCIJQz8YBBAA==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.75,349,1589266800"; 
-   d="scan'208";a="299353622"
-Received: from joy-optiplex-7040.sh.intel.com (HELO joy-OptiPlex-7040) ([10.239.13.16])
-  by orsmga002.jf.intel.com with ESMTP; 13 Jul 2020 16:40:50 -0700
-Date:   Tue, 14 Jul 2020 07:29:57 +0800
-From:   Yan Zhao <yan.y.zhao@intel.com>
-To:     devel@ovirt.org, openstack-discuss@lists.openstack.org,
-        libvir-list@redhat.com
-Cc:     intel-gvt-dev@lists.freedesktop.org, kvm@vger.kernel.org,
-        qemu-devel@nongnu.org, berrange@redhat.com, smooney@redhat.com,
-        eskultet@redhat.com, alex.williamson@redhat.com, cohuck@redhat.com,
-        dinechin@redhat.com, corbet@lwn.net, kwankhede@nvidia.com,
-        dgilbert@redhat.com, eauger@redhat.com, jian-feng.ding@intel.com,
-        hejie.xu@intel.com, kevin.tian@intel.com, zhenyuw@linux.intel.com,
-        bao.yumeng@zte.com.cn, xin-ran.wang@intel.com,
-        shaohe.feng@intel.com
-Subject: device compatibility interface for live migration with assigned
- devices
-Message-ID: <20200713232957.GD5955@joy-OptiPlex-7040>
-Reply-To: Yan Zhao <yan.y.zhao@intel.com>
+   d="scan'208";a="268505771"
+Received: from sjchrist-coffee.jf.intel.com ([10.54.74.152])
+  by fmsmga007.fm.intel.com with ESMTP; 13 Jul 2020 17:23:56 -0700
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     kvm@vger.kernel.org, Krish Sadhukhan <krish.sadhukhan@oracle.com>,
+        Karl Heubaum <karl.heubaum@oracle.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Oliver Upton <oupton@google.com>,
+        Jim Mattson <jmattson@google.com>
+Subject: [kvm-unit-tests PATCH 0/2] nVMX: Two PCIDE related fixes
+Date:   Mon, 13 Jul 2020 17:23:53 -0700
+Message-Id: <20200714002355.538-1-sean.j.christopherson@intel.com>
+X-Mailer: git-send-email 2.26.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-User-Agent: Mutt/1.9.4 (2018-02-28)
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-hi folks,
-we are defining a device migration compatibility interface that helps upper
-layer stack like openstack/ovirt/libvirt to check if two devices are
-live migration compatible.
-The "devices" here could be MDEVs, physical devices, or hybrid of the two.
-e.g. we could use it to check whether
-- a src MDEV can migrate to a target MDEV,
-- a src VF in SRIOV can migrate to a target VF in SRIOV,
-- a src MDEV can migration to a target VF in SRIOV.
-  (e.g. SIOV/SRIOV backward compatibility case)
+PCIDE fixes for two completely unrelated tests that managed to combine
+powers and create a super confusing error where the MTF test loads CR3
+with 0 and sends things into the weeds.
 
-The upper layer stack could use this interface as the last step to check
-if one device is able to migrate to another device before triggering a real
-live migration procedure.
-we are not sure if this interface is of value or help to you. please don't
-hesitate to drop your valuable comments.
+Sean Christopherson (2):
+  nVMX: Restore active host RIP/CR4 after test_host_addr_size()
+  nVMX: Use the standard non-canonical value in test_mtf3
 
+ x86/vmx_tests.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
-(1) interface definition
-The interface is defined in below way:
-
-             __    userspace
-              /\              \
-             /                 \write
-            / read              \
-   ________/__________       ___\|/_____________
-  | migration_version |     | migration_version |-->check migration
-  ---------------------     ---------------------   compatibility
-     device A                    device B
-
-
-a device attribute named migration_version is defined under each device's
-sysfs node. e.g. (/sys/bus/pci/devices/0000\:00\:02.0/$mdev_UUID/migration_version).
-userspace tools read the migration_version as a string from the source device,
-and write it to the migration_version sysfs attribute in the target device.
-
-The userspace should treat ANY of below conditions as two devices not compatible:
-- any one of the two devices does not have a migration_version attribute
-- error when reading from migration_version attribute of one device
-- error when writing migration_version string of one device to
-  migration_version attribute of the other device
-
-The string read from migration_version attribute is defined by device vendor
-driver and is completely opaque to the userspace.
-for a Intel vGPU, string format can be defined like
-"parent device PCI ID" + "version of gvt driver" + "mdev type" + "aggregator count".
-
-for an NVMe VF connecting to a remote storage. it could be
-"PCI ID" + "driver version" + "configured remote storage URL"
-
-for a QAT VF, it may be
-"PCI ID" + "driver version" + "supported encryption set".
-
-(to avoid namespace confliction from each vendor, we may prefix a driver name to
-each migration_version string. e.g. i915-v1-8086-591d-i915-GVTg_V5_8-1)
-
-
-(2) backgrounds
-
-The reason we hope the migration_version string is opaque to the userspace
-is that it is hard to generalize standard comparing fields and comparing
-methods for different devices from different vendors.
-Though userspace now could still do a simple string compare to check if
-two devices are compatible, and result should also be right, it's still
-too limited as it excludes the possible candidate whose migration_version
-string fails to be equal.
-e.g. an MDEV with mdev_type_1, aggregator count 3 is probably compatible
-with another MDEV with mdev_type_3, aggregator count 1, even their
-migration_version strings are not equal.
-(assumed mdev_type_3 is of 3 times equal resources of mdev_type_1).
-
-besides that, driver version + configured resources are all elements demanding
-to take into account.
-
-So, we hope leaving the freedom to vendor driver and let it make the final decision
-in a simple reading from source side and writing for test in the target side way.
-
-
-we then think the device compatibility issues for live migration with assigned
-devices can be divided into two steps:
-a. management tools filter out possible migration target devices.
-   Tags could be created according to info from product specification.
-   we think openstack/ovirt may have vendor proprietary components to create
-   those customized tags for each product from each vendor.
-   e.g.
-   for Intel vGPU, with a vGPU(a MDEV device) in source side, the tags to
-   search target vGPU are like:
-   a tag for compatible parent PCI IDs,
-   a tag for a range of gvt driver versions,
-   a tag for a range of mdev type + aggregator count
-
-   for NVMe VF, the tags to search target VF may be like:
-   a tag for compatible PCI IDs,
-   a tag for a range of driver versions,
-   a tag for URL of configured remote storage.
-
-b. with the output from step a, openstack/ovirt/libvirt could use our proposed
-   device migration compatibility interface to make sure the two devices are
-   indeed live migration compatible before launching the real live migration
-   process to start stream copying, src device stopping and target device
-   resuming.
-   It is supposed that this step would not bring any performance penalty as
-   -in kernel it's just a simple string decoding and comparing
-   -in openstack/ovirt, it could be done by extending current function
-    check_can_live_migrate_destination, along side claiming target resources.[1]
-
-
-[1] https://specs.openstack.org/openstack/nova-specs/specs/stein/approved/libvirt-neutron-sriov-livemigration.html
-
-Thanks
-Yan
+-- 
+2.26.0
 
