@@ -2,158 +2,252 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C27B221FDE8
-	for <lists+kvm@lfdr.de>; Tue, 14 Jul 2020 21:54:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5556521FED2
+	for <lists+kvm@lfdr.de>; Tue, 14 Jul 2020 22:49:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729445AbgGNTye (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 14 Jul 2020 15:54:34 -0400
-Received: from mga05.intel.com ([192.55.52.43]:14481 "EHLO mga05.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726634AbgGNTye (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 14 Jul 2020 15:54:34 -0400
-IronPort-SDR: wsoxCM2zgg6v4TOMoOHx2Z1CHnK4ItRToVe65DXkrrLalS88t+EE6f3iRHMkMVpwqnJfRpWyx3
- G6wPcGDumzig==
-X-IronPort-AV: E=McAfee;i="6000,8403,9682"; a="233873753"
-X-IronPort-AV: E=Sophos;i="5.75,352,1589266800"; 
-   d="scan'208";a="233873753"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Jul 2020 12:54:31 -0700
-IronPort-SDR: PPq2wjG/VuBkxZQWD4RyuTVWXWXFLvv+HMF7lBFHDu2duafo7wT1B5gkBD2jnZ2+WOrFz8kTkL
- JFvUQHUOTZ5w==
-X-IronPort-AV: E=Sophos;i="5.75,352,1589266800"; 
-   d="scan'208";a="459811937"
-Received: from calinapo-mobl.amr.corp.intel.com (HELO [10.255.6.204]) ([10.255.6.204])
-  by orsmga005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Jul 2020 12:54:27 -0700
-Subject: Re: [PATCH] x86/bugs/multihit: Fix mitigation reporting when KVM is
- not in use
-To:     Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
-Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, x86@kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Tony Luck <tony.luck@intel.com>,
-        "Gomez Iglesias, Antonio" <antonio.gomez.iglesias@intel.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Fenghua Yu <fenghua.yu@intel.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Vincenzo Frascino <vincenzo.frascino@arm.com>,
-        Josh Poimboeuf <jpoimboe@redhat.com>,
-        Anthony Steinhauser <asteinhauser@google.com>,
-        Mike Rapoport <rppt@linux.ibm.com>,
-        Mark Gross <mgross@linux.intel.com>,
-        Waiman Long <longman@redhat.com>, linux-doc@vger.kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Jonathan Corbet <corbet@lwn.net>
-References: <267631f4db4fd7e9f7ca789c2efaeab44103f68e.1594689154.git.pawan.kumar.gupta@linux.intel.com>
- <20200714014540.GH29725@linux.intel.com>
- <099d6985-9e9f-1d9f-7098-58a9e26e4450@intel.com>
- <20200714191759.GA7116@guptapadev.amr>
-From:   Dave Hansen <dave.hansen@intel.com>
-Autocrypt: addr=dave.hansen@intel.com; keydata=
- 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
- z5cecg==
-Message-ID: <ba442a51-294e-8624-9a69-5613ff050551@intel.com>
-Date:   Tue, 14 Jul 2020 12:54:26 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
+        id S1727788AbgGNUrb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 14 Jul 2020 16:47:31 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:28890 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726442AbgGNUrb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 14 Jul 2020 16:47:31 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1594759648;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=8umdrM37U6a6XZjrgtkvMu3RYrDH+UAXw+egZm/UTKQ=;
+        b=g4CqDRB06M2Zz10eNNer555hKWXEr1/av+JCB3VBom9R54WJ/NIBC0IlfmYHwHAakN/jev
+        GDJg2oeUO52VoZ5UKsMEbYkfuksgD6SHR0yI+KVNC3tCs3CSc8dZvf+IKwdDshAQAW0gGE
+        YBKwRwKSstvPfZVFDhD03oMXx6aPFd0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-264-9NN1jPDHMCiBgYKFXjPtBA-1; Tue, 14 Jul 2020 16:47:27 -0400
+X-MC-Unique: 9NN1jPDHMCiBgYKFXjPtBA-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7B6171080;
+        Tue, 14 Jul 2020 20:47:24 +0000 (UTC)
+Received: from x1.home (ovpn-112-71.phx2.redhat.com [10.3.112.71])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 59FC31992D;
+        Tue, 14 Jul 2020 20:47:16 +0000 (UTC)
+Date:   Tue, 14 Jul 2020 14:47:15 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     "Daniel P. =?UTF-8?B?QmVycmFuZ8Op?=" <berrange@redhat.com>
+Cc:     Yan Zhao <yan.y.zhao@intel.com>, devel@ovirt.org,
+        openstack-discuss@lists.openstack.org, libvir-list@redhat.com,
+        intel-gvt-dev@lists.freedesktop.org, kvm@vger.kernel.org,
+        qemu-devel@nongnu.org, smooney@redhat.com, eskultet@redhat.com,
+        cohuck@redhat.com, dinechin@redhat.com, corbet@lwn.net,
+        kwankhede@nvidia.com, dgilbert@redhat.com, eauger@redhat.com,
+        jian-feng.ding@intel.com, hejie.xu@intel.com, kevin.tian@intel.com,
+        zhenyuw@linux.intel.com, bao.yumeng@zte.com.cn,
+        xin-ran.wang@intel.com, shaohe.feng@intel.com
+Subject: Re: device compatibility interface for live migration with assigned
+ devices
+Message-ID: <20200714144715.0ef70074@x1.home>
+In-Reply-To: <20200714164722.GL25187@redhat.com>
+References: <20200713232957.GD5955@joy-OptiPlex-7040>
+        <20200714102129.GD25187@redhat.com>
+        <20200714101616.5d3a9e75@x1.home>
+        <20200714164722.GL25187@redhat.com>
+Organization: Red Hat
 MIME-Version: 1.0
-In-Reply-To: <20200714191759.GA7116@guptapadev.amr>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 7/14/20 12:17 PM, Pawan Gupta wrote:
-> On Tue, Jul 14, 2020 at 07:57:53AM -0700, Dave Hansen wrote:
->> Let's stick to things which are at least static per reboot.  Checking
->> for X86_FEATURE_VMX or even CONFIG_KVM_INTEL seems like a good stopping
->> point.  "Could this kernel run a naughty guest?"  If so, report
->> "Vulnerable".  It's the same as Meltdown: "Could this kernel run
->> untrusted code?"  If so, report "Vulnerable".
-> 
-> Thanks, These are good inputs. So what I need to add is a boot time
-> check for VMX feature and report "Vulnerable" or "Not
-> affected(VMX disabled)".
-> 
-> Are you suggesting to not change the reporting when KVM deploys the
-> "Split huge pages" mitigation? Is this because VMX can still be used by
-> other VMMs?
-> 
-> The current mitigation reporting is very specific to KVM:
-> 
-> 	- "KVM: Vulnerable"
-> 	- "KVM: Mitigation: Split huge pages"
-> 
-> As the kernel doesn't know about the mitigation state of out-of-tree
-> VMMs can we add VMX reporting to always say vulnerable when VMX is
-> enabled:
-> 
-> 	- "VMX: Vulnerable, KVM: Vulnerable"
-> 	- "VMX: Vulnerable, KVM: Mitigation: Split huge pages"
-> 
-> And if VMX is disabled report:
-> 
-> 	- "VMX: Not affected(VMX disabled)"
+On Tue, 14 Jul 2020 17:47:22 +0100
+Daniel P. Berrang=C3=A9 <berrange@redhat.com> wrote:
 
-I see three inputs and four possible states (sorry for the ugly table,
-it was this or a spreadsheet :):
+> On Tue, Jul 14, 2020 at 10:16:16AM -0600, Alex Williamson wrote:
+> > On Tue, 14 Jul 2020 11:21:29 +0100
+> > Daniel P. Berrang=C3=A9 <berrange@redhat.com> wrote:
+> >  =20
+> > > On Tue, Jul 14, 2020 at 07:29:57AM +0800, Yan Zhao wrote: =20
+> > > >=20
+> > > > The string read from migration_version attribute is defined by devi=
+ce vendor
+> > > > driver and is completely opaque to the userspace.
+> > > > for a Intel vGPU, string format can be defined like
+> > > > "parent device PCI ID" + "version of gvt driver" + "mdev type" + "a=
+ggregator count".
+> > > >=20
+> > > > for an NVMe VF connecting to a remote storage. it could be
+> > > > "PCI ID" + "driver version" + "configured remote storage URL"
+> > > >=20
+> > > > for a QAT VF, it may be
+> > > > "PCI ID" + "driver version" + "supported encryption set".
+> > > >=20
+> > > > (to avoid namespace confliction from each vendor, we may prefix a d=
+river name to
+> > > > each migration_version string. e.g. i915-v1-8086-591d-i915-GVTg_V5_=
+8-1) =20
+> >=20
+> > It's very strange to define it as opaque and then proceed to describe
+> > the contents of that opaque string.  The point is that its contents
+> > are defined by the vendor driver to describe the device, driver version,
+> > and possibly metadata about the configuration of the device.  One
+> > instance of a device might generate a different string from another.
+> > The string that a device produces is not necessarily the only string
+> > the vendor driver will accept, for example the driver might support
+> > backwards compatible migrations. =20
+>=20
+>=20
+> > > IMHO there needs to be a mechanism for the kernel to report via sysfs
+> > > what versions are supported on a given device. This puts the job of
+> > > reporting compatible versions directly under the responsibility of the
+> > > vendor who writes the kernel driver for it. They are the ones with the
+> > > best knowledge of the hardware they've built and the rules around its
+> > > compatibility. =20
+> >=20
+> > The version string discussed previously is the version string that
+> > represents a given device, possibly including driver information,
+> > configuration, etc.  I think what you're asking for here is an
+> > enumeration of every possible version string that a given device could
+> > accept as an incoming migration stream.  If we consider the string as
+> > opaque, that means the vendor driver needs to generate a separate
+> > string for every possible version it could accept, for every possible
+> > configuration option.  That potentially becomes an excessive amount of
+> > data to either generate or manage.
+> >=20
+> > Am I overestimating how vendors intend to use the version string? =20
+>=20
+> If I'm interpreting your reply & the quoted text orrectly, the version
+> string isn't really a version string in any normal sense of the word
+> "version".
+>=20
+> Instead it sounds like string encoding a set of features in some arbitrary
+> vendor specific format, which they parse and do compatibility checks on
+> individual pieces ? One or more parts may contain a version number, but
+> its much more than just a version.
+>=20
+> If that's correct, then I'd prefer we didn't call it a version string,
+> instead call it a "capability string" to make it clear it is expressing
+> a much more general concept, but...
 
-X86_FEATURE_VMX	CONFIG_KVM_*	hpage split  Result	   Reason
-	N		x	    x	     Not Affected  No VMX
-	Y		N	    x	     Not affected  No KVM
-	Y		Y	    Y	     Mitigated	   hpage split
-	Y		Y	    N	     Vulnerable
+I'd agree with that.  The intent of the previous proposal was to
+provide and interface for reading a string and writing a string back in
+where the result of that write indicated migration compatibility with
+the device.  So yes, "version" is not the right term.
+=20
+> > We'd also need to consider devices that we could create, for instance
+> > providing the same interface enumeration prior to creating an mdev
+> > device to have a confidence level that the new device would be a valid
+> > target.
+> >=20
+> > We defined the string as opaque to allow vendor flexibility and because
+> > defining a common format is hard.  Do we need to revisit this part of
+> > the discussion to define the version string as non-opaque with parsing
+> > rules, probably with separate incoming vs outgoing interfaces?  Thanks,=
+ =20
+>=20
+> ..even if the huge amount of flexibility is technically relevant from the
+> POV of the hardware/drivers, we should consider whether management apps
+> actually want, or can use, that level of flexibility.
+>=20
+> The task of picking which host to place a VM on has alot of factors to
+> consider, and when there are a large number of hosts, the total amount
+> of information to check gets correspondingly large.  The placement
+> process is also fairly performance critical.
+>=20
+> Running complex algorithmic logic to check compatibility of devices
+> based on a arbitrary set of rules is likely to be a performance
+> challenge. A flat list of supported strings is a much simpler
+> thing to check as it reduces down to a simple set membership test.
+>=20
+> IOW, even if there's some complex set of device type / vendor specific
+> rules to check for compatibility, I fear apps will ignore them and
+> just define a very simplified list of compatible string, and ignore
+> all the extra flexibility.
 
-I don't think we should worry about out-of-tree VMX.
+There's always the "try it and see if it works" interface, which is
+essentially what we have currently.  With even a simple version of what
+we're trying to accomplish here, there's still a risk that a management
+engine might rather just ignore it and restrict themselves to 1:1 mdev
+type matches, with or without knowing anything about the vendor driver
+version, relying on the migration to fail quickly if the devices are
+incompatible.  If the complexity of the interface makes it too
+complicated or time consuming to provide sufficient value above such an
+algorithm, there's not much point to implementing it, which is why Yan
+has included so many people in this discussion.
+
+> I'm sure OpenStack maintainers can speak to this more, as they've put
+> alot of work into their scheduling engine to optimize the way it places
+> VMs largely driven from simple structured data reported from hosts.
+
+I think we've weeded out that our intended approach is not worthwhile,
+testing a compatibility string at a device is too much overhead, we
+need to provide enough information to the management engine to predict
+the response without interaction beyond the initial capability probing.
+
+As you've identified above, we're really dealing with more than a
+simple version, we need to construct a compatibility string and we need
+to start defining what goes into that.
+
+The first item seems to be that we're defining compatibility relative
+to a vfio migration stream, vfio devices have a device API, such as
+vfio-pci, so the first attribute might simply define the device API.
+Once we have a class of devices we might then be able to use bus
+specific attributes, for example the PCI vendor and device ID (other
+bus types TBD).
+
+We probably also need driver version numbers, so we need to include
+both the driver name as well as version major and minor numbers.  Rules
+need to be put in place around what we consider to be viable version
+matches, potentially as Sean described.  For example, does the major
+version require a match?  Do we restrict to only formward, ie.
+increasing, minor number matches within that major verison?
+
+Do we then also have section that includes any required device
+attributes to result in a compatible device.  This would be largely
+focused on mdev, but I wouldn't rule out others.  For example if an
+aggregation parameter is required to maintain compatibility, we'd want
+to specify that as a required attribute.
+
+So maybe we end up with something like:
+
+{
+  "device_api": "vfio-pci",
+  "vendor": "vendor-driver-name",
+  "version": {
+    "major": 0,
+    "minor": 1
+  },
+  "vfio-pci": { // Based on above device_api
+    "vendor": 0x1234, // Values for the exposed device
+    "device": 0x5678,
+      // Possibly further parameters for a more specific match
+  }
+  "mdev_attrs": [
+    { "attribute0": "VALUE" }
+  ]
+}
+
+The sysfs interface would return an array containing one or more of
+these for each device supported.  I'm trying to account for things like
+aggregation via the mdev_attrs section, but I haven't really put it all
+together yet.  I think Intel folks want to be able to say mdev type
+foo-3 is compatible with mdev type foo-1 so long as foo-1 is created
+with an aggregation attribute value of 3, but I expect both foo-1 and
+foo-3 would have the same user visible PCI vendor:device IDs  If we
+use mdev type rather than the resulting device IDs, then we introduce
+an barrier to phys<->mdev migration.  We could specify the subsystem
+values though, for example foo-1 might correspond to subsystem IDs
+8086:0001 and foo3 8086:0003, then we can specify that creating an
+foo-1 from this device doesn't require any attributes, but creating a
+foo-3 does.  I'm nervous how that scales though.
+
+NB. I'm also considering how portions of this might be compatible with
+mdevctl such that we could direct mdevctl to create a compatible device
+using information from this compatibility interface.
+
+Thanks,
+Alex
+
