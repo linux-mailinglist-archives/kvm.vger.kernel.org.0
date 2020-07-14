@@ -2,20 +2,20 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2FBC821F0AD
-	for <lists+kvm@lfdr.de>; Tue, 14 Jul 2020 14:16:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id ACA8521F0AC
+	for <lists+kvm@lfdr.de>; Tue, 14 Jul 2020 14:16:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728919AbgGNMP1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 14 Jul 2020 08:15:27 -0400
-Received: from 8bytes.org ([81.169.241.247]:52886 "EHLO theia.8bytes.org"
+        id S1728674AbgGNMP0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 14 Jul 2020 08:15:26 -0400
+Received: from 8bytes.org ([81.169.241.247]:53376 "EHLO theia.8bytes.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728305AbgGNMKx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        id S1728310AbgGNMKx (ORCPT <rfc822;kvm@vger.kernel.org>);
         Tue, 14 Jul 2020 08:10:53 -0400
 Received: from cap.home.8bytes.org (p5b006776.dip0.t-ipconnect.de [91.0.103.118])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
         (No client certificate requested)
-        by theia.8bytes.org (Postfix) with ESMTPSA id B421AE6C;
-        Tue, 14 Jul 2020 14:10:50 +0200 (CEST)
+        by theia.8bytes.org (Postfix) with ESMTPSA id 470F0E6D;
+        Tue, 14 Jul 2020 14:10:51 +0200 (CEST)
 From:   Joerg Roedel <joro@8bytes.org>
 To:     x86@kernel.org
 Cc:     Joerg Roedel <joro@8bytes.org>, Joerg Roedel <jroedel@suse.de>,
@@ -36,9 +36,9 @@ Cc:     Joerg Roedel <joro@8bytes.org>, Joerg Roedel <jroedel@suse.de>,
         Martin Radev <martin.b.radev@gmail.com>,
         linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         virtualization@lists.linux-foundation.org
-Subject: [PATCH v4 33/75] x86/head/64: Switch to initial stack earlier
-Date:   Tue, 14 Jul 2020 14:08:35 +0200
-Message-Id: <20200714120917.11253-34-joro@8bytes.org>
+Subject: [PATCH v4 34/75] x86/head/64: Build k/head64.c with -fno-stack-protector
+Date:   Tue, 14 Jul 2020 14:08:36 +0200
+Message-Id: <20200714120917.11253-35-joro@8bytes.org>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20200714120917.11253-1-joro@8bytes.org>
 References: <20200714120917.11253-1-joro@8bytes.org>
@@ -51,46 +51,31 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Joerg Roedel <jroedel@suse.de>
 
-Make sure there is a stack once the kernel runs from virual addresses.
-At this stage any secondary CPU which boots will have lost its stack
-because the kernel switched to a new page-table which does not map the
-real-mode stack anymore.
-
-This is needed for handling early #VC exceptions caused by instructions
-like CPUID.
+The code inserted by the stack protector does not work in the early
+boot environment because it uses the GS segment, at least with memory
+encryption enabled. Make sure the early code is compiled without this
+feature enabled.
 
 Signed-off-by: Joerg Roedel <jroedel@suse.de>
 ---
- arch/x86/kernel/head_64.S | 9 ++++++---
- 1 file changed, 6 insertions(+), 3 deletions(-)
+ arch/x86/kernel/Makefile | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/arch/x86/kernel/head_64.S b/arch/x86/kernel/head_64.S
-index 61aa1e56fc9c..fcaa5dbd728a 100644
---- a/arch/x86/kernel/head_64.S
-+++ b/arch/x86/kernel/head_64.S
-@@ -195,6 +195,12 @@ SYM_CODE_START(secondary_startup_64)
- 	movl	initial_gs+4(%rip),%edx
- 	wrmsr
+diff --git a/arch/x86/kernel/Makefile b/arch/x86/kernel/Makefile
+index e77261db2391..1b166b866059 100644
+--- a/arch/x86/kernel/Makefile
++++ b/arch/x86/kernel/Makefile
+@@ -39,6 +39,10 @@ ifdef CONFIG_FRAME_POINTER
+ OBJECT_FILES_NON_STANDARD_ftrace_$(BITS).o		:= y
+ endif
  
-+	/*
-+	 * Setup a boot time stack - Any secondary CPU will have lost its stack
-+	 * by now because the cr3-switch above unmaps the real-mode stack
-+	 */
-+	movq initial_stack(%rip), %rsp
++# make sure head64.c is built without stack protector
++nostackp := $(call cc-option, -fno-stack-protector)
++CFLAGS_head64.o		:= $(nostackp)
 +
- 	/* Check if nx is implemented */
- 	movl	$0x80000001, %eax
- 	cpuid
-@@ -215,9 +221,6 @@ SYM_CODE_START(secondary_startup_64)
- 	/* Make changes effective */
- 	movq	%rax, %cr0
- 
--	/* Setup a boot time stack */
--	movq initial_stack(%rip), %rsp
--
- 	/* zero EFLAGS after setting rsp */
- 	pushq $0
- 	popfq
+ # If instrumentation of this dir is enabled, boot hangs during first second.
+ # Probably could be more selective here, but note that files related to irqs,
+ # boot, dumpstack/stacktrace, etc are either non-interesting or can lead to
 -- 
 2.27.0
 
