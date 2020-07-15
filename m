@@ -2,99 +2,112 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 60AE12213EB
-	for <lists+kvm@lfdr.de>; Wed, 15 Jul 2020 20:05:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5B447221451
+	for <lists+kvm@lfdr.de>; Wed, 15 Jul 2020 20:34:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726752AbgGOSEO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 Jul 2020 14:04:14 -0400
-Received: from mga02.intel.com ([134.134.136.20]:13905 "EHLO mga02.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725861AbgGOSEN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 15 Jul 2020 14:04:13 -0400
-IronPort-SDR: LbO8jKw5ZHl11eoddSiR1x2+s/pFVyY/vlu7wIZpVc36X49PhCg7KxW8SaB9baqmXpKc21EZ41
- ULTmnGAeGamQ==
-X-IronPort-AV: E=McAfee;i="6000,8403,9683"; a="137374654"
-X-IronPort-AV: E=Sophos;i="5.75,356,1589266800"; 
-   d="scan'208";a="137374654"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Jul 2020 11:04:13 -0700
-IronPort-SDR: AFEfHv5iEkqe3m2mqnAPe003c26KBkwJz0CViX8toVUivl89IWg0iJNlJ1jpV8USflBvoWpZmC
- 1/iuUBAKXMiA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.75,356,1589266800"; 
-   d="scan'208";a="460181880"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.152])
-  by orsmga005.jf.intel.com with ESMTP; 15 Jul 2020 11:04:13 -0700
-Date:   Wed, 15 Jul 2020 11:04:13 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
-Cc:     Dave Hansen <dave.hansen@intel.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, x86@kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Tony Luck <tony.luck@intel.com>,
-        "Gomez Iglesias, Antonio" <antonio.gomez.iglesias@intel.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Fenghua Yu <fenghua.yu@intel.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Vincenzo Frascino <vincenzo.frascino@arm.com>,
-        Josh Poimboeuf <jpoimboe@redhat.com>,
-        Anthony Steinhauser <asteinhauser@google.com>,
-        Mike Rapoport <rppt@linux.ibm.com>,
-        Mark Gross <mgross@linux.intel.com>,
-        Waiman Long <longman@redhat.com>, linux-doc@vger.kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Jonathan Corbet <corbet@lwn.net>
-Subject: Re: [PATCH] x86/bugs/multihit: Fix mitigation reporting when KVM is
- not in use
-Message-ID: <20200715180413.GB12349@linux.intel.com>
-References: <267631f4db4fd7e9f7ca789c2efaeab44103f68e.1594689154.git.pawan.kumar.gupta@linux.intel.com>
- <20200714014540.GH29725@linux.intel.com>
- <099d6985-9e9f-1d9f-7098-58a9e26e4450@intel.com>
- <20200714191759.GA7116@guptapadev.amr>
- <ba442a51-294e-8624-9a69-5613ff050551@intel.com>
- <20200714210442.GA10488@guptapadev.amr>
- <e12cd3b8-7df1-94e8-e603-39e00648c026@intel.com>
- <20200715005130.GE14404@linux.intel.com>
- <20200715171820.GA12379@guptapadev.amr>
+        id S1726898AbgGOSey (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 15 Jul 2020 14:34:54 -0400
+Received: from aserp2120.oracle.com ([141.146.126.78]:33786 "EHLO
+        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726034AbgGOSey (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 15 Jul 2020 14:34:54 -0400
+Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
+        by aserp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 06FIXUfb138835;
+        Wed, 15 Jul 2020 18:34:49 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2020-01-29;
+ bh=6I12/FdoxOF4xdt6/G3zFI4SqIdDm8HDV/2dXSrs7ps=;
+ b=OYbm8LrdLFebrx8Uq0QXvPdz6Ub/18yYBiFiwBX9Iv/64vSdjtGN+4Z1apKK9lDHHdrL
+ dSDT2JTBodyDbAzm5Og3ZCCssbLE5DHfrUNUhN3qGD/o7+M6ExXlYonMHzNefS8kwCpY
+ xV2yGvRcnYbZvfb2eNwkTsIU2uVoiKtkYj5KQhR7QEU3Y23hPU3YijHZuUhujdZt9IJG
+ bbjJKl4YL/6SomG31+nfjSxJSrpX7IWbjrfvXBdn2SpuovScWfGALGgJ1fumDnAD4fiq
+ WWNC1/+p6b+beuFx7z9Qm8Q8j4ZMwS8E3P6yERV7OdPSOyJubD11einTTIIf5o6yDNWP +w== 
+Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
+        by aserp2120.oracle.com with ESMTP id 3275cmd36a-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
+        Wed, 15 Jul 2020 18:34:49 +0000
+Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
+        by aserp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 06FIXeuh085868;
+        Wed, 15 Jul 2020 18:34:48 GMT
+Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
+        by aserp3030.oracle.com with ESMTP id 327q0rrr41-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 15 Jul 2020 18:34:48 +0000
+Received: from abhmp0009.oracle.com (abhmp0009.oracle.com [141.146.116.15])
+        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 06FIYl37027485;
+        Wed, 15 Jul 2020 18:34:47 GMT
+Received: from localhost.localdomain (/10.159.239.115)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Wed, 15 Jul 2020 11:34:47 -0700
+Subject: Re: [kvm-unit-tests PATCH 1/2] nVMX: Restore active host RIP/CR4
+ after test_host_addr_size()
+To:     Sean Christopherson <sean.j.christopherson@intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     kvm@vger.kernel.org, Karl Heubaum <karl.heubaum@oracle.com>,
+        Oliver Upton <oupton@google.com>,
+        Jim Mattson <jmattson@google.com>
+References: <20200714002355.538-1-sean.j.christopherson@intel.com>
+ <20200714002355.538-2-sean.j.christopherson@intel.com>
+From:   Krish Sadhukhan <krish.sadhukhan@oracle.com>
+Message-ID: <378edd35-38eb-1d62-8471-f111c17afee7@oracle.com>
+Date:   Wed, 15 Jul 2020 11:34:46 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200715171820.GA12379@guptapadev.amr>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+In-Reply-To: <20200714002355.538-2-sean.j.christopherson@intel.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9683 signatures=668680
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxscore=0 malwarescore=0 spamscore=0
+ mlxlogscore=999 bulkscore=0 adultscore=0 phishscore=0 suspectscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
+ definitions=main-2007150143
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9683 signatures=668680
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 priorityscore=1501
+ bulkscore=0 adultscore=0 lowpriorityscore=0 phishscore=0 spamscore=0
+ impostorscore=0 malwarescore=0 mlxlogscore=999 clxscore=1011 mlxscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
+ definitions=main-2007150143
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jul 15, 2020 at 10:18:20AM -0700, Pawan Gupta wrote:
-> On Tue, Jul 14, 2020 at 05:51:30PM -0700, Sean Christopherson wrote:
-> > On Tue, Jul 14, 2020 at 02:20:59PM -0700, Dave Hansen wrote:
-> > > On 7/14/20 2:04 PM, Pawan Gupta wrote:
-> > > >> I see three inputs and four possible states (sorry for the ugly table,
-> > > >> it was this or a spreadsheet :):
-> > > >>
-> > > >> X86_FEATURE_VMX	CONFIG_KVM_*	hpage split  Result	   Reason
-> > > >> 	N			x	    x	     Not Affected  No VMX
-> > > >> 	Y			N	    x	     Not affected  No KVM
-> > 
-> > This line item is pointless, the relevant itlb_multihit_show_state()
-> > implementation depends on CONFIG_KVM_INTEL.  The !KVM_INTEL version simply
-> > prints ""Processor vulnerable".
-> 
-> While we are on it, for CONFIG_KVM_INTEL=n would it make sense to report "Not
-> affected(No KVM)"? "Processor vulnerable" is not telling much about the
-> mitigation.
 
-I know we don't care too much about out-of-tree hypervisors, but IMO stating
-"Not affected" is unnecessarily hostile and "Processor vulnerable" is an
-accurate statement.
+On 7/13/20 5:23 PM, Sean Christopherson wrote:
+> Perform one last VMX transition to actually load the host's RIP and CR4
+> at the end of test_host_addr_size().  Simply writing the VMCS doesn't
+> restore the values in hardware, e.g. as is, CR4.PCIDE can be left set,
+> which causes spectacularly confusing explosions when other misguided
+> tests assume setting bit 63 in CR3 will cause a non-canonical #GP.
+>
+> Fixes: 0786c0316ac05 ("kvm-unit-test: nVMX: Check Host Address Space Size on vmentry of nested guests")
+> Cc: Krish Sadhukhan <krish.sadhukhan@oracle.com>
+> Cc: Karl Heubaum <karl.heubaum@oracle.com>
+> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+> ---
+>   x86/vmx_tests.c | 5 +++++
+>   1 file changed, 5 insertions(+)
+>
+> diff --git a/x86/vmx_tests.c b/x86/vmx_tests.c
+> index 29f3d0e..cb42a2d 100644
+> --- a/x86/vmx_tests.c
+> +++ b/x86/vmx_tests.c
+> @@ -7673,6 +7673,11 @@ static void test_host_addr_size(void)
+>   		vmcs_write(ENT_CONTROLS, entry_ctrl_saved | ENT_GUEST_64);
+>   		vmcs_write(HOST_RIP, rip_saved);
+>   		vmcs_write(HOST_CR4, cr4_saved);
+> +
+> +		/* Restore host's active RIP and CR4 values. */
+> +		report_prefix_pushf("restore host state");
+> +		test_vmx_vmlaunch(0);
+> +		report_prefix_pop();
+>   	}
+>   }
+>   
+Just for my understanding.  When you say, "other misguided tests", which 
+tests are you referring to ?  In the current sequence of tests in 
+vmx_host_state_area_test(), test_load_host_perf_global_ctrl() is the  
+one that follows and it runs fine.
