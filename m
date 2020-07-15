@@ -2,83 +2,91 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 984EE220198
-	for <lists+kvm@lfdr.de>; Wed, 15 Jul 2020 03:04:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C06992201BD
+	for <lists+kvm@lfdr.de>; Wed, 15 Jul 2020 03:23:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727840AbgGOBEl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 14 Jul 2020 21:04:41 -0400
-Received: from mga04.intel.com ([192.55.52.120]:29311 "EHLO mga04.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726962AbgGOBEk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 14 Jul 2020 21:04:40 -0400
-IronPort-SDR: zVKxatvGwfhciKZvFCykYATBurvA8doSX6RumBn/EPvcZkUkarm86IYsHDERMxHMr4OhGPDl8W
- 9+uvHk6BpHgQ==
-X-IronPort-AV: E=McAfee;i="6000,8403,9682"; a="146563181"
-X-IronPort-AV: E=Sophos;i="5.75,353,1589266800"; 
-   d="scan'208";a="146563181"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Jul 2020 18:04:38 -0700
-IronPort-SDR: gbYlDs4Ly5SqxpHpBIogAaCvu597r+FyU8UGFhHgLyt2iKxmSwIjEagGJ2FHxrymAQvdzZX+Ad
- hhl4enV8Ea0w==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.75,353,1589266800"; 
-   d="scan'208";a="459891197"
-Received: from allen-box.sh.intel.com (HELO [10.239.159.139]) ([10.239.159.139])
-  by orsmga005.jf.intel.com with ESMTP; 14 Jul 2020 18:04:36 -0700
-Cc:     baolu.lu@linux.intel.com,
-        Jean-Philippe Brucker <jean-philippe@linaro.org>,
-        Kevin Tian <kevin.tian@intel.com>,
-        Dave Jiang <dave.jiang@intel.com>,
-        Ashok Raj <ashok.raj@intel.com>, kvm@vger.kernel.org,
-        Cornelia Huck <cohuck@redhat.com>,
-        linux-kernel@vger.kernel.org, iommu@lists.linux-foundation.org,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Robin Murphy <robin.murphy@arm.com>
-Subject: Re: [PATCH v3 4/4] vfio/type1: Use iommu_aux_at(de)tach_group() APIs
-To:     Jacob Pan <jacob.jun.pan@linux.intel.com>,
-        Christoph Hellwig <hch@infradead.org>
-References: <20200714055703.5510-1-baolu.lu@linux.intel.com>
- <20200714055703.5510-5-baolu.lu@linux.intel.com>
- <20200714082514.GA30622@infradead.org>
- <20200714092930.4b61b77c@jacob-builder>
-From:   Lu Baolu <baolu.lu@linux.intel.com>
-Message-ID: <ac4507d5-a5fc-d078-9bfc-f9e9fd1244e7@linux.intel.com>
-Date:   Wed, 15 Jul 2020 09:00:00 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
+        id S1728047AbgGOBXX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 14 Jul 2020 21:23:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43158 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728023AbgGOBXR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 14 Jul 2020 21:23:17 -0400
+Received: from mail-pf1-x442.google.com (mail-pf1-x442.google.com [IPv6:2607:f8b0:4864:20::442])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9008FC061794
+        for <kvm@vger.kernel.org>; Tue, 14 Jul 2020 18:23:16 -0700 (PDT)
+Received: by mail-pf1-x442.google.com with SMTP id z3so641547pfn.12
+        for <kvm@vger.kernel.org>; Tue, 14 Jul 2020 18:23:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=NT375/NWnBuLf4KzmogX9uCvmnJa241H/PijGYCo0Rk=;
+        b=bimL89L0BNwd4ir3o2j2V/AyCZ2jVBpqFkU8fi/kDsbmwoDWfcozJeb3xUXgm++f9+
+         1U8Y1/W2AS591JgD3TETxDCp/+qzMH2RffI2AGu37PYQLqP9cI6PXEVdUuxRX36GauNw
+         dKzr1hUEyzapgzl8H0hVFH+9sUvWDXwzCjRLA=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=NT375/NWnBuLf4KzmogX9uCvmnJa241H/PijGYCo0Rk=;
+        b=o2vYXynL5VwA9/dKF15y4EQ4RuEyjOmNR+9tap1Yan9OYOwMzZeLu+lt1XXJoMrS1x
+         l9NHwFFUyhvq3hxyOmsLcu7CvpKtbPd5d+I5+c0uxyfOkcRdDLEQMTCsoQa+IYM+rOPj
+         DMvLx1mZfd16Nj6CcC6cbGyf8ZlkBNqpoJzw3GEndJkSRebzYrCXb18rexuuM6LuJJ66
+         YE/arUdJ/SpXa+q58seaABqz8CCjWi0yi2SZ28+yeIs4umYkz9vBJYLyHaJIICIoosdw
+         X1NqUO5gq3XTzH51ShTJxrhOXmAcc2ub8EIZh/l3QGABVQCw8cmd6aq6I8nukCDRpbp/
+         lFrw==
+X-Gm-Message-State: AOAM530DD0bfEtmi4WDQMvKkZQIB7FSjTU/RAgru5NcYucGOxx3toNIn
+        yVV+BSzxYefb1cvw5kjThZqS1w==
+X-Google-Smtp-Source: ABdhPJzfbFkAdUV1tVZNSCYI/nTLerjov6WaHg2IDFRE3YJozMZNUHsxrGh7aJib+qaIcupcJ1NajA==
+X-Received: by 2002:a63:405:: with SMTP id 5mr5473617pge.449.1594776196084;
+        Tue, 14 Jul 2020 18:23:16 -0700 (PDT)
+Received: from www.outflux.net (smtp.outflux.net. [198.145.64.163])
+        by smtp.gmail.com with ESMTPSA id d4sm306378pgf.9.2020.07.14.18.23.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 14 Jul 2020 18:23:15 -0700 (PDT)
+Date:   Tue, 14 Jul 2020 18:23:14 -0700
+From:   Kees Cook <keescook@chromium.org>
+To:     Joerg Roedel <joro@8bytes.org>
+Cc:     x86@kernel.org, Joerg Roedel <jroedel@suse.de>, hpa@zytor.com,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Jiri Slaby <jslaby@suse.cz>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Juergen Gross <jgross@suse.com>,
+        David Rientjes <rientjes@google.com>,
+        Cfir Cohen <cfir@google.com>,
+        Erdem Aktas <erdemaktas@google.com>,
+        Masami Hiramatsu <mhiramat@kernel.org>,
+        Mike Stunes <mstunes@vmware.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Martin Radev <martin.b.radev@gmail.com>,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org
+Subject: Re: [PATCH v4 13/75] x86/boot/compressed/64: Rename kaslr_64.c to
+ ident_map_64.c
+Message-ID: <202007141823.65F31DE0@keescook>
+References: <20200714120917.11253-1-joro@8bytes.org>
+ <20200714120917.11253-14-joro@8bytes.org>
 MIME-Version: 1.0
-In-Reply-To: <20200714092930.4b61b77c@jacob-builder>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200714120917.11253-14-joro@8bytes.org>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Christoph and Jacob,
-
-On 7/15/20 12:29 AM, Jacob Pan wrote:
-> On Tue, 14 Jul 2020 09:25:14 +0100
-> Christoph Hellwig<hch@infradead.org>  wrote:
+On Tue, Jul 14, 2020 at 02:08:15PM +0200, Joerg Roedel wrote:
+> From: Joerg Roedel <jroedel@suse.de>
 > 
->> On Tue, Jul 14, 2020 at 01:57:03PM +0800, Lu Baolu wrote:
->>> Replace iommu_aux_at(de)tach_device() with
->>> iommu_aux_at(de)tach_group(). It also saves the
->>> IOMMU_DEV_FEAT_AUX-capable physcail device in the vfio_group data
->>> structure so that it could be reused in other places.
->> This removes the last user of iommu_aux_attach_device and
->> iommu_aux_detach_device, which can be removed now.
-> it is still used in patch 2/4 inside iommu_aux_attach_group(), right?
+> The file contains only code related to identity mapped page-tables.
+> Rename the file and compile it always in.
 > 
+> Signed-off-by: Joerg Roedel <jroedel@suse.de>
 
-There is a need to use this interface. For example, an aux-domain is
-attached to a subset of a physical device and used in the kernel. In
-this usage scenario, there's no need to use vfio/mdev. The device driver
-could just allocate an aux-domain and call iommu_aux_attach_device() to
-setup the iommu.
+Reviewed-by: Kees Cook <keescook@chromium.org>
 
-Best regards,
-baolu
+-- 
+Kees Cook
