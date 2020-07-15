@@ -2,133 +2,96 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4165F220741
-	for <lists+kvm@lfdr.de>; Wed, 15 Jul 2020 10:31:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 42A5E220782
+	for <lists+kvm@lfdr.de>; Wed, 15 Jul 2020 10:36:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728606AbgGOIbZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 Jul 2020 04:31:25 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:24270 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1727925AbgGOIbZ (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 15 Jul 2020 04:31:25 -0400
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 06F82Ape195078;
-        Wed, 15 Jul 2020 04:31:18 -0400
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 329r1hj68q-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 15 Jul 2020 04:31:18 -0400
-Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 06F82BB1195254;
-        Wed, 15 Jul 2020 04:31:17 -0400
-Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 329r1hj682-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 15 Jul 2020 04:31:17 -0400
-Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
-        by ppma04ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 06F8Polw007759;
-        Wed, 15 Jul 2020 08:31:16 GMT
-Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
-        by ppma04ams.nl.ibm.com with ESMTP id 329nmygdpn-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 15 Jul 2020 08:31:15 +0000
-Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
-        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 06F8VCiU64618744
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 15 Jul 2020 08:31:13 GMT
-Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id DC6F152057;
-        Wed, 15 Jul 2020 08:31:12 +0000 (GMT)
-Received: from oc3016276355.ibm.com (unknown [9.145.79.52])
-        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 0AF4552054;
-        Wed, 15 Jul 2020 08:31:11 +0000 (GMT)
-From:   Pierre Morel <pmorel@linux.ibm.com>
-To:     linux-kernel@vger.kernel.org
+        id S1730260AbgGOIgZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 15 Jul 2020 04:36:25 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:59803 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1729302AbgGOIgY (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 15 Jul 2020 04:36:24 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1594802183;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=MNvetRDl2vilUXFbqgzafA8aBGGCQYNGMYLuLzvct9U=;
+        b=T3gPvTDmkfeeWqx6IwI/uer9QCzHpnnmC8Lvb+LlK5Gpiv+IhqgFPd+FQDis5kGKmYnLJC
+        RKNrASeazLz3iNlP5flXYn01uW6wMDp5zSk2lX2lI71DAO0B/u9Pmorb0B15cnz7fEYid4
+        8QQ12P1mR2Qwxc9oqSibrMy956N1MkU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-195-WsPBMdGtNm-5uARAGULH1w-1; Wed, 15 Jul 2020 04:36:19 -0400
+X-MC-Unique: WsPBMdGtNm-5uARAGULH1w-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D42101083E94;
+        Wed, 15 Jul 2020 08:36:17 +0000 (UTC)
+Received: from [10.72.13.230] (ovpn-13-230.pek2.redhat.com [10.72.13.230])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 9C4D679CE4;
+        Wed, 15 Jul 2020 08:36:11 +0000 (UTC)
+Subject: Re: [PATCH v7 0/2] s390: virtio: let arch validate VIRTIO features
+To:     Pierre Morel <pmorel@linux.ibm.com>, linux-kernel@vger.kernel.org
 Cc:     pasic@linux.ibm.com, borntraeger@de.ibm.com, frankja@linux.ibm.com,
-        mst@redhat.com, jasowang@redhat.com, cohuck@redhat.com,
-        kvm@vger.kernel.org, linux-s390@vger.kernel.org,
+        mst@redhat.com, cohuck@redhat.com, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org,
         virtualization@lists.linux-foundation.org, thomas.lendacky@amd.com,
         david@gibson.dropbear.id.au, linuxram@us.ibm.com,
         hca@linux.ibm.com, gor@linux.ibm.com
-Subject: [PATCH v7 2/2] s390: virtio: PV needs VIRTIO I/O device protection
-Date:   Wed, 15 Jul 2020 10:31:09 +0200
-Message-Id: <1594801869-13365-3-git-send-email-pmorel@linux.ibm.com>
-X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <1594801869-13365-1-git-send-email-pmorel@linux.ibm.com>
 References: <1594801869-13365-1-git-send-email-pmorel@linux.ibm.com>
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
- definitions=2020-07-15_05:2020-07-15,2020-07-15 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 malwarescore=0
- priorityscore=1501 spamscore=0 mlxlogscore=999 lowpriorityscore=0
- impostorscore=0 adultscore=0 mlxscore=0 bulkscore=0 phishscore=0
- suspectscore=1 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2006250000 definitions=main-2007150063
+From:   Jason Wang <jasowang@redhat.com>
+Message-ID: <73459586-3315-44cf-8d82-13a394bdf115@redhat.com>
+Date:   Wed, 15 Jul 2020 16:36:10 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
+MIME-Version: 1.0
+In-Reply-To: <1594801869-13365-1-git-send-email-pmorel@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-If protected virtualization is active on s390, the virtio queues are
-not accessible to the host, unless VIRTIO_F_IOMMU_PLATFORM has been
-negotiated. Use the new arch_validate_virtio_features() interface to
-fail probe if that's not the case, preventing a host error on access
-attempt.
 
-Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
-Reviewed-by: Cornelia Huck <cohuck@redhat.com>
-Acked-by: Halil Pasic <pasic@linux.ibm.com>
-Acked-by: Christian Borntraeger <borntraeger@de.ibm.com>
----
- arch/s390/mm/init.c | 28 ++++++++++++++++++++++++++++
- 1 file changed, 28 insertions(+)
+On 2020/7/15 下午4:31, Pierre Morel wrote:
+> Hi all,
+>
+> The goal of the series is to give a chance to the architecture
+> to validate VIRTIO device features.
+>
+> in this respin:
+>
+> 1) I kept removed the ack from Jason as I reworked the patch
+>     @Jason, the nature and goal of the patch did not really changed
+>             please can I get back your acked-by with these changes?
 
-diff --git a/arch/s390/mm/init.c b/arch/s390/mm/init.c
-index 6dc7c3b60ef6..d39af6554d4f 100644
---- a/arch/s390/mm/init.c
-+++ b/arch/s390/mm/init.c
-@@ -45,6 +45,7 @@
- #include <asm/kasan.h>
- #include <asm/dma-mapping.h>
- #include <asm/uv.h>
-+#include <linux/virtio_config.h>
- 
- pgd_t swapper_pg_dir[PTRS_PER_PGD] __section(.bss..swapper_pg_dir);
- 
-@@ -161,6 +162,33 @@ bool force_dma_unencrypted(struct device *dev)
- 	return is_prot_virt_guest();
- }
- 
-+/*
-+ * arch_validate_virtio_features
-+ * @dev: the VIRTIO device being added
-+ *
-+ * Return an error if required features are missing on a guest running
-+ * with protected virtualization.
-+ */
-+int arch_validate_virtio_features(struct virtio_device *dev)
-+{
-+	if (!is_prot_virt_guest())
-+		return 0;
-+
-+	if (!virtio_has_feature(dev, VIRTIO_F_VERSION_1)) {
-+		dev_warn(&dev->dev,
-+			 "legacy virtio not supported with protected virtualization\n");
-+		return -ENODEV;
-+	}
-+
-+	if (!virtio_has_feature(dev, VIRTIO_F_IOMMU_PLATFORM)) {
-+		dev_warn(&dev->dev,
-+			 "support for limited memory access required for protected virtualization\n");
-+		return -ENODEV;
-+	}
-+
-+	return 0;
-+}
-+
- /* protected virtualization */
- static void pv_init(void)
- {
--- 
-2.25.1
+
+Yes.
+
+Acked-by: Jason Wang <jasowang@redhat.com>
+
+Thanks
+
+
+>
+> 2) Rewording for warning messages
+>
+> Regards,
+> Pierre
+>
+> Pierre Morel (2):
+>    virtio: let arch validate VIRTIO features
+>    s390: virtio: PV needs VIRTIO I/O device protection
+>
+>   arch/s390/mm/init.c           | 28 ++++++++++++++++++++++++++++
+>   drivers/virtio/virtio.c       | 19 +++++++++++++++++++
+>   include/linux/virtio_config.h |  1 +
+>   3 files changed, 48 insertions(+)
+>
 
