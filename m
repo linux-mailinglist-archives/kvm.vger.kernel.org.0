@@ -2,49 +2,30 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8A6D42208A5
-	for <lists+kvm@lfdr.de>; Wed, 15 Jul 2020 11:25:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8E4952208B3
+	for <lists+kvm@lfdr.de>; Wed, 15 Jul 2020 11:27:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730664AbgGOJZW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 Jul 2020 05:25:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60952 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729672AbgGOJZW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 15 Jul 2020 05:25:22 -0400
-Received: from merlin.infradead.org (merlin.infradead.org [IPv6:2001:8b0:10b:1231::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 15F65C061755;
-        Wed, 15 Jul 2020 02:25:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=merlin.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=dK8UwzUTgUNLePBN/9TrjpAB3tyGtmDfMqWT0SbBnEY=; b=SYThOw0DKQ59j+xOZ9e7s9giuM
-        tDfpXRj67AxyxcDD/DruSpiV3lLLocgumIGHcor3cLJvMbB67U/P86WHzwLBDWnMM7/VE7d5DilUf
-        4YM2HlWFCuP5zJIWETM4zuvR53OwsBKsLKMox2dndow+qB3qgoNDTu5XP018d/PmLoVEQc1+4SV8H
-        EWEbQpfJpVa6/+Ui67qnx6GgCoPLKU0raNxCb0U6Ww2OCVdoVtagwaYzi4qgDr5u/1i9S5Ss2tK9y
-        XIbatbd4Y1yNWkVo40PSHRKeEh/tlULCWSefU7V9Uf0In+2TOyvTgUB9j1R0/FONOEmAyGtW0Sf5P
-        TNZ6ff8Q==;
-Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=noisy.programming.kicks-ass.net)
-        by merlin.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1jvdeu-0001jJ-Bk; Wed, 15 Jul 2020 09:25:00 +0000
-Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (Client did not present a certificate)
-        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 4FE7C305B23;
-        Wed, 15 Jul 2020 11:24:56 +0200 (CEST)
-Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
-        id 438C6207A6655; Wed, 15 Jul 2020 11:24:56 +0200 (CEST)
-Date:   Wed, 15 Jul 2020 11:24:56 +0200
-From:   Peter Zijlstra <peterz@infradead.org>
-To:     Joerg Roedel <joro@8bytes.org>
-Cc:     x86@kernel.org, Joerg Roedel <jroedel@suse.de>, hpa@zytor.com,
+        id S1730680AbgGOJ0m (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 15 Jul 2020 05:26:42 -0400
+Received: from [195.135.220.15] ([195.135.220.15]:36262 "EHLO mx2.suse.de"
+        rhost-flags-FAIL-FAIL-OK-OK) by vger.kernel.org with ESMTP
+        id S1729869AbgGOJ0m (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 15 Jul 2020 05:26:42 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.221.27])
+        by mx2.suse.de (Postfix) with ESMTP id 0D1F0AF6F;
+        Wed, 15 Jul 2020 09:26:44 +0000 (UTC)
+Date:   Wed, 15 Jul 2020 11:26:38 +0200
+From:   Joerg Roedel <jroedel@suse.de>
+To:     Kees Cook <keescook@chromium.org>
+Cc:     Joerg Roedel <joro@8bytes.org>, x86@kernel.org, hpa@zytor.com,
         Andy Lutomirski <luto@kernel.org>,
         Dave Hansen <dave.hansen@linux.intel.com>,
+        Peter Zijlstra <peterz@infradead.org>,
         Jiri Slaby <jslaby@suse.cz>,
         Dan Williams <dan.j.williams@intel.com>,
         Tom Lendacky <thomas.lendacky@amd.com>,
         Juergen Gross <jgross@suse.com>,
-        Kees Cook <keescook@chromium.org>,
         David Rientjes <rientjes@google.com>,
         Cfir Cohen <cfir@google.com>,
         Erdem Aktas <erdemaktas@google.com>,
@@ -54,36 +35,43 @@ Cc:     x86@kernel.org, Joerg Roedel <jroedel@suse.de>, hpa@zytor.com,
         Martin Radev <martin.b.radev@gmail.com>,
         linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         virtualization@lists.linux-foundation.org
-Subject: Re: [PATCH v4 00/75] x86: SEV-ES Guest Support
-Message-ID: <20200715092456.GE10769@hirez.programming.kicks-ass.net>
+Subject: Re: [PATCH v4 70/75] x86/head/64: Don't call verify_cpu() on
+ starting APs
+Message-ID: <20200715092638.GJ16200@suse.de>
 References: <20200714120917.11253-1-joro@8bytes.org>
+ <20200714120917.11253-71-joro@8bytes.org>
+ <202007141837.2B93BBD78@keescook>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200714120917.11253-1-joro@8bytes.org>
+In-Reply-To: <202007141837.2B93BBD78@keescook>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jul 14, 2020 at 02:08:02PM +0200, Joerg Roedel wrote:
-> The #VC entry code now tries to pretend that the #VC handler does not
-> use an IST stack by switching to the task stack if entered from
-> user-mode or the SYSCALL entry path. When it is entered from
-> kernel-mode it is doing its best to switch back to the interrupted
-> stack. This is only possible if it is entered from a known and safe
-> kernel stack (e.g. not the entry stack). If the previous stack is not
-> safe to use the #VC handler switches to a fall-back stack and calls a
-> special handler function which, as of now, just panics the system. For
-> now this is safe as #VC exceptions only happen at know places which
-> use a safe stack.
-> 
-> The use of the fall-back stack is necessary so that the special
-> handler function can safely raise nested #VC exceptions, for
-> example to print a panic message.
+Hi Kees,
 
-Can we get some more words -- preferably in actual code comments, on
-when exactly #VC happens?
+thanks for your reviews!
 
-Because the only thing I remember is that #VC could happen on any memop,
-but I also have vague memories of that being a later extention.
+On Tue, Jul 14, 2020 at 06:40:30PM -0700, Kees Cook wrote:
+> Eek, no. MSR_IA32_MISC_ENABLE_XD_DISABLE needs to be cleared very early
+> during CPU startup; this can't just be skipped.
+
+That MSR is Intel-only, right? The boot-path installed here is only used
+for SEV-ES guests, running on AMD systems, so this MSR is not even
+accessed during boot on those VMs.
+
+The alternative is to set up exception handling prior to calling
+verify_cpu, including segments, stack and IDT. Given that verify_cpu()
+does not add much value to SEV-ES guests, I'd like to avoid adding this
+complexity.
+
+> Also, is UNWIND_HINT_EMPTY needed for the new target?
+
+Yes, I think it is, will add it in the next version.
+
+Regards,
+
+	Joerg
