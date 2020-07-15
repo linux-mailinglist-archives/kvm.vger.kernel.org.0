@@ -2,94 +2,148 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BD44F220951
-	for <lists+kvm@lfdr.de>; Wed, 15 Jul 2020 11:56:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8153922095E
+	for <lists+kvm@lfdr.de>; Wed, 15 Jul 2020 12:01:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730742AbgGOJ4J (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 Jul 2020 05:56:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37518 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726511AbgGOJ4J (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 15 Jul 2020 05:56:09 -0400
-Received: from merlin.infradead.org (merlin.infradead.org [IPv6:2001:8b0:10b:1231::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 28DE2C061755;
-        Wed, 15 Jul 2020 02:56:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=merlin.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=icvsh0UAC9qH2aXd5iDWHDNfzNryn9ZQFj2YeE2x3Lo=; b=aVqwxJf/YogDENWanh6k54iAGI
-        9UWG/KMCQJeVdsLop0VPQ79Zr/SQfouIqOsOlLMxUwWnqkkXy4Oh6Sdw/0KZmzWZ+HycSExS2RqNy
-        4dCX+oEmw4S4UUGMrF4jUES2V8rnOvJZW5gkCi41UyGni8n7w/OrL1RNO/WQxMeHqsC2fiV7h7ERZ
-        78bzlQI2ze2+W5xpUlOrrCFcz/VkLV+AAj1M68CU/vKoQVKVDI+82A0HARYOp8qUjd6peTUn0XET0
-        PNeM9BfgcQNefofCusAPr5QFt3rPrPGPI7BUEVpSgW60HTQaWwS/lB8IqzlYdsOcP1WPds8VPAGzb
-        ri6mySkA==;
-Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=noisy.programming.kicks-ass.net)
-        by merlin.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1jve8s-0001Wv-P0; Wed, 15 Jul 2020 09:55:59 +0000
-Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (Client did not present a certificate)
-        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id E514A302753;
-        Wed, 15 Jul 2020 11:55:56 +0200 (CEST)
-Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
-        id D1352207A6655; Wed, 15 Jul 2020 11:55:56 +0200 (CEST)
-Date:   Wed, 15 Jul 2020 11:55:56 +0200
-From:   Peter Zijlstra <peterz@infradead.org>
-To:     Joerg Roedel <jroedel@suse.de>
-Cc:     Joerg Roedel <joro@8bytes.org>, x86@kernel.org, hpa@zytor.com,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Jiri Slaby <jslaby@suse.cz>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Juergen Gross <jgross@suse.com>,
-        Kees Cook <keescook@chromium.org>,
-        David Rientjes <rientjes@google.com>,
-        Cfir Cohen <cfir@google.com>,
-        Erdem Aktas <erdemaktas@google.com>,
-        Masami Hiramatsu <mhiramat@kernel.org>,
-        Mike Stunes <mstunes@vmware.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Martin Radev <martin.b.radev@gmail.com>,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org
-Subject: Re: [PATCH v4 00/75] x86: SEV-ES Guest Support
-Message-ID: <20200715095556.GI10769@hirez.programming.kicks-ass.net>
-References: <20200714120917.11253-1-joro@8bytes.org>
- <20200715092456.GE10769@hirez.programming.kicks-ass.net>
- <20200715093426.GK16200@suse.de>
+        id S1730950AbgGOKBk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 15 Jul 2020 06:01:40 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:29817 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1730940AbgGOKBi (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 15 Jul 2020 06:01:38 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1594807296;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=HekGS7tagFCyUygsCpeQ/B9KX+evKC/CjFFwusa1ifg=;
+        b=aVwRCI7f+dVnG4OVY6t3rh6vm3oR7QaN4b+lgLFBnPbaUxt0QpohtOb2Fcj2bFWlqWdUz0
+        Q+iKc3noQuXCzmQLdHj0S2YARTGVkwUiNUCQUl+q+tAdI4Q8h4L2SzN08O2sg1N33tBpnK
+        n5RsvSNIl5N9uVeJAS1809QFQtSd3E0=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-362-WAnH4nhkPD6xf3i1NJD_Kg-1; Wed, 15 Jul 2020 06:01:34 -0400
+X-MC-Unique: WAnH4nhkPD6xf3i1NJD_Kg-1
+Received: by mail-wr1-f71.google.com with SMTP id i10so733718wrn.21
+        for <kvm@vger.kernel.org>; Wed, 15 Jul 2020 03:01:34 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=HekGS7tagFCyUygsCpeQ/B9KX+evKC/CjFFwusa1ifg=;
+        b=QtzvUiQxXqTFxtMCoi/Z9d5/YSAaDCwT3aTakjX5teqGlJNAejNKD3rEsjQYSPEC1r
+         obOFQsWgx1vBipI0psDRtvZBfPWNZLf8l3Hh7U3kIYGGY+SstpelKTNMDn6dehBWh8ff
+         32txxEep7E3Ben3nR4Pd0yjgFYDXs66icb4CoNVr5H0W6Mf+T2T/mDEnGwAV5wxO59FA
+         JaeqkDWP1H5Uitpch5F3ut+iMXMnbc9uvEpVL6I2nrwspElcqOyMzI2dspBJvIu5zBiP
+         pg1BauSxrBvZWs31PvX+bLQ75i+424eGZp7iMS/+K/BYXFmiz9QBC7aLstfJLIC9YoaR
+         OkYA==
+X-Gm-Message-State: AOAM530j8lvZlrVV/AcjkL8jiaxMkgOYVA2bEu6+wmL71x1TSS57RCZw
+        TquChdLFzVO3py1atpPs4I7wtRyJ8jDtrXZ3srFoO8uaagbqi2m0wJkyw9nTEsESlSH+bvBGcyf
+        VqXOrAW6/3qw/
+X-Received: by 2002:a7b:cf10:: with SMTP id l16mr7919857wmg.93.1594807293286;
+        Wed, 15 Jul 2020 03:01:33 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJw1WZv6wCcqcC8E09KqCGI8Gy46vvkixsA7u+HHjLSiqLG8muYvy9tQVwLI2mOpJCOMHMsgEA==
+X-Received: by 2002:a7b:cf10:: with SMTP id l16mr7919828wmg.93.1594807293016;
+        Wed, 15 Jul 2020 03:01:33 -0700 (PDT)
+Received: from redhat.com (bzq-79-180-10-140.red.bezeqint.net. [79.180.10.140])
+        by smtp.gmail.com with ESMTPSA id h199sm2701343wme.42.2020.07.15.03.01.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 15 Jul 2020 03:01:32 -0700 (PDT)
+Date:   Wed, 15 Jul 2020 06:01:29 -0400
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Jason Wang <jasowang@redhat.com>
+Cc:     "Zhu, Lingshan" <lingshan.zhu@intel.com>,
+        alex.williamson@redhat.com, pbonzini@redhat.com,
+        sean.j.christopherson@intel.com, wanpengli@tencent.com,
+        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
+        netdev@vger.kernel.org, dan.daly@intel.com
+Subject: Re: [PATCH 6/7] ifcvf: replace irq_request/free with helpers in vDPA
+ core.
+Message-ID: <20200715055538-mutt-send-email-mst@kernel.org>
+References: <1594565366-3195-1-git-send-email-lingshan.zhu@intel.com>
+ <1594565366-3195-6-git-send-email-lingshan.zhu@intel.com>
+ <c7d4eca1-b65a-b795-dfa6-fe7658716cb1@redhat.com>
+ <f6fc09e2-7a45-aaa5-2b4a-f1f963c5ce2c@intel.com>
+ <09e67c20-dda1-97a2-1858-6a543c64fba6@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20200715093426.GK16200@suse.de>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <09e67c20-dda1-97a2-1858-6a543c64fba6@redhat.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jul 15, 2020 at 11:34:26AM +0200, Joerg Roedel wrote:
-> On Wed, Jul 15, 2020 at 11:24:56AM +0200, Peter Zijlstra wrote:
-> > Can we get some more words -- preferably in actual code comments, on
-> > when exactly #VC happens?
+On Wed, Jul 15, 2020 at 04:40:17PM +0800, Jason Wang wrote:
 > 
-> Sure, will add this as a comment before the actual runtime VC handler.
-
-Thanks!
-
-> > Because the only thing I remember is that #VC could happen on any memop,
-> > but I also have vague memories of that being a later extention.
+> On 2020/7/13 下午6:22, Zhu, Lingshan wrote:
+> > 
+> > 
+> > On 7/13/2020 4:33 PM, Jason Wang wrote:
+> > > 
+> > > On 2020/7/12 下午10:49, Zhu Lingshan wrote:
+> > > > This commit replaced irq_request/free() with helpers in vDPA
+> > > > core, so that it can request/free irq and setup irq offloading
+> > > > on order.
+> > > > 
+> > > > Signed-off-by: Zhu Lingshan <lingshan.zhu@intel.com>
+> > > > ---
+> > > >   drivers/vdpa/ifcvf/ifcvf_main.c | 11 ++++++-----
+> > > >   1 file changed, 6 insertions(+), 5 deletions(-)
+> > > > 
+> > > > diff --git a/drivers/vdpa/ifcvf/ifcvf_main.c
+> > > > b/drivers/vdpa/ifcvf/ifcvf_main.c
+> > > > index f5a60c1..65b84e1 100644
+> > > > --- a/drivers/vdpa/ifcvf/ifcvf_main.c
+> > > > +++ b/drivers/vdpa/ifcvf/ifcvf_main.c
+> > > > @@ -47,11 +47,12 @@ static void ifcvf_free_irq(struct
+> > > > ifcvf_adapter *adapter, int queues)
+> > > >   {
+> > > >       struct pci_dev *pdev = adapter->pdev;
+> > > >       struct ifcvf_hw *vf = &adapter->vf;
+> > > > +    struct vdpa_device *vdpa = &adapter->vdpa;
+> > > >       int i;
+> > > >           for (i = 0; i < queues; i++)
+> > > > -        devm_free_irq(&pdev->dev, vf->vring[i].irq, &vf->vring[i]);
+> > > > +        vdpa_free_vq_irq(&pdev->dev, vdpa, vf->vring[i].irq, i,
+> > > > &vf->vring[i]);
+> > > >         ifcvf_free_irq_vectors(pdev);
+> > > >   }
+> > > > @@ -60,6 +61,7 @@ static int ifcvf_request_irq(struct
+> > > > ifcvf_adapter *adapter)
+> > > >   {
+> > > >       struct pci_dev *pdev = adapter->pdev;
+> > > >       struct ifcvf_hw *vf = &adapter->vf;
+> > > > +    struct vdpa_device *vdpa = &adapter->vdpa;
+> > > >       int vector, i, ret, irq;
+> > > >         ret = pci_alloc_irq_vectors(pdev, IFCVF_MAX_INTR,
+> > > > @@ -73,6 +75,7 @@ static int ifcvf_request_irq(struct
+> > > > ifcvf_adapter *adapter)
+> > > >            pci_name(pdev));
+> > > >       vector = 0;
+> > > >       irq = pci_irq_vector(pdev, vector);
+> > > > +    /* config interrupt */
+> > > 
+> > > 
+> > > Unnecessary changes.
+> > This is to show we did not setup this irq offloading for config
+> > interrupt, only setup irq offloading for data vq. But can remove this
+> > since we have config_msix_name in code to show what it is
 > 
-> Currently it is only raised when something happens that the hypervisor
-> intercepts, for example on a couple of instructions like CPUID,
-> RD/WRMSR, ..., or on MMIO/IOIO accesses.
 > 
-> With Secure Nested Paging (SNP), which needs additional enablement, a #VC can
-> happen on any memory access. I wrote the IST handling entry code for #VC
-> with that in mind, but do not actually enable it. This is the reason why
-> the #VC handler just panics the system when it ends up on the fall-back
-> (VC2) stack, with SNP enabled it needs to handle the SNP exit-codes in
-> that path.
+> Btw, any reason for not making config interrupt work for irq offloading? I
+> don't see any thing that blocks this.
+> 
+> Thanks
 
-And recursive #VC was instant death, right? Because there's no way to
-avoid IST stack corruption in that case.
+Well config accesses all go through userspace right?
+Doing config interrupt directly would just be messy ...
+
+
+> 
+> > Thanks BR Zhu Lingshan
+> > > 
+
