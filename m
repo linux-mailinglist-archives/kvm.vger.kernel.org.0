@@ -2,40 +2,40 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 59005221555
-	for <lists+kvm@lfdr.de>; Wed, 15 Jul 2020 21:46:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4F888221553
+	for <lists+kvm@lfdr.de>; Wed, 15 Jul 2020 21:46:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727106AbgGOTq3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 Jul 2020 15:46:29 -0400
-Received: from smtp-fw-6001.amazon.com ([52.95.48.154]:5318 "EHLO
-        smtp-fw-6001.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726864AbgGOTqZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 15 Jul 2020 15:46:25 -0400
+        id S1727050AbgGOTqY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 15 Jul 2020 15:46:24 -0400
+Received: from smtp-fw-9101.amazon.com ([207.171.184.25]:52582 "EHLO
+        smtp-fw-9101.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726878AbgGOTqX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 15 Jul 2020 15:46:23 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1594842381; x=1626378381;
+  t=1594842382; x=1626378382;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=GEI2urm980GaJ1XePmpk1eAHnLHBFeD7rFchtFKK6p8=;
-  b=aNMRHLA2i0mGrIbXhz/2ZbpPVZtLsZzl0gSI08eyJRrKLbn9lG96q6qf
-   6yVIqfL6SAWA/ixsfscZrf35tS2sTYm7b5OfbGO4wmGlUpL/nvJMrl2s8
-   r4XhpRD1DaEG/+nsrPoyYGDW7UaLzXO9J3EwGqzWjEGBWEdkX6KYfP8BH
-   Q=;
-IronPort-SDR: wZIrdnLWtDtUCvAM7uwiSjajSUPqBzvq2BL/tWkcy59ikKiH+5Para3rHFhzdmIBM9xQBdfPDl
- LR4iRcDxPf+A==
+  bh=ISqy6L6ND3ZKlEgvbrSe2KYtqSvPHvFuWxdqmaME2T8=;
+  b=U9UNksuM46NrewXkr0XAEib0PiF/+3lfZj77/0co17KqxJ/9evAnhtA0
+   Y801mAwTEA8bRoU2GHoz0dXzboMx3vthM5cduxOAfWR6E57cRT8lwdeXn
+   OBxKEJLTOgM//bKcbsjHLSfKc4JTaiUPKkxOCcyPJbxpRlaGEJ5CE0bJW
+   M=;
+IronPort-SDR: BanSBBgrP0slXu05xw1qDT/obpiqX4oPamdTU1x9/N5pQRjgpCiYhWjTjolMCT36BOZg+Bcp5K
+ 25SMn0FXQUyA==
 X-IronPort-AV: E=Sophos;i="5.75,356,1589241600"; 
-   d="scan'208";a="43560239"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-2b-81e76b79.us-west-2.amazon.com) ([10.43.8.6])
-  by smtp-border-fw-out-6001.iad6.amazon.com with ESMTP; 15 Jul 2020 19:46:18 +0000
+   d="scan'208";a="51929243"
+Received: from sea32-co-svc-lb4-vlan3.sea.corp.amazon.com (HELO email-inbound-relay-2b-4ff6265a.us-west-2.amazon.com) ([10.47.23.38])
+  by smtp-border-fw-out-9101.sea19.amazon.com with ESMTP; 15 Jul 2020 19:46:19 +0000
 Received: from EX13MTAUEA002.ant.amazon.com (pdx4-ws-svc-p6-lb7-vlan3.pdx.amazon.com [10.170.41.166])
-        by email-inbound-relay-2b-81e76b79.us-west-2.amazon.com (Postfix) with ESMTPS id 581CCA180C;
-        Wed, 15 Jul 2020 19:46:17 +0000 (UTC)
+        by email-inbound-relay-2b-4ff6265a.us-west-2.amazon.com (Postfix) with ESMTPS id 12280A28BB;
+        Wed, 15 Jul 2020 19:46:18 +0000 (UTC)
 Received: from EX13D16EUB001.ant.amazon.com (10.43.166.28) by
  EX13MTAUEA002.ant.amazon.com (10.43.61.77) with Microsoft SMTP Server (TLS)
- id 15.0.1497.2; Wed, 15 Jul 2020 19:46:16 +0000
+ id 15.0.1497.2; Wed, 15 Jul 2020 19:46:17 +0000
 Received: from 38f9d34ed3b1.ant.amazon.com (10.43.161.214) by
  EX13D16EUB001.ant.amazon.com (10.43.166.28) with Microsoft SMTP Server (TLS)
- id 15.0.1497.2; Wed, 15 Jul 2020 19:45:56 +0000
+ id 15.0.1497.2; Wed, 15 Jul 2020 19:46:07 +0000
 From:   Andra Paraschiv <andraprs@amazon.com>
 To:     <linux-kernel@vger.kernel.org>
 CC:     Anthony Liguori <aliguori@amazon.com>,
@@ -60,9 +60,9 @@ CC:     Anthony Liguori <aliguori@amazon.com>,
         <ne-devel-upstream@amazon.com>,
         Andra Paraschiv <andraprs@amazon.com>,
         Alexander Graf <graf@amazon.com>
-Subject: [PATCH v5 01/18] nitro_enclaves: Add ioctl interface definition
-Date:   Wed, 15 Jul 2020 22:45:23 +0300
-Message-ID: <20200715194540.45532-2-andraprs@amazon.com>
+Subject: [PATCH v5 02/18] nitro_enclaves: Define the PCI device interface
+Date:   Wed, 15 Jul 2020 22:45:24 +0300
+Message-ID: <20200715194540.45532-3-andraprs@amazon.com>
 X-Mailer: git-send-email 2.20.1 (Apple Git-117)
 In-Reply-To: <20200715194540.45532-1-andraprs@amazon.com>
 References: <20200715194540.45532-1-andraprs@amazon.com>
@@ -77,16 +77,23 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The Nitro Enclaves driver handles the enclave lifetime management. This
-includes enclave creation, termination and setting up its resources such
-as memory and CPU.
+The Nitro Enclaves (NE) driver communicates with a new PCI device, that
+is exposed to a virtual machine (VM) and handles commands meant for
+handling enclaves lifetime e.g. creation, termination, setting memory
+regions. The communication with the PCI device is handled using a MMIO
+space and MSI-X interrupts.
 
-An enclave runs alongside the VM that spawned it. It is abstracted as a
-process running in the VM that launched it. The process interacts with
-the NE driver, that exposes an ioctl interface for creating an enclave
-and setting up its resources.
+This device communicates with the hypervisor on the host, where the VM
+that spawned the enclave itself runs, e.g. to launch a VM that is used
+for the enclave.
 
-Signed-off-by: Alexandru Vasile <lexnv@amazon.com>
+Define the MMIO space of the NE PCI device, the commands that are
+provided by this device. Add an internal data structure used as private
+data for the PCI device driver and the function for the PCI device
+command requests handling.
+
+Signed-off-by: Alexandru-Catalin Vasile <lexnv@amazon.com>
+Signed-off-by: Alexandru Ciobotaru <alcioa@amazon.com>
 Signed-off-by: Andra Paraschiv <andraprs@amazon.com>
 Reviewed-by: Alexander Graf <graf@amazon.com>
 ---
@@ -94,17 +101,13 @@ Changelog
 
 v4 -> v5
 
-* Add more details about the ioctl calls usage e.g. error codes, file
-  descriptors used.
-* Update the ioctl to set an enclave vCPU to not return a file
-  descriptor.
-* Add specific NE error codes.
+* Add a TODO for including flags in the request to the NE PCI device to
+  set a memory region for an enclave. It is not used for now.
 
 v3 -> v4
 
-* Decouple NE ioctl interface from KVM API.
-* Add NE API version and the corresponding ioctl call.
-* Add enclave / image load flags options.
+* Remove the "packed" attribute and include padding in the NE data
+  structures.
 
 v2 -> v3
 
@@ -113,304 +116,284 @@ v2 -> v3
 
 v1 -> v2
 
-* Add ioctl for getting enclave image load metadata.
-* Update NE_ENCLAVE_START ioctl name to NE_START_ENCLAVE.
-* Add entry in Documentation/userspace-api/ioctl/ioctl-number.rst for NE
-  ioctls.
-* Update NE ioctls definition based on the updated ioctl range for major
-  and minor.
+* Update path naming to drivers/virt/nitro_enclaves.
+* Update NE_ENABLE_OFF / NE_ENABLE_ON defines.
 ---
- .../userspace-api/ioctl/ioctl-number.rst      |   5 +-
- include/linux/nitro_enclaves.h                |  11 +
- include/uapi/linux/nitro_enclaves.h           | 244 ++++++++++++++++++
- 3 files changed, 259 insertions(+), 1 deletion(-)
- create mode 100644 include/linux/nitro_enclaves.h
- create mode 100644 include/uapi/linux/nitro_enclaves.h
+ drivers/virt/nitro_enclaves/ne_pci_dev.h | 265 +++++++++++++++++++++++
+ 1 file changed, 265 insertions(+)
+ create mode 100644 drivers/virt/nitro_enclaves/ne_pci_dev.h
 
-diff --git a/Documentation/userspace-api/ioctl/ioctl-number.rst b/Documentation/userspace-api/ioctl/ioctl-number.rst
-index 59472cd6a11d..783440c6719b 100644
---- a/Documentation/userspace-api/ioctl/ioctl-number.rst
-+++ b/Documentation/userspace-api/ioctl/ioctl-number.rst
-@@ -328,8 +328,11 @@ Code  Seq#    Include File                                           Comments
- 0xAC  00-1F  linux/raw.h
- 0xAD  00                                                             Netfilter device in development:
-                                                                      <mailto:rusty@rustcorp.com.au>
--0xAE  all    linux/kvm.h                                             Kernel-based Virtual Machine
-+0xAE  00-1F  linux/kvm.h                                             Kernel-based Virtual Machine
-                                                                      <mailto:kvm@vger.kernel.org>
-+0xAE  40-FF  linux/kvm.h                                             Kernel-based Virtual Machine
-+                                                                     <mailto:kvm@vger.kernel.org>
-+0xAE  20-3F  linux/nitro_enclaves.h                                  Nitro Enclaves
- 0xAF  00-1F  linux/fsl_hypervisor.h                                  Freescale hypervisor
- 0xB0  all                                                            RATIO devices in development:
-                                                                      <mailto:vgo@ratio.de>
-diff --git a/include/linux/nitro_enclaves.h b/include/linux/nitro_enclaves.h
+diff --git a/drivers/virt/nitro_enclaves/ne_pci_dev.h b/drivers/virt/nitro_enclaves/ne_pci_dev.h
 new file mode 100644
-index 000000000000..d91ef2bfdf47
+index 000000000000..a3a3fab7a04a
 --- /dev/null
-+++ b/include/linux/nitro_enclaves.h
-@@ -0,0 +1,11 @@
++++ b/drivers/virt/nitro_enclaves/ne_pci_dev.h
+@@ -0,0 +1,265 @@
 +/* SPDX-License-Identifier: GPL-2.0 */
 +/*
 + * Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 + */
 +
-+#ifndef _LINUX_NITRO_ENCLAVES_H_
-+#define _LINUX_NITRO_ENCLAVES_H_
++#ifndef _NE_PCI_DEV_H_
++#define _NE_PCI_DEV_H_
 +
-+#include <uapi/linux/nitro_enclaves.h>
++#include <linux/atomic.h>
++#include <linux/list.h>
++#include <linux/mutex.h>
++#include <linux/pci.h>
++#include <linux/pci_ids.h>
++#include <linux/wait.h>
 +
-+#endif /* _LINUX_NITRO_ENCLAVES_H_ */
-diff --git a/include/uapi/linux/nitro_enclaves.h b/include/uapi/linux/nitro_enclaves.h
-new file mode 100644
-index 000000000000..cf1192f6e923
---- /dev/null
-+++ b/include/uapi/linux/nitro_enclaves.h
-@@ -0,0 +1,244 @@
-+/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
-+/*
-+ * Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
-+ */
++/* Nitro Enclaves (NE) PCI device identifier */
 +
-+#ifndef _UAPI_LINUX_NITRO_ENCLAVES_H_
-+#define _UAPI_LINUX_NITRO_ENCLAVES_H_
++#define PCI_DEVICE_ID_NE (0xe4c1)
++#define PCI_BAR_NE (0x03)
 +
-+#include <linux/types.h>
-+
-+/* Nitro Enclaves (NE) Kernel Driver Interface */
-+
-+#define NE_API_VERSION (1)
++/* Device registers */
 +
 +/**
-+ * The command is used to get the version of the NE API. This way the user space
-+ * processes can be aware of the feature sets provided by the NE kernel driver.
-+ *
-+ * The NE API version is returned as result of this ioctl call.
-+ *
-+ * The ioctl can be invoked on the /dev/nitro_enclaves fd, independent of
-+ * enclaves already created / started or not.
-+ *
-+ * No errors are returned.
++ * (1 byte) Register to notify the device that the driver is using it
++ * (Read/Write).
 + */
-+#define NE_GET_API_VERSION _IO(0xAE, 0x20)
++#define NE_ENABLE (0x0000)
++#define NE_ENABLE_OFF (0x00)
++#define NE_ENABLE_ON (0x01)
++
++/* (2 bytes) Register to select the device run-time version (Read/Write). */
++#define NE_VERSION (0x0002)
++#define NE_VERSION_MAX (0x0001)
 +
 +/**
-+ * The command is used to create a slot that is associated with an enclave VM.
-+ * Memory and vCPUs are then set for the slot mapped to an enclave.
-+ *
-+ * The generated unique slot id is an output parameter. An enclave file
-+ * descriptor is returned as result of this ioctl call. The enclave fd can be
-+ * further used with ioctl calls to set vCPUs and memory regions, then start
-+ * the enclave.
-+ *
-+ * The ioctl can be invoked on the /dev/nitro_enclaves fd, before setting any
-+ * resources, such as memory and vCPUs, for an enclave.
-+ *
-+ * A NE CPU pool has be set before calling this function. The pool can be set
-+ * after the NE driver load, using /sys/module/nitro_enclaves/parameters/ne_cpus.
-+ * Its format is the following:
-+ * https://www.kernel.org/doc/html/latest/admin-guide/kernel-parameters.html#cpu-lists
-+ *
-+ * CPU 0 and its siblings have to remain available for the primary / parent VM,
-+ * so they cannot be set for enclaves. Full CPU core(s), from the same NUMA
-+ * node, need(s) be included in the CPU pool.
-+ *
-+ * The returned errors are:
-+ * * -EFAULT - copy_to_user() failure.
-+ * * -ENOMEM - memory allocation failure for internal bookkeeping variables.
-+ * * -NE_ERR_NO_CPUS_AVAIL_IN_POOL - no NE CPU pool set / no CPUs available in the pool.
-+ * * Error codes from get_unused_fd_flags() and anon_inode_getfile().
-+ * * Error codes from the NE PCI device request.
++ * (4 bytes) Register to notify the device what command was requested
++ * (Write-Only).
 + */
-+#define NE_CREATE_VM _IOR(0xAE, 0x21, __u64)
++#define NE_COMMAND (0x0004)
 +
 +/**
-+ * The command is used to set a vCPU for an enclave. The vCPU can be auto-chosen
-+ * from the NE CPU pool or it can be set by the caller, with the note that it
-+ * needs to be available in the NE CPU pool. Full CPU core(s), from the same
-+ * NUMA node, need(s) to be associated with an enclave.
-+ *
-+ * The vCPU id is an input / output parameter. If its value is 0, then a CPU is
-+ * chosen from the enclave CPU pool and returned via this parameter.
-+ *
-+ * The ioctl can be invoked on the enclave fd, before an enclave is started.
-+ *
-+ * The returned errors are:
-+ * * -EFAULT - copy_from_user() / copy_to_user() failure.
-+ * * -ENOMEM - memory allocation failure for internal bookkeeping variables.
-+ * * -EIO - current task mm is not the same as the one that created the enclave.
-+ * * -NE_ERR_NO_CPUS_AVAIL_IN_POOL - no CPUs available in the NE CPU pool.
-+ * * -NE_ERR_VCPU_ALREADY_USED - the provided vCPU is already used.
-+ * * -NE_ERR_VCPU_NOT_IN_POOL - the provided vCPU is not available in the NE CPU pool.
-+ * * -NE_ERR_INVALID_CPU_CORE - the core id of the provided vCPU is invalid / out of range.
-+ * * -NE_ERR_NOT_IN_INIT_STATE - the enclave is not in init state (init = before being started).
-+ * * -NE_ERR_INVALID_VCPU - the provided vCPU is out the available CPUs range.
-+ * * Error codes from the NE PCI device request.
++ * (4 bytes) Register to notify the driver that a reply or a device event
++ * is available (Read-Only):
++ * - Lower half  - command reply counter
++ * - Higher half - out-of-band device event counter
 + */
-+#define NE_ADD_VCPU _IOWR(0xAE, 0x22, __u32)
++#define NE_EVTCNT (0x000c)
++#define NE_EVTCNT_REPLY_SHIFT (0)
++#define NE_EVTCNT_REPLY_MASK (0x0000ffff)
++#define NE_EVTCNT_REPLY(cnt) (((cnt) & NE_EVTCNT_REPLY_MASK) >> \
++			      NE_EVTCNT_REPLY_SHIFT)
++#define NE_EVTCNT_EVENT_SHIFT (16)
++#define NE_EVTCNT_EVENT_MASK (0xffff0000)
++#define NE_EVTCNT_EVENT(cnt) (((cnt) & NE_EVTCNT_EVENT_MASK) >> \
++			      NE_EVTCNT_EVENT_SHIFT)
 +
-+/**
-+ * The command is used to get information needed for in-memory enclave image
-+ * loading e.g. offset in enclave memory to start placing the enclave image.
-+ *
-+ * The image load info is an input / output parameter. It includes info provided
-+ * by the caller - flags - and returns the offset in enclave memory where to
-+ * start placing the enclave image.
-+ *
-+ * The ioctl can be invoked on the enclave fd, before an enclave is started.
-+ *
-+ * The returned errors are:
-+ * * -EFAULT - copy_from_user() / copy_to_user() failure.
-+ * * -NE_ERR_NOT_IN_INIT_STATE - the enclave is not in init state (init = before being started).
-+ */
-+#define NE_GET_IMAGE_LOAD_INFO _IOWR(0xAE, 0x23, struct ne_image_load_info)
++/* (240 bytes) Buffer for sending the command request payload (Read/Write). */
++#define NE_SEND_DATA (0x0010)
 +
-+/**
-+ * The command is used to set a memory region for an enclave, given the
-+ * allocated memory from the userspace. Enclave memory needs to be from the
-+ * same NUMA node as the enclave CPUs.
-+ *
-+ * The user memory region is an input parameter. It includes info provided
-+ * by the caller - flags, memory size and userspace address.
-+ *
-+ * The ioctl can be invoked on the enclave fd, before an enclave is started.
-+ *
-+ * The returned errors are:
-+ * * -EFAULT - copy_from_user() failure.
-+ * * -ENOMEM - memory allocation failure for internal bookkeeping variables.
-+ * * -EIO - current task mm is not the same as the one that created the enclave.
-+ * * -NE_ERR_NOT_IN_INIT_STATE - the enclave is not in init state (init = before being started).
-+ * * -NE_ERR_INVALID_MEM_REGION_SIZE - the memory size of the region is not multiple of 2 MiB.
-+ * * -NE_ERR_INVALID_MEM_REGION_ADDR - invalid user space address given.
-+ * * -NE_ERR_UNALIGNED_MEM_REGION_ADDR - unaligned user space address given.
-+ * * -NE_ERR_MEM_NOT_HUGE_PAGE - the memory regions is not backed by huge pages.
-+ * * -NE_ERR_MEM_DIFF_NUMA_NODE - the memory region is not from the same NUMA node as the CPUs.
-+ * * -NE_ERR_MEM_MAX_REGIONS - the number of memory regions set for the enclave reached maximum.
-+ * * Error codes from get_user_pages().
-+ * * Error codes from the NE PCI device request.
-+ */
-+#define NE_SET_USER_MEMORY_REGION _IOW(0xAE, 0x24, struct ne_user_memory_region)
++/* (240 bytes) Buffer for receiving the command reply payload (Read-Only). */
++#define NE_RECV_DATA (0x0100)
 +
-+/**
-+ * The command is used to trigger enclave start after the enclave resources,
-+ * such as memory and CPU, have been set.
-+ *
-+ * The enclave start info is an input / output parameter. It includes info
-+ * provided by the caller - enclave cid and flags - and returns the cid (if
-+ * input cid is 0).
-+ *
-+ * The ioctl can be invoked on the enclave fd, after an enclave slot is created
-+ * and resources, such as memory and vCPUs are set for an enclave.
-+ *
-+ * The returned errors are:
-+ * * -EFAULT - copy_from_user() / copy_to_user() failure.
-+ * * -NE_ERR_NOT_IN_INIT_STATE - the enclave is not in init state (init = before being started).
-+ * * -NE_ERR_NO_MEM_REGIONS_ADDED / -NE_ERR_NO_VCPUS_ADDED - no CPUs / memory regions are set.
-+ * * -NE_ERR_FULL_CORES_NOT_USED - full core(s) not set for the enclave.
-+ * * -NE_ERR_ENCLAVE_MEM_MIN_SIZE - enclave memory is less than minimum memory size (64 MiB).
-+ * * Error codes from the NE PCI device request.
-+ */
-+#define NE_START_ENCLAVE _IOWR(0xAE, 0x25, struct ne_enclave_start_info)
++/* Device MMIO buffer sizes */
 +
-+/* NE specific error codes */
++/* 240 bytes for send / recv buffer. */
++#define NE_SEND_DATA_SIZE (240)
++#define NE_RECV_DATA_SIZE (240)
 +
-+/* The provided vCPU is already used. */
-+#define NE_ERR_VCPU_ALREADY_USED (512)
-+/* The provided vCPU is not available in the NE CPU pool. */
-+#define NE_ERR_VCPU_NOT_IN_POOL (513)
-+/* The core id of the provided vCPU is invalid / out of range of the NE CPU pool. */
-+#define NE_ERR_INVALID_CPU_CORE (514)
-+/* The user space memory region size is not multiple of 2 MiB. */
-+#define NE_ERR_INVALID_MEM_REGION_SIZE (515)
-+/* The user space memory region address range is invalid. */
-+#define NE_ERR_INVALID_MEM_REGION_ADDR (516)
-+/* The user space memory region address is not aligned. */
-+#define NE_ERR_UNALIGNED_MEM_REGION_ADDR (517)
-+/* The user space memory region is not backed by contiguous physical huge page(s). */
-+#define NE_ERR_MEM_NOT_HUGE_PAGE (518)
-+/* The user space memory region is backed by pages from different NUMA nodes than the CPUs. */
-+#define NE_ERR_MEM_DIFF_NUMA_NODE (519)
-+/* The supported max memory regions per enclaves has been reached. */
-+#define NE_ERR_MEM_MAX_REGIONS (520)
-+/* The command to start an enclave is triggered and no memory regions are added. */
-+#define NE_ERR_NO_MEM_REGIONS_ADDED (521)
-+/* The command to start an enclave is triggered and no vcpus are added. */
-+#define NE_ERR_NO_VCPUS_ADDED (522)
-+/* The enclave memory size is lower than the minimum supported. */
-+#define NE_ERR_ENCLAVE_MEM_MIN_SIZE (523)
-+/* The command to start an enclave is triggered and full CPU cores are not set. */
-+#define NE_ERR_FULL_CORES_NOT_USED (524)
-+/* The enclave is not in init state when setting resources or triggering start. */
-+#define NE_ERR_NOT_IN_INIT_STATE (525)
-+/* The provided vCPU is out of range of the available CPUs. */
-+#define NE_ERR_INVALID_VCPU (526)
-+/* The command to create an enclave is triggered and no CPUs are available in the pool. */
-+#define NE_ERR_NO_CPUS_AVAIL_IN_POOL (527)
++/* MSI-X interrupt vectors */
 +
-+/* Image load info flags */
++/* MSI-X vector used for command reply notification. */
++#define NE_VEC_REPLY (0)
 +
-+/* Enclave Image Format (EIF) */
-+#define NE_EIF_IMAGE (0x01)
++/* MSI-X vector used for out-of-band events e.g. enclave crash. */
++#define NE_VEC_EVENT (1)
 +
-+/* Info necessary for in-memory enclave image loading (in / out). */
-+struct ne_image_load_info {
-+	/**
-+	 * Flags to determine the enclave image type (e.g. Enclave Image Format
-+	 * - EIF) (in).
-+	 */
-+	__u64 flags;
-+
-+	/**
-+	 * Offset in enclave memory where to start placing the enclave image
-+	 * (out).
-+	 */
-+	__u64 memory_offset;
++/* Device command types. */
++enum ne_pci_dev_cmd_type {
++	INVALID_CMD = 0,
++	ENCLAVE_START = 1,
++	ENCLAVE_GET_SLOT = 2,
++	ENCLAVE_STOP = 3,
++	SLOT_ALLOC = 4,
++	SLOT_FREE = 5,
++	SLOT_ADD_MEM = 6,
++	SLOT_ADD_VCPU = 7,
++	SLOT_COUNT = 8,
++	NEXT_SLOT = 9,
++	SLOT_INFO = 10,
++	SLOT_ADD_BULK_VCPUS = 11,
++	MAX_CMD,
 +};
 +
-+/* User memory region flags */
++/* Device commands - payload structure for requests and replies. */
 +
-+/* Memory region for enclave general usage. */
-+#define NE_DEFAULT_MEMORY_REGION (0x00)
-+
-+/* Memory region to be set for an enclave (in). */
-+struct ne_user_memory_region {
-+	/**
-+	 * Flags to determine the usage for the memory region (in).
-+	 */
-+	__u64 flags;
++struct enclave_start_req {
++	/* Slot unique id mapped to the enclave to start. */
++	u64 slot_uid;
 +
 +	/**
-+	 * The size, in bytes, of the memory region to be set for an enclave
-+	 * (in).
++	 * Context ID (CID) for the enclave vsock device.
++	 * If 0, CID is autogenerated.
 +	 */
-+	__u64 memory_size;
++	u64 enclave_cid;
 +
-+	/**
-+	 * The start of the userspace allocated memory of the memory region to
-+	 * set for an enclave (in).
-+	 */
-+	__u64 userspace_addr;
++	/* Flags for the enclave to start with (e.g. debug mode). */
++	u64 flags;
 +};
 +
-+/* Enclave start info flags */
-+
-+/* Start enclave in debug mode. */
-+#define NE_ENCLAVE_DEBUG_MODE (0x01)
-+
-+/* Setup info necessary for enclave start (in / out). */
-+struct ne_enclave_start_info {
-+	/* Flags for the enclave to start with (e.g. debug mode) (in). */
-+	__u64 flags;
-+
-+	/**
-+	 * Context ID (CID) for the enclave vsock device. If 0 as input, the
-+	 * CID is autogenerated by the hypervisor and returned back as output
-+	 * by the driver (in / out).
-+	 */
-+	__u64 enclave_cid;
++struct enclave_get_slot_req {
++	/* Context ID (CID) for the enclave vsock device. */
++	u64 enclave_cid;
 +};
 +
-+#endif /* _UAPI_LINUX_NITRO_ENCLAVES_H_ */
++struct enclave_stop_req {
++	/* Slot unique id mapped to the enclave to stop. */
++	u64 slot_uid;
++};
++
++struct slot_alloc_req {
++	/* In order to avoid weird sizeof edge cases. */
++	u8 unused;
++};
++
++struct slot_free_req {
++	/* Slot unique id mapped to the slot to free. */
++	u64 slot_uid;
++};
++
++/* TODO: Add flags field to the request to add memory region. */
++struct slot_add_mem_req {
++	/* Slot unique id mapped to the slot to add the memory region to. */
++	u64 slot_uid;
++
++	/* Physical address of the memory region to add to the slot. */
++	u64 paddr;
++
++	/* Memory size, in bytes, of the memory region to add to the slot. */
++	u64 size;
++};
++
++struct slot_add_vcpu_req {
++	/* Slot unique id mapped to the slot to add the vCPU to. */
++	u64 slot_uid;
++
++	/* vCPU ID of the CPU to add to the enclave. */
++	u32 vcpu_id;
++
++	u8 padding[4];
++};
++
++struct slot_count_req {
++	/* In order to avoid weird sizeof edge cases. */
++	u8 unused;
++};
++
++struct next_slot_req {
++	/* Slot unique id of the next slot in the iteration. */
++	u64 slot_uid;
++};
++
++struct slot_info_req {
++	/* Slot unique id mapped to the slot to get information about. */
++	u64 slot_uid;
++};
++
++struct slot_add_bulk_vcpus_req {
++	/* Slot unique id mapped to the slot to add vCPUs to. */
++	u64 slot_uid;
++
++	/* Number of vCPUs to add to the slot. */
++	u64 nr_vcpus;
++};
++
++struct ne_pci_dev_cmd_reply {
++	/* Return code of the functionality that processed the request. */
++	s32 rc;
++
++	u8 padding0[4];
++
++	/* Valid for all commands except SLOT_COUNT. */
++	u64 slot_uid;
++
++	/* Valid for ENCLAVE_START command. */
++	u64 enclave_cid;
++
++	/* Valid for SLOT_COUNT command. */
++	u64 slot_count;
++
++	/* Valid for SLOT_ALLOC and SLOT_INFO commands. */
++	u64 mem_regions;
++
++	/* Valid for SLOT_INFO command. */
++	u64 mem_size;
++
++	/* Valid for SLOT_INFO command. */
++	u64 nr_vcpus;
++
++	/* Valid for SLOT_INFO command. */
++	u64 flags;
++
++	/* Valid for SLOT_INFO command. */
++	u16 state;
++
++	u8 padding1[6];
++};
++
++/* Nitro Enclaves (NE) PCI device. */
++struct ne_pci_dev {
++	/* Variable set if a reply has been sent by the PCI device. */
++	atomic_t cmd_reply_avail;
++
++	/* Wait queue for handling command reply from the PCI device. */
++	wait_queue_head_t cmd_reply_wait_q;
++
++	/* List of the enclaves managed by the PCI device. */
++	struct list_head enclaves_list;
++
++	/* Mutex for accessing the list of enclaves. */
++	struct mutex enclaves_list_mutex;
++
++	/**
++	 * Work queue for handling out-of-band events triggered by the Nitro
++	 * Hypervisor which require enclave state scanning and propagation to
++	 * the enclave process.
++	 */
++	struct workqueue_struct *event_wq;
++
++	/* MMIO region of the PCI device. */
++	void __iomem *iomem_base;
++
++	/* Work item for every received out-of-band event. */
++	struct work_struct notify_work;
++
++	/* Mutex for accessing the PCI device MMIO space. */
++	struct mutex pci_dev_mutex;
++
++	/* PCI device data structure. */
++	struct pci_dev *pdev;
++};
++
++/**
++ * ne_do_request - Submit command request to the PCI device based on the command
++ * type and retrieve the associated reply.
++ *
++ * This function uses the ne_pci_dev mutex to handle one command at a time.
++ *
++ * @pdev: PCI device to send the command to and receive the reply from.
++ * @cmd_type: command type of the request sent to the PCI device.
++ * @cmd_request: command request payload.
++ * @cmd_request_size: size of the command request payload.
++ * @cmd_reply: command reply payload.
++ * @cmd_reply_size: size of the command reply payload.
++ *
++ * @returns: 0 on success, negative return value on failure.
++ */
++int ne_do_request(struct pci_dev *pdev, enum ne_pci_dev_cmd_type cmd_type,
++		  void *cmd_request, size_t cmd_request_size,
++		  struct ne_pci_dev_cmd_reply *cmd_reply,
++		  size_t cmd_reply_size);
++
++/* Nitro Enclaves (NE) PCI device driver */
++extern struct pci_driver ne_pci_driver;
++
++#endif /* _NE_PCI_DEV_H_ */
 -- 
 2.20.1 (Apple Git-117)
 
