@@ -2,114 +2,87 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 803032207A6
-	for <lists+kvm@lfdr.de>; Wed, 15 Jul 2020 10:43:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 596442207C1
+	for <lists+kvm@lfdr.de>; Wed, 15 Jul 2020 10:48:30 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730308AbgGOInS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 Jul 2020 04:43:18 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:23255 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1729485AbgGOInR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 15 Jul 2020 04:43:17 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1594802596;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=g3ATeHeFF1J37NbSRujlNcK6+iTDVTNL3b6nVYG9gNI=;
-        b=BdCsp6n4x6lml+v1/P0NIfy4epVqOnRGmryBJDQYcrkTzngcy0PkdV/sP3ZFTgI26R2zV8
-        jfJOT09/hSkw9a6JaHQV0RqPTooqGlECq3YTRpZvxEXw4Lh7AqCejgu9E5uMV5SSYPqxRd
-        ZRPSO5beS5puYTu/ihXOMitk4AS4yEc=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-218-k8z0oujvNH-_u1V4kBvS-Q-1; Wed, 15 Jul 2020 04:43:14 -0400
-X-MC-Unique: k8z0oujvNH-_u1V4kBvS-Q-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6A5FC100CCC1;
-        Wed, 15 Jul 2020 08:43:13 +0000 (UTC)
-Received: from [10.72.13.230] (ovpn-13-230.pek2.redhat.com [10.72.13.230])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 0F7D66FEF4;
-        Wed, 15 Jul 2020 08:43:06 +0000 (UTC)
-Subject: Re: [PATCH 5/7] virtio_vdpa: init IRQ offloading function pointers to
- NULL.
-To:     "Zhu, Lingshan" <lingshan.zhu@intel.com>, mst@redhat.com,
-        alex.williamson@redhat.com, pbonzini@redhat.com,
-        sean.j.christopherson@intel.com, wanpengli@tencent.com
-Cc:     virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
-        netdev@vger.kernel.org, dan.daly@intel.com
-References: <1594565366-3195-1-git-send-email-lingshan.zhu@intel.com>
- <1594565366-3195-5-git-send-email-lingshan.zhu@intel.com>
- <276bf939-8e12-e28a-64f7-1767851e0db5@redhat.com>
- <ba1ea94c-b0ae-8bd8-8425-64b096512d3d@intel.com>
-From:   Jason Wang <jasowang@redhat.com>
-Message-ID: <d5b12368-7d78-6c0b-e593-289594d11985@redhat.com>
-Date:   Wed, 15 Jul 2020 16:43:05 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        id S1730435AbgGOIsN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 15 Jul 2020 04:48:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55214 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729377AbgGOIsN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 15 Jul 2020 04:48:13 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0709CC061755;
+        Wed, 15 Jul 2020 01:48:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=2hxetUaUv/Sl3bYl89m2PSXLP2Q6opXZZBO3eaTSzBk=; b=WW8YoVzkyFTNUO9zvgWo2fwDzD
+        Lqc0L2K1pu7x6Aoez048E/g4JFKPhwgeWkwrPWMYTj0CoOm8R+ljR0SxX8amd6+eXuJX/CS9zmIBP
+        943484iheiZFam8/iMWZxomMZnKu3B5V7HkQa0b7F7vNyE0OOpFL410o1HVKURFQzX7WfnAynrSRq
+        tPJdTgs6yJAUqRMlfeetU4QyxaCqG8Ix+u5Od6IdthJP8fJ/XDceikh2bSZdYT0a33CAF8phFpOoh
+        sMIvkBLrFGVTnISkOolA4A/ruDGcTPVcQFmN13Opjlbj/piWe6oHWmXOLLCQdHnbZ2fe1g5NLgJOf
+        CE8x9iDA==;
+Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=noisy.programming.kicks-ass.net)
+        by casper.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1jvd50-0007wY-B1; Wed, 15 Jul 2020 08:47:54 +0000
+Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (Client did not present a certificate)
+        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id BB2203028C8;
+        Wed, 15 Jul 2020 10:47:52 +0200 (CEST)
+Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
+        id A994F2145CCC2; Wed, 15 Jul 2020 10:47:52 +0200 (CEST)
+Date:   Wed, 15 Jul 2020 10:47:52 +0200
+From:   Peter Zijlstra <peterz@infradead.org>
+To:     Joerg Roedel <joro@8bytes.org>
+Cc:     x86@kernel.org, Joerg Roedel <jroedel@suse.de>, hpa@zytor.com,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Jiri Slaby <jslaby@suse.cz>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Juergen Gross <jgross@suse.com>,
+        Kees Cook <keescook@chromium.org>,
+        David Rientjes <rientjes@google.com>,
+        Cfir Cohen <cfir@google.com>,
+        Erdem Aktas <erdemaktas@google.com>,
+        Masami Hiramatsu <mhiramat@kernel.org>,
+        Mike Stunes <mstunes@vmware.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Martin Radev <martin.b.radev@gmail.com>,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org
+Subject: Re: [PATCH v4 63/75] x86/sev-es: Handle #DB Events
+Message-ID: <20200715084752.GD10769@hirez.programming.kicks-ass.net>
+References: <20200714120917.11253-1-joro@8bytes.org>
+ <20200714120917.11253-64-joro@8bytes.org>
 MIME-Version: 1.0
-In-Reply-To: <ba1ea94c-b0ae-8bd8-8425-64b096512d3d@intel.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200714120917.11253-64-joro@8bytes.org>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Tue, Jul 14, 2020 at 02:09:05PM +0200, Joerg Roedel wrote:
 
-On 2020/7/13 下午6:20, Zhu, Lingshan wrote:
->
->
-> On 7/13/2020 4:28 PM, Jason Wang wrote:
->>
->> On 2020/7/12 下午10:49, Zhu Lingshan wrote:
->>> This commit initialize IRQ offloading function pointers in
->>> virtio_vdpa_driver to NULL. Becasue irq offloading only focus
->>> on VMs for vhost_vdpa.
->>>
->>> Signed-off-by: Zhu Lingshan <lingshan.zhu@intel.com>
->>> ---
->>>   drivers/virtio/virtio_vdpa.c | 2 ++
->>>   1 file changed, 2 insertions(+)
->>>
->>> diff --git a/drivers/virtio/virtio_vdpa.c 
->>> b/drivers/virtio/virtio_vdpa.c
->>> index c30eb55..1e8acb9 100644
->>> --- a/drivers/virtio/virtio_vdpa.c
->>> +++ b/drivers/virtio/virtio_vdpa.c
->>> @@ -386,6 +386,8 @@ static void virtio_vdpa_remove(struct 
->>> vdpa_device *vdpa)
->>>       },
->>>       .probe    = virtio_vdpa_probe,
->>>       .remove = virtio_vdpa_remove,
->>> +    .setup_vq_irq = NULL,
->>> +    .unsetup_vq_irq = NULL,
->>>   };
->>
->>
->> Is this really needed consider the it's static?
->>
->> Thanks
-> This is for readability, to show they are NULL, so virtio_vdpa would not go through irq forwarding / offloading.
->
-> Does this make sense?
+> @@ -1028,6 +1036,16 @@ DEFINE_IDTENTRY_VC_SAFE_STACK(exc_vmm_communication)
+>  	struct ghcb *ghcb;
+>  
+>  	lockdep_assert_irqs_disabled();
+> +
+> +	/*
+> +	 * #DB is special and needs to be handled outside of the intrumentation_begin()/end().
+> +	 * Otherwise the #VC handler could be raised recursivly.
+> +	 */
+> +	if (error_code == SVM_EXIT_EXCP_BASE + X86_TRAP_DB) {
+> +		vc_handle_trap_db(regs);
+> +		return;
+> +	}
+> +
+>  	instrumentation_begin();
 
-
-Probably not, please refer what is done by other subsystems.
-
-Thanks
-
-
->
-> Thanks,
-> BR
-> Zhu Lingshan
->>
->>
->>> module_vdpa_driver(virtio_vdpa_driver);
->>
-
+Wait what?! That makes no sense what so ever.
