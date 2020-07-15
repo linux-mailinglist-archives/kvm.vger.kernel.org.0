@@ -2,152 +2,203 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9238E220651
-	for <lists+kvm@lfdr.de>; Wed, 15 Jul 2020 09:36:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 981072206F3
+	for <lists+kvm@lfdr.de>; Wed, 15 Jul 2020 10:23:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729369AbgGOHfy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 Jul 2020 03:35:54 -0400
-Received: from szxga07-in.huawei.com ([45.249.212.35]:33218 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1729038AbgGOHfy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 15 Jul 2020 03:35:54 -0400
-Received: from DGGEMS414-HUB.china.huawei.com (unknown [172.30.72.58])
-        by Forcepoint Email with ESMTP id D798D686B4C2E6A3B5EA;
-        Wed, 15 Jul 2020 15:35:50 +0800 (CST)
-Received: from localhost.localdomain (10.67.165.24) by
- DGGEMS414-HUB.china.huawei.com (10.3.19.214) with Microsoft SMTP Server id
- 14.3.487.0; Wed, 15 Jul 2020 15:35:45 +0800
-From:   Zeng Tao <prime.zeng@hisilicon.com>
-To:     <alex.williamson@redhat.com>, <cai@lca.pw>
-CC:     Zeng Tao <prime.zeng@hisilicon.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Kevin Tian <kevin.tian@intel.com>,
-        Peter Xu <peterx@redhat.com>,
-        "Andrew Morton" <akpm@linux-foundation.org>,
-        Michel Lespinasse <walken@google.com>,
-        Denis Efremov <efremov@linux.com>, <kvm@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>
-Subject: [PATCH] vfio/pci: fix racy on error and request eventfd ctx
-Date:   Wed, 15 Jul 2020 15:34:41 +0800
-Message-ID: <1594798484-20501-1-git-send-email-prime.zeng@hisilicon.com>
-X-Mailer: git-send-email 2.8.1
+        id S1729679AbgGOIXb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 15 Jul 2020 04:23:31 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:30279 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1729652AbgGOIXb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 15 Jul 2020 04:23:31 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1594801408;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=H1N3KvEZTGjGVeuRJgwl++MJgD0/MJqWd13En7/X0GI=;
+        b=FzHLoVeOLAnf6bvAltvJMoWhjK1MUb2YlgXgDRogdNoizY+UrxP+whsdDRpoYuV5wW733j
+        CYEv+/mySXraD77h9aoQwUc7YcZmcf+qsyjD7TbuJbn1sMKg5rHsgP6ukJKU+MfzDUFo7Y
+        DW75GSYV1sDztb5cKL5xbCyAYdYHXEE=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-393-1LaqrPl6Pga-cYMArC2aQg-1; Wed, 15 Jul 2020 04:23:26 -0400
+X-MC-Unique: 1LaqrPl6Pga-cYMArC2aQg-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6874C8014D4;
+        Wed, 15 Jul 2020 08:23:24 +0000 (UTC)
+Received: from work-vm (ovpn-114-223.ams2.redhat.com [10.36.114.223])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 65E9D60BF4;
+        Wed, 15 Jul 2020 08:23:11 +0000 (UTC)
+Date:   Wed, 15 Jul 2020 09:23:09 +0100
+From:   "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To:     Alex Williamson <alex.williamson@redhat.com>
+Cc:     Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
+        Yan Zhao <yan.y.zhao@intel.com>, devel@ovirt.org,
+        openstack-discuss@lists.openstack.org, libvir-list@redhat.com,
+        intel-gvt-dev@lists.freedesktop.org, kvm@vger.kernel.org,
+        qemu-devel@nongnu.org, smooney@redhat.com, eskultet@redhat.com,
+        cohuck@redhat.com, dinechin@redhat.com, corbet@lwn.net,
+        kwankhede@nvidia.com, eauger@redhat.com, jian-feng.ding@intel.com,
+        hejie.xu@intel.com, kevin.tian@intel.com, zhenyuw@linux.intel.com,
+        bao.yumeng@zte.com.cn, xin-ran.wang@intel.com,
+        shaohe.feng@intel.com
+Subject: Re: device compatibility interface for live migration with assigned
+ devices
+Message-ID: <20200715082309.GC2864@work-vm>
+References: <20200713232957.GD5955@joy-OptiPlex-7040>
+ <20200714102129.GD25187@redhat.com>
+ <20200714101616.5d3a9e75@x1.home>
+ <20200714171946.GL2728@work-vm>
+ <20200714145948.17b95eb3@x1.home>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.67.165.24]
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20200714145948.17b95eb3@x1.home>
+User-Agent: Mutt/1.14.5 (2020-06-23)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The vfio_pci_release call will free and clear the error and request
-eventfd ctx while these ctx could be in use at the same time in the
-function like vfio_pci_request, and it's expected to protect them under
-the vdev->igate mutex, which is missing in vfio_pci_release.
+* Alex Williamson (alex.williamson@redhat.com) wrote:
+> On Tue, 14 Jul 2020 18:19:46 +0100
+> "Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
+> 
+> > * Alex Williamson (alex.williamson@redhat.com) wrote:
+> > > On Tue, 14 Jul 2020 11:21:29 +0100
+> > > Daniel P. Berrangé <berrange@redhat.com> wrote:
+> > >   
+> > > > On Tue, Jul 14, 2020 at 07:29:57AM +0800, Yan Zhao wrote:  
+> > > > > hi folks,
+> > > > > we are defining a device migration compatibility interface that helps upper
+> > > > > layer stack like openstack/ovirt/libvirt to check if two devices are
+> > > > > live migration compatible.
+> > > > > The "devices" here could be MDEVs, physical devices, or hybrid of the two.
+> > > > > e.g. we could use it to check whether
+> > > > > - a src MDEV can migrate to a target MDEV,
+> > > > > - a src VF in SRIOV can migrate to a target VF in SRIOV,
+> > > > > - a src MDEV can migration to a target VF in SRIOV.
+> > > > >   (e.g. SIOV/SRIOV backward compatibility case)
+> > > > > 
+> > > > > The upper layer stack could use this interface as the last step to check
+> > > > > if one device is able to migrate to another device before triggering a real
+> > > > > live migration procedure.
+> > > > > we are not sure if this interface is of value or help to you. please don't
+> > > > > hesitate to drop your valuable comments.
+> > > > > 
+> > > > > 
+> > > > > (1) interface definition
+> > > > > The interface is defined in below way:
+> > > > > 
+> > > > >              __    userspace
+> > > > >               /\              \
+> > > > >              /                 \write
+> > > > >             / read              \
+> > > > >    ________/__________       ___\|/_____________
+> > > > >   | migration_version |     | migration_version |-->check migration
+> > > > >   ---------------------     ---------------------   compatibility
+> > > > >      device A                    device B
+> > > > > 
+> > > > > 
+> > > > > a device attribute named migration_version is defined under each device's
+> > > > > sysfs node. e.g. (/sys/bus/pci/devices/0000\:00\:02.0/$mdev_UUID/migration_version).
+> > > > > userspace tools read the migration_version as a string from the source device,
+> > > > > and write it to the migration_version sysfs attribute in the target device.
+> > > > > 
+> > > > > The userspace should treat ANY of below conditions as two devices not compatible:
+> > > > > - any one of the two devices does not have a migration_version attribute
+> > > > > - error when reading from migration_version attribute of one device
+> > > > > - error when writing migration_version string of one device to
+> > > > >   migration_version attribute of the other device
+> > > > > 
+> > > > > The string read from migration_version attribute is defined by device vendor
+> > > > > driver and is completely opaque to the userspace.
+> > > > > for a Intel vGPU, string format can be defined like
+> > > > > "parent device PCI ID" + "version of gvt driver" + "mdev type" + "aggregator count".
+> > > > > 
+> > > > > for an NVMe VF connecting to a remote storage. it could be
+> > > > > "PCI ID" + "driver version" + "configured remote storage URL"
+> > > > > 
+> > > > > for a QAT VF, it may be
+> > > > > "PCI ID" + "driver version" + "supported encryption set".
+> > > > > 
+> > > > > (to avoid namespace confliction from each vendor, we may prefix a driver name to
+> > > > > each migration_version string. e.g. i915-v1-8086-591d-i915-GVTg_V5_8-1)  
+> > > 
+> > > It's very strange to define it as opaque and then proceed to describe
+> > > the contents of that opaque string.  The point is that its contents
+> > > are defined by the vendor driver to describe the device, driver version,
+> > > and possibly metadata about the configuration of the device.  One
+> > > instance of a device might generate a different string from another.
+> > > The string that a device produces is not necessarily the only string
+> > > the vendor driver will accept, for example the driver might support
+> > > backwards compatible migrations.  
+> > 
+> > (As I've said in the previous discussion, off one of the patch series)
+> > 
+> > My view is it makes sense to have a half-way house on the opaqueness of
+> > this string; I'd expect to have an ID and version that are human
+> > readable, maybe a device ID/name that's human interpretable and then a
+> > bunch of other cruft that maybe device/vendor/version specific.
+> > 
+> > I'm thinking that we want to be able to report problems and include the
+> > string and the user to be able to easily identify the device that was
+> > complaining and notice a difference in versions, and perhaps also use
+> > it in compatibility patterns to find compatible hosts; but that does
+> > get tricky when it's a 'ask the device if it's compatible'.
+> 
+> In the reply I just sent to Dan, I gave this example of what a
+> "compatibility string" might look like represented as json:
+> 
+> {
+>   "device_api": "vfio-pci",
+>   "vendor": "vendor-driver-name",
+>   "version": {
+>     "major": 0,
+>     "minor": 1
+>   },
+>   "vfio-pci": { // Based on above device_api
+>     "vendor": 0x1234, // Values for the exposed device
+>     "device": 0x5678,
+>       // Possibly further parameters for a more specific match
+>   },
+>   "mdev_attrs": [
+>     { "attribute0": "VALUE" }
+>   ]
+> }
+> 
+> Are you thinking that we might allow the vendor to include a vendor
+> specific array where we'd simply require that both sides have matching
+> fields and values?  ie.
+> 
+>   "vendor_fields": [
+>     { "unknown_field0": "unknown_value0" },
+>     { "unknown_field1": "unknown_value1" },
+>   ]
+> 
+> We could certainly make that part of the spec, but I can't really
+> figure the value of it other than to severely restrict compatibility,
+> which the vendor could already do via the version.major value.  Maybe
+> they'd want to put a build timestamp, random uuid, or source sha1 into
+> such a field to make absolutely certain compatibility is only determined
+> between identical builds?  Thanks,
 
-This issue is introduced since commit 1518ac272e78 ("vfio/pci: fix memory
-leaks of eventfd ctx"),and since commit 5c5866c593bb ("vfio/pci: Clear
-error and request eventfd ctx after releasing"), it's very easily to
-trigger the kernel panic like this:
+No, I'd mostly anticipated matching on the vendor and device and maybe a
+version number for the bit the user specifies; I had assumed all that
+'vendor cruft' was still mostly opaque; having said that, if it did
+become a list of attributes like that (some of which were vendor
+specific) that would make sense to me.
 
-[ 9513.904346] Unable to handle kernel NULL pointer dereference at virtual address 0000000000000008
-[ 9513.913091] Mem abort info:
-[ 9513.915871]   ESR = 0x96000006
-[ 9513.918912]   EC = 0x25: DABT (current EL), IL = 32 bits
-[ 9513.924198]   SET = 0, FnV = 0
-[ 9513.927238]   EA = 0, S1PTW = 0
-[ 9513.930364] Data abort info:
-[ 9513.933231]   ISV = 0, ISS = 0x00000006
-[ 9513.937048]   CM = 0, WnR = 0
-[ 9513.940003] user pgtable: 4k pages, 48-bit VAs, pgdp=0000007ec7d12000
-[ 9513.946414] [0000000000000008] pgd=0000007ec7d13003, p4d=0000007ec7d13003, pud=0000007ec728c003, pmd=0000000000000000
-[ 9513.956975] Internal error: Oops: 96000006 [#1] PREEMPT SMP
-[ 9513.962521] Modules linked in: vfio_pci vfio_virqfd vfio_iommu_type1 vfio hclge hns3 hnae3 [last unloaded: vfio_pci]
-[ 9513.972998] CPU: 4 PID: 1327 Comm: bash Tainted: G        W         5.8.0-rc4+ #3
-[ 9513.980443] Hardware name: Huawei TaiShan 2280 V2/BC82AMDC, BIOS 2280-V2 CS V3.B270.01 05/08/2020
-[ 9513.989274] pstate: 80400089 (Nzcv daIf +PAN -UAO BTYPE=--)
-[ 9513.994827] pc : _raw_spin_lock_irqsave+0x48/0x88
-[ 9513.999515] lr : eventfd_signal+0x6c/0x1b0
-[ 9514.003591] sp : ffff800038a0b960
-[ 9514.006889] x29: ffff800038a0b960 x28: ffff007ef7f4da10
-[ 9514.012175] x27: ffff207eefbbfc80 x26: ffffbb7903457000
-[ 9514.017462] x25: ffffbb7912191000 x24: ffff007ef7f4d400
-[ 9514.022747] x23: ffff20be6e0e4c00 x22: 0000000000000008
-[ 9514.028033] x21: 0000000000000000 x20: 0000000000000000
-[ 9514.033321] x19: 0000000000000008 x18: 0000000000000000
-[ 9514.038606] x17: 0000000000000000 x16: ffffbb7910029328
-[ 9514.043893] x15: 0000000000000000 x14: 0000000000000001
-[ 9514.049179] x13: 0000000000000000 x12: 0000000000000002
-[ 9514.054466] x11: 0000000000000000 x10: 0000000000000a00
-[ 9514.059752] x9 : ffff800038a0b840 x8 : ffff007ef7f4de60
-[ 9514.065038] x7 : ffff007fffc96690 x6 : fffffe01faffb748
-[ 9514.070324] x5 : 0000000000000000 x4 : 0000000000000000
-[ 9514.075609] x3 : 0000000000000000 x2 : 0000000000000001
-[ 9514.080895] x1 : ffff007ef7f4d400 x0 : 0000000000000000
-[ 9514.086181] Call trace:
-[ 9514.088618]  _raw_spin_lock_irqsave+0x48/0x88
-[ 9514.092954]  eventfd_signal+0x6c/0x1b0
-[ 9514.096691]  vfio_pci_request+0x84/0xd0 [vfio_pci]
-[ 9514.101464]  vfio_del_group_dev+0x150/0x290 [vfio]
-[ 9514.106234]  vfio_pci_remove+0x30/0x128 [vfio_pci]
-[ 9514.111007]  pci_device_remove+0x48/0x108
-[ 9514.115001]  device_release_driver_internal+0x100/0x1b8
-[ 9514.120200]  device_release_driver+0x28/0x38
-[ 9514.124452]  pci_stop_bus_device+0x68/0xa8
-[ 9514.128528]  pci_stop_and_remove_bus_device+0x20/0x38
-[ 9514.133557]  pci_iov_remove_virtfn+0xb4/0x128
-[ 9514.137893]  sriov_disable+0x3c/0x108
-[ 9514.141538]  pci_disable_sriov+0x28/0x38
-[ 9514.145445]  hns3_pci_sriov_configure+0x48/0xb8 [hns3]
-[ 9514.150558]  sriov_numvfs_store+0x110/0x198
-[ 9514.154724]  dev_attr_store+0x44/0x60
-[ 9514.158373]  sysfs_kf_write+0x5c/0x78
-[ 9514.162018]  kernfs_fop_write+0x104/0x210
-[ 9514.166010]  __vfs_write+0x48/0x90
-[ 9514.169395]  vfs_write+0xbc/0x1c0
-[ 9514.172694]  ksys_write+0x74/0x100
-[ 9514.176079]  __arm64_sys_write+0x24/0x30
-[ 9514.179987]  el0_svc_common.constprop.4+0x110/0x200
-[ 9514.184842]  do_el0_svc+0x34/0x98
-[ 9514.188144]  el0_svc+0x14/0x40
-[ 9514.191185]  el0_sync_handler+0xb0/0x2d0
-[ 9514.195088]  el0_sync+0x140/0x180
-[ 9514.198389] Code: b9001020 d2800000 52800022 f9800271 (885ffe61)
-[ 9514.204455] ---[ end trace 648de00c8406465f ]---
-[ 9514.212308] note: bash[1327] exited with preempt_count 1
+Dave
 
-Cc: Qian Cai <cai@lca.pw>
-Cc: Alex Williamson <alex.williamson@redhat.com>
-Fixes: 1518ac272e78 ("vfio/pci: fix memory leaks of eventfd ctx")
-Signed-off-by: Zeng Tao <prime.zeng@hisilicon.com>
----
- drivers/vfio/pci/vfio_pci.c | 5 +++++
- 1 file changed, 5 insertions(+)
-
-diff --git a/drivers/vfio/pci/vfio_pci.c b/drivers/vfio/pci/vfio_pci.c
-index f634c81..de881a6 100644
---- a/drivers/vfio/pci/vfio_pci.c
-+++ b/drivers/vfio/pci/vfio_pci.c
-@@ -521,14 +521,19 @@ static void vfio_pci_release(void *device_data)
- 		vfio_pci_vf_token_user_add(vdev, -1);
- 		vfio_spapr_pci_eeh_release(vdev->pdev);
- 		vfio_pci_disable(vdev);
-+		mutex_lock(&vdev->igate);
- 		if (vdev->err_trigger) {
- 			eventfd_ctx_put(vdev->err_trigger);
- 			vdev->err_trigger = NULL;
- 		}
-+		mutex_unlock(&vdev->igate);
-+
-+		mutex_lock(&vdev->igate);
- 		if (vdev->req_trigger) {
- 			eventfd_ctx_put(vdev->req_trigger);
- 			vdev->req_trigger = NULL;
- 		}
-+		mutex_unlock(&vdev->igate);
- 	}
- 
- 	mutex_unlock(&vdev->reflck->lock);
--- 
-2.8.1
+> 
+> Alex
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
