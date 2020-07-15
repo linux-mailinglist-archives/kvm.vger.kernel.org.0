@@ -2,82 +2,102 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 45FCF22085D
-	for <lists+kvm@lfdr.de>; Wed, 15 Jul 2020 11:14:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 56FD7220875
+	for <lists+kvm@lfdr.de>; Wed, 15 Jul 2020 11:17:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730312AbgGOJNl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 Jul 2020 05:13:41 -0400
-Received: from [195.135.220.15] ([195.135.220.15]:55238 "EHLO mx2.suse.de"
-        rhost-flags-FAIL-FAIL-OK-OK) by vger.kernel.org with ESMTP
-        id S1728672AbgGOJNl (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 15 Jul 2020 05:13:41 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.221.27])
-        by mx2.suse.de (Postfix) with ESMTP id 1D30FAF69;
-        Wed, 15 Jul 2020 09:13:43 +0000 (UTC)
-Date:   Wed, 15 Jul 2020 11:13:37 +0200
-From:   Joerg Roedel <jroedel@suse.de>
-To:     Peter Zijlstra <peterz@infradead.org>
-Cc:     Joerg Roedel <joro@8bytes.org>, x86@kernel.org, hpa@zytor.com,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Jiri Slaby <jslaby@suse.cz>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Juergen Gross <jgross@suse.com>,
-        Kees Cook <keescook@chromium.org>,
-        David Rientjes <rientjes@google.com>,
-        Cfir Cohen <cfir@google.com>,
-        Erdem Aktas <erdemaktas@google.com>,
-        Masami Hiramatsu <mhiramat@kernel.org>,
-        Mike Stunes <mstunes@vmware.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Martin Radev <martin.b.radev@gmail.com>,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org
-Subject: Re: [PATCH v4 63/75] x86/sev-es: Handle #DB Events
-Message-ID: <20200715091337.GI16200@suse.de>
-References: <20200714120917.11253-1-joro@8bytes.org>
- <20200714120917.11253-64-joro@8bytes.org>
- <20200715084752.GD10769@hirez.programming.kicks-ass.net>
+        id S1730347AbgGOJRG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 15 Jul 2020 05:17:06 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:31283 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1729592AbgGOJRF (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 15 Jul 2020 05:17:05 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1594804624;
+        h=from:from:reply-to:reply-to:subject:subject:date:date:
+         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+         content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=u4BynM0bo8sz1ax9kTNFDfebTLK2fVb4wN9VUIwN5GY=;
+        b=WTbqRjvLmWBs0mSMxuT6nZoLAD4yUjfAYfY17VZPl7i5r5fKYH9B7zAvq573/l/Hza4M0L
+        kaCtuIOJvIAsMm8l5zzrK0vSkzfjpMcdiKGbHzmZaQlki0aoHcYe3KwNUc5/LAzhYrEMYL
+        bV+6Yhd68WliFVeN7trJ/cjK3VdsmK4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-241-kfLB2Gn9PieX4IjTTidrFQ-1; Wed, 15 Jul 2020 05:17:01 -0400
+X-MC-Unique: kfLB2Gn9PieX4IjTTidrFQ-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7B7268027FA;
+        Wed, 15 Jul 2020 09:16:58 +0000 (UTC)
+Received: from redhat.com (unknown [10.36.110.46])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 2156B10013D0;
+        Wed, 15 Jul 2020 09:16:44 +0000 (UTC)
+Date:   Wed, 15 Jul 2020 10:16:41 +0100
+From:   Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To:     Alex Williamson <alex.williamson@redhat.com>
+Cc:     Yan Zhao <yan.y.zhao@intel.com>, devel@ovirt.org,
+        openstack-discuss@lists.openstack.org, libvir-list@redhat.com,
+        intel-gvt-dev@lists.freedesktop.org, kvm@vger.kernel.org,
+        qemu-devel@nongnu.org, smooney@redhat.com, eskultet@redhat.com,
+        cohuck@redhat.com, dinechin@redhat.com, corbet@lwn.net,
+        kwankhede@nvidia.com, dgilbert@redhat.com, eauger@redhat.com,
+        jian-feng.ding@intel.com, hejie.xu@intel.com, kevin.tian@intel.com,
+        zhenyuw@linux.intel.com, bao.yumeng@zte.com.cn,
+        xin-ran.wang@intel.com, shaohe.feng@intel.com
+Subject: Re: device compatibility interface for live migration with assigned
+ devices
+Message-ID: <20200715091641.GD68910@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20200713232957.GD5955@joy-OptiPlex-7040>
+ <20200714102129.GD25187@redhat.com>
+ <20200714101616.5d3a9e75@x1.home>
+ <20200714164722.GL25187@redhat.com>
+ <20200714144715.0ef70074@x1.home>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20200715084752.GD10769@hirez.programming.kicks-ass.net>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20200714144715.0ef70074@x1.home>
+User-Agent: Mutt/1.14.5 (2020-06-23)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jul 15, 2020 at 10:47:52AM +0200, Peter Zijlstra wrote:
-> On Tue, Jul 14, 2020 at 02:09:05PM +0200, Joerg Roedel wrote:
-> 
-> > @@ -1028,6 +1036,16 @@ DEFINE_IDTENTRY_VC_SAFE_STACK(exc_vmm_communication)
-> >  	struct ghcb *ghcb;
-> >  
-> >  	lockdep_assert_irqs_disabled();
-> > +
-> > +	/*
-> > +	 * #DB is special and needs to be handled outside of the intrumentation_begin()/end().
-> > +	 * Otherwise the #VC handler could be raised recursivly.
-> > +	 */
-> > +	if (error_code == SVM_EXIT_EXCP_BASE + X86_TRAP_DB) {
-> > +		vc_handle_trap_db(regs);
-> > +		return;
-> > +	}
-> > +
-> >  	instrumentation_begin();
-> 
-> Wait what?! That makes no sense what so ever.
+On Tue, Jul 14, 2020 at 02:47:15PM -0600, Alex Williamson wrote:
+> On Tue, 14 Jul 2020 17:47:22 +0100
+> Daniel P. Berrangé <berrange@redhat.com> wrote:
 
-Then my understanding of intrumentation_begin/end() is wrong, I thought
-that the kernel will forbid setting breakpoints before
-instrumentation_begin(), which is necessary here because a break-point
-in the #VC handler might cause recursive #VC-exceptions when #DB is
-intercepted.
-Maybe you can elaborate on why this makes no sense?
+> > I'm sure OpenStack maintainers can speak to this more, as they've put
+> > alot of work into their scheduling engine to optimize the way it places
+> > VMs largely driven from simple structured data reported from hosts.
+> 
+> I think we've weeded out that our intended approach is not worthwhile,
+> testing a compatibility string at a device is too much overhead, we
+> need to provide enough information to the management engine to predict
+> the response without interaction beyond the initial capability probing.
+
+Just to clarify in case people mis-interpreted my POV...
+
+I think that testing a compatibility string at a device *is* useful, as
+it allows for a final accurate safety check to be performed before the
+migration stream starts. Libvirt could use that reasonably easily I
+believe.
+
+It just isn't sufficient for a complete solution.
+
+In parallel with the device level test in sysfs, we need something else
+to support the host placement selection problems in an efficient way, as
+you are trying to address in the remainder of your mail.
+
 
 Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
 
-	Joerg
