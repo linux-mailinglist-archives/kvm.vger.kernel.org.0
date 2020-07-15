@@ -2,132 +2,99 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E6D8B22157C
-	for <lists+kvm@lfdr.de>; Wed, 15 Jul 2020 21:50:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CD54822157E
+	for <lists+kvm@lfdr.de>; Wed, 15 Jul 2020 21:50:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728114AbgGOTtL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 Jul 2020 15:49:11 -0400
-Received: from smtp-fw-9102.amazon.com ([207.171.184.29]:54820 "EHLO
-        smtp-fw-9102.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728143AbgGOTtK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 15 Jul 2020 15:49:10 -0400
+        id S1728150AbgGOTt1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 15 Jul 2020 15:49:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44474 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727798AbgGOTtZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 15 Jul 2020 15:49:25 -0400
+Received: from mail-pl1-x643.google.com (mail-pl1-x643.google.com [IPv6:2607:f8b0:4864:20::643])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8F3CBC08C5CE
+        for <kvm@vger.kernel.org>; Wed, 15 Jul 2020 12:49:25 -0700 (PDT)
+Received: by mail-pl1-x643.google.com with SMTP id k4so2804001pld.12
+        for <kvm@vger.kernel.org>; Wed, 15 Jul 2020 12:49:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1594842550; x=1626378550;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=dR4aR3U3V8BmYKFoy5Xq9s4Z+vmz751Zo3a/pd1AIKk=;
-  b=Qhax4MxdHZSfxH7Hxiy80sMVREdlS3iXveukxEFHMXaY7mQr9+ZBkNVA
-   N6lXCDqvDYAYFzSFtKWEKFto5Ky6cMej5KOO14CD7EC+aZ0o5SCI20vsv
-   DmLbPzrMpp0k84h0hVrsKrDECdzqBXMoj6TBBuxzzZSjHPZW93UfKXX/b
-   U=;
-IronPort-SDR: yLa5m8k78+o/vP6cKInHcJ4ND0Q2bbIjrPSTgkg73UKOuRxsN6M/UcPcUwe3lN6/XMwPzpaGnV
- +gECYS6lhDeA==
-X-IronPort-AV: E=Sophos;i="5.75,356,1589241600"; 
-   d="scan'208";a="60147939"
-Received: from sea32-co-svc-lb4-vlan3.sea.corp.amazon.com (HELO email-inbound-relay-2c-4e7c8266.us-west-2.amazon.com) ([10.47.23.38])
-  by smtp-border-fw-out-9102.sea19.amazon.com with ESMTP; 15 Jul 2020 19:49:09 +0000
-Received: from EX13MTAUEA002.ant.amazon.com (pdx4-ws-svc-p6-lb7-vlan2.pdx.amazon.com [10.170.41.162])
-        by email-inbound-relay-2c-4e7c8266.us-west-2.amazon.com (Postfix) with ESMTPS id 356A5A1796;
-        Wed, 15 Jul 2020 19:49:08 +0000 (UTC)
-Received: from EX13D16EUB001.ant.amazon.com (10.43.166.28) by
- EX13MTAUEA002.ant.amazon.com (10.43.61.77) with Microsoft SMTP Server (TLS)
- id 15.0.1497.2; Wed, 15 Jul 2020 19:49:07 +0000
-Received: from 38f9d34ed3b1.ant.amazon.com (10.43.160.65) by
- EX13D16EUB001.ant.amazon.com (10.43.166.28) with Microsoft SMTP Server (TLS)
- id 15.0.1497.2; Wed, 15 Jul 2020 19:48:57 +0000
-From:   Andra Paraschiv <andraprs@amazon.com>
-To:     <linux-kernel@vger.kernel.org>
-CC:     Anthony Liguori <aliguori@amazon.com>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Colm MacCarthaigh <colmmacc@amazon.com>,
-        "David Duncan" <davdunc@amazon.com>,
-        Bjoern Doebel <doebel@amazon.de>,
-        "David Woodhouse" <dwmw@amazon.co.uk>,
-        Frank van der Linden <fllinden@amazon.com>,
-        Alexander Graf <graf@amazon.de>,
-        Greg KH <gregkh@linuxfoundation.org>,
-        "Karen Noel" <knoel@redhat.com>,
-        Martin Pohlack <mpohlack@amazon.de>,
-        Matt Wilson <msw@amazon.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Balbir Singh <sblbir@amazon.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        "Stefan Hajnoczi" <stefanha@redhat.com>,
-        Stewart Smith <trawets@amazon.com>,
-        "Uwe Dannowski" <uwed@amazon.de>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>, <kvm@vger.kernel.org>,
-        <ne-devel-upstream@amazon.com>,
-        Andra Paraschiv <andraprs@amazon.com>
-Subject: [PATCH v5 18/18] MAINTAINERS: Add entry for the Nitro Enclaves driver
-Date:   Wed, 15 Jul 2020 22:45:40 +0300
-Message-ID: <20200715194540.45532-19-andraprs@amazon.com>
-X-Mailer: git-send-email 2.20.1 (Apple Git-117)
-In-Reply-To: <20200715194540.45532-1-andraprs@amazon.com>
-References: <20200715194540.45532-1-andraprs@amazon.com>
+        d=chromium.org; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=yppoieqawtommMNv7F4xEsaylvTK3ZvGj7dcQjgO2TY=;
+        b=j2qfngMt1we3l0IhZifI4twKJ3j3kBQ/HIpn7YZ5j2qvGCpY3D4CxXVvbwFlxonJnk
+         6FWAS/JQzC3Vr2RY57kmgM9BiR+ZrBL3UMBVX0Dg1AEdjzFvwUMCdolO9hvbOeEsYa6u
+         jBGIyYHDqd0rQYUMQHt3Rxit3HX4mUF8GqeNY=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=yppoieqawtommMNv7F4xEsaylvTK3ZvGj7dcQjgO2TY=;
+        b=kNKBfWMa4ivPdutgf5bm6tspRZy8s/DWf3XSMdc7li9cs9ynCdz4LoX4mKZtloxsQL
+         3HfFra6y5V4nelMP1EoDDZNAwFo363wFs/DrO8OPlyC2lot+s7c4jAcJ3pkFegBCyROs
+         Xpu5MKl2p4mwYeEJcYwDAhzhPiU1vJfaI1s0yYTUATwmrI2s7QUbAgoBPLX9p+uv4cpq
+         k807sxCzGuBjUTMEUolTxPSRq/SX+QHYgjWOoNm0NjuXb6HXEQLRypDbBJcSTG2eCSgm
+         XM58D+f/eOBTk6D3/S61vujSiak5d9TukLzyTzL3o+nV1bg+i+bThwJLKWVp+UGaa1kU
+         DjRQ==
+X-Gm-Message-State: AOAM533pAf1P0NBy58wwBTlu6O2b/pEyiBBkfE47rMp2QDkJh7iKn6z5
+        ZwckffvzUicGdhHais0Z3LsN9/W08hs=
+X-Google-Smtp-Source: ABdhPJxvA58SlKkMWKAljrVfZntLrDAODkXc0OEIDnErZntti/oMHX7TUTMJUyPo0nAVuQc7dj8q2g==
+X-Received: by 2002:a17:902:8c91:: with SMTP id t17mr825746plo.235.1594842565095;
+        Wed, 15 Jul 2020 12:49:25 -0700 (PDT)
+Received: from www.outflux.net (smtp.outflux.net. [198.145.64.163])
+        by smtp.gmail.com with ESMTPSA id g7sm2685716pfh.210.2020.07.15.12.49.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 15 Jul 2020 12:49:24 -0700 (PDT)
+Date:   Wed, 15 Jul 2020 12:49:23 -0700
+From:   Kees Cook <keescook@chromium.org>
+To:     Joerg Roedel <jroedel@suse.de>
+Cc:     Joerg Roedel <joro@8bytes.org>, x86@kernel.org, hpa@zytor.com,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Jiri Slaby <jslaby@suse.cz>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Juergen Gross <jgross@suse.com>,
+        David Rientjes <rientjes@google.com>,
+        Cfir Cohen <cfir@google.com>,
+        Erdem Aktas <erdemaktas@google.com>,
+        Masami Hiramatsu <mhiramat@kernel.org>,
+        Mike Stunes <mstunes@vmware.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Martin Radev <martin.b.radev@gmail.com>,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org
+Subject: Re: [PATCH v4 70/75] x86/head/64: Don't call verify_cpu() on
+ starting APs
+Message-ID: <202007151244.315DCBAE@keescook>
+References: <20200714120917.11253-1-joro@8bytes.org>
+ <20200714120917.11253-71-joro@8bytes.org>
+ <202007141837.2B93BBD78@keescook>
+ <20200715092638.GJ16200@suse.de>
+ <202007150815.A81E879@keescook>
+ <20200715154856.GA24822@suse.de>
 MIME-Version: 1.0
-X-Originating-IP: [10.43.160.65]
-X-ClientProxiedBy: EX13D34UWA002.ant.amazon.com (10.43.160.245) To
- EX13D16EUB001.ant.amazon.com (10.43.166.28)
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200715154856.GA24822@suse.de>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Signed-off-by: Andra Paraschiv <andraprs@amazon.com>
----
-Changelog
+On Wed, Jul 15, 2020 at 05:48:56PM +0200, Joerg Roedel wrote:
+> It is actually the CPUID instructions that cause #VC exceptions. The
+> MSRs that are accessed on AMD processors are not intercepted in the
+> hypervisors this code has been tested on, so these will not cause #VC
+> exceptions.
 
-v4 -> v5
+Aaah. I see. Thanks for the details there. So ... can you add a bunch
+more comments about why/when the new entry path is being used? I really
+don't want to accidentally discover some unrelated refactoring down
+the road (in months, years, unrelated to SEV, etc) starts to also skip
+verify_cpu() on Intel systems. There had been a lot of BIOSes that set
+this MSR to disable NX, and I don't want to repeat that pain: Linux must
+never start an Intel CPU with that MSR set. :P
 
-* No changes.
-
-v3 -> v4
-
-* No changes.
-
-v2 -> v3
-
-* Update file entries to be in alphabetical order.
-
-v1 -> v2
-
-* No changes.
----
- MAINTAINERS | 13 +++++++++++++
- 1 file changed, 13 insertions(+)
-
-diff --git a/MAINTAINERS b/MAINTAINERS
-index b4a43a9e7fbc..a1789a8df546 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -12116,6 +12116,19 @@ S:	Maintained
- T:	git git://git.kernel.org/pub/scm/linux/kernel/git/lftan/nios2.git
- F:	arch/nios2/
- 
-+NITRO ENCLAVES (NE)
-+M:	Andra Paraschiv <andraprs@amazon.com>
-+M:	Alexandru Vasile <lexnv@amazon.com>
-+M:	Alexandru Ciobotaru <alcioa@amazon.com>
-+L:	linux-kernel@vger.kernel.org
-+S:	Supported
-+W:	https://aws.amazon.com/ec2/nitro/nitro-enclaves/
-+F:	Documentation/nitro_enclaves/
-+F:	drivers/virt/nitro_enclaves/
-+F:	include/linux/nitro_enclaves.h
-+F:	include/uapi/linux/nitro_enclaves.h
-+F:	samples/nitro_enclaves/
-+
- NOHZ, DYNTICKS SUPPORT
- M:	Frederic Weisbecker <fweisbec@gmail.com>
- M:	Thomas Gleixner <tglx@linutronix.de>
 -- 
-2.20.1 (Apple Git-117)
-
-
-
-
-Amazon Development Center (Romania) S.R.L. registered office: 27A Sf. Lazar Street, UBC5, floor 2, Iasi, Iasi County, 700045, Romania. Registered in Romania. Registration number J22/2621/2005.
-
+Kees Cook
