@@ -2,129 +2,136 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id F16A022182F
-	for <lists+kvm@lfdr.de>; Thu, 16 Jul 2020 01:00:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1E2A1221845
+	for <lists+kvm@lfdr.de>; Thu, 16 Jul 2020 01:13:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727107AbgGOXAM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 Jul 2020 19:00:12 -0400
-Received: from mga03.intel.com ([134.134.136.65]:1713 "EHLO mga03.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726765AbgGOXAL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 15 Jul 2020 19:00:11 -0400
-IronPort-SDR: iHMAX7dbH+1DiZw8mqRitIvrUrA+U24ANHKkWNbM6bUqQrSa2FwouM80KZvL0sVsWl+em9zSi+
- HJkglCgnaC/A==
-X-IronPort-AV: E=McAfee;i="6000,8403,9683"; a="149274296"
-X-IronPort-AV: E=Sophos;i="5.75,357,1589266800"; 
-   d="scan'208";a="149274296"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Jul 2020 16:00:09 -0700
-IronPort-SDR: wabWivlgfsZ89og+8FO6XfFmkaajLr8T24U6dOGKCshdczPg5lcuO8WfrxCgC0KZb0x4ywDy1v
- LJI2s/3cyTXQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.75,357,1589266800"; 
-   d="scan'208";a="486406812"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.152])
-  by fmsmga005.fm.intel.com with ESMTP; 15 Jul 2020 16:00:09 -0700
-Date:   Wed, 15 Jul 2020 16:00:08 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Mohammed Gamal <mgamal@redhat.com>
-Cc:     kvm@vger.kernel.org, pbonzini@redhat.com,
-        linux-kernel@vger.kernel.org, vkuznets@redhat.com,
-        wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org
-Subject: Re: [PATCH v3 7/9] KVM: VMX: Add guest physical address check in EPT
- violation and misconfig
-Message-ID: <20200715230006.GF12349@linux.intel.com>
-References: <20200710154811.418214-1-mgamal@redhat.com>
- <20200710154811.418214-8-mgamal@redhat.com>
+        id S1726905AbgGOXNE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 15 Jul 2020 19:13:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47554 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726776AbgGOXNE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 15 Jul 2020 19:13:04 -0400
+Received: from mail-il1-x143.google.com (mail-il1-x143.google.com [IPv6:2607:f8b0:4864:20::143])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 11D13C061755
+        for <kvm@vger.kernel.org>; Wed, 15 Jul 2020 16:13:04 -0700 (PDT)
+Received: by mail-il1-x143.google.com with SMTP id a11so3511930ilk.0
+        for <kvm@vger.kernel.org>; Wed, 15 Jul 2020 16:13:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=tOz1jJkVML1mQdocE25sKsIyj+RbAb/2bw/59L7mnd0=;
+        b=S+l3EQOQN3PJrwVwEodMRcihRZ553OPkfTycoYBwGrjlvpy4QEFqWmpyUCdyW8paOu
+         dcuoTXG/MGogW9IgH9NHx65sn6mAlcR84YTCLIJOXuNRenR2GvMzPWziw8sWr9H3UwHj
+         KpjF2M/tMHkFTyz7myZwYocfNCqSM4IzxSorZHfqWEJhtob3qh5pa5egl0beyZjpXP40
+         Tznu2v8CNNBM+VNXMvfxSQ+lgJn6O9yRKpsEWxqTxkSyhNZ7CQfyzdjklo4oJqV1NhfX
+         FV5X8mdVYPe65Jq4iu6kDN2aMLClLt//+RDwqc2RYM4kipwXLOLfyArsWGYrp2Vv5CAa
+         ewPw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=tOz1jJkVML1mQdocE25sKsIyj+RbAb/2bw/59L7mnd0=;
+        b=cINPB5LmkNVYtmJEYa1Kx0KetNMbysxJI1chCNXzU/OHaz3NvHNZxI7blXLSpyVj4H
+         I4y0qdV3TNMbDk0baedTKO9fHB+Go//gDsoH+7BO4i2LcoS8G7n2OUxwMFihvPcstEJ1
+         53VLcK8/H4IyRZ3oOkoFQh+o4/TKetUUa6tjYzFDB+rzQUxZtu32tuEvUF6IzPaOfrtg
+         Vrrbz/RZdrZGQn/bba8cFm/weZzn0g9jU1qwUNgiX+3zmhrn4etzOaI29NDqIsvLMnIx
+         2utJtZYVylHDBH5Z61P4uHS324R4GdmyhfTTx5QjU0zEY2UqcwJC35Thu8RF7ARDqgt4
+         IImQ==
+X-Gm-Message-State: AOAM531OEZggd4c0+RdypgnV76qXKeyWf2d2wd2OfPEXr9K3kJsEeCbw
+        3OoNG/LvPCZxilhkyf8ZY0HqI+fd6twknZT/upMwZg==
+X-Google-Smtp-Source: ABdhPJxZtMeeNY8c7127DSlP7S7p+oXctQ1tCisQyulPVEAnDj0rBASLdsjp2Po0sArtmgrBiaQ09BPLGzPebfaSBpA=
+X-Received: by 2002:a92:b685:: with SMTP id m5mr1853432ill.118.1594854783053;
+ Wed, 15 Jul 2020 16:13:03 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200710154811.418214-8-mgamal@redhat.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+References: <20200713043908.39605-1-namit@vmware.com> <ce87fd51-8e27-e5ff-3a90-06cddbf47636@oracle.com>
+ <CCEF21D4-57C3-4843-9443-BE46501FFE8C@vmware.com> <abe9138a-6c61-22e1-f0a6-fcd5d06ef3f1@oracle.com>
+ <6CD095D7-EF7F-49C2-98EF-F72D019817B2@vmware.com> <fe76d847-5106-bc09-e4cf-498fb51e5255@oracle.com>
+ <9DC37B0B-597A-4B31-8397-B6E4764EEA37@vmware.com> <ab9f1669-a295-1022-a62a-8b64c90f6dcb@oracle.com>
+In-Reply-To: <ab9f1669-a295-1022-a62a-8b64c90f6dcb@oracle.com>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Wed, 15 Jul 2020 16:12:51 -0700
+Message-ID: <CALMp9eSoRSKBvNwjm5fpPG2XDJnnC1b-tm68P-K_Jnyab4aPMg@mail.gmail.com>
+Subject: Re: [kvm-unit-tests PATCH] x86: svm: low CR3 bits are not MBZ
+To:     Krish Sadhukhan <krish.sadhukhan@oracle.com>
+Cc:     Nadav Amit <namit@vmware.com>, Paolo Bonzini <pbonzini@redhat.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jul 10, 2020 at 05:48:09PM +0200, Mohammed Gamal wrote:
-> Check guest physical address against it's maximum physical memory. If
-> the guest's physical address exceeds the maximum (i.e. has reserved bits
-> set), inject a guest page fault with PFERR_RSVD_MASK set.
-> 
-> This has to be done both in the EPT violation and page fault paths, as
-> there are complications in both cases with respect to the computation
-> of the correct error code.
-> 
-> For EPT violations, unfortunately the only possibility is to emulate,
-> because the access type in the exit qualification might refer to an
-> access to a paging structure, rather than to the access performed by
-> the program.
-> 
-> Trapping page faults instead is needed in order to correct the error code,
-> but the access type can be obtained from the original error code and
-> passed to gva_to_gpa.  The corrections required in the error code are
-> subtle. For example, imagine that a PTE for a supervisor page has a reserved
-> bit set.  On a supervisor-mode access, the EPT violation path would trigger.
-> However, on a user-mode access, the processor will not notice the reserved
-> bit and not include PFERR_RSVD_MASK in the error code.
-> 
-> Co-developed-by: Mohammed Gamal <mgamal@redhat.com>
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
->  arch/x86/kvm/vmx/vmx.c | 24 +++++++++++++++++++++---
->  arch/x86/kvm/vmx/vmx.h |  3 ++-
->  2 files changed, 23 insertions(+), 4 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index 770b090969fb..de3f436b2d32 100644
-> --- a/arch/x86/kvm/vmx/vmx.c
-> +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -4790,9 +4790,15 @@ static int handle_exception_nmi(struct kvm_vcpu *vcpu)
->  
->  	if (is_page_fault(intr_info)) {
->  		cr2 = vmx_get_exit_qual(vcpu);
-> -		/* EPT won't cause page fault directly */
-> -		WARN_ON_ONCE(!vcpu->arch.apf.host_apf_flags && enable_ept);
-> -		return kvm_handle_page_fault(vcpu, error_code, cr2, NULL, 0);
-> +		if (enable_ept && !vcpu->arch.apf.host_apf_flags) {
-> +			/*
-> +			 * EPT will cause page fault only if we need to
-> +			 * detect illegal GPAs.
-> +			 */
-> +			kvm_fixup_and_inject_pf_error(vcpu, cr2, error_code);
+On Wed, Jul 15, 2020 at 3:40 PM Krish Sadhukhan
+<krish.sadhukhan@oracle.com> wrote:
+>
+>
+> On 7/15/20 3:27 PM, Nadav Amit wrote:
+> >> On Jul 15, 2020, at 3:21 PM, Krish Sadhukhan <krish.sadhukhan@oracle.c=
+om> wrote:
+> >>
+> >>
+> >> On 7/13/20 4:30 PM, Nadav Amit wrote:
+> >>>> On Jul 13, 2020, at 4:17 PM, Krish Sadhukhan <krish.sadhukhan@oracle=
+.com> wrote:
+> >>>>
+> >>>>
+> > [snip]
+> >
+> >>>> I am just saying that the APM language "should be cleared to 0" is m=
+isleading if the processor doesn't enforce it.
+> >>> Just to ensure I am clear - I am not blaming you in any way. I also f=
+ound
+> >>> the phrasing confusing.
+> >>>
+> >>> Having said that, if you (or anyone else) reintroduces =E2=80=9Cposit=
+ive=E2=80=9D tests, in
+> >>> which the VM CR3 is modified to ensure VM-entry succeeds when the res=
+erved
+> >>> non-MBZ bits are set, please ensure the tests fails gracefully. The
+> >>> non-long-mode CR3 tests crashed since the VM page-tables were incompa=
+tible
+> >>> with the paging mode.
+> >>>
+> >>> In other words, instead of setting a VMMCALL instruction in the VM to=
+ trap
+> >>> immediately after entry, consider clearing the present-bits in the hi=
+gh
+> >>> levels of the NPT; or injecting some exception that would trigger exi=
+t
+> >>> during vectoring or something like that.
+> >>>
+> >>> P.S.: If it wasn=E2=80=99t clear, I am not going to fix KVM itself fo=
+r some obvious
+> >>> reasons.
+> >> I think since the APM is not clear, re-adding any test that tests thos=
+e bits, is like adding a test with "undefined behavior" to me.
+> >>
+> >>
+> >> Paolo, Should I send a KVM patch to remove checks for those non-MBZ re=
+served bits ?
+> > Which non-MBZ reserved bits (other than those that I addressed) do you =
+refer
+> > to?
+> >
+> I am referring to,
+>
+>      "[PATCH 2/3 v4] KVM: nSVM: Check that MBZ bits in CR3 and CR4 are
+> not set on vmrun of nested guests"
+>
+> in which I added the following:
+>
+>
+> +#define MSR_CR3_LEGACY_RESERVED_MASK        0xfe7U
+> +#define MSR_CR3_LEGACY_PAE_RESERVED_MASK    0x7U
+> +#define MSR_CR3_LONG_RESERVED_MASK        0xfff0000000000fe7U
 
-This splats when running the PKU unit test, although the test still passed.
-I haven't yet spent the brain power to determine if this is a benign warning,
-i.e. simply unexpected, or if permission_fault() fault truly can't handle PK
-faults.
+In my experience, the APM generally distinguishes between "reserved"
+and "reserved, MBZ." The low bits you have indicated for CR3 are
+marked only as "reserved" in Figures 3-4, 3-5, and 3-6 of the APM,
+volume 2. Only bits 63:52 are marked as "reserved, MBZ." (In fact,
+Figure 3-6 of the May 2020 version of the APM, revision 3.35, also
+calls out bits 11:0 as the PCID when CR4.PCIDE is set.)
 
-  WARNING: CPU: 25 PID: 5465 at arch/x86/kvm/mmu.h:197 paging64_walk_addr_generic+0x594/0x750 [kvm]
-  Hardware name: Intel Corporation WilsonCity/WilsonCity, BIOS WLYDCRB1.SYS.0014.D62.2001092233 01/09/2020
-  RIP: 0010:paging64_walk_addr_generic+0x594/0x750 [kvm]
-  Code: <0f> 0b e9 db fe ff ff 44 8b 43 04 4c 89 6c 24 30 8b 13 41 39 d0 89
-  RSP: 0018:ff53778fc623fb60 EFLAGS: 00010202
-  RAX: 0000000000000001 RBX: ff53778fc623fbf0 RCX: 0000000000000007
-  RDX: 0000000000000001 RSI: 0000000000000002 RDI: ff4501efba818000
-  RBP: 0000000000000020 R08: 0000000000000005 R09: 00000000004000e7
-  R10: 0000000000000001 R11: 0000000000000000 R12: 0000000000000007
-  R13: ff4501efba818388 R14: 10000000004000e7 R15: 0000000000000000
-  FS:  00007f2dcf31a700(0000) GS:ff4501f1c8040000(0000) knlGS:0000000000000000
-  CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-  CR2: 0000000000000000 CR3: 0000001dea475005 CR4: 0000000000763ee0
-  DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-  DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-  PKRU: 55555554
-  Call Trace:
-   paging64_gva_to_gpa+0x3f/0xb0 [kvm]
-   kvm_fixup_and_inject_pf_error+0x48/0xa0 [kvm]
-   handle_exception_nmi+0x4fc/0x5b0 [kvm_intel]
-   kvm_arch_vcpu_ioctl_run+0x911/0x1c10 [kvm]
-   kvm_vcpu_ioctl+0x23e/0x5d0 [kvm]
-   ksys_ioctl+0x92/0xb0
-   __x64_sys_ioctl+0x16/0x20
-   do_syscall_64+0x3e/0xb0
-   entry_SYSCALL_64_after_hwframe+0x44/0xa9
-  ---[ end trace d17eb998aee991da ]---
-
+Of course, you could always test the behavior. :-)
