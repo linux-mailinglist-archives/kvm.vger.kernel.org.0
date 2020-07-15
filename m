@@ -2,129 +2,133 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4FE3F220B51
-	for <lists+kvm@lfdr.de>; Wed, 15 Jul 2020 13:11:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EA7D7220BBA
+	for <lists+kvm@lfdr.de>; Wed, 15 Jul 2020 13:24:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730121AbgGOLLn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 Jul 2020 07:11:43 -0400
-Received: from mga17.intel.com ([192.55.52.151]:26068 "EHLO mga17.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729826AbgGOLKm (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 15 Jul 2020 07:10:42 -0400
-IronPort-SDR: zk0zOTlNmv5kOGhYhZLsuPWJFFToHYjzFOHmor2vIlUmjDaqga/WsKwHtB8dBexb3HzNIOtHpZ
- GYvA/x3KDNQg==
-X-IronPort-AV: E=McAfee;i="6000,8403,9682"; a="129211919"
-X-IronPort-AV: E=Sophos;i="5.75,355,1589266800"; 
-   d="scan'208";a="129211919"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Jul 2020 04:10:40 -0700
-IronPort-SDR: 6DcJAI47bbUJIfMVcs20lJlqGAVcbDvdPgVo9KMBfPj811B2oOgF3VoasSTigz79o9kk5nX6d/
- o1hCF19Rev4A==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.75,355,1589266800"; 
-   d="scan'208";a="460032576"
-Received: from lingshan-mobl5.ccr.corp.intel.com (HELO [10.249.172.100]) ([10.249.172.100])
-  by orsmga005.jf.intel.com with ESMTP; 15 Jul 2020 04:10:37 -0700
-Subject: Re: [PATCH 6/7] ifcvf: replace irq_request/free with helpers in vDPA
- core.
-To:     Jason Wang <jasowang@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>
-Cc:     alex.williamson@redhat.com, pbonzini@redhat.com,
-        sean.j.christopherson@intel.com, wanpengli@tencent.com,
-        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
-        netdev@vger.kernel.org, dan.daly@intel.com
-References: <1594565366-3195-1-git-send-email-lingshan.zhu@intel.com>
- <1594565366-3195-6-git-send-email-lingshan.zhu@intel.com>
- <c7d4eca1-b65a-b795-dfa6-fe7658716cb1@redhat.com>
- <f6fc09e2-7a45-aaa5-2b4a-f1f963c5ce2c@intel.com>
- <09e67c20-dda1-97a2-1858-6a543c64fba6@redhat.com>
- <20200715055538-mutt-send-email-mst@kernel.org>
- <eefc2969-c91e-059e-ed4a-20ce8fa6dfe9@redhat.com>
-From:   "Zhu, Lingshan" <lingshan.zhu@intel.com>
-Message-ID: <5f40e96d-c270-cc0b-e536-8cfb6d0ba7ef@intel.com>
-Date:   Wed, 15 Jul 2020 19:10:37 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.1
+        id S1728001AbgGOLYC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 15 Jul 2020 07:24:02 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:25547 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1725811AbgGOLYC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 15 Jul 2020 07:24:02 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1594812240;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=oWZTkzAA9DPHcbpakWqj0PIztNWmUWrWx7WehE0uGxY=;
+        b=B3aTxvF2ztaDtW50UYqQKUbDjMGIorgBfzXiSHZMAVU0kaWKwp7kZDhkkGnB/xXGZo9KAi
+        nt0k7UnvP1NY6p1V1DUDUcaP+nGoat6AwQjGAVtjOJW7HP68RvRsjgo8/orwXWqK7VwUnN
+        ZMO8E0WmMiLUjCw86TaTnVSGjvUaSsY=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-262-g5yh5mM0NC2f_gxsTnHCZQ-1; Wed, 15 Jul 2020 07:23:51 -0400
+X-MC-Unique: g5yh5mM0NC2f_gxsTnHCZQ-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 38DE5801E6A;
+        Wed, 15 Jul 2020 11:23:50 +0000 (UTC)
+Received: from localhost (ovpn-115-22.ams2.redhat.com [10.36.115.22])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 883A661463;
+        Wed, 15 Jul 2020 11:23:43 +0000 (UTC)
+Date:   Wed, 15 Jul 2020 12:23:42 +0100
+From:   Stefan Hajnoczi <stefanha@redhat.com>
+To:     Nikos Dragazis <ndragazis@arrikto.com>,
+        Jan Kiszka <jan.kiszka@siemens.com>
+Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
+        Thanos Makatos <thanos.makatos@nutanix.com>,
+        "John G. Johnson" <john.g.johnson@oracle.com>,
+        Andra-Irina Paraschiv <andraprs@amazon.com>,
+        Alexander Graf <graf@amazon.com>, qemu-devel@nongnu.org,
+        kvm@vger.kernel.org, Maxime Coquelin <maxime.coquelin@redhat.com>,
+        Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
+Subject: Inter-VM device emulation (call on Mon 20th July 2020)
+Message-ID: <20200715112342.GD18817@stefanha-x1.localdomain>
+References: <86d42090-f042-06a1-efba-d46d449df280@arrikto.com>
 MIME-Version: 1.0
-In-Reply-To: <eefc2969-c91e-059e-ed4a-20ce8fa6dfe9@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
+In-Reply-To: <86d42090-f042-06a1-efba-d46d449df280@arrikto.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="9dgjiU4MmWPVapMU"
+Content-Disposition: inline
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+--9dgjiU4MmWPVapMU
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-On 7/15/2020 6:04 PM, Jason Wang wrote:
->
-> On 2020/7/15 下午6:01, Michael S. Tsirkin wrote:
->> On Wed, Jul 15, 2020 at 04:40:17PM +0800, Jason Wang wrote:
->>> On 2020/7/13 下午6:22, Zhu, Lingshan wrote:
->>>> On 7/13/2020 4:33 PM, Jason Wang wrote:
->>>>> On 2020/7/12 下午10:49, Zhu Lingshan wrote:
->>>>>> This commit replaced irq_request/free() with helpers in vDPA
->>>>>> core, so that it can request/free irq and setup irq offloading
->>>>>> on order.
->>>>>>
->>>>>> Signed-off-by: Zhu Lingshan<lingshan.zhu@intel.com>
->>>>>> ---
->>>>>>    drivers/vdpa/ifcvf/ifcvf_main.c | 11 ++++++-----
->>>>>>    1 file changed, 6 insertions(+), 5 deletions(-)
->>>>>>
->>>>>> diff --git a/drivers/vdpa/ifcvf/ifcvf_main.c
->>>>>> b/drivers/vdpa/ifcvf/ifcvf_main.c
->>>>>> index f5a60c1..65b84e1 100644
->>>>>> --- a/drivers/vdpa/ifcvf/ifcvf_main.c
->>>>>> +++ b/drivers/vdpa/ifcvf/ifcvf_main.c
->>>>>> @@ -47,11 +47,12 @@ static void ifcvf_free_irq(struct
->>>>>> ifcvf_adapter *adapter, int queues)
->>>>>>    {
->>>>>>        struct pci_dev *pdev = adapter->pdev;
->>>>>>        struct ifcvf_hw *vf = &adapter->vf;
->>>>>> +    struct vdpa_device *vdpa = &adapter->vdpa;
->>>>>>        int i;
->>>>>>            for (i = 0; i < queues; i++)
->>>>>> -        devm_free_irq(&pdev->dev, vf->vring[i].irq, &vf->vring[i]);
->>>>>> +        vdpa_free_vq_irq(&pdev->dev, vdpa, vf->vring[i].irq, i,
->>>>>> &vf->vring[i]);
->>>>>>          ifcvf_free_irq_vectors(pdev);
->>>>>>    }
->>>>>> @@ -60,6 +61,7 @@ static int ifcvf_request_irq(struct
->>>>>> ifcvf_adapter *adapter)
->>>>>>    {
->>>>>>        struct pci_dev *pdev = adapter->pdev;
->>>>>>        struct ifcvf_hw *vf = &adapter->vf;
->>>>>> +    struct vdpa_device *vdpa = &adapter->vdpa;
->>>>>>        int vector, i, ret, irq;
->>>>>>          ret = pci_alloc_irq_vectors(pdev, IFCVF_MAX_INTR,
->>>>>> @@ -73,6 +75,7 @@ static int ifcvf_request_irq(struct
->>>>>> ifcvf_adapter *adapter)
->>>>>>             pci_name(pdev));
->>>>>>        vector = 0;
->>>>>>        irq = pci_irq_vector(pdev, vector);
->>>>>> +    /* config interrupt */
->>>>> Unnecessary changes.
->>>> This is to show we did not setup this irq offloading for config
->>>> interrupt, only setup irq offloading for data vq. But can remove this
->>>> since we have config_msix_name in code to show what it is
->>> Btw, any reason for not making config interrupt work for irq 
->>> offloading? I
->>> don't see any thing that blocks this.
->>>
->>> Thanks
->> Well config accesses all go through userspace right?
->> Doing config interrupt directly would just be messy ...
->
->
-> Right, so I think we need a better comment here.
-Thanks, will add a better comment than just "config interrupt".
->
-> Thanks
->
->
->>
->>
->
+Hi,
+Several projects are underway to create an inter-VM device emulation
+interface:
+
+ * ivshmem v2
+   https://www.mail-archive.com/qemu-devel@nongnu.org/msg706465.html
+
+   A PCI device that provides shared-memory communication between VMs.
+   This device already exists but is limited in its current form. The
+   "v2" project updates IVSHMEM's capabilities and makes it suitable as
+   a VIRTIO transport.
+
+   Jan Kiszka is working on this and has posted specs for review.
+
+ * virtio-vhost-user
+   https://www.mail-archive.com/virtio-dev@lists.oasis-open.org/msg06429.html
+
+   A VIRTIO device that transports the vhost-user protocol. Allows
+   vhost-user device emulation to be implemented by another VM.
+
+   Nikos Dragazis is working on this with QEMU, DPDK, and VIRTIO patches
+   posted.
+
+ * VFIO-over-socket
+   https://github.com/tmakatos/qemu/blob/master/docs/devel/vfio-over-socket.rst
+
+   Similar to the vhost-user protocol in spirit but for any PCI device.
+   Uses the Linux VFIO ioctl API as the protocol instead of vhost.
+
+   It doesn't have a virtio-vhost-user equivalent yet, but the same
+   approach could be applied to VFIO-over-socket too.
+
+   Thanos Makatos and John G. Johnson are working on this. The draft
+   spec is available.
+
+Let's have a call to figure out:
+
+1. What is unique about these approaches and how do they overlap?
+2. Can we focus development and code review efforts to get something
+   merged sooner?
+
+Jan and Nikos: do you have time to join on Monday, 20th of July at 15:00
+UTC?
+https://www.timeanddate.com/worldclock/fixedtime.html?iso=20200720T1500
+
+Video call URL: https://bluejeans.com/240406010
+
+It would be nice if Thanos and/or JJ could join the call too. Others
+welcome too (feel free to forward this email)!
+
+Stefan
+
+--9dgjiU4MmWPVapMU
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl8O5z0ACgkQnKSrs4Gr
+c8hjeAf/cWBoN6BvfVBV9auavDcf7KWOyIGyAQ1Km9eixV3EALOXNevMK7Nx7pWM
+JVHpTDwQu9fafM2tryPtQFmOSYB6xddYMbXXKzuXiZyE95OAVOSUMS76Fr5X3Z9r
+pPn4TjK00P2WG/ztfjLO3HyxCpVkinWaaEAFcaFK6sIZ0U+GbbL758QfAvc9Z0Xp
+uwhk3ldruGEvNeq0iMYp1LzNurX/1vI9m+P2gkNcFxwe/xI0NtgJ0cmlZh5efCkA
+4in3ac+qs1lfM8W6MI1/XHSUv5qKvCe9scWiN4eXNuzxqmTht2ti+RyoN8cJ4wwT
+REBQPTd6KNnBTgu8URZjHU1cjKBi6w==
+=ATKX
+-----END PGP SIGNATURE-----
+
+--9dgjiU4MmWPVapMU--
+
