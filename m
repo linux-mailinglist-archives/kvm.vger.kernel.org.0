@@ -2,179 +2,114 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E00162211B9
-	for <lists+kvm@lfdr.de>; Wed, 15 Jul 2020 17:54:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4B52D221238
+	for <lists+kvm@lfdr.de>; Wed, 15 Jul 2020 18:25:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726101AbgGOPyd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 Jul 2020 11:54:33 -0400
-Received: from mga06.intel.com ([134.134.136.31]:3994 "EHLO mga06.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725897AbgGOPyd (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 15 Jul 2020 11:54:33 -0400
-IronPort-SDR: Jfrhcul+9Asal5E6VLwOIUsLKSl7as7HVJXJbyZolYJKmExjM/LA4f80UVHut3IxpFSqWfVnKF
- hDvl+D9MP8mQ==
-X-IronPort-AV: E=McAfee;i="6000,8403,9683"; a="210719066"
-X-IronPort-AV: E=Sophos;i="5.75,355,1589266800"; 
-   d="scan'208";a="210719066"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Jul 2020 08:54:32 -0700
-IronPort-SDR: aQuOBvXboXvtr9LVjlL5IQoQ7kAhQ0ypAtkS+t3EQWIQbydXd6EzK86vUF9k3FT6R/aJglWQbE
- fG7j1Cnj2I4g==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.75,355,1589266800"; 
-   d="scan'208";a="460137858"
-Received: from jacob-builder.jf.intel.com (HELO jacob-builder) ([10.7.199.155])
-  by orsmga005.jf.intel.com with ESMTP; 15 Jul 2020 08:54:32 -0700
-Date:   Wed, 15 Jul 2020 09:01:14 -0700
-From:   Jacob Pan <jacob.jun.pan@linux.intel.com>
-To:     Lu Baolu <baolu.lu@linux.intel.com>
-Cc:     Joerg Roedel <joro@8bytes.org>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Jean-Philippe Brucker <jean-philippe@linaro.org>,
-        Kevin Tian <kevin.tian@intel.com>,
-        Dave Jiang <dave.jiang@intel.com>,
-        Ashok Raj <ashok.raj@intel.com>, kvm@vger.kernel.org,
-        Cornelia Huck <cohuck@redhat.com>,
-        linux-kernel@vger.kernel.org, iommu@lists.linux-foundation.org,
-        Robin Murphy <robin.murphy@arm.com>,
-        jacob.jun.pan@linux.intel.com
-Subject: Re: [PATCH v3 2/4] iommu: Add iommu_aux_at(de)tach_group()
-Message-ID: <20200715090114.50a459d4@jacob-builder>
-In-Reply-To: <b5b22e01-4a51-8dfe-9ba4-aeca783740f1@linux.intel.com>
-References: <20200714055703.5510-1-baolu.lu@linux.intel.com>
-        <20200714055703.5510-3-baolu.lu@linux.intel.com>
-        <20200714093909.1ab93c9e@jacob-builder>
-        <b5b22e01-4a51-8dfe-9ba4-aeca783740f1@linux.intel.com>
-Organization: OTC
-X-Mailer: Claws Mail 3.13.2 (GTK+ 2.24.30; x86_64-pc-linux-gnu)
+        id S1726916AbgGOQZw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 15 Jul 2020 12:25:52 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:50208 "EHLO
+        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1725885AbgGOQZv (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 15 Jul 2020 12:25:51 -0400
+Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 06FG5jGJ102285;
+        Wed, 15 Jul 2020 12:25:45 -0400
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 327u1jscrw-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 15 Jul 2020 12:25:45 -0400
+Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 06FG5jbm102297;
+        Wed, 15 Jul 2020 12:25:44 -0400
+Received: from ppma05wdc.us.ibm.com (1b.90.2fa9.ip4.static.sl-reverse.com [169.47.144.27])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 327u1jscrf-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 15 Jul 2020 12:25:44 -0400
+Received: from pps.filterd (ppma05wdc.us.ibm.com [127.0.0.1])
+        by ppma05wdc.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 06FGP6CY004063;
+        Wed, 15 Jul 2020 16:25:43 GMT
+Received: from b01cxnp22035.gho.pok.ibm.com (b01cxnp22035.gho.pok.ibm.com [9.57.198.25])
+        by ppma05wdc.us.ibm.com with ESMTP id 3275291wuh-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 15 Jul 2020 16:25:43 +0000
+Received: from b01ledav002.gho.pok.ibm.com (b01ledav002.gho.pok.ibm.com [9.57.199.107])
+        by b01cxnp22035.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 06FGPhIa22806888
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 15 Jul 2020 16:25:43 GMT
+Received: from b01ledav002.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 1256512405B;
+        Wed, 15 Jul 2020 16:25:43 +0000 (GMT)
+Received: from b01ledav002.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id E9C33124052;
+        Wed, 15 Jul 2020 16:25:42 +0000 (GMT)
+Received: from localhost.localdomain (unknown [9.85.135.204])
+        by b01ledav002.gho.pok.ibm.com (Postfix) with ESMTPS;
+        Wed, 15 Jul 2020 16:25:42 +0000 (GMT)
+Subject: Re: linux-next: manual merge of the kvms390 tree with the kvm tree
+To:     Stephen Rothwell <sfr@canb.auug.org.au>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>, KVM <kvm@vger.kernel.org>
+Cc:     Linux Next Mailing List <linux-next@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Jim Mattson <jmattson@google.com>
+References: <20200713145007.26acf3fb@canb.auug.org.au>
+From:   Collin Walling <walling@linux.ibm.com>
+Message-ID: <067cf82f-cc6d-968a-d1ab-53edc4e44114@linux.ibm.com>
+Date:   Wed, 15 Jul 2020 12:25:42 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.9.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <20200713145007.26acf3fb@canb.auug.org.au>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
+ definitions=2020-07-15_12:2020-07-15,2020-07-15 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 malwarescore=0
+ spamscore=0 priorityscore=1501 clxscore=1011 mlxlogscore=999
+ suspectscore=0 phishscore=0 bulkscore=0 impostorscore=0 mlxscore=0
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2006250000 definitions=main-2007150125
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 15 Jul 2020 08:47:36 +0800
-Lu Baolu <baolu.lu@linux.intel.com> wrote:
+On 7/13/20 12:50 AM, Stephen Rothwell wrote:
+> Hi all,
+> 
+> Today's linux-next merge of the kvms390 tree got a conflict in:
+> 
+>   include/uapi/linux/kvm.h
+> 
+> between commit:
+> 
+>   1aa561b1a4c0 ("kvm: x86: Add "last CPU" to some KVM_EXIT information")
+> 
+> from the kvm tree and commit:
+> 
+>   23a60f834406 ("s390/kvm: diagnose 0x318 sync and reset")
+> 
+> from the kvms390 tree.
+> 
+> I fixed it up (see below) and can carry the fix as necessary. This
+> is now fixed as far as linux-next is concerned, but any non trivial
+> conflicts should be mentioned to your upstream maintainer when your tree
+> is submitted for merging.  You may also want to consider cooperating
+> with the maintainer of the conflicting tree to minimise any particularly
+> complex conflicts.
+> 
 
-> Hi Jacob,
-> 
-> On 7/15/20 12:39 AM, Jacob Pan wrote:
-> > On Tue, 14 Jul 2020 13:57:01 +0800
-> > Lu Baolu<baolu.lu@linux.intel.com>  wrote:
-> >   
-> >> This adds two new aux-domain APIs for a use case like vfio/mdev
-> >> where sub-devices derived from an aux-domain capable device are
-> >> created and put in an iommu_group.
-> >>
-> >> /**
-> >>   * iommu_aux_attach_group - attach an aux-domain to an iommu_group
-> >> which
-> >>   *                          contains sub-devices (for example
-> >> mdevs) derived
-> >>   *                          from @dev.
-> >>   * @domain: an aux-domain;
-> >>   * @group:  an iommu_group which contains sub-devices derived from
-> >> @dev;
-> >>   * @dev:    the physical device which supports IOMMU_DEV_FEAT_AUX.
-> >>   *
-> >>   * Returns 0 on success, or an error value.
-> >>   */
-> >> int iommu_aux_attach_group(struct iommu_domain *domain,
-> >>                             struct iommu_group *group,
-> >>                             struct device *dev)
-> >>
-> >> /**
-> >>   * iommu_aux_detach_group - detach an aux-domain from an
-> >> iommu_group *
-> >>   * @domain: an aux-domain;
-> >>   * @group:  an iommu_group which contains sub-devices derived from
-> >> @dev;
-> >>   * @dev:    the physical device which supports IOMMU_DEV_FEAT_AUX.
-> >>   *
-> >>   * @domain must have been attached to @group via
-> >> iommu_aux_attach_group(). */
-> >> void iommu_aux_detach_group(struct iommu_domain *domain,
-> >>                              struct iommu_group *group,
-> >>                              struct device *dev)
-> >>
-> >> It also adds a flag in the iommu_group data structure to identify
-> >> an iommu_group with aux-domain attached from those normal ones.
-> >>
-> >> Signed-off-by: Lu Baolu<baolu.lu@linux.intel.com>
-> >> ---
-> >>   drivers/iommu/iommu.c | 58
-> >> +++++++++++++++++++++++++++++++++++++++++++ include/linux/iommu.h |
-> >> 17 +++++++++++++ 2 files changed, 75 insertions(+)
-> >>
-> >> diff --git a/drivers/iommu/iommu.c b/drivers/iommu/iommu.c
-> >> index e1fdd3531d65..cad5a19ebf22 100644
-> >> --- a/drivers/iommu/iommu.c
-> >> +++ b/drivers/iommu/iommu.c
-> >> @@ -45,6 +45,7 @@ struct iommu_group {
-> >>   	struct iommu_domain *default_domain;
-> >>   	struct iommu_domain *domain;
-> >>   	struct list_head entry;
-> >> +	unsigned int aux_domain_attached:1;
-> >>   };
-> >>   
-> >>   struct group_device {
-> >> @@ -2759,6 +2760,63 @@ int iommu_aux_get_pasid(struct iommu_domain
-> >> *domain, struct device *dev) }
-> >>   EXPORT_SYMBOL_GPL(iommu_aux_get_pasid);
-> >>   
-> >> +/**
-> >> + * iommu_aux_attach_group - attach an aux-domain to an iommu_group
-> >> which
-> >> + *                          contains sub-devices (for example
-> >> mdevs) derived
-> >> + *                          from @dev.
-> >> + * @domain: an aux-domain;
-> >> + * @group:  an iommu_group which contains sub-devices derived from
-> >> @dev;
-> >> + * @dev:    the physical device which supports IOMMU_DEV_FEAT_AUX.
-> >> + *
-> >> + * Returns 0 on success, or an error value.
-> >> + */
-> >> +int iommu_aux_attach_group(struct iommu_domain *domain,
-> >> +			   struct iommu_group *group, struct
-> >> device *dev) +{
-> >> +	int ret = -EBUSY;
-> >> +
-> >> +	mutex_lock(&group->mutex);
-> >> +	if (group->domain)
-> >> +		goto out_unlock;
-> >> +  
-> > Perhaps I missed something but are we assuming only one mdev per
-> > mdev group? That seems to change the logic where vfio does:
-> > iommu_group_for_each_dev()
-> > 	iommu_aux_attach_device()
-> >   
-> 
-> It has been changed in PATCH 4/4:
-> 
-> static int vfio_iommu_attach_group(struct vfio_domain *domain,
->                                     struct vfio_group *group)
-> {
->          if (group->mdev_group)
->                  return iommu_aux_attach_group(domain->domain,
->                                                group->iommu_group,
->                                                group->iommu_device);
->          else
->                  return iommu_attach_group(domain->domain, 
-> group->iommu_group);
-> }
-> 
-> So, for both normal domain and aux-domain, we use the same concept:
-> attach a domain to a group.
-> 
-I get that, but don't you have to attach all the devices within the
-group? Here you see the group already has a domain and exit.
+Much appreciated. This change is acceptable and should be properly
+reflected in a header sync for QEMU (which I believe just copies the
+files from the kernel?)
 
-> Best regards,
-> baolu
+Thanks for the update.
 
-[Jacob Pan]
+-- 
+Regards,
+Collin
+
+Stay safe and stay healthy
