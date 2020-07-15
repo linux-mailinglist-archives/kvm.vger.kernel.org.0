@@ -2,79 +2,90 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 90399221150
-	for <lists+kvm@lfdr.de>; Wed, 15 Jul 2020 17:41:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C39FB22118A
+	for <lists+kvm@lfdr.de>; Wed, 15 Jul 2020 17:50:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725909AbgGOPjN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 Jul 2020 11:39:13 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:48709 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1725835AbgGOPjN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 15 Jul 2020 11:39:13 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1594827551;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=AO3HELiSeq5hjugDpVSW9pgmdZmoWY4N39MiwsHMrNM=;
-        b=ZxrN3szdR5z7U6B9NgXex6pPR978j6RV5HFkRTJs4HjePBqJkz4WbeNy9cmUtbbU08bbCn
-        Rw3o5mQ+wYhldQK21TbrecoQbYVEmpm9AQUAGEDsixHRUBySTe7QXy842XCrgb+pvAiXQV
-        xYerKDNaJF5694q0w1nCxZ+6pNX561E=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-439-hP_TMfRsOQyEv04NHJMHcw-1; Wed, 15 Jul 2020 11:39:04 -0400
-X-MC-Unique: hP_TMfRsOQyEv04NHJMHcw-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B65E9800EB6;
-        Wed, 15 Jul 2020 15:39:02 +0000 (UTC)
-Received: from localhost (ovpn-115-22.ams2.redhat.com [10.36.115.22])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id AD7005D9CA;
-        Wed, 15 Jul 2020 15:38:56 +0000 (UTC)
-Date:   Wed, 15 Jul 2020 16:38:55 +0100
-From:   Stefan Hajnoczi <stefanha@redhat.com>
-To:     Nikos Dragazis <ndragazis@arrikto.com>
-Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
-        Thanos Makatos <thanos.makatos@nutanix.com>,
-        "John G. Johnson" <john.g.johnson@oracle.com>,
-        Andra-Irina Paraschiv <andraprs@amazon.com>,
-        Alexander Graf <graf@amazon.com>, qemu-devel@nongnu.org,
-        kvm@vger.kernel.org, Maxime Coquelin <maxime.coquelin@redhat.com>,
-        Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>,
-        Jan Kiszka <jan.kiszka@siemens.com>
-Subject: Re: Inter-VM device emulation (call on Mon 20th July 2020)
-Message-ID: <20200715153855.GA47883@stefanha-x1.localdomain>
-References: <86d42090-f042-06a1-efba-d46d449df280@arrikto.com>
- <20200715112342.GD18817@stefanha-x1.localdomain>
- <deb5788e-c828-6996-025d-333cf2bca7ab@siemens.com>
+        id S1727030AbgGOPtB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 15 Jul 2020 11:49:01 -0400
+Received: from mx2.suse.de ([195.135.220.15]:49944 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725867AbgGOPtA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 15 Jul 2020 11:49:00 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.221.27])
+        by mx2.suse.de (Postfix) with ESMTP id 1FA51ABE4;
+        Wed, 15 Jul 2020 15:49:02 +0000 (UTC)
+Date:   Wed, 15 Jul 2020 17:48:56 +0200
+From:   Joerg Roedel <jroedel@suse.de>
+To:     Kees Cook <keescook@chromium.org>
+Cc:     Joerg Roedel <joro@8bytes.org>, x86@kernel.org, hpa@zytor.com,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Jiri Slaby <jslaby@suse.cz>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Juergen Gross <jgross@suse.com>,
+        David Rientjes <rientjes@google.com>,
+        Cfir Cohen <cfir@google.com>,
+        Erdem Aktas <erdemaktas@google.com>,
+        Masami Hiramatsu <mhiramat@kernel.org>,
+        Mike Stunes <mstunes@vmware.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Martin Radev <martin.b.radev@gmail.com>,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org
+Subject: Re: [PATCH v4 70/75] x86/head/64: Don't call verify_cpu() on
+ starting APs
+Message-ID: <20200715154856.GA24822@suse.de>
+References: <20200714120917.11253-1-joro@8bytes.org>
+ <20200714120917.11253-71-joro@8bytes.org>
+ <202007141837.2B93BBD78@keescook>
+ <20200715092638.GJ16200@suse.de>
+ <202007150815.A81E879@keescook>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <deb5788e-c828-6996-025d-333cf2bca7ab@siemens.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+In-Reply-To: <202007150815.A81E879@keescook>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jul 15, 2020 at 01:28:07PM +0200, Jan Kiszka wrote:
-> On 15.07.20 13:23, Stefan Hajnoczi wrote:
-> > Let's have a call to figure out:
-> > 
-> > 1. What is unique about these approaches and how do they overlap?
-> > 2. Can we focus development and code review efforts to get something
-> >    merged sooner?
-> > 
-> > Jan and Nikos: do you have time to join on Monday, 20th of July at 15:00
-> > UTC?
-> > https://www.timeanddate.com/worldclock/fixedtime.html?iso=20200720T1500
-> > 
+Hi Kees,
+
+as a general note: With SEV-ES the guest kernel will get #VC exceptions
+for events that, without SEV-ES, would just cause a #VMEXIT to the
+hypervisor.
+
+On Wed, Jul 15, 2020 at 08:26:14AM -0700, Kees Cook wrote:
+> On Wed, Jul 15, 2020 at 11:26:38AM +0200, Joerg Roedel wrote:
+> > That MSR is Intel-only, right? The boot-path installed here is only used
+> > for SEV-ES guests, running on AMD systems, so this MSR is not even
+> > accessed during boot on those VMs.
 > 
-> Not at that slot, but one hour earlier or later would work for me (so far).
+> Oh, hrm, yes, that's true. If other x86 maintainers are comfortable with
+> this, then okay. My sense is that changing the early CPU startup paths
+> will cause trouble down the line.
 
-Nikos: Please let us know which of Jan's timeslots works best for you.
+The AP startup path does not change for non SEV-ES guests. But under
+SEV-ES everything that might cause a #VC exception must be avoided until
+the kernel is ready to handle them. With the current patches this
+happens when the AP runs in 64bit long-mode and loaded TSS and IDT.
+Therefore a slightly different AP boot-path is needed for SEV-ES guests.
 
-Thanks,
-Stefan
+> So, going back to the requirements here ... what things in verify_cpu()
+> can cause exceptions? AFAICT, cpuid is safely handled (i.e. it is
+> detected and only run in a way to avoid exceptions and the MSR
+> reads/writes are similarly bound by CPU family/id range checks). I must
+> be missing something. :)
 
+It is actually the CPUID instructions that cause #VC exceptions. The
+MSRs that are accessed on AMD processors are not intercepted in the
+hypervisors this code has been tested on, so these will not cause #VC
+exceptions.
+
+Regards,
+
+	Joerg
