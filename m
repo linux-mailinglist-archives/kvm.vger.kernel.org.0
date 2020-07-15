@@ -2,118 +2,189 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A2598220906
-	for <lists+kvm@lfdr.de>; Wed, 15 Jul 2020 11:43:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5A38E220920
+	for <lists+kvm@lfdr.de>; Wed, 15 Jul 2020 11:47:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730721AbgGOJmx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 Jul 2020 05:42:53 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:22068 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1730338AbgGOJmx (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 15 Jul 2020 05:42:53 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1594806171;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=QVN0SUJiWNQOMGmLO1R6WOiZV8nRybRORnIp3pu3RNw=;
-        b=J8kEUfpyvLj/icCt53NlSudHPXQxLRYctTxhJCL2DjvLvWVi7QiBPDttKIkSTwgefvgVya
-        o+6ywBCN8RjFPxvwDD/p7YP7b7cyrXzxxR0bq5HfP86GWNjkgJ0DuemmBU8ArCou5+Qhe+
-        UAnlNmajWyQMXHsn4R2Cusdz6xYW0bA=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-368-JARX-4MgPmqeCi7a5jNSaA-1; Wed, 15 Jul 2020 05:42:44 -0400
-X-MC-Unique: JARX-4MgPmqeCi7a5jNSaA-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AE7201800D42;
-        Wed, 15 Jul 2020 09:42:42 +0000 (UTC)
-Received: from [10.72.13.230] (ovpn-13-230.pek2.redhat.com [10.72.13.230])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 3395310013D0;
-        Wed, 15 Jul 2020 09:42:34 +0000 (UTC)
-Subject: Re: [PATCH 3/7] vhost_vdpa: implement IRQ offloading functions in
- vhost_vdpa
-To:     "Zhu, Lingshan" <lingshan.zhu@intel.com>, mst@redhat.com,
-        alex.williamson@redhat.com, pbonzini@redhat.com,
-        sean.j.christopherson@intel.com, wanpengli@tencent.com
-Cc:     virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
-        netdev@vger.kernel.org, dan.daly@intel.com
-References: <1594565366-3195-1-git-send-email-lingshan.zhu@intel.com>
- <1594565366-3195-3-git-send-email-lingshan.zhu@intel.com>
- <3fb9ecfc-a325-69b5-f5b7-476a5683a324@redhat.com>
- <e06f9706-441f-0d7a-c8c0-cd43a26c5296@intel.com>
- <f352a1d1-6732-3237-c85e-ffca085195ff@redhat.com>
- <8f52ee3a-7a08-db14-9194-8085432481a4@intel.com>
- <2bd946e3-1524-efa5-df2b-3f6da66d2069@redhat.com>
- <61c1753a-43dc-e448-6ece-13a19058e621@intel.com>
-From:   Jason Wang <jasowang@redhat.com>
-Message-ID: <c9f2ffb0-adc0-8846-9578-1f75a4374df1@redhat.com>
-Date:   Wed, 15 Jul 2020 17:42:33 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        id S1730824AbgGOJrV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 15 Jul 2020 05:47:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36150 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730000AbgGOJrV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 15 Jul 2020 05:47:21 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 07996C061755;
+        Wed, 15 Jul 2020 02:47:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=0elNuqYxcCo1hxsLEEQkxpnR+7H9VliZhBonNrxGt2Y=; b=rGy15IwTdosyqZKG9Fqu61aw8r
+        EcZqWOQPfINy492XWxED50S8KJjaSk2xP068ox4WapjrUXn0tcqK85EqV4MyFmONN72dm0x4BFmsL
+        obY7r6FuMNdeixQGVaOA8lsOHVH1WSfrgP8wMRvXhlrxAMk5wmMbJN72IlywZHIO8SLxOlVd8T5Xm
+        t3qjIJHlibrn7hbOfDk1StAlw/Hgd83oGiTYkjBSF4Tkv34kCsYkgjos0J5jqaOKXuyirk4YKpgy1
+        /IcvszPzckLNg5+AsNpyaCsU/coExmg8PiDbzLwsndF6ajo69ZfzGRko1WQojQClj99DuhyNBasrz
+        t+oPuxPw==;
+Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=noisy.programming.kicks-ass.net)
+        by casper.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1jve0G-00033K-3p; Wed, 15 Jul 2020 09:47:04 +0000
+Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (Client did not present a certificate)
+        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id B9F563028C8;
+        Wed, 15 Jul 2020 11:47:02 +0200 (CEST)
+Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
+        id A202F20D27C63; Wed, 15 Jul 2020 11:47:02 +0200 (CEST)
+Date:   Wed, 15 Jul 2020 11:47:02 +0200
+From:   Peter Zijlstra <peterz@infradead.org>
+To:     Joerg Roedel <joro@8bytes.org>
+Cc:     x86@kernel.org, Joerg Roedel <jroedel@suse.de>, hpa@zytor.com,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Jiri Slaby <jslaby@suse.cz>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Juergen Gross <jgross@suse.com>,
+        Kees Cook <keescook@chromium.org>,
+        David Rientjes <rientjes@google.com>,
+        Cfir Cohen <cfir@google.com>,
+        Erdem Aktas <erdemaktas@google.com>,
+        Masami Hiramatsu <mhiramat@kernel.org>,
+        Mike Stunes <mstunes@vmware.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Martin Radev <martin.b.radev@gmail.com>,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org
+Subject: Re: [PATCH v4 45/75] x86/sev-es: Adjust #VC IST Stack on entering
+ NMI handler
+Message-ID: <20200715094702.GF10769@hirez.programming.kicks-ass.net>
+References: <20200714120917.11253-1-joro@8bytes.org>
+ <20200714120917.11253-46-joro@8bytes.org>
 MIME-Version: 1.0
-In-Reply-To: <61c1753a-43dc-e448-6ece-13a19058e621@intel.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200714120917.11253-46-joro@8bytes.org>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Tue, Jul 14, 2020 at 02:08:47PM +0200, Joerg Roedel wrote:
 
-On 2020/7/15 下午5:20, Zhu, Lingshan wrote:
->>>>
->>>> I meant something like:
->>>>
->>>> unregister();
->>>> vq->call_ctx.producer.token = ctx;
->>>> register();
->>> This is what we are doing now, or I must missed somethig:
->>> if (ctx && ctx != token) {
->>>     irq_bypass_unregister_producer(&vq->call_ctx.producer);
->>>     vq->call_ctx.producer.token = ctx;
->>>     irq_bypass_register_producer(&vq->call_ctx.producer);
->>>
->>> }
->>>
->>> It just unregister and register.
->>
->>
->> I meant there's probably no need for the check and another check and 
->> unregister before. The whole function is as simple as I suggested above.
->>
->> Thanks
-> IMHO we still need the checks, this function handles three cases:
-> (1)if the ctx == token, we do nothing. For this unregister and register can work, but waste of time.
+> @@ -489,6 +490,9 @@ DEFINE_IDTENTRY_RAW(exc_nmi)
+>  	this_cpu_write(nmi_cr2, read_cr2());
+>  nmi_restart:
+>  
+> +	/* Needs to happen before DR7 is accessed */
+> +	sev_es_ist_enter(regs);
+> +
+>  	this_cpu_write(nmi_dr7, local_db_save());
+>  
+>  	nmi_enter();
+> @@ -502,6 +506,8 @@ DEFINE_IDTENTRY_RAW(exc_nmi)
+>  
+>  	local_db_restore(this_cpu_read(nmi_dr7));
+>  
+> +	sev_es_ist_exit();
+> +
+>  	if (unlikely(this_cpu_read(nmi_cr2) != read_cr2()))
+>  		write_cr2(this_cpu_read(nmi_cr2));
+>  	if (this_cpu_dec_return(nmi_state))
 
+I really hate all this #VC stuff :-(
 
-But we have a more simple code and we don't care about the performance 
-here since the operations is rare.
+So the above will make the NMI do 4 unconditional extra CALL+RET, a LOAD
+(which will potentially miss) and a compare and branch.
 
+How's that a win for normal people? Can we please turn all these
+sev_es_*() hooks into something like:
 
-> (2)if token exists but ctx is NULL, this means user space issued an unbind, so we need to only unregister the producer.
+DECLARE_STATIC_KEY_FALSE(sev_es_enabled_key);
 
+static __always_inline void sev_es_foo()
+{
+	if (static_branch_unlikely(&sev_es_enabled_key))
+		__sev_es_foo();
+}
 
-Note that the register/unregister have a graceful check of whether or 
-not there's a token.
+So that normal people will only see an extra NOP?
 
+> diff --git a/arch/x86/kernel/sev-es.c b/arch/x86/kernel/sev-es.c
+> index d415368f16ec..2a7cc72db1d5 100644
+> --- a/arch/x86/kernel/sev-es.c
+> +++ b/arch/x86/kernel/sev-es.c
+> @@ -78,6 +78,67 @@ static void __init sev_es_setup_vc_stacks(int cpu)
+>  	tss->x86_tss.ist[IST_INDEX_VC] = CEA_ESTACK_TOP(&cea->estacks, VC);
+>  }
+>  
+> +static bool on_vc_stack(unsigned long sp)
 
-> (3)if ctx exists and ctx!=token, this means there is a new ctx, we need to update producer by unregister and register.
->
-> I think we can not simply handle all these cases by "unregister and register".
+noinstr or __always_inline
 
+> +{
+> +	return ((sp >= __this_cpu_ist_bot_va(VC)) && (sp < __this_cpu_ist_top_va(VC)));
+> +}
+> +
+> +/*
+> + * This function handles the case when an NMI or an NMI-like exception
+> + * like #DB is raised in the #VC exception handler entry code. In this
 
-So it looks to me the functions are equivalent.
+I've yet to find you handle the NMI-like cases..
 
-Thanks
+> + * case the IST entry for VC must be adjusted, so that any subsequent VC
+> + * exception will not overwrite the stack contents of the interrupted VC
+> + * handler.
+> + *
+> + * The IST entry is adjusted unconditionally so that it can be also be
+> + * unconditionally back-adjusted in sev_es_nmi_exit(). Otherwise a
+> + * nested nmi_exit() call (#VC->NMI->#DB) may back-adjust the IST entry
+> + * too early.
 
+Is this comment accurate, I cannot find the patch touching
+nmi_enter/exit()?
 
->
-> Thanks,
-> BR
-> Zhu Lingshan
+> + */
+> +void noinstr sev_es_ist_enter(struct pt_regs *regs)
+> +{
+> +	unsigned long old_ist, new_ist;
+> +	unsigned long *p;
+> +
+> +	if (!sev_es_active())
+> +		return;
+> +
+> +	/* Read old IST entry */
+> +	old_ist = __this_cpu_read(cpu_tss_rw.x86_tss.ist[IST_INDEX_VC]);
+> +
+> +	/* Make room on the IST stack */
+> +	if (on_vc_stack(regs->sp))
+> +		new_ist = ALIGN_DOWN(regs->sp, 8) - sizeof(old_ist);
+> +	else
+> +		new_ist = old_ist - sizeof(old_ist);
+> +
+> +	/* Store old IST entry */
+> +	p       = (unsigned long *)new_ist;
+> +	*p      = old_ist;
+> +
+> +	/* Set new IST entry */
+> +	this_cpu_write(cpu_tss_rw.x86_tss.ist[IST_INDEX_VC], new_ist);
+> +}
+> +
+> +void noinstr sev_es_ist_exit(void)
+> +{
+> +	unsigned long ist;
+> +	unsigned long *p;
+> +
+> +	if (!sev_es_active())
+> +		return;
+> +
+> +	/* Read IST entry */
+> +	ist = __this_cpu_read(cpu_tss_rw.x86_tss.ist[IST_INDEX_VC]);
+> +
+> +	if (WARN_ON(ist == __this_cpu_ist_top_va(VC)))
+> +		return;
+> +
+> +	/* Read back old IST entry and write it to the TSS */
+> +	p = (unsigned long *)ist;
+> +	this_cpu_write(cpu_tss_rw.x86_tss.ist[IST_INDEX_VC], *p);
+> +}
 
+That's pretty disguisting :-(
