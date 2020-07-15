@@ -2,186 +2,111 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 80FAD2217B5
-	for <lists+kvm@lfdr.de>; Thu, 16 Jul 2020 00:21:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 09C512217B9
+	for <lists+kvm@lfdr.de>; Thu, 16 Jul 2020 00:22:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726770AbgGOWV0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 Jul 2020 18:21:26 -0400
-Received: from aserp2120.oracle.com ([141.146.126.78]:51686 "EHLO
-        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726356AbgGOWV0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 15 Jul 2020 18:21:26 -0400
-Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
-        by aserp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 06FMD1O1130204;
-        Wed, 15 Jul 2020 22:21:24 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=corp-2020-01-29;
- bh=PPGLKgvoj5i7TapTA7OGRWy0LTz7k80lEkNnwexctfg=;
- b=PEYNHzPN1oyGbgmCyb4f7XWR4ios2XOWHrhDWF0IEyXDU7G2t/nTgZFxoNopLEVpGNAa
- bzuhSkaOahoadt9dMOjSfqRRFLlBKjwe2BkogHHCYmfHut6kc7utG2SNAMbU9QLVKYyA
- t+xSH+KURvjSBcnye9o/wYLKqi/NTlGv7XUuN5NIcFczl/DhiEUIyikYg1FWyeXOLOkN
- Zu3Yk4MRMey3Qhs/rMzKoFFAWENxbQxo4gYM+IkIKOTMydkSeWs0hbIy8AFj3uobeROS
- roeH+KjP9FIob0LQaTZNYCo1AazoYac6kUs+ALIc9NLwoB+9i8n8cZAVXaPhvslSWiWF 9g== 
-Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
-        by aserp2120.oracle.com with ESMTP id 3275cme1ww-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
-        Wed, 15 Jul 2020 22:21:23 +0000
-Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
-        by userp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 06FMChFf076322;
-        Wed, 15 Jul 2020 22:21:23 GMT
-Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
-        by userp3030.oracle.com with ESMTP id 327qc1ujr7-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 15 Jul 2020 22:21:23 +0000
-Received: from abhmp0006.oracle.com (abhmp0006.oracle.com [141.146.116.12])
-        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 06FMLMR7007426;
-        Wed, 15 Jul 2020 22:21:22 GMT
-Received: from localhost.localdomain (/10.159.239.115)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Wed, 15 Jul 2020 15:21:22 -0700
-Subject: Re: [kvm-unit-tests PATCH] x86: svm: low CR3 bits are not MBZ
-To:     Nadav Amit <namit@vmware.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-References: <20200713043908.39605-1-namit@vmware.com>
- <ce87fd51-8e27-e5ff-3a90-06cddbf47636@oracle.com>
- <CCEF21D4-57C3-4843-9443-BE46501FFE8C@vmware.com>
- <abe9138a-6c61-22e1-f0a6-fcd5d06ef3f1@oracle.com>
- <6CD095D7-EF7F-49C2-98EF-F72D019817B2@vmware.com>
-From:   Krish Sadhukhan <krish.sadhukhan@oracle.com>
-Message-ID: <fe76d847-5106-bc09-e4cf-498fb51e5255@oracle.com>
-Date:   Wed, 15 Jul 2020 15:21:21 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+        id S1726945AbgGOWWs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 15 Jul 2020 18:22:48 -0400
+Received: from mga09.intel.com ([134.134.136.24]:26585 "EHLO mga09.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726356AbgGOWWs (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 15 Jul 2020 18:22:48 -0400
+IronPort-SDR: 4qjusR9XZc2bonGbPSxd7GO7OphSJebHX3Wv6We2zcR1gQzRLr6LfAL+A4AfbSEN9ulOuUx7iQ
+ WXbGwjLyzO4w==
+X-IronPort-AV: E=McAfee;i="6000,8403,9683"; a="150668678"
+X-IronPort-AV: E=Sophos;i="5.75,357,1589266800"; 
+   d="scan'208";a="150668678"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Jul 2020 15:22:47 -0700
+IronPort-SDR: yr9CiLl5Ckrxm4euE8qLp1tV/RLZORTEXOZT6yO/FV1G2cAxvZ5spp3ETmst5h/vx9/44KbLyc
+ F64GMCQQzqow==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.75,357,1589266800"; 
+   d="scan'208";a="316847391"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.152])
+  by orsmga008.jf.intel.com with ESMTP; 15 Jul 2020 15:22:47 -0700
+Date:   Wed, 15 Jul 2020 15:22:47 -0700
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Krish Sadhukhan <krish.sadhukhan@oracle.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        Karl Heubaum <karl.heubaum@oracle.com>,
+        Oliver Upton <oupton@google.com>,
+        Jim Mattson <jmattson@google.com>
+Subject: Re: [kvm-unit-tests PATCH 1/2] nVMX: Restore active host RIP/CR4
+ after test_host_addr_size()
+Message-ID: <20200715222247.GE12349@linux.intel.com>
+References: <20200714002355.538-1-sean.j.christopherson@intel.com>
+ <20200714002355.538-2-sean.j.christopherson@intel.com>
+ <378edd35-38eb-1d62-8471-f111c17afee7@oracle.com>
+ <20200715184810.GC12349@linux.intel.com>
+ <c00836d0-45bb-3d50-5082-6670c1c5e2a9@oracle.com>
 MIME-Version: 1.0
-In-Reply-To: <6CD095D7-EF7F-49C2-98EF-F72D019817B2@vmware.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9683 signatures=668680
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 spamscore=0
- mlxlogscore=999 bulkscore=0 malwarescore=0 mlxscore=0 phishscore=0
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2006250000 definitions=main-2007150165
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9683 signatures=668680
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 priorityscore=1501
- bulkscore=0 adultscore=0 lowpriorityscore=0 phishscore=0 spamscore=0
- impostorscore=0 malwarescore=0 mlxlogscore=999 clxscore=1015 mlxscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
- definitions=main-2007150165
+In-Reply-To: <c00836d0-45bb-3d50-5082-6670c1c5e2a9@oracle.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Wed, Jul 15, 2020 at 02:34:23PM -0700, Krish Sadhukhan wrote:
+> 
+> On 7/15/20 11:48 AM, Sean Christopherson wrote:
+> >On Wed, Jul 15, 2020 at 11:34:46AM -0700, Krish Sadhukhan wrote:
+> >>On 7/13/20 5:23 PM, Sean Christopherson wrote:
+> >>>Perform one last VMX transition to actually load the host's RIP and CR4
+> >>>at the end of test_host_addr_size().  Simply writing the VMCS doesn't
+> >>>restore the values in hardware, e.g. as is, CR4.PCIDE can be left set,
+> >>>which causes spectacularly confusing explosions when other misguided
+> >>>tests assume setting bit 63 in CR3 will cause a non-canonical #GP.
+> >>>
+> >>>Fixes: 0786c0316ac05 ("kvm-unit-test: nVMX: Check Host Address Space Size on vmentry of nested guests")
+> >>>Cc: Krish Sadhukhan <krish.sadhukhan@oracle.com>
+> >>>Cc: Karl Heubaum <karl.heubaum@oracle.com>
+> >>>Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+> >>>---
+> >>>  x86/vmx_tests.c | 5 +++++
+> >>>  1 file changed, 5 insertions(+)
+> >>>
+> >>>diff --git a/x86/vmx_tests.c b/x86/vmx_tests.c
+> >>>index 29f3d0e..cb42a2d 100644
+> >>>--- a/x86/vmx_tests.c
+> >>>+++ b/x86/vmx_tests.c
+> >>>@@ -7673,6 +7673,11 @@ static void test_host_addr_size(void)
+> >>>  		vmcs_write(ENT_CONTROLS, entry_ctrl_saved | ENT_GUEST_64);
+> >>>  		vmcs_write(HOST_RIP, rip_saved);
+> >>>  		vmcs_write(HOST_CR4, cr4_saved);
+> >>>+
+> >>>+		/* Restore host's active RIP and CR4 values. */
+> >>>+		report_prefix_pushf("restore host state");
+> >>>+		test_vmx_vmlaunch(0);
+> >>>+		report_prefix_pop();
+> >>>  	}
+> >>>  }
+> >>Just for my understanding.  When you say, "other misguided tests", which
+> >>tests are you referring to ?  In the current sequence of tests in
+> >>vmx_host_state_area_test(), test_load_host_perf_global_ctrl() is the  one
+> >>that follows and it runs fine.
+> >See test_mtf_guest() in patch 2/2.  https://patchwork.kernel.org/patch/11661189/
+> 
+> I ran the two tests as follows but couldn't reproduce it:
+> 
+>     ./x86/run x86/vmx.flat  -smp 1 -cpu host,+vmx -append
+> "vmx_host_state_area_test vmx_mtf_test"
+> 
+> 
+> How did you run the them ?
 
-On 7/13/20 4:30 PM, Nadav Amit wrote:
->> On Jul 13, 2020, at 4:17 PM, Krish Sadhukhan <krish.sadhukhan@oracle.com> wrote:
->>
->>
->> On 7/13/20 4:11 PM, Nadav Amit wrote:
->>>> On Jul 13, 2020, at 4:06 PM, Krish Sadhukhan <krish.sadhukhan@oracle.com> wrote:
->>>>
->>>>
->>>> On 7/12/20 9:39 PM, Nadav Amit wrote:
->>>>> The low CR3 bits are reserved but not MBZ according to tha APM. The
->>>>> tests should therefore not check that they cause failed VM-entry. Tests
->>>>> on bare-metal show they do not.
->>>>>
->>>>> Signed-off-by: Nadav Amit <namit@vmware.com>
->>>>> ---
->>>>>   x86/svm.h       |  4 +---
->>>>>   x86/svm_tests.c | 26 +-------------------------
->>>>>   2 files changed, 2 insertions(+), 28 deletions(-)
->>>>>
->>>>> diff --git a/x86/svm.h b/x86/svm.h
->>>>> index f8e7429..15e0f18 100644
->>>>> --- a/x86/svm.h
->>>>> +++ b/x86/svm.h
->>>>> @@ -325,9 +325,7 @@ struct __attribute__ ((__packed__)) vmcb {
->>>>>   #define SVM_CR0_SELECTIVE_MASK (X86_CR0_TS | X86_CR0_MP)
->>>>>     #define	SVM_CR0_RESERVED_MASK			0xffffffff00000000U
->>>>> -#define	SVM_CR3_LEGACY_RESERVED_MASK		0xfe7U
->>>>> -#define	SVM_CR3_LEGACY_PAE_RESERVED_MASK	0x7U
->>>>> -#define	SVM_CR3_LONG_RESERVED_MASK		0xfff0000000000fe7U
->>>>> +#define	SVM_CR3_LONG_RESERVED_MASK		0xfff0000000000000U
->>>>>   #define	SVM_CR4_LEGACY_RESERVED_MASK		0xff88f000U
->>>>>   #define	SVM_CR4_RESERVED_MASK			0xffffffffff88f000U
->>>>>   #define	SVM_DR6_RESERVED_MASK			0xffffffffffff1ff0U
->>>>> diff --git a/x86/svm_tests.c b/x86/svm_tests.c
->>>>> index 3b0d019..1908c7c 100644
->>>>> --- a/x86/svm_tests.c
->>>>> +++ b/x86/svm_tests.c
->>>>> @@ -2007,38 +2007,14 @@ static void test_cr3(void)
->>>>>   {
->>>>>   	/*
->>>>>   	 * CR3 MBZ bits based on different modes:
->>>>> -	 *   [2:0]		    - legacy PAE
->>>>> -	 *   [2:0], [11:5]	    - legacy non-PAE
->>>>> -	 *   [2:0], [11:5], [63:52] - long mode
->>>>> +	 *   [63:52] - long mode
->>>>>   	 */
->>>>>   	u64 cr3_saved = vmcb->save.cr3;
->>>>> -	u64 cr4_saved = vmcb->save.cr4;
->>>>> -	u64 cr4 = cr4_saved;
->>>>> -	u64 efer_saved = vmcb->save.efer;
->>>>> -	u64 efer = efer_saved;
->>>>>   -	efer &= ~EFER_LME;
->>>>> -	vmcb->save.efer = efer;
->>>>> -	cr4 |= X86_CR4_PAE;
->>>>> -	vmcb->save.cr4 = cr4;
->>>>> -	SVM_TEST_CR_RESERVED_BITS(0, 2, 1, 3, cr3_saved,
->>>>> -	    SVM_CR3_LEGACY_PAE_RESERVED_MASK);
->>>>> -
->>>>> -	cr4 = cr4_saved & ~X86_CR4_PAE;
->>>>> -	vmcb->save.cr4 = cr4;
->>>>> -	SVM_TEST_CR_RESERVED_BITS(0, 11, 1, 3, cr3_saved,
->>>>> -	    SVM_CR3_LEGACY_RESERVED_MASK);
->>>>> -
->>>>> -	cr4 |= X86_CR4_PAE;
->>>>> -	vmcb->save.cr4 = cr4;
->>>>> -	efer |= EFER_LME;
->>>>> -	vmcb->save.efer = efer;
->>>>>   	SVM_TEST_CR_RESERVED_BITS(0, 63, 1, 3, cr3_saved,
->>>>>   	    SVM_CR3_LONG_RESERVED_MASK);
->>>>>   -	vmcb->save.cr4 = cr4_saved;
->>>>>   	vmcb->save.cr3 = cr3_saved;
->>>>> -	vmcb->save.efer = efer_saved;
->>>>>   }
->>>>>     static void test_cr4(void)
->>>> APM says,
->>>>
->>>>      "Reserved Bits. Reserved fields should be cleared to 0 by software when writing CR3."
->>>>
->>>> If processor allows these bits to be left non-zero, "should be cleared to 0" means it's not mandatory then. I am wondering what this "should be" actually means :-) !
->>> I really tested it, so I guess we â€œshouldâ€ not argue about it. ;-)
->> No, I am not arguing over your test results. :-)
->>> Anyhow, according to APM Figure 5-16 (â€œControl Register 3 (CR3)-Long Modeâ€),
->>> bits 52:63 are â€œreserved, MBZâ€ and others are just marked as â€œReservedâ€. So
->>> it seems they are not the same.
->> I am just saying that the APM language "should be cleared to 0" is misleading if the processor doesn't enforce it.
-> Just to ensure I am clear - I am not blaming you in any way. I also found
-> the phrasing confusing.
->
-> Having said that, if you (or anyone else) reintroduces â€œpositiveâ€ tests, in
-> which the VM CR3 is modified to ensure VM-entry succeeds when the reserved
-> non-MBZ bits are set, please ensure the tests fails gracefully. The
-> non-long-mode CR3 tests crashed since the VM page-tables were incompatible
-> with the paging mode.
->
-> In other words, instead of setting a VMMCALL instruction in the VM to trap
-> immediately after entry, consider clearing the present-bits in the high
-> levels of the NPT; or injecting some exception that would trigger exit
-> during vectoring or something like that.
->
-> P.S.: If it wasnâ€™t clear, I am not going to fix KVM itself for some obvious
-> reasons.
->
-I think since the APM is not clear, re-adding any test that tests those 
-bits, is like adding a test with "undefined behavior" to me.
+I ran the VMX testcase from x86/unittest.cfg (below) on HSW.  I eventually
+narrowed it down to just test_host_addr_size() and the MTF test.  Note, the
+failure signature will change depending on whether vmx_cr_load_test() is
+run between those two.  If it's not run, the failure is a straightforward
+triple fault.  If it is run, for me the failure morphed into a an emulation
+error because the unit test was able to generate a valid translation out of
+CR3=0 and hit a non-existent memslot, which was all kinds of confusing.
 
-
-Paolo, Should I send a KVM patch to remove checks for those non-MBZ 
-reserved bits ?
-
+./x86/run x86/vmx.flat -smp 1 -cpu host,+vmx -append "-exit_monitor_from_l2_test -ept_access* -vmx_smp* -vmx_vmcs_shadow_test -atomic_switch_overflow_msrs_test -vmx_init_signal_test -vmx_apic_passthrough_tpr_threshold_test"
