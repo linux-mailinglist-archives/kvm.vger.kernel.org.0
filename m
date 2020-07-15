@@ -2,98 +2,76 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 64F2822013A
-	for <lists+kvm@lfdr.de>; Wed, 15 Jul 2020 02:03:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A419C220167
+	for <lists+kvm@lfdr.de>; Wed, 15 Jul 2020 02:41:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727981AbgGOADj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 14 Jul 2020 20:03:39 -0400
-Received: from mga04.intel.com ([192.55.52.120]:24073 "EHLO mga04.intel.com"
+        id S1727030AbgGOAkf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 14 Jul 2020 20:40:35 -0400
+Received: from mga17.intel.com ([192.55.52.151]:63267 "EHLO mga17.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726450AbgGOADj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 14 Jul 2020 20:03:39 -0400
-IronPort-SDR: Kor1lgqUM0jUOBz+UG6tioKzLUwd4GjAae0IGxK2pLvovYJ3yAUtIOywfCJDPXXl4WJGlLN1Ly
- ZWJoISx4Vzfw==
-X-IronPort-AV: E=McAfee;i="6000,8403,9682"; a="146556548"
+        id S1726458AbgGOAkf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 14 Jul 2020 20:40:35 -0400
+IronPort-SDR: 3ZPeNrTGHZvCqucyFIEdaDq5U2dpspwnOCZ30uqtIBEUUAGAppM6Ui4DlFHsI6qjzeM6+kari2
+ nJ6B09dR/mmA==
+X-IronPort-AV: E=McAfee;i="6000,8403,9682"; a="129142399"
 X-IronPort-AV: E=Sophos;i="5.75,353,1589266800"; 
-   d="scan'208";a="146556548"
+   d="scan'208";a="129142399"
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Jul 2020 17:03:38 -0700
-IronPort-SDR: Go80DYoOa+jgCvzUJ8c8qVgmU4RYBMo5yNdEeYJXx1Q0+44kELwwdx2JGTitw+q18rqebtLFFK
- S5ELISaY54uQ==
+Received: from fmsmga006.fm.intel.com ([10.253.24.20])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Jul 2020 17:40:35 -0700
+IronPort-SDR: boOPCVnFb4xBQo9PjccozOnSHmMPmV1/UuxGnTjA5xi0CHudSa/4acyBJSsbYiUmPDcTdy80Z7
+ 8HrGN6Nfa5CA==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.75,353,1589266800"; 
-   d="scan'208";a="281912404"
-Received: from zhangj4-mobl1.ccr.corp.intel.com (HELO [10.249.173.190]) ([10.249.173.190])
-  by orsmga003.jf.intel.com with ESMTP; 14 Jul 2020 17:03:32 -0700
-Subject: Re: [PATCH v2 3/4] x86: Expose SERIALIZE for supported cpuid
-To:     hpa@zytor.com,
-        Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org, x86@kernel.org,
-        pbonzini@redhat.com, vkuznets@redhat.com, wanpengli@tencent.com,
-        jmattson@google.com, joro@8bytes.org, tglx@linutronix.de,
-        mingo@redhat.com, bp@alien8.de,
-        ricardo.neri-calderon@linux.intel.com, kyung.min.park@intel.com,
-        jpoimboe@redhat.com, gregkh@linuxfoundation.org,
-        ak@linux.intel.com, dave.hansen@intel.com, tony.luck@intel.com,
-        ravi.v.shankar@intel.com
-References: <1594088183-7187-1-git-send-email-cathy.zhang@intel.com>
- <1594088183-7187-4-git-send-email-cathy.zhang@intel.com>
- <20200714030047.GA12592@linux.intel.com>
- <80d91e21-6509-ff70-fb5a-5c042f6ea588@intel.com>
- <3EFFDE4B-7844-4BB3-A824-487EE8359376@zytor.com>
-From:   "Zhang, Cathy" <cathy.zhang@intel.com>
-Message-ID: <e24f5802-5187-956c-80ad-a4cc8f66a261@intel.com>
-Date:   Wed, 15 Jul 2020 08:03:31 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+   d="scan'208";a="485543720"
+Received: from unknown (HELO localhost) ([10.239.159.128])
+  by fmsmga006.fm.intel.com with ESMTP; 14 Jul 2020 17:40:33 -0700
+Date:   Wed, 15 Jul 2020 08:40:09 +0800
+From:   Yang Weijiang <weijiang.yang@intel.com>
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     Yang Weijiang <weijiang.yang@intel.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, pbonzini@redhat.com,
+        jmattson@google.com, yu.c.zhang@linux.intel.com
+Subject: Re: [PATCH v13 00/11] Introduce support for guest CET feature
+Message-ID: <20200715004009.GA1271@local-michael-cet-test>
+References: <20200701080411.5802-1-weijiang.yang@intel.com>
+ <20200713181326.GC29725@linux.intel.com>
 MIME-Version: 1.0
-In-Reply-To: <3EFFDE4B-7844-4BB3-A824-487EE8359376@zytor.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200713181326.GC29725@linux.intel.com>
+User-Agent: Mutt/1.11.3 (2019-02-01)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 7/15/2020 7:05 AM, hpa@zytor.com wrote:
-> On July 14, 2020 3:42:08 PM PDT, "Zhang, Cathy" <cathy.zhang@intel.com> wrote:
->> On 7/14/2020 11:00 AM, Sean Christopherson wrote:
->>> On Tue, Jul 07, 2020 at 10:16:22AM +0800, Cathy Zhang wrote:
->>>> SERIALIZE instruction is supported by intel processors,
->>>> like Sapphire Rapids. Expose it in KVM supported cpuid.
->>> Providing at least a rough overview of the instruction, e.g. its
->> enumeration,
->>> usage, fault rules, controls, etc... would be nice.  In isolation,
->> the
->>> changelog isn't remotely helpful in understanding the correctness of
->> the
->>> patch.
->> Thanks Sean! Add it in the next version.
->>>> Signed-off-by: Cathy Zhang <cathy.zhang@intel.com>
->>>> ---
->>>>    arch/x86/kvm/cpuid.c | 3 ++-
->>>>    1 file changed, 2 insertions(+), 1 deletion(-)
->>>>
->>>> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
->>>> index 8a294f9..e603aeb 100644
->>>> --- a/arch/x86/kvm/cpuid.c
->>>> +++ b/arch/x86/kvm/cpuid.c
->>>> @@ -341,7 +341,8 @@ void kvm_set_cpu_caps(void)
->>>>    	kvm_cpu_cap_mask(CPUID_7_EDX,
->>>>    		F(AVX512_4VNNIW) | F(AVX512_4FMAPS) | F(SPEC_CTRL) |
->>>>    		F(SPEC_CTRL_SSBD) | F(ARCH_CAPABILITIES) | F(INTEL_STIBP) |
->>>> -		F(MD_CLEAR) | F(AVX512_VP2INTERSECT) | F(FSRM)
->>>> +		F(MD_CLEAR) | F(AVX512_VP2INTERSECT) | F(FSRM) |
->>>> +		F(SERIALIZE)
->>>>    	);
->>>>    
->>>>    	/* TSC_ADJUST and ARCH_CAPABILITIES are emulated in software. */
->>>> -- 
->>>> 1.8.3.1
->>>>
-> At least that one is easy: SERIALIZE is architecturally a NOP, but with hard serialization, like CPUID or IRET.
-SERIALIZE does not modify registers, arithmetic flags or memory, which 
-is different with CPUID.
+On Mon, Jul 13, 2020 at 11:13:26AM -0700, Sean Christopherson wrote:
+> On Wed, Jul 01, 2020 at 04:04:00PM +0800, Yang Weijiang wrote:
+> > Control-flow Enforcement Technology (CET) provides protection against
+> > Return/Jump-Oriented Programming (ROP/JOP) attack. There're two CET
+> > sub-features: Shadow Stack (SHSTK) and Indirect Branch Tracking (IBT).
+> > SHSTK is to prevent ROP programming and IBT is to prevent JOP programming.
+> > 
+> > Several parts in KVM have been updated to provide VM CET support, including:
+> > CPUID/XSAVES config, MSR pass-through, user space MSR access interface, 
+> > vmentry/vmexit config, nested VM etc. These patches have dependency on CET
+> > kernel patches for xsaves support and CET definitions, e.g., MSR and related
+> > feature flags.
+> > 
+> > CET kernel patches are here:
+> > https://lkml.kernel.org/r/20200429220732.31602-1-yu-cheng.yu@intel.com
+> > 
+> > v13:
+> > - Added CET definitions as a separate patch to facilitate KVM test.
+> > - Disabled CET support in KVM if unrestricted_guest is turned off since
+> >   in this case CET related instructions/infrastructure cannot be emulated
+> >   well.
+> 
+> This needs to be rebased, I can't get it to apply on any kvm branch nor on
+> any 5.8 rc.  And when you send series, especially large series that touch
+> lots of code, please explicitly state what commit the series is based on to
+> make it easy for reviewers to apply the patches, even if the series needs a
+> rebase.
+Sorry for the inconvenience, I'll rebase and resend this series.
