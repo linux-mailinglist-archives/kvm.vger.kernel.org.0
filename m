@@ -2,90 +2,286 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 322B32214AF
-	for <lists+kvm@lfdr.de>; Wed, 15 Jul 2020 20:49:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5450B22154E
+	for <lists+kvm@lfdr.de>; Wed, 15 Jul 2020 21:46:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726786AbgGOSsL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 Jul 2020 14:48:11 -0400
-Received: from mga02.intel.com ([134.134.136.20]:18667 "EHLO mga02.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726465AbgGOSsL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 15 Jul 2020 14:48:11 -0400
-IronPort-SDR: 5Nd8Ja1TD6g7wcWJgq+hNm/TjAkbAVKO7aIm6lEgNT5BxB6JJjNb1GGv+yCcMd4hUAYL4+mtgu
- m5aNuAkob7pg==
-X-IronPort-AV: E=McAfee;i="6000,8403,9683"; a="137381648"
-X-IronPort-AV: E=Sophos;i="5.75,356,1589266800"; 
-   d="scan'208";a="137381648"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Jul 2020 11:48:11 -0700
-IronPort-SDR: 9SW1YoQr66ejwVk9s/TFGxOm9D1B2VjLCvSyMzUNQp+Wfcyu59RqJJI/3Ma7CumYwcM4b4+gvE
- fLkLiAaGjMxQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.75,356,1589266800"; 
-   d="scan'208";a="430228527"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.152])
-  by orsmga004.jf.intel.com with ESMTP; 15 Jul 2020 11:48:11 -0700
-Date:   Wed, 15 Jul 2020 11:48:10 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Krish Sadhukhan <krish.sadhukhan@oracle.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        Karl Heubaum <karl.heubaum@oracle.com>,
-        Oliver Upton <oupton@google.com>,
-        Jim Mattson <jmattson@google.com>
-Subject: Re: [kvm-unit-tests PATCH 1/2] nVMX: Restore active host RIP/CR4
- after test_host_addr_size()
-Message-ID: <20200715184810.GC12349@linux.intel.com>
-References: <20200714002355.538-1-sean.j.christopherson@intel.com>
- <20200714002355.538-2-sean.j.christopherson@intel.com>
- <378edd35-38eb-1d62-8471-f111c17afee7@oracle.com>
+        id S1726932AbgGOTqB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 15 Jul 2020 15:46:01 -0400
+Received: from smtp-fw-33001.amazon.com ([207.171.190.10]:54807 "EHLO
+        smtp-fw-33001.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726661AbgGOTqA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 15 Jul 2020 15:46:00 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1594842360; x=1626378360;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=07ZiHsSJNDyPfOvpZkEmwAGWdhDd52BASM8p6D09UtE=;
+  b=Uj9FeJ9YvPAofU/XH9a9oeNz68jep07n0ALYYrJCnuJs3XbkefTQnIQa
+   VVUCQvPY97qST+oSZMTWO2YX+2pOGRtlyRuLb+kHU+hr2g2DNQyz/ECKy
+   3bzPP7TMHq9RR7Bvr3SDdS2F+sxtRRFDknvpVUPAgHASs3iCUOGKRPHUA
+   I=;
+IronPort-SDR: m0FYBS1y8EPqixIZ3YB7F4fCUkllhYZ4p53vgtEm/8Lyndake2gOPVevlm0oFKIsow/+PrT+ZJ
+ 4fK+gMGx78qw==
+X-IronPort-AV: E=Sophos;i="5.75,356,1589241600"; 
+   d="scan'208";a="58896902"
+Received: from sea32-co-svc-lb4-vlan3.sea.corp.amazon.com (HELO email-inbound-relay-2b-c300ac87.us-west-2.amazon.com) ([10.47.23.38])
+  by smtp-border-fw-out-33001.sea14.amazon.com with ESMTP; 15 Jul 2020 19:45:57 +0000
+Received: from EX13MTAUEA002.ant.amazon.com (pdx4-ws-svc-p6-lb7-vlan2.pdx.amazon.com [10.170.41.162])
+        by email-inbound-relay-2b-c300ac87.us-west-2.amazon.com (Postfix) with ESMTPS id 30B69A25AA;
+        Wed, 15 Jul 2020 19:45:57 +0000 (UTC)
+Received: from EX13D16EUB001.ant.amazon.com (10.43.166.28) by
+ EX13MTAUEA002.ant.amazon.com (10.43.61.77) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.2; Wed, 15 Jul 2020 19:45:56 +0000
+Received: from 38f9d34ed3b1.ant.amazon.com (10.43.161.214) by
+ EX13D16EUB001.ant.amazon.com (10.43.166.28) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.2; Wed, 15 Jul 2020 19:45:46 +0000
+From:   Andra Paraschiv <andraprs@amazon.com>
+To:     <linux-kernel@vger.kernel.org>
+CC:     Anthony Liguori <aliguori@amazon.com>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Colm MacCarthaigh <colmmacc@amazon.com>,
+        "David Duncan" <davdunc@amazon.com>,
+        Bjoern Doebel <doebel@amazon.de>,
+        "David Woodhouse" <dwmw@amazon.co.uk>,
+        Frank van der Linden <fllinden@amazon.com>,
+        Alexander Graf <graf@amazon.de>,
+        Greg KH <gregkh@linuxfoundation.org>,
+        "Karen Noel" <knoel@redhat.com>,
+        Martin Pohlack <mpohlack@amazon.de>,
+        Matt Wilson <msw@amazon.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Balbir Singh <sblbir@amazon.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        "Stefan Hajnoczi" <stefanha@redhat.com>,
+        Stewart Smith <trawets@amazon.com>,
+        "Uwe Dannowski" <uwed@amazon.de>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>, <kvm@vger.kernel.org>,
+        <ne-devel-upstream@amazon.com>,
+        Andra Paraschiv <andraprs@amazon.com>
+Subject: [PATCH v5 00/18] Add support for Nitro Enclaves
+Date:   Wed, 15 Jul 2020 22:45:22 +0300
+Message-ID: <20200715194540.45532-1-andraprs@amazon.com>
+X-Mailer: git-send-email 2.20.1 (Apple Git-117)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <378edd35-38eb-1d62-8471-f111c17afee7@oracle.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+X-Originating-IP: [10.43.161.214]
+X-ClientProxiedBy: EX13D46UWB002.ant.amazon.com (10.43.161.70) To
+ EX13D16EUB001.ant.amazon.com (10.43.166.28)
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jul 15, 2020 at 11:34:46AM -0700, Krish Sadhukhan wrote:
-> 
-> On 7/13/20 5:23 PM, Sean Christopherson wrote:
-> >Perform one last VMX transition to actually load the host's RIP and CR4
-> >at the end of test_host_addr_size().  Simply writing the VMCS doesn't
-> >restore the values in hardware, e.g. as is, CR4.PCIDE can be left set,
-> >which causes spectacularly confusing explosions when other misguided
-> >tests assume setting bit 63 in CR3 will cause a non-canonical #GP.
-> >
-> >Fixes: 0786c0316ac05 ("kvm-unit-test: nVMX: Check Host Address Space Size on vmentry of nested guests")
-> >Cc: Krish Sadhukhan <krish.sadhukhan@oracle.com>
-> >Cc: Karl Heubaum <karl.heubaum@oracle.com>
-> >Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
-> >---
-> >  x86/vmx_tests.c | 5 +++++
-> >  1 file changed, 5 insertions(+)
-> >
-> >diff --git a/x86/vmx_tests.c b/x86/vmx_tests.c
-> >index 29f3d0e..cb42a2d 100644
-> >--- a/x86/vmx_tests.c
-> >+++ b/x86/vmx_tests.c
-> >@@ -7673,6 +7673,11 @@ static void test_host_addr_size(void)
-> >  		vmcs_write(ENT_CONTROLS, entry_ctrl_saved | ENT_GUEST_64);
-> >  		vmcs_write(HOST_RIP, rip_saved);
-> >  		vmcs_write(HOST_CR4, cr4_saved);
-> >+
-> >+		/* Restore host's active RIP and CR4 values. */
-> >+		report_prefix_pushf("restore host state");
-> >+		test_vmx_vmlaunch(0);
-> >+		report_prefix_pop();
-> >  	}
-> >  }
-> Just for my understanding.  When you say, "other misguided tests", which
-> tests are you referring to ?  In the current sequence of tests in
-> vmx_host_state_area_test(), test_load_host_perf_global_ctrl() is the  one
-> that follows and it runs fine.
+Nitro Enclaves (NE) is a new Amazon Elastic Compute Cloud (EC2) capability
+that allows customers to carve out isolated compute environments within EC2
+instances [1].
 
-See test_mtf_guest() in patch 2/2.  https://patchwork.kernel.org/patch/11661189/
+For example, an application that processes sensitive data and runs in a VM,
+can be separated from other applications running in the same VM. This
+application then runs in a separate VM than the primary VM, namely an enclave.
+
+An enclave runs alongside the VM that spawned it. This setup matches low latency
+applications needs. The resources that are allocated for the enclave, such as
+memory and CPUs, are carved out of the primary VM. Each enclave is mapped to a
+process running in the primary VM, that communicates with the NE driver via an
+ioctl interface.
+
+In this sense, there are two components:
+
+1. An enclave abstraction process - a user space process running in the primary
+VM guest that uses the provided ioctl interface of the NE driver to spawn an
+enclave VM (that's 2 below).
+
+There is a NE emulated PCI device exposed to the primary VM. The driver for this
+new PCI device is included in the NE driver.
+
+The ioctl logic is mapped to PCI device commands e.g. the NE_START_ENCLAVE ioctl
+maps to an enclave start PCI command. The PCI device commands are then
+translated into  actions taken on the hypervisor side; that's the Nitro
+hypervisor running on the host where the primary VM is running. The Nitro
+hypervisor is based on core KVM technology.
+
+2. The enclave itself - a VM running on the same host as the primary VM that
+spawned it. Memory and CPUs are carved out of the primary VM and are dedicated
+for the enclave VM. An enclave does not have persistent storage attached.
+
+The memory regions carved out of the primary VM and given to an enclave need to
+be aligned 2 MiB / 1 GiB physically contiguous memory regions (or multiple of
+this size e.g. 8 MiB). The memory can be allocated e.g. by using hugetlbfs from
+user space [2][3]. The memory size for an enclave needs to be at least 64 MiB.
+The enclave memory and CPUs need to be from the same NUMA node.
+
+An enclave runs on dedicated cores. CPU 0 and its CPU siblings need to remain
+available for the primary VM. A CPU pool has to be set for NE purposes by an
+user with admin capability. See the cpu list section from the kernel
+documentation [4] for how a CPU pool format looks.
+
+An enclave communicates with the primary VM via a local communication channel,
+using virtio-vsock [5]. The primary VM has virtio-pci vsock emulated device,
+while the enclave VM has a virtio-mmio vsock emulated device. The vsock device
+uses eventfd for signaling. The enclave VM sees the usual interfaces - local
+APIC and IOAPIC - to get interrupts from virtio-vsock device. The virtio-mmio
+device is placed in memory below the typical 4 GiB.
+
+The application that runs in the enclave needs to be packaged in an enclave
+image together with the OS ( e.g. kernel, ramdisk, init ) that will run in the
+enclave VM. The enclave VM has its own kernel and follows the standard Linux
+boot protocol.
+
+The kernel bzImage, the kernel command line, the ramdisk(s) are part of the
+Enclave Image Format (EIF); plus an EIF header including metadata such as magic
+number, eif version, image size and CRC.
+
+Hash values are computed for the entire enclave image (EIF), the kernel and
+ramdisk(s). That's used, for example, to check that the enclave image that is
+loaded in the enclave VM is the one that was intended to be run.
+
+These crypto measurements are included in a signed attestation document
+generated by the Nitro Hypervisor and further used to prove the identity of the
+enclave; KMS is an example of service that NE is integrated with and that checks
+the attestation doc.
+
+The enclave image (EIF) is loaded in the enclave memory at offset 8 MiB. The
+init process in the enclave connects to the vsock CID of the primary VM and a
+predefined port - 9000 - to send a heartbeat value - 0xb7. This mechanism is
+used to check in the primary VM that the enclave has booted.
+
+If the enclave VM crashes or gracefully exits, an interrupt event is received by
+the NE driver. This event is sent further to the user space enclave process
+running in the primary VM via a poll notification mechanism. Then the user space
+enclave process can exit.
+
+Thank you.
+
+Andra
+
+[1] https://aws.amazon.com/ec2/nitro/nitro-enclaves/
+[2] https://www.kernel.org/doc/Documentation/vm/hugetlbpage.txt
+[3] https://lwn.net/Articles/807108/
+[4] https://www.kernel.org/doc/html/latest/admin-guide/kernel-parameters.html
+[5] https://man7.org/linux/man-pages/man7/vsock.7.html
+
+---
+
+Patch Series Changelog
+
+The patch series is built on top of v5.8-rc5.
+
+v4 -> v5
+
+* Rebase on top of v5.8-rc5.
+* Add more details about the ioctl calls usage e.g. error codes.
+* Update the ioctl to set an enclave vCPU to not return a fd.
+* Add specific NE error codes.
+* Split the NE CPU pool in CPU cores cpumasks.
+* Remove log on copy_from_user() / copy_to_user() failure.
+* Release the reference to the NE PCI device on failure paths.
+* Close enclave fd on copy_to_user() failure.
+* Set empty string in case of invalid NE CPU pool sysfs value.
+* Early exit on NE CPU pool setup if enclave(s) already running.
+* Add more sanity checks for provided vCPUs e.g. maximum possible value.
+* Split logic for checking if a vCPU is in pool / getting a vCPU from pool.
+* Exit without unpinning the pages on NE PCI dev request failure.
+* Add check for the memory region user space address alignment.
+* Update the logic to set memory region to not have a hardcoded check for 2 MiB.
+* Add arch dependency for Arm / x86.
+* v4: https://lore.kernel.org/lkml/20200622200329.52996-1-andraprs@amazon.com/
+
+v3 -> v4
+
+* Rebase on top of v5.8-rc2.
+* Add NE API version and the corresponding ioctl call.
+* Add enclave / image load flags options.
+* Decouple NE ioctl interface from KVM API.
+* Remove the "packed" attribute and include padding in the NE data structures.
+* Update documentation based on the changes from v4.
+* Update sample to match the updates in v4.
+* Remove the NE CPU pool init during NE kernel module loading.
+* Setup the NE CPU pool at runtime via a sysfs file for the kernel parameter.
+* Check if the enclave memory and CPUs are from the same NUMA node.
+* Add minimum enclave memory size definition.
+* v3: https://lore.kernel.org/lkml/20200525221334.62966-1-andraprs@amazon.com/ 
+
+v2 -> v3
+
+* Rebase on top of v5.7-rc7.
+* Add changelog to each patch in the series.
+* Remove "ratelimited" from the logs that are not in the ioctl call paths.
+* Update static calls sanity checks.
+* Remove file ops that do nothing for now.
+* Remove GPL additional wording as SPDX-License-Identifier is already in place.
+* v2: https://lore.kernel.org/lkml/20200522062946.28973-1-andraprs@amazon.com/
+
+v1 -> v2
+
+* Rebase on top of v5.7-rc6.
+* Adapt codebase based on feedback from v1.
+* Update ioctl number definition - major and minor.
+* Add sample / documentation for the ioctl interface basic flow usage.
+* Update cover letter to include more context on the NE overall.
+* Add fix for the enclave / vcpu fd creation error cleanup path.
+* Add fix reported by kbuild test robot <lkp@intel.com>.
+* v1: https://lore.kernel.org/lkml/20200421184150.68011-1-andraprs@amazon.com/
+
+---
+
+Andra Paraschiv (18):
+  nitro_enclaves: Add ioctl interface definition
+  nitro_enclaves: Define the PCI device interface
+  nitro_enclaves: Define enclave info for internal bookkeeping
+  nitro_enclaves: Init PCI device driver
+  nitro_enclaves: Handle PCI device command requests
+  nitro_enclaves: Handle out-of-band PCI device events
+  nitro_enclaves: Init misc device providing the ioctl interface
+  nitro_enclaves: Add logic for creating an enclave VM
+  nitro_enclaves: Add logic for setting an enclave vCPU
+  nitro_enclaves: Add logic for getting the enclave image load info
+  nitro_enclaves: Add logic for setting an enclave memory region
+  nitro_enclaves: Add logic for starting an enclave
+  nitro_enclaves: Add logic for terminating an enclave
+  nitro_enclaves: Add Kconfig for the Nitro Enclaves driver
+  nitro_enclaves: Add Makefile for the Nitro Enclaves driver
+  nitro_enclaves: Add sample for ioctl interface usage
+  nitro_enclaves: Add overview documentation
+  MAINTAINERS: Add entry for the Nitro Enclaves driver
+
+ Documentation/nitro_enclaves/ne_overview.rst  |   87 ++
+ .../userspace-api/ioctl/ioctl-number.rst      |    5 +-
+ MAINTAINERS                                   |   13 +
+ drivers/virt/Kconfig                          |    2 +
+ drivers/virt/Makefile                         |    2 +
+ drivers/virt/nitro_enclaves/Kconfig           |   16 +
+ drivers/virt/nitro_enclaves/Makefile          |   11 +
+ drivers/virt/nitro_enclaves/ne_misc_dev.c     | 1385 +++++++++++++++++
+ drivers/virt/nitro_enclaves/ne_misc_dev.h     |  106 ++
+ drivers/virt/nitro_enclaves/ne_pci_dev.c      |  565 +++++++
+ drivers/virt/nitro_enclaves/ne_pci_dev.h      |  265 ++++
+ include/linux/nitro_enclaves.h                |   11 +
+ include/uapi/linux/nitro_enclaves.h           |  244 +++
+ samples/nitro_enclaves/.gitignore             |    2 +
+ samples/nitro_enclaves/Makefile               |   16 +
+ samples/nitro_enclaves/ne_ioctl_sample.c      |  628 ++++++++
+ 16 files changed, 3357 insertions(+), 1 deletion(-)
+ create mode 100644 Documentation/nitro_enclaves/ne_overview.rst
+ create mode 100644 drivers/virt/nitro_enclaves/Kconfig
+ create mode 100644 drivers/virt/nitro_enclaves/Makefile
+ create mode 100644 drivers/virt/nitro_enclaves/ne_misc_dev.c
+ create mode 100644 drivers/virt/nitro_enclaves/ne_misc_dev.h
+ create mode 100644 drivers/virt/nitro_enclaves/ne_pci_dev.c
+ create mode 100644 drivers/virt/nitro_enclaves/ne_pci_dev.h
+ create mode 100644 include/linux/nitro_enclaves.h
+ create mode 100644 include/uapi/linux/nitro_enclaves.h
+ create mode 100644 samples/nitro_enclaves/.gitignore
+ create mode 100644 samples/nitro_enclaves/Makefile
+ create mode 100644 samples/nitro_enclaves/ne_ioctl_sample.c
+
+-- 
+2.20.1 (Apple Git-117)
+
+
+
+
+Amazon Development Center (Romania) S.R.L. registered office: 27A Sf. Lazar Street, UBC5, floor 2, Iasi, Iasi County, 700045, Romania. Registered in Romania. Registration number J22/2621/2005.
+
