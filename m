@@ -2,131 +2,77 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2DE1722097A
-	for <lists+kvm@lfdr.de>; Wed, 15 Jul 2020 12:05:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B2DD222098B
+	for <lists+kvm@lfdr.de>; Wed, 15 Jul 2020 12:08:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731013AbgGOKEa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 Jul 2020 06:04:30 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:38224 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1725838AbgGOKEa (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 15 Jul 2020 06:04:30 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1594807468;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=weZYbeSY39lus+MmvOlHiowxYixXEAHCQmjpqMFvj2c=;
-        b=AnFWvOJYy2Y7Q9kBsdj6tOVsIanHzCyHLImjBAx53Osx8Y0bDK4YonmYnPgg09oqcLLdyg
-        C54pxCejnwKg4wVsJS0FBWavxrHcCoLMmoXNYQdNCX+E70Qh0Mu7bheU0e2CsjJyvVx8wG
-        V28JQdj6QTVvCZYToKHBYQbAKKiX7mk=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-428-RWF5CGyTORe29C-CK25FGA-1; Wed, 15 Jul 2020 06:04:23 -0400
-X-MC-Unique: RWF5CGyTORe29C-CK25FGA-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8A2F8800597;
-        Wed, 15 Jul 2020 10:04:22 +0000 (UTC)
-Received: from [10.72.13.230] (ovpn-13-230.pek2.redhat.com [10.72.13.230])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 9F55B5C1BD;
-        Wed, 15 Jul 2020 10:04:13 +0000 (UTC)
-Subject: Re: [PATCH 6/7] ifcvf: replace irq_request/free with helpers in vDPA
- core.
-To:     "Michael S. Tsirkin" <mst@redhat.com>
-Cc:     "Zhu, Lingshan" <lingshan.zhu@intel.com>,
-        alex.williamson@redhat.com, pbonzini@redhat.com,
-        sean.j.christopherson@intel.com, wanpengli@tencent.com,
-        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
-        netdev@vger.kernel.org, dan.daly@intel.com
-References: <1594565366-3195-1-git-send-email-lingshan.zhu@intel.com>
- <1594565366-3195-6-git-send-email-lingshan.zhu@intel.com>
- <c7d4eca1-b65a-b795-dfa6-fe7658716cb1@redhat.com>
- <f6fc09e2-7a45-aaa5-2b4a-f1f963c5ce2c@intel.com>
- <09e67c20-dda1-97a2-1858-6a543c64fba6@redhat.com>
- <20200715055538-mutt-send-email-mst@kernel.org>
-From:   Jason Wang <jasowang@redhat.com>
-Message-ID: <eefc2969-c91e-059e-ed4a-20ce8fa6dfe9@redhat.com>
-Date:   Wed, 15 Jul 2020 18:04:11 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        id S1731013AbgGOKIN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 15 Jul 2020 06:08:13 -0400
+Received: from [195.135.220.15] ([195.135.220.15]:40338 "EHLO mx2.suse.de"
+        rhost-flags-FAIL-FAIL-OK-OK) by vger.kernel.org with ESMTP
+        id S1725811AbgGOKIM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 15 Jul 2020 06:08:12 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.221.27])
+        by mx2.suse.de (Postfix) with ESMTP id 505C8B6C0;
+        Wed, 15 Jul 2020 10:08:14 +0000 (UTC)
+Date:   Wed, 15 Jul 2020 12:08:08 +0200
+From:   Joerg Roedel <jroedel@suse.de>
+To:     Peter Zijlstra <peterz@infradead.org>
+Cc:     Joerg Roedel <joro@8bytes.org>, x86@kernel.org, hpa@zytor.com,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Jiri Slaby <jslaby@suse.cz>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Juergen Gross <jgross@suse.com>,
+        Kees Cook <keescook@chromium.org>,
+        David Rientjes <rientjes@google.com>,
+        Cfir Cohen <cfir@google.com>,
+        Erdem Aktas <erdemaktas@google.com>,
+        Masami Hiramatsu <mhiramat@kernel.org>,
+        Mike Stunes <mstunes@vmware.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Martin Radev <martin.b.radev@gmail.com>,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org
+Subject: Re: [PATCH v4 63/75] x86/sev-es: Handle #DB Events
+Message-ID: <20200715100808.GL16200@suse.de>
+References: <20200714120917.11253-1-joro@8bytes.org>
+ <20200714120917.11253-64-joro@8bytes.org>
+ <20200715084752.GD10769@hirez.programming.kicks-ass.net>
+ <20200715091337.GI16200@suse.de>
+ <20200715095136.GG10769@hirez.programming.kicks-ass.net>
 MIME-Version: 1.0
-In-Reply-To: <20200715055538-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200715095136.GG10769@hirez.programming.kicks-ass.net>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Wed, Jul 15, 2020 at 11:51:36AM +0200, Peter Zijlstra wrote:
+> On Wed, Jul 15, 2020 at 11:13:37AM +0200, Joerg Roedel wrote:
+> > Then my understanding of intrumentation_begin/end() is wrong, I thought
+> > that the kernel will forbid setting breakpoints before
+> > instrumentation_begin(), which is necessary here because a break-point
+> > in the #VC handler might cause recursive #VC-exceptions when #DB is
+> > intercepted.
+> > Maybe you can elaborate on why this makes no sense?
+> 
+> Kernel avoids breakpoints in any noinstr text, irrespective of
+> instrumentation_begin().
+> 
+> instrumentation_begin() merely allows one to call !noinstr functions.
 
-On 2020/7/15 下午6:01, Michael S. Tsirkin wrote:
-> On Wed, Jul 15, 2020 at 04:40:17PM +0800, Jason Wang wrote:
->> On 2020/7/13 下午6:22, Zhu, Lingshan wrote:
->>> On 7/13/2020 4:33 PM, Jason Wang wrote:
->>>> On 2020/7/12 下午10:49, Zhu Lingshan wrote:
->>>>> This commit replaced irq_request/free() with helpers in vDPA
->>>>> core, so that it can request/free irq and setup irq offloading
->>>>> on order.
->>>>>
->>>>> Signed-off-by: Zhu Lingshan<lingshan.zhu@intel.com>
->>>>> ---
->>>>>    drivers/vdpa/ifcvf/ifcvf_main.c | 11 ++++++-----
->>>>>    1 file changed, 6 insertions(+), 5 deletions(-)
->>>>>
->>>>> diff --git a/drivers/vdpa/ifcvf/ifcvf_main.c
->>>>> b/drivers/vdpa/ifcvf/ifcvf_main.c
->>>>> index f5a60c1..65b84e1 100644
->>>>> --- a/drivers/vdpa/ifcvf/ifcvf_main.c
->>>>> +++ b/drivers/vdpa/ifcvf/ifcvf_main.c
->>>>> @@ -47,11 +47,12 @@ static void ifcvf_free_irq(struct
->>>>> ifcvf_adapter *adapter, int queues)
->>>>>    {
->>>>>        struct pci_dev *pdev = adapter->pdev;
->>>>>        struct ifcvf_hw *vf = &adapter->vf;
->>>>> +    struct vdpa_device *vdpa = &adapter->vdpa;
->>>>>        int i;
->>>>>            for (i = 0; i < queues; i++)
->>>>> -        devm_free_irq(&pdev->dev, vf->vring[i].irq, &vf->vring[i]);
->>>>> +        vdpa_free_vq_irq(&pdev->dev, vdpa, vf->vring[i].irq, i,
->>>>> &vf->vring[i]);
->>>>>          ifcvf_free_irq_vectors(pdev);
->>>>>    }
->>>>> @@ -60,6 +61,7 @@ static int ifcvf_request_irq(struct
->>>>> ifcvf_adapter *adapter)
->>>>>    {
->>>>>        struct pci_dev *pdev = adapter->pdev;
->>>>>        struct ifcvf_hw *vf = &adapter->vf;
->>>>> +    struct vdpa_device *vdpa = &adapter->vdpa;
->>>>>        int vector, i, ret, irq;
->>>>>          ret = pci_alloc_irq_vectors(pdev, IFCVF_MAX_INTR,
->>>>> @@ -73,6 +75,7 @@ static int ifcvf_request_irq(struct
->>>>> ifcvf_adapter *adapter)
->>>>>             pci_name(pdev));
->>>>>        vector = 0;
->>>>>        irq = pci_irq_vector(pdev, vector);
->>>>> +    /* config interrupt */
->>>> Unnecessary changes.
->>> This is to show we did not setup this irq offloading for config
->>> interrupt, only setup irq offloading for data vq. But can remove this
->>> since we have config_msix_name in code to show what it is
->> Btw, any reason for not making config interrupt work for irq offloading? I
->> don't see any thing that blocks this.
->>
->> Thanks
-> Well config accesses all go through userspace right?
-> Doing config interrupt directly would just be messy ...
+Right, but the handler calls into various other functions. I actually
+started to annotate them all with noinstr, but that was a can of worms
+when calling into generic kernel functions. And the only problem with
+intrumentation in the #VC handler is the #VC-for-#DB exit-code, so I
+decided to only handle this one with instrumentation forbidden and allow
+it for the rest of the handler.
 
+Regards,
 
-Right, so I think we need a better comment here.
-
-Thanks
-
-
->
->
-
+	Joerg
