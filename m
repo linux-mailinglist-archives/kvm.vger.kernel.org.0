@@ -2,29 +2,29 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 93C2A220336
-	for <lists+kvm@lfdr.de>; Wed, 15 Jul 2020 06:07:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4862322032D
+	for <lists+kvm@lfdr.de>; Wed, 15 Jul 2020 06:06:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728716AbgGOEG2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 Jul 2020 00:06:28 -0400
+        id S1726424AbgGOEGF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 15 Jul 2020 00:06:05 -0400
 Received: from mga17.intel.com ([192.55.52.151]:16670 "EHLO mga17.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725916AbgGOEGD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        id S1725980AbgGOEGD (ORCPT <rfc822;kvm@vger.kernel.org>);
         Wed, 15 Jul 2020 00:06:03 -0400
-IronPort-SDR: ewqDVWYm/bKfgZAMVkHy/hNbO8+RCEHg0ojOO9qIl4huHBdAzbR2eHTg1QkAR/UgZjd0qTECN0
- hfVO8KKXhMFg==
-X-IronPort-AV: E=McAfee;i="6000,8403,9682"; a="129167484"
+IronPort-SDR: YVH6ViBrl/AJ3E3MxSKn7cpkxYK9Z9/dKVwm5P+kf0ZP6P9HTa3gMOXXb+3eOA9GUmQaL3H8HQ
+ wXrDlLQ0h7hg==
+X-IronPort-AV: E=McAfee;i="6000,8403,9682"; a="129167486"
 X-IronPort-AV: E=Sophos;i="5.75,353,1589266800"; 
-   d="scan'208";a="129167484"
+   d="scan'208";a="129167486"
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from fmsmga006.fm.intel.com ([10.253.24.20])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Jul 2020 21:06:02 -0700
-IronPort-SDR: SEOjMc0bIN3O1+ATeg3OlT4+KKnZ9ViTaGXOrsu4KzXFmbmdj6Zk8TwBs2jE8Z9XQ9xv6De86Y
- B8u4Vd2kpTZQ==
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Jul 2020 21:06:03 -0700
+IronPort-SDR: 14tQVUJqoTUwoWBKb9RejmYG0x2tdKbE7FGGXpkyFzfBq22hJdG7sHrwcc7yfz/u7JQkQmIDof
+ y+UA/KObHVvw==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.75,353,1589266800"; 
-   d="scan'208";a="485587024"
+   d="scan'208";a="485587029"
 Received: from sjchrist-coffee.jf.intel.com ([10.54.74.152])
   by fmsmga006.fm.intel.com with ESMTP; 14 Jul 2020 21:06:02 -0700
 From:   Sean Christopherson <sean.j.christopherson@intel.com>
@@ -36,9 +36,9 @@ Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
         Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org, Dan Cross <dcross@google.com>,
         Peter Shier <pshier@google.com>
-Subject: [PATCH 5/7] KVM: nVMX: Ensure vmcs01 is the loaded VMCS when freeing nested state
-Date:   Tue, 14 Jul 2020 21:05:55 -0700
-Message-Id: <20200715040557.5889-6-sean.j.christopherson@intel.com>
+Subject: [PATCH 6/7] KVM: nVMX: Drop redundant VMCS switch and free_nested() call
+Date:   Tue, 14 Jul 2020 21:05:56 -0700
+Message-Id: <20200715040557.5889-7-sean.j.christopherson@intel.com>
 X-Mailer: git-send-email 2.26.0
 In-Reply-To: <20200715040557.5889-1-sean.j.christopherson@intel.com>
 References: <20200715040557.5889-1-sean.j.christopherson@intel.com>
@@ -49,33 +49,28 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add a WARN in free_nested() to ensure vmcs01 is loaded prior to freeing
-vmcs02 and friends, and explicitly switch to vmcs01 if it's not.  KVM is
-supposed to keep is_guest_mode() and loaded_vmcs==vmcs02 synchronized,
-but bugs happen and freeing vmcs02 while it's in use will escalate a KVM
-error to a use-after-free and potentially crash the kernel.
-
-Do the WARN and switch even in the !vmxon case to help detect latent
-bugs.  free_nested() is not a hot path, and the check is cheap.
+Remove the explicit switch to vmcs01 and the call to free_nested() in
+nested_vmx_free_vcpu().  free_nested(), which is called unconditionally
+by vmx_leave_nested(), ensures vmcs01 is loaded prior to freeing vmcs02
+and friends.
 
 Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
 ---
- arch/x86/kvm/vmx/nested.c | 3 +++
- 1 file changed, 3 insertions(+)
+ arch/x86/kvm/vmx/nested.c | 2 --
+ 1 file changed, 2 deletions(-)
 
 diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index e9b27c6478da3..5734bff1a5907 100644
+index 5734bff1a5907..66ed449f0d59f 100644
 --- a/arch/x86/kvm/vmx/nested.c
 +++ b/arch/x86/kvm/vmx/nested.c
-@@ -279,6 +279,9 @@ static void free_nested(struct kvm_vcpu *vcpu)
+@@ -326,8 +326,6 @@ void nested_vmx_free_vcpu(struct kvm_vcpu *vcpu)
  {
- 	struct vcpu_vmx *vmx = to_vmx(vcpu);
- 
-+	if (WARN_ON_ONCE(vmx->loaded_vmcs != &vmx->vmcs01))
-+		vmx_switch_vmcs(vcpu, &vmx->vmcs01);
-+
- 	if (!vmx->nested.vmxon && !vmx->nested.smm.vmxon)
- 		return;
+ 	vcpu_load(vcpu);
+ 	vmx_leave_nested(vcpu);
+-	vmx_switch_vmcs(vcpu, &to_vmx(vcpu)->vmcs01);
+-	free_nested(vcpu);
+ 	vcpu_put(vcpu);
+ }
  
 -- 
 2.26.0
