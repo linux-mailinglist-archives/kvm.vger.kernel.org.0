@@ -2,153 +2,188 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id CDE46221A6E
-	for <lists+kvm@lfdr.de>; Thu, 16 Jul 2020 04:59:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9D60B221AAD
+	for <lists+kvm@lfdr.de>; Thu, 16 Jul 2020 05:18:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728107AbgGPC75 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 Jul 2020 22:59:57 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:53137 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1728098AbgGPC74 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 15 Jul 2020 22:59:56 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1594868394;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=dE5m+Um8h+2SUjIIhar0TzsMcMWhB03b3rA1FsH9hrY=;
-        b=DsmsZN4F3bEU+yxcrSnXzfyr5eqnLgDERDAstumaRs/OMyRTjJvSgJMcEGRka5yd91ql5O
-        kFZ3hP3TVLj5n7XAc6ge6QpqOsJ5HlWA9opD0oPdi+GNiLWdNSa0Y2523HeUqaQnsRNwsA
-        Y/RCt/0Mwxw6261g+b/Ts1CIv0ABDRc=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-365-ZEAagCr5PK2jvEWyxvMe5g-1; Wed, 15 Jul 2020 22:59:52 -0400
-X-MC-Unique: ZEAagCr5PK2jvEWyxvMe5g-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 333A8800FF1;
-        Thu, 16 Jul 2020 02:59:51 +0000 (UTC)
-Received: from [10.72.12.131] (ovpn-12-131.pek2.redhat.com [10.72.12.131])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 975DD5C1BD;
-        Thu, 16 Jul 2020 02:59:39 +0000 (UTC)
-Subject: Re: [PATCH 0/7] *** IRQ offloading for vDPA ***
-To:     "Zhu, Lingshan" <lingshan.zhu@intel.com>, mst@redhat.com,
-        alex.williamson@redhat.com, pbonzini@redhat.com,
-        sean.j.christopherson@intel.com, wanpengli@tencent.com
-Cc:     virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
-        netdev@vger.kernel.org, dan.daly@intel.com
-References: <1594565524-3394-1-git-send-email-lingshan.zhu@intel.com>
- <70244d80-08a4-da91-3226-7bfd2019467e@redhat.com>
- <97032c51-3265-c94a-9ce1-f42fcc6d3075@intel.com>
-From:   Jason Wang <jasowang@redhat.com>
-Message-ID: <77318609-85ef-f169-2a1e-500473976d84@redhat.com>
-Date:   Thu, 16 Jul 2020 10:59:36 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
-MIME-Version: 1.0
-In-Reply-To: <97032c51-3265-c94a-9ce1-f42fcc6d3075@intel.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+        id S1728189AbgGPDQ6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 15 Jul 2020 23:16:58 -0400
+Received: from mga06.intel.com ([134.134.136.31]:8143 "EHLO mga06.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728149AbgGPDQ4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 15 Jul 2020 23:16:56 -0400
+IronPort-SDR: 1n3+rtKl315Fpj7xjL7c7EdpqVOBmZXVrlbcAynUN4EuST0RvSVFlJIC2ZRqF4w018/cru1jWs
+ Fqf3HWyoVvjg==
+X-IronPort-AV: E=McAfee;i="6000,8403,9683"; a="210844827"
+X-IronPort-AV: E=Sophos;i="5.75,357,1589266800"; 
+   d="scan'208";a="210844827"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Jul 2020 20:16:55 -0700
+IronPort-SDR: WcX57bLryolWS71PxD9B4xqX2K/v7gerMW1I+hLtAkpIn0FpDYDeDdu/htFLlZlhBrTI4PGhli
+ 88dsjn2ksdww==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.75,357,1589266800"; 
+   d="scan'208";a="360910405"
+Received: from unknown (HELO local-michael-cet-test.sh.intel.com) ([10.239.159.128])
+  by orsmga001.jf.intel.com with ESMTP; 15 Jul 2020 20:16:53 -0700
+From:   Yang Weijiang <weijiang.yang@intel.com>
+To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        pbonzini@redhat.com, sean.j.christopherson@intel.com,
+        jmattson@google.com
+Cc:     yu.c.zhang@linux.intel.com, Yang Weijiang <weijiang.yang@intel.com>
+Subject: [RESEND PATCH v13 00/11] Introduce support for guest CET feature
+Date:   Thu, 16 Jul 2020 11:16:16 +0800
+Message-Id: <20200716031627.11492-1-weijiang.yang@intel.com>
+X-Mailer: git-send-email 2.17.2
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Control-flow Enforcement Technology (CET) provides protection against
+Return/Jump-Oriented Programming (ROP/JOP) attack. There're two CET
+sub-features: Shadow Stack (SHSTK) and Indirect Branch Tracking (IBT).
+SHSTK is to prevent ROP programming and IBT is to prevent JOP programming.
 
-On 2020/7/16 上午9:39, Zhu, Lingshan wrote:
->
->
-> On 7/15/2020 9:43 PM, Jason Wang wrote:
->>
->> On 2020/7/12 下午10:52, Zhu Lingshan wrote:
->>> Hi All,
->>>
->>> This series intends to implement IRQ offloading for
->>> vhost_vdpa.
->>>
->>> By the feat of irq forwarding facilities like posted
->>> interrupt on X86, irq bypass can  help deliver
->>> interrupts to vCPU directly.
->>>
->>> vDPA devices have dedicated hardware backends like VFIO
->>> pass-throughed devices. So it would be possible to setup
->>> irq offloading(irq bypass) for vDPA devices and gain
->>> performance improvements.
->>>
->>> In my testing, with this feature, we can save 0.1ms
->>> in a ping between two VFs on average.
->>
->>
->> Hi Lingshan:
->>
->> During the virtio-networking meeting, Michael spots two possible issues:
->>
->> 1) do we need an new uAPI to stop the irq offloading?
->> 2) can interrupt lost during the eventfd ctx?
->>
->> For 1) I think we probably not, we can allocate an independent 
->> eventfd which does not map to MSIX. So the consumer can't match the 
->> producer and we fallback to eventfd based irq.
-> Hi Jason,
->
-> I wonder why we need to stop irq offloading, but if we need to do so, maybe a new uAPI would be more intuitive to me,
-> but why and who(user? qemu?) shall initialize this process, based on what kinda of basis to make the decision?
+Several parts in KVM have been updated to provide VM CET support, including:
+CPUID/XSAVES config, MSR pass-through, user space MSR access interface, 
+vmentry/vmexit config, nested VM etc. These patches have dependency on CET
+kernel patches for xsaves support and CET definitions, e.g., MSR and related
+feature flags.
 
+CET kernel patches are here:
+https://lkml.kernel.org/r/20200429220732.31602-1-yu-cheng.yu@intel.com
 
-The reason is we may want to fallback to software datapath for some 
-reason (e.g software assisted live migration). In this case we need 
-intercept device write to used ring so we can not offloading virtqueue 
-interrupt in this case.
+v13:
+- Added CET definitions as a separate patch to facilitate KVM test.
+- Disabled CET support in KVM if unrestricted_guest is turned off since
+  in this case CET related instructions/infrastructure cannot be emulated
+  well.
+- Don't expose CET feature to guest if host kernel doesn't support CET.
+- Rebased the series to v5.8-rc5, commit: 11ba468877bb
 
+v12:
+- Fixed a few issues per Sean and Paolo's review feeback.
+- Refactored patches to make them properly arranged.
+- Removed unnecessary hard-coded CET states for host/guest.
+- Added compile-time assertions for vmcs_field_to_offset_table to detect
+  mismatch of the field type and field encoding number.
+- Added a custom MSR MSR_KVM_GUEST_SSP for guest active SSP save/restore.
+- Rebased patches to 5.7-rc3.
 
->> For 2) it looks to me guest should deal with the irq synchronization 
->> when mask or unmask MSIX vectors.
-> Agreed!
+v11:
+- Fixed a guest vmentry failure issue when guest reboots.
+- Used vm_xxx_control_{set, clear}bit() to avoid side effect, it'll
+  clear cached data instead of pure VMCS field bits.
+- Added vcpu->arch.guest_supported_xss dedidated for guest runtime mask,
+  this avoids supported_xss overwritten issue caused by an old qemu.
+- Separated vmentry/vmexit state setting with CR0/CR4 dependency check
+  to make the patch more clear.
+- Added CET VMCS states in dump_vmcs() for debugging purpose.
+- Other refactor based on testing.
+- This patch serial is built on top of below branch and CET kernel patches
+  for seeking xsaves support:
+  https://git.kernel.org/pub/scm/virt/kvm/kvm.git/log/?h=cpu-caps
 
+v10:
+- Refactored code per Sean's review feedback.
+- Added CET support for nested VM.
+- Removed fix-patch for CPUID(0xd,N) enumeration as this part is done
+  by Paolo and Sean.
+- This new patchset is based on Paolo's queued cpu_caps branch.
+- Modified patch per XSAVES related change.
+- Consolidated KVM unit-test patch with KVM patches.
 
-It's better to double check for this.
+v9:
+- Refactored msr-check functions per Sean's feedback.
+- Fixed a few issues per Sean's suggestion.
+- Rebased patch to kernel-v5.4.
+- Moved CET CPUID feature bits and CR4.CET to last patch.
 
-Thanks
+v8:
+- Addressed Jim and Sean's feedback on: 1) CPUID(0xD,i) enumeration. 2)
+  sanity check when configure guest CET. 3) function improvement.
+- Added more sanity check functions.
+- Set host vmexit default status so that guest won't leak CET status to
+  host when vmexit.
+- Added CR0.WP vs. CR4.CET mutual constrains.
 
+v7:
+- Rebased patch to kernel v5.3
+- Sean suggested to change CPUID(0xd, n) enumeration code as alined with
+  existing one, and I think it's better to make the fix as an independent patch 
+  since XSS MSR are being used widely on X86 platforms.
+- Check more host and guest status before configure guest CET
+  per Sean's feedback.
+- Add error-check before guest accesses CET MSRs per Sean's feedback.
+- Other minor fixes suggested by Sean.
 
->
-> Thanks,
-> BR
-> Zhu Lingshan
->>
->> What's your thought?
->>
->> Thanks
->>
->>
->>>
->>>
->>> Zhu Lingshan (7):
->>>    vhost: introduce vhost_call_ctx
->>>    kvm/vfio: detect assigned device via irqbypass manager
->>>    vhost_vdpa: implement IRQ offloading functions in vhost_vdpa
->>>    vDPA: implement IRQ offloading helpers in vDPA core
->>>    virtio_vdpa: init IRQ offloading function pointers to NULL.
->>>    ifcvf: replace irq_request/free with helpers in vDPA core.
->>>    irqbypass: do not start consumer or producer when failed to connect
->>>
->>>   arch/x86/kvm/x86.c              | 10 ++++--
->>>   drivers/vdpa/ifcvf/ifcvf_main.c | 11 +++---
->>>   drivers/vdpa/vdpa.c             | 46 +++++++++++++++++++++++++
->>>   drivers/vhost/Kconfig           |  1 +
->>>   drivers/vhost/vdpa.c            | 75 
->>> +++++++++++++++++++++++++++++++++++++++--
->>>   drivers/vhost/vhost.c           | 22 ++++++++----
->>>   drivers/vhost/vhost.h           |  9 ++++-
->>>   drivers/virtio/virtio_vdpa.c    |  2 ++
->>>   include/linux/vdpa.h            | 11 ++++++
->>>   virt/kvm/vfio.c                 |  2 --
->>>   virt/lib/irqbypass.c            | 16 +++++----
->>>   11 files changed, 181 insertions(+), 24 deletions(-)
->>>
->>
+v6:
+- Rebase patch to kernel v5.2.
+- Move CPUID(0xD, n>=1) helper to a seperate patch.
+- Merge xsave size fix with other patch.
+- Other minor fixes per community feedback.
+
+v5:
+- Rebase patch to kernel v5.1.
+- Wrap CPUID(0xD, n>=1) code to a helper function.
+- Pass through MSR_IA32_PL1_SSP and MSR_IA32_PL2_SSP to Guest.
+- Add Co-developed-by expression in patch description.
+- Refine patch description.
+
+v4:
+- Add Sean's patch for loading Guest fpu state before access XSAVES
+  managed CET MSRs.
+- Melt down CET bits setting into CPUID configuration patch.
+- Add VMX interface to query Host XSS.
+- Check Host and Guest XSS support bits before set Guest XSS.
+- Make Guest SHSTK and IBT feature enabling independent.
+- Do not report CET support to Guest when Host CET feature is Disabled.
+
+v3:
+- Modified patches to make Guest CET independent to Host enabling.
+- Added patch 8 to add user space access for Guest CET MSR access.
+- Modified code comments and patch description to reflect changes.
+
+v2:
+- Re-ordered patch sequence, combined one patch.
+- Added more description for CET related VMCS fields.
+- Added Host CET capability check while enabling Guest CET loading bit.
+- Added Host CET capability check while reporting Guest CPUID(EAX=7, EXC=0).
+- Modified code in reporting Guest CPUID(EAX=D,ECX>=1), make it clearer.
+- Added Host and Guest XSS mask check while setting bits for Guest XSS.
+
+Sean Christopherson (1):
+  KVM: x86: Load guest fpu state when access MSRs managed by XSAVES
+
+Yang Weijiang (10):
+  KVM: x86: Include CET definitions for KVM test purpose
+  KVM: VMX: Introduce CET VMCS fields and flags
+  KVM: VMX: Set guest CET MSRs per KVM and host configuration
+  KVM: VMX: Configure CET settings upon guest CR0/4 changing
+  KVM: x86: Refresh CPUID once guest changes XSS bits
+  KVM: x86: Add userspace access interface for CET MSRs
+  KVM: VMX: Enable CET support for nested VM
+  KVM: VMX: Add VMCS dump and sanity check for CET states
+  KVM: x86: Add #CP support in guest exception dispatch
+  KVM: x86: Enable CET virtualization and advertise CET to userspace
+
+ arch/x86/include/asm/kvm_host.h      |   4 +-
+ arch/x86/include/asm/vmx.h           |   8 +
+ arch/x86/include/uapi/asm/kvm.h      |   1 +
+ arch/x86/include/uapi/asm/kvm_para.h |   7 +-
+ arch/x86/kvm/cpuid.c                 |  28 ++-
+ arch/x86/kvm/vmx/capabilities.h      |   5 +
+ arch/x86/kvm/vmx/nested.c            |  34 ++++
+ arch/x86/kvm/vmx/vmcs12.c            | 267 ++++++++++++++++-----------
+ arch/x86/kvm/vmx/vmcs12.h            |  14 +-
+ arch/x86/kvm/vmx/vmx.c               | 262 +++++++++++++++++++++++++-
+ arch/x86/kvm/x86.c                   |  53 +++++-
+ arch/x86/kvm/x86.h                   |   2 +-
+ include/linux/kvm_host.h             |  32 ++++
+ 13 files changed, 590 insertions(+), 127 deletions(-)
+
+-- 
+2.17.2
 
