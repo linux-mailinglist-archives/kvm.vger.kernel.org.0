@@ -2,143 +2,91 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DC792221AB4
-	for <lists+kvm@lfdr.de>; Thu, 16 Jul 2020 05:18:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 93512221AFF
+	for <lists+kvm@lfdr.de>; Thu, 16 Jul 2020 05:42:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728315AbgGPDRZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 Jul 2020 23:17:25 -0400
-Received: from mga06.intel.com ([134.134.136.31]:8164 "EHLO mga06.intel.com"
+        id S1728157AbgGPDlZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 15 Jul 2020 23:41:25 -0400
+Received: from mga11.intel.com ([192.55.52.93]:49384 "EHLO mga11.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728291AbgGPDRT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 15 Jul 2020 23:17:19 -0400
-IronPort-SDR: OdnQU85mYcQfWJiMkKli+PVyooRpjEYBiF+mX7UegCHpa3NBHLgk/rTt+0hI+TIT7JSoVvJxk9
- VCkXWeXFaUKg==
-X-IronPort-AV: E=McAfee;i="6000,8403,9683"; a="210844869"
+        id S1726905AbgGPDlZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 15 Jul 2020 23:41:25 -0400
+IronPort-SDR: /rECrXmQotmxWnPcx0EoBt6V2wNPBDb2Z8LG1TYxqHOzKG0WytouaPiF++duP31wDYk9/IFbTx
+ ptA1ef/0q3/w==
+X-IronPort-AV: E=McAfee;i="6000,8403,9683"; a="147310947"
 X-IronPort-AV: E=Sophos;i="5.75,357,1589266800"; 
-   d="scan'208";a="210844869"
+   d="scan'208";a="147310947"
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Jul 2020 20:17:18 -0700
-IronPort-SDR: oPH15PgiG93QSLB7jnt4dL1RUrJBgcCH09jfpQLd8HhDCezAW4bvbu8vUIRuK1SMlahR1s/dGR
- KkkQy03e5BXg==
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Jul 2020 20:41:24 -0700
+IronPort-SDR: 7CSdzCyxxWWy3tQqd6zryT58WT1lkLoWGg/ZFMryPCvwMYmrGoyVST5LGfeq3X+BMNHUbM4vmj
+ UfVSxyC6ZQXg==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.75,357,1589266800"; 
-   d="scan'208";a="360910494"
-Received: from unknown (HELO local-michael-cet-test.sh.intel.com) ([10.239.159.128])
-  by orsmga001.jf.intel.com with ESMTP; 15 Jul 2020 20:17:16 -0700
-From:   Yang Weijiang <weijiang.yang@intel.com>
-To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        pbonzini@redhat.com, sean.j.christopherson@intel.com,
-        jmattson@google.com
-Cc:     yu.c.zhang@linux.intel.com, Yang Weijiang <weijiang.yang@intel.com>
-Subject: [RESEND v13 11/11] KVM: x86: Enable CET virtualization and advertise CET to userspace
-Date:   Thu, 16 Jul 2020 11:16:27 +0800
-Message-Id: <20200716031627.11492-12-weijiang.yang@intel.com>
-X-Mailer: git-send-email 2.17.2
-In-Reply-To: <20200716031627.11492-1-weijiang.yang@intel.com>
-References: <20200716031627.11492-1-weijiang.yang@intel.com>
+   d="scan'208";a="316905467"
+Received: from sjchrist-coffee.jf.intel.com ([10.54.74.152])
+  by orsmga008.jf.intel.com with ESMTP; 15 Jul 2020 20:41:24 -0700
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH 0/9] KVM: x86: TDP level cleanups and shadow NPT fix
+Date:   Wed, 15 Jul 2020 20:41:13 -0700
+Message-Id: <20200716034122.5998-1-sean.j.christopherson@intel.com>
+X-Mailer: git-send-email 2.26.0
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Set the feature bits so that CET capabilities can be seen in guest via
-CPUID enumeration. Add CR4.CET bit support in order to allow guest set CET
-master control bit(CR4.CET).
+The primary purpose of this series is to implement a suggestion from Paolo
+to have the MMU make the decision between 4 and 5 level EPT/TDP (when
+5-level page tables are supported).  Having the MMU "own" the decision of
+whether or not to use 5-level paging leads to a variety of nice cleanups,
+and ultimately gets rid of another kvm_x86_ops.
 
-Disable KVM CET feature once unrestricted_guest is turned off because
-KVM cannot emulate guest CET behavior well in this case.
+Patch 1 is a fix for SVM's shadow NPT that is compile tested only.  I
+don't know enough about the shadow NPT details to know if it's a "real"
+bug or just a supericial oddity that can't actually cause problems.
 
-Don't expose CET feature if dependent CET bits are cleared in host XSS.
+"Remove temporary WARN on expected vs. actual EPTP level mismatch" could
+easily be squashed with "Pull the PGD's level from the MMU instead of
+recalculating it", I threw it in as a separate patch to provide a
+bisection helper in case things go sideways.
 
-Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
----
- arch/x86/include/asm/kvm_host.h |  3 ++-
- arch/x86/kvm/cpuid.c            |  5 +++--
- arch/x86/kvm/vmx/vmx.c          |  5 +++++
- arch/x86/kvm/x86.c              | 11 +++++++++++
- 4 files changed, 21 insertions(+), 3 deletions(-)
+Sean Christopherson (9):
+  KVM: nSVM: Correctly set the shadow NPT root level in its MMU role
+  KVM: x86/mmu: Add separate helper for shadow NPT root page role calc
+  KVM: VMX: Drop a duplicate declaration of construct_eptp()
+  KVM: VMX: Make vmx_load_mmu_pgd() static
+  KVM: x86: Pull the PGD's level from the MMU instead of recalculating
+    it
+  KVM: VXM: Remove temporary WARN on expected vs. actual EPTP level
+    mismatch
+  KVM: x86: Dynamically calculate TDP level from max level and
+    MAXPHYADDR
+  KVM: x86/mmu: Rename max_page_level to max_huge_page_level
+  KVM: x86: Specify max TDP level via kvm_configure_mmu()
 
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index e8c749596ba2..c4c82db68b6a 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -99,7 +99,8 @@
- 			  | X86_CR4_PGE | X86_CR4_PCE | X86_CR4_OSFXSR | X86_CR4_PCIDE \
- 			  | X86_CR4_OSXSAVE | X86_CR4_SMEP | X86_CR4_FSGSBASE \
- 			  | X86_CR4_OSXMMEXCPT | X86_CR4_LA57 | X86_CR4_VMXE \
--			  | X86_CR4_SMAP | X86_CR4_PKE | X86_CR4_UMIP))
-+			  | X86_CR4_SMAP | X86_CR4_PKE | X86_CR4_UMIP \
-+			  | X86_CR4_CET))
- 
- #define CR8_RESERVED_BITS (~(unsigned long)X86_CR8_TPR)
- 
-diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-index d97b2a6e8a8c..a085b8c57f34 100644
---- a/arch/x86/kvm/cpuid.c
-+++ b/arch/x86/kvm/cpuid.c
-@@ -340,7 +340,8 @@ void kvm_set_cpu_caps(void)
- 		F(AVX512VBMI) | F(LA57) | F(PKU) | 0 /*OSPKE*/ | F(RDPID) |
- 		F(AVX512_VPOPCNTDQ) | F(UMIP) | F(AVX512_VBMI2) | F(GFNI) |
- 		F(VAES) | F(VPCLMULQDQ) | F(AVX512_VNNI) | F(AVX512_BITALG) |
--		F(CLDEMOTE) | F(MOVDIRI) | F(MOVDIR64B) | 0 /*WAITPKG*/
-+		F(CLDEMOTE) | F(MOVDIRI) | F(MOVDIR64B) | 0 /*WAITPKG*/ |
-+		F(SHSTK)
- 	);
- 	/* Set LA57 based on hardware capability. */
- 	if (cpuid_ecx(7) & F(LA57))
-@@ -356,7 +357,7 @@ void kvm_set_cpu_caps(void)
- 	kvm_cpu_cap_mask(CPUID_7_EDX,
- 		F(AVX512_4VNNIW) | F(AVX512_4FMAPS) | F(SPEC_CTRL) |
- 		F(SPEC_CTRL_SSBD) | F(ARCH_CAPABILITIES) | F(INTEL_STIBP) |
--		F(MD_CLEAR) | F(AVX512_VP2INTERSECT) | F(FSRM)
-+		F(MD_CLEAR) | F(AVX512_VP2INTERSECT) | F(FSRM) | F(IBT)
- 	);
- 
- 	/* TSC_ADJUST and ARCH_CAPABILITIES are emulated in software. */
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 5d4250b9dec8..31593339b6fe 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -7542,6 +7542,11 @@ static __init void vmx_set_cpu_caps(void)
- 
- 	if (vmx_waitpkg_supported())
- 		kvm_cpu_cap_check_and_set(X86_FEATURE_WAITPKG);
-+
-+	if (!enable_unrestricted_guest) {
-+		kvm_cpu_cap_clear(X86_FEATURE_SHSTK);
-+		kvm_cpu_cap_clear(X86_FEATURE_IBT);
-+	}
- }
- 
- static void vmx_request_immediate_exit(struct kvm_vcpu *vcpu)
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 76892fb0b0a0..c7393d62ad72 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -9808,10 +9808,21 @@ int kvm_arch_hardware_setup(void *opaque)
- 	if (kvm_cpu_cap_has(X86_FEATURE_XSAVES))
- 		supported_xss = host_xss & KVM_SUPPORTED_XSS;
- 
-+	if (!(supported_xss & (XFEATURE_MASK_CET_USER |
-+	    XFEATURE_MASK_CET_KERNEL))) {
-+		kvm_cpu_cap_clear(X86_FEATURE_SHSTK);
-+		kvm_cpu_cap_clear(X86_FEATURE_IBT);
-+	}
-+
- #define __kvm_cpu_cap_has(UNUSED_, f) kvm_cpu_cap_has(f)
- 	cr4_reserved_bits = __cr4_reserved_bits(__kvm_cpu_cap_has, UNUSED_);
- #undef __kvm_cpu_cap_has
- 
-+	if (!kvm_cpu_cap_has(X86_FEATURE_SHSTK) &&
-+	    !kvm_cpu_cap_has(X86_FEATURE_IBT))
-+		supported_xss &= ~(XFEATURE_MASK_CET_USER |
-+				   XFEATURE_MASK_CET_KERNEL);
-+
- 	if (kvm_has_tsc_control) {
- 		/*
- 		 * Make sure the user can only configure tsc_khz values that
+ arch/x86/include/asm/kvm_host.h |  9 ++---
+ arch/x86/kvm/cpuid.c            |  2 --
+ arch/x86/kvm/mmu.h              | 10 ++++--
+ arch/x86/kvm/mmu/mmu.c          | 63 +++++++++++++++++++++++++--------
+ arch/x86/kvm/svm/nested.c       |  1 -
+ arch/x86/kvm/svm/svm.c          |  8 ++---
+ arch/x86/kvm/vmx/nested.c       |  2 +-
+ arch/x86/kvm/vmx/vmx.c          | 31 +++++++---------
+ arch/x86/kvm/vmx/vmx.h          |  6 ++--
+ arch/x86/kvm/x86.c              |  1 -
+ 10 files changed, 81 insertions(+), 52 deletions(-)
+
 -- 
-2.17.2
+2.26.0
 
