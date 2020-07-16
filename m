@@ -2,189 +2,126 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7BAD022196A
-	for <lists+kvm@lfdr.de>; Thu, 16 Jul 2020 03:29:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 062EC2219BF
+	for <lists+kvm@lfdr.de>; Thu, 16 Jul 2020 04:11:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727935AbgGPB2x convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Wed, 15 Jul 2020 21:28:53 -0400
-Received: from szxga01-in.huawei.com ([45.249.212.187]:2643 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726776AbgGPB2x (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 15 Jul 2020 21:28:53 -0400
-Received: from DGGEMM402-HUB.china.huawei.com (unknown [172.30.72.55])
-        by Forcepoint Email with ESMTP id 3CC0BA0E7C6EE7FA304C;
-        Thu, 16 Jul 2020 09:28:49 +0800 (CST)
-Received: from DGGEMM526-MBX.china.huawei.com ([169.254.8.195]) by
- DGGEMM402-HUB.china.huawei.com ([10.3.20.210]) with mapi id 14.03.0487.000;
- Thu, 16 Jul 2020 09:28:45 +0800
-From:   "Zengtao (B)" <prime.zeng@hisilicon.com>
-To:     Qian Cai <cai@lca.pw>
-CC:     "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Kevin Tian <kevin.tian@intel.com>,
-        Peter Xu <peterx@redhat.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        "Michel Lespinasse" <walken@google.com>,
-        Denis Efremov <efremov@linux.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: RE: [PATCH] vfio/pci: fix racy on error and request eventfd ctx
-Thread-Topic: [PATCH] vfio/pci: fix racy on error and request eventfd ctx
-Thread-Index: AQHWWnqQ+QrCfngfhUOguFGy1o0RgqkIHjeAgAFMeKA=
-Date:   Thu, 16 Jul 2020 01:28:45 +0000
-Message-ID: <678F3D1BB717D949B966B68EAEB446ED415861C7@dggemm526-mbx.china.huawei.com>
-References: <1594798484-20501-1-git-send-email-prime.zeng@hisilicon.com>
- <20200715133418.GA4426@lca.pw>
-In-Reply-To: <20200715133418.GA4426@lca.pw>
-Accept-Language: zh-CN, en-US
-Content-Language: zh-CN
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.74.221.187]
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
+        id S1728001AbgGPCLB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 15 Jul 2020 22:11:01 -0400
+Received: from relay5.mymailcheap.com ([159.100.248.207]:33917 "EHLO
+        relay5.mymailcheap.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726984AbgGPCLA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 15 Jul 2020 22:11:00 -0400
+Received: from relay1.mymailcheap.com (relay1.mymailcheap.com [149.56.97.132])
+        by relay5.mymailcheap.com (Postfix) with ESMTPS id 7FD2626297;
+        Thu, 16 Jul 2020 02:10:57 +0000 (UTC)
+Received: from filter1.mymailcheap.com (filter1.mymailcheap.com [149.56.130.247])
+        by relay1.mymailcheap.com (Postfix) with ESMTPS id 2FC3B3F157;
+        Wed, 15 Jul 2020 22:10:55 -0400 (EDT)
+Received: from localhost (localhost [127.0.0.1])
+        by filter1.mymailcheap.com (Postfix) with ESMTP id 15DDC2A3AA;
+        Wed, 15 Jul 2020 22:10:55 -0400 (EDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=mymailcheap.com;
+        s=default; t=1594865455;
+        bh=AEVS6FARCeqmIOD4dOV3ZjxZYov8SUPADkze2QBtd2U=;
+        h=Subject:To:Cc:References:From:Date:In-Reply-To:From;
+        b=QNeGTu/dyMvdNtebwUxhirTxhBf7AL3WE570KPi6c1D51TpCAeXJ9qp/uQ+gXNVlJ
+         q12z4Sjd6CIZoXO9fOnFL8ApSr/FBpvzDp97KbxOFqczGMD3mJ3/2653DabEQ9YUMd
+         pvRNCTmNpXBnwQ/dNj1iCFsCW5q5aICfmJpyNt0A=
+X-Virus-Scanned: Debian amavisd-new at filter1.mymailcheap.com
+Received: from filter1.mymailcheap.com ([127.0.0.1])
+        by localhost (filter1.mymailcheap.com [127.0.0.1]) (amavisd-new, port 10024)
+        with ESMTP id dTfR2iRsKyru; Wed, 15 Jul 2020 22:10:52 -0400 (EDT)
+Received: from mail20.mymailcheap.com (mail20.mymailcheap.com [51.83.111.147])
+        (using TLSv1.2 with cipher ADH-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by filter1.mymailcheap.com (Postfix) with ESMTPS;
+        Wed, 15 Jul 2020 22:10:52 -0400 (EDT)
+Received: from [148.251.23.173] (ml.mymailcheap.com [148.251.23.173])
+        by mail20.mymailcheap.com (Postfix) with ESMTP id C21DF4013E;
+        Thu, 16 Jul 2020 02:10:51 +0000 (UTC)
+Authentication-Results: mail20.mymailcheap.com;
+        dkim=pass (1024-bit key; unprotected) header.d=flygoat.com header.i=@flygoat.com header.b="VNGL71/4";
+        dkim-atps=neutral
+AI-Spam-Status: Not processed
+Received: from [0.0.0.0] (114-42-221-235.dynamic-ip.hinet.net [114.42.221.235])
+        (using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+         key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits))
+        (No client certificate requested)
+        by mail20.mymailcheap.com (Postfix) with ESMTPSA id 14B174013E;
+        Thu, 16 Jul 2020 02:10:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=flygoat.com;
+        s=default; t=1594865443;
+        bh=AEVS6FARCeqmIOD4dOV3ZjxZYov8SUPADkze2QBtd2U=;
+        h=Subject:To:Cc:References:From:Date:In-Reply-To:From;
+        b=VNGL71/4e3vOeqULNruQv6Eh42pbPLDrgKrXc6yP8FOVuueE07edPuE8Bkw4kmur9
+         3rIZ/g7uyrx8vg2IPnIMNNqMap5pB2uAFQ9T/AIpE4swnA2aB2K56zTZlUfRlGBE2T
+         B5x8vOq/f0wEQc/8RMQtMx/be5zzYzbTHFNMSi2c=
+Subject: Re: [PATCH v6 5/5] KVM: MIPS: clean up redundant kvm_run parameters
+ in assembly
+To:     Tianjia Zhang <tianjia.zhang@linux.alibaba.com>,
+        pbonzini@redhat.com, chenhuacai@gmail.com
+Cc:     kvm@vger.kernel.org, linux-mips@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <20200623131418.31473-1-tianjia.zhang@linux.alibaba.com>
+ <20200623131418.31473-6-tianjia.zhang@linux.alibaba.com>
+From:   Jiaxun Yang <jiaxun.yang@flygoat.com>
+Message-ID: <e447bb5c-8b83-dfb1-a293-f2e9e586c2ec@flygoat.com>
+Date:   Thu, 16 Jul 2020 10:10:37 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-X-CFilter-Loop: Reflected
+In-Reply-To: <20200623131418.31473-6-tianjia.zhang@linux.alibaba.com>
+Content-Type: text/plain; charset=gbk; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: C21DF4013E
+X-Spamd-Result: default: False [-0.10 / 10.00];
+         ARC_NA(0.00)[];
+         RCVD_VIA_SMTP_AUTH(0.00)[];
+         R_DKIM_ALLOW(0.00)[flygoat.com:s=default];
+         RECEIVED_SPAMHAUS_PBL(0.00)[114.42.221.235:received];
+         FROM_HAS_DN(0.00)[];
+         TO_DN_SOME(0.00)[];
+         FREEMAIL_ENVRCPT(0.00)[gmail.com];
+         TO_MATCH_ENVRCPT_ALL(0.00)[];
+         MIME_GOOD(-0.10)[text/plain];
+         R_SPF_SOFTFAIL(0.00)[~all:c];
+         RCPT_COUNT_FIVE(0.00)[6];
+         ML_SERVERS(-3.10)[148.251.23.173];
+         DKIM_TRACE(0.00)[flygoat.com:+];
+         DMARC_POLICY_ALLOW(0.00)[flygoat.com,none];
+         DMARC_POLICY_ALLOW_WITH_FAILURES(0.00)[];
+         FREEMAIL_TO(0.00)[linux.alibaba.com,redhat.com,gmail.com];
+         RCVD_NO_TLS_LAST(0.10)[];
+         FROM_EQ_ENVFROM(0.00)[];
+         MIME_TRACE(0.00)[0:+];
+         ASN(0.00)[asn:24940, ipnet:148.251.0.0/16, country:DE];
+         RCVD_COUNT_TWO(0.00)[2];
+         MID_RHS_MATCH_FROM(0.00)[];
+         HFILTER_HELO_BAREIP(3.00)[148.251.23.173,1]
+X-Rspamd-Server: mail20.mymailcheap.com
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> -----Original Message-----
-> From: Qian Cai [mailto:cai@lca.pw]
-> Sent: Wednesday, July 15, 2020 9:34 PM
-> To: Zengtao (B)
-> Cc: alex.williamson@redhat.com; Cornelia Huck; Kevin Tian; Peter Xu;
-> Andrew Morton; Michel Lespinasse; Denis Efremov; kvm@vger.kernel.org;
-> linux-kernel@vger.kernel.org
-> Subject: Re: [PATCH] vfio/pci: fix racy on error and request eventfd ctx
+
+
+ÔÚ 2020/6/23 21:14, Tianjia Zhang Ð´µÀ:
+> In the current kvm version, 'kvm_run' has been included in the 'kvm_vcpu'
+> structure. For historical reasons, many kvm-related function parameters
+> retain the 'kvm_run' and 'kvm_vcpu' parameters at the same time. This
+> patch does a unified cleanup of these remaining redundant parameters.
 > 
-> On Wed, Jul 15, 2020 at 03:34:41PM +0800, Zeng Tao wrote:
-> > The vfio_pci_release call will free and clear the error and request
-> > eventfd ctx while these ctx could be in use at the same time in the
-> > function like vfio_pci_request, and it's expected to protect them under
-> > the vdev->igate mutex, which is missing in vfio_pci_release.
-> 
-> How about other similar places calling eventfd_ctx_put() for "struct
-> vfio_pci_device" ? For example, vfio_intx_set_signal().
->
-I think there is no need, since the only wrapper call is
-vfio_pci_set_irqs_ioctl which is already protected by the igate mutex.
- 
-> >
-> > This issue is introduced since commit 1518ac272e78 ("vfio/pci: fix
-> memory
-> > leaks of eventfd ctx"),and since commit 5c5866c593bb ("vfio/pci: Clear
-> > error and request eventfd ctx after releasing"), it's very easily to
-> > trigger the kernel panic like this:
-> >
-> > [ 9513.904346] Unable to handle kernel NULL pointer dereference at
-> virtual address 0000000000000008
-> > [ 9513.913091] Mem abort info:
-> > [ 9513.915871]   ESR = 0x96000006
-> > [ 9513.918912]   EC = 0x25: DABT (current EL), IL = 32 bits
-> > [ 9513.924198]   SET = 0, FnV = 0
-> > [ 9513.927238]   EA = 0, S1PTW = 0
-> > [ 9513.930364] Data abort info:
-> > [ 9513.933231]   ISV = 0, ISS = 0x00000006
-> > [ 9513.937048]   CM = 0, WnR = 0
-> > [ 9513.940003] user pgtable: 4k pages, 48-bit VAs,
-> pgdp=0000007ec7d12000
-> > [ 9513.946414] [0000000000000008] pgd=0000007ec7d13003,
-> p4d=0000007ec7d13003, pud=0000007ec728c003,
-> pmd=0000000000000000
-> > [ 9513.956975] Internal error: Oops: 96000006 [#1] PREEMPT SMP
-> > [ 9513.962521] Modules linked in: vfio_pci vfio_virqfd vfio_iommu_type1
-> vfio hclge hns3 hnae3 [last unloaded: vfio_pci]
-> > [ 9513.972998] CPU: 4 PID: 1327 Comm: bash Tainted: G        W
-> 5.8.0-rc4+ #3
-> > [ 9513.980443] Hardware name: Huawei TaiShan 2280 V2/BC82AMDC,
-> BIOS 2280-V2 CS V3.B270.01 05/08/2020
-> > [ 9513.989274] pstate: 80400089 (Nzcv daIf +PAN -UAO BTYPE=--)
-> > [ 9513.994827] pc : _raw_spin_lock_irqsave+0x48/0x88
-> > [ 9513.999515] lr : eventfd_signal+0x6c/0x1b0
-> > [ 9514.003591] sp : ffff800038a0b960
-> > [ 9514.006889] x29: ffff800038a0b960 x28: ffff007ef7f4da10
-> > [ 9514.012175] x27: ffff207eefbbfc80 x26: ffffbb7903457000
-> > [ 9514.017462] x25: ffffbb7912191000 x24: ffff007ef7f4d400
-> > [ 9514.022747] x23: ffff20be6e0e4c00 x22: 0000000000000008
-> > [ 9514.028033] x21: 0000000000000000 x20: 0000000000000000
-> > [ 9514.033321] x19: 0000000000000008 x18: 0000000000000000
-> > [ 9514.038606] x17: 0000000000000000 x16: ffffbb7910029328
-> > [ 9514.043893] x15: 0000000000000000 x14: 0000000000000001
-> > [ 9514.049179] x13: 0000000000000000 x12: 0000000000000002
-> > [ 9514.054466] x11: 0000000000000000 x10: 0000000000000a00
-> > [ 9514.059752] x9 : ffff800038a0b840 x8 : ffff007ef7f4de60
-> > [ 9514.065038] x7 : ffff007fffc96690 x6 : fffffe01faffb748
-> > [ 9514.070324] x5 : 0000000000000000 x4 : 0000000000000000
-> > [ 9514.075609] x3 : 0000000000000000 x2 : 0000000000000001
-> > [ 9514.080895] x1 : ffff007ef7f4d400 x0 : 0000000000000000
-> > [ 9514.086181] Call trace:
-> > [ 9514.088618]  _raw_spin_lock_irqsave+0x48/0x88
-> > [ 9514.092954]  eventfd_signal+0x6c/0x1b0
-> > [ 9514.096691]  vfio_pci_request+0x84/0xd0 [vfio_pci]
-> > [ 9514.101464]  vfio_del_group_dev+0x150/0x290 [vfio]
-> > [ 9514.106234]  vfio_pci_remove+0x30/0x128 [vfio_pci]
-> > [ 9514.111007]  pci_device_remove+0x48/0x108
-> > [ 9514.115001]  device_release_driver_internal+0x100/0x1b8
-> > [ 9514.120200]  device_release_driver+0x28/0x38
-> > [ 9514.124452]  pci_stop_bus_device+0x68/0xa8
-> > [ 9514.128528]  pci_stop_and_remove_bus_device+0x20/0x38
-> > [ 9514.133557]  pci_iov_remove_virtfn+0xb4/0x128
-> > [ 9514.137893]  sriov_disable+0x3c/0x108
-> > [ 9514.141538]  pci_disable_sriov+0x28/0x38
-> > [ 9514.145445]  hns3_pci_sriov_configure+0x48/0xb8 [hns3]
-> > [ 9514.150558]  sriov_numvfs_store+0x110/0x198
-> > [ 9514.154724]  dev_attr_store+0x44/0x60
-> > [ 9514.158373]  sysfs_kf_write+0x5c/0x78
-> > [ 9514.162018]  kernfs_fop_write+0x104/0x210
-> > [ 9514.166010]  __vfs_write+0x48/0x90
-> > [ 9514.169395]  vfs_write+0xbc/0x1c0
-> > [ 9514.172694]  ksys_write+0x74/0x100
-> > [ 9514.176079]  __arm64_sys_write+0x24/0x30
-> > [ 9514.179987]  el0_svc_common.constprop.4+0x110/0x200
-> > [ 9514.184842]  do_el0_svc+0x34/0x98
-> > [ 9514.188144]  el0_svc+0x14/0x40
-> > [ 9514.191185]  el0_sync_handler+0xb0/0x2d0
-> > [ 9514.195088]  el0_sync+0x140/0x180
-> > [ 9514.198389] Code: b9001020 d2800000 52800022 f9800271
-> (885ffe61)
-> > [ 9514.204455] ---[ end trace 648de00c8406465f ]---
-> > [ 9514.212308] note: bash[1327] exited with preempt_count 1
-> >
-> > Cc: Qian Cai <cai@lca.pw>
-> > Cc: Alex Williamson <alex.williamson@redhat.com>
-> > Fixes: 1518ac272e78 ("vfio/pci: fix memory leaks of eventfd ctx")
-> > Signed-off-by: Zeng Tao <prime.zeng@hisilicon.com>
-> > ---
-> >  drivers/vfio/pci/vfio_pci.c | 5 +++++
-> >  1 file changed, 5 insertions(+)
-> >
-> > diff --git a/drivers/vfio/pci/vfio_pci.c b/drivers/vfio/pci/vfio_pci.c
-> > index f634c81..de881a6 100644
-> > --- a/drivers/vfio/pci/vfio_pci.c
-> > +++ b/drivers/vfio/pci/vfio_pci.c
-> > @@ -521,14 +521,19 @@ static void vfio_pci_release(void
-> *device_data)
-> >  		vfio_pci_vf_token_user_add(vdev, -1);
-> >  		vfio_spapr_pci_eeh_release(vdev->pdev);
-> >  		vfio_pci_disable(vdev);
-> > +		mutex_lock(&vdev->igate);
-> >  		if (vdev->err_trigger) {
-> >  			eventfd_ctx_put(vdev->err_trigger);
-> >  			vdev->err_trigger = NULL;
-> >  		}
-> > +		mutex_unlock(&vdev->igate);
-> > +
-> > +		mutex_lock(&vdev->igate);
-> >  		if (vdev->req_trigger) {
-> >  			eventfd_ctx_put(vdev->req_trigger);
-> >  			vdev->req_trigger = NULL;
-> >  		}
-> > +		mutex_unlock(&vdev->igate);
-> >  	}
-> >
-> >  	mutex_unlock(&vdev->reflck->lock);
-> > --
-> > 2.8.1
-> >
+> Signed-off-by: Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
+> Reviewed-by: Huacai Chen <chenhc@lemote.com>
+
+Tested-by: Jiaxun Yang <jiaxun.yang@flygoat.com>
+
+Can confirm it works on Loongson-3A4000.
+
+Thanks!
+
+> ---
+
+-- 
+- Jiaxun
