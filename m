@@ -2,136 +2,141 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1E2A1221845
-	for <lists+kvm@lfdr.de>; Thu, 16 Jul 2020 01:13:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7E82C221901
+	for <lists+kvm@lfdr.de>; Thu, 16 Jul 2020 02:42:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726905AbgGOXNE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 Jul 2020 19:13:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47554 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726776AbgGOXNE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 15 Jul 2020 19:13:04 -0400
-Received: from mail-il1-x143.google.com (mail-il1-x143.google.com [IPv6:2607:f8b0:4864:20::143])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 11D13C061755
-        for <kvm@vger.kernel.org>; Wed, 15 Jul 2020 16:13:04 -0700 (PDT)
-Received: by mail-il1-x143.google.com with SMTP id a11so3511930ilk.0
-        for <kvm@vger.kernel.org>; Wed, 15 Jul 2020 16:13:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=tOz1jJkVML1mQdocE25sKsIyj+RbAb/2bw/59L7mnd0=;
-        b=S+l3EQOQN3PJrwVwEodMRcihRZ553OPkfTycoYBwGrjlvpy4QEFqWmpyUCdyW8paOu
-         dcuoTXG/MGogW9IgH9NHx65sn6mAlcR84YTCLIJOXuNRenR2GvMzPWziw8sWr9H3UwHj
-         KpjF2M/tMHkFTyz7myZwYocfNCqSM4IzxSorZHfqWEJhtob3qh5pa5egl0beyZjpXP40
-         Tznu2v8CNNBM+VNXMvfxSQ+lgJn6O9yRKpsEWxqTxkSyhNZ7CQfyzdjklo4oJqV1NhfX
-         FV5X8mdVYPe65Jq4iu6kDN2aMLClLt//+RDwqc2RYM4kipwXLOLfyArsWGYrp2Vv5CAa
-         ewPw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=tOz1jJkVML1mQdocE25sKsIyj+RbAb/2bw/59L7mnd0=;
-        b=cINPB5LmkNVYtmJEYa1Kx0KetNMbysxJI1chCNXzU/OHaz3NvHNZxI7blXLSpyVj4H
-         I4y0qdV3TNMbDk0baedTKO9fHB+Go//gDsoH+7BO4i2LcoS8G7n2OUxwMFihvPcstEJ1
-         53VLcK8/H4IyRZ3oOkoFQh+o4/TKetUUa6tjYzFDB+rzQUxZtu32tuEvUF6IzPaOfrtg
-         Vrrbz/RZdrZGQn/bba8cFm/weZzn0g9jU1qwUNgiX+3zmhrn4etzOaI29NDqIsvLMnIx
-         2utJtZYVylHDBH5Z61P4uHS324R4GdmyhfTTx5QjU0zEY2UqcwJC35Thu8RF7ARDqgt4
-         IImQ==
-X-Gm-Message-State: AOAM531OEZggd4c0+RdypgnV76qXKeyWf2d2wd2OfPEXr9K3kJsEeCbw
-        3OoNG/LvPCZxilhkyf8ZY0HqI+fd6twknZT/upMwZg==
-X-Google-Smtp-Source: ABdhPJxZtMeeNY8c7127DSlP7S7p+oXctQ1tCisQyulPVEAnDj0rBASLdsjp2Po0sArtmgrBiaQ09BPLGzPebfaSBpA=
-X-Received: by 2002:a92:b685:: with SMTP id m5mr1853432ill.118.1594854783053;
- Wed, 15 Jul 2020 16:13:03 -0700 (PDT)
+        id S1726984AbgGPAmG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 15 Jul 2020 20:42:06 -0400
+Received: from aserp2130.oracle.com ([141.146.126.79]:50408 "EHLO
+        aserp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726479AbgGPAmF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 15 Jul 2020 20:42:05 -0400
+Received: from pps.filterd (aserp2130.oracle.com [127.0.0.1])
+        by aserp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 06G0bxnB091818;
+        Thu, 16 Jul 2020 00:41:59 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2020-01-29;
+ bh=OEqyHlxnxNuTK7yQOtur9xoUrVtX2sZEtZ5o28xC5A0=;
+ b=dvnG3fbMS3EugJVwG6sj+R7+HS36hin19h0bsHJ/ddfvjRWdhYkAlrYfNv4yqGcq87xc
+ aYW/P00LK4SbRiKdJYbn5lJ9UGnS1NnQTunA3qbRTSOCBaFVRaeDzBOJ9z8AAIQ0fmSd
+ I9qClWmuhbt5i3unlVGjSX8G8yo5ZgQz7Xckrz6dWIMWx780d8uDV711nij/7EXCSXmS
+ W0Bw4a0Sv+1gHs3ZDnAZPLbA89I8+OqeJ4vPfHzlI18hlBGDWM+PzMKRpDi9tUy3Crm/
+ dlsyZQgqL5/7zrnxy26XuKC6RwSoXkCdgvv1OqufvbSNrLaQH3JAQSMv4gdl2LXAK9M0 5A== 
+Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
+        by aserp2130.oracle.com with ESMTP id 327s65mpu1-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
+        Thu, 16 Jul 2020 00:41:58 +0000
+Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
+        by aserp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 06G0bpgf186831;
+        Thu, 16 Jul 2020 00:41:58 GMT
+Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
+        by aserp3030.oracle.com with ESMTP id 327q0sac35-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 16 Jul 2020 00:41:58 +0000
+Received: from abhmp0014.oracle.com (abhmp0014.oracle.com [141.146.116.20])
+        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 06G0fvE0025129;
+        Thu, 16 Jul 2020 00:41:57 GMT
+Received: from localhost.localdomain (/10.159.239.115)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Wed, 15 Jul 2020 17:41:57 -0700
+Subject: Re: [kvm-unit-tests PATCH 1/2] nVMX: Restore active host RIP/CR4
+ after test_host_addr_size()
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        Karl Heubaum <karl.heubaum@oracle.com>,
+        Oliver Upton <oupton@google.com>,
+        Jim Mattson <jmattson@google.com>
+References: <20200714002355.538-1-sean.j.christopherson@intel.com>
+ <20200714002355.538-2-sean.j.christopherson@intel.com>
+ <378edd35-38eb-1d62-8471-f111c17afee7@oracle.com>
+ <20200715184810.GC12349@linux.intel.com>
+ <c00836d0-45bb-3d50-5082-6670c1c5e2a9@oracle.com>
+ <20200715222247.GE12349@linux.intel.com>
+From:   Krish Sadhukhan <krish.sadhukhan@oracle.com>
+Message-ID: <3016bd85-6f40-9df8-80c0-5789f90f201f@oracle.com>
+Date:   Wed, 15 Jul 2020 17:41:56 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-References: <20200713043908.39605-1-namit@vmware.com> <ce87fd51-8e27-e5ff-3a90-06cddbf47636@oracle.com>
- <CCEF21D4-57C3-4843-9443-BE46501FFE8C@vmware.com> <abe9138a-6c61-22e1-f0a6-fcd5d06ef3f1@oracle.com>
- <6CD095D7-EF7F-49C2-98EF-F72D019817B2@vmware.com> <fe76d847-5106-bc09-e4cf-498fb51e5255@oracle.com>
- <9DC37B0B-597A-4B31-8397-B6E4764EEA37@vmware.com> <ab9f1669-a295-1022-a62a-8b64c90f6dcb@oracle.com>
-In-Reply-To: <ab9f1669-a295-1022-a62a-8b64c90f6dcb@oracle.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Wed, 15 Jul 2020 16:12:51 -0700
-Message-ID: <CALMp9eSoRSKBvNwjm5fpPG2XDJnnC1b-tm68P-K_Jnyab4aPMg@mail.gmail.com>
-Subject: Re: [kvm-unit-tests PATCH] x86: svm: low CR3 bits are not MBZ
-To:     Krish Sadhukhan <krish.sadhukhan@oracle.com>
-Cc:     Nadav Amit <namit@vmware.com>, Paolo Bonzini <pbonzini@redhat.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20200715222247.GE12349@linux.intel.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9683 signatures=668680
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxscore=0 malwarescore=0 spamscore=0
+ mlxlogscore=999 bulkscore=0 adultscore=0 phishscore=0 suspectscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
+ definitions=main-2007160001
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9683 signatures=668680
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 malwarescore=0
+ phishscore=0 mlxscore=0 priorityscore=1501 lowpriorityscore=0 spamscore=0
+ clxscore=1015 bulkscore=0 mlxlogscore=999 impostorscore=0 suspectscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
+ definitions=main-2007160001
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jul 15, 2020 at 3:40 PM Krish Sadhukhan
-<krish.sadhukhan@oracle.com> wrote:
->
->
-> On 7/15/20 3:27 PM, Nadav Amit wrote:
-> >> On Jul 15, 2020, at 3:21 PM, Krish Sadhukhan <krish.sadhukhan@oracle.c=
-om> wrote:
-> >>
-> >>
-> >> On 7/13/20 4:30 PM, Nadav Amit wrote:
-> >>>> On Jul 13, 2020, at 4:17 PM, Krish Sadhukhan <krish.sadhukhan@oracle=
-.com> wrote:
-> >>>>
-> >>>>
-> > [snip]
-> >
-> >>>> I am just saying that the APM language "should be cleared to 0" is m=
-isleading if the processor doesn't enforce it.
-> >>> Just to ensure I am clear - I am not blaming you in any way. I also f=
-ound
-> >>> the phrasing confusing.
-> >>>
-> >>> Having said that, if you (or anyone else) reintroduces =E2=80=9Cposit=
-ive=E2=80=9D tests, in
-> >>> which the VM CR3 is modified to ensure VM-entry succeeds when the res=
-erved
-> >>> non-MBZ bits are set, please ensure the tests fails gracefully. The
-> >>> non-long-mode CR3 tests crashed since the VM page-tables were incompa=
-tible
-> >>> with the paging mode.
-> >>>
-> >>> In other words, instead of setting a VMMCALL instruction in the VM to=
- trap
-> >>> immediately after entry, consider clearing the present-bits in the hi=
-gh
-> >>> levels of the NPT; or injecting some exception that would trigger exi=
-t
-> >>> during vectoring or something like that.
-> >>>
-> >>> P.S.: If it wasn=E2=80=99t clear, I am not going to fix KVM itself fo=
-r some obvious
-> >>> reasons.
-> >> I think since the APM is not clear, re-adding any test that tests thos=
-e bits, is like adding a test with "undefined behavior" to me.
-> >>
-> >>
-> >> Paolo, Should I send a KVM patch to remove checks for those non-MBZ re=
-served bits ?
-> > Which non-MBZ reserved bits (other than those that I addressed) do you =
-refer
-> > to?
-> >
-> I am referring to,
->
->      "[PATCH 2/3 v4] KVM: nSVM: Check that MBZ bits in CR3 and CR4 are
-> not set on vmrun of nested guests"
->
-> in which I added the following:
->
->
-> +#define MSR_CR3_LEGACY_RESERVED_MASK        0xfe7U
-> +#define MSR_CR3_LEGACY_PAE_RESERVED_MASK    0x7U
-> +#define MSR_CR3_LONG_RESERVED_MASK        0xfff0000000000fe7U
 
-In my experience, the APM generally distinguishes between "reserved"
-and "reserved, MBZ." The low bits you have indicated for CR3 are
-marked only as "reserved" in Figures 3-4, 3-5, and 3-6 of the APM,
-volume 2. Only bits 63:52 are marked as "reserved, MBZ." (In fact,
-Figure 3-6 of the May 2020 version of the APM, revision 3.35, also
-calls out bits 11:0 as the PCID when CR4.PCIDE is set.)
-
-Of course, you could always test the behavior. :-)
+On 7/15/20 3:22 PM, Sean Christopherson wrote:
+> On Wed, Jul 15, 2020 at 02:34:23PM -0700, Krish Sadhukhan wrote:
+>> On 7/15/20 11:48 AM, Sean Christopherson wrote:
+>>> On Wed, Jul 15, 2020 at 11:34:46AM -0700, Krish Sadhukhan wrote:
+>>>> On 7/13/20 5:23 PM, Sean Christopherson wrote:
+>>>>> Perform one last VMX transition to actually load the host's RIP and CR4
+>>>>> at the end of test_host_addr_size().  Simply writing the VMCS doesn't
+>>>>> restore the values in hardware, e.g. as is, CR4.PCIDE can be left set,
+>>>>> which causes spectacularly confusing explosions when other misguided
+>>>>> tests assume setting bit 63 in CR3 will cause a non-canonical #GP.
+>>>>>
+>>>>> Fixes: 0786c0316ac05 ("kvm-unit-test: nVMX: Check Host Address Space Size on vmentry of nested guests")
+>>>>> Cc: Krish Sadhukhan <krish.sadhukhan@oracle.com>
+>>>>> Cc: Karl Heubaum <karl.heubaum@oracle.com>
+>>>>> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+>>>>> ---
+>>>>>   x86/vmx_tests.c | 5 +++++
+>>>>>   1 file changed, 5 insertions(+)
+>>>>>
+>>>>> diff --git a/x86/vmx_tests.c b/x86/vmx_tests.c
+>>>>> index 29f3d0e..cb42a2d 100644
+>>>>> --- a/x86/vmx_tests.c
+>>>>> +++ b/x86/vmx_tests.c
+>>>>> @@ -7673,6 +7673,11 @@ static void test_host_addr_size(void)
+>>>>>   		vmcs_write(ENT_CONTROLS, entry_ctrl_saved | ENT_GUEST_64);
+>>>>>   		vmcs_write(HOST_RIP, rip_saved);
+>>>>>   		vmcs_write(HOST_CR4, cr4_saved);
+>>>>> +
+>>>>> +		/* Restore host's active RIP and CR4 values. */
+>>>>> +		report_prefix_pushf("restore host state");
+>>>>> +		test_vmx_vmlaunch(0);
+>>>>> +		report_prefix_pop();
+>>>>>   	}
+>>>>>   }
+>>>> Just for my understanding.  When you say, "other misguided tests", which
+>>>> tests are you referring to ?  In the current sequence of tests in
+>>>> vmx_host_state_area_test(), test_load_host_perf_global_ctrl() is the  one
+>>>> that follows and it runs fine.
+>>> See test_mtf_guest() in patch 2/2.  https://patchwork.kernel.org/patch/11661189/
+>> I ran the two tests as follows but couldn't reproduce it:
+>>
+>>      ./x86/run x86/vmx.flat  -smp 1 -cpu host,+vmx -append
+>> "vmx_host_state_area_test vmx_mtf_test"
+>>
+>>
+>> How did you run the them ?
+> I ran the VMX testcase from x86/unittest.cfg (below) on HSW.  I eventually
+> narrowed it down to just test_host_addr_size() and the MTF test.  Note, the
+> failure signature will change depending on whether vmx_cr_load_test() is
+> run between those two.  If it's not run, the failure is a straightforward
+> triple fault.  If it is run, for me the failure morphed into a an emulation
+> error because the unit test was able to generate a valid translation out of
+> CR3=0 and hit a non-existent memslot, which was all kinds of confusing.
+>
+> ./x86/run x86/vmx.flat -smp 1 -cpu host,+vmx -append "-exit_monitor_from_l2_test -ept_access* -vmx_smp* -vmx_vmcs_shadow_test -atomic_switch_overflow_msrs_test -vmx_init_signal_test -vmx_apic_passthrough_tpr_threshold_test"
+Thanks.   I see it now, after I comment out 
+test_load_host_perf_global_ctrl().  If any test calls enter_guest() 
+right after test_host_addr_size(), this problem will manifest.  I didn't 
+think about this sequence of tests when adding test_host_addr_size() or 
+any host-state-area tests for that matter.
