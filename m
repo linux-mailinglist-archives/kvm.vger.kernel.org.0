@@ -2,122 +2,146 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 32B25222790
-	for <lists+kvm@lfdr.de>; Thu, 16 Jul 2020 17:40:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8B6E22228CB
+	for <lists+kvm@lfdr.de>; Thu, 16 Jul 2020 19:17:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729555AbgGPPkT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 16 Jul 2020 11:40:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58688 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729549AbgGPPkP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 16 Jul 2020 11:40:15 -0400
-Received: from mail-ej1-x642.google.com (mail-ej1-x642.google.com [IPv6:2a00:1450:4864:20::642])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5603BC061755
-        for <kvm@vger.kernel.org>; Thu, 16 Jul 2020 08:40:14 -0700 (PDT)
-Received: by mail-ej1-x642.google.com with SMTP id rk21so7039650ejb.2
-        for <kvm@vger.kernel.org>; Thu, 16 Jul 2020 08:40:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=R0hixZr2FmuyDxkOlsaDyB/rdEVS5zH7ZB3SMwB7SjA=;
-        b=hD6l8n5tJJDWItbmnePOZqH87rq9e8eH4kwTJjei+YlKoq+eZA6TxVUrekVxY7d3Wr
-         sq4TgU+k4PJIOwlPET6TC8b7a9T4l6guHNgOwJ7s8lXuIodZrVm/mBol4m6qXC6pQ0ke
-         jeORpF49hRiPTmT1zhAXpBOAXLldbfNj5a9MlouXOr6XopKltk2mbMZsdGW9QZMY0gRu
-         7xKMEt2jKEN1zJWRtNGVQkRz3m785A0bjhgt91N4O1BYoxq8DN37CVavlMU9yBvS2V4w
-         YVfk76wli+I2fBBGwyHwxH+LsW0iXasq9FkxBsWT+Rgjw6oevIZko/T6J7+ORXQl53Yg
-         SKYQ==
+        id S1728837AbgGPRRP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 16 Jul 2020 13:17:15 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:55163 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1727844AbgGPRRJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 16 Jul 2020 13:17:09 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1594919826;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=3fQB3h1kkyYLBylVq5k4Bhd4Kz/DPg9j4ID1VQtmqZc=;
+        b=OHB2c3jXF/BdQg3EeXmxv7KJBKLewakgHAePOm9lFr+h03POqpwE4eEh3DYyPufRFvXg13
+        j3Hc6nXyzY6WX4WIVMiiEFPTJKcNFCe8yfZKFsM8uASGO5qH9tMn3S0eBRkwxeAUuZB7E6
+        mDHadzT5zCqkL5C1Q0GAEw03hz2EpQc=
+Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com
+ [209.85.222.200]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-449-KLXwyMfeOieuhXPx03hN8Q-1; Thu, 16 Jul 2020 13:17:05 -0400
+X-MC-Unique: KLXwyMfeOieuhXPx03hN8Q-1
+Received: by mail-qk1-f200.google.com with SMTP id 204so4191897qki.20
+        for <kvm@vger.kernel.org>; Thu, 16 Jul 2020 10:17:04 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=R0hixZr2FmuyDxkOlsaDyB/rdEVS5zH7ZB3SMwB7SjA=;
-        b=uI5E+MP76dnXneeHL3nI8jDabq3WDLHafzALdqBmCv3QeInAkelkH+qqSpL4RG9CBY
-         r5dD4OodCXuEF40GDZmUfkKr+cKRO/jXe06fslrc+iH6FL0uTmCHnSccb43sJO68WhsI
-         vgSsSgCzS/KeIR18OuQZ98LehAOsHVmYEa0GOWxDmJBHL5QGdRFS4VsLzSHgUMttnAlU
-         j5bdDR02E8VbsOZNVwwY5POX0NeAmo2ot0kbNJj39bC6zIj3c0nVTxOXM/FyF484F3OC
-         JMSRlSHkNsZZ29Nh42TpzqNnbeoJC4ObpktMSWCzAYSIz79APVsRHoGPKiKihyox4syT
-         VngQ==
-X-Gm-Message-State: AOAM531i9+ke44oXL5mM2LVi0KSbvuJRMzkkG6/qofirDyEk/U22ASeM
-        MmmcQ2eIoyVq1WjQexsjsjZdwQ==
-X-Google-Smtp-Source: ABdhPJzjRmSUHB2zFZ7vBLZF6CzWlFP1LEz/kUgyBixSbyTvv5dKfO22jCQHN6IyVtoTtdqjdu9Rpg==
-X-Received: by 2002:a17:906:3c42:: with SMTP id i2mr4628994ejg.14.1594914012974;
-        Thu, 16 Jul 2020 08:40:12 -0700 (PDT)
-Received: from myrica ([2001:1715:4e26:a7e0:116c:c27a:3e7f:5eaf])
-        by smtp.gmail.com with ESMTPSA id gu15sm5285033ejb.111.2020.07.16.08.40.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 16 Jul 2020 08:40:12 -0700 (PDT)
-Date:   Thu, 16 Jul 2020 17:39:59 +0200
-From:   Jean-Philippe Brucker <jean-philippe@linaro.org>
-To:     "Liu, Yi L" <yi.l.liu@intel.com>
-Cc:     Will Deacon <will@kernel.org>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "eric.auger@redhat.com" <eric.auger@redhat.com>,
-        "baolu.lu@linux.intel.com" <baolu.lu@linux.intel.com>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "Tian, Kevin" <kevin.tian@intel.com>,
-        "jacob.jun.pan@linux.intel.com" <jacob.jun.pan@linux.intel.com>,
-        "Raj, Ashok" <ashok.raj@intel.com>,
-        "Tian, Jun J" <jun.j.tian@intel.com>,
-        "Sun, Yi Y" <yi.y.sun@intel.com>,
-        "peterx@redhat.com" <peterx@redhat.com>,
-        "Wu, Hao" <hao.wu@intel.com>,
-        "stefanha@gmail.com" <stefanha@gmail.com>,
-        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Robin Murphy <robin.murphy@arm.com>
-Subject: Re: [PATCH v5 03/15] iommu/smmu: Report empty domain nesting info
-Message-ID: <20200716153959.GA447208@myrica>
-References: <1594552870-55687-1-git-send-email-yi.l.liu@intel.com>
- <1594552870-55687-4-git-send-email-yi.l.liu@intel.com>
- <20200713131454.GA2739@willie-the-truck>
- <CY4PR11MB1432226D0A52D099249E95A0C3610@CY4PR11MB1432.namprd11.prod.outlook.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=3fQB3h1kkyYLBylVq5k4Bhd4Kz/DPg9j4ID1VQtmqZc=;
+        b=LZ6JjgT+5A+Aj3QgGWTahuMUh79sTq6ESJ+CwxMLGumsChJ2cA5p54aJnkwfPChANb
+         06k15QakkeM88dEZwbZwqE7cQaSZz3Rp1aHFpeo0iei7B99HnIhsfBdORSysjsBEbRJ7
+         5tJFTsDxTsglCarC8zUIkn5Q8cTUcjtwovi4P2qWxPQMkbZWQzRnGcrtrcbMeKSIyELI
+         3RPEsGvXGnJC4Jc7AS25J16FZJTGC9cav6t0RtOIob3TzCr4MLPa0g0zlhpg6ku8Mu4p
+         Vd3cd4ZQT+rqg+XfdiwfW+BcOkD08kgMMqpEX+h02QEMve1GIbzwPhinlojNvC5JZ0fK
+         wwGA==
+X-Gm-Message-State: AOAM532mBSXctGc0cE6wXmHeoCnLkOyGO8nTsplCqndVyocjcrCpfdX7
+        c9N6I9Kucp/IsCrUK4kAnuJEj/+SFKJrSL+5iqAXoeQMpsfFHYBcDURFHq6msVh5dCHF78pQqgx
+        U4LdEboYRuqXJiRrONTlR5GIMoVoM
+X-Received: by 2002:a05:620a:11b3:: with SMTP id c19mr5023056qkk.203.1594919824446;
+        Thu, 16 Jul 2020 10:17:04 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxyyC+DL23IP8O9brTPle0l22Dr445jM9hQ5TROISxF5aP01PD5Cpgh6/ubiVQT+bVCdjlg6+/nT3WxD41Gj1I=
+X-Received: by 2002:a05:620a:11b3:: with SMTP id c19mr5023025qkk.203.1594919824159;
+ Thu, 16 Jul 2020 10:17:04 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CY4PR11MB1432226D0A52D099249E95A0C3610@CY4PR11MB1432.namprd11.prod.outlook.com>
+References: <20200622122546-mutt-send-email-mst@kernel.org>
+ <CAJaqyWfbouY4kEXkc6sYsbdCAEk0UNsS5xjqEdHTD7bcTn40Ow@mail.gmail.com>
+ <CAJaqyWefMHPguj8ZGCuccTn0uyKxF9ZTEi2ASLtDSjGNb1Vwsg@mail.gmail.com>
+ <419cc689-adae-7ba4-fe22-577b3986688c@redhat.com> <CAJaqyWedEg9TBkH1MxGP1AecYHD-e-=ugJ6XUN+CWb=rQGf49g@mail.gmail.com>
+ <0a83aa03-8e3c-1271-82f5-4c07931edea3@redhat.com> <CAJaqyWeqF-KjFnXDWXJ2M3Hw3eQeCEE2-7p1KMLmMetMTm22DQ@mail.gmail.com>
+ <20200709133438-mutt-send-email-mst@kernel.org> <7dec8cc2-152c-83f4-aa45-8ef9c6aca56d@redhat.com>
+ <CAJaqyWdLOH2EceTUduKYXCQUUNo1XQ1tLgjYHTBGhtdhBPHn_Q@mail.gmail.com> <20200710015615-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20200710015615-mutt-send-email-mst@kernel.org>
+From:   Eugenio Perez Martin <eperezma@redhat.com>
+Date:   Thu, 16 Jul 2020 19:16:27 +0200
+Message-ID: <CAJaqyWf1skGxrjuT9GLr6dtgd-433y-rCkbtStLHaAs2W2jYXA@mail.gmail.com>
+Subject: Re: [PATCH RFC v8 02/11] vhost: use batched get_vq_desc version
+To:     "Michael S. Tsirkin" <mst@redhat.com>
+Cc:     Jason Wang <jasowang@redhat.com>,
+        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        linux-kernel@vger.kernel.org, kvm list <kvm@vger.kernel.org>,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jul 14, 2020 at 10:12:49AM +0000, Liu, Yi L wrote:
-> > Have you verified that this doesn't break the existing usage of
-> > DOMAIN_ATTR_NESTING in drivers/vfio/vfio_iommu_type1.c?
-> 
-> I didn't have ARM machine on my hand. But I contacted with Jean
-> Philippe, he confirmed no compiling issue. I didn't see any code
-> getting DOMAIN_ATTR_NESTING attr in current drivers/vfio/vfio_iommu_type1.c.
-> What I'm adding is to call iommu_domai_get_attr(, DOMAIN_ATTR_NESTIN)
-> and won't fail if the iommu_domai_get_attr() returns 0. This patch
-> returns an empty nesting info for DOMAIN_ATTR_NESTIN and return
-> value is 0 if no error. So I guess it won't fail nesting for ARM.
+On Fri, Jul 10, 2020 at 7:58 AM Michael S. Tsirkin <mst@redhat.com> wrote:
+>
+> On Fri, Jul 10, 2020 at 07:39:26AM +0200, Eugenio Perez Martin wrote:
+> > > > How about playing with the batch size? Make it a mod parameter instead
+> > > > of the hard coded 64, and measure for all values 1 to 64 ...
+> > >
+> > >
+> > > Right, according to the test result, 64 seems to be too aggressive in
+> > > the case of TX.
+> > >
+> >
+> > Got it, thanks both!
+>
+> In particular I wonder whether with batch size 1
+> we get same performance as without batching
+> (would indicate 64 is too aggressive)
+> or not (would indicate one of the code changes
+> affects performance in an unexpected way).
+>
+> --
+> MST
+>
 
-I confirm that this series doesn't break the current support for
-VFIO_IOMMU_TYPE1_NESTING with an SMMUv3. That said...
+Hi!
 
-If the SMMU does not support stage-2 then there is a change in behavior
-(untested): after the domain is silently switched to stage-1 by the SMMU
-driver, VFIO will now query nesting info and obtain -ENODEV. Instead of
-succeding as before, the VFIO ioctl will now fail. I believe that's a fix
-rather than a regression, it should have been like this since the
-beginning. No known userspace has been using VFIO_IOMMU_TYPE1_NESTING so
-far, so I don't think it should be a concern.
+Varying batch_size as drivers/vhost/net.c:VHOST_NET_BATCH, and testing
+the pps as previous mail says. This means that we have either only
+vhost_net batching (in base testing, like previously to apply this
+patch) or both batching sizes the same.
 
-And if userspace queries the nesting properties using the new ABI
-introduced in this patchset, it will obtain an empty struct. I think
-that's acceptable, but it may be better to avoid adding the nesting cap if
-@format is 0?
+I've checked that vhost process (and pktgen) goes 100% cpu also.
 
-Thanks,
-Jean
+For tx: Batching decrements always the performance, in all cases. Not
+sure why bufapi made things better the last time.
 
-> 
-> @Eric, how about your opinion? your dual-stage vSMMU support may
-> also share the vfio_iommu_type1.c code.
-> 
-> Regards,
-> Yi Liu
-> 
-> > Will
+Batching makes improvements until 64 bufs, I see increments of pps but like 1%.
+
+For rx: Batching always improves performance. It seems that if we
+batch little, bufapi decreases performance, but beyond 64, bufapi is
+much better. The bufapi version keeps improving until I set a batching
+of 1024. So I guess it is super good to have a bunch of buffers to
+receive.
+
+Since with this test I cannot disable event_idx or things like that,
+what would be the next step for testing?
+
+Thanks!
+
+--
+Results:
+# Buf size: 1,16,32,64,128,256,512
+
+# Tx
+# ===
+# Base
+2293304.308,3396057.769,3540860.615,3636056.077,3332950.846,3694276.154,3689820
+# Batch
+2286723.857,3307191.643,3400346.571,3452527.786,3460766.857,3431042.5,3440722.286
+# Batch + Bufapi
+2257970.769,3151268.385,3260150.538,3379383.846,3424028.846,3433384.308,3385635.231,3406554.538
+
+# Rx
+# ==
+# pktgen results (pps)
+1223275,1668868,1728794,1769261,1808574,1837252,1846436
+1456924,1797901,1831234,1868746,1877508,1931598,1936402
+1368923,1719716,1794373,1865170,1884803,1916021,1975160
+
+# Testpmd pps results
+1222698.143,1670604,1731040.6,1769218,1811206,1839308.75,1848478.75
+1450140.5,1799985.75,1834089.75,1871290,1880005.5,1934147.25,1939034
+1370621,1721858,1796287.75,1866618.5,1885466.5,1918670.75,1976173.5,1988760.75,1978316
+
+pktgen was run again for rx with 1024 and 2048 buf size, giving
+1988760.75 and 1978316 pps. Testpmd goes the same way.
+
