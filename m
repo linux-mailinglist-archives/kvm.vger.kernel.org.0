@@ -2,191 +2,189 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D8055221953
-	for <lists+kvm@lfdr.de>; Thu, 16 Jul 2020 03:12:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7BAD022196A
+	for <lists+kvm@lfdr.de>; Thu, 16 Jul 2020 03:29:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727812AbgGPBMa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 Jul 2020 21:12:30 -0400
-Received: from mga01.intel.com ([192.55.52.88]:3875 "EHLO mga01.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726479AbgGPBM3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 15 Jul 2020 21:12:29 -0400
-IronPort-SDR: NZTbzLX4dxDJ7QbAV0V43r6gZixLl8fIrvN0D1CIDqwoYU7szHvgsVord+0G5uBQB2bvPJMEnI
- 4KklAoXkO12g==
-X-IronPort-AV: E=McAfee;i="6000,8403,9683"; a="167430860"
-X-IronPort-AV: E=Sophos;i="5.75,357,1589266800"; 
-   d="scan'208";a="167430860"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Jul 2020 18:12:26 -0700
-IronPort-SDR: GhBuvpJerEQSGZCcQwjV6esXaMp0MVHcttK2IMF8/qwgeeLs4waGLsGO+L6VICx8W1I+0Eonmq
- 4vlc+KAEaZbA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.75,357,1589266800"; 
-   d="scan'208";a="460289202"
-Received: from allen-box.sh.intel.com (HELO [10.239.159.139]) ([10.239.159.139])
-  by orsmga005.jf.intel.com with ESMTP; 15 Jul 2020 18:12:23 -0700
-Cc:     baolu.lu@linux.intel.com, Joerg Roedel <joro@8bytes.org>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Jean-Philippe Brucker <jean-philippe@linaro.org>,
-        Kevin Tian <kevin.tian@intel.com>,
-        Dave Jiang <dave.jiang@intel.com>,
-        Ashok Raj <ashok.raj@intel.com>, kvm@vger.kernel.org,
+        id S1727935AbgGPB2x convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Wed, 15 Jul 2020 21:28:53 -0400
+Received: from szxga01-in.huawei.com ([45.249.212.187]:2643 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726776AbgGPB2x (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 15 Jul 2020 21:28:53 -0400
+Received: from DGGEMM402-HUB.china.huawei.com (unknown [172.30.72.55])
+        by Forcepoint Email with ESMTP id 3CC0BA0E7C6EE7FA304C;
+        Thu, 16 Jul 2020 09:28:49 +0800 (CST)
+Received: from DGGEMM526-MBX.china.huawei.com ([169.254.8.195]) by
+ DGGEMM402-HUB.china.huawei.com ([10.3.20.210]) with mapi id 14.03.0487.000;
+ Thu, 16 Jul 2020 09:28:45 +0800
+From:   "Zengtao (B)" <prime.zeng@hisilicon.com>
+To:     Qian Cai <cai@lca.pw>
+CC:     "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
         Cornelia Huck <cohuck@redhat.com>,
-        linux-kernel@vger.kernel.org, iommu@lists.linux-foundation.org,
-        Robin Murphy <robin.murphy@arm.com>
-Subject: Re: [PATCH v3 2/4] iommu: Add iommu_aux_at(de)tach_group()
-To:     Jacob Pan <jacob.jun.pan@linux.intel.com>
-References: <20200714055703.5510-1-baolu.lu@linux.intel.com>
- <20200714055703.5510-3-baolu.lu@linux.intel.com>
- <20200714093909.1ab93c9e@jacob-builder>
- <b5b22e01-4a51-8dfe-9ba4-aeca783740f1@linux.intel.com>
- <20200715090114.50a459d4@jacob-builder>
-From:   Lu Baolu <baolu.lu@linux.intel.com>
-Message-ID: <435a2014-c2e8-06b9-3c9a-4afbf6607ffe@linux.intel.com>
-Date:   Thu, 16 Jul 2020 09:07:46 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
+        Kevin Tian <kevin.tian@intel.com>,
+        Peter Xu <peterx@redhat.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        "Michel Lespinasse" <walken@google.com>,
+        Denis Efremov <efremov@linux.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: RE: [PATCH] vfio/pci: fix racy on error and request eventfd ctx
+Thread-Topic: [PATCH] vfio/pci: fix racy on error and request eventfd ctx
+Thread-Index: AQHWWnqQ+QrCfngfhUOguFGy1o0RgqkIHjeAgAFMeKA=
+Date:   Thu, 16 Jul 2020 01:28:45 +0000
+Message-ID: <678F3D1BB717D949B966B68EAEB446ED415861C7@dggemm526-mbx.china.huawei.com>
+References: <1594798484-20501-1-git-send-email-prime.zeng@hisilicon.com>
+ <20200715133418.GA4426@lca.pw>
+In-Reply-To: <20200715133418.GA4426@lca.pw>
+Accept-Language: zh-CN, en-US
+Content-Language: zh-CN
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.74.221.187]
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
 MIME-Version: 1.0
-In-Reply-To: <20200715090114.50a459d4@jacob-builder>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+X-CFilter-Loop: Reflected
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Jacob,
-
-On 7/16/20 12:01 AM, Jacob Pan wrote:
-> On Wed, 15 Jul 2020 08:47:36 +0800
-> Lu Baolu <baolu.lu@linux.intel.com> wrote:
+> -----Original Message-----
+> From: Qian Cai [mailto:cai@lca.pw]
+> Sent: Wednesday, July 15, 2020 9:34 PM
+> To: Zengtao (B)
+> Cc: alex.williamson@redhat.com; Cornelia Huck; Kevin Tian; Peter Xu;
+> Andrew Morton; Michel Lespinasse; Denis Efremov; kvm@vger.kernel.org;
+> linux-kernel@vger.kernel.org
+> Subject: Re: [PATCH] vfio/pci: fix racy on error and request eventfd ctx
 > 
->> Hi Jacob,
->>
->> On 7/15/20 12:39 AM, Jacob Pan wrote:
->>> On Tue, 14 Jul 2020 13:57:01 +0800
->>> Lu Baolu<baolu.lu@linux.intel.com>  wrote:
->>>    
->>>> This adds two new aux-domain APIs for a use case like vfio/mdev
->>>> where sub-devices derived from an aux-domain capable device are
->>>> created and put in an iommu_group.
->>>>
->>>> /**
->>>>    * iommu_aux_attach_group - attach an aux-domain to an iommu_group
->>>> which
->>>>    *                          contains sub-devices (for example
->>>> mdevs) derived
->>>>    *                          from @dev.
->>>>    * @domain: an aux-domain;
->>>>    * @group:  an iommu_group which contains sub-devices derived from
->>>> @dev;
->>>>    * @dev:    the physical device which supports IOMMU_DEV_FEAT_AUX.
->>>>    *
->>>>    * Returns 0 on success, or an error value.
->>>>    */
->>>> int iommu_aux_attach_group(struct iommu_domain *domain,
->>>>                              struct iommu_group *group,
->>>>                              struct device *dev)
->>>>
->>>> /**
->>>>    * iommu_aux_detach_group - detach an aux-domain from an
->>>> iommu_group *
->>>>    * @domain: an aux-domain;
->>>>    * @group:  an iommu_group which contains sub-devices derived from
->>>> @dev;
->>>>    * @dev:    the physical device which supports IOMMU_DEV_FEAT_AUX.
->>>>    *
->>>>    * @domain must have been attached to @group via
->>>> iommu_aux_attach_group(). */
->>>> void iommu_aux_detach_group(struct iommu_domain *domain,
->>>>                               struct iommu_group *group,
->>>>                               struct device *dev)
->>>>
->>>> It also adds a flag in the iommu_group data structure to identify
->>>> an iommu_group with aux-domain attached from those normal ones.
->>>>
->>>> Signed-off-by: Lu Baolu<baolu.lu@linux.intel.com>
->>>> ---
->>>>    drivers/iommu/iommu.c | 58
->>>> +++++++++++++++++++++++++++++++++++++++++++ include/linux/iommu.h |
->>>> 17 +++++++++++++ 2 files changed, 75 insertions(+)
->>>>
->>>> diff --git a/drivers/iommu/iommu.c b/drivers/iommu/iommu.c
->>>> index e1fdd3531d65..cad5a19ebf22 100644
->>>> --- a/drivers/iommu/iommu.c
->>>> +++ b/drivers/iommu/iommu.c
->>>> @@ -45,6 +45,7 @@ struct iommu_group {
->>>>    	struct iommu_domain *default_domain;
->>>>    	struct iommu_domain *domain;
->>>>    	struct list_head entry;
->>>> +	unsigned int aux_domain_attached:1;
->>>>    };
->>>>    
->>>>    struct group_device {
->>>> @@ -2759,6 +2760,63 @@ int iommu_aux_get_pasid(struct iommu_domain
->>>> *domain, struct device *dev) }
->>>>    EXPORT_SYMBOL_GPL(iommu_aux_get_pasid);
->>>>    
->>>> +/**
->>>> + * iommu_aux_attach_group - attach an aux-domain to an iommu_group
->>>> which
->>>> + *                          contains sub-devices (for example
->>>> mdevs) derived
->>>> + *                          from @dev.
->>>> + * @domain: an aux-domain;
->>>> + * @group:  an iommu_group which contains sub-devices derived from
->>>> @dev;
->>>> + * @dev:    the physical device which supports IOMMU_DEV_FEAT_AUX.
->>>> + *
->>>> + * Returns 0 on success, or an error value.
->>>> + */
->>>> +int iommu_aux_attach_group(struct iommu_domain *domain,
->>>> +			   struct iommu_group *group, struct
->>>> device *dev) +{
->>>> +	int ret = -EBUSY;
->>>> +
->>>> +	mutex_lock(&group->mutex);
->>>> +	if (group->domain)
->>>> +		goto out_unlock;
->>>> +
->>> Perhaps I missed something but are we assuming only one mdev per
->>> mdev group? That seems to change the logic where vfio does:
->>> iommu_group_for_each_dev()
->>> 	iommu_aux_attach_device()
->>>    
->>
->> It has been changed in PATCH 4/4:
->>
->> static int vfio_iommu_attach_group(struct vfio_domain *domain,
->>                                      struct vfio_group *group)
->> {
->>           if (group->mdev_group)
->>                   return iommu_aux_attach_group(domain->domain,
->>                                                 group->iommu_group,
->>                                                 group->iommu_device);
->>           else
->>                   return iommu_attach_group(domain->domain,
->> group->iommu_group);
->> }
->>
->> So, for both normal domain and aux-domain, we use the same concept:
->> attach a domain to a group.
->>
-> I get that, but don't you have to attach all the devices within the
-
-This iommu_group includes only mediated devices derived from an
-IOMMU_DEV_FEAT_AUX-capable device. Different from iommu_attach_group(),
-iommu_aux_attach_group() doesn't need to attach the domain to each
-device in group, instead it only needs to attach the domain to the
-physical device where the mdev's were created from.
-
-> group? Here you see the group already has a domain and exit.
-
-If the (group->domain) has been set, that means a domain has already
-attached to the group, so it returns -EBUSY.
-
-Best regards,
-baolu
+> On Wed, Jul 15, 2020 at 03:34:41PM +0800, Zeng Tao wrote:
+> > The vfio_pci_release call will free and clear the error and request
+> > eventfd ctx while these ctx could be in use at the same time in the
+> > function like vfio_pci_request, and it's expected to protect them under
+> > the vdev->igate mutex, which is missing in vfio_pci_release.
+> 
+> How about other similar places calling eventfd_ctx_put() for "struct
+> vfio_pci_device" ? For example, vfio_intx_set_signal().
+>
+I think there is no need, since the only wrapper call is
+vfio_pci_set_irqs_ioctl which is already protected by the igate mutex.
+ 
+> >
+> > This issue is introduced since commit 1518ac272e78 ("vfio/pci: fix
+> memory
+> > leaks of eventfd ctx"),and since commit 5c5866c593bb ("vfio/pci: Clear
+> > error and request eventfd ctx after releasing"), it's very easily to
+> > trigger the kernel panic like this:
+> >
+> > [ 9513.904346] Unable to handle kernel NULL pointer dereference at
+> virtual address 0000000000000008
+> > [ 9513.913091] Mem abort info:
+> > [ 9513.915871]   ESR = 0x96000006
+> > [ 9513.918912]   EC = 0x25: DABT (current EL), IL = 32 bits
+> > [ 9513.924198]   SET = 0, FnV = 0
+> > [ 9513.927238]   EA = 0, S1PTW = 0
+> > [ 9513.930364] Data abort info:
+> > [ 9513.933231]   ISV = 0, ISS = 0x00000006
+> > [ 9513.937048]   CM = 0, WnR = 0
+> > [ 9513.940003] user pgtable: 4k pages, 48-bit VAs,
+> pgdp=0000007ec7d12000
+> > [ 9513.946414] [0000000000000008] pgd=0000007ec7d13003,
+> p4d=0000007ec7d13003, pud=0000007ec728c003,
+> pmd=0000000000000000
+> > [ 9513.956975] Internal error: Oops: 96000006 [#1] PREEMPT SMP
+> > [ 9513.962521] Modules linked in: vfio_pci vfio_virqfd vfio_iommu_type1
+> vfio hclge hns3 hnae3 [last unloaded: vfio_pci]
+> > [ 9513.972998] CPU: 4 PID: 1327 Comm: bash Tainted: G        W
+> 5.8.0-rc4+ #3
+> > [ 9513.980443] Hardware name: Huawei TaiShan 2280 V2/BC82AMDC,
+> BIOS 2280-V2 CS V3.B270.01 05/08/2020
+> > [ 9513.989274] pstate: 80400089 (Nzcv daIf +PAN -UAO BTYPE=--)
+> > [ 9513.994827] pc : _raw_spin_lock_irqsave+0x48/0x88
+> > [ 9513.999515] lr : eventfd_signal+0x6c/0x1b0
+> > [ 9514.003591] sp : ffff800038a0b960
+> > [ 9514.006889] x29: ffff800038a0b960 x28: ffff007ef7f4da10
+> > [ 9514.012175] x27: ffff207eefbbfc80 x26: ffffbb7903457000
+> > [ 9514.017462] x25: ffffbb7912191000 x24: ffff007ef7f4d400
+> > [ 9514.022747] x23: ffff20be6e0e4c00 x22: 0000000000000008
+> > [ 9514.028033] x21: 0000000000000000 x20: 0000000000000000
+> > [ 9514.033321] x19: 0000000000000008 x18: 0000000000000000
+> > [ 9514.038606] x17: 0000000000000000 x16: ffffbb7910029328
+> > [ 9514.043893] x15: 0000000000000000 x14: 0000000000000001
+> > [ 9514.049179] x13: 0000000000000000 x12: 0000000000000002
+> > [ 9514.054466] x11: 0000000000000000 x10: 0000000000000a00
+> > [ 9514.059752] x9 : ffff800038a0b840 x8 : ffff007ef7f4de60
+> > [ 9514.065038] x7 : ffff007fffc96690 x6 : fffffe01faffb748
+> > [ 9514.070324] x5 : 0000000000000000 x4 : 0000000000000000
+> > [ 9514.075609] x3 : 0000000000000000 x2 : 0000000000000001
+> > [ 9514.080895] x1 : ffff007ef7f4d400 x0 : 0000000000000000
+> > [ 9514.086181] Call trace:
+> > [ 9514.088618]  _raw_spin_lock_irqsave+0x48/0x88
+> > [ 9514.092954]  eventfd_signal+0x6c/0x1b0
+> > [ 9514.096691]  vfio_pci_request+0x84/0xd0 [vfio_pci]
+> > [ 9514.101464]  vfio_del_group_dev+0x150/0x290 [vfio]
+> > [ 9514.106234]  vfio_pci_remove+0x30/0x128 [vfio_pci]
+> > [ 9514.111007]  pci_device_remove+0x48/0x108
+> > [ 9514.115001]  device_release_driver_internal+0x100/0x1b8
+> > [ 9514.120200]  device_release_driver+0x28/0x38
+> > [ 9514.124452]  pci_stop_bus_device+0x68/0xa8
+> > [ 9514.128528]  pci_stop_and_remove_bus_device+0x20/0x38
+> > [ 9514.133557]  pci_iov_remove_virtfn+0xb4/0x128
+> > [ 9514.137893]  sriov_disable+0x3c/0x108
+> > [ 9514.141538]  pci_disable_sriov+0x28/0x38
+> > [ 9514.145445]  hns3_pci_sriov_configure+0x48/0xb8 [hns3]
+> > [ 9514.150558]  sriov_numvfs_store+0x110/0x198
+> > [ 9514.154724]  dev_attr_store+0x44/0x60
+> > [ 9514.158373]  sysfs_kf_write+0x5c/0x78
+> > [ 9514.162018]  kernfs_fop_write+0x104/0x210
+> > [ 9514.166010]  __vfs_write+0x48/0x90
+> > [ 9514.169395]  vfs_write+0xbc/0x1c0
+> > [ 9514.172694]  ksys_write+0x74/0x100
+> > [ 9514.176079]  __arm64_sys_write+0x24/0x30
+> > [ 9514.179987]  el0_svc_common.constprop.4+0x110/0x200
+> > [ 9514.184842]  do_el0_svc+0x34/0x98
+> > [ 9514.188144]  el0_svc+0x14/0x40
+> > [ 9514.191185]  el0_sync_handler+0xb0/0x2d0
+> > [ 9514.195088]  el0_sync+0x140/0x180
+> > [ 9514.198389] Code: b9001020 d2800000 52800022 f9800271
+> (885ffe61)
+> > [ 9514.204455] ---[ end trace 648de00c8406465f ]---
+> > [ 9514.212308] note: bash[1327] exited with preempt_count 1
+> >
+> > Cc: Qian Cai <cai@lca.pw>
+> > Cc: Alex Williamson <alex.williamson@redhat.com>
+> > Fixes: 1518ac272e78 ("vfio/pci: fix memory leaks of eventfd ctx")
+> > Signed-off-by: Zeng Tao <prime.zeng@hisilicon.com>
+> > ---
+> >  drivers/vfio/pci/vfio_pci.c | 5 +++++
+> >  1 file changed, 5 insertions(+)
+> >
+> > diff --git a/drivers/vfio/pci/vfio_pci.c b/drivers/vfio/pci/vfio_pci.c
+> > index f634c81..de881a6 100644
+> > --- a/drivers/vfio/pci/vfio_pci.c
+> > +++ b/drivers/vfio/pci/vfio_pci.c
+> > @@ -521,14 +521,19 @@ static void vfio_pci_release(void
+> *device_data)
+> >  		vfio_pci_vf_token_user_add(vdev, -1);
+> >  		vfio_spapr_pci_eeh_release(vdev->pdev);
+> >  		vfio_pci_disable(vdev);
+> > +		mutex_lock(&vdev->igate);
+> >  		if (vdev->err_trigger) {
+> >  			eventfd_ctx_put(vdev->err_trigger);
+> >  			vdev->err_trigger = NULL;
+> >  		}
+> > +		mutex_unlock(&vdev->igate);
+> > +
+> > +		mutex_lock(&vdev->igate);
+> >  		if (vdev->req_trigger) {
+> >  			eventfd_ctx_put(vdev->req_trigger);
+> >  			vdev->req_trigger = NULL;
+> >  		}
+> > +		mutex_unlock(&vdev->igate);
+> >  	}
+> >
+> >  	mutex_unlock(&vdev->reflck->lock);
+> > --
+> > 2.8.1
+> >
