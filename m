@@ -2,126 +2,95 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 062EC2219BF
-	for <lists+kvm@lfdr.de>; Thu, 16 Jul 2020 04:11:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2718A2219CD
+	for <lists+kvm@lfdr.de>; Thu, 16 Jul 2020 04:21:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728001AbgGPCLB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 Jul 2020 22:11:01 -0400
-Received: from relay5.mymailcheap.com ([159.100.248.207]:33917 "EHLO
-        relay5.mymailcheap.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726984AbgGPCLA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 15 Jul 2020 22:11:00 -0400
-Received: from relay1.mymailcheap.com (relay1.mymailcheap.com [149.56.97.132])
-        by relay5.mymailcheap.com (Postfix) with ESMTPS id 7FD2626297;
-        Thu, 16 Jul 2020 02:10:57 +0000 (UTC)
-Received: from filter1.mymailcheap.com (filter1.mymailcheap.com [149.56.130.247])
-        by relay1.mymailcheap.com (Postfix) with ESMTPS id 2FC3B3F157;
-        Wed, 15 Jul 2020 22:10:55 -0400 (EDT)
-Received: from localhost (localhost [127.0.0.1])
-        by filter1.mymailcheap.com (Postfix) with ESMTP id 15DDC2A3AA;
-        Wed, 15 Jul 2020 22:10:55 -0400 (EDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=mymailcheap.com;
-        s=default; t=1594865455;
-        bh=AEVS6FARCeqmIOD4dOV3ZjxZYov8SUPADkze2QBtd2U=;
-        h=Subject:To:Cc:References:From:Date:In-Reply-To:From;
-        b=QNeGTu/dyMvdNtebwUxhirTxhBf7AL3WE570KPi6c1D51TpCAeXJ9qp/uQ+gXNVlJ
-         q12z4Sjd6CIZoXO9fOnFL8ApSr/FBpvzDp97KbxOFqczGMD3mJ3/2653DabEQ9YUMd
-         pvRNCTmNpXBnwQ/dNj1iCFsCW5q5aICfmJpyNt0A=
-X-Virus-Scanned: Debian amavisd-new at filter1.mymailcheap.com
-Received: from filter1.mymailcheap.com ([127.0.0.1])
-        by localhost (filter1.mymailcheap.com [127.0.0.1]) (amavisd-new, port 10024)
-        with ESMTP id dTfR2iRsKyru; Wed, 15 Jul 2020 22:10:52 -0400 (EDT)
-Received: from mail20.mymailcheap.com (mail20.mymailcheap.com [51.83.111.147])
-        (using TLSv1.2 with cipher ADH-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by filter1.mymailcheap.com (Postfix) with ESMTPS;
-        Wed, 15 Jul 2020 22:10:52 -0400 (EDT)
-Received: from [148.251.23.173] (ml.mymailcheap.com [148.251.23.173])
-        by mail20.mymailcheap.com (Postfix) with ESMTP id C21DF4013E;
-        Thu, 16 Jul 2020 02:10:51 +0000 (UTC)
-Authentication-Results: mail20.mymailcheap.com;
-        dkim=pass (1024-bit key; unprotected) header.d=flygoat.com header.i=@flygoat.com header.b="VNGL71/4";
-        dkim-atps=neutral
-AI-Spam-Status: Not processed
-Received: from [0.0.0.0] (114-42-221-235.dynamic-ip.hinet.net [114.42.221.235])
-        (using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-         key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits))
-        (No client certificate requested)
-        by mail20.mymailcheap.com (Postfix) with ESMTPSA id 14B174013E;
-        Thu, 16 Jul 2020 02:10:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=flygoat.com;
-        s=default; t=1594865443;
-        bh=AEVS6FARCeqmIOD4dOV3ZjxZYov8SUPADkze2QBtd2U=;
-        h=Subject:To:Cc:References:From:Date:In-Reply-To:From;
-        b=VNGL71/4e3vOeqULNruQv6Eh42pbPLDrgKrXc6yP8FOVuueE07edPuE8Bkw4kmur9
-         3rIZ/g7uyrx8vg2IPnIMNNqMap5pB2uAFQ9T/AIpE4swnA2aB2K56zTZlUfRlGBE2T
-         B5x8vOq/f0wEQc/8RMQtMx/be5zzYzbTHFNMSi2c=
+        id S1727798AbgGPCUJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 15 Jul 2020 22:20:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47924 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726770AbgGPCUI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 15 Jul 2020 22:20:08 -0400
+Received: from mail-io1-xd42.google.com (mail-io1-xd42.google.com [IPv6:2607:f8b0:4864:20::d42])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B7BF6C061755;
+        Wed, 15 Jul 2020 19:20:08 -0700 (PDT)
+Received: by mail-io1-xd42.google.com with SMTP id c16so4416029ioi.9;
+        Wed, 15 Jul 2020 19:20:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=K/9/0SgT5wZwj9R1sUpghAh7g+m3fTsSEDjugLqxv8g=;
+        b=AmaTntOhlM4JMpice0Mu6RueTbKa9PX+0i/1Y0wXYX3sQf4/ejGiVFod6jfAFwtznn
+         114JAsWVBWEtd+7RHxF3gPeFFdZB+nUp1nq6pV45Ie6uGGTO7u9oPh/zstwy86v5HSgz
+         FuzwLvhkYIMUn5Y/ruAar309gX3p1x+Iqk9TfRXNxT5d5vHTFy9vZp8ieyiimbWwgzdV
+         RusncxjDRivjZF/2CVhAL5tJzyDKz3F87J+H8HpdJSDVtsgAbIEUYGOdEGSbdIYR7zI+
+         6ncZtYnLw6o/4T5VJ7x75Wc9VIfYrTjneocgunyBQjeq4aFi5RG0gELTTHGkQJPsbkYN
+         7DgQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=K/9/0SgT5wZwj9R1sUpghAh7g+m3fTsSEDjugLqxv8g=;
+        b=oN2rzsxp2sVSw1gpc4FOd60sGodb3FsSc4rmXx4iOTdMdA94Q5wAKeQpx8N0QYvvAe
+         PNt0RHFQtTkqng/zy3Np6B8nGM5Uw/VBaMr25akHyPph4JxNI15H42Tzi39+hx3A1ecm
+         5AxN6A3DIYeOshwuFDhLCokdnKzM4f9XAeteO7O/aoW79DwacPBt21kzAVTW24kD5Ccn
+         pseH7S1O3lGo+yoI6JA/aZWeBekJxEYe4uZOdqZG7R1RdgpA4AGQN4DEjhfhB2GvS3M+
+         eB/UbhymNiAOMAsrXCGClGrj2O5Ju5mZAGUij4HjMYldDxaF4Ry5R4h11+skBdKlcXw/
+         YrGA==
+X-Gm-Message-State: AOAM532Zx1wlqeW+2hQZJAMojIEabD0SJaQ1x8cIHfh7jG+qHH3r/0G0
+        MVazBrX6b50YG93yl73gRnSAbU0xNrCl0tKaIFs/8HGlNno=
+X-Google-Smtp-Source: ABdhPJxd2FP6wrXSARjYJQs4NkI4C6Vi3SJiTATKbF/80/JnJaXB2T4OQeYu/4X4ob+oS3tvJy/DqPj0y8+T9cs7JMQ=
+X-Received: by 2002:a05:6602:1685:: with SMTP id s5mr2237314iow.84.1594866008138;
+ Wed, 15 Jul 2020 19:20:08 -0700 (PDT)
+MIME-Version: 1.0
+References: <20200623131418.31473-1-tianjia.zhang@linux.alibaba.com>
+ <20200623131418.31473-6-tianjia.zhang@linux.alibaba.com> <e447bb5c-8b83-dfb1-a293-f2e9e586c2ec@flygoat.com>
+In-Reply-To: <e447bb5c-8b83-dfb1-a293-f2e9e586c2ec@flygoat.com>
+From:   Huacai Chen <chenhuacai@gmail.com>
+Date:   Thu, 16 Jul 2020 10:19:56 +0800
+Message-ID: <CAAhV-H53JLTtyi=3vvSw3xxR12YiJq-5SKRXZzVcFLt=r2iXgQ@mail.gmail.com>
 Subject: Re: [PATCH v6 5/5] KVM: MIPS: clean up redundant kvm_run parameters
  in assembly
-To:     Tianjia Zhang <tianjia.zhang@linux.alibaba.com>,
-        pbonzini@redhat.com, chenhuacai@gmail.com
-Cc:     kvm@vger.kernel.org, linux-mips@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20200623131418.31473-1-tianjia.zhang@linux.alibaba.com>
- <20200623131418.31473-6-tianjia.zhang@linux.alibaba.com>
-From:   Jiaxun Yang <jiaxun.yang@flygoat.com>
-Message-ID: <e447bb5c-8b83-dfb1-a293-f2e9e586c2ec@flygoat.com>
-Date:   Thu, 16 Jul 2020 10:10:37 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
-MIME-Version: 1.0
-In-Reply-To: <20200623131418.31473-6-tianjia.zhang@linux.alibaba.com>
-Content-Type: text/plain; charset=gbk; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: C21DF4013E
-X-Spamd-Result: default: False [-0.10 / 10.00];
-         ARC_NA(0.00)[];
-         RCVD_VIA_SMTP_AUTH(0.00)[];
-         R_DKIM_ALLOW(0.00)[flygoat.com:s=default];
-         RECEIVED_SPAMHAUS_PBL(0.00)[114.42.221.235:received];
-         FROM_HAS_DN(0.00)[];
-         TO_DN_SOME(0.00)[];
-         FREEMAIL_ENVRCPT(0.00)[gmail.com];
-         TO_MATCH_ENVRCPT_ALL(0.00)[];
-         MIME_GOOD(-0.10)[text/plain];
-         R_SPF_SOFTFAIL(0.00)[~all:c];
-         RCPT_COUNT_FIVE(0.00)[6];
-         ML_SERVERS(-3.10)[148.251.23.173];
-         DKIM_TRACE(0.00)[flygoat.com:+];
-         DMARC_POLICY_ALLOW(0.00)[flygoat.com,none];
-         DMARC_POLICY_ALLOW_WITH_FAILURES(0.00)[];
-         FREEMAIL_TO(0.00)[linux.alibaba.com,redhat.com,gmail.com];
-         RCVD_NO_TLS_LAST(0.10)[];
-         FROM_EQ_ENVFROM(0.00)[];
-         MIME_TRACE(0.00)[0:+];
-         ASN(0.00)[asn:24940, ipnet:148.251.0.0/16, country:DE];
-         RCVD_COUNT_TWO(0.00)[2];
-         MID_RHS_MATCH_FROM(0.00)[];
-         HFILTER_HELO_BAREIP(3.00)[148.251.23.173,1]
-X-Rspamd-Server: mail20.mymailcheap.com
+To:     Jiaxun Yang <jiaxun.yang@flygoat.com>
+Cc:     Tianjia Zhang <tianjia.zhang@linux.alibaba.com>,
+        Paolo Bonzini <pbonzini@redhat.com>, kvm <kvm@vger.kernel.org>,
+        "open list:MIPS" <linux-mips@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Hi, all,
 
+On Thu, Jul 16, 2020 at 10:10 AM Jiaxun Yang <jiaxun.yang@flygoat.com> wrot=
+e:
+>
+>
+>
+> =E5=9C=A8 2020/6/23 21:14, Tianjia Zhang =E5=86=99=E9=81=93:
+> > In the current kvm version, 'kvm_run' has been included in the 'kvm_vcp=
+u'
+> > structure. For historical reasons, many kvm-related function parameters
+> > retain the 'kvm_run' and 'kvm_vcpu' parameters at the same time. This
+> > patch does a unified cleanup of these remaining redundant parameters.
+> >
+> > Signed-off-by: Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
+> > Reviewed-by: Huacai Chen <chenhc@lemote.com>
+>
+> Tested-by: Jiaxun Yang <jiaxun.yang@flygoat.com>
+>
+> Can confirm it works on Loongson-3A4000.
+I'm sorry for the late response, and thank Jiaxun for his tests.
 
-ÔÚ 2020/6/23 21:14, Tianjia Zhang Ð´µÀ:
-> In the current kvm version, 'kvm_run' has been included in the 'kvm_vcpu'
-> structure. For historical reasons, many kvm-related function parameters
-> retain the 'kvm_run' and 'kvm_vcpu' parameters at the same time. This
-> patch does a unified cleanup of these remaining redundant parameters.
-> 
-> Signed-off-by: Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
-> Reviewed-by: Huacai Chen <chenhc@lemote.com>
-
-Tested-by: Jiaxun Yang <jiaxun.yang@flygoat.com>
-
-Can confirm it works on Loongson-3A4000.
-
-Thanks!
-
-> ---
-
--- 
-- Jiaxun
+Huacai
+>
+> Thanks!
+>
+> > ---
+>
+> --
+> - Jiaxun
