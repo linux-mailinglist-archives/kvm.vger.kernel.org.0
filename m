@@ -2,95 +2,153 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2718A2219CD
-	for <lists+kvm@lfdr.de>; Thu, 16 Jul 2020 04:21:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CDE46221A6E
+	for <lists+kvm@lfdr.de>; Thu, 16 Jul 2020 04:59:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727798AbgGPCUJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 Jul 2020 22:20:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47924 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726770AbgGPCUI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 15 Jul 2020 22:20:08 -0400
-Received: from mail-io1-xd42.google.com (mail-io1-xd42.google.com [IPv6:2607:f8b0:4864:20::d42])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B7BF6C061755;
-        Wed, 15 Jul 2020 19:20:08 -0700 (PDT)
-Received: by mail-io1-xd42.google.com with SMTP id c16so4416029ioi.9;
-        Wed, 15 Jul 2020 19:20:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=K/9/0SgT5wZwj9R1sUpghAh7g+m3fTsSEDjugLqxv8g=;
-        b=AmaTntOhlM4JMpice0Mu6RueTbKa9PX+0i/1Y0wXYX3sQf4/ejGiVFod6jfAFwtznn
-         114JAsWVBWEtd+7RHxF3gPeFFdZB+nUp1nq6pV45Ie6uGGTO7u9oPh/zstwy86v5HSgz
-         FuzwLvhkYIMUn5Y/ruAar309gX3p1x+Iqk9TfRXNxT5d5vHTFy9vZp8ieyiimbWwgzdV
-         RusncxjDRivjZF/2CVhAL5tJzyDKz3F87J+H8HpdJSDVtsgAbIEUYGOdEGSbdIYR7zI+
-         6ncZtYnLw6o/4T5VJ7x75Wc9VIfYrTjneocgunyBQjeq4aFi5RG0gELTTHGkQJPsbkYN
-         7DgQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=K/9/0SgT5wZwj9R1sUpghAh7g+m3fTsSEDjugLqxv8g=;
-        b=oN2rzsxp2sVSw1gpc4FOd60sGodb3FsSc4rmXx4iOTdMdA94Q5wAKeQpx8N0QYvvAe
-         PNt0RHFQtTkqng/zy3Np6B8nGM5Uw/VBaMr25akHyPph4JxNI15H42Tzi39+hx3A1ecm
-         5AxN6A3DIYeOshwuFDhLCokdnKzM4f9XAeteO7O/aoW79DwacPBt21kzAVTW24kD5Ccn
-         pseH7S1O3lGo+yoI6JA/aZWeBekJxEYe4uZOdqZG7R1RdgpA4AGQN4DEjhfhB2GvS3M+
-         eB/UbhymNiAOMAsrXCGClGrj2O5Ju5mZAGUij4HjMYldDxaF4Ry5R4h11+skBdKlcXw/
-         YrGA==
-X-Gm-Message-State: AOAM532Zx1wlqeW+2hQZJAMojIEabD0SJaQ1x8cIHfh7jG+qHH3r/0G0
-        MVazBrX6b50YG93yl73gRnSAbU0xNrCl0tKaIFs/8HGlNno=
-X-Google-Smtp-Source: ABdhPJxd2FP6wrXSARjYJQs4NkI4C6Vi3SJiTATKbF/80/JnJaXB2T4OQeYu/4X4ob+oS3tvJy/DqPj0y8+T9cs7JMQ=
-X-Received: by 2002:a05:6602:1685:: with SMTP id s5mr2237314iow.84.1594866008138;
- Wed, 15 Jul 2020 19:20:08 -0700 (PDT)
+        id S1728107AbgGPC75 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 15 Jul 2020 22:59:57 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:53137 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1728098AbgGPC74 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 15 Jul 2020 22:59:56 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1594868394;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=dE5m+Um8h+2SUjIIhar0TzsMcMWhB03b3rA1FsH9hrY=;
+        b=DsmsZN4F3bEU+yxcrSnXzfyr5eqnLgDERDAstumaRs/OMyRTjJvSgJMcEGRka5yd91ql5O
+        kFZ3hP3TVLj5n7XAc6ge6QpqOsJ5HlWA9opD0oPdi+GNiLWdNSa0Y2523HeUqaQnsRNwsA
+        Y/RCt/0Mwxw6261g+b/Ts1CIv0ABDRc=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-365-ZEAagCr5PK2jvEWyxvMe5g-1; Wed, 15 Jul 2020 22:59:52 -0400
+X-MC-Unique: ZEAagCr5PK2jvEWyxvMe5g-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 333A8800FF1;
+        Thu, 16 Jul 2020 02:59:51 +0000 (UTC)
+Received: from [10.72.12.131] (ovpn-12-131.pek2.redhat.com [10.72.12.131])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 975DD5C1BD;
+        Thu, 16 Jul 2020 02:59:39 +0000 (UTC)
+Subject: Re: [PATCH 0/7] *** IRQ offloading for vDPA ***
+To:     "Zhu, Lingshan" <lingshan.zhu@intel.com>, mst@redhat.com,
+        alex.williamson@redhat.com, pbonzini@redhat.com,
+        sean.j.christopherson@intel.com, wanpengli@tencent.com
+Cc:     virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
+        netdev@vger.kernel.org, dan.daly@intel.com
+References: <1594565524-3394-1-git-send-email-lingshan.zhu@intel.com>
+ <70244d80-08a4-da91-3226-7bfd2019467e@redhat.com>
+ <97032c51-3265-c94a-9ce1-f42fcc6d3075@intel.com>
+From:   Jason Wang <jasowang@redhat.com>
+Message-ID: <77318609-85ef-f169-2a1e-500473976d84@redhat.com>
+Date:   Thu, 16 Jul 2020 10:59:36 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-References: <20200623131418.31473-1-tianjia.zhang@linux.alibaba.com>
- <20200623131418.31473-6-tianjia.zhang@linux.alibaba.com> <e447bb5c-8b83-dfb1-a293-f2e9e586c2ec@flygoat.com>
-In-Reply-To: <e447bb5c-8b83-dfb1-a293-f2e9e586c2ec@flygoat.com>
-From:   Huacai Chen <chenhuacai@gmail.com>
-Date:   Thu, 16 Jul 2020 10:19:56 +0800
-Message-ID: <CAAhV-H53JLTtyi=3vvSw3xxR12YiJq-5SKRXZzVcFLt=r2iXgQ@mail.gmail.com>
-Subject: Re: [PATCH v6 5/5] KVM: MIPS: clean up redundant kvm_run parameters
- in assembly
-To:     Jiaxun Yang <jiaxun.yang@flygoat.com>
-Cc:     Tianjia Zhang <tianjia.zhang@linux.alibaba.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, kvm <kvm@vger.kernel.org>,
-        "open list:MIPS" <linux-mips@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <97032c51-3265-c94a-9ce1-f42fcc6d3075@intel.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi, all,
 
-On Thu, Jul 16, 2020 at 10:10 AM Jiaxun Yang <jiaxun.yang@flygoat.com> wrot=
-e:
+On 2020/7/16 上午9:39, Zhu, Lingshan wrote:
 >
 >
+> On 7/15/2020 9:43 PM, Jason Wang wrote:
+>>
+>> On 2020/7/12 下午10:52, Zhu Lingshan wrote:
+>>> Hi All,
+>>>
+>>> This series intends to implement IRQ offloading for
+>>> vhost_vdpa.
+>>>
+>>> By the feat of irq forwarding facilities like posted
+>>> interrupt on X86, irq bypass can  help deliver
+>>> interrupts to vCPU directly.
+>>>
+>>> vDPA devices have dedicated hardware backends like VFIO
+>>> pass-throughed devices. So it would be possible to setup
+>>> irq offloading(irq bypass) for vDPA devices and gain
+>>> performance improvements.
+>>>
+>>> In my testing, with this feature, we can save 0.1ms
+>>> in a ping between two VFs on average.
+>>
+>>
+>> Hi Lingshan:
+>>
+>> During the virtio-networking meeting, Michael spots two possible issues:
+>>
+>> 1) do we need an new uAPI to stop the irq offloading?
+>> 2) can interrupt lost during the eventfd ctx?
+>>
+>> For 1) I think we probably not, we can allocate an independent 
+>> eventfd which does not map to MSIX. So the consumer can't match the 
+>> producer and we fallback to eventfd based irq.
+> Hi Jason,
 >
-> =E5=9C=A8 2020/6/23 21:14, Tianjia Zhang =E5=86=99=E9=81=93:
-> > In the current kvm version, 'kvm_run' has been included in the 'kvm_vcp=
-u'
-> > structure. For historical reasons, many kvm-related function parameters
-> > retain the 'kvm_run' and 'kvm_vcpu' parameters at the same time. This
-> > patch does a unified cleanup of these remaining redundant parameters.
-> >
-> > Signed-off-by: Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
-> > Reviewed-by: Huacai Chen <chenhc@lemote.com>
->
-> Tested-by: Jiaxun Yang <jiaxun.yang@flygoat.com>
->
-> Can confirm it works on Loongson-3A4000.
-I'm sorry for the late response, and thank Jiaxun for his tests.
+> I wonder why we need to stop irq offloading, but if we need to do so, maybe a new uAPI would be more intuitive to me,
+> but why and who(user? qemu?) shall initialize this process, based on what kinda of basis to make the decision?
 
-Huacai
+
+The reason is we may want to fallback to software datapath for some 
+reason (e.g software assisted live migration). In this case we need 
+intercept device write to used ring so we can not offloading virtqueue 
+interrupt in this case.
+
+
+>> For 2) it looks to me guest should deal with the irq synchronization 
+>> when mask or unmask MSIX vectors.
+> Agreed!
+
+
+It's better to double check for this.
+
+Thanks
+
+
 >
-> Thanks!
->
-> > ---
->
-> --
-> - Jiaxun
+> Thanks,
+> BR
+> Zhu Lingshan
+>>
+>> What's your thought?
+>>
+>> Thanks
+>>
+>>
+>>>
+>>>
+>>> Zhu Lingshan (7):
+>>>    vhost: introduce vhost_call_ctx
+>>>    kvm/vfio: detect assigned device via irqbypass manager
+>>>    vhost_vdpa: implement IRQ offloading functions in vhost_vdpa
+>>>    vDPA: implement IRQ offloading helpers in vDPA core
+>>>    virtio_vdpa: init IRQ offloading function pointers to NULL.
+>>>    ifcvf: replace irq_request/free with helpers in vDPA core.
+>>>    irqbypass: do not start consumer or producer when failed to connect
+>>>
+>>>   arch/x86/kvm/x86.c              | 10 ++++--
+>>>   drivers/vdpa/ifcvf/ifcvf_main.c | 11 +++---
+>>>   drivers/vdpa/vdpa.c             | 46 +++++++++++++++++++++++++
+>>>   drivers/vhost/Kconfig           |  1 +
+>>>   drivers/vhost/vdpa.c            | 75 
+>>> +++++++++++++++++++++++++++++++++++++++--
+>>>   drivers/vhost/vhost.c           | 22 ++++++++----
+>>>   drivers/vhost/vhost.h           |  9 ++++-
+>>>   drivers/virtio/virtio_vdpa.c    |  2 ++
+>>>   include/linux/vdpa.h            | 11 ++++++
+>>>   virt/kvm/vfio.c                 |  2 --
+>>>   virt/lib/irqbypass.c            | 16 +++++----
+>>>   11 files changed, 181 insertions(+), 24 deletions(-)
+>>>
+>>
+
