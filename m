@@ -2,165 +2,173 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 80837221C6A
-	for <lists+kvm@lfdr.de>; Thu, 16 Jul 2020 08:13:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E0DC5221C78
+	for <lists+kvm@lfdr.de>; Thu, 16 Jul 2020 08:15:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727105AbgGPGNJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 16 Jul 2020 02:13:09 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:46449 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1725844AbgGPGNJ (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 16 Jul 2020 02:13:09 -0400
+        id S1728086AbgGPGPo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 16 Jul 2020 02:15:44 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:27243 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1725844AbgGPGPd (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 16 Jul 2020 02:15:33 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1594879987;
+        s=mimecast20190719; t=1594880130;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=1M+pW97CHknoejGWyybKRR4Skij2QdcP792WLZ7CQAc=;
-        b=F7bjhcsSOsZuU1Qn1BK7I8yfage2J7weWng/NowNtsB0jxOXTO4W1jELSMxleYmYo1FOYw
-        kj0NZphNi6mx1b2/GEOAPYboLJgVzCJNSCZExHQJbrhUxH3RCWkGxujNF7Q2kiQkPsnRAH
-        gQM8KQQNtIz53PyGkZRbdiYaca5FvMA=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-302-4atIPXc0MBucFeviZNqFJQ-1; Thu, 16 Jul 2020 02:13:05 -0400
-X-MC-Unique: 4atIPXc0MBucFeviZNqFJQ-1
-Received: by mail-wm1-f71.google.com with SMTP id g6so4336305wmk.4
-        for <kvm@vger.kernel.org>; Wed, 15 Jul 2020 23:13:05 -0700 (PDT)
+        bh=M4FS4yzYrjpQnMFv5QUa2bTajd8sHiv/1qfXLXjqecQ=;
+        b=X9Z6/m/eP45xHAT+IuJ3kHm+p8wAXxDFY2ekpVhTEOPKvWWoskB+gNdg7iD+8H2YgrMNX1
+        2rG07YyQSMp88cGVZwehoUWQh3E+OmCCVI22HPymDOSVplc6MUQcAwBCuFmsjU0yBK7FiZ
+        jqz83ibxDYgbM7i5IEGhqOseUbwhyYI=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-406-YHsVBNo4NFSvkJaY1UaLRw-1; Thu, 16 Jul 2020 02:15:29 -0400
+X-MC-Unique: YHsVBNo4NFSvkJaY1UaLRw-1
+Received: by mail-wm1-f70.google.com with SMTP id g138so4133140wme.7
+        for <kvm@vger.kernel.org>; Wed, 15 Jul 2020 23:15:28 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:content-transfer-encoding
          :in-reply-to;
-        bh=1M+pW97CHknoejGWyybKRR4Skij2QdcP792WLZ7CQAc=;
-        b=MZT43h6TPoiJeNG4lI/cHqkg27g/u4aKmYHvFxGT6l8oOSdDzplguZA8UP1eIUOjWD
-         GLkWUOsKxHf7sVZGCM6IiQaeC8TWgbg5Odn6e3R3sNc5MYFLjGTq3eldsdlYZLlyiwVs
-         PZhTMzXwBnZgcTZLGa0rvMKEKwe+Kb8AVhNH2ZeoUeOa+DwgjmqcP7Fv5pvH4qQhB9dk
-         KqfmcmP1Lz0ATJVniUYLc9nj6cO4BkMB3PO2WgiFQS3UEM6f2XPtWQhEups4dPC/KGPu
-         YfVR1Y5pWheCpkVPEW8X/ri9R+XQOvT8YwxKuSjhynhmm9XVs267FyYCxvOdQETkPihG
-         DhEg==
-X-Gm-Message-State: AOAM531bd9XMzXsRp+dIBpeutcqcK3RCNCQfylKDYHPaCfejx9m3qy0+
-        nbfjgRqYFO8EZFl3eWhHvC3ypCGdO21BIuipJxDlVxHPcBez9fauJAJGLXyPI5c1z2Jxvjzj2Cc
-        jpmR64891ERZc
-X-Received: by 2002:a1c:9a81:: with SMTP id c123mr2755145wme.46.1594879984250;
-        Wed, 15 Jul 2020 23:13:04 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzT8cU5kZjDJ+n5Z01Aw/B3E42nszir+5RtL0b0T6rIbKUWMpod41qWfNHCANmeyj9AKRZROw==
-X-Received: by 2002:a1c:9a81:: with SMTP id c123mr2755118wme.46.1594879983933;
-        Wed, 15 Jul 2020 23:13:03 -0700 (PDT)
+        bh=M4FS4yzYrjpQnMFv5QUa2bTajd8sHiv/1qfXLXjqecQ=;
+        b=dAPpfcD4IIonbf2kCo1wGYupoFH0+TK71oI/8OtHVrUf6DQ4aW4awYR2HBMxF8krQu
+         n9obocPvS13xCXFYUsR2KxlYUJscDD/2khv4HwX8KXtiU6oXzyNoWYyHvQp1qy1TCB5w
+         I51DpqyvAszou6jj6d0TxZeTV4NxAUX5zhvi1ZdCubPQoVmO28FIuzrzwO+uy0sN75qb
+         +Zj8lATNWe+rbeoa4Xrm8DSUujaHiUI93LVRX7GEZSO47QzIU24ELsoysTZLEb8ZHnym
+         /Sm/fJa5NKR6etTlzDJlIynSLH5wpdE9xrFl0UZ2WYsMPTIMuI5VZHn3WOTzo+VsqznH
+         LDwg==
+X-Gm-Message-State: AOAM531H/mLU/DZpUJJBtac9snpgImLgY/3n/UvRhgQ+qTWdYksgML6N
+        uIx9p9SSYrKMExTJ8mO1MB6Ls2SssYZKmTk4VhuPpuNuc1jm6xIYJq77kRGWvc/BBRKeWhcTvM6
+        D/rAyUHFOuPt4
+X-Received: by 2002:adf:cc85:: with SMTP id p5mr3315908wrj.273.1594880127911;
+        Wed, 15 Jul 2020 23:15:27 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzpXKQQdIeqinuWsERGiaLq/STljNJxBfiy4+NiiUehwjdb/coh4z5EcaCuvTh+krGRLDMqrA==
+X-Received: by 2002:adf:cc85:: with SMTP id p5mr3315877wrj.273.1594880127633;
+        Wed, 15 Jul 2020 23:15:27 -0700 (PDT)
 Received: from redhat.com (bzq-79-182-31-92.red.bezeqint.net. [79.182.31.92])
-        by smtp.gmail.com with ESMTPSA id p29sm7031185wmi.43.2020.07.15.23.13.02
+        by smtp.gmail.com with ESMTPSA id l67sm7715417wml.13.2020.07.15.23.15.25
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 15 Jul 2020 23:13:03 -0700 (PDT)
-Date:   Thu, 16 Jul 2020 02:13:00 -0400
+        Wed, 15 Jul 2020 23:15:26 -0700 (PDT)
+Date:   Thu, 16 Jul 2020 02:15:24 -0400
 From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     "Zhu, Lingshan" <lingshan.zhu@intel.com>
-Cc:     Jason Wang <jasowang@redhat.com>, alex.williamson@redhat.com,
+To:     Jason Wang <jasowang@redhat.com>
+Cc:     "Zhu, Lingshan" <lingshan.zhu@intel.com>,
+        alex williamson <alex.williamson@redhat.com>,
         pbonzini@redhat.com, sean.j.christopherson@intel.com,
-        wanpengli@tencent.com, virtualization@lists.linux-foundation.org,
-        kvm@vger.kernel.org, netdev@vger.kernel.org, dan.daly@intel.com
+        wanpengli@tencent.com,
+        "virtualization@lists.linux-foundation.org" 
+        <virtualization@lists.linux-foundation.org>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        dan daly <dan.daly@intel.com>
 Subject: Re: [PATCH 0/7] *** IRQ offloading for vDPA ***
-Message-ID: <20200716021111-mutt-send-email-mst@kernel.org>
+Message-ID: <20200716021435-mutt-send-email-mst@kernel.org>
 References: <1594565524-3394-1-git-send-email-lingshan.zhu@intel.com>
  <70244d80-08a4-da91-3226-7bfd2019467e@redhat.com>
  <97032c51-3265-c94a-9ce1-f42fcc6d3075@intel.com>
+ <77318609-85ef-f169-2a1e-500473976d84@redhat.com>
+ <29ab6da8-ed8e-6b91-d658-f3d240543b29@intel.com>
+ <1e91d9dd-d787-beff-2c14-9c76ffc3b285@redhat.com>
+ <a319cba3-8b3d-8968-0fb7-48a1d34042bf@intel.com>
+ <67c4c41d-9e95-2270-4acb-6f04668c34fa@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <97032c51-3265-c94a-9ce1-f42fcc6d3075@intel.com>
+In-Reply-To: <67c4c41d-9e95-2270-4acb-6f04668c34fa@redhat.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jul 16, 2020 at 09:39:17AM +0800, Zhu, Lingshan wrote:
+On Thu, Jul 16, 2020 at 12:20:09PM +0800, Jason Wang wrote:
 > 
-> On 7/15/2020 9:43 PM, Jason Wang wrote:
+> On 2020/7/16 下午12:13, Zhu, Lingshan wrote:
+> > 
+> > 
+> > On 7/16/2020 12:02 PM, Jason Wang wrote:
+> > > 
+> > > On 2020/7/16 上午11:59, Zhu, Lingshan wrote:
+> > > > 
+> > > > On 7/16/2020 10:59 AM, Jason Wang wrote:
+> > > > > 
+> > > > > On 2020/7/16 上午9:39, Zhu, Lingshan wrote:
+> > > > > > 
+> > > > > > 
+> > > > > > On 7/15/2020 9:43 PM, Jason Wang wrote:
+> > > > > > > 
+> > > > > > > On 2020/7/12 下午10:52, Zhu Lingshan wrote:
+> > > > > > > > Hi All,
+> > > > > > > > 
+> > > > > > > > This series intends to implement IRQ offloading for
+> > > > > > > > vhost_vdpa.
+> > > > > > > > 
+> > > > > > > > By the feat of irq forwarding facilities like posted
+> > > > > > > > interrupt on X86, irq bypass can  help deliver
+> > > > > > > > interrupts to vCPU directly.
+> > > > > > > > 
+> > > > > > > > vDPA devices have dedicated hardware backends like VFIO
+> > > > > > > > pass-throughed devices. So it would be possible to setup
+> > > > > > > > irq offloading(irq bypass) for vDPA devices and gain
+> > > > > > > > performance improvements.
+> > > > > > > > 
+> > > > > > > > In my testing, with this feature, we can save 0.1ms
+> > > > > > > > in a ping between two VFs on average.
+> > > > > > > 
+> > > > > > > 
+> > > > > > > Hi Lingshan:
+> > > > > > > 
+> > > > > > > During the virtio-networking meeting, Michael spots
+> > > > > > > two possible issues:
+> > > > > > > 
+> > > > > > > 1) do we need an new uAPI to stop the irq offloading?
+> > > > > > > 2) can interrupt lost during the eventfd ctx?
+> > > > > > > 
+> > > > > > > For 1) I think we probably not, we can allocate an
+> > > > > > > independent eventfd which does not map to MSIX. So
+> > > > > > > the consumer can't match the producer and we
+> > > > > > > fallback to eventfd based irq.
+> > > > > > Hi Jason,
+> > > > > > 
+> > > > > > I wonder why we need to stop irq offloading, but if we
+> > > > > > need to do so, maybe a new uAPI would be more intuitive
+> > > > > > to me,
+> > > > > > but why and who(user? qemu?) shall initialize this
+> > > > > > process, based on what kinda of basis to make the
+> > > > > > decision?
+> > > > > 
+> > > > > 
+> > > > > The reason is we may want to fallback to software datapath
+> > > > > for some reason (e.g software assisted live migration). In
+> > > > > this case we need intercept device write to used ring so we
+> > > > > can not offloading virtqueue interrupt in this case.
+> > > > so add a VHOST_VDPA_STOP_IRQ_OFFLOADING? Then do we need a
+> > > > VHOST_VDPA_START_IRQ_OFFLOADING, then let userspace fully
+> > > > control this? Or any better approaches?
+> > > 
+> > > 
+> > > Probably not, it's as simple as allocating another eventfd (but not
+> > > irqfd), and pass it to vhost-vdpa. Then the offloading is disabled
+> > > since it doesn't have a consumer.
+> > OK, sounds like QEMU work, no need to take care in this series, right?
 > 
 > 
->     On 2020/7/12 下午10:52, Zhu Lingshan wrote:
+> That's my understanding.
 > 
->         Hi All,
-> 
->         This series intends to implement IRQ offloading for
->         vhost_vdpa.
-> 
->         By the feat of irq forwarding facilities like posted
->         interrupt on X86, irq bypass can  help deliver
->         interrupts to vCPU directly.
-> 
->         vDPA devices have dedicated hardware backends like VFIO
->         pass-throughed devices. So it would be possible to setup
->         irq offloading(irq bypass) for vDPA devices and gain
->         performance improvements.
-> 
->         In my testing, with this feature, we can save 0.1ms
->         in a ping between two VFs on average.
-> 
-> 
-> 
->     Hi Lingshan:
-> 
->     During the virtio-networking meeting, Michael spots two possible issues:
-> 
->     1) do we need an new uAPI to stop the irq offloading?
->     2) can interrupt lost during the eventfd ctx?
-> 
->     For 1) I think we probably not, we can allocate an independent eventfd
->     which does not map to MSIX. So the consumer can't match the producer and we
->     fallback to eventfd based irq.
-> 
-> Hi Jason,
-> 
-> I wonder why we need to stop irq offloading, but if we need to do so, maybe a new uAPI would be more intuitive to me,
-> but why and who(user? qemu?) shall initialize this process, based on what kinda of basis to make the decision?
-> 
->     For 2) it looks to me guest should deal with the irq synchronization when
->     mask or unmask MSIX vectors.
-> 
-> Agreed!
+> Thanks
 
-Well we need to make sure during a switch each interrupt is reported
-*somewhere*: either irq or eventfd - and not lost.
+Let's confirm a switch happens atomically so each interrupt
+is sent either to eventfd to guest directly though.
 
-
-> Thanks,
-> BR
-> Zhu Lingshan
 > 
-> 
->     What's your thought?
-> 
->     Thanks
-> 
-> 
-> 
-> 
-> 
->         Zhu Lingshan (7):
->            vhost: introduce vhost_call_ctx
->            kvm/vfio: detect assigned device via irqbypass manager
->            vhost_vdpa: implement IRQ offloading functions in vhost_vdpa
->            vDPA: implement IRQ offloading helpers in vDPA core
->            virtio_vdpa: init IRQ offloading function pointers to NULL.
->            ifcvf: replace irq_request/free with helpers in vDPA core.
->            irqbypass: do not start consumer or producer when failed to connect
-> 
->           arch/x86/kvm/x86.c              | 10 ++++--
->           drivers/vdpa/ifcvf/ifcvf_main.c | 11 +++---
->           drivers/vdpa/vdpa.c             | 46 +++++++++++++++++++++++++
->           drivers/vhost/Kconfig           |  1 +
->           drivers/vhost/vdpa.c            | 75
->         +++++++++++++++++++++++++++++++++++++++--
->           drivers/vhost/vhost.c           | 22 ++++++++----
->           drivers/vhost/vhost.h           |  9 ++++-
->           drivers/virtio/virtio_vdpa.c    |  2 ++
->           include/linux/vdpa.h            | 11 ++++++
->           virt/kvm/vfio.c                 |  2 --
->           virt/lib/irqbypass.c            | 16 +++++----
->           11 files changed, 181 insertions(+), 24 deletions(-)
-> 
-> 
-> 
-> 
+> > 
+> > Thanks,
+> > BR
+> > Zhu Lingshan
+> > > 
+> > > Thanks
+> > > 
+> > > 
 
