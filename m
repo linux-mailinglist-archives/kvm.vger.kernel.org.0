@@ -2,114 +2,146 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 65BA9221D0C
-	for <lists+kvm@lfdr.de>; Thu, 16 Jul 2020 09:11:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2E8DC221DD4
+	for <lists+kvm@lfdr.de>; Thu, 16 Jul 2020 10:07:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728212AbgGPHLg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 16 Jul 2020 03:11:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36314 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725921AbgGPHLg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 16 Jul 2020 03:11:36 -0400
-Received: from mail-pf1-x441.google.com (mail-pf1-x441.google.com [IPv6:2607:f8b0:4864:20::441])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 467BFC061755
-        for <kvm@vger.kernel.org>; Thu, 16 Jul 2020 00:11:36 -0700 (PDT)
-Received: by mail-pf1-x441.google.com with SMTP id a14so3255655pfi.2
-        for <kvm@vger.kernel.org>; Thu, 16 Jul 2020 00:11:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=vcHZiOtRWbNFoSHPYD2doddbtKLBAtgI/PXZZ2P7grY=;
-        b=ecqbXeJl95gSBxnQ4wKXDH8VW5JRC6TxnLqHWTjeWrxXZWXFSg3W9qoky4rIaLTx8Q
-         0NlDnUJTFg+ghyis44OFH8PE6IiCiuv9MCdCCSWhTD24q7V0UVFwPk7c120VaKXUb54J
-         k0RxEm3FYWNMxvcjSFQDnbrB3xotqSegpguE+osh6gNCTH6eVA4acU+d+Iojkn+jInot
-         5gHvqP0qy8QSEOhUgjUZEQeYht4WSb9iVl39bydjvZoKIwZ68qKp/uvhm7ZX8fHtBH+B
-         3kcaMfazD4h801spPauHYm3e7regdtyyhk+t8we4dTsiKW1czfUYq8CD0Ujz7fvKAZs6
-         inQw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=vcHZiOtRWbNFoSHPYD2doddbtKLBAtgI/PXZZ2P7grY=;
-        b=n8L64IHIwXurXUsIU3GV5UxGyLlvHbZ5l2qvh44QdRZR7pZO7lSE9Lz0BQ3DvnLd8v
-         wXsl91Oq3hTzO0cRRftaGEJ0qVK1wy8xclbQxHYJf+MJltP6ClYkJEFLeFmFf4HfY0ey
-         wP6lpugfPUdwS7DInV+EaIbpn59N4odRYB843JjSbpIkkU26KOOcAm/O42fF1EXs3Cjv
-         8L00YbaqP9EByOXe4cuNMvYicVPYXoCWrjkf0mmMxjnQXlTlWZ60RD/+cqjqo9lVnD9H
-         m89bC1DSQgSKaPZ012RPIDaMj6Eed66CYoiQOHf2MGaTxjfRE5p5ckqi9H1KS2fvzYEg
-         SdSQ==
-X-Gm-Message-State: AOAM533aUfzrxCuwg7MigCUNWBNMGlPFSOdBJrRrN24nBceoifVyD65k
-        1g+o/C+vDrEyZQ3+jTH7UP0=
-X-Google-Smtp-Source: ABdhPJy1VfJn7LQ7zcD/YxYnyJNgBqWzPWGpkWYds3J0RhndcyCQ5vDcHLLbqIyzBKv/dO7/XwmThw==
-X-Received: by 2002:a63:af50:: with SMTP id s16mr3203787pgo.365.1594883495755;
-        Thu, 16 Jul 2020 00:11:35 -0700 (PDT)
-Received: from ?IPv6:2601:647:4700:9b2:3dfe:7232:64d9:57dc? ([2601:647:4700:9b2:3dfe:7232:64d9:57dc])
-        by smtp.gmail.com with ESMTPSA id n22sm3892279pjq.25.2020.07.16.00.11.33
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 16 Jul 2020 00:11:34 -0700 (PDT)
-Content-Type: text/plain;
-        charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 13.4 \(3608.80.23.2.2\))
-Subject: Re: [kvm-unit-tests PATCH v2 2/2] lib/alloc_page: Fix compilation
- issue on 32bit archs
-From:   Nadav Amit <nadav.amit@gmail.com>
-In-Reply-To: <20200714130030.56037-3-imbrenda@linux.ibm.com>
-Date:   Thu, 16 Jul 2020 00:11:31 -0700
-Cc:     kvm <kvm@vger.kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
-        frankja@linux.ibm.com, Thomas Huth <thuth@redhat.com>,
-        David Hildenbrand <david@redhat.com>, drjones@redhat.com,
-        Jim Mattson <jmattson@google.com>
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <7F765FA6-FC63-4D82-BB13-00EF133CB031@gmail.com>
-References: <20200714130030.56037-1-imbrenda@linux.ibm.com>
- <20200714130030.56037-3-imbrenda@linux.ibm.com>
-To:     Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>
-X-Mailer: Apple Mail (2.3608.80.23.2.2)
+        id S1725932AbgGPIGp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 16 Jul 2020 04:06:45 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:42423 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1725897AbgGPIGo (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 16 Jul 2020 04:06:44 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1594886802;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=d5dhBqOnsrkp+ck3vhLEOg3slEAzg8AwB2Xf50MijXU=;
+        b=LzixM7Ban85m/qfhnWhPTikCvFtJQttjJp61qrjOMHL+A0oNleCHNGmRR7RhGDqCaikUf3
+        DkrEE2t2fcETvuCM474S64IUiollxRg9Kdqe/OLdJrg28BXR3zdToN4v6qcli/LXKeAUq1
+        COfsQqxsPfqTMgc/MyOuJmbmRpIY7cQ=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-501-Asf4430XNjmlKVUWtpP1mw-1; Thu, 16 Jul 2020 04:06:40 -0400
+X-MC-Unique: Asf4430XNjmlKVUWtpP1mw-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id ECD0B800FF1;
+        Thu, 16 Jul 2020 08:06:38 +0000 (UTC)
+Received: from [10.72.12.131] (ovpn-12-131.pek2.redhat.com [10.72.12.131])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id BD9302DE69;
+        Thu, 16 Jul 2020 08:06:25 +0000 (UTC)
+Subject: Re: [PATCH 0/7] *** IRQ offloading for vDPA ***
+To:     "Michael S. Tsirkin" <mst@redhat.com>
+Cc:     "Zhu, Lingshan" <lingshan.zhu@intel.com>,
+        alex williamson <alex.williamson@redhat.com>,
+        pbonzini@redhat.com, sean.j.christopherson@intel.com,
+        wanpengli@tencent.com,
+        "virtualization@lists.linux-foundation.org" 
+        <virtualization@lists.linux-foundation.org>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        dan daly <dan.daly@intel.com>
+References: <1594565524-3394-1-git-send-email-lingshan.zhu@intel.com>
+ <70244d80-08a4-da91-3226-7bfd2019467e@redhat.com>
+ <97032c51-3265-c94a-9ce1-f42fcc6d3075@intel.com>
+ <77318609-85ef-f169-2a1e-500473976d84@redhat.com>
+ <29ab6da8-ed8e-6b91-d658-f3d240543b29@intel.com>
+ <1e91d9dd-d787-beff-2c14-9c76ffc3b285@redhat.com>
+ <a319cba3-8b3d-8968-0fb7-48a1d34042bf@intel.com>
+ <67c4c41d-9e95-2270-4acb-6f04668c34fa@redhat.com>
+ <20200716021435-mutt-send-email-mst@kernel.org>
+From:   Jason Wang <jasowang@redhat.com>
+Message-ID: <918ef7c7-852e-6c0a-ed0d-fac3fa6752e4@redhat.com>
+Date:   Thu, 16 Jul 2020 16:06:23 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
+MIME-Version: 1.0
+In-Reply-To: <20200716021435-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> On Jul 14, 2020, at 6:00 AM, Claudio Imbrenda <imbrenda@linux.ibm.com> =
-wrote:
->=20
-> The assert in lib/alloc_page is hardcoded to long.
->=20
-> Use the z modifier instead, which is meant to be used for size_t.
->=20
-> Fixes: 73f4b202beb39 ("lib/alloc_page: change some parameter types")
-> Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
-> ---
-> lib/alloc_page.c | 4 ++--
-> 1 file changed, 2 insertions(+), 2 deletions(-)
->=20
-> diff --git a/lib/alloc_page.c b/lib/alloc_page.c
-> index fa3c527..74fe726 100644
-> --- a/lib/alloc_page.c
-> +++ b/lib/alloc_page.c
-> @@ -29,11 +29,11 @@ void free_pages(void *mem, size_t size)
-> 	assert_msg((unsigned long) mem % PAGE_SIZE =3D=3D 0,
-> 		   "mem not page aligned: %p", mem);
->=20
-> -	assert_msg(size % PAGE_SIZE =3D=3D 0, "size not page aligned: =
-%#lx", size);
-> +	assert_msg(size % PAGE_SIZE =3D=3D 0, "size not page aligned: =
-%#zx", size);
->=20
-> 	assert_msg(size =3D=3D 0 || (uintptr_t)mem =3D=3D -size ||
-> 		   (uintptr_t)mem + size > (uintptr_t)mem,
-> -		   "mem + size overflow: %p + %#lx", mem, size);
-> +		   "mem + size overflow: %p + %#zx", mem, size);
->=20
-> 	if (size =3D=3D 0) {
-> 		freelist =3D NULL;
-> =E2=80=94=20
-> 2.26.2
 
-Sean sent a different patch ("lib/alloc_page: Revert to 'unsigned =
-long=E2=80=99 for
-@size params=E2=80=9D) that changes size to unsigned long, so you really =
-should
-synchronize.
+On 2020/7/16 下午2:15, Michael S. Tsirkin wrote:
+> On Thu, Jul 16, 2020 at 12:20:09PM +0800, Jason Wang wrote:
+>> On 2020/7/16 下午12:13, Zhu, Lingshan wrote:
+>>> On 7/16/2020 12:02 PM, Jason Wang wrote:
+>>>> On 2020/7/16 上午11:59, Zhu, Lingshan wrote:
+>>>>> On 7/16/2020 10:59 AM, Jason Wang wrote:
+>>>>>> On 2020/7/16 上午9:39, Zhu, Lingshan wrote:
+>>>>>>> On 7/15/2020 9:43 PM, Jason Wang wrote:
+>>>>>>>> On 2020/7/12 下午10:52, Zhu Lingshan wrote:
+>>>>>>>>> Hi All,
+>>>>>>>>>
+>>>>>>>>> This series intends to implement IRQ offloading for
+>>>>>>>>> vhost_vdpa.
+>>>>>>>>>
+>>>>>>>>> By the feat of irq forwarding facilities like posted
+>>>>>>>>> interrupt on X86, irq bypass can  help deliver
+>>>>>>>>> interrupts to vCPU directly.
+>>>>>>>>>
+>>>>>>>>> vDPA devices have dedicated hardware backends like VFIO
+>>>>>>>>> pass-throughed devices. So it would be possible to setup
+>>>>>>>>> irq offloading(irq bypass) for vDPA devices and gain
+>>>>>>>>> performance improvements.
+>>>>>>>>>
+>>>>>>>>> In my testing, with this feature, we can save 0.1ms
+>>>>>>>>> in a ping between two VFs on average.
+>>>>>>>> Hi Lingshan:
+>>>>>>>>
+>>>>>>>> During the virtio-networking meeting, Michael spots
+>>>>>>>> two possible issues:
+>>>>>>>>
+>>>>>>>> 1) do we need an new uAPI to stop the irq offloading?
+>>>>>>>> 2) can interrupt lost during the eventfd ctx?
+>>>>>>>>
+>>>>>>>> For 1) I think we probably not, we can allocate an
+>>>>>>>> independent eventfd which does not map to MSIX. So
+>>>>>>>> the consumer can't match the producer and we
+>>>>>>>> fallback to eventfd based irq.
+>>>>>>> Hi Jason,
+>>>>>>>
+>>>>>>> I wonder why we need to stop irq offloading, but if we
+>>>>>>> need to do so, maybe a new uAPI would be more intuitive
+>>>>>>> to me,
+>>>>>>> but why and who(user? qemu?) shall initialize this
+>>>>>>> process, based on what kinda of basis to make the
+>>>>>>> decision?
+>>>>>> The reason is we may want to fallback to software datapath
+>>>>>> for some reason (e.g software assisted live migration). In
+>>>>>> this case we need intercept device write to used ring so we
+>>>>>> can not offloading virtqueue interrupt in this case.
+>>>>> so add a VHOST_VDPA_STOP_IRQ_OFFLOADING? Then do we need a
+>>>>> VHOST_VDPA_START_IRQ_OFFLOADING, then let userspace fully
+>>>>> control this? Or any better approaches?
+>>>> Probably not, it's as simple as allocating another eventfd (but not
+>>>> irqfd), and pass it to vhost-vdpa. Then the offloading is disabled
+>>>> since it doesn't have a consumer.
+>>> OK, sounds like QEMU work, no need to take care in this series, right?
+>> That's my understanding.
+>>
+>> Thanks
+> Let's confirm a switch happens atomically so each interrupt
+> is sent either to eventfd to guest directly though.
+
+
+I think it's safe since:
+
+1) we don't alloc/free interrupt during the eventfd change
+2) The irte is modified automatically through cmpxchg_double() in 
+modify_irte(), so the interrupt is either remapping to eventfd or pi 
+descriptor
+
+Thanks
+
+
+>
 
