@@ -2,146 +2,136 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8B6E22228CB
-	for <lists+kvm@lfdr.de>; Thu, 16 Jul 2020 19:17:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B59D1222BE9
+	for <lists+kvm@lfdr.de>; Thu, 16 Jul 2020 21:30:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728837AbgGPRRP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 16 Jul 2020 13:17:15 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:55163 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1727844AbgGPRRJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 16 Jul 2020 13:17:09 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1594919826;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=3fQB3h1kkyYLBylVq5k4Bhd4Kz/DPg9j4ID1VQtmqZc=;
-        b=OHB2c3jXF/BdQg3EeXmxv7KJBKLewakgHAePOm9lFr+h03POqpwE4eEh3DYyPufRFvXg13
-        j3Hc6nXyzY6WX4WIVMiiEFPTJKcNFCe8yfZKFsM8uASGO5qH9tMn3S0eBRkwxeAUuZB7E6
-        mDHadzT5zCqkL5C1Q0GAEw03hz2EpQc=
-Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com
- [209.85.222.200]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-449-KLXwyMfeOieuhXPx03hN8Q-1; Thu, 16 Jul 2020 13:17:05 -0400
-X-MC-Unique: KLXwyMfeOieuhXPx03hN8Q-1
-Received: by mail-qk1-f200.google.com with SMTP id 204so4191897qki.20
-        for <kvm@vger.kernel.org>; Thu, 16 Jul 2020 10:17:04 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=3fQB3h1kkyYLBylVq5k4Bhd4Kz/DPg9j4ID1VQtmqZc=;
-        b=LZ6JjgT+5A+Aj3QgGWTahuMUh79sTq6ESJ+CwxMLGumsChJ2cA5p54aJnkwfPChANb
-         06k15QakkeM88dEZwbZwqE7cQaSZz3Rp1aHFpeo0iei7B99HnIhsfBdORSysjsBEbRJ7
-         5tJFTsDxTsglCarC8zUIkn5Q8cTUcjtwovi4P2qWxPQMkbZWQzRnGcrtrcbMeKSIyELI
-         3RPEsGvXGnJC4Jc7AS25J16FZJTGC9cav6t0RtOIob3TzCr4MLPa0g0zlhpg6ku8Mu4p
-         Vd3cd4ZQT+rqg+XfdiwfW+BcOkD08kgMMqpEX+h02QEMve1GIbzwPhinlojNvC5JZ0fK
-         wwGA==
-X-Gm-Message-State: AOAM532mBSXctGc0cE6wXmHeoCnLkOyGO8nTsplCqndVyocjcrCpfdX7
-        c9N6I9Kucp/IsCrUK4kAnuJEj/+SFKJrSL+5iqAXoeQMpsfFHYBcDURFHq6msVh5dCHF78pQqgx
-        U4LdEboYRuqXJiRrONTlR5GIMoVoM
-X-Received: by 2002:a05:620a:11b3:: with SMTP id c19mr5023056qkk.203.1594919824446;
-        Thu, 16 Jul 2020 10:17:04 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxyyC+DL23IP8O9brTPle0l22Dr445jM9hQ5TROISxF5aP01PD5Cpgh6/ubiVQT+bVCdjlg6+/nT3WxD41Gj1I=
-X-Received: by 2002:a05:620a:11b3:: with SMTP id c19mr5023025qkk.203.1594919824159;
- Thu, 16 Jul 2020 10:17:04 -0700 (PDT)
+        id S1729595AbgGPT34 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 16 Jul 2020 15:29:56 -0400
+Received: from mga01.intel.com ([192.55.52.88]:62386 "EHLO mga01.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728788AbgGPT34 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 16 Jul 2020 15:29:56 -0400
+IronPort-SDR: dXX6OC5CoOkqakY0NaniPr/XTx4mAwfVa9u4jRPr/O9/lNSXcNWnwWxTISVfjsWdBdvGGOMzqi
+ VrTEmm8eRHNg==
+X-IronPort-AV: E=McAfee;i="6000,8403,9684"; a="167616024"
+X-IronPort-AV: E=Sophos;i="5.75,360,1589266800"; 
+   d="scan'208";a="167616024"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga006.fm.intel.com ([10.253.24.20])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Jul 2020 12:29:55 -0700
+IronPort-SDR: Rw/CNHn192L0+R8y7GGaKRMKcHlm3dB/wEHRSknCC3Mzc7hl/2FGCndwvsfD2gY3p6lsaNLv7p
+ pEUq9GnywRMQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.75,360,1589266800"; 
+   d="scan'208";a="486217234"
+Received: from guptapadev.jf.intel.com (HELO guptapadev.amr) ([10.54.74.188])
+  by fmsmga006.fm.intel.com with ESMTP; 16 Jul 2020 12:29:54 -0700
+Date:   Thu, 16 Jul 2020 12:23:59 -0700
+From:   Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
+To:     Borislav Petkov <bp@alien8.de>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>
+Cc:     Jonathan Corbet <corbet@lwn.net>, x86@kernel.org,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Tony Luck <tony.luck@intel.com>,
+        Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
+        "Gomez Iglesias, Antonio" <antonio.gomez.iglesias@intel.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Fenghua Yu <fenghua.yu@intel.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Vincenzo Frascino <vincenzo.frascino@arm.com>,
+        Josh Poimboeuf <jpoimboe@redhat.com>,
+        Anthony Steinhauser <asteinhauser@google.com>,
+        Waiman Long <longman@redhat.com>,
+        Mike Rapoport <rppt@linux.ibm.com>,
+        Mark Gross <mgross@linux.intel.com>, linux-doc@vger.kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Subject: [PATCH v2] x86/bugs/multihit: Fix mitigation reporting when VMX is
+ not in use
+Message-ID: <0ba029932a816179b9d14a30db38f0f11ef1f166.1594925782.git.pawan.kumar.gupta@linux.intel.com>
 MIME-Version: 1.0
-References: <20200622122546-mutt-send-email-mst@kernel.org>
- <CAJaqyWfbouY4kEXkc6sYsbdCAEk0UNsS5xjqEdHTD7bcTn40Ow@mail.gmail.com>
- <CAJaqyWefMHPguj8ZGCuccTn0uyKxF9ZTEi2ASLtDSjGNb1Vwsg@mail.gmail.com>
- <419cc689-adae-7ba4-fe22-577b3986688c@redhat.com> <CAJaqyWedEg9TBkH1MxGP1AecYHD-e-=ugJ6XUN+CWb=rQGf49g@mail.gmail.com>
- <0a83aa03-8e3c-1271-82f5-4c07931edea3@redhat.com> <CAJaqyWeqF-KjFnXDWXJ2M3Hw3eQeCEE2-7p1KMLmMetMTm22DQ@mail.gmail.com>
- <20200709133438-mutt-send-email-mst@kernel.org> <7dec8cc2-152c-83f4-aa45-8ef9c6aca56d@redhat.com>
- <CAJaqyWdLOH2EceTUduKYXCQUUNo1XQ1tLgjYHTBGhtdhBPHn_Q@mail.gmail.com> <20200710015615-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20200710015615-mutt-send-email-mst@kernel.org>
-From:   Eugenio Perez Martin <eperezma@redhat.com>
-Date:   Thu, 16 Jul 2020 19:16:27 +0200
-Message-ID: <CAJaqyWf1skGxrjuT9GLr6dtgd-433y-rCkbtStLHaAs2W2jYXA@mail.gmail.com>
-Subject: Re: [PATCH RFC v8 02/11] vhost: use batched get_vq_desc version
-To:     "Michael S. Tsirkin" <mst@redhat.com>
-Cc:     Jason Wang <jasowang@redhat.com>,
-        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        linux-kernel@vger.kernel.org, kvm list <kvm@vger.kernel.org>,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jul 10, 2020 at 7:58 AM Michael S. Tsirkin <mst@redhat.com> wrote:
->
-> On Fri, Jul 10, 2020 at 07:39:26AM +0200, Eugenio Perez Martin wrote:
-> > > > How about playing with the batch size? Make it a mod parameter instead
-> > > > of the hard coded 64, and measure for all values 1 to 64 ...
-> > >
-> > >
-> > > Right, according to the test result, 64 seems to be too aggressive in
-> > > the case of TX.
-> > >
-> >
-> > Got it, thanks both!
->
-> In particular I wonder whether with batch size 1
-> we get same performance as without batching
-> (would indicate 64 is too aggressive)
-> or not (would indicate one of the code changes
-> affects performance in an unexpected way).
->
-> --
-> MST
->
+On systems that have virtualization disabled or unsupported, sysfs
+mitigation for X86_BUG_ITLB_MULTIHIT is reported incorrectly as:
 
-Hi!
+  $ cat /sys/devices/system/cpu/vulnerabilities/itlb_multihit
+  KVM: Vulnerable
 
-Varying batch_size as drivers/vhost/net.c:VHOST_NET_BATCH, and testing
-the pps as previous mail says. This means that we have either only
-vhost_net batching (in base testing, like previously to apply this
-patch) or both batching sizes the same.
+System is not vulnerable to DoS attack from a rogue guest when
+virtualization is disabled or unsupported in the hardware. Change the
+mitigation reporting for these cases.
 
-I've checked that vhost process (and pktgen) goes 100% cpu also.
+Fixes: b8e8c8303ff2 ("kvm: mmu: ITLB_MULTIHIT mitigation")
+Reported-by: Nelson Dsouza <nelson.dsouza@linux.intel.com>
+Co-developed-by: Sean Christopherson <sean.j.christopherson@intel.com>
+Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+Signed-off-by: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
+Reviewed-by: Tony Luck <tony.luck@intel.com>
+---
+v2:
+ - Change mitigation reporting as per the state on VMX feature.
 
-For tx: Batching decrements always the performance, in all cases. Not
-sure why bufapi made things better the last time.
+v1: https://lore.kernel.org/lkml/267631f4db4fd7e9f7ca789c2efaeab44103f68e.1594689154.git.pawan.kumar.gupta@linux.intel.com/
 
-Batching makes improvements until 64 bufs, I see increments of pps but like 1%.
+ Documentation/admin-guide/hw-vuln/multihit.rst | 4 ++++
+ arch/x86/kernel/cpu/bugs.c                     | 8 +++++++-
+ 2 files changed, 11 insertions(+), 1 deletion(-)
 
-For rx: Batching always improves performance. It seems that if we
-batch little, bufapi decreases performance, but beyond 64, bufapi is
-much better. The bufapi version keeps improving until I set a batching
-of 1024. So I guess it is super good to have a bunch of buffers to
-receive.
-
-Since with this test I cannot disable event_idx or things like that,
-what would be the next step for testing?
-
-Thanks!
-
---
-Results:
-# Buf size: 1,16,32,64,128,256,512
-
-# Tx
-# ===
-# Base
-2293304.308,3396057.769,3540860.615,3636056.077,3332950.846,3694276.154,3689820
-# Batch
-2286723.857,3307191.643,3400346.571,3452527.786,3460766.857,3431042.5,3440722.286
-# Batch + Bufapi
-2257970.769,3151268.385,3260150.538,3379383.846,3424028.846,3433384.308,3385635.231,3406554.538
-
-# Rx
-# ==
-# pktgen results (pps)
-1223275,1668868,1728794,1769261,1808574,1837252,1846436
-1456924,1797901,1831234,1868746,1877508,1931598,1936402
-1368923,1719716,1794373,1865170,1884803,1916021,1975160
-
-# Testpmd pps results
-1222698.143,1670604,1731040.6,1769218,1811206,1839308.75,1848478.75
-1450140.5,1799985.75,1834089.75,1871290,1880005.5,1934147.25,1939034
-1370621,1721858,1796287.75,1866618.5,1885466.5,1918670.75,1976173.5,1988760.75,1978316
-
-pktgen was run again for rx with 1024 and 2048 buf size, giving
-1988760.75 and 1978316 pps. Testpmd goes the same way.
+diff --git a/Documentation/admin-guide/hw-vuln/multihit.rst b/Documentation/admin-guide/hw-vuln/multihit.rst
+index ba9988d8bce5..140e4cec38c3 100644
+--- a/Documentation/admin-guide/hw-vuln/multihit.rst
++++ b/Documentation/admin-guide/hw-vuln/multihit.rst
+@@ -80,6 +80,10 @@ The possible values in this file are:
+        - The processor is not vulnerable.
+      * - KVM: Mitigation: Split huge pages
+        - Software changes mitigate this issue.
++     * - KVM: Mitigation: VMX unsupported
++       - KVM is not vulnerable because Virtual Machine Extensions (VMX) is not supported.
++     * - KVM: Mitigation: VMX disabled
++       - KVM is not vulnerable because Virtual Machine Extensions (VMX) is disabled.
+      * - KVM: Vulnerable
+        - The processor is vulnerable, but no mitigation enabled
+ 
+diff --git a/arch/x86/kernel/cpu/bugs.c b/arch/x86/kernel/cpu/bugs.c
+index 0b71970d2d3d..b0802d45abd3 100644
+--- a/arch/x86/kernel/cpu/bugs.c
++++ b/arch/x86/kernel/cpu/bugs.c
+@@ -31,6 +31,7 @@
+ #include <asm/intel-family.h>
+ #include <asm/e820/api.h>
+ #include <asm/hypervisor.h>
++#include <asm/tlbflush.h>
+ 
+ #include "cpu.h"
+ 
+@@ -1556,7 +1557,12 @@ static ssize_t l1tf_show_state(char *buf)
+ 
+ static ssize_t itlb_multihit_show_state(char *buf)
+ {
+-	if (itlb_multihit_kvm_mitigation)
++	if (!boot_cpu_has(X86_FEATURE_MSR_IA32_FEAT_CTL) ||
++	    !boot_cpu_has(X86_FEATURE_VMX))
++		return sprintf(buf, "KVM: Mitigation: VMX unsupported\n");
++	else if (!(cr4_read_shadow() & X86_CR4_VMXE))
++		return sprintf(buf, "KVM: Mitigation: VMX disabled\n");
++	else if (itlb_multihit_kvm_mitigation)
+ 		return sprintf(buf, "KVM: Mitigation: Split huge pages\n");
+ 	else
+ 		return sprintf(buf, "KVM: Vulnerable\n");
+-- 
+2.21.3
 
