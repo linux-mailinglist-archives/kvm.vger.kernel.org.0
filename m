@@ -2,143 +2,95 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6AB0022332B
-	for <lists+kvm@lfdr.de>; Fri, 17 Jul 2020 07:57:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8529122368D
+	for <lists+kvm@lfdr.de>; Fri, 17 Jul 2020 10:05:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726386AbgGQF5K (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 17 Jul 2020 01:57:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49778 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725807AbgGQF5J (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 17 Jul 2020 01:57:09 -0400
-Received: from ozlabs.org (ozlabs.org [IPv6:2401:3900:2:1::2])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0B03EC061755;
-        Thu, 16 Jul 2020 22:57:09 -0700 (PDT)
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (No client certificate requested)
-        by mail.ozlabs.org (Postfix) with ESMTPSA id 4B7L3z5kSgz9sQt;
-        Fri, 17 Jul 2020 15:57:03 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=canb.auug.org.au;
-        s=201702; t=1594965425;
-        bh=pogloshOGM434OcRKBF6s6ykZvFgAvuWoOESdMeuiYQ=;
-        h=Date:From:To:Cc:Subject:From;
-        b=Qh6uvWzU9USOoVdsHuNu9fBrdoTUryAb8L7RQvx42+KbM904Jpg/QAkQVAzaoCEWd
-         TYd71mEQtOaxgHgVkBEu7L8kn14f2SbliwRKDAcyU/KTeG05Bv+MqKF9Xi//sa5UkL
-         BzNBXO6HwX6qz5LmOPHV9eTmhV2YWZS9eyhac3rBSnrRCPAwxackvwxhOU52Ni8uJN
-         IzusT8QiRIzNqHR/Les5DWWLeLA96mxB+tLEjAVFP4+yiU6p9BPvpoJHkrLMyEnCKx
-         W0pDwPPaZHpO/t+JesjlkDXhVIZbu8pmfJRfkvO08lZRJxAxm7Ekvv8duZRNshXgi+
-         rgyqV0Ey1ytXQ==
-Date:   Fri, 17 Jul 2020 15:57:01 +1000
-From:   Stephen Rothwell <sfr@canb.auug.org.au>
-To:     Paolo Bonzini <pbonzini@redhat.com>, KVM <kvm@vger.kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@elte.hu>, "H. Peter Anvin" <hpa@zytor.com>,
-        Peter Zijlstra <peterz@infradead.org>
-Cc:     Linux Next Mailing List <linux-next@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-Subject: linux-next: build failure after merge of the kvm tree
-Message-ID: <20200717155701.2d7caebb@canb.auug.org.au>
+        id S1728220AbgGQIFk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 17 Jul 2020 04:05:40 -0400
+Received: from szxga06-in.huawei.com ([45.249.212.32]:52240 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726233AbgGQIFk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 17 Jul 2020 04:05:40 -0400
+Received: from DGGEMS405-HUB.china.huawei.com (unknown [172.30.72.60])
+        by Forcepoint Email with ESMTP id 06DC456026DCBC285F91;
+        Fri, 17 Jul 2020 16:05:36 +0800 (CST)
+Received: from DESKTOP-5IS4806.china.huawei.com (10.174.187.22) by
+ DGGEMS405-HUB.china.huawei.com (10.3.19.205) with Microsoft SMTP Server id
+ 14.3.487.0; Fri, 17 Jul 2020 16:05:26 +0800
+From:   Keqian Zhu <zhukeqian1@huawei.com>
+To:     <linux-kernel@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>,
+        <kvmarm@lists.cs.columbia.edu>, <kvm@vger.kernel.org>
+CC:     Marc Zyngier <maz@kernel.org>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        "Suzuki K Poulose" <suzuki.poulose@arm.com>,
+        <wanghaibin.wang@huawei.com>, Keqian Zhu <zhukeqian1@huawei.com>
+Subject: [PATCH] drivers: arm arch timer: Correct fault programming of CNTKCTL_EL1.EVNTI
+Date:   Fri, 17 Jul 2020 16:05:15 +0800
+Message-ID: <20200717080515.19088-1-zhukeqian1@huawei.com>
+X-Mailer: git-send-email 2.8.4.windows.1
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/A2+892SpS7JbA5SH7D40+2e";
- protocol="application/pgp-signature"; micalg=pgp-sha256
+Content-Type: text/plain
+X-Originating-IP: [10.174.187.22]
+X-CFilter-Loop: Reflected
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
---Sig_/A2+892SpS7JbA5SH7D40+2e
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+ARM virtual counter supports event stream, it can only trigger an event
+when the trigger bit (the value of CNTKCTL_EL1.EVNTI) of CNTVCT_EL0 changes,
+so the actual period of event stream is 2^(cntkctl_evnti + 1). For example,
+when the trigger bit is 0, then virtual counter trigger an event for every
+two cycles.
 
-Hi all,
-
-After merging the kvm tree, today's linux-next build (x86_64 allmodconfig)
-failed like this:
-
-arch/x86/kernel/kvm.c: In function '__sysvec_kvm_asyncpf_interrupt':
-arch/x86/kernel/kvm.c:275:13: error: implicit declaration of function 'idte=
-ntry_enter_cond_rcu'; did you mean 'idtentry_enter_nmi'? [-Werror=3Dimplici=
-t-function-declaration]
-  275 |  rcu_exit =3D idtentry_enter_cond_rcu(regs);
-      |             ^~~~~~~~~~~~~~~~~~~~~~~
-      |             idtentry_enter_nmi
-arch/x86/kernel/kvm.c:286:2: error: implicit declaration of function 'idten=
-try_exit_cond_rcu'; did you mean 'idtentry_exit_nmi'? [-Werror=3Dimplicit-f=
-unction-declaration]
-  286 |  idtentry_exit_cond_rcu(regs, rcu_exit);
-      |  ^~~~~~~~~~~~~~~~~~~~~~
-      |  idtentry_exit_nmi
-
-Caused by commit
-
-  b037b09b9058 ("x86/entry: Rename idtentry_enter/exit_cond_rcu() to idtent=
-ry_enter/exit()")
-
-from the tip tree interacting with commit
-
-  26d05b368a5c ("Merge branch 'kvm-async-pf-int' into HEAD")
-
-from the kvm tree.
-
-I have applied the following merge fix patch.
-
-From: Stephen Rothwell <sfr@canb.auug.org.au>
-Date: Fri, 17 Jul 2020 15:51:27 +1000
-Subject: [PATCH] fix up for idtentry_{enter,exit}_cond_rcu() renaming
-
-Signed-off-by: Stephen Rothwell <sfr@canb.auug.org.au>
+Signed-off-by: Keqian Zhu <zhukeqian1@huawei.com>
 ---
- arch/x86/kernel/kvm.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ drivers/clocksource/arm_arch_timer.c | 17 ++++++++++++++---
+ 1 file changed, 14 insertions(+), 3 deletions(-)
 
-diff --git a/arch/x86/kernel/kvm.c b/arch/x86/kernel/kvm.c
-index cebd96687194..91dd322f768d 100644
---- a/arch/x86/kernel/kvm.c
-+++ b/arch/x86/kernel/kvm.c
-@@ -270,9 +270,9 @@ DEFINE_IDTENTRY_SYSVEC(sysvec_kvm_asyncpf_interrupt)
+diff --git a/drivers/clocksource/arm_arch_timer.c b/drivers/clocksource/arm_arch_timer.c
+index ecf7b7db2d05..bc019dd0975b 100644
+--- a/drivers/clocksource/arm_arch_timer.c
++++ b/drivers/clocksource/arm_arch_timer.c
+@@ -799,10 +799,20 @@ static void __arch_timer_setup(unsigned type,
+ static void arch_timer_evtstrm_enable(int divider)
  {
- 	struct pt_regs *old_regs =3D set_irq_regs(regs);
- 	u32 token;
--	bool rcu_exit;
-+	idtentry_state_t state;
-=20
--	rcu_exit =3D idtentry_enter_cond_rcu(regs);
-+	state =3D idtentry_enter(regs);
-=20
- 	inc_irq_stat(irq_hv_callback_count);
-=20
-@@ -283,7 +283,7 @@ DEFINE_IDTENTRY_SYSVEC(sysvec_kvm_asyncpf_interrupt)
- 		wrmsrl(MSR_KVM_ASYNC_PF_ACK, 1);
- 	}
-=20
--	idtentry_exit_cond_rcu(regs, rcu_exit);
-+	idtentry_exit(regs, state);
- 	set_irq_regs(old_regs);
+ 	u32 cntkctl = arch_timer_get_cntkctl();
++	int cntkctl_evnti;
++
++	/*
++	 * Note that it can only trigger an event when the trigger bit
++	 * of CNTVCT_EL0 changes, so the actual period of event stream
++	 * is 2^(cntkctl_evnti + 1).
++	 */
++	cntkctl_evnti = divider - 1;
++	cntkctl_evnti = min(cntkctl_evnti, 15);
++	cntkctl_evnti = max(cntkctl_evnti, 0);
+ 
+ 	cntkctl &= ~ARCH_TIMER_EVT_TRIGGER_MASK;
+ 	/* Set the divider and enable virtual event stream */
+-	cntkctl |= (divider << ARCH_TIMER_EVT_TRIGGER_SHIFT)
++	cntkctl |= (cntkctl_evnti << ARCH_TIMER_EVT_TRIGGER_SHIFT)
+ 			| ARCH_TIMER_VIRT_EVT_EN;
+ 	arch_timer_set_cntkctl(cntkctl);
+ 	arch_timer_set_evtstrm_feature();
+@@ -816,10 +826,11 @@ static void arch_timer_configure_evtstream(void)
+ 	/* Find the closest power of two to the divisor */
+ 	evt_stream_div = arch_timer_rate / ARCH_TIMER_EVT_STREAM_FREQ;
+ 	pos = fls(evt_stream_div);
+-	if (pos > 1 && !(evt_stream_div & (1 << (pos - 2))))
++	if ((pos == 1) || (pos > 1 && !(evt_stream_div & (1 << (pos - 2)))))
+ 		pos--;
++
+ 	/* enable event stream */
+-	arch_timer_evtstrm_enable(min(pos, 15));
++	arch_timer_evtstrm_enable(pos);
  }
-=20
---=20
-2.27.0
+ 
+ static void arch_counter_set_user_access(void)
+-- 
+2.19.1
 
---=20
-Cheers,
-Stephen Rothwell
-
---Sig_/A2+892SpS7JbA5SH7D40+2e
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAl8RPa0ACgkQAVBC80lX
-0Gz2TggAl6/wSCerW01gjKj4t12AMidEFOAeQs+6Wu9p8rYdNsggQaPG4Y3mMJtr
-T44siKA0jHZ4iHFm/8BrjopwqDcJ5EGoOqAGm1MVOHZILE4Pjg22yxvJm5kc/1aQ
-8fxTiGMc5H5ntKpkeVlsVr+tumcQf1yAtQYhkHGbEloeVHBVS98rQkBzq/9ERLoN
-4DuLnOw6lalilJBSinhs431OzZL243An4aX+Li2S6rn57k9tNVd54xFzNGtUE3B6
-SRpG3twknomwuHVNDDFyL7EQ/eAZg8W2v5YGSqIe9YPvDL3M+Zjrfcsd9bwhD1+T
-5ieVxU+gK1WbvteqeTQGI4xQCndvtA==
-=rcvQ
------END PGP SIGNATURE-----
-
---Sig_/A2+892SpS7JbA5SH7D40+2e--
