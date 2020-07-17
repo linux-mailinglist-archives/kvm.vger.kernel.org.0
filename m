@@ -2,172 +2,213 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 79B22224080
-	for <lists+kvm@lfdr.de>; Fri, 17 Jul 2020 18:23:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0D576224094
+	for <lists+kvm@lfdr.de>; Fri, 17 Jul 2020 18:29:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726715AbgGQQWv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 17 Jul 2020 12:22:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33330 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726210AbgGQQWu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 17 Jul 2020 12:22:50 -0400
-Received: from galois.linutronix.de (Galois.linutronix.de [IPv6:2a0a:51c0:0:12e:550::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2BE34C0619D2;
-        Fri, 17 Jul 2020 09:22:50 -0700 (PDT)
-From:   Thomas Gleixner <tglx@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020; t=1595002968;
+        id S1726359AbgGQQ3s (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 17 Jul 2020 12:29:48 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:55812 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726221AbgGQQ3s (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 17 Jul 2020 12:29:48 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1595003386;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=VL5z70c9ivCEdV8jKg+QDjtim4MWFgGLQSfzhEgLqa4=;
-        b=DfxFj3JOgV4P677n+L/c5gnLES+uaqRVgDiXn4Zyua9k+6KCFkhE7/z4MS2WRsstct8xur
-        nZcrlvILdQK2ZAKEujSK+L0npVKy1e/7kIAKwoYjCbIcPFjNnih6kWQ5elx12s7QxdDCjU
-        PkR2xr/sEuc9eJbkHrs1QBVGajuzYT3up1jq1op76OkNoYB4+jnF0ljFojiMCIwnnIL4LN
-        6xTZATNPpKM0Erw/bQvMt94JNWe/l7yFBJ9NdrLsgnSp4/y3cKCfsQXioB630iNrzoEABF
-        eVzL2Vy2QjloV/c2ZBlGxJjKHJARusemqD0C1M6ReMZjLdhsTiolM6QSMBOEDA==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020e; t=1595002968;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=VL5z70c9ivCEdV8jKg+QDjtim4MWFgGLQSfzhEgLqa4=;
-        b=UV0QsqJXu+FJ1RFv4cdZ1We2LAZTtzHAlTORuWLNQvaypU2QZB7sSYNPBDGjwoP6zoBXn5
-        +ADCc0JiHIgn+RDw==
-To:     Doug Anderson <dianders@chromium.org>
-Cc:     Abhishek Bhardwaj <abhishekbh@google.com>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Anthony Steinhauser <asteinhauser@google.com>,
-        Borislav Petkov <bp@alien8.de>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Josh Poimboeuf <jpoimboe@redhat.com>,
-        Mark Gross <mgross@linux.intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Tony Luck <tony.luck@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Waiman Long <longman@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>, kvm@vger.kernel.org,
-        x86 <x86@kernel.org>
-Subject: Re: [PATCH v5] x86/speculation/l1tf: Add KConfig for setting the L1D cache flush mode
-In-Reply-To: <CAD=FV=WCu7o41iyn27vNBWo4f_X_XVy+PPPjBKc+70g5jd5+8w@mail.gmail.com>
-References: <20200708194715.4073300-1-abhishekbh@google.com> <87y2ntotah.fsf@nanos.tec.linutronix.de> <CAD=FV=WCu7o41iyn27vNBWo4f_X_XVy+PPPjBKc+70g5jd5+8w@mail.gmail.com>
-Date:   Fri, 17 Jul 2020 18:22:47 +0200
-Message-ID: <874kq6ru08.fsf@nanos.tec.linutronix.de>
+        bh=7bDe5Eo8YoDgzpgBHjRncuB5a0kbQWytFHxucrZtSpw=;
+        b=dkEtr7CbnAd3PMpVb7Sk3WiVdRz6732q1D2F+T24lS9td3wANLT/mAt4mBqwRB683Nxpno
+        lrcitG2Lm+sjc5jH5zli8QVQS3cOBu+8kAq6WsLvK163neNYdvWmPHYtPqIBpoOLfjPMza
+        Ma0tmyzD3aOmehwLTq0UmS/2ifeZW1E=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-432-D6KHX6QbNNeV_7wKi6OfLA-1; Fri, 17 Jul 2020 12:29:41 -0400
+X-MC-Unique: D6KHX6QbNNeV_7wKi6OfLA-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C5F9D8015CE;
+        Fri, 17 Jul 2020 16:29:39 +0000 (UTC)
+Received: from [10.36.115.54] (ovpn-115-54.ams2.redhat.com [10.36.115.54])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 6FE5F72E48;
+        Fri, 17 Jul 2020 16:29:30 +0000 (UTC)
+Subject: Re: [PATCH v5 02/15] iommu: Report domain nesting info
+To:     Liu Yi L <yi.l.liu@intel.com>, alex.williamson@redhat.com,
+        baolu.lu@linux.intel.com, joro@8bytes.org
+Cc:     kevin.tian@intel.com, jacob.jun.pan@linux.intel.com,
+        ashok.raj@intel.com, jun.j.tian@intel.com, yi.y.sun@intel.com,
+        jean-philippe@linaro.org, peterx@redhat.com, hao.wu@intel.com,
+        stefanha@gmail.com, iommu@lists.linux-foundation.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <1594552870-55687-1-git-send-email-yi.l.liu@intel.com>
+ <1594552870-55687-3-git-send-email-yi.l.liu@intel.com>
+From:   Auger Eric <eric.auger@redhat.com>
+Message-ID: <99c20ada-b7e8-44f6-e036-ab905d119119@redhat.com>
+Date:   Fri, 17 Jul 2020 18:29:28 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <1594552870-55687-3-git-send-email-yi.l.liu@intel.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Doug,
+Hi Yi,
 
-Doug Anderson <dianders@chromium.org> writes:
-> On Thu, Jul 9, 2020 at 3:51 AM Thomas Gleixner <tglx@linutronix.de> wrote:
->> TBH, I don't see why this is a good idea.
->>
->>  1) I'm not following your argumentation that the command line option is
->>     a poor Kconfig replacement. The L1TF mode is a boot time (module
->>     load time) decision and the command line parameter is there to
->>     override the carefully chosen and sensible default behaviour.
->
-> When you say that the default behavior is carefully chosen and
-> sensible, are you saying that (in your opinion) there would never be a
-> good reason for someone distributing a kernel to others to change the
-> default?  Certainly I agree that having the kernel command line
-> parameter is nice to allow someone to override whatever the person
-> building the kernel chose, but IMO it's not a good way to change the
-> default built-in to the kernel.
+On 7/12/20 1:20 PM, Liu Yi L wrote:
+> IOMMUs that support nesting translation needs report the capability info
+s/needs/need to report
+> to userspace, e.g. the format of first level/stage paging structures.
+It gives information about requirements the userspace needs to implement
+plus other features characterizing the physical implementation.
+> 
+> This patch reports nesting info by DOMAIN_ATTR_NESTING. Caller can get
+> nesting info after setting DOMAIN_ATTR_NESTING.
+I guess you meant after selecting VFIO_TYPE1_NESTING_IOMMU?
+> 
+> Cc: Kevin Tian <kevin.tian@intel.com>
+> CC: Jacob Pan <jacob.jun.pan@linux.intel.com>
+> Cc: Alex Williamson <alex.williamson@redhat.com>
+> Cc: Eric Auger <eric.auger@redhat.com>
+> Cc: Jean-Philippe Brucker <jean-philippe@linaro.org>
+> Cc: Joerg Roedel <joro@8bytes.org>
+> Cc: Lu Baolu <baolu.lu@linux.intel.com>
+> Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
+> Signed-off-by: Jacob Pan <jacob.jun.pan@linux.intel.com>
+> ---
+> v4 -> v5:
+> *) address comments from Eric Auger.
+> 
+> v3 -> v4:
+> *) split the SMMU driver changes to be a separate patch
+> *) move the @addr_width and @pasid_bits from vendor specific
+>    part to generic part.
+> *) tweak the description for the @features field of struct
+>    iommu_nesting_info.
+> *) add description on the @data[] field of struct iommu_nesting_info
+> 
+> v2 -> v3:
+> *) remvoe cap/ecap_mask in iommu_nesting_info.
+> *) reuse DOMAIN_ATTR_NESTING to get nesting info.
+> *) return an empty iommu_nesting_info for SMMU drivers per Jean'
+>    suggestion.
+> ---
+>  include/uapi/linux/iommu.h | 77 ++++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 77 insertions(+)
+> 
+> diff --git a/include/uapi/linux/iommu.h b/include/uapi/linux/iommu.h
+> index 1afc661..d2a47c4 100644
+> --- a/include/uapi/linux/iommu.h
+> +++ b/include/uapi/linux/iommu.h
+> @@ -332,4 +332,81 @@ struct iommu_gpasid_bind_data {
+>  	} vendor;
+>  };
+>  
+> +/*
+> + * struct iommu_nesting_info - Information for nesting-capable IOMMU.
+> + *			       user space should check it before using
+> + *			       nesting capability.
+> + *
+> + * @size:	size of the whole structure
+> + * @format:	PASID table entry format, the same definition as struct
+> + *		iommu_gpasid_bind_data @format.
+> + * @features:	supported nesting features.
+> + * @flags:	currently reserved for future extension.
+> + * @addr_width:	The output addr width of first level/stage translation
+> + * @pasid_bits:	Maximum supported PASID bits, 0 represents no PASID
+> + *		support.
+> + * @data:	vendor specific cap info. data[] structure type can be deduced
+> + *		from @format field.
+> + *
+> + * +===============+======================================================+
+> + * | feature       |  Notes                                               |
+> + * +===============+======================================================+
+> + * | SYSWIDE_PASID |  PASIDs are managed in system-wide, instead of per   |
+s/in system-wide/system-wide ?
+> + * |               |  device. When a device is assigned to userspace or   |
+> + * |               |  VM, proper uAPI (userspace driver framework uAPI,   |
+> + * |               |  e.g. VFIO) must be used to allocate/free PASIDs for |
+> + * |               |  the assigned device.          
+Isn't it possible to be more explicit, something like:
+                      |
+System-wide PASID management is mandated by the physical IOMMU. All
+PASIDs allocation must be mediated through the TBD API.
+> + * +---------------+------------------------------------------------------+
+> + * | BIND_PGTBL    |  The owner of the first level/stage page table must  |
+> + * |               |  explicitly bind the page table to associated PASID  |
+> + * |               |  (either the one specified in bind request or the    |
+> + * |               |  default PASID of iommu domain), through userspace   |
+> + * |               |  driver framework uAPI (e.g. VFIO_IOMMU_NESTING_OP). |
+As per your answer in https://lkml.org/lkml/2020/7/6/383, I now
+understand ARM would not expose that BIND_PGTBL nesting feature, I still
+think the above wording is a bit confusing. Maybe you may explicitly
+talk about the PASID *entry* that needs to be passed from guest to host.
+On ARM we directly pass the PASID table but when reading the above
+description I fail to determine if this does not fit that description.
+> + * +---------------+------------------------------------------------------+
+> + * | CACHE_INVLD   |  The owner of the first level/stage page table must  |
+> + * |               |  explicitly invalidate the IOMMU cache through uAPI  |
+> + * |               |  provided by userspace driver framework (e.g. VFIO)  |
+> + * |               |  according to vendor-specific requirement when       |
+> + * |               |  changing the page table.                            |
+> + * +---------------+------------------------------------------------------+
 
-The problem is that you have to be careful about what you stick into
-Kconfig. It's L1TF on x86 today and tomorrow it's MDS and whatever and
-then you do the same thing on the other architectures as well. And we
-still need the command line options so that generic builds can be
-customized at boot time.
+instead of using the "uAPI provided by userspace driver framework (e.g.
+VFIO)", can't we use the so-called IOMMU UAPI terminology which now has
+a userspace documentation?
 
-> The current plan (as I understand it) is that we'd like to ship
-> Chromebook kernels with this option changed from the default that's
-> there now.  In your opinion, is that a sane thing to do?
+> + *
+> + * @data[] types defined for @format:
+> + * +================================+=====================================+
+> + * | @format                        | @data[]                             |
+> + * +================================+=====================================+
+> + * | IOMMU_PASID_FORMAT_INTEL_VTD   | struct iommu_nesting_info_vtd       |
+> + * +--------------------------------+-------------------------------------+
+> + *
+> + */
+> +struct iommu_nesting_info {
+> +	__u32	size;
+shouldn't it be @argsz to fit the iommu uapi convention and take benefit
+to put the flags field just below?
+> +	__u32	format;
+> +#define IOMMU_NESTING_FEAT_SYSWIDE_PASID	(1 << 0)
+> +#define IOMMU_NESTING_FEAT_BIND_PGTBL		(1 << 1)
+> +#define IOMMU_NESTING_FEAT_CACHE_INVLD		(1 << 2)
+> +	__u32	features;
+> +	__u32	flags;
+> +	__u16	addr_width;
+> +	__u16	pasid_bits;
+> +	__u32	padding;
+> +	__u8	data[];
+> +};
+> +
+> +/*
+> + * struct iommu_nesting_info_vtd - Intel VT-d specific nesting info
+> + *
+> + * @flags:	VT-d specific flags. Currently reserved for future
+> + *		extension.
+must be set to 0?
+> + * @cap_reg:	Describe basic capabilities as defined in VT-d capability
+> + *		register.
+> + * @ecap_reg:	Describe the extended capabilities as defined in VT-d
+> + *		extended capability register.
+> + */
+> +struct iommu_nesting_info_vtd {
+> +	__u32	flags;
+> +	__u32	padding;
+> +	__u64	cap_reg;
+> +	__u64	ecap_reg;
+> +};
+> +
+>  #endif /* _UAPI_IOMMU_H */
+Thanks
 
-If it's sane for you folks, then feel free to do so. Distros & al patch
-the kernel do death anyway, but that does not mean that mainline has to
-have everything these people chose to do.
+Eric
+> 
 
->>  2) You can add the desired mode to the compiled in (partial) kernel
->>     command line today.
->
-> This might be easier on x86 than it is on ARM.  ARM (and ARM64)
-> kernels only have two modes: kernel provides cmdline and bootloader
-> provides cmdline.  There are out-of-mainline ANDROID patches to
-> address this but nothing in mainline.
->
-> The patch we're discussing now is x86-only so it's not such a huge
-> deal, but the fact that combining the kernel and bootloader
-> commandline never landed in mainline for arm/arm64 means that this
-> isn't a super common/expected thing to do.
-
-Did you try to get that merged for arm/arm64?
-
->>  3) Boot loaders are well capable of handling large kernel command lines
->>     and the extra time spend for reading the parameter does not matter
->>     at all.
->
-> Long command lines can still be a bit of a chore for humans to deal
-> with.  Many times I've needed to look at "/proc/cmdline" and make
-> sense of it.  The longer the command line is and the more cruft
-> stuffed into it the more of a chore it is.  Yes, this is just one
-> thing to put in the command line, but if 10 different drivers all have
-> their "one thing" to put there it gets really long.  If 100 different
-> drivers all want their one config option there it gets really really
-> long.
-
-This will not go away when you want to support a gazillion of systems
-which need tweaks left and right due to creative hardware/BIOS with a
-generic kernel. And come on, parsing a long command line is not rocket
-science and it's not something you do every two minutes.
-
-> IMO the command line should be a last resort place to put
-> things and should just contain:
->
-> 1. Legacy things that _have_ to be in the command line because they've
-> always been there.
->
-> 2. Things that the bootloader/BIOS needs to communicate to the kernel
-> and has no better way to communicate.
->
-> 3. Cases where the person running the kernel needs to override a
-> default set by the person compiling the kernel.
-
-Which is the case for a lot of things and it's widely used exactly for
-that reason.
-
->>  4) It's just a tiny part of the whole speculation maze. If we go there
->>     for L1TF then we open the flood gates for a gazillion other config
->>     options.
->
-> It seems like the only options that we'd need CONFIG option for would
-> be the ones where it would be sane to change the default compiled into
-> the kernel.  Hopefully that's not too many things?
-
-That's what _you_ need. But accepting this we set a precedence and how
-do I argue that L1TF makes sense, but other things not? This stuff is
-horrible enough already, no need to add more ifdefs and options and
-whatever to it.
-
-> Obviously, like many design choices, the above is all subjective.
-> It's really your call and if these arguments don't convince you it
-> sounds like the way forward is just to use "CONFIG_CMDLINE" and take
-> advantage of the fact that on x86 this will get merged with the
-> bootloader's command line.
-
-I rather see the support for command line merging extended to arm/arm64
-because that's of general usefulness beyond the problem at hand.
-
-Thanks,
-
-        tglx
