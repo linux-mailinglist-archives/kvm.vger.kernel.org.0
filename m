@@ -2,56 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A9A512231B2
-	for <lists+kvm@lfdr.de>; Fri, 17 Jul 2020 05:32:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8146E2231EA
+	for <lists+kvm@lfdr.de>; Fri, 17 Jul 2020 06:02:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726557AbgGQDce (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 16 Jul 2020 23:32:34 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:36642 "EHLO
+        id S1726334AbgGQEB7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 17 Jul 2020 00:01:59 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:39430 "EHLO
         us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726231AbgGQDcd (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 16 Jul 2020 23:32:33 -0400
+        with ESMTP id S1725807AbgGQEB6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 17 Jul 2020 00:01:58 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1594956751;
+        s=mimecast20190719; t=1594958517;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=6T/hdsKA4gVeLb5zmHKTsZJah3hEDlOSvih8w3wco3Y=;
-        b=W3FKsAWFAQEA+dIAWWZ8ic+cpf17rYiMxgaLrWgzPBwUjTwqnyl0ZDuAJWwutr7vHkI5hy
-        bEQbF05vErDxXG5VwJLHQ9jinyhHJeaeCbsqOKdKBLzAFh7v8WpMLLiQzuUf7mSJK1aFBe
-        7j3wdFOhrS5ibh5exgMV2k3magpQPaI=
+        bh=GnU865a+lrjDGK+CDwUgz8/N+HiB0/YUZTXlDxqFfkc=;
+        b=Lnpoc3BAXud4leKJwabzAB77uXBySJEM4yjCK1gLgecj3xCS/6mvTEj/dhdY7Nn7n2MGkU
+        EodA5HwTGdkbhTAwBtft+SnaiIXusxvy/4mSpqe4JEe5wkQPakque+zpZdzAmkpwp1c4vy
+        vjVgnEIaY9tzCYFVvXBRjlSw/mYk46c=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-165-TgXkhmXkNImcuP1mthYH7w-1; Thu, 16 Jul 2020 23:32:29 -0400
-X-MC-Unique: TgXkhmXkNImcuP1mthYH7w-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+ us-mta-220-AwkVz91IP9mfwhYFxiVpqg-1; Fri, 17 Jul 2020 00:01:53 -0400
+X-MC-Unique: AwkVz91IP9mfwhYFxiVpqg-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A0CD1107ACCA;
-        Fri, 17 Jul 2020 03:32:27 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F0BCE1888AB4;
+        Fri, 17 Jul 2020 04:01:51 +0000 (UTC)
 Received: from [10.72.12.157] (ovpn-12-157.pek2.redhat.com [10.72.12.157])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 5A23F74F64;
-        Fri, 17 Jul 2020 03:32:11 +0000 (UTC)
-Subject: Re: [PATCH V2 1/6] vhost: introduce vhost_call_ctx
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 6EB7D78A59;
+        Fri, 17 Jul 2020 04:01:34 +0000 (UTC)
+Subject: Re: [PATCH V2 2/6] kvm: detect assigned device via irqbypass manager
 To:     Zhu Lingshan <lingshan.zhu@intel.com>, mst@redhat.com,
         alex.williamson@redhat.com, pbonzini@redhat.com,
         sean.j.christopherson@intel.com, wanpengli@tencent.com
 Cc:     virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
         kvm@vger.kernel.org
 References: <1594898629-18790-1-git-send-email-lingshan.zhu@intel.com>
- <1594898629-18790-2-git-send-email-lingshan.zhu@intel.com>
+ <1594898629-18790-3-git-send-email-lingshan.zhu@intel.com>
 From:   Jason Wang <jasowang@redhat.com>
-Message-ID: <871ee1c1-8cf7-3d9d-1892-5991b92e5db3@redhat.com>
-Date:   Fri, 17 Jul 2020 11:32:08 +0800
+Message-ID: <f8e0ced4-2883-e022-8fd0-1224987ebef1@redhat.com>
+Date:   Fri, 17 Jul 2020 12:01:29 +0800
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <1594898629-18790-2-git-send-email-lingshan.zhu@intel.com>
+In-Reply-To: <1594898629-18790-3-git-send-email-lingshan.zhu@intel.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
@@ -59,148 +59,57 @@ X-Mailing-List: kvm@vger.kernel.org
 
 
 On 2020/7/16 下午7:23, Zhu Lingshan wrote:
-> This commit introduces struct vhost_call_ctx which replaced
-> raw struct eventfd_ctx *call_ctx in struct vhost_virtqueue.
-> Besides eventfd_ctx, it contains a spin lock and an
-> irq_bypass_producer in its structure.
->
-> Signed-off-by: Zhu Lingshan <lingshan.zhu@intel.com>
-> Suggested-by: Jason Wang <jasowang@redhat.com>
-> ---
->   drivers/vhost/vdpa.c  |  4 ++--
->   drivers/vhost/vhost.c | 22 ++++++++++++++++------
->   drivers/vhost/vhost.h |  9 ++++++++-
->   3 files changed, 26 insertions(+), 9 deletions(-)
->
-> diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
-> index 7580e34..2fcc422 100644
-> --- a/drivers/vhost/vdpa.c
-> +++ b/drivers/vhost/vdpa.c
-> @@ -96,7 +96,7 @@ static void handle_vq_kick(struct vhost_work *work)
->   static irqreturn_t vhost_vdpa_virtqueue_cb(void *private)
->   {
->   	struct vhost_virtqueue *vq = private;
-> -	struct eventfd_ctx *call_ctx = vq->call_ctx;
-> +	struct eventfd_ctx *call_ctx = vq->call_ctx.ctx;
->   
->   	if (call_ctx)
->   		eventfd_signal(call_ctx, 1);
-> @@ -382,7 +382,7 @@ static long vhost_vdpa_vring_ioctl(struct vhost_vdpa *v, unsigned int cmd,
->   		break;
->   
->   	case VHOST_SET_VRING_CALL:
-> -		if (vq->call_ctx) {
-> +		if (vq->call_ctx.ctx) {
->   			cb.callback = vhost_vdpa_virtqueue_cb;
->   			cb.private = vq;
->   		} else {
-> diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
-> index d7b8df3..4004e94 100644
-> --- a/drivers/vhost/vhost.c
-> +++ b/drivers/vhost/vhost.c
-> @@ -298,6 +298,13 @@ static void vhost_vq_meta_reset(struct vhost_dev *d)
->   		__vhost_vq_meta_reset(d->vqs[i]);
->   }
->   
-> +static void vhost_call_ctx_reset(struct vhost_call_ctx *call_ctx)
-> +{
-> +	call_ctx->ctx = NULL;
-> +	memset(&call_ctx->producer, 0x0, sizeof(struct irq_bypass_producer));
-> +	spin_lock_init(&call_ctx->ctx_lock);
-> +}
-> +
->   static void vhost_vq_reset(struct vhost_dev *dev,
->   			   struct vhost_virtqueue *vq)
->   {
-> @@ -319,13 +326,13 @@ static void vhost_vq_reset(struct vhost_dev *dev,
->   	vq->log_base = NULL;
->   	vq->error_ctx = NULL;
->   	vq->kick = NULL;
-> -	vq->call_ctx = NULL;
->   	vq->log_ctx = NULL;
->   	vhost_reset_is_le(vq);
->   	vhost_disable_cross_endian(vq);
->   	vq->busyloop_timeout = 0;
->   	vq->umem = NULL;
->   	vq->iotlb = NULL;
-> +	vhost_call_ctx_reset(&vq->call_ctx);
->   	__vhost_vq_meta_reset(vq);
->   }
->   
-> @@ -685,8 +692,8 @@ void vhost_dev_cleanup(struct vhost_dev *dev)
->   			eventfd_ctx_put(dev->vqs[i]->error_ctx);
->   		if (dev->vqs[i]->kick)
->   			fput(dev->vqs[i]->kick);
-> -		if (dev->vqs[i]->call_ctx)
-> -			eventfd_ctx_put(dev->vqs[i]->call_ctx);
-> +		if (dev->vqs[i]->call_ctx.ctx)
-> +			eventfd_ctx_put(dev->vqs[i]->call_ctx.ctx);
->   		vhost_vq_reset(dev, dev->vqs[i]);
->   	}
->   	vhost_dev_free_iovecs(dev);
-> @@ -1629,7 +1636,10 @@ long vhost_vring_ioctl(struct vhost_dev *d, unsigned int ioctl, void __user *arg
->   			r = PTR_ERR(ctx);
->   			break;
->   		}
-> -		swap(ctx, vq->call_ctx);
-> +
-> +		spin_lock(&vq->call_ctx.ctx_lock);
-> +		swap(ctx, vq->call_ctx.ctx);
-> +		spin_unlock(&vq->call_ctx.ctx_lock);
->   		break;
->   	case VHOST_SET_VRING_ERR:
->   		if (copy_from_user(&f, argp, sizeof f)) {
-> @@ -2440,8 +2450,8 @@ static bool vhost_notify(struct vhost_dev *dev, struct vhost_virtqueue *vq)
->   void vhost_signal(struct vhost_dev *dev, struct vhost_virtqueue *vq)
->   {
->   	/* Signal the Guest tell them we used something up. */
-> -	if (vq->call_ctx && vhost_notify(dev, vq))
-> -		eventfd_signal(vq->call_ctx, 1);
-> +	if (vq->call_ctx.ctx && vhost_notify(dev, vq))
-> +		eventfd_signal(vq->call_ctx.ctx, 1);
->   }
->   EXPORT_SYMBOL_GPL(vhost_signal);
->   
-> diff --git a/drivers/vhost/vhost.h b/drivers/vhost/vhost.h
-> index c8e96a0..402c62e 100644
-> --- a/drivers/vhost/vhost.h
-> +++ b/drivers/vhost/vhost.h
-> @@ -13,6 +13,7 @@
->   #include <linux/virtio_ring.h>
->   #include <linux/atomic.h>
->   #include <linux/vhost_iotlb.h>
-> +#include <linux/irqbypass.h>
->   
->   struct vhost_work;
->   typedef void (*vhost_work_fn_t)(struct vhost_work *work);
-> @@ -60,6 +61,12 @@ enum vhost_uaddr_type {
->   	VHOST_NUM_ADDRS = 3,
->   };
->   
-> +struct vhost_call_ctx {
+> vDPA devices has dedicated backed hardware like
+> passthrough-ed devices. Then it is possible to setup irq
+> offloading to vCPU for vDPA devices. Thus this patch tries to
+> manipulated assigned device counters via irqbypass manager.
 
 
-I think maybe "vhost_vring_call" is a better name since it contains not 
-only the eventfd_ctx now.
+This part needs some tweak, e.g why assigned device could be detected 
+through this way.
+
+
+>
+> We will increase/decrease the assigned device counter in kvm/x86.
+
+
+And you need explain why we don't need similar thing in other arch.
 
 Thanks
 
 
-> +	struct eventfd_ctx *ctx;
-> +	struct irq_bypass_producer producer;
-> +	spinlock_t ctx_lock;
-> +};
-> +
->   /* The virtqueue structure describes a queue attached to a device. */
->   struct vhost_virtqueue {
->   	struct vhost_dev *dev;
-> @@ -72,7 +79,7 @@ struct vhost_virtqueue {
->   	vring_used_t __user *used;
->   	const struct vhost_iotlb_map *meta_iotlb[VHOST_NUM_ADDRS];
->   	struct file *kick;
-> -	struct eventfd_ctx *call_ctx;
-> +	struct vhost_call_ctx call_ctx;
->   	struct eventfd_ctx *error_ctx;
->   	struct eventfd_ctx *log_ctx;
+> Both vDPA and VFIO would go through this code path.
+>
+> This code path only affect x86 for now.
+>
+> Signed-off-by: Zhu Lingshan <lingshan.zhu@intel.com>
+> Suggested-by: Jason Wang <jasowang@redhat.com>
+> ---
+>   arch/x86/kvm/x86.c | 10 ++++++++--
+>   1 file changed, 8 insertions(+), 2 deletions(-)
+>
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 00c88c2..20c07d3 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -10624,11 +10624,17 @@ int kvm_arch_irq_bypass_add_producer(struct irq_bypass_consumer *cons,
+>   {
+>   	struct kvm_kernel_irqfd *irqfd =
+>   		container_of(cons, struct kvm_kernel_irqfd, consumer);
+> +	int ret;
 >   
+>   	irqfd->producer = prod;
+> +	kvm_arch_start_assignment(irqfd->kvm);
+> +	ret = kvm_x86_ops.update_pi_irte(irqfd->kvm,
+> +					 prod->irq, irqfd->gsi, 1);
+> +
+> +	if (ret)
+> +		kvm_arch_end_assignment(irqfd->kvm);
+>   
+> -	return kvm_x86_ops.update_pi_irte(irqfd->kvm,
+> -					   prod->irq, irqfd->gsi, 1);
+> +	return ret;
+>   }
+>   
+>   void kvm_arch_irq_bypass_del_producer(struct irq_bypass_consumer *cons,
 
