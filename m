@@ -2,132 +2,115 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5911F224191
-	for <lists+kvm@lfdr.de>; Fri, 17 Jul 2020 19:14:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CEE0622419F
+	for <lists+kvm@lfdr.de>; Fri, 17 Jul 2020 19:18:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726635AbgGQRO0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 17 Jul 2020 13:14:26 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:47500 "EHLO
+        id S1726557AbgGQRSd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 17 Jul 2020 13:18:33 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:33475 "EHLO
         us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726205AbgGQRO0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 17 Jul 2020 13:14:26 -0400
+        with ESMTP id S1726293AbgGQRSd (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 17 Jul 2020 13:18:33 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1595006063;
+        s=mimecast20190719; t=1595006311;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=h7Vro6oATDfc57wTbAGmgD4ZVMjfXELJBQKUa0OblJs=;
-        b=BVms1uMgV4BI9jgIDpYG8/kUOelur+zmDR72hY5LZ06Ntk8LGXpPu/YioDt7pb8UIu08mI
-        C7V2KuVBfwWXXI0ssAQ8dZPO89LqqqXuH/9LT2LAsTH5OXteBezcjcYapVlVsmY7uC/Mn7
-        WZ+qn4OgWz/0XX3LH3NXkqQDclKPBDU=
+        bh=gpEKoCVUb0H9sRGX33KH+Wdr5W7X+RwCM8FI3G3gcaI=;
+        b=S7MrObvtboz9QHu2ADL2mNK5tduNg779jfII+QleG8vmKgV/TuYhk1QiiO1Iu4uDK2DrGY
+        3QkojwTuiQVg2pgo2umtLGqPAu5G9oly7e5NpJ+ymI82XWAQ7Db0xchpfV2ZGXzK3SWYb4
+        KpfnXTE4YdjrvWkmG3FzblmJlRVMc9Y=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-63-mBLot0W0O2qV29HKiIlQ-Q-1; Fri, 17 Jul 2020 13:14:19 -0400
-X-MC-Unique: mBLot0W0O2qV29HKiIlQ-Q-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+ us-mta-34-gw8k3hR8OzK81GZ112l71Q-1; Fri, 17 Jul 2020 13:18:29 -0400
+X-MC-Unique: gw8k3hR8OzK81GZ112l71Q-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DAF2F18A1DE5;
-        Fri, 17 Jul 2020 17:14:17 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 39F2C8005B0;
+        Fri, 17 Jul 2020 17:18:27 +0000 (UTC)
 Received: from [10.36.115.54] (ovpn-115-54.ams2.redhat.com [10.36.115.54])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id C8FF910013C4;
-        Fri, 17 Jul 2020 17:14:08 +0000 (UTC)
-Subject: Re: [PATCH v5 15/15] iommu/vt-d: Support reporting nesting capability
- info
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 924B75C1D4;
+        Fri, 17 Jul 2020 17:18:17 +0000 (UTC)
+Subject: Re: [PATCH v5 03/15] iommu/smmu: Report empty domain nesting info
 To:     Liu Yi L <yi.l.liu@intel.com>, alex.williamson@redhat.com,
         baolu.lu@linux.intel.com, joro@8bytes.org
 Cc:     kevin.tian@intel.com, jacob.jun.pan@linux.intel.com,
         ashok.raj@intel.com, jun.j.tian@intel.com, yi.y.sun@intel.com,
         jean-philippe@linaro.org, peterx@redhat.com, hao.wu@intel.com,
         stefanha@gmail.com, iommu@lists.linux-foundation.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Will Deacon <will@kernel.org>,
+        Robin Murphy <robin.murphy@arm.com>
 References: <1594552870-55687-1-git-send-email-yi.l.liu@intel.com>
- <1594552870-55687-16-git-send-email-yi.l.liu@intel.com>
+ <1594552870-55687-4-git-send-email-yi.l.liu@intel.com>
 From:   Auger Eric <eric.auger@redhat.com>
-Message-ID: <be27f7ee-3fac-d1c5-0cd9-9581f8827de6@redhat.com>
-Date:   Fri, 17 Jul 2020 19:14:07 +0200
+Message-ID: <5ee6b661-9c46-20ee-332a-1a449b6f3a43@redhat.com>
+Date:   Fri, 17 Jul 2020 19:18:15 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <1594552870-55687-16-git-send-email-yi.l.liu@intel.com>
+In-Reply-To: <1594552870-55687-4-git-send-email-yi.l.liu@intel.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Yi,
+Yi,
 
-Missing a proper commit message. You can comment on the fact you only
-support the case where all the physical iomms have the same CAP/ECAP MASKS
+On 7/12/20 1:20 PM, Liu Yi L wrote:
+> This patch is added as instead of returning a boolean for DOMAIN_ATTR_NESTING,
+> iommu_domain_get_attr() should return an iommu_nesting_info handle.
 
-On 7/12/20 1:21 PM, Liu Yi L wrote:
-> Cc: Kevin Tian <kevin.tian@intel.com>
-> CC: Jacob Pan <jacob.jun.pan@linux.intel.com>
-> Cc: Alex Williamson <alex.williamson@redhat.com>
+you may add in the commit message you return an empty nesting info
+struct for now as true nesting is not yet supported by the SMMUs.
+
+Besides:
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
+
+Thanks
+
+Eric
+> 
+> Cc: Will Deacon <will@kernel.org>
+> Cc: Robin Murphy <robin.murphy@arm.com>
 > Cc: Eric Auger <eric.auger@redhat.com>
 > Cc: Jean-Philippe Brucker <jean-philippe@linaro.org>
-> Cc: Joerg Roedel <joro@8bytes.org>
-> Cc: Lu Baolu <baolu.lu@linux.intel.com>
+> Suggested-by: Jean-Philippe Brucker <jean-philippe@linaro.org>
 > Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
 > Signed-off-by: Jacob Pan <jacob.jun.pan@linux.intel.com>
 > ---
-> v2 -> v3:
-> *) remove cap/ecap_mask in iommu_nesting_info.
+> v4 -> v5:
+> *) address comments from Eric Auger.
 > ---
->  drivers/iommu/intel/iommu.c | 81 +++++++++++++++++++++++++++++++++++++++++++--
->  include/linux/intel-iommu.h | 16 +++++++++
->  2 files changed, 95 insertions(+), 2 deletions(-)
+>  drivers/iommu/arm-smmu-v3.c | 29 +++++++++++++++++++++++++++--
+>  drivers/iommu/arm-smmu.c    | 29 +++++++++++++++++++++++++++--
+>  2 files changed, 54 insertions(+), 4 deletions(-)
 > 
-> diff --git a/drivers/iommu/intel/iommu.c b/drivers/iommu/intel/iommu.c
-> index a9504cb..9f7ad1a 100644
-> --- a/drivers/iommu/intel/iommu.c
-> +++ b/drivers/iommu/intel/iommu.c
-> @@ -5659,12 +5659,16 @@ static inline bool iommu_pasid_support(void)
->  static inline bool nested_mode_support(void)
->  {
->  	struct dmar_drhd_unit *drhd;
-> -	struct intel_iommu *iommu;
-> +	struct intel_iommu *iommu, *prev = NULL;
->  	bool ret = true;
->  
->  	rcu_read_lock();
->  	for_each_active_iommu(iommu, drhd) {
-> -		if (!sm_supported(iommu) || !ecap_nest(iommu->ecap)) {
-> +		if (!prev)
-> +			prev = iommu;
-> +		if (!sm_supported(iommu) || !ecap_nest(iommu->ecap) ||
-> +		    (VTD_CAP_MASK & (iommu->cap ^ prev->cap)) ||
-> +		    (VTD_ECAP_MASK & (iommu->ecap ^ prev->ecap))) {
->  			ret = false;
->  			break;>  		}
-> @@ -6079,6 +6083,78 @@ intel_iommu_domain_set_attr(struct iommu_domain *domain,
->  	return ret;
+> diff --git a/drivers/iommu/arm-smmu-v3.c b/drivers/iommu/arm-smmu-v3.c
+> index f578677..ec815d7 100644
+> --- a/drivers/iommu/arm-smmu-v3.c
+> +++ b/drivers/iommu/arm-smmu-v3.c
+> @@ -3019,6 +3019,32 @@ static struct iommu_group *arm_smmu_device_group(struct device *dev)
+>  	return group;
 >  }
 >  
-> +static int intel_iommu_get_nesting_info(struct iommu_domain *domain,
-> +					struct iommu_nesting_info *info)
+> +static int arm_smmu_domain_nesting_info(struct arm_smmu_domain *smmu_domain,
+> +					void *data)
 > +{
-> +	struct dmar_domain *dmar_domain = to_dmar_domain(domain);
-> +	u64 cap = VTD_CAP_MASK, ecap = VTD_ECAP_MASK;
-> +	struct device_domain_info *domain_info;
-> +	struct iommu_nesting_info_vtd vtd;
-> +	unsigned long flags;
+> +	struct iommu_nesting_info *info = (struct iommu_nesting_info *)data;
 > +	unsigned int size;
 > +
-> +	if (domain->type != IOMMU_DOMAIN_UNMANAGED ||
-> +	    !(dmar_domain->flags & DOMAIN_FLAG_NESTING_MODE))
+> +	if (!info || smmu_domain->stage != ARM_SMMU_DOMAIN_NESTED)
 > +		return -ENODEV;
 > +
-> +	if (!info)
-> +		return -EINVAL;
+> +	size = sizeof(struct iommu_nesting_info);
 > +
-> +	size = sizeof(struct iommu_nesting_info) +
-> +		sizeof(struct iommu_nesting_info_vtd);
 > +	/*
 > +	 * if provided buffer size is smaller than expected, should
 > +	 * return 0 and also the expected buffer size to caller.
@@ -137,93 +120,71 @@ On 7/12/20 1:21 PM, Liu Yi L wrote:
 > +		return 0;
 > +	}
 > +
-> +	spin_lock_irqsave(&device_domain_lock, flags);
-> +	/*
-> +	 * arbitrary select the first domain_info as all nesting
-> +	 * related capabilities should be consistent across iommu
-> +	 * units.
-> +	 */
-> +	domain_info = list_first_entry(&dmar_domain->devices,
-> +				       struct device_domain_info, link);
-> +	cap &= domain_info->iommu->cap;
-> +	ecap &= domain_info->iommu->ecap;
-> +	spin_unlock_irqrestore(&device_domain_lock, flags);
-> +
-> +	info->format = IOMMU_PASID_FORMAT_INTEL_VTD;
-> +	info->features = IOMMU_NESTING_FEAT_SYSWIDE_PASID |
-> +			 IOMMU_NESTING_FEAT_BIND_PGTBL |
-> +			 IOMMU_NESTING_FEAT_CACHE_INVLD;
-> +	info->addr_width = dmar_domain->gaw;
-> +	info->pasid_bits = ilog2(intel_pasid_max_id);
-> +	info->padding = 0;
-> +	vtd.flags = 0;
-> +	vtd.padding = 0;
-> +	vtd.cap_reg = cap;
-> +	vtd.ecap_reg = ecap;
-> +
-> +	memcpy(info->data, &vtd, sizeof(vtd));
+> +	/* report an empty iommu_nesting_info for now */
+> +	memset(info, 0x0, size);
+> +	info->size = size;
 > +	return 0;
 > +}
 > +
-> +static int intel_iommu_domain_get_attr(struct iommu_domain *domain,
-> +				       enum iommu_attr attr, void *data)
+>  static int arm_smmu_domain_get_attr(struct iommu_domain *domain,
+>  				    enum iommu_attr attr, void *data)
+>  {
+> @@ -3028,8 +3054,7 @@ static int arm_smmu_domain_get_attr(struct iommu_domain *domain,
+>  	case IOMMU_DOMAIN_UNMANAGED:
+>  		switch (attr) {
+>  		case DOMAIN_ATTR_NESTING:
+> -			*(int *)data = (smmu_domain->stage == ARM_SMMU_DOMAIN_NESTED);
+> -			return 0;
+> +			return arm_smmu_domain_nesting_info(smmu_domain, data);
+>  		default:
+>  			return -ENODEV;
+>  		}
+> diff --git a/drivers/iommu/arm-smmu.c b/drivers/iommu/arm-smmu.c
+> index 243bc4c..09e2f1b 100644
+> --- a/drivers/iommu/arm-smmu.c
+> +++ b/drivers/iommu/arm-smmu.c
+> @@ -1506,6 +1506,32 @@ static struct iommu_group *arm_smmu_device_group(struct device *dev)
+>  	return group;
+>  }
+>  
+> +static int arm_smmu_domain_nesting_info(struct arm_smmu_domain *smmu_domain,
+> +					void *data)
 > +{
-> +	switch (attr) {
-> +	case DOMAIN_ATTR_NESTING:
-> +	{
-> +		struct iommu_nesting_info *info =
-> +				(struct iommu_nesting_info *)data;
+> +	struct iommu_nesting_info *info = (struct iommu_nesting_info *)data;
+> +	unsigned int size;
 > +
-> +		return intel_iommu_get_nesting_info(domain, info);
-> +	}
-> +	default:
+> +	if (!info || smmu_domain->stage != ARM_SMMU_DOMAIN_NESTED)
 > +		return -ENODEV;
--ENOENT?
+> +
+> +	size = sizeof(struct iommu_nesting_info);
+> +
+> +	/*
+> +	 * if provided buffer size is smaller than expected, should
+> +	 * return 0 and also the expected buffer size to caller.
+> +	 */
+> +	if (info->size < size) {
+> +		info->size = size;
+> +		return 0;
 > +	}
+> +
+> +	/* report an empty iommu_nesting_info for now */
+> +	memset(info, 0x0, size);
+> +	info->size = size;
+> +	return 0;
 > +}
 > +
->  /*
->   * Check that the device does not live on an external facing PCI port that is
->   * marked as untrusted. Such devices should not be able to apply quirks and
-> @@ -6101,6 +6177,7 @@ const struct iommu_ops intel_iommu_ops = {
->  	.domain_alloc		= intel_iommu_domain_alloc,
->  	.domain_free		= intel_iommu_domain_free,
->  	.domain_set_attr	= intel_iommu_domain_set_attr,
-> +	.domain_get_attr	= intel_iommu_domain_get_attr,
->  	.attach_dev		= intel_iommu_attach_device,
->  	.detach_dev		= intel_iommu_detach_device,
->  	.aux_attach_dev		= intel_iommu_aux_attach_device,
-> diff --git a/include/linux/intel-iommu.h b/include/linux/intel-iommu.h
-> index 18f292e..c4ed0d4 100644
-> --- a/include/linux/intel-iommu.h
-> +++ b/include/linux/intel-iommu.h
-> @@ -197,6 +197,22 @@
->  #define ecap_max_handle_mask(e) ((e >> 20) & 0xf)
->  #define ecap_sc_support(e)	((e >> 7) & 0x1) /* Snooping Control */
->  
-> +/* Nesting Support Capability Alignment */
-> +#define VTD_CAP_FL1GP		BIT_ULL(56)
-> +#define VTD_CAP_FL5LP		BIT_ULL(60)
-> +#define VTD_ECAP_PRS		BIT_ULL(29)
-> +#define VTD_ECAP_ERS		BIT_ULL(30)
-> +#define VTD_ECAP_SRS		BIT_ULL(31)
-> +#define VTD_ECAP_EAFS		BIT_ULL(34)
-> +#define VTD_ECAP_PASID		BIT_ULL(40)
-
-> +
-> +/* Only capabilities marked in below MASKs are reported */
-> +#define VTD_CAP_MASK		(VTD_CAP_FL1GP | VTD_CAP_FL5LP)
-> +
-> +#define VTD_ECAP_MASK		(VTD_ECAP_PRS | VTD_ECAP_ERS | \
-> +				 VTD_ECAP_SRS | VTD_ECAP_EAFS | \
-> +				 VTD_ECAP_PASID)
-> +
->  /* Virtual command interface capability */
->  #define vccap_pasid(v)		(((v) & DMA_VCS_PAS)) /* PASID allocation */
->  
+>  static int arm_smmu_domain_get_attr(struct iommu_domain *domain,
+>  				    enum iommu_attr attr, void *data)
+>  {
+> @@ -1515,8 +1541,7 @@ static int arm_smmu_domain_get_attr(struct iommu_domain *domain,
+>  	case IOMMU_DOMAIN_UNMANAGED:
+>  		switch (attr) {
+>  		case DOMAIN_ATTR_NESTING:
+> -			*(int *)data = (smmu_domain->stage == ARM_SMMU_DOMAIN_NESTED);
+> -			return 0;
+> +			return arm_smmu_domain_nesting_info(smmu_domain, data);
+>  		default:
+>  			return -ENODEV;
+>  		}
 > 
-Thanks
-
-Eric
-
 
