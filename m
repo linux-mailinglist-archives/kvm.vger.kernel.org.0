@@ -2,131 +2,143 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6F53A2232F0
-	for <lists+kvm@lfdr.de>; Fri, 17 Jul 2020 07:33:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6AB0022332B
+	for <lists+kvm@lfdr.de>; Fri, 17 Jul 2020 07:57:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726083AbgGQFdH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 17 Jul 2020 01:33:07 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:47486 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1725909AbgGQFdH (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 17 Jul 2020 01:33:07 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1594963985;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=SKw3TmjYzVk1C1S6gNL1iMqtEatrMQdgW83gtCC8/HU=;
-        b=PBgonayvnhSpr6vJK+LTuHoU1eUbfOoyVryBaS3ZbULHtdI3HPPuNHkVN3OCza+S9VxrtI
-        4KRWLtbF96X5yKfgeZKYskQIWGsH2IXDdlGzY78pYjPbGGkw8Xs7CC4LRqgOiVUoplEGFH
-        AelbERnlJRZhSK7IEBRRHIj1rTprcW8=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-355-R8FnbaM6POmutVFsP9W-Nw-1; Fri, 17 Jul 2020 01:33:03 -0400
-X-MC-Unique: R8FnbaM6POmutVFsP9W-Nw-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        id S1726386AbgGQF5K (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 17 Jul 2020 01:57:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49778 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725807AbgGQF5J (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 17 Jul 2020 01:57:09 -0400
+Received: from ozlabs.org (ozlabs.org [IPv6:2401:3900:2:1::2])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0B03EC061755;
+        Thu, 16 Jul 2020 22:57:09 -0700 (PDT)
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 79A6D107ACCA;
-        Fri, 17 Jul 2020 05:33:02 +0000 (UTC)
-Received: from [10.72.12.157] (ovpn-12-157.pek2.redhat.com [10.72.12.157])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 1D0F71A7C8;
-        Fri, 17 Jul 2020 05:32:32 +0000 (UTC)
-Subject: Re: [PATCH V2 5/6] ifcvf: replace irq_request/free with vDPA helpers
-To:     Zhu Lingshan <lingshan.zhu@intel.com>, mst@redhat.com,
-        alex.williamson@redhat.com, pbonzini@redhat.com,
-        sean.j.christopherson@intel.com, wanpengli@tencent.com
-Cc:     virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        kvm@vger.kernel.org
-References: <1594898629-18790-1-git-send-email-lingshan.zhu@intel.com>
- <1594898629-18790-6-git-send-email-lingshan.zhu@intel.com>
-From:   Jason Wang <jasowang@redhat.com>
-Message-ID: <c0662b7e-98ad-b7a3-a054-56bbb6a364ac@redhat.com>
-Date:   Fri, 17 Jul 2020 13:32:28 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        by mail.ozlabs.org (Postfix) with ESMTPSA id 4B7L3z5kSgz9sQt;
+        Fri, 17 Jul 2020 15:57:03 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=canb.auug.org.au;
+        s=201702; t=1594965425;
+        bh=pogloshOGM434OcRKBF6s6ykZvFgAvuWoOESdMeuiYQ=;
+        h=Date:From:To:Cc:Subject:From;
+        b=Qh6uvWzU9USOoVdsHuNu9fBrdoTUryAb8L7RQvx42+KbM904Jpg/QAkQVAzaoCEWd
+         TYd71mEQtOaxgHgVkBEu7L8kn14f2SbliwRKDAcyU/KTeG05Bv+MqKF9Xi//sa5UkL
+         BzNBXO6HwX6qz5LmOPHV9eTmhV2YWZS9eyhac3rBSnrRCPAwxackvwxhOU52Ni8uJN
+         IzusT8QiRIzNqHR/Les5DWWLeLA96mxB+tLEjAVFP4+yiU6p9BPvpoJHkrLMyEnCKx
+         W0pDwPPaZHpO/t+JesjlkDXhVIZbu8pmfJRfkvO08lZRJxAxm7Ekvv8duZRNshXgi+
+         rgyqV0Ey1ytXQ==
+Date:   Fri, 17 Jul 2020 15:57:01 +1000
+From:   Stephen Rothwell <sfr@canb.auug.org.au>
+To:     Paolo Bonzini <pbonzini@redhat.com>, KVM <kvm@vger.kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@elte.hu>, "H. Peter Anvin" <hpa@zytor.com>,
+        Peter Zijlstra <peterz@infradead.org>
+Cc:     Linux Next Mailing List <linux-next@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+Subject: linux-next: build failure after merge of the kvm tree
+Message-ID: <20200717155701.2d7caebb@canb.auug.org.au>
 MIME-Version: 1.0
-In-Reply-To: <1594898629-18790-6-git-send-email-lingshan.zhu@intel.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+Content-Type: multipart/signed; boundary="Sig_/A2+892SpS7JbA5SH7D40+2e";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+--Sig_/A2+892SpS7JbA5SH7D40+2e
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-On 2020/7/16 下午7:23, Zhu Lingshan wrote:
-> This commit replaced irq_request/free() with helpers in vDPA
-> core, so that it can request/free irq and setup irq offloading
-> on order.
->
-> Signed-off-by: Zhu Lingshan <lingshan.zhu@intel.com>
-> Suggested-by: Jason Wang <jasowang@redhat.com>
-> ---
->   drivers/vdpa/ifcvf/ifcvf_main.c | 14 +++++++++-----
->   1 file changed, 9 insertions(+), 5 deletions(-)
->
-> diff --git a/drivers/vdpa/ifcvf/ifcvf_main.c b/drivers/vdpa/ifcvf/ifcvf_main.c
-> index f5a60c1..bd2a317 100644
-> --- a/drivers/vdpa/ifcvf/ifcvf_main.c
-> +++ b/drivers/vdpa/ifcvf/ifcvf_main.c
-> @@ -47,11 +47,12 @@ static void ifcvf_free_irq(struct ifcvf_adapter *adapter, int queues)
->   {
->   	struct pci_dev *pdev = adapter->pdev;
->   	struct ifcvf_hw *vf = &adapter->vf;
-> +	struct vdpa_device *vdpa = &adapter->vdpa;
->   	int i;
->   
->   
->   	for (i = 0; i < queues; i++)
-> -		devm_free_irq(&pdev->dev, vf->vring[i].irq, &vf->vring[i]);
-> +		vdpa_free_vq_irq(&pdev->dev, vdpa, vf->vring[i].irq, i, &vf->vring[i]);
->   
->   	ifcvf_free_irq_vectors(pdev);
->   }
-> @@ -60,6 +61,7 @@ static int ifcvf_request_irq(struct ifcvf_adapter *adapter)
->   {
->   	struct pci_dev *pdev = adapter->pdev;
->   	struct ifcvf_hw *vf = &adapter->vf;
-> +	struct vdpa_device *vdpa = &adapter->vdpa;
->   	int vector, i, ret, irq;
->   
->   	ret = pci_alloc_irq_vectors(pdev, IFCVF_MAX_INTR,
-> @@ -73,6 +75,10 @@ static int ifcvf_request_irq(struct ifcvf_adapter *adapter)
->   		 pci_name(pdev));
->   	vector = 0;
->   	irq = pci_irq_vector(pdev, vector);
-> +	/* This isconfig interrupt, config accesses all go
+Hi all,
 
+After merging the kvm tree, today's linux-next build (x86_64 allmodconfig)
+failed like this:
 
-Missing a blank between is and config.
+arch/x86/kernel/kvm.c: In function '__sysvec_kvm_asyncpf_interrupt':
+arch/x86/kernel/kvm.c:275:13: error: implicit declaration of function 'idte=
+ntry_enter_cond_rcu'; did you mean 'idtentry_enter_nmi'? [-Werror=3Dimplici=
+t-function-declaration]
+  275 |  rcu_exit =3D idtentry_enter_cond_rcu(regs);
+      |             ^~~~~~~~~~~~~~~~~~~~~~~
+      |             idtentry_enter_nmi
+arch/x86/kernel/kvm.c:286:2: error: implicit declaration of function 'idten=
+try_exit_cond_rcu'; did you mean 'idtentry_exit_nmi'? [-Werror=3Dimplicit-f=
+unction-declaration]
+  286 |  idtentry_exit_cond_rcu(regs, rcu_exit);
+      |  ^~~~~~~~~~~~~~~~~~~~~~
+      |  idtentry_exit_nmi
 
-Thanks
+Caused by commit
 
+  b037b09b9058 ("x86/entry: Rename idtentry_enter/exit_cond_rcu() to idtent=
+ry_enter/exit()")
 
-> +	 * through userspace, so no need to setup
-> +	 * config interrupt offloading.
-> +	 */
->   	ret = devm_request_irq(&pdev->dev, irq,
->   			       ifcvf_config_changed, 0,
->   			       vf->config_msix_name, vf);
-> @@ -82,13 +88,11 @@ static int ifcvf_request_irq(struct ifcvf_adapter *adapter)
->   			 pci_name(pdev), i);
->   		vector = i + IFCVF_MSI_QUEUE_OFF;
->   		irq = pci_irq_vector(pdev, vector);
-> -		ret = devm_request_irq(&pdev->dev, irq,
-> +		ret = vdpa_alloc_vq_irq(&pdev->dev, vdpa, irq,
->   				       ifcvf_intr_handler, 0,
->   				       vf->vring[i].msix_name,
-> -				       &vf->vring[i]);
-> +				       &vf->vring[i], i);
->   		if (ret) {
-> -			IFCVF_ERR(pdev,
-> -				  "Failed to request irq for vq %d\n", i);
->   			ifcvf_free_irq(adapter, i);
->   
->   			return ret;
+from the tip tree interacting with commit
 
+  26d05b368a5c ("Merge branch 'kvm-async-pf-int' into HEAD")
+
+from the kvm tree.
+
+I have applied the following merge fix patch.
+
+From: Stephen Rothwell <sfr@canb.auug.org.au>
+Date: Fri, 17 Jul 2020 15:51:27 +1000
+Subject: [PATCH] fix up for idtentry_{enter,exit}_cond_rcu() renaming
+
+Signed-off-by: Stephen Rothwell <sfr@canb.auug.org.au>
+---
+ arch/x86/kernel/kvm.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/arch/x86/kernel/kvm.c b/arch/x86/kernel/kvm.c
+index cebd96687194..91dd322f768d 100644
+--- a/arch/x86/kernel/kvm.c
++++ b/arch/x86/kernel/kvm.c
+@@ -270,9 +270,9 @@ DEFINE_IDTENTRY_SYSVEC(sysvec_kvm_asyncpf_interrupt)
+ {
+ 	struct pt_regs *old_regs =3D set_irq_regs(regs);
+ 	u32 token;
+-	bool rcu_exit;
++	idtentry_state_t state;
+=20
+-	rcu_exit =3D idtentry_enter_cond_rcu(regs);
++	state =3D idtentry_enter(regs);
+=20
+ 	inc_irq_stat(irq_hv_callback_count);
+=20
+@@ -283,7 +283,7 @@ DEFINE_IDTENTRY_SYSVEC(sysvec_kvm_asyncpf_interrupt)
+ 		wrmsrl(MSR_KVM_ASYNC_PF_ACK, 1);
+ 	}
+=20
+-	idtentry_exit_cond_rcu(regs, rcu_exit);
++	idtentry_exit(regs, state);
+ 	set_irq_regs(old_regs);
+ }
+=20
+--=20
+2.27.0
+
+--=20
+Cheers,
+Stephen Rothwell
+
+--Sig_/A2+892SpS7JbA5SH7D40+2e
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAl8RPa0ACgkQAVBC80lX
+0Gz2TggAl6/wSCerW01gjKj4t12AMidEFOAeQs+6Wu9p8rYdNsggQaPG4Y3mMJtr
+T44siKA0jHZ4iHFm/8BrjopwqDcJ5EGoOqAGm1MVOHZILE4Pjg22yxvJm5kc/1aQ
+8fxTiGMc5H5ntKpkeVlsVr+tumcQf1yAtQYhkHGbEloeVHBVS98rQkBzq/9ERLoN
+4DuLnOw6lalilJBSinhs431OzZL243An4aX+Li2S6rn57k9tNVd54xFzNGtUE3B6
+SRpG3twknomwuHVNDDFyL7EQ/eAZg8W2v5YGSqIe9YPvDL3M+Zjrfcsd9bwhD1+T
+5ieVxU+gK1WbvteqeTQGI4xQCndvtA==
+=rcvQ
+-----END PGP SIGNATURE-----
+
+--Sig_/A2+892SpS7JbA5SH7D40+2e--
