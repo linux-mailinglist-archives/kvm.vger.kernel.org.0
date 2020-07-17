@@ -2,96 +2,228 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3115F223BB6
-	for <lists+kvm@lfdr.de>; Fri, 17 Jul 2020 14:52:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 96348223D7E
+	for <lists+kvm@lfdr.de>; Fri, 17 Jul 2020 15:59:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726648AbgGQMwy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 17 Jul 2020 08:52:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57280 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726205AbgGQMwx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 17 Jul 2020 08:52:53 -0400
-Received: from mail-wr1-x442.google.com (mail-wr1-x442.google.com [IPv6:2a00:1450:4864:20::442])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 27543C061755
-        for <kvm@vger.kernel.org>; Fri, 17 Jul 2020 05:52:53 -0700 (PDT)
-Received: by mail-wr1-x442.google.com with SMTP id z13so10963873wrw.5
-        for <kvm@vger.kernel.org>; Fri, 17 Jul 2020 05:52:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=oahFvkWn9xu77yQoX7qxwILoCEWOJVcZ/jZ2Dt3CCSQ=;
-        b=ubnRa4178Nm2mxDbZhK4nXMmrWyvh7zjC8mmGU4mcCvpvh7xIVcQ7lAIFwlpzyhd9j
-         8uXeqjab/PGn5wDu61cZhyGh5ctswuBMiAXsdCfKWFo2jvr49XacD63+BfcoAgaSm1gK
-         p+DXcn9tfRBU6Nk0JOW+5mdJa54eZFFFcpggblwsG5lpPcZOKaT+p3S/KaArrfPQJ0zt
-         DeeWVkdviiBNx2rMYkpxuqdMViIXTKmC2qdGdyDKQuNBZnvuXOz5brQNBs09RwLTNYJ4
-         gs1Cj1jneIY3XmP7K9C2aekcTb5e2cKyP197vsf5UTry7vBxAfzzjsqFpeRebh7kV+0h
-         ZC/w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=oahFvkWn9xu77yQoX7qxwILoCEWOJVcZ/jZ2Dt3CCSQ=;
-        b=V/NWHfJy0oy3PADlEuZTG6sPBycQwsfMWJLGD8YD3FHV1mpcRF8OEXQ4LZeasIKz4H
-         Ux+HdZOiXmLtrmiTTIFZgwG0/nEOXttdhhyBPOdx0SbPvDViTYeWl/6XENhnGJuZPtDT
-         JlUio5NXYehlteQlHb8vl10kpPTS2gJL3R8x2WN4/VhOCHp/wkwvYh81EHPhdUWoA8FO
-         gWe+KjpIwVHdcGXnbSLu6lKl10wozhcIIDmA1zsV3FT69tLwpkqAnVN9UEjYCBXBrMfq
-         gGBPnOs3FMBqLMR5G6UyEU0rw/lej2Nd5f/gdrF+8O8uILMDvoeBvgMW5UZzFnSu3EJf
-         N9rA==
-X-Gm-Message-State: AOAM532IOAMXj+rlNkXUvRoSuW78U6+Skhu2sZ4+ekIpN6F+p8DUhfFN
-        GydYPVsditUVmxN+wK1kmPFW0+1B
-X-Google-Smtp-Source: ABdhPJxX+7PYBknUfX1DIm+w+CZnA5xttM2A/g18AdQqPcJxzmStnvpnmX6loPZsQuYxnRMMaNX9CQ==
-X-Received: by 2002:a5d:4591:: with SMTP id p17mr10153266wrq.343.1594990371449;
-        Fri, 17 Jul 2020 05:52:51 -0700 (PDT)
-Received: from jondnuc.lan (IGLD-84-229-155-64.inter.net.il. [84.229.155.64])
-        by smtp.gmail.com with ESMTPSA id z132sm15160699wmb.21.2020.07.17.05.52.50
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 17 Jul 2020 05:52:51 -0700 (PDT)
-From:   Jon Doron <arilou@gmail.com>
-To:     kvm@vger.kernel.org
-Cc:     vkuznets@redhat.com, pbonzini@redhat.com, rvkagan@yandex-team.ru,
-        Jon Doron <arilou@gmail.com>
-Subject: [PATCH v1 1/1] x86/kvm/hyper-v: Synic default SCONTROL MSR needs to be enabled
-Date:   Fri, 17 Jul 2020 15:52:38 +0300
-Message-Id: <20200717125238.1103096-2-arilou@gmail.com>
-X-Mailer: git-send-email 2.26.2
-In-Reply-To: <20200717125238.1103096-1-arilou@gmail.com>
-References: <20200717125238.1103096-1-arilou@gmail.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+        id S1726665AbgGQN6e (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 17 Jul 2020 09:58:34 -0400
+Received: from mail.kernel.org ([198.145.29.99]:46290 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726221AbgGQN6e (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 17 Jul 2020 09:58:34 -0400
+Received: from devnote2 (NE2965lan1.rev.em-net.ne.jp [210.141.244.193])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 944A220734;
+        Fri, 17 Jul 2020 13:58:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1594994313;
+        bh=Plz5TltdSn/IewUzgCiC3cN/jylVnKWqSCAhHiSo6lM=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=EctyEe6PrPzJ4u1JkQtW/nGvUCrpipoDf0/CPUxwhU2PXlKI4xD9lEEkG5EVwhyqw
+         k+ybzyL/f09T9OTjUTy+ndrnXIcO7yuf67ZS/TESVH+D5O+d/Qj2VAxvbsQ0oSFlW4
+         R6c3AHkVNVgFv0m/g/P3iQMRVWBpM6TPaa+qmyXQ=
+Date:   Fri, 17 Jul 2020 22:58:26 +0900
+From:   Masami Hiramatsu <mhiramat@kernel.org>
+To:     Joerg Roedel <joro@8bytes.org>
+Cc:     x86@kernel.org, Joerg Roedel <jroedel@suse.de>, hpa@zytor.com,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Jiri Slaby <jslaby@suse.cz>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Juergen Gross <jgross@suse.com>,
+        Kees Cook <keescook@chromium.org>,
+        David Rientjes <rientjes@google.com>,
+        Cfir Cohen <cfir@google.com>,
+        Erdem Aktas <erdemaktas@google.com>,
+        Masami Hiramatsu <mhiramat@kernel.org>,
+        Mike Stunes <mstunes@vmware.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Martin Radev <martin.b.radev@gmail.com>,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org
+Subject: Re: [PATCH v4 06/75] x86/insn: Make inat-tables.c suitable for
+ pre-decompression code
+Message-Id: <20200717225826.3b16e168de2a1573150e7952@kernel.org>
+In-Reply-To: <20200714120917.11253-7-joro@8bytes.org>
+References: <20200714120917.11253-1-joro@8bytes.org>
+        <20200714120917.11253-7-joro@8bytes.org>
+X-Mailer: Sylpheed 3.7.0 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Based on an analysis of the HyperV firmwares (Gen1 and Gen2) it seems
-like the SCONTROL is not being set to the ENABLED state as like we have
-thought.
+On Tue, 14 Jul 2020 14:08:08 +0200
+Joerg Roedel <joro@8bytes.org> wrote:
 
-Also from a test done by Vitaly Kuznetsov, running a nested HyperV it
-was concluded that the first access to the SCONTROL MSR with a read
-resulted with the value of 0x1, aka HV_SYNIC_CONTROL_ENABLE.
+> From: Joerg Roedel <jroedel@suse.de>
+> 
+> The inat-tables.c file has some arrays in it that contain pointers to
+> other arrays. These pointers need to be relocated when the kernel
+> image is moved to a different location.
+> 
+> The pre-decompression boot-code has no support for applying ELF
+> relocations, so initialize these arrays at runtime in the
+> pre-decompression code to make sure all pointers are correctly
+> initialized.
 
-It's important to note that this diverges from the value states in the
-HyperV TLFS of 0.
+OK, This looks good to me.
 
-Signed-off-by: Jon Doron <arilou@gmail.com>
----
- arch/x86/kvm/hyperv.c | 1 +
- 1 file changed, 1 insertion(+)
+Acked-by: Masami Hiramatsu <mhiramat@kernel.org>
 
-diff --git a/arch/x86/kvm/hyperv.c b/arch/x86/kvm/hyperv.c
-index af9cdb426dd2..814d3aee5cef 100644
---- a/arch/x86/kvm/hyperv.c
-+++ b/arch/x86/kvm/hyperv.c
-@@ -900,6 +900,7 @@ int kvm_hv_activate_synic(struct kvm_vcpu *vcpu, bool dont_zero_synic_pages)
- 	kvm_request_apicv_update(vcpu->kvm, false, APICV_INHIBIT_REASON_HYPERV);
- 	synic->active = true;
- 	synic->dont_zero_synic_pages = dont_zero_synic_pages;
-+	synic->control = HV_SYNIC_CONTROL_ENABLE;
- 	return 0;
- }
- 
+Thank you,
+
+> 
+> Signed-off-by: Joerg Roedel <jroedel@suse.de>
+> ---
+>  arch/x86/tools/gen-insn-attr-x86.awk       | 50 +++++++++++++++++++++-
+>  tools/arch/x86/tools/gen-insn-attr-x86.awk | 50 +++++++++++++++++++++-
+>  2 files changed, 98 insertions(+), 2 deletions(-)
+> 
+> diff --git a/arch/x86/tools/gen-insn-attr-x86.awk b/arch/x86/tools/gen-insn-attr-x86.awk
+> index a42015b305f4..af38469afd14 100644
+> --- a/arch/x86/tools/gen-insn-attr-x86.awk
+> +++ b/arch/x86/tools/gen-insn-attr-x86.awk
+> @@ -362,6 +362,9 @@ function convert_operands(count,opnd,       i,j,imm,mod)
+>  END {
+>  	if (awkchecked != "")
+>  		exit 1
+> +
+> +	print "#ifndef __BOOT_COMPRESSED\n"
+> +
+>  	# print escape opcode map's array
+>  	print "/* Escape opcode map array */"
+>  	print "const insn_attr_t * const inat_escape_tables[INAT_ESC_MAX + 1]" \
+> @@ -388,6 +391,51 @@ END {
+>  		for (j = 0; j < max_lprefix; j++)
+>  			if (atable[i,j])
+>  				print "	["i"]["j"] = "atable[i,j]","
+> -	print "};"
+> +	print "};\n"
+> +
+> +	print "#else /* !__BOOT_COMPRESSED */\n"
+> +
+> +	print "/* Escape opcode map array */"
+> +	print "static const insn_attr_t *inat_escape_tables[INAT_ESC_MAX + 1]" \
+> +	      "[INAT_LSTPFX_MAX + 1];"
+> +	print ""
+> +
+> +	print "/* Group opcode map array */"
+> +	print "static const insn_attr_t *inat_group_tables[INAT_GRP_MAX + 1]"\
+> +	      "[INAT_LSTPFX_MAX + 1];"
+> +	print ""
+> +
+> +	print "/* AVX opcode map array */"
+> +	print "static const insn_attr_t *inat_avx_tables[X86_VEX_M_MAX + 1]"\
+> +	      "[INAT_LSTPFX_MAX + 1];"
+> +	print ""
+> +
+> +	print "static void inat_init_tables(void)"
+> +	print "{"
+> +
+> +	# print escape opcode map's array
+> +	print "\t/* Print Escape opcode map array */"
+> +	for (i = 0; i < geid; i++)
+> +		for (j = 0; j < max_lprefix; j++)
+> +			if (etable[i,j])
+> +				print "\tinat_escape_tables["i"]["j"] = "etable[i,j]";"
+> +	print ""
+> +
+> +	# print group opcode map's array
+> +	print "\t/* Print Group opcode map array */"
+> +	for (i = 0; i < ggid; i++)
+> +		for (j = 0; j < max_lprefix; j++)
+> +			if (gtable[i,j])
+> +				print "\tinat_group_tables["i"]["j"] = "gtable[i,j]";"
+> +	print ""
+> +	# print AVX opcode map's array
+> +	print "\t/* Print AVX opcode map array */"
+> +	for (i = 0; i < gaid; i++)
+> +		for (j = 0; j < max_lprefix; j++)
+> +			if (atable[i,j])
+> +				print "\tinat_avx_tables["i"]["j"] = "atable[i,j]";"
+> +
+> +	print "}"
+> +	print "#endif"
+>  }
+>  
+> diff --git a/tools/arch/x86/tools/gen-insn-attr-x86.awk b/tools/arch/x86/tools/gen-insn-attr-x86.awk
+> index a42015b305f4..af38469afd14 100644
+> --- a/tools/arch/x86/tools/gen-insn-attr-x86.awk
+> +++ b/tools/arch/x86/tools/gen-insn-attr-x86.awk
+> @@ -362,6 +362,9 @@ function convert_operands(count,opnd,       i,j,imm,mod)
+>  END {
+>  	if (awkchecked != "")
+>  		exit 1
+> +
+> +	print "#ifndef __BOOT_COMPRESSED\n"
+> +
+>  	# print escape opcode map's array
+>  	print "/* Escape opcode map array */"
+>  	print "const insn_attr_t * const inat_escape_tables[INAT_ESC_MAX + 1]" \
+> @@ -388,6 +391,51 @@ END {
+>  		for (j = 0; j < max_lprefix; j++)
+>  			if (atable[i,j])
+>  				print "	["i"]["j"] = "atable[i,j]","
+> -	print "};"
+> +	print "};\n"
+> +
+> +	print "#else /* !__BOOT_COMPRESSED */\n"
+> +
+> +	print "/* Escape opcode map array */"
+> +	print "static const insn_attr_t *inat_escape_tables[INAT_ESC_MAX + 1]" \
+> +	      "[INAT_LSTPFX_MAX + 1];"
+> +	print ""
+> +
+> +	print "/* Group opcode map array */"
+> +	print "static const insn_attr_t *inat_group_tables[INAT_GRP_MAX + 1]"\
+> +	      "[INAT_LSTPFX_MAX + 1];"
+> +	print ""
+> +
+> +	print "/* AVX opcode map array */"
+> +	print "static const insn_attr_t *inat_avx_tables[X86_VEX_M_MAX + 1]"\
+> +	      "[INAT_LSTPFX_MAX + 1];"
+> +	print ""
+> +
+> +	print "static void inat_init_tables(void)"
+> +	print "{"
+> +
+> +	# print escape opcode map's array
+> +	print "\t/* Print Escape opcode map array */"
+> +	for (i = 0; i < geid; i++)
+> +		for (j = 0; j < max_lprefix; j++)
+> +			if (etable[i,j])
+> +				print "\tinat_escape_tables["i"]["j"] = "etable[i,j]";"
+> +	print ""
+> +
+> +	# print group opcode map's array
+> +	print "\t/* Print Group opcode map array */"
+> +	for (i = 0; i < ggid; i++)
+> +		for (j = 0; j < max_lprefix; j++)
+> +			if (gtable[i,j])
+> +				print "\tinat_group_tables["i"]["j"] = "gtable[i,j]";"
+> +	print ""
+> +	# print AVX opcode map's array
+> +	print "\t/* Print AVX opcode map array */"
+> +	for (i = 0; i < gaid; i++)
+> +		for (j = 0; j < max_lprefix; j++)
+> +			if (atable[i,j])
+> +				print "\tinat_avx_tables["i"]["j"] = "atable[i,j]";"
+> +
+> +	print "}"
+> +	print "#endif"
+>  }
+>  
+> -- 
+> 2.27.0
+> 
+
+
 -- 
-2.24.1
-
+Masami Hiramatsu <mhiramat@kernel.org>
