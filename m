@@ -2,141 +2,136 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D6A912243C1
-	for <lists+kvm@lfdr.de>; Fri, 17 Jul 2020 21:05:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D0D0022443B
+	for <lists+kvm@lfdr.de>; Fri, 17 Jul 2020 21:29:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728471AbgGQTFa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 17 Jul 2020 15:05:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58682 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728459AbgGQTF1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 17 Jul 2020 15:05:27 -0400
-Received: from mail-lj1-x241.google.com (mail-lj1-x241.google.com [IPv6:2a00:1450:4864:20::241])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 15C34C0619D4
-        for <kvm@vger.kernel.org>; Fri, 17 Jul 2020 12:05:27 -0700 (PDT)
-Received: by mail-lj1-x241.google.com with SMTP id x9so13856019ljc.5
-        for <kvm@vger.kernel.org>; Fri, 17 Jul 2020 12:05:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=EHhwNWLvCGKwFX6ZeCk25F8g9x2pupMKT7Bn+2O6siI=;
-        b=UMpy7eBg0VQk13Zh0CsA8daqqCqMYLR/yLgZvVSL0lJ8/e5Ix44NjgigL3+q8XJArC
-         +CoZF6icBgyJrPruDpKiDqs3SPz2T9oivrXhdcRHtNzZ1eOY09EfmGogrMEiKoqjN8Tf
-         QfSD4InjPcIuMhztE9TSwtLzGwGlEqO2hK1TlNN3tpgoD/IpL93Q8TOpldntF8RTIa9i
-         C8ukkczG2UxL4WrwjzmXVCfquGoET/KgUjsKal4Q1IavPiGqE2sp7z7Ky8vMrNAWrbHJ
-         dh1pCRPAhK/qgJYywFwZzK5mejpW5pcI+fhWKbs7znm9DT4r7gpOB4C5y4W8oNfI1t7j
-         EZsw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=EHhwNWLvCGKwFX6ZeCk25F8g9x2pupMKT7Bn+2O6siI=;
-        b=SlN1N4mu/8zc3Zm8dAS1sPVeRHoub/+MKMbj1JCYPlSNcNKEeKo1zFrwp8scj/u/YW
-         UnaqsU81gIkMhQuDPI49haUINwKRLpwH+L8nNR3+ax941CpXhRsdueicVYAzo1qU/Jon
-         zsKoTK8UliLB0OGFqW5nbMddf892S7yTbvPWcnSaQFS8cPG0BqNIMwU5AdITaDnyhwXU
-         Wc2NoNvDaCHKzQkShOqXIvo0PBzW6YP5McsSRhFpM+iF+/Z+s58L1Qii+TZEZc4nexDl
-         BkBz33aakCUHc4+Ql1bdJHGUyFSfFV3ZFn9ebUa11rm6UCHK9PV3oHjMKn0MdPoY7pN5
-         fHaA==
-X-Gm-Message-State: AOAM532FAauXtWdKxWnzx/qYg18TwUNFyvasfDPfNGOjrr8RGK9oB8a8
-        uwyXiM9KacL3JxKU+kdL0T9G5+1UxJ8Xa1jILFiUIg==
-X-Google-Smtp-Source: ABdhPJzA2lclNj5LaSPAOhsYYmx7y36gm/usqNFraHHlhKV4rNqxpPH0IXWB5YiqK4pOf3QGE+Q7RO/aAlHNo2NWhrU=
-X-Received: by 2002:a2e:9b42:: with SMTP id o2mr4877549ljj.102.1595012725372;
- Fri, 17 Jul 2020 12:05:25 -0700 (PDT)
+        id S1728422AbgGQT3k (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 17 Jul 2020 15:29:40 -0400
+Received: from Galois.linutronix.de ([193.142.43.55]:42658 "EHLO
+        galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727999AbgGQT3k (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 17 Jul 2020 15:29:40 -0400
+From:   Thomas Gleixner <tglx@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020; t=1595014176;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=epByd5xUArlj64sAwQwDhQ0ku+RyRhUcoJ9aqhT7QZw=;
+        b=pOJnlIP89W85WkeayXUyvnSOlcLSwC7H0IKBi1adAhCjyZQZ8ap6hcFeAxrRMuyl1bvCK8
+        fZBnF4fLXYdvGFo7FgMdfTl0+ojF3kR37ClLv1hxwtHQ7xyGCK2EF2yfVVA+aXgRxqCFdP
+        l6b7H6h9JE8w+01yq5WbN5fvxjqB6r8KvyUgRblFhgz8TtN9hiWijxCTYcHrGfXdFny+Pi
+        HJdaz4269YX7A7nbjjwigVzIWHldKqmV7j7lCHnHSd/Q0jet3cbrMUuP3Wze/YGVxOJpMD
+        gkDKGeGFG2fAah6fjoVEesLSQxklUa3S7TeYLtc+MfphKcrIarcQ7RCILa/k1g==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020e; t=1595014176;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=epByd5xUArlj64sAwQwDhQ0ku+RyRhUcoJ9aqhT7QZw=;
+        b=S3UsK4BQe5+3DBSPnvpLNIWCaUaYjdBOdD/TwxDOUdmqfUwFqJXlwPMQl+PDTogKSBkfSx
+        8KaURcHGtkWfcXCg==
+To:     Kees Cook <keescook@chromium.org>
+Cc:     LKML <linux-kernel@vger.kernel.org>, x86@kernel.org,
+        linux-arch@vger.kernel.org, Will Deacon <will@kernel.org>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Keno Fischer <keno@juliacomputing.com>,
+        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        Gabriel Krisman Bertazi <krisman@collabora.com>
+Subject: Re: [patch V3 01/13] entry: Provide generic syscall entry functionality
+In-Reply-To: <202007171045.FB4A586F1D@keescook>
+References: <20200716182208.180916541@linutronix.de> <20200716185424.011950288@linutronix.de> <202007161336.B993ED938@keescook> <87d04vt98w.fsf@nanos.tec.linutronix.de> <202007171045.FB4A586F1D@keescook>
+Date:   Fri, 17 Jul 2020 21:29:36 +0200
+Message-ID: <87mu3yq6sf.fsf@nanos.tec.linutronix.de>
 MIME-Version: 1.0
-References: <20200712131003.23271-1-madhuparnabhowmik10@gmail.com>
- <20200712131003.23271-2-madhuparnabhowmik10@gmail.com> <20200712160856.GW9247@paulmck-ThinkPad-P72>
- <CA+G9fYuVmTcttBpVtegwPbKxufupPOtk_WqEtOdS+HDQi7WS9Q@mail.gmail.com>
- <CAA42JLY2L6xFju_qZsVguGtXvDMqfCKbO_h1K9NJPjmqJEav=Q@mail.gmail.com> <20200717170747.GW9247@paulmck-ThinkPad-P72>
-In-Reply-To: <20200717170747.GW9247@paulmck-ThinkPad-P72>
-From:   Naresh Kamboju <naresh.kamboju@linaro.org>
-Date:   Sat, 18 Jul 2020 00:35:12 +0530
-Message-ID: <CA+G9fYvtYr0ri6j-auNOTs98xVj-a1AoZtUfwokwnvuFFWtFdQ@mail.gmail.com>
-Subject: Re: [PATCH 2/2] kvm: mmu: page_track: Fix RCU list API usage
-To:     "Paul E. McKenney" <paulmck@kernel.org>,
-        madhuparnabhowmik10@gmail.com
-Cc:     Dexuan-Linux Cui <dexuan.linux@gmail.com>,
-        Josh Triplett <josh@joshtriplett.org>,
-        Joel Fernandes <joel@joelfernandes.org>,
-        Paolo Bonzini <pbonzini@redhat.com>, rcu@vger.kernel.org,
-        open list <linux-kernel@vger.kernel.org>,
-        X86 ML <x86@kernel.org>, kvm list <kvm@vger.kernel.org>,
-        frextrite@gmail.com, lkft-triage@lists.linaro.org,
-        Dexuan Cui <decui@microsoft.com>, juhlee@microsoft.com,
-        =?UTF-8?B?RGFuaWVsIETDrWF6?= <daniel.diaz@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Paul,
+Kees Cook <keescook@chromium.org> writes:
+> On Thu, Jul 16, 2020 at 11:55:59PM +0200, Thomas Gleixner wrote:
+>> Kees Cook <keescook@chromium.org> writes:
+>> >> +/*
+>> >> + * Define dummy _TIF work flags if not defined by the architecture or for
+>> >> + * disabled functionality.
+>> >> + */
+>> >
+>> > When I was thinking about this last week I was pondering having a split
+>> > between the arch-agnositc TIF flags and the arch-specific TIF flags, and
+>> > that each arch could have a single "there is agnostic work to be done"
+>> > TIF in their thread_info, and the agnostic flags could live in
+>> > task_struct or something. Anyway, I'll keep reading...
+>> 
+>> That's going to be nasty. We rather go and expand the TIF storage to
+>> 64bit. And then do the following in a generic header:
+>
+> I though the point was to make the TIF_WORK check as fast as possible,
+> even on the 32-bit word systems. I mean it's not a huge performance hit,
+> but *shrug*
 
-> I am not seeing this here.
+For 64bit it's definitely faster to have 64bit flags.
 
-Do you notice any warnings while building linux next master
-for x86_64 architecture ?
+For 32bit it's debatable whether having to fiddle with two words and
+taking care about ordering is faster or not. It's a pain on 32bit in any
+case.
 
-> Could you please let us know what compiler
-> and command-line options you are using to generate this?
+But what we can do is distangle the flags into those which really need
+to be grouped into a single 32bit TIF word and architecture specific
+ones which can live in a different place.
 
-We have two build systems one showing it as error and build breaks
-and another one showing it as warning and build pass.
-tool chain: gcc 9.3.0
-build command:
-make -sk KBUILD_BUILD_USER=3DTuxBuild -C/linux -j16 ARCH=3Dx86 HOSTCC=3Dgcc
-CC=3D"sccache gcc" O=3Dbuild
+Looking at x86 which has the most pressure on TIF bits:
 
-metadata:
-    git_repo: https://git.kernel.org/pub/scm/linux/kernel/git/next/linux-ne=
-xt.git,
-    target_arch: x86,
-    toolchain: gcc-9,
-    git_short_log: aab7ee9f8ff0 (\Add linux-next specific files for 2020071=
-7\),
-    git_sha: aab7ee9f8ff0110bfcd594b33dc33748dc1baf46,
-    git_describe: next-20200717,
-    kernel_version: 5.8.0-rc5,
+Real TIF bits
+TIF_SYSCALL_TRACE       Entry/exit
+TIF_SYSCALL_TRACEPOINT	Entry/exit
+TIF_NOTIFY_RESUME       Entry/exit
+TIF_SIGPENDING          Entry/exit
+TIF_NEED_RESCHED        Entry/exit
+TIF_SINGLESTEP          Entry/exit
+TIF_SYSCALL_EMU         Entry/exit
+TIF_SYSCALL_AUDIT       Entry/exit
+TIF_SECCOMP             Entry/exit
+TIF_USER_RETURN_NOTIFY	Entry/exit      (x86 specific)
+TIF_UPROBE		Entry/exit
+TIF_PATCH_PENDING       Entry/exit
+TIF_POLLING_NRFLAG      Scheduler (related to TIF_NEED_RESCHED)
+TIF_MEMDIE              Historical, but not required to be a real one
+TIF_FSCHECK		Historical, but not required to be a real one
 
-warning log,
---
-make -sk KBUILD_BUILD_USER=3DTuxBuild -C/linux -j16 ARCH=3Dx86 HOSTCC=3Dgcc
-CC=3D"sccache gcc" O=3Dbuild
-#
-In file included from ../include/linux/pid.h:5,
-                 from ../include/linux/sched.h:14,
-                 from ../include/linux/kvm_host.h:12,
-                 from ../arch/x86/kvm/mmu/page_track.c:14:
-../arch/x86/kvm/mmu/page_track.c: In function =E2=80=98kvm_page_track_write=
-=E2=80=99:
-../include/linux/rculist.h:727:30: warning: left-hand operand of comma
-expression has no effect [-Wunused-value]
-  727 |  for (__list_check_srcu(cond),     \
-      |                              ^
-../arch/x86/kvm/mmu/page_track.c:232:2: note: in expansion of macro
-=E2=80=98hlist_for_each_entry_srcu=E2=80=99
-  232 |  hlist_for_each_entry_srcu(n, &head->track_notifier_list, node,
-      |  ^~~~~~~~~~~~~~~~~~~~~~~~~
-../arch/x86/kvm/mmu/page_track.c: In function =E2=80=98kvm_page_track_flush=
-_slot=E2=80=99:
-../include/linux/rculist.h:727:30: warning: left-hand operand of comma
-expression has no effect [-Wunused-value]
-  727 |  for (__list_check_srcu(cond),     \
-      |                              ^
-../arch/x86/kvm/mmu/page_track.c:258:2: note: in expansion of macro
-=E2=80=98hlist_for_each_entry_srcu=E2=80=99
-  258 |  hlist_for_each_entry_srcu(n, &head->track_notifier_list, node,
-      |  ^~~~~~~~~~~~~~~~~~~~~~~~~
-arch/x86/kvm/svm/svm.o: warning: objtool: svm_flush_tlb_gva()+0x12:
-call without frame pointer save/setup
-kernel/bpf/core.o: warning: objtool: ___bpf_prog_run.cold()+0x7: call
-without frame pointer save/setup
+Context switch group
+TIF_NOCPUID             X86 Context switch
+TIF_NOTSC               X86 Context switch
+TIF_SLD                 X86 Context switch
+TIF_BLOCKSTEP           X86 Context switch
+TIF_IO_BITMAP           X86 Context switch + Entry/exit (see below)
+TIF_NEED_FPU_LOAD       X86 Context switch + Entry/exit (see below)
+TIF_SSBD                X86 Context switch
+TIF_SPEC_IB             X86 Context switch
+TIF_SPEC_FORCE_UPDATE   X86 Context switch
 
-ref:
-https://gitlab.com/Linaro/lkft/kernel-runs/-/jobs/643978120
+No group requirements
+TIF_IA32                X86 random
+TIF_FORCED_TF           X86 random
+TIF_LAZY_MMU_UPDATES    X86 random
+TIF_ADDR32              X86 random
+TIF_X32                 X86 random
 
+So the only interesting ones are TIF_IO_BITMAP and TIF_NEED_FPU_LOAD,
+but those are really not required to be in the real TIF group because
+they are independently evaluated _after_ the real TIF flags on exit to
+user space and that requires a reread of the flags anyway. So if we put
+the context switch and the random bits into a seperate word right after
+thread_info->flags then the second word is in the same cacheline and it
+wont matter. That way we gain plenty of free bits on 32 bit and have no
+dependency between the two words at all.
 
->                                                         Thanx, Paul
+The alternative is to play nasty games with TIF_IA32, TIF_ADDR32 and
+TIF_X32 to free up bits for 32bit and make the flags field 64 bit on 64
+bit kernels, but I prefer to do the above seperation.
 
-- Naresh
+Thanks,
+
+        tglx
