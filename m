@@ -2,204 +2,73 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 070BA223208
-	for <lists+kvm@lfdr.de>; Fri, 17 Jul 2020 06:19:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7CB5822320C
+	for <lists+kvm@lfdr.de>; Fri, 17 Jul 2020 06:20:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726524AbgGQETz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 17 Jul 2020 00:19:55 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:49639 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1725807AbgGQETz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 17 Jul 2020 00:19:55 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1594959593;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=p8lAg2x78oICwymLwcBtrZ7x/TJ3QSVkvfTDbtDIY1c=;
-        b=JNY2lK4Tf3Qvb5e10LoFRNqQNvLRVdkAEqAGfbvT2vWXpWR4DeoRkg1GgzFXEJVeBbod/b
-        tQTrJjqZNKI7h2r439ts8MUaSStM+wQA2Ua54TuSSFZGRpN63uvT67MkAyrFD6aNMp0r08
-        QQwagnXr81DiviXBJY5uCrxonezWlyw=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-461-iSydANI1P7Gk1OAsrv5axQ-1; Fri, 17 Jul 2020 00:19:51 -0400
-X-MC-Unique: iSydANI1P7Gk1OAsrv5axQ-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B667E10059A9;
-        Fri, 17 Jul 2020 04:19:49 +0000 (UTC)
-Received: from [10.72.12.157] (ovpn-12-157.pek2.redhat.com [10.72.12.157])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 7896A1001B07;
-        Fri, 17 Jul 2020 04:19:37 +0000 (UTC)
-Subject: Re: [PATCH V2 3/6] vDPA: implement IRQ offloading helpers in vDPA
- core
-To:     Zhu Lingshan <lingshan.zhu@intel.com>, mst@redhat.com,
-        alex.williamson@redhat.com, pbonzini@redhat.com,
-        sean.j.christopherson@intel.com, wanpengli@tencent.com
-Cc:     virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        kvm@vger.kernel.org
-References: <1594898629-18790-1-git-send-email-lingshan.zhu@intel.com>
- <1594898629-18790-4-git-send-email-lingshan.zhu@intel.com>
-From:   Jason Wang <jasowang@redhat.com>
-Message-ID: <ab4644cc-9668-a909-4dea-5416aacf7221@redhat.com>
-Date:   Fri, 17 Jul 2020 12:19:30 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        id S1726742AbgGQEUG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 17 Jul 2020 00:20:06 -0400
+Received: from mail-io1-f69.google.com ([209.85.166.69]:48236 "EHLO
+        mail-io1-f69.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726635AbgGQEUF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 17 Jul 2020 00:20:05 -0400
+Received: by mail-io1-f69.google.com with SMTP id r9so5688331ioa.15
+        for <kvm@vger.kernel.org>; Thu, 16 Jul 2020 21:20:04 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:date:in-reply-to:message-id:subject
+         :from:to;
+        bh=j3PfTK/pr4L9iYESodCey/qnyjNi8Dw657O6Mf+Zg20=;
+        b=RrameXs4AzPamOB3pbeAL0uUvPy2SUubt+kLYJFDL6No40zS8BhYCM2dthIwUS3iVD
+         PlQ4/fp4fRxopDEkjeou3wH3dA2cvmtXLP/eYCT0FZHKqYuXCRkVyGJ9qL21bLZPwAy+
+         lN1G3B8ny/zfdXmiqc9+t0bx5Fyw3xvlcFk+zwRTtTuhINY6HYh+cI1lRvv4cDuyjYfC
+         htRXaFopSipcxYp6D1W+WeSfW0RMZiWQTuZyMkzGmz/ocYxfJtf5SyyJgbbcqA0h2IA/
+         l71bB+LhgJ0LuBfIZBtcF8/eUQ8o0mB7/iSS16GZQjAEiIbAvjCz2okdJKrFs/LLGBCl
+         G0LQ==
+X-Gm-Message-State: AOAM530rs4HELSVoneJBfpLkE0gwVbSu5LLlbGtJ3cR3o8/dSDxn0xWh
+        MCmwahpCLwrG9wxaD+4wn8QDxNwFTpZhEARHLsIA9URk7jGa
+X-Google-Smtp-Source: ABdhPJw4xwEhl32rilyRDk1xXUs9He2nKD1ic8BW/rpDuSPhQLS4k36SMiiZktAg7h2AcmcBDhCU1OoPlc3a6bevTEdbZc6L7EZA
 MIME-Version: 1.0
-In-Reply-To: <1594898629-18790-4-git-send-email-lingshan.zhu@intel.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Received: by 2002:a6b:8e56:: with SMTP id q83mr7806086iod.61.1594959604449;
+ Thu, 16 Jul 2020 21:20:04 -0700 (PDT)
+Date:   Thu, 16 Jul 2020 21:20:04 -0700
+In-Reply-To: <000000000000264c6305a9c74d9b@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000a787b205aa9b7863@google.com>
+Subject: Re: INFO: rcu detected stall in tipc_release
+From:   syzbot <syzbot+3654c027d861c6df4b06@syzkaller.appspotmail.com>
+To:     bp@alien8.de, davem@davemloft.net, fweisbec@gmail.com,
+        hpa@zytor.com, jmaloy@redhat.com, jmattson@google.com,
+        joro@8bytes.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        mingo@kernel.org, mingo@redhat.com, pbonzini@redhat.com,
+        sean.j.christopherson@intel.com, syzkaller-bugs@googlegroups.com,
+        tglx@linutronix.de, tuong.t.lien@dektech.com.au,
+        vkuznets@redhat.com, wanpengli@tencent.com, x86@kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+syzbot has bisected this issue to:
 
-On 2020/7/16 下午7:23, Zhu Lingshan wrote:
-> This commit implements IRQ offloading helpers
+commit 5e9eeccc58f3e6bcc99b929670665d2ce047e9c9
+Author: Tuong Lien <tuong.t.lien@dektech.com.au>
+Date:   Wed Jun 3 05:06:01 2020 +0000
 
+    tipc: fix NULL pointer dereference in streaming
 
-Let's say "vq irq allocate/free helpers" here.
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=14641620900000
+start commit:   7cc2a8ea Merge tag 'block-5.8-2020-07-01' of git://git.ker..
+git tree:       upstream
+final oops:     https://syzkaller.appspot.com/x/report.txt?x=16641620900000
+console output: https://syzkaller.appspot.com/x/log.txt?x=12641620900000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=7be693511b29b338
+dashboard link: https://syzkaller.appspot.com/bug?extid=3654c027d861c6df4b06
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=12948233100000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=11344c05100000
 
+Reported-by: syzbot+3654c027d861c6df4b06@syzkaller.appspotmail.com
+Fixes: 5e9eeccc58f3 ("tipc: fix NULL pointer dereference in streaming")
 
-> in vDPA core by
-> introducing two couple of functions:
->
-> vdpa_alloc_vq_irq() and vdpa_free_vq_irq(): request irq and free
-> irq, will setup irq offloading.
->
-> vdpa_setup_irq() and vdpa_unsetup_irq(): supportive functions,
-> will call vhost_vdpa helpers.
->
-> Signed-off-by: Zhu Lingshan <lingshan.zhu@intel.com>
-> Suggested-by: Jason Wang <jasowang@redhat.com>
-> ---
->   drivers/vdpa/vdpa.c  | 42 ++++++++++++++++++++++++++++++++++++++++++
->   include/linux/vdpa.h | 13 +++++++++++++
->   2 files changed, 55 insertions(+)
->
-> diff --git a/drivers/vdpa/vdpa.c b/drivers/vdpa/vdpa.c
-> index ff6562f..cce4d91 100644
-> --- a/drivers/vdpa/vdpa.c
-> +++ b/drivers/vdpa/vdpa.c
-> @@ -163,6 +163,48 @@ void vdpa_unregister_driver(struct vdpa_driver *drv)
->   }
->   EXPORT_SYMBOL_GPL(vdpa_unregister_driver);
->   
-> +static void vdpa_setup_irq(struct vdpa_device *vdev, int qid, int irq)
-> +{
-> +	struct vdpa_driver *drv = drv_to_vdpa(vdev->dev.driver);
-> +
-> +	if (drv->setup_vq_irq)
-> +		drv->setup_vq_irq(vdev, qid, irq);
-> +}
-> +
-> +static void vdpa_unsetup_irq(struct vdpa_device *vdev, int qid)
-> +{
-> +	struct vdpa_driver *drv = drv_to_vdpa(vdev->dev.driver);
-> +
-> +	if (drv->unsetup_vq_irq)
-> +		drv->unsetup_vq_irq(vdev, qid);
-
-
-Do you need to check the existence of drv before calling unset_vq_irq()?
-
-And how can this synchronize with driver releasing and binding?
-
-
-> +}
-> +
-> +int vdpa_alloc_vq_irq(struct device *dev, struct vdpa_device *vdev,
-> +		      unsigned int irq, irq_handler_t handler,
-> +		      unsigned long irqflags, const char *devname, void *dev_id,
-> +		      int qid)
-
-
-Let's add comment as what has been done by other exported helpers.
-
-
-> +{
-> +	int ret;
-> +
-> +	ret = devm_request_irq(dev, irq, handler, irqflags, devname, dev_id);
-> +	if (ret)
-> +		dev_err(dev, "Failed to request irq for vq %d\n", qid);
-> +	else
-> +		vdpa_setup_irq(vdev, qid, irq);
-> +
-> +	return ret;
-> +
-> +}
-> +EXPORT_SYMBOL_GPL(vdpa_alloc_vq_irq);
-> +
-> +void vdpa_free_vq_irq(struct device *dev, struct vdpa_device *vdev, int irq,
-> +			 int qid, void *dev_id)
-> +{
-> +	devm_free_irq(dev, irq, dev_id);
-> +	vdpa_unsetup_irq(vdev, qid);
-> +}
-> +EXPORT_SYMBOL_GPL(vdpa_free_vq_irq);
-> +
->   static int vdpa_init(void)
->   {
->   	return bus_register(&vdpa_bus);
-> diff --git a/include/linux/vdpa.h b/include/linux/vdpa.h
-> index 239db79..7d64d83 100644
-> --- a/include/linux/vdpa.h
-> +++ b/include/linux/vdpa.h
-> @@ -220,17 +220,30 @@ struct vdpa_device *__vdpa_alloc_device(struct device *parent,
->   
->   int vdpa_register_device(struct vdpa_device *vdev);
->   void vdpa_unregister_device(struct vdpa_device *vdev);
-> +/* request irq for a vq, setup irq offloading if its a vhost_vdpa vq */
-
-
-Let's do the documentation in vdpa.c, and again, document the devres 
-implications or j_xxxust name it as vdpa_devm_xxx.
-
-
-> +int vdpa_alloc_vq_irq(struct device *dev, struct vdpa_device *vdev,
-> +		      unsigned int irq, irq_handler_t handler,
-> +		      unsigned long irqflags, const char *devname, void *dev_id,
-> +		      int qid);
-> +/* free irq for a vq, unsetup irq offloading if its a vhost_vdpa vq */
-> +void vdpa_free_vq_irq(struct device *dev, struct vdpa_device *vdev, int irq,
-> +		      int qid, void *dev_id);
-> +
->   
->   /**
->    * vdpa_driver - operations for a vDPA driver
->    * @driver: underlying device driver
->    * @probe: the function to call when a device is found.  Returns 0 or -errno.
->    * @remove: the function to call when a device is removed.
-> + * @setup_vq_irq: setup irq offloading for a vhost_vdpa vq.
-> + * @unsetup_vq_irq: unsetup offloading for a vhost_vdpa vq.
-
-
-Let's not limit the methods for a specific use case like irq offloading 
-here.
-
-
->    */
->   struct vdpa_driver {
->   	struct device_driver driver;
->   	int (*probe)(struct vdpa_device *vdev);
->   	void (*remove)(struct vdpa_device *vdev);
-> +	void (*setup_vq_irq)(struct vdpa_device *vdev, int qid, int irq);
-> +	void (*unsetup_vq_irq)(struct vdpa_device *vdev, int qid);
-
-
-To be consistent with the exported helper, let's use 
-alloc_vq_irq/free_vq_irq
-
-Thanks
-
-
->   };
->   
->   #define vdpa_register_driver(drv) \
-
+For information about bisection process see: https://goo.gl/tpsmEJ#bisection
