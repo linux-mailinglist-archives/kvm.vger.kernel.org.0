@@ -2,127 +2,228 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3E7C222418C
-	for <lists+kvm@lfdr.de>; Fri, 17 Jul 2020 19:11:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5911F224191
+	for <lists+kvm@lfdr.de>; Fri, 17 Jul 2020 19:14:30 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726617AbgGQRLP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 17 Jul 2020 13:11:15 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:42707 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726205AbgGQRLP (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 17 Jul 2020 13:11:15 -0400
+        id S1726635AbgGQRO0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 17 Jul 2020 13:14:26 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:47500 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726205AbgGQRO0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 17 Jul 2020 13:14:26 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1595005874;
+        s=mimecast20190719; t=1595006063;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=2AMU7kXgsmroj3OkjSJnDrsJrfXNO1FrxQl3btc5KCM=;
-        b=eL2UpPp99vO0v1aRE52LpfywLvN+SnvyhBb5O3Ncaf3+YzlQeQPJbrAaQgytde6Mxx3d7Q
-        os8T2krAPyghpU+42HHlBQ8iromTg1/Mf/ezIiiL+thM1k+mqgif1MXOMhmc3ecZvr7tRZ
-        6eECofhhec1F7STldPBz2Wln0pfbFus=
+        bh=h7Vro6oATDfc57wTbAGmgD4ZVMjfXELJBQKUa0OblJs=;
+        b=BVms1uMgV4BI9jgIDpYG8/kUOelur+zmDR72hY5LZ06Ntk8LGXpPu/YioDt7pb8UIu08mI
+        C7V2KuVBfwWXXI0ssAQ8dZPO89LqqqXuH/9LT2LAsTH5OXteBezcjcYapVlVsmY7uC/Mn7
+        WZ+qn4OgWz/0XX3LH3NXkqQDclKPBDU=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-196-XkE7hKg1OgSv7w8CgJlhmg-1; Fri, 17 Jul 2020 13:11:03 -0400
-X-MC-Unique: XkE7hKg1OgSv7w8CgJlhmg-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+ us-mta-63-mBLot0W0O2qV29HKiIlQ-Q-1; Fri, 17 Jul 2020 13:14:19 -0400
+X-MC-Unique: mBLot0W0O2qV29HKiIlQ-Q-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B04D08014D7;
-        Fri, 17 Jul 2020 17:11:01 +0000 (UTC)
-Received: from localhost (ovpn-114-107.ams2.redhat.com [10.36.114.107])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 81E8375559;
-        Fri, 17 Jul 2020 17:10:55 +0000 (UTC)
-Date:   Fri, 17 Jul 2020 18:10:54 +0100
-From:   Stefan Hajnoczi <stefanha@redhat.com>
-To:     Nikos Dragazis <ndragazis@arrikto.com>
-Cc:     Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>,
-        "John G. Johnson" <john.g.johnson@oracle.com>,
-        Andra-Irina Paraschiv <andraprs@amazon.com>,
-        kvm@vger.kernel.org, "Michael S. Tsirkin" <mst@redhat.com>,
-        Jan Kiszka <jan.kiszka@siemens.com>, qemu-devel@nongnu.org,
-        Maxime Coquelin <maxime.coquelin@redhat.com>,
-        Alexander Graf <graf@amazon.com>,
-        Thanos Makatos <thanos.makatos@nutanix.com>
-Subject: Re: Inter-VM device emulation (call on Mon 20th July 2020)
-Message-ID: <20200717171054.GA136776@stefanha-x1.localdomain>
-References: <86d42090-f042-06a1-efba-d46d449df280@arrikto.com>
- <20200715112342.GD18817@stefanha-x1.localdomain>
- <deb5788e-c828-6996-025d-333cf2bca7ab@siemens.com>
- <20200715153855.GA47883@stefanha-x1.localdomain>
- <87y2nkwwvy.fsf@linaro.org>
- <b3efd773-c07e-8095-c1ca-5ffb894ac2ac@arrikto.com>
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DAF2F18A1DE5;
+        Fri, 17 Jul 2020 17:14:17 +0000 (UTC)
+Received: from [10.36.115.54] (ovpn-115-54.ams2.redhat.com [10.36.115.54])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id C8FF910013C4;
+        Fri, 17 Jul 2020 17:14:08 +0000 (UTC)
+Subject: Re: [PATCH v5 15/15] iommu/vt-d: Support reporting nesting capability
+ info
+To:     Liu Yi L <yi.l.liu@intel.com>, alex.williamson@redhat.com,
+        baolu.lu@linux.intel.com, joro@8bytes.org
+Cc:     kevin.tian@intel.com, jacob.jun.pan@linux.intel.com,
+        ashok.raj@intel.com, jun.j.tian@intel.com, yi.y.sun@intel.com,
+        jean-philippe@linaro.org, peterx@redhat.com, hao.wu@intel.com,
+        stefanha@gmail.com, iommu@lists.linux-foundation.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <1594552870-55687-1-git-send-email-yi.l.liu@intel.com>
+ <1594552870-55687-16-git-send-email-yi.l.liu@intel.com>
+From:   Auger Eric <eric.auger@redhat.com>
+Message-ID: <be27f7ee-3fac-d1c5-0cd9-9581f8827de6@redhat.com>
+Date:   Fri, 17 Jul 2020 19:14:07 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <b3efd773-c07e-8095-c1ca-5ffb894ac2ac@arrikto.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="C7zPtVaVf+AK4Oqc"
-Content-Disposition: inline
+In-Reply-To: <1594552870-55687-16-git-send-email-yi.l.liu@intel.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
---C7zPtVaVf+AK4Oqc
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Hi Yi,
 
-On Fri, Jul 17, 2020 at 11:58:40AM +0300, Nikos Dragazis wrote:
-> On 15/7/20 7:44 =CE=BC.=CE=BC., Alex Benn=C3=A9e wrote:
->=20
-> > Stefan Hajnoczi <stefanha@redhat.com> writes:
-> >=20
-> > > On Wed, Jul 15, 2020 at 01:28:07PM +0200, Jan Kiszka wrote:
-> > > > On 15.07.20 13:23, Stefan Hajnoczi wrote:
-> > > > > Let's have a call to figure out:
-> > > > >=20
-> > > > > 1. What is unique about these approaches and how do they overlap?
-> > > > > 2. Can we focus development and code review efforts to get someth=
-ing
-> > > > >     merged sooner?
-> > > > >=20
-> > > > > Jan and Nikos: do you have time to join on Monday, 20th of July a=
-t 15:00
-> > > > > UTC?
-> > > > > https://www.timeanddate.com/worldclock/fixedtime.html?iso=3D20200=
-720T1500
-> > > > >=20
-> > > > Not at that slot, but one hour earlier or later would work for me (=
-so far).
-> > > Nikos: Please let us know which of Jan's timeslots works best for you=
-.
-> > I'm in - the earlier slot would be preferential for me to avoid clashin=
-g with
-> > family time.
-> >=20
->=20
-> I'm OK with all timeslots.
+Missing a proper commit message. You can comment on the fact you only
+support the case where all the physical iomms have the same CAP/ECAP MASKS
 
-Great, let's do 16:00 UTC.
+On 7/12/20 1:21 PM, Liu Yi L wrote:
+> Cc: Kevin Tian <kevin.tian@intel.com>
+> CC: Jacob Pan <jacob.jun.pan@linux.intel.com>
+> Cc: Alex Williamson <alex.williamson@redhat.com>
+> Cc: Eric Auger <eric.auger@redhat.com>
+> Cc: Jean-Philippe Brucker <jean-philippe@linaro.org>
+> Cc: Joerg Roedel <joro@8bytes.org>
+> Cc: Lu Baolu <baolu.lu@linux.intel.com>
+> Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
+> Signed-off-by: Jacob Pan <jacob.jun.pan@linux.intel.com>
+> ---
+> v2 -> v3:
+> *) remove cap/ecap_mask in iommu_nesting_info.
+> ---
+>  drivers/iommu/intel/iommu.c | 81 +++++++++++++++++++++++++++++++++++++++++++--
+>  include/linux/intel-iommu.h | 16 +++++++++
+>  2 files changed, 95 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/iommu/intel/iommu.c b/drivers/iommu/intel/iommu.c
+> index a9504cb..9f7ad1a 100644
+> --- a/drivers/iommu/intel/iommu.c
+> +++ b/drivers/iommu/intel/iommu.c
+> @@ -5659,12 +5659,16 @@ static inline bool iommu_pasid_support(void)
+>  static inline bool nested_mode_support(void)
+>  {
+>  	struct dmar_drhd_unit *drhd;
+> -	struct intel_iommu *iommu;
+> +	struct intel_iommu *iommu, *prev = NULL;
+>  	bool ret = true;
+>  
+>  	rcu_read_lock();
+>  	for_each_active_iommu(iommu, drhd) {
+> -		if (!sm_supported(iommu) || !ecap_nest(iommu->ecap)) {
+> +		if (!prev)
+> +			prev = iommu;
+> +		if (!sm_supported(iommu) || !ecap_nest(iommu->ecap) ||
+> +		    (VTD_CAP_MASK & (iommu->cap ^ prev->cap)) ||
+> +		    (VTD_ECAP_MASK & (iommu->ecap ^ prev->ecap))) {
+>  			ret = false;
+>  			break;>  		}
+> @@ -6079,6 +6083,78 @@ intel_iommu_domain_set_attr(struct iommu_domain *domain,
+>  	return ret;
+>  }
+>  
+> +static int intel_iommu_get_nesting_info(struct iommu_domain *domain,
+> +					struct iommu_nesting_info *info)
+> +{
+> +	struct dmar_domain *dmar_domain = to_dmar_domain(domain);
+> +	u64 cap = VTD_CAP_MASK, ecap = VTD_ECAP_MASK;
+> +	struct device_domain_info *domain_info;
+> +	struct iommu_nesting_info_vtd vtd;
+> +	unsigned long flags;
+> +	unsigned int size;
+> +
+> +	if (domain->type != IOMMU_DOMAIN_UNMANAGED ||
+> +	    !(dmar_domain->flags & DOMAIN_FLAG_NESTING_MODE))
+> +		return -ENODEV;
+> +
+> +	if (!info)
+> +		return -EINVAL;
+> +
+> +	size = sizeof(struct iommu_nesting_info) +
+> +		sizeof(struct iommu_nesting_info_vtd);
+> +	/*
+> +	 * if provided buffer size is smaller than expected, should
+> +	 * return 0 and also the expected buffer size to caller.
+> +	 */
+> +	if (info->size < size) {
+> +		info->size = size;
+> +		return 0;
+> +	}
+> +
+> +	spin_lock_irqsave(&device_domain_lock, flags);
+> +	/*
+> +	 * arbitrary select the first domain_info as all nesting
+> +	 * related capabilities should be consistent across iommu
+> +	 * units.
+> +	 */
+> +	domain_info = list_first_entry(&dmar_domain->devices,
+> +				       struct device_domain_info, link);
+> +	cap &= domain_info->iommu->cap;
+> +	ecap &= domain_info->iommu->ecap;
+> +	spin_unlock_irqrestore(&device_domain_lock, flags);
+> +
+> +	info->format = IOMMU_PASID_FORMAT_INTEL_VTD;
+> +	info->features = IOMMU_NESTING_FEAT_SYSWIDE_PASID |
+> +			 IOMMU_NESTING_FEAT_BIND_PGTBL |
+> +			 IOMMU_NESTING_FEAT_CACHE_INVLD;
+> +	info->addr_width = dmar_domain->gaw;
+> +	info->pasid_bits = ilog2(intel_pasid_max_id);
+> +	info->padding = 0;
+> +	vtd.flags = 0;
+> +	vtd.padding = 0;
+> +	vtd.cap_reg = cap;
+> +	vtd.ecap_reg = ecap;
+> +
+> +	memcpy(info->data, &vtd, sizeof(vtd));
+> +	return 0;
+> +}
+> +
+> +static int intel_iommu_domain_get_attr(struct iommu_domain *domain,
+> +				       enum iommu_attr attr, void *data)
+> +{
+> +	switch (attr) {
+> +	case DOMAIN_ATTR_NESTING:
+> +	{
+> +		struct iommu_nesting_info *info =
+> +				(struct iommu_nesting_info *)data;
+> +
+> +		return intel_iommu_get_nesting_info(domain, info);
+> +	}
+> +	default:
+> +		return -ENODEV;
+-ENOENT?
+> +	}
+> +}
+> +
+>  /*
+>   * Check that the device does not live on an external facing PCI port that is
+>   * marked as untrusted. Such devices should not be able to apply quirks and
+> @@ -6101,6 +6177,7 @@ const struct iommu_ops intel_iommu_ops = {
+>  	.domain_alloc		= intel_iommu_domain_alloc,
+>  	.domain_free		= intel_iommu_domain_free,
+>  	.domain_set_attr	= intel_iommu_domain_set_attr,
+> +	.domain_get_attr	= intel_iommu_domain_get_attr,
+>  	.attach_dev		= intel_iommu_attach_device,
+>  	.detach_dev		= intel_iommu_detach_device,
+>  	.aux_attach_dev		= intel_iommu_aux_attach_device,
+> diff --git a/include/linux/intel-iommu.h b/include/linux/intel-iommu.h
+> index 18f292e..c4ed0d4 100644
+> --- a/include/linux/intel-iommu.h
+> +++ b/include/linux/intel-iommu.h
+> @@ -197,6 +197,22 @@
+>  #define ecap_max_handle_mask(e) ((e >> 20) & 0xf)
+>  #define ecap_sc_support(e)	((e >> 7) & 0x1) /* Snooping Control */
+>  
+> +/* Nesting Support Capability Alignment */
+> +#define VTD_CAP_FL1GP		BIT_ULL(56)
+> +#define VTD_CAP_FL5LP		BIT_ULL(60)
+> +#define VTD_ECAP_PRS		BIT_ULL(29)
+> +#define VTD_ECAP_ERS		BIT_ULL(30)
+> +#define VTD_ECAP_SRS		BIT_ULL(31)
+> +#define VTD_ECAP_EAFS		BIT_ULL(34)
+> +#define VTD_ECAP_PASID		BIT_ULL(40)
 
-I have a meeting at 14:00 UTC so I can't make the earlier slot and it
-sounds like Andra-Irina and Alexander Graf do too. Sorry, Alex (Benn=C3=A9e=
-),
-not optimal but it's hard to find a slot that is perfect for everyone.
+> +
+> +/* Only capabilities marked in below MASKs are reported */
+> +#define VTD_CAP_MASK		(VTD_CAP_FL1GP | VTD_CAP_FL5LP)
+> +
+> +#define VTD_ECAP_MASK		(VTD_ECAP_PRS | VTD_ECAP_ERS | \
+> +				 VTD_ECAP_SRS | VTD_ECAP_EAFS | \
+> +				 VTD_ECAP_PASID)
+> +
+>  /* Virtual command interface capability */
+>  #define vccap_pasid(v)		(((v) & DMA_VCS_PAS)) /* PASID allocation */
+>  
+> 
+Thanks
 
-Stefan
+Eric
 
---C7zPtVaVf+AK4Oqc
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl8R254ACgkQnKSrs4Gr
-c8grAAgAi2wVUmRLdx6YA+VLULX0iVZjWcEwN4qqjvrwXwEHSz5q3MRzkbZCcRI4
-xvlY9ZHk279PCt2CBx8317aupxADZFUAv3N4zz+9XZnOi1A8JfOTjq40D8/9ECZG
-5so8TZrZxjLo5+zXbRlwXPYTMYTbAgLy3EH/Qbj5v1oTavSVO8WcOtsGdWQo+oQm
-Re/KMrIrR+vjPjO9gBuQm9+qtfEIX4W5UfLw0fPVbQeExq2sBG5JkcUA6FGoni9w
-PT6hvOS50YwEbFuEgAY7zkQ0eEziBotU/5V+p6cOoBJq/JKOLXA6b9AxhnLkD+Ee
-gakArk5I1uxEpq/6laYT+DqMTB102A==
-=HI4C
------END PGP SIGNATURE-----
-
---C7zPtVaVf+AK4Oqc--
 
