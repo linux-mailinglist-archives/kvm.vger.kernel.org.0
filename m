@@ -2,251 +2,335 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 417E92241BE
-	for <lists+kvm@lfdr.de>; Fri, 17 Jul 2020 19:27:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A54702241DF
+	for <lists+kvm@lfdr.de>; Fri, 17 Jul 2020 19:34:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726627AbgGQRZ7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 17 Jul 2020 13:25:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43192 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726232AbgGQRZ7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 17 Jul 2020 13:25:59 -0400
-Received: from mail-ot1-x341.google.com (mail-ot1-x341.google.com [IPv6:2607:f8b0:4864:20::341])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3CA83C0619D2
-        for <kvm@vger.kernel.org>; Fri, 17 Jul 2020 10:25:59 -0700 (PDT)
-Received: by mail-ot1-x341.google.com with SMTP id 95so7408358otw.10
-        for <kvm@vger.kernel.org>; Fri, 17 Jul 2020 10:25:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=fA/qgfiMlIm6DaorpA1k/f2IvyM46KgPHDRmF2JATYU=;
-        b=iuthQu6LH99OsV+mQbxcja9ScSRaZvsR5qiIt+DsYophAQaNm8NC6wlZi+yHb2iNJl
-         eVtHP21CqgNla77GmrOUfa4p+gI83t5uNHjiPDa9WF1dk3ifmRaIsNHl+kWdnTYi0GfG
-         cno/9YebyzAxYJhLZ8RuA6dKl2b2JUycwnks0=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=fA/qgfiMlIm6DaorpA1k/f2IvyM46KgPHDRmF2JATYU=;
-        b=JEPLsaDtgTo2T4zLZkfMC0E+G6+hUTkElMk9AfvLvP/gotgNqVPT9yXhWF6YB+N0sG
-         AU9DnZVACQWESEEBtYVtByzCHkvPiqyRXOONHoI8ZWDJdKg7ueRodAnjXbJsEjC9X3WY
-         hOhITwzlofYK3l0KlEoLxVavwhmK9iLiEsIPn3ZGzicCypWWvDLAieAuVIFAVjSFEIsb
-         a1PC7PplaKm0sL2zJCcerwvTkQlmOLj0HyHLWUmnVYBp+URKjJH03mZahmqn9xSBzzx1
-         VndnknJMvDNcgmLw1aMLOOVA76cskIOtpv1CbBXSx5ub2M/jIY+IE9hIJldrL6JuM0s2
-         A5AA==
-X-Gm-Message-State: AOAM531uqMbq72DjqThR83pdvcaaDMxRW7GbuSZvRVqJv9/yedwl5ytC
-        X6kvO6tplRodsHrv17+Y/ZP74eCbGiE=
-X-Google-Smtp-Source: ABdhPJwZprVV6FIy3IxAm5r49yDXgVJCusZrsFQcoOwk498Cnc5O5W/4rwdBszJv1xD585R3ddtmFg==
-X-Received: by 2002:a05:6830:1e55:: with SMTP id e21mr10234491otj.318.1595006758343;
-        Fri, 17 Jul 2020 10:25:58 -0700 (PDT)
-Received: from mail-ot1-f51.google.com (mail-ot1-f51.google.com. [209.85.210.51])
-        by smtp.gmail.com with ESMTPSA id e193sm1953637oib.0.2020.07.17.10.25.58
-        for <kvm@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 17 Jul 2020 10:25:58 -0700 (PDT)
-Received: by mail-ot1-f51.google.com with SMTP id 5so7372123oty.11
-        for <kvm@vger.kernel.org>; Fri, 17 Jul 2020 10:25:58 -0700 (PDT)
-X-Received: by 2002:ab0:150c:: with SMTP id o12mr8307356uae.90.1595006404233;
- Fri, 17 Jul 2020 10:20:04 -0700 (PDT)
+        id S1727040AbgGQReo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 17 Jul 2020 13:34:44 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:32798 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726090AbgGQRen (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 17 Jul 2020 13:34:43 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1595007281;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=xOYTxw3r0CL+8Q4MvBrIEj3j12LO6u9nDXOleZT0OGs=;
+        b=Jx/KtPBFnDBeeekF4V6MRauABFD7bnv3JgEkVZWzM660exIVruDS1dyWj+PfuQA8X5VfCD
+        SxHFAvrzOSbQENnrxP2JJjLpwapnirqZxtUdajqG8gur0Dykj7Ny+xphcrIKGMMLzOGZ4J
+        JpdPWSgRUjQVJU8OzOnyg4Xam+qth5Y=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-319-bYS67CsaOxOXfs0P_w4BaA-1; Fri, 17 Jul 2020 13:34:37 -0400
+X-MC-Unique: bYS67CsaOxOXfs0P_w4BaA-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5FB3C80183C;
+        Fri, 17 Jul 2020 17:34:35 +0000 (UTC)
+Received: from [10.36.115.54] (ovpn-115-54.ams2.redhat.com [10.36.115.54])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id EE8846FECD;
+        Fri, 17 Jul 2020 17:34:25 +0000 (UTC)
+Subject: Re: [PATCH v5 04/15] vfio/type1: Report iommu nesting info to
+ userspace
+To:     Liu Yi L <yi.l.liu@intel.com>, alex.williamson@redhat.com,
+        baolu.lu@linux.intel.com, joro@8bytes.org
+Cc:     kevin.tian@intel.com, jacob.jun.pan@linux.intel.com,
+        ashok.raj@intel.com, jun.j.tian@intel.com, yi.y.sun@intel.com,
+        jean-philippe@linaro.org, peterx@redhat.com, hao.wu@intel.com,
+        stefanha@gmail.com, iommu@lists.linux-foundation.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <1594552870-55687-1-git-send-email-yi.l.liu@intel.com>
+ <1594552870-55687-5-git-send-email-yi.l.liu@intel.com>
+From:   Auger Eric <eric.auger@redhat.com>
+Message-ID: <2eb692fc-a399-8298-4b4b-68adb0357404@redhat.com>
+Date:   Fri, 17 Jul 2020 19:34:24 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-References: <20200708194715.4073300-1-abhishekbh@google.com>
- <87y2ntotah.fsf@nanos.tec.linutronix.de> <CAD=FV=WCu7o41iyn27vNBWo4f_X_XVy+PPPjBKc+70g5jd5+8w@mail.gmail.com>
- <874kq6ru08.fsf@nanos.tec.linutronix.de>
-In-Reply-To: <874kq6ru08.fsf@nanos.tec.linutronix.de>
-From:   Doug Anderson <dianders@chromium.org>
-Date:   Fri, 17 Jul 2020 10:19:52 -0700
-X-Gmail-Original-Message-ID: <CAD=FV=WPhaZC87Yb5LOYZ3s7_NWS2yhyaA6RXZQYojfAGvX84g@mail.gmail.com>
-Message-ID: <CAD=FV=WPhaZC87Yb5LOYZ3s7_NWS2yhyaA6RXZQYojfAGvX84g@mail.gmail.com>
-Subject: Re: [PATCH v5] x86/speculation/l1tf: Add KConfig for setting the L1D
- cache flush mode
-To:     Thomas Gleixner <tglx@linutronix.de>
-Cc:     Abhishek Bhardwaj <abhishekbh@google.com>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Anthony Steinhauser <asteinhauser@google.com>,
-        Borislav Petkov <bp@alien8.de>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Josh Poimboeuf <jpoimboe@redhat.com>,
-        Mark Gross <mgross@linux.intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Tony Luck <tony.luck@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Waiman Long <longman@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>, kvm@vger.kernel.org,
-        x86 <x86@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <1594552870-55687-5-git-send-email-yi.l.liu@intel.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi,
+Yi,
 
-On Fri, Jul 17, 2020 at 9:22 AM Thomas Gleixner <tglx@linutronix.de> wrote:
->
-> Doug,
->
-> Doug Anderson <dianders@chromium.org> writes:
-> > On Thu, Jul 9, 2020 at 3:51 AM Thomas Gleixner <tglx@linutronix.de> wrote:
-> >> TBH, I don't see why this is a good idea.
-> >>
-> >>  1) I'm not following your argumentation that the command line option is
-> >>     a poor Kconfig replacement. The L1TF mode is a boot time (module
-> >>     load time) decision and the command line parameter is there to
-> >>     override the carefully chosen and sensible default behaviour.
-> >
-> > When you say that the default behavior is carefully chosen and
-> > sensible, are you saying that (in your opinion) there would never be a
-> > good reason for someone distributing a kernel to others to change the
-> > default?  Certainly I agree that having the kernel command line
-> > parameter is nice to allow someone to override whatever the person
-> > building the kernel chose, but IMO it's not a good way to change the
-> > default built-in to the kernel.
->
-> The problem is that you have to be careful about what you stick into
-> Kconfig. It's L1TF on x86 today and tomorrow it's MDS and whatever and
-> then you do the same thing on the other architectures as well. And we
-> still need the command line options so that generic builds can be
-> customized at boot time.
->
-> > The current plan (as I understand it) is that we'd like to ship
-> > Chromebook kernels with this option changed from the default that's
-> > there now.  In your opinion, is that a sane thing to do?
->
-> If it's sane for you folks, then feel free to do so. Distros & al patch
-> the kernel do death anyway, but that does not mean that mainline has to
-> have everything these people chose to do.
+On 7/12/20 1:20 PM, Liu Yi L wrote:
+> This patch exports iommu nesting capability info to user space through
+> VFIO. User space is expected to check this info for supported uAPIs (e.g.
+it is not only to check the supported uAPIS but rather to know which
+callbacks it must call upon vIOMMU events and which features are
+supported by the physical IOMMU.
+> PASID alloc/free, bind page table, and cache invalidation) and the vendor
+> specific format information for first level/stage page table that will be
+> bound to.
+> 
+> The nesting info is available only after the nesting iommu type is set
+> for a container.
+to NESTED type
+ Current implementation imposes one limitation - one
+> nesting container should include at most one group. The philosophy of
+> vfio container is having all groups/devices within the container share
+> the same IOMMU context. When vSVA is enabled, one IOMMU context could
+> include one 2nd-level address space and multiple 1st-level address spaces.
+> While the 2nd-level address space is reasonably sharable by multiple groups
+> , blindly sharing 1st-level address spaces across all groups within the
+> container might instead break the guest expectation. In the future sub/
+> super container concept might be introduced to allow partial address space
+> sharing within an IOMMU context. But for now let's go with this restriction
+> by requiring singleton container for using nesting iommu features. Below
+> link has the related discussion about this decision.
 
-Sure, we could carry a local patch.  ...but Chrome OS tries not to be
-like all other distros.  We try very hard (and keep trying harder each
-year) to _not_ carry local patches.  Sure, we fail sometimes, but we
-will still try.  In general it seems like the upstream Linux community
-pushes distros and other Linux users to be upstream first so it's a
-little discouraging to hear the advice of "just carry a local patch".
+Maybe add a note about SMMU related changes spotted by Jean.
+> 
+> https://lkml.org/lkml/2020/5/15/1028
+> 
+> Cc: Kevin Tian <kevin.tian@intel.com>
+> CC: Jacob Pan <jacob.jun.pan@linux.intel.com>
+> Cc: Alex Williamson <alex.williamson@redhat.com>
+> Cc: Eric Auger <eric.auger@redhat.com>
+> Cc: Jean-Philippe Brucker <jean-philippe@linaro.org>
+> Cc: Joerg Roedel <joro@8bytes.org>
+> Cc: Lu Baolu <baolu.lu@linux.intel.com>
+> Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
+> ---
+> v4 -> v5:
+> *) address comments from Eric Auger.
+> *) return struct iommu_nesting_info for VFIO_IOMMU_TYPE1_INFO_CAP_NESTING as
+>    cap is much "cheap", if needs extension in future, just define another cap.
+>    https://lore.kernel.org/kvm/20200708132947.5b7ee954@x1.home/
+> 
+> v3 -> v4:
+> *) address comments against v3.
+> 
+> v1 -> v2:
+> *) added in v2
+> ---
+>  drivers/vfio/vfio_iommu_type1.c | 102 +++++++++++++++++++++++++++++++++++-----
+>  include/uapi/linux/vfio.h       |  19 ++++++++
+>  2 files changed, 109 insertions(+), 12 deletions(-)
+> 
+> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
+> index 3bd70ff..ed80104 100644
+> --- a/drivers/vfio/vfio_iommu_type1.c
+> +++ b/drivers/vfio/vfio_iommu_type1.c
+> @@ -62,18 +62,20 @@ MODULE_PARM_DESC(dma_entry_limit,
+>  		 "Maximum number of user DMA mappings per container (65535).");
+>  
+>  struct vfio_iommu {
+> -	struct list_head	domain_list;
+> -	struct list_head	iova_list;
+> -	struct vfio_domain	*external_domain; /* domain for external user */
+> -	struct mutex		lock;
+> -	struct rb_root		dma_list;
+> -	struct blocking_notifier_head notifier;
+> -	unsigned int		dma_avail;
+> -	uint64_t		pgsize_bitmap;
+> -	bool			v2;
+> -	bool			nesting;
+> -	bool			dirty_page_tracking;
+> -	bool			pinned_page_dirty_scope;
+> +	struct list_head		domain_list;
+> +	struct list_head		iova_list;
+> +	/* domain for external user */
+> +	struct vfio_domain		*external_domain;
+> +	struct mutex			lock;
+> +	struct rb_root			dma_list;
+> +	struct blocking_notifier_head	notifier;
+> +	unsigned int			dma_avail;
+> +	uint64_t			pgsize_bitmap;
+> +	bool				v2;
+> +	bool				nesting;
+> +	bool				dirty_page_tracking;
+> +	bool				pinned_page_dirty_scope;
+> +	struct iommu_nesting_info	*nesting_info;
+>  };
+>  
+>  struct vfio_domain {
+> @@ -130,6 +132,9 @@ struct vfio_regions {
+>  #define IS_IOMMU_CAP_DOMAIN_IN_CONTAINER(iommu)	\
+>  					(!list_empty(&iommu->domain_list))
+>  
+> +#define CONTAINER_HAS_DOMAIN(iommu)	(((iommu)->external_domain) || \
+> +					 (!list_empty(&(iommu)->domain_list)))
+> +
+>  #define DIRTY_BITMAP_BYTES(n)	(ALIGN(n, BITS_PER_TYPE(u64)) / BITS_PER_BYTE)
+>  
+>  /*
+> @@ -1929,6 +1934,13 @@ static void vfio_iommu_iova_insert_copy(struct vfio_iommu *iommu,
+>  
+>  	list_splice_tail(iova_copy, iova);
+>  }
+> +
+> +static void vfio_iommu_release_nesting_info(struct vfio_iommu *iommu)
+> +{
+> +	kfree(iommu->nesting_info);
+> +	iommu->nesting_info = NULL;
+> +}
+> +
+>  static int vfio_iommu_type1_attach_group(void *iommu_data,
+>  					 struct iommu_group *iommu_group)
+>  {
+> @@ -1959,6 +1971,12 @@ static int vfio_iommu_type1_attach_group(void *iommu_data,
+>  		}
+>  	}
+>  
+> +	/* Nesting type container can include only one group */
+> +	if (iommu->nesting && CONTAINER_HAS_DOMAIN(iommu)) {
+> +		mutex_unlock(&iommu->lock);
+> +		return -EINVAL;
+> +	}
+> +
+>  	group = kzalloc(sizeof(*group), GFP_KERNEL);
+>  	domain = kzalloc(sizeof(*domain), GFP_KERNEL);
+>  	if (!group || !domain) {
+> @@ -2029,6 +2047,32 @@ static int vfio_iommu_type1_attach_group(void *iommu_data,
+>  	if (ret)
+>  		goto out_domain;
+>  
+> +	/* Nesting cap info is available only after attaching */
+> +	if (iommu->nesting) {
+> +		struct iommu_nesting_info tmp = { .size = 0, };
+> +
+> +		/* First get the size of vendor specific nesting info */
+> +		ret = iommu_domain_get_attr(domain->domain,
+> +					    DOMAIN_ATTR_NESTING,
+> +					    &tmp);
+> +		if (ret)
+> +			goto out_detach;
+> +
+> +		iommu->nesting_info = kzalloc(tmp.size, GFP_KERNEL);
+> +		if (!iommu->nesting_info) {
+> +			ret = -ENOMEM;
+> +			goto out_detach;
+> +		}
+> +
+> +		/* Now get the nesting info */
+> +		iommu->nesting_info->size = tmp.size;
+> +		ret = iommu_domain_get_attr(domain->domain,
+> +					    DOMAIN_ATTR_NESTING,
+> +					    iommu->nesting_info);
+> +		if (ret)
+> +			goto out_detach;
+> +	}
+> +
+>  	/* Get aperture info */
+>  	iommu_domain_get_attr(domain->domain, DOMAIN_ATTR_GEOMETRY, &geo);
+>  
+> @@ -2138,6 +2182,7 @@ static int vfio_iommu_type1_attach_group(void *iommu_data,
+>  	return 0;
+>  
+>  out_detach:
+> +	vfio_iommu_release_nesting_info(iommu);
+>  	vfio_iommu_detach_group(domain, group);
+>  out_domain:
+>  	iommu_domain_free(domain->domain);
+> @@ -2338,6 +2383,8 @@ static void vfio_iommu_type1_detach_group(void *iommu_data,
+>  					vfio_iommu_unmap_unpin_all(iommu);
+>  				else
+>  					vfio_iommu_unmap_unpin_reaccount(iommu);
+> +
+> +				vfio_iommu_release_nesting_info(iommu);
+>  			}
+>  			iommu_domain_free(domain->domain);
+>  			list_del(&domain->next);
+> @@ -2546,6 +2593,31 @@ static int vfio_iommu_migration_build_caps(struct vfio_iommu *iommu,
+>  	return vfio_info_add_capability(caps, &cap_mig.header, sizeof(cap_mig));
+>  }
+>  
+> +static int vfio_iommu_info_add_nesting_cap(struct vfio_iommu *iommu,
+> +					   struct vfio_info_cap *caps)
+> +{
+> +	struct vfio_info_cap_header *header;
+> +	struct vfio_iommu_type1_info_cap_nesting *nesting_cap;
+> +	size_t size;
+> +
+> +	size = offsetof(struct vfio_iommu_type1_info_cap_nesting, info) +
+> +		iommu->nesting_info->size;
+> +
+> +	header = vfio_info_cap_add(caps, size,
+> +				   VFIO_IOMMU_TYPE1_INFO_CAP_NESTING, 1);
+> +	if (IS_ERR(header))
+> +		return PTR_ERR(header);
+> +
+> +	nesting_cap = container_of(header,
+> +				   struct vfio_iommu_type1_info_cap_nesting,
+> +				   header);
+> +
+> +	memcpy(&nesting_cap->info, iommu->nesting_info,
+> +	       iommu->nesting_info->size);
+you must check whether nesting_info is non NULL before doing that.
 
-In this case, though, I should close the loop.  Abhishek can correct
-me if I'm wrong, but I think the answer here was that it _wasn't_ sane
-for us to change this option via KConfig or even via kernel command
-line.  I believe that Abhishek found that it was better to (in
-userspace) look at the sysfs nodes and configure things how he wanted
-it at runtime.
+Besides I agree with Jean on the fact it may be better to not report the
+capability if nested is not supported.
+> +
+> +	return 0;
+> +}
+> +
+>  static int vfio_iommu_type1_get_info(struct vfio_iommu *iommu,
+>  				     unsigned long arg)
+>  {
+> @@ -2581,6 +2653,12 @@ static int vfio_iommu_type1_get_info(struct vfio_iommu *iommu,
+>  	if (!ret)
+>  		ret = vfio_iommu_iova_build_caps(iommu, &caps);
+>  
+> +	if (iommu->nesting_info) {
+> +		ret = vfio_iommu_info_add_nesting_cap(iommu, &caps);
+> +		if (ret)
+> +			return ret;
+> +	}
+> +
+>  	mutex_unlock(&iommu->lock);
+>  
+>  	if (ret)
+> diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
+> index 9204705..46a78af 100644
+> --- a/include/uapi/linux/vfio.h
+> +++ b/include/uapi/linux/vfio.h
+> @@ -14,6 +14,7 @@
+>  
+>  #include <linux/types.h>
+>  #include <linux/ioctl.h>
+> +#include <linux/iommu.h>
+>  
+>  #define VFIO_API_VERSION	0
+>  
+> @@ -1039,6 +1040,24 @@ struct vfio_iommu_type1_info_cap_migration {
+>  	__u64	max_dirty_bitmap_size;		/* in bytes */
+>  };
+>  
+> +/*
+> + * The nesting capability allows to report the related capability
+> + * and info for nesting iommu type.
+> + *
+> + * The structures below define version 1 of this capability.
+> + *
+> + * User space selected VFIO_TYPE1_NESTING_IOMMU type should check
+> + * this capto get supported features.
+s/capto/capability to get
+> + *
+> + * @info: the nesting info provided by IOMMU driver.
+> + */
+> +#define VFIO_IOMMU_TYPE1_INFO_CAP_NESTING  3
+> +
+> +struct vfio_iommu_type1_info_cap_nesting {
+> +	struct	vfio_info_cap_header header;
+> +	struct iommu_nesting_info info;
+> +};
+> +
+>  #define VFIO_IOMMU_GET_INFO _IO(VFIO_TYPE, VFIO_BASE + 12)
+>  
+>  /**
+> 
 
+Thanks
 
-> >>  2) You can add the desired mode to the compiled in (partial) kernel
-> >>     command line today.
-> >
-> > This might be easier on x86 than it is on ARM.  ARM (and ARM64)
-> > kernels only have two modes: kernel provides cmdline and bootloader
-> > provides cmdline.  There are out-of-mainline ANDROID patches to
-> > address this but nothing in mainline.
-> >
-> > The patch we're discussing now is x86-only so it's not such a huge
-> > deal, but the fact that combining the kernel and bootloader
-> > commandline never landed in mainline for arm/arm64 means that this
-> > isn't a super common/expected thing to do.
->
-> Did you try to get that merged for arm/arm64?
+Eric
 
-Yes, years ago.  References:
-
-https://lore.kernel.org/r/1326492948-26160-1-git-send-email-dianders@chromium.org
-https://lore.kernel.org/r/1328223508-1228-1-git-send-email-dianders@chromium.org
-
-I didn't keep poking it because I got advice (not on the mailing list)
-that it was better to add a KConfig option rather than extending the
-command line.  ;-)  At the time it seemed a reasonable argument to me
-so I didn't keep pushing that patch.
-
-
-> >>  3) Boot loaders are well capable of handling large kernel command lines
-> >>     and the extra time spend for reading the parameter does not matter
-> >>     at all.
-> >
-> > Long command lines can still be a bit of a chore for humans to deal
-> > with.  Many times I've needed to look at "/proc/cmdline" and make
-> > sense of it.  The longer the command line is and the more cruft
-> > stuffed into it the more of a chore it is.  Yes, this is just one
-> > thing to put in the command line, but if 10 different drivers all have
-> > their "one thing" to put there it gets really long.  If 100 different
-> > drivers all want their one config option there it gets really really
-> > long.
->
-> This will not go away when you want to support a gazillion of systems
-> which need tweaks left and right due to creative hardware/BIOS with a
-> generic kernel. And come on, parsing a long command line is not rocket
-> science and it's not something you do every two minutes.
-
-It's funny.  Your argument is the same as mine but the opposite.  I
-say: "but so much crap will be in the command line and it will be
-crazy" and you say "but so much crap will be in the KConfig and it
-will be crazy".  ;-)  I guess it depends on where you want to dump
-your trash.
-
-
-> > IMO the command line should be a last resort place to put
-> > things and should just contain:
-> >
-> > 1. Legacy things that _have_ to be in the command line because they've
-> > always been there.
-> >
-> > 2. Things that the bootloader/BIOS needs to communicate to the kernel
-> > and has no better way to communicate.
-> >
-> > 3. Cases where the person running the kernel needs to override a
-> > default set by the person compiling the kernel.
->
-> Which is the case for a lot of things and it's widely used exactly for
-> that reason.
-
-Right.  To be clear, I definitely wasn't suggesting the option be
-_removed_ from the command line.
-
-
-> >>  4) It's just a tiny part of the whole speculation maze. If we go there
-> >>     for L1TF then we open the flood gates for a gazillion other config
-> >>     options.
-> >
-> > It seems like the only options that we'd need CONFIG option for would
-> > be the ones where it would be sane to change the default compiled into
-> > the kernel.  Hopefully that's not too many things?
->
-> That's what _you_ need. But accepting this we set a precedence and how
-> do I argue that L1TF makes sense, but other things not? This stuff is
-> horrible enough already, no need to add more ifdefs and options and
-> whatever to it.
-
-Again, I think it gets into a matter of opinion.  I'm also objecting
-to setting a precedence, but in the opposite direction.  Today in
-Chrome OS we don't need to use the command line extending for this
-type of thing at all and (IMO) it's really nice.  Your config options
-are in one place, not mixed halfway between the command line and the
-KConfig.  Allowing this one config option to be configured in the
-command line opens the flood gates for having two places to look for
-the base config.  ;-)
-
-In any case, it doesn't sound like I'm going to convince you.  Also,
-since Abhishek has found another way to move forward it sounds like
-the right thing is to consider his patch abandoned anyway.
-
-
-> > Obviously, like many design choices, the above is all subjective.
-> > It's really your call and if these arguments don't convince you it
-> > sounds like the way forward is just to use "CONFIG_CMDLINE" and take
-> > advantage of the fact that on x86 this will get merged with the
-> > bootloader's command line.
->
-> I rather see the support for command line merging extended to arm/arm64
-> because that's of general usefulness beyond the problem at hand.
-
-I have no objections to someone upstreaming those patches, for sure.
-Maybe one day the Android team will do it since they seem to have been
-carrying it as a local patch forever.  If nothing else, it gives us
-more flexibility.
-
-
--Doug
