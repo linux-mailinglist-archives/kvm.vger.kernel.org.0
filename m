@@ -2,335 +2,157 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A54702241DF
-	for <lists+kvm@lfdr.de>; Fri, 17 Jul 2020 19:34:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F26BB224291
+	for <lists+kvm@lfdr.de>; Fri, 17 Jul 2020 19:50:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727040AbgGQReo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 17 Jul 2020 13:34:44 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:32798 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726090AbgGQRen (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 17 Jul 2020 13:34:43 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1595007281;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=xOYTxw3r0CL+8Q4MvBrIEj3j12LO6u9nDXOleZT0OGs=;
-        b=Jx/KtPBFnDBeeekF4V6MRauABFD7bnv3JgEkVZWzM660exIVruDS1dyWj+PfuQA8X5VfCD
-        SxHFAvrzOSbQENnrxP2JJjLpwapnirqZxtUdajqG8gur0Dykj7Ny+xphcrIKGMMLzOGZ4J
-        JpdPWSgRUjQVJU8OzOnyg4Xam+qth5Y=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-319-bYS67CsaOxOXfs0P_w4BaA-1; Fri, 17 Jul 2020 13:34:37 -0400
-X-MC-Unique: bYS67CsaOxOXfs0P_w4BaA-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5FB3C80183C;
-        Fri, 17 Jul 2020 17:34:35 +0000 (UTC)
-Received: from [10.36.115.54] (ovpn-115-54.ams2.redhat.com [10.36.115.54])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id EE8846FECD;
-        Fri, 17 Jul 2020 17:34:25 +0000 (UTC)
-Subject: Re: [PATCH v5 04/15] vfio/type1: Report iommu nesting info to
- userspace
-To:     Liu Yi L <yi.l.liu@intel.com>, alex.williamson@redhat.com,
-        baolu.lu@linux.intel.com, joro@8bytes.org
-Cc:     kevin.tian@intel.com, jacob.jun.pan@linux.intel.com,
-        ashok.raj@intel.com, jun.j.tian@intel.com, yi.y.sun@intel.com,
-        jean-philippe@linaro.org, peterx@redhat.com, hao.wu@intel.com,
-        stefanha@gmail.com, iommu@lists.linux-foundation.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <1594552870-55687-1-git-send-email-yi.l.liu@intel.com>
- <1594552870-55687-5-git-send-email-yi.l.liu@intel.com>
-From:   Auger Eric <eric.auger@redhat.com>
-Message-ID: <2eb692fc-a399-8298-4b4b-68adb0357404@redhat.com>
-Date:   Fri, 17 Jul 2020 19:34:24 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+        id S1726670AbgGQRtQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 17 Jul 2020 13:49:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46860 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726232AbgGQRtQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 17 Jul 2020 13:49:16 -0400
+Received: from mail-pg1-x544.google.com (mail-pg1-x544.google.com [IPv6:2607:f8b0:4864:20::544])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0D81FC0619D2
+        for <kvm@vger.kernel.org>; Fri, 17 Jul 2020 10:49:16 -0700 (PDT)
+Received: by mail-pg1-x544.google.com with SMTP id m22so7013899pgv.9
+        for <kvm@vger.kernel.org>; Fri, 17 Jul 2020 10:49:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=UmBYnpJxLOKWnlQafaq4C6F9spEh+E46qapMdJKdqIk=;
+        b=jGmpJbFeB/mWj5s08JrCEpmPrV70zk0iTrM1SwiDc7+x09ybNxYSjiRZRaCoAi76lN
+         0xgvyFMiLQs/gjLKvXL9xklDnnClPU+OuYnQ7oQhSr3KOT+mv8YST83YVjeNEhJjlN+s
+         vj2un2SxZ6x6CLOG8xk18RT0iCO7YnKwd/D+w=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=UmBYnpJxLOKWnlQafaq4C6F9spEh+E46qapMdJKdqIk=;
+        b=hQjLs5yQhefLPDHpXs5rMJubh7iL2ACc5JjejDUUgKdqp0NSMmljeu/AeKNRainLxc
+         aFp3LMhc2E06JtIKc3ZgLnLqKS4HOR1UCv2/gukJcDfFk0dd8JbtF9vVtC/SVS5vQTYc
+         2QMcwR3bxnstsflBRH1NWlUx3amfoLoNlal0vB5wU5/CkaLLfdZR/jm76OgbDTzGr+RI
+         rPbMntmufdSbgEmpZ++alvRtGvojOqJPi4QE40G57fkbJQ/phoRU6s/HsUPtaPfXvoOy
+         bJcOq0xcjIMz+NKNqdTs0QPVsIKC21QaEeGLblHPWgaHQZoZsJ5r2acDMOYZZPrwWpvH
+         FZdQ==
+X-Gm-Message-State: AOAM531oE/oW0ATG91SvzzWBeJ2uEmm6YzRko4vlludaFxgD9yrqwfBw
+        kDKCmIUUGlTkBUhlhozE7M/csg==
+X-Google-Smtp-Source: ABdhPJzpf9/ZajaIEXyFjFi2Ba7LeZk4ZttZruqVO8DSt3fEPjVmPRj3vBVymqSJ3TNgQl5mmN3v+w==
+X-Received: by 2002:a63:8c5d:: with SMTP id q29mr9353865pgn.249.1595008155556;
+        Fri, 17 Jul 2020 10:49:15 -0700 (PDT)
+Received: from www.outflux.net (smtp.outflux.net. [198.145.64.163])
+        by smtp.gmail.com with ESMTPSA id s30sm8709549pgn.34.2020.07.17.10.49.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 17 Jul 2020 10:49:14 -0700 (PDT)
+Date:   Fri, 17 Jul 2020 10:49:13 -0700
+From:   Kees Cook <keescook@chromium.org>
+To:     Thomas Gleixner <tglx@linutronix.de>
+Cc:     LKML <linux-kernel@vger.kernel.org>, x86@kernel.org,
+        linux-arch@vger.kernel.org, Will Deacon <will@kernel.org>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Keno Fischer <keno@juliacomputing.com>,
+        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        Gabriel Krisman Bertazi <krisman@collabora.com>
+Subject: Re: [patch V3 01/13] entry: Provide generic syscall entry
+ functionality
+Message-ID: <202007171045.FB4A586F1D@keescook>
+References: <20200716182208.180916541@linutronix.de>
+ <20200716185424.011950288@linutronix.de>
+ <202007161336.B993ED938@keescook>
+ <87d04vt98w.fsf@nanos.tec.linutronix.de>
 MIME-Version: 1.0
-In-Reply-To: <1594552870-55687-5-git-send-email-yi.l.liu@intel.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87d04vt98w.fsf@nanos.tec.linutronix.de>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Yi,
+On Thu, Jul 16, 2020 at 11:55:59PM +0200, Thomas Gleixner wrote:
+> Kees Cook <keescook@chromium.org> writes:
+> > On Thu, Jul 16, 2020 at 08:22:09PM +0200, Thomas Gleixner wrote:
+> >> This code is needlessly duplicated and  different in all
+> >> architectures.
+> >> 
+> >> Provide a generic version based on the x86 implementation which has all the
+> >> RCU and instrumentation bits right.
+> >
+> > Ahh! You're reading my mind!
+> 
+> I told you about that plan at the last conference over a beer :)
 
-On 7/12/20 1:20 PM, Liu Yi L wrote:
-> This patch exports iommu nesting capability info to user space through
-> VFIO. User space is expected to check this info for supported uAPIs (e.g.
-it is not only to check the supported uAPIS but rather to know which
-callbacks it must call upon vIOMMU events and which features are
-supported by the physical IOMMU.
-> PASID alloc/free, bind page table, and cache invalidation) and the vendor
-> specific format information for first level/stage page table that will be
-> bound to.
-> 
-> The nesting info is available only after the nesting iommu type is set
-> for a container.
-to NESTED type
- Current implementation imposes one limitation - one
-> nesting container should include at most one group. The philosophy of
-> vfio container is having all groups/devices within the container share
-> the same IOMMU context. When vSVA is enabled, one IOMMU context could
-> include one 2nd-level address space and multiple 1st-level address spaces.
-> While the 2nd-level address space is reasonably sharable by multiple groups
-> , blindly sharing 1st-level address spaces across all groups within the
-> container might instead break the guest expectation. In the future sub/
-> super container concept might be introduced to allow partial address space
-> sharing within an IOMMU context. But for now let's go with this restriction
-> by requiring singleton container for using nesting iommu features. Below
-> link has the related discussion about this decision.
+Thank you for incepting it in my head, then! ;)
 
-Maybe add a note about SMMU related changes spotted by Jean.
+> > [1] https://lore.kernel.org/lkml/20200716193141.4068476-2-krisman@collabora.com/
 > 
-> https://lkml.org/lkml/2020/5/15/1028
-> 
-> Cc: Kevin Tian <kevin.tian@intel.com>
-> CC: Jacob Pan <jacob.jun.pan@linux.intel.com>
-> Cc: Alex Williamson <alex.williamson@redhat.com>
-> Cc: Eric Auger <eric.auger@redhat.com>
-> Cc: Jean-Philippe Brucker <jean-philippe@linaro.org>
-> Cc: Joerg Roedel <joro@8bytes.org>
-> Cc: Lu Baolu <baolu.lu@linux.intel.com>
-> Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
-> ---
-> v4 -> v5:
-> *) address comments from Eric Auger.
-> *) return struct iommu_nesting_info for VFIO_IOMMU_TYPE1_INFO_CAP_NESTING as
->    cap is much "cheap", if needs extension in future, just define another cap.
->    https://lore.kernel.org/kvm/20200708132947.5b7ee954@x1.home/
-> 
-> v3 -> v4:
-> *) address comments against v3.
-> 
-> v1 -> v2:
-> *) added in v2
-> ---
->  drivers/vfio/vfio_iommu_type1.c | 102 +++++++++++++++++++++++++++++++++++-----
->  include/uapi/linux/vfio.h       |  19 ++++++++
->  2 files changed, 109 insertions(+), 12 deletions(-)
-> 
-> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-> index 3bd70ff..ed80104 100644
-> --- a/drivers/vfio/vfio_iommu_type1.c
-> +++ b/drivers/vfio/vfio_iommu_type1.c
-> @@ -62,18 +62,20 @@ MODULE_PARM_DESC(dma_entry_limit,
->  		 "Maximum number of user DMA mappings per container (65535).");
->  
->  struct vfio_iommu {
-> -	struct list_head	domain_list;
-> -	struct list_head	iova_list;
-> -	struct vfio_domain	*external_domain; /* domain for external user */
-> -	struct mutex		lock;
-> -	struct rb_root		dma_list;
-> -	struct blocking_notifier_head notifier;
-> -	unsigned int		dma_avail;
-> -	uint64_t		pgsize_bitmap;
-> -	bool			v2;
-> -	bool			nesting;
-> -	bool			dirty_page_tracking;
-> -	bool			pinned_page_dirty_scope;
-> +	struct list_head		domain_list;
-> +	struct list_head		iova_list;
-> +	/* domain for external user */
-> +	struct vfio_domain		*external_domain;
-> +	struct mutex			lock;
-> +	struct rb_root			dma_list;
-> +	struct blocking_notifier_head	notifier;
-> +	unsigned int			dma_avail;
-> +	uint64_t			pgsize_bitmap;
-> +	bool				v2;
-> +	bool				nesting;
-> +	bool				dirty_page_tracking;
-> +	bool				pinned_page_dirty_scope;
-> +	struct iommu_nesting_info	*nesting_info;
->  };
->  
->  struct vfio_domain {
-> @@ -130,6 +132,9 @@ struct vfio_regions {
->  #define IS_IOMMU_CAP_DOMAIN_IN_CONTAINER(iommu)	\
->  					(!list_empty(&iommu->domain_list))
->  
-> +#define CONTAINER_HAS_DOMAIN(iommu)	(((iommu)->external_domain) || \
-> +					 (!list_empty(&(iommu)->domain_list)))
-> +
->  #define DIRTY_BITMAP_BYTES(n)	(ALIGN(n, BITS_PER_TYPE(u64)) / BITS_PER_BYTE)
->  
->  /*
-> @@ -1929,6 +1934,13 @@ static void vfio_iommu_iova_insert_copy(struct vfio_iommu *iommu,
->  
->  	list_splice_tail(iova_copy, iova);
->  }
-> +
-> +static void vfio_iommu_release_nesting_info(struct vfio_iommu *iommu)
-> +{
-> +	kfree(iommu->nesting_info);
-> +	iommu->nesting_info = NULL;
-> +}
-> +
->  static int vfio_iommu_type1_attach_group(void *iommu_data,
->  					 struct iommu_group *iommu_group)
->  {
-> @@ -1959,6 +1971,12 @@ static int vfio_iommu_type1_attach_group(void *iommu_data,
->  		}
->  	}
->  
-> +	/* Nesting type container can include only one group */
-> +	if (iommu->nesting && CONTAINER_HAS_DOMAIN(iommu)) {
-> +		mutex_unlock(&iommu->lock);
-> +		return -EINVAL;
-> +	}
-> +
->  	group = kzalloc(sizeof(*group), GFP_KERNEL);
->  	domain = kzalloc(sizeof(*domain), GFP_KERNEL);
->  	if (!group || !domain) {
-> @@ -2029,6 +2047,32 @@ static int vfio_iommu_type1_attach_group(void *iommu_data,
->  	if (ret)
->  		goto out_domain;
->  
-> +	/* Nesting cap info is available only after attaching */
-> +	if (iommu->nesting) {
-> +		struct iommu_nesting_info tmp = { .size = 0, };
-> +
-> +		/* First get the size of vendor specific nesting info */
-> +		ret = iommu_domain_get_attr(domain->domain,
-> +					    DOMAIN_ATTR_NESTING,
-> +					    &tmp);
-> +		if (ret)
-> +			goto out_detach;
-> +
-> +		iommu->nesting_info = kzalloc(tmp.size, GFP_KERNEL);
-> +		if (!iommu->nesting_info) {
-> +			ret = -ENOMEM;
-> +			goto out_detach;
-> +		}
-> +
-> +		/* Now get the nesting info */
-> +		iommu->nesting_info->size = tmp.size;
-> +		ret = iommu_domain_get_attr(domain->domain,
-> +					    DOMAIN_ATTR_NESTING,
-> +					    iommu->nesting_info);
-> +		if (ret)
-> +			goto out_detach;
-> +	}
-> +
->  	/* Get aperture info */
->  	iommu_domain_get_attr(domain->domain, DOMAIN_ATTR_GEOMETRY, &geo);
->  
-> @@ -2138,6 +2182,7 @@ static int vfio_iommu_type1_attach_group(void *iommu_data,
->  	return 0;
->  
->  out_detach:
-> +	vfio_iommu_release_nesting_info(iommu);
->  	vfio_iommu_detach_group(domain, group);
->  out_domain:
->  	iommu_domain_free(domain->domain);
-> @@ -2338,6 +2383,8 @@ static void vfio_iommu_type1_detach_group(void *iommu_data,
->  					vfio_iommu_unmap_unpin_all(iommu);
->  				else
->  					vfio_iommu_unmap_unpin_reaccount(iommu);
-> +
-> +				vfio_iommu_release_nesting_info(iommu);
->  			}
->  			iommu_domain_free(domain->domain);
->  			list_del(&domain->next);
-> @@ -2546,6 +2593,31 @@ static int vfio_iommu_migration_build_caps(struct vfio_iommu *iommu,
->  	return vfio_info_add_capability(caps, &cap_mig.header, sizeof(cap_mig));
->  }
->  
-> +static int vfio_iommu_info_add_nesting_cap(struct vfio_iommu *iommu,
-> +					   struct vfio_info_cap *caps)
-> +{
-> +	struct vfio_info_cap_header *header;
-> +	struct vfio_iommu_type1_info_cap_nesting *nesting_cap;
-> +	size_t size;
-> +
-> +	size = offsetof(struct vfio_iommu_type1_info_cap_nesting, info) +
-> +		iommu->nesting_info->size;
-> +
-> +	header = vfio_info_cap_add(caps, size,
-> +				   VFIO_IOMMU_TYPE1_INFO_CAP_NESTING, 1);
-> +	if (IS_ERR(header))
-> +		return PTR_ERR(header);
-> +
-> +	nesting_cap = container_of(header,
-> +				   struct vfio_iommu_type1_info_cap_nesting,
-> +				   header);
-> +
-> +	memcpy(&nesting_cap->info, iommu->nesting_info,
-> +	       iommu->nesting_info->size);
-you must check whether nesting_info is non NULL before doing that.
+> Saw that fly by. *shudder*
 
-Besides I agree with Jean on the fact it may be better to not report the
-capability if nested is not supported.
-> +
-> +	return 0;
-> +}
-> +
->  static int vfio_iommu_type1_get_info(struct vfio_iommu *iommu,
->  				     unsigned long arg)
->  {
-> @@ -2581,6 +2653,12 @@ static int vfio_iommu_type1_get_info(struct vfio_iommu *iommu,
->  	if (!ret)
->  		ret = vfio_iommu_iova_build_caps(iommu, &caps);
->  
-> +	if (iommu->nesting_info) {
-> +		ret = vfio_iommu_info_add_nesting_cap(iommu, &caps);
-> +		if (ret)
-> +			return ret;
-> +	}
-> +
->  	mutex_unlock(&iommu->lock);
->  
->  	if (ret)
-> diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
-> index 9204705..46a78af 100644
-> --- a/include/uapi/linux/vfio.h
-> +++ b/include/uapi/linux/vfio.h
-> @@ -14,6 +14,7 @@
->  
->  #include <linux/types.h>
->  #include <linux/ioctl.h>
-> +#include <linux/iommu.h>
->  
->  #define VFIO_API_VERSION	0
->  
-> @@ -1039,6 +1040,24 @@ struct vfio_iommu_type1_info_cap_migration {
->  	__u64	max_dirty_bitmap_size;		/* in bytes */
->  };
->  
-> +/*
-> + * The nesting capability allows to report the related capability
-> + * and info for nesting iommu type.
-> + *
-> + * The structures below define version 1 of this capability.
-> + *
-> + * User space selected VFIO_TYPE1_NESTING_IOMMU type should check
-> + * this capto get supported features.
-s/capto/capability to get
-> + *
-> + * @info: the nesting info provided by IOMMU driver.
-> + */
-> +#define VFIO_IOMMU_TYPE1_INFO_CAP_NESTING  3
-> +
-> +struct vfio_iommu_type1_info_cap_nesting {
-> +	struct	vfio_info_cap_header header;
-> +	struct iommu_nesting_info info;
-> +};
-> +
->  #define VFIO_IOMMU_GET_INFO _IO(VFIO_TYPE, VFIO_BASE + 12)
->  
->  /**
+Aw, it's nice. Better emulation! :)
+
 > 
+> >> +/*
+> >> + * Define dummy _TIF work flags if not defined by the architecture or for
+> >> + * disabled functionality.
+> >> + */
+> >
+> > When I was thinking about this last week I was pondering having a split
+> > between the arch-agnositc TIF flags and the arch-specific TIF flags, and
+> > that each arch could have a single "there is agnostic work to be done"
+> > TIF in their thread_info, and the agnostic flags could live in
+> > task_struct or something. Anyway, I'll keep reading...
+> 
+> That's going to be nasty. We rather go and expand the TIF storage to
+> 64bit. And then do the following in a generic header:
 
-Thanks
+I though the point was to make the TIF_WORK check as fast as possible,
+even on the 32-bit word systems. I mean it's not a huge performance hit,
+but *shrug*
 
-Eric
+> 
+> #ifndef TIF_ARCH_SPECIFIC
+> # define TIF_ARCH_SPECIFIC
+> #endif
+> 
+> enum tif_bits {
+> 	TIF_NEED_RESCHED = 0,
+>         TIF_...,
+>         TIF_LAST_GENERIC,
+>         TIF_ARCH_SPECIFIC,
+> };
+>         
+> and in the arch specific one:
+> 
+> #define TIF_ARCH_SPECIFIC	\
+> 	TIF_ARCH_1,             \
+>         TIF_ARCH_2,
+> 
+> or something like that.
 
+Okay, yeah, that can work.
+
+> > There's been some recent confusion over "has the syscall changed,
+> > or did seccomp request it be skipped?" that was explored in arm64[2]
+> > (though I see Will and Keno in CC already). There might need to be a
+> > clearer way to distinguish between "wild userspace issued a -1 syscall"
+> > and "seccomp or ptrace asked for the syscall to be skipped". The
+> > difference is mostly about when ENOSYS gets set, with respect to calls
+> > to syscall_set_return_value(), but if the syscall gets changed, the arch
+> > may need to recheck the value and consider ENOSYS, etc. IIUC, what Will
+> > ended up with[3] was having syscall_trace_enter() return the syscall return
+> > value instead of the new syscall.
+> 
+> I was chatting with Will about that yesterday. IIRC he plans to fix the
+> immediate issue on arm64 first and then move arm64 over to the generic
+> variant. That's the reason why I reshuffled the patch series so the
+> generic parts are first which allows me to provide will a branch with
+> just those. If there are any changes needed we can just feed them back
+> into that branch and fixup the affected architecture trees.
+> 
+> IOW, that should not block progress on this stuff.
+
+Ok, great! I just wanted to make sure that didn't surprise anyone. :)
+
+-- 
+Kees Cook
