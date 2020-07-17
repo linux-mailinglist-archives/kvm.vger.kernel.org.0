@@ -2,129 +2,183 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3F3CC2232E5
-	for <lists+kvm@lfdr.de>; Fri, 17 Jul 2020 07:26:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5B6612232ED
+	for <lists+kvm@lfdr.de>; Fri, 17 Jul 2020 07:30:30 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726634AbgGQF0C (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 17 Jul 2020 01:26:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45012 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725807AbgGQF0C (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 17 Jul 2020 01:26:02 -0400
-Received: from ozlabs.org (bilbo.ozlabs.org [IPv6:2401:3900:2:1::2])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E44F4C061755;
-        Thu, 16 Jul 2020 22:26:01 -0700 (PDT)
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        id S1726056AbgGQFa2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 17 Jul 2020 01:30:28 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:45767 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1725909AbgGQFa2 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 17 Jul 2020 01:30:28 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1594963827;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=D+wLk/ePgaJoi2FnNGkrLAcPurLKVDi5tXa+03Q0aj4=;
+        b=YNQyKrYG6ELc+aepoR4t01n10FnBjqO4AJ4Zzk41070izuGizGbbXGOEKCXv0EIWxHdvD1
+        fYIEWslDIYcgFAWFv7zwr3/IgN6yaLIsQ6D5+Bkbk/OfKzEh1ZMuCoBIeB0dVNAPkRuIkr
+        PKySOiJKe1pnMKG5D2NbzGhra8ZpHUI=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-280-XCp00DzjMKeWww0JR7yhyw-1; Fri, 17 Jul 2020 01:30:25 -0400
+X-MC-Unique: XCp00DzjMKeWww0JR7yhyw-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mail.ozlabs.org (Postfix) with ESMTPSA id 4B7KN65K28z9sRR;
-        Fri, 17 Jul 2020 15:25:58 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=canb.auug.org.au;
-        s=201702; t=1594963560;
-        bh=LbMvc5Iklk5Xyio7B6Dc+w1qLyJXPJQeJsnn4jpFg6Y=;
-        h=Date:From:To:Cc:Subject:From;
-        b=HSs0Kgl9Ta8tvTHe1BgLFTd26tXH473RBtQnTuMJip+2hTgbOqhFvIajhjWyILvAF
-         g+EguwyXjq0+GhXfUoV/0j1GM+DaGaBSxkZCOmGNX7PLr4sgF3RsftUYTwQIQwgLOi
-         fhnXKyCAMTV9PitJ4MNxcU/v7n6fpOWTmumDIaZMfcmFkeNbXVXlVKUJi6ysLan6JI
-         FMo+eMIND3AvXNbCn39S89ng9qYc/49CiVFsLn7GTkx0gs3bG8JBQgWGtgFDGcZl1m
-         KUno5e80DQIsubaqIYgJdIWvYtYmsh25MIcy1vxNO+Bycmt5gLddFPnoUR3GE91njm
-         Vso4KK27is2Kg==
-Date:   Fri, 17 Jul 2020 15:25:57 +1000
-From:   Stephen Rothwell <sfr@canb.auug.org.au>
-To:     Paolo Bonzini <pbonzini@redhat.com>, KVM <kvm@vger.kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@elte.hu>, "H. Peter Anvin" <hpa@zytor.com>,
-        Peter Zijlstra <peterz@infradead.org>
-Cc:     Linux Next Mailing List <linux-next@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Andy Lutomirski <luto@kernel.org>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>
-Subject: linux-next: manual merge of the kvm tree with the tip tree
-Message-ID: <20200717152557.49ca6764@canb.auug.org.au>
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3BC611800D42;
+        Fri, 17 Jul 2020 05:30:22 +0000 (UTC)
+Received: from [10.72.12.157] (ovpn-12-157.pek2.redhat.com [10.72.12.157])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id DF7B378A54;
+        Fri, 17 Jul 2020 05:30:02 +0000 (UTC)
+Subject: Re: [PATCH V2 4/6] vhost_vdpa: implement IRQ offloading in vhost_vdpa
+To:     Zhu Lingshan <lingshan.zhu@intel.com>, mst@redhat.com,
+        alex.williamson@redhat.com, pbonzini@redhat.com,
+        sean.j.christopherson@intel.com, wanpengli@tencent.com
+Cc:     virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        kvm@vger.kernel.org
+References: <1594898629-18790-1-git-send-email-lingshan.zhu@intel.com>
+ <1594898629-18790-5-git-send-email-lingshan.zhu@intel.com>
+From:   Jason Wang <jasowang@redhat.com>
+Message-ID: <96df4d83-2297-5f30-b6a3-75a0cdf23a0b@redhat.com>
+Date:   Fri, 17 Jul 2020 13:29:58 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/uTbsuNq/+Q2QD.tf4=F9Ue7";
- protocol="application/pgp-signature"; micalg=pgp-sha256
+In-Reply-To: <1594898629-18790-5-git-send-email-lingshan.zhu@intel.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
---Sig_/uTbsuNq/+Q2QD.tf4=F9Ue7
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
 
-Hi all,
+On 2020/7/16 下午7:23, Zhu Lingshan wrote:
+> This patch introduce a set of functions for setup/unsetup
+> and update irq offloading respectively by register/unregister
+> and re-register the irq_bypass_producer.
+>
+> Signed-off-by: Zhu Lingshan <lingshan.zhu@intel.com>
+> Suggested-by: Jason Wang <jasowang@redhat.com>
+> ---
+>   drivers/vhost/Kconfig |  1 +
+>   drivers/vhost/vdpa.c  | 48 ++++++++++++++++++++++++++++++++++++++++++++++++
+>   2 files changed, 49 insertions(+)
+>
+> diff --git a/drivers/vhost/Kconfig b/drivers/vhost/Kconfig
+> index d3688c6..587fbae 100644
+> --- a/drivers/vhost/Kconfig
+> +++ b/drivers/vhost/Kconfig
+> @@ -65,6 +65,7 @@ config VHOST_VDPA
+>   	tristate "Vhost driver for vDPA-based backend"
+>   	depends on EVENTFD
+>   	select VHOST
+> +	select IRQ_BYPASS_MANAGER
+>   	depends on VDPA
+>   	help
+>   	  This kernel module can be loaded in host kernel to accelerate
+> diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
+> index 2fcc422..b9078d4 100644
+> --- a/drivers/vhost/vdpa.c
+> +++ b/drivers/vhost/vdpa.c
+> @@ -115,6 +115,43 @@ static irqreturn_t vhost_vdpa_config_cb(void *private)
+>   	return IRQ_HANDLED;
+>   }
+>   
+> +static void vhost_vdpa_setup_vq_irq(struct vdpa_device *dev, int qid, int irq)
+> +{
+> +	struct vhost_vdpa *v = vdpa_get_drvdata(dev);
+> +	struct vhost_virtqueue *vq = &v->vqs[qid];
+> +	int ret;
+> +
+> +	spin_lock(&vq->call_ctx.ctx_lock);
+> +	if (!vq->call_ctx.ctx) {
+> +		spin_unlock(&vq->call_ctx.ctx_lock);
+> +		return;
+> +	}
 
-Today's linux-next merge of the kvm tree got a conflict in:
 
-  arch/x86/kernel/kvm.c
+I think we can simply remove this check as what is done in 
+vhost_vdpq_update_vq_irq().
 
-between commit:
 
-  b037b09b9058 ("x86/entry: Rename idtentry_enter/exit_cond_rcu() to idtent=
-ry_enter/exit()")
+> +
+> +	vq->call_ctx.producer.token = vq->call_ctx.ctx;
+> +	vq->call_ctx.producer.irq = irq;
+> +	ret = irq_bypass_register_producer(&vq->call_ctx.producer);
+> +	spin_unlock(&vq->call_ctx.ctx_lock);
+> +}
+> +
+> +static void vhost_vdpa_unsetup_vq_irq(struct vdpa_device *dev, int qid)
+> +{
+> +	struct vhost_vdpa *v = vdpa_get_drvdata(dev);
+> +	struct vhost_virtqueue *vq = &v->vqs[qid];
+> +
+> +	spin_lock(&vq->call_ctx.ctx_lock);
+> +	irq_bypass_unregister_producer(&vq->call_ctx.producer);
+> +	spin_unlock(&vq->call_ctx.ctx_lock);
+> +}
+> +
+> +static void vhost_vdpa_update_vq_irq(struct vhost_virtqueue *vq)
+> +{
+> +	spin_lock(&vq->call_ctx.ctx_lock);
+> +	irq_bypass_unregister_producer(&vq->call_ctx.producer);
+> +	vq->call_ctx.producer.token = vq->call_ctx.ctx;
+> +	irq_bypass_register_producer(&vq->call_ctx.producer);
+> +	spin_unlock(&vq->call_ctx.ctx_lock);
+> +}
+> +
+>   static void vhost_vdpa_reset(struct vhost_vdpa *v)
+>   {
+>   	struct vdpa_device *vdpa = v->vdpa;
+> @@ -332,6 +369,7 @@ static long vhost_vdpa_set_config_call(struct vhost_vdpa *v, u32 __user *argp)
+>   
+>   	return 0;
+>   }
+> +
 
-from the tip tree and commit:
 
-  b1d405751cd5 ("KVM: x86: Switch KVM guest to using interrupts for page re=
-ady APF delivery")
+If you really want to fix coding style issue, it's better to have 
+another patch.
 
-from the kvm tree.
 
-I fixed it up (see below) and can carry the fix as necessary. This
-is now fixed as far as linux-next is concerned, but any non trivial
-conflicts should be mentioned to your upstream maintainer when your tree
-is submitted for merging.  You may also want to consider cooperating
-with the maintainer of the conflicting tree to minimise any particularly
-complex conflicts.
+>   static long vhost_vdpa_vring_ioctl(struct vhost_vdpa *v, unsigned int cmd,
+>   				   void __user *argp)
+>   {
+> @@ -390,6 +428,14 @@ static long vhost_vdpa_vring_ioctl(struct vhost_vdpa *v, unsigned int cmd,
+>   			cb.private = NULL;
+>   		}
+>   		ops->set_vq_cb(vdpa, idx, &cb);
+> +		/*
+> +		 * if it has a non-zero irq, means there is a
+> +		 * previsouly registered irq_bypass_producer,
+> +		 * we should update it when ctx (its token)
+> +		 * changes.
+> +		 */
+> +		if (vq->call_ctx.producer.irq)
+> +			vhost_vdpa_update_vq_irq(vq);
 
---=20
-Cheers,
-Stephen Rothwell
 
-diff --cc arch/x86/kernel/kvm.c
-index 3f78482d9496,d9995931ea18..000000000000
---- a/arch/x86/kernel/kvm.c
-+++ b/arch/x86/kernel/kvm.c
-@@@ -232,18 -235,13 +235,13 @@@ EXPORT_SYMBOL_GPL(kvm_read_and_reset_ap
- =20
-  noinstr bool __kvm_handle_async_pf(struct pt_regs *regs, u32 token)
-  {
-- 	u32 reason =3D kvm_read_and_reset_apf_flags();
-+ 	u32 flags =3D kvm_read_and_reset_apf_flags();
- -	bool rcu_exit;
- +	idtentry_state_t state;
- =20
-- 	switch (reason) {
-- 	case KVM_PV_REASON_PAGE_NOT_PRESENT:
-- 	case KVM_PV_REASON_PAGE_READY:
-- 		break;
-- 	default:
-+ 	if (!flags)
-  		return false;
-- 	}
- =20
- -	rcu_exit =3D idtentry_enter_cond_rcu(regs);
- +	state =3D idtentry_enter(regs);
-  	instrumentation_begin();
- =20
-  	/*
+Is this safe to check producer.irq outside spinlock?
 
---Sig_/uTbsuNq/+Q2QD.tf4=F9Ue7
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
+Thanks
 
------BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAl8RNmUACgkQAVBC80lX
-0GyLnAf+JEDs0FjozNrM0bFizJ/eK1Z66gfGFZ/26fWbMM5oot3q2R6YP2+D+g5Z
-VIoed+WHh1aHeXrrN3nKtGP+Z8NpuiIx3HKa1Tu9dCroEgHUS/xdz3eZ5Jf/MlF3
-yFxY1GxOtoAp4WT9n2hVA07V6CLvf2Y/x/rueS2rDE8PODZdWdQHaaBR/++a1DWU
-UEOyDXs/Kic6xHj9jhggqkYOxIIk0V1TrCkh42x0p1pxh0P4NwVUUSl/55N0e6Lq
-nPqD5CQZEkHLswKgD/r3EzMqEub+oA1tZhWpFueNwwj+KZ5G9e0Qkc7Xirr5LBDI
-RBo0ONnFW19DoPMZtuj/2Jb0GzWZzQ==
-=S/OY
------END PGP SIGNATURE-----
+>   		break;
+>   
+>   	case VHOST_SET_VRING_NUM:
+> @@ -951,6 +997,8 @@ static void vhost_vdpa_remove(struct vdpa_device *vdpa)
+>   	},
+>   	.probe	= vhost_vdpa_probe,
+>   	.remove	= vhost_vdpa_remove,
+> +	.setup_vq_irq = vhost_vdpa_setup_vq_irq,
+> +	.unsetup_vq_irq = vhost_vdpa_unsetup_vq_irq,
+>   };
+>   
+>   static int __init vhost_vdpa_init(void)
 
---Sig_/uTbsuNq/+Q2QD.tf4=F9Ue7--
