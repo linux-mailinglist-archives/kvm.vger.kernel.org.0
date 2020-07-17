@@ -2,119 +2,95 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0764E223A97
-	for <lists+kvm@lfdr.de>; Fri, 17 Jul 2020 13:34:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3D8D3223AC5
+	for <lists+kvm@lfdr.de>; Fri, 17 Jul 2020 13:45:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726759AbgGQLeg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 17 Jul 2020 07:34:36 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:58280 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726401AbgGQLed (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 17 Jul 2020 07:34:33 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1594985672;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=7UJmD/rvbE9K5xfGmqgRe3dQa77FW0PkN9Ro4ee9Oes=;
-        b=EfHbGglXY60xYEvqXA8DBAzIFm2MVFYuSwqnOwFikTJN9gxw0G+oT3tlGZ7CpT+fntWEa9
-        SSeey5lIsqphFagxLGQykvo+wCKYHC+md8yYaZXOez+lF//v4yDvbueWC/9GqJxyxJnL+K
-        A8qiclZgDHfXytwNjIEYIkfQ+PS6zV4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-355-Ojscl9VzMgOVNYnht5IPNw-1; Fri, 17 Jul 2020 07:34:26 -0400
-X-MC-Unique: Ojscl9VzMgOVNYnht5IPNw-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D7F65108A;
-        Fri, 17 Jul 2020 11:34:24 +0000 (UTC)
-Received: from virtlab710.virt.lab.eng.bos.redhat.com (virtlab710.virt.lab.eng.bos.redhat.com [10.19.152.252])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 613FE19C58;
-        Fri, 17 Jul 2020 11:34:24 +0000 (UTC)
-From:   Cathy Avery <cavery@redhat.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        pbonzini@redhat.com
-Subject: [PATCH kvm-unit-tests v2 3/3] svm: INIT intercept test
-Date:   Fri, 17 Jul 2020 07:34:22 -0400
-Message-Id: <20200717113422.19575-4-cavery@redhat.com>
-In-Reply-To: <20200717113422.19575-1-cavery@redhat.com>
-References: <20200717113422.19575-1-cavery@redhat.com>
+        id S1726885AbgGQLpi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 17 Jul 2020 07:45:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46970 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726079AbgGQLph (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 17 Jul 2020 07:45:37 -0400
+Received: from mail-qv1-xf41.google.com (mail-qv1-xf41.google.com [IPv6:2607:f8b0:4864:20::f41])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 44939C061755;
+        Fri, 17 Jul 2020 04:45:37 -0700 (PDT)
+Received: by mail-qv1-xf41.google.com with SMTP id ed14so4095569qvb.2;
+        Fri, 17 Jul 2020 04:45:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:reply-to:mime-version
+         :content-disposition;
+        bh=RGmCnCujTCPHPAqseUf5nHct0c3cR5+Pl0sn8j65GRA=;
+        b=La4PoFUSodowSJLHupAbyoCryYe4IscT0uVjcLdnBdcKu34q4TNYPqzS0Nr/jQc+EM
+         F2XyfYyxL8FQhKctiFagZGB9yxdA12JMq8JEvISZeKuMS1vZ5/Oau3CFZLgR8K43xiUU
+         E86yO3eN5U8q9hW+83UrqolEyLOq60sn5RWpuN0fRb6KFwI9m265IqtAwKVQfl4cygy3
+         0jKEYBIANHgXGZAdahfISR5yQA6FuB5q/EXPJLjCM6LtRPdNK0IPKb1/gbZHs22PgaEY
+         wX7lul5113brAi0ptNWB69Sc4TE4p22uWbGzG5GisCJcFbMfc7QZcO5iTG1ztdjRVt0Y
+         Uktg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:reply-to
+         :mime-version:content-disposition;
+        bh=RGmCnCujTCPHPAqseUf5nHct0c3cR5+Pl0sn8j65GRA=;
+        b=qGMcyCf5HiazK1TIB0hEeejdA3gHvOawaLPnyms2I80MHbS8qx+o82rYiqdlXZqGh9
+         uQ5m45QAM8osavfd8fGRENDtx5tn/ZC+BQnWASw5CozGSRLCv3P1BKgxernNSPlQG9t9
+         yNmzTbUayGQqaOXmynwmmr5iiTyctbQMfboKgsKnnHRvV+lHE+s82oxgRpWQRVtzPLac
+         3HFO243rZmJKbIS/t+Xwtf4YQuHe4MvutB4I+Z51/IOetbxdqF2n8fs5zAzNBL7cKrf8
+         yOZ7ZRyScGsqvrb3/NPEtql26mXxDLaTdTfuF+3rHq1g5AJ/xFfK8dMVcQNiN6SA6235
+         QlEg==
+X-Gm-Message-State: AOAM531570kqhHP5igGwvvl+K2wnd1utHryrtT/hwfmxrojj0j/iwn7n
+        kCwVuEussoQoreJ4MQ/jPMSPFLuE0k3W
+X-Google-Smtp-Source: ABdhPJzKXuvJZlL9/a9hkaENPQ8WnD+XhRB2h7wtRwtCk65prLKd7UbjOiRuatykH0KlTfyqjIJ2+Q==
+X-Received: by 2002:a0c:a992:: with SMTP id a18mr8145355qvb.211.1594986336193;
+        Fri, 17 Jul 2020 04:45:36 -0700 (PDT)
+Received: from PWN (c-76-119-149-155.hsd1.ma.comcast.net. [76.119.149.155])
+        by smtp.gmail.com with ESMTPSA id s8sm10967968qtc.17.2020.07.17.04.45.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 17 Jul 2020 04:45:35 -0700 (PDT)
+Date:   Fri, 17 Jul 2020 07:45:32 -0400
+From:   Peilin Ye <yepeilin.cs@gmail.com>
+To:     Daniel Colascione <dancol@google.com>
+Cc:     timmurray@google.com, selinux@vger.kernel.org,
+        linux-security-module@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, viro@zeniv.linux.org.uk, paul@paul-moore.com,
+        nnk@google.com, sds@tycho.nsa.gov, lokeshgidra@google.com,
+        jmorris@namei.org
+Subject: Reporting a use-after-free read bug in userfaultfd_release()
+Message-ID: <20200717114532.GA688728@PWN>
+Reply-To: 20200401213903.182112-4-dancol@google.com
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-INIT vcpu 2 and intercept the INIT. This test
-will leave the vcpu in an unusable state.
+Hi all,
 
-Signed-off-by: Cathy Avery <cavery@redhat.com>
----
- x86/svm_tests.c | 40 ++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 40 insertions(+)
+Syzbot reported the following use-after-free bug in
+userfaultfd_release():
 
-diff --git a/x86/svm_tests.c b/x86/svm_tests.c
-index 698eb20..b43c19f 100644
---- a/x86/svm_tests.c
-+++ b/x86/svm_tests.c
-@@ -1939,6 +1939,43 @@ static bool init_startup_check(struct svm_test *test)
-     return cpu_online_count == orig_cpu_count;
- }
- 
-+static volatile bool init_intercept;
-+
-+static void init_intercept_prepare(struct svm_test *test)
-+{
-+    init_intercept = false;
-+    vmcb_ident(vmcb);
-+    vmcb->control.intercept |= (1ULL << INTERCEPT_INIT);
-+}
-+
-+static void init_intercept_test(struct svm_test *test)
-+{
-+    apic_icr_write(APIC_DEST_SELF | APIC_DEST_PHYSICAL | APIC_DM_INIT | APIC_INT_ASSERT, 0);
-+}
-+
-+static bool init_intercept_finished(struct svm_test *test)
-+{
-+    vmcb->save.rip += 3;
-+
-+    if (vmcb->control.exit_code != SVM_EXIT_INIT) {
-+        report(false, "VMEXIT not due to init intercept. Exit reason 0x%x",
-+               vmcb->control.exit_code);
-+
-+        return true;
-+        }
-+
-+    init_intercept = true;
-+
-+    report(true, "INIT to vcpu intercepted");
-+
-+    return true;
-+}
-+
-+static bool init_intercept_check(struct svm_test *test)
-+{
-+    return init_intercept;
-+}
-+
- #define TEST(name) { #name, .v2 = name }
- 
- /*
-@@ -2255,6 +2292,9 @@ struct svm_test svm_tests[] = {
-     { "svm_init_startup_test", smp_supported, init_startup_prepare,
-       default_prepare_gif_clear, null_test,
-       init_startup_finished, init_startup_check },
-+    { "svm_init_intercept_test", smp_supported, init_intercept_prepare,
-+      default_prepare_gif_clear, init_intercept_test,
-+      init_intercept_finished, init_intercept_check, .on_vcpu = 2 },
-     TEST(svm_guest_state_test),
-     { NULL, NULL, NULL, NULL, NULL, NULL, NULL }
- };
--- 
-2.20.1
+	https://syzkaller.appspot.com/bug?id=4b9e5aea757b678d9939c364e50212354a3480a6
 
+It seems to be caused by this patch. I took a look at the stack trace.
+In the patch:
+
+	fd = get_unused_fd_flags(O_RDONLY | O_CLOEXEC);
+	if (fd < 0) {
+		fput(file);
+		goto out;
+	}
+
+If get_unused_fd_flags() fails, `ctx` is freed. Later however, before
+returning back to userland, userfaultfd_release() is called and tries to
+use `ctx` again, causing a use-after-free bug.
+
+The syzbot reproducer does a setrlimit() then a userfaultfd(). The
+former sets a hard limit on number of open files to zero, which causes
+get_unused_fd_flags() to fail.
+
+Thank you,
+
+Peilin Ye
