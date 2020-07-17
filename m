@@ -2,349 +2,259 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E76D8223EEE
-	for <lists+kvm@lfdr.de>; Fri, 17 Jul 2020 16:58:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 724FC223EF4
+	for <lists+kvm@lfdr.de>; Fri, 17 Jul 2020 17:00:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726788AbgGQO6d (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 17 Jul 2020 10:58:33 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:55532 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726832AbgGQO6b (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 17 Jul 2020 10:58:31 -0400
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 06HEWOPn102274;
-        Fri, 17 Jul 2020 10:58:30 -0400
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 32aurbecdp-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 17 Jul 2020 10:58:30 -0400
-Received: from m0098399.ppops.net (m0098399.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 06HEfWq4133005;
-        Fri, 17 Jul 2020 10:58:29 -0400
-Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 32aurbeccs-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 17 Jul 2020 10:58:29 -0400
-Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
-        by ppma03fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 06HEntOw008047;
-        Fri, 17 Jul 2020 14:58:27 GMT
-Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
-        by ppma03fra.de.ibm.com with ESMTP id 327527kffw-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 17 Jul 2020 14:58:26 +0000
-Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
-        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 06HEwOW241680970
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 17 Jul 2020 14:58:24 GMT
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 21EA242041;
-        Fri, 17 Jul 2020 14:58:24 +0000 (GMT)
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 5DC0C4203F;
-        Fri, 17 Jul 2020 14:58:23 +0000 (GMT)
-Received: from linux01.pok.stglabs.ibm.com (unknown [9.114.17.81])
-        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Fri, 17 Jul 2020 14:58:23 +0000 (GMT)
-From:   Janosch Frank <frankja@linux.ibm.com>
-To:     kvm@vger.kernel.org
-Cc:     thuth@redhat.com, linux-s390@vger.kernel.org, david@redhat.com,
-        borntraeger@de.ibm.com, cohuck@redhat.com, imbrenda@linux.ibm.com
-Subject: [kvm-unit-tests PATCH 3/3] s390x: Ultavisor guest API test
-Date:   Fri, 17 Jul 2020 10:58:13 -0400
-Message-Id: <20200717145813.62573-4-frankja@linux.ibm.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20200717145813.62573-1-frankja@linux.ibm.com>
-References: <20200717145813.62573-1-frankja@linux.ibm.com>
+        id S1726656AbgGQO7v (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 17 Jul 2020 10:59:51 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:26804 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726233AbgGQO7v (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 17 Jul 2020 10:59:51 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1594997989;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=J2NY/7frN8BTsOiUb4IbJDSeXcfjFIYGhxowUFYVZk0=;
+        b=bx2iLr45QrBuUfVCP8GkGUYxCB9iaBkHN3v1iqrKy6SQ3LRMxFdVe30h6BuJMoWB5QwCEg
+        23A6c7cEX5dBC+5vh9RB1fugDq8qNpT4gjSV3TQjrX9EdyrSspLJu+bSDXZJCi0+sDoDhW
+        96fU+48V3wp6vJawAjbybmZlh0bjF0g=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-215-NE42i7aeN3OkfU8KGvXG2A-1; Fri, 17 Jul 2020 10:59:45 -0400
+X-MC-Unique: NE42i7aeN3OkfU8KGvXG2A-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1FE491083E80;
+        Fri, 17 Jul 2020 14:59:43 +0000 (UTC)
+Received: from x1.home (ovpn-112-71.phx2.redhat.com [10.3.112.71])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id BB51E19C58;
+        Fri, 17 Jul 2020 14:59:35 +0000 (UTC)
+Date:   Fri, 17 Jul 2020 08:59:35 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Yan Zhao <yan.y.zhao@intel.com>
+Cc:     "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+        "Daniel P. =?UTF-8?B?QmVycmFuZ8Op?=" <berrange@redhat.com>,
+        devel@ovirt.org, openstack-discuss@lists.openstack.org,
+        libvir-list@redhat.com, intel-gvt-dev@lists.freedesktop.org,
+        kvm@vger.kernel.org, qemu-devel@nongnu.org, smooney@redhat.com,
+        eskultet@redhat.com, cohuck@redhat.com, dinechin@redhat.com,
+        corbet@lwn.net, kwankhede@nvidia.com, eauger@redhat.com,
+        jian-feng.ding@intel.com, hejie.xu@intel.com, kevin.tian@intel.com,
+        zhenyuw@linux.intel.com, bao.yumeng@zte.com.cn,
+        xin-ran.wang@intel.com, shaohe.feng@intel.com
+Subject: Re: device compatibility interface for live migration with assigned
+ devices
+Message-ID: <20200717085935.224ffd46@x1.home>
+In-Reply-To: <20200715082040.GA13136@joy-OptiPlex-7040>
+References: <20200713232957.GD5955@joy-OptiPlex-7040>
+        <20200714102129.GD25187@redhat.com>
+        <20200714101616.5d3a9e75@x1.home>
+        <20200714171946.GL2728@work-vm>
+        <20200714145948.17b95eb3@x1.home>
+        <20200715082040.GA13136@joy-OptiPlex-7040>
+Organization: Red Hat
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
- definitions=2020-07-17_06:2020-07-17,2020-07-17 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 adultscore=0
- mlxlogscore=999 suspectscore=3 clxscore=1015 bulkscore=0 spamscore=0
- phishscore=0 malwarescore=0 impostorscore=0 priorityscore=1501
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2006250000 definitions=main-2007170103
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Test the error conditions of guest 2 Ultravisor calls, namely:
-     * Query Ultravisor information
-     * Set shared access
-     * Remove shared access
+On Wed, 15 Jul 2020 16:20:41 +0800
+Yan Zhao <yan.y.zhao@intel.com> wrote:
 
-Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
----
- lib/s390x/asm/uv.h  |  68 +++++++++++++++++++
- s390x/Makefile      |   1 +
- s390x/unittests.cfg |   3 +
- s390x/uv-guest.c    | 156 ++++++++++++++++++++++++++++++++++++++++++++
- 4 files changed, 228 insertions(+)
- create mode 100644 lib/s390x/asm/uv.h
- create mode 100644 s390x/uv-guest.c
+> On Tue, Jul 14, 2020 at 02:59:48PM -0600, Alex Williamson wrote:
+> > On Tue, 14 Jul 2020 18:19:46 +0100
+> > "Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
+> >  =20
+> > > * Alex Williamson (alex.williamson@redhat.com) wrote: =20
+> > > > On Tue, 14 Jul 2020 11:21:29 +0100
+> > > > Daniel P. Berrang=C3=83=C2=A9 <berrange@redhat.com> wrote:
+> > > >    =20
+> > > > > On Tue, Jul 14, 2020 at 07:29:57AM +0800, Yan Zhao wrote:   =20
+> > > > > > hi folks,
+> > > > > > we are defining a device migration compatibility interface that=
+ helps upper
+> > > > > > layer stack like openstack/ovirt/libvirt to check if two device=
+s are
+> > > > > > live migration compatible.
+> > > > > > The "devices" here could be MDEVs, physical devices, or hybrid =
+of the two.
+> > > > > > e.g. we could use it to check whether
+> > > > > > - a src MDEV can migrate to a target MDEV,
+> > > > > > - a src VF in SRIOV can migrate to a target VF in SRIOV,
+> > > > > > - a src MDEV can migration to a target VF in SRIOV.
+> > > > > >   (e.g. SIOV/SRIOV backward compatibility case)
+> > > > > >=20
+> > > > > > The upper layer stack could use this interface as the last step=
+ to check
+> > > > > > if one device is able to migrate to another device before trigg=
+ering a real
+> > > > > > live migration procedure.
+> > > > > > we are not sure if this interface is of value or help to you. p=
+lease don't
+> > > > > > hesitate to drop your valuable comments.
+> > > > > >=20
+> > > > > >=20
+> > > > > > (1) interface definition
+> > > > > > The interface is defined in below way:
+> > > > > >=20
+> > > > > >              __    userspace
+> > > > > >               /\              \
+> > > > > >              /                 \write
+> > > > > >             / read              \
+> > > > > >    ________/__________       ___\|/_____________
+> > > > > >   | migration_version |     | migration_version |-->check migra=
+tion
+> > > > > >   ---------------------     ---------------------   compatibili=
+ty
+> > > > > >      device A                    device B
+> > > > > >=20
+> > > > > >=20
+> > > > > > a device attribute named migration_version is defined under eac=
+h device's
+> > > > > > sysfs node. e.g. (/sys/bus/pci/devices/0000\:00\:02.0/$mdev_UUI=
+D/migration_version).
+> > > > > > userspace tools read the migration_version as a string from the=
+ source device,
+> > > > > > and write it to the migration_version sysfs attribute in the ta=
+rget device.
+> > > > > >=20
+> > > > > > The userspace should treat ANY of below conditions as two devic=
+es not compatible:
+> > > > > > - any one of the two devices does not have a migration_version =
+attribute
+> > > > > > - error when reading from migration_version attribute of one de=
+vice
+> > > > > > - error when writing migration_version string of one device to
+> > > > > >   migration_version attribute of the other device
+> > > > > >=20
+> > > > > > The string read from migration_version attribute is defined by =
+device vendor
+> > > > > > driver and is completely opaque to the userspace.
+> > > > > > for a Intel vGPU, string format can be defined like
+> > > > > > "parent device PCI ID" + "version of gvt driver" + "mdev type" =
++ "aggregator count".
+> > > > > >=20
+> > > > > > for an NVMe VF connecting to a remote storage. it could be
+> > > > > > "PCI ID" + "driver version" + "configured remote storage URL"
+> > > > > >=20
+> > > > > > for a QAT VF, it may be
+> > > > > > "PCI ID" + "driver version" + "supported encryption set".
+> > > > > >=20
+> > > > > > (to avoid namespace confliction from each vendor, we may prefix=
+ a driver name to
+> > > > > > each migration_version string. e.g. i915-v1-8086-591d-i915-GVTg=
+_V5_8-1)   =20
+> > > >=20
+> > > > It's very strange to define it as opaque and then proceed to descri=
+be
+> > > > the contents of that opaque string.  The point is that its contents
+> > > > are defined by the vendor driver to describe the device, driver ver=
+sion,
+> > > > and possibly metadata about the configuration of the device.  One
+> > > > instance of a device might generate a different string from another.
+> > > > The string that a device produces is not necessarily the only string
+> > > > the vendor driver will accept, for example the driver might support
+> > > > backwards compatible migrations.   =20
+> > >=20
+> > > (As I've said in the previous discussion, off one of the patch series)
+> > >=20
+> > > My view is it makes sense to have a half-way house on the opaqueness =
+of
+> > > this string; I'd expect to have an ID and version that are human
+> > > readable, maybe a device ID/name that's human interpretable and then a
+> > > bunch of other cruft that maybe device/vendor/version specific.
+> > >=20
+> > > I'm thinking that we want to be able to report problems and include t=
+he
+> > > string and the user to be able to easily identify the device that was
+> > > complaining and notice a difference in versions, and perhaps also use
+> > > it in compatibility patterns to find compatible hosts; but that does
+> > > get tricky when it's a 'ask the device if it's compatible'. =20
+> >=20
+> > In the reply I just sent to Dan, I gave this example of what a
+> > "compatibility string" might look like represented as json:
+> >=20
+> > {
+> >   "device_api": "vfio-pci",
+> >   "vendor": "vendor-driver-name",
+> >   "version": {
+> >     "major": 0,
+> >     "minor": 1
+> >   },
+> >   "vfio-pci": { // Based on above device_api
+> >     "vendor": 0x1234, // Values for the exposed device
+> >     "device": 0x5678,
+> >       // Possibly further parameters for a more specific match
+> >   },
+> >   "mdev_attrs": [
+> >     { "attribute0": "VALUE" }
+> >   ]
+> > }
+> >=20
+> > Are you thinking that we might allow the vendor to include a vendor
+> > specific array where we'd simply require that both sides have matching
+> > fields and values?  ie.
+> >=20
+> >   "vendor_fields": [
+> >     { "unknown_field0": "unknown_value0" },
+> >     { "unknown_field1": "unknown_value1" },
+> >   ]
+> >=20
+> > We could certainly make that part of the spec, but I can't really
+> > figure the value of it other than to severely restrict compatibility,
+> > which the vendor could already do via the version.major value.  Maybe
+> > they'd want to put a build timestamp, random uuid, or source sha1 into
+> > such a field to make absolutely certain compatibility is only determined
+> > between identical builds?  Thanks,
+> > =20
+> Yes, I agree kernel could expose such sysfs interface to educate
+> openstack how to filter out devices. But I still think the proposed
+> migration_version (or rename to migration_compatibility) interface is
+> still required for libvirt to do double check.
+>=20
+> In the following scenario:=20
+> 1. openstack chooses the target device by reading sysfs interface (of json
+> format) of the source device. And Openstack are now pretty sure the two
+> devices are migration compatible.
+> 2. openstack asks libvirt to create the target VM with the target device
+> and start live migration.
+> 3. libvirt now receives the request. so it now has two choices:
+> (1) create the target VM & target device and start live migration directly
+> (2) double check if the target device is compatible with the source
+> device before doing the remaining tasks.
+>=20
+> Because the factors to determine whether two devices are live migration
+> compatible are complicated and may be dynamically changing, (e.g. driver
+> upgrade or configuration changes), and also because libvirt should not
+> totally rely on the input from openstack, I think the cost for libvirt is
+> relatively lower if it chooses to go (2) than (1). At least it has no
+> need to cancel migration and destroy the VM if it knows it earlier.
+>=20
+> So, it means the kernel may need to expose two parallel interfaces:
+> (1) with json format, enumerating all possible fields and comparing
+> methods, so as to indicate openstack how to find a matching target device
+> (2) an opaque driver defined string, requiring write and test in target,
+> which is used by libvirt to make sure device compatibility, rather than
+> rely on the input accurateness from openstack or rely on kernel driver
+> implementing the compatibility detection immediately after migration
+> start.
+>=20
+> Does it make sense?
 
-diff --git a/lib/s390x/asm/uv.h b/lib/s390x/asm/uv.h
-new file mode 100644
-index 0000000..14ab5cc
---- /dev/null
-+++ b/lib/s390x/asm/uv.h
-@@ -0,0 +1,68 @@
-+/*
-+ * s390x Ultravisor related definitions
-+ *
-+ * Copyright (c) 2020 IBM Corp
-+ *
-+ * Authors:
-+ *  Janosch Frank <frankja@linux.ibm.com>
-+ *
-+ * This code is free software; you can redistribute it and/or modify it
-+ * under the terms of the GNU General Public License version 2.
-+ */
-+#ifndef UV_H
-+#define UV_H
-+
-+#define UVC_RC_EXECUTED		0x0001
-+#define UVC_RC_INV_CMD		0x0002
-+#define UVC_RC_INV_STATE	0x0003
-+#define UVC_RC_INV_LEN		0x0005
-+#define UVC_RC_NO_RESUME	0x0007
-+
-+#define UVC_CMD_QUI			0x0001
-+#define UVC_CMD_SET_SHARED_ACCESS	0x1000
-+#define UVC_CMD_REMOVE_SHARED_ACCESS	0x1001
-+
-+/* Bits in installed uv calls */
-+enum uv_cmds_inst {
-+	BIT_UVC_CMD_QUI = 0,
-+	BIT_UVC_CMD_SET_SHARED_ACCESS = 8,
-+	BIT_UVC_CMD_REMOVE_SHARED_ACCESS = 9,
-+};
-+
-+struct uv_cb_header {
-+	u16 len;
-+	u16 cmd;	/* Command Code */
-+	u16 rc;		/* Response Code */
-+	u16 rrc;	/* Return Reason Code */
-+} __attribute__((packed))  __attribute__((aligned(8)));
-+
-+struct uv_cb_qui {
-+	struct uv_cb_header header;
-+	u64 reserved08;
-+	u64 inst_calls_list[4];
-+	u64 reserved30[15];
-+} __attribute__((packed))  __attribute__((aligned(8)));
-+
-+struct uv_cb_share {
-+	struct uv_cb_header header;
-+	u64 reserved08[3];
-+	u64 paddr;
-+	u64 reserved28;
-+} __attribute__((packed))  __attribute__((aligned(8)));
-+
-+static inline int uv_call(unsigned long r1, unsigned long r2)
-+{
-+	int cc;
-+
-+	asm volatile(
-+		"0:	.insn rrf,0xB9A40000,%[r1],%[r2],0,0\n"
-+		"		brc	3,0b\n"
-+		"		ipm	%[cc]\n"
-+		"		srl	%[cc],28\n"
-+		: [cc] "=d" (cc)
-+		: [r1] "a" (r1), [r2] "a" (r2)
-+		: "memory", "cc");
-+	return cc;
-+}
-+
-+#endif
-diff --git a/s390x/Makefile b/s390x/Makefile
-index 0f54bf4..c2213ad 100644
---- a/s390x/Makefile
-+++ b/s390x/Makefile
-@@ -18,6 +18,7 @@ tests += $(TEST_DIR)/skrf.elf
- tests += $(TEST_DIR)/smp.elf
- tests += $(TEST_DIR)/sclp.elf
- tests += $(TEST_DIR)/css.elf
-+tests += $(TEST_DIR)/uv-guest.elf
- tests_binary = $(patsubst %.elf,%.bin,$(tests))
- 
- all: directories test_cases test_cases_binary
-diff --git a/s390x/unittests.cfg b/s390x/unittests.cfg
-index b35269b..38c3257 100644
---- a/s390x/unittests.cfg
-+++ b/s390x/unittests.cfg
-@@ -92,3 +92,6 @@ extra_params = -device virtio-net-ccw
- [skrf]
- file = skrf.elf
- smp = 2
-+
-+[uv-guest]
-+file = uv-guest.elf
-\ No newline at end of file
-diff --git a/s390x/uv-guest.c b/s390x/uv-guest.c
-new file mode 100644
-index 0000000..0cb5fae
---- /dev/null
-+++ b/s390x/uv-guest.c
-@@ -0,0 +1,156 @@
-+/*
-+ * Guest Ultravisor Call tests
-+ *
-+ * Copyright (c) 2020 IBM Corp
-+ *
-+ * Authors:
-+ *  Janosch Frank <frankja@linux.ibm.com>
-+ *
-+ * This code is free software; you can redistribute it and/or modify it
-+ * under the terms of the GNU General Public License version 2.
-+ */
-+
-+#include <libcflat.h>
-+#include <alloc_page.h>
-+#include <asm/page.h>
-+#include <asm/asm-offsets.h>
-+#include <asm/interrupt.h>
-+#include <asm/facility.h>
-+#include <asm/uv.h>
-+
-+static inline int share(unsigned long addr, u16 cmd)
-+{
-+	struct uv_cb_share uvcb = {
-+		.header.cmd = cmd,
-+		.header.len = sizeof(uvcb),
-+		.paddr = addr
-+	};
-+
-+	uv_call(0, (u64)&uvcb);
-+	return uvcb.header.rc;
-+}
-+
-+static inline int uv_set_shared(unsigned long addr)
-+{
-+	return share(addr, UVC_CMD_SET_SHARED_ACCESS);
-+}
-+
-+static inline int uv_remove_shared(unsigned long addr)
-+{
-+	return share(addr, UVC_CMD_REMOVE_SHARED_ACCESS);
-+}
-+
-+static void test_priv(void)
-+{
-+	struct uv_cb_header uvcb = {};
-+
-+	report_prefix_push("privileged");
-+
-+	report_prefix_push("query");
-+	expect_pgm_int();
-+	uvcb.cmd = UVC_CMD_QUI;
-+	uvcb.len = sizeof(struct uv_cb_qui);
-+	enter_pstate();
-+	uv_call(0, (u64)&uvcb);
-+	check_pgm_int_code(PGM_INT_CODE_PRIVILEGED_OPERATION);
-+	report_prefix_pop();
-+
-+	report_prefix_push("share");
-+	expect_pgm_int();
-+	enter_pstate();
-+	uv_set_shared(0x42000);
-+	check_pgm_int_code(PGM_INT_CODE_PRIVILEGED_OPERATION);
-+	report_prefix_pop();
-+
-+	report_prefix_push("unshare");
-+	expect_pgm_int();
-+	enter_pstate();
-+	uv_remove_shared(0x42000);
-+	check_pgm_int_code(PGM_INT_CODE_PRIVILEGED_OPERATION);
-+	report_prefix_pop();
-+
-+	report_prefix_pop();
-+}
-+
-+static void test_query(void)
-+{
-+	struct uv_cb_qui uvcb = {
-+		.header.cmd = UVC_CMD_QUI,
-+		.header.len = sizeof(uvcb) - 8,
-+	};
-+
-+	report_prefix_push("query");
-+	uv_call(0, (u64)&uvcb);
-+	report(uvcb.header.rc == UVC_RC_INV_LEN, "length");
-+
-+	uvcb.header.len = sizeof(uvcb);
-+	uv_call(0, (u64)&uvcb);
-+	report(uvcb.header.rc == UVC_RC_EXECUTED, "successful query");
-+
-+	/*
-+	 * These bits have been introduced with the very first
-+	 * Ultravisor version and are expected to always be available
-+	 * because they are basic building blocks.
-+	 */
-+	report(uvcb.inst_calls_list[0] & (1UL << (63 - BIT_UVC_CMD_QUI)),
-+	       "query indicated");
-+	report(uvcb.inst_calls_list[0] & (1UL << (63 - BIT_UVC_CMD_SET_SHARED_ACCESS)),
-+	       "share indicated");
-+	report(uvcb.inst_calls_list[0] & (1UL << (63 - BIT_UVC_CMD_REMOVE_SHARED_ACCESS)),
-+	       "unshare indicated");
-+	report_prefix_pop();
-+}
-+
-+static void test_sharing(void)
-+{
-+	unsigned long mem = (unsigned long)alloc_page();
-+	struct uv_cb_share uvcb = {
-+		.header.cmd = UVC_CMD_SET_SHARED_ACCESS,
-+		.header.len = sizeof(uvcb) - 8,
-+	};
-+
-+	report_prefix_push("share");
-+	uv_call(0, (u64)&uvcb);
-+	report(uvcb.header.rc == UVC_RC_INV_LEN, "length");
-+	report(uv_set_shared(mem) == UVC_RC_EXECUTED, "share");
-+	report_prefix_pop();
-+
-+	report_prefix_push("unshare");
-+	uvcb.header.cmd = UVC_CMD_REMOVE_SHARED_ACCESS;
-+	uv_call(0, (u64)&uvcb);
-+	report(uvcb.header.rc == UVC_RC_INV_LEN, "length");
-+	report(uv_remove_shared(mem) == UVC_RC_EXECUTED, "unshare");
-+	free_page((void *)mem);
-+	report_prefix_pop();
-+
-+	report_prefix_pop();
-+}
-+
-+static void test_invalid(void)
-+{
-+	struct uv_cb_header uvcb = {
-+		.len = 16,
-+		.cmd = 0x4242,
-+	};
-+
-+	uv_call(0, (u64)&uvcb);
-+	report(uvcb.rc == UVC_RC_INV_CMD, "invalid command");
-+}
-+
-+int main(void)
-+{
-+	bool has_uvc = test_facility(158);
-+
-+	report_prefix_push("uvc");
-+	if (!has_uvc) {
-+		report_skip("Ultravisor call facility is not available");
-+		goto done;
-+	}
-+
-+	test_priv();
-+	test_invalid();
-+	test_query();
-+	test_sharing();
-+done:
-+	return report_summary();
-+}
--- 
-2.25.1
+No, libvirt is not responsible for the success or failure of the
+migration, it's the vendor driver's responsibility to encode
+compatibility information early in the migration stream and error
+should the incoming device prove to be incompatible.  It's not
+libvirt's job to second guess the management engine and I would not
+support a duplicate interface only for that purpose.  Thanks,
+
+Alex
 
