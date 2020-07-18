@@ -2,87 +2,69 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3AB3722475D
-	for <lists+kvm@lfdr.de>; Sat, 18 Jul 2020 02:13:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8EF7A22481E
+	for <lists+kvm@lfdr.de>; Sat, 18 Jul 2020 04:53:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728206AbgGRANA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 17 Jul 2020 20:13:00 -0400
-Received: from mail.kernel.org ([198.145.29.99]:54460 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727946AbgGRANA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 17 Jul 2020 20:13:00 -0400
-Received: from paulmck-ThinkPad-P72.home (50-39-111-31.bvtn.or.frontiernet.net [50.39.111.31])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id C18C520768;
-        Sat, 18 Jul 2020 00:12:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1595031179;
-        bh=6U990pCrqx8gF6az8xcughhGYyeg5SgkZ15i21TePlc=;
-        h=Date:From:To:Cc:Subject:Reply-To:References:In-Reply-To:From;
-        b=yoIF14ITjXcQAKyJR8qBJ+VnsYRCwcHRgk0ySLlYAHyhDb17CruZQZJHiMzxYfLYv
-         Tibk3rxtm5JiGHKxsHN0hAsylHTl2kKVVDs0aJzcIZJj5pkmSNzXyZHWjra9Mzw3FF
-         T1Fy4GNLH5f8r60NTY29YCBd7U6pP5XlA8FqiALQ=
-Received: by paulmck-ThinkPad-P72.home (Postfix, from userid 1000)
-        id A6BB035231DA; Fri, 17 Jul 2020 17:12:59 -0700 (PDT)
-Date:   Fri, 17 Jul 2020 17:12:59 -0700
-From:   "Paul E. McKenney" <paulmck@kernel.org>
-To:     Naresh Kamboju <naresh.kamboju@linaro.org>
-Cc:     madhuparnabhowmik10@gmail.com,
-        Dexuan-Linux Cui <dexuan.linux@gmail.com>,
-        Josh Triplett <josh@joshtriplett.org>,
-        Joel Fernandes <joel@joelfernandes.org>,
-        Paolo Bonzini <pbonzini@redhat.com>, rcu@vger.kernel.org,
-        open list <linux-kernel@vger.kernel.org>,
-        X86 ML <x86@kernel.org>, kvm list <kvm@vger.kernel.org>,
-        frextrite@gmail.com, lkft-triage@lists.linaro.org,
-        Dexuan Cui <decui@microsoft.com>, juhlee@microsoft.com,
-        Daniel =?iso-8859-1?Q?D=EDaz?= <daniel.diaz@linaro.org>
-Subject: Re: [PATCH 2/2] kvm: mmu: page_track: Fix RCU list API usage
-Message-ID: <20200718001259.GY9247@paulmck-ThinkPad-P72>
-Reply-To: paulmck@kernel.org
-References: <20200712131003.23271-1-madhuparnabhowmik10@gmail.com>
- <20200712131003.23271-2-madhuparnabhowmik10@gmail.com>
- <20200712160856.GW9247@paulmck-ThinkPad-P72>
- <CA+G9fYuVmTcttBpVtegwPbKxufupPOtk_WqEtOdS+HDQi7WS9Q@mail.gmail.com>
- <CAA42JLY2L6xFju_qZsVguGtXvDMqfCKbO_h1K9NJPjmqJEav=Q@mail.gmail.com>
- <20200717170747.GW9247@paulmck-ThinkPad-P72>
- <CA+G9fYvtYr0ri6j-auNOTs98xVj-a1AoZtUfwokwnvuFFWtFdQ@mail.gmail.com>
+        id S1728890AbgGRCxi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 17 Jul 2020 22:53:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45800 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726262AbgGRCxi (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 17 Jul 2020 22:53:38 -0400
+Received: from merlin.infradead.org (merlin.infradead.org [IPv6:2001:8b0:10b:1231::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0E5DEC0619D2;
+        Fri, 17 Jul 2020 19:53:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=merlin.20170209; h=Content-Transfer-Encoding:Content-Type:
+        MIME-Version:Date:Message-ID:To:Subject:From:Sender:Reply-To:Cc:Content-ID:
+        Content-Description:In-Reply-To:References;
+        bh=+ZE3FpDlcsZJaSCdlANHvwXhVh4c14KCBuPZ5HWYZG8=; b=dyRxCxkBtOX+Fcxvh5psUO8Jp0
+        Mk7hADTBD9vus9AOajZuiBFIWnXFGV9ZO72ufZLNJS1DIdqTc0zmyBWhWM1WjkD3rclwgxcLYrxDi
+        6YxBoXfeDvMcTd/CmuL1yIZhvdLh+trfgsp+PjcUMppOZqunQ5eK46/T4DUhhdFRrVIGCDanz8bF1
+        fpDy8jHykSyG7AQccpX4MP9cwReE8QqhC2Auy8nhYtaqVScTiWBDQ7V+gRw9EarxpO9yr6Q4WlVud
+        wg3IZWYcADjvqio6ne1RnpZluznfQZuM9RkvIRDYjGoMOSadTF90paefHRoqm4/LGYzMJumKlrlLr
+        A0dRVrWQ==;
+Received: from [2601:1c0:6280:3f0::19c2]
+        by merlin.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1jwcyl-0006lP-0Q; Sat, 18 Jul 2020 02:53:35 +0000
+From:   Randy Dunlap <rdunlap@infradead.org>
+Subject: [PATCH] linux/mdev.h: drop duplicated word in a comment
+To:     LKML <linux-kernel@vger.kernel.org>,
+        Kirti Wankhede <kwankhede@nvidia.com>,
+        KVM <kvm@vger.kernel.org>
+Message-ID: <ae55d252-04e9-843c-94a9-5a211c247718@infradead.org>
+Date:   Fri, 17 Jul 2020 19:53:31 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.9.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CA+G9fYvtYr0ri6j-auNOTs98xVj-a1AoZtUfwokwnvuFFWtFdQ@mail.gmail.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, Jul 18, 2020 at 12:35:12AM +0530, Naresh Kamboju wrote:
-> Hi Paul,
-> 
-> > I am not seeing this here.
-> 
-> Do you notice any warnings while building linux next master
-> for x86_64 architecture ?
+From: Randy Dunlap <rdunlap@infradead.org>
 
-Idiot here was failing to enable building of KVM.  With that, I do see
-the error.  The patch resolves it for me.  Does it help for you?
+Drop the doubled word "a" in a comment.
 
-							Thanx, Paul
+Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
+Cc: Kirti Wankhede <kwankhede@nvidia.com>
+Cc: kvm@vger.kernel.org
+---
+ include/linux/mdev.h |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-------------------------------------------------------------------------
+--- linux-next-20200714.orig/include/linux/mdev.h
++++ linux-next-20200714/include/linux/mdev.h
+@@ -42,7 +42,7 @@ struct device *mdev_get_iommu_device(str
+  *			@mdev: mdev_device structure on of mediated device
+  *			      that is being created
+  *			Returns integer: success (0) or error (< 0)
+- * @remove:		Called to free resources in parent device's driver for a
++ * @remove:		Called to free resources in parent device's driver for
+  *			a mediated device. It is mandatory to provide 'remove'
+  *			ops.
+  *			@mdev: mdev_device device structure which is being
 
-diff --git a/include/linux/rculist.h b/include/linux/rculist.h
-index de9385b..f8633d3 100644
---- a/include/linux/rculist.h
-+++ b/include/linux/rculist.h
-@@ -73,7 +73,7 @@ static inline void INIT_LIST_HEAD_RCU(struct list_head *list)
- #define __list_check_rcu(dummy, cond, extra...)				\
- 	({ check_arg_count_one(extra); })
- 
--#define __list_check_srcu(cond) true
-+#define __list_check_srcu(cond) ({ })
- #endif
- 
- /*
