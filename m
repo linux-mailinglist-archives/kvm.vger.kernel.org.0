@@ -2,151 +2,82 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D4533224BA2
-	for <lists+kvm@lfdr.de>; Sat, 18 Jul 2020 15:49:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D69FA224BBB
+	for <lists+kvm@lfdr.de>; Sat, 18 Jul 2020 16:16:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726627AbgGRNtf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 18 Jul 2020 09:49:35 -0400
-Received: from foss.arm.com ([217.140.110.172]:43882 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726569AbgGRNtf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 18 Jul 2020 09:49:35 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 4952B12FC;
-        Sat, 18 Jul 2020 06:49:34 -0700 (PDT)
-Received: from [192.168.0.110] (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id AC3B93F718;
-        Sat, 18 Jul 2020 06:49:33 -0700 (PDT)
-Subject: Re: [kvm-unit-tests PATCH] arm64: Compile with -mno-outline-atomics
- for GCC >= 10
-To:     Andrew Jones <drjones@redhat.com>
-Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
-        pbonzini@redhat.com
-References: <20200717164727.75580-1-alexandru.elisei@arm.com>
- <20200718091145.zheu46pfjwsntr3a@kamzik.brq.redhat.com>
-From:   Alexandru Elisei <alexandru.elisei@arm.com>
-Message-ID: <202d475d-95df-2350-a8e9-9264144993ac@arm.com>
-Date:   Sat, 18 Jul 2020 14:50:19 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        id S1727771AbgGROQb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 18 Jul 2020 10:16:31 -0400
+Received: from Galois.linutronix.de ([193.142.43.55]:47236 "EHLO
+        galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726574AbgGROQ3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 18 Jul 2020 10:16:29 -0400
+From:   Thomas Gleixner <tglx@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020; t=1595081787;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=InESnWhhE1Lyrbm8RqL/G1i0QjcPEbAb4abQNdrt+bc=;
+        b=ZA0vBN+SrOoNlxKj9fPmZs53XNpqeydqQ30JHCM1TiQIrq4FEa2B+ezj+nlrK2hW4pxtWS
+        DSwRQNtcOFWyUKw77m14YurY6WpoOQJnbiS35d7QbVmhGxve7Kqb2Y1DgPKGLXEpYDYOS4
+        oqoAziR7w2ayMO1EsUzU5G5BACkC3MkKzIC1mbbLKje8l038DFG8bJDFYWeHCPbvHLwrwD
+        wz0iSwrRqslMZ9r2cLvPT98eVAHvW1hONwSwROSMngHDku7tUSDjwHh60DIs6K9UIkN2Xg
+        T2JjpCXJmtonP5VWeUuROYj2AW4xVfxekliuTV2I2RTvtNy6yeEMXKfqzz9sxQ==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020e; t=1595081787;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=InESnWhhE1Lyrbm8RqL/G1i0QjcPEbAb4abQNdrt+bc=;
+        b=Uz16ViUPG75XGv0PA6hTKa6ol+KLikD/0YIRqc3DiZjEqyUo0xmOSZzbt8Vl5Wuc4l8wWf
+        vCyqhYdw8l3qFNAw==
+To:     Andy Lutomirski <luto@kernel.org>
+Cc:     Kees Cook <keescook@chromium.org>,
+        LKML <linux-kernel@vger.kernel.org>, X86 ML <x86@kernel.org>,
+        linux-arch <linux-arch@vger.kernel.org>,
+        Will Deacon <will@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Keno Fischer <keno@juliacomputing.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        kvm list <kvm@vger.kernel.org>,
+        Gabriel Krisman Bertazi <krisman@collabora.com>
+Subject: Re: [patch V3 01/13] entry: Provide generic syscall entry functionality
+In-Reply-To: <CALCETrXz_vEySQJ=f3MTPG9XjZS7U0P-diJE9j_+0KRa_Kie=Q@mail.gmail.com>
+References: <20200716182208.180916541@linutronix.de> <20200716185424.011950288@linutronix.de> <202007161336.B993ED938@keescook> <87d04vt98w.fsf@nanos.tec.linutronix.de> <202007171045.FB4A586F1D@keescook> <87mu3yq6sf.fsf@nanos.tec.linutronix.de> <CALCETrXz_vEySQJ=f3MTPG9XjZS7U0P-diJE9j_+0KRa_Kie=Q@mail.gmail.com>
+Date:   Sat, 18 Jul 2020 16:16:26 +0200
+Message-ID: <875zakq56t.fsf@nanos.tec.linutronix.de>
 MIME-Version: 1.0
-In-Reply-To: <20200718091145.zheu46pfjwsntr3a@kamzik.brq.redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
+Content-Type: text/plain
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi,
-
-On 7/18/20 10:11 AM, Andrew Jones wrote:
-> On Fri, Jul 17, 2020 at 05:47:27PM +0100, Alexandru Elisei wrote:
->> GCC 10.1.0 introduced the -m{,no-}outline-atomics flags which, according to
->> man 1 gcc:
->>
->> "Enable or disable calls to out-of-line helpers to implement atomic
->> operations.  These helpers will, at runtime, determine if the LSE
->> instructions from ARMv8.1-A can be used; if not, they will use the
->> load/store-exclusive instructions that are present in the base ARMv8.0 ISA.
->> [..] This option is on by default."
->>
->> Unfortunately the option causes the following error at compile time:
->>
->> aarch64-linux-gnu-ld -nostdlib -pie -n -o arm/spinlock-test.elf -T /path/to/kvm-unit-tests/arm/flat.lds \
->> 	arm/spinlock-test.o arm/cstart64.o lib/libcflat.a lib/libfdt/libfdt.a /usr/lib/gcc/aarch64-linux-gnu/10.1.0/libgcc.a lib/arm/libeabi.a arm/spinlock-test.aux.o
->> aarch64-linux-gnu-ld: /usr/lib/gcc/aarch64-linux-gnu/10.1.0/libgcc.a(lse-init.o): in function `init_have_lse_atomics':
->> lse-init.c:(.text.startup+0xc): undefined reference to `__getauxval'
->>
->> This is happening because we are linking against our own libcflat which
->> doesn't implement the function __getauxval().
->>
->> Disable the use of the out-of-line functions by compiling with
->> -mno-outline-atomics if we detect a GCC version greater than 10.
->>
->> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
->> ---
->>
->> Tested with gcc versions 10.1.0 and 5.4.0 (cross-compilation), 9.3.0
->> (native).
->>
->> I've been able to suss out the reason for the build failure from this
->> rejected gcc patch [1].
->>
->> [1] https://patches.openembedded.org/patch/172460/
->>
->>  arm/Makefile.arm64 | 6 ++++++
->>  1 file changed, 6 insertions(+)
->>
->> diff --git a/arm/Makefile.arm64 b/arm/Makefile.arm64
->> index dfd0c56fe8fb..3223cb966789 100644
->> --- a/arm/Makefile.arm64
->> +++ b/arm/Makefile.arm64
->> @@ -9,6 +9,12 @@ ldarch = elf64-littleaarch64
->>  arch_LDFLAGS = -pie -n
->>  CFLAGS += -mstrict-align
->>  
->> +# The -mno-outline-atomics flag is only valid for GCC versions 10 and greater.
->> +GCC_MAJOR_VERSION=$(shell $(CC) -dumpversion 2> /dev/null | cut -f1 -d.)
->> +ifeq ($(shell expr "$(GCC_MAJOR_VERSION)" ">=" "10"), 1)
->> +CFLAGS += -mno-outline-atomics
->> +endif
-> How about this patch instead?
+Andy Lutomirski <luto@kernel.org> writes:
+> On Fri, Jul 17, 2020 at 12:29 PM Thomas Gleixner <tglx@linutronix.de> wrote:
+>> The alternative is to play nasty games with TIF_IA32, TIF_ADDR32 and
+>> TIF_X32 to free up bits for 32bit and make the flags field 64 bit on 64
+>> bit kernels, but I prefer to do the above seperation.
 >
-> diff --git a/Makefile b/Makefile
-> index 3ff2f91600f6..0e21a49096ba 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -17,6 +17,11 @@ DESTDIR := $(PREFIX)/share/kvm-unit-tests/
->  
->  .PHONY: arch_clean clean distclean cscope
->  
-> +# cc-option
-> +# Usage: OP_CFLAGS+=$(call cc-option, -falign-functions=0, -malign-functions=0)
-> +cc-option = $(shell if $(CC) -Werror $(1) -S -o /dev/null -xc /dev/null \
-> +              > /dev/null 2>&1; then echo "$(1)"; else echo "$(2)"; fi ;)
-> +
->  #make sure env CFLAGS variable is not used
->  CFLAGS =
->  
-> @@ -43,12 +48,6 @@ OBJDIRS += $(LIBFDT_objdir)
->  #include architecture specific make rules
->  include $(SRCDIR)/$(TEST_DIR)/Makefile
->  
-> -# cc-option
-> -# Usage: OP_CFLAGS+=$(call cc-option, -falign-functions=0, -malign-functions=0)
-> -
-> -cc-option = $(shell if $(CC) -Werror $(1) -S -o /dev/null -xc /dev/null \
-> -              > /dev/null 2>&1; then echo "$(1)"; else echo "$(2)"; fi ;)
-> -
->  COMMON_CFLAGS += -g $(autodepend-flags) -fno-strict-aliasing -fno-common
->  COMMON_CFLAGS += -Wall -Wwrite-strings -Wempty-body -Wuninitialized
->  COMMON_CFLAGS += -Wignored-qualifiers -Werror
-> diff --git a/arm/Makefile.arm64 b/arm/Makefile.arm64
-> index dfd0c56fe8fb..dbc7524d3070 100644
-> --- a/arm/Makefile.arm64
-> +++ b/arm/Makefile.arm64
-> @@ -9,6 +9,9 @@ ldarch = elf64-littleaarch64
->  arch_LDFLAGS = -pie -n
->  CFLAGS += -mstrict-align
->  
-> +mno_outline_atomics := $(call cc-option, -mno-outline-atomics, "")
-> +CFLAGS += $(mno_outline_atomics)
-> +
->  define arch_elf_check =
->  	$(if $(shell ! $(OBJDUMP) -R $(1) >&/dev/null && echo "nok"),
->  		$(error $(shell $(OBJDUMP) -R $(1) 2>&1)))
+> I'm all for cleaning it up, but I don't think any nasty games would be
+> needed regardless.  IMO at least the following flags are nonsense and
+> don't belong in TIF_anything at all:
 >
+> TIF_IA32, TIF_X32: can probably be deleted.  Someone would just need
+> to finish the work.
+> TIF_ADDR32: also probably removable, but I'm less confident.
+> TIF_FORCED_TF: This is purely a ptrace artifact and could easily go
+> somewhere else entirely.
 >
-> Thanks,
-> drew
+> So getting those five bits back would be straightforward.
+>
+> FWIW, TIF_USER_RETURN_NOTIFY is a bit of an odd duck: it's an
+> entry/exit word *and* a context switch word.  The latter is because
+> it's logically a per-cpu flag, not a per-task flag, and the context
+> switch code moves it around so it's always set on the running task.
 
-Looks much better than my version. Do you want me to spin a v2 or do you want to
-send it as a separate patch? If that's the case, I tested the same way I did my
-patch (gcc 10.1.0 and 5.4.0 for cross-compiling, 9.3.0 native):
-
-Tested-by: Alexandru Elisei <alexandru.elisei@arm.com>
+Gah, I missed the context switch thing of that. That stuff is hideous.
 
 Thanks,
-Alex
+
+       tglx
