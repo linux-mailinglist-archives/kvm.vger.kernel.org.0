@@ -2,92 +2,161 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A2B7F224940
-	for <lists+kvm@lfdr.de>; Sat, 18 Jul 2020 08:39:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8ED9A224A07
+	for <lists+kvm@lfdr.de>; Sat, 18 Jul 2020 11:11:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728956AbgGRGjI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 18 Jul 2020 02:39:08 -0400
-Received: from mga09.intel.com ([134.134.136.24]:30319 "EHLO mga09.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728927AbgGRGjD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 18 Jul 2020 02:39:03 -0400
-IronPort-SDR: vAUUUhivkyIFIZCdcpKX8RSmIRaFuHekJk/pcQBDh22zZxOKFEaKnQjF0+wWlg6cKzIoFmBqfP
- CH56wSB5rY9g==
-X-IronPort-AV: E=McAfee;i="6000,8403,9685"; a="151079559"
-X-IronPort-AV: E=Sophos;i="5.75,366,1589266800"; 
-   d="scan'208";a="151079559"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga006.fm.intel.com ([10.253.24.20])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Jul 2020 23:39:01 -0700
-IronPort-SDR: HteSuF+3oaeppCghGDr2/OkcqL2D1fVRROdg5nzdrNT99ETRfwbDMhIiR+VxLK/apJNdVGm0v1
- JV77Sc1d/J3A==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.75,366,1589266800"; 
-   d="scan'208";a="486690976"
-Received: from sjchrist-coffee.jf.intel.com ([10.54.74.152])
-  by fmsmga006.fm.intel.com with ESMTP; 17 Jul 2020 23:39:01 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH 7/7] KVM: nVMX: Read EXIT_QUAL and INTR_INFO only when needed for nested exit
-Date:   Fri, 17 Jul 2020 23:38:54 -0700
-Message-Id: <20200718063854.16017-8-sean.j.christopherson@intel.com>
-X-Mailer: git-send-email 2.26.0
-In-Reply-To: <20200718063854.16017-1-sean.j.christopherson@intel.com>
-References: <20200718063854.16017-1-sean.j.christopherson@intel.com>
+        id S1726096AbgGRJL5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 18 Jul 2020 05:11:57 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:30389 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1725809AbgGRJL5 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Sat, 18 Jul 2020 05:11:57 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1595063515;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=YXOyeyfK3ACOD6XEjJUczttBFVxRcGvCcA2SsYw5mIg=;
+        b=Dht1ICi+kezNktMHFziX1jzu5fEw2zZADXcvF7V5nNtzAvCSRzjcrh2grefmG4OOiG3/gl
+        1GKvB7UQQHxyXsH4HIdpOddZG08PJuKmb4lu0QjjbHDA6BOsj0Kif4vhAAzCOWz9EBeYYE
+        nkcAy1EZ5MTGf193kes7hcT/4o2q4YI=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-330-_T1zoGe8MImMO1oaIkj20Q-1; Sat, 18 Jul 2020 05:11:51 -0400
+X-MC-Unique: _T1zoGe8MImMO1oaIkj20Q-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 894FA800463;
+        Sat, 18 Jul 2020 09:11:50 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (unknown [10.40.192.78])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 09EF460BE2;
+        Sat, 18 Jul 2020 09:11:48 +0000 (UTC)
+Date:   Sat, 18 Jul 2020 11:11:45 +0200
+From:   Andrew Jones <drjones@redhat.com>
+To:     Alexandru Elisei <alexandru.elisei@arm.com>
+Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
+        pbonzini@redhat.com
+Subject: Re: [kvm-unit-tests PATCH] arm64: Compile with -mno-outline-atomics
+ for GCC >= 10
+Message-ID: <20200718091145.zheu46pfjwsntr3a@kamzik.brq.redhat.com>
+References: <20200717164727.75580-1-alexandru.elisei@arm.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200717164727.75580-1-alexandru.elisei@arm.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Read vmcs.EXIT_QUALIFICATION and vmcs.VM_EXIT_INTR_INFO only when the
-VM-Exit is being reflected to L1 now that they are no longer passed
-directly to the kvm_nested_vmexit tracepoint.
+On Fri, Jul 17, 2020 at 05:47:27PM +0100, Alexandru Elisei wrote:
+> GCC 10.1.0 introduced the -m{,no-}outline-atomics flags which, according to
+> man 1 gcc:
+> 
+> "Enable or disable calls to out-of-line helpers to implement atomic
+> operations.  These helpers will, at runtime, determine if the LSE
+> instructions from ARMv8.1-A can be used; if not, they will use the
+> load/store-exclusive instructions that are present in the base ARMv8.0 ISA.
+> [..] This option is on by default."
+> 
+> Unfortunately the option causes the following error at compile time:
+> 
+> aarch64-linux-gnu-ld -nostdlib -pie -n -o arm/spinlock-test.elf -T /path/to/kvm-unit-tests/arm/flat.lds \
+> 	arm/spinlock-test.o arm/cstart64.o lib/libcflat.a lib/libfdt/libfdt.a /usr/lib/gcc/aarch64-linux-gnu/10.1.0/libgcc.a lib/arm/libeabi.a arm/spinlock-test.aux.o
+> aarch64-linux-gnu-ld: /usr/lib/gcc/aarch64-linux-gnu/10.1.0/libgcc.a(lse-init.o): in function `init_have_lse_atomics':
+> lse-init.c:(.text.startup+0xc): undefined reference to `__getauxval'
+> 
+> This is happening because we are linking against our own libcflat which
+> doesn't implement the function __getauxval().
+> 
+> Disable the use of the out-of-line functions by compiling with
+> -mno-outline-atomics if we detect a GCC version greater than 10.
+> 
+> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+> ---
+> 
+> Tested with gcc versions 10.1.0 and 5.4.0 (cross-compilation), 9.3.0
+> (native).
+> 
+> I've been able to suss out the reason for the build failure from this
+> rejected gcc patch [1].
+> 
+> [1] https://patches.openembedded.org/patch/172460/
+> 
+>  arm/Makefile.arm64 | 6 ++++++
+>  1 file changed, 6 insertions(+)
+> 
+> diff --git a/arm/Makefile.arm64 b/arm/Makefile.arm64
+> index dfd0c56fe8fb..3223cb966789 100644
+> --- a/arm/Makefile.arm64
+> +++ b/arm/Makefile.arm64
+> @@ -9,6 +9,12 @@ ldarch = elf64-littleaarch64
+>  arch_LDFLAGS = -pie -n
+>  CFLAGS += -mstrict-align
+>  
+> +# The -mno-outline-atomics flag is only valid for GCC versions 10 and greater.
+> +GCC_MAJOR_VERSION=$(shell $(CC) -dumpversion 2> /dev/null | cut -f1 -d.)
+> +ifeq ($(shell expr "$(GCC_MAJOR_VERSION)" ">=" "10"), 1)
+> +CFLAGS += -mno-outline-atomics
+> +endif
 
-No functional change intended.
+How about this patch instead?
 
-Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
----
- arch/x86/kvm/vmx/nested.c | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
-
-diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index f437d99f4db09..cc5f0085989c7 100644
---- a/arch/x86/kvm/vmx/nested.c
-+++ b/arch/x86/kvm/vmx/nested.c
-@@ -5909,9 +5909,6 @@ bool nested_vmx_reflect_vmexit(struct kvm_vcpu *vcpu)
- 		goto reflect_vmexit;
- 	}
+diff --git a/Makefile b/Makefile
+index 3ff2f91600f6..0e21a49096ba 100644
+--- a/Makefile
++++ b/Makefile
+@@ -17,6 +17,11 @@ DESTDIR := $(PREFIX)/share/kvm-unit-tests/
  
--	exit_intr_info = vmx_get_intr_info(vcpu);
--	exit_qual = vmx_get_exit_qual(vcpu);
+ .PHONY: arch_clean clean distclean cscope
+ 
++# cc-option
++# Usage: OP_CFLAGS+=$(call cc-option, -falign-functions=0, -malign-functions=0)
++cc-option = $(shell if $(CC) -Werror $(1) -S -o /dev/null -xc /dev/null \
++              > /dev/null 2>&1; then echo "$(1)"; else echo "$(2)"; fi ;)
++
+ #make sure env CFLAGS variable is not used
+ CFLAGS =
+ 
+@@ -43,12 +48,6 @@ OBJDIRS += $(LIBFDT_objdir)
+ #include architecture specific make rules
+ include $(SRCDIR)/$(TEST_DIR)/Makefile
+ 
+-# cc-option
+-# Usage: OP_CFLAGS+=$(call cc-option, -falign-functions=0, -malign-functions=0)
 -
- 	trace_kvm_nested_vmexit(exit_reason, vcpu, KVM_ISA_VMX);
+-cc-option = $(shell if $(CC) -Werror $(1) -S -o /dev/null -xc /dev/null \
+-              > /dev/null 2>&1; then echo "$(1)"; else echo "$(2)"; fi ;)
+-
+ COMMON_CFLAGS += -g $(autodepend-flags) -fno-strict-aliasing -fno-common
+ COMMON_CFLAGS += -Wall -Wwrite-strings -Wempty-body -Wuninitialized
+ COMMON_CFLAGS += -Wignored-qualifiers -Werror
+diff --git a/arm/Makefile.arm64 b/arm/Makefile.arm64
+index dfd0c56fe8fb..dbc7524d3070 100644
+--- a/arm/Makefile.arm64
++++ b/arm/Makefile.arm64
+@@ -9,6 +9,9 @@ ldarch = elf64-littleaarch64
+ arch_LDFLAGS = -pie -n
+ CFLAGS += -mstrict-align
  
- 	/* If L0 (KVM) wants the exit, it trumps L1's desires. */
-@@ -5928,12 +5925,14 @@ bool nested_vmx_reflect_vmexit(struct kvm_vcpu *vcpu)
- 	 * need to be synthesized by querying the in-kernel LAPIC, but external
- 	 * interrupts are never reflected to L1 so it's a non-issue.
- 	 */
-+	exit_intr_info = vmx_get_intr_info(vcpu);
- 	if (is_exception_with_error_code(exit_intr_info)) {
- 		struct vmcs12 *vmcs12 = get_vmcs12(vcpu);
- 
- 		vmcs12->vm_exit_intr_error_code =
- 			vmcs_read32(VM_EXIT_INTR_ERROR_CODE);
- 	}
-+	exit_qual = vmx_get_exit_qual(vcpu);
- 
- reflect_vmexit:
- 	nested_vmx_vmexit(vcpu, exit_reason, exit_intr_info, exit_qual);
--- 
-2.26.0
++mno_outline_atomics := $(call cc-option, -mno-outline-atomics, "")
++CFLAGS += $(mno_outline_atomics)
++
+ define arch_elf_check =
+ 	$(if $(shell ! $(OBJDUMP) -R $(1) >&/dev/null && echo "nok"),
+ 		$(error $(shell $(OBJDUMP) -R $(1) 2>&1)))
+
+
+Thanks,
+drew
+
+> +
+>  define arch_elf_check =
+>  	$(if $(shell ! $(OBJDUMP) -R $(1) >&/dev/null && echo "nok"),
+>  		$(error $(shell $(OBJDUMP) -R $(1) 2>&1)))
+> -- 
+> 2.27.0
+> 
 
