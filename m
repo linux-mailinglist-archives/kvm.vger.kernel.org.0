@@ -2,90 +2,40 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1A31F224BF0
-	for <lists+kvm@lfdr.de>; Sat, 18 Jul 2020 16:41:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8A641224CF2
+	for <lists+kvm@lfdr.de>; Sat, 18 Jul 2020 18:16:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727930AbgGROlY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 18 Jul 2020 10:41:24 -0400
-Received: from mail.kernel.org ([198.145.29.99]:60688 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726798AbgGROlY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 18 Jul 2020 10:41:24 -0400
-Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id EFC4D2176B
-        for <kvm@vger.kernel.org>; Sat, 18 Jul 2020 14:41:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1595083283;
-        bh=dmEgNW5VbAFeNYVCYzm5DHh+GZ2HAhVpvEA/afSGYk8=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=czALAJCOZ7586Awrv9GznRMNKeV/qdgPQJFCXCCfE15k5wnr8ifFsqlY3oV7mCnuO
-         Q4Byrexj0+FEgdcIrZDW46mzYt0GKGFxLsc13HJha2aWxv5/0ZyAwSifiXG+EkkYYw
-         6q8zsKSjIQOgjsaYChVhyEqPQnJBNzq4ogGdEHRY=
-Received: by mail-wm1-f52.google.com with SMTP id f139so21148086wmf.5
-        for <kvm@vger.kernel.org>; Sat, 18 Jul 2020 07:41:22 -0700 (PDT)
-X-Gm-Message-State: AOAM533vHw10D8XEpPmEK0+n4C1A1inRde0JZ5Ah7ge3xaCagKzxNG+7
-        1h9Wu7xL+6G6Y8lH6l46GSNZS5cVhzPOGjZftxYaOg==
-X-Google-Smtp-Source: ABdhPJyW8HJzd/bIocRzxwAX14QSJxaW6VGWP36zZ9S5wOQEKzeQ9o9fEK2iENYr8TT19ujOO7fnUUtzTnjw/TsJqVI=
-X-Received: by 2002:a1c:e4d4:: with SMTP id b203mr14776945wmh.49.1595083281508;
- Sat, 18 Jul 2020 07:41:21 -0700 (PDT)
+        id S1728379AbgGRQPI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 18 Jul 2020 12:15:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55118 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726411AbgGRQPH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 18 Jul 2020 12:15:07 -0400
+Received: from 151.80.89.196 (unknown [IPv6:2001:41d0:303:46d2::])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 06C88C0619D2
+        for <kvm@vger.kernel.org>; Sat, 18 Jul 2020 09:15:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha1; c=relaxed/relaxed; s=click; d=offenline.biz;
+ h=Content-Type:MIME-Version:Content-Transfer-Encoding:Content-Description:Subject:To:From:Date:Reply-To:Message-ID;
+ bh=WrCb5nGko31fd5GUgjGBj5htdBM=;
+ b=1oVmxNA45PRvspOWYvUACeP7A6a7juYhjJ/KsLMYtuW6fhaXUa7SVbU9a1a12Bj8PZMtGkDrVzmw
+   aVmmX5mifDMYUv2gk52YT5XwTQJ5WJU4rGcQUIlA8HkNHu1JkZqQxh87uj+LExvrvShuV/OY5WuG
+   GDEBwf2N7MGpaEpNAK0=
+Content-Type: text/plain; charset="iso-8859-1"
 MIME-Version: 1.0
-References: <20200716182208.180916541@linutronix.de> <20200716185424.011950288@linutronix.de>
- <202007161336.B993ED938@keescook> <87d04vt98w.fsf@nanos.tec.linutronix.de>
- <202007171045.FB4A586F1D@keescook> <87mu3yq6sf.fsf@nanos.tec.linutronix.de>
- <CALCETrXz_vEySQJ=f3MTPG9XjZS7U0P-diJE9j_+0KRa_Kie=Q@mail.gmail.com> <875zakq56t.fsf@nanos.tec.linutronix.de>
-In-Reply-To: <875zakq56t.fsf@nanos.tec.linutronix.de>
-From:   Andy Lutomirski <luto@kernel.org>
-Date:   Sat, 18 Jul 2020 07:41:09 -0700
-X-Gmail-Original-Message-ID: <CALCETrU-z_73BsKwNq0fTDEg7tVicd=jOEaq-6LnH24uNWShDg@mail.gmail.com>
-Message-ID: <CALCETrU-z_73BsKwNq0fTDEg7tVicd=jOEaq-6LnH24uNWShDg@mail.gmail.com>
-Subject: Re: [patch V3 01/13] entry: Provide generic syscall entry functionality
-To:     Thomas Gleixner <tglx@linutronix.de>
-Cc:     Andy Lutomirski <luto@kernel.org>,
-        Kees Cook <keescook@chromium.org>,
-        LKML <linux-kernel@vger.kernel.org>, X86 ML <x86@kernel.org>,
-        linux-arch <linux-arch@vger.kernel.org>,
-        Will Deacon <will@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Keno Fischer <keno@juliacomputing.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        kvm list <kvm@vger.kernel.org>,
-        Gabriel Krisman Bertazi <krisman@collabora.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Content-Description: Mail message body
+Subject: Why continued silence 2 
+To:     Recipients <info@lee.org>
+From:   "convy" <info@lee.org>
+Date:   Sat, 18 Jul 2020 17:05:27 +0100
+Reply-To: convy442121@gmail.com
+Message-ID: <0.0.8.73B.1D65D1D88FD8416.0@151.80.89.196>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, Jul 18, 2020 at 7:16 AM Thomas Gleixner <tglx@linutronix.de> wrote:
->
-> Andy Lutomirski <luto@kernel.org> writes:
-> > On Fri, Jul 17, 2020 at 12:29 PM Thomas Gleixner <tglx@linutronix.de> wrote:
-> >> The alternative is to play nasty games with TIF_IA32, TIF_ADDR32 and
-> >> TIF_X32 to free up bits for 32bit and make the flags field 64 bit on 64
-> >> bit kernels, but I prefer to do the above seperation.
-> >
-> > I'm all for cleaning it up, but I don't think any nasty games would be
-> > needed regardless.  IMO at least the following flags are nonsense and
-> > don't belong in TIF_anything at all:
-> >
-> > TIF_IA32, TIF_X32: can probably be deleted.  Someone would just need
-> > to finish the work.
-> > TIF_ADDR32: also probably removable, but I'm less confident.
-> > TIF_FORCED_TF: This is purely a ptrace artifact and could easily go
-> > somewhere else entirely.
-> >
-> > So getting those five bits back would be straightforward.
-> >
-> > FWIW, TIF_USER_RETURN_NOTIFY is a bit of an odd duck: it's an
-> > entry/exit word *and* a context switch word.  The latter is because
-> > it's logically a per-cpu flag, not a per-task flag, and the context
-> > switch code moves it around so it's always set on the running task.
->
-> Gah, I missed the context switch thing of that. That stuff is hideous.
-
-It's also delightful because anything that screws up that dance (such
-as failure to do the exit-to-usermode path exactly right) likely
-results in an insta-root-hole.  If we fail to run user return
-notifiers, we can run user code with incorrect syscall MSRs, etc.
+Did you receive my previous email regarding your family inheritance?
+Reply strictly through: convy0090@gmail.com
+Best Regards,
+Ruben CONVY
