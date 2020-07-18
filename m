@@ -2,69 +2,88 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8EF7A22481E
-	for <lists+kvm@lfdr.de>; Sat, 18 Jul 2020 04:53:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 088DB22494D
+	for <lists+kvm@lfdr.de>; Sat, 18 Jul 2020 08:39:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728890AbgGRCxi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 17 Jul 2020 22:53:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45800 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726262AbgGRCxi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 17 Jul 2020 22:53:38 -0400
-Received: from merlin.infradead.org (merlin.infradead.org [IPv6:2001:8b0:10b:1231::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0E5DEC0619D2;
-        Fri, 17 Jul 2020 19:53:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=merlin.20170209; h=Content-Transfer-Encoding:Content-Type:
-        MIME-Version:Date:Message-ID:To:Subject:From:Sender:Reply-To:Cc:Content-ID:
-        Content-Description:In-Reply-To:References;
-        bh=+ZE3FpDlcsZJaSCdlANHvwXhVh4c14KCBuPZ5HWYZG8=; b=dyRxCxkBtOX+Fcxvh5psUO8Jp0
-        Mk7hADTBD9vus9AOajZuiBFIWnXFGV9ZO72ufZLNJS1DIdqTc0zmyBWhWM1WjkD3rclwgxcLYrxDi
-        6YxBoXfeDvMcTd/CmuL1yIZhvdLh+trfgsp+PjcUMppOZqunQ5eK46/T4DUhhdFRrVIGCDanz8bF1
-        fpDy8jHykSyG7AQccpX4MP9cwReE8QqhC2Auy8nhYtaqVScTiWBDQ7V+gRw9EarxpO9yr6Q4WlVud
-        wg3IZWYcADjvqio6ne1RnpZluznfQZuM9RkvIRDYjGoMOSadTF90paefHRoqm4/LGYzMJumKlrlLr
-        A0dRVrWQ==;
-Received: from [2601:1c0:6280:3f0::19c2]
-        by merlin.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1jwcyl-0006lP-0Q; Sat, 18 Jul 2020 02:53:35 +0000
-From:   Randy Dunlap <rdunlap@infradead.org>
-Subject: [PATCH] linux/mdev.h: drop duplicated word in a comment
-To:     LKML <linux-kernel@vger.kernel.org>,
-        Kirti Wankhede <kwankhede@nvidia.com>,
-        KVM <kvm@vger.kernel.org>
-Message-ID: <ae55d252-04e9-843c-94a9-5a211c247718@infradead.org>
-Date:   Fri, 17 Jul 2020 19:53:31 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.9.0
+        id S1726704AbgGRGjB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 18 Jul 2020 02:39:01 -0400
+Received: from mga09.intel.com ([134.134.136.24]:30319 "EHLO mga09.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726466AbgGRGjA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 18 Jul 2020 02:39:00 -0400
+IronPort-SDR: VBG67egJ9LbN53sa4iL5V6/4uBaZBCqwsqPvXY92LRqJWSDSg8WM3EOb2wNvaPsT674WM//Tnj
+ xmMBSX/GChYA==
+X-IronPort-AV: E=McAfee;i="6000,8403,9685"; a="151079552"
+X-IronPort-AV: E=Sophos;i="5.75,366,1589266800"; 
+   d="scan'208";a="151079552"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga006.fm.intel.com ([10.253.24.20])
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Jul 2020 23:39:00 -0700
+IronPort-SDR: TshmekDtA3lv29or1uv6qeiETKNvK92+6aKC/H/JBGvbMLI+zj+9hscec/rKtRRuz7H13eO27l
+ gx5u7c+d7Awg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.75,366,1589266800"; 
+   d="scan'208";a="486690945"
+Received: from sjchrist-coffee.jf.intel.com ([10.54.74.152])
+  by fmsmga006.fm.intel.com with ESMTP; 17 Jul 2020 23:38:59 -0700
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH 0/7]  KVM: x86: Tracepoint improvements and fixes
+Date:   Fri, 17 Jul 2020 23:38:47 -0700
+Message-Id: <20200718063854.16017-1-sean.j.christopherson@intel.com>
+X-Mailer: git-send-email 2.26.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Randy Dunlap <rdunlap@infradead.org>
+Various improvements and fixes for the kvm_entry, kvm_exit and
+kvm_nested_vmexit tracepoints.
 
-Drop the doubled word "a" in a comment.
+  1. Capture the guest's RIP during kvm_entry for obvious reasons.
 
-Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
-Cc: Kirti Wankhede <kwankhede@nvidia.com>
-Cc: kvm@vger.kernel.org
----
- include/linux/mdev.h |    2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+  2. Extend kvm_exit to report the same info as kvm_nested_vmexit, and
+     macrofy its definition to reuse it verbatim for nested exits.
 
---- linux-next-20200714.orig/include/linux/mdev.h
-+++ linux-next-20200714/include/linux/mdev.h
-@@ -42,7 +42,7 @@ struct device *mdev_get_iommu_device(str
-  *			@mdev: mdev_device structure on of mediated device
-  *			      that is being created
-  *			Returns integer: success (0) or error (< 0)
-- * @remove:		Called to free resources in parent device's driver for a
-+ * @remove:		Called to free resources in parent device's driver for
-  *			a mediated device. It is mandatory to provide 'remove'
-  *			ops.
-  *			@mdev: mdev_device device structure which is being
+  3. Stop passing in params to kvm_nested_vmexit, and instead use the
+     same approach (and now code) as kvm_exit where the tracepoint uses a
+     dedicated kvm_x86_ops hook to retrieve the info.
+
+  4. Stop reading GUEST_RIP, EXIT_QUAL, INTR_INFO, and ERROR_CODE on
+     every VM-Exit from L2 (some of this comes in #3).  This saves ~100
+     cycles (150+ with retpolines) on VM-Exits from L2 that are handled
+     by L0, e.g. hardware interrupts.
+
+Sean Christopherson (7):
+  KVM: x86: Add RIP to the kvm_entry, i.e. VM-Enter, tracepoint
+  KVM: x86: Read guest RIP from within the kvm_nested_vmexit tracepoint
+  KVM: VMX: Add a helper to test for a valid error code given an intr
+    info
+  KVM: x86: Add intr/vectoring info and error code to kvm_exit
+    tracepoint
+  KVM: x86: Add macro wrapper for defining kvm_exit tracepoint
+  KVM: x86: Use common definition for kvm_nested_vmexit tracepoint
+  KVM: nVMX: Read EXIT_QUAL and INTR_INFO only when needed for nested
+    exit
+
+ arch/x86/include/asm/kvm_host.h |   7 ++-
+ arch/x86/kvm/svm/svm.c          |  16 ++---
+ arch/x86/kvm/trace.h            | 107 +++++++++++++-------------------
+ arch/x86/kvm/vmx/nested.c       |  14 ++---
+ arch/x86/kvm/vmx/vmcs.h         |   7 +++
+ arch/x86/kvm/vmx/vmx.c          |  18 +++++-
+ arch/x86/kvm/x86.c              |   2 +-
+ 7 files changed, 86 insertions(+), 85 deletions(-)
+
+-- 
+2.26.0
 
