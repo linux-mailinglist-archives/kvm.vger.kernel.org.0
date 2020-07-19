@@ -2,94 +2,79 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B05E9224D25
-	for <lists+kvm@lfdr.de>; Sat, 18 Jul 2020 18:51:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EF76722513C
+	for <lists+kvm@lfdr.de>; Sun, 19 Jul 2020 12:17:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728092AbgGRQva (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 18 Jul 2020 12:51:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60738 "EHLO
+        id S1726061AbgGSKRN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 19 Jul 2020 06:17:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50874 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727055AbgGRQv3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 18 Jul 2020 12:51:29 -0400
-Received: from mail-qk1-x744.google.com (mail-qk1-x744.google.com [IPv6:2607:f8b0:4864:20::744])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AF02CC0619D2;
-        Sat, 18 Jul 2020 09:51:29 -0700 (PDT)
-Received: by mail-qk1-x744.google.com with SMTP id l6so11557988qkc.6;
-        Sat, 18 Jul 2020 09:51:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=lIGof6uhpVZKmwpXjgyNaJcaBa8FLlzcFqyZDPjbpOc=;
-        b=FHaO/NxHUOFcOqsNLqkObDHrJ8NKtxIFBDdP7zoImnujezq0cfyHkpz4CvGR+iBlNu
-         tKr6ljahu9FVRmldf82wqWgjTTrVZk9C+rVGr2NG9e4zBsNLrzsaGGXDMvMfoF2dzLSK
-         tM3Dl/26+BRVZjJMg2iDIDcJaYoZ1aAFIKenaLkMo6s70zPo6ehETtiAH92tYo1Qh2Vb
-         5gVH8aUlLKgyhkyFRdyAVM/RSJ4ggLNTbHEDzTxtf/VoK8Bcsr/SgooMA/Qr9pr3Fu0C
-         ei0Y8yrA8iK3G/rM5HGkYqk5xNcuWI2yZaFNN4MLl8grVxvVb19hilzgbADagMztdknS
-         y0ug==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=lIGof6uhpVZKmwpXjgyNaJcaBa8FLlzcFqyZDPjbpOc=;
-        b=dSZq97GQCbapVGOn2j+wgJO3OSzUFIpclSAjlo2Twda+HJ8ggLRnjEbwT2x/HtnUSV
-         nGxkojOVTOCjCPOyTkFlrVuWGFxqi4VqsD/QBtposGp0LrDsRny6uEpe2pFckMozxkZ0
-         RZNEo7eprgEDZVQ9L2wIeCD6mNQpKkMoMNnyqpRfLZiQHSBXozYuGnNmvK795xPzYv2F
-         SgbTFvPFD830YmUeZ2rvK+iDhomtcAG6zFJglneHCEZi5Hkuvfj/8AQzjYksdDlrweHl
-         In4z2C/jEqAK6H52ND+p8vKpdQxDgGIsT/Rt8BGYgldmppRoe0uu+8XBf/vfn6rwLKX/
-         a4WA==
-X-Gm-Message-State: AOAM531tLFTv3KTD+geB0/eUkwZ1TTs89W45PjmTcFRfw6E8PPIjPSVO
-        RZXPPCqYCWD+gshqm4awSNM=
-X-Google-Smtp-Source: ABdhPJwAyyLQgydCgRLXXu7r8kcxHE/psJ0c6rdQ+7sbtq2ogG+Z9LOekUBi78aoG+v7Vt+7MIPiow==
-X-Received: by 2002:a05:620a:40c1:: with SMTP id g1mr14360069qko.391.1595091088912;
-        Sat, 18 Jul 2020 09:51:28 -0700 (PDT)
-Received: from localhost.localdomain ([2804:18:602d:16d:d038:1a92:190d:65d2])
-        by smtp.gmail.com with ESMTPSA id q5sm15361801qtf.12.2020.07.18.09.51.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 18 Jul 2020 09:51:28 -0700 (PDT)
-From:   "Daniel W. S. Almeida" <dwlsalmeida@gmail.com>
-X-Google-Original-From: Daniel W. S. Almeida
-To:     corbet@lwn.net, pbonzini@redhat.com
-Cc:     "Daniel W . S . Almeida" <dwlsalmeida@gmail.com>,
-        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Subject: [PATCH] docs: kvm/api.rst: Fix indentation
-Date:   Sat, 18 Jul 2020 13:50:57 -0300
-Message-Id: <20200718165107.625847-3-dwlsalmeida@gmail.com>
-X-Mailer: git-send-email 2.27.0
-In-Reply-To: <20200718165107.625847-1-dwlsalmeida@gmail.com>
-References: <20200718165107.625847-1-dwlsalmeida@gmail.com>
+        with ESMTP id S1725836AbgGSKRN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 19 Jul 2020 06:17:13 -0400
+Received: from galois.linutronix.de (Galois.linutronix.de [IPv6:2a0a:51c0:0:12e:550::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BC79FC0619D2;
+        Sun, 19 Jul 2020 03:17:12 -0700 (PDT)
+From:   Thomas Gleixner <tglx@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020; t=1595153827;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=Klowtb+zpu2upHcc0/al6Z+g7rUSuNatngTABmSqQks=;
+        b=q8WBW4lphpZf+Rpq1Cbtq7QgWkuGOkQnhsp20yFar8wiTi3gddfIDm+NyjZXpS2fG6rA+q
+        nG+u1+A8/GifDOyHJe4mxZ6pq0OhvKaPDIOBpYTOIKKvcrn/YoixV5P5iwYLHRsu/SHrbB
+        oabbWpe0eEH+8X31+lECGS4HW3og5wKDFwN9HWV0zdIh6E2oS5i9Ch6BOhIPYksPf0PS59
+        HSzEz5B0gio3gV1tM43uyUPe2j/HmyVv99lFkpdKIIS5CZWoOK3Y3KH6ULxF3cL7tz/OT5
+        Ye5LMOV4/wPXxTLQxm83eV6glbq19TpIa9HyJMKOa/DSXSJg/LWwwe+6zZl2oA==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020e; t=1595153827;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=Klowtb+zpu2upHcc0/al6Z+g7rUSuNatngTABmSqQks=;
+        b=/icnqJkwLN5zSzDGZYcXzpGR7LI1HSuX35hwBCDMz7GGGc6gotQIlS2LCnsQLZ+UvWAWqy
+        jn0fn49/bZ1nRjAQ==
+To:     Andy Lutomirski <luto@kernel.org>
+Cc:     Andy Lutomirski <luto@kernel.org>,
+        Kees Cook <keescook@chromium.org>,
+        LKML <linux-kernel@vger.kernel.org>, X86 ML <x86@kernel.org>,
+        linux-arch <linux-arch@vger.kernel.org>,
+        Will Deacon <will@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Keno Fischer <keno@juliacomputing.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        kvm list <kvm@vger.kernel.org>,
+        Gabriel Krisman Bertazi <krisman@collabora.com>
+Subject: Re: [patch V3 01/13] entry: Provide generic syscall entry functionality
+In-Reply-To: <CALCETrU-z_73BsKwNq0fTDEg7tVicd=jOEaq-6LnH24uNWShDg@mail.gmail.com>
+References: <20200716182208.180916541@linutronix.de> <20200716185424.011950288@linutronix.de> <202007161336.B993ED938@keescook> <87d04vt98w.fsf@nanos.tec.linutronix.de> <202007171045.FB4A586F1D@keescook> <87mu3yq6sf.fsf@nanos.tec.linutronix.de> <CALCETrXz_vEySQJ=f3MTPG9XjZS7U0P-diJE9j_+0KRa_Kie=Q@mail.gmail.com> <875zakq56t.fsf@nanos.tec.linutronix.de> <CALCETrU-z_73BsKwNq0fTDEg7tVicd=jOEaq-6LnH24uNWShDg@mail.gmail.com>
+Date:   Sun, 19 Jul 2020 12:17:07 +0200
+Message-ID: <87v9ijollo.fsf@nanos.tec.linutronix.de>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Daniel W. S. Almeida <dwlsalmeida@gmail.com>
+Andy Lutomirski <luto@kernel.org> writes:
+> On Sat, Jul 18, 2020 at 7:16 AM Thomas Gleixner <tglx@linutronix.de> wrote:
+>> Andy Lutomirski <luto@kernel.org> writes:
+>> > FWIW, TIF_USER_RETURN_NOTIFY is a bit of an odd duck: it's an
+>> > entry/exit word *and* a context switch word.  The latter is because
+>> > it's logically a per-cpu flag, not a per-task flag, and the context
+>> > switch code moves it around so it's always set on the running task.
+>>
+>> Gah, I missed the context switch thing of that. That stuff is hideous.
+>
+> It's also delightful because anything that screws up that dance (such
+> as failure to do the exit-to-usermode path exactly right) likely
+> results in an insta-root-hole.  If we fail to run user return
+> notifiers, we can run user code with incorrect syscall MSRs, etc.
 
-Fix the following warnings:
+Looking at it deeper, having that thing in the loop is a pointless
+exercise. This really wants to be done _after_ the loop.
 
-WARNING: Definition list ends without a blank line; unexpected unindent
+Thanks,
 
-Signed-off-by: Daniel W. S. Almeida <dwlsalmeida@gmail.com>
----
- Documentation/virt/kvm/api.rst | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-index cdfd981553111..7f24af2760ccd 100644
---- a/Documentation/virt/kvm/api.rst
-+++ b/Documentation/virt/kvm/api.rst
-@@ -4340,7 +4340,7 @@ Errors:
-   #define KVM_STATE_NESTED_VMX_SMM_GUEST_MODE	0x00000001
-   #define KVM_STATE_NESTED_VMX_SMM_VMXON	0x00000002
- 
--#define KVM_STATE_VMX_PREEMPTION_TIMER_DEADLINE 0x00000001
-+  #define KVM_STATE_VMX_PREEMPTION_TIMER_DEADLINE 0x00000001
- 
-   struct kvm_vmx_nested_state_hdr {
- 	__u64 vmxon_pa;
--- 
-2.27.0
-
+        tglx
