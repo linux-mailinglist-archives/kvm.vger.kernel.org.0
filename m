@@ -2,44 +2,69 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 96D75225A18
-	for <lists+kvm@lfdr.de>; Mon, 20 Jul 2020 10:33:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 85B2E225A5B
+	for <lists+kvm@lfdr.de>; Mon, 20 Jul 2020 10:49:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727867AbgGTIdj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 20 Jul 2020 04:33:39 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:23241 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1725815AbgGTIdj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 20 Jul 2020 04:33:39 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1595234016;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=jxZwtU6jCdNzDDA32p8x0Lt0O/6ubHPtsEvyLzyrp7M=;
-        b=e9e23tWOMyqd8t7wuIjXm0hLNciuJfW3wUsali6Z+Fo8lnEsGbocDbqhkCjUoKoLgj4mM1
-        +SWWa+L1WKPJLDqO0G8oZis/ejNt+aPP40pPfFpz91CHFJOYAvM99JhfnLZUhR16U3JRJK
-        k1JjuZ5F6Tz45nG3zHOswaF8BPVYQuc=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-418-dz-TmbyxOae8XgGzqkDTYA-1; Mon, 20 Jul 2020 04:33:28 -0400
-X-MC-Unique: dz-TmbyxOae8XgGzqkDTYA-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DFC0D1080;
-        Mon, 20 Jul 2020 08:33:26 +0000 (UTC)
-Received: from [10.36.115.54] (ovpn-115-54.ams2.redhat.com [10.36.115.54])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 24B435C240;
-        Mon, 20 Jul 2020 08:33:15 +0000 (UTC)
-Subject: Re: [PATCH v5 04/15] vfio/type1: Report iommu nesting info to
- userspace
-To:     "Liu, Yi L" <yi.l.liu@intel.com>,
+        id S1727943AbgGTItq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 20 Jul 2020 04:49:46 -0400
+Received: from mga03.intel.com ([134.134.136.65]:44637 "EHLO mga03.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727786AbgGTItq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 20 Jul 2020 04:49:46 -0400
+IronPort-SDR: XQ9/ov4DUP15fBsKE4joHcUoRShA3DcUrmot9Xw6GrIpiTI8pxIJaWKyc/yyveFOT6half7Gg1
+ d3G4F3VC+QXg==
+X-IronPort-AV: E=McAfee;i="6000,8403,9687"; a="149859740"
+X-IronPort-AV: E=Sophos;i="5.75,374,1589266800"; 
+   d="scan'208";a="149859740"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Jul 2020 01:49:43 -0700
+IronPort-SDR: QwyUGhNCYdX+MS2siVseSF0tGrX/6CimmdHwrNsGaAISalp1Oec31JSd/g+lc1llM0G4i5wSkK
+ HHyAN6ZGn7Mw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.75,374,1589266800"; 
+   d="scan'208";a="283447570"
+Received: from fmsmsx103.amr.corp.intel.com ([10.18.124.201])
+  by orsmga003.jf.intel.com with ESMTP; 20 Jul 2020 01:49:43 -0700
+Received: from fmsmsx125.amr.corp.intel.com (10.18.125.40) by
+ FMSMSX103.amr.corp.intel.com (10.18.124.201) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Mon, 20 Jul 2020 01:49:43 -0700
+Received: from FMSEDG002.ED.cps.intel.com (10.1.192.134) by
+ FMSMSX125.amr.corp.intel.com (10.18.125.40) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Mon, 20 Jul 2020 01:49:43 -0700
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (104.47.56.177)
+ by edgegateway.intel.com (192.55.55.69) with Microsoft SMTP Server (TLS) id
+ 14.3.439.0; Mon, 20 Jul 2020 01:49:42 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=QaXtC8L02dAPJVHLRDTeKJl4+6iHnp1vjMwpuNRGQWUwPUNMmnCT/ZbGp8xgT1VxnevaZOgejHVdeOoMpqRC59RI8wxO63Ef/D9FwQaZLLdCHYAZyj4AxuHbkqUhpA6y31KZwTiVK3jBqITECC6tJh8MAoKJOcq2xHL78n/F7Q82PhtlNxvc6xehqMIMFLpaq0C7Y7vrr3uqrwFfpDoNm+m+9qoBka+/6eeTf2YUmMxOPUfRCUs3Nn0bLXtty958GXP8UIQy/it1dZQA54q1/aV6PGLOJ9ZWllFm93/Dj7ZjOhyppAFhE1+L1tVoL+vES6AQA6KfYl0xhbU79T4pRA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=fHT2dLXi2ZzhTQlZZY1lk6EKaBTXriZPYrCPG/baqVw=;
+ b=d5Tr/zNju/7O3MzbgR2nNfX5fJmsZo4qJoEEUz02nbfh4bbHGq9IL9+CvpHRO7eyDKzhE/lO0mxywo5TBxOglJFLKBasT3XPnYbVTCHeCSF7Y0SQKju9SfkcPFVjsw1T+zJHmvu0/4fCL/eJx8Ul+FNsBW8fhQ3a60x15c0wX/+6MN4pfDyzoDCvz7JkI/470TTmQyGvlyPuLwXkiAsxrBOEB66hLmww55AtDXr7AnlpOmlUhiZHBhYyhZvMXDEFUJuWvLSjzkxh4MLyNc3kTZ7Kl6CclAsCbYw/EmJdCpm5NOGr2RkH6chqVAv1//WU+Vrf+d8PFnrnx3C5UQ0TAQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=intel.onmicrosoft.com;
+ s=selector2-intel-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=fHT2dLXi2ZzhTQlZZY1lk6EKaBTXriZPYrCPG/baqVw=;
+ b=rzsbNZv6MnQeKTIZWkBYY2JjeSrkZW7MDj0fZ+li0OCmjcoZ+LjlYgELBpNBY4RBolG4V1tr3/Rt1xQtopXH8SckygjLcdcLknaZEIYT8hrusmsbgwz9kzSvx2Csrx9u7zLrspf05J5Xo17lT5T5BqKmYeBqFZ7weFkPOWp6JEE=
+Received: from DM5PR11MB1435.namprd11.prod.outlook.com (2603:10b6:4:7::18) by
+ DM5PR11MB1996.namprd11.prod.outlook.com (2603:10b6:3:13::14) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.3195.25; Mon, 20 Jul 2020 08:49:41 +0000
+Received: from DM5PR11MB1435.namprd11.prod.outlook.com
+ ([fe80::9002:97a2:d8c0:8364]) by DM5PR11MB1435.namprd11.prod.outlook.com
+ ([fe80::9002:97a2:d8c0:8364%10]) with mapi id 15.20.3195.025; Mon, 20 Jul
+ 2020 08:49:41 +0000
+From:   "Liu, Yi L" <yi.l.liu@intel.com>
+To:     Auger Eric <eric.auger@redhat.com>,
         "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
         "baolu.lu@linux.intel.com" <baolu.lu@linux.intel.com>,
         "joro@8bytes.org" <joro@8bytes.org>
-Cc:     "Tian, Kevin" <kevin.tian@intel.com>,
+CC:     "Tian, Kevin" <kevin.tian@intel.com>,
         "jacob.jun.pan@linux.intel.com" <jacob.jun.pan@linux.intel.com>,
         "Raj, Ashok" <ashok.raj@intel.com>,
         "Tian, Jun J" <jun.j.tian@intel.com>,
@@ -51,365 +76,84 @@ Cc:     "Tian, Kevin" <kevin.tian@intel.com>,
         "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
         "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
         "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: RE: [PATCH v5 05/15] vfio: Add PASID allocation/free support
+Thread-Topic: [PATCH v5 05/15] vfio: Add PASID allocation/free support
+Thread-Index: AQHWWD2nUFc6pY9OvEK1LW9mFCFZBqkPFNcAgAEQv2CAAAi6AIAAAP+g
+Date:   Mon, 20 Jul 2020 08:49:41 +0000
+Message-ID: <DM5PR11MB14353C2D9929384A45E8B285C37B0@DM5PR11MB1435.namprd11.prod.outlook.com>
 References: <1594552870-55687-1-git-send-email-yi.l.liu@intel.com>
- <1594552870-55687-5-git-send-email-yi.l.liu@intel.com>
- <2eb692fc-a399-8298-4b4b-68adb0357404@redhat.com>
- <DM5PR11MB1435AF9531C5CF29CD1D1251C37B0@DM5PR11MB1435.namprd11.prod.outlook.com>
-From:   Auger Eric <eric.auger@redhat.com>
-Message-ID: <34931d94-b63b-e366-3c7f-9fd85c8e982d@redhat.com>
-Date:   Mon, 20 Jul 2020 10:33:14 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
-MIME-Version: 1.0
-In-Reply-To: <DM5PR11MB1435AF9531C5CF29CD1D1251C37B0@DM5PR11MB1435.namprd11.prod.outlook.com>
-Content-Type: text/plain; charset=utf-8
+ <1594552870-55687-6-git-send-email-yi.l.liu@intel.com>
+ <7ce733ec-e27a-0a80-f78c-eeeb41a4ecf0@redhat.com>
+ <DM5PR11MB14351019ED0DEE3E27A98D70C37B0@DM5PR11MB1435.namprd11.prod.outlook.com>
+ <7d982308-f39c-ab5f-2318-a36600284402@redhat.com>
+In-Reply-To: <7d982308-f39c-ab5f-2318-a36600284402@redhat.com>
+Accept-Language: en-US
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+dlp-reaction: no-action
+dlp-version: 11.2.0.6
+dlp-product: dlpe-windows
+authentication-results: redhat.com; dkim=none (message not signed)
+ header.d=none;redhat.com; dmarc=none action=none header.from=intel.com;
+x-originating-ip: [192.198.147.200]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 602bb015-400a-47ce-2307-08d82c89d7e2
+x-ms-traffictypediagnostic: DM5PR11MB1996:
+x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <DM5PR11MB199674F08CCE1A2EDA6794E1C37B0@DM5PR11MB1996.namprd11.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:2000;
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: jZQfR2xXigA8ytw/3V4+W9VnGpmrsiSlyRp95shXQ/oUVe4zKHVfuHeeHNihng2a9OqXHXjXL3wgEsuMSNdivN78BMslPk779HcKsnAx0J3Yhzp/+RbLj7sek+5KYIaVJAvFwtVmfugvfqmTg/uNYpcuSwlGm/mRIhUGGbVmMDBSPhxLdz/vECkMHTxb0NjPLakapnJud+GdUEuK8a1mExSMXiVXI7lBksq5BpWe47hgszw0AC1IFH83fUHYDZ5JWZhyEaEZCRA8c53zJRxU2B8qpnDYs3zxc5Iv2kcflqJLAc3k2SqEabGONzpt311jqggZ2qY/jMtq9M0Dh7INhruXhWKPbxXjLXE+rVWKYTPn4zzxKm1HMfGJuREJscHgy5OumuzFAykguGceqkBbYQ==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM5PR11MB1435.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFTY:;SFS:(4636009)(366004)(396003)(376002)(346002)(39860400002)(136003)(9686003)(186003)(26005)(316002)(7696005)(55016002)(83380400001)(33656002)(6506007)(4326008)(64756008)(8676002)(2906002)(52536014)(8936002)(110136005)(54906003)(71200400001)(5660300002)(966005)(86362001)(76116006)(66446008)(66946007)(7416002)(66476007)(478600001)(66556008);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata: LXNhQlcQyOJ9IaAO0Zfw8vqob7Qk0p9FPFqpMI5udkCXMJy+Au9MeY6v+XvxUfRNKCkDwmNXrZ7GtF6eOWKnlLhOLd460qzi/13P3eDCPWw9qEziXxYK76mSOIPdEKypZDkgooPLWeLo0Uddfnl9NDVhuvCumvpVzf3WcH6+TOlcEn9KuSrzsbd8S5Mhw/aiIvBU8zgYEUAjeCVmIj8mPuI1eb23Nvo4YijVkrYbiFWshjwrTjqfh0A9F36aaG0AWTumQ++Z2j+eR/2tQpT4fNHS9cSq82zL0kFB8BQGgK0ovzSAx4egHXSphOu8X4wC2OSF2q2wFRW+6zZoAQU5qVfiiXWPds/oV+c61oxi1AVXLm90pfWtIiRPfNtYwNHh/kvOYNLCgioBkmLdIuIbyVodM1xHPLdgSGm/NEpNyl8yVYGYtksLVtUJAk1dcvJ+TvgPY5zGl1/4veKJMVy45E4pqQSFeWcWpItMbxI74mVNGpX/F5lvhRii54YtRYur
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: DM5PR11MB1435.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 602bb015-400a-47ce-2307-08d82c89d7e2
+X-MS-Exchange-CrossTenant-originalarrivaltime: 20 Jul 2020 08:49:41.5129
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 9AxzM/Vl8Rvr/xo0PzBqfqrrU1OMnniRHPbY5MqwDjcgjfc7ubWxCD4bCGxn88i1yttwAh56Cpt1F/g3bm0tGw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM5PR11MB1996
+X-OriginatorOrg: intel.com
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Yi,
-
-On 7/20/20 9:51 AM, Liu, Yi L wrote:
-> Hi Eric,
-> 
->> From: Auger Eric <eric.auger@redhat.com>
->> Sent: Saturday, July 18, 2020 1:34 AM
->>
->> Yi,
->>
->> On 7/12/20 1:20 PM, Liu Yi L wrote:
->>> This patch exports iommu nesting capability info to user space through
->>> VFIO. User space is expected to check this info for supported uAPIs (e.g.
->> it is not only to check the supported uAPIS but rather to know which
->> callbacks it must call upon vIOMMU events and which features are
->> supported by the physical IOMMU.
-> 
-> yes, will refine the description per your comment.
-> 
->>> PASID alloc/free, bind page table, and cache invalidation) and the vendor
->>> specific format information for first level/stage page table that will be
->>> bound to.
->>>
->>> The nesting info is available only after the nesting iommu type is set
->>> for a container.
->> to NESTED type
-> 
-> you mean "The nesting info is available only after container set to be NESTED type."
-> 
-> right?
-correct
-> 
->>  Current implementation imposes one limitation - one
->>> nesting container should include at most one group. The philosophy of
->>> vfio container is having all groups/devices within the container share
->>> the same IOMMU context. When vSVA is enabled, one IOMMU context could
->>> include one 2nd-level address space and multiple 1st-level address spaces.
->>> While the 2nd-level address space is reasonably sharable by multiple groups
->>> , blindly sharing 1st-level address spaces across all groups within the
->>> container might instead break the guest expectation. In the future sub/
->>> super container concept might be introduced to allow partial address space
->>> sharing within an IOMMU context. But for now let's go with this restriction
->>> by requiring singleton container for using nesting iommu features. Below
->>> link has the related discussion about this decision.
->>
->> Maybe add a note about SMMU related changes spotted by Jean.
-> 
-> I guess you mean the comments Jean gave in patch 3/15, right? I'll
-> copy his comments and also give the below link as well.
-> 
-> https://lore.kernel.org/kvm/20200717090900.GC4850@myrica/
-correct
-
-Thanks
-
-Eric
-> 
->>>
->>> https://lkml.org/lkml/2020/5/15/1028
->>>
->>> Cc: Kevin Tian <kevin.tian@intel.com>
->>> CC: Jacob Pan <jacob.jun.pan@linux.intel.com>
->>> Cc: Alex Williamson <alex.williamson@redhat.com>
->>> Cc: Eric Auger <eric.auger@redhat.com>
->>> Cc: Jean-Philippe Brucker <jean-philippe@linaro.org>
->>> Cc: Joerg Roedel <joro@8bytes.org>
->>> Cc: Lu Baolu <baolu.lu@linux.intel.com>
->>> Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
->>> ---
->>> v4 -> v5:
->>> *) address comments from Eric Auger.
->>> *) return struct iommu_nesting_info for
->> VFIO_IOMMU_TYPE1_INFO_CAP_NESTING as
->>>    cap is much "cheap", if needs extension in future, just define another cap.
->>>    https://lore.kernel.org/kvm/20200708132947.5b7ee954@x1.home/
->>>
->>> v3 -> v4:
->>> *) address comments against v3.
->>>
->>> v1 -> v2:
->>> *) added in v2
->>> ---
->>>  drivers/vfio/vfio_iommu_type1.c | 102
->> +++++++++++++++++++++++++++++++++++-----
->>>  include/uapi/linux/vfio.h       |  19 ++++++++
->>>  2 files changed, 109 insertions(+), 12 deletions(-)
->>>
->>> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
->>> index 3bd70ff..ed80104 100644
->>> --- a/drivers/vfio/vfio_iommu_type1.c
->>> +++ b/drivers/vfio/vfio_iommu_type1.c
->>> @@ -62,18 +62,20 @@ MODULE_PARM_DESC(dma_entry_limit,
->>>  		 "Maximum number of user DMA mappings per container (65535).");
->>>
->>>  struct vfio_iommu {
->>> -	struct list_head	domain_list;
->>> -	struct list_head	iova_list;
->>> -	struct vfio_domain	*external_domain; /* domain for external user */
->>> -	struct mutex		lock;
->>> -	struct rb_root		dma_list;
->>> -	struct blocking_notifier_head notifier;
->>> -	unsigned int		dma_avail;
->>> -	uint64_t		pgsize_bitmap;
->>> -	bool			v2;
->>> -	bool			nesting;
->>> -	bool			dirty_page_tracking;
->>> -	bool			pinned_page_dirty_scope;
->>> +	struct list_head		domain_list;
->>> +	struct list_head		iova_list;
->>> +	/* domain for external user */
->>> +	struct vfio_domain		*external_domain;
->>> +	struct mutex			lock;
->>> +	struct rb_root			dma_list;
->>> +	struct blocking_notifier_head	notifier;
->>> +	unsigned int			dma_avail;
->>> +	uint64_t			pgsize_bitmap;
->>> +	bool				v2;
->>> +	bool				nesting;
->>> +	bool				dirty_page_tracking;
->>> +	bool				pinned_page_dirty_scope;
->>> +	struct iommu_nesting_info	*nesting_info;
->>>  };
->>>
->>>  struct vfio_domain {
->>> @@ -130,6 +132,9 @@ struct vfio_regions {
->>>  #define IS_IOMMU_CAP_DOMAIN_IN_CONTAINER(iommu)	\
->>>  					(!list_empty(&iommu->domain_list))
->>>
->>> +#define CONTAINER_HAS_DOMAIN(iommu)	(((iommu)->external_domain) || \
->>> +					 (!list_empty(&(iommu)->domain_list)))
->>> +
->>>  #define DIRTY_BITMAP_BYTES(n)	(ALIGN(n, BITS_PER_TYPE(u64)) /
->> BITS_PER_BYTE)
->>>
->>>  /*
->>> @@ -1929,6 +1934,13 @@ static void vfio_iommu_iova_insert_copy(struct
->> vfio_iommu *iommu,
->>>
->>>  	list_splice_tail(iova_copy, iova);
->>>  }
->>> +
->>> +static void vfio_iommu_release_nesting_info(struct vfio_iommu *iommu)
->>> +{
->>> +	kfree(iommu->nesting_info);
->>> +	iommu->nesting_info = NULL;
->>> +}
->>> +
->>>  static int vfio_iommu_type1_attach_group(void *iommu_data,
->>>  					 struct iommu_group *iommu_group)
->>>  {
->>> @@ -1959,6 +1971,12 @@ static int vfio_iommu_type1_attach_group(void
->> *iommu_data,
->>>  		}
->>>  	}
->>>
->>> +	/* Nesting type container can include only one group */
->>> +	if (iommu->nesting && CONTAINER_HAS_DOMAIN(iommu)) {
->>> +		mutex_unlock(&iommu->lock);
->>> +		return -EINVAL;
->>> +	}
->>> +
->>>  	group = kzalloc(sizeof(*group), GFP_KERNEL);
->>>  	domain = kzalloc(sizeof(*domain), GFP_KERNEL);
->>>  	if (!group || !domain) {
->>> @@ -2029,6 +2047,32 @@ static int vfio_iommu_type1_attach_group(void
->> *iommu_data,
->>>  	if (ret)
->>>  		goto out_domain;
->>>
->>> +	/* Nesting cap info is available only after attaching */
->>> +	if (iommu->nesting) {
->>> +		struct iommu_nesting_info tmp = { .size = 0, };
->>> +
->>> +		/* First get the size of vendor specific nesting info */
->>> +		ret = iommu_domain_get_attr(domain->domain,
->>> +					    DOMAIN_ATTR_NESTING,
->>> +					    &tmp);
->>> +		if (ret)
->>> +			goto out_detach;
->>> +
->>> +		iommu->nesting_info = kzalloc(tmp.size, GFP_KERNEL);
->>> +		if (!iommu->nesting_info) {
->>> +			ret = -ENOMEM;
->>> +			goto out_detach;
->>> +		}
->>> +
->>> +		/* Now get the nesting info */
->>> +		iommu->nesting_info->size = tmp.size;
->>> +		ret = iommu_domain_get_attr(domain->domain,
->>> +					    DOMAIN_ATTR_NESTING,
->>> +					    iommu->nesting_info);
->>> +		if (ret)
->>> +			goto out_detach;
-> 
-> get nesting_info failure will result in group_attach failure.[1]
-> 
->>> +	}
->>> +
->>>  	/* Get aperture info */
->>>  	iommu_domain_get_attr(domain->domain, DOMAIN_ATTR_GEOMETRY,
->> &geo);
->>>
->>> @@ -2138,6 +2182,7 @@ static int vfio_iommu_type1_attach_group(void
->> *iommu_data,
->>>  	return 0;
->>>
->>>  out_detach:
->>> +	vfio_iommu_release_nesting_info(iommu);
->>>  	vfio_iommu_detach_group(domain, group);
->>>  out_domain:
->>>  	iommu_domain_free(domain->domain);
->>> @@ -2338,6 +2383,8 @@ static void vfio_iommu_type1_detach_group(void
->> *iommu_data,
->>>  					vfio_iommu_unmap_unpin_all(iommu);
->>>  				else
->>>
->> 	vfio_iommu_unmap_unpin_reaccount(iommu);
->>> +
->>> +				vfio_iommu_release_nesting_info(iommu);
->>>  			}
->>>  			iommu_domain_free(domain->domain);
->>>  			list_del(&domain->next);
->>> @@ -2546,6 +2593,31 @@ static int vfio_iommu_migration_build_caps(struct
->> vfio_iommu *iommu,
->>>  	return vfio_info_add_capability(caps, &cap_mig.header, sizeof(cap_mig));
->>>  }
->>>
->>> +static int vfio_iommu_info_add_nesting_cap(struct vfio_iommu *iommu,
->>> +					   struct vfio_info_cap *caps)
->>> +{
->>> +	struct vfio_info_cap_header *header;
->>> +	struct vfio_iommu_type1_info_cap_nesting *nesting_cap;
->>> +	size_t size;
->>> +
->>> +	size = offsetof(struct vfio_iommu_type1_info_cap_nesting, info) +
->>> +		iommu->nesting_info->size;
->>> +
->>> +	header = vfio_info_cap_add(caps, size,
->>> +				   VFIO_IOMMU_TYPE1_INFO_CAP_NESTING, 1);
->>> +	if (IS_ERR(header))
->>> +		return PTR_ERR(header);
->>> +
->>> +	nesting_cap = container_of(header,
->>> +				   struct vfio_iommu_type1_info_cap_nesting,
->>> +				   header);
->>> +
->>> +	memcpy(&nesting_cap->info, iommu->nesting_info,
->>> +	       iommu->nesting_info->size);
->> you must check whether nesting_info is non NULL before doing that.
-> 
-> it's now validated in the caller of this function. :-)
-ah ok sorry I missed that.
->  
->> Besides I agree with Jean on the fact it may be better to not report the
->> capability if nested is not supported.
-> 
-> I see. in this patch, just few lines below [2], vfio only reports nesting
-> cap when iommu->nesting_info is non-null. so even if userspace selected
-> nesting type, it may fail at the VFIO_SET_IOMMU phase since group_attach
-> will be failed for NESTED type container if host iommu doesn’t support
-> nesting. the code is marked as [1] in this email.
-OK that's already there then.
-
-Thanks
-
-Eric
-> 
->>> +
->>> +	return 0;
->>> +}
->>> +
->>>  static int vfio_iommu_type1_get_info(struct vfio_iommu *iommu,
->>>  				     unsigned long arg)
->>>  {
->>> @@ -2581,6 +2653,12 @@ static int vfio_iommu_type1_get_info(struct
->> vfio_iommu *iommu,
->>>  	if (!ret)
->>>  		ret = vfio_iommu_iova_build_caps(iommu, &caps);
->>>
->>> +	if (iommu->nesting_info) {
->>> +		ret = vfio_iommu_info_add_nesting_cap(iommu, &caps);
->>> +		if (ret)
->>> +			return ret;
-> 
-> here checks nesting_info before reporting nesting cap. [2]
-> 
->>> +	}
->>> +
->>>  	mutex_unlock(&iommu->lock);
->>>
->>>  	if (ret)
->>> diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
->>> index 9204705..46a78af 100644
->>> --- a/include/uapi/linux/vfio.h
->>> +++ b/include/uapi/linux/vfio.h
->>> @@ -14,6 +14,7 @@
->>>
->>>  #include <linux/types.h>
->>>  #include <linux/ioctl.h>
->>> +#include <linux/iommu.h>
->>>
->>>  #define VFIO_API_VERSION	0
->>>
->>> @@ -1039,6 +1040,24 @@ struct vfio_iommu_type1_info_cap_migration {
->>>  	__u64	max_dirty_bitmap_size;		/* in bytes */
->>>  };
->>>
->>> +/*
->>> + * The nesting capability allows to report the related capability
->>> + * and info for nesting iommu type.
->>> + *
->>> + * The structures below define version 1 of this capability.
->>> + *
->>> + * User space selected VFIO_TYPE1_NESTING_IOMMU type should check
->>> + * this capto get supported features.
->> s/capto/capability to get
-> 
-> got it.
-> 
-> Regards,
-> Yi Liu
-> 
->>> + *
->>> + * @info: the nesting info provided by IOMMU driver.
->>> + */
->>> +#define VFIO_IOMMU_TYPE1_INFO_CAP_NESTING  3
->>> +
->>> +struct vfio_iommu_type1_info_cap_nesting {
->>> +	struct	vfio_info_cap_header header;
->>> +	struct iommu_nesting_info info;
->>> +};
->>> +
->>>  #define VFIO_IOMMU_GET_INFO _IO(VFIO_TYPE, VFIO_BASE + 12)
->>>
->>>  /**
->>>
->>
->> Thanks
->>
->> Eric
-> 
-
+SGkgRXJpYywNCg0KPiBGcm9tOiBBdWdlciBFcmljIDxlcmljLmF1Z2VyQHJlZGhhdC5jb20+DQo+
+IFNlbnQ6IE1vbmRheSwgSnVseSAyMCwgMjAyMCA0OjI2IFBNDQpbLi4uXQ0KPiA+Pj4gK2ludCB2
+ZmlvX3Bhc2lkX2FsbG9jKHN0cnVjdCB2ZmlvX21tICp2bW0sIGludCBtaW4sIGludCBtYXgpIHsN
+Cj4gPj4+ICsJaW9hc2lkX3QgcGFzaWQ7DQo+ID4+PiArCXN0cnVjdCB2ZmlvX3Bhc2lkICp2aWQ7
+DQo+ID4+PiArDQo+ID4+PiArCXBhc2lkID0gaW9hc2lkX2FsbG9jKHZtbS0+aW9hc2lkX3NpZCwg
+bWluLCBtYXgsIE5VTEwpOw0KPiA+Pj4gKwlpZiAocGFzaWQgPT0gSU5WQUxJRF9JT0FTSUQpDQo+
+ID4+PiArCQlyZXR1cm4gLUVOT1NQQzsNCj4gPj4+ICsNCj4gPj4+ICsJdmlkID0ga3phbGxvYyhz
+aXplb2YoKnZpZCksIEdGUF9LRVJORUwpOw0KPiA+Pj4gKwlpZiAoIXZpZCkgew0KPiA+Pj4gKwkJ
+aW9hc2lkX2ZyZWUocGFzaWQpOw0KPiA+Pj4gKwkJcmV0dXJuIC1FTk9NRU07DQo+ID4+PiArCX0N
+Cj4gPj4+ICsNCj4gPj4+ICsJdmlkLT5wYXNpZCA9IHBhc2lkOw0KPiA+Pj4gKw0KPiA+Pj4gKwlt
+dXRleF9sb2NrKCZ2bW0tPnBhc2lkX2xvY2spOw0KPiA+Pj4gKwl2ZmlvX2xpbmtfcGFzaWQodm1t
+LCB2aWQpOw0KPiA+Pj4gKwltdXRleF91bmxvY2soJnZtbS0+cGFzaWRfbG9jayk7DQo+ID4+PiAr
+DQo+ID4+PiArCXJldHVybiBwYXNpZDsNCj4gPj4+ICt9DQo+ID4+IEkgYW0gbm90IHRvdGFsbHkg
+Y29udmluY2VkIGJ5IHlvdXIgcHJldmlvdXMgcmVwbHkgb24gRVhQT1JUX1NZTUJPTF9HUCgpDQo+
+ID4+IGlycmVsZXZhbmNlIGluIHRoaXMgcGF0Y2guIEJ1dCB3ZWxsIDstKQ0KPiA+DQo+ID4gSSBy
+ZWNhbGxlZCBteSBtZW1vcnksIEkgdGhpbmsgaXQncyBtYWRlIHBlciBhIGNvbW1lbnQgZnJvbSBD
+aHJpcy4NCj4gPiBJIGd1ZXNzIGl0IG1heSBtYWtlIHNlbnNlIHRvIGV4cG9ydCBzeW1ib2xzIHRv
+Z2V0aGVyIHdpdGggdGhlIGV4YWN0DQo+ID4gZHJpdmVyIHVzZXIgb2YgaXQgaW4gdGhpcyBwYXRj
+aCBhcyB3ZWxsIDotKSBidXQgbWF5YmUgSSBtaXN1bmRlcnN0b29kDQo+ID4gaGltLiBpZiB5ZXMs
+IEkgbWF5IGFkZCB0aGUgc3ltYm9sIGV4cG9ydCBiYWNrIGluIHRoaXMgcGF0Y2guDQo+ID4NCj4g
+PiBodHRwczovL2xvcmUua2VybmVsLm9yZy9saW51eC1pb21tdS8yMDIwMDMzMTA3NTMzMS5HQTI2
+NTgzQGluZnJhZGVhZC5vcmcvI3QNCj4gT0sgSSBkb24ndCBrbm93IHRoZSBiZXN0IHByYWN0aWNl
+IGhlcmUuIEFueXdheSB0aGVyZSBpcyBubyBjYWxsZXIgYXQNCj4gdGhpcyBzdGFnZSBlaXRoZXIu
+IEkgdGhpbmsgeW91IG1heSBkZXNjcmliZSBpbiB0aGUgY29tbWl0IG1lc3NhZ2UgdGhlDQo+IHZm
+aW9faW9tbXVfdHlwZTEgd2lsbCBiZSB0aGUgZXZlbnR1YWwgdXNlciBvZiB0aGUgZXhwb3J0ZWQg
+ZnVuY3Rpb25zIGluDQo+IHRoaXMgbW9kdWxlLCB3aGF0IGFyZSB0aGUgZXhhY3QgZXhwb3J0ZWQg
+ZnVuY3Rpb25zIGhlcmUuIFlvdSBtYXkgYWxzbw0KPiBleHBsYWluIHRoZSBtb3RpdmF0aW9uIGJl
+aGluZCBjcmVhdGluZyBhIHNlcGFyYXRlIG1vZHVsZS4NCg0KZ290IGl0LiB3aWxsIGFkZCBpdC4N
+Cg0KUmVnYXJkcywNCllpIExpdQ0KDQoNCg==
