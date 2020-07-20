@@ -2,139 +2,118 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A3BE1226D89
-	for <lists+kvm@lfdr.de>; Mon, 20 Jul 2020 19:50:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A7C44226E77
+	for <lists+kvm@lfdr.de>; Mon, 20 Jul 2020 20:43:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732607AbgGTRt0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 20 Jul 2020 13:49:26 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:27220 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1729757AbgGTRtZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 20 Jul 2020 13:49:25 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1595267363;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=4JlHwh3SUGPYylkGk+T5UD+lE4YPhqSmyAUTHmFlqd8=;
-        b=g08pY9C+DMl0Km+42JFhsZqUK0VvUqJjnytsrhzSEyxHH34RFK6H0y2CBs0r7YodfPcM/V
-        2p2HEE5Qyi4U9pt5Wc+64L84m99GITQbalMXrBq1q9cpTLRAVvstv11TKGEVc/2s172dfI
-        PQCtKRLuAj+sTtbS7ubgppJWWf2ijl0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-285-n5KZeqc4Obeqjrl-ozYV4w-1; Mon, 20 Jul 2020 13:49:21 -0400
-X-MC-Unique: n5KZeqc4Obeqjrl-ozYV4w-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        id S1729640AbgGTSnM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 20 Jul 2020 14:43:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39024 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726506AbgGTSnK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 20 Jul 2020 14:43:10 -0400
+Received: from ozlabs.org (bilbo.ozlabs.org [IPv6:2401:3900:2:1::2])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E4DF8C061794;
+        Mon, 20 Jul 2020 11:43:09 -0700 (PDT)
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 88814800468;
-        Mon, 20 Jul 2020 17:49:20 +0000 (UTC)
-Received: from horse.redhat.com (ovpn-115-128.rdu2.redhat.com [10.10.115.128])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id A77F860E3E;
-        Mon, 20 Jul 2020 17:49:17 +0000 (UTC)
-Received: by horse.redhat.com (Postfix, from userid 10451)
-        id 08429220203; Mon, 20 Jul 2020 13:49:17 -0400 (EDT)
-Date:   Mon, 20 Jul 2020 13:49:16 -0400
-From:   Vivek Goyal <vgoyal@redhat.com>
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc:     virtio-fs-list <virtio-fs@redhat.com>, pbonzini@redhat.com,
-        sean.j.christopherson@intel.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v3] kvm,x86: Exit to user space in case of page fault
- error
-Message-ID: <20200720174916.GE502563@redhat.com>
-References: <20200709125442.GA150543@redhat.com>
- <87365qsb2v.fsf@vitty.brq.redhat.com>
+        by mail.ozlabs.org (Postfix) with ESMTPSA id 4B9VwX0y0wz9sRN;
+        Tue, 21 Jul 2020 04:43:08 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=canb.auug.org.au;
+        s=201702; t=1595270588;
+        bh=+4fZqzsxFnaIHx+7cpxpLq2jR5BVjVxJXGeJc3V+N54=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=oNf6dSVe+1GCC6DdMmOM6g41j/tzXitGuhZQ5kHOppikTOVuC95a5RjRfR42RwTgW
+         Gn4ew68xSvE2S1IUtY1PrkYHbdXk14wG7DBOZJ8qghWYup5Qa3cASFBPxvj8V14+r0
+         utRi8p+WiDb/QuAoK7rp5TAV1qGtJ3Nd/E/TkJ1vfs754Op58JxLhtw2NuhZQ3Gn7r
+         TM0bQH5F9/V0zc0hxlWkkPozNTaLeDwQn9tiCkwTpn+ghBDRuF6Edc+odxgP4Kt4Vc
+         yVoTizRhXpVtge/wNgT5zxBILXrwtQcGgXDs6zJOCsxlUm/8PXMShNDKwnpnSwDygz
+         tlpp7jecoc1HQ==
+Date:   Tue, 21 Jul 2020 04:43:07 +1000
+From:   Stephen Rothwell <sfr@canb.auug.org.au>
+To:     Randy Dunlap <rdunlap@infradead.org>
+Cc:     Linux Next Mailing List <linux-next@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        KVM <kvm@vger.kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
+        "Paul E. McKenney" <paulmck@kernel.org>,
+        Madhuparna Bhowmik <madhuparnabhowmik10@gmail.com>
+Subject: Re: linux-next: Tree for Jul 20 (arch/x86/kvm/)
+Message-ID: <20200721044307.6b263e5b@canb.auug.org.au>
+In-Reply-To: <1d2aa97d-4a94-673c-dc82-509da221c5d6@infradead.org>
+References: <20200720194225.17de9962@canb.auug.org.au>
+        <1d2aa97d-4a94-673c-dc82-509da221c5d6@infradead.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87365qsb2v.fsf@vitty.brq.redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Content-Type: multipart/signed; boundary="Sig_/qigNzgqNSb8xRKNnC2ybGUo";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jul 17, 2020 at 12:14:00PM +0200, Vitaly Kuznetsov wrote:
+--Sig_/qigNzgqNSb8xRKNnC2ybGUo
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-[..]
-> > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> > index 6d6a0ae7800c..a0e6283e872d 100644
-> > --- a/arch/x86/kvm/mmu/mmu.c
-> > +++ b/arch/x86/kvm/mmu/mmu.c
-> > @@ -4078,7 +4078,7 @@ static bool try_async_pf(struct kvm_vcpu *vcpu, bool prefault, gfn_t gfn,
-> >  	if (!async)
-> >  		return false; /* *pfn has correct page already */
-> >  
-> > -	if (!prefault && kvm_can_do_async_pf(vcpu)) {
-> > +	if (!prefault && kvm_can_do_async_pf(vcpu, cr2_or_gpa >> PAGE_SHIFT)) {
-> 
-> gpa_to_gfn() ?
+Hi Randy,
 
-Will do. I forgot to make this change since last feedback.
+On Mon, 20 Jul 2020 09:56:08 -0700 Randy Dunlap <rdunlap@infradead.org> wro=
+te:
+>
+> on x86_64:
+>=20
+>   CC [M]  arch/x86/kvm/mmu/page_track.o
+> In file included from ../include/linux/pid.h:5:0,
+>                  from ../include/linux/sched.h:14,
+>                  from ../include/linux/kvm_host.h:12,
+>                  from ../arch/x86/kvm/mmu/page_track.c:14:
+> ../arch/x86/kvm/mmu/page_track.c: In function =E2=80=98kvm_page_track_wri=
+te=E2=80=99:
+> ../include/linux/rculist.h:727:30: error: left-hand operand of comma expr=
+ession has no effect [-Werror=3Dunused-value]
+>   for (__list_check_srcu(cond),     \
+>                               ^
+> ../arch/x86/kvm/mmu/page_track.c:232:2: note: in expansion of macro =E2=
+=80=98hlist_for_each_entry_srcu=E2=80=99
+>   hlist_for_each_entry_srcu(n, &head->track_notifier_list, node,
+>   ^~~~~~~~~~~~~~~~~~~~~~~~~
+> ../arch/x86/kvm/mmu/page_track.c: In function =E2=80=98kvm_page_track_flu=
+sh_slot=E2=80=99:
+> ../include/linux/rculist.h:727:30: error: left-hand operand of comma expr=
+ession has no effect [-Werror=3Dunused-value]
+>   for (__list_check_srcu(cond),     \
+>                               ^
+> ../arch/x86/kvm/mmu/page_track.c:258:2: note: in expansion of macro =E2=
+=80=98hlist_for_each_entry_srcu=E2=80=99
+>   hlist_for_each_entry_srcu(n, &head->track_notifier_list, node,
+>   ^~~~~~~~~~~~~~~~~~~~~~~~~
+> cc1: all warnings being treated as errors
 
-> 
-> >  		trace_kvm_try_async_get_page(cr2_or_gpa, gfn);
-> >  		if (kvm_find_async_pf_gfn(vcpu, gfn)) {
-> >  			trace_kvm_async_pf_doublefault(cr2_or_gpa, gfn);
-> > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> > index 88c593f83b28..c4d4dab3ccde 100644
-> > --- a/arch/x86/kvm/x86.c
-> > +++ b/arch/x86/kvm/x86.c
-> > @@ -263,6 +263,13 @@ static inline void kvm_async_pf_hash_reset(struct kvm_vcpu *vcpu)
-> >  		vcpu->arch.apf.gfns[i] = ~0;
-> >  }
-> >  
-> > +static inline void kvm_error_gfn_hash_reset(struct kvm_vcpu *vcpu)
-> > +{
-> > +	int i;
-> > +	for (i = 0; i < ERROR_GFN_PER_VCPU; i++)
-> > +		vcpu->arch.apf.error_gfns[i] = ~0;
-> 
-> Nit: I see this is already present in kvm_async_pf_hash_reset() but what
-> about defining 
-> 
-> diff --git a/include/linux/kvm_types.h b/include/linux/kvm_types.h
-> index a7580f69dda0..9144fde2550e 100644
-> --- a/include/linux/kvm_types.h
-> +++ b/include/linux/kvm_types.h
-> @@ -38,6 +38,7 @@ typedef u64            gpa_t;
->  typedef u64            gfn_t;
->  
->  #define GPA_INVALID    (~(gpa_t)0)
-> +#define GFN_INVALID    (~(gfn_t)0)
+Caused by commit
 
-Will do.
+  bd4444c47de9 ("rculist : Introduce list/hlist_for_each_entry_srcu() macro=
+s")
 
-[..]
-> > +static void kvm_del_error_gfn(struct kvm_vcpu *vcpu, gfn_t gfn)
-> > +{
-> > +	u32 key = kvm_error_gfn_hash_fn(gfn);
-> > +
-> > +	if (WARN_ON_ONCE(vcpu->arch.apf.error_gfns[key] != gfn))
-> > +		return;
-> > +
-> > +	vcpu->arch.apf.error_gfns[key] = ~0;
-> > +}
-> > +
-> > +static bool kvm_find_error_gfn(struct kvm_vcpu *vcpu, gfn_t gfn)
-> > +{
-> > +	u32 key = kvm_error_gfn_hash_fn(gfn);
-> > +
-> > +	return vcpu->arch.apf.error_gfns[key] == gfn;
-> > +}
-> 
-> These two functions kvm_del_error_gfn()/kvm_find_error_gfn() come in
-> pair and the only usage seems to be
-> 
->  if (kvm_find_error_gfn())
->     kvm_del_error_gfn();
-> 
-> what if we replace it with a single kvm_find_and_remove_error_gfn() and
-> drop the WARN_ON_ONCE()?
+presumably with CONFIG_PROVE_RCU_LIST not set.
 
-Ok, I am fine with this as well. Will do.
+--=20
+Cheers,
+Stephen Rothwell
 
-Thanks
-Vivek
+--Sig_/qigNzgqNSb8xRKNnC2ybGUo
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
 
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAl8V5bsACgkQAVBC80lX
+0GyVQAf8D59dKFMeuZe4W5Ay7oGvQOtXZXcQFnrIz1U5Jf54S+6swjErCT7v51Cx
+kh+RVzGarJD4xwa/hz9keR+csECE0RTJN1OGPmYOmpBe3X42++vGGo7lDg5DNn+S
+X3eP/8AEd13g/Ll4Cu461y5j40aW4tiuaj9NGACWUxzjSEaGde3oRqgtL51iAjEC
+9RCSZrPkaagEWpqIrKvPZaSQpS73k0Jgq6HoQrsz/3wWYYpbzWEOoa2MyyR0ciUk
+DpPngJ0lqrzYJhFfAIQfnHudD49i33aRfdTAfVsXTD5KMidyjWfxAKDpNNXzl0Fh
+SK9pOD0e8aI1xa6izuDbjiwbPa3/TA==
+=ZrJA
+-----END PGP SIGNATURE-----
+
+--Sig_/qigNzgqNSb8xRKNnC2ybGUo--
