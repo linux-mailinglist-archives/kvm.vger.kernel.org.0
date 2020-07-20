@@ -2,141 +2,158 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 724D0225A6D
-	for <lists+kvm@lfdr.de>; Mon, 20 Jul 2020 10:53:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6A901225A8A
+	for <lists+kvm@lfdr.de>; Mon, 20 Jul 2020 10:55:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728112AbgGTIxU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 20 Jul 2020 04:53:20 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:31622 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1728093AbgGTIxT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 20 Jul 2020 04:53:19 -0400
+        id S1728001AbgGTIzh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 20 Jul 2020 04:55:37 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:26394 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1727949AbgGTIzg (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 20 Jul 2020 04:55:36 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1595235198;
+        s=mimecast20190719; t=1595235334;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-        bh=VC7UWeZwwGMUyzO/C691i+yRFsKj4XDKEN6F+aVnn5s=;
-        b=cNLjaKTzgmVS+B+XVN7ZnBhxWATFpP3UdF8RHjIzkyCIVFxZi6QSovF8omOl5ZD2QwYaGP
-        7H/3XhgtOE/eNScY5M5eRGaqncaBxGcXNyAoFOU4iR9F9tb1OViW8F0W3EYhFaRNuBIMAT
-        xz6nfC+z+YLf7vSTOIEPBksE9XwKiWA=
+         in-reply-to:in-reply-to:references:references;
+        bh=UzR9l21YOuN3ikEPzc8GrzbgrODXjbPXreiywMK7+XE=;
+        b=gSS+dIRs4A+BXSTl0cT/9/SJ3+8ZLnNnPQhht/DZYdDT2wNh61QVnefTKcnVgE/bSrA7BM
+        +dHmoTHbb2x+uTpTUDVLUH/KVRMF3fu4dGqpWAa9Hnsf3Fq+E47hYZQjXS4ty3bColUaC4
+        FXxblusQJ1hayAb/WktIB2TfUzj5DCc=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-36-E_pZ_Dm6N4mc9d98q2tK6A-1; Mon, 20 Jul 2020 04:53:14 -0400
-X-MC-Unique: E_pZ_Dm6N4mc9d98q2tK6A-1
+ us-mta-424-tqdoLv4dPYC4cfAHA3ofZw-1; Mon, 20 Jul 2020 04:55:31 -0400
+X-MC-Unique: tqdoLv4dPYC4cfAHA3ofZw-1
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0D32C100CCC0;
-        Mon, 20 Jul 2020 08:53:13 +0000 (UTC)
-Received: from [10.36.114.91] (ovpn-114-91.ams2.redhat.com [10.36.114.91])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id E0D5260E3E;
-        Mon, 20 Jul 2020 08:53:08 +0000 (UTC)
-Subject: Re: [virtio-dev] [PATCH] virtio-balloon: Document byte ordering of
- poison_val
-To:     Alexander Duyck <alexander.duyck@gmail.com>,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org, mst@redhat.com
-Cc:     virtio-dev@lists.oasis-open.org
-References: <20200713203539.17140.71425.stgit@localhost.localdomain>
-From:   David Hildenbrand <david@redhat.com>
-Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
- 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
- WNyWQQ==
-Organization: Red Hat GmbH
-Message-ID: <ce128be5-4756-bb7b-719b-c172cf380fd8@redhat.com>
-Date:   Mon, 20 Jul 2020 10:53:08 +0200
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 46A1C1932488;
+        Mon, 20 Jul 2020 08:55:30 +0000 (UTC)
+Received: from [10.72.12.53] (ovpn-12-53.pek2.redhat.com [10.72.12.53])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 5CD54619C4;
+        Mon, 20 Jul 2020 08:55:22 +0000 (UTC)
+Subject: Re: [PATCH RFC v8 02/11] vhost: use batched get_vq_desc version
+To:     Eugenio Perez Martin <eperezma@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>
+Cc:     Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        linux-kernel@vger.kernel.org, kvm list <kvm@vger.kernel.org>,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org
+References: <20200622122546-mutt-send-email-mst@kernel.org>
+ <CAJaqyWfbouY4kEXkc6sYsbdCAEk0UNsS5xjqEdHTD7bcTn40Ow@mail.gmail.com>
+ <CAJaqyWefMHPguj8ZGCuccTn0uyKxF9ZTEi2ASLtDSjGNb1Vwsg@mail.gmail.com>
+ <419cc689-adae-7ba4-fe22-577b3986688c@redhat.com>
+ <CAJaqyWedEg9TBkH1MxGP1AecYHD-e-=ugJ6XUN+CWb=rQGf49g@mail.gmail.com>
+ <0a83aa03-8e3c-1271-82f5-4c07931edea3@redhat.com>
+ <CAJaqyWeqF-KjFnXDWXJ2M3Hw3eQeCEE2-7p1KMLmMetMTm22DQ@mail.gmail.com>
+ <20200709133438-mutt-send-email-mst@kernel.org>
+ <7dec8cc2-152c-83f4-aa45-8ef9c6aca56d@redhat.com>
+ <CAJaqyWdLOH2EceTUduKYXCQUUNo1XQ1tLgjYHTBGhtdhBPHn_Q@mail.gmail.com>
+ <20200710015615-mutt-send-email-mst@kernel.org>
+ <CAJaqyWf1skGxrjuT9GLr6dtgd-433y-rCkbtStLHaAs2W2jYXA@mail.gmail.com>
+From:   Jason Wang <jasowang@redhat.com>
+Message-ID: <595d4cf3-2b15-8900-e714-f3ebd8d8ca2e@redhat.com>
+Date:   Mon, 20 Jul 2020 16:55:20 +0800
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.9.0
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <20200713203539.17140.71425.stgit@localhost.localdomain>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <CAJaqyWf1skGxrjuT9GLr6dtgd-433y-rCkbtStLHaAs2W2jYXA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 13.07.20 22:35, Alexander Duyck wrote:
-> From: Alexander Duyck <alexander.h.duyck@linux.intel.com>
-> 
-> The poison_val field in the virtio_balloon_config is treated as a
-> little-endian field by the host. Since we are currently only having to deal
-> with a single byte poison value this isn't a problem, however if the value
-> should ever expand it would cause byte ordering issues. Document that in
-> the code so that we know that if the value should ever expand we need to
-> byte swap the value on big-endian architectures.
-> 
-> Signed-off-by: Alexander Duyck <alexander.h.duyck@linux.intel.com>
-> ---
->  drivers/virtio/virtio_balloon.c |    5 +++++
->  1 file changed, 5 insertions(+)
-> 
-> diff --git a/drivers/virtio/virtio_balloon.c b/drivers/virtio/virtio_balloon.c
-> index 1f157d2f4952..d0fd8f8dc6ed 100644
-> --- a/drivers/virtio/virtio_balloon.c
-> +++ b/drivers/virtio/virtio_balloon.c
-> @@ -974,6 +974,11 @@ static int virtballoon_probe(struct virtio_device *vdev)
->  		/*
->  		 * Let the hypervisor know that we are expecting a
->  		 * specific value to be written back in balloon pages.
-> +		 *
-> +		 * If the PAGE_POISON value was larger than a byte we would
-> +		 * need to byte swap poison_val here to guarantee it is
-> +		 * little-endian. However for now it is a single byte so we
-> +		 * can pass it as-is.
 
-Yeah, why not (although it's pretty fundamental that 1-byte values don't
-need any swapping).
-
-Acked-by: David Hildenbrand <david@redhat.com>
+On 2020/7/17 上午1:16, Eugenio Perez Martin wrote:
+> On Fri, Jul 10, 2020 at 7:58 AM Michael S. Tsirkin <mst@redhat.com> wrote:
+>> On Fri, Jul 10, 2020 at 07:39:26AM +0200, Eugenio Perez Martin wrote:
+>>>>> How about playing with the batch size? Make it a mod parameter instead
+>>>>> of the hard coded 64, and measure for all values 1 to 64 ...
+>>>>
+>>>> Right, according to the test result, 64 seems to be too aggressive in
+>>>> the case of TX.
+>>>>
+>>> Got it, thanks both!
+>> In particular I wonder whether with batch size 1
+>> we get same performance as without batching
+>> (would indicate 64 is too aggressive)
+>> or not (would indicate one of the code changes
+>> affects performance in an unexpected way).
+>>
+>> --
+>> MST
+>>
+> Hi!
+>
+> Varying batch_size as drivers/vhost/net.c:VHOST_NET_BATCH,
 
 
--- 
-Thanks,
+Did you mean varying the value of VHOST_NET_BATCH itself or the number 
+of batched descriptors?
 
-David / dhildenb
+
+> and testing
+> the pps as previous mail says. This means that we have either only
+> vhost_net batching (in base testing, like previously to apply this
+> patch) or both batching sizes the same.
+>
+> I've checked that vhost process (and pktgen) goes 100% cpu also.
+>
+> For tx: Batching decrements always the performance, in all cases. Not
+> sure why bufapi made things better the last time.
+>
+> Batching makes improvements until 64 bufs, I see increments of pps but like 1%.
+>
+> For rx: Batching always improves performance. It seems that if we
+> batch little, bufapi decreases performance, but beyond 64, bufapi is
+> much better. The bufapi version keeps improving until I set a batching
+> of 1024. So I guess it is super good to have a bunch of buffers to
+> receive.
+>
+> Since with this test I cannot disable event_idx or things like that,
+> what would be the next step for testing?
+>
+> Thanks!
+>
+> --
+> Results:
+> # Buf size: 1,16,32,64,128,256,512
+>
+> # Tx
+> # ===
+> # Base
+> 2293304.308,3396057.769,3540860.615,3636056.077,3332950.846,3694276.154,3689820
+
+
+What's the meaning of buf size in the context of "base"?
+
+And I wonder maybe perf diff can help.
+
+Thanks
+
+
+> # Batch
+> 2286723.857,3307191.643,3400346.571,3452527.786,3460766.857,3431042.5,3440722.286
+> # Batch + Bufapi
+> 2257970.769,3151268.385,3260150.538,3379383.846,3424028.846,3433384.308,3385635.231,3406554.538
+>
+> # Rx
+> # ==
+> # pktgen results (pps)
+> 1223275,1668868,1728794,1769261,1808574,1837252,1846436
+> 1456924,1797901,1831234,1868746,1877508,1931598,1936402
+> 1368923,1719716,1794373,1865170,1884803,1916021,1975160
+>
+> # Testpmd pps results
+> 1222698.143,1670604,1731040.6,1769218,1811206,1839308.75,1848478.75
+> 1450140.5,1799985.75,1834089.75,1871290,1880005.5,1934147.25,1939034
+> 1370621,1721858,1796287.75,1866618.5,1885466.5,1918670.75,1976173.5,1988760.75,1978316
+>
+> pktgen was run again for rx with 1024 and 2048 buf size, giving
+> 1988760.75 and 1978316 pps. Testpmd goes the same way.
+>
 
