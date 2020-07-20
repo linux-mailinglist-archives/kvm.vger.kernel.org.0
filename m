@@ -2,120 +2,88 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 51F3122567C
-	for <lists+kvm@lfdr.de>; Mon, 20 Jul 2020 06:19:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 93DCB225803
+	for <lists+kvm@lfdr.de>; Mon, 20 Jul 2020 08:50:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726120AbgGTET4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 20 Jul 2020 00:19:56 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:58731 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1725774AbgGTETz (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 20 Jul 2020 00:19:55 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1595218794;
+        id S1726736AbgGTGuG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 20 Jul 2020 02:50:06 -0400
+Received: from Galois.linutronix.de ([193.142.43.55]:55554 "EHLO
+        galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725815AbgGTGuG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 20 Jul 2020 02:50:06 -0400
+From:   Thomas Gleixner <tglx@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020; t=1595227804;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=04wRZDzfAbjzY24AOQSUyoqCb/wNOPZL7NBzxLPbzVc=;
-        b=KCAv2efi67JCr1B9pHyW5eWia+bO+Bk7fOIsrqUSthaIJgdIWi2Rq1Pi+ivzCnVU8GV8ba
-        lm1eSB2U7s64soSBU3LHn2Bl3C82eL3kU+hgNgttUJ542/cp9eyx9dVzmP4J6kuN857Apu
-        n1eU2kM28BZy56TlOjF+BD6wl1PHppE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-84-9KzyVAvVO_aogPSdmTB61Q-1; Mon, 20 Jul 2020 00:19:51 -0400
-X-MC-Unique: 9KzyVAvVO_aogPSdmTB61Q-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6FF53107ACCA;
-        Mon, 20 Jul 2020 04:19:49 +0000 (UTC)
-Received: from [10.72.13.139] (ovpn-13-139.pek2.redhat.com [10.72.13.139])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id B12925C1B2;
-        Mon, 20 Jul 2020 04:19:38 +0000 (UTC)
-Subject: Re: [PATCH V2 2/6] kvm: detect assigned device via irqbypass manager
-To:     Alex Williamson <alex.williamson@redhat.com>,
-        Zhu Lingshan <lingshan.zhu@intel.com>
-Cc:     mst@redhat.com, pbonzini@redhat.com,
-        sean.j.christopherson@intel.com, wanpengli@tencent.com,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        kvm@vger.kernel.org
-References: <1594898629-18790-1-git-send-email-lingshan.zhu@intel.com>
- <1594898629-18790-3-git-send-email-lingshan.zhu@intel.com>
- <20200717120821.3c2a56db@x1.home>
-From:   Jason Wang <jasowang@redhat.com>
-Message-ID: <c46dc561-610e-e992-8bb9-e7286a560971@redhat.com>
-Date:   Mon, 20 Jul 2020 12:19:37 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        bh=t/qYtaXCKWFcQ++IUuI+8VoH3i4cW6b42fWT4jOgYmA=;
+        b=I8NrnAiDCGeIzMpOK6d/529QMrR7yLW1IOA3Bpek9vOOlA2k5NqKlqZcIMaf1j/rYd9B7i
+        /DxmDZ2C+Nbdvj9u/8Qq3lQkvHe7gnEEHyii2lHAY76prCZMPmkADNulos5ebbC43Ao3am
+        rHmpG/LtLwFFz6wZNAje4k4SNHTbAse2Bj6ythgYRHMm7QQOFZBPAkCkMmHxEf8EY8WIAI
+        22SrH2ZbgY/tfUZBgBPJL3Z5uWN3pIJERqp9XBjuGrTnUURQpM/OrFaI5f9eYE449INOef
+        KsVHSDgfX0QAsNfyXOx5l6L5To5hWalfvr/+390Tjjf8wf1NakStsO0UXQNyPQ==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020e; t=1595227804;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=t/qYtaXCKWFcQ++IUuI+8VoH3i4cW6b42fWT4jOgYmA=;
+        b=JmW05mx6NDlANlEtUmk8WumFr8XSkHzEyeysCjvJt7mjlaCLUU8+tb2WwbeVWfpUHTjnBy
+        IV0x3wGCbxgNtKBA==
+To:     Andy Lutomirski <luto@amacapital.net>
+Cc:     Andy Lutomirski <luto@kernel.org>,
+        Kees Cook <keescook@chromium.org>,
+        LKML <linux-kernel@vger.kernel.org>, X86 ML <x86@kernel.org>,
+        linux-arch <linux-arch@vger.kernel.org>,
+        Will Deacon <will@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
+        Mark Rutland <Mark.Rutland@arm.com>,
+        Keno Fischer <keno@juliacomputing.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        kvm list <kvm@vger.kernel.org>,
+        Gabriel Krisman Bertazi <krisman@collabora.com>
+Subject: Re: [patch V3 01/13] entry: Provide generic syscall entry functionality
+In-Reply-To: <A790AF9D-3BF7-4FEE-9E29-7C13FA3FE0C3@amacapital.net>
+References: <87v9ijollo.fsf@nanos.tec.linutronix.de> <A790AF9D-3BF7-4FEE-9E29-7C13FA3FE0C3@amacapital.net>
+Date:   Mon, 20 Jul 2020 08:50:02 +0200
+Message-ID: <87a6zuof39.fsf@nanos.tec.linutronix.de>
 MIME-Version: 1.0
-In-Reply-To: <20200717120821.3c2a56db@x1.home>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Andy Lutomirski <luto@amacapital.net> writes:
+>> On Jul 19, 2020, at 3:17 AM, Thomas Gleixner <tglx@linutronix.de> wrote:
+>>=20
+>> =EF=BB=BFAndy Lutomirski <luto@kernel.org> writes:
+>>>> On Sat, Jul 18, 2020 at 7:16 AM Thomas Gleixner <tglx@linutronix.de> w=
+rote:
+>>>> Andy Lutomirski <luto@kernel.org> writes:
+>>>>> FWIW, TIF_USER_RETURN_NOTIFY is a bit of an odd duck: it's an
+>>>>> entry/exit word *and* a context switch word.  The latter is because
+>>>>> it's logically a per-cpu flag, not a per-task flag, and the context
+>>>>> switch code moves it around so it's always set on the running task.
+>>>>=20
+>>>> Gah, I missed the context switch thing of that. That stuff is hideous.
+>>>=20
+>>> It's also delightful because anything that screws up that dance (such
+>>> as failure to do the exit-to-usermode path exactly right) likely
+>>> results in an insta-root-hole.  If we fail to run user return
+>>> notifiers, we can run user code with incorrect syscall MSRs, etc.
+>>=20
+>> Looking at it deeper, having that thing in the loop is a pointless
+>> exercise. This really wants to be done _after_ the loop.
+>>=20
+> As long as we=E2=80=99re confident that nothing after the loop can set th=
+e flag again.
 
-On 2020/7/18 上午2:08, Alex Williamson wrote:
-> On Thu, 16 Jul 2020 19:23:45 +0800
-> Zhu Lingshan <lingshan.zhu@intel.com> wrote:
->
->> vDPA devices has dedicated backed hardware like
->> passthrough-ed devices. Then it is possible to setup irq
->> offloading to vCPU for vDPA devices. Thus this patch tries to
->> manipulated assigned device counters via irqbypass manager.
->>
->> We will increase/decrease the assigned device counter in kvm/x86.
->> Both vDPA and VFIO would go through this code path.
->>
->> This code path only affect x86 for now.
->>
->> Signed-off-by: Zhu Lingshan <lingshan.zhu@intel.com>
->> Suggested-by: Jason Wang <jasowang@redhat.com>
->> ---
->>   arch/x86/kvm/x86.c | 10 ++++++++--
->>   1 file changed, 8 insertions(+), 2 deletions(-)
->>
->> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
->> index 00c88c2..20c07d3 100644
->> --- a/arch/x86/kvm/x86.c
->> +++ b/arch/x86/kvm/x86.c
->> @@ -10624,11 +10624,17 @@ int kvm_arch_irq_bypass_add_producer(struct irq_bypass_consumer *cons,
->>   {
->>   	struct kvm_kernel_irqfd *irqfd =
->>   		container_of(cons, struct kvm_kernel_irqfd, consumer);
->> +	int ret;
->>   
->>   	irqfd->producer = prod;
->> +	kvm_arch_start_assignment(irqfd->kvm);
->> +	ret = kvm_x86_ops.update_pi_irte(irqfd->kvm,
->> +					 prod->irq, irqfd->gsi, 1);
->> +
->> +	if (ret)
->> +		kvm_arch_end_assignment(irqfd->kvm);
->>   
->> -	return kvm_x86_ops.update_pi_irte(irqfd->kvm,
->> -					   prod->irq, irqfd->gsi, 1);
->> +	return ret;
->>   }
->>   
->>   void kvm_arch_irq_bypass_del_producer(struct irq_bypass_consumer *cons,
->
-> Why isn't there a matching end-assignment in the del_producer path?  It
-> seems this only goes one-way, what happens when a device is
-> hot-unplugged from the VM or the device interrupt configuration changes.
-> This will still break vfio if it's not guaranteed to be symmetric.
-> Thanks,
->
-> Alex
+Yes, because that's the direct way off to user space.
 
+Thanks,
 
-Yes, we need add logic in the del_producer path.
-
-Thanks
-
-
+        tglx
