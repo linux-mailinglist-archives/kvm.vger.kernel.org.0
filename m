@@ -2,494 +2,401 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3198A2259FF
-	for <lists+kvm@lfdr.de>; Mon, 20 Jul 2020 10:26:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6F3DF225A0D
+	for <lists+kvm@lfdr.de>; Mon, 20 Jul 2020 10:30:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727817AbgGTI0X (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 20 Jul 2020 04:26:23 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:59351 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726389AbgGTI0W (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 20 Jul 2020 04:26:22 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1595233579;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=Z1ab9smw8kDVMXi6RwrkIoX/oTbdUtpbF9U74JZp3jk=;
-        b=MKGBZ4ptS04aYzsohOKdBYwJqJxePjzXqoYhvKLAyW1npx+Q9V+iQH4BGrsjBt+xNyIgVF
-        JUakxSz2bP6h9TGysPeLSxcl6DDLljF0S3LgjVZ/JXrJi4Fm4xvSJhONSI/sS81UE4zeW4
-        0DFxt/q5N60wq7OQICbnrSjDkXi01o0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-336-wxRbGnZKNeCX8wS92zuQ7g-1; Mon, 20 Jul 2020 04:26:13 -0400
-X-MC-Unique: wxRbGnZKNeCX8wS92zuQ7g-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0F216106B242;
-        Mon, 20 Jul 2020 08:26:11 +0000 (UTC)
-Received: from [10.36.115.54] (ovpn-115-54.ams2.redhat.com [10.36.115.54])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id D21352DE6B;
-        Mon, 20 Jul 2020 08:26:01 +0000 (UTC)
-Subject: Re: [PATCH v5 05/15] vfio: Add PASID allocation/free support
-To:     "Liu, Yi L" <yi.l.liu@intel.com>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "baolu.lu@linux.intel.com" <baolu.lu@linux.intel.com>,
-        "joro@8bytes.org" <joro@8bytes.org>
-Cc:     "Tian, Kevin" <kevin.tian@intel.com>,
-        "jacob.jun.pan@linux.intel.com" <jacob.jun.pan@linux.intel.com>,
-        "Raj, Ashok" <ashok.raj@intel.com>,
-        "Tian, Jun J" <jun.j.tian@intel.com>,
-        "Sun, Yi Y" <yi.y.sun@intel.com>,
-        "jean-philippe@linaro.org" <jean-philippe@linaro.org>,
-        "peterx@redhat.com" <peterx@redhat.com>,
-        "Wu, Hao" <hao.wu@intel.com>,
-        "stefanha@gmail.com" <stefanha@gmail.com>,
-        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-References: <1594552870-55687-1-git-send-email-yi.l.liu@intel.com>
- <1594552870-55687-6-git-send-email-yi.l.liu@intel.com>
- <7ce733ec-e27a-0a80-f78c-eeeb41a4ecf0@redhat.com>
- <DM5PR11MB14351019ED0DEE3E27A98D70C37B0@DM5PR11MB1435.namprd11.prod.outlook.com>
-From:   Auger Eric <eric.auger@redhat.com>
-Message-ID: <7d982308-f39c-ab5f-2318-a36600284402@redhat.com>
-Date:   Mon, 20 Jul 2020 10:26:00 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+        id S1727905AbgGTIaG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 20 Jul 2020 04:30:06 -0400
+Received: from szxga04-in.huawei.com ([45.249.212.190]:8333 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1727809AbgGTIaG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 20 Jul 2020 04:30:06 -0400
+Received: from DGGEMS401-HUB.china.huawei.com (unknown [172.30.72.58])
+        by Forcepoint Email with ESMTP id B96D04557B5E0E7B3366;
+        Mon, 20 Jul 2020 16:30:01 +0800 (CST)
+Received: from localhost (10.174.149.93) by DGGEMS401-HUB.china.huawei.com
+ (10.3.19.201) with Microsoft SMTP Server id 14.3.487.0; Mon, 20 Jul 2020
+ 16:29:51 +0800
+From:   Jay Zhou <jianjay.zhou@huawei.com>
+To:     <linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>
+CC:     <alex.williamson@redhat.com>, <cohuck@redhat.com>,
+        <maoming.maoming@huawei.com>, <jianjay.zhou@huawei.com>,
+        <weidong.huang@huawei.com>
+Subject: [PATCH] vfio dma_map/unmap: optimized for hugetlbfs pages
+Date:   Mon, 20 Jul 2020 16:29:47 +0800
+Message-ID: <20200720082947.1770-1-jianjay.zhou@huawei.com>
+X-Mailer: git-send-email 2.14.1.windows.1
 MIME-Version: 1.0
-In-Reply-To: <DM5PR11MB14351019ED0DEE3E27A98D70C37B0@DM5PR11MB1435.namprd11.prod.outlook.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+Content-Type: text/plain
+X-Originating-IP: [10.174.149.93]
+X-CFilter-Loop: Reflected
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Yi,
+From: Ming Mao <maoming.maoming@huawei.com>
 
-On 7/20/20 10:03 AM, Liu, Yi L wrote:
-> Hi Eric,
-> 
->> From: Auger Eric <eric.auger@redhat.com>
->> Sent: Sunday, July 19, 2020 11:39 PM
->>
->> Yi,
->>
->> On 7/12/20 1:21 PM, Liu Yi L wrote:
->>> Shared Virtual Addressing (a.k.a Shared Virtual Memory) allows sharing
->>> multiple process virtual address spaces with the device for simplified
->>> programming model. PASID is used to tag an virtual address space in
->>> DMA requests and to identify the related translation structure in
->>> IOMMU. When a PASID-capable device is assigned to a VM, we want the
->>> same capability of using PASID to tag guest process virtual address
->>> spaces to achieve virtual SVA (vSVA).
->>>
->>> PASID management for guest is vendor specific. Some vendors (e.g.
->>> Intel
->>> VT-d) requires system-wide managed PASIDs cross all devices,
->>> regardless
->> across?
-> 
-> yep. will correct it.
-> 
->>> of whether a device is used by host or assigned to guest. Other
->>> vendors (e.g. ARM SMMU) may allow PASIDs managed per-device thus could
->>> be fully delegated to the guest for assigned devices.
->>>
->>> For system-wide managed PASIDs, this patch introduces a vfio module to
->>> handle explicit PASID alloc/free requests from guest. Allocated PASIDs
->>> are associated to a process (or, mm_struct) in IOASID core. A vfio_mm
->>> object is introduced to track mm_struct. Multiple VFIO containers
->>> within a process share the same vfio_mm object.
->>>
->>> A quota mechanism is provided to prevent malicious user from
->>> exhausting available PASIDs. Currently the quota is a global parameter
->>> applied to all VFIO devices. In the future per-device quota might be
->>> supported too.
->>>
->>> Cc: Kevin Tian <kevin.tian@intel.com>
->>> CC: Jacob Pan <jacob.jun.pan@linux.intel.com>
->>> Cc: Eric Auger <eric.auger@redhat.com>
->>> Cc: Jean-Philippe Brucker <jean-philippe@linaro.org>
->>> Cc: Joerg Roedel <joro@8bytes.org>
->>> Cc: Lu Baolu <baolu.lu@linux.intel.com>
->>> Suggested-by: Alex Williamson <alex.williamson@redhat.com>
->>> Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
->>> ---
->>> v4 -> v5:
->>> *) address comments from Eric Auger.
->>> *) address the comments from Alex on the pasid free range support. Added
->>>    per vfio_mm pasid r-b tree.
->>>    https://lore.kernel.org/kvm/20200709082751.320742ab@x1.home/
->>>
->>> v3 -> v4:
->>> *) fix lock leam in vfio_mm_get_from_task()
->>> *) drop pasid_quota field in struct vfio_mm
->>> *) vfio_mm_get_from_task() returns ERR_PTR(-ENOTTY) when
->>> !CONFIG_VFIO_PASID
->>>
->>> v1 -> v2:
->>> *) added in v2, split from the pasid alloc/free support of v1
->>> ---
->>>  drivers/vfio/Kconfig      |   5 +
->>>  drivers/vfio/Makefile     |   1 +
->>>  drivers/vfio/vfio_pasid.c | 235
->> ++++++++++++++++++++++++++++++++++++++++++++++
->>>  include/linux/vfio.h      |  28 ++++++
->>>  4 files changed, 269 insertions(+)
->>>  create mode 100644 drivers/vfio/vfio_pasid.c
->>>
->>> diff --git a/drivers/vfio/Kconfig b/drivers/vfio/Kconfig index
->>> fd17db9..3d8a108 100644
->>> --- a/drivers/vfio/Kconfig
->>> +++ b/drivers/vfio/Kconfig
->>> @@ -19,6 +19,11 @@ config VFIO_VIRQFD
->>>  	depends on VFIO && EVENTFD
->>>  	default n
->>>
->>> +config VFIO_PASID
->>> +	tristate
->>> +	depends on IOASID && VFIO
->>> +	default n
->>> +
->>>  menuconfig VFIO
->>>  	tristate "VFIO Non-Privileged userspace driver framework"
->>>  	depends on IOMMU_API
->>> diff --git a/drivers/vfio/Makefile b/drivers/vfio/Makefile index
->>> de67c47..bb836a3 100644
->>> --- a/drivers/vfio/Makefile
->>> +++ b/drivers/vfio/Makefile
->>> @@ -3,6 +3,7 @@ vfio_virqfd-y := virqfd.o
->>>
->>>  obj-$(CONFIG_VFIO) += vfio.o
->>>  obj-$(CONFIG_VFIO_VIRQFD) += vfio_virqfd.o
->>> +obj-$(CONFIG_VFIO_PASID) += vfio_pasid.o
->>>  obj-$(CONFIG_VFIO_IOMMU_TYPE1) += vfio_iommu_type1.o
->>>  obj-$(CONFIG_VFIO_IOMMU_SPAPR_TCE) += vfio_iommu_spapr_tce.o
->>>  obj-$(CONFIG_VFIO_SPAPR_EEH) += vfio_spapr_eeh.o diff --git
->>> a/drivers/vfio/vfio_pasid.c b/drivers/vfio/vfio_pasid.c new file mode
->>> 100644 index 0000000..66e6054e
->>> --- /dev/null
->>> +++ b/drivers/vfio/vfio_pasid.c
->>> @@ -0,0 +1,235 @@
->>> +// SPDX-License-Identifier: GPL-2.0-only
->>> +/*
->>> + * Copyright (C) 2020 Intel Corporation.
->>> + *     Author: Liu Yi L <yi.l.liu@intel.com>
->>> + *
->>> + */
->>> +
->>> +#include <linux/vfio.h>
->>> +#include <linux/eventfd.h>
->>> +#include <linux/file.h>
->>> +#include <linux/module.h>
->>> +#include <linux/slab.h>
->>> +#include <linux/sched/mm.h>
->>> +
->>> +#define DRIVER_VERSION  "0.1"
->>> +#define DRIVER_AUTHOR   "Liu Yi L <yi.l.liu@intel.com>"
->>> +#define DRIVER_DESC     "PASID management for VFIO bus drivers"
->>> +
->>> +#define VFIO_DEFAULT_PASID_QUOTA	1000
->>> +static int pasid_quota = VFIO_DEFAULT_PASID_QUOTA;
->>> +module_param_named(pasid_quota, pasid_quota, uint, 0444);
->>> +MODULE_PARM_DESC(pasid_quota,
->>> +		 " Set the quota for max number of PASIDs that an application is
->>> +allowed to request (default 1000)");
->> s/ Set/Set
-> 
-> got it.
-> 
->>> +
->>> +struct vfio_mm_token {
->>> +	unsigned long long val;
->>> +};
->>> +
->>> +struct vfio_mm {
->>> +	struct kref		kref;
->>> +	int			ioasid_sid;
->>> +	struct mutex		pasid_lock;
->>> +	struct rb_root		pasid_list;
->>> +	struct list_head	next;
->>> +	struct vfio_mm_token	token;
->>> +};
->>> +
->>> +static struct mutex		vfio_mm_lock;
->>> +static struct list_head		vfio_mm_list;
->>> +
->>> +struct vfio_pasid {
->>> +	struct rb_node		node;
->>> +	ioasid_t		pasid;
->>> +};
->>> +
->>> +static void vfio_remove_all_pasids(struct vfio_mm *vmm);
->>> +
->>> +/* called with vfio.vfio_mm_lock held */ static void
->>> +vfio_mm_release(struct kref *kref) {
->>> +	struct vfio_mm *vmm = container_of(kref, struct vfio_mm, kref);
->>> +
->>> +	list_del(&vmm->next);
->>> +	mutex_unlock(&vfio_mm_lock);
->>> +	vfio_remove_all_pasids(vmm);
->>> +	ioasid_free_set(vmm->ioasid_sid, true);
->>> +	kfree(vmm);
->>> +}
->>> +
->>> +void vfio_mm_put(struct vfio_mm *vmm) {
->>> +	kref_put_mutex(&vmm->kref, vfio_mm_release, &vfio_mm_lock); }
->>> +
->>> +static void vfio_mm_get(struct vfio_mm *vmm) {
->>> +	kref_get(&vmm->kref);
->>> +}
->>> +
->>> +struct vfio_mm *vfio_mm_get_from_task(struct task_struct *task) {
->>> +	struct mm_struct *mm = get_task_mm(task);
->>> +	struct vfio_mm *vmm;
->>> +	unsigned long long val = (unsigned long long)mm;
->>> +	int ret;
->>> +
->>> +	mutex_lock(&vfio_mm_lock);
->>> +	/* Search existing vfio_mm with current mm pointer */
->>> +	list_for_each_entry(vmm, &vfio_mm_list, next) {
->>> +		if (vmm->token.val == val) {
->>> +			vfio_mm_get(vmm);
->>> +			goto out;
->>> +		}
->>> +	}
->>> +
->>> +	vmm = kzalloc(sizeof(*vmm), GFP_KERNEL);
->>> +	if (!vmm) {
->>> +		vmm = ERR_PTR(-ENOMEM);
->>> +		goto out;
->>> +	}
->>> +
->>> +	/*
->>> +	 * IOASID core provides a 'IOASID set' concept to track all
->>> +	 * PASIDs associated with a token. Here we use mm_struct as
->>> +	 * the token and create a IOASID set per mm_struct. All the
->>> +	 * containers of the process share the same IOASID set.
->>> +	 */
->>> +	ret = ioasid_alloc_set((struct ioasid_set *)mm, pasid_quota,
->>> +			       &vmm->ioasid_sid);
->>> +	if (ret) {
->>> +		kfree(vmm);
->>> +		vmm = ERR_PTR(ret);
->>> +		goto out;
->>> +	}
->>> +
->>> +	kref_init(&vmm->kref);
->>> +	vmm->token.val = val;
->>> +	mutex_init(&vmm->pasid_lock);
->>> +	vmm->pasid_list = RB_ROOT;
->>> +
->>> +	list_add(&vmm->next, &vfio_mm_list);
->>> +out:
->>> +	mutex_unlock(&vfio_mm_lock);
->>> +	mmput(mm);
->>> +	return vmm;
->>> +}
->>> +
->>> +/*
->>> + * Find PASID within @min and @max
->>> + */
->>> +static struct vfio_pasid *vfio_find_pasid(struct vfio_mm *vmm,
->>> +					  ioasid_t min, ioasid_t max)
->>> +{
->>> +	struct rb_node *node = vmm->pasid_list.rb_node;
->>> +
->>> +	while (node) {
->>> +		struct vfio_pasid *vid = rb_entry(node,
->>> +						struct vfio_pasid, node);
->>> +
->>> +		if (max < vid->pasid)
->>> +			node = node->rb_left;
->>> +		else if (min > vid->pasid)
->>> +			node = node->rb_right;
->>> +		else
->>> +			return vid;
->>> +	}
->>> +
->>> +	return NULL;
->>> +}
->>> +
->>> +static void vfio_link_pasid(struct vfio_mm *vmm, struct vfio_pasid
->>> +*new) {
->>> +	struct rb_node **link = &vmm->pasid_list.rb_node, *parent = NULL;
->>> +	struct vfio_pasid *vid;
->>> +
->>> +	while (*link) {
->>> +		parent = *link;
->>> +		vid = rb_entry(parent, struct vfio_pasid, node);
->>> +
->>> +		if (new->pasid <= vid->pasid)
->>> +			link = &(*link)->rb_left;
->>> +		else
->>> +			link = &(*link)->rb_right;
->>> +	}
->>> +
->>> +	rb_link_node(&new->node, parent, link);
->>> +	rb_insert_color(&new->node, &vmm->pasid_list); }
->>> +
->>> +static void vfio_remove_pasid(struct vfio_mm *vmm, struct vfio_pasid
->>> +*vid) {
->>> +	rb_erase(&vid->node, &vmm->pasid_list); /* unlink pasid */
->> nit: to be consistent with vfio_unlink_dma, introduce vfio_unlink_pasid
-> 
-> aha, I added it but removed it in the middle of cooking.:-)
-> 
->>> +	ioasid_free(vid->pasid);
->>> +	kfree(vid);
->>> +}
->>> +
->>> +static void vfio_remove_all_pasids(struct vfio_mm *vmm) {
->>> +	struct rb_node *node;
->>> +
->>> +	mutex_lock(&vmm->pasid_lock);
->>> +	while ((node = rb_first(&vmm->pasid_list)))
->>> +		vfio_remove_pasid(vmm, rb_entry(node, struct vfio_pasid, node));
->>> +	mutex_unlock(&vmm->pasid_lock);
->>> +}
->>> +
->>> +int vfio_pasid_alloc(struct vfio_mm *vmm, int min, int max) {
->>> +	ioasid_t pasid;
->>> +	struct vfio_pasid *vid;
->>> +
->>> +	pasid = ioasid_alloc(vmm->ioasid_sid, min, max, NULL);
->>> +	if (pasid == INVALID_IOASID)
->>> +		return -ENOSPC;
->>> +
->>> +	vid = kzalloc(sizeof(*vid), GFP_KERNEL);
->>> +	if (!vid) {
->>> +		ioasid_free(pasid);
->>> +		return -ENOMEM;
->>> +	}
->>> +
->>> +	vid->pasid = pasid;
->>> +
->>> +	mutex_lock(&vmm->pasid_lock);
->>> +	vfio_link_pasid(vmm, vid);
->>> +	mutex_unlock(&vmm->pasid_lock);
->>> +
->>> +	return pasid;
->>> +}
->> I am not totally convinced by your previous reply on EXPORT_SYMBOL_GP()
->> irrelevance in this patch. But well ;-)
-> 
-> I recalled my memory, I think it's made per a comment from Chris.
-> I guess it may make sense to export symbols together with the exact
-> driver user of it in this patch as well :-) but maybe I misunderstood
-> him. if yes, I may add the symbol export back in this patch.
-> 
-> https://lore.kernel.org/linux-iommu/20200331075331.GA26583@infradead.org/#t
-OK I don't know the best practice here. Anyway there is no caller at
-this stage either. I think you may describe in the commit message the
-vfio_iommu_type1 will be the eventual user of the exported functions in
-this module, what are the exact exported functions here. You may also
-explain the motivation behind creating a separate module.
+Hi all,
+I'm working on starting lots of big size
+Virtual Machines(memory: >128GB) with VFIO-devices. And I
+encounter a problem that is the waiting time of starting
+all Virtual Machines is too long. I analyze the startup log
+and find that the time of pinning/unpinning pages could be reduced.
 
-Thanks
+In the original process, to make sure the pages are contiguous,
+we have to check all pages one by one. I think maybe we can use
+hugetlbfs pages which can skip this step.
+So I create a patch to do this.
+According to my test, the result of this patch is pretty well.
 
-Eric
-> 
->>
->>> +
->>> +void vfio_pasid_free_range(struct vfio_mm *vmm,
->>> +			   ioasid_t min, ioasid_t max)
->>> +{
->>> +	struct vfio_pasid *vid = NULL;
->>> +
->>> +	/*
->>> +	 * IOASID core will notify PASID users (e.g. IOMMU driver) to
->>> +	 * teardown necessary structures depending on the to-be-freed
->>> +	 * PASID.
->>> +	 */
->>> +	mutex_lock(&vmm->pasid_lock);
->>> +	while ((vid = vfio_find_pasid(vmm, min, max)) != NULL)
->>> +		vfio_remove_pasid(vmm, vid);
->>> +	mutex_unlock(&vmm->pasid_lock);
->>> +}
->>> +
->>> +static int __init vfio_pasid_init(void) {
->>> +	mutex_init(&vfio_mm_lock);
->>> +	INIT_LIST_HEAD(&vfio_mm_list);
->>> +	return 0;
->>> +}
->>> +
->>> +static void __exit vfio_pasid_exit(void) {
->>> +	WARN_ON(!list_empty(&vfio_mm_list));
->>> +}
->> In your previous reply, ie. https://lkml.org/lkml/2020/7/7/273
->> you said:
->> "
->> I guess yes. VFIO_PASID is supposed to be referenced by VFIO_IOMMU_TYPE1 and
->> may be other module. once vfio_pasid_exit() is triggered, that means its user
->> (VFIO_IOMMU_TYPE1) has been removed. Should all the vfio_mm instances should
->> have been released. If not, means there is vfio_mm leak, should be a bug of user
->> module."
->>
->> if I am not wrong this dependency is not yet known at this stage of
->> the series? I
->> would rather add this comment either in the commit message or here.
-> 
-> make sense, so far it's not known. I can add a comment here. :-)
-> 
-> Regards,
-> Yi Liu
-> 
->> Thanks
->>
->> Eric
->>
->>> +
->>> +module_init(vfio_pasid_init);
->>> +module_exit(vfio_pasid_exit);
->>> +
->>> +MODULE_VERSION(DRIVER_VERSION);
->>> +MODULE_LICENSE("GPL v2");
->>> +MODULE_AUTHOR(DRIVER_AUTHOR);
->>> +MODULE_DESCRIPTION(DRIVER_DESC);
->>> diff --git a/include/linux/vfio.h b/include/linux/vfio.h index
->>> 38d3c6a..31472a9 100644
->>> --- a/include/linux/vfio.h
->>> +++ b/include/linux/vfio.h
->>> @@ -97,6 +97,34 @@ extern int vfio_register_iommu_driver(const struct
->>> vfio_iommu_driver_ops *ops);  extern void vfio_unregister_iommu_driver(
->>>  				const struct vfio_iommu_driver_ops *ops);
->>>
->>> +struct vfio_mm;
->>> +#if IS_ENABLED(CONFIG_VFIO_PASID)
->>> +extern struct vfio_mm *vfio_mm_get_from_task(struct task_struct
->>> +*task); extern void vfio_mm_put(struct vfio_mm *vmm); extern int
->>> +vfio_pasid_alloc(struct vfio_mm *vmm, int min, int max); extern void
->>> +vfio_pasid_free_range(struct vfio_mm *vmm,
->>> +				  ioasid_t min, ioasid_t max);
->>> +#else
->>> +static inline struct vfio_mm *vfio_mm_get_from_task(struct
->>> +task_struct *task) {
->>> +	return ERR_PTR(-ENOTTY);
->>> +}
->>> +
->>> +static inline void vfio_mm_put(struct vfio_mm *vmm) { }
->>> +
->>> +static inline int vfio_pasid_alloc(struct vfio_mm *vmm, int min, int
->>> +max) {
->>> +	return -ENOTTY;
->>> +}
->>> +
->>> +static inline void vfio_pasid_free_range(struct vfio_mm *vmm,
->>> +					  ioasid_t min, ioasid_t max)
->>> +{
->>> +}
->>> +#endif /* CONFIG_VFIO_PASID */
->>> +
->>>  /*
->>>   * External user API
->>>   */
->>>
-> 
+Virtual Machine: 50G memory, 32 CPU, 1 VFIO-device, 1G hugetlbfs page
+        original   after optimization
+pin time   700ms          0.1ms
+
+I Suppose that:
+1)the hugetlbfs page should not be split
+2)PG_reserved is not relevant for hugetlbfs pages
+3)we can delete the for loops and use some operations
+(such as atomic_add,page_ref_add) instead
+
+please correct me if I am wrong.
+
+Thanks.
+
+Signed-off-by: Ming Mao <maoming.maoming@huawei.com>
+---
+ drivers/vfio/vfio_iommu_type1.c | 236 ++++++++++++++++++++++++++++++--
+ include/linux/vfio.h            |  20 +++
+ 2 files changed, 246 insertions(+), 10 deletions(-)
+
+diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
+index 5e556ac91..42e25752e 100644
+--- a/drivers/vfio/vfio_iommu_type1.c
++++ b/drivers/vfio/vfio_iommu_type1.c
+@@ -415,6 +415,46 @@ static int put_pfn(unsigned long pfn, int prot)
+ 	return 0;
+ }
+ 
++/*
++ * put pfns for a hugetlbfs page
++ * @start:the 4KB-page we start to put,can be any page in this hugetlbfs page
++ * @npage:the number of 4KB-pages need to put
++ * @prot:IOMMU_READ/WRITE
++ */
++static int hugetlb_put_pfn(unsigned long start, unsigned int npage, int prot)
++{
++	struct page *page = NULL;
++	struct page *head = NULL;
++
++	if (!npage || !pfn_valid(start))
++		return 0;
++
++	page = pfn_to_page(start);
++	if (!page || !PageHuge(page))
++		return 0;
++	head = compound_head(page);
++	/*
++	 * The last page should be in this hugetlbfs page.
++	 * The number of putting pages should be equal to the number
++	 * of getting pages.So the hugepage pinned refcount and the normal
++	 * page refcount can not be smaller than npage.
++	 */
++	if ((head != compound_head(pfn_to_page(start + npage - 1)))
++	    || (page_ref_count(head) < npage)
++	    || (compound_pincount(page) < npage))
++		return 0;
++
++	if ((prot & IOMMU_WRITE) && !PageDirty(page))
++		set_page_dirty_lock(page);
++
++	atomic_sub(npage, compound_pincount_ptr(head));
++	if (page_ref_sub_and_test(head, npage))
++		__put_page(head);
++
++	mod_node_page_state(page_pgdat(head), NR_FOLL_PIN_RELEASED, npage);
++	return 1;
++}
++
+ static int follow_fault_pfn(struct vm_area_struct *vma, struct mm_struct *mm,
+ 			    unsigned long vaddr, unsigned long *pfn,
+ 			    bool write_fault)
+@@ -479,6 +519,90 @@ static int vaddr_get_pfn(struct mm_struct *mm, unsigned long vaddr,
+ 	return ret;
+ }
+ 
++struct vfio_hupetlbpage_info vfio_hugetlbpage_info[HUGE_MAX_HSTATE] = {
++	{vfio_hugetlbpage_2M, PMD_SIZE, ~((1ULL << HPAGE_PMD_SHIFT) - 1)},
++	{vfio_hugetlbpage_1G, PUD_SIZE, ~((1ULL << HPAGE_PUD_SHIFT) - 1)},
++};
++
++static bool is_hugetlbpage(unsigned long pfn, enum vfio_hugetlbpage_type *type)
++{
++	struct page *page = NULL;
++
++	if (!pfn_valid(pfn) || !type)
++		return false;
++
++	page = pfn_to_page(pfn);
++	/* only check for hugetlbfs pages */
++	if (!page || !PageHuge(page))
++		return false;
++
++	switch (compound_order(compound_head(page))) {
++	case PMD_ORDER:
++		*type = vfio_hugetlbpage_2M;
++		break;
++	case PUD_ORDER:
++		*type = vfio_hugetlbpage_1G;
++		break;
++	default:
++		return false;
++	}
++
++	return true;
++}
++
++/* Is the addr in the last page in hugetlbfs pages? */
++static bool hugetlb_is_last_page(unsigned long addr, enum vfio_hugetlbpage_type type)
++{
++	unsigned int num = 0;
++
++	num = hugetlb_get_resdual_pages(addr & ~(PAGE_SIZE - 1), type);
++
++	if (num == 1)
++		return true;
++	else
++		return false;
++}
++
++static bool hugetlb_page_is_pinned(struct vfio_dma *dma,
++				unsigned long start,
++				unsigned long npages)
++{
++	struct vfio_pfn *vpfn = NULL;
++	struct rb_node *node = rb_first(&dma->pfn_list);
++	unsigned long end = start + npages - 1;
++
++	for (; node; node = rb_next(node)) {
++		vpfn = rb_entry(node, struct vfio_pfn, node);
++
++		if ((vpfn->pfn >= start) && (vpfn->pfn <= end))
++			return true;
++	}
++
++	return false;
++}
++
++static unsigned int hugetlb_get_contiguous_pages_num(struct vfio_dma *dma,
++						unsigned long pfn,
++						unsigned long resdual_npage,
++						unsigned long max_npage)
++{
++	unsigned int num = 0;
++
++	if (!dma)
++		return 0;
++
++	num = resdual_npage < max_npage ? resdual_npage : max_npage;
++	/*
++	 * If there is only one page, it is no need to optimize them.
++	 * Maybe some pages have been pinned and inserted into dma->pfn_list by others.
++	 * In this case, we just goto the slow path simply.
++	 */
++	if ((num < 2) || hugetlb_page_is_pinned(dma, pfn, num))
++		return 0;
++
++	return num;
++}
++
+ /*
+  * Attempt to pin pages.  We really don't want to track all the pfns and
+  * the iommu can only map chunks of consecutive pfns anyway, so get the
+@@ -492,6 +616,7 @@ static long vfio_pin_pages_remote(struct vfio_dma *dma, unsigned long vaddr,
+ 	long ret, pinned = 0, lock_acct = 0;
+ 	bool rsvd;
+ 	dma_addr_t iova = vaddr - dma->vaddr + dma->iova;
++	enum vfio_hugetlbpage_type type;
+ 
+ 	/* This code path is only user initiated */
+ 	if (!current->mm)
+@@ -521,6 +646,55 @@ static long vfio_pin_pages_remote(struct vfio_dma *dma, unsigned long vaddr,
+ 	if (unlikely(disable_hugepages))
+ 		goto out;
+ 
++	/*
++	 * It is no need to get pages one by one for hugetlbfs pages.
++	 * 4KB-pages in hugetlbfs pages are contiguous.
++	 * But if the vaddr is in the last 4KB-page, we just goto the slow path.
++	 */
++	if (is_hugetlbpage(*pfn_base, &type) && !hugetlb_is_last_page(vaddr, type)) {
++		unsigned long hugetlb_resdual_npage = 0;
++		unsigned long contiguous_npage = 0;
++		struct page *head = NULL;
++
++		hugetlb_resdual_npage =
++			hugetlb_get_resdual_pages((vaddr + PAGE_SIZE) & ~(PAGE_SIZE - 1), type);
++		/*
++		 * Maybe the hugetlb_resdual_npage is invalid.
++		 * For example, hugetlb_resdual_npage > (npage - 1) or
++		 * some pages of this hugetlbfs page have been pinned.
++		 */
++		contiguous_npage = hugetlb_get_contiguous_pages_num(dma, *pfn_base + 1,
++						hugetlb_resdual_npage, npage - 1);
++		if (!contiguous_npage)
++			goto slow_path;
++
++		/*
++		 * Unlike THP, the splitting should not happen for hugetlbfs pages.
++		 * Since PG_reserved is not relevant for compound pages, and the pfn of
++		 * 4KB-page which in hugetlbfs pages is valid,
++		 * it is no need to check rsvd for hugetlbfs pages.
++		 */
++		if (!dma->lock_cap &&
++		    current->mm->locked_vm + lock_acct + contiguous_npage > limit) {
++			pr_warn("%s: RLIMIT_MEMLOCK (%ld) exceeded\n",
++				 __func__, limit << PAGE_SHIFT);
++			ret = -ENOMEM;
++			goto unpin_out;
++		}
++		/*
++		 * We got a hugetlbfs page using vaddr_get_pfn alreadly.
++		 * In this case,we do not need to alloc pages and we can finish all
++		 * work by a single operation to the head page.
++		 */
++		lock_acct += contiguous_npage;
++		head = compound_head(pfn_to_page(*pfn_base));
++		atomic_add(contiguous_npage, compound_pincount_ptr(head));
++		page_ref_add(head, contiguous_npage);
++		mod_node_page_state(page_pgdat(head), NR_FOLL_PIN_ACQUIRED, contiguous_npage);
++		pinned += contiguous_npage;
++		goto out;
++	}
++slow_path:
+ 	/* Lock all the consecutive pages from pfn_base */
+ 	for (vaddr += PAGE_SIZE, iova += PAGE_SIZE; pinned < npage;
+ 	     pinned++, vaddr += PAGE_SIZE, iova += PAGE_SIZE) {
+@@ -569,7 +743,30 @@ static long vfio_unpin_pages_remote(struct vfio_dma *dma, dma_addr_t iova,
+ {
+ 	long unlocked = 0, locked = 0;
+ 	long i;
++	enum vfio_hugetlbpage_type type;
++
++	if (is_hugetlbpage(pfn, &type)) {
++		unsigned long hugetlb_resdual_npage = 0;
++		unsigned long contiguous_npage = 0;
+ 
++		hugetlb_resdual_npage = hugetlb_get_resdual_pages(iova & ~(PAGE_SIZE - 1), type);
++		contiguous_npage = hugetlb_get_contiguous_pages_num(dma, pfn,
++						hugetlb_resdual_npage, npage);
++		/*
++		 * There is not enough contiguous pages or this hugetlbfs page
++		 * has been pinned.
++		 * Let's try the slow path.
++		 */
++		if (!contiguous_npage)
++			goto slow_path;
++
++		/* try the slow path if failed */
++		if (hugetlb_put_pfn(pfn, contiguous_npage, dma->prot)) {
++			unlocked = contiguous_npage;
++			goto out;
++		}
++	}
++slow_path:
+ 	for (i = 0; i < npage; i++, iova += PAGE_SIZE) {
+ 		if (put_pfn(pfn++, dma->prot)) {
+ 			unlocked++;
+@@ -578,6 +775,7 @@ static long vfio_unpin_pages_remote(struct vfio_dma *dma, dma_addr_t iova,
+ 		}
+ 	}
+ 
++out:
+ 	if (do_accounting)
+ 		vfio_lock_acct(dma, locked - unlocked, true);
+ 
+@@ -867,6 +1065,7 @@ static long vfio_unmap_unpin(struct vfio_iommu *iommu, struct vfio_dma *dma,
+ 	struct iommu_iotlb_gather iotlb_gather;
+ 	int unmapped_region_cnt = 0;
+ 	long unlocked = 0;
++	enum vfio_hugetlbpage_type type;
+ 
+ 	if (!dma->size)
+ 		return 0;
+@@ -900,16 +1099,33 @@ static long vfio_unmap_unpin(struct vfio_iommu *iommu, struct vfio_dma *dma,
+ 			continue;
+ 		}
+ 
+-		/*
+-		 * To optimize for fewer iommu_unmap() calls, each of which
+-		 * may require hardware cache flushing, try to find the
+-		 * largest contiguous physical memory chunk to unmap.
+-		 */
+-		for (len = PAGE_SIZE;
+-		     !domain->fgsp && iova + len < end; len += PAGE_SIZE) {
+-			next = iommu_iova_to_phys(domain->domain, iova + len);
+-			if (next != phys + len)
+-				break;
++		if (is_hugetlbpage((phys >> PAGE_SHIFT), &type)
++		    && (!domain->fgsp)) {
++			unsigned long hugetlb_resdual_npage = 0;
++			unsigned long contiguous_npage = 0;
++
++			hugetlb_resdual_npage =
++				hugetlb_get_resdual_pages(iova & ~(PAGE_SIZE - 1), type);
++			/*
++			 * The number of contiguous page can not be larger than dma->size
++			 * which is the number of pages pinned.
++			 */
++			contiguous_npage = ((dma->size >> PAGE_SHIFT) > hugetlb_resdual_npage) ?
++				hugetlb_resdual_npage : (dma->size >> PAGE_SHIFT);
++
++			len = contiguous_npage * PAGE_SIZE;
++		} else {
++			/*
++			 * To optimize for fewer iommu_unmap() calls, each of which
++			 * may require hardware cache flushing, try to find the
++			 * largest contiguous physical memory chunk to unmap.
++			 */
++			for (len = PAGE_SIZE;
++			     !domain->fgsp && iova + len < end; len += PAGE_SIZE) {
++				next = iommu_iova_to_phys(domain->domain, iova + len);
++				if (next != phys + len)
++					break;
++			}
+ 		}
+ 
+ 		/*
+diff --git a/include/linux/vfio.h b/include/linux/vfio.h
+index 38d3c6a8d..91ef2058f 100644
+--- a/include/linux/vfio.h
++++ b/include/linux/vfio.h
+@@ -214,4 +214,24 @@ extern int vfio_virqfd_enable(void *opaque,
+ 			      void *data, struct virqfd **pvirqfd, int fd);
+ extern void vfio_virqfd_disable(struct virqfd **pvirqfd);
+ 
++enum vfio_hugetlbpage_type {
++	vfio_hugetlbpage_2M,
++	vfio_hugetlbpage_1G,
++};
++
++struct vfio_hupetlbpage_info {
++	enum vfio_hugetlbpage_type type;
++	unsigned long size;
++	unsigned long mask;
++};
++
++#define PMD_ORDER 9
++#define PUD_ORDER 18
++/*
++ * get the number of resdual 4KB-pages in a hugetlbfs page
++ * (including the page which pointed by this address)
++ */
++#define hugetlb_get_resdual_pages(address, type)				\
++		((vfio_hugetlbpage_info[type].size				\
++		- (address & ~vfio_hugetlbpage_info[type].mask)) >> PAGE_SHIFT)
+ #endif /* VFIO_H */
+-- 
+2.23.0
+
 
