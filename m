@@ -2,74 +2,43 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6432D2259B8
-	for <lists+kvm@lfdr.de>; Mon, 20 Jul 2020 10:11:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3198A2259FF
+	for <lists+kvm@lfdr.de>; Mon, 20 Jul 2020 10:26:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727809AbgGTILZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 20 Jul 2020 04:11:25 -0400
-Received: from mga03.intel.com ([134.134.136.65]:41109 "EHLO mga03.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727774AbgGTILY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 20 Jul 2020 04:11:24 -0400
-IronPort-SDR: RNShMwIQgVYGZi4l5qMTvnhhIFMDD5l9OYYWXTzEKVhU/gNEwBlpRrvbp6F2IXbN4vlWKKl6l5
- Xb0Z8EFP0Yfg==
-X-IronPort-AV: E=McAfee;i="6000,8403,9687"; a="149856122"
-X-IronPort-AV: E=Sophos;i="5.75,374,1589266800"; 
-   d="scan'208";a="149856122"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Jul 2020 01:11:19 -0700
-IronPort-SDR: vnKXm9khiMs7MhJ2rdjCzm8Wl+56hSq02lvfimykMqqzHDS4mnyqh3rbQEiYBkIpCoNka9c6tH
- cfB4axUiwoTQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.75,374,1589266800"; 
-   d="scan'208";a="309755929"
-Received: from fmsmsx108.amr.corp.intel.com ([10.18.124.206])
-  by fmsmga004.fm.intel.com with ESMTP; 20 Jul 2020 01:11:19 -0700
-Received: from fmsmsx611.amr.corp.intel.com (10.18.126.91) by
- FMSMSX108.amr.corp.intel.com (10.18.124.206) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Mon, 20 Jul 2020 01:11:18 -0700
-Received: from fmsmsx611.amr.corp.intel.com (10.18.126.91) by
- fmsmsx611.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.1713.5; Mon, 20 Jul 2020 01:11:18 -0700
-Received: from FMSEDG001.ED.cps.intel.com (10.1.192.133) by
- fmsmsx611.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id 15.1.1713.5
- via Frontend Transport; Mon, 20 Jul 2020 01:11:18 -0700
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (104.47.57.173)
- by edgegateway.intel.com (192.55.55.68) with Microsoft SMTP Server (TLS) id
- 14.3.439.0; Mon, 20 Jul 2020 01:11:15 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=VlipglF7BSI4oFcNXXIQrvHOAxS+Vnhhh3A0dBYq4tVOB7pgBOqYnRgVPHP6a1HE/ybFogMCsFR5uYC/Xgq5fGqxQDyaUvWIn9t8CaL56bYqvTJjXwi8cMTbUcXME5DvHjzn84VUFkA46zOgFKHm4RvNfd/HuN6YvCz0YnU2xnU1yf71nVR7OWRZW1uZ/KIgc70cCRJWBmtzestUwWsOucC50Pm6+JSwQuvgoFpZJKqAY+3hsHqFeh4w31PZh4jVzOXbbALDQ4g7QSP4Pl/pKGGIm3vb9grf/aTy+pcZdvw4Z2i4+YFiye6utVT+6YyK+g9BJ3mMe5YRanpUB+2qdg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=i6DQTSlyuOtS/imL7bsMquuG6/91BpIwmal0aGI6xkk=;
- b=OO1WKPhxb34yji1RhvDLQDKLzfUw0K67ZbJUMw9mVkHWi1ZmApjET+QRT520V/tSQo+TaUn2FpsPhDkCyb9W7hfz/spxPTSzQlkCoZSFFF9zcgEdzixPqUp6sS71WMcxy+JTEtpQVPAIvRkNQ0mHzjTx1ffHBC2XL6Ti4iSFjHbPxPCSSTvGbeXbLdyLHIQa0seR5L7lUecZGReh9ImBsPsWz9iwt/RR3HOaW4P3rz1e3HDPMhBqaqE1atwUmnWxlSkpBIjYDYZVxzdvrrq0BW1+smyEuuO2rHgUE/DUIT8A8bjx36QC7maKyPoIqgR/g/mAy5jeqFDJb8qYkVVvmA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=intel.onmicrosoft.com;
- s=selector2-intel-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=i6DQTSlyuOtS/imL7bsMquuG6/91BpIwmal0aGI6xkk=;
- b=GxybFqIMozFZgMOIFe/OCX68c+PMjyWsSxBk1sSzOwCWMmASBUZIYO5M6Ru6imohndzZeYIi2U1bjvoAiLtOLkqAOpi57hx+gtwFMMJ/c6wsw33Xy7/ZIi5S9c6uQkfNLl86v4MA6c8hGmCbtFXDHvXLX9Wa6ZoM7guq58OVRCA=
-Received: from DM5PR11MB1435.namprd11.prod.outlook.com (2603:10b6:4:7::18) by
- DM6PR11MB3289.namprd11.prod.outlook.com (2603:10b6:5:5f::10) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.3195.25; Mon, 20 Jul 2020 08:11:13 +0000
-Received: from DM5PR11MB1435.namprd11.prod.outlook.com
- ([fe80::9002:97a2:d8c0:8364]) by DM5PR11MB1435.namprd11.prod.outlook.com
- ([fe80::9002:97a2:d8c0:8364%10]) with mapi id 15.20.3195.025; Mon, 20 Jul
- 2020 08:11:13 +0000
-From:   "Liu, Yi L" <yi.l.liu@intel.com>
-To:     Auger Eric <eric.auger@redhat.com>,
+        id S1727817AbgGTI0X (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 20 Jul 2020 04:26:23 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:59351 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726389AbgGTI0W (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 20 Jul 2020 04:26:22 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1595233579;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=Z1ab9smw8kDVMXi6RwrkIoX/oTbdUtpbF9U74JZp3jk=;
+        b=MKGBZ4ptS04aYzsohOKdBYwJqJxePjzXqoYhvKLAyW1npx+Q9V+iQH4BGrsjBt+xNyIgVF
+        JUakxSz2bP6h9TGysPeLSxcl6DDLljF0S3LgjVZ/JXrJi4Fm4xvSJhONSI/sS81UE4zeW4
+        0DFxt/q5N60wq7OQICbnrSjDkXi01o0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-336-wxRbGnZKNeCX8wS92zuQ7g-1; Mon, 20 Jul 2020 04:26:13 -0400
+X-MC-Unique: wxRbGnZKNeCX8wS92zuQ7g-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0F216106B242;
+        Mon, 20 Jul 2020 08:26:11 +0000 (UTC)
+Received: from [10.36.115.54] (ovpn-115-54.ams2.redhat.com [10.36.115.54])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id D21352DE6B;
+        Mon, 20 Jul 2020 08:26:01 +0000 (UTC)
+Subject: Re: [PATCH v5 05/15] vfio: Add PASID allocation/free support
+To:     "Liu, Yi L" <yi.l.liu@intel.com>,
         "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
         "baolu.lu@linux.intel.com" <baolu.lu@linux.intel.com>,
         "joro@8bytes.org" <joro@8bytes.org>
-CC:     "Tian, Kevin" <kevin.tian@intel.com>,
+Cc:     "Tian, Kevin" <kevin.tian@intel.com>,
         "jacob.jun.pan@linux.intel.com" <jacob.jun.pan@linux.intel.com>,
         "Raj, Ashok" <ashok.raj@intel.com>,
         "Tian, Jun J" <jun.j.tian@intel.com>,
@@ -81,130 +50,446 @@ CC:     "Tian, Kevin" <kevin.tian@intel.com>,
         "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
         "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
         "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: RE: [PATCH v5 06/15] iommu/vt-d: Support setting ioasid set to domain
-Thread-Topic: [PATCH v5 06/15] iommu/vt-d: Support setting ioasid set to
- domain
-Thread-Index: AQHWWD2wmreG48S8TkuGZch2ZJs3a6kPFLoAgAEUy6A=
-Date:   Mon, 20 Jul 2020 08:11:13 +0000
-Message-ID: <DM5PR11MB1435D32E0973DA6C0AF562F7C37B0@DM5PR11MB1435.namprd11.prod.outlook.com>
 References: <1594552870-55687-1-git-send-email-yi.l.liu@intel.com>
- <1594552870-55687-7-git-send-email-yi.l.liu@intel.com>
- <e2c45f9d-af78-5da9-c7c2-061b476b6b0a@redhat.com>
-In-Reply-To: <e2c45f9d-af78-5da9-c7c2-061b476b6b0a@redhat.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-dlp-reaction: no-action
-dlp-version: 11.2.0.6
-dlp-product: dlpe-windows
-authentication-results: redhat.com; dkim=none (message not signed)
- header.d=none;redhat.com; dmarc=none action=none header.from=intel.com;
-x-originating-ip: [192.198.147.200]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: de800d2b-31ba-43ec-1f7c-08d82c8477ed
-x-ms-traffictypediagnostic: DM6PR11MB3289:
-x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <DM6PR11MB328979D245BC93354D822EB2C37B0@DM6PR11MB3289.namprd11.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:8273;
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: 4bfhkvH7Wf6ut9eeHFkmLHy0lHGedwWwZTjToH+35h0xKnZJBh2DajS72wrcZ+itrF0vs4jvu10/sXoAY99xZDm7wOudX1Z7BfBuWMxPO9Zjcs4DhtnwdoBJy8yETsxgqTzEjvvqAynkZknU7hQkTnfjg15yZfeFx1sfq64IvHBFwY6sCv+1ymOdzHaPeSW+YpSHFaf5NDOqeptErit7r5aFppL7E9mWKr6ylJLqGjVywEk3x/Eox03LFiAc5O+lE/loIcqprF+UY16YSaDW+/yZ1ufEOYrAIddCc9eS+9TZclw5QAByTxIsk0Wkqj/VZQAMXPmjAKAZUwBtvKfUUw==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM5PR11MB1435.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFTY:;SFS:(4636009)(136003)(396003)(376002)(346002)(39860400002)(366004)(26005)(53546011)(5660300002)(7696005)(7416002)(186003)(33656002)(52536014)(6506007)(110136005)(2906002)(71200400001)(8936002)(83380400001)(4326008)(9686003)(66476007)(54906003)(8676002)(478600001)(66946007)(66446008)(86362001)(66556008)(55016002)(316002)(76116006)(64756008);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata: kJEcepUtHyAuw27udNn6mpzGdyn/z7o6NuaRmYfhHWJJoZMhpwB6pQz5JjWX7/T9caUsUN4xPOTX5cZ6awCiuRn0gCaQj0jXK9h8uWNWKM+21al9PFtdeZvpS2W4alF22BRWsZrQ+oFgQ244NPGIOO+yKYPIZ7Ktxto7kaxzbOCVJjfWIjr/D4eMHSugDV82TVR6Uwu7iOCs1bhjIQi4DXVREOr06nCvm/5M6n8SH24kqelilxY50ETrpNuyloIndENe4USEPNIwQd1pp1i29p82isjMsYhjOIfqFRAPSuMdA7xiWQqnEmvloP5T2o03YUkqTSzrrpPYyxd+5yS1rGnPcKTlRLwgOKjSi5Np6p+40EQWxM4jhcOYPp8u5mRHecPRhfiFJt3/aHqWnZ2EKgV7ueHICRxanT89CH1HqeJX+EaqzV7ApD5yCurKpWiGO1i5Z+OKh97iq/wSTvoPDDPFK95R7zug4uq8AS9c6GRDhV69tv0t98wLX2hi6pS7
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+ <1594552870-55687-6-git-send-email-yi.l.liu@intel.com>
+ <7ce733ec-e27a-0a80-f78c-eeeb41a4ecf0@redhat.com>
+ <DM5PR11MB14351019ED0DEE3E27A98D70C37B0@DM5PR11MB1435.namprd11.prod.outlook.com>
+From:   Auger Eric <eric.auger@redhat.com>
+Message-ID: <7d982308-f39c-ab5f-2318-a36600284402@redhat.com>
+Date:   Mon, 20 Jul 2020 10:26:00 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: DM5PR11MB1435.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: de800d2b-31ba-43ec-1f7c-08d82c8477ed
-X-MS-Exchange-CrossTenant-originalarrivaltime: 20 Jul 2020 08:11:13.1229
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: mPN4wezv9CtDjR3CgTc90COglhNdkveaAXUD2aRZBelRyjCG0D1p6K8gewO+GNczvcqlCjavYi0k6iW2cSqn6g==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR11MB3289
-X-OriginatorOrg: intel.com
+In-Reply-To: <DM5PR11MB14351019ED0DEE3E27A98D70C37B0@DM5PR11MB1435.namprd11.prod.outlook.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-SGkgRXJpYywNCg0KPiBGcm9tOiBBdWdlciBFcmljIDxlcmljLmF1Z2VyQHJlZGhhdC5jb20+DQo+
-IFNlbnQ6IFN1bmRheSwgSnVseSAxOSwgMjAyMCAxMTozOCBQTQ0KPiANCj4gWWksDQo+IA0KPiBP
-biA3LzEyLzIwIDE6MjEgUE0sIExpdSBZaSBMIHdyb3RlOg0KPiA+IEZyb20gSU9NTVUgcC5vLnYu
-LCBQQVNJRHMgYWxsb2NhdGVkIGFuZCBtYW5hZ2VkIGJ5IGV4dGVybmFsIGNvbXBvbmVudHMNCj4g
-PiAoZS5nLiBWRklPKSB3aWxsIGJlIHBhc3NlZCBpbiBmb3IgZ3Bhc2lkX2JpbmQvdW5iaW5kIG9w
-ZXJhdGlvbi4gSU9NTVUNCj4gPiBuZWVkcyBzb21lIGtub3dsZWRnZSB0byBjaGVjayB0aGUgUEFT
-SUQgb3duZXJzaGlwLCBoZW5jZSBhZGQgYW4NCj4gPiBpbnRlcmZhY2UgZm9yIHRob3NlIGNvbXBv
-bmVudHMgdG8gdGVsbCB0aGUgUEFTSUQgb3duZXIuDQo+ID4NCj4gPiBJbiBsYXRlc3Qga2VybmVs
-IGRlc2lnbiwgUEFTSUQgb3duZXJzaGlwIGlzIG1hbmFnZWQgYnkgSU9BU0lEIHNldA0KPiA+IHdo
-ZXJlIHRoZSBQQVNJRCBpcyBhbGxvY2F0ZWQgZnJvbS4gVGhpcyBwYXRjaCBhZGRzIHN1cHBvcnQg
-Zm9yIHNldHRpbmcNCj4gPiBpb2FzaWQgc2V0IElEIHRvIHRoZSBkb21haW5zIHVzZWQgZm9yIG5l
-c3RpbmcvdlNWQS4gU3Vic2VxdWVudCBTVkENCj4gPiBvcGVyYXRpb25zIG9uIHRoZSBQQVNJRCB3
-aWxsIGJlIGNoZWNrZWQgYWdhaW5zdCBpdHMgSU9BU0lEIHNldCBmb3IgcHJvcGVyDQo+IG93bmVy
-c2hpcC4NCj4gU3Vic2VxdWVudCBTVkEgb3BlcmF0aW9ucyB3aWxsIGNoZWNrIHRoZSBQQVNJRCBh
-Z2FpbnN0IGl0cyBJT0FTSUQgc2V0IGZvciBwcm9wZXINCj4gb3duZXJzaGlwLg0KDQpnb3QgaXQu
-DQoNCj4gPg0KPiA+IENjOiBLZXZpbiBUaWFuIDxrZXZpbi50aWFuQGludGVsLmNvbT4NCj4gPiBD
-QzogSmFjb2IgUGFuIDxqYWNvYi5qdW4ucGFuQGxpbnV4LmludGVsLmNvbT4NCj4gPiBDYzogQWxl
-eCBXaWxsaWFtc29uIDxhbGV4LndpbGxpYW1zb25AcmVkaGF0LmNvbT4NCj4gPiBDYzogRXJpYyBB
-dWdlciA8ZXJpYy5hdWdlckByZWRoYXQuY29tPg0KPiA+IENjOiBKZWFuLVBoaWxpcHBlIEJydWNr
-ZXIgPGplYW4tcGhpbGlwcGVAbGluYXJvLm9yZz4NCj4gPiBDYzogSm9lcmcgUm9lZGVsIDxqb3Jv
-QDhieXRlcy5vcmc+DQo+ID4gQ2M6IEx1IEJhb2x1IDxiYW9sdS5sdUBsaW51eC5pbnRlbC5jb20+
-DQo+ID4gU2lnbmVkLW9mZi1ieTogTGl1IFlpIEwgPHlpLmwubGl1QGludGVsLmNvbT4NCj4gPiBT
-aWduZWQtb2ZmLWJ5OiBKYWNvYiBQYW4gPGphY29iLmp1bi5wYW5AbGludXguaW50ZWwuY29tPg0K
-PiA+IC0tLQ0KPiA+IHY0IC0+IHY1Og0KPiA+ICopIGFkZHJlc3MgY29tbWVudHMgZnJvbSBFcmlj
-IEF1Z2VyLg0KPiA+IC0tLQ0KPiA+ICBkcml2ZXJzL2lvbW11L2ludGVsL2lvbW11LmMgfCAyMiAr
-KysrKysrKysrKysrKysrKysrKysrDQo+ID4gaW5jbHVkZS9saW51eC9pbnRlbC1pb21tdS5oIHwg
-IDQgKysrKw0KPiA+ICBpbmNsdWRlL2xpbnV4L2lvbW11LmggICAgICAgfCAgMSArDQo+ID4gIDMg
-ZmlsZXMgY2hhbmdlZCwgMjcgaW5zZXJ0aW9ucygrKQ0KPiA+DQo+ID4gZGlmZiAtLWdpdCBhL2Ry
-aXZlcnMvaW9tbXUvaW50ZWwvaW9tbXUuYyBiL2RyaXZlcnMvaW9tbXUvaW50ZWwvaW9tbXUuYw0K
-PiA+IGluZGV4IDcyYWU2YTIuLjRkNTQxOTggMTAwNjQ0DQo+ID4gLS0tIGEvZHJpdmVycy9pb21t
-dS9pbnRlbC9pb21tdS5jDQo+ID4gKysrIGIvZHJpdmVycy9pb21tdS9pbnRlbC9pb21tdS5jDQo+
-ID4gQEAgLTE3OTMsNiArMTc5Myw3IEBAIHN0YXRpYyBzdHJ1Y3QgZG1hcl9kb21haW4gKmFsbG9j
-X2RvbWFpbihpbnQgZmxhZ3MpDQo+ID4gIAlpZiAoZmlyc3RfbGV2ZWxfYnlfZGVmYXVsdCgpKQ0K
-PiA+ICAJCWRvbWFpbi0+ZmxhZ3MgfD0gRE9NQUlOX0ZMQUdfVVNFX0ZJUlNUX0xFVkVMOw0KPiA+
-ICAJZG9tYWluLT5oYXNfaW90bGJfZGV2aWNlID0gZmFsc2U7DQo+ID4gKwlkb21haW4tPmlvYXNp
-ZF9zaWQgPSBJTlZBTElEX0lPQVNJRF9TRVQ7DQo+ID4gIAlJTklUX0xJU1RfSEVBRCgmZG9tYWlu
-LT5kZXZpY2VzKTsNCj4gPg0KPiA+ICAJcmV0dXJuIGRvbWFpbjsNCj4gPiBAQCAtNjAzOSw2ICs2
-MDQwLDI3IEBAIGludGVsX2lvbW11X2RvbWFpbl9zZXRfYXR0cihzdHJ1Y3QgaW9tbXVfZG9tYWlu
-DQo+ICpkb21haW4sDQo+ID4gIAkJfQ0KPiA+ICAJCXNwaW5fdW5sb2NrX2lycXJlc3RvcmUoJmRl
-dmljZV9kb21haW5fbG9jaywgZmxhZ3MpOw0KPiA+ICAJCWJyZWFrOw0KPiA+ICsJY2FzZSBET01B
-SU5fQVRUUl9JT0FTSURfU0lEOg0KPiA+ICsJew0KPiA+ICsJCWludCBzaWQgPSAqKGludCAqKWRh
-dGE7DQo+ID4gKw0KPiA+ICsJCWlmICghKGRtYXJfZG9tYWluLT5mbGFncyAmIERPTUFJTl9GTEFH
-X05FU1RJTkdfTU9ERSkpIHsNCj4gPiArCQkJcmV0ID0gLUVOT0RFVjsNCj4gPiArCQkJYnJlYWs7
-DQo+ID4gKwkJfQ0KPiA+ICsJCXNwaW5fbG9ja19pcnFzYXZlKCZkZXZpY2VfZG9tYWluX2xvY2ss
-IGZsYWdzKTsNCj4gSSB0aGluayB0aGUgbG9jayBzaG91bGQgYmUgdGFrZW4gYmVmb3JlIHRoZSBE
-T01BSU5fRkxBR19ORVNUSU5HX01PREUgY2hlY2suDQo+IE90aGVyd2lzZSwgdGhlIGZsYWdzIGNh
-biBiZSB0aGVyZXRpY2FsbHkgY2hhbmdlZCBpbmJldHdlZW4gdGhlIGNoZWNrIGFuZCB0aGUgdGVz
-dA0KPiBiZWxvdz8NCg0KSSBzZWUuIHdpbGwgY29ycmVjdCBpdC4NCg0KVGhhbmtzLA0KWWkgTGl1
-DQoNCj4gVGhhbmtzDQo+IA0KPiBFcmljDQo+ID4gKwkJaWYgKGRtYXJfZG9tYWluLT5pb2FzaWRf
-c2lkICE9IElOVkFMSURfSU9BU0lEX1NFVCAmJg0KPiA+ICsJCSAgICBkbWFyX2RvbWFpbi0+aW9h
-c2lkX3NpZCAhPSBzaWQpIHsNCj4gPiArCQkJcHJfd2Fybl9yYXRlbGltaXRlZCgibXVsdGkgaW9h
-c2lkX3NldCAoJWQ6JWQpIHNldHRpbmciLA0KPiA+ICsJCQkJCSAgICBkbWFyX2RvbWFpbi0+aW9h
-c2lkX3NpZCwgc2lkKTsNCj4gPiArCQkJcmV0ID0gLUVCVVNZOw0KPiA+ICsJCQlzcGluX3VubG9j
-a19pcnFyZXN0b3JlKCZkZXZpY2VfZG9tYWluX2xvY2ssIGZsYWdzKTsNCj4gPiArCQkJYnJlYWs7
-DQo+ID4gKwkJfQ0KPiA+ICsJCWRtYXJfZG9tYWluLT5pb2FzaWRfc2lkID0gc2lkOw0KPiA+ICsJ
-CXNwaW5fdW5sb2NrX2lycXJlc3RvcmUoJmRldmljZV9kb21haW5fbG9jaywgZmxhZ3MpOw0KPiA+
-ICsJCWJyZWFrOw0KPiA+ICsJfQ0KPiA+ICAJZGVmYXVsdDoNCj4gPiAgCQlyZXQgPSAtRUlOVkFM
-Ow0KPiA+ICAJCWJyZWFrOw0KPiA+IGRpZmYgLS1naXQgYS9pbmNsdWRlL2xpbnV4L2ludGVsLWlv
-bW11LmggYi9pbmNsdWRlL2xpbnV4L2ludGVsLWlvbW11LmgNCj4gPiBpbmRleCAzZjIzYzI2Li4w
-ZDBhYjMyIDEwMDY0NA0KPiA+IC0tLSBhL2luY2x1ZGUvbGludXgvaW50ZWwtaW9tbXUuaA0KPiA+
-ICsrKyBiL2luY2x1ZGUvbGludXgvaW50ZWwtaW9tbXUuaA0KPiA+IEBAIC01NDksNiArNTQ5LDEw
-IEBAIHN0cnVjdCBkbWFyX2RvbWFpbiB7DQo+ID4gIAkJCQkJICAgMiA9PSAxR2lCLCAzID09IDUx
-MkdpQiwgNCA9PSAxVGlCICovDQo+ID4gIAl1NjQJCW1heF9hZGRyOwkvKiBtYXhpbXVtIG1hcHBl
-ZCBhZGRyZXNzICovDQo+ID4NCj4gPiArCWludAkJaW9hc2lkX3NpZDsJLyoNCj4gPiArCQkJCQkg
-KiB0aGUgaW9hc2lkIHNldCB3aGljaCB0cmFja3MgYWxsDQo+ID4gKwkJCQkJICogUEFTSURzIHVz
-ZWQgYnkgdGhlIGRvbWFpbi4NCj4gPiArCQkJCQkgKi8NCj4gPiAgCWludAkJZGVmYXVsdF9wYXNp
-ZDsJLyoNCj4gPiAgCQkJCQkgKiBUaGUgZGVmYXVsdCBwYXNpZCB1c2VkIGZvciBub24tU1ZNDQo+
-ID4gIAkJCQkJICogdHJhZmZpYyBvbiBtZWRpYXRlZCBkZXZpY2VzLg0KPiA+IGRpZmYgLS1naXQg
-YS9pbmNsdWRlL2xpbnV4L2lvbW11LmggYi9pbmNsdWRlL2xpbnV4L2lvbW11LmggaW5kZXgNCj4g
-PiA3Y2E5ZDQ4Li5lODRhMWQ1IDEwMDY0NA0KPiA+IC0tLSBhL2luY2x1ZGUvbGludXgvaW9tbXUu
-aA0KPiA+ICsrKyBiL2luY2x1ZGUvbGludXgvaW9tbXUuaA0KPiA+IEBAIC0xMjQsNiArMTI0LDcg
-QEAgZW51bSBpb21tdV9hdHRyIHsNCj4gPiAgCURPTUFJTl9BVFRSX0ZTTF9QQU1VVjEsDQo+ID4g
-IAlET01BSU5fQVRUUl9ORVNUSU5HLAkvKiB0d28gc3RhZ2VzIG9mIHRyYW5zbGF0aW9uICovDQo+
-ID4gIAlET01BSU5fQVRUUl9ETUFfVVNFX0ZMVVNIX1FVRVVFLA0KPiA+ICsJRE9NQUlOX0FUVFJf
-SU9BU0lEX1NJRCwNCj4gPiAgCURPTUFJTl9BVFRSX01BWCwNCj4gPiAgfTsNCj4gPg0KPiA+DQoN
-Cg==
+Hi Yi,
+
+On 7/20/20 10:03 AM, Liu, Yi L wrote:
+> Hi Eric,
+> 
+>> From: Auger Eric <eric.auger@redhat.com>
+>> Sent: Sunday, July 19, 2020 11:39 PM
+>>
+>> Yi,
+>>
+>> On 7/12/20 1:21 PM, Liu Yi L wrote:
+>>> Shared Virtual Addressing (a.k.a Shared Virtual Memory) allows sharing
+>>> multiple process virtual address spaces with the device for simplified
+>>> programming model. PASID is used to tag an virtual address space in
+>>> DMA requests and to identify the related translation structure in
+>>> IOMMU. When a PASID-capable device is assigned to a VM, we want the
+>>> same capability of using PASID to tag guest process virtual address
+>>> spaces to achieve virtual SVA (vSVA).
+>>>
+>>> PASID management for guest is vendor specific. Some vendors (e.g.
+>>> Intel
+>>> VT-d) requires system-wide managed PASIDs cross all devices,
+>>> regardless
+>> across?
+> 
+> yep. will correct it.
+> 
+>>> of whether a device is used by host or assigned to guest. Other
+>>> vendors (e.g. ARM SMMU) may allow PASIDs managed per-device thus could
+>>> be fully delegated to the guest for assigned devices.
+>>>
+>>> For system-wide managed PASIDs, this patch introduces a vfio module to
+>>> handle explicit PASID alloc/free requests from guest. Allocated PASIDs
+>>> are associated to a process (or, mm_struct) in IOASID core. A vfio_mm
+>>> object is introduced to track mm_struct. Multiple VFIO containers
+>>> within a process share the same vfio_mm object.
+>>>
+>>> A quota mechanism is provided to prevent malicious user from
+>>> exhausting available PASIDs. Currently the quota is a global parameter
+>>> applied to all VFIO devices. In the future per-device quota might be
+>>> supported too.
+>>>
+>>> Cc: Kevin Tian <kevin.tian@intel.com>
+>>> CC: Jacob Pan <jacob.jun.pan@linux.intel.com>
+>>> Cc: Eric Auger <eric.auger@redhat.com>
+>>> Cc: Jean-Philippe Brucker <jean-philippe@linaro.org>
+>>> Cc: Joerg Roedel <joro@8bytes.org>
+>>> Cc: Lu Baolu <baolu.lu@linux.intel.com>
+>>> Suggested-by: Alex Williamson <alex.williamson@redhat.com>
+>>> Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
+>>> ---
+>>> v4 -> v5:
+>>> *) address comments from Eric Auger.
+>>> *) address the comments from Alex on the pasid free range support. Added
+>>>    per vfio_mm pasid r-b tree.
+>>>    https://lore.kernel.org/kvm/20200709082751.320742ab@x1.home/
+>>>
+>>> v3 -> v4:
+>>> *) fix lock leam in vfio_mm_get_from_task()
+>>> *) drop pasid_quota field in struct vfio_mm
+>>> *) vfio_mm_get_from_task() returns ERR_PTR(-ENOTTY) when
+>>> !CONFIG_VFIO_PASID
+>>>
+>>> v1 -> v2:
+>>> *) added in v2, split from the pasid alloc/free support of v1
+>>> ---
+>>>  drivers/vfio/Kconfig      |   5 +
+>>>  drivers/vfio/Makefile     |   1 +
+>>>  drivers/vfio/vfio_pasid.c | 235
+>> ++++++++++++++++++++++++++++++++++++++++++++++
+>>>  include/linux/vfio.h      |  28 ++++++
+>>>  4 files changed, 269 insertions(+)
+>>>  create mode 100644 drivers/vfio/vfio_pasid.c
+>>>
+>>> diff --git a/drivers/vfio/Kconfig b/drivers/vfio/Kconfig index
+>>> fd17db9..3d8a108 100644
+>>> --- a/drivers/vfio/Kconfig
+>>> +++ b/drivers/vfio/Kconfig
+>>> @@ -19,6 +19,11 @@ config VFIO_VIRQFD
+>>>  	depends on VFIO && EVENTFD
+>>>  	default n
+>>>
+>>> +config VFIO_PASID
+>>> +	tristate
+>>> +	depends on IOASID && VFIO
+>>> +	default n
+>>> +
+>>>  menuconfig VFIO
+>>>  	tristate "VFIO Non-Privileged userspace driver framework"
+>>>  	depends on IOMMU_API
+>>> diff --git a/drivers/vfio/Makefile b/drivers/vfio/Makefile index
+>>> de67c47..bb836a3 100644
+>>> --- a/drivers/vfio/Makefile
+>>> +++ b/drivers/vfio/Makefile
+>>> @@ -3,6 +3,7 @@ vfio_virqfd-y := virqfd.o
+>>>
+>>>  obj-$(CONFIG_VFIO) += vfio.o
+>>>  obj-$(CONFIG_VFIO_VIRQFD) += vfio_virqfd.o
+>>> +obj-$(CONFIG_VFIO_PASID) += vfio_pasid.o
+>>>  obj-$(CONFIG_VFIO_IOMMU_TYPE1) += vfio_iommu_type1.o
+>>>  obj-$(CONFIG_VFIO_IOMMU_SPAPR_TCE) += vfio_iommu_spapr_tce.o
+>>>  obj-$(CONFIG_VFIO_SPAPR_EEH) += vfio_spapr_eeh.o diff --git
+>>> a/drivers/vfio/vfio_pasid.c b/drivers/vfio/vfio_pasid.c new file mode
+>>> 100644 index 0000000..66e6054e
+>>> --- /dev/null
+>>> +++ b/drivers/vfio/vfio_pasid.c
+>>> @@ -0,0 +1,235 @@
+>>> +// SPDX-License-Identifier: GPL-2.0-only
+>>> +/*
+>>> + * Copyright (C) 2020 Intel Corporation.
+>>> + *     Author: Liu Yi L <yi.l.liu@intel.com>
+>>> + *
+>>> + */
+>>> +
+>>> +#include <linux/vfio.h>
+>>> +#include <linux/eventfd.h>
+>>> +#include <linux/file.h>
+>>> +#include <linux/module.h>
+>>> +#include <linux/slab.h>
+>>> +#include <linux/sched/mm.h>
+>>> +
+>>> +#define DRIVER_VERSION  "0.1"
+>>> +#define DRIVER_AUTHOR   "Liu Yi L <yi.l.liu@intel.com>"
+>>> +#define DRIVER_DESC     "PASID management for VFIO bus drivers"
+>>> +
+>>> +#define VFIO_DEFAULT_PASID_QUOTA	1000
+>>> +static int pasid_quota = VFIO_DEFAULT_PASID_QUOTA;
+>>> +module_param_named(pasid_quota, pasid_quota, uint, 0444);
+>>> +MODULE_PARM_DESC(pasid_quota,
+>>> +		 " Set the quota for max number of PASIDs that an application is
+>>> +allowed to request (default 1000)");
+>> s/ Set/Set
+> 
+> got it.
+> 
+>>> +
+>>> +struct vfio_mm_token {
+>>> +	unsigned long long val;
+>>> +};
+>>> +
+>>> +struct vfio_mm {
+>>> +	struct kref		kref;
+>>> +	int			ioasid_sid;
+>>> +	struct mutex		pasid_lock;
+>>> +	struct rb_root		pasid_list;
+>>> +	struct list_head	next;
+>>> +	struct vfio_mm_token	token;
+>>> +};
+>>> +
+>>> +static struct mutex		vfio_mm_lock;
+>>> +static struct list_head		vfio_mm_list;
+>>> +
+>>> +struct vfio_pasid {
+>>> +	struct rb_node		node;
+>>> +	ioasid_t		pasid;
+>>> +};
+>>> +
+>>> +static void vfio_remove_all_pasids(struct vfio_mm *vmm);
+>>> +
+>>> +/* called with vfio.vfio_mm_lock held */ static void
+>>> +vfio_mm_release(struct kref *kref) {
+>>> +	struct vfio_mm *vmm = container_of(kref, struct vfio_mm, kref);
+>>> +
+>>> +	list_del(&vmm->next);
+>>> +	mutex_unlock(&vfio_mm_lock);
+>>> +	vfio_remove_all_pasids(vmm);
+>>> +	ioasid_free_set(vmm->ioasid_sid, true);
+>>> +	kfree(vmm);
+>>> +}
+>>> +
+>>> +void vfio_mm_put(struct vfio_mm *vmm) {
+>>> +	kref_put_mutex(&vmm->kref, vfio_mm_release, &vfio_mm_lock); }
+>>> +
+>>> +static void vfio_mm_get(struct vfio_mm *vmm) {
+>>> +	kref_get(&vmm->kref);
+>>> +}
+>>> +
+>>> +struct vfio_mm *vfio_mm_get_from_task(struct task_struct *task) {
+>>> +	struct mm_struct *mm = get_task_mm(task);
+>>> +	struct vfio_mm *vmm;
+>>> +	unsigned long long val = (unsigned long long)mm;
+>>> +	int ret;
+>>> +
+>>> +	mutex_lock(&vfio_mm_lock);
+>>> +	/* Search existing vfio_mm with current mm pointer */
+>>> +	list_for_each_entry(vmm, &vfio_mm_list, next) {
+>>> +		if (vmm->token.val == val) {
+>>> +			vfio_mm_get(vmm);
+>>> +			goto out;
+>>> +		}
+>>> +	}
+>>> +
+>>> +	vmm = kzalloc(sizeof(*vmm), GFP_KERNEL);
+>>> +	if (!vmm) {
+>>> +		vmm = ERR_PTR(-ENOMEM);
+>>> +		goto out;
+>>> +	}
+>>> +
+>>> +	/*
+>>> +	 * IOASID core provides a 'IOASID set' concept to track all
+>>> +	 * PASIDs associated with a token. Here we use mm_struct as
+>>> +	 * the token and create a IOASID set per mm_struct. All the
+>>> +	 * containers of the process share the same IOASID set.
+>>> +	 */
+>>> +	ret = ioasid_alloc_set((struct ioasid_set *)mm, pasid_quota,
+>>> +			       &vmm->ioasid_sid);
+>>> +	if (ret) {
+>>> +		kfree(vmm);
+>>> +		vmm = ERR_PTR(ret);
+>>> +		goto out;
+>>> +	}
+>>> +
+>>> +	kref_init(&vmm->kref);
+>>> +	vmm->token.val = val;
+>>> +	mutex_init(&vmm->pasid_lock);
+>>> +	vmm->pasid_list = RB_ROOT;
+>>> +
+>>> +	list_add(&vmm->next, &vfio_mm_list);
+>>> +out:
+>>> +	mutex_unlock(&vfio_mm_lock);
+>>> +	mmput(mm);
+>>> +	return vmm;
+>>> +}
+>>> +
+>>> +/*
+>>> + * Find PASID within @min and @max
+>>> + */
+>>> +static struct vfio_pasid *vfio_find_pasid(struct vfio_mm *vmm,
+>>> +					  ioasid_t min, ioasid_t max)
+>>> +{
+>>> +	struct rb_node *node = vmm->pasid_list.rb_node;
+>>> +
+>>> +	while (node) {
+>>> +		struct vfio_pasid *vid = rb_entry(node,
+>>> +						struct vfio_pasid, node);
+>>> +
+>>> +		if (max < vid->pasid)
+>>> +			node = node->rb_left;
+>>> +		else if (min > vid->pasid)
+>>> +			node = node->rb_right;
+>>> +		else
+>>> +			return vid;
+>>> +	}
+>>> +
+>>> +	return NULL;
+>>> +}
+>>> +
+>>> +static void vfio_link_pasid(struct vfio_mm *vmm, struct vfio_pasid
+>>> +*new) {
+>>> +	struct rb_node **link = &vmm->pasid_list.rb_node, *parent = NULL;
+>>> +	struct vfio_pasid *vid;
+>>> +
+>>> +	while (*link) {
+>>> +		parent = *link;
+>>> +		vid = rb_entry(parent, struct vfio_pasid, node);
+>>> +
+>>> +		if (new->pasid <= vid->pasid)
+>>> +			link = &(*link)->rb_left;
+>>> +		else
+>>> +			link = &(*link)->rb_right;
+>>> +	}
+>>> +
+>>> +	rb_link_node(&new->node, parent, link);
+>>> +	rb_insert_color(&new->node, &vmm->pasid_list); }
+>>> +
+>>> +static void vfio_remove_pasid(struct vfio_mm *vmm, struct vfio_pasid
+>>> +*vid) {
+>>> +	rb_erase(&vid->node, &vmm->pasid_list); /* unlink pasid */
+>> nit: to be consistent with vfio_unlink_dma, introduce vfio_unlink_pasid
+> 
+> aha, I added it but removed it in the middle of cooking.:-)
+> 
+>>> +	ioasid_free(vid->pasid);
+>>> +	kfree(vid);
+>>> +}
+>>> +
+>>> +static void vfio_remove_all_pasids(struct vfio_mm *vmm) {
+>>> +	struct rb_node *node;
+>>> +
+>>> +	mutex_lock(&vmm->pasid_lock);
+>>> +	while ((node = rb_first(&vmm->pasid_list)))
+>>> +		vfio_remove_pasid(vmm, rb_entry(node, struct vfio_pasid, node));
+>>> +	mutex_unlock(&vmm->pasid_lock);
+>>> +}
+>>> +
+>>> +int vfio_pasid_alloc(struct vfio_mm *vmm, int min, int max) {
+>>> +	ioasid_t pasid;
+>>> +	struct vfio_pasid *vid;
+>>> +
+>>> +	pasid = ioasid_alloc(vmm->ioasid_sid, min, max, NULL);
+>>> +	if (pasid == INVALID_IOASID)
+>>> +		return -ENOSPC;
+>>> +
+>>> +	vid = kzalloc(sizeof(*vid), GFP_KERNEL);
+>>> +	if (!vid) {
+>>> +		ioasid_free(pasid);
+>>> +		return -ENOMEM;
+>>> +	}
+>>> +
+>>> +	vid->pasid = pasid;
+>>> +
+>>> +	mutex_lock(&vmm->pasid_lock);
+>>> +	vfio_link_pasid(vmm, vid);
+>>> +	mutex_unlock(&vmm->pasid_lock);
+>>> +
+>>> +	return pasid;
+>>> +}
+>> I am not totally convinced by your previous reply on EXPORT_SYMBOL_GP()
+>> irrelevance in this patch. But well ;-)
+> 
+> I recalled my memory, I think it's made per a comment from Chris.
+> I guess it may make sense to export symbols together with the exact
+> driver user of it in this patch as well :-) but maybe I misunderstood
+> him. if yes, I may add the symbol export back in this patch.
+> 
+> https://lore.kernel.org/linux-iommu/20200331075331.GA26583@infradead.org/#t
+OK I don't know the best practice here. Anyway there is no caller at
+this stage either. I think you may describe in the commit message the
+vfio_iommu_type1 will be the eventual user of the exported functions in
+this module, what are the exact exported functions here. You may also
+explain the motivation behind creating a separate module.
+
+Thanks
+
+Eric
+> 
+>>
+>>> +
+>>> +void vfio_pasid_free_range(struct vfio_mm *vmm,
+>>> +			   ioasid_t min, ioasid_t max)
+>>> +{
+>>> +	struct vfio_pasid *vid = NULL;
+>>> +
+>>> +	/*
+>>> +	 * IOASID core will notify PASID users (e.g. IOMMU driver) to
+>>> +	 * teardown necessary structures depending on the to-be-freed
+>>> +	 * PASID.
+>>> +	 */
+>>> +	mutex_lock(&vmm->pasid_lock);
+>>> +	while ((vid = vfio_find_pasid(vmm, min, max)) != NULL)
+>>> +		vfio_remove_pasid(vmm, vid);
+>>> +	mutex_unlock(&vmm->pasid_lock);
+>>> +}
+>>> +
+>>> +static int __init vfio_pasid_init(void) {
+>>> +	mutex_init(&vfio_mm_lock);
+>>> +	INIT_LIST_HEAD(&vfio_mm_list);
+>>> +	return 0;
+>>> +}
+>>> +
+>>> +static void __exit vfio_pasid_exit(void) {
+>>> +	WARN_ON(!list_empty(&vfio_mm_list));
+>>> +}
+>> In your previous reply, ie. https://lkml.org/lkml/2020/7/7/273
+>> you said:
+>> "
+>> I guess yes. VFIO_PASID is supposed to be referenced by VFIO_IOMMU_TYPE1 and
+>> may be other module. once vfio_pasid_exit() is triggered, that means its user
+>> (VFIO_IOMMU_TYPE1) has been removed. Should all the vfio_mm instances should
+>> have been released. If not, means there is vfio_mm leak, should be a bug of user
+>> module."
+>>
+>> if I am not wrong this dependency is not yet known at this stage of
+>> the series? I
+>> would rather add this comment either in the commit message or here.
+> 
+> make sense, so far it's not known. I can add a comment here. :-)
+> 
+> Regards,
+> Yi Liu
+> 
+>> Thanks
+>>
+>> Eric
+>>
+>>> +
+>>> +module_init(vfio_pasid_init);
+>>> +module_exit(vfio_pasid_exit);
+>>> +
+>>> +MODULE_VERSION(DRIVER_VERSION);
+>>> +MODULE_LICENSE("GPL v2");
+>>> +MODULE_AUTHOR(DRIVER_AUTHOR);
+>>> +MODULE_DESCRIPTION(DRIVER_DESC);
+>>> diff --git a/include/linux/vfio.h b/include/linux/vfio.h index
+>>> 38d3c6a..31472a9 100644
+>>> --- a/include/linux/vfio.h
+>>> +++ b/include/linux/vfio.h
+>>> @@ -97,6 +97,34 @@ extern int vfio_register_iommu_driver(const struct
+>>> vfio_iommu_driver_ops *ops);  extern void vfio_unregister_iommu_driver(
+>>>  				const struct vfio_iommu_driver_ops *ops);
+>>>
+>>> +struct vfio_mm;
+>>> +#if IS_ENABLED(CONFIG_VFIO_PASID)
+>>> +extern struct vfio_mm *vfio_mm_get_from_task(struct task_struct
+>>> +*task); extern void vfio_mm_put(struct vfio_mm *vmm); extern int
+>>> +vfio_pasid_alloc(struct vfio_mm *vmm, int min, int max); extern void
+>>> +vfio_pasid_free_range(struct vfio_mm *vmm,
+>>> +				  ioasid_t min, ioasid_t max);
+>>> +#else
+>>> +static inline struct vfio_mm *vfio_mm_get_from_task(struct
+>>> +task_struct *task) {
+>>> +	return ERR_PTR(-ENOTTY);
+>>> +}
+>>> +
+>>> +static inline void vfio_mm_put(struct vfio_mm *vmm) { }
+>>> +
+>>> +static inline int vfio_pasid_alloc(struct vfio_mm *vmm, int min, int
+>>> +max) {
+>>> +	return -ENOTTY;
+>>> +}
+>>> +
+>>> +static inline void vfio_pasid_free_range(struct vfio_mm *vmm,
+>>> +					  ioasid_t min, ioasid_t max)
+>>> +{
+>>> +}
+>>> +#endif /* CONFIG_VFIO_PASID */
+>>> +
+>>>  /*
+>>>   * External user API
+>>>   */
+>>>
+> 
+
