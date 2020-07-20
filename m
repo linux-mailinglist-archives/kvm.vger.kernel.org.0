@@ -2,78 +2,79 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 32B6A22701C
-	for <lists+kvm@lfdr.de>; Mon, 20 Jul 2020 23:02:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 93A4C22702C
+	for <lists+kvm@lfdr.de>; Mon, 20 Jul 2020 23:09:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726307AbgGTVBp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 20 Jul 2020 17:01:45 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:39803 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726016AbgGTVBp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 20 Jul 2020 17:01:45 -0400
+        id S1726530AbgGTVJf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 20 Jul 2020 17:09:35 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:28644 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726046AbgGTVJe (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 20 Jul 2020 17:09:34 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1595278904;
+        s=mimecast20190719; t=1595279373;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=4U6VZiSJ8TPUEgmufp44M9sR4CYrgqTXgYg5iSdD8Jo=;
-        b=Q8aD6zA5FIDVL77se3NH6YYwgeu3zv3zA+jUph3zhdp4ApUMSAhX2iUYDlUz+9phi2JAbS
-        2Bw/i1y6Q86NeORwzKUC1EvZcFThzaaS4IwEcOhl1x691Tmta2qyuSQ6BDi5O/mMPXibU7
-        2XMyPgNOztfCkxYLvbbEKF/ezzhvVtk=
+         content-transfer-encoding:content-transfer-encoding;
+        bh=mlHthLgSXx+0yukG47QpZktLnXxCHnNa5qkendynQ2U=;
+        b=WWarP0NI0eAqiVyUopWQyBPrp9wat8QuH4IMT4MJAmqqIK5eZ2e2dzQQfOy5nk5IDfFA5n
+        2LEAhmBiqCeUuJ2uvzFHjwrJiYwN+2xqLNu7f+8lT0jnrbFOqyRpCwJd580r0wPaOwuF21
+        vbjnX0p+WsOA0CFczMqH2XSEPRJvqt4=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-444-aGJ4eoBgPE-j2EGC2tW1Sg-1; Mon, 20 Jul 2020 17:01:40 -0400
-X-MC-Unique: aGJ4eoBgPE-j2EGC2tW1Sg-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+ us-mta-305-nSOylXgzOdqC6eVgTMJPiw-1; Mon, 20 Jul 2020 17:09:31 -0400
+X-MC-Unique: nSOylXgzOdqC6eVgTMJPiw-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 079151005510;
-        Mon, 20 Jul 2020 21:01:39 +0000 (UTC)
-Received: from x1.home (ovpn-112-71.phx2.redhat.com [10.3.112.71])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 829DA5C22A;
-        Mon, 20 Jul 2020 21:01:38 +0000 (UTC)
-Date:   Mon, 20 Jul 2020 15:01:38 -0600
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BC3D41902EA0;
+        Mon, 20 Jul 2020 21:09:30 +0000 (UTC)
+Received: from gimli.home (ovpn-112-71.phx2.redhat.com [10.3.112.71])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 3CB2176214;
+        Mon, 20 Jul 2020 21:09:27 +0000 (UTC)
+Subject: [PATCH] vfio/pci: Hold igate across releasing eventfd contexts
 From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Cornelia Huck <cohuck@redhat.com>, prime.zeng@hisilicon.com
-Subject: Re: [GIT PULL] VFIO fix for v5.8-rc7
-Message-ID: <20200720150138.5c13e8b9@x1.home>
-In-Reply-To: <CAHk-=wijGPPiUH8-kzu2ZyP9_SgBxbGib7afOMAwpusfx-2K+g@mail.gmail.com>
-References: <20200720083427.50202e82@x1.home>
-        <CAHk-=wijGPPiUH8-kzu2ZyP9_SgBxbGib7afOMAwpusfx-2K+g@mail.gmail.com>
-Organization: Red Hat
+To:     alex.williamson@redhat.com
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        cohuck@redhat.com, prime.zeng@hisilicon.com
+Date:   Mon, 20 Jul 2020 15:09:27 -0600
+Message-ID: <159527934542.26615.503005826695043299.stgit@gimli.home>
+User-Agent: StGit/0.19-dirty
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 20 Jul 2020 13:33:29 -0700
-Linus Torvalds <torvalds@linux-foundation.org> wrote:
+No need to release and immediately re-acquire igate while clearing
+out the eventfd ctxs.
 
-> On Mon, Jul 20, 2020 at 7:34 AM Alex Williamson
-> <alex.williamson@redhat.com> wrote:
-> >
-> > VFIO fixes for v5.8-rc7
-> >
-> >  - Fix race with eventfd ctx cleared outside of mutex (Zeng Tao)  
-> 
-> Why does this take and then re-take the lock immediately? That just
-> looks insane.
-> 
-> I realize that this isn't likely to be a performance-critical path,
-> but this is a basic source cleanliness issue. Doing silly things is
-> silly, and shouldn't be done, even if they don't matter.
+Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
+---
+ drivers/vfio/pci/vfio_pci.c |    4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
 
-Yup, it's silly.  Cornelia identified the same during review and I let
-it slide after some counter arguments by the submitter.  I see this got
-merged, so I'll post a cleanup for v5.9.  Thanks for the input,
-
-Alex
+diff --git a/drivers/vfio/pci/vfio_pci.c b/drivers/vfio/pci/vfio_pci.c
+index b0258b79bb5b..dabca0450e6d 100644
+--- a/drivers/vfio/pci/vfio_pci.c
++++ b/drivers/vfio/pci/vfio_pci.c
+@@ -523,14 +523,12 @@ static void vfio_pci_release(void *device_data)
+ 		vfio_pci_vf_token_user_add(vdev, -1);
+ 		vfio_spapr_pci_eeh_release(vdev->pdev);
+ 		vfio_pci_disable(vdev);
++
+ 		mutex_lock(&vdev->igate);
+ 		if (vdev->err_trigger) {
+ 			eventfd_ctx_put(vdev->err_trigger);
+ 			vdev->err_trigger = NULL;
+ 		}
+-		mutex_unlock(&vdev->igate);
+-
+-		mutex_lock(&vdev->igate);
+ 		if (vdev->req_trigger) {
+ 			eventfd_ctx_put(vdev->req_trigger);
+ 			vdev->req_trigger = NULL;
 
