@@ -2,270 +2,454 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E8324225D3E
-	for <lists+kvm@lfdr.de>; Mon, 20 Jul 2020 13:17:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 11A2D225D9C
+	for <lists+kvm@lfdr.de>; Mon, 20 Jul 2020 13:42:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728469AbgGTLQ5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 20 Jul 2020 07:16:57 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:29674 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1727790AbgGTLQ4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 20 Jul 2020 07:16:56 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1595243814;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=pKSDz6OZ+GyNryE98plOK3ZhF2++MJVw9u34f7BkfWs=;
-        b=PzwyvmCp1oQGHM4Rz5oyyaNbSefb43jgsR4pMEWVHha56SwhbTY1GXiFWvzR/vioxSEv+L
-        2JchwKmn2kM7hP8yHcYtWWmzcVUlqsLvmVlrCyyobovWlxBv5zyp1LMvBkD/4n/3YeNK+s
-        TqFkUHdKH0NDz4tYOUpY4rgua+y8RKk=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-433-4sPU2EK0MDal6-DzAerUTg-1; Mon, 20 Jul 2020 07:16:52 -0400
-X-MC-Unique: 4sPU2EK0MDal6-DzAerUTg-1
-Received: by mail-wr1-f69.google.com with SMTP id s16so11953814wrv.1
-        for <kvm@vger.kernel.org>; Mon, 20 Jul 2020 04:16:51 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:message-id:subject:from:to:cc:date:references
-         :in-reply-to:mime-version:content-transfer-encoding;
-        bh=pKSDz6OZ+GyNryE98plOK3ZhF2++MJVw9u34f7BkfWs=;
-        b=Q8CF8eI4+n6EMmAVc0SnC24cGdILIj25WSnPpmoUkD5i7qlo4/e193XnkmwcmYUIXZ
-         Mzb1zda9CPCtWmhSgmnCvgSC4k54ygj56cpJ5VGqwqRRib0/9Ex7rVdTYYQWTgVnvSOf
-         Uak0bouvLPZ1fix0slJzPoZbeKmSs4Du3rJI1Pl8b0grNcKHzrKXwuZmu6rw3nLOvB1A
-         Gsynr3Xt7uE2gCkShwqgnrrsdZN5XaveCGj23Ni34sf/k+4vZdlizBfL3bdxdNtlwOSg
-         5Ow7ihkRwcGNtVYoK/V8V1z2uP8BNSVeey3torCyHiLvdhcG8d18967hlTD74tVJZnNo
-         yJsQ==
-X-Gm-Message-State: AOAM530JRLu0Ligb6Jwced42/wiK4xqZjMOnSnQWJug4vkcsYwZ9eEb+
-        EjCF7TqH9ugM7j+/riDU5m+hr8SDWShot0Z51kaxOjD1n7WWTouBa6DBMircGnK4KF2ot7QzRqD
-        QHvtFBWC9dq2G
-X-Received: by 2002:adf:e7c2:: with SMTP id e2mr23172268wrn.179.1595243810839;
-        Mon, 20 Jul 2020 04:16:50 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzjLFtqLyAZNNCVeELLHKyxNU1jBhKsL40NIsMrvmlNMr+fVH7IUzil49+kywev+ashATvqQQ==
-X-Received: by 2002:adf:e7c2:: with SMTP id e2mr23172249wrn.179.1595243810586;
-        Mon, 20 Jul 2020 04:16:50 -0700 (PDT)
-Received: from eperezma.remote.csb (165.141.221.87.dynamic.jazztel.es. [87.221.141.165])
-        by smtp.gmail.com with ESMTPSA id 2sm30972148wmo.44.2020.07.20.04.16.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 20 Jul 2020 04:16:49 -0700 (PDT)
-Message-ID: <d4e29f0451f7551ee3a408ecfa40de2de2b8aa75.camel@redhat.com>
-Subject: Re: [PATCH RFC v8 02/11] vhost: use batched get_vq_desc version
-From:   Eugenio =?ISO-8859-1?Q?P=E9rez?= <eperezma@redhat.com>
-To:     "Michael S. Tsirkin" <mst@redhat.com>
-Cc:     Jason Wang <jasowang@redhat.com>,
-        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        linux-kernel@vger.kernel.org, kvm list <kvm@vger.kernel.org>,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org
-Date:   Mon, 20 Jul 2020 13:16:47 +0200
-References: <CAJaqyWefMHPguj8ZGCuccTn0uyKxF9ZTEi2ASLtDSjGNb1Vwsg@mail.gmail.com>
-         <419cc689-adae-7ba4-fe22-577b3986688c@redhat.com>
-         <CAJaqyWedEg9TBkH1MxGP1AecYHD-e-=ugJ6XUN+CWb=rQGf49g@mail.gmail.com>
-         <0a83aa03-8e3c-1271-82f5-4c07931edea3@redhat.com>
-         <CAJaqyWeqF-KjFnXDWXJ2M3Hw3eQeCEE2-7p1KMLmMetMTm22DQ@mail.gmail.com>
-         <20200709133438-mutt-send-email-mst@kernel.org>
-         <7dec8cc2-152c-83f4-aa45-8ef9c6aca56d@redhat.com>
-         <CAJaqyWdLOH2EceTUduKYXCQUUNo1XQ1tLgjYHTBGhtdhBPHn_Q@mail.gmail.com>
-         <20200710015615-mutt-send-email-mst@kernel.org>
-         <CAJaqyWf1skGxrjuT9GLr6dtgd-433y-rCkbtStLHaAs2W2jYXA@mail.gmail.com>
-         <20200720051410-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20200720051410-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-X-Mailer: Evolution 3.28.5 (3.28.5-9.el8) 
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
+        id S1728474AbgGTLmo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 20 Jul 2020 07:42:44 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:4422 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1728058AbgGTLmo (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 20 Jul 2020 07:42:44 -0400
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 06KBXe1p177137;
+        Mon, 20 Jul 2020 07:42:42 -0400
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 32d2m34cjx-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 20 Jul 2020 07:42:42 -0400
+Received: from m0098404.ppops.net (m0098404.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 06KBZOhA183321;
+        Mon, 20 Jul 2020 07:42:41 -0400
+Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 32d2m34cj0-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 20 Jul 2020 07:42:41 -0400
+Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
+        by ppma06ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 06KBfhJY024799;
+        Mon, 20 Jul 2020 11:42:39 GMT
+Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
+        by ppma06ams.nl.ibm.com with ESMTP id 32brbh2kdt-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 20 Jul 2020 11:42:39 +0000
+Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
+        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 06KBgaDS63176836
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 20 Jul 2020 11:42:36 GMT
+Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id CE69E5204F;
+        Mon, 20 Jul 2020 11:42:36 +0000 (GMT)
+Received: from localhost.localdomain (unknown [9.145.20.48])
+        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 5BB0C52051;
+        Mon, 20 Jul 2020 11:42:36 +0000 (GMT)
+Subject: Re: [kvm-unit-tests PATCH 3/3] s390x: Ultavisor guest API test
+To:     Claudio Imbrenda <imbrenda@linux.ibm.com>
+Cc:     kvm@vger.kernel.org, thuth@redhat.com, linux-s390@vger.kernel.org,
+        david@redhat.com, borntraeger@de.ibm.com, cohuck@redhat.com
+References: <20200717145813.62573-1-frankja@linux.ibm.com>
+ <20200717145813.62573-4-frankja@linux.ibm.com>
+ <20200720124938.556220fe@ibm-vm>
+From:   Janosch Frank <frankja@linux.ibm.com>
+Autocrypt: addr=frankja@linux.ibm.com; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <36472fe5-9c74-12c0-8a67-1aea09995aba@linux.ibm.com>
+Date:   Mon, 20 Jul 2020 13:42:35 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.0
+MIME-Version: 1.0
+In-Reply-To: <20200720124938.556220fe@ibm-vm>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="Czr7U9lTXJz9JceWpQwYktjrdbGJ48k4f"
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
+ definitions=2020-07-20_07:2020-07-20,2020-07-20 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 adultscore=0
+ clxscore=1015 suspectscore=2 phishscore=0 spamscore=0 lowpriorityscore=0
+ mlxlogscore=999 bulkscore=0 priorityscore=1501 impostorscore=0 mlxscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
+ definitions=main-2007200081
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--Czr7U9lTXJz9JceWpQwYktjrdbGJ48k4f
+Content-Type: multipart/mixed; boundary="z9AO3NxIdeO7k4GIr24FDkgCCwN6PMKC7"
 
-On Mon, Jul 20, 2020 at 11:27 AM Michael S. Tsirkin <mst@redhat.com> wrote:
-> On Thu, Jul 16, 2020 at 07:16:27PM +0200, Eugenio Perez Martin wrote:
-> > On Fri, Jul 10, 2020 at 7:58 AM Michael S. Tsirkin <mst@redhat.com> wrote:
-> > > On Fri, Jul 10, 2020 at 07:39:26AM +0200, Eugenio Perez Martin wrote:
-> > > > > > How about playing with the batch size? Make it a mod parameter instead
-> > > > > > of the hard coded 64, and measure for all values 1 to 64 ...
-> > > > > 
-> > > > > Right, according to the test result, 64 seems to be too aggressive in
-> > > > > the case of TX.
-> > > > > 
-> > > > 
-> > > > Got it, thanks both!
-> > > 
-> > > In particular I wonder whether with batch size 1
-> > > we get same performance as without batching
-> > > (would indicate 64 is too aggressive)
-> > > or not (would indicate one of the code changes
-> > > affects performance in an unexpected way).
-> > > 
-> > > --
-> > > MST
-> > > 
-> > 
-> > Hi!
-> > 
-> > Varying batch_size as drivers/vhost/net.c:VHOST_NET_BATCH,
-> 
-> sorry this is not what I meant.
-> 
-> I mean something like this:
-> 
-> 
-> diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
-> index 0b509be8d7b1..b94680e5721d 100644
-> --- a/drivers/vhost/net.c
-> +++ b/drivers/vhost/net.c
-> @@ -1279,6 +1279,10 @@ static void handle_rx_net(struct vhost_work *work)
->         handle_rx(net);
->  }
-> 
-> +MODULE_PARM_DESC(batch_num, "Number of batched descriptors. (offset from 64)");
-> +module_param(batch_num, int, 0644);
-> +static int batch_num = 0;
-> +
->  static int vhost_net_open(struct inode *inode, struct file *f)
->  {
->         struct vhost_net *n;
-> @@ -1333,7 +1337,7 @@ static int vhost_net_open(struct inode *inode, struct file *f)
->                 vhost_net_buf_init(&n->vqs[i].rxq);
->         }
->         vhost_dev_init(dev, vqs, VHOST_NET_VQ_MAX,
-> -                      UIO_MAXIOV + VHOST_NET_BATCH,
-> +                      UIO_MAXIOV + VHOST_NET_BATCH + batch_num,
->                        VHOST_NET_PKT_WEIGHT, VHOST_NET_WEIGHT, true,
->                        NULL);
-> 
-> 
-> then you can try tweaking batching and playing with mod parameter without
-> recompiling.
-> 
-> 
-> VHOST_NET_BATCH affects lots of other things.
-> 
+--z9AO3NxIdeO7k4GIr24FDkgCCwN6PMKC7
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-Ok, got it. Since they were aligned from the start, I thought it was a good idea to maintain them in-sync.
+On 7/20/20 12:49 PM, Claudio Imbrenda wrote:
+> On Fri, 17 Jul 2020 10:58:13 -0400
+> Janosch Frank <frankja@linux.ibm.com> wrote:
+>=20
+>> Test the error conditions of guest 2 Ultravisor calls, namely:
+>>      * Query Ultravisor information
+>>      * Set shared access
+>>      * Remove shared access
+>>
+>> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+>> ---
+>>  lib/s390x/asm/uv.h  |  68 +++++++++++++++++++
+>>  s390x/Makefile      |   1 +
+>>  s390x/unittests.cfg |   3 +
+>>  s390x/uv-guest.c    | 156
+>> ++++++++++++++++++++++++++++++++++++++++++++ 4 files changed, 228
+>> insertions(+) create mode 100644 lib/s390x/asm/uv.h
+>>  create mode 100644 s390x/uv-guest.c
+>>
+>> diff --git a/lib/s390x/asm/uv.h b/lib/s390x/asm/uv.h
+>> new file mode 100644
+>> index 0000000..14ab5cc
+>> --- /dev/null
+>> +++ b/lib/s390x/asm/uv.h
+>> @@ -0,0 +1,68 @@
+>> +/*
+>> + * s390x Ultravisor related definitions
+>> + *
+>> + * Copyright (c) 2020 IBM Corp
+>> + *
+>> + * Authors:
+>> + *  Janosch Frank <frankja@linux.ibm.com>
+>> + *
+>> + * This code is free software; you can redistribute it and/or modify
+>> it
+>> + * under the terms of the GNU General Public License version 2.
+>> + */
+>> +#ifndef UV_H
+>> +#define UV_H
+>> +
+>> +#define UVC_RC_EXECUTED		0x0001
+>> +#define UVC_RC_INV_CMD		0x0002
+>> +#define UVC_RC_INV_STATE	0x0003
+>> +#define UVC_RC_INV_LEN		0x0005
+>> +#define UVC_RC_NO_RESUME	0x0007
+>> +
+>> +#define UVC_CMD_QUI			0x0001
+>> +#define UVC_CMD_SET_SHARED_ACCESS	0x1000
+>> +#define UVC_CMD_REMOVE_SHARED_ACCESS	0x1001
+>> +
+>> +/* Bits in installed uv calls */
+>> +enum uv_cmds_inst {
+>> +	BIT_UVC_CMD_QUI =3D 0,
+>> +	BIT_UVC_CMD_SET_SHARED_ACCESS =3D 8,
+>> +	BIT_UVC_CMD_REMOVE_SHARED_ACCESS =3D 9,
+>> +};
+>> +
+>> +struct uv_cb_header {
+>> +	u16 len;
+>> +	u16 cmd;	/* Command Code */
+>> +	u16 rc;		/* Response Code */
+>> +	u16 rrc;	/* Return Reason Code */
+>> +} __attribute__((packed))  __attribute__((aligned(8)));
+>> +
+>> +struct uv_cb_qui {
+>> +	struct uv_cb_header header;
+>> +	u64 reserved08;
+>> +	u64 inst_calls_list[4];
+>> +	u64 reserved30[15];
+>> +} __attribute__((packed))  __attribute__((aligned(8)));
+>> +
+>> +struct uv_cb_share {
+>> +	struct uv_cb_header header;
+>> +	u64 reserved08[3];
+>> +	u64 paddr;
+>> +	u64 reserved28;
+>> +} __attribute__((packed))  __attribute__((aligned(8)));
+>> +
+>> +static inline int uv_call(unsigned long r1, unsigned long r2)
+>> +{
+>> +	int cc;
+>> +
+>> +	asm volatile(
+>> +		"0:	.insn rrf,0xB9A40000,%[r1],%[r2],0,0\n"
+>> +		"		brc	3,0b\n"
+>> +		"		ipm	%[cc]\n"
+>> +		"		srl	%[cc],28\n"
+>> +		: [cc] "=3Dd" (cc)
+>> +		: [r1] "a" (r1), [r2] "a" (r2)
+>> +		: "memory", "cc");
+>> +	return cc;
+>> +}
+>> +
+>> +#endif
+>> diff --git a/s390x/Makefile b/s390x/Makefile
+>> index 0f54bf4..c2213ad 100644
+>> --- a/s390x/Makefile
+>> +++ b/s390x/Makefile
+>> @@ -18,6 +18,7 @@ tests +=3D $(TEST_DIR)/skrf.elf
+>>  tests +=3D $(TEST_DIR)/smp.elf
+>>  tests +=3D $(TEST_DIR)/sclp.elf
+>>  tests +=3D $(TEST_DIR)/css.elf
+>> +tests +=3D $(TEST_DIR)/uv-guest.elf
+>>  tests_binary =3D $(patsubst %.elf,%.bin,$(tests))
+>> =20
+>>  all: directories test_cases test_cases_binary
+>> diff --git a/s390x/unittests.cfg b/s390x/unittests.cfg
+>> index b35269b..38c3257 100644
+>> --- a/s390x/unittests.cfg
+>> +++ b/s390x/unittests.cfg
+>> @@ -92,3 +92,6 @@ extra_params =3D -device virtio-net-ccw
+>>  [skrf]
+>>  file =3D skrf.elf
+>>  smp =3D 2
+>> +
+>> +[uv-guest]
+>> +file =3D uv-guest.elf
+>> \ No newline at end of file
+>> diff --git a/s390x/uv-guest.c b/s390x/uv-guest.c
+>> new file mode 100644
+>> index 0000000..0cb5fae
+>> --- /dev/null
+>> +++ b/s390x/uv-guest.c
+>> @@ -0,0 +1,156 @@
+>> +/*
+>> + * Guest Ultravisor Call tests
+>> + *
+>> + * Copyright (c) 2020 IBM Corp
+>> + *
+>> + * Authors:
+>> + *  Janosch Frank <frankja@linux.ibm.com>
+>> + *
+>> + * This code is free software; you can redistribute it and/or modify
+>> it
+>> + * under the terms of the GNU General Public License version 2.
+>> + */
+>> +
+>> +#include <libcflat.h>
+>> +#include <alloc_page.h>
+>> +#include <asm/page.h>
+>> +#include <asm/asm-offsets.h>
+>> +#include <asm/interrupt.h>
+>> +#include <asm/facility.h>
+>> +#include <asm/uv.h>
+>> +
+>> +static inline int share(unsigned long addr, u16 cmd)
+>> +{
+>> +	struct uv_cb_share uvcb =3D {
+>> +		.header.cmd =3D cmd,
+>> +		.header.len =3D sizeof(uvcb),
+>> +		.paddr =3D addr
+>> +	};
+>> +
+>> +	uv_call(0, (u64)&uvcb);
+>> +	return uvcb.header.rc;
+>> +}
+>> +
+>> +static inline int uv_set_shared(unsigned long addr)
+>> +{
+>> +	return share(addr, UVC_CMD_SET_SHARED_ACCESS);
+>> +}
+>> +
+>> +static inline int uv_remove_shared(unsigned long addr)
+>> +{
+>> +	return share(addr, UVC_CMD_REMOVE_SHARED_ACCESS);
+>> +}
+>> +
+>> +static void test_priv(void)
+>> +{
+>> +	struct uv_cb_header uvcb =3D {};
+>> +
+>> +	report_prefix_push("privileged");
+>> +
+>> +	report_prefix_push("query");
+>> +	expect_pgm_int();
+>> +	uvcb.cmd =3D UVC_CMD_QUI;
+>> +	uvcb.len =3D sizeof(struct uv_cb_qui);
+>> +	enter_pstate();
+>> +	uv_call(0, (u64)&uvcb);
+>> +	check_pgm_int_code(PGM_INT_CODE_PRIVILEGED_OPERATION);
+>> +	report_prefix_pop();
+>> +
+>> +	report_prefix_push("share");
+>> +	expect_pgm_int();
+>> +	enter_pstate();
+>> +	uv_set_shared(0x42000);
+>> +	check_pgm_int_code(PGM_INT_CODE_PRIVILEGED_OPERATION);
+>> +	report_prefix_pop();
+>> +
+>> +	report_prefix_push("unshare");
+>> +	expect_pgm_int();
+>> +	enter_pstate();
+>> +	uv_remove_shared(0x42000);
+>=20
+> I don't like using a hardwired address here (and above). Things can get=
 
-> > and testing
-> > the pps as previous mail says. This means that we have either only
-> > vhost_net batching (in base testing, like previously to apply this
-> > patch) or both batching sizes the same.
-> > 
-> > I've checked that vhost process (and pktgen) goes 100% cpu also.
-> > 
-> > For tx: Batching decrements always the performance, in all cases. Not
-> > sure why bufapi made things better the last time.
-> > 
-> > Batching makes improvements until 64 bufs, I see increments of pps but like 1%.
-> > 
-> > For rx: Batching always improves performance. It seems that if we
-> > batch little, bufapi decreases performance, but beyond 64, bufapi is
-> > much better. The bufapi version keeps improving until I set a batching
-> > of 1024. So I guess it is super good to have a bunch of buffers to
-> > receive.
-> > 
-> > Since with this test I cannot disable event_idx or things like that,
-> > what would be the next step for testing?
-> > 
-> > Thanks!
-> > 
-> > --
-> > Results:
-> > # Buf size: 1,16,32,64,128,256,512
-> > 
-> > # Tx
-> > # ===
-> > # Base
-> > 2293304.308,3396057.769,3540860.615,3636056.077,3332950.846,3694276.154,3689820
-> > # Batch
-> > 2286723.857,3307191.643,3400346.571,3452527.786,3460766.857,3431042.5,3440722.286
-> > # Batch + Bufapi
-> > 2257970.769,3151268.385,3260150.538,3379383.846,3424028.846,3433384.308,3385635.231,3406554.538
-> > 
-> > # Rx
-> > # ==
-> > # pktgen results (pps)
-> > 1223275,1668868,1728794,1769261,1808574,1837252,1846436
-> > 1456924,1797901,1831234,1868746,1877508,1931598,1936402
-> > 1368923,1719716,1794373,1865170,1884803,1916021,1975160
-> > 
-> > # Testpmd pps results
-> > 1222698.143,1670604,1731040.6,1769218,1811206,1839308.75,1848478.75
-> > 1450140.5,1799985.75,1834089.75,1871290,1880005.5,1934147.25,1939034
-> > 1370621,1721858,1796287.75,1866618.5,1885466.5,1918670.75,1976173.5,1988760.75,1978316
-> > 
-> > pktgen was run again for rx with 1024 and 2048 buf size, giving
-> > 1988760.75 and 1978316 pps. Testpmd goes the same way.
-> 
-> Don't really understand what does this data mean.
-> Which number of descs is batched for each run?
-> 
+> messy if the address ends up outside memory or overlapping code.
+>=20
+> I think the best approach would be to declare a page aligned buffer and=
 
-Sorry, I should have explained better. I will expand here, but feel free to skip it since we are going to discard the
-data anyway. Or to propose a better way to tell them.
+> use that (or even allocate a page)=20
 
-Is a CSV with the values I've obtained, in pps, from pktgen and testpmd. This way is easy to plot them.
+Sure, will do
 
-Maybe is easier as tables, if mail readers/gmail does not misalign them.
+>=20
+>> +	check_pgm_int_code(PGM_INT_CODE_PRIVILEGED_OPERATION);
+>> +	report_prefix_pop();
+>> +
+>> +	report_prefix_pop();
+>> +}
+>> +
+>> +static void test_query(void)
+>> +{
+>> +	struct uv_cb_qui uvcb =3D {
+>> +		.header.cmd =3D UVC_CMD_QUI,
+>> +		.header.len =3D sizeof(uvcb) - 8,
+>> +	};
+>> +
+>> +	report_prefix_push("query");
+>> +	uv_call(0, (u64)&uvcb);
+>> +	report(uvcb.header.rc =3D=3D UVC_RC_INV_LEN, "length");
+>> +
+>> +	uvcb.header.len =3D sizeof(uvcb);
+>> +	uv_call(0, (u64)&uvcb);
+>> +	report(uvcb.header.rc =3D=3D UVC_RC_EXECUTED, "successful
+>> query"); +
+>> +	/*
+>> +	 * These bits have been introduced with the very first
+>> +	 * Ultravisor version and are expected to always be available
+>> +	 * because they are basic building blocks.
+>> +	 */
+>> +	report(uvcb.inst_calls_list[0] & (1UL << (63 -
+>> BIT_UVC_CMD_QUI)),
+>> +	       "query indicated");
+>> +	report(uvcb.inst_calls_list[0] & (1UL << (63 -
+>> BIT_UVC_CMD_SET_SHARED_ACCESS)),
+>> +	       "share indicated");
+>> +	report(uvcb.inst_calls_list[0] & (1UL << (63 -
+>> BIT_UVC_CMD_REMOVE_SHARED_ACCESS)),
+>> +	       "unshare indicated");
+>> +	report_prefix_pop();
+>> +}
+>> +
+>> +static void test_sharing(void)
+>> +{
+>> +	unsigned long mem =3D (unsigned long)alloc_page();
+>> +	struct uv_cb_share uvcb =3D {
+>> +		.header.cmd =3D UVC_CMD_SET_SHARED_ACCESS,
+>> +		.header.len =3D sizeof(uvcb) - 8,
+>> +	};
+>> +
+>> +	report_prefix_push("share");
+>> +	uv_call(0, (u64)&uvcb);
+>> +	report(uvcb.header.rc =3D=3D UVC_RC_INV_LEN, "length");
+>> +	report(uv_set_shared(mem) =3D=3D UVC_RC_EXECUTED, "share");
+>> +	report_prefix_pop();
+>> +
+>> +	report_prefix_push("unshare");
+>> +	uvcb.header.cmd =3D UVC_CMD_REMOVE_SHARED_ACCESS;
+>> +	uv_call(0, (u64)&uvcb);
+>> +	report(uvcb.header.rc =3D=3D UVC_RC_INV_LEN, "length");
+>> +	report(uv_remove_shared(mem) =3D=3D UVC_RC_EXECUTED, "unshare");
+>> +	free_page((void *)mem);
+>> +	report_prefix_pop();
+>> +
+>> +	report_prefix_pop();
+>> +}
+>> +
+>> +static void test_invalid(void)
+>> +{
+>> +	struct uv_cb_header uvcb =3D {
+>> +		.len =3D 16,
+>> +		.cmd =3D 0x4242,
+>> +	};
+>> +
+>> +	uv_call(0, (u64)&uvcb);
+>> +	report(uvcb.rc =3D=3D UVC_RC_INV_CMD, "invalid command");
+>> +}
+>> +
+>> +int main(void)
+>> +{
+>> +	bool has_uvc =3D test_facility(158);
+>> +
+>> +	report_prefix_push("uvc");
+>> +	if (!has_uvc) {
+>> +		report_skip("Ultravisor call facility is not
+>> available");
+>> +		goto done;
+>> +	}
+>> +
+>> +	test_priv();
+>> +	test_invalid();
+>> +	test_query();
+>> +	test_sharing();
+>> +done:
+>> +	return report_summary();
+>> +}
+>=20
+> once the above comment is addressed:
+> Claudio Imbrenda <imbrenda@linux.ibm.com>
+>=20
+?
 
-> > # Tx
-> > # ===
 
-Base: With the previous code, not integrating any patch. testpmd is txonly mode, tap interface is XDP_DROP everything.
-We vary VHOST_NET_BATCH (1, 16, 32, ...). As Jason put in a previous mail:
+--z9AO3NxIdeO7k4GIr24FDkgCCwN6PMKC7--
 
-TX: testpmd(txonly) -> virtio-user -> vhost_net -> XDP_DROP on TAP
+--Czr7U9lTXJz9JceWpQwYktjrdbGJ48k4f
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
+-----BEGIN PGP SIGNATURE-----
 
-     1     |     16     |     32     |     64     |     128    |    256     |   512  |
-2293304.308| 3396057.769| 3540860.615| 3636056.077| 3332950.846| 3694276.154| 3689820|
+iQIzBAEBCAAdFiEEwGNS88vfc9+v45Yq41TmuOI4ufgFAl8VgysACgkQ41TmuOI4
+ufi0DBAAr9BlpqaNkx1PTsi1jM11Yej8x6BNVHU0lhEi27ePG9rz2F7J06cUcmvM
+MbXB+8hD/j6nUUJGkUY+LUgqd/A6S1lWjqQNMKu5QsgNslUKQF30t7Tdb8mZiQDh
+xRoNRk7m564dzuw/dOVWduhuefDZWaNW5x6b9a5Y4GHlAOUq27B5XGLC+p++hDbl
+39F/IMWIP2GaE9ey8JeuBI2nmi2+LZz6upwWBQ9xMNN2HThGW/GtrV9Aey647YRb
+gwvD0cl0tOytNv8rn36Ba8AGQHmzdGn21dp69QhiyCU+NTs5RuYfqxoB+U2pVjPn
+1kAkJjo6IRTQsxPHAR3utDTb5UI0+1aoZtQvMGPitkhCIivY5zagxnAuWchdb5rp
+M4UrcY7PoRizRZvQ9lS20VAWD0z9u52u3FxOM8SFVKqX+u9dd6Tt10heBgJVn8aJ
+sZ+IN8LXhrww26Xi4eUfQF2jxXU/9qwSHeMrpnV8VDIPs3H2dnVgYVX7AI6An+KO
+KxUe99HARx+Zjh3R002VRERDZP26WY7A2qjIV5yXYyMjkKLCliBP7BiGkR1Z+PGO
+tzyGbvgdEGjUsZq7ly+jFVndYH1jILmrrZ7ofRu/sFwZJZu3Tp3e3BJvF6aWSIuN
+UakLYRS0R/zZ3MHRoqNpiRLpffc53wKOspKtnHrzFQY8EbQJ15s=
+=kDVc
+-----END PGP SIGNATURE-----
 
-If we add the batching part of the series, but not the bufapi:
-
-      1     |     16     |     32     |     64     |     128    |    256    |     512    |
-2286723.857 | 3307191.643| 3400346.571| 3452527.786| 3460766.857| 3431042.5 | 3440722.286|
-
-And if we add the bufapi part, i.e., all the series:
-
-      1    |     16     |     32     |     64     |     128    |     256    |     512    |    1024
-2257970.769| 3151268.385| 3260150.538| 3379383.846| 3424028.846| 3433384.308| 3385635.231| 3406554.538
-
-For easier treatment, all in the same table:
-
-     1      |     16      |     32      |      64     |     128     |    256      |   512      |    1024
-------------+-------------+-------------+-------------+-------------+-------------+------------+------------
-2293304.308 | 3396057.769 | 3540860.615 | 3636056.077 | 3332950.846 | 3694276.154 | 3689820    |
-2286723.857 | 3307191.643 | 3400346.571 | 3452527.786 | 3460766.857 | 3431042.5   | 3440722.286|
-2257970.769 | 3151268.385 | 3260150.538 | 3379383.846 | 3424028.846 | 3433384.308 | 3385635.231| 3406554.538
- 
-> > # Rx
-> > # ==
-
-The rx tests are done with pktgen injecting packets in tap interface, and testpmd in rxonly forward mode. Again, each
-column is a different value of VHOST_NET_BATCH, and each row is base, +batching, and +buf_api:
-
-> > # pktgen results (pps)
-
-(Didn't record extreme cases like >512 bufs batching)
-
-   1   |   16   |   32   |   64   |   128  |  256   |   512
--------+--------+--------+--------+--------+--------+--------
-1223275| 1668868| 1728794| 1769261| 1808574| 1837252| 1846436
-1456924| 1797901| 1831234| 1868746| 1877508| 1931598| 1936402
-1368923| 1719716| 1794373| 1865170| 1884803| 1916021| 1975160
-
-> > # Testpmd pps results
-
-      1     |     16     |     32     |     64    |    128    |    256     |    512     |    1024    |   2048
-------------+------------+------------+-----------+-----------+------------+------------+------------+---------
-1222698.143 | 1670604    | 1731040.6  | 1769218   | 1811206   | 1839308.75 | 1848478.75 |
-1450140.5   | 1799985.75 | 1834089.75 | 1871290   | 1880005.5 | 1934147.25 | 1939034    |
-1370621     | 1721858    | 1796287.75 | 1866618.5 | 1885466.5 | 1918670.75 | 1976173.5  | 1988760.75 | 1978316
-
-The last extreme cases (>512 bufs batched) were recorded just for the bufapi case.
-
-Does that make sense now?
-
-Thanks!
+--Czr7U9lTXJz9JceWpQwYktjrdbGJ48k4f--
 
