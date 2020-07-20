@@ -2,186 +2,387 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 86D8D226071
-	for <lists+kvm@lfdr.de>; Mon, 20 Jul 2020 15:08:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F0C912260DB
+	for <lists+kvm@lfdr.de>; Mon, 20 Jul 2020 15:24:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727094AbgGTNIY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 20 Jul 2020 09:08:24 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:49969 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1725815AbgGTNIY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 20 Jul 2020 09:08:24 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1595250502;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=ZnI6z9XD4HROXBuf4ZFEC55TsWlw3nYumyPptKBD5+U=;
-        b=a8eXAjIK8yMU7NyqWyDSnIAQ5HJuxdho2XePJMWP0NYLhS2MMmSU0peWYUQtas99YlhRSn
-        F6lL+h1dP68H57yKGKSULH19pwWBOQydWLTvR4tNBIGKcuLgPU5iNVJ/Rt0J16P2j9L9Ey
-        pN1TSueWPWqT+dDzbJiLRltmsKK42U0=
-Received: from mail-qv1-f71.google.com (mail-qv1-f71.google.com
- [209.85.219.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-294-g-D3yQXGOWuMU0CNcTio4w-1; Mon, 20 Jul 2020 09:08:20 -0400
-X-MC-Unique: g-D3yQXGOWuMU0CNcTio4w-1
-Received: by mail-qv1-f71.google.com with SMTP id k3so10088100qvm.11
-        for <kvm@vger.kernel.org>; Mon, 20 Jul 2020 06:08:20 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=ZnI6z9XD4HROXBuf4ZFEC55TsWlw3nYumyPptKBD5+U=;
-        b=GDU2expsnz2RcnFPLyeG6Asgj5Gn6JXROo5AGUB4qWZtX8FmQ8W7bCXUCEu/QPqvPS
-         Rtsl/fp4AtzJCZs96S5IYvqtm4le8OORUelr8D4iaogJMxBz5kaBo6yZcCVXpUJemtYy
-         8v0abkHTpHdztkTFLWBpZ2a01oszAXUT3FwPTlAz6mD1GBvJ/Iq2WxvCn351TZjC93x5
-         rHQaI7tCfBwCwxpJle7vKARNjEqKH/tAmZyInV7UaB5tSHVZkYkon2eDn3IxcUDOwFQt
-         abOCz8WvFq0QxjGedNkM77Oh1WndEdN58EPiyffPvuC6O6cm5Cqb0+3SLzN20nQINutB
-         90LA==
-X-Gm-Message-State: AOAM530nyTRPcZ5sbZk8cutAhJhohV8NqLCu0cJ6Xo7G57tW6fmPJvFv
-        p5NZlPRXM9kgOAW1QrNIQriP3QnO3H5eXFStonJKQYB2HeGSf151i+3Y0X0HxyMpzt/eEEmnrBT
-        /+1jTE32rnBuCUbzZ/c8viuAxcsW8
-X-Received: by 2002:a37:8305:: with SMTP id f5mr9965766qkd.497.1595250500206;
-        Mon, 20 Jul 2020 06:08:20 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJx+qL5VQ7P0iLbnRiSz18JGObnRiei2eT7j7NLOkvfJpRf4REAM1dZ7Q/8SKrI8G1PKv7Jbhz05Pv7AXpAZZlg=
-X-Received: by 2002:a37:8305:: with SMTP id f5mr9965728qkd.497.1595250499886;
- Mon, 20 Jul 2020 06:08:19 -0700 (PDT)
+        id S1728333AbgGTNYt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 20 Jul 2020 09:24:49 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:52248 "EHLO
+        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1728225AbgGTNYs (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 20 Jul 2020 09:24:48 -0400
+Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 06KD3gd8068408;
+        Mon, 20 Jul 2020 09:24:47 -0400
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 32d91u5a6j-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 20 Jul 2020 09:24:46 -0400
+Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 06KD3lAb068592;
+        Mon, 20 Jul 2020 09:24:46 -0400
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 32d91u5a5t-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 20 Jul 2020 09:24:46 -0400
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 06KDFHAh010199;
+        Mon, 20 Jul 2020 13:24:44 GMT
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
+        by ppma03ams.nl.ibm.com with ESMTP id 32brq7jptv-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 20 Jul 2020 13:24:44 +0000
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
+        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 06KDOfVs31588670
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 20 Jul 2020 13:24:41 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id A711AAE045;
+        Mon, 20 Jul 2020 13:24:41 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 38D24AE061;
+        Mon, 20 Jul 2020 13:24:41 +0000 (GMT)
+Received: from ibm-vm (unknown [9.145.8.245])
+        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Mon, 20 Jul 2020 13:24:41 +0000 (GMT)
+Date:   Mon, 20 Jul 2020 15:24:38 +0200
+From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
+To:     Janosch Frank <frankja@linux.ibm.com>
+Cc:     kvm@vger.kernel.org, thuth@redhat.com, linux-s390@vger.kernel.org,
+        david@redhat.com, borntraeger@de.ibm.com, cohuck@redhat.com
+Subject: Re: [kvm-unit-tests PATCH 3/3] s390x: Ultavisor guest API test
+Message-ID: <20200720152438.588e712f@ibm-vm>
+In-Reply-To: <36472fe5-9c74-12c0-8a67-1aea09995aba@linux.ibm.com>
+References: <20200717145813.62573-1-frankja@linux.ibm.com>
+        <20200717145813.62573-4-frankja@linux.ibm.com>
+        <20200720124938.556220fe@ibm-vm>
+        <36472fe5-9c74-12c0-8a67-1aea09995aba@linux.ibm.com>
+Organization: IBM
+X-Mailer: Claws Mail 3.17.5 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-References: <20200622122546-mutt-send-email-mst@kernel.org>
- <CAJaqyWfbouY4kEXkc6sYsbdCAEk0UNsS5xjqEdHTD7bcTn40Ow@mail.gmail.com>
- <CAJaqyWefMHPguj8ZGCuccTn0uyKxF9ZTEi2ASLtDSjGNb1Vwsg@mail.gmail.com>
- <419cc689-adae-7ba4-fe22-577b3986688c@redhat.com> <CAJaqyWedEg9TBkH1MxGP1AecYHD-e-=ugJ6XUN+CWb=rQGf49g@mail.gmail.com>
- <0a83aa03-8e3c-1271-82f5-4c07931edea3@redhat.com> <CAJaqyWeqF-KjFnXDWXJ2M3Hw3eQeCEE2-7p1KMLmMetMTm22DQ@mail.gmail.com>
- <20200709133438-mutt-send-email-mst@kernel.org> <7dec8cc2-152c-83f4-aa45-8ef9c6aca56d@redhat.com>
- <CAJaqyWdLOH2EceTUduKYXCQUUNo1XQ1tLgjYHTBGhtdhBPHn_Q@mail.gmail.com>
- <20200710015615-mutt-send-email-mst@kernel.org> <CAJaqyWf1skGxrjuT9GLr6dtgd-433y-rCkbtStLHaAs2W2jYXA@mail.gmail.com>
- <595d4cf3-2b15-8900-e714-f3ebd8d8ca2e@redhat.com>
-In-Reply-To: <595d4cf3-2b15-8900-e714-f3ebd8d8ca2e@redhat.com>
-From:   Eugenio Perez Martin <eperezma@redhat.com>
-Date:   Mon, 20 Jul 2020 15:07:43 +0200
-Message-ID: <CAJaqyWfr0xQQNFptQbt1mVHrBGnFHjU3Qme-hsXNHkEkC6OkBQ@mail.gmail.com>
-Subject: Re: [PATCH RFC v8 02/11] vhost: use batched get_vq_desc version
-To:     Jason Wang <jasowang@redhat.com>
-Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
-        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        linux-kernel@vger.kernel.org, kvm list <kvm@vger.kernel.org>,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
+ definitions=2020-07-20_07:2020-07-20,2020-07-20 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 malwarescore=0
+ spamscore=0 priorityscore=1501 impostorscore=0 mlxscore=0 bulkscore=0
+ lowpriorityscore=0 adultscore=0 suspectscore=2 clxscore=1015
+ mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2006250000 definitions=main-2007200086
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jul 20, 2020 at 10:55 AM Jason Wang <jasowang@redhat.com> wrote:
->
->
-> On 2020/7/17 =E4=B8=8A=E5=8D=881:16, Eugenio Perez Martin wrote:
-> > On Fri, Jul 10, 2020 at 7:58 AM Michael S. Tsirkin <mst@redhat.com> wro=
-te:
-> >> On Fri, Jul 10, 2020 at 07:39:26AM +0200, Eugenio Perez Martin wrote:
-> >>>>> How about playing with the batch size? Make it a mod parameter inst=
-ead
-> >>>>> of the hard coded 64, and measure for all values 1 to 64 ...
-> >>>>
-> >>>> Right, according to the test result, 64 seems to be too aggressive i=
-n
-> >>>> the case of TX.
-> >>>>
-> >>> Got it, thanks both!
-> >> In particular I wonder whether with batch size 1
-> >> we get same performance as without batching
-> >> (would indicate 64 is too aggressive)
-> >> or not (would indicate one of the code changes
-> >> affects performance in an unexpected way).
+On Mon, 20 Jul 2020 13:42:35 +0200
+Janosch Frank <frankja@linux.ibm.com> wrote:
+
+> On 7/20/20 12:49 PM, Claudio Imbrenda wrote:
+> > On Fri, 17 Jul 2020 10:58:13 -0400
+> > Janosch Frank <frankja@linux.ibm.com> wrote:
+> >   
+> >> Test the error conditions of guest 2 Ultravisor calls, namely:
+> >>      * Query Ultravisor information
+> >>      * Set shared access
+> >>      * Remove shared access
 > >>
-> >> --
-> >> MST
+> >> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+> >> ---
+> >>  lib/s390x/asm/uv.h  |  68 +++++++++++++++++++
+> >>  s390x/Makefile      |   1 +
+> >>  s390x/unittests.cfg |   3 +
+> >>  s390x/uv-guest.c    | 156
+> >> ++++++++++++++++++++++++++++++++++++++++++++ 4 files changed, 228
+> >> insertions(+) create mode 100644 lib/s390x/asm/uv.h
+> >>  create mode 100644 s390x/uv-guest.c
 > >>
-> > Hi!
-> >
-> > Varying batch_size as drivers/vhost/net.c:VHOST_NET_BATCH,
->
->
-> Did you mean varying the value of VHOST_NET_BATCH itself or the number
-> of batched descriptors?
->
->
-> > and testing
-> > the pps as previous mail says. This means that we have either only
-> > vhost_net batching (in base testing, like previously to apply this
-> > patch) or both batching sizes the same.
-> >
-> > I've checked that vhost process (and pktgen) goes 100% cpu also.
-> >
-> > For tx: Batching decrements always the performance, in all cases. Not
-> > sure why bufapi made things better the last time.
-> >
-> > Batching makes improvements until 64 bufs, I see increments of pps but =
-like 1%.
-> >
-> > For rx: Batching always improves performance. It seems that if we
-> > batch little, bufapi decreases performance, but beyond 64, bufapi is
-> > much better. The bufapi version keeps improving until I set a batching
-> > of 1024. So I guess it is super good to have a bunch of buffers to
-> > receive.
-> >
-> > Since with this test I cannot disable event_idx or things like that,
-> > what would be the next step for testing?
-> >
-> > Thanks!
-> >
-> > --
-> > Results:
-> > # Buf size: 1,16,32,64,128,256,512
-> >
-> > # Tx
-> > # =3D=3D=3D
-> > # Base
-> > 2293304.308,3396057.769,3540860.615,3636056.077,3332950.846,3694276.154=
-,3689820
->
->
-> What's the meaning of buf size in the context of "base"?
->
+> >> diff --git a/lib/s390x/asm/uv.h b/lib/s390x/asm/uv.h
+> >> new file mode 100644
+> >> index 0000000..14ab5cc
+> >> --- /dev/null
+> >> +++ b/lib/s390x/asm/uv.h
+> >> @@ -0,0 +1,68 @@
+> >> +/*
+> >> + * s390x Ultravisor related definitions
+> >> + *
+> >> + * Copyright (c) 2020 IBM Corp
+> >> + *
+> >> + * Authors:
+> >> + *  Janosch Frank <frankja@linux.ibm.com>
+> >> + *
+> >> + * This code is free software; you can redistribute it and/or
+> >> modify it
+> >> + * under the terms of the GNU General Public License version 2.
+> >> + */
+> >> +#ifndef UV_H
+> >> +#define UV_H
+> >> +
+> >> +#define UVC_RC_EXECUTED		0x0001
+> >> +#define UVC_RC_INV_CMD		0x0002
+> >> +#define UVC_RC_INV_STATE	0x0003
+> >> +#define UVC_RC_INV_LEN		0x0005
+> >> +#define UVC_RC_NO_RESUME	0x0007
+> >> +
+> >> +#define UVC_CMD_QUI			0x0001
+> >> +#define UVC_CMD_SET_SHARED_ACCESS	0x1000
+> >> +#define UVC_CMD_REMOVE_SHARED_ACCESS	0x1001
+> >> +
+> >> +/* Bits in installed uv calls */
+> >> +enum uv_cmds_inst {
+> >> +	BIT_UVC_CMD_QUI = 0,
+> >> +	BIT_UVC_CMD_SET_SHARED_ACCESS = 8,
+> >> +	BIT_UVC_CMD_REMOVE_SHARED_ACCESS = 9,
+> >> +};
+> >> +
+> >> +struct uv_cb_header {
+> >> +	u16 len;
+> >> +	u16 cmd;	/* Command Code */
+> >> +	u16 rc;		/* Response Code */
+> >> +	u16 rrc;	/* Return Reason Code */
+> >> +} __attribute__((packed))  __attribute__((aligned(8)));
+> >> +
+> >> +struct uv_cb_qui {
+> >> +	struct uv_cb_header header;
+> >> +	u64 reserved08;
+> >> +	u64 inst_calls_list[4];
+> >> +	u64 reserved30[15];
+> >> +} __attribute__((packed))  __attribute__((aligned(8)));
+> >> +
+> >> +struct uv_cb_share {
+> >> +	struct uv_cb_header header;
+> >> +	u64 reserved08[3];
+> >> +	u64 paddr;
+> >> +	u64 reserved28;
+> >> +} __attribute__((packed))  __attribute__((aligned(8)));
+> >> +
+> >> +static inline int uv_call(unsigned long r1, unsigned long r2)
+> >> +{
+> >> +	int cc;
+> >> +
+> >> +	asm volatile(
+> >> +		"0:	.insn rrf,0xB9A40000,%[r1],%[r2],0,0\n"
+> >> +		"		brc	3,0b\n"
+> >> +		"		ipm	%[cc]\n"
+> >> +		"		srl	%[cc],28\n"
+> >> +		: [cc] "=d" (cc)
+> >> +		: [r1] "a" (r1), [r2] "a" (r2)
+> >> +		: "memory", "cc");
+> >> +	return cc;
+> >> +}
+> >> +
+> >> +#endif
+> >> diff --git a/s390x/Makefile b/s390x/Makefile
+> >> index 0f54bf4..c2213ad 100644
+> >> --- a/s390x/Makefile
+> >> +++ b/s390x/Makefile
+> >> @@ -18,6 +18,7 @@ tests += $(TEST_DIR)/skrf.elf
+> >>  tests += $(TEST_DIR)/smp.elf
+> >>  tests += $(TEST_DIR)/sclp.elf
+> >>  tests += $(TEST_DIR)/css.elf
+> >> +tests += $(TEST_DIR)/uv-guest.elf
+> >>  tests_binary = $(patsubst %.elf,%.bin,$(tests))
+> >>  
+> >>  all: directories test_cases test_cases_binary
+> >> diff --git a/s390x/unittests.cfg b/s390x/unittests.cfg
+> >> index b35269b..38c3257 100644
+> >> --- a/s390x/unittests.cfg
+> >> +++ b/s390x/unittests.cfg
+> >> @@ -92,3 +92,6 @@ extra_params = -device virtio-net-ccw
+> >>  [skrf]
+> >>  file = skrf.elf
+> >>  smp = 2
+> >> +
+> >> +[uv-guest]
+> >> +file = uv-guest.elf
+> >> \ No newline at end of file
+> >> diff --git a/s390x/uv-guest.c b/s390x/uv-guest.c
+> >> new file mode 100644
+> >> index 0000000..0cb5fae
+> >> --- /dev/null
+> >> +++ b/s390x/uv-guest.c
+> >> @@ -0,0 +1,156 @@
+> >> +/*
+> >> + * Guest Ultravisor Call tests
+> >> + *
+> >> + * Copyright (c) 2020 IBM Corp
+> >> + *
+> >> + * Authors:
+> >> + *  Janosch Frank <frankja@linux.ibm.com>
+> >> + *
+> >> + * This code is free software; you can redistribute it and/or
+> >> modify it
+> >> + * under the terms of the GNU General Public License version 2.
+> >> + */
+> >> +
+> >> +#include <libcflat.h>
+> >> +#include <alloc_page.h>
+> >> +#include <asm/page.h>
+> >> +#include <asm/asm-offsets.h>
+> >> +#include <asm/interrupt.h>
+> >> +#include <asm/facility.h>
+> >> +#include <asm/uv.h>
+> >> +
+> >> +static inline int share(unsigned long addr, u16 cmd)
+> >> +{
+> >> +	struct uv_cb_share uvcb = {
+> >> +		.header.cmd = cmd,
+> >> +		.header.len = sizeof(uvcb),
+> >> +		.paddr = addr
+> >> +	};
+> >> +
+> >> +	uv_call(0, (u64)&uvcb);
+> >> +	return uvcb.header.rc;
+> >> +}
+> >> +
+> >> +static inline int uv_set_shared(unsigned long addr)
+> >> +{
+> >> +	return share(addr, UVC_CMD_SET_SHARED_ACCESS);
+> >> +}
+> >> +
+> >> +static inline int uv_remove_shared(unsigned long addr)
+> >> +{
+> >> +	return share(addr, UVC_CMD_REMOVE_SHARED_ACCESS);
+> >> +}
+> >> +
+> >> +static void test_priv(void)
+> >> +{
+> >> +	struct uv_cb_header uvcb = {};
+> >> +
+> >> +	report_prefix_push("privileged");
+> >> +
+> >> +	report_prefix_push("query");
+> >> +	expect_pgm_int();
+> >> +	uvcb.cmd = UVC_CMD_QUI;
+> >> +	uvcb.len = sizeof(struct uv_cb_qui);
+> >> +	enter_pstate();
+> >> +	uv_call(0, (u64)&uvcb);
+> >> +	check_pgm_int_code(PGM_INT_CODE_PRIVILEGED_OPERATION);
+> >> +	report_prefix_pop();
+> >> +
+> >> +	report_prefix_push("share");
+> >> +	expect_pgm_int();
+> >> +	enter_pstate();
+> >> +	uv_set_shared(0x42000);
+> >> +	check_pgm_int_code(PGM_INT_CODE_PRIVILEGED_OPERATION);
+> >> +	report_prefix_pop();
+> >> +
+> >> +	report_prefix_push("unshare");
+> >> +	expect_pgm_int();
+> >> +	enter_pstate();
+> >> +	uv_remove_shared(0x42000);  
+> > 
+> > I don't like using a hardwired address here (and above). Things can
+> > get messy if the address ends up outside memory or overlapping code.
+> > 
+> > I think the best approach would be to declare a page aligned buffer
+> > and use that (or even allocate a page)   
+> 
+> Sure, will do
+> 
+> >   
+> >> +	check_pgm_int_code(PGM_INT_CODE_PRIVILEGED_OPERATION);
+> >> +	report_prefix_pop();
+> >> +
+> >> +	report_prefix_pop();
+> >> +}
+> >> +
+> >> +static void test_query(void)
+> >> +{
+> >> +	struct uv_cb_qui uvcb = {
+> >> +		.header.cmd = UVC_CMD_QUI,
+> >> +		.header.len = sizeof(uvcb) - 8,
+> >> +	};
+> >> +
+> >> +	report_prefix_push("query");
+> >> +	uv_call(0, (u64)&uvcb);
+> >> +	report(uvcb.header.rc == UVC_RC_INV_LEN, "length");
+> >> +
+> >> +	uvcb.header.len = sizeof(uvcb);
+> >> +	uv_call(0, (u64)&uvcb);
+> >> +	report(uvcb.header.rc == UVC_RC_EXECUTED, "successful
+> >> query"); +
+> >> +	/*
+> >> +	 * These bits have been introduced with the very first
+> >> +	 * Ultravisor version and are expected to always be
+> >> available
+> >> +	 * because they are basic building blocks.
+> >> +	 */
+> >> +	report(uvcb.inst_calls_list[0] & (1UL << (63 -
+> >> BIT_UVC_CMD_QUI)),
+> >> +	       "query indicated");
+> >> +	report(uvcb.inst_calls_list[0] & (1UL << (63 -
+> >> BIT_UVC_CMD_SET_SHARED_ACCESS)),
+> >> +	       "share indicated");
+> >> +	report(uvcb.inst_calls_list[0] & (1UL << (63 -
+> >> BIT_UVC_CMD_REMOVE_SHARED_ACCESS)),
+> >> +	       "unshare indicated");
+> >> +	report_prefix_pop();
+> >> +}
+> >> +
+> >> +static void test_sharing(void)
+> >> +{
+> >> +	unsigned long mem = (unsigned long)alloc_page();
+> >> +	struct uv_cb_share uvcb = {
+> >> +		.header.cmd = UVC_CMD_SET_SHARED_ACCESS,
+> >> +		.header.len = sizeof(uvcb) - 8,
+> >> +	};
+> >> +
+> >> +	report_prefix_push("share");
+> >> +	uv_call(0, (u64)&uvcb);
+> >> +	report(uvcb.header.rc == UVC_RC_INV_LEN, "length");
+> >> +	report(uv_set_shared(mem) == UVC_RC_EXECUTED, "share");
+> >> +	report_prefix_pop();
+> >> +
+> >> +	report_prefix_push("unshare");
+> >> +	uvcb.header.cmd = UVC_CMD_REMOVE_SHARED_ACCESS;
+> >> +	uv_call(0, (u64)&uvcb);
+> >> +	report(uvcb.header.rc == UVC_RC_INV_LEN, "length");
+> >> +	report(uv_remove_shared(mem) == UVC_RC_EXECUTED,
+> >> "unshare");
+> >> +	free_page((void *)mem);
+> >> +	report_prefix_pop();
+> >> +
+> >> +	report_prefix_pop();
+> >> +}
+> >> +
+> >> +static void test_invalid(void)
+> >> +{
+> >> +	struct uv_cb_header uvcb = {
+> >> +		.len = 16,
+> >> +		.cmd = 0x4242,
+> >> +	};
+> >> +
+> >> +	uv_call(0, (u64)&uvcb);
+> >> +	report(uvcb.rc == UVC_RC_INV_CMD, "invalid command");
+> >> +}
+> >> +
+> >> +int main(void)
+> >> +{
+> >> +	bool has_uvc = test_facility(158);
+> >> +
+> >> +	report_prefix_push("uvc");
+> >> +	if (!has_uvc) {
+> >> +		report_skip("Ultravisor call facility is not
+> >> available");
+> >> +		goto done;
+> >> +	}
+> >> +
+> >> +	test_priv();
+> >> +	test_invalid();
+> >> +	test_query();
+> >> +	test_sharing();
+> >> +done:
+> >> +	return report_summary();
+> >> +}  
+> > 
+> > once the above comment is addressed:
+> > Claudio Imbrenda <imbrenda@linux.ibm.com>
+> >   
+> ?
+> 
 
-Hi Jason.
+copy-paste error.... I meant:
 
-I think that all the previous questions have been answered in the
-response to MST, please let me know if I missed something.
-
-> And I wonder maybe perf diff can help.
-
-Great, I will run it too.
-
-Thanks!
-
->
-> Thanks
->
->
-> > # Batch
-> > 2286723.857,3307191.643,3400346.571,3452527.786,3460766.857,3431042.5,3=
-440722.286
-> > # Batch + Bufapi
-> > 2257970.769,3151268.385,3260150.538,3379383.846,3424028.846,3433384.308=
-,3385635.231,3406554.538
-> >
-> > # Rx
-> > # =3D=3D
-> > # pktgen results (pps)
-> > 1223275,1668868,1728794,1769261,1808574,1837252,1846436
-> > 1456924,1797901,1831234,1868746,1877508,1931598,1936402
-> > 1368923,1719716,1794373,1865170,1884803,1916021,1975160
-> >
-> > # Testpmd pps results
-> > 1222698.143,1670604,1731040.6,1769218,1811206,1839308.75,1848478.75
-> > 1450140.5,1799985.75,1834089.75,1871290,1880005.5,1934147.25,1939034
-> > 1370621,1721858,1796287.75,1866618.5,1885466.5,1918670.75,1976173.5,198=
-8760.75,1978316
-> >
-> > pktgen was run again for rx with 1024 and 2048 buf size, giving
-> > 1988760.75 and 1978316 pps. Testpmd goes the same way.
-> >
->
+Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
 
