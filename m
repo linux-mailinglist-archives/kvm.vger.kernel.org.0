@@ -2,83 +2,92 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 69B87226C83
-	for <lists+kvm@lfdr.de>; Mon, 20 Jul 2020 18:56:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C9209226CF5
+	for <lists+kvm@lfdr.de>; Mon, 20 Jul 2020 19:12:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729843AbgGTQ4O (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 20 Jul 2020 12:56:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50770 "EHLO
+        id S1732434AbgGTRMF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 20 Jul 2020 13:12:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53236 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729270AbgGTQ4O (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 20 Jul 2020 12:56:14 -0400
-Received: from merlin.infradead.org (merlin.infradead.org [IPv6:2001:8b0:10b:1231::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F2BAEC061794;
-        Mon, 20 Jul 2020 09:56:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=merlin.20170209; h=Content-Transfer-Encoding:Content-Type:
-        In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Subject:Sender
-        :Reply-To:Content-ID:Content-Description;
-        bh=yEZNkurgufx3ZCb4un54sl+Zam6nWfgmzTVWvZxSg20=; b=H7oC7q4e5JxlLxxTULi3bOB4rS
-        w6Cr/4ehI3EIGohxKjayYspKcodudDbHHHdKLokO5GAtwd7irSWAWka/2XXgfba668SjHbjt4Y7/s
-        FORgV8iC42DaNFVGgClVy7YC/7wxOfAxlw0Y55SbPETQhMXDXOkh+XW/EJyKKNVEEStOl63flDUrf
-        4G1BeE57RMUmf8pvEe5CAI3ES7lIvyq8uJpE9hk9JlqoTZ2rQL3eNCA3Py1mLLhrHXWPRxOE3JMIx
-        kMz2/2z8/QZVRSKHbiCL0kulXD40C+91ZovsuU1NQKUnJrSpIml94wGAWaUgGVOH9pD8UdN6Jcy2b
-        eIm/Fc3w==;
-Received: from [2601:1c0:6280:3f0::19c2]
-        by merlin.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1jxZ5H-0008W2-QN; Mon, 20 Jul 2020 16:56:12 +0000
-Subject: Re: linux-next: Tree for Jul 20 (arch/x86/kvm/)
-To:     Stephen Rothwell <sfr@canb.auug.org.au>,
-        Linux Next Mailing List <linux-next@vger.kernel.org>
-Cc:     Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        KVM <kvm@vger.kernel.org>, Paolo Bonzini <pbonzini@redhat.com>
-References: <20200720194225.17de9962@canb.auug.org.au>
-From:   Randy Dunlap <rdunlap@infradead.org>
-Message-ID: <1d2aa97d-4a94-673c-dc82-509da221c5d6@infradead.org>
-Date:   Mon, 20 Jul 2020 09:56:08 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        with ESMTP id S1732391AbgGTRMF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 20 Jul 2020 13:12:05 -0400
+Received: from mail-pj1-x1043.google.com (mail-pj1-x1043.google.com [IPv6:2607:f8b0:4864:20::1043])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2FE74C061794
+        for <kvm@vger.kernel.org>; Mon, 20 Jul 2020 10:12:05 -0700 (PDT)
+Received: by mail-pj1-x1043.google.com with SMTP id md7so132926pjb.1
+        for <kvm@vger.kernel.org>; Mon, 20 Jul 2020 10:12:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=h9NtaO/dHZN+veRlqrp09RfatabewzBYbBRadCS8hT8=;
+        b=SHQxkrQ/7aFL+rUTetoqRdouvD8Tuj57jBwL2pjQf9JXaQX9bMh9cx1s7q96QOp703
+         FY1DnWEzMdEUZfvv/QCi1Q9pZsDTsC3OCRb4epofwkRlF9Yfi0BJIFN7DdtFWyEZhGrZ
+         /GpkRLpgJAp/HLN/a3L7k+6fBJ24TeU7OK1J8IaPvzoG7cCmMxGzQCHhJ6yg1OwJ6MhS
+         +yOaHvCbwNNDsBk9d0iefc6a3X78Yy8X3cj/YRtZX2O9SmwOiuHqHkNegDLgZgZE3szE
+         dTZ9DMuBQklHyKIadB6vMbIiFuzoqt9/QXIPor0e4GdGt5yDAoJCUXIqzvVvsYY1HDLn
+         zvRA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=h9NtaO/dHZN+veRlqrp09RfatabewzBYbBRadCS8hT8=;
+        b=Wd3ueLsd+Li47oaf8/cq6M4uhpgK7cY7kfUqCzhv0y2iitFEYlZPeszSW0Ubatxxfq
+         BkTaFm/gkVnwA/BCLhISpDj0WU5gmev8Y50FMT3n7PIOD5izYNy65pzLDVhrO/U7q8BS
+         pH/Si9VvTFN5EEPw2WfLQf9OJEsLbR6NdfE83t7p6PdZ2Wzagxjgn3p/SHagQa1nHDC8
+         gjJ4HLceAWC8EISt9SVxB2czzGS7TbwwIx7yBIKWlmSbv6B/44P3ki1FEEArrNRjLp5i
+         pU/i76uBL2bjOi6hXH60Dogt2m6KuonDaHbFVxDXlA0pO6x4hGI+LzqdOHSPVye38t5y
+         /9hw==
+X-Gm-Message-State: AOAM533hD/woJQq8Ipeb1zGdK+B11KB9fAMga44eZK+dxTbagNwDogjm
+        /xJxK9oAmNyzMDenQj5I9k/abcS6XMTT4bmHENo=
+X-Google-Smtp-Source: ABdhPJzxrLgGlCYLg80UlkG2fYoZCS/8ojPQP0S/YJX7K6Xr/jpwuSVgkza3xGs1oBKuqH7crPIgSAFbuaUbrz1me1Y=
+X-Received: by 2002:a17:902:6bca:: with SMTP id m10mr19014520plt.210.1595265124545;
+ Mon, 20 Jul 2020 10:12:04 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200720194225.17de9962@canb.auug.org.au>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+References: <86d42090-f042-06a1-efba-d46d449df280@arrikto.com> <20200715112342.GD18817@stefanha-x1.localdomain>
+In-Reply-To: <20200715112342.GD18817@stefanha-x1.localdomain>
+From:   Stefan Hajnoczi <stefanha@gmail.com>
+Date:   Mon, 20 Jul 2020 18:11:53 +0100
+Message-ID: <CAJSP0QU78mAK-DiOYXvTOEa3=CAEy1rQtyTBe5rrKDs=yfptAg@mail.gmail.com>
+Subject: Re: Inter-VM device emulation (call on Mon 20th July 2020)
+To:     Stefan Hajnoczi <stefanha@redhat.com>
+Cc:     Nikos Dragazis <ndragazis@arrikto.com>,
+        Jan Kiszka <jan.kiszka@siemens.com>,
+        "John G. Johnson" <john.g.johnson@oracle.com>,
+        Andra-Irina Paraschiv <andraprs@amazon.com>,
+        kvm <kvm@vger.kernel.org>, "Michael S. Tsirkin" <mst@redhat.com>,
+        qemu-devel <qemu-devel@nongnu.org>,
+        Maxime Coquelin <maxime.coquelin@redhat.com>,
+        Alexander Graf <graf@amazon.com>,
+        Thanos Makatos <thanos.makatos@nutanix.com>,
+        =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
+        Jag Raman <jag.raman@oracle.com>,
+        =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 7/20/20 2:42 AM, Stephen Rothwell wrote:
-> Hi all,
-> 
-> Changes since 20200717:
-> 
+Thank you everyone who joined!
 
-on x86_64:
+I didn't take notes but two things stood out:
 
-  CC [M]  arch/x86/kvm/mmu/page_track.o
-In file included from ../include/linux/pid.h:5:0,
-                 from ../include/linux/sched.h:14,
-                 from ../include/linux/kvm_host.h:12,
-                 from ../arch/x86/kvm/mmu/page_track.c:14:
-../arch/x86/kvm/mmu/page_track.c: In function ‘kvm_page_track_write’:
-../include/linux/rculist.h:727:30: error: left-hand operand of comma expression has no effect [-Werror=unused-value]
-  for (__list_check_srcu(cond),     \
-                              ^
-../arch/x86/kvm/mmu/page_track.c:232:2: note: in expansion of macro ‘hlist_for_each_entry_srcu’
-  hlist_for_each_entry_srcu(n, &head->track_notifier_list, node,
-  ^~~~~~~~~~~~~~~~~~~~~~~~~
-../arch/x86/kvm/mmu/page_track.c: In function ‘kvm_page_track_flush_slot’:
-../include/linux/rculist.h:727:30: error: left-hand operand of comma expression has no effect [-Werror=unused-value]
-  for (__list_check_srcu(cond),     \
-                              ^
-../arch/x86/kvm/mmu/page_track.c:258:2: note: in expansion of macro ‘hlist_for_each_entry_srcu’
-  hlist_for_each_entry_srcu(n, &head->track_notifier_list, node,
-  ^~~~~~~~~~~~~~~~~~~~~~~~~
-cc1: all warnings being treated as errors
+1. The ivshmem v2 and virtio-vhost-user use cases are quite different
+so combining them does not seem realistic. ivshmem v2 needs to be as
+simple for the hypervisor to implement as possible even if this
+involves some sacrifices (e.g. not transparent to the Driver VM that
+is accessing the device, performance). virtio-vhost-user is more aimed
+at general-purpose device emulation although support for arbitrary
+devices (e.g. PCI) would be important to serve all use cases.
 
+2. Alexander Graf's idea for a new Linux driver that provides an
+enforcing software IOMMU. This would be a character device driver that
+is mmapped by the device emulation process (either vhost-user-style on
+the host or another VMM for inter-VM device emulation). The Driver VMM
+can program mappings into the device and the page tables in the device
+emulation process will be updated. This way the Driver VMM can share
+memory specific regions of guest RAM with the device emulation process
+and revoke those mappings later.
 
-
--- 
-~Randy
-Reported-by: Randy Dunlap <rdunlap@infradead.org>
+Stefan
