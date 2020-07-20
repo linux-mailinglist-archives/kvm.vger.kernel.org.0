@@ -2,541 +2,540 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id CD552227285
-	for <lists+kvm@lfdr.de>; Tue, 21 Jul 2020 00:55:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9DEDD227278
+	for <lists+kvm@lfdr.de>; Tue, 21 Jul 2020 00:46:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726555AbgGTWzz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 20 Jul 2020 18:55:55 -0400
-Received: from userp2130.oracle.com ([156.151.31.86]:51392 "EHLO
-        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726109AbgGTWzy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 20 Jul 2020 18:55:54 -0400
-Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
-        by userp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 06KMkU3Y183178;
-        Mon, 20 Jul 2020 22:55:48 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
- subject : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=corp-2020-01-29;
- bh=lAMDmMSPe03TMVD16HrjbUC1k3xBR2s09sagwjo/1zo=;
- b=KspMPLYcXm9yrjGUvFLOwk1kRULFpfsXjHgfiY1TVgQ5vDCiSKAwCUukWW1KWGnL9+xh
- GLaX1tGLgTThDQmYRV6hgCk/sktMkbY+6lic8sV11sPiTNlC2lKd9abAlJLaotjc6TA6
- l/vLYwYvb5RYdwH0hObpJJBGcfUYpCcnWWyhRlukhtw2pWA6WW3b2DOUR/W9yiZ/VYlJ
- JgrimEmxZRUT/6iMCKriKjE0zgpXfdT2j8fhFmtWyH+mqmftzLxNoHIoEnqse38pjT8X
- 8TuH/s9tt71F1jOJfNCPBgOheT2b/1/PwyTTZp95OtEc9u48N81AY7n6XF3YTw8un6A4 LA== 
-Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
-        by userp2130.oracle.com with ESMTP id 32brgr9rxb-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
-        Mon, 20 Jul 2020 22:55:48 +0000
-Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
-        by userp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 06KMmxid120275;
-        Mon, 20 Jul 2020 22:53:48 GMT
-Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
-        by userp3030.oracle.com with ESMTP id 32djyx4vt4-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 20 Jul 2020 22:53:47 +0000
-Received: from abhmp0008.oracle.com (abhmp0008.oracle.com [141.146.116.14])
-        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 06KMmoP3007303;
-        Mon, 20 Jul 2020 22:48:50 GMT
-Received: from ban25x6uut29.us.oracle.com (/10.153.73.29)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Mon, 20 Jul 2020 15:48:49 -0700
-From:   Krish Sadhukhan <krish.sadhukhan@oracle.com>
-To:     kvm@vger.kernel.org
-Cc:     jmattson@google.com, sean.j.christopherson@intel.com,
-        pbonzini@redhat.com
-Subject: [PATCH] KVM: x86: Fix names of implemented kvm_x86_ops in VMX and SVM modules
-Date:   Mon, 20 Jul 2020 18:07:28 -0400
-Message-Id: <20200720220728.11140-2-krish.sadhukhan@oracle.com>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200720220728.11140-1-krish.sadhukhan@oracle.com>
-References: <20200720220728.11140-1-krish.sadhukhan@oracle.com>
+        id S1727907AbgGTWqS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 20 Jul 2020 18:46:18 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:51888 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726691AbgGTWqQ (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 20 Jul 2020 18:46:16 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1595285174;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=EWKmrTrQETuKElSLNIbgIEKqM+kupAvxE6/XwMWPhHQ=;
+        b=EXeu2nvC+DNnSy7KBdvOtjOMYvyvcUm4F54p8Z7wxoKArPCDvaJmiknqr87yN+J5VQ4FdP
+        kitFs8WmoakCXwXiBn3B9vo9nyDgrEi96GrExGOs9ORfDBXdxW7tcVR3s2GF9Uq4Egm9yQ
+        oVJohpjOsuXhL6WNHTHByhGdaP1VXZk=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-32-of_UzjfBNV2CpdiAvkNy-g-1; Mon, 20 Jul 2020 18:46:10 -0400
+X-MC-Unique: of_UzjfBNV2CpdiAvkNy-g-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 79ED618A1DFB;
+        Mon, 20 Jul 2020 22:46:08 +0000 (UTC)
+Received: from x1.home (ovpn-112-71.phx2.redhat.com [10.3.112.71])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 81EB92DE6B;
+        Mon, 20 Jul 2020 22:46:04 +0000 (UTC)
+Date:   Mon, 20 Jul 2020 16:46:03 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Jay Zhou <jianjay.zhou@huawei.com>
+Cc:     <linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>,
+        <cohuck@redhat.com>, <maoming.maoming@huawei.com>,
+        <weidong.huang@huawei.com>, Peter Xu <peterx@redhat.com>,
+        Andrea Arcangeli <aarcange@redhat.com>
+Subject: Re: [PATCH] vfio dma_map/unmap: optimized for hugetlbfs pages
+Message-ID: <20200720164603.3a622548@x1.home>
+In-Reply-To: <20200720082947.1770-1-jianjay.zhou@huawei.com>
+References: <20200720082947.1770-1-jianjay.zhou@huawei.com>
+Organization: Red Hat
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9688 signatures=668680
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxscore=0 spamscore=0 adultscore=0
- suspectscore=3 phishscore=0 bulkscore=0 malwarescore=0 mlxlogscore=999
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
- definitions=main-2007200142
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9688 signatures=668680
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0 bulkscore=0 spamscore=0
- impostorscore=0 suspectscore=3 adultscore=0 clxscore=1015 mlxlogscore=999
- priorityscore=1501 phishscore=0 lowpriorityscore=0 mlxscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
- definitions=main-2007200142
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Some of the names do not have a corresponding 'vmx_' or 'svm_' prefix. Also,
-the order of the words in some of the names is not the same as that in the
-kvm_x86_ops structure. Fixing the naming will help in better readability of
-the code and maintenance.
+On Mon, 20 Jul 2020 16:29:47 +0800
+Jay Zhou <jianjay.zhou@huawei.com> wrote:
 
-Signed-off-by: Krish Sadhukhan <krish.sadhukhan@oracle.com>
----
- arch/x86/kvm/svm/avic.c   |  4 +--
- arch/x86/kvm/svm/svm.c    | 46 ++++++++++++++++----------------
- arch/x86/kvm/svm/svm.h    |  2 +-
- arch/x86/kvm/vmx/nested.c |  4 +--
- arch/x86/kvm/vmx/vmx.c    | 56 +++++++++++++++++++--------------------
- arch/x86/kvm/vmx/vmx.h    |  4 +--
- 6 files changed, 58 insertions(+), 58 deletions(-)
+> From: Ming Mao <maoming.maoming@huawei.com>
+> 
+> Hi all,
+> I'm working on starting lots of big size
+> Virtual Machines(memory: >128GB) with VFIO-devices. And I
+> encounter a problem that is the waiting time of starting
+> all Virtual Machines is too long. I analyze the startup log
+> and find that the time of pinning/unpinning pages could be reduced.
+> 
+> In the original process, to make sure the pages are contiguous,
+> we have to check all pages one by one. I think maybe we can use
+> hugetlbfs pages which can skip this step.
+> So I create a patch to do this.
+> According to my test, the result of this patch is pretty well.
+> 
+> Virtual Machine: 50G memory, 32 CPU, 1 VFIO-device, 1G hugetlbfs page
+>         original   after optimization
+> pin time   700ms          0.1ms
+> 
+> I Suppose that:
+> 1)the hugetlbfs page should not be split
+> 2)PG_reserved is not relevant for hugetlbfs pages
+> 3)we can delete the for loops and use some operations
+> (such as atomic_add,page_ref_add) instead
+> 
+> please correct me if I am wrong.
+> 
+> Thanks.
+> 
+> Signed-off-by: Ming Mao <maoming.maoming@huawei.com>
+> ---
+>  drivers/vfio/vfio_iommu_type1.c | 236 ++++++++++++++++++++++++++++++--
+>  include/linux/vfio.h            |  20 +++
+>  2 files changed, 246 insertions(+), 10 deletions(-)
+> 
+> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
+> index 5e556ac91..42e25752e 100644
+> --- a/drivers/vfio/vfio_iommu_type1.c
+> +++ b/drivers/vfio/vfio_iommu_type1.c
+> @@ -415,6 +415,46 @@ static int put_pfn(unsigned long pfn, int prot)
+>  	return 0;
+>  }
+>  
+> +/*
+> + * put pfns for a hugetlbfs page
+> + * @start:the 4KB-page we start to put,can be any page in this hugetlbfs page
+> + * @npage:the number of 4KB-pages need to put
 
-diff --git a/arch/x86/kvm/svm/avic.c b/arch/x86/kvm/svm/avic.c
-index e80daa98682f..619391edced5 100644
---- a/arch/x86/kvm/svm/avic.c
-+++ b/arch/x86/kvm/svm/avic.c
-@@ -579,7 +579,7 @@ int avic_init_vcpu(struct vcpu_svm *svm)
- 	return ret;
- }
- 
--void avic_post_state_restore(struct kvm_vcpu *vcpu)
-+void svm_avic_post_state_restore(struct kvm_vcpu *vcpu)
- {
- 	if (avic_handle_apic_id_update(vcpu) != 0)
- 		return;
-@@ -660,7 +660,7 @@ void svm_refresh_apicv_exec_ctrl(struct kvm_vcpu *vcpu)
- 		 * we need to check and update the AVIC logical APIC ID table
- 		 * accordingly before re-activating.
- 		 */
--		avic_post_state_restore(vcpu);
-+		svm_avic_post_state_restore(vcpu);
- 		vmcb->control.int_ctl |= AVIC_ENABLE_MASK;
- 	} else {
- 		vmcb->control.int_ctl &= ~AVIC_ENABLE_MASK;
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index c0da4dd78ac5..471c648151bc 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -254,7 +254,7 @@ static inline void invlpga(unsigned long addr, u32 asid)
- 	asm volatile (__ex("invlpga %1, %0") : : "c"(asid), "a"(addr));
- }
- 
--static int get_npt_level(struct kvm_vcpu *vcpu)
-+static int svm_get_npt_level(struct kvm_vcpu *vcpu)
- {
- #ifdef CONFIG_X86_64
- 	return PT64_ROOT_4LEVEL;
-@@ -312,7 +312,7 @@ static void svm_set_interrupt_shadow(struct kvm_vcpu *vcpu, int mask)
- 
- }
- 
--static int skip_emulated_instruction(struct kvm_vcpu *vcpu)
-+static int svm_skip_emulated_instruction(struct kvm_vcpu *vcpu)
- {
- 	struct vcpu_svm *svm = to_svm(vcpu);
- 
-@@ -351,7 +351,7 @@ static void svm_queue_exception(struct kvm_vcpu *vcpu)
- 		 * raises a fault that is not intercepted. Still better than
- 		 * failing in all cases.
- 		 */
--		(void)skip_emulated_instruction(&svm->vcpu);
-+		(void)svm_skip_emulated_instruction(&svm->vcpu);
- 		rip = kvm_rip_read(&svm->vcpu);
- 		svm->int3_rip = rip + svm->vmcb->save.cs.base;
- 		svm->int3_injected = rip - old_rip;
-@@ -1153,7 +1153,7 @@ static void svm_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
- 		avic_update_vapic_bar(svm, APIC_DEFAULT_PHYS_BASE);
- }
- 
--static int svm_create_vcpu(struct kvm_vcpu *vcpu)
-+static int svm_vcpu_create(struct kvm_vcpu *vcpu)
- {
- 	struct vcpu_svm *svm;
- 	struct page *page;
-@@ -1232,7 +1232,7 @@ static void svm_clear_current_vmcb(struct vmcb *vmcb)
- 		cmpxchg(&per_cpu(svm_data, i)->current_vmcb, vmcb, NULL);
- }
- 
--static void svm_free_vcpu(struct kvm_vcpu *vcpu)
-+static void svm_vcpu_free(struct kvm_vcpu *vcpu)
- {
- 	struct vcpu_svm *svm = to_svm(vcpu);
- 
-@@ -1627,7 +1627,7 @@ static void svm_set_segment(struct kvm_vcpu *vcpu,
- 	mark_dirty(svm->vmcb, VMCB_SEG);
- }
- 
--static void update_bp_intercept(struct kvm_vcpu *vcpu)
-+static void svm_update_bp_intercept(struct kvm_vcpu *vcpu)
- {
- 	struct vcpu_svm *svm = to_svm(vcpu);
- 
-@@ -2143,7 +2143,7 @@ static int task_switch_interception(struct vcpu_svm *svm)
- 	    int_type == SVM_EXITINTINFO_TYPE_SOFT ||
- 	    (int_type == SVM_EXITINTINFO_TYPE_EXEPT &&
- 	     (int_vec == OF_VECTOR || int_vec == BP_VECTOR))) {
--		if (!skip_emulated_instruction(&svm->vcpu))
-+		if (!svm_skip_emulated_instruction(&svm->vcpu))
- 			return 0;
- 	}
- 
-@@ -2909,7 +2909,7 @@ static void svm_get_exit_info(struct kvm_vcpu *vcpu, u64 *info1, u64 *info2)
- 	*info2 = control->exit_info_2;
- }
- 
--static int handle_exit(struct kvm_vcpu *vcpu, fastpath_t exit_fastpath)
-+static int svm_handle_exit(struct kvm_vcpu *vcpu, fastpath_t exit_fastpath)
- {
- 	struct vcpu_svm *svm = to_svm(vcpu);
- 	struct kvm_run *kvm_run = vcpu->run;
-@@ -3036,7 +3036,7 @@ static void svm_set_irq(struct kvm_vcpu *vcpu)
- 		SVM_EVTINJ_VALID | SVM_EVTINJ_TYPE_INTR;
- }
- 
--static void update_cr8_intercept(struct kvm_vcpu *vcpu, int tpr, int irr)
-+static void svm_update_cr8_intercept(struct kvm_vcpu *vcpu, int tpr, int irr)
- {
- 	struct vcpu_svm *svm = to_svm(vcpu);
- 
-@@ -3145,7 +3145,7 @@ static int svm_interrupt_allowed(struct kvm_vcpu *vcpu, bool for_injection)
- 	return !svm_interrupt_blocked(vcpu);
- }
- 
--static void enable_irq_window(struct kvm_vcpu *vcpu)
-+static void svm_enable_irq_window(struct kvm_vcpu *vcpu)
- {
- 	struct vcpu_svm *svm = to_svm(vcpu);
- 
-@@ -3169,7 +3169,7 @@ static void enable_irq_window(struct kvm_vcpu *vcpu)
- 	}
- }
- 
--static void enable_nmi_window(struct kvm_vcpu *vcpu)
-+static void svm_enable_nmi_window(struct kvm_vcpu *vcpu)
- {
- 	struct vcpu_svm *svm = to_svm(vcpu);
- 
-@@ -3857,7 +3857,7 @@ static int svm_pre_leave_smm(struct kvm_vcpu *vcpu, const char *smstate)
- 	return 0;
- }
- 
--static void enable_smi_window(struct kvm_vcpu *vcpu)
-+static void svm_enable_smi_window(struct kvm_vcpu *vcpu)
- {
- 	struct vcpu_svm *svm = to_svm(vcpu);
- 
-@@ -3975,8 +3975,8 @@ static struct kvm_x86_ops svm_x86_ops __initdata = {
- 	.cpu_has_accelerated_tpr = svm_cpu_has_accelerated_tpr,
- 	.has_emulated_msr = svm_has_emulated_msr,
- 
--	.vcpu_create = svm_create_vcpu,
--	.vcpu_free = svm_free_vcpu,
-+	.vcpu_create = svm_vcpu_create,
-+	.vcpu_free = svm_vcpu_free,
- 	.vcpu_reset = svm_vcpu_reset,
- 
- 	.vm_size = sizeof(struct kvm_svm),
-@@ -3989,7 +3989,7 @@ static struct kvm_x86_ops svm_x86_ops __initdata = {
- 	.vcpu_blocking = svm_vcpu_blocking,
- 	.vcpu_unblocking = svm_vcpu_unblocking,
- 
--	.update_bp_intercept = update_bp_intercept,
-+	.update_bp_intercept = svm_update_bp_intercept,
- 	.get_msr_feature = svm_get_msr_feature,
- 	.get_msr = svm_get_msr,
- 	.set_msr = svm_set_msr,
-@@ -4017,8 +4017,8 @@ static struct kvm_x86_ops svm_x86_ops __initdata = {
- 	.tlb_flush_guest = svm_flush_tlb,
- 
- 	.run = svm_vcpu_run,
--	.handle_exit = handle_exit,
--	.skip_emulated_instruction = skip_emulated_instruction,
-+	.handle_exit = svm_handle_exit,
-+	.skip_emulated_instruction = svm_skip_emulated_instruction,
- 	.update_emulated_instruction = NULL,
- 	.set_interrupt_shadow = svm_set_interrupt_shadow,
- 	.get_interrupt_shadow = svm_get_interrupt_shadow,
-@@ -4031,9 +4031,9 @@ static struct kvm_x86_ops svm_x86_ops __initdata = {
- 	.nmi_allowed = svm_nmi_allowed,
- 	.get_nmi_mask = svm_get_nmi_mask,
- 	.set_nmi_mask = svm_set_nmi_mask,
--	.enable_nmi_window = enable_nmi_window,
--	.enable_irq_window = enable_irq_window,
--	.update_cr8_intercept = update_cr8_intercept,
-+	.enable_nmi_window = svm_enable_nmi_window,
-+	.enable_irq_window = svm_enable_irq_window,
-+	.update_cr8_intercept = svm_update_cr8_intercept,
- 	.set_virtual_apic_mode = svm_set_virtual_apic_mode,
- 	.refresh_apicv_exec_ctrl = svm_refresh_apicv_exec_ctrl,
- 	.check_apicv_inhibit_reasons = svm_check_apicv_inhibit_reasons,
-@@ -4042,11 +4042,11 @@ static struct kvm_x86_ops svm_x86_ops __initdata = {
- 	.hwapic_irr_update = svm_hwapic_irr_update,
- 	.hwapic_isr_update = svm_hwapic_isr_update,
- 	.sync_pir_to_irr = kvm_lapic_find_highest_irr,
--	.apicv_post_state_restore = avic_post_state_restore,
-+	.apicv_post_state_restore = svm_avic_post_state_restore,
- 
- 	.set_tss_addr = svm_set_tss_addr,
- 	.set_identity_map_addr = svm_set_identity_map_addr,
--	.get_tdp_level = get_npt_level,
-+	.get_tdp_level = svm_get_npt_level,
- 	.get_mt_mask = svm_get_mt_mask,
- 
- 	.get_exit_info = svm_get_exit_info,
-@@ -4077,7 +4077,7 @@ static struct kvm_x86_ops svm_x86_ops __initdata = {
- 	.smi_allowed = svm_smi_allowed,
- 	.pre_enter_smm = svm_pre_enter_smm,
- 	.pre_leave_smm = svm_pre_leave_smm,
--	.enable_smi_window = enable_smi_window,
-+	.enable_smi_window = svm_enable_smi_window,
- 
- 	.mem_enc_op = svm_mem_enc_op,
- 	.mem_enc_reg_region = svm_register_enc_region,
-diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
-index 6ac4c00a5d82..ef12288ccc88 100644
---- a/arch/x86/kvm/svm/svm.h
-+++ b/arch/x86/kvm/svm/svm.h
-@@ -444,7 +444,7 @@ int avic_unaccelerated_access_interception(struct vcpu_svm *svm);
- int avic_init_vcpu(struct vcpu_svm *svm);
- void avic_vcpu_load(struct kvm_vcpu *vcpu, int cpu);
- void avic_vcpu_put(struct kvm_vcpu *vcpu);
--void avic_post_state_restore(struct kvm_vcpu *vcpu);
-+void svm_avic_post_state_restore(struct kvm_vcpu *vcpu);
- void svm_set_virtual_apic_mode(struct kvm_vcpu *vcpu);
- void svm_refresh_apicv_exec_ctrl(struct kvm_vcpu *vcpu);
- bool svm_check_apicv_inhibit_reasons(ulong bit);
-diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index d4a4cec034d0..46838c4ba09b 100644
---- a/arch/x86/kvm/vmx/nested.c
-+++ b/arch/x86/kvm/vmx/nested.c
-@@ -2514,7 +2514,7 @@ static int prepare_vmcs02(struct kvm_vcpu *vcpu, struct vmcs12 *vmcs12,
- 	 * bitwise-or of what L1 wants to trap for L2, and what we want to
- 	 * trap. Note that CR0.TS also needs updating - we do this later.
- 	 */
--	update_exception_bitmap(vcpu);
-+	vmx_update_exception_bitmap(vcpu);
- 	vcpu->arch.cr0_guest_owned_bits &= ~vmcs12->cr0_guest_host_mask;
- 	vmcs_writel(CR0_GUEST_HOST_MASK, ~vcpu->arch.cr0_guest_owned_bits);
- 
-@@ -3016,7 +3016,7 @@ static int nested_vmx_check_vmentry_hw(struct kvm_vcpu *vcpu)
- 
- 	preempt_disable();
- 
--	vmx_prepare_switch_to_guest(vcpu);
-+	vmx_prepare_guest_switch(vcpu);
- 
- 	/*
- 	 * Induce a consistency check VMExit by clearing bit 1 in GUEST_RFLAGS,
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 13745f2a5ecd..bad91bef041c 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -617,7 +617,7 @@ static inline bool cpu_need_virtualize_apic_accesses(struct kvm_vcpu *vcpu)
- 	return flexpriority_enabled && lapic_in_kernel(vcpu);
- }
- 
--static inline bool report_flexpriority(void)
-+static inline bool vmx_report_flexpriority(void)
- {
- 	return flexpriority_enabled;
- }
-@@ -760,7 +760,7 @@ static u32 vmx_read_guest_seg_ar(struct vcpu_vmx *vmx, unsigned seg)
- 	return *p;
- }
- 
--void update_exception_bitmap(struct kvm_vcpu *vcpu)
-+void vmx_update_exception_bitmap(struct kvm_vcpu *vcpu)
- {
- 	u32 eb;
- 
-@@ -1122,7 +1122,7 @@ void vmx_set_host_fs_gs(struct vmcs_host_state *host, u16 fs_sel, u16 gs_sel,
- 	}
- }
- 
--void vmx_prepare_switch_to_guest(struct kvm_vcpu *vcpu)
-+void vmx_prepare_guest_switch(struct kvm_vcpu *vcpu)
- {
- 	struct vcpu_vmx *vmx = to_vmx(vcpu);
- 	struct vmcs_host_state *host_state;
-@@ -2314,7 +2314,7 @@ static int kvm_cpu_vmxon(u64 vmxon_pointer)
- 	return -EFAULT;
- }
- 
--static int hardware_enable(void)
-+static int vmx_hardware_enable(void)
- {
- 	int cpu = raw_smp_processor_id();
- 	u64 phys_addr = __pa(per_cpu(vmxarea, cpu));
-@@ -2363,7 +2363,7 @@ static void kvm_cpu_vmxoff(void)
- 	cr4_clear_bits(X86_CR4_VMXE);
- }
- 
--static void hardware_disable(void)
-+static void vmx_hardware_disable(void)
- {
- 	vmclear_local_loaded_vmcss();
- 	kvm_cpu_vmxoff();
-@@ -2769,7 +2769,7 @@ static void enter_pmode(struct kvm_vcpu *vcpu)
- 	vmcs_writel(GUEST_CR4, (vmcs_readl(GUEST_CR4) & ~X86_CR4_VME) |
- 			(vmcs_readl(CR4_READ_SHADOW) & X86_CR4_VME));
- 
--	update_exception_bitmap(vcpu);
-+	vmx_update_exception_bitmap(vcpu);
- 
- 	fix_pmode_seg(vcpu, VCPU_SREG_CS, &vmx->rmode.segs[VCPU_SREG_CS]);
- 	fix_pmode_seg(vcpu, VCPU_SREG_SS, &vmx->rmode.segs[VCPU_SREG_SS]);
-@@ -2849,7 +2849,7 @@ static void enter_rmode(struct kvm_vcpu *vcpu)
- 
- 	vmcs_writel(GUEST_RFLAGS, flags);
- 	vmcs_writel(GUEST_CR4, vmcs_readl(GUEST_CR4) | X86_CR4_VME);
--	update_exception_bitmap(vcpu);
-+	vmx_update_exception_bitmap(vcpu);
- 
- 	fix_rmode_seg(VCPU_SREG_SS, &vmx->rmode.segs[VCPU_SREG_SS]);
- 	fix_rmode_seg(VCPU_SREG_CS, &vmx->rmode.segs[VCPU_SREG_CS]);
-@@ -4445,23 +4445,23 @@ static void vmx_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
- 	vmx_set_cr4(vcpu, 0);
- 	vmx_set_efer(vcpu, 0);
- 
--	update_exception_bitmap(vcpu);
-+	vmx_update_exception_bitmap(vcpu);
- 
- 	vpid_sync_context(vmx->vpid);
- 	if (init_event)
- 		vmx_clear_hlt(vcpu);
- }
- 
--static void enable_irq_window(struct kvm_vcpu *vcpu)
-+static void vmx_enable_irq_window(struct kvm_vcpu *vcpu)
- {
- 	exec_controls_setbit(to_vmx(vcpu), CPU_BASED_INTR_WINDOW_EXITING);
- }
- 
--static void enable_nmi_window(struct kvm_vcpu *vcpu)
-+static void vmx_enable_nmi_window(struct kvm_vcpu *vcpu)
- {
- 	if (!enable_vnmi ||
- 	    vmcs_read32(GUEST_INTERRUPTIBILITY_INFO) & GUEST_INTR_STATE_STI) {
--		enable_irq_window(vcpu);
-+		vmx_enable_irq_window(vcpu);
- 		return;
- 	}
- 
-@@ -6170,7 +6170,7 @@ static void vmx_l1d_flush(struct kvm_vcpu *vcpu)
- 		: "eax", "ebx", "ecx", "edx");
- }
- 
--static void update_cr8_intercept(struct kvm_vcpu *vcpu, int tpr, int irr)
-+static void vmx_update_cr8_intercept(struct kvm_vcpu *vcpu, int tpr, int irr)
- {
- 	struct vmcs12 *vmcs12 = get_vmcs12(vcpu);
- 	int tpr_threshold;
-@@ -6834,7 +6834,7 @@ static fastpath_t vmx_vcpu_run(struct kvm_vcpu *vcpu)
- 	return exit_fastpath;
- }
- 
--static void vmx_free_vcpu(struct kvm_vcpu *vcpu)
-+static void vmx_vcpu_free(struct kvm_vcpu *vcpu)
- {
- 	struct vcpu_vmx *vmx = to_vmx(vcpu);
- 
-@@ -6845,7 +6845,7 @@ static void vmx_free_vcpu(struct kvm_vcpu *vcpu)
- 	free_loaded_vmcs(vmx->loaded_vmcs);
- }
- 
--static int vmx_create_vcpu(struct kvm_vcpu *vcpu)
-+static int vmx_vcpu_create(struct kvm_vcpu *vcpu)
- {
- 	struct vcpu_vmx *vmx;
- 	unsigned long *msr_bitmap;
-@@ -7799,7 +7799,7 @@ static int vmx_pre_leave_smm(struct kvm_vcpu *vcpu, const char *smstate)
- 	return 0;
- }
- 
--static void enable_smi_window(struct kvm_vcpu *vcpu)
-+static void vmx_enable_smi_window(struct kvm_vcpu *vcpu)
- {
- 	/* RSM will cause a vmexit anyway.  */
- }
-@@ -7824,7 +7824,7 @@ static void vmx_migrate_timers(struct kvm_vcpu *vcpu)
- 	}
- }
- 
--static void hardware_unsetup(void)
-+static void vmx_hardware_teardown(void)
- {
- 	if (nested)
- 		nested_vmx_hardware_unsetup();
-@@ -7841,25 +7841,25 @@ static bool vmx_check_apicv_inhibit_reasons(ulong bit)
- }
- 
- static struct kvm_x86_ops vmx_x86_ops __initdata = {
--	.hardware_unsetup = hardware_unsetup,
-+	.hardware_unsetup = vmx_hardware_teardown,
- 
--	.hardware_enable = hardware_enable,
--	.hardware_disable = hardware_disable,
--	.cpu_has_accelerated_tpr = report_flexpriority,
-+	.hardware_enable = vmx_hardware_enable,
-+	.hardware_disable = vmx_hardware_disable,
-+	.cpu_has_accelerated_tpr = vmx_report_flexpriority,
- 	.has_emulated_msr = vmx_has_emulated_msr,
- 
- 	.vm_size = sizeof(struct kvm_vmx),
- 	.vm_init = vmx_vm_init,
- 
--	.vcpu_create = vmx_create_vcpu,
--	.vcpu_free = vmx_free_vcpu,
-+	.vcpu_create = vmx_vcpu_create,
-+	.vcpu_free = vmx_vcpu_free,
- 	.vcpu_reset = vmx_vcpu_reset,
- 
--	.prepare_guest_switch = vmx_prepare_switch_to_guest,
-+	.prepare_guest_switch = vmx_prepare_guest_switch,
- 	.vcpu_load = vmx_vcpu_load,
- 	.vcpu_put = vmx_vcpu_put,
- 
--	.update_bp_intercept = update_exception_bitmap,
-+	.update_bp_intercept = vmx_update_exception_bitmap,
- 	.get_msr_feature = vmx_get_msr_feature,
- 	.get_msr = vmx_get_msr,
- 	.set_msr = vmx_set_msr,
-@@ -7901,9 +7901,9 @@ static struct kvm_x86_ops vmx_x86_ops __initdata = {
- 	.nmi_allowed = vmx_nmi_allowed,
- 	.get_nmi_mask = vmx_get_nmi_mask,
- 	.set_nmi_mask = vmx_set_nmi_mask,
--	.enable_nmi_window = enable_nmi_window,
--	.enable_irq_window = enable_irq_window,
--	.update_cr8_intercept = update_cr8_intercept,
-+	.enable_nmi_window = vmx_enable_nmi_window,
-+	.enable_irq_window = vmx_enable_irq_window,
-+	.update_cr8_intercept = vmx_update_cr8_intercept,
- 	.set_virtual_apic_mode = vmx_set_virtual_apic_mode,
- 	.set_apic_access_page_addr = vmx_set_apic_access_page_addr,
- 	.refresh_apicv_exec_ctrl = vmx_refresh_apicv_exec_ctrl,
-@@ -7963,7 +7963,7 @@ static struct kvm_x86_ops vmx_x86_ops __initdata = {
- 	.smi_allowed = vmx_smi_allowed,
- 	.pre_enter_smm = vmx_pre_enter_smm,
- 	.pre_leave_smm = vmx_pre_leave_smm,
--	.enable_smi_window = enable_smi_window,
-+	.enable_smi_window = vmx_enable_smi_window,
- 
- 	.need_emulation_on_page_fault = vmx_need_emulation_on_page_fault,
- 	.apic_init_signal_blocked = vmx_apic_init_signal_blocked,
-diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
-index 639798e4a6ca..3dcc80ad827e 100644
---- a/arch/x86/kvm/vmx/vmx.h
-+++ b/arch/x86/kvm/vmx/vmx.h
-@@ -325,7 +325,7 @@ void vmx_vcpu_load_vmcs(struct kvm_vcpu *vcpu, int cpu,
- int allocate_vpid(void);
- void free_vpid(int vpid);
- void vmx_set_constant_host_state(struct vcpu_vmx *vmx);
--void vmx_prepare_switch_to_guest(struct kvm_vcpu *vcpu);
-+void vmx_prepare_guest_switch(struct kvm_vcpu *vcpu);
- void vmx_set_host_fs_gs(struct vmcs_host_state *host, u16 fs_sel, u16 gs_sel,
- 			unsigned long fs_base, unsigned long gs_base);
- int vmx_get_cpl(struct kvm_vcpu *vcpu);
-@@ -342,7 +342,7 @@ void ept_save_pdptrs(struct kvm_vcpu *vcpu);
- void vmx_get_segment(struct kvm_vcpu *vcpu, struct kvm_segment *var, int seg);
- void vmx_set_segment(struct kvm_vcpu *vcpu, struct kvm_segment *var, int seg);
- u64 construct_eptp(struct kvm_vcpu *vcpu, unsigned long root_hpa);
--void update_exception_bitmap(struct kvm_vcpu *vcpu);
-+void vmx_update_exception_bitmap(struct kvm_vcpu *vcpu);
- void vmx_update_msr_bitmap(struct kvm_vcpu *vcpu);
- bool vmx_nmi_blocked(struct kvm_vcpu *vcpu);
- bool vmx_interrupt_blocked(struct kvm_vcpu *vcpu);
--- 
-2.20.1
+This code supports systems where PAGE_SIZE is not 4KB.
+
+> + * @prot:IOMMU_READ/WRITE
+> + */
+> +static int hugetlb_put_pfn(unsigned long start, unsigned int npage, int prot)
+> +{
+> +	struct page *page = NULL;
+> +	struct page *head = NULL;
+
+Unnecessary initialization.
+
+> +
+> +	if (!npage || !pfn_valid(start))
+> +		return 0;
+> +
+> +	page = pfn_to_page(start);
+> +	if (!page || !PageHuge(page))
+> +		return 0;
+> +	head = compound_head(page);
+> +	/*
+> +	 * The last page should be in this hugetlbfs page.
+> +	 * The number of putting pages should be equal to the number
+> +	 * of getting pages.So the hugepage pinned refcount and the normal
+> +	 * page refcount can not be smaller than npage.
+> +	 */
+> +	if ((head != compound_head(pfn_to_page(start + npage - 1)))
+> +	    || (page_ref_count(head) < npage)
+> +	    || (compound_pincount(page) < npage))
+> +		return 0;
+> +
+> +	if ((prot & IOMMU_WRITE) && !PageDirty(page))
+> +		set_page_dirty_lock(page);
+> +
+> +	atomic_sub(npage, compound_pincount_ptr(head));
+> +	if (page_ref_sub_and_test(head, npage))
+> +		__put_page(head);
+> +
+> +	mod_node_page_state(page_pgdat(head), NR_FOLL_PIN_RELEASED, npage);
+> +	return 1;
+> +}
+> +
+>  static int follow_fault_pfn(struct vm_area_struct *vma, struct mm_struct *mm,
+>  			    unsigned long vaddr, unsigned long *pfn,
+>  			    bool write_fault)
+> @@ -479,6 +519,90 @@ static int vaddr_get_pfn(struct mm_struct *mm, unsigned long vaddr,
+>  	return ret;
+>  }
+>  
+> +struct vfio_hupetlbpage_info vfio_hugetlbpage_info[HUGE_MAX_HSTATE] = {
+> +	{vfio_hugetlbpage_2M, PMD_SIZE, ~((1ULL << HPAGE_PMD_SHIFT) - 1)},
+> +	{vfio_hugetlbpage_1G, PUD_SIZE, ~((1ULL << HPAGE_PUD_SHIFT) - 1)},
+
+Other architectures support more huge page sizes, also 0-day identified
+these #defines don't exist when THP is not configured.  But why
+couldn't we figure out all of these form the compound_order()?  order
+== shift, size = PAGE_SIZE << order.
+
+> +};
+> +
+> +static bool is_hugetlbpage(unsigned long pfn, enum vfio_hugetlbpage_type *type)
+> +{
+> +	struct page *page = NULL;
+
+Unnecessary initialization.
+
+> +
+> +	if (!pfn_valid(pfn) || !type)
+> +		return false;
+> +
+> +	page = pfn_to_page(pfn);
+> +	/* only check for hugetlbfs pages */
+> +	if (!page || !PageHuge(page))
+> +		return false;
+> +
+> +	switch (compound_order(compound_head(page))) {
+> +	case PMD_ORDER:
+> +		*type = vfio_hugetlbpage_2M;
+> +		break;
+> +	case PUD_ORDER:
+> +		*type = vfio_hugetlbpage_1G;
+> +		break;
+> +	default:
+> +		return false;
+> +	}
+> +
+> +	return true;
+> +}
+> +
+> +/* Is the addr in the last page in hugetlbfs pages? */
+> +static bool hugetlb_is_last_page(unsigned long addr, enum vfio_hugetlbpage_type type)
+> +{
+> +	unsigned int num = 0;
+
+Unnecessary initialization, and in fact unnecessary variable altogether.
+ie.
+
+	return hugetlb_get_resdual_pages(addr & ~(PAGE_SIZE - 1), type) == 1;
+
+
+> +
+> +	num = hugetlb_get_resdual_pages(addr & ~(PAGE_SIZE - 1), type);
+
+residual?
+
+> +
+> +	if (num == 1)
+> +		return true;
+> +	else
+> +		return false;
+> +}
+> +
+> +static bool hugetlb_page_is_pinned(struct vfio_dma *dma,
+> +				unsigned long start,
+> +				unsigned long npages)
+> +{
+> +	struct vfio_pfn *vpfn = NULL;
+
+Unnecessary initialization.
+
+> +	struct rb_node *node = rb_first(&dma->pfn_list);
+> +	unsigned long end = start + npages - 1;
+> +
+> +	for (; node; node = rb_next(node)) {
+> +		vpfn = rb_entry(node, struct vfio_pfn, node);
+> +
+> +		if ((vpfn->pfn >= start) && (vpfn->pfn <= end))
+> +			return true;
+
+This function could be named better, it suggests the hugetlbfs page is
+pinned, but really we're only looking for any pfn_list pinnings
+overlapping the pfn range.
+
+> +	}
+> +
+> +	return false;
+> +}
+> +
+> +static unsigned int hugetlb_get_contiguous_pages_num(struct vfio_dma *dma,
+> +						unsigned long pfn,
+> +						unsigned long resdual_npage,
+> +						unsigned long max_npage)
+> +{
+> +	unsigned int num = 0;
+
+Unnecessary initialization
+
+> +
+> +	if (!dma)
+> +		return 0;
+> +
+> +	num = resdual_npage < max_npage ? resdual_npage : max_npage;
+
+min(resdual_npage, max_npage)
+
+
+> +	/*
+> +	 * If there is only one page, it is no need to optimize them.
+
+s/no need/not necessary/
+
+> +	 * Maybe some pages have been pinned and inserted into dma->pfn_list by others.
+> +	 * In this case, we just goto the slow path simply.
+> +	 */
+> +	if ((num < 2) || hugetlb_page_is_pinned(dma, pfn, num))
+> +		return 0;
+
+Why does having pinnings in the pfn_list disqualify it from hugetlbfs pinning?
+
+Testing for the last page here is redundant to the pinning path, should
+it only be done here?  Can num be zero?  
+
+Maybe better to return -errno for this and above zero conditions rather
+than return a value that doesn't reflect the purpose of the function?
+
+> +
+> +	return num;
+> +}
+> +
+>  /*
+>   * Attempt to pin pages.  We really don't want to track all the pfns and
+>   * the iommu can only map chunks of consecutive pfns anyway, so get the
+> @@ -492,6 +616,7 @@ static long vfio_pin_pages_remote(struct vfio_dma *dma, unsigned long vaddr,
+>  	long ret, pinned = 0, lock_acct = 0;
+>  	bool rsvd;
+>  	dma_addr_t iova = vaddr - dma->vaddr + dma->iova;
+> +	enum vfio_hugetlbpage_type type;
+>  
+>  	/* This code path is only user initiated */
+>  	if (!current->mm)
+> @@ -521,6 +646,55 @@ static long vfio_pin_pages_remote(struct vfio_dma *dma, unsigned long vaddr,
+>  	if (unlikely(disable_hugepages))
+>  		goto out;
+>  
+> +	/*
+> +	 * It is no need to get pages one by one for hugetlbfs pages.
+
+s/no need/not necessary/
+
+> +	 * 4KB-pages in hugetlbfs pages are contiguous.
+> +	 * But if the vaddr is in the last 4KB-page, we just goto the slow path.
+
+
+s/4KB-/PAGE_SIZE /
+
+Please explain the significance of vaddr being in the last PAGE_SIZE
+page of a hugetlbfs page.  Is it simply that we should take the slow
+path for mapping a single page before the end of the hugetlbfs page?
+Is this optimization worthwhile?  Isn't it more consistent to handle
+all mappings over hugetlbfs pages the same?  Should we be operating on
+vaddr here for the hugetlbfs page alignment or base_pfn?
+
+> +	 */
+> +	if (is_hugetlbpage(*pfn_base, &type) && !hugetlb_is_last_page(vaddr, type)) {
+> +		unsigned long hugetlb_resdual_npage = 0;
+> +		unsigned long contiguous_npage = 0;
+> +		struct page *head = NULL;
+> +
+> +		hugetlb_resdual_npage =
+> +			hugetlb_get_resdual_pages((vaddr + PAGE_SIZE) & ~(PAGE_SIZE - 1), type);
+
+~(PAGE_SIZE - 1) is PAGE_MASK, but that whole operation looks like a
+PAGE_ALIGN(vaddr)
+
+This is trying to get the number of pages after this page to the end of
+the hugetlbfs page, right?  Rather than the hugetlb_is_last_page()
+above, shouldn't we have recorded the number of pages there and used
+math to get this value?
+
+> +		/*
+> +		 * Maybe the hugetlb_resdual_npage is invalid.
+> +		 * For example, hugetlb_resdual_npage > (npage - 1) or
+> +		 * some pages of this hugetlbfs page have been pinned.
+> +		 */
+> +		contiguous_npage = hugetlb_get_contiguous_pages_num(dma, *pfn_base + 1,
+> +						hugetlb_resdual_npage, npage - 1);
+> +		if (!contiguous_npage)
+> +			goto slow_path;
+> +
+> +		/*
+> +		 * Unlike THP, the splitting should not happen for hugetlbfs pages.
+> +		 * Since PG_reserved is not relevant for compound pages, and the pfn of
+> +		 * 4KB-page which in hugetlbfs pages is valid,
+
+s/4KB/PAGE_SIZE/
+
+> +		 * it is no need to check rsvd for hugetlbfs pages.
+
+s/no need/not necessary/
+
+> +		 */
+> +		if (!dma->lock_cap &&
+> +		    current->mm->locked_vm + lock_acct + contiguous_npage > limit) {
+> +			pr_warn("%s: RLIMIT_MEMLOCK (%ld) exceeded\n",
+> +				 __func__, limit << PAGE_SHIFT);
+> +			ret = -ENOMEM;
+> +			goto unpin_out;
+> +		}
+> +		/*
+> +		 * We got a hugetlbfs page using vaddr_get_pfn alreadly.
+> +		 * In this case,we do not need to alloc pages and we can finish all
+> +		 * work by a single operation to the head page.
+> +		 */
+> +		lock_acct += contiguous_npage;
+> +		head = compound_head(pfn_to_page(*pfn_base));
+> +		atomic_add(contiguous_npage, compound_pincount_ptr(head));
+> +		page_ref_add(head, contiguous_npage);
+> +		mod_node_page_state(page_pgdat(head), NR_FOLL_PIN_ACQUIRED, contiguous_npage);
+> +		pinned += contiguous_npage;
+> +		goto out;
+
+I'm hoping Peter or Andrea understand this, but I think we still have
+pfn_base pinned separately and I don't see that we've done an unpin
+anywhere, so are we leaking the pin of the first page??
+
+> +	}
+> +slow_path:
+>  	/* Lock all the consecutive pages from pfn_base */
+>  	for (vaddr += PAGE_SIZE, iova += PAGE_SIZE; pinned < npage;
+>  	     pinned++, vaddr += PAGE_SIZE, iova += PAGE_SIZE) {
+> @@ -569,7 +743,30 @@ static long vfio_unpin_pages_remote(struct vfio_dma *dma, dma_addr_t iova,
+>  {
+>  	long unlocked = 0, locked = 0;
+>  	long i;
+> +	enum vfio_hugetlbpage_type type;
+> +
+> +	if (is_hugetlbpage(pfn, &type)) {
+> +		unsigned long hugetlb_resdual_npage = 0;
+> +		unsigned long contiguous_npage = 0;
+
+Unnecessary initialization...
+
+>  
+> +		hugetlb_resdual_npage = hugetlb_get_resdual_pages(iova & ~(PAGE_SIZE - 1), type);
+
+PAGE_MASK
+
+Like above, is it pfn or iova that we should be using when looking at
+hugetlbfs alignment?
+
+> +		contiguous_npage = hugetlb_get_contiguous_pages_num(dma, pfn,
+> +						hugetlb_resdual_npage, npage);
+> +		/*
+> +		 * There is not enough contiguous pages or this hugetlbfs page
+> +		 * has been pinned.
+> +		 * Let's try the slow path.
+> +		 */
+> +		if (!contiguous_npage)
+> +			goto slow_path;
+> +
+> +		/* try the slow path if failed */
+> +		if (hugetlb_put_pfn(pfn, contiguous_npage, dma->prot)) {
+> +			unlocked = contiguous_npage;
+> +			goto out;
+> +		}
+
+Should probably break the pin path into a separate get_pfn function for symmetry.
+
+
+> +	}
+> +slow_path:
+>  	for (i = 0; i < npage; i++, iova += PAGE_SIZE) {
+>  		if (put_pfn(pfn++, dma->prot)) {
+>  			unlocked++;
+> @@ -578,6 +775,7 @@ static long vfio_unpin_pages_remote(struct vfio_dma *dma, dma_addr_t iova,
+>  		}
+>  	}
+>  
+> +out:
+>  	if (do_accounting)
+>  		vfio_lock_acct(dma, locked - unlocked, true);
+>  
+> @@ -867,6 +1065,7 @@ static long vfio_unmap_unpin(struct vfio_iommu *iommu, struct vfio_dma *dma,
+>  	struct iommu_iotlb_gather iotlb_gather;
+>  	int unmapped_region_cnt = 0;
+>  	long unlocked = 0;
+> +	enum vfio_hugetlbpage_type type;
+>  
+>  	if (!dma->size)
+>  		return 0;
+> @@ -900,16 +1099,33 @@ static long vfio_unmap_unpin(struct vfio_iommu *iommu, struct vfio_dma *dma,
+>  			continue;
+>  		}
+>  
+> -		/*
+> -		 * To optimize for fewer iommu_unmap() calls, each of which
+> -		 * may require hardware cache flushing, try to find the
+> -		 * largest contiguous physical memory chunk to unmap.
+> -		 */
+> -		for (len = PAGE_SIZE;
+> -		     !domain->fgsp && iova + len < end; len += PAGE_SIZE) {
+> -			next = iommu_iova_to_phys(domain->domain, iova + len);
+> -			if (next != phys + len)
+> -				break;
+> +		if (is_hugetlbpage((phys >> PAGE_SHIFT), &type)
+> +		    && (!domain->fgsp)) {
+
+Reverse the order of these tests.
+
+> +			unsigned long hugetlb_resdual_npage = 0;
+> +			unsigned long contiguous_npage = 0;
+
+
+Unnecessary...
+
+> +			hugetlb_resdual_npage =
+> +				hugetlb_get_resdual_pages(iova & ~(PAGE_SIZE - 1), type);
+
+PAGE_MASK
+
+> +			/*
+> +			 * The number of contiguous page can not be larger than dma->size
+> +			 * which is the number of pages pinned.
+> +			 */
+> +			contiguous_npage = ((dma->size >> PAGE_SHIFT) > hugetlb_resdual_npage) ?
+> +				hugetlb_resdual_npage : (dma->size >> PAGE_SHIFT);
+
+min()
+
+> +
+> +			len = contiguous_npage * PAGE_SIZE;
+> +		} else {
+> +			/*
+> +			 * To optimize for fewer iommu_unmap() calls, each of which
+> +			 * may require hardware cache flushing, try to find the
+> +			 * largest contiguous physical memory chunk to unmap.
+> +			 */
+> +			for (len = PAGE_SIZE;
+> +			     !domain->fgsp && iova + len < end; len += PAGE_SIZE) {
+> +				next = iommu_iova_to_phys(domain->domain, iova + len);
+> +				if (next != phys + len)
+> +					break;
+> +			}
+>  		}
+>  
+>  		/*
+> diff --git a/include/linux/vfio.h b/include/linux/vfio.h
+> index 38d3c6a8d..91ef2058f 100644
+> --- a/include/linux/vfio.h
+> +++ b/include/linux/vfio.h
+> @@ -214,4 +214,24 @@ extern int vfio_virqfd_enable(void *opaque,
+>  			      void *data, struct virqfd **pvirqfd, int fd);
+>  extern void vfio_virqfd_disable(struct virqfd **pvirqfd);
+>  
+> +enum vfio_hugetlbpage_type {
+> +	vfio_hugetlbpage_2M,
+> +	vfio_hugetlbpage_1G,
+> +};
+> +
+> +struct vfio_hupetlbpage_info {
+> +	enum vfio_hugetlbpage_type type;
+
+The enum within the structure serves no purpose.
+
+> +	unsigned long size;
+> +	unsigned long mask;
+> +};
+> +
+> +#define PMD_ORDER 9
+> +#define PUD_ORDER 18
+
+Architecture specific.
+
+> +/*
+> + * get the number of resdual 4KB-pages in a hugetlbfs page
+> + * (including the page which pointed by this address)
+
+s/4KB/PAGE_SIZE/
+
+> + */
+> +#define hugetlb_get_resdual_pages(address, type)				\
+> +		((vfio_hugetlbpage_info[type].size				\
+> +		- (address & ~vfio_hugetlbpage_info[type].mask)) >> PAGE_SHIFT)
+>  #endif /* VFIO_H */
 
