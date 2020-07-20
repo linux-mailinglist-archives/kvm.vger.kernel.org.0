@@ -2,200 +2,456 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A3E06225BA3
-	for <lists+kvm@lfdr.de>; Mon, 20 Jul 2020 11:27:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2CFAD225BD0
+	for <lists+kvm@lfdr.de>; Mon, 20 Jul 2020 11:37:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728210AbgGTJ1x (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 20 Jul 2020 05:27:53 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:40522 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1728109AbgGTJ1u (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 20 Jul 2020 05:27:50 -0400
+        id S1728180AbgGTJh3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 20 Jul 2020 05:37:29 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:53108 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1727062AbgGTJh2 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 20 Jul 2020 05:37:28 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1595237268;
+        s=mimecast20190719; t=1595237845;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=BfDHngK+oB3XbjAU3xOuqommK/lKgoaQlCXUf45Prys=;
-        b=jC5LVAGVxKeV537zdCDT3oNcaxiO6GwcwsNSy0M4jqeCop6xmdfkbb8AcWOEZ6HC8pDFHy
-        T10e51x/y5jpFKs5u+02AMbxszC6cy5h4+6tvHY+tNkALrXOvth8+lXXkf2YG193eIgrTA
-        kYn2iIjwdDgMRppNEkPwX1XCainFafg=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-488-LLRaiOCRPVGIqGWja5nkgA-1; Mon, 20 Jul 2020 05:27:46 -0400
-X-MC-Unique: LLRaiOCRPVGIqGWja5nkgA-1
-Received: by mail-wm1-f69.google.com with SMTP id c124so12332205wme.0
-        for <kvm@vger.kernel.org>; Mon, 20 Jul 2020 02:27:45 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=BfDHngK+oB3XbjAU3xOuqommK/lKgoaQlCXUf45Prys=;
-        b=GQ31oVVH8oi96BQcE5BRcElqDT+lwgKFuNZRy9kUwXiidHA+hBZYiAb+Qhu6XXokfm
-         9QnFpQ+NFqNYy5thimkNTPYRd3ccznr/jtcRL4l1udgI3ZdU/fuliiSC8BsQAk7HNW5L
-         /Sdxjpco59fOwDSes8s3GADGc/fwwOa6iGsPgoHSbAlYr5XlmxNlZ/qbDLCh/7G8oWcv
-         KXckKGFtDa2XoYY985U5c+ZRVhhgoZYLnxH4z0dMoMGqefVLOFNfhBo1gW8aIvW3X6Cd
-         GD1193AYwo1Bku4n/zPEixKT03kGqnxLe+zXH4PsC5OXPFsmCoW2DeK6v65UqpDS36nP
-         DVNA==
-X-Gm-Message-State: AOAM530SaX7Ei2AiTw28RfeG1YPWpxauz+26xqJy57M5t6dK9xIdQXTx
-        DT4fgNH6/1UO1Py1UXmMursiPyjyEhq8o7M/ADI3sXkqsejnXxYSvJzLNIoAXU9KIpj/Zvds6t6
-        cpslMDsC1SSYB
-X-Received: by 2002:a5d:690a:: with SMTP id t10mr8969056wru.374.1595237264614;
-        Mon, 20 Jul 2020 02:27:44 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwys0tMmHV0ufw5MBx2/qSIQ6Xy9iedoIg6GLkD2GxQLcM8Eic56JAKINuIrtIsYcxRKwK7oA==
-X-Received: by 2002:a5d:690a:: with SMTP id t10mr8969032wru.374.1595237264391;
-        Mon, 20 Jul 2020 02:27:44 -0700 (PDT)
-Received: from redhat.com ([192.117.173.58])
-        by smtp.gmail.com with ESMTPSA id z63sm34167625wmb.2.2020.07.20.02.27.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 20 Jul 2020 02:27:43 -0700 (PDT)
-Date:   Mon, 20 Jul 2020 05:27:39 -0400
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Eugenio Perez Martin <eperezma@redhat.com>
-Cc:     Jason Wang <jasowang@redhat.com>,
-        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        linux-kernel@vger.kernel.org, kvm list <kvm@vger.kernel.org>,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org
-Subject: Re: [PATCH RFC v8 02/11] vhost: use batched get_vq_desc version
-Message-ID: <20200720051410-mutt-send-email-mst@kernel.org>
-References: <CAJaqyWefMHPguj8ZGCuccTn0uyKxF9ZTEi2ASLtDSjGNb1Vwsg@mail.gmail.com>
- <419cc689-adae-7ba4-fe22-577b3986688c@redhat.com>
- <CAJaqyWedEg9TBkH1MxGP1AecYHD-e-=ugJ6XUN+CWb=rQGf49g@mail.gmail.com>
- <0a83aa03-8e3c-1271-82f5-4c07931edea3@redhat.com>
- <CAJaqyWeqF-KjFnXDWXJ2M3Hw3eQeCEE2-7p1KMLmMetMTm22DQ@mail.gmail.com>
- <20200709133438-mutt-send-email-mst@kernel.org>
- <7dec8cc2-152c-83f4-aa45-8ef9c6aca56d@redhat.com>
- <CAJaqyWdLOH2EceTUduKYXCQUUNo1XQ1tLgjYHTBGhtdhBPHn_Q@mail.gmail.com>
- <20200710015615-mutt-send-email-mst@kernel.org>
- <CAJaqyWf1skGxrjuT9GLr6dtgd-433y-rCkbtStLHaAs2W2jYXA@mail.gmail.com>
+        bh=vz16cbD3dDVm72RXEFAxS3bJXzMO/k75AjNcpZo4v54=;
+        b=QPbJ9dGUeIZbRPYqaDZMsCqyY8d2nAh1N5C2en312v2XKJnINXjUVp561FIsOS/jzSQt5c
+        vUT3zfxyeN/RhrxG/2Le32fWjdnYXo0gwtffqhHaioz3Jp3WJM6zGJs11o20r0hWP4HC3R
+        13LZgDu5GhVavD03vd9Bv1EEhUa91Eo=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-382-0VFTlDa1OuGzr6miJYmIBw-1; Mon, 20 Jul 2020 05:37:22 -0400
+X-MC-Unique: 0VFTlDa1OuGzr6miJYmIBw-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6262E18C63C0;
+        Mon, 20 Jul 2020 09:37:20 +0000 (UTC)
+Received: from [10.36.115.54] (ovpn-115-54.ams2.redhat.com [10.36.115.54])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 10AA210021B3;
+        Mon, 20 Jul 2020 09:37:10 +0000 (UTC)
+Subject: Re: [PATCH v5 10/15] vfio/type1: Support binding guest page tables to
+ PASID
+To:     Liu Yi L <yi.l.liu@intel.com>, alex.williamson@redhat.com,
+        baolu.lu@linux.intel.com, joro@8bytes.org
+Cc:     kevin.tian@intel.com, jacob.jun.pan@linux.intel.com,
+        ashok.raj@intel.com, jun.j.tian@intel.com, yi.y.sun@intel.com,
+        jean-philippe@linaro.org, peterx@redhat.com, hao.wu@intel.com,
+        stefanha@gmail.com, iommu@lists.linux-foundation.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <1594552870-55687-1-git-send-email-yi.l.liu@intel.com>
+ <1594552870-55687-11-git-send-email-yi.l.liu@intel.com>
+From:   Auger Eric <eric.auger@redhat.com>
+Message-ID: <c51215a0-3462-1303-1295-7d71675cf469@redhat.com>
+Date:   Mon, 20 Jul 2020 11:37:09 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAJaqyWf1skGxrjuT9GLr6dtgd-433y-rCkbtStLHaAs2W2jYXA@mail.gmail.com>
+In-Reply-To: <1594552870-55687-11-git-send-email-yi.l.liu@intel.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jul 16, 2020 at 07:16:27PM +0200, Eugenio Perez Martin wrote:
-> On Fri, Jul 10, 2020 at 7:58 AM Michael S. Tsirkin <mst@redhat.com> wrote:
-> >
-> > On Fri, Jul 10, 2020 at 07:39:26AM +0200, Eugenio Perez Martin wrote:
-> > > > > How about playing with the batch size? Make it a mod parameter instead
-> > > > > of the hard coded 64, and measure for all values 1 to 64 ...
-> > > >
-> > > >
-> > > > Right, according to the test result, 64 seems to be too aggressive in
-> > > > the case of TX.
-> > > >
-> > >
-> > > Got it, thanks both!
-> >
-> > In particular I wonder whether with batch size 1
-> > we get same performance as without batching
-> > (would indicate 64 is too aggressive)
-> > or not (would indicate one of the code changes
-> > affects performance in an unexpected way).
-> >
-> > --
-> > MST
-> >
-> 
-> Hi!
-> 
-> Varying batch_size as drivers/vhost/net.c:VHOST_NET_BATCH,
+Yi,
 
-sorry this is not what I meant.
+On 7/12/20 1:21 PM, Liu Yi L wrote:
+> Nesting translation allows two-levels/stages page tables, with 1st level
+> for guest translations (e.g. GVA->GPA), 2nd level for host translations
+> (e.g. GPA->HPA). This patch adds interface for binding guest page tables
+> to a PASID. This PASID must have been allocated to user space before the
+by the userspace?
+> binding request.
+> 
+> Cc: Kevin Tian <kevin.tian@intel.com>
+> CC: Jacob Pan <jacob.jun.pan@linux.intel.com>
+> Cc: Alex Williamson <alex.williamson@redhat.com>
+> Cc: Eric Auger <eric.auger@redhat.com>
+> Cc: Jean-Philippe Brucker <jean-philippe@linaro.org>
+> Cc: Joerg Roedel <joro@8bytes.org>
+> Cc: Lu Baolu <baolu.lu@linux.intel.com>
+> Signed-off-by: Jean-Philippe Brucker <jean-philippe@linaro.com>
+> Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
+> Signed-off-by: Jacob Pan <jacob.jun.pan@linux.intel.com>
+> ---
+> v3 -> v4:
+> *) address comments from Alex on v3
+> 
+> v2 -> v3:
+> *) use __iommu_sva_unbind_gpasid() for unbind call issued by VFIO
+>    https://lore.kernel.org/linux-iommu/1592931837-58223-6-git-send-email-jacob.jun.pan@linux.intel.com/
+> 
+> v1 -> v2:
+> *) rename subject from "vfio/type1: Bind guest page tables to host"
+> *) remove VFIO_IOMMU_BIND, introduce VFIO_IOMMU_NESTING_OP to support bind/
+>    unbind guet page table
+> *) replaced vfio_iommu_for_each_dev() with a group level loop since this
+>    series enforces one group per container w/ nesting type as start.
+> *) rename vfio_bind/unbind_gpasid_fn() to vfio_dev_bind/unbind_gpasid_fn()
+> *) vfio_dev_unbind_gpasid() always successful
+> *) use vfio_mm->pasid_lock to avoid race between PASID free and page table
+>    bind/unbind
+> ---
+>  drivers/vfio/vfio_iommu_type1.c | 166 ++++++++++++++++++++++++++++++++++++++++
+>  drivers/vfio/vfio_pasid.c       |  26 +++++++
+>  include/linux/vfio.h            |  20 +++++
+>  include/uapi/linux/vfio.h       |  31 ++++++++
+>  4 files changed, 243 insertions(+)
+> 
+> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
+> index 55b4065..f0f21ff 100644
+> --- a/drivers/vfio/vfio_iommu_type1.c
+> +++ b/drivers/vfio/vfio_iommu_type1.c
+> @@ -149,6 +149,30 @@ struct vfio_regions {
+>  #define DIRTY_BITMAP_PAGES_MAX	 ((u64)INT_MAX)
+>  #define DIRTY_BITMAP_SIZE_MAX	 DIRTY_BITMAP_BYTES(DIRTY_BITMAP_PAGES_MAX)
+>  
+> +struct domain_capsule {
+> +	struct vfio_group *group;
+> +	struct iommu_domain *domain;
+> +	void *data;
+> +};
+> +
+> +/* iommu->lock must be held */
+> +static struct vfio_group *vfio_find_nesting_group(struct vfio_iommu *iommu)
+> +{
+> +	struct vfio_domain *d;
+> +	struct vfio_group *group = NULL;
+> +
+> +	if (!iommu->nesting_info)
+> +		return NULL;
+> +
+> +	/* only support singleton container with nesting type */
+> +	list_for_each_entry(d, &iommu->domain_list, next) {
+> +		list_for_each_entry(group, &d->group_list, next) {
+> +			break;
+use list_first_entry?
+> +		}
+> +	}
+> +	return group;
+> +}
+> +
+>  static int put_pfn(unsigned long pfn, int prot);
+>  
+>  static struct vfio_group *vfio_iommu_find_iommu_group(struct vfio_iommu *iommu,
+> @@ -2349,6 +2373,48 @@ static int vfio_iommu_resv_refresh(struct vfio_iommu *iommu,
+>  	return ret;
+>  }
+>  
+> +static int vfio_dev_bind_gpasid_fn(struct device *dev, void *data)
+> +{
+> +	struct domain_capsule *dc = (struct domain_capsule *)data;
+> +	unsigned long arg = *(unsigned long *)dc->data;
+> +
+> +	return iommu_sva_bind_gpasid(dc->domain, dev, (void __user *)arg);
+> +}
+> +
+> +static int vfio_dev_unbind_gpasid_fn(struct device *dev, void *data)
+> +{
+> +	struct domain_capsule *dc = (struct domain_capsule *)data;
+> +	unsigned long arg = *(unsigned long *)dc->data;
+> +
+> +	iommu_sva_unbind_gpasid(dc->domain, dev, (void __user *)arg);
+> +	return 0;
+> +}
+> +
+> +static int __vfio_dev_unbind_gpasid_fn(struct device *dev, void *data)
+> +{
+> +	struct domain_capsule *dc = (struct domain_capsule *)data;
+> +	struct iommu_gpasid_bind_data *unbind_data =
+> +				(struct iommu_gpasid_bind_data *)dc->data;
+> +
+> +	__iommu_sva_unbind_gpasid(dc->domain, dev, unbind_data);
+> +	return 0;
+> +}
+> +
+> +static void vfio_group_unbind_gpasid_fn(ioasid_t pasid, void *data)
+> +{
+> +	struct domain_capsule *dc = (struct domain_capsule *)data;
+> +	struct iommu_gpasid_bind_data unbind_data;
+> +
+> +	unbind_data.argsz = offsetof(struct iommu_gpasid_bind_data, vendor);
+> +	unbind_data.flags = 0;
+> +	unbind_data.hpasid = pasid;
+> +
+> +	dc->data = &unbind_data;
+> +
+> +	iommu_group_for_each_dev(dc->group->iommu_group,
+> +				 dc, __vfio_dev_unbind_gpasid_fn);
+> +}
+> +
+>  static void vfio_iommu_type1_detach_group(void *iommu_data,
+>  					  struct iommu_group *iommu_group)
+>  {
+> @@ -2392,6 +2458,21 @@ static void vfio_iommu_type1_detach_group(void *iommu_data,
+>  		if (!group)
+>  			continue;
+>  
+> +		if (iommu->nesting_info && iommu->vmm &&
+> +		    (iommu->nesting_info->features &
+> +					IOMMU_NESTING_FEAT_BIND_PGTBL)) {
+> +			struct domain_capsule dc = { .group = group,
+> +						     .domain = domain->domain,
+> +						     .data = NULL };
+> +
+> +			/*
+> +			 * Unbind page tables bound with system wide PASIDs
+> +			 * which are allocated to user space.
+> +			 */
+> +			vfio_mm_for_each_pasid(iommu->vmm, &dc,
+> +					       vfio_group_unbind_gpasid_fn);
+> +		}
+> +
+>  		vfio_iommu_detach_group(domain, group);
+>  		update_dirty_scope = !group->pinned_page_dirty_scope;
+>  		list_del(&group->next);
+> @@ -2938,6 +3019,89 @@ static int vfio_iommu_type1_pasid_request(struct vfio_iommu *iommu,
+>  	}
+>  }
+>  
+> +static long vfio_iommu_handle_pgtbl_op(struct vfio_iommu *iommu,
+> +				       bool is_bind, unsigned long arg)
+> +{
+> +	struct iommu_nesting_info *info;
+> +	struct domain_capsule dc = { .data = &arg };
+> +	struct vfio_group *group;
+> +	struct vfio_domain *domain;
+> +	int ret;
+> +
+> +	mutex_lock(&iommu->lock);
+> +
+> +	info = iommu->nesting_info;
+> +	if (!info || !(info->features & IOMMU_NESTING_FEAT_BIND_PGTBL)) {
+> +		ret = -EOPNOTSUPP;
+> +		goto out_unlock_iommu;
+> +	}
+> +
+> +	if (!iommu->vmm) {
+> +		ret = -EINVAL;
+> +		goto out_unlock_iommu;
+> +	}
+> +
+> +	group = vfio_find_nesting_group(iommu);
+is it realy useful to introduce vfio_find_nesting_group?
+in this function you already test info, you fetch the first domain
+below. So you would only need to fetch the 1st group?
+> +	if (!group) {
+> +		ret = -EINVAL;
+can it happen?
+> +		goto out_unlock_iommu;
+> +	}
+> +
+> +	domain = list_first_entry(&iommu->domain_list,
+> +				  struct vfio_domain, next);
+> +	dc.group = group;
+> +	dc.domain = domain->domain;
+> +
+> +	/* Avoid race with other containers within the same process */
+> +	vfio_mm_pasid_lock(iommu->vmm);
+> +
+> +	if (is_bind) {
+> +		ret = iommu_group_for_each_dev(group->iommu_group, &dc,
+> +					       vfio_dev_bind_gpasid_fn);
+> +		if (ret)
+> +			iommu_group_for_each_dev(group->iommu_group, &dc,
+> +						 vfio_dev_unbind_gpasid_fn);
+> +	} else {
+> +		iommu_group_for_each_dev(group->iommu_group,
+> +					 &dc, vfio_dev_unbind_gpasid_fn);
+> +		ret = 0;
 
-I mean something like this:
+int ret = 0;
 
+if (is_bind) {
+ret = iommu_group_for_each_dev(group->iommu_group, &dc,
+ 			       vfio_dev_bind_gpasid_fn);
+}
+if (ret || !is_bind) {
+	iommu_group_for_each_dev(group->iommu_group,
+			&dc, vfio_dev_unbind_gpasid_fn);
+}
+> +	}
+> +
+> +	vfio_mm_pasid_unlock(iommu->vmm);
+> +out_unlock_iommu:
+> +	mutex_unlock(&iommu->lock);
+> +	return ret;
+> +}
+> +
+> +static long vfio_iommu_type1_nesting_op(struct vfio_iommu *iommu,
+> +					unsigned long arg)
+> +{
+> +	struct vfio_iommu_type1_nesting_op hdr;
+> +	unsigned int minsz;
+> +	int ret;
+> +
+> +	minsz = offsetofend(struct vfio_iommu_type1_nesting_op, flags);
+> +
+> +	if (copy_from_user(&hdr, (void __user *)arg, minsz))
+> +		return -EFAULT;
+> +
+> +	if (hdr.argsz < minsz || hdr.flags & ~VFIO_NESTING_OP_MASK)
+> +		return -EINVAL;
+> +
+> +	switch (hdr.flags & VFIO_NESTING_OP_MASK) {
+> +	case VFIO_IOMMU_NESTING_OP_BIND_PGTBL:
+> +		ret = vfio_iommu_handle_pgtbl_op(iommu, true, arg + minsz);
+> +		break;
+> +	case VFIO_IOMMU_NESTING_OP_UNBIND_PGTBL:
+> +		ret = vfio_iommu_handle_pgtbl_op(iommu, false, arg + minsz);
+> +		break;
+> +	default:
+> +		ret = -EINVAL;
+> +	}
+> +
+> +	return ret;
+> +}
+> +
+>  static long vfio_iommu_type1_ioctl(void *iommu_data,
+>  				   unsigned int cmd, unsigned long arg)
+>  {
+> @@ -2956,6 +3120,8 @@ static long vfio_iommu_type1_ioctl(void *iommu_data,
+>  		return vfio_iommu_type1_dirty_pages(iommu, arg);
+>  	case VFIO_IOMMU_PASID_REQUEST:
+>  		return vfio_iommu_type1_pasid_request(iommu, arg);
+> +	case VFIO_IOMMU_NESTING_OP:
+> +		return vfio_iommu_type1_nesting_op(iommu, arg);
+>  	default:
+>  		return -ENOTTY;
+>  	}
+> diff --git a/drivers/vfio/vfio_pasid.c b/drivers/vfio/vfio_pasid.c
+> index ebec244..ecabaaa 100644
+> --- a/drivers/vfio/vfio_pasid.c
+> +++ b/drivers/vfio/vfio_pasid.c
+> @@ -216,6 +216,8 @@ void vfio_pasid_free_range(struct vfio_mm *vmm,
+>  	 * IOASID core will notify PASID users (e.g. IOMMU driver) to
+>  	 * teardown necessary structures depending on the to-be-freed
+>  	 * PASID.
+> +	 * Hold pasid_lock also avoids race with PASID usages like bind/
+> +	 * unbind page tables to requested PASID.
+>  	 */
+>  	mutex_lock(&vmm->pasid_lock);
+>  	while ((vid = vfio_find_pasid(vmm, min, max)) != NULL)
+> @@ -224,6 +226,30 @@ void vfio_pasid_free_range(struct vfio_mm *vmm,
+>  }
+>  EXPORT_SYMBOL_GPL(vfio_pasid_free_range);
+>  
+> +int vfio_mm_for_each_pasid(struct vfio_mm *vmm, void *data,
+> +			   void (*fn)(ioasid_t id, void *data))
+> +{
+> +	int ret;
+> +
+> +	mutex_lock(&vmm->pasid_lock);
+> +	ret = ioasid_set_for_each_ioasid(vmm->ioasid_sid, fn, data);
+> +	mutex_unlock(&vmm->pasid_lock);
+> +	return ret;
+> +}
+> +EXPORT_SYMBOL_GPL(vfio_mm_for_each_pasid);
+> +
+> +void vfio_mm_pasid_lock(struct vfio_mm *vmm)
+> +{
+> +	mutex_lock(&vmm->pasid_lock);
+> +}
+> +EXPORT_SYMBOL_GPL(vfio_mm_pasid_lock);
+> +
+> +void vfio_mm_pasid_unlock(struct vfio_mm *vmm)
+> +{
+> +	mutex_unlock(&vmm->pasid_lock);
+> +}
+> +EXPORT_SYMBOL_GPL(vfio_mm_pasid_unlock);
+> +
+>  static int __init vfio_pasid_init(void)
+>  {
+>  	mutex_init(&vfio_mm_lock);
+> diff --git a/include/linux/vfio.h b/include/linux/vfio.h
+> index a111108..2bc8347 100644
+> --- a/include/linux/vfio.h
+> +++ b/include/linux/vfio.h
+> @@ -105,6 +105,11 @@ int vfio_mm_ioasid_sid(struct vfio_mm *vmm);
+>  extern int vfio_pasid_alloc(struct vfio_mm *vmm, int min, int max);
+>  extern void vfio_pasid_free_range(struct vfio_mm *vmm,
+>  				  ioasid_t min, ioasid_t max);
+> +extern int vfio_mm_for_each_pasid(struct vfio_mm *vmm, void *data,
+> +				  void (*fn)(ioasid_t id, void *data));
+> +extern void vfio_mm_pasid_lock(struct vfio_mm *vmm);
+> +extern void vfio_mm_pasid_unlock(struct vfio_mm *vmm);
+> +
+>  #else
+>  static inline struct vfio_mm *vfio_mm_get_from_task(struct task_struct *task)
+>  {
+> @@ -129,6 +134,21 @@ static inline void vfio_pasid_free_range(struct vfio_mm *vmm,
+>  					  ioasid_t min, ioasid_t max)
+>  {
+>  }
+> +
+> +static inline int vfio_mm_for_each_pasid(struct vfio_mm *vmm, void *data,
+> +					 void (*fn)(ioasid_t id, void *data))
+> +{
+> +	return -ENOTTY;
+> +}
+> +
+> +static inline void vfio_mm_pasid_lock(struct vfio_mm *vmm)
+> +{
+> +}
+> +
+> +static inline void vfio_mm_pasid_unlock(struct vfio_mm *vmm)
+> +{
+> +}
+> +
+>  #endif /* CONFIG_VFIO_PASID */
+>  
+>  /*
+> diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
+> index 96a115f..a8ad786 100644
+> --- a/include/uapi/linux/vfio.h
+> +++ b/include/uapi/linux/vfio.h
+> @@ -1209,6 +1209,37 @@ struct vfio_iommu_type1_pasid_request {
+>  
+>  #define VFIO_IOMMU_PASID_REQUEST	_IO(VFIO_TYPE, VFIO_BASE + 18)
+>  
+> +/**
+> + * VFIO_IOMMU_NESTING_OP - _IOW(VFIO_TYPE, VFIO_BASE + 19,
+> + *				struct vfio_iommu_type1_nesting_op)
+> + *
+> + * This interface allows user space to utilize the nesting IOMMU
+> + * capabilities as reported in VFIO_IOMMU_TYPE1_INFO_CAP_NESTING
+> + * cap through VFIO_IOMMU_GET_INFO.
+> + *
+> + * @data[] types defined for each op:
+> + * +=================+===============================================+
+> + * | NESTING OP      |      @data[]                                  |
+> + * +=================+===============================================+
+> + * | BIND_PGTBL      |      struct iommu_gpasid_bind_data            |
+> + * +-----------------+-----------------------------------------------+
+> + * | UNBIND_PGTBL    |      struct iommu_gpasid_bind_data            |
+> + * +-----------------+-----------------------------------------------+
+> + *
+> + * returns: 0 on success, -errno on failure.
+> + */
+> +struct vfio_iommu_type1_nesting_op {
+> +	__u32	argsz;
+> +	__u32	flags;
+> +#define VFIO_NESTING_OP_MASK	(0xffff) /* lower 16-bits for op */
+> +	__u8	data[];
+> +};
+> +
+> +#define VFIO_IOMMU_NESTING_OP_BIND_PGTBL	(0)
+> +#define VFIO_IOMMU_NESTING_OP_UNBIND_PGTBL	(1)
+> +
+> +#define VFIO_IOMMU_NESTING_OP		_IO(VFIO_TYPE, VFIO_BASE + 19)
+> +
+>  /* -------- Additional API for SPAPR TCE (Server POWERPC) IOMMU -------- */
+>  
+>  /*
+> 
+Thanks
 
-diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
-index 0b509be8d7b1..b94680e5721d 100644
---- a/drivers/vhost/net.c
-+++ b/drivers/vhost/net.c
-@@ -1279,6 +1279,10 @@ static void handle_rx_net(struct vhost_work *work)
- 	handle_rx(net);
- }
- 
-+MODULE_PARM_DESC(batch_num, "Number of batched descriptors. (offset from 64)");
-+module_param(batch_num, int, 0644);
-+static int batch_num = 0;
-+
- static int vhost_net_open(struct inode *inode, struct file *f)
- {
- 	struct vhost_net *n;
-@@ -1333,7 +1337,7 @@ static int vhost_net_open(struct inode *inode, struct file *f)
- 		vhost_net_buf_init(&n->vqs[i].rxq);
- 	}
- 	vhost_dev_init(dev, vqs, VHOST_NET_VQ_MAX,
--		       UIO_MAXIOV + VHOST_NET_BATCH,
-+		       UIO_MAXIOV + VHOST_NET_BATCH + batch_num,
- 		       VHOST_NET_PKT_WEIGHT, VHOST_NET_WEIGHT, true,
- 		       NULL);
- 
-
-then you can try tweaking batching and playing with mod parameter without
-recompiling.
-
-
-VHOST_NET_BATCH affects lots of other things.
-
-
-> and testing
-> the pps as previous mail says. This means that we have either only
-> vhost_net batching (in base testing, like previously to apply this
-> patch) or both batching sizes the same.
-> 
-> I've checked that vhost process (and pktgen) goes 100% cpu also.
-> 
-> For tx: Batching decrements always the performance, in all cases. Not
-> sure why bufapi made things better the last time.
-> 
-> Batching makes improvements until 64 bufs, I see increments of pps but like 1%.
-> 
-> For rx: Batching always improves performance. It seems that if we
-> batch little, bufapi decreases performance, but beyond 64, bufapi is
-> much better. The bufapi version keeps improving until I set a batching
-> of 1024. So I guess it is super good to have a bunch of buffers to
-> receive.
-> 
-> Since with this test I cannot disable event_idx or things like that,
-> what would be the next step for testing?
-> 
-> Thanks!
-> 
-> --
-> Results:
-> # Buf size: 1,16,32,64,128,256,512
-> 
-> # Tx
-> # ===
-> # Base
-> 2293304.308,3396057.769,3540860.615,3636056.077,3332950.846,3694276.154,3689820
-> # Batch
-> 2286723.857,3307191.643,3400346.571,3452527.786,3460766.857,3431042.5,3440722.286
-> # Batch + Bufapi
-> 2257970.769,3151268.385,3260150.538,3379383.846,3424028.846,3433384.308,3385635.231,3406554.538
-> 
-> # Rx
-> # ==
-> # pktgen results (pps)
-> 1223275,1668868,1728794,1769261,1808574,1837252,1846436
-> 1456924,1797901,1831234,1868746,1877508,1931598,1936402
-> 1368923,1719716,1794373,1865170,1884803,1916021,1975160
-> 
-> # Testpmd pps results
-> 1222698.143,1670604,1731040.6,1769218,1811206,1839308.75,1848478.75
-> 1450140.5,1799985.75,1834089.75,1871290,1880005.5,1934147.25,1939034
-> 1370621,1721858,1796287.75,1866618.5,1885466.5,1918670.75,1976173.5,1988760.75,1978316
-> 
-> pktgen was run again for rx with 1024 and 2048 buf size, giving
-> 1988760.75 and 1978316 pps. Testpmd goes the same way.
-
-Don't really understand what does this data mean.
-Which number of descs is batched for each run?
-
--- 
-MST
+Eric
 
