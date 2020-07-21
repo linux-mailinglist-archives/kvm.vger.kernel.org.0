@@ -2,112 +2,111 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7D6BA2289AE
-	for <lists+kvm@lfdr.de>; Tue, 21 Jul 2020 22:16:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 034B32289B3
+	for <lists+kvm@lfdr.de>; Tue, 21 Jul 2020 22:18:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730085AbgGUUQp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 21 Jul 2020 16:16:45 -0400
-Received: from mga09.intel.com ([134.134.136.24]:42433 "EHLO mga09.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726029AbgGUUQo (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 21 Jul 2020 16:16:44 -0400
-IronPort-SDR: inIMy3EqkIoqUAxYDdC9NPm7YgRcANBN62H4wwKkCBnu3a44ENNQqXTbJH+DvxHFbeyXlgHHfl
- AwM4qMZ0be5Q==
-X-IronPort-AV: E=McAfee;i="6000,8403,9689"; a="151556232"
-X-IronPort-AV: E=Sophos;i="5.75,380,1589266800"; 
-   d="scan'208";a="151556232"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga007.fm.intel.com ([10.253.24.52])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Jul 2020 13:16:44 -0700
-IronPort-SDR: X+1gf0GlOj+mKt3rc02hxwCyd7F7JjgSi1r8outk3FKtXyajk2th3dfB4YrErjB7IeIajCY+VU
- NXWz8qJOdZow==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.75,380,1589266800"; 
-   d="scan'208";a="270538473"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.152])
-  by fmsmga007.fm.intel.com with ESMTP; 21 Jul 2020 13:16:43 -0700
-Date:   Tue, 21 Jul 2020 13:16:43 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Jacob Xu <jacobhxu@google.com>
-Cc:     kvm@vger.kernel.org
-Subject: Re: tlb_flush stat on Intel/AMD
-Message-ID: <20200721201643.GI22083@linux.intel.com>
-References: <CAJ5mJ6i-SoZO+F+Xz5OqK7BE7z7eLvE1hC=KX1ABwdnTw-QZuA@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAJ5mJ6i-SoZO+F+Xz5OqK7BE7z7eLvE1hC=KX1ABwdnTw-QZuA@mail.gmail.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+        id S1730385AbgGUUSW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 21 Jul 2020 16:18:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52324 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726029AbgGUUSV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 21 Jul 2020 16:18:21 -0400
+Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C18CAC061794
+        for <kvm@vger.kernel.org>; Tue, 21 Jul 2020 13:18:21 -0700 (PDT)
+Received: by mail-yb1-xb49.google.com with SMTP id 8so26683126ybc.23
+        for <kvm@vger.kernel.org>; Tue, 21 Jul 2020 13:18:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=TLYIx65uBhH8tKMZC20n1CzNlboYevH1hAYzToPXQyo=;
+        b=sRXFES6q0Ey0/IU/nUy9UtsoyTTOrJ5vMzzf30Xx7HBy4yPhCiClOfbLXTSge3jGW4
+         vd4/h+wvkflMMufw78SHihakxCqgrw0Lh0IAzftfaE+KbaGasqS+oufao0HVWtVgfTZ6
+         7IUugwUAnDptaqm19MCiTNSKEJKjo5sMU0DcF3JtnU10sKLxOnwQVqK6SCoHFIz0gtmJ
+         /5GwwZYWsygKYhB2qhvSQn4PU/yJ+Cpr9hRxMcx9Z3vTFaZeuNOmoBQaytE6+S9k+Eac
+         et7GtpplD6WRZmVPOHcJAhvinaQFo5+FU+Xx2NnOgBgkRjDs13agKpaQbYoMWhttyrxO
+         JE8A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=TLYIx65uBhH8tKMZC20n1CzNlboYevH1hAYzToPXQyo=;
+        b=C7Wi0H0fFuZZB42+FZwcWN4p9WZAGVoTc0Xs4Odja7mWpvsQ3xdrn83gD5ELYVyYcM
+         pIxfRiYt3Jnwp6jHXQCNpxayQ8MOmT56bLbugnI9+FgKXliXKS8x11sw/2wz3cgKIrV/
+         4obK4bqbanGLkMf+aLp0wXWSSfUEKQfgDbAwiF7yd2H2ODxvG64klTCBzCmNLNERoTWh
+         nKBRj3d8mHtZSUXyJ1bYMHzkD3I8MhFwUEGr1S4LNUtoG4PgZFk87WyI3yD5Nh/CVYAN
+         hbWDWuPk+4EuKP4LMs1Y2ly1uo8l6/I5IJHMq3xNyd8qyfAjg7toL0p9S7ItvesUWz2K
+         lk/g==
+X-Gm-Message-State: AOAM53242kkuX8QT/hyAzNUXx9dkkTzVqqPQM7XDqUImO8T1dEy8x0Ce
+        x168WctY0w1pKr16wfxBh2UxiyaBIpRdsxo/kOTE8aOGezMxq7egxu5z0CmDf1cazdpOihOoKDe
+        jjlYqLs53iTfT+gLuB5IxzYej+aTtFACDAN5K8bf4bCj+wR4HXFVAesTJXg==
+X-Google-Smtp-Source: ABdhPJzvO8GTRdE8c2WMbR+gJ3+WIZYQ0HJzgJ1iT2yUDXY11NGWU5ddaeAjCanDq9QislIMkySk89cs+ts=
+X-Received: by 2002:a25:ae4f:: with SMTP id g15mr45255291ybe.441.1595362699898;
+ Tue, 21 Jul 2020 13:18:19 -0700 (PDT)
+Date:   Tue, 21 Jul 2020 20:18:09 +0000
+Message-Id: <20200721201814.2340705-1-oupton@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.28.0.rc0.142.g3c755180ce-goog
+Subject: [PATCH v2 0/5] KVM_{GET,SET}_TSC_OFFSET ioctls
+From:   Oliver Upton <oupton@google.com>
+To:     kvm@vger.kernel.org
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Peter Shier <pshier@google.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Peter Hornyack <peterhornyack@google.com>,
+        Oliver Upton <oupton@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jul 20, 2020 at 12:08:05PM -0700, Jacob Xu wrote:
-> Hi all,
-> 
-> I wrote a kvm selftest to enter a 1-vcpu guest VM running a nop in one
-> thread and check the VM's debugfs entry for # of tlb flushes while
-> that was running. Installing the latest upstream kernel and running
-> this on an intel host showed a tlb_flush count of 30, while running it
-> on an amd host shows the tlb_flush count at 0.
-> 
-> Do we have an inconsistency between Intel and AMD in how VCPU_STAT is
-> incremented?
+To date, VMMs have typically restored the guest's TSCs by value using
+the KVM_SET_MSRS ioctl for each vCPU. However, restoring the TSCs by
+value introduces some challenges with synchronization as the TSCs
+continue to tick throughout the restoration process. As such, KVM has
+some heuristics around TSC writes to infer whether or not the guest or
+host is attempting to synchronize the TSCs.
 
-Yes, you can even drop "between Intel and AMD" and just state "we have
-inconsistencies in how VCPU_STAT is incremented".
+Instead of guessing at the intentions of a VMM, it'd be better to
+provide an interface that allows for explicit synchronization of the
+guest's TSCs. To that end, this series introduces the
+KVM_{GET,SET}_TSC_OFFSET ioctls, yielding control of the TSC offset to
+userspace.
 
-> From browsing the code, we see that the stat only gets incremented in
-> the kvm_ wrappers of the x86_ops functions tlb_flush_all,
-> tlb_flush_current, and tlb_flush_guest. These wrappers are only called
-> via the KVM request api (referred to as deferred flushes in some other
-> threads), and there other instances of calling the x86_ops tlb_flush
-> methods directly (immediate flush).
-> 
-> It looks like most of the tlb flush calls are deferred, but there are
-> a few instances using the immediate flush where it's not counted
-> (kvm_mmu_load, svm_set_cr4, vmx_set_apic_access_page,
-> nested_prepare_vmcb_control). Is there a guideline on when to
-> deferred/immediate tlb_flush?
+v1 => v2:
+ - Added clarification to the documentation of KVM_SET_TSC_OFFSET to
+   indicate that it can be used instead of an IA32_TSC MSR restore
+   through KVM_SET_MSRS
+ - Fixed KVM_SET_TSC_OFFSET to participate in the existing TSC
+   synchronization heuristics, thereby enabling the KVM masterclock when
+   all vCPUs are in phase.
 
-The rule of thumb is to defer the flush whenever possible so that KVM
-doesn't flush multiple times in a single VM-Exit.   However, of the above
-three, svm_set_cr4() is the only one that can be deferred, but only
-because kvm_mmu_load() and vmx_set_apic_access_page() are reachable after
-KVM_REQ_TLB_FLUSH_CURRENT is processed in vcpu_enter_guest().
+Oliver Upton (4):
+  kvm: x86: refactor masterclock sync heuristics out of kvm_write_tsc
+  kvm: vmx: check tsc offsetting with nested_cpu_has()
+  selftests: kvm: use a helper function for reading cpuid
+  selftests: kvm: introduce tsc_offset_test
 
-The VMX APIC flush could be deferred by hoisting KVM_REQ_APIC_PAGE_RELOAD
-up.  I think that's safe?  But it's a very infrequent operation so I'm not
-exactly chomping at the bit to get it fixed.
+Peter Hornyack (1):
+  kvm: x86: add KVM_{GET,SET}_TSC_OFFSET ioctls
 
-> Could this be a cause for the lower tlb_flush stat seen on an AMD
-> host? Or perhaps there's another reason for the difference due to the
-> (too) simple selftest?
+ Documentation/virt/kvm/api.rst                |  31 ++
+ arch/x86/include/asm/kvm_host.h               |   1 +
+ arch/x86/kvm/vmx/vmx.c                        |   2 +-
+ arch/x86/kvm/x86.c                            | 147 ++++---
+ include/uapi/linux/kvm.h                      |   5 +
+ tools/testing/selftests/kvm/.gitignore        |   1 +
+ tools/testing/selftests/kvm/Makefile          |   1 +
+ .../testing/selftests/kvm/include/test_util.h |   3 +
+ .../selftests/kvm/include/x86_64/processor.h  |  15 +
+ .../selftests/kvm/include/x86_64/svm_util.h   |  10 +-
+ .../selftests/kvm/include/x86_64/vmx.h        |   9 +
+ tools/testing/selftests/kvm/lib/kvm_util.c    |   1 +
+ tools/testing/selftests/kvm/lib/x86_64/vmx.c  |  11 +
+ .../selftests/kvm/x86_64/tsc_offset_test.c    | 362 ++++++++++++++++++
+ 14 files changed, 550 insertions(+), 49 deletions(-)
+ create mode 100644 tools/testing/selftests/kvm/x86_64/tsc_offset_test.c
 
-Yes, but it's likely not due to any of the paths listed above.   Obviously
-accounting the flush in kvm_mmu_load() will elevate the count, but it will
-affect VMX and SVM identically.
+-- 
+2.28.0.rc0.142.g3c755180ce-goog
 
-Given that you see 0 on SVM and a low number on VMX, my money is on the
-difference being that VMX accounts the TLB flush that occurs on vCPU
-migration.  vmx_vcpu_load_vmcs() makes a KVM_REQ_TLB_FLUSH request, whereas
-svm_vcpu_load() resets asid_generation but doesn't increment the stats.
- 
-> In the case of svm_tlb_flush, it seems like the tlb flush is deferred
-> anyway since the response to setting a tlb flush control bit in the
-> VMCB is not acted upon until entering the guest. So it seems we could
-> count tlb flushes on svm more easily by incrementing the counter by
-> checking the control bit before KVM_RUN. Though perhaps there's
-> another case we'd like to count as tlb flush when the guest switches
-> ASID (where would we track this?).
->
-> Would switching to this alternative for incrementing tlb_flush stat in
-> svm be much different than what we do right now?
-
-I think a better option is to keep the current accounting, defer flushes
-when possible to naturally fix accounting, and then fix the remaining one
-off cases, e.g. kvm_mmu_load() and svm_vcpu_load().
-
-I can prep a small series unless you want the honors?
