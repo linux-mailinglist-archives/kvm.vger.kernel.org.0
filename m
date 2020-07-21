@@ -2,138 +2,279 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id AD178228A4A
-	for <lists+kvm@lfdr.de>; Tue, 21 Jul 2020 23:01:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E602E228AF4
+	for <lists+kvm@lfdr.de>; Tue, 21 Jul 2020 23:18:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730592AbgGUVBt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 21 Jul 2020 17:01:49 -0400
-Received: from mail-dm6nam10on2056.outbound.protection.outlook.com ([40.107.93.56]:29697
-        "EHLO NAM10-DM6-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726686AbgGUVBs (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 21 Jul 2020 17:01:48 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=ET1yhNIwQyqU0V1gbOgKFxRQtTUQCaRjhsx18XB6Lx0dvyuRF82AR4sIo6MAn4WMAa3iHz7Ev6NBUJff/Datq6USSZRdTcOT7+hRcuzfGPxzUdwsUwktSlRBF8k5hpDZTu6RoDXn02TAwhrl4+Gpdle4/8zanWUW+82X2UvmQn3c24/SGyYCk8/ZtG/EQekrPG9XqkYhxXE3ALamunBqVChIiPnq/ErsDhDo350gClyBEMcq6njPthDhJtsjtYV2CVkFpRN4quaF9oHkdtoTzKlRJGGqAX3E0I0DMUCR/VCeehQWgHRHbFXq1mn9RNT4rNunYAc5KMDGyg7nEET7KQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=+V8S/SNWLMv/0tjR4P09/Ica21Z5Q2Ox4tBDJPV0ZYQ=;
- b=iDMwMT3MMKr7wM+0RcOb0yFnm6W/ZCcwo3XohBqzJGOWVavpOJk/rhsRTdkRZv6uHemh0A1HnFba4sDOgdGzRnCeYOEvubXkvzMFKV6fYxI49x5ynkiobbjxEfZ7ap8GaLagHSGOrzNW0oA2FS7qjEP1pOLOzaWYCb1vHMQQSjupBgiXGEyB9OaRt4EFtZ3PFWec0e8GHm+NGx5mE8+X75elSpsJjNH2t0nbt/rCcWNMs0hXb5zuIGhNJPMvGr/PR8nwp3t5pAxCEErtUu2LwdXBRNHCIpzunouoX+QGkYFdllQgaL7IWZFocQUo+Ovdm/krLf6PIWAv99ABXxVCMw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=vmware.com; dmarc=pass action=none header.from=vmware.com;
- dkim=pass header.d=vmware.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=vmware.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=+V8S/SNWLMv/0tjR4P09/Ica21Z5Q2Ox4tBDJPV0ZYQ=;
- b=KCcGQkn/H6D0uJ4hYsIM3XminAXEDrzm3LdKzCjmxBSdCTqz89GEwDtV/HEvIa+lpsk0n75kf57AkUJ+FQqWwzUVhE10wDNq6AfFyCROZRDLmj1xORGPP4ifF8eyjUOezODoklvpt8iX/W6qQ9Xz2SD/TTc6lGFYyhg3UnvPkVk=
-Received: from BY5PR05MB7191.namprd05.prod.outlook.com (2603:10b6:a03:1d9::14)
- by SJ0PR05MB7472.namprd05.prod.outlook.com (2603:10b6:a03:285::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3216.14; Tue, 21 Jul
- 2020 21:01:44 +0000
-Received: from BY5PR05MB7191.namprd05.prod.outlook.com
- ([fe80::7d2f:b4c0:5bd9:f6af]) by BY5PR05MB7191.namprd05.prod.outlook.com
- ([fe80::7d2f:b4c0:5bd9:f6af%8]) with mapi id 15.20.3216.020; Tue, 21 Jul 2020
- 21:01:44 +0000
-From:   Mike Stunes <mstunes@vmware.com>
-To:     Joerg Roedel <joro@8bytes.org>
-CC:     "x86@kernel.org" <x86@kernel.org>, Joerg Roedel <jroedel@suse.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        "hpa@zytor.com" <hpa@zytor.com>, Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Jiri Slaby <jslaby@suse.cz>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Juergen Gross <jgross@suse.com>,
-        Kees Cook <keescook@chromium.org>,
-        David Rientjes <rientjes@google.com>,
-        Cfir Cohen <cfir@google.com>,
-        Erdem Aktas <erdemaktas@google.com>,
-        Masami Hiramatsu <mhiramat@kernel.org>,
+        id S1731174AbgGUVS0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 21 Jul 2020 17:18:26 -0400
+Received: from mx01.bbu.dsd.mx.bitdefender.com ([91.199.104.161]:37850 "EHLO
+        mx01.bbu.dsd.mx.bitdefender.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1731210AbgGUVQB (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 21 Jul 2020 17:16:01 -0400
+Received: from smtp.bitdefender.com (smtp02.buh.bitdefender.net [10.17.80.76])
+        by mx01.bbu.dsd.mx.bitdefender.com (Postfix) with ESMTPS id 030ED30747C8;
+        Wed, 22 Jul 2020 00:09:19 +0300 (EEST)
+Received: from localhost.localdomain (unknown [91.199.104.27])
+        by smtp.bitdefender.com (Postfix) with ESMTPSA id 81723303EF1A;
+        Wed, 22 Jul 2020 00:09:18 +0300 (EEST)
+From:   =?UTF-8?q?Adalbert=20Laz=C4=83r?= <alazar@bitdefender.com>
+To:     kvm@vger.kernel.org
+Cc:     virtualization@lists.linux-foundation.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        =?UTF-8?q?Adalbert=20Laz=C4=83r?= <alazar@bitdefender.com>,
+        Edwin Zhai <edwin.zhai@intel.com>,
+        Jan Kiszka <jan.kiszka@siemens.com>,
+        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        Mathieu Tarral <mathieu.tarral@protonmail.com>,
+        Patrick Colp <patrick.colp@oracle.com>,
+        =?UTF-8?q?Samuel=20Laur=C3=A9n?= <samuel.lauren@iki.fi>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Tamas K Lengyel <tamas@tklengyel.com>,
+        Weijiang Yang <weijiang.yang@intel.com>,
+        Yu C Zhang <yu.c.zhang@intel.com>,
         Sean Christopherson <sean.j.christopherson@intel.com>,
-        Martin Radev <martin.b.radev@gmail.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "virtualization@lists.linux-foundation.org" 
-        <virtualization@lists.linux-foundation.org>
-Subject: Re: [PATCH v4 51/75] x86/sev-es: Handle MMIO events
-Thread-Topic: [PATCH v4 51/75] x86/sev-es: Handle MMIO events
-Thread-Index: AQHWWdfdDTzyqLev5U6Jd/iJZ+m0yKkSkJaA
-Date:   Tue, 21 Jul 2020 21:01:44 +0000
-Message-ID: <40D5C698-1ED2-4CCE-9C1D-07620A021A6A@vmware.com>
-References: <20200714120917.11253-1-joro@8bytes.org>
- <20200714120917.11253-52-joro@8bytes.org>
-In-Reply-To: <20200714120917.11253-52-joro@8bytes.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-mailer: Apple Mail (2.3608.80.23.2.2)
-authentication-results: 8bytes.org; dkim=none (message not signed)
- header.d=none;8bytes.org; dmarc=none action=none header.from=vmware.com;
-x-originating-ip: [2601:600:9e7f:eac1:44f1:7528:2d31:aa97]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 66fd10c8-cf30-48d2-0b5b-08d82db9462c
-x-ms-traffictypediagnostic: SJ0PR05MB7472:
-x-microsoft-antispam-prvs: <SJ0PR05MB74723E72C230523B1DED2A45C8780@SJ0PR05MB7472.namprd05.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:7219;
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: v2GAPcSZkUSE2SLB+fvUUllRQXatIApzFturWsmYqnHhcLtouSC4k+PIA73CWYQWoQdxceV8x3DQjfOUi6bkg4YkovElZPNtBsLP0rhwRhkVJ0xUM8j8G2/jhkhjSlplFMTDyO3rfANfxGuG40ukLNaVbHN4ozVOcW2TFwu7fHpgt22k2umlrFzdQDl0Yzf/FHunVTgaS1dWKllyQ6ov2XPE3OUsU2zoi7NzYuL4bByU2wYVBtPWte+f/+4Q3/VuRzwIKSQSlKqDSa2hNCLwqLTLbKGSG5op+0rlUrQSpA0PhXR30Oxj4BlAcCedtAP7Fd58rCKCI2SA754StbDySg==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BY5PR05MB7191.namprd05.prod.outlook.com;PTR:;CAT:NONE;SFTY:;SFS:(4636009)(376002)(136003)(346002)(366004)(396003)(39860400002)(6506007)(53546011)(186003)(4326008)(7416002)(2616005)(6486002)(8936002)(6512007)(66476007)(33656002)(478600001)(54906003)(76116006)(316002)(86362001)(5660300002)(2906002)(66446008)(64756008)(66556008)(66946007)(6916009)(71200400001)(8676002)(36756003)(83380400001);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata: d/aW2nUxMcOBiuVRKWyUtd2kod2IZ+VzKZlLf3yQsMGfuP53dU4OiRgTqEON2wh6nd1P9R9lAO5i5/KlG77JDuefNt6Qr0rj4qXz64PUefm2fDtN5OuxPRMXkMS4/auBbKmccdclqhW2B0UujRUB3nOeuG327Leng7Ptl6soFTvXZBYIires8Tnag80pLleCXaVUdmGa8WvuayH1rKTe76yL4O/cHMht359m4Rt95mEGVSYMf3XcTxDcWIFzexaD4K2dtfuzMXp2lgMtmTGZJLdRvKkC3hYdQRg6cH8EztOUsAZdgy9Iu3agwb+a5hJzw0W6hsuqraKkyh/hxZiWfCrkpvmVN142L1aNVeloEUCd9ucDLehqggmslC+izDqXED8p9kQ8dfNuQqvpzFEC5LJQ4u4YA/+49miFVl6tZRUUgzpOYh/8pXOX2F+pt6U97oQysUFJwQU5204U5fuUKeYcN3T++TLnb+ZKbXX6kmUwOk7c60Eeh7iqF4TQZARaWJqqLA1lrWTcz1co/h9KvIlb58yoodfVFRD688kgF9wk7mj8WlrNO7iIE51uEyRO
-x-ms-exchange-transport-forked: True
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <FF0E2EA999EC494A816392FBDBBA1035@namprd05.prod.outlook.com>
-Content-Transfer-Encoding: base64
+        Joerg Roedel <joro@8bytes.org>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>
+Subject: [PATCH v9 00/84] VM introspection
+Date:   Wed, 22 Jul 2020 00:07:58 +0300
+Message-Id: <20200721210922.7646-1-alazar@bitdefender.com>
 MIME-Version: 1.0
-X-OriginatorOrg: vmware.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BY5PR05MB7191.namprd05.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 66fd10c8-cf30-48d2-0b5b-08d82db9462c
-X-MS-Exchange-CrossTenant-originalarrivaltime: 21 Jul 2020 21:01:44.0624
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b39138ca-3cee-4b4a-a4d6-cd83d9dd62f0
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: BIa5w+c9eUC0JD04fYKB0qF83gLmT8ENpKnGaStamfuvLXGQ5eAeBxsjoS/K2Bbp1gRg5YSyIXTMpxi/rHc6Rw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR05MB7472
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-SGkgSm9lcmcsDQoNClRoYW5rcyBmb3IgdGhlIG5ldyBwYXRjaC1zZXQhDQoNCj4gT24gSnVsIDE0
-LCAyMDIwLCBhdCA1OjA4IEFNLCBKb2VyZyBSb2VkZWwgPGpvcm9AOGJ5dGVzLm9yZz4gd3JvdGU6
-DQo+IA0KPiBGcm9tOiBUb20gTGVuZGFja3kgPHRob21hcy5sZW5kYWNreUBhbWQuY29tPg0KPiAN
-Cj4gQWRkIGhhbmRsZXIgZm9yIFZDIGV4Y2VwdGlvbnMgY2F1c2VkIGJ5IE1NSU8gaW50ZXJjZXB0
-cy4gVGhlc2UNCj4gaW50ZXJjZXB0cyBjb21lIGFsb25nIGFzIG5lc3RlZCBwYWdlIGZhdWx0cyBv
-biBwYWdlcyB3aXRoIHJlc2VydmVkDQo+IGJpdHMgc2V0Lg0KPiANCj4gU2lnbmVkLW9mZi1ieTog
-VG9tIExlbmRhY2t5IDx0aG9tYXMubGVuZGFja3lAYW1kLmNvbT4NCj4gWyBqcm9lZGVsQHN1c2Uu
-ZGU6IEFkYXB0IHRvIFZDIGhhbmRsaW5nIGZyYW1ld29yayBdDQo+IENvLWRldmVsb3BlZC1ieTog
-Sm9lcmcgUm9lZGVsIDxqcm9lZGVsQHN1c2UuZGU+DQo+IFNpZ25lZC1vZmYtYnk6IEpvZXJnIFJv
-ZWRlbCA8anJvZWRlbEBzdXNlLmRlPg0KPiANCj4gPHNuaXA+DQoNCknigJltIHJ1bm5pbmcgaW50
-byBhbiBNTUlPLXJlbGF0ZWQgYnVnIHdoZW4gSSB0cnkgdGVzdGluZyB0aGlzIG9uIG91ciBoeXBl
-cnZpc29yLg0KDQpEdXJpbmcgYm9vdCwgcHJvYmVfcm9tcyAoYXJjaC94ODYva2VybmVsL3Byb2Jl
-X3JvbXMuYykgdXNlcyByb21jaGVja3N1bSBvdmVyIHRoZSB2aWRlbyBST00gYW5kIGV4dGVuc2lv
-biBST00gcmVnaW9ucy4gSW4gbXkgdGVzdCBWTSwgdGhlIHZpZGVvIFJPTSByb21jaGVja3N1bSBz
-dGFydHMgYXQgdmlydHVhbCBhZGRyZXNzIDB4ZmZmZjg4ODAwMDBjMDAwMCBhbmQgaGFzIGxlbmd0
-aCA2NTUzNi4gQnV0LCBhdCBhZGRyZXNzIDB4ZmZmZjg4ODAwMDBjNDAwMCwgd2Ugc3dpdGNoIGZy
-b20gYmVpbmcgdmlkZW8tUk9NLWJhY2tlZCB0byBiZWluZyB1bmJhY2tlZCBieSBhbnl0aGluZy4N
-Cg0KV2l0aCBTRVYtRVMgZW5hYmxlZCwgb3VyIHBsYXRmb3JtIGhhbmRsZXMgcmVhZHMgYW5kIHdy
-aXRlcyB0byB1bmJhY2tlZCBtZW1vcnkgYnkgdHJlYXRpbmcgdGhlbSBhcyBNTUlPLiBTbywgdGhl
-IHJlYWQgZnJvbSAweGZmZmY4ODgwMDAwYzQwMDAgY2F1c2VzIGEgI1ZDLCB3aGljaCBpcyBoYW5k
-bGVkIGJ5IGRvX2Vhcmx5X2V4Y2VwdGlvbi4NCg0KSW4gaGFuZGxpbmcgdGhlICNWQywgdmNfc2xv
-d192aXJ0X3RvX3BoeXMgZmFpbHMgZm9yIHRoYXQgYWRkcmVzcy4gTXkgdW5kZXJzdGFuZGluZyBp
-cyB0aGF0IHRoZSAjVkMgaGFuZGxlciBzaG91bGQgdGhlbiBhZGQgYW4gZW50cnkgdG8gdGhlIHBh
-Z2UgdGFibGVzIGFuZCByZXRyeSB0aGUgZmF1bHRpbmcgYWNjZXNzLiBTb21laG93LCB0aGF0IGlz
-buKAmXQgaGFwcGVuaW5nLiBGcm9tIHRoZSBoeXBlcnZpc29yIHNpZGUsIGl0IGxvb2tzIGxpa2Ug
-dGhlIGd1ZXN0IGlzIGxvb3Bpbmcgc29tZWhvdy4gKEkgdGhpbmsgdGhlIFZDUFUgaXMgbW9zdGx5
-IHVuaGFsdGVkIGFuZCBtYWtpbmcgcHJvZ3Jlc3MsIGJ1dCB0aGUgZ3Vlc3QgbmV2ZXIgZ2V0cyBw
-YXN0IHRoYXQgcm9tY2hlY2tzdW0uKSBUaGUgZ3Vlc3QgbmV2ZXIgYWN0dWFsbHkgbWFrZXMgYW4g
-TU1JTyB2bWdleGl0IGZvciB0aGF0IGFkZHJlc3MuDQoNCklmIEkgcmVtb3ZlIHRoZSBjYWxsIHRv
-IHByb2JlX3JvbXMgZnJvbSBzZXR1cF9hcmNoLCBvciByZW1vdmUgdGhlIGNhbGxzIHRvIHJvbWNo
-ZWNrc3VtIGZyb20gcHJvYmVfcm9tcywgdGhpcyBrZXJuZWwgYm9vdHMgbm9ybWFsbHkuDQoNClBs
-ZWFzZSBsZXQgbWUga25vdyBvZiBvdGhlciB0ZXN0cyBJIHNob3VsZCBydW4gb3IgZGF0YSB0aGF0
-IEkgY2FuIGNvbGxlY3QuIFRoYW5rcyENCg0KTWlrZQ==
+The KVM introspection subsystem provides a facility for applications
+running on the host or in a separate VM, to control the execution of
+other VMs (pause, resume, shutdown), query the state of the vCPUs (GPRs,
+MSRs etc.), alter the page access bits in the shadow page tables (only
+for the hardware backed ones, eg. Intel's EPT) and receive notifications
+when events of interest have taken place (shadow page table level faults,
+key MSR writes, hypercalls etc.). Some notifications can be responded
+to with an action (like preventing an MSR from being written), others
+are mere informative (like breakpoint events which can be used for
+execution tracing).  With few exceptions, all events are optional. An
+application using this subsystem will explicitly register for them.
+
+The use case that gave way for the creation of this subsystem is to
+monitor the guest OS and as such the ABI/API is highly influenced by how
+the guest software (kernel, applications) sees the world. For example,
+some events provide information specific for the host CPU architecture
+(eg. MSR_IA32_SYSENTER_EIP) merely because its leveraged by guest software
+to implement a critical feature (fast system calls).
+
+At the moment, the target audience for KVMI are security software authors
+that wish to perform forensics on newly discovered threats (exploits)
+or to implement another layer of security like preventing a large set
+of kernel rootkits simply by "locking" the kernel image in the shadow
+page tables (ie. enforce .text r-x, .rodata rw- etc.). It's the latter
+case that made KVMI a separate subsystem, even though many of these
+features are available in the device manager. The ability to build a
+security application that does not interfere (in terms of performance)
+with the guest software asks for a specialized interface that is designed
+for minimum overhead.
+
+This patch series is based on kvm/master,
+commit 3d9fdc252b52 ("KVM: MIPS: Fix build errors for 32bit kernel").
+
+The previous version (v8) can be read here:
+
+	https://lore.kernel.org/kvm/20200330101308.21702-1-alazar@bitdefender.com/
+
+Patches 1-36: make preparatory changes
+
+Patches 38-82: add basic introspection capabilities
+
+Patch 83: support introspection tools that write-protect guest page tables
+
+Patch 84: notify the introspection tool even on emulation failures
+          (when the read/write callbacks used by the emulator,
+           kvm_page_preread/kvm_page_prewrite, are not invoked)
+
+Changes since v8:
+  - rebase on 5.8
+  - fix non-x86 builds (avoid including the UAPI headers from kvmi_host.h)
+  - fix the clean-up for KVMI_VCPU_SINGLESTEP [Mathieu]
+  - extend KVMI_VM_SET_PAGE_ACCESS with the 'visible' option
+  - improve KVMI_VM_GET_MAX_GFN (skip read-only, invalid or non-user memslots)
+  - add KVMI_VM_CONTROL_CLEANUP [Tamas, Mathieu]
+  - add KVMI_VCPU_GET_XCR and KVMI_VCPU_SET_XSAVE (SSE emulation)
+  - move KVM_REQ_INTROSPECTION in the range of arch-independent requests
+  - better split of x86 vs arch-independent code
+  - cover more error codes with tools/testing/selftests/kvm/x86_64/kvmi_test.c
+  - remove more error messages and close the introspection connection
+    when an error code can't be sent back or it doesn't make sense to send it
+  - other small changes (code refactoring, message validation, etc.).
+
+Adalbert Lazăr (22):
+  KVM: UAPI: add error codes used by the VM introspection code
+  KVM: add kvm_vcpu_kick_and_wait()
+  KVM: doc: fix the hypercall numbering
+  KVM: x86: add .control_cr3_intercept() to struct kvm_x86_ops
+  KVM: x86: add .desc_ctrl_supported()
+  KVM: x86: add .control_desc_intercept()
+  KVM: x86: export kvm_vcpu_ioctl_x86_set_xsave()
+  KVM: introspection: add hook/unhook ioctls
+  KVM: introspection: add permission access ioctls
+  KVM: introspection: add the read/dispatch message function
+  KVM: introspection: add KVMI_GET_VERSION
+  KVM: introspection: add KVMI_VM_CHECK_COMMAND and KVMI_VM_CHECK_EVENT
+  KVM: introspection: add KVMI_EVENT_UNHOOK
+  KVM: introspection: add KVMI_VM_CONTROL_EVENTS
+  KVM: introspection: add a jobs list to every introspected vCPU
+  KVM: introspection: add KVMI_VCPU_PAUSE
+  KVM: introspection: add KVMI_EVENT_PAUSE_VCPU
+  KVM: introspection: add KVMI_VM_CONTROL_CLEANUP
+  KVM: introspection: add KVMI_VCPU_GET_XCR
+  KVM: introspection: add KVMI_VCPU_SET_XSAVE
+  KVM: introspection: extend KVMI_GET_VERSION with struct kvmi_features
+  KVM: introspection: add KVMI_VCPU_TRANSLATE_GVA
+
+Marian Rotariu (1):
+  KVM: introspection: add KVMI_VCPU_GET_CPUID
+
+Mathieu Tarral (1):
+  signal: export kill_pid_info()
+
+Mihai Donțu (35):
+  KVM: x86: add kvm_arch_vcpu_get_regs() and kvm_arch_vcpu_get_sregs()
+  KVM: x86: avoid injecting #PF when emulate the VMCALL instruction
+  KVM: x86: add .control_msr_intercept()
+  KVM: x86: vmx: use a symbolic constant when checking the exit
+    qualifications
+  KVM: x86: save the error code during EPT/NPF exits handling
+  KVM: x86: add .fault_gla()
+  KVM: x86: add .spt_fault()
+  KVM: x86: add .gpt_translation_fault()
+  KVM: x86: extend kvm_mmu_gva_to_gpa_system() with the 'access'
+    parameter
+  KVM: x86: page track: provide all callbacks with the guest virtual
+    address
+  KVM: x86: page track: add track_create_slot() callback
+  KVM: x86: page_track: add support for preread, prewrite and preexec
+  KVM: x86: wire in the preread/prewrite/preexec page trackers
+  KVM: introduce VM introspection
+  KVM: introspection: add KVMI_VM_GET_INFO
+  KVM: introspection: add KVMI_VM_READ_PHYSICAL/KVMI_VM_WRITE_PHYSICAL
+  KVM: introspection: handle vCPU introspection requests
+  KVM: introspection: handle vCPU commands
+  KVM: introspection: add KVMI_VCPU_GET_INFO
+  KVM: introspection: add the crash action handling on the event reply
+  KVM: introspection: add KVMI_VCPU_CONTROL_EVENTS
+  KVM: introspection: add KVMI_VCPU_GET_REGISTERS
+  KVM: introspection: add KVMI_VCPU_SET_REGISTERS
+  KVM: introspection: add KVMI_EVENT_HYPERCALL
+  KVM: introspection: add KVMI_EVENT_BREAKPOINT
+  KVM: introspection: add KVMI_VCPU_CONTROL_CR and KVMI_EVENT_CR
+  KVM: introspection: add KVMI_VCPU_INJECT_EXCEPTION + KVMI_EVENT_TRAP
+  KVM: introspection: add KVMI_EVENT_XSETBV
+  KVM: introspection: add KVMI_VCPU_GET_XSAVE
+  KVM: introspection: add KVMI_VCPU_GET_MTRR_TYPE
+  KVM: introspection: add KVMI_VCPU_CONTROL_MSR and KVMI_EVENT_MSR
+  KVM: introspection: add KVMI_VM_SET_PAGE_ACCESS
+  KVM: introspection: add KVMI_EVENT_PF
+  KVM: introspection: emulate a guest page table walk on SPT violations
+    due to A/D bit updates
+  KVM: x86: call the page tracking code on emulation failure
+
+Mircea Cîrjaliu (2):
+  KVM: x86: disable gpa_available optimization for fetch and page-walk
+    SPT violations
+  KVM: introspection: add vCPU related data
+
+Nicușor Cîțu (21):
+  KVM: x86: add kvm_arch_vcpu_set_regs()
+  KVM: x86: add .bp_intercepted() to struct kvm_x86_ops
+  KVM: x86: add .cr3_write_intercepted()
+  KVM: svm: add support for descriptor-table exits
+  KVM: x86: add .desc_intercepted()
+  KVM: x86: export .msr_write_intercepted()
+  KVM: x86: use MSR_TYPE_R, MSR_TYPE_W and MSR_TYPE_RW with AMD
+  KVM: svm: pass struct kvm_vcpu to set_msr_interception()
+  KVM: vmx: pass struct kvm_vcpu to the intercept msr related functions
+  KVM: x86: add .control_singlestep()
+  KVM: x86: export kvm_arch_vcpu_set_guest_debug()
+  KVM: x86: export kvm_inject_pending_exception()
+  KVM: x86: export kvm_vcpu_ioctl_x86_get_xsave()
+  KVM: introspection: add cleanup support for vCPUs
+  KVM: introspection: restore the state of #BP interception on unhook
+  KVM: introspection: restore the state of CR3 interception on unhook
+  KVM: introspection: add KVMI_EVENT_DESCRIPTOR
+  KVM: introspection: restore the state of descriptor-table register
+    interception on unhook
+  KVM: introspection: restore the state of MSR interception on unhook
+  KVM: introspection: add KVMI_VCPU_CONTROL_SINGLESTEP
+  KVM: introspection: add KVMI_EVENT_SINGLESTEP
+
+Ștefan Șicleru (2):
+  KVM: add kvm_get_max_gfn()
+  KVM: introspection: add KVMI_VM_GET_MAX_GFN
+
+ Documentation/virt/kvm/api.rst                |  149 ++
+ Documentation/virt/kvm/hypercalls.rst         |   39 +-
+ Documentation/virt/kvm/kvmi.rst               | 1546 ++++++++++++
+ arch/x86/include/asm/kvm_host.h               |   41 +-
+ arch/x86/include/asm/kvm_page_track.h         |   71 +-
+ arch/x86/include/asm/kvmi_host.h              |   96 +
+ arch/x86/include/asm/vmx.h                    |    2 +
+ arch/x86/include/uapi/asm/kvmi.h              |  153 ++
+ arch/x86/kvm/Kconfig                          |   13 +
+ arch/x86/kvm/Makefile                         |    2 +
+ arch/x86/kvm/emulate.c                        |    4 +
+ arch/x86/kvm/kvm_emulate.h                    |    1 +
+ arch/x86/kvm/kvmi.c                           | 1413 +++++++++++
+ arch/x86/kvm/mmu.h                            |    4 +
+ arch/x86/kvm/mmu/mmu.c                        |  161 +-
+ arch/x86/kvm/mmu/page_track.c                 |  142 +-
+ arch/x86/kvm/svm/svm.c                        |  268 ++-
+ arch/x86/kvm/svm/svm.h                        |   14 +
+ arch/x86/kvm/vmx/capabilities.h               |    7 +-
+ arch/x86/kvm/vmx/vmx.c                        |  261 +-
+ arch/x86/kvm/vmx/vmx.h                        |    4 -
+ arch/x86/kvm/x86.c                            |  305 ++-
+ drivers/gpu/drm/i915/gvt/kvmgt.c              |    2 +-
+ include/linux/kvm_host.h                      |   20 +
+ include/linux/kvmi_host.h                     |  125 +
+ include/uapi/linux/kvm.h                      |   20 +
+ include/uapi/linux/kvm_para.h                 |    5 +
+ include/uapi/linux/kvmi.h                     |  254 ++
+ kernel/signal.c                               |    1 +
+ tools/testing/selftests/kvm/Makefile          |    1 +
+ .../testing/selftests/kvm/x86_64/kvmi_test.c  | 2143 +++++++++++++++++
+ virt/kvm/introspection/kvmi.c                 | 1409 +++++++++++
+ virt/kvm/introspection/kvmi_int.h             |  146 ++
+ virt/kvm/introspection/kvmi_msg.c             | 1059 ++++++++
+ virt/kvm/kvm_main.c                           |   92 +
+ 35 files changed, 9795 insertions(+), 178 deletions(-)
+ create mode 100644 Documentation/virt/kvm/kvmi.rst
+ create mode 100644 arch/x86/include/asm/kvmi_host.h
+ create mode 100644 arch/x86/include/uapi/asm/kvmi.h
+ create mode 100644 arch/x86/kvm/kvmi.c
+ create mode 100644 include/linux/kvmi_host.h
+ create mode 100644 include/uapi/linux/kvmi.h
+ create mode 100644 tools/testing/selftests/kvm/x86_64/kvmi_test.c
+ create mode 100644 virt/kvm/introspection/kvmi.c
+ create mode 100644 virt/kvm/introspection/kvmi_int.h
+ create mode 100644 virt/kvm/introspection/kvmi_msg.c
+
+
+base-commit: 3d9fdc252b52023260de1d12399cb3157ed28c07
+CC: Edwin Zhai <edwin.zhai@intel.com>
+CC: Jan Kiszka <jan.kiszka@siemens.com>
+CC: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
+CC: Mathieu Tarral <mathieu.tarral@protonmail.com>
+CC: Patrick Colp <patrick.colp@oracle.com>
+CC: Samuel Laurén <samuel.lauren@iki.fi>
+CC: Stefan Hajnoczi <stefanha@redhat.com>
+CC: Tamas K Lengyel <tamas@tklengyel.com>
+CC: Weijiang Yang <weijiang.yang@intel.com>
+CC: Yu C Zhang <yu.c.zhang@intel.com>
+CC: Sean Christopherson <sean.j.christopherson@intel.com>
+CC: Joerg Roedel <joro@8bytes.org>
+CC: Vitaly Kuznetsov <vkuznets@redhat.com>
+CC: Wanpeng Li <wanpengli@tencent.com>
+CC: Jim Mattson <jmattson@google.com>
