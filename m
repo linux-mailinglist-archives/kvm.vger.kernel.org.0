@@ -2,79 +2,105 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E5DBB228B07
-	for <lists+kvm@lfdr.de>; Tue, 21 Jul 2020 23:21:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 62143228B74
+	for <lists+kvm@lfdr.de>; Tue, 21 Jul 2020 23:35:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731194AbgGUVVM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 21 Jul 2020 17:21:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34154 "EHLO
+        id S1731184AbgGUVfX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 21 Jul 2020 17:35:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36310 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731145AbgGUVVL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 21 Jul 2020 17:21:11 -0400
-Received: from mail-pf1-x444.google.com (mail-pf1-x444.google.com [IPv6:2607:f8b0:4864:20::444])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5A89AC0619DC
-        for <kvm@vger.kernel.org>; Tue, 21 Jul 2020 14:21:11 -0700 (PDT)
-Received: by mail-pf1-x444.google.com with SMTP id 1so53644pfn.9
-        for <kvm@vger.kernel.org>; Tue, 21 Jul 2020 14:21:11 -0700 (PDT)
+        with ESMTP id S1728606AbgGUVfW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 21 Jul 2020 17:35:22 -0400
+Received: from mail-ej1-x643.google.com (mail-ej1-x643.google.com [IPv6:2a00:1450:4864:20::643])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 07496C0619DB
+        for <kvm@vger.kernel.org>; Tue, 21 Jul 2020 14:35:21 -0700 (PDT)
+Received: by mail-ej1-x643.google.com with SMTP id y10so36008eje.1
+        for <kvm@vger.kernel.org>; Tue, 21 Jul 2020 14:35:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=Wo2KSkt2uKsTjaxUKUx/AXgKzZQLVgE9fv7oC1pgM9U=;
-        b=fxicQTWxrU2WqFRihd/VZT/MbC0QG/JVXizq/OhLoM/dTFzG3ztptOTItob3McBPXl
-         s/8rfUZi4yvPRDPzB4x1DM25Qk+bOwKx9ZxSOBscZuk4ExZ2eBtnhHe9rpBAjbWdJNu3
-         j1RWLpTE+MfqYyimAtHkTaWYpckroafRcSc40=
+        d=intel-com.20150623.gappssmtp.com; s=20150623;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=pUG6c39OxzQ8IxUpaaU1wklcT+ZDA+H9y6wrizuP1IQ=;
+        b=fpVtZ5vr/bl4gwJZ660px4Eks0k0bFp5F00leanT0uPcOTgmoIVnokm+ua/STwjYYU
+         9V0Le4JZ7BwvhlVhFXG7Dk6uDAL6avESZPtpqEXkGTTx7a0UAf5JI5cLpd6qdzoiV4pc
+         OVZuIyutP3UYG7RX+wyFYILhVk9K+2Bf5Rkkvu4t2vAnzZGCeHNgevlyRyPEZajZKVWb
+         LJx3ccmgwBWG3aOFencD4vIdccFY+YTJ+h0qq1fXsevTE8RiRwpAEsyonT9mp1hrf2yM
+         MP/VlkjZk9cKmlm2n20iRO2IPBPgE/cY4y2TN8o594hbmdnreaFuvl/GYgmWrPMBcdz8
+         wb2Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=Wo2KSkt2uKsTjaxUKUx/AXgKzZQLVgE9fv7oC1pgM9U=;
-        b=C+Yxa3RlCybgoAK7ItYDyggZ5x8wW+9AMQqlbT506kn6PnbKoIBav5u7Yfms5k0duB
-         AxBCOz745Ooamr0F3WbqJcDwkk4o7+GPEr8OAOCa9YpgERm+Nw4rvkQtHjNutcnlvX3D
-         KinKDn7sikVZ5iesxVNb/WiKEmqWk/OSSG4wGxSc8pZZWb26+u1T5rbPZLZ7tXO9B6j4
-         7NcaZxw47Kb285Hr1YDt0ainJlzcVu1vVn+1xRuq28AsI9MrIUqVLxTzPDw1B3SYA6od
-         9VmWKBuGEv9xvw930ratQZJKg3SKwRzAGgC2AmqGjn2BwVsavu9jIDR7JGGOVIVxRNau
-         HFTQ==
-X-Gm-Message-State: AOAM531MPAyAOUOtwYXBZ6NLwEGfNCXRs960/ophNbw7WtMaRJyvlycX
-        +A7nsEbQAEOn8UYxBbDihbB0yQ==
-X-Google-Smtp-Source: ABdhPJxDDnyEVXIY4rLb+RsPBAy4yKWxQVpSGTnpY8gFur3vVyP2p27baBMA8SghPFnQbtOFo9/T2w==
-X-Received: by 2002:a62:6305:: with SMTP id x5mr26195638pfb.81.1595366470930;
-        Tue, 21 Jul 2020 14:21:10 -0700 (PDT)
-Received: from www.outflux.net (smtp.outflux.net. [198.145.64.163])
-        by smtp.gmail.com with ESMTPSA id 66sm21380770pfg.63.2020.07.21.14.21.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 21 Jul 2020 14:21:10 -0700 (PDT)
-Date:   Tue, 21 Jul 2020 14:21:09 -0700
-From:   Kees Cook <keescook@chromium.org>
-To:     Thomas Gleixner <tglx@linutronix.de>
-Cc:     LKML <linux-kernel@vger.kernel.org>, x86@kernel.org,
-        linux-arch@vger.kernel.org, Will Deacon <will@kernel.org>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Keno Fischer <keno@juliacomputing.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        Gabriel Krisman Bertazi <krisman@collabora.com>
-Subject: Re: [patch V4 01/15] seccomp: Provide stub for __secure_computing()
-Message-ID: <202007211421.FE862FEE@keescook>
-References: <20200721105706.030914876@linutronix.de>
- <20200721110808.348199175@linutronix.de>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=pUG6c39OxzQ8IxUpaaU1wklcT+ZDA+H9y6wrizuP1IQ=;
+        b=d4ck57QrPtf8cJfvV3OFmNOBTxqyAQ3xnwUENvTv0GaLUSNLyQq1A13ou23+quiSxf
+         bcU1GOe7qU2Eaxd9YcdjWR2aWFRw+pa6ufWFZ+YgINgIEqTEzFnIUGPYWgX+eLuzINSY
+         WEznCzr7nGf1KxMGI+qwBmg0CM2nR47MdQ3HFHxm/SLwdP1+10DafqbJ4NJIydbD0+xF
+         M+vif7bDDqKZEQeX6wuRc5oiyus4joei4k3FtTS4n5skMru4ByVW72BRkZJHcpemDyZi
+         3I/qp5+67pmGtM/GPCYjy3HLqq8EVR8XFufhQ4Y7yY15qF5gQlBVYevJzKmnRev8ecYg
+         wiQg==
+X-Gm-Message-State: AOAM531Qg6X0InZwHffNpIKanYLci+q61muVCv3SsQUyl7T2mpCFO6fC
+        fbRQDJYVY72Yd+v1RrSj2m78g4kP1A3frwIqTckx9A==
+X-Google-Smtp-Source: ABdhPJybQSo8dZkcp7h1w6spji8sbGsdM1tSDGznEquhq3K0DjuECAckH4y+EAugj+bvtxFnwhrKgK1z4PC3S6mLDA0=
+X-Received: by 2002:a17:906:1a54:: with SMTP id j20mr26707162ejf.455.1595367320599;
+ Tue, 21 Jul 2020 14:35:20 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200721110808.348199175@linutronix.de>
+References: <159534667974.28840.2045034360240786644.stgit@djiang5-desk3.ch.intel.com>
+ <20200721162858.GA2139881@kroah.com>
+In-Reply-To: <20200721162858.GA2139881@kroah.com>
+From:   Dan Williams <dan.j.williams@intel.com>
+Date:   Tue, 21 Jul 2020 14:35:09 -0700
+Message-ID: <CAPcyv4gyYPNL87YnCgg6E+NL_URZfiumyaVfe4jGv4XQ0oO=0w@mail.gmail.com>
+Subject: Re: [PATCH RFC v2 00/18] Add VFIO mediated device support and DEV-MSI
+ support for the idxd driver
+To:     Greg KH <gregkh@linuxfoundation.org>
+Cc:     Dave Jiang <dave.jiang@intel.com>, Vinod Koul <vkoul@kernel.org>,
+        "Dey, Megha" <megha.dey@intel.com>, maz@kernel.org,
+        Bjorn Helgaas <bhelgaas@google.com>,
+        "Rafael J. Wysocki" <rafael@kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Jacob jun Pan <jacob.jun.pan@intel.com>,
+        "Raj, Ashok" <ashok.raj@intel.com>,
+        Jason Gunthorpe <jgg@mellanox.com>,
+        Yi L Liu <yi.l.liu@intel.com>, Baolu Lu <baolu.lu@intel.com>,
+        "Tian, Kevin" <kevin.tian@intel.com>,
+        Sanjay K Kumar <sanjay.k.kumar@intel.com>,
+        "Luck, Tony" <tony.luck@intel.com>, Jing Lin <jing.lin@intel.com>,
+        kwankhede@nvidia.com, eric.auger@redhat.com, parav@mellanox.com,
+        Dave Hansen <dave.hansen@intel.com>, netanelg@mellanox.com,
+        shahafs@mellanox.com, yan.y.zhao@linux.intel.com,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Samuel Ortiz <samuel.ortiz@intel.com>, mona.hossain@intel.com,
+        dmaengine@vger.kernel.org,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        X86 ML <x86@kernel.org>, linux-pci@vger.kernel.org,
+        KVM list <kvm@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jul 21, 2020 at 12:57:07PM +0200, Thomas Gleixner wrote:
-> To avoid #ifdeffery in the upcoming generic syscall entry work code provide
-> a stub for __secure_computing() as this is preferred over
-> secure_computing() because the TIF flag is already evaluated.
-> 
-> Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
+On Tue, Jul 21, 2020 at 9:29 AM Greg KH <gregkh@linuxfoundation.org> wrote:
+>
+> On Tue, Jul 21, 2020 at 09:02:15AM -0700, Dave Jiang wrote:
+> > v2:
+>
+> "RFC" to me means "I don't really think this is mergable, so I'm
+> throwing it out there."  Which implies you know it needs more work
+> before others should review it as you are not comfortable with it :(
 
-Acked-by: Kees Cook <keescook@chromium.org>
+There's full blown reviewed-by from me on the irq changes. The VFIO /
+mdev changes looked ok to me, but I did not feel comfortable / did not
+have time to sign-off on them. At the same time I did not see much to
+be gained to keeping those internal. So "RFC" in this case is a bit
+modest. It's more internal reviewer said this looks like it is going
+in the right direction, but wants more community discussion on the
+approach.
 
--- 
-Kees Cook
+> So, back-of-the-queue you go...
+
+Let's consider this not RFC in that context. The drivers/base/ pieces
+have my review for you, the rest are dmaengine and vfio subsystem
+concerns that could use some commentary.
