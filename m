@@ -2,77 +2,63 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id F30B62277C3
-	for <lists+kvm@lfdr.de>; Tue, 21 Jul 2020 06:54:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C20732277F0
+	for <lists+kvm@lfdr.de>; Tue, 21 Jul 2020 07:04:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726990AbgGUEy2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 21 Jul 2020 00:54:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49958 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725984AbgGUEy2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 21 Jul 2020 00:54:28 -0400
-Received: from ozlabs.org (ozlabs.org [IPv6:2401:3900:2:1::2])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4BA5FC061794;
-        Mon, 20 Jul 2020 21:54:28 -0700 (PDT)
+        id S1728154AbgGUFEx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 21 Jul 2020 01:04:53 -0400
+Received: from ozlabs.org ([203.11.71.1]:46591 "EHLO ozlabs.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726003AbgGUFEw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 21 Jul 2020 01:04:52 -0400
 Received: by ozlabs.org (Postfix, from userid 1003)
-        id 4B9mTt2d5Zz9sSJ; Tue, 21 Jul 2020 14:54:26 +1000 (AEST)
+        id 4B9mjt342fz9sSJ; Tue, 21 Jul 2020 15:04:50 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ozlabs.org; s=201707;
-        t=1595307266; bh=RQE08isQf+lBELg3C8LRhn+T91bIrsMyhyCDly9itjg=;
+        t=1595307890; bh=F77WFg+4dndurqYjYW+EYiJiX3wkHQ0Go7Hn9Xv1mhY=;
         h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=Udf9255C4Pb0JsIeovrxWm1+Cgw67ckgCelFZEEI5ONfcB529BVnIiUek2+i2mUcA
-         cN/1kMZosYyV4sEMOztqQwRWGSS/bhlMtc0tqLWRfHeFmRK8Ql+/I2O7IKYfyzFt+3
-         AKRJwhhYdJGxiV7DAi7kE2G41vSv9nto5+xc8i2/meTd3R0EFXIj75Ubt8fp7JCtMw
-         JKJGLs1+StWjkodJ88zF4QQbQCkt8z5uswJz16Zvmwh1mdDkVJmkDQ8vBpX2S3Fclf
-         OdniE7bhslmcJyWXrig9cq2prnoqonFLNnOFzrN5cAkRgYO3eKkAN0IhS0WSgNwDgu
-         657tg8jJG7ynQ==
-Date:   Tue, 21 Jul 2020 13:54:20 +1000
+        b=DivInJNueA+UccbiuANm5nHiHdMSq1dBegGb0Qi7XOrxUwx8qMXEe14MxEW4C9bWJ
+         VfjM0sYFtB5ndIRadWr57LjUNrnzvoP4GSzN8twwv3qGFtm4xc3H1dXY+d2O3Pd5ib
+         e6JM0ZVmoD8b35ixh03vQ2VUiy48z8q+pQ4dQ7Quli0av6un79xsnGfEbv9x/F3iRk
+         LGodlffg7TZG5Y7OYCxIFbj+3LoFJV2uwMLVjarNIeFlJE0IVtGJXgjzuCimK0ZNmG
+         83dgoFx2Nl7AC4/xqPw9lJ0QVe1LqhhkxIRSLWN2yRs+MR7jtNkhG56D3tXpKyLKT9
+         r1oATtEG7PkpQ==
+Date:   Tue, 21 Jul 2020 15:04:45 +1000
 From:   Paul Mackerras <paulus@ozlabs.org>
-To:     Athira Rajeev <atrajeev@linux.vnet.ibm.com>
-Cc:     mpe@ellerman.id.au, linuxppc-dev@lists.ozlabs.org,
-        maddy@linux.vnet.ibm.com, mikey@neuling.org,
-        kvm-ppc@vger.kernel.org, kvm@vger.kernel.org,
-        ego@linux.vnet.ibm.com, svaidyan@in.ibm.com, acme@kernel.org,
-        jolsa@kernel.org
-Subject: Re: [v3 02/15] KVM: PPC: Book3S HV: Cleanup updates for kvm vcpu MMCR
-Message-ID: <20200721035420.GA3819606@thinks.paulus.ozlabs.org>
-References: <1594996707-3727-1-git-send-email-atrajeev@linux.vnet.ibm.com>
- <1594996707-3727-3-git-send-email-atrajeev@linux.vnet.ibm.com>
+To:     =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
+Cc:     Michael Ellerman <mpe@ellerman.id.au>,
+        linuxppc-dev@lists.ozlabs.org, kvm@vger.kernel.org,
+        kvm-ppc@vger.kernel.org, David Gibson <david@gibson.dropbear.id.au>
+Subject: Re: [PATCH] KVM: PPC: Book3S HV: Use feature flag CPU_FTR_P9_TIDR
+ when accessing TIDR
+Message-ID: <20200721050445.GA3878639@thinks.paulus.ozlabs.org>
+References: <20200623165027.271215-1-clg@kaod.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <1594996707-3727-3-git-send-email-atrajeev@linux.vnet.ibm.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20200623165027.271215-1-clg@kaod.org>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jul 17, 2020 at 10:38:14AM -0400, Athira Rajeev wrote:
-> Currently `kvm_vcpu_arch` stores all Monitor Mode Control registers
-> in a flat array in order: mmcr0, mmcr1, mmcra, mmcr2, mmcrs
-> Split this to give mmcra and mmcrs its own entries in vcpu and
-> use a flat array for mmcr0 to mmcr2. This patch implements this
-> cleanup to make code easier to read.
+On Tue, Jun 23, 2020 at 06:50:27PM +0200, Cédric Le Goater wrote:
+> The TIDR register is only available on POWER9 systems and code
+> accessing this register is not always protected by the CPU_FTR_P9_TIDR
+> flag. Fix that to make sure POWER10 systems won't use it as TIDR has
+> been removed.
 
-Changing the way KVM stores these values internally is fine, but
-changing the user ABI is not.  This part:
+I'm concerned about what this patch would do if we are trying to
+migrate from a P9 guest to a guest on P10 in P9-compat mode, in that
+the destination QEMU would get an error on doing the SET_ONE_REG for
+the TIDR.  I don't think the lack of TIDR is worth failing the
+migration for given that TIDR only actually does anything if you are
+using an accelerator, and KVM has never supported use of accelerators
+in guests.  I'm cc'ing David Gibson for his comments on the
+compatibility and migration issues.
 
-> diff --git a/arch/powerpc/include/uapi/asm/kvm.h b/arch/powerpc/include/uapi/asm/kvm.h
-> index 264e266..e55d847 100644
-> --- a/arch/powerpc/include/uapi/asm/kvm.h
-> +++ b/arch/powerpc/include/uapi/asm/kvm.h
-> @@ -510,8 +510,8 @@ struct kvm_ppc_cpu_char {
->  
->  #define KVM_REG_PPC_MMCR0	(KVM_REG_PPC | KVM_REG_SIZE_U64 | 0x10)
->  #define KVM_REG_PPC_MMCR1	(KVM_REG_PPC | KVM_REG_SIZE_U64 | 0x11)
-> -#define KVM_REG_PPC_MMCRA	(KVM_REG_PPC | KVM_REG_SIZE_U64 | 0x12)
-> -#define KVM_REG_PPC_MMCR2	(KVM_REG_PPC | KVM_REG_SIZE_U64 | 0x13)
-> +#define KVM_REG_PPC_MMCR2	(KVM_REG_PPC | KVM_REG_SIZE_U64 | 0x12)
-> +#define KVM_REG_PPC_MMCRA	(KVM_REG_PPC | KVM_REG_SIZE_U64 | 0x13)
+In any case, given that both move to and move from TIDR will be no-ops
+on P10 (for privileged code), I don't think there is a great urgency
+for this patch.
 
-means that existing userspace programs that used to work would now be
-broken.  That is not acceptable (breaking the user ABI is only ever
-acceptable with a very compelling reason).  So NAK to this part of the
-patch.
-
-Regards,
 Paul.
