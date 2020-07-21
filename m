@@ -2,33 +2,33 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 63BD1228491
-	for <lists+kvm@lfdr.de>; Tue, 21 Jul 2020 18:03:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C0274228496
+	for <lists+kvm@lfdr.de>; Tue, 21 Jul 2020 18:03:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730195AbgGUQC5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 21 Jul 2020 12:02:57 -0400
-Received: from mga14.intel.com ([192.55.52.115]:23714 "EHLO mga14.intel.com"
+        id S1730219AbgGUQDN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 21 Jul 2020 12:03:13 -0400
+Received: from mga18.intel.com ([134.134.136.126]:27543 "EHLO mga18.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730140AbgGUQC4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 21 Jul 2020 12:02:56 -0400
-IronPort-SDR: kbCCVJltOLY8VGmPSxWdZPWScdMb0etBSijwkv2NRGVzzfIaaO5v4nRSvNCdFS4YwhK7fcxqQH
- M/fGnOvuV+9A==
-X-IronPort-AV: E=McAfee;i="6000,8403,9689"; a="149317914"
+        id S1728379AbgGUQDL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 21 Jul 2020 12:03:11 -0400
+IronPort-SDR: Dq0djEvBF8TiOJncBT7x7vNnMSKx7Knez7eG/DZBaDTepUN+hDvUmQ7oolelucTKxp7oRBcJSQ
+ X665Cktj9Nnw==
+X-IronPort-AV: E=McAfee;i="6000,8403,9689"; a="137657200"
 X-IronPort-AV: E=Sophos;i="5.75,379,1589266800"; 
-   d="scan'208";a="149317914"
+   d="scan'208";a="137657200"
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Jul 2020 09:02:56 -0700
-IronPort-SDR: TzPGTcZN9zlLB4fucHhhO1H9cnoXBW7xAE2Mbe+z2aDFCVbwFodYlgtqbeblCcXecZ2xQPB7uY
- yCxSAnwHxaug==
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Jul 2020 09:03:05 -0700
+IronPort-SDR: 2jqYA5uRDWKKOM6kQb9ONkoepEQl6cA680AXMAE0esVC+NDaFW9xMtfN4ACASNt9oG3jkdaV9+
+ B3Dpwpz7LTog==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.75,379,1589266800"; 
-   d="scan'208";a="310293518"
+   d="scan'208";a="488134027"
 Received: from djiang5-desk3.ch.intel.com ([143.182.136.137])
-  by fmsmga004.fm.intel.com with ESMTP; 21 Jul 2020 09:02:54 -0700
-Subject: [PATCH RFC v2 06/18] dmaengine: idxd: add interrupt handle request
- support
+  by fmsmga005.fm.intel.com with ESMTP; 21 Jul 2020 09:03:01 -0700
+Subject: [PATCH RFC v2 07/18] dmaengine: idxd: add DEV-MSI support in base
+ driver
 From:   Dave Jiang <dave.jiang@intel.com>
 To:     vkoul@kernel.org, megha.dey@intel.com, maz@kernel.org,
         bhelgaas@google.com, rafael@kernel.org, gregkh@linuxfoundation.org,
@@ -43,8 +43,8 @@ To:     vkoul@kernel.org, megha.dey@intel.com, maz@kernel.org,
         pbonzini@redhat.com, samuel.ortiz@intel.com, mona.hossain@intel.com
 Cc:     dmaengine@vger.kernel.org, linux-kernel@vger.kernel.org,
         x86@kernel.org, linux-pci@vger.kernel.org, kvm@vger.kernel.org
-Date:   Tue, 21 Jul 2020 09:02:54 -0700
-Message-ID: <159534737478.28840.15476839290532682395.stgit@djiang5-desk3.ch.intel.com>
+Date:   Tue, 21 Jul 2020 09:03:01 -0700
+Message-ID: <159534738102.28840.3470861020183323671.stgit@djiang5-desk3.ch.intel.com>
 In-Reply-To: <159534667974.28840.2045034360240786644.stgit@djiang5-desk3.ch.intel.com>
 References: <159534667974.28840.2045034360240786644.stgit@djiang5-desk3.ch.intel.com>
 User-Agent: StGit/unknown-version
@@ -56,257 +56,316 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add support for requesting interrupt handle from the device. The interrupt
-handle is put in the interrupt handle field of a descriptor for the device
-to determine which interrupt vector to use be it MSI-X or IMS. On the host
-device, the interrupt handle is indexed to the MSI-X table. This allows a
-descriptor to program the interrupt handle 1:1 with the MSI-X index without
-getting it from the request interrupt handle device command. For a guest
-device, the index can be any index that the host assigned for the IMS
-table, and therefore it must be requested from the virtual device during
-MSI-X setup by the driver running on the guest.
+In preparation for support of VFIO mediated device for idxd driver, the
+enabling for Interrupt Message Store (IMS) interrupts is added for the idxd
+base driver. DEV-MSI is the generic kernel support that mechanisms like
+IMS can use to get their interrupts enabled. With IMS support the idxd
+driver can dynamically allocate interrupts on a per mdev basis based on how
+many IMS vectors that are mapped to the mdev device. This commit only
+provides the support functions in the base driver and not the VFIO mdev
+code utilization.
 
-On the actual hardware the MSIX vector 0 is misc interrupt and handles
-events such as administrative command completion, error reporting,
-performance monitor overflow, and etc. The MSIX vectors 1...N
-are used for descriptor completion interrupts. On the guest kernel,
-the MSIX interrupts are backed by the mediated device through emulation
-or IMS vectors. Vector 0 is handled through emulation by the host vdcm.
-It only requires the host driver to send the signal to qemu. The vector 1
-(and more may be supported later) is backed by IMS.
+The commit has some portal related changes. A "portal" is a special
+location within the MMIO BAR2 of the DSA device where descriptors are
+submitted via the CPU command MOVDIR64B or ENQCMD(S). The offset for the
+portal address determines whether the submitted descriptor is for MSI-X
+or IMS notification.
+
+See Intel SIOV spec for more details:
+https://software.intel.com/en-us/download/intel-scalable-io-virtualization-technical-specification
 
 Signed-off-by: Dave Jiang <dave.jiang@intel.com>
 Reviewed-by: Kevin Tian <kevin.tian@intel.com>
 ---
- drivers/dma/idxd/device.c    |   30 ++++++++++++++++++++++++++++++
- drivers/dma/idxd/idxd.h      |   11 +++++++++++
- drivers/dma/idxd/init.c      |   29 +++++++++++++++++++++++++++++
- drivers/dma/idxd/registers.h |    4 +++-
- drivers/dma/idxd/submit.c    |   29 ++++++++++++++++++++++-------
- 5 files changed, 95 insertions(+), 8 deletions(-)
+ drivers/dma/idxd/Makefile |    2 +-
+ drivers/dma/idxd/cdev.c   |    4 ++-
+ drivers/dma/idxd/idxd.h   |   14 ++++++++----
+ drivers/dma/idxd/ims.c    |   53 +++++++++++++++++++++++++++++++++++++++++++++
+ drivers/dma/idxd/init.c   |   52 ++++++++++++++++++++++++++++++++++++++++++++
+ drivers/dma/idxd/submit.c |   10 +++++++-
+ drivers/dma/idxd/sysfs.c  |   11 +++++++++
+ 7 files changed, 137 insertions(+), 9 deletions(-)
+ create mode 100644 drivers/dma/idxd/ims.c
 
-diff --git a/drivers/dma/idxd/device.c b/drivers/dma/idxd/device.c
-index 7531ed9c1b81..2b4e8ab99ebd 100644
---- a/drivers/dma/idxd/device.c
-+++ b/drivers/dma/idxd/device.c
-@@ -502,6 +502,36 @@ void idxd_device_drain_pasid(struct idxd_device *idxd, int pasid)
- 	dev_dbg(dev, "pasid %d drained\n", pasid);
- }
+diff --git a/drivers/dma/idxd/Makefile b/drivers/dma/idxd/Makefile
+index 8978b898d777..d1519b9d1dd0 100644
+--- a/drivers/dma/idxd/Makefile
++++ b/drivers/dma/idxd/Makefile
+@@ -1,2 +1,2 @@
+ obj-$(CONFIG_INTEL_IDXD) += idxd.o
+-idxd-y := init.o irq.o device.o sysfs.o submit.o dma.o cdev.o
++idxd-y := init.o irq.o device.o sysfs.o submit.o dma.o cdev.o ims.o
+diff --git a/drivers/dma/idxd/cdev.c b/drivers/dma/idxd/cdev.c
+index d4841d8c0928..ffeae646f947 100644
+--- a/drivers/dma/idxd/cdev.c
++++ b/drivers/dma/idxd/cdev.c
+@@ -202,8 +202,8 @@ static int idxd_cdev_mmap(struct file *filp, struct vm_area_struct *vma)
+ 		return rc;
  
-+#define INT_HANDLE_IMS_TABLE	0x10000
-+int idxd_device_request_int_handle(struct idxd_device *idxd, int idx,
-+				   int *handle, enum idxd_interrupt_type irq_type)
-+{
-+	struct device *dev = &idxd->pdev->dev;
-+	u32 operand, status;
-+
-+	if (!(idxd->hw.cmd_cap & BIT(IDXD_CMD_REQUEST_INT_HANDLE)))
-+		return -EOPNOTSUPP;
-+
-+	dev_dbg(dev, "get int handle, idx %d\n", idx);
-+
-+	operand = idx & 0xffff;
-+	if (irq_type == IDXD_IRQ_IMS)
-+		operand |= INT_HANDLE_IMS_TABLE;
-+	dev_dbg(dev, "cmd: %u operand: %#x\n",
-+		IDXD_CMD_REQUEST_INT_HANDLE, operand);
-+	idxd_cmd_exec(idxd, IDXD_CMD_REQUEST_INT_HANDLE, operand, &status);
-+
-+	if ((status & 0xff) != IDXD_CMDSTS_SUCCESS) {
-+		dev_dbg(dev, "request int handle failed: %#x\n", status);
-+		return -ENXIO;
-+	}
-+
-+	*handle = (status >> 8) & 0xffff;
-+
-+	dev_dbg(dev, "int handle acquired: %u\n", *handle);
-+	return 0;
-+}
-+
- /* Device configuration bits */
- static void idxd_group_config_write(struct idxd_group *group)
- {
+ 	vma->vm_flags |= VM_DONTCOPY;
+-	pfn = (base + idxd_get_wq_portal_full_offset(wq->id,
+-				IDXD_PORTAL_LIMITED)) >> PAGE_SHIFT;
++	pfn = (base + idxd_get_wq_portal_full_offset(wq->id, IDXD_PORTAL_LIMITED,
++						     IDXD_IRQ_MSIX)) >> PAGE_SHIFT;
+ 	vma->vm_page_prot = pgprot_noncached(vma->vm_page_prot);
+ 	vma->vm_private_data = ctx;
+ 
 diff --git a/drivers/dma/idxd/idxd.h b/drivers/dma/idxd/idxd.h
-index fcea8bc060f5..2cd190a3da73 100644
+index 2cd190a3da73..c65fb6dcb7e0 100644
 --- a/drivers/dma/idxd/idxd.h
 +++ b/drivers/dma/idxd/idxd.h
-@@ -138,6 +138,7 @@ struct idxd_hw {
- 	union group_cap_reg group_cap;
- 	union engine_cap_reg engine_cap;
- 	struct opcap opcap;
-+	u32 cmd_cap;
+@@ -152,6 +152,7 @@ enum idxd_device_flag {
+ 	IDXD_FLAG_CONFIGURABLE = 0,
+ 	IDXD_FLAG_CMD_RUNNING,
+ 	IDXD_FLAG_PASID_ENABLED,
++	IDXD_FLAG_SIOV_SUPPORTED,
  };
  
- enum idxd_device_state {
-@@ -201,6 +202,8 @@ struct idxd_device {
- 	struct dma_device dma_dev;
- 	struct workqueue_struct *wq;
+ struct idxd_device {
+@@ -178,6 +179,7 @@ struct idxd_device {
+ 
+ 	int num_groups;
+ 
++	u32 ims_offset;
+ 	u32 msix_perm_offset;
+ 	u32 wqcfg_offset;
+ 	u32 grpcfg_offset;
+@@ -185,6 +187,7 @@ struct idxd_device {
+ 
+ 	u64 max_xfer_bytes;
+ 	u32 max_batch_size;
++	int ims_size;
+ 	int max_groups;
+ 	int max_engines;
+ 	int max_tokens;
+@@ -204,6 +207,7 @@ struct idxd_device {
  	struct work_struct work;
-+
-+	int *int_handles;
+ 
+ 	int *int_handles;
++	struct sbitmap ims_sbmap;
  };
  
  /* IDXD software descriptor */
-@@ -214,6 +217,7 @@ struct idxd_desc {
- 	struct list_head list;
- 	int id;
- 	int cpu;
-+	unsigned int vec_ptr;
- 	struct idxd_wq *wq;
+@@ -251,15 +255,17 @@ enum idxd_interrupt_type {
+ 	IDXD_IRQ_IMS,
  };
  
-@@ -242,6 +246,11 @@ enum idxd_portal_prot {
- 	IDXD_PORTAL_LIMITED,
- };
- 
-+enum idxd_interrupt_type {
-+	IDXD_IRQ_MSIX = 0,
-+	IDXD_IRQ_IMS,
-+};
-+
- static inline int idxd_get_wq_portal_offset(enum idxd_portal_prot prot)
+-static inline int idxd_get_wq_portal_offset(enum idxd_portal_prot prot)
++static inline int idxd_get_wq_portal_offset(enum idxd_portal_prot prot,
++					    enum idxd_interrupt_type irq_type)
  {
- 	return prot * 0x1000;
-@@ -307,6 +316,8 @@ int idxd_device_config(struct idxd_device *idxd);
- void idxd_device_wqs_clear_state(struct idxd_device *idxd);
- void idxd_device_drain_pasid(struct idxd_device *idxd, int pasid);
- int idxd_device_load_config(struct idxd_device *idxd);
-+int idxd_device_request_int_handle(struct idxd_device *idxd, int idx, int *handle,
-+				   enum idxd_interrupt_type irq_type);
+-	return prot * 0x1000;
++	return prot * 0x1000 + irq_type * 0x2000;
+ }
  
- /* work queue control */
- int idxd_wq_alloc_resources(struct idxd_wq *wq);
+ static inline int idxd_get_wq_portal_full_offset(int wq_id,
+-						 enum idxd_portal_prot prot)
++						 enum idxd_portal_prot prot,
++						 enum idxd_interrupt_type irq_type)
+ {
+-	return ((wq_id * 4) << PAGE_SHIFT) + idxd_get_wq_portal_offset(prot);
++	return ((wq_id * 4) << PAGE_SHIFT) + idxd_get_wq_portal_offset(prot, irq_type);
+ }
+ 
+ static inline void idxd_set_type(struct idxd_device *idxd)
+diff --git a/drivers/dma/idxd/ims.c b/drivers/dma/idxd/ims.c
+new file mode 100644
+index 000000000000..5fece66122a2
+--- /dev/null
++++ b/drivers/dma/idxd/ims.c
+@@ -0,0 +1,53 @@
++// SPDX-License-Identifier: GPL-2.0
++/* Copyright(c) 2019,2020 Intel Corporation. All rights rsvd. */
++#include <linux/init.h>
++#include <linux/kernel.h>
++#include <linux/module.h>
++#include <linux/pci.h>
++#include <linux/device.h>
++#include <linux/io-64-nonatomic-lo-hi.h>
++#include <linux/msi.h>
++#include <uapi/linux/idxd.h>
++#include "registers.h"
++#include "idxd.h"
++
++static void idxd_free_ims_index(struct idxd_device *idxd,
++				unsigned long ims_idx)
++{
++	sbitmap_clear_bit(&idxd->ims_sbmap, ims_idx);
++}
++
++static int idxd_alloc_ims_index(struct idxd_device *idxd)
++{
++	int index;
++
++	index = sbitmap_get(&idxd->ims_sbmap, 0, false);
++	if (index < 0)
++		return -ENOSPC;
++	return index;
++}
++
++static unsigned int idxd_ims_irq_mask(struct msi_desc *desc)
++{
++	// Filled out later when VDCM is introduced.
++
++	return 0;
++}
++
++static unsigned int idxd_ims_irq_unmask(struct msi_desc *desc)
++{
++	// Filled out later when VDCM is introduced.
++
++	return 0;
++}
++
++static void idxd_ims_write_msg(struct msi_desc *desc, struct msi_msg *msg)
++{
++	// Filled out later when VDCM is introduced.
++}
++
++static struct platform_msi_ops idxd_ims_ops  = {
++	.irq_mask		= idxd_ims_irq_mask,
++	.irq_unmask		= idxd_ims_irq_unmask,
++	.write_msg		= idxd_ims_write_msg,
++};
 diff --git a/drivers/dma/idxd/init.c b/drivers/dma/idxd/init.c
-index 50c68de6b4ab..9fd505a03444 100644
+index 9fd505a03444..3e2c7ac83daf 100644
 --- a/drivers/dma/idxd/init.c
 +++ b/drivers/dma/idxd/init.c
-@@ -132,6 +132,22 @@ static int idxd_setup_interrupts(struct idxd_device *idxd)
- 		}
- 		dev_dbg(dev, "Allocated idxd-msix %d for vector %d\n",
- 			i, msix->vector);
-+
-+		if (idxd->hw.cmd_cap & BIT(IDXD_CMD_REQUEST_INT_HANDLE)) {
-+			/*
-+			 * The MSIX vector enumeration starts at 1 with vector 0 being the
-+			 * misc interrupt that handles non I/O completion events. The
-+			 * interrupt handles are for IMS enumeration on guest. The misc
-+			 * interrupt vector does not require a handle and therefore we start
-+			 * the int_handles at index 0. Since 'i' starts at 1, the first
-+			 * int_handles index will be 0.
-+			 */
-+			rc = idxd_device_request_int_handle(idxd, i, &idxd->int_handles[i - 1],
-+							    IDXD_IRQ_MSIX);
-+			if (rc < 0)
-+				goto err_no_irq;
-+			dev_dbg(dev, "int handle requested: %u\n", idxd->int_handles[i - 1]);
-+		}
- 	}
+@@ -241,10 +241,51 @@ static void idxd_read_table_offsets(struct idxd_device *idxd)
+ 	idxd->msix_perm_offset = offsets.msix_perm * 0x100;
+ 	dev_dbg(dev, "IDXD MSIX Permission Offset: %#x\n",
+ 		idxd->msix_perm_offset);
++	idxd->ims_offset = offsets.ims * 0x100;
++	dev_dbg(dev, "IDXD IMS Offset: %#x\n", idxd->ims_offset);
+ 	idxd->perfmon_offset = offsets.perfmon * 0x100;
+ 	dev_dbg(dev, "IDXD Perfmon Offset: %#x\n", idxd->perfmon_offset);
+ }
  
- 	idxd_unmask_error_interrupts(idxd);
-@@ -159,6 +175,13 @@ static int idxd_setup_internals(struct idxd_device *idxd)
- 	int i;
- 
- 	init_waitqueue_head(&idxd->cmd_waitq);
++#define PCI_DEVSEC_CAP		0x23
++#define SIOVDVSEC1(offset)	((offset) + 0x4)
++#define SIOVDVSEC2(offset)	((offset) + 0x8)
++#define DVSECID			0x5
++#define SIOVCAP(offset)		((offset) + 0x14)
 +
-+	if (idxd->hw.cmd_cap & BIT(IDXD_CMD_REQUEST_INT_HANDLE)) {
-+		idxd->int_handles = devm_kcalloc(dev, idxd->max_wqs, sizeof(int), GFP_KERNEL);
-+		if (!idxd->int_handles)
-+			return -ENOMEM;
++static void idxd_check_siov(struct idxd_device *idxd)
++{
++	struct pci_dev *pdev = idxd->pdev;
++	struct device *dev = &pdev->dev;
++	int dvsec;
++	u16 val16;
++	u32 val32;
++
++	dvsec = pci_find_ext_capability(pdev, PCI_DEVSEC_CAP);
++	pci_read_config_word(pdev, SIOVDVSEC1(dvsec), &val16);
++	if (val16 != PCI_VENDOR_ID_INTEL) {
++		dev_dbg(&pdev->dev, "DVSEC vendor id is not Intel\n");
++		return;
 +	}
 +
- 	idxd->groups = devm_kcalloc(dev, idxd->max_groups,
- 				    sizeof(struct idxd_group), GFP_KERNEL);
- 	if (!idxd->groups)
-@@ -230,6 +253,12 @@ static void idxd_read_caps(struct idxd_device *idxd)
- 	/* reading generic capabilities */
- 	idxd->hw.gen_cap.bits = ioread64(idxd->reg_base + IDXD_GENCAP_OFFSET);
- 	dev_dbg(dev, "gen_cap: %#llx\n", idxd->hw.gen_cap.bits);
-+
-+	if (idxd->hw.gen_cap.cmd_cap) {
-+		idxd->hw.cmd_cap = ioread32(idxd->reg_base + IDXD_CMDCAP_OFFSET);
-+		dev_dbg(dev, "cmd_cap: %#x\n", idxd->hw.cmd_cap);
++	pci_read_config_word(pdev, SIOVDVSEC2(dvsec), &val16);
++	if (val16 != DVSECID) {
++		dev_dbg(&pdev->dev, "DVSEC ID is not SIOV\n");
++		return;
 +	}
 +
- 	idxd->max_xfer_bytes = 1ULL << idxd->hw.gen_cap.max_xfer_shift;
++	pci_read_config_dword(pdev, SIOVCAP(dvsec), &val32);
++	if ((val32 & 0x1) && idxd->hw.gen_cap.max_ims_mult) {
++		idxd->ims_size = idxd->hw.gen_cap.max_ims_mult * 256ULL;
++		dev_dbg(dev, "IMS size: %u\n", idxd->ims_size);
++		set_bit(IDXD_FLAG_SIOV_SUPPORTED, &idxd->flags);
++		dev_dbg(&pdev->dev, "IMS supported for device\n");
++		return;
++	}
++
++	dev_dbg(&pdev->dev, "SIOV unsupported for device\n");
++}
++
+ static void idxd_read_caps(struct idxd_device *idxd)
+ {
+ 	struct device *dev = &idxd->pdev->dev;
+@@ -263,6 +304,7 @@ static void idxd_read_caps(struct idxd_device *idxd)
  	dev_dbg(dev, "max xfer size: %llu bytes\n", idxd->max_xfer_bytes);
  	idxd->max_batch_size = 1U << idxd->hw.gen_cap.max_batch_shift;
-diff --git a/drivers/dma/idxd/registers.h b/drivers/dma/idxd/registers.h
-index a0df4f3fe1fb..ace7248ee195 100644
---- a/drivers/dma/idxd/registers.h
-+++ b/drivers/dma/idxd/registers.h
-@@ -23,8 +23,8 @@ union gen_cap_reg {
- 		u64 overlap_copy:1;
- 		u64 cache_control_mem:1;
- 		u64 cache_control_cache:1;
-+		u64 cmd_cap:1;
- 		u64 rsvd:3;
--		u64 int_handle_req:1;
- 		u64 dest_readback:1;
- 		u64 drain_readback:1;
- 		u64 rsvd2:6;
-@@ -223,6 +223,8 @@ enum idxd_cmdsts_err {
- 	IDXD_CMDSTS_ERR_NO_HANDLE,
- };
+ 	dev_dbg(dev, "max batch size: %u\n", idxd->max_batch_size);
++	idxd_check_siov(idxd);
+ 	if (idxd->hw.gen_cap.config_en)
+ 		set_bit(IDXD_FLAG_CONFIGURABLE, &idxd->flags);
  
-+#define IDXD_CMDCAP_OFFSET		0xb0
-+
- #define IDXD_SWERR_OFFSET		0xc0
- #define IDXD_SWERR_VALID		0x00000001
- #define IDXD_SWERR_OVERFLOW		0x00000002
+@@ -397,9 +439,19 @@ static int idxd_probe(struct idxd_device *idxd)
+ 
+ 	idxd->major = idxd_cdev_get_major(idxd);
+ 
++	if (idxd->ims_size) {
++		rc = sbitmap_init_node(&idxd->ims_sbmap, idxd->ims_size, -1,
++				       GFP_KERNEL, dev_to_node(dev));
++		if (rc < 0)
++			goto sbitmap_fail;
++	}
+ 	dev_dbg(dev, "IDXD device %d probed successfully\n", idxd->id);
+ 	return 0;
+ 
++ sbitmap_fail:
++	mutex_lock(&idxd_idr_lock);
++	idr_remove(&idxd_idrs[idxd->type], idxd->id);
++	mutex_unlock(&idxd_idr_lock);
+  err_idr_fail:
+ 	idxd_mask_error_interrupts(idxd);
+ 	idxd_mask_msix_vectors(idxd);
 diff --git a/drivers/dma/idxd/submit.c b/drivers/dma/idxd/submit.c
-index 3e63d820a98e..70c7703a4495 100644
+index 70c7703a4495..f0a0a0d21a7a 100644
 --- a/drivers/dma/idxd/submit.c
 +++ b/drivers/dma/idxd/submit.c
-@@ -22,11 +22,17 @@ static struct idxd_desc *__get_desc(struct idxd_wq *wq, int idx, int cpu)
- 		desc->hw->pasid = idxd->pasid;
+@@ -30,7 +30,13 @@ static struct idxd_desc *__get_desc(struct idxd_wq *wq, int idx, int cpu)
+ 		desc->hw->int_handle = wq->vec_ptr;
+ 	} else {
+ 		desc->vec_ptr = wq->vec_ptr;
+-		desc->hw->int_handle = idxd->int_handles[desc->vec_ptr];
++		/*
++		 * int_handles are only for descriptor completion. However for device
++		 * MSIX enumeration, vec 0 is used for misc interrupts. Therefore even
++		 * though we are rotating through 1...N for descriptor interrupts, we
++		 * need to acqurie the int_handles from 0..N-1.
++		 */
++		desc->hw->int_handle = idxd->int_handles[desc->vec_ptr - 1];
+ 	}
+ 
+ 	return desc;
+@@ -90,7 +96,7 @@ int idxd_submit_desc(struct idxd_wq *wq, struct idxd_desc *desc)
+ 	if (idxd->state != IDXD_DEV_ENABLED)
+ 		return -EIO;
+ 
+-	portal = wq->portal + idxd_get_wq_portal_offset(IDXD_PORTAL_LIMITED);
++	portal = wq->portal + idxd_get_wq_portal_offset(IDXD_PORTAL_LIMITED, IDXD_IRQ_MSIX);
  
  	/*
--	 * Descriptor completion vectors are 1-8 for MSIX. We will round
--	 * robin through the 8 vectors.
-+	 * Descriptor completion vectors are 1...N for MSIX. We will round
-+	 * robin through the N vectors.
- 	 */
- 	wq->vec_ptr = (wq->vec_ptr % idxd->num_wq_irqs) + 1;
--	desc->hw->int_handle = wq->vec_ptr;
-+	if (!idxd->int_handles) {
-+		desc->hw->int_handle = wq->vec_ptr;
-+	} else {
-+		desc->vec_ptr = wq->vec_ptr;
-+		desc->hw->int_handle = idxd->int_handles[desc->vec_ptr];
-+	}
-+
- 	return desc;
+ 	 * The wmb() flushes writes to coherent DMA data before
+diff --git a/drivers/dma/idxd/sysfs.c b/drivers/dma/idxd/sysfs.c
+index fa1abdf503c2..501a1d489ce3 100644
+--- a/drivers/dma/idxd/sysfs.c
++++ b/drivers/dma/idxd/sysfs.c
+@@ -1269,6 +1269,16 @@ static ssize_t numa_node_show(struct device *dev,
  }
+ static DEVICE_ATTR_RO(numa_node);
  
-@@ -79,7 +85,6 @@ void idxd_free_desc(struct idxd_wq *wq, struct idxd_desc *desc)
- int idxd_submit_desc(struct idxd_wq *wq, struct idxd_desc *desc)
++static ssize_t ims_size_show(struct device *dev,
++			     struct device_attribute *attr, char *buf)
++{
++	struct idxd_device *idxd =
++		container_of(dev, struct idxd_device, conf_dev);
++
++	return sprintf(buf, "%u\n", idxd->ims_size);
++}
++static DEVICE_ATTR_RO(ims_size);
++
+ static ssize_t max_batch_size_show(struct device *dev,
+ 				   struct device_attribute *attr, char *buf)
  {
- 	struct idxd_device *idxd = wq->idxd;
--	int vec = desc->hw->int_handle;
- 	void __iomem *portal;
- 
- 	if (idxd->state != IDXD_DEV_ENABLED)
-@@ -110,9 +115,19 @@ int idxd_submit_desc(struct idxd_wq *wq, struct idxd_desc *desc)
- 	 * Pending the descriptor to the lockless list for the irq_entry
- 	 * that we designated the descriptor to.
- 	 */
--	if (desc->hw->flags & IDXD_OP_FLAG_RCI)
--		llist_add(&desc->llnode,
--			  &idxd->irq_entries[vec].pending_llist);
-+	if (desc->hw->flags & IDXD_OP_FLAG_RCI) {
-+		int vec;
-+
-+		/*
-+		 * If the driver is on host kernel, it would be the value
-+		 * assigned to interrupt handle, which is index for MSIX
-+		 * vector. If it's guest then can't use the int_handle since
-+		 * that is the index to IMS for the entire device. The guest
-+		 * device local index will be used.
-+		 */
-+		vec = !idxd->int_handles ? desc->hw->int_handle : desc->vec_ptr;
-+		llist_add(&desc->llnode, &idxd->irq_entries[vec].pending_llist);
-+	}
- 
- 	return 0;
- }
+@@ -1455,6 +1465,7 @@ static struct attribute *idxd_device_attributes[] = {
+ 	&dev_attr_max_work_queues_size.attr,
+ 	&dev_attr_max_engines.attr,
+ 	&dev_attr_numa_node.attr,
++	&dev_attr_ims_size.attr,
+ 	&dev_attr_max_batch_size.attr,
+ 	&dev_attr_max_transfer_size.attr,
+ 	&dev_attr_op_cap.attr,
 
