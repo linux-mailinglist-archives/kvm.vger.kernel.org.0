@@ -2,30 +2,29 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id CBA23228ADE
-	for <lists+kvm@lfdr.de>; Tue, 21 Jul 2020 23:17:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6A7D6228AD5
+	for <lists+kvm@lfdr.de>; Tue, 21 Jul 2020 23:17:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731496AbgGUVRp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 21 Jul 2020 17:17:45 -0400
-Received: from mx01.bbu.dsd.mx.bitdefender.com ([91.199.104.161]:37986 "EHLO
+        id S1731054AbgGUVR1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 21 Jul 2020 17:17:27 -0400
+Received: from mx01.bbu.dsd.mx.bitdefender.com ([91.199.104.161]:37852 "EHLO
         mx01.bbu.dsd.mx.bitdefender.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1731273AbgGUVQF (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 21 Jul 2020 17:16:05 -0400
+        by vger.kernel.org with ESMTP id S1731288AbgGUVQI (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 21 Jul 2020 17:16:08 -0400
 Received: from smtp.bitdefender.com (smtp02.buh.bitdefender.net [10.17.80.76])
-        by mx01.bbu.dsd.mx.bitdefender.com (Postfix) with ESMTPS id 63DE6305D7F1;
+        by mx01.bbu.dsd.mx.bitdefender.com (Postfix) with ESMTPS id 94CF8305D7F3;
         Wed, 22 Jul 2020 00:09:20 +0300 (EEST)
 Received: from localhost.localdomain (unknown [91.199.104.27])
-        by smtp.bitdefender.com (Postfix) with ESMTPSA id 3ACCC308C48E;
+        by smtp.bitdefender.com (Postfix) with ESMTPSA id 66114308C48F;
         Wed, 22 Jul 2020 00:09:20 +0300 (EEST)
 From:   =?UTF-8?q?Adalbert=20Laz=C4=83r?= <alazar@bitdefender.com>
 To:     kvm@vger.kernel.org
 Cc:     virtualization@lists.linux-foundation.org,
         Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?q?Nicu=C8=99or=20C=C3=AE=C8=9Bu?= <ncitu@bitdefender.com>,
         =?UTF-8?q?Adalbert=20Laz=C4=83r?= <alazar@bitdefender.com>
-Subject: [PATCH v9 11/84] KVM: x86: add .cr3_write_intercepted()
-Date:   Wed, 22 Jul 2020 00:08:09 +0300
-Message-Id: <20200721210922.7646-12-alazar@bitdefender.com>
+Subject: [PATCH v9 12/84] KVM: x86: add .desc_ctrl_supported()
+Date:   Wed, 22 Jul 2020 00:08:10 +0300
+Message-Id: <20200721210922.7646-13-alazar@bitdefender.com>
 In-Reply-To: <20200721210922.7646-1-alazar@bitdefender.com>
 References: <20200721210922.7646-1-alazar@bitdefender.com>
 MIME-Version: 1.0
@@ -36,81 +35,85 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Nicușor Cîțu <ncitu@bitdefender.com>
+When the introspection tool tries to enable the KVMI_EVENT_DESCRIPTOR
+event, this function is used to check if it is supported.
 
-This function will be used to allow the introspection tool to disable the
-CR3-write interception when it is no longer interested in these events,
-but only if nothing else depends on these VM-exits.
-
-Signed-off-by: Nicușor Cîțu <ncitu@bitdefender.com>
 Signed-off-by: Adalbert Lazăr <alazar@bitdefender.com>
 ---
  arch/x86/include/asm/kvm_host.h | 1 +
- arch/x86/kvm/svm/svm.c          | 8 ++++++++
- arch/x86/kvm/vmx/vmx.c          | 8 ++++++++
- 3 files changed, 17 insertions(+)
+ arch/x86/kvm/svm/svm.c          | 6 ++++++
+ arch/x86/kvm/vmx/capabilities.h | 7 ++++++-
+ arch/x86/kvm/vmx/vmx.c          | 1 +
+ 4 files changed, 14 insertions(+), 1 deletion(-)
 
 diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 89c0bd6529a5..ac45aacc9fc0 100644
+index ac45aacc9fc0..b3ca64a70bb5 100644
 --- a/arch/x86/include/asm/kvm_host.h
 +++ b/arch/x86/include/asm/kvm_host.h
-@@ -1117,6 +1117,7 @@ struct kvm_x86_ops {
- 	int (*set_cr4)(struct kvm_vcpu *vcpu, unsigned long cr4);
- 	void (*control_cr3_intercept)(struct kvm_vcpu *vcpu, int type,
- 				      bool enable);
-+	bool (*cr3_write_intercepted)(struct kvm_vcpu *vcpu);
- 	void (*set_efer)(struct kvm_vcpu *vcpu, u64 efer);
- 	void (*get_idt)(struct kvm_vcpu *vcpu, struct desc_ptr *dt);
+@@ -1123,6 +1123,7 @@ struct kvm_x86_ops {
  	void (*set_idt)(struct kvm_vcpu *vcpu, struct desc_ptr *dt);
+ 	void (*get_gdt)(struct kvm_vcpu *vcpu, struct desc_ptr *dt);
+ 	void (*set_gdt)(struct kvm_vcpu *vcpu, struct desc_ptr *dt);
++	bool (*desc_ctrl_supported)(void);
+ 	void (*sync_dirty_debug_regs)(struct kvm_vcpu *vcpu);
+ 	void (*set_dr7)(struct kvm_vcpu *vcpu, unsigned long value);
+ 	void (*cache_reg)(struct kvm_vcpu *vcpu, enum kvm_reg reg);
 diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index f14fc940538b..7a4ec6fbffb9 100644
+index 7a4ec6fbffb9..f4d882ca0060 100644
 --- a/arch/x86/kvm/svm/svm.c
 +++ b/arch/x86/kvm/svm/svm.c
-@@ -1609,6 +1609,13 @@ static void svm_control_cr3_intercept(struct kvm_vcpu *vcpu, int type,
- 			 clr_cr_intercept(svm, INTERCEPT_CR3_WRITE);
+@@ -1523,6 +1523,11 @@ static void svm_set_gdt(struct kvm_vcpu *vcpu, struct desc_ptr *dt)
+ 	mark_dirty(svm->vmcb, VMCB_DT);
  }
  
-+static bool svm_cr3_write_intercepted(struct kvm_vcpu *vcpu)
++static bool svm_desc_ctrl_supported(void)
 +{
-+	struct vcpu_svm *svm = to_svm(vcpu);
-+
-+	return is_cr_intercept(svm, INTERCEPT_CR3_WRITE);
++	return true;
 +}
 +
- static void svm_set_segment(struct kvm_vcpu *vcpu,
- 			    struct kvm_segment *var, int seg)
+ static void update_cr0_intercept(struct vcpu_svm *svm)
  {
-@@ -4022,6 +4029,7 @@ static struct kvm_x86_ops svm_x86_ops __initdata = {
- 	.set_cr0 = svm_set_cr0,
- 	.set_cr4 = svm_set_cr4,
- 	.control_cr3_intercept = svm_control_cr3_intercept,
-+	.cr3_write_intercepted = svm_cr3_write_intercepted,
- 	.set_efer = svm_set_efer,
- 	.get_idt = svm_get_idt,
+ 	ulong gcr0 = svm->vcpu.arch.cr0;
+@@ -4035,6 +4040,7 @@ static struct kvm_x86_ops svm_x86_ops __initdata = {
  	.set_idt = svm_set_idt,
+ 	.get_gdt = svm_get_gdt,
+ 	.set_gdt = svm_set_gdt,
++	.desc_ctrl_supported = svm_desc_ctrl_supported,
+ 	.set_dr7 = svm_set_dr7,
+ 	.sync_dirty_debug_regs = svm_sync_dirty_debug_regs,
+ 	.cache_reg = svm_cache_reg,
+diff --git a/arch/x86/kvm/vmx/capabilities.h b/arch/x86/kvm/vmx/capabilities.h
+index 4bbd8b448d22..e7d7fcb7e17f 100644
+--- a/arch/x86/kvm/vmx/capabilities.h
++++ b/arch/x86/kvm/vmx/capabilities.h
+@@ -142,12 +142,17 @@ static inline bool cpu_has_vmx_ept(void)
+ 		SECONDARY_EXEC_ENABLE_EPT;
+ }
+ 
+-static inline bool vmx_umip_emulated(void)
++static inline bool vmx_desc_ctrl_supported(void)
+ {
+ 	return vmcs_config.cpu_based_2nd_exec_ctrl &
+ 		SECONDARY_EXEC_DESC;
+ }
+ 
++static inline bool vmx_umip_emulated(void)
++{
++	return vmx_desc_ctrl_supported();
++}
++
+ static inline bool cpu_has_vmx_rdtscp(void)
+ {
+ 	return vmcs_config.cpu_based_2nd_exec_ctrl &
 diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 6b9639703560..61eb64cf25c7 100644
+index 61eb64cf25c7..ecd4c50bf1a2 100644
 --- a/arch/x86/kvm/vmx/vmx.c
 +++ b/arch/x86/kvm/vmx/vmx.c
-@@ -3020,6 +3020,13 @@ static void vmx_control_cr3_intercept(struct kvm_vcpu *vcpu, int type,
- 		exec_controls_clearbit(vmx, cr3_exec_control);
- }
- 
-+static bool vmx_cr3_write_intercepted(struct kvm_vcpu *vcpu)
-+{
-+	struct vcpu_vmx *vmx = to_vmx(vcpu);
-+
-+	return !!(exec_controls_get(vmx) & CPU_BASED_CR3_LOAD_EXITING);
-+}
-+
- static void ept_update_paging_mode_cr0(unsigned long *hw_cr0,
- 					unsigned long cr0,
- 					struct kvm_vcpu *vcpu)
-@@ -7890,6 +7897,7 @@ static struct kvm_x86_ops vmx_x86_ops __initdata = {
- 	.set_cr0 = vmx_set_cr0,
- 	.set_cr4 = vmx_set_cr4,
- 	.control_cr3_intercept = vmx_control_cr3_intercept,
-+	.cr3_write_intercepted = vmx_cr3_write_intercepted,
- 	.set_efer = vmx_set_efer,
- 	.get_idt = vmx_get_idt,
+@@ -7903,6 +7903,7 @@ static struct kvm_x86_ops vmx_x86_ops __initdata = {
  	.set_idt = vmx_set_idt,
+ 	.get_gdt = vmx_get_gdt,
+ 	.set_gdt = vmx_set_gdt,
++	.desc_ctrl_supported = vmx_desc_ctrl_supported,
+ 	.set_dr7 = vmx_set_dr7,
+ 	.sync_dirty_debug_regs = vmx_sync_dirty_debug_regs,
+ 	.cache_reg = vmx_cache_reg,
