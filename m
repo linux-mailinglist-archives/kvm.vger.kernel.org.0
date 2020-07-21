@@ -2,43 +2,43 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5223F228537
-	for <lists+kvm@lfdr.de>; Tue, 21 Jul 2020 18:21:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D1A9B22853E
+	for <lists+kvm@lfdr.de>; Tue, 21 Jul 2020 18:25:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730138AbgGUQVM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 21 Jul 2020 12:21:12 -0400
-Received: from mail-eopbgr60047.outbound.protection.outlook.com ([40.107.6.47]:19678
+        id S1728773AbgGUQZJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 21 Jul 2020 12:25:09 -0400
+Received: from mail-eopbgr60066.outbound.protection.outlook.com ([40.107.6.66]:14978
         "EHLO EUR04-DB3-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726890AbgGUQVM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 21 Jul 2020 12:21:12 -0400
+        id S1726919AbgGUQZJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 21 Jul 2020 12:25:09 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=PGUPmm9eBQilc9katYLS5zgV6gHYIk6HdnDB7LJIy0flNwoSisTHEqQNTefWzxGLQzPTRLXuIvKCWmuUges1VqY7d3tsaRS+M/HoK7QTAOUbRE9ZgwEik56s03tleNJJd5Hq4l1h5B7N13mQ9DGRrYKmfYzJNOSQ4f0yGy6C1NJ6P56yQH6juW0WjlA2fHqtSiWuFSae8U5G7xw1tn8kE4R2ghZJT5jhXCPoa97aSlXiBYRGof33B2VUUfbOFf+mNzeHzEdXK3sMV4mBsO0DM3s4vOLqWzwp5DqV8nkNlI8MIuvmzFZdBA5wJNEa5s62nWkBqd9oeM/KmxX5OPLDBA==
+ b=LFH0aWIQiXCqS8QMn4vZqrtavYjzm2UzMcgeZhpp6/QVzSHh+mQn+yu/YSl8VX+NstRP+Ojn+TMxq+kUC6t548mB8BjyYIr2OBUtWFYhRRMIphEGZNAYsLxW5H9KtcoddRwiUYwRNPWtzuzzw1W3rOOoC9JV72BCZFtoZuE8kvx86rTW7Z3XClXMcO06XwQQt2k5PtT/AvcHreXZLIIuXw5gS92KekLueA/5aLVlT3S/UF2vY01/58gamoY6VirxU2ePcheSzqDI5rp+fIsjV5qLf4muTfZ39uWtv60zm9BHpzvVzgvz8AN0Wj6u7v1b3zV89485N1x7C7rRaK0/PA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=pfz6R21ZR6TTgTUkkMItOt3R8yEDUpLY6PRV/yUhqJk=;
- b=Fx22qq0hx0LCbGibG2vSFPD6w786PcSHeE95knGp4BbqoKLI0k6lPYkHspQxOdx3c43ZKQE7ZvWaYQQii46aZZ+Qlik0OPZvdUJLvLYQhqiuDUBuS+tKjEAm2wKYJiTM8pWfzVK9dVvORNUHssrEZqFTEszm6lCFVt5tSfZWXdArds7czx+mT4M9scw5RhiZpkoR5KTY+PzEw89ics+tJwZ4GZF1Wl4eWPR/0hoN3B/oI/ewQiPQrRHyAvvt8R42jWq6d7dJWU8hsvZ7cI/rglCvXdY/hvhDDv5ptoJUnSsO9K7DcjfwnCiPTkLPbGsjx+4A6WxdnDQoMmZvdEQk8w==
+ bh=BxIUqmVcJjeucPujZ3oAX3sWhQPvniTvHgdFbarLwdY=;
+ b=TEyiwujcblNEemy5oegVVtOe7W7UZYu4owL+NVuhgYMW3zjgMsX9RJYjTwBmucjTFldjS4jze6tRUc9I6yCmoEcF/wZlkK3fp4eUP94m4y52Xm+i4mLp28xOK6SuNb4R4GYiQK8tkduqLloZ3eugk3OGvGLqIVdiVSi1rVUo72HavabUyZ+d1fNk6ufCla0pPavc+nNYGg7VlP7HPTajEMPVbhQuh/Q88dL60HWgs1MgL/pSB4TnV/drSOEUeEZqwce2qdL/CnVsf8rCxvhTGr+rjsJOfCuUkiGWi+GVtzYFe7wpwdnh22AyThN7Ky4E5zxC1/e8HZ+iMQr7L/Odyg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=mellanox.com; dmarc=pass action=none header.from=mellanox.com;
  dkim=pass header.d=mellanox.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Mellanox.com;
  s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=pfz6R21ZR6TTgTUkkMItOt3R8yEDUpLY6PRV/yUhqJk=;
- b=Dakh7lthQ93kmPlJxgYXp6/iE54EqYvtmsuMZk1XuHXgxJwiy7Qt2o8CZN0R4s5WqVYuER87iB7jU0TZWh41YOZ3YcMI86LaY+brb60IY+Ahv9o1MDD7+EGG0xDJp7n9bwO+dMSyHbdip+Q3ARIX41ELX/3tPK62JcskYBsj79w=
+ bh=BxIUqmVcJjeucPujZ3oAX3sWhQPvniTvHgdFbarLwdY=;
+ b=FdaHrvVgvZgWejETQzRG+5SsRx9886kN969sjeeagfrLLasLt5kq6x7cx4qItamiNBpy3FctAZsEc0HPI+pyomv4hXl+s3+UqDCP3zgrqIfBycSSCG0qBRgIsn4c8mfCQ7NCuJoOMMFp34erAX6sdp4Z0l033mxqIMNtXh5ehrY=
 Authentication-Results: intel.com; dkim=none (message not signed)
  header.d=none;intel.com; dmarc=none action=none header.from=mellanox.com;
 Received: from VI1PR05MB4141.eurprd05.prod.outlook.com (2603:10a6:803:44::15)
  by VI1PR0502MB3952.eurprd05.prod.outlook.com (2603:10a6:803:23::28) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3195.24; Tue, 21 Jul
- 2020 16:21:08 +0000
+ 2020 16:25:05 +0000
 Received: from VI1PR05MB4141.eurprd05.prod.outlook.com
  ([fe80::252e:52c7:170b:35d]) by VI1PR05MB4141.eurprd05.prod.outlook.com
  ([fe80::252e:52c7:170b:35d%5]) with mapi id 15.20.3195.026; Tue, 21 Jul 2020
- 16:21:08 +0000
-Date:   Tue, 21 Jul 2020 13:21:04 -0300
+ 16:25:05 +0000
+Date:   Tue, 21 Jul 2020 13:25:01 -0300
 From:   Jason Gunthorpe <jgg@mellanox.com>
 To:     Dave Jiang <dave.jiang@intel.com>
 Cc:     vkoul@kernel.org, megha.dey@intel.com, maz@kernel.org,
@@ -53,104 +53,69 @@ Cc:     vkoul@kernel.org, megha.dey@intel.com, maz@kernel.org,
         samuel.ortiz@intel.com, mona.hossain@intel.com,
         dmaengine@vger.kernel.org, linux-kernel@vger.kernel.org,
         x86@kernel.org, linux-pci@vger.kernel.org, kvm@vger.kernel.org
-Subject: Re: [PATCH RFC v2 03/18] irq/dev-msi: Create IR-DEV-MSI irq domain
-Message-ID: <20200721162104.GB2021248@mellanox.com>
+Subject: Re: [PATCH RFC v2 04/18] irq/dev-msi: Introduce APIs to
+ allocate/free dev-msi interrupts
+Message-ID: <20200721162501.GC2021248@mellanox.com>
 References: <159534667974.28840.2045034360240786644.stgit@djiang5-desk3.ch.intel.com>
- <159534735519.28840.10435935598386192252.stgit@djiang5-desk3.ch.intel.com>
+ <159534736176.28840.5547007059232964457.stgit@djiang5-desk3.ch.intel.com>
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <159534735519.28840.10435935598386192252.stgit@djiang5-desk3.ch.intel.com>
-X-ClientProxiedBy: MN2PR18CA0026.namprd18.prod.outlook.com
- (2603:10b6:208:23c::31) To VI1PR05MB4141.eurprd05.prod.outlook.com
+In-Reply-To: <159534736176.28840.5547007059232964457.stgit@djiang5-desk3.ch.intel.com>
+X-ClientProxiedBy: MN2PR13CA0029.namprd13.prod.outlook.com
+ (2603:10b6:208:160::42) To VI1PR05MB4141.eurprd05.prod.outlook.com
  (2603:10a6:803:44::15)
 MIME-Version: 1.0
 X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from mlx.ziepe.ca (156.34.48.30) by MN2PR18CA0026.namprd18.prod.outlook.com (2603:10b6:208:23c::31) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3195.19 via Frontend Transport; Tue, 21 Jul 2020 16:21:08 +0000
-Received: from jgg by mlx with local (Exim 4.94)        (envelope-from <jgg@mellanox.com>)      id 1jxv0q-00DGXA-Q2; Tue, 21 Jul 2020 13:21:04 -0300
+Received: from mlx.ziepe.ca (156.34.48.30) by MN2PR13CA0029.namprd13.prod.outlook.com (2603:10b6:208:160::42) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3216.15 via Frontend Transport; Tue, 21 Jul 2020 16:25:04 +0000
+Received: from jgg by mlx with local (Exim 4.94)        (envelope-from <jgg@mellanox.com>)      id 1jxv4f-00DGaQ-GT; Tue, 21 Jul 2020 13:25:01 -0300
 X-Originating-IP: [156.34.48.30]
 X-MS-PublicTrafficType: Email
 X-MS-Office365-Filtering-HT: Tenant
-X-MS-Office365-Filtering-Correlation-Id: b1f212e5-786c-43ac-60cd-08d82d921301
+X-MS-Office365-Filtering-Correlation-Id: 15196007-01a4-4df4-f3d3-08d82d92a02c
 X-MS-TrafficTypeDiagnostic: VI1PR0502MB3952:
 X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <VI1PR0502MB395227752989BA6FD8F8C84BCF780@VI1PR0502MB3952.eurprd05.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:7691;
+X-Microsoft-Antispam-PRVS: <VI1PR0502MB3952B7996A24D99A1BEB8891CF780@VI1PR0502MB3952.eurprd05.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:6430;
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: yixI2HbSJJeUFR/W3IQm4Oi1OPB6eTPNE081pCzA8BSXHKrivpHeOx99NtqqPr58M8yjqkqB+qm2sqJyX8GrPllXx/PbbTAo6IDk2xlkFaxlmZ8vCIDh/UZ2IeO43dHss+kXWO7Lot10Qq7JrUr/epoUAegb3QzgfFg/g49Iukr7sCf08cCPhdivIwYHUgKT9gRxKfsS60QzM0JXkAsnE4tJJ6GJBo74MkxXO0IuNer8rt0sCwgdMsokevTsMa9AOyvPI9anLR5bHJoKTAmT4qLUFhMpATco1JhnYFiVDarx4tSiO0L4BqEk+JvMWiFxbpwEozOclBxJpYSuzZR7LA==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:VI1PR05MB4141.eurprd05.prod.outlook.com;PTR:;CAT:NONE;SFTY:;SFS:(4636009)(39830400003)(396003)(376002)(346002)(136003)(366004)(7416002)(7406005)(83380400001)(2616005)(4326008)(1076003)(8936002)(66946007)(9746002)(9786002)(66556008)(478600001)(36756003)(86362001)(316002)(5660300002)(2906002)(8676002)(6916009)(186003)(66476007)(33656002)(426003)(26005);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData: VSvDcJQ3uZiF//WSS21AtaTHzXHSYRZchv1wXo2GtDi0I2VxeVmg9eol6hfMKiI3HpM/iCw8jnXP1KcAJIQCulk2SbGygBucyRwbPUl9/Fupdf8RVTBKb2QOTxjXU+HwhCKYpQdhMweJxD/k+KBsoZ8lpTF9DtdsxRj6CSiOUUWUKtRDgGRhxQWcSvRiZVCLzWJWqJiA4FRwuHr+uxYOH/8tKDhv7P4tOaLOrExew0URVWAYf0FuOjesOPrttE2IUqormEq6omCFlf4riQgXODHLKbBWCMWukhcaXiQfnz2nc5NNZ3I13a+IYhpwrDDR9LXBDuWYbKFPSeyiQSF8o9Div8bscF4OKGHbCsbCLn+Hec7+bAbzii1Ds2AzhSfS7J3aTcS1jJwx/NPG0Hj9cSAHLJ8iuD60Mt4o78kKwRJpGHAHJMDVDbAHMlLTfjAfxBFtBLB9M4WjCEeIIyxXAk9+JBgDslMvRxgC9wBnbEQ=
+X-Microsoft-Antispam-Message-Info: tvd7/H5c/IytsPIVME8EwHSiMLoAbjf2suVvYSgsrIgnMidYYTJoqcBAB/4EgORSUjtscraVTWy2EDkVTukggcFehxc828p1JsbGAsid+hf6I0dVMEOxSyQmjbWY4/WouiOR3EYkBhIgOZIhLh7vjMRLz1UzgYMGgTUcYzgoxy8cr8tM/JY0cnxHK0KtlFLzSHaWp5bsCLQbH35i9PtUZaQ7ZczSXyCC9EpUtqhRUKmspK3kyNuSlFmIG9CmOvVa8DIAhPpPkQHZeBq8sASfmI0o6D2+WEM4Tan/pcF3R4reTsVAcyc7aaisxZAIXcOY4NcV2Z9RBSHK4iiAPlr4mg==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:VI1PR05MB4141.eurprd05.prod.outlook.com;PTR:;CAT:NONE;SFTY:;SFS:(4636009)(136003)(346002)(366004)(396003)(376002)(39830400003)(36756003)(86362001)(5660300002)(2906002)(316002)(478600001)(66556008)(66476007)(26005)(426003)(33656002)(6916009)(186003)(8676002)(4326008)(7406005)(83380400001)(7416002)(2616005)(4744005)(9746002)(9786002)(8936002)(66946007)(1076003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData: enjRqkU2/KEOmfS0ROVqzO0KNOcuClQIMccQKnBdV4ptmnV6E7illlW2Pu43JGQezIiJ5do/MwxxIKA05D6tYov5qm1MskkjR09pFJi3U+iO2MGCKytzI5IQPDaa4vnTFACO8dWBO4vk+b3JmG86sUHG9UDGxqMqT7CG+YwXwv1cWVlGQzjCAai+0xkAjW0/dsLlW/TTQWD9K221H8qjrMDasY44VHiM9Ibva3y/Bog6BP1FSmSUDRBeJOZdZfn156aaLFY/KZ6foEUGdMmlb70gi3w/TBWCaogbiI+w0ydGZ+3Rfm5hYlGqE0gljaEED6D+o2ZsRW7j/RUgBjlmn+layVgIbHrYrv9KuM7XjcBgL6Cj/oU+EeBAW73snjol4fidbN8R14vbAgu0kQn70iNo+MM1dPyXZdL+7+NWvBcuTKEhPAw7qj8yinG7oikYOHaFP92T2p0iybw7Xls1U8xlVfHnnOMv/TxImazZy/g=
 X-OriginatorOrg: Mellanox.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: b1f212e5-786c-43ac-60cd-08d82d921301
+X-MS-Exchange-CrossTenant-Network-Message-Id: 15196007-01a4-4df4-f3d3-08d82d92a02c
 X-MS-Exchange-CrossTenant-AuthSource: VI1PR05MB4141.eurprd05.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Jul 2020 16:21:08.2566
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Jul 2020 16:25:05.0859
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: a652971c-7d2e-4d9b-a6a4-d149256f461b
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: uxJNC7lzLzMV8Ga/Mq6PStnmDcGUKB0egekGMAJrQDC5JoT0xzopIwx/l8lgYKHv1cYeuSjLRRyxtzdpW7Wh4Q==
+X-MS-Exchange-CrossTenant-UserPrincipalName: WwFLbMYHvWy1dfO8Lt39VNdX8PiVBAlxyfsca9pDMeY7oklJQU2zKDi124nWKHWpyw7YeUXwVur4r9BaLTkh6A==
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR0502MB3952
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jul 21, 2020 at 09:02:35AM -0700, Dave Jiang wrote:
+On Tue, Jul 21, 2020 at 09:02:41AM -0700, Dave Jiang wrote:
 > From: Megha Dey <megha.dey@intel.com>
 > 
-> When DEV_MSI is enabled, the dev_msi_default_domain is updated to the
-> base DEV-MSI irq  domain. If interrupt remapping is enabled, we create
-> a new IR-DEV-MSI irq domain and update the dev_msi_default domain to
-> the same.
+> The dev-msi interrupts are to be allocated/freed only for custom devices,
+> not standard PCI-MSIX devices.
 > 
-> For X86, introduce a new irq_alloc_type which will be used by the
-> interrupt remapping driver.
+> These interrupts are device-defined and they are distinct from the already
+> existing msi interrupts:
+> pci-msi: Standard PCI MSI/MSI-X setup format
+> platform-msi: Platform custom, but device-driver opaque MSI setup/control
+> arch-msi: fallback for devices not assigned to the generic PCI domain
+> dev-msi: device defined IRQ domain for ancillary devices. For e.g. DSA
+> portal devices use device specific IMS(Interrupt message store) interrupts.
+> 
+> dev-msi interrupts are represented by their own device-type. That means
+> dev->msi_list is never contended for different interrupt types. It
+> will either be all PCI-MSI or all device-defined.
 
-Why? Shouldn't this by symmetrical with normal MSI? Does MSI do this?
-
-I would have thought you'd want to switch to this remapping mode as
-part of vfio or something like current cases.
-
-> +struct irq_domain *create_remap_dev_msi_irq_domain(struct irq_domain *parent,
-> +						   const char *name)
-> +{
-> +	struct fwnode_handle *fn;
-> +	struct irq_domain *domain;
-> +
-> +	fn = irq_domain_alloc_named_fwnode(name);
-> +	if (!fn)
-> +		return NULL;
-> +
-> +	domain = msi_create_irq_domain(fn, &dev_msi_ir_domain_info, parent);
-> +	if (!domain) {
-> +		pr_warn("failed to initialize irqdomain for IR-DEV-MSI.\n");
-> +		return ERR_PTR(-ENXIO);
-> +	}
-> +
-> +	irq_domain_update_bus_token(domain, DOMAIN_BUS_PLATFORM_MSI);
-> +
-> +	if (!dev_msi_default_domain)
-> +		dev_msi_default_domain = domain;
-> +
-> +	return domain;
-> +}
-
-What about this code creates a "remap" ? ie why is the function called
-"create_remap" ?
-
-> diff --git a/include/linux/msi.h b/include/linux/msi.h
-> index 1da97f905720..7098ba566bcd 100644
-> +++ b/include/linux/msi.h
-> @@ -378,6 +378,9 @@ void *platform_msi_get_host_data(struct irq_domain *domain);
->  void platform_msi_write_msg(struct irq_data *data, struct msi_msg *msg);
->  void platform_msi_unmask_irq(struct irq_data *data);
->  void platform_msi_mask_irq(struct irq_data *data);
-> +
-> +int dev_msi_prepare(struct irq_domain *domain, struct device *dev,
-> +                           int nvec, msi_alloc_info_t *arg);
-
-I wonder if this should use the popular #ifdef dev_msi_prepare scheme
-instead of a weak symbol?
+Not sure I follow this, where is the enforcement that only dev-msi or
+normal MSI is being used at one time on a single struct device?
 
 Jason
