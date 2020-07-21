@@ -2,256 +2,91 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D11EB2289B6
-	for <lists+kvm@lfdr.de>; Tue, 21 Jul 2020 22:18:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1370B2289B7
+	for <lists+kvm@lfdr.de>; Tue, 21 Jul 2020 22:18:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730567AbgGUUSZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 21 Jul 2020 16:18:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52332 "EHLO
+        id S1730697AbgGUUS1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 21 Jul 2020 16:18:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52340 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726646AbgGUUSY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 21 Jul 2020 16:18:24 -0400
-Received: from mail-pj1-x1049.google.com (mail-pj1-x1049.google.com [IPv6:2607:f8b0:4864:20::1049])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 092BCC061794
-        for <kvm@vger.kernel.org>; Tue, 21 Jul 2020 13:18:24 -0700 (PDT)
-Received: by mail-pj1-x1049.google.com with SMTP id q5so2943409pjd.3
-        for <kvm@vger.kernel.org>; Tue, 21 Jul 2020 13:18:24 -0700 (PDT)
+        with ESMTP id S1730642AbgGUUSZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 21 Jul 2020 16:18:25 -0400
+Received: from mail-pg1-x549.google.com (mail-pg1-x549.google.com [IPv6:2607:f8b0:4864:20::549])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 81F97C061794
+        for <kvm@vger.kernel.org>; Tue, 21 Jul 2020 13:18:25 -0700 (PDT)
+Received: by mail-pg1-x549.google.com with SMTP id s8so17063888pgs.9
+        for <kvm@vger.kernel.org>; Tue, 21 Jul 2020 13:18:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=iklHKK0zHFTjTbO0FrudwgOKpxy7zRNIol/fwy5E6KI=;
-        b=nFweCenjK4MFfpVadM41AshdvuLRKMgW7ckPFgcFYhQ7d0U7v1ypSzL/P1UCaIKyVW
-         SbiadOW9rJAsHqs6ul2DuNIf/lMkqI1gUSeacWJzEqrpdjofddtbA3AmaMGeniJRQ7P5
-         iry7eHeMJdnH3wbMHXs2RTSE3nS8PIJcfcpur7eu44ZFWKJwJF+Uj9UVT0guEfDvWSDO
-         IZYbRNoPzc8m6rRa6wTNzZXfpOW/6XEaoLYAeUCzDpX/yzHYrGYoBLdXpQRYw2ow9yQ9
-         Zdw5dXiqpZGHntxnxW8pMEKtgNty6EipdFLsFCp8WQ9IlaqvcMVv8DyY0X5fOBaTnQW/
-         4j4w==
+        bh=z39UGLiwUBksk1towyRmeqgzcjsEShuupZsYnYVL+Us=;
+        b=rKegZBrTVX4xxVBEOTXScIQU9r+3I3UzVc+V5qfGJiX49ovdnLx+zRPQWSbOQmpBZn
+         UO/CMvrtPRQ5fL2YzOiUu4vi25Q7sYzhnVx3VzY43tgtsLpFNKE5YW6w+Soj9jLfErYc
+         Fc6ePt6Nf4ZtyIKZ1wB+upGHrqvO/blEpT/8weQp5ZMETdUL39bQVVClKuyfbs8+rGEi
+         s+3gBD+rQGLZWAAQgJ/bYT7XLWiOBhCSuYUnSna4LXgAuOxYT3vaCOwg0BxTjHSbfVVE
+         Cd9yWP+S8Ue3G+lXUuiNxVEktGkeASVbATxosrMuGEkBECLHGxGgtWQ1eoR2Trn44FZp
+         VNbQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=iklHKK0zHFTjTbO0FrudwgOKpxy7zRNIol/fwy5E6KI=;
-        b=ZeKAe2srSsMvbyCe6gZbNl/gkLjcM+CEYwff25JL+oVglwFx8Q7/5kH+TZ+V8gmKvN
-         /duPzPQw6I7rVIG59+tpD5hYiI0iv9+ArvQ5G8NfQtlXYJd96izx++G5/eekp7oE8Hjc
-         R6PylDUMkcMuPsJPyOsA9+1OXvil3bVIPTQ9J7XArcbjkssbcX8T0Tj1o55/MitcUo/r
-         h8jJCKKMwvNkQB9IVtjf6pqcjKHoIEVv5DQ/auMnxZ+ULkNokMuyT+vEToAmmhhRVOlT
-         uunzSwhsHR4a4DjTVMAzgDvkoABJ0ARdzHKwM8YEi0QtYEZCNcl7j+lhCSXcievFOdok
-         MhqA==
-X-Gm-Message-State: AOAM531b/dlT+R9wPTTC91kRdaw6t+7bj2Iw6F7oZQhNKomyRTdUeQXl
-        vGRVozj+EwkxQuwkL9msMHV6/1kMKwfpOBU0zgnez5vOkunlNEbvJCKmhuj+qbxtJgip0Pe7qWY
-        X5TxfOYOL7c40/TIszFeDv1dpoyqtwTe0WgAcF3YLWzCFmJeeL1JDXRBarA==
-X-Google-Smtp-Source: ABdhPJyKg99wuI4CHB29CiEeDQsXdCiIJiDwNRB0DVBlp1sIBN3Le5uVS2GPobRIjal729kZuuz76fCMceQ=
-X-Received: by 2002:a63:e114:: with SMTP id z20mr20912151pgh.300.1595362703032;
- Tue, 21 Jul 2020 13:18:23 -0700 (PDT)
-Date:   Tue, 21 Jul 2020 20:18:11 +0000
+        bh=z39UGLiwUBksk1towyRmeqgzcjsEShuupZsYnYVL+Us=;
+        b=s7wvz9qBfPOq4FwcHI2/rSq3ThIzht35AYpdIsQhYIEaIMsu9HuD4XSu4rmEvVUcUF
+         QfIBN6ZqY+fOmakkSSPhiZr6IBras7cwp9i1gsWsW9rip5VEu0eIXQHISybb4+0Wgeyg
+         ffTfq5T1ve+vFlmOW+qEitaeXp6p2glfjONDUDZV0xqp0HKOvJLwCT4JmYatyZC/ecd7
+         5KAdjv+HYxi5SY4v5KcVN8fpGC1UVvhRC9kzzWRM95DSpFMPOVREEKKcJFUiX1Tp2rsk
+         ySdPQdMmda01pZ9mRe4HZQdbcsyrK4CAUSxk2Wz01lC9vkFz0pDsrNZmxsdQeigl+Utu
+         s4Cg==
+X-Gm-Message-State: AOAM531lrjH1bUE2uJ7bsBrWR8dQEVe5hFDmvSPK+YYtnoBinAmA3ZZn
+        IVfaWRKdvardGwtqzjPGBcvR8q7F48wsAnktuqzJFhXAxHIveatQSrE6F3HCNWm5UrDgfyXEIsq
+        AD5DD+ZFS7wf1AoDeyLfM6pmZ0/MToQqCp85etoiK9hACNEMzfwze2Bz2Tg==
+X-Google-Smtp-Source: ABdhPJzKvjyCQvoHdGEutI4GSzk1azjUN1XdrsE0h13RVid56En9AtsZcnMM0RfKF+0jlDwJFurMxOXQZK8=
+X-Received: by 2002:a65:418b:: with SMTP id a11mr23531485pgq.399.1595362704856;
+ Tue, 21 Jul 2020 13:18:24 -0700 (PDT)
+Date:   Tue, 21 Jul 2020 20:18:12 +0000
 In-Reply-To: <20200721201814.2340705-1-oupton@google.com>
-Message-Id: <20200721201814.2340705-3-oupton@google.com>
+Message-Id: <20200721201814.2340705-4-oupton@google.com>
 Mime-Version: 1.0
 References: <20200721201814.2340705-1-oupton@google.com>
 X-Mailer: git-send-email 2.28.0.rc0.142.g3c755180ce-goog
-Subject: [PATCH v2 2/5] kvm: x86: add KVM_{GET,SET}_TSC_OFFSET ioctls
+Subject: [PATCH v2 3/5] kvm: vmx: check tsc offsetting with nested_cpu_has()
 From:   Oliver Upton <oupton@google.com>
 To:     kvm@vger.kernel.org
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Peter Shier <pshier@google.com>,
         Sean Christopherson <sean.j.christopherson@intel.com>,
         Peter Hornyack <peterhornyack@google.com>,
-        Jim Mattson <jmattson@google.com>,
-        Oliver Upton <oupton@google.com>
+        Oliver Upton <oupton@google.com>,
+        Jim Mattson <jmattson@google.com>
 Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Peter Hornyack <peterhornyack@google.com>
-
-The KVM_SET_MSR vcpu ioctl has some temporal and value-based heuristics
-for determining when userspace is attempting to synchronize TSCs.
-Instead of guessing at userspace's intentions in the kernel, directly
-expose control of the TSC offset field to userspace such that userspace
-may deliberately synchronize the guest TSCs.
-
-Note that TSC offset support is mandatory for KVM on both SVM and VMX.
+No functional change intended.
 
 Reviewed-by: Jim Mattson <jmattson@google.com>
 Reviewed-by: Peter Shier <pshier@google.com>
-Signed-off-by: Peter Hornyack <peterhornyack@google.com>
-[oupton - expanded docs, fixed KVM master clock interaction]
 Signed-off-by: Oliver Upton <oupton@google.com>
 ---
- Documentation/virt/kvm/api.rst  | 31 +++++++++++++++++++++
- arch/x86/include/asm/kvm_host.h |  1 +
- arch/x86/kvm/x86.c              | 49 +++++++++++++++++++++++++++++++++
- include/uapi/linux/kvm.h        |  5 ++++
- 4 files changed, 86 insertions(+)
+ arch/x86/kvm/vmx/vmx.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-index 644e5326aa50..7ecef103cc7f 100644
---- a/Documentation/virt/kvm/api.rst
-+++ b/Documentation/virt/kvm/api.rst
-@@ -4701,6 +4701,37 @@ KVM_PV_VM_VERIFY
-   KVM is allowed to start protected VCPUs.
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index 2b41d987b101..fa201010dbe0 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -1775,7 +1775,7 @@ static u64 vmx_write_l1_tsc_offset(struct kvm_vcpu *vcpu, u64 offset)
+ 	 * to the newly set TSC to get L2's TSC.
+ 	 */
+ 	if (is_guest_mode(vcpu) &&
+-	    (vmcs12->cpu_based_vm_exec_control & CPU_BASED_USE_TSC_OFFSETTING))
++	    nested_cpu_has(vmcs12, CPU_BASED_USE_TSC_OFFSETTING))
+ 		g_tsc_offset = vmcs12->tsc_offset;
  
- 
-+4.126 KVM_GET_TSC_OFFSET
-+------------------------
-+
-+:Capability: KVM_CAP_TSC_OFFSET
-+:Architectures: x86
-+:Type: vcpu ioctl
-+:Parameters: __u64 (out)
-+:Returns: 0 on success, < 0 on error
-+
-+This ioctl gets the TSC offset field. The offset is returned as an
-+unsigned value, though it is interpreted as a signed value by hardware.
-+
-+
-+4.127 KVM_SET_TSC_OFFSET
-+------------------------
-+
-+:Capability: KVM_CAP_TSC_OFFSET
-+:Architectures: x86
-+:Type: vcpu ioctl
-+:Parameters: __u64 (in)
-+:Returns: 0 on success, < 0 on error
-+
-+This ioctl sets the TSC offset field. The offset is represented as an
-+unsigned value, though it is interpreted as a signed value by hardware.
-+The guest's TSC value will change based on the written offset. A
-+userspace VMM may use this ioctl to restore the guest's TSC instead of
-+KVM_SET_MSRS, thereby avoiding the in-kernel TSC synchronization
-+detection. To that end, a userspace VMM may deliberately synchronize
-+TSCs by setting the same offset value for all vCPUs.
-+
-+
- 5. The kvm_run structure
- ========================
- 
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 5aaef036627f..0d0e3670fffe 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -920,6 +920,7 @@ struct kvm_arch {
- 	u64 last_tsc_nsec;
- 	u64 last_tsc_write;
- 	u32 last_tsc_khz;
-+	u64 last_tsc_offset;
- 	u64 cur_tsc_nsec;
- 	u64 cur_tsc_write;
- 	u64 cur_tsc_offset;
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 1ad6bcb21f56..c2fe1e7b88e2 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -2026,6 +2026,11 @@ u64 kvm_read_l1_tsc(struct kvm_vcpu *vcpu, u64 host_tsc)
- }
- EXPORT_SYMBOL_GPL(kvm_read_l1_tsc);
- 
-+static u64 kvm_vcpu_read_tsc_offset(struct kvm_vcpu *vcpu)
-+{
-+	return vcpu->arch.l1_tsc_offset;
-+}
-+
- static void kvm_vcpu_write_tsc_offset(struct kvm_vcpu *vcpu, u64 offset)
- {
- 	vcpu->arch.l1_tsc_offset = offset;
-@@ -2063,6 +2068,7 @@ void kvm_write_tsc_offset(struct kvm_vcpu *vcpu, u64 offset, u64 tsc, u64 ns,
- 	kvm->arch.last_tsc_nsec = ns;
- 	kvm->arch.last_tsc_write = tsc;
- 	kvm->arch.last_tsc_khz = vcpu->arch.virtual_tsc_khz;
-+	kvm->arch.last_tsc_offset = offset;
- 
- 	vcpu->arch.last_guest_tsc = tsc;
- 
-@@ -2160,6 +2166,26 @@ void kvm_write_tsc(struct kvm_vcpu *vcpu, struct msr_data *msr)
- 
- EXPORT_SYMBOL_GPL(kvm_write_tsc);
- 
-+static void kvm_vcpu_ioctl_set_tsc_offset(struct kvm_vcpu *vcpu, u64 offset)
-+{
-+	struct kvm *kvm = vcpu->kvm;
-+	unsigned long flags;
-+	bool matched;
-+	u64 tsc, ns;
-+
-+	raw_spin_lock_irqsave(&kvm->arch.tsc_write_lock, flags);
-+
-+	matched = (kvm->arch.last_tsc_offset == offset &&
-+		   vcpu->arch.virtual_tsc_khz &&
-+		   kvm->arch.last_tsc_khz == vcpu->arch.virtual_tsc_khz);
-+
-+	tsc = kvm_scale_tsc(vcpu, rdtsc()) + offset;
-+	ns = get_kvmclock_base_ns();
-+
-+	kvm_write_tsc_offset(vcpu, offset, tsc, ns, matched);
-+	raw_spin_unlock_irqrestore(&kvm->arch.tsc_write_lock, flags);
-+}
-+
- static inline void adjust_tsc_offset_guest(struct kvm_vcpu *vcpu,
- 					   s64 adjustment)
- {
-@@ -3492,6 +3518,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- 	case KVM_CAP_HYPERV_TIME:
- 	case KVM_CAP_IOAPIC_POLARITY_IGNORED:
- 	case KVM_CAP_TSC_DEADLINE_TIMER:
-+	case KVM_CAP_TSC_OFFSET:
- 	case KVM_CAP_DISABLE_QUIRKS:
- 	case KVM_CAP_SET_BOOT_CPU_ID:
-  	case KVM_CAP_SPLIT_IRQCHIP:
-@@ -4744,6 +4771,28 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
- 		r = 0;
- 		break;
- 	}
-+	case KVM_GET_TSC_OFFSET: {
-+		u64 tsc_offset;
-+
-+		r = -EFAULT;
-+		tsc_offset = kvm_vcpu_read_tsc_offset(vcpu);
-+		if (copy_to_user(argp, &tsc_offset, sizeof(tsc_offset)))
-+			goto out;
-+		r = 0;
-+		break;
-+	}
-+	case KVM_SET_TSC_OFFSET: {
-+		u64 __user *tsc_offset_arg = argp;
-+		u64 tsc_offset;
-+
-+		r = -EFAULT;
-+		if (copy_from_user(&tsc_offset, tsc_offset_arg,
-+				   sizeof(tsc_offset)))
-+			goto out;
-+		kvm_vcpu_ioctl_set_tsc_offset(vcpu, tsc_offset);
-+		r = 0;
-+		break;
-+	}
- 	default:
- 		r = -EINVAL;
- 	}
-diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-index ff9b335620d0..41f387ffcd11 100644
---- a/include/uapi/linux/kvm.h
-+++ b/include/uapi/linux/kvm.h
-@@ -1033,6 +1033,7 @@ struct kvm_ppc_resize_hpt {
- #define KVM_CAP_HALT_POLL 182
- #define KVM_CAP_ASYNC_PF_INT 183
- #define KVM_CAP_LAST_CPU 184
-+#define KVM_CAP_TSC_OFFSET 185
- 
- #ifdef KVM_CAP_IRQ_ROUTING
- 
-@@ -1501,6 +1502,10 @@ struct kvm_enc_region {
- #define KVM_S390_NORMAL_RESET	_IO(KVMIO,   0xc3)
- #define KVM_S390_CLEAR_RESET	_IO(KVMIO,   0xc4)
- 
-+/* Available with KVM_CAP_TSC_OFFSET */
-+#define KVM_GET_TSC_OFFSET	_IOR(KVMIO, 0xc5, __u64)
-+#define KVM_SET_TSC_OFFSET	_IOW(KVMIO, 0xc6, __u64)
-+
- struct kvm_s390_pv_sec_parm {
- 	__u64 origin;
- 	__u64 length;
+ 	trace_kvm_write_tsc_offset(vcpu->vcpu_id,
 -- 
 2.28.0.rc0.142.g3c755180ce-goog
 
