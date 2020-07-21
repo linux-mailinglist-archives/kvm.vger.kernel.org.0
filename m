@@ -2,122 +2,84 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4F2A0228671
-	for <lists+kvm@lfdr.de>; Tue, 21 Jul 2020 18:50:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 27F25228720
+	for <lists+kvm@lfdr.de>; Tue, 21 Jul 2020 19:18:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728827AbgGUQtG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 21 Jul 2020 12:49:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48034 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726029AbgGUQtG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 21 Jul 2020 12:49:06 -0400
-Received: from mail-lj1-x242.google.com (mail-lj1-x242.google.com [IPv6:2a00:1450:4864:20::242])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F0AEAC061794
-        for <kvm@vger.kernel.org>; Tue, 21 Jul 2020 09:49:04 -0700 (PDT)
-Received: by mail-lj1-x242.google.com with SMTP id d17so24834013ljl.3
-        for <kvm@vger.kernel.org>; Tue, 21 Jul 2020 09:49:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=Od+zTycOXgLO8KxOLxcSpm14nyLCP4jZwV8jGWRnKLg=;
-        b=lpFuK9OAa+wE2Ulyz7amAwN9pME8grhLmFBJmxuxYbgbyPwDqYiXKVlZRutm696IoP
-         CucdkfpNKHu1dC6W5osl2PoysYrfTz7tKtBYUJCzu/VlEh9Xe5pnjhL6A8Cwyk99gIy7
-         /fnpKlTDy7dEKz6P6+g8l78OCPsXrP6qVBwQWim0bZpWZ87T1RLAAGbdcvZAgGOdCF/e
-         ky3e+cJQeznHXmg0f781bisBn+BB/dgYXYmeLaQp/82EeSVX6mt9LJW/Ss77Xm4nEnwa
-         PZNKC7fb+OnbHqgP5oKOtxA45slZ5xFazzEC5V/m4kiZiIMelPi1u1zWTbpxfr2o5W9Q
-         JaGg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=Od+zTycOXgLO8KxOLxcSpm14nyLCP4jZwV8jGWRnKLg=;
-        b=V1J15kDNRH/q7biXwX37raJnkoXZ9Cnp7fqDx7cPQl1pVhM67NQwZzASy17v1SzZWh
-         7YT/dBCOqvVHNTNb7Nfj0rWyT7EPSPM/WQtrWiA6dcmDvjB9JRtCRrpv2U0q8ZqsCfC7
-         IuLkk+DUe5REOIl5eFFCVkNm9r8ZknzRsJ9/IN/5qd57K1SXiDAaPC87mIxCj3xr3T+z
-         tcYxUC+E1k57IPyidoqTc7cQM3ulzWPlLBHtRtNQBFp/zsa0JFWp2KGfOfTAd5rL3J5s
-         1U04NIGNusrUd/9/JufawAwsj0moJA9UAIfanYSnYAYvA3IdOPcOl33VPpHa8j+pzLjO
-         QbPw==
-X-Gm-Message-State: AOAM5330m+YvsHeU0osSVVe2ESPLatEmTD/RWw8hEtnKKb7+Ue9M06Xl
-        XoOTLKt5ArX8BLwyaXe75aeq7B9MEBc5CZRQBZiuTw==
-X-Google-Smtp-Source: ABdhPJwYDlDFxMbND8/mrk/EvLJEg1yVZ7yDt8/GKj1m85S0l/2vvZs0Ab4E7ekx1j+8SWGe5O2g2dCiYC100eQoheU=
-X-Received: by 2002:a2e:8851:: with SMTP id z17mr13816631ljj.225.1595350143051;
- Tue, 21 Jul 2020 09:49:03 -0700 (PDT)
+        id S1730134AbgGURRj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 21 Jul 2020 13:17:39 -0400
+Received: from mga07.intel.com ([134.134.136.100]:10555 "EHLO mga07.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1729286AbgGURRj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 21 Jul 2020 13:17:39 -0400
+IronPort-SDR: TTKTiD8Ty3QSBBnkPynzNIf8DupNlcN7W5j+3dnNvSWhyXDmxGEnITs4cCfsOeX85wqxHDFp4M
+ LSsXoZj4rC9Q==
+X-IronPort-AV: E=McAfee;i="6000,8403,9689"; a="214839140"
+X-IronPort-AV: E=Sophos;i="5.75,379,1589266800"; 
+   d="scan'208";a="214839140"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Jul 2020 10:17:36 -0700
+IronPort-SDR: PRmyN7gp5wF41uVRnfVHJOfgingQ7F3tDTAjGVtjK7KHwH+C+64WU0/RcXp7UrW8eXBvcXHznz
+ OpytWloy/2sA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.75,379,1589266800"; 
+   d="scan'208";a="326434915"
+Received: from djiang5-mobl1.amr.corp.intel.com (HELO [10.213.181.166]) ([10.213.181.166])
+  by FMSMGA003.fm.intel.com with ESMTP; 21 Jul 2020 10:17:35 -0700
+Subject: Re: [PATCH RFC v2 00/18] Add VFIO mediated device support and DEV-MSI
+ support for the idxd driver
+To:     Greg KH <gregkh@linuxfoundation.org>
+Cc:     vkoul@kernel.org, megha.dey@intel.com, maz@kernel.org,
+        bhelgaas@google.com, rafael@kernel.org, tglx@linutronix.de,
+        hpa@zytor.com, alex.williamson@redhat.com, jacob.jun.pan@intel.com,
+        ashok.raj@intel.com, jgg@mellanox.com, yi.l.liu@intel.com,
+        baolu.lu@intel.com, kevin.tian@intel.com, sanjay.k.kumar@intel.com,
+        tony.luck@intel.com, jing.lin@intel.com, dan.j.williams@intel.com,
+        kwankhede@nvidia.com, eric.auger@redhat.com, parav@mellanox.com,
+        dave.hansen@intel.com, netanelg@mellanox.com, shahafs@mellanox.com,
+        yan.y.zhao@linux.intel.com, pbonzini@redhat.com,
+        samuel.ortiz@intel.com, mona.hossain@intel.com,
+        dmaengine@vger.kernel.org, linux-kernel@vger.kernel.org,
+        x86@kernel.org, linux-pci@vger.kernel.org, kvm@vger.kernel.org
+References: <159534667974.28840.2045034360240786644.stgit@djiang5-desk3.ch.intel.com>
+ <20200721162858.GA2139881@kroah.com>
+From:   Dave Jiang <dave.jiang@intel.com>
+Message-ID: <754118ac-0c3f-c870-eb6e-f7bc24014cfc@intel.com>
+Date:   Tue, 21 Jul 2020 10:17:34 -0700
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-References: <20200714120917.11253-1-joro@8bytes.org> <20200715092456.GE10769@hirez.programming.kicks-ass.net>
- <20200715093426.GK16200@suse.de> <20200715095556.GI10769@hirez.programming.kicks-ass.net>
- <20200715101034.GM16200@suse.de> <CAAYXXYxJf8sr6fvbZK=t6o_to4Ov_yvZ91Hf6ZqQ-_i-HKO2VA@mail.gmail.com>
- <20200721124957.GD6132@suse.de>
-In-Reply-To: <20200721124957.GD6132@suse.de>
-From:   Erdem Aktas <erdemaktas@google.com>
-Date:   Tue, 21 Jul 2020 09:48:51 -0700
-Message-ID: <CAAYXXYwVV_g8pGL52W9vxkgdNxg1dNKq_OBsXKZ_QizdXiTx2g@mail.gmail.com>
-Subject: Re: [PATCH v4 00/75] x86: SEV-ES Guest Support
-To:     Joerg Roedel <jroedel@suse.de>
-Cc:     Peter Zijlstra <peterz@infradead.org>,
-        Joerg Roedel <joro@8bytes.org>, x86@kernel.org, hpa@zytor.com,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Jiri Slaby <jslaby@suse.cz>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Juergen Gross <jgross@suse.com>,
-        Kees Cook <keescook@chromium.org>,
-        David Rientjes <rientjes@google.com>,
-        Cfir Cohen <cfir@google.com>,
-        Masami Hiramatsu <mhiramat@kernel.org>,
-        Mike Stunes <mstunes@vmware.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Martin Radev <martin.b.radev@gmail.com>,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20200721162858.GA2139881@kroah.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Yes, I am using OVMF with SEV-ES (sev-es-v12 patches applied). I am
-running Ubuntu 18.04 distro. My grub target is x86_64-efi. I also
-tried installing the grub-efi-amd64 package. In all cases, the grub is
-running in 64bit but enters the startup_32 in 32 bit mode. I think
-there should be a 32bit #VC handler just something very similar in the
-OVMF patches to handle the cpuid when the CPU is still in 32bit mode.
-As it is now, it will be a huge problem to support different distro images.
-I wonder if I am the only one having this problem.
 
--Erdem
 
-On Tue, Jul 21, 2020 at 5:50 AM Joerg Roedel <jroedel@suse.de> wrote:
->
-> Hi,
->
-> On Mon, Jul 20, 2020 at 06:09:19PM -0700, Erdem Aktas wrote:
-> > It looks like there is an expectation that the bootloader will start
-> > from the 64bit entry point in header_64.S. With the current patch
-> > series, it will not boot up if the bootloader jumps to the startup_32
-> > entry, which might break some default distro images.
-> > What are supported bootloaders and configurations?
-> > I am using grub ( 2.02-2ubuntu8.15) and it fails to boot because of
-> > this reason. I am not a grub expert, so I would appreciate any
-> > pointers on this.
->
-> This is right, the only supported boot path is via the 64bit EFI entry
-> point. The reason is that SEV-ES requires support in the firmware too,
-> and currently only OVMF is supported in that regard. The firmware needs
-> to setup the AP jump-table, for example.
->
-> Other boot-paths have not been implemented. Booting via startup_32 would
-> require exception handling in the 32bit-part of the boot-strap code,
-> because verify_cpu is called there. Also an AMD specific MSR can't be
-> accessed there because this would #GP on non-AMD/SEV-ES machines and,
-> as I said, there is no way yet to handle them.
->
-> How did you get into the startup_32 entry-point, do you have an SEV-ES
-> BIOS supporting this? If it is really needed it could be implemented at
-> a later point.
->
-> Regards,
->
->         Joerg
->
+On 7/21/2020 9:28 AM, Greg KH wrote:
+> On Tue, Jul 21, 2020 at 09:02:15AM -0700, Dave Jiang wrote:
+>> v2:
+> 
+> "RFC" to me means "I don't really think this is mergable, so I'm
+> throwing it out there."  Which implies you know it needs more work
+> before others should review it as you are not comfortable with it :(
+> 
+> So, back-of-the-queue you go...
+> 
+> greg k-h
+> 
+
+Hi Greg! Yes this absolutely needs more work! I think it's in pretty good shape, 
+but it has reached the point where it needs the talented eyes of reviewers from 
+outside of Intel. I was really hoping to get feedback from folks like Jason 
+(Thanks Jason!!) and KVM and VFIO experts like Alex, Paolo, Eric, and Kirti.
+
+I can understand that you are quite busy and can not necessarily provide a 
+detailed review at this phase. Would you prefer to be cc'd on code at this phase 
+in the future? Or, should we reserve putting you on the cc for times when we 
+know it's ready for merge?
