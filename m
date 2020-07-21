@@ -2,251 +2,568 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A0B292280AE
-	for <lists+kvm@lfdr.de>; Tue, 21 Jul 2020 15:12:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A4DC92280E1
+	for <lists+kvm@lfdr.de>; Tue, 21 Jul 2020 15:28:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728498AbgGUNMD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 21 Jul 2020 09:12:03 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:16282 "EHLO
-        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726993AbgGUNMB (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 21 Jul 2020 09:12:01 -0400
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 06LD7Sgs058722;
-        Tue, 21 Jul 2020 09:11:59 -0400
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 32d5k10cks-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 21 Jul 2020 09:11:59 -0400
-Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 06LDAUHR062982;
-        Tue, 21 Jul 2020 09:11:59 -0400
-Received: from ppma06fra.de.ibm.com (48.49.7a9f.ip4.static.sl-reverse.com [159.122.73.72])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 32d5k10cju-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 21 Jul 2020 09:11:59 -0400
-Received: from pps.filterd (ppma06fra.de.ibm.com [127.0.0.1])
-        by ppma06fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 06LD7rI3022002;
-        Tue, 21 Jul 2020 13:11:57 GMT
-Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
-        by ppma06fra.de.ibm.com with ESMTP id 32brbgsxcp-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 21 Jul 2020 13:11:57 +0000
-Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
-        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 06LDBsiG18546988
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 21 Jul 2020 13:11:54 GMT
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id B625D4C04E;
-        Tue, 21 Jul 2020 13:11:54 +0000 (GMT)
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 4ED1E4C058;
-        Tue, 21 Jul 2020 13:11:54 +0000 (GMT)
-Received: from localhost.localdomain (unknown [9.145.20.173])
-        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Tue, 21 Jul 2020 13:11:54 +0000 (GMT)
-Subject: Re: [kvm-unit-tests PATCH v13 0/9] s390x: Testing the Channel
- Subsystem I/O
-To:     Pierre Morel <pmorel@linux.ibm.com>, kvm@vger.kernel.org
-Cc:     linux-s390@vger.kernel.org, david@redhat.com, thuth@redhat.com,
-        cohuck@redhat.com, drjones@redhat.com
-References: <1594887809-10521-1-git-send-email-pmorel@linux.ibm.com>
-From:   Janosch Frank <frankja@linux.ibm.com>
-Autocrypt: addr=frankja@linux.ibm.com; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <3000fa45-2273-5ca3-f4fd-2aac5edf7c5a@linux.ibm.com>
-Date:   Tue, 21 Jul 2020 15:11:53 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
+        id S1726654AbgGUN2f convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Tue, 21 Jul 2020 09:28:35 -0400
+Received: from szxga01-in.huawei.com ([45.249.212.187]:2654 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726014AbgGUN2f (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 21 Jul 2020 09:28:35 -0400
+Received: from DGGEMM403-HUB.china.huawei.com (unknown [172.30.72.54])
+        by Forcepoint Email with ESMTP id 41928FE39F6D5B54CDFE;
+        Tue, 21 Jul 2020 21:28:30 +0800 (CST)
+Received: from DGGEMM508-MBX.china.huawei.com ([169.254.2.193]) by
+ DGGEMM403-HUB.china.huawei.com ([10.3.20.211]) with mapi id 14.03.0487.000;
+ Tue, 21 Jul 2020 21:28:20 +0800
+From:   "Zhoujian (jay)" <jianjay.zhou@huawei.com>
+To:     Alex Williamson <alex.williamson@redhat.com>
+CC:     "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "cohuck@redhat.com" <cohuck@redhat.com>,
+        "Maoming (maoming, Cloud Infrastructure Service Product Dept.)" 
+        <maoming.maoming@huawei.com>,
+        "Huangweidong (C)" <weidong.huang@huawei.com>,
+        Peter Xu <peterx@redhat.com>,
+        Andrea Arcangeli <aarcange@redhat.com>
+Subject: RE: [PATCH] vfio dma_map/unmap: optimized for hugetlbfs pages
+Thread-Topic: [PATCH] vfio dma_map/unmap: optimized for hugetlbfs pages
+Thread-Index: AQHWXm/2XBg1E1uuxEuF0Ts0dF5bR6kQjBuAgAF7pBA=
+Date:   Tue, 21 Jul 2020 13:28:20 +0000
+Message-ID: <B2D15215269B544CADD246097EACE7474BDEED27@dggemm508-mbx.china.huawei.com>
+References: <20200720082947.1770-1-jianjay.zhou@huawei.com>
+ <20200720164603.3a622548@x1.home>
+In-Reply-To: <20200720164603.3a622548@x1.home>
+Accept-Language: zh-CN, en-US
+Content-Language: zh-CN
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.174.149.93]
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
 MIME-Version: 1.0
-In-Reply-To: <1594887809-10521-1-git-send-email-pmorel@linux.ibm.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="ZyXOvTUTP9Fn6MPQEiv8Tq2eVqjiFlluY"
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
- definitions=2020-07-21_08:2020-07-21,2020-07-21 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 phishscore=0
- mlxlogscore=999 suspectscore=0 priorityscore=1501 mlxscore=0 clxscore=1015
- lowpriorityscore=0 malwarescore=0 impostorscore=0 spamscore=0 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
- definitions=main-2007210089
+X-CFilter-Loop: Reflected
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---ZyXOvTUTP9Fn6MPQEiv8Tq2eVqjiFlluY
-Content-Type: multipart/mixed; boundary="y3JPpbATEgTWNhs3bOFLoYwFC1heqkXvP"
+Thanks for taking a close look at the code, Alex.
+We'll check them one by one ASAP.
 
---y3JPpbATEgTWNhs3bOFLoYwFC1heqkXvP
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-
-On 7/16/20 10:23 AM, Pierre Morel wrote:
-> Hi All,
->=20
-> This new respin of the series add modifications to
-> - patch 9: s390x: css: ssch/tsch with sense and interrupt
-> Other patches did not change.
->=20
-> Recall:
->=20
-> Goal of the series is to have a framework to test Channel-Subsystem I/O=
- with
-> QEMU/KVM.
->  =20
-> To be able to support interrupt for CSS I/O and for SCLP we need to mod=
-ify
-> the interrupt framework to allow re-entrant interruptions.
->  =20
-> We add a registration for IRQ callbacks to the test program to define i=
-ts own
-> interrupt handler. We need to do special work under interrupt like ackn=
-owledging
-> the interrupt.
->  =20
-> This series presents three tests:
-> - Enumeration:
->         The CSS is enumerated using the STSCH instruction recursively o=
-n all
->         potentially existing channels.
->         Keeping the first channel found as a reference for future use.
->         Checks STSCH
-> =20
-> - Enable:
->         If the enumeration succeeded the tests enables the reference
->         channel with MSCH and verifies with STSCH that the channel is
->         effectively enabled, retrying a predefined count on failure
-> 	to enable the channel
->         Checks MSCH      =20
-> =20
-> - Sense:
->         If the channel is enabled this test sends a SENSE_ID command
->         to the reference channel, analyzing the answer and expecting
->         the Control unit type being 0x3832, a.k.a. virtio-ccw.
->         Checks SSCH(READ) and IO-IRQ
->=20
-> Note:
-> - The following 5 patches are general usage and may be pulled first:
->   s390x: saving regs for interrupts
->   s390x: I/O interrupt registration
->   s390x: export the clock get_clock_ms() utility
->   s390x: clock and delays calculations
->   s390x: define function to wait for interrupt
->=20
-> - These 4 patches are really I/O oriented:
->   s390x: Library resources for CSS tests
->   s390x: css: stsch, enumeration test
->   s390x: css: msch, enable test
->   s390x: css: ssch/tsch with sense and interrupt
->=20
-> Regards,
-> Pierre
-
-Thanks, picked
-
->=20
-> Pierre Morel (9):
->   s390x: saving regs for interrupts
->   s390x: I/O interrupt registration
->   s390x: export the clock get_clock_ms() utility
->   s390x: clock and delays calculations
->   s390x: define function to wait for interrupt
->   s390x: Library resources for CSS tests
->   s390x: css: stsch, enumeration test
->   s390x: css: msch, enable test
->   s390x: css: ssch/tsch with sense and interrupt
->=20
->  lib/s390x/asm/arch_def.h |  14 ++
->  lib/s390x/asm/time.h     |  50 ++++++
->  lib/s390x/css.h          | 294 +++++++++++++++++++++++++++++++++++
->  lib/s390x/css_dump.c     | 152 ++++++++++++++++++
->  lib/s390x/css_lib.c      | 323 +++++++++++++++++++++++++++++++++++++++=
-
->  lib/s390x/interrupt.c    |  23 ++-
->  lib/s390x/interrupt.h    |   8 +
->  s390x/Makefile           |   3 +
->  s390x/css.c              | 150 ++++++++++++++++++
->  s390x/cstart64.S         |  41 ++++-
->  s390x/intercept.c        |  11 +-
->  s390x/unittests.cfg      |   4 +
->  12 files changed, 1060 insertions(+), 13 deletions(-)
->  create mode 100644 lib/s390x/asm/time.h
->  create mode 100644 lib/s390x/css.h
->  create mode 100644 lib/s390x/css_dump.c
->  create mode 100644 lib/s390x/css_lib.c
->  create mode 100644 lib/s390x/interrupt.h
->  create mode 100644 s390x/css.c
->=20
-
-
-
---y3JPpbATEgTWNhs3bOFLoYwFC1heqkXvP--
-
---ZyXOvTUTP9Fn6MPQEiv8Tq2eVqjiFlluY
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEwGNS88vfc9+v45Yq41TmuOI4ufgFAl8W6ZkACgkQ41TmuOI4
-ufiyRw/+MB+u0jg5fpYEgzxYMkkT6Gs/42LqNsXgI6csqK15E0qTpp0gCT8TRBuw
-YMr6zNQd3SR2umnz6SG2WdfzNe66lpNlpUK14Y6ajT455haufascmAOj2dGNc4F/
-4owWLz/nqYWAV02pVH0WxvQadZ+c+jrxYpwNsSGe+NsyTL1pqPfIgsfwM0tY0+KH
-U6WIEjCpe8rTOXDR9y3kAnOGY1ymAf4SA61PKlYEr1xdFfN+y4IYv/UOBaR6F7jM
-LCJre+d262ibUETC+n/JYdBpuKefhUponX1M38wjnXlzwHR9Oy2oHmzYkWLpLG8B
-gbI1oT3a4s2yWj1e8tcuy4vRWJ89nvejmh4w4ON8rrb4sYVpsWwDsfaM1XlFmRFK
-IgvoRaPURD1Y0lrORGdZimBHGQnsOOotfGyt/p5f5ZSK8tTj8odxhP+sjIF6xpI3
-Dpei24kEl3Kf6eOsqeUgdNrD6qcZkYe7ShCQJqzkTT9AC24BS/65bEvOO5YGSgao
-HtJVo88HigLWuMJLA3dyOL77TRY4vXZD1uI+/xHcT2+NXOi8CtM3th3E2ZSkLw8w
-lTWJ1RF1B/SCtrTdugQyN1IUHV6HajuUCi4GBCvdTofl8n/+/3Pi41pBPRDHB4wZ
-PKmqLdX8tsowl8HcWCjaWhUPMOUGQDc1AbgLHJDjr9uUS6Cz8uw=
-=CjRC
------END PGP SIGNATURE-----
-
---ZyXOvTUTP9Fn6MPQEiv8Tq2eVqjiFlluY--
+> -----Original Message-----
+> From: Alex Williamson [mailto:alex.williamson@redhat.com]
+> Sent: Tuesday, July 21, 2020 6:46 AM
+> To: Zhoujian (jay) <jianjay.zhou@huawei.com>
+> Cc: linux-kernel@vger.kernel.org; kvm@vger.kernel.org; cohuck@redhat.com;
+> Maoming (maoming, Cloud Infrastructure Service Product Dept.)
+> <maoming.maoming@huawei.com>; Huangweidong (C)
+> <weidong.huang@huawei.com>; Peter Xu <peterx@redhat.com>; Andrea
+> Arcangeli <aarcange@redhat.com>
+> Subject: Re: [PATCH] vfio dma_map/unmap: optimized for hugetlbfs pages
+> 
+> On Mon, 20 Jul 2020 16:29:47 +0800
+> Jay Zhou <jianjay.zhou@huawei.com> wrote:
+> 
+> > From: Ming Mao <maoming.maoming@huawei.com>
+> >
+> > Hi all,
+> > I'm working on starting lots of big size Virtual Machines(memory:
+> > >128GB) with VFIO-devices. And I encounter a problem that is the
+> > waiting time of starting all Virtual Machines is too long. I analyze
+> > the startup log and find that the time of pinning/unpinning pages
+> > could be reduced.
+> >
+> > In the original process, to make sure the pages are contiguous, we
+> > have to check all pages one by one. I think maybe we can use hugetlbfs
+> > pages which can skip this step.
+> > So I create a patch to do this.
+> > According to my test, the result of this patch is pretty well.
+> >
+> > Virtual Machine: 50G memory, 32 CPU, 1 VFIO-device, 1G hugetlbfs page
+> >         original   after optimization
+> > pin time   700ms          0.1ms
+> >
+> > I Suppose that:
+> > 1)the hugetlbfs page should not be split 2)PG_reserved is not relevant
+> > for hugetlbfs pages 3)we can delete the for loops and use some
+> > operations (such as atomic_add,page_ref_add) instead
+> >
+> > please correct me if I am wrong.
+> >
+> > Thanks.
+> >
+> > Signed-off-by: Ming Mao <maoming.maoming@huawei.com>
+> > ---
+> >  drivers/vfio/vfio_iommu_type1.c | 236 ++++++++++++++++++++++++++++++--
+> >  include/linux/vfio.h            |  20 +++
+> >  2 files changed, 246 insertions(+), 10 deletions(-)
+> >
+> > diff --git a/drivers/vfio/vfio_iommu_type1.c
+> > b/drivers/vfio/vfio_iommu_type1.c index 5e556ac91..42e25752e 100644
+> > --- a/drivers/vfio/vfio_iommu_type1.c
+> > +++ b/drivers/vfio/vfio_iommu_type1.c
+> > @@ -415,6 +415,46 @@ static int put_pfn(unsigned long pfn, int prot)
+> >  	return 0;
+> >  }
+> >
+> > +/*
+> > + * put pfns for a hugetlbfs page
+> > + * @start:the 4KB-page we start to put,can be any page in this
+> > +hugetlbfs page
+> > + * @npage:the number of 4KB-pages need to put
+> 
+> This code supports systems where PAGE_SIZE is not 4KB.
+> 
+> > + * @prot:IOMMU_READ/WRITE
+> > + */
+> > +static int hugetlb_put_pfn(unsigned long start, unsigned int npage,
+> > +int prot) {
+> > +	struct page *page = NULL;
+> > +	struct page *head = NULL;
+> 
+> Unnecessary initialization.
+> 
+> > +
+> > +	if (!npage || !pfn_valid(start))
+> > +		return 0;
+> > +
+> > +	page = pfn_to_page(start);
+> > +	if (!page || !PageHuge(page))
+> > +		return 0;
+> > +	head = compound_head(page);
+> > +	/*
+> > +	 * The last page should be in this hugetlbfs page.
+> > +	 * The number of putting pages should be equal to the number
+> > +	 * of getting pages.So the hugepage pinned refcount and the normal
+> > +	 * page refcount can not be smaller than npage.
+> > +	 */
+> > +	if ((head != compound_head(pfn_to_page(start + npage - 1)))
+> > +	    || (page_ref_count(head) < npage)
+> > +	    || (compound_pincount(page) < npage))
+> > +		return 0;
+> > +
+> > +	if ((prot & IOMMU_WRITE) && !PageDirty(page))
+> > +		set_page_dirty_lock(page);
+> > +
+> > +	atomic_sub(npage, compound_pincount_ptr(head));
+> > +	if (page_ref_sub_and_test(head, npage))
+> > +		__put_page(head);
+> > +
+> > +	mod_node_page_state(page_pgdat(head), NR_FOLL_PIN_RELEASED,
+> npage);
+> > +	return 1;
+> > +}
+> > +
+> >  static int follow_fault_pfn(struct vm_area_struct *vma, struct mm_struct
+> *mm,
+> >  			    unsigned long vaddr, unsigned long *pfn,
+> >  			    bool write_fault)
+> > @@ -479,6 +519,90 @@ static int vaddr_get_pfn(struct mm_struct *mm,
+> unsigned long vaddr,
+> >  	return ret;
+> >  }
+> >
+> > +struct vfio_hupetlbpage_info vfio_hugetlbpage_info[HUGE_MAX_HSTATE] = {
+> > +	{vfio_hugetlbpage_2M, PMD_SIZE, ~((1ULL << HPAGE_PMD_SHIFT) - 1)},
+> > +	{vfio_hugetlbpage_1G, PUD_SIZE, ~((1ULL << HPAGE_PUD_SHIFT) - 1)},
+> 
+> Other architectures support more huge page sizes, also 0-day identified these
+> #defines don't exist when THP is not configured.  But why couldn't we figure out
+> all of these form the compound_order()?  order == shift, size = PAGE_SIZE <<
+> order.
+> 
+> > +};
+> > +
+> > +static bool is_hugetlbpage(unsigned long pfn, enum
+> > +vfio_hugetlbpage_type *type) {
+> > +	struct page *page = NULL;
+> 
+> Unnecessary initialization.
+> 
+> > +
+> > +	if (!pfn_valid(pfn) || !type)
+> > +		return false;
+> > +
+> > +	page = pfn_to_page(pfn);
+> > +	/* only check for hugetlbfs pages */
+> > +	if (!page || !PageHuge(page))
+> > +		return false;
+> > +
+> > +	switch (compound_order(compound_head(page))) {
+> > +	case PMD_ORDER:
+> > +		*type = vfio_hugetlbpage_2M;
+> > +		break;
+> > +	case PUD_ORDER:
+> > +		*type = vfio_hugetlbpage_1G;
+> > +		break;
+> > +	default:
+> > +		return false;
+> > +	}
+> > +
+> > +	return true;
+> > +}
+> > +
+> > +/* Is the addr in the last page in hugetlbfs pages? */ static bool
+> > +hugetlb_is_last_page(unsigned long addr, enum vfio_hugetlbpage_type
+> > +type) {
+> > +	unsigned int num = 0;
+> 
+> Unnecessary initialization, and in fact unnecessary variable altogether.
+> ie.
+> 
+> 	return hugetlb_get_resdual_pages(addr & ~(PAGE_SIZE - 1), type) == 1;
+> 
+> 
+> > +
+> > +	num = hugetlb_get_resdual_pages(addr & ~(PAGE_SIZE - 1), type);
+> 
+> residual?
+> 
+> > +
+> > +	if (num == 1)
+> > +		return true;
+> > +	else
+> > +		return false;
+> > +}
+> > +
+> > +static bool hugetlb_page_is_pinned(struct vfio_dma *dma,
+> > +				unsigned long start,
+> > +				unsigned long npages)
+> > +{
+> > +	struct vfio_pfn *vpfn = NULL;
+> 
+> Unnecessary initialization.
+> 
+> > +	struct rb_node *node = rb_first(&dma->pfn_list);
+> > +	unsigned long end = start + npages - 1;
+> > +
+> > +	for (; node; node = rb_next(node)) {
+> > +		vpfn = rb_entry(node, struct vfio_pfn, node);
+> > +
+> > +		if ((vpfn->pfn >= start) && (vpfn->pfn <= end))
+> > +			return true;
+> 
+> This function could be named better, it suggests the hugetlbfs page is pinned, but
+> really we're only looking for any pfn_list pinnings overlapping the pfn range.
+> 
+> > +	}
+> > +
+> > +	return false;
+> > +}
+> > +
+> > +static unsigned int hugetlb_get_contiguous_pages_num(struct vfio_dma
+> *dma,
+> > +						unsigned long pfn,
+> > +						unsigned long resdual_npage,
+> > +						unsigned long max_npage)
+> > +{
+> > +	unsigned int num = 0;
+> 
+> Unnecessary initialization
+> 
+> > +
+> > +	if (!dma)
+> > +		return 0;
+> > +
+> > +	num = resdual_npage < max_npage ? resdual_npage : max_npage;
+> 
+> min(resdual_npage, max_npage)
+> 
+> 
+> > +	/*
+> > +	 * If there is only one page, it is no need to optimize them.
+> 
+> s/no need/not necessary/
+> 
+> > +	 * Maybe some pages have been pinned and inserted into dma->pfn_list by
+> others.
+> > +	 * In this case, we just goto the slow path simply.
+> > +	 */
+> > +	if ((num < 2) || hugetlb_page_is_pinned(dma, pfn, num))
+> > +		return 0;
+> 
+> Why does having pinnings in the pfn_list disqualify it from hugetlbfs pinning?
+> 
+> Testing for the last page here is redundant to the pinning path, should it only be
+> done here?  Can num be zero?
+> 
+> Maybe better to return -errno for this and above zero conditions rather than
+> return a value that doesn't reflect the purpose of the function?
+> 
+> > +
+> > +	return num;
+> > +}
+> > +
+> >  /*
+> >   * Attempt to pin pages.  We really don't want to track all the pfns and
+> >   * the iommu can only map chunks of consecutive pfns anyway, so get
+> > the @@ -492,6 +616,7 @@ static long vfio_pin_pages_remote(struct vfio_dma
+> *dma, unsigned long vaddr,
+> >  	long ret, pinned = 0, lock_acct = 0;
+> >  	bool rsvd;
+> >  	dma_addr_t iova = vaddr - dma->vaddr + dma->iova;
+> > +	enum vfio_hugetlbpage_type type;
+> >
+> >  	/* This code path is only user initiated */
+> >  	if (!current->mm)
+> > @@ -521,6 +646,55 @@ static long vfio_pin_pages_remote(struct vfio_dma
+> *dma, unsigned long vaddr,
+> >  	if (unlikely(disable_hugepages))
+> >  		goto out;
+> >
+> > +	/*
+> > +	 * It is no need to get pages one by one for hugetlbfs pages.
+> 
+> s/no need/not necessary/
+> 
+> > +	 * 4KB-pages in hugetlbfs pages are contiguous.
+> > +	 * But if the vaddr is in the last 4KB-page, we just goto the slow path.
+> 
+> 
+> s/4KB-/PAGE_SIZE /
+> 
+> Please explain the significance of vaddr being in the last PAGE_SIZE page of a
+> hugetlbfs page.  Is it simply that we should take the slow path for mapping a
+> single page before the end of the hugetlbfs page?
+> Is this optimization worthwhile?  Isn't it more consistent to handle all mappings
+> over hugetlbfs pages the same?  Should we be operating on vaddr here for the
+> hugetlbfs page alignment or base_pfn?
+> 
+> > +	 */
+> > +	if (is_hugetlbpage(*pfn_base, &type) && !hugetlb_is_last_page(vaddr,
+> type)) {
+> > +		unsigned long hugetlb_resdual_npage = 0;
+> > +		unsigned long contiguous_npage = 0;
+> > +		struct page *head = NULL;
+> > +
+> > +		hugetlb_resdual_npage =
+> > +			hugetlb_get_resdual_pages((vaddr + PAGE_SIZE) & ~(PAGE_SIZE -
+> 1),
+> > +type);
+> 
+> ~(PAGE_SIZE - 1) is PAGE_MASK, but that whole operation looks like a
+> PAGE_ALIGN(vaddr)
+> 
+> This is trying to get the number of pages after this page to the end of the
+> hugetlbfs page, right?  Rather than the hugetlb_is_last_page() above, shouldn't
+> we have recorded the number of pages there and used math to get this value?
+> 
+> > +		/*
+> > +		 * Maybe the hugetlb_resdual_npage is invalid.
+> > +		 * For example, hugetlb_resdual_npage > (npage - 1) or
+> > +		 * some pages of this hugetlbfs page have been pinned.
+> > +		 */
+> > +		contiguous_npage = hugetlb_get_contiguous_pages_num(dma,
+> *pfn_base + 1,
+> > +						hugetlb_resdual_npage, npage - 1);
+> > +		if (!contiguous_npage)
+> > +			goto slow_path;
+> > +
+> > +		/*
+> > +		 * Unlike THP, the splitting should not happen for hugetlbfs pages.
+> > +		 * Since PG_reserved is not relevant for compound pages, and the pfn
+> of
+> > +		 * 4KB-page which in hugetlbfs pages is valid,
+> 
+> s/4KB/PAGE_SIZE/
+> 
+> > +		 * it is no need to check rsvd for hugetlbfs pages.
+> 
+> s/no need/not necessary/
+> 
+> > +		 */
+> > +		if (!dma->lock_cap &&
+> > +		    current->mm->locked_vm + lock_acct + contiguous_npage > limit)
+> {
+> > +			pr_warn("%s: RLIMIT_MEMLOCK (%ld) exceeded\n",
+> > +				 __func__, limit << PAGE_SHIFT);
+> > +			ret = -ENOMEM;
+> > +			goto unpin_out;
+> > +		}
+> > +		/*
+> > +		 * We got a hugetlbfs page using vaddr_get_pfn alreadly.
+> > +		 * In this case,we do not need to alloc pages and we can finish all
+> > +		 * work by a single operation to the head page.
+> > +		 */
+> > +		lock_acct += contiguous_npage;
+> > +		head = compound_head(pfn_to_page(*pfn_base));
+> > +		atomic_add(contiguous_npage, compound_pincount_ptr(head));
+> > +		page_ref_add(head, contiguous_npage);
+> > +		mod_node_page_state(page_pgdat(head), NR_FOLL_PIN_ACQUIRED,
+> contiguous_npage);
+> > +		pinned += contiguous_npage;
+> > +		goto out;
+> 
+> I'm hoping Peter or Andrea understand this, but I think we still have pfn_base
+> pinned separately and I don't see that we've done an unpin anywhere, so are we
+> leaking the pin of the first page??
+> 
+> > +	}
+> > +slow_path:
+> >  	/* Lock all the consecutive pages from pfn_base */
+> >  	for (vaddr += PAGE_SIZE, iova += PAGE_SIZE; pinned < npage;
+> >  	     pinned++, vaddr += PAGE_SIZE, iova += PAGE_SIZE) { @@ -569,7
+> > +743,30 @@ static long vfio_unpin_pages_remote(struct vfio_dma *dma,
+> > dma_addr_t iova,  {
+> >  	long unlocked = 0, locked = 0;
+> >  	long i;
+> > +	enum vfio_hugetlbpage_type type;
+> > +
+> > +	if (is_hugetlbpage(pfn, &type)) {
+> > +		unsigned long hugetlb_resdual_npage = 0;
+> > +		unsigned long contiguous_npage = 0;
+> 
+> Unnecessary initialization...
+> 
+> >
+> > +		hugetlb_resdual_npage = hugetlb_get_resdual_pages(iova &
+> > +~(PAGE_SIZE - 1), type);
+> 
+> PAGE_MASK
+> 
+> Like above, is it pfn or iova that we should be using when looking at hugetlbfs
+> alignment?
+> 
+> > +		contiguous_npage = hugetlb_get_contiguous_pages_num(dma, pfn,
+> > +						hugetlb_resdual_npage, npage);
+> > +		/*
+> > +		 * There is not enough contiguous pages or this hugetlbfs page
+> > +		 * has been pinned.
+> > +		 * Let's try the slow path.
+> > +		 */
+> > +		if (!contiguous_npage)
+> > +			goto slow_path;
+> > +
+> > +		/* try the slow path if failed */
+> > +		if (hugetlb_put_pfn(pfn, contiguous_npage, dma->prot)) {
+> > +			unlocked = contiguous_npage;
+> > +			goto out;
+> > +		}
+> 
+> Should probably break the pin path into a separate get_pfn function for
+> symmetry.
+> 
+> 
+> > +	}
+> > +slow_path:
+> >  	for (i = 0; i < npage; i++, iova += PAGE_SIZE) {
+> >  		if (put_pfn(pfn++, dma->prot)) {
+> >  			unlocked++;
+> > @@ -578,6 +775,7 @@ static long vfio_unpin_pages_remote(struct vfio_dma
+> *dma, dma_addr_t iova,
+> >  		}
+> >  	}
+> >
+> > +out:
+> >  	if (do_accounting)
+> >  		vfio_lock_acct(dma, locked - unlocked, true);
+> >
+> > @@ -867,6 +1065,7 @@ static long vfio_unmap_unpin(struct vfio_iommu
+> *iommu, struct vfio_dma *dma,
+> >  	struct iommu_iotlb_gather iotlb_gather;
+> >  	int unmapped_region_cnt = 0;
+> >  	long unlocked = 0;
+> > +	enum vfio_hugetlbpage_type type;
+> >
+> >  	if (!dma->size)
+> >  		return 0;
+> > @@ -900,16 +1099,33 @@ static long vfio_unmap_unpin(struct vfio_iommu
+> *iommu, struct vfio_dma *dma,
+> >  			continue;
+> >  		}
+> >
+> > -		/*
+> > -		 * To optimize for fewer iommu_unmap() calls, each of which
+> > -		 * may require hardware cache flushing, try to find the
+> > -		 * largest contiguous physical memory chunk to unmap.
+> > -		 */
+> > -		for (len = PAGE_SIZE;
+> > -		     !domain->fgsp && iova + len < end; len += PAGE_SIZE) {
+> > -			next = iommu_iova_to_phys(domain->domain, iova + len);
+> > -			if (next != phys + len)
+> > -				break;
+> > +		if (is_hugetlbpage((phys >> PAGE_SHIFT), &type)
+> > +		    && (!domain->fgsp)) {
+> 
+> Reverse the order of these tests.
+> 
+> > +			unsigned long hugetlb_resdual_npage = 0;
+> > +			unsigned long contiguous_npage = 0;
+> 
+> 
+> Unnecessary...
+> 
+> > +			hugetlb_resdual_npage =
+> > +				hugetlb_get_resdual_pages(iova & ~(PAGE_SIZE - 1), type);
+> 
+> PAGE_MASK
+> 
+> > +			/*
+> > +			 * The number of contiguous page can not be larger than
+> dma->size
+> > +			 * which is the number of pages pinned.
+> > +			 */
+> > +			contiguous_npage = ((dma->size >> PAGE_SHIFT) >
+> hugetlb_resdual_npage) ?
+> > +				hugetlb_resdual_npage : (dma->size >> PAGE_SHIFT);
+> 
+> min()
+> 
+> > +
+> > +			len = contiguous_npage * PAGE_SIZE;
+> > +		} else {
+> > +			/*
+> > +			 * To optimize for fewer iommu_unmap() calls, each of which
+> > +			 * may require hardware cache flushing, try to find the
+> > +			 * largest contiguous physical memory chunk to unmap.
+> > +			 */
+> > +			for (len = PAGE_SIZE;
+> > +			     !domain->fgsp && iova + len < end; len += PAGE_SIZE) {
+> > +				next = iommu_iova_to_phys(domain->domain, iova + len);
+> > +				if (next != phys + len)
+> > +					break;
+> > +			}
+> >  		}
+> >
+> >  		/*
+> > diff --git a/include/linux/vfio.h b/include/linux/vfio.h index
+> > 38d3c6a8d..91ef2058f 100644
+> > --- a/include/linux/vfio.h
+> > +++ b/include/linux/vfio.h
+> > @@ -214,4 +214,24 @@ extern int vfio_virqfd_enable(void *opaque,
+> >  			      void *data, struct virqfd **pvirqfd, int fd);  extern void
+> > vfio_virqfd_disable(struct virqfd **pvirqfd);
+> >
+> > +enum vfio_hugetlbpage_type {
+> > +	vfio_hugetlbpage_2M,
+> > +	vfio_hugetlbpage_1G,
+> > +};
+> > +
+> > +struct vfio_hupetlbpage_info {
+> > +	enum vfio_hugetlbpage_type type;
+> 
+> The enum within the structure serves no purpose.
+> 
+> > +	unsigned long size;
+> > +	unsigned long mask;
+> > +};
+> > +
+> > +#define PMD_ORDER 9
+> > +#define PUD_ORDER 18
+> 
+> Architecture specific.
+> 
+> > +/*
+> > + * get the number of resdual 4KB-pages in a hugetlbfs page
+> > + * (including the page which pointed by this address)
+> 
+> s/4KB/PAGE_SIZE/
+> 
+> > + */
+> > +#define hugetlb_get_resdual_pages(address, type)				\
+> > +		((vfio_hugetlbpage_info[type].size				\
+> > +		- (address & ~vfio_hugetlbpage_info[type].mask)) >> PAGE_SHIFT)
+> >  #endif /* VFIO_H */
 
