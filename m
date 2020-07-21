@@ -2,93 +2,130 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 612D5227BA7
-	for <lists+kvm@lfdr.de>; Tue, 21 Jul 2020 11:24:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 89F14227CB9
+	for <lists+kvm@lfdr.de>; Tue, 21 Jul 2020 12:17:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728904AbgGUJYn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 21 Jul 2020 05:24:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35270 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726089AbgGUJYm (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 21 Jul 2020 05:24:42 -0400
-Received: from mail-pf1-x443.google.com (mail-pf1-x443.google.com [IPv6:2607:f8b0:4864:20::443])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E0EF5C061794;
-        Tue, 21 Jul 2020 02:24:41 -0700 (PDT)
-Received: by mail-pf1-x443.google.com with SMTP id u5so10453613pfn.7;
-        Tue, 21 Jul 2020 02:24:41 -0700 (PDT)
+        id S1729087AbgGUKRj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 21 Jul 2020 06:17:39 -0400
+Received: from smtp-fw-4101.amazon.com ([72.21.198.25]:21974 "EHLO
+        smtp-fw-4101.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726147AbgGUKRf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 21 Jul 2020 06:17:35 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=nCJ0wq1+iNIw82Rl5c0tpfz9VgbOLTbPvMTzVmJqTNI=;
-        b=Ao56ZxaYpU6im+Me37kHpBMg7g3MdPOws9kUTJ42ld7wKg3qmsXiusthDnC2DURk+W
-         14novEz0jLbWc48DXVvyrr36ptVHF0BKRi/MIxROyWCX3xgzqrXLHTmM8S/byB4Ax4ed
-         v0d6R+BXxevNGBDsjNXayJQkL0Jkwwo3VADBkgng4HK2ZO7xMfBAgMM1uQJsPGQz4fyd
-         lwaSz92L81F/E7Ty9SGPqBmY/z5kCtzVOkepfe1CjjWFWvbDsOR9l66qkB6TtyLTDpys
-         xgbrLpYkKzTarlzMEa8GgOysOFXqQxyW4sh4fE1zCWwYU2timfs9lSbeMrqDw1jkSW/i
-         SL2g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references;
-        bh=nCJ0wq1+iNIw82Rl5c0tpfz9VgbOLTbPvMTzVmJqTNI=;
-        b=sHNybMybcWcZN3A8/X+JagqhjVeDRu6ORwwktiv0L8bL2UBNp1RF8FZxbD+iytJBLM
-         sF+xYLXU75CRermRAhvPlr9wQnkVJC4D6SLFAvaoKgZOTY+V3MxAY7H1xR95bcZm9AB6
-         hMW9yVXU37V+EcgoGmMB6sIVJ3evlW1W6K1Gtb2uwqZUmQxrhAI32ptl+U3I9R863lml
-         NzWsuFjeF44opUrNz5FXz9rKPoowmYPzjoHF+TcwWHSxPwGeLI6bH6M0QulOIwkaafrX
-         hh+ujGRrJYzDT97r0HO01ZQIxv/o2B7qPyPtyInccv5q03Ztld7KMdvSXEOAdGmfRnBK
-         e2dQ==
-X-Gm-Message-State: AOAM530SslSwl39ARqe7P4CY0bd+FYfEMmp6y8elpq3mq022gJZlP5cQ
-        iOZzik86++FNf83USrM54wy1m6sc
-X-Google-Smtp-Source: ABdhPJxhQNBFSgIjZmbnWEGJNzFG3rBsfkcbCx4RCO1/lDF7jBAYo6N79YIjtTUSm3oQyKyZR8LQJg==
-X-Received: by 2002:aa7:9630:: with SMTP id r16mr24209002pfg.144.1595323481310;
-        Tue, 21 Jul 2020 02:24:41 -0700 (PDT)
-Received: from localhost.localdomain ([103.7.29.6])
-        by smtp.googlemail.com with ESMTPSA id l9sm2337685pjy.2.2020.07.21.02.24.38
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 21 Jul 2020 02:24:40 -0700 (PDT)
-From:   Wanpeng Li <kernellwp@gmail.com>
-X-Google-Original-From: Wanpeng Li <wanpengli@tencent.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>
-Subject: [PATCH 2/2] KVM: LAPIC: Set the TDCR settable bits
-Date:   Tue, 21 Jul 2020 17:24:28 +0800
-Message-Id: <1595323468-4380-2-git-send-email-wanpengli@tencent.com>
-X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1595323468-4380-1-git-send-email-wanpengli@tencent.com>
-References: <1595323468-4380-1-git-send-email-wanpengli@tencent.com>
+  d=amazon.de; i=@amazon.de; q=dns/txt; s=amazon201209;
+  t=1595326654; x=1626862654;
+  h=subject:to:cc:references:from:message-id:date:
+   mime-version:in-reply-to:content-transfer-encoding;
+  bh=/xLOkM2JYhUnLrEu5qMRjWL8+VI4XlSHNdQQX9qcfLU=;
+  b=D+WP0ntTMQ2m+VZxOuLYtYhaJZhW39kycdQt65letnpFLWmdmkvGNnCD
+   111HZMN+VPuSN9azzteb+0VfCX8jp0AH5CDQ+0VtkDuyvpfTuXyH3oElT
+   BtBcOfoKQQVYhxst1Mxy0mTD47KOXJL/1wYda9kuLZiXGzBjiKgzJDCuy
+   k=;
+IronPort-SDR: +bTGDocgGFhqFJ2NyJdStaKUP0hPLzbGvbFh2wXWM73ksqIUl1QDz4KpRby1Sr7bRT5W588z1Q
+ moud+KP/mfMw==
+X-IronPort-AV: E=Sophos;i="5.75,378,1589241600"; 
+   d="scan'208";a="43267821"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-1e-303d0b0e.us-east-1.amazon.com) ([10.43.8.6])
+  by smtp-border-fw-out-4101.iad4.amazon.com with ESMTP; 21 Jul 2020 10:17:33 +0000
+Received: from EX13MTAUWC001.ant.amazon.com (iad55-ws-svc-p15-lb9-vlan2.iad.amazon.com [10.40.159.162])
+        by email-inbound-relay-1e-303d0b0e.us-east-1.amazon.com (Postfix) with ESMTPS id 70B31A1FA6;
+        Tue, 21 Jul 2020 10:17:32 +0000 (UTC)
+Received: from EX13D20UWC001.ant.amazon.com (10.43.162.244) by
+ EX13MTAUWC001.ant.amazon.com (10.43.162.135) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.2; Tue, 21 Jul 2020 10:17:32 +0000
+Received: from 38f9d3867b82.ant.amazon.com (10.43.162.73) by
+ EX13D20UWC001.ant.amazon.com (10.43.162.244) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.2; Tue, 21 Jul 2020 10:17:26 +0000
+Subject: Re: [PATCH v5 05/18] nitro_enclaves: Handle PCI device command
+ requests
+To:     Andra Paraschiv <andraprs@amazon.com>,
+        <linux-kernel@vger.kernel.org>
+CC:     Anthony Liguori <aliguori@amazon.com>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Colm MacCarthaigh <colmmacc@amazon.com>,
+        "David Duncan" <davdunc@amazon.com>,
+        Bjoern Doebel <doebel@amazon.de>,
+        "David Woodhouse" <dwmw@amazon.co.uk>,
+        Frank van der Linden <fllinden@amazon.com>,
+        Greg KH <gregkh@linuxfoundation.org>,
+        Karen Noel <knoel@redhat.com>,
+        "Martin Pohlack" <mpohlack@amazon.de>,
+        Matt Wilson <msw@amazon.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Balbir Singh <sblbir@amazon.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Stewart Smith <trawets@amazon.com>,
+        Uwe Dannowski <uwed@amazon.de>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>, <kvm@vger.kernel.org>,
+        <ne-devel-upstream@amazon.com>, kbuild test robot <lkp@intel.com>
+References: <20200715194540.45532-1-andraprs@amazon.com>
+ <20200715194540.45532-6-andraprs@amazon.com>
+From:   Alexander Graf <graf@amazon.de>
+Message-ID: <87d25260-24e7-319a-f94f-d1eb77c3da00@amazon.de>
+Date:   Tue, 21 Jul 2020 12:17:24 +0200
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:68.0)
+ Gecko/20100101 Thunderbird/68.10.0
+MIME-Version: 1.0
+In-Reply-To: <20200715194540.45532-6-andraprs@amazon.com>
+Content-Language: en-US
+X-Originating-IP: [10.43.162.73]
+X-ClientProxiedBy: EX13D16UWB003.ant.amazon.com (10.43.161.194) To
+ EX13D20UWC001.ant.amazon.com (10.43.162.244)
+Content-Type: text/plain; charset="windows-1252"; format="flowed"
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Wanpeng Li <wanpengli@tencent.com>
 
-Only bits 0, 1, and 3 are settable, others are reserved for APIC_TDCR. 
-Let's record the settable value in the virtual apic page.
 
-Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
----
- arch/x86/kvm/lapic.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+On 15.07.20 21:45, Andra Paraschiv wrote:
+> The Nitro Enclaves PCI device exposes a MMIO space that this driver
+> uses to submit command requests and to receive command replies e.g. for
+> enclave creation / termination or setting enclave resources.
+> =
 
-diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-index 4ce2ddd..8f7a14d 100644
---- a/arch/x86/kvm/lapic.c
-+++ b/arch/x86/kvm/lapic.c
-@@ -2068,7 +2068,7 @@ int kvm_lapic_reg_write(struct kvm_lapic *apic, u32 reg, u32 val)
- 	case APIC_TDCR: {
- 		uint32_t old_divisor = apic->divide_count;
- 
--		kvm_lapic_set_reg(apic, APIC_TDCR, val);
-+		kvm_lapic_set_reg(apic, APIC_TDCR, val & 0xb);
- 		update_divide_count(apic);
- 		if (apic->divide_count != old_divisor &&
- 				apic->lapic_timer.period) {
--- 
-2.7.4
+> Add logic for handling PCI device command requests based on the given
+> command type.
+> =
+
+> Register an MSI-X interrupt vector for command reply notifications to
+> handle this type of communication events.
+> =
+
+> Signed-off-by: Alexandru-Catalin Vasile <lexnv@amazon.com>
+> Signed-off-by: Andra Paraschiv <andraprs@amazon.com>
+> =
+
+> Fix issue reported in:
+> https://lore.kernel.org/lkml/202004231644.xTmN4Z1z%25lkp@intel.com/
+> =
+
+> Reported-by: kbuild test robot <lkp@intel.com>
+
+This means that the overall patch is a fix that was reported by the test =
+
+rebot. I doubt that's what you mean. Just remove the line.
+
+> Signed-off-by: Andra Paraschiv <andraprs@amazon.com>
+
+Reviewed-by: Alexander Graf <graf@amazon.com>
+
+
+Alex
+
+
+
+
+Amazon Development Center Germany GmbH
+Krausenstr. 38
+10117 Berlin
+Geschaeftsfuehrung: Christian Schlaeger, Jonathan Weiss
+Eingetragen am Amtsgericht Charlottenburg unter HRB 149173 B
+Sitz: Berlin
+Ust-ID: DE 289 237 879
+
+
 
