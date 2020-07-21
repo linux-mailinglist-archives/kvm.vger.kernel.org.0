@@ -2,129 +2,110 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2BEAC228420
-	for <lists+kvm@lfdr.de>; Tue, 21 Jul 2020 17:47:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 329DB228467
+	for <lists+kvm@lfdr.de>; Tue, 21 Jul 2020 18:00:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728180AbgGUPrf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 21 Jul 2020 11:47:35 -0400
-Received: from mga18.intel.com ([134.134.136.126]:25738 "EHLO mga18.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726029AbgGUPrf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 21 Jul 2020 11:47:35 -0400
-IronPort-SDR: 94oebsorumOKhMBFikMS4GcSNFmeQw6X1tVxQQWRN2k8XnY0EpEAETWVz4h7ljL0GgEJaUZhzt
- epmejd3pH3FA==
-X-IronPort-AV: E=McAfee;i="6000,8403,9689"; a="137654416"
-X-IronPort-AV: E=Sophos;i="5.75,379,1589266800"; 
-   d="scan'208";a="137654416"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Jul 2020 08:47:34 -0700
-IronPort-SDR: 9GlHVtXFYmJ5YIJuaam9Dhj7rUEU4iVcVpg4AjATfw6wFGLNu290PKV4hPUCClBSRyOFq9Lds5
- atSYYf5hfHlA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.75,379,1589266800"; 
-   d="scan'208";a="271751941"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.152])
-  by fmsmga008.fm.intel.com with ESMTP; 21 Jul 2020 08:47:34 -0700
-Date:   Tue, 21 Jul 2020 08:47:34 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Krish Sadhukhan <krish.sadhukhan@oracle.com>
-Cc:     kvm@vger.kernel.org, jmattson@google.com, pbonzini@redhat.com
-Subject: Re: [PATCH] KVM: x86: Fix names of implemented kvm_x86_ops in VMX
- and SVM modules
-Message-ID: <20200721154734.GD22083@linux.intel.com>
-References: <20200720220728.11140-1-krish.sadhukhan@oracle.com>
- <20200720220728.11140-2-krish.sadhukhan@oracle.com>
+        id S1729977AbgGUQAu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 21 Jul 2020 12:00:50 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:43986 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726892AbgGUQAs (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 21 Jul 2020 12:00:48 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1595347247;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=eeKT2rOIxGNaO2zvUjaNxphvmuUrFZ8hkCC7PUINRIc=;
+        b=WOsQR8CaobV9EcBs11d4mfXIL0XV22n7jk5ZnhgAqpGF8PW76sHsVUWWlSJdq+8CVn4308
+        vRPwERVkJV0BfNztLWgVy9NcpyjGeV0cNn+ACO/LUqVPtz9BVRTCZU6guJib8eL/9peU0S
+        SqZfc8A/bY3hxB4uu9VcooTL9l6/0HA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-268-xqQdX3AQN2uqd872ket1QQ-1; Tue, 21 Jul 2020 12:00:42 -0400
+X-MC-Unique: xqQdX3AQN2uqd872ket1QQ-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A00E780BCCC;
+        Tue, 21 Jul 2020 16:00:40 +0000 (UTC)
+Received: from w520.home (ovpn-112-71.phx2.redhat.com [10.3.112.71])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 0ECD76FECD;
+        Tue, 21 Jul 2020 16:00:36 +0000 (UTC)
+Date:   Tue, 21 Jul 2020 10:00:36 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Xiong Zhang <xiong.y.zhang@intel.com>,
+        Wayne Boyer <wayne.boyer@intel.com>,
+        Zhenyu Wang <zhenyuw@linux.intel.com>,
+        Jun Nakajima <jun.nakajima@intel.com>,
+        Weijiang Yang <weijiang.yang@intel.com>
+Subject: Re: [PATCH] KVM: x86/mmu: Add capability to zap only sptes for the
+ affected memslot
+Message-ID: <20200721100036.464d4440@w520.home>
+In-Reply-To: <20200721030319.GD20375@linux.intel.com>
+References: <20200703025047.13987-1-sean.j.christopherson@intel.com>
+        <51637a13-f23b-8b76-c93a-76346b4cc982@redhat.com>
+        <20200709211253.GW24919@linux.intel.com>
+        <49c7907a-3ab4-b5db-ccb4-190b990c8be3@redhat.com>
+        <20200710042922.GA24919@linux.intel.com>
+        <20200713122226.28188f93@x1.home>
+        <20200713190649.GE29725@linux.intel.com>
+        <20200721030319.GD20375@linux.intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200720220728.11140-2-krish.sadhukhan@oracle.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jul 20, 2020 at 06:07:28PM -0400, Krish Sadhukhan wrote:
-> Some of the names do not have a corresponding 'vmx_' or 'svm_' prefix. Also,
-> the order of the words in some of the names is not the same as that in the
-> kvm_x86_ops structure. Fixing the naming will help in better readability of
-> the code and maintenance.
+On Mon, 20 Jul 2020 20:03:19 -0700
+Sean Christopherson <sean.j.christopherson@intel.com> wrote:
 
-If we're going to do a massive rename, I would strongly prefer to
-simultaneously enforce the "correct" names by adding a macro to generate the
-kvm_x86_ops hooks[*] (sample patch below).  I'd like to realize long term
-benefits if we're going to incur merge conflicts on everyone's in-flight
-development.
+> +Weijiang
+> 
+> On Mon, Jul 13, 2020 at 12:06:50PM -0700, Sean Christopherson wrote:
+> > The only ideas I have going forward are to:
+> > 
+> >   a) Reproduce the bug outside of your environment and find a resource that
+> >      can go through the painful bisection.  
+> 
+> We're trying to reproduce the original issue in the hopes of biesecting, but
+> have not yet discovered the secret sauce.  A few questions:
+> 
+>   - Are there any known hardware requirements, e.g. specific flavor of GPU?
 
-I had a series for this, but it got derailed when svm.c was fractured and I
-haven't found time to get back to it.  Code is on
-https://github.com/sean-jc/linux/tree/vmx/x86_ops_macros if you have bandwidth
-to pick it up.
+I'm using an old GeForce GT635, I don't think there's anything special
+about this card.
 
-[*] https://lkml.kernel.org/r/30b847cf-98db-145f-8aa0-a847146d5649@redhat.com
+>   - What's the average time to failure when running FurMark/PassMark?  E.g.
+>     what's a reasonable time to wait before rebooting to rerun the tests (I
+>     assume this is what you meant when you said you sometimes needed to
+>     reboot to observe failure).
 
+The failure mode ranges from graphics glitches, ex. vectors drawn
+across a window during the test or stray lines when interacting with
+the Windows menu button, to graphics driver failures triggering an
+error dialog, usually from PassMark.  I usually start FurMark, run the
+stress test for ~10s, kill it, then run a PassMark benchmark.  If I
+don't observe any glitching during the run, I'll trigger the Windows
+menu a few times, then reboot and try again.  The graphics tests within
+PassMark are generally when the glitches are triggered, both 2D and 3D,
+sometimes it's sufficient to only run those tests rather than the full
+system benchmark.  That's largely the trouble with this bisect is that
+the test is very interactive and requires observation.  Sometimes when
+it fails it snowballs into worse and worse errors and there's high
+confidence that it's bad, but other times you'll be suspicious that
+something occurred and need to repeat the testing.  Thanks,
 
-commit 83b835803554f6288af438a519be2c2559d77d89
-Author: Sean Christopherson <sean.j.christopherson@intel.com>
-Date:   Fri Apr 3 14:12:28 2020 -0700
+Alex
 
-    KVM: VMX: Fill in conforming vmx_x86_ops via macro
-
-    Suggested-by: Vitaly Kuznetsov <vkuznets@redhat.com>
-    Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
-    Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
-
-diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index 4a8b5a21dcd2e..adb75e21fd021 100644
---- a/arch/x86/kvm/vmx/nested.c
-+++ b/arch/x86/kvm/vmx/nested.c
-@@ -6279,14 +6279,16 @@ void nested_vmx_hardware_unsetup(void)
-        }
- }
-
-+#define KVM_X86_NESTED_OP(name) .name = nested_vmx_##name
-+
- static struct kvm_x86_nested_ops vmx_nested_ops __initdata = {
--       .check_events = nested_vmx_check_events,
--       .get_state = nested_vmx_get_state,
--       .set_state = nested_vmx_set_state,
--       .get_vmcs12_pages = nested_vmx_get_vmcs12_pages,
--       .enable_evmcs = nested_vmx_enable_evmcs,
--       .get_evmcs_version = nested_vmx_get_evmcs_version,
--       .write_log_dirty = nested_vmx_write_log_dirty,
-+       KVM_X86_NESTED_OP(check_events),
-+       KVM_X86_NESTED_OP(get_state),
-+       KVM_X86_NESTED_OP(set_state),
-+       KVM_X86_NESTED_OP(get_vmcs12_pages),
-+       KVM_X86_NESTED_OP(enable_evmcs),
-+       KVM_X86_NESTED_OP(get_evmcs_version),
-+       KVM_X86_NESTED_OP(write_log_dirty),
- };
-
- __init int nested_vmx_hardware_setup(struct kvm_x86_nested_ops *nested_ops,
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 8453c5b6f090c..447acda22af17 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -7626,134 +7626,136 @@ static bool vmx_check_apicv_inhibit_reasons(ulong bit)
-        return supported & BIT(bit);
- }
-
-+#define KVM_X86_OP(name) .name = vmx_##name
-+
- static struct kvm_x86_ops vmx_x86_ops __initdata = {
--       .hardware_unsetup = vmx_hardware_unsetup,
-+       KVM_X86_OP(hardware_unsetup),
-
--       .hardware_enable = vmx_hardware_enable,
--       .hardware_disable = vmx_hardware_disable,
--       .cpu_has_accelerated_tpr = vmx_cpu_has_accelerated_tpr,
--       .has_emulated_msr = vmx_has_emulated_msr,
-+       KVM_X86_OP(hardware_enable),
-+       KVM_X86_OP(hardware_disable),
-+       KVM_X86_OP(cpu_has_accelerated_tpr),
-+       KVM_X86_OP(has_emulated_msr),
-
-...
