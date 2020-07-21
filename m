@@ -2,20 +2,20 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BBF3F228ABF
-	for <lists+kvm@lfdr.de>; Tue, 21 Jul 2020 23:16:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 14A67228AF9
+	for <lists+kvm@lfdr.de>; Tue, 21 Jul 2020 23:18:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731393AbgGUVQi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 21 Jul 2020 17:16:38 -0400
-Received: from mx01.bbu.dsd.mx.bitdefender.com ([91.199.104.161]:37986 "EHLO
+        id S1731447AbgGUVSf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 21 Jul 2020 17:18:35 -0400
+Received: from mx01.bbu.dsd.mx.bitdefender.com ([91.199.104.161]:37844 "EHLO
         mx01.bbu.dsd.mx.bitdefender.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1731325AbgGUVQQ (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 21 Jul 2020 17:16:16 -0400
+        by vger.kernel.org with ESMTP id S1731209AbgGUVP6 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 21 Jul 2020 17:15:58 -0400
 Received: from smtp.bitdefender.com (smtp02.buh.bitdefender.net [10.17.80.76])
-        by mx01.bbu.dsd.mx.bitdefender.com (Postfix) with ESMTPS id DC7EE305D508;
-        Wed, 22 Jul 2020 00:09:31 +0300 (EEST)
+        by mx01.bbu.dsd.mx.bitdefender.com (Postfix) with ESMTPS id 0FE58305D509;
+        Wed, 22 Jul 2020 00:09:32 +0300 (EEST)
 Received: from localhost.localdomain (unknown [91.199.104.27])
-        by smtp.bitdefender.com (Postfix) with ESMTPSA id BBF67304FA12;
+        by smtp.bitdefender.com (Postfix) with ESMTPSA id DE647304FA14;
         Wed, 22 Jul 2020 00:09:31 +0300 (EEST)
 From:   =?UTF-8?q?Adalbert=20Laz=C4=83r?= <alazar@bitdefender.com>
 To:     kvm@vger.kernel.org
@@ -23,9 +23,9 @@ Cc:     virtualization@lists.linux-foundation.org,
         Paolo Bonzini <pbonzini@redhat.com>,
         =?UTF-8?q?Nicu=C8=99or=20C=C3=AE=C8=9Bu?= <ncitu@bitdefender.com>,
         =?UTF-8?q?Adalbert=20Laz=C4=83r?= <alazar@bitdefender.com>
-Subject: [PATCH v9 80/84] KVM: introspection: add KVMI_VCPU_CONTROL_SINGLESTEP
-Date:   Wed, 22 Jul 2020 00:09:18 +0300
-Message-Id: <20200721210922.7646-81-alazar@bitdefender.com>
+Subject: [PATCH v9 81/84] KVM: introspection: add KVMI_EVENT_SINGLESTEP
+Date:   Wed, 22 Jul 2020 00:09:19 +0300
+Message-Id: <20200721210922.7646-82-alazar@bitdefender.com>
 In-Reply-To: <20200721210922.7646-1-alazar@bitdefender.com>
 References: <20200721210922.7646-1-alazar@bitdefender.com>
 MIME-Version: 1.0
@@ -38,183 +38,179 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Nicușor Cîțu <ncitu@bitdefender.com>
 
-The next commit that adds the KVMI_EVENT_SINGLESTEP event will make this
-command more useful.
+This event is sent after each instruction when the singlestep has been
+enabled for a vCPU.
 
 Signed-off-by: Nicușor Cîțu <ncitu@bitdefender.com>
 Co-developed-by: Adalbert Lazăr <alazar@bitdefender.com>
 Signed-off-by: Adalbert Lazăr <alazar@bitdefender.com>
 ---
- Documentation/virt/kvm/kvmi.rst               | 32 ++++++++++
- arch/x86/kvm/kvmi.c                           | 18 ++++++
- arch/x86/kvm/x86.c                            | 12 +++-
- include/linux/kvmi_host.h                     |  7 +++
- include/uapi/linux/kvmi.h                     |  7 +++
- .../testing/selftests/kvm/x86_64/kvmi_test.c  | 46 ++++++++++++++
- virt/kvm/introspection/kvmi.c                 | 26 +++++++-
- virt/kvm/introspection/kvmi_int.h             |  2 +
- virt/kvm/introspection/kvmi_msg.c             | 60 +++++++++++++++----
- 9 files changed, 193 insertions(+), 17 deletions(-)
+ Documentation/virt/kvm/kvmi.rst               | 31 +++++++++
+ arch/x86/kvm/vmx/vmx.c                        |  6 ++
+ include/linux/kvmi_host.h                     |  4 ++
+ include/uapi/linux/kvmi.h                     |  6 ++
+ .../testing/selftests/kvm/x86_64/kvmi_test.c  | 65 +++++++++++++++++--
+ virt/kvm/introspection/kvmi.c                 | 60 +++++++++++++++++
+ virt/kvm/introspection/kvmi_msg.c             |  5 ++
+ 7 files changed, 172 insertions(+), 5 deletions(-)
 
 diff --git a/Documentation/virt/kvm/kvmi.rst b/Documentation/virt/kvm/kvmi.rst
-index 47387f297029..0a07ef101302 100644
+index 0a07ef101302..3c481c1b2186 100644
 --- a/Documentation/virt/kvm/kvmi.rst
 +++ b/Documentation/virt/kvm/kvmi.rst
-@@ -1049,6 +1049,38 @@ In order to 'forget' an address, all three bits ('rwx') must be set.
- * -KVM_EAGAIN - the selected vCPU can't be introspected yet
- * -KVM_ENOMEM - there is not enough memory to add the page tracking structures
+@@ -576,6 +576,7 @@ because these are sent as a result of certain commands (but they can be
+ disallowed by the device manager) ::
  
-+24. KVMI_VCPU_CONTROL_SINGLESTEP
-+--------------------------------
+ 	KVMI_EVENT_PAUSE_VCPU
++	KVMI_EVENT_SINGLESTEP
+ 	KVMI_EVENT_TRAP
+ 
+ The VM events (e.g. *KVMI_EVENT_UNHOOK*) are controlled with
+@@ -1075,8 +1076,12 @@ Enables/disables singlestep for the selected vCPU.
+ The introspection tool should use *KVMI_GET_VERSION*, to check
+ if the hardware supports singlestep (see **KVMI_GET_VERSION**).
+ 
++After every instruction, a *KVMI_EVENT_SINGLESTEP* event is sent
++to the introspection tool.
 +
-+:Architectures: x86 (vmx)
+ :Errors:
+ 
++* -KVM_EPERM  - the *KVMI_EVENT_SINGLESTEP* event is disallowed
+ * -KVM_EOPNOTSUPP - the hardware doesn't support singlestep
+ * -KVM_EINVAL - the padding is not zero
+ * -KVM_EAGAIN - the selected vCPU can't be introspected yet
+@@ -1481,3 +1486,29 @@ emulation).
+ The *RETRY* action is used by the introspection tool to retry the
+ execution of the current instruction, usually because it changed the
+ instruction pointer or the page restrictions.
++
++11. KVMI_EVENT_SINGLESTEP
++-------------------------
++
++:Architectures: x86
 +:Versions: >= 1
++:Actions: CONTINUE, CRASH
 +:Parameters:
 +
 +::
 +
-+	struct kvmi_vcpu_hdr;
-+	struct kvmi_vcpu_control_singlestep {
-+		__u8 enable;
-+		__u8 padding[7];
-+	};
++	struct kvmi_event;
 +
 +:Returns:
 +
 +::
 +
-+	struct kvmi_error_code;
++	struct kvmi_vcpu_hdr;
++	struct kvmi_event_reply;
++	struct kvmi_event_singlestep {
++		__u8 failed;
++		__u8 padding[7];
++	};
 +
-+Enables/disables singlestep for the selected vCPU.
-+
-+The introspection tool should use *KVMI_GET_VERSION*, to check
-+if the hardware supports singlestep (see **KVMI_GET_VERSION**).
-+
-+:Errors:
-+
-+* -KVM_EOPNOTSUPP - the hardware doesn't support singlestep
-+* -KVM_EINVAL - the padding is not zero
-+* -KVM_EAGAIN - the selected vCPU can't be introspected yet
-+
- Events
- ======
++This event is sent after each instruction, as long as the singlestep is
++enabled for the current vCPU (see **KVMI_VCPU_CONTROL_SINGLESTEP**).
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index f57587ddb3be..8c9ccd1ba0f0 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -5598,6 +5598,7 @@ static int handle_invalid_op(struct kvm_vcpu *vcpu)
  
-diff --git a/arch/x86/kvm/kvmi.c b/arch/x86/kvm/kvmi.c
-index 672a113b3bf4..18713004152d 100644
---- a/arch/x86/kvm/kvmi.c
-+++ b/arch/x86/kvm/kvmi.c
-@@ -1355,3 +1355,21 @@ void kvmi_arch_features(struct kvmi_features *feat)
+ static int handle_monitor_trap(struct kvm_vcpu *vcpu)
  {
- 	feat->singlestep = !!kvm_x86_ops.control_singlestep;
++	kvmi_singlestep_done(vcpu);
+ 	return 1;
  }
-+
-+bool kvmi_arch_start_singlestep(struct kvm_vcpu *vcpu)
-+{
-+	if (!kvm_x86_ops.control_singlestep)
-+		return false;
-+
-+	kvm_x86_ops.control_singlestep(vcpu, true);
-+	return true;
-+}
-+
-+bool kvmi_arch_stop_singlestep(struct kvm_vcpu *vcpu)
-+{
-+	if (!kvm_x86_ops.control_singlestep)
-+		return false;
-+
-+	kvm_x86_ops.control_singlestep(vcpu, false);
-+	return true;
-+}
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 0add0b0b8f2d..02b74a57ca01 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -8515,9 +8515,15 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
- 			goto out;
+ 
+@@ -6173,6 +6174,11 @@ static int vmx_handle_exit(struct kvm_vcpu *vcpu, fastpath_t exit_fastpath)
  		}
+ 	}
  
--		inject_pending_event(vcpu, &req_immediate_exit);
--		if (req_int_win)
--			kvm_x86_ops.enable_irq_window(vcpu);
-+		if (!kvmi_vcpu_running_singlestep(vcpu)) {
-+			/*
-+			 * We cannot inject events during single-stepping.
-+			 * Try again later.
-+			 */
-+			inject_pending_event(vcpu, &req_immediate_exit);
-+			if (req_int_win)
-+				kvm_x86_ops.enable_irq_window(vcpu);
-+		}
++	if (kvmi_vcpu_running_singlestep(vcpu) &&
++	    exit_reason != EXIT_REASON_EPT_VIOLATION &&
++	    exit_reason != EXIT_REASON_MONITOR_TRAP_FLAG)
++		kvmi_singlestep_failed(vcpu);
++
+ 	if (exit_fastpath != EXIT_FASTPATH_NONE)
+ 		return 1;
  
- 		if (kvm_lapic_enabled(vcpu)) {
- 			update_cr8_intercept(vcpu);
 diff --git a/include/linux/kvmi_host.h b/include/linux/kvmi_host.h
-index 11eb9b1c3c5e..a641768027cc 100644
+index a641768027cc..b01e8505f493 100644
 --- a/include/linux/kvmi_host.h
 +++ b/include/linux/kvmi_host.h
-@@ -45,6 +45,10 @@ struct kvm_vcpu_introspection {
- 		bool pending;
- 		bool send_event;
- 	} exception;
-+
-+	struct {
-+		bool loop;
-+	} singlestep;
- };
- 
- struct kvm_introspection {
-@@ -89,6 +93,7 @@ void kvmi_handle_requests(struct kvm_vcpu *vcpu);
- bool kvmi_hypercall_event(struct kvm_vcpu *vcpu);
+@@ -94,6 +94,8 @@ bool kvmi_hypercall_event(struct kvm_vcpu *vcpu);
  bool kvmi_breakpoint_event(struct kvm_vcpu *vcpu, u64 gva, u8 insn_len);
  bool kvmi_enter_guest(struct kvm_vcpu *vcpu);
-+bool kvmi_vcpu_running_singlestep(struct kvm_vcpu *vcpu);
+ bool kvmi_vcpu_running_singlestep(struct kvm_vcpu *vcpu);
++void kvmi_singlestep_done(struct kvm_vcpu *vcpu);
++void kvmi_singlestep_failed(struct kvm_vcpu *vcpu);
  
  #else
  
-@@ -105,6 +110,8 @@ static inline bool kvmi_breakpoint_event(struct kvm_vcpu *vcpu, u64 gva,
+@@ -112,6 +114,8 @@ static inline bool kvmi_enter_guest(struct kvm_vcpu *vcpu)
  			{ return true; }
- static inline bool kvmi_enter_guest(struct kvm_vcpu *vcpu)
- 			{ return true; }
-+static inline bool kvmi_vcpu_running_singlestep(struct kvm_vcpu *vcpu)
-+			{ return false; }
+ static inline bool kvmi_vcpu_running_singlestep(struct kvm_vcpu *vcpu)
+ 			{ return false; }
++static inline void kvmi_singlestep_done(struct kvm_vcpu *vcpu) { }
++static inline void kvmi_singlestep_failed(struct kvm_vcpu *vcpu) { }
  
  #endif /* CONFIG_KVM_INTROSPECTION */
  
 diff --git a/include/uapi/linux/kvmi.h b/include/uapi/linux/kvmi.h
-index a84affbafa67..bc515237612a 100644
+index bc515237612a..040049abd450 100644
 --- a/include/uapi/linux/kvmi.h
 +++ b/include/uapi/linux/kvmi.h
-@@ -47,6 +47,8 @@ enum {
+@@ -63,6 +63,7 @@ enum {
+ 	KVMI_EVENT_DESCRIPTOR = 7,
+ 	KVMI_EVENT_MSR        = 8,
+ 	KVMI_EVENT_PF         = 9,
++	KVMI_EVENT_SINGLESTEP = 10,
  
- 	KVMI_VM_SET_PAGE_ACCESS = 23,
- 
-+	KVMI_VCPU_CONTROL_SINGLESTEP = 24,
-+
- 	KVMI_NUM_MESSAGES
+ 	KVMI_NUM_EVENTS
+ };
+@@ -236,4 +237,9 @@ struct kvmi_event_pf {
+ 	__u32 padding3;
  };
  
-@@ -189,6 +191,11 @@ struct kvmi_vm_set_page_access {
- 	struct kvmi_page_access_entry entries[0];
- };
- 
-+struct kvmi_vcpu_control_singlestep {
-+	__u8 enable;
++struct kvmi_event_singlestep {
++	__u8 failed;
 +	__u8 padding[7];
 +};
 +
- struct kvmi_event {
- 	__u16 size;
- 	__u16 vcpu;
+ #endif /* _UAPI__LINUX_KVMI_H */
 diff --git a/tools/testing/selftests/kvm/x86_64/kvmi_test.c b/tools/testing/selftests/kvm/x86_64/kvmi_test.c
-index eabe7dae149e..0803d7e5af1e 100644
+index 0803d7e5af1e..967ea568d93c 100644
 --- a/tools/testing/selftests/kvm/x86_64/kvmi_test.c
 +++ b/tools/testing/selftests/kvm/x86_64/kvmi_test.c
-@@ -1940,6 +1940,51 @@ static void test_event_pf(struct kvm_vm *vm)
- 	test_pf(vm, cbk_test_event_pf);
+@@ -829,6 +829,14 @@ static void stop_vcpu_worker(pthread_t vcpu_thread,
+ 	wait_vcpu_worker(vcpu_thread);
  }
  
-+static void cmd_vcpu_singlestep(struct kvm_vm *vm, __u8 enable, __u8 padding,
-+				int expected_err)
++static int __do_vcpu_command(struct kvm_vm *vm, int cmd_id,
++			     struct kvmi_msg_hdr *req, size_t req_size,
++			     void *rpl, size_t rpl_size)
++{
++	send_message(cmd_id, req, req_size);
++	return receive_cmd_reply(req, rpl, rpl_size);
++}
++
+ static int do_vcpu_command(struct kvm_vm *vm, int cmd_id,
+ 			   struct kvmi_msg_hdr *req, size_t req_size,
+ 			   void *rpl, size_t rpl_size)
+@@ -839,8 +847,7 @@ static int do_vcpu_command(struct kvm_vm *vm, int cmd_id,
+ 
+ 	vcpu_thread = start_vcpu_worker(&data);
+ 
+-	send_message(cmd_id, req, req_size);
+-	r = receive_cmd_reply(req, rpl, rpl_size);
++	r = __do_vcpu_command(vm, cmd_id, req, req_size, rpl, rpl_size);
+ 
+ 	stop_vcpu_worker(vcpu_thread, &data);
+ 	return r;
+@@ -1960,13 +1967,61 @@ static void cmd_vcpu_singlestep(struct kvm_vm *vm, __u8 enable, __u8 padding,
+ 		-r, kvm_strerror(-r), expected_err);
+ }
+ 
++static void __control_singlestep(bool enable)
 +{
 +	struct {
 +		struct kvmi_msg_hdr hdr;
@@ -223,187 +219,146 @@ index eabe7dae149e..0803d7e5af1e 100644
 +	} req = {};
 +	int r;
 +
-+	req.cmd.enable = enable;
-+	req.cmd.padding[6] = padding;
++	req.cmd.enable = enable ? 1 : 0;
 +
-+	r = do_vcpu0_command(vm, KVMI_VCPU_CONTROL_SINGLESTEP,
++	r = __do_vcpu0_command(KVMI_VCPU_CONTROL_SINGLESTEP,
 +			     &req.hdr, sizeof(req), NULL, 0);
-+	TEST_ASSERT(r == expected_err,
-+		"KVMI_VCPU_CONTROL_SINGLESTEP failed, error %d(%s), expected error %d\n",
-+		-r, kvm_strerror(-r), expected_err);
++	TEST_ASSERT(r == 0,
++		"KVMI_VCPU_CONTROL_SINGLESTEP failed, error %d(%s)\n",
++		-r, kvm_strerror(-r));
 +}
 +
-+static void test_supported_singlestep(struct kvm_vm *vm)
++static void test_singlestep_event(__u16 event_id)
 +{
-+	__u8 disable = 0, enable = 1, enable_inval = 2;
-+	__u8 padding = 1, no_padding = 0;
++	struct {
++		struct kvmi_event common;
++		struct kvmi_event_singlestep singlestep;
++	} ev;
++	bool enable = true, disable = false;
++	struct vcpu_reply rpl = { };
++	struct kvmi_msg_hdr hdr;
 +
-+	cmd_vcpu_singlestep(vm, enable, no_padding, 0);
-+	cmd_vcpu_singlestep(vm, disable, no_padding, 0);
++	__control_singlestep(enable);
 +
-+	cmd_vcpu_singlestep(vm, enable, padding, -KVM_EINVAL);
-+	cmd_vcpu_singlestep(vm, enable_inval, no_padding, -KVM_EINVAL);
++	receive_event(&hdr, &ev.common, sizeof(ev), event_id);
++
++	pr_info("SINGLESTEP event, rip 0x%llx success %d\n",
++		ev.common.arch.regs.rip, !ev.singlestep.failed);
++	TEST_ASSERT(!ev.singlestep.failed, "Singlestep failed");
++
++	__control_singlestep(disable);
++
++	reply_to_event(&hdr, &ev.common, KVMI_EVENT_ACTION_CONTINUE,
++		       &rpl, sizeof(rpl));
 +}
 +
-+static void test_unsupported_singlestep(struct kvm_vm *vm)
-+{
-+	cmd_vcpu_singlestep(vm, 1, 0, -KVM_EOPNOTSUPP);
-+}
-+
-+static void test_cmd_vcpu_control_singlestep(struct kvm_vm *vm)
-+{
-+	if (features.singlestep)
-+		test_supported_singlestep(vm);
-+	else
-+		test_unsupported_singlestep(vm);
-+}
-+
- static void test_introspection(struct kvm_vm *vm)
+ static void test_supported_singlestep(struct kvm_vm *vm)
  {
- 	srandom(time(0));
-@@ -1974,6 +2019,7 @@ static void test_introspection(struct kvm_vm *vm)
- 	test_cmd_vcpu_control_msr(vm);
- 	test_cmd_vm_set_page_access(vm);
- 	test_event_pf(vm);
-+	test_cmd_vcpu_control_singlestep(vm);
+-	__u8 disable = 0, enable = 1, enable_inval = 2;
++	struct vcpu_worker_data data = {.vm = vm, .vcpu_id = VCPU_ID };
++	__u16 event_id = KVMI_EVENT_SINGLESTEP;
++	__u8 enable = 1, enable_inval = 2;
+ 	__u8 padding = 1, no_padding = 0;
++	pthread_t vcpu_thread;
  
- 	unhook_introspection(vm);
- }
+-	cmd_vcpu_singlestep(vm, enable, no_padding, 0);
+-	cmd_vcpu_singlestep(vm, disable, no_padding, 0);
++	enable_vcpu_event(vm, event_id);
++	vcpu_thread = start_vcpu_worker(&data);
++	test_singlestep_event(event_id);
++	stop_vcpu_worker(vcpu_thread, &data);
++	disable_vcpu_event(vm, event_id);
+ 
+ 	cmd_vcpu_singlestep(vm, enable, padding, -KVM_EINVAL);
+ 	cmd_vcpu_singlestep(vm, enable_inval, no_padding, -KVM_EINVAL);
 diff --git a/virt/kvm/introspection/kvmi.c b/virt/kvm/introspection/kvmi.c
-index 99c88e182587..2c7533a966f9 100644
+index 2c7533a966f9..5382569b190b 100644
 --- a/virt/kvm/introspection/kvmi.c
 +++ b/virt/kvm/introspection/kvmi.c
-@@ -429,6 +429,11 @@ static void kvmi_job_release_vcpu(struct kvm_vcpu *vcpu, void *ctx)
+@@ -114,6 +114,7 @@ static void setup_known_events(void)
+ 	set_bit(KVMI_EVENT_MSR, Kvmi_known_vcpu_events);
+ 	set_bit(KVMI_EVENT_PAUSE_VCPU, Kvmi_known_vcpu_events);
+ 	set_bit(KVMI_EVENT_PF, Kvmi_known_vcpu_events);
++	set_bit(KVMI_EVENT_SINGLESTEP, Kvmi_known_vcpu_events);
+ 	set_bit(KVMI_EVENT_TRAP, Kvmi_known_vcpu_events);
+ 	set_bit(KVMI_EVENT_XSETBV, Kvmi_known_vcpu_events);
  
- 	atomic_set(&vcpui->pause_requests, 0);
- 	vcpui->waiting_for_reply = false;
-+
-+	if (vcpui->singlestep.loop) {
-+		kvmi_arch_stop_singlestep(vcpu);
-+		vcpui->singlestep.loop = false;
-+	}
+@@ -1321,3 +1322,62 @@ bool kvmi_vcpu_running_singlestep(struct kvm_vcpu *vcpu)
+ 	return ret;
  }
- 
- static void kvmi_release_vcpus(struct kvm *kvm)
-@@ -1047,7 +1052,9 @@ bool kvmi_enter_guest(struct kvm_vcpu *vcpu)
- 
- 	vcpui = VCPUI(vcpu);
- 
--	if (vcpui->exception.pending) {
-+	if (vcpui->singlestep.loop) {
-+		kvmi_arch_start_singlestep(vcpu);
-+	} else if (vcpui->exception.pending) {
- 		kvmi_inject_pending_exception(vcpu);
- 		r = false;
- 	}
-@@ -1297,3 +1304,20 @@ void kvmi_remove_memslot(struct kvm *kvm, struct kvm_memory_slot *slot)
- 	spin_unlock(&kvm->mmu_lock);
- 	srcu_read_unlock(&kvm->srcu, idx);
- }
+ EXPORT_SYMBOL(kvmi_vcpu_running_singlestep);
 +
-+bool kvmi_vcpu_running_singlestep(struct kvm_vcpu *vcpu)
++static u32 kvmi_send_singlestep(struct kvm_vcpu *vcpu, bool success)
 +{
-+	struct kvm_introspection *kvmi;
-+	bool ret;
++	struct kvmi_event_singlestep e;
++	int err, action;
 +
-+	kvmi = kvmi_get(vcpu->kvm);
-+	if (!kvmi)
-+		return false;
++	memset(&e, 0, sizeof(e));
++	e.failed = success ? 0 : 1;
 +
-+	ret = VCPUI(vcpu)->singlestep.loop;
++	err = kvmi_send_event(vcpu, KVMI_EVENT_SINGLESTEP, &e, sizeof(e),
++			      NULL, 0, &action);
++	if (err)
++		return KVMI_EVENT_ACTION_CONTINUE;
 +
-+	kvmi_put(vcpu->kvm);
-+
-+	return ret;
++	return action;
 +}
-+EXPORT_SYMBOL(kvmi_vcpu_running_singlestep);
-diff --git a/virt/kvm/introspection/kvmi_int.h b/virt/kvm/introspection/kvmi_int.h
-index 68b8d60a7fac..e5fca3502bab 100644
---- a/virt/kvm/introspection/kvmi_int.h
-+++ b/virt/kvm/introspection/kvmi_int.h
-@@ -139,5 +139,7 @@ void kvmi_arch_update_page_tracking(struct kvm *kvm,
- void kvmi_arch_hook(struct kvm *kvm);
- void kvmi_arch_unhook(struct kvm *kvm);
- void kvmi_arch_features(struct kvmi_features *feat);
-+bool kvmi_arch_start_singlestep(struct kvm_vcpu *vcpu);
-+bool kvmi_arch_stop_singlestep(struct kvm_vcpu *vcpu);
- 
- #endif
++
++static void kvmi_singlestep_event(struct kvm_vcpu *vcpu, bool success)
++{
++	u32 action;
++
++	action = kvmi_send_singlestep(vcpu, success);
++	switch (action) {
++	case KVMI_EVENT_ACTION_CONTINUE:
++		break;
++	default:
++		kvmi_handle_common_event_actions(vcpu->kvm, action);
++	}
++}
++
++static void kvmi_handle_singlestep_exit(struct kvm_vcpu *vcpu, bool success)
++{
++	struct kvm_vcpu_introspection *vcpui;
++	struct kvm_introspection *kvmi;
++	struct kvm *kvm = vcpu->kvm;
++
++	kvmi = kvmi_get(kvm);
++	if (!kvmi)
++		return;
++
++	vcpui = VCPUI(vcpu);
++
++	if (vcpui->singlestep.loop)
++		kvmi_singlestep_event(vcpu, success);
++
++	kvmi_put(kvm);
++}
++
++void kvmi_singlestep_done(struct kvm_vcpu *vcpu)
++{
++	kvmi_handle_singlestep_exit(vcpu, true);
++}
++EXPORT_SYMBOL(kvmi_singlestep_done);
++
++void kvmi_singlestep_failed(struct kvm_vcpu *vcpu)
++{
++	kvmi_handle_singlestep_exit(vcpu, false);
++}
++EXPORT_SYMBOL(kvmi_singlestep_failed);
 diff --git a/virt/kvm/introspection/kvmi_msg.c b/virt/kvm/introspection/kvmi_msg.c
-index e754cee48912..04e7511a9777 100644
+index 04e7511a9777..645debc47f13 100644
 --- a/virt/kvm/introspection/kvmi_msg.c
 +++ b/virt/kvm/introspection/kvmi_msg.c
-@@ -609,6 +609,39 @@ static int handle_vcpu_control_msr(const struct kvmi_vcpu_msg_job *job,
- 	return kvmi_msg_vcpu_reply(job, msg, ec, NULL, 0);
- }
+@@ -626,6 +626,11 @@ static int handle_vcpu_control_singlestep(const struct kvmi_vcpu_msg_job *job,
+ 		if (req->padding[i])
+ 			goto reply;
  
-+static int handle_vcpu_control_singlestep(const struct kvmi_vcpu_msg_job *job,
-+					  const struct kvmi_msg_hdr *msg,
-+					  const void *_req)
-+{
-+	const struct kvmi_vcpu_control_singlestep *req = _req;
-+	struct kvm_vcpu *vcpu = job->vcpu;
-+	int ec = -KVM_EINVAL;
-+	bool done;
-+	int i;
-+
-+	if (req->enable > 1)
++	if (!is_event_allowed(KVMI(vcpu->kvm), KVMI_EVENT_SINGLESTEP)) {
++		ec = -KVM_EPERM;
 +		goto reply;
-+
-+	for (i = 0; i < sizeof(req->padding); i++)
-+		if (req->padding[i])
-+			goto reply;
-+
-+	if (req->enable)
-+		done = kvmi_arch_start_singlestep(vcpu);
-+	else
-+		done = kvmi_arch_stop_singlestep(vcpu);
-+
-+	if (done) {
-+		ec = 0;
-+		VCPUI(vcpu)->singlestep.loop = !!req->enable;
-+	} else {
-+		ec = -KVM_EOPNOTSUPP;
 +	}
 +
-+reply:
-+	return kvmi_msg_vcpu_reply(job, msg, ec, NULL, 0);
-+}
-+
- /*
-  * These functions are executed from the vCPU thread. The receiving thread
-  * passes the messages using a newly allocated 'struct kvmi_vcpu_msg_job'
-@@ -617,19 +650,20 @@ static int handle_vcpu_control_msr(const struct kvmi_vcpu_msg_job *job,
-  */
- static int(*const msg_vcpu[])(const struct kvmi_vcpu_msg_job *,
- 			      const struct kvmi_msg_hdr *, const void *) = {
--	[KVMI_EVENT]                 = handle_vcpu_event_reply,
--	[KVMI_VCPU_CONTROL_CR]       = handle_vcpu_control_cr,
--	[KVMI_VCPU_CONTROL_EVENTS]   = handle_vcpu_control_events,
--	[KVMI_VCPU_CONTROL_MSR]      = handle_vcpu_control_msr,
--	[KVMI_VCPU_GET_CPUID]        = handle_vcpu_get_cpuid,
--	[KVMI_VCPU_GET_INFO]         = handle_vcpu_get_info,
--	[KVMI_VCPU_GET_MTRR_TYPE]    = handle_vcpu_get_mtrr_type,
--	[KVMI_VCPU_GET_REGISTERS]    = handle_vcpu_get_registers,
--	[KVMI_VCPU_GET_XCR]          = handle_vcpu_get_xcr,
--	[KVMI_VCPU_GET_XSAVE]        = handle_vcpu_get_xsave,
--	[KVMI_VCPU_INJECT_EXCEPTION] = handle_vcpu_inject_exception,
--	[KVMI_VCPU_SET_REGISTERS]    = handle_vcpu_set_registers,
--	[KVMI_VCPU_SET_XSAVE]        = handle_vcpu_set_xsave,
-+	[KVMI_EVENT]                   = handle_vcpu_event_reply,
-+	[KVMI_VCPU_CONTROL_CR]         = handle_vcpu_control_cr,
-+	[KVMI_VCPU_CONTROL_EVENTS]     = handle_vcpu_control_events,
-+	[KVMI_VCPU_CONTROL_MSR]        = handle_vcpu_control_msr,
-+	[KVMI_VCPU_CONTROL_SINGLESTEP] = handle_vcpu_control_singlestep,
-+	[KVMI_VCPU_GET_CPUID]          = handle_vcpu_get_cpuid,
-+	[KVMI_VCPU_GET_INFO]           = handle_vcpu_get_info,
-+	[KVMI_VCPU_GET_MTRR_TYPE]      = handle_vcpu_get_mtrr_type,
-+	[KVMI_VCPU_GET_REGISTERS]      = handle_vcpu_get_registers,
-+	[KVMI_VCPU_GET_XCR]            = handle_vcpu_get_xcr,
-+	[KVMI_VCPU_GET_XSAVE]          = handle_vcpu_get_xsave,
-+	[KVMI_VCPU_INJECT_EXCEPTION]   = handle_vcpu_inject_exception,
-+	[KVMI_VCPU_SET_REGISTERS]      = handle_vcpu_set_registers,
-+	[KVMI_VCPU_SET_XSAVE]          = handle_vcpu_set_xsave,
- };
- 
- static bool is_vcpu_command(u16 id)
+ 	if (req->enable)
+ 		done = kvmi_arch_start_singlestep(vcpu);
+ 	else
