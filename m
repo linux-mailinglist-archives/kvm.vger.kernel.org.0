@@ -2,176 +2,112 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0FB77227453
-	for <lists+kvm@lfdr.de>; Tue, 21 Jul 2020 03:02:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D0F80227460
+	for <lists+kvm@lfdr.de>; Tue, 21 Jul 2020 03:11:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728336AbgGUBCP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 20 Jul 2020 21:02:15 -0400
-Received: from mga17.intel.com ([192.55.52.151]:52615 "EHLO mga17.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726127AbgGUBCP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 20 Jul 2020 21:02:15 -0400
-IronPort-SDR: 5a46YHiCqnpkYlCdt+CsBE14D+1FzX1Tiz3wywdhz7SCzjM7ZYU/2eliySslCSccX11kVwkkj1
- q5JehNvvuuIg==
-X-IronPort-AV: E=McAfee;i="6000,8403,9688"; a="130116858"
-X-IronPort-AV: E=Sophos;i="5.75,375,1589266800"; 
-   d="scan'208";a="130116858"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Jul 2020 18:02:14 -0700
-IronPort-SDR: Hi0Ier/KvzEzjHeSvJlfOUyWhGaXqFZ3+zz2qvL2a3c30d2ssVeCpeyzIyinF7dy1V9Y1U8uZ8
- CpOPxy1z/ErA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.75,375,1589266800"; 
-   d="scan'208";a="283698887"
-Received: from joy-optiplex-7040.sh.intel.com (HELO joy-OptiPlex-7040) ([10.239.13.16])
-  by orsmga003.jf.intel.com with ESMTP; 20 Jul 2020 18:02:08 -0700
-Date:   Tue, 21 Jul 2020 08:51:13 +0800
-From:   Yan Zhao <yan.y.zhao@intel.com>
-To:     Alex Williamson <alex.williamson@redhat.com>
-Cc:     Jason Wang <jasowang@redhat.com>, devel@ovirt.org,
-        openstack-discuss@lists.openstack.org, libvir-list@redhat.com,
-        intel-gvt-dev@lists.freedesktop.org, kvm@vger.kernel.org,
-        qemu-devel@nongnu.org, berrange@redhat.com, smooney@redhat.com,
-        eskultet@redhat.com, cohuck@redhat.com, dinechin@redhat.com,
-        corbet@lwn.net, kwankhede@nvidia.com, dgilbert@redhat.com,
-        eauger@redhat.com, jian-feng.ding@intel.com, hejie.xu@intel.com,
-        kevin.tian@intel.com, zhenyuw@linux.intel.com,
-        bao.yumeng@zte.com.cn, xin-ran.wang@intel.com,
-        shaohe.feng@intel.com
-Subject: Re: device compatibility interface for live migration with assigned
- devices
-Message-ID: <20200721005113.GA10502@joy-OptiPlex-7040>
-Reply-To: Yan Zhao <yan.y.zhao@intel.com>
-References: <20200713232957.GD5955@joy-OptiPlex-7040>
- <9bfa8700-91f5-ebb4-3977-6321f0487a63@redhat.com>
- <20200716083230.GA25316@joy-OptiPlex-7040>
- <20200717101258.65555978@x1.home>
+        id S1727107AbgGUBJc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 20 Jul 2020 21:09:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41962 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726425AbgGUBJb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 20 Jul 2020 21:09:31 -0400
+Received: from mail-oi1-x242.google.com (mail-oi1-x242.google.com [IPv6:2607:f8b0:4864:20::242])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A7278C0619D5
+        for <kvm@vger.kernel.org>; Mon, 20 Jul 2020 18:09:31 -0700 (PDT)
+Received: by mail-oi1-x242.google.com with SMTP id 12so15911366oir.4
+        for <kvm@vger.kernel.org>; Mon, 20 Jul 2020 18:09:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=dt+Q1yBp4pDTEEa5JxC/tBw6WPMfkbJUYHcrzD2fQPw=;
+        b=UvsgbLTUQVe3b9JkR+S3lcYaaULY2+DOIgYkocU2xTKRCoNAhp507MLqfV8Tr7TxY5
+         SV2680GHMFFcbul/qFtIEHUMySCfPwia7v4SzLorXXNiUDtiD7SZ9pOE2+AnZPIxqCrp
+         nAJ9T6tfwuFOr8XBFfc9SwXZAdsJkxeP/C6j/NqQJyf+3vXmHBVk56fpwRATQ6TWtoOt
+         gkob0DsXY93bLDeEgFEEyShn8N6C7hky2zBopNoCIWijwswFg7cyrrQssMsACCIxfoXy
+         8LJoO6CFPVZ32L5qPqKXFAVxKcNVCYvNxpdATzgIgnvq3t5A8Ld4C60w5CNENQWJM2M6
+         d2lg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=dt+Q1yBp4pDTEEa5JxC/tBw6WPMfkbJUYHcrzD2fQPw=;
+        b=Fx/C6TZTxR8jfpb3eCxWPIW6Gr9Nk2ldthFDHL2pHI2l3G/zgiz4+HvnBFx5Sl3KRw
+         VwSAyilLqN2JIrahX8lR9CDJ9nC53LoonwejltDE5Jw0UE8AAagjfmqSY0ZSVIz6MZnO
+         Oqcws2jfVXPz4YpVFERD8NMQ8TG1tmG48eayxrHDVBohG96ytjT1lxuBQ1xdyP5f5aKF
+         bRyp66PPNAKMLCZfq1tQmXqZl40AO1+ziVwwr5ns/5KOsI8vLgwyte/FgYjPoErYkLSG
+         VzoTCV+JHavNn79XRVCXKv/IVedpY1imuB4wUqJ0pDB8eMgm4NmnhSkz7XtQJVTqBMWx
+         KUlw==
+X-Gm-Message-State: AOAM533r0hlO237T7seWsKNb+baVT6w0q6o0zvRczHz2O8I3Cz+VQM7D
+        YZYdYlrSwgyIchUJZPcurByJ0fRsXbqTr/4YmbDdLw==
+X-Google-Smtp-Source: ABdhPJzbi5+F2TpRM+GQt+/eaPnbEZR9u3OoIuc3AKHNzYvH8Zc12Ws1ii+wl9fUXQMMJAX4w6v2msuWZo+eFSwG/us=
+X-Received: by 2002:aca:d643:: with SMTP id n64mr1432769oig.33.1595293770513;
+ Mon, 20 Jul 2020 18:09:30 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200717101258.65555978@x1.home>
-User-Agent: Mutt/1.9.4 (2018-02-28)
+References: <20200714120917.11253-1-joro@8bytes.org> <20200715092456.GE10769@hirez.programming.kicks-ass.net>
+ <20200715093426.GK16200@suse.de> <20200715095556.GI10769@hirez.programming.kicks-ass.net>
+ <20200715101034.GM16200@suse.de>
+In-Reply-To: <20200715101034.GM16200@suse.de>
+From:   Erdem Aktas <erdemaktas@google.com>
+Date:   Mon, 20 Jul 2020 18:09:19 -0700
+Message-ID: <CAAYXXYxJf8sr6fvbZK=t6o_to4Ov_yvZ91Hf6ZqQ-_i-HKO2VA@mail.gmail.com>
+Subject: Re: [PATCH v4 00/75] x86: SEV-ES Guest Support
+To:     Joerg Roedel <jroedel@suse.de>
+Cc:     Peter Zijlstra <peterz@infradead.org>,
+        Joerg Roedel <joro@8bytes.org>, x86@kernel.org, hpa@zytor.com,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Jiri Slaby <jslaby@suse.cz>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Juergen Gross <jgross@suse.com>,
+        Kees Cook <keescook@chromium.org>,
+        David Rientjes <rientjes@google.com>,
+        Cfir Cohen <cfir@google.com>,
+        Masami Hiramatsu <mhiramat@kernel.org>,
+        Mike Stunes <mstunes@vmware.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Martin Radev <martin.b.radev@gmail.com>,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jul 17, 2020 at 10:12:58AM -0600, Alex Williamson wrote:
-<...>
-> > yes, in another reply, Alex proposed to use an interface in json format.
-> > I guess we can define something like
-> > 
-> > { "self" :
-> >   [
-> >     { "pciid" : "8086591d",
-> >       "driver" : "i915",
-> >       "gvt-version" : "v1",
-> >       "mdev_type"   : "i915-GVTg_V5_2",
-> >       "aggregator"  : "1",
-> >       "pv-mode"     : "none",
-> >     }
-> >   ],
-> >   "compatible" :
-> >   [
-> >     { "pciid" : "8086591d",
-> >       "driver" : "i915",
-> >       "gvt-version" : "v1",
-> >       "mdev_type"   : "i915-GVTg_V5_2",
-> >       "aggregator"  : "1"
-> >       "pv-mode"     : "none",
-> >     },
-> >     { "pciid" : "8086591d",
-> >       "driver" : "i915",
-> >       "gvt-version" : "v1",
-> >       "mdev_type"   : "i915-GVTg_V5_4",
-> >       "aggregator"  : "2"
-> >       "pv-mode"     : "none",
-> >     },
-> >     { "pciid" : "8086591d",
-> >       "driver" : "i915",
-> >       "gvt-version" : "v2",
-> >       "mdev_type"   : "i915-GVTg_V5_4",
-> >       "aggregator"  : "2"
-> >       "pv-mode"     : "none, ppgtt, context",
-> >     }
-> >     ...
-> >   ]
-> > }
-> > 
-> > But as those fields are mostly vendor specific, the userspace can
-> > only do simple string comparing, I guess the list would be very long as
-> > it needs to enumerate all possible targets.
-> 
-> 
-> This ignores so much of what I tried to achieve in my example :(
-> 
-sorry, I just was eager to show and confirm the way to list all compatible
-combination of mdev_type and mdev attributes.
+Hi,
 
-> 
-> > also, in some fileds like "gvt-version", is there a simple way to express
-> > things like v2+?
-> 
-> 
-> That's not a reasonable thing to express anyway, how can you be certain
-> that v3 won't break compatibility with v2?  Sean proposed a versioning
-> scheme that accounts for this, using an x.y.z version expressing the
-> major, minor, and bugfix versions, where there is no compatibility
-> across major versions, minor versions have forward compatibility (ex. 1
-> -> 2 is ok, 2 -> 1 is not) and bugfix version number indicates some
-> degree of internal improvement that is not visible to the user in terms
-> of features or compatibility, but provides a basis for preferring
-> equally compatible candidates.
+It looks like there is an expectation that the bootloader will start
+from the 64bit entry point in header_64.S. With the current patch
+series, it will not boot up if the bootloader jumps to the startup_32
+entry, which might break some default distro images.
+What are supported bootloaders and configurations?
+I am using grub ( 2.02-2ubuntu8.15) and it fails to boot because of
+this reason. I am not a grub expert, so I would appreciate any
+pointers on this.
+Also, it would be nice to put some error code in the GHCB MSR if the
+guest dies for some reason in real mode. Currently, it just dies with
+no information provided.
+
+PS: sorry for sending twice due to the wrong email body type.
+
+Regards
+-Erdem
+
+
+On Wed, Jul 15, 2020 at 3:10 AM Joerg Roedel <jroedel@suse.de> wrote:
 >
-right. if self version is v1, it can't know its compatible version is
-v2. it can only be done in reverse. i.e.
-when self version is v2, it can list its compatible version is v1 and
-v2.
-and maybe later when self version is v3, there's no v1 in its compatible
-list.
-
-In this way, do you think we still need the complex x.y.z versioning scheme?
-
->  
-> > If the userspace can read this interface both in src and target and
-> > check whether both src and target are in corresponding compatible list, I
-> > think it will work for us.
-> > 
-> > But still, kernel should not rely on userspace's choice, the opaque
-> > compatibility string is still required in kernel. No matter whether
-> > it would be exposed to userspace as an compatibility checking interface,
-> > vendor driver would keep this part of code and embed the string into the
-> > migration stream. so exposing it as an interface to be used by libvirt to
-> > do a safety check before a real live migration is only about enabling
-> > the kernel part of check to happen ahead.
-> 
-> As you indicate, the vendor driver is responsible for checking version
-> information embedded within the migration stream.  Therefore a
-> migration should fail early if the devices are incompatible.  Is it
-but as I know, currently in VFIO migration protocol, we have no way to
-get vendor specific compatibility checking string in migration setup stage
-(i.e. .save_setup stage) before the device is set to _SAVING state.
-In this way, for devices who does not save device data in precopy stage,
-the migration compatibility checking is as late as in stop-and-copy
-stage, which is too late.
-do you think we need to add the getting/checking of vendor specific
-compatibility string early in save_setup stage?
-
-> really libvirt's place to second guess what it has been directed to do?
-if libvirt uses the scheme of reading compatibility string at source and
-writing for checking at the target, it can not be called "a second guess".
-It's not a guess, but a confirmation.
-
-> Why would we even proceed to design a user parse-able version interface
-> if we still have a dependency on an opaque interface?  Thanks,
-one reason is that libvirt can't trust the parsing result from
-openstack.
-Another reason is that libvirt can use this opaque interface easier than
-another parsing by itself, in the fact that it would not introduce more
-burden to kernel who would write this part of code anyway, no matter
-libvirt uses it or not.
- 
-Thanks
-Yan
+> On Wed, Jul 15, 2020 at 11:55:56AM +0200, Peter Zijlstra wrote:
+> > And recursive #VC was instant death, right? Because there's no way to
+> > avoid IST stack corruption in that case.
+>
+> Right, a #VC exception while still on the IST stack must instantly kill
+> the VM. That needs an additional check which is not implemented yet, as
+> it only becomes necessary with SNP.
+>
+> Regards,
+>
+>         Joerg
+>
+>
