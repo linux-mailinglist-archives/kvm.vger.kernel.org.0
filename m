@@ -2,81 +2,124 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A493E22765D
-	for <lists+kvm@lfdr.de>; Tue, 21 Jul 2020 05:03:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9F14E2276B3
+	for <lists+kvm@lfdr.de>; Tue, 21 Jul 2020 05:26:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726719AbgGUDDX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 20 Jul 2020 23:03:23 -0400
-Received: from mga07.intel.com ([134.134.136.100]:59502 "EHLO mga07.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725857AbgGUDDX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 20 Jul 2020 23:03:23 -0400
-IronPort-SDR: AukhDBGLKowAWdlz7POWWV+5BgpgN+0Muze9p6/g2PVSDjifzaeWRHCJp9Bb2IaKq1jO9O319N
- ICLgoQFSyJpQ==
-X-IronPort-AV: E=McAfee;i="6000,8403,9688"; a="214717283"
-X-IronPort-AV: E=Sophos;i="5.75,377,1589266800"; 
-   d="scan'208";a="214717283"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Jul 2020 20:03:22 -0700
-IronPort-SDR: HzVpQaG5twjIfxpnju8GDWuos4dAPQdPHlwMjDDX3gAPI5polM1zA6MY0q1jyqRDJxkom6+vDk
- TzYQS+SHGubQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.75,377,1589266800"; 
-   d="scan'208";a="487930766"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.152])
-  by fmsmga005.fm.intel.com with ESMTP; 20 Jul 2020 20:03:19 -0700
-Date:   Mon, 20 Jul 2020 20:03:19 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Alex Williamson <alex.williamson@redhat.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Xiong Zhang <xiong.y.zhang@intel.com>,
-        Wayne Boyer <wayne.boyer@intel.com>,
-        Zhenyu Wang <zhenyuw@linux.intel.com>,
-        Jun Nakajima <jun.nakajima@intel.com>,
-        Weijiang Yang <weijiang.yang@intel.com>
-Subject: Re: [PATCH] KVM: x86/mmu: Add capability to zap only sptes for the
- affected memslot
-Message-ID: <20200721030319.GD20375@linux.intel.com>
-References: <20200703025047.13987-1-sean.j.christopherson@intel.com>
- <51637a13-f23b-8b76-c93a-76346b4cc982@redhat.com>
- <20200709211253.GW24919@linux.intel.com>
- <49c7907a-3ab4-b5db-ccb4-190b990c8be3@redhat.com>
- <20200710042922.GA24919@linux.intel.com>
- <20200713122226.28188f93@x1.home>
- <20200713190649.GE29725@linux.intel.com>
+        id S1728617AbgGUD0o (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 20 Jul 2020 23:26:44 -0400
+Received: from szxga07-in.huawei.com ([45.249.212.35]:38376 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726715AbgGUD0n (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 20 Jul 2020 23:26:43 -0400
+Received: from DGGEMS408-HUB.china.huawei.com (unknown [172.30.72.58])
+        by Forcepoint Email with ESMTP id A0D07E63F265E152B026;
+        Tue, 21 Jul 2020 11:26:39 +0800 (CST)
+Received: from [10.174.187.22] (10.174.187.22) by
+ DGGEMS408-HUB.china.huawei.com (10.3.19.208) with Microsoft SMTP Server id
+ 14.3.487.0; Tue, 21 Jul 2020 11:26:31 +0800
+Subject: Re: [PATCH 0/9] arm64: Stolen time support
+To:     Steven Price <steven.price@arm.com>
+References: <20190802145017.42543-1-steven.price@arm.com>
+CC:     <linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        <linux-doc@vger.kernel.org>, Russell King <linux@armlinux.org.uk>,
+        <linux-arm-kernel@lists.infradead.org>,
+        Marc Zyngier <maz@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Will Deacon <will@kernel.org>, <kvmarm@lists.cs.columbia.edu>,
+        <xiexiangyou@huawei.com>, <yebiaoxiang@huawei.com>,
+        "wanghaibin.wang@huawei.com >> Wanghaibin (D)" 
+        <wanghaibin.wang@huawei.com>
+From:   zhukeqian <zhukeqian1@huawei.com>
+Message-ID: <1611996b-1ec1-dee7-ed61-b3b9df23f138@huawei.com>
+Date:   Tue, 21 Jul 2020 11:26:30 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
+ Thunderbird/45.7.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200713190649.GE29725@linux.intel.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+In-Reply-To: <20190802145017.42543-1-steven.price@arm.com>
+Content-Type: text/plain; charset="windows-1252"
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.174.187.22]
+X-CFilter-Loop: Reflected
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-+Weijiang
+Hi Steven,
 
-On Mon, Jul 13, 2020 at 12:06:50PM -0700, Sean Christopherson wrote:
-> The only ideas I have going forward are to:
+On 2019/8/2 22:50, Steven Price wrote:
+> This series add support for paravirtualized time for arm64 guests and
+> KVM hosts following the specification in Arm's document DEN 0057A:
 > 
->   a) Reproduce the bug outside of your environment and find a resource that
->      can go through the painful bisection.
+> https://developer.arm.com/docs/den0057/a
+> 
+> It implements support for stolen time, allowing the guest to
+> identify time when it is forcibly not executing.
+> 
+> It doesn't implement support for Live Physical Time (LPT) as there are
+> some concerns about the overheads and approach in the above
+Do you plan to pick up LPT support? As there is demand of cross-frequency migration
+(from older platform to newer platform).
 
-We're trying to reproduce the original issue in the hopes of biesecting, but
-have not yet discovered the secret sauce.  A few questions:
+I am not clear about the overheads and approach problem here, could you please
+give some detail information? Maybe we can work together to solve these concerns. :-)
 
-  - Are there any known hardware requirements, e.g. specific flavor of GPU?
-
-  - What's the average time to failure when running FurMark/PassMark?  E.g.
-    what's a reasonable time to wait before rebooting to rerun the tests (I
-    assume this is what you meant when you said you sometimes needed to
-    reboot to observe failure).
-
-Thanks!
+Thanks,
+Keqian
+> specification, and I expect an updated version of the specification to
+> be released soon with just the stolen time parts.
+> 
+> I previously posted a series including LPT (as well as stolen time):
+> https://lore.kernel.org/kvmarm/20181212150226.38051-1-steven.price@arm.com/
+> 
+> Patches 2, 5, 7 and 8 are cleanup patches and could be taken separately.
+> 
+> Christoffer Dall (1):
+>   KVM: arm/arm64: Factor out hypercall handling from PSCI code
+> 
+> Steven Price (8):
+>   KVM: arm64: Document PV-time interface
+>   KVM: arm64: Implement PV_FEATURES call
+>   KVM: arm64: Support stolen time reporting via shared structure
+>   KVM: Allow kvm_device_ops to be const
+>   KVM: arm64: Provide a PV_TIME device to user space
+>   arm/arm64: Provide a wrapper for SMCCC 1.1 calls
+>   arm/arm64: Make use of the SMCCC 1.1 wrapper
+>   arm64: Retrieve stolen time as paravirtualized guest
+> 
+>  Documentation/virtual/kvm/arm/pvtime.txt | 107 +++++++++++++
+>  arch/arm/kvm/Makefile                    |   2 +-
+>  arch/arm/kvm/handle_exit.c               |   2 +-
+>  arch/arm/mm/proc-v7-bugs.c               |  13 +-
+>  arch/arm64/include/asm/kvm_host.h        |  13 +-
+>  arch/arm64/include/asm/kvm_mmu.h         |   2 +
+>  arch/arm64/include/asm/pvclock-abi.h     |  20 +++
+>  arch/arm64/include/uapi/asm/kvm.h        |   6 +
+>  arch/arm64/kernel/Makefile               |   1 +
+>  arch/arm64/kernel/cpu_errata.c           |  80 ++++------
+>  arch/arm64/kernel/kvm.c                  | 155 ++++++++++++++++++
+>  arch/arm64/kvm/Kconfig                   |   1 +
+>  arch/arm64/kvm/Makefile                  |   2 +
+>  arch/arm64/kvm/handle_exit.c             |   4 +-
+>  include/kvm/arm_hypercalls.h             |  44 ++++++
+>  include/kvm/arm_psci.h                   |   2 +-
+>  include/linux/arm-smccc.h                |  58 +++++++
+>  include/linux/cpuhotplug.h               |   1 +
+>  include/linux/kvm_host.h                 |   4 +-
+>  include/linux/kvm_types.h                |   2 +
+>  include/uapi/linux/kvm.h                 |   2 +
+>  virt/kvm/arm/arm.c                       |  18 +++
+>  virt/kvm/arm/hypercalls.c                | 138 ++++++++++++++++
+>  virt/kvm/arm/mmu.c                       |  44 ++++++
+>  virt/kvm/arm/psci.c                      |  84 +---------
+>  virt/kvm/arm/pvtime.c                    | 190 +++++++++++++++++++++++
+>  virt/kvm/kvm_main.c                      |   6 +-
+>  27 files changed, 848 insertions(+), 153 deletions(-)
+>  create mode 100644 Documentation/virtual/kvm/arm/pvtime.txt
+>  create mode 100644 arch/arm64/include/asm/pvclock-abi.h
+>  create mode 100644 arch/arm64/kernel/kvm.c
+>  create mode 100644 include/kvm/arm_hypercalls.h
+>  create mode 100644 virt/kvm/arm/hypercalls.c
+>  create mode 100644 virt/kvm/arm/pvtime.c
+> 
