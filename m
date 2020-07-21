@@ -2,20 +2,20 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 13129228AE0
-	for <lists+kvm@lfdr.de>; Tue, 21 Jul 2020 23:17:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 83433228ADC
+	for <lists+kvm@lfdr.de>; Tue, 21 Jul 2020 23:17:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731323AbgGUVRo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 21 Jul 2020 17:17:44 -0400
-Received: from mx01.bbu.dsd.mx.bitdefender.com ([91.199.104.161]:37844 "EHLO
+        id S1731317AbgGUVRm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 21 Jul 2020 17:17:42 -0400
+Received: from mx01.bbu.dsd.mx.bitdefender.com ([91.199.104.161]:38092 "EHLO
         mx01.bbu.dsd.mx.bitdefender.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1731193AbgGUVQG (ORCPT
+        by vger.kernel.org with ESMTP id S1731259AbgGUVQG (ORCPT
         <rfc822;kvm@vger.kernel.org>); Tue, 21 Jul 2020 17:16:06 -0400
 Received: from smtp.bitdefender.com (smtp02.buh.bitdefender.net [10.17.80.76])
-        by mx01.bbu.dsd.mx.bitdefender.com (Postfix) with ESMTPS id 5E225305D505;
+        by mx01.bbu.dsd.mx.bitdefender.com (Postfix) with ESMTPS id 8C12A305D506;
         Wed, 22 Jul 2020 00:09:31 +0300 (EEST)
 Received: from localhost.localdomain (unknown [91.199.104.27])
-        by smtp.bitdefender.com (Postfix) with ESMTPSA id 2FA8E304FA12;
+        by smtp.bitdefender.com (Postfix) with ESMTPSA id 62D70304FA14;
         Wed, 22 Jul 2020 00:09:31 +0300 (EEST)
 From:   =?UTF-8?q?Adalbert=20Laz=C4=83r?= <alazar@bitdefender.com>
 To:     kvm@vger.kernel.org
@@ -23,9 +23,9 @@ Cc:     virtualization@lists.linux-foundation.org,
         Paolo Bonzini <pbonzini@redhat.com>,
         =?UTF-8?q?Mihai=20Don=C8=9Bu?= <mdontu@bitdefender.com>,
         =?UTF-8?q?Adalbert=20Laz=C4=83r?= <alazar@bitdefender.com>
-Subject: [PATCH v9 77/84] KVM: introspection: add KVMI_VM_SET_PAGE_ACCESS
-Date:   Wed, 22 Jul 2020 00:09:15 +0300
-Message-Id: <20200721210922.7646-78-alazar@bitdefender.com>
+Subject: [PATCH v9 78/84] KVM: introspection: add KVMI_EVENT_PF
+Date:   Wed, 22 Jul 2020 00:09:16 +0300
+Message-Id: <20200721210922.7646-79-alazar@bitdefender.com>
 In-Reply-To: <20200721210922.7646-1-alazar@bitdefender.com>
 References: <20200721210922.7646-1-alazar@bitdefender.com>
 MIME-Version: 1.0
@@ -38,609 +38,613 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Mihai Donțu <mdontu@bitdefender.com>
 
-This command sets the spte access bits (rwx) for an array of guest
-physical addresses (through the page tracking subsystem).
-
-These GPAs, with the requested access bits, are also kept in a radix
-tree in order to filter out the #PF events which are of no interest to
-the introspection tool.
-
-The access restrictions for pages that are not visible to the guest are
-silently ignored by default (the tool might set restrictions for the
-whole memory, based on KVMI_VM_GET_MAX_GFN).
+This event is sent when a #PF occurs due to a failed permission check
+in the shadow page tables, for a page in which the introspection tool
+has shown interest.
 
 Signed-off-by: Mihai Donțu <mdontu@bitdefender.com>
 Co-developed-by: Adalbert Lazăr <alazar@bitdefender.com>
 Signed-off-by: Adalbert Lazăr <alazar@bitdefender.com>
 ---
- Documentation/virt/kvm/kvmi.rst               |  60 ++++++
- arch/x86/include/asm/kvm_host.h               |   2 +
- arch/x86/include/asm/kvmi_host.h              |   7 +
- arch/x86/kvm/kvmi.c                           |  40 ++++
- include/linux/kvmi_host.h                     |   3 +
- include/uapi/linux/kvmi.h                     |  23 +++
- .../testing/selftests/kvm/x86_64/kvmi_test.c  |  52 ++++++
- virt/kvm/introspection/kvmi.c                 | 174 +++++++++++++++++-
- virt/kvm/introspection/kvmi_int.h             |  12 ++
- virt/kvm/introspection/kvmi_msg.c             |  12 ++
- 10 files changed, 384 insertions(+), 1 deletion(-)
+ Documentation/virt/kvm/kvmi.rst               |  51 +++++++
+ arch/x86/include/asm/kvmi_host.h              |   1 +
+ arch/x86/kvm/kvmi.c                           | 141 ++++++++++++++++++
+ include/uapi/linux/kvmi.h                     |  10 ++
+ .../testing/selftests/kvm/x86_64/kvmi_test.c  |  76 ++++++++++
+ virt/kvm/introspection/kvmi.c                 | 115 ++++++++++++++
+ virt/kvm/introspection/kvmi_int.h             |   9 ++
+ virt/kvm/introspection/kvmi_msg.c             |  18 +++
+ 8 files changed, 421 insertions(+)
 
 diff --git a/Documentation/virt/kvm/kvmi.rst b/Documentation/virt/kvm/kvmi.rst
-index 536d6ecec026..123b2360d2e0 100644
+index 123b2360d2e0..b2e2a9edda77 100644
 --- a/Documentation/virt/kvm/kvmi.rst
 +++ b/Documentation/virt/kvm/kvmi.rst
-@@ -977,6 +977,66 @@ to control events for any other register will fail with -KVM_EINVAL::
- * -KVM_EINVAL - the padding is not zero
- * -KVM_EAGAIN - the selected vCPU can't be introspected yet
+@@ -554,6 +554,7 @@ the following events::
+ 	KVMI_EVENT_DESCRIPTOR
+ 	KVMI_EVENT_HYPERCALL
+ 	KVMI_EVENT_MSR
++	KVMI_EVENT_PF
+ 	KVMI_EVENT_XSETBV
  
-+23. KVMI_VM_SET_PAGE_ACCESS
-+---------------------------
+ When an event is enabled, the introspection tool is notified and
+@@ -1387,3 +1388,53 @@ register (see **KVMI_VCPU_CONTROL_EVENTS**).
+ 
+ ``kvmi_event``, the MSR number, the old value and the new value are
+ sent to the introspection tool. The *CONTINUE* action will set the ``new_val``.
++
++10. KVMI_EVENT_PF
++-----------------
 +
 +:Architectures: x86
 +:Versions: >= 1
++:Actions: CONTINUE, CRASH, RETRY
 +:Parameters:
 +
 +::
 +
-+	struct kvmi_vm_set_page_access {
-+		__u16 count;
-+		__u16 padding1;
-+		__u32 padding2;
-+		struct kvmi_page_access_entry entries[0];
-+	};
-+
-+where::
-+
-+	struct kvmi_page_access_entry {
++	struct kvmi_event;
++	struct kvmi_event_pf {
++		__u64 gva;
 +		__u64 gpa;
 +		__u8 access;
-+		__u8 visible;
-+		__u16 padding1;
-+		__u32 padding2;
++		__u8 padding1;
++		__u16 padding2;
++		__u32 padding3;
 +	};
-+
 +
 +:Returns:
 +
 +::
 +
-+	struct kvmi_error_code
++	struct kvmi_vcpu_hdr;
++	struct kvmi_event_reply;
 +
-+Sets the access bits (rwx) for an array of ``count`` guest physical
-+addresses.
++This event is sent when a hypervisor page fault occurs due to a failed
++permission check in the shadow page tables, the introspection has been
++enabled for this event (see *KVMI_VCPU_CONTROL_EVENTS*) and the event was
++generated for a page in which the introspection tool has shown interest
++(ie. has previously touched it by adjusting the spte permissions).
 +
-+The valid access bits are::
++The shadow page tables can be used by the introspection tool to guarantee
++the purpose of code areas inside the guest (code, rodata, stack, heap
++etc.) Each attempt at an operation unfitting for a certain memory
++range (eg. execute code in heap) triggers a page fault and gives the
++introspection tool the chance to audit the code attempting the operation.
 +
-+	KVMI_PAGE_ACCESS_R
-+	KVMI_PAGE_ACCESS_W
-+	KVMI_PAGE_ACCESS_X
++``kvmi_event``, guest virtual address (or 0xffffffff/UNMAPPED_GVA),
++guest physical address and the access flags (eg. KVMI_PAGE_ACCESS_R)
++are sent to the introspection tool.
 +
++The *CONTINUE* action will continue the page fault handling (e.g. via
++emulation).
 +
-+The command will fail with -KVM_EINVAL if any of the specified combination
-+of access bits is not supported. Also, if ``visible`` is set to 1 but
-+the page is not visible.
-+
-+The command will try to apply all changes and return the first error if
-+some failed. The introspection tool should handle the rollback.
-+
-+In order to 'forget' an address, all three bits ('rwx') must be set.
-+
-+:Errors:
-+
-+* -KVM_EINVAL - the specified access bits combination is invalid
-+* -KVM_EINVAL - the padding is not zero
-+* -KVM_EINVAL - the message size is invalid
-+* -KVM_EAGAIN - the selected vCPU can't be introspected yet
-+* -KVM_ENOMEM - there is not enough memory to add the page tracking structures
-+
- Events
- ======
- 
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index acfcebce51dd..d96bf0e15ea2 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -45,6 +45,8 @@
- #define KVM_PRIVATE_MEM_SLOTS 3
- #define KVM_MEM_SLOTS_NUM (KVM_USER_MEM_SLOTS + KVM_PRIVATE_MEM_SLOTS)
- 
-+#include <asm/kvmi_host.h>
-+
- #define KVM_HALT_POLL_NS_DEFAULT 200000
- 
- #define KVM_IRQCHIP_NUM_PINS  KVM_IOAPIC_NUM_PINS
++The *RETRY* action is used by the introspection tool to retry the
++execution of the current instruction, usually because it changed the
++instruction pointer or the page restrictions.
 diff --git a/arch/x86/include/asm/kvmi_host.h b/arch/x86/include/asm/kvmi_host.h
-index acc003403c95..98ea548c0b15 100644
+index 98ea548c0b15..25c7bb8a9082 100644
 --- a/arch/x86/include/asm/kvmi_host.h
 +++ b/arch/x86/include/asm/kvmi_host.h
-@@ -2,6 +2,7 @@
- #ifndef _ASM_X86_KVMI_HOST_H
- #define _ASM_X86_KVMI_HOST_H
- 
-+#include <asm/kvm_page_track.h>
- #include <asm/kvmi.h>
- 
- struct msr_data;
-@@ -42,6 +43,12 @@ struct kvm_vcpu_arch_introspection {
- struct kvm_arch_introspection {
+@@ -41,6 +41,7 @@ struct kvm_vcpu_arch_introspection {
  };
  
-+#define SLOTS_SIZE BITS_TO_LONGS(KVM_MEM_SLOTS_NUM)
-+
-+struct kvmi_arch_mem_access {
-+	unsigned long active[KVM_PAGE_TRACK_MAX][SLOTS_SIZE];
-+};
-+
- #ifdef CONFIG_KVM_INTROSPECTION
+ struct kvm_arch_introspection {
++	struct kvm_page_track_notifier_node kptn_node;
+ };
  
- bool kvmi_monitor_bp_intercept(struct kvm_vcpu *vcpu, u32 dbg);
+ #define SLOTS_SIZE BITS_TO_LONGS(KVM_MEM_SLOTS_NUM)
 diff --git a/arch/x86/kvm/kvmi.c b/arch/x86/kvm/kvmi.c
-index 0b1301ebafba..b233a3c5becb 100644
+index b233a3c5becb..8fbf1720749b 100644
 --- a/arch/x86/kvm/kvmi.c
 +++ b/arch/x86/kvm/kvmi.c
-@@ -1169,3 +1169,43 @@ bool kvmi_msr_event(struct kvm_vcpu *vcpu, struct msr_data *msr)
+@@ -10,6 +10,21 @@
+ #include "cpuid.h"
+ #include "../../../virt/kvm/introspection/kvmi_int.h"
  
- 	return ret;
++static bool kvmi_track_preread(struct kvm_vcpu *vcpu, gpa_t gpa, gva_t gva,
++			       int bytes,
++			       struct kvm_page_track_notifier_node *node);
++static bool kvmi_track_prewrite(struct kvm_vcpu *vcpu, gpa_t gpa, gva_t gva,
++				const u8 *new, int bytes,
++				struct kvm_page_track_notifier_node *node);
++static bool kvmi_track_preexec(struct kvm_vcpu *vcpu, gpa_t gpa, gva_t gva,
++			       struct kvm_page_track_notifier_node *node);
++static void kvmi_track_create_slot(struct kvm *kvm,
++				   struct kvm_memory_slot *slot,
++				   unsigned long npages,
++				   struct kvm_page_track_notifier_node *node);
++static void kvmi_track_flush_slot(struct kvm *kvm, struct kvm_memory_slot *slot,
++				  struct kvm_page_track_notifier_node *node);
++
+ static unsigned int kvmi_vcpu_mode(const struct kvm_vcpu *vcpu,
+ 				   const struct kvm_sregs *sregs)
+ {
+@@ -1209,3 +1224,129 @@ void kvmi_arch_update_page_tracking(struct kvm *kvm,
+ 		}
+ 	}
  }
 +
-+static const struct {
-+	unsigned int allow_bit;
-+	enum kvm_page_track_mode track_mode;
-+} track_modes[] = {
-+	{ KVMI_PAGE_ACCESS_R, KVM_PAGE_TRACK_PREREAD },
-+	{ KVMI_PAGE_ACCESS_W, KVM_PAGE_TRACK_PREWRITE },
-+	{ KVMI_PAGE_ACCESS_X, KVM_PAGE_TRACK_PREEXEC },
-+};
-+
-+void kvmi_arch_update_page_tracking(struct kvm *kvm,
-+				    struct kvm_memory_slot *slot,
-+				    struct kvmi_mem_access *m)
++void kvmi_arch_hook(struct kvm *kvm)
 +{
-+	struct kvmi_arch_mem_access *arch = &m->arch;
-+	int i;
++	struct kvm_introspection *kvmi = KVMI(kvm);
 +
-+	if (!slot) {
-+		slot = gfn_to_memslot(kvm, m->gfn);
-+		if (!slot)
-+			return;
-+	}
++	kvmi->arch.kptn_node.track_preread = kvmi_track_preread;
++	kvmi->arch.kptn_node.track_prewrite = kvmi_track_prewrite;
++	kvmi->arch.kptn_node.track_preexec = kvmi_track_preexec;
++	kvmi->arch.kptn_node.track_create_slot = kvmi_track_create_slot;
++	kvmi->arch.kptn_node.track_flush_slot = kvmi_track_flush_slot;
 +
-+	for (i = 0; i < ARRAY_SIZE(track_modes); i++) {
-+		unsigned int allow_bit = track_modes[i].allow_bit;
-+		enum kvm_page_track_mode mode = track_modes[i].track_mode;
-+		bool slot_tracked = test_bit(slot->id, arch->active[mode]);
-+
-+		if (m->access & allow_bit) {
-+			if (slot_tracked) {
-+				kvm_slot_page_track_remove_page(kvm, slot,
-+								m->gfn, mode);
-+				clear_bit(slot->id, arch->active[mode]);
-+			}
-+		} else if (!slot_tracked) {
-+			kvm_slot_page_track_add_page(kvm, slot, m->gfn, mode);
-+			set_bit(slot->id, arch->active[mode]);
-+		}
-+	}
++	kvm_page_track_register_notifier(kvm, &kvmi->arch.kptn_node);
 +}
-diff --git a/include/linux/kvmi_host.h b/include/linux/kvmi_host.h
-index 1fae589d9d35..11eb9b1c3c5e 100644
---- a/include/linux/kvmi_host.h
-+++ b/include/linux/kvmi_host.h
-@@ -64,6 +64,9 @@ struct kvm_introspection {
- 	atomic_t ev_seq;
- 
- 	bool cleanup_on_unhook;
 +
-+	struct radix_tree_root access_tree;
-+	rwlock_t access_tree_lock;
- };
- 
- int kvmi_version(void);
++void kvmi_arch_unhook(struct kvm *kvm)
++{
++	struct kvm_introspection *kvmi = KVMI(kvm);
++
++	kvm_page_track_unregister_notifier(kvm, &kvmi->arch.kptn_node);
++}
++
++static bool is_pf_of_interest(struct kvm_vcpu *vcpu, gpa_t gpa, u8 access)
++{
++	if (!kvm_x86_ops.spt_fault(vcpu))
++		return false;
++
++	if (kvm_x86_ops.gpt_translation_fault(vcpu))
++		return false;
++
++	return kvmi_restricted_page_access(KVMI(vcpu->kvm), gpa, access);
++}
++
++static bool handle_pf_event(struct kvm_vcpu *vcpu, gpa_t gpa, gva_t gva,
++			    int access)
++{
++	if (!is_pf_of_interest(vcpu, gpa, access))
++		return true;
++
++	return kvmi_pf_event(vcpu, gpa, gva, access);
++}
++
++static bool kvmi_track_preread(struct kvm_vcpu *vcpu, gpa_t gpa, gva_t gva,
++			       int bytes,
++			       struct kvm_page_track_notifier_node *node)
++{
++	struct kvm_introspection *kvmi;
++	bool ret = true;
++
++	kvmi = kvmi_get(vcpu->kvm);
++	if (!kvmi)
++		return true;
++
++	if (is_event_enabled(vcpu, KVMI_EVENT_PF))
++		ret = handle_pf_event(vcpu, gpa, gva, KVMI_PAGE_ACCESS_R);
++
++	kvmi_put(vcpu->kvm);
++
++	return ret;
++}
++
++static bool kvmi_track_prewrite(struct kvm_vcpu *vcpu, gpa_t gpa, gva_t gva,
++				const u8 *new, int bytes,
++				struct kvm_page_track_notifier_node *node)
++{
++	struct kvm_introspection *kvmi;
++	bool ret = true;
++
++	kvmi = kvmi_get(vcpu->kvm);
++	if (!kvmi)
++		return true;
++
++	if (is_event_enabled(vcpu, KVMI_EVENT_PF))
++		ret = handle_pf_event(vcpu, gpa, gva, KVMI_PAGE_ACCESS_W);
++
++	kvmi_put(vcpu->kvm);
++
++	return ret;
++}
++
++static bool kvmi_track_preexec(struct kvm_vcpu *vcpu, gpa_t gpa, gva_t gva,
++			       struct kvm_page_track_notifier_node *node)
++{
++	struct kvm_introspection *kvmi;
++	bool ret = true;
++
++	kvmi = kvmi_get(vcpu->kvm);
++	if (!kvmi)
++		return true;
++
++	if (is_event_enabled(vcpu, KVMI_EVENT_PF))
++		ret = handle_pf_event(vcpu, gpa, gva, KVMI_PAGE_ACCESS_X);
++
++	kvmi_put(vcpu->kvm);
++
++	return ret;
++}
++
++static void kvmi_track_create_slot(struct kvm *kvm,
++				   struct kvm_memory_slot *slot,
++				   unsigned long npages,
++				   struct kvm_page_track_notifier_node *node)
++{
++	struct kvm_introspection *kvmi;
++
++	kvmi = kvmi_get(kvm);
++	if (!kvmi)
++		return;
++
++	kvmi_add_memslot(kvm, slot, npages);
++
++	kvmi_put(kvm);
++}
++
++static void kvmi_track_flush_slot(struct kvm *kvm, struct kvm_memory_slot *slot,
++				  struct kvm_page_track_notifier_node *node)
++{
++	struct kvm_introspection *kvmi;
++
++	kvmi = kvmi_get(kvm);
++	if (!kvmi)
++		return;
++
++	kvmi_remove_memslot(kvm, slot);
++
++	kvmi_put(kvm);
++}
 diff --git a/include/uapi/linux/kvmi.h b/include/uapi/linux/kvmi.h
-index 2872f90ff092..dc82f192534c 100644
+index dc82f192534c..dc7ba12498b7 100644
 --- a/include/uapi/linux/kvmi.h
 +++ b/include/uapi/linux/kvmi.h
-@@ -45,6 +45,8 @@ enum {
- 	KVMI_VCPU_GET_MTRR_TYPE = 21,
- 	KVMI_VCPU_CONTROL_MSR   = 22,
+@@ -60,6 +60,7 @@ enum {
+ 	KVMI_EVENT_XSETBV     = 6,
+ 	KVMI_EVENT_DESCRIPTOR = 7,
+ 	KVMI_EVENT_MSR        = 8,
++	KVMI_EVENT_PF         = 9,
  
-+	KVMI_VM_SET_PAGE_ACCESS = 23,
-+
- 	KVMI_NUM_MESSAGES
+ 	KVMI_NUM_EVENTS
+ };
+@@ -218,4 +219,13 @@ struct kvmi_vcpu_inject_exception {
+ 	__u64 address;
  };
  
-@@ -68,6 +70,12 @@ enum {
- 	KVMI_EVENT_ACTION_CRASH    = 2,
- };
- 
-+enum {
-+	KVMI_PAGE_ACCESS_R = 1 << 0,
-+	KVMI_PAGE_ACCESS_W = 1 << 1,
-+	KVMI_PAGE_ACCESS_X = 1 << 2,
-+};
-+
- struct kvmi_msg_hdr {
- 	__u16 id;
- 	__u16 size;
-@@ -164,6 +172,21 @@ struct kvmi_vm_get_max_gfn_reply {
- 	__u64 gfn;
- };
- 
-+struct kvmi_page_access_entry {
++struct kvmi_event_pf {
++	__u64 gva;
 +	__u64 gpa;
 +	__u8 access;
-+	__u8 visible;
-+	__u16 padding1;
-+	__u32 padding2;
++	__u8 padding1;
++	__u16 padding2;
++	__u32 padding3;
 +};
 +
-+struct kvmi_vm_set_page_access {
-+	__u16 count;
-+	__u16 padding1;
-+	__u32 padding2;
-+	struct kvmi_page_access_entry entries[0];
-+};
-+
- struct kvmi_event {
- 	__u16 size;
- 	__u16 vcpu;
+ #endif /* _UAPI__LINUX_KVMI_H */
 diff --git a/tools/testing/selftests/kvm/x86_64/kvmi_test.c b/tools/testing/selftests/kvm/x86_64/kvmi_test.c
-index 0ddc0029e3e5..4fb109cec1b4 100644
+index 4fb109cec1b4..21b3f7a459c8 100644
 --- a/tools/testing/selftests/kvm/x86_64/kvmi_test.c
 +++ b/tools/testing/selftests/kvm/x86_64/kvmi_test.c
-@@ -1809,6 +1809,57 @@ static void test_cmd_vcpu_control_msr(struct kvm_vm *vm)
- 	test_invalid_control_msr(vm, msr);
+@@ -42,6 +42,11 @@ struct vcpu_reply {
+ 	struct kvmi_event_reply reply;
+ };
+ 
++struct pf_ev {
++	struct kvmi_event common;
++	struct kvmi_event_pf pf;
++};
++
+ struct vcpu_worker_data {
+ 	struct kvm_vm *vm;
+ 	int vcpu_id;
+@@ -51,6 +56,10 @@ struct vcpu_worker_data {
+ 	bool restart_on_shutdown;
+ };
+ 
++typedef void (*fct_pf_event)(struct kvm_vm *vm, struct kvmi_msg_hdr *hdr,
++				struct pf_ev *ev,
++				struct vcpu_reply *rpl);
++
+ enum {
+ 	GUEST_TEST_NOOP = 0,
+ 	GUEST_TEST_BP,
+@@ -58,6 +67,7 @@ enum {
+ 	GUEST_TEST_DESCRIPTOR,
+ 	GUEST_TEST_HYPERCALL,
+ 	GUEST_TEST_MSR,
++	GUEST_TEST_PF,
+ 	GUEST_TEST_XSETBV,
+ };
+ 
+@@ -111,6 +121,11 @@ static void guest_msr_test(void)
+ 	wrmsr(MSR_MISC_FEATURES_ENABLES, msr);
  }
  
-+static int cmd_set_page_access(__u16 count, __u64 *gpa, __u8 *access)
++static void guest_pf_test(void)
 +{
-+	struct kvmi_page_access_entry *entry, *end;
-+	struct kvmi_vm_set_page_access *cmd;
-+	struct kvmi_msg_hdr *req;
-+	size_t req_size;
-+	int r;
-+
-+	req_size = sizeof(*req) + sizeof(*cmd) + count * sizeof(*entry);
-+	req = calloc(1, req_size);
-+
-+	TEST_ASSERT(req, "Insufficient Memory\n");
-+
-+	cmd = (struct kvmi_vm_set_page_access *)(req + 1);
-+	cmd->count = count;
-+
-+	entry = cmd->entries;
-+	end = cmd->entries + count;
-+	for (; entry < end; entry++) {
-+		entry->gpa = *gpa++;
-+		entry->access = *access++;
-+	}
-+
-+	r = do_command(KVMI_VM_SET_PAGE_ACCESS, req, req_size, NULL, 0);
-+
-+	free(req);
-+	return r;
++	*((uint8_t *)test_gva) = READ_ONCE(test_write_pattern);
 +}
 +
-+static void set_page_access(__u64 gpa, __u8 access)
+ /* from fpu/internal.h */
+ static u64 xgetbv(u32 index)
+ {
+@@ -171,6 +186,9 @@ static void guest_code(void)
+ 		case GUEST_TEST_MSR:
+ 			guest_msr_test();
+ 			break;
++		case GUEST_TEST_PF:
++			guest_pf_test();
++			break;
+ 		case GUEST_TEST_XSETBV:
+ 			guest_xsetbv_test();
+ 			break;
+@@ -1860,6 +1878,63 @@ static void test_cmd_vm_set_page_access(struct kvm_vm *vm)
+ 	set_page_access(gpa, full_access);
+ }
+ 
++static void test_pf(struct kvm_vm *vm, fct_pf_event cbk)
 +{
-+	int r;
++	__u16 event_id = KVMI_EVENT_PF;
++	struct vcpu_worker_data data = {
++		.vm = vm,
++		.vcpu_id = VCPU_ID,
++		.test_id = GUEST_TEST_PF,
++	};
++	struct kvmi_msg_hdr hdr;
++	struct vcpu_reply rpl = {};
++	pthread_t vcpu_thread;
++	struct pf_ev ev;
 +
-+	r = cmd_set_page_access(1, &gpa, &access);
-+	TEST_ASSERT(r == 0,
-+		"KVMI_VM_SET_PAGE_ACCESS failed, gpa 0x%llx, access 0x%x, error %d (%s)\n",
-+		gpa, access, -r, kvm_strerror(-r));
++	set_page_access(test_gpa, KVMI_PAGE_ACCESS_R);
++	enable_vcpu_event(vm, event_id);
++
++	new_test_write_pattern(vm);
++
++	vcpu_thread = start_vcpu_worker(&data);
++
++	receive_event(&hdr, &ev.common, sizeof(ev), event_id);
++
++	pr_info("PF event, gpa 0x%llx, gva 0x%llx, access 0x%x\n",
++		ev.pf.gpa, ev.pf.gva, ev.pf.access);
++
++	TEST_ASSERT(ev.pf.gpa == test_gpa && ev.pf.gva == test_gva,
++		"Unexpected #PF event, gpa 0x%llx (expended 0x%lx), gva 0x%llx (expected 0x%lx)\n",
++		ev.pf.gpa, test_gpa, ev.pf.gva, test_gva);
++
++	cbk(vm, &hdr, &ev, &rpl);
++
++	stop_vcpu_worker(vcpu_thread, &data);
++
++	TEST_ASSERT(*((uint8_t *)test_hva) == test_write_pattern,
++		"Write failed, expected 0x%x, result 0x%x\n",
++		test_write_pattern, *((uint8_t *)test_hva));
++
++	disable_vcpu_event(vm, event_id);
++	set_page_access(test_gpa, KVMI_PAGE_ACCESS_R
++				| KVMI_PAGE_ACCESS_W
++				| KVMI_PAGE_ACCESS_X);
 +}
 +
-+static void test_cmd_vm_set_page_access(struct kvm_vm *vm)
++static void cbk_test_event_pf(struct kvm_vm *vm, struct kvmi_msg_hdr *hdr,
++				struct pf_ev *ev, struct vcpu_reply *rpl)
 +{
-+	__u8 full_access = KVMI_PAGE_ACCESS_R | KVMI_PAGE_ACCESS_W
-+			| KVMI_PAGE_ACCESS_X;
-+	__u8 no_access = 0;
-+	__u64 gpa = 0;
++	set_page_access(test_gpa, KVMI_PAGE_ACCESS_R | KVMI_PAGE_ACCESS_W);
 +
-+	set_page_access(gpa, no_access);
++	reply_to_event(hdr, &ev->common, KVMI_EVENT_ACTION_RETRY,
++			rpl, sizeof(*rpl));
++}
 +
-+	set_page_access(gpa, full_access);
++static void test_event_pf(struct kvm_vm *vm)
++{
++	test_pf(vm, cbk_test_event_pf);
 +}
 +
  static void test_introspection(struct kvm_vm *vm)
  {
  	srandom(time(0));
-@@ -1841,6 +1892,7 @@ static void test_introspection(struct kvm_vm *vm)
- 	test_cmd_vcpu_get_mtrr_type(vm);
+@@ -1893,6 +1968,7 @@ static void test_introspection(struct kvm_vm *vm)
  	test_event_descriptor(vm);
  	test_cmd_vcpu_control_msr(vm);
-+	test_cmd_vm_set_page_access(vm);
+ 	test_cmd_vm_set_page_access(vm);
++	test_event_pf(vm);
  
  	unhook_introspection(vm);
  }
 diff --git a/virt/kvm/introspection/kvmi.c b/virt/kvm/introspection/kvmi.c
-index aa8a0708cc1c..b57ad490dd06 100644
+index b57ad490dd06..99c88e182587 100644
 --- a/virt/kvm/introspection/kvmi.c
 +++ b/virt/kvm/introspection/kvmi.c
-@@ -21,6 +21,11 @@ static DECLARE_BITMAP(Kvmi_known_vcpu_events, KVMI_NUM_EVENTS);
+@@ -113,6 +113,7 @@ static void setup_known_events(void)
+ 	set_bit(KVMI_EVENT_HYPERCALL, Kvmi_known_vcpu_events);
+ 	set_bit(KVMI_EVENT_MSR, Kvmi_known_vcpu_events);
+ 	set_bit(KVMI_EVENT_PAUSE_VCPU, Kvmi_known_vcpu_events);
++	set_bit(KVMI_EVENT_PF, Kvmi_known_vcpu_events);
+ 	set_bit(KVMI_EVENT_TRAP, Kvmi_known_vcpu_events);
+ 	set_bit(KVMI_EVENT_XSETBV, Kvmi_known_vcpu_events);
  
- static struct kmem_cache *msg_cache;
- static struct kmem_cache *job_cache;
-+static struct kmem_cache *radix_cache;
+@@ -368,6 +369,8 @@ static void __kvmi_unhook(struct kvm *kvm)
+ 	struct kvm_introspection *kvmi = KVMI(kvm);
+ 
+ 	wait_for_completion_killable(&kvm->kvmi_complete);
 +
-+static const u8 full_access  =	KVMI_PAGE_ACCESS_R |
-+				KVMI_PAGE_ACCESS_W |
-+				KVMI_PAGE_ACCESS_X;
- 
- void *kvmi_msg_alloc(void)
- {
-@@ -39,6 +44,8 @@ static void kvmi_cache_destroy(void)
- 	msg_cache = NULL;
- 	kmem_cache_destroy(job_cache);
- 	job_cache = NULL;
-+	kmem_cache_destroy(radix_cache);
-+	radix_cache = NULL;
++	kvmi_arch_unhook(kvm);
+ 	kvmi_sock_put(kvmi);
  }
  
- static int kvmi_cache_create(void)
-@@ -48,8 +55,11 @@ static int kvmi_cache_create(void)
- 	job_cache = kmem_cache_create("kvmi_job",
- 				      sizeof(struct kvmi_job),
- 				      0, SLAB_ACCOUNT, NULL);
-+	radix_cache = kmem_cache_create("kvmi_radix_tree",
-+					sizeof(struct kvmi_mem_access),
-+					0, SLAB_ACCOUNT, NULL);
+@@ -415,6 +418,8 @@ static int __kvmi_hook(struct kvm *kvm,
+ 	if (!kvmi_sock_get(kvmi, hook->fd))
+ 		return -EINVAL;
  
--	if (!msg_cache || !job_cache) {
-+	if (!msg_cache || !job_cache || !radix_cache) {
- 		kvmi_cache_destroy();
- 
- 		return -1;
-@@ -241,12 +251,38 @@ static void free_vcpui(struct kvm_vcpu *vcpu, bool restore_interception)
- 	kvmi_make_request(vcpu, false);
++	kvmi_arch_hook(kvm);
++
+ 	return 0;
  }
  
-+static void kvmi_clear_mem_access(struct kvm *kvm)
+@@ -1182,3 +1187,113 @@ int kvmi_cmd_set_page_access(struct kvm_introspection *kvmi,
+ 
+ 	return ec;
+ }
++
++static int kvmi_get_gfn_access(struct kvm_introspection *kvmi, const gfn_t gfn,
++			       u8 *access)
++{
++	struct kvmi_mem_access *m;
++
++	read_lock(&kvmi->access_tree_lock);
++	m = __kvmi_get_gfn_access(kvmi, gfn);
++	if (m)
++		*access = m->access;
++	read_unlock(&kvmi->access_tree_lock);
++
++	return m ? 0 : -1;
++}
++
++bool kvmi_restricted_page_access(struct kvm_introspection *kvmi, gpa_t gpa,
++				 u8 access)
++{
++	u8 allowed_access;
++	int err;
++
++	err = kvmi_get_gfn_access(kvmi, gpa_to_gfn(gpa), &allowed_access);
++	if (err)
++		return false;
++
++	/*
++	 * We want to be notified only for violations involving access
++	 * bits that we've specifically cleared
++	 */
++	if (access & (~allowed_access))
++		return true;
++
++	return false;
++}
++
++bool kvmi_pf_event(struct kvm_vcpu *vcpu, gpa_t gpa, gva_t gva, u8 access)
++{
++	bool ret = false;
++	u32 action;
++
++	action = kvmi_msg_send_pf(vcpu, gpa, gva, access);
++
++	switch (action) {
++	case KVMI_EVENT_ACTION_CONTINUE:
++		ret = true;
++		break;
++	case KVMI_EVENT_ACTION_RETRY:
++		break;
++	default:
++		kvmi_handle_common_event_actions(vcpu->kvm, action);
++	}
++
++	return ret;
++}
++
++void kvmi_add_memslot(struct kvm *kvm, struct kvm_memory_slot *slot,
++		      unsigned long npages)
 +{
 +	struct kvm_introspection *kvmi = KVMI(kvm);
-+	struct radix_tree_iter iter;
-+	void **slot;
++	gfn_t start = slot->base_gfn;
++	gfn_t end = start + npages;
 +	int idx;
 +
 +	idx = srcu_read_lock(&kvm->srcu);
 +	spin_lock(&kvm->mmu_lock);
++	read_lock(&kvmi->access_tree_lock);
 +
-+	radix_tree_for_each_slot(slot, &kvmi->access_tree, &iter, 0) {
-+		struct kvmi_mem_access *m = *slot;
++	while (start < end) {
++		struct kvmi_mem_access *m;
 +
-+		m->access = full_access;
-+		kvmi_arch_update_page_tracking(kvm, NULL, m);
-+
-+		radix_tree_iter_delete(&kvmi->access_tree, &iter, slot);
-+		kmem_cache_free(radix_cache, m);
++		m = __kvmi_get_gfn_access(kvmi, start);
++		if (m)
++			kvmi_arch_update_page_tracking(kvm, slot, m);
++		start++;
 +	}
 +
++	read_unlock(&kvmi->access_tree_lock);
 +	spin_unlock(&kvm->mmu_lock);
 +	srcu_read_unlock(&kvm->srcu, idx);
 +}
 +
- static void free_kvmi(struct kvm *kvm)
- {
- 	bool restore_interception = KVMI(kvm)->cleanup_on_unhook;
- 	struct kvm_vcpu *vcpu;
- 	int i;
- 
-+	kvmi_clear_mem_access(kvm);
-+
- 	kvm_for_each_vcpu(i, vcpu, kvm)
- 		free_vcpui(vcpu, restore_interception);
- 
-@@ -297,6 +333,10 @@ alloc_kvmi(struct kvm *kvm, const struct kvm_introspection_hook *hook)
- 
- 	atomic_set(&kvmi->ev_seq, 0);
- 
-+	INIT_RADIX_TREE(&kvmi->access_tree,
-+			GFP_KERNEL & ~__GFP_DIRECT_RECLAIM);
-+	rwlock_init(&kvmi->access_tree_lock);
-+
- 	kvm_for_each_vcpu(i, vcpu, kvm) {
- 		int err = create_vcpui(vcpu);
- 
-@@ -1010,3 +1050,135 @@ bool kvmi_enter_guest(struct kvm_vcpu *vcpu)
- 	kvmi_put(vcpu->kvm);
- 	return r;
- }
-+
-+static struct kvmi_mem_access *
-+__kvmi_get_gfn_access(struct kvm_introspection *kvmi, const gfn_t gfn)
-+{
-+	return radix_tree_lookup(&kvmi->access_tree, gfn);
-+}
-+
-+static void kvmi_update_mem_access(struct kvm *kvm, struct kvmi_mem_access *m)
++void kvmi_remove_memslot(struct kvm *kvm, struct kvm_memory_slot *slot)
 +{
 +	struct kvm_introspection *kvmi = KVMI(kvm);
-+
-+	kvmi_arch_update_page_tracking(kvm, NULL, m);
-+
-+	if (m->access == full_access) {
-+		radix_tree_delete(&kvmi->access_tree, m->gfn);
-+		kmem_cache_free(radix_cache, m);
-+	}
-+}
-+
-+static void kvmi_insert_mem_access(struct kvm *kvm, struct kvmi_mem_access *m)
-+{
-+	struct kvm_introspection *kvmi = KVMI(kvm);
-+
-+	radix_tree_insert(&kvmi->access_tree, m->gfn, m);
-+	kvmi_arch_update_page_tracking(kvm, NULL, m);
-+}
-+
-+static void kvmi_set_mem_access(struct kvm *kvm, struct kvmi_mem_access *m,
-+				bool *used)
-+{
-+	struct kvm_introspection *kvmi = KVMI(kvm);
-+	struct kvmi_mem_access *found;
++	gfn_t start = slot->base_gfn;
++	gfn_t end = start + slot->npages;
 +	int idx;
 +
 +	idx = srcu_read_lock(&kvm->srcu);
 +	spin_lock(&kvm->mmu_lock);
 +	write_lock(&kvmi->access_tree_lock);
 +
-+	found = __kvmi_get_gfn_access(kvmi, m->gfn);
-+	if (found) {
-+		found->access = m->access;
-+		kvmi_update_mem_access(kvm, found);
-+	} else if (m->access != full_access) {
-+		kvmi_insert_mem_access(kvm, m);
-+		*used = true;
++	while (start < end) {
++		struct kvmi_mem_access *m;
++
++		m = __kvmi_get_gfn_access(kvmi, start);
++		if (m) {
++			u8 prev_access = m->access;
++
++			m->access = full_access;
++			kvmi_arch_update_page_tracking(kvm, slot, m);
++			m->access = prev_access;
++		}
++		start++;
 +	}
 +
 +	write_unlock(&kvmi->access_tree_lock);
 +	spin_unlock(&kvm->mmu_lock);
 +	srcu_read_unlock(&kvm->srcu, idx);
 +}
-+
-+static int kvmi_set_gfn_access(struct kvm *kvm, gfn_t gfn, u8 access)
-+{
-+	struct kvmi_mem_access *m;
-+	bool used = false;
-+	int err = 0;
-+
-+	m = kmem_cache_zalloc(radix_cache, GFP_KERNEL);
-+	if (!m)
-+		return -KVM_ENOMEM;
-+
-+	m->gfn = gfn;
-+	m->access = access;
-+
-+	if (radix_tree_preload(GFP_KERNEL))
-+		err = -KVM_ENOMEM;
-+	else
-+		kvmi_set_mem_access(kvm, m, &used);
-+
-+	radix_tree_preload_end();
-+
-+	if (!used)
-+		kmem_cache_free(radix_cache, m);
-+
-+	return err;
-+}
-+
-+static bool kvmi_is_visible_gfn(struct kvm *kvm, gfn_t gfn)
-+{
-+	bool visible;
-+	int idx;
-+
-+	idx = srcu_read_lock(&kvm->srcu);
-+	visible = kvm_is_visible_gfn(kvm, gfn);
-+	srcu_read_unlock(&kvm->srcu, idx);
-+
-+	return visible;
-+}
-+
-+static int set_page_access_entry(struct kvm_introspection *kvmi,
-+				 const struct kvmi_page_access_entry *entry)
-+{
-+	u8 unknown_bits = ~(KVMI_PAGE_ACCESS_R | KVMI_PAGE_ACCESS_W
-+			    | KVMI_PAGE_ACCESS_X);
-+	gfn_t gfn = gpa_to_gfn(entry->gpa);
-+	struct kvm *kvm = kvmi->kvm;
-+
-+	if ((entry->access & unknown_bits)
-+			|| entry->padding1 || entry->padding2
-+			|| entry->visible > 1)
-+		return -KVM_EINVAL;
-+
-+	if (!kvmi_is_visible_gfn(kvm, gfn))
-+		return entry->visible ? -KVM_EINVAL : 0;
-+
-+	return kvmi_set_gfn_access(kvm, gfn, entry->access);
-+}
-+
-+int kvmi_cmd_set_page_access(struct kvm_introspection *kvmi,
-+			     const struct kvmi_msg_hdr *msg,
-+			     const struct kvmi_vm_set_page_access *req)
-+{
-+	const struct kvmi_page_access_entry *entry = req->entries;
-+	const struct kvmi_page_access_entry *end = req->entries + req->count;
-+	int ec = 0;
-+
-+	if (req->padding1 || req->padding2)
-+		return -KVM_EINVAL;
-+
-+	if (msg->size < struct_size(req, entries, req->count))
-+		return -KVM_EINVAL;
-+
-+	for (; entry < end; entry++) {
-+		int r = set_page_access_entry(kvmi, entry);
-+
-+		if (r && !ec)
-+			ec = r;
-+	}
-+
-+	return ec;
-+}
 diff --git a/virt/kvm/introspection/kvmi_int.h b/virt/kvm/introspection/kvmi_int.h
-index 8f8557bd8ab0..024e7acf0dce 100644
+index 024e7acf0dce..9f2341fe21d5 100644
 --- a/virt/kvm/introspection/kvmi_int.h
 +++ b/virt/kvm/introspection/kvmi_int.h
-@@ -21,6 +21,12 @@
- #define KVMI(kvm) ((kvm)->kvmi)
- #define VCPUI(vcpu) ((vcpu)->kvmi)
+@@ -47,6 +47,7 @@ int kvmi_msg_send_unhook(struct kvm_introspection *kvmi);
+ u32 kvmi_msg_send_vcpu_pause(struct kvm_vcpu *vcpu);
+ u32 kvmi_msg_send_hypercall(struct kvm_vcpu *vcpu);
+ u32 kvmi_msg_send_bp(struct kvm_vcpu *vcpu, u64 gpa, u8 insn_len);
++u32 kvmi_msg_send_pf(struct kvm_vcpu *vcpu, u64 gpa, u64 gva, u8 access);
  
-+struct kvmi_mem_access {
-+	gfn_t gfn;
-+	u8 access;
-+	struct kvmi_arch_mem_access arch;
-+};
-+
- static inline bool is_event_enabled(struct kvm_vcpu *vcpu, int event)
- {
- 	return test_bit(event, VCPUI(vcpu)->ev_enable_mask);
-@@ -73,6 +79,9 @@ int kvmi_cmd_write_physical(struct kvm *kvm, u64 gpa, size_t size,
- int kvmi_cmd_vcpu_pause(struct kvm_vcpu *vcpu, bool wait);
- int kvmi_cmd_vcpu_set_registers(struct kvm_vcpu *vcpu,
- 				const struct kvm_regs *regs);
-+int kvmi_cmd_set_page_access(struct kvm_introspection *kvmi,
-+			     const struct kvmi_msg_hdr *msg,
-+			     const struct kvmi_vm_set_page_access *req);
+ /* kvmi.c */
+ void *kvmi_msg_alloc(void);
+@@ -82,6 +83,12 @@ int kvmi_cmd_vcpu_set_registers(struct kvm_vcpu *vcpu,
+ int kvmi_cmd_set_page_access(struct kvm_introspection *kvmi,
+ 			     const struct kvmi_msg_hdr *msg,
+ 			     const struct kvmi_vm_set_page_access *req);
++bool kvmi_restricted_page_access(struct kvm_introspection *kvmi, gpa_t gpa,
++				 u8 access);
++bool kvmi_pf_event(struct kvm_vcpu *vcpu, gpa_t gpa, gva_t gva, u8 access);
++void kvmi_add_memslot(struct kvm *kvm, struct kvm_memory_slot *slot,
++		      unsigned long npages);
++void kvmi_remove_memslot(struct kvm *kvm, struct kvm_memory_slot *slot);
  
  /* arch */
  bool kvmi_arch_vcpu_alloc_interception(struct kvm_vcpu *vcpu);
-@@ -117,5 +126,8 @@ int kvmi_arch_cmd_vcpu_set_xsave(struct kvm_vcpu *vcpu,
- int kvmi_arch_cmd_vcpu_get_mtrr_type(struct kvm_vcpu *vcpu, u64 gpa, u8 *type);
- int kvmi_arch_cmd_vcpu_control_msr(struct kvm_vcpu *vcpu,
- 				   const struct kvmi_vcpu_control_msr *req);
-+void kvmi_arch_update_page_tracking(struct kvm *kvm,
-+				    struct kvm_memory_slot *slot,
-+				    struct kvmi_mem_access *m);
+@@ -129,5 +136,7 @@ int kvmi_arch_cmd_vcpu_control_msr(struct kvm_vcpu *vcpu,
+ void kvmi_arch_update_page_tracking(struct kvm *kvm,
+ 				    struct kvm_memory_slot *slot,
+ 				    struct kvmi_mem_access *m);
++void kvmi_arch_hook(struct kvm *kvm);
++void kvmi_arch_unhook(struct kvm *kvm);
  
  #endif
 diff --git a/virt/kvm/introspection/kvmi_msg.c b/virt/kvm/introspection/kvmi_msg.c
-index d9cbbefb9993..f7ffb971f1dc 100644
+index f7ffb971f1dc..0a0d10b43f2d 100644
 --- a/virt/kvm/introspection/kvmi_msg.c
 +++ b/virt/kvm/introspection/kvmi_msg.c
-@@ -334,6 +334,17 @@ static int handle_vm_get_max_gfn(struct kvm_introspection *kvmi,
- 	return kvmi_msg_vm_reply(kvmi, msg, 0, &rpl, sizeof(rpl));
+@@ -983,3 +983,21 @@ u32 kvmi_msg_send_bp(struct kvm_vcpu *vcpu, u64 gpa, u8 insn_len)
+ 
+ 	return action;
  }
- 
-+static int handle_vm_set_page_access(struct kvm_introspection *kvmi,
-+				     const struct kvmi_msg_hdr *msg,
-+				     const void *req)
++
++u32 kvmi_msg_send_pf(struct kvm_vcpu *vcpu, u64 gpa, u64 gva, u8 access)
 +{
-+	int ec;
++	struct kvmi_event_pf e;
++	int err, action;
 +
-+	ec = kvmi_cmd_set_page_access(kvmi, msg, req);
++	memset(&e, 0, sizeof(e));
++	e.gpa = gpa;
++	e.gva = gva;
++	e.access = access;
 +
-+	return kvmi_msg_vm_reply(kvmi, msg, ec, NULL, 0);
++	err = kvmi_send_event(vcpu, KVMI_EVENT_PF, &e, sizeof(e),
++			      NULL, 0, &action);
++	if (err)
++		return KVMI_EVENT_ACTION_CONTINUE;
++
++	return action;
 +}
-+
- /*
-  * These commands are executed by the receiving thread.
-  */
-@@ -348,6 +359,7 @@ static int(*const msg_vm[])(struct kvm_introspection *,
- 	[KVMI_VM_GET_INFO]        = handle_vm_get_info,
- 	[KVMI_VM_GET_MAX_GFN]     = handle_vm_get_max_gfn,
- 	[KVMI_VM_READ_PHYSICAL]   = handle_vm_read_physical,
-+	[KVMI_VM_SET_PAGE_ACCESS] = handle_vm_set_page_access,
- 	[KVMI_VM_WRITE_PHYSICAL]  = handle_vm_write_physical,
- };
- 
