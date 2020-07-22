@@ -2,175 +2,212 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 59A1022A062
-	for <lists+kvm@lfdr.de>; Wed, 22 Jul 2020 21:59:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6815B22A09D
+	for <lists+kvm@lfdr.de>; Wed, 22 Jul 2020 22:14:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732480AbgGVT7l (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 22 Jul 2020 15:59:41 -0400
-Received: from mail-eopbgr60083.outbound.protection.outlook.com ([40.107.6.83]:20215
-        "EHLO EUR04-DB3-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726525AbgGVT7k (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 22 Jul 2020 15:59:40 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=TCe1iNUWcLy8vnQKdTuUqBZvnbvLjh4qkDR4hSMx1bD69PsL7mY6axtzqEkIpoBhJXIkvqelDkOsNiVroSCV3EpNKb4/zQ7b3aeRPhTo0apE6qxsngBZOI/WfcBrcGzVSV44GJbXAOS37hpAfLcT1EQEN1T1j6YsOR2EkB6cM2kwcvmuej9sG9+TWapC0Y/iwtyGyXAnyOrGonJ8uy9oyuhgMheQXe8OGoYuE2pP2zO5EhRq5cbT+7axew4mPW6yLkmKfJuBKLOsCp99ZRS6WqWezJw0z3jQbZHWzCl/oGns5I8+OBp8iP0/eervcqrNf8rbAEFaxnBDqocxf81Pkw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=iGnDCXd5ioezBdVspcwdN8R6jyAldhQV7kTz7vVKUPo=;
- b=bK9BSD8Kx/3UfwfrTo/6eboa/EMXuCtGl+UXEw6f1+Dm4LiWvNNyTu704pAu9KLIbzCak7YjMHpSIyaYyBPpKIizNqWTmLGxaN2Cmcgr8ISHdGTQk46sPSI5k5a7gsjxInBf8sdSpyp29ZbfIq3iyeXe5TOyhq/n2bJYOAxBaedFb/ESdmK0rRizjtpd+pkJt/V+gKSsXB7sydEiszNRL8jpqGe9dqcvacTUuLe0Yg9pBZqVuo51Oji5UDgLCMVkWhuV5bJop8kdjMjOHR8GAWh+alkp3rHmtDyJrCRFPhKn3gw0tPCjmNqOTwGQ4QTi54zWL+SqZV32n0Tta6kUcQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=mellanox.com; dmarc=pass action=none header.from=mellanox.com;
- dkim=pass header.d=mellanox.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Mellanox.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=iGnDCXd5ioezBdVspcwdN8R6jyAldhQV7kTz7vVKUPo=;
- b=QpR1PRHNvYFNgMQK6cfFhLcQX/TWdgVseOG6fcMziI2fWl9jJAm1K8WBLRkSzrPlgaM9Lstjgg+1CXTGNYqq61k0m3ITAKxU2xr+44CM8YnqwzMAvrD9xI6b/0oweZC8Xw8RxJVv73CJr+WbNUVKwwFI56LYciRhS1fcP99Uc8I=
-Authentication-Results: kernel.org; dkim=none (message not signed)
- header.d=none;kernel.org; dmarc=none action=none header.from=mellanox.com;
-Received: from VI1PR05MB4141.eurprd05.prod.outlook.com (2603:10a6:803:44::15)
- by VI1PR05MB4927.eurprd05.prod.outlook.com (2603:10a6:803:56::26) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3216.21; Wed, 22 Jul
- 2020 19:59:34 +0000
-Received: from VI1PR05MB4141.eurprd05.prod.outlook.com
- ([fe80::252e:52c7:170b:35d]) by VI1PR05MB4141.eurprd05.prod.outlook.com
- ([fe80::252e:52c7:170b:35d%5]) with mapi id 15.20.3195.028; Wed, 22 Jul 2020
- 19:59:34 +0000
-Date:   Wed, 22 Jul 2020 16:59:28 -0300
-From:   Jason Gunthorpe <jgg@mellanox.com>
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     Dave Jiang <dave.jiang@intel.com>, vkoul@kernel.org,
-        megha.dey@intel.com, bhelgaas@google.com, rafael@kernel.org,
-        gregkh@linuxfoundation.org, tglx@linutronix.de, hpa@zytor.com,
-        alex.williamson@redhat.com, jacob.jun.pan@intel.com,
-        ashok.raj@intel.com, yi.l.liu@intel.com, baolu.lu@intel.com,
-        kevin.tian@intel.com, sanjay.k.kumar@intel.com,
-        tony.luck@intel.com, jing.lin@intel.com, dan.j.williams@intel.com,
-        kwankhede@nvidia.com, eric.auger@redhat.com, parav@mellanox.com,
-        dave.hansen@intel.com, netanelg@mellanox.com, shahafs@mellanox.com,
-        yan.y.zhao@linux.intel.com, pbonzini@redhat.com,
-        samuel.ortiz@intel.com, mona.hossain@intel.com,
-        dmaengine@vger.kernel.org, linux-kernel@vger.kernel.org,
-        x86@kernel.org, linux-pci@vger.kernel.org, kvm@vger.kernel.org
-Subject: Re: [PATCH RFC v2 02/18] irq/dev-msi: Add support for a new DEV_MSI
- irq domain
-Message-ID: <20200722195928.GN2021248@mellanox.com>
-References: <159534667974.28840.2045034360240786644.stgit@djiang5-desk3.ch.intel.com>
- <159534734833.28840.10067945890695808535.stgit@djiang5-desk3.ch.intel.com>
- <878sfbxtzi.wl-maz@kernel.org>
+        id S1728263AbgGVUOp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 22 Jul 2020 16:14:45 -0400
+Received: from mga14.intel.com ([192.55.52.115]:5765 "EHLO mga14.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726564AbgGVUOp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 22 Jul 2020 16:14:45 -0400
+IronPort-SDR: geoAAs1tLuEpC960nkpQIqjnle4sQDTDNGASp95u5eFCVsUcMkUnwDCbJ6JhfEiRXCnp8E42oj
+ csY8pA0h51Qg==
+X-IronPort-AV: E=McAfee;i="6000,8403,9690"; a="149596481"
+X-IronPort-AV: E=Sophos;i="5.75,383,1589266800"; 
+   d="scan'208";a="149596481"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jul 2020 13:14:44 -0700
+IronPort-SDR: sJk5YV1JL3JCyBwvZGyFggoOXg6ZWKzFlDEIhVOjLLep/SXIlqkEQfM8XIekrCZoUYyaZWJeEO
+ lPkqHxbWRFiQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.75,383,1589266800"; 
+   d="scan'208";a="462584581"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.152])
+  by orsmga005.jf.intel.com with ESMTP; 22 Jul 2020 13:14:44 -0700
+Date:   Wed, 22 Jul 2020 13:14:44 -0700
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Yang Weijiang <weijiang.yang@intel.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        pbonzini@redhat.com, jmattson@google.com,
+        yu.c.zhang@linux.intel.com
+Subject: Re: [RESEND v13 03/11] KVM: VMX: Set guest CET MSRs per KVM and host
+ configuration
+Message-ID: <20200722201444.GD9114@linux.intel.com>
+References: <20200716031627.11492-1-weijiang.yang@intel.com>
+ <20200716031627.11492-4-weijiang.yang@intel.com>
+MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <878sfbxtzi.wl-maz@kernel.org>
-X-ClientProxiedBy: YT1PR01CA0042.CANPRD01.PROD.OUTLOOK.COM
- (2603:10b6:b01:2e::11) To VI1PR05MB4141.eurprd05.prod.outlook.com
- (2603:10a6:803:44::15)
-MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from mlx.ziepe.ca (156.34.48.30) by YT1PR01CA0042.CANPRD01.PROD.OUTLOOK.COM (2603:10b6:b01:2e::11) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3216.22 via Frontend Transport; Wed, 22 Jul 2020 19:59:33 +0000
-Received: from jgg by mlx with local (Exim 4.94)        (envelope-from <jgg@mellanox.com>)      id 1jyKtk-00E3bq-St; Wed, 22 Jul 2020 16:59:28 -0300
-X-Originating-IP: [156.34.48.30]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-HT: Tenant
-X-MS-Office365-Filtering-Correlation-Id: 74a53c8d-c10d-42cd-55c0-08d82e79c122
-X-MS-TrafficTypeDiagnostic: VI1PR05MB4927:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <VI1PR05MB492769BD90DA2B21586A0AFFCF790@VI1PR05MB4927.eurprd05.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:10000;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: KZO/s5SjgDuTOpq6Ob71zmkgmx+++dbgADhS/sFB/Gf7gMMqheBCOZtNZhPGTK2n6zu2bbQe4+/kOB4obFihg/wV1I2V8+cPojH93sOomuCxswLWOimrSB6eWoynIybN4NarETaQUodSY8ON7XQ0QzUD3dJezzQ8aMFVjz/qUHwGe9fpiSZVDRs+BQjdVwMAWacYyZ7h1/cayoxO+U1XJP+QbmH2Cj4iIsCf9mMMzdiAFZnUSwaGMK4tDsOctksMuG+3P0FfU5ggpksZq/UZTPo6I7pctZ9cbeLwhcj9YWZNm/nrhgeq06SJAxcG1HKt2ev6Y/ysb9Y4DllLZzkBdg==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:VI1PR05MB4141.eurprd05.prod.outlook.com;PTR:;CAT:NONE;SFTY:;SFS:(4636009)(39860400002)(376002)(396003)(366004)(346002)(136003)(4326008)(2906002)(9786002)(9746002)(186003)(66556008)(33656002)(6916009)(26005)(316002)(36756003)(7416002)(7406005)(8676002)(66476007)(478600001)(1076003)(426003)(2616005)(8936002)(86362001)(83380400001)(5660300002)(66946007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData: p5G0tpn4DYJ2hk8XGZlkDMkPkNM0Lk5BF3802CEMXlozv2UvFVB4+8siuJjyGdHmxvgnfEv5d6uijNshBkGoQKiNTrfFFNWhcaq3YhSJOs+ATjU0LpF5mURSclBW8wd9ahapb4lPfH42OXt4ltCfiaQWi0/a/PT5LwN4fN/BDeJjWd/tgCW5FcEHx3m641H0lTo4NURMR2M8khL/lUqvRR3obZdKab9z/TU7MrAlcEcpA5Mm6OTOU140tP58DWml1BDDxQBwRGMJ6NCGQwrHUmIhMIfEOHdtKxcJ6+/NwRVIYLSlPU3pHm5Av3OuDxxYoJHBO+C9s8VeJsy1CZQJD7Slu77Kdjdzo/7y5J6jgd4ECrgkz6tuUAYiG8JHdj24SjPonS6viA5wN3h5ZrwHNyhNZdiEOcZdJFmbNSv8mLzCJTYGIalkBVlhyss4/fNAVNq+PMs103MejpxqEhP+jTrYx8OwzWxvtDHPPZd0GII=
-X-OriginatorOrg: Mellanox.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 74a53c8d-c10d-42cd-55c0-08d82e79c122
-X-MS-Exchange-CrossTenant-AuthSource: VI1PR05MB4141.eurprd05.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Jul 2020 19:59:34.6744
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: a652971c-7d2e-4d9b-a6a4-d149256f461b
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: xD151n8rjK2bbI66Wj7FTCm0tg27V0dudWfZfQmYmxpwXfRgyRTHzmYoSMzHo4Y3DgPEu5oGt6mSwFU4Y+JLNA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR05MB4927
+In-Reply-To: <20200716031627.11492-4-weijiang.yang@intel.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jul 22, 2020 at 07:52:33PM +0100, Marc Zyngier wrote:
+On Thu, Jul 16, 2020 at 11:16:19AM +0800, Yang Weijiang wrote:
+> CET MSRs pass through guest directly to enhance performance. CET runtime
+> control settings are stored in MSR_IA32_{U,S}_CET, Shadow Stack Pointer(SSP)
+> are stored in MSR_IA32_PL{0,1,2,3}_SSP, SSP table base address is stored in
+> MSR_IA32_INT_SSP_TAB, these MSRs are defined in kernel and re-used here.
+> 
+> MSR_IA32_U_CET and MSR_IA32_PL3_SSP are used for user-mode protection,the MSR
+> contents are switched between threads during scheduling, it makes sense to pass
+> through them so that the guest kernel can use xsaves/xrstors to operate them
+> efficiently. Other MSRs are used for non-user mode protection. See SDM for detailed
+> info.
+> 
+> The difference between CET VMCS fields and CET MSRs is that,the former are used
+> during VMEnter/VMExit, whereas the latter are used for CET state storage between
+> task/thread scheduling.
 
-> Which is exactly what platform-MSI already does. Why do we need
-> something else?
+I moved this patch until after CET virtualization is enabled.  Functionally,
+KVM should be able to virtualize CET without allowing the guest to access
+the MSRs directly.  Moving this after CET enabling will allow bisecting this
+specific patch, e.g. if there's a problem with pass-through but not basic
+support, or vice versa, and will also allow better testing of the MSR access
+code.  At least, that's the theory.
+ 
+> Co-developed-by: Zhang Yi Z <yi.z.zhang@linux.intel.com>
+> Signed-off-by: Zhang Yi Z <yi.z.zhang@linux.intel.com>
+> Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
+> ---
+>  arch/x86/kvm/vmx/vmx.c | 46 ++++++++++++++++++++++++++++++++++++++++++
+>  arch/x86/kvm/x86.c     |  3 +++
+>  2 files changed, 49 insertions(+)
+> 
+> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> index 13745f2a5ecd..a9f135c52cbc 100644
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -3126,6 +3126,13 @@ void vmx_load_mmu_pgd(struct kvm_vcpu *vcpu, unsigned long pgd)
+>  		vmcs_writel(GUEST_CR3, guest_cr3);
+>  }
+>  
+> +static bool is_cet_state_supported(struct kvm_vcpu *vcpu, u32 xss_states)
 
-It looks to me like all the code is around managing the
-dev->msi_domain of the devices.
+s/xss_states/xss_state, i.e. make it singular instead of plural to match the
+function name, and because the below check is at best ambiguous for multiple
+states, e.g. it arguably should be ((supported_xss & xss_states) == xss_states).
 
-The intended use would have PCI drivers create children devices using
-mdev or virtbus and those devices wouldn't have a msi_domain from the
-platform. Looks like platform_msi_alloc_priv_data() fails immediately
-because dev->msi_domain will be NULL for these kinds of devices.
+> +{
+> +	return ((supported_xss & xss_states) &&
 
-Maybe that issue should be handled directly instead of wrappering
-platform_msi_*?
+Nit, the () around the entire statement is unnecessary.
 
-For instance a trivial addition to the platform_msi API:
+Checking supported_xss is incorrect, this needs to check guest_supported_xss.
 
-  platform_msi_assign_domain(struct_device *newly_created_virtual_device,
-                             struct device *physical_device);
+> +		(guest_cpuid_has(vcpu, X86_FEATURE_SHSTK) ||
+> +		guest_cpuid_has(vcpu, X86_FEATURE_IBT)));
 
-Which could set the msi_domain of new device using the topology of
-physical_device to deduce the correct domain?
+Nit, please align inner statements, e.g. so it looks like:
 
-Then the question is how to properly create a domain within the
-hardware topology of physical_device with the correct parameters for
-the platform. 
+               (guest_cpuid_has(...) ||
+                guest_cpuid_has(...)))
 
-Why do we need a dummy msi_domain anyhow? Can this just use
-physical_device->msi_domain directly? (I'm at my limit here of how
-much of this I remember, sorry)
+> +}
+> +
+>  int vmx_set_cr4(struct kvm_vcpu *vcpu, unsigned long cr4)
+>  {
+>  	struct vcpu_vmx *vmx = to_vmx(vcpu);
+> @@ -7230,6 +7237,42 @@ static void update_intel_pt_cfg(struct kvm_vcpu *vcpu)
+>  		vmx->pt_desc.ctl_bitmask &= ~(0xfULL << (32 + i * 4));
+>  }
+>  
+> +static void vmx_update_intercept_for_cet_msr(struct kvm_vcpu *vcpu)
+> +{
+> +	struct vcpu_vmx *vmx = to_vmx(vcpu);
+> +	unsigned long *msr_bitmap = vmx->vmcs01.msr_bitmap;
 
-If you solve that it should solve the remapping problem too, as the
-physical_device is already assigned by the platform to a remapping irq
-domain if that is what the platform wants.
+Naming the local 'bitmap' will avoid wrapping lines.  Everything except
+INT_SSP_TAB fits under 80 chars, and for that one it's ok to poke out a bit.
 
->> +	parent = irq_get_default_host();
-> Really? How is it going to work once you have devices sending their
-> MSIs to two different downstream blocks? This looks rather
-> short-sighted.
+> +	bool incpt;
+> +
+> +	incpt = !is_cet_state_supported(vcpu, XFEATURE_MASK_CET_USER);
 
-.. and fix this too, the parent domain should be derived from the
-topology of the physical_device which is originating the interrupt
-messages.
+> +	/*
+> +	 * U_CET is required for USER CET, and U_CET, PL3_SPP are bound as
+> +	 * one component and controlled by IA32_XSS[bit 11].
+> +	 */
+> +	vmx_set_intercept_for_msr(msr_bitmap, MSR_IA32_U_CET, MSR_TYPE_RW,
+> +				  incpt);
+> +	vmx_set_intercept_for_msr(msr_bitmap, MSR_IA32_PL3_SSP, MSR_TYPE_RW,
+> +				  incpt);
 
-> On the other hand, masking an interrupt is an irqchip operation, and
-> only concerns the irqchip level. Here, you seem to be making it an
-> end-point operation, which doesn't really make sense to me. Or is this
-> device its own interrupt controller as well? That would be extremely
-> surprising, and I'd expect some block downstream of the device to be
-> able to control the masking of the interrupt.
+This is wrong, PL3_SSP should be intercepted if IBT is supported by SHSTK is
+not.  Weird XSAVES virtualization hole aside, we need to be consistent with
+the emulation of the MSRs.
 
-These are message interrupts so they originate directly from the
-device and generally travel directly to the CPU APIC. On the wire
-there is no difference between a MSI, MSI-X and a device using the
-dev-msi approach. 
+> +
+> +	incpt = !is_cet_state_supported(vcpu, XFEATURE_MASK_CET_KERNEL);
+> +	/*
+> +	 * S_CET is required for KERNEL CET, and PL0_SSP ... PL2_SSP are
+> +	 * bound as one component and controlled by IA32_XSS[bit 12].
+> +	 */
+> +	vmx_set_intercept_for_msr(msr_bitmap, MSR_IA32_S_CET, MSR_TYPE_RW,
+> +				  incpt);
+> +	vmx_set_intercept_for_msr(msr_bitmap, MSR_IA32_PL0_SSP, MSR_TYPE_RW,
+> +				  incpt);
+> +	vmx_set_intercept_for_msr(msr_bitmap, MSR_IA32_PL1_SSP, MSR_TYPE_RW,
+> +				  incpt);
+> +	vmx_set_intercept_for_msr(msr_bitmap, MSR_IA32_PL2_SSP, MSR_TYPE_RW,
+> +				  incpt);
+> +
+> +	incpt |= !guest_cpuid_has(vcpu, X86_FEATURE_SHSTK);
+> +	/* SSP_TAB is only available for KERNEL SHSTK.*/
+> +	vmx_set_intercept_for_msr(msr_bitmap, MSR_IA32_INT_SSP_TAB, MSR_TYPE_RW,
+> +				  incpt);
+> +}
+> +
+>  static void vmx_cpuid_update(struct kvm_vcpu *vcpu)
+>  {
+>  	struct vcpu_vmx *vmx = to_vmx(vcpu);
+> @@ -7268,6 +7311,9 @@ static void vmx_cpuid_update(struct kvm_vcpu *vcpu)
+>  			vmx_set_guest_msr(vmx, msr, enabled ? 0 : TSX_CTRL_RTM_DISABLE);
+>  		}
+>  	}
+> +
+> +	if (supported_xss & (XFEATURE_MASK_CET_KERNEL | XFEATURE_MASK_CET_USER))
 
-IIRC on Intel/AMD at least once a MSI is launched it is not maskable.
+Given that the proposed kernel support bundles USER and KERNEL together, we
+can simplify the KVM implementation by adding kvm_cet_supported(), with a
+similar implementation to MPX:
 
-So the model for MSI is always "mask at source". The closest mapping
-to the Linux IRQ model is to say the end device has a irqchip that
-encapsulates the ability of the device to generate the MSI in the
-first place.
+static inline bool kvm_cet_supported(void)
+{
+	const u64 mask = XFEATURE_MASK_CET_USER | XFEATURE_MASK_CET_KERNEL;
 
-It looks like existing platform_msi drivers deal with "masking"
-implicitly by halting the device interrupt generation before releasing
-the interrupt and have no way for the generic irqchip layer to mask
-the interrupt.
+	return (supported_xss & mask) == mask;
+}
 
-I suppose the motivation to make it explicit is related to vfio using
-the generic mask/unmask functionality?
+> +		vmx_update_intercept_for_cet_msr(vcpu);
+>  }
+>  
+>  static __init void vmx_set_cpu_caps(void)
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 88c593f83b28..ea8a9dc9fbad 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -184,6 +184,9 @@ static struct kvm_shared_msrs __percpu *shared_msrs;
+>  				| XFEATURE_MASK_BNDCSR | XFEATURE_MASK_AVX512 \
+>  				| XFEATURE_MASK_PKRU)
+>  
+> +#define KVM_SUPPORTED_XSS       (XFEATURE_MASK_CET_USER | \
+> +				 XFEATURE_MASK_CET_KERNEL)
 
-Explicit seems better, IMHO.
+Xiaoyao called out that this belongs in a later patch, which it does, but we
+can actually do away with it entirely.  Because CET is dependent on multiple
+features and feature flags, we can't do a straight mask in any case, i.e.
+having KVM_SUPPORTED_XSS doesn't add value as VMX needs to manually set the
+CET flags anyways.
 
-Jason
+>  u64 __read_mostly host_efer;
+>  EXPORT_SYMBOL_GPL(host_efer);
+>  
+> -- 
+> 2.17.2
+> 
