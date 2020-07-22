@@ -2,189 +2,90 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 95564229579
-	for <lists+kvm@lfdr.de>; Wed, 22 Jul 2020 11:53:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4F1D022958D
+	for <lists+kvm@lfdr.de>; Wed, 22 Jul 2020 11:58:30 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731629AbgGVJxL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 22 Jul 2020 05:53:11 -0400
-Received: from mga18.intel.com ([134.134.136.126]:63311 "EHLO mga18.intel.com"
+        id S1731271AbgGVJ5y (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 22 Jul 2020 05:57:54 -0400
+Received: from mail.kernel.org ([198.145.29.99]:52000 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1731561AbgGVJxL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 22 Jul 2020 05:53:11 -0400
-IronPort-SDR: P+X4izlAgIkDr8yuxWDb/1457zkaH+BNL4ZBjLUHys3Etmlys5QxEo7zxKXv2cJtTPzu6d5Q/o
- cz3Q2hiGExeg==
-X-IronPort-AV: E=McAfee;i="6000,8403,9689"; a="137804230"
-X-IronPort-AV: E=Sophos;i="5.75,381,1589266800"; 
-   d="scan'208";a="137804230"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga006.fm.intel.com ([10.253.24.20])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jul 2020 02:53:09 -0700
-IronPort-SDR: mB+rfWFeiRQEzremak0a2YtT3q+qmLrum5kwCitYG3VPFZUd7hq0Gru2Wimin1BrZ+o4YyTuWK
- lr6NBKFCk/tA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.75,381,1589266800"; 
-   d="scan'208";a="487936075"
-Received: from unknown (HELO localhost.localdomain.bj.intel.com) ([10.240.192.131])
-  by fmsmga006.fm.intel.com with ESMTP; 22 Jul 2020 02:53:06 -0700
-From:   Zhu Lingshan <lingshan.zhu@live.com>
-To:     jasowang@redhat.com, alex.williamson@redhat.com, mst@redhat.com,
-        pbonzini@redhat.com, sean.j.christopherson@intel.com,
-        wanpengli@tencent.com
-Cc:     virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        kvm@vger.kernel.org, Zhu Lingshan <lingshan.zhu@intel.com>,
-        lszhu <lszhu@localhost.localdomain>,
-        Zhu Lingshan <lingshan.zhu@live.com>
-Subject: [PATCH V3 1/6] vhost: introduce vhost_vring_call
-Date:   Wed, 22 Jul 2020 17:49:05 +0800
-Message-Id: <20200722094910.218014-2-lingshan.zhu@live.com>
-X-Mailer: git-send-email 2.18.4
-In-Reply-To: <20200722094910.218014-1-lingshan.zhu@live.com>
-References: <20200722094910.218014-1-lingshan.zhu@live.com>
+        id S1726153AbgGVJ5x (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 22 Jul 2020 05:57:53 -0400
+Received: from localhost (83-86-89-107.cable.dynamic.v4.ziggo.nl [83.86.89.107])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 84C4220714;
+        Wed, 22 Jul 2020 09:57:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1595411873;
+        bh=Ac2zSfnLK6EdjtxqVu1WgVKMMw2MnwHoF9j9QNHNO7g=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=abKrNRxXeuctelcKVMQbIUVI1Fxcf2Kts4FdVgofW1X77fDquvE4r9eZGe7/KBJsb
+         DotcyKDC//m8E2dWye8Sa6UoTEfBk+ehLisu8oOYbqRPDppbhrS835EBNvvSs5dfVa
+         doYjLbY6XAMppyxD6z7vZ1B8qgDfDDKM4B3MMqRk=
+Date:   Wed, 22 Jul 2020 11:57:59 +0200
+From:   Greg KH <gregkh@linuxfoundation.org>
+To:     "Paraschiv, Andra-Irina" <andraprs@amazon.com>
+Cc:     linux-kernel@vger.kernel.org,
+        Anthony Liguori <aliguori@amazon.com>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Colm MacCarthaigh <colmmacc@amazon.com>,
+        David Duncan <davdunc@amazon.com>,
+        Bjoern Doebel <doebel@amazon.de>,
+        David Woodhouse <dwmw@amazon.co.uk>,
+        Frank van der Linden <fllinden@amazon.com>,
+        Alexander Graf <graf@amazon.de>, Karen Noel <knoel@redhat.com>,
+        Martin Pohlack <mpohlack@amazon.de>,
+        Matt Wilson <msw@amazon.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Balbir Singh <sblbir@amazon.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Stewart Smith <trawets@amazon.com>,
+        Uwe Dannowski <uwed@amazon.de>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org,
+        ne-devel-upstream@amazon.com, Alexander Graf <graf@amazon.com>
+Subject: Re: [PATCH v5 01/18] nitro_enclaves: Add ioctl interface definition
+Message-ID: <20200722095759.GA2817347@kroah.com>
+References: <20200715194540.45532-1-andraprs@amazon.com>
+ <20200715194540.45532-2-andraprs@amazon.com>
+ <20200721121225.GA1855212@kroah.com>
+ <5dad638c-0ef3-9d16-818c-54e1556d8fc8@amazon.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <5dad638c-0ef3-9d16-818c-54e1556d8fc8@amazon.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Zhu Lingshan <lingshan.zhu@intel.com>
+On Wed, Jul 22, 2020 at 11:27:29AM +0300, Paraschiv, Andra-Irina wrote:
+> > > +#ifndef _UAPI_LINUX_NITRO_ENCLAVES_H_
+> > > +#define _UAPI_LINUX_NITRO_ENCLAVES_H_
+> > > +
+> > > +#include <linux/types.h>
+> > > +
+> > > +/* Nitro Enclaves (NE) Kernel Driver Interface */
+> > > +
+> > > +#define NE_API_VERSION (1)
+> > Why do you need this version?  It shouldn't be needed, right?
+> 
+> The version is used as a way for the user space tooling to sync on the
+> features set provided by the driver e.g. in case an older version of the
+> driver is available on the system and the user space tooling expects a set
+> of features that is not included in that driver version.
 
-This commit introduces struct vhost_vring_call which replaced
-raw struct eventfd_ctx *call_ctx in struct vhost_virtqueue.
-Besides eventfd_ctx, it contains a spin lock and an
-irq_bypass_producer in its structure.
+That is guaranteed to get out of sync instantly with different distro
+kernels backporting random things, combined with stable kernel patch
+updates and the like.
 
-Signed-off-by: Zhu Lingshan <lingshan.zhu@intel.com>
-Signed-off-by: lszhu <lszhu@localhost.localdomain>
-Signed-off-by: Zhu Lingshan <lingshan.zhu@live.com>
----
- drivers/vhost/vdpa.c  |  4 ++--
- drivers/vhost/vhost.c | 22 ++++++++++++++++------
- drivers/vhost/vhost.h |  9 ++++++++-
- 3 files changed, 26 insertions(+), 9 deletions(-)
+Just use the normal api interfaces instead, don't try to "version"
+anything, it will not work, trust us :)
 
-diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
-index a54b60d6623f..df3cf386b0cd 100644
---- a/drivers/vhost/vdpa.c
-+++ b/drivers/vhost/vdpa.c
-@@ -96,7 +96,7 @@ static void handle_vq_kick(struct vhost_work *work)
- static irqreturn_t vhost_vdpa_virtqueue_cb(void *private)
- {
- 	struct vhost_virtqueue *vq = private;
--	struct eventfd_ctx *call_ctx = vq->call_ctx;
-+	struct eventfd_ctx *call_ctx = vq->call_ctx.ctx;
- 
- 	if (call_ctx)
- 		eventfd_signal(call_ctx, 1);
-@@ -382,7 +382,7 @@ static long vhost_vdpa_vring_ioctl(struct vhost_vdpa *v, unsigned int cmd,
- 		break;
- 
- 	case VHOST_SET_VRING_CALL:
--		if (vq->call_ctx) {
-+		if (vq->call_ctx.ctx) {
- 			cb.callback = vhost_vdpa_virtqueue_cb;
- 			cb.private = vq;
- 		} else {
-diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
-index d7b8df3edffc..9f1a845a9302 100644
---- a/drivers/vhost/vhost.c
-+++ b/drivers/vhost/vhost.c
-@@ -298,6 +298,13 @@ static void vhost_vq_meta_reset(struct vhost_dev *d)
- 		__vhost_vq_meta_reset(d->vqs[i]);
- }
- 
-+static void vhost_vring_call_reset(struct vhost_vring_call *call_ctx)
-+{
-+	call_ctx->ctx = NULL;
-+	memset(&call_ctx->producer, 0x0, sizeof(struct irq_bypass_producer));
-+	spin_lock_init(&call_ctx->ctx_lock);
-+}
-+
- static void vhost_vq_reset(struct vhost_dev *dev,
- 			   struct vhost_virtqueue *vq)
- {
-@@ -319,13 +326,13 @@ static void vhost_vq_reset(struct vhost_dev *dev,
- 	vq->log_base = NULL;
- 	vq->error_ctx = NULL;
- 	vq->kick = NULL;
--	vq->call_ctx = NULL;
- 	vq->log_ctx = NULL;
- 	vhost_reset_is_le(vq);
- 	vhost_disable_cross_endian(vq);
- 	vq->busyloop_timeout = 0;
- 	vq->umem = NULL;
- 	vq->iotlb = NULL;
-+	vhost_vring_call_reset(&vq->call_ctx);
- 	__vhost_vq_meta_reset(vq);
- }
- 
-@@ -685,8 +692,8 @@ void vhost_dev_cleanup(struct vhost_dev *dev)
- 			eventfd_ctx_put(dev->vqs[i]->error_ctx);
- 		if (dev->vqs[i]->kick)
- 			fput(dev->vqs[i]->kick);
--		if (dev->vqs[i]->call_ctx)
--			eventfd_ctx_put(dev->vqs[i]->call_ctx);
-+		if (dev->vqs[i]->call_ctx.ctx)
-+			eventfd_ctx_put(dev->vqs[i]->call_ctx.ctx);
- 		vhost_vq_reset(dev, dev->vqs[i]);
- 	}
- 	vhost_dev_free_iovecs(dev);
-@@ -1629,7 +1636,10 @@ long vhost_vring_ioctl(struct vhost_dev *d, unsigned int ioctl, void __user *arg
- 			r = PTR_ERR(ctx);
- 			break;
- 		}
--		swap(ctx, vq->call_ctx);
-+
-+		spin_lock(&vq->call_ctx.ctx_lock);
-+		swap(ctx, vq->call_ctx.ctx);
-+		spin_unlock(&vq->call_ctx.ctx_lock);
- 		break;
- 	case VHOST_SET_VRING_ERR:
- 		if (copy_from_user(&f, argp, sizeof f)) {
-@@ -2440,8 +2450,8 @@ static bool vhost_notify(struct vhost_dev *dev, struct vhost_virtqueue *vq)
- void vhost_signal(struct vhost_dev *dev, struct vhost_virtqueue *vq)
- {
- 	/* Signal the Guest tell them we used something up. */
--	if (vq->call_ctx && vhost_notify(dev, vq))
--		eventfd_signal(vq->call_ctx, 1);
-+	if (vq->call_ctx.ctx && vhost_notify(dev, vq))
-+		eventfd_signal(vq->call_ctx.ctx, 1);
- }
- EXPORT_SYMBOL_GPL(vhost_signal);
- 
-diff --git a/drivers/vhost/vhost.h b/drivers/vhost/vhost.h
-index c8e96a095d3b..38eb1aa3b68d 100644
---- a/drivers/vhost/vhost.h
-+++ b/drivers/vhost/vhost.h
-@@ -13,6 +13,7 @@
- #include <linux/virtio_ring.h>
- #include <linux/atomic.h>
- #include <linux/vhost_iotlb.h>
-+#include <linux/irqbypass.h>
- 
- struct vhost_work;
- typedef void (*vhost_work_fn_t)(struct vhost_work *work);
-@@ -60,6 +61,12 @@ enum vhost_uaddr_type {
- 	VHOST_NUM_ADDRS = 3,
- };
- 
-+struct vhost_vring_call {
-+	struct eventfd_ctx *ctx;
-+	struct irq_bypass_producer producer;
-+	spinlock_t ctx_lock;
-+};
-+
- /* The virtqueue structure describes a queue attached to a device. */
- struct vhost_virtqueue {
- 	struct vhost_dev *dev;
-@@ -72,7 +79,7 @@ struct vhost_virtqueue {
- 	vring_used_t __user *used;
- 	const struct vhost_iotlb_map *meta_iotlb[VHOST_NUM_ADDRS];
- 	struct file *kick;
--	struct eventfd_ctx *call_ctx;
-+	struct vhost_vring_call call_ctx;
- 	struct eventfd_ctx *error_ctx;
- 	struct eventfd_ctx *log_ctx;
- 
--- 
-2.18.4
+If an ioctl returns -ENOTTY then hey, it's not present and your
+userspace code can handle it that way.
 
+thanks,
+
+greg k-h
