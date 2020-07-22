@@ -2,106 +2,94 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D559122A046
-	for <lists+kvm@lfdr.de>; Wed, 22 Jul 2020 21:48:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 441C722A04B
+	for <lists+kvm@lfdr.de>; Wed, 22 Jul 2020 21:49:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732360AbgGVTsG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 22 Jul 2020 15:48:06 -0400
-Received: from mga03.intel.com ([134.134.136.65]:61947 "EHLO mga03.intel.com"
+        id S1732557AbgGVTsx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 22 Jul 2020 15:48:53 -0400
+Received: from mga12.intel.com ([192.55.52.136]:36992 "EHLO mga12.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726322AbgGVTsG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 22 Jul 2020 15:48:06 -0400
-IronPort-SDR: dFYppU4XYY9lYqN3wpz+zx6Dc/i+Lm+34jLybgjumL7E7TsdIDotmUCAXXGOB+hnCa8BNQWmRh
- GFi4QIiRzHYQ==
-X-IronPort-AV: E=McAfee;i="6000,8403,9690"; a="150387669"
+        id S1726157AbgGVTsw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 22 Jul 2020 15:48:52 -0400
+IronPort-SDR: /Ql/DWqO4cc7/GJjictpTBwnWVZIDEc/ee8fA8aIDZF7un+xNHW06uAQ5ACuDKo9YFf5FB/kqr
+ j1haVqE8M8KQ==
+X-IronPort-AV: E=McAfee;i="6000,8403,9690"; a="129975929"
 X-IronPort-AV: E=Sophos;i="5.75,383,1589266800"; 
-   d="scan'208";a="150387669"
+   d="scan'208";a="129975929"
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jul 2020 12:48:05 -0700
-IronPort-SDR: r9maA/iucCrZf50hkHfb11scgmVnKBrFPuIo4JMHXQ5WBXO+oKh/rBRkE/qauSg6XRTdnSFFoh
- UV68JX0FhFdA==
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jul 2020 12:48:52 -0700
+IronPort-SDR: wvqOUWN7ePWMY35wp8A3MZ+1fd6IImJ8hi2QoUYL5oAiVimoIJ1RPF0ydeIMDJZVFPT8E2S+DK
+ EWSwLL8+7Gqw==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.75,383,1589266800"; 
-   d="scan'208";a="320399186"
+   d="scan'208";a="310753345"
 Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.152])
-  by fmsmga002.fm.intel.com with ESMTP; 22 Jul 2020 12:48:05 -0700
-Date:   Wed, 22 Jul 2020 12:48:05 -0700
+  by fmsmga004.fm.intel.com with ESMTP; 22 Jul 2020 12:48:52 -0700
+Date:   Wed, 22 Jul 2020 12:48:51 -0700
 From:   Sean Christopherson <sean.j.christopherson@intel.com>
 To:     Yang Weijiang <weijiang.yang@intel.com>
 Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
         pbonzini@redhat.com, jmattson@google.com,
         yu.c.zhang@linux.intel.com
-Subject: Re: [RESEND PATCH v13 00/11] Introduce support for guest CET feature
-Message-ID: <20200722194805.GB9114@linux.intel.com>
+Subject: Re: [RESEND v13 02/11] KVM: VMX: Introduce CET VMCS fields and flags
+Message-ID: <20200722194851.GC9114@linux.intel.com>
 References: <20200716031627.11492-1-weijiang.yang@intel.com>
+ <20200716031627.11492-3-weijiang.yang@intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200716031627.11492-1-weijiang.yang@intel.com>
+In-Reply-To: <20200716031627.11492-3-weijiang.yang@intel.com>
 User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jul 16, 2020 at 11:16:16AM +0800, Yang Weijiang wrote:
-> Control-flow Enforcement Technology (CET) provides protection against
-> Return/Jump-Oriented Programming (ROP/JOP) attack. There're two CET
-> sub-features: Shadow Stack (SHSTK) and Indirect Branch Tracking (IBT).
-> SHSTK is to prevent ROP programming and IBT is to prevent JOP programming.
+On Thu, Jul 16, 2020 at 11:16:18AM +0800, Yang Weijiang wrote:
+> CET(Control-flow Enforcement Technology) is a CPU feature used to prevent
+> Return/Jump-Oriented Programming(ROP/JOP) attacks. It provides the following
+> sub-features to defend against ROP/JOP style control-flow subversion attacks:
 > 
-> Several parts in KVM have been updated to provide VM CET support, including:
-> CPUID/XSAVES config, MSR pass-through, user space MSR access interface, 
-> vmentry/vmexit config, nested VM etc. These patches have dependency on CET
-> kernel patches for xsaves support and CET definitions, e.g., MSR and related
-> feature flags.
+> Shadow Stack (SHSTK):
+>   A second stack for program which is used exclusively for control transfer
+>   operations.
 > 
-> CET kernel patches are here:
-> https://lkml.kernel.org/r/20200429220732.31602-1-yu-cheng.yu@intel.com
+> Indirect Branch Tracking (IBT):
+>   Code branching protection to defend against jump/call oriented programming.
 > 
-> v13:
-> - Added CET definitions as a separate patch to facilitate KVM test.
+> Several new CET MSRs are defined in kernel to support CET:
+>   MSR_IA32_{U,S}_CET: Controls the CET settings for user mode and kernel mode
+>   respectively.
+> 
+>   MSR_IA32_PL{0,1,2,3}_SSP: Stores shadow stack pointers for CPL-0,1,2,3
+>   protection respectively.
+> 
+>   MSR_IA32_INT_SSP_TAB: Stores base address of shadow stack pointer table.
+> 
+> Two XSAVES state bits are introduced for CET:
+>   IA32_XSS:[bit 11]: Control saving/restoring user mode CET states
+>   IA32_XSS:[bit 12]: Control saving/restoring kernel mode CET states.
+> 
+> Six VMCS fields are introduced for CET:
+>   {HOST,GUEST}_S_CET: Stores CET settings for kernel mode.
+>   {HOST,GUEST}_SSP: Stores shadow stack pointer of current task/thread.
+>   {HOST,GUEST}_INTR_SSP_TABLE: Stores base address of shadow stack pointer
+>   table.
+> 
+> If VM_EXIT_LOAD_HOST_CET_STATE = 1, the host CET states are restored from below
+> VMCS fields at VM-Exit:
+>   HOST_S_CET
+>   HOST_SSP
+>   HOST_INTR_SSP_TABLE
+> 
+> If VM_ENTRY_LOAD_GUEST_CET_STATE = 1, the guest CET states are loaded from below
+> VMCS fields at VM-Entry:
+>   GUEST_S_CET
+>   GUEST_SSP
+>   GUEST_INTR_SSP_TABLE
 
-What I actually want to do is pull in actual kernel patches themselves so
-that we can upstream KVM support without having to wait for the kernel to
-sort out the ABI, which seems like it's going to drag on.
-
-I was thinking that we'd only need the MSR/CR4/CPUID definitions, but forgot
-that KVM also needs XSAVES context switching, so it's not as simple as I was
-thinking.  It's still relatively simple, but it means there would be
-functional changes in the kernel.
-
-I'll respond to the main SSP series to pose the question of taking the two
-small-ish kernel patches through the KVM tree.
-
->  arch/x86/include/asm/kvm_host.h      |   4 +-
->  arch/x86/include/asm/vmx.h           |   8 +
->  arch/x86/include/uapi/asm/kvm.h      |   1 +
->  arch/x86/include/uapi/asm/kvm_para.h |   7 +-
->  arch/x86/kvm/cpuid.c                 |  28 ++-
->  arch/x86/kvm/vmx/capabilities.h      |   5 +
->  arch/x86/kvm/vmx/nested.c            |  34 ++++
->  arch/x86/kvm/vmx/vmcs12.c            | 267 ++++++++++++++++-----------
->  arch/x86/kvm/vmx/vmcs12.h            |  14 +-
->  arch/x86/kvm/vmx/vmx.c               | 262 +++++++++++++++++++++++++-
->  arch/x86/kvm/x86.c                   |  53 +++++-
->  arch/x86/kvm/x86.h                   |   2 +-
->  include/linux/kvm_host.h             |  32 ++++
->  13 files changed, 590 insertions(+), 127 deletions(-)
-
-I have quite a few comments/changes (will respond to individual patches),
-but have done all the updates/rework and, assuming I haven't broken things,
-we're nearing the point where I can carry this and push it past the finish
-line, e.g. get acks from tip/x86 maintainers for the kernel patches and
-send a pull request to Paolo.
-
-I pushed the result to:
-
-  https://github.com/sean-jc/linux/releases/tag/kvm-cet-v14-rc1
-
-can you please review and test?  If everything looks good, I'll post v14.
-If not, I'll work offline with you to get it into shape.
-
-Thanks!
+No changes to the patch itself, but I tweaked the formatting of the changelog
+a bit and expanded the introduction for SHSTK and IBT to provide a bit more
+background.
