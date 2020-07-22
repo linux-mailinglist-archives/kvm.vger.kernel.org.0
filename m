@@ -2,117 +2,120 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5D963229D91
-	for <lists+kvm@lfdr.de>; Wed, 22 Jul 2020 18:54:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0B12D229DAC
+	for <lists+kvm@lfdr.de>; Wed, 22 Jul 2020 19:02:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730694AbgGVQyz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 22 Jul 2020 12:54:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46384 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726564AbgGVQyy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 22 Jul 2020 12:54:54 -0400
-Received: from mail-lf1-x141.google.com (mail-lf1-x141.google.com [IPv6:2a00:1450:4864:20::141])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BDFC3C0619DC
-        for <kvm@vger.kernel.org>; Wed, 22 Jul 2020 09:54:53 -0700 (PDT)
-Received: by mail-lf1-x141.google.com with SMTP id m15so1043207lfp.7
-        for <kvm@vger.kernel.org>; Wed, 22 Jul 2020 09:54:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=QUxmdpqhygtgKfzN8W9vujh+GzdOa2S0bqyvDwXYyhA=;
-        b=wV+co3N+GbqN/y0oexAFRRgA4x0zoc2MLgnobj+GtwIikjfaAX3O4tJp9+0E/QTE4a
-         IBadGE3VzIlg/ZGN7ZdALOZfaOpWX+rFiBDJg++rJ9tbsdMABK7FuX5Ap8bNtP4kzCDk
-         /tzLC4ZuQYtp3U9M0KzBCdHy9w2fhLm+ebpnJjmmCedEGqGKFyiwvNfxx8I6D3QozfXc
-         7sA12yOo1tyb1vrs3KuCTZ+izv3FeBPQoWTTOD//8QCbEhSvhep5x4qulR1Tx9H8i8Cw
-         3ApnTAVI2Of8xOV4GDoZTPTAl9H9G+sqlsZvPvejhMnpxeyZ5xCqSaLCZk8WoU2ORf6k
-         Yfpg==
+        id S1726938AbgGVRCS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 22 Jul 2020 13:02:18 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:35196 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726157AbgGVRCR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 22 Jul 2020 13:02:17 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1595437335;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=kbVInIg0O9sB9/rV79n2+MQeF/xVnND4ezNrHJWAuNU=;
+        b=EXK/VEdppEduXGQURfW5X3Bergve8L9heTAokIr5LnBuGLyIREIB7/VyncVYulxGBol2HY
+        sSrUFLWQhHKew89YVYY8o93ElsD30eedrAHJT43+Ve/piI4IXObUC0GKE/ysQlL7tyU79a
+        xphyydGm/ka4YG3DUpIqii+InZ2n454=
+Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
+ [209.85.218.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-216-ALgg1YhDPKi4ow8oG8riYQ-1; Wed, 22 Jul 2020 13:02:13 -0400
+X-MC-Unique: ALgg1YhDPKi4ow8oG8riYQ-1
+Received: by mail-ej1-f71.google.com with SMTP id b14so1262159ejv.14
+        for <kvm@vger.kernel.org>; Wed, 22 Jul 2020 10:02:12 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=QUxmdpqhygtgKfzN8W9vujh+GzdOa2S0bqyvDwXYyhA=;
-        b=rxjb4RVWwqSyBuqV8hyCLOj/xb8fTB2bchjg2O6dXnFAjEmNzzSWS6snCU3LXpqBBv
-         58RHkI41+Mhb17ELYrpR7TKK+A3LnsD1Zgv+x2nSKrlI9MTOoELFyILmnvvitq49ZfoW
-         4TG5q+m+4p4N7MxJaVU67NuZ8r0d72VZtj3uJrt/t66Qz+Zaai0pZjh7WPaD81ixDdCn
-         //yA+Pu8nBft4CQLypTuPD5FzVU6DEYmngrv/HfC25uC5vVkt/fMmCQ7blyUThNQ+5iK
-         kUmPfZJpZYXUrZDUdcawC2aMDltfgaZ7KNg6WsZAatkAZHk1E0LtFS46gW+yYL0sZeV1
-         Wrfw==
-X-Gm-Message-State: AOAM5321DR2LMXYSwN5ZEueZ6miQ8twmxppC2JV+iYk8D0AkPltmHD1V
-        tQ0ZEiI5wYyAUbwkwqSkmiinZ2hKG2xnCtxRVbh91A==
-X-Google-Smtp-Source: ABdhPJziugCNOtA+haz6tPn4p1Sdw9jHB5V1BZaSpUkzo1SkrAuZ5w9XZAE+IuJ+QaTyXtQCEjaq7N+rEOxkaVHXQWU=
-X-Received: by 2002:a05:6512:1182:: with SMTP id g2mr150606lfr.126.1595436891943;
- Wed, 22 Jul 2020 09:54:51 -0700 (PDT)
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=kbVInIg0O9sB9/rV79n2+MQeF/xVnND4ezNrHJWAuNU=;
+        b=StO3S7JTGD09vWzJt1o8QUdmKGxfInntw7d80g42TXwIJmFQjKqsUEr/GN7/PfBDC+
+         cDKgLuxgZlTm7weg/aPZXEHJHHXPQEUWm/umDX+JgaqPPOKmHP4Vv0g4DTRn4BIPvHQO
+         5eqv7jYUWIbfC/4WGuk1/RecU1gWnPiSyFrviXm0nGQhGof+2Kyu2BWJy3ycZy82vcre
+         RUdXFiwrBfoNpfmsSp3JtKtZlIyToGIjeYeJzfYzr6Bpr5Z8fGnc/WmFPYByWT97V8GU
+         703Fq4hP2dKzbrV+2N+qWDeeEh/icSh323hVQKQyOPYc7YOsphteb7ME7VKlrTUG5+hU
+         bk7Q==
+X-Gm-Message-State: AOAM531lt8rTbI1kC2G2xUN802UbenApl1S5I8HbF95qdIUp9bJBqfeF
+        dNK5tRM6J2ytNZ0c1Ju2HLj7QzLwhqPyuL/uxEy5u4kzHJ67Vn1ixENovvtCaC32e4lFt0ldVft
+        VAlKJiJfM2Qgc
+X-Received: by 2002:a05:6402:c83:: with SMTP id cm3mr374604edb.307.1595437331638;
+        Wed, 22 Jul 2020 10:02:11 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJz94j8HcWYcquzCOKto29+28RpeYYe5s5ZRTcFELIy0kjd1eezYC15hqN13fTOfh2pm35iWlw==
+X-Received: by 2002:a05:6402:c83:: with SMTP id cm3mr374579edb.307.1595437331400;
+        Wed, 22 Jul 2020 10:02:11 -0700 (PDT)
+Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
+        by smtp.gmail.com with ESMTPSA id sa10sm151309ejb.79.2020.07.22.10.02.09
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 22 Jul 2020 10:02:10 -0700 (PDT)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     Sean Christopherson <sean.j.christopherson@intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 1/9] KVM: nSVM: Correctly set the shadow NPT root level in its MMU role
+In-Reply-To: <20200716034122.5998-2-sean.j.christopherson@intel.com>
+References: <20200716034122.5998-1-sean.j.christopherson@intel.com> <20200716034122.5998-2-sean.j.christopherson@intel.com>
+Date:   Wed, 22 Jul 2020 19:02:08 +0200
+Message-ID: <877duvpjov.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
-References: <20200714120917.11253-1-joro@8bytes.org> <20200715092456.GE10769@hirez.programming.kicks-ass.net>
- <20200715093426.GK16200@suse.de> <20200715095556.GI10769@hirez.programming.kicks-ass.net>
- <20200715101034.GM16200@suse.de> <CAAYXXYxJf8sr6fvbZK=t6o_to4Ov_yvZ91Hf6ZqQ-_i-HKO2VA@mail.gmail.com>
- <20200721124957.GD6132@suse.de> <CAAYXXYwVV_g8pGL52W9vxkgdNxg1dNKq_OBsXKZ_QizdXiTx2g@mail.gmail.com>
- <20200722090442.GI6132@suse.de>
-In-Reply-To: <20200722090442.GI6132@suse.de>
-From:   Erdem Aktas <erdemaktas@google.com>
-Date:   Wed, 22 Jul 2020 09:54:40 -0700
-Message-ID: <CAAYXXYxRzO+hFvge4sKvNyH64iW9N2eLNbbKOR2DZf0DDL6CUw@mail.gmail.com>
-Subject: Re: [PATCH v4 00/75] x86: SEV-ES Guest Support
-To:     Joerg Roedel <jroedel@suse.de>
-Cc:     Peter Zijlstra <peterz@infradead.org>,
-        Joerg Roedel <joro@8bytes.org>, x86@kernel.org, hpa@zytor.com,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Jiri Slaby <jslaby@suse.cz>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Juergen Gross <jgross@suse.com>,
-        Kees Cook <keescook@chromium.org>,
-        David Rientjes <rientjes@google.com>,
-        Cfir Cohen <cfir@google.com>,
-        Masami Hiramatsu <mhiramat@kernel.org>,
-        Mike Stunes <mstunes@vmware.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Martin Radev <martin.b.radev@gmail.com>,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-I am using a custom, optimized and stripped down version, OVMF build.
-Do you think it is because of the OVMF or grub?
+Sean Christopherson <sean.j.christopherson@intel.com> writes:
 
-In my case, there are 2 places where the CPUID is called: the first
-one is to decide if long mode is supported, along with few other
-features like SSE support and the second one is to retrieve the
-encryption bit location.
+> Move the initialization of shadow NPT MMU's shadow_root_level into
+> kvm_init_shadow_npt_mmu() and explicitly set the level in the shadow NPT
+> MMU's role to be the TDP level.  This ensures the role and MMU levels
+> are synchronized and also initialized before __kvm_mmu_new_pgd(), which
+> consumes the level when attempting a fast PGD switch.
+>
+> Cc: Vitaly Kuznetsov <vkuznets@redhat.com>
+> Fixes: 9fa72119b24db ("kvm: x86: Introduce kvm_mmu_calc_root_page_role()")
+> Fixes: a506fdd223426 ("KVM: nSVM: implement nested_svm_load_cr3() and use it for host->guest switch")
+> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+> ---
+>  arch/x86/kvm/mmu/mmu.c    | 3 +++
+>  arch/x86/kvm/svm/nested.c | 1 -
+>  2 files changed, 3 insertions(+), 1 deletion(-)
+>
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index 77810ce66bdb4..678b6209dad50 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -4963,6 +4963,9 @@ void kvm_init_shadow_npt_mmu(struct kvm_vcpu *vcpu, u32 cr0, u32 cr4, u32 efer,
+>  	union kvm_mmu_role new_role =
+>  		kvm_calc_shadow_mmu_root_page_role(vcpu, false);
+>  
+> +	new_role.base.level = vcpu->arch.tdp_level;
+> +	context->shadow_root_level = new_role.base.level;
+> +
+>  	__kvm_mmu_new_pgd(vcpu, nested_cr3, new_role.base, false, false);
+>  
+>  	if (new_role.as_u64 != context->mmu_role.as_u64)
+> diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
+> index 61378a3c2ce44..fb68467e60496 100644
+> --- a/arch/x86/kvm/svm/nested.c
+> +++ b/arch/x86/kvm/svm/nested.c
+> @@ -85,7 +85,6 @@ static void nested_svm_init_mmu_context(struct kvm_vcpu *vcpu)
+>  	vcpu->arch.mmu->get_guest_pgd     = nested_svm_get_tdp_cr3;
+>  	vcpu->arch.mmu->get_pdptr         = nested_svm_get_tdp_pdptr;
+>  	vcpu->arch.mmu->inject_page_fault = nested_svm_inject_npf_exit;
+> -	vcpu->arch.mmu->shadow_root_level = vcpu->arch.tdp_level;
+>  	reset_shadow_zero_bits_mask(vcpu, vcpu->arch.mmu);
+>  	vcpu->arch.walk_mmu              = &vcpu->arch.nested_mmu;
+>  }
 
--Erdem
+FWIW,
 
-On Wed, Jul 22, 2020 at 2:04 AM Joerg Roedel <jroedel@suse.de> wrote:
->
-> Hi Erdem,
->
-> On Tue, Jul 21, 2020 at 09:48:51AM -0700, Erdem Aktas wrote:
-> > Yes, I am using OVMF with SEV-ES (sev-es-v12 patches applied). I am
-> > running Ubuntu 18.04 distro. My grub target is x86_64-efi. I also
-> > tried installing the grub-efi-amd64 package. In all cases, the grub is
-> > running in 64bit but enters the startup_32 in 32 bit mode. I think
-> > there should be a 32bit #VC handler just something very similar in the
-> > OVMF patches to handle the cpuid when the CPU is still in 32bit mode.
-> > As it is now, it will be a huge problem to support different distro images.
-> > I wonder if I am the only one having this problem.
->
-> I havn't heard from anyone else that the startup_32 boot-path is being
-> used for SEV-ES. What OVMF binary do you use for your guest?
->
-> In general it is not that difficult to support that boot-path too, but
-> I'd like to keep that as a future addition, as the patch-set is already
-> quite large. In the startup_32 path there is already a GDT set up, so
-> whats needed is an IDT and a 32-bit #VC handler using the MRS-based
-> protocol (and hoping that there will only be CPUID intercepts until it
-> reaches long-mode).
->
-> Regards,
->
->         Joerg
->
+Reviewed-and-tested-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+
+-- 
+Vitaly
+
