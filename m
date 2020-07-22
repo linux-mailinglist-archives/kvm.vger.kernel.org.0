@@ -2,80 +2,90 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A49AC2292A0
-	for <lists+kvm@lfdr.de>; Wed, 22 Jul 2020 09:55:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 26B992292A2
+	for <lists+kvm@lfdr.de>; Wed, 22 Jul 2020 09:55:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727906AbgGVHzF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 22 Jul 2020 03:55:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46992 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726506AbgGVHzF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 22 Jul 2020 03:55:05 -0400
-Received: from merlin.infradead.org (merlin.infradead.org [IPv6:2001:8b0:10b:1231::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 160EBC0619DC;
-        Wed, 22 Jul 2020 00:55:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=merlin.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=RM7GOf2CU2j7IEdxsQ76+7tPsuDp35umedz/Oe8IL6c=; b=wVfIXSUtGE9pDSPf46IprCtRvt
-        rlP4DWLTU+26h7YnzffGvPwx+Q2V5KStDB4gowD8s7ZZPyjjQVbdcNRz7+j0R7IR4XOtvs2rUjWC1
-        k6y/xZUeyIKYZGAM7I8yNwLrgkRoj1kgHzOVzvTP0ydEzmzgaYqYxd0TV0b9aCa4+k3NQb8+7IVqs
-        ICcLMaAeUsXe1p6j3U2a9gtA5y2ra0GrRVvTm5UBCFozLFNoWobQZLIMxocwnw8BEZWEwm+L6+iPh
-        Nc0Bf4pLM6xygsvwGTyEYclLbqc97zAnATlncIKI8vXTQwPnxeuPouY72d2tZkMrMcTJEnDtMCQW3
-        ZETQILTQ==;
-Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=noisy.programming.kicks-ass.net)
-        by merlin.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1jy9aa-0005h7-Sf; Wed, 22 Jul 2020 07:54:57 +0000
-Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (Client did not present a certificate)
-        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 8529E301AC6;
-        Wed, 22 Jul 2020 09:54:55 +0200 (CEST)
-Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
-        id 4B06D20140AD7; Wed, 22 Jul 2020 09:54:55 +0200 (CEST)
-Date:   Wed, 22 Jul 2020 09:54:55 +0200
-From:   peterz@infradead.org
-To:     Kees Cook <keescook@chromium.org>
-Cc:     Thomas Gleixner <tglx@linutronix.de>,
-        LKML <linux-kernel@vger.kernel.org>, x86@kernel.org,
-        linux-arch@vger.kernel.org, Will Deacon <will@kernel.org>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Keno Fischer <keno@juliacomputing.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        Gabriel Krisman Bertazi <krisman@collabora.com>
-Subject: Re: [patch V4 02/15] entry: Provide generic syscall entry
- functionality
-Message-ID: <20200722075455.GQ119549@hirez.programming.kicks-ass.net>
-References: <20200721105706.030914876@linutronix.de>
- <20200721110808.455350746@linutronix.de>
- <202007211426.B40A7A7BD@keescook>
+        id S1727993AbgGVHzv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 22 Jul 2020 03:55:51 -0400
+Received: from mx2.suse.de ([195.135.220.15]:36452 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726153AbgGVHzv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 22 Jul 2020 03:55:51 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.221.27])
+        by mx2.suse.de (Postfix) with ESMTP id 8D778AEDA;
+        Wed, 22 Jul 2020 07:55:56 +0000 (UTC)
+Date:   Wed, 22 Jul 2020 09:55:46 +0200
+From:   Joerg Roedel <jroedel@suse.de>
+To:     Mike Stunes <mstunes@vmware.com>
+Cc:     Joerg Roedel <joro@8bytes.org>, "x86@kernel.org" <x86@kernel.org>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "hpa@zytor.com" <hpa@zytor.com>, Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Jiri Slaby <jslaby@suse.cz>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Juergen Gross <jgross@suse.com>,
+        Kees Cook <keescook@chromium.org>,
+        David Rientjes <rientjes@google.com>,
+        Cfir Cohen <cfir@google.com>,
+        Erdem Aktas <erdemaktas@google.com>,
+        Masami Hiramatsu <mhiramat@kernel.org>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Martin Radev <martin.b.radev@gmail.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "virtualization@lists.linux-foundation.org" 
+        <virtualization@lists.linux-foundation.org>
+Subject: Re: [PATCH v4 51/75] x86/sev-es: Handle MMIO events
+Message-ID: <20200722075546.GG6132@suse.de>
+References: <20200714120917.11253-1-joro@8bytes.org>
+ <20200714120917.11253-52-joro@8bytes.org>
+ <40D5C698-1ED2-4CCE-9C1D-07620A021A6A@vmware.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <202007211426.B40A7A7BD@keescook>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <40D5C698-1ED2-4CCE-9C1D-07620A021A6A@vmware.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jul 21, 2020 at 02:38:16PM -0700, Kees Cook wrote:
-> One thing I noticed while doing syscall entry timings for the kernel
-> stack base offset randomization was that the stack protector was being
-> needlessly enabled in certain paths (seccomp, audit) due to seeing a
-> register array being declared on the stack. As part of that series I
-> suggested down-grading the stack protector. Since then, Peter's changes
-> entirely disabled the stack protector on the entry code, which I
-> grudgingly accept (I'd rather have a way to mark a variable as "ignore
-> this for stack protector detection", but ... there isn't, so fine.)
+Hi Mike,
 
-I don't think I'd like to have that per variable, but a function
-attribute to disable stack protector would be awesome, except our
-GCC-besties forgot to create that function attribute :-(
+On Tue, Jul 21, 2020 at 09:01:44PM +0000, Mike Stunes wrote:
+> I’m running into an MMIO-related bug when I try testing this on our hypervisor.
+> 
+> During boot, probe_roms (arch/x86/kernel/probe_roms.c) uses
+> romchecksum over the video ROM and extension ROM regions. In my test
+> VM, the video ROM romchecksum starts at virtual address
+> 0xffff8880000c0000 and has length 65536. But, at address
+> 0xffff8880000c4000, we switch from being video-ROM-backed to being
+> unbacked by anything.
+> 
+> With SEV-ES enabled, our platform handles reads and writes to unbacked
+> memory by treating them as MMIO. So, the read from 0xffff8880000c4000
+> causes a #VC, which is handled by do_early_exception.
+> 
+> In handling the #VC, vc_slow_virt_to_phys fails for that address. My
+> understanding is that the #VC handler should then add an entry to the
+> page tables and retry the faulting access. Somehow, that isn’t
+> happening. From the hypervisor side, it looks like the guest is
+> looping somehow. (I think the VCPU is mostly unhalted and making
+> progress, but the guest never gets past that romchecksum.) The guest
+> never actually makes an MMIO vmgexit for that address.
 
-If/when we get such a function attribute, we can add it to noinstr.
+That sounds like your guest is in a page-fault loop, but I can't yet
+explain why. Can you please find out the instruction which is causing
+the #VC exception?
 
-Also see this here:
+If a page-fault happens during #VC emulation it is forwared to the
+page-fault handler, so this should work. But somehow this isn't
+happening or the page-fault handler can't map the faulting address.
 
-  https://lkml.kernel.org/r/20200314164451.346497-1-slyfox@gentoo.org
+
+Regards,
+
+	Joerg
