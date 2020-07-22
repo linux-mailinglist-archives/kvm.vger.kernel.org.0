@@ -2,120 +2,145 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0B12D229DAC
-	for <lists+kvm@lfdr.de>; Wed, 22 Jul 2020 19:02:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 510F6229DB9
+	for <lists+kvm@lfdr.de>; Wed, 22 Jul 2020 19:03:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726938AbgGVRCS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 22 Jul 2020 13:02:18 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:35196 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726157AbgGVRCR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 22 Jul 2020 13:02:17 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1595437335;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=kbVInIg0O9sB9/rV79n2+MQeF/xVnND4ezNrHJWAuNU=;
-        b=EXK/VEdppEduXGQURfW5X3Bergve8L9heTAokIr5LnBuGLyIREIB7/VyncVYulxGBol2HY
-        sSrUFLWQhHKew89YVYY8o93ElsD30eedrAHJT43+Ve/piI4IXObUC0GKE/ysQlL7tyU79a
-        xphyydGm/ka4YG3DUpIqii+InZ2n454=
-Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
- [209.85.218.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-216-ALgg1YhDPKi4ow8oG8riYQ-1; Wed, 22 Jul 2020 13:02:13 -0400
-X-MC-Unique: ALgg1YhDPKi4ow8oG8riYQ-1
-Received: by mail-ej1-f71.google.com with SMTP id b14so1262159ejv.14
-        for <kvm@vger.kernel.org>; Wed, 22 Jul 2020 10:02:12 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=kbVInIg0O9sB9/rV79n2+MQeF/xVnND4ezNrHJWAuNU=;
-        b=StO3S7JTGD09vWzJt1o8QUdmKGxfInntw7d80g42TXwIJmFQjKqsUEr/GN7/PfBDC+
-         cDKgLuxgZlTm7weg/aPZXEHJHHXPQEUWm/umDX+JgaqPPOKmHP4Vv0g4DTRn4BIPvHQO
-         5eqv7jYUWIbfC/4WGuk1/RecU1gWnPiSyFrviXm0nGQhGof+2Kyu2BWJy3ycZy82vcre
-         RUdXFiwrBfoNpfmsSp3JtKtZlIyToGIjeYeJzfYzr6Bpr5Z8fGnc/WmFPYByWT97V8GU
-         703Fq4hP2dKzbrV+2N+qWDeeEh/icSh323hVQKQyOPYc7YOsphteb7ME7VKlrTUG5+hU
-         bk7Q==
-X-Gm-Message-State: AOAM531lt8rTbI1kC2G2xUN802UbenApl1S5I8HbF95qdIUp9bJBqfeF
-        dNK5tRM6J2ytNZ0c1Ju2HLj7QzLwhqPyuL/uxEy5u4kzHJ67Vn1ixENovvtCaC32e4lFt0ldVft
-        VAlKJiJfM2Qgc
-X-Received: by 2002:a05:6402:c83:: with SMTP id cm3mr374604edb.307.1595437331638;
-        Wed, 22 Jul 2020 10:02:11 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJz94j8HcWYcquzCOKto29+28RpeYYe5s5ZRTcFELIy0kjd1eezYC15hqN13fTOfh2pm35iWlw==
-X-Received: by 2002:a05:6402:c83:: with SMTP id cm3mr374579edb.307.1595437331400;
-        Wed, 22 Jul 2020 10:02:11 -0700 (PDT)
-Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id sa10sm151309ejb.79.2020.07.22.10.02.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 22 Jul 2020 10:02:10 -0700 (PDT)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 1/9] KVM: nSVM: Correctly set the shadow NPT root level in its MMU role
-In-Reply-To: <20200716034122.5998-2-sean.j.christopherson@intel.com>
-References: <20200716034122.5998-1-sean.j.christopherson@intel.com> <20200716034122.5998-2-sean.j.christopherson@intel.com>
-Date:   Wed, 22 Jul 2020 19:02:08 +0200
-Message-ID: <877duvpjov.fsf@vitty.brq.redhat.com>
+        id S1731378AbgGVRDt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 22 Jul 2020 13:03:49 -0400
+Received: from mga07.intel.com ([134.134.136.100]:13584 "EHLO mga07.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726717AbgGVRDt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 22 Jul 2020 13:03:49 -0400
+IronPort-SDR: WncTuVHB6W+2q2Dku1w0kCI1soF6shXjWgHmIwAdhIj3Q62ob4p49w+dH2m3rXas8o6Bwj5EFo
+ 2k6EqhezeyNQ==
+X-IronPort-AV: E=McAfee;i="6000,8403,9690"; a="215007242"
+X-IronPort-AV: E=Sophos;i="5.75,383,1589266800"; 
+   d="scan'208";a="215007242"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jul 2020 10:03:48 -0700
+IronPort-SDR: kZ7E+EWBoHhQmGLIn6X8M9EMk6wAI4cZKfcD9O1Bld2YtAg/0tt7cAw/BySjHNbl5PjqTD9eQJ
+ zNMN1KUY8iRw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.75,383,1589266800"; 
+   d="scan'208";a="328275881"
+Received: from orsmsx101.amr.corp.intel.com ([10.22.225.128])
+  by orsmga007.jf.intel.com with ESMTP; 22 Jul 2020 10:03:48 -0700
+Received: from [10.254.181.38] (10.254.181.38) by ORSMSX101.amr.corp.intel.com
+ (10.22.225.128) with Microsoft SMTP Server (TLS) id 14.3.439.0; Wed, 22 Jul
+ 2020 10:03:48 -0700
+Subject: Re: [PATCH RFC v2 03/18] irq/dev-msi: Create IR-DEV-MSI irq domain
+To:     Jason Gunthorpe <jgg@mellanox.com>,
+        Dave Jiang <dave.jiang@intel.com>
+CC:     <vkoul@kernel.org>, <maz@kernel.org>, <bhelgaas@google.com>,
+        <rafael@kernel.org>, <gregkh@linuxfoundation.org>,
+        <tglx@linutronix.de>, <hpa@zytor.com>,
+        <alex.williamson@redhat.com>, <jacob.jun.pan@intel.com>,
+        <ashok.raj@intel.com>, <yi.l.liu@intel.com>, <baolu.lu@intel.com>,
+        <kevin.tian@intel.com>, <sanjay.k.kumar@intel.com>,
+        <tony.luck@intel.com>, <jing.lin@intel.com>,
+        <dan.j.williams@intel.com>, <kwankhede@nvidia.com>,
+        <eric.auger@redhat.com>, <parav@mellanox.com>,
+        <dave.hansen@intel.com>, <netanelg@mellanox.com>,
+        <shahafs@mellanox.com>, <yan.y.zhao@linux.intel.com>,
+        <pbonzini@redhat.com>, <samuel.ortiz@intel.com>,
+        <mona.hossain@intel.com>, <dmaengine@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <x86@kernel.org>,
+        <linux-pci@vger.kernel.org>, <kvm@vger.kernel.org>
+References: <159534667974.28840.2045034360240786644.stgit@djiang5-desk3.ch.intel.com>
+ <159534735519.28840.10435935598386192252.stgit@djiang5-desk3.ch.intel.com>
+ <20200721162104.GB2021248@mellanox.com>
+From:   "Dey, Megha" <megha.dey@intel.com>
+Message-ID: <84fd4ae2-e7ee-4f9d-7686-6a034f3e2614@intel.com>
+Date:   Wed, 22 Jul 2020 10:03:45 -0700
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <20200721162104.GB2021248@mellanox.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.254.181.38]
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Sean Christopherson <sean.j.christopherson@intel.com> writes:
+Hi Dan,
 
-> Move the initialization of shadow NPT MMU's shadow_root_level into
-> kvm_init_shadow_npt_mmu() and explicitly set the level in the shadow NPT
-> MMU's role to be the TDP level.  This ensures the role and MMU levels
-> are synchronized and also initialized before __kvm_mmu_new_pgd(), which
-> consumes the level when attempting a fast PGD switch.
->
-> Cc: Vitaly Kuznetsov <vkuznets@redhat.com>
-> Fixes: 9fa72119b24db ("kvm: x86: Introduce kvm_mmu_calc_root_page_role()")
-> Fixes: a506fdd223426 ("KVM: nSVM: implement nested_svm_load_cr3() and use it for host->guest switch")
-> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
-> ---
->  arch/x86/kvm/mmu/mmu.c    | 3 +++
->  arch/x86/kvm/svm/nested.c | 1 -
->  2 files changed, 3 insertions(+), 1 deletion(-)
->
-> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> index 77810ce66bdb4..678b6209dad50 100644
-> --- a/arch/x86/kvm/mmu/mmu.c
-> +++ b/arch/x86/kvm/mmu/mmu.c
-> @@ -4963,6 +4963,9 @@ void kvm_init_shadow_npt_mmu(struct kvm_vcpu *vcpu, u32 cr0, u32 cr4, u32 efer,
->  	union kvm_mmu_role new_role =
->  		kvm_calc_shadow_mmu_root_page_role(vcpu, false);
->  
-> +	new_role.base.level = vcpu->arch.tdp_level;
-> +	context->shadow_root_level = new_role.base.level;
-> +
->  	__kvm_mmu_new_pgd(vcpu, nested_cr3, new_role.base, false, false);
->  
->  	if (new_role.as_u64 != context->mmu_role.as_u64)
-> diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
-> index 61378a3c2ce44..fb68467e60496 100644
-> --- a/arch/x86/kvm/svm/nested.c
-> +++ b/arch/x86/kvm/svm/nested.c
-> @@ -85,7 +85,6 @@ static void nested_svm_init_mmu_context(struct kvm_vcpu *vcpu)
->  	vcpu->arch.mmu->get_guest_pgd     = nested_svm_get_tdp_cr3;
->  	vcpu->arch.mmu->get_pdptr         = nested_svm_get_tdp_pdptr;
->  	vcpu->arch.mmu->inject_page_fault = nested_svm_inject_npf_exit;
-> -	vcpu->arch.mmu->shadow_root_level = vcpu->arch.tdp_level;
->  	reset_shadow_zero_bits_mask(vcpu, vcpu->arch.mmu);
->  	vcpu->arch.walk_mmu              = &vcpu->arch.nested_mmu;
->  }
+On 7/21/2020 9:21 AM, Jason Gunthorpe wrote:
+> On Tue, Jul 21, 2020 at 09:02:35AM -0700, Dave Jiang wrote:
+>> From: Megha Dey <megha.dey@intel.com>
+>>
+>> When DEV_MSI is enabled, the dev_msi_default_domain is updated to the
+>> base DEV-MSI irq  domain. If interrupt remapping is enabled, we create
+>> a new IR-DEV-MSI irq domain and update the dev_msi_default domain to
+>> the same.
+>>
+>> For X86, introduce a new irq_alloc_type which will be used by the
+>> interrupt remapping driver.
+> 
+> Why? Shouldn't this by symmetrical with normal MSI? Does MSI do this?
 
-FWIW,
+Since I am introducing the new dev msi domain for the case when IR_REMAP 
+is turned on, I have introduced the new type in this patch.
 
-Reviewed-and-tested-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+MSI/MSIX have their own irq alloc types which are also only used by the 
+intel remapping driver..
 
--- 
-Vitaly
+> 
+> I would have thought you'd want to switch to this remapping mode as
+> part of vfio or something like current cases.
 
+Can you let me know what current case you are referring to?
+> 
+>> +struct irq_domain *create_remap_dev_msi_irq_domain(struct irq_domain *parent,
+>> +						   const char *name)
+>> +{
+>> +	struct fwnode_handle *fn;
+>> +	struct irq_domain *domain;
+>> +
+>> +	fn = irq_domain_alloc_named_fwnode(name);
+>> +	if (!fn)
+>> +		return NULL;
+>> +
+>> +	domain = msi_create_irq_domain(fn, &dev_msi_ir_domain_info, parent);
+>> +	if (!domain) {
+>> +		pr_warn("failed to initialize irqdomain for IR-DEV-MSI.\n");
+>> +		return ERR_PTR(-ENXIO);
+>> +	}
+>> +
+>> +	irq_domain_update_bus_token(domain, DOMAIN_BUS_PLATFORM_MSI);
+>> +
+>> +	if (!dev_msi_default_domain)
+>> +		dev_msi_default_domain = domain;
+>> +
+>> +	return domain;
+>> +}
+> 
+> What about this code creates a "remap" ? ie why is the function called
+> "create_remap" ?
+
+Well, this function creates a new domain for the case when IR_REMAP is 
+enabled, hence I called it create_remap...
+
+> 
+>> diff --git a/include/linux/msi.h b/include/linux/msi.h
+>> index 1da97f905720..7098ba566bcd 100644
+>> +++ b/include/linux/msi.h
+>> @@ -378,6 +378,9 @@ void *platform_msi_get_host_data(struct irq_domain *domain);
+>>   void platform_msi_write_msg(struct irq_data *data, struct msi_msg *msg);
+>>   void platform_msi_unmask_irq(struct irq_data *data);
+>>   void platform_msi_mask_irq(struct irq_data *data);
+>> +
+>> +int dev_msi_prepare(struct irq_domain *domain, struct device *dev,
+>> +                           int nvec, msi_alloc_info_t *arg);
+> 
+> I wonder if this should use the popular #ifdef dev_msi_prepare scheme
+> instead of a weak symbol?
+
+Ok, I will look into the #ifdef option.
+> 
+> Jason
+> 
