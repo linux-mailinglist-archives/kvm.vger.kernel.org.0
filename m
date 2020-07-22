@@ -2,194 +2,95 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8C4042297AF
-	for <lists+kvm@lfdr.de>; Wed, 22 Jul 2020 13:48:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 968892297D3
+	for <lists+kvm@lfdr.de>; Wed, 22 Jul 2020 14:03:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732070AbgGVLsl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 22 Jul 2020 07:48:41 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:13464 "EHLO
-        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726462AbgGVLsk (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 22 Jul 2020 07:48:40 -0400
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 06MBWM5w052537;
-        Wed, 22 Jul 2020 07:48:31 -0400
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 32e1vrr308-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 22 Jul 2020 07:48:31 -0400
-Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 06MBWXnx053701;
-        Wed, 22 Jul 2020 07:48:30 -0400
-Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 32e1vrr2yj-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 22 Jul 2020 07:48:30 -0400
-Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
-        by ppma04ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 06MBeoI8032571;
-        Wed, 22 Jul 2020 11:48:28 GMT
-Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
-        by ppma04ams.nl.ibm.com with ESMTP id 32brq84yjr-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 22 Jul 2020 11:48:28 +0000
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
-        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 06MBl2TA66453950
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 22 Jul 2020 11:47:02 GMT
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 0FB71AE045;
-        Wed, 22 Jul 2020 11:48:26 +0000 (GMT)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 2DA1CAE04D;
-        Wed, 22 Jul 2020 11:48:25 +0000 (GMT)
-Received: from oc3016276355.ibm.com (unknown [9.145.50.252])
-        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Wed, 22 Jul 2020 11:48:25 +0000 (GMT)
-Subject: Re: [PATCH v7 2/2] s390: virtio: PV needs VIRTIO I/O device
- protection
-To:     "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, pasic@linux.ibm.com,
-        borntraeger@de.ibm.com, frankja@linux.ibm.com, cohuck@redhat.com,
-        kvm@vger.kernel.org, linux-s390@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, thomas.lendacky@amd.com,
-        david@gibson.dropbear.id.au, linuxram@us.ibm.com,
-        hca@linux.ibm.com, gor@linux.ibm.com
-References: <1594801869-13365-1-git-send-email-pmorel@linux.ibm.com>
- <1594801869-13365-3-git-send-email-pmorel@linux.ibm.com>
- <20200715054807-mutt-send-email-mst@kernel.org>
- <bc5e09ad-faaf-8b38-83e0-5f4a4b1daeb0@redhat.com>
- <20200715074917-mutt-send-email-mst@kernel.org>
-From:   Pierre Morel <pmorel@linux.ibm.com>
-Message-ID: <be992b00-de1d-4499-ee7f-b2b2b5a8879d@linux.ibm.com>
-Date:   Wed, 22 Jul 2020 13:48:24 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.9.0
+        id S1727948AbgGVMDZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 22 Jul 2020 08:03:25 -0400
+Received: from bilbo.ozlabs.org ([203.11.71.1]:47687 "EHLO ozlabs.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726161AbgGVMDZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 22 Jul 2020 08:03:25 -0400
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (No client certificate requested)
+        by mail.ozlabs.org (Postfix) with ESMTPSA id 4BBYyM02F6z9sPf;
+        Wed, 22 Jul 2020 22:03:22 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ellerman.id.au;
+        s=201909; t=1595419403;
+        bh=ZYxAwsh+3V5ye+dbkADhu2jHGiIvpQV3pkw5+1n3oQ4=;
+        h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
+        b=pbJKuaAbmKMnTeSJtpm/DmRD0ObL6TwDoH5YKVdk177dIMEO3tiudGi2nfK4T1nGC
+         IEGLosv3KFMK582kcIoHGZqOsxpq5V3/V5oTOHNL4VtyaEflh9c1+1O2OuQqi+ShRA
+         1dzO0TPYEYCY2av4+fsq9esViJWyOfQCgEIa5yrWoBiui7Haa8VR16wV3Lg0tmOUts
+         o8KQyfOsD11S8kQ2m+UsCIjtXAYzZ5tm8MItxsKIPAgCT3QZuKwVwNxi6HCk3iS1fe
+         SOpwGxc75kco5+vnZgaymlIE4J7sKjzeMd/N15WclBfP+E/vOZN+lZzvtpDPFLGmya
+         rS+fUezpswXXQ==
+From:   Michael Ellerman <mpe@ellerman.id.au>
+To:     Jordan Niethe <jniethe5@gmail.com>,
+        Athira Rajeev <atrajeev@linux.vnet.ibm.com>
+Cc:     Gautham R Shenoy <ego@linux.vnet.ibm.com>, mikey@neuling.org,
+        maddy@linux.vnet.ibm.com, kvm@vger.kernel.org,
+        kvm-ppc@vger.kernel.org, svaidyan@in.ibm.com, acme@kernel.org,
+        jolsa@kernel.org, linuxppc-dev <linuxppc-dev@lists.ozlabs.org>
+Subject: Re: [v3 04/15] powerpc/perf: Add support for ISA3.1 PMU SPRs
+In-Reply-To: <CACzsE9r9fy22hScRm7yz5OeZH9jXA+97hEfAOo-Nk_EPwW-_Dw@mail.gmail.com>
+References: <1594996707-3727-1-git-send-email-atrajeev@linux.vnet.ibm.com> <1594996707-3727-5-git-send-email-atrajeev@linux.vnet.ibm.com> <CACzsE9r9fy22hScRm7yz5OeZH9jXA+97hEfAOo-Nk_EPwW-_Dw@mail.gmail.com>
+Date:   Wed, 22 Jul 2020 22:03:19 +1000
+Message-ID: <87d04nrc3c.fsf@mpe.ellerman.id.au>
 MIME-Version: 1.0
-In-Reply-To: <20200715074917-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
- definitions=2020-07-22_04:2020-07-22,2020-07-22 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 suspectscore=0
- mlxlogscore=999 malwarescore=0 priorityscore=1501 adultscore=0 mlxscore=0
- impostorscore=0 bulkscore=0 phishscore=0 lowpriorityscore=0 clxscore=1015
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
- definitions=main-2007220085
+Content-Type: text/plain
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-
-On 2020-07-15 13:51, Michael S. Tsirkin wrote:
-> On Wed, Jul 15, 2020 at 06:16:59PM +0800, Jason Wang wrote:
+Jordan Niethe <jniethe5@gmail.com> writes:
+> On Sat, Jul 18, 2020 at 1:02 AM Athira Rajeev <atrajeev@linux.vnet.ibm.com> wrote:
+>> From: Madhavan Srinivasan <maddy@linux.ibm.com>
 >>
->> On 2020/7/15 下午5:50, Michael S. Tsirkin wrote:
->>> On Wed, Jul 15, 2020 at 10:31:09AM +0200, Pierre Morel wrote:
->>>> If protected virtualization is active on s390, the virtio queues are
->>>> not accessible to the host, unless VIRTIO_F_IOMMU_PLATFORM has been
->>>> negotiated. Use the new arch_validate_virtio_features() interface to
->>>> fail probe if that's not the case, preventing a host error on access
->>>> attempt.
->>>>
->>>> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
->>>> Reviewed-by: Cornelia Huck <cohuck@redhat.com>
->>>> Acked-by: Halil Pasic <pasic@linux.ibm.com>
->>>> Acked-by: Christian Borntraeger <borntraeger@de.ibm.com>
->>>> ---
->>>>    arch/s390/mm/init.c | 28 ++++++++++++++++++++++++++++
->>>>    1 file changed, 28 insertions(+)
->>>>
->>>> diff --git a/arch/s390/mm/init.c b/arch/s390/mm/init.c
->>>> index 6dc7c3b60ef6..d39af6554d4f 100644
->>>> --- a/arch/s390/mm/init.c
->>>> +++ b/arch/s390/mm/init.c
->>>> @@ -45,6 +45,7 @@
->>>>    #include <asm/kasan.h>
->>>>    #include <asm/dma-mapping.h>
->>>>    #include <asm/uv.h>
->>>> +#include <linux/virtio_config.h>
->>>>    pgd_t swapper_pg_dir[PTRS_PER_PGD] __section(.bss..swapper_pg_dir);
->>>> @@ -161,6 +162,33 @@ bool force_dma_unencrypted(struct device *dev)
->>>>    	return is_prot_virt_guest();
->>>>    }
->>>> +/*
->>>> + * arch_validate_virtio_features
->>>> + * @dev: the VIRTIO device being added
->>>> + *
->>>> + * Return an error if required features are missing on a guest running
->>>> + * with protected virtualization.
->>>> + */
->>>> +int arch_validate_virtio_features(struct virtio_device *dev)
->>>> +{
->>>> +	if (!is_prot_virt_guest())
->>>> +		return 0;
->>>> +
->>>> +	if (!virtio_has_feature(dev, VIRTIO_F_VERSION_1)) {
->>>> +		dev_warn(&dev->dev,
->>>> +			 "legacy virtio not supported with protected virtualization\n");
->>>> +		return -ENODEV;
->>>> +	}
->>>> +
->>>> +	if (!virtio_has_feature(dev, VIRTIO_F_IOMMU_PLATFORM)) {
->>>> +		dev_warn(&dev->dev,
->>>> +			 "support for limited memory access required for protected virtualization\n");
->>>> +		return -ENODEV;
->>>> +	}
->>>> +
->>>> +	return 0;
->>>> +}
->>>> +
->>>>    /* protected virtualization */
->>>>    static void pv_init(void)
->>>>    {
->>> What bothers me here is that arch code depends on virtio now.
->>> It works even with a modular virtio when functions are inline,
->>> but it seems fragile: e.g. it breaks virtio as an out of tree module,
->>> since layout of struct virtio_device can change.
+>> PowerISA v3.1 includes new performance monitoring unit(PMU)
+>> special purpose registers (SPRs). They are
+...
 >>
->>
->> The code was only called from virtio.c so it should be fine.
->>
->> And my understanding is that we don't need to care about the kABI issue
->> during upstream development?
->>
->> Thanks
-> 
-> No, but so far it has been convenient at least for me, for development,
-> to just be able to unload all of virtio and load a different version.
-> 
-> 
->>
->>>
->>> I'm not sure what to do with this yet, will try to think about it
->>> over the weekend. Thanks!
->>>
->>>
->>>> -- 
->>>> 2.25.1
-> 
+>> diff --git a/arch/powerpc/include/asm/perf_event_server.h b/arch/powerpc/include/asm/perf_event_server.h
+>> index 14b8dc1..832450a 100644
+>> --- a/arch/powerpc/include/asm/perf_event_server.h
+>> +++ b/arch/powerpc/include/asm/perf_event_server.h
+>> @@ -75,6 +76,7 @@ struct power_pmu {
+>>  #define PPMU_HAS_SIER          0x00000040 /* Has SIER */
+>>  #define PPMU_ARCH_207S         0x00000080 /* PMC is architecture v2.07S */
+>>  #define PPMU_NO_SIAR           0x00000100 /* Do not use SIAR */
+>> +#define PPMU_ARCH_310S         0x00000200 /* Has MMCR3, SIER2 and SIER3 */
 
-Hi Michael,
+> We elsewhere have CPU_FTR_ARCH_31, so should this be PPMU_ARCH_31S to
+> be consistent.
 
-I am not sure to understand the problem so I may propose a wrong 
-solution but, let's try:
+The "S" is no longer needed as there's no Book S vs Book E distinction
+in ISA v3.1.
 
-Would a callback registration instead of a weak function solve the problem?
-The registrating function in core could test a parameter to check if the 
-callback is in sync with the VIRTIO core.
+So I changed it to PPMU_ARCH_31.
 
-What do you think?
+>> diff --git a/arch/powerpc/perf/core-book3s.c b/arch/powerpc/perf/core-book3s.c
+>> index f4d07b5..ca32fc0 100644
+>> --- a/arch/powerpc/perf/core-book3s.c
+>> +++ b/arch/powerpc/perf/core-book3s.c
+>> @@ -581,6 +589,11 @@ static void ebb_switch_out(unsigned long mmcr0)
+>>         current->thread.sdar  = mfspr(SPRN_SDAR);
+>>         current->thread.mmcr0 = mmcr0 & MMCR0_USER_MASK;
+>>         current->thread.mmcr2 = mfspr(SPRN_MMCR2) & MMCR2_USER_MASK;
+>> +       if (ppmu->flags & PPMU_ARCH_310S) {
+>> +               current->thread.mmcr3 = mfspr(SPRN_MMCR3);
 
-Regards,
-Pierre
+> Like MMCR0_USER_MASK and MMCR2_USER_MASK do we need a MMCR3_USER_MASK
+> here, or is there no need?
 
+mmcr0 and mmcr2 are visible via ptrace, so masking them here means we
+don't expose any bits to userspace via ptrace that aren't also visible
+by reading the register.
 
+So at least while mmcr3 is not exposed via ptrace it's safe to not mask
+it, if there are even any sensitive bits in it.
 
--- 
-Pierre Morel
-IBM Lab Boeblingen
+cheers
