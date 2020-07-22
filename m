@@ -2,59 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8AA022296A0
-	for <lists+kvm@lfdr.de>; Wed, 22 Jul 2020 12:50:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0CC532296A8
+	for <lists+kvm@lfdr.de>; Wed, 22 Jul 2020 12:53:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726907AbgGVKu4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 22 Jul 2020 06:50:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46012 "EHLO
+        id S1727834AbgGVKxz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 22 Jul 2020 06:53:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46468 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726028AbgGVKu4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 22 Jul 2020 06:50:56 -0400
-Received: from mail-ot1-x344.google.com (mail-ot1-x344.google.com [IPv6:2607:f8b0:4864:20::344])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E630EC0619DC;
-        Wed, 22 Jul 2020 03:50:55 -0700 (PDT)
-Received: by mail-ot1-x344.google.com with SMTP id 18so1413278otv.6;
-        Wed, 22 Jul 2020 03:50:55 -0700 (PDT)
+        with ESMTP id S1726153AbgGVKxy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 22 Jul 2020 06:53:54 -0400
+Received: from mail-ot1-x341.google.com (mail-ot1-x341.google.com [IPv6:2607:f8b0:4864:20::341])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 73CF6C0619DE;
+        Wed, 22 Jul 2020 03:53:54 -0700 (PDT)
+Received: by mail-ot1-x341.google.com with SMTP id 95so1402930otw.10;
+        Wed, 22 Jul 2020 03:53:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc:content-transfer-encoding;
-        bh=HPDKDuuyjQV+L83qxsRs2j2r4Bd7vA94jp4URGDWu4Y=;
-        b=mU7EvmGD8NaC/WxKLxCBF9L5Wn32NNHaquGqwWvUQ2Ipwh3lZFTk/BOFjB2AEeC5no
-         jJKzzLKroTcdmOzNKXpROsK7ykMscs5qPJBqqfhq2fFwcW0koFg7UCU49MWQeHz/dGIO
-         WsA/sZ4IjbjU7lml4RkVO8K9jWPmUujgLyNyOdKPV0erTkiAUZvOFi0l1VO3ce7Yr4R5
-         3iZ5LFk0VRmtWW6jk1/uxIiM5hkCtd+KDYwS3aEDHhj2Jeqexu0vpsf8gVLyp9sLvfLR
-         VdPHdOIUoUcZGiLwt39EbZfDWx/72WkheWwTkux2Jj1rd5DSceLYeQ0xEM8FFqbw90oi
-         /lVg==
+        bh=iqmfyazKZn+mho7lCVo6bAfqAtnXjAxCJUZ6qkqG5N8=;
+        b=h51Ey7x7HvsDRKy5nt/Xut6/VRHk2YC8951rxIrga+LpXtB0nntvi6HhO1PA6GPfTm
+         O0hVgW6hJ5KkejAVJqj9vjAXAu+nOGITaZw+ylT3O2I4z118D+wfHgt/TUCXmKdRPQvJ
+         o5mTsP1DfOVprhD5TLNQ3w39aElOc2jEe4d+byibdUQigKZIQ1YWYUzGVbNwttFcEejA
+         9jJ63mz7ZpHrZW0WleP2ZD83Vb/RGhp6jabVlPKrf36nf27xk2IB4ODfu+Y5dJ4tDs2l
+         g104OP4yaqwdCxVY+JG0SBa57bDQP7ul65yuL79zn6oeLtPLcppNsS9SBdL4QUwg9usa
+         HNQA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc:content-transfer-encoding;
-        bh=HPDKDuuyjQV+L83qxsRs2j2r4Bd7vA94jp4URGDWu4Y=;
-        b=Aajwf55j5FDvTrVolxmR2m3anE54OU44o+Kyv61xUU421pyI9n9GMmXm493/KTj3D7
-         FsUgwFNnfvSoiFm+odn8hdToV0o/oq+xXxnysyhygC32nzPeWvRukc1zMivcWH7mUxwS
-         MTl1bHttG8TbvAhbe08Dn3M/9+VPNjfIgxoqsfAWXZ464QIssEIHeCmjrw+bHaq8QUYs
-         Yf0/2V4Ti4fT8UWczclmxkaiBv2paB8F5eWNzobR/ARvtnMEmWYrupW7PBopeUK3X/ib
-         t1ZPztv6VLJXPV5c2pQXoCPo8icWhPQzZhq6pu7OjTg8evtgh9DhggBcahzi6WBfo3DP
-         vKCQ==
-X-Gm-Message-State: AOAM533XAKe4tyLwp2R77n9DRUb0ee12CKphlO+DDptkBzZaioCMHapM
-        vfeD6CYUOewLhFgvYZhx1RH7/0edpTYCjZFdCNg=
-X-Google-Smtp-Source: ABdhPJyrjEgChDABzeBhizt53D7WFa2C+14B6jlaOlTS/PyAebeN5XITrey22WkeFKRvK2pBbm1TaYTScMuKGwhqyKI=
-X-Received: by 2002:a9d:2041:: with SMTP id n59mr29562720ota.28.1595415055176;
- Wed, 22 Jul 2020 03:50:55 -0700 (PDT)
+        bh=iqmfyazKZn+mho7lCVo6bAfqAtnXjAxCJUZ6qkqG5N8=;
+        b=QYq5dWz1A9Rr1cpg86XunD4/iGpBzPgIvveV+wExJRqNMQvUxPqs2/UjJRFtgnT01J
+         1rX4kN9tDobURDjPtYl7E+rr57F88OIGDDz7yOgX4dUdgkREGC5wDmt6VG9yJZCnVgWx
+         Vi6ktO/+aGANa50ScBpEoDgF4z2wcAmb5NdrN1R6SYuR1aVFEKYMRnnlT5W6KHO21cRy
+         fpbAVvmiBfBJByrUs/En3ucBgLwMwzoJVn1AsxUrlEoU0pqzXQ6g/feNc6AR/9GQybZ4
+         kQ5jIBIDeL8l1sDuHAgB3rLmmA63tdtJJraPClEl8i79KjyOELlAxxyjeHpUNKlAPK0o
+         hF0A==
+X-Gm-Message-State: AOAM5334h7NClEw3XHpUxaoSpUZsT90UCiIhO+A48i/KAQOd1y9BMW1C
+        g0s5YO/8ahDhJ5dDacfnIIhYxM6oMa2wu1Iqewc=
+X-Google-Smtp-Source: ABdhPJy5LqlqeJceoKnQgpa7j3P1jG9JOaGl1DQYLKelA89UplFxMi5nc2kMkPZSPcf4DWiSVpAt+HZJ/dNgP7hXQt4=
+X-Received: by 2002:a9d:2041:: with SMTP id n59mr29570051ota.28.1595415233727;
+ Wed, 22 Jul 2020 03:53:53 -0700 (PDT)
 MIME-Version: 1.0
 References: <1594996707-3727-1-git-send-email-atrajeev@linux.vnet.ibm.com>
- <1594996707-3727-8-git-send-email-atrajeev@linux.vnet.ibm.com>
- <CACzsE9oBw1ZrJLqOAg1QqPrQgSoVbEdPh_ax7mU_kcWNyfyAcg@mail.gmail.com> <9A4E06A2-5686-4C85-B2F7-0904F195B58A@linux.vnet.ibm.com>
-In-Reply-To: <9A4E06A2-5686-4C85-B2F7-0904F195B58A@linux.vnet.ibm.com>
+ <1594996707-3727-5-git-send-email-atrajeev@linux.vnet.ibm.com>
+ <CACzsE9r9fy22hScRm7yz5OeZH9jXA+97hEfAOo-Nk_EPwW-_Dw@mail.gmail.com> <F54F7D50-8255-428A-B79E-EE1E2D70074B@linux.vnet.ibm.com>
+In-Reply-To: <F54F7D50-8255-428A-B79E-EE1E2D70074B@linux.vnet.ibm.com>
 From:   Jordan Niethe <jniethe5@gmail.com>
-Date:   Wed, 22 Jul 2020 20:49:57 +1000
-Message-ID: <CACzsE9p-mNGptKi_+RSOOhvmW5gfLcKEbtoS6ah_5ZmVCThfpQ@mail.gmail.com>
-Subject: Re: [v3 07/15] powerpc/perf: Add power10_feat to dt_cpu_ftrs
+Date:   Wed, 22 Jul 2020 20:52:56 +1000
+Message-ID: <CACzsE9oUkodkbGEMJJwbZKbbACX5fn-rNVKtnd+yRMp5=Ara4A@mail.gmail.com>
+Subject: Re: [v3 04/15] powerpc/perf: Add support for ISA3.1 PMU SPRs
 To:     Athira Rajeev <atrajeev@linux.vnet.ibm.com>
-Cc:     Michael Ellerman <mpe@ellerman.id.au>,
-        Gautham R Shenoy <ego@linux.vnet.ibm.com>,
+Cc:     Gautham R Shenoy <ego@linux.vnet.ibm.com>,
         Michael Neuling <mikey@neuling.org>, maddy@linux.vnet.ibm.com,
         kvm@vger.kernel.org, kvm-ppc@vger.kernel.org, svaidyan@in.ibm.com,
         acme@kernel.org, jolsa@kernel.org,
@@ -66,250 +65,259 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jul 22, 2020 at 5:55 PM Athira Rajeev
+On Wed, Jul 22, 2020 at 6:07 PM Athira Rajeev
 <atrajeev@linux.vnet.ibm.com> wrote:
 >
 >
 >
-> On 22-Jul-2020, at 10:11 AM, Jordan Niethe <jniethe5@gmail.com> wrote:
+> On 22-Jul-2020, at 9:48 AM, Jordan Niethe <jniethe5@gmail.com> wrote:
 >
-> On Sat, Jul 18, 2020 at 1:13 AM Athira Rajeev
+> On Sat, Jul 18, 2020 at 1:02 AM Athira Rajeev
 > <atrajeev@linux.vnet.ibm.com> wrote:
 >
 >
 > From: Madhavan Srinivasan <maddy@linux.ibm.com>
 >
-> Add power10 feature function to dt_cpu_ftrs.c along
-> with a power10 specific init() to initialize pmu sprs,
-> sets the oprofile_cpu_type and cpu_features. This will
-> enable performance monitoring unit(PMU) for Power10
-> in CPU features with "performance-monitor-power10".
+> PowerISA v3.1 includes new performance monitoring unit(PMU)
+> special purpose registers (SPRs). They are
 >
-> For PowerISA v3.1, BHRB disable is controlled via Monitor Mode
-> Control Register A (MMCRA) bit, namely "BHRB Recording Disable
-> (BHRBRD)". This patch initializes MMCRA BHRBRD to disable BHRB
-> feature at boot for power10.
+> Monitor Mode Control Register 3 (MMCR3)
+> Sampled Instruction Event Register 2 (SIER2)
+> Sampled Instruction Event Register 3 (SIER3)
+>
+> MMCR3 is added for further sampling related configuration
+> control. SIER2/SIER3 are added to provide additional
+> information about the sampled instruction.
+>
+> Patch adds new PPMU flag called "PPMU_ARCH_310S" to support
+> handling of these new SPRs, updates the struct thread_struct
+> to include these new SPRs, include MMCR3 in struct mmcr_regs.
+> This is needed to support programming of MMCR3 SPR during
+> event_[enable/disable]. Patch also adds the sysfs support
+> for the MMCR3 SPR along with SPRN_ macros for these new pmu sprs.
 >
 > Signed-off-by: Madhavan Srinivasan <maddy@linux.ibm.com>
 > ---
-> arch/powerpc/include/asm/reg.h        |  3 +++
-> arch/powerpc/kernel/cpu_setup_power.S |  8 ++++++++
-> arch/powerpc/kernel/dt_cpu_ftrs.c     | 26 ++++++++++++++++++++++++++
-> 3 files changed, 37 insertions(+)
+> arch/powerpc/include/asm/perf_event_server.h |  2 ++
+> arch/powerpc/include/asm/processor.h         |  4 ++++
+> arch/powerpc/include/asm/reg.h               |  6 ++++++
+> arch/powerpc/kernel/sysfs.c                  |  8 ++++++++
+> arch/powerpc/perf/core-book3s.c              | 29 +++++++++++++++++++++++=
++++++
+> 5 files changed, 49 insertions(+)
 >
-> diff --git a/arch/powerpc/include/asm/reg.h b/arch/powerpc/include/asm/re=
-g.h
-> index 21a1b2d..900ada1 100644
-> --- a/arch/powerpc/include/asm/reg.h
-> +++ b/arch/powerpc/include/asm/reg.h
-> @@ -1068,6 +1068,9 @@
-> #define MMCR0_PMC2_LOADMISSTIME        0x5
+> diff --git a/arch/powerpc/include/asm/perf_event_server.h b/arch/powerpc/=
+include/asm/perf_event_server.h
+> index 14b8dc1..832450a 100644
+> --- a/arch/powerpc/include/asm/perf_event_server.h
+> +++ b/arch/powerpc/include/asm/perf_event_server.h
+> @@ -22,6 +22,7 @@ struct mmcr_regs {
+>        unsigned long mmcr1;
+>        unsigned long mmcr2;
+>        unsigned long mmcra;
+> +       unsigned long mmcr3;
+> };
+> /*
+>  * This struct provides the constants and functions needed to
+> @@ -75,6 +76,7 @@ struct power_pmu {
+> #define PPMU_HAS_SIER          0x00000040 /* Has SIER */
+> #define PPMU_ARCH_207S         0x00000080 /* PMC is architecture v2.07S *=
+/
+> #define PPMU_NO_SIAR           0x00000100 /* Do not use SIAR */
+> +#define PPMU_ARCH_310S         0x00000200 /* Has MMCR3, SIER2 and SIER3 =
+*/
+>
+> We elsewhere have CPU_FTR_ARCH_31, so should this be PPMU_ARCH_31S to
+> be consistent.
+>
+>
+>
+> Ok,
+> This change will need to be done in all places which are currently using =
+PPMU_ARCH_310S
+>
+> /*
+>  * Values for flags to get_alternatives()
+> diff --git a/arch/powerpc/include/asm/processor.h b/arch/powerpc/include/=
+asm/processor.h
+> index 52a6783..a466e94 100644
+> --- a/arch/powerpc/include/asm/processor.h
+> +++ b/arch/powerpc/include/asm/processor.h
+> @@ -272,6 +272,10 @@ struct thread_struct {
+>        unsigned        mmcr0;
+>
+>        unsigned        used_ebb;
+> +       unsigned long   mmcr3;
+> +       unsigned long   sier2;
+> +       unsigned long   sier3;
+> +
 > #endif
->
-> +/* BHRB disable bit for PowerISA v3.10 */
-> +#define MMCRA_BHRB_DISABLE     0x0000002000000000
->
-> Shouldn't this go under SPRN_MMCRA with the other MMCRA_*.
->
->
->
-> Hi Jordan
->
-> Ok, the definition of MMCRA is under #ifdef for 64 bit .  if I move defin=
-ition of MMCRA_BHRB_DISABLE along with other SPR's, I also
-> need to define this for 32-bit to satisfy core-book3s to compile as below=
-:
+> };
 >
 > diff --git a/arch/powerpc/include/asm/reg.h b/arch/powerpc/include/asm/re=
 g.h
-> index 900ada10762c..7e271657b412 100644
+> index 88e6c78..21a1b2d 100644
 > --- a/arch/powerpc/include/asm/reg.h
 > +++ b/arch/powerpc/include/asm/reg.h
-> @@ -888,6 +888,8 @@
->  #define   MMCRA_SLOT   0x07000000UL /* SLOT bits (37-39) */
->  #define   MMCRA_SLOT_SHIFT     24
->  #define   MMCRA_SAMPLE_ENABLE 0x00000001UL /* enable sampling */
-> +/* BHRB disable bit for PowerISA v3.10 */
-> +#define   MMCRA_BHRB_DISABLE  0x0000002000000000
->  #define   POWER6_MMCRA_SDSYNC 0x0000080000000000ULL    /* SDAR/SIAR sync=
-ed */
->  #define   POWER6_MMCRA_SIHV   0x0000040000000000ULL
->  #define   POWER6_MMCRA_SIPR   0x0000020000000000ULL
-> @@ -1068,9 +1070,6 @@
->  #define MMCR0_PMC2_LOADMISSTIME        0x5
->  #endif
+> @@ -876,7 +876,9 @@
+> #define   MMCR0_FCHV   0x00000001UL /* freeze conditions in hypervisor mo=
+de */
+> #define SPRN_MMCR1     798
+> #define SPRN_MMCR2     785
+> +#define SPRN_MMCR3     754
+> #define SPRN_UMMCR2    769
+> +#define SPRN_UMMCR3    738
+> #define SPRN_MMCRA     0x312
+> #define   MMCRA_SDSYNC 0x80000000UL /* SDAR synced with SIAR */
+> #define   MMCRA_SDAR_DCACHE_MISS 0x40000000UL
+> @@ -918,6 +920,10 @@
+> #define   SIER_SIHV            0x1000000       /* Sampled MSR_HV */
+> #define   SIER_SIAR_VALID      0x0400000       /* SIAR contents valid */
+> #define   SIER_SDAR_VALID      0x0200000       /* SDAR contents valid */
+> +#define SPRN_SIER2     752
+> +#define SPRN_SIER3     753
+> +#define SPRN_USIER2    736
+> +#define SPRN_USIER3    737
+> #define SPRN_SIAR      796
+> #define SPRN_SDAR      797
+> #define SPRN_TACR      888
+> diff --git a/arch/powerpc/kernel/sysfs.c b/arch/powerpc/kernel/sysfs.c
+> index 571b325..46b4ebc 100644
+> --- a/arch/powerpc/kernel/sysfs.c
+> +++ b/arch/powerpc/kernel/sysfs.c
+> @@ -622,8 +622,10 @@ void ppc_enable_pmcs(void)
+> SYSFS_PMCSETUP(pmc8, SPRN_PMC8);
+>
+> SYSFS_PMCSETUP(mmcra, SPRN_MMCRA);
+> +SYSFS_PMCSETUP(mmcr3, SPRN_MMCR3);
+>
+> static DEVICE_ATTR(mmcra, 0600, show_mmcra, store_mmcra);
+> +static DEVICE_ATTR(mmcr3, 0600, show_mmcr3, store_mmcr3);
+> #endif /* HAS_PPC_PMC56 */
 >
 >
+> @@ -886,6 +888,9 @@ static int register_cpu_online(unsigned int cpu)
+> #ifdef CONFIG_PMU_SYSFS
+>        if (cpu_has_feature(CPU_FTR_MMCRA))
+>                device_create_file(s, &dev_attr_mmcra);
+> +
+> +       if (cpu_has_feature(CPU_FTR_ARCH_31))
+> +               device_create_file(s, &dev_attr_mmcr3);
+> #endif /* CONFIG_PMU_SYSFS */
 >
-> -/* BHRB disable bit for PowerISA v3.10 */
-> -#define MMCRA_BHRB_DISABLE     0x0000002000000000
-> -
->  /*
->   * SPRG usage:
->   *
+>        if (cpu_has_feature(CPU_FTR_PURR)) {
+> @@ -980,6 +985,9 @@ static int unregister_cpu_online(unsigned int cpu)
+> #ifdef CONFIG_PMU_SYSFS
+>        if (cpu_has_feature(CPU_FTR_MMCRA))
+>                device_remove_file(s, &dev_attr_mmcra);
+> +
+> +       if (cpu_has_feature(CPU_FTR_ARCH_31))
+> +               device_remove_file(s, &dev_attr_mmcr3);
+> #endif /* CONFIG_PMU_SYSFS */
+>
+>        if (cpu_has_feature(CPU_FTR_PURR)) {
 > diff --git a/arch/powerpc/perf/core-book3s.c b/arch/powerpc/perf/core-boo=
 k3s.c
-> index 36baae666387..88068f20827c 100644
+> index f4d07b5..ca32fc0 100644
 > --- a/arch/powerpc/perf/core-book3s.c
 > +++ b/arch/powerpc/perf/core-book3s.c
-> @@ -94,6 +94,7 @@ static unsigned int freeze_events_kernel =3D MMCR0_FCS;
->  #define SPRN_SIER2             0
->  #define SPRN_SIER3             0
->  #define MMCRA_SAMPLE_ENABLE    0
-> +#define MMCRA_BHRB_DISABLE     0
->
->
->
->  static inline unsigned long perf_ip_adjust(struct pt_regs *regs)
->  {
->
->
->
-> +
+> @@ -72,6 +72,11 @@ struct cpu_hw_events {
 > /*
->  * SPRG usage:
->  *
-> diff --git a/arch/powerpc/kernel/cpu_setup_power.S b/arch/powerpc/kernel/=
-cpu_setup_power.S
-> index efdcfa7..b8e0d1e 100644
-> --- a/arch/powerpc/kernel/cpu_setup_power.S
-> +++ b/arch/powerpc/kernel/cpu_setup_power.S
-> @@ -94,6 +94,7 @@ _GLOBAL(__restore_cpu_power8)
-> _GLOBAL(__setup_cpu_power10)
->        mflr    r11
->        bl      __init_FSCR_power10
-> +       bl      __init_PMU_ISA31
+>  * 32-bit doesn't have MMCRA but does have an MMCR2,
+>  * and a few other names are different.
+> + * Also 32-bit doesn't have MMCR3, SIER2 and SIER3.
+> + * Define them as zero knowing that any code path accessing
+> + * these registers (via mtspr/mfspr) are done under ppmu flag
+> + * check for PPMU_ARCH_310S and we will not enter that code path
+> + * for 32-bit.
+>  */
+> #ifdef CONFIG_PPC32
 >
-> So we set MMCRA here but then aren't we still going to call __init_PMU
-> which will overwrite that?
-> Would this setting MMCRA also need to be handled in __restore_cpu_power10=
-?
+> @@ -85,6 +90,9 @@ struct cpu_hw_events {
+> #define MMCR0_PMCC_U6          0
+>
+> #define SPRN_MMCRA             SPRN_MMCR2
+> +#define SPRN_MMCR3             0
+> +#define SPRN_SIER2             0
+> +#define SPRN_SIER3             0
+> #define MMCRA_SAMPLE_ENABLE    0
+>
+> static inline unsigned long perf_ip_adjust(struct pt_regs *regs)
+> @@ -581,6 +589,11 @@ static void ebb_switch_out(unsigned long mmcr0)
+>        current->thread.sdar  =3D mfspr(SPRN_SDAR);
+>        current->thread.mmcr0 =3D mmcr0 & MMCR0_USER_MASK;
+>        current->thread.mmcr2 =3D mfspr(SPRN_MMCR2) & MMCR2_USER_MASK;
+> +       if (ppmu->flags & PPMU_ARCH_310S) {
+> +               current->thread.mmcr3 =3D mfspr(SPRN_MMCR3);
+>
+> Like MMCR0_USER_MASK and MMCR2_USER_MASK do we need a MMCR3_USER_MASK
+> here, or is there no need?
 >
 >
-> Thanks for this nice catch !  When I rebased code initial phase, we didn=
-=E2=80=99t had power10 part filled in.
-> It was a miss from my side in adding PMu init functions and thanks for po=
-inting this out.
-> Below patch will call __init_PMU functions in setup and restore. Please c=
-heck if this looks good
+> Jordan
 >
-> --
-> diff --git a/arch/powerpc/kernel/cpu_setup_power.S b/arch/powerpc/kernel/=
-cpu_setup_power.S
-> index efdcfa714106..e672a6c5fd7c 100644
-> --- a/arch/powerpc/kernel/cpu_setup_power.S
-> +++ b/arch/powerpc/kernel/cpu_setup_power.S
-> @@ -94,6 +94,9 @@ _GLOBAL(__restore_cpu_power8)
->  _GLOBAL(__setup_cpu_power10)
->   mflr r11
->   bl __init_FSCR_power10
-> + bl __init_PMU
-> + bl __init_PMU_ISA31
-> + bl __init_PMU_HV
->   b 1f
+> We don=E2=80=99t need user mask for MMCR3 and other new SPRs ( SIER2/3) .=
+ Incase of MMCR3, we dont have any Freeze control bits and incase of SIER2/=
+3, it is similar to SIER (where HW handles the masking of the bits), hence =
+we didn't add any user_mask for these SPRs
+Okay thank you for explaining that.
 >
->  _GLOBAL(__setup_cpu_power9)
-
-Won't you also need to change where the label 1 is:
---- a/arch/powerpc/kernel/cpu_setup_power.S
-+++ b/arch/powerpc/kernel/cpu_setup_power.S
-@@ -100,8 +100,8 @@ _GLOBAL(__setup_cpu_power10)
- _GLOBAL(__setup_cpu_power9)
-        mflr    r11
-        bl      __init_FSCR
--1:     bl      __init_PMU
--       bl      __init_hvmode_206
-+       bl      __init_PMU
-+1:     bl      __init_hvmode_206
-        mtlr    r11
-        beqlr
-        li      r0,0
-
-> @@ -124,6 +127,9 @@ _GLOBAL(__setup_cpu_power9)
->  _GLOBAL(__restore_cpu_power10)
->   mflr r11
->   bl __init_FSCR_power10
-> + bl __init_PMU
-> + bl __init_PMU_ISA31
-> + bl __init_PMU_HV
->   b 1f
+> Thanks
+> Athira
 >
->  _GLOBAL(__restore_cpu_power9)
-> @@ -233,3 +239,10 @@ __init_PMU_ISA207:
->   li r5,0
->   mtspr SPRN_MMCRS,r5
->   blr
-> +
-> +__init_PMU_ISA31:
-> + li r5,0
-> + mtspr SPRN_MMCR3,r5
-> + LOAD_REG_IMMEDIATE(r5, MMCRA_BHRB_DISABLE)
-> + mtspr SPRN_MMCRA,r5
-> + blr
->
-> =E2=80=94
->
->        b       1f
->
-> _GLOBAL(__setup_cpu_power9)
-> @@ -233,3 +234,10 @@ __init_PMU_ISA207:
->        li      r5,0
->        mtspr   SPRN_MMCRS,r5
->        blr
-> +
-> +__init_PMU_ISA31:
-> +       li      r5,0
-> +       mtspr   SPRN_MMCR3,r5
-> +       LOAD_REG_IMMEDIATE(r5, MMCRA_BHRB_DISABLE)
-> +       mtspr   SPRN_MMCRA,r5
-> +       blr
-> diff --git a/arch/powerpc/kernel/dt_cpu_ftrs.c b/arch/powerpc/kernel/dt_c=
-pu_ftrs.c
-> index 3a40951..f482286 100644
-> --- a/arch/powerpc/kernel/dt_cpu_ftrs.c
-> +++ b/arch/powerpc/kernel/dt_cpu_ftrs.c
-> @@ -450,6 +450,31 @@ static int __init feat_enable_pmu_power9(struct dt_c=
-pu_feature *f)
->        return 1;
+> +               current->thread.sier2 =3D mfspr(SPRN_SIER2);
+> +               current->thread.sier3 =3D mfspr(SPRN_SIER3);
+> +       }
 > }
 >
-> +static void init_pmu_power10(void)
-> +{
-> +       init_pmu_power9();
+> static unsigned long ebb_switch_in(bool ebb, struct cpu_hw_events *cpuhw)
+> @@ -620,6 +633,12 @@ static unsigned long ebb_switch_in(bool ebb, struct =
+cpu_hw_events *cpuhw)
+>         * instead manage the MMCR2 entirely by itself.
+>         */
+>        mtspr(SPRN_MMCR2, cpuhw->mmcr.mmcr2 | current->thread.mmcr2);
 > +
-> +       mtspr(SPRN_MMCR3, 0);
-> +       mtspr(SPRN_MMCRA, MMCRA_BHRB_DISABLE);
-> +}
+> +       if (ppmu->flags & PPMU_ARCH_310S) {
+> +               mtspr(SPRN_MMCR3, current->thread.mmcr3);
+> +               mtspr(SPRN_SIER2, current->thread.sier2);
+> +               mtspr(SPRN_SIER3, current->thread.sier3);
+> +       }
+> out:
+>        return mmcr0;
+> }
+> @@ -840,6 +859,11 @@ void perf_event_print_debug(void)
+>                pr_info("EBBRR: %016lx BESCR: %016lx\n",
+>                        mfspr(SPRN_EBBRR), mfspr(SPRN_BESCR));
+>        }
 > +
-> +static int __init feat_enable_pmu_power10(struct dt_cpu_feature *f)
-> +{
-> +       hfscr_pmu_enable();
+> +       if (ppmu->flags & PPMU_ARCH_310S) {
+> +               pr_info("MMCR3: %016lx SIER2: %016lx SIER3: %016lx\n",
+> +                       mfspr(SPRN_MMCR3), mfspr(SPRN_SIER2), mfspr(SPRN_=
+SIER3));
+> +       }
+> #endif
+>        pr_info("SIAR:  %016lx SDAR:  %016lx SIER:  %016lx\n",
+>                mfspr(SPRN_SIAR), sdar, sier);
+> @@ -1305,6 +1329,8 @@ static void power_pmu_enable(struct pmu *pmu)
+>        if (!cpuhw->n_added) {
+>                mtspr(SPRN_MMCRA, cpuhw->mmcr.mmcra & ~MMCRA_SAMPLE_ENABLE=
+);
+>                mtspr(SPRN_MMCR1, cpuhw->mmcr.mmcr1);
+> +               if (ppmu->flags & PPMU_ARCH_310S)
+> +                       mtspr(SPRN_MMCR3, cpuhw->mmcr.mmcr3);
+>                goto out_enable;
+>        }
+>
+> @@ -1348,6 +1374,9 @@ static void power_pmu_enable(struct pmu *pmu)
+>        if (ppmu->flags & PPMU_ARCH_207S)
+>                mtspr(SPRN_MMCR2, cpuhw->mmcr.mmcr2);
+>
+> +       if (ppmu->flags & PPMU_ARCH_310S)
+> +               mtspr(SPRN_MMCR3, cpuhw->mmcr.mmcr3);
 > +
-> +       init_pmu_power10();
-> +       init_pmu_registers =3D init_pmu_power10;
-> +
-> +       cur_cpu_spec->cpu_features |=3D CPU_FTR_MMCRA;
-> +       cur_cpu_spec->cpu_user_features |=3D PPC_FEATURE_PSERIES_PERFMON_=
-COMPAT;
-> +
-> +       cur_cpu_spec->num_pmcs          =3D 6;
-> +       cur_cpu_spec->pmc_type          =3D PPC_PMC_IBM;
-> +       cur_cpu_spec->oprofile_cpu_type =3D "ppc64/power10";
-> +
-> +       return 1;
-> +}
-> +
-> static int __init feat_enable_tm(struct dt_cpu_feature *f)
-> {
-> #ifdef CONFIG_PPC_TRANSACTIONAL_MEM
-> @@ -639,6 +664,7 @@ struct dt_cpu_feature_match {
->        {"pc-relative-addressing", feat_enable, 0},
->        {"machine-check-power9", feat_enable_mce_power9, 0},
->        {"performance-monitor-power9", feat_enable_pmu_power9, 0},
-> +       {"performance-monitor-power10", feat_enable_pmu_power10, 0},
->        {"event-based-branch-v3", feat_enable, 0},
->        {"random-number-generator", feat_enable, 0},
->        {"system-call-vectored", feat_disable, 0},
+>        /*
+>         * Read off any pre-existing events that need to move
+>         * to another PMC.
 > --
 > 1.8.3.1
 >
