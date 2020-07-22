@@ -2,97 +2,183 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 404F7229D0B
-	for <lists+kvm@lfdr.de>; Wed, 22 Jul 2020 18:23:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EF178229D83
+	for <lists+kvm@lfdr.de>; Wed, 22 Jul 2020 18:50:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727044AbgGVQXG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 22 Jul 2020 12:23:06 -0400
-Received: from mail.kernel.org ([198.145.29.99]:46776 "EHLO mail.kernel.org"
+        id S1731051AbgGVQuy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 22 Jul 2020 12:50:54 -0400
+Received: from mga07.intel.com ([134.134.136.100]:12009 "EHLO mga07.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726642AbgGVQXG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 22 Jul 2020 12:23:06 -0400
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 983052065F;
-        Wed, 22 Jul 2020 16:23:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1595434985;
-        bh=JDuAd/IXbI8mLdXTBjc0KnzENivxsT/B90lZcHtXwho=;
-        h=From:To:Cc:Subject:Date:From;
-        b=udcoRBeZF9RGPjhoURMUpD3UOr/OOnpMCD9pTkbd3aDurKJl11MY/yzD6rpZoRjA6
-         Z/t+wAijL9lSdZLAeCBTU4LBlpf4oj26sPVCr3uXmGNTNIZC46aunqF46m2n5U1Fnb
-         T9gu5YQz2f6mdtoBlP32JjoZHYvc1cawuc1feO5c=
-Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=why.lan)
-        by disco-boy.misterjones.org with esmtpsa (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-        (Exim 4.92)
-        (envelope-from <maz@kernel.org>)
-        id 1jyHWJ-00E1Ih-Uq; Wed, 22 Jul 2020 17:23:04 +0100
-From:   Marc Zyngier <maz@kernel.org>
-To:     kvmarm@lists.cs.columbia.edu
-Cc:     linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
-        James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Will Deacon <will@kernel.org>, kernel-team@android.com,
-        Nathan Chancellor <natechancellor@gmail.com>,
-        Nick Desaulniers <ndesaulniers@google.com>
-Subject: [PATCH] KVM: arm64: Prevent vcpu_has_ptrauth from generating OOL functions
-Date:   Wed, 22 Jul 2020 17:22:31 +0100
-Message-Id: <20200722162231.3689767-1-maz@kernel.org>
-X-Mailer: git-send-email 2.27.0
+        id S1726642AbgGVQux (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 22 Jul 2020 12:50:53 -0400
+IronPort-SDR: yiVEIujHbbYbaMEjiDiNcyTh5qmSgLPkrBiPOSmYpj6la6z/3lzSMs9ZwvI9PzJlF9sItzlAOc
+ b/rp1EmHkp+A==
+X-IronPort-AV: E=McAfee;i="6000,8403,9690"; a="215002841"
+X-IronPort-AV: E=Sophos;i="5.75,383,1589266800"; 
+   d="scan'208";a="215002841"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jul 2020 09:50:51 -0700
+IronPort-SDR: L+8m7J8RWmfQdUFP7nNVsRis/hvFKPt3CUmzdUuG4sPpU5xSTU/i5zwca/aG50/A9u2+9/d4gx
+ vrvmDvcVD7gw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.75,383,1589266800"; 
+   d="scan'208";a="462526859"
+Received: from orsmsx101.amr.corp.intel.com ([10.22.225.128])
+  by orsmga005.jf.intel.com with ESMTP; 22 Jul 2020 09:50:50 -0700
+Received: from [10.254.181.38] (10.254.181.38) by ORSMSX101.amr.corp.intel.com
+ (10.22.225.128) with Microsoft SMTP Server (TLS) id 14.3.439.0; Wed, 22 Jul
+ 2020 09:50:50 -0700
+Subject: Re: [PATCH RFC v2 02/18] irq/dev-msi: Add support for a new DEV_MSI
+ irq domain
+To:     Jason Gunthorpe <jgg@mellanox.com>,
+        Dave Jiang <dave.jiang@intel.com>
+CC:     <vkoul@kernel.org>, <maz@kernel.org>, <bhelgaas@google.com>,
+        <rafael@kernel.org>, <gregkh@linuxfoundation.org>,
+        <tglx@linutronix.de>, <hpa@zytor.com>,
+        <alex.williamson@redhat.com>, <jacob.jun.pan@intel.com>,
+        <ashok.raj@intel.com>, <yi.l.liu@intel.com>, <baolu.lu@intel.com>,
+        <kevin.tian@intel.com>, <sanjay.k.kumar@intel.com>,
+        <tony.luck@intel.com>, <jing.lin@intel.com>,
+        <dan.j.williams@intel.com>, <kwankhede@nvidia.com>,
+        <eric.auger@redhat.com>, <parav@mellanox.com>,
+        <dave.hansen@intel.com>, <netanelg@mellanox.com>,
+        <shahafs@mellanox.com>, <yan.y.zhao@linux.intel.com>,
+        <pbonzini@redhat.com>, <samuel.ortiz@intel.com>,
+        <mona.hossain@intel.com>, <dmaengine@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <x86@kernel.org>,
+        <linux-pci@vger.kernel.org>, <kvm@vger.kernel.org>
+References: <159534667974.28840.2045034360240786644.stgit@djiang5-desk3.ch.intel.com>
+ <159534734833.28840.10067945890695808535.stgit@djiang5-desk3.ch.intel.com>
+ <20200721161344.GA2021248@mellanox.com>
+From:   "Dey, Megha" <megha.dey@intel.com>
+Message-ID: <a99af84f-f3ef-ee3c-1f94-680909e97868@intel.com>
+Date:   Wed, 22 Jul 2020 09:50:47 -0700
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 62.31.163.78
-X-SA-Exim-Rcpt-To: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, will@kernel.org, kernel-team@android.com, natechancellor@gmail.com, ndesaulniers@google.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+In-Reply-To: <20200721161344.GA2021248@mellanox.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.254.181.38]
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-So far, vcpu_has_ptrauth() is implemented in terms of system_supports_*_auth()
-calls, which are declared "inline". In some specific conditions (clang
-and SCS), the "inline" very much turns into an "out of line", which
-leads to a fireworks when this predicate is evaluated on a non-VHE
-system (right at the beginning of __hyp_handle_ptrauth).
+Hi Jason,
 
-Instead, make sure vcpu_has_ptrauth gets expanded inline by directly
-using the cpus_have_final_cap() helpers, which are __always_inline,
-generate much better code, and are the only thing that make sense when
-running at EL2 on a nVHE system.
+On 7/21/2020 9:13 AM, Jason Gunthorpe wrote:
+> On Tue, Jul 21, 2020 at 09:02:28AM -0700, Dave Jiang wrote:
+>> From: Megha Dey <megha.dey@intel.com>
+>>
+>> Add support for the creation of a new DEV_MSI irq domain. It creates a
+>> new irq chip associated with the DEV_MSI domain and adds the necessary
+>> domain operations to it.
+>>
+>> Add a new config option DEV_MSI which must be enabled by any
+>> driver that wants to support device-specific message-signaled-interrupts
+>> outside of PCI-MSI(-X).
+>>
+>> Lastly, add device specific mask/unmask callbacks in addition to a write
+>> function to the platform_msi_ops.
+>>
+>> Reviewed-by: Dan Williams <dan.j.williams@intel.com>
+>> Signed-off-by: Megha Dey <megha.dey@intel.com>
+>> Signed-off-by: Dave Jiang <dave.jiang@intel.com>
+>>   arch/x86/include/asm/hw_irq.h |    5 ++
+>>   drivers/base/Kconfig          |    7 +++
+>>   drivers/base/Makefile         |    1
+>>   drivers/base/dev-msi.c        |   95 +++++++++++++++++++++++++++++++++++++++++
+>>   drivers/base/platform-msi.c   |   45 +++++++++++++------
+>>   drivers/base/platform-msi.h   |   23 ++++++++++
+>>   include/linux/msi.h           |    8 +++
+>>   7 files changed, 168 insertions(+), 16 deletions(-)
+>>   create mode 100644 drivers/base/dev-msi.c
+>>   create mode 100644 drivers/base/platform-msi.h
+>>
+>> diff --git a/arch/x86/include/asm/hw_irq.h b/arch/x86/include/asm/hw_irq.h
+>> index 74c12437401e..8ecd7570589d 100644
+>> +++ b/arch/x86/include/asm/hw_irq.h
+>> @@ -61,6 +61,11 @@ struct irq_alloc_info {
+>>   			irq_hw_number_t	msi_hwirq;
+>>   		};
+>>   #endif
+>> +#ifdef CONFIG_DEV_MSI
+>> +		struct {
+>> +			irq_hw_number_t hwirq;
+>> +		};
+>> +#endif
+> 
+> Why is this in this patch? I didn't see an obvious place where it is
+> used?
 
-Fixes: 29eb5a3c57f7 ("KVM: arm64: Handle PtrAuth traps early")
-Reported-by: Nathan Chancellor <natechancellor@gmail.com>
-Reported-by: Nick Desaulniers <ndesaulniers@google.com>
-Signed-off-by: Marc Zyngier <maz@kernel.org>
----
- arch/arm64/include/asm/kvm_host.h | 11 ++++++++---
- 1 file changed, 8 insertions(+), 3 deletions(-)
+Since I have introduced the DEV-MSI domain and related ops, this is 
+required in the dev_msi_set_hwirq and dev_msi_set_desc in this patch.
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 147064314abf..a8278f6873e6 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -391,9 +391,14 @@ struct kvm_vcpu_arch {
- #define vcpu_has_sve(vcpu) (system_supports_sve() && \
- 			    ((vcpu)->arch.flags & KVM_ARM64_GUEST_HAS_SVE))
- 
--#define vcpu_has_ptrauth(vcpu)	((system_supports_address_auth() || \
--				  system_supports_generic_auth()) && \
--				 ((vcpu)->arch.flags & KVM_ARM64_GUEST_HAS_PTRAUTH))
-+#ifdef CONFIG_ARM64_PTR_AUTH
-+#define vcpu_has_ptrauth(vcpu)						\
-+	((cpus_have_final_cap(ARM64_HAS_ADDRESS_AUTH) ||		\
-+	  cpus_have_final_cap(ARM64_HAS_GENERIC_AUTH)) &&		\
-+	 (vcpu)->arch.flags & KVM_ARM64_GUEST_HAS_PTRAUTH)
-+#else
-+#define vcpu_has_ptrauth(vcpu)		false
-+#endif
- 
- #define vcpu_gp_regs(v)		(&(v)->arch.ctxt.gp_regs)
- 
--- 
-2.28.0.rc0.142.g3c755180ce-goog
+>>   
+>> +static void __platform_msi_desc_mask_unmask_irq(struct msi_desc *desc, u32 mask)
+>> +{
+>> +	const struct platform_msi_ops *ops;
+>> +
+>> +	ops = desc->platform.msi_priv_data->ops;
+>> +	if (!ops)
+>> +		return;
+>> +
+>> +	if (mask) {
+>> +		if (ops->irq_mask)
+>> +			ops->irq_mask(desc);
+>> +	} else {
+>> +		if (ops->irq_unmask)
+>> +			ops->irq_unmask(desc);
+>> +	}
+>> +}
+>> +
+>> +void platform_msi_mask_irq(struct irq_data *data)
+>> +{
+>> +	__platform_msi_desc_mask_unmask_irq(irq_data_get_msi_desc(data), 1);
+>> +}
+>> +
+>> +void platform_msi_unmask_irq(struct irq_data *data)
+>> +{
+>> +	__platform_msi_desc_mask_unmask_irq(irq_data_get_msi_desc(data), 0);
+>> +}
+> 
+> This is a bit convoluted, just call the op directly:
+> 
+> void platform_msi_unmask_irq(struct irq_data *data)
+> {
+> 	const struct platform_msi_ops *ops = desc->platform.msi_priv_data->ops;
+> 
+> 	if (ops->irq_unmask)
+> 		ops->irq_unmask(desc);
+> }
+>
 
+Sure, I will update this.
+
+>> diff --git a/include/linux/msi.h b/include/linux/msi.h
+>> index 7f6a8eb51aca..1da97f905720 100644
+>> +++ b/include/linux/msi.h
+>> @@ -323,9 +323,13 @@ enum {
+>>   
+>>   /*
+>>    * platform_msi_ops - Callbacks for platform MSI ops
+>> + * @irq_mask:   mask an interrupt source
+>> + * @irq_unmask: unmask an interrupt source
+>>    * @write_msg:	write message content
+>>    */
+>>   struct platform_msi_ops {
+>> +	unsigned int            (*irq_mask)(struct msi_desc *desc);
+>> +	unsigned int            (*irq_unmask)(struct msi_desc *desc);
+> 
+> Why do these functions return things if the only call site throws it
+> away?
+
+Hmmm, fair enough, I will change it to void.
+
+> 
+> Jason
+> 
