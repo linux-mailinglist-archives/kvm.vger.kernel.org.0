@@ -2,88 +2,70 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6077322A932
-	for <lists+kvm@lfdr.de>; Thu, 23 Jul 2020 09:01:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CCFF522A97D
+	for <lists+kvm@lfdr.de>; Thu, 23 Jul 2020 09:21:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726735AbgGWHBh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 23 Jul 2020 03:01:37 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:38516 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1725774AbgGWHBg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 23 Jul 2020 03:01:36 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1595487695;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=tCJ9HV/dQQNN/kdt2YO0dJshLcnXkw4jxhsX/ogpvnQ=;
-        b=WnKXCssAkZoguoYnLUDQVc0TIXedvEVVcgRbFDJcxjPMov7gXMn1oHRTDJuzUtn6kjdMF+
-        fyQKLRQvFJ89PlSQb9FCSbevoJgd6xCwZioOdNFVUi5i3NfviTvkCIK63cFh2roRyytsQV
-        p94zZRtxRNPid+Dwn0Sm7vfGqAYfeEo=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-228-KzkHWC6xN2yqCVe1f7Qr1Q-1; Thu, 23 Jul 2020 03:01:31 -0400
-X-MC-Unique: KzkHWC6xN2yqCVe1f7Qr1Q-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 333D71DE0;
-        Thu, 23 Jul 2020 07:01:30 +0000 (UTC)
-Received: from gondolin (ovpn-112-228.ams2.redhat.com [10.36.112.228])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 038A91000232;
-        Thu, 23 Jul 2020 07:01:26 +0000 (UTC)
-Date:   Thu, 23 Jul 2020 09:01:23 +0200
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Alex Williamson <alex.williamson@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        prime.zeng@hisilicon.com
-Subject: Re: [PATCH] vfio/pci: Hold igate across releasing eventfd contexts
-Message-ID: <20200723090123.095159ed.cohuck@redhat.com>
-In-Reply-To: <159527934542.26615.503005826695043299.stgit@gimli.home>
-References: <159527934542.26615.503005826695043299.stgit@gimli.home>
-Organization: Red Hat GmbH
+        id S1726801AbgGWHVG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 23 Jul 2020 03:21:06 -0400
+Received: from 8bytes.org ([81.169.241.247]:58794 "EHLO theia.8bytes.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725862AbgGWHVF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 23 Jul 2020 03:21:05 -0400
+Received: by theia.8bytes.org (Postfix, from userid 1000)
+        id E2EE4346; Thu, 23 Jul 2020 09:21:03 +0200 (CEST)
+Date:   Thu, 23 Jul 2020 09:21:02 +0200
+From:   Joerg Roedel <joro@8bytes.org>
+To:     Mike Stunes <mstunes@vmware.com>
+Cc:     Joerg Roedel <jroedel@suse.de>, "x86@kernel.org" <x86@kernel.org>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "hpa@zytor.com" <hpa@zytor.com>, Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Jiri Slaby <jslaby@suse.cz>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Juergen Gross <jgross@suse.com>,
+        Kees Cook <keescook@chromium.org>,
+        David Rientjes <rientjes@google.com>,
+        Cfir Cohen <cfir@google.com>,
+        Erdem Aktas <erdemaktas@google.com>,
+        Masami Hiramatsu <mhiramat@kernel.org>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Martin Radev <martin.b.radev@gmail.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "virtualization@lists.linux-foundation.org" 
+        <virtualization@lists.linux-foundation.org>
+Subject: Re: [PATCH v4 51/75] x86/sev-es: Handle MMIO events
+Message-ID: <20200723072102.GN27672@8bytes.org>
+References: <20200714120917.11253-1-joro@8bytes.org>
+ <20200714120917.11253-52-joro@8bytes.org>
+ <40D5C698-1ED2-4CCE-9C1D-07620A021A6A@vmware.com>
+ <20200722080530.GH6132@suse.de>
+ <7020C1D2-5900-4AD8-ADCD-04A571DF2EA7@vmware.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <7020C1D2-5900-4AD8-ADCD-04A571DF2EA7@vmware.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 20 Jul 2020 15:09:27 -0600
-Alex Williamson <alex.williamson@redhat.com> wrote:
+Hi Mike,
 
-> No need to release and immediately re-acquire igate while clearing
-> out the eventfd ctxs.
-> 
-> Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
-> ---
->  drivers/vfio/pci/vfio_pci.c |    4 +---
->  1 file changed, 1 insertion(+), 3 deletions(-)
-> 
-> diff --git a/drivers/vfio/pci/vfio_pci.c b/drivers/vfio/pci/vfio_pci.c
-> index b0258b79bb5b..dabca0450e6d 100644
-> --- a/drivers/vfio/pci/vfio_pci.c
-> +++ b/drivers/vfio/pci/vfio_pci.c
-> @@ -523,14 +523,12 @@ static void vfio_pci_release(void *device_data)
->  		vfio_pci_vf_token_user_add(vdev, -1);
->  		vfio_spapr_pci_eeh_release(vdev->pdev);
->  		vfio_pci_disable(vdev);
-> +
->  		mutex_lock(&vdev->igate);
->  		if (vdev->err_trigger) {
->  			eventfd_ctx_put(vdev->err_trigger);
->  			vdev->err_trigger = NULL;
->  		}
-> -		mutex_unlock(&vdev->igate);
-> -
-> -		mutex_lock(&vdev->igate);
->  		if (vdev->req_trigger) {
->  			eventfd_ctx_put(vdev->req_trigger);
->  			vdev->req_trigger = NULL;
-> 
+On Wed, Jul 22, 2020 at 10:53:02PM +0000, Mike Stunes wrote:
+> Thanks Joerg! With that change in place, this kernel boots normally.
+> What was the problem?
 
-Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+The problem was that the code got its page-table from
+current->active_mm. But these pointers are not set up during early boot,
+so that the #VC handler can't walk the page-table and propagates a
+page-fault every time. This loops forever.
 
+Getting the page-table from CR3 instead works at all stages of the
+systems runtime.
+
+Regards,
+
+	Joerg
