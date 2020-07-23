@@ -2,86 +2,116 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id CF7DD22ADD1
-	for <lists+kvm@lfdr.de>; Thu, 23 Jul 2020 13:34:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A6E2222AE88
+	for <lists+kvm@lfdr.de>; Thu, 23 Jul 2020 14:01:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728110AbgGWLee (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 23 Jul 2020 07:34:34 -0400
-Received: from mx2.itam.mx ([148.205.229.36]:52750 "EHLO mx2.itam.mx"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725846AbgGWLee (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 23 Jul 2020 07:34:34 -0400
-Received: from cronos2.itam.mx (cronos2.itam.mx [148.205.148.141])
-        by mx2.itam.mx  with ESMTP id 06NBXnmk007913-06NBXnn3007913
-        (version=TLSv1.0 cipher=DHE-RSA-AES256-SHA bits=256 verify=FAIL);
-        Thu, 23 Jul 2020 06:33:50 -0500
-Received: from [10.81.183.86] (105.8.4.105) by cronos2.itam.mx
- (148.205.148.141) with Microsoft SMTP Server (TLS) id 14.3.468.0; Thu, 23 Jul
- 2020 06:33:49 -0500
-Content-Type: text/plain; charset="utf-8"
+        id S1727869AbgGWMBY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 23 Jul 2020 08:01:24 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:53075 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726558AbgGWMBY (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 23 Jul 2020 08:01:24 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1595505682;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=cPGyi1XLifSOA1yXGeuHZfsgFwwkLUi8q0Ep7G+DUCY=;
+        b=KvcKO0ft8j8SueUe1VJWcseIgLafzS1iP1cA8SlBdAKs4+T0BSywUSwK6u3w8zhe22n/7K
+        /ZxonMEQLs8qpsmRcC3Dh375UaUxQ/OOZr288F3sUxrHDp/Uo2NVSgmPP8fPekWElFHxje
+        k1G6Mdg49QwEMsNwA6GXhEkgkk/N7i4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-31-F-ByViL0PHWhKmEDT2pKwQ-1; Thu, 23 Jul 2020 08:01:20 -0400
+X-MC-Unique: F-ByViL0PHWhKmEDT2pKwQ-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1EE638064DE;
+        Thu, 23 Jul 2020 12:01:19 +0000 (UTC)
+Received: from gondolin (ovpn-112-228.ams2.redhat.com [10.36.112.228])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id CF78219C4F;
+        Thu, 23 Jul 2020 12:01:14 +0000 (UTC)
+Date:   Thu, 23 Jul 2020 14:01:12 +0200
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Janosch Frank <frankja@linux.ibm.com>
+Cc:     kvm@vger.kernel.org, thuth@redhat.com, linux-s390@vger.kernel.org,
+        david@redhat.com, borntraeger@de.ibm.com, imbrenda@linux.ibm.com
+Subject: Re: [kvm-unit-tests PATCH 1/3] s390x: Add custom pgm cleanup
+ function
+Message-ID: <20200723140112.6525ddba.cohuck@redhat.com>
+In-Reply-To: <20200717145813.62573-2-frankja@linux.ibm.com>
+References: <20200717145813.62573-1-frankja@linux.ibm.com>
+        <20200717145813.62573-2-frankja@linux.ibm.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Description: Mail message body
-Subject: =?utf-8?q?Covid_19_Wohlt=C3=A4tigkeitsfonds?=
-To:     Recipients <aflore98@itam.mx>
-From:   ''Tayeb Souami'' <aflore98@itam.mx>
-Date:   Thu, 23 Jul 2020 13:33:31 +0200
-Reply-To: <Tayebsouam.spende@gmail.com>
-Message-ID: <f3b70415-4f76-429a-bf27-7c3a607a95ee@CRONOS2.itam.mx>
-X-Originating-IP: [105.8.4.105]
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; d=itam.mx; s=2019; c=relaxed/relaxed;
- h=content-type:mime-version:subject:to:from:date:reply-to:message-id;
- bh=0e+iY5sBEFO/sjChqI6a0rePLYR3wNA+X31I1uNCUzI=;
- b=e1L3HdkWOKiLVGzMoOUxRqMyT2pHJJrKqaMLwrzkXJiOZwNra7k+3+GixQhlqBacUtDxXnPVVtRZ
-        ErpAnfBKpPSlgn/ChmlCVyxur8ajEZyPckLV0aHAIDE8jptIlNqaVlhiJStfdqOtrRdTe8tzFal0
-        iRhu9rgHYOUUFDj4rQzcSlkrmYDaaLZ1Dw5oJVd8/s2P1GdmJ+wACZUsVMAJrFDtOEjT7z6G9X3W
-        fGYeV7Xxs1UJWvnQzQoYmv/rSUFALwGjzWZdq63egedBiQd65TYeiLZbwGqczufcRqj6ZgqbVc8H
-        tGBNildRntvX59pujYlE9q/kxD5F8eqRcvcVFQ==
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Lieber Freund,
+On Fri, 17 Jul 2020 10:58:11 -0400
+Janosch Frank <frankja@linux.ibm.com> wrote:
 
-Ich bin Herr Tayeb Souami, New Jersey, Vereinigte Staaten von Amerika, der =
-Mega-Gewinner von $ 315million In Mega Millions Jackpot, spende ich an 5 zu=
-f=C3=A4llige Personen, wenn Sie diese E-Mail erhalten, dann wurde Ihre E-Ma=
-il nach einem Spinball ausgew=C3=A4hlt.Ich habe den gr=C3=B6=C3=9Ften Teil =
-meines Verm=C3=B6gens auf eine Reihe von Wohlt=C3=A4tigkeitsorganisationen =
-und Organisationen verteilt.Ich habe mich freiwillig dazu entschieden, die =
-Summe von =E2=82=AC 2.000.000,00 an Sie als eine der ausgew=C3=A4hlten 5 zu=
- spenden, um meine Gewinne zu =C3=BCberpr=C3=BCfen, sehen Sie bitte meine Y=
-ou Tube Seite unten.
+> Sometimes we need to do cleanup which we don't necessarily want to add
+> to interrupt.c, so lets add a way to register a cleanup function.
 
-UHR MICH HIER: https://www.youtube.com/watch?v=3DZ6ui8ZDQ6Ks
+s/lets/let's/ :)
 
+> 
+> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+> ---
+>  lib/s390x/asm/interrupt.h | 1 +
+>  lib/s390x/interrupt.c     | 9 +++++++++
+>  2 files changed, 10 insertions(+)
+> 
+> diff --git a/lib/s390x/asm/interrupt.h b/lib/s390x/asm/interrupt.h
+> index 4cfade9..b2a7c83 100644
+> --- a/lib/s390x/asm/interrupt.h
+> +++ b/lib/s390x/asm/interrupt.h
+> @@ -15,6 +15,7 @@
+>  #define EXT_IRQ_EXTERNAL_CALL	0x1202
+>  #define EXT_IRQ_SERVICE_SIG	0x2401
+>  
+> +void register_pgm_int_func(void (*f)(void));
+>  void handle_pgm_int(void);
+>  void handle_ext_int(void);
+>  void handle_mcck_int(void);
+> diff --git a/lib/s390x/interrupt.c b/lib/s390x/interrupt.c
+> index 243b9c2..36ba720 100644
+> --- a/lib/s390x/interrupt.c
+> +++ b/lib/s390x/interrupt.c
+> @@ -16,6 +16,7 @@
+>  
+>  static bool pgm_int_expected;
+>  static bool ext_int_expected;
+> +static void (*pgm_int_func)(void);
+>  static struct lowcore *lc;
+>  
+>  void expect_pgm_int(void)
+> @@ -51,8 +52,16 @@ void check_pgm_int_code(uint16_t code)
+>  	       lc->pgm_int_code);
+>  }
+>  
+> +void register_pgm_int_func(void (*f)(void))
+> +{
+> +	pgm_int_func = f;
+> +}
+> +
+>  static void fixup_pgm_int(void)
+>  {
+> +	if (pgm_int_func)
+> +		return (*pgm_int_func)();
+> +
 
+Maybe rather call this function, if set, instead of fixup_pgm_int() in
+handle_pgm_int()? Feels a bit cleaner to me.
+		
+>  	switch (lc->pgm_int_code) {
+>  	case PGM_INT_CODE_PRIVILEGED_OPERATION:
+>  		/* Normal operation is in supervisor state, so this exception
 
-Das ist dein Spendencode: [TS530342018]
-
-
-
-Antworten Sie mit dem SPENDE-CODE an diese
-
-E-Mail:Tayebsouam.spende@gmail.com
-
-
-Ich hoffe, Sie und Ihre Familie gl=C3=BCcklich zu machen.
-
-Gr=C3=BC=C3=9Fe
-Herr Tayeb Souami
-
-________________________________
-
-La informaci=C3=B3n contenida en este mensaje de datos es confidencial, con=
-stituye un secreto industrial y/o profesional en t=C3=A9rminos de la legisl=
-aci=C3=B3n vigente y se encuentra dirigida exclusivamente al destinatario i=
-ndicado en dicho mensaje. Si usted recibe esta informaci=C3=B3n por error o=
- si usted no es el destinatario del mensaje, favor de notificar al emisor, =
-y destr=C3=BAyalo.
-The information contained in this electronic message is confidential, it co=
-nstitutes a professional and/or industrial secret in terms of the current l=
-egislation, and is intended for its recipient only. If you receive this mes=
-sage by mistake or if you are not the recipient thereof, please notify the =
-sender and destroy it.
