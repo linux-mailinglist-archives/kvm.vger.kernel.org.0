@@ -2,64 +2,60 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2D83B22A8D9
-	for <lists+kvm@lfdr.de>; Thu, 23 Jul 2020 08:21:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1172F22A8DD
+	for <lists+kvm@lfdr.de>; Thu, 23 Jul 2020 08:21:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726984AbgGWGVV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 23 Jul 2020 02:21:21 -0400
-Received: from bilbo.ozlabs.org ([203.11.71.1]:53217 "EHLO ozlabs.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726390AbgGWGVU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 23 Jul 2020 02:21:20 -0400
+        id S1727052AbgGWGVX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 23 Jul 2020 02:21:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58350 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726390AbgGWGVW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 23 Jul 2020 02:21:22 -0400
+Received: from ozlabs.org (bilbo.ozlabs.org [IPv6:2401:3900:2:1::2])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 70FDDC0619DC;
+        Wed, 22 Jul 2020 23:21:22 -0700 (PDT)
 Received: by ozlabs.org (Postfix, from userid 1003)
-        id 4BC2KB5s0qz9sSJ; Thu, 23 Jul 2020 16:21:18 +1000 (AEST)
+        id 4BC2KB3wqzz9sRf; Thu, 23 Jul 2020 16:21:18 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ozlabs.org; s=201707;
-        t=1595485278; bh=IFTCm6zcqf516abhJ4Sn7meDBWdJj/FMmew567e6yPo=;
+        t=1595485278; bh=odF+torp6O5+9CyXhkwTTM6NVHZyqHYWRUU9Y7X2ibs=;
         h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=QHrs12kseRVGEX+ozdM7Bk6vM8hN0rntxzjRAXDLPJB5+D4I5trx8JLVKEGr+HWlW
-         Mj63kCsmYQo/uJVxEQyo6xy71+qys9EPiyUnLS0wybJYnvAxhe3k+ZSJ+U2csi6dEv
-         m4p3ywW83Fc4+QdjQ8081sBvInO0dflWfc+rdmby+iEWn07BdpvNwnJNhl+BoXRUko
-         PGFpiYQvGK+7m6HjKWHrkG4zVYjQaSTJZBb90cqJYr+EdFmgz1kCMJiQLPN4BTwuys
-         wW2IRygLknjUHpNpoWgw1D7M2qtPhMQU14/2XHHACcZE0i5VV9A13lZCYY5BQd0UY8
-         9ybHPfknMp5Lg==
-Date:   Thu, 23 Jul 2020 16:19:04 +1000
+        b=mxcHUvB17Jv0PuLCtPPCCEstr+aT1ErnByOEHg9mCCOjpZ3XCqDZ2aqHskXu1U17s
+         1J/JBy9nM5hKvwlMgGyJM5iD3WOAj3X32zauNKlXC7CPbSf7NsGYwfzeWnl8Ly7fRF
+         YgQp4txyASY1BRh0JS4UZ6aaTQkaf7pmJ5LzT1EoD+8qq8CQ0z1oRWuvjVGRQxszpv
+         VtexzBIrAFvcptPeV9KF+SlXvpbg8bnc/wrTVoshZn+QB7LyWHwixMRbjmzvvM/N3v
+         +AnnvBgBSu2wf9uBliqvVWeLfS++sa/9iEQtGRMtKaD7/AYfmFY+DevDOE+a3++8EG
+         3mXxDYfHW/TaQ==
+Date:   Thu, 23 Jul 2020 16:20:16 +1000
 From:   Paul Mackerras <paulus@ozlabs.org>
-To:     Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
-Cc:     pbonzini@redhat.com, tsbogend@alpha.franken.de, mpe@ellerman.id.au,
-        benh@kernel.crashing.org, borntraeger@de.ibm.com,
-        frankja@linux.ibm.com, david@redhat.com, cohuck@redhat.com,
-        heiko.carstens@de.ibm.com, gor@linux.ibm.com,
-        sean.j.christopherson@intel.com, vkuznets@redhat.com,
-        wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org,
-        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, x86@kernel.org,
-        hpa@zytor.com, maz@kernel.org, james.morse@arm.com,
-        julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com,
-        christoffer.dall@arm.com, peterx@redhat.com, thuth@redhat.com,
-        chenhuacai@gmail.com, kvm@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        linux-mips@vger.kernel.org, kvm-ppc@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org, linux-s390@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v6 3/5] KVM: PPC: clean up redundant kvm_run parameters
- in assembly
-Message-ID: <20200723061904.GC213782@thinks.paulus.ozlabs.org>
-References: <20200623131418.31473-1-tianjia.zhang@linux.alibaba.com>
- <20200623131418.31473-4-tianjia.zhang@linux.alibaba.com>
+To:     =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
+Cc:     Michael Ellerman <mpe@ellerman.id.au>, kvm@vger.kernel.org,
+        Nicholas Piggin <npiggin@gmail.com>, kvm-ppc@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org
+Subject: Re: [PATCH] KVM: PPC: Book3S HV: increase KVMPPC_NR_LPIDS on POWER8
+ and POWER9
+Message-ID: <20200723062016.GE213782@thinks.paulus.ozlabs.org>
+References: <20200608115714.1139735-1-clg@kaod.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <20200623131418.31473-4-tianjia.zhang@linux.alibaba.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20200608115714.1139735-1-clg@kaod.org>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jun 23, 2020 at 09:14:16PM +0800, Tianjia Zhang wrote:
-> In the current kvm version, 'kvm_run' has been included in the 'kvm_vcpu'
-> structure. For historical reasons, many kvm-related function parameters
-> retain the 'kvm_run' and 'kvm_vcpu' parameters at the same time. This
-> patch does a unified cleanup of these remaining redundant parameters.
+On Mon, Jun 08, 2020 at 01:57:14PM +0200, Cédric Le Goater wrote:
+> POWER8 and POWER9 have 12-bit LPIDs. Change LPID_RSVD to support up to
+> (4096 - 2) guests on these processors. POWER7 is kept the same with a
+> limitation of (1024 - 2), but it might be time to drop KVM support for
+> POWER7.
+> 
+> Tested with 2048 guests * 4 vCPUs on a witherspoon system with 512G
+> RAM and a bit of swap.
+> 
+> Signed-off-by: Cédric Le Goater <clg@kaod.org>
 
-Thanks, patch applied to my kvm-ppc-next branch, with fixes.
+Thanks, patch applied to my kvm-ppc-next branch.
 
 Paul.
