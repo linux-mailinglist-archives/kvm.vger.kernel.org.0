@@ -2,62 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8A4C322AEEC
-	for <lists+kvm@lfdr.de>; Thu, 23 Jul 2020 14:20:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3E5F022AEF5
+	for <lists+kvm@lfdr.de>; Thu, 23 Jul 2020 14:23:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728130AbgGWMUJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 23 Jul 2020 08:20:09 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:50086 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726666AbgGWMUH (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 23 Jul 2020 08:20:07 -0400
-Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 06NCEUj5024548;
-        Thu, 23 Jul 2020 08:20:07 -0400
+        id S1728588AbgGWMX4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 23 Jul 2020 08:23:56 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:15418 "EHLO
+        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1728180AbgGWMX4 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 23 Jul 2020 08:23:56 -0400
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 06NC28uA142532;
+        Thu, 23 Jul 2020 08:23:54 -0400
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 32facj046u-1
+        by mx0a-001b2d01.pphosted.com with ESMTP id 32f1pped66-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 23 Jul 2020 08:20:06 -0400
-Received: from m0187473.ppops.net (m0187473.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 06NCEdvj025091;
-        Thu, 23 Jul 2020 08:20:05 -0400
-Received: from ppma04fra.de.ibm.com (6a.4a.5195.ip4.static.sl-reverse.com [149.81.74.106])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 32facj045d-1
+        Thu, 23 Jul 2020 08:23:54 -0400
+Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 06NC3Abr146699;
+        Thu, 23 Jul 2020 08:23:54 -0400
+Received: from ppma06fra.de.ibm.com (48.49.7a9f.ip4.static.sl-reverse.com [159.122.73.72])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 32f1pped58-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 23 Jul 2020 08:20:05 -0400
-Received: from pps.filterd (ppma04fra.de.ibm.com [127.0.0.1])
-        by ppma04fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 06NCFLSX016989;
-        Thu, 23 Jul 2020 12:20:03 GMT
-Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
-        by ppma04fra.de.ibm.com with ESMTP id 32dbmn1ye8-1
+        Thu, 23 Jul 2020 08:23:53 -0400
+Received: from pps.filterd (ppma06fra.de.ibm.com [127.0.0.1])
+        by ppma06fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 06NCBLo6006288;
+        Thu, 23 Jul 2020 12:23:52 GMT
+Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
+        by ppma06fra.de.ibm.com with ESMTP id 32brbgu8et-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 23 Jul 2020 12:20:03 +0000
+        Thu, 23 Jul 2020 12:23:52 +0000
 Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
-        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 06NCK00W262486
+        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 06NCMPpX52822484
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 23 Jul 2020 12:20:00 GMT
+        Thu, 23 Jul 2020 12:22:25 GMT
 Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id E472BA4053;
-        Thu, 23 Jul 2020 12:19:59 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id 5C067A4051;
+        Thu, 23 Jul 2020 12:23:49 +0000 (GMT)
 Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 8596DA4040;
-        Thu, 23 Jul 2020 12:19:59 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id F1506A4040;
+        Thu, 23 Jul 2020 12:23:48 +0000 (GMT)
 Received: from localhost.localdomain (unknown [9.145.184.48])
         by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu, 23 Jul 2020 12:19:59 +0000 (GMT)
-Subject: Re: [kvm-unit-tests PATCH 2/3] s390x: skrf: Add exception new skey
- test and add test to unittests.cfg
+        Thu, 23 Jul 2020 12:23:48 +0000 (GMT)
+Subject: Re: [kvm-unit-tests PATCH 1/3] s390x: Add custom pgm cleanup function
 To:     Cornelia Huck <cohuck@redhat.com>
-Cc:     Thomas Huth <thuth@redhat.com>, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org, david@redhat.com,
-        borntraeger@de.ibm.com, imbrenda@linux.ibm.com
+Cc:     kvm@vger.kernel.org, thuth@redhat.com, linux-s390@vger.kernel.org,
+        david@redhat.com, borntraeger@de.ibm.com, imbrenda@linux.ibm.com
 References: <20200717145813.62573-1-frankja@linux.ibm.com>
- <20200717145813.62573-3-frankja@linux.ibm.com>
- <78da93f7-118d-2c1d-582a-092232f36108@redhat.com>
- <032c1103-3020-9deb-a307-70ded3bdb55e@linux.ibm.com>
- <1aa0a21c-90c9-0214-1869-87cc60a46548@redhat.com>
- <acc2a56c-6157-32e1-f305-48bf5a2a285d@linux.ibm.com>
- <20200723141043.7efadd30.cohuck@redhat.com>
+ <20200717145813.62573-2-frankja@linux.ibm.com>
+ <20200723140112.6525ddba.cohuck@redhat.com>
 From:   Janosch Frank <frankja@linux.ibm.com>
 Autocrypt: addr=frankja@linux.ibm.com; prefer-encrypt=mutual; keydata=
  mQINBFubpD4BEADX0uhkRhkj2AVn7kI4IuPY3A8xKat0ihuPDXbynUC77mNox7yvK3X5QBO6
@@ -101,113 +95,138 @@ Autocrypt: addr=frankja@linux.ibm.com; prefer-encrypt=mutual; keydata=
  DchCqFm5adiSP5+OT4NjkKUeGpBe/aRyQSle/RropTgCi85pje/juYEn2P9UAgkfBJrOHvQ9
  Z+2Sva8FRd61NJLkCJ4LFumRn9wQlX2icFbi8UDV3do0hXJRRYTWCxrHscMhkrFWLhYiPF4i
  phX7UNdOWBQ90qpHyAxHmDazdo27gEjfvsgYMdveKknEOTEb5phwxWgg7BcIDoJf9UMC
-Message-ID: <3be78ac2-6d75-2d4b-850d-e1744fbce9ef@linux.ibm.com>
-Date:   Thu, 23 Jul 2020 14:19:58 +0200
+Message-ID: <8a7c9e38-8d92-0353-b883-368c2dcdec04@linux.ibm.com>
+Date:   Thu, 23 Jul 2020 14:23:48 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.8.0
 MIME-Version: 1.0
-In-Reply-To: <20200723141043.7efadd30.cohuck@redhat.com>
+In-Reply-To: <20200723140112.6525ddba.cohuck@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="SRqyTEwNZ0CQDdb3VjJyo7I5PZzlbGYKq"
+ boundary="HahkwqycjwN8Ar8ZBVPAAf2ELi3zUYIBA"
 X-TM-AS-GCONF: 00
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
- definitions=2020-07-23_05:2020-07-23,2020-07-23 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0
- lowpriorityscore=0 phishscore=0 suspectscore=0 bulkscore=0 mlxlogscore=998
- spamscore=0 priorityscore=1501 clxscore=1015 adultscore=0 mlxscore=0
- impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2006250000 definitions=main-2007230090
+ definitions=2020-07-23_03:2020-07-23,2020-07-23 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 mlxscore=0
+ bulkscore=0 phishscore=0 clxscore=1015 impostorscore=0 malwarescore=0
+ lowpriorityscore=0 suspectscore=0 mlxlogscore=999 spamscore=0
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2006250000 definitions=main-2007230087
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---SRqyTEwNZ0CQDdb3VjJyo7I5PZzlbGYKq
-Content-Type: multipart/mixed; boundary="YVDuruXzugb6H4LdH7oEFFGyMXkIG3sJc"
+--HahkwqycjwN8Ar8ZBVPAAf2ELi3zUYIBA
+Content-Type: multipart/mixed; boundary="BnezAcZawUheR1KIft8DXVrTK6A3niqU4"
 
---YVDuruXzugb6H4LdH7oEFFGyMXkIG3sJc
-Content-Type: text/plain; charset=windows-1252
+--BnezAcZawUheR1KIft8DXVrTK6A3niqU4
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
-On 7/23/20 2:10 PM, Cornelia Huck wrote:
-> On Tue, 21 Jul 2020 17:03:10 +0200
+On 7/23/20 2:01 PM, Cornelia Huck wrote:
+> On Fri, 17 Jul 2020 10:58:11 -0400
 > Janosch Frank <frankja@linux.ibm.com> wrote:
 >=20
->> On 7/21/20 4:28 PM, Thomas Huth wrote:
->>> On 21/07/2020 10.52, Janosch Frank wrote: =20
->>>> On 7/21/20 9:28 AM, Thomas Huth wrote: =20
->>>>> On 17/07/2020 16.58, Janosch Frank wrote: =20
->>>>>> If a exception new psw mask contains a key a specification excepti=
-on
->>>>>> instead of a special operation exception is presented. =20
->>>>>
->>>>> I have troubles parsing that sentence... could you write that diffe=
-rently?
->>>>> (and: "s/a exception/an exception/") =20
->>>>
->>>> How about:
->>>>
->>>> When an exception psw new with a storage key in its mask is loaded f=
-rom
->>>> lowcore a specification exception is raised instead of the special
->>>> operation exception that is normally presented when skrf is active. =
-=20
->>>
->>> Still a huge beast of a sentence. Could you maybe make two sentences =
-out
->>> of it? For example:
->>>
->>> " ... is raised. This differs from the normal case where ..." =20
+>> Sometimes we need to do cleanup which we don't necessarily want to add=
+
+>> to interrupt.c, so lets add a way to register a cleanup function.
+>=20
+> s/lets/let's/ :)
+>=20
 >>
->> When an exception psw new with a storage key in its mask is loaded fro=
-m
->> lowcore a specification exception is raised. This behavior differs fro=
-m
->> the one that is presented when trying to execute skey related
->> instructions which will raise special operation exceptions.
+>> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+>> ---
+>>  lib/s390x/asm/interrupt.h | 1 +
+>>  lib/s390x/interrupt.c     | 9 +++++++++
+>>  2 files changed, 10 insertions(+)
+>>
+>> diff --git a/lib/s390x/asm/interrupt.h b/lib/s390x/asm/interrupt.h
+>> index 4cfade9..b2a7c83 100644
+>> --- a/lib/s390x/asm/interrupt.h
+>> +++ b/lib/s390x/asm/interrupt.h
+>> @@ -15,6 +15,7 @@
+>>  #define EXT_IRQ_EXTERNAL_CALL	0x1202
+>>  #define EXT_IRQ_SERVICE_SIG	0x2401
+>> =20
+>> +void register_pgm_int_func(void (*f)(void));
+>>  void handle_pgm_int(void);
+>>  void handle_ext_int(void);
+>>  void handle_mcck_int(void);
+>> diff --git a/lib/s390x/interrupt.c b/lib/s390x/interrupt.c
+>> index 243b9c2..36ba720 100644
+>> --- a/lib/s390x/interrupt.c
+>> +++ b/lib/s390x/interrupt.c
+>> @@ -16,6 +16,7 @@
+>> =20
+>>  static bool pgm_int_expected;
+>>  static bool ext_int_expected;
+>> +static void (*pgm_int_func)(void);
+>>  static struct lowcore *lc;
+>> =20
+>>  void expect_pgm_int(void)
+>> @@ -51,8 +52,16 @@ void check_pgm_int_code(uint16_t code)
+>>  	       lc->pgm_int_code);
+>>  }
+>> =20
+>> +void register_pgm_int_func(void (*f)(void))
+>> +{
+>> +	pgm_int_func =3D f;
+>> +}
+>> +
+>>  static void fixup_pgm_int(void)
+>>  {
+>> +	if (pgm_int_func)
+>> +		return (*pgm_int_func)();
+>> +
 >=20
-> s/psw new/new psw/ ?
+> Maybe rather call this function, if set, instead of fixup_pgm_int() in
+> handle_pgm_int()? Feels a bit cleaner to me.
 
-Yeah that would align the naming with the pop one.
+Well it's currently a cleanup function so it should be in
+fixup_pgm_int() because it fixes up.
 
+I don't need a handler here like Pierre with his IO changes.
+
+So it might more sense to change the name of the function ptr and
+registration function:
+
+register_pgm_cleanup_func()
+static void (*pgm_cleanup_func)(void);
+
+> 	=09
+>>  	switch (lc->pgm_int_code) {
+>>  	case PGM_INT_CODE_PRIVILEGED_OPERATION:
+>>  		/* Normal operation is in supervisor state, so this exception
 >=20
-> (And probably a comma after 'lowcore'.)
->=20
-> "This differs from the behaviour when trying to execute skey related
-> instructions, which will result in special operation exceptions."
->=20
-> ?
-
-Sure
 
 
 
---YVDuruXzugb6H4LdH7oEFFGyMXkIG3sJc--
+--BnezAcZawUheR1KIft8DXVrTK6A3niqU4--
 
---SRqyTEwNZ0CQDdb3VjJyo7I5PZzlbGYKq
+--HahkwqycjwN8Ar8ZBVPAAf2ELi3zUYIBA
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEwGNS88vfc9+v45Yq41TmuOI4ufgFAl8ZgG8ACgkQ41TmuOI4
-ufiEwBAAk028kn/8hdqCRF7fCbsaNujQ4M11Sx40Wa7xaOXXAoos2rC4lyQu0WmE
-+J8tzHs8IvCPOezaocRAt8nrGMsUsg5RUHjY1YSlWjgF8JhNjvN7jziUXcf6l320
-du0KbK/URXJVdUE5eut4QmCPQc2r+S1/kmUoUlAVLsUlyrxQvIJ40GZ1iQMzzW0y
-FX0iQKb+0oxUpjlnS+FN5vsJV24aB0/fMe3WvkAKkLk7GJbAINpjEBuEb9r/18au
-/q6Lx4KkcTuhIbeMik1mcfU6f6lwcn5F+KLIiwfGt0L5K9DnRxqFho+0nniG2hLv
-+vurNnEwD6SvSDqWBysI5QFDcfzlehqhRptGW8C8wdtgn07nio2eWA7rBg9cXjKg
-3E/Tz3crAysin7acndVvWdiY26Ht2LhGOzQXuUoyktnWuEzi3xd0cUYKxFLJwtUm
-bOlr0eGVe5Vbw17MTPLiOcvCAznH+1ObyL6EcWHnsF1kaNWT7UKpi/eDvmW+VO4g
-Q2p+U/KvOAAKAMKKN1tAGj0QncXMV4cuBc97G5OD5HeX4bxmeUZ6tHUU02iITjoz
-xCMgDEooZAIn2UthO1OPLxnBYmmcU8TkxeFRF8Bq/cszbu8jSKXGIEXnjDFPSBOX
-9brTpKYqFu2r3ZfMW/TZB7i3KSA5RTp5M3vGLk7lmJbLxi4nf+w=
-=04UE
+iQIzBAEBCAAdFiEEwGNS88vfc9+v45Yq41TmuOI4ufgFAl8ZgVQACgkQ41TmuOI4
+ufjirRAAvFdeOdRL18jIQlAnvHPn5MMxrdB1IZojjCr77KU9BW0ZOFCYdBM3toJY
+fYz/i4NUcGOOG5hH5Y4YErb6JofDb4fSf+740vdvJHYyoaYL1+McuM/fDMMrhMDB
+yiYsWdO7+xF4r3q0X7INAnyhwEcaWdhqhULTBSSMe+whgKUTz8CC6Cavuj2sYvoO
+PsbHOA2krAA8HrckJbieNZ0UZ5aOU/N3uhUAYwePKZn7KCuS7Rezhpv9FvcumVTo
+B5glnQuV5dKXuR8cTxTicGZWQE441F12+hcGtRArAm+UAJVA4DYsvNfuYBzVexTa
+v9zOKBdBojBu5+5tu0IgmXbBUDM6RUHknCMcFxMFILEsZmxI811m0hSkcsvPtp7v
+eF3vZJ2YvOSEA1vaHEywQSf70bSxq7OvrcORoEoFGR1J3ruAB8f8JJ5yrytpBxnf
+lsOndJuIGWau6kMLLuWaWwrpHoC4wk9dcrBOzGT/fh5l5EiLP437sBhyEmIDFmPY
+kRqKr3otMFNKKBsXxmbJWUR9Sq7oXXAfBH7EJ9s/pgeziBPZ6Kk1yZiHkO+2eRCM
+qnhgo1azNTXhKCCNflO9D6IzNJjbe0lUWEKbaAahGIiWP7OdLmgEqg/QGXVeyQYH
+OdzbivggKt3iVn20r0fg/1e9fm4PFxIzziaj6ybpzXzQdDDoY68=
+=Zdds
 -----END PGP SIGNATURE-----
 
---SRqyTEwNZ0CQDdb3VjJyo7I5PZzlbGYKq--
+--HahkwqycjwN8Ar8ZBVPAAf2ELi3zUYIBA--
 
