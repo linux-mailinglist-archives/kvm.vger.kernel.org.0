@@ -2,277 +2,119 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7043A22B5CA
-	for <lists+kvm@lfdr.de>; Thu, 23 Jul 2020 20:36:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DB59F22B8C9
+	for <lists+kvm@lfdr.de>; Thu, 23 Jul 2020 23:38:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727927AbgGWSgG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 23 Jul 2020 14:36:06 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:27767 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726666AbgGWSgE (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 23 Jul 2020 14:36:04 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1595529361;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=BjMEMo7D/ooHPdAOuZ5F7N2yj6cdYx6amr6g21w93l4=;
-        b=ZZsr1bPnelz/J5ivl39tvB+4efudt4y64H2QeM1eKhkVRKSPfaKKC5I7HoQ42q8JmdcVNP
-        XjfI0nZIuiLjsQqm6OrDZdof1FfCcDQa4S8nhYmH0QSn6OIo22S7tTWY0uSOWuEg6FoFBy
-        C79Uiob16rEmTsAqzQJljaA4Sdvloy4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-409-BZ3USn77Ohi5QhFdIZo0QA-1; Thu, 23 Jul 2020 14:35:56 -0400
-X-MC-Unique: BZ3USn77Ohi5QhFdIZo0QA-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 94D67800688;
-        Thu, 23 Jul 2020 18:35:53 +0000 (UTC)
-Received: from w520.home (ovpn-112-71.phx2.redhat.com [10.3.112.71])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 62EA15C221;
-        Thu, 23 Jul 2020 18:35:50 +0000 (UTC)
-Date:   Thu, 23 Jul 2020 12:35:44 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Xiong Zhang <xiong.y.zhang@intel.com>,
-        Wayne Boyer <wayne.boyer@intel.com>,
-        Zhenyu Wang <zhenyuw@linux.intel.com>,
-        Jun Nakajima <jun.nakajima@intel.com>,
-        Weijiang Yang <weijiang.yang@intel.com>
-Subject: Re: [PATCH] KVM: x86/mmu: Add capability to zap only sptes for the
- affected memslot
-Message-ID: <20200723123544.6268b465@w520.home>
-In-Reply-To: <20200723155711.GD21891@linux.intel.com>
-References: <20200703025047.13987-1-sean.j.christopherson@intel.com>
-        <51637a13-f23b-8b76-c93a-76346b4cc982@redhat.com>
-        <20200709211253.GW24919@linux.intel.com>
-        <49c7907a-3ab4-b5db-ccb4-190b990c8be3@redhat.com>
-        <20200710042922.GA24919@linux.intel.com>
-        <20200713122226.28188f93@x1.home>
-        <20200713190649.GE29725@linux.intel.com>
-        <20200721030319.GD20375@linux.intel.com>
-        <20200721100036.464d4440@w520.home>
-        <20200723155711.GD21891@linux.intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+        id S1726334AbgGWVif (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 23 Jul 2020 17:38:35 -0400
+Received: from mx0a-0016f401.pphosted.com ([67.231.148.174]:56800 "EHLO
+        mx0b-0016f401.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726033AbgGWVie (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 23 Jul 2020 17:38:34 -0400
+Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
+        by mx0a-0016f401.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 06NLUkVY013129
+        for <kvm@vger.kernel.org>; Thu, 23 Jul 2020 14:38:34 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=from : to : subject
+ : date : message-id : content-type : content-transfer-encoding :
+ mime-version; s=pfpt0818; bh=+cNf+7bcSbfKHMlwj3gpV7YcJfZ+dLUg98hYL7jy0H0=;
+ b=r2AonhkMu7C45e6Ca721e3j+F/38JkDkG2O/F+MY27WgkXTxrEYADQ34ys+XL6b1tSc7
+ d2M8bBAdARLpUwM1TkwXOXN4BDOPYeD4MnTh5arg7C3t6lHtCEhbTDcf3/w97sotwZ2X
+ t0E1Pjv3vfTJf7pFZaL0gvtdBZjESzXwAl1nNK6Jv1IJB4TIz3CM1dI31wmIB6waPepn
+ jQQ0Lg0JkRlZpJcUedyG5an4zifNidmDI/Vqmc9Mhrb3hPyBbMqS/E74bRG1dRKn8vEL
+ 5GwtGlFfWGK7Qfg8R88YVSdfZ/iL4vdk4NeCtYbH+4i7WkxZQsjiV4N4DFmRLnh93ldP rA== 
+Received: from sc-exch02.marvell.com ([199.233.58.182])
+        by mx0a-0016f401.pphosted.com with ESMTP id 32bxenyt9n-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Thu, 23 Jul 2020 14:38:34 -0700
+Received: from SC-EXCH03.marvell.com (10.93.176.83) by SC-EXCH02.marvell.com
+ (10.93.176.82) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Thu, 23 Jul
+ 2020 14:38:33 -0700
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (104.47.58.102)
+ by SC-EXCH03.marvell.com (10.93.176.83) with Microsoft SMTP Server (TLS) id
+ 15.0.1497.2 via Frontend Transport; Thu, 23 Jul 2020 14:38:32 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=ZKfGvEjnSALldiNkYGGJbpV16nuVlrQDU1odtOkdr2cVHJDWvkJz6iAjHiQQiFwIdhYSbAEz4Q48imKkn+bCpZ8WIMtAWlID3TyHQDS5fDWilNbmOLmtTsPMifQ/yPTl6RD5//32gpT6xtlkqnA2hbjh3YEfRgdo8UCAXAsXt6BZ1w/k1acbDaiGHq6j0Xe2rk1tmqwd4ZVy6Ae+dWLh4EbIG5azF5yhpjhXtadph4dNuZTj7ZmuRfl2L6C73fbk1H4Y9r5tv+ZM8a4T+g2AOyR6CAMsxsHOf8k2Vdi28LQZ3mb7aaG4CMsZWaghzQOnuCW7YAynWcq101GiNFddmQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=+cNf+7bcSbfKHMlwj3gpV7YcJfZ+dLUg98hYL7jy0H0=;
+ b=CnyMpURhORJvNzSQdWIgVesQtxUwkvpRg+rkAVwrhTrZZK+YarqFxNChpABmQ1rZCI+HQDxJmpCgPYzHgmSBlBVHUz4JfSYQD8V9W8Wz2DOTV85sNsGvbZKtZ+kPJmo2hs5PcBT20zzmM+L+mG+rLpxjOzntyXyksJDE21pLp+3YgBreX7yBo9iNRNF+PCeDOEl6oeBcFeoeM6nYb5wxLi0uqR8y8eqa+I0fYUoiriTyNmb58MUlTfvyaeeiX67b4MvT79sec5oUUVEvWvZzlVZR3lCtP2O0ejdy7v1nbYOqnBDEs7ugy/kBmr6I7anw54dOGDAVdoE3UIuc54bJ/A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=marvell.com; dmarc=pass action=none header.from=marvell.com;
+ dkim=pass header.d=marvell.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=marvell.onmicrosoft.com; s=selector1-marvell-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=+cNf+7bcSbfKHMlwj3gpV7YcJfZ+dLUg98hYL7jy0H0=;
+ b=jXbXHiZQg5A7Qd3xA03z22ltWtw3fdXOqjOF371rRvW4bpIA8hUB2KfR4CDf9O1QKyYu7hLFSBgZHF1+YJhIyTO+v82mPwsEmStHkN/DLuPW2cjiiNDw8wsW2q06b1GP3EnCOctQ4VPuHTpDN5Y6ESaVgekmHQEwmrIZK6dDlf8=
+Received: from BY5PR18MB3282.namprd18.prod.outlook.com (2603:10b6:a03:1ac::15)
+ by BY5PR18MB3186.namprd18.prod.outlook.com (2603:10b6:a03:1af::33) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3216.22; Thu, 23 Jul
+ 2020 21:38:32 +0000
+Received: from BY5PR18MB3282.namprd18.prod.outlook.com
+ ([fe80::f948:e533:540a:8adf]) by BY5PR18MB3282.namprd18.prod.outlook.com
+ ([fe80::f948:e533:540a:8adf%5]) with mapi id 15.20.3216.024; Thu, 23 Jul 2020
+ 21:38:31 +0000
+From:   Ross Deleon <rdeleon@marvell.com>
+To:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Subject: Could multiple PCIe devices in one IOMMU group be added to different
+ KVM VM separately?
+Thread-Topic: Could multiple PCIe devices in one IOMMU group be added to
+ different KVM VM separately?
+Thread-Index: AdZhOZr8DFKi39UsTGyXZ0YdgDbVFw==
+Date:   Thu, 23 Jul 2020 21:38:31 +0000
+Message-ID: <BY5PR18MB3282589C431572AC89EC531CA3760@BY5PR18MB3282.namprd18.prod.outlook.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: vger.kernel.org; dkim=none (message not signed)
+ header.d=none;vger.kernel.org; dmarc=none action=none
+ header.from=marvell.com;
+x-originating-ip: [69.181.108.88]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 33fba8dc-cd0b-4b33-90c2-08d82f50bed3
+x-ms-traffictypediagnostic: BY5PR18MB3186:
+x-microsoft-antispam-prvs: <BY5PR18MB31863591E783C24B41939296A3760@BY5PR18MB3186.namprd18.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:8273;
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: GJeoKUFkk0x6XXQZ6Rauz9TX1bSkPGkbe1dJmHA6x6ArSng6xwtAnj1HmqBrfRCnVEVfnnZtbYOLWZbjhB2x483ku0Bz1hVkhGCGjnRrC8qUoGq9pWo4mvqUA/nptVwvKxMyKmc79WnI0NmxRm1hOqNqkALIuXNWHOIvGeU2ge0ExFPJEBhJfMLqDUrLOsJO1NArtiK+V9G79BGl6gylTI21Ulab6xuJ04SZL+r/BPub0KjQBDjhI0dvsH0+/dJWicBa7S5BaQZIum2+ckLr5qOa8CCkiEX0pPtsLFoxcvquKeYL6OmyxFHP2qFTmyMcsgirtSaur/IREzYIhhhCIw==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BY5PR18MB3282.namprd18.prod.outlook.com;PTR:;CAT:NONE;SFTY:;SFS:(4636009)(366004)(136003)(346002)(39860400002)(396003)(376002)(316002)(33656002)(66446008)(5660300002)(2906002)(478600001)(4744005)(66476007)(66556008)(64756008)(8936002)(52536014)(186003)(9686003)(55016002)(7696005)(83380400001)(26005)(71200400001)(86362001)(6916009)(6506007)(76116006)(66946007)(8676002);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata: SlpeOMq8K1T1tp2qyKNZjwWSZqHXlgB7n98U26dl9v6UvYq+MbHWXEBhwW8FNy8iOY1lfsv6U1VIbu4nNjAyrZre62ZwPvimYMRfBIKWmmWRnfJLzJ8ok4CJaSVF2or9lRJZQ0ZfeJNHuseY1jgTiJUuc0XQHrqDOe6HrNXISzC1P0B1tdvOdOp9UBr6jdSEV3Yd5GnXqAQ2vW4TFDGy+RIxdJ/Kr5NkaenaTC/RyO8tpmiWyaSm1r4VA91/icUyjaxziSGGc8Vd7vYowGDlUdLs3igOm1f3ZkupKQbBzXZWtBZQ+apDyxKE6yuKoMUQPoz8L3z/OtTrSNG3ESwSddZDvxSvT5F4+zUiWA4l4WiE7EJa0pyL+10xTBkREf9886sTY1XESkloSzgVq+y+yn2LaUPewxFN+uUenyYq2qZE5t2nMRjzy5DImg6QRj3ETIVjB7iwm0idhrjuGKTGUdYR3k/HEa7aKUI4OD96t+EMxBee2Kgn/iqSHKwOf/ut
+x-ms-exchange-transport-forked: True
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+MIME-Version: 1.0
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BY5PR18MB3282.namprd18.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 33fba8dc-cd0b-4b33-90c2-08d82f50bed3
+X-MS-Exchange-CrossTenant-originalarrivaltime: 23 Jul 2020 21:38:31.6381
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 70e1fb47-1155-421d-87fc-2e58f638b6e0
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: jaR8kzzGMDjnfQ3l6MBFKqygD9/04bnXYAsxRitwifYeoutQLxRo4la1kHTeoKIenMOh65T85eBjY9uB8jskLw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY5PR18MB3186
+X-OriginatorOrg: marvell.com
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
+ definitions=2020-07-23_09:2020-07-23,2020-07-23 signatures=0
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 23 Jul 2020 08:57:11 -0700
-Sean Christopherson <sean.j.christopherson@intel.com> wrote:
+Hi:
+I want to know could multiple PCIe devices in one IOMMU group be added to d=
+ifferent KVM VM separately?
+Mother board: ASUS 390-A(intel supports VT-D)
+host OS: Ubuntu 18.04 with kernel 4.18.0-15
+KVM-QEMU: version 2.11.1
+I have got failed message like *card1 is used by VM1, and card2 is in the c=
+ard1's group and added to VM2, then VM2 can't boot*
+I have tried vfio driver, but it didn't work, so what should I do? try SR-I=
+OV? or update KVM-QEMU or update kernel?
 
-> On Tue, Jul 21, 2020 at 10:00:36AM -0600, Alex Williamson wrote:
-> > On Mon, 20 Jul 2020 20:03:19 -0700
-> > Sean Christopherson <sean.j.christopherson@intel.com> wrote:
-> >  =20
-> > > +Weijiang
-> > >=20
-> > > On Mon, Jul 13, 2020 at 12:06:50PM -0700, Sean Christopherson wrote: =
-=20
-> > > > The only ideas I have going forward are to:
-> > > >=20
-> > > >   a) Reproduce the bug outside of your environment and find a resou=
-rce that
-> > > >      can go through the painful bisection.   =20
-> > >=20
-> > > We're trying to reproduce the original issue in the hopes of biesecti=
-ng, but
-> > > have not yet discovered the secret sauce.  A few questions:
-> > >=20
-> > >   - Are there any known hardware requirements, e.g. specific flavor o=
-f GPU? =20
-> >=20
-> > I'm using an old GeForce GT635, I don't think there's anything special
-> > about this card. =20
->=20
-> Would you be able to provide your QEMU command line?  Or at least any
-> potentially relevant bits?  Still no luck reproducing this on our end.
-
-XML:
-
-<domain type=3D'kvm'>
-  <name>GeForce</name>
-  <uuid>2b417d4b-f25b-4522-a5be-e105f032f99c</uuid>
-  <memory unit=3D'KiB'>4194304</memory>
-  <currentMemory unit=3D'KiB'>4194304</currentMemory>
-  <memoryBacking>
-    <hugepages/>
-  </memoryBacking>
-  <vcpu placement=3D'static'>4</vcpu>
-  <cputune>
-    <vcpupin vcpu=3D'0' cpuset=3D'3'/>
-    <vcpupin vcpu=3D'1' cpuset=3D'7'/>
-    <vcpupin vcpu=3D'2' cpuset=3D'2'/>
-    <vcpupin vcpu=3D'3' cpuset=3D'6'/>
-    <emulatorpin cpuset=3D'0,4'/>
-  </cputune>
-  <os>
-    <type arch=3D'x86_64' machine=3D'pc-i440fx-5.0'>hvm</type>
-    <loader readonly=3D'yes' type=3D'pflash'>/usr/share/edk2/ovmf/OVMF_CODE=
-.fd</loader>
-    <nvram template=3D'/usr/share/edk2/ovmf/OVMF_VARS.fd'>/var/lib/libvirt/=
-qemu/nvram/GeForce_VARS.fd</nvram>
-    <bootmenu enable=3D'yes'/>
-  </os>
-  <features>
-    <acpi/>
-    <apic/>
-    <pae/>
-    <hyperv>
-      <relaxed state=3D'on'/>
-      <vapic state=3D'on'/>
-      <spinlocks state=3D'on' retries=3D'8191'/>
-      <vendor_id state=3D'on' value=3D'KeenlyKVM'/>
-    </hyperv>
-    <kvm>
-      <hidden state=3D'on'/>
-    </kvm>
-    <vmport state=3D'off'/>
-  </features>
-  <cpu mode=3D'custom' match=3D'exact' check=3D'none'>
-    <model fallback=3D'allow'>IvyBridge-IBRS</model>
-    <topology sockets=3D'1' dies=3D'1' cores=3D'4' threads=3D'1'/>
-  </cpu>
-  <clock offset=3D'localtime'>
-    <timer name=3D'rtc' tickpolicy=3D'catchup'/>
-    <timer name=3D'pit' tickpolicy=3D'delay'/>
-    <timer name=3D'hpet' present=3D'no'/>
-    <timer name=3D'hypervclock' present=3D'yes'/>
-  </clock>
-  <on_poweroff>destroy</on_poweroff>
-  <on_reboot>restart</on_reboot>
-  <on_crash>restart</on_crash>
-  <devices>
-    <emulator>/usr/local/bin/qemu-system-x86_64</emulator>
-    <disk type=3D'file' device=3D'disk'>
-      <driver name=3D'qemu' type=3D'qcow2' cache=3D'none'/>
-      <source file=3D'/mnt/ssd/GeForce.qcow2'/>
-      <target dev=3D'sda' bus=3D'scsi'/>
-      <boot order=3D'2'/>
-      <address type=3D'drive' controller=3D'0' bus=3D'0' target=3D'0' unit=
-=3D'0'/>
-    </disk>
-    <controller type=3D'scsi' index=3D'0' model=3D'virtio-scsi'>
-      <driver queues=3D'4'/>
-      <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x05' fu=
-nction=3D'0x0'/>
-    </controller>
-    <controller type=3D'pci' index=3D'0' model=3D'pci-root'/>
-    <controller type=3D'usb' index=3D'0' model=3D'nec-xhci'>
-      <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x08' fu=
-nction=3D'0x0'/>
-    </controller>
-    <interface type=3D'direct'>
-      <mac address=3D'52:54:00:60:ef:ac'/>
-      <source dev=3D'enp4s0' mode=3D'bridge'/>
-      <model type=3D'virtio'/>
-      <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x03' fu=
-nction=3D'0x0'/>
-    </interface>
-    <input type=3D'mouse' bus=3D'ps2'/>
-    <input type=3D'keyboard' bus=3D'ps2'/>
-    <hostdev mode=3D'subsystem' type=3D'pci' managed=3D'yes'>
-      <source>
-        <address domain=3D'0x0000' bus=3D'0x01' slot=3D'0x00' function=3D'0=
-x0'/>
-      </source>
-      <rom bar=3D'on'/>
-      <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x04' fu=
-nction=3D'0x0'/>
-    </hostdev>
-    <hostdev mode=3D'subsystem' type=3D'pci' managed=3D'yes'>
-      <source>
-        <address domain=3D'0x0000' bus=3D'0x01' slot=3D'0x00' function=3D'0=
-x1'/>
-      </source>
-      <rom bar=3D'off'/>
-      <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x06' fu=
-nction=3D'0x0'/>
-    </hostdev>
-    <memballoon model=3D'none'/>
-  </devices>
-</domain>
-
-=46rom libvirt log:
-
-LC_ALL=3DC \
-PATH=3D/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin \
-HOME=3D/var/lib/libvirt/qemu/domain-1-GeForce \
-XDG_DATA_HOME=3D/var/lib/libvirt/qemu/domain-1-GeForce/.local/share \
-XDG_CACHE_HOME=3D/var/lib/libvirt/qemu/domain-1-GeForce/.cache \
-XDG_CONFIG_HOME=3D/var/lib/libvirt/qemu/domain-1-GeForce/.config \
-QEMU_AUDIO_DRV=3Dnone \
-/usr/local/bin/qemu-system-x86_64 \
--name guest=3DGeForce,debug-threads=3Don \
--S \
--object secret,id=3DmasterKey0,format=3Draw,file=3D/var/lib/libvirt/qemu/do=
-main-1-GeForce/master-key.aes \
--blockdev '{"driver":"file","filename":"/usr/share/edk2/ovmf/OVMF_CODE.fd",=
-"node-name":"libvirt-pflash0-storage","auto-read-only":true,"discard":"unma=
-p"}' \
--blockdev '{"node-name":"libvirt-pflash0-format","read-only":true,"driver":=
-"raw","file":"libvirt-pflash0-storage"}' \
--blockdev '{"driver":"file","filename":"/var/lib/libvirt/qemu/nvram/GeForce=
-_VARS.fd","node-name":"libvirt-pflash1-storage","auto-read-only":true,"disc=
-ard":"unmap"}' \
--blockdev '{"node-name":"libvirt-pflash1-format","read-only":false,"driver"=
-:"raw","file":"libvirt-pflash1-storage"}' \
--machine pc-i440fx-5.0,accel=3Dkvm,usb=3Doff,vmport=3Doff,dump-guest-core=
-=3Doff,pflash0=3Dlibvirt-pflash0-format,pflash1=3Dlibvirt-pflash1-format \
--cpu IvyBridge-IBRS,hv-time,hv-relaxed,hv-vapic,hv-spinlocks=3D0x1fff,hv-ve=
-ndor-id=3DKeenlyKVM,kvm=3Doff \
--m 4096 \
--mem-prealloc \
--mem-path /dev/hugepages/libvirt/qemu/1-GeForce \
--overcommit mem-lock=3Doff \
--smp 4,sockets=3D1,dies=3D1,cores=3D4,threads=3D1 \
--uuid 2b417d4b-f25b-4522-a5be-e105f032f99c \
--display none \
--no-user-config \
--nodefaults \
--chardev socket,id=3Dcharmonitor,fd=3D36,server,nowait \
--mon chardev=3Dcharmonitor,id=3Dmonitor,mode=3Dcontrol \
--rtc base=3Dlocaltime,driftfix=3Dslew \
--global kvm-pit.lost_tick_policy=3Ddelay \
--no-hpet \
--no-shutdown \
--boot menu=3Don,strict=3Don \
--device nec-usb-xhci,id=3Dusb,bus=3Dpci.0,addr=3D0x8 \
--device virtio-scsi-pci,id=3Dscsi0,num_queues=3D4,bus=3Dpci.0,addr=3D0x5 \
--blockdev '{"driver":"file","filename":"/mnt/ssd/GeForce-2019-08-02.img","n=
-ode-name":"libvirt-2-storage","cache":{"direct":true,"no-flush":false},"aut=
-o-read-only":true,"discard":"unmap"}' \
--blockdev '{"node-name":"libvirt-2-format","read-only":true,"cache":{"direc=
-t":true,"no-flush":false},"driver":"raw","file":"libvirt-2-storage"}' \
--blockdev '{"driver":"file","filename":"/mnt/ssd/Geforce.qcow2","node-name"=
-:"libvirt-1-storage","cache":{"direct":true,"no-flush":false},"auto-read-on=
-ly":true,"discard":"unmap"}' \
--blockdev '{"node-name":"libvirt-1-format","read-only":false,"cache":{"dire=
-ct":true,"no-flush":false},"driver":"qcow2","file":"libvirt-1-storage","bac=
-king":"libvirt-2-format"}' \
--device scsi-hd,bus=3Dscsi0.0,channel=3D0,scsi-id=3D0,lun=3D0,device_id=3Dd=
-rive-scsi0-0-0-0,drive=3Dlibvirt-1-format,id=3Dscsi0-0-0-0,bootindex=3D2,wr=
-ite-cache=3Don \
--netdev tap,fd=3D38,id=3Dhostnet0,vhost=3Don,vhostfd=3D40 \
--device virtio-net-pci,netdev=3Dhostnet0,id=3Dnet0,mac=3D52:54:00:60:ef:ac,=
-bus=3Dpci.0,addr=3D0x3 \
--device vfio-pci,host=3D0000:01:00.0,id=3Dhostdev0,bus=3Dpci.0,addr=3D0x4,r=
-ombar=3D1 \
--device vfio-pci,host=3D0000:01:00.1,id=3Dhostdev1,bus=3Dpci.0,addr=3D0x6,r=
-ombar=3D0 \
--sandbox on,obsolete=3Ddeny,elevateprivileges=3Ddeny,spawn=3Ddeny,resourcec=
-ontrol=3Ddeny \
--msg timestamp=3Don
-
+Thanks
+Dahui
