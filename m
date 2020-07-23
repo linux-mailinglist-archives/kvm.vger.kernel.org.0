@@ -2,60 +2,88 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1172F22A8DD
-	for <lists+kvm@lfdr.de>; Thu, 23 Jul 2020 08:21:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6077322A932
+	for <lists+kvm@lfdr.de>; Thu, 23 Jul 2020 09:01:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727052AbgGWGVX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 23 Jul 2020 02:21:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58350 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726390AbgGWGVW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 23 Jul 2020 02:21:22 -0400
-Received: from ozlabs.org (bilbo.ozlabs.org [IPv6:2401:3900:2:1::2])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 70FDDC0619DC;
-        Wed, 22 Jul 2020 23:21:22 -0700 (PDT)
-Received: by ozlabs.org (Postfix, from userid 1003)
-        id 4BC2KB3wqzz9sRf; Thu, 23 Jul 2020 16:21:18 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ozlabs.org; s=201707;
-        t=1595485278; bh=odF+torp6O5+9CyXhkwTTM6NVHZyqHYWRUU9Y7X2ibs=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=mxcHUvB17Jv0PuLCtPPCCEstr+aT1ErnByOEHg9mCCOjpZ3XCqDZ2aqHskXu1U17s
-         1J/JBy9nM5hKvwlMgGyJM5iD3WOAj3X32zauNKlXC7CPbSf7NsGYwfzeWnl8Ly7fRF
-         YgQp4txyASY1BRh0JS4UZ6aaTQkaf7pmJ5LzT1EoD+8qq8CQ0z1oRWuvjVGRQxszpv
-         VtexzBIrAFvcptPeV9KF+SlXvpbg8bnc/wrTVoshZn+QB7LyWHwixMRbjmzvvM/N3v
-         +AnnvBgBSu2wf9uBliqvVWeLfS++sa/9iEQtGRMtKaD7/AYfmFY+DevDOE+a3++8EG
-         3mXxDYfHW/TaQ==
-Date:   Thu, 23 Jul 2020 16:20:16 +1000
-From:   Paul Mackerras <paulus@ozlabs.org>
-To:     =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
-Cc:     Michael Ellerman <mpe@ellerman.id.au>, kvm@vger.kernel.org,
-        Nicholas Piggin <npiggin@gmail.com>, kvm-ppc@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org
-Subject: Re: [PATCH] KVM: PPC: Book3S HV: increase KVMPPC_NR_LPIDS on POWER8
- and POWER9
-Message-ID: <20200723062016.GE213782@thinks.paulus.ozlabs.org>
-References: <20200608115714.1139735-1-clg@kaod.org>
+        id S1726735AbgGWHBh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 23 Jul 2020 03:01:37 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:38516 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1725774AbgGWHBg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 23 Jul 2020 03:01:36 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1595487695;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=tCJ9HV/dQQNN/kdt2YO0dJshLcnXkw4jxhsX/ogpvnQ=;
+        b=WnKXCssAkZoguoYnLUDQVc0TIXedvEVVcgRbFDJcxjPMov7gXMn1oHRTDJuzUtn6kjdMF+
+        fyQKLRQvFJ89PlSQb9FCSbevoJgd6xCwZioOdNFVUi5i3NfviTvkCIK63cFh2roRyytsQV
+        p94zZRtxRNPid+Dwn0Sm7vfGqAYfeEo=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-228-KzkHWC6xN2yqCVe1f7Qr1Q-1; Thu, 23 Jul 2020 03:01:31 -0400
+X-MC-Unique: KzkHWC6xN2yqCVe1f7Qr1Q-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 333D71DE0;
+        Thu, 23 Jul 2020 07:01:30 +0000 (UTC)
+Received: from gondolin (ovpn-112-228.ams2.redhat.com [10.36.112.228])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 038A91000232;
+        Thu, 23 Jul 2020 07:01:26 +0000 (UTC)
+Date:   Thu, 23 Jul 2020 09:01:23 +0200
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Alex Williamson <alex.williamson@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        prime.zeng@hisilicon.com
+Subject: Re: [PATCH] vfio/pci: Hold igate across releasing eventfd contexts
+Message-ID: <20200723090123.095159ed.cohuck@redhat.com>
+In-Reply-To: <159527934542.26615.503005826695043299.stgit@gimli.home>
+References: <159527934542.26615.503005826695043299.stgit@gimli.home>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20200608115714.1139735-1-clg@kaod.org>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jun 08, 2020 at 01:57:14PM +0200, Cédric Le Goater wrote:
-> POWER8 and POWER9 have 12-bit LPIDs. Change LPID_RSVD to support up to
-> (4096 - 2) guests on these processors. POWER7 is kept the same with a
-> limitation of (1024 - 2), but it might be time to drop KVM support for
-> POWER7.
-> 
-> Tested with 2048 guests * 4 vCPUs on a witherspoon system with 512G
-> RAM and a bit of swap.
-> 
-> Signed-off-by: Cédric Le Goater <clg@kaod.org>
+On Mon, 20 Jul 2020 15:09:27 -0600
+Alex Williamson <alex.williamson@redhat.com> wrote:
 
-Thanks, patch applied to my kvm-ppc-next branch.
+> No need to release and immediately re-acquire igate while clearing
+> out the eventfd ctxs.
+> 
+> Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
+> ---
+>  drivers/vfio/pci/vfio_pci.c |    4 +---
+>  1 file changed, 1 insertion(+), 3 deletions(-)
+> 
+> diff --git a/drivers/vfio/pci/vfio_pci.c b/drivers/vfio/pci/vfio_pci.c
+> index b0258b79bb5b..dabca0450e6d 100644
+> --- a/drivers/vfio/pci/vfio_pci.c
+> +++ b/drivers/vfio/pci/vfio_pci.c
+> @@ -523,14 +523,12 @@ static void vfio_pci_release(void *device_data)
+>  		vfio_pci_vf_token_user_add(vdev, -1);
+>  		vfio_spapr_pci_eeh_release(vdev->pdev);
+>  		vfio_pci_disable(vdev);
+> +
+>  		mutex_lock(&vdev->igate);
+>  		if (vdev->err_trigger) {
+>  			eventfd_ctx_put(vdev->err_trigger);
+>  			vdev->err_trigger = NULL;
+>  		}
+> -		mutex_unlock(&vdev->igate);
+> -
+> -		mutex_lock(&vdev->igate);
+>  		if (vdev->req_trigger) {
+>  			eventfd_ctx_put(vdev->req_trigger);
+>  			vdev->req_trigger = NULL;
+> 
 
-Paul.
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+
