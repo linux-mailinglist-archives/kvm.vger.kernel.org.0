@@ -2,174 +2,125 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 99AC222AB14
-	for <lists+kvm@lfdr.de>; Thu, 23 Jul 2020 10:53:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2C73D22ABB7
+	for <lists+kvm@lfdr.de>; Thu, 23 Jul 2020 11:24:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727118AbgGWIv4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 23 Jul 2020 04:51:56 -0400
-Received: from mail.kernel.org ([198.145.29.99]:46020 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725858AbgGWIvz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 23 Jul 2020 04:51:55 -0400
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 5B3B72071A;
-        Thu, 23 Jul 2020 08:51:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1595494314;
-        bh=IRF2/hQ81/fJN2jLe+emwgKLQGhbq9l8YIf8OxkkSik=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=JoLsejGOUeUv83nQAMznfUoFwoaNSxjbwr27sVlLosQjoq8SM2k7dgTUgxUvKR+8r
-         zYhfXQFkgR18bjjIH+98j5xi2EK4WyKJq63OkADl9v+HxRRQj9Pgwx7OxMUDW18eS2
-         5B4NMpR85PDvoLQsxH3EtQR8ml/ZXD0/LjkdFNnk=
-Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
-        by disco-boy.misterjones.org with esmtpsa (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
-        (Exim 4.92)
-        (envelope-from <maz@kernel.org>)
-        id 1jyWxE-00EDOw-Q3; Thu, 23 Jul 2020 09:51:52 +0100
+        id S1728074AbgGWJYY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 23 Jul 2020 05:24:24 -0400
+Received: from smtp-fw-33001.amazon.com ([207.171.190.10]:58340 "EHLO
+        smtp-fw-33001.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726177AbgGWJYX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 23 Jul 2020 05:24:23 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1595496264; x=1627032264;
+  h=subject:to:cc:references:from:message-id:date:
+   mime-version:in-reply-to:content-transfer-encoding;
+  bh=1tGH2qetce90/6FA+/iXztID8HBjMok4ZhMRdNQxxyE=;
+  b=muUkG+WUKXOxKQtDb/XE2jrC9B4Unji064k6XXJaX0qupq8e0YmB1GmS
+   OpL8J40BSJsR10KnCSrRDLSNACy/VFHYJjWBe1WGAz+9uTKmHyq3pg7tW
+   7k/YI6ouWHUjgPiJNjEx2/b69I+Bm4zMLDgbiEWZMx9gj0Ji+ne0XBOpu
+   Y=;
+IronPort-SDR: UQriON/eq5zU/rwJccEd9SzPe8MrP3FGlOcj4UUpxhoTqwAr5B0vrHnxnTZCsEJ+amZ0yQH/Z+
+ 42Bz5mZXBKkw==
+X-IronPort-AV: E=Sophos;i="5.75,386,1589241600"; 
+   d="scan'208";a="60974662"
+Received: from sea32-co-svc-lb4-vlan3.sea.corp.amazon.com (HELO email-inbound-relay-2a-119b4f96.us-west-2.amazon.com) ([10.47.23.38])
+  by smtp-border-fw-out-33001.sea14.amazon.com with ESMTP; 23 Jul 2020 09:24:17 +0000
+Received: from EX13MTAUEA002.ant.amazon.com (pdx4-ws-svc-p6-lb7-vlan2.pdx.amazon.com [10.170.41.162])
+        by email-inbound-relay-2a-119b4f96.us-west-2.amazon.com (Postfix) with ESMTPS id 562FF1A0AD3;
+        Thu, 23 Jul 2020 09:24:16 +0000 (UTC)
+Received: from EX13D16EUB003.ant.amazon.com (10.43.166.99) by
+ EX13MTAUEA002.ant.amazon.com (10.43.61.77) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.2; Thu, 23 Jul 2020 09:24:15 +0000
+Received: from 38f9d34ed3b1.ant.amazon.com (10.43.162.73) by
+ EX13D16EUB003.ant.amazon.com (10.43.166.99) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.2; Thu, 23 Jul 2020 09:24:06 +0000
+Subject: Re: [PATCH v5 01/18] nitro_enclaves: Add ioctl interface definition
+To:     Greg KH <gregkh@linuxfoundation.org>
+CC:     <linux-kernel@vger.kernel.org>,
+        Anthony Liguori <aliguori@amazon.com>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Colm MacCarthaigh <colmmacc@amazon.com>,
+        David Duncan <davdunc@amazon.com>,
+        Bjoern Doebel <doebel@amazon.de>,
+        David Woodhouse <dwmw@amazon.co.uk>,
+        Frank van der Linden <fllinden@amazon.com>,
+        Alexander Graf <graf@amazon.de>, Karen Noel <knoel@redhat.com>,
+        Martin Pohlack <mpohlack@amazon.de>,
+        Matt Wilson <msw@amazon.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Balbir Singh <sblbir@amazon.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        "Stefan Hajnoczi" <stefanha@redhat.com>,
+        Stewart Smith <trawets@amazon.com>,
+        "Uwe Dannowski" <uwed@amazon.de>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>, <kvm@vger.kernel.org>,
+        <ne-devel-upstream@amazon.com>, Alexander Graf <graf@amazon.com>
+References: <20200715194540.45532-1-andraprs@amazon.com>
+ <20200715194540.45532-2-andraprs@amazon.com>
+ <20200721121225.GA1855212@kroah.com>
+ <5dad638c-0ef3-9d16-818c-54e1556d8fc8@amazon.com>
+ <20200722095759.GA2817347@kroah.com>
+From:   "Paraschiv, Andra-Irina" <andraprs@amazon.com>
+Message-ID: <b952de82-94de-fc14-74d3-f13859fe19f0@amazon.com>
+Date:   Thu, 23 Jul 2020 12:23:56 +0300
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:68.0)
+ Gecko/20100101 Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-Date:   Thu, 23 Jul 2020 09:51:52 +0100
-From:   Marc Zyngier <maz@kernel.org>
-To:     Jason Gunthorpe <jgg@mellanox.com>
-Cc:     Dave Jiang <dave.jiang@intel.com>, vkoul@kernel.org,
-        megha.dey@intel.com, bhelgaas@google.com, rafael@kernel.org,
-        gregkh@linuxfoundation.org, tglx@linutronix.de, hpa@zytor.com,
-        alex.williamson@redhat.com, jacob.jun.pan@intel.com,
-        ashok.raj@intel.com, yi.l.liu@intel.com, baolu.lu@intel.com,
-        kevin.tian@intel.com, sanjay.k.kumar@intel.com,
-        tony.luck@intel.com, jing.lin@intel.com, dan.j.williams@intel.com,
-        kwankhede@nvidia.com, eric.auger@redhat.com, parav@mellanox.com,
-        dave.hansen@intel.com, netanelg@mellanox.com, shahafs@mellanox.com,
-        yan.y.zhao@linux.intel.com, pbonzini@redhat.com,
-        samuel.ortiz@intel.com, mona.hossain@intel.com,
-        dmaengine@vger.kernel.org, linux-kernel@vger.kernel.org,
-        x86@kernel.org, linux-pci@vger.kernel.org, kvm@vger.kernel.org
-Subject: Re: [PATCH RFC v2 02/18] irq/dev-msi: Add support for a new DEV_MSI
- irq domain
-In-Reply-To: <20200722195928.GN2021248@mellanox.com>
-References: <159534667974.28840.2045034360240786644.stgit@djiang5-desk3.ch.intel.com>
- <159534734833.28840.10067945890695808535.stgit@djiang5-desk3.ch.intel.com>
- <878sfbxtzi.wl-maz@kernel.org> <20200722195928.GN2021248@mellanox.com>
-User-Agent: Roundcube Webmail/1.4.5
-Message-ID: <cfb8191e364e77f352b1483c415a83a5@kernel.org>
-X-Sender: maz@kernel.org
-X-SA-Exim-Connect-IP: 51.254.78.96
-X-SA-Exim-Rcpt-To: jgg@mellanox.com, dave.jiang@intel.com, vkoul@kernel.org, megha.dey@intel.com, bhelgaas@google.com, rafael@kernel.org, gregkh@linuxfoundation.org, tglx@linutronix.de, hpa@zytor.com, alex.williamson@redhat.com, jacob.jun.pan@intel.com, ashok.raj@intel.com, yi.l.liu@intel.com, baolu.lu@intel.com, kevin.tian@intel.com, sanjay.k.kumar@intel.com, tony.luck@intel.com, jing.lin@intel.com, dan.j.williams@intel.com, kwankhede@nvidia.com, eric.auger@redhat.com, parav@mellanox.com, dave.hansen@intel.com, netanelg@mellanox.com, shahafs@mellanox.com, yan.y.zhao@linux.intel.com, pbonzini@redhat.com, samuel.ortiz@intel.com, mona.hossain@intel.com, dmaengine@vger.kernel.org, linux-kernel@vger.kernel.org, x86@kernel.org, linux-pci@vger.kernel.org, kvm@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+In-Reply-To: <20200722095759.GA2817347@kroah.com>
+Content-Language: en-US
+X-Originating-IP: [10.43.162.73]
+X-ClientProxiedBy: EX13D29UWA004.ant.amazon.com (10.43.160.33) To
+ EX13D16EUB003.ant.amazon.com (10.43.166.99)
+Content-Type: text/plain; charset="utf-8"; format="flowed"
+Content-Transfer-Encoding: base64
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2020-07-22 20:59, Jason Gunthorpe wrote:
-> On Wed, Jul 22, 2020 at 07:52:33PM +0100, Marc Zyngier wrote:
-> 
->> Which is exactly what platform-MSI already does. Why do we need
->> something else?
-> 
-> It looks to me like all the code is around managing the
-> dev->msi_domain of the devices.
-> 
-> The intended use would have PCI drivers create children devices using
-> mdev or virtbus and those devices wouldn't have a msi_domain from the
-> platform. Looks like platform_msi_alloc_priv_data() fails immediately
-> because dev->msi_domain will be NULL for these kinds of devices.
-> 
-> Maybe that issue should be handled directly instead of wrappering
-> platform_msi_*?
-> 
-> For instance a trivial addition to the platform_msi API:
-> 
->   platform_msi_assign_domain(struct_device 
-> *newly_created_virtual_device,
->                              struct device *physical_device);
-> 
-> Which could set the msi_domain of new device using the topology of
-> physical_device to deduce the correct domain?
+CgpPbiAyMi8wNy8yMDIwIDEyOjU3LCBHcmVnIEtIIHdyb3RlOgo+IE9uIFdlZCwgSnVsIDIyLCAy
+MDIwIGF0IDExOjI3OjI5QU0gKzAzMDAsIFBhcmFzY2hpdiwgQW5kcmEtSXJpbmEgd3JvdGU6Cj4+
+Pj4gKyNpZm5kZWYgX1VBUElfTElOVVhfTklUUk9fRU5DTEFWRVNfSF8KPj4+PiArI2RlZmluZSBf
+VUFQSV9MSU5VWF9OSVRST19FTkNMQVZFU19IXwo+Pj4+ICsKPj4+PiArI2luY2x1ZGUgPGxpbnV4
+L3R5cGVzLmg+Cj4+Pj4gKwo+Pj4+ICsvKiBOaXRybyBFbmNsYXZlcyAoTkUpIEtlcm5lbCBEcml2
+ZXIgSW50ZXJmYWNlICovCj4+Pj4gKwo+Pj4+ICsjZGVmaW5lIE5FX0FQSV9WRVJTSU9OICgxKQo+
+Pj4gV2h5IGRvIHlvdSBuZWVkIHRoaXMgdmVyc2lvbj8gIEl0IHNob3VsZG4ndCBiZSBuZWVkZWQs
+IHJpZ2h0Pwo+PiBUaGUgdmVyc2lvbiBpcyB1c2VkIGFzIGEgd2F5IGZvciB0aGUgdXNlciBzcGFj
+ZSB0b29saW5nIHRvIHN5bmMgb24gdGhlCj4+IGZlYXR1cmVzIHNldCBwcm92aWRlZCBieSB0aGUg
+ZHJpdmVyIGUuZy4gaW4gY2FzZSBhbiBvbGRlciB2ZXJzaW9uIG9mIHRoZQo+PiBkcml2ZXIgaXMg
+YXZhaWxhYmxlIG9uIHRoZSBzeXN0ZW0gYW5kIHRoZSB1c2VyIHNwYWNlIHRvb2xpbmcgZXhwZWN0
+cyBhIHNldAo+PiBvZiBmZWF0dXJlcyB0aGF0IGlzIG5vdCBpbmNsdWRlZCBpbiB0aGF0IGRyaXZl
+ciB2ZXJzaW9uLgo+IFRoYXQgaXMgZ3VhcmFudGVlZCB0byBnZXQgb3V0IG9mIHN5bmMgaW5zdGFu
+dGx5IHdpdGggZGlmZmVyZW50IGRpc3Rybwo+IGtlcm5lbHMgYmFja3BvcnRpbmcgcmFuZG9tIHRo
+aW5ncywgY29tYmluZWQgd2l0aCBzdGFibGUga2VybmVsIHBhdGNoCj4gdXBkYXRlcyBhbmQgdGhl
+IGxpa2UuCj4KPiBKdXN0IHVzZSB0aGUgbm9ybWFsIGFwaSBpbnRlcmZhY2VzIGluc3RlYWQsIGRv
+bid0IHRyeSB0byAidmVyc2lvbiIKPiBhbnl0aGluZywgaXQgd2lsbCBub3Qgd29yaywgdHJ1c3Qg
+dXMgOikKPgo+IElmIGFuIGlvY3RsIHJldHVybnMgLUVOT1RUWSB0aGVuIGhleSwgaXQncyBub3Qg
+cHJlc2VudCBhbmQgeW91cgo+IHVzZXJzcGFjZSBjb2RlIGNhbiBoYW5kbGUgaXQgdGhhdCB3YXku
+CgpDb3JyZWN0LCB0aGVyZSBjb3VsZCBiZSBhIHZhcmlldHkgb2Yga2VybmVsIHZlcnNpb25zIGFu
+ZCB1c2VyIHNwYWNlIAp0b29saW5nIGVpdGhlciBpbiB0aGUgb3JpZ2luYWwgZm9ybSwgY3VzdG9t
+aXplZCBvciB3cml0dGVuIGZyb20gc2NyYXRjaC4gCkFuZCBFTk9UVFkgc2lnbmFscyBhbiBpb2N0
+bCBub3QgYXZhaWxhYmxlIG9yIGUuZy4gRUlOVkFMIChvciBjdXN0b20gCmVycm9yKSBpZiB0aGUg
+cGFyYW1ldGVyIGZpZWxkIHZhbHVlIGlzIG5vdCB2YWxpZCB3aXRoaW4gYSBjZXJ0YWluIAp2ZXJz
+aW9uLiBXZSBoYXZlIHRoZXNlIGluIHBsYWNlLCB0aGF0J3MgZ29vZC4gOikKCkhvd2V2ZXIsIEkg
+d2FzIHRoaW5raW5nLCBmb3IgZXhhbXBsZSwgb2YgYW4gaW9jdGwgZmxvdyB1c2FnZSB3aGVyZSBh
+IApjZXJ0YWluIG9yZGVyIG5lZWRzIHRvIGJlIGZvbGxvd2VkIGUuZy4gY3JlYXRlIGEgVk0sIGFk
+ZCByZXNvdXJjZXMgdG8gYSAKVk0sIHN0YXJ0IGEgVk0uCgpMZXQncyBzYXksIGZvciBhbiB1c2Ug
+Y2FzZSB3cnQgbmV3IGZlYXR1cmVzLCBpb2N0bCBBIChjcmVhdGUgYSBWTSkgCnN1Y2NlZWRzLCBp
+b2N0bCBCIChhZGQgbWVtb3J5IHRvIHRoZSBWTSkgc3VjY2VlZHMsIGlvY3RsIEMgKGFkZCBDUFUg
+dG8gCnRoZSBWTSkgc3VjY2VlZHMgYW5kIGlvY3RsIEQgKGFkZCBhbnkgb3RoZXIgdHlwZSBvZiBy
+ZXNvdXJjZSBiZWZvcmUgCnN0YXJ0aW5nIHRoZSBWTSkgZmFpbHMgYmVjYXVzZSBpdCBpcyBub3Qg
+c3VwcG9ydGVkLgoKV291bGQgbm90IG5lZWQgdG8gY2FsbCBpb2N0bCBBIHRvIEMgYW5kIGdvIHRo
+cm91Z2ggdGhlaXIgdW5kZXJuZWF0aCAKbG9naWMgdG8gcmVhbGl6ZSBpb2N0bCBEIHN1cHBvcnQg
+aXMgbm90IHRoZXJlIGFuZCByb2xsYmFjayBhbGwgdGhlIApjaGFuZ2VzIGRvbmUgdGlsbCB0aGVu
+IHdpdGhpbiBpb2N0bCBBIHRvIEMgbG9naWMuIE9mIGNvdXJzZSwgdGhlcmUgY291bGQgCmJlIGlv
+Y3RsIEEgZm9sbG93ZWQgYnkgaW9jdGwgRCwgYW5kIHdvdWxkIG5lZWQgdG8gcm9sbGJhY2sgaW9j
+dGwgQSAKY2hhbmdlcywgYnV0IEkgc2hhcmVkIGEgbW9yZSBsZW5ndGh5IGNhbGwgY2hhaW4gdGhh
+dCBjYW4gYmUgYW4gb3B0aW9uIGFzIAp3ZWxsLgoKVGhhbmtzLApBbmRyYQoKCgpBbWF6b24gRGV2
+ZWxvcG1lbnQgQ2VudGVyIChSb21hbmlhKSBTLlIuTC4gcmVnaXN0ZXJlZCBvZmZpY2U6IDI3QSBT
+Zi4gTGF6YXIgU3RyZWV0LCBVQkM1LCBmbG9vciAyLCBJYXNpLCBJYXNpIENvdW50eSwgNzAwMDQ1
+LCBSb21hbmlhLiBSZWdpc3RlcmVkIGluIFJvbWFuaWEuIFJlZ2lzdHJhdGlvbiBudW1iZXIgSjIy
+LzI2MjEvMjAwNS4K
 
-That would seem like a sensible course of action, as losing
-the topology information will likely result in problems down
-the line.
-
-> Then the question is how to properly create a domain within the
-> hardware topology of physical_device with the correct parameters for
-> the platform.
-> 
-> Why do we need a dummy msi_domain anyhow? Can this just use
-> physical_device->msi_domain directly? (I'm at my limit here of how
-> much of this I remember, sorry)
-
-The parent device would be a PCI device, if I follow you correctly.
-It would thus expect to be able to program the MSI the PCI way,
-which wouldn't work. So we end-up with this custom MSI domain
-that knows about *this* particular family of devices.
-
-> If you solve that it should solve the remapping problem too, as the
-> physical_device is already assigned by the platform to a remapping irq
-> domain if that is what the platform wants.
-> 
->>> +	parent = irq_get_default_host();
->> Really? How is it going to work once you have devices sending their
->> MSIs to two different downstream blocks? This looks rather
->> short-sighted.
-> 
-> .. and fix this too, the parent domain should be derived from the
-> topology of the physical_device which is originating the interrupt
-> messages.
-> 
->> On the other hand, masking an interrupt is an irqchip operation, and
->> only concerns the irqchip level. Here, you seem to be making it an
->> end-point operation, which doesn't really make sense to me. Or is this
->> device its own interrupt controller as well? That would be extremely
->> surprising, and I'd expect some block downstream of the device to be
->> able to control the masking of the interrupt.
-> 
-> These are message interrupts so they originate directly from the
-> device and generally travel directly to the CPU APIC. On the wire
-> there is no difference between a MSI, MSI-X and a device using the
-> dev-msi approach.
-
-I understand that.
-
-> IIRC on Intel/AMD at least once a MSI is launched it is not maskable.
-
-Really? So you can't shut a device with a screaming interrupt,
-for example, should it become otherwise unresponsive?
-
-> So the model for MSI is always "mask at source". The closest mapping
-> to the Linux IRQ model is to say the end device has a irqchip that
-> encapsulates the ability of the device to generate the MSI in the
-> first place.
-
-This is an x86'ism, I'm afraid. Systems I deal with can mask any
-interrupt at the interrupt controller level, MSI or not.
-
-> It looks like existing platform_msi drivers deal with "masking"
-> implicitly by halting the device interrupt generation before releasing
-> the interrupt and have no way for the generic irqchip layer to mask
-> the interrupt.
-
-No. As I said above, the interrupt controller is perfectly capable
-of masking interrupts on its own, without touching the device.
-
-> I suppose the motivation to make it explicit is related to vfio using
-> the generic mask/unmask functionality?
-> 
-> Explicit seems better, IMHO.
-
-If masking at the source is the only way to shut the device up,
-and assuming that the device provides the expected semantics
-(a MSI raised by the device while the interrupt is masked
-isn't lost and gets sent when unmasked), that's fair enough.
-It's just ugly.
-
-Thanks,
-
-         M.
--- 
-Jazz is not dead. It just smells funny...
