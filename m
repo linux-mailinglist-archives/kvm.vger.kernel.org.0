@@ -2,121 +2,120 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 481F722AA72
-	for <lists+kvm@lfdr.de>; Thu, 23 Jul 2020 10:17:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1F43622AABD
+	for <lists+kvm@lfdr.de>; Thu, 23 Jul 2020 10:34:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726500AbgGWIRR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 23 Jul 2020 04:17:17 -0400
-Received: from mail.kernel.org ([198.145.29.99]:52756 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725846AbgGWIRR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 23 Jul 2020 04:17:17 -0400
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 972BD2086A;
-        Thu, 23 Jul 2020 08:17:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1595492236;
-        bh=kgavO6LARHrOsiohXcR0b/r+PArNmIu2z3PsvONh/5U=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=ZTHqP7lLhUkaZNW51k7H1hutdSuROAs44/5hLigNvWjpSwYWTE6ML8boordmj+vkQ
-         AJSKeJ3cQyH/DVOUcASFHosJgjVL/GsQj5r7yp/kFQvPctiu5NDFVQuYJdSs6Ui9Ex
-         TJWafT0zGrsseMmYEC1yCTVc/bqu2xXgkACBFj6A=
-Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
-        by disco-boy.misterjones.org with esmtpsa (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
-        (Exim 4.92)
-        (envelope-from <maz@kernel.org>)
-        id 1jyWPj-00ECtD-2X; Thu, 23 Jul 2020 09:17:15 +0100
+        id S1726092AbgGWIeq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 23 Jul 2020 04:34:46 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:46505 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1725846AbgGWIep (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 23 Jul 2020 04:34:45 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1595493284;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=xGTIbgCx+rDVKvWTlEHAJATfxUUpkuPfnD7JMbYkQY8=;
+        b=Q9TvbV+hkGZs0MeWmEiWZfVRPg9TshPH0P6bYkmZqO65IbKU0DAppaVlRQ68GjfZOcP0HJ
+        B3DkQzb4kTuQAD8ufADqOolDQUj32HbSaHLrLeyl9+gYkuaN7ve3TQqWM83Tn15QCQ8PRE
+        /j6cUe58LoAd9gjVN3ufIngDREaYieo=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-385-HSUEivGwPkafClJwqUmUQg-1; Thu, 23 Jul 2020 04:34:43 -0400
+X-MC-Unique: HSUEivGwPkafClJwqUmUQg-1
+Received: by mail-wr1-f72.google.com with SMTP id k11so657493wrv.1
+        for <kvm@vger.kernel.org>; Thu, 23 Jul 2020 01:34:42 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=xGTIbgCx+rDVKvWTlEHAJATfxUUpkuPfnD7JMbYkQY8=;
+        b=r6TdazyvtVc+X964bOarZ6byCZKsdGDAxN0FGCHTIn5UzdUvI/9VvSb9GFzGXZsFrP
+         xnWc3e7ndwWYN+ADlHaqj1/MovFY+Kq7+AYnpXeJbIa4Emb3Pqf3yD3ZFj0VaVLRFA5v
+         gaN9zSB7BSHblTpfE43lexo+OGWtQCWwCpZnoy+fa34eYBS3oSEtPHTxuKTZ7xfWOXco
+         t7ZxEdzPcTAq0nfhTlyFce8ExXz6fcBNPkqn6L9sxBvpISY+GFsTSACvxsSBvKPD7oXh
+         QFRvLHxSdGQvUZTRnLA4/AQ9sRX77zk/GGZy1DXYf1pIwTMXhJ4rHpRzAhQbBhbO2b0+
+         89zg==
+X-Gm-Message-State: AOAM533HJcEqG1xPkJaimsiQdK3oba+psvcapCwR4ZZZZyUPia3EBjc0
+        AUPZNrvIc+6GzbTLVa39yJ40tFOypR2GJFdhJcJI2uU5FuzqBFVibd45CvOtH7EAjDmghYQzuCX
+        6AjOeNdoYj9PR
+X-Received: by 2002:a7b:cb8d:: with SMTP id m13mr2650633wmi.120.1595493281557;
+        Thu, 23 Jul 2020 01:34:41 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzXZi0KGyqccwK0YBH6EPSIFaT3xENgDnbzBhFqPmSY7XV5a91YqQHX0IHrfs3AUaL6q2mXag==
+X-Received: by 2002:a7b:cb8d:: with SMTP id m13mr2650615wmi.120.1595493281258;
+        Thu, 23 Jul 2020 01:34:41 -0700 (PDT)
+Received: from steredhat.lan ([5.180.207.22])
+        by smtp.gmail.com with ESMTPSA id o2sm2897806wrj.21.2020.07.23.01.34.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 23 Jul 2020 01:34:40 -0700 (PDT)
+Date:   Thu, 23 Jul 2020 10:34:35 +0200
+From:   Stefano Garzarella <sgarzare@redhat.com>
+To:     Guennadi Liakhovetski <guennadi.liakhovetski@linux.intel.com>
+Cc:     kvm@vger.kernel.org, linux-remoteproc@vger.kernel.org,
+        virtualization@lists.linux-foundation.org,
+        sound-open-firmware@alsa-project.org,
+        Pierre-Louis Bossart <pierre-louis.bossart@linux.intel.com>,
+        Liam Girdwood <liam.r.girdwood@linux.intel.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Ohad Ben-Cohen <ohad@wizery.com>,
+        Bjorn Andersson <bjorn.andersson@linaro.org>,
+        Mathieu Poirier <mathieu.poirier@linaro.org>,
+        Vincent Whitchurch <vincent.whitchurch@axis.com>
+Subject: Re: [PATCH v4 1/4] vhost: convert VHOST_VSOCK_SET_RUNNING to a
+ generic ioctl
+Message-ID: <20200723083435.3rjn5qiqhxcvxxwk@steredhat.lan>
+References: <20200722150927.15587-1-guennadi.liakhovetski@linux.intel.com>
+ <20200722150927.15587-2-guennadi.liakhovetski@linux.intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-Date:   Thu, 23 Jul 2020 09:17:15 +0100
-From:   Marc Zyngier <maz@kernel.org>
-To:     Nathan Chancellor <natechancellor@gmail.com>
-Cc:     kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
-        kvm@vger.kernel.org, James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Will Deacon <will@kernel.org>, kernel-team@android.com,
-        Nick Desaulniers <ndesaulniers@google.com>
-Subject: Re: [PATCH] KVM: arm64: Prevent vcpu_has_ptrauth from generating OOL
- functions
-In-Reply-To: <20200723025142.GA361584@ubuntu-n2-xlarge-x86>
-References: <20200722162231.3689767-1-maz@kernel.org>
- <20200723025142.GA361584@ubuntu-n2-xlarge-x86>
-User-Agent: Roundcube Webmail/1.4.5
-Message-ID: <0fab73670fa24d1c08711991133e4255@kernel.org>
-X-Sender: maz@kernel.org
-X-SA-Exim-Connect-IP: 51.254.78.96
-X-SA-Exim-Rcpt-To: natechancellor@gmail.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, will@kernel.org, kernel-team@android.com, ndesaulniers@google.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200722150927.15587-2-guennadi.liakhovetski@linux.intel.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Nathan,
-
-On 2020-07-23 03:51, Nathan Chancellor wrote:
-> On Wed, Jul 22, 2020 at 05:22:31PM +0100, Marc Zyngier wrote:
->> So far, vcpu_has_ptrauth() is implemented in terms of 
->> system_supports_*_auth()
->> calls, which are declared "inline". In some specific conditions (clang
->> and SCS), the "inline" very much turns into an "out of line", which
->> leads to a fireworks when this predicate is evaluated on a non-VHE
->> system (right at the beginning of __hyp_handle_ptrauth).
->> 
->> Instead, make sure vcpu_has_ptrauth gets expanded inline by directly
->> using the cpus_have_final_cap() helpers, which are __always_inline,
->> generate much better code, and are the only thing that make sense when
->> running at EL2 on a nVHE system.
->> 
->> Fixes: 29eb5a3c57f7 ("KVM: arm64: Handle PtrAuth traps early")
->> Reported-by: Nathan Chancellor <natechancellor@gmail.com>
->> Reported-by: Nick Desaulniers <ndesaulniers@google.com>
->> Signed-off-by: Marc Zyngier <maz@kernel.org>
+On Wed, Jul 22, 2020 at 05:09:24PM +0200, Guennadi Liakhovetski wrote:
+> VHOST_VSOCK_SET_RUNNING is used by the vhost vsock driver to perform
+> crucial VirtQueue initialisation, like assigning .private fields and
+> calling vhost_vq_init_access(), and clean up. However, this ioctl is
+> actually extremely useful for any vhost driver, that doesn't have a
+> side channel to inform it of a status change, e.g. upon a guest
+> reboot. This patch makes that ioctl generic, while preserving its
+> numeric value and also keeping the original alias.
 > 
-> Thank you for the quick fix! I have booted a mainline kernel with this
-> patch with Shadow Call Stack enabled and verified that using KVM no
-> longer causes a panic.
-
-Great! I'll try and ferry this to mainline  as quickly as possible.
-
-> Reviewed-by: Nathan Chancellor <natechancellor@gmail.com>
-> Tested-by: Nathan Chancellor <natechancellor@gmail.com>
+> Signed-off-by: Guennadi Liakhovetski <guennadi.liakhovetski@linux.intel.com>
+> ---
+>  include/uapi/linux/vhost.h | 4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
 > 
-> For the future, is there an easy way to tell which type of system I am
-> using (nVHE or VHE)? I am new to the arm64 KVM world but it is 
-> something
-> that I am going to continue to test with various clang technologies now
-> that I have actual hardware capable of it that can run a mainline
-> kernel.
+> diff --git a/include/uapi/linux/vhost.h b/include/uapi/linux/vhost.h
+> index 0c2349612e77..5d9254e2a6b6 100644
+> --- a/include/uapi/linux/vhost.h
+> +++ b/include/uapi/linux/vhost.h
+> @@ -95,6 +95,8 @@
+>  #define VHOST_SET_BACKEND_FEATURES _IOW(VHOST_VIRTIO, 0x25, __u64)
+>  #define VHOST_GET_BACKEND_FEATURES _IOR(VHOST_VIRTIO, 0x26, __u64)
+>  
+> +#define VHOST_SET_RUNNING _IOW(VHOST_VIRTIO, 0x61, int)
+> +
+>  /* VHOST_NET specific defines */
+>  
+>  /* Attach virtio net ring to a raw socket, or tap device.
+> @@ -116,7 +118,7 @@
+>  /* VHOST_VSOCK specific defines */
+>  
+>  #define VHOST_VSOCK_SET_GUEST_CID	_IOW(VHOST_VIRTIO, 0x60, __u64)
+> -#define VHOST_VSOCK_SET_RUNNING		_IOW(VHOST_VIRTIO, 0x61, int)
+> +#define VHOST_VSOCK_SET_RUNNING		VHOST_SET_RUNNING
+>  
+>  /* VHOST_VDPA specific defines */
+>  
+> -- 
+> 2.27.0
+> 
 
-ARMv8.0 CPUs are only capable of running non-VHE. So if you have
-something based on older ARM CPUs (such as A57, A72, A53, A73, A35...),
-or licensee CPUs (ThunderX, XGene, EMag...), this will only run
-non-VHE (the host kernel runs at EL1, while the hypervisor runs at
-EL2.
+Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
 
- From ARMv8.1 onward, VHE is normally present, and the host kernel
-can run at EL2 directly. ARM CPUs include A55, A65, A75, A76, A77,
-N1, while licensee CPUs include TX2, Kunpeng 920, and probably some
-more.
-
-As pointed out by Zenghui in another email, KVM shows which mode
-it is using. Even without KVM, the kernel prints very early on:
-
-[    0.000000] CPU features: detected: Virtualization Host Extensions
-
-Note that this is only a performance difference, and that most
-features that are supported by the CPU can be used by KVM in either
-mode.
-
-Thanks again,
-
-         M.
--- 
-Jazz is not dead. It just smells funny...
