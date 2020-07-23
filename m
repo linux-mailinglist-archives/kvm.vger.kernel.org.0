@@ -2,70 +2,104 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id EC69D22A60C
-	for <lists+kvm@lfdr.de>; Thu, 23 Jul 2020 05:30:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8DECE22A670
+	for <lists+kvm@lfdr.de>; Thu, 23 Jul 2020 06:20:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387718AbgGWDal (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 22 Jul 2020 23:30:41 -0400
-Received: from szxga06-in.huawei.com ([45.249.212.32]:34898 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1733203AbgGWDal (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 22 Jul 2020 23:30:41 -0400
-Received: from DGGEMS402-HUB.china.huawei.com (unknown [172.30.72.59])
-        by Forcepoint Email with ESMTP id 5104EB7C2985CD5A5D6C;
-        Thu, 23 Jul 2020 11:30:35 +0800 (CST)
-Received: from [10.174.185.226] (10.174.185.226) by
- DGGEMS402-HUB.china.huawei.com (10.3.19.202) with Microsoft SMTP Server id
- 14.3.487.0; Thu, 23 Jul 2020 11:30:27 +0800
-Subject: Re: [PATCH] KVM: arm64: Prevent vcpu_has_ptrauth from generating OOL
- functions
-To:     Nathan Chancellor <natechancellor@gmail.com>,
-        Marc Zyngier <maz@kernel.org>
-CC:     <kvm@vger.kernel.org>, Suzuki K Poulose <suzuki.poulose@arm.com>,
-        <kernel-team@android.com>,
-        Nick Desaulniers <ndesaulniers@google.com>,
-        "James Morse" <james.morse@arm.com>,
-        <linux-arm-kernel@lists.infradead.org>,
-        "Will Deacon" <will@kernel.org>, <kvmarm@lists.cs.columbia.edu>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>
-References: <20200722162231.3689767-1-maz@kernel.org>
- <20200723025142.GA361584@ubuntu-n2-xlarge-x86>
-From:   Zenghui Yu <yuzenghui@huawei.com>
-Message-ID: <b60f9cd1-adf1-b32a-e6cc-ca880506ff03@huawei.com>
-Date:   Thu, 23 Jul 2020 11:30:27 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.9.0
+        id S1726127AbgGWEUA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 23 Jul 2020 00:20:00 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:37295 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1725814AbgGWEUA (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 23 Jul 2020 00:20:00 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1595477998;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=9eSYwQ7URF4XR6sMcM6IEzD2UsZRflT6r9H22UCBNEQ=;
+        b=WZWPmx0AQ5acD5yvn5H96VTC0RJIbwi5jGlVj1gZLrF0RegLMTLw0s0X4Dkgij0Yn8aIRC
+        pvELlskzg7YlIwu7SMCZT5XdtTKIguKbxFTKzhRCgcdSDg/8Nun23PcLnXkS7DFoqCkf6q
+        AYQpf9xoJVoc63W7RfWD+vPNfc5EAuQ=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-291-1rwufoNOPpqTclCp-AlzPA-1; Thu, 23 Jul 2020 00:19:53 -0400
+X-MC-Unique: 1rwufoNOPpqTclCp-AlzPA-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 69FF8800464;
+        Thu, 23 Jul 2020 04:19:52 +0000 (UTC)
+Received: from [10.72.13.141] (ovpn-13-141.pek2.redhat.com [10.72.13.141])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id D2ABB71D25;
+        Thu, 23 Jul 2020 04:19:43 +0000 (UTC)
+Subject: Re: [PATCH V3 3/6] vDPA: implement vq IRQ allocate/free helpers in
+ vDPA core
+To:     Zhu Lingshan <lingshan.zhu@intel.com>, alex.williamson@redhat.com,
+        mst@redhat.com, pbonzini@redhat.com,
+        sean.j.christopherson@intel.com, wanpengli@tencent.com
+Cc:     virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        kvm@vger.kernel.org
+References: <20200722100859.221669-1-lingshan.zhu@intel.com>
+ <20200722100859.221669-4-lingshan.zhu@intel.com>
+From:   Jason Wang <jasowang@redhat.com>
+Message-ID: <a3c05c65-74bf-6250-5f4a-3b6cf60f4474@redhat.com>
+Date:   Thu, 23 Jul 2020 12:19:42 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <20200723025142.GA361584@ubuntu-n2-xlarge-x86>
-Content-Type: text/plain; charset="utf-8"; format=flowed
+In-Reply-To: <20200722100859.221669-4-lingshan.zhu@intel.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.174.185.226]
-X-CFilter-Loop: Reflected
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Nathan,
 
-On 2020/7/23 10:51, Nathan Chancellor wrote:
-> For the future, is there an easy way to tell which type of system I am
-> using (nVHE or VHE)?
-
-afaict the easiest way is looking at the kernel log and you will find
-something like "{VHE,Hyp} mode initialized successfully". I can get the
-following message on my *VHE* box:
-
-  # cat /var/log/dmesg | grep kvm
-[    4.896295] kvm [1]: IPA Size Limit: 48bits
-[    4.896339] [...]
-[    4.899407] kvm [1]: VHE mode initialized successfully
-                         ^^^
-
-Have a look at kvm_arch_init(). With VHE, the host kernel is running at
-EL2 (aka Hyp mode).
+On 2020/7/22 下午6:08, Zhu Lingshan wrote:
+> +/*
+> + * Request irq for a vq, setup irq offloading if its a vhost_vdpa vq.
+> + * This function should be only called through setting virtio DRIVER_OK.
+> + * If you want to request irq during probe, you should use raw APIs
+> + * like request_irq() or devm_request_irq().
 
 
-Thanks,
-Zenghui
+This makes the API less flexibile. The reason is we store the irq in 
+vhost-vdpa not vDPA.
+
+I wonder whether the following looks better:
+
+1) store irq in vdpa device
+2) register producer when DRIVER_OK and unregister producer when 
+!DRIVER_OK in vhost-vDPA
+3) deal with the synchronization with SET_VRING_CALL
+4) document that irq is not expected to be changed during DRIVER_OK
+
+This can make sure the API works during driver probe, and we don't need 
+the setup_irq and unsetup_irq method in vdpa_driver
+
+Thanks
+
+
+> + */
+> +int vdpa_devm_request_irq(struct device *dev, struct vdpa_device *vdev,
+> +			  unsigned int irq, irq_handler_t handler,
+> +			  unsigned long irqflags, const char *devname, void *dev_id,
+> +			  int qid)
+> +{
+> +	int ret;
+> +
+> +	ret = devm_request_irq(dev, irq, handler, irqflags, devname, dev_id);
+> +	if (ret)
+> +		dev_err(dev, "Failed to request irq for vq %d\n", qid);
+> +	else
+> +		vdpa_setup_irq(vdev, qid, irq);
+> +
+> +	return ret;
+> +
+> +}
+> +EXPORT_SYMBOL_GPL(vdpa_devm_request_irq);
+
