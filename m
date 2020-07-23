@@ -2,92 +2,126 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D18C722ACF8
-	for <lists+kvm@lfdr.de>; Thu, 23 Jul 2020 12:49:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1C59822AD03
+	for <lists+kvm@lfdr.de>; Thu, 23 Jul 2020 12:54:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728480AbgGWKtF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 23 Jul 2020 06:49:05 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:37582 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727996AbgGWKtE (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 23 Jul 2020 06:49:04 -0400
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 06NAYWW1043310;
-        Thu, 23 Jul 2020 06:48:49 -0400
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 32ecpbg4wx-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 23 Jul 2020 06:48:48 -0400
-Received: from m0098393.ppops.net (m0098393.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 06NAel08062237;
-        Thu, 23 Jul 2020 06:48:48 -0400
-Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 32ecpbg4w8-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 23 Jul 2020 06:48:48 -0400
-Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
-        by ppma03ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 06NAjRBI001639;
-        Thu, 23 Jul 2020 10:48:45 GMT
-Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
-        by ppma03ams.nl.ibm.com with ESMTP id 32brq7p2u6-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 23 Jul 2020 10:48:45 +0000
-Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
-        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 06NAmfY161407296
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 23 Jul 2020 10:48:41 GMT
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 5C7E64C050;
-        Thu, 23 Jul 2020 10:48:41 +0000 (GMT)
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 302964C044;
-        Thu, 23 Jul 2020 10:48:38 +0000 (GMT)
-Received: from [9.199.40.160] (unknown [9.199.40.160])
-        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu, 23 Jul 2020 10:48:37 +0000 (GMT)
-Subject: Re: [PATCH 0/7] powerpc/watchpoint: 2nd DAWR kvm enablement +
- selftests
-To:     mpe@ellerman.id.au, paulus@samba.org
-Cc:     mikey@neuling.org, npiggin@gmail.com, pbonzini@redhat.com,
-        christophe.leroy@c-s.fr, jniethe5@gmail.com, pedromfc@br.ibm.com,
-        rogealve@br.ibm.com, kvm@vger.kernel.org, kvm-ppc@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        linux-kselftest@vger.kernel.org,
-        Ravi Bangoria <ravi.bangoria@linux.ibm.com>
-References: <20200723102058.312282-1-ravi.bangoria@linux.ibm.com>
-From:   Ravi Bangoria <ravi.bangoria@linux.ibm.com>
-Message-ID: <a50f2a17-ccd0-6772-6c55-82a37561bf76@linux.ibm.com>
-Date:   Thu, 23 Jul 2020 16:18:37 +0530
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        id S1727964AbgGWKyG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 23 Jul 2020 06:54:06 -0400
+Received: from mail.kernel.org ([198.145.29.99]:45956 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726675AbgGWKyF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 23 Jul 2020 06:54:05 -0400
+Received: from localhost (83-86-89-107.cable.dynamic.v4.ziggo.nl [83.86.89.107])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 8D1CC2080D;
+        Thu, 23 Jul 2020 10:54:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1595501645;
+        bh=6mmcCqMpDjuHIfe4cmovpxW4cdlpod52A2L6wyDcPis=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=zIar5ScHC+i6Mq8/SSAAYEsE8slatSyTY9n5bYSFM6zw1CQQTSPgfG+Fdfe6MmtMH
+         Y+NgDlJRVdZ6aFYTFOCrPrU+FBKwbG7uBTzja+6FJ8GejWP2eIrh/rJoIROOeyzOUJ
+         5IolWMc6qdRUVQmS8/09gVKUOHvXNuPbd0XEGtpk=
+Date:   Thu, 23 Jul 2020 12:54:09 +0200
+From:   Greg KH <gregkh@linuxfoundation.org>
+To:     "Paraschiv, Andra-Irina" <andraprs@amazon.com>
+Cc:     linux-kernel@vger.kernel.org,
+        Anthony Liguori <aliguori@amazon.com>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Colm MacCarthaigh <colmmacc@amazon.com>,
+        David Duncan <davdunc@amazon.com>,
+        Bjoern Doebel <doebel@amazon.de>,
+        David Woodhouse <dwmw@amazon.co.uk>,
+        Frank van der Linden <fllinden@amazon.com>,
+        Alexander Graf <graf@amazon.de>, Karen Noel <knoel@redhat.com>,
+        Martin Pohlack <mpohlack@amazon.de>,
+        Matt Wilson <msw@amazon.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Balbir Singh <sblbir@amazon.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Stewart Smith <trawets@amazon.com>,
+        Uwe Dannowski <uwed@amazon.de>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org,
+        ne-devel-upstream@amazon.com, Alexander Graf <graf@amazon.com>
+Subject: Re: [PATCH v5 01/18] nitro_enclaves: Add ioctl interface definition
+Message-ID: <20200723105409.GC1949236@kroah.com>
+References: <20200715194540.45532-1-andraprs@amazon.com>
+ <20200715194540.45532-2-andraprs@amazon.com>
+ <20200721121225.GA1855212@kroah.com>
+ <5dad638c-0ef3-9d16-818c-54e1556d8fc8@amazon.com>
+ <20200722095759.GA2817347@kroah.com>
+ <b952de82-94de-fc14-74d3-f13859fe19f0@amazon.com>
 MIME-Version: 1.0
-In-Reply-To: <20200723102058.312282-1-ravi.bangoria@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
- definitions=2020-07-23_03:2020-07-23,2020-07-23 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 spamscore=0
- impostorscore=0 clxscore=1015 suspectscore=0 phishscore=0 malwarescore=0
- priorityscore=1501 adultscore=0 mlxlogscore=942 mlxscore=0
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2006250000 definitions=main-2007230076
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <b952de82-94de-fc14-74d3-f13859fe19f0@amazon.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-
-On 7/23/20 3:50 PM, Ravi Bangoria wrote:
-> Patch #1, #2 and #3 enables p10 2nd DAWR feature for Book3S kvm guest. DAWR
-> is a hypervisor resource and thus H_SET_MODE hcall is used to set/unset it.
-> A new case H_SET_MODE_RESOURCE_SET_DAWR1 is introduced in H_SET_MODE hcall
-> for setting/unsetting 2nd DAWR. Also, new capability KVM_CAP_PPC_DAWR1 has
-> been added to query 2nd DAWR support via kvm ioctl.
+On Thu, Jul 23, 2020 at 12:23:56PM +0300, Paraschiv, Andra-Irina wrote:
 > 
-> This feature also needs to be enabled in Qemu to really use it. I'll reply
-> link to qemu patches once I post them in qemu-devel mailing list.
+> 
+> On 22/07/2020 12:57, Greg KH wrote:
+> > On Wed, Jul 22, 2020 at 11:27:29AM +0300, Paraschiv, Andra-Irina wrote:
+> > > > > +#ifndef _UAPI_LINUX_NITRO_ENCLAVES_H_
+> > > > > +#define _UAPI_LINUX_NITRO_ENCLAVES_H_
+> > > > > +
+> > > > > +#include <linux/types.h>
+> > > > > +
+> > > > > +/* Nitro Enclaves (NE) Kernel Driver Interface */
+> > > > > +
+> > > > > +#define NE_API_VERSION (1)
+> > > > Why do you need this version?  It shouldn't be needed, right?
+> > > The version is used as a way for the user space tooling to sync on the
+> > > features set provided by the driver e.g. in case an older version of the
+> > > driver is available on the system and the user space tooling expects a set
+> > > of features that is not included in that driver version.
+> > That is guaranteed to get out of sync instantly with different distro
+> > kernels backporting random things, combined with stable kernel patch
+> > updates and the like.
+> > 
+> > Just use the normal api interfaces instead, don't try to "version"
+> > anything, it will not work, trust us :)
+> > 
+> > If an ioctl returns -ENOTTY then hey, it's not present and your
+> > userspace code can handle it that way.
+> 
+> Correct, there could be a variety of kernel versions and user space tooling
+> either in the original form, customized or written from scratch. And ENOTTY
+> signals an ioctl not available or e.g. EINVAL (or custom error) if the
+> parameter field value is not valid within a certain version. We have these
+> in place, that's good. :)
+> 
+> However, I was thinking, for example, of an ioctl flow usage where a certain
+> order needs to be followed e.g. create a VM, add resources to a VM, start a
+> VM.
+> 
+> Let's say, for an use case wrt new features, ioctl A (create a VM) succeeds,
+> ioctl B (add memory to the VM) succeeds, ioctl C (add CPU to the VM)
+> succeeds and ioctl D (add any other type of resource before starting the VM)
+> fails because it is not supported.
+> 
+> Would not need to call ioctl A to C and go through their underneath logic to
+> realize ioctl D support is not there and rollback all the changes done till
+> then within ioctl A to C logic. Of course, there could be ioctl A followed
+> by ioctl D, and would need to rollback ioctl A changes, but I shared a more
+> lengthy call chain that can be an option as well.
 
-Qemu patches: https://lore.kernel.org/kvm/20200723104220.314671-1-ravi.bangoria@linux.ibm.com
+I think you are overthinking this.
+
+If your interface is this complex, you have much larger issues as you
+ALWAYS have to be able to handle error conditions properly, even if the
+API is "supported".
+
+Perhaps your API is showing to be too complex?
+
+Also, where is the userspace code for all of this?  Did I miss a link to
+it in the patches somewhere?
+
+good luck!
+
+greg k-h
