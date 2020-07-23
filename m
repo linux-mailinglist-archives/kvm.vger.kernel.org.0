@@ -2,80 +2,88 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BE63B22B900
-	for <lists+kvm@lfdr.de>; Thu, 23 Jul 2020 23:56:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1060422B989
+	for <lists+kvm@lfdr.de>; Fri, 24 Jul 2020 00:32:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726980AbgGWV4Y (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 23 Jul 2020 17:56:24 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:32516 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726390AbgGWV4X (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 23 Jul 2020 17:56:23 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1595541381;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=trSNjsEZ79kQSms1jrHGawiHWSPORXd3ii+S1p8EaA8=;
-        b=DiY8N5SXu6Xdtpa+lY0YWLw2CuG8RVFZeEK3fq8iN08kcFUqJh+lLBcjJxpRUNFsV2GjX9
-        B1TDCLGDcJmqWXlr7NOEmTzv7bwh2IYICVNxbk1oyFe2SvTb8uWVyLkNV8N8cIl/H6I3mP
-        SOfX6DFn/n3z4j0uG4JqsQ39dGqgSAI=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-340-uM1OFygfN92MC6XC1ntOMg-1; Thu, 23 Jul 2020 17:56:19 -0400
-X-MC-Unique: uM1OFygfN92MC6XC1ntOMg-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3B70A80183C;
-        Thu, 23 Jul 2020 21:56:18 +0000 (UTC)
-Received: from w520.home (ovpn-112-71.phx2.redhat.com [10.3.112.71])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 1025637DD;
-        Thu, 23 Jul 2020 21:56:18 +0000 (UTC)
-Date:   Thu, 23 Jul 2020 15:55:36 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Ross Deleon <rdeleon@marvell.com>
-Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-Subject: Re: Could multiple PCIe devices in one IOMMU group be added to
- different KVM VM separately?
-Message-ID: <20200723155536.52655375@w520.home>
-In-Reply-To: <BY5PR18MB3282589C431572AC89EC531CA3760@BY5PR18MB3282.namprd18.prod.outlook.com>
-References: <BY5PR18MB3282589C431572AC89EC531CA3760@BY5PR18MB3282.namprd18.prod.outlook.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+        id S1727815AbgGWWcR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 23 Jul 2020 18:32:17 -0400
+Received: from userp2130.oracle.com ([156.151.31.86]:40248 "EHLO
+        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726608AbgGWWcQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 23 Jul 2020 18:32:16 -0400
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+        by userp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 06NMMcHo115782;
+        Thu, 23 Jul 2020 22:32:09 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
+ subject : date : message-id; s=corp-2020-01-29;
+ bh=rks5fOjKavKDt1iZXF1Sv1m3ADy9gyD46Q9/hbigKOQ=;
+ b=URps8MuCtHByb6W8KBgHFY5i0CKkeZB8+WLHbozE7l1bZAxkiYGNgWgP0BWSxFHIzt6v
+ KJsemlT5Gt9pwRiLtQb9Hv8JeAFss5D3kXbyHoOoKWYotPsOpU10zlvDcY4XIpoi5Mt2
+ aH7B6VmCvm1V9uHgyphWDECD4XJL+SXAnbupOSeSz28rpKfswhur0mAJEp6GdOzKNAGO
+ uUnRd+3Byc6QWqdcMZHCyH8BsZ9K3MsJObiHqcmTgNxf0DXCoOsJZSxKk2NyHoxFRaxv
+ fXyjfQMNTLFkpXTgcJ9kN3wruzYz3VxK5Nb5BovgeBol6y3NohhipAwHDYNficKF4/fa Ww== 
+Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
+        by userp2130.oracle.com with ESMTP id 32brgrv7qp-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
+        Thu, 23 Jul 2020 22:32:09 +0000
+Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
+        by userp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 06NMNAkC038232;
+        Thu, 23 Jul 2020 22:32:09 GMT
+Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
+        by userp3030.oracle.com with ESMTP id 32fhy66kv6-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 23 Jul 2020 22:32:08 +0000
+Received: from abhmp0013.oracle.com (abhmp0013.oracle.com [141.146.116.19])
+        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 06NMW7rY008999;
+        Thu, 23 Jul 2020 22:32:07 GMT
+Received: from nsvm-sadhukhan.osdevelopmeniad.oraclevcn.com (/100.100.231.196)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Thu, 23 Jul 2020 15:32:07 -0700
+From:   Krish Sadhukhan <krish.sadhukhan@oracle.com>
+To:     kvm@vger.kernel.org
+Cc:     jmattson@google.com, sean.j.christopherson@intel.com,
+        pbonzini@redhat.com, vkuznets@redhat.com
+Subject: [PATCH] KVM: x86: Fill in conforming {vmx|svm}_x86_ops and {vmx|svm}_nested_ops via macros
+Date:   Thu, 23 Jul 2020 22:31:57 +0000
+Message-Id: <1595543518-72310-1-git-send-email-krish.sadhukhan@oracle.com>
+X-Mailer: git-send-email 1.8.3.1
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9691 signatures=668680
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=564 spamscore=0
+ phishscore=0 adultscore=0 malwarescore=0 bulkscore=0 suspectscore=1
+ mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2006250000 definitions=main-2007230156
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9691 signatures=668680
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0 bulkscore=0 spamscore=0
+ impostorscore=0 suspectscore=1 adultscore=0 clxscore=1015 mlxlogscore=571
+ priorityscore=1501 phishscore=0 lowpriorityscore=0 mlxscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
+ definitions=main-2007230156
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 23 Jul 2020 21:38:31 +0000
-Ross Deleon <rdeleon@marvell.com> wrote:
+There is no functional change. Just the names of the implemented functions in
+KVM and SVM modules have been made conformant to the kvm_x86_ops and
+kvm_x86_nested_ops structures, by using macros. This will help in better
+readability and maintenance of the code.
 
-> Hi:
-> I want to know could multiple PCIe devices in one IOMMU group be
-> added to different KVM VM separately? Mother board: ASUS 390-A(intel
-> supports VT-D) host OS: Ubuntu 18.04 with kernel 4.18.0-15
-> KVM-QEMU: version 2.11.1
-> I have got failed message like *card1 is used by VM1, and card2 is in
-> the card1's group and added to VM2, then VM2 can't boot* I have tried
-> vfio driver, but it didn't work, so what should I do? try SR-IOV? or
-> update KVM-QEMU or update kernel?
 
-No.  The IOMMU group is the smallest set of devices that are DMA
-isolated from other groups.  An IOMMU group is the unit of assignment
-for vfio and also the granularity with which we manage IOMMU context.
+[PATCH] KVM: x86: Fill in conforming {vmx|svm}_x86_ops and
 
-The processor and chipset support for PCIe ACS (Access Control Services)
-plays a significant role in getting the smallest granularity in IOMMU
-grouping.  Consumer systems often do not support ACS to the same degree
-as a server, therefore if you have independent devices that are grouped
-together, the supported answer might be to get new hardware, or
-possibly move the device to a different slot.  Intel consumer CPUs do
-not support ACS, but the chipsets do make use of several quirks that
-can sometime provide ACS equivalent isolation.  Thanks,
+[root@nsvm-sadhukhan linux]# /root/Tools/git-format-patch.sh dcb7fd8
+ arch/x86/include/asm/kvm_host.h |  12 +-
+ arch/x86/kvm/svm/avic.c         |   4 +-
+ arch/x86/kvm/svm/nested.c       |  16 +--
+ arch/x86/kvm/svm/sev.c          |   4 +-
+ arch/x86/kvm/svm/svm.c          | 218 +++++++++++++++++-----------------
+ arch/x86/kvm/svm/svm.h          |   8 +-
+ arch/x86/kvm/vmx/nested.c       |  26 +++--
+ arch/x86/kvm/vmx/nested.h       |   2 +-
+ arch/x86/kvm/vmx/vmx.c          | 238 +++++++++++++++++++-------------------
+ arch/x86/kvm/vmx/vmx.h          |   2 +-
+ arch/x86/kvm/x86.c              |  20 ++--
+ 11 files changed, 279 insertions(+), 271 deletions(-)
 
-Alex
-
+Krish Sadhukhan (1):
+      KVM: x86: Fill in conforming {vmx|svm}_x86_ops and {vmx|svm}_nested_ops
