@@ -2,169 +2,277 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3973522B593
-	for <lists+kvm@lfdr.de>; Thu, 23 Jul 2020 20:22:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7043A22B5CA
+	for <lists+kvm@lfdr.de>; Thu, 23 Jul 2020 20:36:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727085AbgGWSWV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 23 Jul 2020 14:22:21 -0400
-Received: from smtp-fw-6001.amazon.com ([52.95.48.154]:23171 "EHLO
-        smtp-fw-6001.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726666AbgGWSWV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 23 Jul 2020 14:22:21 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1595528540; x=1627064540;
-  h=subject:to:cc:references:from:message-id:date:
-   mime-version:in-reply-to:content-transfer-encoding;
-  bh=OqsVKyONHBgrXDgQg9OKR7QshZHpcXMCyDkfKOGw2qs=;
-  b=QEdUwYr4uFUywQQlLRwQbU5tB6MJ7QFB47jENzGK1+CoElAjPq98UPWQ
-   +tJGHU83l0plkSxbBAIVkb5wb5g0Hbo+b0dnRs2UGaCqz4EcuwNESMw4V
-   1uhf6J6NsyY6uuzxe/xWbGtTuneMjg2MKMzJD/6OgCNTg30uVQVWtu8bM
-   M=;
-IronPort-SDR: WRqLE31tF1s7PT+TAApABwKfYGwIflBjDpx1h+HGZ9TpUC4bd7g4cZmkxOs/EvtVoNjoS4MupM
- 6l4rRH1aiKlA==
-X-IronPort-AV: E=Sophos;i="5.75,387,1589241600"; 
-   d="scan'208";a="45066285"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-2b-81e76b79.us-west-2.amazon.com) ([10.43.8.6])
-  by smtp-border-fw-out-6001.iad6.amazon.com with ESMTP; 23 Jul 2020 18:22:18 +0000
-Received: from EX13MTAUEA002.ant.amazon.com (pdx4-ws-svc-p6-lb7-vlan3.pdx.amazon.com [10.170.41.166])
-        by email-inbound-relay-2b-81e76b79.us-west-2.amazon.com (Postfix) with ESMTPS id 5338AA1FD1;
-        Thu, 23 Jul 2020 18:22:16 +0000 (UTC)
-Received: from EX13D16EUB003.ant.amazon.com (10.43.166.99) by
- EX13MTAUEA002.ant.amazon.com (10.43.61.77) with Microsoft SMTP Server (TLS)
- id 15.0.1497.2; Thu, 23 Jul 2020 18:22:15 +0000
-Received: from 38f9d34ed3b1.ant.amazon.com (10.43.161.146) by
- EX13D16EUB003.ant.amazon.com (10.43.166.99) with Microsoft SMTP Server (TLS)
- id 15.0.1497.2; Thu, 23 Jul 2020 18:22:04 +0000
-Subject: Re: [PATCH v5 01/18] nitro_enclaves: Add ioctl interface definition
-To:     Greg KH <gregkh@linuxfoundation.org>
-CC:     <linux-kernel@vger.kernel.org>,
-        Anthony Liguori <aliguori@amazon.com>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Colm MacCarthaigh <colmmacc@amazon.com>,
-        David Duncan <davdunc@amazon.com>,
-        Bjoern Doebel <doebel@amazon.de>,
-        David Woodhouse <dwmw@amazon.co.uk>,
-        Frank van der Linden <fllinden@amazon.com>,
-        Alexander Graf <graf@amazon.de>, Karen Noel <knoel@redhat.com>,
-        Martin Pohlack <mpohlack@amazon.de>,
-        Matt Wilson <msw@amazon.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Balbir Singh <sblbir@amazon.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        "Stefan Hajnoczi" <stefanha@redhat.com>,
-        Stewart Smith <trawets@amazon.com>,
-        "Uwe Dannowski" <uwed@amazon.de>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>, <kvm@vger.kernel.org>,
-        <ne-devel-upstream@amazon.com>, Alexander Graf <graf@amazon.com>
-References: <20200715194540.45532-1-andraprs@amazon.com>
- <20200715194540.45532-2-andraprs@amazon.com>
- <20200721121225.GA1855212@kroah.com>
- <5dad638c-0ef3-9d16-818c-54e1556d8fc8@amazon.com>
- <20200722095759.GA2817347@kroah.com>
- <b952de82-94de-fc14-74d3-f13859fe19f0@amazon.com>
- <20200723105409.GC1949236@kroah.com>
-From:   "Paraschiv, Andra-Irina" <andraprs@amazon.com>
-Message-ID: <dd99213b-3caf-4fc0-1bf5-314297e3d450@amazon.com>
-Date:   Thu, 23 Jul 2020 21:21:51 +0300
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:68.0)
- Gecko/20100101 Thunderbird/68.10.0
+        id S1727927AbgGWSgG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 23 Jul 2020 14:36:06 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:27767 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726666AbgGWSgE (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 23 Jul 2020 14:36:04 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1595529361;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=BjMEMo7D/ooHPdAOuZ5F7N2yj6cdYx6amr6g21w93l4=;
+        b=ZZsr1bPnelz/J5ivl39tvB+4efudt4y64H2QeM1eKhkVRKSPfaKKC5I7HoQ42q8JmdcVNP
+        XjfI0nZIuiLjsQqm6OrDZdof1FfCcDQa4S8nhYmH0QSn6OIo22S7tTWY0uSOWuEg6FoFBy
+        C79Uiob16rEmTsAqzQJljaA4Sdvloy4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-409-BZ3USn77Ohi5QhFdIZo0QA-1; Thu, 23 Jul 2020 14:35:56 -0400
+X-MC-Unique: BZ3USn77Ohi5QhFdIZo0QA-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 94D67800688;
+        Thu, 23 Jul 2020 18:35:53 +0000 (UTC)
+Received: from w520.home (ovpn-112-71.phx2.redhat.com [10.3.112.71])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 62EA15C221;
+        Thu, 23 Jul 2020 18:35:50 +0000 (UTC)
+Date:   Thu, 23 Jul 2020 12:35:44 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Xiong Zhang <xiong.y.zhang@intel.com>,
+        Wayne Boyer <wayne.boyer@intel.com>,
+        Zhenyu Wang <zhenyuw@linux.intel.com>,
+        Jun Nakajima <jun.nakajima@intel.com>,
+        Weijiang Yang <weijiang.yang@intel.com>
+Subject: Re: [PATCH] KVM: x86/mmu: Add capability to zap only sptes for the
+ affected memslot
+Message-ID: <20200723123544.6268b465@w520.home>
+In-Reply-To: <20200723155711.GD21891@linux.intel.com>
+References: <20200703025047.13987-1-sean.j.christopherson@intel.com>
+        <51637a13-f23b-8b76-c93a-76346b4cc982@redhat.com>
+        <20200709211253.GW24919@linux.intel.com>
+        <49c7907a-3ab4-b5db-ccb4-190b990c8be3@redhat.com>
+        <20200710042922.GA24919@linux.intel.com>
+        <20200713122226.28188f93@x1.home>
+        <20200713190649.GE29725@linux.intel.com>
+        <20200721030319.GD20375@linux.intel.com>
+        <20200721100036.464d4440@w520.home>
+        <20200723155711.GD21891@linux.intel.com>
 MIME-Version: 1.0
-In-Reply-To: <20200723105409.GC1949236@kroah.com>
-Content-Language: en-US
-X-Originating-IP: [10.43.161.146]
-X-ClientProxiedBy: EX13D12UWA004.ant.amazon.com (10.43.160.168) To
- EX13D16EUB003.ant.amazon.com (10.43.166.99)
-Content-Type: text/plain; charset="utf-8"; format="flowed"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-CgpPbiAyMy8wNy8yMDIwIDEzOjU0LCBHcmVnIEtIIHdyb3RlOgo+IE9uIFRodSwgSnVsIDIzLCAy
-MDIwIGF0IDEyOjIzOjU2UE0gKzAzMDAsIFBhcmFzY2hpdiwgQW5kcmEtSXJpbmEgd3JvdGU6Cj4+
-Cj4+IE9uIDIyLzA3LzIwMjAgMTI6NTcsIEdyZWcgS0ggd3JvdGU6Cj4+PiBPbiBXZWQsIEp1bCAy
-MiwgMjAyMCBhdCAxMToyNzoyOUFNICswMzAwLCBQYXJhc2NoaXYsIEFuZHJhLUlyaW5hIHdyb3Rl
-Ogo+Pj4+Pj4gKyNpZm5kZWYgX1VBUElfTElOVVhfTklUUk9fRU5DTEFWRVNfSF8KPj4+Pj4+ICsj
-ZGVmaW5lIF9VQVBJX0xJTlVYX05JVFJPX0VOQ0xBVkVTX0hfCj4+Pj4+PiArCj4+Pj4+PiArI2lu
-Y2x1ZGUgPGxpbnV4L3R5cGVzLmg+Cj4+Pj4+PiArCj4+Pj4+PiArLyogTml0cm8gRW5jbGF2ZXMg
-KE5FKSBLZXJuZWwgRHJpdmVyIEludGVyZmFjZSAqLwo+Pj4+Pj4gKwo+Pj4+Pj4gKyNkZWZpbmUg
-TkVfQVBJX1ZFUlNJT04gKDEpCj4+Pj4+IFdoeSBkbyB5b3UgbmVlZCB0aGlzIHZlcnNpb24/ICBJ
-dCBzaG91bGRuJ3QgYmUgbmVlZGVkLCByaWdodD8KPj4+PiBUaGUgdmVyc2lvbiBpcyB1c2VkIGFz
-IGEgd2F5IGZvciB0aGUgdXNlciBzcGFjZSB0b29saW5nIHRvIHN5bmMgb24gdGhlCj4+Pj4gZmVh
-dHVyZXMgc2V0IHByb3ZpZGVkIGJ5IHRoZSBkcml2ZXIgZS5nLiBpbiBjYXNlIGFuIG9sZGVyIHZl
-cnNpb24gb2YgdGhlCj4+Pj4gZHJpdmVyIGlzIGF2YWlsYWJsZSBvbiB0aGUgc3lzdGVtIGFuZCB0
-aGUgdXNlciBzcGFjZSB0b29saW5nIGV4cGVjdHMgYSBzZXQKPj4+PiBvZiBmZWF0dXJlcyB0aGF0
-IGlzIG5vdCBpbmNsdWRlZCBpbiB0aGF0IGRyaXZlciB2ZXJzaW9uLgo+Pj4gVGhhdCBpcyBndWFy
-YW50ZWVkIHRvIGdldCBvdXQgb2Ygc3luYyBpbnN0YW50bHkgd2l0aCBkaWZmZXJlbnQgZGlzdHJv
-Cj4+PiBrZXJuZWxzIGJhY2twb3J0aW5nIHJhbmRvbSB0aGluZ3MsIGNvbWJpbmVkIHdpdGggc3Rh
-YmxlIGtlcm5lbCBwYXRjaAo+Pj4gdXBkYXRlcyBhbmQgdGhlIGxpa2UuCj4+Pgo+Pj4gSnVzdCB1
-c2UgdGhlIG5vcm1hbCBhcGkgaW50ZXJmYWNlcyBpbnN0ZWFkLCBkb24ndCB0cnkgdG8gInZlcnNp
-b24iCj4+PiBhbnl0aGluZywgaXQgd2lsbCBub3Qgd29yaywgdHJ1c3QgdXMgOikKPj4+Cj4+PiBJ
-ZiBhbiBpb2N0bCByZXR1cm5zIC1FTk9UVFkgdGhlbiBoZXksIGl0J3Mgbm90IHByZXNlbnQgYW5k
-IHlvdXIKPj4+IHVzZXJzcGFjZSBjb2RlIGNhbiBoYW5kbGUgaXQgdGhhdCB3YXkuCj4+IENvcnJl
-Y3QsIHRoZXJlIGNvdWxkIGJlIGEgdmFyaWV0eSBvZiBrZXJuZWwgdmVyc2lvbnMgYW5kIHVzZXIg
-c3BhY2UgdG9vbGluZwo+PiBlaXRoZXIgaW4gdGhlIG9yaWdpbmFsIGZvcm0sIGN1c3RvbWl6ZWQg
-b3Igd3JpdHRlbiBmcm9tIHNjcmF0Y2guIEFuZCBFTk9UVFkKPj4gc2lnbmFscyBhbiBpb2N0bCBu
-b3QgYXZhaWxhYmxlIG9yIGUuZy4gRUlOVkFMIChvciBjdXN0b20gZXJyb3IpIGlmIHRoZQo+PiBw
-YXJhbWV0ZXIgZmllbGQgdmFsdWUgaXMgbm90IHZhbGlkIHdpdGhpbiBhIGNlcnRhaW4gdmVyc2lv
-bi4gV2UgaGF2ZSB0aGVzZQo+PiBpbiBwbGFjZSwgdGhhdCdzIGdvb2QuIDopCj4+Cj4+IEhvd2V2
-ZXIsIEkgd2FzIHRoaW5raW5nLCBmb3IgZXhhbXBsZSwgb2YgYW4gaW9jdGwgZmxvdyB1c2FnZSB3
-aGVyZSBhIGNlcnRhaW4KPj4gb3JkZXIgbmVlZHMgdG8gYmUgZm9sbG93ZWQgZS5nLiBjcmVhdGUg
-YSBWTSwgYWRkIHJlc291cmNlcyB0byBhIFZNLCBzdGFydCBhCj4+IFZNLgo+Pgo+PiBMZXQncyBz
-YXksIGZvciBhbiB1c2UgY2FzZSB3cnQgbmV3IGZlYXR1cmVzLCBpb2N0bCBBIChjcmVhdGUgYSBW
-TSkgc3VjY2VlZHMsCj4+IGlvY3RsIEIgKGFkZCBtZW1vcnkgdG8gdGhlIFZNKSBzdWNjZWVkcywg
-aW9jdGwgQyAoYWRkIENQVSB0byB0aGUgVk0pCj4+IHN1Y2NlZWRzIGFuZCBpb2N0bCBEIChhZGQg
-YW55IG90aGVyIHR5cGUgb2YgcmVzb3VyY2UgYmVmb3JlIHN0YXJ0aW5nIHRoZSBWTSkKPj4gZmFp
-bHMgYmVjYXVzZSBpdCBpcyBub3Qgc3VwcG9ydGVkLgo+Pgo+PiBXb3VsZCBub3QgbmVlZCB0byBj
-YWxsIGlvY3RsIEEgdG8gQyBhbmQgZ28gdGhyb3VnaCB0aGVpciB1bmRlcm5lYXRoIGxvZ2ljIHRv
-Cj4+IHJlYWxpemUgaW9jdGwgRCBzdXBwb3J0IGlzIG5vdCB0aGVyZSBhbmQgcm9sbGJhY2sgYWxs
-IHRoZSBjaGFuZ2VzIGRvbmUgdGlsbAo+PiB0aGVuIHdpdGhpbiBpb2N0bCBBIHRvIEMgbG9naWMu
-IE9mIGNvdXJzZSwgdGhlcmUgY291bGQgYmUgaW9jdGwgQSBmb2xsb3dlZAo+PiBieSBpb2N0bCBE
-LCBhbmQgd291bGQgbmVlZCB0byByb2xsYmFjayBpb2N0bCBBIGNoYW5nZXMsIGJ1dCBJIHNoYXJl
-ZCBhIG1vcmUKPj4gbGVuZ3RoeSBjYWxsIGNoYWluIHRoYXQgY2FuIGJlIGFuIG9wdGlvbiBhcyB3
-ZWxsLgo+IEkgdGhpbmsgeW91IGFyZSBvdmVydGhpbmtpbmcgdGhpcy4KPgo+IElmIHlvdXIgaW50
-ZXJmYWNlIGlzIHRoaXMgY29tcGxleCwgeW91IGhhdmUgbXVjaCBsYXJnZXIgaXNzdWVzIGFzIHlv
-dQo+IEFMV0FZUyBoYXZlIHRvIGJlIGFibGUgdG8gaGFuZGxlIGVycm9yIGNvbmRpdGlvbnMgcHJv
-cGVybHksIGV2ZW4gaWYgdGhlCj4gQVBJIGlzICJzdXBwb3J0ZWQiLgoKVHJ1ZSwgdGhlIGVycm9y
-IHBhdGhzIG5lZWQgdG8gaGFuZGxlZCBjb3JyZWN0bHkgb24gdGhlIGtlcm5lbCBkcml2ZXIgYW5k
-IApvbiB0aGUgdXNlciBzcGFjZSBsb2dpYyBzaWRlLCBpbmRlcGVuZGVudCBvZiBzdXBwb3J0ZWQg
-ZmVhdHVyZXMgb3Igbm90LiAKQ2Fubm90IGFzc3VtZSB0aGF0IGFsbCBpb2N0bCBjYWxsZXJzIGFy
-ZSBiZWhhdmluZyBjb3JyZWN0bHkgb3IgdGhlcmUgYXJlIApubyBlcnJvcnMgaW4gdGhlIHN5c3Rl
-bS4KCldoYXQgSSB3YW50ZWQgdG8gY292ZXIgd2l0aCB0aGF0IGV4YW1wbGUgaXMgbW9yZSB0b3dh
-cmRzIHRoZSB1c2VyIHNwYWNlIApsb2dpYyB1c2luZyBuZXcgZmVhdHVyZXMsIGVpdGhlciBlYXJs
-eSBleGl0aW5nIGJlZm9yZSBldmVuIHRyeWluZyB0aGUgCmlvY3RsIGNhbGwgZmxvdyBwYXRoIG9y
-IGdvaW5nIHRocm91Z2ggcGFydCBvZiB0aGUgZmxvdyB0aWxsIGdldHRpbmcgdGhlIAplcnJvciBl
-LmcuIEVOT1RUWSBmb3Igb25lIG9mIHRoZSBpb2N0bCBjYWxscy4KCj4KPiBQZXJoYXBzIHlvdXIg
-QVBJIGlzIHNob3dpbmcgdG8gYmUgdG9vIGNvbXBsZXg/Cj4KPiBBbHNvLCB3aGVyZSBpcyB0aGUg
-dXNlcnNwYWNlIGNvZGUgZm9yIGFsbCBvZiB0aGlzPyAgRGlkIEkgbWlzcyBhIGxpbmsgdG8KPiBp
-dCBpbiB0aGUgcGF0Y2hlcyBzb21ld2hlcmU/CgpOb3BlLCB5b3UgZGlkbid0IG1pc3MgYW55IHJl
-ZmVyZW5jZXMgdG8gaXQuIFRoZSBjb2RlYmFzZSBmb3IgdGhlIHVzZXIgCnNwYWNlIGNvZGUgaXMg
-bm90IHB1YmxpY2x5IGF2YWlsYWJsZSBmb3Igbm93LCBidXQgaXQgd2lsbCBiZSBhdmFpbGFibGUg
-Cm9uIEdpdEh1YiBvbmNlIHRoZSB3aG9sZSBwcm9qZWN0IGlzIEdBLiBBbmQgSSdsbCBpbmNsdWRl
-IHRoZSByZWZzLCBvbmNlIAphdmFpbGFibGUsIGluIHRoZSBORSBrZXJuZWwgZHJpdmVyIGRvY3Vt
-ZW50YXRpb24uCgpJIGNhbiBzdW1tYXJpemUgaGVyZSB0aGUgaW9jdGwgaW50ZXJmYWNlIHVzYWdl
-IGZsb3csIGxldCBtZSBrbm93IGlmIEkgCmNhbiBoZWxwIHdpdGggbW9yZSBjbGFyaWZpY2F0aW9u
-czoKCkVuY2xhdmUgY3JlYXRpb24KCiogT3BlbiB0aGUgbWlzYyBkZXZpY2UgKC9kZXYvbml0cm9f
-ZW5jbGF2ZXMpIGFuZCBnZXQgdGhlIGRldmljZSBmZC4KKiBVc2luZyB0aGUgZGV2aWNlIGZkLCBj
-YWxsIE5FX0dFVF9BUElfVkVSU0lPTiB0byBjaGVjayB0aGUgQVBJIHZlcnNpb24uCiogVXNpbmcg
-dGhlIGRldmljZSBmZCwgY2FsbCBORV9DUkVBVEVfVk0gYW5kIGdldCBhbiBlbmNsYXZlIGZkLgoq
-IFVzaW5nIHRoZSBlbmNsYXZlIGZkLCBjYWxsIE5FX0dFVF9JTUFHRV9MT0FEX0lORk8gdG8gZ2V0
-IHRoZSBvZmZzZXQgaW4gCnRoZSBlbmNsYXZlIG1lbW9yeSB3aGVyZSB0byBwbGFjZSB0aGUgZW5j
-bGF2ZSBpbWFnZS4gRW5jbGF2ZSBtZW1vcnkgCnJlZ2lvbnMgY29uc2lzdCBvZiBodWdldGxiZnMg
-aHVnZSBwYWdlcy4gUGxhY2UgdGhlIGVuY2xhdmUgaW1hZ2UgaW4gCmVuY2xhdmUgbWVtb3J5Lgoq
-IFVzaW5nIHRoZSBlbmNsYXZlIGZkLCBjYWxsIE5FX1NFVF9VU0VSX01FTU9SWV9SRUdJT04gdG8g
-c2V0IGEgbWVtb3J5IApyZWdpb24gZm9yIGFuIGVuY2xhdmUuIFJlcGVhdCB0aGlzIHN0ZXAgZm9y
-IGFsbCBlbmNsYXZlIG1lbW9yeSByZWdpb25zLgoqIFVzaW5nIHRoZSBlbmNsYXZlIGZkLCBjYWxs
-IE5FX0FERF9WQ1BVIHRvIGFkZCBhIHZDUFUgZm9yIGFuIGVuY2xhdmUuIApSZXBlYXQgdGhpcyBz
-dGVwIGZvciBhbGwgZW5jbGF2ZSB2Q1BVcy4gVGhlIENQVXMgYXJlIHBhcnQgb2YgdGhlIE5FIENQ
-VSAKcG9vbCwgc2V0IHVzaW5nIGEgc3lzZnMgZmlsZSBiZWZvcmUgc3RhcnRpbmcgdG8gY3JlYXRl
-IGFuIGVuY2xhdmUuCiogVXNpbmcgdGhlIGVuY2xhdmUgZmQsIGNhbGwgTkVfU1RBUlRfRU5DTEFW
-RSB0byBzdGFydCBhbiBlbmNsYXZlLgoKCkVuY2xhdmUgdGVybWluYXRpb24KCiogQ2xvc2UgdGhl
-IGVuY2xhdmUgZmQuCgoKVGhhbmtzLApBbmRyYQoKPgo+IGdvb2QgbHVjayEKPgo+IGdyZWcgay1o
-CgoKCgpBbWF6b24gRGV2ZWxvcG1lbnQgQ2VudGVyIChSb21hbmlhKSBTLlIuTC4gcmVnaXN0ZXJl
-ZCBvZmZpY2U6IDI3QSBTZi4gTGF6YXIgU3RyZWV0LCBVQkM1LCBmbG9vciAyLCBJYXNpLCBJYXNp
-IENvdW50eSwgNzAwMDQ1LCBSb21hbmlhLiBSZWdpc3RlcmVkIGluIFJvbWFuaWEuIFJlZ2lzdHJh
-dGlvbiBudW1iZXIgSjIyLzI2MjEvMjAwNS4K
+On Thu, 23 Jul 2020 08:57:11 -0700
+Sean Christopherson <sean.j.christopherson@intel.com> wrote:
+
+> On Tue, Jul 21, 2020 at 10:00:36AM -0600, Alex Williamson wrote:
+> > On Mon, 20 Jul 2020 20:03:19 -0700
+> > Sean Christopherson <sean.j.christopherson@intel.com> wrote:
+> >  =20
+> > > +Weijiang
+> > >=20
+> > > On Mon, Jul 13, 2020 at 12:06:50PM -0700, Sean Christopherson wrote: =
+=20
+> > > > The only ideas I have going forward are to:
+> > > >=20
+> > > >   a) Reproduce the bug outside of your environment and find a resou=
+rce that
+> > > >      can go through the painful bisection.   =20
+> > >=20
+> > > We're trying to reproduce the original issue in the hopes of biesecti=
+ng, but
+> > > have not yet discovered the secret sauce.  A few questions:
+> > >=20
+> > >   - Are there any known hardware requirements, e.g. specific flavor o=
+f GPU? =20
+> >=20
+> > I'm using an old GeForce GT635, I don't think there's anything special
+> > about this card. =20
+>=20
+> Would you be able to provide your QEMU command line?  Or at least any
+> potentially relevant bits?  Still no luck reproducing this on our end.
+
+XML:
+
+<domain type=3D'kvm'>
+  <name>GeForce</name>
+  <uuid>2b417d4b-f25b-4522-a5be-e105f032f99c</uuid>
+  <memory unit=3D'KiB'>4194304</memory>
+  <currentMemory unit=3D'KiB'>4194304</currentMemory>
+  <memoryBacking>
+    <hugepages/>
+  </memoryBacking>
+  <vcpu placement=3D'static'>4</vcpu>
+  <cputune>
+    <vcpupin vcpu=3D'0' cpuset=3D'3'/>
+    <vcpupin vcpu=3D'1' cpuset=3D'7'/>
+    <vcpupin vcpu=3D'2' cpuset=3D'2'/>
+    <vcpupin vcpu=3D'3' cpuset=3D'6'/>
+    <emulatorpin cpuset=3D'0,4'/>
+  </cputune>
+  <os>
+    <type arch=3D'x86_64' machine=3D'pc-i440fx-5.0'>hvm</type>
+    <loader readonly=3D'yes' type=3D'pflash'>/usr/share/edk2/ovmf/OVMF_CODE=
+.fd</loader>
+    <nvram template=3D'/usr/share/edk2/ovmf/OVMF_VARS.fd'>/var/lib/libvirt/=
+qemu/nvram/GeForce_VARS.fd</nvram>
+    <bootmenu enable=3D'yes'/>
+  </os>
+  <features>
+    <acpi/>
+    <apic/>
+    <pae/>
+    <hyperv>
+      <relaxed state=3D'on'/>
+      <vapic state=3D'on'/>
+      <spinlocks state=3D'on' retries=3D'8191'/>
+      <vendor_id state=3D'on' value=3D'KeenlyKVM'/>
+    </hyperv>
+    <kvm>
+      <hidden state=3D'on'/>
+    </kvm>
+    <vmport state=3D'off'/>
+  </features>
+  <cpu mode=3D'custom' match=3D'exact' check=3D'none'>
+    <model fallback=3D'allow'>IvyBridge-IBRS</model>
+    <topology sockets=3D'1' dies=3D'1' cores=3D'4' threads=3D'1'/>
+  </cpu>
+  <clock offset=3D'localtime'>
+    <timer name=3D'rtc' tickpolicy=3D'catchup'/>
+    <timer name=3D'pit' tickpolicy=3D'delay'/>
+    <timer name=3D'hpet' present=3D'no'/>
+    <timer name=3D'hypervclock' present=3D'yes'/>
+  </clock>
+  <on_poweroff>destroy</on_poweroff>
+  <on_reboot>restart</on_reboot>
+  <on_crash>restart</on_crash>
+  <devices>
+    <emulator>/usr/local/bin/qemu-system-x86_64</emulator>
+    <disk type=3D'file' device=3D'disk'>
+      <driver name=3D'qemu' type=3D'qcow2' cache=3D'none'/>
+      <source file=3D'/mnt/ssd/GeForce.qcow2'/>
+      <target dev=3D'sda' bus=3D'scsi'/>
+      <boot order=3D'2'/>
+      <address type=3D'drive' controller=3D'0' bus=3D'0' target=3D'0' unit=
+=3D'0'/>
+    </disk>
+    <controller type=3D'scsi' index=3D'0' model=3D'virtio-scsi'>
+      <driver queues=3D'4'/>
+      <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x05' fu=
+nction=3D'0x0'/>
+    </controller>
+    <controller type=3D'pci' index=3D'0' model=3D'pci-root'/>
+    <controller type=3D'usb' index=3D'0' model=3D'nec-xhci'>
+      <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x08' fu=
+nction=3D'0x0'/>
+    </controller>
+    <interface type=3D'direct'>
+      <mac address=3D'52:54:00:60:ef:ac'/>
+      <source dev=3D'enp4s0' mode=3D'bridge'/>
+      <model type=3D'virtio'/>
+      <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x03' fu=
+nction=3D'0x0'/>
+    </interface>
+    <input type=3D'mouse' bus=3D'ps2'/>
+    <input type=3D'keyboard' bus=3D'ps2'/>
+    <hostdev mode=3D'subsystem' type=3D'pci' managed=3D'yes'>
+      <source>
+        <address domain=3D'0x0000' bus=3D'0x01' slot=3D'0x00' function=3D'0=
+x0'/>
+      </source>
+      <rom bar=3D'on'/>
+      <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x04' fu=
+nction=3D'0x0'/>
+    </hostdev>
+    <hostdev mode=3D'subsystem' type=3D'pci' managed=3D'yes'>
+      <source>
+        <address domain=3D'0x0000' bus=3D'0x01' slot=3D'0x00' function=3D'0=
+x1'/>
+      </source>
+      <rom bar=3D'off'/>
+      <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x06' fu=
+nction=3D'0x0'/>
+    </hostdev>
+    <memballoon model=3D'none'/>
+  </devices>
+</domain>
+
+=46rom libvirt log:
+
+LC_ALL=3DC \
+PATH=3D/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin \
+HOME=3D/var/lib/libvirt/qemu/domain-1-GeForce \
+XDG_DATA_HOME=3D/var/lib/libvirt/qemu/domain-1-GeForce/.local/share \
+XDG_CACHE_HOME=3D/var/lib/libvirt/qemu/domain-1-GeForce/.cache \
+XDG_CONFIG_HOME=3D/var/lib/libvirt/qemu/domain-1-GeForce/.config \
+QEMU_AUDIO_DRV=3Dnone \
+/usr/local/bin/qemu-system-x86_64 \
+-name guest=3DGeForce,debug-threads=3Don \
+-S \
+-object secret,id=3DmasterKey0,format=3Draw,file=3D/var/lib/libvirt/qemu/do=
+main-1-GeForce/master-key.aes \
+-blockdev '{"driver":"file","filename":"/usr/share/edk2/ovmf/OVMF_CODE.fd",=
+"node-name":"libvirt-pflash0-storage","auto-read-only":true,"discard":"unma=
+p"}' \
+-blockdev '{"node-name":"libvirt-pflash0-format","read-only":true,"driver":=
+"raw","file":"libvirt-pflash0-storage"}' \
+-blockdev '{"driver":"file","filename":"/var/lib/libvirt/qemu/nvram/GeForce=
+_VARS.fd","node-name":"libvirt-pflash1-storage","auto-read-only":true,"disc=
+ard":"unmap"}' \
+-blockdev '{"node-name":"libvirt-pflash1-format","read-only":false,"driver"=
+:"raw","file":"libvirt-pflash1-storage"}' \
+-machine pc-i440fx-5.0,accel=3Dkvm,usb=3Doff,vmport=3Doff,dump-guest-core=
+=3Doff,pflash0=3Dlibvirt-pflash0-format,pflash1=3Dlibvirt-pflash1-format \
+-cpu IvyBridge-IBRS,hv-time,hv-relaxed,hv-vapic,hv-spinlocks=3D0x1fff,hv-ve=
+ndor-id=3DKeenlyKVM,kvm=3Doff \
+-m 4096 \
+-mem-prealloc \
+-mem-path /dev/hugepages/libvirt/qemu/1-GeForce \
+-overcommit mem-lock=3Doff \
+-smp 4,sockets=3D1,dies=3D1,cores=3D4,threads=3D1 \
+-uuid 2b417d4b-f25b-4522-a5be-e105f032f99c \
+-display none \
+-no-user-config \
+-nodefaults \
+-chardev socket,id=3Dcharmonitor,fd=3D36,server,nowait \
+-mon chardev=3Dcharmonitor,id=3Dmonitor,mode=3Dcontrol \
+-rtc base=3Dlocaltime,driftfix=3Dslew \
+-global kvm-pit.lost_tick_policy=3Ddelay \
+-no-hpet \
+-no-shutdown \
+-boot menu=3Don,strict=3Don \
+-device nec-usb-xhci,id=3Dusb,bus=3Dpci.0,addr=3D0x8 \
+-device virtio-scsi-pci,id=3Dscsi0,num_queues=3D4,bus=3Dpci.0,addr=3D0x5 \
+-blockdev '{"driver":"file","filename":"/mnt/ssd/GeForce-2019-08-02.img","n=
+ode-name":"libvirt-2-storage","cache":{"direct":true,"no-flush":false},"aut=
+o-read-only":true,"discard":"unmap"}' \
+-blockdev '{"node-name":"libvirt-2-format","read-only":true,"cache":{"direc=
+t":true,"no-flush":false},"driver":"raw","file":"libvirt-2-storage"}' \
+-blockdev '{"driver":"file","filename":"/mnt/ssd/Geforce.qcow2","node-name"=
+:"libvirt-1-storage","cache":{"direct":true,"no-flush":false},"auto-read-on=
+ly":true,"discard":"unmap"}' \
+-blockdev '{"node-name":"libvirt-1-format","read-only":false,"cache":{"dire=
+ct":true,"no-flush":false},"driver":"qcow2","file":"libvirt-1-storage","bac=
+king":"libvirt-2-format"}' \
+-device scsi-hd,bus=3Dscsi0.0,channel=3D0,scsi-id=3D0,lun=3D0,device_id=3Dd=
+rive-scsi0-0-0-0,drive=3Dlibvirt-1-format,id=3Dscsi0-0-0-0,bootindex=3D2,wr=
+ite-cache=3Don \
+-netdev tap,fd=3D38,id=3Dhostnet0,vhost=3Don,vhostfd=3D40 \
+-device virtio-net-pci,netdev=3Dhostnet0,id=3Dnet0,mac=3D52:54:00:60:ef:ac,=
+bus=3Dpci.0,addr=3D0x3 \
+-device vfio-pci,host=3D0000:01:00.0,id=3Dhostdev0,bus=3Dpci.0,addr=3D0x4,r=
+ombar=3D1 \
+-device vfio-pci,host=3D0000:01:00.1,id=3Dhostdev1,bus=3Dpci.0,addr=3D0x6,r=
+ombar=3D0 \
+-sandbox on,obsolete=3Ddeny,elevateprivileges=3Ddeny,spawn=3Ddeny,resourcec=
+ontrol=3Ddeny \
+-msg timestamp=3Don
 
