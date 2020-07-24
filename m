@@ -2,97 +2,91 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 96A2722CC3E
-	for <lists+kvm@lfdr.de>; Fri, 24 Jul 2020 19:35:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 636EC22CC4C
+	for <lists+kvm@lfdr.de>; Fri, 24 Jul 2020 19:40:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726899AbgGXRfr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 24 Jul 2020 13:35:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48080 "EHLO
+        id S1726861AbgGXRka (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 24 Jul 2020 13:40:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48828 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726397AbgGXRfq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 24 Jul 2020 13:35:46 -0400
-Received: from mail-pf1-x449.google.com (mail-pf1-x449.google.com [IPv6:2607:f8b0:4864:20::449])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 98A55C0619E5
-        for <kvm@vger.kernel.org>; Fri, 24 Jul 2020 10:35:46 -0700 (PDT)
-Received: by mail-pf1-x449.google.com with SMTP id u11so105557pfm.23
-        for <kvm@vger.kernel.org>; Fri, 24 Jul 2020 10:35:46 -0700 (PDT)
+        with ESMTP id S1726381AbgGXRk3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 24 Jul 2020 13:40:29 -0400
+Received: from mail-pj1-x1043.google.com (mail-pj1-x1043.google.com [IPv6:2607:f8b0:4864:20::1043])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 76623C0619D3
+        for <kvm@vger.kernel.org>; Fri, 24 Jul 2020 10:40:29 -0700 (PDT)
+Received: by mail-pj1-x1043.google.com with SMTP id t15so5705672pjq.5
+        for <kvm@vger.kernel.org>; Fri, 24 Jul 2020 10:40:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:message-id:mime-version:subject:from:to:cc;
-        bh=9z4C5r79ACInbjfze4NId6Y2btX0M3fh8nl4dn9b26s=;
-        b=fN4sZq/TP83yFzy+siEXLP4SrgOpx7NBN6ZiJVHwc3DsYjLS6vFtBeOspp2/PMgVYc
-         BRp6JmUw/hMfGePHy/NJFvFDe4LzBFq+JJE/NvACrw8LLgRTmINP+mnqpWisEEkunNQo
-         Fws/zekrL0GiMxgAUAMLgsE/13aJfgnxXFtzWBra/K5uSTlmzpjtzQ+184Qw3Ap7Dpx4
-         UXtMdoJtToto60EenvqQcfQmcQXzbcG0KMU7+EsrPUzi9282GIyW5upCwSSvvhDFy5XM
-         n6lc9UKvVwwk5SFEm6220t9AwlKp07h/YEo0IuB+ak1ke9ySE/DZhqPkzRHcs1peQsMn
-         0L9Q==
+        d=chromium.org; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=QMsfHaQGQ+0SRHcIqI75rby1zzIeBrnwc+TycCSBhRM=;
+        b=UFmzpMf7uzK2lx30P3rhoBpvw5w85/VUsDXt/5ykAeCH/VFrEJEwB9RmNcdbY2LhWz
+         FiNtcwq6cYSJDFEy9jc1V2I68Ud1ixnRqGj5AYeAVOuh08EcTn9UXClFjujGlNhJqqyt
+         /o0xfCbeW0wGt1skpJ0dBBA+3UPdspZahcnFQ=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
-        bh=9z4C5r79ACInbjfze4NId6Y2btX0M3fh8nl4dn9b26s=;
-        b=Qv7TX6gvkWa0EhPmB0zaskaQ9XljS9EU8pYdks3H05OnE8QJbpEbqzS5dHR3mG7BkB
-         S/6edJHEoVLzsh37Ppy9iLRqydQJXZaZN2mdVb7x7WYh+rCS5l3Jsqzhf93+mm/Sx8k+
-         uSpfHVrRdyX54Ufgi/Vzkq7Iy/g3MfECTuj+JPSBzT08X5z4ckZqkt/6iu3Bx6wQ7syn
-         Fja3gaEitPf028SYEKWwwh+vdc7Jr5XZ1u0GWojtyF/7ttb/Bil5iyGuVwBV7V5fDyTg
-         UtezkaB9QaIrgb1kxRhznun0dE7KcqTw1RvCk8XvcqflP/9XxTTNfbbUh5gG0xeJBNuK
-         56wQ==
-X-Gm-Message-State: AOAM532A1RC//YDIP56VOL731kI6iiRhM4IJHi8hjmuTpcgof+RoUDiD
-        2krhNpeoA5kbVlH2iEeLlmYtD7fLCzKzqb2Rnf9BpMjvwKpgFsr0syqtcwkaxjPvy8YUFnv+Tf/
-        QnhUaIwtwjNQd2qepgokB10zlCv8qMQm/+Xi4Q2Y2Wzc42cfGeFVUxHIDwg==
-X-Google-Smtp-Source: ABdhPJzodcJYbtUzygaRALh5D65g0it/h4cc6rUSeS1ixMjdWjcC2aH+Frr78yzdpW4AwxEmwHhFlf6YfCg=
-X-Received: by 2002:a17:90b:1b08:: with SMTP id nu8mr2292293pjb.190.1595612145895;
- Fri, 24 Jul 2020 10:35:45 -0700 (PDT)
-Date:   Fri, 24 Jul 2020 17:35:36 +0000
-Message-Id: <20200724173536.789982-1-oupton@google.com>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.28.0.rc0.142.g3c755180ce-goog
-Subject: [PATCH] kvm: x86: fix reversed timespec values in PV wall clock
-From:   Oliver Upton <oupton@google.com>
-To:     kvm@vger.kernel.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=QMsfHaQGQ+0SRHcIqI75rby1zzIeBrnwc+TycCSBhRM=;
+        b=YzVP4LlhSul16VdmKjunISpRA+TCmP8lwBWZOKeZltH+rvwZzpDCYeHQiuTeahbnFe
+         sa3e4INoMC9n+eOHF6+dXHPbT6bdgzLMlXvwL81HBqo+GurS9gnHXbJ4o7Y76dm5/E4U
+         Tg6RCCoOTgLh4VXCMBiH4Bg9BDaLTm5Xa8XySe23XuiHyi21cJFa/Uqhm9b1w3ltDgu8
+         IUTO0gx+mk9+bMS31/2mGW7G38Gr/HC0d3790EU+vFtDmTlwuPo1Cb8dNvPcK3NQycX9
+         RMLKi+vvCDwo/+v8i0/WaM3B9oeZMqzfY+Rocmx/uOfr1/nJ6QnAMVhrrUASdCiAgfNM
+         MChg==
+X-Gm-Message-State: AOAM530cJkq3eTSDVUT/ZQ8OaJESbiAYgGHk2+IrGfmkKC4PpuRuO5sE
+        uJLFEJ6iNlRzsdOOdvJ9w67A+g==
+X-Google-Smtp-Source: ABdhPJyekeM+nvr+iN70DB8t8eLU5BEdU2IBMUBrLQ9bGL/yN7X161hHc1aZr2MM8o1xGhcfY2+Q3A==
+X-Received: by 2002:a17:902:9a0a:: with SMTP id v10mr9082983plp.134.1595612429062;
+        Fri, 24 Jul 2020 10:40:29 -0700 (PDT)
+Received: from www.outflux.net (smtp.outflux.net. [198.145.64.163])
+        by smtp.gmail.com with ESMTPSA id q24sm7188513pfg.34.2020.07.24.10.40.27
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 24 Jul 2020 10:40:28 -0700 (PDT)
+Date:   Fri, 24 Jul 2020 10:40:27 -0700
+From:   Kees Cook <keescook@chromium.org>
+To:     Joerg Roedel <joro@8bytes.org>
+Cc:     x86@kernel.org, Joerg Roedel <jroedel@suse.de>, hpa@zytor.com,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Jiri Slaby <jslaby@suse.cz>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Juergen Gross <jgross@suse.com>,
+        David Rientjes <rientjes@google.com>,
+        Cfir Cohen <cfir@google.com>,
+        Erdem Aktas <erdemaktas@google.com>,
+        Masami Hiramatsu <mhiramat@kernel.org>,
+        Mike Stunes <mstunes@vmware.com>,
         Sean Christopherson <sean.j.christopherson@intel.com>,
-        linux-kernel@vger.kernel.org, Oliver Upton <oupton@google.com>,
-        stable@vger.kernel.org, Jim Mattson <jmattson@google.com>,
-        Peter Shier <pshier@google.com>
-Content-Type: text/plain; charset="UTF-8"
+        Martin Radev <martin.b.radev@gmail.com>,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org
+Subject: Re: [PATCH v5 31/75] x86/head/64: Load GDT after switch to virtual
+ addresses
+Message-ID: <202007241040.4A0CF961@keescook>
+References: <20200724160336.5435-1-joro@8bytes.org>
+ <20200724160336.5435-32-joro@8bytes.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200724160336.5435-32-joro@8bytes.org>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-commit 8171cd68806b ("KVM: x86: use raw clock values consistently")
-causes KVM to accidentally write seconds to the nanoseconds field (and
-vice versa) in the KVM wall clock. Fix it by reversing this accidental
-switch. Modulo the written nanoseconds value by NSEC_PER_SEC to correct
-for the amount of time represented as seconds.
+On Fri, Jul 24, 2020 at 06:02:52PM +0200, Joerg Roedel wrote:
+> From: Joerg Roedel <jroedel@suse.de>
+> 
+> Load the GDT right after switching to virtual addresses to make sure
+> there is a defined GDT for exception handling.
+> 
+> Signed-off-by: Joerg Roedel <jroedel@suse.de>
 
-Fixes: 8171cd68806b ("KVM: x86: use raw clock values consistently")
-Cc: stable@vger.kernel.org
-Reviewed-by: Jim Mattson <jmattson@google.com>
-Reviewed-by: Peter Shier <pshier@google.com>
-Signed-off-by: Oliver Upton <oupton@google.com>
----
- Parent commit: c34b26b98cac ("KVM: MIPS: clean up redundant 'kvm_run' parameters")
+Reviewed-by: Kees Cook <keescook@chromium.org>
 
- arch/x86/kvm/x86.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
-
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index e27d3db7e43f..86228cc6b29e 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -1809,8 +1809,9 @@ static void kvm_write_wall_clock(struct kvm *kvm, gpa_t wall_clock)
- 	 */
- 	wall_nsec = ktime_get_real_ns() - get_kvmclock_ns(kvm);
- 
--	wc.nsec = do_div(wall_nsec, 1000000000);
--	wc.sec = (u32)wall_nsec; /* overflow in 2106 guest time */
-+	/* overflow in 2106 guest time */
-+	wc.sec = (u32)do_div(wall_nsec, NSEC_PER_SEC);
-+	wc.nsec = wall_nsec % NSEC_PER_SEC;
- 	wc.version = version;
- 
- 	kvm_write_guest(kvm, wall_clock, &wc, sizeof(wc));
 -- 
-2.28.0.rc0.142.g3c755180ce-goog
-
+Kees Cook
