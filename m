@@ -2,19 +2,19 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5F4F122CA3D
-	for <lists+kvm@lfdr.de>; Fri, 24 Jul 2020 18:08:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D8E5222CA4F
+	for <lists+kvm@lfdr.de>; Fri, 24 Jul 2020 18:08:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727948AbgGXQE3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 24 Jul 2020 12:04:29 -0400
-Received: from 8bytes.org ([81.169.241.247]:60312 "EHLO theia.8bytes.org"
+        id S1728555AbgGXQIj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 24 Jul 2020 12:08:39 -0400
+Received: from 8bytes.org ([81.169.241.247]:60034 "EHLO theia.8bytes.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727910AbgGXQE1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 24 Jul 2020 12:04:27 -0400
+        id S1727923AbgGXQE2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 24 Jul 2020 12:04:28 -0400
 Received: from cap.home.8bytes.org (p5b006776.dip0.t-ipconnect.de [91.0.103.118])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
         (No client certificate requested)
-        by theia.8bytes.org (Postfix) with ESMTPSA id 27AF9E60;
+        by theia.8bytes.org (Postfix) with ESMTPSA id A8017FBE;
         Fri, 24 Jul 2020 18:04:20 +0200 (CEST)
 From:   Joerg Roedel <joro@8bytes.org>
 To:     x86@kernel.org
@@ -36,9 +36,9 @@ Cc:     Joerg Roedel <joro@8bytes.org>, Joerg Roedel <jroedel@suse.de>,
         Martin Radev <martin.b.radev@gmail.com>,
         linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         virtualization@lists.linux-foundation.org
-Subject: [PATCH v5 37/75] x86/head/64: Set CR4.FSGSBASE early
-Date:   Fri, 24 Jul 2020 18:02:58 +0200
-Message-Id: <20200724160336.5435-38-joro@8bytes.org>
+Subject: [PATCH v5 38/75] x86/sev-es: Add SEV-ES Feature Detection
+Date:   Fri, 24 Jul 2020 18:02:59 +0200
+Message-Id: <20200724160336.5435-39-joro@8bytes.org>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20200724160336.5435-1-joro@8bytes.org>
 References: <20200724160336.5435-1-joro@8bytes.org>
@@ -51,32 +51,101 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Joerg Roedel <jroedel@suse.de>
 
-Early exception handling will use rd/wrgsbase in paranoid_entry/exit.
-Enable the feature to avoid #UD exceptions on boot APs.
+Add the sev_es_active function for checking whether SEV-ES is enabled.
+Also cache the value of MSR_AMD64_SEV at boot to speed up the feature
+checking in the running code.
 
 Signed-off-by: Joerg Roedel <jroedel@suse.de>
 ---
- arch/x86/kernel/head_64.S | 7 +++++++
- 1 file changed, 7 insertions(+)
+ arch/x86/include/asm/mem_encrypt.h | 3 +++
+ arch/x86/include/asm/msr-index.h   | 2 ++
+ arch/x86/mm/mem_encrypt.c          | 9 ++++++++-
+ arch/x86/mm/mem_encrypt_identity.c | 3 +++
+ 4 files changed, 16 insertions(+), 1 deletion(-)
 
-diff --git a/arch/x86/kernel/head_64.S b/arch/x86/kernel/head_64.S
-index 08412f308de3..4622940134a5 100644
---- a/arch/x86/kernel/head_64.S
-+++ b/arch/x86/kernel/head_64.S
-@@ -153,6 +153,13 @@ SYM_CODE_START(secondary_startup_64)
- 	orl	$X86_CR4_LA57, %ecx
- 1:
- #endif
-+
-+	ALTERNATIVE "jmp .Lstartup_write_cr4", "", X86_FEATURE_FSGSBASE
-+
-+	/* Early exception handling uses FSGSBASE on APs */
-+	orl	$X86_CR4_FSGSBASE, %ecx
-+
-+.Lstartup_write_cr4:
- 	movq	%rcx, %cr4
+diff --git a/arch/x86/include/asm/mem_encrypt.h b/arch/x86/include/asm/mem_encrypt.h
+index 5049f6c22683..4e72b73a9cb5 100644
+--- a/arch/x86/include/asm/mem_encrypt.h
++++ b/arch/x86/include/asm/mem_encrypt.h
+@@ -19,6 +19,7 @@
+ #ifdef CONFIG_AMD_MEM_ENCRYPT
  
- 	/* Setup early boot stage 4-/5-level pagetables. */
+ extern u64 sme_me_mask;
++extern u64 sev_status;
+ extern bool sev_enabled;
+ 
+ void sme_encrypt_execute(unsigned long encrypted_kernel_vaddr,
+@@ -50,6 +51,7 @@ void __init mem_encrypt_init(void);
+ 
+ bool sme_active(void);
+ bool sev_active(void);
++bool sev_es_active(void);
+ 
+ #define __bss_decrypted __attribute__((__section__(".bss..decrypted")))
+ 
+@@ -72,6 +74,7 @@ static inline void __init sme_enable(struct boot_params *bp) { }
+ 
+ static inline bool sme_active(void) { return false; }
+ static inline bool sev_active(void) { return false; }
++static inline bool sev_es_active(void) { return false; }
+ 
+ static inline int __init
+ early_set_memory_decrypted(unsigned long vaddr, unsigned long size) { return 0; }
+diff --git a/arch/x86/include/asm/msr-index.h b/arch/x86/include/asm/msr-index.h
+index aa61e63d8fd6..5595e299ad7f 100644
+--- a/arch/x86/include/asm/msr-index.h
++++ b/arch/x86/include/asm/msr-index.h
+@@ -467,7 +467,9 @@
+ #define MSR_AMD64_SEV_ES_GHCB		0xc0010130
+ #define MSR_AMD64_SEV			0xc0010131
+ #define MSR_AMD64_SEV_ENABLED_BIT	0
++#define MSR_AMD64_SEV_ES_ENABLED_BIT	1
+ #define MSR_AMD64_SEV_ENABLED		BIT_ULL(MSR_AMD64_SEV_ENABLED_BIT)
++#define MSR_AMD64_SEV_ES_ENABLED	BIT_ULL(MSR_AMD64_SEV_ES_ENABLED_BIT)
+ 
+ #define MSR_AMD64_VIRT_SPEC_CTRL	0xc001011f
+ 
+diff --git a/arch/x86/mm/mem_encrypt.c b/arch/x86/mm/mem_encrypt.c
+index 9f1177edc2e7..232d6e1bcfc6 100644
+--- a/arch/x86/mm/mem_encrypt.c
++++ b/arch/x86/mm/mem_encrypt.c
+@@ -38,6 +38,7 @@
+  * section is later cleared.
+  */
+ u64 sme_me_mask __section(.data) = 0;
++u64 sev_status __section(.data) = 0;
+ EXPORT_SYMBOL(sme_me_mask);
+ DEFINE_STATIC_KEY_FALSE(sev_enable_key);
+ EXPORT_SYMBOL_GPL(sev_enable_key);
+@@ -347,7 +348,13 @@ bool sme_active(void)
+ 
+ bool sev_active(void)
+ {
+-	return sme_me_mask && sev_enabled;
++	return !!(sev_status & MSR_AMD64_SEV_ENABLED);
++}
++
++/* Needs to be called from non-instrumentable code */
++bool noinstr sev_es_active(void)
++{
++	return !!(sev_status & MSR_AMD64_SEV_ES_ENABLED);
+ }
+ 
+ /* Override for DMA direct allocation check - ARCH_HAS_FORCE_DMA_UNENCRYPTED */
+diff --git a/arch/x86/mm/mem_encrypt_identity.c b/arch/x86/mm/mem_encrypt_identity.c
+index e2b0e2ac07bb..68d75379e06a 100644
+--- a/arch/x86/mm/mem_encrypt_identity.c
++++ b/arch/x86/mm/mem_encrypt_identity.c
+@@ -540,6 +540,9 @@ void __init sme_enable(struct boot_params *bp)
+ 		if (!(msr & MSR_AMD64_SEV_ENABLED))
+ 			return;
+ 
++		/* Save SEV_STATUS to avoid reading MSR again */
++		sev_status = msr;
++
+ 		/* SEV state cannot be controlled by a command line option */
+ 		sme_me_mask = me_mask;
+ 		sev_enabled = true;
 -- 
 2.27.0
 
