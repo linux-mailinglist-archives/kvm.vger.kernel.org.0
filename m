@@ -2,49 +2,49 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DB8BE22CCA0
-	for <lists+kvm@lfdr.de>; Fri, 24 Jul 2020 19:54:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AF10322CCA2
+	for <lists+kvm@lfdr.de>; Fri, 24 Jul 2020 19:54:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726820AbgGXRyM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 24 Jul 2020 13:54:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51002 "EHLO
+        id S1726972AbgGXRyk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 24 Jul 2020 13:54:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51082 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726381AbgGXRyL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 24 Jul 2020 13:54:11 -0400
-Received: from mail-pg1-x541.google.com (mail-pg1-x541.google.com [IPv6:2607:f8b0:4864:20::541])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 86B2AC0619E4
-        for <kvm@vger.kernel.org>; Fri, 24 Jul 2020 10:54:11 -0700 (PDT)
-Received: by mail-pg1-x541.google.com with SMTP id t6so5708744pgq.1
-        for <kvm@vger.kernel.org>; Fri, 24 Jul 2020 10:54:11 -0700 (PDT)
+        with ESMTP id S1726455AbgGXRyk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 24 Jul 2020 13:54:40 -0400
+Received: from mail-pg1-x543.google.com (mail-pg1-x543.google.com [IPv6:2607:f8b0:4864:20::543])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5BEC5C0619D3
+        for <kvm@vger.kernel.org>; Fri, 24 Jul 2020 10:54:40 -0700 (PDT)
+Received: by mail-pg1-x543.google.com with SMTP id k27so5701260pgm.2
+        for <kvm@vger.kernel.org>; Fri, 24 Jul 2020 10:54:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=chromium.org; s=google;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=LlWadNnJdj0hYYYVqCSZw2hjiyDxpJ2Kj8kn/NHt3FY=;
-        b=atxoVVvNQ3oTazgRIDpHxSGrFLt9cvtoIBlvch0KQdY3aDyXvLQIdUzTcezi4vTG7R
-         p3oklZStvCkO8gbZjqGkGxlAitCYYYinGGGKXpTA/1ZkFvIU2Ri3ri/cv2Fi2+1owHn3
-         aDPZiQhkJ2XnheLh3/Pzmn1G0Q2Js7lTuAUNg=
+        bh=3zh6CKPu9OXN15zjWZk7WlElaxcoMcysSL6HQfo9H3E=;
+        b=BbNuGRub6gajP1oXDi9LwdUymaGqj51igXR8/6ZLQKhDEfSjyi+vtEXaLGXxlqngob
+         kJegiFXVFS80BXaVFZw1O/OKTg/9rxDkgjecPYAyHkfgMBDh/BX8tEvs/bqrbasncZoZ
+         RQVIid6OkNAf+JNeU/aRV3dfwXuwxI59wPrxU=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=LlWadNnJdj0hYYYVqCSZw2hjiyDxpJ2Kj8kn/NHt3FY=;
-        b=jjeqdQwbH0oEB/rkvFhZ63L0EJE6lffJvg1kuBZ75Gs74qUzn5EUOB75m8BoF00JkB
-         DVnaUN0sSjlkN+jszP87Im7bB2KiHD9IdhfK5+eZmWoLKZ1nGlZ6cll8NyoHi+0zJCN7
-         ufuT/ZJkvtmuJY5do6+5sTKFSzyH3z1M6qUKvxpeQwPbmB5A4w7T69puMK6OJigzaS2O
-         uTIjx/CYrbjQlAH0f1FP7aTO4OMIeTIrVU3tNkcD7ru0l7BeZaDebq9UJeI69NcfxCPO
-         eIqJdcGltet2gkR52wD/sAZJH2a81p7MrCJZ4Jk2BMXyTIlJsOO/J7QZjtfuDufcbbQe
-         0hZQ==
-X-Gm-Message-State: AOAM532PGywTUBbsDYIlzMZHM/LOdpkH+x9jpax7YWITf3eTJIaMayYw
-        CuhgF7HyPm698gzt1ejW9o3Il2dKsgY=
-X-Google-Smtp-Source: ABdhPJwAqrIfdoT4BFkrasAiJFdaIdj3r/Ze/FIypWTH8bIiiBhHfRqSOlNvvGH0vC6qTvZaO894kw==
-X-Received: by 2002:a63:e241:: with SMTP id y1mr9814521pgj.410.1595613251093;
-        Fri, 24 Jul 2020 10:54:11 -0700 (PDT)
+        bh=3zh6CKPu9OXN15zjWZk7WlElaxcoMcysSL6HQfo9H3E=;
+        b=EyfApKP7zVxf418puN0iUsEAp3gYIhobfQ08vMRu6fKBhYd41Wdg9Y+SdqtmhpBi9E
+         Lm0L4DETvs9uB9Jx0WKvzQg0LGWF7xkFgLT59JIq6sOa4Pht9eT+LHcIp4DmXE/zvbtQ
+         pXllGxAP7C+6zru2CN6xHzt4iiNjy8GVGzQ8LLiL57WdNgJLx5+wVx2pvXRjBLxC4fUs
+         JOnbsnvbZ2R8yHf7ZFXfS5CAByEhG1EdBKbTWJtdAZNmDBOx2mK6pBeHFFlyhr+2o5QL
+         QB4/EuERplqnsf/45+lsQfq9mMiNEjt1mx4Hv2PVT/ENfpTM4omLMpTJ7lDx9xFOIHQP
+         Az2Q==
+X-Gm-Message-State: AOAM533e0bQkCztqG+60ZQLZjEp2G1fnClyCYy5O6RKG1MjXzERz+53m
+        YsdJUWQpGQ4h9sfpMWMIOWW3hA==
+X-Google-Smtp-Source: ABdhPJzI1NNk18MRpvgt6+LY08/9F3MGjY/+aI5dG+MQzucT+SD3uVmkPKkrl3cYefTv0keng+DOCg==
+X-Received: by 2002:a63:3d01:: with SMTP id k1mr9236832pga.71.1595613279983;
+        Fri, 24 Jul 2020 10:54:39 -0700 (PDT)
 Received: from www.outflux.net (smtp.outflux.net. [198.145.64.163])
-        by smtp.gmail.com with ESMTPSA id my16sm3221207pjb.43.2020.07.24.10.54.09
+        by smtp.gmail.com with ESMTPSA id d29sm5683851pgb.54.2020.07.24.10.54.38
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 24 Jul 2020 10:54:10 -0700 (PDT)
-Date:   Fri, 24 Jul 2020 10:54:08 -0700
+        Fri, 24 Jul 2020 10:54:39 -0700 (PDT)
+Date:   Fri, 24 Jul 2020 10:54:38 -0700
 From:   Kees Cook <keescook@chromium.org>
 To:     Joerg Roedel <joro@8bytes.org>
 Cc:     x86@kernel.org, Joerg Roedel <jroedel@suse.de>, hpa@zytor.com,
@@ -64,26 +64,25 @@ Cc:     x86@kernel.org, Joerg Roedel <jroedel@suse.de>, hpa@zytor.com,
         Martin Radev <martin.b.radev@gmail.com>,
         linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         virtualization@lists.linux-foundation.org
-Subject: Re: [PATCH v5 39/75] x86/sev-es: Print SEV-ES info into kernel log
-Message-ID: <202007241054.B7E226E8@keescook>
+Subject: Re: [PATCH v5 38/75] x86/sev-es: Add SEV-ES Feature Detection
+Message-ID: <202007241054.25B564BA61@keescook>
 References: <20200724160336.5435-1-joro@8bytes.org>
- <20200724160336.5435-40-joro@8bytes.org>
+ <20200724160336.5435-39-joro@8bytes.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200724160336.5435-40-joro@8bytes.org>
+In-Reply-To: <20200724160336.5435-39-joro@8bytes.org>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jul 24, 2020 at 06:03:00PM +0200, Joerg Roedel wrote:
+On Fri, Jul 24, 2020 at 06:02:59PM +0200, Joerg Roedel wrote:
 > From: Joerg Roedel <jroedel@suse.de>
 > 
-> Refactor the message printed to the kernel log which indicates whether
-> SEV or SME is active to print a list of enabled encryption features.
-> This will scale better in the future when more memory encryption
-> features might be added. Also add SEV-ES to the list of features.
+> Add the sev_es_active function for checking whether SEV-ES is enabled.
+> Also cache the value of MSR_AMD64_SEV at boot to speed up the feature
+> checking in the running code.
 > 
 > Signed-off-by: Joerg Roedel <jroedel@suse.de>
 
