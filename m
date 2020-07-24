@@ -2,144 +2,118 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9FF0022CCB7
-	for <lists+kvm@lfdr.de>; Fri, 24 Jul 2020 19:58:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 99EFC22CCBE
+	for <lists+kvm@lfdr.de>; Fri, 24 Jul 2020 20:02:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726731AbgGXR6W (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 24 Jul 2020 13:58:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51714 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726639AbgGXR6V (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 24 Jul 2020 13:58:21 -0400
-Received: from mail-qt1-x844.google.com (mail-qt1-x844.google.com [IPv6:2607:f8b0:4864:20::844])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8467FC0619D3;
-        Fri, 24 Jul 2020 10:58:21 -0700 (PDT)
-Received: by mail-qt1-x844.google.com with SMTP id s23so7483589qtq.12;
-        Fri, 24 Jul 2020 10:58:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=sender:from:date:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=nNxE3+XkF4L9QAdGaxowxMGCxg8LNIy3uR1pRcTBli8=;
-        b=IRsMsqR//APDGVVqlwMqj9i8FEhPtdym9xLU/hrqoJFLeA28tM1yuiV39r1+Tewy1R
-         OqhuvBQYpmn9x+80zP6rITJWNoEkQrrNjdoCTUa2CraEfVogjBBFVXSzVJ/fW/LoSP3n
-         ThLDyUjFxsXJdDTf3KRzj0J6cZ009Ec8gzlxCNo+pf1zQusT5UH7mTwig6RD13VrihQQ
-         dP+XUIIAy0uz2FP/4QiSXy1TAAVh6KjvJSJLVRS0+iicQ8cKzxezWKEFuURcrHa6QsW0
-         rgZaL29YQsivXvFW/gR1d4OJMOEvG88XDu+S5/zGHmHGEzUo3C0uhJDk4xe/kLjkJ5Dl
-         OxYQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:from:date:to:cc:subject:message-id
-         :references:mime-version:content-disposition:in-reply-to;
-        bh=nNxE3+XkF4L9QAdGaxowxMGCxg8LNIy3uR1pRcTBli8=;
-        b=XbggV43azL5N2lVcVypFcVtbgsaMzaPaZViu37qNxbqUF0wTHRdV0YmAWMhuUWWcCV
-         CzrABiWoDrfVS5nN2XgJ7qY9+BzG91kdPDWTISeSdOfSUh/Je8nLN2YwcasP1zw1GbQ5
-         bN52o1BWAWtZizJbWeLHFTTyapkW62D6N1C9Rh9VyS7ZJJzHvU5Q4ZpjR+IoJ/rMY1xR
-         H6BBE+aJkBd7pMtwRH/Tsjt0dRThXywYuQZequ/UGHF4cXuSiteNSBvG9+6IMpRUi3Hv
-         zno3hJrJ5O/GwcJvagVJ4tQ/LNe6/a2W9Mg8GYRYW1uBeJbJ7H+TXlOfTDCZVza51C9I
-         gVvQ==
-X-Gm-Message-State: AOAM530piO2vcijFujgQNuXjbQhUaUWCRIksG/a6kHqpjHW+EPrMyOOu
-        JMxs/cnAfC5x5kEfpuD2a44=
-X-Google-Smtp-Source: ABdhPJwnUda8U9jPe6l5SaeP7NYrS9DsjuxSVrOKEOdJwPbzA+tWm03LJ6+gS8YFbvPWm+2sSJv0Jw==
-X-Received: by 2002:ac8:1baf:: with SMTP id z44mr10871128qtj.129.1595613500705;
-        Fri, 24 Jul 2020 10:58:20 -0700 (PDT)
-Received: from rani.riverdale.lan ([2001:470:1f07:5f3::b55f])
-        by smtp.gmail.com with ESMTPSA id a203sm7199153qkg.30.2020.07.24.10.58.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 24 Jul 2020 10:58:20 -0700 (PDT)
-From:   Arvind Sankar <nivedita@alum.mit.edu>
-X-Google-Original-From: Arvind Sankar <arvind@rani.riverdale.lan>
-Date:   Fri, 24 Jul 2020 13:58:18 -0400
-To:     Joerg Roedel <joro@8bytes.org>
-Cc:     x86@kernel.org, Joerg Roedel <jroedel@suse.de>, hpa@zytor.com,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Jiri Slaby <jslaby@suse.cz>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Juergen Gross <jgross@suse.com>,
-        Kees Cook <keescook@chromium.org>,
-        David Rientjes <rientjes@google.com>,
-        Cfir Cohen <cfir@google.com>,
-        Erdem Aktas <erdemaktas@google.com>,
-        Masami Hiramatsu <mhiramat@kernel.org>,
-        Mike Stunes <mstunes@vmware.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Martin Radev <martin.b.radev@gmail.com>,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org
-Subject: Re: [PATCH v5 11/75] x86/boot/compressed/64: Disable red-zone usage
-Message-ID: <20200724175818.GA732164@rani.riverdale.lan>
-References: <20200724160336.5435-1-joro@8bytes.org>
- <20200724160336.5435-12-joro@8bytes.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20200724160336.5435-12-joro@8bytes.org>
+        id S1726719AbgGXSCb convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Fri, 24 Jul 2020 14:02:31 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:1834 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726381AbgGXSCb (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 24 Jul 2020 14:02:31 -0400
+Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 06OHi6ak169093;
+        Fri, 24 Jul 2020 14:02:21 -0400
+Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 32fack89yc-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 24 Jul 2020 14:02:21 -0400
+Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
+        by ppma03fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 06OHp7LG029088;
+        Fri, 24 Jul 2020 18:02:17 GMT
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
+        by ppma03fra.de.ibm.com with ESMTP id 32brq845ws-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 24 Jul 2020 18:02:17 +0000
+Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
+        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 06OI2Ejl30212556
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 24 Jul 2020 18:02:14 GMT
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id A096CA4040;
+        Fri, 24 Jul 2020 18:02:14 +0000 (GMT)
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 461D5A4053;
+        Fri, 24 Jul 2020 18:02:11 +0000 (GMT)
+Received: from [9.85.74.228] (unknown [9.85.74.228])
+        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
+        Fri, 24 Jul 2020 18:02:11 +0000 (GMT)
+Content-Type: text/plain;
+        charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 13.4 \(3608.80.23.2.2\))
+Subject: Re: [v3 13/15] tools/perf: Add perf tools support for extended
+ register capability in powerpc
+From:   Athira Rajeev <atrajeev@linux.vnet.ibm.com>
+In-Reply-To: <7fcf405f-440a-19dc-7c3a-33fc52c9d1ef@linux.ibm.com>
+Date:   Fri, 24 Jul 2020 23:32:08 +0530
+Cc:     Gautham R Shenoy <ego@linux.vnet.ibm.com>,
+        Michael Neuling <mikey@neuling.org>, maddy@linux.vnet.ibm.com,
+        kvm@vger.kernel.org, kvm-ppc@vger.kernel.org, svaidyan@in.ibm.com,
+        acme@kernel.org, jolsa@kernel.org, linuxppc-dev@lists.ozlabs.org
+Content-Transfer-Encoding: 8BIT
+Message-Id: <4940969B-501F-4F1E-B233-B1047EDD1384@linux.vnet.ibm.com>
+References: <1594996707-3727-1-git-send-email-atrajeev@linux.vnet.ibm.com>
+ <1594996707-3727-14-git-send-email-atrajeev@linux.vnet.ibm.com>
+ <7fcf405f-440a-19dc-7c3a-33fc52c9d1ef@linux.ibm.com>
+To:     Ravi Bangoria <ravi.bangoria@linux.ibm.com>
+X-Mailer: Apple Mail (2.3608.80.23.2.2)
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
+ definitions=2020-07-24_07:2020-07-24,2020-07-24 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0
+ lowpriorityscore=0 phishscore=0 suspectscore=0 bulkscore=0 mlxlogscore=999
+ spamscore=0 priorityscore=1501 clxscore=1015 adultscore=0 mlxscore=0
+ impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2006250000 definitions=main-2007240132
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jul 24, 2020 at 06:02:32PM +0200, Joerg Roedel wrote:
-> From: Joerg Roedel <jroedel@suse.de>
-> 
-> The x86-64 ABI defines a red-zone on the stack:
-> 
->   The 128-byte area beyond the location pointed to by %rsp is considered
->   to be reserved and shall not be modified by signal or interrupt
->   handlers. Therefore, functions may use this area for temporary data
->   that is not needed across function calls. In particular, leaf
->   functions may use this area for their entire stack frame, rather than
->   adjusting the stack pointer in the prologue and epilogue. This area is
->   known as the red zone.
-> 
-> This is not compatible with exception handling, because the IRET frame
-> written by the hardware at the stack pointer and the functions to handle
-> the exception will overwrite the temporary variables of the interrupted
-> function, causing undefined behavior. So disable red-zones for the
-> pre-decompression boot code.
-> 
-> Signed-off-by: Joerg Roedel <jroedel@suse.de>
-> ---
->  arch/x86/boot/Makefile            | 2 +-
->  arch/x86/boot/compressed/Makefile | 2 +-
->  2 files changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/arch/x86/boot/Makefile b/arch/x86/boot/Makefile
-> index fe605205b4ce..4d6a16a47e9f 100644
-> --- a/arch/x86/boot/Makefile
-> +++ b/arch/x86/boot/Makefile
-> @@ -66,7 +66,7 @@ targets += cpustr.h
->  
->  # ---------------------------------------------------------------------------
->  
-> -KBUILD_CFLAGS	:= $(REALMODE_CFLAGS) -D_SETUP
-> +KBUILD_CFLAGS	:= $(REALMODE_CFLAGS) -D_SETUP -mno-red-zone
->  KBUILD_AFLAGS	:= $(KBUILD_CFLAGS) -D__ASSEMBLY__
->  KBUILD_CFLAGS	+= $(call cc-option,-fmacro-prefix-map=$(srctree)/=)
->  KBUILD_CFLAGS	+= -fno-asynchronous-unwind-tables
 
-This change seems unnecessary? REALMODE_CFLAGS means it uses -m16, so
-this isn't 64-bit code. [As an aside, we can drop the check for -m16
-support in arch/x86/Makefile now that we've bumbed to 4.9]
 
-> diff --git a/arch/x86/boot/compressed/Makefile b/arch/x86/boot/compressed/Makefile
-> index 5a828fde7a42..416f52ab39ec 100644
-> --- a/arch/x86/boot/compressed/Makefile
-> +++ b/arch/x86/boot/compressed/Makefile
-> @@ -32,7 +32,7 @@ KBUILD_CFLAGS := -m$(BITS) -O2
->  KBUILD_CFLAGS += -fno-strict-aliasing $(call cc-option, -fPIE, -fPIC)
->  KBUILD_CFLAGS += -DDISABLE_BRANCH_PROFILING
->  cflags-$(CONFIG_X86_32) := -march=i386
-> -cflags-$(CONFIG_X86_64) := -mcmodel=small
-> +cflags-$(CONFIG_X86_64) := -mcmodel=small -mno-red-zone
->  KBUILD_CFLAGS += $(cflags-y)
->  KBUILD_CFLAGS += -mno-mmx -mno-sse
->  KBUILD_CFLAGS += $(call cc-option,-ffreestanding)
-> -- 
-> 2.27.0
+> On 24-Jul-2020, at 4:32 PM, Ravi Bangoria <ravi.bangoria@linux.ibm.com> wrote:
 > 
+> Hi Athira,
+> 
+> On 7/17/20 8:08 PM, Athira Rajeev wrote:
+>> From: Anju T Sudhakar <anju@linux.vnet.ibm.com>
+>> Add extended regs to sample_reg_mask in the tool side to use
+>> with `-I?` option. Perf tools side uses extended mask to display
+>> the platform supported register names (with -I? option) to the user
+>> and also send this mask to the kernel to capture the extended registers
+>> in each sample. Hence decide the mask value based on the processor
+>> version.
+>> Currently definitions for `mfspr`, `SPRN_PVR` are part of
+>> `arch/powerpc/util/header.c`. Move this to a header file so that
+>> these definitions can be re-used in other source files as well.
+> 
+> It seems this patch has a regression.
+> 
+> Without this patch:
+> 
+>  $ sudo ./perf record -I
+>  ^C[ perf record: Woken up 1 times to write data ]
+>  [ perf record: Captured and wrote 0.458 MB perf.data (318 samples) ]
+> 
+> With this patch:
+> 
+>  $ sudo ./perf record -I
+>  Error:
+>  dummy:HG: PMU Hardware doesn't support sampling/overflow-interrupts. Try 'perf stat'
 
-This one is necessary.
+
+Hi Ravi,
+
+Thanks for reviewing this patch and also testing. The above issue happens since
+commit 0a892c1c9472 ("perf record: Add dummy event during system wide synthesis”) which adds a dummy event.
+
+The fix for this issue is currently discussed here:  https://lkml.org/lkml/2020/7/19/413
+So once this fix is in, the issue will be resolved.
+
+Thanks
+Athira
+
+> 
+> Ravi
+
