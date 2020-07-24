@@ -2,57 +2,49 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id F1B8F22BB13
-	for <lists+kvm@lfdr.de>; Fri, 24 Jul 2020 02:36:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A4E8D22BB1A
+	for <lists+kvm@lfdr.de>; Fri, 24 Jul 2020 02:46:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727955AbgGXAga (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 23 Jul 2020 20:36:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58798 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726723AbgGXAga (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 23 Jul 2020 20:36:30 -0400
-Received: from galois.linutronix.de (Galois.linutronix.de [IPv6:2a0a:51c0:0:12e:550::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1B63CC0619D3;
-        Thu, 23 Jul 2020 17:36:30 -0700 (PDT)
+        id S1728278AbgGXAq3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 23 Jul 2020 20:46:29 -0400
+Received: from Galois.linutronix.de ([193.142.43.55]:34170 "EHLO
+        galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727783AbgGXAq3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 23 Jul 2020 20:46:29 -0400
 From:   Thomas Gleixner <tglx@linutronix.de>
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020; t=1595550988;
+        s=2020; t=1595551586;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=/sRzv0b/bz/POqyqjoZfEPy4Nx5XjZu9PPTUOfSVGkE=;
-        b=EbjD2pbE9xi9X6EuT6/rBzkOU6K3d+v/6/JJb8wA5gqm5/NAbvriX9OxDb4zpEMrgT3P1V
-        8Qe43EfciXdkNx332TkQ91suJSH3eEOwHQWMu/kmgnAD/haYxa60VS00D+lYgh4/LnHCh5
-        Pdp+nBV5MrcyMlYKlw5U/71XhWmdCKmP/IeBlG5roj0NsKlY71fX5VB/DO8nREQfs3QSFO
-        upMIW0mFVX6JGEZITdAqxGSQWuwOn/g3zp6CNHoXEOC5i9hZC6xMdA7/xmrmEKMzFeAFYR
-        ilvTG4hHwzetSB2KYExZbiXuPHjKlavYT1DS6c4tB1x3tXXyCe5/elx1N8Q0/g==
+        bh=Rtfgquq0SEtwZ4k84B82DPLcPpqLHnp8JJ3FWAcLToc=;
+        b=FCgBIDO4dFsTETDUU2z/PvMVPTNfhdLwM5G/qDHHhVn2Gs40PUDpnDpAOj3DEVrkHdll98
+        7wAgbLI/+nDwQpJDtNYgT6mqBoKwiCRV4gyxmHfMOtUSi7DN6ICz3XPdRgrJd4EoAiLdpp
+        eQ/9G7ynZYGbAB2vUMWGo+xiVHX0Hz7DVsxZFMJfYt3v/iLlq0+S/2M+h9DvO+DChPsK0Y
+        wzni2LKKB+siE3TZ1Jv0QkYIOAqk+OMRaDafmvVfG3K0GT5ORqNRnL9fBOGKa8xDVq6LiJ
+        7ihiBQyTB+GsD+mLaNyW79iXXxNhjvTggArcGvrEnykstAVlNf+queHKwAEqKQ==
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020e; t=1595550988;
+        s=2020e; t=1595551586;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=/sRzv0b/bz/POqyqjoZfEPy4Nx5XjZu9PPTUOfSVGkE=;
-        b=AXxWb6SEOMOM8pVovKOD5jMvjWwY8VB+Vyq6cRSWK7OH06fR2JFMaPSsDA9qW3J6czD05O
-        sxw3A3fEfTlP+dCg==
-To:     Jason Gunthorpe <jgg@mellanox.com>, Marc Zyngier <maz@kernel.org>
-Cc:     Dave Jiang <dave.jiang@intel.com>, vkoul@kernel.org,
-        megha.dey@intel.com, bhelgaas@google.com, rafael@kernel.org,
-        gregkh@linuxfoundation.org, hpa@zytor.com,
-        alex.williamson@redhat.com, jacob.jun.pan@intel.com,
-        ashok.raj@intel.com, yi.l.liu@intel.com, baolu.lu@intel.com,
-        kevin.tian@intel.com, sanjay.k.kumar@intel.com,
-        tony.luck@intel.com, jing.lin@intel.com, dan.j.williams@intel.com,
-        kwankhede@nvidia.com, eric.auger@redhat.com, parav@mellanox.com,
-        dave.hansen@intel.com, netanelg@mellanox.com, shahafs@mellanox.com,
-        yan.y.zhao@linux.intel.com, pbonzini@redhat.com,
-        samuel.ortiz@intel.com, mona.hossain@intel.com,
-        dmaengine@vger.kernel.org, linux-kernel@vger.kernel.org,
-        x86@kernel.org, linux-pci@vger.kernel.org, kvm@vger.kernel.org
-Subject: Re: [PATCH RFC v2 02/18] irq/dev-msi: Add support for a new DEV_MSI irq domain
-In-Reply-To: <20200724001606.GR2021248@mellanox.com>
-References: <159534667974.28840.2045034360240786644.stgit@djiang5-desk3.ch.intel.com> <159534734833.28840.10067945890695808535.stgit@djiang5-desk3.ch.intel.com> <878sfbxtzi.wl-maz@kernel.org> <20200722195928.GN2021248@mellanox.com> <cfb8191e364e77f352b1483c415a83a5@kernel.org> <20200724001606.GR2021248@mellanox.com>
-Date:   Fri, 24 Jul 2020 02:36:27 +0200
-Message-ID: <87h7txvjec.fsf@nanos.tec.linutronix.de>
+        bh=Rtfgquq0SEtwZ4k84B82DPLcPpqLHnp8JJ3FWAcLToc=;
+        b=+72kDR/MnJXvaBvbhjSwQo5IS35v9oHJhgRGmkKtKtzg6sQLvwVBCrjHDfoUoWBVBeX80p
+        sslkbtIwIa5O9sCA==
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     LKML <linux-kernel@vger.kernel.org>, x86@kernel.org,
+        linux-arch@vger.kernel.org, Will Deacon <will@kernel.org>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Kees Cook <keescook@chromium.org>,
+        Keno Fischer <keno@juliacomputing.com>,
+        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        Gabriel Krisman Bertazi <krisman@collabora.com>
+Subject: Re: [patch V5 15/15] x86/kvm: Use generic xfer to guest work function
+In-Reply-To: <20200724001736.GK21891@linux.intel.com>
+References: <20200722215954.464281930@linutronix.de> <20200722220520.979724969@linutronix.de> <20200724001736.GK21891@linux.intel.com>
+Date:   Fri, 24 Jul 2020 02:46:26 +0200
+Message-ID: <87eep1vixp.fsf@nanos.tec.linutronix.de>
 MIME-Version: 1.0
 Content-Type: text/plain
 Sender: kvm-owner@vger.kernel.org
@@ -60,72 +52,30 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Jason Gunthorpe <jgg@mellanox.com> writes:
-> On Thu, Jul 23, 2020 at 09:51:52AM +0100, Marc Zyngier wrote:
->> > IIRC on Intel/AMD at least once a MSI is launched it is not maskable.
->> 
->> Really? So you can't shut a device with a screaming interrupt,
->> for example, should it become otherwise unresponsive?
+Sean,
+
+Sean Christopherson <sean.j.christopherson@intel.com> writes:
+> On Thu, Jul 23, 2020 at 12:00:09AM +0200, Thomas Gleixner wrote:
+>> +		if (xfer_to_guest_mode_work_pending()) {
+>>  			srcu_read_unlock(&kvm->srcu, vcpu->srcu_idx);
+>> -			cond_resched();
+>> +			r = xfer_to_guest_mode(vcpu);
 >
-> Well, it used to be like that in the APICv1 days. I suppose modern
-> interrupt remapping probably changes things.
+> Any reason not to call this xfer_to_guest_mode_work()?  Or handle_work(),
+> do_work(), etc...  Without the "work" part, it looks like a function that
+> should be invoked unconditionally.  It's obvious that's not the case if
+> one looks at the implementation, but it's a bit confusing on the KVM side
+> of things.
 
-The MSI side of affairs has nothing to do with Intel and neither with
-ACPIv1. It's a trainwreck on the PCI side.
+The reason is probably lazyness. The original approach was to have this
+as close as possible to user entry/exit but with the recent changes
+vs. instrumentation and RCU this is not longer the case.
 
-MSI interrupts do not have mandatory masking. For those which do not
-implement it (and that's still the case with devices designed today
-especially CPU internal peripherals) there are only a few options to
-shut them up:
+I really want to keep the notion of transitioning in the function name,
+so xfer_to_guest_mode_handle_work() makes a lot of sense.
 
-  1) Disable MSI which has the problem that the interrupt gets
-     redirected to legacy PCI #A-#D interrupt unless the hardware
-     supports to disable that redirection, which is another optional
-     thing and hopeless case
-
-  2) Disable it at the IRQ remapping level which fortunately allows by
-     design to do so.
-
-  3) Disable it at the device level which is feasible for a device
-     driver but impossible for the irq side
-
->> > So the model for MSI is always "mask at source". The closest mapping
->> > to the Linux IRQ model is to say the end device has a irqchip that
->> > encapsulates the ability of the device to generate the MSI in the
->> > first place.
->> 
->> This is an x86'ism, I'm afraid. Systems I deal with can mask any
->> interrupt at the interrupt controller level, MSI or not.
-
-Yes, it's a pain, but reality.
-
-> Sure. However it feels like a bad practice to leave the source
-> unmasked and potentially continuing to generate messages if the
-> intention was to disable the IRQ that was assigned to it - even if the
-> messages do not result in CPU interrupts they will still consume
-> system resources.
-
-See above. You cannot reach out to the device driver to disable the
-underlying interrupt source, which is the ultimate ratio if #1 or #2 are
-not working or not there. That would be squaring the circle and
-violating all rules of layering and locking at once.
-
-The bad news is that we can't change the hardware. We have to deal with
-it. And yes, I told HW people publicly and in private conversations that
-unmaskable interrupts are broken by definition for more than a
-decade. They still get designed that way ...
-
->> If masking at the source is the only way to shut the device up,
->> and assuming that the device provides the expected semantics
->> (a MSI raised by the device while the interrupt is masked
->> isn't lost and gets sent when unmasked), that's fair enough.
->> It's just ugly.
->
-> It makes sense that the masking should follow the same semantics for
-> PCI MSI masking.
-
-Which semantics? The horrors of MSI or the halfways reasonable MSI-X
-variant?
+I'll change that before merging the lot into the tip tree if your
+Reviewed-by still stands with that change made w/o reposting.
 
 Thanks,
 
