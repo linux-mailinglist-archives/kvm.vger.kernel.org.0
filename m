@@ -2,180 +2,116 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7CDEF22C12D
-	for <lists+kvm@lfdr.de>; Fri, 24 Jul 2020 10:48:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1F9AB22C177
+	for <lists+kvm@lfdr.de>; Fri, 24 Jul 2020 10:55:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727818AbgGXIs1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 24 Jul 2020 04:48:27 -0400
-Received: from mga02.intel.com ([134.134.136.20]:45604 "EHLO mga02.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726554AbgGXIs0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 24 Jul 2020 04:48:26 -0400
-IronPort-SDR: pIDhLSUNvR3EsaAQM80gDa6PXMxlsHXN4uHfBmwET5M/pMz4RAXVv0N58CiVzzKOBeN+q+RF/S
- creILAa2MCAA==
-X-IronPort-AV: E=McAfee;i="6000,8403,9691"; a="138742764"
-X-IronPort-AV: E=Sophos;i="5.75,390,1589266800"; 
-   d="scan'208";a="138742764"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Jul 2020 01:48:26 -0700
-IronPort-SDR: V8R8aOVSxL34PFSmEt7k2xbNrpYQn1Ioqrjhl6IVcY6BvWdjAR1TFItSUUy7NE1K+QFgvZGrRg
- 1QIdn+Bg0JEg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.75,390,1589266800"; 
-   d="scan'208";a="311335322"
-Received: from silpixa00400314.ir.intel.com (HELO silpixa00400314.ger.corp.intel.com) ([10.237.222.51])
-  by fmsmga004.fm.intel.com with ESMTP; 24 Jul 2020 01:48:23 -0700
-From:   Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-To:     alex.williamson@redhat.com, herbert@gondor.apana.org.au
-Cc:     cohuck@redhat.com, nhorman@redhat.com, vdronov@redhat.com,
-        bhelgaas@google.com, mark.a.chambers@intel.com,
-        gordon.mcfadden@intel.com, ahsan.atta@intel.com,
-        fiona.trahe@intel.com, qat-linux@intel.com, kvm@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-pci@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-Subject: [PATCH v4 5/5] crypto: qat - use PCI_VDEVICE
-Date:   Fri, 24 Jul 2020 09:48:00 +0100
-Message-Id: <20200724084800.6136-6-giovanni.cabiddu@intel.com>
-X-Mailer: git-send-email 2.26.2
-In-Reply-To: <20200724084800.6136-1-giovanni.cabiddu@intel.com>
-References: <20200724084800.6136-1-giovanni.cabiddu@intel.com>
+        id S1726979AbgGXIzf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 24 Jul 2020 04:55:35 -0400
+Received: from szxga07-in.huawei.com ([45.249.212.35]:54784 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726554AbgGXIzf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 24 Jul 2020 04:55:35 -0400
+Received: from DGGEMS401-HUB.china.huawei.com (unknown [172.30.72.59])
+        by Forcepoint Email with ESMTP id D3DA38FE8846B0F92B8C;
+        Fri, 24 Jul 2020 16:55:33 +0800 (CST)
+Received: from huawei.com (10.174.187.31) by DGGEMS401-HUB.china.huawei.com
+ (10.3.19.201) with Microsoft SMTP Server id 14.3.487.0; Fri, 24 Jul 2020
+ 16:55:27 +0800
+From:   Yifei Jiang <jiangyifei@huawei.com>
+To:     <pbonzini@redhat.com>, <paul.walmsley@sifive.com>,
+        <palmer@dabbelt.com>, <aou@eecs.berkeley.edu>
+CC:     <anup.patel@wdc.com>, <atish.patra@wdc.com>, <kvm@vger.kernel.org>,
+        <kvm-riscv@lists.infradead.org>, <linux-riscv@lists.infradead.org>,
+        <linux-kernel@vger.kernel.org>, <victor.zhangxiaofeng@huawei.com>,
+        <wu.wubin@huawei.com>, <zhang.zhanghailiang@huawei.com>,
+        <dengkai1@huawei.com>, <limingwang@huawei.com>,
+        Yifei Jiang <jiangyifei@huawei.com>
+Subject: [RFC 0/2] Add risc-v vhost-net support
+Date:   Fri, 24 Jul 2020 16:54:39 +0800
+Message-ID: <20200724085441.1514-1-jiangyifei@huawei.com>
+X-Mailer: git-send-email 2.26.2.windows.1
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
+X-Originating-IP: [10.174.187.31]
+X-CFilter-Loop: Reflected
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Build pci_device_id structure using the PCI_VDEVICE macro.
-This removes any references to the ADF_SYSTEM_DEVICE macro.
+Hi,
 
-Signed-off-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
----
- drivers/crypto/qat/qat_c3xxx/adf_drv.c      | 7 ++-----
- drivers/crypto/qat/qat_c3xxxvf/adf_drv.c    | 7 ++-----
- drivers/crypto/qat/qat_c62x/adf_drv.c       | 7 ++-----
- drivers/crypto/qat/qat_c62xvf/adf_drv.c     | 7 ++-----
- drivers/crypto/qat/qat_dh895xcc/adf_drv.c   | 7 ++-----
- drivers/crypto/qat/qat_dh895xccvf/adf_drv.c | 7 ++-----
- 6 files changed, 12 insertions(+), 30 deletions(-)
+These two patches enable support for vhost-net on RISC-V architecture. They are developed
+based on the Linux source in this repo: https://github.com/avpatel/linux,
+the branch is riscv_kvm_v13. 
 
-diff --git a/drivers/crypto/qat/qat_c3xxx/adf_drv.c b/drivers/crypto/qat/qat_c3xxx/adf_drv.c
-index bba0f142f7f6..43929d70c41d 100644
---- a/drivers/crypto/qat/qat_c3xxx/adf_drv.c
-+++ b/drivers/crypto/qat/qat_c3xxx/adf_drv.c
-@@ -18,12 +18,9 @@
- #include <adf_cfg.h>
- #include "adf_c3xxx_hw_data.h"
- 
--#define ADF_SYSTEM_DEVICE(device_id) \
--	{PCI_DEVICE(PCI_VENDOR_ID_INTEL, device_id)}
--
- static const struct pci_device_id adf_pci_tbl[] = {
--	ADF_SYSTEM_DEVICE(PCI_DEVICE_ID_INTEL_QAT_C3XXX),
--	{0,}
-+	{ PCI_VDEVICE(INTEL, PCI_DEVICE_ID_INTEL_QAT_C3XXX), },
-+	{ }
- };
- MODULE_DEVICE_TABLE(pci, adf_pci_tbl);
- 
-diff --git a/drivers/crypto/qat/qat_c3xxxvf/adf_drv.c b/drivers/crypto/qat/qat_c3xxxvf/adf_drv.c
-index b77a58886599..dca52de22e8d 100644
---- a/drivers/crypto/qat/qat_c3xxxvf/adf_drv.c
-+++ b/drivers/crypto/qat/qat_c3xxxvf/adf_drv.c
-@@ -18,12 +18,9 @@
- #include <adf_cfg.h>
- #include "adf_c3xxxvf_hw_data.h"
- 
--#define ADF_SYSTEM_DEVICE(device_id) \
--	{PCI_DEVICE(PCI_VENDOR_ID_INTEL, device_id)}
--
- static const struct pci_device_id adf_pci_tbl[] = {
--	ADF_SYSTEM_DEVICE(PCI_DEVICE_ID_INTEL_QAT_C3XXX_VF),
--	{0,}
-+	{ PCI_VDEVICE(INTEL, PCI_DEVICE_ID_INTEL_QAT_C3XXX_VF), },
-+	{ }
- };
- MODULE_DEVICE_TABLE(pci, adf_pci_tbl);
- 
-diff --git a/drivers/crypto/qat/qat_c62x/adf_drv.c b/drivers/crypto/qat/qat_c62x/adf_drv.c
-index 722838ff03be..f104c9d1195d 100644
---- a/drivers/crypto/qat/qat_c62x/adf_drv.c
-+++ b/drivers/crypto/qat/qat_c62x/adf_drv.c
-@@ -18,12 +18,9 @@
- #include <adf_cfg.h>
- #include "adf_c62x_hw_data.h"
- 
--#define ADF_SYSTEM_DEVICE(device_id) \
--	{PCI_DEVICE(PCI_VENDOR_ID_INTEL, device_id)}
--
- static const struct pci_device_id adf_pci_tbl[] = {
--	ADF_SYSTEM_DEVICE(PCI_DEVICE_ID_INTEL_QAT_C62X),
--	{0,}
-+	{ PCI_VDEVICE(INTEL, PCI_DEVICE_ID_INTEL_QAT_C62X), },
-+	{ }
- };
- MODULE_DEVICE_TABLE(pci, adf_pci_tbl);
- 
-diff --git a/drivers/crypto/qat/qat_c62xvf/adf_drv.c b/drivers/crypto/qat/qat_c62xvf/adf_drv.c
-index a766cc18aae9..e0b909e70712 100644
---- a/drivers/crypto/qat/qat_c62xvf/adf_drv.c
-+++ b/drivers/crypto/qat/qat_c62xvf/adf_drv.c
-@@ -18,12 +18,9 @@
- #include <adf_cfg.h>
- #include "adf_c62xvf_hw_data.h"
- 
--#define ADF_SYSTEM_DEVICE(device_id) \
--	{PCI_DEVICE(PCI_VENDOR_ID_INTEL, device_id)}
--
- static const struct pci_device_id adf_pci_tbl[] = {
--	ADF_SYSTEM_DEVICE(PCI_DEVICE_ID_INTEL_QAT_C62X_VF),
--	{0,}
-+	{ PCI_VDEVICE(INTEL, PCI_DEVICE_ID_INTEL_QAT_C62X_VF), },
-+	{ }
- };
- MODULE_DEVICE_TABLE(pci, adf_pci_tbl);
- 
-diff --git a/drivers/crypto/qat/qat_dh895xcc/adf_drv.c b/drivers/crypto/qat/qat_dh895xcc/adf_drv.c
-index 4c3aea07f444..857aa4c8595f 100644
---- a/drivers/crypto/qat/qat_dh895xcc/adf_drv.c
-+++ b/drivers/crypto/qat/qat_dh895xcc/adf_drv.c
-@@ -18,12 +18,9 @@
- #include <adf_cfg.h>
- #include "adf_dh895xcc_hw_data.h"
- 
--#define ADF_SYSTEM_DEVICE(device_id) \
--	{PCI_DEVICE(PCI_VENDOR_ID_INTEL, device_id)}
--
- static const struct pci_device_id adf_pci_tbl[] = {
--	ADF_SYSTEM_DEVICE(PCI_DEVICE_ID_INTEL_QAT_DH895XCC),
--	{0,}
-+	{ PCI_VDEVICE(INTEL, PCI_DEVICE_ID_INTEL_QAT_DH895XCC), },
-+	{ }
- };
- MODULE_DEVICE_TABLE(pci, adf_pci_tbl);
- 
-diff --git a/drivers/crypto/qat/qat_dh895xccvf/adf_drv.c b/drivers/crypto/qat/qat_dh895xccvf/adf_drv.c
-index 673348ca5dea..2987855a70dc 100644
---- a/drivers/crypto/qat/qat_dh895xccvf/adf_drv.c
-+++ b/drivers/crypto/qat/qat_dh895xccvf/adf_drv.c
-@@ -18,12 +18,9 @@
- #include <adf_cfg.h>
- #include "adf_dh895xccvf_hw_data.h"
- 
--#define ADF_SYSTEM_DEVICE(device_id) \
--	{PCI_DEVICE(PCI_VENDOR_ID_INTEL, device_id)}
--
- static const struct pci_device_id adf_pci_tbl[] = {
--	ADF_SYSTEM_DEVICE(PCI_DEVICE_ID_INTEL_QAT_DH895XCC_VF),
--	{0,}
-+	{ PCI_VDEVICE(INTEL, PCI_DEVICE_ID_INTEL_QAT_DH895XCC_VF), },
-+	{ }
- };
- MODULE_DEVICE_TABLE(pci, adf_pci_tbl);
- 
+The accompanying QEMU is from the repo: https://github.com/alistair23/qemu, the branch is
+hyp-ext-v0.6.next. In order for the QEMU to work with KVM, the patch found here is necessary:
+https://patchwork.kernel.org/cover/11435965/
+
+Several steps to use this:
+
+1. create virbr0 on riscv64 emulation
+$ brctl addbr virbr0
+$ brctl stp virbr0 on
+$ ifconfig virbr0 up
+$ ifconfig virbr0 <virbr0_ip> netmask <virbr0_netmask>
+
+2. boot riscv64 guestOS on riscv64 emulation
+$ ./qemu-system-riscv64 -M virt,accel=kvm -m 1024M -cpu host -nographic \
+	-name guest=riscv-guest \
+	-smp 2 \
+	-kernel ./Image \
+	-drive file=./guest.img,format=raw,id=hd0 \
+	-device virtio-blk,drive=hd0 \
+	-netdev type=tap,vhost=on,script=./ifup.sh,downscript=./ifdown.sh,id=net0 \
+	-append "root=/dev/vda rw console=ttyS0 earlycon=sbi"
+
+$ cat ifup.sh
+#!/bin/sh
+brctl addif virbr0 $1
+ifconfig $1 up
+
+$ cat ifdown.sh
+#!/bin/sh
+ifconfig $1 down
+brctl delif virbr0 $1
+
+This brenchmark is vhost-net compare with virtio:
+
+$ ./netperf -H <virbr0_ip> -l 100 -t TCP_STREAM
+
+vhost-net:
+Recv   Send    Send                          
+Socket Socket  Message  Elapsed              
+Size   Size    Size     Time     Throughput  
+bytes  bytes   bytes    secs.    10^6bits/sec  
+
+131072  16384  16384    100.07    457.55
+
+virtio:
+Recv   Send    Send                          
+Socket Socket  Message  Elapsed              
+Size   Size    Size     Time     Throughput  
+bytes  bytes   bytes    secs.    10^6bits/sec  
+
+131072  16384  16384    100.07    227.02
+
+
+The next step is to support irqfd on RISC-V architecture.
+
+Yifei Jiang (2):
+  RISC-V: KVM: enable ioeventfd capability and compile for risc-v
+  RISC-V: KVM: read\write kernel mmio device support
+
+ arch/riscv/kvm/Kconfig     |  2 ++
+ arch/riscv/kvm/Makefile    |  2 +-
+ arch/riscv/kvm/vcpu_exit.c | 38 ++++++++++++++++++++++++++++++++------
+ arch/riscv/kvm/vm.c        |  1 +
+ 4 files changed, 36 insertions(+), 7 deletions(-)
+
 -- 
-2.26.2
+2.19.1
+
 
