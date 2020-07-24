@@ -2,29 +2,29 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DCADB22CA74
-	for <lists+kvm@lfdr.de>; Fri, 24 Jul 2020 18:10:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0D82722CA5F
+	for <lists+kvm@lfdr.de>; Fri, 24 Jul 2020 18:09:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728293AbgGXQJ7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 24 Jul 2020 12:09:59 -0400
-Received: from 8bytes.org ([81.169.241.247]:59394 "EHLO theia.8bytes.org"
+        id S1727769AbgGXQEO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 24 Jul 2020 12:04:14 -0400
+Received: from 8bytes.org ([81.169.241.247]:59368 "EHLO theia.8bytes.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726838AbgGXQEN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        id S1727093AbgGXQEN (ORCPT <rfc822;kvm@vger.kernel.org>);
         Fri, 24 Jul 2020 12:04:13 -0400
 Received: from cap.home.8bytes.org (p5b006776.dip0.t-ipconnect.de [91.0.103.118])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
         (No client certificate requested)
-        by theia.8bytes.org (Postfix) with ESMTPSA id 2C0BCF8E;
+        by theia.8bytes.org (Postfix) with ESMTPSA id AB38A7CB;
         Fri, 24 Jul 2020 18:04:09 +0200 (CEST)
 From:   Joerg Roedel <joro@8bytes.org>
 To:     x86@kernel.org
 Cc:     Joerg Roedel <joro@8bytes.org>, Joerg Roedel <jroedel@suse.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>, hpa@zytor.com,
-        Andy Lutomirski <luto@kernel.org>,
+        hpa@zytor.com, Andy Lutomirski <luto@kernel.org>,
         Dave Hansen <dave.hansen@linux.intel.com>,
         Peter Zijlstra <peterz@infradead.org>,
         Jiri Slaby <jslaby@suse.cz>,
         Dan Williams <dan.j.williams@intel.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
         Juergen Gross <jgross@suse.com>,
         Kees Cook <keescook@chromium.org>,
         David Rientjes <rientjes@google.com>,
@@ -36,9 +36,9 @@ Cc:     Joerg Roedel <joro@8bytes.org>, Joerg Roedel <jroedel@suse.de>,
         Martin Radev <martin.b.radev@gmail.com>,
         linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         virtualization@lists.linux-foundation.org
-Subject: [PATCH v5 24/75] x86/sev-es: Add support for handling IOIO exceptions
-Date:   Fri, 24 Jul 2020 18:02:45 +0200
-Message-Id: <20200724160336.5435-25-joro@8bytes.org>
+Subject: [PATCH v5 25/75] x86/fpu: Move xgetbv()/xsetbv() into separate header
+Date:   Fri, 24 Jul 2020 18:02:46 +0200
+Message-Id: <20200724160336.5435-26-joro@8bytes.org>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20200724160336.5435-1-joro@8bytes.org>
 References: <20200724160336.5435-1-joro@8bytes.org>
@@ -49,291 +49,115 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Tom Lendacky <thomas.lendacky@amd.com>
+From: Joerg Roedel <jroedel@suse.de>
 
-Add support for decoding and handling #VC exceptions for IOIO events.
+The xgetbv() function is needed in pre-decompression boot code, but
+asm/fpu/internal.h can't be included there directly. Doing so opens
+the door to include-hell due to various include-magic in
+boot/compressed/misc.h.
 
-Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
-[ jroedel@suse.de: Adapted code to #VC handling framework ]
-Co-developed-by: Joerg Roedel <jroedel@suse.de>
+Avoid that by moving xgetbv()/xsetbv() to a separate header file and
+include this instead.
+
 Signed-off-by: Joerg Roedel <jroedel@suse.de>
 ---
- arch/x86/boot/compressed/sev-es.c |  32 +++++
- arch/x86/kernel/sev-es-shared.c   | 214 ++++++++++++++++++++++++++++++
- 2 files changed, 246 insertions(+)
+ arch/x86/include/asm/fpu/internal.h | 33 +------------------------
+ arch/x86/include/asm/fpu/xcr.h      | 37 +++++++++++++++++++++++++++++
+ 2 files changed, 38 insertions(+), 32 deletions(-)
+ create mode 100644 arch/x86/include/asm/fpu/xcr.h
 
-diff --git a/arch/x86/boot/compressed/sev-es.c b/arch/x86/boot/compressed/sev-es.c
-index e3abf8737015..4f2fc7a85c2f 100644
---- a/arch/x86/boot/compressed/sev-es.c
-+++ b/arch/x86/boot/compressed/sev-es.c
-@@ -24,6 +24,35 @@
- struct ghcb boot_ghcb_page __aligned(PAGE_SIZE);
- struct ghcb *boot_ghcb;
+diff --git a/arch/x86/include/asm/fpu/internal.h b/arch/x86/include/asm/fpu/internal.h
+index 6b10cdaa7c96..6caf2a14d8dc 100644
+--- a/arch/x86/include/asm/fpu/internal.h
++++ b/arch/x86/include/asm/fpu/internal.h
+@@ -19,6 +19,7 @@
+ #include <asm/user.h>
+ #include <asm/fpu/api.h>
+ #include <asm/fpu/xstate.h>
++#include <asm/fpu/xcr.h>
+ #include <asm/cpufeature.h>
+ #include <asm/trace/fpu.h>
  
-+/*
-+ * Copy a version of this function here - insn-eval.c can't be used in
-+ * pre-decompression code.
-+ */
-+static bool insn_has_rep_prefix(struct insn *insn)
-+{
-+	int i;
-+
-+	insn_get_prefixes(insn);
-+
-+	for (i = 0; i < insn->prefixes.nbytes; i++) {
-+		insn_byte_t p = insn->prefixes.bytes[i];
-+
-+		if (p == 0xf2 || p == 0xf3)
-+			return true;
-+	}
-+
-+	return false;
-+}
-+
-+/*
-+ * Only a dummy for insn_get_seg_base() - Early boot-code is 64bit only and
-+ * doesn't use segments.
-+ */
-+static unsigned long insn_get_seg_base(struct pt_regs *regs, int seg_reg_idx)
-+{
-+	return 0UL;
-+}
-+
- static inline u64 sev_es_rd_ghcb_msr(void)
- {
- 	unsigned long low, high;
-@@ -151,6 +180,9 @@ void do_boot_stage2_vc(struct pt_regs *regs, unsigned long exit_code)
- 		goto finish;
- 
- 	switch (exit_code) {
-+	case SVM_EXIT_IOIO:
-+		result = vc_handle_ioio(boot_ghcb, &ctxt);
-+		break;
- 	default:
- 		result = ES_UNSUPPORTED;
- 		break;
-diff --git a/arch/x86/kernel/sev-es-shared.c b/arch/x86/kernel/sev-es-shared.c
-index 7ac6e6b0ae57..66d60e34eba0 100644
---- a/arch/x86/kernel/sev-es-shared.c
-+++ b/arch/x86/kernel/sev-es-shared.c
-@@ -218,3 +218,217 @@ static enum es_result vc_insn_string_write(struct es_em_ctxt *ctxt,
- 
- 	return ret;
+@@ -586,36 +587,4 @@ static inline void switch_fpu_finish(struct fpu *new_fpu)
+ 	__write_pkru(pkru_val);
  }
+ 
+-/*
+- * MXCSR and XCR definitions:
+- */
+-
+-static inline void ldmxcsr(u32 mxcsr)
+-{
+-	asm volatile("ldmxcsr %0" :: "m" (mxcsr));
+-}
+-
+-extern unsigned int mxcsr_feature_mask;
+-
+-#define XCR_XFEATURE_ENABLED_MASK	0x00000000
+-
+-static inline u64 xgetbv(u32 index)
+-{
+-	u32 eax, edx;
+-
+-	asm volatile(".byte 0x0f,0x01,0xd0" /* xgetbv */
+-		     : "=a" (eax), "=d" (edx)
+-		     : "c" (index));
+-	return eax + ((u64)edx << 32);
+-}
+-
+-static inline void xsetbv(u32 index, u64 value)
+-{
+-	u32 eax = value;
+-	u32 edx = value >> 32;
+-
+-	asm volatile(".byte 0x0f,0x01,0xd1" /* xsetbv */
+-		     : : "a" (eax), "d" (edx), "c" (index));
+-}
+-
+ #endif /* _ASM_X86_FPU_INTERNAL_H */
+diff --git a/arch/x86/include/asm/fpu/xcr.h b/arch/x86/include/asm/fpu/xcr.h
+new file mode 100644
+index 000000000000..d8e8fafebfdc
+--- /dev/null
++++ b/arch/x86/include/asm/fpu/xcr.h
+@@ -0,0 +1,37 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++#ifndef _ASM_X86_FPU_XCR_H
++#define _ASM_X86_FPU_XCR_H
 +
-+#define IOIO_TYPE_STR  BIT(2)
-+#define IOIO_TYPE_IN   1
-+#define IOIO_TYPE_INS  (IOIO_TYPE_IN | IOIO_TYPE_STR)
-+#define IOIO_TYPE_OUT  0
-+#define IOIO_TYPE_OUTS (IOIO_TYPE_OUT | IOIO_TYPE_STR)
++/*
++ * MXCSR and XCR definitions:
++ */
 +
-+#define IOIO_REP       BIT(3)
-+
-+#define IOIO_ADDR_64   BIT(9)
-+#define IOIO_ADDR_32   BIT(8)
-+#define IOIO_ADDR_16   BIT(7)
-+
-+#define IOIO_DATA_32   BIT(6)
-+#define IOIO_DATA_16   BIT(5)
-+#define IOIO_DATA_8    BIT(4)
-+
-+#define IOIO_SEG_ES    (0 << 10)
-+#define IOIO_SEG_DS    (3 << 10)
-+
-+static enum es_result vc_ioio_exitinfo(struct es_em_ctxt *ctxt, u64 *exitinfo)
++static inline void ldmxcsr(u32 mxcsr)
 +{
-+	struct insn *insn = &ctxt->insn;
-+	*exitinfo = 0;
-+
-+	switch (insn->opcode.bytes[0]) {
-+	/* INS opcodes */
-+	case 0x6c:
-+	case 0x6d:
-+		*exitinfo |= IOIO_TYPE_INS;
-+		*exitinfo |= IOIO_SEG_ES;
-+		*exitinfo |= (ctxt->regs->dx & 0xffff) << 16;
-+		break;
-+
-+	/* OUTS opcodes */
-+	case 0x6e:
-+	case 0x6f:
-+		*exitinfo |= IOIO_TYPE_OUTS;
-+		*exitinfo |= IOIO_SEG_DS;
-+		*exitinfo |= (ctxt->regs->dx & 0xffff) << 16;
-+		break;
-+
-+	/* IN immediate opcodes */
-+	case 0xe4:
-+	case 0xe5:
-+		*exitinfo |= IOIO_TYPE_IN;
-+		*exitinfo |= insn->immediate.value << 16;
-+		break;
-+
-+	/* OUT immediate opcodes */
-+	case 0xe6:
-+	case 0xe7:
-+		*exitinfo |= IOIO_TYPE_OUT;
-+		*exitinfo |= insn->immediate.value << 16;
-+		break;
-+
-+	/* IN register opcodes */
-+	case 0xec:
-+	case 0xed:
-+		*exitinfo |= IOIO_TYPE_IN;
-+		*exitinfo |= (ctxt->regs->dx & 0xffff) << 16;
-+		break;
-+
-+	/* OUT register opcodes */
-+	case 0xee:
-+	case 0xef:
-+		*exitinfo |= IOIO_TYPE_OUT;
-+		*exitinfo |= (ctxt->regs->dx & 0xffff) << 16;
-+		break;
-+
-+	default:
-+		return ES_DECODE_FAILED;
-+	}
-+
-+	switch (insn->opcode.bytes[0]) {
-+	case 0x6c:
-+	case 0x6e:
-+	case 0xe4:
-+	case 0xe6:
-+	case 0xec:
-+	case 0xee:
-+		/* Single byte opcodes */
-+		*exitinfo |= IOIO_DATA_8;
-+		break;
-+	default:
-+		/* Length determined by instruction parsing */
-+		*exitinfo |= (insn->opnd_bytes == 2) ? IOIO_DATA_16
-+						     : IOIO_DATA_32;
-+	}
-+	switch (insn->addr_bytes) {
-+	case 2:
-+		*exitinfo |= IOIO_ADDR_16;
-+		break;
-+	case 4:
-+		*exitinfo |= IOIO_ADDR_32;
-+		break;
-+	case 8:
-+		*exitinfo |= IOIO_ADDR_64;
-+		break;
-+	}
-+
-+	if (insn_has_rep_prefix(insn))
-+		*exitinfo |= IOIO_REP;
-+
-+	return ES_OK;
++	asm volatile("ldmxcsr %0" :: "m" (mxcsr));
 +}
 +
-+static enum es_result vc_handle_ioio(struct ghcb *ghcb, struct es_em_ctxt *ctxt)
++extern unsigned int mxcsr_feature_mask;
++
++#define XCR_XFEATURE_ENABLED_MASK	0x00000000
++
++static inline u64 xgetbv(u32 index)
 +{
-+	struct pt_regs *regs = ctxt->regs;
-+	u64 exit_info_1, exit_info_2;
-+	enum es_result ret;
++	u32 eax, edx;
 +
-+	ret = vc_ioio_exitinfo(ctxt, &exit_info_1);
-+	if (ret != ES_OK)
-+		return ret;
-+
-+	if (exit_info_1 & IOIO_TYPE_STR) {
-+
-+		/* (REP) INS/OUTS */
-+
-+		bool df = ((regs->flags & X86_EFLAGS_DF) == X86_EFLAGS_DF);
-+		unsigned int io_bytes, exit_bytes;
-+		unsigned int ghcb_count, op_count;
-+		unsigned long es_base;
-+		u64 sw_scratch;
-+
-+		/*
-+		 * For the string variants with rep prefix the amount of in/out
-+		 * operations per #VC exception is limited so that the kernel
-+		 * has a chance to take interrupts and re-schedule while the
-+		 * instruction is emulated.
-+		 */
-+		io_bytes   = (exit_info_1 >> 4) & 0x7;
-+		ghcb_count = sizeof(ghcb->shared_buffer) / io_bytes;
-+
-+		op_count    = (exit_info_1 & IOIO_REP) ? regs->cx : 1;
-+		exit_info_2 = min(op_count, ghcb_count);
-+		exit_bytes  = exit_info_2 * io_bytes;
-+
-+		es_base = insn_get_seg_base(ctxt->regs, INAT_SEG_REG_ES);
-+
-+		/* Read bytes of OUTS into the shared buffer */
-+		if (!(exit_info_1 & IOIO_TYPE_IN)) {
-+			ret = vc_insn_string_read(ctxt,
-+					       (void *)(es_base + regs->si),
-+					       ghcb->shared_buffer, io_bytes,
-+					       exit_info_2, df);
-+			if (ret)
-+				return ret;
-+		}
-+
-+		/*
-+		 * Issue an VMGEXIT to the HV to consume the bytes from the
-+		 * shared buffer or to have it write them into the shared buffer
-+		 * depending on the instruction: OUTS or INS.
-+		 */
-+		sw_scratch = __pa(ghcb) + offsetof(struct ghcb, shared_buffer);
-+		ghcb_set_sw_scratch(ghcb, sw_scratch);
-+		ret = sev_es_ghcb_hv_call(ghcb, ctxt, SVM_EXIT_IOIO,
-+					  exit_info_1, exit_info_2);
-+		if (ret != ES_OK)
-+			return ret;
-+
-+		/* Read bytes from shared buffer into the guest's destination. */
-+		if (exit_info_1 & IOIO_TYPE_IN) {
-+			ret = vc_insn_string_write(ctxt,
-+						   (void *)(es_base + regs->di),
-+						   ghcb->shared_buffer, io_bytes,
-+						   exit_info_2, df);
-+			if (ret)
-+				return ret;
-+
-+			if (df)
-+				regs->di -= exit_bytes;
-+			else
-+				regs->di += exit_bytes;
-+		} else {
-+			if (df)
-+				regs->si -= exit_bytes;
-+			else
-+				regs->si += exit_bytes;
-+		}
-+
-+		if (exit_info_1 & IOIO_REP)
-+			regs->cx -= exit_info_2;
-+
-+		ret = regs->cx ? ES_RETRY : ES_OK;
-+
-+	} else {
-+
-+		/* IN/OUT into/from rAX */
-+
-+		int bits = (exit_info_1 & 0x70) >> 1;
-+		u64 rax = 0;
-+
-+		if (!(exit_info_1 & IOIO_TYPE_IN))
-+			rax = lower_bits(regs->ax, bits);
-+
-+		ghcb_set_rax(ghcb, rax);
-+
-+		ret = sev_es_ghcb_hv_call(ghcb, ctxt, SVM_EXIT_IOIO, exit_info_1, 0);
-+		if (ret != ES_OK)
-+			return ret;
-+
-+		if (exit_info_1 & IOIO_TYPE_IN) {
-+			if (!ghcb_is_valid_rax(ghcb))
-+				return ES_VMM_ERROR;
-+			regs->ax = lower_bits(ghcb->save.rax, bits);
-+		}
-+	}
-+
-+	return ret;
++	asm volatile(".byte 0x0f,0x01,0xd0" /* xgetbv */
++		     : "=a" (eax), "=d" (edx)
++		     : "c" (index));
++	return eax + ((u64)edx << 32);
 +}
++
++static inline void xsetbv(u32 index, u64 value)
++{
++	u32 eax = value;
++	u32 edx = value >> 32;
++
++	asm volatile(".byte 0x0f,0x01,0xd1" /* xsetbv */
++		     : : "a" (eax), "d" (edx), "c" (index));
++}
++
++#endif /* _ASM_X86_FPU_XCR_H */
 -- 
 2.27.0
 
