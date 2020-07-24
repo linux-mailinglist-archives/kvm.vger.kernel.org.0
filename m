@@ -2,103 +2,154 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 08A3A22CC7A
-	for <lists+kvm@lfdr.de>; Fri, 24 Jul 2020 19:44:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2AE5922CC7E
+	for <lists+kvm@lfdr.de>; Fri, 24 Jul 2020 19:44:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727051AbgGXRny (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 24 Jul 2020 13:43:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49396 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726593AbgGXRnx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 24 Jul 2020 13:43:53 -0400
-Received: from mail-pg1-x543.google.com (mail-pg1-x543.google.com [IPv6:2607:f8b0:4864:20::543])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 43440C0619D3
-        for <kvm@vger.kernel.org>; Fri, 24 Jul 2020 10:43:52 -0700 (PDT)
-Received: by mail-pg1-x543.google.com with SMTP id p3so5676433pgh.3
-        for <kvm@vger.kernel.org>; Fri, 24 Jul 2020 10:43:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=aaWhQPcSW3bE7rs+REjPzCquXYXIKucEYvw8vc6PND4=;
-        b=GhnZGzFM9H5MZ1G8rKO9LRqg8IW3cO1w1wH/BXcQWPilam/lAlnkxGLmZrE9vV4u52
-         K4DmyhZRZKHcPv0GEdH0K9KyLtYBYiIg8Y7BKPfji1nPew2uVmw2Cu0KJWgn0+QrhCy6
-         J33pUtSnzj+iojGpXI+KpUUcr8S8iTr9Qn8UQ=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=aaWhQPcSW3bE7rs+REjPzCquXYXIKucEYvw8vc6PND4=;
-        b=LlCthZyRJiJ8qrMfeNanrXbZt8ynX9RuMHHXgjerLaoyBJLTCd3QOVPZHfmdc/nsa2
-         8PL2pSDR90ChfR35tEbHbRuwqDrUggAizHiYJvhHrrT3sZJs5pOc7hXoW0ZQOs2hwBkx
-         uDmI0vFg3pXzpjU9aTKBxrlgKrrSOl2p1kk9//p2NwIQRK1+5oD9HRczT2kfNT0IH83D
-         eH2Skez8wNgCyk6rpl3P5ouz+73b3Vc1yh+7MtdnSOJOtsRF8CEOVBfdwmafHmOYFA0c
-         CvphKQQEVMkXb0434zZm9VGQOzx2qSpXa5lTuGl0KD2RtoQ1AxcKeIbbmdFq/dqIhGEM
-         Y+dA==
-X-Gm-Message-State: AOAM530cBfKAp7flgiOXw9TXKQYmHVHaROCr+mO/N+TUqTe/4GbvBeh9
-        BPrc4bS85rKUTU9gDUoIHodjhg==
-X-Google-Smtp-Source: ABdhPJxm1pOTytr68wKlbjbawG7twhZ21XJYJ4ElyB1DPdJJWPc/wanYtwrYMS+M80MURBbJFVeEdw==
-X-Received: by 2002:aa7:8096:: with SMTP id v22mr10436021pff.132.1595612631874;
-        Fri, 24 Jul 2020 10:43:51 -0700 (PDT)
-Received: from www.outflux.net (smtp.outflux.net. [198.145.64.163])
-        by smtp.gmail.com with ESMTPSA id o136sm6832398pfg.24.2020.07.24.10.43.50
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 24 Jul 2020 10:43:51 -0700 (PDT)
-Date:   Fri, 24 Jul 2020 10:43:50 -0700
-From:   Kees Cook <keescook@chromium.org>
-To:     Joerg Roedel <joro@8bytes.org>
-Cc:     x86@kernel.org, Joerg Roedel <jroedel@suse.de>, hpa@zytor.com,
+        id S1726704AbgGXRog (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 24 Jul 2020 13:44:36 -0400
+Received: from mail.kernel.org ([198.145.29.99]:51564 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726381AbgGXRog (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 24 Jul 2020 13:44:36 -0400
+Received: from localhost (83-86-89-107.cable.dynamic.v4.ziggo.nl [83.86.89.107])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 3402A2067D;
+        Fri, 24 Jul 2020 17:44:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1595612675;
+        bh=bAQpgRroLYP5aRy6ABfGc3GgdNAR1aE+sPxU5qd9MzQ=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=eduqc2DjA8GQbBNmmXwHci4z566RPcuNqvvblv4OJPEP+cg1NMrBHRTOPKmptXOiL
+         fbD3r87NblRq9eY8+ROnWRqvfuRP/YiU60A6eLZmoeEwfuQ2N356OsEYUTRGwTlv8W
+         jDTvet9vZgTOohuYEsGJt9hDSwUV2MgGyrPXPSXo=
+Date:   Fri, 24 Jul 2020 19:44:37 +0200
+From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To:     Jan Kiszka <jan.kiszka@siemens.com>
+Cc:     linux-kernel@vger.kernel.org,
+        Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+        stable@vger.kernel.org, Borislav Petkov <bp@suse.de>,
+        Ingo Molnar <mingo@kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
         Andy Lutomirski <luto@kernel.org>,
         Dave Hansen <dave.hansen@linux.intel.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Jiri Slaby <jslaby@suse.cz>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Juergen Gross <jgross@suse.com>,
-        David Rientjes <rientjes@google.com>,
-        Cfir Cohen <cfir@google.com>,
-        Erdem Aktas <erdemaktas@google.com>,
-        Masami Hiramatsu <mhiramat@kernel.org>,
-        Mike Stunes <mstunes@vmware.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Martin Radev <martin.b.radev@gmail.com>,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org
-Subject: Re: [PATCH v5 11/75] x86/boot/compressed/64: Disable red-zone usage
-Message-ID: <202007241043.654ABB2@keescook>
-References: <20200724160336.5435-1-joro@8bytes.org>
- <20200724160336.5435-12-joro@8bytes.org>
+        "H. Peter Anvin" <hpa@zytor.com>,
+        "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        kvm ML <kvm@vger.kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        Rik van Riel <riel@surriel.com>, x86-ml <x86@kernel.org>,
+        cip-dev <cip-dev@lists.cip-project.org>
+Subject: Re: [PATCH 4.9 18/22] x86/fpu: Disable bottom halves while loading
+ FPU registers
+Message-ID: <20200724174437.GB555114@kroah.com>
+References: <20181228113126.144310132@linuxfoundation.org>
+ <20181228113127.414176417@linuxfoundation.org>
+ <01857944-ce1a-c6cd-3666-1e9b6ca8cccc@siemens.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20200724160336.5435-12-joro@8bytes.org>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <01857944-ce1a-c6cd-3666-1e9b6ca8cccc@siemens.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jul 24, 2020 at 06:02:32PM +0200, Joerg Roedel wrote:
-> From: Joerg Roedel <jroedel@suse.de>
+On Fri, Jul 24, 2020 at 07:07:06PM +0200, Jan Kiszka wrote:
+> On 28.12.18 12:52, Greg Kroah-Hartman wrote:
+> > 4.9-stable review patch.  If anyone has any objections, please let me know.
+> > 
+> > ------------------
+> > 
+> > From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+> > 
+> > commit 68239654acafe6aad5a3c1dc7237e60accfebc03 upstream.
+> > 
+> > The sequence
+> > 
+> >    fpu->initialized = 1;		/* step A */
+> >    preempt_disable();		/* step B */
+> >    fpu__restore(fpu);
+> >    preempt_enable();
+> > 
+> > in __fpu__restore_sig() is racy in regard to a context switch.
+> > 
+> > For 32bit frames, __fpu__restore_sig() prepares the FPU state within
+> > fpu->state. To ensure that a context switch (switch_fpu_prepare() in
+> > particular) does not modify fpu->state it uses fpu__drop() which sets
+> > fpu->initialized to 0.
+> > 
+> > After fpu->initialized is cleared, the CPU's FPU state is not saved
+> > to fpu->state during a context switch. The new state is loaded via
+> > fpu__restore(). It gets loaded into fpu->state from userland and
+> > ensured it is sane. fpu->initialized is then set to 1 in order to avoid
+> > fpu__initialize() doing anything (overwrite the new state) which is part
+> > of fpu__restore().
+> > 
+> > A context switch between step A and B above would save CPU's current FPU
+> > registers to fpu->state and overwrite the newly prepared state. This
+> > looks like a tiny race window but the Kernel Test Robot reported this
+> > back in 2016 while we had lazy FPU support. Borislav Petkov made the
+> > link between that report and another patch that has been posted. Since
+> > the removal of the lazy FPU support, this race goes unnoticed because
+> > the warning has been removed.
+> > 
+> > Disable bottom halves around the restore sequence to avoid the race. BH
+> > need to be disabled because BH is allowed to run (even with preemption
+> > disabled) and might invoke kernel_fpu_begin() by doing IPsec.
+> > 
+> >   [ bp: massage commit message a bit. ]
+> > 
+> > Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+> > Signed-off-by: Borislav Petkov <bp@suse.de>
+> > Acked-by: Ingo Molnar <mingo@kernel.org>
+> > Acked-by: Thomas Gleixner <tglx@linutronix.de>
+> > Cc: Andy Lutomirski <luto@kernel.org>
+> > Cc: Dave Hansen <dave.hansen@linux.intel.com>
+> > Cc: "H. Peter Anvin" <hpa@zytor.com>
+> > Cc: "Jason A. Donenfeld" <Jason@zx2c4.com>
+> > Cc: kvm ML <kvm@vger.kernel.org>
+> > Cc: Paolo Bonzini <pbonzini@redhat.com>
+> > Cc: Radim Krčmář <rkrcmar@redhat.com>
+> > Cc: Rik van Riel <riel@surriel.com>
+> > Cc: stable@vger.kernel.org
+> > Cc: x86-ml <x86@kernel.org>
+> > Link: http://lkml.kernel.org/r/20181120102635.ddv3fvavxajjlfqk@linutronix.de
+> > Link: https://lkml.kernel.org/r/20160226074940.GA28911@pd.tnic
+> > Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+> > Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+> > ---
+> >   arch/x86/kernel/fpu/signal.c |    4 ++--
+> >   1 file changed, 2 insertions(+), 2 deletions(-)
+> > 
+> > --- a/arch/x86/kernel/fpu/signal.c
+> > +++ b/arch/x86/kernel/fpu/signal.c
+> > @@ -342,10 +342,10 @@ static int __fpu__restore_sig(void __use
+> >   			sanitize_restored_xstate(tsk, &env, xfeatures, fx_only);
+> >   		}
+> > +		local_bh_disable();
+> >   		fpu->fpstate_active = 1;
+> > -		preempt_disable();
+> >   		fpu__restore(fpu);
+> > -		preempt_enable();
+> > +		local_bh_enable();
+> >   		return err;
+> >   	} else {
+> > 
+> > 
 > 
-> The x86-64 ABI defines a red-zone on the stack:
-> 
->   The 128-byte area beyond the location pointed to by %rsp is considered
->   to be reserved and shall not be modified by signal or interrupt
->   handlers. Therefore, functions may use this area for temporary data
->   that is not needed across function calls. In particular, leaf
->   functions may use this area for their entire stack frame, rather than
->   adjusting the stack pointer in the prologue and epilogue. This area is
->   known as the red zone.
-> 
-> This is not compatible with exception handling, because the IRET frame
-> written by the hardware at the stack pointer and the functions to handle
-> the exception will overwrite the temporary variables of the interrupted
-> function, causing undefined behavior. So disable red-zones for the
-> pre-decompression boot code.
-> 
-> Signed-off-by: Joerg Roedel <jroedel@suse.de>
+> Any reason why the backport stopped back than at 4.9? I just debugged this
+> out of a 4.4 kernel, and it is needed there as well. I'm happy to propose a
+> backport, would just appreciate a hint if the BH protection is needed also
+> there (my case was without BH).
 
-Reviewed-by: Kees Cook <keescook@chromium.org>
+You are asking about something we did back in 2018.  I can't remember
+what I did last week :)
 
--- 
-Kees Cook
+If you provide a backport that works, I'll be glad to take it.  The
+current patch does not apply cleanly there at all.
+
+thanks,
+
+greg k-h
