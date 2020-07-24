@@ -2,49 +2,49 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E0BA522CC75
-	for <lists+kvm@lfdr.de>; Fri, 24 Jul 2020 19:43:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 08A3A22CC7A
+	for <lists+kvm@lfdr.de>; Fri, 24 Jul 2020 19:44:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727803AbgGXRnM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 24 Jul 2020 13:43:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49282 "EHLO
+        id S1727051AbgGXRny (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 24 Jul 2020 13:43:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49396 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727071AbgGXRnJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 24 Jul 2020 13:43:09 -0400
-Received: from mail-pg1-x544.google.com (mail-pg1-x544.google.com [IPv6:2607:f8b0:4864:20::544])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A077EC0619D3
-        for <kvm@vger.kernel.org>; Fri, 24 Jul 2020 10:43:09 -0700 (PDT)
-Received: by mail-pg1-x544.google.com with SMTP id m22so5665613pgv.9
-        for <kvm@vger.kernel.org>; Fri, 24 Jul 2020 10:43:09 -0700 (PDT)
+        with ESMTP id S1726593AbgGXRnx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 24 Jul 2020 13:43:53 -0400
+Received: from mail-pg1-x543.google.com (mail-pg1-x543.google.com [IPv6:2607:f8b0:4864:20::543])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 43440C0619D3
+        for <kvm@vger.kernel.org>; Fri, 24 Jul 2020 10:43:52 -0700 (PDT)
+Received: by mail-pg1-x543.google.com with SMTP id p3so5676433pgh.3
+        for <kvm@vger.kernel.org>; Fri, 24 Jul 2020 10:43:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=chromium.org; s=google;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=sd5Rp6atrzE1Stcg3iirVnf9ToDQSXxRMnjLTBZ9L1A=;
-        b=VWFQY0cDmbN0RBRUPgEZB4t35+VutKPpoaFz/9Te/2hqGPRJlr4gQQD20xOnEsAalg
-         q4QdepCDOJhFDcxkYOx0eWXU914L7Wlxsg17nmn6JKAJcVOD226V1u+tZy10pc8p4cZH
-         9pTdR/jBEBTnCN1m1IfLHJtg1L0c15Pimq0k8=
+        bh=aaWhQPcSW3bE7rs+REjPzCquXYXIKucEYvw8vc6PND4=;
+        b=GhnZGzFM9H5MZ1G8rKO9LRqg8IW3cO1w1wH/BXcQWPilam/lAlnkxGLmZrE9vV4u52
+         K4DmyhZRZKHcPv0GEdH0K9KyLtYBYiIg8Y7BKPfji1nPew2uVmw2Cu0KJWgn0+QrhCy6
+         J33pUtSnzj+iojGpXI+KpUUcr8S8iTr9Qn8UQ=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=sd5Rp6atrzE1Stcg3iirVnf9ToDQSXxRMnjLTBZ9L1A=;
-        b=OB3q996Gv7spVwcg4a/X03CdYgZ9QPFrxhXzIvou100IQXYsxrDM9onXfFXlhvcbOB
-         4TrpdCUyIosD4RpySvEPSApQfucC9j0LsFPlG2AHuJL79qsKqUucP3z6UmtMk1j1To7Q
-         lA/mJe61Obyo59afl73fAS1tT1IZLAUAiz2As1i8deX/8CJIoEIAvqhmChm+G7WSXHwW
-         RWOfumSt0THKUCoWLZrKJ3xOHFMmkMyHjflkyLSzchs+hnBwAd3Xa7hJ05zwPjpIzzdQ
-         LIc9DdR1+0m7A6ud3V2VlIjVvrneDLC6WF/B7sf1uDkpVXi4W3y1upPPXEN47WRx6Wmu
-         f23Q==
-X-Gm-Message-State: AOAM530G/oEA7iNidaALa5uL+/VPAHmfSjatcJ4TF6vOiEZWGlvI+9AM
-        /Y907CrsZdQWWSAqNObvmnw7yg==
-X-Google-Smtp-Source: ABdhPJwJFv2Oz78lM4tZKg9Jhv4RklfsNq7Gh1Z0ycsFgw9wKR0oBpge+dRt0td8MxgcFpPTLwKJLQ==
-X-Received: by 2002:a62:a217:: with SMTP id m23mr9922513pff.291.1595612589235;
-        Fri, 24 Jul 2020 10:43:09 -0700 (PDT)
+        bh=aaWhQPcSW3bE7rs+REjPzCquXYXIKucEYvw8vc6PND4=;
+        b=LlCthZyRJiJ8qrMfeNanrXbZt8ynX9RuMHHXgjerLaoyBJLTCd3QOVPZHfmdc/nsa2
+         8PL2pSDR90ChfR35tEbHbRuwqDrUggAizHiYJvhHrrT3sZJs5pOc7hXoW0ZQOs2hwBkx
+         uDmI0vFg3pXzpjU9aTKBxrlgKrrSOl2p1kk9//p2NwIQRK1+5oD9HRczT2kfNT0IH83D
+         eH2Skez8wNgCyk6rpl3P5ouz+73b3Vc1yh+7MtdnSOJOtsRF8CEOVBfdwmafHmOYFA0c
+         CvphKQQEVMkXb0434zZm9VGQOzx2qSpXa5lTuGl0KD2RtoQ1AxcKeIbbmdFq/dqIhGEM
+         Y+dA==
+X-Gm-Message-State: AOAM530cBfKAp7flgiOXw9TXKQYmHVHaROCr+mO/N+TUqTe/4GbvBeh9
+        BPrc4bS85rKUTU9gDUoIHodjhg==
+X-Google-Smtp-Source: ABdhPJxm1pOTytr68wKlbjbawG7twhZ21XJYJ4ElyB1DPdJJWPc/wanYtwrYMS+M80MURBbJFVeEdw==
+X-Received: by 2002:aa7:8096:: with SMTP id v22mr10436021pff.132.1595612631874;
+        Fri, 24 Jul 2020 10:43:51 -0700 (PDT)
 Received: from www.outflux.net (smtp.outflux.net. [198.145.64.163])
-        by smtp.gmail.com with ESMTPSA id u16sm6647629pfn.52.2020.07.24.10.43.08
+        by smtp.gmail.com with ESMTPSA id o136sm6832398pfg.24.2020.07.24.10.43.50
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 24 Jul 2020 10:43:08 -0700 (PDT)
-Date:   Fri, 24 Jul 2020 10:43:07 -0700
+        Fri, 24 Jul 2020 10:43:51 -0700 (PDT)
+Date:   Fri, 24 Jul 2020 10:43:50 -0700
 From:   Kees Cook <keescook@chromium.org>
 To:     Joerg Roedel <joro@8bytes.org>
 Cc:     x86@kernel.org, Joerg Roedel <jroedel@suse.de>, hpa@zytor.com,
@@ -64,29 +64,37 @@ Cc:     x86@kernel.org, Joerg Roedel <jroedel@suse.de>, hpa@zytor.com,
         Martin Radev <martin.b.radev@gmail.com>,
         linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         virtualization@lists.linux-foundation.org
-Subject: Re: [PATCH v5 33/75] x86/head/64: Switch to initial stack earlier
-Message-ID: <202007241043.96A920ADEC@keescook>
+Subject: Re: [PATCH v5 11/75] x86/boot/compressed/64: Disable red-zone usage
+Message-ID: <202007241043.654ABB2@keescook>
 References: <20200724160336.5435-1-joro@8bytes.org>
- <20200724160336.5435-34-joro@8bytes.org>
+ <20200724160336.5435-12-joro@8bytes.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200724160336.5435-34-joro@8bytes.org>
+In-Reply-To: <20200724160336.5435-12-joro@8bytes.org>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jul 24, 2020 at 06:02:54PM +0200, Joerg Roedel wrote:
+On Fri, Jul 24, 2020 at 06:02:32PM +0200, Joerg Roedel wrote:
 > From: Joerg Roedel <jroedel@suse.de>
 > 
-> Make sure there is a stack once the kernel runs from virual addresses.
-> At this stage any secondary CPU which boots will have lost its stack
-> because the kernel switched to a new page-table which does not map the
-> real-mode stack anymore.
+> The x86-64 ABI defines a red-zone on the stack:
 > 
-> This is needed for handling early #VC exceptions caused by instructions
-> like CPUID.
+>   The 128-byte area beyond the location pointed to by %rsp is considered
+>   to be reserved and shall not be modified by signal or interrupt
+>   handlers. Therefore, functions may use this area for temporary data
+>   that is not needed across function calls. In particular, leaf
+>   functions may use this area for their entire stack frame, rather than
+>   adjusting the stack pointer in the prologue and epilogue. This area is
+>   known as the red zone.
+> 
+> This is not compatible with exception handling, because the IRET frame
+> written by the hardware at the stack pointer and the functions to handle
+> the exception will overwrite the temporary variables of the interrupted
+> function, causing undefined behavior. So disable red-zones for the
+> pre-decompression boot code.
 > 
 > Signed-off-by: Joerg Roedel <jroedel@suse.de>
 
