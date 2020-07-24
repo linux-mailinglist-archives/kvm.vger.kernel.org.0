@@ -2,162 +2,128 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 24A7822CCD4
-	for <lists+kvm@lfdr.de>; Fri, 24 Jul 2020 20:12:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D447222CCD7
+	for <lists+kvm@lfdr.de>; Fri, 24 Jul 2020 20:13:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727019AbgGXSMF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 24 Jul 2020 14:12:05 -0400
-Received: from mail.kernel.org ([198.145.29.99]:58658 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726639AbgGXSME (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 24 Jul 2020 14:12:04 -0400
-Received: from localhost (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id AC1BC20674;
-        Fri, 24 Jul 2020 18:12:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1595614324;
-        bh=GyWp8VrTjZ0A08Fvlj0CfmjIs4WgMSh7t+oFkdXeAn0=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=I/SNsW+PQboUSevmXeGiN5O7Fh8HhWNrSVxrBxr7Cr2YDO+8yOemA5h5Bw0rDujYq
-         wfxdPwxodeCw1hkqehMgYSxgm+DSXCWVHzs96TPgY8u/XTjlZJ/LYiWTnDlkhivB18
-         pbKn/Sqmxa+8qDRP0Vto3BuFF3ciBpFfX3u43/9A=
-Date:   Fri, 24 Jul 2020 14:12:02 -0400
-From:   Sasha Levin <sashal@kernel.org>
-To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc:     Jan Kiszka <jan.kiszka@siemens.com>, linux-kernel@vger.kernel.org,
-        Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-        stable@vger.kernel.org, Borislav Petkov <bp@suse.de>,
-        Ingo Molnar <mingo@kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        kvm ML <kvm@vger.kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Rik van Riel <riel@surriel.com>, x86-ml <x86@kernel.org>,
-        cip-dev <cip-dev@lists.cip-project.org>
-Subject: Re: [PATCH 4.9 18/22] x86/fpu: Disable bottom halves while loading
- FPU registers
-Message-ID: <20200724181202.GG406581@sasha-vm>
-References: <20181228113126.144310132@linuxfoundation.org>
- <20181228113127.414176417@linuxfoundation.org>
- <01857944-ce1a-c6cd-3666-1e9b6ca8cccc@siemens.com>
- <20200724174437.GB555114@kroah.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20200724174437.GB555114@kroah.com>
+        id S1726992AbgGXSNw convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Fri, 24 Jul 2020 14:13:52 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:13114 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726503AbgGXSNw (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 24 Jul 2020 14:13:52 -0400
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 06OI3K9L049700;
+        Fri, 24 Jul 2020 14:13:45 -0400
+Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com [159.122.73.71])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 32fac4c6jh-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 24 Jul 2020 14:13:45 -0400
+Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
+        by ppma02fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 06OIBK6B025023;
+        Fri, 24 Jul 2020 18:13:43 GMT
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
+        by ppma02fra.de.ibm.com with ESMTP id 32brq7xcpy-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 24 Jul 2020 18:13:42 +0000
+Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
+        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 06OIDeZs32899382
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 24 Jul 2020 18:13:40 GMT
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id F0ACDA404D;
+        Fri, 24 Jul 2020 18:13:39 +0000 (GMT)
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 51A46A405B;
+        Fri, 24 Jul 2020 18:13:37 +0000 (GMT)
+Received: from [9.85.74.228] (unknown [9.85.74.228])
+        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
+        Fri, 24 Jul 2020 18:13:36 +0000 (GMT)
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 13.4 \(3608.80.23.2.2\))
+Subject: Re: [v3 12/15] powerpc/perf: Add support for outputting extended regs
+ in perf intr_regs
+From:   Athira Rajeev <atrajeev@linux.vnet.ibm.com>
+In-Reply-To: <b7aa5dfb-273b-e0f7-6337-c71094c666cd@linux.ibm.com>
+Date:   Fri, 24 Jul 2020 23:43:34 +0530
+Cc:     Gautham R Shenoy <ego@linux.vnet.ibm.com>,
+        Michael Neuling <mikey@neuling.org>, maddy@linux.vnet.ibm.com,
+        kvm@vger.kernel.org, kvm-ppc@vger.kernel.org, svaidyan@in.ibm.com,
+        acme@kernel.org, jolsa@kernel.org, linuxppc-dev@lists.ozlabs.org
+Content-Transfer-Encoding: 8BIT
+Message-Id: <763A7E0C-24E4-4F60-AE92-F0DBB64BAE4B@linux.vnet.ibm.com>
+References: <1594996707-3727-1-git-send-email-atrajeev@linux.vnet.ibm.com>
+ <1594996707-3727-13-git-send-email-atrajeev@linux.vnet.ibm.com>
+ <b7aa5dfb-273b-e0f7-6337-c71094c666cd@linux.ibm.com>
+To:     Ravi Bangoria <ravi.bangoria@linux.ibm.com>
+X-Mailer: Apple Mail (2.3608.80.23.2.2)
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
+ definitions=2020-07-24_07:2020-07-24,2020-07-24 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 bulkscore=0
+ suspectscore=0 phishscore=0 mlxlogscore=999 priorityscore=1501
+ adultscore=0 lowpriorityscore=0 malwarescore=0 spamscore=0 impostorscore=0
+ mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2006250000 definitions=main-2007240133
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jul 24, 2020 at 07:44:37PM +0200, Greg Kroah-Hartman wrote:
->On Fri, Jul 24, 2020 at 07:07:06PM +0200, Jan Kiszka wrote:
->> On 28.12.18 12:52, Greg Kroah-Hartman wrote:
->> > 4.9-stable review patch.  If anyone has any objections, please let me know.
->> >
->> > ------------------
->> >
->> > From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
->> >
->> > commit 68239654acafe6aad5a3c1dc7237e60accfebc03 upstream.
->> >
->> > The sequence
->> >
->> >    fpu->initialized = 1;		/* step A */
->> >    preempt_disable();		/* step B */
->> >    fpu__restore(fpu);
->> >    preempt_enable();
->> >
->> > in __fpu__restore_sig() is racy in regard to a context switch.
->> >
->> > For 32bit frames, __fpu__restore_sig() prepares the FPU state within
->> > fpu->state. To ensure that a context switch (switch_fpu_prepare() in
->> > particular) does not modify fpu->state it uses fpu__drop() which sets
->> > fpu->initialized to 0.
->> >
->> > After fpu->initialized is cleared, the CPU's FPU state is not saved
->> > to fpu->state during a context switch. The new state is loaded via
->> > fpu__restore(). It gets loaded into fpu->state from userland and
->> > ensured it is sane. fpu->initialized is then set to 1 in order to avoid
->> > fpu__initialize() doing anything (overwrite the new state) which is part
->> > of fpu__restore().
->> >
->> > A context switch between step A and B above would save CPU's current FPU
->> > registers to fpu->state and overwrite the newly prepared state. This
->> > looks like a tiny race window but the Kernel Test Robot reported this
->> > back in 2016 while we had lazy FPU support. Borislav Petkov made the
->> > link between that report and another patch that has been posted. Since
->> > the removal of the lazy FPU support, this race goes unnoticed because
->> > the warning has been removed.
->> >
->> > Disable bottom halves around the restore sequence to avoid the race. BH
->> > need to be disabled because BH is allowed to run (even with preemption
->> > disabled) and might invoke kernel_fpu_begin() by doing IPsec.
->> >
->> >   [ bp: massage commit message a bit. ]
->> >
->> > Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
->> > Signed-off-by: Borislav Petkov <bp@suse.de>
->> > Acked-by: Ingo Molnar <mingo@kernel.org>
->> > Acked-by: Thomas Gleixner <tglx@linutronix.de>
->> > Cc: Andy Lutomirski <luto@kernel.org>
->> > Cc: Dave Hansen <dave.hansen@linux.intel.com>
->> > Cc: "H. Peter Anvin" <hpa@zytor.com>
->> > Cc: "Jason A. Donenfeld" <Jason@zx2c4.com>
->> > Cc: kvm ML <kvm@vger.kernel.org>
->> > Cc: Paolo Bonzini <pbonzini@redhat.com>
->> > Cc: Radim Krčmář <rkrcmar@redhat.com>
->> > Cc: Rik van Riel <riel@surriel.com>
->> > Cc: stable@vger.kernel.org
->> > Cc: x86-ml <x86@kernel.org>
->> > Link: http://lkml.kernel.org/r/20181120102635.ddv3fvavxajjlfqk@linutronix.de
->> > Link: https://lkml.kernel.org/r/20160226074940.GA28911@pd.tnic
->> > Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
->> > Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
->> > ---
->> >   arch/x86/kernel/fpu/signal.c |    4 ++--
->> >   1 file changed, 2 insertions(+), 2 deletions(-)
->> >
->> > --- a/arch/x86/kernel/fpu/signal.c
->> > +++ b/arch/x86/kernel/fpu/signal.c
->> > @@ -342,10 +342,10 @@ static int __fpu__restore_sig(void __use
->> >   			sanitize_restored_xstate(tsk, &env, xfeatures, fx_only);
->> >   		}
->> > +		local_bh_disable();
->> >   		fpu->fpstate_active = 1;
->> > -		preempt_disable();
->> >   		fpu__restore(fpu);
->> > -		preempt_enable();
->> > +		local_bh_enable();
->> >   		return err;
->> >   	} else {
->> >
->> >
->>
->> Any reason why the backport stopped back than at 4.9? I just debugged this
->> out of a 4.4 kernel, and it is needed there as well. I'm happy to propose a
->> backport, would just appreciate a hint if the BH protection is needed also
->> there (my case was without BH).
->
->You are asking about something we did back in 2018.  I can't remember
->what I did last week :)
->
->If you provide a backport that works, I'll be glad to take it.  The
->current patch does not apply cleanly there at all.
 
-The conflict was due to a missing rename back in 4.4: e4a81bfcaae1
-("x86/fpu: Rename fpu::fpstate_active to fpu::initialized").
 
-I've fixed up the patch and queued it for 4.4, thanks for pointing it
-out Jan!
+> On 24-Jul-2020, at 5:56 PM, Ravi Bangoria <ravi.bangoria@linux.ibm.com> wrote:
+> 
+> Hi Athira,
+> 
+>> +/* Function to return the extended register values */
+>> +static u64 get_ext_regs_value(int idx)
+>> +{
+>> +	switch (idx) {
+>> +	case PERF_REG_POWERPC_MMCR0:
+>> +		return mfspr(SPRN_MMCR0);
+>> +	case PERF_REG_POWERPC_MMCR1:
+>> +		return mfspr(SPRN_MMCR1);
+>> +	case PERF_REG_POWERPC_MMCR2:
+>> +		return mfspr(SPRN_MMCR2);
+>> +	default: return 0;
+>> +	}
+>> +}
+>> +
+>>  u64 perf_reg_value(struct pt_regs *regs, int idx)
+>>  {
+>> -	if (WARN_ON_ONCE(idx >= PERF_REG_POWERPC_MAX))
+>> -		return 0;
+>> +	u64 PERF_REG_EXTENDED_MAX;
+> 
+> PERF_REG_EXTENDED_MAX should be initialized. otherwise ...
+> 
+>> +
+>> +	if (cpu_has_feature(CPU_FTR_ARCH_300))
+>> +		PERF_REG_EXTENDED_MAX = PERF_REG_MAX_ISA_300;
+>>    	if (idx == PERF_REG_POWERPC_SIER &&
+>>  	   (IS_ENABLED(CONFIG_FSL_EMB_PERF_EVENT) ||
+>> @@ -85,6 +103,16 @@ u64 perf_reg_value(struct pt_regs *regs, int idx)
+>>  	    IS_ENABLED(CONFIG_PPC32)))
+>>  		return 0;
+>>  +	if (idx >= PERF_REG_POWERPC_MAX && idx < PERF_REG_EXTENDED_MAX)
+>> +		return get_ext_regs_value(idx);
+> 
+> On non p9/p10 machine, PERF_REG_EXTENDED_MAX may contain random value which will
+> allow user to pass this if condition unintentionally.
 
--- 
-Thanks,
-Sasha
+> 
+> Neat: PERF_REG_EXTENDED_MAX is a local variable so it should be in lowercase.
+> Any specific reason to define it in capital?
+
+Hi Ravi
+
+There is no specific reason. I will include both these changes in next version
+
+Thanks
+Athira Rajeev
+
+
+> 
+> Ravi
+
