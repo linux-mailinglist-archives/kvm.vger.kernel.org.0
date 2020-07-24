@@ -2,165 +2,148 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9DD7022C9F9
-	for <lists+kvm@lfdr.de>; Fri, 24 Jul 2020 18:05:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CF83222CBAB
+	for <lists+kvm@lfdr.de>; Fri, 24 Jul 2020 19:07:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728063AbgGXQFU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 24 Jul 2020 12:05:20 -0400
-Received: from 8bytes.org ([81.169.241.247]:60432 "EHLO theia.8bytes.org"
+        id S1726539AbgGXRHp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 24 Jul 2020 13:07:45 -0400
+Received: from gecko.sbs.de ([194.138.37.40]:46604 "EHLO gecko.sbs.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728203AbgGXQEr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 24 Jul 2020 12:04:47 -0400
-Received: from cap.home.8bytes.org (p5b006776.dip0.t-ipconnect.de [91.0.103.118])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
-        (No client certificate requested)
-        by theia.8bytes.org (Postfix) with ESMTPSA id D33AFFF4;
-        Fri, 24 Jul 2020 18:04:40 +0200 (CEST)
-From:   Joerg Roedel <joro@8bytes.org>
-To:     x86@kernel.org
-Cc:     Joerg Roedel <joro@8bytes.org>, Joerg Roedel <jroedel@suse.de>,
-        Martin Radev <martin.b.radev@gmail.com>, hpa@zytor.com,
+        id S1726326AbgGXRHp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 24 Jul 2020 13:07:45 -0400
+Received: from mail2.sbs.de (mail2.sbs.de [192.129.41.66])
+        by gecko.sbs.de (8.15.2/8.15.2) with ESMTPS id 06OH7AVU029510
+        (version=TLSv1.2 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 24 Jul 2020 19:07:10 +0200
+Received: from [139.22.112.247] ([139.22.112.247])
+        by mail2.sbs.de (8.15.2/8.15.2) with ESMTP id 06OH76bs007058;
+        Fri, 24 Jul 2020 19:07:07 +0200
+Subject: Re: [PATCH 4.9 18/22] x86/fpu: Disable bottom halves while loading
+ FPU registers
+To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        linux-kernel@vger.kernel.org,
+        Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Cc:     stable@vger.kernel.org, Borislav Petkov <bp@suse.de>,
+        Ingo Molnar <mingo@kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
         Andy Lutomirski <luto@kernel.org>,
         Dave Hansen <dave.hansen@linux.intel.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Jiri Slaby <jslaby@suse.cz>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Juergen Gross <jgross@suse.com>,
-        Kees Cook <keescook@chromium.org>,
-        David Rientjes <rientjes@google.com>,
-        Cfir Cohen <cfir@google.com>,
-        Erdem Aktas <erdemaktas@google.com>,
-        Masami Hiramatsu <mhiramat@kernel.org>,
-        Mike Stunes <mstunes@vmware.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org
-Subject: [PATCH v5 75/75] x86/sev-es: Check required CPU features for SEV-ES
-Date:   Fri, 24 Jul 2020 18:03:36 +0200
-Message-Id: <20200724160336.5435-76-joro@8bytes.org>
-X-Mailer: git-send-email 2.27.0
-In-Reply-To: <20200724160336.5435-1-joro@8bytes.org>
-References: <20200724160336.5435-1-joro@8bytes.org>
+        "H. Peter Anvin" <hpa@zytor.com>,
+        "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        kvm ML <kvm@vger.kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        Rik van Riel <riel@surriel.com>, x86-ml <x86@kernel.org>,
+        cip-dev <cip-dev@lists.cip-project.org>
+References: <20181228113126.144310132@linuxfoundation.org>
+ <20181228113127.414176417@linuxfoundation.org>
+From:   Jan Kiszka <jan.kiszka@siemens.com>
+Message-ID: <01857944-ce1a-c6cd-3666-1e9b6ca8cccc@siemens.com>
+Date:   Fri, 24 Jul 2020 19:07:06 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
+In-Reply-To: <20181228113127.414176417@linuxfoundation.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Martin Radev <martin.b.radev@gmail.com>
+On 28.12.18 12:52, Greg Kroah-Hartman wrote:
+> 4.9-stable review patch.  If anyone has any objections, please let me know.
+> 
+> ------------------
+> 
+> From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+> 
+> commit 68239654acafe6aad5a3c1dc7237e60accfebc03 upstream.
+> 
+> The sequence
+> 
+>    fpu->initialized = 1;		/* step A */
+>    preempt_disable();		/* step B */
+>    fpu__restore(fpu);
+>    preempt_enable();
+> 
+> in __fpu__restore_sig() is racy in regard to a context switch.
+> 
+> For 32bit frames, __fpu__restore_sig() prepares the FPU state within
+> fpu->state. To ensure that a context switch (switch_fpu_prepare() in
+> particular) does not modify fpu->state it uses fpu__drop() which sets
+> fpu->initialized to 0.
+> 
+> After fpu->initialized is cleared, the CPU's FPU state is not saved
+> to fpu->state during a context switch. The new state is loaded via
+> fpu__restore(). It gets loaded into fpu->state from userland and
+> ensured it is sane. fpu->initialized is then set to 1 in order to avoid
+> fpu__initialize() doing anything (overwrite the new state) which is part
+> of fpu__restore().
+> 
+> A context switch between step A and B above would save CPU's current FPU
+> registers to fpu->state and overwrite the newly prepared state. This
+> looks like a tiny race window but the Kernel Test Robot reported this
+> back in 2016 while we had lazy FPU support. Borislav Petkov made the
+> link between that report and another patch that has been posted. Since
+> the removal of the lazy FPU support, this race goes unnoticed because
+> the warning has been removed.
+> 
+> Disable bottom halves around the restore sequence to avoid the race. BH
+> need to be disabled because BH is allowed to run (even with preemption
+> disabled) and might invoke kernel_fpu_begin() by doing IPsec.
+> 
+>   [ bp: massage commit message a bit. ]
+> 
+> Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+> Signed-off-by: Borislav Petkov <bp@suse.de>
+> Acked-by: Ingo Molnar <mingo@kernel.org>
+> Acked-by: Thomas Gleixner <tglx@linutronix.de>
+> Cc: Andy Lutomirski <luto@kernel.org>
+> Cc: Dave Hansen <dave.hansen@linux.intel.com>
+> Cc: "H. Peter Anvin" <hpa@zytor.com>
+> Cc: "Jason A. Donenfeld" <Jason@zx2c4.com>
+> Cc: kvm ML <kvm@vger.kernel.org>
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Cc: Radim Krčmář <rkrcmar@redhat.com>
+> Cc: Rik van Riel <riel@surriel.com>
+> Cc: stable@vger.kernel.org
+> Cc: x86-ml <x86@kernel.org>
+> Link: http://lkml.kernel.org/r/20181120102635.ddv3fvavxajjlfqk@linutronix.de
+> Link: https://lkml.kernel.org/r/20160226074940.GA28911@pd.tnic
+> Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+> Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+> ---
+>   arch/x86/kernel/fpu/signal.c |    4 ++--
+>   1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> --- a/arch/x86/kernel/fpu/signal.c
+> +++ b/arch/x86/kernel/fpu/signal.c
+> @@ -342,10 +342,10 @@ static int __fpu__restore_sig(void __use
+>   			sanitize_restored_xstate(tsk, &env, xfeatures, fx_only);
+>   		}
+>   
+> +		local_bh_disable();
+>   		fpu->fpstate_active = 1;
+> -		preempt_disable();
+>   		fpu__restore(fpu);
+> -		preempt_enable();
+> +		local_bh_enable();
+>   
+>   		return err;
+>   	} else {
+> 
+> 
 
-Make sure the machine supports RDRAND, otherwise there is no trusted
-source of of randomness in the system.
+Any reason why the backport stopped back than at 4.9? I just debugged 
+this out of a 4.4 kernel, and it is needed there as well. I'm happy to 
+propose a backport, would just appreciate a hint if the BH protection is 
+needed also there (my case was without BH).
 
-To also check this in the pre-decompression stage, make has_cpuflag
-not depend on CONFIG_RANDOMIZE_BASE anymore.
+Thanks,
+Jan
 
-Signed-off-by: Martin Radev <martin.b.radev@gmail.com>
-Signed-off-by: Joerg Roedel <jroedel@suse.de>
----
- arch/x86/boot/compressed/cpuflags.c |  4 ----
- arch/x86/boot/compressed/misc.h     |  5 +++--
- arch/x86/boot/compressed/sev-es.c   |  3 +++
- arch/x86/kernel/sev-es-shared.c     | 15 +++++++++++++++
- arch/x86/kernel/sev-es.c            |  3 +++
- 5 files changed, 24 insertions(+), 6 deletions(-)
-
-diff --git a/arch/x86/boot/compressed/cpuflags.c b/arch/x86/boot/compressed/cpuflags.c
-index 6448a8196d32..0cc1323896d1 100644
---- a/arch/x86/boot/compressed/cpuflags.c
-+++ b/arch/x86/boot/compressed/cpuflags.c
-@@ -1,6 +1,4 @@
- // SPDX-License-Identifier: GPL-2.0
--#ifdef CONFIG_RANDOMIZE_BASE
--
- #include "../cpuflags.c"
- 
- bool has_cpuflag(int flag)
-@@ -9,5 +7,3 @@ bool has_cpuflag(int flag)
- 
- 	return test_bit(flag, cpu.flags);
- }
--
--#endif
-diff --git a/arch/x86/boot/compressed/misc.h b/arch/x86/boot/compressed/misc.h
-index 2e5f82acc122..a37e7d4b00e4 100644
---- a/arch/x86/boot/compressed/misc.h
-+++ b/arch/x86/boot/compressed/misc.h
-@@ -85,8 +85,6 @@ void choose_random_location(unsigned long input,
- 			    unsigned long *output,
- 			    unsigned long output_size,
- 			    unsigned long *virt_addr);
--/* cpuflags.c */
--bool has_cpuflag(int flag);
- #else
- static inline void choose_random_location(unsigned long input,
- 					  unsigned long input_size,
-@@ -97,6 +95,9 @@ static inline void choose_random_location(unsigned long input,
- }
- #endif
- 
-+/* cpuflags.c */
-+bool has_cpuflag(int flag);
-+
- #ifdef CONFIG_X86_64
- extern int set_page_decrypted(unsigned long address);
- extern int set_page_encrypted(unsigned long address);
-diff --git a/arch/x86/boot/compressed/sev-es.c b/arch/x86/boot/compressed/sev-es.c
-index b522c18c0588..eb1a8b5cc753 100644
---- a/arch/x86/boot/compressed/sev-es.c
-+++ b/arch/x86/boot/compressed/sev-es.c
-@@ -145,6 +145,9 @@ void sev_es_shutdown_ghcb(void)
- 	if (!boot_ghcb)
- 		return;
- 
-+	if (!sev_es_check_cpu_features())
-+		error("SEV-ES CPU Features missing.");
-+
- 	/*
- 	 * GHCB Page must be flushed from the cache and mapped encrypted again.
- 	 * Otherwise the running kernel will see strange cache effects when
-diff --git a/arch/x86/kernel/sev-es-shared.c b/arch/x86/kernel/sev-es-shared.c
-index 608f76d0d088..56de70cb80d8 100644
---- a/arch/x86/kernel/sev-es-shared.c
-+++ b/arch/x86/kernel/sev-es-shared.c
-@@ -9,6 +9,21 @@
-  * and is included directly into both code-bases.
-  */
- 
-+#ifndef __BOOT_COMPRESSED
-+#define error(v)	pr_err(v)
-+#define has_cpuflag(f)	boot_cpu_has(f)
-+#endif
-+
-+static bool __init sev_es_check_cpu_features(void)
-+{
-+	if (!has_cpuflag(X86_FEATURE_RDRAND)) {
-+		error("RDRAND instruction not supported - no trusted source of randomness available\n");
-+		return false;
-+	}
-+
-+	return true;
-+}
-+
- static void sev_es_terminate(unsigned int reason)
- {
- 	u64 val = GHCB_SEV_TERMINATE;
-diff --git a/arch/x86/kernel/sev-es.c b/arch/x86/kernel/sev-es.c
-index c5e0ceb099c2..e1fea7a38019 100644
---- a/arch/x86/kernel/sev-es.c
-+++ b/arch/x86/kernel/sev-es.c
-@@ -670,6 +670,9 @@ void __init sev_es_init_vc_handling(void)
- 	if (!sev_es_active())
- 		return;
- 
-+	if (!sev_es_check_cpu_features())
-+		panic("SEV-ES CPU Features missing");
-+
- 	/* Enable SEV-ES special handling */
- 	static_branch_enable(&sev_es_enable_key);
- 
 -- 
-2.27.0
-
+Siemens AG, Corporate Technology, CT RDA IOT SES-DE
+Corporate Competence Center Embedded Linux
