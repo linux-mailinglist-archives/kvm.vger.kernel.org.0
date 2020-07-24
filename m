@@ -2,31 +2,31 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 15C0F22CA69
-	for <lists+kvm@lfdr.de>; Fri, 24 Jul 2020 18:09:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BCEBB22CA5D
+	for <lists+kvm@lfdr.de>; Fri, 24 Jul 2020 18:09:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728373AbgGXQJZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 24 Jul 2020 12:09:25 -0400
-Received: from 8bytes.org ([81.169.241.247]:59420 "EHLO theia.8bytes.org"
+        id S1727957AbgGXQJN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 24 Jul 2020 12:09:13 -0400
+Received: from 8bytes.org ([81.169.241.247]:60034 "EHLO theia.8bytes.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727783AbgGXQEQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 24 Jul 2020 12:04:16 -0400
+        id S1727797AbgGXQEU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 24 Jul 2020 12:04:20 -0400
 Received: from cap.home.8bytes.org (p5b006776.dip0.t-ipconnect.de [91.0.103.118])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
         (No client certificate requested)
-        by theia.8bytes.org (Postfix) with ESMTPSA id 34A17FB4;
+        by theia.8bytes.org (Postfix) with ESMTPSA id C2DC1F95;
         Fri, 24 Jul 2020 18:04:11 +0200 (CEST)
 From:   Joerg Roedel <joro@8bytes.org>
 To:     x86@kernel.org
 Cc:     Joerg Roedel <joro@8bytes.org>, Joerg Roedel <jroedel@suse.de>,
-        Kees Cook <keescook@chromium.org>, hpa@zytor.com,
-        Andy Lutomirski <luto@kernel.org>,
+        hpa@zytor.com, Andy Lutomirski <luto@kernel.org>,
         Dave Hansen <dave.hansen@linux.intel.com>,
         Peter Zijlstra <peterz@infradead.org>,
         Jiri Slaby <jslaby@suse.cz>,
         Dan Williams <dan.j.williams@intel.com>,
         Tom Lendacky <thomas.lendacky@amd.com>,
         Juergen Gross <jgross@suse.com>,
+        Kees Cook <keescook@chromium.org>,
         David Rientjes <rientjes@google.com>,
         Cfir Cohen <cfir@google.com>,
         Erdem Aktas <erdemaktas@google.com>,
@@ -36,9 +36,9 @@ Cc:     Joerg Roedel <joro@8bytes.org>, Joerg Roedel <jroedel@suse.de>,
         Martin Radev <martin.b.radev@gmail.com>,
         linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         virtualization@lists.linux-foundation.org
-Subject: [PATCH v5 28/75] x86/idt: Split idt_data setup out of set_intr_gate()
-Date:   Fri, 24 Jul 2020 18:02:49 +0200
-Message-Id: <20200724160336.5435-29-joro@8bytes.org>
+Subject: [PATCH v5 29/75] x86/head/64: Install startup GDT
+Date:   Fri, 24 Jul 2020 18:02:50 +0200
+Message-Id: <20200724160336.5435-30-joro@8bytes.org>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20200724160336.5435-1-joro@8bytes.org>
 References: <20200724160336.5435-1-joro@8bytes.org>
@@ -51,56 +51,102 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Joerg Roedel <jroedel@suse.de>
 
-The code to setup idt_data is needed for early exception handling, but
-set_intr_gate() can't be used that early because it has pv-ops in its
-code path, which don't work that early.
-
-Split out the idt_data initialization part from set_intr_gate() so
-that it can be used separatly.
+Handling exceptions during boot requires a working GDT. The kernel GDT
+can't be used on the direct mapping, so load a startup GDT and setup
+segments.
 
 Signed-off-by: Joerg Roedel <jroedel@suse.de>
-Reviewed-by: Kees Cook <keescook@chromium.org>
 ---
- arch/x86/kernel/idt.c | 22 ++++++++++++++--------
- 1 file changed, 14 insertions(+), 8 deletions(-)
+ arch/x86/include/asm/setup.h |  1 +
+ arch/x86/kernel/head64.c     | 33 +++++++++++++++++++++++++++++++++
+ arch/x86/kernel/head_64.S    | 14 ++++++++++++++
+ 3 files changed, 48 insertions(+)
 
-diff --git a/arch/x86/kernel/idt.c b/arch/x86/kernel/idt.c
-index 34fcc58b81b5..c19773174221 100644
---- a/arch/x86/kernel/idt.c
-+++ b/arch/x86/kernel/idt.c
-@@ -205,18 +205,24 @@ idt_setup_from_table(gate_desc *idt, const struct idt_data *t, int size, bool sy
- 	}
- }
+diff --git a/arch/x86/include/asm/setup.h b/arch/x86/include/asm/setup.h
+index 84b645cc8bc9..5c2fd05bd52c 100644
+--- a/arch/x86/include/asm/setup.h
++++ b/arch/x86/include/asm/setup.h
+@@ -48,6 +48,7 @@ extern void reserve_standard_io_resources(void);
+ extern void i386_reserve_resources(void);
+ extern unsigned long __startup_64(unsigned long physaddr, struct boot_params *bp);
+ extern unsigned long __startup_secondary_64(void);
++extern void startup_64_setup_env(unsigned long physbase);
+ extern int early_make_pgtable(unsigned long address);
  
-+static void init_idt_data(struct idt_data *data, unsigned int n,
-+			  const void *addr)
+ #ifdef CONFIG_X86_INTEL_MID
+diff --git a/arch/x86/kernel/head64.c b/arch/x86/kernel/head64.c
+index cbb71c1b574f..8c82be44be94 100644
+--- a/arch/x86/kernel/head64.c
++++ b/arch/x86/kernel/head64.c
+@@ -61,6 +61,24 @@ unsigned long vmemmap_base __ro_after_init = __VMEMMAP_BASE_L4;
+ EXPORT_SYMBOL(vmemmap_base);
+ #endif
+ 
++/*
++ * GDT used on the boot CPU before switching to virtual addresses.
++ */
++static struct desc_struct startup_gdt[GDT_ENTRIES] = {
++	[GDT_ENTRY_KERNEL32_CS]         = GDT_ENTRY_INIT(0xc09b, 0, 0xfffff),
++	[GDT_ENTRY_KERNEL_CS]           = GDT_ENTRY_INIT(0xa09b, 0, 0xfffff),
++	[GDT_ENTRY_KERNEL_DS]           = GDT_ENTRY_INIT(0xc093, 0, 0xfffff),
++};
++
++/*
++ * Address needs to be set at runtime because it references the startup_gdt
++ * while the kernel still uses a direct mapping.
++ */
++static struct desc_ptr startup_gdt_descr = {
++	.size = sizeof(startup_gdt),
++	.address = 0,
++};
++
+ #define __head	__section(.head.text)
+ 
+ static void __head *fixup_pointer(void *ptr, unsigned long physaddr)
+@@ -489,3 +507,18 @@ void __init x86_64_start_reservations(char *real_mode_data)
+ 
+ 	start_kernel();
+ }
++
++/*
++ * Setup boot CPU state needed before kernel switches to virtual addresses.
++ */
++void __head startup_64_setup_env(unsigned long physbase)
 +{
-+	BUG_ON(n > 0xFF);
++	/* Load GDT */
++	startup_gdt_descr.address = (unsigned long)fixup_pointer(startup_gdt, physbase);
++	native_load_gdt(&startup_gdt_descr);
 +
-+	memset(data, 0, sizeof(*data));
-+	data->vector	= n;
-+	data->addr	= addr;
-+	data->segment	= __KERNEL_CS;
-+	data->bits.type	= GATE_INTERRUPT;
-+	data->bits.p	= 1;
++	/* New GDT is live - reload data segment registers */
++	asm volatile("movl %%eax, %%ds\n"
++		     "movl %%eax, %%ss\n"
++		     "movl %%eax, %%es\n" : : "a"(__KERNEL_DS) : "memory");
 +}
+diff --git a/arch/x86/kernel/head_64.S b/arch/x86/kernel/head_64.S
+index 16da4ac01597..2b2e91627221 100644
+--- a/arch/x86/kernel/head_64.S
++++ b/arch/x86/kernel/head_64.S
+@@ -73,6 +73,20 @@ SYM_CODE_START_NOALIGN(startup_64)
+ 	/* Set up the stack for verify_cpu(), similar to initial_stack below */
+ 	leaq	(__end_init_task - SIZEOF_PTREGS)(%rip), %rsp
+ 
++	leaq	_text(%rip), %rdi
++	pushq	%rsi
++	call	startup_64_setup_env
++	popq	%rsi
 +
- static __init void set_intr_gate(unsigned int n, const void *addr)
- {
- 	struct idt_data data;
++	/* Now switch to __KERNEL_CS so IRET works reliably */
++	pushq	$__KERNEL_CS
++	leaq	.Lon_kernel_cs(%rip), %rax
++	pushq	%rax
++	lretq
++
++.Lon_kernel_cs:
++	UNWIND_HINT_EMPTY
++
+ 	/* Sanitize CPU configuration */
+ 	call verify_cpu
  
--	BUG_ON(n > 0xFF);
--
--	memset(&data, 0, sizeof(data));
--	data.vector	= n;
--	data.addr	= addr;
--	data.segment	= __KERNEL_CS;
--	data.bits.type	= GATE_INTERRUPT;
--	data.bits.p	= 1;
-+	init_idt_data(&data, n, addr);
- 
- 	idt_setup_from_table(idt_table, &data, 1, false);
- }
 -- 
 2.27.0
 
