@@ -2,154 +2,108 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2AE5922CC7E
-	for <lists+kvm@lfdr.de>; Fri, 24 Jul 2020 19:44:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D4BFA22CC98
+	for <lists+kvm@lfdr.de>; Fri, 24 Jul 2020 19:50:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726704AbgGXRog (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 24 Jul 2020 13:44:36 -0400
-Received: from mail.kernel.org ([198.145.29.99]:51564 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726381AbgGXRog (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 24 Jul 2020 13:44:36 -0400
-Received: from localhost (83-86-89-107.cable.dynamic.v4.ziggo.nl [83.86.89.107])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 3402A2067D;
-        Fri, 24 Jul 2020 17:44:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1595612675;
-        bh=bAQpgRroLYP5aRy6ABfGc3GgdNAR1aE+sPxU5qd9MzQ=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=eduqc2DjA8GQbBNmmXwHci4z566RPcuNqvvblv4OJPEP+cg1NMrBHRTOPKmptXOiL
-         fbD3r87NblRq9eY8+ROnWRqvfuRP/YiU60A6eLZmoeEwfuQ2N356OsEYUTRGwTlv8W
-         jDTvet9vZgTOohuYEsGJt9hDSwUV2MgGyrPXPSXo=
-Date:   Fri, 24 Jul 2020 19:44:37 +0200
-From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To:     Jan Kiszka <jan.kiszka@siemens.com>
-Cc:     linux-kernel@vger.kernel.org,
-        Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-        stable@vger.kernel.org, Borislav Petkov <bp@suse.de>,
-        Ingo Molnar <mingo@kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        kvm ML <kvm@vger.kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Rik van Riel <riel@surriel.com>, x86-ml <x86@kernel.org>,
-        cip-dev <cip-dev@lists.cip-project.org>
-Subject: Re: [PATCH 4.9 18/22] x86/fpu: Disable bottom halves while loading
- FPU registers
-Message-ID: <20200724174437.GB555114@kroah.com>
-References: <20181228113126.144310132@linuxfoundation.org>
- <20181228113127.414176417@linuxfoundation.org>
- <01857944-ce1a-c6cd-3666-1e9b6ca8cccc@siemens.com>
+        id S1726887AbgGXRuO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 24 Jul 2020 13:50:14 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:29153 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726593AbgGXRuO (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 24 Jul 2020 13:50:14 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1595613012;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=sTJ+cPiiGlwq5/s3PSlzC8KEoaa5YrhJ4JrwoRgWcV0=;
+        b=b84ySiIOBhNEMLgIeSKuNWpV/YVJELOKmiKXFExhKh0iGwwpu05MHS4es45jzwSFTCKeTv
+        1zbU3kU5nYhom4sqKTi33DajrxrWv3m8nrH6qj5itPZQIckMGGr5Z7zB+fdG3JpXIscqKA
+        rX7LkHE6c8XbVkDQewNEYJu8vrakYjY=
+Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
+ [209.85.218.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-65-OizNlznkO-Ct1BAGYvVcfA-1; Fri, 24 Jul 2020 13:50:11 -0400
+X-MC-Unique: OizNlznkO-Ct1BAGYvVcfA-1
+Received: by mail-ej1-f71.google.com with SMTP id cf15so3954937ejb.6
+        for <kvm@vger.kernel.org>; Fri, 24 Jul 2020 10:50:10 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=sTJ+cPiiGlwq5/s3PSlzC8KEoaa5YrhJ4JrwoRgWcV0=;
+        b=M/MzHvgMVOiBjsJqR0h5L+D9eK6ACxSJ1rHOxo6nAdmG4fymkmW0hhrIKeCDqStGQN
+         JAksWGGYt3cxHgGgfoLSQ/GtvmAQuTVQeokZ8JT5205Jv5epQADNWQ5YBkdUx5fpcX9b
+         dgpFv81X5j768sbQGKQFjO6WJ3oo6HajTK4pedZHHDDDaz32qoALhP138AIAHp0RsmAX
+         RdM7/z4fNQWHuLMkTwuZYwnBZ2cUkK1IcnmFiX1Nuj33IuM8gqIH43IeJpjwdftBfn16
+         HvY/KUiiWDg55X9h1r0JwaymTlKJE7jfNL9Uc64lOu/T1flf3v87AThXwkIPNwCVxNJZ
+         SYqQ==
+X-Gm-Message-State: AOAM5338HNFaU4yLWWgFSnz+b8a7WtqMySWWHshtIR+hFUt7R0C2I/XP
+        TZ7lG7mu5hbHEXIolxtVC/t1vr+wz/6Th58ZZbKap8WneOg+zsoSrjO+K37ZNYRT37N24qbObWs
+        CVXInxPcyEFCd
+X-Received: by 2002:a50:8a62:: with SMTP id i89mr10223846edi.324.1595613009919;
+        Fri, 24 Jul 2020 10:50:09 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJybapy5a8Qja8Vc8+vPK3f+zAoda+bqijI+q1PHQanVyoWiDBG9nz2/Xh6L2JP4+WEBEJmKgQ==
+X-Received: by 2002:a50:8a62:: with SMTP id i89mr10223831edi.324.1595613009746;
+        Fri, 24 Jul 2020 10:50:09 -0700 (PDT)
+Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
+        by smtp.gmail.com with ESMTPSA id sd15sm1079000ejb.66.2020.07.24.10.50.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 24 Jul 2020 10:50:09 -0700 (PDT)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     Krish Sadhukhan <krish.sadhukhan@oracle.com>, kvm@vger.kernel.org
+Cc:     jmattson@google.com, sean.j.christopherson@intel.com,
+        pbonzini@redhat.com
+Subject: Re: [PATCH] KVM: x86: Fill in conforming {vmx|svm}_x86_ops and {vmx|svm}_nested_ops via macros
+In-Reply-To: <1595543518-72310-1-git-send-email-krish.sadhukhan@oracle.com>
+References: <1595543518-72310-1-git-send-email-krish.sadhukhan@oracle.com>
+Date:   Fri, 24 Jul 2020 19:50:08 +0200
+Message-ID: <87zh7on6pb.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <01857944-ce1a-c6cd-3666-1e9b6ca8cccc@siemens.com>
+Content-Type: text/plain
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jul 24, 2020 at 07:07:06PM +0200, Jan Kiszka wrote:
-> On 28.12.18 12:52, Greg Kroah-Hartman wrote:
-> > 4.9-stable review patch.  If anyone has any objections, please let me know.
-> > 
-> > ------------------
-> > 
-> > From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-> > 
-> > commit 68239654acafe6aad5a3c1dc7237e60accfebc03 upstream.
-> > 
-> > The sequence
-> > 
-> >    fpu->initialized = 1;		/* step A */
-> >    preempt_disable();		/* step B */
-> >    fpu__restore(fpu);
-> >    preempt_enable();
-> > 
-> > in __fpu__restore_sig() is racy in regard to a context switch.
-> > 
-> > For 32bit frames, __fpu__restore_sig() prepares the FPU state within
-> > fpu->state. To ensure that a context switch (switch_fpu_prepare() in
-> > particular) does not modify fpu->state it uses fpu__drop() which sets
-> > fpu->initialized to 0.
-> > 
-> > After fpu->initialized is cleared, the CPU's FPU state is not saved
-> > to fpu->state during a context switch. The new state is loaded via
-> > fpu__restore(). It gets loaded into fpu->state from userland and
-> > ensured it is sane. fpu->initialized is then set to 1 in order to avoid
-> > fpu__initialize() doing anything (overwrite the new state) which is part
-> > of fpu__restore().
-> > 
-> > A context switch between step A and B above would save CPU's current FPU
-> > registers to fpu->state and overwrite the newly prepared state. This
-> > looks like a tiny race window but the Kernel Test Robot reported this
-> > back in 2016 while we had lazy FPU support. Borislav Petkov made the
-> > link between that report and another patch that has been posted. Since
-> > the removal of the lazy FPU support, this race goes unnoticed because
-> > the warning has been removed.
-> > 
-> > Disable bottom halves around the restore sequence to avoid the race. BH
-> > need to be disabled because BH is allowed to run (even with preemption
-> > disabled) and might invoke kernel_fpu_begin() by doing IPsec.
-> > 
-> >   [ bp: massage commit message a bit. ]
-> > 
-> > Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-> > Signed-off-by: Borislav Petkov <bp@suse.de>
-> > Acked-by: Ingo Molnar <mingo@kernel.org>
-> > Acked-by: Thomas Gleixner <tglx@linutronix.de>
-> > Cc: Andy Lutomirski <luto@kernel.org>
-> > Cc: Dave Hansen <dave.hansen@linux.intel.com>
-> > Cc: "H. Peter Anvin" <hpa@zytor.com>
-> > Cc: "Jason A. Donenfeld" <Jason@zx2c4.com>
-> > Cc: kvm ML <kvm@vger.kernel.org>
-> > Cc: Paolo Bonzini <pbonzini@redhat.com>
-> > Cc: Radim Krčmář <rkrcmar@redhat.com>
-> > Cc: Rik van Riel <riel@surriel.com>
-> > Cc: stable@vger.kernel.org
-> > Cc: x86-ml <x86@kernel.org>
-> > Link: http://lkml.kernel.org/r/20181120102635.ddv3fvavxajjlfqk@linutronix.de
-> > Link: https://lkml.kernel.org/r/20160226074940.GA28911@pd.tnic
-> > Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-> > Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-> > ---
-> >   arch/x86/kernel/fpu/signal.c |    4 ++--
-> >   1 file changed, 2 insertions(+), 2 deletions(-)
-> > 
-> > --- a/arch/x86/kernel/fpu/signal.c
-> > +++ b/arch/x86/kernel/fpu/signal.c
-> > @@ -342,10 +342,10 @@ static int __fpu__restore_sig(void __use
-> >   			sanitize_restored_xstate(tsk, &env, xfeatures, fx_only);
-> >   		}
-> > +		local_bh_disable();
-> >   		fpu->fpstate_active = 1;
-> > -		preempt_disable();
-> >   		fpu__restore(fpu);
-> > -		preempt_enable();
-> > +		local_bh_enable();
-> >   		return err;
-> >   	} else {
-> > 
-> > 
-> 
-> Any reason why the backport stopped back than at 4.9? I just debugged this
-> out of a 4.4 kernel, and it is needed there as well. I'm happy to propose a
-> backport, would just appreciate a hint if the BH protection is needed also
-> there (my case was without BH).
+Krish Sadhukhan <krish.sadhukhan@oracle.com> writes:
 
-You are asking about something we did back in 2018.  I can't remember
-what I did last week :)
+> There is no functional change. Just the names of the implemented functions in
+> KVM and SVM modules have been made conformant to the kvm_x86_ops and
+> kvm_x86_nested_ops structures, by using macros. This will help in better
+> readability and maintenance of the code.
+>
+>
+> [PATCH] KVM: x86: Fill in conforming {vmx|svm}_x86_ops and
+>
+> [root@nsvm-sadhukhan linux]# /root/Tools/git-format-patch.sh dcb7fd8
+>  arch/x86/include/asm/kvm_host.h |  12 +-
+>  arch/x86/kvm/svm/avic.c         |   4 +-
+>  arch/x86/kvm/svm/nested.c       |  16 +--
+>  arch/x86/kvm/svm/sev.c          |   4 +-
+>  arch/x86/kvm/svm/svm.c          | 218 +++++++++++++++++-----------------
+>  arch/x86/kvm/svm/svm.h          |   8 +-
+>  arch/x86/kvm/vmx/nested.c       |  26 +++--
+>  arch/x86/kvm/vmx/nested.h       |   2 +-
+>  arch/x86/kvm/vmx/vmx.c          | 238 +++++++++++++++++++-------------------
+>  arch/x86/kvm/vmx/vmx.h          |   2 +-
+>  arch/x86/kvm/x86.c              |  20 ++--
+>  11 files changed, 279 insertions(+), 271 deletions(-)
+>
+> Krish Sadhukhan (1):
+>       KVM: x86: Fill in conforming {vmx|svm}_x86_ops and {vmx|svm}_nested_ops
+>
 
-If you provide a backport that works, I'll be glad to take it.  The
-current patch does not apply cleanly there at all.
+I like the patch!
 
-thanks,
+I would, however, want to suggest to split this:
 
-greg k-h
+1) Separate {vmx|svm}_x86_ops change from {vmx|svm}_nested_ops
+2) Separate VMX/nVMX from SVM/nSVM
+3) Separate other changes (like svm_tlb_flush() -> svm_flush_tlb()
+rename, set_irq() -> inject_irq() rename, ...) into induvidual patches.
+
+Or you'll have to provide a script to review it as a whole :-)
+
+-- 
+Vitaly
+
