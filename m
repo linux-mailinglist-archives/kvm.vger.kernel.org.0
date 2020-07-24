@@ -2,103 +2,158 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4C22F22C3F7
-	for <lists+kvm@lfdr.de>; Fri, 24 Jul 2020 13:02:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A8AEB22C3FC
+	for <lists+kvm@lfdr.de>; Fri, 24 Jul 2020 13:02:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726985AbgGXLC0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 24 Jul 2020 07:02:26 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:17742 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726114AbgGXLCZ (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 24 Jul 2020 07:02:25 -0400
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 06OAWe9M025926;
-        Fri, 24 Jul 2020 07:02:17 -0400
-Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com [159.122.73.71])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 32fhu02cp3-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 24 Jul 2020 07:02:17 -0400
-Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
-        by ppma02fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 06OB08dR022597;
-        Fri, 24 Jul 2020 11:02:15 GMT
-Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
-        by ppma02fra.de.ibm.com with ESMTP id 32brq7x5wq-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 24 Jul 2020 11:02:14 +0000
-Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
-        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 06OB2C1540763422
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 24 Jul 2020 11:02:12 GMT
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id DADF211C04C;
-        Fri, 24 Jul 2020 11:02:11 +0000 (GMT)
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 7031811C054;
-        Fri, 24 Jul 2020 11:02:09 +0000 (GMT)
-Received: from [9.199.32.41] (unknown [9.199.32.41])
-        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Fri, 24 Jul 2020 11:02:09 +0000 (GMT)
-Subject: Re: [v3 13/15] tools/perf: Add perf tools support for extended
- register capability in powerpc
-To:     Athira Rajeev <atrajeev@linux.vnet.ibm.com>
-Cc:     mpe@ellerman.id.au, ego@linux.vnet.ibm.com, mikey@neuling.org,
-        maddy@linux.vnet.ibm.com, kvm@vger.kernel.org,
-        kvm-ppc@vger.kernel.org, svaidyan@in.ibm.com, acme@kernel.org,
-        jolsa@kernel.org, linuxppc-dev@lists.ozlabs.org,
-        Ravi Bangoria <ravi.bangoria@linux.ibm.com>
-References: <1594996707-3727-1-git-send-email-atrajeev@linux.vnet.ibm.com>
- <1594996707-3727-14-git-send-email-atrajeev@linux.vnet.ibm.com>
-From:   Ravi Bangoria <ravi.bangoria@linux.ibm.com>
-Message-ID: <7fcf405f-440a-19dc-7c3a-33fc52c9d1ef@linux.ibm.com>
-Date:   Fri, 24 Jul 2020 16:32:08 +0530
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        id S1727051AbgGXLCp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 24 Jul 2020 07:02:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42946 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726953AbgGXLCo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 24 Jul 2020 07:02:44 -0400
+Received: from mail-pj1-x1042.google.com (mail-pj1-x1042.google.com [IPv6:2607:f8b0:4864:20::1042])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AF975C0619D3;
+        Fri, 24 Jul 2020 04:02:44 -0700 (PDT)
+Received: by mail-pj1-x1042.google.com with SMTP id k5so5044236pjg.3;
+        Fri, 24 Jul 2020 04:02:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=FfesR7ZT5qXcTi29yTDLUUd3CkRzbDIr3gddgJd2pEA=;
+        b=ULjTfKn6wgQjuRYnfk8arHeojc4it0s3Z02NGt8se0n375u4P9/6ZpQJaMQDGIFQKn
+         btV9lnLarheBlK4BIPbxANr+sZ7BTv5TU0gO5NhHRd9pqUhIxsM7Q+9Ez+hO1TKrIaDY
+         YWBOHIiQsEknnUh5tqbM2HZECVwUOcuRt68ouJQ9v60+H/lmbbIDZ+TPQD9iKtNeJpLc
+         f/aqzZ85NGNeLoJFJSBfgXRMPqCap5M6gGuD+wwiNz+fkLXoRHudH3NBGakI1i88uEDp
+         9WJ0dubTZAkauBJUhVfRi+Vc2/0TPmN/RrALdDQXtGNspj61LV7p3qiwsHVEzSz0zE/d
+         0chA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=FfesR7ZT5qXcTi29yTDLUUd3CkRzbDIr3gddgJd2pEA=;
+        b=OdIKUDZ1ghyldwhaWiPpZMLWXBndywxlz3UaZYmfLdv1Q2bFvNmKMNVa2qRowNZAGA
+         Pl8n4DAQfD5/Xe1/SMhEzdUK/Dc/SY9KPh97THGx/L6DWmBYZXb3epAeqGSUGJ0CTRDr
+         2tLS71MxgVNMzm686vCvsc7wfeixik6RzMyoP5f8dgrIO+r9VENehXwxP1MWzl+v/T7L
+         aduL1YzOA3R1Gra7YN1bdbuu7hDtGYzpfedDbAX6mMu3GtBSU3WKcBs4gNdQ0FLn3YZz
+         ZS4bpzB045twPbaxJnpF2eYWgnumeOu+6mP/WdlxBLfcmrtxLyLxDCQHXiXLZBOkCfTk
+         a3gw==
+X-Gm-Message-State: AOAM530JETJ23Jt64sIAjGB1uPYJX3pKcESc/WRTf0h5c56mkE/pQvlt
+        +e3oM1la2cDyIyrHrzeTvSVG31fGT+NP+7Jl4Zs=
+X-Google-Smtp-Source: ABdhPJwYcmTO2+w+O+IAx4ADzupDHHlyAIJOZJ9tCjeFSztHK+LtA282fIxvP10WiGCMf0PxilSuIy5I/vXfX09D5BY=
+X-Received: by 2002:a17:902:8491:: with SMTP id c17mr7580569plo.262.1595588563901;
+ Fri, 24 Jul 2020 04:02:43 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <1594996707-3727-14-git-send-email-atrajeev@linux.vnet.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
- definitions=2020-07-24_03:2020-07-24,2020-07-24 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 mlxscore=0
- impostorscore=0 mlxlogscore=811 spamscore=0 suspectscore=0 malwarescore=0
- priorityscore=1501 adultscore=0 lowpriorityscore=0 phishscore=0
- clxscore=1011 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2006250000 definitions=main-2007240080
+References: <20200724105600.10814-1-giovanni.cabiddu@intel.com>
+In-Reply-To: <20200724105600.10814-1-giovanni.cabiddu@intel.com>
+From:   Andy Shevchenko <andy.shevchenko@gmail.com>
+Date:   Fri, 24 Jul 2020 14:02:27 +0300
+Message-ID: <CAHp75VduFnt=5eBiyUgV-B+Kes-JgkKvxMQ_YQOCGv4j5=qx6g@mail.gmail.com>
+Subject: Re: [PATCH v5 0/5] vfio/pci: add denylist and disable qat
+To:     Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+Cc:     Alex Williamson <alex.williamson@redhat.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Cornelia Huck <cohuck@redhat.com>, nhorman@redhat.com,
+        vdronov@redhat.com, Bjorn Helgaas <bhelgaas@google.com>,
+        mark.a.chambers@intel.com, gordon.mcfadden@intel.com,
+        ahsan.atta@intel.com, fiona.trahe@intel.com, qat-linux@intel.com,
+        "open list:VFIO DRIVER" <kvm@vger.kernel.org>,
+        linux-crypto <linux-crypto@vger.kernel.org>,
+        linux-pci <linux-pci@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Athira,
+On Fri, Jul 24, 2020 at 1:59 PM Giovanni Cabiddu
+<giovanni.cabiddu@intel.com> wrote:
+>
+> This patchset defines a denylist of devices in the vfio-pci module and ad=
+ds
+> the current generation of Intel(R) QuickAssist devices to it as they are
+> not designed to run in an untrusted environment.
+>
+> By default, if a device is in the denylist, the probe of vfio-pci fails.
+> If a user wants to use a device in the denylist, he needs to disable the
+> full denylist providing the option disable_denylist=3D1 at the load of
+> vfio-pci or specifying that parameter in a config file in /etc/modprobe.d=
+.
+>
+> This series also moves the device ids definitions present in the qat driv=
+er
+> to linux/pci_ids.h since they will be shared between the vfio-pci and the=
+ qat
+> drivers and replaces the custom ADF_SYSTEM_DEVICE macro with PCI_VDEVICE.
+>
+> The series is applicable to Herbert's tree. Patches 1 to 3 apply also to
+> Alex's tree (next). Patches 4 and 5 are optional and can be applied at a =
+later
+> stage.
 
-On 7/17/20 8:08 PM, Athira Rajeev wrote:
-> From: Anju T Sudhakar <anju@linux.vnet.ibm.com>
-> 
-> Add extended regs to sample_reg_mask in the tool side to use
-> with `-I?` option. Perf tools side uses extended mask to display
-> the platform supported register names (with -I? option) to the user
-> and also send this mask to the kernel to capture the extended registers
-> in each sample. Hence decide the mask value based on the processor
-> version.
-> 
-> Currently definitions for `mfspr`, `SPRN_PVR` are part of
-> `arch/powerpc/util/header.c`. Move this to a header file so that
-> these definitions can be re-used in other source files as well.
+Thanks!
+FWIW,
+Reviewed-by: Andy Shevchenko <andy.shevchenko@gmail.com>
 
-It seems this patch has a regression.
 
-Without this patch:
+> Changes from v4:
+>  - Patch #2: added Reviewed-by tag from Cornelia Huck
+>  - Patch #5: added Suggested-by tag as this change was suggested internal=
+ly
+>    by Andy Shevchenko
+>  - Patches 1-5: added Reviewed-by tag from Fiona Trahe
+>
+> Changes from v3:
+>  - Patch #1: included Acked-by tag, after ack from Bjorn Helgaas
+>  - Patch #2: s/prevents/allows/ in module parameter description
+>
+> Changes from v2:
+>  - Renamed blocklist in denylist
+>  - Patch #2: reworded module parameter description to clarify why a devic=
+e is
+>    in the denylist
+>  - Patch #2: reworded warning that occurs when denylist is enabled and de=
+vice
+>    is present in that list
+>
+> Changes from v1:
+>  - Reworked commit messages:
+>    Patches #1, #2 and #3: capitalized first character after column to com=
+ply to
+>    subject line convention
+>    Patch #3: Capitalized QAT acronym and added link and doc number for do=
+cument
+>    "Intel=C2=AE QuickAssist Technology (Intel=C2=AE QAT) Software for Lin=
+ux"
+>
+>
+> Giovanni Cabiddu (5):
+>   PCI: Add Intel QuickAssist device IDs
+>   vfio/pci: Add device denylist
+>   vfio/pci: Add QAT devices to denylist
+>   crypto: qat - replace device ids defines
+>   crypto: qat - use PCI_VDEVICE
+>
+>  drivers/crypto/qat/qat_c3xxx/adf_drv.c        | 11 ++---
+>  drivers/crypto/qat/qat_c3xxxvf/adf_drv.c      | 11 ++---
+>  drivers/crypto/qat/qat_c62x/adf_drv.c         | 11 ++---
+>  drivers/crypto/qat/qat_c62xvf/adf_drv.c       | 11 ++---
+>  .../crypto/qat/qat_common/adf_accel_devices.h |  6 ---
+>  drivers/crypto/qat/qat_common/qat_hal.c       |  7 +--
+>  drivers/crypto/qat/qat_common/qat_uclo.c      |  9 ++--
+>  drivers/crypto/qat/qat_dh895xcc/adf_drv.c     | 11 ++---
+>  drivers/crypto/qat/qat_dh895xccvf/adf_drv.c   | 11 ++---
+>  drivers/vfio/pci/vfio_pci.c                   | 48 +++++++++++++++++++
+>  include/linux/pci_ids.h                       |  6 +++
+>  11 files changed, 87 insertions(+), 55 deletions(-)
+>
+> --
+> 2.26.2
+>
 
-   $ sudo ./perf record -I
-   ^C[ perf record: Woken up 1 times to write data ]
-   [ perf record: Captured and wrote 0.458 MB perf.data (318 samples) ]
 
-With this patch:
-
-   $ sudo ./perf record -I
-   Error:
-   dummy:HG: PMU Hardware doesn't support sampling/overflow-interrupts. Try 'perf stat'
-
-Ravi
+--=20
+With Best Regards,
+Andy Shevchenko
