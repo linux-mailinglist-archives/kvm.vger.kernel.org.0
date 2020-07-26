@@ -2,31 +2,31 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 03E4422E0B6
-	for <lists+kvm@lfdr.de>; Sun, 26 Jul 2020 17:34:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B34B422E0B8
+	for <lists+kvm@lfdr.de>; Sun, 26 Jul 2020 17:34:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726669AbgGZPel (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 26 Jul 2020 11:34:41 -0400
+        id S1726887AbgGZPeo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 26 Jul 2020 11:34:44 -0400
 Received: from mga03.intel.com ([134.134.136.65]:17603 "EHLO mga03.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726065AbgGZPek (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 26 Jul 2020 11:34:40 -0400
-IronPort-SDR: 3JDtvrYbd/NB2XliehxKueJtDoi/xsVOwa1mKq9vuS13pWJLmh4Ho6zE4TeDncKhhB0itQbBxq
- Ya+Svp0Lyddg==
-X-IronPort-AV: E=McAfee;i="6000,8403,9694"; a="150890955"
+        id S1726065AbgGZPen (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 26 Jul 2020 11:34:43 -0400
+IronPort-SDR: ECY5LGkiLdUzWsO8mRFUWRz/kk3XSoYFko3mo3QIDVoS9P/Vz2NVKR4I2EXsTiVNrPnLzAmfpv
+ emf6YvGMJjTA==
+X-IronPort-AV: E=McAfee;i="6000,8403,9694"; a="150890960"
 X-IronPort-AV: E=Sophos;i="5.75,399,1589266800"; 
-   d="scan'208";a="150890955"
+   d="scan'208";a="150890960"
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jul 2020 08:34:40 -0700
-IronPort-SDR: rUbsBwb1OF0ZnNlTNb4A+AFbeSGDD2v84/a2gsxpeHuSNf5b1wETG6HQPgJe8c0Vgsbsb/kH6p
- phQhwRJNF7Fg==
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jul 2020 08:34:42 -0700
+IronPort-SDR: xBe0in7NsNEsZ7F3QCwY1vi0YOcZ1oSNWfNDlYpizimvoN59TFVVIOuZUpK5u4Z31jSsaE4Co5
+ 0wyQkgLgjfog==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.75,399,1589266800"; 
-   d="scan'208";a="303177494"
+   d="scan'208";a="303177505"
 Received: from sqa-gate.sh.intel.com (HELO clx-ap-likexu.tsp.org) ([10.239.48.212])
-  by orsmga002.jf.intel.com with ESMTP; 26 Jul 2020 08:34:37 -0700
+  by orsmga002.jf.intel.com with ESMTP; 26 Jul 2020 08:34:40 -0700
 From:   Like Xu <like.xu@linux.intel.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
@@ -35,10 +35,12 @@ Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Joerg Roedel <joro@8bytes.org>, linux-kernel@vger.kernel.org,
         Like Xu <like.xu@linux.intel.com>
-Subject: [PATCH v13 00/10] Guest Last Branch Recording Enabling (KVM part)
-Date:   Sun, 26 Jul 2020 23:32:18 +0800
-Message-Id: <20200726153229.27149-1-like.xu@linux.intel.com>
+Subject: [PATCH v13 01/10] KVM: x86: Move common set/get handler of MSR_IA32_DEBUGCTLMSR to VMX
+Date:   Sun, 26 Jul 2020 23:32:19 +0800
+Message-Id: <20200726153229.27149-2-like.xu@linux.intel.com>
 X-Mailer: git-send-email 2.21.3
+In-Reply-To: <20200726153229.27149-1-like.xu@linux.intel.com>
+References: <20200726153229.27149-1-like.xu@linux.intel.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
@@ -46,132 +48,92 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Paolo,
+SVM already has specific handlers of MSR_IA32_DEBUGCTLMSR in the
+svm_get/set_msr, so the x86 common part can be safely moved to VMX.
 
-Please review this new version for the Kernel 5.9 release, and
-Sean may not review them as he said in the previous email
-https://lore.kernel.org/kvm/20200710162819.GF1749@linux.intel.com/
+Add vmx_supported_debugctl() to refactor the throwing logic of #GP.
 
-You may cherry-pick the perf patches "3cb9d5464c1c..e1ad1ac2deb8"
-from the branch "tip/perf/core" of scm/linux/kernel/git/tip/tip.git
-as PeterZ said in the previous email
-https://lore.kernel.org/kvm/20200703075646.GJ117543@hirez.programming.kicks-ass.net/
-
-We may also apply the qemu-devel patch to the upstream qemu and try
-the QEMU command lines with '-cpu host' or '-cpu host,pmu=true,lbr=true'.
-
-The following error will be gone forever with the patchset:
-
-  $ perf record -b lbr ${WORKLOAD}
-  or $ perf record --call-graph lbr ${WORKLOAD}
-  Error:
-  cycles: PMU Hardware doesn't support sampling/overflow-interrupts. Try 'perf stat'
-
-Please check more details in each commit and feel free to test.
-
-v12->v13 Changelog:
-- remove perf patches since they're queued in the tip/perf/core;
-- add a minor patch to refactor MSR_IA32_DEBUGCTLMSR set/get handler;
-- add a minor patch to expose vmx_set_intercept_for_msr();
-- add a minor patch to initialize perf_capabilities in the intel_pmu_init();
-- spilt the big patch to three pieces (0004-0006) for better understanding and review
-- make the LBR_FMT exposure patch as the last step to enable guest LBR;
-
-Previous:
-https://lore.kernel.org/kvm/20200613080958.132489-1-like.xu@linux.intel.com/
-
+Signed-off-by: Like Xu <like.xu@linux.intel.com>
 ---
+ arch/x86/kvm/vmx/capabilities.h |  5 +++++
+ arch/x86/kvm/vmx/vmx.c          | 11 ++++++++---
+ arch/x86/kvm/x86.c              | 13 -------------
+ 3 files changed, 13 insertions(+), 16 deletions(-)
 
-The last branch recording (LBR) is a performance monitor unit (PMU)
-feature on Intel processors that records a running trace of the most
-recent branches taken by the processor in the LBR stack. This patch
-series is going to enable this feature for plenty of KVM guests.
-
-The user space could configure whether it's enabled or not for each
-guest via MSR_IA32_PERF_CAPABILITIES msr. As a first step, a guest
-could only enable LBR feature if its cpu model is the same as the
-host since the LBR feature is still one of model specific features.
-
-If it's enabled on the guest, the guest LBR driver would accesses the
-LBR MSR (including IA32_DEBUGCTLMSR and records MSRs) as host does.
-The first guest access on the LBR related MSRs is always interceptible.
-The KVM trap would create a special LBR event (called guest LBR event)
-which enables the callstack mode and none of hardware counter is assigned.
-The host perf would enable and schedule this event as usual. 
-
-Guest's first access to a LBR registers gets trapped to KVM, which
-creates a guest LBR perf event. It's a regular LBR perf event which gets
-the LBR facility assigned from the perf subsystem. Once that succeeds,
-the LBR stack msrs are passed through to the guest for efficient accesses.
-However, if another host LBR event comes in and takes over the LBR
-facility, the LBR msrs will be made interceptible, and guest following
-accesses to the LBR msrs will be trapped and meaningless. 
-
-Because saving/restoring tens of LBR MSRs (e.g. 32 LBR stack entries) in
-VMX transition brings too excessive overhead to frequent vmx transition
-itself, the guest LBR event would help save/restore the LBR stack msrs
-during the context switching with the help of native LBR event callstack
-mechanism, including LBR_SELECT msr.
-
-If the guest no longer accesses the LBR-related MSRs within a scheduling
-time slice and the LBR enable bit is unset, vPMU would release its guest
-LBR event as a normal event of a unused vPMC and the pass-through
-state of the LBR stack msrs would be canceled.
-
----
-
-LBR testcase:
-echo 1 > /proc/sys/kernel/watchdog
-echo 25 > /proc/sys/kernel/perf_cpu_time_max_percent
-echo 5000 > /proc/sys/kernel/perf_event_max_sample_rate
-echo 0 > /proc/sys/kernel/perf_cpu_time_max_percent
-./perf record -b ./br_instr a
-
-- Perf report on the host:
-Samples: 72K of event 'cycles', Event count (approx.): 72512
-Overhead  Command   Source Shared Object           Source Symbol                           Target Symbol                           Basic Block Cycles
-  12.12%  br_instr  br_instr                       [.] cmp_end                             [.] lfsr_cond                           1
-  11.05%  br_instr  br_instr                       [.] lfsr_cond                           [.] cmp_end                             5
-   8.81%  br_instr  br_instr                       [.] lfsr_cond                           [.] cmp_end                             4
-   5.04%  br_instr  br_instr                       [.] cmp_end                             [.] lfsr_cond                           20
-   4.92%  br_instr  br_instr                       [.] lfsr_cond                           [.] cmp_end                             6
-   4.88%  br_instr  br_instr                       [.] cmp_end                             [.] lfsr_cond                           6
-   4.58%  br_instr  br_instr                       [.] cmp_end                             [.] lfsr_cond                           5
-
-- Perf report on the guest:
-Samples: 92K of event 'cycles', Event count (approx.): 92544
-Overhead  Command   Source Shared Object  Source Symbol                                   Target Symbol                                   Basic Block Cycles
-  12.03%  br_instr  br_instr              [.] cmp_end                                     [.] lfsr_cond                                   1
-  11.09%  br_instr  br_instr              [.] lfsr_cond                                   [.] cmp_end                                     5
-   8.57%  br_instr  br_instr              [.] lfsr_cond                                   [.] cmp_end                                     4
-   5.08%  br_instr  br_instr              [.] lfsr_cond                                   [.] cmp_end                                     6
-   5.06%  br_instr  br_instr              [.] cmp_end                                     [.] lfsr_cond                                   20
-   4.87%  br_instr  br_instr              [.] cmp_end                                     [.] lfsr_cond                                   6
-   4.70%  br_instr  br_instr              [.] cmp_end                                     [.] lfsr_cond                                   5
-
-Conclusion: the profiling results on the guest are similar to that on the host.
-
-Like Xu (10):
-  KVM: x86: Move common set/get handler of MSR_IA32_DEBUGCTLMSR to VMX
-  KVM: x86/vmx: Make vmx_set_intercept_for_msr() non-static and expose it
-  KVM: vmx/pmu: Initialize vcpu perf_capabilities once in intel_pmu_init()
-  KVM: vmx/pmu: Clear PMU_CAP_LBR_FMT when guest LBR is disabled
-  KVM: vmx/pmu: Create a guest LBR event when vcpu sets DEBUGCTLMSR_LBR
-  KVM: vmx/pmu: Pass-through LBR msrs to when the guest LBR event is ACTIVE
-  KVM: vmx/pmu: Reduce the overhead of LBR pass-through or cancellation
-  KVM: vmx/pmu: Emulate legacy freezing LBRs on virtual PMI
-  KVM: vmx/pmu: Expose LBR_FMT in the MSR_IA32_PERF_CAPABILITIES
-  KVM: vmx/pmu: Release guest LBR event via lazy release mechanism
-
- arch/x86/kvm/pmu.c              |  12 +-
- arch/x86/kvm/pmu.h              |   5 +
- arch/x86/kvm/vmx/capabilities.h |  22 ++-
- arch/x86/kvm/vmx/pmu_intel.c    | 296 +++++++++++++++++++++++++++++++-
- arch/x86/kvm/vmx/vmx.c          |  44 ++++-
- arch/x86/kvm/vmx/vmx.h          |  28 +++
- arch/x86/kvm/x86.c              |  15 +-
- 7 files changed, 395 insertions(+), 27 deletions(-)
-
+diff --git a/arch/x86/kvm/vmx/capabilities.h b/arch/x86/kvm/vmx/capabilities.h
+index 4bbd8b448d22..c199885af7c7 100644
+--- a/arch/x86/kvm/vmx/capabilities.h
++++ b/arch/x86/kvm/vmx/capabilities.h
+@@ -378,4 +378,9 @@ static inline u64 vmx_get_perf_capabilities(void)
+ 	return PMU_CAP_FW_WRITES;
+ }
+ 
++static inline u64 vmx_supported_debugctl(void)
++{
++	return DEBUGCTLMSR_LBR | DEBUGCTLMSR_BTF;
++}
++
+ #endif /* __KVM_X86_VMX_CAPS_H */
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index 1bb59ae5016d..dcde73a230c6 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -1956,6 +1956,9 @@ static int vmx_get_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+ 		    !guest_cpuid_has(vcpu, X86_FEATURE_RDTSCP))
+ 			return 1;
+ 		goto find_shared_msr;
++	case MSR_IA32_DEBUGCTLMSR:
++		msr_info->data = 0;
++		break;
+ 	default:
+ 	find_shared_msr:
+ 		msr = find_msr_entry(vmx, msr_info->index);
+@@ -2034,9 +2037,11 @@ static int vmx_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+ 						VM_EXIT_SAVE_DEBUG_CONTROLS)
+ 			get_vmcs12(vcpu)->guest_ia32_debugctl = data;
+ 
+-		ret = kvm_set_msr_common(vcpu, msr_info);
+-		break;
+-
++		if (data & ~vmx_supported_debugctl())
++			return 1;
++		vcpu_unimpl(vcpu, "%s: MSR_IA32_DEBUGCTLMSR 0x%llx, nop\n",
++			    __func__, data);
++		return 0;
+ 	case MSR_IA32_BNDCFGS:
+ 		if (!kvm_mpx_supported() ||
+ 		    (!msr_info->host_initiated &&
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 95ef62922869..c79953b49c77 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -2897,18 +2897,6 @@ int kvm_set_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+ 			return 1;
+ 		}
+ 		break;
+-	case MSR_IA32_DEBUGCTLMSR:
+-		if (!data) {
+-			/* We support the non-activated case already */
+-			break;
+-		} else if (data & ~(DEBUGCTLMSR_LBR | DEBUGCTLMSR_BTF)) {
+-			/* Values other than LBR and BTF are vendor-specific,
+-			   thus reserved and should throw a #GP */
+-			return 1;
+-		}
+-		vcpu_unimpl(vcpu, "%s: MSR_IA32_DEBUGCTLMSR 0x%llx, nop\n",
+-			    __func__, data);
+-		break;
+ 	case 0x200 ... 0x2ff:
+ 		return kvm_mtrr_set_msr(vcpu, msr, data);
+ 	case MSR_IA32_APICBASE:
+@@ -3167,7 +3155,6 @@ int kvm_get_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+ 	switch (msr_info->index) {
+ 	case MSR_IA32_PLATFORM_ID:
+ 	case MSR_IA32_EBL_CR_POWERON:
+-	case MSR_IA32_DEBUGCTLMSR:
+ 	case MSR_IA32_LASTBRANCHFROMIP:
+ 	case MSR_IA32_LASTBRANCHTOIP:
+ 	case MSR_IA32_LASTINTFROMIP:
 -- 
 2.21.3
 
