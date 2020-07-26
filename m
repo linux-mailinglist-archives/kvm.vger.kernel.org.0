@@ -2,53 +2,53 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E02AC22DF61
-	for <lists+kvm@lfdr.de>; Sun, 26 Jul 2020 14:57:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D71D722DF68
+	for <lists+kvm@lfdr.de>; Sun, 26 Jul 2020 14:59:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726980AbgGZM5a (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 26 Jul 2020 08:57:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56168 "EHLO
+        id S1727906AbgGZM7K (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 26 Jul 2020 08:59:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56424 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726711AbgGZM5a (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 26 Jul 2020 08:57:30 -0400
-Received: from mail-wm1-x341.google.com (mail-wm1-x341.google.com [IPv6:2a00:1450:4864:20::341])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E49F4C0619D4
-        for <kvm@vger.kernel.org>; Sun, 26 Jul 2020 05:57:29 -0700 (PDT)
-Received: by mail-wm1-x341.google.com with SMTP id k20so4491381wmi.5
-        for <kvm@vger.kernel.org>; Sun, 26 Jul 2020 05:57:29 -0700 (PDT)
+        with ESMTP id S1726455AbgGZM7K (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 26 Jul 2020 08:59:10 -0400
+Received: from mail-wr1-x441.google.com (mail-wr1-x441.google.com [IPv6:2a00:1450:4864:20::441])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F20A8C0619D2
+        for <kvm@vger.kernel.org>; Sun, 26 Jul 2020 05:59:09 -0700 (PDT)
+Received: by mail-wr1-x441.google.com with SMTP id z18so8689351wrm.12
+        for <kvm@vger.kernel.org>; Sun, 26 Jul 2020 05:59:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=brainfault-org.20150623.gappssmtp.com; s=20150623;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=cj1AA+QajmRenSwYh/8g5RjvZ+1Kfi4azWkbk5rVJMY=;
-        b=l4ouuUm+RZKjkDPNsYC7yAU3y2YJaYqK7fRoN7KnpfYrRUJXIdaNeqJraLDSLj+Hsq
-         DoCjcYHNOPx4wQ8IoFKBY8oXq+gP6wlJ5S/+4ZJRUZe7F+op3/uY4m7z1/B2VnkOgD5m
-         t2uIGFEk+6v+lJhjcexw3MSjbYwv9XzgPyuSk2nG7+0gRoCIhPcpMUQxBQ0CXJeMW7Bq
-         Pj3YcVraJh5zWRzVM0CLCI1eEwZtk2hlU89S/EKMlfBzmwOSdLrkBcQe9JB7QgVZ03Q+
-         zeks5A6Odx9k1ILsGYWcElYbzhHbp57Sf/ChsiYlNzHYRcSM26Z/AA8OZ33WJhBEDIgd
-         p68A==
+        bh=aJ0QTk1kAr2FXG3tNKxMDTj3E6xC0tBqD5CEm/p3JFE=;
+        b=e3qylBuPPyd36kYi09rS61kEhLJtEb/XiQOym4M3xymiMBeoHEsRYf7Cl7PEyEpyzg
+         c6RjEdgiKjPRk80f99amxldvIWn8kAn2HrIK+4WB97VzHtKsfAq4IidLgJqkLaPb8vf2
+         lgOrGq2sfuOHdd2NQeeywpEG7BhiYWAOtFlnHV9PhGwA855BfYE19uhn8Cud4Mvvd23l
+         pKb4vFdCWBWOzwXwFnKBv/Wod/PlT0wyvHouPqYCoQQpUfqTUYylmYyoq5AYUZC3dbBp
+         LxEonSSWb6BKqUxWs+cLg65BjTqzXH6n5wq0JqZqrEzIBxAzVyPpSfVirsjtlJylWK0p
+         256A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=cj1AA+QajmRenSwYh/8g5RjvZ+1Kfi4azWkbk5rVJMY=;
-        b=RqJjg0vDSGd+pH9i/GIA51KQIQ43oQOmqGTKL587HqLZVzyApUEVqEPOFvTeU9E4cT
-         zMAaQyNqJ26NeURuKbNQStEcYlM3oq7qtU/2xyxkDokmg3fzESf0r+GQ8jUHlqnhw6SY
-         0X8JOqkLotevJkhYjoGlYtW0xULzeCyuBmZyeywnXFIRPXufF2BoI8YsnP5hGDd1NU1c
-         CzZ0jggLx0cXEXS5uU90QUs3GnEoBNzo9ph6IU/Iow9H/VPc4yTqj4ezKnBnkNb9eksS
-         /apAmMOFBfLMJG6B9a3nv6KkWoUkOzHDUBquCBhrxv5HWBwbkfcSqkXIY3jnel/j30n8
-         y/3g==
-X-Gm-Message-State: AOAM532P7ig1sqa9gFyJVnepEgLMoQqnOEZSQQYoPkkVhEvhc0Iv3R4G
-        xE0cmqlICMOmVDu/vAMUAKXy39NVH3crvy1/WdvG/g==
-X-Google-Smtp-Source: ABdhPJwiFhCYXoqV5R1BrUk4cFAFcu/0v8ywSpRptTToyE31Qt/lRbVUr0NbxhMSfFzTA3SQmpsU/BUW05YZkVeyxhw=
-X-Received: by 2002:a1c:5f41:: with SMTP id t62mr17178624wmb.134.1595768248343;
- Sun, 26 Jul 2020 05:57:28 -0700 (PDT)
+        bh=aJ0QTk1kAr2FXG3tNKxMDTj3E6xC0tBqD5CEm/p3JFE=;
+        b=sEYWqelPu42OfEcT0RJ9/XH9Fgsc7vZ6/ODcZMwDHXP8BH5un/hTsbOe5RCRzJx71b
+         PdP2CfZYUbFJFE1aEIMF5+GAm2IfaEq0qgdhBo21uC73oBSRBF2fp5QTU2z22xgXNAIR
+         HX2KNWzBQYdiYOxgKRsJMVPnzQwD8C1K/onFi5T0LTNlgxEituQMGXfSVwGRR5mI+WHF
+         w2p47YTigZWgn4/egz8tYMNIEQGjGfYcMxD3K79aMqKJWOQdrY+4WFHWe1EEIueeWURW
+         GoTp2JXmKh9HFmtEqQtx1WIYmaVigSrb0+d6mWSuylfPKRMEXCaigLG+i0x4UUmHNZ7M
+         GuNQ==
+X-Gm-Message-State: AOAM53227Vs2QFUbvWDqYXK/SXCra2mOBlnugibJNex4zHMIZeVeEuvE
+        ux7P57tzDj9e/ZwhWk9wR2LzwIq1bZwiyPmWVe7nvg==
+X-Google-Smtp-Source: ABdhPJwkwpK6Km+ushc9A1CmJalY7YDxkaZpWvaeV6P1vmcPyklRXsQahQs5E1vm5UD0ctxrGufZWxwQaQTBXHNbh18=
+X-Received: by 2002:adf:f186:: with SMTP id h6mr16468220wro.144.1595768348627;
+ Sun, 26 Jul 2020 05:59:08 -0700 (PDT)
 MIME-Version: 1.0
 References: <20200724085441.1514-1-jiangyifei@huawei.com> <20200724085441.1514-3-jiangyifei@huawei.com>
 In-Reply-To: <20200724085441.1514-3-jiangyifei@huawei.com>
 From:   Anup Patel <anup@brainfault.org>
-Date:   Sun, 26 Jul 2020 18:27:16 +0530
-Message-ID: <CAAhSdy3q3tNUqSxnFy2tdmXOLJZjt4rMAZirZh88-0BXT7-X1g@mail.gmail.com>
+Date:   Sun, 26 Jul 2020 18:28:57 +0530
+Message-ID: <CAAhSdy18+3ub9Lw+2v0WEujYkFJ2yU0x=GqZ+PQGe2DrWCR8Bg@mail.gmail.com>
 Subject: Re: [RFC 2/2] RISC-V: KVM: read\write kernel mmio device support
 To:     Yifei Jiang <jiangyifei@huawei.com>
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
@@ -70,6 +70,11 @@ Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
+
+Change subject to:
+RISC-V: KVM: kernel mmio read/write support
+
+Also add 1-2 sentences of commit description.
 
 On Fri, Jul 24, 2020 at 2:25 PM Yifei Jiang <jiangyifei@huawei.com> wrote:
 >
@@ -102,9 +107,6 @@ On Fri, Jul 24, 2020 at 2:25 PM Yifei Jiang <jiangyifei@huawei.com> wrote:
 > +       ret = kvm_io_bus_read(vcpu, KVM_MMIO_BUS, fault_addr, len,
 > +                                                 data_buf);
 > +
-
-Move "ret = kvm_io_bus_read()" just before "if (!ret)".
-
 >         run->mmio.is_write = false;
 >         run->mmio.phys_addr = fault_addr;
 >         run->mmio.len = len;
@@ -141,11 +143,6 @@ Move "ret = kvm_io_bus_read()" just before "if (!ret)".
 > +       ret = kvm_io_bus_write(vcpu, KVM_MMIO_BUS, fault_addr, len,
 > +                                                  run->mmio.data);
 > +
-
-Same as above.
-
-Move "ret = kvm_io_bus_write()" just before "if (!ret) {"
-
 >         run->mmio.is_write = true;
 >         run->mmio.phys_addr = fault_addr;
 >         run->mmio.len = len;
