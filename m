@@ -2,55 +2,54 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A8DAC22DF2C
-	for <lists+kvm@lfdr.de>; Sun, 26 Jul 2020 14:48:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E02AC22DF61
+	for <lists+kvm@lfdr.de>; Sun, 26 Jul 2020 14:57:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727794AbgGZMsw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 26 Jul 2020 08:48:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54816 "EHLO
+        id S1726980AbgGZM5a (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 26 Jul 2020 08:57:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56168 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726937AbgGZMsw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 26 Jul 2020 08:48:52 -0400
-Received: from mail-wm1-x343.google.com (mail-wm1-x343.google.com [IPv6:2a00:1450:4864:20::343])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D1F7BC0619D2
-        for <kvm@vger.kernel.org>; Sun, 26 Jul 2020 05:48:51 -0700 (PDT)
-Received: by mail-wm1-x343.google.com with SMTP id f18so12150291wml.3
-        for <kvm@vger.kernel.org>; Sun, 26 Jul 2020 05:48:51 -0700 (PDT)
+        with ESMTP id S1726711AbgGZM5a (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 26 Jul 2020 08:57:30 -0400
+Received: from mail-wm1-x341.google.com (mail-wm1-x341.google.com [IPv6:2a00:1450:4864:20::341])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E49F4C0619D4
+        for <kvm@vger.kernel.org>; Sun, 26 Jul 2020 05:57:29 -0700 (PDT)
+Received: by mail-wm1-x341.google.com with SMTP id k20so4491381wmi.5
+        for <kvm@vger.kernel.org>; Sun, 26 Jul 2020 05:57:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=brainfault-org.20150623.gappssmtp.com; s=20150623;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=rCLczGQIxWKiTkxHU6NiarIhxc9Z+JmjQxED80qEJss=;
-        b=gwsElXHX2E2bUDww3ab3IoZnn76R5AZW2fLMad++U/SfNz2BQysjn9tmQWLc68si09
-         vjvfu12vgyKudVHKrUiZ5jfldqlKc8Wj28ZbK0upIQvgG5/tXeW3EpZimmGZGW2ExcKJ
-         qP553zFfDrJdUvHw8f0LhdqsapqLZD7UtlzRre2tgNZMRe2O+1x8zy1B8/0hCRv1kHxv
-         YPkUSzFVgMQNOnLyjSHr+G4o/H9zQ9UtallmpbnPciV2SfNw8hqZ5/VHB4SBaosZh/vD
-         01OTENe/iN0DPo/jtmvNS4QD/YrdszGynX1Fb+bIQnmFxhzWGbsV1U1nzbekl4PX/7Qr
-         NIcg==
+        bh=cj1AA+QajmRenSwYh/8g5RjvZ+1Kfi4azWkbk5rVJMY=;
+        b=l4ouuUm+RZKjkDPNsYC7yAU3y2YJaYqK7fRoN7KnpfYrRUJXIdaNeqJraLDSLj+Hsq
+         DoCjcYHNOPx4wQ8IoFKBY8oXq+gP6wlJ5S/+4ZJRUZe7F+op3/uY4m7z1/B2VnkOgD5m
+         t2uIGFEk+6v+lJhjcexw3MSjbYwv9XzgPyuSk2nG7+0gRoCIhPcpMUQxBQ0CXJeMW7Bq
+         Pj3YcVraJh5zWRzVM0CLCI1eEwZtk2hlU89S/EKMlfBzmwOSdLrkBcQe9JB7QgVZ03Q+
+         zeks5A6Odx9k1ILsGYWcElYbzhHbp57Sf/ChsiYlNzHYRcSM26Z/AA8OZ33WJhBEDIgd
+         p68A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=rCLczGQIxWKiTkxHU6NiarIhxc9Z+JmjQxED80qEJss=;
-        b=lPADxVFvVmnxskBtIV3A8Xz2algEPkjMYmH2D6j706bdSaZWSbAnSTziv9Cb+7zeBE
-         3uaE0yaPXckrsXhaGN7I6dRrr/6WvAtKE4Bz/NeMgMbIfqxqZL+UfkDPZeFb1bXVf3PJ
-         uvwdC8GuN6mH8/hGvmAD0B8RZ8P3+XSSZrkJ5tggE33g+FgIQWbOeQF8qKKuXR36T6Ra
-         dfR4uA7VuGDxtNyL+AmJSWg4WJhMyO3aRJ4wocmvPk7oQM0X7MNM4tXXsp4iA9m6v/GI
-         olcAP7mdM9GNFBiItXw4CstOKoruUmknXJAwhMA7PdeB8iCNQwCbyBs/JCRpA/3vPI5/
-         bAWw==
-X-Gm-Message-State: AOAM532r3VEjBIt1VA2mL1cdtZEiUd6/HRCWpNNDZWGhhHFSISCzvZY4
-        HdyTmw49IFehee3SZTVLdpogFI5OSOpLRcIvMwndCTE4N0I=
-X-Google-Smtp-Source: ABdhPJwhqkhQturWmZRFMqSZv9GNE6rrK3X7LahzNQkb0Zo4Tkad6SpMIBWX4YYc/OAmqOhmFgHIsVezEkmX8Si7Pes=
-X-Received: by 2002:a1c:6689:: with SMTP id a131mr5266820wmc.157.1595767730427;
- Sun, 26 Jul 2020 05:48:50 -0700 (PDT)
+        bh=cj1AA+QajmRenSwYh/8g5RjvZ+1Kfi4azWkbk5rVJMY=;
+        b=RqJjg0vDSGd+pH9i/GIA51KQIQ43oQOmqGTKL587HqLZVzyApUEVqEPOFvTeU9E4cT
+         zMAaQyNqJ26NeURuKbNQStEcYlM3oq7qtU/2xyxkDokmg3fzESf0r+GQ8jUHlqnhw6SY
+         0X8JOqkLotevJkhYjoGlYtW0xULzeCyuBmZyeywnXFIRPXufF2BoI8YsnP5hGDd1NU1c
+         CzZ0jggLx0cXEXS5uU90QUs3GnEoBNzo9ph6IU/Iow9H/VPc4yTqj4ezKnBnkNb9eksS
+         /apAmMOFBfLMJG6B9a3nv6KkWoUkOzHDUBquCBhrxv5HWBwbkfcSqkXIY3jnel/j30n8
+         y/3g==
+X-Gm-Message-State: AOAM532P7ig1sqa9gFyJVnepEgLMoQqnOEZSQQYoPkkVhEvhc0Iv3R4G
+        xE0cmqlICMOmVDu/vAMUAKXy39NVH3crvy1/WdvG/g==
+X-Google-Smtp-Source: ABdhPJwiFhCYXoqV5R1BrUk4cFAFcu/0v8ywSpRptTToyE31Qt/lRbVUr0NbxhMSfFzTA3SQmpsU/BUW05YZkVeyxhw=
+X-Received: by 2002:a1c:5f41:: with SMTP id t62mr17178624wmb.134.1595768248343;
+ Sun, 26 Jul 2020 05:57:28 -0700 (PDT)
 MIME-Version: 1.0
-References: <20200724085441.1514-1-jiangyifei@huawei.com> <20200724085441.1514-2-jiangyifei@huawei.com>
-In-Reply-To: <20200724085441.1514-2-jiangyifei@huawei.com>
+References: <20200724085441.1514-1-jiangyifei@huawei.com> <20200724085441.1514-3-jiangyifei@huawei.com>
+In-Reply-To: <20200724085441.1514-3-jiangyifei@huawei.com>
 From:   Anup Patel <anup@brainfault.org>
-Date:   Sun, 26 Jul 2020 18:18:38 +0530
-Message-ID: <CAAhSdy08NEMR2jjJ-FVixyWMOpQ4+V-P9k2xuyO+Xu5OWKrmFQ@mail.gmail.com>
-Subject: Re: [RFC 1/2] RISC-V: KVM: enable ioeventfd capability and compile
- for risc-v
+Date:   Sun, 26 Jul 2020 18:27:16 +0530
+Message-ID: <CAAhSdy3q3tNUqSxnFy2tdmXOLJZjt4rMAZirZh88-0BXT7-X1g@mail.gmail.com>
+Subject: Re: [RFC 2/2] RISC-V: KVM: read\write kernel mmio device support
 To:     Yifei Jiang <jiangyifei@huawei.com>
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Paul Walmsley <paul.walmsley@sifive.com>,
@@ -72,66 +71,99 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Please change subject to:
-"RISC-V: KVM: enable ioeventfd capability"
-
-Also add 1-2 sentences of commit description.
-
 On Fri, Jul 24, 2020 at 2:25 PM Yifei Jiang <jiangyifei@huawei.com> wrote:
 >
 > Signed-off-by: Yifei Jiang <jiangyifei@huawei.com>
 > Signed-off-by: Mingwang Li <limingwang@huawei.com>
 > ---
->  arch/riscv/kvm/Kconfig  | 2 ++
->  arch/riscv/kvm/Makefile | 2 +-
->  arch/riscv/kvm/vm.c     | 1 +
->  3 files changed, 4 insertions(+), 1 deletion(-)
+>  arch/riscv/kvm/vcpu_exit.c | 38 ++++++++++++++++++++++++++++++++------
+>  1 file changed, 32 insertions(+), 6 deletions(-)
 >
-> diff --git a/arch/riscv/kvm/Kconfig b/arch/riscv/kvm/Kconfig
-> index 2356dc52ebb3..95d85d893ab6 100644
-> --- a/arch/riscv/kvm/Kconfig
-> +++ b/arch/riscv/kvm/Kconfig
-> @@ -4,6 +4,7 @@
->  #
+> diff --git a/arch/riscv/kvm/vcpu_exit.c b/arch/riscv/kvm/vcpu_exit.c
+> index e97ba96cb0ae..448f11179fa8 100644
+> --- a/arch/riscv/kvm/vcpu_exit.c
+> +++ b/arch/riscv/kvm/vcpu_exit.c
+> @@ -191,6 +191,8 @@ static int virtual_inst_fault(struct kvm_vcpu *vcpu, struct kvm_run *run,
+>  static int emulate_load(struct kvm_vcpu *vcpu, struct kvm_run *run,
+>                         unsigned long fault_addr, unsigned long htinst)
+>  {
+> +       int ret;
+> +       u8 data_buf[8];
+>         unsigned long insn;
+>         int shift = 0, len = 0;
+>         struct kvm_cpu_trap utrap = { 0 };
+> @@ -272,19 +274,32 @@ static int emulate_load(struct kvm_vcpu *vcpu, struct kvm_run *run,
+>         vcpu->arch.mmio_decode.len = len;
+>         vcpu->arch.mmio_decode.return_handled = 0;
 >
->  source "virt/kvm/Kconfig"
-> +source "drivers/vhost/Kconfig"
+> -       /* Exit to userspace for MMIO emulation */
+> -       vcpu->stat.mmio_exit_user++;
+> -       run->exit_reason = KVM_EXIT_MMIO;
+> +       ret = kvm_io_bus_read(vcpu, KVM_MMIO_BUS, fault_addr, len,
+> +                                                 data_buf);
+> +
+
+Move "ret = kvm_io_bus_read()" just before "if (!ret)".
+
+>         run->mmio.is_write = false;
+>         run->mmio.phys_addr = fault_addr;
+>         run->mmio.len = len;
 >
->  menuconfig VIRTUALIZATION
->         bool "Virtualization"
-> @@ -26,6 +27,7 @@ config KVM
->         select KVM_MMIO
->         select HAVE_KVM_VCPU_ASYNC_IOCTL
->         select SRCU
-> +       select HAVE_KVM_EVENTFD
->         help
->           Support hosting virtualized guest machines.
+> +       if (!ret) {
+> +               /* We handled the access successfully in the kernel. */
+> +               memcpy(run->mmio.data, data_buf, len);
+> +               vcpu->stat.mmio_exit_kernel++;
+> +               kvm_riscv_vcpu_mmio_return(vcpu, run);
+> +               return 1;
+> +       }
+> +
+> +       /* Exit to userspace for MMIO emulation */
+> +       vcpu->stat.mmio_exit_user++;
+> +       run->exit_reason = KVM_EXIT_MMIO;
+> +
+>         return 0;
+>  }
 >
-> diff --git a/arch/riscv/kvm/Makefile b/arch/riscv/kvm/Makefile
-> index b56dc1650d2c..3ad46fe44900 100644
-> --- a/arch/riscv/kvm/Makefile
-> +++ b/arch/riscv/kvm/Makefile
-> @@ -2,7 +2,7 @@
->  # Makefile for RISC-V KVM support
->  #
+>  static int emulate_store(struct kvm_vcpu *vcpu, struct kvm_run *run,
+>                          unsigned long fault_addr, unsigned long htinst)
+>  {
+> +       int ret;
+>         u8 data8;
+>         u16 data16;
+>         u32 data32;
+> @@ -378,13 +393,24 @@ static int emulate_store(struct kvm_vcpu *vcpu, struct kvm_run *run,
+>                 return -ENOTSUPP;
+>         };
 >
-> -common-objs-y = $(addprefix ../../../virt/kvm/, kvm_main.o coalesced_mmio.o)
-> +common-objs-y = $(addprefix ../../../virt/kvm/, kvm_main.o coalesced_mmio.o eventfd.o)
+> -       /* Exit to userspace for MMIO emulation */
+> -       vcpu->stat.mmio_exit_user++;
+> -       run->exit_reason = KVM_EXIT_MMIO;
+> +       ret = kvm_io_bus_write(vcpu, KVM_MMIO_BUS, fault_addr, len,
+> +                                                  run->mmio.data);
+> +
+
+Same as above.
+
+Move "ret = kvm_io_bus_write()" just before "if (!ret) {"
+
+>         run->mmio.is_write = true;
+>         run->mmio.phys_addr = fault_addr;
+>         run->mmio.len = len;
 >
->  ccflags-y := -Ivirt/kvm -Iarch/riscv/kvm
+> +       if (!ret) {
+> +               /* We handled the access successfully in the kernel. */
+> +               vcpu->stat.mmio_exit_kernel++;
+> +               kvm_riscv_vcpu_mmio_return(vcpu, run);
+> +               return 1;
+> +       }
+> +
+> +       /* Exit to userspace for MMIO emulation */
+> +       vcpu->stat.mmio_exit_user++;
+> +       run->exit_reason = KVM_EXIT_MMIO;
+> +
+>         return 0;
+>  }
 >
-> diff --git a/arch/riscv/kvm/vm.c b/arch/riscv/kvm/vm.c
-> index 4f2498198cb5..473299e71f68 100644
-> --- a/arch/riscv/kvm/vm.c
-> +++ b/arch/riscv/kvm/vm.c
-> @@ -52,6 +52,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
->         int r;
->
->         switch (ext) {
-> +       case KVM_CAP_IOEVENTFD:
->         case KVM_CAP_DEVICE_CTRL:
->         case KVM_CAP_USER_MEMORY:
->         case KVM_CAP_SYNC_MMU:
 > --
 > 2.19.1
 >
