@@ -2,101 +2,115 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 530B222F308
-	for <lists+kvm@lfdr.de>; Mon, 27 Jul 2020 16:52:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DB29522F344
+	for <lists+kvm@lfdr.de>; Mon, 27 Jul 2020 17:02:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729571AbgG0Ov4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 27 Jul 2020 10:51:56 -0400
-Received: from szxga04-in.huawei.com ([45.249.212.190]:8830 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727032AbgG0Ovz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 27 Jul 2020 10:51:55 -0400
-Received: from DGGEMS414-HUB.china.huawei.com (unknown [172.30.72.59])
-        by Forcepoint Email with ESMTP id 1CF99BE30548D6D8FEA0;
-        Mon, 27 Jul 2020 22:51:52 +0800 (CST)
-Received: from [127.0.0.1] (10.174.186.173) by DGGEMS414-HUB.china.huawei.com
- (10.3.19.214) with Microsoft SMTP Server id 14.3.487.0; Mon, 27 Jul 2020
- 22:51:43 +0800
-Subject: Re: [RESEND RFC PATCH v1] arm64: kvm: flush tlbs by range in
- unmap_stage2_range function
-To:     Marc Zyngier <maz@kernel.org>
-CC:     <james.morse@arm.com>, <julien.thierry.kdev@gmail.com>,
-        <suzuki.poulose@arm.com>, <catalin.marinas@arm.com>,
-        <will@kernel.org>, <steven.price@arm.com>, <mark.rutland@arm.com>,
-        <ascull@google.com>, <kvm@vger.kernel.org>,
-        <kvmarm@lists.cs.columbia.edu>,
-        <linux-arm-kernel@lists.infradead.org>,
-        <linux-kernel@vger.kernel.org>, <linux-arch@vger.kernel.org>,
-        <linux-mm@kvack.org>, <arm@kernel.org>, <xiexiangyou@huawei.com>
-References: <20200724134315.805-1-yezhenyu2@huawei.com>
- <5d54c860b3b4e7a98e4d53397e6424ae@kernel.org>
-From:   Zhenyu Ye <yezhenyu2@huawei.com>
-Message-ID: <f74277fd-5af2-c46f-169f-c15a321165cd@huawei.com>
-Date:   Mon, 27 Jul 2020 22:51:41 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.3.0
+        id S1729967AbgG0PCU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 27 Jul 2020 11:02:20 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:28552 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726983AbgG0PCT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 27 Jul 2020 11:02:19 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1595862138;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=bsciqIa8fXOddHPzcAGR7K9op1vJPoheDHoXbCvop18=;
+        b=N4SnhlWRxkL0pxKdXw/lmv4SD/q0dgut9FI4OZumkCQa3Sfe9qvBI/scmNkwpDSXgQ3+3N
+        dmCPOJPXZ+ZKIgLR6STG2yIYRs2zZNsep2QqVbcLmSz8mwj6o04HDXyXyXHbPzC+blys2U
+        dpGXeRWxWOcn4dVdpYmAmfTDPtnxG0I=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-324-rFIiD02OPoaGU8VroFhj_A-1; Mon, 27 Jul 2020 11:02:13 -0400
+X-MC-Unique: rFIiD02OPoaGU8VroFhj_A-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3C2308017FB;
+        Mon, 27 Jul 2020 15:02:11 +0000 (UTC)
+Received: from work-vm (ovpn-114-135.ams2.redhat.com [10.36.114.135])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 89DDF5D9E8;
+        Mon, 27 Jul 2020 15:02:00 +0000 (UTC)
+Date:   Mon, 27 Jul 2020 16:01:57 +0100
+From:   "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To:     David Gibson <david@gibson.dropbear.id.au>
+Cc:     frankja@linux.ibm.com, pair@us.ibm.com, qemu-devel@nongnu.org,
+        pbonzini@redhat.com, brijesh.singh@amd.com, ehabkost@redhat.com,
+        marcel.apfelbaum@gmail.com, "Michael S. Tsirkin" <mst@redhat.com>,
+        qemu-ppc@nongnu.org, kvm@vger.kernel.org, pasic@linux.ibm.com,
+        qemu-s390x@nongnu.org, David Hildenbrand <david@redhat.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Richard Henderson <rth@twiddle.net>,
+        Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
+        mdroth@linux.vnet.ibm.com, Thomas Huth <thuth@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>
+Subject: Re: [for-5.2 v4 08/10] spapr: PEF: block migration
+Message-ID: <20200727150157.GP3040@work-vm>
+References: <20200724025744.69644-1-david@gibson.dropbear.id.au>
+ <20200724025744.69644-9-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
-In-Reply-To: <5d54c860b3b4e7a98e4d53397e6424ae@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.174.186.173]
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200724025744.69644-9-david@gibson.dropbear.id.au>
+User-Agent: Mutt/1.14.5 (2020-06-23)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Marc,
-
-On 2020/7/26 1:40, Marc Zyngier wrote:
-> On 2020-07-24 14:43, Zhenyu Ye wrote:
->> Now in unmap_stage2_range(), we flush tlbs one by one just after the
->> corresponding pages cleared.  However, this may cause some performance
->> problems when the unmap range is very large (such as when the vm
->> migration rollback, this may cause vm downtime too loog).
+* David Gibson (david@gibson.dropbear.id.au) wrote:
+> We haven't yet implemented the fairly involved handshaking that will be
+> needed to migrate PEF protected guests.  For now, just use a migration
+> blocker so we get a meaningful error if someone attempts this (this is the
+> same approach used by AMD SEV).
 > 
-> You keep resending this patch, but you don't give any numbers
-> that would back your assertion.
-
-I have tested the downtime of vm migration rollback on arm64, and found
-the downtime could even take up to 7s.  Then I traced the cost of
-unmap_stage2_range() and found it could take a maximum of 1.2s.  The
-vm configuration is as follows (with high memory pressure, the dirty
-rate is about 500MB/s):
-
-  <memory unit='GiB'>192</memory>
-  <vcpu placement='static'>48</vcpu>
-  <memoryBacking>
-    <hugepages>
-      <page size='1' unit='GiB' nodeset='0'/>
-    </hugepages>
-  </memoryBacking>
-
-After this patch applied, the cost of unmap_stage2_range() can reduce to
-16ms, and VM downtime can be less than 1s.
-
-The following figure shows a clear comparison:
-
-	      |	vm downtime  |	cost of unmap_stage2_range()
---------------+--------------+----------------------------------
-before change |		7s   |		1200 ms
-after  change |		1s   |		  16 ms
---------------+--------------+----------------------------------
-
->> +
->> +    if ((end - start) >= 512 << (PAGE_SHIFT - 12)) {
->> +        __tlbi(vmalls12e1is);
+> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+> ---
+>  target/ppc/pef.c | 6 ++++++
+>  1 file changed, 6 insertions(+)
 > 
-> And what is this magic value based on? You don't even mention in the
-> commit log that you are taking this shortcut.
+> diff --git a/target/ppc/pef.c b/target/ppc/pef.c
+> index 53a6af0347..6a50efd580 100644
+> --- a/target/ppc/pef.c
+> +++ b/target/ppc/pef.c
+> @@ -36,6 +36,8 @@ struct PefGuestState {
+>      Object parent_obj;
+>  };
+>  
+> +static Error *pef_mig_blocker;
+> +
+>  static int pef_kvm_init(HostTrustLimitation *gmpo, Error **errp)
+>  {
+>      if (!kvm_check_extension(kvm_state, KVM_CAP_PPC_SECURE_GUEST)) {
+> @@ -52,6 +54,10 @@ static int pef_kvm_init(HostTrustLimitation *gmpo, Error **errp)
+>          }
+>      }
+>  
+> +    /* add migration blocker */
+> +    error_setg(&pef_mig_blocker, "PEF: Migration is not implemented");
+> +    migrate_add_blocker(pef_mig_blocker, &error_abort);
+> +
+
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+
+You might want that to be &error_fatal rather than error_abort; I think
+someone could trigger it just by using --only-migratable together with
+your pef device?
+
+(I previously asked whether this would trigger with -cpu host; I hadn't
+noticed this was based on the device rather than the CPU flag that said
+whether you had the feature)
+
+Dave
+
+>      return 0;
+>  }
+>  
+> -- 
+> 2.26.2
 > 
-
-
-If the page num is bigger than 512, flush all tlbs of this vm to avoid
-soft lock-ups on large TLB flushing ranges.  Just like what the
-flush_tlb_range() does.
-
-
-Thanks,
-Zhenyu
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
