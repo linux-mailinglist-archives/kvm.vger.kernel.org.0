@@ -2,154 +2,130 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8934622F4B0
-	for <lists+kvm@lfdr.de>; Mon, 27 Jul 2020 18:17:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 05A5D22F645
+	for <lists+kvm@lfdr.de>; Mon, 27 Jul 2020 19:12:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731550AbgG0QRG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 27 Jul 2020 12:17:06 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:57073 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1731548AbgG0QRE (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 27 Jul 2020 12:17:04 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1595866622;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=BsUwnhDK87WKgN3gqd90CcbtRyIxe05OQOcWAwl8fSE=;
-        b=AFoLLC2qS99U3G9pEMQhxwwf5A9rH4NoyCWBiy1jyRpZd30b82U905HQ+02H0kGXnabuUa
-        nFsAz8udCXgmwrz49sRt8rrqr/DNGI/8XVs6hbjfTtZ0Xp+NuZOjMDrYdux5V36cDeCgu/
-        HOUOAuz7dF1u98iQvCwbQHXLQLtpS14=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-67-onv0KavHMWGMq9CX_B4SUw-1; Mon, 27 Jul 2020 12:17:00 -0400
-X-MC-Unique: onv0KavHMWGMq9CX_B4SUw-1
-Received: by mail-wr1-f70.google.com with SMTP id d6so2552387wrv.23
-        for <kvm@vger.kernel.org>; Mon, 27 Jul 2020 09:16:59 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=BsUwnhDK87WKgN3gqd90CcbtRyIxe05OQOcWAwl8fSE=;
-        b=Mqrg07cIGhvYwsheqXwoDiSS2E4srK8dR8C6urFpr565dpRmW6EX2RyPb+yfljcmZI
-         Ue5zxeq4NEsB0wz53aH6mVPLZGPnain6QqCGzjgDIHK5kWiPHPDKg9k6Xqb3JLgGYFaW
-         enVgHkC8KEkYwuNXQx1mrCh4F0uwFFA7mTIMekZ3Tt90mztZxH0n/7NSHvBPFwSWhJJ/
-         MXoSSzZqQHF5dq0pg4ripqv8n1LWfmvxKlMqux9HxOGHegk1wXQlUcxT6UBjbV1D4HJi
-         EVHKUI9Mh9mTP6mZISkLZCPkKgeSGWwTSaCmRTc/gjp4Ccgt3a/5ZqA34cnNpd1DvPU2
-         3ZXQ==
-X-Gm-Message-State: AOAM5311f2XJbK8otv/FIOj46mLYrw9Mku8gNzSN0HtqeSk7DlGxWnQy
-        dLGQJM79cNQBz9ws5K5CnMDipZyOQLTRWXfUh/A+qXUDgE9I/to/f004E9Rbc3XF5IWBHjWZd6Y
-        SEnXhEvSLJRle
-X-Received: by 2002:a1c:6408:: with SMTP id y8mr84044wmb.52.1595866618759;
-        Mon, 27 Jul 2020 09:16:58 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxLKcAmtjP5qdwtcop3VZz69phHqUmhA/GYnUvT8EjsYnFf+2mjdi7w0x6HCc4EEuewJ9M+uA==
-X-Received: by 2002:a1c:6408:: with SMTP id y8mr84025wmb.52.1595866618480;
-        Mon, 27 Jul 2020 09:16:58 -0700 (PDT)
-Received: from [192.168.10.150] ([93.56.170.5])
-        by smtp.gmail.com with ESMTPSA id u66sm76686wmu.37.2020.07.27.09.16.57
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 27 Jul 2020 09:16:57 -0700 (PDT)
-Subject: Re: [PATCH] KVM: nVMX: properly pad struct kvm_vmx_nested_state_hdr
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>, linux-kernel@vger.kernel.org
-References: <20200713082824.1728868-1-vkuznets@redhat.com>
- <20200713151750.GA29901@linux.intel.com>
- <878sfntnoz.fsf@vitty.brq.redhat.com>
- <85fd54ff-01f5-0f1f-1bb7-922c740a37c1@redhat.com>
- <20200727154654.GA8675@linux.intel.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <5d50ea1e-f2a2-8aa9-1dd3-4cbca6c6f885@redhat.com>
-Date:   Mon, 27 Jul 2020 18:16:56 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.9.0
+        id S1728692AbgG0RMh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 27 Jul 2020 13:12:37 -0400
+Received: from mail.kernel.org ([198.145.29.99]:46178 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728045AbgG0RMh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 27 Jul 2020 13:12:37 -0400
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 9B562206E7;
+        Mon, 27 Jul 2020 17:12:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1595869956;
+        bh=WogOJT1SpSbDm9BIS5mq+VMEccrmGTd/fbEvNfTWPgM=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=lQ1Z9K59C8/AlkD1/eM/JwEqvlO7ySlctuRPoQqZ36nRK1Dy7JlBuq/54o4cIjEcD
+         cbn9dbymYVSeLmrss7+oAwKbKw0LEVhdVjYi0OVwO3tnBP+DzAKy8Wn2N0a0srie7z
+         DjhgZiDTdIYE3B13+xlYN3P1+D7OOQalV77YMcwg=
+Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
+        by disco-boy.misterjones.org with esmtpsa (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+        (Exim 4.92)
+        (envelope-from <maz@kernel.org>)
+        id 1k06fy-00FNOn-Va; Mon, 27 Jul 2020 18:12:35 +0100
 MIME-Version: 1.0
-In-Reply-To: <20200727154654.GA8675@linux.intel.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8;
+ format=flowed
+Content-Transfer-Encoding: 8bit
+Date:   Mon, 27 Jul 2020 18:12:34 +0100
+From:   Marc Zyngier <maz@kernel.org>
+To:     Zhenyu Ye <yezhenyu2@huawei.com>
+Cc:     james.morse@arm.com, julien.thierry.kdev@gmail.com,
+        suzuki.poulose@arm.com, catalin.marinas@arm.com, will@kernel.org,
+        steven.price@arm.com, mark.rutland@arm.com, ascull@google.com,
+        kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
+        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+        linux-arch@vger.kernel.org, linux-mm@kvack.org, arm@kernel.org,
+        xiexiangyou@huawei.com
+Subject: Re: [RESEND RFC PATCH v1] arm64: kvm: flush tlbs by range in
+ unmap_stage2_range function
+In-Reply-To: <f74277fd-5af2-c46f-169f-c15a321165cd@huawei.com>
+References: <20200724134315.805-1-yezhenyu2@huawei.com>
+ <5d54c860b3b4e7a98e4d53397e6424ae@kernel.org>
+ <f74277fd-5af2-c46f-169f-c15a321165cd@huawei.com>
+User-Agent: Roundcube Webmail/1.4.5
+Message-ID: <fb4756b58892fbc2022cf1f5b9320c27@kernel.org>
+X-Sender: maz@kernel.org
+X-SA-Exim-Connect-IP: 51.254.78.96
+X-SA-Exim-Rcpt-To: yezhenyu2@huawei.com, james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, catalin.marinas@arm.com, will@kernel.org, steven.price@arm.com, mark.rutland@arm.com, ascull@google.com, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org, linux-mm@kvack.org, arm@kernel.org, xiexiangyou@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 27/07/20 17:46, Sean Christopherson wrote:
->> It might as well send it now if the code didn't attempt to zero the
->> struct before filling it in (this is another good reason to use a
->> "flags" field to say what's been filled in).
-> The issue is that flags itself could hold garbage.
+Zhenyu,
+
+On 2020-07-27 15:51, Zhenyu Ye wrote:
+> Hi Marc,
 > 
-> https://lkml.kernel.org/r/20200713151750.GA29901@linux.intel.com
-
-Quoting from there:
-
-> Which means that userspace built for the old kernel will potentially send in
-> garbage for the new 'flags' field due to it being uninitialized stack data,
-> even with the layout after this patch.
-
-Userspace should always zero everything.  I don't think that the padding
-between fields is any different from the other bytes padding the header
-to 128 bytes.
-
->   struct kvm_vmx_nested_state_hdr hdr = {
->       .vmxon_pa = root,
->       .vmcs12_pa = vmcs12,
->   };
+> On 2020/7/26 1:40, Marc Zyngier wrote:
+>> On 2020-07-24 14:43, Zhenyu Ye wrote:
+>>> Now in unmap_stage2_range(), we flush tlbs one by one just after the
+>>> corresponding pages cleared.  However, this may cause some 
+>>> performance
+>>> problems when the unmap range is very large (such as when the vm
+>>> migration rollback, this may cause vm downtime too loog).
+>> 
+>> You keep resending this patch, but you don't give any numbers
+>> that would back your assertion.
 > 
-> QEMU won't see issues because it zero allocates the entire nested state.
+> I have tested the downtime of vm migration rollback on arm64, and found
+> the downtime could even take up to 7s.  Then I traced the cost of
+> unmap_stage2_range() and found it could take a maximum of 1.2s.  The
+> vm configuration is as follows (with high memory pressure, the dirty
+> rate is about 500MB/s):
 > 
-> All the above being said, after looking at the whole picture I think padding
-> the header is a moot point.  The header is padded out to 120 bytes[*] when
-> including in the full nested state, and KVM only ever consumes the header in
-> the context of the full nested state.  I.e. if there's garbage at offset 6,
-> odds are there's going to be garbage at offset 18, so internally padding the
-> header does nothing.
+>   <memory unit='GiB'>192</memory>
+>   <vcpu placement='static'>48</vcpu>
+>   <memoryBacking>
+>     <hugepages>
+>       <page size='1' unit='GiB' nodeset='0'/>
+>     </hugepages>
+>   </memoryBacking>
 
-Yes, that was what I was hinting at with "it might as well send it now"
-(i.e., after the patch).
+This means nothing to me, I'm afraid.
 
-(All of this is moot for userspace that just uses KVM_GET_NESTED_STATE
-and passes it back to KVM_SET_NESTED_STATE).
-
-> KVM should be checking that the unused bytes of (sizeof(pad) - sizeof(vmx/svm))
-> is zero if we want to expand into the padding in the future.  Right now we're
-> relying on userspace to zero allocate the struct without enforcing it.
-
-The alternative, which is almost as good, is to only use these extra
-fields which could be garbage if the flags are not set, and check the
-flags (see the patches I have sent earlier today).
-
-The chance of the flags passing the check will decrease over time as
-more flags are added; but the chance of having buggy userspace that
-sends down garbage also will.
-
-> [*] Amusing side note, the comment in the header is wrong.  It states "pad
->     the header to 128 bytes", but only pads it to 120 bytes, because union.
 > 
-> /* for KVM_CAP_NESTED_STATE */
-> struct kvm_nested_state {
-> 	__u16 flags;
-> 	__u16 format;
-> 	__u32 size;
+> After this patch applied, the cost of unmap_stage2_range() can reduce 
+> to
+> 16ms, and VM downtime can be less than 1s.
 > 
-> 	union {
-> 		struct kvm_vmx_nested_state_hdr vmx;
-> 		struct kvm_svm_nested_state_hdr svm;
+> The following figure shows a clear comparison:
 > 
-> 		/* Pad the header to 128 bytes.  */
-> 		__u8 pad[120];
-> 	} hdr;
+> 	      |	vm downtime  |	cost of unmap_stage2_range()
+> --------------+--------------+----------------------------------
+> before change |		7s   |		1200 ms
+> after  change |		1s   |		  16 ms
+> --------------+--------------+----------------------------------
 
-There are 8 bytes before the union, and it's not a coincidence. :)
-"Header" refers to the stuff before the data region.
+I don't see how you turn a 1.184s reduction into a 6s gain.
+Surely there is more to it than what you posted.
 
-> Odds are no real VMM will have issue given the dynamic size of struct
-> kvm_nested_state, but 
+>>> +
+>>> +    if ((end - start) >= 512 << (PAGE_SHIFT - 12)) {
+>>> +        __tlbi(vmalls12e1is);
+>> 
+>> And what is this magic value based on? You don't even mention in the
+>> commit log that you are taking this shortcut.
+>> 
+> 
+> 
+> If the page num is bigger than 512, flush all tlbs of this vm to avoid
+> soft lock-ups on large TLB flushing ranges.  Just like what the
+> flush_tlb_range() does.
 
-... *suspence* ...
+I'm not sure this is applicable here, and it doesn't mean
+this is as good on other systems.
 
-Paolo
+Thanks,
 
+         M.
+-- 
+Jazz is not dead. It just smells funny...
