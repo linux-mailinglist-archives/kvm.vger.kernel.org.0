@@ -2,115 +2,91 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0408422EA55
-	for <lists+kvm@lfdr.de>; Mon, 27 Jul 2020 12:48:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A676422EAA1
+	for <lists+kvm@lfdr.de>; Mon, 27 Jul 2020 13:02:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727014AbgG0KsL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 27 Jul 2020 06:48:11 -0400
-Received: from foss.arm.com ([217.140.110.172]:41614 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726298AbgG0KsL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 27 Jul 2020 06:48:11 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 600E630E;
-        Mon, 27 Jul 2020 03:48:10 -0700 (PDT)
-Received: from [192.168.1.84] (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id A66B93F66E;
-        Mon, 27 Jul 2020 03:48:07 -0700 (PDT)
-Subject: Re: [PATCH 0/9] arm64: Stolen time support
-To:     zhukeqian <zhukeqian1@huawei.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        linux-doc@vger.kernel.org, Russell King <linux@armlinux.org.uk>,
-        linux-arm-kernel@lists.infradead.org,
-        Marc Zyngier <maz@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
-        xiexiangyou@huawei.com, yebiaoxiang@huawei.com,
-        "wanghaibin.wang@huawei.com >> Wanghaibin (D)" 
-        <wanghaibin.wang@huawei.com>
-References: <20190802145017.42543-1-steven.price@arm.com>
- <1611996b-1ec1-dee7-ed61-b3b9df23f138@huawei.com>
-From:   Steven Price <steven.price@arm.com>
-Message-ID: <25c7f2e2-e779-4e97-fdc5-0aba9fcf0fbc@arm.com>
-Date:   Mon, 27 Jul 2020 11:48:05 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        id S1728439AbgG0LCf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 27 Jul 2020 07:02:35 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:59101 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1727971AbgG0LCf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 27 Jul 2020 07:02:35 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1595847754;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=Bhjm+k3ZKFy4jBT6oOZ6KaNSYOxpyHTbPoNoFYayimA=;
+        b=iNk1DF57/z4nOOwknsqw0krE9LakSkllT9S1B/CkV3z3i5RuS5Tc7bzpjXjAdV0w+ryDgb
+        kNoabom4Gk3icpntp4ob/xO/H8FFLMZgJn8P1MiU8lRF5FzqqaGAJBtRLVt/soVI7D8+hA
+        gw9tI6FbyPKrn6w3w71iKop6iHiKuts=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-262-LAev5u0sNhCroDOd5CsXbw-1; Mon, 27 Jul 2020 07:02:30 -0400
+X-MC-Unique: LAev5u0sNhCroDOd5CsXbw-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4C917800597;
+        Mon, 27 Jul 2020 11:02:29 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (unknown [10.40.194.132])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 5361719C66;
+        Mon, 27 Jul 2020 11:02:27 +0000 (UTC)
+Date:   Mon, 27 Jul 2020 13:02:24 +0200
+From:   Andrew Jones <drjones@redhat.com>
+To:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
+Cc:     pbonzini@redhat.com, maz@kernel.org, steven.price@arm.com
+Subject: Re: [PATCH 0/5] KVM: arm64: pvtime: Fixes and a new cap
+Message-ID: <20200727110224.vpsakrqaj2vm7g66@kamzik.brq.redhat.com>
+References: <20200711100434.46660-1-drjones@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <1611996b-1ec1-dee7-ed61-b3b9df23f138@huawei.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Language: en-GB
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200711100434.46660-1-drjones@redhat.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 21/07/2020 04:26, zhukeqian wrote:
-> Hi Steven,
 
-Hi Keqian,
+Hi Marc,
 
-> On 2019/8/2 22:50, Steven Price wrote:
->> This series add support for paravirtualized time for arm64 guests and
->> KVM hosts following the specification in Arm's document DEN 0057A:
->>
->> https://developer.arm.com/docs/den0057/a
->>
->> It implements support for stolen time, allowing the guest to
->> identify time when it is forcibly not executing.
->>
->> It doesn't implement support for Live Physical Time (LPT) as there are
->> some concerns about the overheads and approach in the above
-> Do you plan to pick up LPT support? As there is demand of cross-frequency migration
-> (from older platform to newer platform).
-
-I don't have any plans to pick up the LPT support at the moment - feel 
-free to pick it up! ;)
-
-> I am not clear about the overheads and approach problem here, could you please
-> give some detail information? Maybe we can work together to solve these concerns. :-)
-
-Fundamentally the issue here is that LPT only solves one small part of 
-migration between different hosts. To successfully migrate between hosts 
-with different CPU implementations it is also necessary to be able to 
-virtualise various ID registers (e.g. MIDR_EL1, REVIDR_EL1, AIDR_EL1) 
-which we have no support for currently.
-
-The problem with just virtualising the registers is how you handle 
-errata. The guest will currently use those (and other) ID registers to 
-decide whether to enable specific errata workarounds. But what errata 
-should be enabled for a guest which might migrate to another host?
-
-What we ideally need is a mechanism to communicate to the guest what 
-workarounds are required to successfully run on any of the hosts that 
-the guest may be migrated to. You may also have the situation where the 
-workarounds required for two hosts are mutually incompatible - something 
-needs to understand this and do the "right thing" (most likely just 
-reject this situation, i.e. prevent the migration).
-
-There are various options here: e.g. a para-virtualised interface to 
-describe the workarounds (but this is hard to do in an OS-agnostic way), 
-or virtual-ID registers describing an idealised environment where no 
-workarounds are required (and only hosts that have no errata affecting a 
-guest would be able to provide this).
-
-Given the above complexity and the fact that Armv8.6-A standardises the 
-frequency to 1GHz this didn't seem worth continuing with. So LPT was 
-dropped from the spec and patches to avoid holding up the stolen time 
-support.
-
-However, if you have a use case which doesn't require such a generic 
-migration (e.g. perhaps old and new platforms are based on the same IP) 
-then it might be worth looking at bring this back. But to make the 
-problem solvable it either needs to be restricted to platforms which are 
-substantially the same (so the errata list will be identical), or 
-there's work to be done in preparation to deal with migrating a guest 
-successfully between hosts with potentially different errata requirements.
-
-Can you share more details about the hosts that you are interested in 
-migrating between?
+Ping?
 
 Thanks,
+drew
 
-Steve
+
+On Sat, Jul 11, 2020 at 12:04:29PM +0200, Andrew Jones wrote:
+> The first three patches in the series are fixes that come from testing
+> and reviewing pvtime code while writing the QEMU support (I'll reply
+> to this mail with a link to the QEMU patches after posting - which I'll
+> do shortly). The last patch is only a convenience for userspace, and I
+> wouldn't be heartbroken if it wasn't deemed worth it. The QEMU patches
+> I'll be posting are currently written without the cap. However, if the
+> cap is accepted, then I'll change the QEMU code to use it.
+> 
+> Thanks,
+> drew
+> 
+> Andrew Jones (5):
+>   KVM: arm64: pvtime: steal-time is only supported when configured
+>   KVM: arm64: pvtime: Fix potential loss of stolen time
+>   KVM: arm64: pvtime: Fix stolen time accounting across migration
+>   KVM: Documentation minor fixups
+>   arm64/x86: KVM: Introduce steal-time cap
+> 
+>  Documentation/virt/kvm/api.rst    | 20 ++++++++++++++++----
+>  arch/arm64/include/asm/kvm_host.h |  2 +-
+>  arch/arm64/kvm/arm.c              |  3 +++
+>  arch/arm64/kvm/pvtime.c           | 31 +++++++++++++++----------------
+>  arch/x86/kvm/x86.c                |  3 +++
+>  include/linux/kvm_host.h          | 19 +++++++++++++++++++
+>  include/uapi/linux/kvm.h          |  1 +
+>  7 files changed, 58 insertions(+), 21 deletions(-)
+> 
+> -- 
+> 2.25.4
+> 
+
