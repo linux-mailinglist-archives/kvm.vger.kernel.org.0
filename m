@@ -2,120 +2,136 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 504AC22F362
-	for <lists+kvm@lfdr.de>; Mon, 27 Jul 2020 17:05:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7826E22F412
+	for <lists+kvm@lfdr.de>; Mon, 27 Jul 2020 17:46:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730044AbgG0PFf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 27 Jul 2020 11:05:35 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:40858 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1728933AbgG0PFf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 27 Jul 2020 11:05:35 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1595862334;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=J7H68rHMGgj4y/RigpW4INmzQNkKVxj5I39s/CIOURI=;
-        b=TvKubWIaqRUH8i7nQKBFyB9FUxrFrzligJZ+KS35KdAKqc25bxZfXE5GIhfp99tWksn7rF
-        79ddNXTY/djlmw6spoXWgGSzZH7OnREk0N1L5IuwRL7cUrPBpBAfdFoNYnAJh4SYiyOEyh
-        /EUZ6V9UJF66Ox2uiiGiI3KazUYXBN0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-64-2cDVulTlP1Sb7Q_0ZVgRlQ-1; Mon, 27 Jul 2020 11:05:28 -0400
-X-MC-Unique: 2cDVulTlP1Sb7Q_0ZVgRlQ-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 13278800466;
-        Mon, 27 Jul 2020 15:05:26 +0000 (UTC)
-Received: from work-vm (ovpn-114-135.ams2.redhat.com [10.36.114.135])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 138165F21D;
-        Mon, 27 Jul 2020 15:05:16 +0000 (UTC)
-Date:   Mon, 27 Jul 2020 16:05:14 +0100
-From:   "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To:     David Gibson <david@gibson.dropbear.id.au>
-Cc:     frankja@linux.ibm.com, pair@us.ibm.com, qemu-devel@nongnu.org,
-        pbonzini@redhat.com, brijesh.singh@amd.com, ehabkost@redhat.com,
-        marcel.apfelbaum@gmail.com, "Michael S. Tsirkin" <mst@redhat.com>,
-        qemu-ppc@nongnu.org, kvm@vger.kernel.org, pasic@linux.ibm.com,
-        qemu-s390x@nongnu.org, David Hildenbrand <david@redhat.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Richard Henderson <rth@twiddle.net>,
-        Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
-        mdroth@linux.vnet.ibm.com, Thomas Huth <thuth@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>
-Subject: Re: [for-5.2 v4 09/10] host trust limitation: Alter virtio default
- properties for protected guests
-Message-ID: <20200727150514.GQ3040@work-vm>
-References: <20200724025744.69644-1-david@gibson.dropbear.id.au>
- <20200724025744.69644-10-david@gibson.dropbear.id.au>
+        id S1731023AbgG0Pq4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 27 Jul 2020 11:46:56 -0400
+Received: from mga12.intel.com ([192.55.52.136]:33366 "EHLO mga12.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728015AbgG0Pqz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 27 Jul 2020 11:46:55 -0400
+IronPort-SDR: ijYCwLN+uF2fKAdRqy7GWUg2qeY5F000UrK8mmx8U1fCSoVbRwpuVJgTrLLBtM3Vj4+7nnJzIl
+ E2wKSb/PJTpg==
+X-IronPort-AV: E=McAfee;i="6000,8403,9694"; a="130593839"
+X-IronPort-AV: E=Sophos;i="5.75,402,1589266800"; 
+   d="scan'208";a="130593839"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Jul 2020 08:46:55 -0700
+IronPort-SDR: ih74wHAEYTgG09ISPxHpa0sZYUGRI/PD0HgCEATM0+pBVOUSwgyikQi0/0Q2DOSW/3f5JerjGz
+ ZIhxFi+nRlFQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.75,402,1589266800"; 
+   d="scan'208";a="273290556"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.152])
+  by fmsmga008.fm.intel.com with ESMTP; 27 Jul 2020 08:46:54 -0700
+Date:   Mon, 27 Jul 2020 08:46:54 -0700
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] KVM: nVMX: properly pad struct kvm_vmx_nested_state_hdr
+Message-ID: <20200727154654.GA8675@linux.intel.com>
+References: <20200713082824.1728868-1-vkuznets@redhat.com>
+ <20200713151750.GA29901@linux.intel.com>
+ <878sfntnoz.fsf@vitty.brq.redhat.com>
+ <85fd54ff-01f5-0f1f-1bb7-922c740a37c1@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200724025744.69644-10-david@gibson.dropbear.id.au>
-User-Agent: Mutt/1.14.5 (2020-06-23)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+In-Reply-To: <85fd54ff-01f5-0f1f-1bb7-922c740a37c1@redhat.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-* David Gibson (david@gibson.dropbear.id.au) wrote:
-> The default behaviour for virtio devices is not to use the platforms normal
-> DMA paths, but instead to use the fact that it's running in a hypervisor
-> to directly access guest memory.  That doesn't work if the guest's memory
-> is protected from hypervisor access, such as with AMD's SEV or POWER's PEF.
+On Mon, Jul 27, 2020 at 01:43:34PM +0200, Paolo Bonzini wrote:
+> On 13/07/20 17:54, Vitaly Kuznetsov wrote:
+> > Which means that userspace built for the old kernel will potentially send in
+> > garbage for the new 'flags' field due to it being uninitialized stack data,
+> > even with the layout after this patch.
 > 
-> So, if a host trust limitation mechanism is enabled, then apply the
-> iommu_platform=on option so it will go through normal DMA mechanisms.
-> Those will presumably have some way of marking memory as shared with the
-> hypervisor or hardware so that DMA will work.
+> It might as well send it now if the code didn't attempt to zero the
+> struct before filling it in (this is another good reason to use a
+> "flags" field to say what's been filled in).
+
+The issue is that flags itself could hold garbage.
+
+https://lkml.kernel.org/r/20200713151750.GA29901@linux.intel.com
+
+>  I don't think special
+> casing padding is particularly useful; C11 for example requires
+> designated initializers to fill padding with zero bits[1] and even
+> before it's always been considered good behavior to use memset.
 > 
-> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-
-Good, it's just too easy to forget them at the moment and get hopelessly
-confused.
-
-
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-
-> ---
->  hw/core/machine.c | 11 +++++++++++
->  1 file changed, 11 insertions(+)
+> Paolo
 > 
-> diff --git a/hw/core/machine.c b/hw/core/machine.c
-> index b599b0ba65..2a723bf07b 100644
-> --- a/hw/core/machine.c
-> +++ b/hw/core/machine.c
-> @@ -28,6 +28,8 @@
->  #include "hw/mem/nvdimm.h"
->  #include "migration/vmstate.h"
->  #include "exec/host-trust-limitation.h"
-> +#include "hw/virtio/virtio.h"
-> +#include "hw/virtio/virtio-pci.h"
->  
->  GlobalProperty hw_compat_5_0[] = {
->      { "virtio-balloon-device", "page-poison", "false" },
-> @@ -1161,6 +1163,15 @@ void machine_run_board_init(MachineState *machine)
->           * areas.
->           */
->          machine_set_mem_merge(OBJECT(machine), false, &error_abort);
-> +
-> +        /*
-> +         * Virtio devices can't count on directly accessing guest
-> +         * memory, so they need iommu_platform=on to use normal DMA
-> +         * mechanisms.  That requires disabling legacy virtio support
-> +         * for virtio pci devices
-> +         */
-> +        object_register_sugar_prop(TYPE_VIRTIO_PCI, "disable-legacy", "on");
-> +        object_register_sugar_prop(TYPE_VIRTIO_DEVICE, "iommu_platform", "on");
->      }
->  
->      machine_class->init(machine);
-> -- 
-> 2.26.2
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> [1]  It says: "If an object that has static or thread storage duration
+> is not initialized explicitly, then [...] any padding is initialized to
+> zero bits" 
 
+static and per-thread storage is unlikely to be relevant, 
+
+> and even for non-static objects, "If there are fewer
+> initializers in a brace-enclosed list than there are elements or members
+> of an aggregate [...] the remainder of the aggregate shall be
+> initialized implicitly the same as objects that have static storage
+> duration".
+
+That's specifically talking about members, not usused/padded space, e.g.
+smm.flags (in the hold struct) must be zeroed with this, but it doesn't
+say anything about initializing padding.
+
+  struct kvm_vmx_nested_state_hdr hdr = {
+      .vmxon_pa = root,
+      .vmcs12_pa = vmcs12,
+  };
+
+QEMU won't see issues because it zero allocates the entire nested state.
+
+All the above being said, after looking at the whole picture I think padding
+the header is a moot point.  The header is padded out to 120 bytes[*] when
+including in the full nested state, and KVM only ever consumes the header in
+the context of the full nested state.  I.e. if there's garbage at offset 6,
+odds are there's going to be garbage at offset 18, so internally padding the
+header does nothing.
+
+KVM should be checking that the unused bytes of (sizeof(pad) - sizeof(vmx/svm))
+is zero if we want to expand into the padding in the future.  Right now we're
+relying on userspace to zero allocate the struct without enforcing it.
+
+[*] Amusing side note, the comment in the header is wrong.  It states "pad
+    the header to 128 bytes", but only pads it to 120 bytes, because union.
+
+/* for KVM_CAP_NESTED_STATE */
+struct kvm_nested_state {
+	__u16 flags;
+	__u16 format;
+	__u32 size;
+
+	union {
+		struct kvm_vmx_nested_state_hdr vmx;
+		struct kvm_svm_nested_state_hdr svm;
+
+		/* Pad the header to 128 bytes.  */
+		__u8 pad[120];
+	} hdr;
+
+	/*
+	 * Define data region as 0 bytes to preserve backwards-compatability
+	 * to old definition of kvm_nested_state in order to avoid changing
+	 * KVM_{GET,PUT}_NESTED_STATE ioctl values.
+	 */
+	union {
+		struct kvm_vmx_nested_state_data vmx[0];
+		struct kvm_svm_nested_state_data svm[0];
+	} data;
+};
+
+
+Odds are no real VMM will have issue given the dynamic size of struct
+kvm_nested_state, but 
