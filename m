@@ -2,111 +2,225 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1182522EE35
-	for <lists+kvm@lfdr.de>; Mon, 27 Jul 2020 16:05:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 88FCF22EEBF
+	for <lists+kvm@lfdr.de>; Mon, 27 Jul 2020 16:10:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728458AbgG0OE4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 27 Jul 2020 10:04:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34120 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726222AbgG0OEz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 27 Jul 2020 10:04:55 -0400
-Received: from mail-pg1-x544.google.com (mail-pg1-x544.google.com [IPv6:2607:f8b0:4864:20::544])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 31F94C061794;
-        Mon, 27 Jul 2020 07:04:55 -0700 (PDT)
-Received: by mail-pg1-x544.google.com with SMTP id g67so9576870pgc.8;
-        Mon, 27 Jul 2020 07:04:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=RyHF/+puhzg55DCNoaFMk4tPij78gjhmB7e2S31c+Mw=;
-        b=qi4gB50pKm/HTNHxwz2l1Wt6UHixmVaBVfd095HTeG1HF7fPr2fgjtU/lhdRFdLtpg
-         5GkR6ciAukxRBC+6p/hijprEOWr6N/ti21TRGyJLkERBWKbcmHE61jktGdd4ng2S4kqi
-         WShBSGiN26EzaKt5iiyEqR8/iq4Fkh1VgbsnEp0nPozR9K0APamac8qJVtU3IUVRLUjq
-         x5cjgotwkcFr5An8m7dLJTN+EeWNro1wS4oBt4ArK1Nh5ki2EP6RTF3iqXgM+RkuW7+r
-         /WL01dMKNkEocdqD8nVLUF1cENjPhpwaNbqiU1Go0XOwsAHSJ3tNCtaC6VS+os8eeaa8
-         e5Kg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=RyHF/+puhzg55DCNoaFMk4tPij78gjhmB7e2S31c+Mw=;
-        b=ISPI0Z4WhibWSsl8pqyvWApTkmpBtJSq8peGBvhwvxipy8Tu4fHheKjWEPvrl3y8C4
-         rgKeYkX7RDNLYb9p0/8QeI/pi6BSqAKaxGlLi0Jse//jZw9G4GDQ+ULe3iJ2XhYbqY+I
-         HxyuT716ZVVbGIqgNphmcq9aEqHlpTqn5dQzfGUJalu5kN3q99WsBv6nYInWWxddhTFa
-         ty65LFLLzob7soynnqCiCk1ylMhvyYda2GE3dIg2y/CWQz2n5EFGFO++VeZkEO2MTP0g
-         GLLDYMpiavy8r0CZg0smT3tCVROedpgXPNuUN6A8YtX3xX5MPIn7Mpt3ACGP/BtWQ5LS
-         YM2Q==
-X-Gm-Message-State: AOAM531auIsid3FBpJymUN4y+YUcPl9dbXnXcecaAc+FQFaPdNqutbCH
-        w0vX3eH8Qzj/9cttIPqp7Up0e/Az+2Qqq35Z2vk=
-X-Google-Smtp-Source: ABdhPJzovOawUCJEI4j6HaCrflDk4hy4VX1DIO68Q/H7U8G0USPW7WPLKWfPlN3cxl4gmpC7xS9QZFiZXbVUBcWcqIA=
-X-Received: by 2002:a63:ce41:: with SMTP id r1mr20428734pgi.203.1595858694737;
- Mon, 27 Jul 2020 07:04:54 -0700 (PDT)
+        id S1729839AbgG0OKY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 27 Jul 2020 10:10:24 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:11908 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1729829AbgG0OKX (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 27 Jul 2020 10:10:23 -0400
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 06RE0qlp162323;
+        Mon, 27 Jul 2020 10:10:04 -0400
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 32hvhdqhmm-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 27 Jul 2020 10:10:04 -0400
+Received: from m0098399.ppops.net (m0098399.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 06RE0uYE162713;
+        Mon, 27 Jul 2020 10:10:03 -0400
+Received: from ppma03dal.us.ibm.com (b.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.11])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 32hvhdqhm1-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 27 Jul 2020 10:10:03 -0400
+Received: from pps.filterd (ppma03dal.us.ibm.com [127.0.0.1])
+        by ppma03dal.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 06RDoQQ0032136;
+        Mon, 27 Jul 2020 14:10:02 GMT
+Received: from b03cxnp07028.gho.boulder.ibm.com (b03cxnp07028.gho.boulder.ibm.com [9.17.130.15])
+        by ppma03dal.us.ibm.com with ESMTP id 32gcy6p1qj-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 27 Jul 2020 14:10:02 +0000
+Received: from b03ledav003.gho.boulder.ibm.com (b03ledav003.gho.boulder.ibm.com [9.17.130.234])
+        by b03cxnp07028.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 06RE9xjE41419180
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 27 Jul 2020 14:09:59 GMT
+Received: from b03ledav003.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 75B786A05A;
+        Mon, 27 Jul 2020 14:09:59 +0000 (GMT)
+Received: from b03ledav003.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 288766A057;
+        Mon, 27 Jul 2020 14:09:58 +0000 (GMT)
+Received: from cpe-172-100-175-116.stny.res.rr.com (unknown [9.85.167.215])
+        by b03ledav003.gho.boulder.ibm.com (Postfix) with ESMTP;
+        Mon, 27 Jul 2020 14:09:57 +0000 (GMT)
+Subject: Re: [PATCH v9 02/15] s390/vfio-ap: use new AP bus interface to search
+ for queue devices
+To:     Pierre Morel <pmorel@linux.ibm.com>, linux-s390@vger.kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     freude@linux.ibm.com, borntraeger@de.ibm.com, cohuck@redhat.com,
+        mjrosato@linux.ibm.com, pasic@linux.ibm.com,
+        alex.williamson@redhat.com, kwankhede@nvidia.com,
+        fiuczy@linux.ibm.com, kernel test robot <lkp@intel.com>
+References: <20200720150344.24488-1-akrowiak@linux.ibm.com>
+ <20200720150344.24488-3-akrowiak@linux.ibm.com>
+ <a946e992-ff36-ca45-1811-7c6b0aaa161f@linux.ibm.com>
+From:   Tony Krowiak <akrowiak@linux.ibm.com>
+Message-ID: <4b0bd2a8-4c28-7daa-8ea4-397926c9054b@linux.ibm.com>
+Date:   Mon, 27 Jul 2020 10:09:57 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-References: <20200722001513.298315-1-jusual@redhat.com> <87d04nq40h.fsf@vitty.brq.redhat.com>
-In-Reply-To: <87d04nq40h.fsf@vitty.brq.redhat.com>
-From:   Andy Shevchenko <andy.shevchenko@gmail.com>
-Date:   Mon, 27 Jul 2020 17:04:39 +0300
-Message-ID: <CAHp75VfLjYvFUVw+uHbMJCeoNfs6nb4Qh1OoQraA5bTkR9SeRg@mail.gmail.com>
-Subject: Re: [PATCH] x86/PCI: Use MMCONFIG by default for KVM guests
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc:     Julia Suvorova <jusual@redhat.com>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Bjorn Helgaas <bhelgaas@google.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Matthew Wilcox <willy@infradead.org>,
-        "open list:VFIO DRIVER" <kvm@vger.kernel.org>,
-        linux-pci <linux-pci@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <a946e992-ff36-ca45-1811-7c6b0aaa161f@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
+ definitions=2020-07-27_08:2020-07-27,2020-07-27 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
+ lowpriorityscore=0 phishscore=0 bulkscore=0 malwarescore=0 mlxlogscore=999
+ clxscore=1015 mlxscore=0 priorityscore=1501 suspectscore=3 spamscore=0
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2006250000 definitions=main-2007270096
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jul 22, 2020 at 12:47 PM Vitaly Kuznetsov <vkuznets@redhat.com> wrote:
-> Julia Suvorova <jusual@redhat.com> writes:
 
-> > Scanning for PCI devices at boot takes a long time for KVM guests. It
-> > can be reduced if KVM will handle all configuration space accesses for
-> > non-existent devices without going to userspace [1]. But for this to
-> > work, all accesses must go through MMCONFIG.
-> > This change allows to use pci_mmcfg as raw_pci_ops for 64-bit KVM
-> > guests making MMCONFIG the default access method.
 
-I'm not sure it won't break anything.
-
-> > [1] https://lkml.org/lkml/2020/5/14/936
-
-use Link: tag and better to use lore.kernel.org.
-
-> This implies mmconfig access method is always functional (when present)
-> for all KVM guests, regardless of hypervisor version/which KVM userspace
-> is is use/... In case the assumption is true the patch looks good (to
-> me) but in case it isn't or if we think that more control over this
-> is needed we may want to introduce a PV feature bit for KVM.
+On 7/24/20 4:38 AM, Pierre Morel wrote:
 >
-> Also, I'm thinking about moving this to arch/x86/kernel/kvm.c: we can
-> override x86_init.pci.arch_init and reassign raw_pci_ops after doing
-> pci_arch_init().
+>
+> On 2020-07-20 17:03, Tony Krowiak wrote:
+>> This patch refactor's the vfio_ap device driver to use the AP bus's
+>> ap_get_qdev() function to retrieve the vfio_ap_queue struct containing
+>> information about a queue that is bound to the vfio_ap device driver.
+>> The bus's ap_get_qdev() function retrieves the queue device from a
+>> hashtable keyed by APQN. This is much more efficient than looping over
+>> the list of devices attached to the AP bus by several orders of
+>> magnitude.
+>
+> The patch does much more than modifying this line. ;)
+>
+>>
+>> Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
+>> Reported-by: kernel test robot <lkp@intel.com>
+>> ---
+>>   drivers/s390/crypto/vfio_ap_drv.c     | 27 ++-------
+>>   drivers/s390/crypto/vfio_ap_ops.c     | 86 +++++++++++++++------------
+>>   drivers/s390/crypto/vfio_ap_private.h |  8 ++-
+>>   3 files changed, 59 insertions(+), 62 deletions(-)
+>>
+>> diff --git a/drivers/s390/crypto/vfio_ap_drv.c 
+>> b/drivers/s390/crypto/vfio_ap_drv.c
+>> index f4ceb380dd61..24cdef60039a 100644
+>> --- a/drivers/s390/crypto/vfio_ap_drv.c
+>> +++ b/drivers/s390/crypto/vfio_ap_drv.c
+>> @@ -53,15 +53,9 @@ MODULE_DEVICE_TABLE(vfio_ap, ap_queue_ids);
+>>    */
+>>   static int vfio_ap_queue_dev_probe(struct ap_device *apdev)
+>>   {
+>> -    struct vfio_ap_queue *q;
+>> -
+>> -    q = kzalloc(sizeof(*q), GFP_KERNEL);
+>> -    if (!q)
+>> -        return -ENOMEM;
+>> -    dev_set_drvdata(&apdev->device, q);
+>> -    q->apqn = to_ap_queue(&apdev->device)->qid;
+>> -    q->saved_isc = VFIO_AP_ISC_INVALID;
+>> -    return 0;
+>> +    struct ap_queue *queue = to_ap_queue(&apdev->device);
+>> +
+>> +    return vfio_ap_mdev_probe_queue(queue);
+>>   }
+>
+> You should explain the reason why this function is modified.
+>
+>>     /**
+>> @@ -72,18 +66,9 @@ static int vfio_ap_queue_dev_probe(struct 
+>> ap_device *apdev)
+>>    */
+>>   static void vfio_ap_queue_dev_remove(struct ap_device *apdev)
+>>   {
+>> -    struct vfio_ap_queue *q;
+>> -    int apid, apqi;
+>> -
+>> -    mutex_lock(&matrix_dev->lock);
+>> -    q = dev_get_drvdata(&apdev->device);
+>> -    dev_set_drvdata(&apdev->device, NULL);
+>> -    apid = AP_QID_CARD(q->apqn);
+>> -    apqi = AP_QID_QUEUE(q->apqn);
+>> -    vfio_ap_mdev_reset_queue(apid, apqi, 1);
+>> -    vfio_ap_irq_disable(q);
+>> -    kfree(q);
+>> -    mutex_unlock(&matrix_dev->lock);
+>> +    struct ap_queue *queue = to_ap_queue(&apdev->device);
+>> +
+>> +    vfio_ap_mdev_remove_queue(queue);
+>>   }
+>
+> ... and this one?
+>
+>>     static void vfio_ap_matrix_dev_release(struct device *dev)
+>> diff --git a/drivers/s390/crypto/vfio_ap_ops.c 
+>> b/drivers/s390/crypto/vfio_ap_ops.c
+>> index e0bde8518745..ad3925f04f61 100644
+>> --- a/drivers/s390/crypto/vfio_ap_ops.c
+>> +++ b/drivers/s390/crypto/vfio_ap_ops.c
+>> @@ -26,43 +26,26 @@
+>>     static int vfio_ap_mdev_reset_queues(struct mdev_device *mdev);
+>>   -static int match_apqn(struct device *dev, const void *data)
+>> -{
+>> -    struct vfio_ap_queue *q = dev_get_drvdata(dev);
+>> -
+>> -    return (q->apqn == *(int *)(data)) ? 1 : 0;
+>> -}
+>> -
+>>   /**
+>> - * vfio_ap_get_queue: Retrieve a queue with a specific APQN from a list
+>> - * @matrix_mdev: the associated mediated matrix
+>> + * vfio_ap_get_queue: Retrieve a queue with a specific APQN.
+>>    * @apqn: The queue APQN
+>>    *
+>> - * Retrieve a queue with a specific APQN from the list of the
+>> - * devices of the vfio_ap_drv.
+>> - * Verify that the APID and the APQI are set in the matrix.
+>> + * Retrieve a queue with a specific APQN from the AP queue devices 
+>> attached to
+>> + * the AP bus.
+>>    *
+>> - * Returns the pointer to the associated vfio_ap_queue
+>> + * Returns the pointer to the vfio_ap_queue with the specified APQN, 
+>> or NULL.
+>>    */
+>> -static struct vfio_ap_queue *vfio_ap_get_queue(
+>> -                    struct ap_matrix_mdev *matrix_mdev,
+>> -                    int apqn)
+>> +static struct vfio_ap_queue *vfio_ap_get_queue(unsigned long apqn)
+>>   {
+>> +    struct ap_queue *queue;
+>>       struct vfio_ap_queue *q;
+>> -    struct device *dev;
+>>   -    if (!test_bit_inv(AP_QID_CARD(apqn), matrix_mdev->matrix.apm))
+>> -        return NULL;
+>> -    if (!test_bit_inv(AP_QID_QUEUE(apqn), matrix_mdev->matrix.aqm))
+>> +    queue = ap_get_qdev(apqn);
+>> +    if (!queue)
+>>           return NULL;
+>>   -    dev = driver_find_device(&matrix_dev->vfio_ap_drv->driver, NULL,
+>> -                 &apqn, match_apqn);
+>> -    if (!dev)
+>> -        return NULL;
+>> -    q = dev_get_drvdata(dev);
+>> -    q->matrix_mdev = matrix_mdev;
+>> -    put_device(dev);
+>> +    q = dev_get_drvdata(&queue->ap_dev.device);
+>> +    put_device(&queue->ap_dev.device);
+>>         return q;
+>>   }
+>
+> this function changed a lot too, you should explain the goal in the 
+> patch comment.
 
-% git grep -n -w x86_init.pci.arch_init -- arch/x86/
-arch/x86/hyperv/hv_init.c:400:  x86_init.pci.arch_init = hv_pci_init;
-arch/x86/kernel/apic/apic_numachip.c:203:       x86_init.pci.arch_init
-= pci_numachip_init;
-arch/x86/kernel/jailhouse.c:207:        x86_init.pci.arch_init
- = jailhouse_pci_arch_init;
-arch/x86/pci/init.c:20: if (x86_init.pci.arch_init && !x86_init.pci.arch_init())
-arch/x86/platform/intel-mid/intel-mid.c:172:    x86_init.pci.arch_init
-= intel_mid_pci_init;
-arch/x86/platform/olpc/olpc.c:309:              x86_init.pci.arch_init
-= pci_olpc_init;
-arch/x86/xen/enlighten_pv.c:1411:
-x86_init.pci.arch_init = pci_xen_init;
+This is precisely what the current patch comment describes.
 
-Are you going to update all these? Or how this is supposed to work (I
-may be missing something)?
+>
+> ...snip...
+>
+> Regards,
+> Pierre
+>
 
--- 
-With Best Regards,
-Andy Shevchenko
