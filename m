@@ -2,232 +2,156 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 17B7222E9FF
-	for <lists+kvm@lfdr.de>; Mon, 27 Jul 2020 12:26:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7621122EA0C
+	for <lists+kvm@lfdr.de>; Mon, 27 Jul 2020 12:30:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728049AbgG0K0v (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 27 Jul 2020 06:26:51 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:1060 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726744AbgG0K0v (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 27 Jul 2020 06:26:51 -0400
-Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 06RA2X0V179822
-        for <kvm@vger.kernel.org>; Mon, 27 Jul 2020 06:26:49 -0400
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 32hrnkqbcu-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Mon, 27 Jul 2020 06:26:49 -0400
-Received: from m0098413.ppops.net (m0098413.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 06RA2gc4180568
-        for <kvm@vger.kernel.org>; Mon, 27 Jul 2020 06:26:49 -0400
-Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 32hrnkqbc9-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 27 Jul 2020 06:26:49 -0400
-Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
-        by ppma06ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 06RAQCLd016343;
-        Mon, 27 Jul 2020 10:26:47 GMT
-Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
-        by ppma06ams.nl.ibm.com with ESMTP id 32gcqgj3kr-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 27 Jul 2020 10:26:47 +0000
-Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
-        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 06RAQicx50528330
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 27 Jul 2020 10:26:44 GMT
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 96ECF11C05E;
-        Mon, 27 Jul 2020 10:26:44 +0000 (GMT)
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 3979A11C04A;
-        Mon, 27 Jul 2020 10:26:44 +0000 (GMT)
-Received: from ibm-vm.ibmuc.com (unknown [9.145.10.171])
-        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Mon, 27 Jul 2020 10:26:44 +0000 (GMT)
-From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
-To:     kvm@vger.kernel.org, david@redhat.com
-Cc:     frankja@linux.ibm.com, thuth@redhat.com, borntraeger@de.ibm.com
-Subject: [kvm-unit-tests PATCH v1 1/1] s390x: fix inline asm on gcc10
-Date:   Mon, 27 Jul 2020 12:26:43 +0200
-Message-Id: <20200727102643.15439-1-imbrenda@linux.ibm.com>
-X-Mailer: git-send-email 2.26.2
+        id S1728051AbgG0Ka2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 27 Jul 2020 06:30:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57306 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726701AbgG0Ka1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 27 Jul 2020 06:30:27 -0400
+Received: from mail-wr1-x436.google.com (mail-wr1-x436.google.com [IPv6:2a00:1450:4864:20::436])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 76C40C061794
+        for <kvm@vger.kernel.org>; Mon, 27 Jul 2020 03:30:27 -0700 (PDT)
+Received: by mail-wr1-x436.google.com with SMTP id r12so14281911wrj.13
+        for <kvm@vger.kernel.org>; Mon, 27 Jul 2020 03:30:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=references:user-agent:from:to:cc:subject:in-reply-to:date
+         :message-id:mime-version:content-transfer-encoding;
+        bh=ef+DlaPDlCdGo3GcQcb/cr5plIeVe0IdjPjPGvh9Xlw=;
+        b=z2A9HWvqP8rUdS23qGeI4oeuzorNnNTPzGD9XntkgGyZpU1srjFbFlMHFkcb9StnPJ
+         n9v5VN0tFiHnug/CCCCSSkHHWozP8XO4937s/cbUuNFP39chWhbsqlU4tPnflja5OeTE
+         kg/dNfhCdNWMednO4Sa/ww97VKQ/mt+9K5UTYUddX2Bnn0yEO2Mt2dor9HG35a4lJHfc
+         qqr7BpOpex8xYikAfL5j3MCM+AXUWDYahOUOGqtJxS/HDVpIUt7IYkuhMOE4x2Bb12WZ
+         JS2+sNsVkxQXzXYpurbuo7TLVJ7cB6ZimA/0tQayXLAw76xhZP1vrG7NVGO3eeDn0ZMU
+         /HqA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:references:user-agent:from:to:cc:subject
+         :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+        bh=ef+DlaPDlCdGo3GcQcb/cr5plIeVe0IdjPjPGvh9Xlw=;
+        b=ol2btOYLAiw6RHT5Tu66M+e0WpqGbJ8KQNg7vqegLUNvI3tTiHlwDhxYiPV6kQmEQL
+         n95f2QWDfJTmHh5qm7LW2iU6/ctqdYv5P0PBmhPBugz8msJNpFX8bRG3KvtlEu0l4Hfe
+         l2ZNh19BuThr6dIzv/1VBQkx6c888d68VVK9zqEvkyyNxPLl0Jsd4OTC3V12OMbRbbZe
+         9cwIRdKJ5Mf/7ughEi3H1bECDqyzAm6F4aRS+lp5IGM61fcyd6yNeKmyEkY5UoDvH12v
+         ZxxyeQ4JVg59o8Zv7Bw8Uamg0FJJCjagLEGs3JM2oOqHtmLTUeORwGxS51gZk9A9vGip
+         DSSA==
+X-Gm-Message-State: AOAM530NqNpl1ofFIWrZkQvcOkiTj4fV4qK+yjWbitdAPKA3R7E9XYFp
+        Ku2W8Q7/GQCkoMwLHqfWwoQvyA==
+X-Google-Smtp-Source: ABdhPJwCGWvlr8PvKPAIatHcCGvWo7ZNxfYvqPc2JcsXJpH3HzTyXWfTPcp+1HArG829ltp3gnr0pg==
+X-Received: by 2002:adf:dcc9:: with SMTP id x9mr21684234wrm.153.1595845826053;
+        Mon, 27 Jul 2020 03:30:26 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+        by smtp.gmail.com with ESMTPSA id t17sm3180629wmj.34.2020.07.27.03.30.24
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 27 Jul 2020 03:30:24 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+        by zen.linaroharston (Postfix) with ESMTP id 373BB1FF7E;
+        Mon, 27 Jul 2020 11:30:24 +0100 (BST)
+References: <86d42090-f042-06a1-efba-d46d449df280@arrikto.com>
+ <20200715112342.GD18817@stefanha-x1.localdomain>
+ <CAJSP0QU78mAK-DiOYXvTOEa3=CAEy1rQtyTBe5rrKDs=yfptAg@mail.gmail.com>
+ <874kq1w3bz.fsf@linaro.org>
+ <20200727101403.GF380177@stefanha-x1.localdomain>
+User-agent: mu4e 1.5.5; emacs 28.0.50
+From:   Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To:     Stefan Hajnoczi <stefanha@redhat.com>
+Cc:     Stefan Hajnoczi <stefanha@gmail.com>,
+        Nikos Dragazis <ndragazis@arrikto.com>,
+        Jan Kiszka <jan.kiszka@siemens.com>,
+        "John G. Johnson" <john.g.johnson@oracle.com>,
+        Andra-Irina Paraschiv <andraprs@amazon.com>,
+        kvm <kvm@vger.kernel.org>, "Michael S. Tsirkin" <mst@redhat.com>,
+        qemu-devel <qemu-devel@nongnu.org>,
+        Maxime Coquelin <maxime.coquelin@redhat.com>,
+        Alexander Graf <graf@amazon.com>,
+        Thanos Makatos <thanos.makatos@nutanix.com>,
+        Jag Raman <jag.raman@oracle.com>,
+        Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+        Jean-Philippe Brucker <jean-philippe@linaro.org>,
+        Eric Auger <eric.auger@redhat.com>
+Subject: Re: Inter-VM device emulation (call on Mon 20th July 2020)
+In-reply-to: <20200727101403.GF380177@stefanha-x1.localdomain>
+Date:   Mon, 27 Jul 2020 11:30:24 +0100
+Message-ID: <87h7tt45dr.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
- definitions=2020-07-27_06:2020-07-27,2020-07-27 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 suspectscore=0
- mlxlogscore=888 adultscore=0 clxscore=1015 impostorscore=0 phishscore=0
- mlxscore=0 spamscore=0 bulkscore=0 lowpriorityscore=0 priorityscore=1501
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
- definitions=main-2007270069
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Fix compilation issues on 390x with gcc 10.
 
-Simply mark the inline functions that lead to a .insn with a variable
-opcode as __always_inline, to make gcc 10 happy.
+Stefan Hajnoczi <stefanha@redhat.com> writes:
 
-Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
----
- lib/s390x/asm/cpacf.h |  5 +++--
- s390x/emulator.c      | 25 +++++++++++++------------
- 2 files changed, 16 insertions(+), 14 deletions(-)
+> On Tue, Jul 21, 2020 at 11:49:04AM +0100, Alex Benn=C3=A9e wrote:
+>> Stefan Hajnoczi <stefanha@gmail.com> writes:
+>> > 2. Alexander Graf's idea for a new Linux driver that provides an
+>> > enforcing software IOMMU. This would be a character device driver that
+>> > is mmapped by the device emulation process (either vhost-user-style on
+>> > the host or another VMM for inter-VM device emulation). The Driver VMM
+>> > can program mappings into the device and the page tables in the device
+>> > emulation process will be updated. This way the Driver VMM can share
+>> > memory specific regions of guest RAM with the device emulation process
+>> > and revoke those mappings later.
+>>=20
+>> I'm wondering if there is enough plumbing on the guest side so a guest
+>> can use the virtio-iommu to mark out exactly which bits of memory the
+>> virtual device can have access to? At a minimum the virtqueues need to
+>> be accessible and for larger transfers maybe a bounce buffer. However
+>> for speed you want as wide as possible mapping but no more. It would be
+>> nice for example if a block device could load data directly into the
+>> guests block cache (zero-copy) but without getting a view of the kernels
+>> internal data structures.
+>
+> Maybe Jean-Philippe or Eric can answer that?
+>
+>> Another thing that came across in the call was quite a lot of
+>> assumptions about QEMU and Linux w.r.t virtio. While our project will
+>> likely have Linux as a guest OS we are looking specifically at enabling
+>> virtio for Type-1 hypervisors like Xen and the various safety certified
+>> proprietary ones. It is unlikely that QEMU would be used as the VMM for
+>> these deployments. We want to work out what sort of common facilities
+>> hypervisors need to support to enable virtio so the daemons can be
+>> re-usable and maybe setup with a minimal shim for the particular
+>> hypervisor in question.
+>
+> The vhost-user protocol together with the backend program conventions
+> define the wire protocol and command-line interface (see
+> docs/interop/vhost-user.rst).
+>
+> vhost-user is already used by other VMMs today. For example,
+> cloud-hypervisor implements vhost-user.
 
-diff --git a/lib/s390x/asm/cpacf.h b/lib/s390x/asm/cpacf.h
-index ae2ec53..2146a01 100644
---- a/lib/s390x/asm/cpacf.h
-+++ b/lib/s390x/asm/cpacf.h
-@@ -11,6 +11,7 @@
- #define _ASM_S390_CPACF_H
- 
- #include <asm/facility.h>
-+#include <linux/compiler.h>
- 
- /*
-  * Instruction opcodes for the CPACF instructions
-@@ -145,7 +146,7 @@ typedef struct { unsigned char bytes[16]; } cpacf_mask_t;
-  *
-  * Returns 1 if @func is available for @opcode, 0 otherwise
-  */
--static inline void __cpacf_query(unsigned int opcode, cpacf_mask_t *mask)
-+static __always_inline void __cpacf_query(unsigned int opcode, cpacf_mask_t *mask)
- {
- 	register unsigned long r0 asm("0") = 0;	/* query function */
- 	register unsigned long r1 asm("1") = (unsigned long) mask;
-@@ -183,7 +184,7 @@ static inline int __cpacf_check_opcode(unsigned int opcode)
- 	}
- }
- 
--static inline int cpacf_query(unsigned int opcode, cpacf_mask_t *mask)
-+static __always_inline int cpacf_query(unsigned int opcode, cpacf_mask_t *mask)
- {
- 	if (__cpacf_check_opcode(opcode)) {
- 		__cpacf_query(opcode, mask);
-diff --git a/s390x/emulator.c b/s390x/emulator.c
-index 1ee0df5..70ef51a 100644
---- a/s390x/emulator.c
-+++ b/s390x/emulator.c
-@@ -14,6 +14,7 @@
- #include <asm/cpacf.h>
- #include <asm/interrupt.h>
- #include <asm/float.h>
-+#include <linux/compiler.h>
- 
- struct lowcore *lc = NULL;
- 
-@@ -46,7 +47,7 @@ static void test_spm_ipm(void)
- 	__test_spm_ipm(0, 0);
- }
- 
--static inline void __test_cpacf(unsigned int opcode, unsigned long func,
-+static __always_inline void __test_cpacf(unsigned int opcode, unsigned long func,
- 				unsigned int r1, unsigned int r2,
- 				unsigned int r3)
- {
-@@ -59,7 +60,7 @@ static inline void __test_cpacf(unsigned int opcode, unsigned long func,
- 		         [r1] "i" (r1), [r2] "i" (r2), [r3] "i" (r3));
- }
- 
--static inline void __test_cpacf_r1_odd(unsigned int opcode)
-+static __always_inline void __test_cpacf_r1_odd(unsigned int opcode)
- {
- 	report_prefix_push("r1 odd");
- 	expect_pgm_int();
-@@ -68,7 +69,7 @@ static inline void __test_cpacf_r1_odd(unsigned int opcode)
- 	report_prefix_pop();
- }
- 
--static inline void __test_cpacf_r1_null(unsigned int opcode)
-+static __always_inline void __test_cpacf_r1_null(unsigned int opcode)
- {
- 	report_prefix_push("r1 null");
- 	expect_pgm_int();
-@@ -77,7 +78,7 @@ static inline void __test_cpacf_r1_null(unsigned int opcode)
- 	report_prefix_pop();
- }
- 
--static inline void __test_cpacf_r2_odd(unsigned int opcode)
-+static __always_inline void __test_cpacf_r2_odd(unsigned int opcode)
- {
- 	report_prefix_push("r2 odd");
- 	expect_pgm_int();
-@@ -86,7 +87,7 @@ static inline void __test_cpacf_r2_odd(unsigned int opcode)
- 	report_prefix_pop();
- }
- 
--static inline void __test_cpacf_r2_null(unsigned int opcode)
-+static __always_inline void __test_cpacf_r2_null(unsigned int opcode)
- {
- 	report_prefix_push("r2 null");
- 	expect_pgm_int();
-@@ -95,7 +96,7 @@ static inline void __test_cpacf_r2_null(unsigned int opcode)
- 	report_prefix_pop();
- }
- 
--static inline void __test_cpacf_r3_odd(unsigned int opcode)
-+static __always_inline void __test_cpacf_r3_odd(unsigned int opcode)
- {
- 	report_prefix_push("r3 odd");
- 	expect_pgm_int();
-@@ -104,7 +105,7 @@ static inline void __test_cpacf_r3_odd(unsigned int opcode)
- 	report_prefix_pop();
- }
- 
--static inline void __test_cpacf_r3_null(unsigned int opcode)
-+static __always_inline void __test_cpacf_r3_null(unsigned int opcode)
- {
- 	report_prefix_push("r3 null");
- 	expect_pgm_int();
-@@ -113,7 +114,7 @@ static inline void __test_cpacf_r3_null(unsigned int opcode)
- 	report_prefix_pop();
- }
- 
--static inline void __test_cpacf_mod_bit(unsigned int opcode)
-+static __always_inline void __test_cpacf_mod_bit(unsigned int opcode)
- {
- 	report_prefix_push("mod bit");
- 	expect_pgm_int();
-@@ -122,7 +123,7 @@ static inline void __test_cpacf_mod_bit(unsigned int opcode)
- 	report_prefix_pop();
- }
- 
--static inline void __test_cpacf_invalid_func(unsigned int opcode)
-+static __always_inline void __test_cpacf_invalid_func(unsigned int opcode)
- {
- 	report_prefix_push("invalid subfunction");
- 	expect_pgm_int();
-@@ -137,7 +138,7 @@ static inline void __test_cpacf_invalid_func(unsigned int opcode)
- 	report_prefix_pop();
- }
- 
--static inline void __test_cpacf_invalid_parm(unsigned int opcode)
-+static __always_inline void __test_cpacf_invalid_parm(unsigned int opcode)
- {
- 	report_prefix_push("invalid parm address");
- 	expect_pgm_int();
-@@ -146,7 +147,7 @@ static inline void __test_cpacf_invalid_parm(unsigned int opcode)
- 	report_prefix_pop();
- }
- 
--static inline void __test_cpacf_protected_parm(unsigned int opcode)
-+static __always_inline void __test_cpacf_protected_parm(unsigned int opcode)
- {
- 	report_prefix_push("protected parm address");
- 	expect_pgm_int();
-@@ -157,7 +158,7 @@ static inline void __test_cpacf_protected_parm(unsigned int opcode)
- 	report_prefix_pop();
- }
- 
--static inline void __test_basic_cpacf_opcode(unsigned int opcode)
-+static __always_inline void __test_basic_cpacf_opcode(unsigned int opcode)
- {
- 	bool mod_bit_allowed = false;
- 
--- 
-2.26.2
+Ohh that's a new one for me. I see it is a KVM only project but it's
+nice to see another VMM using the common rust-vmm backend. There is
+interest in using rust-vmm to implement VMMs for type-1 hypervisors but
+we need to work out if there are two many type-2 concepts backed into
+the lower level rust crates.
 
+> I'm sure there is room for improvement, but it seems like an incremental
+> step given that vhost-user already tries to cater for this scenario.
+>
+> Are there any specific gaps you have identified?
+
+Aside from the desire to limit the shared memory footprint between the
+backend daemon and a guest not yet.
+
+I suspect the eventfd mechanism might just end up being simulated by the
+VMM as a result of whatever comes from the type-1 interface indicating a
+doorbell has been rung. It is after all just a FD you consume numbers
+over right?
+
+Not all setups will have an equivalent of a Dom0 "master" guest to do
+orchestration. Highly embedded are likely to have fixed domains created
+as the firmware/hypervisor start up.
+
+>
+> Stefan
+
+
+--=20
+Alex Benn=C3=A9e
