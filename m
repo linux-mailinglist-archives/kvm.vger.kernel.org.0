@@ -2,87 +2,154 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 812E422F456
-	for <lists+kvm@lfdr.de>; Mon, 27 Jul 2020 18:09:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8934622F4B0
+	for <lists+kvm@lfdr.de>; Mon, 27 Jul 2020 18:17:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727855AbgG0QJj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 27 Jul 2020 12:09:39 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:33819 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726942AbgG0QJj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 27 Jul 2020 12:09:39 -0400
+        id S1731550AbgG0QRG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 27 Jul 2020 12:17:06 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:57073 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1731548AbgG0QRE (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 27 Jul 2020 12:17:04 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1595866177;
+        s=mimecast20190719; t=1595866622;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=OPQOqiZCF/CXGUjGCPsDuUPFb0RD1RJET28Zyk3zKE4=;
-        b=hCjtKjd7/AELjjEaFiP7dQoPy6xdxdTT4b8Q24hbxY4aI2xDAXDKX5FbzWwT7UEB+9cIZt
-        kBTYOmJ2lPUBp6g3XXRznMEpF9Pz/bov0Y2dzy2Lz0ePHrH6dOkO5CyDJHJYPZc4GOPLM1
-        G0F/0/lPuzgjk1+5Ct3kY9n0m4JchSM=
-Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
- [209.85.218.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-497-9PoBM5gwOm-5sCmb6W2S7Q-1; Mon, 27 Jul 2020 12:09:35 -0400
-X-MC-Unique: 9PoBM5gwOm-5sCmb6W2S7Q-1
-Received: by mail-ej1-f71.google.com with SMTP id l7so633889ejr.7
-        for <kvm@vger.kernel.org>; Mon, 27 Jul 2020 09:09:35 -0700 (PDT)
+        bh=BsUwnhDK87WKgN3gqd90CcbtRyIxe05OQOcWAwl8fSE=;
+        b=AFoLLC2qS99U3G9pEMQhxwwf5A9rH4NoyCWBiy1jyRpZd30b82U905HQ+02H0kGXnabuUa
+        nFsAz8udCXgmwrz49sRt8rrqr/DNGI/8XVs6hbjfTtZ0Xp+NuZOjMDrYdux5V36cDeCgu/
+        HOUOAuz7dF1u98iQvCwbQHXLQLtpS14=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-67-onv0KavHMWGMq9CX_B4SUw-1; Mon, 27 Jul 2020 12:17:00 -0400
+X-MC-Unique: onv0KavHMWGMq9CX_B4SUw-1
+Received: by mail-wr1-f70.google.com with SMTP id d6so2552387wrv.23
+        for <kvm@vger.kernel.org>; Mon, 27 Jul 2020 09:16:59 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=OPQOqiZCF/CXGUjGCPsDuUPFb0RD1RJET28Zyk3zKE4=;
-        b=sWHVJKKfZH20b6CyQ3AKrPPFy/BBo9jmjvrf7OJOLV/dAeMGZ9cQEuuAl/Af9saZra
-         xscCwjUOMoMK3o4LoYgXCeV/vERA9M+V5yJyo78X4Qwyoxxb12uB9DAI+pXlVSMOy2VK
-         TjAu19GisfNfWN86Am1Y0bzVjXN6ri+9lKmbPVEaAjiYzkkcAi9FukS7cK7SiV0o6A1t
-         WXGOgCxz7PvA5sNK/4+aAYH1XFjPlRf00806FVHPn12owFVp3XwF174SB61kR7eWwMyV
-         +ZMfINZ8vdWBv0fK9AwP7Oy8YiBYwdXoxQKYwqLxQrt9uSo5SUfoVNTvCz9uZUGfHsVm
-         g/6w==
-X-Gm-Message-State: AOAM533SUVw+7gH8W/VtgB1aQVGWiTCOPscs+SyznwnPrIIm5xFEuPz5
-        QurEz5oo5YVaXma6uY5+pvGtcF/6ZCvqSPoWnLoUnZTyTZvXRnKpHaWTTnq5UN9unWcqP2BCVwO
-        b/pa3LyecdWxE
-X-Received: by 2002:a05:6402:cb:: with SMTP id i11mr9374794edu.372.1595866174555;
-        Mon, 27 Jul 2020 09:09:34 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJx/hhArY+P/WnFI9GEc6R3AlSG06qBpjRYmUOuaXpr8IMw0UcMbxhNf3VfCAhBOae5V8WHpqw==
-X-Received: by 2002:a05:6402:cb:: with SMTP id i11mr9374774edu.372.1595866174365;
-        Mon, 27 Jul 2020 09:09:34 -0700 (PDT)
-Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id gh25sm1891816ejb.109.2020.07.27.09.09.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 27 Jul 2020 09:09:33 -0700 (PDT)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Vivek Goyal <vgoyal@redhat.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Cc:     virtio-fs-list <virtio-fs@redhat.com>, pbonzini@redhat.com,
-        sean.j.christopherson@intel.com
-Subject: Re: [PATCH v4] kvm,x86: Exit to user space in case page fault error
-In-Reply-To: <20200727135603.GA39559@redhat.com>
-References: <20200720211359.GF502563@redhat.com> <20200727135603.GA39559@redhat.com>
-Date:   Mon, 27 Jul 2020 18:09:32 +0200
-Message-ID: <87ft9dlz2b.fsf@vitty.brq.redhat.com>
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=BsUwnhDK87WKgN3gqd90CcbtRyIxe05OQOcWAwl8fSE=;
+        b=Mqrg07cIGhvYwsheqXwoDiSS2E4srK8dR8C6urFpr565dpRmW6EX2RyPb+yfljcmZI
+         Ue5zxeq4NEsB0wz53aH6mVPLZGPnain6QqCGzjgDIHK5kWiPHPDKg9k6Xqb3JLgGYFaW
+         enVgHkC8KEkYwuNXQx1mrCh4F0uwFFA7mTIMekZ3Tt90mztZxH0n/7NSHvBPFwSWhJJ/
+         MXoSSzZqQHF5dq0pg4ripqv8n1LWfmvxKlMqux9HxOGHegk1wXQlUcxT6UBjbV1D4HJi
+         EVHKUI9Mh9mTP6mZISkLZCPkKgeSGWwTSaCmRTc/gjp4Ccgt3a/5ZqA34cnNpd1DvPU2
+         3ZXQ==
+X-Gm-Message-State: AOAM5311f2XJbK8otv/FIOj46mLYrw9Mku8gNzSN0HtqeSk7DlGxWnQy
+        dLGQJM79cNQBz9ws5K5CnMDipZyOQLTRWXfUh/A+qXUDgE9I/to/f004E9Rbc3XF5IWBHjWZd6Y
+        SEnXhEvSLJRle
+X-Received: by 2002:a1c:6408:: with SMTP id y8mr84044wmb.52.1595866618759;
+        Mon, 27 Jul 2020 09:16:58 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxLKcAmtjP5qdwtcop3VZz69phHqUmhA/GYnUvT8EjsYnFf+2mjdi7w0x6HCc4EEuewJ9M+uA==
+X-Received: by 2002:a1c:6408:: with SMTP id y8mr84025wmb.52.1595866618480;
+        Mon, 27 Jul 2020 09:16:58 -0700 (PDT)
+Received: from [192.168.10.150] ([93.56.170.5])
+        by smtp.gmail.com with ESMTPSA id u66sm76686wmu.37.2020.07.27.09.16.57
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 27 Jul 2020 09:16:57 -0700 (PDT)
+Subject: Re: [PATCH] KVM: nVMX: properly pad struct kvm_vmx_nested_state_hdr
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>, linux-kernel@vger.kernel.org
+References: <20200713082824.1728868-1-vkuznets@redhat.com>
+ <20200713151750.GA29901@linux.intel.com>
+ <878sfntnoz.fsf@vitty.brq.redhat.com>
+ <85fd54ff-01f5-0f1f-1bb7-922c740a37c1@redhat.com>
+ <20200727154654.GA8675@linux.intel.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <5d50ea1e-f2a2-8aa9-1dd3-4cbca6c6f885@redhat.com>
+Date:   Mon, 27 Jul 2020 18:16:56 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.9.0
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <20200727154654.GA8675@linux.intel.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Vivek Goyal <vgoyal@redhat.com> writes:
+On 27/07/20 17:46, Sean Christopherson wrote:
+>> It might as well send it now if the code didn't attempt to zero the
+>> struct before filling it in (this is another good reason to use a
+>> "flags" field to say what's been filled in).
+> The issue is that flags itself could hold garbage.
+> 
+> https://lkml.kernel.org/r/20200713151750.GA29901@linux.intel.com
 
-> On Mon, Jul 20, 2020 at 05:13:59PM -0400, Vivek Goyal wrote:
->> Page fault error handling behavior in kvm seems little inconsistent when
->> page fault reports error. If we are doing fault synchronously
->> then we capture error (-EFAULT) returned by __gfn_to_pfn_memslot() and
->> exit to user space and qemu reports error, "error: kvm run failed Bad address".
->
-> Hi Vitaly,
->
-> A gentle reminder. How does this patch look now?
->
+Quoting from there:
 
-Sorry, I even reviewd it but never replied. It looks good to me!
+> Which means that userspace built for the old kernel will potentially send in
+> garbage for the new 'flags' field due to it being uninitialized stack data,
+> even with the layout after this patch.
 
-Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+Userspace should always zero everything.  I don't think that the padding
+between fields is any different from the other bytes padding the header
+to 128 bytes.
 
--- 
-Vitaly
+>   struct kvm_vmx_nested_state_hdr hdr = {
+>       .vmxon_pa = root,
+>       .vmcs12_pa = vmcs12,
+>   };
+> 
+> QEMU won't see issues because it zero allocates the entire nested state.
+> 
+> All the above being said, after looking at the whole picture I think padding
+> the header is a moot point.  The header is padded out to 120 bytes[*] when
+> including in the full nested state, and KVM only ever consumes the header in
+> the context of the full nested state.  I.e. if there's garbage at offset 6,
+> odds are there's going to be garbage at offset 18, so internally padding the
+> header does nothing.
+
+Yes, that was what I was hinting at with "it might as well send it now"
+(i.e., after the patch).
+
+(All of this is moot for userspace that just uses KVM_GET_NESTED_STATE
+and passes it back to KVM_SET_NESTED_STATE).
+
+> KVM should be checking that the unused bytes of (sizeof(pad) - sizeof(vmx/svm))
+> is zero if we want to expand into the padding in the future.  Right now we're
+> relying on userspace to zero allocate the struct without enforcing it.
+
+The alternative, which is almost as good, is to only use these extra
+fields which could be garbage if the flags are not set, and check the
+flags (see the patches I have sent earlier today).
+
+The chance of the flags passing the check will decrease over time as
+more flags are added; but the chance of having buggy userspace that
+sends down garbage also will.
+
+> [*] Amusing side note, the comment in the header is wrong.  It states "pad
+>     the header to 128 bytes", but only pads it to 120 bytes, because union.
+> 
+> /* for KVM_CAP_NESTED_STATE */
+> struct kvm_nested_state {
+> 	__u16 flags;
+> 	__u16 format;
+> 	__u32 size;
+> 
+> 	union {
+> 		struct kvm_vmx_nested_state_hdr vmx;
+> 		struct kvm_svm_nested_state_hdr svm;
+> 
+> 		/* Pad the header to 128 bytes.  */
+> 		__u8 pad[120];
+> 	} hdr;
+
+There are 8 bytes before the union, and it's not a coincidence. :)
+"Header" refers to the stuff before the data region.
+
+> Odds are no real VMM will have issue given the dynamic size of struct
+> kvm_nested_state, but 
+
+... *suspence* ...
+
+Paolo
 
