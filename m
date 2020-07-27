@@ -2,116 +2,108 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 03FB922E959
-	for <lists+kvm@lfdr.de>; Mon, 27 Jul 2020 11:43:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 27FB022E994
+	for <lists+kvm@lfdr.de>; Mon, 27 Jul 2020 11:54:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726929AbgG0Jnf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 27 Jul 2020 05:43:35 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:35625 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726315AbgG0Jnf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 27 Jul 2020 05:43:35 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1595843013;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=uGcI5xsgsbptuVoEY3MeSgaMk9etfElSCP7nQow4UW0=;
-        b=XQbvTqimtke4n8yY0Rqzj+ZFDrxtwr1CktDh6K0vquh6wT9smatImDZrCOP8mb1HF+0b5b
-        3a/COop75q4qPeJF+8Ua86cypUWMB5d7GMFfW1lib9LOiJ4PObpFbA9kOK40h5vWfzJwa5
-        P4SXj/Enz5E6EQZYyHWCuk9y0hZhPHw=
-Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
- [209.85.218.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-1-mA9eNvMwN9W5FrJHH9zNPQ-1; Mon, 27 Jul 2020 05:43:31 -0400
-X-MC-Unique: mA9eNvMwN9W5FrJHH9zNPQ-1
-Received: by mail-ej1-f69.google.com with SMTP id cf15so5826839ejb.6
-        for <kvm@vger.kernel.org>; Mon, 27 Jul 2020 02:43:31 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=uGcI5xsgsbptuVoEY3MeSgaMk9etfElSCP7nQow4UW0=;
-        b=Edrsmw+oLaLOTvUzhgFQWw5d11Hpjwyv5RYKtqHRfxNz62tukGBo/OS1Z36uw53x9T
-         MoPPslfZ8qMg1J0rHCeAHfabJM/u8U5Dedw4QtuQwvpE3XVH+SXYxEsxCAcKGIpdGXZ0
-         j+KsSn5ehpoDm6ieOiqBD3sQojB/SvCMzj3JJZBCmh0IbaqaBh6+bL8gkyTM3WWTyuYC
-         CnZWYXA5Bo/ye9rQwbWVkSaD5buM4JbqnKwwbwyTN/zRpMe3JllFB8E7BSMlYLHosbJk
-         3OkUjz4NnzWskKuPvCZvZy+nnerstPDXcBcPfb7wbpN3TxcntSqb6ZT33E1lpLMWxEmB
-         C+4Q==
-X-Gm-Message-State: AOAM533KiSP3dFNOn5tUx3uohEt7w4YGw1TcTDkuCGvxE6fqG7HVOKcE
-        Htc/nUuNwxHlyxKOHedPFsqZSCyPTTGc8zCjzNQhMHk2yn3gnhhLhTYXD+UUmkD9kOhciIEx6b6
-        8CfmG0BQML58n
-X-Received: by 2002:a17:906:1b0a:: with SMTP id o10mr11678419ejg.463.1595843010595;
-        Mon, 27 Jul 2020 02:43:30 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJy9tvKTj/kb1GyOaj3xu24e0KLBqXPQgMQABhmNBEQIj6+g9/iVtSxPNo+nkTWpqwMLGeIGTA==
-X-Received: by 2002:a17:906:1b0a:: with SMTP id o10mr11678406ejg.463.1595843010409;
-        Mon, 27 Jul 2020 02:43:30 -0700 (PDT)
-Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id b17sm6755564ejc.82.2020.07.27.02.43.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 27 Jul 2020 02:43:29 -0700 (PDT)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Krish Sadhukhan <krish.sadhukhan@oracle.com>, kvm@vger.kernel.org
-Cc:     jmattson@google.com, sean.j.christopherson@intel.com,
-        pbonzini@redhat.com
-Subject: Re: [PATCH] KVM: x86: Fill in conforming {vmx|svm}_x86_ops and {vmx|svm}_nested_ops via macros
-In-Reply-To: <411a1f85-6de8-8167-a861-12edb2bc0e35@oracle.com>
-References: <1595543518-72310-1-git-send-email-krish.sadhukhan@oracle.com> <87zh7on6pb.fsf@vitty.brq.redhat.com> <411a1f85-6de8-8167-a861-12edb2bc0e35@oracle.com>
-Date:   Mon, 27 Jul 2020 11:43:29 +0200
-Message-ID: <87sgddmgxq.fsf@vitty.brq.redhat.com>
+        id S1727775AbgG0Jya (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 27 Jul 2020 05:54:30 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:40228 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726140AbgG0Jya (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 27 Jul 2020 05:54:30 -0400
+Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 06R9XN3X094221;
+        Mon, 27 Jul 2020 05:54:29 -0400
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 32htsjuasc-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 27 Jul 2020 05:54:29 -0400
+Received: from m0187473.ppops.net (m0187473.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 06R9XYkh094604;
+        Mon, 27 Jul 2020 05:54:29 -0400
+Received: from ppma04fra.de.ibm.com (6a.4a.5195.ip4.static.sl-reverse.com [149.81.74.106])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 32htsjuarf-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 27 Jul 2020 05:54:28 -0400
+Received: from pps.filterd (ppma04fra.de.ibm.com [127.0.0.1])
+        by ppma04fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 06R9qTul012138;
+        Mon, 27 Jul 2020 09:54:26 GMT
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
+        by ppma04fra.de.ibm.com with ESMTP id 32gcpw98pr-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 27 Jul 2020 09:54:26 +0000
+Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
+        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 06R9sNmT26149208
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 27 Jul 2020 09:54:23 GMT
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 8201F4C05C;
+        Mon, 27 Jul 2020 09:54:23 +0000 (GMT)
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id B29364C046;
+        Mon, 27 Jul 2020 09:54:22 +0000 (GMT)
+Received: from linux01.pok.stglabs.ibm.com (unknown [9.114.17.81])
+        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Mon, 27 Jul 2020 09:54:22 +0000 (GMT)
+From:   Janosch Frank <frankja@linux.ibm.com>
+To:     kvm@vger.kernel.org
+Cc:     thuth@redhat.com, linux-s390@vger.kernel.org, david@redhat.com,
+        borntraeger@de.ibm.com, cohuck@redhat.com, imbrenda@linux.ibm.com
+Subject: [kvm-unit-tests PATCH v2 0/3] PV tests part 1
+Date:   Mon, 27 Jul 2020 05:54:12 -0400
+Message-Id: <20200727095415.494318-1-frankja@linux.ibm.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
+ definitions=2020-07-27_06:2020-07-27,2020-07-27 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 suspectscore=0
+ priorityscore=1501 mlxlogscore=873 phishscore=0 lowpriorityscore=0
+ bulkscore=0 malwarescore=0 mlxscore=0 spamscore=0 adultscore=0
+ impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2006250000 definitions=main-2007270069
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Krish Sadhukhan <krish.sadhukhan@oracle.com> writes:
+Let's start bringing in some more PV related code.
 
-> On 7/24/20 10:50 AM, Vitaly Kuznetsov wrote:
->> Krish Sadhukhan <krish.sadhukhan@oracle.com> writes:
->>
->>> There is no functional change. Just the names of the implemented functions in
->>> KVM and SVM modules have been made conformant to the kvm_x86_ops and
->>> kvm_x86_nested_ops structures, by using macros. This will help in better
->>> readability and maintenance of the code.
->>>
->>>
->>> [PATCH] KVM: x86: Fill in conforming {vmx|svm}_x86_ops and
->>>
->>> [root@nsvm-sadhukhan linux]# /root/Tools/git-format-patch.sh dcb7fd8
->>>   arch/x86/include/asm/kvm_host.h |  12 +-
->>>   arch/x86/kvm/svm/avic.c         |   4 +-
->>>   arch/x86/kvm/svm/nested.c       |  16 +--
->>>   arch/x86/kvm/svm/sev.c          |   4 +-
->>>   arch/x86/kvm/svm/svm.c          | 218 +++++++++++++++++-----------------
->>>   arch/x86/kvm/svm/svm.h          |   8 +-
->>>   arch/x86/kvm/vmx/nested.c       |  26 +++--
->>>   arch/x86/kvm/vmx/nested.h       |   2 +-
->>>   arch/x86/kvm/vmx/vmx.c          | 238 +++++++++++++++++++-------------------
->>>   arch/x86/kvm/vmx/vmx.h          |   2 +-
->>>   arch/x86/kvm/x86.c              |  20 ++--
->>>   11 files changed, 279 insertions(+), 271 deletions(-)
->>>
->>> Krish Sadhukhan (1):
->>>        KVM: x86: Fill in conforming {vmx|svm}_x86_ops and {vmx|svm}_nested_ops
->>>
->> I like the patch!
->>
->> I would, however, want to suggest to split this:
->>
->> 1) Separate {vmx|svm}_x86_ops change from {vmx|svm}_nested_ops
->> 2) Separate VMX/nVMX from SVM/nSVM
->> 3) Separate other changes (like svm_tlb_flush() -> svm_flush_tlb()
->> rename, set_irq() -> inject_irq() rename, ...) into induvidual patches.
->
-> It makes sense. However, I haven't separated #3 that you mentioned 
-> because the changes are not that many and hence I just squeezed them 
-> into the relevant patches. If you feel strongly about it, I will 
-> separate them.
->
+Somehow I missed that we can also have a key in a exception new
+PSW. The interesting bit is that if such a PSW is loaded on an
+exception it will result in a specification exception and not a
+special operation exception.
 
-No, I don't, v2 looks good. Thanks!
+The third patch adds a basic guest UV call API test. It has mostly
+been used for firmware testing but I also think it's good to have a
+building block like this for more PV tests.
+
+
+GIT: https://github.com/frankjaa/kvm-unit-tests/tree/queue
+
+v2:
+	* Page alloc instead of static memory reservation
+	* Moved pgm cleanup function call to pgm handler
+	* Commit message changes
+
+
+Janosch Frank (3):
+  s390x: Add custom pgm cleanup function
+  s390x: skrf: Add exception new skey test and add test to unittests.cfg
+  s390x: Ultravisor guest API test
+
+ lib/s390x/asm/interrupt.h |   1 +
+ lib/s390x/asm/uv.h        |  68 ++++++++++++++++
+ lib/s390x/interrupt.c     |  10 +++
+ s390x/Makefile            |   1 +
+ s390x/skrf.c              |  80 +++++++++++++++++++
+ s390x/unittests.cfg       |   7 ++
+ s390x/uv-guest.c          | 159 ++++++++++++++++++++++++++++++++++++++
+ 7 files changed, 326 insertions(+)
+ create mode 100644 lib/s390x/asm/uv.h
+ create mode 100644 s390x/uv-guest.c
 
 -- 
-Vitaly
+2.25.1
 
