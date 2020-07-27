@@ -2,168 +2,131 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8B3F322FA24
-	for <lists+kvm@lfdr.de>; Mon, 27 Jul 2020 22:33:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 24F0C22FC14
+	for <lists+kvm@lfdr.de>; Tue, 28 Jul 2020 00:23:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726196AbgG0Uda (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 27 Jul 2020 16:33:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38720 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728254AbgG0Ud3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 27 Jul 2020 16:33:29 -0400
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E5903C0619D2
-        for <kvm@vger.kernel.org>; Mon, 27 Jul 2020 13:33:28 -0700 (PDT)
-Received: by mail-yb1-xb49.google.com with SMTP id j187so22152395ybj.7
-        for <kvm@vger.kernel.org>; Mon, 27 Jul 2020 13:33:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:message-id:mime-version:subject:from:to:cc;
-        bh=8+GWCqToRsYuSGreGCapWzOVpnWd7snaZLCa1XNJr0I=;
-        b=SGMEjLSsF+Ur+M/B7vxrNKGkbM9VGYJ4OL16bAu+jA4wlVRqUKmhkovlTjCvo5cwU9
-         /GR6A4itCCVvgEwtK6ZdxnsEsFauXhRtDAeadxCpTuMTAFSYGn3km+Wp/WDZ5pV/gE4h
-         5OPZoJf92JLkU7KvFmGXdg4/sOkHWtZBnadjwZtWWIw3EWWfeUUoEaQa7B/7pGV01SWb
-         m1h0X+ZNhWSnCC/KQ7tVoclpMbFgTjvcOXkHZJ5eTjyTTCkc12F3Xg9ylL2tYHwxh9iF
-         RMSKvHSOapmw+rwteyyXBBlypKDGCfdEQfDDkF+XzY69jwq96n38yxI8cUB000mfvGjj
-         CEMQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
-        bh=8+GWCqToRsYuSGreGCapWzOVpnWd7snaZLCa1XNJr0I=;
-        b=PCglBYXn61eDcoBKV9LA28FG1EibChHfepF0XjROy/zmY7X41cLm1ZJYMdKp8UrYQw
-         m0PiunItiUAnANO5G1vpOCcdJIhMzF6EXmsF18aMvpzEMkidIT3xYZsyTJ66pphnpfCK
-         qmHY0hgLypX7adq0QR+BjFZrgM55Cp5Nw3UbcKtDyeAtzDH/xeKIN7+N45N6X6wTnLVK
-         1c3XyrfT5Lfjlu0mGjOYderBYRPb6b14oIiCqy2AeZDIuRwQVlHoK0ChfM4zt35iU23K
-         hvHfR4WzpNle3ZBWA4Pv93elOcK5J1+YeaiWlfwFRpTXvBRElwoB1s48pu5ZHecpjgSE
-         nk3w==
-X-Gm-Message-State: AOAM531ue3fhb2feoCc797wv7kI6sURLOZD3VjJmaSjSnchIJ9wCEJfA
-        ic2nU1MmS9jDcVzH+AagPI1irIn5CQdv
-X-Google-Smtp-Source: ABdhPJyJorpxq2jFPepAV9fDiih8wuRQXMoiV5SISAnOdfN1gBNWXGfdqI5rYs7ErSZFfzEXT7vNGuGHGtL8
-X-Received: by 2002:a25:31d4:: with SMTP id x203mr37893178ybx.396.1595882008151;
- Mon, 27 Jul 2020 13:33:28 -0700 (PDT)
-Date:   Mon, 27 Jul 2020 13:33:24 -0700
-Message-Id: <20200727203324.2614917-1-bgardon@google.com>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.28.0.rc0.142.g3c755180ce-goog
-Subject: [PATCH 1/1] kvm: mmu: zap pages when zapping only parent
-From:   Ben Gardon <bgardon@google.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-kselftest@vger.kernel.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, Peter Xu <peterx@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Peter Shier <pshier@google.com>,
-        Ben Gardon <bgardon@google.com>
-Content-Type: text/plain; charset="UTF-8"
+        id S1726738AbgG0WXh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 27 Jul 2020 18:23:37 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:30060 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726171AbgG0WXg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 27 Jul 2020 18:23:36 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1595888614;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=/WjBxlf3Xuoxy9j6KCZZCmLv8iGNmTmLnBbZHprfUFA=;
+        b=cQGHS5R3totkEegLQH6Fuj+5CnRqxa9qdRX57bpxFtl//ZpEVaa2EzEpGhWvyW6zzMW6O4
+        /oevV0Fa46VcFTQvg/v6ABx+yKAFJNlZ+jnGPWJQDOJMIaH/8m3519VQUGkGAOAINVfFUb
+        r+M0v+4CSmjqmd1ZB9VmnWQ3As8t4ts=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-451-oGpnXVEpN4e1Yi2ZO7gJcg-1; Mon, 27 Jul 2020 18:23:32 -0400
+X-MC-Unique: oGpnXVEpN4e1Yi2ZO7gJcg-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 177BA1005504;
+        Mon, 27 Jul 2020 22:23:30 +0000 (UTC)
+Received: from x1.home (ovpn-112-71.phx2.redhat.com [10.3.112.71])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 4FF3790E69;
+        Mon, 27 Jul 2020 22:23:22 +0000 (UTC)
+Date:   Mon, 27 Jul 2020 16:23:21 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Yan Zhao <yan.y.zhao@intel.com>
+Cc:     kvm@vger.kernel.org, libvir-list@redhat.com,
+        Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org,
+        kwankhede@nvidia.com, eauger@redhat.com, xin-ran.wang@intel.com,
+        corbet@lwn.net, openstack-discuss@lists.openstack.org,
+        shaohe.feng@intel.com, kevin.tian@intel.com, eskultet@redhat.com,
+        jian-feng.ding@intel.com, dgilbert@redhat.com,
+        zhenyuw@linux.intel.com, hejie.xu@intel.com, bao.yumeng@zte.com.cn,
+        smooney@redhat.com, intel-gvt-dev@lists.freedesktop.org,
+        berrange@redhat.com, cohuck@redhat.com, dinechin@redhat.com,
+        devel@ovirt.org
+Subject: Re: device compatibility interface for live migration with assigned
+ devices
+Message-ID: <20200727162321.7097070e@x1.home>
+In-Reply-To: <20200727072440.GA28676@joy-OptiPlex-7040>
+References: <20200713232957.GD5955@joy-OptiPlex-7040>
+        <9bfa8700-91f5-ebb4-3977-6321f0487a63@redhat.com>
+        <20200716083230.GA25316@joy-OptiPlex-7040>
+        <20200717101258.65555978@x1.home>
+        <20200721005113.GA10502@joy-OptiPlex-7040>
+        <20200727072440.GA28676@joy-OptiPlex-7040>
+Organization: Red Hat
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-When the KVM MMU zaps a page, it will recursively zap the unsynced child
-pages, but not the synced ones. This can create problems over time when
-running many nested guests because it leaves unlinked pages which will not
-be freed until the page quota is hit. With the default page quota of 20
-shadow pages per 1000 guest pages, this looks like a memory leak and can
-degrade MMU performance.
+On Mon, 27 Jul 2020 15:24:40 +0800
+Yan Zhao <yan.y.zhao@intel.com> wrote:
 
-In a recent benchmark, substantial performance degradation was observed:
-An L1 guest was booted with 64G memory.
-2G nested Windows guests were booted, 10 at a time for 20
-iterations. (200 total boots)
-Windows was used in this benchmark because they touch all of their
-memory on startup.
-By the end of the benchmark, the nested guests were taking ~10% longer
-to boot. With this patch there is no degradation in boot time.
-Without this patch the benchmark ends with hundreds of thousands of
-stale EPT02 pages cluttering up rmaps and the page hash map. As a
-result, VM shutdown is also much slower: deleting memslot 0 was
-observed to take over a minute. With this patch it takes just a
-few miliseconds.
+> > > As you indicate, the vendor driver is responsible for checking version
+> > > information embedded within the migration stream.  Therefore a
+> > > migration should fail early if the devices are incompatible.  Is it  
+> > but as I know, currently in VFIO migration protocol, we have no way to
+> > get vendor specific compatibility checking string in migration setup stage
+> > (i.e. .save_setup stage) before the device is set to _SAVING state.
+> > In this way, for devices who does not save device data in precopy stage,
+> > the migration compatibility checking is as late as in stop-and-copy
+> > stage, which is too late.
+> > do you think we need to add the getting/checking of vendor specific
+> > compatibility string early in save_setup stage?
+> >  
+> hi Alex,
+> after an offline discussion with Kevin, I realized that it may not be a
+> problem if migration compatibility check in vendor driver occurs late in
+> stop-and-copy phase for some devices, because if we report device
+> compatibility attributes clearly in an interface, the chances for
+> libvirt/openstack to make a wrong decision is little.
 
-If TDP is enabled, zap child shadow pages when zapping the only parent
-shadow page.
+I think it would be wise for a vendor driver to implement a pre-copy
+phase, even if only to send version information and verify it at the
+target.  Deciding you have no device state to send during pre-copy does
+not mean your vendor driver needs to opt-out of the pre-copy phase
+entirely.  Please also note that pre-copy is at the user's discretion,
+we've defined that we can enter stop-and-copy at any point, including
+without a pre-copy phase, so I would recommend that vendor drivers
+validate compatibility at the start of both the pre-copy and the
+stop-and-copy phases.
 
-Tested by running the kvm-unit-tests suite on an Intel Haswell machine.
-No regressions versus
-commit c34b26b98cac ("KVM: MIPS: clean up redundant 'kvm_run' parameters"),
-or warnings.
+> so, do you think we are now arriving at an agreement that we'll give up
+> the read-and-test scheme and start to defining one interface (perhaps in
+> json format), from which libvirt/openstack is able to parse and find out
+> compatibility list of a source mdev/physical device?
 
-Reviewed-by: Peter Shier <pshier@google.com>
-Signed-off-by: Ben Gardon <bgardon@google.com>
----
- arch/x86/kvm/mmu/mmu.c | 49 +++++++++++++++++++++++++++++++++++++-----
- 1 file changed, 44 insertions(+), 5 deletions(-)
+Based on the feedback we've received, the previously proposed interface
+is not viable.  I think there's agreement that the user needs to be
+able to parse and interpret the version information.  Using json seems
+viable, but I don't know if it's the best option.  Is there any
+precedent of markup strings returned via sysfs we could follow?
 
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index fa506aaaf0194..c550bc3831dcc 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -2626,13 +2626,52 @@ static bool mmu_page_zap_pte(struct kvm *kvm, struct kvm_mmu_page *sp,
- 	return false;
- }
- 
--static void kvm_mmu_page_unlink_children(struct kvm *kvm,
--					 struct kvm_mmu_page *sp)
-+static int kvm_mmu_page_unlink_children(struct kvm *kvm,
-+					struct kvm_mmu_page *sp,
-+					struct list_head *invalid_list)
- {
- 	unsigned i;
-+	int zapped = 0;
-+
-+	for (i = 0; i < PT64_ENT_PER_PAGE; ++i) {
-+		u64 *sptep = sp->spt + i;
-+		u64 spte = *sptep;
-+		struct kvm_mmu_page *child_sp;
-+
-+		/*
-+		 * Zap the page table entry, unlinking any potential child
-+		 * page
-+		 */
-+		mmu_page_zap_pte(kvm, sp, sptep);
-+
-+		/* If there is no child page for this spte, continue */
-+		if (!is_shadow_present_pte(spte) ||
-+		    is_last_spte(spte, sp->role.level))
-+			continue;
-+
-+		/*
-+		 * If TDP is enabled, then any shadow pages are part of either
-+		 * the EPT01 or an EPT02. In either case, do not expect the
-+		 * same pattern of page reuse seen in x86 PTs for
-+		 * copy-on-write  and similar techniques. In this case, it is
-+		 * unlikely that a parentless shadow PT will be used again in
-+		 * the near future. Zap it to keep the rmaps and page hash
-+		 * maps from filling up with stale EPT02 pages.
-+		 */
-+		if (!tdp_enabled)
-+			continue;
-+
-+		child_sp = to_shadow_page(spte & PT64_BASE_ADDR_MASK);
-+		if (WARN_ON_ONCE(!child_sp))
-+			continue;
-+
-+		/* Zap the page if it has no remaining parent pages */
-+		if (!child_sp->parent_ptes.val)
-+			zapped += kvm_mmu_prepare_zap_page(kvm, child_sp,
-+							   invalid_list);
-+	}
- 
--	for (i = 0; i < PT64_ENT_PER_PAGE; ++i)
--		mmu_page_zap_pte(kvm, sp, sp->spt + i);
-+	return zapped;
- }
- 
- static void kvm_mmu_unlink_parents(struct kvm *kvm, struct kvm_mmu_page *sp)
-@@ -2678,7 +2717,7 @@ static bool __kvm_mmu_prepare_zap_page(struct kvm *kvm,
- 	trace_kvm_mmu_prepare_zap_page(sp);
- 	++kvm->stat.mmu_shadow_zapped;
- 	*nr_zapped = mmu_zap_unsync_children(kvm, sp, invalid_list);
--	kvm_mmu_page_unlink_children(kvm, sp);
-+	*nr_zapped += kvm_mmu_page_unlink_children(kvm, sp, invalid_list);
- 	kvm_mmu_unlink_parents(kvm, sp);
- 
- 	/* Zapping children means active_mmu_pages has become unstable. */
--- 
-2.28.0.rc0.142.g3c755180ce-goog
+Your idea of having both a "self" object and an array of "compatible"
+objects is perhaps something we can build on, but we must not assume
+PCI devices at the root level of the object.  Providing both the
+mdev-type and the driver is a bit redundant, since the former includes
+the latter.  We can't have vendor specific versioning schemes though,
+ie. gvt-version. We need to agree on a common scheme and decide which
+fields the version is relative to, ex. just the mdev type?
+
+I had also proposed fields that provide information to create a
+compatible type, for example to create a type_x2 device from a type_x1
+mdev type, they need to know to apply an aggregation attribute.  If we
+need to explicitly list every aggregation value and the resulting type,
+I think we run aground of what aggregation was trying to avoid anyway,
+so we might need to pick a language that defines variable substitution
+or some kind of tagging.  For example if we could define ${aggr} as an
+integer within a specified range, then we might be able to define a type
+relative to that value (type_x${aggr}) which requires an aggregation
+attribute using the same value.  I dunno, just spit balling.  Thanks,
+
+Alex
 
