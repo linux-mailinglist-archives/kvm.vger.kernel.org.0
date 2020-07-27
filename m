@@ -2,156 +2,207 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id AF83022EB7B
-	for <lists+kvm@lfdr.de>; Mon, 27 Jul 2020 13:52:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1F20422EBF5
+	for <lists+kvm@lfdr.de>; Mon, 27 Jul 2020 14:20:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728142AbgG0Lwo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 27 Jul 2020 07:52:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41744 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726873AbgG0Lwo (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 27 Jul 2020 07:52:44 -0400
-Received: from mail-ed1-x544.google.com (mail-ed1-x544.google.com [IPv6:2a00:1450:4864:20::544])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 81777C061794
-        for <kvm@vger.kernel.org>; Mon, 27 Jul 2020 04:52:42 -0700 (PDT)
-Received: by mail-ed1-x544.google.com with SMTP id c2so6055599edx.8
-        for <kvm@vger.kernel.org>; Mon, 27 Jul 2020 04:52:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:content-transfer-encoding:in-reply-to;
-        bh=D5pQiMPzLB8XD5JHM4wdoWxT4TgqCFRpOcFljgyTlfc=;
-        b=K3CK0lxO2t8MyWxIBSrkltJCVJh7mLsvW2hqQK75KIpcJdI6shjwejuVcaD2hN10Sy
-         XmUGeS5ZhpQ//k9mjCdxLGUgkzwPCtJDOe6QXpWr+d3SPbLTiAYCgs0v27wVIYyZ1uBd
-         OcZn+xroudR4UzgnffapO5Yw6SDzV0kKiwJDxAurvtpV3r25A6aJd0yA/qILRcEZLKqp
-         XQZFeONuAs0DTEqQCcg74OhB54RxAaFmw7ywGEdliCJBqk93YUMXQbE3zik3qfQOLkEm
-         +U/TPxXY3UAn8CwtH6KZDw8pVuTdQdc9NTsgXBU0erkaSPowlM934kzZ6g6slUHeFLJj
-         /PUw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=D5pQiMPzLB8XD5JHM4wdoWxT4TgqCFRpOcFljgyTlfc=;
-        b=fQxzvZVe/PUG7eajwZ1qerUEgC1TdrJhWqfVsqFDIKUvNQH90H7GO65mpVfXVBID5Z
-         s73d3XtHqXAX1z1XpYi6AyOabbsYi3/SZFt7HPGFkZ0u16CminMziQKxaACWkaZsb+he
-         4CkshKwlqlc63LjOUKgqo5bmtp5uY6ExF79wKobgRy3e/e+C2PE1zUKJF8cu7YRboKBC
-         wyyXK2+6cZBJnRKGCDPde6kpescaqcRGnhGzRRZZCy/2zvgEA2kGmcmsSUgLRV8rPcfM
-         HNEGY9pIJzaHZUBSDY91WaoVXV5JC4KuARcjsgdnwoC3UYMsSlNllMHvyFRSXQQargUI
-         aFMA==
-X-Gm-Message-State: AOAM533o8GnvO27hmHJq+0ynzo60nag89PiCVEmAD/hLJITYZM9XzMjt
-        rFsJo5p9uIqZ62g1rFxRxCzp6g==
-X-Google-Smtp-Source: ABdhPJyz7oMH5aj3Z7KcOTsoBp1IC9xCaWx+x2xvCBguSsbEnabd8V4mqYOIHsCAcbXk/z+m6gJynw==
-X-Received: by 2002:a50:fd8d:: with SMTP id o13mr1277004edt.313.1595850761074;
-        Mon, 27 Jul 2020 04:52:41 -0700 (PDT)
-Received: from myrica ([2001:1715:4e26:a7e0:116c:c27a:3e7f:5eaf])
-        by smtp.gmail.com with ESMTPSA id h19sm6777631ejt.115.2020.07.27.04.52.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 27 Jul 2020 04:52:40 -0700 (PDT)
-Date:   Mon, 27 Jul 2020 13:52:25 +0200
-From:   Jean-Philippe Brucker <jean-philippe@linaro.org>
-To:     Stefan Hajnoczi <stefanha@redhat.com>
-Cc:     Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>,
-        Stefan Hajnoczi <stefanha@gmail.com>,
-        Nikos Dragazis <ndragazis@arrikto.com>,
-        Jan Kiszka <jan.kiszka@siemens.com>,
-        "John G. Johnson" <john.g.johnson@oracle.com>,
-        Andra-Irina Paraschiv <andraprs@amazon.com>,
-        kvm <kvm@vger.kernel.org>, "Michael S. Tsirkin" <mst@redhat.com>,
-        qemu-devel <qemu-devel@nongnu.org>,
-        Maxime Coquelin <maxime.coquelin@redhat.com>,
-        Alexander Graf <graf@amazon.com>,
-        Thanos Makatos <thanos.makatos@nutanix.com>,
-        Jag Raman <jag.raman@oracle.com>,
-        Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
-        Eric Auger <eric.auger@redhat.com>
-Subject: Re: Inter-VM device emulation (call on Mon 20th July 2020)
-Message-ID: <20200727115225.GA12008@myrica>
-References: <86d42090-f042-06a1-efba-d46d449df280@arrikto.com>
- <20200715112342.GD18817@stefanha-x1.localdomain>
- <CAJSP0QU78mAK-DiOYXvTOEa3=CAEy1rQtyTBe5rrKDs=yfptAg@mail.gmail.com>
- <874kq1w3bz.fsf@linaro.org>
- <20200727101403.GF380177@stefanha-x1.localdomain>
+        id S1728115AbgG0MUv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 27 Jul 2020 08:20:51 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:43749 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1727088AbgG0MUv (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 27 Jul 2020 08:20:51 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1595852450;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references:openpgp:openpgp;
+        bh=iauMB52mqXOIqXTYfmHeVxFCv5nckIDI3t6Hqn0OjUI=;
+        b=HAmXK0ypgHgujjOat3f2xloEd/o+bDXWUNWRZkucvmkFYDEB7MHlcphoE2CnAV6h04uPIQ
+        wmpVyloXgh1uoxcbLEtwWYHyOgLUCGbXPbhPVhWMECFBivdg43ap0PhbkCTrydOTxII2dk
+        xuYn2SZjhLH7uNN3Z00OJZdwBYRgqBs=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-229-oS3ABpabNACmXxhTn-uoZQ-1; Mon, 27 Jul 2020 08:20:48 -0400
+X-MC-Unique: oS3ABpabNACmXxhTn-uoZQ-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DC114102C853;
+        Mon, 27 Jul 2020 12:20:36 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-112-156.ams2.redhat.com [10.36.112.156])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 2A93079D02;
+        Mon, 27 Jul 2020 12:20:34 +0000 (UTC)
+Subject: Re: [kvm-unit-tests PATCH v2 2/3] s390x: skrf: Add exception new skey
+ test and add test to unittests.cfg
+To:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
+Cc:     linux-s390@vger.kernel.org, david@redhat.com,
+        borntraeger@de.ibm.com, cohuck@redhat.com, imbrenda@linux.ibm.com
+References: <20200727095415.494318-1-frankja@linux.ibm.com>
+ <20200727095415.494318-3-frankja@linux.ibm.com>
+From:   Thomas Huth <thuth@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <b5b0f9d1-075d-edf6-8a30-39cb84f7b42c@redhat.com>
+Date:   Mon, 27 Jul 2020 14:20:33 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
+In-Reply-To: <20200727095415.494318-3-frankja@linux.ibm.com>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20200727101403.GF380177@stefanha-x1.localdomain>
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jul 27, 2020 at 11:14:03AM +0100, Stefan Hajnoczi wrote:
-> On Tue, Jul 21, 2020 at 11:49:04AM +0100, Alex Bennée wrote:
-> > Stefan Hajnoczi <stefanha@gmail.com> writes:
-> > > 2. Alexander Graf's idea for a new Linux driver that provides an
-> > > enforcing software IOMMU. This would be a character device driver that
-> > > is mmapped by the device emulation process (either vhost-user-style on
-> > > the host or another VMM for inter-VM device emulation). The Driver VMM
-> > > can program mappings into the device and the page tables in the device
-> > > emulation process will be updated. This way the Driver VMM can share
-> > > memory specific regions of guest RAM with the device emulation process
-> > > and revoke those mappings later.
-> > 
-> > I'm wondering if there is enough plumbing on the guest side so a guest
-> > can use the virtio-iommu to mark out exactly which bits of memory the
-> > virtual device can have access to? At a minimum the virtqueues need to
-> > be accessible and for larger transfers maybe a bounce buffer. However
-
-Just to make sure I didn't misunderstand - do you want to tell the guest
-precisely where the buffers are, like "address X is the used ring, address
-Y is the descriptor table", or do you want to specify a range of memory
-where the guest can allocate DMA buffers, in no specific order, for a
-given device?  So far I've assumed we're talking about the latter.
-
-> > for speed you want as wide as possible mapping but no more. It would be
-> > nice for example if a block device could load data directly into the
-> > guests block cache (zero-copy) but without getting a view of the kernels
-> > internal data structures.
+On 27/07/2020 11.54, Janosch Frank wrote:
+> When an exception new psw with a storage key in its mask is loaded
+> from lowcore, a specification exception is raised. This differs from
+> the behavior when trying to execute skey related instructions, which
+> will result in special operation exceptions.
 > 
-> Maybe Jean-Philippe or Eric can answer that?
+> Also let's add the test unittests.cfg so it is run more often.
+> 
+> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+> Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+> ---
+>  s390x/skrf.c        | 80 +++++++++++++++++++++++++++++++++++++++++++++
+>  s390x/unittests.cfg |  4 +++
+>  2 files changed, 84 insertions(+)
+> 
+> diff --git a/s390x/skrf.c b/s390x/skrf.c
+> index 9cae589..fe78711 100644
+> --- a/s390x/skrf.c
+> +++ b/s390x/skrf.c
+> @@ -11,12 +11,16 @@
+>   */
+>  #include <libcflat.h>
+>  #include <asm/asm-offsets.h>
+> +#include <asm-generic/barrier.h>
+>  #include <asm/interrupt.h>
+>  #include <asm/page.h>
+>  #include <asm/facility.h>
+>  #include <asm/mem.h>
+> +#include <asm/sigp.h>
+> +#include <smp.h>
+>  
+>  static uint8_t pagebuf[PAGE_SIZE * 2] __attribute__((aligned(PAGE_SIZE * 2)));
+> +static int testflag = 0;
+>  
+>  static void test_facilities(void)
+>  {
+> @@ -106,6 +110,81 @@ static void test_tprot(void)
+>  	report_prefix_pop();
+>  }
+>  
+> +static void wait_for_flag(void)
+> +{
+> +	while (!testflag)
+> +		mb();
+> +}
+> +
+> +static void set_flag(int val)
+> +{
+> +	mb();
+> +	testflag = val;
+> +	mb();
+> +}
+> +
+> +static void ecall_cleanup(void)
+> +{
+> +	struct lowcore *lc = (void *)0x0;
+> +
+> +	lc->ext_new_psw.mask = 0x0000000180000000UL;
+> +	lc->sw_int_crs[0] = 0x0000000000040000;
+> +
+> +	/*
+> +	 * PGM old contains the ext new PSW, we need to clean it up,
+> +	 * so we don't get a special operation exception on the lpswe
+> +	 * of pgm old.
+> +	 */
+> +	lc->pgm_old_psw.mask = 0x0000000180000000UL;
+> +	lc->pgm_old_psw.addr = (unsigned long)wait_for_flag;
 
-Virtio-iommu could describe which bits of guest-physical memory is
-available for DMA for a given device. It already provides a mechanism for
-describing per-device memory properties (the PROBE request) which is
-extensible. And I think the virtio-iommu device could be used exclusively
-for this, too, by having DMA bypass the VA->PA translation
-(VIRTIO_IOMMU_F_BYPASS) and only enforcing guest-physical boundaries. Or
-just describe the memory and not enforce anything.
+I don't quite understand why you are using wait_for_flag here? Won't
+that function return immediately due to the set_flag(1) below? And if it
+returns, where does the cpu continue to exec code in that case? Wouldn't
+it be better to leave the .addr unchanged, so that the CPU returns to
+the endless loop in smp_cpu_setup_state ?
 
-I don't know how to plug this into the DMA layer of a Linux guest, though,
-but there seems to exist a per-device DMA pool infrastructure. Have you
-looked at rproc_add_virtio_dev()?  It seems to allocates a specific DMA
-region per device, from a "memory-region" device-tree property, so perhaps
-you could simply reuse this.
+ Thomas
 
-Thanks,
-Jean
 
+> +	check_pgm_int_code(PGM_INT_CODE_SPECIFICATION);
+> +	set_flag(1);
+> +}
+> +
+> +/* Set a key into the external new psw mask and open external call masks */
+> +static void ecall_setup(void)
+> +{
+> +	struct lowcore *lc = (void *)0x0;
+> +	uint64_t mask;
+> +
+> +	register_pgm_int_func(ecall_cleanup);
+> +	expect_pgm_int();
+> +	/* Put a skey into the ext new psw */
+> +	lc->ext_new_psw.mask = 0x00F0000180000000UL;
+> +	/* Open up ext masks */
+> +	ctl_set_bit(0, 13);
+> +	mask = extract_psw_mask();
+> +	mask |= PSW_MASK_EXT;
+> +	load_psw_mask(mask);
+> +	/* Tell cpu 0 that we're ready */
+> +	set_flag(1);
+> +}
+> +
+> +static void test_exception_ext_new(void)
+> +{
+> +	struct psw psw = {
+> +		.mask = extract_psw_mask(),
+> +		.addr = (unsigned long)ecall_setup
+> +	};
+> +
+> +	report_prefix_push("exception external new");
+> +	if (smp_query_num_cpus() < 2) {
+> +		report_skip("Need second cpu for exception external new test.");
+> +		report_prefix_pop();
+> +		return;
+> +	}
+> +
+> +	smp_cpu_setup(1, psw);
+> +	wait_for_flag();
+> +	set_flag(0);
+> +
+> +	sigp(1, SIGP_EXTERNAL_CALL, 0, NULL);
+> +	wait_for_flag();
+> +	smp_cpu_stop(1);
+> +	report_prefix_pop();
+> +}
+> +
+>  int main(void)
+>  {
+>  	report_prefix_push("skrf");
+> @@ -121,6 +200,7 @@ int main(void)
+>  	test_mvcos();
+>  	test_spka();
+>  	test_tprot();
+> +	test_exception_ext_new();
+>  
+>  done:
+>  	report_prefix_pop();
+> diff --git a/s390x/unittests.cfg b/s390x/unittests.cfg
+> index 0f156af..b35269b 100644
+> --- a/s390x/unittests.cfg
+> +++ b/s390x/unittests.cfg
+> @@ -88,3 +88,7 @@ extra_params = -m 3G
+>  [css]
+>  file = css.elf
+>  extra_params = -device virtio-net-ccw
+> +
+> +[skrf]
+> +file = skrf.elf
+> +smp = 2
 > 
-> > Another thing that came across in the call was quite a lot of
-> > assumptions about QEMU and Linux w.r.t virtio. While our project will
-> > likely have Linux as a guest OS we are looking specifically at enabling
-> > virtio for Type-1 hypervisors like Xen and the various safety certified
-> > proprietary ones. It is unlikely that QEMU would be used as the VMM for
-> > these deployments. We want to work out what sort of common facilities
-> > hypervisors need to support to enable virtio so the daemons can be
-> > re-usable and maybe setup with a minimal shim for the particular
-> > hypervisor in question.
-> 
-> The vhost-user protocol together with the backend program conventions
-> define the wire protocol and command-line interface (see
-> docs/interop/vhost-user.rst).
-> 
-> vhost-user is already used by other VMMs today. For example,
-> cloud-hypervisor implements vhost-user.
-> 
-> I'm sure there is room for improvement, but it seems like an incremental
-> step given that vhost-user already tries to cater for this scenario.
-> 
-> Are there any specific gaps you have identified?
-> 
-> Stefan
-
 
