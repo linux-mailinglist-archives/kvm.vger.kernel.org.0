@@ -2,31 +2,31 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 867ED2302D4
-	for <lists+kvm@lfdr.de>; Tue, 28 Jul 2020 08:27:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 624C32302DD
+	for <lists+kvm@lfdr.de>; Tue, 28 Jul 2020 08:28:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727906AbgG1G1z (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 28 Jul 2020 02:27:55 -0400
-Received: from mga12.intel.com ([192.55.52.136]:57961 "EHLO mga12.intel.com"
+        id S1728093AbgG1G2L (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 28 Jul 2020 02:28:11 -0400
+Received: from mga12.intel.com ([192.55.52.136]:57967 "EHLO mga12.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727996AbgG1G1y (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 28 Jul 2020 02:27:54 -0400
-IronPort-SDR: OXRFVTlsGxhGk3h4wiD4u6eKpKdEw7DMj+DZlqgC3eocOCFDyNDPafs9bqTG3FAsxXw4dZdmjH
- kcqVf6VRWHtQ==
-X-IronPort-AV: E=McAfee;i="6000,8403,9695"; a="130720434"
+        id S1727986AbgG1G14 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 28 Jul 2020 02:27:56 -0400
+IronPort-SDR: soeiEW/HUIIbvWOoQkJ9qyodAOQrbbu1AUVOE075jAntxW2SykZqVYLcLqxC3ZIWh7TVozzoaK
+ WLJDP96ij/ng==
+X-IronPort-AV: E=McAfee;i="6000,8403,9695"; a="130720437"
 X-IronPort-AV: E=Sophos;i="5.75,405,1589266800"; 
-   d="scan'208";a="130720434"
+   d="scan'208";a="130720437"
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Jul 2020 23:27:54 -0700
-IronPort-SDR: cI+u6BoBiVXaD1ZHPOtGYUecQ1q4g30tRZxcHcHm4aDudZcHfvA8Ack9r2K6qx0ItpuoSIQrV4
- fhC02+72y6PQ==
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Jul 2020 23:27:55 -0700
+IronPort-SDR: ejMU6DzdEDW/ABSoGRiipppTxqc9OzO7XfaQxChOAC7EQJFA5skIXq+AIvA81uV11Q6WgEXI9m
+ S2V3TpLbWJQw==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.75,405,1589266800"; 
-   d="scan'208";a="394233060"
+   d="scan'208";a="394233075"
 Received: from jacob-builder.jf.intel.com ([10.7.199.155])
-  by fmsmga001.fm.intel.com with ESMTP; 27 Jul 2020 23:27:52 -0700
+  by fmsmga001.fm.intel.com with ESMTP; 27 Jul 2020 23:27:54 -0700
 From:   Liu Yi L <yi.l.liu@intel.com>
 To:     qemu-devel@nongnu.org, alex.williamson@redhat.com,
         peterx@redhat.com, jasowang@redhat.com
@@ -35,12 +35,10 @@ Cc:     mst@redhat.com, pbonzini@redhat.com, eric.auger@redhat.com,
         kevin.tian@intel.com, yi.l.liu@intel.com, jun.j.tian@intel.com,
         yi.y.sun@intel.com, hao.wu@intel.com, kvm@vger.kernel.org,
         Jacob Pan <jacob.jun.pan@linux.intel.com>,
-        Yi Sun <yi.y.sun@linux.intel.com>,
-        Richard Henderson <rth@twiddle.net>,
-        Eduardo Habkost <ehabkost@redhat.com>
-Subject: [RFC v9 20/25] intel_iommu: do not pass down pasid bind for PASID #0
-Date:   Mon, 27 Jul 2020 23:34:13 -0700
-Message-Id: <1595918058-33392-21-git-send-email-yi.l.liu@intel.com>
+        Yi Sun <yi.y.sun@linux.intel.com>
+Subject: [RFC v9 21/25] vfio: add support for flush iommu stage-1 cache
+Date:   Mon, 27 Jul 2020 23:34:14 -0700
+Message-Id: <1595918058-33392-22-git-send-email-yi.l.liu@intel.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1595918058-33392-1-git-send-email-yi.l.liu@intel.com>
 References: <1595918058-33392-1-git-send-email-yi.l.liu@intel.com>
@@ -49,64 +47,124 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-RID_PASID field was introduced in VT-d 3.0 spec, it is used
-for DMA requests w/o PASID in scalable mode VT-d. It is also
-known as IOVA. And in VT-d 3.1 spec, there is definition on it:
-
-"Implementations not supporting RID_PASID capability
-(ECAP_REG.RPS is 0b), use a PASID value of 0 to perform
-address translation for requests without PASID."
-
-This patch adds a check against the PASIDs which are going to be
-bound to device. For PASID #0, it is not necessary to pass down
-pasid bind request for it since PASID #0 is used as RID_PASID for
-DMA requests without pasid. Further reason is current Intel vIOMMU
-supports gIOVA by shadowing guest 2nd level page table. However,
-in future, if guest IOMMU driver uses 1st level page table to store
-IOVA mappings, then guest IOVA support will also be done via nested
-translation. When gIOVA is over FLPT, then vIOMMU should pass down
-the pasid bind request for PASID #0 to host, host needs to bind the
-guest IOVA page table to a proper PASID. e.g. PASID value in RID_PASID
-field for PF/VF if ECAP_REG.RPS is clear or default PASID for ADI
-(Assignable Device Interface in Scalable IOV solution).
-
-IOVA over FLPT support on Intel VT-d:
-https://lkml.org/lkml/2019/9/23/297
+This patch adds flush_stage1_cache() definition in HostIOMUContextClass.
+And adds corresponding implementation in VFIO. This is to expose a way
+for vIOMMU to flush stage-1 cache in host side since guest owns stage-1
+translation structures in dual stage DMA translation configuration.
 
 Cc: Kevin Tian <kevin.tian@intel.com>
 Cc: Jacob Pan <jacob.jun.pan@linux.intel.com>
 Cc: Peter Xu <peterx@redhat.com>
+Cc: Eric Auger <eric.auger@redhat.com>
 Cc: Yi Sun <yi.y.sun@linux.intel.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Richard Henderson <rth@twiddle.net>
-Cc: Eduardo Habkost <ehabkost@redhat.com>
-Reviewed-by: Peter Xu <peterx@redhat.com>
+Cc: David Gibson <david@gibson.dropbear.id.au>
+Cc: Alex Williamson <alex.williamson@redhat.com>
+Acked-by: Peter Xu <peterx@redhat.com>
 Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
 ---
- hw/i386/intel_iommu.c | 10 ++++++++++
- 1 file changed, 10 insertions(+)
+ hw/iommu/host_iommu_context.c         | 19 +++++++++++++++++++
+ hw/vfio/common.c                      | 24 ++++++++++++++++++++++++
+ include/hw/iommu/host_iommu_context.h |  8 ++++++++
+ 3 files changed, 51 insertions(+)
 
-diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
-index efad0af..f0e1afa 100644
---- a/hw/i386/intel_iommu.c
-+++ b/hw/i386/intel_iommu.c
-@@ -1893,6 +1893,16 @@ static int vtd_bind_guest_pasid(IntelIOMMUState *s, VTDBus *vtd_bus,
-     HostIOMMUContext *iommu_ctx;
-     int ret = -1;
+diff --git a/hw/iommu/host_iommu_context.c b/hw/iommu/host_iommu_context.c
+index c43965c..a3f7706 100644
+--- a/hw/iommu/host_iommu_context.c
++++ b/hw/iommu/host_iommu_context.c
+@@ -113,6 +113,25 @@ int host_iommu_ctx_unbind_stage1_pgtbl(HostIOMMUContext *iommu_ctx,
+     return hicxc->unbind_stage1_pgtbl(iommu_ctx, unbind);
+ }
  
-+    if (pasid < VTD_HPASID_MIN) {
-+        /*
-+         * If pasid < VTD_HPASID_MIN, this pasid is not allocated
-+         * from host. No need to pass down the changes on it to host.
-+         * TODO: when IOVA over FLPT is ready, this switch should be
-+         * refined.
-+         */
-+        return 0;
++int host_iommu_ctx_flush_stage1_cache(HostIOMMUContext *iommu_ctx,
++                                 struct iommu_cache_invalidate_info *cache)
++{
++    HostIOMMUContextClass *hicxc;
++
++    hicxc = HOST_IOMMU_CONTEXT_GET_CLASS(iommu_ctx);
++
++    if (!hicxc) {
++        return -EINVAL;
 +    }
 +
-     vtd_dev_icx = vtd_bus->dev_icx[devfn];
-     if (!vtd_dev_icx) {
-         /* means no need to go further, e.g. for emulated devices */
++    if (!(iommu_ctx->flags & HOST_IOMMU_NESTING) ||
++        !hicxc->flush_stage1_cache) {
++        return -EINVAL;
++    }
++
++    return hicxc->flush_stage1_cache(iommu_ctx, cache);
++}
++
+ void host_iommu_ctx_init(void *_iommu_ctx, size_t instance_size,
+                          const char *mrtypename,
+                          uint64_t flags,
+diff --git a/hw/vfio/common.c b/hw/vfio/common.c
+index 3f09e74..97b8200 100644
+--- a/hw/vfio/common.c
++++ b/hw/vfio/common.c
+@@ -1275,6 +1275,29 @@ static int vfio_host_iommu_ctx_unbind_stage1_pgtbl(HostIOMMUContext *iommu_ctx,
+     return ret;
+ }
+ 
++static int vfio_host_iommu_ctx_flush_stage1_cache(HostIOMMUContext *iommu_ctx,
++                                    struct iommu_cache_invalidate_info *cache)
++{
++    VFIOContainer *container = container_of(iommu_ctx,
++                                            VFIOContainer, iommu_ctx);
++    struct vfio_iommu_type1_nesting_op *op;
++    unsigned long argsz;
++    int ret = 0;
++
++    argsz = sizeof(*op) + sizeof(*cache);
++    op = g_malloc0(argsz);
++    op->argsz = argsz;
++    op->flags = VFIO_IOMMU_NESTING_OP_CACHE_INVLD;
++    memcpy(&op->data, cache, sizeof(*cache));
++
++    if (ioctl(container->fd, VFIO_IOMMU_NESTING_OP, op)) {
++        ret = -errno;
++        error_report("%s: iommu cache flush failed: %m", __func__);
++    }
++    g_free(op);
++    return ret;
++}
++
+ /**
+  * Get iommu info from host. Caller of this funcion should free
+  * the memory pointed by the returned pointer stored in @info
+@@ -2023,6 +2046,7 @@ static void vfio_host_iommu_context_class_init(ObjectClass *klass,
+     hicxc->pasid_free = vfio_host_iommu_ctx_pasid_free;
+     hicxc->bind_stage1_pgtbl = vfio_host_iommu_ctx_bind_stage1_pgtbl;
+     hicxc->unbind_stage1_pgtbl = vfio_host_iommu_ctx_unbind_stage1_pgtbl;
++    hicxc->flush_stage1_cache = vfio_host_iommu_ctx_flush_stage1_cache;
+ }
+ 
+ static const TypeInfo vfio_host_iommu_context_info = {
+diff --git a/include/hw/iommu/host_iommu_context.h b/include/hw/iommu/host_iommu_context.h
+index 2883ed8..40e860a 100644
+--- a/include/hw/iommu/host_iommu_context.h
++++ b/include/hw/iommu/host_iommu_context.h
+@@ -64,6 +64,12 @@ typedef struct HostIOMMUContextClass {
+     /* Undo a previous bind. @unbind specifies the unbind info. */
+     int (*unbind_stage1_pgtbl)(HostIOMMUContext *iommu_ctx,
+                                struct iommu_gpasid_bind_data *unbind);
++    /*
++     * Propagate stage-1 cache flush to host IOMMU, cache
++     * info specifid in @cache
++     */
++    int (*flush_stage1_cache)(HostIOMMUContext *iommu_ctx,
++                              struct iommu_cache_invalidate_info *cache);
+ } HostIOMMUContextClass;
+ 
+ /*
+@@ -85,6 +91,8 @@ int host_iommu_ctx_bind_stage1_pgtbl(HostIOMMUContext *iommu_ctx,
+                                      struct iommu_gpasid_bind_data *bind);
+ int host_iommu_ctx_unbind_stage1_pgtbl(HostIOMMUContext *iommu_ctx,
+                                  struct iommu_gpasid_bind_data *unbind);
++int host_iommu_ctx_flush_stage1_cache(HostIOMMUContext *iommu_ctx,
++                               struct iommu_cache_invalidate_info *cache);
+ 
+ void host_iommu_ctx_init(void *_iommu_ctx, size_t instance_size,
+                          const char *mrtypename,
 -- 
 2.7.4
 
