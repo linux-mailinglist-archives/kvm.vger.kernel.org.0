@@ -2,124 +2,116 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4D59C23053F
-	for <lists+kvm@lfdr.de>; Tue, 28 Jul 2020 10:23:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1A41D230613
+	for <lists+kvm@lfdr.de>; Tue, 28 Jul 2020 11:04:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728059AbgG1IX1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 28 Jul 2020 04:23:27 -0400
-Received: from mail.kernel.org ([198.145.29.99]:49382 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728017AbgG1IX0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 28 Jul 2020 04:23:26 -0400
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id A523B20838;
-        Tue, 28 Jul 2020 08:23:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1595924605;
-        bh=7J4ifTf3z4A0dVzuF6o8Muc/dgb2Mqij10g2be4Y9DE=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=inLBOhOJkaD/rInFVr1UHi1jHUyuEcmkFu2RME7YqR8Z/cjTmNBcyc0T4SQKugqml
-         Kd2psSirXcMv+m0Xz9GHST5fjl+MoyktTLW4hqNdAh7Ry3JB2jO0eQB7d2SQ250sSf
-         TvEIhuEQxk5whTW4cm9PBhZrjnrSRKMQOtbRSX3U=
-Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=why.lan)
-        by disco-boy.misterjones.org with esmtpsa (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-        (Exim 4.92)
-        (envelope-from <maz@kernel.org>)
-        id 1k0KtQ-00FaXh-7H; Tue, 28 Jul 2020 09:23:24 +0100
-From:   Marc Zyngier <maz@kernel.org>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Nathan Chancellor <natechancellor@gmail.com>,
-        Nick Desaulniers <ndesaulniers@google.com>,
-        Quentin Perret <qperret@google.com>,
-        Will Deacon <will@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org, kernel-team@android.com,
-        stable@vger.kernel.org
-Subject: [PATCH 2/2] KVM: arm64: Don't inherit exec permission across page-table levels
-Date:   Tue, 28 Jul 2020 09:22:55 +0100
-Message-Id: <20200728082255.3864378-3-maz@kernel.org>
-X-Mailer: git-send-email 2.27.0
-In-Reply-To: <20200728082255.3864378-1-maz@kernel.org>
-References: <20200728082255.3864378-1-maz@kernel.org>
+        id S1728346AbgG1JEp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 28 Jul 2020 05:04:45 -0400
+Received: from mail-vi1eur05on2060.outbound.protection.outlook.com ([40.107.21.60]:49761
+        "EHLO EUR05-VI1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1728051AbgG1JEp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 28 Jul 2020 05:04:45 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Nb5Izy49APrelQwQhwDdjunQFfN9O5rbW1YIsKq7k9HblSBzkWWtg2Nnlg/mtwTT6pd7vzVxar0Iq5ZlP4BKqzTw3p4wi33+OUh1Xc8AE07KLuvxD9hVxQUNprI8vFRDfQ79O4v/BGIlY8B9qD4T3pCOsGHf9PskiM7/02p8dUc6OL52wlMGGpIE78Vz8/cbktjUGUSTRj9sm1aX4OmPfUbsIRCSFT+UP6JazLdCEY7BmjhdIA4xJ/EIjXOYKOla203jiYRwyOPc4CxCwCU7g3IxRCrN9NhA674sQZeSQesW1Y5IBw9ff5Bf4EpUBowe6Jchk26JfrHbRpBuVLVIiw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=PwSbCoyT48SY+W2X3hco12Y0BUw0tGELfvsSSILW9fM=;
+ b=hm+wfsexBlcgJoVmEkulnoAbac5g07J7XCa8/dIkEcgoXucj+yHf/roxv64Aff+4v0x6s5gIcBEY9oLZbpyH0i+kHdpdRzePGOIeQwUWp7ygftDFet5oZgInVdQkcQrMnlqu/qt9X+Ia7kkhfu9zgOcRQR4eDXtsuG9wl4gZ4InHZ+Y0nh7TTaNizVihl3/0O7z+qRgW6Wpl+MpkJ8YVwhV9Lc37M+OOn/OFucFGZHvnEPJf5WX+qszug10kdU4MZdvt1gEiKPGn+jEDTU4VlVtvd+BrIWwvhb7disXCN0+GMcYajob3/f9asF/vSIyonq7CHZctP5GtPMyPOkJg9A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=mellanox.com; dmarc=pass action=none header.from=mellanox.com;
+ dkim=pass header.d=mellanox.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Mellanox.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=PwSbCoyT48SY+W2X3hco12Y0BUw0tGELfvsSSILW9fM=;
+ b=nYc8lh20AgqnNya15OP9cKUSDM9zc2qzuOdWacVqRh74zbWWOfc8e+51eEs5N3voUDVg9Pq+RwB+zY9BEfDLOWPne2QgNKP2dlsUmkVhH5Snk45ldE15HE4WUEciwVPmLRAyNgcjJVpA5r1xG3CUVQfa99Dv+0D/67sQ/1GwCLw=
+Authentication-Results: intel.com; dkim=none (message not signed)
+ header.d=none;intel.com; dmarc=none action=none header.from=mellanox.com;
+Received: from AM0PR05MB4786.eurprd05.prod.outlook.com (2603:10a6:208:b3::15)
+ by AM0PR05MB6116.eurprd05.prod.outlook.com (2603:10a6:208:130::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3216.20; Tue, 28 Jul
+ 2020 09:04:41 +0000
+Received: from AM0PR05MB4786.eurprd05.prod.outlook.com
+ ([fe80::9186:8b7:3cf7:7813]) by AM0PR05MB4786.eurprd05.prod.outlook.com
+ ([fe80::9186:8b7:3cf7:7813%7]) with mapi id 15.20.3216.033; Tue, 28 Jul 2020
+ 09:04:41 +0000
+Date:   Tue, 28 Jul 2020 12:04:38 +0300
+From:   Eli Cohen <eli@mellanox.com>
+To:     Zhu Lingshan <lingshan.zhu@intel.com>
+Cc:     jasowang@redhat.com, alex.williamson@redhat.com, mst@redhat.com,
+        pbonzini@redhat.com, sean.j.christopherson@intel.com,
+        wanpengli@tencent.com, virtualization@lists.linux-foundation.org,
+        netdev@vger.kernel.org, kvm@vger.kernel.org, shahafs@mellanox.com,
+        parav@mellanox.com
+Subject: Re: [PATCH V4 4/6] vhost_vdpa: implement IRQ offloading in vhost_vdpa
+Message-ID: <20200728090438.GA21875@nps-server-21.mtl.labs.mlnx>
+References: <20200728042405.17579-1-lingshan.zhu@intel.com>
+ <20200728042405.17579-5-lingshan.zhu@intel.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200728042405.17579-5-lingshan.zhu@intel.com>
+User-Agent: Mutt/1.5.21 (2010-09-15)
+X-ClientProxiedBy: AM0PR10CA0059.EURPRD10.PROD.OUTLOOK.COM
+ (2603:10a6:20b:150::39) To AM0PR05MB4786.eurprd05.prod.outlook.com
+ (2603:10a6:208:b3::15)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 62.31.163.78
-X-SA-Exim-Rcpt-To: pbonzini@redhat.com, natechancellor@gmail.com, ndesaulniers@google.com, qperret@google.com, will@kernel.org, james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, kernel-team@android.com, stable@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from nps-server-21.mtl.labs.mlnx (94.188.199.18) by AM0PR10CA0059.EURPRD10.PROD.OUTLOOK.COM (2603:10a6:20b:150::39) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3216.23 via Frontend Transport; Tue, 28 Jul 2020 09:04:40 +0000
+X-Originating-IP: [94.188.199.18]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-HT: Tenant
+X-MS-Office365-Filtering-Correlation-Id: a8d71944-5193-4780-6d8a-08d832d54355
+X-MS-TrafficTypeDiagnostic: AM0PR05MB6116:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <AM0PR05MB6116493FE9A159D8CBBD54D1C5730@AM0PR05MB6116.eurprd05.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:7691;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: Akn45LIkWeuZLcHr8c61Gc5GY5h6JszSf19DEc7E2eQsEtrTUuGfKg8PnpR4NCYZlxOPwi3tW9BIEwX3aJtUGsYUSG7lp86d8XScotE9TvUIQfL+A48EOd1Xd3u5CYiBqQPOWHCyjmTbpYGtZ79VP3psL2iCjvzPVZ8l5B/jnANDoxSaID2wqj2KquIsBIw9VvokI4XUqqz6s0lEagPm+T/ZxNPG/4cxvdbXfsKS5iNTKevoSe20EglVIjis8j0QRudyP+YU4mdNMxMekxhQkdqoACvO4s2gS+iz7/4808yPXHurnKKG8uB+bIN2cY4ie+qP7UBHkMf0stW13XGOqg==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM0PR05MB4786.eurprd05.prod.outlook.com;PTR:;CAT:NONE;SFTY:;SFS:(4636009)(39860400002)(346002)(136003)(376002)(366004)(396003)(83380400001)(6506007)(7696005)(52116002)(86362001)(66556008)(66476007)(4744005)(5660300002)(33656002)(7416002)(66946007)(4326008)(2906002)(1076003)(186003)(6916009)(55016002)(9686003)(478600001)(316002)(107886003)(26005)(956004)(8936002)(8676002)(16526019);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData: Z2omUVDN/mCYkPGPl2fdthKrm5ulXuLtMCNokLaWm+dCPnHCSSlgAWfvWip+1oIDvzQKN0CX04bSLbxiwh3Bs7jbvzwP4xeoT6laITtLXKFPxAYjjToeIIyR1Fi1tFOa3nJ3Vv/HfOUnrkiJvwnl2J2KIx+TNZ2fv3EQ0epHl2tkcbFXDpj04P3AJBcKo5BDcpJi8BXJD7Dir+mVIXik7YN18zYqpONqgy5nFOuRgn5NXBEfAHETnKQQtpon8XBTz+xuLsQ668t25gqUwHyDuxclBBWzl25yZsvFckNyD5c3HKgF8bXjXPT36wgkehDcdg3TY6cucnpPx0mtG7yy44syrR5LXU22qo9tK0odGCKB5AsNZbqPH/AdtjWXqfliopstxYsxwVBrqNskk/JbeY+FhprXbL7ZBKmGzG/yY4q7unljqMrn/qail9RD24993b5JDK34s84F1l5X3p1ssJE6jKeTlKInrTdb+hYrPxA=
+X-OriginatorOrg: Mellanox.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: a8d71944-5193-4780-6d8a-08d832d54355
+X-MS-Exchange-CrossTenant-AuthSource: AM0PR05MB4786.eurprd05.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Jul 2020 09:04:41.3749
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: a652971c-7d2e-4d9b-a6a4-d149256f461b
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: G8RE3aVQ08CIERWvHIlogqGbd2blyW5+vLuUchlge0TbfoG5X1E+vbV1KjmIwSEp9Aon9oeJ1PFyHjwMJjXReQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM0PR05MB6116
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Will Deacon <will@kernel.org>
+On Tue, Jul 28, 2020 at 12:24:03PM +0800, Zhu Lingshan wrote:
+>  
+> +static void vhost_vdpa_setup_vq_irq(struct vhost_vdpa *v, int qid)
+> +{
+> +	struct vhost_virtqueue *vq = &v->vqs[qid];
+> +	const struct vdpa_config_ops *ops = v->vdpa->config;
+> +	struct vdpa_device *vdpa = v->vdpa;
+> +	int ret, irq;
+> +
+> +	spin_lock(&vq->call_ctx.ctx_lock);
+> +	irq = ops->get_vq_irq(vdpa, qid);
+> +	if (!vq->call_ctx.ctx || irq == -EINVAL) {
+> +		spin_unlock(&vq->call_ctx.ctx_lock);
+> +		return;
+> +	}
+> +
 
-If a stage-2 page-table contains an executable, read-only mapping at the
-pte level (e.g. due to dirty logging being enabled), a subsequent write
-fault to the same page which tries to install a larger block mapping
-(e.g. due to dirty logging having been disabled) will erroneously inherit
-the exec permission and consequently skip I-cache invalidation for the
-rest of the block.
+If I understand correctly, this will cause these IRQs to be forwarded
+directly to the VCPU, e.g. will be handled by the guest/qemu.
+Does this mean that the host will not handle this interrupt? How does it
+work in case on level triggered interrupts?
 
-Ensure that exec permission is only inherited by write faults when the
-new mapping is of the same size as the existing one. A subsequent
-instruction abort will result in I-cache invalidation for the entire
-block mapping.
+In the case of ConnectX, I need to execute some code to acknowledge the
+interrupt.
 
-Signed-off-by: Will Deacon <will@kernel.org>
-Signed-off-by: Marc Zyngier <maz@kernel.org>
-Tested-by: Quentin Perret <qperret@google.com>
-Reviewed-by: Quentin Perret <qperret@google.com>
-Cc: Marc Zyngier <maz@kernel.org>
-Cc: <stable@vger.kernel.org>
-Link: https://lore.kernel.org/r/20200723101714.15873-1-will@kernel.org
----
- arch/arm64/kvm/mmu.c | 11 ++++++-----
- 1 file changed, 6 insertions(+), 5 deletions(-)
-
-diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index 8c0035cab6b6..31058e6e7c2a 100644
---- a/arch/arm64/kvm/mmu.c
-+++ b/arch/arm64/kvm/mmu.c
-@@ -1326,7 +1326,7 @@ static bool stage2_get_leaf_entry(struct kvm *kvm, phys_addr_t addr,
- 	return true;
- }
- 
--static bool stage2_is_exec(struct kvm *kvm, phys_addr_t addr)
-+static bool stage2_is_exec(struct kvm *kvm, phys_addr_t addr, unsigned long sz)
- {
- 	pud_t *pudp;
- 	pmd_t *pmdp;
-@@ -1338,11 +1338,11 @@ static bool stage2_is_exec(struct kvm *kvm, phys_addr_t addr)
- 		return false;
- 
- 	if (pudp)
--		return kvm_s2pud_exec(pudp);
-+		return sz <= PUD_SIZE && kvm_s2pud_exec(pudp);
- 	else if (pmdp)
--		return kvm_s2pmd_exec(pmdp);
-+		return sz <= PMD_SIZE && kvm_s2pmd_exec(pmdp);
- 	else
--		return kvm_s2pte_exec(ptep);
-+		return sz == PAGE_SIZE && kvm_s2pte_exec(ptep);
- }
- 
- static int stage2_set_pte(struct kvm *kvm, struct kvm_mmu_memory_cache *cache,
-@@ -1958,7 +1958,8 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 	 * execute permissions, and we preserve whatever we have.
- 	 */
- 	needs_exec = exec_fault ||
--		(fault_status == FSC_PERM && stage2_is_exec(kvm, fault_ipa));
-+		(fault_status == FSC_PERM &&
-+		 stage2_is_exec(kvm, fault_ipa, vma_pagesize));
- 
- 	if (vma_pagesize == PUD_SIZE) {
- 		pud_t new_pud = kvm_pfn_pud(pfn, mem_type);
--- 
-2.27.0
-
+Can you explain how this should be done?
