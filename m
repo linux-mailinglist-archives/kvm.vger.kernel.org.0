@@ -2,319 +2,256 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BB8CD230C93
-	for <lists+kvm@lfdr.de>; Tue, 28 Jul 2020 16:38:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C3AFD230C97
+	for <lists+kvm@lfdr.de>; Tue, 28 Jul 2020 16:40:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730506AbgG1OiK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 28 Jul 2020 10:38:10 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:52958 "EHLO
+        id S1730461AbgG1OkE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 28 Jul 2020 10:40:04 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:30072 "EHLO
         us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1730486AbgG1OiH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 28 Jul 2020 10:38:07 -0400
+        with ESMTP id S1730449AbgG1OkD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 28 Jul 2020 10:40:03 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1595947085;
+        s=mimecast20190719; t=1595947201;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=pOFRF28EbT8Q3R4fTExC5nvCZHNOSRSF8WWCt3CjB0k=;
-        b=Kj+VaVYdDIV3i4FoK0wXuAJXeNdCjIqekfEvM1i31pDTkavRrVeqgwTZC6d2STUUYiH2aA
-        ZAd7f0Mad5gr8y48q8QPowM5QPaibpbJQLIcvw/6ytvenMOwGOtZgoRcK0I4wViZ+FNOba
-        BNKbzefRpu0B627yyDFI6rikZbVTG6c=
+         to:to:cc:mime-version:mime-version:content-type:content-type;
+        bh=n9RcmArQYWuTpAAdErmPZFmnkNv3sBLv+UXOnyAaRMc=;
+        b=dfS1KQhXXclnOnW+XfHy+L9eycSKr65TDIJC/MODcXXD+pKtaSMbc2s58dZMfzUQZRZBMH
+        xEeuB5qo498fmWf+ulwVO/Aoi79ivl6/4wWJhyMGbIH4oiNcG/9YmkAD3o0ykmmBiH7CNQ
+        PDCBWCnA834BybuW2g8E5JIt88EvIfw=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-286-FFUuaVVEMy64ZwDDW35S8Q-1; Tue, 28 Jul 2020 10:38:03 -0400
-X-MC-Unique: FFUuaVVEMy64ZwDDW35S8Q-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+ us-mta-160-WoCX-GzcPXGCAUZw2cnI1g-1; Tue, 28 Jul 2020 10:39:57 -0400
+X-MC-Unique: WoCX-GzcPXGCAUZw2cnI1g-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D67EF100AA22;
-        Tue, 28 Jul 2020 14:38:01 +0000 (UTC)
-Received: from vitty.brq.redhat.com (unknown [10.40.195.70])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 2EE147BD60;
-        Tue, 28 Jul 2020 14:37:58 +0000 (UTC)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Peter Xu <peterx@redhat.com>, Michael Tsirkin <mst@redhat.com>,
-        Julia Suvorova <jsuvorov@redhat.com>,
-        Andy Lutomirski <luto@kernel.org>, linux-kernel@vger.kernel.org
-Subject: [PATCH 3/3] KVM: selftests: add KVM_MEM_PCI_HOLE test
-Date:   Tue, 28 Jul 2020 16:37:41 +0200
-Message-Id: <20200728143741.2718593-4-vkuznets@redhat.com>
-In-Reply-To: <20200728143741.2718593-1-vkuznets@redhat.com>
-References: <20200728143741.2718593-1-vkuznets@redhat.com>
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1A724107BEF7;
+        Tue, 28 Jul 2020 14:39:56 +0000 (UTC)
+Received: from [10.10.115.102] (ovpn-115-102.rdu2.redhat.com [10.10.115.102])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 4A2C819D7C;
+        Tue, 28 Jul 2020 14:39:51 +0000 (UTC)
+To:     linux-kernel@vger.kernel.org, KVM list <kvm@vger.kernel.org>,
+        wanpengli@tencent.com, Paolo Bonzini <pbonzini@redhat.com>,
+        sean.j.christopherson@intel.com, vkuznets@redhat.com,
+        liran.alon@oracle.com, "frederic@kernel.org" <frederic@kernel.org>,
+        tglx@linutronix.de, Juri Lelli <juri.lelli@redhat.com>
+From:   Nitesh Narayan Lal <nitesh@redhat.com>
+Subject: WARNING: suspicious RCU usage - while installing a VM on a CPU listed
+ under nohz_full
+Organization: Red Hat Inc,
+Message-ID: <ece36eb1-253a-8ec6-c183-309c10bb35d5@redhat.com>
+Date:   Tue, 28 Jul 2020 10:39:49 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="cKA76uN3vpOZ7s5J449z384XSweVwhWxY"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Test the newly introduced KVM_MEM_PCI_HOLE memslots:
-- Reads from all pages return '0xff'
-- Writes to all pages cause KVM_EXIT_MMIO
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--cKA76uN3vpOZ7s5J449z384XSweVwhWxY
+Content-Type: multipart/mixed; boundary="aTJONYBsVsQ5tMycSC03DBOrrMr8uJuQs"
 
-Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
----
- tools/testing/selftests/kvm/Makefile          |   1 +
- .../testing/selftests/kvm/include/kvm_util.h  |   1 +
- tools/testing/selftests/kvm/lib/kvm_util.c    |  81 +++++++------
- .../kvm/x86_64/memory_slot_pci_hole.c         | 112 ++++++++++++++++++
- 4 files changed, 162 insertions(+), 33 deletions(-)
- create mode 100644 tools/testing/selftests/kvm/x86_64/memory_slot_pci_hole.c
+--aTJONYBsVsQ5tMycSC03DBOrrMr8uJuQs
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Content-Language: en-US
 
-diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-index 4a166588d99f..a6fe303fbf6a 100644
---- a/tools/testing/selftests/kvm/Makefile
-+++ b/tools/testing/selftests/kvm/Makefile
-@@ -41,6 +41,7 @@ LIBKVM_s390x = lib/s390x/processor.c lib/s390x/ucall.c
- TEST_GEN_PROGS_x86_64 = x86_64/cr4_cpuid_sync_test
- TEST_GEN_PROGS_x86_64 += x86_64/evmcs_test
- TEST_GEN_PROGS_x86_64 += x86_64/hyperv_cpuid
-+TEST_GEN_PROGS_x86_64 += x86_64/memory_slot_pci_hole
- TEST_GEN_PROGS_x86_64 += x86_64/mmio_warning_test
- TEST_GEN_PROGS_x86_64 += x86_64/platform_info_test
- TEST_GEN_PROGS_x86_64 += x86_64/set_sregs_test
-diff --git a/tools/testing/selftests/kvm/include/kvm_util.h b/tools/testing/selftests/kvm/include/kvm_util.h
-index 919e161dd289..8e7bec7bd287 100644
---- a/tools/testing/selftests/kvm/include/kvm_util.h
-+++ b/tools/testing/selftests/kvm/include/kvm_util.h
-@@ -59,6 +59,7 @@ enum vm_mem_backing_src_type {
- 	VM_MEM_SRC_ANONYMOUS,
- 	VM_MEM_SRC_ANONYMOUS_THP,
- 	VM_MEM_SRC_ANONYMOUS_HUGETLB,
-+	VM_MEM_SRC_NONE,
- };
- 
- int kvm_check_cap(long cap);
-diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
-index 74776ee228f2..46bb28ea34ec 100644
---- a/tools/testing/selftests/kvm/lib/kvm_util.c
-+++ b/tools/testing/selftests/kvm/lib/kvm_util.c
-@@ -453,8 +453,11 @@ static void __vm_mem_region_delete(struct kvm_vm *vm,
- 		    "rc: %i errno: %i", ret, errno);
- 
- 	sparsebit_free(&region->unused_phy_pages);
--	ret = munmap(region->mmap_start, region->mmap_size);
--	TEST_ASSERT(ret == 0, "munmap failed, rc: %i errno: %i", ret, errno);
-+	if (region->mmap_start) {
-+		ret = munmap(region->mmap_start, region->mmap_size);
-+		TEST_ASSERT(ret == 0, "munmap failed, rc: %i errno: %i", ret,
-+			    errno);
-+	}
- 
- 	free(region);
- }
-@@ -643,34 +646,42 @@ void vm_userspace_mem_region_add(struct kvm_vm *vm,
- 	alignment = 1;
- #endif
- 
--	if (src_type == VM_MEM_SRC_ANONYMOUS_THP)
--		alignment = max(huge_page_size, alignment);
--
--	/* Add enough memory to align up if necessary */
--	if (alignment > 1)
--		region->mmap_size += alignment;
--
--	region->mmap_start = mmap(NULL, region->mmap_size,
--				  PROT_READ | PROT_WRITE,
--				  MAP_PRIVATE | MAP_ANONYMOUS
--				  | (src_type == VM_MEM_SRC_ANONYMOUS_HUGETLB ? MAP_HUGETLB : 0),
--				  -1, 0);
--	TEST_ASSERT(region->mmap_start != MAP_FAILED,
--		    "test_malloc failed, mmap_start: %p errno: %i",
--		    region->mmap_start, errno);
--
--	/* Align host address */
--	region->host_mem = align(region->mmap_start, alignment);
--
--	/* As needed perform madvise */
--	if (src_type == VM_MEM_SRC_ANONYMOUS || src_type == VM_MEM_SRC_ANONYMOUS_THP) {
--		ret = madvise(region->host_mem, npages * vm->page_size,
--			     src_type == VM_MEM_SRC_ANONYMOUS ? MADV_NOHUGEPAGE : MADV_HUGEPAGE);
--		TEST_ASSERT(ret == 0, "madvise failed,\n"
--			    "  addr: %p\n"
--			    "  length: 0x%lx\n"
--			    "  src_type: %x",
--			    region->host_mem, npages * vm->page_size, src_type);
-+	if (src_type != VM_MEM_SRC_NONE) {
-+		if (src_type == VM_MEM_SRC_ANONYMOUS_THP)
-+			alignment = max(huge_page_size, alignment);
-+
-+		/* Add enough memory to align up if necessary */
-+		if (alignment > 1)
-+			region->mmap_size += alignment;
-+
-+		region->mmap_start = mmap(NULL, region->mmap_size,
-+			  PROT_READ | PROT_WRITE,
-+			  MAP_PRIVATE | MAP_ANONYMOUS
-+			  | (src_type == VM_MEM_SRC_ANONYMOUS_HUGETLB ?
-+			     MAP_HUGETLB : 0), -1, 0);
-+		TEST_ASSERT(region->mmap_start != MAP_FAILED,
-+			    "test_malloc failed, mmap_start: %p errno: %i",
-+			    region->mmap_start, errno);
-+
-+		/* Align host address */
-+		region->host_mem = align(region->mmap_start, alignment);
-+
-+		/* As needed perform madvise */
-+		if (src_type == VM_MEM_SRC_ANONYMOUS ||
-+		    src_type == VM_MEM_SRC_ANONYMOUS_THP) {
-+			ret = madvise(region->host_mem, npages * vm->page_size,
-+				      src_type == VM_MEM_SRC_ANONYMOUS ?
-+				      MADV_NOHUGEPAGE : MADV_HUGEPAGE);
-+			TEST_ASSERT(ret == 0, "madvise failed,\n"
-+				    "  addr: %p\n"
-+				    "  length: 0x%lx\n"
-+				    "  src_type: %x",
-+				    region->host_mem, npages * vm->page_size,
-+				    src_type);
-+		}
-+	} else {
-+		region->mmap_start = NULL;
-+		region->host_mem = NULL;
- 	}
- 
- 	region->unused_phy_pages = sparsebit_alloc();
-@@ -1076,9 +1087,13 @@ void *addr_gpa2hva(struct kvm_vm *vm, vm_paddr_t gpa)
- 	list_for_each_entry(region, &vm->userspace_mem_regions, list) {
- 		if ((gpa >= region->region.guest_phys_addr)
- 			&& (gpa <= (region->region.guest_phys_addr
--				+ region->region.memory_size - 1)))
--			return (void *) ((uintptr_t) region->host_mem
--				+ (gpa - region->region.guest_phys_addr));
-+				+ region->region.memory_size - 1))) {
-+			if (region->host_mem)
-+				return (void *) ((uintptr_t) region->host_mem
-+				 + (gpa - region->region.guest_phys_addr));
-+			else
-+				return NULL;
-+		}
- 	}
- 
- 	TEST_FAIL("No vm physical memory at 0x%lx", gpa);
-diff --git a/tools/testing/selftests/kvm/x86_64/memory_slot_pci_hole.c b/tools/testing/selftests/kvm/x86_64/memory_slot_pci_hole.c
-new file mode 100644
-index 000000000000..f5fa80dfcba7
---- /dev/null
-+++ b/tools/testing/selftests/kvm/x86_64/memory_slot_pci_hole.c
-@@ -0,0 +1,112 @@
-+// SPDX-License-Identifier: GPL-2.0
-+#define _GNU_SOURCE /* for program_invocation_short_name */
-+#include <fcntl.h>
-+#include <pthread.h>
-+#include <sched.h>
-+#include <signal.h>
-+#include <stdio.h>
-+#include <stdlib.h>
-+#include <string.h>
-+#include <sys/ioctl.h>
-+
-+#include <linux/compiler.h>
-+
-+#include <test_util.h>
-+#include <kvm_util.h>
-+#include <processor.h>
-+
-+#define VCPU_ID 0
-+
-+#define MEM_REGION_GPA		0xc0000000
-+#define MEM_REGION_SIZE		0x4000
-+#define MEM_REGION_SLOT		10
-+
-+static void guest_code(void)
-+{
-+	uint8_t val;
-+
-+	/* First byte in the first page */
-+	val = READ_ONCE(*((uint8_t *)MEM_REGION_GPA));
-+	GUEST_ASSERT(val == 0xff);
-+
-+	GUEST_SYNC(1);
-+
-+	/* Random byte in the second page */
-+	val = READ_ONCE(*((uint8_t *)MEM_REGION_GPA + 5000));
-+	GUEST_ASSERT(val == 0xff);
-+
-+	GUEST_SYNC(2);
-+
-+	/* Write to the first page */
-+	WRITE_ONCE(*((uint64_t *)MEM_REGION_GPA + 1024/8), 0xdeafbeef);
-+
-+	GUEST_SYNC(3);
-+
-+	/* Write to the second page */
-+	WRITE_ONCE(*((uint64_t *)MEM_REGION_GPA + 8000/8), 0xdeafbeef);
-+
-+	GUEST_SYNC(4);
-+
-+	GUEST_DONE();
-+}
-+
-+int main(int argc, char *argv[])
-+{
-+	struct kvm_vm *vm;
-+	struct kvm_run *run;
-+	struct ucall uc;
-+	int stage, rv;
-+
-+	rv = kvm_check_cap(KVM_CAP_PCI_HOLE_MEM);
-+	if (!rv) {
-+		print_skip("KVM_CAP_PCI_HOLE_MEM not supported");
-+		exit(KSFT_SKIP);
-+	}
-+
-+	vm = vm_create_default(VCPU_ID, 0, guest_code);
-+
-+	run = vcpu_state(vm, VCPU_ID);
-+
-+	vcpu_set_cpuid(vm, VCPU_ID, kvm_get_supported_cpuid());
-+
-+	vm_userspace_mem_region_add(vm, VM_MEM_SRC_NONE,
-+				    MEM_REGION_GPA, MEM_REGION_SLOT,
-+				    MEM_REGION_SIZE / getpagesize(),
-+				    KVM_MEM_PCI_HOLE);
-+
-+	virt_map(vm, MEM_REGION_GPA, MEM_REGION_GPA,
-+		 MEM_REGION_SIZE / getpagesize(), 0);
-+
-+	for (stage = 1;; stage++) {
-+		_vcpu_run(vm, VCPU_ID);
-+
-+		if (stage == 3 || stage == 5) {
-+			TEST_ASSERT(run->exit_reason == KVM_EXIT_MMIO,
-+			   "Write to PCI_HOLE page should cause KVM_EXIT_MMIO");
-+			continue;
-+		}
-+
-+		TEST_ASSERT(run->exit_reason == KVM_EXIT_IO,
-+			    "Stage %d: unexpected exit reason: %u (%s),\n",
-+			    stage, run->exit_reason,
-+			    exit_reason_str(run->exit_reason));
-+
-+		switch (get_ucall(vm, VCPU_ID, &uc)) {
-+		case UCALL_ABORT:
-+			TEST_FAIL("%s at %s:%ld", (const char *)uc.args[0],
-+				  __FILE__, uc.args[1]);
-+			/* NOT REACHED */
-+		case UCALL_SYNC:
-+			break;
-+		case UCALL_DONE:
-+			goto done;
-+		default:
-+			TEST_FAIL("Unknown ucall %lu", uc.cmd);
-+		}
-+	}
-+
-+done:
-+	kvm_vm_free(vm);
-+
-+	return 0;
-+}
--- 
-2.25.4
+Hi,
+
+I have recently come across an RCU trace with the 5.8-rc7 kernel that has t=
+he
+debug configs enabled while installing a VM on a CPU that is listed under
+nohz_full.
+
+Based on some of the initial debugging, my impression is that the issue is
+triggered because of the fastpath that is meant to optimize the writes to x=
+2APIC
+ICR that eventually leads to a virtual IPI in fixed delivery mode, is getti=
+ng
+invoked from the quiescent state.
+
+Following is the RCU trace dump that I was getting:
+
+[=C2=A0 178.109535] =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+[=C2=A0 178.114027] WARNING: suspicious RCU usage
+[=C2=A0 178.118518] 5.8.0-rc7-upstream-+ #10 Not tainted
+[=C2=A0 178.123685] -----------------------------
+[=C2=A0 178.128176] arch/x86/kvm/lapic.c:269 suspicious rcu_dereference_che=
+ck() usage!
+[=C2=A0 178.136254]
+[=C2=A0 178.136254] other info that might help us debug this:
+[=C2=A0 178.136254]
+[=C2=A0 178.145205]
+[=C2=A0 178.145205] rcu_scheduler_active =3D 2, debug_locks =3D 1
+[=C2=A0 178.152506] 1 lock held by CPU 0/KVM/2959:
+[=C2=A0 178.157091]=C2=A0 #0: ffffc9000717b6f8 (&kvm->arch.apic_map_lock){+=
+.+.}-{3:3}, at:
+kvm_recalculate_apic_map+0x8b/0xdd0 [kvm]
+[=C2=A0 178.169207]
+[=C2=A0 178.169207] stack backtrace:
+[=C2=A0 178.174086] CPU: 18 PID: 2959 Comm: CPU 0/KVM Not tainted
+5.8.0-rc7-upstream-+ #10
+[=C2=A0 178.182539] Hardware name: Dell Inc. PowerEdge R430/0CN7X8, BIOS 2.=
+6.0 10/31/2017
+[=C2=A0 178.190895] Call Trace:
+[=C2=A0 178.193637]=C2=A0 dump_stack+0x9d/0xe0
+[=C2=A0 178.197379]=C2=A0 kvm_recalculate_apic_map+0x8ce/0xdd0 [kvm]
+[=C2=A0 178.203259]=C2=A0 ? kvm_lapic_reset+0x832/0xe50 [kvm]
+[=C2=A0 178.208459]=C2=A0 kvm_vcpu_reset+0x28/0x7b0 [kvm]
+[=C2=A0 178.213270]=C2=A0 kvm_arch_vcpu_create+0x830/0xb70 [kvm]
+[=C2=A0 178.218759]=C2=A0 kvm_vm_ioctl+0x11b1/0x1fe0 [kvm]
+[=C2=A0 178.223635]=C2=A0 ? mark_lock+0x144/0x19e0
+[=C2=A0 178.227757]=C2=A0 ? kvm_unregister_device_ops+0xe0/0xe0 [kvm]
+[=C2=A0 178.233698]=C2=A0 ? sched_clock+0x5/0x10
+[=C2=A0 178.237597]=C2=A0 ? sched_clock_cpu+0x18/0x1d0
+[=C2=A0 178.242087]=C2=A0 ? __lock_acquire+0xcf6/0x5010
+[=C2=A0 178.246686]=C2=A0 ? lockdep_hardirqs_on_prepare+0x550/0x550
+[=C2=A0 178.252429]=C2=A0 ? lockdep_hardirqs_on_prepare+0x550/0x550
+[=C2=A0 178.258177]=C2=A0 ? sched_clock+0x5/0x10
+[=C2=A0 178.262074]=C2=A0 ? sched_clock_cpu+0x18/0x1d0
+[=C2=A0 178.266556]=C2=A0 ? find_held_lock+0x3a/0x1c0
+[=C2=A0 178.270953]=C2=A0 ? ioctl_file_clone+0x120/0x120
+[=C2=A0 178.275630]=C2=A0 ? selinux_file_ioctl+0x98/0x570
+[=C2=A0 178.280405]=C2=A0 ? selinux_file_mprotect+0x5b0/0x5b0
+[=C2=A0 178.285569]=C2=A0 ? rcu_tasks_wait_gp+0x6d1/0xa50
+[=C2=A0 178.290342]=C2=A0 ? rcu_read_lock_sched_held+0xe0/0xe0
+[=C2=A0 178.295608]=C2=A0 ? __fget_files+0x1f0/0x300
+[=C2=A0 178.299912]=C2=A0 ksys_ioctl+0xc0/0x110
+[=C2=A0 178.303719]=C2=A0 __x64_sys_ioctl+0x6f/0xb0
+[=C2=A0 178.307913]=C2=A0 do_syscall_64+0x51/0xb0
+[=C2=A0 178.311913]=C2=A0 entry_SYSCALL_64_after_hwframe+0x44/0xa9
+[=C2=A0 178.317557] RIP: 0033:0x7f6b9700d88b
+[=C2=A0 178.321551] Code: 0f 1e fa 48 8b 05 fd 95 2c 00 64 c7 00 26 00 00 0=
+0 48 c7 c0
+ff ff ff ff c3 66 0f 1f 44 00 00 f3 0f 1e fa b8 10 00 00 00 0f 05 <48> 3d 0=
+1 f0
+ff ff 73 018
+[=C2=A0 178.342513] RSP: 002b:00007f6b8cbe9668 EFLAGS: 00000246 ORIG_RAX:
+0000000000000010
+[=C2=A0 178.350967] RAX: ffffffffffffffda RBX: 000055e8162d9000 RCX: 00007f=
+6b9700d88b
+[=C2=A0 178.358935] RDX: 0000000000000000 RSI: 000000000000ae41 RDI: 000000=
+000000000e
+[=C2=A0 178.366903] RBP: 000055e8162d9000 R08: 000055e8155ec4d0 R09: 000055=
+e8162d9000
+[=C2=A0 178.374871] R10: 000055e815d94ee0 R11: 0000000000000246 R12: 000055=
+e8162ad420
+[=C2=A0 178.382838] R13: 000055e8162d9000 R14: 00007ffedf043660 R15: 00007f=
+6b8cbe9800
+[=C2=A0 182.771858]
+[=C2=A0 182.773606] =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+[=C2=A0 182.778084] WARNING: suspicious RCU usage
+[=C2=A0 182.782564] 5.8.0-rc7-upstream-+ #10 Not tainted
+[=C2=A0 182.787719] -----------------------------
+[=C2=A0 182.792197] arch/x86/include/asm/trace/fpu.h:60 suspicious
+rcu_dereference_check() usage!
+[=C2=A0 182.801329]
+[=C2=A0 182.801329] other info that might help us debug this:
+[=C2=A0 182.801329]
+[=C2=A0 182.810268]
+[=C2=A0 182.810268] RCU used illegally from idle CPU!
+[=C2=A0 182.810268] rcu_scheduler_active =3D 2, debug_locks =3D 1
+[=C2=A0 182.822407] RCU used illegally from extended quiescent state!
+[=C2=A0 182.828824] 1 lock held by CPU 0/KVM/2959:
+[=C2=A0 182.833397]=C2=A0 #0: ffff88903f8500d0 (&vcpu->mutex){+.+.}-{3:3}, =
+at:
+kvm_vcpu_ioctl+0x172/0xb00 [kvm]
+[=C2=A0 182.838308]
+[=C2=A0 182.838308] stack backtrace:
+[=C2=A0 182.838313] CPU: 18 PID: 2959 Comm: CPU 0/KVM Tainted: G=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 W=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0
+5.8.0-rc7-upstream-+ #10
+[=C2=A0 182.838316] Hardware name: Dell Inc. PowerEdge R430/0CN7X8, BIOS 2.=
+6.0 10/31/2017
+[=C2=A0 182.838318] Call Trace:
+[=C2=A0 182.874318]=C2=A0 dump_stack+0x9d/0xe0
+[=C2=A0 182.878024]=C2=A0 switch_fpu_return+0x37c/0x410
+[=C2=A0 182.882602]=C2=A0 ? fpu__clear+0x1a0/0x1a0
+[=C2=A0 182.886700]=C2=A0 ? rcu_dynticks_eqs_enter+0x15/0x30
+[=C2=A0 182.891807]=C2=A0 vcpu_enter_guest+0x1854/0x3df0 [kvm]
+[=C2=A0 182.897121]=C2=A0 ? kvm_vcpu_reload_apic_access_page+0x60/0x60 [kvm=
+]
+[=C2=A0 182.903738]=C2=A0 ? lock_acquire+0x1ac/0xac0
+[=C2=A0 182.908062]=C2=A0 ? kvm_arch_vcpu_ioctl_run+0x1dc/0x13c0 [kvm]
+[=C2=A0 182.914107]=C2=A0 ? rcu_read_unlock+0x50/0x50
+[=C2=A0 182.918489]=C2=A0 ? rcu_read_lock_sched_held+0xaf/0xe0
+[=C2=A0 182.923788]=C2=A0 ? kvm_load_guest_fpu+0x94/0x350 [kvm]
+[=C2=A0 182.929177]=C2=A0 ? kvm_load_guest_fpu+0x94/0x350 [kvm]
+[=C2=A0 182.934528]=C2=A0 ? __local_bh_enable_ip+0x123/0x1a0
+[=C2=A0 182.939635]=C2=A0 kvm_arch_vcpu_ioctl_run+0x310/0x13c0 [kvm]
+[=C2=A0 182.945529]=C2=A0 kvm_vcpu_ioctl+0x3ee/0xb00 [kvm]
+[=C2=A0 182.950406]=C2=A0 ? sched_clock+0x5/0x10
+[=C2=A0 182.954336]=C2=A0 ? kvm_set_memory_region+0x40/0x40 [kvm]
+[=C2=A0 182.959897]=C2=A0 ? ioctl_file_clone+0x120/0x120
+[=C2=A0 182.964572]=C2=A0 ? selinux_file_ioctl+0x98/0x570
+[=C2=A0 182.969347]=C2=A0 ? selinux_file_mprotect+0x5b0/0x5b0
+[=C2=A0 182.974507]=C2=A0 ? rcu_tasks_wait_gp+0x710/0xa50
+[=C2=A0 182.979280]=C2=A0 ? rcu_read_lock_sched_held+0xe0/0xe0
+[=C2=A0 182.984547]=C2=A0 ? __fget_files+0x1f0/0x300
+[=C2=A0 182.988852]=C2=A0 ksys_ioctl+0xc0/0x110
+[=C2=A0 182.992660]=C2=A0 __x64_sys_ioctl+0x6f/0xb0
+[=C2=A0 182.996853]=C2=A0 do_syscall_64+0x51/0xb0
+[=C2=A0 183.000849]=C2=A0 entry_SYSCALL_64_after_hwframe+0x44/0xa9
+[=C2=A0 183.006491] RIP: 0033:0x7f6b9700d88b
+[=C2=A0 183.010486] Code: 0f 1e fa 48 8b 05 fd 95 2c 00 64 c7 00 26 00 00 0=
+0 48 c7 c0
+ff ff ff ff c3 66 0f 1f 44 00 00 f3 0f 1e fa b8 10 00 00 00 0f 05 <48> 3d 0=
+1 f0
+ff ff 73 018
+[=C2=A0 183.031446] RSP: 002b:00007f6b8cbe9618 EFLAGS: 00000246 ORIG_RAX:
+0000000000000010
+[=C2=A0 183.039901] RAX: ffffffffffffffda RBX: 000055e8162d9000 RCX: 00007f=
+6b9700d88b
+[=C2=A0 183.047868] RDX: 0000000000000000 RSI: 000000000000ae80 RDI: 000000=
+0000000018
+[=C2=A0 183.055826] RBP: 000055e8162d909b R08: 000055e8155ec1d0 R09: 000055=
+e815db1620
+[=C2=A0 183.063784] R10: 0000000000000000 R11: 0000000000000246 R12: 000055=
+e8151f6290
+[=C2=A0 183.071752] R13: 000055e8155c81c0 R14: 00007ffedf043660 R15: 00007f=
+6b9c163000
+
+Please let me know if any other information is required.
+
+--=20
+Nitesh
+
+
+--aTJONYBsVsQ5tMycSC03DBOrrMr8uJuQs--
+
+--cKA76uN3vpOZ7s5J449z384XSweVwhWxY
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEkXcoRVGaqvbHPuAGo4ZA3AYyozkFAl8gOLUACgkQo4ZA3AYy
+oznjIw//cdB8faGNVptH+3XAklgpKq65lAgc/pXBqHp2NqeWtOv/J8RiFXpDtZcS
+vl2XbQHggOvcSXIGv9ygqwfWSkdx8d7rt1BCg7ErXqHEVbY0B9PvevCQr10QnQxB
+aXn5mEqc55sk8iX/NgBZQF9oIiQEB8AzlB7IJVWslQ+2yp940QSCP1s3UAJat0Sp
+dpqfeABd3waQZYHGY9IgJ+8TeA2Sch6nlCg9TTZHEyL2xKfZOT+eZpX6KDM+7xHA
+qQnMpw5PqM9F+3hHgFYNw0Fgc3Mj1342F1NqSrtdlEzDrS4I17vLJQXpTiQSK78+
+C2Qtd3e8TqLHXdZWhKiWTfdVtI4Xwoq4SQtzombs4jrzM591Qgjykp568JBQ/r0R
+AAh9QZHtvrAeOZ90cvoSR/lumFDc8ImTnCILL5psKMzopTMq5GzR0zIPWGbGp2JY
+6zq5OAE9H0IPZjP9CLGGGoJdWwNM9UQXFN39tXiYRG6rUzdZwdTua27Vh884iDBB
+YgOEwcONMZQY/RJBidn7fAnba//v1bKQPpejhAxc+3ky8th21WUH64lwr/06P3Ag
+Y/vOJROzQYUWjyIK5rzNtYwoRbBxa17WmT9O9JmSQ5pcz5XAHNG2mNke6EhX42B5
+Efb7gx8I4M52+ZM58KlZzDefkc4Mn9ZyJqd41Otlhed+frow5ps=
+=/N2c
+-----END PGP SIGNATURE-----
+
+--cKA76uN3vpOZ7s5J449z384XSweVwhWxY--
 
