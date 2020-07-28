@@ -2,119 +2,147 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B59F8230F6F
-	for <lists+kvm@lfdr.de>; Tue, 28 Jul 2020 18:34:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B7FCC2310A8
+	for <lists+kvm@lfdr.de>; Tue, 28 Jul 2020 19:13:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731451AbgG1Qd7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 28 Jul 2020 12:33:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54888 "EHLO
+        id S1731839AbgG1RN0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 28 Jul 2020 13:13:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32864 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731191AbgG1Qd6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 28 Jul 2020 12:33:58 -0400
-Received: from mail-lj1-x241.google.com (mail-lj1-x241.google.com [IPv6:2a00:1450:4864:20::241])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A3F00C061794
-        for <kvm@vger.kernel.org>; Tue, 28 Jul 2020 09:33:57 -0700 (PDT)
-Received: by mail-lj1-x241.google.com with SMTP id s16so6608721ljc.8
-        for <kvm@vger.kernel.org>; Tue, 28 Jul 2020 09:33:57 -0700 (PDT)
+        with ESMTP id S1731684AbgG1RN0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 28 Jul 2020 13:13:26 -0400
+Received: from mail-io1-xd42.google.com (mail-io1-xd42.google.com [IPv6:2607:f8b0:4864:20::d42])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EE56EC0619D4
+        for <kvm@vger.kernel.org>; Tue, 28 Jul 2020 10:13:25 -0700 (PDT)
+Received: by mail-io1-xd42.google.com with SMTP id w12so7925888iom.4
+        for <kvm@vger.kernel.org>; Tue, 28 Jul 2020 10:13:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=yuxijuLHIOB0F9v49dQBc2O0af6WKNiJzGh1ZbKbHko=;
-        b=qsskc5KL0O+PY0safIF+iwWyev/qr/QYPqK184NvB4tWeb1Qc4WElTrgsjF8wUJBde
-         6MOlXLXFGN0WOGQ8uP/XgKzS68dmY/cP8bWCA/2t7/F5E/VFCrjFKUnzEuaCW7CIhKH0
-         t04iiX06F00McgNMDboalxkDBmyOsGcCAQK3C5VF6zuol7T7wQNK6MpF/ox5qu+Qd1yK
-         mcAGqt09zds5G55etToMx0hH8PwE3lTjZcG1kjHZBnxCe4hIsrIm5dpCOQ2yiAtuHqZC
-         bm/zIzgpWWZQl0a8QB2YBhlSWvNgIoebiT7WFxWFD9ip4iSW4uotv0iK6ptBimzxaB8B
-         kD7A==
+        bh=G7RHcaI6/eTe56IzgJ5p2FT6CPrKQOVowAeyYJ5JZY8=;
+        b=hqBFbZ1EIlbZWPYoCsixxDe1MAR9ZiNu7XW7VsFaOGKOrul7BN73reE5RP2wJUhIMi
+         soM8CTX6M0sE6+8mXj356oFq7afSTEN3raZmVx7Iw6ZX1LBvJkmNf8BeFWhXyWgTt5QO
+         sX/uSn8oNMCt4QDEShDFJ7/oldS98rYaGFuedhtSNN+eDif4oEixlTqZPeAbfbXRDt/U
+         cFfLAi/d75TyOrcppGsnsrwsy1s6s4M/K5qeJH4Qg2x2NnVDLWg00bUa+RswtIAz0yV8
+         uZjiyPSCrman08np7drF5ovs+s0yYro3RLrjtBQtnu85Srj/Kdbt8DZ3cLk/3fN4nkny
+         9iqQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=yuxijuLHIOB0F9v49dQBc2O0af6WKNiJzGh1ZbKbHko=;
-        b=YBRjBGUKKOuovG59cDZdwIzG1GPOgYBgI8TLKvLBFnIeANyPkE3VTUcpChOXA4G1bW
-         UuUHaAKAfZ/XODlmVgmOocrJcgkH2g/E0lMttyk83oXGPOYFIAvm1gLMBsuHKQcd8Enk
-         Cn5Twk7/uI9I2JheHkfGNH8cHb6yFP74zydoQACPrnpGxk823oecCEkr00hB5twy1W5S
-         gN4i5E4XIBlvfppIAt09odrSKt0GmAsIjmfs7lSGfNLmvPRVj+d5aDUM3ZxhYj363kI4
-         WnmLEX5XX3gZCT9skkWevwDAta9Mv89QiBryAdumH+ksCocSg2hszgelToIzTkO3XRT+
-         xovg==
-X-Gm-Message-State: AOAM533c4KM7DhR6hNovBH3e8FbxctI1Hsno47d6mZXA1nO8HYcPOPUM
-        m4O3GIbFGkAwl8kupdToeggCJqj9e2WwuHCA2sSX+e1f
-X-Google-Smtp-Source: ABdhPJxMv6WOP64yxWZJODcfz0QcbngiD7jQIfRiSyMAGdRtOUJr9z5zEVBqrGvazNCPGBspJIYC8iIZ26e5dNfAp7Y=
-X-Received: by 2002:a05:651c:324:: with SMTP id b4mr12255329ljp.235.1595954035506;
- Tue, 28 Jul 2020 09:33:55 -0700 (PDT)
+        bh=G7RHcaI6/eTe56IzgJ5p2FT6CPrKQOVowAeyYJ5JZY8=;
+        b=P+PEueLtteb9ESV4Emr7ZfiHC9rBS6bKoxfL7ul/ZqICUakmPbHjBkWFtEak05tjkX
+         /7Hojj7XJtKPYGaOxmZ51TEsDv4fA+7cwfKxA7tietgT5ZVI/31ZHf3XLicEQJHOAN/+
+         I8MiTzRvZdkgHk0GnNBUCDNW9+sY1or2tk8soy3gIMqMFZn8L6llWwai+au38zF2Ac82
+         Rgr2NjZ+0O0e0HJwL4mqqB2jRum1bt6Iv6X2lBhP1leMQl8ZNeb0EBm6e5/cT005m2mC
+         HCYxEU93n2Wu4a5NqckeD8G82o/zrX4NLgZYO5400WxeztqbMWE6ag70bGxdOBlSimt/
+         JbXA==
+X-Gm-Message-State: AOAM533pslRvJCVvn1NAA7n5ZaG7ABcoXSwLjaLnrZOLyXBJIuIO6D61
+        YOAWHe4oLjoegoDa2EMSimMA7KcpchCOE48GrDFfxQ==
+X-Google-Smtp-Source: ABdhPJzma4OqnK14EV4esOOkgwzNHy5xbaUVnJne8BaCRpJN0GzCX3/MLC6Rh5rtpUGBJ1dGDwx7gOeDEISxL4P9YPA=
+X-Received: by 2002:a05:6638:164e:: with SMTP id a14mr9658222jat.18.1595956404815;
+ Tue, 28 Jul 2020 10:13:24 -0700 (PDT)
 MIME-Version: 1.0
-References: <20200722032629.3687068-1-oupton@google.com>
-In-Reply-To: <20200722032629.3687068-1-oupton@google.com>
-From:   Oliver Upton <oupton@google.com>
-Date:   Tue, 28 Jul 2020 09:33:43 -0700
-Message-ID: <CAOQ_QsgeN4DCghH6ibb68C+P0ETr77s2s7Us+uxF6E6LFx62tw@mail.gmail.com>
-Subject: Re: [PATCH v3 0/5] KVM_{GET,SET}_TSC_OFFSET ioctls
-To:     kvm list <kvm@vger.kernel.org>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Peter Shier <pshier@google.com>,
+References: <20200728004446.932-1-graf@amazon.com> <87d04gm4ws.fsf@vitty.brq.redhat.com>
+ <a1f30fc8-09f5-fe2f-39e2-136b881ed15a@amazon.com>
+In-Reply-To: <a1f30fc8-09f5-fe2f-39e2-136b881ed15a@amazon.com>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Tue, 28 Jul 2020 10:13:13 -0700
+Message-ID: <CALMp9eQ3OxhQZYiHPiebX=KyvjWQgxQEO-owjSoxgPKsOMRvjw@mail.gmail.com>
+Subject: Re: [PATCH] KVM: x86: Deflect unknown MSR accesses to user space
+To:     Alexander Graf <graf@amazon.com>,
+        Aaron Lewis <aaronlewis@google.com>
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
         Sean Christopherson <sean.j.christopherson@intel.com>,
-        Peter Hornyack <peterhornyack@google.com>
+        Wanpeng Li <wanpengli@tencent.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm list <kvm@vger.kernel.org>,
+        linux-doc@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jul 21, 2020 at 8:26 PM Oliver Upton <oupton@google.com> wrote:
+On Tue, Jul 28, 2020 at 5:41 AM Alexander Graf <graf@amazon.com> wrote:
 >
-> To date, VMMs have typically restored the guest's TSCs by value using
-> the KVM_SET_MSRS ioctl for each vCPU. However, restoring the TSCs by
-> value introduces some challenges with synchronization as the TSCs
-> continue to tick throughout the restoration process. As such, KVM has
-> some heuristics around TSC writes to infer whether or not the guest or
-> host is attempting to synchronize the TSCs.
 >
-> Instead of guessing at the intentions of a VMM, it'd be better to
-> provide an interface that allows for explicit synchronization of the
-> guest's TSCs. To that end, this series introduces the
-> KVM_{GET,SET}_TSC_OFFSET ioctls, yielding control of the TSC offset to
-> userspace.
 >
-> v2 => v3:
->  - Mark kvm_write_tsc_offset() as static (whoops)
->
-> v1 => v2:
->  - Added clarification to the documentation of KVM_SET_TSC_OFFSET to
->    indicate that it can be used instead of an IA32_TSC MSR restore
->    through KVM_SET_MSRS
->  - Fixed KVM_SET_TSC_OFFSET to participate in the existing TSC
->    synchronization heuristics, thereby enabling the KVM masterclock when
->    all vCPUs are in phase.
->
-> Oliver Upton (4):
->   kvm: x86: refactor masterclock sync heuristics out of kvm_write_tsc
->   kvm: vmx: check tsc offsetting with nested_cpu_has()
->   selftests: kvm: use a helper function for reading cpuid
->   selftests: kvm: introduce tsc_offset_test
->
-> Peter Hornyack (1):
->   kvm: x86: add KVM_{GET,SET}_TSC_OFFSET ioctls
->
->  Documentation/virt/kvm/api.rst                |  31 ++
->  arch/x86/include/asm/kvm_host.h               |   1 +
->  arch/x86/kvm/vmx/vmx.c                        |   2 +-
->  arch/x86/kvm/x86.c                            | 147 ++++---
->  include/uapi/linux/kvm.h                      |   5 +
->  tools/testing/selftests/kvm/.gitignore        |   1 +
->  tools/testing/selftests/kvm/Makefile          |   1 +
->  .../testing/selftests/kvm/include/test_util.h |   3 +
->  .../selftests/kvm/include/x86_64/processor.h  |  15 +
->  .../selftests/kvm/include/x86_64/svm_util.h   |  10 +-
->  .../selftests/kvm/include/x86_64/vmx.h        |   9 +
->  tools/testing/selftests/kvm/lib/kvm_util.c    |   1 +
->  tools/testing/selftests/kvm/lib/x86_64/vmx.c  |  11 +
->  .../selftests/kvm/x86_64/tsc_offset_test.c    | 362 ++++++++++++++++++
->  14 files changed, 550 insertions(+), 49 deletions(-)
->  create mode 100644 tools/testing/selftests/kvm/x86_64/tsc_offset_test.c
->
-> --
-> 2.28.0.rc0.142.g3c755180ce-goog
->
+> On 28.07.20 10:15, Vitaly Kuznetsov wrote:
+> >
+> > Alexander Graf <graf@amazon.com> writes:
+> >
+> >> MSRs are weird. Some of them are normal control registers, such as EFER.
+> >> Some however are registers that really are model specific, not very
+> >> interesting to virtualization workloads, and not performance critical.
+> >> Others again are really just windows into package configuration.
+> >>
+> >> Out of these MSRs, only the first category is necessary to implement in
+> >> kernel space. Rarely accessed MSRs, MSRs that should be fine tunes against
+> >> certain CPU models and MSRs that contain information on the package level
+> >> are much better suited for user space to process. However, over time we have
+> >> accumulated a lot of MSRs that are not the first category, but still handled
+> >> by in-kernel KVM code.
+> >>
+> >> This patch adds a generic interface to handle WRMSR and RDMSR from user
+> >> space. With this, any future MSR that is part of the latter categories can
+> >> be handled in user space.
 
-Ping :)
+This sounds similar to Peter Hornyack's RFC from 5 years ago:
+https://www.mail-archive.com/kvm@vger.kernel.org/msg124448.html.
+
+> >> Furthermore, it allows us to replace the existing "ignore_msrs" logic with
+> >> something that applies per-VM rather than on the full system. That way you
+> >> can run productive VMs in parallel to experimental ones where you don't care
+> >> about proper MSR handling.
+> >>
+> >
+> > In theory, we can go further: userspace will give KVM the list of MSRs
+> > it is interested in. This list may even contain MSRs which are normally
+> > handled by KVM, in this case userspace gets an option to mangle KVM's
+> > reply (RDMSR) or do something extra (WRMSR). I'm not sure if there is a
+> > real need behind this, just an idea.
+> >
+> > The problem with this approach is: if currently some MSR is not
+> > implemented in KVM you will get an exit. When later someone comes with a
+> > patch to implement this MSR your userspace handling will immediately get
+> > broken so the list of not implemented MSRs effectively becomes an API :-)
+
+Indeed. This is a legitimate concern. At Google, we have experienced
+this problem already, using Peter Hornyack's approach. We ended up
+commenting out some MSRs from kvm, which is less than ideal.
+
+> Yeah, I'm not quite sure how to do this without bloating the kernel's
+> memory footprint too much though.
+>
+> One option would be to create a shared bitmap with user space. But that
+> would need to be sparse and quite big to be able to address all of
+> today's possible MSR indexes. From a quick glimpse at Linux's MSR
+> defines, there are:
+>
+>    0x00000000 - 0x00001000 (Intel)
+>    0x00001000 - 0x00002000 (VIA)
+>    0x40000000 - 0x50000000 (PV)
+>    0xc0000000 - 0xc0003000 (AMD)
+>    0xc0010000 - 0xc0012000 (AMD)
+>    0x80860000 - 0x80870000 (Transmeta)
+>
+> Another idea would be to turn the logic around and implement an
+> allowlist in KVM with all of the MSRs that KVM should handle. In that
+> API we could ask for an array of KVM supported MSRs into user space.
+> User space could then bounce that array back to KVM to have all in-KVM
+> supported MSRs handled. Or it could remove entries that it wants to
+> handle on its own.
+>
+> KVM internally could then save the list as a dense bitmap, translating
+> every list entry into its corresponding bit.
+>
+> While it does feel a bit overengineered, it would solve the problem that
+> we're turning in-KVM handled MSRs into an ABI.
+
+It seems unlikely that userspace is going to know what to do with a
+large number of MSRs. I suspect that a small enumerated list will
+suffice. In fact, +Aaron Lewis is working on upstreaming a local
+Google patch set that does just that.
