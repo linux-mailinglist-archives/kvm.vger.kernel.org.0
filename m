@@ -2,88 +2,145 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 44564231144
-	for <lists+kvm@lfdr.de>; Tue, 28 Jul 2020 20:08:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D7F362314A0
+	for <lists+kvm@lfdr.de>; Tue, 28 Jul 2020 23:31:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732156AbgG1SII (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 28 Jul 2020 14:08:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41308 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728681AbgG1SIH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 28 Jul 2020 14:08:07 -0400
-Received: from mail-lf1-x12b.google.com (mail-lf1-x12b.google.com [IPv6:2a00:1450:4864:20::12b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6E5D5C061794
-        for <kvm@vger.kernel.org>; Tue, 28 Jul 2020 11:08:07 -0700 (PDT)
-Received: by mail-lf1-x12b.google.com with SMTP id v15so6975847lfg.6
-        for <kvm@vger.kernel.org>; Tue, 28 Jul 2020 11:08:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=3ZNW2KQX07GwhrRQSaht18Jf7IWigkF5mQEeicomsg4=;
-        b=ncbKFXyY0+Av004YmAE8x3dA+VdJK8QDDSX+TDzfw5T4KGV6NZDGZbh6PhwwgJXfiN
-         3OdGVkAbOBc5a5ia+hOE6v20zid6rqWd0+BiJ/Awlo4A7r85BPYh/SiU+AyLs3EqQJtX
-         1EyidBwuMOlBnkQRdHXg8XXuOeZY88htoppPWkSstuzsj1K2tQ78jwNAkvZdCjb1MgWs
-         hwShYmvp3MV3UTMu9XZysdE9Hl78ETAdvJXcK5qCmPdBQspNQtJtzFVOhwH4mLztExA0
-         UX8XzWxJ4VGN8ffJ1Ntvd+dpxa1Yy0heIqLqUUeWP96OLcbabf2w3qs0nLms8C2v/XaB
-         ydDQ==
+        id S1729379AbgG1Vbp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 28 Jul 2020 17:31:45 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:60375 "EHLO
+        us-smtp-delivery-74.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1728149AbgG1Vbp (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 28 Jul 2020 17:31:45 -0400
+X-Greylist: delayed 378 seconds by postgrey-1.27 at vger.kernel.org; Tue, 28 Jul 2020 17:31:44 EDT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1595971903;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=UjpEBnWwNeMyM4AXLo8va3vZKuvKlfpizEQ8IIwLYbM=;
+        b=Xqi43ehve4DRlwRjEehMe5gjsKY4SUdSkeZWey0yEKJQ0SNRzLSfmPLFzThOVYoTGMjfWW
+        1ZnRdQoGIQ9g+8Bl42VeRi9DCUHm+lV1KTboa5FWz3R/ap5ryGgXLL12UyFPqxjtX5gI5y
+        danilnSuoFmUfUfoJGLT/U/L5SYQKv0=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-136-gwi6qt2VNIOFg2TWH7BvBQ-1; Tue, 28 Jul 2020 17:25:23 -0400
+X-MC-Unique: gwi6qt2VNIOFg2TWH7BvBQ-1
+Received: by mail-wm1-f69.google.com with SMTP id a5so303455wmj.5
+        for <kvm@vger.kernel.org>; Tue, 28 Jul 2020 14:25:23 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=3ZNW2KQX07GwhrRQSaht18Jf7IWigkF5mQEeicomsg4=;
-        b=aKbOsDbTx2NBNtiPkbJdj9PqOsEBOUDOFWHFK8Fil3u0RPh4fHiYtCSspsNZQjpYJx
-         R+swQk8lWh2Ey0WiJjSAReeqOLFnjpoR07qai5P7vRQfZmw7pTm0rhlnaa6x7VT4GC4w
-         Q1cdW5nEElwSGdczzULPXpipAjtqVYpL1HCvw/UA/z8xvoEPWLfbSgQ7rZRvXbQAqCU2
-         bBe1OgjPT84158sWWWKRzzMMKBh4v6ptCkphlimTa+VE6zGsESwPgNAHEcNg2lQvZ5KV
-         RwOI/RXudaI+vQ1HH9vm7p89LfbeHdZXdtHmgUKOmBNXqj9/oiL/QH0+eAG8AjavWAK5
-         vHUw==
-X-Gm-Message-State: AOAM532nAOj7gcNsrjErNv9lxBp6mRXLbsJQvo28b3spfl/vlnzdcrYJ
-        X/r7RsmF9Pf4jrb7AoMX0c+pxcqr2pyUUXuMdJSjx+0t
-X-Google-Smtp-Source: ABdhPJxD735RZzgInyRg67uc5PtX/Pk2QqqKRlVufPlSOzR4QVe1kaW6hgc7sz/Yh7Q1GaoyQY9w1k/aZorqsu3mRR0=
-X-Received: by 2002:a19:2256:: with SMTP id i83mr15429592lfi.165.1595959684265;
- Tue, 28 Jul 2020 11:08:04 -0700 (PDT)
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=UjpEBnWwNeMyM4AXLo8va3vZKuvKlfpizEQ8IIwLYbM=;
+        b=keMoZ5/gRZQJyNFT6zVDUzF03NJ8Me8MTFaTlJCGffkNId1/erq5eoIA5OyS+NiiCW
+         a61qZgGzk6iMMmaiNYUm+J+qBJfdRYb+YObin4BJvAIrVbxsi0O7DRvkDXjwd6VrN+Lz
+         L3PN/Kvw1ln4o1RIYslYPdb9kbrrHSZnPi2bMhqbrm2V9VOl+D3JFXaHhz0tzcR/eeKK
+         a7ae5GnWORI7TCrpo+/99yAvl5vALP6pr5obIoiMmJiRvwbXLkrM5q3lsOIrcDVRAfuW
+         mD+o/TB3atvorhJty6bSs+L5+pzr865+JoUFVl9a29Nn57f/7aEgY1HIt1Aj2eUdSxSr
+         nqOg==
+X-Gm-Message-State: AOAM5304gaB0xxrPOzUzubNhd+BsWHYLz9/7gFxSj4ChQv/X6WrPY78V
+        H681NRkoySyu8AMdiQa4h5GpxO8f1zwwDjjN9ht8DHipP0a20Fd02Z20r6j4eNoVBCt2nH3ALZb
+        iNyzgPEvXbFbW
+X-Received: by 2002:a1c:2109:: with SMTP id h9mr5541034wmh.174.1595971522628;
+        Tue, 28 Jul 2020 14:25:22 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxvS4Yoat8bT0HyeCP4HpI77T+segRt+fHEYM4hC3RLBuQTzQc+DrZBzPSyirYQqHWAZtm+xg==
+X-Received: by 2002:a1c:2109:: with SMTP id h9mr5541021wmh.174.1595971522363;
+        Tue, 28 Jul 2020 14:25:22 -0700 (PDT)
+Received: from [192.168.10.150] ([93.56.170.5])
+        by smtp.gmail.com with ESMTPSA id f15sm155948wmj.39.2020.07.28.14.25.20
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 28 Jul 2020 14:25:21 -0700 (PDT)
+Subject: Re: [PATCH kvm-unit-tests] arm64: Compile with -mno-outline-atomics
+To:     Andrew Jones <drjones@redhat.com>, kvm@vger.kernel.org,
+        kvmarm@lists.cs.columbia.edu
+Cc:     alexandru.elisei@arm.com
+References: <20200728121751.15083-1-drjones@redhat.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <07b701a3-927c-abd1-2177-e18eade53224@redhat.com>
+Date:   Tue, 28 Jul 2020 23:25:20 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.9.0
 MIME-Version: 1.0
-References: <CAJ5mJ6i-SoZO+F+Xz5OqK7BE7z7eLvE1hC=KX1ABwdnTw-QZuA@mail.gmail.com>
- <20200721201643.GI22083@linux.intel.com>
-In-Reply-To: <20200721201643.GI22083@linux.intel.com>
-From:   Jacob Xu <jacobhxu@google.com>
-Date:   Tue, 28 Jul 2020 11:07:52 -0700
-Message-ID: <CAJ5mJ6h6WYJHTKNWvyZ2co0HEBWjkrNC5yX4hn9v9VdMzyqo3g@mail.gmail.com>
-Subject: Re: tlb_flush stat on Intel/AMD
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20200728121751.15083-1-drjones@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> The VMX APIC flush could be deferred by hoisting KVM_REQ_APIC_PAGE_RELOAD
-> up.  I think that's safe?  But it's a very infrequent operation so I'm not
-> exactly chomping at the bit to get it fixed.
+On 28/07/20 14:17, Andrew Jones wrote:
+> GCC 10.1.0 introduced the -moutline-atomics option which, when
+> enabled, use LSE instructions when the processor provides them.
+> The option is enabled by default and unfortunately causes the
+> following error at compile time:
+> 
+>  aarch64-linux-gnu-ld: /usr/lib/gcc/aarch64-linux-gnu/10.1.0/libgcc.a(lse-init.o): in function `init_have_lse_atomics':
+>  lse-init.c:(.text.startup+0xc): undefined reference to `__getauxval'
+> 
+> This is happening because we are linking against our own libcflat which
+> doesn't implement the function __getauxval().
+> 
+> Disable the use of the out-of-line functions by compiling with
+> -mno-outline-atomics.
+> 
+> Reported-by: Alexandru Elisei <alexandru.elisei@arm.com>
+> Tested-by: Alexandru Elisei <alexandru.elisei@arm.com>
+> Signed-off-by: Andrew Jones <drjones@redhat.com>
+> ---
+>  Makefile           | 11 +++++------
+>  arm/Makefile.arm64 |  3 +++
+>  2 files changed, 8 insertions(+), 6 deletions(-)
+> 
+> diff --git a/Makefile b/Makefile
+> index 3ff2f91600f6..0e21a49096ba 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -17,6 +17,11 @@ DESTDIR := $(PREFIX)/share/kvm-unit-tests/
+>  
+>  .PHONY: arch_clean clean distclean cscope
+>  
+> +# cc-option
+> +# Usage: OP_CFLAGS+=$(call cc-option, -falign-functions=0, -malign-functions=0)
+> +cc-option = $(shell if $(CC) -Werror $(1) -S -o /dev/null -xc /dev/null \
+> +              > /dev/null 2>&1; then echo "$(1)"; else echo "$(2)"; fi ;)
+> +
+>  #make sure env CFLAGS variable is not used
+>  CFLAGS =
+>  
+> @@ -43,12 +48,6 @@ OBJDIRS += $(LIBFDT_objdir)
+>  #include architecture specific make rules
+>  include $(SRCDIR)/$(TEST_DIR)/Makefile
+>  
+> -# cc-option
+> -# Usage: OP_CFLAGS+=$(call cc-option, -falign-functions=0, -malign-functions=0)
+> -
+> -cc-option = $(shell if $(CC) -Werror $(1) -S -o /dev/null -xc /dev/null \
+> -              > /dev/null 2>&1; then echo "$(1)"; else echo "$(2)"; fi ;)
+> -
+>  COMMON_CFLAGS += -g $(autodepend-flags) -fno-strict-aliasing -fno-common
+>  COMMON_CFLAGS += -Wall -Wwrite-strings -Wempty-body -Wuninitialized
+>  COMMON_CFLAGS += -Wignored-qualifiers -Werror
+> diff --git a/arm/Makefile.arm64 b/arm/Makefile.arm64
+> index dfd0c56fe8fb..dbc7524d3070 100644
+> --- a/arm/Makefile.arm64
+> +++ b/arm/Makefile.arm64
+> @@ -9,6 +9,9 @@ ldarch = elf64-littleaarch64
+>  arch_LDFLAGS = -pie -n
+>  CFLAGS += -mstrict-align
+>  
+> +mno_outline_atomics := $(call cc-option, -mno-outline-atomics, "")
+> +CFLAGS += $(mno_outline_atomics)
+> +
+>  define arch_elf_check =
+>  	$(if $(shell ! $(OBJDUMP) -R $(1) >&/dev/null && echo "nok"),
+>  		$(error $(shell $(OBJDUMP) -R $(1) 2>&1)))
+> 
 
-Could moving KVM_REQ_TLB_FLUSH and _CURRENT down also work?
-It seems that none of the check_request() calls below depend on them.
+Queued, thanks.
 
-> Given that you see 0 on SVM and a low number on VMX, my money is on the
-> difference being that VMX accounts the TLB flush that occurs on vCPU
-> migration.  vmx_vcpu_load_vmcs() makes a KVM_REQ_TLB_FLUSH request, whereas
-> svm_vcpu_load() resets asid_generation but doesn't increment the stats.
+Paolo
 
-I'll try adding a one-off stat increment here, and check the results.
-
-> I think a better option is to keep the current accounting, defer flushes
-> when possible to naturally fix accounting, and then fix the remaining one
-> off cases, e.g. kvm_mmu_load() and svm_vcpu_load().
->
-> I can prep a small series unless you want the honors?
-
-I'll try making a small series:
-kvm: selftests: add get_debugfs_stat to kvm_util
-kvm: x86: increment tlb_flush stat on svm_vcpu_load(), kvm_mmu_load()
-# omit kvm_mmu_load() if feasible to move check_request(KVM_REQ_TLB_FLUSH) down
-kvm: x86: re-order check_request() to prefer use of deferred tlb_flush
-
-Thanks for the explanations! Sorry for my late reply, I've updated my
-email filter accordingly.
