@@ -2,29 +2,29 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5A8392302AD
-	for <lists+kvm@lfdr.de>; Tue, 28 Jul 2020 08:22:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 079D62302AA
+	for <lists+kvm@lfdr.de>; Tue, 28 Jul 2020 08:22:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728079AbgG1GVv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 28 Jul 2020 02:21:51 -0400
+        id S1727811AbgG1GU7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 28 Jul 2020 02:20:59 -0400
 Received: from mga06.intel.com ([134.134.136.31]:26362 "EHLO mga06.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726797AbgG1GVA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 28 Jul 2020 02:21:00 -0400
-IronPort-SDR: 10Qixp0AZO3+60nKY5G7/cPm1n+sgOYabyB8MFUY3tt0PSWcpxrjTeReqvaEK/WnopmeSsq063
- SgrpBK+VnNzQ==
-X-IronPort-AV: E=McAfee;i="6000,8403,9695"; a="212681236"
+        id S1727087AbgG1GU5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 28 Jul 2020 02:20:57 -0400
+IronPort-SDR: MrjbY7M+Am5TJgcPZAfNYZYEtfVedJWYDkEShFvpbate5Vk/9CUoZDMM7ZC4dqb8oEEjBsGLA0
+ p8pd+AVdGaJA==
+X-IronPort-AV: E=McAfee;i="6000,8403,9695"; a="212681238"
 X-IronPort-AV: E=Sophos;i="5.75,405,1589266800"; 
-   d="scan'208";a="212681236"
+   d="scan'208";a="212681238"
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from orsmga008.jf.intel.com ([10.7.209.65])
   by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Jul 2020 23:20:55 -0700
-IronPort-SDR: S7zGkWPQoBjR9LpGT59YqNR1s4Dj8G8UfhwFVzd5Z+6NxBwoDYclT4tLH2iDsEitT9o4vRnx1g
- otuo3MyMg2jg==
+IronPort-SDR: FdetQ7pJX1vBwEWxMioDORW1sMLGf3G1G+2QwRHnLuTHtAKD7fop8b58T+v2E27JYezdazCnpL
+ Pjz2f6s+6Bbw==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.75,405,1589266800"; 
-   d="scan'208";a="320274382"
+   d="scan'208";a="320274388"
 Received: from jacob-builder.jf.intel.com ([10.7.199.155])
   by orsmga008.jf.intel.com with ESMTP; 27 Jul 2020 23:20:55 -0700
 From:   Liu Yi L <yi.l.liu@intel.com>
@@ -35,10 +35,11 @@ Cc:     kevin.tian@intel.com, jacob.jun.pan@linux.intel.com,
         yi.y.sun@intel.com, jean-philippe@linaro.org, peterx@redhat.com,
         hao.wu@intel.com, stefanha@gmail.com,
         iommu@lists.linux-foundation.org, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH v6 02/15] iommu: Report domain nesting info
-Date:   Mon, 27 Jul 2020 23:27:31 -0700
-Message-Id: <1595917664-33276-3-git-send-email-yi.l.liu@intel.com>
+        linux-kernel@vger.kernel.org, Will Deacon <will@kernel.org>,
+        Robin Murphy <robin.murphy@arm.com>
+Subject: [PATCH v6 03/15] iommu/smmu: Report empty domain nesting info
+Date:   Mon, 27 Jul 2020 23:27:32 -0700
+Message-Id: <1595917664-33276-4-git-send-email-yi.l.liu@intel.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1595917664-33276-1-git-send-email-yi.l.liu@intel.com>
 References: <1595917664-33276-1-git-send-email-yi.l.liu@intel.com>
@@ -47,131 +48,124 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-IOMMUs that support nesting translation needs report the capability info
-to userspace. It gives information about requirements the userspace needs
-to implement plus other features characterizing the physical implementation.
+This patch is added as instead of returning a boolean for DOMAIN_ATTR_NESTING,
+iommu_domain_get_attr() should return an iommu_nesting_info handle. For
+now, return an empty nesting info struct for now as true nesting is not
+yet supported by the SMMUs.
 
-This patch reports nesting info by DOMAIN_ATTR_NESTING. Caller can get
-nesting info after setting DOMAIN_ATTR_NESTING. For VFIO, it is after
-selecting VFIO_TYPE1_NESTING_IOMMU.
-
-Cc: Kevin Tian <kevin.tian@intel.com>
-CC: Jacob Pan <jacob.jun.pan@linux.intel.com>
-Cc: Alex Williamson <alex.williamson@redhat.com>
+Cc: Will Deacon <will@kernel.org>
+Cc: Robin Murphy <robin.murphy@arm.com>
 Cc: Eric Auger <eric.auger@redhat.com>
 Cc: Jean-Philippe Brucker <jean-philippe@linaro.org>
-Cc: Joerg Roedel <joro@8bytes.org>
-Cc: Lu Baolu <baolu.lu@linux.intel.com>
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
+Suggested-by: Jean-Philippe Brucker <jean-philippe@linaro.org>
 Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
 Signed-off-by: Jacob Pan <jacob.jun.pan@linux.intel.com>
 ---
 v5 -> v6:
-*) rephrase the feature notes per comments from Eric Auger.
-*) rename @size of struct iommu_nesting_info to @argsz.
+*) add review-by from Eric Auger.
 
 v4 -> v5:
 *) address comments from Eric Auger.
-
-v3 -> v4:
-*) split the SMMU driver changes to be a separate patch
-*) move the @addr_width and @pasid_bits from vendor specific
-   part to generic part.
-*) tweak the description for the @features field of struct
-   iommu_nesting_info.
-*) add description on the @data[] field of struct iommu_nesting_info
-
-v2 -> v3:
-*) remvoe cap/ecap_mask in iommu_nesting_info.
-*) reuse DOMAIN_ATTR_NESTING to get nesting info.
-*) return an empty iommu_nesting_info for SMMU drivers per Jean'
-   suggestion.
 ---
- include/uapi/linux/iommu.h | 74 ++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 74 insertions(+)
+ drivers/iommu/arm-smmu-v3.c | 29 +++++++++++++++++++++++++++--
+ drivers/iommu/arm-smmu.c    | 29 +++++++++++++++++++++++++++--
+ 2 files changed, 54 insertions(+), 4 deletions(-)
 
-diff --git a/include/uapi/linux/iommu.h b/include/uapi/linux/iommu.h
-index 7c8e075..5e4745a 100644
---- a/include/uapi/linux/iommu.h
-+++ b/include/uapi/linux/iommu.h
-@@ -332,4 +332,78 @@ struct iommu_gpasid_bind_data {
- 	} vendor;
- };
+diff --git a/drivers/iommu/arm-smmu-v3.c b/drivers/iommu/arm-smmu-v3.c
+index f578677..c702ef9 100644
+--- a/drivers/iommu/arm-smmu-v3.c
++++ b/drivers/iommu/arm-smmu-v3.c
+@@ -3019,6 +3019,32 @@ static struct iommu_group *arm_smmu_device_group(struct device *dev)
+ 	return group;
+ }
  
-+/*
-+ * struct iommu_nesting_info - Information for nesting-capable IOMMU.
-+ *			       userspace should check it before using
-+ *			       nesting capability.
-+ *
-+ * @argsz:	size of the whole structure.
-+ * @flags:	currently reserved for future extension. must set to 0.
-+ * @format:	PASID table entry format, the same definition as struct
-+ *		iommu_gpasid_bind_data @format.
-+ * @features:	supported nesting features.
-+ * @addr_width:	The output addr width of first level/stage translation
-+ * @pasid_bits:	Maximum supported PASID bits, 0 represents no PASID
-+ *		support.
-+ * @data:	vendor specific cap info. data[] structure type can be deduced
-+ *		from @format field.
-+ *
-+ * +===============+======================================================+
-+ * | feature       |  Notes                                               |
-+ * +===============+======================================================+
-+ * | SYSWIDE_PASID |  IOMMU vendor driver sets it to mandate userspace    |
-+ * |               |  to allocate PASID from kernel. All PASID allocation |
-+ * |               |  free must be mediated through the TBD API.          |
-+ * +---------------+------------------------------------------------------+
-+ * | BIND_PGTBL    |  IOMMU vendor driver sets it to mandate userspace    |
-+ * |               |  bind the first level/stage page table to associated |
-+ * |               |  PASID (either the one specified in bind request or  |
-+ * |               |  the default PASID of iommu domain), through IOMMU   |
-+ * |               |  UAPI.                                               |
-+ * +---------------+------------------------------------------------------+
-+ * | CACHE_INVLD   |  IOMMU vendor driver sets it to mandate userspace    |
-+ * |               |  explicitly invalidate the IOMMU cache through IOMMU |
-+ * |               |  UAPI according to vendor-specific requirement when  |
-+ * |               |  changing the 1st level/stage page table.            |
-+ * +---------------+------------------------------------------------------+
-+ *
-+ * @data[] types defined for @format:
-+ * +================================+=====================================+
-+ * | @format                        | @data[]                             |
-+ * +================================+=====================================+
-+ * | IOMMU_PASID_FORMAT_INTEL_VTD   | struct iommu_nesting_info_vtd       |
-+ * +--------------------------------+-------------------------------------+
-+ *
-+ */
-+struct iommu_nesting_info {
-+	__u32	argsz;
-+	__u32	flags;
-+	__u32	format;
-+#define IOMMU_NESTING_FEAT_SYSWIDE_PASID	(1 << 0)
-+#define IOMMU_NESTING_FEAT_BIND_PGTBL		(1 << 1)
-+#define IOMMU_NESTING_FEAT_CACHE_INVLD		(1 << 2)
-+	__u32	features;
-+	__u16	addr_width;
-+	__u16	pasid_bits;
-+	__u32	padding;
-+	__u8	data[];
-+};
++static int arm_smmu_domain_nesting_info(struct arm_smmu_domain *smmu_domain,
++					void *data)
++{
++	struct iommu_nesting_info *info = (struct iommu_nesting_info *)data;
++	unsigned int size;
 +
-+/*
-+ * struct iommu_nesting_info_vtd - Intel VT-d specific nesting info.
-+ *
-+ * @flags:	VT-d specific flags. Currently reserved for future
-+ *		extension. must be set to 0.
-+ * @cap_reg:	Describe basic capabilities as defined in VT-d capability
-+ *		register.
-+ * @ecap_reg:	Describe the extended capabilities as defined in VT-d
-+ *		extended capability register.
-+ */
-+struct iommu_nesting_info_vtd {
-+	__u32	flags;
-+	__u32	padding;
-+	__u64	cap_reg;
-+	__u64	ecap_reg;
-+};
++	if (!info || smmu_domain->stage != ARM_SMMU_DOMAIN_NESTED)
++		return -ENODEV;
 +
- #endif /* _UAPI_IOMMU_H */
++	size = sizeof(struct iommu_nesting_info);
++
++	/*
++	 * if provided buffer size is smaller than expected, should
++	 * return 0 and also the expected buffer size to caller.
++	 */
++	if (info->argsz < size) {
++		info->argsz = size;
++		return 0;
++	}
++
++	/* report an empty iommu_nesting_info for now */
++	memset(info, 0x0, size);
++	info->argsz = size;
++	return 0;
++}
++
+ static int arm_smmu_domain_get_attr(struct iommu_domain *domain,
+ 				    enum iommu_attr attr, void *data)
+ {
+@@ -3028,8 +3054,7 @@ static int arm_smmu_domain_get_attr(struct iommu_domain *domain,
+ 	case IOMMU_DOMAIN_UNMANAGED:
+ 		switch (attr) {
+ 		case DOMAIN_ATTR_NESTING:
+-			*(int *)data = (smmu_domain->stage == ARM_SMMU_DOMAIN_NESTED);
+-			return 0;
++			return arm_smmu_domain_nesting_info(smmu_domain, data);
+ 		default:
+ 			return -ENODEV;
+ 		}
+diff --git a/drivers/iommu/arm-smmu.c b/drivers/iommu/arm-smmu.c
+index 243bc4c..2bd58f4 100644
+--- a/drivers/iommu/arm-smmu.c
++++ b/drivers/iommu/arm-smmu.c
+@@ -1506,6 +1506,32 @@ static struct iommu_group *arm_smmu_device_group(struct device *dev)
+ 	return group;
+ }
+ 
++static int arm_smmu_domain_nesting_info(struct arm_smmu_domain *smmu_domain,
++					void *data)
++{
++	struct iommu_nesting_info *info = (struct iommu_nesting_info *)data;
++	unsigned int size;
++
++	if (!info || smmu_domain->stage != ARM_SMMU_DOMAIN_NESTED)
++		return -ENODEV;
++
++	size = sizeof(struct iommu_nesting_info);
++
++	/*
++	 * if provided buffer size is smaller than expected, should
++	 * return 0 and also the expected buffer size to caller.
++	 */
++	if (info->argsz < size) {
++		info->argsz = size;
++		return 0;
++	}
++
++	/* report an empty iommu_nesting_info for now */
++	memset(info, 0x0, size);
++	info->argsz = size;
++	return 0;
++}
++
+ static int arm_smmu_domain_get_attr(struct iommu_domain *domain,
+ 				    enum iommu_attr attr, void *data)
+ {
+@@ -1515,8 +1541,7 @@ static int arm_smmu_domain_get_attr(struct iommu_domain *domain,
+ 	case IOMMU_DOMAIN_UNMANAGED:
+ 		switch (attr) {
+ 		case DOMAIN_ATTR_NESTING:
+-			*(int *)data = (smmu_domain->stage == ARM_SMMU_DOMAIN_NESTED);
+-			return 0;
++			return arm_smmu_domain_nesting_info(smmu_domain, data);
+ 		default:
+ 			return -ENODEV;
+ 		}
 -- 
 2.7.4
 
