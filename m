@@ -2,131 +2,146 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 86BD12306CF
-	for <lists+kvm@lfdr.de>; Tue, 28 Jul 2020 11:45:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E5CCF23077D
+	for <lists+kvm@lfdr.de>; Tue, 28 Jul 2020 12:16:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728575AbgG1JpX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 28 Jul 2020 05:45:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48180 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728564AbgG1JpV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 28 Jul 2020 05:45:21 -0400
-Received: from mail-pl1-x644.google.com (mail-pl1-x644.google.com [IPv6:2607:f8b0:4864:20::644])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 71394C061794;
-        Tue, 28 Jul 2020 02:45:21 -0700 (PDT)
-Received: by mail-pl1-x644.google.com with SMTP id k13so1791533plk.13;
-        Tue, 28 Jul 2020 02:45:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=v4hzsRw11Wiw6xr0GvgfYpPF0Q4BnW/4rsf/8GkZyQw=;
-        b=Zos4drdqzuG48wXtTv4pVVnjusmQl20abj+Kz1EqvewUtCnxXvkgMu0kwocJVglioq
-         IGYaSAvrCj7Xt1MwTvrLt/GTXjliBxkNT+YTiZJWKuJI+F0eQxtzPsKj37plB7VyuTSn
-         7xN+UTf26Hu/SartpedeJofd3RnImxX3lAT0j1Nfq5AjCYKn8uWbFigOEevIfBzcay0l
-         Chljv6Gk/6ZrD3mlVeQHl367jg/cxrG0PLHltEBZnT1E8sat9X3g9KRPskDUUch0z9Cp
-         f+L5WVGo7e8klo7kB0PhQ51xQNZaf6u0hk5/VNPMhXxpUZizcUoJbpsXMSTJHN7duWKc
-         AmWQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references;
-        bh=v4hzsRw11Wiw6xr0GvgfYpPF0Q4BnW/4rsf/8GkZyQw=;
-        b=luCF/VdCih1z/QADt95HH5yiJhJmj/yisYGTE3ssq0eO0aNm65iSzYkYPkZHH/ePGa
-         Xv6QvC/0AyUMXBt/NJYh+8jUMRMWghgvXahQjv6U9frPUsMpPjEpoPbqUENXODLsu7XU
-         ZVODNg33Cx8mvTf3gGu3/IR69d+RuxcFUP5jTDERrM08CcoDYxSoXVpld6kcerCyFSKk
-         ZfzRbj9SDnyQ4tTew40ZHCJ7776t1P6NciqSE22xMfRIK+mI6Yv9mgnXQvhOVuOFRzs8
-         1oFiSON4MO2zABdqNU1q+5Em9C64uk/3wn72O0eqfOOOkptQOkefH5fr6eVKqOGuRahS
-         PfQw==
-X-Gm-Message-State: AOAM5326Ox1o8QitFORgMJc8/NgHmbwFI/BxAYiAM9/G22nxG8dnJiGh
-        2PCM7tet8B3wjDI1bB0VXHmfpekJ
-X-Google-Smtp-Source: ABdhPJxsZ5mYTWHDw/CZGoeaB7OeyI6mv6+zZ2Fpowq9ZFMFVYcxatXVTbH9YxF75bc0dzckLtbQUQ==
-X-Received: by 2002:a17:902:59d2:: with SMTP id d18mr11673509plj.243.1595929520819;
-        Tue, 28 Jul 2020 02:45:20 -0700 (PDT)
-Received: from localhost.localdomain ([103.7.29.6])
-        by smtp.googlemail.com with ESMTPSA id r17sm17969173pfg.62.2020.07.28.02.45.18
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 28 Jul 2020 02:45:20 -0700 (PDT)
-From:   Wanpeng Li <kernellwp@gmail.com>
-X-Google-Original-From: Wanpeng Li <wanpengli@tencent.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>
-Subject: [PATCH v2 3/3] KVM: SVM: Fix disable pause loop exit/pause filtering capability on SVM
-Date:   Tue, 28 Jul 2020 17:45:06 +0800
-Message-Id: <1595929506-9203-3-git-send-email-wanpengli@tencent.com>
-X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1595929506-9203-1-git-send-email-wanpengli@tencent.com>
-References: <1595929506-9203-1-git-send-email-wanpengli@tencent.com>
+        id S1728755AbgG1KQv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 28 Jul 2020 06:16:51 -0400
+Received: from mail.kernel.org ([198.145.29.99]:42438 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728445AbgG1KQu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 28 Jul 2020 06:16:50 -0400
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 9BFB320714;
+        Tue, 28 Jul 2020 10:16:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1595931409;
+        bh=ZfZF4pLvNemxD3En2Fwag4OkbrDfzKVU9SSSrL6fd/A=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=VBdHKzomeWjgG1TMubp9tgrJfSfvIiWmv/K4FkXE5Rs7AJCr+6dTw7JhR+SJdMQYt
+         fPlyE+EJ3CP6EqlEzoY0Ft3LE0pMPFyKPhAVwGK3Qo4iqhoODr1mWy8T3OvnA7FuDq
+         4MT7WpcnF3emS2LhtbRxOesdw6RmcyTlTn3bQdJM=
+Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
+        by disco-boy.misterjones.org with esmtpsa (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+        (Exim 4.92)
+        (envelope-from <maz@kernel.org>)
+        id 1k0Mf9-00FcMr-Ug; Tue, 28 Jul 2020 11:16:48 +0100
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Content-Transfer-Encoding: 7bit
+Date:   Tue, 28 Jul 2020 11:16:47 +0100
+From:   Marc Zyngier <maz@kernel.org>
+To:     Keqian Zhu <zhukeqian1@huawei.com>
+Cc:     linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        wanghaibin.wang@huawei.com
+Subject: Re: [RESEND PATCH] drivers: arm arch timer: Correct fault programming
+ of CNTKCTL_EL1.EVNTI
+In-Reply-To: <20200717092104.15428-1-zhukeqian1@huawei.com>
+References: <20200717092104.15428-1-zhukeqian1@huawei.com>
+User-Agent: Roundcube Webmail/1.4.5
+Message-ID: <3a95ec8ce3e34d86c09f9b1b4f17d0ad@kernel.org>
+X-Sender: maz@kernel.org
+X-SA-Exim-Connect-IP: 51.254.78.96
+X-SA-Exim-Rcpt-To: zhukeqian1@huawei.com, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, catalin.marinas@arm.com, will@kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, wanghaibin.wang@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Wanpeng Li <wanpengli@tencent.com>
+On 2020-07-17 10:21, Keqian Zhu wrote:
+> ARM virtual counter supports event stream. It can only trigger an event
+> when the trigger bit of CNTVCT_EL0 changes from 0 to 1 (or from 1 to 
+> 0),
+> so the actual period of event stream is 2 ^ (cntkctl_evnti + 1). For
+> example, when the trigger bit is 0, then it triggers an event for every
+> two cycles.
+> 
+> Signed-off-by: Keqian Zhu <zhukeqian1@huawei.com>
+> ---
+>  drivers/clocksource/arm_arch_timer.c | 17 ++++++++++++++---
+>  1 file changed, 14 insertions(+), 3 deletions(-)
+> 
+> diff --git a/drivers/clocksource/arm_arch_timer.c
+> b/drivers/clocksource/arm_arch_timer.c
+> index ecf7b7db2d05..06d99a4b1b9b 100644
+> --- a/drivers/clocksource/arm_arch_timer.c
+> +++ b/drivers/clocksource/arm_arch_timer.c
+> @@ -799,10 +799,20 @@ static void __arch_timer_setup(unsigned type,
+>  static void arch_timer_evtstrm_enable(int divider)
+>  {
+>  	u32 cntkctl = arch_timer_get_cntkctl();
+> +	int cntkctl_evnti;
+> +
+> +	/*
+> +	 * Note that it can only trigger an event when the trigger bit
+> +	 * of CNTVCT_EL0 changes from 1 to 0 (or from 0 to 1), so the
+> +	 * actual period of event stream is 2 ^ (cntkctl_evnti + 1).
+> +	 */
+> +	cntkctl_evnti = divider - 1;
+> +	cntkctl_evnti = min(cntkctl_evnti, 15);
+> +	cntkctl_evnti = max(cntkctl_evnti, 0);
+> 
+>  	cntkctl &= ~ARCH_TIMER_EVT_TRIGGER_MASK;
+>  	/* Set the divider and enable virtual event stream */
+> -	cntkctl |= (divider << ARCH_TIMER_EVT_TRIGGER_SHIFT)
+> +	cntkctl |= (cntkctl_evnti << ARCH_TIMER_EVT_TRIGGER_SHIFT)
+>  			| ARCH_TIMER_VIRT_EVT_EN;
+>  	arch_timer_set_cntkctl(cntkctl);
+>  	arch_timer_set_evtstrm_feature();
+> @@ -816,10 +826,11 @@ static void arch_timer_configure_evtstream(void)
+>  	/* Find the closest power of two to the divisor */
+>  	evt_stream_div = arch_timer_rate / ARCH_TIMER_EVT_STREAM_FREQ;
+>  	pos = fls(evt_stream_div);
+> -	if (pos > 1 && !(evt_stream_div & (1 << (pos - 2))))
+> +	if ((pos == 1) || (pos > 1 && !(evt_stream_div & (1 << (pos - 2)))))
+>  		pos--;
+> +
+>  	/* enable event stream */
+> -	arch_timer_evtstrm_enable(min(pos, 15));
+> +	arch_timer_evtstrm_enable(pos);
+>  }
+> 
+>  static void arch_counter_set_user_access(void)
 
-Commit 8566ac8b (KVM: SVM: Implement pause loop exit logic in SVM) drops
-disable pause loop exit/pause filtering capability completely, I guess it
-is a merge fault by Radim since disable vmexits capabilities and pause
-loop exit for SVM patchsets are merged at the same time. This patch
-reintroduces the disable pause loop exit/pause filtering capability
-support.
+This looks like a very convoluted fix. If the problem you are
+trying to fix is that the event frequency is at most half of
+that of the counter, why isn't the patch below the most
+obvious fix?
 
-We can observe 2.9% hackbench improvement for a 92 vCPUs guest on AMD 
-Rome Server.
+Thanks,
 
-Reported-by: Haiwei Li <lihaiwei@tencent.com>
-Tested-by: Haiwei Li <lihaiwei@tencent.com>
-Fixes: 8566ac8b (KVM: SVM: Implement pause loop exit logic in SVM)
-Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
----
- arch/x86/kvm/svm/svm.c | 9 ++++++---
- 1 file changed, 6 insertions(+), 3 deletions(-)
+         M.
 
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index c0da4dd..c20f127 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -1090,7 +1090,7 @@ static void init_vmcb(struct vcpu_svm *svm)
- 	svm->nested.vmcb = 0;
- 	svm->vcpu.arch.hflags = 0;
- 
--	if (pause_filter_count) {
-+	if (pause_filter_count && !kvm_pause_in_guest(svm->vcpu.kvm)) {
- 		control->pause_filter_count = pause_filter_count;
- 		if (pause_filter_thresh)
- 			control->pause_filter_thresh = pause_filter_thresh;
-@@ -2693,7 +2693,7 @@ static int pause_interception(struct vcpu_svm *svm)
- 	struct kvm_vcpu *vcpu = &svm->vcpu;
- 	bool in_kernel = (svm_get_cpl(vcpu) == 0);
- 
--	if (pause_filter_thresh)
-+	if (!kvm_pause_in_guest(vcpu->kvm))
- 		grow_ple_window(vcpu);
- 
- 	kvm_vcpu_on_spin(vcpu, in_kernel);
-@@ -3780,7 +3780,7 @@ static void svm_handle_exit_irqoff(struct kvm_vcpu *vcpu)
- 
- static void svm_sched_in(struct kvm_vcpu *vcpu, int cpu)
- {
--	if (pause_filter_thresh)
-+	if (!kvm_pause_in_guest(vcpu->kvm))
- 		shrink_ple_window(vcpu);
- }
- 
-@@ -3958,6 +3958,9 @@ static void svm_vm_destroy(struct kvm *kvm)
- 
- static int svm_vm_init(struct kvm *kvm)
- {
-+	if (!pause_filter_thresh)
-+		kvm->arch.pause_in_guest = true;
-+
- 	if (avic) {
- 		int ret = avic_vm_init(kvm);
- 		if (ret)
+diff --git a/drivers/clocksource/arm_arch_timer.c 
+b/drivers/clocksource/arm_arch_timer.c
+index 6c3e84180146..0a65414b781f 100644
+--- a/drivers/clocksource/arm_arch_timer.c
++++ b/drivers/clocksource/arm_arch_timer.c
+@@ -824,8 +824,12 @@ static void arch_timer_configure_evtstream(void)
+  {
+  	int evt_stream_div, pos;
+
+-	/* Find the closest power of two to the divisor */
+-	evt_stream_div = arch_timer_rate / ARCH_TIMER_EVT_STREAM_FREQ;
++	/*
++	 * Find the closest power of two to the divisor. As the event
++	 * stream can at most be generated at half the frequency of the
++	 * counter, use half the frequency when computing the divider.
++	 */
++	evt_stream_div = arch_timer_rate / ARCH_TIMER_EVT_STREAM_FREQ / 2;
+  	pos = fls(evt_stream_div);
+  	if (pos > 1 && !(evt_stream_div & (1 << (pos - 2))))
+  		pos--;
+
 -- 
-2.7.4
-
+Jazz is not dead. It just smells funny...
