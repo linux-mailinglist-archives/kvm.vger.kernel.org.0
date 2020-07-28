@@ -2,116 +2,91 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1A41D230613
-	for <lists+kvm@lfdr.de>; Tue, 28 Jul 2020 11:04:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2A4992306CC
+	for <lists+kvm@lfdr.de>; Tue, 28 Jul 2020 11:45:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728346AbgG1JEp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 28 Jul 2020 05:04:45 -0400
-Received: from mail-vi1eur05on2060.outbound.protection.outlook.com ([40.107.21.60]:49761
-        "EHLO EUR05-VI1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1728051AbgG1JEp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 28 Jul 2020 05:04:45 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Nb5Izy49APrelQwQhwDdjunQFfN9O5rbW1YIsKq7k9HblSBzkWWtg2Nnlg/mtwTT6pd7vzVxar0Iq5ZlP4BKqzTw3p4wi33+OUh1Xc8AE07KLuvxD9hVxQUNprI8vFRDfQ79O4v/BGIlY8B9qD4T3pCOsGHf9PskiM7/02p8dUc6OL52wlMGGpIE78Vz8/cbktjUGUSTRj9sm1aX4OmPfUbsIRCSFT+UP6JazLdCEY7BmjhdIA4xJ/EIjXOYKOla203jiYRwyOPc4CxCwCU7g3IxRCrN9NhA674sQZeSQesW1Y5IBw9ff5Bf4EpUBowe6Jchk26JfrHbRpBuVLVIiw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=PwSbCoyT48SY+W2X3hco12Y0BUw0tGELfvsSSILW9fM=;
- b=hm+wfsexBlcgJoVmEkulnoAbac5g07J7XCa8/dIkEcgoXucj+yHf/roxv64Aff+4v0x6s5gIcBEY9oLZbpyH0i+kHdpdRzePGOIeQwUWp7ygftDFet5oZgInVdQkcQrMnlqu/qt9X+Ia7kkhfu9zgOcRQR4eDXtsuG9wl4gZ4InHZ+Y0nh7TTaNizVihl3/0O7z+qRgW6Wpl+MpkJ8YVwhV9Lc37M+OOn/OFucFGZHvnEPJf5WX+qszug10kdU4MZdvt1gEiKPGn+jEDTU4VlVtvd+BrIWwvhb7disXCN0+GMcYajob3/f9asF/vSIyonq7CHZctP5GtPMyPOkJg9A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=mellanox.com; dmarc=pass action=none header.from=mellanox.com;
- dkim=pass header.d=mellanox.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Mellanox.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=PwSbCoyT48SY+W2X3hco12Y0BUw0tGELfvsSSILW9fM=;
- b=nYc8lh20AgqnNya15OP9cKUSDM9zc2qzuOdWacVqRh74zbWWOfc8e+51eEs5N3voUDVg9Pq+RwB+zY9BEfDLOWPne2QgNKP2dlsUmkVhH5Snk45ldE15HE4WUEciwVPmLRAyNgcjJVpA5r1xG3CUVQfa99Dv+0D/67sQ/1GwCLw=
-Authentication-Results: intel.com; dkim=none (message not signed)
- header.d=none;intel.com; dmarc=none action=none header.from=mellanox.com;
-Received: from AM0PR05MB4786.eurprd05.prod.outlook.com (2603:10a6:208:b3::15)
- by AM0PR05MB6116.eurprd05.prod.outlook.com (2603:10a6:208:130::16) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3216.20; Tue, 28 Jul
- 2020 09:04:41 +0000
-Received: from AM0PR05MB4786.eurprd05.prod.outlook.com
- ([fe80::9186:8b7:3cf7:7813]) by AM0PR05MB4786.eurprd05.prod.outlook.com
- ([fe80::9186:8b7:3cf7:7813%7]) with mapi id 15.20.3216.033; Tue, 28 Jul 2020
- 09:04:41 +0000
-Date:   Tue, 28 Jul 2020 12:04:38 +0300
-From:   Eli Cohen <eli@mellanox.com>
-To:     Zhu Lingshan <lingshan.zhu@intel.com>
-Cc:     jasowang@redhat.com, alex.williamson@redhat.com, mst@redhat.com,
-        pbonzini@redhat.com, sean.j.christopherson@intel.com,
-        wanpengli@tencent.com, virtualization@lists.linux-foundation.org,
-        netdev@vger.kernel.org, kvm@vger.kernel.org, shahafs@mellanox.com,
-        parav@mellanox.com
-Subject: Re: [PATCH V4 4/6] vhost_vdpa: implement IRQ offloading in vhost_vdpa
-Message-ID: <20200728090438.GA21875@nps-server-21.mtl.labs.mlnx>
-References: <20200728042405.17579-1-lingshan.zhu@intel.com>
- <20200728042405.17579-5-lingshan.zhu@intel.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200728042405.17579-5-lingshan.zhu@intel.com>
-User-Agent: Mutt/1.5.21 (2010-09-15)
-X-ClientProxiedBy: AM0PR10CA0059.EURPRD10.PROD.OUTLOOK.COM
- (2603:10a6:20b:150::39) To AM0PR05MB4786.eurprd05.prod.outlook.com
- (2603:10a6:208:b3::15)
-MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from nps-server-21.mtl.labs.mlnx (94.188.199.18) by AM0PR10CA0059.EURPRD10.PROD.OUTLOOK.COM (2603:10a6:20b:150::39) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3216.23 via Frontend Transport; Tue, 28 Jul 2020 09:04:40 +0000
-X-Originating-IP: [94.188.199.18]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-HT: Tenant
-X-MS-Office365-Filtering-Correlation-Id: a8d71944-5193-4780-6d8a-08d832d54355
-X-MS-TrafficTypeDiagnostic: AM0PR05MB6116:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <AM0PR05MB6116493FE9A159D8CBBD54D1C5730@AM0PR05MB6116.eurprd05.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:7691;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: Akn45LIkWeuZLcHr8c61Gc5GY5h6JszSf19DEc7E2eQsEtrTUuGfKg8PnpR4NCYZlxOPwi3tW9BIEwX3aJtUGsYUSG7lp86d8XScotE9TvUIQfL+A48EOd1Xd3u5CYiBqQPOWHCyjmTbpYGtZ79VP3psL2iCjvzPVZ8l5B/jnANDoxSaID2wqj2KquIsBIw9VvokI4XUqqz6s0lEagPm+T/ZxNPG/4cxvdbXfsKS5iNTKevoSe20EglVIjis8j0QRudyP+YU4mdNMxMekxhQkdqoACvO4s2gS+iz7/4808yPXHurnKKG8uB+bIN2cY4ie+qP7UBHkMf0stW13XGOqg==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM0PR05MB4786.eurprd05.prod.outlook.com;PTR:;CAT:NONE;SFTY:;SFS:(4636009)(39860400002)(346002)(136003)(376002)(366004)(396003)(83380400001)(6506007)(7696005)(52116002)(86362001)(66556008)(66476007)(4744005)(5660300002)(33656002)(7416002)(66946007)(4326008)(2906002)(1076003)(186003)(6916009)(55016002)(9686003)(478600001)(316002)(107886003)(26005)(956004)(8936002)(8676002)(16526019);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData: Z2omUVDN/mCYkPGPl2fdthKrm5ulXuLtMCNokLaWm+dCPnHCSSlgAWfvWip+1oIDvzQKN0CX04bSLbxiwh3Bs7jbvzwP4xeoT6laITtLXKFPxAYjjToeIIyR1Fi1tFOa3nJ3Vv/HfOUnrkiJvwnl2J2KIx+TNZ2fv3EQ0epHl2tkcbFXDpj04P3AJBcKo5BDcpJi8BXJD7Dir+mVIXik7YN18zYqpONqgy5nFOuRgn5NXBEfAHETnKQQtpon8XBTz+xuLsQ668t25gqUwHyDuxclBBWzl25yZsvFckNyD5c3HKgF8bXjXPT36wgkehDcdg3TY6cucnpPx0mtG7yy44syrR5LXU22qo9tK0odGCKB5AsNZbqPH/AdtjWXqfliopstxYsxwVBrqNskk/JbeY+FhprXbL7ZBKmGzG/yY4q7unljqMrn/qail9RD24993b5JDK34s84F1l5X3p1ssJE6jKeTlKInrTdb+hYrPxA=
-X-OriginatorOrg: Mellanox.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: a8d71944-5193-4780-6d8a-08d832d54355
-X-MS-Exchange-CrossTenant-AuthSource: AM0PR05MB4786.eurprd05.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Jul 2020 09:04:41.3749
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: a652971c-7d2e-4d9b-a6a4-d149256f461b
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: G8RE3aVQ08CIERWvHIlogqGbd2blyW5+vLuUchlge0TbfoG5X1E+vbV1KjmIwSEp9Aon9oeJ1PFyHjwMJjXReQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM0PR05MB6116
+        id S1728556AbgG1JpT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 28 Jul 2020 05:45:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48162 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728197AbgG1JpR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 28 Jul 2020 05:45:17 -0400
+Received: from mail-pl1-x644.google.com (mail-pl1-x644.google.com [IPv6:2607:f8b0:4864:20::644])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 79CD0C061794;
+        Tue, 28 Jul 2020 02:45:16 -0700 (PDT)
+Received: by mail-pl1-x644.google.com with SMTP id u10so108778plr.7;
+        Tue, 28 Jul 2020 02:45:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id;
+        bh=YW61uT4gs7NLfpC0VAfH7u18rjoR4roJ54bakldbt1o=;
+        b=RfYnzTVaaiIcgr+9v6Qpt+9Sn4A6BP7Q9yIcBs4oG6bfhviw+3JSTCk5bxF1v0Q9VP
+         CUq/x8J/Q5xlyidW5jaxO5+QUJ1nIMYZT95rI6r8HwIvVYcixErDeg97g06HHpbEo/7F
+         LwwNFv4NhVm7TKSdT4zHjQsYvZhtIh6u86VYKcMqCJCod6yK6Tl5nqYYVoMm8ubtdCGH
+         quJmKGjBIogttIL6DsrSLmV1jPalEf2Fq+43Dty6I0iwCNBjfVc23hz+lt+1g9YQV+SJ
+         3TP1vfw0eBPVO9iLug6dQSoZVxRimiRsV98IQ6Ahh8vFpJK16eXVvpLLG6ndwl95wNg4
+         mHkw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=YW61uT4gs7NLfpC0VAfH7u18rjoR4roJ54bakldbt1o=;
+        b=S/277hyXeTjAkmgbQCqdwINDdJJWLN12opdg270kTVxjc18S4U4LlQqtNRp3h6DoqW
+         hmfJBS0E/2aPOY8u+8/FBpk4qCPhilA6K8/8PPfbDTvB6bcbrTgDSwqpgtlFPEWBG7qy
+         BhTPoxjwZO7hFV4s8dIuJweqwNCoyUm6dM+SSC74myDwWkaxja6c7KWPozLWrkSzSneB
+         2VwBSSpbBL6P9S0Q1b1+rt53FtcW1BbtDGRh1knnfbDHtAoIrnagK3F1lOqhOW/TnZcy
+         zCzjj15FAQ+mc7hPYH1bESIMp0kvcH9oSeew5I0/a65t/VTQIaLakn+SXfHAhIY8tF2W
+         +3DA==
+X-Gm-Message-State: AOAM5321UOlqULWQu45mXdZcC5m+wpiwPbc8Zadf7gKr3JvTSPkbg53F
+        EroCfbUVz8I7Xqe4xn3dT4mrm2Nc
+X-Google-Smtp-Source: ABdhPJxD6tzllfcRVDmb1xoKhd2jMzTzXphKdkN4ooTcK2t2IBIzxcYpjGFm4Em3KQhe2BXXOgUfSA==
+X-Received: by 2002:a17:90a:d30c:: with SMTP id p12mr3843893pju.4.1595929515664;
+        Tue, 28 Jul 2020 02:45:15 -0700 (PDT)
+Received: from localhost.localdomain ([103.7.29.6])
+        by smtp.googlemail.com with ESMTPSA id r17sm17969173pfg.62.2020.07.28.02.45.12
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Tue, 28 Jul 2020 02:45:15 -0700 (PDT)
+From:   Wanpeng Li <kernellwp@gmail.com>
+X-Google-Original-From: Wanpeng Li <wanpengli@tencent.com>
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, stable@vger.kernel.org
+Subject: [PATCH v2 1/3] KVM: LAPIC: Prevent setting the tscdeadline timer if the lapic is hw disabled
+Date:   Tue, 28 Jul 2020 17:45:04 +0800
+Message-Id: <1595929506-9203-1-git-send-email-wanpengli@tencent.com>
+X-Mailer: git-send-email 2.7.4
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jul 28, 2020 at 12:24:03PM +0800, Zhu Lingshan wrote:
->  
-> +static void vhost_vdpa_setup_vq_irq(struct vhost_vdpa *v, int qid)
-> +{
-> +	struct vhost_virtqueue *vq = &v->vqs[qid];
-> +	const struct vdpa_config_ops *ops = v->vdpa->config;
-> +	struct vdpa_device *vdpa = v->vdpa;
-> +	int ret, irq;
-> +
-> +	spin_lock(&vq->call_ctx.ctx_lock);
-> +	irq = ops->get_vq_irq(vdpa, qid);
-> +	if (!vq->call_ctx.ctx || irq == -EINVAL) {
-> +		spin_unlock(&vq->call_ctx.ctx_lock);
-> +		return;
-> +	}
-> +
+From: Wanpeng Li <wanpengli@tencent.com>
 
-If I understand correctly, this will cause these IRQs to be forwarded
-directly to the VCPU, e.g. will be handled by the guest/qemu.
-Does this mean that the host will not handle this interrupt? How does it
-work in case on level triggered interrupts?
+Prevent setting the tscdeadline timer if the lapic is hw disabled.
 
-In the case of ConnectX, I need to execute some code to acknowledge the
-interrupt.
+Fixes: bce87cce88 (KVM: x86: consolidate different ways to test for in-kernel LAPIC)
+Cc: <stable@vger.kernel.org>
+Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
+---
+ arch/x86/kvm/lapic.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Can you explain how this should be done?
+diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+index 5bf72fc..4ce2ddd 100644
+--- a/arch/x86/kvm/lapic.c
++++ b/arch/x86/kvm/lapic.c
+@@ -2195,7 +2195,7 @@ void kvm_set_lapic_tscdeadline_msr(struct kvm_vcpu *vcpu, u64 data)
+ {
+ 	struct kvm_lapic *apic = vcpu->arch.apic;
+ 
+-	if (!lapic_in_kernel(vcpu) || apic_lvtt_oneshot(apic) ||
++	if (!kvm_apic_present(vcpu) || apic_lvtt_oneshot(apic) ||
+ 			apic_lvtt_period(apic))
+ 		return;
+ 
+-- 
+2.7.4
+
