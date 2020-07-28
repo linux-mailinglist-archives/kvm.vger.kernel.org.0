@@ -2,146 +2,145 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E5CCF23077D
-	for <lists+kvm@lfdr.de>; Tue, 28 Jul 2020 12:16:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 982AC2307AC
+	for <lists+kvm@lfdr.de>; Tue, 28 Jul 2020 12:30:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728755AbgG1KQv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 28 Jul 2020 06:16:51 -0400
-Received: from mail.kernel.org ([198.145.29.99]:42438 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728445AbgG1KQu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 28 Jul 2020 06:16:50 -0400
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        id S1728614AbgG1KaN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 28 Jul 2020 06:30:13 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:22038 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1728609AbgG1KaN (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 28 Jul 2020 06:30:13 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1595932211;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=2eXwPZgBliCyd1sHEj5P6kwd7xBg6PnDz+mvU5GcUYk=;
+        b=VAyLutPt8F4N8OZAisg9gfSO3THB9PXUcqQ2S6vqZ61qPvHSan0y73uvUt05pi7tPisZIu
+        l7Qc5dNFtLZJInVatVLLrQJY/0y9J5sh+LAQHQUbBWMywSMVqeftqeqthAt9UNTb7ZxmJD
+        pXTbacA2Q2j0nNQy3u3u2h613Xf+a30=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-357-hrqz5xcqMXaBppmT1Ngusg-1; Tue, 28 Jul 2020 06:30:07 -0400
+X-MC-Unique: hrqz5xcqMXaBppmT1Ngusg-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 9BFB320714;
-        Tue, 28 Jul 2020 10:16:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1595931409;
-        bh=ZfZF4pLvNemxD3En2Fwag4OkbrDfzKVU9SSSrL6fd/A=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=VBdHKzomeWjgG1TMubp9tgrJfSfvIiWmv/K4FkXE5Rs7AJCr+6dTw7JhR+SJdMQYt
-         fPlyE+EJ3CP6EqlEzoY0Ft3LE0pMPFyKPhAVwGK3Qo4iqhoODr1mWy8T3OvnA7FuDq
-         4MT7WpcnF3emS2LhtbRxOesdw6RmcyTlTn3bQdJM=
-Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
-        by disco-boy.misterjones.org with esmtpsa (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
-        (Exim 4.92)
-        (envelope-from <maz@kernel.org>)
-        id 1k0Mf9-00FcMr-Ug; Tue, 28 Jul 2020 11:16:48 +0100
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E9FBF101C8A7;
+        Tue, 28 Jul 2020 10:30:05 +0000 (UTC)
+Received: from [10.72.13.242] (ovpn-13-242.pek2.redhat.com [10.72.13.242])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 0E18C171F9;
+        Tue, 28 Jul 2020 10:29:53 +0000 (UTC)
+Subject: Re: [PATCH V4 4/6] vhost_vdpa: implement IRQ offloading in vhost_vdpa
+To:     "Zhu, Lingshan" <lingshan.zhu@intel.com>,
+        alex.williamson@redhat.com, mst@redhat.com, pbonzini@redhat.com,
+        sean.j.christopherson@intel.com, wanpengli@tencent.com
+Cc:     virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        kvm@vger.kernel.org, eli@mellanox.com, shahafs@mellanox.com,
+        parav@mellanox.com
+References: <20200728042405.17579-1-lingshan.zhu@intel.com>
+ <20200728042405.17579-5-lingshan.zhu@intel.com>
+ <10dd83c0-f68a-ed9e-9860-45c215fc67f6@redhat.com>
+ <f3e375da-3aa8-7a0c-237c-25943667a535@intel.com>
+From:   Jason Wang <jasowang@redhat.com>
+Message-ID: <a017e479-2ea5-459f-a016-011d53e09ced@redhat.com>
+Date:   Tue, 28 Jul 2020 18:29:52 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-Date:   Tue, 28 Jul 2020 11:16:47 +0100
-From:   Marc Zyngier <maz@kernel.org>
-To:     Keqian Zhu <zhukeqian1@huawei.com>
-Cc:     linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        wanghaibin.wang@huawei.com
-Subject: Re: [RESEND PATCH] drivers: arm arch timer: Correct fault programming
- of CNTKCTL_EL1.EVNTI
-In-Reply-To: <20200717092104.15428-1-zhukeqian1@huawei.com>
-References: <20200717092104.15428-1-zhukeqian1@huawei.com>
-User-Agent: Roundcube Webmail/1.4.5
-Message-ID: <3a95ec8ce3e34d86c09f9b1b4f17d0ad@kernel.org>
-X-Sender: maz@kernel.org
-X-SA-Exim-Connect-IP: 51.254.78.96
-X-SA-Exim-Rcpt-To: zhukeqian1@huawei.com, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, catalin.marinas@arm.com, will@kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, wanghaibin.wang@huawei.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+In-Reply-To: <f3e375da-3aa8-7a0c-237c-25943667a535@intel.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2020-07-17 10:21, Keqian Zhu wrote:
-> ARM virtual counter supports event stream. It can only trigger an event
-> when the trigger bit of CNTVCT_EL0 changes from 0 to 1 (or from 1 to 
-> 0),
-> so the actual period of event stream is 2 ^ (cntkctl_evnti + 1). For
-> example, when the trigger bit is 0, then it triggers an event for every
-> two cycles.
-> 
-> Signed-off-by: Keqian Zhu <zhukeqian1@huawei.com>
-> ---
->  drivers/clocksource/arm_arch_timer.c | 17 ++++++++++++++---
->  1 file changed, 14 insertions(+), 3 deletions(-)
-> 
-> diff --git a/drivers/clocksource/arm_arch_timer.c
-> b/drivers/clocksource/arm_arch_timer.c
-> index ecf7b7db2d05..06d99a4b1b9b 100644
-> --- a/drivers/clocksource/arm_arch_timer.c
-> +++ b/drivers/clocksource/arm_arch_timer.c
-> @@ -799,10 +799,20 @@ static void __arch_timer_setup(unsigned type,
->  static void arch_timer_evtstrm_enable(int divider)
->  {
->  	u32 cntkctl = arch_timer_get_cntkctl();
-> +	int cntkctl_evnti;
-> +
-> +	/*
-> +	 * Note that it can only trigger an event when the trigger bit
-> +	 * of CNTVCT_EL0 changes from 1 to 0 (or from 0 to 1), so the
-> +	 * actual period of event stream is 2 ^ (cntkctl_evnti + 1).
-> +	 */
-> +	cntkctl_evnti = divider - 1;
-> +	cntkctl_evnti = min(cntkctl_evnti, 15);
-> +	cntkctl_evnti = max(cntkctl_evnti, 0);
-> 
->  	cntkctl &= ~ARCH_TIMER_EVT_TRIGGER_MASK;
->  	/* Set the divider and enable virtual event stream */
-> -	cntkctl |= (divider << ARCH_TIMER_EVT_TRIGGER_SHIFT)
-> +	cntkctl |= (cntkctl_evnti << ARCH_TIMER_EVT_TRIGGER_SHIFT)
->  			| ARCH_TIMER_VIRT_EVT_EN;
->  	arch_timer_set_cntkctl(cntkctl);
->  	arch_timer_set_evtstrm_feature();
-> @@ -816,10 +826,11 @@ static void arch_timer_configure_evtstream(void)
->  	/* Find the closest power of two to the divisor */
->  	evt_stream_div = arch_timer_rate / ARCH_TIMER_EVT_STREAM_FREQ;
->  	pos = fls(evt_stream_div);
-> -	if (pos > 1 && !(evt_stream_div & (1 << (pos - 2))))
-> +	if ((pos == 1) || (pos > 1 && !(evt_stream_div & (1 << (pos - 2)))))
->  		pos--;
-> +
->  	/* enable event stream */
-> -	arch_timer_evtstrm_enable(min(pos, 15));
-> +	arch_timer_evtstrm_enable(pos);
->  }
-> 
->  static void arch_counter_set_user_access(void)
 
-This looks like a very convoluted fix. If the problem you are
-trying to fix is that the event frequency is at most half of
-that of the counter, why isn't the patch below the most
-obvious fix?
+On 2020/7/28 下午5:18, Zhu, Lingshan wrote:
+>>>
+>>>        * status to 0.
+>>> @@ -167,6 +220,15 @@ static long vhost_vdpa_set_status(struct 
+>>> vhost_vdpa *v, u8 __user *statusp)
+>>>       if (status != 0 && (ops->get_status(vdpa) & ~status) != 0)
+>>>           return -EINVAL;
+>>>   +    /* vq irq is not expected to be changed once DRIVER_OK is set */
+>>
+>>
+>> So this basically limit the usage of get_vq_irq() in the context 
+>> vhost_vdpa_set_status() and other vDPA bus drivers' set_status(). If 
+>> this is true, there's even no need to introduce any new config ops 
+>> but just let set_status() to return the irqs used for the device. Or 
+>> if we want this to be more generic, we need vpda's own irq manager 
+>> (which should be similar to irq bypass manager). That is:
+> I think there is no need for a driver to free / re-request its irqs after DRIVER_OK though it can do so. If a driver changed its irq of a vq after DRIVER_OK, the vq is still operational but will lose irq offloading that is reasonable.
+> If we want set_status() return irqs, we need to record the irqs somewhere in vdpa_device,
 
-Thanks,
 
-         M.
+Why, we can simply pass an array to the driver I think?
 
-diff --git a/drivers/clocksource/arm_arch_timer.c 
-b/drivers/clocksource/arm_arch_timer.c
-index 6c3e84180146..0a65414b781f 100644
---- a/drivers/clocksource/arm_arch_timer.c
-+++ b/drivers/clocksource/arm_arch_timer.c
-@@ -824,8 +824,12 @@ static void arch_timer_configure_evtstream(void)
-  {
-  	int evt_stream_div, pos;
+void (*set_status)(struct vdpa_device *vdev, u8 status, int *irqs);
 
--	/* Find the closest power of two to the divisor */
--	evt_stream_div = arch_timer_rate / ARCH_TIMER_EVT_STREAM_FREQ;
-+	/*
-+	 * Find the closest power of two to the divisor. As the event
-+	 * stream can at most be generated at half the frequency of the
-+	 * counter, use half the frequency when computing the divider.
-+	 */
-+	evt_stream_div = arch_timer_rate / ARCH_TIMER_EVT_STREAM_FREQ / 2;
-  	pos = fls(evt_stream_div);
-  	if (pos > 1 && !(evt_stream_div & (1 << (pos - 2))))
-  		pos--;
 
--- 
-Jazz is not dead. It just smells funny...
+> as we discussed in a previous thread, this may need initialize and cleanup works, so a new ops
+> with proper comments (don't say they could not change irq, but highlight if irq changes, irq offloading will not work till next DRIVER_OK) could be more elegant.
+> However if we really need to change irq after DRIVER_OK, I think maybe we still need vDPA vq irq allocate / free helpers, then the helpers can not be used in probe() as we discussed before, it is a step back to V3 series.
+
+
+Still, it's not about whether driver may change irq after DRIVER_OK but 
+implication of the assumption. If one bus ops must be called in another 
+ops, it's better to just implement them in one ops.
+
+
+>>
+>> - bus driver can register itself as consumer
+>> - vDPA device driver can register itself as producer
+>> - matching via queue index
+> IMHO, is it too heavy for this feature,
+
+
+Do you mean LOCs? We can:
+
+1) refactor irq bypass manager
+2) invent it our own (a much simplified version compared to bypass manager)
+3) enforcing them via vDPA bus
+
+Each of the above should be not a lot of coding. I think method 3 is 
+partially done in your previous series but in an implicit manner:
+
+- bus driver that has alloc_irq/free_irq implemented could be implicitly 
+treated as consumer registering
+- every vDPA device driver could be treated as producer
+- vdpa_devm_alloc_irq() could be treated as producer registering
+- alloc_irq/free_irq is the add_producer/del_procuer
+
+We probably just lack some synchronization with driver probe/remove.
+
+
+> and how can they match if two individual adapters both have vq idx = 1.
+
+
+The matching is per vDPA device.
+
+Thanks
+
+
+> Thanks!
+>> - deal with registering/unregistering of consumer/producer
+>>
+>> So there's no need to care when or where the vDPA device driver to 
+>> allocate the irq, and we don't need to care at which context the vDPA 
+>> bus driver can use the irq. Either side may get notified when the 
+>> other side is gone (though we only care about the gone of producer 
+>> probably).
+>>
+>> Any thought on this?
+>>
+>> Thanks
+>>
+>>
+
