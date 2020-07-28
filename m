@@ -2,31 +2,31 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E83CA2302D0
-	for <lists+kvm@lfdr.de>; Tue, 28 Jul 2020 08:27:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3C7E52302DF
+	for <lists+kvm@lfdr.de>; Tue, 28 Jul 2020 08:28:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727987AbgG1G1r (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 28 Jul 2020 02:27:47 -0400
+        id S1727933AbgG1G1q (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 28 Jul 2020 02:27:46 -0400
 Received: from mga11.intel.com ([192.55.52.93]:41268 "EHLO mga11.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727904AbgG1G1r (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 28 Jul 2020 02:27:47 -0400
-IronPort-SDR: n4q+6drSXm0qENjcnP9crWMy0TWLm/VvKDwlXHxaK86yhSen25OYzsM/5Tx2ctpJUFzU5TzP2I
- l213SET8ADZA==
-X-IronPort-AV: E=McAfee;i="6000,8403,9695"; a="149021042"
+        id S1727883AbgG1G1p (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 28 Jul 2020 02:27:45 -0400
+IronPort-SDR: 8/4QnLfyIXxuZs+r9o2JzUltBqpxJbobprS5V8PBW3B4fRDCBbSxizlgQ2lqLlCAPMdZ/NkkdQ
+ o1Mafy2rnLFA==
+X-IronPort-AV: E=McAfee;i="6000,8403,9695"; a="149021043"
 X-IronPort-AV: E=Sophos;i="5.75,405,1589266800"; 
-   d="scan'208";a="149021042"
+   d="scan'208";a="149021043"
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Jul 2020 23:27:40 -0700
-IronPort-SDR: W5TGVapuQnG5O9nWo9hOMQL7iMTEoGV4pfvhi1jijMfY4eMRe+rfAkD6UXCNUoIy5dIM0RA+jE
- x8kz4uAP/DTA==
+  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Jul 2020 23:27:41 -0700
+IronPort-SDR: ZZBh2i2ZiLLbFq2GI8n1scT1MUTr2ELDtZKZ6a62v2422P609PZmiTGok7fQ4Y3rhkjetKls9u
+ qv8FmENxgEzw==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.75,405,1589266800"; 
-   d="scan'208";a="394232888"
+   d="scan'208";a="394232901"
 Received: from jacob-builder.jf.intel.com ([10.7.199.155])
-  by fmsmga001.fm.intel.com with ESMTP; 27 Jul 2020 23:27:39 -0700
+  by fmsmga001.fm.intel.com with ESMTP; 27 Jul 2020 23:27:40 -0700
 From:   Liu Yi L <yi.l.liu@intel.com>
 To:     qemu-devel@nongnu.org, alex.williamson@redhat.com,
         peterx@redhat.com, jasowang@redhat.com
@@ -35,12 +35,10 @@ Cc:     mst@redhat.com, pbonzini@redhat.com, eric.auger@redhat.com,
         kevin.tian@intel.com, yi.l.liu@intel.com, jun.j.tian@intel.com,
         yi.y.sun@intel.com, hao.wu@intel.com, kvm@vger.kernel.org,
         Jacob Pan <jacob.jun.pan@linux.intel.com>,
-        Yi Sun <yi.y.sun@linux.intel.com>,
-        Richard Henderson <rth@twiddle.net>,
-        Eduardo Habkost <ehabkost@redhat.com>
-Subject: [RFC v9 10/25] intel_iommu: add set/unset_iommu_context callback
-Date:   Mon, 27 Jul 2020 23:34:03 -0700
-Message-Id: <1595918058-33392-11-git-send-email-yi.l.liu@intel.com>
+        Yi Sun <yi.y.sun@linux.intel.com>
+Subject: [RFC v9 11/25] vfio/common: provide PASID alloc/free hooks
+Date:   Mon, 27 Jul 2020 23:34:04 -0700
+Message-Id: <1595918058-33392-12-git-send-email-yi.l.liu@intel.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1595918058-33392-1-git-send-email-yi.l.liu@intel.com>
 References: <1595918058-33392-1-git-send-email-yi.l.liu@intel.com>
@@ -49,180 +47,146 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This patch adds set/unset_iommu_context() impelementation in Intel
-vIOMMU. PCIe devices (VFIO case) sets HostIOMMUContext to vIOMMU as
-an ack of vIOMMU's "want_nested" attribute. Thus vIOMMU could build
-DMA protection based on nested paging of host IOMMU.
+This patch defines vfio_host_iommu_context_info, implements the PASID
+alloc/free hooks defined in HostIOMMUContextClass.
 
 Cc: Kevin Tian <kevin.tian@intel.com>
 Cc: Jacob Pan <jacob.jun.pan@linux.intel.com>
 Cc: Peter Xu <peterx@redhat.com>
+Cc: Eric Auger <eric.auger@redhat.com>
 Cc: Yi Sun <yi.y.sun@linux.intel.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Richard Henderson <rth@twiddle.net>
-Cc: Eduardo Habkost <ehabkost@redhat.com>
+Cc: David Gibson <david@gibson.dropbear.id.au>
+Cc: Alex Williamson <alex.williamson@redhat.com>
 Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
 ---
- hw/i386/intel_iommu.c         | 71 ++++++++++++++++++++++++++++++++++++++++---
- include/hw/i386/intel_iommu.h | 21 ++++++++++---
- 2 files changed, 83 insertions(+), 9 deletions(-)
+ hw/vfio/common.c                      | 66 +++++++++++++++++++++++++++++++++++
+ include/hw/iommu/host_iommu_context.h |  3 ++
+ include/hw/vfio/vfio-common.h         |  4 +++
+ 3 files changed, 73 insertions(+)
 
-diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
-index 9ad7242..4550cb9 100644
---- a/hw/i386/intel_iommu.c
-+++ b/hw/i386/intel_iommu.c
-@@ -3359,23 +3359,33 @@ static const MemoryRegionOps vtd_mem_ir_ops = {
-     },
- };
- 
--VTDAddressSpace *vtd_find_add_as(IntelIOMMUState *s, PCIBus *bus, int devfn)
-+/**
-+ * Fetch a VTDBus instance for given PCIBus. If no existing instance,
-+ * allocate one.
-+ */
-+static VTDBus *vtd_find_add_bus(IntelIOMMUState *s, PCIBus *bus)
- {
-     uintptr_t key = (uintptr_t)bus;
-     VTDBus *vtd_bus = g_hash_table_lookup(s->vtd_as_by_busptr, &key);
--    VTDAddressSpace *vtd_dev_as;
--    char name[128];
- 
-     if (!vtd_bus) {
-         uintptr_t *new_key = g_malloc(sizeof(*new_key));
-         *new_key = (uintptr_t)bus;
-         /* No corresponding free() */
--        vtd_bus = g_malloc0(sizeof(VTDBus) + sizeof(VTDAddressSpace *) * \
--                            PCI_DEVFN_MAX);
-+        vtd_bus = g_malloc0(sizeof(VTDBus));
-         vtd_bus->bus = bus;
-         g_hash_table_insert(s->vtd_as_by_busptr, new_key, vtd_bus);
-     }
-+    return vtd_bus;
-+}
- 
-+VTDAddressSpace *vtd_find_add_as(IntelIOMMUState *s, PCIBus *bus, int devfn)
-+{
-+    VTDBus *vtd_bus;
-+    VTDAddressSpace *vtd_dev_as;
-+    char name[128];
-+
-+    vtd_bus = vtd_find_add_bus(s, bus);
-     vtd_dev_as = vtd_bus->dev_as[devfn];
- 
-     if (!vtd_dev_as) {
-@@ -3463,6 +3473,55 @@ static int vtd_dev_get_iommu_attr(PCIBus *bus, void *opaque, int32_t devfn,
+diff --git a/hw/vfio/common.c b/hw/vfio/common.c
+index af91eca..41aaf41 100644
+--- a/hw/vfio/common.c
++++ b/hw/vfio/common.c
+@@ -1183,6 +1183,50 @@ static int vfio_get_iommu_type(VFIOContainer *container,
      return ret;
  }
  
-+static int vtd_dev_set_iommu_context(PCIBus *bus, void *opaque,
-+                                     int devfn,
-+                                     HostIOMMUContext *iommu_ctx)
++static int vfio_host_iommu_ctx_pasid_alloc(HostIOMMUContext *iommu_ctx,
++                                           uint32_t min, uint32_t max,
++                                           uint32_t *pasid)
 +{
-+    IntelIOMMUState *s = opaque;
-+    VTDBus *vtd_bus;
-+    VTDHostIOMMUContext *vtd_dev_icx;
++    VFIOContainer *container = container_of(iommu_ctx,
++                                            VFIOContainer, iommu_ctx);
++    struct vfio_iommu_type1_pasid_request req;
++    int ret = 0;
 +
-+    assert(0 <= devfn && devfn < PCI_DEVFN_MAX);
++    req.argsz = sizeof(req);
++    req.flags = VFIO_IOMMU_FLAG_ALLOC_PASID;
++    req.range.min = min;
++    req.range.max = max;
 +
-+    vtd_bus = vtd_find_add_bus(s, bus);
-+
-+    vtd_iommu_lock(s);
-+
-+    vtd_dev_icx = vtd_bus->dev_icx[devfn];
-+
-+    assert(!vtd_dev_icx);
-+
-+    vtd_bus->dev_icx[devfn] = vtd_dev_icx =
-+                    g_malloc0(sizeof(VTDHostIOMMUContext));
-+    vtd_dev_icx->vtd_bus = vtd_bus;
-+    vtd_dev_icx->devfn = (uint8_t)devfn;
-+    vtd_dev_icx->iommu_state = s;
-+    vtd_dev_icx->iommu_ctx = iommu_ctx;
-+
-+    vtd_iommu_unlock(s);
-+
++    ret = ioctl(container->fd, VFIO_IOMMU_PASID_REQUEST, &req);
++    if (ret < 0) {
++        error_report("%s: alloc failed (%m)", __func__);
++        return ret;
++    }
++    *pasid = ret;
 +    return 0;
 +}
 +
-+static void vtd_dev_unset_iommu_context(PCIBus *bus, void *opaque, int devfn)
++static int vfio_host_iommu_ctx_pasid_free(HostIOMMUContext *iommu_ctx,
++                                          uint32_t pasid)
 +{
-+    IntelIOMMUState *s = opaque;
-+    VTDBus *vtd_bus;
-+    VTDHostIOMMUContext *vtd_dev_icx;
++    VFIOContainer *container = container_of(iommu_ctx,
++                                            VFIOContainer, iommu_ctx);
++    struct vfio_iommu_type1_pasid_request req;
 +
-+    assert(0 <= devfn && devfn < PCI_DEVFN_MAX);
++    int ret = 0;
 +
-+    vtd_bus = vtd_find_add_bus(s, bus);
++    req.argsz = sizeof(req);
++    req.flags = VFIO_IOMMU_FLAG_FREE_PASID;
++    req.range.min = pasid;
++    req.range.max = pasid + 1;
 +
-+    vtd_iommu_lock(s);
-+
-+    vtd_dev_icx = vtd_bus->dev_icx[devfn];
-+    g_free(vtd_dev_icx);
-+    vtd_bus->dev_icx[devfn] = NULL;
-+
-+    vtd_iommu_unlock(s);
++    ret = ioctl(container->fd, VFIO_IOMMU_PASID_REQUEST, &req);
++    if (ret) {
++        error_report("%s: free failed (%m)", __func__);
++    }
++    return ret;
 +}
 +
- static uint64_t get_naturally_aligned_size(uint64_t start,
-                                            uint64_t size, int gaw)
+ static int vfio_init_container(VFIOContainer *container, int group_fd,
+                                bool want_nested, Error **errp)
  {
-@@ -3759,6 +3818,8 @@ static AddressSpace *vtd_host_dma_iommu(PCIBus *bus, void *opaque, int devfn)
- static PCIIOMMUOps vtd_iommu_ops = {
-     .get_address_space = vtd_host_dma_iommu,
-     .get_iommu_attr = vtd_dev_get_iommu_attr,
-+    .set_iommu_context = vtd_dev_set_iommu_context,
-+    .unset_iommu_context = vtd_dev_unset_iommu_context,
- };
- 
- static bool vtd_decide_config(IntelIOMMUState *s, Error **errp)
-diff --git a/include/hw/i386/intel_iommu.h b/include/hw/i386/intel_iommu.h
-index 3870052..b5fefb9 100644
---- a/include/hw/i386/intel_iommu.h
-+++ b/include/hw/i386/intel_iommu.h
-@@ -64,6 +64,7 @@ typedef union VTD_IR_TableEntry VTD_IR_TableEntry;
- typedef union VTD_IR_MSIAddress VTD_IR_MSIAddress;
- typedef struct VTDPASIDDirEntry VTDPASIDDirEntry;
- typedef struct VTDPASIDEntry VTDPASIDEntry;
-+typedef struct VTDHostIOMMUContext VTDHostIOMMUContext;
- 
- /* Context-Entry */
- struct VTDContextEntry {
-@@ -112,10 +113,20 @@ struct VTDAddressSpace {
-     IOVATree *iova_tree;          /* Traces mapped IOVA ranges */
- };
- 
-+struct VTDHostIOMMUContext {
-+    VTDBus *vtd_bus;
-+    uint8_t devfn;
-+    HostIOMMUContext *iommu_ctx;
-+    IntelIOMMUState *iommu_state;
+@@ -1802,3 +1846,25 @@ int vfio_eeh_as_op(AddressSpace *as, uint32_t op)
+     }
+     return vfio_eeh_container_op(container, op);
+ }
++
++static void vfio_host_iommu_context_class_init(ObjectClass *klass,
++                                                       void *data)
++{
++    HostIOMMUContextClass *hicxc = HOST_IOMMU_CONTEXT_CLASS(klass);
++
++    hicxc->pasid_alloc = vfio_host_iommu_ctx_pasid_alloc;
++    hicxc->pasid_free = vfio_host_iommu_ctx_pasid_free;
++}
++
++static const TypeInfo vfio_host_iommu_context_info = {
++    .parent = TYPE_HOST_IOMMU_CONTEXT,
++    .name = TYPE_VFIO_HOST_IOMMU_CONTEXT,
++    .class_init = vfio_host_iommu_context_class_init,
 +};
 +
- struct VTDBus {
--    PCIBus* bus;		/* A reference to the bus to provide translation for */
-+    /* A reference to the bus to provide translation for */
-+    PCIBus *bus;
-     /* A table of VTDAddressSpace objects indexed by devfn */
--    VTDAddressSpace *dev_as[];
-+    VTDAddressSpace *dev_as[PCI_DEVFN_MAX];
-+    /* A table of VTDHostIOMMUContext objects indexed by devfn */
-+    VTDHostIOMMUContext *dev_icx[PCI_DEVFN_MAX];
- };
++static void vfio_register_types(void)
++{
++    type_register_static(&vfio_host_iommu_context_info);
++}
++
++type_init(vfio_register_types)
+diff --git a/include/hw/iommu/host_iommu_context.h b/include/hw/iommu/host_iommu_context.h
+index 35c4861..227c433 100644
+--- a/include/hw/iommu/host_iommu_context.h
++++ b/include/hw/iommu/host_iommu_context.h
+@@ -33,6 +33,9 @@
+ #define TYPE_HOST_IOMMU_CONTEXT "qemu:host-iommu-context"
+ #define HOST_IOMMU_CONTEXT(obj) \
+         OBJECT_CHECK(HostIOMMUContext, (obj), TYPE_HOST_IOMMU_CONTEXT)
++#define HOST_IOMMU_CONTEXT_CLASS(klass) \
++        OBJECT_CLASS_CHECK(HostIOMMUContextClass, (klass), \
++                         TYPE_HOST_IOMMU_CONTEXT)
+ #define HOST_IOMMU_CONTEXT_GET_CLASS(obj) \
+         OBJECT_GET_CLASS(HostIOMMUContextClass, (obj), \
+                          TYPE_HOST_IOMMU_CONTEXT)
+diff --git a/include/hw/vfio/vfio-common.h b/include/hw/vfio/vfio-common.h
+index bdb09f4..a5eaf35 100644
+--- a/include/hw/vfio/vfio-common.h
++++ b/include/hw/vfio/vfio-common.h
+@@ -26,12 +26,15 @@
+ #include "qemu/notify.h"
+ #include "ui/console.h"
+ #include "hw/display/ramfb.h"
++#include "hw/iommu/host_iommu_context.h"
+ #ifdef CONFIG_LINUX
+ #include <linux/vfio.h>
+ #endif
  
- struct VTDIOTLBEntry {
-@@ -269,8 +280,10 @@ struct IntelIOMMUState {
-     bool dma_drain;                 /* Whether DMA r/w draining enabled */
+ #define VFIO_MSG_PREFIX "vfio %s: "
  
-     /*
--     * Protects IOMMU states in general.  Currently it protects the
--     * per-IOMMU IOTLB cache, and context entry cache in VTDAddressSpace.
-+     * iommu_lock protects below:
-+     * - per-IOMMU IOTLB caches
-+     * - context entry cache in VTDAddressSpace
-+     * - HostIOMMUContext pointer cached in vIOMMU
-      */
-     QemuMutex iommu_lock;
- };
++#define TYPE_VFIO_HOST_IOMMU_CONTEXT "qemu:vfio-host-iommu-context"
++
+ enum {
+     VFIO_DEVICE_TYPE_PCI = 0,
+     VFIO_DEVICE_TYPE_PLATFORM = 1,
+@@ -71,6 +74,7 @@ typedef struct VFIOContainer {
+     MemoryListener listener;
+     MemoryListener prereg_listener;
+     unsigned iommu_type;
++    HostIOMMUContext iommu_ctx;
+     Error *error;
+     bool initialized;
+     unsigned long pgsizes;
 -- 
 2.7.4
 
