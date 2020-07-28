@@ -2,108 +2,119 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E5141230F28
-	for <lists+kvm@lfdr.de>; Tue, 28 Jul 2020 18:25:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B59F8230F6F
+	for <lists+kvm@lfdr.de>; Tue, 28 Jul 2020 18:34:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731191AbgG1QZ2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 28 Jul 2020 12:25:28 -0400
-Received: from mga18.intel.com ([134.134.136.126]:2871 "EHLO mga18.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730679AbgG1QZ2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 28 Jul 2020 12:25:28 -0400
-IronPort-SDR: j9HYufdvPC8mybHGZP8sBdzH6L4Slak0UVRx6JOXTtbl+5/yIs+MJNYyDe/f28L5WaSfEAMIJn
- BEdk0X8Db0jA==
-X-IronPort-AV: E=McAfee;i="6000,8403,9696"; a="138772585"
-X-IronPort-AV: E=Sophos;i="5.75,406,1589266800"; 
-   d="scan'208";a="138772585"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Jul 2020 09:25:28 -0700
-IronPort-SDR: YAW0CaxbxjIeOA9o7ZaCbA5yvLUgv88BYxvkLjskK3Y4+SilGEzhvrR8BL2HdV5/HfpcSnkpiB
- nEQiVb0Gabcw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.75,406,1589266800"; 
-   d="scan'208";a="290231385"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.152])
-  by orsmga006.jf.intel.com with ESMTP; 28 Jul 2020 09:25:24 -0700
-Date:   Tue, 28 Jul 2020 09:25:24 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Xiaoyao Li <xiaoyao.li@intel.com>
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Chenyi Qiang <chenyi.qiang@intel.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>
-Subject: Re: [RFC 2/2] KVM: VMX: Enable bus lock VM exit
-Message-ID: <20200728162524.GE5300@linux.intel.com>
-References: <20200628085341.5107-1-chenyi.qiang@intel.com>
- <20200628085341.5107-3-chenyi.qiang@intel.com>
- <878sg3bo8b.fsf@vitty.brq.redhat.com>
- <0159554d-82d5-b388-d289-a5375ca91323@intel.com>
- <87366bbe1y.fsf@vitty.brq.redhat.com>
- <adad61e8-8252-0491-7feb-992a52c1b4f3@intel.com>
- <87zh8j9to2.fsf@vitty.brq.redhat.com>
- <20200723012114.GP9114@linux.intel.com>
- <a1c2a7dc-d52a-daad-4078-3097579ffef2@intel.com>
+        id S1731451AbgG1Qd7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 28 Jul 2020 12:33:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54888 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1731191AbgG1Qd6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 28 Jul 2020 12:33:58 -0400
+Received: from mail-lj1-x241.google.com (mail-lj1-x241.google.com [IPv6:2a00:1450:4864:20::241])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A3F00C061794
+        for <kvm@vger.kernel.org>; Tue, 28 Jul 2020 09:33:57 -0700 (PDT)
+Received: by mail-lj1-x241.google.com with SMTP id s16so6608721ljc.8
+        for <kvm@vger.kernel.org>; Tue, 28 Jul 2020 09:33:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=yuxijuLHIOB0F9v49dQBc2O0af6WKNiJzGh1ZbKbHko=;
+        b=qsskc5KL0O+PY0safIF+iwWyev/qr/QYPqK184NvB4tWeb1Qc4WElTrgsjF8wUJBde
+         6MOlXLXFGN0WOGQ8uP/XgKzS68dmY/cP8bWCA/2t7/F5E/VFCrjFKUnzEuaCW7CIhKH0
+         t04iiX06F00McgNMDboalxkDBmyOsGcCAQK3C5VF6zuol7T7wQNK6MpF/ox5qu+Qd1yK
+         mcAGqt09zds5G55etToMx0hH8PwE3lTjZcG1kjHZBnxCe4hIsrIm5dpCOQ2yiAtuHqZC
+         bm/zIzgpWWZQl0a8QB2YBhlSWvNgIoebiT7WFxWFD9ip4iSW4uotv0iK6ptBimzxaB8B
+         kD7A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=yuxijuLHIOB0F9v49dQBc2O0af6WKNiJzGh1ZbKbHko=;
+        b=YBRjBGUKKOuovG59cDZdwIzG1GPOgYBgI8TLKvLBFnIeANyPkE3VTUcpChOXA4G1bW
+         UuUHaAKAfZ/XODlmVgmOocrJcgkH2g/E0lMttyk83oXGPOYFIAvm1gLMBsuHKQcd8Enk
+         Cn5Twk7/uI9I2JheHkfGNH8cHb6yFP74zydoQACPrnpGxk823oecCEkr00hB5twy1W5S
+         gN4i5E4XIBlvfppIAt09odrSKt0GmAsIjmfs7lSGfNLmvPRVj+d5aDUM3ZxhYj363kI4
+         WnmLEX5XX3gZCT9skkWevwDAta9Mv89QiBryAdumH+ksCocSg2hszgelToIzTkO3XRT+
+         xovg==
+X-Gm-Message-State: AOAM533c4KM7DhR6hNovBH3e8FbxctI1Hsno47d6mZXA1nO8HYcPOPUM
+        m4O3GIbFGkAwl8kupdToeggCJqj9e2WwuHCA2sSX+e1f
+X-Google-Smtp-Source: ABdhPJxMv6WOP64yxWZJODcfz0QcbngiD7jQIfRiSyMAGdRtOUJr9z5zEVBqrGvazNCPGBspJIYC8iIZ26e5dNfAp7Y=
+X-Received: by 2002:a05:651c:324:: with SMTP id b4mr12255329ljp.235.1595954035506;
+ Tue, 28 Jul 2020 09:33:55 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <a1c2a7dc-d52a-daad-4078-3097579ffef2@intel.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+References: <20200722032629.3687068-1-oupton@google.com>
+In-Reply-To: <20200722032629.3687068-1-oupton@google.com>
+From:   Oliver Upton <oupton@google.com>
+Date:   Tue, 28 Jul 2020 09:33:43 -0700
+Message-ID: <CAOQ_QsgeN4DCghH6ibb68C+P0ETr77s2s7Us+uxF6E6LFx62tw@mail.gmail.com>
+Subject: Re: [PATCH v3 0/5] KVM_{GET,SET}_TSC_OFFSET ioctls
+To:     kvm list <kvm@vger.kernel.org>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Peter Shier <pshier@google.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Peter Hornyack <peterhornyack@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jul 27, 2020 at 12:38:53PM +0800, Xiaoyao Li wrote:
-> On 7/23/2020 9:21 AM, Sean Christopherson wrote:
-> >On Wed, Jul 01, 2020 at 04:49:49PM +0200, Vitaly Kuznetsov wrote:
-> >>Xiaoyao Li <xiaoyao.li@intel.com> writes:
-> >>>So you want an exit to userspace for every bus lock and leave it all to
-> >>>userspace. Yes, it's doable.
-> >>
-> >>In some cases we may not even want to have a VM exit: think
-> >>e.g. real-time/partitioning case when even in case of bus lock we may
-> >>not want to add additional latency just to count such events.
-> >
-> >Hmm, I suspect this isn't all that useful for real-time cases because they'd
-> >probably want to prevent the split lock in the first place, e.g. would prefer
-> >to use the #AC variant in fatal mode.  Of course, the availability of split
-> >lock #AC is a whole other can of worms.
-> >
-> >But anyways, I 100% agree that this needs either an off-by-default module
-> >param or an opt-in per-VM capability.
-> >
-> 
-> Maybe on-by-default or an opt-out per-VM capability?
-> Turning it on introduces no overhead if no bus lock happens in guest but
-> gives KVM the capability to track every potential bus lock. If user doesn't
-> want the extra latency due to bus lock VM exit, it's better try to fix the
-> bus lock, which also incurs high latency.
+On Tue, Jul 21, 2020 at 8:26 PM Oliver Upton <oupton@google.com> wrote:
+>
+> To date, VMMs have typically restored the guest's TSCs by value using
+> the KVM_SET_MSRS ioctl for each vCPU. However, restoring the TSCs by
+> value introduces some challenges with synchronization as the TSCs
+> continue to tick throughout the restoration process. As such, KVM has
+> some heuristics around TSC writes to infer whether or not the guest or
+> host is attempting to synchronize the TSCs.
+>
+> Instead of guessing at the intentions of a VMM, it'd be better to
+> provide an interface that allows for explicit synchronization of the
+> guest's TSCs. To that end, this series introduces the
+> KVM_{GET,SET}_TSC_OFFSET ioctls, yielding control of the TSC offset to
+> userspace.
+>
+> v2 => v3:
+>  - Mark kvm_write_tsc_offset() as static (whoops)
+>
+> v1 => v2:
+>  - Added clarification to the documentation of KVM_SET_TSC_OFFSET to
+>    indicate that it can be used instead of an IA32_TSC MSR restore
+>    through KVM_SET_MSRS
+>  - Fixed KVM_SET_TSC_OFFSET to participate in the existing TSC
+>    synchronization heuristics, thereby enabling the KVM masterclock when
+>    all vCPUs are in phase.
+>
+> Oliver Upton (4):
+>   kvm: x86: refactor masterclock sync heuristics out of kvm_write_tsc
+>   kvm: vmx: check tsc offsetting with nested_cpu_has()
+>   selftests: kvm: use a helper function for reading cpuid
+>   selftests: kvm: introduce tsc_offset_test
+>
+> Peter Hornyack (1):
+>   kvm: x86: add KVM_{GET,SET}_TSC_OFFSET ioctls
+>
+>  Documentation/virt/kvm/api.rst                |  31 ++
+>  arch/x86/include/asm/kvm_host.h               |   1 +
+>  arch/x86/kvm/vmx/vmx.c                        |   2 +-
+>  arch/x86/kvm/x86.c                            | 147 ++++---
+>  include/uapi/linux/kvm.h                      |   5 +
+>  tools/testing/selftests/kvm/.gitignore        |   1 +
+>  tools/testing/selftests/kvm/Makefile          |   1 +
+>  .../testing/selftests/kvm/include/test_util.h |   3 +
+>  .../selftests/kvm/include/x86_64/processor.h  |  15 +
+>  .../selftests/kvm/include/x86_64/svm_util.h   |  10 +-
+>  .../selftests/kvm/include/x86_64/vmx.h        |   9 +
+>  tools/testing/selftests/kvm/lib/kvm_util.c    |   1 +
+>  tools/testing/selftests/kvm/lib/x86_64/vmx.c  |  11 +
+>  .../selftests/kvm/x86_64/tsc_offset_test.c    | 362 ++++++++++++++++++
+>  14 files changed, 550 insertions(+), 49 deletions(-)
+>  create mode 100644 tools/testing/selftests/kvm/x86_64/tsc_offset_test.c
+>
+> --
+> 2.28.0.rc0.142.g3c755180ce-goog
+>
 
-Except that I doubt the physical system owner and VM owner are the same
-entity in the vast majority of KVM use cases.  So yeah, in a perfect world
-the guest application that's causing bus locks would be fixed, but in
-practice there is likely no sane way for the KVM owner to inform the guest
-application owner that their application is broken, let alone fix said
-application.
-
-The caveat would be that we may need to enable this by default if the host
-kernel policy mandates it.
-
-> >>I'd suggest we make the new capability tri-state:
-> >>- disabled (no vmexit, default)
-> >>- stats only (what this patch does)
-> >>- userspace exit
-> >>But maybe this is an overkill, I'd like to hear what others think.
-> >
-> >Userspace exit would also be interesting for debug.  Another throttling
-> >option would be schedule() or cond_reched(), though that's probably getting
-> >into overkill territory.
-> >
-> 
-> We're going to leverage host's policy, i.e., calling handle_user_bus_lock(),
-> for throttling, as proposed in https://lkml.kernel.org/r/1595021700-68460-1-git-send-email-fenghua.yu@intel.com
-> 
+Ping :)
