@@ -2,139 +2,115 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4486D23094A
-	for <lists+kvm@lfdr.de>; Tue, 28 Jul 2020 13:59:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EF0442309CC
+	for <lists+kvm@lfdr.de>; Tue, 28 Jul 2020 14:17:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729293AbgG1L7T (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 28 Jul 2020 07:59:19 -0400
-Received: from szxga06-in.huawei.com ([45.249.212.32]:33014 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1728300AbgG1L7S (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 28 Jul 2020 07:59:18 -0400
-Received: from DGGEMS401-HUB.china.huawei.com (unknown [172.30.72.60])
-        by Forcepoint Email with ESMTP id 6DC798DE40530D5A81BE;
-        Tue, 28 Jul 2020 19:59:15 +0800 (CST)
-Received: from [10.174.187.22] (10.174.187.22) by
- DGGEMS401-HUB.china.huawei.com (10.3.19.201) with Microsoft SMTP Server id
- 14.3.487.0; Tue, 28 Jul 2020 19:59:06 +0800
-Subject: Re: [RESEND PATCH] drivers: arm arch timer: Correct fault programming
- of CNTKCTL_EL1.EVNTI
-To:     Marc Zyngier <maz@kernel.org>
-References: <20200717092104.15428-1-zhukeqian1@huawei.com>
- <3a95ec8ce3e34d86c09f9b1b4f17d0ad@kernel.org>
-CC:     <linux-kernel@vger.kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>,
-        <kvmarm@lists.cs.columbia.edu>, <kvm@vger.kernel.org>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        <wanghaibin.wang@huawei.com>
-From:   zhukeqian <zhukeqian1@huawei.com>
-Message-ID: <40c70f5d-7156-2b49-00b8-c79e015c2f3c@huawei.com>
-Date:   Tue, 28 Jul 2020 19:59:05 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
- Thunderbird/45.7.1
+        id S1728949AbgG1MR6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 28 Jul 2020 08:17:58 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:44732 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1728846AbgG1MR6 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 28 Jul 2020 08:17:58 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1595938676;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=HO4Ntmg3kwx+WcOk0iJR+OxS3yvS+0YEtkK0xDPBSYY=;
+        b=GAeHemuLk99KCC9Z/075tsBzInqot/dF7eJOE9VkPA5Q6BSRZ3G7zbS3ocn81veCgWOZJB
+        pbkHj6GN6cJ7/jEE7ytSnER2EtDYfkDCkWRxL3sO3dov9ssMQRgDgFytY8qVGujjm+0oOj
+        efsJHYO8crRvuH82pZDGTMBGLY1sVqc=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-508-erVVCjArPW-1yLLTTnUWUA-1; Tue, 28 Jul 2020 08:17:54 -0400
+X-MC-Unique: erVVCjArPW-1yLLTTnUWUA-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E685E1902EA0;
+        Tue, 28 Jul 2020 12:17:53 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (unknown [10.40.193.15])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 77AD6712F2;
+        Tue, 28 Jul 2020 12:17:52 +0000 (UTC)
+From:   Andrew Jones <drjones@redhat.com>
+To:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
+Cc:     alexandru.elisei@arm.com, pbonzini@redhat.com
+Subject: [PATCH kvm-unit-tests] arm64: Compile with -mno-outline-atomics
+Date:   Tue, 28 Jul 2020 14:17:51 +0200
+Message-Id: <20200728121751.15083-1-drjones@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <3a95ec8ce3e34d86c09f9b1b4f17d0ad@kernel.org>
-Content-Type: text/plain; charset="windows-1252"
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.174.187.22]
-X-CFilter-Loop: Reflected
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Marc,
+GCC 10.1.0 introduced the -moutline-atomics option which, when
+enabled, use LSE instructions when the processor provides them.
+The option is enabled by default and unfortunately causes the
+following error at compile time:
 
-On 2020/7/28 18:16, Marc Zyngier wrote:
-> On 2020-07-17 10:21, Keqian Zhu wrote:
->> ARM virtual counter supports event stream. It can only trigger an event
->> when the trigger bit of CNTVCT_EL0 changes from 0 to 1 (or from 1 to 0),
->> so the actual period of event stream is 2 ^ (cntkctl_evnti + 1). For
->> example, when the trigger bit is 0, then it triggers an event for every
->> two cycles.
->>
->> Signed-off-by: Keqian Zhu <zhukeqian1@huawei.com>
->> ---
->>  drivers/clocksource/arm_arch_timer.c | 17 ++++++++++++++---
->>  1 file changed, 14 insertions(+), 3 deletions(-)
->>
->> diff --git a/drivers/clocksource/arm_arch_timer.c
->> b/drivers/clocksource/arm_arch_timer.c
->> index ecf7b7db2d05..06d99a4b1b9b 100644
->> --- a/drivers/clocksource/arm_arch_timer.c
->> +++ b/drivers/clocksource/arm_arch_timer.c
->> @@ -799,10 +799,20 @@ static void __arch_timer_setup(unsigned type,
->>  static void arch_timer_evtstrm_enable(int divider)
->>  {
->>      u32 cntkctl = arch_timer_get_cntkctl();
->> +    int cntkctl_evnti;
->> +
->> +    /*
->> +     * Note that it can only trigger an event when the trigger bit
->> +     * of CNTVCT_EL0 changes from 1 to 0 (or from 0 to 1), so the
->> +     * actual period of event stream is 2 ^ (cntkctl_evnti + 1).
->> +     */
->> +    cntkctl_evnti = divider - 1;
->> +    cntkctl_evnti = min(cntkctl_evnti, 15);
->> +    cntkctl_evnti = max(cntkctl_evnti, 0);
->>
->>      cntkctl &= ~ARCH_TIMER_EVT_TRIGGER_MASK;
->>      /* Set the divider and enable virtual event stream */
->> -    cntkctl |= (divider << ARCH_TIMER_EVT_TRIGGER_SHIFT)
->> +    cntkctl |= (cntkctl_evnti << ARCH_TIMER_EVT_TRIGGER_SHIFT)
->>              | ARCH_TIMER_VIRT_EVT_EN;
->>      arch_timer_set_cntkctl(cntkctl);
->>      arch_timer_set_evtstrm_feature();
->> @@ -816,10 +826,11 @@ static void arch_timer_configure_evtstream(void)
->>      /* Find the closest power of two to the divisor */
->>      evt_stream_div = arch_timer_rate / ARCH_TIMER_EVT_STREAM_FREQ;
->>      pos = fls(evt_stream_div);
->> -    if (pos > 1 && !(evt_stream_div & (1 << (pos - 2))))
->> +    if ((pos == 1) || (pos > 1 && !(evt_stream_div & (1 << (pos - 2)))))
->>          pos--;
->> +
->>      /* enable event stream */
->> -    arch_timer_evtstrm_enable(min(pos, 15));
->> +    arch_timer_evtstrm_enable(pos);
->>  }
->>
->>  static void arch_counter_set_user_access(void)
-> 
-> This looks like a very convoluted fix. If the problem you are
-> trying to fix is that the event frequency is at most half of
-> that of the counter, why isn't the patch below the most
-> obvious fix?
-> 
-> Thanks,
-> 
->         M.
-> 
-> diff --git a/drivers/clocksource/arm_arch_timer.c b/drivers/clocksource/arm_arch_timer.c
-> index 6c3e84180146..0a65414b781f 100644
-> --- a/drivers/clocksource/arm_arch_timer.c
-> +++ b/drivers/clocksource/arm_arch_timer.c
-> @@ -824,8 +824,12 @@ static void arch_timer_configure_evtstream(void)
->  {
->      int evt_stream_div, pos;
-> 
-> -    /* Find the closest power of two to the divisor */
-> -    evt_stream_div = arch_timer_rate / ARCH_TIMER_EVT_STREAM_FREQ;
-> +    /*
-> +     * Find the closest power of two to the divisor. As the event
-> +     * stream can at most be generated at half the frequency of the
-> +     * counter, use half the frequency when computing the divider.
-> +     */
-> +    evt_stream_div = arch_timer_rate / ARCH_TIMER_EVT_STREAM_FREQ / 2;
->      pos = fls(evt_stream_div);
->      if (pos > 1 && !(evt_stream_div & (1 << (pos - 2))))
-I think here does not consider the case of pos==1 (though it will not occur...)
->          pos--;
-> 
+ aarch64-linux-gnu-ld: /usr/lib/gcc/aarch64-linux-gnu/10.1.0/libgcc.a(lse-init.o): in function `init_have_lse_atomics':
+ lse-init.c:(.text.startup+0xc): undefined reference to `__getauxval'
 
-It looks good to me.
+This is happening because we are linking against our own libcflat which
+doesn't implement the function __getauxval().
 
-Thanks,
-Keqian
+Disable the use of the out-of-line functions by compiling with
+-mno-outline-atomics.
+
+Reported-by: Alexandru Elisei <alexandru.elisei@arm.com>
+Tested-by: Alexandru Elisei <alexandru.elisei@arm.com>
+Signed-off-by: Andrew Jones <drjones@redhat.com>
+---
+ Makefile           | 11 +++++------
+ arm/Makefile.arm64 |  3 +++
+ 2 files changed, 8 insertions(+), 6 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index 3ff2f91600f6..0e21a49096ba 100644
+--- a/Makefile
++++ b/Makefile
+@@ -17,6 +17,11 @@ DESTDIR := $(PREFIX)/share/kvm-unit-tests/
+ 
+ .PHONY: arch_clean clean distclean cscope
+ 
++# cc-option
++# Usage: OP_CFLAGS+=$(call cc-option, -falign-functions=0, -malign-functions=0)
++cc-option = $(shell if $(CC) -Werror $(1) -S -o /dev/null -xc /dev/null \
++              > /dev/null 2>&1; then echo "$(1)"; else echo "$(2)"; fi ;)
++
+ #make sure env CFLAGS variable is not used
+ CFLAGS =
+ 
+@@ -43,12 +48,6 @@ OBJDIRS += $(LIBFDT_objdir)
+ #include architecture specific make rules
+ include $(SRCDIR)/$(TEST_DIR)/Makefile
+ 
+-# cc-option
+-# Usage: OP_CFLAGS+=$(call cc-option, -falign-functions=0, -malign-functions=0)
+-
+-cc-option = $(shell if $(CC) -Werror $(1) -S -o /dev/null -xc /dev/null \
+-              > /dev/null 2>&1; then echo "$(1)"; else echo "$(2)"; fi ;)
+-
+ COMMON_CFLAGS += -g $(autodepend-flags) -fno-strict-aliasing -fno-common
+ COMMON_CFLAGS += -Wall -Wwrite-strings -Wempty-body -Wuninitialized
+ COMMON_CFLAGS += -Wignored-qualifiers -Werror
+diff --git a/arm/Makefile.arm64 b/arm/Makefile.arm64
+index dfd0c56fe8fb..dbc7524d3070 100644
+--- a/arm/Makefile.arm64
++++ b/arm/Makefile.arm64
+@@ -9,6 +9,9 @@ ldarch = elf64-littleaarch64
+ arch_LDFLAGS = -pie -n
+ CFLAGS += -mstrict-align
+ 
++mno_outline_atomics := $(call cc-option, -mno-outline-atomics, "")
++CFLAGS += $(mno_outline_atomics)
++
+ define arch_elf_check =
+ 	$(if $(shell ! $(OBJDUMP) -R $(1) >&/dev/null && echo "nok"),
+ 		$(error $(shell $(OBJDUMP) -R $(1) 2>&1)))
+-- 
+2.25.4
+
