@@ -2,32 +2,32 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9516823053C
-	for <lists+kvm@lfdr.de>; Tue, 28 Jul 2020 10:23:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 60F7023053D
+	for <lists+kvm@lfdr.de>; Tue, 28 Jul 2020 10:23:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727978AbgG1IXZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 28 Jul 2020 04:23:25 -0400
-Received: from mail.kernel.org ([198.145.29.99]:49312 "EHLO mail.kernel.org"
+        id S1728037AbgG1IX0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 28 Jul 2020 04:23:26 -0400
+Received: from mail.kernel.org ([198.145.29.99]:49340 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727878AbgG1IXY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 28 Jul 2020 04:23:24 -0400
+        id S1727878AbgG1IXZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 28 Jul 2020 04:23:25 -0400
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 5E64A2075D;
+        by mail.kernel.org (Postfix) with ESMTPSA id F0B4820809;
         Tue, 28 Jul 2020 08:23:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1595924604;
-        bh=s+JcctlNG0hHX2xEwi6C3ENfXMCtVb68JpHdq0Skmw4=;
-        h=From:To:Cc:Subject:Date:From;
-        b=FhwUUQidy339zU5Wogz7l7ZnPOqzOczutbqIH2gK1BTX5z0NE9l7Ve489HTCVByJR
-         5FoMU64OWFU+Dy1nx65lqauBVZMUso+rxZB+85ve4BCguqOnD/Wqy9eerAg2rICaOl
-         8x8WSiJjUkToSjV+fWon8nmzf7GyS8B66OyclbPA=
+        s=default; t=1595924605;
+        bh=iJ+8/MWn5KdaoZ81Y0HfDlr48qzak2k8kb91X6SO0S4=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=2uewzYw+Xs67HzTT2pJajyh1R5CYcRLNJBkQAy0ca72w4NYphAI5cXI/qsrZk+gbl
+         oCAXjVjUAa24o1lA0ewSimmiTtPJPx2LWThxiP8+NgPur0ha3BJ5ydDIiw+ceqxwog
+         +ToKOaROkXVQnHLz0hrkP8AmJqLeQgQWGrXs4Ar0=
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=why.lan)
         by disco-boy.misterjones.org with esmtpsa (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
         (Exim 4.92)
         (envelope-from <maz@kernel.org>)
-        id 1k0KtO-00FaXh-S3; Tue, 28 Jul 2020 09:23:23 +0100
+        id 1k0KtP-00FaXh-GW; Tue, 28 Jul 2020 09:23:23 +0100
 From:   Marc Zyngier <maz@kernel.org>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Nathan Chancellor <natechancellor@gmail.com>,
@@ -39,10 +39,12 @@ Cc:     Nathan Chancellor <natechancellor@gmail.com>,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
         linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
         kvm@vger.kernel.org, kernel-team@android.com
-Subject: [GIT PULL] KVM/arm64 fixes for 5.8, take #4
-Date:   Tue, 28 Jul 2020 09:22:53 +0100
-Message-Id: <20200728082255.3864378-1-maz@kernel.org>
+Subject: [PATCH 1/2] KVM: arm64: Prevent vcpu_has_ptrauth from generating OOL functions
+Date:   Tue, 28 Jul 2020 09:22:54 +0100
+Message-Id: <20200728082255.3864378-2-maz@kernel.org>
 X-Mailer: git-send-email 2.27.0
+In-Reply-To: <20200728082255.3864378-1-maz@kernel.org>
+References: <20200728082255.3864378-1-maz@kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 62.31.163.78
@@ -54,43 +56,50 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Paolo,
+So far, vcpu_has_ptrauth() is implemented in terms of system_supports_*_auth()
+calls, which are declared "inline". In some specific conditions (clang
+and SCS), the "inline" very much turns into an "out of line", which
+leads to a fireworks when this predicate is evaluated on a non-VHE
+system (right at the beginning of __hyp_handle_ptrauth).
 
-This is the last batch of fixes for 5.8. One fixes a long standing MMU
-issue, while the other addresses a more recent brekage with out-of-line
-helpers in the nVHE code.
+Instead, make sure vcpu_has_ptrauth gets expanded inline by directly
+using the cpus_have_final_cap() helpers, which are __always_inline,
+generate much better code, and are the only thing that make sense when
+running at EL2 on a nVHE system.
 
-Please pull,
-
-	M.
-
-The following changes since commit b9e10d4a6c9f5cbe6369ce2c17ebc67d2e5a4be5:
-
-  KVM: arm64: Stop clobbering x0 for HVC_SOFT_RESTART (2020-07-06 11:47:02 +0100)
-
-are available in the Git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvmarm-fixes-5.8-4
-
-for you to fetch changes up to b757b47a2fcba584d4a32fd7ee68faca510ab96f:
-
-  KVM: arm64: Don't inherit exec permission across page-table levels (2020-07-28 09:03:57 +0100)
-
-----------------------------------------------------------------
-KVM/arm64 fixes for Linux 5.8, take #3
-
-- Fix a corner case of a new mapping inheriting exec permission without
-  and yet bypassing invalidation of the I-cache
-- Make sure PtrAuth predicates oinly generate inline code for the
-  non-VHE hypervisor code
-
-----------------------------------------------------------------
-Marc Zyngier (1):
-      KVM: arm64: Prevent vcpu_has_ptrauth from generating OOL functions
-
-Will Deacon (1):
-      KVM: arm64: Don't inherit exec permission across page-table levels
-
+Fixes: 29eb5a3c57f7 ("KVM: arm64: Handle PtrAuth traps early")
+Reported-by: Nathan Chancellor <natechancellor@gmail.com>
+Reported-by: Nick Desaulniers <ndesaulniers@google.com>
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+Tested-by: Nathan Chancellor <natechancellor@gmail.com>
+Reviewed-by: Nathan Chancellor <natechancellor@gmail.com>
+Link: https://lore.kernel.org/r/20200722162231.3689767-1-maz@kernel.org
+---
  arch/arm64/include/asm/kvm_host.h | 11 ++++++++---
- arch/arm64/kvm/mmu.c              | 11 ++++++-----
- 2 files changed, 14 insertions(+), 8 deletions(-)
+ 1 file changed, 8 insertions(+), 3 deletions(-)
+
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index c3e6fcc664b1..e21d4a01372f 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -380,9 +380,14 @@ struct kvm_vcpu_arch {
+ #define vcpu_has_sve(vcpu) (system_supports_sve() && \
+ 			    ((vcpu)->arch.flags & KVM_ARM64_GUEST_HAS_SVE))
+ 
+-#define vcpu_has_ptrauth(vcpu)	((system_supports_address_auth() || \
+-				  system_supports_generic_auth()) && \
+-				 ((vcpu)->arch.flags & KVM_ARM64_GUEST_HAS_PTRAUTH))
++#ifdef CONFIG_ARM64_PTR_AUTH
++#define vcpu_has_ptrauth(vcpu)						\
++	((cpus_have_final_cap(ARM64_HAS_ADDRESS_AUTH) ||		\
++	  cpus_have_final_cap(ARM64_HAS_GENERIC_AUTH)) &&		\
++	 (vcpu)->arch.flags & KVM_ARM64_GUEST_HAS_PTRAUTH)
++#else
++#define vcpu_has_ptrauth(vcpu)		false
++#endif
+ 
+ #define vcpu_gp_regs(v)		(&(v)->arch.ctxt.gp_regs)
+ 
+-- 
+2.27.0
+
