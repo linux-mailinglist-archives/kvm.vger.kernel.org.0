@@ -2,17 +2,20 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DA070231F36
-	for <lists+kvm@lfdr.de>; Wed, 29 Jul 2020 15:23:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3FC6E231F3F
+	for <lists+kvm@lfdr.de>; Wed, 29 Jul 2020 15:23:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727085AbgG2NWs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 29 Jul 2020 09:22:48 -0400
-Received: from 8bytes.org ([81.169.241.247]:33806 "EHLO theia.8bytes.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726353AbgG2NWr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        id S1727846AbgG2NXV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 29 Jul 2020 09:23:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49350 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727072AbgG2NWr (ORCPT <rfc822;kvm@vger.kernel.org>);
         Wed, 29 Jul 2020 09:22:47 -0400
+Received: from theia.8bytes.org (8bytes.org [IPv6:2a01:238:4383:600:38bc:a715:4b6d:a889])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 61383C0619D2;
+        Wed, 29 Jul 2020 06:22:47 -0700 (PDT)
 Received: by theia.8bytes.org (Postfix, from userid 1000)
-        id 08A37E4; Wed, 29 Jul 2020 15:22:45 +0200 (CEST)
+        id 480B3457; Wed, 29 Jul 2020 15:22:45 +0200 (CEST)
 From:   Joerg Roedel <joro@8bytes.org>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
@@ -20,10 +23,12 @@ Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
         Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Joerg Roedel <jroedel@suse.de>
-Subject: [PATCH 1/4] KVM: SVM: nested: Don't allocate VMCB structures on stack
-Date:   Wed, 29 Jul 2020 15:22:31 +0200
-Message-Id: <20200729132234.2346-2-joro@8bytes.org>
+        linux-kernel@vger.kernel.org,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Joerg Roedel <jroedel@suse.de>
+Subject: [PATCH 2/4] KVM: SVM: Add GHCB definitions
+Date:   Wed, 29 Jul 2020 15:22:32 +0200
+Message-Id: <20200729132234.2346-3-joro@8bytes.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20200729132234.2346-1-joro@8bytes.org>
 References: <20200729132234.2346-1-joro@8bytes.org>
@@ -32,107 +37,93 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Joerg Roedel <jroedel@suse.de>
+From: Tom Lendacky <thomas.lendacky@amd.com>
 
-Do not allocate a vmcb_control_area and a vmcb_save_area on the stack,
-as these structures will become larger with future extenstions of
-SVM and thus the svm_set_nested_state() function will become a too large
-stack frame.
+Extend the vmcb_safe_area with SEV-ES fields and add a new
+'struct ghcb' which will be used for guest-hypervisor communication.
 
+Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
 Signed-off-by: Joerg Roedel <jroedel@suse.de>
 ---
- arch/x86/kvm/svm/nested.c | 44 ++++++++++++++++++++++++++-------------
- 1 file changed, 30 insertions(+), 14 deletions(-)
+ arch/x86/include/asm/svm.h | 45 +++++++++++++++++++++++++++++++++++++-
+ arch/x86/kvm/svm/svm.c     |  2 ++
+ 2 files changed, 46 insertions(+), 1 deletion(-)
 
-diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
-index 61378a3c2ce4..f3c3c4e1ca7f 100644
---- a/arch/x86/kvm/svm/nested.c
-+++ b/arch/x86/kvm/svm/nested.c
-@@ -1061,8 +1061,9 @@ static int svm_set_nested_state(struct kvm_vcpu *vcpu,
- 	struct vmcb *hsave = svm->nested.hsave;
- 	struct vmcb __user *user_vmcb = (struct vmcb __user *)
- 		&user_kvm_nested_state->data.svm[0];
--	struct vmcb_control_area ctl;
--	struct vmcb_save_area save;
-+	struct vmcb_control_area *ctl;
-+	struct vmcb_save_area *save;
-+	int ret;
- 	u32 cr0;
- 
- 	if (kvm_state->format != KVM_STATE_NESTED_FORMAT_SVM)
-@@ -1096,13 +1097,22 @@ static int svm_set_nested_state(struct kvm_vcpu *vcpu,
- 		return -EINVAL;
- 	if (kvm_state->size < sizeof(*kvm_state) + KVM_STATE_NESTED_SVM_VMCB_SIZE)
- 		return -EINVAL;
--	if (copy_from_user(&ctl, &user_vmcb->control, sizeof(ctl)))
--		return -EFAULT;
--	if (copy_from_user(&save, &user_vmcb->save, sizeof(save)))
--		return -EFAULT;
- 
--	if (!nested_vmcb_check_controls(&ctl))
--		return -EINVAL;
-+	ret  = -ENOMEM;
-+	ctl  = kzalloc(sizeof(*ctl),  GFP_KERNEL);
-+	save = kzalloc(sizeof(*save), GFP_KERNEL);
-+	if (!ctl || !save)
-+		goto out_free;
+diff --git a/arch/x86/include/asm/svm.h b/arch/x86/include/asm/svm.h
+index 8a1f5382a4ea..9a3e0b802716 100644
+--- a/arch/x86/include/asm/svm.h
++++ b/arch/x86/include/asm/svm.h
+@@ -200,13 +200,56 @@ struct __attribute__ ((__packed__)) vmcb_save_area {
+ 	u64 br_to;
+ 	u64 last_excp_from;
+ 	u64 last_excp_to;
 +
-+	ret = -EFAULT;
-+	if (copy_from_user(ctl, &user_vmcb->control, sizeof(ctl)))
-+		goto out_free;
-+	if (copy_from_user(save, &user_vmcb->save, sizeof(save)))
-+		goto out_free;
++	/*
++	 * The following part of the save area is valid only for
++	 * SEV-ES guests when referenced through the GHCB.
++	 */
++	u8 reserved_7[104];
++	u64 reserved_8;		/* rax already available at 0x01f8 */
++	u64 rcx;
++	u64 rdx;
++	u64 rbx;
++	u64 reserved_9;		/* rsp already available at 0x01d8 */
++	u64 rbp;
++	u64 rsi;
++	u64 rdi;
++	u64 r8;
++	u64 r9;
++	u64 r10;
++	u64 r11;
++	u64 r12;
++	u64 r13;
++	u64 r14;
++	u64 r15;
++	u8 reserved_10[16];
++	u64 sw_exit_code;
++	u64 sw_exit_info_1;
++	u64 sw_exit_info_2;
++	u64 sw_scratch;
++	u8 reserved_11[56];
++	u64 xcr0;
++	u8 valid_bitmap[16];
++	u64 x87_state_gpa;
++};
 +
-+	ret = -EINVAL;
-+	if (!nested_vmcb_check_controls(ctl))
-+		goto out_free;
- 
- 	/*
- 	 * Processor state contains L2 state.  Check that it is
-@@ -1110,15 +1120,15 @@ static int svm_set_nested_state(struct kvm_vcpu *vcpu,
- 	 */
- 	cr0 = kvm_read_cr0(vcpu);
-         if (((cr0 & X86_CR0_CD) == 0) && (cr0 & X86_CR0_NW))
--                return -EINVAL;
-+                goto out_free;
- 
- 	/*
- 	 * Validate host state saved from before VMRUN (see
- 	 * nested_svm_check_permissions).
- 	 * TODO: validate reserved bits for all saved state.
- 	 */
--	if (!(save.cr0 & X86_CR0_PG))
--		return -EINVAL;
-+	if (!(save->cr0 & X86_CR0_PG))
-+		goto out_free;
- 
- 	/*
- 	 * All checks done, we can enter guest mode.  L1 control fields
-@@ -1127,15 +1137,21 @@ static int svm_set_nested_state(struct kvm_vcpu *vcpu,
- 	 * contains saved L1 state.
- 	 */
- 	copy_vmcb_control_area(&hsave->control, &svm->vmcb->control);
--	hsave->save = save;
-+	hsave->save = *save;
- 
- 	svm->nested.vmcb = kvm_state->hdr.svm.vmcb_pa;
--	load_nested_vmcb_control(svm, &ctl);
-+	load_nested_vmcb_control(svm, ctl);
- 	nested_prepare_vmcb_control(svm);
- 
- out_set_gif:
- 	svm_set_gif(svm, !!(kvm_state->flags & KVM_STATE_NESTED_GIF_SET));
--	return 0;
++struct __attribute__ ((__packed__)) ghcb {
++	struct vmcb_save_area save;
++	u8 reserved_save[2048 - sizeof(struct vmcb_save_area)];
 +
-+	ret = 0;
-+out_free:
-+	kfree(save);
-+	kfree(ctl);
++	u8 shared_buffer[2032];
 +
-+	return ret;
++	u8 reserved_1[10];
++	u16 protocol_version;	/* negotiated SEV-ES/GHCB protocol version */
++	u32 ghcb_usage;
+ };
+ 
+ 
+ static inline void __unused_size_checks(void)
+ {
+-	BUILD_BUG_ON(sizeof(struct vmcb_save_area) != 0x298);
++	BUILD_BUG_ON(sizeof(struct vmcb_save_area) != 1032);
+ 	BUILD_BUG_ON(sizeof(struct vmcb_control_area) != 256);
++	BUILD_BUG_ON(sizeof(struct ghcb) != 4096);
  }
  
- struct kvm_x86_nested_ops svm_nested_ops = {
+ struct __attribute__ ((__packed__)) vmcb {
+diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+index 783330d0e7b8..953cf947f022 100644
+--- a/arch/x86/kvm/svm/svm.c
++++ b/arch/x86/kvm/svm/svm.c
+@@ -4161,6 +4161,8 @@ static struct kvm_x86_init_ops svm_init_ops __initdata = {
+ 
+ static int __init svm_init(void)
+ {
++	__unused_size_checks();
++
+ 	return kvm_init(&svm_init_ops, sizeof(struct vcpu_svm),
+ 			__alignof__(struct vcpu_svm), THIS_MODULE);
+ }
 -- 
 2.17.1
 
