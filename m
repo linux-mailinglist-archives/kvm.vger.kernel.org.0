@@ -2,97 +2,70 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D5511231B29
-	for <lists+kvm@lfdr.de>; Wed, 29 Jul 2020 10:23:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6AD37231BBB
+	for <lists+kvm@lfdr.de>; Wed, 29 Jul 2020 10:59:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727992AbgG2IX1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 29 Jul 2020 04:23:27 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:37696 "EHLO
-        us-smtp-delivery-74.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726737AbgG2IX0 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 29 Jul 2020 04:23:26 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1596011005;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=8lrqZhx4wIlIKGfI1v+EKqO6jc0hqmda+j4PZMrvWEE=;
-        b=izATLkqoGsmn4NG6MP7HxZydLZv+7lEfCEEwa7nofJYBi+idgLTcpHMgWzgWEP07esXa8C
-        f5L9WvT7cLQ9N4h704UtbI0zELjZo0z6Hd67gptJjLBUcGkZejw7woN6ek+t+Ju1hvnVgn
-        Sv/3byYdJZLX2gX2O05Gzf/+VF/RAKo=
-Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
- [209.85.218.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-503-ftZZS5_ZPwyi0LUtVU8aog-1; Wed, 29 Jul 2020 04:23:23 -0400
-X-MC-Unique: ftZZS5_ZPwyi0LUtVU8aog-1
-Received: by mail-ej1-f72.google.com with SMTP id q9so8176495ejr.21
-        for <kvm@vger.kernel.org>; Wed, 29 Jul 2020 01:23:23 -0700 (PDT)
+        id S1727978AbgG2I7G (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 29 Jul 2020 04:59:06 -0400
+Received: from mail-io1-f71.google.com ([209.85.166.71]:42540 "EHLO
+        mail-io1-f71.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726548AbgG2I7G (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 29 Jul 2020 04:59:06 -0400
+Received: by mail-io1-f71.google.com with SMTP id l18so15704463ion.9
+        for <kvm@vger.kernel.org>; Wed, 29 Jul 2020 01:59:05 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=8lrqZhx4wIlIKGfI1v+EKqO6jc0hqmda+j4PZMrvWEE=;
-        b=rFZB6WetZknlpO+orpm9zFEyFYbk7WdZERShcpNWJdZH+lrdYifpe8JuwtEPHaCXpg
-         E4z1KCQ51J8iJt1wng66hGnRrsX2dg3cBmeFbU/DYeFwf4QL4Uipc1/ppL7Ae7BHaYy3
-         Z2DO8O8hIjIB29IW1Q3wEK62/0foCQiKojg4z4sTuFKStxRVjgVQO+vf+fdrC5MvVLww
-         u+EN2yxKV+2b06nasYwzFvv/AwiTVVNVTWnFdEAG6TZWGRlYeq2IvEAXDWBHkwsFaZ7j
-         WuU0wJxivGd6xH8VY3sO4ZzWZpIveD1S8qb4s6Fo8NlIu0QXfwA31cZYnP5ipAXiqoYw
-         Tt1w==
-X-Gm-Message-State: AOAM532HXldoz4VLx32oCl+yZQHTsyMzj6rnyw6C1Hd2LegufcDUvE+k
-        l6QhZhfvszPwGbOmVg1W7Jj2kY0N/g+B/aHJT5pumZqW4VXsXiOjhH6E5H4c/FJ7G867vj1OehG
-        3lwF2KTqQKl9Q
-X-Received: by 2002:a17:906:c096:: with SMTP id f22mr19924869ejz.159.1596011002577;
-        Wed, 29 Jul 2020 01:23:22 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyrtor48PKaJPzhZluQN3DnUZRQ0VogdZPOhAt3ZNs96b8Wg1nFDHyxjUTEMO1FmMqAUc0VVA==
-X-Received: by 2002:a17:906:c096:: with SMTP id f22mr19924858ejz.159.1596011002411;
-        Wed, 29 Jul 2020 01:23:22 -0700 (PDT)
-Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id g9sm609366ejf.101.2020.07.29.01.23.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 29 Jul 2020 01:23:21 -0700 (PDT)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Jim Mattson <jmattson@google.com>, Alexander Graf <graf@amazon.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm list <kvm@vger.kernel.org>,
-        linux-doc@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
-        Aaron Lewis <aaronlewis@google.com>
-Subject: Re: [PATCH] KVM: x86: Deflect unknown MSR accesses to user space
-In-Reply-To: <CALMp9eQ3OxhQZYiHPiebX=KyvjWQgxQEO-owjSoxgPKsOMRvjw@mail.gmail.com>
-References: <20200728004446.932-1-graf@amazon.com> <87d04gm4ws.fsf@vitty.brq.redhat.com> <a1f30fc8-09f5-fe2f-39e2-136b881ed15a@amazon.com> <CALMp9eQ3OxhQZYiHPiebX=KyvjWQgxQEO-owjSoxgPKsOMRvjw@mail.gmail.com>
-Date:   Wed, 29 Jul 2020 10:23:20 +0200
-Message-ID: <87y2n2log7.fsf@vitty.brq.redhat.com>
+        h=x-gm-message-state:mime-version:date:in-reply-to:message-id:subject
+         :from:to;
+        bh=gFBRlRWNk92oL6Fz7e42YwVu/c/ZEOEHHkd5Zj/UqNY=;
+        b=bwRhkn4nZ0nsTAAklq28oE2Adx5/N8ra5HDl5yi7bqU6RNGluxVmF7XUliOwvG/X+u
+         5dZBMN4S1MYWUOa4qclOr1lefgl5qDfyz7hMkFdi/PmfXC+lBfLkC1ce0DNMcBCb5ZEa
+         EKlpSHyfwUfPU+y4/0skeY9Bby5/NkXpsJT9wjwsvUm6TLJ2XVrfIGX7xqPPN/lWtBO4
+         a47b+BoDTPBwOgxlMKw0/GmcS5jQyd5KhAOyFKkKbSW0awNmSj64Gl2ZRsijQXIMYJVp
+         NqddcBnGoGc+n/+IoEE4VFfizk3wCi4y6tl3pVxqPR0WHQ3i41PDDAcgGRK7km64zOdt
+         QFcg==
+X-Gm-Message-State: AOAM531SDQi6hqGZQyBP3L4E2XkQgCdX9YF7/0xTNHZvDsKNYx43zhv2
+        exzy/UjRc2o/C0nZjq5d1ZSRVnn5DrxYgDBM0v9zgjxgjhYw
+X-Google-Smtp-Source: ABdhPJyvyX5E1smDObksgtmqLLMrzGTwPv5XpW2cLAchMk5lOO3bPvgvMcHEpqBPYAXEd1vldHGiYB5nuAwSxaE5cK9yKPxGFxaw
 MIME-Version: 1.0
-Content-Type: text/plain
+X-Received: by 2002:a92:48dd:: with SMTP id j90mr27158851ilg.75.1596013145206;
+ Wed, 29 Jul 2020 01:59:05 -0700 (PDT)
+Date:   Wed, 29 Jul 2020 01:59:05 -0700
+In-Reply-To: <00000000000099052605aafb5923@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <00000000000093b5dc05ab90c468@google.com>
+Subject: Re: general protection fault in vsock_poll
+From:   syzbot <syzbot+a61bac2fcc1a7c6623fe@syzkaller.appspotmail.com>
+To:     davem@davemloft.net, decui@microsoft.com, jhansen@vmware.com,
+        kuba@kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        netdev@vger.kernel.org, sgarzare@redhat.com, stefanha@redhat.com,
+        syzkaller-bugs@googlegroups.com,
+        virtualization@lists.linux-foundation.org
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Jim Mattson <jmattson@google.com> writes:
+syzbot has bisected this issue to:
 
-> On Tue, Jul 28, 2020 at 5:41 AM Alexander Graf <graf@amazon.com> wrote:
->>
+commit 408624af4c89989117bb2c6517bd50b7708a2fcd
+Author: Stefano Garzarella <sgarzare@redhat.com>
+Date:   Tue Dec 10 10:43:06 2019 +0000
 
-...
+    vsock: use local transport when it is loaded
 
->> While it does feel a bit overengineered, it would solve the problem that
->> we're turning in-KVM handled MSRs into an ABI.
->
-> It seems unlikely that userspace is going to know what to do with a
-> large number of MSRs. I suspect that a small enumerated list will
-> suffice.
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=17e6489b100000
+start commit:   92ed3019 Linux 5.8-rc7
+git tree:       upstream
+final oops:     https://syzkaller.appspot.com/x/report.txt?x=1416489b100000
+console output: https://syzkaller.appspot.com/x/log.txt?x=1016489b100000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=84f076779e989e69
+dashboard link: https://syzkaller.appspot.com/bug?extid=a61bac2fcc1a7c6623fe
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=15930b64900000
 
-The list can also be 'wildcarded', i.e. 
-{
- u32 index;
- u32 mask;
- ...
-}
+Reported-by: syzbot+a61bac2fcc1a7c6623fe@syzkaller.appspotmail.com
+Fixes: 408624af4c89 ("vsock: use local transport when it is loaded")
 
-to make it really short.
-
--- 
-Vitaly
-
+For information about bisection process see: https://goo.gl/tpsmEJ#bisection
