@@ -2,82 +2,162 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1BBB523260D
-	for <lists+kvm@lfdr.de>; Wed, 29 Jul 2020 22:16:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A3E8E232621
+	for <lists+kvm@lfdr.de>; Wed, 29 Jul 2020 22:25:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726842AbgG2UQv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 29 Jul 2020 16:16:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57020 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726821AbgG2UQv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 29 Jul 2020 16:16:51 -0400
-Received: from mail-io1-xd42.google.com (mail-io1-xd42.google.com [IPv6:2607:f8b0:4864:20::d42])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D46C6C0619D2
-        for <kvm@vger.kernel.org>; Wed, 29 Jul 2020 13:16:50 -0700 (PDT)
-Received: by mail-io1-xd42.google.com with SMTP id l1so25894675ioh.5
-        for <kvm@vger.kernel.org>; Wed, 29 Jul 2020 13:16:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=qq+ysuvSU+V8JQG1DuA+Q8eHlgCH1eO+fRWf5OmQClQ=;
-        b=YcvEkCx9qexk7f+HNawBWOgq3Ozk6TN2CCHAbw23oQ3VzwAf9Q+gVni2+YeXOSo80m
-         wNwNPYLaR+D5PcrJyAE4lrbD2wdX27P0wNO/Y0GesGL7tfLXyFOKSNPWJ8UhME89F2SC
-         WW3HOcWX4qfczElt0ALpYlZcC+WRjvve8dFU5bPSu+SbWSM14nknjDRcYRNi/vH8x6Dv
-         bEX35VZtg4Q56GYYgrkWRr6bk6MAFZugFyJE60UCLZDE5s9p7DC3pgpzDT1vN2TxTAXz
-         VRdn0EwJFjhmR7zFyq9o4uyPUYIjCgcyWccX8a5348RDxrepHllS7xCIzaTGR+DzibhZ
-         D1Xg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=qq+ysuvSU+V8JQG1DuA+Q8eHlgCH1eO+fRWf5OmQClQ=;
-        b=A69du4DuTnP8xLWQnmyLetUMVacASw3W0gN3Ker2wS8ezd20mJhcRv1C/+Epvq18tB
-         +5aUZU1u0YM+5mFoG7czyME0wuuW4uk4R6otBIxgNny73fht4MwRK6LriMgVcYg+lfRE
-         7zDkqsHXktjAtd4VBoEvM6QhSJm9HjGruPW34fgEKHh6pBRWAraEHqgbO8ri6NwdteUv
-         e1cBXUEZ2AtK4Jdckw6LcYeBJ5MUg40wjb11Cw3icBXM6Y1VycVpYGkyvMqYcvY7FbCn
-         WfuxoRZCNYfhfcpBmGwt8rs0odmllKIlDPttlWsrbfkfQgikzwg96JnysNid/QZMZkPv
-         z+Vw==
-X-Gm-Message-State: AOAM533aP8uNVIKblDkVIHHiJi0C1yO36dAYzM2Mpvnm8Qcvgjs6hwhJ
-        huYSrTLjIgzts+iM9GW/d6lNUcgucWYHWW66xd/afA==
-X-Google-Smtp-Source: ABdhPJy4w7jgd/UAwb5pPY2xqkZRN3ELOqqLs6AJUHt05VUljtTZQfKhOa5aVXvbhgUsVDCOuYt1rMmZ2zibhre8Xok=
-X-Received: by 2002:a6b:b38a:: with SMTP id c132mr17932385iof.75.1596053809764;
- Wed, 29 Jul 2020 13:16:49 -0700 (PDT)
+        id S1726588AbgG2UZQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 29 Jul 2020 16:25:16 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:40022 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726365AbgG2UZQ (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 29 Jul 2020 16:25:16 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1596054314;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=NCZpvlTRYeKn2G2IpCrrj/S3gke7jRP5RvQ+owSSG9A=;
+        b=Ca6ABU1R9C70AarbV3y+iuoM6OUVPPR6mFvcpR/gFYww6F8dHIiEgMw6WR1qjLJdQy1nBr
+        mBvhY7aqALB+VvJz5oospbjDjHQd+E7UVyFveVhHyZ2LhCZHKkQB6kDOivFg3clUwD5XwZ
+        c2wNKV8vywP4t9JV9MDq/HwjAz1hGSc=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-125-q_PLVkyGOsiYWaHlKxve7w-1; Wed, 29 Jul 2020 16:25:10 -0400
+X-MC-Unique: q_PLVkyGOsiYWaHlKxve7w-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 09D638017FB;
+        Wed, 29 Jul 2020 20:25:09 +0000 (UTC)
+Received: from x1.home (ovpn-112-71.phx2.redhat.com [10.3.112.71])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 12A4B512FE;
+        Wed, 29 Jul 2020 20:25:07 +0000 (UTC)
+Date:   Wed, 29 Jul 2020 14:25:07 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Lu Baolu <baolu.lu@linux.intel.com>
+Cc:     Joerg Roedel <joro@8bytes.org>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Jean-Philippe Brucker <jean-philippe@linaro.org>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Kevin Tian <kevin.tian@intel.com>,
+        Ashok Raj <ashok.raj@intel.com>,
+        Dave Jiang <dave.jiang@intel.com>,
+        Liu Yi L <yi.l.liu@intel.com>,
+        iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+Subject: Re: [PATCH v3 3/4] iommu: Add iommu_aux_get_domain_for_dev()
+Message-ID: <20200729142507.182cd18a@x1.home>
+In-Reply-To: <20200714055703.5510-4-baolu.lu@linux.intel.com>
+References: <20200714055703.5510-1-baolu.lu@linux.intel.com>
+        <20200714055703.5510-4-baolu.lu@linux.intel.com>
+Organization: Red Hat
 MIME-Version: 1.0
-References: <fdc7e57d-4fd6-4d49-22e6-b18003034ff5@gmail.com>
-In-Reply-To: <fdc7e57d-4fd6-4d49-22e6-b18003034ff5@gmail.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Wed, 29 Jul 2020 13:16:38 -0700
-Message-ID: <CALMp9eRyyO3d36j6YbcvLEuPLZpByYS8SOCpVithpfqCeKhDUg@mail.gmail.com>
-Subject: Re: [PATCH] perf/x86/svm: Convert 'perf kvm stat report' output
- lowercase to uppercase
-To:     Haiwei Li <lihaiwei.kernel@gmail.com>
-Cc:     "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        kvm list <kvm@vger.kernel.org>,
-        "x86@kernel.org" <x86@kernel.org>, acme@redhat.com,
-        "hpa@zytor.com" <hpa@zytor.com>, "bp@alien8.de" <bp@alien8.de>,
-        "mingo@redhat.com" <mingo@redhat.com>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        "vkuznets@redhat.com" <vkuznets@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jul 28, 2020 at 11:24 PM Haiwei Li <lihaiwei.kernel@gmail.com> wrote:
->
-> From: Haiwei Li <lihaiwei@tencent.com>
->
-> The reason output of 'perf kvm stat report --event=vmexit' is uppercase
-> on VMX and lowercase on SVM.
->
-> To be consistent with VMX, convert lowercase to uppercase.
->
-> Signed-off-by: Haiwei Li <lihaiwei@tencent.com>
+On Tue, 14 Jul 2020 13:57:02 +0800
+Lu Baolu <baolu.lu@linux.intel.com> wrote:
 
-Please don't do this. It breaks an existing ABI.
+> The device driver needs an API to get its aux-domain. A typical usage
+> scenario is:
+> 
+>         unsigned long pasid;
+>         struct iommu_domain *domain;
+>         struct device *dev = mdev_dev(mdev);
+>         struct device *iommu_device = vfio_mdev_get_iommu_device(dev);
+> 
+>         domain = iommu_aux_get_domain_for_dev(dev);
+>         if (!domain)
+>                 return -ENODEV;
+> 
+>         pasid = iommu_aux_get_pasid(domain, iommu_device);
+>         if (pasid <= 0)
+>                 return -EINVAL;
+> 
+>          /* Program the device context */
+>          ....
+> 
+> This adds an API for such use case.
+> 
+> Suggested-by: Alex Williamson <alex.williamson@redhat.com>
+> Signed-off-by: Lu Baolu <baolu.lu@linux.intel.com>
+> ---
+>  drivers/iommu/iommu.c | 18 ++++++++++++++++++
+>  include/linux/iommu.h |  7 +++++++
+>  2 files changed, 25 insertions(+)
+> 
+> diff --git a/drivers/iommu/iommu.c b/drivers/iommu/iommu.c
+> index cad5a19ebf22..434bf42b6b9b 100644
+> --- a/drivers/iommu/iommu.c
+> +++ b/drivers/iommu/iommu.c
+> @@ -2817,6 +2817,24 @@ void iommu_aux_detach_group(struct iommu_domain *domain,
+>  }
+>  EXPORT_SYMBOL_GPL(iommu_aux_detach_group);
+>  
+> +struct iommu_domain *iommu_aux_get_domain_for_dev(struct device *dev)
+> +{
+> +	struct iommu_domain *domain = NULL;
+> +	struct iommu_group *group;
+> +
+> +	group = iommu_group_get(dev);
+> +	if (!group)
+> +		return NULL;
+> +
+> +	if (group->aux_domain_attached)
+> +		domain = group->domain;
+
+Why wouldn't the aux domain flag be on the domain itself rather than
+the group?  Then if we wanted sanity checking in patch 1/ we'd only
+need to test the flag on the object we're provided.
+
+If we had such a flag, we could create an iommu_domain_is_aux()
+function and then simply use iommu_get_domain_for_dev() and test that
+it's an aux domain in the example use case.  It seems like that would
+resolve the jump from a domain to an aux-domain just as well as adding
+this separate iommu_aux_get_domain_for_dev() interface.  The is_aux
+test might also be useful in other cases too.  Thanks,
+
+Alex
+
+> +
+> +	iommu_group_put(group);
+> +
+> +	return domain;
+> +}
+> +EXPORT_SYMBOL_GPL(iommu_aux_get_domain_for_dev);
+> +
+>  /**
+>   * iommu_sva_bind_device() - Bind a process address space to a device
+>   * @dev: the device
+> diff --git a/include/linux/iommu.h b/include/linux/iommu.h
+> index 9506551139ab..cda6cef7579e 100644
+> --- a/include/linux/iommu.h
+> +++ b/include/linux/iommu.h
+> @@ -639,6 +639,7 @@ int iommu_aux_attach_group(struct iommu_domain *domain,
+>  			   struct iommu_group *group, struct device *dev);
+>  void iommu_aux_detach_group(struct iommu_domain *domain,
+>  			   struct iommu_group *group, struct device *dev);
+> +struct iommu_domain *iommu_aux_get_domain_for_dev(struct device *dev);
+>  
+>  struct iommu_sva *iommu_sva_bind_device(struct device *dev,
+>  					struct mm_struct *mm,
+> @@ -1040,6 +1041,12 @@ iommu_aux_detach_group(struct iommu_domain *domain,
+>  {
+>  }
+>  
+> +static inline struct iommu_domain *
+> +iommu_aux_get_domain_for_dev(struct device *dev)
+> +{
+> +	return NULL;
+> +}
+> +
+>  static inline struct iommu_sva *
+>  iommu_sva_bind_device(struct device *dev, struct mm_struct *mm, void *drvdata)
+>  {
+
