@@ -2,187 +2,318 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C0464231D40
-	for <lists+kvm@lfdr.de>; Wed, 29 Jul 2020 13:13:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 484A1231D59
+	for <lists+kvm@lfdr.de>; Wed, 29 Jul 2020 13:28:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726533AbgG2LNP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 29 Jul 2020 07:13:15 -0400
-Received: from mail-db8eur05on2075.outbound.protection.outlook.com ([40.107.20.75]:15649
-        "EHLO EUR05-DB8-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726365AbgG2LNO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 29 Jul 2020 07:13:14 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=VFBHRXOA0uxei34cwVPtQiIVbQ2fTJyZGWnJ73t5Z8SWJdr5P7M9wjfGRe7lsDQ4ZQaMj2dWRq/fM/Yzp0DWQsdhQcMF83LgxYrkuvF/jmU+1fF7xS86WbYWlISam62Z/thi4RPj+PWelj3ZaaJKzJJe6UtcUn+lpv1PHB4avaCTfoVZ4MULyC4URTpVRqqYThmsELJYAgFlmftQFqG6zIN4qq55Qsoi8ZwUbzyPOeke/JKKv4O5otBoEbJCt46REWt2sw1ypoZpG6J4Kd1rH9oj0GNZfyFu5969jQH+YCqcMc5Nywi++hsipU/2vS5YYLnDGZyIEmD8/kezQy1cjg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=NPe8Pr/80s9y+H9ROcV9Mw6a14xWAL8L7gKG/Fx5ino=;
- b=fo8nte0tLuS5NQhi5oKN0bVD9bbNOj2RVPu3pqMOBq165rLKIdn/hmNnYWRW51nL7JeQQjrmzgxMQDvYeCSHDJuVeTc6pbjTakJa/BwRSlA+gwwjfSpj2RMZKUIOjlB3T2UwNQOrCDIlf3uogARgoepUtJN9WLSYRzRnCF4PG2D8kNtOXDlfF+aYIiZe2de12OiPucxTMmiAkP7IT4TuXi7uz9OEPkUoFAw4IrtM0KhqqfBvCRaJwOIGYLr6sFxo1BfKsKK62BQE7KVqHebX32QBvQbz+O0wmAsHBhf916pS9BJJTLeeellLGm1MJG0zz4KY0BYyivmPoPSThP1n5A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=mellanox.com; dmarc=pass action=none header.from=mellanox.com;
- dkim=pass header.d=mellanox.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Mellanox.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=NPe8Pr/80s9y+H9ROcV9Mw6a14xWAL8L7gKG/Fx5ino=;
- b=c/MGwn7D7mR4uny1ylO1Mf6PBbHgPE7URvlB8s+t8UIMmx7w0mgdYOOkaM+J8IWMT7VMsfHucjwmEccfvVxF7livLK4HkpTWSc02cuFvuZMmAgPeSszg4hFy1pl1JtBolDeS8fve45LThRYoBsXcAQktYk86I8jCebN6GvmDDCI=
-Authentication-Results: redhat.com; dkim=none (message not signed)
- header.d=none;redhat.com; dmarc=none action=none header.from=mellanox.com;
-Received: from AM0PR05MB4786.eurprd05.prod.outlook.com (2603:10a6:208:b3::15)
- by AM0PR05MB6627.eurprd05.prod.outlook.com (2603:10a6:20b:145::11) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3216.21; Wed, 29 Jul
- 2020 11:13:09 +0000
-Received: from AM0PR05MB4786.eurprd05.prod.outlook.com
- ([fe80::9186:8b7:3cf7:7813]) by AM0PR05MB4786.eurprd05.prod.outlook.com
- ([fe80::9186:8b7:3cf7:7813%7]) with mapi id 15.20.3216.033; Wed, 29 Jul 2020
- 11:13:09 +0000
-Date:   Wed, 29 Jul 2020 14:13:06 +0300
-From:   Eli Cohen <eli@mellanox.com>
-To:     Jason Wang <jasowang@redhat.com>
-Cc:     Zhu Lingshan <lingshan.zhu@intel.com>, alex.williamson@redhat.com,
-        mst@redhat.com, pbonzini@redhat.com,
-        sean.j.christopherson@intel.com, wanpengli@tencent.com,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        kvm@vger.kernel.org, shahafs@mellanox.com, parav@mellanox.com
-Subject: Re: [PATCH V4 4/6] vhost_vdpa: implement IRQ offloading in vhost_vdpa
-Message-ID: <20200729111306.GE35280@mtl-vdi-166.wap.labs.mlnx>
-References: <20200728042405.17579-1-lingshan.zhu@intel.com>
- <20200728042405.17579-5-lingshan.zhu@intel.com>
- <20200728090438.GA21875@nps-server-21.mtl.labs.mlnx>
- <c87d4a5a-3106-caf2-2bc1-764677218967@redhat.com>
- <20200729095503.GD35280@mtl-vdi-166.wap.labs.mlnx>
- <45b7e8aa-47a9-06f6-6b72-762d504adb00@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <45b7e8aa-47a9-06f6-6b72-762d504adb00@redhat.com>
-User-Agent: Mutt/1.5.21 (2010-09-15)
-X-ClientProxiedBy: AM0PR06CA0126.eurprd06.prod.outlook.com
- (2603:10a6:208:ab::31) To AM0PR05MB4786.eurprd05.prod.outlook.com
- (2603:10a6:208:b3::15)
-MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from mtl-vdi-166.wap.labs.mlnx (94.188.199.18) by AM0PR06CA0126.eurprd06.prod.outlook.com (2603:10a6:208:ab::31) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3239.16 via Frontend Transport; Wed, 29 Jul 2020 11:13:08 +0000
-X-Originating-IP: [94.188.199.18]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-HT: Tenant
-X-MS-Office365-Filtering-Correlation-Id: 204256e8-003d-4d32-b637-08d833b06056
-X-MS-TrafficTypeDiagnostic: AM0PR05MB6627:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <AM0PR05MB66270EB05AFB70301FBF5DF9C5700@AM0PR05MB6627.eurprd05.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:10000;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: o0olHCAaxIJSUssOIp6hb0vjXa82Z/CMfPHDWsVLXWHLtaKOUQ8FpcKqAvMcGkk5BuDR2UptmmJuBlnCRL4lhX/WvABPQYbZ1LXiRPa0b7XPpBCMHR6talWjK338XtAVd2EPpO+HJqEot3sHrM3V6y5JJUeJPSZL+YuJp34ensAcbrPOLoKSGrAM8jeUujF64Z88fVIqRfa2QdrddzGrxqdsQ+YlRJ9Pto+LYcDm9n926T3o7JzeiGOgxbDRKq5flCpHUlT9oRItfSImNBmKjBLX4t/knXCVOLbgpCnDPix/0zmMdoYwigxub+S4urNXXEVETbZhqImTjO06kQRCkw==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM0PR05MB4786.eurprd05.prod.outlook.com;PTR:;CAT:NONE;SFTY:;SFS:(4636009)(39860400002)(396003)(366004)(346002)(376002)(136003)(86362001)(52116002)(33656002)(8676002)(478600001)(107886003)(1076003)(956004)(6916009)(8936002)(6506007)(4326008)(9686003)(316002)(55016002)(7696005)(186003)(2906002)(16526019)(5660300002)(66476007)(26005)(83380400001)(66556008)(66946007)(7416002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData: la7AhP2UR5G8jgMNlRs2SpxRuM6/xC374NCq/DiofuANVxIG8HBx12bToW+Ad4gxITFDc94YSG7paBv+OODk7SqcqzD4D3pXjXs+pv3KdzPk8cqHIHRd4GfO3yUtqM0/XiTMlG6fe6sUEwAqZSkuxZW4SOUjwo3N/AQvgXe/x2lyxWS05RPaCWfeIwKkLae0FGpGJEzXWQuDyWr5DKItCym9cZ4BIy0ckza/rKEX2vDoDlL7WfqfQk7b5/a2aptZz072qRGhnp2xnUJnTQPx0NQ8ziYXANxcrsa5AhXL8hyNL3UEmOGpEV+z0cXO0/w29WrAd8WDmhOULKGN+/bWoR/HugnDPton6Es0M/rWajcRVgnIxccOgsQRTeoEKbGqCLTyXMtdSBs8/9/JYWhLVfkvJks7Izrjnz4uiUPaTLjyFjjKftbHBCuYNlAvzFmsPXlxV1aqIP5mPQQXnlAw7KEiAcPO/Yjo7E1wU+PCYFQ=
-X-OriginatorOrg: Mellanox.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 204256e8-003d-4d32-b637-08d833b06056
-X-MS-Exchange-CrossTenant-AuthSource: AM0PR05MB4786.eurprd05.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Jul 2020 11:13:09.8010
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: a652971c-7d2e-4d9b-a6a4-d149256f461b
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: sOnnG1pnAa3CrYtvc+aaV30Ox2yAwpy+/PIBn9agvIx19DgRGMPshThqAIBy5/wT4uli0ZtMoAzcd7atXAroLg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM0PR05MB6627
+        id S1726502AbgG2L24 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 29 Jul 2020 07:28:56 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:20003 "EHLO
+        us-smtp-delivery-74.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726365AbgG2L2z (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 29 Jul 2020 07:28:55 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1596022132;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=bRCwriZuya4PIqyCKK+++y6J/9RTsVsLdq/Wykb7orU=;
+        b=dnw325olbA9RL2m3yFxUG5EYYuBk2mqtxugmp0MkrY6oq4YF9IKXZ1bflT4Xz+aDJKFmYq
+        SiO5hJw1bgrOmybAYbDtZVUcxaTIeUnhwsJW9o2QXvi5VOrFwTvR3q7XzWrRwW4+UHqMHu
+        YntlMJs65B10SIDDek8oGVs1cwC2L48=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-389-KVqOY6ZuMsmB_JOqNGcqyg-1; Wed, 29 Jul 2020 07:28:51 -0400
+X-MC-Unique: KVqOY6ZuMsmB_JOqNGcqyg-1
+Received: by mail-wm1-f72.google.com with SMTP id f74so902539wmf.1
+        for <kvm@vger.kernel.org>; Wed, 29 Jul 2020 04:28:51 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:message-id:subject:from:to:cc:date:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=bRCwriZuya4PIqyCKK+++y6J/9RTsVsLdq/Wykb7orU=;
+        b=kIji7lBaBT4uLph2fWBX4lGoB7zEc641HMARO10tiGIQFrA5L1+oth1atik37TLWYf
+         EvyV4n2QmJcxdySIgU5vSZTW2YH6Gd/FVpwKQC1KWdN1cHBEvvDwMt+nENUWf/Maa1WD
+         kRhxSQxi2/+5H6epS1QSm/RtGbtJwQMLGRQif1tJzp2MMAb16FEtHtl3PllckHVXQ+TR
+         bmBOhDQ2ZN1jI3RkKh5+5587P1hQumM0SLvAfisoSsk80oQU1UUjN922Ogbb6/B5I/xs
+         7gBRl72wFno2YrQrL96f/DR0HlZKK+dq7ntb2sy3uzRgDl8/D/F02qgCZOZf2P5wGuEX
+         GWzQ==
+X-Gm-Message-State: AOAM530cQVDjx44YYKZ/pfJz2u+D5LOOanCorqjI1HCjywp1a7Fem76w
+        HeWdx0VmglVnQ+GblIAftaL0pkeKyCFjJSbl3ia9i7HcYTg8X+rZpBNLzmRBRqwybRI3F9SxOO+
+        MpIdSiGY5PuTx
+X-Received: by 2002:a7b:ce04:: with SMTP id m4mr8106795wmc.1.1596022129931;
+        Wed, 29 Jul 2020 04:28:49 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwZvgnBRnonp6o9AsWUWxKGzzu2XlLjhGEgh0vj0YKqRBTQggJO98+P6VhHPzbp4gCHeHsQag==
+X-Received: by 2002:a7b:ce04:: with SMTP id m4mr8106739wmc.1.1596022129417;
+        Wed, 29 Jul 2020 04:28:49 -0700 (PDT)
+Received: from pop-os ([2001:470:1f1d:1ea:4fde:6f63:1f5a:12b1])
+        by smtp.gmail.com with ESMTPSA id c194sm4994688wme.8.2020.07.29.04.28.47
+        (version=TLS1_2 cipher=ECDHE-ECDSA-CHACHA20-POLY1305 bits=256/256);
+        Wed, 29 Jul 2020 04:28:48 -0700 (PDT)
+Message-ID: <e8a973ea0bb2bc3eb15649fb1c44599ae3509e84.camel@redhat.com>
+Subject: Re: device compatibility interface for live migration with assigned
+ devices
+From:   Sean Mooney <smooney@redhat.com>
+To:     Yan Zhao <yan.y.zhao@intel.com>,
+        Alex Williamson <alex.williamson@redhat.com>
+Cc:     kvm@vger.kernel.org, libvir-list@redhat.com,
+        Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org,
+        kwankhede@nvidia.com, eauger@redhat.com, xin-ran.wang@intel.com,
+        corbet@lwn.net, openstack-discuss@lists.openstack.org,
+        shaohe.feng@intel.com, kevin.tian@intel.com, eskultet@redhat.com,
+        jian-feng.ding@intel.com, dgilbert@redhat.com,
+        zhenyuw@linux.intel.com, hejie.xu@intel.com, bao.yumeng@zte.com.cn,
+        intel-gvt-dev@lists.freedesktop.org, berrange@redhat.com,
+        cohuck@redhat.com, dinechin@redhat.com, devel@ovirt.org
+Date:   Wed, 29 Jul 2020 12:28:46 +0100
+In-Reply-To: <20200729080503.GB28676@joy-OptiPlex-7040>
+References: <20200713232957.GD5955@joy-OptiPlex-7040>
+         <9bfa8700-91f5-ebb4-3977-6321f0487a63@redhat.com>
+         <20200716083230.GA25316@joy-OptiPlex-7040>
+         <20200717101258.65555978@x1.home>
+         <20200721005113.GA10502@joy-OptiPlex-7040>
+         <20200727072440.GA28676@joy-OptiPlex-7040>
+         <20200727162321.7097070e@x1.home>
+         <20200729080503.GB28676@joy-OptiPlex-7040>
+Content-Type: text/plain; charset="UTF-8"
+X-Mailer: Evolution 3.28.5-0ubuntu0.18.04.2 
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jul 29, 2020 at 06:19:52PM +0800, Jason Wang wrote:
-I am checking internally if we can work in a mode not requiring to
-acknowledge the interrupt. I will update.
+On Wed, 2020-07-29 at 16:05 +0800, Yan Zhao wrote:
+> On Mon, Jul 27, 2020 at 04:23:21PM -0600, Alex Williamson wrote:
+> > On Mon, 27 Jul 2020 15:24:40 +0800
+> > Yan Zhao <yan.y.zhao@intel.com> wrote:
+> > 
+> > > > > As you indicate, the vendor driver is responsible for checking version
+> > > > > information embedded within the migration stream.  Therefore a
+> > > > > migration should fail early if the devices are incompatible.  Is it  
+> > > > 
+> > > > but as I know, currently in VFIO migration protocol, we have no way to
+> > > > get vendor specific compatibility checking string in migration setup stage
+> > > > (i.e. .save_setup stage) before the device is set to _SAVING state.
+> > > > In this way, for devices who does not save device data in precopy stage,
+> > > > the migration compatibility checking is as late as in stop-and-copy
+> > > > stage, which is too late.
+> > > > do you think we need to add the getting/checking of vendor specific
+> > > > compatibility string early in save_setup stage?
+> > > >  
+> > > 
+> > > hi Alex,
+> > > after an offline discussion with Kevin, I realized that it may not be a
+> > > problem if migration compatibility check in vendor driver occurs late in
+> > > stop-and-copy phase for some devices, because if we report device
+> > > compatibility attributes clearly in an interface, the chances for
+> > > libvirt/openstack to make a wrong decision is little.
+> > 
+> > I think it would be wise for a vendor driver to implement a pre-copy
+> > phase, even if only to send version information and verify it at the
+> > target.  Deciding you have no device state to send during pre-copy does
+> > not mean your vendor driver needs to opt-out of the pre-copy phase
+> > entirely.  Please also note that pre-copy is at the user's discretion,
+> > we've defined that we can enter stop-and-copy at any point, including
+> > without a pre-copy phase, so I would recommend that vendor drivers
+> > validate compatibility at the start of both the pre-copy and the
+> > stop-and-copy phases.
+> > 
+> 
+> ok. got it!
+> 
+> > > so, do you think we are now arriving at an agreement that we'll give up
+> > > the read-and-test scheme and start to defining one interface (perhaps in
+> > > json format), from which libvirt/openstack is able to parse and find out
+> > > compatibility list of a source mdev/physical device?
+> > 
+> > Based on the feedback we've received, the previously proposed interface
+> > is not viable.  I think there's agreement that the user needs to be
+> > able to parse and interpret the version information.  Using json seems
+> > viable, but I don't know if it's the best option.  Is there any
+> > precedent of markup strings returned via sysfs we could follow?
+> 
+> I found some examples of using formatted string under /sys, mostly under
+> tracing. maybe we can do a similar implementation.
+> 
+> #cat /sys/kernel/debug/tracing/events/kvm/kvm_mmio/format
+> 
+> name: kvm_mmio
+> ID: 32
+> format:
+>         field:unsigned short common_type;       offset:0;       size:2; signed:0;
+>         field:unsigned char common_flags;       offset:2;       size:1; signed:0;
+>         field:unsigned char common_preempt_count;       offset:3;       size:1; signed:0;
+>         field:int common_pid;   offset:4;       size:4; signed:1;
+> 
+>         field:u32 type; offset:8;       size:4; signed:0;
+>         field:u32 len;  offset:12;      size:4; signed:0;
+>         field:u64 gpa;  offset:16;      size:8; signed:0;
+>         field:u64 val;  offset:24;      size:8; signed:0;
+> 
+> print fmt: "mmio %s len %u gpa 0x%llx val 0x%llx", __print_symbolic(REC->type, { 0, "unsatisfied-read" }, { 1, "read"
+> }, { 2, "write" }), REC->len, REC->gpa, REC->val
+> 
+this is not json fromat and its not supper frendly to parse.
+> 
+> #cat /sys/devices/pci0000:00/0000:00:02.0/uevent
+> DRIVER=vfio-pci
+> PCI_CLASS=30000
+> PCI_ID=8086:591D
+> PCI_SUBSYS_ID=8086:2212
+> PCI_SLOT_NAME=0000:00:02.0
+> MODALIAS=pci:v00008086d0000591Dsv00008086sd00002212bc03sc00i00
+> 
+this is ini format or conf formant 
+this is pretty simple to parse whichi would be fine.
+that said you could also have a version or capablitiy directory with a file
+for each key and a singel value.
 
-Thanks for the explanations.
+i would prefer to only have to do one read personally the list the files in
+directory and then read tehm all ot build the datastucture myself but that is
+doable though the simple ini format use d for uevent seams the best of 3 options
+provided above.
+> > 
+> > Your idea of having both a "self" object and an array of "compatible"
+> > objects is perhaps something we can build on, but we must not assume
+> > PCI devices at the root level of the object.  Providing both the
+> > mdev-type and the driver is a bit redundant, since the former includes
+> > the latter.  We can't have vendor specific versioning schemes though,
+> > ie. gvt-version. We need to agree on a common scheme and decide which
+> > fields the version is relative to, ex. just the mdev type?
+> 
+> what about making all comparing fields vendor specific?
+> userspace like openstack only needs to parse and compare if target
+> device is within source compatible list without understanding the meaning
+> of each field.
+that kind of defeats the reason for having them be be parsable.
+the reason openstack want to be able to understand the capablitys is so
+we can staticaly declare the capablit of devices ahead of time on so our schduler
+can select host based on that. is the keys and data are opaquce to userspace
+becaue they are just random vendor sepecific blobs we cant do that.
+> 
+> > I had also proposed fields that provide information to create a
+> > compatible type, for example to create a type_x2 device from a type_x1
+> > mdev type, they need to know to apply an aggregation attribute.  If we
+> > need to explicitly list every aggregation value and the resulting type,
+> > I think we run aground of what aggregation was trying to avoid anyway,
+> > so we might need to pick a language that defines variable substitution
+> > or some kind of tagging.  For example if we could define ${aggr} as an
+> > integer within a specified range, then we might be able to define a type
+> > relative to that value (type_x${aggr}) which requires an aggregation
+> > attribute using the same value.  I dunno, just spit balling.  Thanks,
+> 
+> what about a migration_compatible attribute under device node like
+> below?
+rather then listing comaptiable devices it would be better if you could declaritivly 
+list the feature supported and we could compare those along with a simple semver version string.
+> 
+> #cat /sys/bus/pci/devices/0000\:00\:02.0/UUID1/migration_compatible
+> SELF:
+> 	device_type=pci
+> 	device_id=8086591d
+> 	mdev_type=i915-GVTg_V5_2
+> 	aggregator=1
+> 	pv_mode="none+ppgtt+context"
+> 	interface_version=3
+> COMPATIBLE:
+> 	device_type=pci
+> 	device_id=8086591d
+> 	mdev_type=i915-GVTg_V5_{val1:int:1,2,4,8}
+this mixed notation will be hard to parse so i would avoid that.
+> 	aggregator={val1}/2
+> 	pv_mode={val2:string:"none+ppgtt","none+context","none+ppgtt+context"}
+>  
+> 	interface_version={val3:int:2,3}
+> COMPATIBLE:
+> 	device_type=pci
+> 	device_id=8086591d
+> 	mdev_type=i915-GVTg_V5_{val1:int:1,2,4,8}
+> 	aggregator={val1}/2
+> 	pv_mode=""  #"" meaning empty, could be absent in a compatible device
+> 	interface_version=1
+if you presented this information the only way i could see to use it would be to
+extract the mdev_type name and interface_vertion  and build a database table as follows
 
+source_mdev_type | source_version | target_mdev_type | target_version
+i915-GVTg_V5_2 | 3 | 915-GVTg_V5_{val1:int:1,2,4,8} | {val3:int:2,3}
+i915-GVTg_V5_2 | 3 | 915-GVTg_V5_{val1:int:1,2,4,8} | 1
+
+this would either reuiqre use to use a post placment sechudler filter to itrospec this data base
+or thansform the target_mdev_type and target_version colum data into CUSTOM_* traits we apply to
+our placment resouce providers and we would have to prefrom multiple reuqest for each posible compatiable
+alternitive.  if the vm has muplite mdevs this is combinatorially problmenatic as it is 1 query for each
+device * the number of possible compatible devices for that device.
+
+in other word if this is just opaque data we cant ever represent it efficently in our placment service and
+have to fall back to an explisive post placment schdluer filter base on the db table approch.
+
+this also ignore the fact that at present the mdev_type cannot change druing a migration so the compatiable
+devicve with a different mdev type would not be considerd accpetable choice in openstack. they way you select a host
+with a specific vgpu mdev type today is to apply a custome trait which is CUSTOM_<medev_type_goes_here> to the vGPU
+resouce provider and then in the flavor you request 1 allcoaton of vGPU and require the CUSTOM_<medev_type_goes_here>
+trait. so going form i915-GVTg_V5_2 to i915-GVTg_V5_{val1:int:1,2,4,8} would not currently be compatiable with that
+workflow.
+
+
+> #cat /sys/bus/pci/dei915-GVTg_V5_{val1:int:1,2,4,8}vices/0000\:00\:i915-
+> GVTg_V5_{val1:int:1,2,4,8}2.0/UUID2/migration_compatible
+> SELF:
+> 	device_type=pci
+> 	device_id=8086591d
+> 	mdev_type=i915-GVTg_V5_4
+> 	aggregator=2
+> 	interface_version=1
+> COMPATIBLE: 
+> 	device_type=pci
+> 	device_id=8086591d
+> 	mdev_type=i915-GVTg_V5_{val1:int:1,2,4,8}
+> 	aggregator={val1}/2
+> 	interface_version=1
+by the way this is closer to yaml format then it is to json but it does not align with any exsiting
+format i know of so that just make the representation needless hard to consume
+if we are going to use a markup lanag let use a standard one like yaml json or toml and not invent a new one.
 > 
-> On 2020/7/29 下午5:55, Eli Cohen wrote:
-> >On Wed, Jul 29, 2020 at 05:21:53PM +0800, Jason Wang wrote:
-> >>On 2020/7/28 下午5:04, Eli Cohen wrote:
-> >>>On Tue, Jul 28, 2020 at 12:24:03PM +0800, Zhu Lingshan wrote:
-> >>>>+static void vhost_vdpa_setup_vq_irq(struct vhost_vdpa *v, int qid)
-> >>>>+{
-> >>>>+	struct vhost_virtqueue *vq = &v->vqs[qid];
-> >>>>+	const struct vdpa_config_ops *ops = v->vdpa->config;
-> >>>>+	struct vdpa_device *vdpa = v->vdpa;
-> >>>>+	int ret, irq;
-> >>>>+
-> >>>>+	spin_lock(&vq->call_ctx.ctx_lock);
-> >>>>+	irq = ops->get_vq_irq(vdpa, qid);
-> >>>>+	if (!vq->call_ctx.ctx || irq == -EINVAL) {
-> >>>>+		spin_unlock(&vq->call_ctx.ctx_lock);
-> >>>>+		return;
-> >>>>+	}
-> >>>>+
-> >>>If I understand correctly, this will cause these IRQs to be forwarded
-> >>>directly to the VCPU, e.g. will be handled by the guest/qemu.
-> >>
-> >>Yes, if it can bypassed, the interrupt will be delivered to vCPU directly.
-> >>
-> >So, usually the network driver knows how to handle interrups for its
-> >devices. I assume the virtio_net driver at the guest has some default
-> >processing but what if the underlying hardware device (such as the case
-> >of vdpa) needs to take some actions?
+> Notes:
+> - A COMPATIBLE object is a line starting with COMPATIBLE.
+>   It specifies a list of compatible devices that are allowed to migrate
+>   in.
+>   The reason to allow multiple COMPATIBLE objects is that when it
+>   is hard to express a complex compatible logic in one COMPATIBLE
+>   object, a simple enumeration is still a fallback.
+>   in the above example, device UUID2 is in the compatible list of
+>   device UUID1, but device UUID1 is not in the compatible list of device
+>   UUID2, so device UUID2 is able to migrate to device UUID1, but device
+>   UUID1 is not able to migrate to device UUID2.
 > 
+> - fields under each object are of "and" relationship to each other,  meaning
+>   all fields of SELF object of a target device must be equal to corresponding
+>   fields of a COMPATIBLE object of source device, otherwise it is regarded as not
+>   compatible.
 > 
-> Virtio splits the bus operations out of device operations. So did
-> the driver.
+> - each field, however, is able to specify multiple allowed values, using
+>   variables as explained below.
 > 
-> The virtio-net driver depends on a transport driver to talk to the
-> real device. Usually PCI is used as the transport for the device. In
-> this case virtio-pci driver is in charge of dealing with irq
-> allocation/free/configuration and it needs to co-operate with
-> platform specific irqchip (virtualized by KVM) to finish the work
-> like irq acknowledge etc.  E.g for x86, the irq offloading can only
-> work when there's a hardware support of virtual irqchip (APICv) then
-> all stuffs could be done without vmexits.
+> - variables are represented with {}, the first appearance of one variable
+>   specifies its type and allowed list. e.g.
+>   {val1:int:1,2,4,8} represents var1 whose type is integer and allowed
+>   values are 1, 2, 4, 8.
 > 
-> So no vendor specific part since the device and transport are all standard.
-> 
-> 
-> >  Is there an option to do bounce the
-> >interrupt back to the vendor specific driver in the host so it can take
-> >these actions?
-> 
-> 
-> Currently not, but even if we can do this, I'm afraid we will lose
-> the performance advantage of irq bypassing.
-> 
-> 
-> >
-> >>>Does this mean that the host will not handle this interrupt? How does it
-> >>>work in case on level triggered interrupts?
-> >>
-> >>There's no guarantee that the KVM arch code can make sure the irq
-> >>bypass work for any type of irq. So if they the irq will still need
-> >>to be handled by host first. This means we should keep the host
-> >>interrupt handler as a slowpath (fallback).
-> >>
-> >>>In the case of ConnectX, I need to execute some code to acknowledge the
-> >>>interrupt.
-> >>
-> >>This turns out to be hard for irq bypassing to work. Is it because
-> >>the irq is shared or what kind of ack you need to do?
-> >I have an EQ which is a queue for events comming from the hardware. This
-> >EQ can created so it reports only completion events but I still need to
-> >execute code that roughly tells the device that I saw these event
-> >records and then arm it again so it can report more interrupts (e.g if
-> >more packets are received or sent). This is device specific code.
-> 
-> 
-> Any chance that the hardware can use MSI (which is not the case here)?
+> - vendors are able to specify which fields are within the comparing list
+>   and which fields are not. e.g. for physical VF migration, it may not
+>   choose mdev_type as a comparing field, and maybe use driver name instead.
+this format might be useful to vendors but from a orcestrator perspecive i dont think this has
+value to us likely we would not use this api if it was added as it does not help us with schduling.
+ideally instead fo declaring which other mdev types a device is compatiable with (which could presumably change over
+time as new device and firmwares are released) i would prefer to see a declaritive non vendor specific api that declares
+the feature set provided by each mdev_type from which we can infer comaptiablity similar to cpu feature flags.
+for devices fo the same mdev_type name addtionally a declaritive version sting could also be used if required for
+addtional compatiablity checks.
+>  
 > 
 > Thanks
+> Yan
 > 
 > 
-> >>Thanks
-> >>
-> >>
-> >>>Can you explain how this should be done?
-> >>>
-> 
+
