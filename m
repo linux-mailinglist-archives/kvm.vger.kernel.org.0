@@ -2,113 +2,485 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2CFC42317DF
-	for <lists+kvm@lfdr.de>; Wed, 29 Jul 2020 04:57:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B28F423197E
+	for <lists+kvm@lfdr.de>; Wed, 29 Jul 2020 08:24:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731163AbgG2C5m (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 28 Jul 2020 22:57:42 -0400
-Received: from szxga04-in.huawei.com ([45.249.212.190]:8846 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1728401AbgG2C5l (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 28 Jul 2020 22:57:41 -0400
-Received: from DGGEMS405-HUB.china.huawei.com (unknown [172.30.72.60])
-        by Forcepoint Email with ESMTP id DEDAF5C6B6236BE30C72;
-        Wed, 29 Jul 2020 10:57:38 +0800 (CST)
-Received: from [10.174.187.22] (10.174.187.22) by
- DGGEMS405-HUB.china.huawei.com (10.3.19.205) with Microsoft SMTP Server id
- 14.3.487.0; Wed, 29 Jul 2020 10:57:30 +0800
-From:   zhukeqian <zhukeqian1@huawei.com>
-Subject: Re: [PATCH 0/9] arm64: Stolen time support
-To:     Steven Price <steven.price@arm.com>
-References: <20190802145017.42543-1-steven.price@arm.com>
- <1611996b-1ec1-dee7-ed61-b3b9df23f138@huawei.com>
- <25c7f2e2-e779-4e97-fdc5-0aba9fcf0fbc@arm.com>
-CC:     <linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        <linux-doc@vger.kernel.org>, Russell King <linux@armlinux.org.uk>,
-        <linux-arm-kernel@lists.infradead.org>,
-        Marc Zyngier <maz@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Will Deacon <will@kernel.org>, <kvmarm@lists.cs.columbia.edu>,
-        <xiexiangyou@huawei.com>, <yebiaoxiang@huawei.com>,
-        "wanghaibin.wang@huawei.com >> Wanghaibin (D)" 
-        <wanghaibin.wang@huawei.com>
-Message-ID: <816e3b46-07fc-0274-deb2-0d026d50b989@huawei.com>
-Date:   Wed, 29 Jul 2020 10:57:30 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
- Thunderbird/45.7.1
+        id S1726797AbgG2GYx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 29 Jul 2020 02:24:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41684 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726286AbgG2GYw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 29 Jul 2020 02:24:52 -0400
+Received: from mail-pf1-x443.google.com (mail-pf1-x443.google.com [IPv6:2607:f8b0:4864:20::443])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BF9CCC061794;
+        Tue, 28 Jul 2020 23:24:52 -0700 (PDT)
+Received: by mail-pf1-x443.google.com with SMTP id d188so6365812pfd.2;
+        Tue, 28 Jul 2020 23:24:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=to:cc:from:subject:message-id:date:user-agent:mime-version
+         :content-language:content-transfer-encoding;
+        bh=sMFl8A9jPxjNMZOvebjCYmlhRA1mXGyUaqgUwzyXfq0=;
+        b=J66knnMasKtQuXL0XnyYfUftY3b90hkTLSjlUXZrnfi3cAomEhuNTUJ04QBBiPbelO
+         GBVwvatTo/r1aarV30knngJW3xfSocwQFFkY7jlcEEV4xoyIGxXUTRfD2AsbzPpi0rPz
+         VbbaxTZ3AzOIEDKFT2DN/RGAb1A5bbKKeUPh7eDa7mvEPNG09B6aWmoJJeY/GLgTepOE
+         gQ0hX44bo6mae/mhLOoGRwyvtdvOrfztmsdda5RrdFMmnw8Mh12muZNS5Noa77Z5xM8K
+         rXV1vsG0s05hjPTwFkqXFfh80DCVf7r8PHgkjp+AgdYFI45u84Ppyk20Z8DamAnY02Wd
+         J1JQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:to:cc:from:subject:message-id:date:user-agent
+         :mime-version:content-language:content-transfer-encoding;
+        bh=sMFl8A9jPxjNMZOvebjCYmlhRA1mXGyUaqgUwzyXfq0=;
+        b=Nq5vh69DLNvI97HPl8XmqzuowjAXFopaIGB2YdLc40O8uUui2bAvztHIkYSmTs8nXG
+         rQwxx5xeQ2+knRfgy++D1FEj+eZ31EQBTrQJnzdr5pqmIFul+stAQe3osfBcHBZBSPdp
+         5A/8wBaajxRGKks7JD+otYDR/A8uFYYdfONJCt5DZehsGi9OW18G0SbUr3MLV+oD5QMu
+         qZC08EjzTnowI1/JeZbBsmBcHcBIu7H66juzBO1vfGuiFy/9ibpr+2fAyV9GFt+yM6hH
+         sZaUKviEeGQmTL/edg5TZ0c7zqW8t+7EulVODuWxaZK/p3Qyd8hCjNE+uhEwI4rlSCds
+         T4nw==
+X-Gm-Message-State: AOAM532vO531AHdZ5WWnVyQ1HXCCpirfVcpDsaOi3AOEv0Fm/26Flt5T
+        0lb9OepCK8gawUqdQQ4bPK0pMTjp7w==
+X-Google-Smtp-Source: ABdhPJzNBOg0gxTtUNOgmKD3LPQ210Qcu0zYNNCIbxNbYwmbKC2WmetoyLCzCAAygzMobKggZhg2BQ==
+X-Received: by 2002:aa7:95b6:: with SMTP id a22mr4885606pfk.152.1596003891707;
+        Tue, 28 Jul 2020 23:24:51 -0700 (PDT)
+Received: from [127.0.0.1] ([103.7.29.6])
+        by smtp.gmail.com with ESMTPSA id d22sm996502pgm.93.2020.07.28.23.24.47
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 28 Jul 2020 23:24:51 -0700 (PDT)
+To:     "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        kvm@vger.kernel.org, "x86@kernel.org" <x86@kernel.org>
+Cc:     acme@redhat.com, "hpa@zytor.com" <hpa@zytor.com>,
+        "bp@alien8.de" <bp@alien8.de>,
+        "mingo@redhat.com" <mingo@redhat.com>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "joro@8bytes.org" <joro@8bytes.org>, jmattson@google.com,
+        wanpengli@tencent.com, "vkuznets@redhat.com" <vkuznets@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>
+From:   Haiwei Li <lihaiwei.kernel@gmail.com>
+Subject: [PATCH] perf/x86/svm: Convert 'perf kvm stat report' output lowercase
+ to uppercase
+Message-ID: <fdc7e57d-4fd6-4d49-22e6-b18003034ff5@gmail.com>
+Date:   Wed, 29 Jul 2020 14:24:39 +0800
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:68.0)
+ Gecko/20100101 Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <25c7f2e2-e779-4e97-fdc5-0aba9fcf0fbc@arm.com>
-Content-Type: text/plain; charset="windows-1252"
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.174.187.22]
-X-CFilter-Loop: Reflected
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Steven,
+From: Haiwei Li <lihaiwei@tencent.com>
 
-On 2020/7/27 18:48, Steven Price wrote:
-> On 21/07/2020 04:26, zhukeqian wrote:
->> Hi Steven,
-> 
-> Hi Keqian,
-> 
->> On 2019/8/2 22:50, Steven Price wrote:
->>> This series add support for paravirtualized time for arm64 guests and
->>> KVM hosts following the specification in Arm's document DEN 0057A:
->>>
->>> https://developer.arm.com/docs/den0057/a
->>>
->>> It implements support for stolen time, allowing the guest to
->>> identify time when it is forcibly not executing.
->>>
->>> It doesn't implement support for Live Physical Time (LPT) as there are
->>> some concerns about the overheads and approach in the above
->> Do you plan to pick up LPT support? As there is demand of cross-frequency migration
->> (from older platform to newer platform).
-> 
-> I don't have any plans to pick up the LPT support at the moment - feel free to pick it up! ;)
-> 
->> I am not clear about the overheads and approach problem here, could you please
->> give some detail information? Maybe we can work together to solve these concerns. :-)
-> 
-> Fundamentally the issue here is that LPT only solves one small part of migration between different hosts. To successfully migrate between hosts with different CPU implementations it is also necessary to be able to virtualise various ID registers (e.g. MIDR_EL1, REVIDR_EL1, AIDR_EL1) which we have no support for currently.
-> 
-Yeah, currently we are trying to do both timer freq virtualization and CPU feature virtualization.
+The reason output of 'perf kvm stat report --event=vmexit' is uppercase 
+on VMX and lowercase on SVM.
 
-> The problem with just virtualising the registers is how you handle errata. The guest will currently use those (and other) ID registers to decide whether to enable specific errata workarounds. But what errata should be enabled for a guest which might migrate to another host?
-> 
-Thanks for pointing this out.
+To be consistent with VMX, convert lowercase to uppercase.
 
-I think the most important thing is that we should introduce a concept named CPU baseline which represents a standard platform.
-If we bring up a guest with a specific CPU baseline, then this guest can only run on a platform that is compatible with this CPU baseline.
-So "baseline" and "compatible" are the key point to promise successful cross-platform migration.
+Signed-off-by: Haiwei Li <lihaiwei@tencent.com>
+---
+  arch/x86/include/uapi/asm/svm.h       | 184 
++++++++++++++++++-----------------
+  tools/arch/x86/include/uapi/asm/svm.h | 184 
++++++++++++++++++-----------------
+  2 files changed, 184 insertions(+), 184 deletions(-)
+
+diff --git a/arch/x86/include/uapi/asm/svm.h 
+b/arch/x86/include/uapi/asm/svm.h
+index 2e8a30f..647b6e2 100644
+--- a/arch/x86/include/uapi/asm/svm.h
++++ b/arch/x86/include/uapi/asm/svm.h
+@@ -83,98 +83,98 @@
+  #define SVM_EXIT_ERR           -1
+
+  #define SVM_EXIT_REASONS \
+-	{ SVM_EXIT_READ_CR0,    "read_cr0" }, \
+-	{ SVM_EXIT_READ_CR2,    "read_cr2" }, \
+-	{ SVM_EXIT_READ_CR3,    "read_cr3" }, \
+-	{ SVM_EXIT_READ_CR4,    "read_cr4" }, \
+-	{ SVM_EXIT_READ_CR8,    "read_cr8" }, \
+-	{ SVM_EXIT_WRITE_CR0,   "write_cr0" }, \
+-	{ SVM_EXIT_WRITE_CR2,   "write_cr2" }, \
+-	{ SVM_EXIT_WRITE_CR3,   "write_cr3" }, \
+-	{ SVM_EXIT_WRITE_CR4,   "write_cr4" }, \
+-	{ SVM_EXIT_WRITE_CR8,   "write_cr8" }, \
+-	{ SVM_EXIT_READ_DR0,    "read_dr0" }, \
+-	{ SVM_EXIT_READ_DR1,    "read_dr1" }, \
+-	{ SVM_EXIT_READ_DR2,    "read_dr2" }, \
+-	{ SVM_EXIT_READ_DR3,    "read_dr3" }, \
+-	{ SVM_EXIT_READ_DR4,    "read_dr4" }, \
+-	{ SVM_EXIT_READ_DR5,    "read_dr5" }, \
+-	{ SVM_EXIT_READ_DR6,    "read_dr6" }, \
+-	{ SVM_EXIT_READ_DR7,    "read_dr7" }, \
+-	{ SVM_EXIT_WRITE_DR0,   "write_dr0" }, \
+-	{ SVM_EXIT_WRITE_DR1,   "write_dr1" }, \
+-	{ SVM_EXIT_WRITE_DR2,   "write_dr2" }, \
+-	{ SVM_EXIT_WRITE_DR3,   "write_dr3" }, \
+-	{ SVM_EXIT_WRITE_DR4,   "write_dr4" }, \
+-	{ SVM_EXIT_WRITE_DR5,   "write_dr5" }, \
+-	{ SVM_EXIT_WRITE_DR6,   "write_dr6" }, \
+-	{ SVM_EXIT_WRITE_DR7,   "write_dr7" }, \
+-	{ SVM_EXIT_EXCP_BASE + DE_VECTOR,       "DE excp" }, \
+-	{ SVM_EXIT_EXCP_BASE + DB_VECTOR,       "DB excp" }, \
+-	{ SVM_EXIT_EXCP_BASE + BP_VECTOR,       "BP excp" }, \
+-	{ SVM_EXIT_EXCP_BASE + OF_VECTOR,       "OF excp" }, \
+-	{ SVM_EXIT_EXCP_BASE + BR_VECTOR,       "BR excp" }, \
+-	{ SVM_EXIT_EXCP_BASE + UD_VECTOR,       "UD excp" }, \
+-	{ SVM_EXIT_EXCP_BASE + NM_VECTOR,       "NM excp" }, \
+-	{ SVM_EXIT_EXCP_BASE + DF_VECTOR,       "DF excp" }, \
+-	{ SVM_EXIT_EXCP_BASE + TS_VECTOR,       "TS excp" }, \
+-	{ SVM_EXIT_EXCP_BASE + NP_VECTOR,       "NP excp" }, \
+-	{ SVM_EXIT_EXCP_BASE + SS_VECTOR,       "SS excp" }, \
+-	{ SVM_EXIT_EXCP_BASE + GP_VECTOR,       "GP excp" }, \
+-	{ SVM_EXIT_EXCP_BASE + PF_VECTOR,       "PF excp" }, \
+-	{ SVM_EXIT_EXCP_BASE + MF_VECTOR,       "MF excp" }, \
+-	{ SVM_EXIT_EXCP_BASE + AC_VECTOR,       "AC excp" }, \
+-	{ SVM_EXIT_EXCP_BASE + MC_VECTOR,       "MC excp" }, \
+-	{ SVM_EXIT_EXCP_BASE + XM_VECTOR,       "XF excp" }, \
+-	{ SVM_EXIT_INTR,        "interrupt" }, \
+-	{ SVM_EXIT_NMI,         "nmi" }, \
+-	{ SVM_EXIT_SMI,         "smi" }, \
+-	{ SVM_EXIT_INIT,        "init" }, \
+-	{ SVM_EXIT_VINTR,       "vintr" }, \
+-	{ SVM_EXIT_CR0_SEL_WRITE, "cr0_sel_write" }, \
+-	{ SVM_EXIT_IDTR_READ,   "read_idtr" }, \
+-	{ SVM_EXIT_GDTR_READ,   "read_gdtr" }, \
+-	{ SVM_EXIT_LDTR_READ,   "read_ldtr" }, \
+-	{ SVM_EXIT_TR_READ,     "read_rt" }, \
+-	{ SVM_EXIT_IDTR_WRITE,  "write_idtr" }, \
+-	{ SVM_EXIT_GDTR_WRITE,  "write_gdtr" }, \
+-	{ SVM_EXIT_LDTR_WRITE,  "write_ldtr" }, \
+-	{ SVM_EXIT_TR_WRITE,    "write_rt" }, \
+-	{ SVM_EXIT_RDTSC,       "rdtsc" }, \
+-	{ SVM_EXIT_RDPMC,       "rdpmc" }, \
+-	{ SVM_EXIT_PUSHF,       "pushf" }, \
+-	{ SVM_EXIT_POPF,        "popf" }, \
+-	{ SVM_EXIT_CPUID,       "cpuid" }, \
+-	{ SVM_EXIT_RSM,         "rsm" }, \
+-	{ SVM_EXIT_IRET,        "iret" }, \
+-	{ SVM_EXIT_SWINT,       "swint" }, \
+-	{ SVM_EXIT_INVD,        "invd" }, \
+-	{ SVM_EXIT_PAUSE,       "pause" }, \
+-	{ SVM_EXIT_HLT,         "hlt" }, \
+-	{ SVM_EXIT_INVLPG,      "invlpg" }, \
+-	{ SVM_EXIT_INVLPGA,     "invlpga" }, \
+-	{ SVM_EXIT_IOIO,        "io" }, \
+-	{ SVM_EXIT_MSR,         "msr" }, \
+-	{ SVM_EXIT_TASK_SWITCH, "task_switch" }, \
+-	{ SVM_EXIT_FERR_FREEZE, "ferr_freeze" }, \
+-	{ SVM_EXIT_SHUTDOWN,    "shutdown" }, \
+-	{ SVM_EXIT_VMRUN,       "vmrun" }, \
+-	{ SVM_EXIT_VMMCALL,     "hypercall" }, \
+-	{ SVM_EXIT_VMLOAD,      "vmload" }, \
+-	{ SVM_EXIT_VMSAVE,      "vmsave" }, \
+-	{ SVM_EXIT_STGI,        "stgi" }, \
+-	{ SVM_EXIT_CLGI,        "clgi" }, \
+-	{ SVM_EXIT_SKINIT,      "skinit" }, \
+-	{ SVM_EXIT_RDTSCP,      "rdtscp" }, \
+-	{ SVM_EXIT_ICEBP,       "icebp" }, \
+-	{ SVM_EXIT_WBINVD,      "wbinvd" }, \
+-	{ SVM_EXIT_MONITOR,     "monitor" }, \
+-	{ SVM_EXIT_MWAIT,       "mwait" }, \
+-	{ SVM_EXIT_XSETBV,      "xsetbv" }, \
+-	{ SVM_EXIT_NPF,         "npf" }, \
+-	{ SVM_EXIT_AVIC_INCOMPLETE_IPI,		"avic_incomplete_ipi" }, \
+-	{ SVM_EXIT_AVIC_UNACCELERATED_ACCESS,   "avic_unaccelerated_access" }, \
+-	{ SVM_EXIT_ERR,         "invalid_guest_state" }
++	{ SVM_EXIT_READ_CR0,    "READ_CR0" }, \
++	{ SVM_EXIT_READ_CR2,    "READ_CR2" }, \
++	{ SVM_EXIT_READ_CR3,    "READ_CR3" }, \
++	{ SVM_EXIT_READ_CR4,    "READ_CR4" }, \
++	{ SVM_EXIT_READ_CR8,    "READ_CR8" }, \
++	{ SVM_EXIT_WRITE_CR0,   "WRITE_CR0" }, \
++	{ SVM_EXIT_WRITE_CR2,   "WRITE_CR2" }, \
++	{ SVM_EXIT_WRITE_CR3,   "WRITE_CR3" }, \
++	{ SVM_EXIT_WRITE_CR4,   "WRITE_CR4" }, \
++	{ SVM_EXIT_WRITE_CR8,   "WRITE_CR8" }, \
++	{ SVM_EXIT_READ_DR0,    "READ_DR0" }, \
++	{ SVM_EXIT_READ_DR1,    "READ_DR1" }, \
++	{ SVM_EXIT_READ_DR2,    "READ_DR2" }, \
++	{ SVM_EXIT_READ_DR3,    "READ_DR3" }, \
++	{ SVM_EXIT_READ_DR4,    "READ_DR4" }, \
++	{ SVM_EXIT_READ_DR5,    "READ_DR5" }, \
++	{ SVM_EXIT_READ_DR6,    "READ_DR6" }, \
++	{ SVM_EXIT_READ_DR7,    "READ_DR7" }, \
++	{ SVM_EXIT_WRITE_DR0,   "WRITE_DR0" }, \
++	{ SVM_EXIT_WRITE_DR1,   "WRITE_DR1" }, \
++	{ SVM_EXIT_WRITE_DR2,   "WRITE_DR2" }, \
++	{ SVM_EXIT_WRITE_DR3,   "WRITE_DR3" }, \
++	{ SVM_EXIT_WRITE_DR4,   "WRITE_DR4" }, \
++	{ SVM_EXIT_WRITE_DR5,   "WRITE_DR5" }, \
++	{ SVM_EXIT_WRITE_DR6,   "WRITE_DR6" }, \
++	{ SVM_EXIT_WRITE_DR7,   "WRITE_DR7" }, \
++	{ SVM_EXIT_EXCP_BASE + DE_VECTOR,       "DE EXCP" }, \
++	{ SVM_EXIT_EXCP_BASE + DB_VECTOR,       "DB EXCP" }, \
++	{ SVM_EXIT_EXCP_BASE + BP_VECTOR,       "BP EXCP" }, \
++	{ SVM_EXIT_EXCP_BASE + OF_VECTOR,       "OF EXCP" }, \
++	{ SVM_EXIT_EXCP_BASE + BR_VECTOR,       "BR EXCP" }, \
++	{ SVM_EXIT_EXCP_BASE + UD_VECTOR,       "UD EXCP" }, \
++	{ SVM_EXIT_EXCP_BASE + NM_VECTOR,       "NM EXCP" }, \
++	{ SVM_EXIT_EXCP_BASE + DF_VECTOR,       "DF EXCP" }, \
++	{ SVM_EXIT_EXCP_BASE + TS_VECTOR,       "TS EXCP" }, \
++	{ SVM_EXIT_EXCP_BASE + NP_VECTOR,       "NP EXCP" }, \
++	{ SVM_EXIT_EXCP_BASE + SS_VECTOR,       "SS EXCP" }, \
++	{ SVM_EXIT_EXCP_BASE + GP_VECTOR,       "GP EXCP" }, \
++	{ SVM_EXIT_EXCP_BASE + PF_VECTOR,       "PF EXCP" }, \
++	{ SVM_EXIT_EXCP_BASE + MF_VECTOR,       "MF EXCP" }, \
++	{ SVM_EXIT_EXCP_BASE + AC_VECTOR,       "AC EXCP" }, \
++	{ SVM_EXIT_EXCP_BASE + MC_VECTOR,       "MC EXCP" }, \
++	{ SVM_EXIT_EXCP_BASE + XM_VECTOR,       "XF EXCP" }, \
++	{ SVM_EXIT_INTR,        "INTERRUPT" }, \
++	{ SVM_EXIT_NMI,         "NMI" }, \
++	{ SVM_EXIT_SMI,         "SMI" }, \
++	{ SVM_EXIT_INIT,        "INIT" }, \
++	{ SVM_EXIT_VINTR,       "VINTR" }, \
++	{ SVM_EXIT_CR0_SEL_WRITE, "CR0_SEL_WRITE" }, \
++	{ SVM_EXIT_IDTR_READ,   "READ_IDTR" }, \
++	{ SVM_EXIT_GDTR_READ,   "READ_GDTR" }, \
++	{ SVM_EXIT_LDTR_READ,   "READ_LDTR" }, \
++	{ SVM_EXIT_TR_READ,     "READ_RT" }, \
++	{ SVM_EXIT_IDTR_WRITE,  "WRITE_IDTR" }, \
++	{ SVM_EXIT_GDTR_WRITE,  "WRITE_GDTR" }, \
++	{ SVM_EXIT_LDTR_WRITE,  "WRITE_LDTR" }, \
++	{ SVM_EXIT_TR_WRITE,    "WRITE_RT" }, \
++	{ SVM_EXIT_RDTSC,       "RDTSC" }, \
++	{ SVM_EXIT_RDPMC,       "RDPMC" }, \
++	{ SVM_EXIT_PUSHF,       "PUSHF" }, \
++	{ SVM_EXIT_POPF,        "POPF" }, \
++	{ SVM_EXIT_CPUID,       "CPUID" }, \
++	{ SVM_EXIT_RSM,         "RSM" }, \
++	{ SVM_EXIT_IRET,        "IRET" }, \
++	{ SVM_EXIT_SWINT,       "SWINT" }, \
++	{ SVM_EXIT_INVD,        "INVD" }, \
++	{ SVM_EXIT_PAUSE,       "PAUSE" }, \
++	{ SVM_EXIT_HLT,         "HLT" }, \
++	{ SVM_EXIT_INVLPG,      "INVLPG" }, \
++	{ SVM_EXIT_INVLPGA,     "INVLPGA" }, \
++	{ SVM_EXIT_IOIO,        "IO" }, \
++	{ SVM_EXIT_MSR,         "MSR" }, \
++	{ SVM_EXIT_TASK_SWITCH, "TASK_SWITCH" }, \
++	{ SVM_EXIT_FERR_FREEZE, "FERR_FREEZE" }, \
++	{ SVM_EXIT_SHUTDOWN,    "SHUTDOWN" }, \
++	{ SVM_EXIT_VMRUN,       "VMRUN" }, \
++	{ SVM_EXIT_VMMCALL,     "HYPERCALL" }, \
++	{ SVM_EXIT_VMLOAD,      "VMLOAD" }, \
++	{ SVM_EXIT_VMSAVE,      "VMSAVE" }, \
++	{ SVM_EXIT_STGI,        "STGI" }, \
++	{ SVM_EXIT_CLGI,        "CLGI" }, \
++	{ SVM_EXIT_SKINIT,      "SKINIT" }, \
++	{ SVM_EXIT_RDTSCP,      "RDTSCP" }, \
++	{ SVM_EXIT_ICEBP,       "ICEBP" }, \
++	{ SVM_EXIT_WBINVD,      "WBINVD" }, \
++	{ SVM_EXIT_MONITOR,     "MONITOR" }, \
++	{ SVM_EXIT_MWAIT,       "MWAIT" }, \
++	{ SVM_EXIT_XSETBV,      "XSETBV" }, \
++	{ SVM_EXIT_NPF,         "NPF" }, \
++	{ SVM_EXIT_AVIC_INCOMPLETE_IPI,		"AVIC_INCOMPLETE_IPI" }, \
++	{ SVM_EXIT_AVIC_UNACCELERATED_ACCESS,   "AVIC_UNACCELERATED_ACCESS" }, \
++	{ SVM_EXIT_ERR,         "INVALID_GUEST_STATE" }
 
 
-> What we ideally need is a mechanism to communicate to the guest what workarounds are required to successfully run on any of the hosts that the guest may be migrated to. You may also have the situation where the workarounds required for two hosts are mutually incompatible - something needs to understand this and do the "right thing" (most likely just reject this situation, i.e. prevent the migration).
-> 
-> There are various options here: e.g. a para-virtualised interface to describe the workarounds (but this is hard to do in an OS-agnostic way), or virtual-ID registers describing an idealised environment where no workarounds are required (and only hosts that have no errata affecting a guest would be able to provide this).
-> 
-My idea is similar with the "idealised environment", but errata workaround still exists.
-We do not provide para-virtualised interface, and migration is restricted between platforms that are compatible with baseline.
+  #endif /* _UAPI__SVM_H */
+diff --git a/tools/arch/x86/include/uapi/asm/svm.h 
+b/tools/arch/x86/include/uapi/asm/svm.h
+index 2e8a30f..647b6e2 100644
+--- a/tools/arch/x86/include/uapi/asm/svm.h
++++ b/tools/arch/x86/include/uapi/asm/svm.h
+@@ -83,98 +83,98 @@
+  #define SVM_EXIT_ERR           -1
 
-Baseline should has two aspects: CPU feature and errata. These platforms that are compatible with a specific baseline should have the corresponding CPU feature and errata.
+  #define SVM_EXIT_REASONS \
+-	{ SVM_EXIT_READ_CR0,    "read_cr0" }, \
+-	{ SVM_EXIT_READ_CR2,    "read_cr2" }, \
+-	{ SVM_EXIT_READ_CR3,    "read_cr3" }, \
+-	{ SVM_EXIT_READ_CR4,    "read_cr4" }, \
+-	{ SVM_EXIT_READ_CR8,    "read_cr8" }, \
+-	{ SVM_EXIT_WRITE_CR0,   "write_cr0" }, \
+-	{ SVM_EXIT_WRITE_CR2,   "write_cr2" }, \
+-	{ SVM_EXIT_WRITE_CR3,   "write_cr3" }, \
+-	{ SVM_EXIT_WRITE_CR4,   "write_cr4" }, \
+-	{ SVM_EXIT_WRITE_CR8,   "write_cr8" }, \
+-	{ SVM_EXIT_READ_DR0,    "read_dr0" }, \
+-	{ SVM_EXIT_READ_DR1,    "read_dr1" }, \
+-	{ SVM_EXIT_READ_DR2,    "read_dr2" }, \
+-	{ SVM_EXIT_READ_DR3,    "read_dr3" }, \
+-	{ SVM_EXIT_READ_DR4,    "read_dr4" }, \
+-	{ SVM_EXIT_READ_DR5,    "read_dr5" }, \
+-	{ SVM_EXIT_READ_DR6,    "read_dr6" }, \
+-	{ SVM_EXIT_READ_DR7,    "read_dr7" }, \
+-	{ SVM_EXIT_WRITE_DR0,   "write_dr0" }, \
+-	{ SVM_EXIT_WRITE_DR1,   "write_dr1" }, \
+-	{ SVM_EXIT_WRITE_DR2,   "write_dr2" }, \
+-	{ SVM_EXIT_WRITE_DR3,   "write_dr3" }, \
+-	{ SVM_EXIT_WRITE_DR4,   "write_dr4" }, \
+-	{ SVM_EXIT_WRITE_DR5,   "write_dr5" }, \
+-	{ SVM_EXIT_WRITE_DR6,   "write_dr6" }, \
+-	{ SVM_EXIT_WRITE_DR7,   "write_dr7" }, \
+-	{ SVM_EXIT_EXCP_BASE + DE_VECTOR,       "DE excp" }, \
+-	{ SVM_EXIT_EXCP_BASE + DB_VECTOR,       "DB excp" }, \
+-	{ SVM_EXIT_EXCP_BASE + BP_VECTOR,       "BP excp" }, \
+-	{ SVM_EXIT_EXCP_BASE + OF_VECTOR,       "OF excp" }, \
+-	{ SVM_EXIT_EXCP_BASE + BR_VECTOR,       "BR excp" }, \
+-	{ SVM_EXIT_EXCP_BASE + UD_VECTOR,       "UD excp" }, \
+-	{ SVM_EXIT_EXCP_BASE + NM_VECTOR,       "NM excp" }, \
+-	{ SVM_EXIT_EXCP_BASE + DF_VECTOR,       "DF excp" }, \
+-	{ SVM_EXIT_EXCP_BASE + TS_VECTOR,       "TS excp" }, \
+-	{ SVM_EXIT_EXCP_BASE + NP_VECTOR,       "NP excp" }, \
+-	{ SVM_EXIT_EXCP_BASE + SS_VECTOR,       "SS excp" }, \
+-	{ SVM_EXIT_EXCP_BASE + GP_VECTOR,       "GP excp" }, \
+-	{ SVM_EXIT_EXCP_BASE + PF_VECTOR,       "PF excp" }, \
+-	{ SVM_EXIT_EXCP_BASE + MF_VECTOR,       "MF excp" }, \
+-	{ SVM_EXIT_EXCP_BASE + AC_VECTOR,       "AC excp" }, \
+-	{ SVM_EXIT_EXCP_BASE + MC_VECTOR,       "MC excp" }, \
+-	{ SVM_EXIT_EXCP_BASE + XM_VECTOR,       "XF excp" }, \
+-	{ SVM_EXIT_INTR,        "interrupt" }, \
+-	{ SVM_EXIT_NMI,         "nmi" }, \
+-	{ SVM_EXIT_SMI,         "smi" }, \
+-	{ SVM_EXIT_INIT,        "init" }, \
+-	{ SVM_EXIT_VINTR,       "vintr" }, \
+-	{ SVM_EXIT_CR0_SEL_WRITE, "cr0_sel_write" }, \
+-	{ SVM_EXIT_IDTR_READ,   "read_idtr" }, \
+-	{ SVM_EXIT_GDTR_READ,   "read_gdtr" }, \
+-	{ SVM_EXIT_LDTR_READ,   "read_ldtr" }, \
+-	{ SVM_EXIT_TR_READ,     "read_rt" }, \
+-	{ SVM_EXIT_IDTR_WRITE,  "write_idtr" }, \
+-	{ SVM_EXIT_GDTR_WRITE,  "write_gdtr" }, \
+-	{ SVM_EXIT_LDTR_WRITE,  "write_ldtr" }, \
+-	{ SVM_EXIT_TR_WRITE,    "write_rt" }, \
+-	{ SVM_EXIT_RDTSC,       "rdtsc" }, \
+-	{ SVM_EXIT_RDPMC,       "rdpmc" }, \
+-	{ SVM_EXIT_PUSHF,       "pushf" }, \
+-	{ SVM_EXIT_POPF,        "popf" }, \
+-	{ SVM_EXIT_CPUID,       "cpuid" }, \
+-	{ SVM_EXIT_RSM,         "rsm" }, \
+-	{ SVM_EXIT_IRET,        "iret" }, \
+-	{ SVM_EXIT_SWINT,       "swint" }, \
+-	{ SVM_EXIT_INVD,        "invd" }, \
+-	{ SVM_EXIT_PAUSE,       "pause" }, \
+-	{ SVM_EXIT_HLT,         "hlt" }, \
+-	{ SVM_EXIT_INVLPG,      "invlpg" }, \
+-	{ SVM_EXIT_INVLPGA,     "invlpga" }, \
+-	{ SVM_EXIT_IOIO,        "io" }, \
+-	{ SVM_EXIT_MSR,         "msr" }, \
+-	{ SVM_EXIT_TASK_SWITCH, "task_switch" }, \
+-	{ SVM_EXIT_FERR_FREEZE, "ferr_freeze" }, \
+-	{ SVM_EXIT_SHUTDOWN,    "shutdown" }, \
+-	{ SVM_EXIT_VMRUN,       "vmrun" }, \
+-	{ SVM_EXIT_VMMCALL,     "hypercall" }, \
+-	{ SVM_EXIT_VMLOAD,      "vmload" }, \
+-	{ SVM_EXIT_VMSAVE,      "vmsave" }, \
+-	{ SVM_EXIT_STGI,        "stgi" }, \
+-	{ SVM_EXIT_CLGI,        "clgi" }, \
+-	{ SVM_EXIT_SKINIT,      "skinit" }, \
+-	{ SVM_EXIT_RDTSCP,      "rdtscp" }, \
+-	{ SVM_EXIT_ICEBP,       "icebp" }, \
+-	{ SVM_EXIT_WBINVD,      "wbinvd" }, \
+-	{ SVM_EXIT_MONITOR,     "monitor" }, \
+-	{ SVM_EXIT_MWAIT,       "mwait" }, \
+-	{ SVM_EXIT_XSETBV,      "xsetbv" }, \
+-	{ SVM_EXIT_NPF,         "npf" }, \
+-	{ SVM_EXIT_AVIC_INCOMPLETE_IPI,		"avic_incomplete_ipi" }, \
+-	{ SVM_EXIT_AVIC_UNACCELERATED_ACCESS,   "avic_unaccelerated_access" }, \
+-	{ SVM_EXIT_ERR,         "invalid_guest_state" }
++	{ SVM_EXIT_READ_CR0,    "READ_CR0" }, \
++	{ SVM_EXIT_READ_CR2,    "READ_CR2" }, \
++	{ SVM_EXIT_READ_CR3,    "READ_CR3" }, \
++	{ SVM_EXIT_READ_CR4,    "READ_CR4" }, \
++	{ SVM_EXIT_READ_CR8,    "READ_CR8" }, \
++	{ SVM_EXIT_WRITE_CR0,   "WRITE_CR0" }, \
++	{ SVM_EXIT_WRITE_CR2,   "WRITE_CR2" }, \
++	{ SVM_EXIT_WRITE_CR3,   "WRITE_CR3" }, \
++	{ SVM_EXIT_WRITE_CR4,   "WRITE_CR4" }, \
++	{ SVM_EXIT_WRITE_CR8,   "WRITE_CR8" }, \
++	{ SVM_EXIT_READ_DR0,    "READ_DR0" }, \
++	{ SVM_EXIT_READ_DR1,    "READ_DR1" }, \
++	{ SVM_EXIT_READ_DR2,    "READ_DR2" }, \
++	{ SVM_EXIT_READ_DR3,    "READ_DR3" }, \
++	{ SVM_EXIT_READ_DR4,    "READ_DR4" }, \
++	{ SVM_EXIT_READ_DR5,    "READ_DR5" }, \
++	{ SVM_EXIT_READ_DR6,    "READ_DR6" }, \
++	{ SVM_EXIT_READ_DR7,    "READ_DR7" }, \
++	{ SVM_EXIT_WRITE_DR0,   "WRITE_DR0" }, \
++	{ SVM_EXIT_WRITE_DR1,   "WRITE_DR1" }, \
++	{ SVM_EXIT_WRITE_DR2,   "WRITE_DR2" }, \
++	{ SVM_EXIT_WRITE_DR3,   "WRITE_DR3" }, \
++	{ SVM_EXIT_WRITE_DR4,   "WRITE_DR4" }, \
++	{ SVM_EXIT_WRITE_DR5,   "WRITE_DR5" }, \
++	{ SVM_EXIT_WRITE_DR6,   "WRITE_DR6" }, \
++	{ SVM_EXIT_WRITE_DR7,   "WRITE_DR7" }, \
++	{ SVM_EXIT_EXCP_BASE + DE_VECTOR,       "DE EXCP" }, \
++	{ SVM_EXIT_EXCP_BASE + DB_VECTOR,       "DB EXCP" }, \
++	{ SVM_EXIT_EXCP_BASE + BP_VECTOR,       "BP EXCP" }, \
++	{ SVM_EXIT_EXCP_BASE + OF_VECTOR,       "OF EXCP" }, \
++	{ SVM_EXIT_EXCP_BASE + BR_VECTOR,       "BR EXCP" }, \
++	{ SVM_EXIT_EXCP_BASE + UD_VECTOR,       "UD EXCP" }, \
++	{ SVM_EXIT_EXCP_BASE + NM_VECTOR,       "NM EXCP" }, \
++	{ SVM_EXIT_EXCP_BASE + DF_VECTOR,       "DF EXCP" }, \
++	{ SVM_EXIT_EXCP_BASE + TS_VECTOR,       "TS EXCP" }, \
++	{ SVM_EXIT_EXCP_BASE + NP_VECTOR,       "NP EXCP" }, \
++	{ SVM_EXIT_EXCP_BASE + SS_VECTOR,       "SS EXCP" }, \
++	{ SVM_EXIT_EXCP_BASE + GP_VECTOR,       "GP EXCP" }, \
++	{ SVM_EXIT_EXCP_BASE + PF_VECTOR,       "PF EXCP" }, \
++	{ SVM_EXIT_EXCP_BASE + MF_VECTOR,       "MF EXCP" }, \
++	{ SVM_EXIT_EXCP_BASE + AC_VECTOR,       "AC EXCP" }, \
++	{ SVM_EXIT_EXCP_BASE + MC_VECTOR,       "MC EXCP" }, \
++	{ SVM_EXIT_EXCP_BASE + XM_VECTOR,       "XF EXCP" }, \
++	{ SVM_EXIT_INTR,        "INTERRUPT" }, \
++	{ SVM_EXIT_NMI,         "NMI" }, \
++	{ SVM_EXIT_SMI,         "SMI" }, \
++	{ SVM_EXIT_INIT,        "INIT" }, \
++	{ SVM_EXIT_VINTR,       "VINTR" }, \
++	{ SVM_EXIT_CR0_SEL_WRITE, "CR0_SEL_WRITE" }, \
++	{ SVM_EXIT_IDTR_READ,   "READ_IDTR" }, \
++	{ SVM_EXIT_GDTR_READ,   "READ_GDTR" }, \
++	{ SVM_EXIT_LDTR_READ,   "READ_LDTR" }, \
++	{ SVM_EXIT_TR_READ,     "READ_RT" }, \
++	{ SVM_EXIT_IDTR_WRITE,  "WRITE_IDTR" }, \
++	{ SVM_EXIT_GDTR_WRITE,  "WRITE_GDTR" }, \
++	{ SVM_EXIT_LDTR_WRITE,  "WRITE_LDTR" }, \
++	{ SVM_EXIT_TR_WRITE,    "WRITE_RT" }, \
++	{ SVM_EXIT_RDTSC,       "RDTSC" }, \
++	{ SVM_EXIT_RDPMC,       "RDPMC" }, \
++	{ SVM_EXIT_PUSHF,       "PUSHF" }, \
++	{ SVM_EXIT_POPF,        "POPF" }, \
++	{ SVM_EXIT_CPUID,       "CPUID" }, \
++	{ SVM_EXIT_RSM,         "RSM" }, \
++	{ SVM_EXIT_IRET,        "IRET" }, \
++	{ SVM_EXIT_SWINT,       "SWINT" }, \
++	{ SVM_EXIT_INVD,        "INVD" }, \
++	{ SVM_EXIT_PAUSE,       "PAUSE" }, \
++	{ SVM_EXIT_HLT,         "HLT" }, \
++	{ SVM_EXIT_INVLPG,      "INVLPG" }, \
++	{ SVM_EXIT_INVLPGA,     "INVLPGA" }, \
++	{ SVM_EXIT_IOIO,        "IO" }, \
++	{ SVM_EXIT_MSR,         "MSR" }, \
++	{ SVM_EXIT_TASK_SWITCH, "TASK_SWITCH" }, \
++	{ SVM_EXIT_FERR_FREEZE, "FERR_FREEZE" }, \
++	{ SVM_EXIT_SHUTDOWN,    "SHUTDOWN" }, \
++	{ SVM_EXIT_VMRUN,       "VMRUN" }, \
++	{ SVM_EXIT_VMMCALL,     "HYPERCALL" }, \
++	{ SVM_EXIT_VMLOAD,      "VMLOAD" }, \
++	{ SVM_EXIT_VMSAVE,      "VMSAVE" }, \
++	{ SVM_EXIT_STGI,        "STGI" }, \
++	{ SVM_EXIT_CLGI,        "CLGI" }, \
++	{ SVM_EXIT_SKINIT,      "SKINIT" }, \
++	{ SVM_EXIT_RDTSCP,      "RDTSCP" }, \
++	{ SVM_EXIT_ICEBP,       "ICEBP" }, \
++	{ SVM_EXIT_WBINVD,      "WBINVD" }, \
++	{ SVM_EXIT_MONITOR,     "MONITOR" }, \
++	{ SVM_EXIT_MWAIT,       "MWAIT" }, \
++	{ SVM_EXIT_XSETBV,      "XSETBV" }, \
++	{ SVM_EXIT_NPF,         "NPF" }, \
++	{ SVM_EXIT_AVIC_INCOMPLETE_IPI,		"AVIC_INCOMPLETE_IPI" }, \
++	{ SVM_EXIT_AVIC_UNACCELERATED_ACCESS,   "AVIC_UNACCELERATED_ACCESS" }, \
++	{ SVM_EXIT_ERR,         "INVALID_GUEST_STATE" }
 
-> Given the above complexity and the fact that Armv8.6-A standardises the frequency to 1GHz this didn't seem worth continuing with. So LPT was dropped from the spec and patches to avoid holding up the stolen time support.
-> 
-> However, if you have a use case which doesn't require such a generic migration (e.g. perhaps old and new platforms are based on the same IP) then it might be worth looking at bring this back. But to make the problem solvable it either needs to be restricted to platforms which are substantially the same (so the errata list will be identical), or there's work to be done in preparation to deal with migrating a guest successfully between hosts with potentially different errata requirements.
-> 
-> Can you share more details about the hosts that you are interested in migrating between?
-Here we have new platform with 1GHz timer, and old platform is 100MHZ, so we want to solve the cross-platform migration firstly.
 
-Thanks,
-Keqian
-> 
-> Thanks,
-> 
-> Steve
-> .
-> 
+  #endif /* _UAPI__SVM_H */
+-- 
+1.8.3.1
+
+
