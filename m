@@ -2,122 +2,82 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 15FDC2325CB
-	for <lists+kvm@lfdr.de>; Wed, 29 Jul 2020 22:03:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1BBB523260D
+	for <lists+kvm@lfdr.de>; Wed, 29 Jul 2020 22:16:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726826AbgG2UDu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 29 Jul 2020 16:03:50 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:41003 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726825AbgG2UDt (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 29 Jul 2020 16:03:49 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1596053028;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=QeyS6hEHiK3c3NVQsKxvW8k7HJvPYBCqvPsl0jPPbrg=;
-        b=eAicRs9cqkpaUjrCs3lPDLWJ6fXf+Hj7N/g+fQ+oeK8cIXRyBN5dBE0qW/Z9hDgpRDlAjK
-        K9bah7dD6ZmWFd/CgpP3BAVKlUXIUpCxxUdDjphb7M8LQtE9FvFrP5ucyiSC/zqIYuyOZ/
-        0DJZJtLWtFPddnH1RPVbN+alKcae8E8=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-411-lV5JfxIrNgqWJ0JBZrb2PA-1; Wed, 29 Jul 2020 16:03:46 -0400
-X-MC-Unique: lV5JfxIrNgqWJ0JBZrb2PA-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7C6D98017FB;
-        Wed, 29 Jul 2020 20:03:44 +0000 (UTC)
-Received: from x1.home (ovpn-112-71.phx2.redhat.com [10.3.112.71])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 8A82F5C6C0;
-        Wed, 29 Jul 2020 20:03:43 +0000 (UTC)
-Date:   Wed, 29 Jul 2020 14:03:43 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Lu Baolu <baolu.lu@linux.intel.com>
-Cc:     Joerg Roedel <joro@8bytes.org>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Jean-Philippe Brucker <jean-philippe@linaro.org>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Kevin Tian <kevin.tian@intel.com>,
-        Ashok Raj <ashok.raj@intel.com>,
-        Dave Jiang <dave.jiang@intel.com>,
-        Liu Yi L <yi.l.liu@intel.com>,
-        iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Subject: Re: [PATCH v3 1/4] iommu: Check IOMMU_DEV_FEAT_AUX feature in aux
- api's
-Message-ID: <20200729140343.2b7047b2@x1.home>
-In-Reply-To: <20200714055703.5510-2-baolu.lu@linux.intel.com>
-References: <20200714055703.5510-1-baolu.lu@linux.intel.com>
-        <20200714055703.5510-2-baolu.lu@linux.intel.com>
-Organization: Red Hat
+        id S1726842AbgG2UQv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 29 Jul 2020 16:16:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57020 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726821AbgG2UQv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 29 Jul 2020 16:16:51 -0400
+Received: from mail-io1-xd42.google.com (mail-io1-xd42.google.com [IPv6:2607:f8b0:4864:20::d42])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D46C6C0619D2
+        for <kvm@vger.kernel.org>; Wed, 29 Jul 2020 13:16:50 -0700 (PDT)
+Received: by mail-io1-xd42.google.com with SMTP id l1so25894675ioh.5
+        for <kvm@vger.kernel.org>; Wed, 29 Jul 2020 13:16:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=qq+ysuvSU+V8JQG1DuA+Q8eHlgCH1eO+fRWf5OmQClQ=;
+        b=YcvEkCx9qexk7f+HNawBWOgq3Ozk6TN2CCHAbw23oQ3VzwAf9Q+gVni2+YeXOSo80m
+         wNwNPYLaR+D5PcrJyAE4lrbD2wdX27P0wNO/Y0GesGL7tfLXyFOKSNPWJ8UhME89F2SC
+         WW3HOcWX4qfczElt0ALpYlZcC+WRjvve8dFU5bPSu+SbWSM14nknjDRcYRNi/vH8x6Dv
+         bEX35VZtg4Q56GYYgrkWRr6bk6MAFZugFyJE60UCLZDE5s9p7DC3pgpzDT1vN2TxTAXz
+         VRdn0EwJFjhmR7zFyq9o4uyPUYIjCgcyWccX8a5348RDxrepHllS7xCIzaTGR+DzibhZ
+         D1Xg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=qq+ysuvSU+V8JQG1DuA+Q8eHlgCH1eO+fRWf5OmQClQ=;
+        b=A69du4DuTnP8xLWQnmyLetUMVacASw3W0gN3Ker2wS8ezd20mJhcRv1C/+Epvq18tB
+         +5aUZU1u0YM+5mFoG7czyME0wuuW4uk4R6otBIxgNny73fht4MwRK6LriMgVcYg+lfRE
+         7zDkqsHXktjAtd4VBoEvM6QhSJm9HjGruPW34fgEKHh6pBRWAraEHqgbO8ri6NwdteUv
+         e1cBXUEZ2AtK4Jdckw6LcYeBJ5MUg40wjb11Cw3icBXM6Y1VycVpYGkyvMqYcvY7FbCn
+         WfuxoRZCNYfhfcpBmGwt8rs0odmllKIlDPttlWsrbfkfQgikzwg96JnysNid/QZMZkPv
+         z+Vw==
+X-Gm-Message-State: AOAM533aP8uNVIKblDkVIHHiJi0C1yO36dAYzM2Mpvnm8Qcvgjs6hwhJ
+        huYSrTLjIgzts+iM9GW/d6lNUcgucWYHWW66xd/afA==
+X-Google-Smtp-Source: ABdhPJy4w7jgd/UAwb5pPY2xqkZRN3ELOqqLs6AJUHt05VUljtTZQfKhOa5aVXvbhgUsVDCOuYt1rMmZ2zibhre8Xok=
+X-Received: by 2002:a6b:b38a:: with SMTP id c132mr17932385iof.75.1596053809764;
+ Wed, 29 Jul 2020 13:16:49 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+References: <fdc7e57d-4fd6-4d49-22e6-b18003034ff5@gmail.com>
+In-Reply-To: <fdc7e57d-4fd6-4d49-22e6-b18003034ff5@gmail.com>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Wed, 29 Jul 2020 13:16:38 -0700
+Message-ID: <CALMp9eRyyO3d36j6YbcvLEuPLZpByYS8SOCpVithpfqCeKhDUg@mail.gmail.com>
+Subject: Re: [PATCH] perf/x86/svm: Convert 'perf kvm stat report' output
+ lowercase to uppercase
+To:     Haiwei Li <lihaiwei.kernel@gmail.com>
+Cc:     "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        kvm list <kvm@vger.kernel.org>,
+        "x86@kernel.org" <x86@kernel.org>, acme@redhat.com,
+        "hpa@zytor.com" <hpa@zytor.com>, "bp@alien8.de" <bp@alien8.de>,
+        "mingo@redhat.com" <mingo@redhat.com>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        "vkuznets@redhat.com" <vkuznets@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 14 Jul 2020 13:57:00 +0800
-Lu Baolu <baolu.lu@linux.intel.com> wrote:
+On Tue, Jul 28, 2020 at 11:24 PM Haiwei Li <lihaiwei.kernel@gmail.com> wrote:
+>
+> From: Haiwei Li <lihaiwei@tencent.com>
+>
+> The reason output of 'perf kvm stat report --event=vmexit' is uppercase
+> on VMX and lowercase on SVM.
+>
+> To be consistent with VMX, convert lowercase to uppercase.
+>
+> Signed-off-by: Haiwei Li <lihaiwei@tencent.com>
 
-> The iommu aux-domain api's work only when IOMMU_DEV_FEAT_AUX is enabled
-> for the device. Add this check to avoid misuse.
-
-Shouldn't this really be the IOMMU driver's responsibility to test?  If
-nothing else, iommu_dev_feature_enabled() needs to get the iommu_ops
-from dev->bus->iommu_ops, which is presumably the same iommu_ops we're
-then calling from domain->ops to attach/detach the device, so it'd be
-more efficient for the IOMMU driver to error on devices that don't
-support aux.  Thanks,
-
-Alex
-
-> Signed-off-by: Lu Baolu <baolu.lu@linux.intel.com>
-> ---
->  drivers/iommu/iommu.c | 16 +++++++++-------
->  1 file changed, 9 insertions(+), 7 deletions(-)
-> 
-> diff --git a/drivers/iommu/iommu.c b/drivers/iommu/iommu.c
-> index 1ed1e14a1f0c..e1fdd3531d65 100644
-> --- a/drivers/iommu/iommu.c
-> +++ b/drivers/iommu/iommu.c
-> @@ -2725,11 +2725,13 @@ EXPORT_SYMBOL_GPL(iommu_dev_feature_enabled);
->   */
->  int iommu_aux_attach_device(struct iommu_domain *domain, struct device *dev)
->  {
-> -	int ret = -ENODEV;
-> +	int ret;
->  
-> -	if (domain->ops->aux_attach_dev)
-> -		ret = domain->ops->aux_attach_dev(domain, dev);
-> +	if (!iommu_dev_feature_enabled(dev, IOMMU_DEV_FEAT_AUX) ||
-> +	    !domain->ops->aux_attach_dev)
-> +		return -ENODEV;
->  
-> +	ret = domain->ops->aux_attach_dev(domain, dev);
->  	if (!ret)
->  		trace_attach_device_to_domain(dev);
->  
-> @@ -2748,12 +2750,12 @@ EXPORT_SYMBOL_GPL(iommu_aux_detach_device);
->  
->  int iommu_aux_get_pasid(struct iommu_domain *domain, struct device *dev)
->  {
-> -	int ret = -ENODEV;
-> +	if (!iommu_dev_feature_enabled(dev, IOMMU_DEV_FEAT_AUX) ||
-> +	    !domain->ops->aux_get_pasid)
-> +		return -ENODEV;
->  
-> -	if (domain->ops->aux_get_pasid)
-> -		ret = domain->ops->aux_get_pasid(domain, dev);
-> +	return domain->ops->aux_get_pasid(domain, dev);
->  
-> -	return ret;
->  }
->  EXPORT_SYMBOL_GPL(iommu_aux_get_pasid);
->  
-
+Please don't do this. It breaks an existing ABI.
