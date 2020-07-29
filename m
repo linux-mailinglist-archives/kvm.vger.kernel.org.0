@@ -2,109 +2,114 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D40E4231C04
-	for <lists+kvm@lfdr.de>; Wed, 29 Jul 2020 11:22:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id ADD83231C07
+	for <lists+kvm@lfdr.de>; Wed, 29 Jul 2020 11:23:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728142AbgG2JWP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 29 Jul 2020 05:22:15 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:24353 "EHLO
+        id S1728170AbgG2JWv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 29 Jul 2020 05:22:51 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:38367 "EHLO
         us-smtp-delivery-74.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1728107AbgG2JWP (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 29 Jul 2020 05:22:15 -0400
+        by vger.kernel.org with ESMTP id S1726548AbgG2JWv (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 29 Jul 2020 05:22:51 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1596014534;
+        s=mimecast20190719; t=1596014569;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=gfMmbbC8VgRw8IQ9ZtQih9sQCoQJENghyVj/1NXZj5U=;
-        b=T9UoEIknSwUDf/2kxu5WvCZ3rTITlwy98ZFg9AFeQqJgkGyfmjq6EBz66jTLtqNt2xlCZk
-        JctLLKTcgRtKptch61SSOElbupeK21LG6oWq+5pew8rRFqYFgqqTOPSkfTEF7u5/Wxa7ri
-        ZnDeYSN6U9zAj8wq0QDpKJETv6Gayjg=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-206-JsuazCKzOVC8QSBFb1PA1Q-1; Wed, 29 Jul 2020 05:22:10 -0400
-X-MC-Unique: JsuazCKzOVC8QSBFb1PA1Q-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D662C1800D4A;
-        Wed, 29 Jul 2020 09:22:08 +0000 (UTC)
-Received: from [10.72.13.120] (ovpn-13-120.pek2.redhat.com [10.72.13.120])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 86C7179310;
-        Wed, 29 Jul 2020 09:21:55 +0000 (UTC)
-Subject: Re: [PATCH V4 4/6] vhost_vdpa: implement IRQ offloading in vhost_vdpa
-To:     Eli Cohen <eli@mellanox.com>, Zhu Lingshan <lingshan.zhu@intel.com>
-Cc:     alex.williamson@redhat.com, mst@redhat.com, pbonzini@redhat.com,
-        sean.j.christopherson@intel.com, wanpengli@tencent.com,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        kvm@vger.kernel.org, shahafs@mellanox.com, parav@mellanox.com
-References: <20200728042405.17579-1-lingshan.zhu@intel.com>
- <20200728042405.17579-5-lingshan.zhu@intel.com>
- <20200728090438.GA21875@nps-server-21.mtl.labs.mlnx>
-From:   Jason Wang <jasowang@redhat.com>
-Message-ID: <c87d4a5a-3106-caf2-2bc1-764677218967@redhat.com>
-Date:   Wed, 29 Jul 2020 17:21:53 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        bh=cleKEEqa/Yi8QZ9Y9pY/hJ9mwP+xc/IFgNkiTAzi7w4=;
+        b=doXSmJ/D/QyWLvuQdG1J3Bhb85vvhp+8+7itYpTpldr6xgEKYrHnuZSAgPbHJgsLKkZQEF
+        Quw1TybqNAq74FOtTaUqPgGxJBXm2f6qJiwhgvCrU0QsvSNhBSA0QQf6Zj9TCAIBhvMvz3
+        YNl4GcxeOduXiJ4HyLc/KX1jPVuGf08=
+Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
+ [209.85.218.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-440-CZ3g7Ix3NnKxf-6ZiSUG4Q-1; Wed, 29 Jul 2020 05:22:48 -0400
+X-MC-Unique: CZ3g7Ix3NnKxf-6ZiSUG4Q-1
+Received: by mail-ej1-f69.google.com with SMTP id bx27so3552075ejc.15
+        for <kvm@vger.kernel.org>; Wed, 29 Jul 2020 02:22:47 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=cleKEEqa/Yi8QZ9Y9pY/hJ9mwP+xc/IFgNkiTAzi7w4=;
+        b=kuNZrm4lHCY13uIGen0DjDzTEsVxdTMwHP56zayP6JO7HXHKu29jNNs3msH9bSaS16
+         T1EAWvETnRwxZgmdS1Uoa7r9cAwq/UiDS0cL1Bftwfss6snGe3yAQnjb216bwfQ9NwyO
+         lO1ICC510iFefoiTsPUcsiYUdIO0bYsBpz5mZbVN4WCQikuDLJyVCCtiajNJgzWulvSl
+         SYtp8xRvu8aEVXjE+Gi80bzvRpZ4nyF3l0oSX2daZPvgQgHu5SpB2ZN0+jFImZPYqMcK
+         3djpkJiI9qCORRPwCk4a69fLyPK8+VD8jOGBo63/uOD3qzpxSOXb3vx6YdotrPD8ij9p
+         +3yg==
+X-Gm-Message-State: AOAM531wnbKiC238xPELQATKOub3MrubX3LFhG7VB4dUKRHWLDDuFyG/
+        JAfHoDJhuTAy2Rp8wIFadw/V8O0IREblZWYr1nhu+JaHBkHwDu9p4KwquYx3X2Q1ebcPKstO+qg
+        um8gJI7d3G8V4
+X-Received: by 2002:aa7:c885:: with SMTP id p5mr31451500eds.100.1596014566900;
+        Wed, 29 Jul 2020 02:22:46 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxCfeK5XNoFAzUDf6eYvR8YIVLMGH++FnVZqU3fYGpDuVRQRBQL15uPpm5p2erVWzHIwOY8Cg==
+X-Received: by 2002:aa7:c885:: with SMTP id p5mr31451482eds.100.1596014566725;
+        Wed, 29 Jul 2020 02:22:46 -0700 (PDT)
+Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
+        by smtp.gmail.com with ESMTPSA id c15sm1343755edm.47.2020.07.29.02.22.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 29 Jul 2020 02:22:46 -0700 (PDT)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     Alexander Graf <graf@amazon.com>, Jim Mattson <jmattson@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm list <kvm@vger.kernel.org>,
+        linux-doc@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
+        Aaron Lewis <aaronlewis@google.com>
+Subject: Re: [PATCH] KVM: x86: Deflect unknown MSR accesses to user space
+In-Reply-To: <173948e8-4c7a-6dc4-de17-99151bc56d91@amazon.com>
+References: <20200728004446.932-1-graf@amazon.com> <87d04gm4ws.fsf@vitty.brq.redhat.com> <a1f30fc8-09f5-fe2f-39e2-136b881ed15a@amazon.com> <CALMp9eQ3OxhQZYiHPiebX=KyvjWQgxQEO-owjSoxgPKsOMRvjw@mail.gmail.com> <87y2n2log7.fsf@vitty.brq.redhat.com> <173948e8-4c7a-6dc4-de17-99151bc56d91@amazon.com>
+Date:   Wed, 29 Jul 2020 11:22:45 +0200
+Message-ID: <87pn8ellp6.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200728090438.GA21875@nps-server-21.mtl.labs.mlnx>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Content-Type: text/plain
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Alexander Graf <graf@amazon.com> writes:
 
-On 2020/7/28 下午5:04, Eli Cohen wrote:
-> On Tue, Jul 28, 2020 at 12:24:03PM +0800, Zhu Lingshan wrote:
->>   
->> +static void vhost_vdpa_setup_vq_irq(struct vhost_vdpa *v, int qid)
->> +{
->> +	struct vhost_virtqueue *vq = &v->vqs[qid];
->> +	const struct vdpa_config_ops *ops = v->vdpa->config;
->> +	struct vdpa_device *vdpa = v->vdpa;
->> +	int ret, irq;
->> +
->> +	spin_lock(&vq->call_ctx.ctx_lock);
->> +	irq = ops->get_vq_irq(vdpa, qid);
->> +	if (!vq->call_ctx.ctx || irq == -EINVAL) {
->> +		spin_unlock(&vq->call_ctx.ctx_lock);
->> +		return;
->> +	}
->> +
-> If I understand correctly, this will cause these IRQs to be forwarded
-> directly to the VCPU, e.g. will be handled by the guest/qemu.
-
-
-Yes, if it can bypassed, the interrupt will be delivered to vCPU directly.
-
-
-> Does this mean that the host will not handle this interrupt? How does it
-> work in case on level triggered interrupts?
-
-
-There's no guarantee that the KVM arch code can make sure the irq bypass 
-work for any type of irq. So if they the irq will still need to be 
-handled by host first. This means we should keep the host interrupt 
-handler as a slowpath (fallback).
-
-
+> On 29.07.20 10:23, Vitaly Kuznetsov wrote:
+>> 
+>> 
+>> 
+>> Jim Mattson <jmattson@google.com> writes:
+>> 
+>>> On Tue, Jul 28, 2020 at 5:41 AM Alexander Graf <graf@amazon.com> wrote:
+>>>>
+>> 
+>> ...
+>> 
+>>>> While it does feel a bit overengineered, it would solve the problem that
+>>>> we're turning in-KVM handled MSRs into an ABI.
+>>>
+>>> It seems unlikely that userspace is going to know what to do with a
+>>> large number of MSRs. I suspect that a small enumerated list will
+>>> suffice.
+>> 
+>> The list can also be 'wildcarded', i.e.
+>> {
+>>   u32 index;
+>>   u32 mask;
+>>   ...
+>> }
+>> 
+>> to make it really short.
 >
-> In the case of ConnectX, I need to execute some code to acknowledge the
-> interrupt.
-
-
-This turns out to be hard for irq bypassing to work. Is it because the 
-irq is shared or what kind of ack you need to do?
-
-Thanks
-
-
+> I like the idea of wildcards, but I can't quite wrap my head around how 
+> we would implement ignore_msrs in user space with them?
 >
-> Can you explain how this should be done?
->
+
+For that I think we can still deflect all unknown MSR accesses to
+userspace (when the CAP is enabled of course ) but MSRs which are on the
+list will *have to be deflected*, i.e. KVM can't handle them internally
+without consulting with userspace.
+
+We can make it tunable through a parameter for CAP enablement if needed.
+
+-- 
+Vitaly
 
