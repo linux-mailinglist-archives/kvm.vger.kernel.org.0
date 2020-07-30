@@ -2,111 +2,133 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 96FC7233622
-	for <lists+kvm@lfdr.de>; Thu, 30 Jul 2020 17:59:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EA82B233652
+	for <lists+kvm@lfdr.de>; Thu, 30 Jul 2020 18:08:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728286AbgG3P7A (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 30 Jul 2020 11:59:00 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:42485 "EHLO
+        id S1729091AbgG3QIl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 30 Jul 2020 12:08:41 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:56605 "EHLO
         us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726275AbgG3P7A (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 30 Jul 2020 11:59:00 -0400
+        by vger.kernel.org with ESMTP id S1728452AbgG3QIk (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 30 Jul 2020 12:08:40 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1596124738;
+        s=mimecast20190719; t=1596125319;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references:openpgp:openpgp;
-        bh=yvixA7AnuX+SIl1eVGj6Lt/rHsyqN1zKTYG6L6GtgFY=;
-        b=ivduR8Q1O5pW2dy5zLVJ5OtJ5KG86npwdYn7hdDOQpzQYk4PZBWs+uLMA3ITdHajV4zwSV
-        mrU61WA8gN2fcdCCpNiVBNyMb0AHnfrAodD0WpK4n1SCNBk706fa7pzAVcYuILjN23qT6x
-        a7OJhCFKGxTdm9RxCSaqu3+LHQkSoBY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-330-7kPf4hY3MiOEn1K890EMag-1; Thu, 30 Jul 2020 11:58:56 -0400
-X-MC-Unique: 7kPf4hY3MiOEn1K890EMag-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 863DC8015CE;
-        Thu, 30 Jul 2020 15:58:55 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-112-85.ams2.redhat.com [10.36.112.85])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 00D0269324;
-        Thu, 30 Jul 2020 15:58:50 +0000 (UTC)
-Subject: Re: [kvm-unit-tests PATCH v2 3/3] s390x: Ultravisor guest API test
-To:     Cornelia Huck <cohuck@redhat.com>,
-        Janosch Frank <frankja@linux.ibm.com>
-Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org, david@redhat.com,
-        borntraeger@de.ibm.com, imbrenda@linux.ibm.com
-References: <20200727095415.494318-1-frankja@linux.ibm.com>
- <20200727095415.494318-4-frankja@linux.ibm.com>
- <20200730131617.7f7d5e5f.cohuck@redhat.com>
-From:   Thomas Huth <thuth@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <1a407971-0b43-879e-0aac-65c7f9e29606@redhat.com>
-Date:   Thu, 30 Jul 2020 17:58:48 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+         in-reply-to:in-reply-to:references:references;
+        bh=qUqXLll+NefydSj//AgmT8C1K6WHp8sxKqjeN68cy/c=;
+        b=P9Is4vT31V72vfeftlCYxg4ElT/PZqdeIhRNrDLXfh12ZGmDjwWXEGz2bFayvoz6IyLLrw
+        UX5bpUYZD2XZ8xKTJnTJlLOf1x1lM5W24jXHBPk8Hr9huB6HdV2ObLTS+7GmJSUK95HFS/
+        AZ+sJEgX6i0uFXlFDP7kaRbEAGjOtMo=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-306-BdQB1nUEMg2C4-fuetlYtg-1; Thu, 30 Jul 2020 12:08:35 -0400
+X-MC-Unique: BdQB1nUEMg2C4-fuetlYtg-1
+Received: by mail-wm1-f71.google.com with SMTP id t26so2371708wmn.4
+        for <kvm@vger.kernel.org>; Thu, 30 Jul 2020 09:08:35 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=qUqXLll+NefydSj//AgmT8C1K6WHp8sxKqjeN68cy/c=;
+        b=nJ5TTAjH9Vk1eGwhwtCnGMa/yM/gUXbj0+t3LkafD2x6oUHul7GGS0xuk0RnUwElDg
+         vwtyeHTgbsj2Gg3MAFc3lrr9zvRidCtGKLKD6BKLCNC1Ti63PRo+axh1cdjGmqHFyygB
+         PMnaZcSEDq2fEFru3zggJy5NqMd/c3xZ9URCbyo8Sws5GSOpj/hyEDA0vLZAPevwuR0K
+         bidSC0puIaAFNS7uZMzoWpzo9Oa1xWNvGuKqjfIDtridfkfuoqIGaFKjhm1EjyfbtDnA
+         FsitRa700qY2jymnHC7EBMIEMVLfXLTpu7/RcvyOj9q2tovkd7pxukx7SYuFcxF15S3I
+         yJLA==
+X-Gm-Message-State: AOAM532kBmTtqz0uTyEb41nYvugtm5jYC7uZ8tpoOPl7cGXTy1yLtQr0
+        RTjF4R3GEN0oApsxsn1xgiKO+79uKwiV6ild90YDMkAfJ3yw+SUrzsVOlPQ8R/7Ose0nkAqVx3+
+        0TRmWrXzmGRk7
+X-Received: by 2002:a1c:2095:: with SMTP id g143mr36497wmg.78.1596125314304;
+        Thu, 30 Jul 2020 09:08:34 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJy8EEO1xnALZftyrn6Van6xavkoUdqm7ncbftjelxThfdJiLZtzyAchyb3bUf7eXUGwTaOiKg==
+X-Received: by 2002:a1c:2095:: with SMTP id g143mr36424wmg.78.1596125313141;
+        Thu, 30 Jul 2020 09:08:33 -0700 (PDT)
+Received: from redhat.com (bzq-79-179-105-63.red.bezeqint.net. [79.179.105.63])
+        by smtp.gmail.com with ESMTPSA id g7sm10167067wrv.82.2020.07.30.09.08.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 30 Jul 2020 09:08:32 -0700 (PDT)
+Date:   Thu, 30 Jul 2020 12:08:29 -0400
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Guennadi Liakhovetski <guennadi.liakhovetski@linux.intel.com>
+Cc:     kvm@vger.kernel.org, linux-remoteproc@vger.kernel.org,
+        virtualization@lists.linux-foundation.org,
+        sound-open-firmware@alsa-project.org,
+        Pierre-Louis Bossart <pierre-louis.bossart@linux.intel.com>,
+        Liam Girdwood <liam.r.girdwood@linux.intel.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Ohad Ben-Cohen <ohad@wizery.com>,
+        Bjorn Andersson <bjorn.andersson@linaro.org>,
+        Mathieu Poirier <mathieu.poirier@linaro.org>,
+        Vincent Whitchurch <vincent.whitchurch@axis.com>
+Subject: Re: [PATCH v4 0/4] Add a vhost RPMsg API
+Message-ID: <20200730120805-mutt-send-email-mst@kernel.org>
+References: <20200722150927.15587-1-guennadi.liakhovetski@linux.intel.com>
 MIME-Version: 1.0
-In-Reply-To: <20200730131617.7f7d5e5f.cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200722150927.15587-1-guennadi.liakhovetski@linux.intel.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 30/07/2020 13.16, Cornelia Huck wrote:
-> On Mon, 27 Jul 2020 05:54:15 -0400
-> Janosch Frank <frankja@linux.ibm.com> wrote:
+On Wed, Jul 22, 2020 at 05:09:23PM +0200, Guennadi Liakhovetski wrote:
+> Hi,
 > 
->> Test the error conditions of guest 2 Ultravisor calls, namely:
->>      * Query Ultravisor information
->>      * Set shared access
->>      * Remove shared access
->>
->> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
->> Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
->> ---
->>  lib/s390x/asm/uv.h  |  68 +++++++++++++++++++
->>  s390x/Makefile      |   1 +
->>  s390x/unittests.cfg |   3 +
->>  s390x/uv-guest.c    | 159 ++++++++++++++++++++++++++++++++++++++++++++
->>  4 files changed, 231 insertions(+)
->>  create mode 100644 lib/s390x/asm/uv.h
->>  create mode 100644 s390x/uv-guest.c
->>
-> 
-> (...)
-> 
->> +static inline int uv_call(unsigned long r1, unsigned long r2)
->> +{
->> +	int cc;
->> +
->> +	asm volatile(
->> +		"0:	.insn rrf,0xB9A40000,%[r1],%[r2],0,0\n"
->> +		"		brc	3,0b\n"
->> +		"		ipm	%[cc]\n"
->> +		"		srl	%[cc],28\n"
->> +		: [cc] "=d" (cc)
->> +		: [r1] "a" (r1), [r2] "a" (r2)
->> +		: "memory", "cc");
->> +	return cc;
->> +}
-> 
-> This returns the condition code, but no caller seems to check it
-> (instead, they look at header.rc, which is presumably only set if the
-> instruction executed successfully in some way?)
-> 
-> Looking at the kernel, it retries for cc > 1 (presumably busy
-> conditions), and cc != 0 seems to be considered a failure. Do we want
-> to look at the cc here as well?
+> Now that virtio-rpmsg endianness fixes have been merged we can 
+> proceed with the next step.
 
-It's there - but here it's in the assembly code, the "brc 3,0b".
+Which tree is this for?
 
-Patch looks ok to me (but I didn't do a full review):
 
-Acked-by: Thomas Huth <thuth@redhat.com>
+> v4:
+> - add endianness conversions to comply with the VirtIO standard
+> 
+> v3:
+> - address several checkpatch warnings
+> - address comments from Mathieu Poirier
+> 
+> v2:
+> - update patch #5 with a correct vhost_dev_init() prototype
+> - drop patch #6 - it depends on a different patch, that is currently
+>   an RFC
+> - address comments from Pierre-Louis Bossart:
+>   * remove "default n" from Kconfig
+> 
+> Linux supports RPMsg over VirtIO for "remote processor" / AMP use
+> cases. It can however also be used for virtualisation scenarios,
+> e.g. when using KVM to run Linux on both the host and the guests.
+> This patch set adds a wrapper API to facilitate writing vhost
+> drivers for such RPMsg-based solutions. The first use case is an
+> audio DSP virtualisation project, currently under development, ready
+> for review and submission, available at
+> https://github.com/thesofproject/linux/pull/1501/commits
+> 
+> Thanks
+> Guennadi
+> 
+> Guennadi Liakhovetski (4):
+>   vhost: convert VHOST_VSOCK_SET_RUNNING to a generic ioctl
+>   rpmsg: move common structures and defines to headers
+>   rpmsg: update documentation
+>   vhost: add an RPMsg API
+> 
+>  Documentation/rpmsg.txt          |   6 +-
+>  drivers/rpmsg/virtio_rpmsg_bus.c |  78 +------
+>  drivers/vhost/Kconfig            |   7 +
+>  drivers/vhost/Makefile           |   3 +
+>  drivers/vhost/rpmsg.c            | 375 +++++++++++++++++++++++++++++++
+>  drivers/vhost/vhost_rpmsg.h      |  74 ++++++
+>  include/linux/virtio_rpmsg.h     |  83 +++++++
+>  include/uapi/linux/rpmsg.h       |   3 +
+>  include/uapi/linux/vhost.h       |   4 +-
+>  9 files changed, 553 insertions(+), 80 deletions(-)
+>  create mode 100644 drivers/vhost/rpmsg.c
+>  create mode 100644 drivers/vhost/vhost_rpmsg.h
+>  create mode 100644 include/linux/virtio_rpmsg.h
+> 
+> -- 
+> 2.27.0
 
