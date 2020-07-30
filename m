@@ -2,296 +2,116 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 53BE123393F
-	for <lists+kvm@lfdr.de>; Thu, 30 Jul 2020 21:47:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0BD7D233954
+	for <lists+kvm@lfdr.de>; Thu, 30 Jul 2020 21:50:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730579AbgG3TrJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 30 Jul 2020 15:47:09 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:20824 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1730551AbgG3TrG (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 30 Jul 2020 15:47:06 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1596138423;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=HBQQmJPaywtGjRPnPxfMrCP97/jk9vz+YTn2z/bOwXE=;
-        b=GF8K7XBSjdo7u+lY2XSCSwcNbgur0vx6+lzwTwynbswpltTeVraAOd9k3wOGpEV+08pBch
-        UepM4Sonrt68q9iigxLclvvGJyfF9OUp19irCp3AJeTyDPar172D/zzjUQ0eKdePjBd1kS
-        gbg6GKwnEHyy6FWP4NhmBxahPUiHbU8=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-127-FVNopLLKNFaqli-_SWKSjA-1; Thu, 30 Jul 2020 15:47:01 -0400
-X-MC-Unique: FVNopLLKNFaqli-_SWKSjA-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C13101932480;
-        Thu, 30 Jul 2020 19:46:59 +0000 (UTC)
-Received: from x1.home (ovpn-112-71.phx2.redhat.com [10.3.112.71])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id DC8A75BAC3;
-        Thu, 30 Jul 2020 19:46:58 +0000 (UTC)
-Date:   Thu, 30 Jul 2020 13:46:58 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     "Tian, Kevin" <kevin.tian@intel.com>
-Cc:     Lu Baolu <baolu.lu@linux.intel.com>,
-        Jacob Pan <jacob.jun.pan@linux.intel.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Jean-Philippe Brucker <jean-philippe@linaro.org>,
-        "Jiang, Dave" <dave.jiang@intel.com>,
-        "Raj, Ashok" <ashok.raj@intel.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        Cornelia Huck <cohuck@redhat.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
-        Robin Murphy <robin.murphy@arm.com>
-Subject: Re: [PATCH v3 2/4] iommu: Add iommu_aux_at(de)tach_group()
-Message-ID: <20200730134658.44c57a67@x1.home>
-In-Reply-To: <MWHPR11MB16454283959A365ED7964C488C700@MWHPR11MB1645.namprd11.prod.outlook.com>
-References: <20200714055703.5510-1-baolu.lu@linux.intel.com>
-        <20200714055703.5510-3-baolu.lu@linux.intel.com>
-        <20200714093909.1ab93c9e@jacob-builder>
-        <b5b22e01-4a51-8dfe-9ba4-aeca783740f1@linux.intel.com>
-        <20200715090114.50a459d4@jacob-builder>
-        <435a2014-c2e8-06b9-3c9a-4afbf6607ffe@linux.intel.com>
-        <20200729140336.09d2bfe7@x1.home>
-        <MWHPR11MB16454283959A365ED7964C488C700@MWHPR11MB1645.namprd11.prod.outlook.com>
-Organization: Red Hat
+        id S1730600AbgG3Tuq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 30 Jul 2020 15:50:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48298 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730377AbgG3Tuq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 30 Jul 2020 15:50:46 -0400
+Received: from mail-pl1-x643.google.com (mail-pl1-x643.google.com [IPv6:2607:f8b0:4864:20::643])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2FD3BC061574;
+        Thu, 30 Jul 2020 12:50:46 -0700 (PDT)
+Received: by mail-pl1-x643.google.com with SMTP id t10so9795163plz.10;
+        Thu, 30 Jul 2020 12:50:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=tMXvAgV7y7E7g3D1Q8GTY7E552yzOC14eLgZur5bOX4=;
+        b=kxVJFfipNn+Aa+QD1px2nW0qiEiM/lI4U7W6jk2kqnzMFytG1ybU18pP4MGcrHhYnT
+         ZF06DS+lPzJ41rC7TqP6wDhYI8yiae9n4SjJODgj1Hj1CqMErax8rYP3TlyL/cpsahCl
+         vvpw9ksu8nT2OhyGyOLfRIlMQQUTXGxyq0009jfWcozRK5tLt0bpJpl+K3RqM7Vg70b8
+         pH0GI+TmKPzT0JdOgMH+P3uNQKIMU6EpvTI7x7pxYXyx6uq8E5M4l7vt7CoPtZYQREfo
+         X0j97FndDgTSJ092q5QwCB1MporPW5eoJXTXt6mXHOB3gEwdnSZZ55PfIAyu7kwJBEKf
+         IPzA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=tMXvAgV7y7E7g3D1Q8GTY7E552yzOC14eLgZur5bOX4=;
+        b=CNpi0TmsbEL//SUb0GNdYR8X3yOc6DIr0c5Q9qZISPxDX5AqJGskdVXgnBA3qfLm+R
+         ZRcvb3l4cncKoRnJhOrZjdPx82/Exq42jN52j8EbPBYHTJ7p3W9dJiQgrLPoUxcpNT4y
+         fGLuUhI4S2MHlBSPbckkqEvXoNCZic9DpzDqlFnWlbWQt29e5MArkG3EToygNOP4PQHx
+         46yHa65kjgY4Md7lDFfPJHvlZWoVcLNzUREIF8ik97tKCa9luQPPjhL0gXHfAEifyifD
+         jr0Kp8/H9fM4NeXKCBRuTJqdMNdqwFT6+vzLr8yozniOrXhgk1qdfwKX3C4URlPC9iwh
+         yeNg==
+X-Gm-Message-State: AOAM532+jQ4xajOzoFv1RxrUZpeV0aklb20qznCdb2C5rH4rlHxRtE6Q
+        N1cylgISST9KyXFADCWtFkACWa0DzJBDV5rz7I8=
+X-Google-Smtp-Source: ABdhPJy3/p35FG9tefm9R+LVBFlJys79Eb4rSZlOzkM8ZMdIR5Ub5tAyBAc6UmBduAWzlHFwoqdkyJyAXBlq9OwW6mk=
+X-Received: by 2002:a17:90a:a393:: with SMTP id x19mr707926pjp.228.1596138645586;
+ Thu, 30 Jul 2020 12:50:45 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+References: <20200730193510.578309-1-jusual@redhat.com>
+In-Reply-To: <20200730193510.578309-1-jusual@redhat.com>
+From:   Andy Shevchenko <andy.shevchenko@gmail.com>
+Date:   Thu, 30 Jul 2020 22:50:29 +0300
+Message-ID: <CAHp75VcyRjAr3ugmAWYcKMrAeea6ioQOPfJnj-Srntdg_W8ScQ@mail.gmail.com>
+Subject: Re: [PATCH] KVM: x86: Use MMCONFIG for all PCI config space accesses
+To:     Julia Suvorova <jusual@redhat.com>
+Cc:     "open list:VFIO DRIVER" <kvm@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Bjorn Helgaas <helgaas@kernel.org>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Matthew Wilcox <willy@infradead.org>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 29 Jul 2020 23:34:40 +0000
-"Tian, Kevin" <kevin.tian@intel.com> wrote:
+On Thu, Jul 30, 2020 at 10:37 PM Julia Suvorova <jusual@redhat.com> wrote:
+>
+> Using MMCONFIG instead of I/O ports cuts the number of config space
+> accesses in half, which is faster on KVM and opens the door for
+> additional optimizations such as Vitaly's "[PATCH 0/3] KVM: x86: KVM
+> MEM_PCI_HOLE memory":
 
-> > From: Alex Williamson <alex.williamson@redhat.com>
-> > Sent: Thursday, July 30, 2020 4:04 AM
-> > 
-> > On Thu, 16 Jul 2020 09:07:46 +0800
-> > Lu Baolu <baolu.lu@linux.intel.com> wrote:
-> >   
-> > > Hi Jacob,
-> > >
-> > > On 7/16/20 12:01 AM, Jacob Pan wrote:  
-> > > > On Wed, 15 Jul 2020 08:47:36 +0800
-> > > > Lu Baolu <baolu.lu@linux.intel.com> wrote:
-> > > >  
-> > > >> Hi Jacob,
-> > > >>
-> > > >> On 7/15/20 12:39 AM, Jacob Pan wrote:  
-> > > >>> On Tue, 14 Jul 2020 13:57:01 +0800
-> > > >>> Lu Baolu<baolu.lu@linux.intel.com>  wrote:
-> > > >>>  
-> > > >>>> This adds two new aux-domain APIs for a use case like vfio/mdev
-> > > >>>> where sub-devices derived from an aux-domain capable device are
-> > > >>>> created and put in an iommu_group.
-> > > >>>>
-> > > >>>> /**
-> > > >>>>    * iommu_aux_attach_group - attach an aux-domain to an  
-> > iommu_group  
-> > > >>>> which
-> > > >>>>    *                          contains sub-devices (for example
-> > > >>>> mdevs) derived
-> > > >>>>    *                          from @dev.
-> > > >>>>    * @domain: an aux-domain;
-> > > >>>>    * @group:  an iommu_group which contains sub-devices derived  
-> > from  
-> > > >>>> @dev;
-> > > >>>>    * @dev:    the physical device which supports  
-> > IOMMU_DEV_FEAT_AUX.  
-> > > >>>>    *
-> > > >>>>    * Returns 0 on success, or an error value.
-> > > >>>>    */
-> > > >>>> int iommu_aux_attach_group(struct iommu_domain *domain,
-> > > >>>>                              struct iommu_group *group,
-> > > >>>>                              struct device *dev)
-> > > >>>>
-> > > >>>> /**
-> > > >>>>    * iommu_aux_detach_group - detach an aux-domain from an
-> > > >>>> iommu_group *
-> > > >>>>    * @domain: an aux-domain;
-> > > >>>>    * @group:  an iommu_group which contains sub-devices derived  
-> > from  
-> > > >>>> @dev;
-> > > >>>>    * @dev:    the physical device which supports  
-> > IOMMU_DEV_FEAT_AUX.  
-> > > >>>>    *
-> > > >>>>    * @domain must have been attached to @group via
-> > > >>>> iommu_aux_attach_group(). */
-> > > >>>> void iommu_aux_detach_group(struct iommu_domain *domain,
-> > > >>>>                               struct iommu_group *group,
-> > > >>>>                               struct device *dev)
-> > > >>>>
-> > > >>>> It also adds a flag in the iommu_group data structure to identify
-> > > >>>> an iommu_group with aux-domain attached from those normal ones.
-> > > >>>>
-> > > >>>> Signed-off-by: Lu Baolu<baolu.lu@linux.intel.com>
-> > > >>>> ---
-> > > >>>>    drivers/iommu/iommu.c | 58
-> > > >>>> +++++++++++++++++++++++++++++++++++++++++++  
-> > include/linux/iommu.h |  
-> > > >>>> 17 +++++++++++++ 2 files changed, 75 insertions(+)
-> > > >>>>
-> > > >>>> diff --git a/drivers/iommu/iommu.c b/drivers/iommu/iommu.c
-> > > >>>> index e1fdd3531d65..cad5a19ebf22 100644
-> > > >>>> --- a/drivers/iommu/iommu.c
-> > > >>>> +++ b/drivers/iommu/iommu.c
-> > > >>>> @@ -45,6 +45,7 @@ struct iommu_group {
-> > > >>>>    	struct iommu_domain *default_domain;
-> > > >>>>    	struct iommu_domain *domain;
-> > > >>>>    	struct list_head entry;
-> > > >>>> +	unsigned int aux_domain_attached:1;
-> > > >>>>    };
-> > > >>>>
-> > > >>>>    struct group_device {
-> > > >>>> @@ -2759,6 +2760,63 @@ int iommu_aux_get_pasid(struct  
-> > iommu_domain  
-> > > >>>> *domain, struct device *dev) }
-> > > >>>>    EXPORT_SYMBOL_GPL(iommu_aux_get_pasid);
-> > > >>>>
-> > > >>>> +/**
-> > > >>>> + * iommu_aux_attach_group - attach an aux-domain to an  
-> > iommu_group  
-> > > >>>> which
-> > > >>>> + *                          contains sub-devices (for example
-> > > >>>> mdevs) derived
-> > > >>>> + *                          from @dev.
-> > > >>>> + * @domain: an aux-domain;
-> > > >>>> + * @group:  an iommu_group which contains sub-devices derived  
-> > from  
-> > > >>>> @dev;
-> > > >>>> + * @dev:    the physical device which supports  
-> > IOMMU_DEV_FEAT_AUX.  
-> > > >>>> + *
-> > > >>>> + * Returns 0 on success, or an error value.
-> > > >>>> + */
-> > > >>>> +int iommu_aux_attach_group(struct iommu_domain *domain,
-> > > >>>> +			   struct iommu_group *group, struct
-> > > >>>> device *dev) +{
-> > > >>>> +	int ret = -EBUSY;
-> > > >>>> +
-> > > >>>> +	mutex_lock(&group->mutex);
-> > > >>>> +	if (group->domain)
-> > > >>>> +		goto out_unlock;
-> > > >>>> +  
-> > > >>> Perhaps I missed something but are we assuming only one mdev per
-> > > >>> mdev group? That seems to change the logic where vfio does:
-> > > >>> iommu_group_for_each_dev()
-> > > >>> 	iommu_aux_attach_device()
-> > > >>>  
-> > > >>
-> > > >> It has been changed in PATCH 4/4:
-> > > >>
-> > > >> static int vfio_iommu_attach_group(struct vfio_domain *domain,
-> > > >>                                      struct vfio_group *group)
-> > > >> {
-> > > >>           if (group->mdev_group)
-> > > >>                   return iommu_aux_attach_group(domain->domain,
-> > > >>                                                 group->iommu_group,
-> > > >>                                                 group->iommu_device);
-> > > >>           else
-> > > >>                   return iommu_attach_group(domain->domain,
-> > > >> group->iommu_group);
-> > > >> }
-> > > >>
-> > > >> So, for both normal domain and aux-domain, we use the same concept:
-> > > >> attach a domain to a group.
-> > > >>  
-> > > > I get that, but don't you have to attach all the devices within the  
-> > >
-> > > This iommu_group includes only mediated devices derived from an
-> > > IOMMU_DEV_FEAT_AUX-capable device. Different from  
-> > iommu_attach_group(),  
-> > > iommu_aux_attach_group() doesn't need to attach the domain to each
-> > > device in group, instead it only needs to attach the domain to the
-> > > physical device where the mdev's were created from.
-> > >  
-> > > > group? Here you see the group already has a domain and exit.  
-> > >
-> > > If the (group->domain) has been set, that means a domain has already
-> > > attached to the group, so it returns -EBUSY.  
-> > 
-> > I agree with Jacob, singleton groups should not be built into the IOMMU
-> > API, we're not building an interface just for mdevs or current
-> > limitations of mdevs.  This also means that setting a flag on the group
-> > and passing a device that's assumed to be common for all devices within
-> > the group, don't really make sense here.  Thanks,
-> > 
-> > Alex  
-> 
-> Baolu and I discussed about this assumption before. The assumption is
-> not based on singleton groups. We do consider multiple mdevs in one
-> group. But our feeling at the moment is that all mdevs (or other AUX
-> derivatives) in the same group should come from the same parent 
-> device, thus comes with above design. Does it sound a reasonable
-> assumption to you?
+> https://lore.kernel.org/kvm/20200728143741.2718593-1-vkuznets@redhat.com
 
-No, the approach in this series doesn't really make sense to me.  We
-currently have the following workflow as Baolu notes in the cover
-letter:
+You may use Link: tag for this.
 
-	domain = iommu_domain_alloc(bus);
+> However, this change will not bring significant performance improvement
+> unless it is running on x86 within a hypervisor. Moreover, allowing
+> MMCONFIG access for addresses < 256 can be dangerous for some devices:
+> see commit a0ca99096094 ("PCI x86: always use conf1 to access config
+> space below 256 bytes"). That is why a special feature flag is needed.
+>
+> Introduce KVM_FEATURE_PCI_GO_MMCONFIG, which can be enabled when the
+> configuration is known to be safe (e.g. in QEMU).
 
-	iommu_group_for_each_dev(group... 
+...
 
-		iommu_device = mdev-magic()
+> +static int __init kvm_pci_arch_init(void)
+> +{
+> +       if (raw_pci_ext_ops &&
+> +           kvm_para_has_feature(KVM_FEATURE_PCI_GO_MMCONFIG)) {
 
-		if (iommu_dev_feature_enabled(iommu_device,
-						IOMMU_DEV_FEAT_AUX))
-			iommu_aux_attach_device(domain, iommu_device);
+Better to use traditional pattern, i.e.
+  if (not_supported)
+    return bail_out;
 
-And we want to convert this to a group function, like we have for
-non-aux domains:
+  ...do useful things...
+  return 0;
 
-	domain = iommu_domain_alloc(bus);
+> +               pr_info("PCI: Using MMCONFIG for base access\n");
+> +               raw_pci_ops = raw_pci_ext_ops;
+> +               return 0;
+> +       }
 
-	iommu_device = mdev-magic()
+> +       return 1;
 
-	iommu_aux_attach_group(domain, group, iommu_device);
+Hmm... I don't remember what positive codes means there. Perhaps you
+need to return a rather error code?
 
-And I think we want to do that largely because iommu_group.domain is
-private to iommu.c (therefore vfio code cannot set it), but we need it
-set in order for iommu_get_domain_for_dev() to work with a group
-attached to an aux domain.  Passing an iommu_device avoids the problem
-that IOMMU API code doesn't know how to derive an iommu_device for each
-device in the group, but while doing so it ignores the fundamental
-nature of a group as being a set of one or more devices.  Even if we
-can make the leap that all devices within the group would use the same
-iommu_device, an API that sets and aux domain for a group while
-entirely ignoring the devices within the group seems very broken.
+> +}
 
-So, barring adding an abstraction at struct device where an IOMMU API
-could retrieve the iommu_device backing anther device (which seems a
-very abstract concept for the base class), why not have the caller
-provide a lookup function?  Ex:
-
-int iommu_aux_attach_group(struct iommu_domain *domain,
-			   struct iommu_group *group,
-			   struct device *(*iommu_device_lookup)(
-				struct device *dev));
-
-Thus vfio could could simply provide &vfio_mdev_get_iommu_device and
-we'd have equivalent functionality to what we have currently, but with
-the domain pointer set in the iommu_group.
-
-This also however highlights that our VF backed mdevs will have the
-same issue, so maybe this new IOMMU API interface should mimic
-vfio_mdev_attach_domain() more directly, testing whether the resulting
-device supports IOMMU_DEV_FEAT_AUX and using an aux vs non-aux attach.
-I'm not sure what the name of this combined function should be,
-iommu_attach_group_with_lookup()?  This could be the core
-implementation of iommu_attach_group() where the existing function
-simply wraps the call with a NULL function pointer.
-
-Anyway, I think there are ways to implement this that are more in line
-with the spirit of groups.  Thanks,
-
-Alex
-
+-- 
+With Best Regards,
+Andy Shevchenko
