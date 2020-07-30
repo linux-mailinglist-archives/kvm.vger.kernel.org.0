@@ -2,200 +2,114 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 85150233A69
-	for <lists+kvm@lfdr.de>; Thu, 30 Jul 2020 23:17:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5EC5B233B07
+	for <lists+kvm@lfdr.de>; Thu, 30 Jul 2020 23:58:30 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730626AbgG3VRO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 30 Jul 2020 17:17:14 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:25934 "EHLO
+        id S1730651AbgG3V62 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 30 Jul 2020 17:58:28 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:21136 "EHLO
         us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1730493AbgG3VRO (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 30 Jul 2020 17:17:14 -0400
+        by vger.kernel.org with ESMTP id S1730635AbgG3V62 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 30 Jul 2020 17:58:28 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1596143830;
+        s=mimecast20190719; t=1596146307;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=bZGuV4rD0Ceq1ep6s52mf/yK6aOPC8Nt7kiDKbGKZCM=;
-        b=fSD5EdSO4Nry2NbMtGCBXHpYrFugAVbC9tkpespU/M+T6/H60af3AvbeEfXb5bwupHm6Wo
-        JpDKJEyb5PqHjcrbr89Ft3/exIDM4FvC+IcUKDDNtkC4v5YQ7vNaRAbJP7mVrjDsCEqhY8
-        mg87dFG8lwmzXvMNYApNlZMzdPiF818=
+         to:to:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=+1f/uSLSGKmf8jEEPF1yVvJi+XRpXH6xSbKl2HyV+QQ=;
+        b=QJRhiUGR8rbqoBHU25qB9Vvr2W1RXtIf/IHEXwARyvLokVr0xrogVZILJEv9GnmcLpc7sP
+        UnEy4MT9wN4jAqXhqktXSWHYsTpBEy6+rjrmgr5BJA5rHHN0tbahejyHe5Inj/ya5zXvdO
+        9Njnz3ZoB168fQhI5X+nVkUtwn3lP0o=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-180-x-mLPphPMe-v_LHwNhgtoA-1; Thu, 30 Jul 2020 17:17:06 -0400
-X-MC-Unique: x-mLPphPMe-v_LHwNhgtoA-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+ us-mta-63-xh4orQasNqKZzJK2iyoAaw-1; Thu, 30 Jul 2020 17:58:11 -0400
+X-MC-Unique: xh4orQasNqKZzJK2iyoAaw-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B53B1100A8F2;
-        Thu, 30 Jul 2020 21:17:04 +0000 (UTC)
-Received: from x1.home (ovpn-112-71.phx2.redhat.com [10.3.112.71])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id C301519D7B;
-        Thu, 30 Jul 2020 21:17:03 +0000 (UTC)
-Date:   Thu, 30 Jul 2020 15:17:03 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Lu Baolu <baolu.lu@linux.intel.com>
-Cc:     Joerg Roedel <joro@8bytes.org>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Jean-Philippe Brucker <jean-philippe@linaro.org>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Kevin Tian <kevin.tian@intel.com>,
-        Ashok Raj <ashok.raj@intel.com>,
-        Dave Jiang <dave.jiang@intel.com>,
-        Liu Yi L <yi.l.liu@intel.com>,
-        iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Subject: Re: [PATCH v3 4/4] vfio/type1: Use iommu_aux_at(de)tach_group()
- APIs
-Message-ID: <20200730151703.5daf8ad4@x1.home>
-In-Reply-To: <af6c95a7-3238-1cbd-8656-014c12498587@linux.intel.com>
-References: <20200714055703.5510-1-baolu.lu@linux.intel.com>
-        <20200714055703.5510-5-baolu.lu@linux.intel.com>
-        <20200729143258.22533170@x1.home>
-        <af6c95a7-3238-1cbd-8656-014c12498587@linux.intel.com>
-Organization: Red Hat
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8D77F800685
+        for <kvm@vger.kernel.org>; Thu, 30 Jul 2020 21:58:10 +0000 (UTC)
+Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 5A40569335
+        for <kvm@vger.kernel.org>; Thu, 30 Jul 2020 21:58:10 +0000 (UTC)
+From:   Paolo Bonzini <pbonzini@redhat.com>
+To:     kvm@vger.kernel.org
+Subject: [PATCH kvm-unit-tests] fw_cfg: avoid index out of bounds
+Date:   Thu, 30 Jul 2020 17:58:09 -0400
+Message-Id: <20200730215809.1970-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 30 Jul 2020 10:41:32 +0800
-Lu Baolu <baolu.lu@linux.intel.com> wrote:
+clang compilation fails with
 
-> Hi Alex,
-> 
-> On 7/30/20 4:32 AM, Alex Williamson wrote:
-> > On Tue, 14 Jul 2020 13:57:03 +0800
-> > Lu Baolu <baolu.lu@linux.intel.com> wrote:
-> >   
-> >> Replace iommu_aux_at(de)tach_device() with iommu_aux_at(de)tach_group().
-> >> It also saves the IOMMU_DEV_FEAT_AUX-capable physcail device in the
-> >> vfio_group data structure so that it could be reused in other places.
-> >>
-> >> Signed-off-by: Lu Baolu <baolu.lu@linux.intel.com>
-> >> ---
-> >>   drivers/vfio/vfio_iommu_type1.c | 44 ++++++---------------------------
-> >>   1 file changed, 7 insertions(+), 37 deletions(-)
-> >>
-> >> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-> >> index 5e556ac9102a..f8812e68de77 100644
-> >> --- a/drivers/vfio/vfio_iommu_type1.c
-> >> +++ b/drivers/vfio/vfio_iommu_type1.c
-> >> @@ -100,6 +100,7 @@ struct vfio_dma {
-> >>   struct vfio_group {
-> >>   	struct iommu_group	*iommu_group;
-> >>   	struct list_head	next;
-> >> +	struct device		*iommu_device;
-> >>   	bool			mdev_group;	/* An mdev group */
-> >>   	bool			pinned_page_dirty_scope;
-> >>   };
-> >> @@ -1627,45 +1628,13 @@ static struct device *vfio_mdev_get_iommu_device(struct device *dev)
-> >>   	return NULL;
-> >>   }
-> >>   
-> >> -static int vfio_mdev_attach_domain(struct device *dev, void *data)
-> >> -{
-> >> -	struct iommu_domain *domain = data;
-> >> -	struct device *iommu_device;
-> >> -
-> >> -	iommu_device = vfio_mdev_get_iommu_device(dev);
-> >> -	if (iommu_device) {
-> >> -		if (iommu_dev_feature_enabled(iommu_device, IOMMU_DEV_FEAT_AUX))
-> >> -			return iommu_aux_attach_device(domain, iommu_device);
-> >> -		else
-> >> -			return iommu_attach_device(domain, iommu_device);
-> >> -	}
-> >> -
-> >> -	return -EINVAL;
-> >> -}
-> >> -
-> >> -static int vfio_mdev_detach_domain(struct device *dev, void *data)
-> >> -{
-> >> -	struct iommu_domain *domain = data;
-> >> -	struct device *iommu_device;
-> >> -
-> >> -	iommu_device = vfio_mdev_get_iommu_device(dev);
-> >> -	if (iommu_device) {
-> >> -		if (iommu_dev_feature_enabled(iommu_device, IOMMU_DEV_FEAT_AUX))
-> >> -			iommu_aux_detach_device(domain, iommu_device);
-> >> -		else
-> >> -			iommu_detach_device(domain, iommu_device);
-> >> -	}
-> >> -
-> >> -	return 0;
-> >> -}
-> >> -
-> >>   static int vfio_iommu_attach_group(struct vfio_domain *domain,
-> >>   				   struct vfio_group *group)
-> >>   {
-> >>   	if (group->mdev_group)
-> >> -		return iommu_group_for_each_dev(group->iommu_group,
-> >> -						domain->domain,
-> >> -						vfio_mdev_attach_domain);
-> >> +		return iommu_aux_attach_group(domain->domain,
-> >> +					      group->iommu_group,
-> >> +					      group->iommu_device);  
-> > 
-> > No, we previously iterated all devices in the group and used the aux
-> > interface only when we have an iommu_device supporting aux.  If we
-> > simply assume an mdev group only uses an aux domain we break existing
-> > users, ex. SR-IOV VF backed mdevs.  Thanks,  
-> 
-> Oh, yes. Sorry! I didn't consider the physical device backed mdevs
-> cases.
-> 
-> Looked into this part of code, it seems that there's a lock issue here.
-> The group->mutex is held in iommu_group_for_each_dev() and will be
-> acquired again in iommu_attach_device().
+lib/x86/fwcfg.c:32:3: error: array index 17 is past the end of the array (which contains 16 elements) [-Werror,-Warray-bounds]
+                fw_override[FW_CFG_MAX_RAM] = atol(str) * 1024 * 1024;
 
-These are two different groups.  We walk the devices in the mdev's
-group with iommu_group_for_each_dev(), holding the mdev's group lock,
-but we call iommu_attach_device() with iommu_device, which results in
-acquiring the lock for the iommu_device's group.
+The reason is that FW_CFG_MAX_RAM does not exist in the fw-cfg spec and was
+added for bare metal support.  Fix the size of the array and rename FW_CFG_MAX_ENTRY
+to FW_CFG_NUM_ENTRIES, so that it is clear that it must be one plus the
+highest valid entry.
 
-> How about making it like:
-> 
-> static int vfio_iommu_attach_group(struct vfio_domain *domain,
->                                     struct vfio_group *group)
-> {
->          if (group->mdev_group) {
->                  struct device *iommu_device = group->iommu_device;
-> 
->                  if (WARN_ON(!iommu_device))
->                          return -EINVAL;
-> 
->                  if (iommu_dev_feature_enabled(iommu_device, 
-> IOMMU_DEV_FEAT_AUX))
->                          return iommu_aux_attach_device(domain->domain, 
-> iommu_device);
->                  else
->                          return iommu_attach_device(domain->domain, 
-> iommu_device);
->          } else {
->                  return iommu_attach_group(domain->domain, 
-> group->iommu_group);
->          }
-> }
-> 
-> The caller (vfio_iommu_type1_attach_group) has guaranteed that all mdevs
-> in an iommu group should be derived from a same physical device.
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ lib/x86/fwcfg.c | 6 +++---
+ lib/x86/fwcfg.h | 5 ++++-
+ 2 files changed, 7 insertions(+), 4 deletions(-)
 
-Have we?  iommu_attach_device() will fail if the group is not
-singleton, but that's just encouraging us to use the _attach_group()
-interface where the _attach_device() interface is relegated to special
-cases.  Ideally we'd get out of those special cases and create an
-_attach_group() for aux that doesn't further promote these notions.
-
-> Any thoughts?
-
-See my reply to Kevin, I'm thinking we need to provide a callback that
-can enlighten the IOMMU layer to be able to do _attach_group() with
-aux or separate IOMMU backed devices.  Thanks,
-
-Alex
+diff --git a/lib/x86/fwcfg.c b/lib/x86/fwcfg.c
+index c2aaf5a..1734afb 100644
+--- a/lib/x86/fwcfg.c
++++ b/lib/x86/fwcfg.c
+@@ -4,7 +4,7 @@
+ 
+ static struct spinlock lock;
+ 
+-static long fw_override[FW_CFG_MAX_ENTRY];
++static long fw_override[FW_CFG_NUM_ENTRIES];
+ static bool fw_override_done;
+ 
+ bool no_test_device;
+@@ -15,7 +15,7 @@ static void read_cfg_override(void)
+ 	int i;
+ 
+ 	/* Initialize to negative value that would be considered as invalid */
+-	for (i = 0; i < FW_CFG_MAX_ENTRY; i++)
++	for (i = 0; i < FW_CFG_NUM_ENTRIES; i++)
+ 		fw_override[i] = -1;
+ 
+ 	if ((str = getenv("NR_CPUS")))
+@@ -44,7 +44,7 @@ static uint64_t fwcfg_get_u(uint16_t index, int bytes)
+     if (!fw_override_done)
+         read_cfg_override();
+ 
+-    if (index < FW_CFG_MAX_ENTRY && fw_override[index] >= 0)
++    if (index < FW_CFG_NUM_ENTRIES && fw_override[index] >= 0)
+ 	    return fw_override[index];
+ 
+     spin_lock(&lock);
+diff --git a/lib/x86/fwcfg.h b/lib/x86/fwcfg.h
+index 64d4c6e..ac4257e 100644
+--- a/lib/x86/fwcfg.h
++++ b/lib/x86/fwcfg.h
+@@ -20,9 +20,12 @@
+ #define FW_CFG_NUMA             0x0d
+ #define FW_CFG_BOOT_MENU        0x0e
+ #define FW_CFG_MAX_CPUS         0x0f
+-#define FW_CFG_MAX_ENTRY        0x10
++
++/* Dummy entries used when running on bare metal */
+ #define FW_CFG_MAX_RAM		0x11
+ 
++#define FW_CFG_NUM_ENTRIES      (FW_CFG_MAX_RAM + 1)
++
+ #define FW_CFG_WRITE_CHANNEL    0x4000
+ #define FW_CFG_ARCH_LOCAL       0x8000
+ #define FW_CFG_ENTRY_MASK       ~(FW_CFG_WRITE_CHANNEL | FW_CFG_ARCH_LOCAL)
+-- 
+2.26.2
 
