@@ -2,116 +2,200 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0BD7D233954
-	for <lists+kvm@lfdr.de>; Thu, 30 Jul 2020 21:50:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3D4E123399E
+	for <lists+kvm@lfdr.de>; Thu, 30 Jul 2020 22:17:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730600AbgG3Tuq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 30 Jul 2020 15:50:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48298 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730377AbgG3Tuq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 30 Jul 2020 15:50:46 -0400
-Received: from mail-pl1-x643.google.com (mail-pl1-x643.google.com [IPv6:2607:f8b0:4864:20::643])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2FD3BC061574;
-        Thu, 30 Jul 2020 12:50:46 -0700 (PDT)
-Received: by mail-pl1-x643.google.com with SMTP id t10so9795163plz.10;
-        Thu, 30 Jul 2020 12:50:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=tMXvAgV7y7E7g3D1Q8GTY7E552yzOC14eLgZur5bOX4=;
-        b=kxVJFfipNn+Aa+QD1px2nW0qiEiM/lI4U7W6jk2kqnzMFytG1ybU18pP4MGcrHhYnT
-         ZF06DS+lPzJ41rC7TqP6wDhYI8yiae9n4SjJODgj1Hj1CqMErax8rYP3TlyL/cpsahCl
-         vvpw9ksu8nT2OhyGyOLfRIlMQQUTXGxyq0009jfWcozRK5tLt0bpJpl+K3RqM7Vg70b8
-         pH0GI+TmKPzT0JdOgMH+P3uNQKIMU6EpvTI7x7pxYXyx6uq8E5M4l7vt7CoPtZYQREfo
-         X0j97FndDgTSJ092q5QwCB1MporPW5eoJXTXt6mXHOB3gEwdnSZZ55PfIAyu7kwJBEKf
-         IPzA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=tMXvAgV7y7E7g3D1Q8GTY7E552yzOC14eLgZur5bOX4=;
-        b=CNpi0TmsbEL//SUb0GNdYR8X3yOc6DIr0c5Q9qZISPxDX5AqJGskdVXgnBA3qfLm+R
-         ZRcvb3l4cncKoRnJhOrZjdPx82/Exq42jN52j8EbPBYHTJ7p3W9dJiQgrLPoUxcpNT4y
-         fGLuUhI4S2MHlBSPbckkqEvXoNCZic9DpzDqlFnWlbWQt29e5MArkG3EToygNOP4PQHx
-         46yHa65kjgY4Md7lDFfPJHvlZWoVcLNzUREIF8ik97tKCa9luQPPjhL0gXHfAEifyifD
-         jr0Kp8/H9fM4NeXKCBRuTJqdMNdqwFT6+vzLr8yozniOrXhgk1qdfwKX3C4URlPC9iwh
-         yeNg==
-X-Gm-Message-State: AOAM532+jQ4xajOzoFv1RxrUZpeV0aklb20qznCdb2C5rH4rlHxRtE6Q
-        N1cylgISST9KyXFADCWtFkACWa0DzJBDV5rz7I8=
-X-Google-Smtp-Source: ABdhPJy3/p35FG9tefm9R+LVBFlJys79Eb4rSZlOzkM8ZMdIR5Ub5tAyBAc6UmBduAWzlHFwoqdkyJyAXBlq9OwW6mk=
-X-Received: by 2002:a17:90a:a393:: with SMTP id x19mr707926pjp.228.1596138645586;
- Thu, 30 Jul 2020 12:50:45 -0700 (PDT)
+        id S1730357AbgG3URg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 30 Jul 2020 16:17:36 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:28110 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726495AbgG3URg (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 30 Jul 2020 16:17:36 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1596140254;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=LSG66HoNLmBtxPByeCF0UpAy3dBM2fYznxaZ+/uxjK0=;
+        b=ZLWh+hZ0q9/fW6mqYnaHR1Ue268MIk5MfHJ58eazTtvxZFxi5PyAOtZ/yRn9g2bsqH4hOG
+        7bbwFmQex7Pg/v5Lf4VjRaJwtJkFLPZ/5nYv0mXQi07hqn7Z1jdd8VgI4XQH8Ad/MZwKxv
+        JQbDPkxhUQJENClIpmGzYA3n/sRLIhc=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-278-dgqAD41JNK6CSATW3me9kw-1; Thu, 30 Jul 2020 16:17:29 -0400
+X-MC-Unique: dgqAD41JNK6CSATW3me9kw-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AE7CA107ACCA;
+        Thu, 30 Jul 2020 20:17:27 +0000 (UTC)
+Received: from x1.home (ovpn-112-71.phx2.redhat.com [10.3.112.71])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 68E2E7C0E2;
+        Thu, 30 Jul 2020 20:17:26 +0000 (UTC)
+Date:   Thu, 30 Jul 2020 14:17:25 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     "Tian, Kevin" <kevin.tian@intel.com>
+Cc:     Lu Baolu <baolu.lu@linux.intel.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Jean-Philippe Brucker <jean-philippe@linaro.org>,
+        Cornelia Huck <cohuck@redhat.com>,
+        "Raj, Ashok" <ashok.raj@intel.com>,
+        "Jiang, Dave" <dave.jiang@intel.com>,
+        "Liu, Yi L" <yi.l.liu@intel.com>,
+        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Subject: Re: [PATCH v3 3/4] iommu: Add iommu_aux_get_domain_for_dev()
+Message-ID: <20200730141725.5f63b508@x1.home>
+In-Reply-To: <MWHPR11MB1645736D9ED91A95D1D4519A8C700@MWHPR11MB1645.namprd11.prod.outlook.com>
+References: <20200714055703.5510-1-baolu.lu@linux.intel.com>
+        <20200714055703.5510-4-baolu.lu@linux.intel.com>
+        <20200729142507.182cd18a@x1.home>
+        <MWHPR11MB1645736D9ED91A95D1D4519A8C700@MWHPR11MB1645.namprd11.prod.outlook.com>
+Organization: Red Hat
 MIME-Version: 1.0
-References: <20200730193510.578309-1-jusual@redhat.com>
-In-Reply-To: <20200730193510.578309-1-jusual@redhat.com>
-From:   Andy Shevchenko <andy.shevchenko@gmail.com>
-Date:   Thu, 30 Jul 2020 22:50:29 +0300
-Message-ID: <CAHp75VcyRjAr3ugmAWYcKMrAeea6ioQOPfJnj-Srntdg_W8ScQ@mail.gmail.com>
-Subject: Re: [PATCH] KVM: x86: Use MMCONFIG for all PCI config space accesses
-To:     Julia Suvorova <jusual@redhat.com>
-Cc:     "open list:VFIO DRIVER" <kvm@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Bjorn Helgaas <helgaas@kernel.org>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Matthew Wilcox <willy@infradead.org>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jul 30, 2020 at 10:37 PM Julia Suvorova <jusual@redhat.com> wrote:
->
-> Using MMCONFIG instead of I/O ports cuts the number of config space
-> accesses in half, which is faster on KVM and opens the door for
-> additional optimizations such as Vitaly's "[PATCH 0/3] KVM: x86: KVM
-> MEM_PCI_HOLE memory":
+On Wed, 29 Jul 2020 23:49:20 +0000
+"Tian, Kevin" <kevin.tian@intel.com> wrote:
 
-> https://lore.kernel.org/kvm/20200728143741.2718593-1-vkuznets@redhat.com
+> > From: Alex Williamson <alex.williamson@redhat.com>
+> > Sent: Thursday, July 30, 2020 4:25 AM
+> > 
+> > On Tue, 14 Jul 2020 13:57:02 +0800
+> > Lu Baolu <baolu.lu@linux.intel.com> wrote:
+> >   
+> > > The device driver needs an API to get its aux-domain. A typical usage
+> > > scenario is:
+> > >
+> > >         unsigned long pasid;
+> > >         struct iommu_domain *domain;
+> > >         struct device *dev = mdev_dev(mdev);
+> > >         struct device *iommu_device = vfio_mdev_get_iommu_device(dev);
+> > >
+> > >         domain = iommu_aux_get_domain_for_dev(dev);
+> > >         if (!domain)
+> > >                 return -ENODEV;
+> > >
+> > >         pasid = iommu_aux_get_pasid(domain, iommu_device);
+> > >         if (pasid <= 0)
+> > >                 return -EINVAL;
+> > >
+> > >          /* Program the device context */
+> > >          ....
+> > >
+> > > This adds an API for such use case.
+> > >
+> > > Suggested-by: Alex Williamson <alex.williamson@redhat.com>
+> > > Signed-off-by: Lu Baolu <baolu.lu@linux.intel.com>
+> > > ---
+> > >  drivers/iommu/iommu.c | 18 ++++++++++++++++++
+> > >  include/linux/iommu.h |  7 +++++++
+> > >  2 files changed, 25 insertions(+)
+> > >
+> > > diff --git a/drivers/iommu/iommu.c b/drivers/iommu/iommu.c
+> > > index cad5a19ebf22..434bf42b6b9b 100644
+> > > --- a/drivers/iommu/iommu.c
+> > > +++ b/drivers/iommu/iommu.c
+> > > @@ -2817,6 +2817,24 @@ void iommu_aux_detach_group(struct  
+> > iommu_domain *domain,  
+> > >  }
+> > >  EXPORT_SYMBOL_GPL(iommu_aux_detach_group);
+> > >
+> > > +struct iommu_domain *iommu_aux_get_domain_for_dev(struct device  
+> > *dev)  
+> > > +{
+> > > +	struct iommu_domain *domain = NULL;
+> > > +	struct iommu_group *group;
+> > > +
+> > > +	group = iommu_group_get(dev);
+> > > +	if (!group)
+> > > +		return NULL;
+> > > +
+> > > +	if (group->aux_domain_attached)
+> > > +		domain = group->domain;  
+> > 
+> > Why wouldn't the aux domain flag be on the domain itself rather than
+> > the group?  Then if we wanted sanity checking in patch 1/ we'd only
+> > need to test the flag on the object we're provided.
+> > 
+> > If we had such a flag, we could create an iommu_domain_is_aux()
+> > function and then simply use iommu_get_domain_for_dev() and test that
+> > it's an aux domain in the example use case.  It seems like that would  
+> 
+> IOMMU layer manages domains per parent device. Here given a
 
-You may use Link: tag for this.
+Is this the IOMMU layer or the VT-d driver?  I don't see any notion of
+managing domains relative to a parent in the IOMMU layer.  Please point
+to something more specific if I'm wrong here.
 
-> However, this change will not bring significant performance improvement
-> unless it is running on x86 within a hypervisor. Moreover, allowing
-> MMCONFIG access for addresses < 256 can be dangerous for some devices:
-> see commit a0ca99096094 ("PCI x86: always use conf1 to access config
-> space below 256 bytes"). That is why a special feature flag is needed.
->
-> Introduce KVM_FEATURE_PCI_GO_MMCONFIG, which can be enabled when the
-> configuration is known to be safe (e.g. in QEMU).
+> dev (of mdev), we need a way to find its associated domain under its
+> parent device. And we cannot simply use iommu_get_domain_for_dev
+> on the parent device of the mdev, as it will give us the primary domain
+> of parent device. 
 
-...
+Not the parent device of the mdev, but the mdev_dev(mdev) device.
+Isn't that what this series is enabling, being able to return the
+domain from the group that contains the mdev_dev?  We shouldn't need to
+leave breadcrumbs on the group to know about the domain, the domain
+itself should be the source of knowledge, or provide a mechanism/ops to
+learn that knowledge.  Thanks,
 
-> +static int __init kvm_pci_arch_init(void)
-> +{
-> +       if (raw_pci_ext_ops &&
-> +           kvm_para_has_feature(KVM_FEATURE_PCI_GO_MMCONFIG)) {
+Alex
 
-Better to use traditional pattern, i.e.
-  if (not_supported)
-    return bail_out;
 
-  ...do useful things...
-  return 0;
+> > resolve the jump from a domain to an aux-domain just as well as adding
+> > this separate iommu_aux_get_domain_for_dev() interface.  The is_aux
+> > test might also be useful in other cases too.  Thanks,
+> > 
+> > Alex
+> >   
+> > > +
+> > > +	iommu_group_put(group);
+> > > +
+> > > +	return domain;
+> > > +}
+> > > +EXPORT_SYMBOL_GPL(iommu_aux_get_domain_for_dev);
+> > > +
+> > >  /**
+> > >   * iommu_sva_bind_device() - Bind a process address space to a device
+> > >   * @dev: the device
+> > > diff --git a/include/linux/iommu.h b/include/linux/iommu.h
+> > > index 9506551139ab..cda6cef7579e 100644
+> > > --- a/include/linux/iommu.h
+> > > +++ b/include/linux/iommu.h
+> > > @@ -639,6 +639,7 @@ int iommu_aux_attach_group(struct  
+> > iommu_domain *domain,  
+> > >  			   struct iommu_group *group, struct device *dev);
+> > >  void iommu_aux_detach_group(struct iommu_domain *domain,
+> > >  			   struct iommu_group *group, struct device *dev);
+> > > +struct iommu_domain *iommu_aux_get_domain_for_dev(struct device  
+> > *dev);  
+> > >
+> > >  struct iommu_sva *iommu_sva_bind_device(struct device *dev,
+> > >  					struct mm_struct *mm,
+> > > @@ -1040,6 +1041,12 @@ iommu_aux_detach_group(struct  
+> > iommu_domain *domain,  
+> > >  {
+> > >  }
+> > >
+> > > +static inline struct iommu_domain *
+> > > +iommu_aux_get_domain_for_dev(struct device *dev)
+> > > +{
+> > > +	return NULL;
+> > > +}
+> > > +
+> > >  static inline struct iommu_sva *
+> > >  iommu_sva_bind_device(struct device *dev, struct mm_struct *mm, void  
+> > *drvdata)  
+> > >  {  
+> 
 
-> +               pr_info("PCI: Using MMCONFIG for base access\n");
-> +               raw_pci_ops = raw_pci_ext_ops;
-> +               return 0;
-> +       }
-
-> +       return 1;
-
-Hmm... I don't remember what positive codes means there. Perhaps you
-need to return a rather error code?
-
-> +}
-
--- 
-With Best Regards,
-Andy Shevchenko
