@@ -2,107 +2,146 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D52A023390E
-	for <lists+kvm@lfdr.de>; Thu, 30 Jul 2020 21:30:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 02AAD233921
+	for <lists+kvm@lfdr.de>; Thu, 30 Jul 2020 21:37:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730486AbgG3TaH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 30 Jul 2020 15:30:07 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:43272 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726853AbgG3TaH (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 30 Jul 2020 15:30:07 -0400
+        id S1727972AbgG3ThM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 30 Jul 2020 15:37:12 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:41436 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726650AbgG3ThL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 30 Jul 2020 15:37:11 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1596137406;
+        s=mimecast20190719; t=1596137830;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type;
-        bh=Zo62zBr05G4i/w6uOCrF5bcIwehfjUuSBLT3HlEcuYQ=;
-        b=TK4/ArutFiX30RTVSeQP72Z2Gg3T069qDEa8QhEdpHXY4H9Wb9h/Q4PtRO7epGbvlxFCR6
-        b7xh+gPHuedTwoEnaJewZS1w/y+Nxl6KOj3YtkbirOPQVc/+g6xkdBIucTEE8VtXApf05t
-        HdtsZRI1T2jnHEfDUECFPrFB3Ys83mA=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-54-QKL0iWxkNVC7_REwZ5NrHw-1; Thu, 30 Jul 2020 15:30:04 -0400
-X-MC-Unique: QKL0iWxkNVC7_REwZ5NrHw-1
-Received: by mail-wr1-f70.google.com with SMTP id j16so8341336wrw.3
-        for <kvm@vger.kernel.org>; Thu, 30 Jul 2020 12:30:04 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:mime-version
-         :content-disposition;
-        bh=Zo62zBr05G4i/w6uOCrF5bcIwehfjUuSBLT3HlEcuYQ=;
-        b=pMu+rGIQOXWiASM29rI/HxGXPUEgciNPy0lROlNtLHP4uqCp10+U9XWvx0UipMdQ2n
-         Ton8/3kk17w9LoLST9vwCTgeZ9LQLHeAfpn6nOPB8lNyTSTG/6a5YSfwA4h2F22VEAyn
-         Fgp8GcklsoXmhhP3pyyI24zN4GCWwDuNaNi9RuUVDGfoWQSFKyOtceGytR3SN+Dqy9Fx
-         0xey4aJ9cF70mD2Ym5U0lF7aYwtSpHvoRS945l2nTSwr0egN7XlDcvYeInh/FJ4KO4Fg
-         JImMMh9UndBEemGKp/2J1DVNFiJWqoO2CFnZ2vla20dFTPs9mY0Tf+qSAM0s5juK2bEl
-         wp8A==
-X-Gm-Message-State: AOAM53315x3EZhZovYgluwcWc5EXfQPVIX0qizDHNSDa6YrhorVLgQmQ
-        R2g3WflLfwXP8OY4itBpFJXLu+vaFZjOrzwGAzWJ18Cw9J6meaSAYN3ko7sB9+COn3PECzgLdT6
-        ZMAsuMMCJJUNP
-X-Received: by 2002:a5d:538a:: with SMTP id d10mr267393wrv.280.1596137403065;
-        Thu, 30 Jul 2020 12:30:03 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxM38R/gaJ4B9lHJnwY7CoXgiuKGr1JOva2N2K51sHps4St8QHQsZSys7gU+zLzyFwcYWboVQ==
-X-Received: by 2002:a5d:538a:: with SMTP id d10mr267372wrv.280.1596137402764;
-        Thu, 30 Jul 2020 12:30:02 -0700 (PDT)
-Received: from redhat.com (bzq-79-179-105-63.red.bezeqint.net. [79.179.105.63])
-        by smtp.gmail.com with ESMTPSA id w64sm9081104wmb.26.2020.07.30.12.29.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 30 Jul 2020 12:30:01 -0700 (PDT)
-Date:   Thu, 30 Jul 2020 15:29:58 -0400
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-        alexander.h.duyck@linux.intel.com, chenweilong@huawei.com,
-        david@redhat.com, jasowang@redhat.com, mst@redhat.com,
-        rdunlap@infradead.org, stable@vger.kernel.org, wu000273@umn.edu
-Subject: [GIT PULL] virtio, qemu_fw: bugfixes
-Message-ID: <20200730152958-mutt-send-email-mst@kernel.org>
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=evGWKkVwKQbCUf877DPL3WNOIsuP9Jsv7c2BA2D1qwo=;
+        b=cJ5Ex6muHurYQD1DoKzGQr/Vdh7V42t/Vj9qJUr/8nUiG7+2cby5WJJDEUElqi0DoXSaNC
+        cJaDUQ7IqpUkJRvpcM/kXHKqvJr8pXDeTnznYJEhKjptyTrGLTZOSOMvpsATVM4fACglib
+        Jkja/9l/xKbu9HDhbP4LfNEL3HJx570=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-476-PkkDqE-UMYi3wYkWz6A3QQ-1; Thu, 30 Jul 2020 15:37:07 -0400
+X-MC-Unique: PkkDqE-UMYi3wYkWz6A3QQ-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DFC11102C7EE;
+        Thu, 30 Jul 2020 19:37:05 +0000 (UTC)
+Received: from localhost.localdomain.com (unknown [10.40.192.46])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 735A51002393;
+        Thu, 30 Jul 2020 19:36:45 +0000 (UTC)
+From:   Julia Suvorova <jusual@redhat.com>
+To:     kvm@vger.kernel.org
+Cc:     linux-kernel@vger.kernel.org, Bjorn Helgaas <helgaas@kernel.org>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Matthew Wilcox <willy@infradead.org>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Andy Shevchenko <andy.shevchenko@gmail.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Julia Suvorova <jusual@redhat.com>
+Subject: [PATCH] KVM: x86: Use MMCONFIG for all PCI config space accesses
+Date:   Thu, 30 Jul 2020 21:35:10 +0200
+Message-Id: <20200730193510.578309-1-jusual@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-X-Mutt-Fcc: =sent
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The following changes since commit 92ed301919932f777713b9172e525674157e983d:
+Using MMCONFIG instead of I/O ports cuts the number of config space
+accesses in half, which is faster on KVM and opens the door for
+additional optimizations such as Vitaly's "[PATCH 0/3] KVM: x86: KVM
+MEM_PCI_HOLE memory":
+https://lore.kernel.org/kvm/20200728143741.2718593-1-vkuznets@redhat.com
 
-  Linux 5.8-rc7 (2020-07-26 14:14:06 -0700)
+However, this change will not bring significant performance improvement
+unless it is running on x86 within a hypervisor. Moreover, allowing
+MMCONFIG access for addresses < 256 can be dangerous for some devices:
+see commit a0ca99096094 ("PCI x86: always use conf1 to access config
+space below 256 bytes"). That is why a special feature flag is needed.
 
-are available in the Git repository at:
+Introduce KVM_FEATURE_PCI_GO_MMCONFIG, which can be enabled when the
+configuration is known to be safe (e.g. in QEMU).
 
-  https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git tags/for_linus
+Signed-off-by: Julia Suvorova <jusual@redhat.com>
+---
+ Documentation/virt/kvm/cpuid.rst     |  4 ++++
+ arch/x86/include/uapi/asm/kvm_para.h |  1 +
+ arch/x86/kernel/kvm.c                | 14 ++++++++++++++
+ 3 files changed, 19 insertions(+)
 
-for you to fetch changes up to a96b0d061d476093cf86ca1c2de06fc57163588d:
-
-  virtio-mem: Fix build error due to improper use 'select' (2020-07-30 11:28:17 -0400)
-
-----------------------------------------------------------------
-virtio, qemu_fw: bugfixes
-
-A couple of last minute bugfixes.
-
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-
-----------------------------------------------------------------
-Alexander Duyck (1):
-      virtio-balloon: Document byte ordering of poison_val
-
-Michael S. Tsirkin (2):
-      vhost/scsi: fix up req type endian-ness
-      virtio_balloon: fix up endian-ness for free cmd id
-
-Qiushi Wu (1):
-      firmware: Fix a reference count leak.
-
-Weilong Chen (1):
-      virtio-mem: Fix build error due to improper use 'select'
-
- drivers/firmware/qemu_fw_cfg.c  |  7 ++++---
- drivers/vhost/scsi.c            |  2 +-
- drivers/virtio/Kconfig          |  2 +-
- drivers/virtio/virtio_balloon.c | 11 ++++++++++-
- 4 files changed, 16 insertions(+), 6 deletions(-)
+diff --git a/Documentation/virt/kvm/cpuid.rst b/Documentation/virt/kvm/cpuid.rst
+index a7dff9186bed..711f2074877b 100644
+--- a/Documentation/virt/kvm/cpuid.rst
++++ b/Documentation/virt/kvm/cpuid.rst
+@@ -92,6 +92,10 @@ KVM_FEATURE_ASYNC_PF_INT          14          guest checks this feature bit
+                                               async pf acknowledgment msr
+                                               0x4b564d07.
+ 
++KVM_FEATURE_PCI_GO_MMCONFIG       15          guest checks this feature bit
++                                              before using MMCONFIG for all
++                                              PCI config accesses
++
+ KVM_FEATURE_CLOCSOURCE_STABLE_BIT 24          host will warn if no guest-side
+                                               per-cpu warps are expeced in
+                                               kvmclock
+diff --git a/arch/x86/include/uapi/asm/kvm_para.h b/arch/x86/include/uapi/asm/kvm_para.h
+index 812e9b4c1114..5793f372cae0 100644
+--- a/arch/x86/include/uapi/asm/kvm_para.h
++++ b/arch/x86/include/uapi/asm/kvm_para.h
+@@ -32,6 +32,7 @@
+ #define KVM_FEATURE_POLL_CONTROL	12
+ #define KVM_FEATURE_PV_SCHED_YIELD	13
+ #define KVM_FEATURE_ASYNC_PF_INT	14
++#define KVM_FEATURE_PCI_GO_MMCONFIG	15
+ 
+ #define KVM_HINTS_REALTIME      0
+ 
+diff --git a/arch/x86/kernel/kvm.c b/arch/x86/kernel/kvm.c
+index df63786e7bfa..1ec73e6f25ce 100644
+--- a/arch/x86/kernel/kvm.c
++++ b/arch/x86/kernel/kvm.c
+@@ -33,6 +33,7 @@
+ #include <asm/hypervisor.h>
+ #include <asm/tlb.h>
+ #include <asm/cpuidle_haltpoll.h>
++#include <asm/pci_x86.h>
+ 
+ DEFINE_STATIC_KEY_FALSE(kvm_async_pf_enabled);
+ 
+@@ -715,6 +716,18 @@ static uint32_t __init kvm_detect(void)
+ 	return kvm_cpuid_base();
+ }
+ 
++static int __init kvm_pci_arch_init(void)
++{
++	if (raw_pci_ext_ops &&
++	    kvm_para_has_feature(KVM_FEATURE_PCI_GO_MMCONFIG)) {
++		pr_info("PCI: Using MMCONFIG for base access\n");
++		raw_pci_ops = raw_pci_ext_ops;
++		return 0;
++	}
++
++	return 1;
++}
++
+ static void __init kvm_apic_init(void)
+ {
+ #if defined(CONFIG_SMP)
+@@ -726,6 +739,7 @@ static void __init kvm_apic_init(void)
+ static void __init kvm_init_platform(void)
+ {
+ 	kvmclock_init();
++	x86_init.pci.arch_init = kvm_pci_arch_init;
+ 	x86_platform.apic_post_init = kvm_apic_init;
+ }
+ 
+-- 
+2.25.4
 
