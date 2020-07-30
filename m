@@ -2,106 +2,111 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7AB012335CE
-	for <lists+kvm@lfdr.de>; Thu, 30 Jul 2020 17:44:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 96FC7233622
+	for <lists+kvm@lfdr.de>; Thu, 30 Jul 2020 17:59:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729885AbgG3PoD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 30 Jul 2020 11:44:03 -0400
-Received: from 8bytes.org ([81.169.241.247]:34118 "EHLO theia.8bytes.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728412AbgG3Pnq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 30 Jul 2020 11:43:46 -0400
-Received: by theia.8bytes.org (Postfix, from userid 1000)
-        id 028269FA; Thu, 30 Jul 2020 17:43:44 +0200 (CEST)
-From:   Joerg Roedel <joro@8bytes.org>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Tom Lendacky <thomas.lendacky@amd.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Borislav Petkov <bp@alien8.de>,
-        Joerg Roedel <jroedel@suse.de>
-Subject: [PATCH v2 4/4] KVM: SVM: Use __packed shorthand
-Date:   Thu, 30 Jul 2020 17:43:40 +0200
-Message-Id: <20200730154340.14021-5-joro@8bytes.org>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20200730154340.14021-1-joro@8bytes.org>
-References: <20200730154340.14021-1-joro@8bytes.org>
+        id S1728286AbgG3P7A (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 30 Jul 2020 11:59:00 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:42485 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726275AbgG3P7A (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 30 Jul 2020 11:59:00 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1596124738;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references:openpgp:openpgp;
+        bh=yvixA7AnuX+SIl1eVGj6Lt/rHsyqN1zKTYG6L6GtgFY=;
+        b=ivduR8Q1O5pW2dy5zLVJ5OtJ5KG86npwdYn7hdDOQpzQYk4PZBWs+uLMA3ITdHajV4zwSV
+        mrU61WA8gN2fcdCCpNiVBNyMb0AHnfrAodD0WpK4n1SCNBk706fa7pzAVcYuILjN23qT6x
+        a7OJhCFKGxTdm9RxCSaqu3+LHQkSoBY=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-330-7kPf4hY3MiOEn1K890EMag-1; Thu, 30 Jul 2020 11:58:56 -0400
+X-MC-Unique: 7kPf4hY3MiOEn1K890EMag-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 863DC8015CE;
+        Thu, 30 Jul 2020 15:58:55 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-112-85.ams2.redhat.com [10.36.112.85])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 00D0269324;
+        Thu, 30 Jul 2020 15:58:50 +0000 (UTC)
+Subject: Re: [kvm-unit-tests PATCH v2 3/3] s390x: Ultravisor guest API test
+To:     Cornelia Huck <cohuck@redhat.com>,
+        Janosch Frank <frankja@linux.ibm.com>
+Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org, david@redhat.com,
+        borntraeger@de.ibm.com, imbrenda@linux.ibm.com
+References: <20200727095415.494318-1-frankja@linux.ibm.com>
+ <20200727095415.494318-4-frankja@linux.ibm.com>
+ <20200730131617.7f7d5e5f.cohuck@redhat.com>
+From:   Thomas Huth <thuth@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <1a407971-0b43-879e-0aac-65c7f9e29606@redhat.com>
+Date:   Thu, 30 Jul 2020 17:58:48 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
+MIME-Version: 1.0
+In-Reply-To: <20200730131617.7f7d5e5f.cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Borislav Petkov <bp@alien8.de>
+On 30/07/2020 13.16, Cornelia Huck wrote:
+> On Mon, 27 Jul 2020 05:54:15 -0400
+> Janosch Frank <frankja@linux.ibm.com> wrote:
+> 
+>> Test the error conditions of guest 2 Ultravisor calls, namely:
+>>      * Query Ultravisor information
+>>      * Set shared access
+>>      * Remove shared access
+>>
+>> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+>> Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+>> ---
+>>  lib/s390x/asm/uv.h  |  68 +++++++++++++++++++
+>>  s390x/Makefile      |   1 +
+>>  s390x/unittests.cfg |   3 +
+>>  s390x/uv-guest.c    | 159 ++++++++++++++++++++++++++++++++++++++++++++
+>>  4 files changed, 231 insertions(+)
+>>  create mode 100644 lib/s390x/asm/uv.h
+>>  create mode 100644 s390x/uv-guest.c
+>>
+> 
+> (...)
+> 
+>> +static inline int uv_call(unsigned long r1, unsigned long r2)
+>> +{
+>> +	int cc;
+>> +
+>> +	asm volatile(
+>> +		"0:	.insn rrf,0xB9A40000,%[r1],%[r2],0,0\n"
+>> +		"		brc	3,0b\n"
+>> +		"		ipm	%[cc]\n"
+>> +		"		srl	%[cc],28\n"
+>> +		: [cc] "=d" (cc)
+>> +		: [r1] "a" (r1), [r2] "a" (r2)
+>> +		: "memory", "cc");
+>> +	return cc;
+>> +}
+> 
+> This returns the condition code, but no caller seems to check it
+> (instead, they look at header.rc, which is presumably only set if the
+> instruction executed successfully in some way?)
+> 
+> Looking at the kernel, it retries for cc > 1 (presumably busy
+> conditions), and cc != 0 seems to be considered a failure. Do we want
+> to look at the cc here as well?
 
-Use the shorthand to make it more readable.
+It's there - but here it's in the assembly code, the "brc 3,0b".
 
-No functional changes.
+Patch looks ok to me (but I didn't do a full review):
 
-Signed-off-by: Joerg Roedel <jroedel@suse.de>
----
- arch/x86/include/asm/svm.h | 16 ++++++++--------
- 1 file changed, 8 insertions(+), 8 deletions(-)
-
-diff --git a/arch/x86/include/asm/svm.h b/arch/x86/include/asm/svm.h
-index 8744817358bf..6b4b43f68f4b 100644
---- a/arch/x86/include/asm/svm.h
-+++ b/arch/x86/include/asm/svm.h
-@@ -150,14 +150,14 @@ struct __attribute__ ((__packed__)) vmcb_control_area {
- #define SVM_NESTED_CTL_NP_ENABLE	BIT(0)
- #define SVM_NESTED_CTL_SEV_ENABLE	BIT(1)
- 
--struct __attribute__ ((__packed__)) vmcb_seg {
-+struct vmcb_seg {
- 	u16 selector;
- 	u16 attrib;
- 	u32 limit;
- 	u64 base;
--};
-+} __packed;
- 
--struct __attribute__ ((__packed__)) vmcb_save_area {
-+struct vmcb_save_area {
- 	struct vmcb_seg es;
- 	struct vmcb_seg cs;
- 	struct vmcb_seg ss;
-@@ -231,9 +231,9 @@ struct __attribute__ ((__packed__)) vmcb_save_area {
- 	u64 xcr0;
- 	u8 valid_bitmap[16];
- 	u64 x87_state_gpa;
--};
-+} __packed;
- 
--struct __attribute__ ((__packed__)) ghcb {
-+struct ghcb {
- 	struct vmcb_save_area save;
- 	u8 reserved_save[2048 - sizeof(struct vmcb_save_area)];
- 
-@@ -242,7 +242,7 @@ struct __attribute__ ((__packed__)) ghcb {
- 	u8 reserved_1[10];
- 	u16 protocol_version;	/* negotiated SEV-ES/GHCB protocol version */
- 	u32 ghcb_usage;
--};
-+} __packed;
- 
- 
- static inline void __unused_size_checks(void)
-@@ -252,11 +252,11 @@ static inline void __unused_size_checks(void)
- 	BUILD_BUG_ON(sizeof(struct ghcb) != 4096);
- }
- 
--struct __attribute__ ((__packed__)) vmcb {
-+struct vmcb {
- 	struct vmcb_control_area control;
- 	u8 reserved_control[1024 - sizeof(struct vmcb_control_area)];
- 	struct vmcb_save_area save;
--};
-+} __packed;
- 
- #define SVM_CPUID_FUNC 0x8000000a
- 
--- 
-2.17.1
+Acked-by: Thomas Huth <thuth@redhat.com>
 
