@@ -2,155 +2,101 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A19D32330D0
-	for <lists+kvm@lfdr.de>; Thu, 30 Jul 2020 13:16:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 040FC2330DA
+	for <lists+kvm@lfdr.de>; Thu, 30 Jul 2020 13:18:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726891AbgG3LQR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 30 Jul 2020 07:16:17 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:29543 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726367AbgG3LQQ (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 30 Jul 2020 07:16:16 -0400
+        id S1726794AbgG3LR5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 30 Jul 2020 07:17:57 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:54222 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726367AbgG3LR5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 30 Jul 2020 07:17:57 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1596107775;
+        s=mimecast20190719; t=1596107876;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=i6M54uk3wxSqMByimlcSdiyFDQobGVGgtyqtJxIsLh8=;
-        b=JFZZfdlhjHXOWnzF5JaK9iuZLO29PMlXuZzChzzQPzk7QJw94HwD+5zWUX2GvJlBHlWnPJ
-        R91jg7DtUCDgZc7Rg6JfnH8YzEBJGCkaBtoeYzq288OcQCOgpON6g5QOpuXNLQ09hi6lPY
-        TUutwD54nLb/HA9AFO40DYRRjezRqs0=
-Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
- [209.85.218.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-254-uo8S23o_PXKYJAS6JvseqQ-1; Thu, 30 Jul 2020 07:16:13 -0400
-X-MC-Unique: uo8S23o_PXKYJAS6JvseqQ-1
-Received: by mail-ej1-f71.google.com with SMTP id e7so9700262ejj.10
-        for <kvm@vger.kernel.org>; Thu, 30 Jul 2020 04:16:13 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=i6M54uk3wxSqMByimlcSdiyFDQobGVGgtyqtJxIsLh8=;
-        b=sJJA4fZa/IXVQ5+blfqLUGUYOEWn9mBwDN1WqsSPvj/eFv07b5lXtlKGF2wFpQZ+3z
-         b0b5vRJW0eePF3FT59GHUA4PiKrDZfVza6p/RN0/z46XDjQqlZNuUO0CKnVJDrVki0HB
-         oOEEj9ZHOYXDNA8STcsOSH+/uJyWfmgvbEV2plyqSzLk8PhK9j9Qj8w5Eq0UoWRhdp5R
-         LnnNE8aN+x+OBaJS70Zp/0m/+gunVyRm2ckJ1sBdhqcRRpnIh97rE8muVMiOVfHQEQvF
-         ImPkUFz56okP3P7xFG9H5Y6S5zzPpipFquyajm2mkKY0vsUVQuXbARikseRi0DHHYdaa
-         qy6A==
-X-Gm-Message-State: AOAM533U6NYpyy9/MGvTFweudbGGHgZ0WN6ULFqq+CF/7XxdnuAc44SC
-        qyxM8NZ0Bwp9E7pk9LjKbXmx9NhlVu2qjfv72rMyqJbHwQmn0mBk5AhQ+U7GPD9eEQsvKjZFXvz
-        JOFP7TlPFG9GA
-X-Received: by 2002:a17:906:8782:: with SMTP id za2mr1998828ejb.419.1596107771886;
-        Thu, 30 Jul 2020 04:16:11 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwWZycTltIDSKNoeknahH26vkjSn5+zXLiJ8OL45eqL5qMszYqVuD9fPffkhz0Wugn3GjdTpA==
-X-Received: by 2002:a17:906:8782:: with SMTP id za2mr1998815ejb.419.1596107771693;
-        Thu, 30 Jul 2020 04:16:11 -0700 (PDT)
-Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id cc9sm5811982edb.14.2020.07.30.04.16.10
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 30 Jul 2020 04:16:10 -0700 (PDT)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Wanpeng Li <kernellwp@gmail.com>
-Cc:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>
-Subject: Re: [PATCH v2 3/3] KVM: SVM: Fix disable pause loop exit/pause filtering capability on SVM
-In-Reply-To: <CANRm+Cx-VM=QGcDNG0oRq7YX+2wmmw8yDjESrJGxTeEWkUUv0A@mail.gmail.com>
-References: <1595929506-9203-1-git-send-email-wanpengli@tencent.com> <1595929506-9203-3-git-send-email-wanpengli@tencent.com> <87k0ymldg9.fsf@vitty.brq.redhat.com> <CANRm+Cx-VM=QGcDNG0oRq7YX+2wmmw8yDjESrJGxTeEWkUUv0A@mail.gmail.com>
-Date:   Thu, 30 Jul 2020 13:16:09 +0200
-Message-ID: <875za5l0cm.fsf@vitty.brq.redhat.com>
+        bh=pWmDyEUJNIWGFgAmxoCDd0Zsu8Ym8vYf2vNm/NuhUkQ=;
+        b=IK3yXUqoHTkK2q+IoQylV5Si+YqbDXgASrfmoeq1M/x//xDxM6CN2XaRbubGPdQrfsrsgG
+        yyI0tpy2zKf155IO1vC3AOZBuxrSduNv+dX7bWuzGEU/8X17mRYU9bdBTcUlRz16sxhbX0
+        SmSvG1R/pnfnSooll+hIbTqI5xMs504=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-99-iJezKbNFOuCUc0AwNLjD2A-1; Thu, 30 Jul 2020 07:17:52 -0400
+X-MC-Unique: iJezKbNFOuCUc0AwNLjD2A-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0766E102C7E9;
+        Thu, 30 Jul 2020 11:17:51 +0000 (UTC)
+Received: from gondolin (ovpn-112-203.ams2.redhat.com [10.36.112.203])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 956361001B2C;
+        Thu, 30 Jul 2020 11:17:46 +0000 (UTC)
+Date:   Thu, 30 Jul 2020 13:16:17 +0200
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Janosch Frank <frankja@linux.ibm.com>
+Cc:     kvm@vger.kernel.org, thuth@redhat.com, linux-s390@vger.kernel.org,
+        david@redhat.com, borntraeger@de.ibm.com, imbrenda@linux.ibm.com
+Subject: Re: [kvm-unit-tests PATCH v2 3/3] s390x: Ultravisor guest API test
+Message-ID: <20200730131617.7f7d5e5f.cohuck@redhat.com>
+In-Reply-To: <20200727095415.494318-4-frankja@linux.ibm.com>
+References: <20200727095415.494318-1-frankja@linux.ibm.com>
+        <20200727095415.494318-4-frankja@linux.ibm.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Wanpeng Li <kernellwp@gmail.com> writes:
+On Mon, 27 Jul 2020 05:54:15 -0400
+Janosch Frank <frankja@linux.ibm.com> wrote:
 
-> On Wed, 29 Jul 2020 at 20:21, Vitaly Kuznetsov <vkuznets@redhat.com> wrote:
->>
->> Wanpeng Li <kernellwp@gmail.com> writes:
->>
->> > From: Wanpeng Li <wanpengli@tencent.com>
->> >
->> > Commit 8566ac8b (KVM: SVM: Implement pause loop exit logic in SVM) drops
->> > disable pause loop exit/pause filtering capability completely, I guess it
->> > is a merge fault by Radim since disable vmexits capabilities and pause
->> > loop exit for SVM patchsets are merged at the same time. This patch
->> > reintroduces the disable pause loop exit/pause filtering capability
->> > support.
->> >
->> > We can observe 2.9% hackbench improvement for a 92 vCPUs guest on AMD
->> > Rome Server.
->> >
->> > Reported-by: Haiwei Li <lihaiwei@tencent.com>
->> > Tested-by: Haiwei Li <lihaiwei@tencent.com>
->> > Fixes: 8566ac8b (KVM: SVM: Implement pause loop exit logic in SVM)
->> > Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
->> > ---
->> >  arch/x86/kvm/svm/svm.c | 9 ++++++---
->> >  1 file changed, 6 insertions(+), 3 deletions(-)
->> >
->> > diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
->> > index c0da4dd..c20f127 100644
->> > --- a/arch/x86/kvm/svm/svm.c
->> > +++ b/arch/x86/kvm/svm/svm.c
->> > @@ -1090,7 +1090,7 @@ static void init_vmcb(struct vcpu_svm *svm)
->> >       svm->nested.vmcb = 0;
->> >       svm->vcpu.arch.hflags = 0;
->> >
->> > -     if (pause_filter_count) {
->> > +     if (pause_filter_count && !kvm_pause_in_guest(svm->vcpu.kvm)) {
->> >               control->pause_filter_count = pause_filter_count;
->> >               if (pause_filter_thresh)
->> >                       control->pause_filter_thresh = pause_filter_thresh;
->> > @@ -2693,7 +2693,7 @@ static int pause_interception(struct vcpu_svm *svm)
->> >       struct kvm_vcpu *vcpu = &svm->vcpu;
->> >       bool in_kernel = (svm_get_cpl(vcpu) == 0);
->> >
->> > -     if (pause_filter_thresh)
->> > +     if (!kvm_pause_in_guest(vcpu->kvm))
->> >               grow_ple_window(vcpu);
->> >
->> >       kvm_vcpu_on_spin(vcpu, in_kernel);
->> > @@ -3780,7 +3780,7 @@ static void svm_handle_exit_irqoff(struct kvm_vcpu *vcpu)
->> >
->> >  static void svm_sched_in(struct kvm_vcpu *vcpu, int cpu)
->> >  {
->> > -     if (pause_filter_thresh)
->> > +     if (!kvm_pause_in_guest(vcpu->kvm))
->> >               shrink_ple_window(vcpu);
->> >  }
->> >
->> > @@ -3958,6 +3958,9 @@ static void svm_vm_destroy(struct kvm *kvm)
->> >
->> >  static int svm_vm_init(struct kvm *kvm)
->> >  {
->> > +     if (!pause_filter_thresh)
->> > +             kvm->arch.pause_in_guest = true;
->>
->> Would it make sense to do
->>
->>         if (!pause_filter_count || !pause_filter_thresh)
->>                 kvm->arch.pause_in_guest = true;
->>
->> here and simplify the condition in init_vmcb()?
->
-> kvm->arch.pause_in_guest can also be true when userspace sets the
-> KVM_CAP_X86_DISABLE_EXITS capability, so we can't simplify the
-> condition in init_vmcb().
->
+> Test the error conditions of guest 2 Ultravisor calls, namely:
+>      * Query Ultravisor information
+>      * Set shared access
+>      * Remove shared access
+> 
+> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+> Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+> ---
+>  lib/s390x/asm/uv.h  |  68 +++++++++++++++++++
+>  s390x/Makefile      |   1 +
+>  s390x/unittests.cfg |   3 +
+>  s390x/uv-guest.c    | 159 ++++++++++++++++++++++++++++++++++++++++++++
+>  4 files changed, 231 insertions(+)
+>  create mode 100644 lib/s390x/asm/uv.h
+>  create mode 100644 s390x/uv-guest.c
+> 
 
-I meant we simplify it to
+(...)
 
-if (!kvm_pause_in_guest(svm->vcpu.kvm))
+> +static inline int uv_call(unsigned long r1, unsigned long r2)
+> +{
+> +	int cc;
+> +
+> +	asm volatile(
+> +		"0:	.insn rrf,0xB9A40000,%[r1],%[r2],0,0\n"
+> +		"		brc	3,0b\n"
+> +		"		ipm	%[cc]\n"
+> +		"		srl	%[cc],28\n"
+> +		: [cc] "=d" (cc)
+> +		: [r1] "a" (r1), [r2] "a" (r2)
+> +		: "memory", "cc");
+> +	return cc;
+> +}
 
-as "!pause_filter_count" gets included.
+This returns the condition code, but no caller seems to check it
+(instead, they look at header.rc, which is presumably only set if the
+instruction executed successfully in some way?)
 
--- 
-Vitaly
+Looking at the kernel, it retries for cc > 1 (presumably busy
+conditions), and cc != 0 seems to be considered a failure. Do we want
+to look at the cc here as well?
+
+(...)
 
