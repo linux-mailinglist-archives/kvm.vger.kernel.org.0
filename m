@@ -2,111 +2,107 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B47662337C6
-	for <lists+kvm@lfdr.de>; Thu, 30 Jul 2020 19:36:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D52A023390E
+	for <lists+kvm@lfdr.de>; Thu, 30 Jul 2020 21:30:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730215AbgG3Rgq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 30 Jul 2020 13:36:46 -0400
-Received: from mail-eopbgr770057.outbound.protection.outlook.com ([40.107.77.57]:62870
-        "EHLO NAM02-SN1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727080AbgG3Rgq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 30 Jul 2020 13:36:46 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Qk2wgpWvpHra3oSGaV3KooxDv3iPnjVYNUSp5dzxbqA4QCOtpjJo9NutUtCDbQbqQkzxytN2yoJT4V6ufMmhGcLWPQqKhDAYmAm4C+rLctJBGtCXb0cNv4/3fBNZQyMFGyazdvLJMofTEfCOQDEJIILVr5Ca5dPILdAETZ6Il0/yB96gZpBHOBgF8CAQoUPygqIBm16ikbPy1UiC6ONLr89HBL5kR3OBjSsYJy1u8JdROhcJYBqlhYLrq/uext8sJ0SDZqN6zI8YBj/Eqf0UPsn59qp8ydg/WhFXzkc5+0Q35YENfYrFDPnUvsFF6JtmwdyPyNKxDKXOX7j9hFun7A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=hYGlhh/Lx0j2n6eR/tg/ymss0HwDw36Rc9NbO1CSWqU=;
- b=lLpIpa3h9w+NIh3yoxXKLLK4jKzMzwnSHTlCcprO/IAQHPNRrTRv21W4PBUQRMc0k7TzMW5JZAUxJwC3HyU1mDeI3m8GCAkS6wJ+6Oa5fgw+sAVjOY6sbC49WBuIsa6naI0Fus1U/Kfefcoww/nkFxHPtE71KmKq8w/8tJTV08udI3aqKrcXmybX2IpytcmZnLe28y98d5FEflviSJs0ffW4EL1so5zZq2lkcbTOAiEJlIW+EwjzV0AIc5f9nHufOeVd/F3BXt4mVFlEbA9y0cNcAiaGGBxKwMoiJNNbXAuJXJLJ3XO2nXCcZKScrYW0vDqldUACefEk7CTDf0r7RQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=vmware.com; dmarc=pass action=none header.from=vmware.com;
- dkim=pass header.d=vmware.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=vmware.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=hYGlhh/Lx0j2n6eR/tg/ymss0HwDw36Rc9NbO1CSWqU=;
- b=06IsDw0i9UhGz6D+oY0CNBu+jndxcD3VrlTP5ub2aKwx9npfZRnSPx1sXUqd8Y6/fGccyIuJwtN9qXTeCS12Ar6EGLf4bRVEJQVYHx+l0neQZNjIzH/omv7/D3FKhohGbSBYZIqZd8YQVqxS5P0yi8up+fZ65Dj4neQrNE6F1oE=
-Received: from BL0PR05MB4772.namprd05.prod.outlook.com (2603:10b6:208:29::17)
- by BL0PR05MB4820.namprd05.prod.outlook.com (2603:10b6:208:5d::31) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3239.9; Thu, 30 Jul
- 2020 17:36:42 +0000
-Received: from BL0PR05MB4772.namprd05.prod.outlook.com
- ([fe80::692d:b0ee:1561:60be]) by BL0PR05MB4772.namprd05.prod.outlook.com
- ([fe80::692d:b0ee:1561:60be%3]) with mapi id 15.20.3239.019; Thu, 30 Jul 2020
- 17:36:42 +0000
-From:   Nadav Amit <namit@vmware.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-CC:     Andrew Jones <drjones@redhat.com>,
-        Wanpeng Li <kernellwp@gmail.com>,
-        David Hildenbrand <david@redhat.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Thomas Huth <thuth@redhat.com>, KVM <kvm@vger.kernel.org>,
-        Laurent Vivier <lvivier@redhat.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Liran Alon <liran.alon@oracle.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>
-Subject: Re: A new name for kvm-unit-tests ?
-Thread-Topic: A new name for kvm-unit-tests ?
-Thread-Index: AQHWZjQkZcbo6dMKYUqQXELtxmgWZakfq8cAgAAIk4CAAAEWAIAABiwAgAAEN4CAAD3qgIAAZMqAgAAAp4CAAABgAA==
-Date:   Thu, 30 Jul 2020 17:36:42 +0000
-Message-ID: <EA3D04A5-3144-4F0B-B7D5-A99DB0FC4818@vmware.com>
-References: <dc518389-945a-1887-7ad0-00ebaf9ae30e@redhat.com>
- <682fe35c-f4ea-2540-f692-f23a42c6d56b@de.ibm.com>
- <c8e83bff-1762-f719-924f-618bd29e7894@redhat.com>
- <CANRm+Czsb79JYAHcOm49tg=M2vHdOzh_XFaEcSS_RUPfX3dRuw@mail.gmail.com>
- <c92c6905-fcfb-ea5b-8c80-1025488adc98@redhat.com>
- <1B9660BF-6A81-475E-B80C-632C6D8F4BF9@vmware.com>
- <20200730113215.dakrrilcdz5p4z7e@kamzik.brq.redhat.com>
- <CA3B8C12-0421-489C-A135-3D97D58D9D5F@vmware.com>
- <2b07717e-3716-cc55-8f1b-8047a318c1f2@redhat.com>
-In-Reply-To: <2b07717e-3716-cc55-8f1b-8047a318c1f2@redhat.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: redhat.com; dkim=none (message not signed)
- header.d=none;redhat.com; dmarc=none action=none header.from=vmware.com;
-x-originating-ip: [24.4.128.201]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 32784e24-af4e-4a83-e84b-08d834af1f6e
-x-ms-traffictypediagnostic: BL0PR05MB4820:
-x-microsoft-antispam-prvs: <BL0PR05MB482065DC29FD37AADA028A19D0710@BL0PR05MB4820.namprd05.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:4303;
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: SFn433ZI0Tu2HDjy6SnhVljDIxGG40GbwszLqg8yh/0oCgtslobsjliPeR2LP0Wjq/tsdtodsBdhvEV3PUukhp+lanmyNa59sd4T0rNkS/V5E37Q1QS4eupfbXCKIliGUW/VgBzoxs/lQ5UApzq+JWZOHewMaEhJJsi35TtwhLFXElxeaYYnEkOuJDCSN1U9UISRercQ9QnZTY2of4lHd53mbtlUlpVrh3BSAA1quBjTZRWLQXdpzCXCCa88uXUCU/qIVFSZLLXNYtQ236Kn8xKjTAeHAclOsnldlCsuXmfLbmTkIGUEJ5lyMnioBBsHP3vZwLzpTrWhEGbBL0WlEg==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL0PR05MB4772.namprd05.prod.outlook.com;PTR:;CAT:NONE;SFTY:;SFS:(4636009)(376002)(346002)(136003)(39860400002)(366004)(396003)(4326008)(8676002)(8936002)(33656002)(186003)(54906003)(26005)(2616005)(6512007)(6506007)(6916009)(76116006)(2906002)(91956017)(53546011)(71200400001)(7416002)(4744005)(5660300002)(86362001)(66556008)(478600001)(36756003)(66476007)(66946007)(316002)(64756008)(66446008)(6486002);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata: 8o4B3wSiyB/qQBxNfE41TISut3Fzi11/Ixj16fpfk5rDtCkXDsbCchF7Yd7VlgM5tR4VizqwRyzM/XGfF2hguOUK7qLeVqIX6QzaDPRGEMm9Ha6BvKGjjmM4pzARKjRrAbZzNOEZ4Cr3Rsdt+bnd6cC6jB1as7r99pwW9+uWAtfQqHzxWiZxsq6m9ubqw/fhcaIOqCHAUDi5fT17yYv5XBovkwKInY3zdenGzzbM2YtVQMIeXkr771zeWQKaRBfcNxTCo9anavYlskNN4EmV2a90WgqQohgcek7dz92l7BzdNHuCqtFc22DANIRtoOegTxNnFTBged42BIItna4nFjrUkE49rLA0SaVkSbzmtWfgtKSXX2g48W591DdCLoc8kNwWHPxZdBUZrWWkFaUyfZ3pBYbu9BCAcC7PH1HyNrxLep4YkLXUIWRGvNVICrK1s+IfrxzNtSCNY1+mBFN3vDmr3F0D5mI2n6galWMjAiqvEJ/Fik0kZvqTqZtCyfS/uqeDOnrOPAq9xOzOrZ+aDg+j9fMmTq4uMsyv+Y3v3CyjXJ+tyMH3X3AnezaOj3RYBnWJJ4JdSSE7kkdFosXz04idFySj8Ap1MrsMIbQgRrurolo7HEJQrHe9hV8SlIPozow+iowjvTO2i7zHOheAMA==
-x-ms-exchange-transport-forked: True
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <13EEC804BB36F049B41025B7DDA5AE02@namprd05.prod.outlook.com>
-Content-Transfer-Encoding: base64
+        id S1730486AbgG3TaH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 30 Jul 2020 15:30:07 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:43272 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726853AbgG3TaH (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 30 Jul 2020 15:30:07 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1596137406;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type;
+        bh=Zo62zBr05G4i/w6uOCrF5bcIwehfjUuSBLT3HlEcuYQ=;
+        b=TK4/ArutFiX30RTVSeQP72Z2Gg3T069qDEa8QhEdpHXY4H9Wb9h/Q4PtRO7epGbvlxFCR6
+        b7xh+gPHuedTwoEnaJewZS1w/y+Nxl6KOj3YtkbirOPQVc/+g6xkdBIucTEE8VtXApf05t
+        HdtsZRI1T2jnHEfDUECFPrFB3Ys83mA=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-54-QKL0iWxkNVC7_REwZ5NrHw-1; Thu, 30 Jul 2020 15:30:04 -0400
+X-MC-Unique: QKL0iWxkNVC7_REwZ5NrHw-1
+Received: by mail-wr1-f70.google.com with SMTP id j16so8341336wrw.3
+        for <kvm@vger.kernel.org>; Thu, 30 Jul 2020 12:30:04 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:mime-version
+         :content-disposition;
+        bh=Zo62zBr05G4i/w6uOCrF5bcIwehfjUuSBLT3HlEcuYQ=;
+        b=pMu+rGIQOXWiASM29rI/HxGXPUEgciNPy0lROlNtLHP4uqCp10+U9XWvx0UipMdQ2n
+         Ton8/3kk17w9LoLST9vwCTgeZ9LQLHeAfpn6nOPB8lNyTSTG/6a5YSfwA4h2F22VEAyn
+         Fgp8GcklsoXmhhP3pyyI24zN4GCWwDuNaNi9RuUVDGfoWQSFKyOtceGytR3SN+Dqy9Fx
+         0xey4aJ9cF70mD2Ym5U0lF7aYwtSpHvoRS945l2nTSwr0egN7XlDcvYeInh/FJ4KO4Fg
+         JImMMh9UndBEemGKp/2J1DVNFiJWqoO2CFnZ2vla20dFTPs9mY0Tf+qSAM0s5juK2bEl
+         wp8A==
+X-Gm-Message-State: AOAM53315x3EZhZovYgluwcWc5EXfQPVIX0qizDHNSDa6YrhorVLgQmQ
+        R2g3WflLfwXP8OY4itBpFJXLu+vaFZjOrzwGAzWJ18Cw9J6meaSAYN3ko7sB9+COn3PECzgLdT6
+        ZMAsuMMCJJUNP
+X-Received: by 2002:a5d:538a:: with SMTP id d10mr267393wrv.280.1596137403065;
+        Thu, 30 Jul 2020 12:30:03 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxM38R/gaJ4B9lHJnwY7CoXgiuKGr1JOva2N2K51sHps4St8QHQsZSys7gU+zLzyFwcYWboVQ==
+X-Received: by 2002:a5d:538a:: with SMTP id d10mr267372wrv.280.1596137402764;
+        Thu, 30 Jul 2020 12:30:02 -0700 (PDT)
+Received: from redhat.com (bzq-79-179-105-63.red.bezeqint.net. [79.179.105.63])
+        by smtp.gmail.com with ESMTPSA id w64sm9081104wmb.26.2020.07.30.12.29.59
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 30 Jul 2020 12:30:01 -0700 (PDT)
+Date:   Thu, 30 Jul 2020 15:29:58 -0400
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+        alexander.h.duyck@linux.intel.com, chenweilong@huawei.com,
+        david@redhat.com, jasowang@redhat.com, mst@redhat.com,
+        rdunlap@infradead.org, stable@vger.kernel.org, wu000273@umn.edu
+Subject: [GIT PULL] virtio, qemu_fw: bugfixes
+Message-ID: <20200730152958-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: vmware.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BL0PR05MB4772.namprd05.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 32784e24-af4e-4a83-e84b-08d834af1f6e
-X-MS-Exchange-CrossTenant-originalarrivaltime: 30 Jul 2020 17:36:42.2189
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b39138ca-3cee-4b4a-a4d6-cd83d9dd62f0
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 4lK4AnFPrXQJE0O9tWRkM912LhDeNoUUOfWB9FIRY7u88gls6aqHNKB3I9FCtwvpfi3ow9rimtqP5pWYs18wcQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL0PR05MB4820
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+X-Mutt-Fcc: =sent
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-PiBPbiBKdWwgMzAsIDIwMjAsIGF0IDEwOjM1IEFNLCBQYW9sbyBCb256aW5pIDxwYm9uemluaUBy
-ZWRoYXQuY29tPiB3cm90ZToNCj4gDQo+IE9uIDMwLzA3LzIwIDE5OjMyLCBOYWRhdiBBbWl0IHdy
-b3RlOg0KPj4+IFdlIGNhbiB1c2UgY29tcGlsZS10aW1lIG9yIHJ1bi10aW1lIGxvZ2ljIHRoYXQg
-ZGVwZW5kcyBvbiB0aGUgdGFyZ2V0IHRvDQo+Pj4gZGVjaWRlIHdoZXRoZXIgYSB0ZXN0IHNob3Vs
-ZCBiZSBhIG5vcm1hbCB0ZXN0IChwYXNzL2ZhaWwpIG9yIGFuDQo+Pj4geHBhc3MveGZhaWwgdGVz
-dC4NCj4+IFRoaXMgaXMgc2ltcGxlLiBXaGVuIEkgZmluZCBzb21lIHRpbWUsIEkgd2lsbCBzZW5k
-IHNvbWUgcGF0Y2hlcyBmb3IgdGhhdC4NCj4gDQo+IE5vdCB0b28gcXVpY2ssIGxldCdzIGZpcnN0
-IGxvb2sgYXQgYSBkZXNpZ24uDQoNCkRvbuKAmXQgd29ycnksIEkgYW0gYnVzeSA7LSkNCg0KVGhl
-IHN1YnRleHQgb2YgbXkgcmVzcG9uc2Ugd2FzIHRoYXQgYSBmdWxseSBmbGVkZ2VkIGVycmF0YSBt
-ZWNoYW5pc20gaXMgbW9yZQ0KY29tcGxpY2F0ZWQuDQoNCg==
+The following changes since commit 92ed301919932f777713b9172e525674157e983d:
+
+  Linux 5.8-rc7 (2020-07-26 14:14:06 -0700)
+
+are available in the Git repository at:
+
+  https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git tags/for_linus
+
+for you to fetch changes up to a96b0d061d476093cf86ca1c2de06fc57163588d:
+
+  virtio-mem: Fix build error due to improper use 'select' (2020-07-30 11:28:17 -0400)
+
+----------------------------------------------------------------
+virtio, qemu_fw: bugfixes
+
+A couple of last minute bugfixes.
+
+Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+
+----------------------------------------------------------------
+Alexander Duyck (1):
+      virtio-balloon: Document byte ordering of poison_val
+
+Michael S. Tsirkin (2):
+      vhost/scsi: fix up req type endian-ness
+      virtio_balloon: fix up endian-ness for free cmd id
+
+Qiushi Wu (1):
+      firmware: Fix a reference count leak.
+
+Weilong Chen (1):
+      virtio-mem: Fix build error due to improper use 'select'
+
+ drivers/firmware/qemu_fw_cfg.c  |  7 ++++---
+ drivers/vhost/scsi.c            |  2 +-
+ drivers/virtio/Kconfig          |  2 +-
+ drivers/virtio/virtio_balloon.c | 11 ++++++++++-
+ 4 files changed, 16 insertions(+), 6 deletions(-)
+
