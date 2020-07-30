@@ -2,17 +2,17 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A52F02335C8
-	for <lists+kvm@lfdr.de>; Thu, 30 Jul 2020 17:43:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7AB012335CE
+	for <lists+kvm@lfdr.de>; Thu, 30 Jul 2020 17:44:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729797AbgG3Pnq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 30 Jul 2020 11:43:46 -0400
-Received: from 8bytes.org ([81.169.241.247]:34112 "EHLO theia.8bytes.org"
+        id S1729885AbgG3PoD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 30 Jul 2020 11:44:03 -0400
+Received: from 8bytes.org ([81.169.241.247]:34118 "EHLO theia.8bytes.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728286AbgG3Pnq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        id S1728412AbgG3Pnq (ORCPT <rfc822;kvm@vger.kernel.org>);
         Thu, 30 Jul 2020 11:43:46 -0400
 Received: by theia.8bytes.org (Postfix, from userid 1000)
-        id CBEB99CE; Thu, 30 Jul 2020 17:43:44 +0200 (CEST)
+        id 028269FA; Thu, 30 Jul 2020 17:43:44 +0200 (CEST)
 From:   Joerg Roedel <joro@8bytes.org>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
@@ -21,10 +21,11 @@ Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
         Jim Mattson <jmattson@google.com>,
         Joerg Roedel <joro@8bytes.org>,
         Tom Lendacky <thomas.lendacky@amd.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Joerg Roedel <jroedel@suse.de>
-Subject: [PATCH v2 3/4] KVM: SVM: Add GHCB Accessor functions
-Date:   Thu, 30 Jul 2020 17:43:39 +0200
-Message-Id: <20200730154340.14021-4-joro@8bytes.org>
+        linux-kernel@vger.kernel.org, Borislav Petkov <bp@alien8.de>,
+        Joerg Roedel <jroedel@suse.de>
+Subject: [PATCH v2 4/4] KVM: SVM: Use __packed shorthand
+Date:   Thu, 30 Jul 2020 17:43:40 +0200
+Message-Id: <20200730154340.14021-5-joro@8bytes.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20200730154340.14021-1-joro@8bytes.org>
 References: <20200730154340.14021-1-joro@8bytes.org>
@@ -33,73 +34,74 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Joerg Roedel <jroedel@suse.de>
+From: Borislav Petkov <bp@alien8.de>
 
-Building a correct GHCB for the hypervisor requires setting valid bits
-in the GHCB. Simplify that process by providing accessor functions to
-set values and to update the valid bitmap and to check the valid bitmap
-in KVM.
+Use the shorthand to make it more readable.
+
+No functional changes.
 
 Signed-off-by: Joerg Roedel <jroedel@suse.de>
 ---
- arch/x86/include/asm/svm.h | 46 ++++++++++++++++++++++++++++++++++++++
- 1 file changed, 46 insertions(+)
+ arch/x86/include/asm/svm.h | 16 ++++++++--------
+ 1 file changed, 8 insertions(+), 8 deletions(-)
 
 diff --git a/arch/x86/include/asm/svm.h b/arch/x86/include/asm/svm.h
-index 9a3e0b802716..8744817358bf 100644
+index 8744817358bf..6b4b43f68f4b 100644
 --- a/arch/x86/include/asm/svm.h
 +++ b/arch/x86/include/asm/svm.h
-@@ -341,4 +341,50 @@ struct __attribute__ ((__packed__)) vmcb {
+@@ -150,14 +150,14 @@ struct __attribute__ ((__packed__)) vmcb_control_area {
+ #define SVM_NESTED_CTL_NP_ENABLE	BIT(0)
+ #define SVM_NESTED_CTL_SEV_ENABLE	BIT(1)
  
- #define SVM_CR0_SELECTIVE_MASK (X86_CR0_TS | X86_CR0_MP)
+-struct __attribute__ ((__packed__)) vmcb_seg {
++struct vmcb_seg {
+ 	u16 selector;
+ 	u16 attrib;
+ 	u32 limit;
+ 	u64 base;
+-};
++} __packed;
  
-+/* GHCB Accessor functions */
-+
-+#define GHB_BITMAP_IDX(field)								\
-+        (offsetof(struct vmcb_save_area, field) / sizeof(u64))
-+
-+#define GHCB_SET_VALID(ghcb, field)							\
-+	__set_bit(GHB_BITMAP_IDX(field), (unsigned long *)&(ghcb)->save.valid_bitmap);	\
-+
-+#define DEFINE_GHCB_ACCESSORS(field)							\
-+	static inline bool ghcb_##field##_is_valid(const struct ghcb *ghcb)		\
-+	{										\
-+		int idx = offsetof(struct vmcb_save_area, field) / sizeof(u64);		\
-+		return test_bit(idx, (unsigned long *)&(ghcb)->save.valid_bitmap);	\
-+	}										\
-+											\
-+	static inline void								\
-+	ghcb_set_##field(struct ghcb *ghcb, u64 value)					\
-+	{										\
-+		GHCB_SET_VALID(ghcb, field)						\
-+		ghcb->save.field = value;						\
-+	}
-+
-+DEFINE_GHCB_ACCESSORS(cpl)
-+DEFINE_GHCB_ACCESSORS(rip)
-+DEFINE_GHCB_ACCESSORS(rsp)
-+DEFINE_GHCB_ACCESSORS(rax)
-+DEFINE_GHCB_ACCESSORS(rcx)
-+DEFINE_GHCB_ACCESSORS(rdx)
-+DEFINE_GHCB_ACCESSORS(rbx)
-+DEFINE_GHCB_ACCESSORS(rbp)
-+DEFINE_GHCB_ACCESSORS(rsi)
-+DEFINE_GHCB_ACCESSORS(rdi)
-+DEFINE_GHCB_ACCESSORS(r8)
-+DEFINE_GHCB_ACCESSORS(r9)
-+DEFINE_GHCB_ACCESSORS(r10)
-+DEFINE_GHCB_ACCESSORS(r11)
-+DEFINE_GHCB_ACCESSORS(r12)
-+DEFINE_GHCB_ACCESSORS(r13)
-+DEFINE_GHCB_ACCESSORS(r14)
-+DEFINE_GHCB_ACCESSORS(r15)
-+DEFINE_GHCB_ACCESSORS(sw_exit_code)
-+DEFINE_GHCB_ACCESSORS(sw_exit_info_1)
-+DEFINE_GHCB_ACCESSORS(sw_exit_info_2)
-+DEFINE_GHCB_ACCESSORS(sw_scratch)
-+DEFINE_GHCB_ACCESSORS(xcr0)
-+
- #endif
+-struct __attribute__ ((__packed__)) vmcb_save_area {
++struct vmcb_save_area {
+ 	struct vmcb_seg es;
+ 	struct vmcb_seg cs;
+ 	struct vmcb_seg ss;
+@@ -231,9 +231,9 @@ struct __attribute__ ((__packed__)) vmcb_save_area {
+ 	u64 xcr0;
+ 	u8 valid_bitmap[16];
+ 	u64 x87_state_gpa;
+-};
++} __packed;
+ 
+-struct __attribute__ ((__packed__)) ghcb {
++struct ghcb {
+ 	struct vmcb_save_area save;
+ 	u8 reserved_save[2048 - sizeof(struct vmcb_save_area)];
+ 
+@@ -242,7 +242,7 @@ struct __attribute__ ((__packed__)) ghcb {
+ 	u8 reserved_1[10];
+ 	u16 protocol_version;	/* negotiated SEV-ES/GHCB protocol version */
+ 	u32 ghcb_usage;
+-};
++} __packed;
+ 
+ 
+ static inline void __unused_size_checks(void)
+@@ -252,11 +252,11 @@ static inline void __unused_size_checks(void)
+ 	BUILD_BUG_ON(sizeof(struct ghcb) != 4096);
+ }
+ 
+-struct __attribute__ ((__packed__)) vmcb {
++struct vmcb {
+ 	struct vmcb_control_area control;
+ 	u8 reserved_control[1024 - sizeof(struct vmcb_control_area)];
+ 	struct vmcb_save_area save;
+-};
++} __packed;
+ 
+ #define SVM_CPUID_FUNC 0x8000000a
+ 
 -- 
 2.17.1
 
