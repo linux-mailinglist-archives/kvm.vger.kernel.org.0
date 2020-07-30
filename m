@@ -2,103 +2,76 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7E1A2233324
-	for <lists+kvm@lfdr.de>; Thu, 30 Jul 2020 15:33:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BD34D2333A6
+	for <lists+kvm@lfdr.de>; Thu, 30 Jul 2020 15:59:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728124AbgG3NdL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 30 Jul 2020 09:33:11 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:51909 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726275AbgG3NdK (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 30 Jul 2020 09:33:10 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1596115989;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=yoofDigctfM1LCNhluEuEXbsP3wkbmZPS2uj7H6BtlY=;
-        b=SJ+2Iqbl/5Xh12uWq2Q8oF85Xz5uEq2Y1JaCSpv6Y8Gee7lNzyW2FmSU9FtsPerc39YQ5S
-        S9fAgK0z9DXDIHASz9WRvF4iHkCDi1hUggMG1z4t3+sgjnRLGfWW2vZNeikbCEp37anjOg
-        LIOct9ptzTzpHwnLa39xOElSBE1MlX0=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-68-si5dTY1FOHiRfIDTZKgS9g-1; Thu, 30 Jul 2020 09:33:07 -0400
-X-MC-Unique: si5dTY1FOHiRfIDTZKgS9g-1
-Received: by mail-wm1-f69.google.com with SMTP id h6so1392891wml.8
-        for <kvm@vger.kernel.org>; Thu, 30 Jul 2020 06:33:07 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=yoofDigctfM1LCNhluEuEXbsP3wkbmZPS2uj7H6BtlY=;
-        b=r4itX9/Lmm+2JCup9oSdk0hzg03Mg/mSrVM/sUvISTJJssnbrhQTzVthqibVLvNVlm
-         KOosVucz33bgpDmo9QbvwEl2JOmnQxwuX34G5rJb1y4mrENDg4N91i99plH7xrjBxrh8
-         v/8m2xqy3xGLFl/fdbKv8aNONVAu0zeCBXPvwL0TP1YsisIChm7rcbbkw5Nj0Y+Nv9u7
-         T2NqZrRHXgr+1lV6CfG1ILkoM/KJ0XzApqYIxqA/bFI3VW5AmDKz91ylMID+7ohLT6l+
-         Ot50GHX00ehDpC8SN+Lyx8nYPEU/7XTBq/Rz+R+l2vjHaiLpLm+/mYGWWU5x+KfphoSo
-         oL7A==
-X-Gm-Message-State: AOAM5318kwIV21PZF5qNyrmWqgc3MYjw0o9g0LdoN7Dq2zkjJw/YbrPs
-        6x/wN8b0K69cslDhOsNwrkUFRufz3JfumCHzYnpJ/eLnUHPDY+SY+FJZOLO4f3W4Ul6Af+G2N28
-        hzKfc4930xX0O
-X-Received: by 2002:adf:ce89:: with SMTP id r9mr3079763wrn.116.1596115986330;
-        Thu, 30 Jul 2020 06:33:06 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwI77ayAVTtCtv5QswHU9dsUiT1TEFXBaIiLvjfRhzkS9BbkhD5lHHX3xFSwxH8ps6cUIqPHQ==
-X-Received: by 2002:adf:ce89:: with SMTP id r9mr3079736wrn.116.1596115986066;
-        Thu, 30 Jul 2020 06:33:06 -0700 (PDT)
-Received: from [192.168.10.150] ([93.56.170.5])
-        by smtp.gmail.com with ESMTPSA id w132sm2275720wma.32.2020.07.30.06.33.04
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 30 Jul 2020 06:33:05 -0700 (PDT)
-Subject: Re: A new name for kvm-unit-tests ?
-To:     Andrew Jones <drjones@redhat.com>, Nadav Amit <namit@vmware.com>
-Cc:     Wanpeng Li <kernellwp@gmail.com>,
-        David Hildenbrand <david@redhat.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Thomas Huth <thuth@redhat.com>, KVM <kvm@vger.kernel.org>,
-        Laurent Vivier <lvivier@redhat.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Liran Alon <liran.alon@oracle.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>
-References: <dc518389-945a-1887-7ad0-00ebaf9ae30e@redhat.com>
- <682fe35c-f4ea-2540-f692-f23a42c6d56b@de.ibm.com>
- <c8e83bff-1762-f719-924f-618bd29e7894@redhat.com>
- <CANRm+Czsb79JYAHcOm49tg=M2vHdOzh_XFaEcSS_RUPfX3dRuw@mail.gmail.com>
- <c92c6905-fcfb-ea5b-8c80-1025488adc98@redhat.com>
- <1B9660BF-6A81-475E-B80C-632C6D8F4BF9@vmware.com>
- <20200730113215.dakrrilcdz5p4z7e@kamzik.brq.redhat.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <7b77d175-d119-0c69-c2ba-2068cfddbbf2@redhat.com>
-Date:   Thu, 30 Jul 2020 15:33:04 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.9.0
+        id S1728690AbgG3N6F (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 30 Jul 2020 09:58:05 -0400
+Received: from mail.kernel.org ([198.145.29.99]:36580 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727966AbgG3N6E (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 30 Jul 2020 09:58:04 -0400
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 368962074B;
+        Thu, 30 Jul 2020 13:58:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1596117484;
+        bh=I4VtO+RvTl5dHcnmis2rhMN15keqAvYuB5FZEdImv3A=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=bm9nVVGjGZ7XYNnFoyAkAmwjyW5kA9q1IsWKYLKaXwYx5CxsIH156XdZeWk+HBeOn
+         nkjkN6aIgkq/OSSDn08riSiwgRXr2P9h+M3dHPFJmZk2HRzvSiuVcc3IOnBZLRq4lG
+         bbcdjhffeKKlT7hQJnfY11YZKzgeDrmUju2alRl8=
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=hot-poop.lan)
+        by disco-boy.misterjones.org with esmtpsa (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+        (Exim 4.92)
+        (envelope-from <maz@kernel.org>)
+        id 1k194M-00GH3a-Mo; Thu, 30 Jul 2020 14:58:02 +0100
+From:   Marc Zyngier <maz@kernel.org>
+To:     Alexander Graf <graf@amazon.com>, kvm@vger.kernel.org
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Heinrich Schuchardt <xypron.glpk@gmx.de>,
+        linux-kernel@vger.kernel.org,
+        Christoffer Dall <christoffer.dall@arm.com>,
+        kvmarm@lists.cs.columbia.edu,
+        Vitaly Kuznetsov <vkuznets@redhat.com>
+Subject: Re: [PATCH] KVM: arm: Add trace name for ARM_NISV
+Date:   Thu, 30 Jul 2020 14:57:56 +0100
+Message-Id: <159611742543.1691243.7923791390001583960.b4-ty@kernel.org>
+X-Mailer: git-send-email 2.27.0
+In-Reply-To: <20200730094441.18231-1-graf@amazon.com>
+References: <20200730094441.18231-1-graf@amazon.com>
 MIME-Version: 1.0
-In-Reply-To: <20200730113215.dakrrilcdz5p4z7e@kamzik.brq.redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
 Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: graf@amazon.com, kvm@vger.kernel.org, pbonzini@redhat.com, xypron.glpk@gmx.de, linux-kernel@vger.kernel.org, christoffer.dall@arm.com, kvmarm@lists.cs.columbia.edu, vkuznets@redhat.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 30/07/20 13:32, Andrew Jones wrote:
->> This should have practical implications. I remember, for example, that I had
->> a discussion with Paolo in the past regarding “xpass” being reported as a
->> failure. The rationale was that if a test that is expected to fail on KVM
->> (since KVM is known to be broken) surprisingly passes, there is some problem
->> that should be reported as a failure. I would argue that if the project is
->> hypervisor-agnostic, “xpass” is not a failure.
-> We can use compile-time or run-time logic that depends on the target to
-> decide whether a test should be a normal test (pass/fail) or an
-> xpass/xfail test.
+On Thu, 30 Jul 2020 11:44:41 +0200, Alexander Graf wrote:
+> Commit c726200dd106d ("KVM: arm/arm64: Allow reporting non-ISV data aborts
+> to userspace") introduced a mechanism to deflect MMIO traffic the kernel
+> can not handle to user space. For that, it introduced a new exit reason.
+> 
+> However, it did not update the trace point array that gives human readable
+> names to these exit reasons inside the trace log.
+> 
+> [...]
 
-Yeah, that would be basically the old "errata" mechanism.
+Applied to kvm-arm64/misc-5.9, thanks!
 
-Probably we should have some kind of configure script that builds
-"errata" files based on hypervisor, uname or whatnot.  (Upstream should
-do the bare minimum, just the hypervisor).
+[1/1] KVM: arm: Add trace name for ARM_NISV
+      commit: 1ccf2fe35c30f79102ad129c5aa71059daaaed7f
 
-Paolo
+Cheers,
+
+	M.
+-- 
+Without deviation from the norm, progress is not possible.
+
 
