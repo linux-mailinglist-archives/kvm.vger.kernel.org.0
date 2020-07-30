@@ -2,75 +2,200 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C5986233A59
-	for <lists+kvm@lfdr.de>; Thu, 30 Jul 2020 23:10:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 85150233A69
+	for <lists+kvm@lfdr.de>; Thu, 30 Jul 2020 23:17:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730583AbgG3VKs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 30 Jul 2020 17:10:48 -0400
-Received: from userp2120.oracle.com ([156.151.31.85]:36962 "EHLO
-        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730279AbgG3VKq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 30 Jul 2020 17:10:46 -0400
-Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
-        by userp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 06UL1kii144978
-        for <kvm@vger.kernel.org>; Thu, 30 Jul 2020 21:10:45 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=to : from : subject :
- message-id : date : mime-version : content-type :
- content-transfer-encoding; s=corp-2020-01-29;
- bh=cobRzjEpBLwZku9+RNbw0pbhm/V1p8fvAj5wkVWUu84=;
- b=wuAFacQLZGv1Mn3HQwhS8cpEtjpo6VCs2clpTeQONB6U3flnMcpre7xRaRlLjm1TJhc7
- eLRahjdpGyggnJNcWwh8BH96ILL95iXRtiaNT2OLsAMTcpN3wbE8qUerYzj9A5ZORJYd
- a5hXkkJ0daCbdIU1TUvBsyjVbyv66G9GTBgiAfvXLJFSgLCZGo7rVggk29U8PiYlkfhe
- T2kC2LPpuRvGvkonG4fHB+n0z+GIkng8hDHCc0Ru0X2RMUjhlj8+5kAXH8/ftA3yBIQm
- L1lvaRWkXriMDdVwAUnrIipbsBAHF+0bF3Za+fc66tbNsjY5QLH6JNeim/ztyPtPAp2r Rg== 
-Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
-        by userp2120.oracle.com with ESMTP id 32hu1jx0fm-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL)
-        for <kvm@vger.kernel.org>; Thu, 30 Jul 2020 21:10:45 +0000
-Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
-        by aserp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 06UL2pQo055278
-        for <kvm@vger.kernel.org>; Thu, 30 Jul 2020 21:10:44 GMT
-Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
-        by aserp3030.oracle.com with ESMTP id 32hu5xxp58-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK)
-        for <kvm@vger.kernel.org>; Thu, 30 Jul 2020 21:10:44 +0000
-Received: from abhmp0020.oracle.com (abhmp0020.oracle.com [141.146.116.26])
-        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 06ULAhGC016907
-        for <kvm@vger.kernel.org>; Thu, 30 Jul 2020 21:10:43 GMT
-Received: from localhost.localdomain (/10.159.234.214)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Thu, 30 Jul 2020 14:10:43 -0700
-To:     kvm <kvm@vger.kernel.org>
-From:   Krish Sadhukhan <krish.sadhukhan@oracle.com>
-Subject: Guest identity in VMCS/VMCB
-Message-ID: <8f77270a-b47e-8e69-2e36-f28de927cd7a@oracle.com>
-Date:   Thu, 30 Jul 2020 14:10:42 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+        id S1730626AbgG3VRO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 30 Jul 2020 17:17:14 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:25934 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1730493AbgG3VRO (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 30 Jul 2020 17:17:14 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1596143830;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=bZGuV4rD0Ceq1ep6s52mf/yK6aOPC8Nt7kiDKbGKZCM=;
+        b=fSD5EdSO4Nry2NbMtGCBXHpYrFugAVbC9tkpespU/M+T6/H60af3AvbeEfXb5bwupHm6Wo
+        JpDKJEyb5PqHjcrbr89Ft3/exIDM4FvC+IcUKDDNtkC4v5YQ7vNaRAbJP7mVrjDsCEqhY8
+        mg87dFG8lwmzXvMNYApNlZMzdPiF818=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-180-x-mLPphPMe-v_LHwNhgtoA-1; Thu, 30 Jul 2020 17:17:06 -0400
+X-MC-Unique: x-mLPphPMe-v_LHwNhgtoA-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B53B1100A8F2;
+        Thu, 30 Jul 2020 21:17:04 +0000 (UTC)
+Received: from x1.home (ovpn-112-71.phx2.redhat.com [10.3.112.71])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id C301519D7B;
+        Thu, 30 Jul 2020 21:17:03 +0000 (UTC)
+Date:   Thu, 30 Jul 2020 15:17:03 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Lu Baolu <baolu.lu@linux.intel.com>
+Cc:     Joerg Roedel <joro@8bytes.org>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Jean-Philippe Brucker <jean-philippe@linaro.org>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Kevin Tian <kevin.tian@intel.com>,
+        Ashok Raj <ashok.raj@intel.com>,
+        Dave Jiang <dave.jiang@intel.com>,
+        Liu Yi L <yi.l.liu@intel.com>,
+        iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+Subject: Re: [PATCH v3 4/4] vfio/type1: Use iommu_aux_at(de)tach_group()
+ APIs
+Message-ID: <20200730151703.5daf8ad4@x1.home>
+In-Reply-To: <af6c95a7-3238-1cbd-8656-014c12498587@linux.intel.com>
+References: <20200714055703.5510-1-baolu.lu@linux.intel.com>
+        <20200714055703.5510-5-baolu.lu@linux.intel.com>
+        <20200729143258.22533170@x1.home>
+        <af6c95a7-3238-1cbd-8656-014c12498587@linux.intel.com>
+Organization: Red Hat
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9698 signatures=668679
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
- mlxscore=0 adultscore=0 spamscore=0 phishscore=0 mlxlogscore=825
- bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2006250000 definitions=main-2007300148
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9698 signatures=668679
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 clxscore=1015 mlxlogscore=848
- malwarescore=0 impostorscore=0 priorityscore=1501 spamscore=0 phishscore=0
- suspectscore=0 bulkscore=0 mlxscore=0 lowpriorityscore=0 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
- definitions=main-2007300148
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-When I am debugging and looking at the trace-point output for a guest, there is no way for me to determine whether a given trace-point, say, {vmx|svm}_handle_exit() or {vmx|svm}_vcpu_run(), was executed as part of which L1/L2 guest. As VMs do such operations so many times in a short period of time, trace-point output looks overwhelming and is of no use when  analyzed from this angle.
+On Thu, 30 Jul 2020 10:41:32 +0800
+Lu Baolu <baolu.lu@linux.intel.com> wrote:
 
-Does it makes sense to embed some sort of guest identification within the VMCS/VMCB, say, loaded_vmcs or vmcb, so that trace-points can spit out which guest/nested-guest executed the operation ?
+> Hi Alex,
+> 
+> On 7/30/20 4:32 AM, Alex Williamson wrote:
+> > On Tue, 14 Jul 2020 13:57:03 +0800
+> > Lu Baolu <baolu.lu@linux.intel.com> wrote:
+> >   
+> >> Replace iommu_aux_at(de)tach_device() with iommu_aux_at(de)tach_group().
+> >> It also saves the IOMMU_DEV_FEAT_AUX-capable physcail device in the
+> >> vfio_group data structure so that it could be reused in other places.
+> >>
+> >> Signed-off-by: Lu Baolu <baolu.lu@linux.intel.com>
+> >> ---
+> >>   drivers/vfio/vfio_iommu_type1.c | 44 ++++++---------------------------
+> >>   1 file changed, 7 insertions(+), 37 deletions(-)
+> >>
+> >> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
+> >> index 5e556ac9102a..f8812e68de77 100644
+> >> --- a/drivers/vfio/vfio_iommu_type1.c
+> >> +++ b/drivers/vfio/vfio_iommu_type1.c
+> >> @@ -100,6 +100,7 @@ struct vfio_dma {
+> >>   struct vfio_group {
+> >>   	struct iommu_group	*iommu_group;
+> >>   	struct list_head	next;
+> >> +	struct device		*iommu_device;
+> >>   	bool			mdev_group;	/* An mdev group */
+> >>   	bool			pinned_page_dirty_scope;
+> >>   };
+> >> @@ -1627,45 +1628,13 @@ static struct device *vfio_mdev_get_iommu_device(struct device *dev)
+> >>   	return NULL;
+> >>   }
+> >>   
+> >> -static int vfio_mdev_attach_domain(struct device *dev, void *data)
+> >> -{
+> >> -	struct iommu_domain *domain = data;
+> >> -	struct device *iommu_device;
+> >> -
+> >> -	iommu_device = vfio_mdev_get_iommu_device(dev);
+> >> -	if (iommu_device) {
+> >> -		if (iommu_dev_feature_enabled(iommu_device, IOMMU_DEV_FEAT_AUX))
+> >> -			return iommu_aux_attach_device(domain, iommu_device);
+> >> -		else
+> >> -			return iommu_attach_device(domain, iommu_device);
+> >> -	}
+> >> -
+> >> -	return -EINVAL;
+> >> -}
+> >> -
+> >> -static int vfio_mdev_detach_domain(struct device *dev, void *data)
+> >> -{
+> >> -	struct iommu_domain *domain = data;
+> >> -	struct device *iommu_device;
+> >> -
+> >> -	iommu_device = vfio_mdev_get_iommu_device(dev);
+> >> -	if (iommu_device) {
+> >> -		if (iommu_dev_feature_enabled(iommu_device, IOMMU_DEV_FEAT_AUX))
+> >> -			iommu_aux_detach_device(domain, iommu_device);
+> >> -		else
+> >> -			iommu_detach_device(domain, iommu_device);
+> >> -	}
+> >> -
+> >> -	return 0;
+> >> -}
+> >> -
+> >>   static int vfio_iommu_attach_group(struct vfio_domain *domain,
+> >>   				   struct vfio_group *group)
+> >>   {
+> >>   	if (group->mdev_group)
+> >> -		return iommu_group_for_each_dev(group->iommu_group,
+> >> -						domain->domain,
+> >> -						vfio_mdev_attach_domain);
+> >> +		return iommu_aux_attach_group(domain->domain,
+> >> +					      group->iommu_group,
+> >> +					      group->iommu_device);  
+> > 
+> > No, we previously iterated all devices in the group and used the aux
+> > interface only when we have an iommu_device supporting aux.  If we
+> > simply assume an mdev group only uses an aux domain we break existing
+> > users, ex. SR-IOV VF backed mdevs.  Thanks,  
+> 
+> Oh, yes. Sorry! I didn't consider the physical device backed mdevs
+> cases.
+> 
+> Looked into this part of code, it seems that there's a lock issue here.
+> The group->mutex is held in iommu_group_for_each_dev() and will be
+> acquired again in iommu_attach_device().
 
+These are two different groups.  We walk the devices in the mdev's
+group with iommu_group_for_each_dev(), holding the mdev's group lock,
+but we call iommu_attach_device() with iommu_device, which results in
+acquiring the lock for the iommu_device's group.
 
--Krish
+> How about making it like:
+> 
+> static int vfio_iommu_attach_group(struct vfio_domain *domain,
+>                                     struct vfio_group *group)
+> {
+>          if (group->mdev_group) {
+>                  struct device *iommu_device = group->iommu_device;
+> 
+>                  if (WARN_ON(!iommu_device))
+>                          return -EINVAL;
+> 
+>                  if (iommu_dev_feature_enabled(iommu_device, 
+> IOMMU_DEV_FEAT_AUX))
+>                          return iommu_aux_attach_device(domain->domain, 
+> iommu_device);
+>                  else
+>                          return iommu_attach_device(domain->domain, 
+> iommu_device);
+>          } else {
+>                  return iommu_attach_group(domain->domain, 
+> group->iommu_group);
+>          }
+> }
+> 
+> The caller (vfio_iommu_type1_attach_group) has guaranteed that all mdevs
+> in an iommu group should be derived from a same physical device.
+
+Have we?  iommu_attach_device() will fail if the group is not
+singleton, but that's just encouraging us to use the _attach_group()
+interface where the _attach_device() interface is relegated to special
+cases.  Ideally we'd get out of those special cases and create an
+_attach_group() for aux that doesn't further promote these notions.
+
+> Any thoughts?
+
+See my reply to Kevin, I'm thinking we need to provide a callback that
+can enlighten the IOMMU layer to be able to do _attach_group() with
+aux or separate IOMMU backed devices.  Thanks,
+
+Alex
 
