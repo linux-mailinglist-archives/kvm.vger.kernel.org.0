@@ -2,73 +2,72 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6F25A2331F9
-	for <lists+kvm@lfdr.de>; Thu, 30 Jul 2020 14:26:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D51B3233256
+	for <lists+kvm@lfdr.de>; Thu, 30 Jul 2020 14:39:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727794AbgG3M0x (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 30 Jul 2020 08:26:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36288 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726631AbgG3M0x (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 30 Jul 2020 08:26:53 -0400
-Received: from theia.8bytes.org (8bytes.org [IPv6:2a01:238:4383:600:38bc:a715:4b6d:a889])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3AC7AC061794;
-        Thu, 30 Jul 2020 05:26:53 -0700 (PDT)
+        id S1728124AbgG3Mi4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 30 Jul 2020 08:38:56 -0400
+Received: from 8bytes.org ([81.169.241.247]:34032 "EHLO theia.8bytes.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726535AbgG3Miz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 30 Jul 2020 08:38:55 -0400
 Received: by theia.8bytes.org (Postfix, from userid 1000)
-        id 185E83C8; Thu, 30 Jul 2020 14:26:49 +0200 (CEST)
-Date:   Thu, 30 Jul 2020 14:26:45 +0200
+        id 1D1C53C8; Thu, 30 Jul 2020 14:38:54 +0200 (CEST)
+Date:   Thu, 30 Jul 2020 14:38:52 +0200
 From:   Joerg Roedel <joro@8bytes.org>
-To:     Mike Stunes <mstunes@vmware.com>
-Cc:     "x86@kernel.org" <x86@kernel.org>, Joerg Roedel <jroedel@suse.de>,
-        "hpa@zytor.com" <hpa@zytor.com>, Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Jiri Slaby <jslaby@suse.cz>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Juergen Gross <jgross@suse.com>,
-        Kees Cook <keescook@chromium.org>,
-        David Rientjes <rientjes@google.com>,
-        Cfir Cohen <cfir@google.com>,
-        Erdem Aktas <erdemaktas@google.com>,
-        Masami Hiramatsu <mhiramat@kernel.org>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Martin Radev <martin.b.radev@gmail.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "virtualization@lists.linux-foundation.org" 
-        <virtualization@lists.linux-foundation.org>
-Subject: Re: [PATCH v5 00/75] x86: SEV-ES Guest Support
-Message-ID: <20200730122645.GA3257@8bytes.org>
-References: <20200724160336.5435-1-joro@8bytes.org>
- <B65392F4-FD42-4AA3-8AA8-6C0C0D1FF007@vmware.com>
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Joerg Roedel <jroedel@suse.de>
+Subject: Re: [PATCH 1/4] KVM: SVM: nested: Don't allocate VMCB structures on
+ stack
+Message-ID: <20200730123852.GB3257@8bytes.org>
+References: <20200729132234.2346-1-joro@8bytes.org>
+ <20200729132234.2346-2-joro@8bytes.org>
+ <20200729151454.GB27751@linux.intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <B65392F4-FD42-4AA3-8AA8-6C0C0D1FF007@vmware.com>
+In-Reply-To: <20200729151454.GB27751@linux.intel.com>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Mike,
+Hi Sean,
 
-On Thu, Jul 30, 2020 at 01:27:48AM +0000, Mike Stunes wrote:
-> Thanks for the updated patches! I applied this patch-set onto commit
-> 01634f2bd42e ("Merge branch 'x86/urgent’”) from your tree. It boots,
-> but CPU 1 (on a two-CPU VM) is offline at boot, and `chcpu -e 1` returns:
-> 
-> chcpu: CPU 1 enable failed: Input/output error
-> 
-> with nothing in dmesg to indicate why it failed. The first thing I thought
-> of was anything relating to the AP jump table, but I haven’t changed
-> anything there on the hypervisor side. Let me know what other data I can
-> provide for you.
+thanks for your review!
 
-Hard to tell, have you enabled FSGSBASE in the guest? If yes, can you
-try to disable it?
+On Wed, Jul 29, 2020 at 08:14:55AM -0700, Sean Christopherson wrote:
+> On Wed, Jul 29, 2020 at 03:22:31PM +0200, Joerg Roedel wrote:
+> Speaking of too large, would it be overly paranoid to add:
+> 
+>   BUILD_BUG_ON(sizeof(struct vmcb_control_area) + sizeof(struct vmcb_save_area) <
+> 	       KVM_STATE_NESTED_SVM_VMCB_SIZE)
+> 
+> More so for documentation than for any real concern that the SVM architecture
+> will do something silly, e.g. to make it obvious that patch 2 in this series
+> won't break backwards compatibility.
+
+The check should actually be '>', but then it makes sense. The control-
+and save-area together are still way smaller than 4k. I will add the
+check for '>' to this patch.
+
+> > +	ret = -EFAULT;
+> > +	if (copy_from_user(ctl, &user_vmcb->control, sizeof(ctl)))
+> 
+> The sizeof() calc is wrong, this is now calculating the size of the pointer,
+> not the size of the struct.  It'd need to be sizeof(*ctl).
+> 
+> > +		goto out_free;
+> > +	if (copy_from_user(save, &user_vmcb->save, sizeof(save)))
+> 
+> Same bug here.
+
+Thanks, fixed that.
 
 Regards,
 
