@@ -2,195 +2,131 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 71731233F38
-	for <lists+kvm@lfdr.de>; Fri, 31 Jul 2020 08:42:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 93C9B233F4F
+	for <lists+kvm@lfdr.de>; Fri, 31 Jul 2020 08:45:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731423AbgGaGlY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 31 Jul 2020 02:41:24 -0400
-Received: from ozlabs.org ([203.11.71.1]:38869 "EHLO ozlabs.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1731369AbgGaGlX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 31 Jul 2020 02:41:23 -0400
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (No client certificate requested)
-        by mail.ozlabs.org (Postfix) with ESMTPSA id 4BHyNZ6xtsz9sRN;
-        Fri, 31 Jul 2020 16:41:17 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=canb.auug.org.au;
-        s=201702; t=1596177680;
-        bh=YiqLrRycvqLl4QUJsOXEjPkwKcEk/G+XXcaUYXrgJBE=;
-        h=Date:From:To:Cc:Subject:From;
-        b=uS7CB3LWcSRO5A3NOPyQbmC98LYlgrYkHkhyprR9Z1D+us23DsxZgnNBnz1JVB0kR
-         JMEM/mX03jkm4uNQ8YNyr4b9LX8r57KAsxc99PDVOrRi84Ia5769oU6jyfFVNSwaUx
-         nqwxdXUhgH8w1D7YKS/I3K04Q0ZiMXW49eos8bmPoSvTaubVc9tWKEjN3et1yGJ0tk
-         cTwSpF2OCU2JNciaCFvy3hLaKdkcq5eRGN+b+tRRRZm9VINtLEENT6QkD2dml5+Bdd
-         t1diSEqu3NX8ttdhwA/pvenENNBrlTwHtc7w5q9TefnMZtgLc2+0mx9L3mrLTkXYmx
-         lVS+YUg9Qdw8A==
-Date:   Fri, 31 Jul 2020 16:41:17 +1000
-From:   Stephen Rothwell <sfr@canb.auug.org.au>
-To:     Christoffer Dall <cdall@cs.columbia.edu>,
-        Marc Zyngier <maz@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>, KVM <kvm@vger.kernel.org>
-Cc:     Linux Next Mailing List <linux-next@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Sean Christopherson <sean.j.christopherson@intel.com>
-Subject: linux-next: manual merge of the kvm-arm tree with the kvm-fixes
- tree
-Message-ID: <20200731164117.3ecb9791@canb.auug.org.au>
+        id S1731447AbgGaGpD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 31 Jul 2020 02:45:03 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:41246 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1731224AbgGaGpD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 31 Jul 2020 02:45:03 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1596177901;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=akcf5o31IxmDQVV9nGhhRCpgu422ncpTC7D3b7rqbA4=;
+        b=FdAebtOA95UDn4MRlqXB/Oj3N5hSQyi3CIRQqQzx4tmUXgvWj/9DITBTqaAgKOySAAAGEh
+        qy/qFWdxBId0+P/ZZAYbA7Rr4ZoLdfZow8s1uM99yx8OXnIraS3wnbFZzWsUXut5Zvnxto
+        +2ZfEfB+Vxf/prsys7S98csZokiXJHw=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-399-iceKlaKqMMuhmap-eETy3w-1; Fri, 31 Jul 2020 02:44:59 -0400
+X-MC-Unique: iceKlaKqMMuhmap-eETy3w-1
+Received: by mail-wr1-f70.google.com with SMTP id w7so6446934wre.11
+        for <kvm@vger.kernel.org>; Thu, 30 Jul 2020 23:44:58 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=akcf5o31IxmDQVV9nGhhRCpgu422ncpTC7D3b7rqbA4=;
+        b=AUmZ8swb6V2CW3r59kt1T6lmRy0v9lyp5EjVqAcOcOq1jMWrJ2QOVgvx67iqYW5ZeH
+         yIdpQZpQHPA/ZtUa6Yz4JjJMYKL73rEce/wCwdK7/xJXzicIMU2YEymGBHTKAqRxMa/3
+         OH4r4ekNZdhjsVLmwXW0BHfNnDM75l+sOq7+VmDgzp+j6ZOQdCE89RDHnOyYc7SBIeXn
+         wSqyREI3wrDodDB86IcriaOwP2nNzDcJLb5drMJzyqrgeENfAz0iHXWmPcfMdzLVDP+8
+         M2sonjDSshwCQUlqGHPT/XVPop8XjoBTC9xq1F9gY0gOoIXQlBUM7jI0MRkuCMxyc2lg
+         0Yww==
+X-Gm-Message-State: AOAM533Oig4uu8z1nRr9f2wUcCa3uH9ST2nVNTvXjcbfhk9vM4DlhRPc
+        3fFUFvG3lf9jyhBWWZlLxxL4cNqHE64CCf9Rs5bIwrs1xhNMl2ZjhNY3DWyGi7RKkjlzf7kMCB+
+        nZol8pfp0vrSq
+X-Received: by 2002:a5d:4109:: with SMTP id l9mr2102413wrp.398.1596177897799;
+        Thu, 30 Jul 2020 23:44:57 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxb5GRvfk7uYiQKiLNWu3grzIfY78jWIsuxWLgPwULOyAUG8/2c+Tmj75lzVnz9+VNZS5ExPA==
+X-Received: by 2002:a5d:4109:: with SMTP id l9mr2102394wrp.398.1596177897568;
+        Thu, 30 Jul 2020 23:44:57 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:90a5:f767:5f9f:3445? ([2001:b07:6468:f312:90a5:f767:5f9f:3445])
+        by smtp.gmail.com with ESMTPSA id 32sm14850330wrh.18.2020.07.30.23.44.56
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 30 Jul 2020 23:44:57 -0700 (PDT)
+Subject: Re: [Question] the check of ioeventfd collision in
+ kvm_*assign_ioeventfd_idx
+To:     Zhenyu Ye <yezhenyu2@huawei.com>
+Cc:     "S. Tsirkin, Michael" <mst@redhat.com>, gleb@redhat.com,
+        linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
+        Xiexiangyou <xiexiangyou@huawei.com>
+References: <bbece68b-fb39-d599-9ba7-a8ee8be16525@huawei.com>
+ <CABgObfbFXYodCeGWSnKw0j_n2-QLxpnD_Uyc5r-_ApXv=x+qmw@mail.gmail.com>
+ <4aa75d90-f2d2-888c-8970-02a41f3733e4@huawei.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <cffcf9e1-6675-6815-ccfc-f48497ade818@redhat.com>
+Date:   Fri, 31 Jul 2020 08:44:56 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.9.0
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/sHtRfof93J1vXO=3zZ.KFni";
- protocol="application/pgp-signature"; micalg=pgp-sha256
+In-Reply-To: <4aa75d90-f2d2-888c-8970-02a41f3733e4@huawei.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
---Sig_/sHtRfof93J1vXO=3zZ.KFni
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+On 31/07/20 08:39, Zhenyu Ye wrote:
+> On 2020/7/31 2:03, Paolo Bonzini wrote:
+>> Yes, I think it's not needed. Probably the deassign check can be turned into an assertion?
+>>
+>> Paolo
+>>
+> 
+> I think we can do this in the same function, and turnt he check of
+> p->eventfd into assertion in kvm_deassign_ioeventfd_idx(). Just like:
+> 
+> ---8<---
+> static inline struct _ioeventfd *
+> get_ioeventfd(struct kvm *kvm, enum kvm_bus bus_idx,
+>               struct kvm_ioeventfd *args)
+> {
+>         static struct _ioeventfd *_p;
+>         bool wildcard = !(args->flags & KVM_IOEVENTFD_FLAG_DATAMATCH);
+> 
+>         list_for_each_entry(_p, &kvm->ioeventfds, list)
+>                 if (_p->bus_idx == bus_idx &&
+>                     _p->addr == args->addr &&
+>                     (!_p->length || !args->len ||
+>                      (_p->length == args->len &&
+>                       (_p->wildcard || wildcard ||
+>                        _p->datamatch == args->datamatch))))
+>                         return _p;
+> 
+>         return NULL;
+> }
+> 
+> kvm_deassign_ioeventfd_idx() {
+> 	...
+> 	p = get_ioeventfd(kvm, bus_idx, args);
+> 	if (p) {
+> 		assert(p->eventfd == eventfd);
+> 		...
+> 	}
+> 
+> ---8<----
+> 
+> This may be easier to understand (keep the same logic in assign/deassign).
 
-Hi all,
+I think you should also warn if:
 
-Today's linux-next merge of the kvm-arm tree got a conflict in:
+1) p->length != args->len
 
-  arch/arm64/kvm/mmu.c
+2) p->wildcard != args->wildcard if p->length
 
-between commit:
+3) p->datamatch != args->datamatch if p->length && !p->wildcard
 
-  b757b47a2fcb ("KVM: arm64: Don't inherit exec permission across page-tabl=
-e levels")
+but yeah it sounds like a plan.
 
-from the kvm-fixes tree and commit:
+Paolo
 
-  a0e50aa3f4a8 ("KVM: arm64: Factor out stage 2 page table data from struct=
- kvm")
-
-from the kvm-arm tree.
-
-I fixed it up (see below) and can carry the fix as necessary. This
-is now fixed as far as linux-next is concerned, but any non trivial
-conflicts should be mentioned to your upstream maintainer when your tree
-is submitted for merging.  You may also want to consider cooperating
-with the maintainer of the conflicting tree to minimise any particularly
-complex conflicts.
-
---=20
-Cheers,
-Stephen Rothwell
-
-diff --cc arch/arm64/kvm/mmu.c
-index 7a7ddc4558a7,05e0e03fbdf8..000000000000
---- a/arch/arm64/kvm/mmu.c
-+++ b/arch/arm64/kvm/mmu.c
-@@@ -124,11 -127,44 +127,12 @@@ static void stage2_dissolve_pud(struct=20
-  	put_page(virt_to_page(pudp));
-  }
- =20
-- static void clear_stage2_pgd_entry(struct kvm *kvm, pgd_t *pgd, phys_addr=
-_t addr)
- -static int mmu_topup_memory_cache(struct kvm_mmu_memory_cache *cache,
- -				  int min, int max)
- -{
- -	void *page;
- -
- -	BUG_ON(max > KVM_NR_MEM_OBJS);
- -	if (cache->nobjs >=3D min)
- -		return 0;
- -	while (cache->nobjs < max) {
- -		page =3D (void *)__get_free_page(GFP_PGTABLE_USER);
- -		if (!page)
- -			return -ENOMEM;
- -		cache->objects[cache->nobjs++] =3D page;
- -	}
- -	return 0;
- -}
- -
- -static void mmu_free_memory_cache(struct kvm_mmu_memory_cache *mc)
- -{
- -	while (mc->nobjs)
- -		free_page((unsigned long)mc->objects[--mc->nobjs]);
- -}
- -
- -static void *mmu_memory_cache_alloc(struct kvm_mmu_memory_cache *mc)
- -{
- -	void *p;
- -
- -	BUG_ON(!mc || !mc->nobjs);
- -	p =3D mc->objects[--mc->nobjs];
- -	return p;
- -}
- -
-+ static void clear_stage2_pgd_entry(struct kvm_s2_mmu *mmu, pgd_t *pgd, ph=
-ys_addr_t addr)
-  {
-+ 	struct kvm *kvm =3D mmu->kvm;
-  	p4d_t *p4d_table __maybe_unused =3D stage2_p4d_offset(kvm, pgd, 0UL);
-  	stage2_pgd_clear(kvm, pgd);
-- 	kvm_tlb_flush_vmid_ipa(kvm, addr);
-+ 	kvm_tlb_flush_vmid_ipa(mmu, addr, S2_NO_LEVEL_HINT);
-  	stage2_p4d_free(kvm, p4d_table);
-  	put_page(virt_to_page(pgd));
-  }
-@@@ -1294,7 -1356,7 +1324,8 @@@ static bool stage2_get_leaf_entry(struc
-  	return true;
-  }
- =20
-- static bool stage2_is_exec(struct kvm *kvm, phys_addr_t addr, unsigned lo=
-ng sz)
- -static bool stage2_is_exec(struct kvm_s2_mmu *mmu, phys_addr_t addr)
-++static bool stage2_is_exec(struct kvm_s2_mmu *mmu, phys_addr_t addr,
-++			   unsigned long sz)
-  {
-  	pud_t *pudp;
-  	pmd_t *pmdp;
-@@@ -1306,14 -1368,15 +1337,15 @@@
-  		return false;
- =20
-  	if (pudp)
- -		return kvm_s2pud_exec(pudp);
- +		return sz <=3D PUD_SIZE && kvm_s2pud_exec(pudp);
-  	else if (pmdp)
- -		return kvm_s2pmd_exec(pmdp);
- +		return sz <=3D PMD_SIZE && kvm_s2pmd_exec(pmdp);
-  	else
- -		return kvm_s2pte_exec(ptep);
- +		return sz =3D=3D PAGE_SIZE && kvm_s2pte_exec(ptep);
-  }
- =20
-- static int stage2_set_pte(struct kvm *kvm, struct kvm_mmu_memory_cache *c=
-ache,
-+ static int stage2_set_pte(struct kvm_s2_mmu *mmu,
-+ 			  struct kvm_mmu_memory_cache *cache,
-  			  phys_addr_t addr, const pte_t *new_pte,
-  			  unsigned long flags)
-  {
-@@@ -1924,8 -1995,7 +1962,8 @@@ static int user_mem_abort(struct kvm_vc
-  	 * execute permissions, and we preserve whatever we have.
-  	 */
-  	needs_exec =3D exec_fault ||
- -		(fault_status =3D=3D FSC_PERM && stage2_is_exec(mmu, fault_ipa));
- +		(fault_status =3D=3D FSC_PERM &&
-- 		 stage2_is_exec(kvm, fault_ipa, vma_pagesize));
-++		 stage2_is_exec(mmu, fault_ipa, vma_pagesize));
- =20
-  	if (vma_pagesize =3D=3D PUD_SIZE) {
-  		pud_t new_pud =3D kvm_pfn_pud(pfn, mem_type);
-
---Sig_/sHtRfof93J1vXO=3zZ.KFni
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAl8jvQ0ACgkQAVBC80lX
-0Gy0lwf+JCeYR7z4ALYZJLhk2HOQMU9eiSRwKbm4w6NEs2oS+XjQ8A7Dd0mNVYk5
-dvEK9GhATqGPMoltbQT4UEF7g0XNKT2WaJ4uOYlqHtFeIw29mAtUmrk1FYzjHjNa
-+t+TkqTnwIvx5/HjaJu2h4kNBARPS3MX3Ny/bt9+whXSXgwsZAHeijEO6sah3lmB
-AQPBzTO2bdm0KVBtqx3G7+H+rQRoIP3sOoGZzwAQDCm2P90q/VZ4OZVrNGEX9ir1
-pTjEBhGga6lKeGwKq96M2HMffyfqSN9t9S6YrRebWxfezojMhTV1LWtTrmo4SsHG
-Htv8r4BH9oqjNyL+45/NvD67EuJXmg==
-=G+w3
------END PGP SIGNATURE-----
-
---Sig_/sHtRfof93J1vXO=3zZ.KFni--
