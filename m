@@ -2,135 +2,195 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id EE3DC233F30
-	for <lists+kvm@lfdr.de>; Fri, 31 Jul 2020 08:39:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 71731233F38
+	for <lists+kvm@lfdr.de>; Fri, 31 Jul 2020 08:42:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731375AbgGaGjp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 31 Jul 2020 02:39:45 -0400
-Received: from szxga04-in.huawei.com ([45.249.212.190]:8865 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1731224AbgGaGjo (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 31 Jul 2020 02:39:44 -0400
-Received: from DGGEMS408-HUB.china.huawei.com (unknown [172.30.72.58])
-        by Forcepoint Email with ESMTP id DD9B19CED4C9D6C8A047;
-        Fri, 31 Jul 2020 14:39:37 +0800 (CST)
-Received: from [127.0.0.1] (10.174.186.173) by DGGEMS408-HUB.china.huawei.com
- (10.3.19.208) with Microsoft SMTP Server id 14.3.487.0; Fri, 31 Jul 2020
- 14:39:30 +0800
-Subject: Re: [Question] the check of ioeventfd collision in
- kvm_*assign_ioeventfd_idx
-To:     Paolo Bonzini <pbonzini@redhat.com>
-CC:     "S. Tsirkin, Michael" <mst@redhat.com>, <gleb@redhat.com>,
-        <linux-kernel@vger.kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>, <kvm@vger.kernel.org>,
-        <kvmarm@lists.cs.columbia.edu>,
-        Xiexiangyou <xiexiangyou@huawei.com>
-References: <bbece68b-fb39-d599-9ba7-a8ee8be16525@huawei.com>
- <CABgObfbFXYodCeGWSnKw0j_n2-QLxpnD_Uyc5r-_ApXv=x+qmw@mail.gmail.com>
-From:   Zhenyu Ye <yezhenyu2@huawei.com>
-Message-ID: <4aa75d90-f2d2-888c-8970-02a41f3733e4@huawei.com>
-Date:   Fri, 31 Jul 2020 14:39:29 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.3.0
+        id S1731423AbgGaGlY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 31 Jul 2020 02:41:24 -0400
+Received: from ozlabs.org ([203.11.71.1]:38869 "EHLO ozlabs.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1731369AbgGaGlX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 31 Jul 2020 02:41:23 -0400
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (No client certificate requested)
+        by mail.ozlabs.org (Postfix) with ESMTPSA id 4BHyNZ6xtsz9sRN;
+        Fri, 31 Jul 2020 16:41:17 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=canb.auug.org.au;
+        s=201702; t=1596177680;
+        bh=YiqLrRycvqLl4QUJsOXEjPkwKcEk/G+XXcaUYXrgJBE=;
+        h=Date:From:To:Cc:Subject:From;
+        b=uS7CB3LWcSRO5A3NOPyQbmC98LYlgrYkHkhyprR9Z1D+us23DsxZgnNBnz1JVB0kR
+         JMEM/mX03jkm4uNQ8YNyr4b9LX8r57KAsxc99PDVOrRi84Ia5769oU6jyfFVNSwaUx
+         nqwxdXUhgH8w1D7YKS/I3K04Q0ZiMXW49eos8bmPoSvTaubVc9tWKEjN3et1yGJ0tk
+         cTwSpF2OCU2JNciaCFvy3hLaKdkcq5eRGN+b+tRRRZm9VINtLEENT6QkD2dml5+Bdd
+         t1diSEqu3NX8ttdhwA/pvenENNBrlTwHtc7w5q9TefnMZtgLc2+0mx9L3mrLTkXYmx
+         lVS+YUg9Qdw8A==
+Date:   Fri, 31 Jul 2020 16:41:17 +1000
+From:   Stephen Rothwell <sfr@canb.auug.org.au>
+To:     Christoffer Dall <cdall@cs.columbia.edu>,
+        Marc Zyngier <maz@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>, KVM <kvm@vger.kernel.org>
+Cc:     Linux Next Mailing List <linux-next@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Sean Christopherson <sean.j.christopherson@intel.com>
+Subject: linux-next: manual merge of the kvm-arm tree with the kvm-fixes
+ tree
+Message-ID: <20200731164117.3ecb9791@canb.auug.org.au>
 MIME-Version: 1.0
-In-Reply-To: <CABgObfbFXYodCeGWSnKw0j_n2-QLxpnD_Uyc5r-_ApXv=x+qmw@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.174.186.173]
-X-CFilter-Loop: Reflected
+Content-Type: multipart/signed; boundary="Sig_/sHtRfof93J1vXO=3zZ.KFni";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2020/7/31 2:03, Paolo Bonzini wrote:
-> Yes, I think it's not needed. Probably the deassign check can be turned into an assertion?
-> 
-> Paolo
-> 
+--Sig_/sHtRfof93J1vXO=3zZ.KFni
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-I think we can do this in the same function, and turnt he check of
-p->eventfd into assertion in kvm_deassign_ioeventfd_idx(). Just like:
+Hi all,
 
----8<---
-static inline struct _ioeventfd *
-get_ioeventfd(struct kvm *kvm, enum kvm_bus bus_idx,
-              struct kvm_ioeventfd *args)
-{
-        static struct _ioeventfd *_p;
-        bool wildcard = !(args->flags & KVM_IOEVENTFD_FLAG_DATAMATCH);
+Today's linux-next merge of the kvm-arm tree got a conflict in:
 
-        list_for_each_entry(_p, &kvm->ioeventfds, list)
-                if (_p->bus_idx == bus_idx &&
-                    _p->addr == args->addr &&
-                    (!_p->length || !args->len ||
-                     (_p->length == args->len &&
-                      (_p->wildcard || wildcard ||
-                       _p->datamatch == args->datamatch))))
-                        return _p;
+  arch/arm64/kvm/mmu.c
 
-        return NULL;
-}
+between commit:
 
-kvm_deassign_ioeventfd_idx() {
-	...
-	p = get_ioeventfd(kvm, bus_idx, args);
-	if (p) {
-		assert(p->eventfd == eventfd);
-		...
-	}
+  b757b47a2fcb ("KVM: arm64: Don't inherit exec permission across page-tabl=
+e levels")
 
----8<----
+from the kvm-fixes tree and commit:
 
-This may be easier to understand (keep the same logic in assign/deassign).
+  a0e50aa3f4a8 ("KVM: arm64: Factor out stage 2 page table data from struct=
+ kvm")
 
-I will send a formal patch soon.
+from the kvm-arm tree.
 
-Thanks,
-Zhenyu
+I fixed it up (see below) and can carry the fix as necessary. This
+is now fixed as far as linux-next is concerned, but any non trivial
+conflicts should be mentioned to your upstream maintainer when your tree
+is submitted for merging.  You may also want to consider cooperating
+with the maintainer of the conflicting tree to minimise any particularly
+complex conflicts.
 
+--=20
+Cheers,
+Stephen Rothwell
 
-> Il gio 30 lug 2020, 16:36 Zhenyu Ye <yezhenyu2@huawei.com <mailto:yezhenyu2@huawei.com>> ha scritto:
-> 
->     Hi all,
-> 
->     There are checks of ioeventfd collision in both kvm_assign_ioeventfd_idx()
->     and kvm_deassign_ioeventfd_idx(), however, with different logic.
-> 
->     In kvm_assign_ioeventfd_idx(), this is done by ioeventfd_check_collision():
->     ---8<---
->             if (_p->bus_idx == p->bus_idx &&
->                 _p->addr == p->addr &&
->                 (!_p->length || !p->length ||
->                  (_p->length == p->length &&
->                   (_p->wildcard || p->wildcard ||
->                    _p->datamatch == p->datamatch))))
->                     // then we consider the two are the same
->     ---8<---
-> 
->     The logic in kvm_deassign_ioeventfd_idx() is as follows:
->     ---8<---
->             if (p->bus_idx != bus_idx ||
->                 p->eventfd != eventfd  ||
->                 p->addr != args->addr  ||
->                 p->length != args->len ||
->                 p->wildcard != wildcard)
->                     continue;
-> 
->             if (!p->wildcard && p->datamatch != args->datamatch)
->                     continue;
-> 
->             // then we consider the two are the same
->     ---8<---
-> 
->     As we can see, there is extra check of p->eventfd in
-> 
->     ().  Why we don't check p->eventfd
->     in kvm_assign_ioeventfd_idx()? Or should we delete this in
->     kvm_deassign_ioeventfd_idx()?
-> 
-> 
->     Thanks,
->     Zhenyu
-> 
+diff --cc arch/arm64/kvm/mmu.c
+index 7a7ddc4558a7,05e0e03fbdf8..000000000000
+--- a/arch/arm64/kvm/mmu.c
++++ b/arch/arm64/kvm/mmu.c
+@@@ -124,11 -127,44 +127,12 @@@ static void stage2_dissolve_pud(struct=20
+  	put_page(virt_to_page(pudp));
+  }
+ =20
+- static void clear_stage2_pgd_entry(struct kvm *kvm, pgd_t *pgd, phys_addr=
+_t addr)
+ -static int mmu_topup_memory_cache(struct kvm_mmu_memory_cache *cache,
+ -				  int min, int max)
+ -{
+ -	void *page;
+ -
+ -	BUG_ON(max > KVM_NR_MEM_OBJS);
+ -	if (cache->nobjs >=3D min)
+ -		return 0;
+ -	while (cache->nobjs < max) {
+ -		page =3D (void *)__get_free_page(GFP_PGTABLE_USER);
+ -		if (!page)
+ -			return -ENOMEM;
+ -		cache->objects[cache->nobjs++] =3D page;
+ -	}
+ -	return 0;
+ -}
+ -
+ -static void mmu_free_memory_cache(struct kvm_mmu_memory_cache *mc)
+ -{
+ -	while (mc->nobjs)
+ -		free_page((unsigned long)mc->objects[--mc->nobjs]);
+ -}
+ -
+ -static void *mmu_memory_cache_alloc(struct kvm_mmu_memory_cache *mc)
+ -{
+ -	void *p;
+ -
+ -	BUG_ON(!mc || !mc->nobjs);
+ -	p =3D mc->objects[--mc->nobjs];
+ -	return p;
+ -}
+ -
++ static void clear_stage2_pgd_entry(struct kvm_s2_mmu *mmu, pgd_t *pgd, ph=
+ys_addr_t addr)
+  {
++ 	struct kvm *kvm =3D mmu->kvm;
+  	p4d_t *p4d_table __maybe_unused =3D stage2_p4d_offset(kvm, pgd, 0UL);
+  	stage2_pgd_clear(kvm, pgd);
+- 	kvm_tlb_flush_vmid_ipa(kvm, addr);
++ 	kvm_tlb_flush_vmid_ipa(mmu, addr, S2_NO_LEVEL_HINT);
+  	stage2_p4d_free(kvm, p4d_table);
+  	put_page(virt_to_page(pgd));
+  }
+@@@ -1294,7 -1356,7 +1324,8 @@@ static bool stage2_get_leaf_entry(struc
+  	return true;
+  }
+ =20
+- static bool stage2_is_exec(struct kvm *kvm, phys_addr_t addr, unsigned lo=
+ng sz)
+ -static bool stage2_is_exec(struct kvm_s2_mmu *mmu, phys_addr_t addr)
+++static bool stage2_is_exec(struct kvm_s2_mmu *mmu, phys_addr_t addr,
+++			   unsigned long sz)
+  {
+  	pud_t *pudp;
+  	pmd_t *pmdp;
+@@@ -1306,14 -1368,15 +1337,15 @@@
+  		return false;
+ =20
+  	if (pudp)
+ -		return kvm_s2pud_exec(pudp);
+ +		return sz <=3D PUD_SIZE && kvm_s2pud_exec(pudp);
+  	else if (pmdp)
+ -		return kvm_s2pmd_exec(pmdp);
+ +		return sz <=3D PMD_SIZE && kvm_s2pmd_exec(pmdp);
+  	else
+ -		return kvm_s2pte_exec(ptep);
+ +		return sz =3D=3D PAGE_SIZE && kvm_s2pte_exec(ptep);
+  }
+ =20
+- static int stage2_set_pte(struct kvm *kvm, struct kvm_mmu_memory_cache *c=
+ache,
++ static int stage2_set_pte(struct kvm_s2_mmu *mmu,
++ 			  struct kvm_mmu_memory_cache *cache,
+  			  phys_addr_t addr, const pte_t *new_pte,
+  			  unsigned long flags)
+  {
+@@@ -1924,8 -1995,7 +1962,8 @@@ static int user_mem_abort(struct kvm_vc
+  	 * execute permissions, and we preserve whatever we have.
+  	 */
+  	needs_exec =3D exec_fault ||
+ -		(fault_status =3D=3D FSC_PERM && stage2_is_exec(mmu, fault_ipa));
+ +		(fault_status =3D=3D FSC_PERM &&
+- 		 stage2_is_exec(kvm, fault_ipa, vma_pagesize));
+++		 stage2_is_exec(mmu, fault_ipa, vma_pagesize));
+ =20
+  	if (vma_pagesize =3D=3D PUD_SIZE) {
+  		pud_t new_pud =3D kvm_pfn_pud(pfn, mem_type);
 
+--Sig_/sHtRfof93J1vXO=3zZ.KFni
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAl8jvQ0ACgkQAVBC80lX
+0Gy0lwf+JCeYR7z4ALYZJLhk2HOQMU9eiSRwKbm4w6NEs2oS+XjQ8A7Dd0mNVYk5
+dvEK9GhATqGPMoltbQT4UEF7g0XNKT2WaJ4uOYlqHtFeIw29mAtUmrk1FYzjHjNa
++t+TkqTnwIvx5/HjaJu2h4kNBARPS3MX3Ny/bt9+whXSXgwsZAHeijEO6sah3lmB
+AQPBzTO2bdm0KVBtqx3G7+H+rQRoIP3sOoGZzwAQDCm2P90q/VZ4OZVrNGEX9ir1
+pTjEBhGga6lKeGwKq96M2HMffyfqSN9t9S6YrRebWxfezojMhTV1LWtTrmo4SsHG
+Htv8r4BH9oqjNyL+45/NvD67EuJXmg==
+=G+w3
+-----END PGP SIGNATURE-----
+
+--Sig_/sHtRfof93J1vXO=3zZ.KFni--
