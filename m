@@ -2,138 +2,78 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7A11E23406B
-	for <lists+kvm@lfdr.de>; Fri, 31 Jul 2020 09:46:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4193123405E
+	for <lists+kvm@lfdr.de>; Fri, 31 Jul 2020 09:45:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731783AbgGaHqZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 31 Jul 2020 03:46:25 -0400
-Received: from mga11.intel.com ([192.55.52.93]:55479 "EHLO mga11.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1731847AbgGaHqY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 31 Jul 2020 03:46:24 -0400
-IronPort-SDR: /dg0grk4nntUPv7mguLk2fvQ7aLsMSo+GXSXJVpRMTzRrdkSiV3C0oIzKSXyTCh3Iw8fqRIK0W
- ApCloWeW1PlA==
-X-IronPort-AV: E=McAfee;i="6000,8403,9698"; a="149570546"
-X-IronPort-AV: E=Sophos;i="5.75,417,1589266800"; 
-   d="scan'208";a="149570546"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Jul 2020 00:46:23 -0700
-IronPort-SDR: mTjKe2EyTrpcOAEWUYf7cP83Dco3zl414hR8QtrWi17ZOTT5X1fQZ5WtppiF9tmQlwf1kOTTSq
- RqnTgoZ4APRg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.75,417,1589266800"; 
-   d="scan'208";a="323160625"
-Received: from sqa-gate.sh.intel.com (HELO clx-ap-likexu.tsp.org) ([10.239.48.212])
-  by fmsmga002.fm.intel.com with ESMTP; 31 Jul 2020 00:46:21 -0700
-From:   Like Xu <like.xu@linux.intel.com>
-To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Joerg Roedel <joro@8bytes.org>, wei.w.wang@intel.com,
-        linux-kernel@vger.kernel.org, Like Xu <like.xu@linux.intel.com>
-Subject: [PATCH 6/6] KVM: x86: Expose Architectural LBR CPUID and its XSAVES bit
-Date:   Fri, 31 Jul 2020 15:44:02 +0800
-Message-Id: <20200731074402.8879-7-like.xu@linux.intel.com>
-X-Mailer: git-send-email 2.21.3
-In-Reply-To: <20200731074402.8879-1-like.xu@linux.intel.com>
-References: <20200731074402.8879-1-like.xu@linux.intel.com>
+        id S1731696AbgGaHpo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 31 Jul 2020 03:45:44 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:20813 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1731678AbgGaHpn (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 31 Jul 2020 03:45:43 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1596181542;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=8lhRC0CmqkXl0SilgG/GMWzrZn9mSwXCDhK4r7aEcoA=;
+        b=D224RgjYO9OD2elU0JnqrUtpTI2+lALG3FrWz6a5fCaYROplKnrhgFLT0mmqjtWXUGjAM4
+        TyNk/uKe9rT0UZ7FE19zu7Y7QtAhp9IbZTxtjWX1jwD8gsCRimFHcVRmhRyH5gprUVgw1D
+        lkHUb/Nkb1s80aSyFNDvgXk40WwN2/M=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-105-lxjeD9VZMpqEldaMMGg8gA-1; Fri, 31 Jul 2020 03:45:40 -0400
+X-MC-Unique: lxjeD9VZMpqEldaMMGg8gA-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D1FA718839CF
+        for <kvm@vger.kernel.org>; Fri, 31 Jul 2020 07:45:39 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (unknown [10.40.192.116])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id CA4EB6932B;
+        Fri, 31 Jul 2020 07:45:38 +0000 (UTC)
+Date:   Fri, 31 Jul 2020 09:45:35 +0200
+From:   Andrew Jones <drjones@redhat.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Thomas Huth <thuth@redhat.com>, kvm@vger.kernel.org
+Subject: Re: [kvm-unit-tests PATCH] scripts/runtime: Replace "|&" with "2>&1
+ |"
+Message-ID: <20200731074535.vntfhmciwf3q3awj@kamzik.brq.redhat.com>
+References: <20200731060909.1163-1-thuth@redhat.com>
+ <20200731063200.ylvid4qrtvyduagr@kamzik.brq.redhat.com>
+ <b3e57992-3f61-50fb-4cbb-3f3a494d7639@redhat.com>
+ <805d57bb-be3d-50af-a40f-4d37629d42d5@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <805d57bb-be3d-50af-a40f-4d37629d42d5@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-If CPUID.(EAX=07H, ECX=0):EDX[19] is exposed to 1, the KVM supports Arch
-LBRs and CPUID leaf 01CH indicates details of the Arch LBRs capabilities.
-As the first step, KVM only exposes the current LBR depth on the host for
-guest, which is likely to be the maximum supported value on the host.
+On Fri, Jul 31, 2020 at 09:17:53AM +0200, Paolo Bonzini wrote:
+> On 31/07/20 09:13, Thomas Huth wrote:
+> > the bash version that Apple ships is incredibly old (version 3).
+> 
+> Yes, due to GPLv3.  :(  I think either we rewrite the whole thing in
+> Python (except for the "shar"-like code in mkstandalone.sh)
 
-If KVM supports XSAVES, the CPUID.(EAX=0DH, ECX=1):EDX:ECX[bit 15]
-is also exposed to 1, which means the availability of support for Arch
-LBR configuration state save and restore. When available, guest software
-operating at CPL=0 can use XSAVES/XRSTORS manage supervisor state
-component Arch LBR for own purposes once IA32_XSS [bit 15] is set.
-XSAVE support for Arch LBRs is enumerated in CPUID.(EAX=0DH, ECX=0FH).
+I once suggested Python (or anything less awkward than Bash) be used
+for our harness, but ARM people told me that they like Bash because
+then they can install the unit tests on minimal images that they
+use on the ARM models. There may other "embedded" cases for kvm-unit-tests
+in the future too, if we were to introduce bare-metal targets, etc.,
+so I think the minimal language (Bash) requirement makes sense to
+maintain (not to mention we already wrote it...)
 
-Signed-off-by: Like Xu <like.xu@linux.intel.com>
----
- arch/x86/kvm/cpuid.c   | 19 +++++++++++++++++++
- arch/x86/kvm/vmx/vmx.c |  2 ++
- arch/x86/kvm/x86.c     |  6 ++++++
- 3 files changed, 27 insertions(+)
+> or we keep
+> bash 4 as the minimum supported version.
 
-diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-index 7d92854082a1..578ef0719182 100644
---- a/arch/x86/kvm/cpuid.c
-+++ b/arch/x86/kvm/cpuid.c
-@@ -713,6 +713,25 @@ static inline int __do_cpuid_func(struct kvm_cpuid_array *array, u32 function)
- 			entry->edx = 0;
- 		}
- 		break;
-+	/* Architectural LBR */
-+	case 0x1c:
-+	{
-+		u64 lbr_depth_mask = 0;
-+
-+		if (!kvm_cpu_cap_has(X86_FEATURE_ARCH_LBR)) {
-+			entry->eax = entry->ebx = entry->ecx = entry->edx = 0;
-+			break;
-+		}
-+
-+		lbr_depth_mask = 1UL << fls(entry->eax & 0xff);
-+		/*
-+		 * KVM only exposes the maximum supported depth,
-+		 * which is also the value used by the host Arch LBR driver.
-+		 */
-+		entry->eax &= ~0xff;
-+		entry->eax |= lbr_depth_mask;
-+		break;
-+	}
- 	/* Intel PT */
- 	case 0x14:
- 		if (!kvm_cpu_cap_has(X86_FEATURE_INTEL_PT)) {
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 3843aebf4efb..98bad0dbfdf1 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -7409,6 +7409,8 @@ static __init void vmx_set_cpu_caps(void)
- 		kvm_cpu_cap_check_and_set(X86_FEATURE_INVPCID);
- 	if (vmx_pt_mode_is_host_guest())
- 		kvm_cpu_cap_check_and_set(X86_FEATURE_INTEL_PT);
-+	if (cpu_has_vmx_arch_lbr())
-+		kvm_cpu_cap_check_and_set(X86_FEATURE_ARCH_LBR);
- 
- 	if (vmx_umip_emulated())
- 		kvm_cpu_cap_set(X86_FEATURE_UMIP);
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 8a58d0355a99..4da3f9ee96a6 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -184,6 +184,8 @@ static struct kvm_shared_msrs __percpu *shared_msrs;
- 				| XFEATURE_MASK_BNDCSR | XFEATURE_MASK_AVX512 \
- 				| XFEATURE_MASK_PKRU)
- 
-+#define KVM_SUPPORTED_XSS_ARCH_LBR  (1ULL << 15)
-+
- u64 __read_mostly host_efer;
- EXPORT_SYMBOL_GPL(host_efer);
- 
-@@ -9803,6 +9805,10 @@ int kvm_arch_hardware_setup(void *opaque)
- 
- 	if (!kvm_cpu_cap_has(X86_FEATURE_XSAVES))
- 		supported_xss = 0;
-+	else {
-+		if (kvm_cpu_cap_has(X86_FEATURE_ARCH_LBR))
-+			supported_xss |= KVM_SUPPORTED_XSS_ARCH_LBR;
-+	}
- 
- #define __kvm_cpu_cap_has(UNUSED_, f) kvm_cpu_cap_has(f)
- 	cr4_reserved_bits = __cr4_reserved_bits(__kvm_cpu_cap_has, UNUSED_);
--- 
-2.21.3
+Is 4.2 OK? That would allow Thomas' CI to get the coverage we need
+by using CentOS, without having to install a specific Bash.
+
+Thanks,
+drew
 
