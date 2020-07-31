@@ -2,149 +2,245 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 577FF233C4D
-	for <lists+kvm@lfdr.de>; Fri, 31 Jul 2020 01:53:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5A51D233C8E
+	for <lists+kvm@lfdr.de>; Fri, 31 Jul 2020 02:26:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730810AbgG3XxT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 30 Jul 2020 19:53:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57448 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730729AbgG3XxS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 30 Jul 2020 19:53:18 -0400
-Received: from mail-io1-xd42.google.com (mail-io1-xd42.google.com [IPv6:2607:f8b0:4864:20::d42])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EC142C061575
-        for <kvm@vger.kernel.org>; Thu, 30 Jul 2020 16:53:17 -0700 (PDT)
-Received: by mail-io1-xd42.google.com with SMTP id j8so17700822ioe.9
-        for <kvm@vger.kernel.org>; Thu, 30 Jul 2020 16:53:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=3CLzCjMBt0EKQ8Od8SUKp9/clTlKR5oUCuqD33/hskA=;
-        b=XYTGewCy/RlfHIVseL4R2WM9baUKalaKyj/NzAx10Un+zLMe+y15BF9qzYaSZJQ9xP
-         6yAeSFfKps5QOx3VQ5Q58Guy1ph9s33t3+GR/k/nrBhb4LjCJM5Ma6sCyPLsw8g6PYwb
-         lyGDiqBe6vQuOdGF5gpjctO/B/9R+UmiyGFPPCq+iHQna7Ed79RZhHLD/CB/nl3WspHq
-         E0xWcZqMGI43rC2eBCaf2U9v39UkJuuAzgWan3ahy3m/+CpMGnmB/lWNkB1MWvebdrFW
-         iml1pVvm4Uvo5gBrtxqml8bG6A5mbL8SvsPRHVeZRxSV3oYQd/G+E5Qe9HGoP63VQI6k
-         mRjQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=3CLzCjMBt0EKQ8Od8SUKp9/clTlKR5oUCuqD33/hskA=;
-        b=YLg62upoXv2Cd28PmpmickBa2lmdIuhKGVcrPSIntGK+Io310e/N2jRLJ6MBOh6wMR
-         jJl6cT4egXVt+Cc2wqzcLED/2GoDdEptOnUjSxzyIO7qKwdgNjd1/+Oqua8NY+++rDqu
-         QZGGEzR+FdJbIGxGASOo9g50MoFUHXIvIBoAMFPqPAsDG2KQzTXBlLhjWJEXteYHgWLv
-         f17A2Z7FdGHRcKMvdz4kvXyJp75PAI6t5Zy58f4WB8roL1QXgVIyTd8bNo/4t4gfSTAG
-         +Jn6Zoz/0hGHreZYrzVzdzKOGxIBt614ur93ALIT7zfRgLgo2kOIZz45xSj8SqS+NPi6
-         9Heg==
-X-Gm-Message-State: AOAM532S+j0YtfiGJa0IZDw2gTzPFQLJVlefIBoFCCTcNzPIe3zfryWd
-        pTBKBkRCdpsBadONrGtjzkPqWVdw6YItfY7qekrNTA==
-X-Google-Smtp-Source: ABdhPJxdhCRMSR9raaPxevagNIQp0WilocU/CysoSyfc6CQBq2lFplC1V7dIcdYE1l2wtx2gNfczz6R4d/i2sn6sgPg=
-X-Received: by 2002:a02:854a:: with SMTP id g68mr1963820jai.24.1596153196882;
- Thu, 30 Jul 2020 16:53:16 -0700 (PDT)
-MIME-Version: 1.0
-References: <20200729235929.379-1-graf@amazon.com> <20200729235929.379-2-graf@amazon.com>
- <CALMp9eRq3QUG64BwSGLbehFr8k-OLSM3phcw7mhuZ9hVk_N2-A@mail.gmail.com> <e7cbf218-fb01-2f30-6c5c-a4b6e441b5e4@amazon.com>
-In-Reply-To: <e7cbf218-fb01-2f30-6c5c-a4b6e441b5e4@amazon.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Thu, 30 Jul 2020 16:53:05 -0700
-Message-ID: <CALMp9eRQRaw7raxeH1nOTGr0rBk5bqbmoxUo7txGyQfaBs0=4g@mail.gmail.com>
-Subject: Re: [PATCH v2 1/3] KVM: x86: Deflect unknown MSR accesses to user space
-To:     Alexander Graf <graf@amazon.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
+        id S1730925AbgGaA0Q (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 30 Jul 2020 20:26:16 -0400
+Received: from mga11.intel.com ([192.55.52.93]:12386 "EHLO mga11.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1730781AbgGaA0P (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 30 Jul 2020 20:26:15 -0400
+IronPort-SDR: B61kyDO2A7zr1XEZTLKXTGJvJG6hUT/agHBYjywVBnGhrx3No1FrLOaiBS1D1232D6ykDfgRvb
+ yXFH8fdezE+Q==
+X-IronPort-AV: E=McAfee;i="6000,8403,9698"; a="149542940"
+X-IronPort-AV: E=Sophos;i="5.75,416,1589266800"; 
+   d="scan'208";a="149542940"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga006.jf.intel.com ([10.7.209.51])
+  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Jul 2020 17:26:10 -0700
+IronPort-SDR: +rrzfOuU21xdQgYoO4zzH87MA5bD/Ub2rRq54X7cINi/lOcGKsk8Xv/Ss07HKhQDQXAMp2zIOp
+ 5nZmNhhXvymg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.75,416,1589266800"; 
+   d="scan'208";a="291061474"
+Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
+  by orsmga006.jf.intel.com with ESMTP; 30 Jul 2020 17:26:09 -0700
+Received: from fmsmsx606.amr.corp.intel.com (10.18.126.86) by
+ fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.1713.5; Thu, 30 Jul 2020 17:26:08 -0700
+Received: from FMSEDG002.ED.cps.intel.com (10.1.192.134) by
+ fmsmsx606.amr.corp.intel.com (10.18.126.86) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id 15.1.1713.5
+ via Frontend Transport; Thu, 30 Jul 2020 17:26:08 -0700
+Received: from NAM04-SN1-obe.outbound.protection.outlook.com (104.47.44.59) by
+ edgegateway.intel.com (192.55.55.69) with Microsoft SMTP Server (TLS) id
+ 14.3.439.0; Thu, 30 Jul 2020 17:26:08 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=TEziJD9Xen+qnZgM2ULewexHMoy9Am1owOGzttZjZtbH2ZJ/9PJ0dy0aMZeKtoy80I/pxZ0r7Ew/McOZ+2dWEt0rFd/YjxMrr/BuWSc7XYl18+K9YL/0iZjctzGGZ3P76wDZbEJkGdj6CtXyUKZ+Hk/tv25QjTiTXZ/RxvNTH0J5n6d9Q5yrNBbNx5r5Pb3Jyy/KaWtJHlysDXRJnxzVpjv6b6yhMQiJ2HlUNG5rk2V3M2eho4y4a3hY1tlwszIyGL/BBCm1kw2mi91SpxRragjWMRvGya5ysiBhlHUDL6ieR706V6t567SRL7gAAkmmecPOwyKGCDyFNIQqd4acLg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=4VRWk4byTnHwy2eZ1o2Zt8gFM9RgXPcn04hcOlgUcHU=;
+ b=UZ+7KRtYkcY3/FCOxoOw1wN9clMS6UE/sTQUZJEeSH2eUcLEMKZ4MsXpFEHKbqIxcSRgDECwcaWR7LHO0+sZd7T7Hfj5FuOk0/ZngEVfGSaIFJI1aGzpfeVtsgYW0GXv5BN8TcT9YonW/1vHL6qkWnokzCZStyW0fXvCxt9pKQlp9lt9BRc8bd/f5+QQOP1BJb8kiCK82unhZ5QriujNVNPE9q2SgnZWCjcxPl1jrnAub0WNT7rLuZDozy+VqGB8zn2N2cBhMya88p1hzd4Kw2FKjKmZt7H+n+tEwHHQFnkZ4pAu7S7mW/Fnh4OzHIQwcZ/1dJEfvcNoEdylviqFFQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=intel.onmicrosoft.com;
+ s=selector2-intel-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=4VRWk4byTnHwy2eZ1o2Zt8gFM9RgXPcn04hcOlgUcHU=;
+ b=S1LZpTa7UkiSchVFGckxM4Ui931KNfdXi3xwRXXv/WAp3ZhuskF8tkL+3ZdqVjE6X2R14qjVRZ+QFWfLGmC0eNcTJjeWbgN80dN15Zi08twWTcoP95TTe8WFdMBjHBXaUCQOYpJlw3mHsepwFsHVvuPMf+VgJlIqfEm8FyFqAIs=
+Received: from MWHPR11MB1645.namprd11.prod.outlook.com (2603:10b6:301:b::12)
+ by MWHPR11MB1599.namprd11.prod.outlook.com (2603:10b6:301:e::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3216.21; Fri, 31 Jul
+ 2020 00:26:06 +0000
+Received: from MWHPR11MB1645.namprd11.prod.outlook.com
+ ([fe80::9864:e0cb:af36:6feb]) by MWHPR11MB1645.namprd11.prod.outlook.com
+ ([fe80::9864:e0cb:af36:6feb%5]) with mapi id 15.20.3216.034; Fri, 31 Jul 2020
+ 00:26:06 +0000
+From:   "Tian, Kevin" <kevin.tian@intel.com>
+To:     Alex Williamson <alex.williamson@redhat.com>
+CC:     Lu Baolu <baolu.lu@linux.intel.com>,
         Joerg Roedel <joro@8bytes.org>,
-        KarimAllah Raslan <karahmed@amazon.de>,
-        kvm list <kvm@vger.kernel.org>, linux-doc@vger.kernel.org,
-        LKML <linux-kernel@vger.kernel.org>,
-        Aaron Lewis <aaronlewis@google.com>
-Content-Type: text/plain; charset="UTF-8"
+        Robin Murphy <robin.murphy@arm.com>,
+        Jean-Philippe Brucker <jean-philippe@linaro.org>,
+        Cornelia Huck <cohuck@redhat.com>,
+        "Raj, Ashok" <ashok.raj@intel.com>,
+        "Jiang, Dave" <dave.jiang@intel.com>,
+        "Liu, Yi L" <yi.l.liu@intel.com>,
+        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Subject: RE: [PATCH v3 3/4] iommu: Add iommu_aux_get_domain_for_dev()
+Thread-Topic: [PATCH v3 3/4] iommu: Add iommu_aux_get_domain_for_dev()
+Thread-Index: AQHWWaRTwLJlmIhIiUK0CZQgQ7WVGKkfGWqAgAA12uCAAVpUgIAAQGTw
+Date:   Fri, 31 Jul 2020 00:26:06 +0000
+Message-ID: <MWHPR11MB16452F5E657F26B1137B80C98C4E0@MWHPR11MB1645.namprd11.prod.outlook.com>
+References: <20200714055703.5510-1-baolu.lu@linux.intel.com>
+        <20200714055703.5510-4-baolu.lu@linux.intel.com>
+        <20200729142507.182cd18a@x1.home>
+        <MWHPR11MB1645736D9ED91A95D1D4519A8C700@MWHPR11MB1645.namprd11.prod.outlook.com>
+ <20200730141725.5f63b508@x1.home>
+In-Reply-To: <20200730141725.5f63b508@x1.home>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+dlp-version: 11.5.1.3
+dlp-product: dlpe-windows
+dlp-reaction: no-action
+authentication-results: redhat.com; dkim=none (message not signed)
+ header.d=none;redhat.com; dmarc=none action=none header.from=intel.com;
+x-originating-ip: [192.198.147.210]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: a1250e37-90cb-4004-b3e9-08d834e8509f
+x-ms-traffictypediagnostic: MWHPR11MB1599:
+x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <MWHPR11MB1599D2F67FCA648CC3138A7F8C4E0@MWHPR11MB1599.namprd11.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:8882;
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: HilnXslHMvTRVwCYj8JsVZ4fvg3hPNLo3x2f2P7JLutDqFa6QRxz9BwC+kPJgr1P2qrP5R69ic03gDsX8NyeM5yunN50QiDTffbD1EA9TIdzQf6kGqG6G23NJn1OAyCFTCwihaNuGtgLYoj159D7RTrccoMlrec0gp69IYCIaO8ZmIx8Z7ih1aTM2q8NTMfleo3H0q6Vh0cekkBUUHfrAWOfLE67AaYDQJx2PZ563kzdTxgbOeTRdwDM21HuDCLZJP+9ckQd5WCw0+6Mp/D88n0s/uHln01fS4efkmFHBI2A3+PbE0bRX8rqDTIDSvafelPecftD5I/ELkJ5SzsB4Q==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MWHPR11MB1645.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFTY:;SFS:(4636009)(39860400002)(396003)(366004)(136003)(346002)(376002)(6506007)(6916009)(76116006)(5660300002)(4326008)(54906003)(2906002)(64756008)(55016002)(66946007)(52536014)(66476007)(7696005)(66446008)(66556008)(8676002)(316002)(9686003)(71200400001)(8936002)(26005)(478600001)(186003)(86362001)(33656002);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata: D9OZTaJkdTN4ge7+ejD4g2R60MZlrW1qd83Cu4wEHTAHIq9Kw7zQ96Bip7IVdhL7Ix8J6M82qitRbmyTDpsQPxML8hYr2I3ll3hi7oBN0eY2r4UyfTRPuNArA1c0LKQP0lPxMbtOkpVIuQjs0WN4MhOv1yo/6175pQ9/0EONqYyn1dD98Yr5zp2Yk8F3B5if598/xTn4etpvUX3vPiHujcOSkcOxVJd7jcyza9LeVW2VnSQJWeNw4u32zGiFU4BHGLTWUvBlr1IP+93TQbtCLF4nv16U16HW0m44i233/wsMSjseOo4jEE0fqkeXMUpYyozL2xZZXHE0Sm+V3zOIS7o3VB3AfWr8V71xBEq3S1xPlHQOkaUQh9XFbXRNuDYpK5NHx4VgSehMmE3Qvyi9qbj17BvrHCYrrr+tmkrhLnDPzxTWglwNgL3P09q9b3/4Zt7+idnhq/fsDU7tLVARjGfLlBy03ou2fShjRrWHqxTTXxH6On0cOgNuF4F9MkmO
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: MWHPR11MB1645.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: a1250e37-90cb-4004-b3e9-08d834e8509f
+X-MS-Exchange-CrossTenant-originalarrivaltime: 31 Jul 2020 00:26:06.1606
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: WnP98AdjfvhDfFatzazqCzG6Bu2xZo6e32bduGqkilW+1OEDIwYGQr6uKtOfbsqQR6kOcT2lR9tDBxEnEi2YbA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MWHPR11MB1599
+X-OriginatorOrg: intel.com
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jul 30, 2020 at 4:08 PM Alexander Graf <graf@amazon.com> wrote:
->
->
->
-> On 31.07.20 00:42, Jim Mattson wrote:
+> From: Alex Williamson <alex.williamson@redhat.com>
+> Sent: Friday, July 31, 2020 4:17 AM
+>=20
+> On Wed, 29 Jul 2020 23:49:20 +0000
+> "Tian, Kevin" <kevin.tian@intel.com> wrote:
+>=20
+> > > From: Alex Williamson <alex.williamson@redhat.com>
+> > > Sent: Thursday, July 30, 2020 4:25 AM
+> > >
+> > > On Tue, 14 Jul 2020 13:57:02 +0800
+> > > Lu Baolu <baolu.lu@linux.intel.com> wrote:
+> > >
+> > > > The device driver needs an API to get its aux-domain. A typical usa=
+ge
+> > > > scenario is:
+> > > >
+> > > >         unsigned long pasid;
+> > > >         struct iommu_domain *domain;
+> > > >         struct device *dev =3D mdev_dev(mdev);
+> > > >         struct device *iommu_device =3D vfio_mdev_get_iommu_device(=
+dev);
+> > > >
+> > > >         domain =3D iommu_aux_get_domain_for_dev(dev);
+> > > >         if (!domain)
+> > > >                 return -ENODEV;
+> > > >
+> > > >         pasid =3D iommu_aux_get_pasid(domain, iommu_device);
+> > > >         if (pasid <=3D 0)
+> > > >                 return -EINVAL;
+> > > >
+> > > >          /* Program the device context */
+> > > >          ....
+> > > >
+> > > > This adds an API for such use case.
+> > > >
+> > > > Suggested-by: Alex Williamson <alex.williamson@redhat.com>
+> > > > Signed-off-by: Lu Baolu <baolu.lu@linux.intel.com>
+> > > > ---
+> > > >  drivers/iommu/iommu.c | 18 ++++++++++++++++++
+> > > >  include/linux/iommu.h |  7 +++++++
+> > > >  2 files changed, 25 insertions(+)
+> > > >
+> > > > diff --git a/drivers/iommu/iommu.c b/drivers/iommu/iommu.c
+> > > > index cad5a19ebf22..434bf42b6b9b 100644
+> > > > --- a/drivers/iommu/iommu.c
+> > > > +++ b/drivers/iommu/iommu.c
+> > > > @@ -2817,6 +2817,24 @@ void iommu_aux_detach_group(struct
+> > > iommu_domain *domain,
+> > > >  }
+> > > >  EXPORT_SYMBOL_GPL(iommu_aux_detach_group);
+> > > >
+> > > > +struct iommu_domain *iommu_aux_get_domain_for_dev(struct
+> device
+> > > *dev)
+> > > > +{
+> > > > +	struct iommu_domain *domain =3D NULL;
+> > > > +	struct iommu_group *group;
+> > > > +
+> > > > +	group =3D iommu_group_get(dev);
+> > > > +	if (!group)
+> > > > +		return NULL;
+> > > > +
+> > > > +	if (group->aux_domain_attached)
+> > > > +		domain =3D group->domain;
+> > >
+> > > Why wouldn't the aux domain flag be on the domain itself rather than
+> > > the group?  Then if we wanted sanity checking in patch 1/ we'd only
+> > > need to test the flag on the object we're provided.
+> > >
+> > > If we had such a flag, we could create an iommu_domain_is_aux()
+> > > function and then simply use iommu_get_domain_for_dev() and test that
+> > > it's an aux domain in the example use case.  It seems like that would
 > >
-> > On Wed, Jul 29, 2020 at 4:59 PM Alexander Graf <graf@amazon.com> wrote:
-> >>
-> >> MSRs are weird. Some of them are normal control registers, such as EFER.
-> >> Some however are registers that really are model specific, not very
-> >> interesting to virtualization workloads, and not performance critical.
-> >> Others again are really just windows into package configuration.
-> >>
-> >> Out of these MSRs, only the first category is necessary to implement in
-> >> kernel space. Rarely accessed MSRs, MSRs that should be fine tunes against
-> >> certain CPU models and MSRs that contain information on the package level
-> >> are much better suited for user space to process. However, over time we have
-> >> accumulated a lot of MSRs that are not the first category, but still handled
-> >> by in-kernel KVM code.
-> >>
-> >> This patch adds a generic interface to handle WRMSR and RDMSR from user
-> >> space. With this, any future MSR that is part of the latter categories can
-> >> be handled in user space.
-> >>
-> >> Furthermore, it allows us to replace the existing "ignore_msrs" logic with
-> >> something that applies per-VM rather than on the full system. That way you
-> >> can run productive VMs in parallel to experimental ones where you don't care
-> >> about proper MSR handling.
-> >>
-> >> Signed-off-by: Alexander Graf <graf@amazon.com>
-> >
-> > Can we just drop em_wrmsr and em_rdmsr? The in-kernel emulator is
-> > already incomplete, and I don't think there is ever a good reason for
-> > kvm to emulate RDMSR or WRMSR if the VM-exit was for some other reason
-> > (and we shouldn't end up here if the VM-exit was for RDMSR or WRMSR).
-> > Am I missing something?
->
-> On certain combinations of CPUs and guest modes, such as real mode on
-> pre-Nehalem(?) at least, we are running all guest code through the
-> emulator and thus may encounter a RDMSR or WRMSR instruction. I *think*
-> we also do so for big real mode on more modern CPUs, but I'm not 100% sure.
+> > IOMMU layer manages domains per parent device. Here given a
+>=20
+> Is this the IOMMU layer or the VT-d driver?  I don't see any notion of
+> managing domains relative to a parent in the IOMMU layer.  Please point
+> to something more specific if I'm wrong here.
 
-Oh, gag me with a spoon! (BTW, we shouldn't have to emulate big real
-mode if the CPU supports unrestricted guest mode. If we do, something
-is probably wrong.)
+it's maintained in VT-d driver (include/linux/intel-iommu.h)
 
-> > You seem to be assuming that the instruction at CS:IP will still be
-> > RDMSR (or WRMSR) after returning from userspace, and we will come
-> > through kvm_{get,set}_msr_user_space again at the next KVM_RUN. That
-> > isn't necessarily the case, for a variety of reasons. I think the
->
-> Do you have a particular situation in mind where that would not be the
-> case and where we would still want to actually complete an MSR operation
-> after the environment changed?
+struct device_domain_info {
+        struct list_head link;  /* link to domain siblings */
+        struct list_head global; /* link to global list */
+        struct list_head table; /* link to pasid table */
+        struct list_head auxiliary_domains; /* auxiliary domains
+                                             * attached to this device
+                                             */
+	...
 
-As far as userspace is concerned, if it has replied with error=0, the
-instruction has completed and retired. If the kernel executes a
-different instruction at CS:RIP, the state is certainly inconsistent
-for WRMSR exits. It would also be inconsistent for RDMSR exits if the
-RDMSR emulation on the userspace side had any side-effects.
+>=20
+> > dev (of mdev), we need a way to find its associated domain under its
+> > parent device. And we cannot simply use iommu_get_domain_for_dev
+> > on the parent device of the mdev, as it will give us the primary domain
+> > of parent device.
+>=20
+> Not the parent device of the mdev, but the mdev_dev(mdev) device.
+> Isn't that what this series is enabling, being able to return the
+> domain from the group that contains the mdev_dev?  We shouldn't need to
+> leave breadcrumbs on the group to know about the domain, the domain
+> itself should be the source of knowledge, or provide a mechanism/ops to
+> learn that knowledge.  Thanks,
+>=20
+> Alex
 
-> > 'completion' of the userspace instruction emulation should be done
-> > with the complete_userspace_io [sic] mechanism instead.
->
-> Hm, that would avoid a roundtrip into guest mode, but add a cycle
-> through the in-kernel emulator. I'm not sure that's a net win quite yet.
->
-> >
-> > I'd really like to see this mechanism apply only in the case of
-> > invalid/unknown MSRs, and not for illegal reads/writes as well.
->
-> Why? Any #GP inducing MSR access will be on the slow path. What's the
-> problem if you get a few more of them in user space that you just bounce
-> back as failing, so they actually do inject a fault?
+It's the tradeoff between leaving breadcrumb in domain or in group.=20
+Today the domain has no knowledge of mdev. It just includes a list
+of physical devices which are attached to the domain (either due to
+the device is assigned in a whole or as the parent device of an assigned
+mdev). Then we have two choices. One is to save the mdev_dev info
+in device_domain_info and maintain a mapping between mdev_dev
+and related aux domain. The other is to record the domain info directly
+in group. Earlier we choose the latter one as it looks simpler. If you
+prefer to the former one, we can think more and have a try.
 
-I'm not concerned about the performance. I think I'm just biased
-because of what we have today. But since we're planning on dropping
-that anyway, I take it back. IIRC, the plumbing to make the
-distinction is a little painful, and I don't want to ask you to go
-there.
+Thanks
+Kevin
