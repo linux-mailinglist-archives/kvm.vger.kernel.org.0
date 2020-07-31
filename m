@@ -2,112 +2,86 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A1AB223450B
-	for <lists+kvm@lfdr.de>; Fri, 31 Jul 2020 14:01:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3FF5723454F
+	for <lists+kvm@lfdr.de>; Fri, 31 Jul 2020 14:09:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732859AbgGaMBd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 31 Jul 2020 08:01:33 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:54034 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1732771AbgGaMBc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 31 Jul 2020 08:01:32 -0400
+        id S1732776AbgGaMJs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 31 Jul 2020 08:09:48 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:25275 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1732719AbgGaMJs (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 31 Jul 2020 08:09:48 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1596196891;
+        s=mimecast20190719; t=1596197386;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=1lZyrqI3xLbFTyVC9E3z5frdUks/QZNq3MxuxGz/sbI=;
-        b=L8vKXBi5C/hwbTaL2Ma76FqkhB4+o/nQKzxUArw5W4waD5Y4S+FaH+HmjfDjYaoN4EjdWU
-        t4x5li+4KwxshppcFjhJ0A4r6QkFMurZHRo1LPWJ0Kin0tnCqajZAGR4YnGUajT24nHYiI
-        q5mI3HCcVTdPM7zb4TfxVb0Iyg0J04E=
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references:openpgp:openpgp;
+        bh=TRRTfZ7A/GWI6BWj05qLLb8nll1+A6buSHfRoaYqMxg=;
+        b=TrEDyk7WtWhDbBFRd0/OCy4iOnmrU3636Pk6nCkkB90vS7eMg7rh4xEfZJ6b0oZ6kQr5rh
+        3BEJO6Wp+LzatTQy7263bbajejBdmaqUqO6ILM51z/fzurzLKQrx5E0xMkUuRu/KZFvzgt
+        8/ow32KoPPNSSsgwvTYVgxyaQC+F4OA=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-176-bPznMw3cPcSTHCPxHfRF7g-1; Fri, 31 Jul 2020 08:01:24 -0400
-X-MC-Unique: bPznMw3cPcSTHCPxHfRF7g-1
+ us-mta-371--9uCdJxzMSa4QDTGERhgbA-1; Fri, 31 Jul 2020 08:09:40 -0400
+X-MC-Unique: -9uCdJxzMSa4QDTGERhgbA-1
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0EEA0102C84B;
-        Fri, 31 Jul 2020 12:01:23 +0000 (UTC)
-Received: from kamzik.brq.redhat.com (unknown [10.40.194.209])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 9C57619C58;
-        Fri, 31 Jul 2020 12:01:20 +0000 (UTC)
-Date:   Fri, 31 Jul 2020 14:01:17 +0200
-From:   Andrew Jones <drjones@redhat.com>
-To:     Jingyi Wang <wangjingyi11@huawei.com>
-Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, maz@kernel.org,
-        wanghaibin.wang@huawei.com, yuzenghui@huawei.com,
-        eric.auger@redhat.com, prime.zeng@hisilicon.com
-Subject: Re: [kvm-unit-tests PATCH v3 00/10] arm/arm64: Add IPI/LPI/vtimer
- latency test
-Message-ID: <20200731120117.5kk22hx2wpbt6kpz@kamzik.brq.redhat.com>
-References: <20200731074244.20432-1-wangjingyi11@huawei.com>
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 41A3E8015F3;
+        Fri, 31 Jul 2020 12:09:39 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-112-153.ams2.redhat.com [10.36.112.153])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 741D319D7F;
+        Fri, 31 Jul 2020 12:09:34 +0000 (UTC)
+Subject: Re: [kvm-unit-tests GIT PULL 00/11] s390x patches
+To:     Janosch Frank <frankja@linux.ibm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     kvm@vger.kernel.org, frankja@linux.vnet.ibm.com, david@redhat.com,
+        pmorel@linux.ibm.com, linux-s390@vger.kernel.org,
+        imbrenda@linux.ibm.com
+References: <20200731094607.15204-1-frankja@linux.ibm.com>
+ <dfce14f4-5e7b-9060-6520-06e7dd69cfa4@redhat.com>
+ <524d5b00-94ec-da47-601a-a5909e3ed63e@linux.ibm.com>
+From:   Thomas Huth <thuth@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <00cc99d2-6020-3111-38a4-232991ffcf0d@redhat.com>
+Date:   Fri, 31 Jul 2020 14:09:32 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200731074244.20432-1-wangjingyi11@huawei.com>
+In-Reply-To: <524d5b00-94ec-da47-601a-a5909e3ed63e@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jul 31, 2020 at 03:42:34PM +0800, Jingyi Wang wrote:
-> With the development of arm gic architecture, we think it will be useful
-> to add some performance test in kut to measure the cost of interrupts.
-> In this series, we add GICv4.1 support for ipi latency test and
-> implement LPI/vtimer latency test.
+On 31/07/2020 13.31, Janosch Frank wrote:
+> On 7/31/20 12:31 PM, Paolo Bonzini wrote:
+>> On 31/07/20 11:45, Janosch Frank wrote:
+>>>   https://github.com/frankjaa/kvm-unit-tests.git tags/s390x-2020-31-07
+>>
+>> Pulled, thanks.  FWIW you may want to gitlab in order to get the CI.
+>>
+>> Paolo
+>>
 > 
-> This series of patches has been tested on GICv4.1 supported hardware.
+> Hey Paolo, that repository is hooked up to travis already:
+> https://travis-ci.com/github/frankjaa/kvm-unit-tests/builds/177931162
 > 
-> Note:
-> Based on patch "arm/arm64: timer: Extract irqs at setup time",
-> https://www.spinics.net/lists/kvm-arm/msg41425.html
-> 
-> * From v2:
->   - Code and commit message cleanup
->   - Clear nr_ipi_received before ipi_exec() thanks for Tao Zeng's review
->   - rebase the patch "Add vtimer latency test" on Andrew's patch
+> I'll consider it if it has any benefit.
+> @Thomas: Are there differences in the CI?
 
-It'd be good if you'd reposted my patch along with this series, since we
-didn't merge mine yet either. Don't worry about now, though, I'll pick it
-up the same time I pick up this series, which I plan to do later today
-or tomorrow.
+Not that much, you get a good build test coverage with both. Travis uses
+real (nested) KVM tests, but the compiler and QEMU versions are a little
+bit backlevel (still using Ubuntu bionic). Gitlab-CI uses newer versions
+(thanks to Fedora 32), but there is no KVM support here, so the tests
+run with TCG only (I'm thinking of adding the cirrus-run script to the
+Gitlab-CI, maybe we could get some KVM-coverage that way there, too, but
+that will certainly take some time to figure it out).
 
-Getting this series applied will allow me to try out our new and shiny
-gitlab repo :-)
-
-Thanks,
-drew
-
->   - Add test->post() to get actual PPI latency
-> 
-> * From v1:
->   - Fix spelling mistake
->   - Use the existing interface to inject hw sgi to simply the logic
->   - Add two separate patches to limit the running times and time cost
->     of each individual micro-bench test
-> 
-> Jingyi Wang (10):
->   arm64: microbench: get correct ipi received num
->   arm64: microbench: Generalize ipi test names
->   arm64: microbench: gic: Add ipi latency test for gicv4.1 support kvm
->   arm64: its: Handle its command queue wrapping
->   arm64: microbench: its: Add LPI latency test
->   arm64: microbench: Allow each test to specify its running times
->   arm64: microbench: Add time limit for each individual test
->   arm64: microbench: Add vtimer latency test
->   arm64: microbench: Add test->post() to further process test results
->   arm64: microbench: Add timer_post() to get actual PPI latency
-> 
->  arm/micro-bench.c          | 256 ++++++++++++++++++++++++++++++-------
->  lib/arm/asm/gic-v3.h       |   3 +
->  lib/arm/asm/gic.h          |   1 +
->  lib/arm64/gic-v3-its-cmd.c |   3 +-
->  4 files changed, 219 insertions(+), 44 deletions(-)
-> 
-> -- 
-> 2.19.1
-> 
-> 
+ Thomas
 
