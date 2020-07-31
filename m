@@ -2,95 +2,135 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D997A233F1E
-	for <lists+kvm@lfdr.de>; Fri, 31 Jul 2020 08:32:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EE3DC233F30
+	for <lists+kvm@lfdr.de>; Fri, 31 Jul 2020 08:39:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731351AbgGaGcK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 31 Jul 2020 02:32:10 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:38749 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731269AbgGaGcK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 31 Jul 2020 02:32:10 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1596177129;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=jUqlOS0LGIgs5xxc+eVW16fZljaITYx6kre8je7X1Zk=;
-        b=RpeHP0hA3D7P+ZEvqdWWGv+l9/vYTdYOTBRR/2dj6Z4jQSF9xD8i3Jll+5dd+xSvaCRi/9
-        23wW0/Jbjfw+2KxkEpCGIcFiUxvMYrzwEjTrh/l/i0F3StcKCe+FguGUNtX8fLURL0XHV1
-        fdlLGq1dn/WD5XCGgYD0cuHoSHI1ZWE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-10-XdAYOR7bPSSlzBGA623goQ-1; Fri, 31 Jul 2020 02:32:06 -0400
-X-MC-Unique: XdAYOR7bPSSlzBGA623goQ-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2142D107ACCA
-        for <kvm@vger.kernel.org>; Fri, 31 Jul 2020 06:32:06 +0000 (UTC)
-Received: from kamzik.brq.redhat.com (unknown [10.40.192.116])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id A789573037;
-        Fri, 31 Jul 2020 06:32:02 +0000 (UTC)
-Date:   Fri, 31 Jul 2020 08:32:00 +0200
-From:   Andrew Jones <drjones@redhat.com>
-To:     Thomas Huth <thuth@redhat.com>
-Cc:     kvm@vger.kernel.org, pbonzini@redhat.com
-Subject: Re: [kvm-unit-tests PATCH] scripts/runtime: Replace "|&" with "2>&1
- |"
-Message-ID: <20200731063200.ylvid4qrtvyduagr@kamzik.brq.redhat.com>
-References: <20200731060909.1163-1-thuth@redhat.com>
+        id S1731375AbgGaGjp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 31 Jul 2020 02:39:45 -0400
+Received: from szxga04-in.huawei.com ([45.249.212.190]:8865 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1731224AbgGaGjo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 31 Jul 2020 02:39:44 -0400
+Received: from DGGEMS408-HUB.china.huawei.com (unknown [172.30.72.58])
+        by Forcepoint Email with ESMTP id DD9B19CED4C9D6C8A047;
+        Fri, 31 Jul 2020 14:39:37 +0800 (CST)
+Received: from [127.0.0.1] (10.174.186.173) by DGGEMS408-HUB.china.huawei.com
+ (10.3.19.208) with Microsoft SMTP Server id 14.3.487.0; Fri, 31 Jul 2020
+ 14:39:30 +0800
+Subject: Re: [Question] the check of ioeventfd collision in
+ kvm_*assign_ioeventfd_idx
+To:     Paolo Bonzini <pbonzini@redhat.com>
+CC:     "S. Tsirkin, Michael" <mst@redhat.com>, <gleb@redhat.com>,
+        <linux-kernel@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>, <kvm@vger.kernel.org>,
+        <kvmarm@lists.cs.columbia.edu>,
+        Xiexiangyou <xiexiangyou@huawei.com>
+References: <bbece68b-fb39-d599-9ba7-a8ee8be16525@huawei.com>
+ <CABgObfbFXYodCeGWSnKw0j_n2-QLxpnD_Uyc5r-_ApXv=x+qmw@mail.gmail.com>
+From:   Zhenyu Ye <yezhenyu2@huawei.com>
+Message-ID: <4aa75d90-f2d2-888c-8970-02a41f3733e4@huawei.com>
+Date:   Fri, 31 Jul 2020 14:39:29 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.3.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200731060909.1163-1-thuth@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+In-Reply-To: <CABgObfbFXYodCeGWSnKw0j_n2-QLxpnD_Uyc5r-_ApXv=x+qmw@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.174.186.173]
+X-CFilter-Loop: Reflected
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jul 31, 2020 at 08:09:09AM +0200, Thomas Huth wrote:
-> The "|&" only works with newer versions of the bash. For compatibility
-> with older versions, we should use "2>&1 |" instead.
-
-Hi Thomas,
-
-Which bash version are you targeting with this change?
-
-I think it's time we pick a bash version that we want to support
-(thoroughly test all the scripts with it) and then document it. As
-part of the CI we should test with both that version and with the
-latest released version (394d1421 ("run_migration: Implement our own
-wait") is an example of why only testing with our supported version
-wouldn't be sufficient, unless we required everyone to use that
-version when running the tests, and I don't want to do that.)
-
+On 2020/7/31 2:03, Paolo Bonzini wrote:
+> Yes, I think it's not needed. Probably the deassign check can be turned into an assertion?
 > 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> ---
->  scripts/runtime.bash | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+> Paolo
 > 
-> diff --git a/scripts/runtime.bash b/scripts/runtime.bash
-> index c88e246..35689a7 100644
-> --- a/scripts/runtime.bash
-> +++ b/scripts/runtime.bash
-> @@ -172,7 +172,7 @@ function run()
->  # "arm/arm64: KVM: Remove 'config KVM_ARM_MAX_VCPUS'". So, at some
->  # point when maintaining the while loop gets too tiresome, we can
->  # just remove it...
-> -while $RUNTIME_arch_run _NO_FILE_4Uhere_ -smp $MAX_SMP \
-> -		|& grep -qi 'exceeds max CPUs'; do
-> +while $RUNTIME_arch_run _NO_FILE_4Uhere_ -smp $MAX_SMP 2>&1 \
-> +		| grep -qi 'exceeds max CPUs'; do
->  	MAX_SMP=$((MAX_SMP >> 1))
->  done
-> -- 
-> 2.18.1
->
 
-Anyway
- 
-Reviewed-by: Andrew Jones <drjones@redhat.com>
+I think we can do this in the same function, and turnt he check of
+p->eventfd into assertion in kvm_deassign_ioeventfd_idx(). Just like:
+
+---8<---
+static inline struct _ioeventfd *
+get_ioeventfd(struct kvm *kvm, enum kvm_bus bus_idx,
+              struct kvm_ioeventfd *args)
+{
+        static struct _ioeventfd *_p;
+        bool wildcard = !(args->flags & KVM_IOEVENTFD_FLAG_DATAMATCH);
+
+        list_for_each_entry(_p, &kvm->ioeventfds, list)
+                if (_p->bus_idx == bus_idx &&
+                    _p->addr == args->addr &&
+                    (!_p->length || !args->len ||
+                     (_p->length == args->len &&
+                      (_p->wildcard || wildcard ||
+                       _p->datamatch == args->datamatch))))
+                        return _p;
+
+        return NULL;
+}
+
+kvm_deassign_ioeventfd_idx() {
+	...
+	p = get_ioeventfd(kvm, bus_idx, args);
+	if (p) {
+		assert(p->eventfd == eventfd);
+		...
+	}
+
+---8<----
+
+This may be easier to understand (keep the same logic in assign/deassign).
+
+I will send a formal patch soon.
+
+Thanks,
+Zhenyu
+
+
+> Il gio 30 lug 2020, 16:36 Zhenyu Ye <yezhenyu2@huawei.com <mailto:yezhenyu2@huawei.com>> ha scritto:
+> 
+>     Hi all,
+> 
+>     There are checks of ioeventfd collision in both kvm_assign_ioeventfd_idx()
+>     and kvm_deassign_ioeventfd_idx(), however, with different logic.
+> 
+>     In kvm_assign_ioeventfd_idx(), this is done by ioeventfd_check_collision():
+>     ---8<---
+>             if (_p->bus_idx == p->bus_idx &&
+>                 _p->addr == p->addr &&
+>                 (!_p->length || !p->length ||
+>                  (_p->length == p->length &&
+>                   (_p->wildcard || p->wildcard ||
+>                    _p->datamatch == p->datamatch))))
+>                     // then we consider the two are the same
+>     ---8<---
+> 
+>     The logic in kvm_deassign_ioeventfd_idx() is as follows:
+>     ---8<---
+>             if (p->bus_idx != bus_idx ||
+>                 p->eventfd != eventfd  ||
+>                 p->addr != args->addr  ||
+>                 p->length != args->len ||
+>                 p->wildcard != wildcard)
+>                     continue;
+> 
+>             if (!p->wildcard && p->datamatch != args->datamatch)
+>                     continue;
+> 
+>             // then we consider the two are the same
+>     ---8<---
+> 
+>     As we can see, there is extra check of p->eventfd in
+> 
+>     ().  Why we don't check p->eventfd
+>     in kvm_assign_ioeventfd_idx()? Or should we delete this in
+>     kvm_deassign_ioeventfd_idx()?
+> 
+> 
+>     Thanks,
+>     Zhenyu
+> 
 
