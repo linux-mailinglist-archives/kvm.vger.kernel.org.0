@@ -2,209 +2,147 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 97053234CE2
-	for <lists+kvm@lfdr.de>; Fri, 31 Jul 2020 23:23:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B5EDC234D4D
+	for <lists+kvm@lfdr.de>; Fri, 31 Jul 2020 23:50:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729542AbgGaVXf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 31 Jul 2020 17:23:35 -0400
-Received: from mga14.intel.com ([192.55.52.115]:50224 "EHLO mga14.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729197AbgGaVXb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 31 Jul 2020 17:23:31 -0400
-IronPort-SDR: QlZ05md2KNPYIzpbAmiKQbyIGgBXkeRSKYVEeu6fHUZuIl+fUPqDNgtdYOnT6pDFQnqCWuKbDw
- MPqm4m31ynRg==
-X-IronPort-AV: E=McAfee;i="6000,8403,9699"; a="151075134"
-X-IronPort-AV: E=Sophos;i="5.75,419,1589266800"; 
-   d="scan'208";a="151075134"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Jul 2020 14:23:27 -0700
-IronPort-SDR: cyySMoQBdLD4wZpxqY0qAajzuUxlrh3m7BtU7M5kj5Q6OmwQ6m+4iDeqyrT+RMOmRBlTHLGPB1
- eQfhzUHiTzWA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.75,419,1589266800"; 
-   d="scan'208";a="331191319"
-Received: from sjchrist-coffee.jf.intel.com ([10.54.74.160])
-  by orsmga007.jf.intel.com with ESMTP; 31 Jul 2020 14:23:26 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
+        id S1727008AbgGaVuH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 31 Jul 2020 17:50:07 -0400
+Received: from smtp-fw-9101.amazon.com ([207.171.184.25]:19920 "EHLO
+        smtp-fw-9101.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726881AbgGaVuG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 31 Jul 2020 17:50:06 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1596232206; x=1627768206;
+  h=from:to:cc:subject:date:message-id:mime-version;
+  bh=TCl662mUkal176BNY6VRMbOf0sBUN6kp6uCGLE85bLE=;
+  b=nB3wO3EGTr7NQEKhWraOY5/Cf8kz/DhvIoHKKyNf2yhObAeLpYYcqfAB
+   Y6uR8R9W60XqpD2oHr5AnW8/hchfMKgVKbz8Q4HK3wtjUQJZLgmQfMTIm
+   y2byfiU/hbWBvzftEaedGboAsmX55SASj5bHAy5PMyfxPIy6dHX12YrYV
+   8=;
+IronPort-SDR: oUPSmJGeLX2JoT+MfwiALEgEB86WPd23cJ0UzlfwclfAJLNTuYnXLpMRU7jlYkr6mN5h+jYvRa
+ m5CMGeWGBxfQ==
+X-IronPort-AV: E=Sophos;i="5.75,419,1589241600"; 
+   d="scan'208";a="56451571"
+Received: from sea32-co-svc-lb4-vlan3.sea.corp.amazon.com (HELO email-inbound-relay-1e-27fb8269.us-east-1.amazon.com) ([10.47.23.38])
+  by smtp-border-fw-out-9101.sea19.amazon.com with ESMTP; 31 Jul 2020 21:50:03 +0000
+Received: from EX13MTAUWC001.ant.amazon.com (iad55-ws-svc-p15-lb9-vlan2.iad.amazon.com [10.40.159.162])
+        by email-inbound-relay-1e-27fb8269.us-east-1.amazon.com (Postfix) with ESMTPS id D5063A2026;
+        Fri, 31 Jul 2020 21:49:58 +0000 (UTC)
+Received: from EX13D20UWC002.ant.amazon.com (10.43.162.163) by
+ EX13MTAUWC001.ant.amazon.com (10.43.162.135) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.2; Fri, 31 Jul 2020 21:49:58 +0000
+Received: from u79c5a0a55de558.ant.amazon.com (10.43.160.100) by
+ EX13D20UWC002.ant.amazon.com (10.43.162.163) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.2; Fri, 31 Jul 2020 21:49:55 +0000
+From:   Alexander Graf <graf@amazon.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
+CC:     Jonathan Corbet <corbet@lwn.net>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        eric van tassell <Eric.VanTassell@amd.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>
-Subject: [RFC PATCH 8/8] KVM: SVM: Pin SEV pages in MMU during sev_launch_update_data()
-Date:   Fri, 31 Jul 2020 14:23:23 -0700
-Message-Id: <20200731212323.21746-9-sean.j.christopherson@intel.com>
-X-Mailer: git-send-email 2.28.0
-In-Reply-To: <20200731212323.21746-1-sean.j.christopherson@intel.com>
-References: <20200731212323.21746-1-sean.j.christopherson@intel.com>
+        "Joerg Roedel" <joro@8bytes.org>,
+        KarimAllah Raslan <karahmed@amazon.de>,
+        Aaron Lewis <aaronlewis@google.com>, <kvm@vger.kernel.org>,
+        <linux-doc@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+Subject: [PATCH v3 0/3] Allow user space to restrict and augment MSR emulation
+Date:   Fri, 31 Jul 2020 23:49:44 +0200
+Message-ID: <20200731214947.16885-1-graf@amazon.com>
+X-Mailer: git-send-email 2.17.1
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [10.43.160.100]
+X-ClientProxiedBy: EX13D48UWA001.ant.amazon.com (10.43.163.52) To
+ EX13D20UWC002.ant.amazon.com (10.43.162.163)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
----
- arch/x86/kvm/svm/sev.c | 117 +++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 112 insertions(+), 5 deletions(-)
+While tying to add support for the MSR_CORE_THREAD_COUNT MSR in KVM,
+I realized that we were still in a world where user space has no control
+over what happens with MSR emulation in KVM.
 
-diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-index f640b8beb443e..eb95914578497 100644
---- a/arch/x86/kvm/svm/sev.c
-+++ b/arch/x86/kvm/svm/sev.c
-@@ -15,6 +15,7 @@
- #include <linux/pagemap.h>
- #include <linux/swap.h>
- 
-+#include "mmu.h"
- #include "x86.h"
- #include "svm.h"
- 
-@@ -415,6 +416,107 @@ static unsigned long get_num_contig_pages(unsigned long idx,
- 	return pages;
- }
- 
-+#define SEV_PFERR (PFERR_WRITE_MASK | PFERR_USER_MASK)
-+
-+static void *sev_alloc_pages(unsigned long size, unsigned long *npages)
-+{
-+	/* TODO */
-+	*npages = 0;
-+	return NULL;
-+}
-+
-+static struct kvm_memory_slot *hva_to_memslot(struct kvm *kvm,
-+					      unsigned long hva)
-+{
-+	struct kvm_memslots *slots = kvm_memslots(kvm);
-+	struct kvm_memory_slot *memslot;
-+
-+	kvm_for_each_memslot(memslot, slots) {
-+		if (hva >= memslot->userspace_addr &&
-+			hva < memslot->userspace_addr +
-+				(memslot->npages << PAGE_SHIFT))
-+			return memslot;
-+	}
-+
-+	return NULL;
-+}
-+
-+static bool hva_to_gpa(struct kvm *kvm, unsigned long hva)
-+{
-+	struct kvm_memory_slot *memslot;
-+	gpa_t gpa_offset;
-+
-+	memslot = hva_to_memslot(kvm, hva);
-+	if (!memslot)
-+		return UNMAPPED_GVA;
-+
-+	gpa_offset = hva - memslot->userspace_addr;
-+	return ((memslot->base_gfn << PAGE_SHIFT) + gpa_offset);
-+}
-+
-+static struct page **sev_pin_memory_in_mmu(struct kvm *kvm, unsigned long addr,
-+					   unsigned long size,
-+					   unsigned long *npages)
-+{
-+	struct kvm_vcpu *vcpu;
-+	struct page **pages;
-+	unsigned long i;
-+	kvm_pfn_t pfn;
-+	int idx, ret;
-+	gpa_t gpa;
-+
-+	pages = sev_alloc_pages(size, npages);
-+	if (!pages)
-+		return ERR_PTR(-ENOMEM);
-+
-+	vcpu = kvm_get_vcpu(kvm, 0);
-+	if (mutex_lock_killable(&vcpu->mutex)) {
-+		kvfree(pages);
-+		return ERR_PTR(-EINTR);
-+	}
-+
-+	vcpu_load(vcpu);
-+	idx = srcu_read_lock(&kvm->srcu);
-+
-+	kvm_mmu_load(vcpu);
-+
-+	for (i = 0; i < *npages; i++, addr += PAGE_SIZE) {
-+		if (signal_pending(current)) {
-+			ret = -ERESTARTSYS;
-+			goto err;
-+		}
-+
-+		if (need_resched())
-+			cond_resched();
-+
-+		gpa = hva_to_gpa(kvm, addr);
-+		if (gpa == UNMAPPED_GVA) {
-+			ret = -EFAULT;
-+			goto err;
-+		}
-+		pfn = kvm_mmu_map_tdp_page(vcpu, gpa, SEV_PFERR, PG_LEVEL_4K);
-+		if (is_error_noslot_pfn(pfn)) {
-+			ret = -EFAULT;
-+			goto err;
-+		}
-+		pages[i] = pfn_to_page(pfn);
-+		get_page(pages[i]);
-+	}
-+
-+	srcu_read_unlock(&kvm->srcu, idx);
-+	vcpu_put(vcpu);
-+
-+	mutex_unlock(&vcpu->mutex);
-+	return pages;
-+
-+err:
-+	for ( ; i; --i)
-+		put_page(pages[i-1]);
-+
-+	kvfree(pages);
-+	return ERR_PTR(ret);
-+}
-+
- static int sev_launch_update_data(struct kvm *kvm, struct kvm_sev_cmd *argp)
- {
- 	unsigned long vaddr, vaddr_end, next_vaddr, npages, pages, size, i;
-@@ -439,9 +541,12 @@ static int sev_launch_update_data(struct kvm *kvm, struct kvm_sev_cmd *argp)
- 	vaddr_end = vaddr + size;
- 
- 	/* Lock the user memory. */
--	inpages = sev_pin_memory(kvm, vaddr, size, &npages, 1);
--	if (!inpages) {
--		ret = -ENOMEM;
-+	if (atomic_read(&kvm->online_vcpus))
-+		inpages = sev_pin_memory_in_mmu(kvm, vaddr, size, &npages);
-+	else
-+		inpages = sev_pin_memory(kvm, vaddr, size, &npages, 1);
-+	if (IS_ERR(inpages)) {
-+		ret = PTR_ERR(inpages);
- 		goto e_free;
- 	}
- 
-@@ -449,9 +554,11 @@ static int sev_launch_update_data(struct kvm *kvm, struct kvm_sev_cmd *argp)
- 	 * The LAUNCH_UPDATE command will perform in-place encryption of the
- 	 * memory content (i.e it will write the same memory region with C=1).
- 	 * It's possible that the cache may contain the data with C=0, i.e.,
--	 * unencrypted so invalidate it first.
-+	 * unencrypted so invalidate it first.  Flushing is automatically
-+	 * handled if the pages can be pinned in the MMU.
- 	 */
--	sev_clflush_pages(inpages, npages);
-+	if (!atomic_read(&kvm->online_vcpus))
-+		sev_clflush_pages(inpages, npages);
- 
- 	for (i = 0; vaddr < vaddr_end; vaddr = next_vaddr, i += pages) {
- 		int offset, len;
+That is bad for multiple reasons. In my case, I wanted to emulate the
+MSR in user space, because it's a CPU specific register that does not
+exist on older CPUs and that really only contains informational data that
+is on the package level, so it's a natural fit for user space to provide
+it.
+
+However, it is also bad on a platform compatibility level. Currrently,
+KVM has no way to expose different MSRs based on the selected target CPU
+type.
+
+This patch set introduces a way for user space to indicate to KVM which
+MSRs should be handled in kernel space. With that, we can solve part of
+the platform compatibility story. Or at least we can not handle AMD specific
+MSRs on an Intel platform and vice versa.
+
+In addition, it introduces a way for user space to get into the loop
+when an MSR access would generate a #GP fault, such as when KVM finds an
+MSR that is not handled by the in-kernel MSR emulation or when the guest
+is trying to access reserved registers.
+
+In combination with the allow list, the user space trapping allows us
+to emulate arbitrary MSRs in user space, paving the way for target CPU
+specific MSR implementations from user space.
+
+v1 -> v2:
+
+  - s/ETRAP_TO_USER_SPACE/ENOENT/g
+  - deflect all #GP injection events to user space, not just unknown MSRs.
+    That was we can also deflect allowlist errors later
+  - fix emulator case
+  - new patch: KVM: x86: Introduce allow list for MSR emulation
+  - new patch: KVM: selftests: Add test for user space MSR handling
+
+v2 -> v3:
+
+  - return r if r == X86EMUL_IO_NEEDED
+  - s/KVM_EXIT_RDMSR/KVM_EXIT_X86_RDMSR/g
+  - s/KVM_EXIT_WRMSR/KVM_EXIT_X86_WRMSR/g
+  - Use complete_userspace_io logic instead of reply field
+  - Simplify trapping code
+  - document flags for KVM_X86_ADD_MSR_ALLOWLIST
+  - generalize exit path, always unlock when returning
+  - s/KVM_CAP_ADD_MSR_ALLOWLIST/KVM_CAP_X86_MSR_ALLOWLIST/g
+  - Add KVM_X86_CLEAR_MSR_ALLOWLIST
+  - Add test to clear whitelist
+  - Adjust to reply-less API
+  - Fix asserts
+  - Actually trap on MSR_IA32_POWER_CTL writes
+
+Alexander Graf (3):
+  KVM: x86: Deflect unknown MSR accesses to user space
+  KVM: x86: Introduce allow list for MSR emulation
+  KVM: selftests: Add test for user space MSR handling
+
+ Documentation/virt/kvm/api.rst                | 153 +++++++++++
+ arch/x86/include/asm/kvm_host.h               |  16 ++
+ arch/x86/include/uapi/asm/kvm.h               |  15 ++
+ arch/x86/kvm/emulate.c                        |  18 +-
+ arch/x86/kvm/x86.c                            | 241 +++++++++++++++++-
+ include/trace/events/kvm.h                    |   2 +-
+ include/uapi/linux/kvm.h                      |  15 ++
+ tools/testing/selftests/kvm/Makefile          |   1 +
+ .../selftests/kvm/x86_64/user_msr_test.c      | 221 ++++++++++++++++
+ 9 files changed, 675 insertions(+), 7 deletions(-)
+ create mode 100644 tools/testing/selftests/kvm/x86_64/user_msr_test.c
+
 -- 
-2.28.0
+2.17.1
+
+
+
+
+Amazon Development Center Germany GmbH
+Krausenstr. 38
+10117 Berlin
+Geschaeftsfuehrung: Christian Schlaeger, Jonathan Weiss
+Eingetragen am Amtsgericht Charlottenburg unter HRB 149173 B
+Sitz: Berlin
+Ust-ID: DE 289 237 879
+
+
 
