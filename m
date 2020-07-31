@@ -2,67 +2,74 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E108D23447F
-	for <lists+kvm@lfdr.de>; Fri, 31 Jul 2020 13:24:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EB9E4234484
+	for <lists+kvm@lfdr.de>; Fri, 31 Jul 2020 13:26:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732485AbgGaLYj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 31 Jul 2020 07:24:39 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:33299 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1732104AbgGaLYh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 31 Jul 2020 07:24:37 -0400
+        id S1732662AbgGaL0I (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 31 Jul 2020 07:26:08 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:60462 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1732303AbgGaL0E (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 31 Jul 2020 07:26:04 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1596194675;
+        s=mimecast20190719; t=1596194763;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=FnDKMoIrI6Brz2FxzLVFulkmaL5xDwKSC+gKy7dwOZc=;
-        b=OTrZZtAlxPWBN6n705pkAMW9lQvALvZXAb8WyrJeXGDqc/01Su1VapG3uPqGvNrwgdpBCc
-        z3lSfPv84rrXdo94uIs1HiY8I51si/m8uQpmvY5MIv38qPs266W9rf3aMU/UwKfA58uxSJ
-        aMVffBZ4LFI9oRW5sMSLpEmI783lgz4=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-19-LbJuluI3OZiVPe2ZJTBr-A-1; Fri, 31 Jul 2020 07:24:33 -0400
-X-MC-Unique: LbJuluI3OZiVPe2ZJTBr-A-1
-Received: by mail-wr1-f72.google.com with SMTP id j2so6442226wrr.14
-        for <kvm@vger.kernel.org>; Fri, 31 Jul 2020 04:24:33 -0700 (PDT)
+        bh=qOaj9Z+2J+hwBOQBlLHm+67/cw8pKJ5RjzcvJzQQPlo=;
+        b=VZPFf98THy8KP3uWNww+8Q1YvWA7rGMOsirY0QnefEUkYt2UJTnJiMC6Sw+XHxN11ptf7B
+        YBqv9CExaIztdNCcPvbfgVc2zWwPlXVLAqIK5Is7dG+olw3nuna2U/ikeTBAKNN3J4WySh
+        taStOYB/ZRec5CLXZ5HQxj3Dkx4EyJA=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-415-G6j_JAI4MiCY4RXowZ-NCQ-1; Fri, 31 Jul 2020 07:26:01 -0400
+X-MC-Unique: G6j_JAI4MiCY4RXowZ-NCQ-1
+Received: by mail-wr1-f69.google.com with SMTP id j2so6443593wrr.14
+        for <kvm@vger.kernel.org>; Fri, 31 Jul 2020 04:26:01 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=FnDKMoIrI6Brz2FxzLVFulkmaL5xDwKSC+gKy7dwOZc=;
-        b=CVmgNsH2TzQlfnbCHG0+WuMr9di3/qCfOPvSQfLcyVAzJSMCX6kpibybPAM7bVtatD
-         qATbmf/9wKP6OkZd2MffBb35i3JMO1CKoLx0EmjePPvnost6up8o9HAWJiPK5/iZz05m
-         Tv6bL6QmpVjMOcW2Yqj+cvqCMS0Bh5EoKM0Gm/AIBT4IwE9ICdLdXgKMGBUCCYVsRwiu
-         TMPLeP2Ur3TBpq94d/+NEwedUUy55uB/haf7/aIOyHARvZ/KUin3aMxYGFnlZ+WR07nS
-         pufiDiU3P1QOxVYbBQfvq+GPR6+hOa2OAMq6G0zH0Oq9kMdjDQ24519uaWzHDN3HNYsR
-         TrpQ==
-X-Gm-Message-State: AOAM531bbPMlgDo8gHSVM+Gq9zIgRUtuewhjGLXZe68CVRs8SPeucL1/
-        aFjDK0HvNoiS0blrLfabege4+TFG69PLMyAwHEj1b4QRD/wrtd1ZFyO48UPPC3+6kdQdvyy3t2J
-        Q/la5bktZwiPz
-X-Received: by 2002:a05:6000:1211:: with SMTP id e17mr3145446wrx.263.1596194672656;
-        Fri, 31 Jul 2020 04:24:32 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwfooP8J1sqE0dwd7h/KW/oWNUPCynNOlZVCfM60R+5HV2KUnh0EDFuZ+vXB907kTFPAzl/4g==
-X-Received: by 2002:a05:6000:1211:: with SMTP id e17mr3145425wrx.263.1596194672381;
-        Fri, 31 Jul 2020 04:24:32 -0700 (PDT)
+        bh=qOaj9Z+2J+hwBOQBlLHm+67/cw8pKJ5RjzcvJzQQPlo=;
+        b=Q11U9PEa2C6zaZUonmUp3CH+m3C7UI0AeQnFfNyon/e4H6Vx6XEC3S/DVVuDMl8PTV
+         tGcCfCd7SzssaLE95H2SavqpT96DmXbCWEEjex4qQqS01jK4AjvSXQhKcUI5cs0m8upn
+         jj/4hIFgCe6ASJpbIuP85vRV5ffdqaz4C39ag1c1hFF27SsFse+2t4Y7cJ3RswX7FCjX
+         2qBn4WLkULB0YIWpeCiA2dO/PKaS3jV0lcimH+Sr5VQGU59012VIKuZu05tcMIBHzeqT
+         4Oflv/2s7F+2/STLkPkKHe7MHPqPKr+P8EfbE3JfI4iy791gCaftuZfLiTD/qxmsJQM4
+         JP9g==
+X-Gm-Message-State: AOAM531IWJuQNNIQswEzKOtEAhe7VES6lXfW6EIGzN+OZ+jbre33Bakt
+        lW8f+k9gD5Z4lZU1gVZBC4XXTQxvxQkCzhhMFgj2YAgRyx2GjHOTbhasjGoIkerwo+hJ1/V8WrG
+        IXsT986SQYVO4
+X-Received: by 2002:adf:f486:: with SMTP id l6mr3109674wro.265.1596194760248;
+        Fri, 31 Jul 2020 04:26:00 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwk/sUGOSyrEXkSz7ip47hO4+s0lhkAC2W0ZVyNgZ4SZAfSzwoO1WyP1uGy8VewJvKt/OOPNQ==
+X-Received: by 2002:adf:f486:: with SMTP id l6mr3109648wro.265.1596194759982;
+        Fri, 31 Jul 2020 04:25:59 -0700 (PDT)
 Received: from ?IPv6:2001:b07:6468:f312:310b:68e5:c01a:3778? ([2001:b07:6468:f312:310b:68e5:c01a:3778])
-        by smtp.gmail.com with ESMTPSA id d7sm6954118wra.29.2020.07.31.04.24.31
+        by smtp.gmail.com with ESMTPSA id r22sm5313359wmh.45.2020.07.31.04.25.59
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 31 Jul 2020 04:24:31 -0700 (PDT)
-Subject: Re: [kvm-unit-tests PATCH] gitlab-ci.yml: Compile some jobs
- out-of-tree
-To:     Thomas Huth <thuth@redhat.com>, kvm@vger.kernel.org
-Cc:     drjones@redhat.com
-References: <20200731094139.9364-1-thuth@redhat.com>
+        Fri, 31 Jul 2020 04:25:59 -0700 (PDT)
+Subject: Re: [GIT PULL] KVM/arm64 fixes for 5.8, take #4
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     Nathan Chancellor <natechancellor@gmail.com>,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        Quentin Perret <qperret@google.com>,
+        Will Deacon <will@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, kernel-team@android.com
+References: <20200728082255.3864378-1-maz@kernel.org>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <e2b61ffa-fc82-ebae-fab3-0b5022c11296@redhat.com>
-Date:   Fri, 31 Jul 2020 13:24:31 +0200
+Message-ID: <29d7df19-0621-2589-50c6-c00b726e2c05@redhat.com>
+Date:   Fri, 31 Jul 2020 13:25:58 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.9.0
 MIME-Version: 1.0
-In-Reply-To: <20200731094139.9364-1-thuth@redhat.com>
+In-Reply-To: <20200728082255.3864378-1-maz@kernel.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -71,57 +78,50 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 31/07/20 11:41, Thomas Huth wrote:
-> So far we only compiled all jobs in-tree in the gitlab-CI. For the code
-> that gets compiled twice (one time for 64-bit and one time for 32-bit
-> for example), we can easily move one of the two jobs to out-of-tree build
-> mode to increase the build test coverage a little bit.
+On 28/07/20 10:22, Marc Zyngier wrote:
+> Hi Paolo,
 > 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> ---
->  .gitlab-ci.yml | 12 +++++++++---
->  1 file changed, 9 insertions(+), 3 deletions(-)
+> This is the last batch of fixes for 5.8. One fixes a long standing MMU
+> issue, while the other addresses a more recent brekage with out-of-line
+> helpers in the nVHE code.
 > 
-> diff --git a/.gitlab-ci.yml b/.gitlab-ci.yml
-> index 1ec9797..6613c7b 100644
-> --- a/.gitlab-ci.yml
-> +++ b/.gitlab-ci.yml
-> @@ -19,7 +19,9 @@ build-aarch64:
->  build-arm:
->   script:
->   - dnf install -y qemu-system-arm gcc-arm-linux-gnu
-> - - ./configure --arch=arm --cross-prefix=arm-linux-gnu-
-> + - mkdir build
-> + - cd build
-> + - ../configure --arch=arm --cross-prefix=arm-linux-gnu-
->   - make -j2
->   - ACCEL=tcg MAX_SMP=8 ./run_tests.sh
->       selftest-setup selftest-vectors-kernel selftest-vectors-user selftest-smp
-> @@ -31,7 +33,9 @@ build-arm:
->  build-ppc64be:
->   script:
->   - dnf install -y qemu-system-ppc gcc-powerpc64-linux-gnu
-> - - ./configure --arch=ppc64 --endian=big --cross-prefix=powerpc64-linux-gnu-
-> + - mkdir build
-> + - cd build
-> + - ../configure --arch=ppc64 --endian=big --cross-prefix=powerpc64-linux-gnu-
->   - make -j2
->   - ACCEL=tcg ./run_tests.sh
->       selftest-setup spapr_hcall rtas-get-time-of-day rtas-get-time-of-day-base
-> @@ -77,7 +81,9 @@ build-x86_64:
->  build-i386:
->   script:
->   - dnf install -y qemu-system-x86 gcc
-> - - ./configure --arch=i386
-> + - mkdir build
-> + - cd build
-> + - ../configure --arch=i386
->   - make -j2
->   - ACCEL=tcg ./run_tests.sh
->       cmpxchg8b vmexit_cpuid vmexit_mov_from_cr8 vmexit_mov_to_cr8
+> Please pull,
+> 
+> 	M.
+> 
+> The following changes since commit b9e10d4a6c9f5cbe6369ce2c17ebc67d2e5a4be5:
+> 
+>   KVM: arm64: Stop clobbering x0 for HVC_SOFT_RESTART (2020-07-06 11:47:02 +0100)
+> 
+> are available in the Git repository at:
+> 
+>   git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvmarm-fixes-5.8-4
+> 
+> for you to fetch changes up to b757b47a2fcba584d4a32fd7ee68faca510ab96f:
+> 
+>   KVM: arm64: Don't inherit exec permission across page-table levels (2020-07-28 09:03:57 +0100)
+> 
+> ----------------------------------------------------------------
+> KVM/arm64 fixes for Linux 5.8, take #3
+> 
+> - Fix a corner case of a new mapping inheriting exec permission without
+>   and yet bypassing invalidation of the I-cache
+> - Make sure PtrAuth predicates oinly generate inline code for the
+>   non-VHE hypervisor code
+> 
+> ----------------------------------------------------------------
+> Marc Zyngier (1):
+>       KVM: arm64: Prevent vcpu_has_ptrauth from generating OOL functions
+> 
+> Will Deacon (1):
+>       KVM: arm64: Don't inherit exec permission across page-table levels
+> 
+>  arch/arm64/include/asm/kvm_host.h | 11 ++++++++---
+>  arch/arm64/kvm/mmu.c              | 11 ++++++-----
+>  2 files changed, 14 insertions(+), 8 deletions(-)
 > 
 
-Applied, thanks.
+Pulled, thanks.
 
 Paolo
 
