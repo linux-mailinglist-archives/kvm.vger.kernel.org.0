@@ -2,29 +2,29 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6922A234CE8
-	for <lists+kvm@lfdr.de>; Fri, 31 Jul 2020 23:23:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6DBFC234CE9
+	for <lists+kvm@lfdr.de>; Fri, 31 Jul 2020 23:23:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726571AbgGaVXg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 31 Jul 2020 17:23:36 -0400
+        id S1729491AbgGaVXe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 31 Jul 2020 17:23:34 -0400
 Received: from mga14.intel.com ([192.55.52.115]:50227 "EHLO mga14.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728655AbgGaVX3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 31 Jul 2020 17:23:29 -0400
-IronPort-SDR: 6U13IaOWIutveJZigExAcIaX+/xN9fxwDw2b9eZyQD0mwUtcTqVENFG4APuxcKr3Es883OV1zB
- 0C8Xzx/56SsQ==
-X-IronPort-AV: E=McAfee;i="6000,8403,9699"; a="151075132"
+        id S1729214AbgGaVXb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 31 Jul 2020 17:23:31 -0400
+IronPort-SDR: jSvX9znS4jgPNzwY9fCSJhN0VZliV99ABokru1ltozaS+1akuyWSu++E65Hqzp7gy/xJgNByaY
+ mIhFa2rtwCMQ==
+X-IronPort-AV: E=McAfee;i="6000,8403,9699"; a="151075133"
 X-IronPort-AV: E=Sophos;i="5.75,419,1589266800"; 
-   d="scan'208";a="151075132"
+   d="scan'208";a="151075133"
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from orsmga007.jf.intel.com ([10.7.209.58])
   by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Jul 2020 14:23:27 -0700
-IronPort-SDR: 0dxITT+mw/DBoc2cD0a1KPHakQR7T57+QAoK254zJ3Nu/6obst6UuBtT9jiCX5LntxjXmx4SjO
- 70KVutgnY2sw==
+IronPort-SDR: n1XueUoeOVIDoIt4dEfR0g+zYAgDwHeFJJXQMA5ZiC6TDIlzXDPottjMbmZ0iNmQd0bWxq4Y0d
+ BJKSY2GQ8QJg==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.75,419,1589266800"; 
-   d="scan'208";a="331191311"
+   d="scan'208";a="331191315"
 Received: from sjchrist-coffee.jf.intel.com ([10.54.74.160])
   by orsmga007.jf.intel.com with ESMTP; 31 Jul 2020 14:23:26 -0700
 From:   Sean Christopherson <sean.j.christopherson@intel.com>
@@ -37,9 +37,9 @@ Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
         linux-kernel@vger.kernel.org,
         eric van tassell <Eric.VanTassell@amd.com>,
         Tom Lendacky <thomas.lendacky@amd.com>
-Subject: [RFC PATCH 6/8] KVM: x86/mmu: Move 'pfn' variable to caller of direct_page_fault()
-Date:   Fri, 31 Jul 2020 14:23:21 -0700
-Message-Id: <20200731212323.21746-7-sean.j.christopherson@intel.com>
+Subject: [RFC PATCH 7/8] KVM: x86/mmu: Introduce kvm_mmu_map_tdp_page() for use by SEV
+Date:   Fri, 31 Jul 2020 14:23:22 -0700
+Message-Id: <20200731212323.21746-8-sean.j.christopherson@intel.com>
 X-Mailer: git-send-email 2.28.0
 In-Reply-To: <20200731212323.21746-1-sean.j.christopherson@intel.com>
 References: <20200731212323.21746-1-sean.j.christopherson@intel.com>
@@ -50,96 +50,68 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-When adding pages prior to boot, SEV needs to pin the resulting host pfn
-so that the pages that are consumed by sev_launch_update_data() are not
-moved after the memory is encrypted, which would corrupt the guest data.
+Introduce a helper to directly (pun intended) fault-in a TDP page
+without having to go through the full page fault path.  This allows
+SEV to pin pages before booting the guest, provides the resulting pfn to
+vendor code if should be needed in the future, and allows the RET_PF_*
+enums to stay in mmu.c where they belong.
 
 Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
 ---
- arch/x86/kvm/mmu/mmu.c | 19 +++++++++++--------
- 1 file changed, 11 insertions(+), 8 deletions(-)
+ arch/x86/kvm/mmu.h     |  3 +++
+ arch/x86/kvm/mmu/mmu.c | 25 +++++++++++++++++++++++++
+ 2 files changed, 28 insertions(+)
 
+diff --git a/arch/x86/kvm/mmu.h b/arch/x86/kvm/mmu.h
+index 9f6554613babc..06f4475b8aad8 100644
+--- a/arch/x86/kvm/mmu.h
++++ b/arch/x86/kvm/mmu.h
+@@ -108,6 +108,9 @@ static inline int kvm_mmu_do_page_fault(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
+ 	return vcpu->arch.mmu->page_fault(vcpu, cr2_or_gpa, err, prefault);
+ }
+ 
++kvm_pfn_t kvm_mmu_map_tdp_page(struct kvm_vcpu *vcpu, gpa_t gpa,
++			       u32 error_code, int max_level);
++
+ /*
+  * Currently, we have two sorts of write-protection, a) the first one
+  * write-protects guest page to sync the guest modification, b) another one is
 diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index cab3b2f2f49c3..92b133d7b1713 100644
+index 92b133d7b1713..06dbc1bb79a6a 100644
 --- a/arch/x86/kvm/mmu/mmu.c
 +++ b/arch/x86/kvm/mmu/mmu.c
-@@ -4156,7 +4156,8 @@ static bool try_async_pf(struct kvm_vcpu *vcpu, bool prefault, gfn_t gfn,
+@@ -4271,6 +4271,31 @@ int kvm_tdp_page_fault(struct kvm_vcpu *vcpu, gpa_t gpa, u32 error_code,
+ 				 max_level, true, &pfn);
  }
  
- static int direct_page_fault(struct kvm_vcpu *vcpu, gpa_t gpa, u32 error_code,
--			     bool prefault, int max_level, bool is_tdp)
-+			     bool prefault, int max_level, bool is_tdp,
-+			     kvm_pfn_t *pfn)
- {
- 	bool write = error_code & PFERR_WRITE_MASK;
- 	bool exec = error_code & PFERR_FETCH_MASK;
-@@ -4165,7 +4166,6 @@ static int direct_page_fault(struct kvm_vcpu *vcpu, gpa_t gpa, u32 error_code,
- 
- 	gfn_t gfn = gpa >> PAGE_SHIFT;
- 	unsigned long mmu_seq;
--	kvm_pfn_t pfn;
- 	int r;
- 
- 	if (page_fault_handle_page_track(vcpu, error_code, gfn))
-@@ -4184,10 +4184,10 @@ static int direct_page_fault(struct kvm_vcpu *vcpu, gpa_t gpa, u32 error_code,
- 	mmu_seq = vcpu->kvm->mmu_notifier_seq;
- 	smp_rmb();
- 
--	if (try_async_pf(vcpu, prefault, gfn, gpa, &pfn, write, &map_writable))
-+	if (try_async_pf(vcpu, prefault, gfn, gpa, pfn, write, &map_writable))
- 		return RET_PF_RETRY;
- 
--	if (handle_abnormal_pfn(vcpu, is_tdp ? 0 : gpa, gfn, pfn, ACC_ALL, &r))
-+	if (handle_abnormal_pfn(vcpu, is_tdp ? 0 : gpa, gfn, *pfn, ACC_ALL, &r))
- 		return r;
- 
- 	r = RET_PF_RETRY;
-@@ -4197,23 +4197,25 @@ static int direct_page_fault(struct kvm_vcpu *vcpu, gpa_t gpa, u32 error_code,
- 	r = make_mmu_pages_available(vcpu);
- 	if (r)
- 		goto out_unlock;
--	r = __direct_map(vcpu, gpa, write, map_writable, max_level, pfn,
-+	r = __direct_map(vcpu, gpa, write, map_writable, max_level, *pfn,
- 			 prefault, is_tdp && lpage_disallowed);
- 
- out_unlock:
- 	spin_unlock(&vcpu->kvm->mmu_lock);
--	kvm_release_pfn_clean(pfn);
-+	kvm_release_pfn_clean(*pfn);
- 	return r;
- }
- 
- static int nonpaging_page_fault(struct kvm_vcpu *vcpu, gpa_t gpa,
- 				u32 error_code, bool prefault)
- {
++kvm_pfn_t kvm_mmu_map_tdp_page(struct kvm_vcpu *vcpu, gpa_t gpa,
++			       u32 error_code, int max_level)
++{
 +	kvm_pfn_t pfn;
++	int r;
 +
- 	pgprintk("%s: gva %lx error %x\n", __func__, gpa, error_code);
- 
- 	/* This path builds a PAE pagetable, we can map 2mb pages at maximum. */
- 	return direct_page_fault(vcpu, gpa & PAGE_MASK, error_code, prefault,
--				 PG_LEVEL_2M, false);
-+				 PG_LEVEL_2M, false, &pfn);
- }
- 
- int kvm_handle_page_fault(struct kvm_vcpu *vcpu, u64 error_code,
-@@ -4252,6 +4254,7 @@ EXPORT_SYMBOL_GPL(kvm_handle_page_fault);
- int kvm_tdp_page_fault(struct kvm_vcpu *vcpu, gpa_t gpa, u32 error_code,
- 		       bool prefault)
- {
-+	kvm_pfn_t pfn;
- 	int max_level;
- 
- 	for (max_level = KVM_MAX_HUGEPAGE_LEVEL;
-@@ -4265,7 +4268,7 @@ int kvm_tdp_page_fault(struct kvm_vcpu *vcpu, gpa_t gpa, u32 error_code,
- 	}
- 
- 	return direct_page_fault(vcpu, gpa, error_code, prefault,
--				 max_level, true);
-+				 max_level, true, &pfn);
- }
- 
++	if (mmu_topup_memory_caches(vcpu, false))
++		return KVM_PFN_ERR_FAULT;
++
++	/*
++	 * Loop on the page fault path to handle the case where an mmu_notifier
++	 * invalidation triggers RET_PF_RETRY.  In the normal page fault path,
++	 * KVM needs to resume the guest in case the invalidation changed any
++	 * of the page fault properties, i.e. the gpa or error code.  For this
++	 * path, the gpa and error code are fixed by the caller, and the caller
++	 * expects failure if and only if the page fault can't be fixed.
++	 */
++	do {
++		r = direct_page_fault(vcpu, gpa, error_code, false, max_level,
++				      true, &pfn);
++	} while (r == RET_PF_RETRY && !is_error_noslot_pfn(pfn));
++	return pfn;
++}
++EXPORT_SYMBOL_GPL(kvm_mmu_map_tdp_page);
++
  static void nonpaging_init_context(struct kvm_vcpu *vcpu,
+ 				   struct kvm_mmu *context)
+ {
 -- 
 2.28.0
 
