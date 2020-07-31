@@ -2,84 +2,109 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5D0FF23404D
-	for <lists+kvm@lfdr.de>; Fri, 31 Jul 2020 09:43:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 27736234062
+	for <lists+kvm@lfdr.de>; Fri, 31 Jul 2020 09:46:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731761AbgGaHnk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 31 Jul 2020 03:43:40 -0400
-Received: from szxga06-in.huawei.com ([45.249.212.32]:34340 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1731747AbgGaHni (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 31 Jul 2020 03:43:38 -0400
-Received: from DGGEMS414-HUB.china.huawei.com (unknown [172.30.72.60])
-        by Forcepoint Email with ESMTP id B4BA015B9C2EA815E558;
-        Fri, 31 Jul 2020 15:43:36 +0800 (CST)
-Received: from DESKTOP-FPN2511.china.huawei.com (10.174.187.42) by
- DGGEMS414-HUB.china.huawei.com (10.3.19.214) with Microsoft SMTP Server id
- 14.3.487.0; Fri, 31 Jul 2020 15:43:29 +0800
-From:   Jingyi Wang <wangjingyi11@huawei.com>
-To:     <drjones@redhat.com>, <kvm@vger.kernel.org>,
-        <kvmarm@lists.cs.columbia.edu>
-CC:     <maz@kernel.org>, <wanghaibin.wang@huawei.com>,
-        <yuzenghui@huawei.com>, <eric.auger@redhat.com>,
-        <wangjingyi11@huawei.com>, <prime.zeng@hisilicon.com>
-Subject: [kvm-unit-tests PATCH v3 10/10] arm64: microbench: Add timer_post() to get actual PPI latency
-Date:   Fri, 31 Jul 2020 15:42:44 +0800
-Message-ID: <20200731074244.20432-11-wangjingyi11@huawei.com>
-X-Mailer: git-send-email 2.14.1.windows.1
-In-Reply-To: <20200731074244.20432-1-wangjingyi11@huawei.com>
-References: <20200731074244.20432-1-wangjingyi11@huawei.com>
+        id S1731736AbgGaHqI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 31 Jul 2020 03:46:08 -0400
+Received: from mga11.intel.com ([192.55.52.93]:55461 "EHLO mga11.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1731670AbgGaHqI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 31 Jul 2020 03:46:08 -0400
+IronPort-SDR: P0pTLrC5X5xLd5ERjA6tMkhJlgyVWn8dX9hAHM5E2bzNjcQyMkqjjtm4dBmLl4AfbvxSPxGbaO
+ /7nx2oWJCxFQ==
+X-IronPort-AV: E=McAfee;i="6000,8403,9698"; a="149570521"
+X-IronPort-AV: E=Sophos;i="5.75,417,1589266800"; 
+   d="scan'208";a="149570521"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Jul 2020 00:46:08 -0700
+IronPort-SDR: UpyMh/lK9an/C14G0mcuFItCYfbx42J98CpGfhEs5WwhxLcoUUULVYX086lVu3do3W9g9gCw7V
+ 4WngttTE+nFw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.75,417,1589266800"; 
+   d="scan'208";a="323160568"
+Received: from sqa-gate.sh.intel.com (HELO clx-ap-likexu.tsp.org) ([10.239.48.212])
+  by fmsmga002.fm.intel.com with ESMTP; 31 Jul 2020 00:46:05 -0700
+From:   Like Xu <like.xu@linux.intel.com>
+To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Joerg Roedel <joro@8bytes.org>, wei.w.wang@intel.com,
+        linux-kernel@vger.kernel.org, Like Xu <like.xu@linux.intel.com>
+Subject: [PATCH 0/6] Guest Architectural LBR Enabling
+Date:   Fri, 31 Jul 2020 15:43:56 +0800
+Message-Id: <20200731074402.8879-1-like.xu@linux.intel.com>
+X-Mailer: git-send-email 2.21.3
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.174.187.42]
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-For we get the time duration of (10msec timer + injection latency)
-in timer_exec(), we substract the value of 10msec in timer_post()
-to get the actual latency.
+Hi All (especially developers who use perf in guest),
 
-Signed-off-by: Jingyi Wang <wangjingyi11@huawei.com>
----
- arm/micro-bench.c | 14 +++++++++++++-
- 1 file changed, 13 insertions(+), 1 deletion(-)
+Please help review the ssuccessor pacthes to enable Arch LBR on KVM.
+(The prerequisite v13 LBR patchset [2] seems more eager to get
+the attention of reviewers and maintainer).
 
-diff --git a/arm/micro-bench.c b/arm/micro-bench.c
-index 4680ba4..315fc7c 100644
---- a/arm/micro-bench.c
-+++ b/arm/micro-bench.c
-@@ -254,6 +254,18 @@ static void timer_exec(void)
- 	assert_msg(irq_received, "failed to receive PPI in time, but received %d successfully\n", received);
- }
- 
-+static void timer_post(uint64_t total_ticks, uint64_t ntimes, struct ns_time *total_ns)
-+{
-+	/*
-+	 * We use a 10msec timer to test the latency of PPI,
-+	 * so we substract the ticks of 10msec to get the
-+	 * actual latency
-+	 */
-+
-+	total_ticks -= ntimes * (cntfrq / 100);
-+	ticks_to_ns_time(total_ticks, total_ns);
-+}
-+
- static void hvc_exec(void)
- {
- 	asm volatile("mov w0, #0x4b000000; hvc #0" ::: "w0");
-@@ -302,7 +314,7 @@ static struct exit_test tests[] = {
- 	{"ipi",			ipi_prep,	ipi_exec,		NULL,		65536,		true},
- 	{"ipi_hw",		ipi_hw_prep,	ipi_exec,		NULL,		65536,		true},
- 	{"lpi",			lpi_prep,	lpi_exec,		NULL,		65536,		true},
--	{"timer_10ms",		timer_prep,	timer_exec,		NULL,		256,		true},
-+	{"timer_10ms",		timer_prep,	timer_exec,		timer_post,	256,		true},
- };
- 
- #define PS_PER_SEC (1000 * 1000 * 1000 * 1000UL)
+LBR (Last Branch Records) enables recording of software path history
+by logging taken branches and other control flows within architectural
+registers. Intel CPUs have had model-specific LBRs for quite some time
+but this evolves them into an architectural feature now.
+
+The Architectural Last Branch Records (LBRS) is already publiced
+in the 319433-040 release of Intel® Architecture Instruction
+Set Extensions and Future Features Programming Reference [0].
+
+The main advantages for the Arch LBR users are [1]:
+- Faster context switching due to XSAVES support and faster reset of
+  LBR MSRs via the new DEPTH MSR
+- Faster LBR read for a non-PEBS event due to XSAVES support, which
+  lowers the overhead of the NMI handler. (For a PEBS event, the LBR
+  information is recorded in the PEBS records. There is no impact on
+  the PEBS event.)
+- Linux kernel can support the LBR features without knowing the model
+  number of the current CPU.
+
+The Kernel 5.9 will enable Arch LBR on the host based on
+tip/perf/core, so this patchset happens to enable it on KVM as well.
+
+Before 'git am' this patchset, you may need merge the latest
+tip/perf/core branch and the legacy LBR enabling patches
+[PATCH v13 00/10] Guest Last Branch Recording Enabling [2].
+or just wait for the above pacthes to be merged upstream.
+
+[0] https://software.intel.com/content/www/us/en/develop/download/
+intel-architecture-instruction-set-extensions-and-future-features-programming-reference.html
+[1] https://lore.kernel.org/lkml/1593780569-62993-1-git-send-email-kan.liang@linux.intel.com/
+[2] https://lore.kernel.org/kvm/20200726153229.27149-1-like.xu@linux.intel.com/
+
+Please check more details in each commit and feel free to comment.
+
+Like Xu (6):
+  KVM: vmx/pmu: Add VMCS field check before exposing LBR_FMT
+  perf/x86/lbr: Unify LBR_INFO registers exposure check condition
+  KVM: vmx/pmu: Add MSR_ARCH_LBR_DEPTH emulation for Arch LBR
+  KVM: vmx/pmu: Add MSR_ARCH_LBR_CTL emulation for Arch LBR
+  KVM: vmx/pmu: Add Arch LBR emulation and its VMCS field
+  KVM: x86: Expose Architectural LBR CPUID and its XSAVES bit
+
+ arch/x86/events/intel/lbr.c     |  4 +-
+ arch/x86/include/asm/vmx.h      |  4 ++
+ arch/x86/kvm/cpuid.c            | 19 +++++++++
+ arch/x86/kvm/vmx/capabilities.h | 16 ++++++-
+ arch/x86/kvm/vmx/pmu_intel.c    | 74 +++++++++++++++++++++++++++++++--
+ arch/x86/kvm/vmx/vmx.c          | 16 ++++++-
+ arch/x86/kvm/vmx/vmx.h          |  3 ++
+ arch/x86/kvm/x86.c              |  6 +++
+ 8 files changed, 133 insertions(+), 9 deletions(-)
+
 -- 
-2.19.1
-
+2.21.3
 
