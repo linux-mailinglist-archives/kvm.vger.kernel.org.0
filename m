@@ -2,29 +2,29 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id F141E234CEC
-	for <lists+kvm@lfdr.de>; Fri, 31 Jul 2020 23:24:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DC3D2234CEA
+	for <lists+kvm@lfdr.de>; Fri, 31 Jul 2020 23:23:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729823AbgGaVYA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 31 Jul 2020 17:24:00 -0400
+        id S1729079AbgGaVX2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 31 Jul 2020 17:23:28 -0400
 Received: from mga14.intel.com ([192.55.52.115]:50224 "EHLO mga14.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728186AbgGaVX1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 31 Jul 2020 17:23:27 -0400
-IronPort-SDR: tZgs9q8IUzK8Ad1NG6weuFbnExjtjlVbyBHxdI/hpbNV2aYGGrJcBe5BlCHAzmC1RWuvNp7iqO
- qKDqrNw2SPqw==
-X-IronPort-AV: E=McAfee;i="6000,8403,9699"; a="151075128"
+        id S1728655AbgGaVX2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 31 Jul 2020 17:23:28 -0400
+IronPort-SDR: RcyqnpSecoO/Ccf9TaeG6VdztrKD+CF578Zgm+BOiHrpDQZgyFOTz6QrkEtf1hLJvP6+Ia8/On
+ ZIK3n9Ctg60Q==
+X-IronPort-AV: E=McAfee;i="6000,8403,9699"; a="151075129"
 X-IronPort-AV: E=Sophos;i="5.75,419,1589266800"; 
-   d="scan'208";a="151075128"
+   d="scan'208";a="151075129"
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from orsmga007.jf.intel.com ([10.7.209.58])
   by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Jul 2020 14:23:27 -0700
-IronPort-SDR: XgiYUcAvmq0d0KmB7mBPZFVTJZBsdfcE9u47qGuK/O4qUyua/RAdqnnhdnPfjJbgAJA4QwNSaH
- nPhpyV9KSfUw==
+IronPort-SDR: RSAMy2OpJI1Dt0mMuQewKa8YeQBi06oPFkDh8y7woTwL97jtt2H4A+yYsdoNwAFpV7Wy3ntjF+
+ wlx3vGuGYHyA==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.75,419,1589266800"; 
-   d="scan'208";a="331191298"
+   d="scan'208";a="331191301"
 Received: from sjchrist-coffee.jf.intel.com ([10.54.74.160])
   by orsmga007.jf.intel.com with ESMTP; 31 Jul 2020 14:23:26 -0700
 From:   Sean Christopherson <sean.j.christopherson@intel.com>
@@ -37,9 +37,9 @@ Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
         linux-kernel@vger.kernel.org,
         eric van tassell <Eric.VanTassell@amd.com>,
         Tom Lendacky <thomas.lendacky@amd.com>
-Subject: [RFC PATCH 2/8] KVM: x86/mmu: Use bits 2:0 to check for present SPTEs
-Date:   Fri, 31 Jul 2020 14:23:17 -0700
-Message-Id: <20200731212323.21746-3-sean.j.christopherson@intel.com>
+Subject: [RFC PATCH 3/8] KVM: x86/mmu: Refactor handling of not-present SPTEs in mmu_set_spte()
+Date:   Fri, 31 Jul 2020 14:23:18 -0700
+Message-Id: <20200731212323.21746-4-sean.j.christopherson@intel.com>
 X-Mailer: git-send-email 2.28.0
 In-Reply-To: <20200731212323.21746-1-sean.j.christopherson@intel.com>
 References: <20200731212323.21746-1-sean.j.christopherson@intel.com>
@@ -50,52 +50,40 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Use what are effectively EPT's RWX bits to detect present SPTEs instead
-of simply looking for a non-zero value.  This will allow using a
-non-zero initial value for SPTEs as well as using not-present SPTEs to
-track metadata for zapped private SPTEs.
+Return early from mmu_set_spte() if the new SPTE is not-present so as to
+reduce the indentation of the code that performs metadata updates, e.g.
+rmap manipulation.  Additional metadata updates will soon follow...
 
 Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
 ---
- arch/x86/kvm/mmu/mmu.c         | 9 +++++++--
- arch/x86/kvm/mmu/paging_tmpl.h | 3 ++-
- 2 files changed, 9 insertions(+), 3 deletions(-)
+ arch/x86/kvm/mmu/mmu.c | 14 ++++++++------
+ 1 file changed, 8 insertions(+), 6 deletions(-)
 
 diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index d737042fea55e..82f69a7456004 100644
+index 82f69a7456004..182f398036248 100644
 --- a/arch/x86/kvm/mmu/mmu.c
 +++ b/arch/x86/kvm/mmu/mmu.c
-@@ -625,9 +625,14 @@ static int is_nx(struct kvm_vcpu *vcpu)
- 	return vcpu->arch.efer & EFER_NX;
- }
+@@ -3126,12 +3126,14 @@ static int mmu_set_spte(struct kvm_vcpu *vcpu, u64 *sptep,
+ 	if (!was_rmapped && is_large_pte(*sptep))
+ 		++vcpu->kvm->stat.lpages;
  
--static int is_shadow_present_pte(u64 pte)
-+static inline bool __is_shadow_present_pte(u64 pte)
- {
--	return (pte != 0) && !is_mmio_spte(pte);
-+	return !!(pte & 0x7);
-+}
+-	if (is_shadow_present_pte(*sptep)) {
+-		if (!was_rmapped) {
+-			rmap_count = rmap_add(vcpu, sptep, gfn);
+-			if (rmap_count > RMAP_RECYCLE_THRESHOLD)
+-				rmap_recycle(vcpu, sptep, gfn);
+-		}
++	/* No additional tracking necessary for not-present SPTEs. */
++	if (!is_shadow_present_pte(*sptep))
++		return ret;
 +
-+static bool is_shadow_present_pte(u64 pte)
-+{
-+	return __is_shadow_present_pte(pte) && !is_mmio_spte(pte);
- }
++	if (!was_rmapped) {
++		rmap_count = rmap_add(vcpu, sptep, gfn);
++		if (rmap_count > RMAP_RECYCLE_THRESHOLD)
++			rmap_recycle(vcpu, sptep, gfn);
+ 	}
  
- static int is_large_pte(u64 pte)
-diff --git a/arch/x86/kvm/mmu/paging_tmpl.h b/arch/x86/kvm/mmu/paging_tmpl.h
-index 0172a949f6a75..57813e92ea8e0 100644
---- a/arch/x86/kvm/mmu/paging_tmpl.h
-+++ b/arch/x86/kvm/mmu/paging_tmpl.h
-@@ -1024,7 +1024,8 @@ static int FNAME(sync_page)(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp)
- 		gpa_t pte_gpa;
- 		gfn_t gfn;
- 
--		if (!sp->spt[i])
-+		if (!__is_shadow_present_pte(sp->spt[i]) &&
-+		    !is_mmio_spte(sp->spt[i]))
- 			continue;
- 
- 		pte_gpa = first_pte_gpa + i * sizeof(pt_element_t);
+ 	return ret;
 -- 
 2.28.0
 
