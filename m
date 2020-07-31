@@ -2,137 +2,69 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DEC43234AD6
-	for <lists+kvm@lfdr.de>; Fri, 31 Jul 2020 20:24:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 16B18234C16
+	for <lists+kvm@lfdr.de>; Fri, 31 Jul 2020 22:19:02 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387786AbgGaSX5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 31 Jul 2020 14:23:57 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:23472 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S2387695AbgGaSXz (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 31 Jul 2020 14:23:55 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1596219833;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=FNpcdsYn9B2kxIJXPQv8FKNGYI77IPCjCGNgFBGg9TU=;
-        b=jAOAxME0pF6xAYDA2Jdxd1ujI7EihvrXu8ApNU2yhrk25VgOeP5Z/QjlJ6E1FbWcbi7pxU
-        kyEfMbMSOSmZK/4LygESZju4fiRFMGF9kaaBWcCIQHQcJJ12brI/nw5NoEYoFm2ie6xhh+
-        GgoktZ18Pr6v5fKOPCMd8LV8vx6DxXc=
-Received: from mail-lf1-f71.google.com (mail-lf1-f71.google.com
- [209.85.167.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-343-sSMvz-nzO8euI5_g7tMsdQ-1; Fri, 31 Jul 2020 14:23:50 -0400
-X-MC-Unique: sSMvz-nzO8euI5_g7tMsdQ-1
-Received: by mail-lf1-f71.google.com with SMTP id j22so6377383lfg.21
-        for <kvm@vger.kernel.org>; Fri, 31 Jul 2020 11:23:50 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=FNpcdsYn9B2kxIJXPQv8FKNGYI77IPCjCGNgFBGg9TU=;
-        b=bjrtPhX5yfELEyUNjXP/8LA6gYNjedK/Sqp+Q3zdSzhwUgSKFawL2FbCZ7hatk/vET
-         nKvn8OytOe8tIZeAAowXXOJzjv2tOQNB6PFXQGIvFRND5Rl/DtSZ8WTRV+q0RpNY3VlG
-         IfTrgpde1S7LrorRzGF4oq004e+c70Uz2CX1hF8ZuQAC8Y0bKh+HhoSdg+ZsyARbz2ok
-         9negLYjziTUMiJFOj6c91CwnDZAq6nZXDCDF9zZAGqQASs5mqcJrY2GkrnsNUNrKDx5g
-         C9N2HDVCNg8BVf+eyQ8kMHWa0SZB5ZRMr+yfDfHlYByX3KPbBk0iHoYvugcD5z82ZnY5
-         u8Jg==
-X-Gm-Message-State: AOAM531imENiuPxBrdvqxaoZFlJIZWdMF2dZQXvS/5dzACdr4TiayNWY
-        GNmQ1GcjYlFvDneVrZpPM+EsLmPk3DhrrqlkvCIJ+EYwx+aPkrS6V67MhHwYZJz3k1fQbpXAG0F
-        bKLlI/HEq/eRR8OkJA+ecEvJzSTQn
-X-Received: by 2002:a2e:9b92:: with SMTP id z18mr2632607lji.364.1596219828920;
-        Fri, 31 Jul 2020 11:23:48 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJy4Ant7fRiaPouV8KSdgTTmMLlIjwSIMUXrC6ApBECDS2mEDf33c4K66gE4HFkxWsG1WUkVTH6tWl9p/Sj0yXU=
-X-Received: by 2002:a2e:9b92:: with SMTP id z18mr2632592lji.364.1596219828575;
- Fri, 31 Jul 2020 11:23:48 -0700 (PDT)
+        id S1727890AbgGaUTB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 31 Jul 2020 16:19:01 -0400
+Received: from mga11.intel.com ([192.55.52.93]:64834 "EHLO mga11.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727053AbgGaUTA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 31 Jul 2020 16:19:00 -0400
+IronPort-SDR: 50ZpE8OUBX0TbR3nvUkFYm3kbvAqFcN423ea9e+ptSWqbXB4qEOwUHW/2OlLAH4zaxD+w6zyTK
+ Ussyyr3MZ9lw==
+X-IronPort-AV: E=McAfee;i="6000,8403,9698"; a="149680778"
+X-IronPort-AV: E=Sophos;i="5.75,419,1589266800"; 
+   d="scan'208";a="149680778"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Jul 2020 13:19:00 -0700
+IronPort-SDR: AHScc4we9f3xmnrVWCpGy6chHo2SgIpdsMNe++sadmbTPNfMwOIXtrXLWmsIs4EEqewv1QRi+c
+ OYszwsewJKow==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.75,419,1589266800"; 
+   d="scan'208";a="274592037"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.160])
+  by fmsmga008.fm.intel.com with ESMTP; 31 Jul 2020 13:18:59 -0700
+Date:   Fri, 31 Jul 2020 13:18:59 -0700
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Dan Carpenter <dan.carpenter@oracle.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
+        kvm@vger.kernel.org, kernel-janitors@vger.kernel.org
+Subject: Re: [PATCH] KVM: SVM: Fix sev_pin_memory() error handling
+Message-ID: <20200731201859.GF31451@linux.intel.com>
+References: <20200714142351.GA315374@mwanda>
 MIME-Version: 1.0
-References: <20200730193510.578309-1-jusual@redhat.com> <CAHp75VcyRjAr3ugmAWYcKMrAeea6ioQOPfJnj-Srntdg_W8ScQ@mail.gmail.com>
- <873658kpj2.fsf@vitty.brq.redhat.com>
-In-Reply-To: <873658kpj2.fsf@vitty.brq.redhat.com>
-From:   Julia Suvorova <jusual@redhat.com>
-Date:   Fri, 31 Jul 2020 20:23:37 +0200
-Message-ID: <CAMDeoFUO7UqDx05dK3fJBCfWMDCmEJ+K=nVAvvnPZiTz2+gSTg@mail.gmail.com>
-Subject: Re: [PATCH] KVM: x86: Use MMCONFIG for all PCI config space accesses
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc:     Andy Shevchenko <andy.shevchenko@gmail.com>,
-        "open list:VFIO DRIVER" <kvm@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Bjorn Helgaas <helgaas@kernel.org>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Matthew Wilcox <willy@infradead.org>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200714142351.GA315374@mwanda>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jul 31, 2020 at 11:22 AM Vitaly Kuznetsov <vkuznets@redhat.com> wrote:
->
-> Andy Shevchenko <andy.shevchenko@gmail.com> writes:
->
-> > On Thu, Jul 30, 2020 at 10:37 PM Julia Suvorova <jusual@redhat.com> wrote:
-> >>
-> >> Using MMCONFIG instead of I/O ports cuts the number of config space
-> >> accesses in half, which is faster on KVM and opens the door for
-> >> additional optimizations such as Vitaly's "[PATCH 0/3] KVM: x86: KVM
-> >> MEM_PCI_HOLE memory":
-> >
-> >> https://lore.kernel.org/kvm/20200728143741.2718593-1-vkuznets@redhat.com
-> >
-> > You may use Link: tag for this.
-> >
-> >> However, this change will not bring significant performance improvement
-> >> unless it is running on x86 within a hypervisor. Moreover, allowing
-> >> MMCONFIG access for addresses < 256 can be dangerous for some devices:
-> >> see commit a0ca99096094 ("PCI x86: always use conf1 to access config
-> >> space below 256 bytes"). That is why a special feature flag is needed.
-> >>
-> >> Introduce KVM_FEATURE_PCI_GO_MMCONFIG, which can be enabled when the
-> >> configuration is known to be safe (e.g. in QEMU).
-> >
-> > ...
-> >
-> >> +static int __init kvm_pci_arch_init(void)
-> >> +{
-> >> +       if (raw_pci_ext_ops &&
-> >> +           kvm_para_has_feature(KVM_FEATURE_PCI_GO_MMCONFIG)) {
-> >
-> > Better to use traditional pattern, i.e.
-> >   if (not_supported)
-> >     return bail_out;
-> >
-> >   ...do useful things...
-> >   return 0;
-> >
-> >> +               pr_info("PCI: Using MMCONFIG for base access\n");
-> >> +               raw_pci_ops = raw_pci_ext_ops;
-> >> +               return 0;
-> >> +       }
-> >
-> >> +       return 1;
-> >
-> > Hmm... I don't remember what positive codes means there. Perhaps you
-> > need to return a rather error code?
->
-> If I'm reading the code correctly,
->
-> pci_arch_init() has the following:
->
->         if (x86_init.pci.arch_init && !x86_init.pci.arch_init())
->                 return 0;
->
->
-> so returning '1' here means 'continue' and this seems to be
-> correct. (E.g. Hyper-V's hv_pci_init() does the same). What I'm not sure
-> about is 'return 0' above as this will result in skipping the rest of
-> pci_arch_init(). Was this desired or should we return '1' in both cases?
+On Tue, Jul 14, 2020 at 05:23:51PM +0300, Dan Carpenter wrote:
+> The sev_pin_memory() function was modified to return error pointers
+> instead of NULL but there are two problems.  The first problem is that
+> if "npages" is zero then it still returns NULL.  Secondly, several of
+> the callers were not updated to check for error pointers instead of
+> NULL.
+> 
+> Either one of these issues will lead to an Oops.
+> 
+> Fixes: a8d908b5873c ("KVM: x86: report sev_pin_memory errors with PTR_ERR")
 
-This is intentional because pci_direct_init() is about to overwrite
-raw_pci_ops. And since QEMU doesn't have anything in
-pciprobe_dmi_table, it is safe to skip it.
+Explicit Cc: to stable needed for KVM patches.
 
-Best regards, Julia Suvorova.
+> Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
 
+Reviewed-by: Sean Christopherson <sean.j.christopherson@intel.com>
