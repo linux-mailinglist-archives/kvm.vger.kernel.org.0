@@ -2,146 +2,219 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9436C233FEA
-	for <lists+kvm@lfdr.de>; Fri, 31 Jul 2020 09:21:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 953D7234005
+	for <lists+kvm@lfdr.de>; Fri, 31 Jul 2020 09:34:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731603AbgGaHVg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 31 Jul 2020 03:21:36 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:53640 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1731507AbgGaHVg (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 31 Jul 2020 03:21:36 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1596180094;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=YhINLqqhxnP4dI0gpE4qU/e48aN+/lH7whG0lTG2sOM=;
-        b=jEKyvQT0wlbkvzNkQEtUmvC2ODAz327wMMKvdMv9mMS1N7cZaVJB6mpHLtugSUURx7SEwZ
-        Aw+8hlO3r7mPdd0633emvRsPyrl0dsHfHd9BRxwiY3RB972Sha3qkxNG5gAhDIJM5H/Qrx
-        KFxzxz7HWni1kkSKpp1WPCS0iIRALvg=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-381-ncp4oxPNP2OLqv4gzieYhQ-1; Fri, 31 Jul 2020 03:21:30 -0400
-X-MC-Unique: ncp4oxPNP2OLqv4gzieYhQ-1
-Received: by mail-wr1-f69.google.com with SMTP id j16so8852449wrw.3
-        for <kvm@vger.kernel.org>; Fri, 31 Jul 2020 00:21:30 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=YhINLqqhxnP4dI0gpE4qU/e48aN+/lH7whG0lTG2sOM=;
-        b=Pb8TTnDODaDIGsvZkSfiROeMjJsArBgzFx7n8g/hbmO8ssfVNhi1wXYdz7FnOdzt1h
-         iWfmnckauke3QY4OHQcLHI2xHBLk5evTT6CBUOqmtSHx+9OMLJepPliPGAa3QNz48A4t
-         hMq5jQrd46jginioLeADOHcZfREDVZ2vEvwG+dmoB7MbgGBvGg0k5E2U/gvKOYJUL8Uk
-         j0xxmArwIwsW72HIEtS8S7MPsp3sTtCC/pO0HRqWC3HW+4RDOOX//kLP4qUpW1Rbf3/M
-         b/ugM+Ta8dbg6H3Xq/SmVaDmiUYWE8Fz6q/1bLNez9O4M8KBNqI7f8ACWb6/7Zh8G/pC
-         WHuA==
-X-Gm-Message-State: AOAM532t8vwTK3kvUEtgvFhiwX6VLipm2fazVoF00oblEDF5u5TY4QxX
-        ORQLVUIeR0QBXTc1LiNATGBGp3QWK16ro7CZYL01tyXoSgJ8kEJ3EgRpJSWVMHa6TwQvJ5lsQpL
-        dML+BlmpOzMvR
-X-Received: by 2002:a1c:1d52:: with SMTP id d79mr2761782wmd.82.1596180089308;
-        Fri, 31 Jul 2020 00:21:29 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyYuiwOQg3zrH0P/vMjCtmTUs3SPv1/R6CQYiqzJb5lGc+AXN0tsrZpBEo62hsb3u2/PJ4lTg==
-X-Received: by 2002:a1c:1d52:: with SMTP id d79mr2761767wmd.82.1596180089022;
-        Fri, 31 Jul 2020 00:21:29 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:90a5:f767:5f9f:3445? ([2001:b07:6468:f312:90a5:f767:5f9f:3445])
-        by smtp.gmail.com with ESMTPSA id b186sm13204394wme.1.2020.07.31.00.21.28
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 31 Jul 2020 00:21:28 -0700 (PDT)
-Subject: Re: [PATCH v3 3/3] KVM: SVM: Fix disable pause loop exit/pause
- filtering capability on SVM
-To:     Wanpeng Li <kernellwp@gmail.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>
-References: <1596165141-28874-1-git-send-email-wanpengli@tencent.com>
- <1596165141-28874-3-git-send-email-wanpengli@tencent.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <ae8bf85f-00ee-c59c-e543-e0364481526c@redhat.com>
-Date:   Fri, 31 Jul 2020 09:21:27 +0200
+        id S1731685AbgGaHeu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 31 Jul 2020 03:34:50 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:38212 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1731669AbgGaHet (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 31 Jul 2020 03:34:49 -0400
+Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 06V7Ukm5101156;
+        Fri, 31 Jul 2020 03:34:48 -0400
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 32maxxnsdt-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 31 Jul 2020 03:34:48 -0400
+Received: from m0098413.ppops.net (m0098413.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 06V7Unom102571;
+        Fri, 31 Jul 2020 03:34:47 -0400
+Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com [149.81.74.108])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 32maxxnsd3-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 31 Jul 2020 03:34:47 -0400
+Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
+        by ppma05fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 06V7VRpR025199;
+        Fri, 31 Jul 2020 07:34:46 GMT
+Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
+        by ppma05fra.de.ibm.com with ESMTP id 32gcqk4946-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 31 Jul 2020 07:34:45 +0000
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
+        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 06V7YgfR27328802
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 31 Jul 2020 07:34:43 GMT
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id D42BEA405B;
+        Fri, 31 Jul 2020 07:34:42 +0000 (GMT)
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 73A1EA405C;
+        Fri, 31 Jul 2020 07:34:42 +0000 (GMT)
+Received: from localhost.localdomain (unknown [9.145.62.184])
+        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Fri, 31 Jul 2020 07:34:42 +0000 (GMT)
+Subject: Re: [kvm-unit-tests PATCH v2 3/3] s390x: Ultravisor guest API test
+To:     Thomas Huth <thuth@redhat.com>, Cornelia Huck <cohuck@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org, david@redhat.com,
+        borntraeger@de.ibm.com, imbrenda@linux.ibm.com
+References: <20200727095415.494318-1-frankja@linux.ibm.com>
+ <20200727095415.494318-4-frankja@linux.ibm.com>
+ <20200730131617.7f7d5e5f.cohuck@redhat.com>
+ <1a407971-0b43-879e-0aac-65c7f9e29606@redhat.com>
+From:   Janosch Frank <frankja@linux.ibm.com>
+Autocrypt: addr=frankja@linux.ibm.com; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <d9333547-b93e-629b-e004-53f1b581914f@linux.ibm.com>
+Date:   Fri, 31 Jul 2020 09:34:41 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.9.0
+ Thunderbird/68.8.0
 MIME-Version: 1.0
-In-Reply-To: <1596165141-28874-3-git-send-email-wanpengli@tencent.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <1a407971-0b43-879e-0aac-65c7f9e29606@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="gzOEqjHdnFoYeLi4AgG4RU5cJTaj1yabA"
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
+ definitions=2020-07-31_02:2020-07-30,2020-07-31 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 phishscore=0
+ mlxlogscore=999 clxscore=1015 adultscore=0 mlxscore=0 malwarescore=0
+ impostorscore=0 spamscore=0 lowpriorityscore=0 suspectscore=0
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2006250000 definitions=main-2007310050
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 31/07/20 05:12, Wanpeng Li wrote:
-> From: Wanpeng Li <wanpengli@tencent.com>
-> 
-> 'Commit 8566ac8b8e7c ("KVM: SVM: Implement pause loop exit logic in SVM")' 
-> drops disable pause loop exit/pause filtering capability completely, I 
-> guess it is a merge fault by Radim since disable vmexits capabilities and 
-> pause loop exit for SVM patchsets are merged at the same time. This patch 
-> reintroduces the disable pause loop exit/pause filtering capability support.
-> 
-> Reported-by: Haiwei Li <lihaiwei@tencent.com>
-> Tested-by: Haiwei Li <lihaiwei@tencent.com>
-> Fixes: 8566ac8b (KVM: SVM: Implement pause loop exit logic in SVM)
-> Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
-> ---
-> v2 -> v3:
->  * simplify the condition in init_vmcb() 
-> 
->  arch/x86/kvm/svm/svm.c | 9 ++++++---
->  1 file changed, 6 insertions(+), 3 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-> index c0da4dd..bf77f90 100644
-> --- a/arch/x86/kvm/svm/svm.c
-> +++ b/arch/x86/kvm/svm/svm.c
-> @@ -1090,7 +1090,7 @@ static void init_vmcb(struct vcpu_svm *svm)
->  	svm->nested.vmcb = 0;
->  	svm->vcpu.arch.hflags = 0;
->  
-> -	if (pause_filter_count) {
-> +	if (!kvm_pause_in_guest(svm->vcpu.kvm)) {
->  		control->pause_filter_count = pause_filter_count;
->  		if (pause_filter_thresh)
->  			control->pause_filter_thresh = pause_filter_thresh;
-> @@ -2693,7 +2693,7 @@ static int pause_interception(struct vcpu_svm *svm)
->  	struct kvm_vcpu *vcpu = &svm->vcpu;
->  	bool in_kernel = (svm_get_cpl(vcpu) == 0);
->  
-> -	if (pause_filter_thresh)
-> +	if (!kvm_pause_in_guest(vcpu->kvm))
->  		grow_ple_window(vcpu);
->  
->  	kvm_vcpu_on_spin(vcpu, in_kernel);
-> @@ -3780,7 +3780,7 @@ static void svm_handle_exit_irqoff(struct kvm_vcpu *vcpu)
->  
->  static void svm_sched_in(struct kvm_vcpu *vcpu, int cpu)
->  {
-> -	if (pause_filter_thresh)
-> +	if (!kvm_pause_in_guest(vcpu->kvm))
->  		shrink_ple_window(vcpu);
->  }
->  
-> @@ -3958,6 +3958,9 @@ static void svm_vm_destroy(struct kvm *kvm)
->  
->  static int svm_vm_init(struct kvm *kvm)
->  {
-> +	if (!pause_filter_count || !pause_filter_thresh)
-> +		kvm->arch.pause_in_guest = true;
-> +
->  	if (avic) {
->  		int ret = avic_vm_init(kvm);
->  		if (ret)
-> 
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--gzOEqjHdnFoYeLi4AgG4RU5cJTaj1yabA
+Content-Type: multipart/mixed; boundary="MYUINQtcUh4NQZUeoDgasgx3U0Vw7km82"
 
-Queued all three, thanks.  Please do send a testcase for patch 1
-however, I only queued it in order to have it in 5.8.
+--MYUINQtcUh4NQZUeoDgasgx3U0Vw7km82
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-Paolo
+On 7/30/20 5:58 PM, Thomas Huth wrote:
+> On 30/07/2020 13.16, Cornelia Huck wrote:
+>> On Mon, 27 Jul 2020 05:54:15 -0400
+>> Janosch Frank <frankja@linux.ibm.com> wrote:
+>>
+>>> Test the error conditions of guest 2 Ultravisor calls, namely:
+>>>      * Query Ultravisor information
+>>>      * Set shared access
+>>>      * Remove shared access
+>>>
+>>> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+>>> Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+>>> ---
+>>>  lib/s390x/asm/uv.h  |  68 +++++++++++++++++++
+>>>  s390x/Makefile      |   1 +
+>>>  s390x/unittests.cfg |   3 +
+>>>  s390x/uv-guest.c    | 159 ++++++++++++++++++++++++++++++++++++++++++=
+++
+>>>  4 files changed, 231 insertions(+)
+>>>  create mode 100644 lib/s390x/asm/uv.h
+>>>  create mode 100644 s390x/uv-guest.c
+>>>
+>>
+>> (...)
+>>
+>>> +static inline int uv_call(unsigned long r1, unsigned long r2)
+>>> +{
+>>> +	int cc;
+>>> +
+>>> +	asm volatile(
+>>> +		"0:	.insn rrf,0xB9A40000,%[r1],%[r2],0,0\n"
+>>> +		"		brc	3,0b\n"
+>>> +		"		ipm	%[cc]\n"
+>>> +		"		srl	%[cc],28\n"
+>>> +		: [cc] "=3Dd" (cc)
+>>> +		: [r1] "a" (r1), [r2] "a" (r2)
+>>> +		: "memory", "cc");
+>>> +	return cc;
+>>> +}
+>>
+>> This returns the condition code, but no caller seems to check it
+>> (instead, they look at header.rc, which is presumably only set if the
+>> instruction executed successfully in some way?)
+>>
+>> Looking at the kernel, it retries for cc > 1 (presumably busy
+>> conditions), and cc !=3D 0 seems to be considered a failure. Do we wan=
+t
+>> to look at the cc here as well?
+>=20
+> It's there - but here it's in the assembly code, the "brc 3,0b".
+
+Yes, we needed to factor that out in KVM because we sometimes need to
+schedule and then it looks nicer handling that in C code. The branch on
+condition will jump back for cc 2 and 3. cc 0 and 1 are success and
+error respectively and only then the rc and rrc in the UV header are set.=
+
+
+>=20
+> Patch looks ok to me (but I didn't do a full review):
+>=20
+> Acked-by: Thomas Huth <thuth@redhat.com>
+>=20
+
+
+
+--MYUINQtcUh4NQZUeoDgasgx3U0Vw7km82--
+
+--gzOEqjHdnFoYeLi4AgG4RU5cJTaj1yabA
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEwGNS88vfc9+v45Yq41TmuOI4ufgFAl8jyZIACgkQ41TmuOI4
+ufhmbw/8C367vtevYJ1CEEz5mNWY6MVMo+0TdXx1XAOkfn/pEAmAH6UJk6zt8Fve
+8u9KKlYyTgKWhUDaDelWwdEs3TTI/4RtN/ABKuVUPyDX+zth8G4SqKYRHbmJ2Ta/
+Xr4ISoBO1oOsGM0QOZjMoFjctTy+kKMe2OVjY0y4M6YK7SamfxB1zuLGbEoxGVDq
+CunpfWPORun0QUZUkYIFxj6yIBTU45zvLOetuioqjDS7zt9vk/XsFJUujrLWj/Hi
+tF+OPcSPT8mVSBdSSXHEYy9j+YdVUCD52QvgwkbXIQ3FKLCXJ3k2zGhUv0k+EPc7
++CtXP4OS6ek7Wvybj3xX/X5JCcJSbm3htIecNJDAvpwjHAcMgqQ+yrdmJMyPI8Q+
+y+ewvrUfjtIbsAjP/xZrkRjIxbYrn/AU/+SKJCqaly6pz6wWGXqj4LrLSbUoxJ9L
+5UD/v1ssRRe6pteQRcqwQoBpo+l3K4qzHETvP7hNlLQzL7HVywJTci923Xael3yz
+C/NClKWaykbA4WOP4DKg3KrL4uFKpR16zWYRhKDkNhcyeSPHrI/xeo3DV2gw5RxF
+VRWOER1+HMpLLfK/zsuDnqSHFDMWk2Iy25dUDS+30XsC98P6A5kDHQqq6GGAOHf4
+QTFj5K+Wf8Cp1q1OR8gPqZVutmq5JyNZQKWgqRA/WQyoDJvSBQM=
+=qSXU
+-----END PGP SIGNATURE-----
+
+--gzOEqjHdnFoYeLi4AgG4RU5cJTaj1yabA--
 
