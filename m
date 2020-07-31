@@ -2,76 +2,94 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0DCFB233D91
-	for <lists+kvm@lfdr.de>; Fri, 31 Jul 2020 05:11:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 24BF8233D94
+	for <lists+kvm@lfdr.de>; Fri, 31 Jul 2020 05:12:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731255AbgGaDLm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 30 Jul 2020 23:11:42 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:40831 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1731224AbgGaDLm (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 30 Jul 2020 23:11:42 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1596165101;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=yBkzE1GY4sKZofWxL1HoI+rHXtmD6ULkP6+Di1oBJyg=;
-        b=DnRxJiV1UdIdhqpn7hjBcjLiK66sBmmPYfRahrmzSqAJM9uS8wG30giC3CD6PZaBHw0IiG
-        Jdmw+kAwh5p+XWSiXEuwgTRKDK+IIAOXg2a57AOPMzsCDOkqntarTwjPKhbdpFEjvghUs0
-        Lp6cdqScJeJ0G+wRTAoF5wLrcsTVnYs=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-379-t8GgYqvBMOqL9Lemag7LTw-1; Thu, 30 Jul 2020 23:11:39 -0400
-X-MC-Unique: t8GgYqvBMOqL9Lemag7LTw-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 636FFE918;
-        Fri, 31 Jul 2020 03:11:37 +0000 (UTC)
-Received: from [10.72.13.197] (ovpn-13-197.pek2.redhat.com [10.72.13.197])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 3C19471929;
-        Fri, 31 Jul 2020 03:11:26 +0000 (UTC)
-Subject: Re: [PATCH V4 4/6] vhost_vdpa: implement IRQ offloading in vhost_vdpa
-To:     Eli Cohen <eli@mellanox.com>
-Cc:     Zhu Lingshan <lingshan.zhu@intel.com>, alex.williamson@redhat.com,
-        mst@redhat.com, pbonzini@redhat.com,
-        sean.j.christopherson@intel.com, wanpengli@tencent.com,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        kvm@vger.kernel.org, shahafs@mellanox.com, parav@mellanox.com
-References: <20200728042405.17579-1-lingshan.zhu@intel.com>
- <20200728042405.17579-5-lingshan.zhu@intel.com>
- <20200728090438.GA21875@nps-server-21.mtl.labs.mlnx>
- <c87d4a5a-3106-caf2-2bc1-764677218967@redhat.com>
- <20200729095503.GD35280@mtl-vdi-166.wap.labs.mlnx>
- <45b7e8aa-47a9-06f6-6b72-762d504adb00@redhat.com>
- <20200729141554.GA47212@mtl-vdi-166.wap.labs.mlnx>
-From:   Jason Wang <jasowang@redhat.com>
-Message-ID: <bef51630-f81e-2b59-6bb8-23c89f530410@redhat.com>
-Date:   Fri, 31 Jul 2020 11:11:25 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
-MIME-Version: 1.0
-In-Reply-To: <20200729141554.GA47212@mtl-vdi-166.wap.labs.mlnx>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+        id S1731268AbgGaDMj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 30 Jul 2020 23:12:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59786 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730820AbgGaDMi (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 30 Jul 2020 23:12:38 -0400
+Received: from mail-pj1-x1041.google.com (mail-pj1-x1041.google.com [IPv6:2607:f8b0:4864:20::1041])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EBC49C061574;
+        Thu, 30 Jul 2020 20:12:37 -0700 (PDT)
+Received: by mail-pj1-x1041.google.com with SMTP id c10so3273825pjn.1;
+        Thu, 30 Jul 2020 20:12:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id;
+        bh=CmJxc+XhZero9r+6q4uoOOTuXV90dMxdt2faOFzAcdY=;
+        b=UOtVTTaOgPUCZucic0rjP7R/0UCYE1hGM2DtZQAZkSvbYgH4aiIUe1RSWRYIuyiPRr
+         1bjNKVcYR6t8wIGGP/Yd/KsB1QZyAdmvYo0cxzRSMrXDs1YqOhOHbszlIls2r9wHBuqm
+         93NrCV2rM6xN8UyPzE8Qyf0Bx6nQY1MNffIHzBovXdY2TQDIg4GI12h1d6+iML5KcjEc
+         IR6NmTB0skdQ5226ijlQvdU+e6j1Q7U9hJT+3pFOMQ/r+xuWBOo82Ak0Pu/KE8JwXbuv
+         VaBybxme7S/k31A/nOZGHtsu2TOdc4PE+fOcNNiEqpF2TVCZmNdXOZzB8GxX0I10/tN0
+         HOyQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=CmJxc+XhZero9r+6q4uoOOTuXV90dMxdt2faOFzAcdY=;
+        b=LZbVc3r/pC2rAT2cG/Y4aHtjMCjDvcz/+jIUraNlQ2HT4QFEoxQYfph8FLrnVir/lJ
+         8n5SFPWj0o3I461k/U+S5GWc2y4D1VevynqJpbVyTG/JzPzInzhtTwUgN8DuE2fxOJvg
+         D41Q5jnhxByC+qCVzZAJYFPJ1IzaeFoDAZQXJFQAbK+hHa/sl47poSNurskfgFsXC4hR
+         jl0JEhagxs+wQSuh1qWMGoay2MZ5zXHpWXNqLbPT/E3M6iBi3Kr19kWmL/+QPgg6Ow8/
+         1WSIVbBggEwbshKQcD0mGTomjTOtQV/WaZ+hsIhwgN97S/AiknuL+bGBia5TrBLs/ah4
+         kjvg==
+X-Gm-Message-State: AOAM532vhBTM9ZIaDzm6XOBoF52OZSuOBZ+pkn8NU3Tl3D86RCBHZ4WI
+        owGiVrglF/kEKDN38WctJe7ef5wy
+X-Google-Smtp-Source: ABdhPJxh16+judrCc9+W6BGiAb8rYYh+q1qUJ3nANGdE5Ei1cEQokwGhGm9lfoBfIcMMCZ8hy4g3dQ==
+X-Received: by 2002:a63:d446:: with SMTP id i6mr1696694pgj.438.1596165157234;
+        Thu, 30 Jul 2020 20:12:37 -0700 (PDT)
+Received: from localhost.localdomain ([103.7.29.6])
+        by smtp.googlemail.com with ESMTPSA id t19sm8221961pfq.179.2020.07.30.20.12.34
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Thu, 30 Jul 2020 20:12:36 -0700 (PDT)
+From:   Wanpeng Li <kernellwp@gmail.com>
+X-Google-Original-From: Wanpeng Li <wanpengli@tencent.com>
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, stable@vger.kernel.org
+Subject: [PATCH v3 1/3] KVM: LAPIC: Prevent setting the tscdeadline timer if the lapic is hw disabled
+Date:   Fri, 31 Jul 2020 11:12:19 +0800
+Message-Id: <1596165141-28874-1-git-send-email-wanpengli@tencent.com>
+X-Mailer: git-send-email 2.7.4
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+From: Wanpeng Li <wanpengli@tencent.com>
 
-On 2020/7/29 下午10:15, Eli Cohen wrote:
-> OK, we have a mode of operation that does not require driver
-> intervention to manipulate the event queues so I think we're ok with
-> this design.
+Prevent setting the tscdeadline timer if the lapic is hw disabled.
 
+Fixes: bce87cce88 (KVM: x86: consolidate different ways to test for in-kernel LAPIC)
+Cc: <stable@vger.kernel.org>
+Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
+---
+v1 -> v2:
+ * add Fixes tag and cc stable
 
-Good to know this.
+ arch/x86/kvm/lapic.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Thanks
-
+diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+index 5bf72fc..4ce2ddd 100644
+--- a/arch/x86/kvm/lapic.c
++++ b/arch/x86/kvm/lapic.c
+@@ -2195,7 +2195,7 @@ void kvm_set_lapic_tscdeadline_msr(struct kvm_vcpu *vcpu, u64 data)
+ {
+ 	struct kvm_lapic *apic = vcpu->arch.apic;
+ 
+-	if (!lapic_in_kernel(vcpu) || apic_lvtt_oneshot(apic) ||
++	if (!kvm_apic_present(vcpu) || apic_lvtt_oneshot(apic) ||
+ 			apic_lvtt_period(apic))
+ 		return;
+ 
+-- 
+2.7.4
 
