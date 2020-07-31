@@ -2,30 +2,30 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5E4C0234050
-	for <lists+kvm@lfdr.de>; Fri, 31 Jul 2020 09:43:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5D0FF23404D
+	for <lists+kvm@lfdr.de>; Fri, 31 Jul 2020 09:43:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731797AbgGaHno (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 31 Jul 2020 03:43:44 -0400
-Received: from szxga06-in.huawei.com ([45.249.212.32]:34510 "EHLO huawei.com"
+        id S1731761AbgGaHnk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 31 Jul 2020 03:43:40 -0400
+Received: from szxga06-in.huawei.com ([45.249.212.32]:34340 "EHLO huawei.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1731789AbgGaHnm (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 31 Jul 2020 03:43:42 -0400
+        id S1731747AbgGaHni (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 31 Jul 2020 03:43:38 -0400
 Received: from DGGEMS414-HUB.china.huawei.com (unknown [172.30.72.60])
-        by Forcepoint Email with ESMTP id CF4FA47FF5AF96551DE;
+        by Forcepoint Email with ESMTP id B4BA015B9C2EA815E558;
         Fri, 31 Jul 2020 15:43:36 +0800 (CST)
 Received: from DESKTOP-FPN2511.china.huawei.com (10.174.187.42) by
  DGGEMS414-HUB.china.huawei.com (10.3.19.214) with Microsoft SMTP Server id
- 14.3.487.0; Fri, 31 Jul 2020 15:43:28 +0800
+ 14.3.487.0; Fri, 31 Jul 2020 15:43:29 +0800
 From:   Jingyi Wang <wangjingyi11@huawei.com>
 To:     <drjones@redhat.com>, <kvm@vger.kernel.org>,
         <kvmarm@lists.cs.columbia.edu>
 CC:     <maz@kernel.org>, <wanghaibin.wang@huawei.com>,
         <yuzenghui@huawei.com>, <eric.auger@redhat.com>,
         <wangjingyi11@huawei.com>, <prime.zeng@hisilicon.com>
-Subject: [kvm-unit-tests PATCH v3 09/10] arm64: microbench: Add test->post() to further process test results
-Date:   Fri, 31 Jul 2020 15:42:43 +0800
-Message-ID: <20200731074244.20432-10-wangjingyi11@huawei.com>
+Subject: [kvm-unit-tests PATCH v3 10/10] arm64: microbench: Add timer_post() to get actual PPI latency
+Date:   Fri, 31 Jul 2020 15:42:44 +0800
+Message-ID: <20200731074244.20432-11-wangjingyi11@huawei.com>
 X-Mailer: git-send-email 2.14.1.windows.1
 In-Reply-To: <20200731074244.20432-1-wangjingyi11@huawei.com>
 References: <20200731074244.20432-1-wangjingyi11@huawei.com>
@@ -38,76 +38,47 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Under certain circumstances, we need to further process microbench
-test results, so we add test->post() in the microbench framework,
-later patch will use that.
+For we get the time duration of (10msec timer + injection latency)
+in timer_exec(), we substract the value of 10msec in timer_post()
+to get the actual latency.
 
 Signed-off-by: Jingyi Wang <wangjingyi11@huawei.com>
 ---
- arm/micro-bench.c | 31 ++++++++++++++++++-------------
- 1 file changed, 18 insertions(+), 13 deletions(-)
+ arm/micro-bench.c | 14 +++++++++++++-
+ 1 file changed, 13 insertions(+), 1 deletion(-)
 
 diff --git a/arm/micro-bench.c b/arm/micro-bench.c
-index 1e1bde5..4680ba4 100644
+index 4680ba4..315fc7c 100644
 --- a/arm/micro-bench.c
 +++ b/arm/micro-bench.c
-@@ -33,6 +33,12 @@ static int nr_ipi_received;
- static void *vgic_dist_base;
- static void (*write_eoir)(u32 irqstat);
+@@ -254,6 +254,18 @@ static void timer_exec(void)
+ 	assert_msg(irq_received, "failed to receive PPI in time, but received %d successfully\n", received);
+ }
  
-+struct ns_time {
-+	uint64_t ns;
-+	uint64_t ns_frac;
-+};
-+static void ticks_to_ns_time(uint64_t ticks, struct ns_time *ns_time);
++static void timer_post(uint64_t total_ticks, uint64_t ntimes, struct ns_time *total_ns)
++{
++	/*
++	 * We use a 10msec timer to test the latency of PPI,
++	 * so we substract the ticks of 10msec to get the
++	 * actual latency
++	 */
 +
- static void gic_irq_handler(struct pt_regs *regs)
++	total_ticks -= ntimes * (cntfrq / 100);
++	ticks_to_ns_time(total_ticks, total_ns);
++}
++
+ static void hvc_exec(void)
  {
- 	u32 irqstat = gic_read_iar();
-@@ -283,24 +289,20 @@ struct exit_test {
- 	const char *name;
- 	bool (*prep)(void);
- 	void (*exec)(void);
-+	void (*post)(uint64_t, uint64_t, struct ns_time*);
- 	u32 times;
- 	bool run;
- };
- 
- static struct exit_test tests[] = {
--	{"hvc",			NULL,		hvc_exec,		65536,		true},
--	{"mmio_read_user",	NULL,		mmio_read_user_exec,	65536,		true},
--	{"mmio_read_vgic",	NULL,		mmio_read_vgic_exec,	65536,		true},
--	{"eoi",			NULL,		eoi_exec,		65536,		true},
--	{"ipi",			ipi_prep,	ipi_exec,		65536,		true},
--	{"ipi_hw",		ipi_hw_prep,	ipi_exec,		65536,		true},
--	{"lpi",			lpi_prep,	lpi_exec,		65536,		true},
--	{"timer_10ms",		timer_prep,	timer_exec,		256,		true},
--};
--
--struct ns_time {
--	uint64_t ns;
--	uint64_t ns_frac;
-+	{"hvc",			NULL,		hvc_exec,		NULL,		65536,		true},
-+	{"mmio_read_user",	NULL,		mmio_read_user_exec,	NULL,		65536,		true},
-+	{"mmio_read_vgic",	NULL,		mmio_read_vgic_exec,	NULL,		65536,		true},
-+	{"eoi",			NULL,		eoi_exec,		NULL,		65536,		true},
-+	{"ipi",			ipi_prep,	ipi_exec,		NULL,		65536,		true},
-+	{"ipi_hw",		ipi_hw_prep,	ipi_exec,		NULL,		65536,		true},
-+	{"lpi",			lpi_prep,	lpi_exec,		NULL,		65536,		true},
-+	{"timer_10ms",		timer_prep,	timer_exec,		NULL,		256,		true},
+ 	asm volatile("mov w0, #0x4b000000; hvc #0" ::: "w0");
+@@ -302,7 +314,7 @@ static struct exit_test tests[] = {
+ 	{"ipi",			ipi_prep,	ipi_exec,		NULL,		65536,		true},
+ 	{"ipi_hw",		ipi_hw_prep,	ipi_exec,		NULL,		65536,		true},
+ 	{"lpi",			lpi_prep,	lpi_exec,		NULL,		65536,		true},
+-	{"timer_10ms",		timer_prep,	timer_exec,		NULL,		256,		true},
++	{"timer_10ms",		timer_prep,	timer_exec,		timer_post,	256,		true},
  };
  
  #define PS_PER_SEC (1000 * 1000 * 1000 * 1000UL)
-@@ -339,6 +341,9 @@ static void loop_test(struct exit_test *test)
- 		ticks_to_ns_time(total_ticks, &total_ns);
- 	}
- 
-+	if (test->post)
-+		test->post(total_ticks, ntimes, &total_ns);
-+
- 	avg_ns.ns = total_ns.ns / ntimes;
- 	avg_ns.ns_frac = total_ns.ns_frac / ntimes;
- 
 -- 
 2.19.1
 
