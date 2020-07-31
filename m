@@ -2,125 +2,149 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id EA85C23484B
-	for <lists+kvm@lfdr.de>; Fri, 31 Jul 2020 17:18:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5BD692348D7
+	for <lists+kvm@lfdr.de>; Fri, 31 Jul 2020 18:00:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729511AbgGaPSF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 31 Jul 2020 11:18:05 -0400
-Received: from mga05.intel.com ([192.55.52.43]:31636 "EHLO mga05.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726391AbgGaPSF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 31 Jul 2020 11:18:05 -0400
-IronPort-SDR: m/lRqeA9buvmMqysv5L0WXyYsa/lss13fEvgHjUJokBrkVxQwAWQrjAh7R3i14hzFiWsE0UYsq
- VZb7ErC05EsQ==
-X-IronPort-AV: E=McAfee;i="6000,8403,9698"; a="236660317"
-X-IronPort-AV: E=Sophos;i="5.75,418,1589266800"; 
-   d="scan'208";a="236660317"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Jul 2020 08:18:04 -0700
-IronPort-SDR: j5afO6+0Al1OxlzUlWnPR1eEpRFeCBJIJnHRooFJfsEoV57xwJr58U8TjL1xN/QCNziE+tGQhn
- fHAfblpALDGQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.75,418,1589266800"; 
-   d="scan'208";a="395330974"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.160])
-  by fmsmga001.fm.intel.com with ESMTP; 31 Jul 2020 08:18:04 -0700
-Date:   Fri, 31 Jul 2020 08:18:04 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Joerg Roedel <joro@8bytes.org>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Joerg Roedel <jroedel@suse.de>
-Subject: Re: [PATCH v2 3/4] KVM: SVM: Add GHCB Accessor functions
-Message-ID: <20200731151804.GA31451@linux.intel.com>
-References: <20200730154340.14021-1-joro@8bytes.org>
- <20200730154340.14021-4-joro@8bytes.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200730154340.14021-4-joro@8bytes.org>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+        id S2387586AbgGaQAc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 31 Jul 2020 12:00:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36422 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1732481AbgGaQAc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 31 Jul 2020 12:00:32 -0400
+Received: from mail-pg1-x541.google.com (mail-pg1-x541.google.com [IPv6:2607:f8b0:4864:20::541])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3E606C061574
+        for <kvm@vger.kernel.org>; Fri, 31 Jul 2020 09:00:32 -0700 (PDT)
+Received: by mail-pg1-x541.google.com with SMTP id o13so16273937pgf.0
+        for <kvm@vger.kernel.org>; Fri, 31 Jul 2020 09:00:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:subject:from:in-reply-to:date:cc
+         :content-transfer-encoding:message-id:references:to;
+        bh=Kzyn08iYOJC9RiZ2WEaANmy9s/jDSBtmNDRF5zNa9yA=;
+        b=DwGsFOAFJU99lO/Ci3zPbYrpc1m0cV4DLP/iSy8NZNu36uB3pl/naDzGk8dZn48cAA
+         qm5sG2p2gCvufXL8exk+YsmrHk1H0fS4oQsv3BBHwt5+RVq41NeoqpDu/znrgn4nEwUI
+         7/iWY0cDqsfqu77kFfNztqj1ui1EG2T6VFmRlQ5xym34WKtdSAycuBaN+RNwsJWQGmGU
+         ir6c0UEiwbkmm4sEt0P7aBei8hpuayjBRedkfyFmBvCTzSgIZOTcBsH4uDFaCuBMqYSp
+         HP+2vL7qV2QwOhHrAXOKmZi7M+PykEGazQiVGMap2ar0nqWlL/OK0Na2425DaN548hfh
+         drNw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
+         :content-transfer-encoding:message-id:references:to;
+        bh=Kzyn08iYOJC9RiZ2WEaANmy9s/jDSBtmNDRF5zNa9yA=;
+        b=C5P6d92DadLPKH/wIM+CSoAMEGKxE+/n+b4QppW22EVWLvTM2JxKuPJw+A0gBuNX0T
+         SaIe4h2vuVHsOaiHGsPJptIUlGfPPTQbNkKD4aosnkBbp19ts9brxjR3h3CcXc6SX74L
+         4cXnMD6aX4st0MW2zZO7KJE+Gm3fIoXkDnq3+3H6qRraLFwSoaiWSVDDrGQ330A3fPta
+         r7XjE0RdTNFLyZECQ3ycdO8S9Ehb3nH6bQFdmPfbsdchgjwbmCNARQNlxpQ85OlYuy3m
+         Jd5SAcZ27g4xcAR0EcgKHiiBZzihoeYrarNU6lYn7BOPhyLWdtiyASnDKxDan1M17csM
+         qnSg==
+X-Gm-Message-State: AOAM532RnIn3KGYlPx9qeHtFZuDTJY8Rvr5GSb7qMUTqYt4KW6pJjuoD
+        SXKMdYzdeuOP5lxON0l6Kt4qYPNlIug=
+X-Google-Smtp-Source: ABdhPJxSVKLOoY0TEa0AUpcxXcd635liWUpbDFNG40Jsb2CuSNqKHoEqz2v4ZexW6m2vgef6YhnF/Q==
+X-Received: by 2002:a62:8f4b:: with SMTP id n72mr4277658pfd.5.1596211231504;
+        Fri, 31 Jul 2020 09:00:31 -0700 (PDT)
+Received: from ?IPv6:2601:647:4700:9b2:25da:dbcf:1e8c:d224? ([2601:647:4700:9b2:25da:dbcf:1e8c:d224])
+        by smtp.gmail.com with ESMTPSA id b21sm10316523pfp.172.2020.07.31.09.00.30
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Fri, 31 Jul 2020 09:00:30 -0700 (PDT)
+Content-Type: text/plain;
+        charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 13.4 \(3608.120.23.2.1\))
+Subject: Re: [PATCH kvm-unit-tests] fw_cfg: avoid index out of bounds
+From:   Nadav Amit <nadav.amit@gmail.com>
+In-Reply-To: <20200730215809.1970-1-pbonzini@redhat.com>
+Date:   Fri, 31 Jul 2020 09:00:29 -0700
+Cc:     kvm@vger.kernel.org
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <B357AE3F-2ACB-41F0-B6C1-D9A3F6604F4F@gmail.com>
+References: <20200730215809.1970-1-pbonzini@redhat.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+X-Mailer: Apple Mail (2.3608.120.23.2.1)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jul 30, 2020 at 05:43:39PM +0200, Joerg Roedel wrote:
-> From: Joerg Roedel <jroedel@suse.de>
-> 
-> Building a correct GHCB for the hypervisor requires setting valid bits
-> in the GHCB. Simplify that process by providing accessor functions to
-> set values and to update the valid bitmap and to check the valid bitmap
-> in KVM.
-> 
-> Signed-off-by: Joerg Roedel <jroedel@suse.de>
+>=20
+> On Jul 30, 2020, at 2:58 PM, Paolo Bonzini <pbonzini@redhat.com> =
+wrote:
+>=20
+> clang compilation fails with
+>=20
+> lib/x86/fwcfg.c:32:3: error: array index 17 is past the end of the =
+array (which contains 16 elements) [-Werror,-Warray-bounds]
+>                fw_override[FW_CFG_MAX_RAM] =3D atol(str) * 1024 * =
+1024;
+>=20
+> The reason is that FW_CFG_MAX_RAM does not exist in the fw-cfg spec =
+and was
+> added for bare metal support.  Fix the size of the array and rename =
+FW_CFG_MAX_ENTRY
+> to FW_CFG_NUM_ENTRIES, so that it is clear that it must be one plus =
+the
+> highest valid entry.
+>=20
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 > ---
->  arch/x86/include/asm/svm.h | 46 ++++++++++++++++++++++++++++++++++++++
->  1 file changed, 46 insertions(+)
-> 
-> diff --git a/arch/x86/include/asm/svm.h b/arch/x86/include/asm/svm.h
-> index 9a3e0b802716..8744817358bf 100644
-> --- a/arch/x86/include/asm/svm.h
-> +++ b/arch/x86/include/asm/svm.h
-> @@ -341,4 +341,50 @@ struct __attribute__ ((__packed__)) vmcb {
->  
->  #define SVM_CR0_SELECTIVE_MASK (X86_CR0_TS | X86_CR0_MP)
->  
-> +/* GHCB Accessor functions */
+> lib/x86/fwcfg.c | 6 +++---
+> lib/x86/fwcfg.h | 5 ++++-
+> 2 files changed, 7 insertions(+), 4 deletions(-)
+>=20
+> diff --git a/lib/x86/fwcfg.c b/lib/x86/fwcfg.c
+> index c2aaf5a..1734afb 100644
+> --- a/lib/x86/fwcfg.c
+> +++ b/lib/x86/fwcfg.c
+> @@ -4,7 +4,7 @@
+>=20
+> static struct spinlock lock;
+>=20
+> -static long fw_override[FW_CFG_MAX_ENTRY];
+> +static long fw_override[FW_CFG_NUM_ENTRIES];
+> static bool fw_override_done;
+>=20
+> bool no_test_device;
+> @@ -15,7 +15,7 @@ static void read_cfg_override(void)
+> 	int i;
+>=20
+> 	/* Initialize to negative value that would be considered as =
+invalid */
+> -	for (i =3D 0; i < FW_CFG_MAX_ENTRY; i++)
+> +	for (i =3D 0; i < FW_CFG_NUM_ENTRIES; i++)
+> 		fw_override[i] =3D -1;
+>=20
+> 	if ((str =3D getenv("NR_CPUS")))
+> @@ -44,7 +44,7 @@ static uint64_t fwcfg_get_u(uint16_t index, int =
+bytes)
+>     if (!fw_override_done)
+>         read_cfg_override();
+>=20
+> -    if (index < FW_CFG_MAX_ENTRY && fw_override[index] >=3D 0)
+> +    if (index < FW_CFG_NUM_ENTRIES && fw_override[index] >=3D 0)
+> 	    return fw_override[index];
+>=20
+>     spin_lock(&lock);
+> diff --git a/lib/x86/fwcfg.h b/lib/x86/fwcfg.h
+> index 64d4c6e..ac4257e 100644
+> --- a/lib/x86/fwcfg.h
+> +++ b/lib/x86/fwcfg.h
+> @@ -20,9 +20,12 @@
+> #define FW_CFG_NUMA             0x0d
+> #define FW_CFG_BOOT_MENU        0x0e
+> #define FW_CFG_MAX_CPUS         0x0f
+> -#define FW_CFG_MAX_ENTRY        0x10
 > +
-> +#define GHB_BITMAP_IDX(field)								\
-> +        (offsetof(struct vmcb_save_area, field) / sizeof(u64))
+> +/* Dummy entries used when running on bare metal */
+> #define FW_CFG_MAX_RAM		0x11
+>=20
+> +#define FW_CFG_NUM_ENTRIES      (FW_CFG_MAX_RAM + 1)
 > +
-> +#define GHCB_SET_VALID(ghcb, field)							\
-> +	__set_bit(GHB_BITMAP_IDX(field), (unsigned long *)&(ghcb)->save.valid_bitmap);	\
-> +
-> +#define DEFINE_GHCB_ACCESSORS(field)							\
-> +	static inline bool ghcb_##field##_is_valid(const struct ghcb *ghcb)		\
-> +	{										\
-> +		int idx = offsetof(struct vmcb_save_area, field) / sizeof(u64);		\
+> #define FW_CFG_WRITE_CHANNEL    0x4000
+> #define FW_CFG_ARCH_LOCAL       0x8000
+> #define FW_CFG_ENTRY_MASK       ~(FW_CFG_WRITE_CHANNEL | =
+FW_CFG_ARCH_LOCAL)
+> =E2=80=94=20
+> 2.26.2
 
-This should also use GHB_BITMAP_IDX.
+For the record: I did send a patch more than two weeks ago to fix this
+problem (that I created).
 
-> +		return test_bit(idx, (unsigned long *)&(ghcb)->save.valid_bitmap);	\
-> +	}										\
-> +											\
-> +	static inline void								\
-> +	ghcb_set_##field(struct ghcb *ghcb, u64 value)					\
-> +	{										\
-> +		GHCB_SET_VALID(ghcb, field)						\
-> +		ghcb->save.field = value;						\
-> +	}
-> +
-> +DEFINE_GHCB_ACCESSORS(cpl)
-> +DEFINE_GHCB_ACCESSORS(rip)
-> +DEFINE_GHCB_ACCESSORS(rsp)
-> +DEFINE_GHCB_ACCESSORS(rax)
-> +DEFINE_GHCB_ACCESSORS(rcx)
-> +DEFINE_GHCB_ACCESSORS(rdx)
-> +DEFINE_GHCB_ACCESSORS(rbx)
-> +DEFINE_GHCB_ACCESSORS(rbp)
-> +DEFINE_GHCB_ACCESSORS(rsi)
-> +DEFINE_GHCB_ACCESSORS(rdi)
-> +DEFINE_GHCB_ACCESSORS(r8)
-> +DEFINE_GHCB_ACCESSORS(r9)
-> +DEFINE_GHCB_ACCESSORS(r10)
-> +DEFINE_GHCB_ACCESSORS(r11)
-> +DEFINE_GHCB_ACCESSORS(r12)
-> +DEFINE_GHCB_ACCESSORS(r13)
-> +DEFINE_GHCB_ACCESSORS(r14)
-> +DEFINE_GHCB_ACCESSORS(r15)
-> +DEFINE_GHCB_ACCESSORS(sw_exit_code)
-> +DEFINE_GHCB_ACCESSORS(sw_exit_info_1)
-> +DEFINE_GHCB_ACCESSORS(sw_exit_info_2)
-> +DEFINE_GHCB_ACCESSORS(sw_scratch)
-> +DEFINE_GHCB_ACCESSORS(xcr0)
-> +
->  #endif
-> -- 
-> 2.17.1
-> 
