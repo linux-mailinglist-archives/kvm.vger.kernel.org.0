@@ -2,50 +2,50 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9AA05233D97
-	for <lists+kvm@lfdr.de>; Fri, 31 Jul 2020 05:12:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 19277233D98
+	for <lists+kvm@lfdr.de>; Fri, 31 Jul 2020 05:12:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731289AbgGaDMn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 30 Jul 2020 23:12:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59792 "EHLO
+        id S1731304AbgGaDMr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 30 Jul 2020 23:12:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59804 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730820AbgGaDMk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 30 Jul 2020 23:12:40 -0400
-Received: from mail-pj1-x1042.google.com (mail-pj1-x1042.google.com [IPv6:2607:f8b0:4864:20::1042])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 65815C061574;
-        Thu, 30 Jul 2020 20:12:40 -0700 (PDT)
-Received: by mail-pj1-x1042.google.com with SMTP id e4so2781968pjd.0;
-        Thu, 30 Jul 2020 20:12:40 -0700 (PDT)
+        with ESMTP id S1731284AbgGaDMn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 30 Jul 2020 23:12:43 -0400
+Received: from mail-pj1-x1044.google.com (mail-pj1-x1044.google.com [IPv6:2607:f8b0:4864:20::1044])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E9F45C061574;
+        Thu, 30 Jul 2020 20:12:42 -0700 (PDT)
+Received: by mail-pj1-x1044.google.com with SMTP id a9so6014623pjd.3;
+        Thu, 30 Jul 2020 20:12:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=n4jnMGbCRukfnq6mAWC7DIZwbVNmNRQBNC6Djiv/OMc=;
-        b=FZ95jRAv43lUFjjKKZ5yU+PvIm34UyEsXv4FM5BpQp9BL7l/z5eVisL0lUqtQeqWl9
-         GSFRF8lyuYD9evBme/Aho9gzt8cBU9EAJWJHErT0/o25GsuyTuYPzffbINcuV7FX4bdv
-         vZGU1BtlWPk5cIqLSRsOE0bm1rDLAdtaxgrG04xMoQDSM+l+iFsxfTxuAK5oDvLclr0j
-         6TygTREXdX5ZA1ckniL5mrjqcu+i8KovpttI2SjLbXf65PMCouuzzRQfymnqeLrwkLJo
-         r025XcbOaBcSIX6ESx1wu3v9YidelyeQ+qrii+QS4qd0HwVsaBo5Lryv0L9hEr2VmqE1
-         4LwA==
+        bh=tPJzt6hCr28nMvlRPeU7cuy9KZpdsuKpUl1/2Pv7MJo=;
+        b=mLD+hI5qyhPWZAbK5CjoAHjrxXCA29ORK7oi4ZLY7vihruRs7sX/QL/AUBFIi3I5ka
+         OEjuZC6ss/bbaEe/CHy3N6YC9k3fhFHAZaWBLzRLNE8vZq88+OIhbTuRyXFcolNncZVg
+         5c8JRsgyhNwEaNXvZ9QfGpWMKTYEEhEULmM6mZDNKEqHhgNQYIc6SdPBynbq+NOwRfDQ
+         JFgOMjBEcSWpSESrhjfwdQrYvVCrmf2eRDIftNoZ44SNN/t3b895RhOPR6D5ulDAIkjg
+         rFA34XgkYpbX9Gv6TN4v0YayoF7UzlIj7BZ6xDwyIiwcC+0/9hbIXwHoTc44Vd2lKqXT
+         giTg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references;
-        bh=n4jnMGbCRukfnq6mAWC7DIZwbVNmNRQBNC6Djiv/OMc=;
-        b=Vui8wFJO/GW0R+oAYB1s3eHeC5MNbHDORtb2YcnLfcpbE13qHu8MjUGp2GpOnhDcMm
-         7KW/EEPFRMMSMGEU9KwE+XodYK5XQa9Str+Bk+hOKfivWKzw4FnnpjE16TIVax1fJD8N
-         al0rgN8ZWpsCOB70u0vFr33KWukzu8NAZg6icYtNGwu6efa16w5OYiYEB8m2FkGfqxzZ
-         6ejuhpHo1DU3U4RkWQfNMAfPn5TnRdIulrbjU7FhkD74yhC2YpU1cIuTO+SEUOaOfUqC
-         mH7SNgzwIGKOEcYLNvehR2Seh5x7vYEUwfQ0nzqvGfH9bnglQqwlrAB+MQL24BmjwQbq
-         YJhA==
-X-Gm-Message-State: AOAM532ZjMqBQxPKRsZYJyT8PIfseQzWgJWD/VCpd9YZnYUlcGlGda0m
-        n/oh7AwVrloDonmBzP/Z6KsocmFc
-X-Google-Smtp-Source: ABdhPJxBvOVyMFOZYiBnF5HqG3dQBBvFhUR/0+KGOEIZhFCN14A/LLvDtXKz8ET0a83yS9gXdcMclw==
-X-Received: by 2002:a63:6fc7:: with SMTP id k190mr1782013pgc.54.1596165159782;
-        Thu, 30 Jul 2020 20:12:39 -0700 (PDT)
+        bh=tPJzt6hCr28nMvlRPeU7cuy9KZpdsuKpUl1/2Pv7MJo=;
+        b=LmCO59sp3TjGgA6AyxzQUguCL8Wzt0tCKskRWG+zvirZ6owl8mUsqAeYEQadp26Bv9
+         Mm/4zCqSDTlvQ25jbJrKh7CoP0IgX1WuyA3HEL5FW5tC1eNj+Hij+mIVPORH+yYV6GKo
+         XlN7SVcaAcwt1C336Or7gAkNil96ZxDr45icv7tV/dHNm9bdbfQEDSvmWyMIF7XnMnJq
+         jnYKh+T76HwUURrWJ8GOQgFFoB4eU6EdzQSSn8srBQADJQ4BbJ34f6qD7xt9Q4ZlcqIi
+         9YMwABK7myrojCxUfapCbmI5KLPPonWyX+3z1CdX8wEPxDF1cKEtaLlbs7I1vglwKSBo
+         D47w==
+X-Gm-Message-State: AOAM530VhnfNuL4XNUEed4TSI3Mxq3vgDRa4Mg2OE81zVH0MR7BJgBt0
+        0OD6hvCOgQctxTDHKFJ7s+jnwqTJ
+X-Google-Smtp-Source: ABdhPJz4SqGEyF0fKUXkl4NNUswbWn0leItPQBNpbUyN94kwgKwftMcOg4m9cQxjICJZw7R9qih0Ow==
+X-Received: by 2002:a17:90b:390f:: with SMTP id ob15mr2053196pjb.156.1596165162337;
+        Thu, 30 Jul 2020 20:12:42 -0700 (PDT)
 Received: from localhost.localdomain ([103.7.29.6])
-        by smtp.googlemail.com with ESMTPSA id t19sm8221961pfq.179.2020.07.30.20.12.37
+        by smtp.googlemail.com with ESMTPSA id t19sm8221961pfq.179.2020.07.30.20.12.40
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 30 Jul 2020 20:12:39 -0700 (PDT)
+        Thu, 30 Jul 2020 20:12:41 -0700 (PDT)
 From:   Wanpeng Li <kernellwp@gmail.com>
 X-Google-Original-From: Wanpeng Li <wanpengli@tencent.com>
 To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
@@ -55,9 +55,9 @@ Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
         Joerg Roedel <joro@8bytes.org>
-Subject: [PATCH v3 2/3] KVM: LAPIC: Set the TDCR settable bits
-Date:   Fri, 31 Jul 2020 11:12:20 +0800
-Message-Id: <1596165141-28874-2-git-send-email-wanpengli@tencent.com>
+Subject: [PATCH v3 3/3] KVM: SVM: Fix disable pause loop exit/pause filtering capability on SVM
+Date:   Fri, 31 Jul 2020 11:12:21 +0800
+Message-Id: <1596165141-28874-3-git-send-email-wanpengli@tencent.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1596165141-28874-1-git-send-email-wanpengli@tencent.com>
 References: <1596165141-28874-1-git-send-email-wanpengli@tencent.com>
@@ -68,34 +68,64 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Wanpeng Li <wanpengli@tencent.com>
 
-It is a little different between Intel and AMD, Intel's bit 2
-is 0 and AMD is reserved. On bare-metal, Intel will refuse to set
-APIC_TDCR once bits except 0, 1, 3 are setting, however, AMD will
-accept bits 0, 1, 3 and ignore other bits setting as patch does.
-Before the patch, we can get back anything what we set to the
-APIC_TDCR, this patch improves it.
+'Commit 8566ac8b8e7c ("KVM: SVM: Implement pause loop exit logic in SVM")' 
+drops disable pause loop exit/pause filtering capability completely, I 
+guess it is a merge fault by Radim since disable vmexits capabilities and 
+pause loop exit for SVM patchsets are merged at the same time. This patch 
+reintroduces the disable pause loop exit/pause filtering capability support.
 
+Reported-by: Haiwei Li <lihaiwei@tencent.com>
+Tested-by: Haiwei Li <lihaiwei@tencent.com>
+Fixes: 8566ac8b (KVM: SVM: Implement pause loop exit logic in SVM)
 Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
 ---
-v1 -> v2:
- * update patch description
+v2 -> v3:
+ * simplify the condition in init_vmcb() 
 
- arch/x86/kvm/lapic.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ arch/x86/kvm/svm/svm.c | 9 ++++++---
+ 1 file changed, 6 insertions(+), 3 deletions(-)
 
-diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-index 4ce2ddd..8f7a14d 100644
---- a/arch/x86/kvm/lapic.c
-+++ b/arch/x86/kvm/lapic.c
-@@ -2068,7 +2068,7 @@ int kvm_lapic_reg_write(struct kvm_lapic *apic, u32 reg, u32 val)
- 	case APIC_TDCR: {
- 		uint32_t old_divisor = apic->divide_count;
+diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+index c0da4dd..bf77f90 100644
+--- a/arch/x86/kvm/svm/svm.c
++++ b/arch/x86/kvm/svm/svm.c
+@@ -1090,7 +1090,7 @@ static void init_vmcb(struct vcpu_svm *svm)
+ 	svm->nested.vmcb = 0;
+ 	svm->vcpu.arch.hflags = 0;
  
--		kvm_lapic_set_reg(apic, APIC_TDCR, val);
-+		kvm_lapic_set_reg(apic, APIC_TDCR, val & 0xb);
- 		update_divide_count(apic);
- 		if (apic->divide_count != old_divisor &&
- 				apic->lapic_timer.period) {
+-	if (pause_filter_count) {
++	if (!kvm_pause_in_guest(svm->vcpu.kvm)) {
+ 		control->pause_filter_count = pause_filter_count;
+ 		if (pause_filter_thresh)
+ 			control->pause_filter_thresh = pause_filter_thresh;
+@@ -2693,7 +2693,7 @@ static int pause_interception(struct vcpu_svm *svm)
+ 	struct kvm_vcpu *vcpu = &svm->vcpu;
+ 	bool in_kernel = (svm_get_cpl(vcpu) == 0);
+ 
+-	if (pause_filter_thresh)
++	if (!kvm_pause_in_guest(vcpu->kvm))
+ 		grow_ple_window(vcpu);
+ 
+ 	kvm_vcpu_on_spin(vcpu, in_kernel);
+@@ -3780,7 +3780,7 @@ static void svm_handle_exit_irqoff(struct kvm_vcpu *vcpu)
+ 
+ static void svm_sched_in(struct kvm_vcpu *vcpu, int cpu)
+ {
+-	if (pause_filter_thresh)
++	if (!kvm_pause_in_guest(vcpu->kvm))
+ 		shrink_ple_window(vcpu);
+ }
+ 
+@@ -3958,6 +3958,9 @@ static void svm_vm_destroy(struct kvm *kvm)
+ 
+ static int svm_vm_init(struct kvm *kvm)
+ {
++	if (!pause_filter_count || !pause_filter_thresh)
++		kvm->arch.pause_in_guest = true;
++
+ 	if (avic) {
+ 		int ret = avic_vm_init(kvm);
+ 		if (ret)
 -- 
 2.7.4
 
