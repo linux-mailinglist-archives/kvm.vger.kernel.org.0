@@ -2,21 +2,21 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id F126623560D
-	for <lists+kvm@lfdr.de>; Sun,  2 Aug 2020 11:04:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 80D8623561B
+	for <lists+kvm@lfdr.de>; Sun,  2 Aug 2020 11:19:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726908AbgHBJDL convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Sun, 2 Aug 2020 05:03:11 -0400
-Received: from mail.kernel.org ([198.145.29.99]:57702 "EHLO mail.kernel.org"
+        id S1727994AbgHBJTR convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Sun, 2 Aug 2020 05:19:17 -0400
+Received: from mail.kernel.org ([198.145.29.99]:59772 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726416AbgHBJDL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 2 Aug 2020 05:03:11 -0400
+        id S1725916AbgHBJTR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 2 Aug 2020 05:19:17 -0400
 From:   bugzilla-daemon@bugzilla.kernel.org
 Authentication-Results: mail.kernel.org; dkim=permerror (bad message/signature format)
 To:     kvm@vger.kernel.org
 Subject: [Bug 208767] kernel stack overflow due to Lazy update IOAPIC on an
  x86_64 *host*, when gpu is passthrough to macos guest vm
-Date:   Sun, 02 Aug 2020 09:03:10 +0000
+Date:   Sun, 02 Aug 2020 09:19:16 +0000
 X-Bugzilla-Reason: None
 X-Bugzilla-Type: changed
 X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
@@ -25,14 +25,14 @@ X-Bugzilla-Component: kvm
 X-Bugzilla-Version: unspecified
 X-Bugzilla-Keywords: 
 X-Bugzilla-Severity: normal
-X-Bugzilla-Who: yaweb@mail.bg
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
+X-Bugzilla-Who: bonzini@gnu.org
+X-Bugzilla-Status: RESOLVED
+X-Bugzilla-Resolution: CODE_FIX
 X-Bugzilla-Priority: P1
 X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
 X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: cf_regression
-Message-ID: <bug-208767-28872-tICBabMwfD@https.bugzilla.kernel.org/>
+X-Bugzilla-Changed-Fields: bug_status cc resolution
+Message-ID: <bug-208767-28872-heR8hGFlxd@https.bugzilla.kernel.org/>
 In-Reply-To: <bug-208767-28872@https.bugzilla.kernel.org/>
 References: <bug-208767-28872@https.bugzilla.kernel.org/>
 Content-Type: text/plain; charset="UTF-8"
@@ -47,11 +47,17 @@ X-Mailing-List: kvm@vger.kernel.org
 
 https://bugzilla.kernel.org/show_bug.cgi?id=208767
 
-Yani Stoyanov (yaweb@mail.bg) changed:
+Paolo Bonzini (bonzini@gnu.org) changed:
 
            What    |Removed                     |Added
 ----------------------------------------------------------------------------
-         Regression|No                          |Yes
+             Status|NEW                         |RESOLVED
+                 CC|                            |bonzini@gnu.org
+         Resolution|---                         |CODE_FIX
+
+--- Comment #1 from Paolo Bonzini (bonzini@gnu.org) ---
+This should have been fixed by commit 8be8f932e3db5fe4ed178b8892eeffeab530273a
+in Linux 5.7.
 
 -- 
 You are receiving this mail because:
