@@ -2,80 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 84D372356B1
-	for <lists+kvm@lfdr.de>; Sun,  2 Aug 2020 13:25:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 415E7235986
+	for <lists+kvm@lfdr.de>; Sun,  2 Aug 2020 19:45:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727992AbgHBLZc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 2 Aug 2020 07:25:32 -0400
-Received: from relay7-d.mail.gandi.net ([217.70.183.200]:58157 "EHLO
-        relay7-d.mail.gandi.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726578AbgHBLZb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 2 Aug 2020 07:25:31 -0400
-X-Originating-IP: 180.110.142.179
-Received: from localhost (unknown [180.110.142.179])
-        (Authenticated sender: fly@kernel.page)
-        by relay7-d.mail.gandi.net (Postfix) with ESMTPSA id 64DFD20007;
-        Sun,  2 Aug 2020 11:24:54 +0000 (UTC)
-Date:   Sun, 2 Aug 2020 19:23:47 +0800
-From:   Pengfei Li <fly@kernel.page>
-To:     Daniel Jordan <daniel.m.jordan@oracle.com>
-Cc:     Hugh Dickins <hughd@google.com>, akpm@linux-foundation.org,
-        bmt@zurich.ibm.com, dledford@redhat.com, willy@infradead.org,
-        vbabka@suse.cz, kirill.shutemov@linux.intel.com, jgg@ziepe.ca,
-        alex.williamson@redhat.com, cohuck@redhat.com, dbueso@suse.de,
-        jglisse@redhat.com, jhubbard@nvidia.com, ldufour@linux.ibm.com,
-        Liam.Howlett@oracle.com, peterz@infradead.org, cl@linux.com,
-        jack@suse.cz, rientjes@google.com, walken@google.com,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-mm@kvack.org, fly@kernel.page
-Subject: Re: [PATCH 2/2] mm, util: account_locked_vm() does not hold
- mmap_lock
-Message-ID: <20200802192347.534ece64.fly@kernel.page>
-In-Reply-To: <20200730205705.ityqlyeswzo5dkow@ca-dmjordan1.us.oracle.com>
-References: <20200726080224.205470-1-fly@kernel.page>
-        <20200726080224.205470-2-fly@kernel.page>
-        <alpine.LSU.2.11.2007291121280.4649@eggly.anvils>
-        <20200730205705.ityqlyeswzo5dkow@ca-dmjordan1.us.oracle.com>
+        id S1727029AbgHBRpo convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Sun, 2 Aug 2020 13:45:44 -0400
+Received: from mail.kernel.org ([198.145.29.99]:60978 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727019AbgHBRpo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 2 Aug 2020 13:45:44 -0400
+From:   bugzilla-daemon@bugzilla.kernel.org
+Authentication-Results: mail.kernel.org; dkim=permerror (bad message/signature format)
+To:     kvm@vger.kernel.org
+Subject: [Bug 208767] kernel stack overflow due to Lazy update IOAPIC on an
+ x86_64 *host*, when gpu is passthrough to macos guest vm
+Date:   Sun, 02 Aug 2020 17:45:43 +0000
+X-Bugzilla-Reason: None
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Product: Virtualization
+X-Bugzilla-Component: kvm
+X-Bugzilla-Version: unspecified
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: yaweb@mail.bg
+X-Bugzilla-Status: RESOLVED
+X-Bugzilla-Resolution: CODE_FIX
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: 
+Message-ID: <bug-208767-28872-bPZjgW8LaW@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-208767-28872@https.bugzilla.kernel.org/>
+References: <bug-208767-28872@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8BIT
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 30 Jul 2020 16:57:05 -0400
-Daniel Jordan <daniel.m.jordan@oracle.com> wrote:
+https://bugzilla.kernel.org/show_bug.cgi?id=208767
 
-> On Wed, Jul 29, 2020 at 12:21:11PM -0700, Hugh Dickins wrote:
-> > On Sun, 26 Jul 2020, Pengfei Li wrote:
-> > 
-> > > Since mm->locked_vm is already an atomic counter,
-> > > account_locked_vm() does not need to hold mmap_lock.
-> > 
-> > I am worried that this patch, already added to mmotm, along with its
-> > 1/2 making locked_vm an atomic64, might be rushed into v5.9 with
-> > just that two-line commit description, and no discussion at all.
-> > 
-> > locked_vm belongs fundamentally to mm/mlock.c, and the lock to guard
-> > it is mmap_lock; and mlock() has some complicated stuff to do under
-> > that lock while it decides how to adjust locked_vm.
-> >
-> > It is very easy to convert an unsigned long to an atomic64_t, but
-> > "atomic read, check limit and do stuff, atomic add" does not give
-> > the same guarantee as holding the right lock around it all.
-> 
-> Yes, this is why I withdrew my attempt to do something similar last
-> year, I didn't want to make the accounting racy. Stack and heap
-> growing and mremap would be affected in addition to mlock.
->
-> It'd help to hear more about the motivation for this.
-> 
+--- Comment #3 from Yani Stoyanov (yaweb@mail.bg) ---
+(In reply to Paolo Bonzini from comment #1)
+> This should have been fixed by commit
+> 8be8f932e3db5fe4ed178b8892eeffeab530273a in Linux 5.7.
 
-Thanks for your comments.
-
-My motivation is to allow mm related counters to be safely read and
-written without holding mmap_lock. But sorry i didn't do well.
+This commit is already merged to kernel-5.7.10-201.fc32.x86_64 right?
 
 -- 
-Pengfei
+You are receiving this mail because:
+You are watching the assignee of the bug.
