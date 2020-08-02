@@ -2,107 +2,80 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3967C235687
-	for <lists+kvm@lfdr.de>; Sun,  2 Aug 2020 13:11:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 84D372356B1
+	for <lists+kvm@lfdr.de>; Sun,  2 Aug 2020 13:25:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727992AbgHBLLa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 2 Aug 2020 07:11:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36208 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726416AbgHBLLa (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 2 Aug 2020 07:11:30 -0400
-Received: from ozlabs.org (ozlabs.org [IPv6:2401:3900:2:1::2])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E566FC06174A;
-        Sun,  2 Aug 2020 04:11:29 -0700 (PDT)
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (No client certificate requested)
-        by mail.ozlabs.org (Postfix) with ESMTPSA id 4BKJHK4qQPz9sRN;
-        Sun,  2 Aug 2020 21:11:25 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=canb.auug.org.au;
-        s=201702; t=1596366686;
-        bh=5uCbBvvTxj60H9uD/TN9xyrNZM3pahYzd1cSEffXcpc=;
-        h=Date:From:To:Cc:Subject:From;
-        b=aRwD1cp3incqjLgV0BeWoQy0xKJV0WvTkE5ZbXtf0Z3kCapUbQLRL5eJmcH+2VDwC
-         7Oe0qQjFzv6wzkkARQSwqAt1lFjSr+S/itHfmMRYY1B1YSZ3sHt7kQk/3Kkw/NFfPT
-         T3KUq0tkHgyDmYJgoOyaIDN/xhtjI9C35/xvk1c1hse3XL7MIPh2vkQEuN/YFbIUtT
-         ACWQQYv+WvYILdOa4EeVXjwsiJN1rKWs+SLnU/lDrZiFkYbh6oD2EpQoUjnVhxjU0C
-         L0XAFpFOqjFv54SWeHHbQw/WVSwdQH3JEP+j4KDCcMW1Z+tpADVvP72IzzVcW7RFX1
-         x3YKqCkeEF6Lw==
-Date:   Sun, 2 Aug 2020 21:11:24 +1000
-From:   Stephen Rothwell <sfr@canb.auug.org.au>
-To:     Paolo Bonzini <pbonzini@redhat.com>, KVM <kvm@vger.kernel.org>
-Cc:     Linux Next Mailing List <linux-next@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Wanpeng Li <wanpengli@tencent.com>
-Subject: linux-next: Fixes tags need some work in the kvm-fixes tree
-Message-ID: <20200802211124.00311643@canb.auug.org.au>
+        id S1727992AbgHBLZc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 2 Aug 2020 07:25:32 -0400
+Received: from relay7-d.mail.gandi.net ([217.70.183.200]:58157 "EHLO
+        relay7-d.mail.gandi.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726578AbgHBLZb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 2 Aug 2020 07:25:31 -0400
+X-Originating-IP: 180.110.142.179
+Received: from localhost (unknown [180.110.142.179])
+        (Authenticated sender: fly@kernel.page)
+        by relay7-d.mail.gandi.net (Postfix) with ESMTPSA id 64DFD20007;
+        Sun,  2 Aug 2020 11:24:54 +0000 (UTC)
+Date:   Sun, 2 Aug 2020 19:23:47 +0800
+From:   Pengfei Li <fly@kernel.page>
+To:     Daniel Jordan <daniel.m.jordan@oracle.com>
+Cc:     Hugh Dickins <hughd@google.com>, akpm@linux-foundation.org,
+        bmt@zurich.ibm.com, dledford@redhat.com, willy@infradead.org,
+        vbabka@suse.cz, kirill.shutemov@linux.intel.com, jgg@ziepe.ca,
+        alex.williamson@redhat.com, cohuck@redhat.com, dbueso@suse.de,
+        jglisse@redhat.com, jhubbard@nvidia.com, ldufour@linux.ibm.com,
+        Liam.Howlett@oracle.com, peterz@infradead.org, cl@linux.com,
+        jack@suse.cz, rientjes@google.com, walken@google.com,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-mm@kvack.org, fly@kernel.page
+Subject: Re: [PATCH 2/2] mm, util: account_locked_vm() does not hold
+ mmap_lock
+Message-ID: <20200802192347.534ece64.fly@kernel.page>
+In-Reply-To: <20200730205705.ityqlyeswzo5dkow@ca-dmjordan1.us.oracle.com>
+References: <20200726080224.205470-1-fly@kernel.page>
+        <20200726080224.205470-2-fly@kernel.page>
+        <alpine.LSU.2.11.2007291121280.4649@eggly.anvils>
+        <20200730205705.ityqlyeswzo5dkow@ca-dmjordan1.us.oracle.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/esB4f=Wx.bHI8+faGsv2avb";
- protocol="application/pgp-signature"; micalg=pgp-sha256
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
---Sig_/esB4f=Wx.bHI8+faGsv2avb
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+On Thu, 30 Jul 2020 16:57:05 -0400
+Daniel Jordan <daniel.m.jordan@oracle.com> wrote:
 
-Hi all,
+> On Wed, Jul 29, 2020 at 12:21:11PM -0700, Hugh Dickins wrote:
+> > On Sun, 26 Jul 2020, Pengfei Li wrote:
+> > 
+> > > Since mm->locked_vm is already an atomic counter,
+> > > account_locked_vm() does not need to hold mmap_lock.
+> > 
+> > I am worried that this patch, already added to mmotm, along with its
+> > 1/2 making locked_vm an atomic64, might be rushed into v5.9 with
+> > just that two-line commit description, and no discussion at all.
+> > 
+> > locked_vm belongs fundamentally to mm/mlock.c, and the lock to guard
+> > it is mmap_lock; and mlock() has some complicated stuff to do under
+> > that lock while it decides how to adjust locked_vm.
+> >
+> > It is very easy to convert an unsigned long to an atomic64_t, but
+> > "atomic read, check limit and do stuff, atomic add" does not give
+> > the same guarantee as holding the right lock around it all.
+> 
+> Yes, this is why I withdrew my attempt to do something similar last
+> year, I didn't want to make the accounting racy. Stack and heap
+> growing and mremap would be affected in addition to mlock.
+>
+> It'd help to hear more about the motivation for this.
+> 
 
-In commit
+Thanks for your comments.
 
-  830f01b089b1 ("KVM: SVM: Fix disable pause loop exit/pause filtering capa=
-bility on SVM")
+My motivation is to allow mm related counters to be safely read and
+written without holding mmap_lock. But sorry i didn't do well.
 
-Fixes tag
-
-  Fixes: 8566ac8b ("KVM: SVM: Implement pause loop exit logic in SVM")
-
-has these problem(s):
-
-  - SHA1 should be at least 12 digits long
-    Can be fixed by setting core.abbrev to 12 (or more) or (for git v2.11
-    or later) just making sure it is not set (or set to "auto").
-
-In commit
-
-  d2286ba7d574 ("KVM: LAPIC: Prevent setting the tscdeadline timer if the l=
-apic is hw disabled")
-
-Fixes tag
-
-  Fixes: bce87cce88 (KVM: x86: consolidate different ways to test for in-ke=
-rnel LAPIC)
-
-has these problem(s):
-
-  - SHA1 should be at least 12 digits long
-    Can be fixed by setting core.abbrev to 12 (or more) or (for git v2.11
-    or later) just making sure it is not set (or set to "auto").
-
-Something to remember for next time.
-
---=20
-Cheers,
-Stephen Rothwell
-
---Sig_/esB4f=Wx.bHI8+faGsv2avb
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAl8mn1wACgkQAVBC80lX
-0GznBQf+LttyGsuUjfAwm29XPgV8AcmseDQx2xVX4/1z1jj+4Ehf5oRiqzVxHALE
-VN7+dE1bm1DeK/Q9PiVjnJycLTFtXyX1Q1D+U2mQ3kNj6+gPaoLKNXtANueaan/u
-ys67FMzeJl93Ip/GpA0UAuSPZmkzO8sgoRnk9sp0uxzB62smPcVk0Zr+q12uhPFY
-cF5Xqrp1E6gz+ITGev7I5gGYf8MbXRrgv5fHysMmMaHYmIC194U+ftoj9g9t3Hqq
-u5vIapqZNyXvailDQKqWrfZUsExbV0a9PWJ+h6dFW+Ec62BdWxz3pTFlJSY3L1Q9
-10ExPaa9y1xzIpuFoHB3w8ZYJqn2AQ==
-=nM1V
------END PGP SIGNATURE-----
-
---Sig_/esB4f=Wx.bHI8+faGsv2avb--
+-- 
+Pengfei
