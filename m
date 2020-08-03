@@ -2,165 +2,113 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 693B623AB71
-	for <lists+kvm@lfdr.de>; Mon,  3 Aug 2020 19:16:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 287D423AC0B
+	for <lists+kvm@lfdr.de>; Mon,  3 Aug 2020 19:59:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728309AbgHCRQV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 3 Aug 2020 13:16:21 -0400
-Received: from mga14.intel.com ([192.55.52.115]:35486 "EHLO mga14.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726878AbgHCRQV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 3 Aug 2020 13:16:21 -0400
-IronPort-SDR: F5c2XloV9mmQyA3S7wkiHgqPmw4GAlsZjW4R2+rHOemShMpbsyKg4LZr3Lza68EWjATAxJrv36
- 8Kd9KR5hApmQ==
-X-IronPort-AV: E=McAfee;i="6000,8403,9702"; a="151380040"
-X-IronPort-AV: E=Sophos;i="5.75,430,1589266800"; 
-   d="scan'208";a="151380040"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Aug 2020 10:16:20 -0700
-IronPort-SDR: T0DvdcXbtswj8yXJnYcPRihU+tQTTHY9wlLZmToGC+zKZzYyLKl1U6XNReliHIbcL9QeyD3aSr
- VGQL9sx90v3w==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.75,430,1589266800"; 
-   d="scan'208";a="492469357"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.160])
-  by fmsmga005.fm.intel.com with ESMTP; 03 Aug 2020 10:16:20 -0700
-Date:   Mon, 3 Aug 2020 10:16:20 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Brijesh Singh <brijesh.singh@amd.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        eric van tassell <Eric.VanTassell@amd.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>
-Subject: Re: [RFC PATCH 0/8] KVM: x86/mmu: Introduce pinned SPTEs framework
-Message-ID: <20200803171620.GC3151@linux.intel.com>
-References: <20200731212323.21746-1-sean.j.christopherson@intel.com>
- <3bf90589-8404-8bd6-925c-427f72528fc2@amd.com>
+        id S1727114AbgHCR7Q (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 3 Aug 2020 13:59:16 -0400
+Received: from esa4.hgst.iphmx.com ([216.71.154.42]:64728 "EHLO
+        esa4.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726239AbgHCR7Q (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 3 Aug 2020 13:59:16 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1596477555; x=1628013555;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=VOtqlyeTI7pj/+WHRY84iOltoY1CldDSHk2ut6rF0TA=;
+  b=ULxvTcVi1llcpnaSO40ak6Zvkze1vb0XTLevuyK67GidwfQfT3tv1yhm
+   kiwhUowBxWIcNSOXB3LqP0e2JSUjYj8T9yH1sbXVkX/0HSQhdFi8mflYu
+   KmT4uVaf13AcVOQdb1H8AhLeIenNJvO6Iv/caIS8w0+r414gMZqh+Ax71
+   KVU7ob+N1vmlj5Ow5ytynOOztmN5TM8RMnL7/UMOasoluYX1xQk8WPiYJ
+   TkD9t81eheeU//vSPzdok8GoKYTit+demOpofOIYIVZKCAqbctAfsfGaN
+   YK19yn3A6v/Pi5sa748liv02OW+kmbZ+Z1Yi0LpmONXOwG/8UyLeYbIXr
+   w==;
+IronPort-SDR: oPMxDLwMfQHHOCpDbh1TynPUcKhbP0zVZDhIpHc9ZQaUKp5Uvt0zicWTa+VALzh2K1UiaTorSZ
+ iGyLjrkO2pAavsidp9T0GlaU1ocdt2diK3Qv//pX2IMdpsPrYRrjy0e8xZzphgvoqZ6IHEn8wY
+ 1ltRyH5WoQ6k+qj2wQvTGHPQBqM5jAYG6I2xkvMuymmmZmT7DeZTTsmH7PsQzrIdYKxuBUWJlt
+ I9mk6XbEsPGR7fvqXZndzoxONk0hwpkgBqDy2kj0/L3x8tbZ/pus9bCbA8a5r7Cgf2xqw+keQZ
+ zok=
+X-IronPort-AV: E=Sophos;i="5.75,430,1589212800"; 
+   d="scan'208";a="144033180"
+Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
+  by ob1.hgst.iphmx.com with ESMTP; 04 Aug 2020 01:59:03 +0800
+IronPort-SDR: rmitMzpTBLuDNA1XJ/LlNY19nniyj4M68ST5vAlB0K/1mVnb9ubEMpML9H6BNkENh4F+xPH/n3
+ Aami7WoNuM/A==
+Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
+  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Aug 2020 10:47:06 -0700
+IronPort-SDR: iZb2sq5TmobDGkm1+xth6Z7qWVDWypo/WO9cBwNRRp0XCuOe4j67qj5bOnpyao4FekVWUgDZom
+ eh4CemSsEC9g==
+WDCIronportException: Internal
+Received: from cnf007830.ad.shared (HELO jedi-01.hgst.com) ([10.86.58.196])
+  by uls-op-cesaip01.wdc.com with ESMTP; 03 Aug 2020 10:59:03 -0700
+From:   Atish Patra <atish.patra@wdc.com>
+To:     kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org
+Cc:     Atish Patra <atish.patra@wdc.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        Anup Patel <anup.patel@wdc.com>,
+        Kefeng Wang <wangkefeng.wang@huawei.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Palmer Dabbelt <palmer@dabbelt.com>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Alexander Graf <graf@amazon.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Alistair Francis <Alistair.Francis@wdc.com>
+Subject: [PATCH 0/6] Add SBI v0.2 support for KVM
+Date:   Mon,  3 Aug 2020 10:58:40 -0700
+Message-Id: <20200803175846.26272-1-atish.patra@wdc.com>
+X-Mailer: git-send-email 2.24.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <3bf90589-8404-8bd6-925c-427f72528fc2@amd.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Aug 03, 2020 at 10:52:05AM -0500, Brijesh Singh wrote:
-> Thanks for series Sean. Some thoughts
-> 
-> 
-> On 7/31/20 4:23 PM, Sean Christopherson wrote:
-> > SEV currently needs to pin guest memory as it doesn't support migrating
-> > encrypted pages.  Introduce a framework in KVM's MMU to support pinning
-> > pages on demand without requiring additional memory allocations, and with
-> > (somewhat hazy) line of sight toward supporting more advanced features for
-> > encrypted guest memory, e.g. host page migration.
-> 
-> 
-> Eric's attempt to do a lazy pinning suffers with the memory allocation
-> problem and your series seems to address it. As you have noticed,
-> currently the SEV enablement  in the KVM does not support migrating the
-> encrypted pages. But the recent SEV firmware provides a support to
-> migrate the encrypted pages (e.g host page migration). The support is
-> available in SEV FW >= 0.17.
+The Supervisor Binary Interface(SBI) specification[1] now defines a
+base extension that provides extendability to add future extensions
+while maintaining backward compatibility with previous versions.
+The new version is defined as 0.2 and older version is marked as 0.1.
 
-I assume SEV also doesn't support ballooning?  Ballooning would be a good
-first step toward page migration as I think it'd be easier for KVM to
-support, e.g. only needs to deal with the "zap" and not the "move".
+This series adds following features to RISC-V Linux KVM.
+1. Adds support for SBI v0.2 in KVM
+2. SBI Hart state management extension (HSM) in KVM
+3. Ordered booting of guest vcpus in guest Linux
 
-> > The idea is to use a software available bit in the SPTE to track that a
-> > page has been pinned.  The decision to pin a page and the actual pinning
-> > managment is handled by vendor code via kvm_x86_ops hooks.  There are
-> > intentionally two hooks (zap and unzap) introduced that are not needed for
-> > SEV.  I included them to again show how the flag (probably renamed?) could
-> > be used for more than just pin/unpin.
-> 
-> If using the available software bits for the tracking the pinning is
-> acceptable then it can be used for the non-SEV guests (if needed). I
-> will look through your patch more carefully but one immediate question,
-> when do we unpin the pages? In the case of the SEV, once a page is
-> pinned then it should not be unpinned until the guest terminates. If we
-> unpin the page before the VM terminates then there is a  chance the host
-> page migration will kick-in and move the pages. The KVM MMU code may
-> call to drop the spte's during the zap/unzap and this happens a lot
-> during a guest execution and it will lead us to the path where a vendor
-> specific code will unpin the pages during the guest execution and cause
-> a data corruption for the SEV guest.
+This series depends on the base kvm support series[2].
 
-The pages are unpinned by:
+Guest kernel needs to also support SBI v0.2 and HSM extension in Kernel
+to boot multiple vcpus. Linux kernel supports both starting v5.7.
+In absense of that, guest can only boot 1vcpu.
 
-  drop_spte()
-  |
-  -> rmap_remove()
-     |
-     -> sev_drop_pinned_spte()
+[1] https://github.com/riscv/riscv-sbi-doc/blob/master/riscv-sbi.adoc
+[2] http://lists.infradead.org/pipermail/linux-riscv/2020-July/001028.html
 
+Atish Patra (6):
+RISC-V: Add a non-void return for sbi v02 functions
+RISC-V: Mark the existing SBI v0.1 implementation as legacy
+RISC-V: Reorganize SBI code by moving legacy SBI to its own file
+RISC-V: Add SBI v0.2 base extension
+RISC-V: Add v0.1 replacement SBI extensions defined in v02
+RISC-V: Add SBI HSM extension in KVM
 
-The intent is to allow unpinning pages when the mm_struct dies, i.e. when
-the memory is no longer reachable (as opposed to when the last reference to
-KVM is put), but typing that out, I realize there are dependencies and
-assumptions that don't hold true for SEV as implemented.
+arch/riscv/include/asm/kvm_vcpu_sbi.h |  32 +++++
+arch/riscv/include/asm/sbi.h          |  17 ++-
+arch/riscv/kernel/sbi.c               |  32 ++---
+arch/riscv/kvm/Makefile               |   4 +-
+arch/riscv/kvm/vcpu.c                 |  19 +++
+arch/riscv/kvm/vcpu_sbi.c             | 194 ++++++++++++--------------
+arch/riscv/kvm/vcpu_sbi_base.c        |  73 ++++++++++
+arch/riscv/kvm/vcpu_sbi_hsm.c         | 109 +++++++++++++++
+arch/riscv/kvm/vcpu_sbi_legacy.c      | 129 +++++++++++++++++
+arch/riscv/kvm/vcpu_sbi_replace.c     | 136 ++++++++++++++++++
+10 files changed, 619 insertions(+), 126 deletions(-)
+create mode 100644 arch/riscv/include/asm/kvm_vcpu_sbi.h
+create mode 100644 arch/riscv/kvm/vcpu_sbi_base.c
+create mode 100644 arch/riscv/kvm/vcpu_sbi_hsm.c
+create mode 100644 arch/riscv/kvm/vcpu_sbi_legacy.c
+create mode 100644 arch/riscv/kvm/vcpu_sbi_replace.c
 
-  - Parent shadow pages won't be zapped.  Recycling MMU pages and zapping
-    all SPs due to memslot updates are the two concerns.
+--
+2.24.0
 
-    The easy way out for recycling is to not recycle SPs with pinned
-    children, though that may or may not fly with VMM admins.
-
-    I'm trying to resolve the memslot issue[*], but confirming that there's
-    no longer an issue with not zapping everything is proving difficult as
-    we haven't yet reproduced the original bug.
-
-  - drop_large_spte() won't be invoked.  I believe the only semi-legitimate
-    scenario is if the NX huge page workaround is toggled on while a VM is
-    running.  Disallowing that if there is an SEV guest seems reasonable?
-
-    There might be an issue with the host page size changing, but I don't
-    think that can happen if the page is pinned.  That needs more
-    investigation.
-
-
-[*] https://lkml.kernel.org/r/20200703025047.13987-1-sean.j.christopherson@intel.com
-
-> > Bugs in the core implementation are pretty much guaranteed.  The basic
-> > concept has been tested, but in a fairly different incarnation.  Most
-> > notably, tagging PRESENT SPTEs as PINNED has not been tested, although
-> > using the PINNED flag to track zapped (and known to be pinned) SPTEs has
-> > been tested.  I cobbled this variation together fairly quickly to get the
-> > code out there for discussion.
-> >
-> > The last patch to pin SEV pages during sev_launch_update_data() is
-> > incomplete; it's there to show how we might leverage MMU-based pinning to
-> > support pinning pages before the guest is live.
-> 
-> 
-> I will add the SEV specific bits and  give this a try.
-> 
-> >
-> > Sean Christopherson (8):
-> >   KVM: x86/mmu: Return old SPTE from mmu_spte_clear_track_bits()
-> >   KVM: x86/mmu: Use bits 2:0 to check for present SPTEs
-> >   KVM: x86/mmu: Refactor handling of not-present SPTEs in mmu_set_spte()
-> >   KVM: x86/mmu: Add infrastructure for pinning PFNs on demand
-> >   KVM: SVM: Use the KVM MMU SPTE pinning hooks to pin pages on demand
-> >   KVM: x86/mmu: Move 'pfn' variable to caller of direct_page_fault()
-> >   KVM: x86/mmu: Introduce kvm_mmu_map_tdp_page() for use by SEV
-> >   KVM: SVM: Pin SEV pages in MMU during sev_launch_update_data()
-> >
-> >  arch/x86/include/asm/kvm_host.h |   7 ++
-> >  arch/x86/kvm/mmu.h              |   3 +
-> >  arch/x86/kvm/mmu/mmu.c          | 186 +++++++++++++++++++++++++-------
-> >  arch/x86/kvm/mmu/paging_tmpl.h  |   3 +-
-> >  arch/x86/kvm/svm/sev.c          | 141 +++++++++++++++++++++++-
-> >  arch/x86/kvm/svm/svm.c          |   3 +
-> >  arch/x86/kvm/svm/svm.h          |   3 +
-> >  7 files changed, 302 insertions(+), 44 deletions(-)
-> >
