@@ -2,107 +2,166 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 99C1523A636
-	for <lists+kvm@lfdr.de>; Mon,  3 Aug 2020 14:46:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BE4CD23A5B9
+	for <lists+kvm@lfdr.de>; Mon,  3 Aug 2020 14:41:30 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728790AbgHCMpu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 3 Aug 2020 08:45:50 -0400
-Received: from 8bytes.org ([81.169.241.247]:34698 "EHLO theia.8bytes.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728537AbgHCM10 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 3 Aug 2020 08:27:26 -0400
-Received: by theia.8bytes.org (Postfix, from userid 1000)
-        id AE694CA2; Mon,  3 Aug 2020 14:27:24 +0200 (CEST)
-From:   Joerg Roedel <joro@8bytes.org>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        id S1728718AbgHCMl3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 3 Aug 2020 08:41:29 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:23192 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1727892AbgHCMl0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 3 Aug 2020 08:41:26 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1596458485;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=kuJzN9R6wZEsQ5ZHMFVRxApLOxyAZvL/LhRqQsAj2sY=;
+        b=a40lsd7ovvcIR8QwKwZK3mlj6Xf3ekrlbDaHlMtf21vU0uRjVRMunQRInwLKFnKLDvxiQS
+        p7/OcjcgDS/F855AwaFOH81q7pCUePtH4Pjt/uD6/kW3XFPKW4Q3FRAR5FkGepDnychLb4
+        Jmnj2aLKEIQ8P+F/p8nfVdJxa1H/U7Q=
+Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
+ [209.85.208.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-336-WTKnrNs7N9WIO8LLr0F1RQ-1; Mon, 03 Aug 2020 08:41:21 -0400
+X-MC-Unique: WTKnrNs7N9WIO8LLr0F1RQ-1
+Received: by mail-ed1-f71.google.com with SMTP id cz26so556097edb.7
+        for <kvm@vger.kernel.org>; Mon, 03 Aug 2020 05:41:21 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=kuJzN9R6wZEsQ5ZHMFVRxApLOxyAZvL/LhRqQsAj2sY=;
+        b=eXXQAQVPb3R8VCOfVD538Et0O+YtARcoxjJBrqS7eVcsQGXfnr65aVZ1D2Ld0c4OD2
+         TO0Hu7XWTzu2EvaM3klCQij6Bnm9XtenyOkMzWGFmci0YdC/YgMW4Vwr+JKVUo7VcN2J
+         T3WnyH44Wh/JiQce1lKztOglI5ZMAT1KEB4FkYyQzGBCi+adVCPnimzZsnqYm7WJuOPX
+         /6FmUgC7OHVS3My7A3/qoCd3pBVw40uAfhK2Z+v5rUKN2D1/8gPCGbhviCCUQMNO6Brk
+         4IQZ94HiyZcKxIUpCQUSgKYKRinZJsQDWp7lPTjRn+qCns89ap9z0jC4lza6b+mzuDZp
+         NDLA==
+X-Gm-Message-State: AOAM530cBngCTr173BlZgwTZnZZmF3LxhnZdFymWWY1uvL0f2K3Bzmk1
+        CqxptOta7/NVBHSxx65tevvHI+uSKXJEYU7RDaMuSA94lqyUBxnm8OMmsdXll6zMzCC9Cp1XPKx
+        VBv3osDHWSjwZ
+X-Received: by 2002:a05:6402:1e2:: with SMTP id i2mr15099340edy.70.1596458480440;
+        Mon, 03 Aug 2020 05:41:20 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwUW/x/ociYNjBHtYwNZYjZYKHhFAFg9409aA9+QRUWZiWeqBlJuitJChPyzx9wS3FGb9mh3A==
+X-Received: by 2002:a05:6402:1e2:: with SMTP id i2mr15099321edy.70.1596458480197;
+        Mon, 03 Aug 2020 05:41:20 -0700 (PDT)
+Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
+        by smtp.gmail.com with ESMTPSA id h24sm16057707ejk.12.2020.08.03.05.41.19
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 03 Aug 2020 05:41:19 -0700 (PDT)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     Wanpeng Li <kernellwp@gmail.com>, kvm@vger.kernel.org
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Tom Lendacky <thomas.lendacky@amd.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Borislav Petkov <bp@alien8.de>,
-        Joerg Roedel <jroedel@suse.de>
-Subject: [PATCH v3 4/4] KVM: SVM: Use __packed shorthand
-Date:   Mon,  3 Aug 2020 14:27:08 +0200
-Message-Id: <20200803122708.5942-5-joro@8bytes.org>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20200803122708.5942-1-joro@8bytes.org>
-References: <20200803122708.5942-1-joro@8bytes.org>
+        Joerg Roedel <joro@8bytes.org>
+Subject: Re: [kvm-unit-tests PATCH] x86: tscdeadline timer testing when apic is hw disabled
+In-Reply-To: <1596441715-14959-1-git-send-email-wanpengli@tencent.com>
+References: <1596441715-14959-1-git-send-email-wanpengli@tencent.com>
+Date:   Mon, 03 Aug 2020 14:41:18 +0200
+Message-ID: <87wo2fq4up.fsf@vitty.brq.redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Borislav Petkov <bp@alien8.de>
+Wanpeng Li <kernellwp@gmail.com> writes:
 
-Use the shorthand to make it more readable.
+> From: Wanpeng Li <wanpengli@tencent.com>
+>
+> This patch adds tscdeadline timer testing when apic is hw disabled.
+>
+> Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
+> ---
+>  x86/apic.c | 27 +++++++++++++++++++++------
+>  1 file changed, 21 insertions(+), 6 deletions(-)
+>
+> diff --git a/x86/apic.c b/x86/apic.c
+> index a7681fe..bcf56e2 100644
+> --- a/x86/apic.c
+> +++ b/x86/apic.c
+> @@ -30,15 +30,18 @@ static void tsc_deadline_timer_isr(isr_regs_t *regs)
+>      eoi();
+>  }
+>  
+> -static void __test_tsc_deadline_timer(void)
+> +static void __test_tsc_deadline_timer(bool apic_enabled)
+>  {
+>      handle_irq(TSC_DEADLINE_TIMER_VECTOR, tsc_deadline_timer_isr);
+>      irq_enable();
+>  
+>      wrmsr(MSR_IA32_TSCDEADLINE, rdmsr(MSR_IA32_TSC));
+>      asm volatile ("nop");
+> -    report(tdt_count == 1, "tsc deadline timer");
+> -    report(rdmsr(MSR_IA32_TSCDEADLINE) == 0, "tsc deadline timer clearing");
+> +    if (apic_enabled) {
+> +        report(tdt_count == 1, "tsc deadline timer");
+> +        report(rdmsr(MSR_IA32_TSCDEADLINE) == 0, "tsc deadline timer clearing");
+> +    } else
+> +        report(rdmsr(MSR_IA32_TSCDEADLINE) == 0, "tsc deadline timer is not set");
 
-No functional changes.
+I'd suggest we also check that the timer didn't fire, e.g.
 
-Signed-off-by: Borislav Petkov <bp@alien8.de>
-Signed-off-by: Joerg Roedel <jroedel@suse.de>
----
- arch/x86/include/asm/svm.h | 16 ++++++++--------
- 1 file changed, 8 insertions(+), 8 deletions(-)
+report(tdt_count == 0, "tsc deadline timer didn't fire");
 
-diff --git a/arch/x86/include/asm/svm.h b/arch/x86/include/asm/svm.h
-index 71a308f1fbc8..f41b329943e5 100644
---- a/arch/x86/include/asm/svm.h
-+++ b/arch/x86/include/asm/svm.h
-@@ -150,14 +150,14 @@ struct __attribute__ ((__packed__)) vmcb_control_area {
- #define SVM_NESTED_CTL_NP_ENABLE	BIT(0)
- #define SVM_NESTED_CTL_SEV_ENABLE	BIT(1)
- 
--struct __attribute__ ((__packed__)) vmcb_seg {
-+struct vmcb_seg {
- 	u16 selector;
- 	u16 attrib;
- 	u32 limit;
- 	u64 base;
--};
-+} __packed;
- 
--struct __attribute__ ((__packed__)) vmcb_save_area {
-+struct vmcb_save_area {
- 	struct vmcb_seg es;
- 	struct vmcb_seg cs;
- 	struct vmcb_seg ss;
-@@ -231,9 +231,9 @@ struct __attribute__ ((__packed__)) vmcb_save_area {
- 	u64 xcr0;
- 	u8 valid_bitmap[16];
- 	u64 x87_state_gpa;
--};
-+} __packed;
- 
--struct __attribute__ ((__packed__)) ghcb {
-+struct ghcb {
- 	struct vmcb_save_area save;
- 	u8 reserved_save[2048 - sizeof(struct vmcb_save_area)];
- 
-@@ -242,7 +242,7 @@ struct __attribute__ ((__packed__)) ghcb {
- 	u8 reserved_1[10];
- 	u16 protocol_version;	/* negotiated SEV-ES/GHCB protocol version */
- 	u32 ghcb_usage;
--};
-+} __packed;
- 
- 
- static inline void __unused_size_checks(void)
-@@ -252,11 +252,11 @@ static inline void __unused_size_checks(void)
- 	BUILD_BUG_ON(sizeof(struct ghcb) != 4096);
- }
- 
--struct __attribute__ ((__packed__)) vmcb {
-+struct vmcb {
- 	struct vmcb_control_area control;
- 	u8 reserved_control[1024 - sizeof(struct vmcb_control_area)];
- 	struct vmcb_save_area save;
--};
-+} __packed;
- 
- #define SVM_CPUID_FUNC 0x8000000a
- 
+as a bonus, we'd get another reason to use braces for both branches of
+the 'if' (which is a good thing regardless).
+
+>  }
+>  
+>  static int enable_tsc_deadline_timer(void)
+> @@ -54,10 +57,10 @@ static int enable_tsc_deadline_timer(void)
+>      }
+>  }
+>  
+> -static void test_tsc_deadline_timer(void)
+> +static void test_tsc_deadline_timer(bool apic_enabled)
+>  {
+>      if(enable_tsc_deadline_timer()) {
+> -        __test_tsc_deadline_timer();
+> +        __test_tsc_deadline_timer(apic_enabled);
+>      } else {
+>          report_skip("tsc deadline timer not detected");
+>      }
+> @@ -132,6 +135,17 @@ static void verify_disabled_apic_mmio(void)
+>      write_cr8(cr8);
+>  }
+>  
+> +static void verify_disabled_apic_tsc_deadline_timer(void)
+> +{
+> +    reset_apic();
+> +    if (enable_tsc_deadline_timer()) {
+> +        disable_apic();
+> +        __test_tsc_deadline_timer(false);
+> +    } else {
+> +        report_skip("tsc deadline timer not detected");
+> +    }
+> +}
+> +
+>  static void test_apic_disable(void)
+>  {
+>      volatile u32 *lvr = (volatile u32 *)(APIC_DEFAULT_PHYS_BASE + APIC_LVR);
+> @@ -148,6 +162,7 @@ static void test_apic_disable(void)
+>      report(!this_cpu_has(X86_FEATURE_APIC),
+>             "CPUID.1H:EDX.APIC[bit 9] is clear");
+>      verify_disabled_apic_mmio();
+> +    verify_disabled_apic_tsc_deadline_timer();
+>  
+>      reset_apic();
+>      report((rdmsr(MSR_IA32_APICBASE) & (APIC_EN | APIC_EXTD)) == APIC_EN,
+> @@ -668,7 +683,7 @@ int main(void)
+>  
+>      test_apic_timer_one_shot();
+>      test_apic_change_mode();
+> -    test_tsc_deadline_timer();
+> +    test_tsc_deadline_timer(true);
+>  
+>      return report_summary();
+>  }
+
 -- 
-2.17.1
+Vitaly
 
