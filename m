@@ -2,214 +2,368 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C1031239D02
-	for <lists+kvm@lfdr.de>; Mon,  3 Aug 2020 01:55:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 461BE239D5E
+	for <lists+kvm@lfdr.de>; Mon,  3 Aug 2020 04:02:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727059AbgHBXzP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 2 Aug 2020 19:55:15 -0400
-Received: from mail-bn8nam12on2053.outbound.protection.outlook.com ([40.107.237.53]:17760
-        "EHLO NAM12-BN8-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726364AbgHBXzO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 2 Aug 2020 19:55:14 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=JX4SFtOpiJEYAhZFWV+fWQWDLwvtvWrClvb76sU/HGyotZqkzXz/j15lwB28n5CfpptoJmXCvwhAn1+ouVaPOhgyWf6Wx22Tn09eSRuACZfrU82xsTaZnfy3pKU5YhLSBm3cVcm0hcgeaO1lQR9ihgpoybzYKSxL3t+QFk1jGNCs/p9rcfF6raukPipz94qOlFTBoXuPdedt82d+4BwEfM2D4VSOYhBTm/c3hsIuN2cQ2SsR1KQRYdFWRypuahAovLo8yTJXE1Pe9n73+0vyBdyYTdX17AUp02ZGb/WHjZki99frObWFsXmWeNFdF5+vw0N60SUchsBMUAq/6uKhTw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=NBn9muAuukgu0RPBuZwDISW6bVlrJZy0XWsEeUyY0+g=;
- b=bPNMizMZCslPTnT1GpqARgq62i3tclsoU4OMCh7AWH516gxssFkrUCtz1Aj8nkX2OOJzdVl3crfSEwoh5IWkxMoB6iTCmD//eiFUQoFEOnPhK4kvX+httFpcgeSniwzfdfyKrS5bNJk8W5JnsU9V4BosfiWXYlqnFvNWTKaPEcaUI0s4lw7YPWC1jki1Mn3+9MYr1K1oyLKPfZTeqbgS4AqMz941vqFKwEvBAp7NdCXQdFvW7G8Au5GzAckmhqV2yQ9w7dD06cMUq0YCy/BuEI9zjFs+N1BnwvEGeRTTKCtuNdsolBYUOVZSc9ik2Bk6ACDK/wZTHn+Gc30smHpQfg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=NBn9muAuukgu0RPBuZwDISW6bVlrJZy0XWsEeUyY0+g=;
- b=iFeDnCKBqek7sXf33fAnQOoAH9M9pRKPHXrsAhFnTApOSmESjBUJmuBHFizNz5hszRz4MzTSd+07wDAzOtQ5qRGuKpNU0bnAFzMbuBeS22m400R987D5zyUYe7VdTQzisl2d2Gl4+Ca+tEJ6jyrzxLbWhKOK2ZwYEgelK2aO/Zc=
-Authentication-Results: kernel.org; dkim=none (message not signed)
- header.d=none;kernel.org; dmarc=none action=none header.from=amd.com;
-Received: from DM5PR12MB1307.namprd12.prod.outlook.com (2603:10b6:3:79::21) by
- DM5PR12MB1626.namprd12.prod.outlook.com (2603:10b6:4:d::17) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.3239.16; Sun, 2 Aug 2020 23:55:10 +0000
-Received: from DM5PR12MB1307.namprd12.prod.outlook.com
- ([fe80::15d7:c2da:d92a:2162]) by DM5PR12MB1307.namprd12.prod.outlook.com
- ([fe80::15d7:c2da:d92a:2162%11]) with mapi id 15.20.3239.021; Sun, 2 Aug 2020
- 23:55:10 +0000
-Subject: Re: [Patch 3/4] KVM:SVM: Pin sev_launch_update_data() pages via
- sev_get_page()
-To:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        eric van tassell <Eric.VanTassell@amd.com>
-Cc:     kvm@vger.kernel.org, bp@alien8.de, hpa@zytor.com, mingo@redhat.com,
-        jmattson@google.com, joro@8bytes.org, pbonzini@redhat.com,
-        tglx@linutronix.de, vkuznets@redhat.com, wanpengli@tencent.com,
-        x86@kernel.org
-References: <20200724235448.106142-1-Eric.VanTassell@amd.com>
- <20200724235448.106142-4-Eric.VanTassell@amd.com>
- <20200731204028.GH31451@linux.intel.com>
-From:   Eric van Tassell <evantass@amd.com>
-Message-ID: <bd9f4790-66d0-7ca8-4aed-5349e765991f@amd.com>
-Date:   Sun, 2 Aug 2020 18:55:05 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
-In-Reply-To: <20200731204028.GH31451@linux.intel.com>
+        id S1726693AbgHCCCd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 2 Aug 2020 22:02:33 -0400
+Received: from mga14.intel.com ([192.55.52.115]:7282 "EHLO mga14.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725820AbgHCCCc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 2 Aug 2020 22:02:32 -0400
+IronPort-SDR: mmpLeQE5zXIICBLkZtcuYmUgKWmZBDFDyFVKjShvVG4PYw4VuAyL8mN/qKgkROCQdPHsJBuILO
+ PNKWL0dr3dlQ==
+X-IronPort-AV: E=McAfee;i="6000,8403,9701"; a="151238790"
+X-IronPort-AV: E=Sophos;i="5.75,428,1589266800"; 
+   d="scan'208";a="151238790"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Aug 2020 19:02:28 -0700
+IronPort-SDR: ljepv2Eh78IstXl+1Q0xhZ21vaoTSa0CNzm22yFD7Al/VtvAgAe9NQxyssDy2gZyel+YkRQC8m
+ 5bKEA7bf7UJw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.75,428,1589266800"; 
+   d="scan'208";a="395906051"
+Received: from allen-box.sh.intel.com (HELO [10.239.159.139]) ([10.239.159.139])
+  by fmsmga001.fm.intel.com with ESMTP; 02 Aug 2020 19:02:23 -0700
+Cc:     baolu.lu@linux.intel.com, "Tian, Kevin" <kevin.tian@intel.com>,
+        Jacob Pan <jacob.jun.pan@linux.intel.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Jean-Philippe Brucker <jean-philippe@linaro.org>,
+        "Jiang, Dave" <dave.jiang@intel.com>,
+        "Raj, Ashok" <ashok.raj@intel.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        Cornelia Huck <cohuck@redhat.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
+        Robin Murphy <robin.murphy@arm.com>
+Subject: Re: [PATCH v3 2/4] iommu: Add iommu_aux_at(de)tach_group()
+To:     Alex Williamson <alex.williamson@redhat.com>
+References: <20200714055703.5510-1-baolu.lu@linux.intel.com>
+ <20200714055703.5510-3-baolu.lu@linux.intel.com>
+ <20200714093909.1ab93c9e@jacob-builder>
+ <b5b22e01-4a51-8dfe-9ba4-aeca783740f1@linux.intel.com>
+ <20200715090114.50a459d4@jacob-builder>
+ <435a2014-c2e8-06b9-3c9a-4afbf6607ffe@linux.intel.com>
+ <20200729140336.09d2bfe7@x1.home>
+ <MWHPR11MB16454283959A365ED7964C488C700@MWHPR11MB1645.namprd11.prod.outlook.com>
+ <20200730134658.44c57a67@x1.home>
+ <3e252771-b1ed-a9fc-b179-97c8f280c526@linux.intel.com>
+ <20200731120537.2e1d8916@x1.home>
+From:   Lu Baolu <baolu.lu@linux.intel.com>
+Message-ID: <9ee76708-f50c-adb1-0b3f-67871c799cab@linux.intel.com>
+Date:   Mon, 3 Aug 2020 09:57:24 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
+MIME-Version: 1.0
+In-Reply-To: <20200731120537.2e1d8916@x1.home>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SA0PR11CA0082.namprd11.prod.outlook.com
- (2603:10b6:806:d2::27) To DM5PR12MB1307.namprd12.prod.outlook.com
- (2603:10b6:3:79::21)
-MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from [10.252.16.211] (165.204.77.11) by SA0PR11CA0082.namprd11.prod.outlook.com (2603:10b6:806:d2::27) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3239.18 via Frontend Transport; Sun, 2 Aug 2020 23:55:07 +0000
-X-Originating-IP: [165.204.77.11]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-HT: Tenant
-X-MS-Office365-Filtering-Correlation-Id: 490d0483-0da0-4d60-af60-08d8373f7d57
-X-MS-TrafficTypeDiagnostic: DM5PR12MB1626:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <DM5PR12MB1626B2C6276382031A743D9AE74C0@DM5PR12MB1626.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:10000;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 19eK/tNkz/ZgKgqAWuc/TS/vqtmr1xUIQeCQU4k+OK69gZ728LRKU3UtmyE2ri0lFL8eSJVCx2c45N66r5dflQmx3CG8FtrgslpN4GmfAhlvRS+pi5hMlYgvwtAsuHU4XaW1nG761dppKjg9AXCbQaNnn5uqoJvRjIYvB9e+UoQQW9DsdYlCMD3/q5e8Z7UZMpCaAbdFr80L501UjnmuLLH6Y3HSvlawmPOpTkSiJCtR6c5Da7lrP8icQC9jON1Nc5O28DPQLJq01ASNtygJm1J85qg82my2UEKu16O4cuRW1XymyIR4eq/CaG6q0ecbJWsBiMNep18mmVyuUJII5Ft9FFYQOVNIajF1egW5Lbml5UyYFZMwDIbc2sZaz8gQ
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM5PR12MB1307.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFTY:;SFS:(4636009)(346002)(136003)(376002)(366004)(396003)(39860400002)(26005)(478600001)(316002)(83380400001)(36756003)(2906002)(6486002)(53546011)(2616005)(956004)(4326008)(52116002)(6636002)(7416002)(8936002)(110136005)(31696002)(8676002)(186003)(16526019)(66556008)(66946007)(16576012)(5660300002)(31686004)(66476007)(43740500002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData: och9RaaojIH7/QTSvK9MY124gYMfnH6BlwPPEMXqiWdgQ02Y3nc1QtLdUtNWWCSFCCP2bsVTArvKpQxu9kZ/urLzLp1pJdPufYoAF/rSZzwAwDZ6/SN6QhLninhLz+19L0zbM1p7rP8E024VRwGUGmrDgVsoZcJ2Tlrn02YfpXZZbi8wx75xqqAJorWqbcSGWvk9798BKZNR+2nmxMj9//ODBSyvDm4vZnJfSijYmU5L/FYm81EZ19UjdnuJeKxhh+/NMPnbWOOCH6brT/JD5OI7wF9QMqsMD09DEX2gSnPcDhEuH9VHdEYRUQ8o8BFIeqZvQGUNV5X6E3D/DH1C53kDfnrkhUvlXhOazfnsswTiVYAoKPfQ9iodnMdD74L5bZsfgY/uMWf9YsROteXZ1LF5MgLuVLoc00QbtRpRQRS/vZehk1H6BMHJqwwesvCROG13Ec4i1s4XSlEZUtiKGTE/WqpRw7Bv/YPBgJZcSbz5Uhd/P9R8yEGzW/T7aPj5xbQI5ppm/S4qkleKjRiPlC+KwV9gMLRMETWIS7caORxSUGusCAxpZDQ/I+kOR2LgJE5rEgwVtmV4julLkZGWN8/wnxxeFdyRZ2DboA2yF5s4oifIFMgxhwtxWKvCuW4cxZBFAbD9FQAbAlWz5xRg7A==
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 490d0483-0da0-4d60-af60-08d8373f7d57
-X-MS-Exchange-CrossTenant-AuthSource: DM5PR12MB1307.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Aug 2020 23:55:10.1709
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: h/Im5R7tJ8ZYBA/9n6giVZ3FaoVrqHwBAJxrExHG2DE782RNYVUMfTDoHB5wVr8au6Shw+tCV+jWeRe30WjKhQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM5PR12MB1626
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Hi Alex,
 
+On 8/1/20 2:05 AM, Alex Williamson wrote:
+> On Fri, 31 Jul 2020 13:47:57 +0800
+> Lu Baolu <baolu.lu@linux.intel.com> wrote:
+> 
+>> Hi Alex,
+>>
+>> On 2020/7/31 3:46, Alex Williamson wrote:
+>>> On Wed, 29 Jul 2020 23:34:40 +0000
+>>> "Tian, Kevin" <kevin.tian@intel.com> wrote:
+>>>    
+>>>>> From: Alex Williamson <alex.williamson@redhat.com>
+>>>>> Sent: Thursday, July 30, 2020 4:04 AM
+>>>>>
+>>>>> On Thu, 16 Jul 2020 09:07:46 +0800
+>>>>> Lu Baolu <baolu.lu@linux.intel.com> wrote:
+>>>>>       
+>>>>>> Hi Jacob,
+>>>>>>
+>>>>>> On 7/16/20 12:01 AM, Jacob Pan wrote:
+>>>>>>> On Wed, 15 Jul 2020 08:47:36 +0800
+>>>>>>> Lu Baolu <baolu.lu@linux.intel.com> wrote:
+>>>>>>>      
+>>>>>>>> Hi Jacob,
+>>>>>>>>
+>>>>>>>> On 7/15/20 12:39 AM, Jacob Pan wrote:
+>>>>>>>>> On Tue, 14 Jul 2020 13:57:01 +0800
+>>>>>>>>> Lu Baolu<baolu.lu@linux.intel.com>  wrote:
+>>>>>>>>>      
+>>>>>>>>>> This adds two new aux-domain APIs for a use case like vfio/mdev
+>>>>>>>>>> where sub-devices derived from an aux-domain capable device are
+>>>>>>>>>> created and put in an iommu_group.
+>>>>>>>>>>
+>>>>>>>>>> /**
+>>>>>>>>>>      * iommu_aux_attach_group - attach an aux-domain to an
+>>>>> iommu_group
+>>>>>>>>>> which
+>>>>>>>>>>      *                          contains sub-devices (for example
+>>>>>>>>>> mdevs) derived
+>>>>>>>>>>      *                          from @dev.
+>>>>>>>>>>      * @domain: an aux-domain;
+>>>>>>>>>>      * @group:  an iommu_group which contains sub-devices derived
+>>>>> from
+>>>>>>>>>> @dev;
+>>>>>>>>>>      * @dev:    the physical device which supports
+>>>>> IOMMU_DEV_FEAT_AUX.
+>>>>>>>>>>      *
+>>>>>>>>>>      * Returns 0 on success, or an error value.
+>>>>>>>>>>      */
+>>>>>>>>>> int iommu_aux_attach_group(struct iommu_domain *domain,
+>>>>>>>>>>                                struct iommu_group *group,
+>>>>>>>>>>                                struct device *dev)
+>>>>>>>>>>
+>>>>>>>>>> /**
+>>>>>>>>>>      * iommu_aux_detach_group - detach an aux-domain from an
+>>>>>>>>>> iommu_group *
+>>>>>>>>>>      * @domain: an aux-domain;
+>>>>>>>>>>      * @group:  an iommu_group which contains sub-devices derived
+>>>>> from
+>>>>>>>>>> @dev;
+>>>>>>>>>>      * @dev:    the physical device which supports
+>>>>> IOMMU_DEV_FEAT_AUX.
+>>>>>>>>>>      *
+>>>>>>>>>>      * @domain must have been attached to @group via
+>>>>>>>>>> iommu_aux_attach_group(). */
+>>>>>>>>>> void iommu_aux_detach_group(struct iommu_domain *domain,
+>>>>>>>>>>                                 struct iommu_group *group,
+>>>>>>>>>>                                 struct device *dev)
+>>>>>>>>>>
+>>>>>>>>>> It also adds a flag in the iommu_group data structure to identify
+>>>>>>>>>> an iommu_group with aux-domain attached from those normal ones.
+>>>>>>>>>>
+>>>>>>>>>> Signed-off-by: Lu Baolu<baolu.lu@linux.intel.com>
+>>>>>>>>>> ---
+>>>>>>>>>>      drivers/iommu/iommu.c | 58
+>>>>>>>>>> +++++++++++++++++++++++++++++++++++++++++++
+>>>>> include/linux/iommu.h |
+>>>>>>>>>> 17 +++++++++++++ 2 files changed, 75 insertions(+)
+>>>>>>>>>>
+>>>>>>>>>> diff --git a/drivers/iommu/iommu.c b/drivers/iommu/iommu.c
+>>>>>>>>>> index e1fdd3531d65..cad5a19ebf22 100644
+>>>>>>>>>> --- a/drivers/iommu/iommu.c
+>>>>>>>>>> +++ b/drivers/iommu/iommu.c
+>>>>>>>>>> @@ -45,6 +45,7 @@ struct iommu_group {
+>>>>>>>>>>      	struct iommu_domain *default_domain;
+>>>>>>>>>>      	struct iommu_domain *domain;
+>>>>>>>>>>      	struct list_head entry;
+>>>>>>>>>> +	unsigned int aux_domain_attached:1;
+>>>>>>>>>>      };
+>>>>>>>>>>
+>>>>>>>>>>      struct group_device {
+>>>>>>>>>> @@ -2759,6 +2760,63 @@ int iommu_aux_get_pasid(struct
+>>>>> iommu_domain
+>>>>>>>>>> *domain, struct device *dev) }
+>>>>>>>>>>      EXPORT_SYMBOL_GPL(iommu_aux_get_pasid);
+>>>>>>>>>>
+>>>>>>>>>> +/**
+>>>>>>>>>> + * iommu_aux_attach_group - attach an aux-domain to an
+>>>>> iommu_group
+>>>>>>>>>> which
+>>>>>>>>>> + *                          contains sub-devices (for example
+>>>>>>>>>> mdevs) derived
+>>>>>>>>>> + *                          from @dev.
+>>>>>>>>>> + * @domain: an aux-domain;
+>>>>>>>>>> + * @group:  an iommu_group which contains sub-devices derived
+>>>>> from
+>>>>>>>>>> @dev;
+>>>>>>>>>> + * @dev:    the physical device which supports
+>>>>> IOMMU_DEV_FEAT_AUX.
+>>>>>>>>>> + *
+>>>>>>>>>> + * Returns 0 on success, or an error value.
+>>>>>>>>>> + */
+>>>>>>>>>> +int iommu_aux_attach_group(struct iommu_domain *domain,
+>>>>>>>>>> +			   struct iommu_group *group, struct
+>>>>>>>>>> device *dev) +{
+>>>>>>>>>> +	int ret = -EBUSY;
+>>>>>>>>>> +
+>>>>>>>>>> +	mutex_lock(&group->mutex);
+>>>>>>>>>> +	if (group->domain)
+>>>>>>>>>> +		goto out_unlock;
+>>>>>>>>>> +
+>>>>>>>>> Perhaps I missed something but are we assuming only one mdev per
+>>>>>>>>> mdev group? That seems to change the logic where vfio does:
+>>>>>>>>> iommu_group_for_each_dev()
+>>>>>>>>> 	iommu_aux_attach_device()
+>>>>>>>>>      
+>>>>>>>>
+>>>>>>>> It has been changed in PATCH 4/4:
+>>>>>>>>
+>>>>>>>> static int vfio_iommu_attach_group(struct vfio_domain *domain,
+>>>>>>>>                                        struct vfio_group *group)
+>>>>>>>> {
+>>>>>>>>             if (group->mdev_group)
+>>>>>>>>                     return iommu_aux_attach_group(domain->domain,
+>>>>>>>>                                                   group->iommu_group,
+>>>>>>>>                                                   group->iommu_device);
+>>>>>>>>             else
+>>>>>>>>                     return iommu_attach_group(domain->domain,
+>>>>>>>> group->iommu_group);
+>>>>>>>> }
+>>>>>>>>
+>>>>>>>> So, for both normal domain and aux-domain, we use the same concept:
+>>>>>>>> attach a domain to a group.
+>>>>>>>>      
+>>>>>>> I get that, but don't you have to attach all the devices within the
+>>>>>>
+>>>>>> This iommu_group includes only mediated devices derived from an
+>>>>>> IOMMU_DEV_FEAT_AUX-capable device. Different from
+>>>>> iommu_attach_group(),
+>>>>>> iommu_aux_attach_group() doesn't need to attach the domain to each
+>>>>>> device in group, instead it only needs to attach the domain to the
+>>>>>> physical device where the mdev's were created from.
+>>>>>>      
+>>>>>>> group? Here you see the group already has a domain and exit.
+>>>>>>
+>>>>>> If the (group->domain) has been set, that means a domain has already
+>>>>>> attached to the group, so it returns -EBUSY.
+>>>>>
+>>>>> I agree with Jacob, singleton groups should not be built into the IOMMU
+>>>>> API, we're not building an interface just for mdevs or current
+>>>>> limitations of mdevs.  This also means that setting a flag on the group
+>>>>> and passing a device that's assumed to be common for all devices within
+>>>>> the group, don't really make sense here.  Thanks,
+>>>>>
+>>>>> Alex
+>>>>
+>>>> Baolu and I discussed about this assumption before. The assumption is
+>>>> not based on singleton groups. We do consider multiple mdevs in one
+>>>> group. But our feeling at the moment is that all mdevs (or other AUX
+>>>> derivatives) in the same group should come from the same parent
+>>>> device, thus comes with above design. Does it sound a reasonable
+>>>> assumption to you?
+>>>
+>>> No, the approach in this series doesn't really make sense to me.  We
+>>> currently have the following workflow as Baolu notes in the cover
+>>> letter:
+>>>
+>>> 	domain = iommu_domain_alloc(bus);
+>>>
+>>> 	iommu_group_for_each_dev(group...
+>>>
+>>> 		iommu_device = mdev-magic()
+>>>
+>>> 		if (iommu_dev_feature_enabled(iommu_device,
+>>> 						IOMMU_DEV_FEAT_AUX))
+>>> 			iommu_aux_attach_device(domain, iommu_device);
+>>>
+>>> And we want to convert this to a group function, like we have for
+>>> non-aux domains:
+>>>
+>>> 	domain = iommu_domain_alloc(bus);
+>>>
+>>> 	iommu_device = mdev-magic()
+>>>
+>>> 	iommu_aux_attach_group(domain, group, iommu_device);
+>>>
+>>> And I think we want to do that largely because iommu_group.domain is
+>>> private to iommu.c (therefore vfio code cannot set it), but we need it
+>>> set in order for iommu_get_domain_for_dev() to work with a group
+>>> attached to an aux domain.  Passing an iommu_device avoids the problem
+>>> that IOMMU API code doesn't know how to derive an iommu_device for each
+>>> device in the group, but while doing so it ignores the fundamental
+>>> nature of a group as being a set of one or more devices.  Even if we
+>>> can make the leap that all devices within the group would use the same
+>>> iommu_device, an API that sets and aux domain for a group while
+>>> entirely ignoring the devices within the group seems very broken.
+>>
+>> Agreed. We couldn't assume that all devices in an iommu group shares a
+>> same iommu_device, especially when it comes to PF/VF wrapped mediated
+>> device case.
+>>
+>>>
+>>> So, barring adding an abstraction at struct device where an IOMMU API
+>>> could retrieve the iommu_device backing anther device (which seems a
+>>> very abstract concept for the base class), why not have the caller
+>>> provide a lookup function?  Ex:
+>>>
+>>> int iommu_aux_attach_group(struct iommu_domain *domain,
+>>> 			   struct iommu_group *group,
+>>> 			   struct device *(*iommu_device_lookup)(
+>>> 				struct device *dev));
+>>>
+>>> Thus vfio could could simply provide &vfio_mdev_get_iommu_device and
+>>> we'd have equivalent functionality to what we have currently, but with
+>>> the domain pointer set in the iommu_group.
+>>
+>> This looks good to me.
+>>
+>>>
+>>> This also however highlights that our VF backed mdevs will have the
+>>> same issue, so maybe this new IOMMU API interface should mimic
+>>> vfio_mdev_attach_domain() more directly, testing whether the resulting
+>>> device supports IOMMU_DEV_FEAT_AUX and using an aux vs non-aux attach.
+>>> I'm not sure what the name of this combined function should be,
+>>> iommu_attach_group_with_lookup()?  This could be the core
+>>> implementation of iommu_attach_group() where the existing function
+>>> simply wraps the call with a NULL function pointer.
+>>>
+>>> Anyway, I think there are ways to implement this that are more in line
+>>> with the spirit of groups.
+>>
+>> Another possible implementation, just for discussion purpose:
+>>
+>> 1. Add a member in group_device to save the iommu_device if it exists:
+>>
+>> diff --git a/drivers/iommu/iommu.c b/drivers/iommu/iommu.c
+>> index b6858adc4f17..6474e82cf4b4 100644
+>> --- a/drivers/iommu/iommu.c
+>> +++ b/drivers/iommu/iommu.c
+>> @@ -47,9 +47,16 @@ struct iommu_group {
+>>           struct list_head entry;
+>>    };
+>>
+>> +/*
+>> + * dma_alias: The device put in this group might depends on another
+>> + *            physical device to do the DMA remapping. At(de)taching
+>> + *            the domain to/from @dma_alias instead of @dev if
+>> + *            @dma_alias is set.
+>> + */
+>>    struct group_device {
+>>           struct list_head list;
+>>           struct device *dev;
+>> +       struct device *dma_alias;
+>>           char *name;
+>>    };
+>>
+>> 2. Pass in the iommu_device when calling iommu_group_add_device().
+>>
+>> int iommu_group_add_device(struct iommu_group *group,
+>>                              struct device *dev,
+>>                              struct device *dma_alias)
+>>
+>> Hence, the iommu core could get a chance to set the iommu_device in the
+>> group device.
+>>
+>> 3. Mimic vfio_mdev_attach_domain() logic in iommu_group_do_attach_device():
+>>
+>> if (group->dma_alias) {
+>> 	if (iommu_dev_feature_enabled(group->dma_alias, IOMMU_DEV_FEAT_AUX))
+>> 		iommu_aux_attach_device(domain, group->dma_alias);
+>> 	else
+>> 		__iommu_attach_device(domain, group->dma_alias);
+>> } else {
+>> 	__iommu_attach_device(domain, dev);
+>> }
+>>
+>> One limitation is that the driver should call mdev_set_iommu_device()
+>> before the mdev_probe() get called.
+> 
+> That's an option, but DMA aliases are an existing thing within our
+> IOMMU/PCI constructs, so I'd steer away from "dma_alias" terminology.  I
+> thought the callback was a little less invasive to the IOMMU layer for
+> now as aux domains are still a rather unique use case, and I'm not sure
+> we can justify the hack of otherwise IOMMU backed mdevs formally within
+> the IOMMU API.
 
-On 7/31/20 3:40 PM, Sean Christopherson wrote:
-> On Fri, Jul 24, 2020 at 06:54:47PM -0500, eric van tassell wrote:
->> Add 2 small infrastructure functions here which to enable pinning the SEV
->> guest pages used for sev_launch_update_data() using sev_get_page().
->>
->> Pin the memory for the data being passed to launch_update_data() because it
->> gets encrypted before the guest is first run and must not be moved which
->> would corrupt it.
->>
->> Signed-off-by: eric van tassell <Eric.VanTassell@amd.com>
->> ---
->>   arch/x86/kvm/svm/sev.c | 48 ++++++++++++++++++++++++++++++++++++++++++
->>   1 file changed, 48 insertions(+)
->>
->> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
->> index 040ae4aa7c5a..e0eed9a20a51 100644
->> --- a/arch/x86/kvm/svm/sev.c
->> +++ b/arch/x86/kvm/svm/sev.c
->> @@ -453,6 +453,37 @@ static int sev_get_page(struct kvm *kvm, gfn_t gfn, kvm_pfn_t pfn)
->>   	return 0;
->>   }
->>   
->> +static struct kvm_memory_slot *hva_to_memslot(struct kvm *kvm,
->> +					      unsigned long hva)
->> +{
->> +	struct kvm_memslots *slots = kvm_memslots(kvm);
->> +	struct kvm_memory_slot *memslot;
->> +
->> +	kvm_for_each_memslot(memslot, slots) {
->> +		if (hva >= memslot->userspace_addr &&
->> +		    hva < memslot->userspace_addr +
->> +			      (memslot->npages << PAGE_SHIFT))
->> +			return memslot;
->> +	}
->> +
->> +	return NULL;
->> +}
->> +
->> +static bool hva_to_gfn(struct kvm *kvm, unsigned long hva, gfn_t *gfn)
->> +{
->> +	struct kvm_memory_slot *memslot;
->> +	gpa_t gpa_offset;
->> +
->> +	memslot = hva_to_memslot(kvm, hva);
->> +	if (!memslot)
->> +		return false;
->> +
->> +	gpa_offset = hva - memslot->userspace_addr;
->> +	*gfn = ((memslot->base_gfn << PAGE_SHIFT) + gpa_offset) >> PAGE_SHIFT;
->> +
->> +	return true;
->> +}
->> +
->>   static int sev_launch_update_data(struct kvm *kvm, struct kvm_sev_cmd *argp)
->>   {
->>   	unsigned long vaddr, vaddr_end, next_vaddr, npages, pages, size, i;
->> @@ -483,6 +514,23 @@ static int sev_launch_update_data(struct kvm *kvm, struct kvm_sev_cmd *argp)
->>   		goto e_free;
->>   	}
->>   
->> +	/*
->> +	 * Increment the page ref count so that the pages do not get migrated or
->> +	 * moved after we are done from the LAUNCH_UPDATE_DATA.
->> +	 */
->> +	for (i = 0; i < npages; i++) {
->> +		gfn_t gfn;
->> +
->> +		if (!hva_to_gfn(kvm, (vaddr + (i * PAGE_SIZE)) & PAGE_MASK, &gfn)) {
-> 
-> This needs to hold kvm->srcu to block changes to memslots while looking up
-> the hva->gpa translation.
-I'll look into this.
-> 
->> +			ret = -EFAULT;
->> +			goto e_unpin;
->> +		}
->> +
->> +		ret = sev_get_page(kvm, gfn, page_to_pfn(inpages[i]));
-> 
-> Rather than dump everything into an xarray, KVM can instead pin the pages
-> by faulting them into its MMU.  By pinning pages in the MMU proper, KVM can
-> use software available bits in the SPTEs to track which pages are pinned,
-> can assert/WARN on unexpected behavior with respect to pinned pages, and
-> can drop/unpin pages as soon as they are no longer reachable from KVM, e.g.
-> when the mm_struct dies or the associated memslot is removed.
-> 
-> Leveraging the MMU would also make this extensible to non-SEV features,
-> e.g. it can be shared by VMX if VMX adds a feature that needs similar hooks
-> in the MMU.  Shoving the tracking in SEV means the core logic would need to
-> be duplicated for other features.
-> 
-> The big caveat is that funneling this through the MMU requires a vCPU[*],
-> i.e. is only viable if userspace has already created at least one vCPU.
-> For QEMU, this is guaranteed.  I don't know about other VMMs.
-> 
-> If there are VMMs that support SEV and don't create vCPUs before encrypting
-> guest memory, one option would be to automatically go down the optimized
-> route iff at least one vCPU has been created.  In other words, don't break
-> old VMMs, but don't carry more hacks to make them faster either.
-> 
-> It just so happens that I have some code that sort of implements the above.
-> I reworked it to mesh with SEV and will post it as an RFC.  It's far from
-> a tested-and-ready-to-roll implemenation, but I think it's fleshed out
-> enough to start a conversation.
-> 
-> [*] This isn't a hard requirement, i.e. KVM could be reworked to provide a
->      common MMU for non-nested TDP, but that's a much bigger effort.
-> 
-I will think about this. (I'm out of the office Monday and Tuesday.)
->> +		if (ret)
->> +			goto e_unpin;
->> +	}
->> +
->>   	/*
->>   	 * The LAUNCH_UPDATE command will perform in-place encryption of the
->>   	 * memory content (i.e it will write the same memory region with C=1).
->> -- 
->> 2.17.1
->>
+Fair enough. I will start with lookup callback solution.
+
+Best regards,
+baolu
