@@ -2,181 +2,167 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id F1B3523A119
-	for <lists+kvm@lfdr.de>; Mon,  3 Aug 2020 10:33:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 597DD23A1AB
+	for <lists+kvm@lfdr.de>; Mon,  3 Aug 2020 11:17:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726167AbgHCIdl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 3 Aug 2020 04:33:41 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:30822 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1725831AbgHCIdk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 3 Aug 2020 04:33:40 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1596443619;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=eiODh9iEk5Y1dLmycFGRV8bBkh4XdJ9QBJIGydOQe60=;
-        b=RrXygq2okYD0fthYgfbbv99nEXrGj7/rcAYaFR/mJQx1TmAvVSrcph3zzuw495MLYkCsOi
-        GTZ4dCRPak1UunfUVPGl6su0LqnXEnOBtpnzOXxnEe80Uryx3pCPcFliF/mCqwrXswchGd
-        +104sOWvbbH/fLiFEhC5iDzE6VuttWw=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-333-y6embGqIMTyNY_T3JCLjeA-1; Mon, 03 Aug 2020 04:33:35 -0400
-X-MC-Unique: y6embGqIMTyNY_T3JCLjeA-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        id S1726195AbgHCJRu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 3 Aug 2020 05:17:50 -0400
+Received: from relay5.mymailcheap.com ([159.100.241.64]:40896 "EHLO
+        relay5.mymailcheap.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725965AbgHCJRu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 3 Aug 2020 05:17:50 -0400
+Received: from relay4.mymailcheap.com (relay4.mymailcheap.com [137.74.199.117])
+        by relay5.mymailcheap.com (Postfix) with ESMTPS id 9F360206BD
+        for <kvm@vger.kernel.org>; Mon,  3 Aug 2020 09:17:48 +0000 (UTC)
+Received: from filter1.mymailcheap.com (filter1.mymailcheap.com [149.56.130.247])
+        by relay4.mymailcheap.com (Postfix) with ESMTPS id 265DD3F1D0;
+        Mon,  3 Aug 2020 11:17:45 +0200 (CEST)
+Received: from localhost (localhost [127.0.0.1])
+        by filter1.mymailcheap.com (Postfix) with ESMTP id 56F8F2A3BC;
+        Mon,  3 Aug 2020 05:17:44 -0400 (EDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=mymailcheap.com;
+        s=default; t=1596446264;
+        bh=22/goNB7gt/XyIaESxstbuULirnXgB6CEVT5iza0SEo=;
+        h=Subject:To:Cc:References:From:Date:In-Reply-To:From;
+        b=D3HX9gdmvUNlV+i63rHLXEm9L6hgAHZ59sf/KuYwrfgLdgjaB0RQB4L4qCy2n19jj
+         Odfj4bEyY0sQSoCs391HK1/akBH181CApeT3A6+hSKS8zumlfXtrB3CKBGs8AH567/
+         Up5MlxJVLNf4+lbq9ALJlCZFlYoy2giYAgigk8Ps=
+X-Virus-Scanned: Debian amavisd-new at filter1.mymailcheap.com
+Received: from filter1.mymailcheap.com ([127.0.0.1])
+        by localhost (filter1.mymailcheap.com [127.0.0.1]) (amavisd-new, port 10024)
+        with ESMTP id zBzcSTGfcWSy; Mon,  3 Aug 2020 05:17:42 -0400 (EDT)
+Received: from mail20.mymailcheap.com (mail20.mymailcheap.com [51.83.111.147])
+        (using TLSv1.2 with cipher ADH-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DF23180183C;
-        Mon,  3 Aug 2020 08:33:32 +0000 (UTC)
-Received: from gondolin (ovpn-112-197.ams2.redhat.com [10.36.112.197])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id A5AC787E35;
-        Mon,  3 Aug 2020 08:33:18 +0000 (UTC)
-Date:   Mon, 3 Aug 2020 10:33:07 +0200
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     David Gibson <david@gibson.dropbear.id.au>
-Cc:     Janosch Frank <frankja@linux.ibm.com>, dgilbert@redhat.com,
-        pair@us.ibm.com, qemu-devel@nongnu.org, pbonzini@redhat.com,
-        brijesh.singh@amd.com, Thomas Huth <thuth@redhat.com>,
-        "Daniel P. =?UTF-8?B?QmVycmFuZ8Op?=" <berrange@redhat.com>,
-        ehabkost@redhat.com, kvm@vger.kernel.org,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        David Hildenbrand <david@redhat.com>,
-        mdroth@linux.vnet.ibm.com, pasic@linux.ibm.com,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        qemu-s390x@nongnu.org, qemu-ppc@nongnu.org,
-        Richard Henderson <rth@twiddle.net>
-Subject: Re: [for-5.2 v4 10/10] s390: Recognize host-trust-limitation option
-Message-ID: <20200803103307.3b213a1c.cohuck@redhat.com>
-In-Reply-To: <20200803081457.GE7553@yekko.fritz.box>
-References: <20200724025744.69644-1-david@gibson.dropbear.id.au>
-        <20200724025744.69644-11-david@gibson.dropbear.id.au>
-        <8be75973-65bc-6d15-99b0-fbea9fe61c80@linux.ibm.com>
-        <20200803075459.GC7553@yekko.fritz.box>
-        <d8168c58-7935-99e7-dfe5-d97f22766bf7@linux.ibm.com>
-        <20200803081457.GE7553@yekko.fritz.box>
-Organization: Red Hat GmbH
+        by filter1.mymailcheap.com (Postfix) with ESMTPS;
+        Mon,  3 Aug 2020 05:17:42 -0400 (EDT)
+Received: from [148.251.23.173] (ml.mymailcheap.com [148.251.23.173])
+        by mail20.mymailcheap.com (Postfix) with ESMTP id 108B34014B;
+        Mon,  3 Aug 2020 09:17:41 +0000 (UTC)
+Authentication-Results: mail20.mymailcheap.com;
+        dkim=pass (1024-bit key; unprotected) header.d=flygoat.com header.i=@flygoat.com header.b="W34K0YrP";
+        dkim-atps=neutral
+AI-Spam-Status: Not processed
+Received: from [0.0.0.0] (n11212042148.netvigator.com [112.120.42.148])
+        (using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+         key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits))
+        (No client certificate requested)
+        by mail20.mymailcheap.com (Postfix) with ESMTPSA id E78D64014B;
+        Mon,  3 Aug 2020 09:13:47 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=flygoat.com;
+        s=default; t=1596446031;
+        bh=22/goNB7gt/XyIaESxstbuULirnXgB6CEVT5iza0SEo=;
+        h=Subject:To:Cc:References:From:Date:In-Reply-To:From;
+        b=W34K0YrPVs/+TXT0otCrjxRv25RDq7fmfcWDp1cksmaeCNo2WDmCJs2pIzu44t/Mp
+         GTFKPVM/vBXg/eIt2RZr111mQj7JtcmbK126XgqXC90gmOZoIxz1bQg/Iraim7ktdj
+         l+ueH+OqaTFCEoeEQJOiUpvU758niCr9miJuE04k=
+Subject: Re: [PATCH 2/5] dt-bindings: mips: Document Loongson kvm guest board
+To:     Huacai Chen <chenhc@lemote.com>
+Cc:     Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        Rob Herring <robh+dt@kernel.org>,
+        "open list:MIPS" <linux-mips@vger.kernel.org>,
+        kvm <kvm@vger.kernel.org>, Fuxin Zhang <zhangfx@lemote.com>
+References: <1596005919-29365-1-git-send-email-chenhc@lemote.com>
+ <1596005919-29365-2-git-send-email-chenhc@lemote.com>
+ <20200729095248.GA9234@alpha.franken.de>
+ <CAAhV-H7MzcW6Uv8XPaOh=5PmsFbRa9n=W1GjWP1WWwCYL_r-hA@mail.gmail.com>
+ <CAAhV-H4SXCmW8V-fXhGGiSQbM4cQ3bN3K76JK61Ms+vWxiuviw@mail.gmail.com>
+ <20200731083252.GA7946@alpha.franken.de>
+ <89376514-e6c1-469c-f212-865d7a549854@flygoat.com>
+ <CAAhV-H4amAWtNr-DTWV=W-g-B4eob3+zLjVDN5GgKMumnjqYjw@mail.gmail.com>
+From:   Jiaxun Yang <jiaxun.yang@flygoat.com>
+Message-ID: <a1147c93-8852-4a6f-fdee-214b64f2db65@flygoat.com>
+Date:   Mon, 3 Aug 2020 17:13:39 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; boundary="Sig_/JpL+alQ2rrMB=FqQpkLBumG";
- protocol="application/pgp-signature"; micalg=pgp-sha256
+In-Reply-To: <CAAhV-H4amAWtNr-DTWV=W-g-B4eob3+zLjVDN5GgKMumnjqYjw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-Rspamd-Queue-Id: 108B34014B
+X-Spamd-Result: default: False [1.40 / 10.00];
+         RCVD_VIA_SMTP_AUTH(0.00)[];
+         ARC_NA(0.00)[];
+         R_DKIM_ALLOW(0.00)[flygoat.com:s=default];
+         MID_RHS_MATCH_FROM(0.00)[];
+         FROM_HAS_DN(0.00)[];
+         FREEMAIL_ENVRCPT(0.00)[gmail.com];
+         TO_MATCH_ENVRCPT_ALL(0.00)[];
+         TAGGED_RCPT(0.00)[dt];
+         MIME_GOOD(-0.10)[text/plain];
+         R_SPF_SOFTFAIL(0.00)[~all];
+         HFILTER_HELO_BAREIP(3.00)[148.251.23.173,1];
+         ML_SERVERS(-3.10)[148.251.23.173];
+         DKIM_TRACE(0.00)[flygoat.com:+];
+         DMARC_POLICY_ALLOW(0.00)[flygoat.com,none];
+         RCPT_COUNT_SEVEN(0.00)[8];
+         DMARC_POLICY_ALLOW_WITH_FAILURES(0.00)[];
+         TO_DN_ALL(0.00)[];
+         RCVD_NO_TLS_LAST(0.10)[];
+         FROM_EQ_ENVFROM(0.00)[];
+         MIME_TRACE(0.00)[0:+];
+         ASN(0.00)[asn:24940, ipnet:148.251.0.0/16, country:DE];
+         FREEMAIL_CC(0.00)[alpha.franken.de,redhat.com,gmail.com,kernel.org,vger.kernel.org,lemote.com];
+         SUSPICIOUS_RECIPS(1.50)[];
+         RCVD_COUNT_TWO(0.00)[2]
+X-Rspamd-Server: mail20.mymailcheap.com
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
---Sig_/JpL+alQ2rrMB=FqQpkLBumG
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
 
-On Mon, 3 Aug 2020 18:14:57 +1000
-David Gibson <david@gibson.dropbear.id.au> wrote:
 
-> On Mon, Aug 03, 2020 at 10:07:42AM +0200, Janosch Frank wrote:
-> > On 8/3/20 9:54 AM, David Gibson wrote: =20
-> > > On Mon, Aug 03, 2020 at 09:49:42AM +0200, Janosch Frank wrote: =20
-> > >> On 7/24/20 4:57 AM, David Gibson wrote: =20
-> > >>> At least some s390 cpu models support "Protected Virtualization" (P=
-V),
-> > >>> a mechanism to protect guests from eavesdropping by a compromised
-> > >>> hypervisor.
-> > >>>
-> > >>> This is similar in function to other mechanisms like AMD's SEV and
-> > >>> POWER's PEF, which are controlled bythe "host-trust-limitation"
-> > >>> machine option.  s390 is a slightly special case, because we alread=
-y
-> > >>> supported PV, simply by using a CPU model with the required feature
-> > >>> (S390_FEAT_UNPACK).
-> > >>>
-> > >>> To integrate this with the option used by other platforms, we
-> > >>> implement the following compromise:
-> > >>>
-> > >>>  - When the host-trust-limitation option is set, s390 will recogniz=
-e
-> > >>>    it, verify that the CPU can support PV (failing if not) and set
-> > >>>    virtio default options necessary for encrypted or protected gues=
-ts,
-> > >>>    as on other platforms.  i.e. if host-trust-limitation is set, we
-> > >>>    will either create a guest capable of entering PV mode, or fail
-> > >>>    outright
-> > >>>
-> > >>>  - If host-trust-limitation is not set, guest's might still be able=
- to
-> > >>>    enter PV mode, if the CPU has the right model.  This may be a
-> > >>>    little surprising, but shouldn't actually be harmful. =20
-> > >>
-> > >> As I already explained, they have to continue to work without any ch=
-ange
-> > >> to the VM's configuration. =20
-> > >=20
-> > > Yes.. that's what I'm saying will happen.
-> > >  =20
-> > >> Our users already expect PV to work without HTL. This feature is alr=
-eady
-> > >> being used and the documentation has been online for a few months. I=
-'ve
-> > >> already heard enough complains because users found small errors in o=
-ur
-> > >> documentation. I'm not looking forward to complains because suddenly=
- we
-> > >> need to specify new command line arguments depending on the QEMU ver=
-sion.
-> > >>
-> > >> @Cornelia: QEMU is not my expertise, am I missing something here? =
-=20
-> > >=20
-> > > What I'm saying here is that you don't need a new option.  I'm only
-> > > suggesting we make the new option the preferred way for future
-> > > upstream releases.  (the new option has the advantage that you *just*
-> > > need to specify it, and any necessary virtio or other options to be
-> > > compatible should be handled for you).
-> > >=20
-> > > But existing configurations should work as is (I'm not sure they do
-> > > with the current patch, because I'm not familiar with the s390 code
-> > > and have no means to test PV, but that can be sorted out before
-> > > merge).
-> > >  =20
-> > OK, should and might are two different things so I was a bit concerned.
-> > That's fine then, thanks for the answer. =20
->=20
-> Well, the "should" and "might" are covering different things.
-> Existing working command lines should continue to work.  But those
-> command lines must already have the necessary tweaks to make virtio
-> work properly.  If you try to make a new command line for a PV guest
-> with a virtio device - or anything else that introduces extra PV
-> complications - then just chosing a CPU model with UNPACK might not be
-> enough.  By contrast, if you set host-trust-limitation, then it should
-> work and be PV capable with an arbitrary set of devices, or else fail
-> immediately with a meaningful error.
+在 2020/8/3 下午2:05, Huacai Chen 写道:
+> Hi, Thomas,
+>
+> On Fri, Jul 31, 2020 at 7:57 PM Jiaxun Yang <jiaxun.yang@flygoat.com> wrote:
+>>
+>>
+>> 在 2020/7/31 下午4:32, Thomas Bogendoerfer 写道:
+>>> On Fri, Jul 31, 2020 at 11:01:58AM +0800, Huacai Chen wrote:
+>>>> Hi, Thomas,
+>>>>
+>>>> On Wed, Jul 29, 2020 at 6:08 PM Huacai Chen <chenhc@lemote.com> wrote:
+>>>>> Hi, Thomas,
+>>>>>
+>>>>>
+>>>>> On Wed, Jul 29, 2020 at 6:00 PM Thomas Bogendoerfer
+>>>>> <tsbogend@alpha.franken.de> wrote:
+>>>>>> On Wed, Jul 29, 2020 at 02:58:36PM +0800, Huacai Chen wrote:
+>>>>>>> Document loongson64v-4core-virtio, a virtio based kvm guest board for
+>>>>>>> Loongson-3.
+>>>>>>>
+>>>>>>> Signed-off-by: Huacai Chen <chenhc@lemote.com>
+>>>>>>> Signed-off-by: Jiaxun Yang <jiaxun.yang@flygoat.com>
+>>>>>>> Signed-off-by: Thomas Bogendoerfer <tsbogend@alpha.franken.de>
+>>>>>> hmm, I can't remember adding my signed-off to this patch. Could you
+>>>>>> give me a reference for this ?
+>>>>>>
+>>>>> I'm sorry, this is a copy paste error..
+>>>>>
+>>>> Should I send V2 for this series?
+>>> no, if nothing else needs a resent. Problem with this series is,
+>>> that it touches a few places, so it's not clear who should merge
+>>> it...
+>> Actually the first patch is already in the next. I suspect they should
+>> go through MIPS tree.
+>> Probably this patch needs a ack from Rob?
+> I agree with Jiaxun, this series should go through MIPS tree.
 
-Yes, that was also my understanding.
+I'd suggest to have a topic branch for this after getting PCI tree merged.
 
-Getting the interaction with the cpu model right seems to be the tricky
-part, though. The UNPACK feature would only be set automatically
-_after_ the htl device has already checked for it...
+Anyway, I really wish to see this as a part of 5.9 release.
 
---Sig_/JpL+alQ2rrMB=FqQpkLBumG
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
+Thanks.
 
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEw9DWbcNiT/aowBjO3s9rk8bwL68FAl8ny8MACgkQ3s9rk8bw
-L68bYhAAgJSdtqjUzbxvCFFHLhDpjwAQY/kiMyI+yqVHl6hMxa/57Xiz76RXAiVL
-nM3Uptu8TPHJa9nh1XYN6Zt8kCU/KIg2wZCKqap60EbmfIBFH8f0dfeouPGDmxDu
-o6OY5wwnJNnD4iJgUxHv9PYWj8DKGXDc10xP4H4lO1jtIBXGfdcP0Y1JKrmY+ztj
-zfZF6XFCgLuFpS3MMzk1eIryiDnxGn3PS4nZEq3fdi8GgRinbWgdiI5Yez4e4B5D
-NMnFcv1+vbh8HVSUUFAkw9/heZOPpqZzknF5aEP3b2q6v7lDPChv/v+ttnsLeipY
-Ln8L9w56lRKZNRCf5YrA/wsIygjwdSRqjHx0JrzOZJtTXcVPWrqYIj6ZdMucKhO8
-v+gzUB2hnOvag9hR507LKmgQXb4fwdng4dhZPUxvBR1EwUZG8It4yj1fxvms5t9k
-8TKSG/8i5HTEeUHPJZXZBfriYu2suiqwS2WWTR3ClPMSVA657t6YWPI4VtfX1uVB
-dN0seJXgl0MjfjOoPAu4eoITVbx/NzHHqdMlVRTedewVUVeQIbuEdu8qR/q2xknH
-4RKvdBy1uzz7Aqu/1VpughHs2E8r8wuPghN4k+MSKkFMrd1rsuWNIC6pANJCkgtX
-qraO5PLlimfLqOkO21/C69YVtuetALZ9z9uE9hPjaa/a98+grzo=
-=p0E1
------END PGP SIGNATURE-----
-
---Sig_/JpL+alQ2rrMB=FqQpkLBumG--
-
+- Jiaxun
+>
+> Huacai
+>> - Jiaxun
+>>
+>>> Thomas.
+>>>
