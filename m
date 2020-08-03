@@ -2,113 +2,183 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 16614239D6E
-	for <lists+kvm@lfdr.de>; Mon,  3 Aug 2020 04:15:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 44320239D77
+	for <lists+kvm@lfdr.de>; Mon,  3 Aug 2020 04:20:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725924AbgHCCPT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 2 Aug 2020 22:15:19 -0400
-Received: from szxga04-in.huawei.com ([45.249.212.190]:9319 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1725820AbgHCCPT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 2 Aug 2020 22:15:19 -0400
-Received: from DGGEMS409-HUB.china.huawei.com (unknown [172.30.72.60])
-        by Forcepoint Email with ESMTP id 66B73CAFDBFEB9A71E88;
-        Mon,  3 Aug 2020 10:15:17 +0800 (CST)
-Received: from [127.0.0.1] (10.174.187.42) by DGGEMS409-HUB.china.huawei.com
- (10.3.19.209) with Microsoft SMTP Server id 14.3.487.0; Mon, 3 Aug 2020
- 10:15:06 +0800
-Subject: Re: [kvm-unit-tests PATCH v3 00/10] arm/arm64: Add IPI/LPI/vtimer
- latency test
-To:     Andrew Jones <drjones@redhat.com>
-CC:     <kvm@vger.kernel.org>, <kvmarm@lists.cs.columbia.edu>,
-        <maz@kernel.org>, <wanghaibin.wang@huawei.com>,
-        <yuzenghui@huawei.com>, <eric.auger@redhat.com>,
-        <prime.zeng@hisilicon.com>
-References: <20200731074244.20432-1-wangjingyi11@huawei.com>
- <20200731120117.5kk22hx2wpbt6kpz@kamzik.brq.redhat.com>
-From:   Jingyi Wang <wangjingyi11@huawei.com>
-Message-ID: <b5263ff5-385f-cf03-33bd-3d4efd3bcdab@huawei.com>
-Date:   Mon, 3 Aug 2020 10:15:05 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+        id S1726321AbgHCCUb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 2 Aug 2020 22:20:31 -0400
+Received: from mga07.intel.com ([134.134.136.100]:64772 "EHLO mga07.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725820AbgHCCUb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 2 Aug 2020 22:20:31 -0400
+IronPort-SDR: E42l+X6uc+x0susDBFNWFK1kuROhbRZF3kO2BaTfxeNNloQqv4jHWftIJG0Q3JNns724cmMvkf
+ 3qegQIiWCppQ==
+X-IronPort-AV: E=McAfee;i="6000,8403,9701"; a="216461700"
+X-IronPort-AV: E=Sophos;i="5.75,428,1589266800"; 
+   d="scan'208";a="216461700"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Aug 2020 19:20:29 -0700
+IronPort-SDR: qBWMv2KDbNwROoK6QxaoQTKg3p7yCiwqOsxCFMDmeLzSALxSB3YfchntlexrlpC10igfhQ/2Jw
+ Jb+scsqpJqsQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.75,428,1589266800"; 
+   d="scan'208";a="395909209"
+Received: from allen-box.sh.intel.com (HELO [10.239.159.139]) ([10.239.159.139])
+  by fmsmga001.fm.intel.com with ESMTP; 02 Aug 2020 19:20:26 -0700
+Cc:     baolu.lu@linux.intel.com, Joerg Roedel <joro@8bytes.org>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Jean-Philippe Brucker <jean-philippe@linaro.org>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Kevin Tian <kevin.tian@intel.com>,
+        Ashok Raj <ashok.raj@intel.com>,
+        Dave Jiang <dave.jiang@intel.com>,
+        Liu Yi L <yi.l.liu@intel.com>,
+        iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+Subject: Re: [PATCH v3 3/4] iommu: Add iommu_aux_get_domain_for_dev()
+To:     Alex Williamson <alex.williamson@redhat.com>
+References: <20200714055703.5510-1-baolu.lu@linux.intel.com>
+ <20200714055703.5510-4-baolu.lu@linux.intel.com>
+ <20200729142507.182cd18a@x1.home>
+ <06fd91c1-a978-d526-7e2b-fec619a458e4@linux.intel.com>
+ <20200731121418.0274afb8@x1.home>
+From:   Lu Baolu <baolu.lu@linux.intel.com>
+Message-ID: <3fd171a2-a5cc-89d7-f539-04eb2faf130f@linux.intel.com>
+Date:   Mon, 3 Aug 2020 10:15:27 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <20200731120117.5kk22hx2wpbt6kpz@kamzik.brq.redhat.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
+In-Reply-To: <20200731121418.0274afb8@x1.home>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.174.187.42]
-X-CFilter-Loop: Reflected
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Hi Alex,
 
+On 8/1/20 2:14 AM, Alex Williamson wrote:
+> On Fri, 31 Jul 2020 14:30:03 +0800
+> Lu Baolu <baolu.lu@linux.intel.com> wrote:
+> 
+>> Hi Alex,
+>>
+>> On 2020/7/30 4:25, Alex Williamson wrote:
+>>> On Tue, 14 Jul 2020 13:57:02 +0800
+>>> Lu Baolu<baolu.lu@linux.intel.com>  wrote:
+>>>    
+>>>> The device driver needs an API to get its aux-domain. A typical usage
+>>>> scenario is:
+>>>>
+>>>>           unsigned long pasid;
+>>>>           struct iommu_domain *domain;
+>>>>           struct device *dev = mdev_dev(mdev);
+>>>>           struct device *iommu_device = vfio_mdev_get_iommu_device(dev);
+>>>>
+>>>>           domain = iommu_aux_get_domain_for_dev(dev);
+>>>>           if (!domain)
+>>>>                   return -ENODEV;
+>>>>
+>>>>           pasid = iommu_aux_get_pasid(domain, iommu_device);
+>>>>           if (pasid <= 0)
+>>>>                   return -EINVAL;
+>>>>
+>>>>            /* Program the device context */
+>>>>            ....
+>>>>
+>>>> This adds an API for such use case.
+>>>>
+>>>> Suggested-by: Alex Williamson<alex.williamson@redhat.com>
+>>>> Signed-off-by: Lu Baolu<baolu.lu@linux.intel.com>
+>>>> ---
+>>>>    drivers/iommu/iommu.c | 18 ++++++++++++++++++
+>>>>    include/linux/iommu.h |  7 +++++++
+>>>>    2 files changed, 25 insertions(+)
+>>>>
+>>>> diff --git a/drivers/iommu/iommu.c b/drivers/iommu/iommu.c
+>>>> index cad5a19ebf22..434bf42b6b9b 100644
+>>>> --- a/drivers/iommu/iommu.c
+>>>> +++ b/drivers/iommu/iommu.c
+>>>> @@ -2817,6 +2817,24 @@ void iommu_aux_detach_group(struct iommu_domain *domain,
+>>>>    }
+>>>>    EXPORT_SYMBOL_GPL(iommu_aux_detach_group);
+>>>>    
+>>>> +struct iommu_domain *iommu_aux_get_domain_for_dev(struct device *dev)
+>>>> +{
+>>>> +	struct iommu_domain *domain = NULL;
+>>>> +	struct iommu_group *group;
+>>>> +
+>>>> +	group = iommu_group_get(dev);
+>>>> +	if (!group)
+>>>> +		return NULL;
+>>>> +
+>>>> +	if (group->aux_domain_attached)
+>>>> +		domain = group->domain;
+>>> Why wouldn't the aux domain flag be on the domain itself rather than
+>>> the group?  Then if we wanted sanity checking in patch 1/ we'd only
+>>> need to test the flag on the object we're provided.
+>>
+>> Agreed. Given that a group may contain both non-aux and aux devices,
+>> adding such flag in iommu_group doesn't make sense.
+>>
+>>>
+>>> If we had such a flag, we could create an iommu_domain_is_aux()
+>>> function and then simply use iommu_get_domain_for_dev() and test that
+>>> it's an aux domain in the example use case.  It seems like that would
+>>> resolve the jump from a domain to an aux-domain just as well as adding
+>>> this separate iommu_aux_get_domain_for_dev() interface.  The is_aux
+>>> test might also be useful in other cases too.
+>>
+>> Let's rehearsal our use case.
+>>
+>>           unsigned long pasid;
+>>           struct iommu_domain *domain;
+>>           struct device *dev = mdev_dev(mdev);
+>>           struct device *iommu_device = vfio_mdev_get_iommu_device(dev);
+>>
+>> [1]     domain = iommu_get_domain_for_dev(dev);
+>>           if (!domain)
+>>                   return -ENODEV;
+>>
+>> [2]     pasid = iommu_aux_get_pasid(domain, iommu_device);
+>>           if (pasid <= 0)
+>>                   return -EINVAL;
+>>
+>>            /* Program the device context */
+>>            ....
+>>
+>> The reason why I add this iommu_aux_get_domain_for_dev() is that we need
+>> to make sure the domain got at [1] is valid to be used at [2].
+>>
+>> https://lore.kernel.org/linux-iommu/20200707150408.474d81f1@x1.home/
+> 
+> Yep, I thought that was a bit of a leap in logic.
+> 
+>> When calling into iommu_aux_get_pasid(), the iommu driver should make
+>> sure that @domain is a valid aux-domain for @iommu_device. Hence, for
+>> our use case, it seems that there's no need for a is_aux_domain() api.
+>>
+>> Anyway, I'm not against adding a new is_aux_domain() api if there's a
+>> need elsewhere.
+> 
+> I think it could work either way, we could have an
+> iommu_get_aux_domain_for_dev() which returns NULL if the domain is not
+> an aux domain, or we could use iommu_get_domain_for_dev() and the
+> caller could test the domain with iommu_is_aux_domain() if they need to
+> confirm if it's an aux domain.  The former could even be written using
+> the latter, a wrapper of iommu_get_domain_for_dev() that checks aux
+> property before returning.
 
-On 7/31/2020 8:01 PM, Andrew Jones wrote:
-> On Fri, Jul 31, 2020 at 03:42:34PM +0800, Jingyi Wang wrote:
->> With the development of arm gic architecture, we think it will be useful
->> to add some performance test in kut to measure the cost of interrupts.
->> In this series, we add GICv4.1 support for ipi latency test and
->> implement LPI/vtimer latency test.
->>
->> This series of patches has been tested on GICv4.1 supported hardware.
->>
->> Note:
->> Based on patch "arm/arm64: timer: Extract irqs at setup time",
->> https://www.spinics.net/lists/kvm-arm/msg41425.html
->>
->> * From v2:
->>    - Code and commit message cleanup
->>    - Clear nr_ipi_received before ipi_exec() thanks for Tao Zeng's review
->>    - rebase the patch "Add vtimer latency test" on Andrew's patch
-> 
-> It'd be good if you'd reposted my patch along with this series, since we
-> didn't merge mine yet either. Don't worry about now, though, I'll pick it
-> up the same time I pick up this series, which I plan to do later today
-> or tomorrow.
-> 
-> Getting this series applied will allow me to try out our new and shiny
-> gitlab repo :-)
-> 
-> Thanks,
-> drew
-> 
+Okay. So iommu_get_domain_for_dev() and iommu_is_aux_domain() are what
+we wanted. The iommu_get_domain_for_dev() could be a simple wrapper of
+them.
 
-Thanks for your reviewing and fix.
+Thanks a lot for the guide. I will implement a new version according to
+the feedbacks.
 
->>    - Add test->post() to get actual PPI latency
->>
->> * From v1:
->>    - Fix spelling mistake
->>    - Use the existing interface to inject hw sgi to simply the logic
->>    - Add two separate patches to limit the running times and time cost
->>      of each individual micro-bench test
->>
->> Jingyi Wang (10):
->>    arm64: microbench: get correct ipi received num
->>    arm64: microbench: Generalize ipi test names
->>    arm64: microbench: gic: Add ipi latency test for gicv4.1 support kvm
->>    arm64: its: Handle its command queue wrapping
->>    arm64: microbench: its: Add LPI latency test
->>    arm64: microbench: Allow each test to specify its running times
->>    arm64: microbench: Add time limit for each individual test
->>    arm64: microbench: Add vtimer latency test
->>    arm64: microbench: Add test->post() to further process test results
->>    arm64: microbench: Add timer_post() to get actual PPI latency
->>
->>   arm/micro-bench.c          | 256 ++++++++++++++++++++++++++++++-------
->>   lib/arm/asm/gic-v3.h       |   3 +
->>   lib/arm/asm/gic.h          |   1 +
->>   lib/arm64/gic-v3-its-cmd.c |   3 +-
->>   4 files changed, 219 insertions(+), 44 deletions(-)
->>
->> -- 
->> 2.19.1
->>
->>
-> 
-> 
-> .
-> 
-
+Best regards,
+baolu
