@@ -2,98 +2,143 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 453C523A6FA
-	for <lists+kvm@lfdr.de>; Mon,  3 Aug 2020 14:57:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8059E23A76C
+	for <lists+kvm@lfdr.de>; Mon,  3 Aug 2020 15:25:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727912AbgHCM4i (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 3 Aug 2020 08:56:38 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:20139 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1729713AbgHCM4X (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 3 Aug 2020 08:56:23 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1596459382;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=j08PD5TKmptgvWzFXs3mBZWsz6N4iiWTg8v49XuWVeU=;
-        b=GKdz7Ghr9YShd9AGoU4Cb4IoDWihBHvRqGUTgFFiiJNBGtckEbvBL324XpbNOudf37NTss
-        R60lFdKZIQfwHmRF8GzSKv5p77Acc6c5lQi989cCnkQq3b0EVQcCiv3O3bQhZZ3PVc8SFG
-        Rvi1nrBbsSUI0HCwwuxfwQO2RA5YWg0=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-377-eT7CheHBPY6YfrjEyBZDSQ-1; Mon, 03 Aug 2020 08:56:20 -0400
-X-MC-Unique: eT7CheHBPY6YfrjEyBZDSQ-1
-Received: by mail-wr1-f69.google.com with SMTP id j2so9030414wrr.14
-        for <kvm@vger.kernel.org>; Mon, 03 Aug 2020 05:56:20 -0700 (PDT)
+        id S1726864AbgHCNZk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 3 Aug 2020 09:25:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51436 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726478AbgHCNZj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 3 Aug 2020 09:25:39 -0400
+Received: from mail-il1-x143.google.com (mail-il1-x143.google.com [IPv6:2607:f8b0:4864:20::143])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 94641C06174A
+        for <kvm@vger.kernel.org>; Mon,  3 Aug 2020 06:25:39 -0700 (PDT)
+Received: by mail-il1-x143.google.com with SMTP id z3so20839810ilh.3
+        for <kvm@vger.kernel.org>; Mon, 03 Aug 2020 06:25:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=c2vK/1zu2OP/s7TIUiQTFoYDV/b0nUZhW8aW8ydvfvQ=;
+        b=PHLwvD/8MG7vXtdgxgOkv+dblHiq1c0cJDd430K0FLAATpdMqtknJeD4BIuPQSbMbk
+         PUh5ndi5I6pJ1XtpdUjfPSOvneWg8hfsnO4NS0a2zyyFI2kntrN6AvFtuEcrreEU+Gxq
+         L9S4Z64P6Q7tv0ZvKDznX82M7XQVFGsYdIxdF1YnOlY1HwkGoqAvklkUhjGrzzgTXBN3
+         XXVWO11KvPD8isrwVqHZzhhH4VGdr3DZ1RQiM9bhox0eK+2YKRGPu4SiKq9+S4E94b1B
+         7JFLkytkhJ5pADDj5DSOD9GEeqBunCL4FCgN7bAeJusZnPmudqpMmgjTfyteU91PKK42
+         31nA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=j08PD5TKmptgvWzFXs3mBZWsz6N4iiWTg8v49XuWVeU=;
-        b=RF55NJWrLDfqTCMltS4VjwAh0gaMSNxRXJ6AuPcV5CL1hnPvg9Fhd72XA4Gn79J6nt
-         NmZCaRswM7yvqtSXf/z/J+JDmvFc5tbxsuwv2tR/uNX4Vqb56c6TX2dJiiE56UTdsSeQ
-         4MSaDlGqmMWny72mnbx76avvtcy8ONHeKfIKsMCXdmvTsli8JjRkX+D9vqa8NpQrgmzp
-         Vr/0RElYfgDCEzUfjxvE6fYPgbIdittkWWkUK2fJfU/pNInSmEvbJqnuv3KOgGc1V88C
-         HNnG4nsMt24kD35PNj8k0kZ+yPzk9hVTWmILvONuWeqkbX/H+SwACxqTcTJFW0tzjNyJ
-         9VJA==
-X-Gm-Message-State: AOAM532oQ5SfDPgCT/bBLaYK1xLfTWdZV2933lEQ+RIK6zoF1RySho45
-        2nMF/mt0eZKlIC+ylJi3FPco48UXUNwsTAKhzFGB0RGBBZ4lnciH2nbKpgEOe0r67+P9SoiMe3a
-        8OvIMCw0V7XeJ
-X-Received: by 2002:a05:600c:224e:: with SMTP id a14mr35962wmm.80.1596459379611;
-        Mon, 03 Aug 2020 05:56:19 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxpW1uePH536qqOxGNXww+3gN09vvUWEp1fYIiGFThtlO3NOlBdsdybu1o6t4YT+t/ZuhUTSg==
-X-Received: by 2002:a05:600c:224e:: with SMTP id a14mr35945wmm.80.1596459379370;
-        Mon, 03 Aug 2020 05:56:19 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:7841:78cc:18c6:1e20? ([2001:b07:6468:f312:7841:78cc:18c6:1e20])
-        by smtp.gmail.com with ESMTPSA id o125sm7749016wma.27.2020.08.03.05.56.18
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 03 Aug 2020 05:56:18 -0700 (PDT)
-Subject: Re: [kvm-unit-tests PATCH] x86: tscdeadline timer testing when apic
- is hw disabled
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <kernellwp@gmail.com>, kvm@vger.kernel.org
-Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>
-References: <1596441715-14959-1-git-send-email-wanpengli@tencent.com>
- <87wo2fq4up.fsf@vitty.brq.redhat.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <aa3131be-5421-5a06-c582-232d6b34fe38@redhat.com>
-Date:   Mon, 3 Aug 2020 14:56:17 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.9.0
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=c2vK/1zu2OP/s7TIUiQTFoYDV/b0nUZhW8aW8ydvfvQ=;
+        b=quclMp7u+ANrwJLQfLWgpoI7o9erETDZDgd2CUzS4iz1FTWj/nFdrRbV3/bVDLOrvL
+         1sDeBLNNQx/ZjWhicbLBf9QTEhAUXuWezptloLtDIFxNtl6HvdOBc1CNrXPl38xqhIrt
+         WUWWoeu0f/KEroV4dEHSXu//CIGD36I0e+K94dy7a0JN7jhd6E0yC51NTIFMHUdof/3D
+         UMRjLCMtDjG7WLdy+IgAmVxWNtW0rFMlvTIFLzJI1VlKXpERDqtoUiapY1YM097a61rs
+         zvygo1ag3sGV0lCLmM1iJKaIp9Jjdu+lLpawxBtEyXnGdUdqlnIDMe/DgGtKNZqoOENf
+         1Ozg==
+X-Gm-Message-State: AOAM530e/GSReM62nnGGcyl22aeHaa8R+93p67EmqdQgqYgvq9uh7f84
+        oFZ3mdrOzSk2QwStLyO5zsbNgE1wrjTo7/P+xkFUDA==
+X-Google-Smtp-Source: ABdhPJz3dmegEtXXbFm/awaeYdh78FtTf6HjPxXdxh7UD1kqoG0Woo68Y2QRCQ/xlUxwFhylaOjFprYSoC/sXrn5ktc=
+X-Received: by 2002:a92:84d2:: with SMTP id y79mr9863524ilk.50.1596461138925;
+ Mon, 03 Aug 2020 06:25:38 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <87wo2fq4up.fsf@vitty.brq.redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+References: <20200722150927.15587-1-guennadi.liakhovetski@linux.intel.com>
+ <20200730120805-mutt-send-email-mst@kernel.org> <20200731054752.GA28005@ubuntu>
+In-Reply-To: <20200731054752.GA28005@ubuntu>
+From:   Mathieu Poirier <mathieu.poirier@linaro.org>
+Date:   Mon, 3 Aug 2020 07:25:24 -0600
+Message-ID: <CANLsYkxuCf6yeoqJ-T2x3LHvr9+DuxFdcsxJPmrh9A4H8yNr3w@mail.gmail.com>
+Subject: Re: [PATCH v4 0/4] Add a vhost RPMsg API
+To:     Guennadi Liakhovetski <guennadi.liakhovetski@linux.intel.com>
+Cc:     "Michael S. Tsirkin" <mst@redhat.com>, kvm@vger.kernel.org,
+        linux-remoteproc <linux-remoteproc@vger.kernel.org>,
+        virtualization@lists.linux-foundation.org,
+        sound-open-firmware@alsa-project.org,
+        Pierre-Louis Bossart <pierre-louis.bossart@linux.intel.com>,
+        Liam Girdwood <liam.r.girdwood@linux.intel.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Ohad Ben-Cohen <ohad@wizery.com>,
+        Bjorn Andersson <bjorn.andersson@linaro.org>,
+        Vincent Whitchurch <vincent.whitchurch@axis.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 03/08/20 14:41, Vitaly Kuznetsov wrote:
->> -    report(tdt_count == 1, "tsc deadline timer");
->> -    report(rdmsr(MSR_IA32_TSCDEADLINE) == 0, "tsc deadline timer clearing");
->> +    if (apic_enabled) {
->> +        report(tdt_count == 1, "tsc deadline timer");
->> +        report(rdmsr(MSR_IA32_TSCDEADLINE) == 0, "tsc deadline timer clearing");
->> +    } else
->> +        report(rdmsr(MSR_IA32_TSCDEADLINE) == 0, "tsc deadline timer is not set");
-> I'd suggest we also check that the timer didn't fire, e.g.
-> 
-> report(tdt_count == 0, "tsc deadline timer didn't fire");
-> 
-> as a bonus, we'd get another reason to use braces for both branches of
-> the 'if' (which is a good thing regardless).
-> 
+On Thu, 30 Jul 2020 at 23:47, Guennadi Liakhovetski
+<guennadi.liakhovetski@linux.intel.com> wrote:
+>
+> Hi Michael,
+>
+> On Thu, Jul 30, 2020 at 12:08:29PM -0400, Michael S. Tsirkin wrote:
+> > On Wed, Jul 22, 2020 at 05:09:23PM +0200, Guennadi Liakhovetski wrote:
+> > > Hi,
+> > >
+> > > Now that virtio-rpmsg endianness fixes have been merged we can
+> > > proceed with the next step.
+> >
+> > Which tree is this for?
+>
+> The essential part of this series is for drivers/vhost, so, I presume
+> that should be the target tree as well. There is however a small part
+> for the drivers/rpmsg, should I split this series in two or shall we
+> first review is as a whole to make its goals clearer?
 
-Agreed, and KVM also needs to return 0 if the APIC is hardware-disabled
-I think?
+I suggest to keep it whole for now.
 
-Paolo
-
+>
+> Thanks
+> Guennadi
+>
+> > > v4:
+> > > - add endianness conversions to comply with the VirtIO standard
+> > >
+> > > v3:
+> > > - address several checkpatch warnings
+> > > - address comments from Mathieu Poirier
+> > >
+> > > v2:
+> > > - update patch #5 with a correct vhost_dev_init() prototype
+> > > - drop patch #6 - it depends on a different patch, that is currently
+> > >   an RFC
+> > > - address comments from Pierre-Louis Bossart:
+> > >   * remove "default n" from Kconfig
+> > >
+> > > Linux supports RPMsg over VirtIO for "remote processor" / AMP use
+> > > cases. It can however also be used for virtualisation scenarios,
+> > > e.g. when using KVM to run Linux on both the host and the guests.
+> > > This patch set adds a wrapper API to facilitate writing vhost
+> > > drivers for such RPMsg-based solutions. The first use case is an
+> > > audio DSP virtualisation project, currently under development, ready
+> > > for review and submission, available at
+> > > https://github.com/thesofproject/linux/pull/1501/commits
+> > >
+> > > Thanks
+> > > Guennadi
+> > >
+> > > Guennadi Liakhovetski (4):
+> > >   vhost: convert VHOST_VSOCK_SET_RUNNING to a generic ioctl
+> > >   rpmsg: move common structures and defines to headers
+> > >   rpmsg: update documentation
+> > >   vhost: add an RPMsg API
+> > >
+> > >  Documentation/rpmsg.txt          |   6 +-
+> > >  drivers/rpmsg/virtio_rpmsg_bus.c |  78 +------
+> > >  drivers/vhost/Kconfig            |   7 +
+> > >  drivers/vhost/Makefile           |   3 +
+> > >  drivers/vhost/rpmsg.c            | 375 +++++++++++++++++++++++++++++++
+> > >  drivers/vhost/vhost_rpmsg.h      |  74 ++++++
+> > >  include/linux/virtio_rpmsg.h     |  83 +++++++
+> > >  include/uapi/linux/rpmsg.h       |   3 +
+> > >  include/uapi/linux/vhost.h       |   4 +-
+> > >  9 files changed, 553 insertions(+), 80 deletions(-)
+> > >  create mode 100644 drivers/vhost/rpmsg.c
+> > >  create mode 100644 drivers/vhost/vhost_rpmsg.h
+> > >  create mode 100644 include/linux/virtio_rpmsg.h
+> > >
+> > > --
+> > > 2.27.0
+> >
