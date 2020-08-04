@@ -2,167 +2,258 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D7CC023B6F6
-	for <lists+kvm@lfdr.de>; Tue,  4 Aug 2020 10:42:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DF3FE23B713
+	for <lists+kvm@lfdr.de>; Tue,  4 Aug 2020 10:52:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729798AbgHDImj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 4 Aug 2020 04:42:39 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:21798 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726233AbgHDImi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 4 Aug 2020 04:42:38 -0400
+        id S1730004AbgHDIwO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 4 Aug 2020 04:52:14 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:23246 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1729586AbgHDIwO (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 4 Aug 2020 04:52:14 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1596530557;
+        s=mimecast20190719; t=1596531132;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=SQN2omUmbLugG62IVKIBTw16+eueSOPnGyTIHs/+g+w=;
-        b=Z9sgA1nnTZiF0ijATh2p/d5Urh9gZ1QRlXCCS0wrX2/rmMgmwXcwj3M7honcQdInP5VoUc
-        VtBUW32FEX2IxhlbtQDhmL3QMI++RqOnnxpdrtJF+kjDgK0mWacFRGd4UKZ+EAAM4LIIWi
-        8UMmT5HuuJyzVBrgrU0CQhHGvHf5VlU=
-Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
- [209.85.218.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-506-kpPt_QETORmakgbmOrUpcw-1; Tue, 04 Aug 2020 04:42:35 -0400
-X-MC-Unique: kpPt_QETORmakgbmOrUpcw-1
-Received: by mail-ej1-f72.google.com with SMTP id z14so13705713eje.19
-        for <kvm@vger.kernel.org>; Tue, 04 Aug 2020 01:42:35 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=SQN2omUmbLugG62IVKIBTw16+eueSOPnGyTIHs/+g+w=;
-        b=XnSLJ3c3NVA/HbX5ZZKxIji67GJ770sD23usCTOMcV1d1UO9MvAxNpvSe8dsNBHoz+
-         4VLl7VrfhqhIdXbcRhlgt9mjanKCUJCQN0MF876ocpej/CK0ibONAoRRHiYceO5+MIMx
-         pLHIvyzAIv1I0klmxc1gyt4sqH/FIW6CcuyF5MiTsKJnNeDSrLNlmn2DreGXI/nV35Un
-         c5ho/xYegVF25k0ySEOmMcqpOYdVe7gXIQV5FtUP6eAVBHEuMGv1rt7BV0AcyJpIkPVS
-         1PD/KEOc2vc7tG2r3P6regY9uCTfUFIxKWVpFZDgPwTiSrDOW/MSAwp0zFB7hhPycNH8
-         FPIw==
-X-Gm-Message-State: AOAM531zs/YV4Jb5acvpz5smjANinPjZ8IMNltMANaI39Qfmr1bEyaVq
-        bVbJebykNk0ZzrDR3k/jdcYxFk3Pq3IMB02WXDKk0KLCGfNi4mfAeaZ1CzbdwvK5ZN8Qt4XCo5V
-        txarynphVRARn
-X-Received: by 2002:a17:906:990c:: with SMTP id zl12mr19734618ejb.488.1596530554028;
-        Tue, 04 Aug 2020 01:42:34 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyQcHZCeBLaEBENnHGgMO4NWr2NRl0v5OaYAGkfPzEm1BO+7QDmTV00mLBkqYZLTbNRm+yz6Q==
-X-Received: by 2002:a17:906:990c:: with SMTP id zl12mr19734607ejb.488.1596530553849;
-        Tue, 04 Aug 2020 01:42:33 -0700 (PDT)
-Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id by3sm18093398ejb.9.2020.08.04.01.42.32
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 04 Aug 2020 01:42:33 -0700 (PDT)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Wanpeng Li <kernellwp@gmail.com>, kvm@vger.kernel.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>
-Subject: Re: [kvm-unit-tests PATCH RESEND v2] x86: tscdeadline timer testing when apic disabled
-In-Reply-To: <1596501559-22385-1-git-send-email-wanpengli@tencent.com>
-References: <1596501559-22385-1-git-send-email-wanpengli@tencent.com>
-Date:   Tue, 04 Aug 2020 10:42:32 +0200
-Message-ID: <87o8nqpzt3.fsf@vitty.brq.redhat.com>
+        bh=UqjEJLolPmGHNe5yaOt/yfSsQ1bGdkSL/AwXQ/PFIg4=;
+        b=FKGndC5zDHxI1Vgu8IADbk9pJWHdyQ+hHHBTUCMQAdp6GCNeyiwpwxjT6f/0RqQZzEoysS
+        FjlUdB97t76kd/JJKgL9MpEN2AYCArDUl4JsHKYe8lXCwy9p6xB8V6lZwUWHyiMhXCIJ6M
+        PQIyx/KvOA4Ml21RZt7tCjvGubZoJQg=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-149-OEkxtpFKOnqa8QMMyG6L9w-1; Tue, 04 Aug 2020 04:52:10 -0400
+X-MC-Unique: OEkxtpFKOnqa8QMMyG6L9w-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BEA7E8014D7;
+        Tue,  4 Aug 2020 08:52:08 +0000 (UTC)
+Received: from [10.72.13.197] (ovpn-13-197.pek2.redhat.com [10.72.13.197])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 966FF5C5B7;
+        Tue,  4 Aug 2020 08:51:45 +0000 (UTC)
+Subject: Re: [PATCH V5 4/6] vhost_vdpa: implement IRQ offloading in vhost_vdpa
+To:     Zhu Lingshan <lingshan.zhu@intel.com>, alex.williamson@redhat.com,
+        mst@redhat.com, pbonzini@redhat.com,
+        sean.j.christopherson@intel.com, wanpengli@tencent.com
+Cc:     virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        kvm@vger.kernel.org, eli@mellanox.com, shahafs@mellanox.com,
+        parav@mellanox.com
+References: <20200731065533.4144-1-lingshan.zhu@intel.com>
+ <20200731065533.4144-5-lingshan.zhu@intel.com>
+From:   Jason Wang <jasowang@redhat.com>
+Message-ID: <5212669d-6e7b-21cb-6e25-1837d70624b2@redhat.com>
+Date:   Tue, 4 Aug 2020 16:51:43 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <20200731065533.4144-5-lingshan.zhu@intel.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Wanpeng Li <kernellwp@gmail.com> writes:
 
-> From: Wanpeng Li <wanpengli@tencent.com>
+On 2020/7/31 下午2:55, Zhu Lingshan wrote:
+> This patch introduce a set of functions for setup/unsetup
+> and update irq offloading respectively by register/unregister
+> and re-register the irq_bypass_producer.
 >
-> This patch adds tscdeadline timer testing when apic is hw disabled.
+> With these functions, this commit can setup/unsetup
+> irq offloading through setting DRIVER_OK/!DRIVER_OK, and
+> update irq offloading through SET_VRING_CALL.
 >
-> Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
+> Signed-off-by: Zhu Lingshan <lingshan.zhu@intel.com>
+> Suggested-by: Jason Wang <jasowang@redhat.com>
 > ---
-> v1 -> v2:
->  * check tscdeadline timer didn't fire
+>   drivers/vhost/Kconfig |  1 +
+>   drivers/vhost/vdpa.c  | 79 ++++++++++++++++++++++++++++++++++++++++++-
+>   2 files changed, 79 insertions(+), 1 deletion(-)
 >
->  x86/apic.c | 29 +++++++++++++++++++++++------
->  1 file changed, 23 insertions(+), 6 deletions(-)
->
-> diff --git a/x86/apic.c b/x86/apic.c
-> index a7681fe..123ba26 100644
-> --- a/x86/apic.c
-> +++ b/x86/apic.c
-> @@ -30,15 +30,20 @@ static void tsc_deadline_timer_isr(isr_regs_t *regs)
->      eoi();
->  }
->  
-> -static void __test_tsc_deadline_timer(void)
-> +static void __test_tsc_deadline_timer(bool apic_enabled)
->  {
->      handle_irq(TSC_DEADLINE_TIMER_VECTOR, tsc_deadline_timer_isr);
->      irq_enable();
->  
->      wrmsr(MSR_IA32_TSCDEADLINE, rdmsr(MSR_IA32_TSC));
->      asm volatile ("nop");
-> -    report(tdt_count == 1, "tsc deadline timer");
-> -    report(rdmsr(MSR_IA32_TSCDEADLINE) == 0, "tsc deadline timer clearing");
-> +    if (apic_enabled) {
-> +        report(tdt_count == 1, "tsc deadline timer");
-> +        report(rdmsr(MSR_IA32_TSCDEADLINE) == 0, "tsc deadline timer clearing");
-> +    } else {
-> +        report(tdt_count == 0, "tsc deadline timer didn't fire");
-> +        report(rdmsr(MSR_IA32_TSCDEADLINE) == 0, "tsc deadline timer is not set");
-> +    }
->  }
->  
->  static int enable_tsc_deadline_timer(void)
-> @@ -54,10 +59,10 @@ static int enable_tsc_deadline_timer(void)
->      }
->  }
->  
-> -static void test_tsc_deadline_timer(void)
-> +static void test_tsc_deadline_timer(bool apic_enabled)
->  {
->      if(enable_tsc_deadline_timer()) {
-> -        __test_tsc_deadline_timer();
-> +        __test_tsc_deadline_timer(apic_enabled);
->      } else {
->          report_skip("tsc deadline timer not detected");
->      }
-> @@ -132,6 +137,17 @@ static void verify_disabled_apic_mmio(void)
->      write_cr8(cr8);
->  }
->  
-> +static void verify_disabled_apic_tsc_deadline_timer(void)
+> diff --git a/drivers/vhost/Kconfig b/drivers/vhost/Kconfig
+> index d3688c6afb87..587fbae06182 100644
+> --- a/drivers/vhost/Kconfig
+> +++ b/drivers/vhost/Kconfig
+> @@ -65,6 +65,7 @@ config VHOST_VDPA
+>   	tristate "Vhost driver for vDPA-based backend"
+>   	depends on EVENTFD
+>   	select VHOST
+> +	select IRQ_BYPASS_MANAGER
+>   	depends on VDPA
+>   	help
+>   	  This kernel module can be loaded in host kernel to accelerate
+> diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
+> index df3cf386b0cd..278ea2f00172 100644
+> --- a/drivers/vhost/vdpa.c
+> +++ b/drivers/vhost/vdpa.c
+> @@ -115,6 +115,55 @@ static irqreturn_t vhost_vdpa_config_cb(void *private)
+>   	return IRQ_HANDLED;
+>   }
+>   
+> +static void vhost_vdpa_setup_vq_irq(struct vhost_vdpa *v, u16 qid)
 > +{
-> +    reset_apic();
-> +    if (enable_tsc_deadline_timer()) {
-> +        disable_apic();
-> +        __test_tsc_deadline_timer(false);
-> +    } else {
-> +        report_skip("tsc deadline timer not detected");
-> +    }
+> +	struct vhost_virtqueue *vq = &v->vqs[qid];
+> +	const struct vdpa_config_ops *ops = v->vdpa->config;
+> +	struct vdpa_device *vdpa = v->vdpa;
+> +	int ret, irq;
+> +
+> +	spin_lock(&vq->call_ctx.ctx_lock);
+> +	irq = ops->get_vq_irq(vdpa, qid);
+> +	if (!vq->call_ctx.ctx || irq < 0) {
+> +		spin_unlock(&vq->call_ctx.ctx_lock);
+> +		return;
+> +	}
+> +
+> +	vq->call_ctx.producer.token = vq->call_ctx.ctx;
+> +	vq->call_ctx.producer.irq = irq;
+> +	ret = irq_bypass_register_producer(&vq->call_ctx.producer);
+> +	spin_unlock(&vq->call_ctx.ctx_lock);
 > +}
 > +
->  static void test_apic_disable(void)
->  {
->      volatile u32 *lvr = (volatile u32 *)(APIC_DEFAULT_PHYS_BASE + APIC_LVR);
-> @@ -148,6 +164,7 @@ static void test_apic_disable(void)
->      report(!this_cpu_has(X86_FEATURE_APIC),
->             "CPUID.1H:EDX.APIC[bit 9] is clear");
->      verify_disabled_apic_mmio();
-> +    verify_disabled_apic_tsc_deadline_timer();
->  
->      reset_apic();
->      report((rdmsr(MSR_IA32_APICBASE) & (APIC_EN | APIC_EXTD)) == APIC_EN,
-> @@ -668,7 +685,7 @@ int main(void)
->  
->      test_apic_timer_one_shot();
->      test_apic_change_mode();
-> -    test_tsc_deadline_timer();
-> +    test_tsc_deadline_timer(true);
->  
->      return report_summary();
->  }
+> +static void vhost_vdpa_unsetup_vq_irq(struct vhost_vdpa *v, u16 qid)
+> +{
+> +	struct vhost_virtqueue *vq = &v->vqs[qid];
+> +
+> +	spin_lock(&vq->call_ctx.ctx_lock);
+> +	irq_bypass_unregister_producer(&vq->call_ctx.producer);
 
-Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
 
-Thanks!
+Any reason for not checking vq->call_ctx.producer.irq as below here?
 
--- 
-Vitaly
+
+> +	spin_unlock(&vq->call_ctx.ctx_lock);
+> +}
+> +
+> +static void vhost_vdpa_update_vq_irq(struct vhost_virtqueue *vq)
+> +{
+> +	spin_lock(&vq->call_ctx.ctx_lock);
+> +	/*
+> +	 * if it has a non-zero irq, means there is a
+> +	 * previsouly registered irq_bypass_producer,
+> +	 * we should update it when ctx (its token)
+> +	 * changes.
+> +	 */
+> +	if (!vq->call_ctx.producer.irq) {
+> +		spin_unlock(&vq->call_ctx.ctx_lock);
+> +		return;
+> +	}
+> +
+> +	irq_bypass_unregister_producer(&vq->call_ctx.producer);
+> +	vq->call_ctx.producer.token = vq->call_ctx.ctx;
+> +	irq_bypass_register_producer(&vq->call_ctx.producer);
+> +	spin_unlock(&vq->call_ctx.ctx_lock);
+> +}
+
+
+I think setup_irq() and update_irq() could be unified with the following 
+logic:
+
+irq_bypass_unregister_producer(&vq->call_ctx.producer);
+irq = ops->get_vq_irq(vdpa, qid);
+     if (!vq->call_ctx.ctx || irq < 0) {
+         spin_unlock(&vq->call_ctx.ctx_lock);
+         return;
+     }
+
+vq->call_ctx.producer.token = vq->call_ctx.ctx;
+vq->call_ctx.producer.irq = irq;
+ret = irq_bypass_register_producer(&vq->call_ctx.producer);
+
+> +
+>   static void vhost_vdpa_reset(struct vhost_vdpa *v)
+>   {
+>   	struct vdpa_device *vdpa = v->vdpa;
+> @@ -155,11 +204,15 @@ static long vhost_vdpa_set_status(struct vhost_vdpa *v, u8 __user *statusp)
+>   {
+>   	struct vdpa_device *vdpa = v->vdpa;
+>   	const struct vdpa_config_ops *ops = vdpa->config;
+> -	u8 status;
+> +	u8 status, status_old;
+> +	int nvqs = v->nvqs;
+> +	u16 i;
+>   
+>   	if (copy_from_user(&status, statusp, sizeof(status)))
+>   		return -EFAULT;
+>   
+> +	status_old = ops->get_status(vdpa);
+> +
+>   	/*
+>   	 * Userspace shouldn't remove status bits unless reset the
+>   	 * status to 0.
+> @@ -169,6 +222,15 @@ static long vhost_vdpa_set_status(struct vhost_vdpa *v, u8 __user *statusp)
+>   
+>   	ops->set_status(vdpa, status);
+>   
+> +	/* vq irq is not expected to be changed once DRIVER_OK is set */
+
+
+Let's move this comment to the get_vq_irq bus operation.
+
+
+> +	if ((status & VIRTIO_CONFIG_S_DRIVER_OK) && !(status_old & VIRTIO_CONFIG_S_DRIVER_OK))
+> +		for (i = 0; i < nvqs; i++)
+> +			vhost_vdpa_setup_vq_irq(v, i);
+> +
+> +	if ((status_old & VIRTIO_CONFIG_S_DRIVER_OK) && !(status & VIRTIO_CONFIG_S_DRIVER_OK))
+> +		for (i = 0; i < nvqs; i++)
+> +			vhost_vdpa_unsetup_vq_irq(v, i);
+> +
+>   	return 0;
+>   }
+>   
+> @@ -332,6 +394,7 @@ static long vhost_vdpa_set_config_call(struct vhost_vdpa *v, u32 __user *argp)
+>   
+>   	return 0;
+>   }
+> +
+>   static long vhost_vdpa_vring_ioctl(struct vhost_vdpa *v, unsigned int cmd,
+>   				   void __user *argp)
+>   {
+> @@ -390,6 +453,7 @@ static long vhost_vdpa_vring_ioctl(struct vhost_vdpa *v, unsigned int cmd,
+>   			cb.private = NULL;
+>   		}
+>   		ops->set_vq_cb(vdpa, idx, &cb);
+> +		vhost_vdpa_update_vq_irq(vq);
+>   		break;
+>   
+>   	case VHOST_SET_VRING_NUM:
+> @@ -765,6 +829,18 @@ static int vhost_vdpa_open(struct inode *inode, struct file *filep)
+>   	return r;
+>   }
+>   
+> +static void vhost_vdpa_clean_irq(struct vhost_vdpa *v)
+> +{
+> +	struct vhost_virtqueue *vq;
+> +	int i;
+> +
+> +	for (i = 0; i < v->nvqs; i++) {
+> +		vq = &v->vqs[i];
+> +		if (vq->call_ctx.producer.irq)
+> +			irq_bypass_unregister_producer(&vq->call_ctx.producer);
+> +	}
+> +}
+
+
+Why not using vhost_vdpa_unsetup_vq_irq()?
+
+Thanks
+
+
+> +
+>   static int vhost_vdpa_release(struct inode *inode, struct file *filep)
+>   {
+>   	struct vhost_vdpa *v = filep->private_data;
+> @@ -777,6 +853,7 @@ static int vhost_vdpa_release(struct inode *inode, struct file *filep)
+>   	vhost_vdpa_iotlb_free(v);
+>   	vhost_vdpa_free_domain(v);
+>   	vhost_vdpa_config_put(v);
+> +	vhost_vdpa_clean_irq(v);
+>   	vhost_dev_cleanup(&v->vdev);
+>   	kfree(v->vdev.vqs);
+>   	mutex_unlock(&d->mutex);
 
