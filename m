@@ -2,149 +2,240 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4E75523BD09
-	for <lists+kvm@lfdr.de>; Tue,  4 Aug 2020 17:16:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 92BD623BD13
+	for <lists+kvm@lfdr.de>; Tue,  4 Aug 2020 17:19:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729535AbgHDPQ1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 4 Aug 2020 11:16:27 -0400
-Received: from mail-eopbgr760079.outbound.protection.outlook.com ([40.107.76.79]:6720
-        "EHLO NAM02-CY1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1729391AbgHDPQX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 4 Aug 2020 11:16:23 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=ZW78Wv/2rF8FFhwyhALUZz+XOF1BpzgnODLklW7wTWqNUbiNcazI2kQz4YPjGTGldHEB+Ur5bjgbtTsj8dNw3Mvx32ZbgSIgXLRA2Mn5xDTCHSfxpAdiNRetMf3Xtn0io1UYr35+eV0mEFJ9k0qYQydpBVFFKRz0xJfv9MQ+xAfNwUwj/WN4119tB39+M/aqzVA7rAlXdFV92RxeatVnGioE7iOJTmK5ZU4hErcrzxNtFRR44jyyPOH20NkLYAnAz2DIEuUNfEzAEkq65U+aB4FI6lAt7D8Fx8lOaKsxrWNp4tk9+UWzoEKIu9IbTQoNeIRr3SDoJe7Uo9KTeX1iVw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=DHhBiE+RBQVxdCwuvN0VZhLmB1YGcOvw1+touWcV7ok=;
- b=ZBeEzHPmtettEkq98bt2Hq5woK9bd5RBvkD2e1vC7dFjRb7rSwKmi+Bq45OP+6zTeCVr8Y4HlZGEuamE1Op7lgOakb0NkynhKPoYCyq4rgVWroLVvX0eXBdU1lsZPweM+BNYiEcMeGfSwLaO7dGfw5tb9snOyss6RDLh8vFc5ypDWeDeXrKlKGuQyMzD7s/wOnz+zX+MiNUY/tdJPDItO8mWneoSbiOAX3dLcKMPv05esJYUf/Xjsf4hhUluHJXUgT2sgbvyFtQ0gcjVJOWn03JpEd5yqU7yP26IB6vhQGoTtBXc5zpef2HlItOFDMYYJffK//E5scuyT9IjWLTF1A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=DHhBiE+RBQVxdCwuvN0VZhLmB1YGcOvw1+touWcV7ok=;
- b=31hAGbUKqp+sqMDqCw9GXZ+7vIKFUgG/moSweHFvWZN0ZD4IvYd+EgLYUzYmc0oJUROmx7XlYEEWrpvbtG1qn1W6S/HfW1b6nqO8HL3xrdI+RvDo64sqEgUVNylmHJmZI3AqYSJIbtdjFDAUHhLuVXuiE9Lz14VrOy0wBKA1pZA=
-Authentication-Results: amd.com; dkim=none (message not signed)
- header.d=none;amd.com; dmarc=none action=none header.from=amd.com;
-Received: from SN6PR12MB2718.namprd12.prod.outlook.com (2603:10b6:805:6f::22)
- by SA0PR12MB4495.namprd12.prod.outlook.com (2603:10b6:806:70::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3239.20; Tue, 4 Aug
- 2020 15:16:21 +0000
-Received: from SN6PR12MB2718.namprd12.prod.outlook.com
- ([fe80::a8ae:5626:2bf5:3624]) by SN6PR12MB2718.namprd12.prod.outlook.com
- ([fe80::a8ae:5626:2bf5:3624%7]) with mapi id 15.20.3239.022; Tue, 4 Aug 2020
- 15:16:21 +0000
-Cc:     brijesh.singh@amd.com, Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Tom Lendacky <thomas.lendacky@amd.com>
-Subject: Re: [RFC PATCH] KVM: SVM: Disallow SEV if NPT is disabled
-To:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-References: <20200731205116.14891-1-sean.j.christopherson@intel.com>
-From:   Brijesh Singh <brijesh.singh@amd.com>
-Message-ID: <c1ae98a9-beeb-c58e-4623-bf25374330e4@amd.com>
-Date:   Tue, 4 Aug 2020 10:16:18 -0500
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:68.0)
- Gecko/20100101 Thunderbird/68.11.0
-In-Reply-To: <20200731205116.14891-1-sean.j.christopherson@intel.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-ClientProxiedBy: DM5PR06CA0072.namprd06.prod.outlook.com
- (2603:10b6:3:37::34) To SN6PR12MB2718.namprd12.prod.outlook.com
- (2603:10b6:805:6f::22)
+        id S1729496AbgHDPTX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 4 Aug 2020 11:19:23 -0400
+Received: from mga12.intel.com ([192.55.52.136]:65135 "EHLO mga12.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728586AbgHDPTX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 4 Aug 2020 11:19:23 -0400
+IronPort-SDR: MqdE98bm7iYYL8NZZbiCdMdTnf8B/+NRs0cXSJ3NOYbkNHD8jjzZ/Eg2jcQgyHGEemf8L36/e0
+ JAGwHpqfBNqg==
+X-IronPort-AV: E=McAfee;i="6000,8403,9703"; a="131894842"
+X-IronPort-AV: E=Sophos;i="5.75,434,1589266800"; 
+   d="scan'208";a="131894842"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga006.jf.intel.com ([10.7.209.51])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Aug 2020 08:19:21 -0700
+IronPort-SDR: W+0vT9pAMJBlKPN8WWB96VYU+kRNXdEUZ7vCtbaQQAlMLFNnvV0fPnuBjQUVihn0RRt51v9QU5
+ 8jZKh7RTmSTA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.75,434,1589266800"; 
+   d="scan'208";a="292606786"
+Received: from gliakhov-mobl2.ger.corp.intel.com (HELO ubuntu) ([10.252.37.210])
+  by orsmga006.jf.intel.com with ESMTP; 04 Aug 2020 08:19:18 -0700
+Date:   Tue, 4 Aug 2020 17:19:17 +0200
+From:   Guennadi Liakhovetski <guennadi.liakhovetski@linux.intel.com>
+To:     "Michael S. Tsirkin" <mst@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-remoteproc@vger.kernel.org,
+        virtualization@lists.linux-foundation.org,
+        sound-open-firmware@alsa-project.org,
+        Pierre-Louis Bossart <pierre-louis.bossart@linux.intel.com>,
+        Liam Girdwood <liam.r.girdwood@linux.intel.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Ohad Ben-Cohen <ohad@wizery.com>,
+        Bjorn Andersson <bjorn.andersson@linaro.org>,
+        Mathieu Poirier <mathieu.poirier@linaro.org>,
+        Vincent Whitchurch <vincent.whitchurch@axis.com>
+Subject: Re: [PATCH v4 4/4] vhost: add an RPMsg API
+Message-ID: <20200804151916.GC19025@ubuntu>
+References: <20200722150927.15587-1-guennadi.liakhovetski@linux.intel.com>
+ <20200722150927.15587-5-guennadi.liakhovetski@linux.intel.com>
+ <20200804102132-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from Brijeshs-MacBook-Pro.local (70.112.153.56) by DM5PR06CA0072.namprd06.prod.outlook.com (2603:10b6:3:37::34) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3239.17 via Frontend Transport; Tue, 4 Aug 2020 15:16:20 +0000
-X-Originating-IP: [70.112.153.56]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-HT: Tenant
-X-MS-Office365-Filtering-Correlation-Id: c07cdbff-f5d8-47e7-51ed-08d838895809
-X-MS-TrafficTypeDiagnostic: SA0PR12MB4495:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <SA0PR12MB4495E922B9FE6E150E323D36E54A0@SA0PR12MB4495.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:302;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: aJuIDg8PnYq5l2Dcf/nT1NEGvyp5RAtY7ZYs9n6ezjcRAHqZzWYZQhaXbwpk6qqrSHgtvYjERcmatLYHN0U1ukoMp4HjFPEKdTP0yIXAQlt6n9M5xZOYiaIfy//d223nC4toQ/Zv1fTCsdhknF824PbGEEDqnRm7gRz+4anz+0nHWnCzI30JHkNXs9b69x9aDGAsp2+AN/1joOW1hYgly34vLHA+UYvioZvAsNbGWS58UGesFrwDGivim6nHAUcBT5+6TonkR0RiyMgyZY1fc+cucFhLkSLBw80isBKpHIebSJkScVoW9AzFR6AR8tRSyER/s/m7d8PWIkR6bKScwm81zkflUrK1aB8WGQtVS8UErH5JxQj6mG/xSh6FJBLD
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2718.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFTY:;SFS:(4636009)(39860400002)(396003)(376002)(366004)(346002)(136003)(53546011)(36756003)(4326008)(6506007)(26005)(31696002)(31686004)(86362001)(6512007)(16526019)(2906002)(54906003)(83380400001)(186003)(52116002)(110136005)(66946007)(5660300002)(44832011)(66476007)(8936002)(2616005)(956004)(6486002)(316002)(478600001)(8676002)(66556008)(43740500002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData: iQEkmEXYp+nSxR07TFJsmYAoCcQMIH1IO2nNZeoYzh0KU4C0Hr4LVutlnDM9LruWCy6uWI4yPb+v8vuo683qCJgESQLqWSiXfz/1WvnDHeuoEpW3vW60XSYTwtGzOOYNyglc7PqAIXnKGqojGWKbDHpMGK38Y8BiWbpJPymy3jvue5M7ozlvRFbL/vt3uKHtByE7mEb0ZfvNOfSPeWlHiuPGM63xEjYZB2Cwe/fworLT0gIgRys2mw56pynImpK5Kbsm6YojzRV8/tC4eIm0/+Dpj6XJn/zJdGdSSMFJQhKD6EsUd+CKv86RsRdLJymvnZmGuS4EY9W5gilrJejESLxQUAXbwyaSqlHQCGs1+WEhvST60eTnnOUGzrUrlP+IO7ASoLF2X0ALFDbWp7qK6VwJvWghemu9048McLsh6SUuUeWtGtpPn3pNqWBenlwy+25W2K0RWok0oaQO8B5+jtCJy26/1Wckk+uxXndomphRqeiWwWyQTTc/xLXXZAgqrmfU8SiFcwSHUO0S+M7GwBr5HREu4BLRLobJlw+IPgZjggeJCh3a22rExCuPbm2XO4nOuF9SOAOrewxBCBiD38JN2zuGxiQnnmY66ng2PoZeGNvpsjXe+YC0IpvF1uHK8ujWCip3kj+jOLALMZC6tQ==
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: c07cdbff-f5d8-47e7-51ed-08d838895809
-X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2718.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Aug 2020 15:16:21.5123
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: +G9Yp+TUC9ortzRykLMJ39hS+b8T10FBgOZJ17iixe+Ch2fggif0ixOWhT04ooy9tsmduWDtlxDJPUI2TnYJ0g==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR12MB4495
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200804102132-mutt-send-email-mst@kernel.org>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Tue, Aug 04, 2020 at 10:27:08AM -0400, Michael S. Tsirkin wrote:
+> On Wed, Jul 22, 2020 at 05:09:27PM +0200, Guennadi Liakhovetski wrote:
+> > Linux supports running the RPMsg protocol over the VirtIO transport
+> > protocol, but currently there is only support for VirtIO clients and
+> > no support for a VirtIO server. This patch adds a vhost-based RPMsg
+> > server implementation.
+> > 
+> > Signed-off-by: Guennadi Liakhovetski <guennadi.liakhovetski@linux.intel.com>
+> > ---
+> >  drivers/vhost/Kconfig       |   7 +
+> >  drivers/vhost/Makefile      |   3 +
+> >  drivers/vhost/rpmsg.c       | 375 ++++++++++++++++++++++++++++++++++++
+> >  drivers/vhost/vhost_rpmsg.h |  74 +++++++
+> >  4 files changed, 459 insertions(+)
+> >  create mode 100644 drivers/vhost/rpmsg.c
+> >  create mode 100644 drivers/vhost/vhost_rpmsg.h
+> > 
+> > diff --git a/drivers/vhost/Kconfig b/drivers/vhost/Kconfig
+> > index d3688c6afb87..602421bf1d03 100644
+> > --- a/drivers/vhost/Kconfig
+> > +++ b/drivers/vhost/Kconfig
+> > @@ -38,6 +38,13 @@ config VHOST_NET
+> >  	  To compile this driver as a module, choose M here: the module will
+> >  	  be called vhost_net.
+> >  
+> > +config VHOST_RPMSG
+> > +	tristate
+> 
+> So this lacks a description line so it does not appear
+> in menuconfig. How is user supposed to set it?
+> I added a one-line description.
 
-On 7/31/20 3:51 PM, Sean Christopherson wrote:
-> Forcefully turn off SEV if NPT is disabled, e.g. via module param.  SEV
-> requires NPT as the C-bit only exists if NPT is active.
->
-> Fixes: e9df09428996f ("KVM: SVM: Add sev module_param")
-> Cc: stable@vger.kernel.org
-> Cc: Tom Lendacky <thomas.lendacky@amd.com>
-> Cc: Brijesh Singh <brijesh.singh@amd.com>
-> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
-> ---
->
-> RFC as it's entirely possible that I am completely misunderstanding how
-> SEV works.  Compile tested only.
+That was on purpose. I don't think there's any value in this API stand-alone, 
+so I let users select it as needed. But we can change that too, id desired.
 
+> > +	depends on VHOST
+> 
+> Other drivers select VHOST instead. Any reason not to
+> do it like this here?
 
-Reviewed-By: Brijesh Singh <brijesh.singh@amd.com>
+I have
 
++	select VHOST
++	select VHOST_RPMSG
 
->
->  arch/x86/kvm/svm/svm.c | 14 +++++++-------
->  1 file changed, 7 insertions(+), 7 deletions(-)
->
-> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-> index 783330d0e7b88..e30629593458b 100644
-> --- a/arch/x86/kvm/svm/svm.c
-> +++ b/arch/x86/kvm/svm/svm.c
-> @@ -860,8 +860,14 @@ static __init int svm_hardware_setup(void)
->  		kvm_enable_efer_bits(EFER_SVME | EFER_LMSLE);
->  	}
->  
-> +	if (!boot_cpu_has(X86_FEATURE_NPT))
-> +		npt_enabled = false;
-> +
-> +	if (npt_enabled && !npt)
-> +		npt_enabled = false;
-> +
->  	if (sev) {
-> -		if (boot_cpu_has(X86_FEATURE_SEV) &&
-> +		if (boot_cpu_has(X86_FEATURE_SEV) && npt_enabled &&
->  		    IS_ENABLED(CONFIG_KVM_AMD_SEV)) {
->  			r = sev_hardware_setup();
->  			if (r)
-> @@ -879,12 +885,6 @@ static __init int svm_hardware_setup(void)
->  			goto err;
->  	}
->  
-> -	if (!boot_cpu_has(X86_FEATURE_NPT))
-> -		npt_enabled = false;
-> -
-> -	if (npt_enabled && !npt)
-> -		npt_enabled = false;
-> -
->  	kvm_configure_mmu(npt_enabled, PG_LEVEL_1G);
->  	pr_info("kvm: Nested Paging %sabled\n", npt_enabled ? "en" : "dis");
->  
+in my client driver patch.
+
+> > +	help
+> > +	  Vhost RPMsg API allows vhost drivers to communicate with VirtIO
+> > +	  drivers, using the RPMsg over VirtIO protocol.
+> > +
+> 
+> >  config VHOST_SCSI
+> >  	tristate "VHOST_SCSI TCM fabric driver"
+> >  	depends on TARGET_CORE && EVENTFD
+> > diff --git a/drivers/vhost/Makefile b/drivers/vhost/Makefile
+> > index f3e1897cce85..9cf459d59f97 100644
+> > --- a/drivers/vhost/Makefile
+> > +++ b/drivers/vhost/Makefile
+> > @@ -2,6 +2,9 @@
+> >  obj-$(CONFIG_VHOST_NET) += vhost_net.o
+> >  vhost_net-y := net.o
+> >  
+> > +obj-$(CONFIG_VHOST_RPMSG) += vhost_rpmsg.o
+> > +vhost_rpmsg-y := rpmsg.o
+> > +
+> >  obj-$(CONFIG_VHOST_SCSI) += vhost_scsi.o
+> >  vhost_scsi-y := scsi.o
+> >  
+> > diff --git a/drivers/vhost/rpmsg.c b/drivers/vhost/rpmsg.c
+> > new file mode 100644
+> > index 000000000000..d7ab48414224
+> > --- /dev/null
+> > +++ b/drivers/vhost/rpmsg.c
+> > @@ -0,0 +1,375 @@
+> > +// SPDX-License-Identifier: GPL-2.0-only
+> > +/*
+> > + * Copyright(c) 2020 Intel Corporation. All rights reserved.
+> > + *
+> > + * Author: Guennadi Liakhovetski <guennadi.liakhovetski@linux.intel.com>
+> > + *
+> > + * Vhost RPMsg VirtIO interface. It provides a set of functions to match the
+> > + * guest side RPMsg VirtIO API, provided by drivers/rpmsg/virtio_rpmsg_bus.c
+> > + * These functions handle creation of 2 virtual queues, handling of endpoint
+> > + * addresses, sending a name-space announcement to the guest as well as any
+> > + * user messages. This API can be used by any vhost driver to handle RPMsg
+> > + * specific processing.
+> > + * Specific vhost drivers, using this API will use their own VirtIO device
+> > + * IDs, that should then also be added to the ID table in virtio_rpmsg_bus.c
+> > + */
+> > +
+> > +#include <linux/compat.h>
+> > +#include <linux/file.h>
+> > +#include <linux/miscdevice.h>
+> > +#include <linux/module.h>
+> > +#include <linux/mutex.h>
+> > +#include <linux/vhost.h>
+> > +#include <linux/virtio_rpmsg.h>
+> > +#include <uapi/linux/rpmsg.h>
+> > +
+> > +#include "vhost.h"
+> > +#include "vhost_rpmsg.h"
+> > +
+> > +/*
+> > + * All virtio-rpmsg virtual queue kicks always come with just one buffer -
+> > + * either input or output
+> > + */
+> > +static int vhost_rpmsg_get_single(struct vhost_virtqueue *vq)
+> > +{
+> > +	struct vhost_rpmsg *vr = container_of(vq->dev, struct vhost_rpmsg, dev);
+> > +	unsigned int out, in;
+> > +	int head = vhost_get_vq_desc(vq, vq->iov, ARRAY_SIZE(vq->iov), &out, &in,
+> > +				     NULL, NULL);
+> > +	if (head < 0) {
+> > +		vq_err(vq, "%s(): error %d getting buffer\n",
+> > +		       __func__, head);
+> > +		return head;
+> > +	}
+> > +
+> > +	/* Nothing new? */
+> > +	if (head == vq->num)
+> > +		return head;
+> > +
+> > +	if (vq == &vr->vq[VIRTIO_RPMSG_RESPONSE] && (out || in != 1)) {
+> 
+> This in != 1 looks like a dependency on a specific message layout.
+> virtio spec says to avoid these. Using iov iters it's not too hard to do
+> ...
+
+This is an RPMsg VirtIO implementation, and it has to match the virtio_rpmsg_bus.c 
+driver, and that one has specific VirtIO queue and message usage patterns.
+
+> > +		vq_err(vq,
+> > +		       "%s(): invalid %d input and %d output in response queue\n",
+> > +		       __func__, in, out);
+> > +		goto return_buf;
+> > +	}
+> > +
+> > +	if (vq == &vr->vq[VIRTIO_RPMSG_REQUEST] && (in || out != 1)) {
+> > +		vq_err(vq,
+> > +		       "%s(): invalid %d input and %d output in request queue\n",
+> > +		       __func__, in, out);
+> > +		goto return_buf;
+> > +	}
+> > +
+> > +	return head;
+> > +
+> > +return_buf:
+> > +	/*
+> > +	 * FIXME: might need to return the buffer using vhost_add_used()
+> > +	 * or vhost_discard_vq_desc(). vhost_discard_vq_desc() is
+> > +	 * described as "being useful for error handling," but it makes
+> > +	 * the thus discarded buffers "unseen," so next time we look we
+> > +	 * retrieve them again?
+> 
+> 
+> Yes. It's your decision what to do on error. if you also signal
+> an eventfd using vq_err, then discarding will
+> make it so userspace can poke at ring and hopefully fix it ...
+
+I assume the user-space in this case is QEMU. Would it be the safest to use 
+vhost_add_used() then?
+
+> > +	 */
+> > +	return -EINVAL;
+> > +}
+
+[snip]
+
+> > +	return 0;
+> > +
+> > +return_buf:
+> > +	/*
+> > +	 * FIXME: vhost_discard_vq_desc() or vhost_add_used(), see comment in
+> > +	 * vhost_rpmsg_get_single()
+> > +	 */
+> 
+> What's to be done with this FIXME?
+
+This is the same question as above - I just wasn't sure which error handling 
+was appropriate here, don't think many vhost drivers do any od this...
+
+Thanks
+Guennadi
