@@ -2,96 +2,92 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DE17423B4CF
-	for <lists+kvm@lfdr.de>; Tue,  4 Aug 2020 08:11:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7C56D23B55D
+	for <lists+kvm@lfdr.de>; Tue,  4 Aug 2020 09:08:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728671AbgHDGLC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 4 Aug 2020 02:11:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37180 "EHLO
+        id S1726797AbgHDHIO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 4 Aug 2020 03:08:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45926 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727076AbgHDGLA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 4 Aug 2020 02:11:00 -0400
-Received: from mail-pf1-x444.google.com (mail-pf1-x444.google.com [IPv6:2607:f8b0:4864:20::444])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D566DC06174A;
-        Mon,  3 Aug 2020 23:11:00 -0700 (PDT)
-Received: by mail-pf1-x444.google.com with SMTP id s26so19602780pfm.4;
-        Mon, 03 Aug 2020 23:11:00 -0700 (PDT)
+        with ESMTP id S1725811AbgHDHIN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 4 Aug 2020 03:08:13 -0400
+Received: from mail-ot1-x343.google.com (mail-ot1-x343.google.com [IPv6:2607:f8b0:4864:20::343])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A4B74C06174A
+        for <kvm@vger.kernel.org>; Tue,  4 Aug 2020 00:08:12 -0700 (PDT)
+Received: by mail-ot1-x343.google.com with SMTP id c4so4313726otf.12
+        for <kvm@vger.kernel.org>; Tue, 04 Aug 2020 00:08:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=wLvICjqjYrd+Zh2vXjvJTYfRwMLWZImSkaARuz+JdB8=;
-        b=FjkP8xIZDswm8+jRTrI5ZhoFdaZ6QvN44Ax01M1JKS9Hj7/uYxXG+Asd/FDBQIadYx
-         AhYYpcW3ObeMCHOe+joGcwXzxpN7HUm5/KhVOMqd+IhNiYy2TDxlTb6h5wV64hPhOgZr
-         qHCHzNth+o8khSBXs9la4GEMIz8cIqeWBqCu/ChJ6TSUfLUTTVzk1rB7xa29844EafWb
-         pLJ0rl4LXp3DHE+HY4Qe0/otW4Ow7dmRjqWo3vkbTzrhV7CwIdOf5AfJa6X32s0oob3N
-         gTwI153xeeN43agfAZ119zrZ81EQ5zavIwXrWB1cQ90ejpuWaq1PnZcfMMmh/zae0Yfu
-         JnHQ==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=oeDUTRUrE1gk7vCCSRrRZwx8cho+e+eBqdVW5IdKYew=;
+        b=cWKSbXHJBoZqVh+ZMJcDDl39cl8sYoOXbvBotGoMvJFnwiRcc89ROGxr9dgsvZIvVR
+         LqeQP3VMnEe09lvc/bO7QyIjTVO/fUTv1sBakFYRNI3d0PlX9CUoMvdhgmIVWBesZZtD
+         xIYCoF27YMTMKXdHEPqxc/xGzC8IjgNUJjTm2abpTDo/zCL3ra+X+cf7ISb0hPUdCrZA
+         se0orMKBR1hLtrKcx0n00/uGM1+BJ82PTke+Qn5siznl3IPWkTyI9f4pTJOKoMoukvmy
+         JohcG0Sgb6PegQYDPCpKaIcRT8bNDllst/kkYd8RtHV/5oyAk8+htKKSSttJRp3W8u2f
+         OIbA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references;
-        bh=wLvICjqjYrd+Zh2vXjvJTYfRwMLWZImSkaARuz+JdB8=;
-        b=D6cBMDMEr9/xLZaPgFc0xsLfU2uTZyjkVqSlpGTK85J7+By8IE4d6RJlr+Oy3vNE8P
-         AGD8a7rX7LkvGQxNnLJ5FWfyulOb7Tdt0OLLdP8qXk1aNagkgFEUvekI7SvwA88wD0VB
-         WCYHorHAVWw24PEWy0C4d0x7B1CMKPmeS0oUPd8HKMSSccVXuew8Ft8vnsWzWd5IETGl
-         1PZoYupCQ2Lbijpsd4Q+AGGLkhSVW5MfOPUKK8jIft7yruZX2QrG/KGmzgRtkUtxZHoN
-         /bESWxgEP4qatLKaH2mr9UvEQ0tTRCVMDGJG3xT3BDCun3Kcx8t+LJP/q87IsU0M6t10
-         mrDg==
-X-Gm-Message-State: AOAM531lKfnNIfd97L+TU61Hx1sc7e1bVZnShCEDSbxCkncmEXnrLCBk
-        VIQav61gjXJrwLefT41pC34cjFCO
-X-Google-Smtp-Source: ABdhPJwrYtKdS8xuzfckXsojr3zeK6ZtLenz+rXKx9XMlQUa2Bdpi0VPPIt/W8r9nTDbLQ3t8zaFAg==
-X-Received: by 2002:a05:6a00:90:: with SMTP id c16mr11083964pfj.200.1596521460237;
-        Mon, 03 Aug 2020 23:11:00 -0700 (PDT)
-Received: from localhost.localdomain ([103.7.29.6])
-        by smtp.googlemail.com with ESMTPSA id s8sm22093069pfc.122.2020.08.03.23.10.57
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 03 Aug 2020 23:10:59 -0700 (PDT)
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=oeDUTRUrE1gk7vCCSRrRZwx8cho+e+eBqdVW5IdKYew=;
+        b=kskmn7P2oyP5ct4sYgP+c0dgBifXkSeGwowWd2lG2KACtH3nr6tjEOrTQ41K4nBFbA
+         RqvJg70Gd1oR4OT8+G/POyR+kq3Yfx4rRItL9SYucs3uD3xTJdsrBq0en6f3tGREkyuM
+         XvTgFztsW2hH1eZLvlbtCVazHg3cD2n7bBpagq4rEyD+m/JUXifuvXFlhl0oWI+vdSLj
+         INnjazERex8v4fLObK9aujHryCSRW8OeZWyp5j+nDwSuzOCm5lOXzrr3EGGGj0FsCILF
+         bmUxz7Nqe6bMURHddG9cj8XpqiOlNHsD6IFpKMQA3v4eMuUWxTuvpiNfTSlTQAoqlKNW
+         bTjw==
+X-Gm-Message-State: AOAM531hE6DAQ8TUTGskUuI+gIaKjXbjtnlY7GCtcP3XibH6nSFFu17l
+        cF6+CmMzrhBJtDi2npgvE4tUhHRYZIfAGqCcgdIarA==
+X-Google-Smtp-Source: ABdhPJzE5GE1URw8Iz6ERFrCy7/PaMhvhFMHPYcNOyr2Ldht3Ud9jdr/JfDLEOur9HFQcnDTv8YZT3knmFc3Tcj0Y0o=
+X-Received: by 2002:a9d:c44:: with SMTP id 62mr1897628otr.185.1596524892032;
+ Tue, 04 Aug 2020 00:08:12 -0700 (PDT)
+MIME-Version: 1.0
+References: <1596441715-14959-1-git-send-email-wanpengli@tencent.com>
+ <87wo2fq4up.fsf@vitty.brq.redhat.com> <aa3131be-5421-5a06-c582-232d6b34fe38@redhat.com>
+In-Reply-To: <aa3131be-5421-5a06-c582-232d6b34fe38@redhat.com>
 From:   Wanpeng Li <kernellwp@gmail.com>
-X-Google-Original-From: Wanpeng Li <wanpengli@tencent.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+Date:   Tue, 4 Aug 2020 15:08:01 +0800
+Message-ID: <CANRm+Cx99z11opDAg0+6d=+aToa8BuhdkfYxxQEPkv38=PsYYA@mail.gmail.com>
+Subject: Re: [kvm-unit-tests PATCH] x86: tscdeadline timer testing when apic
+ is hw disabled
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>, kvm <kvm@vger.kernel.org>,
         Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
         Joerg Roedel <joro@8bytes.org>
-Subject: [PATCH 2/2] KVM: LAPIC: Guarantee the timer is in tsc-deadline mode when setting
-Date:   Tue,  4 Aug 2020 14:10:48 +0800
-Message-Id: <1596521448-4010-2-git-send-email-wanpengli@tencent.com>
-X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1596521448-4010-1-git-send-email-wanpengli@tencent.com>
-References: <1596521448-4010-1-git-send-email-wanpengli@tencent.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Wanpeng Li <wanpengli@tencent.com>
+On Mon, 3 Aug 2020 at 20:56, Paolo Bonzini <pbonzini@redhat.com> wrote:
+>
+> On 03/08/20 14:41, Vitaly Kuznetsov wrote:
+> >> -    report(tdt_count == 1, "tsc deadline timer");
+> >> -    report(rdmsr(MSR_IA32_TSCDEADLINE) == 0, "tsc deadline timer clearing");
+> >> +    if (apic_enabled) {
+> >> +        report(tdt_count == 1, "tsc deadline timer");
+> >> +        report(rdmsr(MSR_IA32_TSCDEADLINE) == 0, "tsc deadline timer clearing");
+> >> +    } else
+> >> +        report(rdmsr(MSR_IA32_TSCDEADLINE) == 0, "tsc deadline timer is not set");
+> > I'd suggest we also check that the timer didn't fire, e.g.
+> >
+> > report(tdt_count == 0, "tsc deadline timer didn't fire");
 
-Check apic_lvtt_tscdeadline() mode directly instead of apic_lvtt_oneshot()
-and apic_lvtt_period() to guarantee the timer is in tsc-deadline mode when
-wrmsr MSR_IA32_TSCDEADLINE.
+Agreed.
 
-Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
----
- arch/x86/kvm/lapic.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+> >
+> > as a bonus, we'd get another reason to use braces for both branches of
+> > the 'if' (which is a good thing regardless).
+> >
+>
+> Agreed, and KVM also needs to return 0 if the APIC is hardware-disabled
+> I think?
 
-diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-index d89ab48..7b11fa8 100644
---- a/arch/x86/kvm/lapic.c
-+++ b/arch/x86/kvm/lapic.c
-@@ -2193,8 +2193,8 @@ void kvm_set_lapic_tscdeadline_msr(struct kvm_vcpu *vcpu, u64 data)
- {
- 	struct kvm_lapic *apic = vcpu->arch.apic;
- 
--	if (!kvm_apic_present(vcpu) || apic_lvtt_oneshot(apic) ||
--			apic_lvtt_period(apic))
-+	if (!kvm_apic_present(vcpu) ||
-+		!apic_lvtt_tscdeadline(apic))
- 		return;
- 
- 	hrtimer_cancel(&apic->lapic_timer.timer);
--- 
-2.7.4
+Just sent out a patch to do it.
 
+    Wanpeng
