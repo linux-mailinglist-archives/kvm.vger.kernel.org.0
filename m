@@ -2,49 +2,49 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BDCB423B1B2
-	for <lists+kvm@lfdr.de>; Tue,  4 Aug 2020 02:32:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8659023B1B9
+	for <lists+kvm@lfdr.de>; Tue,  4 Aug 2020 02:39:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729279AbgHDAcB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 3 Aug 2020 20:32:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41488 "EHLO
+        id S1727779AbgHDAjf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 3 Aug 2020 20:39:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42638 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729221AbgHDAcA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 3 Aug 2020 20:32:00 -0400
-Received: from mail-pg1-x544.google.com (mail-pg1-x544.google.com [IPv6:2607:f8b0:4864:20::544])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B4A25C06174A
-        for <kvm@vger.kernel.org>; Mon,  3 Aug 2020 17:32:00 -0700 (PDT)
-Received: by mail-pg1-x544.google.com with SMTP id o13so21157889pgf.0
-        for <kvm@vger.kernel.org>; Mon, 03 Aug 2020 17:32:00 -0700 (PDT)
+        with ESMTP id S1726130AbgHDAjf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 3 Aug 2020 20:39:35 -0400
+Received: from mail-pf1-x444.google.com (mail-pf1-x444.google.com [IPv6:2607:f8b0:4864:20::444])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 45836C06174A
+        for <kvm@vger.kernel.org>; Mon,  3 Aug 2020 17:39:35 -0700 (PDT)
+Received: by mail-pf1-x444.google.com with SMTP id f193so8843355pfa.12
+        for <kvm@vger.kernel.org>; Mon, 03 Aug 2020 17:39:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id;
-        bh=ai8WbK+SXwuJDxkBKbMxeQLFCKmPAxXHO5IzqCRJqVQ=;
-        b=nWO/47bGThgdVWwFmm/sXPM+Pkhj9f5jB7BK/bARXm/59F0OAi3Pnq2f/QFly+e8X2
-         kPql01AcjTjHQzAoG2ARe/+KfCKPYwk01I8UwKvAdKWvpAClVIBUTPpGHhe/6fdTFBo0
-         do37T6PeNbAFHzOXq3DTPg/1MHemey/TRnsqHCznYMRmXe5fDnQzMS6fexVCJ20gte6l
-         Z3MGUvrKGD3wJwJ+X+wYQ/EAnNngba+7scdMzxJvMB4+4Rl6v7ALAjpuskrPnGtUKhwU
-         gPWq9nmep0z8vOQG3JbNmdU5cRp69PAYjpVLGxZTpRg4EXmjc9SQXviIlEQiGeiAvO0x
-         eb2w==
+        bh=P7K1/or27Q5kuNX+G726+alc8/6c9ST1cR6CdnWA9Ek=;
+        b=sE2zzvp+3n8gXNBzs1nAoCGBiFS/us8VMTP5rvpCJdHhaQ0xMm4+SWWplfOk3oTBOo
+         qBQ39Iid9wIFlsjXqSS4SAbvzL1HLf9jjr8q15KuJdJwqXrbZixDHcnb1xBNrVHifT7N
+         L4fgdzUm48L6j5g2mfW9O4IhzM4jg3geakAz8I+IO/HnCCRgW3N0rfcr5tLbawLa7Utt
+         onrUAjYtU1VOwqTn6NsMdfQ2S3D7pfquZ1PomSZdoMOKBlf1ON26msbFsk0hJGl29dZc
+         ClFCB3/5x/n5Ug3PFy3491pzXE+4MbDY38FmwEeFJjyjCyQNS/D9m6KDhcLc8Bmxo9Kp
+         IX1w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id;
-        bh=ai8WbK+SXwuJDxkBKbMxeQLFCKmPAxXHO5IzqCRJqVQ=;
-        b=EKVijLCKjUTye1+7lkPrFDN1stCGG0gXWvw+o1e+NUyQSygwgNdTWx08CMWfDzvu63
-         chiozg4kH4ZBRiysxyHSmoOZWclvxjX8444DUJaShCKE8y+BaKZ+onxxiXL/qjGE27BK
-         XgibG/VkHVQBFcX0FZ5w4co0K9hH8fOiZKwKKZBqhg9XkfveN63XU7ABcrMwqBZD/8sJ
-         heVg418ypqN27SXdeP7GvLR5VZkuFW2bYFOOmmXPIY9uOyw+ooc2u5zNnh94JkkzkhuS
-         aHEGrGJ641CSwloTM4FBEBNcr7u7/HLQR968k3PA5stT1TH30EUBr2KbFdR/TK5nDgQM
-         OVQQ==
-X-Gm-Message-State: AOAM530rAu5W7QbbndQr8EHqIHNkslbeVumA135Nbbmeb2+7OS2oVl2w
-        sVrnUUil3jY6oSSFJIfFRte+JfkI
-X-Google-Smtp-Source: ABdhPJzzM8dc24JxlNdGyMx3aclJAJ8LBSFX5LszRE/moZVybJwdBjWtO3EqdK343GxogtHJFGl4cw==
-X-Received: by 2002:a62:1951:: with SMTP id 78mr18280488pfz.137.1596501119886;
-        Mon, 03 Aug 2020 17:31:59 -0700 (PDT)
+        bh=P7K1/or27Q5kuNX+G726+alc8/6c9ST1cR6CdnWA9Ek=;
+        b=a39i50OeUiAKO8kkWZ8YJPya+6tg3jI2qK5QhV3nPPiJV+A5itsPqlEDMm3jrOyxgl
+         Kv95OyZOnKQKJ9TWrMXl7coGNSrn9L9VDRuCU2yB6/608/HmWE0pxSH/UY5ItklEjMk7
+         fkSi9aLhGYxhOHAyCVYpjiI1F9rt8vwYQJsYgPfNkNrAl5hA8RMH1W/RG2d5w7Xrg39e
+         HDt89mEyaIobpaSRlBZ/VWFI2Jpq9dlZQpLJWpQRv9jdec92Ls3lnb48dBXMalOJNeKJ
+         3SbQclVdhZCqIJfzcgvJfm+mPtu/xW1471CwEmYUbSxVwPUTQPuRY7/T2/CyuxJRPa6s
+         EpCg==
+X-Gm-Message-State: AOAM533ji34RNA4J0xjHGug8VD6Nnc9qXgt0zYhHvr9ixpGEZA0YvBLG
+        ZWqYvEa8ew8va4YnnwjXDYWlgg19
+X-Google-Smtp-Source: ABdhPJw4o7EGEKLPsrHpIa9TFgV/JQQ1z3OM+JXUuEvqMEfeVaHT9ac1Q3vS2pyuLzsqpbgMkqE+Lw==
+X-Received: by 2002:a63:1a44:: with SMTP id a4mr17241160pgm.281.1596501574581;
+        Mon, 03 Aug 2020 17:39:34 -0700 (PDT)
 Received: from localhost.localdomain ([103.7.29.6])
-        by smtp.googlemail.com with ESMTPSA id e3sm19950714pgu.40.2020.08.03.17.31.57
+        by smtp.googlemail.com with ESMTPSA id mp3sm2426610pjb.0.2020.08.03.17.39.32
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 03 Aug 2020 17:31:59 -0700 (PDT)
+        Mon, 03 Aug 2020 17:39:34 -0700 (PDT)
 From:   Wanpeng Li <kernellwp@gmail.com>
 X-Google-Original-From: Wanpeng Li <wanpengli@tencent.com>
 To:     kvm@vger.kernel.org
@@ -54,9 +54,9 @@ Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
         Joerg Roedel <joro@8bytes.org>
-Subject: [PATCH v2] x86: tscdeadline timer testing when apic disabled
-Date:   Tue,  4 Aug 2020 08:31:50 +0800
-Message-Id: <1596501110-22239-1-git-send-email-wanpengli@tencent.com>
+Subject: [kvm-unit-tests PATCH RESEND v2] x86: tscdeadline timer testing when apic disabled
+Date:   Tue,  4 Aug 2020 08:39:19 +0800
+Message-Id: <1596501559-22385-1-git-send-email-wanpengli@tencent.com>
 X-Mailer: git-send-email 2.7.4
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
@@ -69,6 +69,9 @@ This patch adds tscdeadline timer testing when apic is hw disabled.
 
 Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
 ---
+v1 -> v2:
+ * check tscdeadline timer didn't fire
+
  x86/apic.c | 29 +++++++++++++++++++++++------
  1 file changed, 23 insertions(+), 6 deletions(-)
 
