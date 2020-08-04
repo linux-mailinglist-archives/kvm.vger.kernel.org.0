@@ -2,55 +2,54 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0255023B3CA
-	for <lists+kvm@lfdr.de>; Tue,  4 Aug 2020 06:21:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6E96623B3CB
+	for <lists+kvm@lfdr.de>; Tue,  4 Aug 2020 06:21:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728740AbgHDEU7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 4 Aug 2020 00:20:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48286 "EHLO
+        id S1728749AbgHDEVC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 4 Aug 2020 00:21:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48300 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725807AbgHDEU6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 4 Aug 2020 00:20:58 -0400
+        with ESMTP id S1728761AbgHDEVB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 4 Aug 2020 00:21:01 -0400
 Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B3A4DC06174A
-        for <kvm@vger.kernel.org>; Mon,  3 Aug 2020 21:20:58 -0700 (PDT)
-Received: by mail-yb1-xb4a.google.com with SMTP id a127so51306602ybb.14
-        for <kvm@vger.kernel.org>; Mon, 03 Aug 2020 21:20:58 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7CD37C06174A
+        for <kvm@vger.kernel.org>; Mon,  3 Aug 2020 21:21:01 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id i62so50849087ybc.15
+        for <kvm@vger.kernel.org>; Mon, 03 Aug 2020 21:21:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=ekkRqwCzpqNMyGqJ+IRasMCYa9RWitCN8gbAOG6hXZk=;
-        b=MzLRCwgmVe1d+5I0WOIS0U9CrCUYF4M3JbVIo6ANGyAhKNLKYsthIHEVFqISGtbDzw
-         nQ36PyjlsnnXqKN3806i6lDPnCwTujCE5ioXaJtxgsXHWOmqlNLaQSxorvuxqktkbiW0
-         QWqnNt44fXxFwRSi/LhOY2TIJnUadY0EpcrplOUSMwlcJoZQqvBODsH3C3jU+3SCfHpm
-         s/Z4p2KoF3osYWnI3+6YEG+bwJrJtSCmDaFWn8ar6yluvhlyZ+xMgtjYw8UjHJImQwwP
-         DZGCAfekS4mV7QctoarlI+Ater27beXNzjt0m0N8HCpqjnrn5/idQeb56EayFP5exxtM
-         tRaA==
+        bh=dzeTFxAYWtTD3RJGEX8iHhDjCrEuLXRqKxOLaG/0j/k=;
+        b=t21BmMgpHXJH25M38sXOici6cTzr5HWstP5/5PcBQ66vymEjq9wkVxAEFI3OygeMmk
+         mGTy03nV6R9giOKLYiUh6NtWD5LeHs9Bv2AMxA1h0eRcrTMIZltnTs3BmkgH6YDPoZcq
+         uJQFOnMmwpFoRLrDs6VxscS9XaJpmnmJIwosAitszvEHHQ44wbTi3tmjWnaK9PFRsEmA
+         CDiMH3hzaoMgjQcEGCdFAg5WOMhNKBduoMH+/hviO5KNHnq0SihllJnNExSbrlPrrkS2
+         EDKo5KTF1H8xX7+JNwO6dZ4Xlo18FT11g6waq8N97bUE4WmEvDAKbAGSZN6E4HaGYZMV
+         PZAg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=ekkRqwCzpqNMyGqJ+IRasMCYa9RWitCN8gbAOG6hXZk=;
-        b=kNwCj08aB9FWfuPBlCn2VvA3oDNZ2Zt3NkZd1fCv0U8w+q5tEN9CspjpHdlEY5it86
-         BOT7u7+nHzfKYTYwgbL6CMCGicIULsriyMrcR9IUNspLsW+vhhrBGq4ZQXnD+Nf9NEVO
-         R9pkJ6Q7PBZY7MF/HFSt1PfCwRsnaz5IxrlYbySa8rUKPEy/9xsJFZxH0TxJakbCWHj2
-         pxkxgg3k6IBPMG8gJ9B4hrnro+DBRtfF/Xyjn6T6S9An/DQm1bzcX8jMT6NnXcHIgnAw
-         eslmpCw+kMgT78ayROoQ32/UTI3U6qam2GarHYMWxtoKctVNQx4RTbNZMIAg7bOWkl/E
-         fZ8g==
-X-Gm-Message-State: AOAM533TCZftbbSv9sc5brUQnAIe9utg84jrdCA++z2fRimynSJJeOni
-        RpHvR0MgX855JCEMLGgmxJbwvYvHR9Q+TU2x
-X-Google-Smtp-Source: ABdhPJw64jiau5VUkGApgQyQWba/ROMFe5/War77J64dUHeJghJ8JHrJeU1tF3lYsbeEGDShEW0kfgBoZg/B7/gK
-X-Received: by 2002:a25:ba42:: with SMTP id z2mr30928789ybj.336.1596514857952;
- Mon, 03 Aug 2020 21:20:57 -0700 (PDT)
-Date:   Mon,  3 Aug 2020 21:20:39 -0700
+        bh=dzeTFxAYWtTD3RJGEX8iHhDjCrEuLXRqKxOLaG/0j/k=;
+        b=cxa8O5SkCVUxt9A/IxFfFr/ree0L0un5Ka7WD0ijo4qm3KS9XfJJ8NQswEu+Yo9w0d
+         NNE7gXC0eeKkTUqXbx9kNsbsYg0fsZKbh+Qbj28XZQLlmNjMkFPjk6KjZs06AgNuWqRJ
+         0+KTrsQhbyvhjqTYGXfR1ee79K4F90Rn79YgjOfGQ+ELiX0tyJRBF5X41bJXesAT1I6I
+         NayyBP84GN/umBwzCblI0H7GDGYVbt194XeyuK1saMrVEve5DnFzeeZfqNQIhPXfJ9TA
+         PycPNWAXKJ9fQoBFDFWfUwGoUu4jnIbrqIdHg1OikhV7mRen7tCfm9WKTCx6pSc6RuLK
+         8beA==
+X-Gm-Message-State: AOAM530WkALH4gZzYz7R5GmKHSNKjgRQiKZT/tMIdAxhOttUtUzAStQZ
+        Vu5I7YOwF1KlyBAfY8VMIgXm9xbNvTh6qQ0h
+X-Google-Smtp-Source: ABdhPJy2AjSlxmxpNptbV0oi6KMz6nynpymByxZjdR09CKzQ+SWOK10f5benf+zvqZhdMDhsuFh/ov4aZ5GbdGDX
+X-Received: by 2002:a25:bcce:: with SMTP id l14mr18046186ybm.467.1596514860682;
+ Mon, 03 Aug 2020 21:21:00 -0700 (PDT)
+Date:   Mon,  3 Aug 2020 21:20:40 -0700
 In-Reply-To: <20200804042043.3592620-1-aaronlewis@google.com>
-Message-Id: <20200804042043.3592620-3-aaronlewis@google.com>
+Message-Id: <20200804042043.3592620-4-aaronlewis@google.com>
 Mime-Version: 1.0
 References: <20200804042043.3592620-1-aaronlewis@google.com>
 X-Mailer: git-send-email 2.28.0.163.g6104cc2f0b6-goog
-Subject: [PATCH 2/6] KVM: x86: Add support for exiting to userspace on rdmsr
- or wrmsr
+Subject: [PATCH 3/6] KVM: x86: Prepare MSR bitmaps for userspace tracked MSRs
 From:   Aaron Lewis <aaronlewis@google.com>
 To:     jmattson@google.com, graf@amazon.com
 Cc:     pshier@google.com, oupton@google.com, kvm@vger.kernel.org,
@@ -61,265 +60,353 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add support for exiting to userspace on a rdmsr or wrmsr instruction if
-the MSR being read from or written to is in the user_exit_msrs list.
+Prepare vmx and svm for a subsequent change that ensures the MSR bitmap
+allows for a vm_exit for all MSRs that userspace is tracking.
 
 Signed-off-by: Aaron Lewis <aaronlewis@google.com>
+Reviewed-by: Oliver Upton <oupton@google.com>
 ---
- Documentation/virt/kvm/api.rst | 29 +++++++++++-
- arch/x86/kvm/trace.h           | 24 ++++++++++
- arch/x86/kvm/x86.c             | 83 ++++++++++++++++++++++++++++++++++
- include/trace/events/kvm.h     |  2 +-
- include/uapi/linux/kvm.h       | 10 ++++
- 5 files changed, 145 insertions(+), 3 deletions(-)
+ arch/x86/kvm/svm/svm.c    | 48 +++++++++++-----------
+ arch/x86/kvm/vmx/nested.c |  2 +-
+ arch/x86/kvm/vmx/vmx.c    | 83 +++++++++++++++++++--------------------
+ arch/x86/kvm/vmx/vmx.h    |  2 +-
+ 4 files changed, 67 insertions(+), 68 deletions(-)
 
-diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-index 7d8167c165aa..8b7078707e0a 100644
---- a/Documentation/virt/kvm/api.rst
-+++ b/Documentation/virt/kvm/api.rst
-@@ -4885,8 +4885,9 @@ to the byte array.
- 
- .. note::
- 
--      For KVM_EXIT_IO, KVM_EXIT_MMIO, KVM_EXIT_OSI, KVM_EXIT_PAPR and
--      KVM_EXIT_EPR the corresponding
-+      For KVM_EXIT_IO, KVM_EXIT_MMIO, KVM_EXIT_OSI, KVM_EXIT_PAPR,
-+      KVM_EXIT_EPR, KVM_EXIT_X86_RDMSR, and KVM_EXIT_X86_WRMSR the
-+      corresponding
- 
- operations are complete (and guest state is consistent) only after userspace
- has re-entered the kernel with KVM_RUN.  The kernel side will first finish
-@@ -5179,6 +5180,30 @@ Note that KVM does not skip the faulting instruction as it does for
- KVM_EXIT_MMIO, but userspace has to emulate any change to the processing state
- if it decides to decode and emulate the instruction.
- 
-+::
-+
-+    /* KVM_EXIT_X86_RDMSR */
-+    /* KVM_EXIT_X86_WRMSR */
-+    struct {
-+      __u8 inject_gp; /* out */
-+      __u8 pad[3];
-+      __u32 index;    /* i.e. ecx; out */
-+      __u64 data;     /* in (wrmsr) / out (rdmsr) */
-+    } msr;
-+
-+If the exit_reason is KVM_EXIT_X86_RDMSR then a rdmsr instruction in the guest
-+needs to be processed by userspace.  If the exit_reason is KVM_EXIT_X86_WRMSR
-+then a wrmsr instruction in the guest needs to be processed by userspace.
-+
-+Userspace can tell KVM to inject a #GP into the guest by setting the
-+'inject_gp' flag.  Setting the flag to 1 tells KVM to inject a GP into the
-+guest.  Setting the flag to 0 tells KVM to not inject a GP into the guest.
-+
-+The MSR being processed is indicated by 'index'.  If a read is being processed
-+the 'data' field is expected to be filled out by userspace (as an out
-+parameter). If a write is being processed the 'data' field will contain the
-+updated value of the MSR (as an in parameter).
-+
- ::
- 
- 		/* Fix the size of the union. */
-diff --git a/arch/x86/kvm/trace.h b/arch/x86/kvm/trace.h
-index b66432b015d2..d03143ebd6f0 100644
---- a/arch/x86/kvm/trace.h
-+++ b/arch/x86/kvm/trace.h
-@@ -367,6 +367,30 @@ TRACE_EVENT(kvm_msr,
- #define trace_kvm_msr_read_ex(ecx)         trace_kvm_msr(0, ecx, 0, true)
- #define trace_kvm_msr_write_ex(ecx, data)  trace_kvm_msr(1, ecx, data, true)
- 
-+TRACE_EVENT(kvm_userspace_msr,
-+	TP_PROTO(bool is_write, u8 inject_gp, u32 index, u64 data),
-+	TP_ARGS(is_write, inject_gp, index, data),
-+
-+	TP_STRUCT__entry(
-+		__field(bool,	is_write)
-+		__field(u8,	inject_gp)
-+		__field(u32,	index)
-+		__field(u64,	data)
-+	),
-+
-+	TP_fast_assign(
-+		__entry->is_write	= is_write;
-+		__entry->inject_gp	= inject_gp;
-+		__entry->index		= index;
-+		__entry->data		= data;
-+	),
-+
-+	TP_printk("userspace %s %x = 0x%llx, %s",
-+		  __entry->is_write ? "wrmsr" : "rdmsr",
-+		  __entry->index, __entry->data,
-+		  __entry->inject_gp ? "inject_gp" : "no_gp")
-+);
-+
- /*
-  * Tracepoint for guest CR access.
-  */
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 46a0fb9e0869..47619b49818a 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -108,6 +108,8 @@ static void __kvm_set_rflags(struct kvm_vcpu *vcpu, unsigned long rflags);
- static void store_regs(struct kvm_vcpu *vcpu);
- static int sync_regs(struct kvm_vcpu *vcpu);
- 
-+bool kvm_msr_user_exit(struct kvm *kvm, u32 index);
-+
- struct kvm_x86_ops kvm_x86_ops __read_mostly;
- EXPORT_SYMBOL_GPL(kvm_x86_ops);
- 
-@@ -1549,11 +1551,61 @@ int kvm_set_msr(struct kvm_vcpu *vcpu, u32 index, u64 data)
+diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+index c0da4dd78ac5..eb673b59f7b7 100644
+--- a/arch/x86/kvm/svm/svm.c
++++ b/arch/x86/kvm/svm/svm.c
+@@ -564,7 +564,7 @@ static bool valid_msr_intercept(u32 index)
+ 	return false;
  }
- EXPORT_SYMBOL_GPL(kvm_set_msr);
  
-+/*
-+ * On success, returns 1 so that __vcpu_run() will happen next. On
-+ * error, returns 0.
-+ */
-+static int complete_userspace_msr(struct kvm_vcpu *vcpu, bool is_write)
-+{
-+	u32 ecx = vcpu->run->msr.index;
-+	u64 data = vcpu->run->msr.data;
-+
-+	trace_kvm_userspace_msr(is_write,
-+				vcpu->run->msr.inject_gp,
-+				vcpu->run->msr.index,
-+				vcpu->run->msr.data);
-+
-+	if (vcpu->run->msr.inject_gp) {
-+		trace_kvm_msr(is_write, ecx, data, true);
-+		kvm_inject_gp(vcpu, 0);
-+		return 1;
-+	}
-+
-+	trace_kvm_msr(is_write, ecx, data, false);
-+	if (!is_write) {
-+		kvm_rax_write(vcpu, data & -1u);
-+		kvm_rdx_write(vcpu, (data >> 32) & -1u);
-+	}
-+
-+	return kvm_skip_emulated_instruction(vcpu);
-+}
-+
-+static int complete_userspace_rdmsr(struct kvm_vcpu *vcpu)
-+{
-+	return complete_userspace_msr(vcpu, false);
-+}
-+
-+static int complete_userspace_wrmsr(struct kvm_vcpu *vcpu)
-+{
-+	return complete_userspace_msr(vcpu, true);
-+}
-+
- int kvm_emulate_rdmsr(struct kvm_vcpu *vcpu)
+-static bool msr_write_intercepted(struct kvm_vcpu *vcpu, unsigned msr)
++static bool msr_write_intercepted(struct kvm_vcpu *vcpu, u32 msr)
  {
- 	u32 ecx = kvm_rcx_read(vcpu);
- 	u64 data;
+ 	u8 bit_write;
+ 	unsigned long tmp;
+@@ -583,9 +583,11 @@ static bool msr_write_intercepted(struct kvm_vcpu *vcpu, unsigned msr)
+ 	return !!test_bit(bit_write,  &tmp);
+ }
  
-+	if (kvm_msr_user_exit(vcpu->kvm, ecx)) {
-+		vcpu->run->exit_reason = KVM_EXIT_X86_RDMSR;
-+		vcpu->run->msr.index = ecx;
-+		vcpu->run->msr.data = 0;
-+		vcpu->run->msr.inject_gp = 0;
-+		memset(vcpu->run->msr.pad, 0, sizeof(vcpu->run->msr.pad));
-+		vcpu->arch.complete_userspace_io =
-+			complete_userspace_rdmsr;
-+		return 0;
-+	}
-+
- 	if (kvm_get_msr(vcpu, ecx, &data)) {
- 		trace_kvm_msr_read_ex(ecx);
- 		kvm_inject_gp(vcpu, 0);
-@@ -1573,6 +1625,17 @@ int kvm_emulate_wrmsr(struct kvm_vcpu *vcpu)
- 	u32 ecx = kvm_rcx_read(vcpu);
- 	u64 data = kvm_read_edx_eax(vcpu);
+-static void set_msr_interception(u32 *msrpm, unsigned msr,
+-				 int read, int write)
++static void set_msr_interception(struct kvm_vcpu *vcpu, u32 msr, int read,
++				 int write)
+ {
++	struct vcpu_svm *svm = to_svm(vcpu);
++	u32 *msrpm = svm->msrpm;
+ 	u8 bit_read, bit_write;
+ 	unsigned long tmp;
+ 	u32 offset;
+@@ -609,7 +611,7 @@ static void set_msr_interception(u32 *msrpm, unsigned msr,
+ 	msrpm[offset] = tmp;
+ }
  
-+	if (kvm_msr_user_exit(vcpu->kvm, ecx)) {
-+		vcpu->run->exit_reason = KVM_EXIT_X86_WRMSR;
-+		vcpu->run->msr.index = ecx;
-+		vcpu->run->msr.data = data;
-+		vcpu->run->msr.inject_gp = 0;
-+		memset(vcpu->run->msr.pad, 0, sizeof(vcpu->run->msr.pad));
-+		vcpu->arch.complete_userspace_io =
-+			complete_userspace_wrmsr;
-+		return 0;
-+	}
-+
- 	if (kvm_set_msr(vcpu, ecx, data)) {
- 		trace_kvm_msr_write_ex(ecx, data);
- 		kvm_inject_gp(vcpu, 0);
-@@ -3455,6 +3518,25 @@ static int kvm_vm_ioctl_set_exit_msrs(struct kvm *kvm,
+-static void svm_vcpu_init_msrpm(u32 *msrpm)
++static void svm_vcpu_init_msrpm(struct kvm_vcpu *vcpu, u32 *msrpm)
+ {
+ 	int i;
+ 
+@@ -619,7 +621,7 @@ static void svm_vcpu_init_msrpm(u32 *msrpm)
+ 		if (!direct_access_msrs[i].always)
+ 			continue;
+ 
+-		set_msr_interception(msrpm, direct_access_msrs[i].index, 1, 1);
++		set_msr_interception(vcpu, direct_access_msrs[i].index, 1, 1);
+ 	}
+ }
+ 
+@@ -666,26 +668,26 @@ static void init_msrpm_offsets(void)
+ 	}
+ }
+ 
+-static void svm_enable_lbrv(struct vcpu_svm *svm)
++static void svm_enable_lbrv(struct kvm_vcpu *vcpu)
+ {
+-	u32 *msrpm = svm->msrpm;
++	struct vcpu_svm *svm = to_svm(vcpu);
+ 
+ 	svm->vmcb->control.virt_ext |= LBR_CTL_ENABLE_MASK;
+-	set_msr_interception(msrpm, MSR_IA32_LASTBRANCHFROMIP, 1, 1);
+-	set_msr_interception(msrpm, MSR_IA32_LASTBRANCHTOIP, 1, 1);
+-	set_msr_interception(msrpm, MSR_IA32_LASTINTFROMIP, 1, 1);
+-	set_msr_interception(msrpm, MSR_IA32_LASTINTTOIP, 1, 1);
++	set_msr_interception(vcpu, MSR_IA32_LASTBRANCHFROMIP, 1, 1);
++	set_msr_interception(vcpu, MSR_IA32_LASTBRANCHTOIP, 1, 1);
++	set_msr_interception(vcpu, MSR_IA32_LASTINTFROMIP, 1, 1);
++	set_msr_interception(vcpu, MSR_IA32_LASTINTTOIP, 1, 1);
+ }
+ 
+-static void svm_disable_lbrv(struct vcpu_svm *svm)
++static void svm_disable_lbrv(struct kvm_vcpu *vcpu)
+ {
+-	u32 *msrpm = svm->msrpm;
++	struct vcpu_svm *svm = to_svm(vcpu);
+ 
+ 	svm->vmcb->control.virt_ext &= ~LBR_CTL_ENABLE_MASK;
+-	set_msr_interception(msrpm, MSR_IA32_LASTBRANCHFROMIP, 0, 0);
+-	set_msr_interception(msrpm, MSR_IA32_LASTBRANCHTOIP, 0, 0);
+-	set_msr_interception(msrpm, MSR_IA32_LASTINTFROMIP, 0, 0);
+-	set_msr_interception(msrpm, MSR_IA32_LASTINTTOIP, 0, 0);
++	set_msr_interception(vcpu, MSR_IA32_LASTBRANCHFROMIP, 0, 0);
++	set_msr_interception(vcpu, MSR_IA32_LASTBRANCHTOIP, 0, 0);
++	set_msr_interception(vcpu, MSR_IA32_LASTINTFROMIP, 0, 0);
++	set_msr_interception(vcpu, MSR_IA32_LASTINTTOIP, 0, 0);
+ }
+ 
+ void disable_nmi_singlestep(struct vcpu_svm *svm)
+@@ -1196,10 +1198,10 @@ static int svm_create_vcpu(struct kvm_vcpu *vcpu)
+ 	clear_page(svm->nested.hsave);
+ 
+ 	svm->msrpm = page_address(msrpm_pages);
+-	svm_vcpu_init_msrpm(svm->msrpm);
++	svm_vcpu_init_msrpm(vcpu, svm->msrpm);
+ 
+ 	svm->nested.msrpm = page_address(nested_msrpm_pages);
+-	svm_vcpu_init_msrpm(svm->nested.msrpm);
++	svm_vcpu_init_msrpm(vcpu, svm->nested.msrpm);
+ 
+ 	svm->vmcb = page_address(page);
+ 	clear_page(svm->vmcb);
+@@ -2540,7 +2542,7 @@ static int svm_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr)
+ 		 * We update the L1 MSR bit as well since it will end up
+ 		 * touching the MSR anyway now.
+ 		 */
+-		set_msr_interception(svm->msrpm, MSR_IA32_SPEC_CTRL, 1, 1);
++		set_msr_interception(vcpu, MSR_IA32_SPEC_CTRL, 1, 1);
+ 		break;
+ 	case MSR_IA32_PRED_CMD:
+ 		if (!msr->host_initiated &&
+@@ -2555,7 +2557,7 @@ static int svm_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr)
+ 			break;
+ 
+ 		wrmsrl(MSR_IA32_PRED_CMD, PRED_CMD_IBPB);
+-		set_msr_interception(svm->msrpm, MSR_IA32_PRED_CMD, 0, 1);
++		set_msr_interception(vcpu, MSR_IA32_PRED_CMD, 0, 1);
+ 		break;
+ 	case MSR_AMD64_VIRT_SPEC_CTRL:
+ 		if (!msr->host_initiated &&
+@@ -2619,9 +2621,9 @@ static int svm_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr)
+ 		svm->vmcb->save.dbgctl = data;
+ 		mark_dirty(svm->vmcb, VMCB_LBR);
+ 		if (data & (1ULL<<0))
+-			svm_enable_lbrv(svm);
++			svm_enable_lbrv(vcpu);
+ 		else
+-			svm_disable_lbrv(svm);
++			svm_disable_lbrv(vcpu);
+ 		break;
+ 	case MSR_VM_HSAVE_PA:
+ 		svm->nested.hsave_msr = data;
+diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+index d4a4cec034d0..9313814d9e91 100644
+--- a/arch/x86/kvm/vmx/nested.c
++++ b/arch/x86/kvm/vmx/nested.c
+@@ -4704,7 +4704,7 @@ static int enter_vmx_operation(struct kvm_vcpu *vcpu)
+ 
+ 	if (vmx_pt_mode_is_host_guest()) {
+ 		vmx->pt_desc.guest.ctl = 0;
+-		pt_update_intercept_for_msr(vmx);
++		pt_update_intercept_for_msr(vcpu);
+ 	}
+ 
  	return 0;
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index 13745f2a5ecd..1313e47a5a1e 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -342,7 +342,7 @@ module_param_cb(vmentry_l1d_flush, &vmentry_l1d_flush_ops, NULL, 0644);
+ 
+ static bool guest_state_valid(struct kvm_vcpu *vcpu);
+ static u32 vmx_segment_access_rights(struct kvm_segment *var);
+-static __always_inline void vmx_disable_intercept_for_msr(unsigned long *msr_bitmap,
++static __always_inline void vmx_disable_intercept_for_msr(struct kvm_vcpu *vcpu,
+ 							  u32 msr, int type);
+ 
+ void vmx_vmexit(void);
+@@ -2081,7 +2081,7 @@ static int vmx_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+ 		 * in the merging. We update the vmcs01 here for L1 as well
+ 		 * since it will end up touching the MSR anyway now.
+ 		 */
+-		vmx_disable_intercept_for_msr(vmx->vmcs01.msr_bitmap,
++		vmx_disable_intercept_for_msr(vcpu,
+ 					      MSR_IA32_SPEC_CTRL,
+ 					      MSR_TYPE_RW);
+ 		break;
+@@ -2117,8 +2117,7 @@ static int vmx_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+ 		 * vmcs02.msr_bitmap here since it gets completely overwritten
+ 		 * in the merging.
+ 		 */
+-		vmx_disable_intercept_for_msr(vmx->vmcs01.msr_bitmap, MSR_IA32_PRED_CMD,
+-					      MSR_TYPE_W);
++		vmx_disable_intercept_for_msr(vcpu, MSR_IA32_PRED_CMD, MSR_TYPE_W);
+ 		break;
+ 	case MSR_IA32_CR_PAT:
+ 		if (!kvm_pat_valid(data))
+@@ -2168,7 +2167,7 @@ static int vmx_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+ 			return 1;
+ 		vmcs_write64(GUEST_IA32_RTIT_CTL, data);
+ 		vmx->pt_desc.guest.ctl = data;
+-		pt_update_intercept_for_msr(vmx);
++		pt_update_intercept_for_msr(vcpu);
+ 		break;
+ 	case MSR_IA32_RTIT_STATUS:
+ 		if (!pt_can_write_msr(vmx))
+@@ -3691,9 +3690,11 @@ void free_vpid(int vpid)
+ 	spin_unlock(&vmx_vpid_lock);
  }
  
-+bool kvm_msr_user_exit(struct kvm *kvm, u32 index)
-+{
-+	struct kvm_msr_list *exit_msrs;
-+	int i;
-+
-+	exit_msrs = kvm->arch.user_exit_msrs;
-+
-+	if (!exit_msrs)
-+		return false;
-+
-+	for (i = 0; i < exit_msrs->nmsrs; ++i) {
-+		if (exit_msrs->indices[i] == index)
-+			return true;
-+	}
-+
-+	return false;
-+}
-+EXPORT_SYMBOL_GPL(kvm_msr_user_exit);
-+
- int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+-static __always_inline void vmx_disable_intercept_for_msr(unsigned long *msr_bitmap,
++static __always_inline void vmx_disable_intercept_for_msr(struct kvm_vcpu *vcpu,
+ 							  u32 msr, int type)
  {
- 	int r = 0;
-@@ -10762,3 +10844,4 @@ EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_avic_unaccelerated_access);
- EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_avic_incomplete_ipi);
- EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_avic_ga_log);
- EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_apicv_update_request);
-+EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_userspace_msr);
-diff --git a/include/trace/events/kvm.h b/include/trace/events/kvm.h
-index 2c735a3e6613..19f33a704174 100644
---- a/include/trace/events/kvm.h
-+++ b/include/trace/events/kvm.h
-@@ -17,7 +17,7 @@
- 	ERSN(NMI), ERSN(INTERNAL_ERROR), ERSN(OSI), ERSN(PAPR_HCALL),	\
- 	ERSN(S390_UCONTROL), ERSN(WATCHDOG), ERSN(S390_TSCH), ERSN(EPR),\
- 	ERSN(SYSTEM_EVENT), ERSN(S390_STSI), ERSN(IOAPIC_EOI),          \
--	ERSN(HYPERV)
-+	ERSN(HYPERV), ERSN(X86_RDMSR), ERSN(X86_WRMSR)
++	struct vcpu_vmx *vmx = to_vmx(vcpu);
++	unsigned long *msr_bitmap = vmx->vmcs01.msr_bitmap;
+ 	int f = sizeof(unsigned long);
  
- TRACE_EVENT(kvm_userspace_exit,
- 	    TP_PROTO(__u32 reason, int errno),
-diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-index de4638c1bd15..2b7d21e6338c 100644
---- a/include/uapi/linux/kvm.h
-+++ b/include/uapi/linux/kvm.h
-@@ -248,6 +248,8 @@ struct kvm_hyperv_exit {
- #define KVM_EXIT_IOAPIC_EOI       26
- #define KVM_EXIT_HYPERV           27
- #define KVM_EXIT_ARM_NISV         28
-+#define KVM_EXIT_X86_RDMSR        29
-+#define KVM_EXIT_X86_WRMSR        30
+ 	if (!cpu_has_vmx_msr_bitmap())
+@@ -3729,9 +3730,11 @@ static __always_inline void vmx_disable_intercept_for_msr(unsigned long *msr_bit
+ 	}
+ }
  
- /* For KVM_EXIT_INTERNAL_ERROR */
- /* Emulate instruction failed. */
-@@ -412,6 +414,14 @@ struct kvm_run {
- 			__u64 esr_iss;
- 			__u64 fault_ipa;
- 		} arm_nisv;
-+		/* KVM_EXIT_X86_RDMSR */
-+		/* KVM_EXIT_X86_RDMSR */
-+		struct {
-+			__u8 inject_gp;
-+			__u8 pad[3];
-+			__u32 index;
-+			__u64 data;
-+		} msr;
- 		/* Fix the size of the union. */
- 		char padding[256];
- 	};
+-static __always_inline void vmx_enable_intercept_for_msr(unsigned long *msr_bitmap,
++static __always_inline void vmx_enable_intercept_for_msr(struct kvm_vcpu *vcpu,
+ 							 u32 msr, int type)
+ {
++	struct vcpu_vmx *vmx = to_vmx(vcpu);
++	unsigned long *msr_bitmap = vmx->vmcs01.msr_bitmap;
+ 	int f = sizeof(unsigned long);
+ 
+ 	if (!cpu_has_vmx_msr_bitmap())
+@@ -3767,13 +3770,13 @@ static __always_inline void vmx_enable_intercept_for_msr(unsigned long *msr_bitm
+ 	}
+ }
+ 
+-static __always_inline void vmx_set_intercept_for_msr(unsigned long *msr_bitmap,
+-			     			      u32 msr, int type, bool value)
++static __always_inline void vmx_set_intercept_for_msr(struct kvm_vcpu *vcpu,
++						      u32 msr, int type, bool value)
+ {
+ 	if (value)
+-		vmx_enable_intercept_for_msr(msr_bitmap, msr, type);
++		vmx_enable_intercept_for_msr(vcpu, msr, type);
+ 	else
+-		vmx_disable_intercept_for_msr(msr_bitmap, msr, type);
++		vmx_disable_intercept_for_msr(vcpu, msr, type);
+ }
+ 
+ static u8 vmx_msr_bitmap_mode(struct kvm_vcpu *vcpu)
+@@ -3791,8 +3794,8 @@ static u8 vmx_msr_bitmap_mode(struct kvm_vcpu *vcpu)
+ 	return mode;
+ }
+ 
+-static void vmx_update_msr_bitmap_x2apic(unsigned long *msr_bitmap,
+-					 u8 mode)
++static void vmx_update_msr_bitmap_x2apic(struct kvm_vcpu *vcpu,
++					 unsigned long *msr_bitmap, u8 mode)
+ {
+ 	int msr;
+ 
+@@ -3807,11 +3810,11 @@ static void vmx_update_msr_bitmap_x2apic(unsigned long *msr_bitmap,
+ 		 * TPR reads and writes can be virtualized even if virtual interrupt
+ 		 * delivery is not in use.
+ 		 */
+-		vmx_disable_intercept_for_msr(msr_bitmap, X2APIC_MSR(APIC_TASKPRI), MSR_TYPE_RW);
++		vmx_disable_intercept_for_msr(vcpu, X2APIC_MSR(APIC_TASKPRI), MSR_TYPE_RW);
+ 		if (mode & MSR_BITMAP_MODE_X2APIC_APICV) {
+-			vmx_enable_intercept_for_msr(msr_bitmap, X2APIC_MSR(APIC_TMCCT), MSR_TYPE_R);
+-			vmx_disable_intercept_for_msr(msr_bitmap, X2APIC_MSR(APIC_EOI), MSR_TYPE_W);
+-			vmx_disable_intercept_for_msr(msr_bitmap, X2APIC_MSR(APIC_SELF_IPI), MSR_TYPE_W);
++			vmx_enable_intercept_for_msr(vcpu, X2APIC_MSR(APIC_TMCCT), MSR_TYPE_RW);
++			vmx_disable_intercept_for_msr(vcpu, X2APIC_MSR(APIC_EOI), MSR_TYPE_W);
++			vmx_disable_intercept_for_msr(vcpu, X2APIC_MSR(APIC_SELF_IPI), MSR_TYPE_W);
+ 		}
+ 	}
+ }
+@@ -3827,30 +3830,24 @@ void vmx_update_msr_bitmap(struct kvm_vcpu *vcpu)
+ 		return;
+ 
+ 	if (changed & (MSR_BITMAP_MODE_X2APIC | MSR_BITMAP_MODE_X2APIC_APICV))
+-		vmx_update_msr_bitmap_x2apic(msr_bitmap, mode);
++		vmx_update_msr_bitmap_x2apic(vcpu, msr_bitmap, mode);
+ 
+ 	vmx->msr_bitmap_mode = mode;
+ }
+ 
+-void pt_update_intercept_for_msr(struct vcpu_vmx *vmx)
++void pt_update_intercept_for_msr(struct kvm_vcpu *vcpu)
+ {
+-	unsigned long *msr_bitmap = vmx->vmcs01.msr_bitmap;
++	struct vcpu_vmx *vmx = to_vmx(vcpu);
+ 	bool flag = !(vmx->pt_desc.guest.ctl & RTIT_CTL_TRACEEN);
+ 	u32 i;
+ 
+-	vmx_set_intercept_for_msr(msr_bitmap, MSR_IA32_RTIT_STATUS,
+-							MSR_TYPE_RW, flag);
+-	vmx_set_intercept_for_msr(msr_bitmap, MSR_IA32_RTIT_OUTPUT_BASE,
+-							MSR_TYPE_RW, flag);
+-	vmx_set_intercept_for_msr(msr_bitmap, MSR_IA32_RTIT_OUTPUT_MASK,
+-							MSR_TYPE_RW, flag);
+-	vmx_set_intercept_for_msr(msr_bitmap, MSR_IA32_RTIT_CR3_MATCH,
+-							MSR_TYPE_RW, flag);
++	vmx_set_intercept_for_msr(vcpu, MSR_IA32_RTIT_STATUS, MSR_TYPE_RW, flag);
++	vmx_set_intercept_for_msr(vcpu, MSR_IA32_RTIT_OUTPUT_BASE, MSR_TYPE_RW, flag);
++	vmx_set_intercept_for_msr(vcpu, MSR_IA32_RTIT_OUTPUT_MASK, MSR_TYPE_RW, flag);
++	vmx_set_intercept_for_msr(vcpu, MSR_IA32_RTIT_CR3_MATCH, MSR_TYPE_RW, flag);
+ 	for (i = 0; i < vmx->pt_desc.addr_range; i++) {
+-		vmx_set_intercept_for_msr(msr_bitmap,
+-			MSR_IA32_RTIT_ADDR0_A + i * 2, MSR_TYPE_RW, flag);
+-		vmx_set_intercept_for_msr(msr_bitmap,
+-			MSR_IA32_RTIT_ADDR0_B + i * 2, MSR_TYPE_RW, flag);
++		vmx_set_intercept_for_msr(vcpu, MSR_IA32_RTIT_ADDR0_A + i * 2, MSR_TYPE_RW, flag);
++		vmx_set_intercept_for_msr(vcpu, MSR_IA32_RTIT_ADDR0_B + i * 2, MSR_TYPE_RW, flag);
+ 	}
+ }
+ 
+@@ -6905,18 +6902,18 @@ static int vmx_create_vcpu(struct kvm_vcpu *vcpu)
+ 		goto free_pml;
+ 
+ 	msr_bitmap = vmx->vmcs01.msr_bitmap;
+-	vmx_disable_intercept_for_msr(msr_bitmap, MSR_IA32_TSC, MSR_TYPE_R);
+-	vmx_disable_intercept_for_msr(msr_bitmap, MSR_FS_BASE, MSR_TYPE_RW);
+-	vmx_disable_intercept_for_msr(msr_bitmap, MSR_GS_BASE, MSR_TYPE_RW);
+-	vmx_disable_intercept_for_msr(msr_bitmap, MSR_KERNEL_GS_BASE, MSR_TYPE_RW);
+-	vmx_disable_intercept_for_msr(msr_bitmap, MSR_IA32_SYSENTER_CS, MSR_TYPE_RW);
+-	vmx_disable_intercept_for_msr(msr_bitmap, MSR_IA32_SYSENTER_ESP, MSR_TYPE_RW);
+-	vmx_disable_intercept_for_msr(msr_bitmap, MSR_IA32_SYSENTER_EIP, MSR_TYPE_RW);
++	vmx_disable_intercept_for_msr(vcpu, MSR_IA32_TSC, MSR_TYPE_R);
++	vmx_disable_intercept_for_msr(vcpu, MSR_FS_BASE, MSR_TYPE_RW);
++	vmx_disable_intercept_for_msr(vcpu, MSR_GS_BASE, MSR_TYPE_RW);
++	vmx_disable_intercept_for_msr(vcpu, MSR_KERNEL_GS_BASE, MSR_TYPE_RW);
++	vmx_disable_intercept_for_msr(vcpu, MSR_IA32_SYSENTER_CS, MSR_TYPE_RW);
++	vmx_disable_intercept_for_msr(vcpu, MSR_IA32_SYSENTER_ESP, MSR_TYPE_RW);
++	vmx_disable_intercept_for_msr(vcpu, MSR_IA32_SYSENTER_EIP, MSR_TYPE_RW);
+ 	if (kvm_cstate_in_guest(vcpu->kvm)) {
+-		vmx_disable_intercept_for_msr(msr_bitmap, MSR_CORE_C1_RES, MSR_TYPE_R);
+-		vmx_disable_intercept_for_msr(msr_bitmap, MSR_CORE_C3_RESIDENCY, MSR_TYPE_R);
+-		vmx_disable_intercept_for_msr(msr_bitmap, MSR_CORE_C6_RESIDENCY, MSR_TYPE_R);
+-		vmx_disable_intercept_for_msr(msr_bitmap, MSR_CORE_C7_RESIDENCY, MSR_TYPE_R);
++		vmx_disable_intercept_for_msr(vcpu, MSR_CORE_C1_RES, MSR_TYPE_R);
++		vmx_disable_intercept_for_msr(vcpu, MSR_CORE_C3_RESIDENCY, MSR_TYPE_R);
++		vmx_disable_intercept_for_msr(vcpu, MSR_CORE_C6_RESIDENCY, MSR_TYPE_R);
++		vmx_disable_intercept_for_msr(vcpu, MSR_CORE_C7_RESIDENCY, MSR_TYPE_R);
+ 	}
+ 	vmx->msr_bitmap_mode = 0;
+ 
+diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
+index 639798e4a6ca..b3c74f0fe8a1 100644
+--- a/arch/x86/kvm/vmx/vmx.h
++++ b/arch/x86/kvm/vmx/vmx.h
+@@ -350,7 +350,7 @@ bool vmx_get_nmi_mask(struct kvm_vcpu *vcpu);
+ void vmx_set_nmi_mask(struct kvm_vcpu *vcpu, bool masked);
+ void vmx_set_virtual_apic_mode(struct kvm_vcpu *vcpu);
+ struct shared_msr_entry *find_msr_entry(struct vcpu_vmx *vmx, u32 msr);
+-void pt_update_intercept_for_msr(struct vcpu_vmx *vmx);
++void pt_update_intercept_for_msr(struct kvm_vcpu *vcpu);
+ void vmx_update_host_rsp(struct vcpu_vmx *vmx, unsigned long host_rsp);
+ int vmx_find_msr_index(struct vmx_msrs *m, u32 msr);
+ int vmx_handle_memory_failure(struct kvm_vcpu *vcpu, int r,
 -- 
 2.28.0.163.g6104cc2f0b6-goog
 
