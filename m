@@ -2,131 +2,150 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4051C23BC92
-	for <lists+kvm@lfdr.de>; Tue,  4 Aug 2020 16:47:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4930623BCB0
+	for <lists+kvm@lfdr.de>; Tue,  4 Aug 2020 16:52:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729305AbgHDOrg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 4 Aug 2020 10:47:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60116 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725904AbgHDOrM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 4 Aug 2020 10:47:12 -0400
-Received: from mail-wm1-x342.google.com (mail-wm1-x342.google.com [IPv6:2a00:1450:4864:20::342])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BB174C061756
-        for <kvm@vger.kernel.org>; Tue,  4 Aug 2020 07:47:11 -0700 (PDT)
-Received: by mail-wm1-x342.google.com with SMTP id x5so2936243wmi.2
-        for <kvm@vger.kernel.org>; Tue, 04 Aug 2020 07:47:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=references:user-agent:from:to:cc:subject:in-reply-to:date
-         :message-id:mime-version:content-transfer-encoding;
-        bh=r6kGfPE/KsV7nTfH/d4o6yMleyqMBQteeLYhE/uXEe8=;
-        b=aVExCt4oLxLR9aFvpeWEL25FVcXyMBmA32sEnExxpKELRADyd/9R8grqfipU4KCnal
-         xw/mDJ1vB99SSCGocIuUpjfn/n+6sq37uzwOBd9mLMKkVAI+lqriN5bX9rydaC5fOnbj
-         0JtNaK5ZOpnv/jS7GrAf3KIXRvmO0w8y8UIlljMRS32B26TgTdXAdQygC7MBMHn5lvoP
-         AxItZMMHNLnLZ4HD7gvVz87UAMtI4b+WfUKZPyuyAhPhQZn3H0V7TXQuP4XID2r4pBE8
-         0WVBskw0itNLwIU1bhZ/+0X4da9muIyp02S9F8OzsA8dAJ6ZSM4dlKp55if4+eS/15qd
-         3g0Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:references:user-agent:from:to:cc:subject
-         :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
-        bh=r6kGfPE/KsV7nTfH/d4o6yMleyqMBQteeLYhE/uXEe8=;
-        b=e8DpY4GVTv1JpufDO2kZFKE2LiF9J6y4H60ucZ9KS9WBYjgYLkBzTen8T0myUybTgU
-         mFjLfypPGq6Sm4jdnqRXxu/AHBzH19CadslIrnUnn+eMjcvgE5O5yIpktp0yqpuChtky
-         M06BrxUSoKDvpG7byaMz1ytrKSGlUexOV4LXwM+meDkFBs0lAw8tABlx5U+jgTlJnRiq
-         lyVZ6uxSUSZn0VrnAvxh+BK268/9vAxpjZziJAR+sIWwc8nf2XvoZSTLMl3QepYdIKnD
-         vozEYTOAcy2LSw429u0pR01DtO3uwy3ahrsMrRLKgvVHOkVTu6sJJgJ9/O6uRNz8+mb2
-         UeJw==
-X-Gm-Message-State: AOAM532VjG0DCNNXKG2NIvQ7DKQEg3ltM1tQO8fnuBkWP4CrhAbuvYc/
-        Y4zjbXxBx9BmK0VIXaGoVmp9NQ==
-X-Google-Smtp-Source: ABdhPJygwsnCNO92emQNPWtLheZnx+hxAUxJL5JREQ4YEEZj8ftsQfnryzZlL6jATdGaMqcJvVKRKw==
-X-Received: by 2002:a1c:f605:: with SMTP id w5mr4306747wmc.26.1596552430480;
-        Tue, 04 Aug 2020 07:47:10 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
-        by smtp.gmail.com with ESMTPSA id t25sm4403673wmj.18.2020.08.04.07.47.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 04 Aug 2020 07:47:09 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
-        by zen.linaroharston (Postfix) with ESMTP id 48B801FF7E;
-        Tue,  4 Aug 2020 15:47:08 +0100 (BST)
-References: <20200804124417.27102-1-alex.bennee@linaro.org>
- <CAMj1kXErSf7sQ4pPu-1em4AM=9JejA_-w3iwv4Wt=dgbQHxp-g@mail.gmail.com>
-User-agent: mu4e 1.5.5; emacs 28.0.50
-From:   Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To:     Ard Biesheuvel <ardb@kernel.org>
-Cc:     kvm@vger.kernel.org,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        Marc Zyngier <maz@kernel.org>,
-        Christoffer Dall <christoffer.dall@arm.com>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        kvmarm <kvmarm@lists.cs.columbia.edu>
-Subject: Re: [RFC PATCH v1 0/3] put arm64 kvm_config on a diet
-In-reply-to: <CAMj1kXErSf7sQ4pPu-1em4AM=9JejA_-w3iwv4Wt=dgbQHxp-g@mail.gmail.com>
-Date:   Tue, 04 Aug 2020 15:47:08 +0100
-Message-ID: <87o8nqmpsj.fsf@linaro.org>
+        id S1729200AbgHDOwa (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 4 Aug 2020 10:52:30 -0400
+Received: from foss.arm.com ([217.140.110.172]:44952 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728097AbgHDOw0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 4 Aug 2020 10:52:26 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 2299431B;
+        Tue,  4 Aug 2020 07:52:26 -0700 (PDT)
+Received: from monolith.localdoman (unknown [10.37.12.88])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id D86BE3F718;
+        Tue,  4 Aug 2020 07:52:24 -0700 (PDT)
+From:   Alexandru Elisei <alexandru.elisei@arm.com>
+To:     kvm@vger.kernel.org
+Cc:     milon@wq.cz, julien.thierry.kdev@gmail.com, will@kernel.org,
+        jean-philippe@linaro.org, andre.przywara@arm.com,
+        Anvay Virkar <anvay.virkar@arm.com>
+Subject: [PATCH v2 kvmtool] virtio: Fix ordering of virtio_queue__should_signal()
+Date:   Tue,  4 Aug 2020 15:53:17 +0100
+Message-Id: <20200804145317.51633-1-alexandru.elisei@arm.com>
+X-Mailer: git-send-email 2.28.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+The guest programs used_event in the avail ring to let the host know when
+it wants a notification from the device. The host notifies the guest when
+the used ring index passes used_event. It is possible for the guest to
+submit a buffer, and then go into uninterruptible sleep waiting for this
+notification.
 
-Ard Biesheuvel <ardb@kernel.org> writes:
+The virtio-blk guest driver, in the notification callback virtblk_done(),
+increments the last known used ring index, then sets used_event to this
+value, which means it will get a notification after the next buffer is
+consumed by the host. virtblk_done() exits after the value of the used
+ring idx has been propagated from the host thread.
 
-> On Tue, 4 Aug 2020 at 14:45, Alex Benn=C3=A9e <alex.bennee@linaro.org> wr=
-ote:
->>
->> Hi,
->>
->> When building guest kernels for virtualisation we were bringing in a
->> bunch of stuff from physical hardware which we don't need for our
->> idealised fixable virtual PCI devices. This series makes some Kconfig
->> changes to allow the ThunderX and XGene PCI drivers to be compiled
->> out. It also drops PCI_QUIRKS from the KVM guest build as a virtual
->> PCI device should be quirk free.
->>
->
-> What about PCI passthrough?
+On the host side, the virtio-blk device increments the used ring index,
+then compares it to used_event to decide if a notification should be sent.
 
-That is a good point - how much of the host PCI controller is visible to
-a pass-through guest?
+This is a common communication pattern between two threads, called store
+buffer. Memory barriers are needed in order for the pattern to work
+correctly, otherwise it is possible for the host to miss sending a required
+notification.
 
-AIUI in passthrough the driver only interacts with the particular cards
-IO window. How many quirks are visible just at the device level (rather
-than the bus itself)?
+Initial state: vring.used.idx = 2, vring.used_event = 1 (idx passes
+used_event, which means kvmtool notifies the guest).
 
-That said I think the last patch might get dropped as long as the user
-has the option to slim down their kernel with the first two.
+	GUEST (in virtblk_done())	| KVMTOOL (in virtio_blk_complete())
+					|
+(increment vq->last_used_idx = 2)	|
+// virtqueue_enable_cb_prepare_split():	| // virt_queue__used_idx_advance():
+write vring.used_event = 2		| write vring.used.idx = 3
+// virtqueue_poll():			|
+mb()					| wmb()
+// virtqueue_poll_split():		| // virt_queue__should_signal():
+read vring.used.idx = 2			| read vring.used_event = 1
+// virtblk_done() exits.		| // No notification.
 
->
->> This is my first time hacking around Kconfig so I hope I've got the
->> balance between depends and selects right but please let be know if it
->> could be specified in a cleaner way.
->>
->> Alex Benn=C3=A9e (3):
->>   arm64: allow de-selection of ThunderX PCI controllers
->>   arm64: gate the whole of pci-xgene on CONFIG_PCI_XGENE
->>   kernel/configs: don't include PCI_QUIRKS in KVM guest configs
->>
->>  arch/arm64/Kconfig.platforms    | 2 ++
->>  arch/arm64/configs/defconfig    | 1 +
->>  drivers/pci/controller/Kconfig  | 7 +++++++
->>  drivers/pci/controller/Makefile | 8 +++-----
->>  kernel/configs/kvm_guest.config | 1 +
->>  5 files changed, 14 insertions(+), 5 deletions(-)
->>
->> --
->> 2.20.1
->>
->>
->> _______________________________________________
->> linux-arm-kernel mailing list
->> linux-arm-kernel@lists.infradead.org
->> http://lists.infradead.org/mailman/listinfo/linux-arm-kernel
+The write memory barrier on the host side is not enough to prevent
+reordering of the read in the kvmtool thread, which can lead to the guest
+thread waiting forever for IO to complete. Replace it with a full memory
+barrier to get the correct store buffer pattern described in the Linux
+litmus test SB+fencembonceonces.litmus, which forbids both threads reading
+the initial values.
 
+Also move the barrier in virtio_queue__should_signal(), because the barrier
+is needed for notifications to work correctly, and it makes more sense to
+have it in the function that determines if the host should notify the
+guest.
 
---=20
-Alex Benn=C3=A9e
+Reported-by: Anvay Virkar <anvay.virkar@arm.com>
+Suggested-by: Anvay Virkar <anvay.virkar@arm.com>
+Reviewed-by: Jean-Philippe Brucker <jean-philippe@linaro.org>
+Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+---
+Changes in v2:
+- Updated commit message with suggestions from Jean. Hoping that now it's
+  clearer that the hang is caused by kvmtool not implementing the store
+  buffer pattern correctly.
+
+I've added a link to the online herd7 memory model tool with the store
+buffer pattern [1]. The DMB SY can be replaced with DMB ST in one of
+the threads, to mimic what kvmtool does, and the forbidden behaviour
+becomes possible.
+
+This was observed by Anvay, where both the guest and kvmtool read the
+previous values of used.idx, and used_event respectively. The guest goes
+into uninterruptible sleep and the notification is not sent.
+
+I *think* this also fixes the VM hang reported in [2], where several
+processes in the guest were stuck in uninterruptible sleep. I am not
+familiar with the block layer, but my theory is that the threads were stuck
+in wait_for_completion_io(), from blk_execute_rq() executing a flush
+request. Milan has agreed to give this patch a spin [3], but that might
+take a while because the bug is not easily reproducible. I believe the
+patch can be merged on its own.
+
+[1] http://diy.inria.fr/www/index.html?record=aarch64&cat=aarch64-v04&litmus=SB%2Bdmb.sys&cfg=new-web
+[2] https://www.spinics.net/lists/kvm/msg204543.html
+[3] https://www.spinics.net/lists/kvm/msg222201.html
+
+ virtio/core.c | 15 ++++++++-------
+ 1 file changed, 8 insertions(+), 7 deletions(-)
+
+diff --git a/virtio/core.c b/virtio/core.c
+index f5b3c07fc100..90a661d12e14 100644
+--- a/virtio/core.c
++++ b/virtio/core.c
+@@ -33,13 +33,6 @@ void virt_queue__used_idx_advance(struct virt_queue *queue, u16 jump)
+ 	wmb();
+ 	idx += jump;
+ 	queue->vring.used->idx = virtio_host_to_guest_u16(queue, idx);
+-
+-	/*
+-	 * Use wmb to assure used idx has been increased before we signal the guest.
+-	 * Without a wmb here the guest may ignore the queue since it won't see
+-	 * an updated idx.
+-	 */
+-	wmb();
+ }
+ 
+ struct vring_used_elem *
+@@ -194,6 +187,14 @@ bool virtio_queue__should_signal(struct virt_queue *vq)
+ {
+ 	u16 old_idx, new_idx, event_idx;
+ 
++	/*
++	 * Use mb to assure used idx has been increased before we signal the
++	 * guest, and we don't read a stale value for used_event. Without a mb
++	 * here we might not send a notification that we need to send, or the
++	 * guest may ignore the queue since it won't see an updated idx.
++	 */
++	mb();
++
+ 	if (!vq->use_event_idx) {
+ 		/*
+ 		 * When VIRTIO_RING_F_EVENT_IDX isn't negotiated, interrupt the
+-- 
+2.28.0
+
