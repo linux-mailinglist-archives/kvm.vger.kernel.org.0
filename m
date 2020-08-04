@@ -2,142 +2,131 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5BA3F23BC8D
-	for <lists+kvm@lfdr.de>; Tue,  4 Aug 2020 16:46:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4051C23BC92
+	for <lists+kvm@lfdr.de>; Tue,  4 Aug 2020 16:47:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729232AbgHDOqt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 4 Aug 2020 10:46:49 -0400
-Received: from mga04.intel.com ([192.55.52.120]:46126 "EHLO mga04.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725904AbgHDOqs (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 4 Aug 2020 10:46:48 -0400
-IronPort-SDR: +Cp4ycQKCgN1f2McA/e4L/6qewZYI4rTgTur/gZhlP+/JhcZHvxsqdOGNNwQE57O5cSOP2Z9j9
- l69stIBZQOOQ==
-X-IronPort-AV: E=McAfee;i="6000,8403,9703"; a="149766952"
-X-IronPort-AV: E=Sophos;i="5.75,434,1589266800"; 
-   d="scan'208";a="149766952"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Aug 2020 07:46:46 -0700
-IronPort-SDR: 5bWjSithPV0Oq0tMhji8wu4ZfDsDLYRZd1SyJ7g4vGMo0Svq57KyLV7M+fbzispGQ0uqn+fsqW
- Wa9dRXsFcJ4A==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.75,434,1589266800"; 
-   d="scan'208";a="324677258"
-Received: from gliakhov-mobl2.ger.corp.intel.com (HELO ubuntu) ([10.252.37.210])
-  by fmsmga002.fm.intel.com with ESMTP; 04 Aug 2020 07:46:43 -0700
-Date:   Tue, 4 Aug 2020 16:46:42 +0200
-From:   Guennadi Liakhovetski <guennadi.liakhovetski@linux.intel.com>
-To:     "Michael S. Tsirkin" <mst@redhat.com>
-Cc:     kvm@vger.kernel.org, linux-remoteproc@vger.kernel.org,
-        virtualization@lists.linux-foundation.org,
-        sound-open-firmware@alsa-project.org,
-        Pierre-Louis Bossart <pierre-louis.bossart@linux.intel.com>,
-        Liam Girdwood <liam.r.girdwood@linux.intel.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Ohad Ben-Cohen <ohad@wizery.com>,
-        Bjorn Andersson <bjorn.andersson@linaro.org>,
-        Mathieu Poirier <mathieu.poirier@linaro.org>,
-        Vincent Whitchurch <vincent.whitchurch@axis.com>
-Subject: Re: [PATCH v4 0/4] Add a vhost RPMsg API
-Message-ID: <20200804144642.GB19025@ubuntu>
-References: <20200722150927.15587-1-guennadi.liakhovetski@linux.intel.com>
- <20200804082250-mutt-send-email-mst@kernel.org>
- <20200804131918.GA19025@ubuntu>
- <20200804100747-mutt-send-email-mst@kernel.org>
+        id S1729305AbgHDOrg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 4 Aug 2020 10:47:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60116 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725904AbgHDOrM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 4 Aug 2020 10:47:12 -0400
+Received: from mail-wm1-x342.google.com (mail-wm1-x342.google.com [IPv6:2a00:1450:4864:20::342])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BB174C061756
+        for <kvm@vger.kernel.org>; Tue,  4 Aug 2020 07:47:11 -0700 (PDT)
+Received: by mail-wm1-x342.google.com with SMTP id x5so2936243wmi.2
+        for <kvm@vger.kernel.org>; Tue, 04 Aug 2020 07:47:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=references:user-agent:from:to:cc:subject:in-reply-to:date
+         :message-id:mime-version:content-transfer-encoding;
+        bh=r6kGfPE/KsV7nTfH/d4o6yMleyqMBQteeLYhE/uXEe8=;
+        b=aVExCt4oLxLR9aFvpeWEL25FVcXyMBmA32sEnExxpKELRADyd/9R8grqfipU4KCnal
+         xw/mDJ1vB99SSCGocIuUpjfn/n+6sq37uzwOBd9mLMKkVAI+lqriN5bX9rydaC5fOnbj
+         0JtNaK5ZOpnv/jS7GrAf3KIXRvmO0w8y8UIlljMRS32B26TgTdXAdQygC7MBMHn5lvoP
+         AxItZMMHNLnLZ4HD7gvVz87UAMtI4b+WfUKZPyuyAhPhQZn3H0V7TXQuP4XID2r4pBE8
+         0WVBskw0itNLwIU1bhZ/+0X4da9muIyp02S9F8OzsA8dAJ6ZSM4dlKp55if4+eS/15qd
+         3g0Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:references:user-agent:from:to:cc:subject
+         :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+        bh=r6kGfPE/KsV7nTfH/d4o6yMleyqMBQteeLYhE/uXEe8=;
+        b=e8DpY4GVTv1JpufDO2kZFKE2LiF9J6y4H60ucZ9KS9WBYjgYLkBzTen8T0myUybTgU
+         mFjLfypPGq6Sm4jdnqRXxu/AHBzH19CadslIrnUnn+eMjcvgE5O5yIpktp0yqpuChtky
+         M06BrxUSoKDvpG7byaMz1ytrKSGlUexOV4LXwM+meDkFBs0lAw8tABlx5U+jgTlJnRiq
+         lyVZ6uxSUSZn0VrnAvxh+BK268/9vAxpjZziJAR+sIWwc8nf2XvoZSTLMl3QepYdIKnD
+         vozEYTOAcy2LSw429u0pR01DtO3uwy3ahrsMrRLKgvVHOkVTu6sJJgJ9/O6uRNz8+mb2
+         UeJw==
+X-Gm-Message-State: AOAM532VjG0DCNNXKG2NIvQ7DKQEg3ltM1tQO8fnuBkWP4CrhAbuvYc/
+        Y4zjbXxBx9BmK0VIXaGoVmp9NQ==
+X-Google-Smtp-Source: ABdhPJygwsnCNO92emQNPWtLheZnx+hxAUxJL5JREQ4YEEZj8ftsQfnryzZlL6jATdGaMqcJvVKRKw==
+X-Received: by 2002:a1c:f605:: with SMTP id w5mr4306747wmc.26.1596552430480;
+        Tue, 04 Aug 2020 07:47:10 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+        by smtp.gmail.com with ESMTPSA id t25sm4403673wmj.18.2020.08.04.07.47.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 04 Aug 2020 07:47:09 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+        by zen.linaroharston (Postfix) with ESMTP id 48B801FF7E;
+        Tue,  4 Aug 2020 15:47:08 +0100 (BST)
+References: <20200804124417.27102-1-alex.bennee@linaro.org>
+ <CAMj1kXErSf7sQ4pPu-1em4AM=9JejA_-w3iwv4Wt=dgbQHxp-g@mail.gmail.com>
+User-agent: mu4e 1.5.5; emacs 28.0.50
+From:   Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To:     Ard Biesheuvel <ardb@kernel.org>
+Cc:     kvm@vger.kernel.org,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        Marc Zyngier <maz@kernel.org>,
+        Christoffer Dall <christoffer.dall@arm.com>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        kvmarm <kvmarm@lists.cs.columbia.edu>
+Subject: Re: [RFC PATCH v1 0/3] put arm64 kvm_config on a diet
+In-reply-to: <CAMj1kXErSf7sQ4pPu-1em4AM=9JejA_-w3iwv4Wt=dgbQHxp-g@mail.gmail.com>
+Date:   Tue, 04 Aug 2020 15:47:08 +0100
+Message-ID: <87o8nqmpsj.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200804100747-mutt-send-email-mst@kernel.org>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Aug 04, 2020 at 10:10:23AM -0400, Michael S. Tsirkin wrote:
-> On Tue, Aug 04, 2020 at 03:19:19PM +0200, Guennadi Liakhovetski wrote:
-> > Hi Michael,
-> > 
-> > On Tue, Aug 04, 2020 at 08:26:53AM -0400, Michael S. Tsirkin wrote:
-> > > On Wed, Jul 22, 2020 at 05:09:23PM +0200, Guennadi Liakhovetski wrote:
-> > > > Hi,
-> > > > 
-> > > > Now that virtio-rpmsg endianness fixes have been merged we can 
-> > > > proceed with the next step.
-> > > 
-> > > OK my attempts to resolve conflicts just created a mess.
-> > 
-> > You just need to apply my previous patch for virtio-rpmsg first 
-> > https://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git/commit/drivers/rpmsg/virtio_rpmsg_bus.c?id=111d1089700cdb752681ef44f54ab6137736f5c2
-> > Then this series should apply cleanly.
-> > 
-> > Thanks
-> > Guennadi
-> 
-> Hmm.  Could you test the vhost branch in my tree, and tell me if that looks
-> good to you?
 
-Sorry, I'm not sure I understand why you're trying to resolve conflicts 
-manually. My previous patch is already in "next," if you don't pull from 
-"next" you will have a conflict when pushing to it. What am I missing?
+Ard Biesheuvel <ardb@kernel.org> writes:
 
-Thanks
-Guennadi
+> On Tue, 4 Aug 2020 at 14:45, Alex Benn=C3=A9e <alex.bennee@linaro.org> wr=
+ote:
+>>
+>> Hi,
+>>
+>> When building guest kernels for virtualisation we were bringing in a
+>> bunch of stuff from physical hardware which we don't need for our
+>> idealised fixable virtual PCI devices. This series makes some Kconfig
+>> changes to allow the ThunderX and XGene PCI drivers to be compiled
+>> out. It also drops PCI_QUIRKS from the KVM guest build as a virtual
+>> PCI device should be quirk free.
+>>
+>
+> What about PCI passthrough?
 
-> > > I dropped these for now, could you pls rebase on top
-> > > of linux-next branch in my tree, and repost?
-> > > Thanks!
-> > > 
-> > > 
-> > > > v4:
-> > > > - add endianness conversions to comply with the VirtIO standard
-> > > > 
-> > > > v3:
-> > > > - address several checkpatch warnings
-> > > > - address comments from Mathieu Poirier
-> > > > 
-> > > > v2:
-> > > > - update patch #5 with a correct vhost_dev_init() prototype
-> > > > - drop patch #6 - it depends on a different patch, that is currently
-> > > >   an RFC
-> > > > - address comments from Pierre-Louis Bossart:
-> > > >   * remove "default n" from Kconfig
-> > > > 
-> > > > Linux supports RPMsg over VirtIO for "remote processor" / AMP use
-> > > > cases. It can however also be used for virtualisation scenarios,
-> > > > e.g. when using KVM to run Linux on both the host and the guests.
-> > > > This patch set adds a wrapper API to facilitate writing vhost
-> > > > drivers for such RPMsg-based solutions. The first use case is an
-> > > > audio DSP virtualisation project, currently under development, ready
-> > > > for review and submission, available at
-> > > > https://github.com/thesofproject/linux/pull/1501/commits
-> > > > 
-> > > > Thanks
-> > > > Guennadi
-> > > > 
-> > > > Guennadi Liakhovetski (4):
-> > > >   vhost: convert VHOST_VSOCK_SET_RUNNING to a generic ioctl
-> > > >   rpmsg: move common structures and defines to headers
-> > > >   rpmsg: update documentation
-> > > >   vhost: add an RPMsg API
-> > > > 
-> > > >  Documentation/rpmsg.txt          |   6 +-
-> > > >  drivers/rpmsg/virtio_rpmsg_bus.c |  78 +------
-> > > >  drivers/vhost/Kconfig            |   7 +
-> > > >  drivers/vhost/Makefile           |   3 +
-> > > >  drivers/vhost/rpmsg.c            | 375 +++++++++++++++++++++++++++++++
-> > > >  drivers/vhost/vhost_rpmsg.h      |  74 ++++++
-> > > >  include/linux/virtio_rpmsg.h     |  83 +++++++
-> > > >  include/uapi/linux/rpmsg.h       |   3 +
-> > > >  include/uapi/linux/vhost.h       |   4 +-
-> > > >  9 files changed, 553 insertions(+), 80 deletions(-)
-> > > >  create mode 100644 drivers/vhost/rpmsg.c
-> > > >  create mode 100644 drivers/vhost/vhost_rpmsg.h
-> > > >  create mode 100644 include/linux/virtio_rpmsg.h
-> > > > 
-> > > > -- 
-> > > > 2.27.0
-> > > 
-> 
+That is a good point - how much of the host PCI controller is visible to
+a pass-through guest?
+
+AIUI in passthrough the driver only interacts with the particular cards
+IO window. How many quirks are visible just at the device level (rather
+than the bus itself)?
+
+That said I think the last patch might get dropped as long as the user
+has the option to slim down their kernel with the first two.
+
+>
+>> This is my first time hacking around Kconfig so I hope I've got the
+>> balance between depends and selects right but please let be know if it
+>> could be specified in a cleaner way.
+>>
+>> Alex Benn=C3=A9e (3):
+>>   arm64: allow de-selection of ThunderX PCI controllers
+>>   arm64: gate the whole of pci-xgene on CONFIG_PCI_XGENE
+>>   kernel/configs: don't include PCI_QUIRKS in KVM guest configs
+>>
+>>  arch/arm64/Kconfig.platforms    | 2 ++
+>>  arch/arm64/configs/defconfig    | 1 +
+>>  drivers/pci/controller/Kconfig  | 7 +++++++
+>>  drivers/pci/controller/Makefile | 8 +++-----
+>>  kernel/configs/kvm_guest.config | 1 +
+>>  5 files changed, 14 insertions(+), 5 deletions(-)
+>>
+>> --
+>> 2.20.1
+>>
+>>
+>> _______________________________________________
+>> linux-arm-kernel mailing list
+>> linux-arm-kernel@lists.infradead.org
+>> http://lists.infradead.org/mailman/listinfo/linux-arm-kernel
+
+
+--=20
+Alex Benn=C3=A9e
