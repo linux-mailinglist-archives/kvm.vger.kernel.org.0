@@ -2,91 +2,86 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 81AFC23BB58
-	for <lists+kvm@lfdr.de>; Tue,  4 Aug 2020 15:46:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 80B6523BB87
+	for <lists+kvm@lfdr.de>; Tue,  4 Aug 2020 15:56:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726887AbgHDNq3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 4 Aug 2020 09:46:29 -0400
-Received: from mail.kernel.org ([198.145.29.99]:51222 "EHLO mail.kernel.org"
+        id S1728616AbgHDN4a (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 4 Aug 2020 09:56:30 -0400
+Received: from mga05.intel.com ([192.55.52.43]:51588 "EHLO mga05.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725826AbgHDNq3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 4 Aug 2020 09:46:29 -0400
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 4EE162075D;
-        Tue,  4 Aug 2020 13:46:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1596548788;
-        bh=roMCFNmPPkY9aOtB8mbdYYu8t78Z3ZS0O3Rhws1u9uE=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=ebOiwiw6ObunrZDT7PrvjzIBqiWke7wA41Iayk6OkmK6KmXuDxquLSr6joJ6RQz6D
-         9zdmERHtU5Z+zeY4147ZiponZGJgLvcc98Y+Nzaargz1rPGaZMCR1UrttQMh1Jun8c
-         aDQFAOYaJRFhnGNldBQbEEjc2jAiqKKBlbxvNxZk=
-Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
-        by disco-boy.misterjones.org with esmtpsa (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
-        (Exim 4.92)
-        (envelope-from <maz@kernel.org>)
-        id 1k2xGs-00HOpC-P7; Tue, 04 Aug 2020 14:46:26 +0100
+        id S1726887AbgHDN42 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 4 Aug 2020 09:56:28 -0400
+IronPort-SDR: voATJnc/sswHb5kLwOpUaMX7IicBrKKf62v1Tn5Z4IOneJk1ljFWE2xAAs0QwS36Z9ocYT7u6v
+ gHjOo/ldl8bQ==
+X-IronPort-AV: E=McAfee;i="6000,8403,9702"; a="237170552"
+X-IronPort-AV: E=Sophos;i="5.75,434,1589266800"; 
+   d="scan'208";a="237170552"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Aug 2020 06:56:26 -0700
+IronPort-SDR: 57O1IX73IgUM+mN6NBg+lrNuHF+iCZ9XBdzoZgVlBCCoQN5s0nqS40/M2O8FUO5iY7mqivH7gG
+ AdexYfJtPnzA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.75,434,1589266800"; 
+   d="scan'208";a="492901361"
+Received: from black.fi.intel.com ([10.237.72.28])
+  by fmsmga005.fm.intel.com with ESMTP; 04 Aug 2020 06:56:24 -0700
+Received: by black.fi.intel.com (Postfix, from userid 1003)
+        id 83A2F11C; Tue,  4 Aug 2020 16:56:23 +0300 (EEST)
+From:   Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+To:     Eric Auger <eric.auger@redhat.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        kvm@vger.kernel.org, Cornelia Huck <cohuck@redhat.com>
+Cc:     Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+Subject: [PATCH v1] vfio: platform: use platform_get_resource()
+Date:   Tue,  4 Aug 2020 16:56:22 +0300
+Message-Id: <20200804135622.11952-1-andriy.shevchenko@linux.intel.com>
+X-Mailer: git-send-email 2.27.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8;
- format=flowed
 Content-Transfer-Encoding: 8bit
-Date:   Tue, 04 Aug 2020 14:46:26 +0100
-From:   Marc Zyngier <maz@kernel.org>
-To:     =?UTF-8?Q?Alex_Benn=C3=A9e?= <alex.bennee@linaro.org>
-Cc:     kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
-        christoffer.dall@arm.com
-Subject: Re: [PATCH  v1 3/3] kernel/configs: don't include PCI_QUIRKS in KVM
- guest configs
-In-Reply-To: <20200804124417.27102-4-alex.bennee@linaro.org>
-References: <20200804124417.27102-1-alex.bennee@linaro.org>
- <20200804124417.27102-4-alex.bennee@linaro.org>
-User-Agent: Roundcube Webmail/1.4.5
-Message-ID: <f80cfa932a650d8f7e8fc02a1656b4c2@kernel.org>
-X-Sender: maz@kernel.org
-X-SA-Exim-Connect-IP: 51.254.78.96
-X-SA-Exim-Rcpt-To: alex.bennee@linaro.org, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu, christoffer.dall@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2020-08-04 13:44, Alex Bennée wrote:
-> The VIRTIO_PCI support is an idealised PCI bus, we don't need a bunch
-> of bloat for real world hardware for a VirtIO guest.
+Use platform_get_resource() to fetch the memory resource
+instead of open-coded variant.
 
-Who says this guest will only have virtio devices?
+Signed-off-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+---
+ drivers/vfio/platform/vfio_platform.c | 16 +++++-----------
+ 1 file changed, 5 insertions(+), 11 deletions(-)
 
-Or even, virtio devices without bugs? Given that said device can
-come from any VMM, I'm not sure this is the right thing to do.
-
-Thanks,
-
-         M.
-
-> 
-> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-> ---
->  kernel/configs/kvm_guest.config | 1 +
->  1 file changed, 1 insertion(+)
-> 
-> diff --git a/kernel/configs/kvm_guest.config 
-> b/kernel/configs/kvm_guest.config
-> index 208481d91090..672863a2fdf1 100644
-> --- a/kernel/configs/kvm_guest.config
-> +++ b/kernel/configs/kvm_guest.config
-> @@ -13,6 +13,7 @@ CONFIG_IP_PNP_DHCP=y
->  CONFIG_BINFMT_ELF=y
->  CONFIG_PCI=y
->  CONFIG_PCI_MSI=y
-> +CONFIG_PCI_QUIRKS=n
->  CONFIG_DEBUG_KERNEL=y
->  CONFIG_VIRTUALIZATION=y
->  CONFIG_HYPERVISOR_GUEST=y
-
+diff --git a/drivers/vfio/platform/vfio_platform.c b/drivers/vfio/platform/vfio_platform.c
+index 1e2769010089..d216126a31c4 100644
+--- a/drivers/vfio/platform/vfio_platform.c
++++ b/drivers/vfio/platform/vfio_platform.c
+@@ -25,19 +25,13 @@ static struct resource *get_platform_resource(struct vfio_platform_device *vdev,
+ 					      int num)
+ {
+ 	struct platform_device *dev = (struct platform_device *) vdev->opaque;
+-	int i;
++	struct resource *res;
+ 
+-	for (i = 0; i < dev->num_resources; i++) {
+-		struct resource *r = &dev->resource[i];
++	res = platform_get_resource(dev, IORESOURCE_MEM, num);
++	if (res)
++		return res;
+ 
+-		if (resource_type(r) & (IORESOURCE_MEM|IORESOURCE_IO)) {
+-			if (!num)
+-				return r;
+-
+-			num--;
+-		}
+-	}
+-	return NULL;
++	return platform_get_resource(dev, IORESOURCE_IO, num);
+ }
+ 
+ static int get_platform_irq(struct vfio_platform_device *vdev, int i)
 -- 
-Jazz is not dead. It just smells funny...
+2.27.0
+
