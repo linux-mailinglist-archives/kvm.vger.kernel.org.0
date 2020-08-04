@@ -2,184 +2,89 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4530823BE43
-	for <lists+kvm@lfdr.de>; Tue,  4 Aug 2020 18:42:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5B69323BE9B
+	for <lists+kvm@lfdr.de>; Tue,  4 Aug 2020 19:08:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729535AbgHDQl7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 4 Aug 2020 12:41:59 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:32384 "EHLO
+        id S1729970AbgHDRIi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 4 Aug 2020 13:08:38 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:29339 "EHLO
         us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1728678AbgHDQl6 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 4 Aug 2020 12:41:58 -0400
+        by vger.kernel.org with ESMTP id S1729305AbgHDRIX (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 4 Aug 2020 13:08:23 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1596559316;
+        s=mimecast20190719; t=1596560902;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=CVKPZjD+nqawWUht3msA2tjd8QOSfxMbQgsYbiHL9vc=;
-        b=bmEki7ePIEzBhOPtalq5wmQ9DZD5OJvqDwMI6gmwjZnbXMzqXhoHCC6CvWu+Bkk5FhMvbf
-        F9QHIr+E1iaMt2WLBe6kFQu8m03N71QLK+t/On4l8d3iXa33+2SVLJGjaG7H9i3Aw6qnqp
-        faS6HxqyWqIUFBnSumEhxU4bk2Nghb0=
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=ursdoHm0tMH2wXUeTBLWm59Mni6170SDHwjwgqHwT+o=;
+        b=fREyw3tqR5I+Gw55wTs3dsCson+0OGrAXZ+t4inTxO/HhAwG0HQZSrnhfsUiXqHZbDqHRi
+        /4fd0AGkbuHPg8oB9Dwfa5BbtjHi6/Jxp9Qur19i7BJZ6ZDzm6FzPcfETIqjVH0/LFD1GX
+        pfMWniAgjpQkDLM1inLgAu4WKDdehdQ=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-443-ylVZJniGNg6PzblW4k6ERA-1; Tue, 04 Aug 2020 12:41:54 -0400
-X-MC-Unique: ylVZJniGNg6PzblW4k6ERA-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+ us-mta-170-2ZsODA-iONy5CZ-XCCUzcA-1; Tue, 04 Aug 2020 13:06:08 -0400
+X-MC-Unique: 2ZsODA-iONy5CZ-XCCUzcA-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8F1D61DE0;
-        Tue,  4 Aug 2020 16:41:52 +0000 (UTC)
-Received: from gondolin (ovpn-112-169.ams2.redhat.com [10.36.112.169])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 7EB445FC36;
-        Tue,  4 Aug 2020 16:41:38 +0000 (UTC)
-Date:   Tue, 4 Aug 2020 18:35:03 +0200
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Yan Zhao <yan.y.zhao@intel.com>
-Cc:     Alex Williamson <alex.williamson@redhat.com>, kvm@vger.kernel.org,
-        libvir-list@redhat.com, Jason Wang <jasowang@redhat.com>,
-        qemu-devel@nongnu.org, kwankhede@nvidia.com, eauger@redhat.com,
-        xin-ran.wang@intel.com, corbet@lwn.net,
-        openstack-discuss@lists.openstack.org, shaohe.feng@intel.com,
-        kevin.tian@intel.com, eskultet@redhat.com,
-        jian-feng.ding@intel.com, dgilbert@redhat.com,
-        zhenyuw@linux.intel.com, hejie.xu@intel.com, bao.yumeng@zte.com.cn,
-        smooney@redhat.com, intel-gvt-dev@lists.freedesktop.org,
-        berrange@redhat.com, dinechin@redhat.com, devel@ovirt.org
-Subject: Re: device compatibility interface for live migration with assigned
- devices
-Message-ID: <20200804183503.39f56516.cohuck@redhat.com>
-In-Reply-To: <20200729080503.GB28676@joy-OptiPlex-7040>
-References: <20200713232957.GD5955@joy-OptiPlex-7040>
-        <9bfa8700-91f5-ebb4-3977-6321f0487a63@redhat.com>
-        <20200716083230.GA25316@joy-OptiPlex-7040>
-        <20200717101258.65555978@x1.home>
-        <20200721005113.GA10502@joy-OptiPlex-7040>
-        <20200727072440.GA28676@joy-OptiPlex-7040>
-        <20200727162321.7097070e@x1.home>
-        <20200729080503.GB28676@joy-OptiPlex-7040>
-Organization: Red Hat GmbH
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8115B106B242;
+        Tue,  4 Aug 2020 17:06:07 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (unknown [10.40.192.120])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 896CC72E48;
+        Tue,  4 Aug 2020 17:06:05 +0000 (UTC)
+From:   Andrew Jones <drjones@redhat.com>
+To:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
+Cc:     maz@kernel.org, steven.price@arm.com, pbonzini@redhat.com
+Subject: [PATCH v2 0/6] KVM: arm64: pvtime: Fixes and a new cap
+Date:   Tue,  4 Aug 2020 19:05:58 +0200
+Message-Id: <20200804170604.42662-1-drjones@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-[sorry about not chiming in earlier]
+v2:
+  - ARM_SMCCC_HV_PV_TIME_FEATURES now also returns SMCCC_RET_NOT_SUPPORTED
+    when steal time is not supported
+  - Added READ_ONCE() for the run_delay read
+  - Reworked kvm_put/get_guest to not require type as a parameter
+  - Added some more text to the documentation for KVM_CAP_STEAL_TIME
+  - Enough changed that I didn't pick up Steven's r-b's
 
-On Wed, 29 Jul 2020 16:05:03 +0800
-Yan Zhao <yan.y.zhao@intel.com> wrote:
 
-> On Mon, Jul 27, 2020 at 04:23:21PM -0600, Alex Williamson wrote:
+The first four patches in the series are fixes that come from testing
+and reviewing pvtime code while writing the QEMU support[*]. The last
+patch is only a convenience for userspace, and I wouldn't be heartbroken
+if it wasn't deemed worth it. The QEMU patches are currently written
+without the cap. However, if the cap is accepted, then I'll change the
+QEMU code to use it.
 
-(...)
+Thanks,
+drew
 
-> > Based on the feedback we've received, the previously proposed interface
-> > is not viable.  I think there's agreement that the user needs to be
-> > able to parse and interpret the version information.  Using json seems
-> > viable, but I don't know if it's the best option.  Is there any
-> > precedent of markup strings returned via sysfs we could follow?  
+[*] https://lists.gnu.org/archive/html/qemu-devel/2020-07/msg03856.html
+    (a v2 of this series will also be posted shortly)
 
-I don't think encoding complex information in a sysfs file is a viable
-approach. Quoting Documentation/filesystems/sysfs.rst:
+Andrew Jones (6):
+  KVM: arm64: pvtime: steal-time is only supported when configured
+  KVM: arm64: pvtime: Fix potential loss of stolen time
+  KVM: arm64: Drop type input from kvm_put_guest
+  KVM: arm64: pvtime: Fix stolen time accounting across migration
+  KVM: Documentation: Minor fixups
+  arm64/x86: KVM: Introduce steal-time cap
 
-"Attributes should be ASCII text files, preferably with only one value            
-per file. It is noted that it may not be efficient to contain only one           
-value per file, so it is socially acceptable to express an array of              
-values of the same type.                                                         
-                                                                                 
-Mixing types, expressing multiple lines of data, and doing fancy                 
-formatting of data is heavily frowned upon."
+ Documentation/virt/kvm/api.rst    | 22 ++++++++++++++++++----
+ arch/arm64/include/asm/kvm_host.h |  2 +-
+ arch/arm64/kvm/arm.c              |  3 +++
+ arch/arm64/kvm/pvtime.c           | 29 +++++++++++++----------------
+ arch/x86/kvm/x86.c                |  3 +++
+ include/linux/kvm_host.h          | 31 ++++++++++++++++++++++++++-----
+ include/uapi/linux/kvm.h          |  1 +
+ 7 files changed, 65 insertions(+), 26 deletions(-)
 
-Even though this is an older file, I think these restrictions still
-apply.
-
-> I found some examples of using formatted string under /sys, mostly under
-> tracing. maybe we can do a similar implementation.
-> 
-> #cat /sys/kernel/debug/tracing/events/kvm/kvm_mmio/format
-
-Note that this is *not* sysfs (anything under debug/ follows different
-rules anyway!)
-
-> 
-> name: kvm_mmio
-> ID: 32
-> format:
->         field:unsigned short common_type;       offset:0;       size:2; signed:0;
->         field:unsigned char common_flags;       offset:2;       size:1; signed:0;
->         field:unsigned char common_preempt_count;       offset:3;       size:1; signed:0;
->         field:int common_pid;   offset:4;       size:4; signed:1;
-> 
->         field:u32 type; offset:8;       size:4; signed:0;
->         field:u32 len;  offset:12;      size:4; signed:0;
->         field:u64 gpa;  offset:16;      size:8; signed:0;
->         field:u64 val;  offset:24;      size:8; signed:0;
-> 
-> print fmt: "mmio %s len %u gpa 0x%llx val 0x%llx", __print_symbolic(REC->type, { 0, "unsatisfied-read" }, { 1, "read" }, { 2, "write" }), REC->len, REC->gpa, REC->val
-> 
-> 
-> #cat /sys/devices/pci0000:00/0000:00:02.0/uevent
-
-'uevent' can probably be considered a special case, I would not really
-want to copy it.
-
-> DRIVER=vfio-pci
-> PCI_CLASS=30000
-> PCI_ID=8086:591D
-> PCI_SUBSYS_ID=8086:2212
-> PCI_SLOT_NAME=0000:00:02.0
-> MODALIAS=pci:v00008086d0000591Dsv00008086sd00002212bc03sc00i00
-> 
-
-(...)
-
-> what about a migration_compatible attribute under device node like
-> below?
-> 
-> #cat /sys/bus/pci/devices/0000\:00\:02.0/UUID1/migration_compatible
-> SELF:
-> 	device_type=pci
-> 	device_id=8086591d
-> 	mdev_type=i915-GVTg_V5_2
-> 	aggregator=1
-> 	pv_mode="none+ppgtt+context"
-> 	interface_version=3
-> COMPATIBLE:
-> 	device_type=pci
-> 	device_id=8086591d
-> 	mdev_type=i915-GVTg_V5_{val1:int:1,2,4,8}
-> 	aggregator={val1}/2
-> 	pv_mode={val2:string:"none+ppgtt","none+context","none+ppgtt+context"} 
-> 	interface_version={val3:int:2,3}
-> COMPATIBLE:
-> 	device_type=pci
-> 	device_id=8086591d
-> 	mdev_type=i915-GVTg_V5_{val1:int:1,2,4,8}
-> 	aggregator={val1}/2
-> 	pv_mode=""  #"" meaning empty, could be absent in a compatible device
-> 	interface_version=1
-
-I'd consider anything of a comparable complexity to be a big no-no. If
-anything, this needs to be split into individual files (with many of
-them being vendor driver specific anyway.)
-
-I think we can list compatible versions in a range/list format, though.
-Something like
-
-cat interface_version 
-2.1.3
-
-cat interface_version_compatible
-2.0.2-2.0.4,2.1.0-
-
-(indicating that versions 2.0.{2,3,4} and all versions after 2.1.0 are
-compatible, considering versions <2 and >2 incompatible by default)
-
-Possible compatibility between different mdev types feels a bit odd to
-me, and should not be included by default (only if it makes sense for a
-particular vendor driver.)
+-- 
+2.25.4
 
