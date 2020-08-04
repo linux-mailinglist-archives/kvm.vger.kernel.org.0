@@ -2,211 +2,205 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3766523B6FF
-	for <lists+kvm@lfdr.de>; Tue,  4 Aug 2020 10:48:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4163A23B6E9
+	for <lists+kvm@lfdr.de>; Tue,  4 Aug 2020 10:38:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729767AbgHDIsP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 4 Aug 2020 04:48:15 -0400
-Received: from mga09.intel.com ([134.134.136.24]:60171 "EHLO mga09.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729390AbgHDIsO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 4 Aug 2020 04:48:14 -0400
-IronPort-SDR: YmuqumWh7UdAdxPJ5gVB/hd72Ce/2Q6uQcgT0wS7YCOC9XLG/s5yJEO20wZFmMTMFBXWD8y5MR
- BhsBJtZazJtw==
-X-IronPort-AV: E=McAfee;i="6000,8403,9702"; a="153441666"
-X-IronPort-AV: E=Sophos;i="5.75,433,1589266800"; 
-   d="scan'208";a="153441666"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Aug 2020 01:48:14 -0700
-IronPort-SDR: irc5RID6ULqLZNetmbd2upm83OlouI5asaiOG3qd3M8sRHo28+PjSLXy2Sis8HfsZ5nGDWBkND
- 2wytEYurr0ZA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.75,433,1589266800"; 
-   d="scan'208";a="330538296"
-Received: from joy-optiplex-7040.sh.intel.com (HELO joy-OptiPlex-7040) ([10.239.13.16])
-  by FMSMGA003.fm.intel.com with ESMTP; 04 Aug 2020 01:48:09 -0700
-Date:   Tue, 4 Aug 2020 16:37:08 +0800
-From:   Yan Zhao <yan.y.zhao@intel.com>
-To:     Alex Williamson <alex.williamson@redhat.com>
-Cc:     Sean Mooney <smooney@redhat.com>, kvm@vger.kernel.org,
-        libvir-list@redhat.com, Jason Wang <jasowang@redhat.com>,
-        qemu-devel@nongnu.org, kwankhede@nvidia.com, eauger@redhat.com,
-        xin-ran.wang@intel.com, corbet@lwn.net,
-        openstack-discuss@lists.openstack.org, shaohe.feng@intel.com,
-        kevin.tian@intel.com, eskultet@redhat.com,
-        jian-feng.ding@intel.com, dgilbert@redhat.com,
-        zhenyuw@linux.intel.com, hejie.xu@intel.com, bao.yumeng@zte.com.cn,
-        intel-gvt-dev@lists.freedesktop.org, berrange@redhat.com,
-        cohuck@redhat.com, dinechin@redhat.com, devel@ovirt.org
-Subject: Re: device compatibility interface for live migration with assigned
- devices
-Message-ID: <20200804083708.GA30485@joy-OptiPlex-7040>
-Reply-To: Yan Zhao <yan.y.zhao@intel.com>
-References: <20200716083230.GA25316@joy-OptiPlex-7040>
- <20200717101258.65555978@x1.home>
- <20200721005113.GA10502@joy-OptiPlex-7040>
- <20200727072440.GA28676@joy-OptiPlex-7040>
- <20200727162321.7097070e@x1.home>
- <20200729080503.GB28676@joy-OptiPlex-7040>
- <e8a973ea0bb2bc3eb15649fb1c44599ae3509e84.camel@redhat.com>
- <20200729131255.68730f68@x1.home>
- <20200730034104.GB32327@joy-OptiPlex-7040>
- <20200730112930.6f4c5762@x1.home>
+        id S1729978AbgHDIik (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 4 Aug 2020 04:38:40 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:35170 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1729794AbgHDIik (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 4 Aug 2020 04:38:40 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1596530318;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=IHNP6heDtaeW+hWwm0uePXKP19Hfc5NyOA6m2+z2mfI=;
+        b=Qwr86XroIonP4oFZw2Me9cxYBxjoxElMMNRC6sTiFjvsyn0/yK9DdchtlH9acyMQvMXxuo
+        IxuJoWuDjs7txwrDlO368IhzU17vSBtVjmTeC8ZW+n28Z3KcNrLv6DIvAFhfOT1zyNyho9
+        xWamwoBmpNXscYqzgdq6qe5UvW0gLM0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-119-h4MQ3iLQM9G6TTnE5NEoRQ-1; Tue, 04 Aug 2020 04:38:36 -0400
+X-MC-Unique: h4MQ3iLQM9G6TTnE5NEoRQ-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DB707101C8A0;
+        Tue,  4 Aug 2020 08:38:34 +0000 (UTC)
+Received: from [10.72.13.197] (ovpn-13-197.pek2.redhat.com [10.72.13.197])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 7167E5C3F8;
+        Tue,  4 Aug 2020 08:38:21 +0000 (UTC)
+Subject: Re: [PATCH V5 1/6] vhost: introduce vhost_vring_call
+To:     Zhu Lingshan <lingshan.zhu@intel.com>, alex.williamson@redhat.com,
+        mst@redhat.com, pbonzini@redhat.com,
+        sean.j.christopherson@intel.com, wanpengli@tencent.com
+Cc:     virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        kvm@vger.kernel.org, eli@mellanox.com, shahafs@mellanox.com,
+        parav@mellanox.com
+References: <20200731065533.4144-1-lingshan.zhu@intel.com>
+ <20200731065533.4144-2-lingshan.zhu@intel.com>
+From:   Jason Wang <jasowang@redhat.com>
+Message-ID: <5e646141-ca8d-77a5-6f41-d30710d91e6d@redhat.com>
+Date:   Tue, 4 Aug 2020 16:38:19 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200730112930.6f4c5762@x1.home>
-User-Agent: Mutt/1.9.4 (2018-02-28)
+In-Reply-To: <20200731065533.4144-2-lingshan.zhu@intel.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> > yes, include a device_api field is better.
-> > for mdev, "device_type=vfio-mdev", is it right?
-> 
-> No, vfio-mdev is not a device API, it's the driver that attaches to the
-> mdev bus device to expose it through vfio.  The device_api exposes the
-> actual interface of the vfio device, it's also vfio-pci for typical
-> mdev devices found on x86, but may be vfio-ccw, vfio-ap, etc...  See
-> VFIO_DEVICE_API_PCI_STRING and friends.
-> 
-ok. got it.
 
-> > > > > 	device_id=8086591d  
-> > > 
-> > > Is device_id interpreted relative to device_type?  How does this
-> > > relate to mdev_type?  If we have an mdev_type, doesn't that fully
-> > > defined the software API?
-> > >   
-> > it's parent pci id for mdev actually.
+On 2020/7/31 下午2:55, Zhu Lingshan wrote:
+> This commit introduces struct vhost_vring_call which replaced
+> raw struct eventfd_ctx *call_ctx in struct vhost_virtqueue.
+> Besides eventfd_ctx, it contains a spin lock and an
+> irq_bypass_producer in its structure.
 >
-> If we need to specify the parent PCI ID then something is fundamentally
-> wrong with the mdev_type.  The mdev_type should define a unique,
-> software compatible interface, regardless of the parent device IDs.  If
-> a i915-GVTg_V5_2 means different things based on the parent device IDs,
-> then then different mdev_types should be reported for those parent
-> devices.
+> Signed-off-by: Zhu Lingshan <lingshan.zhu@intel.com>
+> Suggested-by: Jason Wang <jasowang@redhat.com>
+> ---
+>   drivers/vhost/vdpa.c  |  4 ++--
+>   drivers/vhost/vhost.c | 22 ++++++++++++++++------
+>   drivers/vhost/vhost.h |  9 ++++++++-
+>   3 files changed, 26 insertions(+), 9 deletions(-)
 >
-hmm, then do we allow vendor specific fields?
-or is it a must that a vendor specific field should have corresponding
-vendor attribute?
+> diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
+> index a54b60d6623f..df3cf386b0cd 100644
+> --- a/drivers/vhost/vdpa.c
+> +++ b/drivers/vhost/vdpa.c
+> @@ -96,7 +96,7 @@ static void handle_vq_kick(struct vhost_work *work)
+>   static irqreturn_t vhost_vdpa_virtqueue_cb(void *private)
+>   {
+>   	struct vhost_virtqueue *vq = private;
+> -	struct eventfd_ctx *call_ctx = vq->call_ctx;
+> +	struct eventfd_ctx *call_ctx = vq->call_ctx.ctx;
+>   
+>   	if (call_ctx)
+>   		eventfd_signal(call_ctx, 1);
+> @@ -382,7 +382,7 @@ static long vhost_vdpa_vring_ioctl(struct vhost_vdpa *v, unsigned int cmd,
+>   		break;
+>   
+>   	case VHOST_SET_VRING_CALL:
+> -		if (vq->call_ctx) {
+> +		if (vq->call_ctx.ctx) {
+>   			cb.callback = vhost_vdpa_virtqueue_cb;
+>   			cb.private = vq;
+>   		} else {
+> diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
+> index d7b8df3edffc..9f1a845a9302 100644
+> --- a/drivers/vhost/vhost.c
+> +++ b/drivers/vhost/vhost.c
+> @@ -298,6 +298,13 @@ static void vhost_vq_meta_reset(struct vhost_dev *d)
+>   		__vhost_vq_meta_reset(d->vqs[i]);
+>   }
+>   
+> +static void vhost_vring_call_reset(struct vhost_vring_call *call_ctx)
+> +{
+> +	call_ctx->ctx = NULL;
+> +	memset(&call_ctx->producer, 0x0, sizeof(struct irq_bypass_producer));
+> +	spin_lock_init(&call_ctx->ctx_lock);
+> +}
+> +
+>   static void vhost_vq_reset(struct vhost_dev *dev,
+>   			   struct vhost_virtqueue *vq)
+>   {
+> @@ -319,13 +326,13 @@ static void vhost_vq_reset(struct vhost_dev *dev,
+>   	vq->log_base = NULL;
+>   	vq->error_ctx = NULL;
+>   	vq->kick = NULL;
+> -	vq->call_ctx = NULL;
+>   	vq->log_ctx = NULL;
+>   	vhost_reset_is_le(vq);
+>   	vhost_disable_cross_endian(vq);
+>   	vq->busyloop_timeout = 0;
+>   	vq->umem = NULL;
+>   	vq->iotlb = NULL;
+> +	vhost_vring_call_reset(&vq->call_ctx);
+>   	__vhost_vq_meta_reset(vq);
+>   }
+>   
+> @@ -685,8 +692,8 @@ void vhost_dev_cleanup(struct vhost_dev *dev)
+>   			eventfd_ctx_put(dev->vqs[i]->error_ctx);
+>   		if (dev->vqs[i]->kick)
+>   			fput(dev->vqs[i]->kick);
+> -		if (dev->vqs[i]->call_ctx)
+> -			eventfd_ctx_put(dev->vqs[i]->call_ctx);
+> +		if (dev->vqs[i]->call_ctx.ctx)
+> +			eventfd_ctx_put(dev->vqs[i]->call_ctx.ctx);
+>   		vhost_vq_reset(dev, dev->vqs[i]);
+>   	}
+>   	vhost_dev_free_iovecs(dev);
+> @@ -1629,7 +1636,10 @@ long vhost_vring_ioctl(struct vhost_dev *d, unsigned int ioctl, void __user *arg
+>   			r = PTR_ERR(ctx);
+>   			break;
+>   		}
+> -		swap(ctx, vq->call_ctx);
+> +
+> +		spin_lock(&vq->call_ctx.ctx_lock);
+> +		swap(ctx, vq->call_ctx.ctx);
+> +		spin_unlock(&vq->call_ctx.ctx_lock);
+>   		break;
+>   	case VHOST_SET_VRING_ERR:
+>   		if (copy_from_user(&f, argp, sizeof f)) {
+> @@ -2440,8 +2450,8 @@ static bool vhost_notify(struct vhost_dev *dev, struct vhost_virtqueue *vq)
+>   void vhost_signal(struct vhost_dev *dev, struct vhost_virtqueue *vq)
+>   {
+>   	/* Signal the Guest tell them we used something up. */
+> -	if (vq->call_ctx && vhost_notify(dev, vq))
+> -		eventfd_signal(vq->call_ctx, 1);
+> +	if (vq->call_ctx.ctx && vhost_notify(dev, vq))
+> +		eventfd_signal(vq->call_ctx.ctx, 1);
+>   }
+>   EXPORT_SYMBOL_GPL(vhost_signal);
+>   
+> diff --git a/drivers/vhost/vhost.h b/drivers/vhost/vhost.h
+> index c8e96a095d3b..38eb1aa3b68d 100644
+> --- a/drivers/vhost/vhost.h
+> +++ b/drivers/vhost/vhost.h
+> @@ -13,6 +13,7 @@
+>   #include <linux/virtio_ring.h>
+>   #include <linux/atomic.h>
+>   #include <linux/vhost_iotlb.h>
+> +#include <linux/irqbypass.h>
+>   
+>   struct vhost_work;
+>   typedef void (*vhost_work_fn_t)(struct vhost_work *work);
+> @@ -60,6 +61,12 @@ enum vhost_uaddr_type {
+>   	VHOST_NUM_ADDRS = 3,
+>   };
+>   
+> +struct vhost_vring_call {
+> +	struct eventfd_ctx *ctx;
+> +	struct irq_bypass_producer producer;
+> +	spinlock_t ctx_lock;
 
-another thing is that the definition of mdev_type in GVT only corresponds
-to vGPU computing ability currently,
-e.g. i915-GVTg_V5_2, is 1/2 of a gen9 IGD, i915-GVTg_V4_2 is 1/2 of a
-gen8 IGD.
-It is too coarse-grained to live migration compatibility.
 
-Do you think we need to update GVT's definition of mdev_type?
-And is there any guide in mdev_type definition?
-
-> > > > > 	mdev_type=i915-GVTg_V5_2  
-> > > 
-> > > And how are non-mdev devices represented?
-> > >   
-> > non-mdev can opt to not include this field, or as you said below, a
-> > vendor signature. 
-> > 
-> > > > > 	aggregator=1
-> > > > > 	pv_mode="none+ppgtt+context"  
-> > > 
-> > > These are meaningless vendor specific matches afaict.
-> > >   
-> > yes, pv_mode and aggregator are vendor specific fields.
-> > but they are important to decide whether two devices are compatible.
-> > pv_mode means whether a vGPU supports guest paravirtualized api.
-> > "none+ppgtt+context" means guest can not use pv, or use ppgtt mode pv or
-> > use context mode pv.
-> > 
-> > > > > 	interface_version=3  
-> > > 
-> > > Not much granularity here, I prefer Sean's previous
-> > > <major>.<minor>[.bugfix] scheme.
-> > >   
-> > yes, <major>.<minor>[.bugfix] scheme may be better, but I'm not sure if
-> > it works for a complicated scenario.
-> > e.g for pv_mode,
-> > (1) initially,  pv_mode is not supported, so it's pv_mode=none, it's 0.0.0,
-> > (2) then, pv_mode=ppgtt is supported, pv_mode="none+ppgtt", it's 0.1.0,
-> > indicating pv_mode=none can migrate to pv_mode="none+ppgtt", but not vice versa.
-> > (3) later, pv_mode=context is also supported,
-> > pv_mode="none+ppgtt+context", so it's 0.2.0.
-> > 
-> > But if later, pv_mode=ppgtt is removed. pv_mode="none+context", how to
-> > name its version? "none+ppgtt" (0.1.0) is not compatible to
-> > "none+context", but "none+ppgtt+context" (0.2.0) is compatible to
-> > "none+context".
-> 
-> If pv_mode=ppgtt is removed, then the compatible versions would be
-> 0.0.0 or 1.0.0, ie. the major version would be incremented due to
-> feature removal.
->  
-> > Maintain such scheme is painful to vendor driver.
-> 
-> Migration compatibility is painful, there's no way around that.  I
-> think the version scheme is an attempt to push some of that low level
-> burden on the vendor driver, otherwise the management tools need to
-> work on an ever growing matrix of vendor specific features which is
-> going to become unwieldy and is largely meaningless outside of the
-> vendor driver.  Instead, the vendor driver can make strategic decisions
-> about where to continue to maintain a support burden and make explicit
-> decisions to maintain or break compatibility.  The version scheme is a
-> simplification and abstraction of vendor driver features in order to
-> create a small, logical compatibility matrix.  Compromises necessarily
-> need to be made for that to occur.
->
-ok. got it.
-
-> > > > > COMPATIBLE:
-> > > > > 	device_type=pci
-> > > > > 	device_id=8086591d
-> > > > > 	mdev_type=i915-GVTg_V5_{val1:int:1,2,4,8}    
-> > > > this mixed notation will be hard to parse so i would avoid that.  
-> > > 
-> > > Some background, Intel has been proposing aggregation as a solution to
-> > > how we scale mdev devices when hardware exposes large numbers of
-> > > assignable objects that can be composed in essentially arbitrary ways.
-> > > So for instance, if we have a workqueue (wq), we might have an mdev
-> > > type for 1wq, 2wq, 3wq,... Nwq.  It's not really practical to expose a
-> > > discrete mdev type for each of those, so they want to define a base
-> > > type which is composable to other types via this aggregation.  This is
-> > > what this substitution and tagging is attempting to accomplish.  So
-> > > imagine this set of values for cases where it's not practical to unroll
-> > > the values for N discrete types.
-> > >   
-> > > > > 	aggregator={val1}/2  
-> > > 
-> > > So the {val1} above would be substituted here, though an aggregation
-> > > factor of 1/2 is a head scratcher...
-> > >   
-> > > > > 	pv_mode={val2:string:"none+ppgtt","none+context","none+ppgtt+context"}  
-> > > 
-> > > I'm lost on this one though.  I think maybe it's indicating that it's
-> > > compatible with any of these, so do we need to list it?  Couldn't this
-> > > be handled by Sean's version proposal where the minor version
-> > > represents feature compatibility?  
-> > yes, it's indicating that it's compatible with any of these.
-> > Sean's version proposal may also work, but it would be painful for
-> > vendor driver to maintain the versions when multiple similar features
-> > are involved.
-> 
-> This is something vendor drivers need to consider when adding and
-> removing features.
-> 
-> > > > > 	interface_version={val3:int:2,3}  
-> > > 
-> > > What does this turn into in a few years, 2,7,12,23,75,96,...
-> > >   
-> > is a range better?
-> 
-> I was really trying to point out that sparseness becomes an issue if
-> the vendor driver is largely disconnected from how their feature
-> addition and deprecation affects migration support.  Thanks,
->
-ok. we'll use the x.y.z scheme then.
+It's not clear to me why we need ctx_lock here.
 
 Thanks
-Yan
+
+
+> +};
+> +
+>   /* The virtqueue structure describes a queue attached to a device. */
+>   struct vhost_virtqueue {
+>   	struct vhost_dev *dev;
+> @@ -72,7 +79,7 @@ struct vhost_virtqueue {
+>   	vring_used_t __user *used;
+>   	const struct vhost_iotlb_map *meta_iotlb[VHOST_NUM_ADDRS];
+>   	struct file *kick;
+> -	struct eventfd_ctx *call_ctx;
+> +	struct vhost_vring_call call_ctx;
+>   	struct eventfd_ctx *error_ctx;
+>   	struct eventfd_ctx *log_ctx;
+>   
+
