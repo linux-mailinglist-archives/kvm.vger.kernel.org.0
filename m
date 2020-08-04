@@ -2,616 +2,305 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 138A323BC24
-	for <lists+kvm@lfdr.de>; Tue,  4 Aug 2020 16:29:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id ABCDB23BC21
+	for <lists+kvm@lfdr.de>; Tue,  4 Aug 2020 16:28:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729028AbgHDO3S (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 4 Aug 2020 10:29:18 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:35654 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1729085AbgHDO3F (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 4 Aug 2020 10:29:05 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1596551342;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=bGF5oICf+wJWIa6fAxOVBYLLnnJYZ/ChyTSMp+GyURE=;
-        b=gUWpB/YPH/n16iTuT9XXrHBdQiZx+WHYivkSaGmSWpVpjuxAAKtQP+0K9YD0owvp4gMIo7
-        YWupJglKHLdJZK85QrUk3zIPKFQH/AXPB4oXY8YrssHC5iwVxtf/uZSXZ1wdt0lOsdwe5x
-        Aa+UpUHVytFfXB4djnZI3Bz+1ykQK1w=
-Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com
- [209.85.222.197]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-249-7VwcZN3aPIqapFlpbkltSw-1; Tue, 04 Aug 2020 10:27:19 -0400
-X-MC-Unique: 7VwcZN3aPIqapFlpbkltSw-1
-Received: by mail-qk1-f197.google.com with SMTP id f18so14454075qke.0
-        for <kvm@vger.kernel.org>; Tue, 04 Aug 2020 07:27:19 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=bGF5oICf+wJWIa6fAxOVBYLLnnJYZ/ChyTSMp+GyURE=;
-        b=TSayu/j6SRN+XaUZZS33x7ebs51hnQLvfLXXBVeKl2rs9GRBVMIBQcaFj3LT1qDV3Y
-         ZaLT/8Tb8PtSq2uSfQJWm/uwGBuNdZ3A1kBOB16dt+364vrVwzntVU2GbJlcXRenCvaP
-         Xx+9EP0g0lVUmKy4GrCtbB7bCzEn0PsgGUE0u7tJMrnbFp6nMx7sOdhkDX4KlwldSSah
-         jPSiApVBusP1O5dh1d2vc7TOHdQvCkk6QwfjLHSAl/xjX8Z0kXqtELDHXIfXZ84CV7P/
-         NgxUZ2Dnlg5EzyxR57rEmZB0RPgyrHDQEMbdM7E9kErcOz9OLOrtyFE0sAjNc3ygS2it
-         lM+g==
-X-Gm-Message-State: AOAM531tccFV3LWKEXObMUsH/2n6ZktSk45/vcrdeg5uD9BjPuOJBWPp
-        5A0OzuRfHyqqGTmimFh8//GTJ7BEggr1iipfLT5ulsLK5LJyQVCmzaQ2OflGigJpyHV2dbQpJC+
-        4EWhNQMsMepUm
-X-Received: by 2002:ac8:152:: with SMTP id f18mr22417264qtg.163.1596551235481;
-        Tue, 04 Aug 2020 07:27:15 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwxAKWSfZv5KvDGgWYvwWeTZ6oFjZGkGgH55qlqvWT0QAT381rkkB4I4jx2DK/sGmepiWWX0w==
-X-Received: by 2002:ac8:152:: with SMTP id f18mr22417227qtg.163.1596551235101;
-        Tue, 04 Aug 2020 07:27:15 -0700 (PDT)
-Received: from redhat.com (bzq-79-177-102-128.red.bezeqint.net. [79.177.102.128])
-        by smtp.gmail.com with ESMTPSA id k11sm20908702qkk.93.2020.08.04.07.27.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 04 Aug 2020 07:27:14 -0700 (PDT)
-Date:   Tue, 4 Aug 2020 10:27:08 -0400
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Guennadi Liakhovetski <guennadi.liakhovetski@linux.intel.com>
-Cc:     kvm@vger.kernel.org, linux-remoteproc@vger.kernel.org,
-        virtualization@lists.linux-foundation.org,
-        sound-open-firmware@alsa-project.org,
-        Pierre-Louis Bossart <pierre-louis.bossart@linux.intel.com>,
-        Liam Girdwood <liam.r.girdwood@linux.intel.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Ohad Ben-Cohen <ohad@wizery.com>,
-        Bjorn Andersson <bjorn.andersson@linaro.org>,
-        Mathieu Poirier <mathieu.poirier@linaro.org>,
-        Vincent Whitchurch <vincent.whitchurch@axis.com>
-Subject: Re: [PATCH v4 4/4] vhost: add an RPMsg API
-Message-ID: <20200804102132-mutt-send-email-mst@kernel.org>
-References: <20200722150927.15587-1-guennadi.liakhovetski@linux.intel.com>
- <20200722150927.15587-5-guennadi.liakhovetski@linux.intel.com>
+        id S1729113AbgHDO2x (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 4 Aug 2020 10:28:53 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:17702 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1729028AbgHDO2g (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 4 Aug 2020 10:28:36 -0400
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 074E350S120103;
+        Tue, 4 Aug 2020 10:28:31 -0400
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 32q86qtv4x-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 04 Aug 2020 10:28:31 -0400
+Received: from m0098394.ppops.net (m0098394.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 074E3Q18122520;
+        Tue, 4 Aug 2020 10:28:30 -0400
+Received: from ppma04wdc.us.ibm.com (1a.90.2fa9.ip4.static.sl-reverse.com [169.47.144.26])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 32q86qtv44-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 04 Aug 2020 10:28:30 -0400
+Received: from pps.filterd (ppma04wdc.us.ibm.com [127.0.0.1])
+        by ppma04wdc.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 074EK2Pu002201;
+        Tue, 4 Aug 2020 14:28:29 GMT
+Received: from b01cxnp22034.gho.pok.ibm.com (b01cxnp22034.gho.pok.ibm.com [9.57.198.24])
+        by ppma04wdc.us.ibm.com with ESMTP id 32n0190t0a-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 04 Aug 2020 14:28:29 +0000
+Received: from b01ledav002.gho.pok.ibm.com (b01ledav002.gho.pok.ibm.com [9.57.199.107])
+        by b01cxnp22034.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 074ESRUk41156890
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 4 Aug 2020 14:28:27 GMT
+Received: from b01ledav002.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id D82C512405A;
+        Tue,  4 Aug 2020 14:28:27 +0000 (GMT)
+Received: from b01ledav002.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 6531C124055;
+        Tue,  4 Aug 2020 14:28:27 +0000 (GMT)
+Received: from cpe-172-100-175-116.stny.res.rr.com (unknown [9.85.175.63])
+        by b01ledav002.gho.pok.ibm.com (Postfix) with ESMTP;
+        Tue,  4 Aug 2020 14:28:27 +0000 (GMT)
+Subject: Re: [PATCH v9 00/15] s390/vfio-ap: dynamic configuration support
+To:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+Cc:     freude@linux.ibm.com, borntraeger@de.ibm.com, cohuck@redhat.com,
+        mjrosato@linux.ibm.com, pasic@linux.ibm.com,
+        alex.williamson@redhat.com, kwankhede@nvidia.com,
+        fiuczy@linux.ibm.com
+References: <20200720150344.24488-1-akrowiak@linux.ibm.com>
+From:   Tony Krowiak <akrowiak@linux.ibm.com>
+Message-ID: <21bf3576-cb40-d02b-2245-e140a6edd15e@linux.ibm.com>
+Date:   Tue, 4 Aug 2020 10:28:27 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200722150927.15587-5-guennadi.liakhovetski@linux.intel.com>
+In-Reply-To: <20200720150344.24488-1-akrowiak@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
+ definitions=2020-08-04_04:2020-08-03,2020-08-04 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 impostorscore=0
+ malwarescore=0 mlxlogscore=999 phishscore=0 clxscore=1015
+ lowpriorityscore=0 bulkscore=0 priorityscore=1501 suspectscore=3
+ mlxscore=0 adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2006250000 definitions=main-2008040105
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jul 22, 2020 at 05:09:27PM +0200, Guennadi Liakhovetski wrote:
-> Linux supports running the RPMsg protocol over the VirtIO transport
-> protocol, but currently there is only support for VirtIO clients and
-> no support for a VirtIO server. This patch adds a vhost-based RPMsg
-> server implementation.
-> 
-> Signed-off-by: Guennadi Liakhovetski <guennadi.liakhovetski@linux.intel.com>
-> ---
->  drivers/vhost/Kconfig       |   7 +
->  drivers/vhost/Makefile      |   3 +
->  drivers/vhost/rpmsg.c       | 375 ++++++++++++++++++++++++++++++++++++
->  drivers/vhost/vhost_rpmsg.h |  74 +++++++
->  4 files changed, 459 insertions(+)
->  create mode 100644 drivers/vhost/rpmsg.c
->  create mode 100644 drivers/vhost/vhost_rpmsg.h
-> 
-> diff --git a/drivers/vhost/Kconfig b/drivers/vhost/Kconfig
-> index d3688c6afb87..602421bf1d03 100644
-> --- a/drivers/vhost/Kconfig
-> +++ b/drivers/vhost/Kconfig
-> @@ -38,6 +38,13 @@ config VHOST_NET
->  	  To compile this driver as a module, choose M here: the module will
->  	  be called vhost_net.
->  
-> +config VHOST_RPMSG
-> +	tristate
+PING!
 
-So this lacks a description line so it does not appear
-in menuconfig. How is user supposed to set it?
-I added a one-line description.
-
-
-> +	depends on VHOST
-
-Other drivers select VHOST instead. Any reason not to
-do it like this here?
-
-
-> +	help
-> +	  Vhost RPMsg API allows vhost drivers to communicate with VirtIO
-> +	  drivers, using the RPMsg over VirtIO protocol.
-> +
-
->  config VHOST_SCSI
->  	tristate "VHOST_SCSI TCM fabric driver"
->  	depends on TARGET_CORE && EVENTFD
-> diff --git a/drivers/vhost/Makefile b/drivers/vhost/Makefile
-> index f3e1897cce85..9cf459d59f97 100644
-> --- a/drivers/vhost/Makefile
-> +++ b/drivers/vhost/Makefile
-> @@ -2,6 +2,9 @@
->  obj-$(CONFIG_VHOST_NET) += vhost_net.o
->  vhost_net-y := net.o
->  
-> +obj-$(CONFIG_VHOST_RPMSG) += vhost_rpmsg.o
-> +vhost_rpmsg-y := rpmsg.o
-> +
->  obj-$(CONFIG_VHOST_SCSI) += vhost_scsi.o
->  vhost_scsi-y := scsi.o
->  
-> diff --git a/drivers/vhost/rpmsg.c b/drivers/vhost/rpmsg.c
-> new file mode 100644
-> index 000000000000..d7ab48414224
-> --- /dev/null
-> +++ b/drivers/vhost/rpmsg.c
-> @@ -0,0 +1,375 @@
-> +// SPDX-License-Identifier: GPL-2.0-only
-> +/*
-> + * Copyright(c) 2020 Intel Corporation. All rights reserved.
-> + *
-> + * Author: Guennadi Liakhovetski <guennadi.liakhovetski@linux.intel.com>
-> + *
-> + * Vhost RPMsg VirtIO interface. It provides a set of functions to match the
-> + * guest side RPMsg VirtIO API, provided by drivers/rpmsg/virtio_rpmsg_bus.c
-> + * These functions handle creation of 2 virtual queues, handling of endpoint
-> + * addresses, sending a name-space announcement to the guest as well as any
-> + * user messages. This API can be used by any vhost driver to handle RPMsg
-> + * specific processing.
-> + * Specific vhost drivers, using this API will use their own VirtIO device
-> + * IDs, that should then also be added to the ID table in virtio_rpmsg_bus.c
-> + */
-> +
-> +#include <linux/compat.h>
-> +#include <linux/file.h>
-> +#include <linux/miscdevice.h>
-> +#include <linux/module.h>
-> +#include <linux/mutex.h>
-> +#include <linux/vhost.h>
-> +#include <linux/virtio_rpmsg.h>
-> +#include <uapi/linux/rpmsg.h>
-> +
-> +#include "vhost.h"
-> +#include "vhost_rpmsg.h"
-> +
-> +/*
-> + * All virtio-rpmsg virtual queue kicks always come with just one buffer -
-> + * either input or output
-> + */
-> +static int vhost_rpmsg_get_single(struct vhost_virtqueue *vq)
-> +{
-> +	struct vhost_rpmsg *vr = container_of(vq->dev, struct vhost_rpmsg, dev);
-> +	unsigned int out, in;
-> +	int head = vhost_get_vq_desc(vq, vq->iov, ARRAY_SIZE(vq->iov), &out, &in,
-> +				     NULL, NULL);
-> +	if (head < 0) {
-> +		vq_err(vq, "%s(): error %d getting buffer\n",
-> +		       __func__, head);
-> +		return head;
-> +	}
-> +
-> +	/* Nothing new? */
-> +	if (head == vq->num)
-> +		return head;
-> +
-> +	if (vq == &vr->vq[VIRTIO_RPMSG_RESPONSE] && (out || in != 1)) {
-
-This in != 1 looks like a dependency on a specific message layout.
-virtio spec says to avoid these. Using iov iters it's not too hard to do
-...
-
-
-> +		vq_err(vq,
-> +		       "%s(): invalid %d input and %d output in response queue\n",
-> +		       __func__, in, out);
-> +		goto return_buf;
-> +	}
-> +
-> +	if (vq == &vr->vq[VIRTIO_RPMSG_REQUEST] && (in || out != 1)) {
-> +		vq_err(vq,
-> +		       "%s(): invalid %d input and %d output in request queue\n",
-> +		       __func__, in, out);
-> +		goto return_buf;
-> +	}
-> +
-> +	return head;
-> +
-> +return_buf:
-> +	/*
-> +	 * FIXME: might need to return the buffer using vhost_add_used()
-> +	 * or vhost_discard_vq_desc(). vhost_discard_vq_desc() is
-> +	 * described as "being useful for error handling," but it makes
-> +	 * the thus discarded buffers "unseen," so next time we look we
-> +	 * retrieve them again?
-
-
-Yes. It's your decision what to do on error. if you also signal
-an eventfd using vq_err, then discarding will
-make it so userspace can poke at ring and hopefully fix it ...
-
-> +	 */
-> +	return -EINVAL;
-> +}
-> +
-> +static const struct vhost_rpmsg_ept *vhost_rpmsg_ept_find(struct vhost_rpmsg *vr, int addr)
-> +{
-> +	unsigned int i;
-> +
-> +	for (i = 0; i < vr->n_epts; i++)
-> +		if (vr->ept[i].addr == addr)
-> +			return vr->ept + i;
-> +
-> +	return NULL;
-> +}
-> +
-> +/*
-> + * if len < 0, then for reading a request, the complete virtual queue buffer
-> + * size is prepared, for sending a response, the length in the iterator is used
-> + */
-> +int vhost_rpmsg_start_lock(struct vhost_rpmsg *vr, struct vhost_rpmsg_iter *iter,
-> +			   unsigned int qid, ssize_t len)
-> +	__acquires(vq->mutex)
-> +{
-> +	struct vhost_virtqueue *vq = vr->vq + qid;
-> +	size_t tmp;
-> +
-> +	if (qid >= VIRTIO_RPMSG_NUM_OF_VQS)
-> +		return -EINVAL;
-> +
-> +	iter->vq = vq;
-> +
-> +	mutex_lock(&vq->mutex);
-> +	vhost_disable_notify(&vr->dev, vq);
-> +
-> +	iter->head = vhost_rpmsg_get_single(vq);
-> +	if (iter->head == vq->num)
-> +		iter->head = -EAGAIN;
-> +
-> +	if (iter->head < 0)
-> +		goto unlock;
-> +
-> +	tmp = vq->iov[0].iov_len;
-> +	if (tmp < sizeof(iter->rhdr)) {
-> +		vq_err(vq, "%s(): size %zu too small\n", __func__, tmp);
-> +		iter->head = -ENOBUFS;
-> +		goto return_buf;
-> +	}
-> +
-> +	switch (qid) {
-> +	case VIRTIO_RPMSG_REQUEST:
-> +		if (len < 0) {
-> +			len = tmp - sizeof(iter->rhdr);
-> +		} else if (tmp < sizeof(iter->rhdr) + len) {
-> +			iter->head = -ENOBUFS;
-> +			goto return_buf;
-> +		}
-> +
-> +		/* len is now the size of the payload */
-> +		iov_iter_init(&iter->iov_iter, WRITE,
-> +			      vq->iov, 1, sizeof(iter->rhdr) + len);
-> +
-> +		/* Read the RPMSG header with endpoint addresses */
-> +		tmp = copy_from_iter(&iter->rhdr, sizeof(iter->rhdr), &iter->iov_iter);
-> +		if (tmp != sizeof(iter->rhdr)) {
-> +			vq_err(vq, "%s(): got %zu instead of %zu\n", __func__,
-> +			       tmp, sizeof(iter->rhdr));
-> +			iter->head = -EIO;
-> +			goto return_buf;
-> +		}
-> +
-> +		iter->ept = vhost_rpmsg_ept_find(vr, vhost32_to_cpu(vq, iter->rhdr.dst));
-> +		if (!iter->ept) {
-> +			vq_err(vq, "%s(): no endpoint with address %d\n",
-> +			       __func__, vhost32_to_cpu(vq, iter->rhdr.dst));
-> +			iter->head = -ENOENT;
-> +			goto return_buf;
-> +		}
-> +
-> +		/* Let the endpoint read the payload */
-> +		if (iter->ept->read) {
-> +			ssize_t ret = iter->ept->read(vr, iter);
-> +
-> +			if (ret < 0) {
-> +				iter->head = ret;
-> +				goto return_buf;
-> +			}
-> +
-> +			iter->rhdr.len = cpu_to_vhost16(vq, ret);
-> +		} else {
-> +			iter->rhdr.len = 0;
-> +		}
-> +
-> +		/* Prepare for the response phase */
-> +		iter->rhdr.dst = iter->rhdr.src;
-> +		iter->rhdr.src = cpu_to_vhost32(vq, iter->ept->addr);
-> +
-> +		break;
-> +	case VIRTIO_RPMSG_RESPONSE:
-> +		if (!iter->ept && iter->rhdr.dst != cpu_to_vhost32(vq, RPMSG_NS_ADDR)) {
-> +			/*
-> +			 * Usually the iterator is configured when processing a
-> +			 * message on the request queue, but it's also possible
-> +			 * to send a message on the response queue without a
-> +			 * preceding request, in that case the iterator must
-> +			 * contain source and destination addresses.
-> +			 */
-> +			iter->ept = vhost_rpmsg_ept_find(vr, vhost32_to_cpu(vq, iter->rhdr.src));
-> +			if (!iter->ept) {
-> +				iter->head = -ENOENT;
-> +				goto return_buf;
-> +			}
-> +		}
-> +
-> +		if (len < 0) {
-> +			len = tmp - sizeof(iter->rhdr);
-> +		} else if (tmp < sizeof(iter->rhdr) + len) {
-> +			iter->head = -ENOBUFS;
-> +			goto return_buf;
-> +		} else {
-> +			iter->rhdr.len = cpu_to_vhost16(vq, len);
-> +		}
-> +
-> +		/* len is now the size of the payload */
-> +		iov_iter_init(&iter->iov_iter, READ, vq->iov, 1, sizeof(iter->rhdr) + len);
-> +
-> +		/* Write the RPMSG header with endpoint addresses */
-> +		tmp = copy_to_iter(&iter->rhdr, sizeof(iter->rhdr), &iter->iov_iter);
-> +		if (tmp != sizeof(iter->rhdr)) {
-> +			iter->head = -EIO;
-> +			goto return_buf;
-> +		}
-> +
-> +		/* Let the endpoint write the payload */
-> +		if (iter->ept && iter->ept->write) {
-> +			ssize_t ret = iter->ept->write(vr, iter);
-> +
-> +			if (ret < 0) {
-> +				iter->head = ret;
-> +				goto return_buf;
-> +			}
-> +		}
-> +
-> +		break;
-> +	}
-> +
-> +	return 0;
-> +
-> +return_buf:
-> +	/*
-> +	 * FIXME: vhost_discard_vq_desc() or vhost_add_used(), see comment in
-> +	 * vhost_rpmsg_get_single()
-> +	 */
-
-What's to be done with this FIXME?
-
-
-> +unlock:
-> +	vhost_enable_notify(&vr->dev, vq);
-> +	mutex_unlock(&vq->mutex);
-> +
-> +	return iter->head;
-> +}
-> +EXPORT_SYMBOL_GPL(vhost_rpmsg_start_lock);
-> +
-> +size_t vhost_rpmsg_copy(struct vhost_rpmsg *vr, struct vhost_rpmsg_iter *iter,
-> +			void *data, size_t size)
-> +{
-> +	/*
-> +	 * We could check for excess data, but copy_{to,from}_iter() don't do
-> +	 * that either
-> +	 */
-> +	if (iter->vq == vr->vq + VIRTIO_RPMSG_RESPONSE)
-> +		return copy_to_iter(data, size, &iter->iov_iter);
-> +
-> +	return copy_from_iter(data, size, &iter->iov_iter);
-> +}
-> +EXPORT_SYMBOL_GPL(vhost_rpmsg_copy);
-> +
-> +int vhost_rpmsg_finish_unlock(struct vhost_rpmsg *vr,
-> +			      struct vhost_rpmsg_iter *iter)
-> +	__releases(vq->mutex)
-> +{
-> +	if (iter->head >= 0)
-> +		vhost_add_used_and_signal(iter->vq->dev, iter->vq, iter->head,
-> +					  vhost16_to_cpu(iter->vq, iter->rhdr.len) +
-> +					  sizeof(iter->rhdr));
-> +
-> +	vhost_enable_notify(&vr->dev, iter->vq);
-> +	mutex_unlock(&iter->vq->mutex);
-> +
-> +	return iter->head;
-> +}
-> +EXPORT_SYMBOL_GPL(vhost_rpmsg_finish_unlock);
-> +
-> +/*
-> + * Return false to terminate the external loop only if we fail to obtain either
-> + * a request or a response buffer
-> + */
-> +static bool handle_rpmsg_req_single(struct vhost_rpmsg *vr,
-> +				    struct vhost_virtqueue *vq)
-> +{
-> +	struct vhost_rpmsg_iter iter;
-> +	int ret = vhost_rpmsg_start_lock(vr, &iter, VIRTIO_RPMSG_REQUEST, -EINVAL);
-> +	if (!ret)
-> +		ret = vhost_rpmsg_finish_unlock(vr, &iter);
-> +	if (ret < 0) {
-> +		if (ret != -EAGAIN)
-> +			vq_err(vq, "%s(): RPMSG processing failed %d\n",
-> +			       __func__, ret);
-> +		return false;
-> +	}
-> +
-> +	if (!iter.ept->write)
-> +		return true;
-> +
-> +	ret = vhost_rpmsg_start_lock(vr, &iter, VIRTIO_RPMSG_RESPONSE, -EINVAL);
-> +	if (!ret)
-> +		ret = vhost_rpmsg_finish_unlock(vr, &iter);
-> +	if (ret < 0) {
-> +		vq_err(vq, "%s(): RPMSG finalising failed %d\n", __func__, ret);
-> +		return false;
-> +	}
-> +
-> +	return true;
-> +}
-> +
-> +static void handle_rpmsg_req_kick(struct vhost_work *work)
-> +{
-> +	struct vhost_virtqueue *vq = container_of(work, struct vhost_virtqueue,
-> +						  poll.work);
-> +	struct vhost_rpmsg *vr = container_of(vq->dev, struct vhost_rpmsg, dev);
-> +
-> +	while (handle_rpmsg_req_single(vr, vq))
-> +		;
-> +}
-> +
-> +/*
-> + * initialise two virtqueues with an array of endpoints,
-> + * request and response callbacks
-> + */
-> +void vhost_rpmsg_init(struct vhost_rpmsg *vr, const struct vhost_rpmsg_ept *ept,
-> +		      unsigned int n_epts)
-> +{
-> +	unsigned int i;
-> +
-> +	for (i = 0; i < ARRAY_SIZE(vr->vq); i++)
-> +		vr->vq_p[i] = &vr->vq[i];
-> +
-> +	/* vq[0]: host -> guest, vq[1]: host <- guest */
-> +	vr->vq[VIRTIO_RPMSG_REQUEST].handle_kick = handle_rpmsg_req_kick;
-> +	vr->vq[VIRTIO_RPMSG_RESPONSE].handle_kick = NULL;
-> +
-> +	vr->ept = ept;
-> +	vr->n_epts = n_epts;
-> +
-> +	vhost_dev_init(&vr->dev, vr->vq_p, VIRTIO_RPMSG_NUM_OF_VQS,
-> +		       UIO_MAXIOV, 0, 0, true, NULL);
-> +}
-> +EXPORT_SYMBOL_GPL(vhost_rpmsg_init);
-> +
-> +void vhost_rpmsg_destroy(struct vhost_rpmsg *vr)
-> +{
-> +	if (vhost_dev_has_owner(&vr->dev))
-> +		vhost_poll_flush(&vr->vq[VIRTIO_RPMSG_REQUEST].poll);
-> +
-> +	vhost_dev_cleanup(&vr->dev);
-> +}
-> +EXPORT_SYMBOL_GPL(vhost_rpmsg_destroy);
-> +
-> +/* send namespace */
-> +int vhost_rpmsg_ns_announce(struct vhost_rpmsg *vr, const char *name, unsigned int src)
-> +{
-> +	struct vhost_virtqueue *vq = &vr->vq[VIRTIO_RPMSG_RESPONSE];
-> +	struct vhost_rpmsg_iter iter = {
-> +		.rhdr = {
-> +			.src = 0,
-> +			.dst = cpu_to_vhost32(vq, RPMSG_NS_ADDR),
-> +			.flags = cpu_to_vhost16(vq, RPMSG_NS_CREATE), /* rpmsg_recv_single() */
-> +		},
-> +	};
-> +	struct rpmsg_ns_msg ns = {
-> +		.addr = cpu_to_vhost32(vq, src),
-> +		.flags = cpu_to_vhost32(vq, RPMSG_NS_CREATE), /* for rpmsg_ns_cb() */
-> +	};
-> +	int ret = vhost_rpmsg_start_lock(vr, &iter, VIRTIO_RPMSG_RESPONSE, sizeof(ns));
-> +
-> +	if (ret < 0)
-> +		return ret;
-> +
-> +	strlcpy(ns.name, name, sizeof(ns.name));
-> +
-> +	ret = vhost_rpmsg_copy(vr, &iter, &ns, sizeof(ns));
-> +	if (ret != sizeof(ns))
-> +		vq_err(iter.vq, "%s(): added %d instead of %zu bytes\n",
-> +		       __func__, ret, sizeof(ns));
-> +
-> +	ret = vhost_rpmsg_finish_unlock(vr, &iter);
-> +	if (ret < 0)
-> +		vq_err(iter.vq, "%s(): namespace announcement failed: %d\n",
-> +		       __func__, ret);
-> +
-> +	return ret;
-> +}
-> +EXPORT_SYMBOL_GPL(vhost_rpmsg_ns_announce);
-> +
-> +MODULE_LICENSE("GPL v2");
-> +MODULE_AUTHOR("Intel, Inc.");
-> +MODULE_DESCRIPTION("Vhost RPMsg API");
-> diff --git a/drivers/vhost/vhost_rpmsg.h b/drivers/vhost/vhost_rpmsg.h
-> new file mode 100644
-> index 000000000000..30072cecb8a0
-> --- /dev/null
-> +++ b/drivers/vhost/vhost_rpmsg.h
-> @@ -0,0 +1,74 @@
-> +/* SPDX-License-Identifier: GPL-2.0 */
-> +/*
-> + * Copyright(c) 2020 Intel Corporation. All rights reserved.
-> + *
-> + * Author: Guennadi Liakhovetski <guennadi.liakhovetski@linux.intel.com>
-> + */
-> +
-> +#ifndef VHOST_RPMSG_H
-> +#define VHOST_RPMSG_H
-> +
-> +#include <linux/uio.h>
-> +#include <linux/virtio_rpmsg.h>
-> +
-> +#include "vhost.h"
-> +
-> +/* RPMsg uses two VirtQueues: one for each direction */
-> +enum {
-> +	VIRTIO_RPMSG_RESPONSE,	/* RPMsg response (host->guest) buffers */
-> +	VIRTIO_RPMSG_REQUEST,	/* RPMsg request (guest->host) buffers */
-> +	/* Keep last */
-> +	VIRTIO_RPMSG_NUM_OF_VQS,
-> +};
-> +
-> +struct vhost_rpmsg_ept;
-> +
-> +struct vhost_rpmsg_iter {
-> +	struct iov_iter iov_iter;
-> +	struct rpmsg_hdr rhdr;
-> +	struct vhost_virtqueue *vq;
-> +	const struct vhost_rpmsg_ept *ept;
-> +	int head;
-> +	void *priv;
-> +};
-> +
-> +struct vhost_rpmsg {
-> +	struct vhost_dev dev;
-> +	struct vhost_virtqueue vq[VIRTIO_RPMSG_NUM_OF_VQS];
-> +	struct vhost_virtqueue *vq_p[VIRTIO_RPMSG_NUM_OF_VQS];
-> +	const struct vhost_rpmsg_ept *ept;
-> +	unsigned int n_epts;
-> +};
-> +
-> +struct vhost_rpmsg_ept {
-> +	ssize_t (*read)(struct vhost_rpmsg *, struct vhost_rpmsg_iter *);
-> +	ssize_t (*write)(struct vhost_rpmsg *, struct vhost_rpmsg_iter *);
-> +	int addr;
-> +};
-> +
-> +static inline size_t vhost_rpmsg_iter_len(const struct vhost_rpmsg_iter *iter)
-> +{
-> +	return iter->rhdr.len;
-> +}
-> +
-> +#define VHOST_RPMSG_ITER(_vq, _src, _dst) {			\
-> +	.rhdr = {						\
-> +			.src = cpu_to_vhost32(_vq, _src),	\
-> +			.dst = cpu_to_vhost32(_vq, _dst),	\
-> +		},						\
-> +	}
-> +
-> +void vhost_rpmsg_init(struct vhost_rpmsg *vr, const struct vhost_rpmsg_ept *ept,
-> +		      unsigned int n_epts);
-> +void vhost_rpmsg_destroy(struct vhost_rpmsg *vr);
-> +int vhost_rpmsg_ns_announce(struct vhost_rpmsg *vr, const char *name,
-> +			    unsigned int src);
-> +int vhost_rpmsg_start_lock(struct vhost_rpmsg *vr,
-> +			   struct vhost_rpmsg_iter *iter,
-> +			   unsigned int qid, ssize_t len);
-> +size_t vhost_rpmsg_copy(struct vhost_rpmsg *vr, struct vhost_rpmsg_iter *iter,
-> +			void *data, size_t size);
-> +int vhost_rpmsg_finish_unlock(struct vhost_rpmsg *vr,
-> +			      struct vhost_rpmsg_iter *iter);
-> +
-> +#endif
-> -- 
-> 2.27.0
+On 7/20/20 11:03 AM, Tony Krowiak wrote:
+> The current design for AP pass-through does not support making dynamic
+> changes to the AP matrix of a running guest resulting in a few
+> deficiencies this patch series is intended to mitigate:
+>
+> 1. Adapters, domains and control domains can not be added to or removed
+>     from a running guest. In order to modify a guest's AP configuration,
+>     the guest must be terminated; only then can AP resources be assigned
+>     to or unassigned from the guest's matrix mdev. The new AP
+>     configuration becomes available to the guest when it is subsequently
+>     restarted.
+>
+> 2. The AP bus's /sys/bus/ap/apmask and /sys/bus/ap/aqmask interfaces can
+>     be modified by a root user without any restrictions. A change to
+>     either mask can result in AP queue devices being unbound from the
+>     vfio_ap device driver and bound to a zcrypt device driver even if a
+>     guest is using the queues, thus giving the host access to the guest's
+>     private crypto data and vice versa.
+>
+> 3. The APQNs derived from the Cartesian product of the APIDs of the
+>     adapters and APQIs of the domains assigned to a matrix mdev must
+>     reference an AP queue device bound to the vfio_ap device driver. The
+>     AP architecture allows assignment of AP resources that are not
+>     available to the system, so this artificial restriction is not
+>     compliant with the architecture.
+>
+> 4. The AP configuration profile can be dynamically changed for the linux
+>     host after a KVM guest is started. For example, a new domain can be
+>     dynamically added to the configuration profile via the SE or an HMC
+>     connected to a DPM enabled lpar. Likewise, AP adapters can be
+>     dynamically configured (online state) and deconfigured (standby state)
+>     using the SE, an SCLP command or an HMC connected to a DPM enabled
+>     lpar. This can result in inadvertent sharing of AP queues between the
+>     guest and host.
+>
+> 5. A root user can manually unbind an AP queue device representing a
+>     queue in use by a KVM guest via the vfio_ap device driver's sysfs
+>     unbind attribute. In this case, the guest will be using a queue that
+>     is not bound to the driver which violates the device model.
+>
+> This patch series introduces the following changes to the current design
+> to alleviate the shortcomings described above as well as to implement
+> more of the AP architecture:
+>
+> 1. A root user will be prevented from making changes to the AP bus's
+>     /sys/bus/ap/apmask or /sys/bus/ap/aqmask if the ownership of an APQN
+>     changes from the vfio_ap device driver to a zcrypt driver when the
+>     APQN is assigned to a matrix mdev.
+>
+> 2. Allow a root user to hot plug/unplug AP adapters, domains and control
+>     domains using the matrix mdev's assign/unassign attributes.
+>
+> 4. Allow assignment of an AP adapter or domain to a matrix mdev even if
+>     it results in assignment of an APQN that does not reference an AP
+>     queue device bound to the vfio_ap device driver, as long as the APQN
+>     is not reserved for use by the default zcrypt drivers (also known as
+>     over-provisioning of AP resources). Allowing over-provisioning of AP
+>     resources better models the architecture which does not preclude
+>     assigning AP resources that are not yet available in the system. Such
+>     APQNs, however, will not be assigned to the guest using the matrix
+>     mdev; only APQNs referencing AP queue devices bound to the vfio_ap
+>     device driver will actually get assigned to the guest.
+>
+> 5. Handle dynamic changes to the AP device model.
+>
+> 1. Rationale for changes to AP bus's apmask/aqmask interfaces:
+> ----------------------------------------------------------
+> Due to the extremely sensitive nature of cryptographic data, it is
+> imperative that great care be taken to ensure that such data is secured.
+> Allowing a root user, either inadvertently or maliciously, to configure
+> these masks such that a queue is shared between the host and a guest is
+> not only avoidable, it is advisable. It was suggested that this scenario
+> is better handled in user space with management software, but that does
+> not preclude a malicious administrator from using the sysfs interfaces
+> to gain access to a guest's crypto data. It was also suggested that this
+> scenario could be avoided by taking access to the adapter away from the
+> guest and zeroing out the queues prior to the vfio_ap driver releasing the
+> device; however, stealing an adapter in use from a guest as a by-product
+> of an operation is bad and will likely cause problems for the guest
+> unnecessarily. It was decided that the most effective solution with the
+> least number of negative side effects is to prevent the situation at the
+> source.
+>
+> 2. Rationale for hot plug/unplug using matrix mdev sysfs interfaces:
+> ----------------------------------------------------------------
+> Allowing a user to hot plug/unplug AP resources using the matrix mdev
+> sysfs interfaces circumvents the need to terminate the guest in order to
+> modify its AP configuration. Allowing dynamic configuration makes
+> reconfiguring a guest's AP matrix much less disruptive.
+>
+> 3. Rationale for allowing over-provisioning of AP resources:
+> -----------------------------------------------------------
+> Allowing assignment of AP resources to a matrix mdev and ultimately to a
+> guest better models the AP architecture. The architecture does not
+> preclude assignment of unavailable AP resources. If a queue subsequently
+> becomes available while a guest using the matrix mdev to which its APQN
+> is assigned, the guest will be given access to it. If an APQN
+> is dynamically unassigned from the underlying host system, it will
+> automatically become unavailable to the guest.
+>
+> Change log v8-v9:
+> ----------------
+> * Fixed errors flagged by the kernel test robot
+>
+> * Fixed issue with guest losing queues when a new queue is probed due to
+>    manual bind operation.
+>
+> Change log v7-v8:
+> ----------------
+> * Now logging a message when an attempt to reserve APQNs for the zcrypt
+>    drivers will result in taking a queue away from a KVM guest to provide
+>    the sysadmin a way to ascertain why the sysfs operation failed.
+>
+> * Created locked and unlocked versions of the ap_parse_mask_str() function.
+>
+> * Now using new interface provided by an AP bus patch -
+>    s390/ap: introduce new ap function ap_get_qdev() - to retrieve
+>    struct ap_queue representing an AP queue device. This patch is not a
+>    part of this series but is a prerequisite for this series.
+>
+> Change log v6-v7:
+> ----------------
+> * Added callbacks to AP bus:
+>    - on_config_changed: Notifies implementing drivers that
+>      the AP configuration has changed since last AP device scan.
+>    - on_scan_complete: Notifies implementing drivers that the device scan
+>      has completed.
+>    - implemented on_config_changed and on_scan_complete callbacks for
+>      vfio_ap device driver.
+>    - updated vfio_ap device driver's probe and remove callbacks to handle
+>      dynamic changes to the AP device model.
+> * Added code to filter APQNs when assigning AP resources to a KVM guest's
+>    CRYCB
+>
+> Change log v5-v6:
+> ----------------
+> * Fixed a bug in ap_bus.c introduced with patch 2/7 of the v5
+>    series. Harald Freudenberer pointed out that the mutex lock
+>    for ap_perms_mutex in the apmask_store and aqmask_store functions
+>    was not being freed.
+>
+> * Removed patch 6/7 which added logging to the vfio_ap driver
+>    to expedite acceptance of this series. The logging will be introduced
+>    with a separate patch series to allow more time to explore options
+>    such as DBF logging vs. tracepoints.
+>
+> * Added 3 patches related to ensuring that APQNs that do not reference
+>    AP queue devices bound to the vfio_ap device driver are not assigned
+>    to the guest CRYCB:
+>
+>    Patch 4: Filter CRYCB bits for unavailable queue devices
+>    Patch 5: sysfs attribute to display the guest CRYCB
+>    Patch 6: update guest CRYCB in vfio_ap probe and remove callbacks
+>
+> * Added a patch (Patch 9) to version the vfio_ap module.
+>
+> * Reshuffled patches to allow the in_use callback implementation to
+>    invoke the vfio_ap_mdev_verify_no_sharing() function introduced in
+>    patch 2.
+>
+> Change log v4-v5:
+> ----------------
+> * Added a patch to provide kernel s390dbf debug logs for VFIO AP
+>
+> Change log v3->v4:
+> -----------------
+> * Restored patches preventing root user from changing ownership of
+>    APQNs from zcrypt drivers to the vfio_ap driver if the APQN is
+>    assigned to an mdev.
+>
+> * No longer enforcing requirement restricting guest access to
+>    queues represented by a queue device bound to the vfio_ap
+>    device driver.
+>
+> * Removed shadow CRYCB and now directly updating the guest CRYCB
+>    from the matrix mdev's matrix.
+>
+> * Rebased the patch series on top of 'vfio: ap: AP Queue Interrupt
+>    Control' patches.
+>
+> * Disabled bind/unbind sysfs interfaces for vfio_ap driver
+>
+> Change log v2->v3:
+> -----------------
+> * Allow guest access to an AP queue only if the queue is bound to
+>    the vfio_ap device driver.
+>
+> * Removed the patch to test CRYCB masks before taking the vCPUs
+>    out of SIE. Now checking the shadow CRYCB in the vfio_ap driver.
+>
+> Change log v1->v2:
+> -----------------
+> * Removed patches preventing root user from unbinding AP queues from
+>    the vfio_ap device driver
+> * Introduced a shadow CRYCB in the vfio_ap driver to manage dynamic
+>    changes to the AP guest configuration due to root user interventions
+>    or hardware anomalies.
+>
+> Harald Freudenberger (1):
+>    s390/zcrypt: Notify driver on config changed and scan complete
+>      callbacks
+>
+> Tony Krowiak (14):
+>    s390/vfio-ap: add version vfio_ap module
+>    s390/vfio-ap: use new AP bus interface to search for queue devices
+>    s390/vfio-ap: manage link between queue struct and matrix mdev
+>    s390/zcrypt: driver callback to indicate resource in use
+>    s390/vfio-ap: implement in-use callback for vfio_ap driver
+>    s390/vfio-ap: introduce shadow APCB
+>    s390/vfio-ap: sysfs attribute to display the guest's matrix
+>    s390/vfio-ap: filter matrix for unavailable queue devices
+>    s390/vfio-ap: allow assignment of unavailable AP queues to mdev device
+>    s390/vfio-ap: allow configuration of matrix mdev in use by a KVM guest
+>    s390/vfio-ap: allow hot plug/unplug of AP resources using mdev device
+>    s390/vfio-ap: handle host AP config change notification
+>    s390/vfio-ap: handle AP bus scan completed notification
+>    s390/vfio-ap: handle probe/remove not due to host AP config changes
+>
+>   drivers/s390/crypto/ap_bus.c          |  323 +++++--
+>   drivers/s390/crypto/ap_bus.h          |   16 +
+>   drivers/s390/crypto/vfio_ap_drv.c     |   36 +-
+>   drivers/s390/crypto/vfio_ap_ops.c     | 1216 ++++++++++++++++++++-----
+>   drivers/s390/crypto/vfio_ap_private.h |   23 +-
+>   5 files changed, 1294 insertions(+), 320 deletions(-)
+>
 
