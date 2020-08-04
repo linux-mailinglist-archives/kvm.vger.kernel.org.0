@@ -2,79 +2,54 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5F96A23B8B8
-	for <lists+kvm@lfdr.de>; Tue,  4 Aug 2020 12:25:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5653723B8D8
+	for <lists+kvm@lfdr.de>; Tue,  4 Aug 2020 12:35:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728401AbgHDKZ2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 4 Aug 2020 06:25:28 -0400
-Received: from mga05.intel.com ([192.55.52.43]:29375 "EHLO mga05.intel.com"
+        id S1729358AbgHDKfI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 4 Aug 2020 06:35:08 -0400
+Received: from foss.arm.com ([217.140.110.172]:42326 "EHLO foss.arm.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726041AbgHDKZZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 4 Aug 2020 06:25:25 -0400
-IronPort-SDR: B93MxYmO4K3WeJ3o2QVOa8Bdk9By1tAfxEQft+BTVuQy1ki8fi0L3g615Rh2USfv9ysIw+v1S5
- 6jIQoyyp/DAA==
-X-IronPort-AV: E=McAfee;i="6000,8403,9702"; a="237146609"
-X-IronPort-AV: E=Sophos;i="5.75,433,1589266800"; 
-   d="scan'208";a="237146609"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Aug 2020 03:25:25 -0700
-IronPort-SDR: /0RVEfgju9VaF9xmo8ygzfV/HOYmfFaIf2GRKeBWFsOMbiohTJlfu1lhlD65XmfvJziaMnydV3
- Nv3Gendtu4qQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.75,433,1589266800"; 
-   d="scan'208";a="330560245"
-Received: from unknown (HELO localhost.localdomain.bj.intel.com) ([10.240.192.131])
-  by FMSMGA003.fm.intel.com with ESMTP; 04 Aug 2020 03:25:23 -0700
-From:   Zhu Lingshan <lingshan.zhu@intel.com>
-To:     jasowang@redhat.com, mst@redhat.com
-Cc:     virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        kvm@vger.kernel.org, eli@mellanox.com, shahafs@mellanox.com,
-        parav@mellanox.com, Zhu Lingshan <lingshan.zhu@intel.com>
-Subject: [PATCH] vDPA: dont change vq irq after DRIVER_OK
-Date:   Tue,  4 Aug 2020 18:21:23 +0800
-Message-Id: <20200804102123.69978-1-lingshan.zhu@intel.com>
-X-Mailer: git-send-email 2.18.4
+        id S1725996AbgHDKfH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 4 Aug 2020 06:35:07 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id EBBA01FB;
+        Tue,  4 Aug 2020 03:35:06 -0700 (PDT)
+Received: from e121166-lin.cambridge.arm.com (e121166-lin.cambridge.arm.com [10.1.196.255])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id E93413F718;
+        Tue,  4 Aug 2020 03:35:05 -0700 (PDT)
+Date:   Tue, 4 Aug 2020 11:34:57 +0100
+From:   Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>
+To:     kvm@vger.kernel.org, linux-pci@vger.kernel.org,
+        iommu@lists.linux-foundation.org
+Cc:     helgaas@kernel.org, alex.williamson@redhat.com, joro@8bytes.org,
+        lorenzo.pieralisi@arm.com
+Subject: VFIO/IOMMU/PCI MC at LPC20 - Call for Topics
+Message-ID: <20200804103457.GA6930@e121166-lin.cambridge.arm.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+User-Agent: Mutt/1.9.4 (2018-02-28)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-IRQ of a vq is not expected to be changed in a DRIVER_OK ~ !DRIVER_OK
-period for irq offloading purposes. Place this comment at the side of
-bus ops get_vq_irq than in set_status in vhost_vdpa.
+Hi all,
 
-Signed-off-by: Zhu Lingshan <lingshan.zhu@intel.com>
----
- drivers/vhost/vdpa.c | 1 -
- include/linux/vdpa.h | 1 +
- 2 files changed, 1 insertion(+), 1 deletion(-)
+following up the LPC20 blog announcement:
 
-diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
-index 278ea2f00172..26f166a8192e 100644
---- a/drivers/vhost/vdpa.c
-+++ b/drivers/vhost/vdpa.c
-@@ -222,7 +222,6 @@ static long vhost_vdpa_set_status(struct vhost_vdpa *v, u8 __user *statusp)
- 
- 	ops->set_status(vdpa, status);
- 
--	/* vq irq is not expected to be changed once DRIVER_OK is set */
- 	if ((status & VIRTIO_CONFIG_S_DRIVER_OK) && !(status_old & VIRTIO_CONFIG_S_DRIVER_OK))
- 		for (i = 0; i < nvqs; i++)
- 			vhost_vdpa_setup_vq_irq(v, i);
-diff --git a/include/linux/vdpa.h b/include/linux/vdpa.h
-index ba898486f2c7..03aa9f77f192 100644
---- a/include/linux/vdpa.h
-+++ b/include/linux/vdpa.h
-@@ -183,6 +183,7 @@ struct vdpa_config_ops {
- 	u64 (*get_vq_state)(struct vdpa_device *vdev, u16 idx);
- 	struct vdpa_notification_area
- 	(*get_vq_notification)(struct vdpa_device *vdev, u16 idx);
-+	/* vq irq is not expected to be changed once DRIVER_OK is set */
- 	int (*get_vq_irq)(struct vdpa_device *vdv, u16 idx);
- 
- 	/* Device ops */
--- 
-2.18.4
+https://www.linuxplumbersconf.org/blog/2020/vfio-iommu-pci-microconference-accepted-into-2020-linux-plumbers-conference/
 
+The call for topics for the VFIO/IOMMU/PCI microconference at LPC20 is
+now open, the LPC20 entry below provides a list of possible topics but
+you should feel free to submit topics of interest that you would like to
+discuss with maintainers and developers of the respective subsystems.
+
+https://www.linuxplumbersconf.org/event/7/page/80-accepted-microconferences#vfio-cr
+
+Please do reach out for any other piece of information we can help with.
+
+Looking forward to receiving your submissions !
+
+Thanks,
+Lorenzo
