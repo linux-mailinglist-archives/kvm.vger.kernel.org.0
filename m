@@ -2,40 +2,40 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1E01223C8C3
-	for <lists+kvm@lfdr.de>; Wed,  5 Aug 2020 11:14:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4501823C8CB
+	for <lists+kvm@lfdr.de>; Wed,  5 Aug 2020 11:14:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728465AbgHEJLx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 5 Aug 2020 05:11:53 -0400
-Received: from smtp-fw-6001.amazon.com ([52.95.48.154]:63541 "EHLO
-        smtp-fw-6001.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728411AbgHEJLb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 5 Aug 2020 05:11:31 -0400
+        id S1728330AbgHEJMg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 5 Aug 2020 05:12:36 -0400
+Received: from smtp-fw-6002.amazon.com ([52.95.49.90]:58766 "EHLO
+        smtp-fw-6002.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728432AbgHEJLo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 5 Aug 2020 05:11:44 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1596618689; x=1628154689;
+  t=1596618703; x=1628154703;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=2qBYoNJYs41GG4msErUaIq9V/mAp37u59OJNaRN/+Oo=;
-  b=Qlu5yJIp6xBZUsQWxVifGYkiqnuTx2io/ihvPH7/pjB2nm2v5pR1u9nY
-   6Ps48Z75X3ejx3ZiZboeaFtBD8OKiaGXnn19HlC547xQxoyqbLp9XNjxu
-   zHqMcjxNGDzprwnX5ihrB4Xe9+P9hboDzjbYbvR60DrDwhI5GXgGbr71/
+  bh=ZronyD2XkhBmFSaKHRiozvNzsOcMNsD5kSWwUfxdedM=;
+  b=oX2812bXmpcI+DCG0Fg0lt+KKoRUz0fjqBF9wbTOcjVcU68j8qRqmTPy
+   1jHzz1oefSNq1zZ+Bza2JfaOv9jRJy+BDCQh4xg2i/UMN3NElJdkNiFzr
+   ODVF68Rt0D3thkekSlrwkxRqhA9ooxumkBZAFVCAUq+2zQfkbOVdKL1nM
    s=;
-IronPort-SDR: 49micGN8D5e0JXmZpJP4iu4GKxJjsRPhLk3sYqrYraC6fLo9MCUlOA1LPp36SE9WZIilLftCGZ
- jY4D90fKno6g==
+IronPort-SDR: ffVt6N+M+QD0uPBP+l77ZzIAeyauyAvGCkfHMF3d27xgizNsyNtQwqkS2Z1gJtcoUueoGpxDmO
+ ANWuYFWKFIww==
 X-IronPort-AV: E=Sophos;i="5.75,436,1589241600"; 
-   d="scan'208";a="47577632"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-2b-a7fdc47a.us-west-2.amazon.com) ([10.43.8.6])
-  by smtp-border-fw-out-6001.iad6.amazon.com with ESMTP; 05 Aug 2020 09:11:28 +0000
-Received: from EX13MTAUEA002.ant.amazon.com (pdx4-ws-svc-p6-lb7-vlan2.pdx.amazon.com [10.170.41.162])
-        by email-inbound-relay-2b-a7fdc47a.us-west-2.amazon.com (Postfix) with ESMTPS id C5B00C08A6;
-        Wed,  5 Aug 2020 09:11:26 +0000 (UTC)
+   d="scan'208";a="46143536"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-2b-4ff6265a.us-west-2.amazon.com) ([10.43.8.6])
+  by smtp-border-fw-out-6002.iad6.amazon.com with ESMTP; 05 Aug 2020 09:11:38 +0000
+Received: from EX13MTAUEA002.ant.amazon.com (pdx4-ws-svc-p6-lb7-vlan3.pdx.amazon.com [10.170.41.166])
+        by email-inbound-relay-2b-4ff6265a.us-west-2.amazon.com (Postfix) with ESMTPS id 5DD4FA1F49;
+        Wed,  5 Aug 2020 09:11:36 +0000 (UTC)
 Received: from EX13D16EUB003.ant.amazon.com (10.43.166.99) by
  EX13MTAUEA002.ant.amazon.com (10.43.61.77) with Microsoft SMTP Server (TLS)
- id 15.0.1497.2; Wed, 5 Aug 2020 09:11:26 +0000
+ id 15.0.1497.2; Wed, 5 Aug 2020 09:11:35 +0000
 Received: from 38f9d34ed3b1.ant.amazon.com (10.43.160.100) by
  EX13D16EUB003.ant.amazon.com (10.43.166.99) with Microsoft SMTP Server (TLS)
- id 15.0.1497.2; Wed, 5 Aug 2020 09:11:16 +0000
+ id 15.0.1497.2; Wed, 5 Aug 2020 09:11:25 +0000
 From:   Andra Paraschiv <andraprs@amazon.com>
 To:     linux-kernel <linux-kernel@vger.kernel.org>
 CC:     Anthony Liguori <aliguori@amazon.com>,
@@ -60,9 +60,9 @@ CC:     Anthony Liguori <aliguori@amazon.com>,
         kvm <kvm@vger.kernel.org>,
         ne-devel-upstream <ne-devel-upstream@amazon.com>,
         Andra Paraschiv <andraprs@amazon.com>
-Subject: [PATCH v6 05/18] nitro_enclaves: Handle PCI device command requests
-Date:   Wed, 5 Aug 2020 12:10:04 +0300
-Message-ID: <20200805091017.86203-6-andraprs@amazon.com>
+Subject: [PATCH v6 06/18] nitro_enclaves: Handle out-of-band PCI device events
+Date:   Wed, 5 Aug 2020 12:10:05 +0300
+Message-ID: <20200805091017.86203-7-andraprs@amazon.com>
 X-Mailer: git-send-email 2.20.1 (Apple Git-117)
 In-Reply-To: <20200805091017.86203-1-andraprs@amazon.com>
 References: <20200805091017.86203-1-andraprs@amazon.com>
@@ -77,19 +77,22 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The Nitro Enclaves PCI device exposes a MMIO space that this driver
-uses to submit command requests and to receive command replies e.g. for
-enclave creation / termination or setting enclave resources.
+In addition to the replies sent by the Nitro Enclaves PCI device in
+response to command requests, out-of-band enclave events can happen e.g.
+an enclave crashes. In this case, the Nitro Enclaves driver needs to be
+aware of the event and notify the corresponding user space process that
+abstracts the enclave.
 
-Add logic for handling PCI device command requests based on the given
-command type.
+Register an MSI-X interrupt vector to be used for this kind of
+out-of-band events. The interrupt notifies that the state of an enclave
+changed and the driver logic scans the state of each running enclave to
+identify for which this notification is intended.
 
-Register an MSI-X interrupt vector for command reply notifications to
-handle this type of communication events.
+Create an workqueue to handle the out-of-band events. Notify user space
+enclave process that is using a polling mechanism on the enclave fd.
 
 Signed-off-by: Alexandru-Catalin Vasile <lexnv@amazon.com>
 Signed-off-by: Andra Paraschiv <andraprs@amazon.com>
-Reviewed-by: Alexander Graf <graf@amazon.com>
 ---
 Changelog
 
@@ -117,199 +120,97 @@ v2 -> v3
 v1 -> v2
 
 * Add log pattern for NE.
-* Remove the BUG_ON calls.
 * Update goto labels to match their purpose.
-* Add fix for kbuild report:
-  https://lore.kernel.org/lkml/202004231644.xTmN4Z1z%25lkp@intel.com/
 ---
- drivers/virt/nitro_enclaves/ne_pci_dev.c | 204 +++++++++++++++++++++++
- 1 file changed, 204 insertions(+)
+ drivers/virt/nitro_enclaves/ne_pci_dev.c | 116 +++++++++++++++++++++++
+ 1 file changed, 116 insertions(+)
 
 diff --git a/drivers/virt/nitro_enclaves/ne_pci_dev.c b/drivers/virt/nitro_enclaves/ne_pci_dev.c
-index 31650dcd592e..77ccbc43bce3 100644
+index 77ccbc43bce3..a898fae066d9 100644
 --- a/drivers/virt/nitro_enclaves/ne_pci_dev.c
 +++ b/drivers/virt/nitro_enclaves/ne_pci_dev.c
-@@ -33,6 +33,187 @@ static const struct pci_device_id ne_pci_ids[] = {
+@@ -214,6 +214,88 @@ static irqreturn_t ne_reply_handler(int irq, void *args)
+ 	return IRQ_HANDLED;
+ }
  
- MODULE_DEVICE_TABLE(pci, ne_pci_ids);
- 
 +/**
-+ * ne_submit_request() - Submit command request to the PCI device based on the
-+ *			 command type.
-+ * @pdev:		PCI device to send the command to.
-+ * @cmd_type:		Command type of the request sent to the PCI device.
-+ * @cmd_request:	Command request payload.
-+ * @cmd_request_size:	Size of the command request payload.
++ * ne_event_work_handler() - Work queue handler for notifying enclaves on a
++ *			     state change received by the event interrupt
++ *			     handler.
++ * @work:	Item containing the NE PCI device for which an out-of-band event
++ *		was issued.
 + *
-+ * Context: Process context. This function is called with the ne_pci_dev mutex held.
-+ * Return:
-+ * * 0 on success.
-+ * * Negative return value on failure.
-+ */
-+static int ne_submit_request(struct pci_dev *pdev, enum ne_pci_dev_cmd_type cmd_type,
-+			     void *cmd_request, size_t cmd_request_size)
-+{
-+	struct ne_pci_dev *ne_pci_dev = pci_get_drvdata(pdev);
-+
-+	memcpy_toio(ne_pci_dev->iomem_base + NE_SEND_DATA, cmd_request, cmd_request_size);
-+
-+	iowrite32(cmd_type, ne_pci_dev->iomem_base + NE_COMMAND);
-+
-+	return 0;
-+}
-+
-+/**
-+ * ne_retrieve_reply() - Retrieve reply from the PCI device.
-+ * @pdev:		PCI device to receive the reply from.
-+ * @cmd_reply:		Command reply payload.
-+ * @cmd_reply_size:	Size of the command reply payload.
++ * An out-of-band event is being issued by the Nitro Hypervisor when at least
++ * one enclave is changing state without client interaction.
 + *
-+ * Context: Process context. This function is called with the ne_pci_dev mutex held.
-+ * Return:
-+ * * 0 on success.
-+ * * Negative return value on failure.
++ * Context: Work queue context.
 + */
-+static int ne_retrieve_reply(struct pci_dev *pdev, struct ne_pci_dev_cmd_reply *cmd_reply,
-+			     size_t cmd_reply_size)
++static void ne_event_work_handler(struct work_struct *work)
 +{
-+	struct ne_pci_dev *ne_pci_dev = pci_get_drvdata(pdev);
-+
-+	memcpy_fromio(cmd_reply, ne_pci_dev->iomem_base + NE_RECV_DATA, cmd_reply_size);
-+
-+	return 0;
-+}
-+
-+/**
-+ * ne_wait_for_reply() - Wait for a reply of a PCI device command.
-+ * @pdev:	PCI device for which a reply is waited.
-+ *
-+ * Context: Process context. This function is called with the ne_pci_dev mutex held.
-+ * Return:
-+ * * 0 on success.
-+ * * Negative return value on failure.
-+ */
-+static int ne_wait_for_reply(struct pci_dev *pdev)
-+{
-+	struct ne_pci_dev *ne_pci_dev = pci_get_drvdata(pdev);
++	struct ne_pci_dev_cmd_reply cmd_reply = {};
++	struct ne_enclave *ne_enclave = NULL;
++	struct ne_pci_dev *ne_pci_dev =
++		container_of(work, struct ne_pci_dev, notify_work);
 +	int rc = -EINVAL;
++	struct slot_info_req slot_info_req = {};
++
++	mutex_lock(&ne_pci_dev->enclaves_list_mutex);
 +
 +	/*
-+	 * TODO: Update to _interruptible and handle interrupted wait event
-+	 * e.g. -ERESTARTSYS, incoming signals + update timeout, if needed.
++	 * Iterate over all enclaves registered for the Nitro Enclaves
++	 * PCI device and determine for which enclave(s) the out-of-band event
++	 * is corresponding to.
 +	 */
-+	rc = wait_event_timeout(ne_pci_dev->cmd_reply_wait_q,
-+				atomic_read(&ne_pci_dev->cmd_reply_avail) != 0,
-+				msecs_to_jiffies(NE_DEFAULT_TIMEOUT_MSECS));
-+	if (!rc)
-+		return -ETIMEDOUT;
++	list_for_each_entry(ne_enclave, &ne_pci_dev->enclaves_list, enclave_list_entry) {
++		mutex_lock(&ne_enclave->enclave_info_mutex);
 +
-+	return 0;
-+}
++		/*
++		 * Enclaves that were never started cannot receive out-of-band
++		 * events.
++		 */
++		if (ne_enclave->state != NE_STATE_RUNNING)
++			goto unlock;
 +
-+int ne_do_request(struct pci_dev *pdev, enum ne_pci_dev_cmd_type cmd_type,
-+		  void *cmd_request, size_t cmd_request_size,
-+		  struct ne_pci_dev_cmd_reply *cmd_reply, size_t cmd_reply_size)
-+{
-+	struct ne_pci_dev *ne_pci_dev = pci_get_drvdata(pdev);
-+	int rc = -EINVAL;
++		slot_info_req.slot_uid = ne_enclave->slot_uid;
 +
-+	if (cmd_type <= INVALID_CMD || cmd_type >= MAX_CMD) {
-+		dev_err_ratelimited(&pdev->dev, "Invalid cmd type=%u\n", cmd_type);
++		rc = ne_do_request(ne_enclave->pdev, SLOT_INFO, &slot_info_req,
++				   sizeof(slot_info_req), &cmd_reply, sizeof(cmd_reply));
++		if (rc < 0)
++			dev_err(&ne_enclave->pdev->dev, "Error in slot info [rc=%d]\n", rc);
 +
-+		return -EINVAL;
++		/* Notify enclave process that the enclave state changed. */
++		if (ne_enclave->state != cmd_reply.state) {
++			ne_enclave->state = cmd_reply.state;
++
++			ne_enclave->has_event = true;
++
++			wake_up_interruptible(&ne_enclave->eventq);
++		}
++
++unlock:
++		 mutex_unlock(&ne_enclave->enclave_info_mutex);
 +	}
 +
-+	if (!cmd_request) {
-+		dev_err_ratelimited(&pdev->dev, "Null cmd request\n");
-+
-+		return -EINVAL;
-+	}
-+
-+	if (cmd_request_size > NE_SEND_DATA_SIZE) {
-+		dev_err_ratelimited(&pdev->dev, "Invalid req size=%zu for cmd type=%u\n",
-+				    cmd_request_size, cmd_type);
-+
-+		return -EINVAL;
-+	}
-+
-+	if (!cmd_reply) {
-+		dev_err_ratelimited(&pdev->dev, "Null cmd reply\n");
-+
-+		return -EINVAL;
-+	}
-+
-+	if (cmd_reply_size > NE_RECV_DATA_SIZE) {
-+		dev_err_ratelimited(&pdev->dev, "Invalid reply size=%zu\n", cmd_reply_size);
-+
-+		return -EINVAL;
-+	}
-+
-+	/*
-+	 * Use this mutex so that the PCI device handles one command request at
-+	 * a time.
-+	 */
-+	mutex_lock(&ne_pci_dev->pci_dev_mutex);
-+
-+	atomic_set(&ne_pci_dev->cmd_reply_avail, 0);
-+
-+	rc = ne_submit_request(pdev, cmd_type, cmd_request, cmd_request_size);
-+	if (rc < 0) {
-+		dev_err_ratelimited(&pdev->dev, "Error in submit request [rc=%d]\n", rc);
-+
-+		goto unlock_mutex;
-+	}
-+
-+	rc = ne_wait_for_reply(pdev);
-+	if (rc < 0) {
-+		dev_err_ratelimited(&pdev->dev, "Error in wait for reply [rc=%d]\n", rc);
-+
-+		goto unlock_mutex;
-+	}
-+
-+	rc = ne_retrieve_reply(pdev, cmd_reply, cmd_reply_size);
-+	if (rc < 0) {
-+		dev_err_ratelimited(&pdev->dev, "Error in retrieve reply [rc=%d]\n", rc);
-+
-+		goto unlock_mutex;
-+	}
-+
-+	atomic_set(&ne_pci_dev->cmd_reply_avail, 0);
-+
-+	if (cmd_reply->rc < 0) {
-+		rc = cmd_reply->rc;
-+
-+		dev_err_ratelimited(&pdev->dev, "Error in cmd process logic [rc=%d]\n", rc);
-+
-+		goto unlock_mutex;
-+	}
-+
-+	rc = 0;
-+
-+unlock_mutex:
-+	mutex_unlock(&ne_pci_dev->pci_dev_mutex);
-+
-+	return rc;
++	mutex_unlock(&ne_pci_dev->enclaves_list_mutex);
 +}
 +
 +/**
-+ * ne_reply_handler() - Interrupt handler for retrieving a reply matching a
-+ *			request sent to the PCI device for enclave lifetime
-+ *			management.
-+ * @irq:	Received interrupt for a reply sent by the PCI device.
++ * ne_event_handler() - Interrupt handler for PCI device out-of-band events.
++ *			This interrupt does not supply any data in the MMIO
++ *			region. It notifies a change in the state of any of
++ *			the launched enclaves.
++ * @irq:	Received interrupt for an out-of-band event.
 + * @args:	PCI device private data structure.
 + *
 + * Context: Interrupt context.
 + * Return:
 + * * IRQ_HANDLED on handled interrupt.
 + */
-+static irqreturn_t ne_reply_handler(int irq, void *args)
++static irqreturn_t ne_event_handler(int irq, void *args)
 +{
 +	struct ne_pci_dev *ne_pci_dev = (struct ne_pci_dev *)args;
 +
-+	atomic_set(&ne_pci_dev->cmd_reply_avail, 1);
-+
-+	/* TODO: Update to _interruptible. */
-+	wake_up(&ne_pci_dev->cmd_reply_wait_q);
++	queue_work(ne_pci_dev->event_wq, &ne_pci_dev->notify_work);
 +
 +	return IRQ_HANDLED;
 +}
@@ -317,51 +218,56 @@ index 31650dcd592e..77ccbc43bce3 100644
  /**
   * ne_setup_msix() - Setup MSI-X vectors for the PCI device.
   * @pdev:	PCI device to setup the MSI-X for.
-@@ -44,6 +225,7 @@ MODULE_DEVICE_TABLE(pci, ne_pci_ids);
-  */
- static int ne_setup_msix(struct pci_dev *pdev)
- {
-+	struct ne_pci_dev *ne_pci_dev = pci_get_drvdata(pdev);
- 	int nr_vecs = 0;
- 	int rc = -EINVAL;
- 
-@@ -63,7 +245,25 @@ static int ne_setup_msix(struct pci_dev *pdev)
- 		return rc;
+@@ -258,8 +340,36 @@ static int ne_setup_msix(struct pci_dev *pdev)
+ 		goto free_irq_vectors;
  	}
  
-+	/*
-+	 * This IRQ gets triggered every time the PCI device responds to a
-+	 * command request. The reply is then retrieved, reading from the MMIO
-+	 * space of the PCI device.
-+	 */
-+	rc = request_irq(pci_irq_vector(pdev, NE_VEC_REPLY), ne_reply_handler,
-+			 0, "enclave_cmd", ne_pci_dev);
-+	if (rc < 0) {
-+		dev_err(&pdev->dev, "Error in request irq reply [rc=%d]\n", rc);
++	ne_pci_dev->event_wq = create_singlethread_workqueue("ne_pci_dev_wq");
++	if (!ne_pci_dev->event_wq) {
++		rc = -ENOMEM;
 +
-+		goto free_irq_vectors;
++		dev_err(&pdev->dev, "Cannot get wq for dev events [rc=%d]\n", rc);
++
++		goto free_reply_irq_vec;
++	}
++
++	INIT_WORK(&ne_pci_dev->notify_work, ne_event_work_handler);
++
++	/*
++	 * This IRQ gets triggered every time any enclave's state changes. Its
++	 * handler then scans for the changes and propagates them to the user
++	 * space.
++	 */
++	rc = request_irq(pci_irq_vector(pdev, NE_VEC_EVENT), ne_event_handler,
++			 0, "enclave_evt", ne_pci_dev);
++	if (rc < 0) {
++		dev_err(&pdev->dev, "Error in request irq event [rc=%d]\n", rc);
++
++		goto destroy_wq;
 +	}
 +
  	return 0;
-+
-+free_irq_vectors:
-+	pci_free_irq_vectors(pdev);
-+
-+	return rc;
- }
  
- /**
-@@ -74,6 +274,10 @@ static int ne_setup_msix(struct pci_dev *pdev)
-  */
- static void ne_teardown_msix(struct pci_dev *pdev)
- {
-+	struct ne_pci_dev *ne_pci_dev = pci_get_drvdata(pdev);
-+
++destroy_wq:
++	destroy_workqueue(ne_pci_dev->event_wq);
++free_reply_irq_vec:
 +	free_irq(pci_irq_vector(pdev, NE_VEC_REPLY), ne_pci_dev);
-+
+ free_irq_vectors:
  	pci_free_irq_vectors(pdev);
- }
  
+@@ -276,6 +386,12 @@ static void ne_teardown_msix(struct pci_dev *pdev)
+ {
+ 	struct ne_pci_dev *ne_pci_dev = pci_get_drvdata(pdev);
+ 
++	free_irq(pci_irq_vector(pdev, NE_VEC_EVENT), ne_pci_dev);
++
++	flush_work(&ne_pci_dev->notify_work);
++	flush_workqueue(ne_pci_dev->event_wq);
++	destroy_workqueue(ne_pci_dev->event_wq);
++
+ 	free_irq(pci_irq_vector(pdev, NE_VEC_REPLY), ne_pci_dev);
+ 
+ 	pci_free_irq_vectors(pdev);
 -- 
 2.20.1 (Apple Git-117)
 
