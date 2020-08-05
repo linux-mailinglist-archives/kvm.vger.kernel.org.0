@@ -2,85 +2,123 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9F9FD23D144
-	for <lists+kvm@lfdr.de>; Wed,  5 Aug 2020 21:58:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B48D323D05C
+	for <lists+kvm@lfdr.de>; Wed,  5 Aug 2020 21:48:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729252AbgHET61 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 5 Aug 2020 15:58:27 -0400
-Received: from foss.arm.com ([217.140.110.172]:33258 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726900AbgHEQnI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 5 Aug 2020 12:43:08 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 1FC041045;
-        Wed,  5 Aug 2020 08:37:23 -0700 (PDT)
-Received: from [192.168.1.84] (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 5DE223F7D7;
-        Wed,  5 Aug 2020 08:37:22 -0700 (PDT)
-Subject: Re: [PATCH v2 0/6] KVM: arm64: pvtime: Fixes and a new cap
-To:     Andrew Jones <drjones@redhat.com>, kvm@vger.kernel.org,
-        kvmarm@lists.cs.columbia.edu
-Cc:     maz@kernel.org, pbonzini@redhat.com
-References: <20200804170604.42662-1-drjones@redhat.com>
-From:   Steven Price <steven.price@arm.com>
-Message-ID: <c5dbe385-d0d5-94f5-5e8a-620e439e482b@arm.com>
-Date:   Wed, 5 Aug 2020 16:37:20 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        id S1728489AbgHETrm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 5 Aug 2020 15:47:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48882 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728393AbgHERAH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 5 Aug 2020 13:00:07 -0400
+Received: from mail-lj1-x241.google.com (mail-lj1-x241.google.com [IPv6:2a00:1450:4864:20::241])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5F11CC001FD9
+        for <kvm@vger.kernel.org>; Wed,  5 Aug 2020 09:07:02 -0700 (PDT)
+Received: by mail-lj1-x241.google.com with SMTP id h19so48321334ljg.13
+        for <kvm@vger.kernel.org>; Wed, 05 Aug 2020 09:07:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=n0oirlzv8CSElmbedgdT8ng988ArvzupJ4QdhwzcCys=;
+        b=uWXDItoJBXfGvimVjOTNjntF+41kfCYTISDyr+COBThDYjpOAVEug/G+WcmO1wP6vv
+         cfA+k5+cZWLcATthyjY3wR35BbRIVa3oEf6t5qUT4SWq4/PKv4YX3WeOwhd00VlZnRMP
+         42OvGPM4Z/ifYe7pW/P8iQ9gIicIw+DCZDLiaWF07Serg4P8/0b22t81jLaiZndwFCbP
+         Z/zWs68a+VMXzm7MutUA3sz3oFjmqrbBUSOJnc7XCSaJibfRx7ejh+WQoZ8hOyergMPB
+         650VdXOdBDfkH477pz7vF+PXnpDQAtjrnzM39a1TAsP0e2s2DCxNR9SCGx3p9kIbvXrY
+         i2LQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=n0oirlzv8CSElmbedgdT8ng988ArvzupJ4QdhwzcCys=;
+        b=eahUgEZL9cqq1n1hV5FdN2ubfztCVYTV/oPtRMXEiO5Fh0Jp1M71nQkoPrvk3toru9
+         GpZ77hQ3gmzOdotNtMeKPtgk3peOB4/z5muqx92/lvHSrZLgIgLiUWztYbdSNe5Vf0Vr
+         N+kdALLNEarOph1FErIpUtR7h9KVMRTnzlE8ATj5y1Fsqq0rvDMelfDSffgeucrGSHyf
+         jeEtsUIVjaEOR44ZrhvrUrRv9CtysRkQEmRZEEQYlvU9DdHdxDxYkZSZWptu4lU85gYT
+         8zoE6AZKD5n0Xp6DGlXwyx/+MpHdJfsvWg4QYECAE6HGrRBrNpmakguvIPwwsun6Ei7Z
+         ALbw==
+X-Gm-Message-State: AOAM530hlf5ZXd0aHgJnSmm8jsyuwBQ2jxfmep9mO0dlcyjuQB25sgKD
+        A0wrqt/31vbl9O4xSQvuxHD4Qq4Lu8PoHCa47rsuE8xZ
+X-Google-Smtp-Source: ABdhPJwKxwdSLKhlKkCvebZnf1/Zjm1qwgx7SQ8MsmVusUXcPygUYBXfHPW9sAZskvJJ9A86pa/GW+EO253tJSgWqWM=
+X-Received: by 2002:a2e:90e:: with SMTP id 14mr1844954ljj.293.1596643620309;
+ Wed, 05 Aug 2020 09:07:00 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200804170604.42662-1-drjones@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-GB
-Content-Transfer-Encoding: 7bit
+References: <20200722032629.3687068-1-oupton@google.com> <CAOQ_QsgeN4DCghH6ibb68C+P0ETr77s2s7Us+uxF6E6LFx62tw@mail.gmail.com>
+In-Reply-To: <CAOQ_QsgeN4DCghH6ibb68C+P0ETr77s2s7Us+uxF6E6LFx62tw@mail.gmail.com>
+From:   Oliver Upton <oupton@google.com>
+Date:   Wed, 5 Aug 2020 11:06:50 -0500
+Message-ID: <CAOQ_QshUE_OQmAuWd6SzdfXvn7Y6SVukcC1669Re0TRGCoeEgg@mail.gmail.com>
+Subject: Re: [PATCH v3 0/5] KVM_{GET,SET}_TSC_OFFSET ioctls
+To:     kvm list <kvm@vger.kernel.org>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Peter Shier <pshier@google.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Peter Hornyack <peterhornyack@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 04/08/2020 18:05, Andrew Jones wrote:
-> v2:
->    - ARM_SMCCC_HV_PV_TIME_FEATURES now also returns SMCCC_RET_NOT_SUPPORTED
->      when steal time is not supported
->    - Added READ_ONCE() for the run_delay read
->    - Reworked kvm_put/get_guest to not require type as a parameter
->    - Added some more text to the documentation for KVM_CAP_STEAL_TIME
->    - Enough changed that I didn't pick up Steven's r-b's
+On Tue, Jul 28, 2020 at 11:33 AM Oliver Upton <oupton@google.com> wrote:
+>
+> On Tue, Jul 21, 2020 at 8:26 PM Oliver Upton <oupton@google.com> wrote:
+> >
+> > To date, VMMs have typically restored the guest's TSCs by value using
+> > the KVM_SET_MSRS ioctl for each vCPU. However, restoring the TSCs by
+> > value introduces some challenges with synchronization as the TSCs
+> > continue to tick throughout the restoration process. As such, KVM has
+> > some heuristics around TSC writes to infer whether or not the guest or
+> > host is attempting to synchronize the TSCs.
+> >
+> > Instead of guessing at the intentions of a VMM, it'd be better to
+> > provide an interface that allows for explicit synchronization of the
+> > guest's TSCs. To that end, this series introduces the
+> > KVM_{GET,SET}_TSC_OFFSET ioctls, yielding control of the TSC offset to
+> > userspace.
+> >
+> > v2 => v3:
+> >  - Mark kvm_write_tsc_offset() as static (whoops)
+> >
+> > v1 => v2:
+> >  - Added clarification to the documentation of KVM_SET_TSC_OFFSET to
+> >    indicate that it can be used instead of an IA32_TSC MSR restore
+> >    through KVM_SET_MSRS
+> >  - Fixed KVM_SET_TSC_OFFSET to participate in the existing TSC
+> >    synchronization heuristics, thereby enabling the KVM masterclock when
+> >    all vCPUs are in phase.
+> >
+> > Oliver Upton (4):
+> >   kvm: x86: refactor masterclock sync heuristics out of kvm_write_tsc
+> >   kvm: vmx: check tsc offsetting with nested_cpu_has()
+> >   selftests: kvm: use a helper function for reading cpuid
+> >   selftests: kvm: introduce tsc_offset_test
+> >
+> > Peter Hornyack (1):
+> >   kvm: x86: add KVM_{GET,SET}_TSC_OFFSET ioctls
+> >
+> >  Documentation/virt/kvm/api.rst                |  31 ++
+> >  arch/x86/include/asm/kvm_host.h               |   1 +
+> >  arch/x86/kvm/vmx/vmx.c                        |   2 +-
+> >  arch/x86/kvm/x86.c                            | 147 ++++---
+> >  include/uapi/linux/kvm.h                      |   5 +
+> >  tools/testing/selftests/kvm/.gitignore        |   1 +
+> >  tools/testing/selftests/kvm/Makefile          |   1 +
+> >  .../testing/selftests/kvm/include/test_util.h |   3 +
+> >  .../selftests/kvm/include/x86_64/processor.h  |  15 +
+> >  .../selftests/kvm/include/x86_64/svm_util.h   |  10 +-
+> >  .../selftests/kvm/include/x86_64/vmx.h        |   9 +
+> >  tools/testing/selftests/kvm/lib/kvm_util.c    |   1 +
+> >  tools/testing/selftests/kvm/lib/x86_64/vmx.c  |  11 +
+> >  .../selftests/kvm/x86_64/tsc_offset_test.c    | 362 ++++++++++++++++++
+> >  14 files changed, 550 insertions(+), 49 deletions(-)
+> >  create mode 100644 tools/testing/selftests/kvm/x86_64/tsc_offset_test.c
+> >
+> > --
+> > 2.28.0.rc0.142.g3c755180ce-goog
+> >
+>
+> Ping :)
 
-Feel free to add my r-b's - the changes all look fine to me.
-
-Thanks,
-
-Steve
-
-> 
-> The first four patches in the series are fixes that come from testing
-> and reviewing pvtime code while writing the QEMU support[*]. The last
-> patch is only a convenience for userspace, and I wouldn't be heartbroken
-> if it wasn't deemed worth it. The QEMU patches are currently written
-> without the cap. However, if the cap is accepted, then I'll change the
-> QEMU code to use it.
-> 
-> Thanks,
-> drew
-> 
-> [*] https://lists.gnu.org/archive/html/qemu-devel/2020-07/msg03856.html
->      (a v2 of this series will also be posted shortly)
-> 
-> Andrew Jones (6):
->    KVM: arm64: pvtime: steal-time is only supported when configured
->    KVM: arm64: pvtime: Fix potential loss of stolen time
->    KVM: arm64: Drop type input from kvm_put_guest
->    KVM: arm64: pvtime: Fix stolen time accounting across migration
->    KVM: Documentation: Minor fixups
->    arm64/x86: KVM: Introduce steal-time cap
-> 
->   Documentation/virt/kvm/api.rst    | 22 ++++++++++++++++++----
->   arch/arm64/include/asm/kvm_host.h |  2 +-
->   arch/arm64/kvm/arm.c              |  3 +++
->   arch/arm64/kvm/pvtime.c           | 29 +++++++++++++----------------
->   arch/x86/kvm/x86.c                |  3 +++
->   include/linux/kvm_host.h          | 31 ++++++++++++++++++++++++++-----
->   include/uapi/linux/kvm.h          |  1 +
->   7 files changed, 65 insertions(+), 26 deletions(-)
-> 
-
+Ping
