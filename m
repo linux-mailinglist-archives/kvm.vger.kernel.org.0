@@ -2,40 +2,40 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4501823C8CB
-	for <lists+kvm@lfdr.de>; Wed,  5 Aug 2020 11:14:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9146623C8D0
+	for <lists+kvm@lfdr.de>; Wed,  5 Aug 2020 11:14:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728330AbgHEJMg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 5 Aug 2020 05:12:36 -0400
-Received: from smtp-fw-6002.amazon.com ([52.95.49.90]:58766 "EHLO
-        smtp-fw-6002.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728432AbgHEJLo (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 5 Aug 2020 05:11:44 -0400
+        id S1728368AbgHEJMp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 5 Aug 2020 05:12:45 -0400
+Received: from smtp-fw-33001.amazon.com ([207.171.190.10]:58766 "EHLO
+        smtp-fw-33001.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728475AbgHEJL6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 5 Aug 2020 05:11:58 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1596618703; x=1628154703;
+  t=1596618717; x=1628154717;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=ZronyD2XkhBmFSaKHRiozvNzsOcMNsD5kSWwUfxdedM=;
-  b=oX2812bXmpcI+DCG0Fg0lt+KKoRUz0fjqBF9wbTOcjVcU68j8qRqmTPy
-   1jHzz1oefSNq1zZ+Bza2JfaOv9jRJy+BDCQh4xg2i/UMN3NElJdkNiFzr
-   ODVF68Rt0D3thkekSlrwkxRqhA9ooxumkBZAFVCAUq+2zQfkbOVdKL1nM
-   s=;
-IronPort-SDR: ffVt6N+M+QD0uPBP+l77ZzIAeyauyAvGCkfHMF3d27xgizNsyNtQwqkS2Z1gJtcoUueoGpxDmO
- ANWuYFWKFIww==
+  bh=6Tv2QWTXhiZ306oHG5fSYhlp4TPezNgj4UyHmZuDnGc=;
+  b=um86f9e1EWN6j1X8o2M38FEPHhEqptSu1RV95IYDVSYZpAiEibG9Jqwd
+   B7V2DHyzOQGsce6vdxojqUN+MX1B/f6coKiJXTdbuPh1N0Ku0wkXr34KD
+   LtA1KBD8eUTuhxf4mCDajmtjwcTYOEfbREhsZhAxEnVqC9qWZEICDe/G3
+   I=;
+IronPort-SDR: Z3S+H8z8Phnyz8qrZQBb91pmKFT7YUgmnQ46r3PElbP2Z/L5ZuR0Fs0wP5YR/H+ZhYqVK7y6zW
+ 0plhc8Zg59gw==
 X-IronPort-AV: E=Sophos;i="5.75,436,1589241600"; 
-   d="scan'208";a="46143536"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-2b-4ff6265a.us-west-2.amazon.com) ([10.43.8.6])
-  by smtp-border-fw-out-6002.iad6.amazon.com with ESMTP; 05 Aug 2020 09:11:38 +0000
-Received: from EX13MTAUEA002.ant.amazon.com (pdx4-ws-svc-p6-lb7-vlan3.pdx.amazon.com [10.170.41.166])
-        by email-inbound-relay-2b-4ff6265a.us-west-2.amazon.com (Postfix) with ESMTPS id 5DD4FA1F49;
-        Wed,  5 Aug 2020 09:11:36 +0000 (UTC)
+   d="scan'208";a="64480765"
+Received: from sea32-co-svc-lb4-vlan3.sea.corp.amazon.com (HELO email-inbound-relay-2b-baacba05.us-west-2.amazon.com) ([10.47.23.38])
+  by smtp-border-fw-out-33001.sea14.amazon.com with ESMTP; 05 Aug 2020 09:11:47 +0000
+Received: from EX13MTAUEA002.ant.amazon.com (pdx4-ws-svc-p6-lb7-vlan2.pdx.amazon.com [10.170.41.162])
+        by email-inbound-relay-2b-baacba05.us-west-2.amazon.com (Postfix) with ESMTPS id 2CCFDA07BF;
+        Wed,  5 Aug 2020 09:11:46 +0000 (UTC)
 Received: from EX13D16EUB003.ant.amazon.com (10.43.166.99) by
  EX13MTAUEA002.ant.amazon.com (10.43.61.77) with Microsoft SMTP Server (TLS)
- id 15.0.1497.2; Wed, 5 Aug 2020 09:11:35 +0000
+ id 15.0.1497.2; Wed, 5 Aug 2020 09:11:45 +0000
 Received: from 38f9d34ed3b1.ant.amazon.com (10.43.160.100) by
  EX13D16EUB003.ant.amazon.com (10.43.166.99) with Microsoft SMTP Server (TLS)
- id 15.0.1497.2; Wed, 5 Aug 2020 09:11:25 +0000
+ id 15.0.1497.2; Wed, 5 Aug 2020 09:11:35 +0000
 From:   Andra Paraschiv <andraprs@amazon.com>
 To:     linux-kernel <linux-kernel@vger.kernel.org>
 CC:     Anthony Liguori <aliguori@amazon.com>,
@@ -60,9 +60,9 @@ CC:     Anthony Liguori <aliguori@amazon.com>,
         kvm <kvm@vger.kernel.org>,
         ne-devel-upstream <ne-devel-upstream@amazon.com>,
         Andra Paraschiv <andraprs@amazon.com>
-Subject: [PATCH v6 06/18] nitro_enclaves: Handle out-of-band PCI device events
-Date:   Wed, 5 Aug 2020 12:10:05 +0300
-Message-ID: <20200805091017.86203-7-andraprs@amazon.com>
+Subject: [PATCH v6 07/18] nitro_enclaves: Init misc device providing the ioctl interface
+Date:   Wed, 5 Aug 2020 12:10:06 +0300
+Message-ID: <20200805091017.86203-8-andraprs@amazon.com>
 X-Mailer: git-send-email 2.20.1 (Apple Git-117)
 In-Reply-To: <20200805091017.86203-1-andraprs@amazon.com>
 References: <20200805091017.86203-1-andraprs@amazon.com>
@@ -77,197 +77,220 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-In addition to the replies sent by the Nitro Enclaves PCI device in
-response to command requests, out-of-band enclave events can happen e.g.
-an enclave crashes. In this case, the Nitro Enclaves driver needs to be
-aware of the event and notify the corresponding user space process that
-abstracts the enclave.
+The Nitro Enclaves driver provides an ioctl interface to the user space
+for enclave lifetime management e.g. enclave creation / termination and
+setting enclave resources such as memory and CPU.
 
-Register an MSI-X interrupt vector to be used for this kind of
-out-of-band events. The interrupt notifies that the state of an enclave
-changed and the driver logic scans the state of each running enclave to
-identify for which this notification is intended.
+This ioctl interface is mapped to a Nitro Enclaves misc device.
 
-Create an workqueue to handle the out-of-band events. Notify user space
-enclave process that is using a polling mechanism on the enclave fd.
-
-Signed-off-by: Alexandru-Catalin Vasile <lexnv@amazon.com>
 Signed-off-by: Andra Paraschiv <andraprs@amazon.com>
 ---
 Changelog
 
 v5 -> v6
 
+* Remove the ioctl to query API version.
 * Update documentation to kernel-doc format.
 
 v4 -> v5
 
-* Remove sanity checks for situations that shouldn't happen, only if
-  buggy system or broken logic at all.
+* Update the size of the NE CPU pool string from 4096 to 512 chars.
 
 v3 -> v4
 
 * Use dev_err instead of custom NE log pattern.
-* Return IRQ_NONE when interrupts are not handled.
+* Remove the NE CPU pool init during kernel module loading, as the CPU
+  pool is now setup at runtime, via a sysfs file for the kernel
+  parameter.
+* Add minimum enclave memory size definition.
 
 v2 -> v3
 
+* Remove the GPL additional wording as SPDX-License-Identifier is
+  already in place.
 * Remove the WARN_ON calls.
-* Update static calls sanity checks.
+* Remove linux/bug and linux/kvm_host includes that are not needed.
 * Remove "ratelimited" from the logs that are not in the ioctl call
   paths.
+* Remove file ops that do nothing for now - open and release.
 
 v1 -> v2
 
 * Add log pattern for NE.
 * Update goto labels to match their purpose.
+* Update ne_cpu_pool data structure to include the global mutex.
+* Update NE misc device mode to 0660.
+* Check if the CPU siblings are included in the NE CPU pool, as full CPU
+  cores are given for the enclave(s).
 ---
- drivers/virt/nitro_enclaves/ne_pci_dev.c | 116 +++++++++++++++++++++++
- 1 file changed, 116 insertions(+)
+ drivers/virt/nitro_enclaves/ne_misc_dev.c | 121 ++++++++++++++++++++++
+ drivers/virt/nitro_enclaves/ne_pci_dev.c  |  11 ++
+ 2 files changed, 132 insertions(+)
+ create mode 100644 drivers/virt/nitro_enclaves/ne_misc_dev.c
 
+diff --git a/drivers/virt/nitro_enclaves/ne_misc_dev.c b/drivers/virt/nitro_enclaves/ne_misc_dev.c
+new file mode 100644
+index 000000000000..472850250220
+--- /dev/null
++++ b/drivers/virt/nitro_enclaves/ne_misc_dev.c
+@@ -0,0 +1,121 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
++ */
++
++/**
++ * DOC: Enclave lifetime management driver for Nitro Enclaves (NE).
++ * Nitro is a hypervisor that has been developed by Amazon.
++ */
++
++#include <linux/anon_inodes.h>
++#include <linux/capability.h>
++#include <linux/cpu.h>
++#include <linux/device.h>
++#include <linux/file.h>
++#include <linux/hugetlb.h>
++#include <linux/list.h>
++#include <linux/miscdevice.h>
++#include <linux/mm.h>
++#include <linux/mman.h>
++#include <linux/module.h>
++#include <linux/mutex.h>
++#include <linux/nitro_enclaves.h>
++#include <linux/pci.h>
++#include <linux/poll.h>
++#include <linux/slab.h>
++#include <linux/types.h>
++
++#include "ne_misc_dev.h"
++#include "ne_pci_dev.h"
++
++/**
++ * NE_CPUS_SIZE - Size for max 128 CPUs, for now, in a cpu-list string, comma
++ *		  separated. The NE CPU pool includes CPUs from a single NUMA
++ *		  node.
++ */
++#define NE_CPUS_SIZE		(512)
++
++/**
++ * NE_EIF_LOAD_OFFSET - The offset where to copy the Enclave Image Format (EIF)
++ *			image in enclave memory.
++ */
++#define NE_EIF_LOAD_OFFSET	(8 * 1024UL * 1024UL)
++
++/**
++ * NE_MIN_ENCLAVE_MEM_SIZE - The minimum memory size an enclave can be launched
++ *			     with.
++ */
++#define NE_MIN_ENCLAVE_MEM_SIZE	(64 * 1024UL * 1024UL)
++
++/**
++ * NE_MIN_MEM_REGION_SIZE - The minimum size of an enclave memory region.
++ */
++#define NE_MIN_MEM_REGION_SIZE	(2 * 1024UL * 1024UL)
++
++/*
++ * TODO: Update logic to create new sysfs entries instead of using
++ * a kernel parameter e.g. if multiple sysfs files needed.
++ */
++static const struct kernel_param_ops ne_cpu_pool_ops = {
++	.get	= param_get_string,
++};
++
++static char ne_cpus[NE_CPUS_SIZE];
++static struct kparam_string ne_cpus_arg = {
++	.maxlen	= sizeof(ne_cpus),
++	.string	= ne_cpus,
++};
++
++module_param_cb(ne_cpus, &ne_cpu_pool_ops, &ne_cpus_arg, 0644);
++/* https://www.kernel.org/doc/html/latest/admin-guide/kernel-parameters.html#cpu-lists */
++MODULE_PARM_DESC(ne_cpus, "<cpu-list> - CPU pool used for Nitro Enclaves");
++
++/**
++ * struct ne_cpu_pool - CPU pool used for Nitro Enclaves.
++ * @avail_cores:	Available CPU cores in the pool.
++ * @avail_cores_size:	The size of the available cores array.
++ * @mutex:		Mutex for the access to the NE CPU pool.
++ * @numa_node:		NUMA node of the CPUs in the pool.
++ */
++struct ne_cpu_pool {
++	cpumask_var_t	*avail_cores;
++	unsigned int	avail_cores_size;
++	struct mutex	mutex;
++	int		numa_node;
++};
++
++static struct ne_cpu_pool ne_cpu_pool;
++
++static const struct file_operations ne_fops = {
++	.owner		= THIS_MODULE,
++	.llseek		= noop_llseek,
++};
++
++struct miscdevice ne_misc_dev = {
++	.minor	= MISC_DYNAMIC_MINOR,
++	.name	= "nitro_enclaves",
++	.fops	= &ne_fops,
++	.mode	= 0660,
++};
++
++static int __init ne_init(void)
++{
++	mutex_init(&ne_cpu_pool.mutex);
++
++	return pci_register_driver(&ne_pci_driver);
++}
++
++static void __exit ne_exit(void)
++{
++	pci_unregister_driver(&ne_pci_driver);
++}
++
++/* TODO: Handle actions such as reboot, kexec. */
++
++module_init(ne_init);
++module_exit(ne_exit);
++
++MODULE_AUTHOR("Amazon.com, Inc. or its affiliates");
++MODULE_DESCRIPTION("Nitro Enclaves Driver");
++MODULE_LICENSE("GPL v2");
 diff --git a/drivers/virt/nitro_enclaves/ne_pci_dev.c b/drivers/virt/nitro_enclaves/ne_pci_dev.c
-index 77ccbc43bce3..a898fae066d9 100644
+index a898fae066d9..1e434bf44c9d 100644
 --- a/drivers/virt/nitro_enclaves/ne_pci_dev.c
 +++ b/drivers/virt/nitro_enclaves/ne_pci_dev.c
-@@ -214,6 +214,88 @@ static irqreturn_t ne_reply_handler(int irq, void *args)
- 	return IRQ_HANDLED;
- }
- 
-+/**
-+ * ne_event_work_handler() - Work queue handler for notifying enclaves on a
-+ *			     state change received by the event interrupt
-+ *			     handler.
-+ * @work:	Item containing the NE PCI device for which an out-of-band event
-+ *		was issued.
-+ *
-+ * An out-of-band event is being issued by the Nitro Hypervisor when at least
-+ * one enclave is changing state without client interaction.
-+ *
-+ * Context: Work queue context.
-+ */
-+static void ne_event_work_handler(struct work_struct *work)
-+{
-+	struct ne_pci_dev_cmd_reply cmd_reply = {};
-+	struct ne_enclave *ne_enclave = NULL;
-+	struct ne_pci_dev *ne_pci_dev =
-+		container_of(work, struct ne_pci_dev, notify_work);
-+	int rc = -EINVAL;
-+	struct slot_info_req slot_info_req = {};
-+
-+	mutex_lock(&ne_pci_dev->enclaves_list_mutex);
-+
-+	/*
-+	 * Iterate over all enclaves registered for the Nitro Enclaves
-+	 * PCI device and determine for which enclave(s) the out-of-band event
-+	 * is corresponding to.
-+	 */
-+	list_for_each_entry(ne_enclave, &ne_pci_dev->enclaves_list, enclave_list_entry) {
-+		mutex_lock(&ne_enclave->enclave_info_mutex);
-+
-+		/*
-+		 * Enclaves that were never started cannot receive out-of-band
-+		 * events.
-+		 */
-+		if (ne_enclave->state != NE_STATE_RUNNING)
-+			goto unlock;
-+
-+		slot_info_req.slot_uid = ne_enclave->slot_uid;
-+
-+		rc = ne_do_request(ne_enclave->pdev, SLOT_INFO, &slot_info_req,
-+				   sizeof(slot_info_req), &cmd_reply, sizeof(cmd_reply));
-+		if (rc < 0)
-+			dev_err(&ne_enclave->pdev->dev, "Error in slot info [rc=%d]\n", rc);
-+
-+		/* Notify enclave process that the enclave state changed. */
-+		if (ne_enclave->state != cmd_reply.state) {
-+			ne_enclave->state = cmd_reply.state;
-+
-+			ne_enclave->has_event = true;
-+
-+			wake_up_interruptible(&ne_enclave->eventq);
-+		}
-+
-+unlock:
-+		 mutex_unlock(&ne_enclave->enclave_info_mutex);
-+	}
-+
-+	mutex_unlock(&ne_pci_dev->enclaves_list_mutex);
-+}
-+
-+/**
-+ * ne_event_handler() - Interrupt handler for PCI device out-of-band events.
-+ *			This interrupt does not supply any data in the MMIO
-+ *			region. It notifies a change in the state of any of
-+ *			the launched enclaves.
-+ * @irq:	Received interrupt for an out-of-band event.
-+ * @args:	PCI device private data structure.
-+ *
-+ * Context: Interrupt context.
-+ * Return:
-+ * * IRQ_HANDLED on handled interrupt.
-+ */
-+static irqreturn_t ne_event_handler(int irq, void *args)
-+{
-+	struct ne_pci_dev *ne_pci_dev = (struct ne_pci_dev *)args;
-+
-+	queue_work(ne_pci_dev->event_wq, &ne_pci_dev->notify_work);
-+
-+	return IRQ_HANDLED;
-+}
-+
- /**
-  * ne_setup_msix() - Setup MSI-X vectors for the PCI device.
-  * @pdev:	PCI device to setup the MSI-X for.
-@@ -258,8 +340,36 @@ static int ne_setup_msix(struct pci_dev *pdev)
- 		goto free_irq_vectors;
+@@ -527,6 +527,13 @@ static int ne_pci_probe(struct pci_dev *pdev, const struct pci_device_id *id)
+ 		goto teardown_msix;
  	}
  
-+	ne_pci_dev->event_wq = create_singlethread_workqueue("ne_pci_dev_wq");
-+	if (!ne_pci_dev->event_wq) {
-+		rc = -ENOMEM;
-+
-+		dev_err(&pdev->dev, "Cannot get wq for dev events [rc=%d]\n", rc);
-+
-+		goto free_reply_irq_vec;
-+	}
-+
-+	INIT_WORK(&ne_pci_dev->notify_work, ne_event_work_handler);
-+
-+	/*
-+	 * This IRQ gets triggered every time any enclave's state changes. Its
-+	 * handler then scans for the changes and propagates them to the user
-+	 * space.
-+	 */
-+	rc = request_irq(pci_irq_vector(pdev, NE_VEC_EVENT), ne_event_handler,
-+			 0, "enclave_evt", ne_pci_dev);
++	rc = misc_register(&ne_misc_dev);
 +	if (rc < 0) {
-+		dev_err(&pdev->dev, "Error in request irq event [rc=%d]\n", rc);
++		dev_err(&pdev->dev, "Error in misc dev register [rc=%d]\n", rc);
 +
-+		goto destroy_wq;
++		goto disable_ne_pci_dev;
 +	}
 +
+ 	atomic_set(&ne_pci_dev->cmd_reply_avail, 0);
+ 	init_waitqueue_head(&ne_pci_dev->cmd_reply_wait_q);
+ 	INIT_LIST_HEAD(&ne_pci_dev->enclaves_list);
+@@ -536,6 +543,8 @@ static int ne_pci_probe(struct pci_dev *pdev, const struct pci_device_id *id)
+ 
  	return 0;
  
-+destroy_wq:
-+	destroy_workqueue(ne_pci_dev->event_wq);
-+free_reply_irq_vec:
-+	free_irq(pci_irq_vector(pdev, NE_VEC_REPLY), ne_pci_dev);
- free_irq_vectors:
- 	pci_free_irq_vectors(pdev);
- 
-@@ -276,6 +386,12 @@ static void ne_teardown_msix(struct pci_dev *pdev)
++disable_ne_pci_dev:
++	ne_pci_dev_disable(pdev);
+ teardown_msix:
+ 	ne_teardown_msix(pdev);
+ iounmap_pci_bar:
+@@ -561,6 +570,8 @@ static void ne_pci_remove(struct pci_dev *pdev)
  {
  	struct ne_pci_dev *ne_pci_dev = pci_get_drvdata(pdev);
  
-+	free_irq(pci_irq_vector(pdev, NE_VEC_EVENT), ne_pci_dev);
++	misc_deregister(&ne_misc_dev);
 +
-+	flush_work(&ne_pci_dev->notify_work);
-+	flush_workqueue(ne_pci_dev->event_wq);
-+	destroy_workqueue(ne_pci_dev->event_wq);
-+
- 	free_irq(pci_irq_vector(pdev, NE_VEC_REPLY), ne_pci_dev);
+ 	ne_pci_dev_disable(pdev);
  
- 	pci_free_irq_vectors(pdev);
+ 	ne_teardown_msix(pdev);
 -- 
 2.20.1 (Apple Git-117)
 
