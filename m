@@ -2,88 +2,80 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B2D2E23C704
-	for <lists+kvm@lfdr.de>; Wed,  5 Aug 2020 09:35:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A9C8F23C739
+	for <lists+kvm@lfdr.de>; Wed,  5 Aug 2020 09:54:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726915AbgHEHfl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 5 Aug 2020 03:35:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45766 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725981AbgHEHfk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 5 Aug 2020 03:35:40 -0400
-Received: from mail-ej1-x641.google.com (mail-ej1-x641.google.com [IPv6:2a00:1450:4864:20::641])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 66F35C06174A
-        for <kvm@vger.kernel.org>; Wed,  5 Aug 2020 00:35:40 -0700 (PDT)
-Received: by mail-ej1-x641.google.com with SMTP id kq25so32342367ejb.3
-        for <kvm@vger.kernel.org>; Wed, 05 Aug 2020 00:35:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=37y5rUKhu0jpnEUDKpCx4KGZtn1fERr8MCrbljhNVSU=;
-        b=plvOlgjuWtB/0cSDvYuoxcQizdObfz2j5fPDg9RRE98kRmuv75mZPzixlxKGsE/vxl
-         R1aR3BwyGM/zPCWWeYplrNK0kxJFo0Zjoy5M2TsNmYkZds5TY1rdEpd9ToTvyzAloRgD
-         w0ub1dLH54ce/lqia6c4ko/0wiLd/fRqE8FE1oTSGuDycj3YGShwnwBEDv+f/ki+/sSY
-         WbUBnJ5mtb0IBXbwlEOFkwfcLGQkEFLOy68e959DFGjZ9XJ/naiiMUHB9E5d4BPundMQ
-         8PQGJUA8kTKB5UEAo2+frvjLL7kDnA4AaK665ShZpV8jwJ2VAx/prIv6sRBfe9++2J5g
-         nJ5Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=37y5rUKhu0jpnEUDKpCx4KGZtn1fERr8MCrbljhNVSU=;
-        b=BIaxjHKLMz+yP7S8ljOqEap8omOIUEdNwQPJ1urfsQnzB0iGrT1FhZN0zPZSkJz5b7
-         9RU3gPaiXgQZbl9llzsn5s6q1Od7VsqpAe004C+F1OsSy+AuL+NRCd0x9xWHvJQPfZL+
-         e+9vgIrjTtFj8itDF58mKhX6f880n5Te/hLosNodzO00egzY1WNdAhafN60s06gsWddR
-         UyTgC8GgbOIL6ssUiXoJPQ1+PmiQf6vZac3FV62q4YH6VPdo5+LR8uwXFBIfpxH3epzU
-         2ean3P1ShA+ihBHO5r+l0DSN/5/zWGgoFR4FP9DTbxDbq6os46JgHeRImHMf8sUp+KN3
-         Uteg==
-X-Gm-Message-State: AOAM533TUAkxYFkP5jYP2rk4O+T2m1kaOndR281k+/aLZDBeM5hotSRw
-        +RkAn6FylvC8laO0RYSQofo3VOjpItu85uRUo2snQA==
-X-Google-Smtp-Source: ABdhPJyNHRykW4G8roUg1AB6bhuXOJiMYm2C6e4ns2nnzfWDIJZJCTkz/+HcdjZGQoyhsexRUHSgSRAb9OWCKDfmrQw=
-X-Received: by 2002:a17:906:aed4:: with SMTP id me20mr1992074ejb.141.1596612938875;
- Wed, 05 Aug 2020 00:35:38 -0700 (PDT)
+        id S1727976AbgHEHxe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 5 Aug 2020 03:53:34 -0400
+Received: from srw1.wq.cz ([80.92.240.241]:51764 "EHLO srw1.wq.cz"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725868AbgHEHxe (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 5 Aug 2020 03:53:34 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=wq.cz;
+        s=default; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
+        Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+        Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+        :Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+        List-Post:List-Owner:List-Archive;
+        bh=70BAV1/GDN5+Jzd7DjxRMQB7uEmFb47ibqtU8zEuk+M=; b=rH12b35c15in9IxZMnZtvQ4DAk
+        8wVWJUjZz9gWT4yI6lRAK3w7o2svtPpOAviIl6xUvup+b+rD9yU77N46t6w/UKwDrlxHkIqLG1J/W
+        wdEZxaPsNV6XgJj3yVNBFDWET9tszJ3FUCTRapIO+BSI1w+9FCDtTwGpiI3I51fHDQyk=;
+Received: from fw.wq.cz ([185.71.40.210] helo=msc.wq.cz)
+        by srw1.wq.cz with esmtpsa (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+        (Exim 4.92)
+        (envelope-from <milon@wq.cz>)
+        id 1k3EEp-00039o-MI; Wed, 05 Aug 2020 09:53:27 +0200
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=wq.cz;
+        s=ntm; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:Subject:
+        Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+        Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+        :Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+        List-Post:List-Owner:List-Archive;
+        bh=70BAV1/GDN5+Jzd7DjxRMQB7uEmFb47ibqtU8zEuk+M=; b=ZXp1EDhBeohuRFcipXzQG604Xn
+        isD3GiWgNcwFrcR1dDLJreUvPmkpmVfbpOT/hrNWqbkHVAfXx5sdy6BIJdt0lEmoRn2C5lsFrRLpx
+        GhV1A+Gamu5vblo1ZEjL98T0J4KMGO3MRrxmbQV2MB//R1yOJ6159wfO973w8ElU1PW8=;
+Received: from milon by msc.wq.cz with local (Exim 4.92)
+        (envelope-from <milon@wq.cz>)
+        id 1k3EEp-0007Vt-DX; Wed, 05 Aug 2020 09:53:27 +0200
+Date:   Wed, 5 Aug 2020 09:53:27 +0200
+From:   Milan Kocian <milon@wq.cz>
+To:     Alexandru Elisei <alexandru.elisei@arm.com>
+Cc:     kvm@vger.kernel.org, julien.thierry.kdev@gmail.com,
+        will@kernel.org, jean-philippe@linaro.org, andre.przywara@arm.com,
+        Anvay Virkar <anvay.virkar@arm.com>
+Subject: Re: [PATCH v2 kvmtool] virtio: Fix ordering of
+ virtio_queue__should_signal()
+Message-ID: <20200805075327.GJ7810@msc.wq.cz>
+References: <20200804145317.51633-1-alexandru.elisei@arm.com>
 MIME-Version: 1.0
-References: <20200717125238.1103096-1-arilou@gmail.com>
-In-Reply-To: <20200717125238.1103096-1-arilou@gmail.com>
-From:   Jon Doron <arilou@gmail.com>
-Date:   Wed, 5 Aug 2020 10:35:27 +0300
-Message-ID: <CAP7QCoju_-pgUJZAoHoFgrSb_H8LeBQNxzrf66iNxoxGGv7grA@mail.gmail.com>
-Subject: Re: [PATCH v1 0/1] Synic default SCONTROL MSR needs to be enabled
-To:     kvm@vger.kernel.org
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Roman Kagan <rvkagan@yandex-team.ru>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200804145317.51633-1-alexandru.elisei@arm.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Ping, can this patch please be queued to 5.9?
+Hello,
 
-Thanks,
--- Jon.
+> I *think* this also fixes the VM hang reported in [2], where several
+> processes in the guest were stuck in uninterruptible sleep. I am not
+> familiar with the block layer, but my theory is that the threads were stuck
+> in wait_for_completion_io(), from blk_execute_rq() executing a flush
+> request. Milan has agreed to give this patch a spin [3], but that might
+> take a while because the bug is not easily reproducible. I believe the
+> patch can be merged on its own.
+> 
+> [1] http://diy.inria.fr/www/index.html?record=aarch64&cat=aarch64-v04&litmus=SB%2Bdmb.sys&cfg=new-web
+> [2] https://www.spinics.net/lists/kvm/msg204543.html
+> [3] https://www.spinics.net/lists/kvm/msg222201.html
+> 
 
-On Fri, Jul 17, 2020 at 3:52 PM Jon Doron <arilou@gmail.com> wrote:
->
-> Based on an analysis of the HyperV firmwares (Gen1 and Gen2) it seems
-> like the SCONTROL is not being set to the ENABLED state as like we have
-> thought.
->
-> Also from a test done by Vitaly Kuznetsov, running a nested HyperV it
-> was concluded that the first access to the SCONTROL MSR with a read
-> resulted with the value of 0x1, aka HV_SYNIC_CONTROL_ENABLE.
->
-> It's important to note that this diverges from the value states in the
-> HyperV TLFS of 0.
->
-> Jon Doron (1):
->   x86/kvm/hyper-v: Synic default SCONTROL MSR needs to be enabled
->
->  arch/x86/kvm/hyperv.c | 1 +
->  1 file changed, 1 insertion(+)
->
-> --
-> 2.24.1
->
+Unfortunately it didn't help. I can see the problem again now.
+
+Thanks.
+
+Best regards.
+
+-- 
+Milan Kocian
