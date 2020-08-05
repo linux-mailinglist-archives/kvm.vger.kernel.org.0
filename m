@@ -2,32 +2,32 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 35CF923CDF0
-	for <lists+kvm@lfdr.de>; Wed,  5 Aug 2020 19:59:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8B48223CDF1
+	for <lists+kvm@lfdr.de>; Wed,  5 Aug 2020 19:59:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729021AbgHER7t (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 5 Aug 2020 13:59:49 -0400
-Received: from mail.kernel.org ([198.145.29.99]:46426 "EHLO mail.kernel.org"
+        id S1729129AbgHER7u (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 5 Aug 2020 13:59:50 -0400
+Received: from mail.kernel.org ([198.145.29.99]:46494 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729056AbgHER6W (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 5 Aug 2020 13:58:22 -0400
+        id S1728935AbgHER63 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 5 Aug 2020 13:58:29 -0400
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 57C9A22D02;
-        Wed,  5 Aug 2020 17:57:19 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 4851022D05;
+        Wed,  5 Aug 2020 17:57:21 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1596650239;
-        bh=3Tfkvqoo8GFPZXEgY5NJ8zdwN9kP0ftFGO3mLvEnD1E=;
+        s=default; t=1596650241;
+        bh=vdT2zEXntyWq9LjC/EBegpSbUib6Cx9T2XnUgvEDcGs=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=nLgBjoP4hI7Bg1AKLcAd0tELZnTTuzYpHe0aqkyEg3E+supjbL5ueXv7gdoBpajeP
-         MyCDmGjbD4OGxJRYZvFJwSHTj9joBNnUyo7pYRt8iwgJf4Nb8kW0FJSaZvBd/OzqR9
-         DONem/7ea0Ys7hS+X5XswKwOv/z4s7z1lnoLtKfM=
+        b=2aclcxQunFMLh6x4Kml2GdHrbx+xTMSvoVl6jFZvPn/Ckqe7xsmSFYaAwDWrPTQy5
+         eHLfKqTo1OZBSCvdeqRPfGv9HKJXjYM+2mdvVprWPbnOCzsTmmEeS8UD2E2pz6yryR
+         QuSZc2s2q8CRIB5bFgABE33Edyo8ja7g+m34An1E=
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=why.lan)
         by disco-boy.misterjones.org with esmtpsa (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
         (Exim 4.92)
         (envelope-from <maz@kernel.org>)
-        id 1k3NfB-0004w9-R4; Wed, 05 Aug 2020 18:57:17 +0100
+        id 1k3NfD-0004w9-Go; Wed, 05 Aug 2020 18:57:19 +0100
 From:   Marc Zyngier <maz@kernel.org>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Alexander Graf <graf@amazon.com>,
@@ -47,9 +47,9 @@ Cc:     Alexander Graf <graf@amazon.com>,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
         linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
         kvm@vger.kernel.org, kernel-team@android.com
-Subject: [PATCH 07/56] arm64: kvm: Remove kern_hyp_va from get_vcpu_ptr
-Date:   Wed,  5 Aug 2020 18:56:11 +0100
-Message-Id: <20200805175700.62775-8-maz@kernel.org>
+Subject: [PATCH 09/56] KVM: arm64: Tolerate an empty target_table list
+Date:   Wed,  5 Aug 2020 18:56:13 +0100
+Message-Id: <20200805175700.62775-10-maz@kernel.org>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20200805175700.62775-1-maz@kernel.org>
 References: <20200805175700.62775-1-maz@kernel.org>
@@ -64,37 +64,37 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Andrew Scull <ascull@google.com>
+From: James Morse <james.morse@arm.com>
 
-get_vcpu_ptr is an assembly accessor for the percpu value
-kvm_host_data->host_ctxt.__hyp_running_vcpu. kern_hyp_va only applies to
-nVHE however __hyp_running_vcpu is always assigned a pointer that has
-already had kern_hyp_va applied in __kvm_vcpu_run_nvhe.
+Before emptying the target_table lists, and then removing their
+infrastructure, add some tolerance to an empty list.
 
-kern_hyp_va is currently idempotent as it just masks and inserts the
-tag, but this could change in future and the second application is
-unnecessary.
+Instead of bugging-out on an empty list, pretend we already
+reached the end in the two-list-walk.
 
-Signed-off-by: Andrew Scull <ascull@google.com>
+Signed-off-by: James Morse <james.morse@arm.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
-Reviewed-by: James Morse <james.morse@arm.com>
-Link: https://lore.kernel.org/r/20200618093616.164413-1-ascull@google.com
+Link: https://lore.kernel.org/r/20200622113317.20477-3-james.morse@arm.com
 ---
- arch/arm64/include/asm/kvm_asm.h | 1 -
- 1 file changed, 1 deletion(-)
+ arch/arm64/kvm/sys_regs.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
-index 352aaebf4198..ac71d0939f2e 100644
---- a/arch/arm64/include/asm/kvm_asm.h
-+++ b/arch/arm64/include/asm/kvm_asm.h
-@@ -143,7 +143,6 @@ extern char __smccc_workaround_1_smc[__SMCCC_WORKAROUND_1_SMC_SZ];
- .macro get_vcpu_ptr vcpu, ctxt
- 	get_host_ctxt \ctxt, \vcpu
- 	ldr	\vcpu, [\ctxt, #HOST_CONTEXT_VCPU]
--	kern_hyp_va	\vcpu
- .endm
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index 6333a7cd92d3..fb448bfc83ec 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -2809,7 +2809,10 @@ static int walk_sys_regs(struct kvm_vcpu *vcpu, u64 __user *uind)
+ 	i2 = sys_reg_descs;
+ 	end2 = sys_reg_descs + ARRAY_SIZE(sys_reg_descs);
  
- #endif
+-	BUG_ON(i1 == end1 || i2 == end2);
++	if (i1 == end1)
++		i1 = NULL;
++
++	BUG_ON(i2 == end2);
+ 
+ 	/* Walk carefully, as both tables may refer to the same register. */
+ 	while (i1 || i2) {
 -- 
 2.27.0
 
