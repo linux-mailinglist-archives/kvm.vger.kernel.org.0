@@ -2,93 +2,156 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BE65423D380
-	for <lists+kvm@lfdr.de>; Wed,  5 Aug 2020 23:16:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9FA0423D381
+	for <lists+kvm@lfdr.de>; Wed,  5 Aug 2020 23:16:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726399AbgHEVQT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 5 Aug 2020 17:16:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60624 "EHLO
+        id S1726547AbgHEVQV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 5 Aug 2020 17:16:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60626 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725920AbgHEVQQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 5 Aug 2020 17:16:16 -0400
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6687EC061575
-        for <kvm@vger.kernel.org>; Wed,  5 Aug 2020 14:16:16 -0700 (PDT)
-Received: by mail-yb1-xb49.google.com with SMTP id u206so20906080ybb.8
-        for <kvm@vger.kernel.org>; Wed, 05 Aug 2020 14:16:16 -0700 (PDT)
+        with ESMTP id S1726217AbgHEVQR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 5 Aug 2020 17:16:17 -0400
+Received: from mail-pj1-x1049.google.com (mail-pj1-x1049.google.com [IPv6:2607:f8b0:4864:20::1049])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1F5D0C06174A
+        for <kvm@vger.kernel.org>; Wed,  5 Aug 2020 14:16:17 -0700 (PDT)
+Received: by mail-pj1-x1049.google.com with SMTP id hi12so5491721pjb.6
+        for <kvm@vger.kernel.org>; Wed, 05 Aug 2020 14:16:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
-        h=date:message-id:mime-version:subject:from:to:cc;
-        bh=6YME6h3frh55VOhFAbXLI9InvDtCOC1i09SrGpWX2Gg=;
-        b=Rl6YpFib0Dg8qz/g/d0nLv+Iu6+R6IdjY8jIpYyJEjWQRS79tXRrsqjjr1K7SVNDab
-         5INS0mkjWMq9FJ+2rsX+bunqP5fFQhX+8bpgitkmtVuxhzDWy70iOouaW9O84OkjUFv6
-         tF8PhFvxvP74FPoXqtMLNpgpQlXipV0m7XumoX9sC68JI4vTaLQY1JnVF2mxsVtoT1Xg
-         sQABl8u4cy4r58Y2+hcQxCnQNtrMf0K1dFXET9uVikRp2CMruUZ9MEVP0KvY0979LED5
-         GdlYb58GWCxTFVjoI5EAxFXd4K2TS6Bm1gsCFPkDRFVAYyKFuDy5DsBFNPcLt6/I8gWu
-         SXsw==
+        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
+         :cc;
+        bh=la1fBNohyp9Rq0q7N/prOaEAn3Pa3Ne3Ld2u4313kWw=;
+        b=bXpi2JLztAZeYO0FKrcoi/neZ2SaOju3+iUfx3+Z4jiX7mN4K6Sq7bqKw4jreYFbyJ
+         GrHQszRjcrAL6sEDiyRoBr28+wvCWUMTQNYtnMJDRc/txE2wdF3WWaOwOl2k5E/fjkGi
+         TLFmiwLiKWFV8In+Delusu8dHNPPmkThIn++0gAHKzco93VyIagcaeOD3YW4/IdxiAV3
+         T6PBS/BgmhjUcAq3JNEdXGpMzuFTAkff7p377MvNxbnLrYqbfIb3eTRJ8s54ptjYt5qm
+         aXCnJBvX0IHcRHNXAk8Jbzf+5VA44ftqstXlpiSGKVjoUzRLolqWufbwzng7huCW/6Ul
+         ZDqw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
-        bh=6YME6h3frh55VOhFAbXLI9InvDtCOC1i09SrGpWX2Gg=;
-        b=nuNzqcCpLh8QsFKvtLYtlHIZqgyqabQvJAmLjPN99pKWHyfvj0UUkRZk+S6Y3vlQjX
-         YFARfXrwdQ6X0iAr1+rj6r7kd0I0nb5ioDl7wCrxKDN5OPjP3Z33FwTadcm5dISZ15mu
-         uvZpA+NlaxWkk7YSqE+pHezN7MGl9nVCUtTxjGiK5iDhjaDerPkaQhtqeb/euBh6wk2n
-         5+9LWgcBeWYEDt+0PbT1Kv6EUT1gMQc9jt306VcTEKm31UK1Mvc8hhK6ieZpcSQNDrub
-         s4K0AL5NzSStuJymCLqgTWWQlkqW4UPeniygsRfYp8d2dDx3y7bECE0d4zZaTZiiojVS
-         xeOQ==
-X-Gm-Message-State: AOAM5317Y3aABv1sAV13r6lqzi5qwNPJmfJVUg7kxKZwo8EezWn3Gf8O
-        Si7Nwzge69xXLLwD51duxWWyGLfCn17n3DAvcLuFrgfnM75i6FH0CTeMYItwAsl9OsGFFuI1h9j
-        eWK4iwySax3LSSA8WsJSoxkpO5V/696Qgu9u/AKe3Pyw9C6kwuTn4NCUKww==
-X-Google-Smtp-Source: ABdhPJx1uczf46tedRc6MnjromBY3Kc2pRLCXPNzk6KKP/R0AddR72fEYUfkebpsd2HCOcZ22BHUAHDf2R4=
-X-Received: by 2002:a25:a0c6:: with SMTP id i6mr7683961ybm.58.1596662174395;
- Wed, 05 Aug 2020 14:16:14 -0700 (PDT)
-Date:   Wed,  5 Aug 2020 21:16:03 +0000
-Message-Id: <20200805211607.2048862-1-oupton@google.com>
+        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
+         :references:subject:from:to:cc;
+        bh=la1fBNohyp9Rq0q7N/prOaEAn3Pa3Ne3Ld2u4313kWw=;
+        b=AEnsMbdTIwUjbPTwk+dYb25HC1ztCSvcJ1Jhg9Fk9Epeo0fJeCBgaf/p+pCtzmPdxH
+         bIOJxdEMyivtUcTDoP3OUjMr6laFjQljhjZ4BI1tP5/bNENSeb+4IMYP0rU61rEdPvlN
+         hWzOrm1oLRdcZngjk1KqyZ3R6zp4Gc8O2QBWMTD/VChQ5PdkKz/NhrvDtmJ4aKJjoTfv
+         suqCRfZAgKsTILqbLRun8WW5JcrxwfQ0Nnn6WYM1GKnLuAQRzmLdZ+vLWe7I+qeOu50O
+         Bu7CHMR2WIvGx35Fh69KhPu0oaveoTjitx2NnNwnZkLqGvQw6HVdKI1h17w/pbE9BCbz
+         7gQA==
+X-Gm-Message-State: AOAM530k6ZprHKfjvrcfEj8NPgISVsV9tLXD2jiBbwOMzlCOyfjs0Gz2
+        PKXrJf1/5x0ZP+LuekThzolWlT33MuN/g4fAnFEjUAp4Q2LnQ0hkuXwIQuf7KYuLiygmchSvgpe
+        TGIewRBJY16cFpJRRNTZf7SoMKS2VvlAPGzylN2vz5dGYNz6Bn37I6trr4g==
+X-Google-Smtp-Source: ABdhPJxm0hDF3GRIJjqfboYKhyLEgT0INlvVWxOxioqjRDAr3Dfw1NulJLURWwjZZVzBfWpTTN+xs8E6aMw=
+X-Received: by 2002:a17:902:8e86:: with SMTP id bg6mr5029643plb.57.1596662176080;
+ Wed, 05 Aug 2020 14:16:16 -0700 (PDT)
+Date:   Wed,  5 Aug 2020 21:16:04 +0000
+In-Reply-To: <20200805211607.2048862-1-oupton@google.com>
+Message-Id: <20200805211607.2048862-2-oupton@google.com>
 Mime-Version: 1.0
+References: <20200805211607.2048862-1-oupton@google.com>
 X-Mailer: git-send-email 2.28.0.236.gb10cc79966-goog
-Subject: [PATCH 0/4] Restrict PV features to only enabled guests
+Subject: [PATCH 1/4] kvm: x86: encapsulate wrmsr(MSR_KVM_SYSTEM_TIME)
+ emulation in helper fn
 From:   Oliver Upton <oupton@google.com>
 To:     kvm@vger.kernel.org
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Sean Christopherson <sean.j.christopherson@intel.com>,
-        Oliver Upton <oupton@google.com>
+        Oliver Upton <oupton@google.com>,
+        Jim Mattson <jmattson@google.com>,
+        Peter Shier <pshier@google.com>
 Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-To date, KVM has allowed guests to use paravirtual interfaces regardless
-of the configured CPUID. While almost any guest will consult the
-KVM_CPUID_FEATURES leaf _before_ using PV features, it is still
-undesirable to have such interfaces silently present.
+No functional change intended.
 
-This series aims to address the issue by adding explicit checks against
-the guest's CPUID when servicing any paravirtual feature. Since this
-effectively changes the guest/hypervisor ABI, a KVM_CAP is warranted to
-guard the new behavior.
+Reviewed-by: Jim Mattson <jmattson@google.com>
+Reviewed-by: Peter Shier <pshier@google.com>
+Signed-off-by: Oliver Upton <oupton@google.com>
+Change-Id: I7cbe71069db98d1ded612fd2ef088b70e7618426
+---
+ arch/x86/kvm/x86.c | 58 +++++++++++++++++++++++++---------------------
+ 1 file changed, 32 insertions(+), 26 deletions(-)
 
-Patches 1-2 refactor some of the PV code in anticipation of the change.
-Patch 3 introduces the checks + KVM_CAP. Finally, patch 4 fixes some doc
-typos that were noticed when working on this series.
-
-Parent commit: f3633c268354 ("Merge tag 'kvm-s390-next-5.9-1' of git://git.kernel.org/pub/scm/linux/kernel/git/kvms390/linux into kvm-next-5.6")
-
-Oliver Upton (4):
-  kvm: x86: encapsulate wrmsr(MSR_KVM_SYSTEM_TIME) emulation in helper
-    fn
-  kvm: x86: set wall_clock in kvm_write_wall_clock()
-  kvm: x86: only provide PV features if enabled in guest's CPUID
-  Documentation: kvm: fix some typos in cpuid.rst
-
- Documentation/virt/kvm/api.rst   |  11 +++
- Documentation/virt/kvm/cpuid.rst |  88 +++++++++++-----------
- arch/x86/include/asm/kvm_host.h  |   6 ++
- arch/x86/kvm/cpuid.h             |  16 ++++
- arch/x86/kvm/x86.c               | 122 +++++++++++++++++++++++--------
- include/uapi/linux/kvm.h         |   1 +
- 6 files changed, 171 insertions(+), 73 deletions(-)
-
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index dc4370394ab8..d18582aefa9f 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -1822,6 +1822,34 @@ static void kvm_write_wall_clock(struct kvm *kvm, gpa_t wall_clock)
+ 	kvm_write_guest(kvm, wall_clock, &version, sizeof(version));
+ }
+ 
++void kvm_write_system_time(struct kvm_vcpu *vcpu, gpa_t system_time,
++			   bool old_msr, bool host_initiated)
++{
++	struct kvm_arch *ka = &vcpu->kvm->arch;
++
++	if (vcpu->vcpu_id == 0 && !host_initiated) {
++		if (ka->boot_vcpu_runs_old_kvmclock && old_msr)
++			kvm_make_request(KVM_REQ_MASTERCLOCK_UPDATE, vcpu);
++
++		ka->boot_vcpu_runs_old_kvmclock = old_msr;
++	}
++
++	vcpu->arch.time = system_time;
++	kvm_make_request(KVM_REQ_GLOBAL_CLOCK_UPDATE, vcpu);
++
++	/* we verify if the enable bit is set... */
++	vcpu->arch.pv_time_enabled = false;
++	if (!(system_time & 1))
++		return;
++
++	if (!kvm_gfn_to_hva_cache_init(vcpu->kvm,
++				       &vcpu->arch.pv_time, system_time & ~1ULL,
++				       sizeof(struct pvclock_vcpu_time_info)))
++		vcpu->arch.pv_time_enabled = true;
++
++	return;
++}
++
+ static uint32_t div_frac(uint32_t dividend, uint32_t divisor)
+ {
+ 	do_shl32_div32(dividend, divisor);
+@@ -2973,33 +3001,11 @@ int kvm_set_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+ 		kvm_write_wall_clock(vcpu->kvm, data);
+ 		break;
+ 	case MSR_KVM_SYSTEM_TIME_NEW:
+-	case MSR_KVM_SYSTEM_TIME: {
+-		struct kvm_arch *ka = &vcpu->kvm->arch;
+-
+-		if (vcpu->vcpu_id == 0 && !msr_info->host_initiated) {
+-			bool tmp = (msr == MSR_KVM_SYSTEM_TIME);
+-
+-			if (ka->boot_vcpu_runs_old_kvmclock != tmp)
+-				kvm_make_request(KVM_REQ_MASTERCLOCK_UPDATE, vcpu);
+-
+-			ka->boot_vcpu_runs_old_kvmclock = tmp;
+-		}
+-
+-		vcpu->arch.time = data;
+-		kvm_make_request(KVM_REQ_GLOBAL_CLOCK_UPDATE, vcpu);
+-
+-		/* we verify if the enable bit is set... */
+-		vcpu->arch.pv_time_enabled = false;
+-		if (!(data & 1))
+-			break;
+-
+-		if (!kvm_gfn_to_hva_cache_init(vcpu->kvm,
+-		     &vcpu->arch.pv_time, data & ~1ULL,
+-		     sizeof(struct pvclock_vcpu_time_info)))
+-			vcpu->arch.pv_time_enabled = true;
+-
++		kvm_write_system_time(vcpu, data, false, msr_info->host_initiated);
++		break;
++	case MSR_KVM_SYSTEM_TIME:
++		kvm_write_system_time(vcpu, data, true, msr_info->host_initiated);
+ 		break;
+-	}
+ 	case MSR_KVM_ASYNC_PF_EN:
+ 		if (kvm_pv_enable_async_pf(vcpu, data))
+ 			return 1;
 -- 
 2.28.0.236.gb10cc79966-goog
 
