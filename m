@@ -2,160 +2,123 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 787ED23C215
-	for <lists+kvm@lfdr.de>; Wed,  5 Aug 2020 01:13:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 81CFE23C270
+	for <lists+kvm@lfdr.de>; Wed,  5 Aug 2020 02:02:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727782AbgHDXNi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 4 Aug 2020 19:13:38 -0400
-Received: from userp2130.oracle.com ([156.151.31.86]:60656 "EHLO
-        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727045AbgHDXNi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 4 Aug 2020 19:13:38 -0400
-Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
-        by userp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 074NDXje191497;
-        Tue, 4 Aug 2020 23:13:33 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=corp-2020-01-29;
- bh=y53NKxn8aOrH3bHEOTlBOYnFp+EJNoJg67+P0D74cvQ=;
- b=AwUeYYLVuUruoH7R6PkIgp2sPOj6E4D6KXJD2g5Bz5mAMEvQxZOMSYdipAzbcpSYyXUx
- R154nsTxqR84BAu0EjCxNMxL4nIMQW/TdPx+Fkg77ZnWIJx0bsWUoFFyz6MsHbn/fdDm
- PZoBYJervR4devppViTjMjgcZzxV3FvmlojKzYI8VHM0cbhlyjtIKrSeIUSrRhX8Z0Lp
- ahI06xlEhAhiWHX7/V/xD6c02y6EO1OekHGyOu7XDFlmLI6nrEDJx0Pn/7hR2aT+uiQC
- IXHXSFKZESDdUBOA41ZyGiXzKlu/lwxdCzrMu9FoFdAWP1OqxtkHVdKEdWcesj5lL727 Pw== 
-Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
-        by userp2130.oracle.com with ESMTP id 32pdnqactp-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
-        Tue, 04 Aug 2020 23:13:33 +0000
-Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
-        by aserp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 074NCqQU176708;
-        Tue, 4 Aug 2020 23:13:32 GMT
-Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
-        by aserp3020.oracle.com with ESMTP id 32pdnrjq22-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 04 Aug 2020 23:13:32 +0000
-Received: from abhmp0001.oracle.com (abhmp0001.oracle.com [141.146.116.7])
-        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 074NDVYR000904;
-        Tue, 4 Aug 2020 23:13:32 GMT
-Received: from localhost.localdomain (/10.159.250.31)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Tue, 04 Aug 2020 16:13:31 -0700
-Subject: Re: [kvm-unit-tests PATCH] x86: svm: low CR3 bits are not MBZ
-To:     Jim Mattson <jmattson@google.com>
-Cc:     Nadav Amit <namit@vmware.com>, Paolo Bonzini <pbonzini@redhat.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-References: <20200713043908.39605-1-namit@vmware.com>
- <ce87fd51-8e27-e5ff-3a90-06cddbf47636@oracle.com>
- <CCEF21D4-57C3-4843-9443-BE46501FFE8C@vmware.com>
- <abe9138a-6c61-22e1-f0a6-fcd5d06ef3f1@oracle.com>
- <6CD095D7-EF7F-49C2-98EF-F72D019817B2@vmware.com>
- <fe76d847-5106-bc09-e4cf-498fb51e5255@oracle.com>
- <9DC37B0B-597A-4B31-8397-B6E4764EEA37@vmware.com>
- <ab9f1669-a295-1022-a62a-8b64c90f6dcb@oracle.com>
- <CALMp9eSoRSKBvNwjm5fpPG2XDJnnC1b-tm68P-K_Jnyab4aPMg@mail.gmail.com>
-From:   Krish Sadhukhan <krish.sadhukhan@oracle.com>
-Message-ID: <4bb7c975-70dd-0247-3824-973229f3337b@oracle.com>
-Date:   Tue, 4 Aug 2020 16:13:30 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+        id S1726925AbgHEACb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 4 Aug 2020 20:02:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60802 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726011AbgHEAC3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 4 Aug 2020 20:02:29 -0400
+Received: from ozlabs.org (ozlabs.org [IPv6:2401:3900:2:1::2])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 80171C06174A;
+        Tue,  4 Aug 2020 17:02:29 -0700 (PDT)
+Received: by ozlabs.org (Postfix, from userid 1003)
+        id 4BLsJ066Zlz9sRK; Wed,  5 Aug 2020 10:02:24 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ozlabs.org; s=201707;
+        t=1596585744; bh=p6C4gVm2bMX/RrVwQNkcZB018a5/2rrG6y0y7oxc4q8=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=TIdAbZMifYTpH0uuTATHNmC/fukDz0v2BsYrXjcj/FSoDA8AE0dvOKbKVx0aIF24h
+         VQsQMQsUIzcuSCvwS2YesLoNkYdLL8Bt63o71KaeEblgYFxu5ILL0sRcHH+H42+mCf
+         lk8jCSQqYCwWaZPm98LaUGpeh9u6a3710B4JX5w9OrOmkSjTr4mBFXtnSYOcVx90IH
+         2ubIby20SiK9DpfAmAsjbAuWxw/+GI1MhDIK4Q4t2huV/pu3pQXA3WRgNVe1Aid8Vu
+         BQO0BvV+SpPvXfgC1zmn9uCfzO/kCy9OAZGGVOyv5WkG3YBA0CeSLNQBx/mtYLcIA1
+         kH7sZEi2dnYPQ==
+Date:   Wed, 5 Aug 2020 10:02:21 +1000
+From:   Paul Mackerras <paulus@ozlabs.org>
+To:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
+Cc:     kvm-ppc@vger.kernel.org
+Subject: Re: [GIT PULL] Please pull my kvm-ppc-next-5.9-1 tag
+Message-ID: <20200805000221.GA808843@thinks.paulus.ozlabs.org>
+References: <20200728055100.GA2460422@thinks.paulus.ozlabs.org>
 MIME-Version: 1.0
-In-Reply-To: <CALMp9eSoRSKBvNwjm5fpPG2XDJnnC1b-tm68P-K_Jnyab4aPMg@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9703 signatures=668679
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 spamscore=0 mlxscore=0
- bulkscore=0 adultscore=0 phishscore=0 malwarescore=0 mlxlogscore=999
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
- definitions=main-2008040159
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9703 signatures=668679
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 impostorscore=0 mlxscore=0
- suspectscore=0 clxscore=1015 priorityscore=1501 bulkscore=0 adultscore=0
- malwarescore=0 phishscore=0 mlxlogscore=999 spamscore=0 lowpriorityscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
- definitions=main-2008040159
+In-Reply-To: <20200728055100.GA2460422@thinks.paulus.ozlabs.org>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Tue, Jul 28, 2020 at 03:51:00PM +1000, Paul Mackerras wrote:
+> Paolo,
+> 
+> Please do a pull from my kvm-ppc-next-5.9-1 tag to get a PPC KVM
+> update for 5.9.  It's another relatively small update this time, the
+> main thing being a series to improve the startup time for secure VMs
+> and make memory hotplug work in secure VMs.
 
-On 7/15/20 4:12 PM, Jim Mattson wrote:
-> On Wed, Jul 15, 2020 at 3:40 PM Krish Sadhukhan
-> <krish.sadhukhan@oracle.com> wrote:
->>
->> On 7/15/20 3:27 PM, Nadav Amit wrote:
->>>> On Jul 15, 2020, at 3:21 PM, Krish Sadhukhan <krish.sadhukhan@oracle.com> wrote:
->>>>
->>>>
->>>> On 7/13/20 4:30 PM, Nadav Amit wrote:
->>>>>> On Jul 13, 2020, at 4:17 PM, Krish Sadhukhan <krish.sadhukhan@oracle.com> wrote:
->>>>>>
->>>>>>
->>> [snip]
->>>
->>>>>> I am just saying that the APM language "should be cleared to 0" is misleading if the processor doesn't enforce it.
->>>>> Just to ensure I am clear - I am not blaming you in any way. I also found
->>>>> the phrasing confusing.
->>>>>
->>>>> Having said that, if you (or anyone else) reintroduces “positive” tests, in
->>>>> which the VM CR3 is modified to ensure VM-entry succeeds when the reserved
->>>>> non-MBZ bits are set, please ensure the tests fails gracefully. The
->>>>> non-long-mode CR3 tests crashed since the VM page-tables were incompatible
->>>>> with the paging mode.
->>>>>
->>>>> In other words, instead of setting a VMMCALL instruction in the VM to trap
->>>>> immediately after entry, consider clearing the present-bits in the high
->>>>> levels of the NPT; or injecting some exception that would trigger exit
->>>>> during vectoring or something like that.
->>>>>
->>>>> P.S.: If it wasn’t clear, I am not going to fix KVM itself for some obvious
->>>>> reasons.
->>>> I think since the APM is not clear, re-adding any test that tests those bits, is like adding a test with "undefined behavior" to me.
->>>>
->>>>
->>>> Paolo, Should I send a KVM patch to remove checks for those non-MBZ reserved bits ?
->>> Which non-MBZ reserved bits (other than those that I addressed) do you refer
->>> to?
->>>
->> I am referring to,
->>
->>       "[PATCH 2/3 v4] KVM: nSVM: Check that MBZ bits in CR3 and CR4 are
->> not set on vmrun of nested guests"
->>
->> in which I added the following:
->>
->>
->> +#define MSR_CR3_LEGACY_RESERVED_MASK        0xfe7U
->> +#define MSR_CR3_LEGACY_PAE_RESERVED_MASK    0x7U
->> +#define MSR_CR3_LONG_RESERVED_MASK        0xfff0000000000fe7U
-> In my experience, the APM generally distinguishes between "reserved"
-> and "reserved, MBZ." The low bits you have indicated for CR3 are
-> marked only as "reserved" in Figures 3-4, 3-5, and 3-6 of the APM,
-> volume 2. Only bits 63:52 are marked as "reserved, MBZ." (In fact,
-> Figure 3-6 of the May 2020 version of the APM, revision 3.35, also
-> calls out bits 11:0 as the PCID when CR4.PCIDE is set.)
->
-> Of course, you could always test the behavior. :-)
+Hi Paolo,
 
-I did some experiments on the processor behavior on an Epyc 2 system via 
-KVM:
+Did this get missed?
 
-    1. MBZ bits:  VMRUN passes even if these bits are set to 1 and guest 
-is exiting with exit code of            SVM_EXIT_VMMCALL. According to 
-the APM, this settting should constitute an invalid guest state and 
-hence I should get and exit code of SVM_EXIT_ERR. There's no KVM check 
-in place for these CR3 bits, so the check is all done in hardware.
+Thanks,
+Paul.
 
-    2. non-MBZ reserved bits:  Based on Nadav Amit's suggestion, I set 
-the 'not present' bit in an upper level NPT in order to trigger an NPF 
-and I did get an exit code of SVM_EXIT_NPF when I set any of these bits. 
-I am hoping that the processor has done the consistency check before it 
-tripped on NPF and not the other way around, so that our test is useful :
-
-     In PAE-legacy and non-PAE-legacy modes, the guest doesn't exit with 
-SVM_EXIT_VMMCALL when these bits are set to 0. I am not sure if I am 
-missing any special setting for the PAE-legacy and non-PAE-legacy modes. 
-In long-mode, however, the processor seems to behave as per APM, i.e., 
-guest exits with SVM_EXIT_VMMCALL when these bits are set to 0.
-
+> Thanks,
+> Paul.
+> 
+> The following changes since commit b3a9e3b9622ae10064826dccb4f7a52bd88c7407:
+> 
+>   Linux 5.8-rc1 (2020-06-14 12:45:04 -0700)
+> 
+> are available in the git repository at:
+> 
+>   git://git.kernel.org/pub/scm/linux/kernel/git/paulus/powerpc tags/kvm-ppc-next-5.9-1
+> 
+> for you to fetch changes up to 81ab595ddd3c3036806b460526e1fbc5b271ff33:
+> 
+>   KVM: PPC: Book3S HV: Rework secure mem slot dropping (2020-07-28 12:34:52 +1000)
+> 
+> ----------------------------------------------------------------
+> PPC KVM update for 5.9
+> 
+> - Improvements and bug-fixes for secure VM support, giving reduced startup
+>   time and memory hotplug support.
+> - Locking fixes in nested KVM code
+> - Increase number of guests supported by HV KVM to 4094
+> - Preliminary POWER10 support
+> 
+> ----------------------------------------------------------------
+> Alexey Kardashevskiy (1):
+>       KVM: PPC: Protect kvm_vcpu_read_guest with srcu locks
+> 
+> Alistair Popple (1):
+>       KVM: PPC: Book3SHV: Enable support for ISA v3.1 guests
+> 
+> C�dric Le Goater (1):
+>       KVM: PPC: Book3S HV: Increase KVMPPC_NR_LPIDS on POWER8 and POWER9
+> 
+> Laurent Dufour (3):
+>       KVM: PPC: Book3S HV: Migrate hot plugged memory
+>       KVM: PPC: Book3S HV: Move kvmppc_svm_page_out up
+>       KVM: PPC: Book3S HV: Rework secure mem slot dropping
+> 
+> Ram Pai (4):
+>       KVM: PPC: Book3S HV: Fix function definition in book3s_hv_uvmem.c
+>       KVM: PPC: Book3S HV: Disable page merging in H_SVM_INIT_START
+>       KVM: PPC: Book3S HV: Track the state GFNs associated with secure VMs
+>       KVM: PPC: Book3S HV: In H_SVM_INIT_DONE, migrate remaining normal-GFNs to secure-GFNs
+> 
+> Tianjia Zhang (1):
+>       KVM: PPC: Clean up redundant kvm_run parameters in assembly
+> 
+>  Documentation/powerpc/ultravisor.rst        |   3 +
+>  arch/powerpc/include/asm/kvm_book3s_uvmem.h |  14 +
+>  arch/powerpc/include/asm/kvm_ppc.h          |   2 +-
+>  arch/powerpc/include/asm/reg.h              |   4 +-
+>  arch/powerpc/kvm/book3s_64_mmu_hv.c         |   8 +-
+>  arch/powerpc/kvm/book3s_64_mmu_radix.c      |   4 +
+>  arch/powerpc/kvm/book3s_hv.c                |  26 +-
+>  arch/powerpc/kvm/book3s_hv_nested.c         |  30 +-
+>  arch/powerpc/kvm/book3s_hv_uvmem.c          | 698 +++++++++++++++++++++-------
+>  arch/powerpc/kvm/book3s_interrupts.S        |  56 ++-
+>  arch/powerpc/kvm/book3s_pr.c                |   9 +-
+>  arch/powerpc/kvm/book3s_rtas.c              |   2 +
+>  arch/powerpc/kvm/booke.c                    |   9 +-
+>  arch/powerpc/kvm/booke_interrupts.S         |   9 +-
+>  arch/powerpc/kvm/bookehv_interrupts.S       |  10 +-
+>  arch/powerpc/kvm/powerpc.c                  |   5 +-
+>  16 files changed, 646 insertions(+), 243 deletions(-)
