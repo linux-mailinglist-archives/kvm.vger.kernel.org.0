@@ -2,110 +2,112 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 77B6023CCB8
-	for <lists+kvm@lfdr.de>; Wed,  5 Aug 2020 18:59:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1771923CC91
+	for <lists+kvm@lfdr.de>; Wed,  5 Aug 2020 18:52:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728378AbgHEQ72 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 5 Aug 2020 12:59:28 -0400
-Received: from mga05.intel.com ([192.55.52.43]:36356 "EHLO mga05.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728197AbgHEQ6G (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 5 Aug 2020 12:58:06 -0400
-IronPort-SDR: r0cb1ZQZX6dLlWw2Ga5M2var144iy1E0LleoBlrYPIUvzCXQFT+Gsv6AA51+p2vjBHeYyJBeEh
- ZhtlEorFyx/A==
-X-IronPort-AV: E=McAfee;i="6000,8403,9703"; a="237376266"
-X-IronPort-AV: E=Sophos;i="5.75,436,1589266800"; 
-   d="scan'208";a="237376266"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Aug 2020 04:42:21 -0700
-IronPort-SDR: vNbn1vEX5/bKMuCyBYWNsn2Dbcj1dnl8nyAIPRWOxH/odcQoy7qUJGnkOeSSB0b3GEimUs6M4N
- QU5DANQ0Ryzg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.75,436,1589266800"; 
-   d="scan'208";a="437142946"
-Received: from unknown (HELO localhost.localdomain.bj.intel.com) ([10.240.192.131])
-  by orsmga004.jf.intel.com with ESMTP; 05 Aug 2020 04:42:18 -0700
-From:   Zhu Lingshan <lingshan.zhu@intel.com>
-To:     jasowang@redhat.com, mst@redhat.com
-Cc:     virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        kvm@vger.kernel.org, eli@mellanox.com, shahafs@mellanox.com,
-        parav@mellanox.com, Zhu Lingshan <lingshan.zhu@intel.com>
-Subject: [PATCH 2/2] vhost_vdpa: unified set_vq_irq() and update_vq_irq()
-Date:   Wed,  5 Aug 2020 19:38:32 +0800
-Message-Id: <20200805113832.3755-1-lingshan.zhu@intel.com>
-X-Mailer: git-send-email 2.18.4
+        id S1728225AbgHEQwb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 5 Aug 2020 12:52:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46396 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728139AbgHEQtq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 5 Aug 2020 12:49:46 -0400
+Received: from mail-pg1-x544.google.com (mail-pg1-x544.google.com [IPv6:2607:f8b0:4864:20::544])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 76992C0A8938;
+        Wed,  5 Aug 2020 07:11:20 -0700 (PDT)
+Received: by mail-pg1-x544.google.com with SMTP id t6so24510493pgq.1;
+        Wed, 05 Aug 2020 07:11:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id;
+        bh=gnq2bYcLCYbS7fB6hPJYIGySV/efaN7joodM7bHp3HM=;
+        b=mGGnDTpNY8ZF+dLJA+3RJn/hk+73NVX1GPiWuFeKj+prG1T5Q8RHEnAe34YY7ukHRh
+         C9nNFsKDK339IwgGBO4ithBKkz6AQSgtkyiJzTUXPPI+SF9/zjSlJ3GmJQbHhepK72cs
+         i0nwwk1P6k9gGvDitoQ5lD+4hQDzmYv49X2pGW/d3uNqLhLzH0wO4oPzqwI1Fs1Vpi01
+         OWCldIcCxihrBnDzIWcJaNL9kjCR6ErUPUQ6nDigCLnEbr0ObGtSWZ76VyZxhFTo4Obl
+         vqQr+3waWg9fZ/qrUl/4lfkLv1DAwOJAZCzyMehir3PlK6cc9umER0w/WUJNmlSUS9qZ
+         7CYg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=gnq2bYcLCYbS7fB6hPJYIGySV/efaN7joodM7bHp3HM=;
+        b=ll40ktqYFkDll/eFP8oNlInzcdHl8eaC5GWXDhOk97yeEinYji2P7l33r3BiDv7kWG
+         9lIDsDXcJGPgTpNd+C2rm6cXgQrSSG5mou+c2dR8ckFzS8CvZxgasiapIA8fspNJMo7/
+         b/pMHlvLJCND0FHsJvaeb3MIj+pWZphqZWSFTnOhPgjX6FqWXh5oF2odcA+Hgotur6w1
+         HbyZMHTTQ92CQwSSApG+yfVMK0ZRYWuscLeqfX7FzpqIwH0Y29Ri7fiRi+7/23F8LvTA
+         kHAKg2mzrB3rBNveqNBkt/ItRFHlbYNGzcS88Uf1tjw1yzhaGOcYlQ3gPrWVcXbXLD/6
+         2icA==
+X-Gm-Message-State: AOAM531cJHyPvxK3dL2+Oidd+9anwJeLPQJTOKwWBE2h0sg/NzQXMKyF
+        7eNdYiGwbL5qwQJ1u6OVP0s=
+X-Google-Smtp-Source: ABdhPJy77TbI6/Hga9l/DBSuyThrNPQZmn3Gth7qz6s8qSxdXr8BWBae5Rt5ikEaEgOlo8d1yiB2zg==
+X-Received: by 2002:a63:4c22:: with SMTP id z34mr3191367pga.370.1596636680035;
+        Wed, 05 Aug 2020 07:11:20 -0700 (PDT)
+Received: from localhost.localdomain ([203.205.141.56])
+        by smtp.gmail.com with ESMTPSA id z29sm3898453pfj.182.2020.08.05.07.11.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 05 Aug 2020 07:11:19 -0700 (PDT)
+From:   Yulei Zhang <yulei.kernel@gmail.com>
+To:     pbonzini@redhat.com
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        sean.j.christopherson@intel.com, jmattson@google.com,
+        vkuznets@redhat.com, xiaoguangrong.eric@gmail.com,
+        kernellwp@gmail.com, lihaiwei.kernel@gmail.com,
+        Yulei Zhang <yuleixzhang@tencent.com>
+Subject: [RFC 0/9] KVM:x86/mmu:Introduce parallel memory virtualization to boost performance
+Date:   Wed,  5 Aug 2020 22:12:02 +0800
+Message-Id: <20200805141202.8641-1-yulei.kernel@gmail.com>
+X-Mailer: git-send-email 2.17.1
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This commit merge vhost_vdpa_update_vq_irq() logics into
-vhost_vdpa_setup_vq_irq(), so that code are unified.
+From: Yulei Zhang <yuleixzhang@tencent.com>
 
-In vhost_vdpa_setup_vq_irq(), added checks for the existence
-for get_vq_irq().
+Currently in KVM memory virtulization we relay on mmu_lock to synchronize
+the memory mapping update, which make vCPUs work in serialize mode and
+slow down the execution, especially after migration to do substantial
+memory mapping setup, and performance get worse if increase vCPU numbers
+and guest memories.
+  
+The idea we present in this patch set is to mitigate the issue with
+pre-constructed memory mapping table. We will fast pin the guest memory
+to build up a global memory mapping table according to the guest memslots
+changes and apply it to cr3, so that after guest starts up all the vCPUs
+would be able to update the memory concurrently, thus the performance 
+improvement is expected.
 
-Signed-off-by: Zhu Lingshan <lingshan.zhu@intel.com>
----
- drivers/vhost/vdpa.c | 28 ++++++----------------------
- 1 file changed, 6 insertions(+), 22 deletions(-)
+And after test the initial patch with memory dirty pattern workload, we
+have seen positive results even with huge page enabled. For example,
+guest with 32 vCPUs and 64G memories, in 2M/1G huge page mode we would get
+more than 50% improvement. 
 
-diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
-index 26f166a8192e..044e1f54582a 100644
---- a/drivers/vhost/vdpa.c
-+++ b/drivers/vhost/vdpa.c
-@@ -122,8 +122,12 @@ static void vhost_vdpa_setup_vq_irq(struct vhost_vdpa *v, u16 qid)
- 	struct vdpa_device *vdpa = v->vdpa;
- 	int ret, irq;
- 
--	spin_lock(&vq->call_ctx.ctx_lock);
-+	if (!ops->get_vq_irq)
-+		return;
-+
- 	irq = ops->get_vq_irq(vdpa, qid);
-+	spin_lock(&vq->call_ctx.ctx_lock);
-+	irq_bypass_unregister_producer(&vq->call_ctx.producer);
- 	if (!vq->call_ctx.ctx || irq < 0) {
- 		spin_unlock(&vq->call_ctx.ctx_lock);
- 		return;
-@@ -144,26 +148,6 @@ static void vhost_vdpa_unsetup_vq_irq(struct vhost_vdpa *v, u16 qid)
- 	spin_unlock(&vq->call_ctx.ctx_lock);
- }
- 
--static void vhost_vdpa_update_vq_irq(struct vhost_virtqueue *vq)
--{
--	spin_lock(&vq->call_ctx.ctx_lock);
--	/*
--	 * if it has a non-zero irq, means there is a
--	 * previsouly registered irq_bypass_producer,
--	 * we should update it when ctx (its token)
--	 * changes.
--	 */
--	if (!vq->call_ctx.producer.irq) {
--		spin_unlock(&vq->call_ctx.ctx_lock);
--		return;
--	}
--
--	irq_bypass_unregister_producer(&vq->call_ctx.producer);
--	vq->call_ctx.producer.token = vq->call_ctx.ctx;
--	irq_bypass_register_producer(&vq->call_ctx.producer);
--	spin_unlock(&vq->call_ctx.ctx_lock);
--}
--
- static void vhost_vdpa_reset(struct vhost_vdpa *v)
- {
- 	struct vdpa_device *vdpa = v->vdpa;
-@@ -452,7 +436,7 @@ static long vhost_vdpa_vring_ioctl(struct vhost_vdpa *v, unsigned int cmd,
- 			cb.private = NULL;
- 		}
- 		ops->set_vq_cb(vdpa, idx, &cb);
--		vhost_vdpa_update_vq_irq(vq);
-+		vhost_vdpa_setup_vq_irq(v, idx);
- 		break;
- 
- 	case VHOST_SET_VRING_NUM:
+
+Yulei Zhang (9):
+  Introduce new fields in kvm_arch/vcpu_arch struct for direct build EPT
+    support
+  Introduce page table population function for direct build EPT feature
+  Introduce page table remove function for direct build EPT feature
+  Add release function for direct build ept when guest VM exit
+  Modify the page fault path to meet the direct build EPT requirement
+  Apply the direct build EPT according to the memory slots change
+  Add migration support when using direct build EPT
+  Introduce kvm module parameter global_tdp to turn on the direct build
+    EPT mode
+  Handle certain mmu exposed functions properly while turn on direct
+    build EPT mode
+
+ arch/mips/kvm/mips.c            |  13 +
+ arch/powerpc/kvm/powerpc.c      |  13 +
+ arch/s390/kvm/kvm-s390.c        |  13 +
+ arch/x86/include/asm/kvm_host.h |  13 +-
+ arch/x86/kvm/mmu/mmu.c          | 537 ++++++++++++++++++++++++++++++--
+ arch/x86/kvm/svm/svm.c          |   2 +-
+ arch/x86/kvm/vmx/vmx.c          |  17 +-
+ arch/x86/kvm/x86.c              |  55 ++--
+ include/linux/kvm_host.h        |   7 +-
+ virt/kvm/kvm_main.c             |  43 ++-
+ 10 files changed, 648 insertions(+), 65 deletions(-)
+
 -- 
-2.18.4
+2.17.1
 
