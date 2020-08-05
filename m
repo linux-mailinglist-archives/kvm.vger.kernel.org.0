@@ -2,32 +2,32 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4502A23CEC3
-	for <lists+kvm@lfdr.de>; Wed,  5 Aug 2020 21:04:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E549E23CF08
+	for <lists+kvm@lfdr.de>; Wed,  5 Aug 2020 21:12:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728461AbgHETBz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 5 Aug 2020 15:01:55 -0400
-Received: from mail.kernel.org ([198.145.29.99]:42260 "EHLO mail.kernel.org"
+        id S1729042AbgHETMV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 5 Aug 2020 15:12:21 -0400
+Received: from mail.kernel.org ([198.145.29.99]:34514 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728458AbgHES7q (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 5 Aug 2020 14:59:46 -0400
+        id S1728918AbgHES1V (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 5 Aug 2020 14:27:21 -0400
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 817F022D72;
-        Wed,  5 Aug 2020 18:26:40 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 3D72F22D04;
+        Wed,  5 Aug 2020 18:26:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1596652000;
-        bh=+lXuXUltgmbMBkuNMBXJyjHQYx65EDyG+jJEa8PtrFg=;
+        s=default; t=1596651967;
+        bh=B/jPCLQ/xBA20yQ0kQHCyvDom/Z2WtI15fihJ9w0l20=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=Ho/msCv7hsQWPHCk/tEGgMWwf6p34EAg0ihVI5UlmgNzM/PZKVmqpVoZmuC2LYKnm
-         kxB6s3jEhlVzwXMcEb9B6bMwDvjRfWqbTGFuu1d2E/L7yYePxTgXnpal09CqA1UqYI
-         h74lLWBCletydJfTY9HitoOWBMyV2S7hiRSVYqbY=
+        b=nS9sEKoycrPqJyLTvjfjAHO2VpVE03KGBalunyjpUIG1BMGYwNIOMb/SbOoN1iSn6
+         jn7tEE52oQWe6shKPN9lsTd7O1NQsPFARYBBDKcnAM0vV8bwa8MSv32gRYtuK8VHPo
+         j0vpTWm8yTCG9Np5oVUVjrOtqs2LCEXMeIfn6xu0=
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=why.lan)
         by disco-boy.misterjones.org with esmtpsa (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
         (Exim 4.92)
         (envelope-from <maz@kernel.org>)
-        id 1k3Nfx-0004w9-H6; Wed, 05 Aug 2020 18:58:05 +0100
+        id 1k3Nfz-0004w9-Ay; Wed, 05 Aug 2020 18:58:07 +0100
 From:   Marc Zyngier <maz@kernel.org>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Alexander Graf <graf@amazon.com>,
@@ -47,9 +47,9 @@ Cc:     Alexander Graf <graf@amazon.com>,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
         linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
         kvm@vger.kernel.org, kernel-team@android.com
-Subject: [PATCH 48/56] KVM: arm64: Don't use has_vhe() for CHOOSE_HYP_SYM()
-Date:   Wed,  5 Aug 2020 18:56:52 +0100
-Message-Id: <20200805175700.62775-49-maz@kernel.org>
+Subject: [PATCH 50/56] KVM: arm64: Substitute RANDOMIZE_BASE for HARDEN_EL2_VECTORS
+Date:   Wed,  5 Aug 2020 18:56:54 +0100
+Message-Id: <20200805175700.62775-51-maz@kernel.org>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20200805175700.62775-1-maz@kernel.org>
 References: <20200805175700.62775-1-maz@kernel.org>
@@ -64,98 +64,107 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The recently introduced CHOOSE_HYP_SYM() macro picks one symbol
-or another, depending on whether the kernel run as a VHE
-hypervisor or not. For that, it uses the has_vhe() helper, which
-is itself implemented as a final capability.
+From: David Brazdil <dbrazdil@google.com>
 
-Unfortunately, __copy_hyp_vect_bpi now indirectly uses CHOOSE_HYP_SYM
-to get the __bp_harden_hyp_vecs symbol, using has_vhe() in the process.
-At this stage, the capability isn't final and things explode:
+The HARDEN_EL2_VECTORS config maps vectors at a fixed location on cores which
+are susceptible to Spector variant 3a (A57, A72) to prevent defeating hyp
+layout randomization by leaking the value of VBAR_EL2.
 
-[    0.000000] ACPI: SRAT not present
-[    0.000000] percpu: Embedded 34 pages/cpu s101264 r8192 d29808 u139264
-[    0.000000] Detected PIPT I-cache on CPU0
-[    0.000000] ------------[ cut here ]------------
-[    0.000000] kernel BUG at arch/arm64/include/asm/cpufeature.h:459!
-[    0.000000] Internal error: Oops - BUG: 0 [#1] PREEMPT SMP
-[    0.000000] Modules linked in:
-[    0.000000] CPU: 0 PID: 0 Comm: swapper Not tainted 5.8.0-rc4-00080-gd630681366e5 #1388
-[    0.000000] pstate: 80000085 (Nzcv daIf -PAN -UAO BTYPE=--)
-[    0.000000] pc : check_branch_predictor+0x3a4/0x408
-[    0.000000] lr : check_branch_predictor+0x2a4/0x408
-[    0.000000] sp : ffff800011693e90
-[    0.000000] x29: ffff800011693e90 x28: ffff8000116a1530
-[    0.000000] x27: ffff8000112c1008 x26: ffff800010ca6ff8
-[    0.000000] x25: ffff8000112c1000 x24: ffff8000116a1320
-[    0.000000] x23: 0000000000000000 x22: ffff8000112c1000
-[    0.000000] x21: ffff800010177120 x20: ffff8000116ae108
-[    0.000000] x19: 0000000000000000 x18: ffff800011965c90
-[    0.000000] x17: 0000000000022000 x16: 0000000000000003
-[    0.000000] x15: 00000000ffffffff x14: ffff8000118c3a38
-[    0.000000] x13: 0000000000000021 x12: 0000000000000022
-[    0.000000] x11: d37a6f4de9bd37a7 x10: 000000000000001d
-[    0.000000] x9 : 0000000000000000 x8 : ffff800011f8dad8
-[    0.000000] x7 : ffff800011965ad0 x6 : 0000000000000003
-[    0.000000] x5 : 0000000000000000 x4 : 0000000000000000
-[    0.000000] x3 : 0000000000000100 x2 : 0000000000000004
-[    0.000000] x1 : ffff8000116ae148 x0 : 0000000000000000
-[    0.000000] Call trace:
-[    0.000000]  check_branch_predictor+0x3a4/0x408
-[    0.000000]  update_cpu_capabilities+0x84/0x138
-[    0.000000]  init_cpu_features+0x2c0/0x2d8
-[    0.000000]  cpuinfo_store_boot_cpu+0x54/0x64
-[    0.000000]  smp_prepare_boot_cpu+0x2c/0x60
-[    0.000000]  start_kernel+0x16c/0x574
-[    0.000000] Code: 17ffffc7 91010281 14000198 17ffffca (d4210000)
+Since this feature is only applicable when EL2 layout randomization is enabled,
+unify both behind the same RANDOMIZE_BASE Kconfig. Majority of code remains
+conditional on a capability selected for the affected cores.
 
-This is addressed using a two-fold process:
-- Replace has_vhe() with is_kernel_in_hyp_mode(), which tests
-  whether we are running at EL2.
-- Make CHOOSE_HYP_SYM() return an *undefined* symbol when
-  compiled in the nVHE hypervisor, as we really should never
-  use this helper in the nVHE-specific code.
-
-With this in place, we're back to a bootable kernel again.
-
-Fixes: b877e9849d41 ("KVM: arm64: Build hyp-entry.S separately for VHE/nVHE")
+Signed-off-by: David Brazdil <dbrazdil@google.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
+Link: https://lore.kernel.org/r/20200721094445.82184-3-dbrazdil@google.com
 ---
- arch/arm64/include/asm/kvm_asm.h | 20 +++++++++++++++++++-
- 1 file changed, 19 insertions(+), 1 deletion(-)
+ arch/arm64/Kconfig             | 16 ----------------
+ arch/arm64/include/asm/mmu.h   |  6 ++----
+ arch/arm64/kernel/cpu_errata.c |  4 ++--
+ arch/arm64/kvm/Kconfig         |  2 +-
+ 4 files changed, 5 insertions(+), 23 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
-index 5a91aaae78d2..1a66815ea01b 100644
---- a/arch/arm64/include/asm/kvm_asm.h
-+++ b/arch/arm64/include/asm/kvm_asm.h
-@@ -62,8 +62,26 @@
+diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
+index 31380da53689..152deef3277e 100644
+--- a/arch/arm64/Kconfig
++++ b/arch/arm64/Kconfig
+@@ -1182,22 +1182,6 @@ config HARDEN_BRANCH_PREDICTOR
  
- #define CHOOSE_VHE_SYM(sym)	sym
- #define CHOOSE_NVHE_SYM(sym)	kvm_nvhe_sym(sym)
--#define CHOOSE_HYP_SYM(sym)	(has_vhe() ? CHOOSE_VHE_SYM(sym) \
-+
-+#ifndef __KVM_NVHE_HYPERVISOR__
-+/*
-+ * BIG FAT WARNINGS:
-+ *
-+ * - Don't be tempted to change the following is_kernel_in_hyp_mode()
-+ *   to has_vhe(). has_vhe() is implemented as a *final* capability,
-+ *   while this is used early at boot time, when the capabilities are
-+ *   not final yet....
-+ *
-+ * - Don't let the nVHE hypervisor have access to this, as it will
-+ *   pick the *wrong* symbol (yes, it runs at EL2...).
-+ */
-+#define CHOOSE_HYP_SYM(sym)	(is_kernel_in_hyp_mode() ? CHOOSE_VHE_SYM(sym) \
- 					   : CHOOSE_NVHE_SYM(sym))
-+#else
-+/* The nVHE hypervisor shouldn't even try to access anything */
-+extern void *__nvhe_undefined_symbol;
-+#define CHOOSE_HYP_SYM(sym)	__nvhe_undefined_symbol
+ 	  If unsure, say Y.
+ 
+-config HARDEN_EL2_VECTORS
+-	bool "Harden EL2 vector mapping against system register leak" if EXPERT
+-	default y
+-	help
+-	  Speculation attacks against some high-performance processors can
+-	  be used to leak privileged information such as the vector base
+-	  register, resulting in a potential defeat of the EL2 layout
+-	  randomization.
+-
+-	  This config option will map the vectors to a fixed location,
+-	  independent of the EL2 code mapping, so that revealing VBAR_EL2
+-	  to an attacker does not give away any extra information. This
+-	  only gets enabled on affected CPUs.
+-
+-	  If unsure, say Y.
+-
+ config ARM64_SSBD
+ 	bool "Speculative Store Bypass Disable" if EXPERT
+ 	default y
+diff --git a/arch/arm64/include/asm/mmu.h b/arch/arm64/include/asm/mmu.h
+index 68140fdd89d6..bd12011eb560 100644
+--- a/arch/arm64/include/asm/mmu.h
++++ b/arch/arm64/include/asm/mmu.h
+@@ -42,12 +42,10 @@ struct bp_hardening_data {
+ 	bp_hardening_cb_t	fn;
+ };
+ 
+-#if (defined(CONFIG_HARDEN_BRANCH_PREDICTOR) ||	\
+-     defined(CONFIG_HARDEN_EL2_VECTORS))
+-
++#ifdef CONFIG_KVM_INDIRECT_VECTORS
+ extern char __bp_harden_hyp_vecs[];
+ extern atomic_t arm64_el2_vector_last_slot;
+-#endif  /* CONFIG_HARDEN_BRANCH_PREDICTOR || CONFIG_HARDEN_EL2_VECTORS */
 +#endif
  
- /* Translate a kernel address @ptr into its equivalent linear mapping */
- #define kvm_ksym_ref(ptr)						\
+ #ifdef CONFIG_HARDEN_BRANCH_PREDICTOR
+ DECLARE_PER_CPU_READ_MOSTLY(struct bp_hardening_data, bp_hardening_data);
+diff --git a/arch/arm64/kernel/cpu_errata.c b/arch/arm64/kernel/cpu_errata.c
+index ad06d6802d2e..a524142e55d0 100644
+--- a/arch/arm64/kernel/cpu_errata.c
++++ b/arch/arm64/kernel/cpu_errata.c
+@@ -635,7 +635,7 @@ has_neoverse_n1_erratum_1542419(const struct arm64_cpu_capabilities *entry,
+ 	return is_midr_in_range(midr, &range) && has_dic;
+ }
+ 
+-#if defined(CONFIG_HARDEN_EL2_VECTORS)
++#ifdef CONFIG_RANDOMIZE_BASE
+ 
+ static const struct midr_range ca57_a72[] = {
+ 	MIDR_ALL_VERSIONS(MIDR_CORTEX_A57),
+@@ -880,7 +880,7 @@ const struct arm64_cpu_capabilities arm64_errata[] = {
+ 		.type = ARM64_CPUCAP_LOCAL_CPU_ERRATUM,
+ 		.matches = check_branch_predictor,
+ 	},
+-#ifdef CONFIG_HARDEN_EL2_VECTORS
++#ifdef CONFIG_RANDOMIZE_BASE
+ 	{
+ 		.desc = "EL2 vector hardening",
+ 		.capability = ARM64_HARDEN_EL2_VECTORS,
+diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
+index 13489aff4440..318c8f2df245 100644
+--- a/arch/arm64/kvm/Kconfig
++++ b/arch/arm64/kvm/Kconfig
+@@ -58,7 +58,7 @@ config KVM_ARM_PMU
+ 	  virtual machines.
+ 
+ config KVM_INDIRECT_VECTORS
+-	def_bool HARDEN_BRANCH_PREDICTOR || HARDEN_EL2_VECTORS
++	def_bool HARDEN_BRANCH_PREDICTOR || RANDOMIZE_BASE
+ 
+ endif # KVM
+ 
 -- 
 2.27.0
 
