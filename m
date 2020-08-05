@@ -2,70 +2,51 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0F58823D219
-	for <lists+kvm@lfdr.de>; Wed,  5 Aug 2020 22:09:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 619C123D1A7
+	for <lists+kvm@lfdr.de>; Wed,  5 Aug 2020 22:05:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729681AbgHEUJD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 5 Aug 2020 16:09:03 -0400
-Received: from mga06.intel.com ([134.134.136.31]:6730 "EHLO mga06.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726392AbgHEQce (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 5 Aug 2020 12:32:34 -0400
-IronPort-SDR: jUYgZT5wOinZiVWNnUH5zLCtcgkqC9zo5HWVa7TwAX9VjTeHOmCpgPxv5oE4ZiN6EnMPqTtoTB
- l5+hiYhLViSg==
-X-IronPort-AV: E=McAfee;i="6000,8403,9703"; a="214047223"
-X-IronPort-AV: E=Sophos;i="5.75,436,1589266800"; 
-   d="scan'208";a="214047223"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Aug 2020 04:41:48 -0700
-IronPort-SDR: voInwl4vfbYWzZUXFHCdXSR5TLohsgoXijCOnbprW6erlSv+R5na1gMwKuobZESQFIQPx/W9hx
- 4A4Yz0c4RE9w==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.75,436,1589266800"; 
-   d="scan'208";a="467437398"
-Received: from unknown (HELO localhost.localdomain.bj.intel.com) ([10.240.192.131])
-  by orsmga005.jf.intel.com with ESMTP; 05 Aug 2020 04:41:45 -0700
-From:   Zhu Lingshan <lingshan.zhu@intel.com>
-To:     jasowang@redhat.com, mst@redhat.com
-Cc:     virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        kvm@vger.kernel.org, eli@mellanox.com, shahafs@mellanox.com,
-        parav@mellanox.com, Zhu Lingshan <lingshan.zhu@intel.com>
-Subject: [PATCH 1/2] vDPA: get_vq_irq() should be optional
-Date:   Wed,  5 Aug 2020 19:37:59 +0800
-Message-Id: <20200805113759.3591-1-lingshan.zhu@intel.com>
-X-Mailer: git-send-email 2.18.4
+        id S1726948AbgHEUEv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 5 Aug 2020 16:04:51 -0400
+Received: from szxga05-in.huawei.com ([45.249.212.191]:8769 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1728337AbgHEUEq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 5 Aug 2020 16:04:46 -0400
+Received: from DGGEMS406-HUB.china.huawei.com (unknown [172.30.72.59])
+        by Forcepoint Email with ESMTP id 42C43697C4BC60F81D39;
+        Wed,  5 Aug 2020 19:55:01 +0800 (CST)
+Received: from [127.0.0.1] (10.174.187.42) by DGGEMS406-HUB.china.huawei.com
+ (10.3.19.206) with Microsoft SMTP Server id 14.3.487.0; Wed, 5 Aug 2020
+ 19:54:52 +0800
+Subject: Re: [kvm-unit-tests PATCH v3 00/10] arm/arm64: Add IPI/LPI/vtimer
+ latency test
+To:     <drjones@redhat.com>, <kvm@vger.kernel.org>,
+        <kvmarm@lists.cs.columbia.edu>, <maz@kernel.org>,
+        <eric.auger@redhat.com>
+CC:     <wanghaibin.wang@huawei.com>, <yuzenghui@huawei.com>
+References: <20200731074244.20432-1-wangjingyi11@huawei.com>
+From:   Jingyi Wang <wangjingyi11@huawei.com>
+Message-ID: <957a4657-7e17-b173-ea4d-10c29ab9e3cd@huawei.com>
+Date:   Wed, 5 Aug 2020 19:54:51 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <20200731074244.20432-1-wangjingyi11@huawei.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.174.187.42]
+X-CFilter-Loop: Reflected
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-get_vq_irq() should be optional, it's required when
-we need to setup irq offloading, otherwise it‘s OK to be NULL.
+Hi all,
 
-Signed-off-by: Zhu Lingshan <lingshan.zhu@intel.com>
----
- include/linux/vdpa.h | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+Currently, kvm-unit-tests only support GICv3 vLPI injection. May I ask
+is there any plan or suggestion on constructing irq bypass mechanism
+to test vLPI direct injection in kvm-unit-tests?
 
-diff --git a/include/linux/vdpa.h b/include/linux/vdpa.h
-index 03aa9f77f192..56c6a03db43b 100644
---- a/include/linux/vdpa.h
-+++ b/include/linux/vdpa.h
-@@ -87,7 +87,8 @@ struct vdpa_device {
-  *				@vdev: vdpa device
-  *				@idx: virtqueue index
-  *				Returns the notifcation area
-- * @get_vq_irq:			Get the irq number of a virtqueue
-+ * @get_vq_irq:			Get the irq number of a virtqueue (optional,
-+ *				but must implemented if require vq irq offloading)
-  *				@vdev: vdpa device
-  *				@idx: virtqueue index
-  *				Returns int: irq number of a virtqueue,
--- 
-2.18.4
+Thanks，
+Jingyi
 
