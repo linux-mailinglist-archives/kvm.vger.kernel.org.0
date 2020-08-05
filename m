@@ -2,189 +2,96 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id CEB7123D384
-	for <lists+kvm@lfdr.de>; Wed,  5 Aug 2020 23:16:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BF57023D38A
+	for <lists+kvm@lfdr.de>; Wed,  5 Aug 2020 23:21:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726985AbgHEVQ1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 5 Aug 2020 17:16:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60648 "EHLO
+        id S1726155AbgHEVVg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 5 Aug 2020 17:21:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33234 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726481AbgHEVQV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 5 Aug 2020 17:16:21 -0400
-Received: from mail-pf1-x449.google.com (mail-pf1-x449.google.com [IPv6:2607:f8b0:4864:20::449])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9535FC061575
-        for <kvm@vger.kernel.org>; Wed,  5 Aug 2020 14:16:21 -0700 (PDT)
-Received: by mail-pf1-x449.google.com with SMTP id y13so8927523pfp.5
-        for <kvm@vger.kernel.org>; Wed, 05 Aug 2020 14:16:21 -0700 (PDT)
+        with ESMTP id S1725730AbgHEVVf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 5 Aug 2020 17:21:35 -0400
+Received: from mail-pg1-x54a.google.com (mail-pg1-x54a.google.com [IPv6:2607:f8b0:4864:20::54a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 779BAC061575
+        for <kvm@vger.kernel.org>; Wed,  5 Aug 2020 14:21:35 -0700 (PDT)
+Received: by mail-pg1-x54a.google.com with SMTP id d1so11596005pgn.11
+        for <kvm@vger.kernel.org>; Wed, 05 Aug 2020 14:21:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
-        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
-         :cc;
-        bh=o0c8+R/G+PRbA64Z+pWqNQDnbLfSRBJEpSpCp6nbDmE=;
-        b=iUH43Uyn3hglXOycjOqF4nv/9uF/H9i59F/A78hqlf91/mk5tXq3cbVu+5zZ6uNw7O
-         w+71gQr2PxBb2Wpu8ypVADZgEWB5PQPSmULDS2rYMZyaSsztSjyjPFP1wUmFcdiF/TgM
-         Xe84r2bRXRcMOkFk218Pr2mL5o57KanD6oVVEuODKzhQxLpTXZ7cjwdxxydr/Q9oijQv
-         HZuTEqf6MMM2gK5FS6OyCwAMOYIHn87l1vChJljY8cuhWmn35G3XQe39Z4OjdLZlVcsN
-         8arChWjEYLRKbDhPmwCTS4/Va16ifQz0lUlxIpzx7zJFQ562P7pZNzo0fxqMpiwgqFi2
-         1Xbg==
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=A2zBYE4JiXe7P1RdEtYrh0UlIzax492Zsz/u2fr1/JI=;
+        b=hrlTCk0JLM37eqUbn0GuG+7BNaEmJ45LEewsJ+6ngaPgcRmz7yxuhpqe5cN0X6NwCO
+         vf+4J9HNw4c1m+NngZc4U6DESy7MEL26WmMwM/zaeK2TibV9Y7n67kPcTsKPZF6SwHfh
+         Ntz1AYkxDWrdQNSkrm5a3GkVGwNEoqrMFpPvHbNyinKxcs+GVjFIODQbwtNjbKsVuwYX
+         hzUzx5iY9V1ScOrBkhYvQMw+34Kplf3y68OSvocchxobBGNaZYIY9z1H28/nCjauHDbT
+         R/jC1za9d+rMwAtQYDxHm1UP3L/8KexM2nFt227nkFmjkajhbrxF6VWUn5ZFaJVGELHz
+         kbzA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
-         :references:subject:from:to:cc;
-        bh=o0c8+R/G+PRbA64Z+pWqNQDnbLfSRBJEpSpCp6nbDmE=;
-        b=dmryp6NXAzb/ajFrgYv/RTv3ZPE3mfEwIs7c8DWYr8B8XgjmXJo6euNBXvF+wN9hXC
-         nGpLCUVedID2OMTs1QZfv970YbLp48Gl4RC3uXVAIPxRvlZrXQbb6oyn6BNUvEsh3PA5
-         D2NWpzHTi1dui8nBxFWchEPO+9Ux05q+jUi8Gt3q6+2sNlUrwIDeO7JNSKesIKPbgZNO
-         2IsGWWOaq5Vxig4uFwtaVdkRAgGQRFNeQt9SEIsSj4MIbcVPKD2hDcED11TwYEfU5MQw
-         6JRYYCLpui6sJp3KFiiYrSh3h3SFdI8bAe4sTf261Ia2DiwnktUOruaz1VWcU+XViN55
-         imTw==
-X-Gm-Message-State: AOAM5328rzMZKmpSGNnjL0Z2YnphPcE7l13vnexGtygmYOLE2WlqGyL8
-        +VnXPyxuvcTcq6U5bmjZE7csLXdXVT7k9XA1fglJjM9XaFfw3FevVZDg3xqrA6mlBvK6pdawM4x
-        eJXJNWdC1DAJ+8dQYTgBjgE0S8327hmX/xu7TMhqn6n8U637PhDlkjWyf3A==
-X-Google-Smtp-Source: ABdhPJzIirgEGq0frpd8p8Gmn2cuYMiyR6fp8hAd4RyyNH0jnSMIwL7YbDxCl5zqemqRKERmzMNDSRm1b2E=
-X-Received: by 2002:aa7:9a12:: with SMTP id w18mr4964768pfj.128.1596662180900;
- Wed, 05 Aug 2020 14:16:20 -0700 (PDT)
-Date:   Wed,  5 Aug 2020 21:16:07 +0000
-In-Reply-To: <20200805211607.2048862-1-oupton@google.com>
-Message-Id: <20200805211607.2048862-5-oupton@google.com>
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=A2zBYE4JiXe7P1RdEtYrh0UlIzax492Zsz/u2fr1/JI=;
+        b=JzJysX9/5sl9ghdbxqb3RYixBjnSnzRb5nFVJN11ebBF33TS4ZofRVAF0emJYYKrJs
+         4F782/egjlRmmG10OQi+Si9nxhWEYHqLC5cozu70/upQUnyOgANduA6nIxr0ddcyX1m8
+         SmOPCQfnN09DjWZ3haUqsJfsUeYsKkftJT4bV2mbiUvTwpxiegjiJSwKPROU0amtvFQa
+         7hWDIB93bnBzV5bzwaxAcLt3oJu7qn/o4GI6ANuZZqPKIjOtEjepC4kBhkbxlQshbDLl
+         XE7N46lw7Q3xnKblyUnKq+kcyZK3YOv8VREFNKhPvW+Uj0HXFy6PXevK4RRq2WCkkzZq
+         argw==
+X-Gm-Message-State: AOAM530poj/YfQYSZ8lFcwlT8SzkSf+E8cytJ4N8tqdYwRtKJb/XNUXj
+        kjyASbRGdFi4PkbiSy4ysnqS8pus+hyKceueFK2ApJoidYVtVZXxAhEiVGQLaFdCuXaaeRXqAa5
+        P4O7Px4AdJWkee5sowZBlPAnQWciODs1mMHoJC63WqnOlbIVkx868eMt4jQ==
+X-Google-Smtp-Source: ABdhPJz1YPcyRQUytsMWE18wuedIDmO9gzPSlezLeApOG/5uD6NLkw/fWQdNaUSbcQtOJJlc0mpRobFkfcs=
+X-Received: by 2002:a62:7c4f:: with SMTP id x76mr5471614pfc.124.1596662493665;
+ Wed, 05 Aug 2020 14:21:33 -0700 (PDT)
+Date:   Wed,  5 Aug 2020 21:21:27 +0000
+Message-Id: <20200805212131.2059634-1-oupton@google.com>
 Mime-Version: 1.0
-References: <20200805211607.2048862-1-oupton@google.com>
 X-Mailer: git-send-email 2.28.0.236.gb10cc79966-goog
-Subject: [PATCH 4/4] Documentation: kvm: fix some typos in cpuid.rst
+Subject: [PATCH v2 0/4] Restrict PV features to only enabled guests
 From:   Oliver Upton <oupton@google.com>
 To:     kvm@vger.kernel.org
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Sean Christopherson <sean.j.christopherson@intel.com>,
-        Oliver Upton <oupton@google.com>,
-        Jim Mattson <jmattson@google.com>,
-        Peter Shier <pshier@google.com>
+        Oliver Upton <oupton@google.com>
 Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Reviewed-by: Jim Mattson <jmattson@google.com>
-Reviewed-by: Peter Shier <pshier@google.com>
-Signed-off-by: Oliver Upton <oupton@google.com>
-Change-Id: I0c6355b09fedf8f9cc4cc5f51be418e2c1c82b7b
----
- Documentation/virt/kvm/cpuid.rst | 88 ++++++++++++++++----------------
- 1 file changed, 44 insertions(+), 44 deletions(-)
+To date, KVM has allowed guests to use paravirtual interfaces regardless
+of the configured CPUID. While almost any guest will consult the
+KVM_CPUID_FEATURES leaf _before_ using PV features, it is still
+undesirable to have such interfaces silently present.
 
-diff --git a/Documentation/virt/kvm/cpuid.rst b/Documentation/virt/kvm/cpuid.rst
-index a7dff9186bed..f1583e682cc8 100644
---- a/Documentation/virt/kvm/cpuid.rst
-+++ b/Documentation/virt/kvm/cpuid.rst
-@@ -38,64 +38,64 @@ returns::
- 
- where ``flag`` is defined as below:
- 
--================================= =========== ================================
--flag                              value       meaning
--================================= =========== ================================
--KVM_FEATURE_CLOCKSOURCE           0           kvmclock available at msrs
--                                              0x11 and 0x12
-+================================== =========== ================================
-+flag                               value       meaning
-+================================== =========== ================================
-+KVM_FEATURE_CLOCKSOURCE            0           kvmclock available at msrs
-+                                               0x11 and 0x12
- 
--KVM_FEATURE_NOP_IO_DELAY          1           not necessary to perform delays
--                                              on PIO operations
-+KVM_FEATURE_NOP_IO_DELAY           1           not necessary to perform delays
-+                                               on PIO operations
- 
--KVM_FEATURE_MMU_OP                2           deprecated
-+KVM_FEATURE_MMU_OP                 2           deprecated
- 
--KVM_FEATURE_CLOCKSOURCE2          3           kvmclock available at msrs
--                                              0x4b564d00 and 0x4b564d01
-+KVM_FEATURE_CLOCKSOURCE2           3           kvmclock available at msrs
-+                                               0x4b564d00 and 0x4b564d01
- 
--KVM_FEATURE_ASYNC_PF              4           async pf can be enabled by
--                                              writing to msr 0x4b564d02
-+KVM_FEATURE_ASYNC_PF               4           async pf can be enabled by
-+                                               writing to msr 0x4b564d02
- 
--KVM_FEATURE_STEAL_TIME            5           steal time can be enabled by
--                                              writing to msr 0x4b564d03
-+KVM_FEATURE_STEAL_TIME             5           steal time can be enabled by
-+                                               writing to msr 0x4b564d03
- 
--KVM_FEATURE_PV_EOI                6           paravirtualized end of interrupt
--                                              handler can be enabled by
--                                              writing to msr 0x4b564d04
-+KVM_FEATURE_PV_EOI                 6           paravirtualized end of interrupt
-+                                               handler can be enabled by
-+                                               writing to msr 0x4b564d04
- 
--KVM_FEATURE_PV_UNHAULT            7           guest checks this feature bit
--                                              before enabling paravirtualized
--                                              spinlock support
-+KVM_FEATURE_PV_UNHALT              7           guest checks this feature bit
-+                                               before enabling paravirtualized
-+                                               spinlock support
- 
--KVM_FEATURE_PV_TLB_FLUSH          9           guest checks this feature bit
--                                              before enabling paravirtualized
--                                              tlb flush
-+KVM_FEATURE_PV_TLB_FLUSH           9           guest checks this feature bit
-+                                               before enabling paravirtualized
-+                                               tlb flush
- 
--KVM_FEATURE_ASYNC_PF_VMEXIT       10          paravirtualized async PF VM EXIT
--                                              can be enabled by setting bit 2
--                                              when writing to msr 0x4b564d02
-+KVM_FEATURE_ASYNC_PF_VMEXIT        10          paravirtualized async PF VM EXIT
-+                                               can be enabled by setting bit 2
-+                                               when writing to msr 0x4b564d02
- 
--KVM_FEATURE_PV_SEND_IPI           11          guest checks this feature bit
--                                              before enabling paravirtualized
--                                              sebd IPIs
-+KVM_FEATURE_PV_SEND_IPI            11          guest checks this feature bit
-+                                               before enabling paravirtualized
-+                                               send IPIs
- 
--KVM_FEATURE_PV_POLL_CONTROL       12          host-side polling on HLT can
--                                              be disabled by writing
--                                              to msr 0x4b564d05.
-+KVM_FEATURE_PV_POLL_CONTROL        12          host-side polling on HLT can
-+                                               be disabled by writing
-+                                               to msr 0x4b564d05.
- 
--KVM_FEATURE_PV_SCHED_YIELD        13          guest checks this feature bit
--                                              before using paravirtualized
--                                              sched yield.
-+KVM_FEATURE_PV_SCHED_YIELD         13          guest checks this feature bit
-+                                               before using paravirtualized
-+                                               sched yield.
- 
--KVM_FEATURE_ASYNC_PF_INT          14          guest checks this feature bit
--                                              before using the second async
--                                              pf control msr 0x4b564d06 and
--                                              async pf acknowledgment msr
--                                              0x4b564d07.
-+KVM_FEATURE_ASYNC_PF_INT           14          guest checks this feature bit
-+                                               before using the second async
-+                                               pf control msr 0x4b564d06 and
-+                                               async pf acknowledgment msr
-+                                               0x4b564d07.
- 
--KVM_FEATURE_CLOCSOURCE_STABLE_BIT 24          host will warn if no guest-side
--                                              per-cpu warps are expeced in
--                                              kvmclock
--================================= =========== ================================
-+KVM_FEATURE_CLOCKSOURCE_STABLE_BIT 24          host will warn if no guest-side
-+                                               per-cpu warps are expected in
-+                                               kvmclock
-+================================== =========== ================================
- 
- ::
- 
+This series aims to address the issue by adding explicit checks against
+the guest's CPUID when servicing any paravirtual feature. Since this
+effectively changes the guest/hypervisor ABI, a KVM_CAP is warranted to
+guard the new behavior.
+
+Patches 1-2 refactor some of the PV code in anticipation of the change.
+Patch 3 introduces the checks + KVM_CAP. Finally, patch 4 fixes some doc
+typos that were noticed when working on this series.
+
+v1 => v2:
+ - Strip Change-Id footers (checkpatch is your friend!)
+
+Parent commit: f3633c268354 ("Merge tag 'kvm-s390-next-5.9-1' of git://git.kernel.org/pub/scm/linux/kernel/git/kvms390/linux into kvm-next-5.6")
+
+Oliver Upton (4):
+  kvm: x86: encapsulate wrmsr(MSR_KVM_SYSTEM_TIME) emulation in helper
+    fn
+  kvm: x86: set wall_clock in kvm_write_wall_clock()
+  kvm: x86: only provide PV features if enabled in guest's CPUID
+  Documentation: kvm: fix some typos in cpuid.rst
+
+ Documentation/virt/kvm/api.rst   |  11 +++
+ Documentation/virt/kvm/cpuid.rst |  88 +++++++++++-----------
+ arch/x86/include/asm/kvm_host.h  |   6 ++
+ arch/x86/kvm/cpuid.h             |  16 ++++
+ arch/x86/kvm/x86.c               | 122 +++++++++++++++++++++++--------
+ include/uapi/linux/kvm.h         |   1 +
+ 6 files changed, 171 insertions(+), 73 deletions(-)
+
 -- 
 2.28.0.236.gb10cc79966-goog
 
