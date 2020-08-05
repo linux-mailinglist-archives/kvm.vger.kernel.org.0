@@ -2,32 +2,32 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E764923CF0C
-	for <lists+kvm@lfdr.de>; Wed,  5 Aug 2020 21:12:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2302E23CECE
+	for <lists+kvm@lfdr.de>; Wed,  5 Aug 2020 21:06:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728511AbgHETMr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 5 Aug 2020 15:12:47 -0400
-Received: from mail.kernel.org ([198.145.29.99]:34384 "EHLO mail.kernel.org"
+        id S1728367AbgHETGB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 5 Aug 2020 15:06:01 -0400
+Received: from mail.kernel.org ([198.145.29.99]:42728 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728825AbgHES1V (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 5 Aug 2020 14:27:21 -0400
+        id S1726721AbgHETAm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 5 Aug 2020 15:00:42 -0400
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 5F06822CB3;
-        Wed,  5 Aug 2020 18:25:58 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 4D19722CA1;
+        Wed,  5 Aug 2020 18:25:51 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1596651958;
-        bh=kQqWB9nR8C721TvBKL/d/pl9SOM/oXtaAvToHBb4mtQ=;
+        s=default; t=1596651951;
+        bh=r2Dto6XkGTFiL/tfKizK8S9fMTFHJyg+njqLkp9sfLE=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=hFyLINeTa3ODpWskXd3tK9TWPEwk94Gmw53gzZmMkotYkz93ocPZrFqn9lqaNt7Og
-         jG26z0sWEvvSmROlZzij4WnmFbkce/8ja33vibXRDmaXD/U9yhClELKhaUnVBfxhiB
-         7W2UwlStd1h9++sYXWw+F1fJ6I5N2Rfi4REhaWp8=
+        b=hA+zMDGXCw0jhnfWI74Wa7Mm9jaaENkt5TreR4WLAhI0b6QXPB+b9sPaxIRfbf3bA
+         dhN+lED0yUBnKhXbGikK9/zE7z8c1tbBc9q11FmqFxRgUfuPRQXpFhQIiug1z2FNLJ
+         ZXYl8up+eU88Y5OXBiiybcyeXu11Wsq9UNCCmZE4=
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=why.lan)
         by disco-boy.misterjones.org with esmtpsa (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
         (Exim 4.92)
         (envelope-from <maz@kernel.org>)
-        id 1k3NfE-0004w9-Lu; Wed, 05 Aug 2020 18:57:20 +0100
+        id 1k3NfF-0004w9-GD; Wed, 05 Aug 2020 18:57:21 +0100
 From:   Marc Zyngier <maz@kernel.org>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Alexander Graf <graf@amazon.com>,
@@ -47,9 +47,9 @@ Cc:     Alexander Graf <graf@amazon.com>,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
         linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
         kvm@vger.kernel.org, kernel-team@android.com
-Subject: [PATCH 10/56] KVM: arm64: Move ACTLR_EL1 emulation to the sys_reg_descs array
-Date:   Wed,  5 Aug 2020 18:56:14 +0100
-Message-Id: <20200805175700.62775-11-maz@kernel.org>
+Subject: [PATCH 11/56] KVM: arm64: Remove target_table from exit handlers
+Date:   Wed,  5 Aug 2020 18:56:15 +0100
+Message-Id: <20200805175700.62775-12-maz@kernel.org>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20200805175700.62775-1-maz@kernel.org>
 References: <20200805175700.62775-1-maz@kernel.org>
@@ -66,127 +66,200 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: James Morse <james.morse@arm.com>
 
-The only entry in the genericv8_sys_regs arrays is for emulation of
-ACTLR_EL1. As all targets emulate this in the same way, move it to
-sys_reg_descs[].
+Whenever KVM searches for a register (e.g. due to a guest exit), it
+works with two tables, as the target table overrides the sys_regs array.
+
+Now that everything is in the sys_regs array, and the target table is
+empty, stop doing that.
+
+Remove the second table and its size from all the functions that take
+it.
 
 Signed-off-by: James Morse <james.morse@arm.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
-Link: https://lore.kernel.org/r/20200622113317.20477-4-james.morse@arm.com
+Link: https://lore.kernel.org/r/20200622113317.20477-5-james.morse@arm.com
 ---
- arch/arm64/kvm/sys_regs.c            | 28 ++++++++++++++++++++++++++
- arch/arm64/kvm/sys_regs_generic_v8.c | 30 ----------------------------
- 2 files changed, 28 insertions(+), 30 deletions(-)
+ arch/arm64/kvm/sys_regs.c | 87 +++++++--------------------------------
+ 1 file changed, 16 insertions(+), 71 deletions(-)
 
 diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index fb448bfc83ec..f8407cfa9032 100644
+index f8407cfa9032..14333005b476 100644
 --- a/arch/arm64/kvm/sys_regs.c
 +++ b/arch/arm64/kvm/sys_regs.c
-@@ -242,6 +242,25 @@ static bool access_vm_reg(struct kvm_vcpu *vcpu,
- 	return true;
- }
- 
-+static bool access_actlr(struct kvm_vcpu *vcpu,
-+			 struct sys_reg_params *p,
-+			 const struct sys_reg_desc *r)
-+{
-+	if (p->is_write)
-+		return ignore_write(vcpu, p);
-+
-+	p->regval = vcpu_read_sys_reg(vcpu, ACTLR_EL1);
-+
-+	if (p->is_aarch32) {
-+		if (r->Op2 & 2)
-+			p->regval = upper_32_bits(p->regval);
-+		else
-+			p->regval = lower_32_bits(p->regval);
-+	}
-+
-+	return true;
-+}
-+
- /*
-  * Trap handler for the GICv3 SGI generation system register.
-  * Forward the request to the VGIC emulation.
-@@ -615,6 +634,12 @@ static void reset_amair_el1(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
- 	vcpu_write_sys_reg(vcpu, amair, AMAIR_EL1);
- }
- 
-+static void reset_actlr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
-+{
-+	u64 actlr = read_sysreg(actlr_el1);
-+	vcpu_write_sys_reg(vcpu, actlr, ACTLR_EL1);
-+}
-+
- static void reset_mpidr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
- {
- 	u64 mpidr;
-@@ -1518,6 +1543,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
- 	ID_UNALLOCATED(7,7),
- 
- 	{ SYS_DESC(SYS_SCTLR_EL1), access_vm_reg, reset_val, SCTLR_EL1, 0x00C50078 },
-+	{ SYS_DESC(SYS_ACTLR_EL1), access_actlr, reset_actlr, ACTLR_EL1 },
- 	{ SYS_DESC(SYS_CPACR_EL1), NULL, reset_val, CPACR_EL1, 0 },
- 	{ SYS_DESC(SYS_ZCR_EL1), NULL, reset_val, ZCR_EL1, 0, .visibility = sve_visibility },
- 	{ SYS_DESC(SYS_TTBR0_EL1), access_vm_reg, reset_unknown, TTBR0_EL1 },
-@@ -1957,6 +1983,8 @@ static const struct sys_reg_desc cp14_64_regs[] = {
- static const struct sys_reg_desc cp15_regs[] = {
- 	{ Op1( 0), CRn( 0), CRm( 0), Op2( 1), access_ctr },
- 	{ Op1( 0), CRn( 1), CRm( 0), Op2( 0), access_vm_reg, NULL, c1_SCTLR },
-+	{ Op1( 0), CRn( 1), CRm( 0), Op2( 1), access_actlr },
-+	{ Op1( 0), CRn( 1), CRm( 0), Op2( 3), access_actlr },
- 	{ Op1( 0), CRn( 2), CRm( 0), Op2( 0), access_vm_reg, NULL, c2_TTBR0 },
- 	{ Op1( 0), CRn( 2), CRm( 0), Op2( 1), access_vm_reg, NULL, c2_TTBR1 },
- 	{ Op1( 0), CRn( 2), CRm( 0), Op2( 2), access_vm_reg, NULL, c2_TTBCR },
-diff --git a/arch/arm64/kvm/sys_regs_generic_v8.c b/arch/arm64/kvm/sys_regs_generic_v8.c
-index a82cc2ccfd44..a7e21e61beea 100644
---- a/arch/arm64/kvm/sys_regs_generic_v8.c
-+++ b/arch/arm64/kvm/sys_regs_generic_v8.c
-@@ -19,44 +19,14 @@
- 
- #include "sys_regs.h"
- 
--static bool access_actlr(struct kvm_vcpu *vcpu,
--			 struct sys_reg_params *p,
--			 const struct sys_reg_desc *r)
--{
--	if (p->is_write)
--		return ignore_write(vcpu, p);
--
--	p->regval = vcpu_read_sys_reg(vcpu, ACTLR_EL1);
--
--	if (p->is_aarch32) {
--		if (r->Op2 & 2)
--			p->regval = upper_32_bits(p->regval);
--		else
--			p->regval = lower_32_bits(p->regval);
--	}
--
--	return true;
--}
--
--static void reset_actlr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
--{
--	__vcpu_sys_reg(vcpu, ACTLR_EL1) = read_sysreg(actlr_el1);
--}
--
- /*
-  * Implementation specific sys-reg registers.
-  * Important: Must be sorted ascending by Op0, Op1, CRn, CRm, Op2
+@@ -2269,9 +2269,7 @@ static void unhandled_cp_access(struct kvm_vcpu *vcpu,
   */
- static const struct sys_reg_desc genericv8_sys_regs[] = {
--	{ SYS_DESC(SYS_ACTLR_EL1), access_actlr, reset_actlr, ACTLR_EL1 },
- };
+ static int kvm_handle_cp_64(struct kvm_vcpu *vcpu,
+ 			    const struct sys_reg_desc *global,
+-			    size_t nr_global,
+-			    const struct sys_reg_desc *target_specific,
+-			    size_t nr_specific)
++			    size_t nr_global)
+ {
+ 	struct sys_reg_params params;
+ 	u32 hsr = kvm_vcpu_get_hsr(vcpu);
+@@ -2298,14 +2296,11 @@ static int kvm_handle_cp_64(struct kvm_vcpu *vcpu,
+ 	}
  
- static const struct sys_reg_desc genericv8_cp15_regs[] = {
--	/* ACTLR */
--	{ Op1(0b000), CRn(0b0001), CRm(0b0000), Op2(0b001),
--	  access_actlr },
--	{ Op1(0b000), CRn(0b0001), CRm(0b0000), Op2(0b011),
--	  access_actlr },
- };
+ 	/*
+-	 * Try to emulate the coprocessor access using the target
+-	 * specific table first, and using the global table afterwards.
+-	 * If either of the tables contains a handler, handle the
++	 * If the table contains a handler, handle the
+ 	 * potential register operation in the case of a read and return
+ 	 * with success.
+ 	 */
+-	if (!emulate_cp(vcpu, &params, target_specific, nr_specific) ||
+-	    !emulate_cp(vcpu, &params, global, nr_global)) {
++	if (!emulate_cp(vcpu, &params, global, nr_global)) {
+ 		/* Split up the value between registers for the read side */
+ 		if (!params.is_write) {
+ 			vcpu_set_reg(vcpu, Rt, lower_32_bits(params.regval));
+@@ -2326,9 +2321,7 @@ static int kvm_handle_cp_64(struct kvm_vcpu *vcpu,
+  */
+ static int kvm_handle_cp_32(struct kvm_vcpu *vcpu,
+ 			    const struct sys_reg_desc *global,
+-			    size_t nr_global,
+-			    const struct sys_reg_desc *target_specific,
+-			    size_t nr_specific)
++			    size_t nr_global)
+ {
+ 	struct sys_reg_params params;
+ 	u32 hsr = kvm_vcpu_get_hsr(vcpu);
+@@ -2344,8 +2337,7 @@ static int kvm_handle_cp_32(struct kvm_vcpu *vcpu,
+ 	params.Op1 = (hsr >> 14) & 0x7;
+ 	params.Op2 = (hsr >> 17) & 0x7;
  
- struct kvm_sys_reg_target_table genericv8_target_table = {
+-	if (!emulate_cp(vcpu, &params, target_specific, nr_specific) ||
+-	    !emulate_cp(vcpu, &params, global, nr_global)) {
++	if (!emulate_cp(vcpu, &params, global, nr_global)) {
+ 		if (!params.is_write)
+ 			vcpu_set_reg(vcpu, Rt, params.regval);
+ 		return 1;
+@@ -2357,38 +2349,22 @@ static int kvm_handle_cp_32(struct kvm_vcpu *vcpu,
+ 
+ int kvm_handle_cp15_64(struct kvm_vcpu *vcpu, struct kvm_run *run)
+ {
+-	const struct sys_reg_desc *target_specific;
+-	size_t num;
+-
+-	target_specific = get_target_table(vcpu->arch.target, false, &num);
+-	return kvm_handle_cp_64(vcpu,
+-				cp15_64_regs, ARRAY_SIZE(cp15_64_regs),
+-				target_specific, num);
++	return kvm_handle_cp_64(vcpu, cp15_64_regs, ARRAY_SIZE(cp15_64_regs));
+ }
+ 
+ int kvm_handle_cp15_32(struct kvm_vcpu *vcpu, struct kvm_run *run)
+ {
+-	const struct sys_reg_desc *target_specific;
+-	size_t num;
+-
+-	target_specific = get_target_table(vcpu->arch.target, false, &num);
+-	return kvm_handle_cp_32(vcpu,
+-				cp15_regs, ARRAY_SIZE(cp15_regs),
+-				target_specific, num);
++	return kvm_handle_cp_32(vcpu, cp15_regs, ARRAY_SIZE(cp15_regs));
+ }
+ 
+ int kvm_handle_cp14_64(struct kvm_vcpu *vcpu, struct kvm_run *run)
+ {
+-	return kvm_handle_cp_64(vcpu,
+-				cp14_64_regs, ARRAY_SIZE(cp14_64_regs),
+-				NULL, 0);
++	return kvm_handle_cp_64(vcpu, cp14_64_regs, ARRAY_SIZE(cp14_64_regs));
+ }
+ 
+ int kvm_handle_cp14_32(struct kvm_vcpu *vcpu, struct kvm_run *run)
+ {
+-	return kvm_handle_cp_32(vcpu,
+-				cp14_regs, ARRAY_SIZE(cp14_regs),
+-				NULL, 0);
++	return kvm_handle_cp_32(vcpu, cp14_regs, ARRAY_SIZE(cp14_regs));
+ }
+ 
+ static bool is_imp_def_sys_reg(struct sys_reg_params *params)
+@@ -2400,15 +2376,9 @@ static bool is_imp_def_sys_reg(struct sys_reg_params *params)
+ static int emulate_sys_reg(struct kvm_vcpu *vcpu,
+ 			   struct sys_reg_params *params)
+ {
+-	size_t num;
+-	const struct sys_reg_desc *table, *r;
+-
+-	table = get_target_table(vcpu->arch.target, true, &num);
++	const struct sys_reg_desc *r;
+ 
+-	/* Search target-specific then generic table. */
+-	r = find_reg(params, table, num);
+-	if (!r)
+-		r = find_reg(params, sys_reg_descs, ARRAY_SIZE(sys_reg_descs));
++	r = find_reg(params, sys_reg_descs, ARRAY_SIZE(sys_reg_descs));
+ 
+ 	if (likely(r)) {
+ 		perform_access(vcpu, params, r);
+@@ -2512,8 +2482,7 @@ const struct sys_reg_desc *find_reg_by_id(u64 id,
+ static const struct sys_reg_desc *index_to_sys_reg_desc(struct kvm_vcpu *vcpu,
+ 						    u64 id)
+ {
+-	size_t num;
+-	const struct sys_reg_desc *table, *r;
++	const struct sys_reg_desc *r;
+ 	struct sys_reg_params params;
+ 
+ 	/* We only do sys_reg for now. */
+@@ -2523,10 +2492,7 @@ static const struct sys_reg_desc *index_to_sys_reg_desc(struct kvm_vcpu *vcpu,
+ 	if (!index_to_params(id, &params))
+ 		return NULL;
+ 
+-	table = get_target_table(vcpu->arch.target, true, &num);
+-	r = find_reg(&params, table, num);
+-	if (!r)
+-		r = find_reg(&params, sys_reg_descs, ARRAY_SIZE(sys_reg_descs));
++	r = find_reg(&params, sys_reg_descs, ARRAY_SIZE(sys_reg_descs));
+ 
+ 	/* Not saved in the sys_reg array and not otherwise accessible? */
+ 	if (r && !(r->reg || r->get_user))
+@@ -2826,38 +2792,17 @@ static int walk_one_sys_reg(const struct kvm_vcpu *vcpu,
+ /* Assumed ordered tables, see kvm_sys_reg_table_init. */
+ static int walk_sys_regs(struct kvm_vcpu *vcpu, u64 __user *uind)
+ {
+-	const struct sys_reg_desc *i1, *i2, *end1, *end2;
++	const struct sys_reg_desc *i2, *end2;
+ 	unsigned int total = 0;
+-	size_t num;
+ 	int err;
+ 
+-	/* We check for duplicates here, to allow arch-specific overrides. */
+-	i1 = get_target_table(vcpu->arch.target, true, &num);
+-	end1 = i1 + num;
+ 	i2 = sys_reg_descs;
+ 	end2 = sys_reg_descs + ARRAY_SIZE(sys_reg_descs);
+ 
+-	if (i1 == end1)
+-		i1 = NULL;
+-
+-	BUG_ON(i2 == end2);
+-
+-	/* Walk carefully, as both tables may refer to the same register. */
+-	while (i1 || i2) {
+-		int cmp = cmp_sys_reg(i1, i2);
+-		/* target-specific overrides generic entry. */
+-		if (cmp <= 0)
+-			err = walk_one_sys_reg(vcpu, i1, &uind, &total);
+-		else
+-			err = walk_one_sys_reg(vcpu, i2, &uind, &total);
+-
++	while (i2 != end2) {
++		err = walk_one_sys_reg(vcpu, i2++, &uind, &total);
+ 		if (err)
+ 			return err;
+-
+-		if (cmp <= 0 && ++i1 == end1)
+-			i1 = NULL;
+-		if (cmp >= 0 && ++i2 == end2)
+-			i2 = NULL;
+ 	}
+ 	return total;
+ }
 -- 
 2.27.0
 
