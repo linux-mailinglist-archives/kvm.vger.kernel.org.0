@@ -2,32 +2,32 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 08F3423CE9C
-	for <lists+kvm@lfdr.de>; Wed,  5 Aug 2020 20:40:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BFA0523CEA3
+	for <lists+kvm@lfdr.de>; Wed,  5 Aug 2020 20:49:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727840AbgHESjj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 5 Aug 2020 14:39:39 -0400
-Received: from mail.kernel.org ([198.145.29.99]:35400 "EHLO mail.kernel.org"
+        id S1728064AbgHESr2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 5 Aug 2020 14:47:28 -0400
+Received: from mail.kernel.org ([198.145.29.99]:35360 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728887AbgHES1p (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 5 Aug 2020 14:27:45 -0400
+        id S1729177AbgHES1k (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 5 Aug 2020 14:27:40 -0400
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 75E8622D6E;
-        Wed,  5 Aug 2020 18:26:34 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 129A022D0B;
+        Wed,  5 Aug 2020 18:26:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1596651994;
-        bh=NYJ9si41AeBNM/gClyftM9iewSbHDHRYYgjNfO+jb3A=;
+        s=default; t=1596651983;
+        bh=tX1M5vmJuo+EBJC9fcecfSgx6/3pvXsr7yb+SDklIBc=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=tzUdwVTUOiCOF64SxT0C4N+Wu1ozHXJQLcW9qWw1FoF7vCMAzUkZKNy9Y7bKygxp6
-         nzT6s9XD9tS94H+BKtE8KfzBSXQzZIdwOc0MzVQXtiHD8PERORQDvXaP+mLlmfIhth
-         94ixADdS9GeXRbvGnjLT5+CCH6S/08u9lFfFk13Y=
+        b=AT13DAeLum6DvyGWnE3zX+cYUNO9g3FZmibKlY9uZ+rQBRBc3M+i0uGnMSrEWW3oC
+         aXzbiXNLS6BNJa4KUDcc/LW3HfyGmztmZc3I912JKAzpnwio5v3sZVp5lgzNujYvcO
+         lUD/s2wblic2En14VZ/4CG7QXG3BLqFF8dvB/mQE=
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=why.lan)
         by disco-boy.misterjones.org with esmtpsa (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
         (Exim 4.92)
         (envelope-from <maz@kernel.org>)
-        id 1k3NfI-0004w9-Hm; Wed, 05 Aug 2020 18:57:24 +0100
+        id 1k3NfN-0004w9-VO; Wed, 05 Aug 2020 18:57:30 +0100
 From:   Marc Zyngier <maz@kernel.org>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Alexander Graf <graf@amazon.com>,
@@ -47,9 +47,9 @@ Cc:     Alexander Graf <graf@amazon.com>,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
         linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
         kvm@vger.kernel.org, kernel-team@android.com
-Subject: [PATCH 13/56] KVM: arm64: Fix symbol dependency in __hyp_call_panic_nvhe
-Date:   Wed,  5 Aug 2020 18:56:17 +0100
-Message-Id: <20200805175700.62775-14-maz@kernel.org>
+Subject: [PATCH 16/56] KVM: arm64: Use build-time defines in has_vhe()
+Date:   Wed,  5 Aug 2020 18:56:20 +0100
+Message-Id: <20200805175700.62775-17-maz@kernel.org>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20200805175700.62775-1-maz@kernel.org>
 References: <20200805175700.62775-1-maz@kernel.org>
@@ -66,35 +66,41 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: David Brazdil <dbrazdil@google.com>
 
-__hyp_call_panic_nvhe contains inline assembly which did not declare
-its dependency on the __hyp_panic_string symbol.
-
-The static-declared string has previously been kept alive because of a use in
-__hyp_call_panic_vhe. Fix this in preparation for separating the source files
-between VHE and nVHE when the two users land in two different compilation
-units. The static variable otherwise gets dropped when compiling the nVHE
-source file, causing an undefined symbol linker error later.
+Build system compiles hyp code with macros specifying if the code belongs
+to VHE or nVHE. Use these macros to evaluate has_vhe() at compile time.
 
 Signed-off-by: David Brazdil <dbrazdil@google.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
-Link: https://lore.kernel.org/r/20200625131420.71444-2-dbrazdil@google.com
+Link: https://lore.kernel.org/r/20200625131420.71444-5-dbrazdil@google.com
 ---
- arch/arm64/kvm/hyp/switch.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ arch/arm64/include/asm/virt.h | 13 ++++++++++---
+ 1 file changed, 10 insertions(+), 3 deletions(-)
 
-diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
-index db1c4487d95d..9270b14157b5 100644
---- a/arch/arm64/kvm/hyp/switch.c
-+++ b/arch/arm64/kvm/hyp/switch.c
-@@ -897,7 +897,7 @@ static void __hyp_text __hyp_call_panic_nvhe(u64 spsr, u64 elr, u64 par,
- 	 * making sure it is a kernel address and not a PC-relative
- 	 * reference.
- 	 */
--	asm volatile("ldr %0, =__hyp_panic_string" : "=r" (str_va));
-+	asm volatile("ldr %0, =%1" : "=r" (str_va) : "S" (__hyp_panic_string));
+diff --git a/arch/arm64/include/asm/virt.h b/arch/arm64/include/asm/virt.h
+index 5051b388c654..09977acc007d 100644
+--- a/arch/arm64/include/asm/virt.h
++++ b/arch/arm64/include/asm/virt.h
+@@ -85,10 +85,17 @@ static inline bool is_kernel_in_hyp_mode(void)
  
- 	__hyp_do_panic(str_va,
- 		       spsr, elr,
+ static __always_inline bool has_vhe(void)
+ {
+-	if (cpus_have_final_cap(ARM64_HAS_VIRT_HOST_EXTN))
++	/*
++	 * The following macros are defined for code specic to VHE/nVHE.
++	 * If has_vhe() is inlined into those compilation units, it can
++	 * be determined statically. Otherwise fall back to caps.
++	 */
++	if (__is_defined(__KVM_VHE_HYPERVISOR__))
+ 		return true;
+-
+-	return false;
++	else if (__is_defined(__KVM_NVHE_HYPERVISOR__))
++		return false;
++	else
++		return cpus_have_final_cap(ARM64_HAS_VIRT_HOST_EXTN);
+ }
+ 
+ #endif /* __ASSEMBLY__ */
 -- 
 2.27.0
 
