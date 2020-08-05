@@ -2,310 +2,99 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5A75E23CDFD
-	for <lists+kvm@lfdr.de>; Wed,  5 Aug 2020 20:04:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 08F3423CE9C
+	for <lists+kvm@lfdr.de>; Wed,  5 Aug 2020 20:40:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728533AbgHESEG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 5 Aug 2020 14:04:06 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:52887 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1728488AbgHER6U (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 5 Aug 2020 13:58:20 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1596650298;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=2x3mgNdTSCpVK/PvsDtS076Na69D7EpUGAvTaGV+Rek=;
-        b=NeztqPI2uItGb/UxDEd+G6pKaCRCvntgYgwWHswtfJyH8R9Yw6RHDt4zBWh3iLGD2Lo3ZV
-        4+GxcgXISsi0AKhaqv2GaJsjvpjNsMZQ4dwno2rwQ/eMwitQVSFI4pO8BJQQSksYZSHi6z
-        eb0j0JydXf3Jqy+wa/QvULg3jLDrpfU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-478-EZlvipCxNui6X3CIYHErHA-1; Wed, 05 Aug 2020 13:58:16 -0400
-X-MC-Unique: EZlvipCxNui6X3CIYHErHA-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        id S1727840AbgHESjj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 5 Aug 2020 14:39:39 -0400
+Received: from mail.kernel.org ([198.145.29.99]:35400 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728887AbgHES1p (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 5 Aug 2020 14:27:45 -0400
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2A74F81EDB7;
-        Wed,  5 Aug 2020 17:58:06 +0000 (UTC)
-Received: from gimli.home (ovpn-112-71.phx2.redhat.com [10.3.112.71])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id CC8441755E;
-        Wed,  5 Aug 2020 17:58:05 +0000 (UTC)
-Subject: [PATCH] vfio-pci: Avoid recursive read-lock usage
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     alex.williamson@redhat.com
-Cc:     cohuck@redhat.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Date:   Wed, 05 Aug 2020 11:58:05 -0600
-Message-ID: <159665024415.30380.4401928486051321567.stgit@gimli.home>
-User-Agent: StGit/0.19-dirty
+        by mail.kernel.org (Postfix) with ESMTPSA id 75E8622D6E;
+        Wed,  5 Aug 2020 18:26:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1596651994;
+        bh=NYJ9si41AeBNM/gClyftM9iewSbHDHRYYgjNfO+jb3A=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=tzUdwVTUOiCOF64SxT0C4N+Wu1ozHXJQLcW9qWw1FoF7vCMAzUkZKNy9Y7bKygxp6
+         nzT6s9XD9tS94H+BKtE8KfzBSXQzZIdwOc0MzVQXtiHD8PERORQDvXaP+mLlmfIhth
+         94ixADdS9GeXRbvGnjLT5+CCH6S/08u9lFfFk13Y=
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=why.lan)
+        by disco-boy.misterjones.org with esmtpsa (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+        (Exim 4.92)
+        (envelope-from <maz@kernel.org>)
+        id 1k3NfI-0004w9-Hm; Wed, 05 Aug 2020 18:57:24 +0100
+From:   Marc Zyngier <maz@kernel.org>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Alexander Graf <graf@amazon.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Andrew Scull <ascull@google.com>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Christoffer Dall <christoffer.dall@arm.com>,
+        David Brazdil <dbrazdil@google.com>,
+        Eric Auger <eric.auger@redhat.com>,
+        Gavin Shan <gshan@redhat.com>,
+        James Morse <james.morse@arm.com>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Peng Hao <richard.peng@oppo.com>,
+        Quentin Perret <qperret@google.com>,
+        Will Deacon <will@kernel.org>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, kernel-team@android.com
+Subject: [PATCH 13/56] KVM: arm64: Fix symbol dependency in __hyp_call_panic_nvhe
+Date:   Wed,  5 Aug 2020 18:56:17 +0100
+Message-Id: <20200805175700.62775-14-maz@kernel.org>
+X-Mailer: git-send-email 2.27.0
+In-Reply-To: <20200805175700.62775-1-maz@kernel.org>
+References: <20200805175700.62775-1-maz@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: pbonzini@redhat.com, graf@amazon.com, alexandru.elisei@arm.com, ascull@google.com, catalin.marinas@arm.com, christoffer.dall@arm.com, dbrazdil@google.com, eric.auger@redhat.com, gshan@redhat.com, james.morse@arm.com, mark.rutland@arm.com, richard.peng@oppo.com, qperret@google.com, will@kernel.org, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, kernel-team@android.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-A down_read on memory_lock is held when performing read/write accesses
-to MMIO BAR space, including across the copy_to/from_user() callouts
-which may fault.  If the user buffer for these copies resides in an
-mmap of device MMIO space, the mmap fault handler will acquire a
-recursive read-lock on memory_lock.  Avoid this by reducing the lock
-granularity.  Sequential accesses requiring multiple ioread/iowrite
-cycles are expected to be rare, therefore typical accesses should not
-see additional overhead.
+From: David Brazdil <dbrazdil@google.com>
 
-VGA MMIO accesses are expected to be non-fatal regardless of the PCI
-memory enable bit to allow legacy probing, this behavior remains with
-a comment added.  ioeventfds are now included in memory access testing,
-with writes dropped while memory space is disabled.
+__hyp_call_panic_nvhe contains inline assembly which did not declare
+its dependency on the __hyp_panic_string symbol.
 
-Fixes: abafbc551fdd ("vfio-pci: Invalidate mmaps and block MMIO access on disabled memory")
-Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
+The static-declared string has previously been kept alive because of a use in
+__hyp_call_panic_vhe. Fix this in preparation for separating the source files
+between VHE and nVHE when the two users land in two different compilation
+units. The static variable otherwise gets dropped when compiling the nVHE
+source file, causing an undefined symbol linker error later.
+
+Signed-off-by: David Brazdil <dbrazdil@google.com>
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+Link: https://lore.kernel.org/r/20200625131420.71444-2-dbrazdil@google.com
 ---
- drivers/vfio/pci/vfio_pci_private.h |    2 +
- drivers/vfio/pci/vfio_pci_rdwr.c    |  120 ++++++++++++++++++++++++++++-------
- 2 files changed, 98 insertions(+), 24 deletions(-)
+ arch/arm64/kvm/hyp/switch.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/vfio/pci/vfio_pci_private.h b/drivers/vfio/pci/vfio_pci_private.h
-index 86a02aff8735..61ca8ab165dc 100644
---- a/drivers/vfio/pci/vfio_pci_private.h
-+++ b/drivers/vfio/pci/vfio_pci_private.h
-@@ -33,12 +33,14 @@
+diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
+index db1c4487d95d..9270b14157b5 100644
+--- a/arch/arm64/kvm/hyp/switch.c
++++ b/arch/arm64/kvm/hyp/switch.c
+@@ -897,7 +897,7 @@ static void __hyp_text __hyp_call_panic_nvhe(u64 spsr, u64 elr, u64 par,
+ 	 * making sure it is a kernel address and not a PC-relative
+ 	 * reference.
+ 	 */
+-	asm volatile("ldr %0, =__hyp_panic_string" : "=r" (str_va));
++	asm volatile("ldr %0, =%1" : "=r" (str_va) : "S" (__hyp_panic_string));
  
- struct vfio_pci_ioeventfd {
- 	struct list_head	next;
-+	struct vfio_pci_device	*vdev;
- 	struct virqfd		*virqfd;
- 	void __iomem		*addr;
- 	uint64_t		data;
- 	loff_t			pos;
- 	int			bar;
- 	int			count;
-+	bool			test_mem;
- };
- 
- struct vfio_pci_irq_ctx {
-diff --git a/drivers/vfio/pci/vfio_pci_rdwr.c b/drivers/vfio/pci/vfio_pci_rdwr.c
-index 916b184df3a5..9e353c484ace 100644
---- a/drivers/vfio/pci/vfio_pci_rdwr.c
-+++ b/drivers/vfio/pci/vfio_pci_rdwr.c
-@@ -37,17 +37,70 @@
- #define vfio_ioread8	ioread8
- #define vfio_iowrite8	iowrite8
- 
-+#define VFIO_IOWRITE(size) \
-+static int vfio_pci_iowrite##size(struct vfio_pci_device *vdev,		\
-+			bool test_mem, u##size val, void __iomem *io)	\
-+{									\
-+	if (test_mem) {							\
-+		down_read(&vdev->memory_lock);				\
-+		if (!__vfio_pci_memory_enabled(vdev)) {			\
-+			up_read(&vdev->memory_lock);			\
-+			return -EIO;					\
-+		}							\
-+	}								\
-+									\
-+	vfio_iowrite##size(val, io);					\
-+									\
-+	if (test_mem)							\
-+		up_read(&vdev->memory_lock);				\
-+									\
-+	return 0;							\
-+}
-+
-+VFIO_IOWRITE(8)
-+VFIO_IOWRITE(16)
-+VFIO_IOWRITE(32)
-+#ifdef iowrite64
-+VFIO_IOWRITE(64)
-+#endif
-+
-+#define VFIO_IOREAD(size) \
-+static int vfio_pci_ioread##size(struct vfio_pci_device *vdev,		\
-+			bool test_mem, u##size *val, void __iomem *io)	\
-+{									\
-+	if (test_mem) {							\
-+		down_read(&vdev->memory_lock);				\
-+		if (!__vfio_pci_memory_enabled(vdev)) {			\
-+			up_read(&vdev->memory_lock);			\
-+			return -EIO;					\
-+		}							\
-+	}								\
-+									\
-+	*val = vfio_ioread##size(io);					\
-+									\
-+	if (test_mem)							\
-+		up_read(&vdev->memory_lock);				\
-+									\
-+	return 0;							\
-+}
-+
-+VFIO_IOREAD(8)
-+VFIO_IOREAD(16)
-+VFIO_IOREAD(32)
-+
- /*
-  * Read or write from an __iomem region (MMIO or I/O port) with an excluded
-  * range which is inaccessible.  The excluded range drops writes and fills
-  * reads with -1.  This is intended for handling MSI-X vector tables and
-  * leftover space for ROM BARs.
-  */
--static ssize_t do_io_rw(void __iomem *io, char __user *buf,
-+static ssize_t do_io_rw(struct vfio_pci_device *vdev, bool test_mem,
-+			void __iomem *io, char __user *buf,
- 			loff_t off, size_t count, size_t x_start,
- 			size_t x_end, bool iswrite)
- {
- 	ssize_t done = 0;
-+	int ret;
- 
- 	while (count) {
- 		size_t fillable, filled;
-@@ -66,9 +119,15 @@ static ssize_t do_io_rw(void __iomem *io, char __user *buf,
- 				if (copy_from_user(&val, buf, 4))
- 					return -EFAULT;
- 
--				vfio_iowrite32(val, io + off);
-+				ret = vfio_pci_iowrite32(vdev, test_mem,
-+							 val, io + off);
-+				if (ret)
-+					return ret;
- 			} else {
--				val = vfio_ioread32(io + off);
-+				ret = vfio_pci_ioread32(vdev, test_mem,
-+							&val, io + off);
-+				if (ret)
-+					return ret;
- 
- 				if (copy_to_user(buf, &val, 4))
- 					return -EFAULT;
-@@ -82,9 +141,15 @@ static ssize_t do_io_rw(void __iomem *io, char __user *buf,
- 				if (copy_from_user(&val, buf, 2))
- 					return -EFAULT;
- 
--				vfio_iowrite16(val, io + off);
-+				ret = vfio_pci_iowrite16(vdev, test_mem,
-+							 val, io + off);
-+				if (ret)
-+					return ret;
- 			} else {
--				val = vfio_ioread16(io + off);
-+				ret = vfio_pci_ioread16(vdev, test_mem,
-+							&val, io + off);
-+				if (ret)
-+					return ret;
- 
- 				if (copy_to_user(buf, &val, 2))
- 					return -EFAULT;
-@@ -98,9 +163,15 @@ static ssize_t do_io_rw(void __iomem *io, char __user *buf,
- 				if (copy_from_user(&val, buf, 1))
- 					return -EFAULT;
- 
--				vfio_iowrite8(val, io + off);
-+				ret = vfio_pci_iowrite8(vdev, test_mem,
-+							val, io + off);
-+				if (ret)
-+					return ret;
- 			} else {
--				val = vfio_ioread8(io + off);
-+				ret = vfio_pci_ioread8(vdev, test_mem,
-+						       &val, io + off);
-+				if (ret)
-+					return ret;
- 
- 				if (copy_to_user(buf, &val, 1))
- 					return -EFAULT;
-@@ -178,14 +249,6 @@ ssize_t vfio_pci_bar_rw(struct vfio_pci_device *vdev, char __user *buf,
- 
- 	count = min(count, (size_t)(end - pos));
- 
--	if (res->flags & IORESOURCE_MEM) {
--		down_read(&vdev->memory_lock);
--		if (!__vfio_pci_memory_enabled(vdev)) {
--			up_read(&vdev->memory_lock);
--			return -EIO;
--		}
--	}
--
- 	if (bar == PCI_ROM_RESOURCE) {
- 		/*
- 		 * The ROM can fill less space than the BAR, so we start the
-@@ -213,7 +276,8 @@ ssize_t vfio_pci_bar_rw(struct vfio_pci_device *vdev, char __user *buf,
- 		x_end = vdev->msix_offset + vdev->msix_size;
- 	}
- 
--	done = do_io_rw(io, buf, pos, count, x_start, x_end, iswrite);
-+	done = do_io_rw(vdev, res->flags & IORESOURCE_MEM, io, buf, pos,
-+			count, x_start, x_end, iswrite);
- 
- 	if (done >= 0)
- 		*ppos += done;
-@@ -221,9 +285,6 @@ ssize_t vfio_pci_bar_rw(struct vfio_pci_device *vdev, char __user *buf,
- 	if (bar == PCI_ROM_RESOURCE)
- 		pci_unmap_rom(pdev, io);
- out:
--	if (res->flags & IORESOURCE_MEM)
--		up_read(&vdev->memory_lock);
--
- 	return done;
- }
- 
-@@ -278,7 +339,12 @@ ssize_t vfio_pci_vga_rw(struct vfio_pci_device *vdev, char __user *buf,
- 		return ret;
- 	}
- 
--	done = do_io_rw(iomem, buf, off, count, 0, 0, iswrite);
-+	/*
-+	 * VGA MMIO is a legacy, non-BAR resource that hopefully allows
-+	 * probing, so we don't currently worry about access in relation
-+	 * to the memory enable bit in the command register.
-+	 */
-+	done = do_io_rw(vdev, false, iomem, buf, off, count, 0, 0, iswrite);
- 
- 	vga_put(vdev->pdev, rsrc);
- 
-@@ -296,17 +362,21 @@ static int vfio_pci_ioeventfd_handler(void *opaque, void *unused)
- 
- 	switch (ioeventfd->count) {
- 	case 1:
--		vfio_iowrite8(ioeventfd->data, ioeventfd->addr);
-+		vfio_pci_iowrite8(ioeventfd->vdev, ioeventfd->test_mem,
-+				  ioeventfd->data, ioeventfd->addr);
- 		break;
- 	case 2:
--		vfio_iowrite16(ioeventfd->data, ioeventfd->addr);
-+		vfio_pci_iowrite16(ioeventfd->vdev, ioeventfd->test_mem,
-+				   ioeventfd->data, ioeventfd->addr);
- 		break;
- 	case 4:
--		vfio_iowrite32(ioeventfd->data, ioeventfd->addr);
-+		vfio_pci_iowrite32(ioeventfd->vdev, ioeventfd->test_mem,
-+				   ioeventfd->data, ioeventfd->addr);
- 		break;
- #ifdef iowrite64
- 	case 8:
--		vfio_iowrite64(ioeventfd->data, ioeventfd->addr);
-+		vfio_pci_iowrite64(ioeventfd->vdev, ioeventfd->test_mem,
-+				   ioeventfd->data, ioeventfd->addr);
- 		break;
- #endif
- 	}
-@@ -378,11 +448,13 @@ long vfio_pci_ioeventfd(struct vfio_pci_device *vdev, loff_t offset,
- 		goto out_unlock;
- 	}
- 
-+	ioeventfd->vdev = vdev;
- 	ioeventfd->addr = vdev->barmap[bar] + pos;
- 	ioeventfd->data = data;
- 	ioeventfd->pos = pos;
- 	ioeventfd->bar = bar;
- 	ioeventfd->count = count;
-+	ioeventfd->test_mem = vdev->pdev->resource[bar].flags & IORESOURCE_MEM;
- 
- 	ret = vfio_virqfd_enable(ioeventfd, vfio_pci_ioeventfd_handler,
- 				 NULL, NULL, &ioeventfd->virqfd, fd);
+ 	__hyp_do_panic(str_va,
+ 		       spsr, elr,
+-- 
+2.27.0
 
