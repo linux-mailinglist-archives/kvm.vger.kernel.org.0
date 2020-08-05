@@ -2,276 +2,191 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E6F5323CF92
-	for <lists+kvm@lfdr.de>; Wed,  5 Aug 2020 21:22:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0EAFB23CFDE
+	for <lists+kvm@lfdr.de>; Wed,  5 Aug 2020 21:26:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729034AbgHETWb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 5 Aug 2020 15:22:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55450 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728962AbgHERlt (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 5 Aug 2020 13:41:49 -0400
-Received: from EUR05-VI1-obe.outbound.protection.outlook.com (mail-vi1eur05on20624.outbound.protection.outlook.com [IPv6:2a01:111:f400:7d00::624])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AC072C008694
-        for <kvm@vger.kernel.org>; Wed,  5 Aug 2020 07:34:02 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=dRfVRAGKIsp2yA4si5D90REUtbs+VBRf7/dpn/Yk8ol1jiovuoVyfieAY+AXGJaGr5BebFaUsuOZdHn8rIcpGffoEhePocCgOEGQV19HIsQqCsS3nBZErNJhveAFNpWHz88eav81HwYcz1p5gkiDURuTQSTf7H5e3mQH6FZ4T47Mo800BfLOnyHs0z95CXkfBCTxYNdpAbLkKC9fxB0e+xesiSfZbUZc4x20Yz8qp8LvBG5GFuuDc763VsAHzah2OQWvzJeF6MZ3q09z3FfZRIoVgTzGRME0IezDjINiXM1h2neabSR3xzB34n0i014gf32Sb0XYMETgAkUWnZUiqg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=rfkT8do/kbOgLCMtyVg3es7mghFtXsbz5vTkRN91GpI=;
- b=RPHDP4FIBrI0XLKaoBcNYw06j8qC6L/5p0cj423wczrp5RdVqknHYBO+GgFR2OVPiX8g9MOkqpAP2WcidXp+jT8LgnwpGbjPACw9Mt+DPBTgJ8yKa0yujGyZxUkI9ROTCzL1VgfwJyZ8jvUNyb9rFW9XJn8CiP/OujY7XEHm/ENMcGhx6qlpRRESiTaIxoc1i1XH88bO7h7XtXv4DK8lOpgSnai6233CXs6gBXT8d7oMovT4TGlupPhw8rGyOed9kptJjRvYsVLXVLNZpzdnL6UZNBdNEaFSh1RFk9NjNAEBqDXTJwrM3oGCaJpX/KrW/raMLd45yuQFeskRZYcqxw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=mellanox.com; dmarc=pass action=none header.from=mellanox.com;
- dkim=pass header.d=mellanox.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Mellanox.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=rfkT8do/kbOgLCMtyVg3es7mghFtXsbz5vTkRN91GpI=;
- b=JkcIvkKaO1+Q0IwmKB3khjL5K7CbGGdL45yNVgIi7LToaUuml9CaT4yADanrT4eoE5dk1JyBFyktNhh0SeNDZkhz6w5tFR6IZYt+QaJWsaw1sK80do8E2oSnNdAj5J2b4+UDE/IFg1jq8I0OIPB6Y2hKpwAMANWCmgOVB4o9ZeY=
-Authentication-Results: intel.com; dkim=none (message not signed)
- header.d=none;intel.com; dmarc=none action=none header.from=mellanox.com;
-Received: from DBBPR05MB6364.eurprd05.prod.outlook.com (2603:10a6:10:cc::22)
- by DB6PR05MB3175.eurprd05.prod.outlook.com (2603:10a6:6:1a::25) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3239.21; Wed, 5 Aug
- 2020 10:53:23 +0000
-Received: from DBBPR05MB6364.eurprd05.prod.outlook.com
- ([fe80::6510:4e88:1d64:18ae]) by DBBPR05MB6364.eurprd05.prod.outlook.com
- ([fe80::6510:4e88:1d64:18ae%6]) with mapi id 15.20.3239.022; Wed, 5 Aug 2020
- 10:53:23 +0000
-Date:   Wed, 5 Aug 2020 12:53:19 +0200
-From:   Jiri Pirko <jiri@mellanox.com>
-To:     Yan Zhao <yan.y.zhao@intel.com>
-Cc:     Jason Wang <jasowang@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        kvm@vger.kernel.org, libvir-list@redhat.com, qemu-devel@nongnu.org,
-        kwankhede@nvidia.com, eauger@redhat.com, xin-ran.wang@intel.com,
-        corbet@lwn.net, openstack-discuss@lists.openstack.org,
-        shaohe.feng@intel.com, kevin.tian@intel.com, eskultet@redhat.com,
-        jian-feng.ding@intel.com, dgilbert@redhat.com,
-        zhenyuw@linux.intel.com, hejie.xu@intel.com, bao.yumeng@zte.com.cn,
-        smooney@redhat.com, intel-gvt-dev@lists.freedesktop.org,
-        berrange@redhat.com, dinechin@redhat.com, devel@ovirt.org,
-        Parav Pandit <parav@mellanox.com>
-Subject: Re: device compatibility interface for live migration with assigned
- devices
-Message-ID: <20200805105319.GF2177@nanopsycho>
-References: <20200727072440.GA28676@joy-OptiPlex-7040>
- <20200727162321.7097070e@x1.home>
- <20200729080503.GB28676@joy-OptiPlex-7040>
- <20200804183503.39f56516.cohuck@redhat.com>
- <c178a0d3-269d-1620-22b1-9010f602d8ff@redhat.com>
- <20200805021654.GB30485@joy-OptiPlex-7040>
- <2624b12f-3788-7e2b-2cb7-93534960bcb7@redhat.com>
- <20200805075647.GB2177@nanopsycho>
- <eb1d01c2-fbad-36b6-10cf-9e03483a736b@redhat.com>
- <20200805093338.GC30485@joy-OptiPlex-7040>
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20200805093338.GC30485@joy-OptiPlex-7040>
-X-ClientProxiedBy: FR2P281CA0004.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:d10:a::14) To DBBPR05MB6364.eurprd05.prod.outlook.com
- (2603:10a6:10:cc::22)
+        id S1728749AbgHET0K (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 5 Aug 2020 15:26:10 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:53987 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1728748AbgHERO1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 5 Aug 2020 13:14:27 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1596647665;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=2J9LJah/aWCk57IzVK6fx/wEiWGV1AN7ftTN0d7Z7L0=;
+        b=c5feeV6isMViIGc3J1ZgfS21KWW2pTbSgL7fzaFO/Q8QFgQ/e6OGxG+qKfwjAM1zhXrKUr
+        IEOzkJ5BBsoa7emHL6h+NgeRYuZ8WbUuayVnGlzrv2vnDpKZDfY6YXAMRSh+OyA2u070pl
+        qTMl1ASZezCynPQdZ3l0ihcgzUfkVq8=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-13-Z9EQF295MG-1KhS46ZV88Q-1; Wed, 05 Aug 2020 07:34:12 -0400
+X-MC-Unique: Z9EQF295MG-1KhS46ZV88Q-1
+Received: by mail-wm1-f69.google.com with SMTP id q15so2605771wmj.6
+        for <kvm@vger.kernel.org>; Wed, 05 Aug 2020 04:34:12 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=2J9LJah/aWCk57IzVK6fx/wEiWGV1AN7ftTN0d7Z7L0=;
+        b=kPyv7+gjEKCnhj5+ZHetJqJHanJqgO8hPYR2WXwbUYJjHKSeu6jJkgei/1LHN+BAjP
+         yAxOcLzN4nLGas9bxD9TxotLHPyim8UZJPzOa8BN8qGIuRYZkJCDxORd4/BDXao/iyyN
+         bMYRrJQbDB0C6y9TsXUvBJ+8IuhwSkEyKmlj/J0TURE4frCu9SufytOcc9Ef8qfBqi+i
+         vrquyHTYbPEwfcZKPmfI+guitkqZzkCGRb3ZAkJtvOgxzgkbzG6xxrd7FflgpVCES/mF
+         gG3YHmwYSmO1e2jUzeGq6MasJHF6fmxH/X7gFADaaHjl5SZcD8YgsYQd9wwmsYwqP2c2
+         uDLA==
+X-Gm-Message-State: AOAM530nGAJ6oF5pkcFME5YnB8zPq71CyFpOPCthsLkrBA4ydXwJzJMN
+        5rpRaKwl73bQ8AY5AiV3jIjTJfmnM3DPOvenrcfKm+tPUYsFKB5U+kZdF6w4Ief55lp4MkFMt9e
+        HoGg9/AR8dAGZ
+X-Received: by 2002:a7b:c8cd:: with SMTP id f13mr2721069wml.29.1596627251690;
+        Wed, 05 Aug 2020 04:34:11 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyUHoMIFdt/4QubWV9RKUWmzgFURf9uw07yiy0Uaimh1czYGUqufIiAYoZ9lh96it76IKA3Qg==
+X-Received: by 2002:a7b:c8cd:: with SMTP id f13mr2721038wml.29.1596627251392;
+        Wed, 05 Aug 2020 04:34:11 -0700 (PDT)
+Received: from redhat.com (bzq-79-178-123-8.red.bezeqint.net. [79.178.123.8])
+        by smtp.gmail.com with ESMTPSA id c10sm2340858wro.84.2020.08.05.04.34.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 05 Aug 2020 04:34:10 -0700 (PDT)
+Date:   Wed, 5 Aug 2020 07:34:06 -0400
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Mathieu Poirier <mathieu.poirier@linaro.org>
+Cc:     Guennadi Liakhovetski <guennadi.liakhovetski@linux.intel.com>,
+        kvm@vger.kernel.org,
+        linux-remoteproc <linux-remoteproc@vger.kernel.org>,
+        virtualization@lists.linux-foundation.org,
+        sound-open-firmware@alsa-project.org,
+        Pierre-Louis Bossart <pierre-louis.bossart@linux.intel.com>,
+        Liam Girdwood <liam.r.girdwood@linux.intel.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Ohad Ben-Cohen <ohad@wizery.com>,
+        Bjorn Andersson <bjorn.andersson@linaro.org>,
+        Vincent Whitchurch <vincent.whitchurch@axis.com>
+Subject: Re: [PATCH v4 0/4] Add a vhost RPMsg API
+Message-ID: <20200805073253-mutt-send-email-mst@kernel.org>
+References: <20200722150927.15587-1-guennadi.liakhovetski@linux.intel.com>
+ <20200730120805-mutt-send-email-mst@kernel.org>
+ <20200731054752.GA28005@ubuntu>
+ <CANLsYkxuCf6yeoqJ-T2x3LHvr9+DuxFdcsxJPmrh9A4H8yNr3w@mail.gmail.com>
+ <20200803164605-mutt-send-email-mst@kernel.org>
+ <CANLsYkx9e=-2dU26Lx5JFrtrbV07Vtwsi3gFphxKW5QRiwqoHg@mail.gmail.com>
+ <20200804100640-mutt-send-email-mst@kernel.org>
+ <CANLsYkzqvev1es_J-FYaBv02jkGHZwpn2cNwZKamAsZ_D=QB7g@mail.gmail.com>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from nanopsycho (85.163.43.78) by FR2P281CA0004.DEUP281.PROD.OUTLOOK.COM (2603:10a6:d10:a::14) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3261.12 via Frontend Transport; Wed, 5 Aug 2020 10:53:21 +0000
-X-Originating-IP: [85.163.43.78]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-HT: Tenant
-X-MS-Office365-Filtering-Correlation-Id: 8b41274d-ec81-4dc9-5688-08d8392dc5d4
-X-MS-TrafficTypeDiagnostic: DB6PR05MB3175:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <DB6PR05MB31753C6A751E091733E805E8BD4B0@DB6PR05MB3175.eurprd05.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: PEzo+jy7cQh7gPwTjkb4PfOzl538yMIcb0Zio+6j/Nyt9ajYiVsoxHk9waJjARBSI+AIujFHXiSbb7DYhrxN0pfjB2oopn1JVRRcwzP6Tu3kHG0FjnE2ir30tOrHbJ8ysCAekV1YxnQa65cHc90yikrlKr6B4ALC3n2J//Xz74EkzH3VyeLUk9QanzsopiG13Ey9U0iF22mZ/hznMJEkeXI2t9ukcKtPhCag9m0XUAzjTRcSObOlQ1b7DXCm5Bm22neU4uCYXU17Zw6XRgPa5y6nOrqv/tI+2bIQcvoJGbEpR25r1mCi42j23Jq+h7G3+CL7/nI6WEKnMp5AfSYgbQ==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DBBPR05MB6364.eurprd05.prod.outlook.com;PTR:;CAT:NONE;SFTY:;SFS:(4636009)(366004)(396003)(39860400002)(136003)(376002)(346002)(52116002)(1076003)(6496006)(33656002)(83380400001)(186003)(6916009)(33716001)(4326008)(7416002)(16526019)(8676002)(66946007)(107886003)(66556008)(9686003)(316002)(55016002)(956004)(54906003)(9576002)(26005)(66476007)(2906002)(5660300002)(86362001)(478600001)(8936002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData: V96vhdqQ4MTMABcXDnfQo40/+OYfUg+WQU0PgNQR/Gxc8R12jRL0w+rePsvH4xKK1nZKJrV5Q+jZz7o/r49W5Ur8aY852FWxv55co5nsYIYq8686GgH9SeXWuZ4nG803LXg1XSHC7Ae+4KwX2AGwrBBzFLpSYlmhxpc86bdxdDvv58K+vpME3Efcky6qc5bcYEAn0mTE1dG7LmtWcCcvhuqEed9X/dow6FEaV77O8hF7f1lyNwHc3VH1BkEguHe6KYoRQry6mSRSZO1/4HzLcZfVVqFYq/G7++/k7/8QpkzGxTU6/SP2be662LsVntIKInmymhOLIEMp7kW8eT5lTz3G/0OyclkB9ORYEHyslZOLS7eFy1qf03t1S2eJZoS2CiTSCRDAwl+cpJUsAezR4yXE/2rVLJ5HQMec+GyJjRfyHYUzeqruYbIzehEzv8w9KBLdH2e1oyVJgQnGGQhMsAU5hRUzGhK+TfHyoD8EudnOMbd/prFzWfLE5O/5UUUQ+nC01PlPhmWfYiIi/sNTvxOQeeGbpnCOFxrJ6xakQfVfkZZSoHbrIRGeVAXb1a3m5ehMaFVyO0PCLUb05zupcD1YaJRuJGJSLpcThK/61G4WYRnFpkcGPNxGvRiV6m2LDkuQQnuHHJfonurq7Z+ywQ==
-X-OriginatorOrg: Mellanox.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 8b41274d-ec81-4dc9-5688-08d8392dc5d4
-X-MS-Exchange-CrossTenant-AuthSource: DBBPR05MB6364.eurprd05.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Aug 2020 10:53:23.0582
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: a652971c-7d2e-4d9b-a6a4-d149256f461b
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Dl/e0IjnfkRKlFA97H04T2InDckrrLp2n3JtIKYirwpkWT2VPFeaLJ3LsKM4dz7eXj26G5npCJjMuH9CTYVbNA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB6PR05MB3175
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CANLsYkzqvev1es_J-FYaBv02jkGHZwpn2cNwZKamAsZ_D=QB7g@mail.gmail.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Wed, Aug 05, 2020 at 11:33:38AM CEST, yan.y.zhao@intel.com wrote:
->On Wed, Aug 05, 2020 at 04:02:48PM +0800, Jason Wang wrote:
->> 
->> On 2020/8/5 下午3:56, Jiri Pirko wrote:
->> > Wed, Aug 05, 2020 at 04:41:54AM CEST, jasowang@redhat.com wrote:
->> > > On 2020/8/5 上午10:16, Yan Zhao wrote:
->> > > > On Wed, Aug 05, 2020 at 10:22:15AM +0800, Jason Wang wrote:
->> > > > > On 2020/8/5 上午12:35, Cornelia Huck wrote:
->> > > > > > [sorry about not chiming in earlier]
->> > > > > > 
->> > > > > > On Wed, 29 Jul 2020 16:05:03 +0800
->> > > > > > Yan Zhao <yan.y.zhao@intel.com> wrote:
->> > > > > > 
->> > > > > > > On Mon, Jul 27, 2020 at 04:23:21PM -0600, Alex Williamson wrote:
->> > > > > > (...)
->> > > > > > 
->> > > > > > > > Based on the feedback we've received, the previously proposed interface
->> > > > > > > > is not viable.  I think there's agreement that the user needs to be
->> > > > > > > > able to parse and interpret the version information.  Using json seems
->> > > > > > > > viable, but I don't know if it's the best option.  Is there any
->> > > > > > > > precedent of markup strings returned via sysfs we could follow?
->> > > > > > I don't think encoding complex information in a sysfs file is a viable
->> > > > > > approach. Quoting Documentation/filesystems/sysfs.rst:
->> > > > > > 
->> > > > > > "Attributes should be ASCII text files, preferably with only one value
->> > > > > > per file. It is noted that it may not be efficient to contain only one
->> > > > > > value per file, so it is socially acceptable to express an array of
->> > > > > > values of the same type.
->> > > > > > Mixing types, expressing multiple lines of data, and doing fancy
->> > > > > > formatting of data is heavily frowned upon."
->> > > > > > 
->> > > > > > Even though this is an older file, I think these restrictions still
->> > > > > > apply.
->> > > > > +1, that's another reason why devlink(netlink) is better.
->> > > > > 
->> > > > hi Jason,
->> > > > do you have any materials or sample code about devlink, so we can have a good
->> > > > study of it?
->> > > > I found some kernel docs about it but my preliminary study didn't show me the
->> > > > advantage of devlink.
->> > > 
->> > > CC Jiri and Parav for a better answer for this.
->> > > 
->> > > My understanding is that the following advantages are obvious (as I replied
->> > > in another thread):
->> > > 
->> > > - existing users (NIC, crypto, SCSI, ib), mature and stable
->> > > - much better error reporting (ext_ack other than string or errno)
->> > > - namespace aware
->> > > - do not couple with kobject
->> > Jason, what is your use case?
->> 
->> 
->> I think the use case is to report device compatibility for live migration.
->> Yan proposed a simple sysfs based migration version first, but it looks not
->> sufficient and something based on JSON is discussed.
->> 
->> Yan, can you help to summarize the discussion so far for Jiri as a
->> reference?
->> 
->yes.
->we are currently defining an device live migration compatibility
->interface in order to let user space like openstack and libvirt knows
->which two devices are live migration compatible.
->currently the devices include mdev (a kernel emulated virtual device)
->and physical devices (e.g.  a VF of a PCI SRIOV device).
->
->the attributes we want user space to compare including
->common attribues:
->    device_api: vfio-pci, vfio-ccw...
->    mdev_type: mdev type of mdev or similar signature for physical device
->               It specifies a device's hardware capability. e.g.
->	       i915-GVTg_V5_4 means it's of 1/4 of a gen9 Intel graphics
->	       device.
->    software_version: device driver's version.
->               in <major>.<minor>[.bugfix] scheme, where there is no
->	       compatibility across major versions, minor versions have
->	       forward compatibility (ex. 1-> 2 is ok, 2 -> 1 is not) and
->	       bugfix version number indicates some degree of internal
->	       improvement that is not visible to the user in terms of
->	       features or compatibility,
->
->vendor specific attributes: each vendor may define different attributes
->   device id : device id of a physical devices or mdev's parent pci device.
->               it could be equal to pci id for pci devices
->   aggregator: used together with mdev_type. e.g. aggregator=2 together
->               with i915-GVTg_V5_4 means 2*1/4=1/2 of a gen9 Intel
->	       graphics device.
->   remote_url: for a local NVMe VF, it may be configured with a remote
->               url of a remote storage and all data is stored in the
->	       remote side specified by the remote url.
->   ...
->
->Comparing those attributes by user space alone is not an easy job, as it
->can't simply assume an equal relationship between source attributes and
->target attributes. e.g.
->for a source device of mdev_type=i915-GVTg_V5_4,aggregator=2, (1/2 of
->gen9), it actually could find a compatible device of
->mdev_type=i915-GVTg_V5_8,aggregator=4 (also 1/2 of gen9),
->if mdev_type of i915-GVTg_V5_4 is not available in the target machine.
->
->So, in our current proposal, we want to create two sysfs attributes
->under a device sysfs node.
->/sys/<path to device>/migration/self
->/sys/<path to device>/migration/compatible
->
->#cat /sys/<path to device>/migration/self
->device_type=vfio_pci
->mdev_type=i915-GVTg_V5_4
->device_id=8086591d
->aggregator=2
->software_version=1.0.0
->
->#cat /sys/<path to device>/migration/compatible
->device_type=vfio_pci
->mdev_type=i915-GVTg_V5_{val1:int:2,4,8}
->device_id=8086591d
->aggregator={val1}/2
->software_version=1.0.0
->
->The /sys/<path to device>/migration/self specifies self attributes of
->a device.
->The /sys/<path to device>/migration/compatible specifies the list of
->compatible devices of a device. as in the example, compatible devices
->could have
->	device_type == vfio_pci &&
->	device_id == 8086591d   &&
->	software_version == 1.0.0 &&
->        (
->	(mdev_type of i915-GVTg_V5_2 && aggregator==1) ||
->	(mdev_type of i915-GVTg_V5_4 && aggregator==2) ||
->	(mdev_type of i915-GVTg_V5_8 && aggregator=4)
->	)
->
->by comparing whether a target device is in compatible list of source
->device, the user space can know whether a two devices are live migration
->compatible.
->
->Additional notes:
->1)software_version in the compatible list may not be necessary as it
->already has a major.minor.bugfix scheme.
->2)for vendor attribute like remote_url, it may not be statically
->assigned and could be changed with a device interface.
->
->So, as Cornelia pointed that it's not good to use complex format in
->a sysfs attribute, we'd like to know whether there're other good ways to
->our use case, e.g. splitting a single attribute to multiple simple sysfs
->attributes as what Cornelia suggested or devlink that Jason has strongly
->recommended.
+On Tue, Aug 04, 2020 at 01:30:32PM -0600, Mathieu Poirier wrote:
+> On Tue, 4 Aug 2020 at 08:07, Michael S. Tsirkin <mst@redhat.com> wrote:
+> >
+> > On Tue, Aug 04, 2020 at 07:37:49AM -0600, Mathieu Poirier wrote:
+> > > On Mon, 3 Aug 2020 at 14:47, Michael S. Tsirkin <mst@redhat.com> wrote:
+> > > >
+> > > > On Mon, Aug 03, 2020 at 07:25:24AM -0600, Mathieu Poirier wrote:
+> > > > > On Thu, 30 Jul 2020 at 23:47, Guennadi Liakhovetski
+> > > > > <guennadi.liakhovetski@linux.intel.com> wrote:
+> > > > > >
+> > > > > > Hi Michael,
+> > > > > >
+> > > > > > On Thu, Jul 30, 2020 at 12:08:29PM -0400, Michael S. Tsirkin wrote:
+> > > > > > > On Wed, Jul 22, 2020 at 05:09:23PM +0200, Guennadi Liakhovetski wrote:
+> > > > > > > > Hi,
+> > > > > > > >
+> > > > > > > > Now that virtio-rpmsg endianness fixes have been merged we can
+> > > > > > > > proceed with the next step.
+> > > > > > >
+> > > > > > > Which tree is this for?
+> > > > > >
+> > > > > > The essential part of this series is for drivers/vhost, so, I presume
+> > > > > > that should be the target tree as well. There is however a small part
+> > > > > > for the drivers/rpmsg, should I split this series in two or shall we
+> > > > > > first review is as a whole to make its goals clearer?
+> > > > >
+> > > > > I suggest to keep it whole for now.
+> > > >
+> > > >
+> > > > Ok can I get some acks please?
+> > >
+> > > Yes, as soon as I have the opportunity to review the work.  There is a
+> > > lot of volume on the linux-remoteproc mailing list lately and
+> > > patchsets are reviewed in the order they have been received.
+> >
+> > Well the merge window is open, I guess I'll merge this and
+> > any issues can be addressed later then?
+> 
+> Please don't do that.  I prefer to miss a merge window than impacting
+> upstream consumers.  This patch will be reviewed, just not in time for
+> this merge window.
 
-Hi Yan.
-
-Thanks for the explanation, I'm still fuzzy about the details.
-Anyway, I suggest you to check "devlink dev info" command we have
-implemented for multiple drivers. You can try netdevsim to test this.
-I think that the info you need to expose might be put there.
-
-Devlink creates instance per-device. Specific device driver calls into
-devlink core to create the instance.  What device do you have? What
-driver is it handled by?
+OK then.
 
 
->
->Thanks
->Yan
->
->
->
+> >
+> > > > Also, I put this in my linux-next branch on
+> > > >
+> > > > https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git
+> > > >
+> > > > there were some conflicts - could you pls test and report it's ok?
+> > > >
+> > > > > >
+> > > > > > Thanks
+> > > > > > Guennadi
+> > > > > >
+> > > > > > > > v4:
+> > > > > > > > - add endianness conversions to comply with the VirtIO standard
+> > > > > > > >
+> > > > > > > > v3:
+> > > > > > > > - address several checkpatch warnings
+> > > > > > > > - address comments from Mathieu Poirier
+> > > > > > > >
+> > > > > > > > v2:
+> > > > > > > > - update patch #5 with a correct vhost_dev_init() prototype
+> > > > > > > > - drop patch #6 - it depends on a different patch, that is currently
+> > > > > > > >   an RFC
+> > > > > > > > - address comments from Pierre-Louis Bossart:
+> > > > > > > >   * remove "default n" from Kconfig
+> > > > > > > >
+> > > > > > > > Linux supports RPMsg over VirtIO for "remote processor" / AMP use
+> > > > > > > > cases. It can however also be used for virtualisation scenarios,
+> > > > > > > > e.g. when using KVM to run Linux on both the host and the guests.
+> > > > > > > > This patch set adds a wrapper API to facilitate writing vhost
+> > > > > > > > drivers for such RPMsg-based solutions. The first use case is an
+> > > > > > > > audio DSP virtualisation project, currently under development, ready
+> > > > > > > > for review and submission, available at
+> > > > > > > > https://github.com/thesofproject/linux/pull/1501/commits
+> > > > > > > >
+> > > > > > > > Thanks
+> > > > > > > > Guennadi
+> > > > > > > >
+> > > > > > > > Guennadi Liakhovetski (4):
+> > > > > > > >   vhost: convert VHOST_VSOCK_SET_RUNNING to a generic ioctl
+> > > > > > > >   rpmsg: move common structures and defines to headers
+> > > > > > > >   rpmsg: update documentation
+> > > > > > > >   vhost: add an RPMsg API
+> > > > > > > >
+> > > > > > > >  Documentation/rpmsg.txt          |   6 +-
+> > > > > > > >  drivers/rpmsg/virtio_rpmsg_bus.c |  78 +------
+> > > > > > > >  drivers/vhost/Kconfig            |   7 +
+> > > > > > > >  drivers/vhost/Makefile           |   3 +
+> > > > > > > >  drivers/vhost/rpmsg.c            | 375 +++++++++++++++++++++++++++++++
+> > > > > > > >  drivers/vhost/vhost_rpmsg.h      |  74 ++++++
+> > > > > > > >  include/linux/virtio_rpmsg.h     |  83 +++++++
+> > > > > > > >  include/uapi/linux/rpmsg.h       |   3 +
+> > > > > > > >  include/uapi/linux/vhost.h       |   4 +-
+> > > > > > > >  9 files changed, 553 insertions(+), 80 deletions(-)
+> > > > > > > >  create mode 100644 drivers/vhost/rpmsg.c
+> > > > > > > >  create mode 100644 drivers/vhost/vhost_rpmsg.h
+> > > > > > > >  create mode 100644 include/linux/virtio_rpmsg.h
+> > > > > > > >
+> > > > > > > > --
+> > > > > > > > 2.27.0
+> > > > > > >
+> > > >
+> >
+
