@@ -2,106 +2,85 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B371023D0F5
-	for <lists+kvm@lfdr.de>; Wed,  5 Aug 2020 21:54:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9F9FD23D144
+	for <lists+kvm@lfdr.de>; Wed,  5 Aug 2020 21:58:30 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729612AbgHETy4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 5 Aug 2020 15:54:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46308 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728071AbgHEQsi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 5 Aug 2020 12:48:38 -0400
-Received: from mail-pl1-x641.google.com (mail-pl1-x641.google.com [IPv6:2607:f8b0:4864:20::641])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3D017C0086D0;
-        Wed,  5 Aug 2020 07:15:28 -0700 (PDT)
-Received: by mail-pl1-x641.google.com with SMTP id z20so4577113plo.6;
-        Wed, 05 Aug 2020 07:15:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id;
-        bh=rEOIric6Ir5n+lOqeIUvVaHq8kkbGDlIxFcFnaIeFVQ=;
-        b=ZkRT9n6qi1MmrCkM+E537KhVRT1l3vdm2/Ro4pCdDJRA6UkpwxDmS8ZAyxOdST5s62
-         WBF4QZ/RCetbs01gGxXt1a02B2K+L5tE6l8UkHXoItIluhgeuw3INFKrnuvDNdTdCWHN
-         s/QyMREKiE87UIIBQXZuCKez7UJ63uDhXPgUH6Xwz9mcxZMDtjvVxt4eceSv4x8PTyGA
-         B5ZGKsXdPM4wZ1E+xnGW/xdPlkv0xTcfJuKeReyDLfljFHOZfQKYI59kg0aamYAy54b2
-         nSbl8F62rRI6F1BGgexyInUdVE8u38O7AcmnjAEZs2NO7ET5GcxsI65CDT86tzgobmGs
-         pryA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id;
-        bh=rEOIric6Ir5n+lOqeIUvVaHq8kkbGDlIxFcFnaIeFVQ=;
-        b=V3TOuKnc2p7tK3ANQdyyk48gTmy385C1LGWO/BUZP6oSTjwtl3LgibourgFR0BWzbV
-         CJnY+EiURtpNzPg92sVW54dGjGdTCv6OEuuZyxVu1vlm34kc+4iKhw5xxfGZcreA39jF
-         qkbkxxTfk4X0PzWIbitNWFALtV/X5dQdwyiw13lnZlwZyXTzvkdYY+lFp0pzNEcGdxUl
-         bFr3oJY8hAUfeEq66QFDChKURhcx631X3X+dgLMLgO95zEWhL3wP+VvbjClZIAhC1Eh6
-         SRgppINgoCkUgGIPVSVwnQtJNnq2rK25O4DXc+5VDrc92g52Q+aNkAR/gPegYES8FFei
-         KrhQ==
-X-Gm-Message-State: AOAM533x1XHlloGm3cEUHDCjCKDixSt+69+cTE9wNDmMXJ5a5dov0Mm0
-        fAudTHotGtiJ9ASQ0vie42Q=
-X-Google-Smtp-Source: ABdhPJxoCHeKbtH4i8Re0QtrWCP7cYen3eIDSZ4CjAepg/EGPcmYe2gP1t4htLViL7C20uPS82QTlA==
-X-Received: by 2002:a17:902:b489:: with SMTP id y9mr3065180plr.99.1596636927791;
-        Wed, 05 Aug 2020 07:15:27 -0700 (PDT)
-Received: from localhost.localdomain ([203.205.141.62])
-        by smtp.gmail.com with ESMTPSA id q82sm4253725pfc.139.2020.08.05.07.15.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 05 Aug 2020 07:15:27 -0700 (PDT)
-From:   Yulei Zhang <yulei.kernel@gmail.com>
-To:     pbonzini@redhat.com
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        sean.j.christopherson@intel.com, jmattson@google.com,
-        vkuznets@redhat.com, xiaoguangrong.eric@gmail.com,
-        kernellwp@gmail.com, lihaiwei.kernel@gmail.com,
-        Yulei Zhang <yuleixzhang@tencent.com>
-Subject: [RFC 9/9] Handle certain mmu exposed functions properly while turn on direct build EPT mode
-Date:   Wed,  5 Aug 2020 22:16:19 +0800
-Message-Id: <20200805141619.9529-1-yulei.kernel@gmail.com>
-X-Mailer: git-send-email 2.17.1
+        id S1729252AbgHET61 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 5 Aug 2020 15:58:27 -0400
+Received: from foss.arm.com ([217.140.110.172]:33258 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726900AbgHEQnI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 5 Aug 2020 12:43:08 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 1FC041045;
+        Wed,  5 Aug 2020 08:37:23 -0700 (PDT)
+Received: from [192.168.1.84] (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 5DE223F7D7;
+        Wed,  5 Aug 2020 08:37:22 -0700 (PDT)
+Subject: Re: [PATCH v2 0/6] KVM: arm64: pvtime: Fixes and a new cap
+To:     Andrew Jones <drjones@redhat.com>, kvm@vger.kernel.org,
+        kvmarm@lists.cs.columbia.edu
+Cc:     maz@kernel.org, pbonzini@redhat.com
+References: <20200804170604.42662-1-drjones@redhat.com>
+From:   Steven Price <steven.price@arm.com>
+Message-ID: <c5dbe385-d0d5-94f5-5e8a-620e439e482b@arm.com>
+Date:   Wed, 5 Aug 2020 16:37:20 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
+MIME-Version: 1.0
+In-Reply-To: <20200804170604.42662-1-drjones@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-GB
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Yulei Zhang <yuleixzhang@tencent.com>
+On 04/08/2020 18:05, Andrew Jones wrote:
+> v2:
+>    - ARM_SMCCC_HV_PV_TIME_FEATURES now also returns SMCCC_RET_NOT_SUPPORTED
+>      when steal time is not supported
+>    - Added READ_ONCE() for the run_delay read
+>    - Reworked kvm_put/get_guest to not require type as a parameter
+>    - Added some more text to the documentation for KVM_CAP_STEAL_TIME
+>    - Enough changed that I didn't pick up Steven's r-b's
 
-Signed-off-by: Yulei Zhang <yuleixzhang@tencent.com>
----
- arch/x86/kvm/mmu/mmu.c | 9 +++++++++
- 1 file changed, 9 insertions(+)
+Feel free to add my r-b's - the changes all look fine to me.
 
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index f963a3b0500f..bad01f66983d 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -1775,6 +1775,9 @@ bool kvm_mmu_slot_gfn_write_protect(struct kvm *kvm,
- 	int i;
- 	bool write_protected = false;
- 
-+	if (kvm->arch.global_root_hpa)
-+		return write_protected;
-+
- 	for (i = PT_PAGE_TABLE_LEVEL; i <= PT_MAX_HUGEPAGE_LEVEL; ++i) {
- 		rmap_head = __gfn_to_rmap(gfn, i, slot);
- 		write_protected |= __rmap_write_protect(kvm, rmap_head, true);
-@@ -5835,6 +5838,9 @@ static void kvm_zap_obsolete_pages(struct kvm *kvm)
-  */
- static void kvm_mmu_zap_all_fast(struct kvm *kvm)
- {
-+	if (kvm->arch.global_root_hpa)
-+		return;
-+
- 	lockdep_assert_held(&kvm->slots_lock);
- 
- 	spin_lock(&kvm->mmu_lock);
-@@ -5897,6 +5903,9 @@ void kvm_zap_gfn_range(struct kvm *kvm, gfn_t gfn_start, gfn_t gfn_end)
- 	struct kvm_memory_slot *memslot;
- 	int i;
- 
-+	if (kvm->arch.global_root_hpa)
-+		return;
-+
- 	spin_lock(&kvm->mmu_lock);
- 	for (i = 0; i < KVM_ADDRESS_SPACE_NUM; i++) {
- 		slots = __kvm_memslots(kvm, i);
--- 
-2.17.1
+Thanks,
+
+Steve
+
+> 
+> The first four patches in the series are fixes that come from testing
+> and reviewing pvtime code while writing the QEMU support[*]. The last
+> patch is only a convenience for userspace, and I wouldn't be heartbroken
+> if it wasn't deemed worth it. The QEMU patches are currently written
+> without the cap. However, if the cap is accepted, then I'll change the
+> QEMU code to use it.
+> 
+> Thanks,
+> drew
+> 
+> [*] https://lists.gnu.org/archive/html/qemu-devel/2020-07/msg03856.html
+>      (a v2 of this series will also be posted shortly)
+> 
+> Andrew Jones (6):
+>    KVM: arm64: pvtime: steal-time is only supported when configured
+>    KVM: arm64: pvtime: Fix potential loss of stolen time
+>    KVM: arm64: Drop type input from kvm_put_guest
+>    KVM: arm64: pvtime: Fix stolen time accounting across migration
+>    KVM: Documentation: Minor fixups
+>    arm64/x86: KVM: Introduce steal-time cap
+> 
+>   Documentation/virt/kvm/api.rst    | 22 ++++++++++++++++++----
+>   arch/arm64/include/asm/kvm_host.h |  2 +-
+>   arch/arm64/kvm/arm.c              |  3 +++
+>   arch/arm64/kvm/pvtime.c           | 29 +++++++++++++----------------
+>   arch/x86/kvm/x86.c                |  3 +++
+>   include/linux/kvm_host.h          | 31 ++++++++++++++++++++++++++-----
+>   include/uapi/linux/kvm.h          |  1 +
+>   7 files changed, 65 insertions(+), 26 deletions(-)
+> 
 
