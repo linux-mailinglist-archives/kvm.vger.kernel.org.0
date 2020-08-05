@@ -2,32 +2,32 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E549E23CF08
-	for <lists+kvm@lfdr.de>; Wed,  5 Aug 2020 21:12:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4F98523CEFE
+	for <lists+kvm@lfdr.de>; Wed,  5 Aug 2020 21:11:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729042AbgHETMV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 5 Aug 2020 15:12:21 -0400
-Received: from mail.kernel.org ([198.145.29.99]:34514 "EHLO mail.kernel.org"
+        id S1728626AbgHETLI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 5 Aug 2020 15:11:08 -0400
+Received: from mail.kernel.org ([198.145.29.99]:35358 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728918AbgHES1V (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 5 Aug 2020 14:27:21 -0400
+        id S1729246AbgHESaU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 5 Aug 2020 14:30:20 -0400
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 3D72F22D04;
-        Wed,  5 Aug 2020 18:26:07 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 8518422E01;
+        Wed,  5 Aug 2020 18:26:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1596651967;
-        bh=B/jPCLQ/xBA20yQ0kQHCyvDom/Z2WtI15fihJ9w0l20=;
+        s=default; t=1596652018;
+        bh=qWbqjPlIPwkyEPb+J2ieeFiKJ1fw2t8X5TuAlqMXn4o=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=nS9sEKoycrPqJyLTvjfjAHO2VpVE03KGBalunyjpUIG1BMGYwNIOMb/SbOoN1iSn6
-         jn7tEE52oQWe6shKPN9lsTd7O1NQsPFARYBBDKcnAM0vV8bwa8MSv32gRYtuK8VHPo
-         j0vpTWm8yTCG9Np5oVUVjrOtqs2LCEXMeIfn6xu0=
+        b=vMLT1zygplaGzq1ry484nkOe49QbNtJysFnQnA0VGRPDz5QKI9WoHaBh6OIvAKxZC
+         ZSlMV1dLmyWCOjtZl/foqv2sJBoKSjYZTwiw1+hqY+63NS3fSREa+GpzxQ+CrXZKwe
+         2c1EXdR1vs50js27ni2fL2Vl3jAngS9wSIs4xUOA=
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=why.lan)
         by disco-boy.misterjones.org with esmtpsa (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
         (Exim 4.92)
         (envelope-from <maz@kernel.org>)
-        id 1k3Nfz-0004w9-Ay; Wed, 05 Aug 2020 18:58:07 +0100
+        id 1k3Ng0-0004w9-5p; Wed, 05 Aug 2020 18:58:08 +0100
 From:   Marc Zyngier <maz@kernel.org>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Alexander Graf <graf@amazon.com>,
@@ -47,9 +47,9 @@ Cc:     Alexander Graf <graf@amazon.com>,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
         linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
         kvm@vger.kernel.org, kernel-team@android.com
-Subject: [PATCH 50/56] KVM: arm64: Substitute RANDOMIZE_BASE for HARDEN_EL2_VECTORS
-Date:   Wed,  5 Aug 2020 18:56:54 +0100
-Message-Id: <20200805175700.62775-51-maz@kernel.org>
+Subject: [PATCH 51/56] KVM: arm64: Ensure that all nVHE hyp code is in .hyp.text
+Date:   Wed,  5 Aug 2020 18:56:55 +0100
+Message-Id: <20200805175700.62775-52-maz@kernel.org>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20200805175700.62775-1-maz@kernel.org>
 References: <20200805175700.62775-1-maz@kernel.org>
@@ -66,105 +66,76 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: David Brazdil <dbrazdil@google.com>
 
-The HARDEN_EL2_VECTORS config maps vectors at a fixed location on cores which
-are susceptible to Spector variant 3a (A57, A72) to prevent defeating hyp
-layout randomization by leaking the value of VBAR_EL2.
+Some compilers may put a subset of generated functions into '.text.*'
+ELF sections and the linker may leverage this division to optimize ELF
+layout. Unfortunately, the recently introduced HYPCOPY command assumes
+that all executable code (with the exception of specialized sections
+such as '.hyp.idmap.text') is in the '.text' section. If this
+assumption is broken, code in '.text.*' will be merged into kernel
+proper '.text' instead of the '.hyp.text' that is mapped in EL2.
 
-Since this feature is only applicable when EL2 layout randomization is enabled,
-unify both behind the same RANDOMIZE_BASE Kconfig. Majority of code remains
-conditional on a capability selected for the affected cores.
+To ensure that this cannot happen, insert an OBJDUMP assertion into
+HYPCOPY. The command dumps a list of ELF sections in the input object
+file and greps for '.text.'. If found, compilation fails. Tested with
+both binutils' and LLVM's objdump (the output format is different).
+
+GCC offers '-fno-reorder-functions' to disable this behaviour. Select
+the flag if it is available. From inspection of GCC source (latest
+Git in July 2020), this flag does force all code into '.text'.
+By default, GCC uses profile data, heuristics and attributes to select
+a subsection.
+
+LLVM/Clang currently does not have a similar optimization pass. It can
+place static constructors into '.text.startup' and it's optimizer can
+be provided with profile data to reorder hot/cold functions. Neither
+of these is applicable to nVHE hyp code. If this changes in the future,
+the OBJDUMP assertion should alert users to the problem.
 
 Signed-off-by: David Brazdil <dbrazdil@google.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
-Link: https://lore.kernel.org/r/20200721094445.82184-3-dbrazdil@google.com
+Link: https://lore.kernel.org/r/20200730132519.48787-1-dbrazdil@google.com
 ---
- arch/arm64/Kconfig             | 16 ----------------
- arch/arm64/include/asm/mmu.h   |  6 ++----
- arch/arm64/kernel/cpu_errata.c |  4 ++--
- arch/arm64/kvm/Kconfig         |  2 +-
- 4 files changed, 5 insertions(+), 23 deletions(-)
+ arch/arm64/kvm/hyp/nvhe/Makefile | 26 +++++++++++++++++++++++---
+ 1 file changed, 23 insertions(+), 3 deletions(-)
 
-diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
-index 31380da53689..152deef3277e 100644
---- a/arch/arm64/Kconfig
-+++ b/arch/arm64/Kconfig
-@@ -1182,22 +1182,6 @@ config HARDEN_BRANCH_PREDICTOR
+diff --git a/arch/arm64/kvm/hyp/nvhe/Makefile b/arch/arm64/kvm/hyp/nvhe/Makefile
+index 0b34414557d6..aef76487edc2 100644
+--- a/arch/arm64/kvm/hyp/nvhe/Makefile
++++ b/arch/arm64/kvm/hyp/nvhe/Makefile
+@@ -20,10 +20,30 @@ $(obj)/%.hyp.tmp.o: $(src)/%.S FORCE
+ $(obj)/%.hyp.o: $(obj)/%.hyp.tmp.o FORCE
+ 	$(call if_changed,hypcopy)
  
- 	  If unsure, say Y.
++# Disable reordering functions by GCC (enabled at -O2).
++# This pass puts functions into '.text.*' sections to aid the linker
++# in optimizing ELF layout. See HYPCOPY comment below for more info.
++ccflags-y += $(call cc-option,-fno-reorder-functions)
++
++# The HYPCOPY command uses `objcopy` to prefix all ELF symbol names
++# and relevant ELF section names to avoid clashes with VHE code/data.
++#
++# Hyp code is assumed to be in the '.text' section of the input object
++# files (with the exception of specialized sections such as
++# '.hyp.idmap.text'). This assumption may be broken by a compiler that
++# divides code into sections like '.text.unlikely' so as to optimize
++# ELF layout. HYPCOPY checks that no such sections exist in the input
++# using `objdump`, otherwise they would be linked together with other
++# kernel code and not memory-mapped correctly at runtime.
+ quiet_cmd_hypcopy = HYPCOPY $@
+-      cmd_hypcopy = $(OBJCOPY)	--prefix-symbols=__kvm_nvhe_		\
+-				--rename-section=.text=.hyp.text	\
+-				$< $@
++      cmd_hypcopy =							\
++	if $(OBJDUMP) -h $< | grep -F '.text.'; then			\
++		echo "$@: function reordering not supported in nVHE hyp code" >&2; \
++		/bin/false;						\
++	fi;								\
++	$(OBJCOPY) --prefix-symbols=__kvm_nvhe_				\
++		   --rename-section=.text=.hyp.text			\
++		   $< $@
  
--config HARDEN_EL2_VECTORS
--	bool "Harden EL2 vector mapping against system register leak" if EXPERT
--	default y
--	help
--	  Speculation attacks against some high-performance processors can
--	  be used to leak privileged information such as the vector base
--	  register, resulting in a potential defeat of the EL2 layout
--	  randomization.
--
--	  This config option will map the vectors to a fixed location,
--	  independent of the EL2 code mapping, so that revealing VBAR_EL2
--	  to an attacker does not give away any extra information. This
--	  only gets enabled on affected CPUs.
--
--	  If unsure, say Y.
--
- config ARM64_SSBD
- 	bool "Speculative Store Bypass Disable" if EXPERT
- 	default y
-diff --git a/arch/arm64/include/asm/mmu.h b/arch/arm64/include/asm/mmu.h
-index 68140fdd89d6..bd12011eb560 100644
---- a/arch/arm64/include/asm/mmu.h
-+++ b/arch/arm64/include/asm/mmu.h
-@@ -42,12 +42,10 @@ struct bp_hardening_data {
- 	bp_hardening_cb_t	fn;
- };
- 
--#if (defined(CONFIG_HARDEN_BRANCH_PREDICTOR) ||	\
--     defined(CONFIG_HARDEN_EL2_VECTORS))
--
-+#ifdef CONFIG_KVM_INDIRECT_VECTORS
- extern char __bp_harden_hyp_vecs[];
- extern atomic_t arm64_el2_vector_last_slot;
--#endif  /* CONFIG_HARDEN_BRANCH_PREDICTOR || CONFIG_HARDEN_EL2_VECTORS */
-+#endif
- 
- #ifdef CONFIG_HARDEN_BRANCH_PREDICTOR
- DECLARE_PER_CPU_READ_MOSTLY(struct bp_hardening_data, bp_hardening_data);
-diff --git a/arch/arm64/kernel/cpu_errata.c b/arch/arm64/kernel/cpu_errata.c
-index ad06d6802d2e..a524142e55d0 100644
---- a/arch/arm64/kernel/cpu_errata.c
-+++ b/arch/arm64/kernel/cpu_errata.c
-@@ -635,7 +635,7 @@ has_neoverse_n1_erratum_1542419(const struct arm64_cpu_capabilities *entry,
- 	return is_midr_in_range(midr, &range) && has_dic;
- }
- 
--#if defined(CONFIG_HARDEN_EL2_VECTORS)
-+#ifdef CONFIG_RANDOMIZE_BASE
- 
- static const struct midr_range ca57_a72[] = {
- 	MIDR_ALL_VERSIONS(MIDR_CORTEX_A57),
-@@ -880,7 +880,7 @@ const struct arm64_cpu_capabilities arm64_errata[] = {
- 		.type = ARM64_CPUCAP_LOCAL_CPU_ERRATUM,
- 		.matches = check_branch_predictor,
- 	},
--#ifdef CONFIG_HARDEN_EL2_VECTORS
-+#ifdef CONFIG_RANDOMIZE_BASE
- 	{
- 		.desc = "EL2 vector hardening",
- 		.capability = ARM64_HARDEN_EL2_VECTORS,
-diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
-index 13489aff4440..318c8f2df245 100644
---- a/arch/arm64/kvm/Kconfig
-+++ b/arch/arm64/kvm/Kconfig
-@@ -58,7 +58,7 @@ config KVM_ARM_PMU
- 	  virtual machines.
- 
- config KVM_INDIRECT_VECTORS
--	def_bool HARDEN_BRANCH_PREDICTOR || HARDEN_EL2_VECTORS
-+	def_bool HARDEN_BRANCH_PREDICTOR || RANDOMIZE_BASE
- 
- endif # KVM
- 
+ # Remove ftrace and Shadow Call Stack CFLAGS.
+ # This is equivalent to the 'notrace' and '__noscs' annotations.
 -- 
 2.27.0
 
