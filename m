@@ -2,68 +2,110 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0D8E823CC6C
-	for <lists+kvm@lfdr.de>; Wed,  5 Aug 2020 18:45:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 77B6023CCB8
+	for <lists+kvm@lfdr.de>; Wed,  5 Aug 2020 18:59:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728024AbgHEQoW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 5 Aug 2020 12:44:22 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:41099 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1727946AbgHEQmM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 5 Aug 2020 12:42:12 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1596645730;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=H65nkYxxHcXXk/lXbbowgvGI5MP7eM/h57JZNUz72sI=;
-        b=VsBnhi0x/fvUnAuSrI51s5I1T83Hx4PRPPa/ZR+1DqL3JQ6RwVb5ux/vFTrlsnSD22mOnE
-        pwPEjQTy/HyLPJtV0uqhTE0LSKdEYcuwaHz9UpEKKtUiz3/MK1EEzRkUMYo/RIqrWAxJAz
-        ZI0P+J4qRnoVPsK0reEfVuyQgJhvHco=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-19-Qnmd5bDgNV66awADnKJrKA-1; Wed, 05 Aug 2020 07:06:45 -0400
-X-MC-Unique: Qnmd5bDgNV66awADnKJrKA-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 601ED102C7E9;
-        Wed,  5 Aug 2020 11:06:44 +0000 (UTC)
-Received: from gondolin (ovpn-113-4.ams2.redhat.com [10.36.113.4])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id CD3BA88D7A;
-        Wed,  5 Aug 2020 11:06:37 +0000 (UTC)
-Date:   Wed, 5 Aug 2020 13:06:35 +0200
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-Cc:     Eric Auger <eric.auger@redhat.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        kvm@vger.kernel.org
-Subject: Re: [PATCH v1] vfio: platform: use platform_get_resource()
-Message-ID: <20200805130635.373b0daf.cohuck@redhat.com>
-In-Reply-To: <20200804135622.11952-1-andriy.shevchenko@linux.intel.com>
-References: <20200804135622.11952-1-andriy.shevchenko@linux.intel.com>
-Organization: Red Hat GmbH
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+        id S1728378AbgHEQ72 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 5 Aug 2020 12:59:28 -0400
+Received: from mga05.intel.com ([192.55.52.43]:36356 "EHLO mga05.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728197AbgHEQ6G (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 5 Aug 2020 12:58:06 -0400
+IronPort-SDR: r0cb1ZQZX6dLlWw2Ga5M2var144iy1E0LleoBlrYPIUvzCXQFT+Gsv6AA51+p2vjBHeYyJBeEh
+ ZhtlEorFyx/A==
+X-IronPort-AV: E=McAfee;i="6000,8403,9703"; a="237376266"
+X-IronPort-AV: E=Sophos;i="5.75,436,1589266800"; 
+   d="scan'208";a="237376266"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Aug 2020 04:42:21 -0700
+IronPort-SDR: vNbn1vEX5/bKMuCyBYWNsn2Dbcj1dnl8nyAIPRWOxH/odcQoy7qUJGnkOeSSB0b3GEimUs6M4N
+ QU5DANQ0Ryzg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.75,436,1589266800"; 
+   d="scan'208";a="437142946"
+Received: from unknown (HELO localhost.localdomain.bj.intel.com) ([10.240.192.131])
+  by orsmga004.jf.intel.com with ESMTP; 05 Aug 2020 04:42:18 -0700
+From:   Zhu Lingshan <lingshan.zhu@intel.com>
+To:     jasowang@redhat.com, mst@redhat.com
+Cc:     virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        kvm@vger.kernel.org, eli@mellanox.com, shahafs@mellanox.com,
+        parav@mellanox.com, Zhu Lingshan <lingshan.zhu@intel.com>
+Subject: [PATCH 2/2] vhost_vdpa: unified set_vq_irq() and update_vq_irq()
+Date:   Wed,  5 Aug 2020 19:38:32 +0800
+Message-Id: <20200805113832.3755-1-lingshan.zhu@intel.com>
+X-Mailer: git-send-email 2.18.4
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue,  4 Aug 2020 16:56:22 +0300
-Andy Shevchenko <andriy.shevchenko@linux.intel.com> wrote:
+This commit merge vhost_vdpa_update_vq_irq() logics into
+vhost_vdpa_setup_vq_irq(), so that code are unified.
 
-> Use platform_get_resource() to fetch the memory resource
-> instead of open-coded variant.
-> 
-> Signed-off-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-> ---
->  drivers/vfio/platform/vfio_platform.c | 16 +++++-----------
->  1 file changed, 5 insertions(+), 11 deletions(-)
-> 
+In vhost_vdpa_setup_vq_irq(), added checks for the existence
+for get_vq_irq().
 
-Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+Signed-off-by: Zhu Lingshan <lingshan.zhu@intel.com>
+---
+ drivers/vhost/vdpa.c | 28 ++++++----------------------
+ 1 file changed, 6 insertions(+), 22 deletions(-)
+
+diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
+index 26f166a8192e..044e1f54582a 100644
+--- a/drivers/vhost/vdpa.c
++++ b/drivers/vhost/vdpa.c
+@@ -122,8 +122,12 @@ static void vhost_vdpa_setup_vq_irq(struct vhost_vdpa *v, u16 qid)
+ 	struct vdpa_device *vdpa = v->vdpa;
+ 	int ret, irq;
+ 
+-	spin_lock(&vq->call_ctx.ctx_lock);
++	if (!ops->get_vq_irq)
++		return;
++
+ 	irq = ops->get_vq_irq(vdpa, qid);
++	spin_lock(&vq->call_ctx.ctx_lock);
++	irq_bypass_unregister_producer(&vq->call_ctx.producer);
+ 	if (!vq->call_ctx.ctx || irq < 0) {
+ 		spin_unlock(&vq->call_ctx.ctx_lock);
+ 		return;
+@@ -144,26 +148,6 @@ static void vhost_vdpa_unsetup_vq_irq(struct vhost_vdpa *v, u16 qid)
+ 	spin_unlock(&vq->call_ctx.ctx_lock);
+ }
+ 
+-static void vhost_vdpa_update_vq_irq(struct vhost_virtqueue *vq)
+-{
+-	spin_lock(&vq->call_ctx.ctx_lock);
+-	/*
+-	 * if it has a non-zero irq, means there is a
+-	 * previsouly registered irq_bypass_producer,
+-	 * we should update it when ctx (its token)
+-	 * changes.
+-	 */
+-	if (!vq->call_ctx.producer.irq) {
+-		spin_unlock(&vq->call_ctx.ctx_lock);
+-		return;
+-	}
+-
+-	irq_bypass_unregister_producer(&vq->call_ctx.producer);
+-	vq->call_ctx.producer.token = vq->call_ctx.ctx;
+-	irq_bypass_register_producer(&vq->call_ctx.producer);
+-	spin_unlock(&vq->call_ctx.ctx_lock);
+-}
+-
+ static void vhost_vdpa_reset(struct vhost_vdpa *v)
+ {
+ 	struct vdpa_device *vdpa = v->vdpa;
+@@ -452,7 +436,7 @@ static long vhost_vdpa_vring_ioctl(struct vhost_vdpa *v, unsigned int cmd,
+ 			cb.private = NULL;
+ 		}
+ 		ops->set_vq_cb(vdpa, idx, &cb);
+-		vhost_vdpa_update_vq_irq(vq);
++		vhost_vdpa_setup_vq_irq(v, idx);
+ 		break;
+ 
+ 	case VHOST_SET_VRING_NUM:
+-- 
+2.18.4
 
