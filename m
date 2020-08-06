@@ -2,56 +2,55 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2549323DFC6
-	for <lists+kvm@lfdr.de>; Thu,  6 Aug 2020 19:53:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8458623DFC7
+	for <lists+kvm@lfdr.de>; Thu,  6 Aug 2020 19:53:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730457AbgHFRxd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        id S1728362AbgHFRxd (ORCPT <rfc822;lists+kvm@lfdr.de>);
         Thu, 6 Aug 2020 13:53:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40172 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40160 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727936AbgHFQbD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S1728337AbgHFQbD (ORCPT <rfc822;kvm@vger.kernel.org>);
         Thu, 6 Aug 2020 12:31:03 -0400
 Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1258AC008688
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 105F9C008686
         for <kvm@vger.kernel.org>; Thu,  6 Aug 2020 08:14:45 -0700 (PDT)
-Received: by mail-pl1-x649.google.com with SMTP id k21so27446496pls.2
+Received: by mail-pl1-x649.google.com with SMTP id p6so35217164plo.8
         for <kvm@vger.kernel.org>; Thu, 06 Aug 2020 08:14:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=LAEdgjlTVf1hTtRKfm4PTzrcSwYjp4TQd8jrl5e77wk=;
-        b=PbGGktM2lHbrpi61tVJsiQKUX/nyB6Ib/WEIfcT9BM2LfM/SNOkrB4mDgokA78i9+f
-         q/u0VRw402jpTQvMX2gMgzpUwBzCrwwmhTrJIR38wLjGyK4jgEBCNlBvj6OlwNs5uzyL
-         tC/DHVm72Srb/ZKWWmSasKz3EFeO1rU+jqnpc2cHBZuF3SIrq6gwsu9GUFJKAOK1qJi7
-         TgiMX+kAi/AXx+qoDFkQRZVRPNOcwsHjBbkA2wZ5lPLBU7QevxoBAcrMUpsa5PTs6krD
-         3EjYNzuhDSmDosDPhDYP9nwpcw/ps1n8LYlk3dBR86IhAPSKo6gAFgASdQzS7x9dZJvr
-         3/og==
+        bh=OH4M4A2tRqFAq/VO6fLf2hKWyVzHSTEuFuDzJJzFqVk=;
+        b=elhOl0MxsVpva63g9u2Seo9661v/jptcPCu7ksbFFaqk/cp3Hatt8bpqlE6O3MJCba
+         h2WrGV+Z5sXHfD8CWvH5uLRPC/S5+31/NhHPf08Yu2gOZKUtOldPxp6LnBdswrjwICvA
+         DTfKqoNE6FC3r1hMj/81MMMzyKYR2CS/NN9UupT8zMzpexet34tOQ+9HHHIfU2KIsNwz
+         9pMe4AVLn5N9s5zPT25FZ3FDKpPbNzUnw62jsTahFt+7nprGPwl4pklVDbJca55Y7ude
+         DYObBzO+LgHt46NQAdXRTPTVFUvW4RXnBeKKgwt6fc8F5n6/MPc7r/Bi8RtBg1ZAoFWW
+         g2Ng==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=LAEdgjlTVf1hTtRKfm4PTzrcSwYjp4TQd8jrl5e77wk=;
-        b=Pp6UIzJfvW5h76pWvIIGxZMnV794uPAurw72sybQ2XzL+mWRbExNWanqt64SxF+3qd
-         kjqH3JJYwPEbW2VaMD3CbmS7kuxk5FmfStaj73BMwF76zAVfs+HftUYNvYophApZ4WoF
-         O0T/ZXnmiNCgNMJnBTdSTGNWg0kPhROp+eFb8lOqq2QCLbfytM7IsW6g6kDXVesMPKBv
-         EQGpsrkBVh7IQTT43p1uh9/heKfjKBU+jUoVREWo3NeXn3lurJUmHNjNshdQ8wXU4VUY
-         xpZi35JAIEiOFqFShuKtMovo2j9Zfno4aDvQP4Xy6uiLHlLvSfkN0h4gMPCyAKdt6SNA
-         mGaQ==
-X-Gm-Message-State: AOAM531poFHPviUH2CMpXhdWdLnogak6cGSyVgV3a9xw3CGbmP+Vc+PM
-        OB4dSxN4JQGIHzV1N02ytcBPMRZMakhYchpGk4tPpHKmHFGwjin6zaGi11+yV0SZTvD9lLJEx9k
-        CDsNRvG3x7+otZIYXDTh4tC3X6wQWwom4ziK1KR2AiVStBBwkzFkj17+9Mw==
-X-Google-Smtp-Source: ABdhPJw9dzpQLNg0cjoNS1OreAhKWmkuObYVgcE6xuPEYPqfCE/7NE6QdNRguzX+Br9/pRiXW30UKb4s65Q=
-X-Received: by 2002:a63:b91e:: with SMTP id z30mr7677471pge.329.1596726881267;
- Thu, 06 Aug 2020 08:14:41 -0700 (PDT)
-Date:   Thu,  6 Aug 2020 15:14:32 +0000
+        bh=OH4M4A2tRqFAq/VO6fLf2hKWyVzHSTEuFuDzJJzFqVk=;
+        b=FuwOGD4U8D6GLGKxSSTnnMqZVW6ZJMoheC4uKV22qKeWM3CTx9nPbM2gRnotngLt8H
+         xAmW+9YIGI68pXJPjMgOewTfDUTzNfQHBRCkdbM+xukJAWoAFgBwws3byhIMk2cYy8sY
+         r1LKbIzDKprpc4YTr6gHB/NQ/oDYkGAhr4WariTvP/pdz/O9iM5dh0U20KBXXcxfVJeH
+         irxlAtIcf+yAqOgPn4ZYx7CccO7AP+e0SCQFs/IX6+R4o3UM5VDcv4ZS2zzzd/d25Ii4
+         xRnThXV8R46wE5iVKTFg7hDCYRWwPLCxl/HvdSFsCDC2p9r7Tv7irwc8S+Qp4nrZ0NB+
+         bOMQ==
+X-Gm-Message-State: AOAM533jCm2gbPez5a/Yy+rwLZmK8CyHJ2lEcrB/nH2WZaXCn7zj+UEM
+        eDn9lIKz8OwgDugn7/S1N21qFWU6W9HVmQr+i3Obs+VVgtmxW8vYvq3CP68GOWeLLGKggLFEbWr
+        vwYG9tLN9q5g3GweRCmza79ioHnJRPz9riCauKgbtsafHx95yD3/Jn+HLdQ==
+X-Google-Smtp-Source: ABdhPJwZDKNQlsUnHZraFFPcE7A3H4P+YPGaj/qrgSCw6NcEqrnJWEnXnHuiI1GtNHjgEe+RC23lwe2TQOQ=
+X-Received: by 2002:a17:902:d341:: with SMTP id l1mr8177774plk.134.1596726882920;
+ Thu, 06 Aug 2020 08:14:42 -0700 (PDT)
+Date:   Thu,  6 Aug 2020 15:14:33 +0000
 In-Reply-To: <20200806151433.2747952-1-oupton@google.com>
-Message-Id: <20200806151433.2747952-4-oupton@google.com>
+Message-Id: <20200806151433.2747952-5-oupton@google.com>
 Mime-Version: 1.0
 References: <20200806151433.2747952-1-oupton@google.com>
 X-Mailer: git-send-email 2.28.0.236.gb10cc79966-goog
-Subject: [PATCH v3 3/4] kvm: x86: only provide PV features if enabled in
- guest's CPUID
+Subject: [PATCH v3 4/4] Documentation: kvm: fix some typos in cpuid.rst
 From:   Oliver Upton <oupton@google.com>
 To:     kvm@vger.kernel.org
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
@@ -65,271 +64,125 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-KVM unconditionally provides PV features to the guest, regardless of the
-configured CPUID. An unwitting guest that doesn't check
-KVM_CPUID_FEATURES before use could access paravirt features that
-userspace did not intend to provide. Fix this by checking the guest's
-CPUID before performing any paravirtual operations.
-
-Introduce a capability, KVM_CAP_ENFORCE_PV_FEATURE_CPUID, to gate the
-aforementioned enforcement. Migrating a VM from a host w/o this patch to
-a host with this patch could silently change the ABI exposed to the
-guest, warranting that we default to the old behavior and opt-in for
-the new one.
-
 Reviewed-by: Jim Mattson <jmattson@google.com>
 Reviewed-by: Peter Shier <pshier@google.com>
 Signed-off-by: Oliver Upton <oupton@google.com>
 ---
- Documentation/virt/kvm/api.rst  | 11 ++++++
- arch/x86/include/asm/kvm_host.h |  6 +++
- arch/x86/kvm/cpuid.h            | 16 ++++++++
- arch/x86/kvm/x86.c              | 67 ++++++++++++++++++++++++++++++---
- include/uapi/linux/kvm.h        |  1 +
- 5 files changed, 96 insertions(+), 5 deletions(-)
+ Documentation/virt/kvm/cpuid.rst | 88 ++++++++++++++++----------------
+ 1 file changed, 44 insertions(+), 44 deletions(-)
 
-diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-index 644e5326aa50..e8fc6e34f344 100644
---- a/Documentation/virt/kvm/api.rst
-+++ b/Documentation/virt/kvm/api.rst
-@@ -6155,3 +6155,14 @@ KVM can therefore start protected VMs.
- This capability governs the KVM_S390_PV_COMMAND ioctl and the
- KVM_MP_STATE_LOAD MP_STATE. KVM_SET_MP_STATE can fail for protected
- guests when the state change is invalid.
-+
-+
-+8.24 KVM_CAP_ENFORCE_PV_CPUID
-+-----------------------------
-+
-+Architectures: x86
-+
-+When enabled, KVM will disable paravirtual features provided to the
-+guest according to the bits in the KVM_CPUID_FEATURES CPUID leaf
-+(0x40000001). Otherwise, a guest may use the paravirtual features
-+regardless of what has actually been exposed through the CPUID leaf.
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 5ab3af7275d8..a641c3840a1e 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -788,6 +788,12 @@ struct kvm_vcpu_arch {
+diff --git a/Documentation/virt/kvm/cpuid.rst b/Documentation/virt/kvm/cpuid.rst
+index a7dff9186bed..f1583e682cc8 100644
+--- a/Documentation/virt/kvm/cpuid.rst
++++ b/Documentation/virt/kvm/cpuid.rst
+@@ -38,64 +38,64 @@ returns::
  
- 	/* AMD MSRC001_0015 Hardware Configuration */
- 	u64 msr_hwcr;
-+
-+	/*
-+	 * Indicates whether PV emulation should be disabled if not present in
-+	 * the guest's cpuid.
-+	 */
-+	bool enforce_pv_feature_cpuid;
- };
+ where ``flag`` is defined as below:
  
- struct kvm_lpage_info {
-diff --git a/arch/x86/kvm/cpuid.h b/arch/x86/kvm/cpuid.h
-index 3a923ae15f2f..c364c2877583 100644
---- a/arch/x86/kvm/cpuid.h
-+++ b/arch/x86/kvm/cpuid.h
-@@ -5,6 +5,7 @@
- #include "x86.h"
- #include <asm/cpu.h>
- #include <asm/processor.h>
-+#include <uapi/asm/kvm_para.h>
+-================================= =========== ================================
+-flag                              value       meaning
+-================================= =========== ================================
+-KVM_FEATURE_CLOCKSOURCE           0           kvmclock available at msrs
+-                                              0x11 and 0x12
++================================== =========== ================================
++flag                               value       meaning
++================================== =========== ================================
++KVM_FEATURE_CLOCKSOURCE            0           kvmclock available at msrs
++                                               0x11 and 0x12
  
- extern u32 kvm_cpu_caps[NCAPINTS] __read_mostly;
- void kvm_set_cpu_caps(void);
-@@ -308,4 +309,19 @@ static inline bool page_address_valid(struct kvm_vcpu *vcpu, gpa_t gpa)
- 	return PAGE_ALIGNED(gpa) && !(gpa >> cpuid_maxphyaddr(vcpu));
- }
+-KVM_FEATURE_NOP_IO_DELAY          1           not necessary to perform delays
+-                                              on PIO operations
++KVM_FEATURE_NOP_IO_DELAY           1           not necessary to perform delays
++                                               on PIO operations
  
-+static __always_inline bool guest_pv_has(struct kvm_vcpu *vcpu,
-+					   unsigned int kvm_feature)
-+{
-+	struct kvm_cpuid_entry2 *cpuid;
-+
-+	if (!vcpu->arch.enforce_pv_feature_cpuid)
-+		return true;
-+
-+	cpuid = kvm_find_cpuid_entry(vcpu, KVM_CPUID_FEATURES, 0);
-+	if (!cpuid)
-+		return false;
-+
-+	return cpuid->eax & (1u << kvm_feature);
-+}
-+
- #endif
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 683ce68d96b2..9900a846dfc0 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -2763,6 +2763,14 @@ static int kvm_pv_enable_async_pf(struct kvm_vcpu *vcpu, u64 data)
- 	if (data & 0x30)
- 		return 1;
+-KVM_FEATURE_MMU_OP                2           deprecated
++KVM_FEATURE_MMU_OP                 2           deprecated
  
-+	if (!guest_pv_has(vcpu, KVM_FEATURE_ASYNC_PF_VMEXIT) &&
-+	    (data & KVM_ASYNC_PF_DELIVERY_AS_PF_VMEXIT))
-+		return 1;
-+
-+	if (!guest_pv_has(vcpu, KVM_FEATURE_ASYNC_PF_INT) &&
-+	    (data & KVM_ASYNC_PF_DELIVERY_AS_INT))
-+		return 1;
-+
- 	if (!lapic_in_kernel(vcpu))
- 		return 1;
+-KVM_FEATURE_CLOCKSOURCE2          3           kvmclock available at msrs
+-                                              0x4b564d00 and 0x4b564d01
++KVM_FEATURE_CLOCKSOURCE2           3           kvmclock available at msrs
++                                               0x4b564d00 and 0x4b564d01
  
-@@ -2840,10 +2848,12 @@ static void record_steal_time(struct kvm_vcpu *vcpu)
- 	 * Doing a TLB flush here, on the guest's behalf, can avoid
- 	 * expensive IPIs.
- 	 */
--	trace_kvm_pv_tlb_flush(vcpu->vcpu_id,
--		st->preempted & KVM_VCPU_FLUSH_TLB);
--	if (xchg(&st->preempted, 0) & KVM_VCPU_FLUSH_TLB)
--		kvm_vcpu_flush_tlb_guest(vcpu);
-+	if (guest_pv_has(vcpu, KVM_FEATURE_PV_TLB_FLUSH)) {
-+		trace_kvm_pv_tlb_flush(vcpu->vcpu_id,
-+				       st->preempted & KVM_VCPU_FLUSH_TLB);
-+		if (xchg(&st->preempted, 0) & KVM_VCPU_FLUSH_TLB)
-+			kvm_vcpu_flush_tlb_guest(vcpu);
-+	}
+-KVM_FEATURE_ASYNC_PF              4           async pf can be enabled by
+-                                              writing to msr 0x4b564d02
++KVM_FEATURE_ASYNC_PF               4           async pf can be enabled by
++                                               writing to msr 0x4b564d02
  
- 	vcpu->arch.st.preempted = 0;
+-KVM_FEATURE_STEAL_TIME            5           steal time can be enabled by
+-                                              writing to msr 0x4b564d03
++KVM_FEATURE_STEAL_TIME             5           steal time can be enabled by
++                                               writing to msr 0x4b564d03
  
-@@ -2998,30 +3008,54 @@ int kvm_set_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
- 		vcpu->arch.smi_count = data;
- 		break;
- 	case MSR_KVM_WALL_CLOCK_NEW:
-+		if (!guest_pv_has(vcpu, KVM_FEATURE_CLOCKSOURCE2))
-+			return 1;
-+
-+		kvm_write_wall_clock(vcpu->kvm, data);
-+		break;
- 	case MSR_KVM_WALL_CLOCK:
-+		if (!guest_pv_has(vcpu, KVM_FEATURE_CLOCKSOURCE))
-+			return 1;
-+
- 		kvm_write_wall_clock(vcpu->kvm, data);
- 		break;
- 	case MSR_KVM_SYSTEM_TIME_NEW:
-+		if (!guest_pv_has(vcpu, KVM_FEATURE_CLOCKSOURCE2))
-+			return 1;
-+
- 		kvm_write_system_time(vcpu, data, false, msr_info->host_initiated);
- 		break;
- 	case MSR_KVM_SYSTEM_TIME:
--		kvm_write_system_time(vcpu, data, true, msr_info->host_initiated);
-+		if (!guest_pv_has(vcpu, KVM_FEATURE_CLOCKSOURCE))
-+			return 1;
-+
-+		kvm_write_system_time(vcpu, data, true,  msr_info->host_initiated);
- 		break;
- 	case MSR_KVM_ASYNC_PF_EN:
-+		if (!guest_pv_has(vcpu, KVM_FEATURE_ASYNC_PF))
-+			return 1;
-+
- 		if (kvm_pv_enable_async_pf(vcpu, data))
- 			return 1;
- 		break;
- 	case MSR_KVM_ASYNC_PF_INT:
-+		if (!guest_pv_has(vcpu, KVM_FEATURE_ASYNC_PF_INT))
-+			return 1;
-+
- 		if (kvm_pv_enable_async_pf_int(vcpu, data))
- 			return 1;
- 		break;
- 	case MSR_KVM_ASYNC_PF_ACK:
-+		if (!guest_pv_has(vcpu, KVM_FEATURE_ASYNC_PF))
-+			return 1;
- 		if (data & 0x1) {
- 			vcpu->arch.apf.pageready_pending = false;
- 			kvm_check_async_pf_completion(vcpu);
- 		}
- 		break;
- 	case MSR_KVM_STEAL_TIME:
-+		if (!guest_pv_has(vcpu, KVM_FEATURE_STEAL_TIME))
-+			return 1;
+-KVM_FEATURE_PV_EOI                6           paravirtualized end of interrupt
+-                                              handler can be enabled by
+-                                              writing to msr 0x4b564d04
++KVM_FEATURE_PV_EOI                 6           paravirtualized end of interrupt
++                                               handler can be enabled by
++                                               writing to msr 0x4b564d04
  
- 		if (unlikely(!sched_info_on()))
- 			return 1;
-@@ -3038,11 +3072,17 @@ int kvm_set_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+-KVM_FEATURE_PV_UNHAULT            7           guest checks this feature bit
+-                                              before enabling paravirtualized
+-                                              spinlock support
++KVM_FEATURE_PV_UNHALT              7           guest checks this feature bit
++                                               before enabling paravirtualized
++                                               spinlock support
  
- 		break;
- 	case MSR_KVM_PV_EOI_EN:
-+		if (!guest_pv_has(vcpu, KVM_FEATURE_PV_EOI))
-+			return 1;
-+
- 		if (kvm_lapic_enable_pv_eoi(vcpu, data, sizeof(u8)))
- 			return 1;
- 		break;
+-KVM_FEATURE_PV_TLB_FLUSH          9           guest checks this feature bit
+-                                              before enabling paravirtualized
+-                                              tlb flush
++KVM_FEATURE_PV_TLB_FLUSH           9           guest checks this feature bit
++                                               before enabling paravirtualized
++                                               tlb flush
  
- 	case MSR_KVM_POLL_CONTROL:
-+		if (!guest_pv_has(vcpu, KVM_FEATURE_POLL_CONTROL))
-+			return 1;
-+
- 		/* only enable bit supported */
- 		if (data & (-1ULL << 1))
- 			return 1;
-@@ -3522,6 +3562,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- 	case KVM_CAP_EXCEPTION_PAYLOAD:
- 	case KVM_CAP_SET_GUEST_DEBUG:
- 	case KVM_CAP_LAST_CPU:
-+	case KVM_CAP_ENFORCE_PV_FEATURE_CPUID:
- 		r = 1;
- 		break;
- 	case KVM_CAP_SYNC_REGS:
-@@ -4389,6 +4430,11 @@ static int kvm_vcpu_ioctl_enable_cap(struct kvm_vcpu *vcpu,
+-KVM_FEATURE_ASYNC_PF_VMEXIT       10          paravirtualized async PF VM EXIT
+-                                              can be enabled by setting bit 2
+-                                              when writing to msr 0x4b564d02
++KVM_FEATURE_ASYNC_PF_VMEXIT        10          paravirtualized async PF VM EXIT
++                                               can be enabled by setting bit 2
++                                               when writing to msr 0x4b564d02
  
- 		return kvm_x86_ops.enable_direct_tlbflush(vcpu);
+-KVM_FEATURE_PV_SEND_IPI           11          guest checks this feature bit
+-                                              before enabling paravirtualized
+-                                              sebd IPIs
++KVM_FEATURE_PV_SEND_IPI            11          guest checks this feature bit
++                                               before enabling paravirtualized
++                                               send IPIs
  
-+	case KVM_CAP_ENFORCE_PV_FEATURE_CPUID:
-+		vcpu->arch.enforce_pv_feature_cpuid = cap->args[0];
-+
-+		return 0;
-+
- 	default:
- 		return -EINVAL;
- 	}
-@@ -7723,11 +7769,16 @@ int kvm_emulate_hypercall(struct kvm_vcpu *vcpu)
- 		goto out;
- 	}
+-KVM_FEATURE_PV_POLL_CONTROL       12          host-side polling on HLT can
+-                                              be disabled by writing
+-                                              to msr 0x4b564d05.
++KVM_FEATURE_PV_POLL_CONTROL        12          host-side polling on HLT can
++                                               be disabled by writing
++                                               to msr 0x4b564d05.
  
-+	ret = -KVM_ENOSYS;
-+
- 	switch (nr) {
- 	case KVM_HC_VAPIC_POLL_IRQ:
- 		ret = 0;
- 		break;
- 	case KVM_HC_KICK_CPU:
-+		if (!guest_pv_has(vcpu, KVM_FEATURE_PV_UNHALT))
-+			break;
-+
- 		kvm_pv_kick_cpu_op(vcpu->kvm, a0, a1);
- 		kvm_sched_yield(vcpu->kvm, a1);
- 		ret = 0;
-@@ -7738,9 +7789,15 @@ int kvm_emulate_hypercall(struct kvm_vcpu *vcpu)
- 		break;
- #endif
- 	case KVM_HC_SEND_IPI:
-+		if (!guest_pv_has(vcpu, KVM_FEATURE_PV_SEND_IPI))
-+			break;
-+
- 		ret = kvm_pv_send_ipi(vcpu->kvm, a0, a1, a2, a3, op_64_bit);
- 		break;
- 	case KVM_HC_SCHED_YIELD:
-+		if (!guest_pv_has(vcpu, KVM_FEATURE_PV_SCHED_YIELD))
-+			break;
-+
- 		kvm_sched_yield(vcpu->kvm, a0);
- 		ret = 0;
- 		break;
-diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-index f6d86033c4fa..48c2d5c10b1e 100644
---- a/include/uapi/linux/kvm.h
-+++ b/include/uapi/linux/kvm.h
-@@ -1035,6 +1035,7 @@ struct kvm_ppc_resize_hpt {
- #define KVM_CAP_LAST_CPU 184
- #define KVM_CAP_SMALLER_MAXPHYADDR 185
- #define KVM_CAP_S390_DIAG318 186
-+#define KVM_CAP_ENFORCE_PV_FEATURE_CPUID 187
+-KVM_FEATURE_PV_SCHED_YIELD        13          guest checks this feature bit
+-                                              before using paravirtualized
+-                                              sched yield.
++KVM_FEATURE_PV_SCHED_YIELD         13          guest checks this feature bit
++                                               before using paravirtualized
++                                               sched yield.
  
- #ifdef KVM_CAP_IRQ_ROUTING
+-KVM_FEATURE_ASYNC_PF_INT          14          guest checks this feature bit
+-                                              before using the second async
+-                                              pf control msr 0x4b564d06 and
+-                                              async pf acknowledgment msr
+-                                              0x4b564d07.
++KVM_FEATURE_ASYNC_PF_INT           14          guest checks this feature bit
++                                               before using the second async
++                                               pf control msr 0x4b564d06 and
++                                               async pf acknowledgment msr
++                                               0x4b564d07.
+ 
+-KVM_FEATURE_CLOCSOURCE_STABLE_BIT 24          host will warn if no guest-side
+-                                              per-cpu warps are expeced in
+-                                              kvmclock
+-================================= =========== ================================
++KVM_FEATURE_CLOCKSOURCE_STABLE_BIT 24          host will warn if no guest-side
++                                               per-cpu warps are expected in
++                                               kvmclock
++================================== =========== ================================
+ 
+ ::
  
 -- 
 2.28.0.236.gb10cc79966-goog
