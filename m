@@ -2,142 +2,175 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9B27C23DD6A
-	for <lists+kvm@lfdr.de>; Thu,  6 Aug 2020 19:10:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 45AA723DDA0
+	for <lists+kvm@lfdr.de>; Thu,  6 Aug 2020 19:12:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730021AbgHFRJP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 6 Aug 2020 13:09:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45820 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729998AbgHFRGE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 6 Aug 2020 13:06:04 -0400
-Received: from mail-io1-xd41.google.com (mail-io1-xd41.google.com [IPv6:2607:f8b0:4864:20::d41])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 45574C0617A9
-        for <kvm@vger.kernel.org>; Thu,  6 Aug 2020 10:04:11 -0700 (PDT)
-Received: by mail-io1-xd41.google.com with SMTP id v6so35060079iow.11
-        for <kvm@vger.kernel.org>; Thu, 06 Aug 2020 10:04:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=nC6PJfNXVU4vFSBxvbjKSl0ryoqOjAjd9RWGvuVHbDM=;
-        b=oLZpvRf1kTJ4eibRUBcjxdeDvtdZOPtNEomtrXn5C94Hbs8Rj8dHrZnApxdRFEwjCl
-         WBc8yQHq3KYajW40zb9qdXGQih4IRSt9uGsN29kdUUfkeijhhBhk6xJqY18RwkHQExnz
-         En5loq1sNJvdr9jvuHobjEotIrsWjcIKsW/9iQLsjtEx4p2gHXPoyKfw1uUZjlnoMgEr
-         cwfI76oogIyUiUU8qlY+Ugbn9lc35uMPWzQr+rfeC0c6wD3GxBi6pVfoIgQbJ8oLdNTa
-         F4WcNsXK48XhtTQShEm/52gGR2owP8y3C7Uh7G0GJAgUeyMsrEVGHSwuLDZzOSVQ3qXj
-         YEhg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=nC6PJfNXVU4vFSBxvbjKSl0ryoqOjAjd9RWGvuVHbDM=;
-        b=Po660+xtB+Xg8K12iIWcwOacf2T6ywjuYZNbQPMKFsy8UMRsMFuLcfA1XMtpmaWMLJ
-         S6ZL33gLJBmFZZ6wTJ94vX0+Ll0GbNe4uLuTDHyJ/jK9AcsM69TFBeMovbgi7iqu8KQJ
-         DTGrKIGpkwQFAI/q9OUIEtpRjHy0nn/3vtSUBh3gtzlMi44XNkZ1ktANoJLIt5hnFwIQ
-         IyBD68NquEVMAWycfn3L5stzvboKDDDVvmn+n5us7eKnDQTR0qqomw7I23vbchi7n2CR
-         tAkXzAx+nUBAuFHlXEnPTRUvZHfPh7DJggiDVJ3hIVLJBAq/EQ3T7+N7H+CRRQZdM9bA
-         0FJA==
-X-Gm-Message-State: AOAM532yaB5I4IkFz2QqZoQ9i2ZssHUkamRG6x+XA8jDWPGEDaGCD4qn
-        OwEUUVjRthYuMoPuDUsXFEmQtHp2QuKCWX6dNoAI1LI1LlFzkg==
-X-Google-Smtp-Source: ABdhPJzzfGB7YzJrZpItnSdv7H0n5425elbodoOWx8Z/hmcoLH46KhADWrSuaoJDJxAtjYKU+SpwKZ8kaLVmNy3x9qo=
-X-Received: by 2002:a5d:80cb:: with SMTP id h11mr10901351ior.189.1596733449095;
- Thu, 06 Aug 2020 10:04:09 -0700 (PDT)
+        id S1729293AbgHFRMK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 6 Aug 2020 13:12:10 -0400
+Received: from Galois.linutronix.de ([193.142.43.55]:58938 "EHLO
+        galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729728AbgHFRKI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 6 Aug 2020 13:10:08 -0400
+From:   Thomas Gleixner <tglx@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020; t=1596733806;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=yKVD0ICRirwJxf/czTIoL9qaNHOqC5llD5fZwtykD6w=;
+        b=Uu02hQeXnceW1clbDFU34w01Na01ihe8gw5vdOZssFKm0ZWXV+ig/hiWrMPj3DyEDWsWmp
+        d5q6kG0wmvOmqMIX3dWRl6kqRLWtU/fisAqjfMYs/MNmgVZG/RmheVA60Im0TeiUhxBCZi
+        9hqt3C2EPyjAChYbG+bZD0bMlT5GYo2qRQV4t2yqJImq4xW2cQe2ctC176iuoCQtFZxNNG
+        MI4kIWnaPSegaZ8F6XUsUtUkLhfST8e4RlThO9ng/MYX/egAzO5ulxnw6h/KaTv4bLrWqA
+        /2u4RF35uMj/YCiBZQtAEM2JK91u6lf5m4pEzA64GZc0kJ2gbDtWTsZWc4f9MQ==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020e; t=1596733806;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=yKVD0ICRirwJxf/czTIoL9qaNHOqC5llD5fZwtykD6w=;
+        b=1ench/3Yz4ELlGwrmwd8zDNRPuZX7xmwBO6TcJKMNpbwZC7PP+JR9mKgtVvQyp3pUUu5qC
+        WOvTlcXJ7KEJIRBQ==
+To:     "Dey\, Megha" <megha.dey@intel.com>,
+        Jason Gunthorpe <jgg@mellanox.com>
+Cc:     Marc Zyngier <maz@kernel.org>,
+        "Jiang\, Dave" <dave.jiang@intel.com>,
+        "vkoul\@kernel.org" <vkoul@kernel.org>,
+        "bhelgaas\@google.com" <bhelgaas@google.com>,
+        "rafael\@kernel.org" <rafael@kernel.org>,
+        "gregkh\@linuxfoundation.org" <gregkh@linuxfoundation.org>,
+        "hpa\@zytor.com" <hpa@zytor.com>,
+        "alex.williamson\@redhat.com" <alex.williamson@redhat.com>,
+        "Pan\, Jacob jun" <jacob.jun.pan@intel.com>,
+        "Raj\, Ashok" <ashok.raj@intel.com>,
+        "Liu\, Yi L" <yi.l.liu@intel.com>,
+        "Lu\, Baolu" <baolu.lu@intel.com>,
+        "Tian\, Kevin" <kevin.tian@intel.com>,
+        "Kumar\, Sanjay K" <sanjay.k.kumar@intel.com>,
+        "Luck\, Tony" <tony.luck@intel.com>,
+        "Lin\, Jing" <jing.lin@intel.com>,
+        "Williams\, Dan J" <dan.j.williams@intel.com>,
+        "kwankhede\@nvidia.com" <kwankhede@nvidia.com>,
+        "eric.auger\@redhat.com" <eric.auger@redhat.com>,
+        "parav\@mellanox.com" <parav@mellanox.com>,
+        "Hansen\, Dave" <dave.hansen@intel.com>,
+        "netanelg\@mellanox.com" <netanelg@mellanox.com>,
+        "shahafs\@mellanox.com" <shahafs@mellanox.com>,
+        "yan.y.zhao\@linux.intel.com" <yan.y.zhao@linux.intel.com>,
+        "pbonzini\@redhat.com" <pbonzini@redhat.com>,
+        "Ortiz\, Samuel" <samuel.ortiz@intel.com>,
+        "Hossain\, Mona" <mona.hossain@intel.com>,
+        "dmaengine\@vger.kernel.org" <dmaengine@vger.kernel.org>,
+        "linux-kernel\@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "x86\@kernel.org" <x86@kernel.org>,
+        "linux-pci\@vger.kernel.org" <linux-pci@vger.kernel.org>,
+        "kvm\@vger.kernel.org" <kvm@vger.kernel.org>
+Subject: RE: [PATCH RFC v2 02/18] irq/dev-msi: Add support for a new DEV_MSI irq domain
+In-Reply-To: <c6a1c065ab9b46bbaf9f5713462085a5@intel.com>
+References: <159534667974.28840.2045034360240786644.stgit@djiang5-desk3.ch.intel.com> <159534734833.28840.10067945890695808535.stgit@djiang5-desk3.ch.intel.com> <878sfbxtzi.wl-maz@kernel.org> <20200722195928.GN2021248@mellanox.com> <96a1eb5ccc724790b5404a642583919d@intel.com> <20200805221548.GK19097@mellanox.com> <70465fd3a7ae428a82e19f98daa779e8@intel.com> <20200805225330.GL19097@mellanox.com> <630e6a4dc17b49aba32675377f5a50e0@intel.com> <20200806001927.GM19097@mellanox.com> <c6a1c065ab9b46bbaf9f5713462085a5@intel.com>
+Date:   Thu, 06 Aug 2020 19:10:05 +0200
+Message-ID: <87tuxfhf9u.fsf@nanos.tec.linutronix.de>
 MIME-Version: 1.0
-References: <20200805141202.8641-1-yulei.kernel@gmail.com>
-In-Reply-To: <20200805141202.8641-1-yulei.kernel@gmail.com>
-From:   Ben Gardon <bgardon@google.com>
-Date:   Thu, 6 Aug 2020 10:03:57 -0700
-Message-ID: <CANgfPd_P_bjduGgS7miCp4BLUaDXBTYb9swC1gzxwYG2baWRVw@mail.gmail.com>
-Subject: Re: [RFC 0/9] KVM:x86/mmu:Introduce parallel memory virtualization to
- boost performance
-To:     Yulei Zhang <yulei.kernel@gmail.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Jim Mattson <jmattson@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        xiaoguangrong.eric@gmail.com, kernellwp@gmail.com,
-        lihaiwei.kernel@gmail.com, Yulei Zhang <yuleixzhang@tencent.com>,
-        Junaid Shahid <junaids@google.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Aug 5, 2020 at 9:53 AM Yulei Zhang <yulei.kernel@gmail.com> wrote:
->
-> From: Yulei Zhang <yuleixzhang@tencent.com>
->
-> Currently in KVM memory virtulization we relay on mmu_lock to synchronize
-> the memory mapping update, which make vCPUs work in serialize mode and
-> slow down the execution, especially after migration to do substantial
-> memory mapping setup, and performance get worse if increase vCPU numbers
-> and guest memories.
->
-> The idea we present in this patch set is to mitigate the issue with
-> pre-constructed memory mapping table. We will fast pin the guest memory
-> to build up a global memory mapping table according to the guest memslots
-> changes and apply it to cr3, so that after guest starts up all the vCPUs
-> would be able to update the memory concurrently, thus the performance
-> improvement is expected.
+Megha,
 
-Is a re-implementation of the various MMU functions in this series
-necessary to pre-populate the EPT/NPT? I realize the approach you took
-is probably the fastest way to pre-populate an EPT, but it seems like
-similar pre-population could be achieved with some changes to the PF
-handler's prefault scheme or, from user space by adding a dummy vCPU
-to touch memory before loading the actual guest image.
+"Dey, Megha" <megha.dey@intel.com> writes:
 
-I think this series is taking a similar approach to the direct MMU RFC
-I sent out a little less than a year ago. (I will send another version
-of that series in the next month.) I'm not sure this level of
-complexity is worth it if you're only interested in EPT pre-population.
-Is pre-population your goal? You mention "parallel memory
-virtualization," does that refer to parallel page fault handling you
-intend to implement in a future series?
+>> -----Original Message-----
+>> From: Jason Gunthorpe <jgg@mellanox.com>
+<SNIP>
+>> Subject: Re: [PATCH RFC v2 02/18] irq/dev-msi: Add support for a new DEV_MSI
+>> irq domain
 
-There are a number of features I see you've chosen to leave behind in
-this series which might work for your use case, but I think they're
-necessary. These include handling vCPUs with different roles (SMM, VMX
-non root mode, etc.), MMU notifiers (which I realize matter less for
-pinned memory), demand paging through UFFD, fast EPT
-invalidation/teardown and others.
+can you please fix your mail client not to copy the whole header of the
+mail you are replying to into the mail body?
 
+>> > > Well, I had suggested to pass in the parent struct device, but it
+>> Oops, I was thinking of platform_msi_domain_alloc_irqs() not
+>> create_device_domain()
+>> 
+>> ie call it in the device driver that wishes to consume the extra MSIs.
+>> 
+>> Is there a harm if each device driver creates a new irq_domain for its use?
 >
-> And after test the initial patch with memory dirty pattern workload, we
-> have seen positive results even with huge page enabled. For example,
-> guest with 32 vCPUs and 64G memories, in 2M/1G huge page mode we would get
-> more than 50% improvement.
->
->
-> Yulei Zhang (9):
->   Introduce new fields in kvm_arch/vcpu_arch struct for direct build EPT
->     support
->   Introduce page table population function for direct build EPT feature
->   Introduce page table remove function for direct build EPT feature
->   Add release function for direct build ept when guest VM exit
->   Modify the page fault path to meet the direct build EPT requirement
->   Apply the direct build EPT according to the memory slots change
->   Add migration support when using direct build EPT
->   Introduce kvm module parameter global_tdp to turn on the direct build
->     EPT mode
->   Handle certain mmu exposed functions properly while turn on direct
->     build EPT mode
->
->  arch/mips/kvm/mips.c            |  13 +
->  arch/powerpc/kvm/powerpc.c      |  13 +
->  arch/s390/kvm/kvm-s390.c        |  13 +
->  arch/x86/include/asm/kvm_host.h |  13 +-
->  arch/x86/kvm/mmu/mmu.c          | 537 ++++++++++++++++++++++++++++++--
->  arch/x86/kvm/svm/svm.c          |   2 +-
->  arch/x86/kvm/vmx/vmx.c          |  17 +-
->  arch/x86/kvm/x86.c              |  55 ++--
->  include/linux/kvm_host.h        |   7 +-
->  virt/kvm/kvm_main.c             |  43 ++-
->  10 files changed, 648 insertions(+), 65 deletions(-)
->
-> --
-> 2.17.1
->
+> Well, the only harm is if we want to reuse the irq domain.
+
+You cannot reuse the irq domain if you create a domain per driver. The
+way how hierarchical domains work is:
+
+vector --- DMAR-MSI
+       |
+       |-- ....
+       |
+       |-- IR-0 --- IO/APIC-0
+       |        | 
+       |        |-- IO/APIC-1
+       |        |
+       |        |-- PCI/MSI-0
+       |        |
+       |        |-- HPET/MSI-0
+       |
+       |-- IR-1 --- PCI/MSI-1
+       |        |
+
+The outermost domain is what the actual device driver uses. I.e. for
+PCI-MSI it's the msi domain which is associated to the bus the device is
+connected to. Each domain has its own interrupt chip instance and its
+own data set.
+
+Domains of the same type share the code, but neither the data nor the
+interrupt chip instance.
+
+Also there is a strict parent child relationship in terms of resources.
+Let's look at PCI.
+
+PCI/MSI-0 depends on IR-0 which depends on the vector domain. That's
+reflecting both the flow of the interrupt and the steps required for
+various tasks, e.g. allocation/deallocation and also interrupt chip
+operations. In order to allocate a PCI/MSI interrupt in domain PCI/MSI-0
+a slot in the remapping unit and a vector needs to be allocated.
+
+If you disable interrupt remapping all the outermost domains in the
+scheme above become childs of the vector domain.
+
+So if we look at DEV/MSI as a infrastructure domain then the scheme
+looks like this:
+
+vector --- DMAR-MSI
+       |
+       |-- ....
+       |
+       |-- IR-0 --- IO/APIC-0
+       |        | 
+       |        |-- IO/APIC-1
+       |        |
+       |        |-- PCI/MSI-0
+       |        |
+       |        |-- HPET/MSI-0
+       |        |
+       |        |-- DEV/MSI-0
+       |
+       |-- IR-1 --- PCI/MSI-1
+       |        |
+       |        |-- DEV/MSI-1
+
+
+But if you make it per device then you have multiple DEV/MSI domains per
+IR unit.
+
+What's the right thing to do?
+
+If the DEV/MSI domain has it's own per IR unit resource management, then
+you need one per IR unit.
+
+If the resource management is solely per device then having a domain per
+device is the right choice.
+
+Thanks,
+
+        tglx
