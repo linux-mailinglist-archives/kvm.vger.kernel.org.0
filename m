@@ -2,163 +2,138 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1E05223D484
-	for <lists+kvm@lfdr.de>; Thu,  6 Aug 2020 02:19:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 99F2F23D489
+	for <lists+kvm@lfdr.de>; Thu,  6 Aug 2020 02:22:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726643AbgHFATj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 5 Aug 2020 20:19:39 -0400
-Received: from mail-eopbgr00045.outbound.protection.outlook.com ([40.107.0.45]:31969
-        "EHLO EUR02-AM5-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1725999AbgHFATi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 5 Aug 2020 20:19:38 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=R2x7I04CiEpQ5hIGWKDJ/sDeklVDKHvs7JhzXvBhTpRkhXLYm+tH1Zc/DwjhQBJwD3Bm1o1TkTkHgTcegtYc5rG9knwMlVdjbc7jlJB7nB6smAz+pREG+Sjpr7p+Xcpu92gHAiIdjwSfGm6yOIMF/0dt7uJxzBKv+W9K3LE1G/Eyh15kHmSo6dq2i4BzKJTrmSUso+K/yb7j1S6uP4pqVWQUDr/8vx3PCBMFzTN6PuaIV4zUCCCkLUzPRt8o58vkkesm/1napmHUpaQRYCXvs8TmvgcVW/E3+Wu+3v0e37OQcnS2g/6ADvWTnY716MhpaPzZyjLRnCvCYNIqZsBKvg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=8/ieMeAv+UuHyv+8RMNofaAoQw9WgzA1jEFYWwxzzVU=;
- b=L2jzjVDd1WkbOUMZy81Vp6FLDEWZULU4KhHT3ywUc078pnbUM9K4COPfwXjdEJZb4endG4a/OUZj5IU23zW/lUBkG9CGUAr4scggkZp8yHZ7bOWu9WHZOwmftUZ5Zdb89B36CKKrbpDs6SOxo57jg7k0vFCMPIcdAgXC9uyO8B/yx8+6OtUmx/oThu2HHCgmik48TyM2dQ99zkEipoEGUvOJzwHlBjd3oWRX0L3L6nP/p3FXOfoBVkPhhowNHnjeBDuJpIeO5T8dd4o5u8cQlshQtfIZOMYSw/PfkXX7LjzeAxV1FKwNEtiUVUmsibUQtM7VQmlF+I9nZ5KpEO6INg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=mellanox.com; dmarc=pass action=none header.from=mellanox.com;
- dkim=pass header.d=mellanox.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Mellanox.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=8/ieMeAv+UuHyv+8RMNofaAoQw9WgzA1jEFYWwxzzVU=;
- b=j1j7NHwxx6Qv1w0aUSmKW9agNs50jJmO7tYJVMOsIYVmQLy/uDGqJ9n0SSfiXyrYuQ7vD0GIf5y/OFAubOQvS5W93LPq5cfVikOwS43dGpseeMks6KQ6Mzp+bCevEj8DjjcA/Aplpi1S0NOItnrT41l7FZI8cUfZC0TfFGTfcFc=
-Authentication-Results: intel.com; dkim=none (message not signed)
- header.d=none;intel.com; dmarc=none action=none header.from=mellanox.com;
-Received: from VI1PR05MB4141.eurprd05.prod.outlook.com (2603:10a6:803:44::15)
- by VE1PR05MB7375.eurprd05.prod.outlook.com (2603:10a6:800:1ab::24) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3261.16; Thu, 6 Aug
- 2020 00:19:32 +0000
-Received: from VI1PR05MB4141.eurprd05.prod.outlook.com
- ([fe80::10b0:e5f1:adab:799a]) by VI1PR05MB4141.eurprd05.prod.outlook.com
- ([fe80::10b0:e5f1:adab:799a%4]) with mapi id 15.20.3261.016; Thu, 6 Aug 2020
- 00:19:32 +0000
-Date:   Wed, 5 Aug 2020 21:19:27 -0300
-From:   Jason Gunthorpe <jgg@mellanox.com>
-To:     "Dey, Megha" <megha.dey@intel.com>
-Cc:     Marc Zyngier <maz@kernel.org>,
-        "Jiang, Dave" <dave.jiang@intel.com>,
-        "vkoul@kernel.org" <vkoul@kernel.org>,
-        "bhelgaas@google.com" <bhelgaas@google.com>,
-        "rafael@kernel.org" <rafael@kernel.org>,
-        "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        "hpa@zytor.com" <hpa@zytor.com>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "Pan, Jacob jun" <jacob.jun.pan@intel.com>,
-        "Raj, Ashok" <ashok.raj@intel.com>,
-        "Liu, Yi L" <yi.l.liu@intel.com>, "Lu, Baolu" <baolu.lu@intel.com>,
-        "Tian, Kevin" <kevin.tian@intel.com>,
-        "Kumar, Sanjay K" <sanjay.k.kumar@intel.com>,
-        "Luck, Tony" <tony.luck@intel.com>,
-        "Lin, Jing" <jing.lin@intel.com>,
-        "Williams, Dan J" <dan.j.williams@intel.com>,
-        "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
-        "eric.auger@redhat.com" <eric.auger@redhat.com>,
-        "parav@mellanox.com" <parav@mellanox.com>,
-        "Hansen, Dave" <dave.hansen@intel.com>,
-        "netanelg@mellanox.com" <netanelg@mellanox.com>,
-        "shahafs@mellanox.com" <shahafs@mellanox.com>,
-        "yan.y.zhao@linux.intel.com" <yan.y.zhao@linux.intel.com>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "Ortiz, Samuel" <samuel.ortiz@intel.com>,
-        "Hossain, Mona" <mona.hossain@intel.com>,
-        "dmaengine@vger.kernel.org" <dmaengine@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "x86@kernel.org" <x86@kernel.org>,
-        "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-Subject: Re: [PATCH RFC v2 02/18] irq/dev-msi: Add support for a new DEV_MSI
- irq domain
-Message-ID: <20200806001927.GM19097@mellanox.com>
-References: <159534667974.28840.2045034360240786644.stgit@djiang5-desk3.ch.intel.com>
- <159534734833.28840.10067945890695808535.stgit@djiang5-desk3.ch.intel.com>
- <878sfbxtzi.wl-maz@kernel.org>
- <20200722195928.GN2021248@mellanox.com>
- <96a1eb5ccc724790b5404a642583919d@intel.com>
- <20200805221548.GK19097@mellanox.com>
- <70465fd3a7ae428a82e19f98daa779e8@intel.com>
- <20200805225330.GL19097@mellanox.com>
- <630e6a4dc17b49aba32675377f5a50e0@intel.com>
+        id S1726401AbgHFAWC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 5 Aug 2020 20:22:02 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:24856 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726013AbgHFAV7 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 5 Aug 2020 20:21:59 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1596673318;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=NNC27QJGcBMosaf0qhEYeMAB3BZCYSImh+vM7tQXNuI=;
+        b=eugBS+KePJtOuiAmV93iSHznht9hkrwzd+2xlOdtBZ2ABwrHvzsz/b8M5MZ454tUWsIKDt
+        AedCh+cWtal6sfYLEqE23yQRy4JxFi7iBYpgrAtiv6YTmQuipW1R5H0ZH8X9MrTWWKxVET
+        rWmFDPhNZtIdt4SyX6ucXTuQ1lLRilE=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-120-d_YNOHByNsCpB8WQH88ilQ-1; Wed, 05 Aug 2020 20:21:56 -0400
+X-MC-Unique: d_YNOHByNsCpB8WQH88ilQ-1
+Received: by mail-wr1-f72.google.com with SMTP id d6so12475216wrv.23
+        for <kvm@vger.kernel.org>; Wed, 05 Aug 2020 17:21:56 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=NNC27QJGcBMosaf0qhEYeMAB3BZCYSImh+vM7tQXNuI=;
+        b=IU7UgkHrclFGOBVvdwqEjo2NIxnJuKi1yJ23n+TW/HBMaj+Aw2VII3sfcvg9wihgk+
+         p8Vl13yQ+n3g6Wcc/LE3BWsDvYrxDT8Zr0kvT+WQ1ApY+/BQrZSmiTjNuPlakJz91aVD
+         lpemQ6pJUrG5jA/Bh7fP0z2QSoVZpTHk7sTOxF87CtG8dDZ+7MVLaohFCkm0o/eKQ8NM
+         YLL/L0qDiI+Fc0d+fElTT8z+URv2iMP9lz5qt94FAC3qk/RQsBM/47kLpJtkWb0Ze7pU
+         WucF5JEp4CKvBeCKd3age1VkmyWXI8cqn0jk1qkLhRsxX9MrSiG5GIke7hwcbiveJyo3
+         HppQ==
+X-Gm-Message-State: AOAM530zNisqFZt0wAKBig4YSlUztq+Oh4PFOW3+c+x1abq9BPKrDP+I
+        mlsmuJfiLpyBgMEQSMsfUoS4ETDQyi6lUMjtE23Fam34aVJaubxdT7CKYj2KOSlG7RPuB8OXQ1a
+        jbLAWJwewwoAm
+X-Received: by 2002:a1c:cc12:: with SMTP id h18mr5767452wmb.56.1596673315378;
+        Wed, 05 Aug 2020 17:21:55 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwlN6Bpmb2ZW3xnYrX864VA5YiEsKXz0L7ESwTdaDPvOupscpVX/k+KQxw9CIv4k/gk0OQ5FA==
+X-Received: by 2002:a1c:cc12:: with SMTP id h18mr5767425wmb.56.1596673315112;
+        Wed, 05 Aug 2020 17:21:55 -0700 (PDT)
+Received: from redhat.com (bzq-79-177-102-128.red.bezeqint.net. [79.177.102.128])
+        by smtp.gmail.com with ESMTPSA id w64sm4753537wmb.26.2020.08.05.17.21.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 05 Aug 2020 17:21:54 -0700 (PDT)
+Date:   Wed, 5 Aug 2020 20:21:51 -0400
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Peter Xu <peterx@redhat.com>,
+        Julia Suvorova <jsuvorov@redhat.com>,
+        Andy Lutomirski <luto@kernel.org>, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 0/3] KVM: x86: KVM_MEM_PCI_HOLE memory
+Message-ID: <20200805201851-mutt-send-email-mst@kernel.org>
+References: <20200728143741.2718593-1-vkuznets@redhat.com>
+MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <630e6a4dc17b49aba32675377f5a50e0@intel.com>
-X-ClientProxiedBy: MN2PR19CA0025.namprd19.prod.outlook.com
- (2603:10b6:208:178::38) To VI1PR05MB4141.eurprd05.prod.outlook.com
- (2603:10a6:803:44::15)
-MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from mlx.ziepe.ca (156.34.48.30) by MN2PR19CA0025.namprd19.prod.outlook.com (2603:10b6:208:178::38) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3261.17 via Frontend Transport; Thu, 6 Aug 2020 00:19:31 +0000
-Received: from jgg by mlx with local (Exim 4.94)        (envelope-from <jgg@mellanox.com>)      id 1k3Td1-0041NA-Rr; Wed, 05 Aug 2020 21:19:27 -0300
-X-Originating-IP: [156.34.48.30]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-HT: Tenant
-X-MS-Office365-Filtering-Correlation-Id: 35c259cf-ef0f-4f8e-58e6-08d8399e640d
-X-MS-TrafficTypeDiagnostic: VE1PR05MB7375:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <VE1PR05MB73756B41940CD215299747C9CF480@VE1PR05MB7375.eurprd05.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:8882;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: hAZPRAlyoOS0DqCNSfPPuVELncAkDI0H2F1WKEeBVIhMyy4hPw+Y3JJAGyfmDgePCSpKlR+k+VPhbFuR3zAcSut6hWlM/QpR+GZMldJ/cICE4EK8v51a5BkOgk3xDhC862K/Wod85hS9lxA0uQeM0e4mc8sAPMAQZGnunlMbifRYuGpZwv4JtsX1x1UnoBOXkf0bKeITQMnnCMComTfKSmCrFM4/73furvcrJLRGVRZL0NHeaqOkscYWo+M1ohS5AMESQ0MSPBxayXZpUve9WY3tX50ddqGGFQQPetTfr493FgiYT4ielKsRRg9EYiZPa7b8ykEdeOmb9Pvjfm6miQ==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:VI1PR05MB4141.eurprd05.prod.outlook.com;PTR:;CAT:NONE;SFTY:;SFS:(4636009)(396003)(366004)(376002)(136003)(39860400002)(346002)(36756003)(26005)(1076003)(86362001)(2906002)(2616005)(6916009)(5660300002)(426003)(7406005)(7416002)(9746002)(9786002)(66556008)(66476007)(316002)(54906003)(8936002)(33656002)(478600001)(8676002)(66946007)(4326008);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData: VjgGJxWg8Xuwv0bjfwwW0JiN1Io2mf46DBKd6f2cJqKopkFysKaEI2HUMDTsU7oeDIBo47EJLmYWt2oNLvXFPelOoZAbKxqbn37bm1aue94TH3xPX2ofg9DJO8OcR9wGdeDeErAguC63/z6LyucDlaQB6Bnj1qXN3YfSYnCWRwDdEzW57AWHXkgY7mCc+vxCO6W7koSFXKmTTE/PZxIup3i6rlF8t47XhNepZPdu8MgRktHMdapWX3P5M7ezuG1aiNRcG9lo/NsXWUgnYY7NztTzOtkaG65wsdFeulpjWz125uK3MCGJ9QoSmY1XBS/AljQ2PlReA+yCPrImiBSiaYYgzmq32U/t9r33cqbHfJyIWbgvzA9G0Du9/ZE8HrWcb6h2AaKjgjy5RyrMzoMw/N+qHvQCpl8PWjPKomHG6k/aIaMYD8FUAi5rHwB70zjTEu5KWwmRIYj7hsBMmag6qcIti1hdTMKF1DzXBo6gkHkHvnPwrOwnZAOaJyRcNlULEzv/ydAr0MOeYoeXnW+vVCSo9ut1L9x9pyp0chR6LPjFnVop7T0gBuU0NVFSNc0fplqXhmVPjMAeeVZB7v+6E0JEEzjszNR9w7Zcoif5iEsfVN1KtrwYZfP0K1ik5IoD6hUHz8TOo3UmYB55X4N5oA==
-X-OriginatorOrg: Mellanox.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 35c259cf-ef0f-4f8e-58e6-08d8399e640d
-X-MS-Exchange-CrossTenant-AuthSource: VI1PR05MB4141.eurprd05.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Aug 2020 00:19:32.2195
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: a652971c-7d2e-4d9b-a6a4-d149256f461b
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Bxv+NhQc3z/r93GlbwCk84DKYResC6dCmTJEWzqW5a3LS29wJ9ubqJsV0iSLeg6l7lLwJwzNhUI3GJS42uGI+w==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VE1PR05MB7375
+In-Reply-To: <20200728143741.2718593-1-vkuznets@redhat.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Aug 06, 2020 at 12:13:24AM +0000, Dey, Megha wrote:
-> > Well, I had suggested to pass in the parent struct device, but it could certainly
-> > use an irq_domain instead:
-> > 
-> >   platform_msi_assign_domain(dev, device_to_iommu(p_dev)->ir_domain);
-> > 
-> > Or
-> > 
-> >   platform_msi_assign_domain(dev, pdev->msi_domain)
-> > 
-> > ?
-> > 
-> > Any maybe the natural expression is to add a version of
-> > platform_msi_create_device_domain() that accepts a parent irq_domain() and if
-> > the device doesn't already have a msi_domain then it creates one. Might be too
-> > tricky to manage lifetime of the new irq_domain though..
-> > 
-> > It feels cleaner to me if everything related to this is contained in the
-> > platform_msi and the driver using it. Not sure it makes sense to involve the
-> > iommu?
+On Tue, Jul 28, 2020 at 04:37:38PM +0200, Vitaly Kuznetsov wrote:
+> This is a continuation of "[PATCH RFC 0/5] KVM: x86: KVM_MEM_ALLONES
+> memory" work: 
+> https://lore.kernel.org/kvm/20200514180540.52407-1-vkuznets@redhat.com/
+> and pairs with Julia's "x86/PCI: Use MMCONFIG by default for KVM guests":
+> https://lore.kernel.org/linux-pci/20200722001513.298315-1-jusual@redhat.com/
 > 
-> Well yeah something like this can be done, but what is the missing
-> piece is where the IRQ domain actually gets created, i.e where this
-> new version of platform_msi_create_device_domain() is called. That
-> is the only piece that is currently done in the IOMMU driver only
-> for DSA mdev. Not that all devices need to do it this way.. do you
-> have suggestions as to where you want to call this function?
+> PCIe config space can (depending on the configuration) be quite big but
+> usually is sparsely populated. Guest may scan it by accessing individual
+> device's page which, when device is missing, is supposed to have 'pci
+> hole' semantics: reads return '0xff' and writes get discarded.
+> 
+> When testing Linux kernel boot with QEMU q35 VM and direct kernel boot
+> I observed 8193 accesses to PCI hole memory. When such exit is handled
+> in KVM without exiting to userspace, it takes roughly 0.000001 sec.
+> Handling the same exit in userspace is six times slower (0.000006 sec) so
+> the overal; difference is 0.04 sec. This may be significant for 'microvm'
+> ideas.
+> 
+> Note, the same speed can already be achieved by using KVM_MEM_READONLY
+> but doing this would require allocating real memory for all missing
+> devices and e.g. 8192 pages gives us 32mb. This will have to be allocated
+> for each guest separately and for 'microvm' use-cases this is likely
+> a no-go.
+> 
+> Introduce special KVM_MEM_PCI_HOLE memory: userspace doesn't need to
+> back it with real memory, all reads from it are handled inside KVM and
+> return '0xff'. Writes still go to userspace but these should be extremely
+> rare.
+> 
+> The original 'KVM_MEM_ALLONES' idea had additional optimizations: KVM
+> was mapping all 'PCI hole' pages to a single read-only page stuffed with
+> 0xff. This is omitted in this submission as the benefits are unclear:
+> KVM will have to allocate SPTEs (either on demand or aggressively) and
+> this also consumes time/memory.
 
-Oops, I was thinking of platform_msi_domain_alloc_irqs() not
-create_device_domain()
+Curious about this: if we do it aggressively on the 1st fault,
+how long does it take to allocate 256 huge page SPTEs?
+And the amount of memory seems pretty small then, right?
 
-ie call it in the device driver that wishes to consume the extra
-MSIs. 
+> We can always take a look at possible
+> optimizations later.
+> 
+> Vitaly Kuznetsov (3):
+>   KVM: x86: move kvm_vcpu_gfn_to_memslot() out of try_async_pf()
+>   KVM: x86: introduce KVM_MEM_PCI_HOLE memory
+>   KVM: selftests: add KVM_MEM_PCI_HOLE test
+> 
+>  Documentation/virt/kvm/api.rst                |  19 ++-
+>  arch/x86/include/uapi/asm/kvm.h               |   1 +
+>  arch/x86/kvm/mmu/mmu.c                        |  19 +--
+>  arch/x86/kvm/mmu/paging_tmpl.h                |  10 +-
+>  arch/x86/kvm/x86.c                            |  10 +-
+>  include/linux/kvm_host.h                      |   7 +-
+>  include/uapi/linux/kvm.h                      |   3 +-
+>  tools/testing/selftests/kvm/Makefile          |   1 +
+>  .../testing/selftests/kvm/include/kvm_util.h  |   1 +
+>  tools/testing/selftests/kvm/lib/kvm_util.c    |  81 +++++++------
+>  .../kvm/x86_64/memory_slot_pci_hole.c         | 112 ++++++++++++++++++
+>  virt/kvm/kvm_main.c                           |  39 ++++--
+>  12 files changed, 243 insertions(+), 60 deletions(-)
+>  create mode 100644 tools/testing/selftests/kvm/x86_64/memory_slot_pci_hole.c
+> 
+> -- 
+> 2.25.4
 
-Is there a harm if each device driver creates a new irq_domain for its
-use?
-
-Jason
