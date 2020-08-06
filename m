@@ -2,58 +2,53 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3E85323D4DD
-	for <lists+kvm@lfdr.de>; Thu,  6 Aug 2020 02:46:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2C81B23D504
+	for <lists+kvm@lfdr.de>; Thu,  6 Aug 2020 03:23:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726932AbgHFAqZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 5 Aug 2020 20:46:25 -0400
-Received: from mail-eopbgr20069.outbound.protection.outlook.com ([40.107.2.69]:23524
-        "EHLO EUR02-VE1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726150AbgHFAqX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 5 Aug 2020 20:46:23 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=gU3jKzOapUa2EP9Z1bZcKYFrxljklgPZXMErl83g5Lfr+IclgWHrJRrvODN3rXIR7RbLVR5HAai59AXkI8ZiOaZVgKkTWL5H+yZyFsM9eX8r/nfTn7EbIoylFaMC9TfdMCxYNNjFp4ofg0+B0w/S7u39MnuNsRAqSQirq2neao4DHhMEcqGxiNsQZutQHTPSN8ZWfDh2ZxcqDy42bBiyx7CbRfpdLGwddPqXF1qxXfOiblnojE2Iutczsbw3pMJuoZ/743gfdeiMtRJ3h9+LvCdFz7RNZIQ248ThF5E7X3GnoJmXy+PerS0MfN4gjNMfyFj5WgkdNPIeb6Khtp58dw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=wJVQBcW4hT256/PgomfUcWtiFllxl/LoBaMm6CzjBHI=;
- b=OOBMI2xmNnZxJ2NfUqssc6Pju/rQJff7mL1lVazqcCG2Ii4bGkrA0WDMAEedDwtDIq65J43SNYWP2/xSRgIiRfIGMlXGU2gyFyLHKEgurc3j8OCsR3i93Z/gRKr6GB+Te/Fm+KQhKQ33JvI3VNt2cBgCUJh1f/sFvgmjb1UmKvPWQgSRYgYTJfa+j66cK8KVy6u71QS99i5yH9RammC+GaqnsKcNoS/ChaWeZ24htUNbLnBrY9bHhMr/kznxwUJJgcYwDjTI8IHxrY3wYNaywXRngSWG3rVG9W0Ip+tCcWenm2LlyfmWVeG5Ohv3Eoznwj1WOHOTnouPmiu3eoIVFw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=mellanox.com; dmarc=pass action=none header.from=mellanox.com;
- dkim=pass header.d=mellanox.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Mellanox.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=wJVQBcW4hT256/PgomfUcWtiFllxl/LoBaMm6CzjBHI=;
- b=sFsK+4VIHDqgaCmzqhJif4T2jOrAM321UmOVn/QPYgVzMBtTfGZG8wpWe18ytDnw8mJWOCEHKWOVJWSdZXyphH5V9Yj9/KfjeJoSknp1lAty9Bm+McKDIJ0iWfOqiAUcjS3GGqnJk4E9yTEb4yZUjJJptR5lpfmEE8G+yz4nPsk=
-Authentication-Results: intel.com; dkim=none (message not signed)
- header.d=none;intel.com; dmarc=none action=none header.from=mellanox.com;
-Received: from VI1PR05MB4141.eurprd05.prod.outlook.com (2603:10a6:803:44::15)
- by VI1PR05MB4493.eurprd05.prod.outlook.com (2603:10a6:803:45::11) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3261.16; Thu, 6 Aug
- 2020 00:46:18 +0000
-Received: from VI1PR05MB4141.eurprd05.prod.outlook.com
- ([fe80::10b0:e5f1:adab:799a]) by VI1PR05MB4141.eurprd05.prod.outlook.com
- ([fe80::10b0:e5f1:adab:799a%4]) with mapi id 15.20.3261.016; Thu, 6 Aug 2020
- 00:46:18 +0000
-Date:   Wed, 5 Aug 2020 21:46:14 -0300
-From:   Jason Gunthorpe <jgg@mellanox.com>
-To:     "Dey, Megha" <megha.dey@intel.com>
-Cc:     Marc Zyngier <maz@kernel.org>,
+        id S1725998AbgHFBXQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 5 Aug 2020 21:23:16 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:36061 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1725999AbgHFBXN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 5 Aug 2020 21:23:13 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1596676991;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=6UMQQrEZ+Nh2Ng/k4GnJLH3osJ2CLCkGK7FDHnj5N9Y=;
+        b=XJXXIKg6ompKt+iu/UjvY9yQS8z6YW8nS1ZhVeoeRrwCQ5rYImj7cnrowr0jnpzlMe39tc
+        L3WgKUJwuf/hH18i2aZyT5HnicSC9lBkp4Ns0zlgNj0FB9vFNNkrnGLM0twfDfbsxXHUYf
+        yDlatuRI9qeeQHmOHMDek7ist/At0iw=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-114-hlfFQIgrNMqgf_91JPS2og-1; Wed, 05 Aug 2020 21:23:09 -0400
+X-MC-Unique: hlfFQIgrNMqgf_91JPS2og-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9A77180046B;
+        Thu,  6 Aug 2020 01:23:05 +0000 (UTC)
+Received: from x1.home (ovpn-112-71.phx2.redhat.com [10.3.112.71])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id AA47910013D7;
+        Thu,  6 Aug 2020 01:22:59 +0000 (UTC)
+Date:   Wed, 5 Aug 2020 19:22:58 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Jason Gunthorpe <jgg@mellanox.com>
+Cc:     "Tian, Kevin" <kevin.tian@intel.com>,
         "Jiang, Dave" <dave.jiang@intel.com>,
         "vkoul@kernel.org" <vkoul@kernel.org>,
+        "Dey, Megha" <megha.dey@intel.com>,
+        "maz@kernel.org" <maz@kernel.org>,
         "bhelgaas@google.com" <bhelgaas@google.com>,
         "rafael@kernel.org" <rafael@kernel.org>,
         "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>,
         "tglx@linutronix.de" <tglx@linutronix.de>,
         "hpa@zytor.com" <hpa@zytor.com>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
         "Pan, Jacob jun" <jacob.jun.pan@intel.com>,
         "Raj, Ashok" <ashok.raj@intel.com>,
         "Liu, Yi L" <yi.l.liu@intel.com>, "Lu, Baolu" <baolu.lu@intel.com>,
-        "Tian, Kevin" <kevin.tian@intel.com>,
         "Kumar, Sanjay K" <sanjay.k.kumar@intel.com>,
         "Luck, Tony" <tony.luck@intel.com>,
         "Lin, Jing" <jing.lin@intel.com>,
@@ -73,91 +68,80 @@ Cc:     Marc Zyngier <maz@kernel.org>,
         "x86@kernel.org" <x86@kernel.org>,
         "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
         "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-Subject: Re: [PATCH RFC v2 02/18] irq/dev-msi: Add support for a new DEV_MSI
- irq domain
-Message-ID: <20200806004614.GN19097@mellanox.com>
-References: <159534734833.28840.10067945890695808535.stgit@djiang5-desk3.ch.intel.com>
- <878sfbxtzi.wl-maz@kernel.org>
- <20200722195928.GN2021248@mellanox.com>
- <96a1eb5ccc724790b5404a642583919d@intel.com>
- <20200805221548.GK19097@mellanox.com>
- <70465fd3a7ae428a82e19f98daa779e8@intel.com>
- <20200805225330.GL19097@mellanox.com>
- <630e6a4dc17b49aba32675377f5a50e0@intel.com>
- <20200806001927.GM19097@mellanox.com>
- <c6a1c065ab9b46bbaf9f5713462085a5@intel.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <c6a1c065ab9b46bbaf9f5713462085a5@intel.com>
-X-ClientProxiedBy: MN2PR19CA0026.namprd19.prod.outlook.com
- (2603:10b6:208:178::39) To VI1PR05MB4141.eurprd05.prod.outlook.com
- (2603:10a6:803:44::15)
+Subject: Re: [PATCH RFC v2 00/18] Add VFIO mediated device support and
+ DEV-MSI support for the idxd driver
+Message-ID: <20200805192258.5ee7a05b@x1.home>
+In-Reply-To: <20200724001930.GS2021248@mellanox.com>
+References: <159534667974.28840.2045034360240786644.stgit@djiang5-desk3.ch.intel.com>
+ <20200721164527.GD2021248@mellanox.com>
+ <CY4PR11MB1638103EC73DD9C025F144C98C780@CY4PR11MB1638.namprd11.prod.outlook.com>
+ <20200724001930.GS2021248@mellanox.com>
+Organization: Red Hat
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from mlx.ziepe.ca (156.34.48.30) by MN2PR19CA0026.namprd19.prod.outlook.com (2603:10b6:208:178::39) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3261.18 via Frontend Transport; Thu, 6 Aug 2020 00:46:18 +0000
-Received: from jgg by mlx with local (Exim 4.94)        (envelope-from <jgg@mellanox.com>)      id 1k3U2w-0041x8-JR; Wed, 05 Aug 2020 21:46:14 -0300
-X-Originating-IP: [156.34.48.30]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-HT: Tenant
-X-MS-Office365-Filtering-Correlation-Id: 3d4d3e80-06bb-4a2b-8f3a-08d839a22186
-X-MS-TrafficTypeDiagnostic: VI1PR05MB4493:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <VI1PR05MB4493762000332FAEAC859519CF480@VI1PR05MB4493.eurprd05.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: JffkrB6OM3UAs62K6bgfuq825jMtU4VGZe+aWplJBQvPQZMcG1Z48VWJFUigDE1SA6tgigBdCrNGwu4X0WVMbKpWMOIY2ttO650BIv7b8WY0oIjr0bPr90vCYOy1v3wJnRHI1EIU4hIDV5dXdgpgjyUx52eDa8Bm2M9YN6vypFOhZv7aOy9XjusONXRp/rDhebdWloIRpI5CJF/96stNA/iBNfefscev7DC6EtOvwl1z2RgKKldQi4C80SK0jPSA+Qp/gPBmgVxVhA2bH4aTWNHFzpjIa2+6jIhxt6USMtctYpoH4MBFI6yA/pJ7A7PNV4cqy7QY0HBIR3us+t1yQQ==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:VI1PR05MB4141.eurprd05.prod.outlook.com;PTR:;CAT:NONE;SFTY:;SFS:(4636009)(136003)(39860400002)(366004)(346002)(396003)(376002)(6916009)(2616005)(36756003)(86362001)(2906002)(5660300002)(54906003)(7416002)(66946007)(8676002)(316002)(66556008)(66476007)(7406005)(4326008)(1076003)(33656002)(8936002)(9746002)(9786002)(186003)(426003)(26005)(478600001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData: zEmWJwMljiMzHl9+XMBCAkjGE8oPdvQo21+ny3BFALNp6ou0iot2xrLISXMgAdbuhzxlqDBKoUPSHwBWvSrFM5nKNN1WTF1vqLRmgjzjbMW++wzyB6ctSaQQK5Kdo55pDBaDkP6XxfzL815sUaQb00gAVDHc2cBzqaYUueneSa7vHu6gzNJ32NTF4cZe9L/pZcbH3OxDFZGEHKHIDSXMCDrZq5CDp5uNqQYIKccarKf9DJupsO57vfc8+GVqAFYlr3UkASchMZjIsrgaWzNFI8HeHEn0dtGr38WIzHsX9Gt+Oqk47piM0mL4wp13khmDBWCJ+S7QjyQrOFpRCrMcshhxpEl5lpcGpwB9JCE6Bl3pgaS1iaFruJwMxmESmUNyOcpMpru578xCDBllsm431qN3kkpMLR9nTDnC7UWYxNFaApG1Y9MvOPIInD6oYZgea53HN6ZpwjJTbjUfbhdyP79+Wuk9ShOlL1HxgN2RUP48fJaMiJ8pbzih01Ko/3Aqfa94yA0zyNSRRmb3fs1KYTQQIuoaf9DZDJPOoR86QSCuOygCVnnq0GoZ8yWhP/wnfIea6T6NUIsnnRy5+NGPQTXqBjlbKB5ewciE+zEmatw9l4zO/mVF7JqX3B7bbqOQxxhEW4lXUBUhvDb2ZTS3iQ==
-X-OriginatorOrg: Mellanox.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 3d4d3e80-06bb-4a2b-8f3a-08d839a22186
-X-MS-Exchange-CrossTenant-AuthSource: VI1PR05MB4141.eurprd05.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Aug 2020 00:46:18.5275
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: a652971c-7d2e-4d9b-a6a4-d149256f461b
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Q7vYwNhVu3UGT+zk/7Vfmxg9IGrIQp+MN7E32Gd0BI97oLLxOUKAZF9PxiZmDDToXAvv6qR59q4Q0nCp9Xlcuw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR05MB4493
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Aug 06, 2020 at 12:32:31AM +0000, Dey, Megha wrote:
-> > Oops, I was thinking of platform_msi_domain_alloc_irqs() not
-> > create_device_domain()
-> > 
-> > ie call it in the device driver that wishes to consume the extra MSIs.
-> > 
-> > Is there a harm if each device driver creates a new irq_domain for its use?
-> 
-> Well, the only harm is if we want to reuse the irq domain.
-> 
-> As of today, we only have DSA mdev which uses the dev-msi domain. In the IRQ domain hierarchy,
-> We will have this:
-> 
-> Vector-> intel-ir->dev-msi 
-> 
-> So tmrw if we have a new device, which would also want to have the
-> intel-ir as the parent and use the same domain ops, we will simply
-> be creating a copy of this IRQ domain, which may not be very
-> fruitful.
->
-> But apart from that, I don't think there are any issues..
-> 
-> What do you think is the best approach here?
+On Thu, 23 Jul 2020 21:19:30 -0300
+Jason Gunthorpe <jgg@mellanox.com> wrote:
 
-I've surely forgotten these details, I can't advise if duplicate
-irq_domains are very bad.
+> On Tue, Jul 21, 2020 at 11:54:49PM +0000, Tian, Kevin wrote:
+> > In a nutshell, applications don't require raw WQ controllability as guest
+> > kernel drivers may expect. Extending DSA user space interface to be another
+> > passthrough interface just for virtualization needs is less compelling than
+> > leveraging established VFIO/mdev framework (with the major merit that
+> > existing user space VMMs just work w/o any change as long as they already
+> > support VFIO uAPI).  
+> 
+> Sure, but the above is how the cover letter should have summarized
+> that discussion, not as "it is not much code difference"
+> 
+> > In last review you said that you didn't hard nak this approach and would
+> > like to hear opinion from virtualization guys. In this version we CCed KVM
+> > mailing list, Paolo (VFIO/Qemu), Alex (VFIO), Samuel (Rust-VMM/Cloud
+> > hypervisor), etc. Let's see how they feel about this approach.  
+> 
+> Yes, the VFIO community should decide.
+> 
+> If we are doing emulation tasks in the kernel now, then I can think of
+> several nice semi-emulated mdevs to propose.
+> 
+> This will not be some one off, but the start of a widely copied
+> pattern.
 
-A single domain per parent irq_domain does seem more elegant, but I'm
-not sure it is worth the extra work to do it?
+And that's definitely a concern, there should be a reason for
+implementing device emulation in the kernel beyond an easy path to get
+a device exposed up through a virtualization stack.  The entire idea of
+mdev is the mediation of access to a device to make it safe for a user
+and to fit within the vfio device API.  Mediation, emulation, and
+virtualization can be hard to differentiate, and there is some degree of
+emulation required to fill out the device API, for vfio-pci itself
+included.  So I struggle with a specific measure of where to draw the
+line, and also whose authority it is to draw that line.  I don't think
+it's solely mine, that's something we need to decide as a community.
 
-In any event the API seems cleaner if it is all contained in the
-platform_msi and strongly connected to the driver, not spread to the
-iommu as well. If it had to create single dev-msi domain per parent
-irq_domain then it certainly could be done in a few ways.
+If you see this as an abuse of the framework, then let's identify those
+specific issues and come up with a better approach.  As we've discussed
+before, things like basic PCI config space emulation are acceptable
+overhead and low risk (imo) and some degree of register emulation is
+well within the territory of an mdev driver.  Drivers are accepting
+some degree of increased attack surface by each addition of a uAPI and
+the complexity of those uAPIs, but it seems largely a decision for
+those drivers whether they're willing to take on that responsibility
+and burden.
 
-Jason
+At some point, possibly in the near-ish future, we might have a
+vfio-user interface with userspace vfio-over-socket servers that might
+be able to consume existing uAPIs and offload some of this complexity
+and emulation to userspace while still providing an easy path to insert
+devices into the virtualization stack.  Hopefully if/when that comes
+along, it would provide these sorts of drivers an opportunity to
+offload some of the current overhead out to userspace, but I'm not sure
+it's worth denying a mainline implementation now.  Thanks,
+
+Alex
+
