@@ -2,141 +2,131 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 01BF523D8F2
-	for <lists+kvm@lfdr.de>; Thu,  6 Aug 2020 11:54:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1CBCF23DB29
+	for <lists+kvm@lfdr.de>; Thu,  6 Aug 2020 16:29:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729261AbgHFJyA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 6 Aug 2020 05:54:00 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:37630 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1729128AbgHFJxc (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 6 Aug 2020 05:53:32 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1596707605;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=KFQZ0mX53TPSFs7e42z02Iv0vBjIKEpvfFKAKifFm84=;
-        b=OdQhs77y+/xp+GSTQX+QW5cg2VvJV3fBBmrtv2wTcuZXzMq/IPHgSn8sxQ0Ko2AcuhWgHr
-        rhHrLHEsdYu4hMFbuOYle4f0O0ZDdnYScwoatS9hE0D2TctHeFADz9l0xsmaZTcc8hIyaw
-        bvKW1ZhDkkA6PxGO4M3x9jskuGUhSfQ=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-165-KiOdB-5bM2K-1w3nnKOLrQ-1; Thu, 06 Aug 2020 05:53:23 -0400
-X-MC-Unique: KiOdB-5bM2K-1w3nnKOLrQ-1
-Received: by mail-wm1-f71.google.com with SMTP id u14so2811955wml.0
-        for <kvm@vger.kernel.org>; Thu, 06 Aug 2020 02:53:23 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=KFQZ0mX53TPSFs7e42z02Iv0vBjIKEpvfFKAKifFm84=;
-        b=HmpVbWJtAhV4lEsfhCpG5AzOJQH/v09JsCzxQ/WhRcwr8TwUILCitmXvzsqUhNVtjH
-         lLJF2pbqR1wx77cr+8fuZkdrm3ApC+QQe8Mn4H9/1o3586hrh714nr2WKFzR+SHx0Sno
-         9Rezt+rM7PQPSFCjFc6FZkUxsWquy5qnESui42OfRWREN8guupRPi0j9LWb2WHmcJ+1T
-         ko5+kIhqudsnQ1TRZ208VpGsBQPT6ggWbIcBaneHoDqeZmNRbPF6kXxSjcHDMg0jyoB5
-         9rzt64MU+V9ZEvCKmqqBuwANk3zF6rmnwEk7g1S35c7pT9/WKSc4QrDooo4uOutsqfkE
-         TFnw==
-X-Gm-Message-State: AOAM531iKPRvMMK9GOvOXJ8gqLx+0r/dTZ9qtqvrxeUfstP0J4AGsl51
-        kUKhWKhFVpPiGl9xFQtsffksS59TAqgYGJDaa9HR9bI1/1FBFMLmSyKaMgeRfS0xnWBrZqcyDp6
-        wH39FrcpK2Qp8
-X-Received: by 2002:adf:a35e:: with SMTP id d30mr7103530wrb.53.1596707602574;
-        Thu, 06 Aug 2020 02:53:22 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzH/h9qDvGp6nYOJg6CynBAkWPpcdo5K5kwjUb/kSWQKLCWEkI6SJe/Yh1L7V0XGzkLsCqZXw==
-X-Received: by 2002:adf:a35e:: with SMTP id d30mr7103515wrb.53.1596707602334;
-        Thu, 06 Aug 2020 02:53:22 -0700 (PDT)
-Received: from redhat.com (bzq-79-178-123-8.red.bezeqint.net. [79.178.123.8])
-        by smtp.gmail.com with ESMTPSA id m126sm5943543wmf.3.2020.08.06.02.53.20
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 06 Aug 2020 02:53:21 -0700 (PDT)
-Date:   Thu, 6 Aug 2020 05:53:18 -0400
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Peter Xu <peterx@redhat.com>,
-        Julia Suvorova <jsuvorov@redhat.com>,
-        Andy Lutomirski <luto@kernel.org>, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 0/3] KVM: x86: KVM_MEM_PCI_HOLE memory
-Message-ID: <20200806055008-mutt-send-email-mst@kernel.org>
-References: <20200728143741.2718593-1-vkuznets@redhat.com>
- <20200805201851-mutt-send-email-mst@kernel.org>
- <873650p1vo.fsf@vitty.brq.redhat.com>
+        id S1727800AbgHFO0b (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 6 Aug 2020 10:26:31 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:35158 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726490AbgHFOVR (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 6 Aug 2020 10:21:17 -0400
+Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 076E1ehi162143;
+        Thu, 6 Aug 2020 10:19:33 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : from : to : cc
+ : references : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=cSxQ8SGvCMLjMUkDt4NrKElp1fxGGbRAH4O/nOssxSI=;
+ b=XxI//zNfUBcX3pIEyKFwC1wjdJ+TNO5rWewCpPu9PTOS9Dk/nwZNVdQuELBNYByMbDz7
+ 7MYvQ6WvVu0mQFyqfrC++jh3oS6HymKaz7pDFWfX3VdJj4fz3VlGX52WLEmVSeCiPeGr
+ 1HZiO6IVbDQ/St5UjGNmYvlHFSYVWucn91vZjzYadephhmTeGI3pc7MtYy+B/rttCgqN
+ Rmy2d8PhgbVNUrGmwc3Gd1FHp0pcuWdL+YhltgrYarbG5EXgo3f6C8QKCs+W/wMEQzQQ
+ NTyUfAOAcRntfkweiDmJrn4iV0GmVmgGISq+gBHvCY+O8RWloIYoXdhrH2wPV6zpDXV0 4w== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 32rg3ndurt-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 06 Aug 2020 10:19:31 -0400
+Received: from m0187473.ppops.net (m0187473.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 076E1c3m162114;
+        Thu, 6 Aug 2020 10:19:30 -0400
+Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 32rg3nduqn-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 06 Aug 2020 10:19:30 -0400
+Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
+        by ppma06ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 076EH99O001140;
+        Thu, 6 Aug 2020 14:19:28 GMT
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
+        by ppma06ams.nl.ibm.com with ESMTP id 32mynh5j4g-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 06 Aug 2020 14:19:28 +0000
+Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
+        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 076EJPfV26607874
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 6 Aug 2020 14:19:25 GMT
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id E5660A4053;
+        Thu,  6 Aug 2020 14:19:24 +0000 (GMT)
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 2FE89A4051;
+        Thu,  6 Aug 2020 14:19:24 +0000 (GMT)
+Received: from oc3016276355.ibm.com (unknown [9.145.149.70])
+        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Thu,  6 Aug 2020 14:19:24 +0000 (GMT)
+Subject: Re: [PATCH v7 2/2] s390: virtio: PV needs VIRTIO I/O device
+ protection
+From:   Pierre Morel <pmorel@linux.ibm.com>
+To:     "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, pasic@linux.ibm.com,
+        borntraeger@de.ibm.com, frankja@linux.ibm.com, cohuck@redhat.com,
+        kvm@vger.kernel.org, linux-s390@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, thomas.lendacky@amd.com,
+        david@gibson.dropbear.id.au, linuxram@us.ibm.com,
+        hca@linux.ibm.com, gor@linux.ibm.com
+References: <1594801869-13365-1-git-send-email-pmorel@linux.ibm.com>
+ <1594801869-13365-3-git-send-email-pmorel@linux.ibm.com>
+ <20200715054807-mutt-send-email-mst@kernel.org>
+ <bc5e09ad-faaf-8b38-83e0-5f4a4b1daeb0@redhat.com>
+ <20200715074917-mutt-send-email-mst@kernel.org>
+ <e41d039c-5fe2-b9db-093b-c0dddcc2ad4f@linux.ibm.com>
+Message-ID: <ef819e0e-85c3-0b14-4f8e-0d2a6c452355@linux.ibm.com>
+Date:   Thu, 6 Aug 2020 16:19:23 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <873650p1vo.fsf@vitty.brq.redhat.com>
+In-Reply-To: <e41d039c-5fe2-b9db-093b-c0dddcc2ad4f@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
+ definitions=2020-08-06_09:2020-08-06,2020-08-06 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 suspectscore=0
+ bulkscore=0 priorityscore=1501 clxscore=1015 lowpriorityscore=0
+ mlxlogscore=999 malwarescore=0 adultscore=0 mlxscore=0 spamscore=0
+ impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2006250000 definitions=main-2008060096
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Aug 06, 2020 at 11:19:55AM +0200, Vitaly Kuznetsov wrote:
-> "Michael S. Tsirkin" <mst@redhat.com> writes:
-> 
-> > On Tue, Jul 28, 2020 at 04:37:38PM +0200, Vitaly Kuznetsov wrote:
-> >> This is a continuation of "[PATCH RFC 0/5] KVM: x86: KVM_MEM_ALLONES
-> >> memory" work: 
-> >> https://lore.kernel.org/kvm/20200514180540.52407-1-vkuznets@redhat.com/
-> >> and pairs with Julia's "x86/PCI: Use MMCONFIG by default for KVM guests":
-> >> https://lore.kernel.org/linux-pci/20200722001513.298315-1-jusual@redhat.com/
-> >> 
-> >> PCIe config space can (depending on the configuration) be quite big but
-> >> usually is sparsely populated. Guest may scan it by accessing individual
-> >> device's page which, when device is missing, is supposed to have 'pci
-> >> hole' semantics: reads return '0xff' and writes get discarded.
-> >> 
-> >> When testing Linux kernel boot with QEMU q35 VM and direct kernel boot
-> >> I observed 8193 accesses to PCI hole memory. When such exit is handled
-> >> in KVM without exiting to userspace, it takes roughly 0.000001 sec.
-> >> Handling the same exit in userspace is six times slower (0.000006 sec) so
-> >> the overal; difference is 0.04 sec. This may be significant for 'microvm'
-> >> ideas.
-> >> 
-> >> Note, the same speed can already be achieved by using KVM_MEM_READONLY
-> >> but doing this would require allocating real memory for all missing
-> >> devices and e.g. 8192 pages gives us 32mb. This will have to be allocated
-> >> for each guest separately and for 'microvm' use-cases this is likely
-> >> a no-go.
-> >> 
-> >> Introduce special KVM_MEM_PCI_HOLE memory: userspace doesn't need to
-> >> back it with real memory, all reads from it are handled inside KVM and
-> >> return '0xff'. Writes still go to userspace but these should be extremely
-> >> rare.
-> >> 
-> >> The original 'KVM_MEM_ALLONES' idea had additional optimizations: KVM
-> >> was mapping all 'PCI hole' pages to a single read-only page stuffed with
-> >> 0xff. This is omitted in this submission as the benefits are unclear:
-> >> KVM will have to allocate SPTEs (either on demand or aggressively) and
-> >> this also consumes time/memory.
-> >
-> > Curious about this: if we do it aggressively on the 1st fault,
-> > how long does it take to allocate 256 huge page SPTEs?
-> > And the amount of memory seems pretty small then, right?
-> 
-> Right, this could work but we'll need a 2M region (one per KVM host of
-> course) filled with 0xff-s instead of a single 4k page.
 
-Given it's global doesn't sound too bad.
 
-> 
-> Generally, I'd like to reach an agreement on whether this feature (and
-> the corresponding Julia's patch addding PV feature bit) is worthy. In
-> case it is (meaning it gets merged in this simplest form), we can
-> suggest further improvements. It would also help if firmware (SeaBIOS,
-> OVMF) would start recognizing the PV feature bit too, this way we'll be
-> seeing even bigger improvement and this may or may not be a deal-breaker
-> when it comes to the 'aggressive PTE mapping' idea.
+On 2020-07-30 13:31, Pierre Morel wrote:
+...snip...
+>>>> What bothers me here is that arch code depends on virtio now.
+>>>> It works even with a modular virtio when functions are inline,
+>>>> but it seems fragile: e.g. it breaks virtio as an out of tree module,
+>>>> since layout of struct virtio_device can change.
+>>>
+>>>
+>>> The code was only called from virtio.c so it should be fine.
+>>>
+>>> And my understanding is that we don't need to care about the kABI issue
+>>> during upstream development?
+>>>
+>>> Thanks
+>>
+>> No, but so far it has been convenient at least for me, for development,
+>> to just be able to unload all of virtio and load a different version.
+>>
+>>
+>>>
+>>>>
+>>>> I'm not sure what to do with this yet, will try to think about it
+>>>> over the weekend. Thanks!
 
-About the feature bit, I am not sure why it's really needed. A single
-mmio access is cheaper than two io accesses anyway, right? So it makes
-sense for a kvm guest whether host has this feature or not.
-We need to be careful and limit to a specific QEMU implementation
-to avoid tripping up bugs, but it seems more appropriate to
-check it using pci host IDs.
+After reflection, I am not sure that this problem must be treated on the 
+architecture level or inside the VIRTIO transport.
+Consequently, I will propose another patch series based on CCW transport.
+This also should be more convenient for core development.
 
-> -- 
-> Vitaly
+Regards,
+Pierre
 
+-- 
+Pierre Morel
+IBM Lab Boeblingen
