@@ -2,127 +2,78 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 74CBB23D879
-	for <lists+kvm@lfdr.de>; Thu,  6 Aug 2020 11:20:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 09E3E23D8C3
+	for <lists+kvm@lfdr.de>; Thu,  6 Aug 2020 11:37:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729089AbgHFJUT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 6 Aug 2020 05:20:19 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:30935 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1729127AbgHFJUC (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 6 Aug 2020 05:20:02 -0400
+        id S1729247AbgHFJhA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 6 Aug 2020 05:37:00 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:44991 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1729228AbgHFJg4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 6 Aug 2020 05:36:56 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1596705600;
+        s=mimecast20190719; t=1596706615;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=Qbng0KIuhjnrRqPApXRDER8ey72aYykcRLaK9qO7KvA=;
-        b=aJoNTiGNVQq/9rsm+zX69b3d7pA2f2jaLzsv18RemmSfJapF4oenDiwwvK8wT0QfD3q2Ut
-        Hj5ZyyB+g9Lr/fmV5M4jC7mQHKfKXr455RpBJY8L44GTbqF5ALBPZi+Z/DEU0IOi2R+JQn
-        956138YIj5+dCQZQxzhL+Ur46Iyd1JU=
-Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
- [209.85.218.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-430-K08FyLgEMxmoyIFJlY5sug-1; Thu, 06 Aug 2020 05:19:58 -0400
-X-MC-Unique: K08FyLgEMxmoyIFJlY5sug-1
-Received: by mail-ej1-f69.google.com with SMTP id op5so4838383ejb.2
-        for <kvm@vger.kernel.org>; Thu, 06 Aug 2020 02:19:58 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=Qbng0KIuhjnrRqPApXRDER8ey72aYykcRLaK9qO7KvA=;
-        b=MKXLaP0BVy9XQGCFbmDHKl2ceuRz2lm4rVcQRapCnG6eY1AI5JfpJ8fiNYGjPof1lx
-         WhGXCM5O0OiHLsBqRy3xr/2xsbPtzQmTthyogsLPPG7XgHx+vhUqXWSyJBJcAdZ5cB1/
-         VCbzHNlq7/FtTk0GB9I1n/nNnfgna91q+TFmTUw0Jc7/Rge3gfDfECUtqO6Y70tmWAwp
-         VEVsuw3ORj+PXTlkuhx8zC7mx5nvPsTwsjouAigkdulvXjFP8X+z3sdsLecrIYKuvFWj
-         9mep3FgRBAK8OgO116/N/iNKm/aWXQpGSezpHOXHV7oNYFHy2HjauqDBqImfuWDrtVnb
-         yoeQ==
-X-Gm-Message-State: AOAM53049tSytzRjIXjfzUhJ5P68i03udy9SA0bOa4e3X3+ROJKddGas
-        RUPlQul8I6iPGvDqa693OP90OoXKAvTxS3YYtu8gh/xQ3I8D8l8bHg9zf9sb356gY83FQHQ/cv3
-        coO8DcgQ5QaOQ
-X-Received: by 2002:a17:906:c1c3:: with SMTP id bw3mr3607435ejb.8.1596705596999;
-        Thu, 06 Aug 2020 02:19:56 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxuRhDEaObKZG/m3SESq3Y56+cff+sBnsRhNDN/4SkNQ35QaOrvvNAQiLpZKC54ekRuuLKNEA==
-X-Received: by 2002:a17:906:c1c3:: with SMTP id bw3mr3607421ejb.8.1596705596800;
-        Thu, 06 Aug 2020 02:19:56 -0700 (PDT)
-Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id i9sm3312397ejb.48.2020.08.06.02.19.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 06 Aug 2020 02:19:56 -0700 (PDT)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     "Michael S. Tsirkin" <mst@redhat.com>
-Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Peter Xu <peterx@redhat.com>,
-        Julia Suvorova <jsuvorov@redhat.com>,
-        Andy Lutomirski <luto@kernel.org>, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 0/3] KVM: x86: KVM_MEM_PCI_HOLE memory
-In-Reply-To: <20200805201851-mutt-send-email-mst@kernel.org>
-References: <20200728143741.2718593-1-vkuznets@redhat.com> <20200805201851-mutt-send-email-mst@kernel.org>
-Date:   Thu, 06 Aug 2020 11:19:55 +0200
-Message-ID: <873650p1vo.fsf@vitty.brq.redhat.com>
+        bh=2SRXYqR/w4ZPmQdMHnc72Nwp3MhKm+bh3iVJiUJELNE=;
+        b=ISelayjvZq0aFt5mkkgJVvzj00VbSJBZZGgzsuTGeH067PsenEEvUsUj8IzBONYtRK45qG
+        DFfO1pZSfqPSjhjSYbQhVh7c3w7SspCH/jhpZOamrjoheNH5Fz5ZPWyGyEUih7A+dWfDYi
+        oklV5b2Y/xb4Ir2hxGemH6lri1uGUok=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-322-H-9PRI80Pv28O2DYRxpUzg-1; Thu, 06 Aug 2020 05:36:53 -0400
+X-MC-Unique: H-9PRI80Pv28O2DYRxpUzg-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1B39D1940922;
+        Thu,  6 Aug 2020 09:36:52 +0000 (UTC)
+Received: from gondolin (ovpn-113-2.ams2.redhat.com [10.36.113.2])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 3E70F5C6D9;
+        Thu,  6 Aug 2020 09:36:48 +0000 (UTC)
+Date:   Thu, 6 Aug 2020 11:36:45 +0200
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Alex Williamson <alex.williamson@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] vfio-pci: Avoid recursive read-lock usage
+Message-ID: <20200806113645.47de0bfa.cohuck@redhat.com>
+In-Reply-To: <159665024415.30380.4401928486051321567.stgit@gimli.home>
+References: <159665024415.30380.4401928486051321567.stgit@gimli.home>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-"Michael S. Tsirkin" <mst@redhat.com> writes:
+On Wed, 05 Aug 2020 11:58:05 -0600
+Alex Williamson <alex.williamson@redhat.com> wrote:
 
-> On Tue, Jul 28, 2020 at 04:37:38PM +0200, Vitaly Kuznetsov wrote:
->> This is a continuation of "[PATCH RFC 0/5] KVM: x86: KVM_MEM_ALLONES
->> memory" work: 
->> https://lore.kernel.org/kvm/20200514180540.52407-1-vkuznets@redhat.com/
->> and pairs with Julia's "x86/PCI: Use MMCONFIG by default for KVM guests":
->> https://lore.kernel.org/linux-pci/20200722001513.298315-1-jusual@redhat.com/
->> 
->> PCIe config space can (depending on the configuration) be quite big but
->> usually is sparsely populated. Guest may scan it by accessing individual
->> device's page which, when device is missing, is supposed to have 'pci
->> hole' semantics: reads return '0xff' and writes get discarded.
->> 
->> When testing Linux kernel boot with QEMU q35 VM and direct kernel boot
->> I observed 8193 accesses to PCI hole memory. When such exit is handled
->> in KVM without exiting to userspace, it takes roughly 0.000001 sec.
->> Handling the same exit in userspace is six times slower (0.000006 sec) so
->> the overal; difference is 0.04 sec. This may be significant for 'microvm'
->> ideas.
->> 
->> Note, the same speed can already be achieved by using KVM_MEM_READONLY
->> but doing this would require allocating real memory for all missing
->> devices and e.g. 8192 pages gives us 32mb. This will have to be allocated
->> for each guest separately and for 'microvm' use-cases this is likely
->> a no-go.
->> 
->> Introduce special KVM_MEM_PCI_HOLE memory: userspace doesn't need to
->> back it with real memory, all reads from it are handled inside KVM and
->> return '0xff'. Writes still go to userspace but these should be extremely
->> rare.
->> 
->> The original 'KVM_MEM_ALLONES' idea had additional optimizations: KVM
->> was mapping all 'PCI hole' pages to a single read-only page stuffed with
->> 0xff. This is omitted in this submission as the benefits are unclear:
->> KVM will have to allocate SPTEs (either on demand or aggressively) and
->> this also consumes time/memory.
->
-> Curious about this: if we do it aggressively on the 1st fault,
-> how long does it take to allocate 256 huge page SPTEs?
-> And the amount of memory seems pretty small then, right?
+> A down_read on memory_lock is held when performing read/write accesses
+> to MMIO BAR space, including across the copy_to/from_user() callouts
+> which may fault.  If the user buffer for these copies resides in an
+> mmap of device MMIO space, the mmap fault handler will acquire a
+> recursive read-lock on memory_lock.  Avoid this by reducing the lock
+> granularity.  Sequential accesses requiring multiple ioread/iowrite
+> cycles are expected to be rare, therefore typical accesses should not
+> see additional overhead.
+> 
+> VGA MMIO accesses are expected to be non-fatal regardless of the PCI
+> memory enable bit to allow legacy probing, this behavior remains with
+> a comment added.  ioeventfds are now included in memory access testing,
+> with writes dropped while memory space is disabled.
+> 
+> Fixes: abafbc551fdd ("vfio-pci: Invalidate mmaps and block MMIO access on disabled memory")
+> Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
+> ---
+>  drivers/vfio/pci/vfio_pci_private.h |    2 +
+>  drivers/vfio/pci/vfio_pci_rdwr.c    |  120 ++++++++++++++++++++++++++++-------
+>  2 files changed, 98 insertions(+), 24 deletions(-)
 
-Right, this could work but we'll need a 2M region (one per KVM host of
-course) filled with 0xff-s instead of a single 4k page.
-
-Generally, I'd like to reach an agreement on whether this feature (and
-the corresponding Julia's patch addding PV feature bit) is worthy. In
-case it is (meaning it gets merged in this simplest form), we can
-suggest further improvements. It would also help if firmware (SeaBIOS,
-OVMF) would start recognizing the PV feature bit too, this way we'll be
-seeing even bigger improvement and this may or may not be a deal-breaker
-when it comes to the 'aggressive PTE mapping' idea.
-
--- 
-Vitaly
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
 
