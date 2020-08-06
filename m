@@ -2,108 +2,142 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E3E2223DE35
-	for <lists+kvm@lfdr.de>; Thu,  6 Aug 2020 19:24:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9B27C23DD6A
+	for <lists+kvm@lfdr.de>; Thu,  6 Aug 2020 19:10:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727971AbgHFRXc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 6 Aug 2020 13:23:32 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:26028 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1729955AbgHFRE5 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 6 Aug 2020 13:04:57 -0400
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 076E4BLq037516;
-        Thu, 6 Aug 2020 10:23:10 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id; s=pp1;
- bh=kmhmWCdm048zOKwXHN42FLNuOm7WrXWJMfUPgkm2BNs=;
- b=XogXsXMRXlfm/JAY1LPooBLT63IRYCp8ojV2ctAf3lkvx5Vw9iebfbHieezthAQNC8c0
- /b1g87Yz1d4zB3k1WmuW66G9PU53U8W4EKMQAt7AIgCI/psb/OtVEE/vgSFef0buG0Z7
- JYYwr4i98hQQjP4LOaXvML4fgtZAkymKXVkOEnyDvVVF2gFiGNfUIeZK/XEjsOlO4vj2
- JabFvOzanHZCzsGRQ9PzVHJrSjmUeuJaEAN0xISsn+fffwArKOrYc5vb2gWSAF6EBLid
- tAJK30i6TKzf/UYtYNXDr7tiutyamSPYWlkM7VKb4hqRKBliSIvFSDVr+n1qfByVXcpS JA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 32rgnf5y0j-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 06 Aug 2020 10:23:10 -0400
-Received: from m0098399.ppops.net (m0098399.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 076E4iXH040969;
-        Thu, 6 Aug 2020 10:23:10 -0400
-Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 32rgnf5xyj-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 06 Aug 2020 10:23:10 -0400
-Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
-        by ppma03ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 076EF6Jl029907;
-        Thu, 6 Aug 2020 14:23:07 GMT
-Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
-        by ppma03ams.nl.ibm.com with ESMTP id 32n0185j5x-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 06 Aug 2020 14:23:07 +0000
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
-        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 076EN48J16253204
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 6 Aug 2020 14:23:05 GMT
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id CAB55AE059;
-        Thu,  6 Aug 2020 14:23:04 +0000 (GMT)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 541CFAE04D;
-        Thu,  6 Aug 2020 14:23:04 +0000 (GMT)
-Received: from oc3016276355.ibm.com (unknown [9.145.149.70])
-        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu,  6 Aug 2020 14:23:04 +0000 (GMT)
-From:   Pierre Morel <pmorel@linux.ibm.com>
-To:     linux-kernel@vger.kernel.org
-Cc:     pasic@linux.ibm.com, borntraeger@de.ibm.com, frankja@linux.ibm.com,
-        mst@redhat.com, jasowang@redhat.com, cohuck@redhat.com,
-        kvm@vger.kernel.org, linux-s390@vger.kernel.org,
-        virtualization@lists.linux-foundation.org
-Subject: [PATCH v1 0/1] s390: virtio-ccw: PV needs VIRTIO I/O device protection
-Date:   Thu,  6 Aug 2020 16:23:01 +0200
-Message-Id: <1596723782-12798-1-git-send-email-pmorel@linux.ibm.com>
-X-Mailer: git-send-email 1.8.3.1
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
- definitions=2020-08-06_09:2020-08-06,2020-08-06 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0
- priorityscore=1501 mlxlogscore=999 malwarescore=0 adultscore=0 mlxscore=0
- phishscore=0 suspectscore=1 clxscore=1015 impostorscore=0 bulkscore=0
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2006250000 definitions=main-2008060099
+        id S1730021AbgHFRJP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 6 Aug 2020 13:09:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45820 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729998AbgHFRGE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 6 Aug 2020 13:06:04 -0400
+Received: from mail-io1-xd41.google.com (mail-io1-xd41.google.com [IPv6:2607:f8b0:4864:20::d41])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 45574C0617A9
+        for <kvm@vger.kernel.org>; Thu,  6 Aug 2020 10:04:11 -0700 (PDT)
+Received: by mail-io1-xd41.google.com with SMTP id v6so35060079iow.11
+        for <kvm@vger.kernel.org>; Thu, 06 Aug 2020 10:04:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=nC6PJfNXVU4vFSBxvbjKSl0ryoqOjAjd9RWGvuVHbDM=;
+        b=oLZpvRf1kTJ4eibRUBcjxdeDvtdZOPtNEomtrXn5C94Hbs8Rj8dHrZnApxdRFEwjCl
+         WBc8yQHq3KYajW40zb9qdXGQih4IRSt9uGsN29kdUUfkeijhhBhk6xJqY18RwkHQExnz
+         En5loq1sNJvdr9jvuHobjEotIrsWjcIKsW/9iQLsjtEx4p2gHXPoyKfw1uUZjlnoMgEr
+         cwfI76oogIyUiUU8qlY+Ugbn9lc35uMPWzQr+rfeC0c6wD3GxBi6pVfoIgQbJ8oLdNTa
+         F4WcNsXK48XhtTQShEm/52gGR2owP8y3C7Uh7G0GJAgUeyMsrEVGHSwuLDZzOSVQ3qXj
+         YEhg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=nC6PJfNXVU4vFSBxvbjKSl0ryoqOjAjd9RWGvuVHbDM=;
+        b=Po660+xtB+Xg8K12iIWcwOacf2T6ywjuYZNbQPMKFsy8UMRsMFuLcfA1XMtpmaWMLJ
+         S6ZL33gLJBmFZZ6wTJ94vX0+Ll0GbNe4uLuTDHyJ/jK9AcsM69TFBeMovbgi7iqu8KQJ
+         DTGrKIGpkwQFAI/q9OUIEtpRjHy0nn/3vtSUBh3gtzlMi44XNkZ1ktANoJLIt5hnFwIQ
+         IyBD68NquEVMAWycfn3L5stzvboKDDDVvmn+n5us7eKnDQTR0qqomw7I23vbchi7n2CR
+         tAkXzAx+nUBAuFHlXEnPTRUvZHfPh7DJggiDVJ3hIVLJBAq/EQ3T7+N7H+CRRQZdM9bA
+         0FJA==
+X-Gm-Message-State: AOAM532yaB5I4IkFz2QqZoQ9i2ZssHUkamRG6x+XA8jDWPGEDaGCD4qn
+        OwEUUVjRthYuMoPuDUsXFEmQtHp2QuKCWX6dNoAI1LI1LlFzkg==
+X-Google-Smtp-Source: ABdhPJzzfGB7YzJrZpItnSdv7H0n5425elbodoOWx8Z/hmcoLH46KhADWrSuaoJDJxAtjYKU+SpwKZ8kaLVmNy3x9qo=
+X-Received: by 2002:a5d:80cb:: with SMTP id h11mr10901351ior.189.1596733449095;
+ Thu, 06 Aug 2020 10:04:09 -0700 (PDT)
+MIME-Version: 1.0
+References: <20200805141202.8641-1-yulei.kernel@gmail.com>
+In-Reply-To: <20200805141202.8641-1-yulei.kernel@gmail.com>
+From:   Ben Gardon <bgardon@google.com>
+Date:   Thu, 6 Aug 2020 10:03:57 -0700
+Message-ID: <CANgfPd_P_bjduGgS7miCp4BLUaDXBTYb9swC1gzxwYG2baWRVw@mail.gmail.com>
+Subject: Re: [RFC 0/9] KVM:x86/mmu:Introduce parallel memory virtualization to
+ boost performance
+To:     Yulei Zhang <yulei.kernel@gmail.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Jim Mattson <jmattson@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        xiaoguangrong.eric@gmail.com, kernellwp@gmail.com,
+        lihaiwei.kernel@gmail.com, Yulei Zhang <yuleixzhang@tencent.com>,
+        Junaid Shahid <junaids@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi all,
+On Wed, Aug 5, 2020 at 9:53 AM Yulei Zhang <yulei.kernel@gmail.com> wrote:
+>
+> From: Yulei Zhang <yuleixzhang@tencent.com>
+>
+> Currently in KVM memory virtulization we relay on mmu_lock to synchronize
+> the memory mapping update, which make vCPUs work in serialize mode and
+> slow down the execution, especially after migration to do substantial
+> memory mapping setup, and performance get worse if increase vCPU numbers
+> and guest memories.
+>
+> The idea we present in this patch set is to mitigate the issue with
+> pre-constructed memory mapping table. We will fast pin the guest memory
+> to build up a global memory mapping table according to the guest memslots
+> changes and apply it to cr3, so that after guest starts up all the vCPUs
+> would be able to update the memory concurrently, thus the performance
+> improvement is expected.
 
-In another series I proposed to add an architecture specific
-callback to fail feature negociation on architecture need.
+Is a re-implementation of the various MMU functions in this series
+necessary to pre-populate the EPT/NPT? I realize the approach you took
+is probably the fastest way to pre-populate an EPT, but it seems like
+similar pre-population could be achieved with some changes to the PF
+handler's prefault scheme or, from user space by adding a dummy vCPU
+to touch memory before loading the actual guest image.
 
-In VIRTIO, we already have an entry to reject the features on the
-transport basis.
+I think this series is taking a similar approach to the direct MMU RFC
+I sent out a little less than a year ago. (I will send another version
+of that series in the next month.) I'm not sure this level of
+complexity is worth it if you're only interested in EPT pre-population.
+Is pre-population your goal? You mention "parallel memory
+virtualization," does that refer to parallel page fault handling you
+intend to implement in a future series?
 
-Transport is not architecture so I send a separate series in which
-we fail the feature negociation inside virtio_ccw_finalize_features,
-the virtio_config_ops.finalize_features for S390 CCW transport,
-when the device do not propose the VIRTIO_F_IOMMU_PLATFORM.
+There are a number of features I see you've chosen to leave behind in
+this series which might work for your use case, but I think they're
+necessary. These include handling vCPUs with different roles (SMM, VMX
+non root mode, etc.), MMU notifiers (which I realize matter less for
+pinned memory), demand paging through UFFD, fast EPT
+invalidation/teardown and others.
 
-This solves the problem of crashing QEMU when this one is not using
-a CCW device with iommu_platform=on in S390.
-
-Regards,
-Pierre
-
-Regards,
-Pierre
-
-Pierre Morel (1):
-  s390: virtio-ccw: PV needs VIRTIO I/O device protection
-
- drivers/s390/virtio/virtio_ccw.c | 24 +++++++++++++++++++-----
- 1 file changed, 19 insertions(+), 5 deletions(-)
-
--- 
-2.25.1
-
+>
+> And after test the initial patch with memory dirty pattern workload, we
+> have seen positive results even with huge page enabled. For example,
+> guest with 32 vCPUs and 64G memories, in 2M/1G huge page mode we would get
+> more than 50% improvement.
+>
+>
+> Yulei Zhang (9):
+>   Introduce new fields in kvm_arch/vcpu_arch struct for direct build EPT
+>     support
+>   Introduce page table population function for direct build EPT feature
+>   Introduce page table remove function for direct build EPT feature
+>   Add release function for direct build ept when guest VM exit
+>   Modify the page fault path to meet the direct build EPT requirement
+>   Apply the direct build EPT according to the memory slots change
+>   Add migration support when using direct build EPT
+>   Introduce kvm module parameter global_tdp to turn on the direct build
+>     EPT mode
+>   Handle certain mmu exposed functions properly while turn on direct
+>     build EPT mode
+>
+>  arch/mips/kvm/mips.c            |  13 +
+>  arch/powerpc/kvm/powerpc.c      |  13 +
+>  arch/s390/kvm/kvm-s390.c        |  13 +
+>  arch/x86/include/asm/kvm_host.h |  13 +-
+>  arch/x86/kvm/mmu/mmu.c          | 537 ++++++++++++++++++++++++++++++--
+>  arch/x86/kvm/svm/svm.c          |   2 +-
+>  arch/x86/kvm/vmx/vmx.c          |  17 +-
+>  arch/x86/kvm/x86.c              |  55 ++--
+>  include/linux/kvm_host.h        |   7 +-
+>  virt/kvm/kvm_main.c             |  43 ++-
+>  10 files changed, 648 insertions(+), 65 deletions(-)
+>
+> --
+> 2.17.1
+>
