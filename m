@@ -2,218 +2,210 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1DC2423D46B
-	for <lists+kvm@lfdr.de>; Thu,  6 Aug 2020 02:13:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B6F4F23D46F
+	for <lists+kvm@lfdr.de>; Thu,  6 Aug 2020 02:15:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726202AbgHFANc convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Wed, 5 Aug 2020 20:13:32 -0400
-Received: from mga09.intel.com ([134.134.136.24]:43086 "EHLO mga09.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725779AbgHFANb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 5 Aug 2020 20:13:31 -0400
-IronPort-SDR: CCnQvBXdQG2rAKgIJwjByYUcADcRB+JRR4UTJHcJUxusEBT5saKeMepGqWk1P28eirIY5KJwZX
- h6Dc1VPv9KFw==
-X-IronPort-AV: E=McAfee;i="6000,8403,9704"; a="153826693"
-X-IronPort-AV: E=Sophos;i="5.75,439,1589266800"; 
-   d="scan'208";a="153826693"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Aug 2020 17:13:26 -0700
-IronPort-SDR: O+4ZBxorw0u5ywPhlz5HYztfE7PG/PVS2kRihrUtZGzMN4Cep/aEuXblIykJ5YwhLjuI41z2Jv
- y9HSTDrEPPlw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.75,439,1589266800"; 
-   d="scan'208";a="276237168"
-Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
-  by fmsmga008.fm.intel.com with ESMTP; 05 Aug 2020 17:13:25 -0700
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.1713.5; Wed, 5 Aug 2020 17:13:25 -0700
-Received: from orsmsx612.amr.corp.intel.com (10.22.229.25) by
- ORSMSX610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.1713.5; Wed, 5 Aug 2020 17:13:24 -0700
-Received: from orsmsx612.amr.corp.intel.com ([10.22.229.25]) by
- ORSMSX612.amr.corp.intel.com ([10.22.229.25]) with mapi id 15.01.1713.004;
- Wed, 5 Aug 2020 17:13:24 -0700
-From:   "Dey, Megha" <megha.dey@intel.com>
-To:     Jason Gunthorpe <jgg@mellanox.com>
-CC:     Marc Zyngier <maz@kernel.org>,
-        "Jiang, Dave" <dave.jiang@intel.com>,
-        "vkoul@kernel.org" <vkoul@kernel.org>,
-        "bhelgaas@google.com" <bhelgaas@google.com>,
-        "rafael@kernel.org" <rafael@kernel.org>,
-        "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        "hpa@zytor.com" <hpa@zytor.com>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "Pan, Jacob jun" <jacob.jun.pan@intel.com>,
-        "Raj, Ashok" <ashok.raj@intel.com>,
-        "Liu, Yi L" <yi.l.liu@intel.com>, "Lu, Baolu" <baolu.lu@intel.com>,
-        "Tian, Kevin" <kevin.tian@intel.com>,
-        "Kumar, Sanjay K" <sanjay.k.kumar@intel.com>,
-        "Luck, Tony" <tony.luck@intel.com>,
-        "Lin, Jing" <jing.lin@intel.com>,
-        "Williams, Dan J" <dan.j.williams@intel.com>,
-        "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
-        "eric.auger@redhat.com" <eric.auger@redhat.com>,
-        "parav@mellanox.com" <parav@mellanox.com>,
-        "Hansen, Dave" <dave.hansen@intel.com>,
-        "netanelg@mellanox.com" <netanelg@mellanox.com>,
-        "shahafs@mellanox.com" <shahafs@mellanox.com>,
-        "yan.y.zhao@linux.intel.com" <yan.y.zhao@linux.intel.com>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "Ortiz, Samuel" <samuel.ortiz@intel.com>,
-        "Hossain, Mona" <mona.hossain@intel.com>,
-        "dmaengine@vger.kernel.org" <dmaengine@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "x86@kernel.org" <x86@kernel.org>,
-        "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-Subject: RE: [PATCH RFC v2 02/18] irq/dev-msi: Add support for a new DEV_MSI
- irq domain
-Thread-Topic: [PATCH RFC v2 02/18] irq/dev-msi: Add support for a new DEV_MSI
- irq domain
-Thread-Index: AQHWX3hgWhQMXvQig0qc4n40fOCoeakUaOyAgAASsgCAFXzAsIAAqfsA//+MFHCAAH50AP//nxnA
-Date:   Thu, 6 Aug 2020 00:13:24 +0000
-Message-ID: <630e6a4dc17b49aba32675377f5a50e0@intel.com>
-References: <159534667974.28840.2045034360240786644.stgit@djiang5-desk3.ch.intel.com>
- <159534734833.28840.10067945890695808535.stgit@djiang5-desk3.ch.intel.com>
- <878sfbxtzi.wl-maz@kernel.org> <20200722195928.GN2021248@mellanox.com>
- <96a1eb5ccc724790b5404a642583919d@intel.com>
- <20200805221548.GK19097@mellanox.com>
- <70465fd3a7ae428a82e19f98daa779e8@intel.com>
- <20200805225330.GL19097@mellanox.com>
-In-Reply-To: <20200805225330.GL19097@mellanox.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-dlp-product: dlpe-windows
-dlp-reaction: no-action
-dlp-version: 11.5.1.3
-x-originating-ip: [10.22.254.132]
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
-MIME-Version: 1.0
+        id S1726490AbgHFAOm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 5 Aug 2020 20:14:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59740 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725779AbgHFAOj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 5 Aug 2020 20:14:39 -0400
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2E5CDC061574
+        for <kvm@vger.kernel.org>; Wed,  5 Aug 2020 17:14:38 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id d26so26401163yba.20
+        for <kvm@vger.kernel.org>; Wed, 05 Aug 2020 17:14:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=ukHjjWs5WkFtiIo1+uIoaJAHaeV1zsDQLFHCLViDx9A=;
+        b=oGOu/f1TAJ6j3p+WWvzitUIbdLGn8Duqb+dycILCf+u/HF87ubz84dGBN4tweHZLK4
+         u/azbVeHevh0sZ2wvJIpoDUl/qrx1n/IIVR/aq/ZlkleDhpHq+2TlAD1oaDS/XCiwPdw
+         mD5Ep+zfU/1V/JtWSuHyz6kyo1/PLM/D0Hg5nVGQMe9w7ooe/FVBa5bWyWF4EIHusdt1
+         ru01c0Yjlkv9p7b29FLi872xUBhf7Ee67Lks1XzQk7qpNBeyUKhv8W/OKZhKdtNHijut
+         vpqf7Pxm266TabuQLpw+zirpX3jIUfrWH5do9jKQKAqdILOUSvFPmP5Ta5WC1kjLhpea
+         1Meg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=ukHjjWs5WkFtiIo1+uIoaJAHaeV1zsDQLFHCLViDx9A=;
+        b=IdRf50jPS1QhlbP6RSXnZUfuxdpy7AkbH5sq+WqsDvWDddxZ9rWCtlZSPxJHStS2ZB
+         lvabfcErR2JyZWdnH5EKzx6klRyy2zEV/56WKmym4wNS1xcH3qLR8vLHq1N3EuwsU16k
+         GXxy9HN5ZJQ6JWkQk/Av4NhnnlMLA6TGaY54YqN+Y2OntXuRSxAiLjXEP9u7JMKq/7A7
+         zdFq3am8nqZti8M3rHawBECs1eawzIVAQR/5hnkbwAy0RywX+n50cY2KHQwmIlvGCkY4
+         ipFiq+BDHm3o0GUcmPUvggVywdDZYuOYqgzvED9Bjmv3APNfLLv/jmAZO462HnlYDKBv
+         +h9w==
+X-Gm-Message-State: AOAM533gDrAwCm5iEZL8D8y13ZuN6YWUmEKHnl1x0MAy4hdgSlwkz5E5
+        piVIS8BdMtpP8xjpYvkdOt3r09eU1EY=
+X-Google-Smtp-Source: ABdhPJx+cPe/ZfGxzR9zdfhIWm8DUg/eVg2ptgtOtQPOFUmRpLc+elP5rUSmOj2N95q5WLDf+3HcontyW5cD
+X-Received: by 2002:a25:cf95:: with SMTP id f143mr7894705ybg.126.1596672877936;
+ Wed, 05 Aug 2020 17:14:37 -0700 (PDT)
+Date:   Wed,  5 Aug 2020 17:14:24 -0700
+Message-Id: <20200806001431.2072150-1-jwadams@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.28.0.236.gb10cc79966-goog
+Subject: [RFC PATCH 0/7] metricfs metric file system and examples
+From:   Jonathan Adams <jwadams@google.com>
+To:     linux-kernel@vger.kernel.org
+Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        David Rientjes <rientjes@google.com>,
+        Jonathan Adams <jwadams@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Jason,
+To try to restart the discussion of kernel statistics started by the
+statsfs patchsets (https://lkml.org/lkml/2020/5/26/332), I wanted
+to share the following set of patches which are Google's 'metricfs'
+implementation and some example uses.  Google has been using metricfs
+internally since 2012 as a way to export various statistics to our
+telemetry systems (similar to OpenTelemetry), and we have over 200
+statistics exported on a typical machine.
 
-> -----Original Message-----
-> From: Jason Gunthorpe <jgg@mellanox.com>
-> Sent: Wednesday, August 5, 2020 3:54 PM
-> To: Dey, Megha <megha.dey@intel.com>
-> Cc: Marc Zyngier <maz@kernel.org>; Jiang, Dave <dave.jiang@intel.com>;
-> vkoul@kernel.org; bhelgaas@google.com; rafael@kernel.org;
-> gregkh@linuxfoundation.org; tglx@linutronix.de; hpa@zytor.com;
-> alex.williamson@redhat.com; Pan, Jacob jun <jacob.jun.pan@intel.com>; Raj,
-> Ashok <ashok.raj@intel.com>; Liu, Yi L <yi.l.liu@intel.com>; Lu, Baolu
-> <baolu.lu@intel.com>; Tian, Kevin <kevin.tian@intel.com>; Kumar, Sanjay K
-> <sanjay.k.kumar@intel.com>; Luck, Tony <tony.luck@intel.com>; Lin, Jing
-> <jing.lin@intel.com>; Williams, Dan J <dan.j.williams@intel.com>;
-> kwankhede@nvidia.com; eric.auger@redhat.com; parav@mellanox.com;
-> Hansen, Dave <dave.hansen@intel.com>; netanelg@mellanox.com;
-> shahafs@mellanox.com; yan.y.zhao@linux.intel.com; pbonzini@redhat.com;
-> Ortiz, Samuel <samuel.ortiz@intel.com>; Hossain, Mona
-> <mona.hossain@intel.com>; dmaengine@vger.kernel.org; linux-
-> kernel@vger.kernel.org; x86@kernel.org; linux-pci@vger.kernel.org;
-> kvm@vger.kernel.org
-> Subject: Re: [PATCH RFC v2 02/18] irq/dev-msi: Add support for a new DEV_MSI
-> irq domain
-> 
-> On Wed, Aug 05, 2020 at 10:36:23PM +0000, Dey, Megha wrote:
-> > Hi Jason,
-> >
-> > > From: Jason Gunthorpe <jgg@mellanox.com>
-> > > Sent: Wednesday, August 5, 2020 3:16 PM
-> > > To: Dey, Megha <megha.dey@intel.com>
-> > > Cc: Marc Zyngier <maz@kernel.org>; Jiang, Dave
-> > > <dave.jiang@intel.com>; vkoul@kernel.org; bhelgaas@google.com;
-> > > rafael@kernel.org; gregkh@linuxfoundation.org; tglx@linutronix.de;
-> > > hpa@zytor.com; alex.williamson@redhat.com; Pan, Jacob jun
-> > > <jacob.jun.pan@intel.com>; Raj, Ashok <ashok.raj@intel.com>; Liu, Yi
-> > > L <yi.l.liu@intel.com>; Lu, Baolu <baolu.lu@intel.com>; Tian, Kevin
-> > > <kevin.tian@intel.com>; Kumar, Sanjay K <sanjay.k.kumar@intel.com>;
-> > > Luck, Tony <tony.luck@intel.com>; Lin, Jing <jing.lin@intel.com>;
-> > > Williams, Dan J <dan.j.williams@intel.com>; kwankhede@nvidia.com;
-> > > eric.auger@redhat.com; parav@mellanox.com; Hansen, Dave
-> > > <dave.hansen@intel.com>; netanelg@mellanox.com;
-> > > shahafs@mellanox.com; yan.y.zhao@linux.intel.com;
-> > > pbonzini@redhat.com; Ortiz, Samuel <samuel.ortiz@intel.com>;
-> > > Hossain, Mona <mona.hossain@intel.com>; dmaengine@vger.kernel.org;
-> > > linux- kernel@vger.kernel.org; x86@kernel.org;
-> > > linux-pci@vger.kernel.org; kvm@vger.kernel.org
-> > > Subject: Re: [PATCH RFC v2 02/18] irq/dev-msi: Add support for a new
-> > > DEV_MSI irq domain
-> > >
-> > > On Wed, Aug 05, 2020 at 07:18:39PM +0000, Dey, Megha wrote:
-> > >
-> > > > Hence we will only have one create_dev_msi_domain which can be
-> > > > called by any device driver that wants to use the dev-msi IRQ
-> > > > domain to alloc/free IRQs. It would be the responsibility of the
-> > > > device driver to provide the correct device and update the dev-
-> >msi_domain.
-> > >
-> > > I'm not sure that sounds like a good idea, why should a device
-> > > driver touch dev-
-> > > >msi_domain?
-> > >
-> > > There was a certain appeal to the api I suggested by having
-> > > everything related to setting up the new IRQs being in the core code.
-> >
-> > The basic API to create the dev_msi domain would be :
-> >
-> > struct irq_domain *create_dev_msi_irq_domain(struct irq_domain
-> > *parent)
-> >
-> > This can be called by devices according to their use case.
-> >
-> > For e.g. in dsa case, it is called from the irq remapping driver:
-> > iommu->ir_dev_msi_domain = create_dev_msi_domain(iommu->ir_domain)
-> >
-> > and from the dsa mdev driver:
-> > p_dev = get_parent_pci_dev(dev);
-> > iommu = device_to_iommu(p_dev);
-> >
-> > dev->msi_domain = iommu->ir_dev_msi_domain;
-> >
-> > So we are creating the domain in the IRQ  remapping domain which can be
-> used by other devices which want to have the same IRQ parent domain and use
-> dev-msi APIs. We are only updating that device's msi_domain to the already
-> created dev-msi domain in the driver.
-> >
-> > Other devices (your rdma driver etc) can create their own dev-msi domain by
-> passing the appropriate parent IRq domain.
-> >
-> > We cannot have this in the core code since the parent domain cannot be
-> > the same?
-> 
-> Well, I had suggested to pass in the parent struct device, but it could certainly
-> use an irq_domain instead:
-> 
->   platform_msi_assign_domain(dev, device_to_iommu(p_dev)->ir_domain);
-> 
-> Or
-> 
->   platform_msi_assign_domain(dev, pdev->msi_domain)
-> 
-> ?
-> 
-> Any maybe the natural expression is to add a version of
-> platform_msi_create_device_domain() that accepts a parent irq_domain() and if
-> the device doesn't already have a msi_domain then it creates one. Might be too
-> tricky to manage lifetime of the new irq_domain though..
-> 
-> It feels cleaner to me if everything related to this is contained in the
-> platform_msi and the driver using it. Not sure it makes sense to involve the
-> iommu?
+These patches have been cleaned up and modernized v.s. the versions
+in production; I've included notes under the fold in the patches.
+They're based on v5.8-rc6.
 
-Well yeah something like this can be done, but what is the missing piece is where the IRQ domain actually gets created, i.e where this new version of platform_msi_create_device_domain() is called. That is the only piece that is currently done in the IOMMU driver only for DSA mdev. Not that all devices need to do it this way.. do you have suggestions as to where you want to call this function?
-> 
-> Jason
+The statistics live under debugfs, in a tree rooted at:
+
+	/sys/kernel/debug/metricfs
+
+Each metric is a directory, with four files in it.  For example, the '
+core/metricfs: Create metricfs, standardized files under debugfs.' patch
+includes a simple 'metricfs_presence' metric, whose files look like:
+/sys/kernel/debug/metricfs:
+ metricfs_presence/annotations
+  DESCRIPTION A\ basic\ presence\ metric.
+ metricfs_presence/fields
+  value
+  int
+ metricfs_presence/values
+  1
+ metricfs_presence/version
+  1
+
+(The "version" field always says '1', and is kind of vestigial)
+
+An example of a more complicated stat is the networking stats.
+For example, the tx_bytes stat looks like:
+
+net/dev/stats/tx_bytes/annotations
+  DESCRIPTION net\ device\ transmited\ bytes\ count
+  CUMULATIVE
+net/dev/stats/tx_bytes/fields
+  interface value
+  str int
+net/dev/stats/tx_bytes/values
+  lo 4394430608
+  eth0 33353183843
+  eth1 16228847091
+net/dev/stats/tx_bytes/version
+  1
+
+The per-cpu statistics show up in the schedulat stat info and x86
+IRQ counts.  For example:
+
+stat/user/annotations
+  DESCRIPTION time\ in\ user\ mode\ (nsec)
+  CUMULATIVE
+stat/user/fields
+  cpu value
+  int int
+stat/user/values
+  0 1183486517734
+  1 1038284237228
+  ...
+stat/user/version
+  1
+
+The full set of example metrics I've included are:
+
+core/metricfs: Create metricfs, standardized files under debugfs.
+  metricfs_presence
+core/metricfs: metric for kernel warnings
+  warnings/values
+core/metricfs: expose scheduler stat information through metricfs
+  stat/*
+net-metricfs: Export /proc/net/dev via metricfs.
+  net/dev/stats/[tr]x_*
+core/metricfs: expose x86-specific irq information through metricfs
+  irq_x86/*
+
+The general approach is called out in kernel/metricfs.c:
+
+The kernel provides:
+  - A description of the metric
+  - The subsystem for the metric (NULL is ok)
+  - Type information about the metric, and
+  - A callback function which supplies metric values.
+
+Limitations:
+  - "values" files are at MOST 64K. We truncate the file at that point.
+  - The list of fields and types is at most 1K.
+  - Metrics may have at most 2 fields.
+
+Best Practices:
+  - Emit the most important data first! Once the 64K per-metric buffer
+    is full, the emit* functions won't do anything.
+  - In userspace, open(), read(), and close() the file quickly! The kernel
+    allocation for the metric is alive as long as the file is open. This
+    permits users to seek around the contents of the file, while
+    permitting an atomic view of the data.
+
+Note that since the callbacks are called and the data is generated at
+file open() time, the relative consistency is only between members of
+a given metric; the rx_bytes stat for every network interface will
+be read at almost the same time, but if you want to get rx_bytes
+and rx_packets, there could be a bunch of slew between the two file
+opens.  (So this doesn't entirely address Andrew Lunn's comments in
+https://lkml.org/lkml/2020/5/26/490)
+
+This also doesn't address one of the basic parts of the statsfs work:
+moving the statistics out of debugfs to avoid lockdown interactions.
+
+Google has found a lot of value in having a generic interface for adding
+these kinds of statistics with reasonably low overhead (reading them
+is O(number of statistics), not number of objects in each statistic).
+There are definitely warts in the interface, but does the basic approach
+make sense to folks?
+
+Thanks,
+- Jonathan
+
+Jonathan Adams (5):
+  core/metricfs: add support for percpu metricfs files
+  core/metricfs: metric for kernel warnings
+  core/metricfs: expose softirq information through metricfs
+  core/metricfs: expose scheduler stat information through metricfs
+  core/metricfs: expose x86-specific irq information through metricfs
+
+Justin TerAvest (1):
+  core/metricfs: Create metricfs, standardized files under debugfs.
+
+Laurent Chavey (1):
+  net-metricfs: Export /proc/net/dev via metricfs.
+
+ arch/x86/kernel/irq.c      |  80 ++++
+ fs/proc/stat.c             |  57 +++
+ include/linux/metricfs.h   | 131 +++++++
+ kernel/Makefile            |   2 +
+ kernel/metricfs.c          | 775 +++++++++++++++++++++++++++++++++++++
+ kernel/metricfs_examples.c | 151 ++++++++
+ kernel/panic.c             | 131 +++++++
+ kernel/softirq.c           |  45 +++
+ lib/Kconfig.debug          |  18 +
+ net/core/Makefile          |   1 +
+ net/core/net_metricfs.c    | 194 ++++++++++
+ 11 files changed, 1585 insertions(+)
+ create mode 100644 include/linux/metricfs.h
+ create mode 100644 kernel/metricfs.c
+ create mode 100644 kernel/metricfs_examples.c
+ create mode 100644 net/core/net_metricfs.c
+
+-- 
+2.28.0.236.gb10cc79966-goog
+
