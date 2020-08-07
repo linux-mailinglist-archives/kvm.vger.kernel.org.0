@@ -2,67 +2,66 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id EEF2923ED44
-	for <lists+kvm@lfdr.de>; Fri,  7 Aug 2020 14:23:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9B56E23ED61
+	for <lists+kvm@lfdr.de>; Fri,  7 Aug 2020 14:36:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728245AbgHGMXw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 7 Aug 2020 08:23:52 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:45748 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1728270AbgHGMXu (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 7 Aug 2020 08:23:50 -0400
+        id S1728421AbgHGMgb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 7 Aug 2020 08:36:31 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:20388 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726073AbgHGMga (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 7 Aug 2020 08:36:30 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1596803029;
+        s=mimecast20190719; t=1596803788;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=WCaSq3P5iLlKmhUo+4VVzO9aQrcq3PWlSM7EKazRPPY=;
-        b=P+d2oMe7YYFxEPWmI+SX5Qe7+sXEa2p25BishPiTUultfNr1VL30rU29Qv4LXSDqIY4zn/
-        1byVtjuGKBtizokMp/FpWY5KF5QkUGe9e47dZmBahiWqzsk+ey+cmk/fW/wboXhVRqNw/g
-        grwwE18t1kYrH9EOmUmlrYx3tRvFBxo=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-344-H_wfGOb1NwOp9xdlOKfwTQ-1; Fri, 07 Aug 2020 08:23:47 -0400
-X-MC-Unique: H_wfGOb1NwOp9xdlOKfwTQ-1
-Received: by mail-wm1-f72.google.com with SMTP id i15so615461wmb.5
-        for <kvm@vger.kernel.org>; Fri, 07 Aug 2020 05:23:47 -0700 (PDT)
+        bh=rSQdzT7H+4LpZsteVQiSFjDrjWc1ok8uzbhUSttUkq4=;
+        b=PP1kQCRvwXnvTtITVBJ1zUFl/JyAg/KbOfAmoVYxIlhH31+41iRyHbei9/qEOEbms9YI9C
+        1ley/Y1hfr77VKqjl8jVdsowRBw+zoEPK1dR/bmmr30ImmyG+ZVzRmqgtpQc8jj8hEzksm
+        YoZ08H7OjVXeJqqmnMQOmDWLICAh8m0=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-391-mqTgS58xNDSYphp_9qe7xQ-1; Fri, 07 Aug 2020 08:36:22 -0400
+X-MC-Unique: mqTgS58xNDSYphp_9qe7xQ-1
+Received: by mail-wr1-f72.google.com with SMTP id d6so700645wrv.23
+        for <kvm@vger.kernel.org>; Fri, 07 Aug 2020 05:36:22 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=WCaSq3P5iLlKmhUo+4VVzO9aQrcq3PWlSM7EKazRPPY=;
-        b=VHXfA+/43hoHCwKOAp7Vq4Y42ASiyXO1v3RJ/oPTHm0wfs22NTED7wWvCjR9+f7DEI
-         /uUGTUvZCtsKdiRcslxRBq3Hu6qJklPXVxDaBnJ91yKPHABR6H0+5WndMGqkAyEP+bS5
-         69/n8d/Yh6DZxvUHFzBkkqQzcca6jBU9RmbC3g+E1kS/23tTWEwG6xboSIBG4TaBiWnh
-         PYs5q9Rr7+4zH1qo7QtK4iK+phWJN7kIeZ/92LMCFT/OSG07Wp7PbQW/fLWddUDs+tid
-         a8obN+Q1YdXuo9TNfspRCs8mJQvEtGCETDAeSKTwBu+qP4Gtv3blTEMbslB9MwHyxCWn
-         6/1A==
-X-Gm-Message-State: AOAM533WKT43mV8KxC+Q+o4l1tU0hh8asiQ1r/C4+CZdrbl+shiTmoGm
-        vJ4I64kIaZWWWwSyEUE02nMA0LEy6OzxqQkmDVp3dllOrUOqII4z2E/eVp15VQny6bcuIxny6A2
-        UqQ03UIgegS9U
-X-Received: by 2002:a7b:c084:: with SMTP id r4mr12286572wmh.23.1596803026576;
-        Fri, 07 Aug 2020 05:23:46 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwNtoYPVrH0iqO5AMwfqgSAf1OGvEjs5WjmFz4KsXTdJh4rQumUnnVViYiKUgphr0/dgPMp8g==
-X-Received: by 2002:a7b:c084:: with SMTP id r4mr12286558wmh.23.1596803026380;
-        Fri, 07 Aug 2020 05:23:46 -0700 (PDT)
+        bh=rSQdzT7H+4LpZsteVQiSFjDrjWc1ok8uzbhUSttUkq4=;
+        b=U2vvs8ZbGWZi4yEduT3qBsxtwOXMoRSesnk40iE5O4viOsdDto8PohKz65ksGQue8n
+         gaJRlUvLakFI1zl8cczL9jzLstyYWzWXHUeCRS7QvmgaV8E1OVmKW370faTVOwNPvZWj
+         Ss7xkesNHktkCb09TQz9PPZMf+Y2L9mdLkmpABmY2MrPjWWorsxBDOBW6lSsrDiMcuQp
+         nukE5Rgog6v8jTNhnzGxTfGLleLNzX4zqAJF9e9KOtgr99cSgOFsaJ6jCzeuV4FXEYNZ
+         aPHxd9aGKe9pvReYcxbPtfhuwdc4m0TLGLRQsmAKqpFkY1VxdEndjH6RCBTsfA+k5FvF
+         J+Gg==
+X-Gm-Message-State: AOAM5303rAQxWIYOFNYkZQmx0/Tr89njRPIN38+3uB2/1adFdy4NeHY7
+        jKLmdaWptLj+r92pSynPMscvRNeyjPct/Axa6WhpPxr7eSN5bH8wvF9xynw54oHK6CHhNHXLMOm
+        5U9BkAb8/wZxu
+X-Received: by 2002:a7b:c941:: with SMTP id i1mr12440139wml.73.1596803781569;
+        Fri, 07 Aug 2020 05:36:21 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJy++d/iNBNlxpS408ApnJ6hJ1kj6cCNrPLWp6KR03nlEWj2RVoifDtPxcqbzhatTdCupXP2iQ==
+X-Received: by 2002:a7b:c941:: with SMTP id i1mr12440125wml.73.1596803781373;
+        Fri, 07 Aug 2020 05:36:21 -0700 (PDT)
 Received: from [192.168.178.58] ([151.20.136.3])
-        by smtp.gmail.com with ESMTPSA id c15sm9906265wme.23.2020.08.07.05.23.41
+        by smtp.gmail.com with ESMTPSA id j4sm10066356wmi.48.2020.08.07.05.36.20
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 07 Aug 2020 05:23:45 -0700 (PDT)
-Subject: Re: [GIT PULL] Please pull my kvm-ppc-next-5.9-1 tag
-To:     Paul Mackerras <paulus@ozlabs.org>, kvm@vger.kernel.org
-Cc:     kvm-ppc@vger.kernel.org
-References: <20200728055100.GA2460422@thinks.paulus.ozlabs.org>
- <20200805000221.GA808843@thinks.paulus.ozlabs.org>
+        Fri, 07 Aug 2020 05:36:20 -0700 (PDT)
+Subject: Re: Guest OS migration and lost IPIs
+To:     paulmck@kernel.org
+Cc:     kvm@vger.kernel.org
+References: <20200805000720.GA7516@paulmck-ThinkPad-P72>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <e0e3c1d2-c52a-1ea0-b4ef-72691a2d30c1@redhat.com>
-Date:   Fri, 7 Aug 2020 14:23:41 +0200
+Message-ID: <191fd6d6-a66e-06b1-aa6e-9a0f12efcfc8@redhat.com>
+Date:   Fri, 7 Aug 2020 14:36:17 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.9.0
 MIME-Version: 1.0
-In-Reply-To: <20200805000221.GA808843@thinks.paulus.ozlabs.org>
+In-Reply-To: <20200805000720.GA7516@paulmck-ThinkPad-P72>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -71,21 +70,31 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 05/08/20 02:02, Paul Mackerras wrote:
-> On Tue, Jul 28, 2020 at 03:51:00PM +1000, Paul Mackerras wrote:
->> Paolo,
->>
->> Please do a pull from my kvm-ppc-next-5.9-1 tag to get a PPC KVM
->> update for 5.9.  It's another relatively small update this time, the
->> main thing being a series to improve the startup time for secure VMs
->> and make memory hotplug work in secure VMs.
-> Hi Paolo,
+On 05/08/20 02:07, Paul E. McKenney wrote:
 > 
-> Did this get missed?
+> We are seeing occasional odd hangs, but only in cases where guest OSes
+> are being migrated.  Migrating more often makes the hangs happen more
+> frequently.
+> 
+> Added debug showed that the hung CPU is stuck trying to send an IPI (e.g.,
+> smp_call_function_single()).  The hung CPU thinks that it has sent the
+> IPI, but the destination CPU has interrupts enabled (-not- disabled,
+> enabled, as in ready, willing, and able to take interrupts).  In fact,
+> the destination CPU usually is going about its business as if nothing
+> was wrong, which makes me suspect that the IPI got lost somewhere along
+> the way.
+> 
+> I bumbled a bit through the qemu and KVM source, and didn't find anything
+> synchronizing IPIs and migrations, though given that I know pretty much
+> nothing about either qemu or KVM, this doesn't count for much.
 
-More or less; I was on vacation so I did miss it.  But I was planning
-anyway to send ARM and PPC on a second pull request, I would have
-noticed it when preparing it (as I did now :)).
+The code migrating the interrupt controller is in
+kvm_x86_ops.sync_pir_to_irr (which calls vmx_sync_pir_to_irr) and
+kvm_apic_get_state.  kvm_apic_get_state is called after CPUs are stopped.
+
+It's possible that we're missing a kvm_x86_ops.sync_pir_to_irr call
+somewhere.  It would be surprising but it would explain the symptoms
+very well.
 
 Paolo
 
