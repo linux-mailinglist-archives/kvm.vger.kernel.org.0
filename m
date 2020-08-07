@@ -2,56 +2,175 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 220F123F0A6
-	for <lists+kvm@lfdr.de>; Fri,  7 Aug 2020 18:10:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C59BA23F0C0
+	for <lists+kvm@lfdr.de>; Fri,  7 Aug 2020 18:12:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726198AbgHGQKe convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Fri, 7 Aug 2020 12:10:34 -0400
-Received: from mail.furshetcrimea.ru ([193.27.243.220]:40572 "EHLO
-        furshetcrimea.ru" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726915AbgHGQK2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 7 Aug 2020 12:10:28 -0400
-Received: from [154.118.61.214] (account info@furshetcrimea.ru HELO [192.168.8.100])
-  by furshetcrimea.ru (CommuniGate Pro SMTP 6.1.10)
-  with ESMTPA id 11168856; Fri, 07 Aug 2020 19:21:50 +0300
-Content-Type: text/plain; charset="iso-8859-1"
+        id S1726233AbgHGQMr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 7 Aug 2020 12:12:47 -0400
+Received: from smtp-fw-4101.amazon.com ([72.21.198.25]:8951 "EHLO
+        smtp-fw-4101.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725934AbgHGQMp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 7 Aug 2020 12:12:45 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1596816764; x=1628352764;
+  h=subject:to:cc:references:from:message-id:date:
+   mime-version:in-reply-to:content-transfer-encoding;
+  bh=HbLJqUEGZM/G8PaM16hmOZtBp0w/dQJGyO2J5d0K1UU=;
+  b=QCuYP8slqprHHQgZqDfNAnJlug+L4KRp8/v0F0hY46i3vURJUZRrUEMa
+   Sg0Dw4va1evsmL61z3U3trqdL+D8O5fbuGOjNb1DH1Gtq/GWkdfycxci6
+   IEq2iewPEcHNdunbYv8AQhmgAcWTeyLX7VHNI0Q1mRWs32LVh1aY6CgT6
+   8=;
+IronPort-SDR: a9Vx9pm62i39jECqN2BqsuDn+Tom5ttiMEL0uVe41y2fbnUHJ+QCsS5llsN2nkhZbKF2EyyTWe
+ dkUi+qSGlMJQ==
+X-IronPort-AV: E=Sophos;i="5.75,446,1589241600"; 
+   d="scan'208";a="46733221"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-2c-1968f9fa.us-west-2.amazon.com) ([10.43.8.6])
+  by smtp-border-fw-out-4101.iad4.amazon.com with ESMTP; 07 Aug 2020 16:12:42 +0000
+Received: from EX13MTAUWC001.ant.amazon.com (pdx4-ws-svc-p6-lb7-vlan3.pdx.amazon.com [10.170.41.166])
+        by email-inbound-relay-2c-1968f9fa.us-west-2.amazon.com (Postfix) with ESMTPS id A3524A24FE;
+        Fri,  7 Aug 2020 16:12:40 +0000 (UTC)
+Received: from EX13D20UWC001.ant.amazon.com (10.43.162.244) by
+ EX13MTAUWC001.ant.amazon.com (10.43.162.135) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.2; Fri, 7 Aug 2020 16:12:40 +0000
+Received: from 38f9d3867b82.ant.amazon.com (10.43.161.203) by
+ EX13D20UWC001.ant.amazon.com (10.43.162.244) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.2; Fri, 7 Aug 2020 16:12:33 +0000
+Subject: Re: [PATCH 1/6] KVM: x86: Add ioctl for accepting a userspace
+ provided MSR list
+To:     Aaron Lewis <aaronlewis@google.com>, <jmattson@google.com>
+CC:     <pshier@google.com>, <oupton@google.com>, <kvm@vger.kernel.org>
+References: <20200804042043.3592620-1-aaronlewis@google.com>
+ <20200804042043.3592620-2-aaronlewis@google.com>
+From:   Alexander Graf <graf@amazon.com>
+Message-ID: <183f3ebd-0872-8758-6770-a5769a87011d@amazon.com>
+Date:   Fri, 7 Aug 2020 18:12:31 +0200
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:68.0)
+ Gecko/20100101 Thunderbird/68.11.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8BIT
-Content-Description: Mail message body
-Subject: Bei Interesse antworten.
-To:     Recipients <info@furshetcrimea.ru>
-From:   info@furshetcrimea.ru
-Date:   Fri, 07 Aug 2020 17:09:12 +0100
-Reply-To: mattiassjoborg751@gmail.com
-X-Antivirus: Avast (VPS 200807-2, 08/07/2020), Outbound message
-X-Antivirus-Status: Clean
-Message-ID: <auto-000011168856@furshetcrimea.ru>
+In-Reply-To: <20200804042043.3592620-2-aaronlewis@google.com>
+Content-Language: en-US
+X-Originating-IP: [10.43.161.203]
+X-ClientProxiedBy: EX13D14UWB004.ant.amazon.com (10.43.161.137) To
+ EX13D20UWC001.ant.amazon.com (10.43.162.244)
+Content-Type: text/plain; charset="utf-8"; format="flowed"
+Content-Transfer-Encoding: base64
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Schöne Grüße,
-
-Mein Name ist MATTIAS SJOBORG, ich bin Schweizer Staatsbürger und (Vorsitzender des Vergütungs- und Nominierungsausschusses) von Tethys Petroleum, einem multinationalen Ölkonzern mit Sitz in London-England, Großbritannien. Ich bitte Sie um Ihre Hilfe, um die Summe von vierzig Millionen Dollar abzurufen, die aus zwei Sendungsboxen besteht.
-
-Dieses Geld wurde von der Firma erworben und von einem Diplomaten begleitet und korrekt in einer Sicherheitsfirma in Amerika hinterlegt. Mein Grund dafür ist, dass ich von der Firma zu lange um meine Ansprüche betrogen wurde, nur weil ich kein bin Britisch. Die Kontaktdaten des Diplomaten erhalten Sie, wenn Sie Ihr Interesse bekunden, mir zu helfen.
-
-Jede der Schachteln enthält 20 Mio. USD. Für Ihre Hilfe bin ich bereit, 40% an Sie freizugeben. Aus Sicherheitsgründen wurde die Sendung als VERTRAULICHE DIPLOMATISCHE DOKUMENTE registriert, und ich kann erklären, warum dies so erklärt wurde. Denken Sie daran, dass der Diplomat den Inhalt der Sendung nicht kennt. Er ist seit einem Monat dort, während ich nach einem zuverlässigen Partner suchen möchte. Ich werde das Land verlassen, sobald die Sendung für Sie an Sie geliefert wird Private Investitionen und ich haben geschworen, niemals nach London zurückzukehren. Bitte, ich brauche Ihre dringende Antwort, bevor meine Pläne, das Unternehmen zu verlassen, entdeckt werden.
-
-www.tethyspetroleum.com/tethys/static/EN_US/au_seniormanagement.html
-
-Im Moment ist die sicherste Form der Korrespondenz meine eigene E-Mail-Adresse. Bitte antworten Sie im Interesse der Vertraulichkeit nur über meine direkte E-Mail-Adresse. Antworten Sie zusammen mit Ihrer direkten Telefon- und Faxnummer, unter der ich Sie alternativ erreichen kann.
-
-Bitte, wenn Sie nicht bereit und interessiert sind, mir zu helfen, löschen Sie bitte diese E-Mail aus Ihrer E-Mail und tun Sie so, als hätten Sie sie nie erhalten.
-
-Freundliche Grüße,
-Mr.Mattias Sjoborg
-(Vorsitzender des Vergütungs- und Nominierungsausschusses)
-Tethys Petroleum.
-London, England
-
--- 
-This email has been checked for viruses by Avast antivirus software.
-https://www.avast.com/antivirus
+CgpPbiAwNC4wOC4yMCAwNjoyMCwgQWFyb24gTGV3aXMgd3JvdGU6Cj4gQ0FVVElPTjogVGhpcyBl
+bWFpbCBvcmlnaW5hdGVkIGZyb20gb3V0c2lkZSBvZiB0aGUgb3JnYW5pemF0aW9uLiBEbyBub3Qg
+Y2xpY2sgbGlua3Mgb3Igb3BlbiBhdHRhY2htZW50cyB1bmxlc3MgeW91IGNhbiBjb25maXJtIHRo
+ZSBzZW5kZXIgYW5kIGtub3cgdGhlIGNvbnRlbnQgaXMgc2FmZS4KPiAKPiAKPiAKPiBBZGQgS1ZN
+X1NFVF9FWElUX01TUlMgaW9jdGwgdG8gYWxsb3cgdXNlcnNwYWNlIHRvIHBhc3MgaW4gYSBsaXN0
+IG9mIE1TUnMKPiB0aGF0IGZvcmNlIGFuIGV4aXQgdG8gdXNlcnNwYWNlIHdoZW4gcmRtc3Igb3Ig
+d3Jtc3IgYXJlIHVzZWQgYnkgdGhlCj4gZ3Vlc3QuCj4gCj4gS1ZNX1NFVF9FWElUX01TUlMgd2ls
+bCBuZWVkIHRvIGJlIGNhbGxlZCBiZWZvcmUgYW55IHZDUFVzIGFyZQo+IGNyZWF0ZWQgdG8gcHJv
+dGVjdCB0aGUgJ3VzZXJfZXhpdF9tc3JzJyBsaXN0IGZyb20gYmVpbmcgbXV0YXRlZCB3aGlsZQo+
+IHZDUFVzIGFyZSBydW5uaW5nLgo+IAo+IEFkZCBLVk1fQ0FQX1NFVF9NU1JfRVhJVFMgdG8gaWRl
+bnRpZnkgdGhlIGZlYXR1cmUgZXhpc3RzLgo+IAo+IFNpZ25lZC1vZmYtYnk6IEFhcm9uIExld2lz
+IDxhYXJvbmxld2lzQGdvb2dsZS5jb20+Cj4gUmV2aWV3ZWQtYnk6IE9saXZlciBVcHRvbiA8b3Vw
+dG9uQGdvb2dsZS5jb20+Cj4gLS0tCj4gICBEb2N1bWVudGF0aW9uL3ZpcnQva3ZtL2FwaS5yc3Qg
+IHwgMjQgKysrKysrKysrKysrKysrKysrKwo+ICAgYXJjaC94ODYvaW5jbHVkZS9hc20va3ZtX2hv
+c3QuaCB8ICAyICsrCj4gICBhcmNoL3g4Ni9rdm0veDg2LmMgICAgICAgICAgICAgIHwgNDEgKysr
+KysrKysrKysrKysrKysrKysrKysrKysrKysrKysrCj4gICBpbmNsdWRlL3VhcGkvbGludXgva3Zt
+LmggICAgICAgIHwgIDIgKysKPiAgIDQgZmlsZXMgY2hhbmdlZCwgNjkgaW5zZXJ0aW9ucygrKQo+
+IAo+IGRpZmYgLS1naXQgYS9Eb2N1bWVudGF0aW9uL3ZpcnQva3ZtL2FwaS5yc3QgYi9Eb2N1bWVu
+dGF0aW9uL3ZpcnQva3ZtL2FwaS5yc3QKPiBpbmRleCAzMjA3ODhmODFhMDUuLjdkODE2N2MxNjVh
+YSAxMDA2NDQKPiAtLS0gYS9Eb2N1bWVudGF0aW9uL3ZpcnQva3ZtL2FwaS5yc3QKPiArKysgYi9E
+b2N1bWVudGF0aW9uL3ZpcnQva3ZtL2FwaS5yc3QKPiBAQCAtMTAwNiw2ICsxMDA2LDMwIEBAIHN1
+Y2ggYXMgbWlncmF0aW9uLgo+ICAgOlBhcmFtZXRlcnM6IHN0cnVjdCBrdm1fdmNwdV9ldmVudCAo
+b3V0KQo+ICAgOlJldHVybnM6IDAgb24gc3VjY2VzcywgLTEgb24gZXJyb3IKPiAKPiArNC4zMiBL
+Vk1fU0VUX0VYSVRfTVNSUwo+ICstLS0tLS0tLS0tLS0tLS0tLS0KPiArCj4gKzpDYXBhYmlsaXR5
+OiBLVk1fQ0FQX1NFVF9NU1JfRVhJVFMKPiArOkFyY2hpdGVjdHVyZXM6IHg4Ngo+ICs6VHlwZTog
+dm0gaW9jdGwKPiArOlBhcmFtZXRlcnM6IHN0cnVjdCBrdm1fbXNyX2xpc3QgKGluKQo+ICs6UmV0
+dXJuczogMCBvbiBzdWNjZXNzLCAtMSBvbiBlcnJvcgo+ICsKPiArU2V0cyB0aGUgdXNlcnNwYWNl
+IE1TUiBsaXN0IHdoaWNoIGlzIHVzZWQgdG8gdHJhY2sgd2hpY2ggTVNScyBLVk0gc2hvdWxkIHNl
+bmQKPiArdG8gdXNlcnNwYWNlIHRvIGJlIHNlcnZpY2VkIHdoZW4gdGhlIGd1ZXN0IGV4ZWN1dGVz
+IHJkbXNyIG9yIHdybXNyLgoKVW5mb3J0dW5hdGVseSB0aGlzIGRvZXNuJ3Qgc29sdmUgdGhlIHdo
+b2xlICJpZ25vcmVfbXNycyIgbWVzcyB0aGF0IHdlIApoYXZlIHRvZGF5LiBIb3cgY2FuIEkganVz
+dCBzYXkgInRlbGwgdXNlciBzcGFjZSBhYm91dCB1bmhhbmRsZWQgTVNScyI/IApBbmQgaWYgSSBh
+ZGQgdGhhdCBvbiB0b3Agb2YgdGhpcyBtZWNoYW5pc20sIGhvdyBkbyB3ZSBub3QgbWFrZSB0aGUg
+bGlzdCAKb2YgTVNScyB0aGF0IGFyZSBoYW5kbGVkIGluLWtlcm5lbCBhbiBBQkk/Cgo+ICsKPiAr
+VGhpcyBpb2N0bCBuZWVkcyB0byBiZSBjYWxsZWQgYmVmb3JlIHZDUFVzIGFyZSBzZXR1cCBvdGhl
+cndpc2UgdGhlIGxpc3Qgb2YgTVNScwo+ICt3aWxsIG5vdCBiZSBhY2NlcHRlZCBhbmQgYW4gRUlO
+VkFMIGVycm9yIHdpbGwgYmUgcmV0dXJuZWQuICBBbHNvLCBpZiBhIGxpc3Qgb2YKPiArTVNScyBo
+YXMgYWxyZWFkeSBiZWVuIHN1cHBsaWVkLCBhbmQgdGhpcyBpb2N0bCBpcyBjYWxsZWQgYWdhaW4g
+YW4gRUVYSVNUIGVycm9yCj4gK3dpbGwgYmUgcmV0dXJuZWQuCj4gKwo+ICs6Ogo+ICsKPiArICBz
+dHJ1Y3Qga3ZtX21zcl9saXN0IHsKPiArICBfX3UzMiBubXNyczsKPiArICBfX3UzMiBpbmRpY2Vz
+WzBdOwo+ICt9Owo+ICsKPiAgIFg4NjoKPiAgIF5eXl4KPiAKPiBkaWZmIC0tZ2l0IGEvYXJjaC94
+ODYvaW5jbHVkZS9hc20va3ZtX2hvc3QuaCBiL2FyY2gveDg2L2luY2x1ZGUvYXNtL2t2bV9ob3N0
+LmgKPiBpbmRleCBiZTUzNjNiMjE1NDAuLjUxMDA1NTQ3MWRkMCAxMDA2NDQKPiAtLS0gYS9hcmNo
+L3g4Ni9pbmNsdWRlL2FzbS9rdm1faG9zdC5oCj4gKysrIGIvYXJjaC94ODYvaW5jbHVkZS9hc20v
+a3ZtX2hvc3QuaAo+IEBAIC0xMDA0LDYgKzEwMDQsOCBAQCBzdHJ1Y3Qga3ZtX2FyY2ggewo+IAo+
+ICAgICAgICAgIHN0cnVjdCBrdm1fcG11X2V2ZW50X2ZpbHRlciAqcG11X2V2ZW50X2ZpbHRlcjsK
+PiAgICAgICAgICBzdHJ1Y3QgdGFza19zdHJ1Y3QgKm54X2xwYWdlX3JlY292ZXJ5X3RocmVhZDsK
+PiArCj4gKyAgICAgICBzdHJ1Y3Qga3ZtX21zcl9saXN0ICp1c2VyX2V4aXRfbXNyczsKPiAgIH07
+Cj4gCj4gICBzdHJ1Y3Qga3ZtX3ZtX3N0YXQgewo+IGRpZmYgLS1naXQgYS9hcmNoL3g4Ni9rdm0v
+eDg2LmMgYi9hcmNoL3g4Ni9rdm0veDg2LmMKPiBpbmRleCA4OGM1OTNmODNiMjguLjQ2YTBmYjll
+MDg2OSAxMDA2NDQKPiAtLS0gYS9hcmNoL3g4Ni9rdm0veDg2LmMKPiArKysgYi9hcmNoL3g4Ni9r
+dm0veDg2LmMKPiBAQCAtMzQxOSw2ICszNDE5LDQyIEBAIHN0YXRpYyBpbmxpbmUgYm9vbCBrdm1f
+Y2FuX213YWl0X2luX2d1ZXN0KHZvaWQpCj4gICAgICAgICAgICAgICAgICBib290X2NwdV9oYXMo
+WDg2X0ZFQVRVUkVfQVJBVCk7Cj4gICB9Cj4gCj4gK3N0YXRpYyBpbnQga3ZtX3ZtX2lvY3RsX3Nl
+dF9leGl0X21zcnMoc3RydWN0IGt2bSAqa3ZtLAo+ICsgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgc3RydWN0IGt2bV9tc3JfbGlzdCBfX3VzZXIgKnVzZXJfbXNyX2xpc3QpCj4g
+K3sKPiArICAgICAgIHN0cnVjdCBrdm1fbXNyX2xpc3QgKm1zcl9saXN0LCBoZHI7Cj4gKyAgICAg
+ICBzaXplX3QgaW5kaWNlc19zaXplOwo+ICsKPiArICAgICAgIGlmIChrdm0tPmFyY2gudXNlcl9l
+eGl0X21zcnMgIT0gTlVMTCkKPiArICAgICAgICAgICAgICAgcmV0dXJuIC1FRVhJU1Q7Cj4gKwo+
+ICsgICAgICAgaWYgKGt2bS0+Y3JlYXRlZF92Y3B1cykKPiArICAgICAgICAgICAgICAgcmV0dXJu
+IC1FSU5WQUw7CgpXaGF0IGlmIHdlIG5lZWQgdG8gY2hhbmdlIHRoZSBzZXQgb2YgdXNlciBzcGFj
+ZSBoYW5kbGVkIE1TUnMgCmR5bmFtaWNhbGx5LCBmb3IgZXhhbXBsZSBiZWNhdXNlIGEgZmVhdHVy
+ZSBoYXMgYmVlbiBlbmFibGVkIHRocm91Z2ggYSAKcHJldmlvdXMgTVNSPwoKPiArCj4gKyAgICAg
+ICBpZiAoY29weV9mcm9tX3VzZXIoJmhkciwgdXNlcl9tc3JfbGlzdCwgc2l6ZW9mKGhkcikpKQo+
+ICsgICAgICAgICAgICAgICByZXR1cm4gLUVGQVVMVDsKPiArCj4gKyAgICAgICBpZiAoaGRyLm5t
+c3JzID49IE1BWF9JT19NU1JTKQoKVGhpcyBjb25zdGFudCBpcyBub3QgZGVmaW5lZCBpbnNpZGUg
+dGhlIHNjb3BlIG9mIHRoaXMgcGF0Y2guIElzIHlvdXIgCnBhdGNoc2V0IGZ1bGx5IGJpc2VjdGFi
+bGU/IFBsZWFzZSBtYWtlIHN1cmUgdGhhdCBldmVyeSBwYXRjaCBidWlsZHMgCnN1Y2Nlc3NmdWxs
+eSBvbiBpdHMgb3duIDopLgoKCkFsZXgKCj4gKyAgICAgICAgICAgICAgIHJldHVybiAtRTJCSUc7
+Cj4gKwo+ICsgICAgICAgaW5kaWNlc19zaXplID0gc2l6ZW9mKGhkci5pbmRpY2VzWzBdKSAqIGhk
+ci5ubXNyczsKPiArICAgICAgIG1zcl9saXN0ID0ga3Z6YWxsb2Moc2l6ZW9mKHN0cnVjdCBrdm1f
+bXNyX2xpc3QpICsgaW5kaWNlc19zaXplLAo+ICsgICAgICAgICAgICAgICAgICAgICAgICAgICBH
+RlBfS0VSTkVMX0FDQ09VTlQpOwo+ICsgICAgICAgaWYgKCFtc3JfbGlzdCkKPiArICAgICAgICAg
+ICAgICAgcmV0dXJuIC1FTk9NRU07Cj4gKyAgICAgICBtc3JfbGlzdC0+bm1zcnMgPSBoZHIubm1z
+cnM7Cj4gKwo+ICsgICAgICAgaWYgKGNvcHlfZnJvbV91c2VyKG1zcl9saXN0LT5pbmRpY2VzLCB1
+c2VyX21zcl9saXN0LT5pbmRpY2VzLAo+ICsgICAgICAgICAgICAgICAgICAgICAgICAgIGluZGlj
+ZXNfc2l6ZSkpIHsKPiArICAgICAgICAgICAgICAga3ZmcmVlKG1zcl9saXN0KTsKPiArICAgICAg
+ICAgICAgICAgcmV0dXJuIC1FRkFVTFQ7Cj4gKyAgICAgICB9Cj4gKwo+ICsgICAgICAga3ZtLT5h
+cmNoLnVzZXJfZXhpdF9tc3JzID0gbXNyX2xpc3Q7Cj4gKwo+ICsgICAgICAgcmV0dXJuIDA7Cj4g
+K30KPiArCj4gICBpbnQga3ZtX3ZtX2lvY3RsX2NoZWNrX2V4dGVuc2lvbihzdHJ1Y3Qga3ZtICpr
+dm0sIGxvbmcgZXh0KQo+ICAgewo+ICAgICAgICAgIGludCByID0gMDsKPiBAQCAtMzQ3Niw2ICsz
+NTEyLDcgQEAgaW50IGt2bV92bV9pb2N0bF9jaGVja19leHRlbnNpb24oc3RydWN0IGt2bSAqa3Zt
+LCBsb25nIGV4dCkKPiAgICAgICAgICBjYXNlIEtWTV9DQVBfTVNSX1BMQVRGT1JNX0lORk86Cj4g
+ICAgICAgICAgY2FzZSBLVk1fQ0FQX0VYQ0VQVElPTl9QQVlMT0FEOgo+ICAgICAgICAgIGNhc2Ug
+S1ZNX0NBUF9TRVRfR1VFU1RfREVCVUc6Cj4gKyAgICAgICBjYXNlIEtWTV9DQVBfU0VUX01TUl9F
+WElUUzoKPiAgICAgICAgICAgICAgICAgIHIgPSAxOwo+ICAgICAgICAgICAgICAgICAgYnJlYWs7
+Cj4gICAgICAgICAgY2FzZSBLVk1fQ0FQX1NZTkNfUkVHUzoKPiBAQCAtNTI2MSw2ICs1Mjk4LDEw
+IEBAIGxvbmcga3ZtX2FyY2hfdm1faW9jdGwoc3RydWN0IGZpbGUgKmZpbHAsCj4gICAgICAgICAg
+ICAgICAgICByID0gMDsKPiAgICAgICAgICAgICAgICAgIGJyZWFrOwo+ICAgICAgICAgIH0KPiAr
+ICAgICAgIGNhc2UgS1ZNX1NFVF9FWElUX01TUlM6IHsKPiArICAgICAgICAgICAgICAgciA9IGt2
+bV92bV9pb2N0bF9zZXRfZXhpdF9tc3JzKGt2bSwgYXJncCk7Cj4gKyAgICAgICAgICAgICAgIGJy
+ZWFrOwo+ICsgICAgICAgfQo+ICAgICAgICAgIGNhc2UgS1ZNX01FTU9SWV9FTkNSWVBUX09QOiB7
+Cj4gICAgICAgICAgICAgICAgICByID0gLUVOT1RUWTsKPiAgICAgICAgICAgICAgICAgIGlmIChr
+dm1feDg2X29wcy5tZW1fZW5jX29wKQo+IGRpZmYgLS1naXQgYS9pbmNsdWRlL3VhcGkvbGludXgv
+a3ZtLmggYi9pbmNsdWRlL3VhcGkvbGludXgva3ZtLmgKPiBpbmRleCA0ZmRmMzAzMTY1ODIuLmRl
+NDYzOGMxYmQxNSAxMDA2NDQKPiAtLS0gYS9pbmNsdWRlL3VhcGkvbGludXgva3ZtLmgKPiArKysg
+Yi9pbmNsdWRlL3VhcGkvbGludXgva3ZtLmgKPiBAQCAtMTAzMSw2ICsxMDMxLDcgQEAgc3RydWN0
+IGt2bV9wcGNfcmVzaXplX2hwdCB7Cj4gICAjZGVmaW5lIEtWTV9DQVBfUFBDX1NFQ1VSRV9HVUVT
+VCAxODEKPiAgICNkZWZpbmUgS1ZNX0NBUF9IQUxUX1BPTEwgMTgyCj4gICAjZGVmaW5lIEtWTV9D
+QVBfQVNZTkNfUEZfSU5UIDE4Mwo+ICsjZGVmaW5lIEtWTV9DQVBfU0VUX01TUl9FWElUUyAxODUK
+PiAKPiAgICNpZmRlZiBLVk1fQ0FQX0lSUV9ST1VUSU5HCj4gCj4gQEAgLTEzNzEsNiArMTM3Miw3
+IEBAIHN0cnVjdCBrdm1fczM5MF91Y2FzX21hcHBpbmcgewo+ICAgLyogQXZhaWxhYmxlIHdpdGgg
+S1ZNX0NBUF9QTVVfRVZFTlRfRklMVEVSICovCj4gICAjZGVmaW5lIEtWTV9TRVRfUE1VX0VWRU5U
+X0ZJTFRFUiAgX0lPVyhLVk1JTywgIDB4YjIsIHN0cnVjdCBrdm1fcG11X2V2ZW50X2ZpbHRlcikK
+PiAgICNkZWZpbmUgS1ZNX1BQQ19TVk1fT0ZGICAgICAgICAgICAgICAgICAgX0lPKEtWTUlPLCAg
+MHhiMykKPiArI2RlZmluZSBLVk1fU0VUX0VYSVRfTVNSUyAgICAgIF9JT1coS1ZNSU8sIDB4YjQs
+IHN0cnVjdCBrdm1fbXNyX2xpc3QpCj4gCj4gICAvKiBpb2N0bCBmb3Igdm0gZmQgKi8KPiAgICNk
+ZWZpbmUgS1ZNX0NSRUFURV9ERVZJQ0UgICAgICAgIF9JT1dSKEtWTUlPLCAgMHhlMCwgc3RydWN0
+IGt2bV9jcmVhdGVfZGV2aWNlKQo+IC0tCj4gMi4yOC4wLjE2My5nNjEwNGNjMmYwYjYtZ29vZwo+
+IAoKCgpBbWF6b24gRGV2ZWxvcG1lbnQgQ2VudGVyIEdlcm1hbnkgR21iSApLcmF1c2Vuc3RyLiAz
+OAoxMDExNyBCZXJsaW4KR2VzY2hhZWZ0c2Z1ZWhydW5nOiBDaHJpc3RpYW4gU2NobGFlZ2VyLCBK
+b25hdGhhbiBXZWlzcwpFaW5nZXRyYWdlbiBhbSBBbXRzZ2VyaWNodCBDaGFybG90dGVuYnVyZyB1
+bnRlciBIUkIgMTQ5MTczIEIKU2l0ejogQmVybGluClVzdC1JRDogREUgMjg5IDIzNyA4NzkKCgo=
 
