@@ -2,99 +2,133 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9B56E23ED61
-	for <lists+kvm@lfdr.de>; Fri,  7 Aug 2020 14:36:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0E8DF23ED66
+	for <lists+kvm@lfdr.de>; Fri,  7 Aug 2020 14:38:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728421AbgHGMgb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 7 Aug 2020 08:36:31 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:20388 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726073AbgHGMga (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 7 Aug 2020 08:36:30 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1596803788;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=rSQdzT7H+4LpZsteVQiSFjDrjWc1ok8uzbhUSttUkq4=;
-        b=PP1kQCRvwXnvTtITVBJ1zUFl/JyAg/KbOfAmoVYxIlhH31+41iRyHbei9/qEOEbms9YI9C
-        1ley/Y1hfr77VKqjl8jVdsowRBw+zoEPK1dR/bmmr30ImmyG+ZVzRmqgtpQc8jj8hEzksm
-        YoZ08H7OjVXeJqqmnMQOmDWLICAh8m0=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-391-mqTgS58xNDSYphp_9qe7xQ-1; Fri, 07 Aug 2020 08:36:22 -0400
-X-MC-Unique: mqTgS58xNDSYphp_9qe7xQ-1
-Received: by mail-wr1-f72.google.com with SMTP id d6so700645wrv.23
-        for <kvm@vger.kernel.org>; Fri, 07 Aug 2020 05:36:22 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=rSQdzT7H+4LpZsteVQiSFjDrjWc1ok8uzbhUSttUkq4=;
-        b=U2vvs8ZbGWZi4yEduT3qBsxtwOXMoRSesnk40iE5O4viOsdDto8PohKz65ksGQue8n
-         gaJRlUvLakFI1zl8cczL9jzLstyYWzWXHUeCRS7QvmgaV8E1OVmKW370faTVOwNPvZWj
-         Ss7xkesNHktkCb09TQz9PPZMf+Y2L9mdLkmpABmY2MrPjWWorsxBDOBW6lSsrDiMcuQp
-         nukE5Rgog6v8jTNhnzGxTfGLleLNzX4zqAJF9e9KOtgr99cSgOFsaJ6jCzeuV4FXEYNZ
-         aPHxd9aGKe9pvReYcxbPtfhuwdc4m0TLGLRQsmAKqpFkY1VxdEndjH6RCBTsfA+k5FvF
-         J+Gg==
-X-Gm-Message-State: AOAM5303rAQxWIYOFNYkZQmx0/Tr89njRPIN38+3uB2/1adFdy4NeHY7
-        jKLmdaWptLj+r92pSynPMscvRNeyjPct/Axa6WhpPxr7eSN5bH8wvF9xynw54oHK6CHhNHXLMOm
-        5U9BkAb8/wZxu
-X-Received: by 2002:a7b:c941:: with SMTP id i1mr12440139wml.73.1596803781569;
-        Fri, 07 Aug 2020 05:36:21 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJy++d/iNBNlxpS408ApnJ6hJ1kj6cCNrPLWp6KR03nlEWj2RVoifDtPxcqbzhatTdCupXP2iQ==
-X-Received: by 2002:a7b:c941:: with SMTP id i1mr12440125wml.73.1596803781373;
-        Fri, 07 Aug 2020 05:36:21 -0700 (PDT)
-Received: from [192.168.178.58] ([151.20.136.3])
-        by smtp.gmail.com with ESMTPSA id j4sm10066356wmi.48.2020.08.07.05.36.20
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 07 Aug 2020 05:36:20 -0700 (PDT)
-Subject: Re: Guest OS migration and lost IPIs
-To:     paulmck@kernel.org
-Cc:     kvm@vger.kernel.org
-References: <20200805000720.GA7516@paulmck-ThinkPad-P72>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <191fd6d6-a66e-06b1-aa6e-9a0f12efcfc8@redhat.com>
-Date:   Fri, 7 Aug 2020 14:36:17 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.9.0
+        id S1728451AbgHGMiU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 7 Aug 2020 08:38:20 -0400
+Received: from mail.kernel.org ([198.145.29.99]:53072 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727783AbgHGMiT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 7 Aug 2020 08:38:19 -0400
+Received: from localhost (83-86-89-107.cable.dynamic.v4.ziggo.nl [83.86.89.107])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 2CB552086A;
+        Fri,  7 Aug 2020 12:38:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1596803898;
+        bh=fEDd6WVXFZL6y21ZUytHI7qe5dgGRL3OroGXMuAeFv0=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=sq+hm/QJyvxkysE8pjDRAg919/6DIkLyvz20wceT31jYDFyd5r5A0K8HjXkJSj8F/
+         /LHosTTh2/2dm+eb45g3bsrgrQmmm+R8P80VXgaxN/hklSZ5w8qgspx17oL+wSrXRz
+         DAP7zrm068q5ItWhpO45xqkF5I3Iytxlro9j/gEM=
+Date:   Fri, 7 Aug 2020 14:38:31 +0200
+From:   "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>
+To:     Jason Gunthorpe <jgg@nvidia.com>
+Cc:     Thomas Gleixner <tglx@linutronix.de>,
+        "Dey, Megha" <megha.dey@intel.com>, Marc Zyngier <maz@kernel.org>,
+        "Jiang, Dave" <dave.jiang@intel.com>,
+        "vkoul@kernel.org" <vkoul@kernel.org>,
+        "bhelgaas@google.com" <bhelgaas@google.com>,
+        "rafael@kernel.org" <rafael@kernel.org>,
+        "hpa@zytor.com" <hpa@zytor.com>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "Pan, Jacob jun" <jacob.jun.pan@intel.com>,
+        "Raj, Ashok" <ashok.raj@intel.com>,
+        "Liu, Yi L" <yi.l.liu@intel.com>, "Lu, Baolu" <baolu.lu@intel.com>,
+        "Tian, Kevin" <kevin.tian@intel.com>,
+        "Kumar, Sanjay K" <sanjay.k.kumar@intel.com>,
+        "Luck, Tony" <tony.luck@intel.com>,
+        "Lin, Jing" <jing.lin@intel.com>,
+        "Williams, Dan J" <dan.j.williams@intel.com>,
+        "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
+        "eric.auger@redhat.com" <eric.auger@redhat.com>,
+        "parav@mellanox.com" <parav@mellanox.com>,
+        "Hansen, Dave" <dave.hansen@intel.com>,
+        "netanelg@mellanox.com" <netanelg@mellanox.com>,
+        "shahafs@mellanox.com" <shahafs@mellanox.com>,
+        "yan.y.zhao@linux.intel.com" <yan.y.zhao@linux.intel.com>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "Ortiz, Samuel" <samuel.ortiz@intel.com>,
+        "Hossain, Mona" <mona.hossain@intel.com>,
+        "dmaengine@vger.kernel.org" <dmaengine@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "x86@kernel.org" <x86@kernel.org>,
+        "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Subject: Re: [PATCH RFC v2 02/18] irq/dev-msi: Add support for a new DEV_MSI
+ irq domain
+Message-ID: <20200807123831.GA645281@kroah.com>
+References: <20200805221548.GK19097@mellanox.com>
+ <70465fd3a7ae428a82e19f98daa779e8@intel.com>
+ <20200805225330.GL19097@mellanox.com>
+ <630e6a4dc17b49aba32675377f5a50e0@intel.com>
+ <20200806001927.GM19097@mellanox.com>
+ <c6a1c065ab9b46bbaf9f5713462085a5@intel.com>
+ <87tuxfhf9u.fsf@nanos.tec.linutronix.de>
+ <014ffe59-38d3-b770-e065-dfa2d589adc6@intel.com>
+ <87h7tfh6fc.fsf@nanos.tec.linutronix.de>
+ <20200807120650.GR16789@nvidia.com>
 MIME-Version: 1.0
-In-Reply-To: <20200805000720.GA7516@paulmck-ThinkPad-P72>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200807120650.GR16789@nvidia.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 05/08/20 02:07, Paul E. McKenney wrote:
+On Fri, Aug 07, 2020 at 09:06:50AM -0300, Jason Gunthorpe wrote:
+> On Thu, Aug 06, 2020 at 10:21:11PM +0200, Thomas Gleixner wrote:
 > 
-> We are seeing occasional odd hangs, but only in cases where guest OSes
-> are being migrated.  Migrating more often makes the hangs happen more
-> frequently.
+> > Optionally? Please tell the hardware folks to make this mandatory. We
+> > have enough pain with non maskable MSI interrupts already so introducing
+> > yet another non maskable interrupt trainwreck is not an option.
 > 
-> Added debug showed that the hung CPU is stuck trying to send an IPI (e.g.,
-> smp_call_function_single()).  The hung CPU thinks that it has sent the
-> IPI, but the destination CPU has interrupts enabled (-not- disabled,
-> enabled, as in ready, willing, and able to take interrupts).  In fact,
-> the destination CPU usually is going about its business as if nothing
-> was wrong, which makes me suspect that the IPI got lost somewhere along
-> the way.
+> Can you elaborate on the flows where Linux will need to trigger
+> masking?
 > 
-> I bumbled a bit through the qemu and KVM source, and didn't find anything
-> synchronizing IPIs and migrations, though given that I know pretty much
-> nothing about either qemu or KVM, this doesn't count for much.
+> I expect that masking will be available in our NIC HW too - but it
+> will require a spin loop if masking has to be done in an atomic
+> context.
+> 
+> > It's more than a decade now that I tell HW people not to repeat the
+> > non-maskable MSI failure, but obviously they still think that
+> > non-maskable interrupts are a brilliant idea. I know that HW folks
+> > believe that everything they omit can be fixed in software, but they
+> > have to finally understand that this particular issue _cannot_ be fixed
+> > at all.
+> 
+> Sure, the CPU should always be able to shut off an interrupt!
+> 
+> Maybe explaining the goals would help understand the HW perspective.
+> 
+> Today HW can process > 100k queues of work at once. Interrupt delivery
+> works by having a MSI index in each queue's metadata and the interrupt
+> indirects through a MSI-X table on-chip which has the
+> addr/data/mask/etc.
+> 
+> What IMS proposes is that the interrupt data can move into the queue
+> meta data (which is not required to be on-chip), eg along side the
+> producer/consumer pointers, and the central MSI-X table is not
+> needed. This is necessary because the PCI spec has very harsh design
+> requirements for a MSI-X table that make scaling it prohibitive.
+> 
+> So an IRQ can be silenced by deleting or stopping the queue(s)
+> triggering it. It can be masked by including masking in the queue
+> metadata. We can detect pending by checking the producer/consumer
+> values.
+> 
+> However synchronizing all the HW and all the state is now more
+> complicated than just writing a mask bit via MMIO to an on-die memory.
 
-The code migrating the interrupt controller is in
-kvm_x86_ops.sync_pir_to_irr (which calls vmx_sync_pir_to_irr) and
-kvm_apic_get_state.  kvm_apic_get_state is called after CPUs are stopped.
+Because doing all of the work that used to be done in HW in software is
+so much faster and scalable?  Feels really wrong to me :(
 
-It's possible that we're missing a kvm_x86_ops.sync_pir_to_irr call
-somewhere.  It would be surprising but it would explain the symptoms
-very well.
+Do you all have a pointer to the spec for this newly proposed stuff
+anywhere to try to figure out how the HW wants this to all work?
 
-Paolo
+thanks,
 
+greg k-h
