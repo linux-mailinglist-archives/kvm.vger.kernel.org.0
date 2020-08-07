@@ -2,176 +2,160 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 06AAC23EFED
-	for <lists+kvm@lfdr.de>; Fri,  7 Aug 2020 17:22:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4C3ED23F047
+	for <lists+kvm@lfdr.de>; Fri,  7 Aug 2020 17:57:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726078AbgHGPWr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 7 Aug 2020 11:22:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53668 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725993AbgHGPWq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 7 Aug 2020 11:22:46 -0400
-Received: from galois.linutronix.de (Galois.linutronix.de [IPv6:2a0a:51c0:0:12e:550::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4D6AAC061756;
-        Fri,  7 Aug 2020 08:22:46 -0700 (PDT)
-From:   Thomas Gleixner <tglx@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020; t=1596813755;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=NVumAgezZv+7SVfB6Q2/Q8X5jlsIYt1eVjkbA1gdAYw=;
-        b=4EQlx0KMb0meqiPGzR18ImjZq7WryZlWL+Wk7/0XxpI9c6/yULykLFr3nu6YZveprK0jmQ
-        2hc/eLkG/qsh+mXKa61yIcVVPRhV8BLJFvhJ8P1ZRJum5AsynK7ZbfOOWyea+jCzK7NVEC
-        SbNXq1fNSunkpoMw60WEF94xSccakAhh7MZHhvlHXiKcBIOJN5IQR+5bENh9jLeEU+3+Ta
-        I5dLC6u+27CZhHOVbwaRoMkNMdsHK0VAVdaJfYqOsdJENLFg1W9zRdj9TuD7SQ7GPjBoXL
-        phOY9PTQYgmjbwLVdmUwV2P+h88yDTUCPhqTV4r5h9Gi/jPPIejCXB2Gf3YnRw==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020e; t=1596813755;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=NVumAgezZv+7SVfB6Q2/Q8X5jlsIYt1eVjkbA1gdAYw=;
-        b=snOYMyrybLgc0p11pj36AhN+M0Ea0tL3D1T62sjEyZSxQB9iW8Bt1kc8zPiAhMnhZywXor
-        B5a75eWk7dW5XNBA==
-To:     Jason Gunthorpe <jgg@nvidia.com>
-Cc:     "Dey\, Megha" <megha.dey@intel.com>, Marc Zyngier <maz@kernel.org>,
-        "Jiang\, Dave" <dave.jiang@intel.com>,
-        "vkoul\@kernel.org" <vkoul@kernel.org>,
-        "bhelgaas\@google.com" <bhelgaas@google.com>,
-        "rafael\@kernel.org" <rafael@kernel.org>,
-        "gregkh\@linuxfoundation.org" <gregkh@linuxfoundation.org>,
-        "hpa\@zytor.com" <hpa@zytor.com>,
-        "alex.williamson\@redhat.com" <alex.williamson@redhat.com>,
-        "Pan\, Jacob jun" <jacob.jun.pan@intel.com>,
-        "Raj\, Ashok" <ashok.raj@intel.com>,
-        "Liu\, Yi L" <yi.l.liu@intel.com>,
-        "Lu\, Baolu" <baolu.lu@intel.com>,
-        "Tian\, Kevin" <kevin.tian@intel.com>,
-        "Kumar\, Sanjay K" <sanjay.k.kumar@intel.com>,
-        "Luck\, Tony" <tony.luck@intel.com>,
-        "Lin\, Jing" <jing.lin@intel.com>,
-        "Williams\, Dan J" <dan.j.williams@intel.com>,
-        "kwankhede\@nvidia.com" <kwankhede@nvidia.com>,
-        "eric.auger\@redhat.com" <eric.auger@redhat.com>,
-        "parav\@mellanox.com" <parav@mellanox.com>,
-        "Hansen\, Dave" <dave.hansen@intel.com>,
-        "netanelg\@mellanox.com" <netanelg@mellanox.com>,
-        "shahafs\@mellanox.com" <shahafs@mellanox.com>,
-        "yan.y.zhao\@linux.intel.com" <yan.y.zhao@linux.intel.com>,
-        "pbonzini\@redhat.com" <pbonzini@redhat.com>,
-        "Ortiz\, Samuel" <samuel.ortiz@intel.com>,
-        "Hossain\, Mona" <mona.hossain@intel.com>,
-        "dmaengine\@vger.kernel.org" <dmaengine@vger.kernel.org>,
-        "linux-kernel\@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "x86\@kernel.org" <x86@kernel.org>,
-        "linux-pci\@vger.kernel.org" <linux-pci@vger.kernel.org>,
-        "kvm\@vger.kernel.org" <kvm@vger.kernel.org>
-Subject: Re: [PATCH RFC v2 02/18] irq/dev-msi: Add support for a new DEV_MSI irq domain
-In-Reply-To: <20200807120650.GR16789@nvidia.com>
-References: <96a1eb5ccc724790b5404a642583919d@intel.com> <20200805221548.GK19097@mellanox.com> <70465fd3a7ae428a82e19f98daa779e8@intel.com> <20200805225330.GL19097@mellanox.com> <630e6a4dc17b49aba32675377f5a50e0@intel.com> <20200806001927.GM19097@mellanox.com> <c6a1c065ab9b46bbaf9f5713462085a5@intel.com> <87tuxfhf9u.fsf@nanos.tec.linutronix.de> <014ffe59-38d3-b770-e065-dfa2d589adc6@intel.com> <87h7tfh6fc.fsf@nanos.tec.linutronix.de> <20200807120650.GR16789@nvidia.com>
-Date:   Fri, 07 Aug 2020 17:22:34 +0200
-Message-ID: <87y2mqfpl1.fsf@nanos.tec.linutronix.de>
+        id S1726386AbgHGP5G (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 7 Aug 2020 11:57:06 -0400
+Received: from smtp-fw-4101.amazon.com ([72.21.198.25]:65242 "EHLO
+        smtp-fw-4101.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725993AbgHGP5F (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 7 Aug 2020 11:57:05 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1596815825; x=1628351825;
+  h=from:to:cc:subject:date:message-id:mime-version;
+  bh=aRi9Uy05R53LS40Cl2TUQpYE2SoFuLjkjihkP3mfagk=;
+  b=r9DSZhRnLAY3Lh6WxwtvX3DDXDaKH9jxGXflXD9pZy/Sz4SZcuitD84+
+   H2uvc+IM/6DDhlbPRTgmSN5ZYWafYjJcpgKUBYFR3UK82ujDWfJU7J9S9
+   tjn39cgpvI3go0c5c53dBMEDiuvCdz/wtZBKu0AhMrUvPc63PXyumoFty
+   w=;
+IronPort-SDR: y4XqMm+0kzfvW4yIpAFwF1Tu+qCceBTtGffx1tonMt08r4cNIV5o41CNIGp5ooiDazwJVjVxQj
+ gmheqMJRHdNg==
+X-IronPort-AV: E=Sophos;i="5.75,446,1589241600"; 
+   d="scan'208";a="46730315"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-1a-e34f1ddc.us-east-1.amazon.com) ([10.43.8.6])
+  by smtp-border-fw-out-4101.iad4.amazon.com with ESMTP; 07 Aug 2020 15:57:03 +0000
+Received: from EX13MTAUWC001.ant.amazon.com (iad55-ws-svc-p15-lb9-vlan3.iad.amazon.com [10.40.159.166])
+        by email-inbound-relay-1a-e34f1ddc.us-east-1.amazon.com (Postfix) with ESMTPS id 9A85FA211B;
+        Fri,  7 Aug 2020 15:56:59 +0000 (UTC)
+Received: from EX13D20UWC001.ant.amazon.com (10.43.162.244) by
+ EX13MTAUWC001.ant.amazon.com (10.43.162.135) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.2; Fri, 7 Aug 2020 15:56:58 +0000
+Received: from u79c5a0a55de558.ant.amazon.com (10.43.162.140) by
+ EX13D20UWC001.ant.amazon.com (10.43.162.244) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.2; Fri, 7 Aug 2020 15:56:55 +0000
+From:   Alexander Graf <graf@amazon.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+CC:     Jonathan Corbet <corbet@lwn.net>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        "Joerg Roedel" <joro@8bytes.org>,
+        KarimAllah Raslan <karahmed@amazon.de>,
+        Aaron Lewis <aaronlewis@google.com>, <kvm@vger.kernel.org>,
+        <linux-doc@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+Subject: [PATCH v5 0/3] Allow user space to restrict and augment MSR emulation
+Date:   Fri, 7 Aug 2020 17:56:45 +0200
+Message-ID: <20200807155648.8602-1-graf@amazon.com>
+X-Mailer: git-send-email 2.17.1
 MIME-Version: 1.0
 Content-Type: text/plain
+X-Originating-IP: [10.43.162.140]
+X-ClientProxiedBy: EX13D29UWA001.ant.amazon.com (10.43.160.187) To
+ EX13D20UWC001.ant.amazon.com (10.43.162.244)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Jason,
+While tying to add support for the MSR_CORE_THREAD_COUNT MSR in KVM,
+I realized that we were still in a world where user space has no control
+over what happens with MSR emulation in KVM.
 
-Jason Gunthorpe <jgg@nvidia.com> writes:
-> On Thu, Aug 06, 2020 at 10:21:11PM +0200, Thomas Gleixner wrote:
->
->> Optionally? Please tell the hardware folks to make this mandatory. We
->> have enough pain with non maskable MSI interrupts already so introducing
->> yet another non maskable interrupt trainwreck is not an option.
->
-> Can you elaborate on the flows where Linux will need to trigger
-> masking?
+That is bad for multiple reasons. In my case, I wanted to emulate the
+MSR in user space, because it's a CPU specific register that does not
+exist on older CPUs and that really only contains informational data that
+is on the package level, so it's a natural fit for user space to provide
+it.
 
-1) disable/enable_irq() obviously needs masking
-   
-2) Affinity changes are preferrably done with masking to avoid a
-   boatload of nasty side effect. We have a "fix" for 32bit addressing
-   mode which works by chance due to the layout but it would fail
-   miserably with 64bit addressing mode. 64bit addressing mode is only
-   relevant for more than 256 CPUs which requires X2APIC which in turn
-   requires interrupt remapping. Interrupt remappind saves us here
-   because the interrupt can be disabled at the remapping level.
+However, it is also bad on a platform compatibility level. Currrently,
+KVM has no way to expose different MSRs based on the selected target CPU
+type.
 
-3) The ability to shutdown an irq at the interrupt level in case of
-   malfunction. Of course that's pure paranoia because devices are
-   perfect and never misbehave :)
+This patch set introduces a way for user space to indicate to KVM which
+MSRs should be handled in kernel space. With that, we can solve part of
+the platform compatibility story. Or at least we can not handle AMD specific
+MSRs on an Intel platform and vice versa.
 
-So it's nowhere in the hot path of interrupt handling itself.
+In addition, it introduces a way for user space to get into the loop
+when an MSR access would generate a #GP fault, such as when KVM finds an
+MSR that is not handled by the in-kernel MSR emulation or when the guest
+is trying to access reserved registers.
 
-> I expect that masking will be available in our NIC HW too - but it
-> will require a spin loop if masking has to be done in an atomic
-> context.
+In combination with the allow list, the user space trapping allows us
+to emulate arbitrary MSRs in user space, paving the way for target CPU
+specific MSR implementations from user space.
 
-Yes, it's all in atomic context.
+v1 -> v2:
 
-We have functionality in the interrupt core to do #1 and #2 from task
-context (requires the caller to be in task context as well). #3 not so
-much.
+  - s/ETRAP_TO_USER_SPACE/ENOENT/g
+  - deflect all #GP injection events to user space, not just unknown MSRs.
+    That was we can also deflect allowlist errors later
+  - fix emulator case
+  - new patch: KVM: x86: Introduce allow list for MSR emulation
+  - new patch: KVM: selftests: Add test for user space MSR handling
 
->> It's more than a decade now that I tell HW people not to repeat the
->> non-maskable MSI failure, but obviously they still think that
->> non-maskable interrupts are a brilliant idea. I know that HW folks
->> believe that everything they omit can be fixed in software, but they
->> have to finally understand that this particular issue _cannot_ be fixed
->> at all.
->
-> Sure, the CPU should always be able to shut off an interrupt!
+v2 -> v3:
 
-Oh yes!
+  - return r if r == X86EMUL_IO_NEEDED
+  - s/KVM_EXIT_RDMSR/KVM_EXIT_X86_RDMSR/g
+  - s/KVM_EXIT_WRMSR/KVM_EXIT_X86_WRMSR/g
+  - Use complete_userspace_io logic instead of reply field
+  - Simplify trapping code
+  - document flags for KVM_X86_ADD_MSR_ALLOWLIST
+  - generalize exit path, always unlock when returning
+  - s/KVM_CAP_ADD_MSR_ALLOWLIST/KVM_CAP_X86_MSR_ALLOWLIST/g
+  - Add KVM_X86_CLEAR_MSR_ALLOWLIST
+  - Add test to clear whitelist
+  - Adjust to reply-less API
+  - Fix asserts
+  - Actually trap on MSR_IA32_POWER_CTL writes
 
-> Maybe explaining the goals would help understand the HW perspective.
->
-> Today HW can process > 100k queues of work at once. Interrupt delivery
-> works by having a MSI index in each queue's metadata and the interrupt
-> indirects through a MSI-X table on-chip which has the
-> addr/data/mask/etc.
->
-> What IMS proposes is that the interrupt data can move into the queue
-> meta data (which is not required to be on-chip), eg along side the
-> producer/consumer pointers, and the central MSI-X table is not
-> needed. This is necessary because the PCI spec has very harsh design
-> requirements for a MSI-X table that make scaling it prohibitive.
+v3 -> v4:
 
-I know.
+  - Mention exit reasons in re-enter mandatory section of API documentation
+  - Clear padding bytes
+  - Generalize get/set deflect functions
+  - Remove redundant pending_user_msr field
+  - lock allow check and clearing
+  - free bitmaps on clear
 
-> So an IRQ can be silenced by deleting or stopping the queue(s)
-> triggering it.
+v4 -> v5:
 
-We cannot do that from the interrupt layer without squaring the
-circle and violating all locking and layering rules in one go.
+  - use srcu 
 
-> It can be masked by including masking in the queue metadata. We can
-> detect pending by checking the producer/consumer values.
->
-> However synchronizing all the HW and all the state is now more
-> complicated than just writing a mask bit via MMIO to an on-die memory.
+Alexander Graf (3):
+  KVM: x86: Deflect unknown MSR accesses to user space
+  KVM: x86: Introduce allow list for MSR emulation
+  KVM: selftests: Add test for user space MSR handling
 
-That's one of the reasons why I think that the IMS handling has to be a
-per device irqdomain with it's own interrupt chip because the way how
-IMS is managed is completely device specific.
+ Documentation/virt/kvm/api.rst                | 157 ++++++++++-
+ arch/x86/include/asm/kvm_host.h               |  13 +
+ arch/x86/include/uapi/asm/kvm.h               |  15 +
+ arch/x86/kvm/emulate.c                        |  18 +-
+ arch/x86/kvm/x86.c                            | 266 +++++++++++++++++-
+ include/trace/events/kvm.h                    |   2 +-
+ include/uapi/linux/kvm.h                      |  15 +
+ tools/testing/selftests/kvm/Makefile          |   1 +
+ .../selftests/kvm/x86_64/user_msr_test.c      | 221 +++++++++++++++
+ 9 files changed, 699 insertions(+), 9 deletions(-)
+ create mode 100644 tools/testing/selftests/kvm/x86_64/user_msr_test.c
 
-There is certainly opportunity for sharing some of the functionality and
-code, but not by creating a pseudo-shared entity which is customized per
-device with indirections and magic storage plus device specific IMS slot
-management glued at it as a wart. Such concepts fall apart in no time or
-end up in a completely unmaintainable mess.
+-- 
+2.17.1
 
-Coming back to mask/unmask. We could lift that requirement if and only
-if irq remapping is mandatory to make use of those magic devices because
-the remapping unit allows us to do the masking. That still would not
-justify the pseudo-shared irqdomain because the IMS slot management
-still stays per device.
 
-Thanks,
 
-        tglx
+
+Amazon Development Center Germany GmbH
+Krausenstr. 38
+10117 Berlin
+Geschaeftsfuehrung: Christian Schlaeger, Jonathan Weiss
+Eingetragen am Amtsgericht Charlottenburg unter HRB 149173 B
+Sitz: Berlin
+Ust-ID: DE 289 237 879
+
+
 
