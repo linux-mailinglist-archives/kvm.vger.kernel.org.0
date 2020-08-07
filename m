@@ -2,65 +2,65 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 657B023EC32
-	for <lists+kvm@lfdr.de>; Fri,  7 Aug 2020 13:16:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2F8C723EC34
+	for <lists+kvm@lfdr.de>; Fri,  7 Aug 2020 13:16:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728032AbgHGLQP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 7 Aug 2020 07:16:15 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:61440 "EHLO
+        id S1726058AbgHGLQR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 7 Aug 2020 07:16:17 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:9298 "EHLO
         mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726398AbgHGLQH (ORCPT
+        by vger.kernel.org with ESMTP id S1726418AbgHGLQH (ORCPT
         <rfc822;kvm@vger.kernel.org>); Fri, 7 Aug 2020 07:16:07 -0400
 Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 077B1hmD192084;
-        Fri, 7 Aug 2020 07:16:06 -0400
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 077B1gR3191993;
+        Fri, 7 Aug 2020 07:16:07 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
  : date : message-id : in-reply-to : references : mime-version :
  content-transfer-encoding; s=pp1;
- bh=Fr1iz+RFNb1Dq8EX4XEUqnmzyRFZChcgQDIyojQrvnk=;
- b=GqnxW3eyGkm2HmjrPIguvhgLdjPsZiuj0yzaElk4BfxOVFgso2lLH/PseJnz71GNejp/
- OSYb+ewoyPhIRWyGSnZLofEVFEj2CrmPC2pZQnm5d2oN3v9gZm0YGUj5N8Ad3e0QnsU8
- qco5cd65JAGQQmxwNUUh7d1ZEQ93I5YGGhgN5/Df1Cjr/7qFn9ANRWsgOIbmKfjRFicT
- +Z/PaxH69FIDTjff8cTC8p7+VL+LzEPuFznDtbTh7SzNX9aXG/Liu4me0A/en7D0UM60
- +RnN90SNBnpNuyaCFOHx6UcKS2XUzzExRcoPqxJUoB8QF/NpCT/xnmHK/REO8T4fupyv DQ== 
+ bh=aLUCZG0byd/L0nTnpRLr0CEhle5/TDx0KglUE8IUI08=;
+ b=EHRgfQcGDNGr1KMEWIbNWrrSaEcAdwGdkYsTqVa+YvgGtdQt3N6skYtQXPB3vOTYihLp
+ /zreK9k26Ei1rSRq7NqSguf/z+SBt9p3Eh4x36lyYKI86PHtRJbBSpYg6o0/zHSvK6VW
+ 8U2OcoSYSUKkbclRtvmVe9a0XzYh63wdTwjkXZ8z1zpLoAZbip+jcK75VPC2NtB31DDD
+ oHt2QJuQ27lE0Mfz57GNupbDhUwX9iKP0VMiPHVBJ2o3LbsoBIukXuhvxy2ADeD83v2K
+ X9iU1O8eUnzDrhw+nhacJ1p8ViIkha13F6hdb3+svYEAD2+Dm4qCYJrCPY1FRNv4IyhA 3g== 
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 32s0tes245-1
+        by mx0a-001b2d01.pphosted.com with ESMTP id 32s0tes24r-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 07 Aug 2020 07:16:05 -0400
+        Fri, 07 Aug 2020 07:16:06 -0400
 Received: from m0098396.ppops.net (m0098396.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 077B1oiZ192543;
-        Fri, 7 Aug 2020 07:16:05 -0400
-Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 32s0tes23b-1
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 077B3PSd002333;
+        Fri, 7 Aug 2020 07:16:06 -0400
+Received: from ppma04fra.de.ibm.com (6a.4a.5195.ip4.static.sl-reverse.com [149.81.74.106])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 32s0tes23q-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 07 Aug 2020 07:16:05 -0400
-Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
-        by ppma03ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 077AtHL7002795;
-        Fri, 7 Aug 2020 11:16:03 GMT
-Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
-        by ppma03ams.nl.ibm.com with ESMTP id 32n0186k0v-1
+        Fri, 07 Aug 2020 07:16:06 -0400
+Received: from pps.filterd (ppma04fra.de.ibm.com [127.0.0.1])
+        by ppma04fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 077BG4gM029095;
+        Fri, 7 Aug 2020 11:16:04 GMT
+Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
+        by ppma04fra.de.ibm.com with ESMTP id 32n018c13y-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 07 Aug 2020 11:16:02 +0000
+        Fri, 07 Aug 2020 11:16:04 +0000
 Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
-        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 077BG0h824248668
+        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 077BG14W65601874
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 7 Aug 2020 11:16:00 GMT
+        Fri, 7 Aug 2020 11:16:01 GMT
 Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 362BAAE05F;
+        by IMSVA (Postfix) with ESMTP id 1F1A3AE061;
+        Fri,  7 Aug 2020 11:16:01 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 5CCC7AE056;
         Fri,  7 Aug 2020 11:16:00 +0000 (GMT)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 72D77AE055;
-        Fri,  7 Aug 2020 11:15:59 +0000 (GMT)
 Received: from linux01.pok.stglabs.ibm.com (unknown [9.114.17.81])
         by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Fri,  7 Aug 2020 11:15:59 +0000 (GMT)
+        Fri,  7 Aug 2020 11:16:00 +0000 (GMT)
 From:   Janosch Frank <frankja@linux.ibm.com>
 To:     kvm@vger.kernel.org
 Cc:     thuth@redhat.com, linux-s390@vger.kernel.org, david@redhat.com,
         borntraeger@de.ibm.com, cohuck@redhat.com, imbrenda@linux.ibm.com
-Subject: [kvm-unit-tests PATCH v2 2/3] s390x: skrf: Add exception new skey test and add test to unittests.cfg
-Date:   Fri,  7 Aug 2020 07:15:54 -0400
-Message-Id: <20200807111555.11169-3-frankja@linux.ibm.com>
+Subject: [kvm-unit-tests PATCH v2 3/3] s390x: Ultravisor guest API test
+Date:   Fri,  7 Aug 2020 07:15:55 -0400
+Message-Id: <20200807111555.11169-4-frankja@linux.ibm.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20200807111555.11169-1-frankja@linux.ibm.com>
 References: <20200807111555.11169-1-frankja@linux.ibm.com>
@@ -70,7 +70,7 @@ X-TM-AS-GCONF: 00
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
  definitions=2020-08-07_06:2020-08-06,2020-08-07 signatures=0
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 mlxlogscore=999
- priorityscore=1501 bulkscore=0 lowpriorityscore=0 suspectscore=1
+ priorityscore=1501 bulkscore=0 lowpriorityscore=0 suspectscore=3
  phishscore=0 impostorscore=0 clxscore=1015 spamscore=0 malwarescore=0
  mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
  engine=8.12.0-2006250000 definitions=main-2008070077
@@ -79,142 +79,293 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-When an exception new psw with a storage key in its mask is loaded
-from lowcore, a specification exception is raised. This differs from
-the behavior when trying to execute skey related instructions, which
-will result in special operation exceptions.
-
-Also let's add the test to unittests.cfg so it is run more often.
+Test the error conditions of guest 2 Ultravisor calls, namely:
+     * Query Ultravisor information
+     * Set shared access
+     * Remove shared access
 
 Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
 Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
 ---
- s390x/skrf.c        | 79 +++++++++++++++++++++++++++++++++++++++++++++
- s390x/unittests.cfg |  4 +++
- 2 files changed, 83 insertions(+)
+ lib/s390x/asm/uv.h  |  74 ++++++++++++++++++++
+ s390x/Makefile      |   1 +
+ s390x/unittests.cfg |   3 +
+ s390x/uv-guest.c    | 162 ++++++++++++++++++++++++++++++++++++++++++++
+ 4 files changed, 240 insertions(+)
+ create mode 100644 lib/s390x/asm/uv.h
+ create mode 100644 s390x/uv-guest.c
 
-diff --git a/s390x/skrf.c b/s390x/skrf.c
-index 9cae589..b19d0f4 100644
---- a/s390x/skrf.c
-+++ b/s390x/skrf.c
-@@ -11,12 +11,16 @@
-  */
- #include <libcflat.h>
- #include <asm/asm-offsets.h>
-+#include <asm-generic/barrier.h>
- #include <asm/interrupt.h>
- #include <asm/page.h>
- #include <asm/facility.h>
- #include <asm/mem.h>
-+#include <asm/sigp.h>
-+#include <smp.h>
- 
- static uint8_t pagebuf[PAGE_SIZE * 2] __attribute__((aligned(PAGE_SIZE * 2)));
-+static int testflag = 0;
- 
- static void test_facilities(void)
- {
-@@ -106,6 +110,80 @@ static void test_tprot(void)
- 	report_prefix_pop();
- }
- 
-+static void wait_for_flag(void)
-+{
-+	while (!testflag)
-+		mb();
-+}
+diff --git a/lib/s390x/asm/uv.h b/lib/s390x/asm/uv.h
+new file mode 100644
+index 0000000..4c2fc48
+--- /dev/null
++++ b/lib/s390x/asm/uv.h
+@@ -0,0 +1,74 @@
++/*
++ * s390x Ultravisor related definitions
++ *
++ * Copyright (c) 2020 IBM Corp
++ *
++ * Authors:
++ *  Janosch Frank <frankja@linux.ibm.com>
++ *
++ * This code is free software; you can redistribute it and/or modify it
++ * under the terms of the GNU General Public License version 2.
++ */
++#ifndef UV_H
++#define UV_H
 +
-+static void set_flag(int val)
-+{
-+	mb();
-+	testflag = val;
-+	mb();
-+}
++#define UVC_RC_EXECUTED		0x0001
++#define UVC_RC_INV_CMD		0x0002
++#define UVC_RC_INV_STATE	0x0003
++#define UVC_RC_INV_LEN		0x0005
++#define UVC_RC_NO_RESUME	0x0007
 +
-+static void ecall_cleanup(void)
-+{
-+	struct lowcore *lc = (void *)0x0;
++#define UVC_CMD_QUI			0x0001
++#define UVC_CMD_SET_SHARED_ACCESS	0x1000
++#define UVC_CMD_REMOVE_SHARED_ACCESS	0x1001
 +
-+	lc->ext_new_psw.mask = 0x0000000180000000UL;
-+	lc->sw_int_crs[0] = 0x0000000000040000;
++/* Bits in installed uv calls */
++enum uv_cmds_inst {
++	BIT_UVC_CMD_QUI = 0,
++	BIT_UVC_CMD_SET_SHARED_ACCESS = 8,
++	BIT_UVC_CMD_REMOVE_SHARED_ACCESS = 9,
++};
++
++struct uv_cb_header {
++	u16 len;
++	u16 cmd;	/* Command Code */
++	u16 rc;		/* Response Code */
++	u16 rrc;	/* Return Reason Code */
++} __attribute__((packed))  __attribute__((aligned(8)));
++
++struct uv_cb_qui {
++	struct uv_cb_header header;
++	u64 reserved08;
++	u64 inst_calls_list[4];
++	u64 reserved30[15];
++} __attribute__((packed))  __attribute__((aligned(8)));
++
++struct uv_cb_share {
++	struct uv_cb_header header;
++	u64 reserved08[3];
++	u64 paddr;
++	u64 reserved28;
++} __attribute__((packed))  __attribute__((aligned(8)));
++
++static inline int uv_call(unsigned long r1, unsigned long r2)
++{
++	int cc;
 +
 +	/*
-+	 * PGM old contains the ext new PSW, we need to clean it up,
-+	 * so we don't get a special operation exception on the lpswe
-+	 * of pgm old.
-+	 */
-+	lc->pgm_old_psw.mask = 0x0000000180000000UL;
-+
-+	check_pgm_int_code(PGM_INT_CODE_SPECIFICATION);
-+	set_flag(1);
++	 * The brc instruction will take care of the cc 2/3 case where
++	 * we need to continue the execution because we were
++	 * interrupted. The inline assembly will only return on
++	 * success/error i.e. cc 0/1.
++	*/
++	asm volatile(
++		"0:	.insn rrf,0xB9A40000,%[r1],%[r2],0,0\n"
++		"		brc	3,0b\n"
++		"		ipm	%[cc]\n"
++		"		srl	%[cc],28\n"
++		: [cc] "=d" (cc)
++		: [r1] "a" (r1), [r2] "a" (r2)
++		: "memory", "cc");
++	return cc;
 +}
 +
-+/* Set a key into the external new psw mask and open external call masks */
-+static void ecall_setup(void)
-+{
-+	struct lowcore *lc = (void *)0x0;
-+	uint64_t mask;
++#endif
+diff --git a/s390x/Makefile b/s390x/Makefile
+index 0f54bf4..c2213ad 100644
+--- a/s390x/Makefile
++++ b/s390x/Makefile
+@@ -18,6 +18,7 @@ tests += $(TEST_DIR)/skrf.elf
+ tests += $(TEST_DIR)/smp.elf
+ tests += $(TEST_DIR)/sclp.elf
+ tests += $(TEST_DIR)/css.elf
++tests += $(TEST_DIR)/uv-guest.elf
+ tests_binary = $(patsubst %.elf,%.bin,$(tests))
+ 
+ all: directories test_cases test_cases_binary
+diff --git a/s390x/unittests.cfg b/s390x/unittests.cfg
+index b35269b..6d50c63 100644
+--- a/s390x/unittests.cfg
++++ b/s390x/unittests.cfg
+@@ -92,3 +92,6 @@ extra_params = -device virtio-net-ccw
+ [skrf]
+ file = skrf.elf
+ smp = 2
 +
-+	register_pgm_cleanup_func(ecall_cleanup);
-+	expect_pgm_int();
-+	/* Put a skey into the ext new psw */
-+	lc->ext_new_psw.mask = 0x00F0000180000000UL;
-+	/* Open up ext masks */
-+	ctl_set_bit(0, 13);
-+	mask = extract_psw_mask();
-+	mask |= PSW_MASK_EXT;
-+	load_psw_mask(mask);
-+	/* Tell cpu 0 that we're ready */
-+	set_flag(1);
-+}
++[uv-guest]
++file = uv-guest.elf
+diff --git a/s390x/uv-guest.c b/s390x/uv-guest.c
+new file mode 100644
+index 0000000..1aaf7ca
+--- /dev/null
++++ b/s390x/uv-guest.c
+@@ -0,0 +1,162 @@
++/*
++ * Guest Ultravisor Call tests
++ *
++ * Copyright (c) 2020 IBM Corp
++ *
++ * Authors:
++ *  Janosch Frank <frankja@linux.ibm.com>
++ *
++ * This code is free software; you can redistribute it and/or modify it
++ * under the terms of the GNU General Public License version 2.
++ */
 +
-+static void test_exception_ext_new(void)
++#include <libcflat.h>
++#include <alloc_page.h>
++#include <asm/page.h>
++#include <asm/asm-offsets.h>
++#include <asm/interrupt.h>
++#include <asm/facility.h>
++#include <asm/uv.h>
++
++static unsigned long page;
++
++static inline int share(unsigned long addr, u16 cmd)
 +{
-+	struct psw psw = {
-+		.mask = extract_psw_mask(),
-+		.addr = (unsigned long)ecall_setup
++	struct uv_cb_share uvcb = {
++		.header.cmd = cmd,
++		.header.len = sizeof(uvcb),
++		.paddr = addr
 +	};
 +
-+	report_prefix_push("exception external new");
-+	if (smp_query_num_cpus() < 2) {
-+		report_skip("Need second cpu for exception external new test.");
-+		report_prefix_pop();
-+		return;
-+	}
++	uv_call(0, (u64)&uvcb);
++	return uvcb.header.rc;
++}
 +
-+	smp_cpu_setup(1, psw);
-+	wait_for_flag();
-+	set_flag(0);
++static inline int uv_set_shared(unsigned long addr)
++{
++	return share(addr, UVC_CMD_SET_SHARED_ACCESS);
++}
 +
-+	sigp(1, SIGP_EXTERNAL_CALL, 0, NULL);
-+	wait_for_flag();
-+	smp_cpu_stop(1);
++static inline int uv_remove_shared(unsigned long addr)
++{
++	return share(addr, UVC_CMD_REMOVE_SHARED_ACCESS);
++}
++
++static void test_priv(void)
++{
++	struct uv_cb_header uvcb = {};
++
++	report_prefix_push("privileged");
++
++	report_prefix_push("query");
++	expect_pgm_int();
++	uvcb.cmd = UVC_CMD_QUI;
++	uvcb.len = sizeof(struct uv_cb_qui);
++	enter_pstate();
++	uv_call(0, (u64)&uvcb);
++	check_pgm_int_code(PGM_INT_CODE_PRIVILEGED_OPERATION);
++	report_prefix_pop();
++
++	report_prefix_push("share");
++	expect_pgm_int();
++	enter_pstate();
++	uv_set_shared((unsigned long)page);
++	check_pgm_int_code(PGM_INT_CODE_PRIVILEGED_OPERATION);
++	report_prefix_pop();
++
++	report_prefix_push("unshare");
++	expect_pgm_int();
++	enter_pstate();
++	uv_remove_shared((unsigned long)page);
++	check_pgm_int_code(PGM_INT_CODE_PRIVILEGED_OPERATION);
++	report_prefix_pop();
++
 +	report_prefix_pop();
 +}
 +
- int main(void)
- {
- 	report_prefix_push("skrf");
-@@ -121,6 +199,7 @@ int main(void)
- 	test_mvcos();
- 	test_spka();
- 	test_tprot();
-+	test_exception_ext_new();
- 
- done:
- 	report_prefix_pop();
-diff --git a/s390x/unittests.cfg b/s390x/unittests.cfg
-index 0f156af..b35269b 100644
---- a/s390x/unittests.cfg
-+++ b/s390x/unittests.cfg
-@@ -88,3 +88,7 @@ extra_params = -m 3G
- [css]
- file = css.elf
- extra_params = -device virtio-net-ccw
++static void test_query(void)
++{
++	struct uv_cb_qui uvcb = {
++		.header.cmd = UVC_CMD_QUI,
++		.header.len = sizeof(uvcb) - 8,
++	};
++	int cc;
 +
-+[skrf]
-+file = skrf.elf
-+smp = 2
++	report_prefix_push("query");
++	cc = uv_call(0, (u64)&uvcb);
++	report(cc == 1 && uvcb.header.rc == UVC_RC_INV_LEN, "length");
++
++	uvcb.header.len = sizeof(uvcb);
++	cc = uv_call(0, (u64)&uvcb);
++	report(cc == 0 && uvcb.header.rc == UVC_RC_EXECUTED, "successful query");
++
++	/*
++	 * These bits have been introduced with the very first
++	 * Ultravisor version and are expected to always be available
++	 * because they are basic building blocks.
++	 */
++	report(uvcb.inst_calls_list[0] & (1UL << (63 - BIT_UVC_CMD_QUI)),
++	       "query indicated");
++	report(uvcb.inst_calls_list[0] & (1UL << (63 - BIT_UVC_CMD_SET_SHARED_ACCESS)),
++	       "share indicated");
++	report(uvcb.inst_calls_list[0] & (1UL << (63 - BIT_UVC_CMD_REMOVE_SHARED_ACCESS)),
++	       "unshare indicated");
++	report_prefix_pop();
++}
++
++static void test_sharing(void)
++{
++	struct uv_cb_share uvcb = {
++		.header.cmd = UVC_CMD_SET_SHARED_ACCESS,
++		.header.len = sizeof(uvcb) - 8,
++	};
++	int cc;
++
++	report_prefix_push("share");
++	cc = uv_call(0, (u64)&uvcb);
++	report(cc == 1 && uvcb.header.rc == UVC_RC_INV_LEN, "length");
++	report(uv_set_shared(page) == UVC_RC_EXECUTED, "share");
++	report_prefix_pop();
++
++	report_prefix_push("unshare");
++	uvcb.header.cmd = UVC_CMD_REMOVE_SHARED_ACCESS;
++	cc = uv_call(0, (u64)&uvcb);
++	report(cc == 1 && uvcb.header.rc == UVC_RC_INV_LEN, "length");
++	report(uv_remove_shared(page) == UVC_RC_EXECUTED, "unshare");
++	report_prefix_pop();
++
++	report_prefix_pop();
++}
++
++static void test_invalid(void)
++{
++	struct uv_cb_header uvcb = {
++		.len = 16,
++		.cmd = 0x4242,
++	};
++	int cc;
++
++	cc = uv_call(0, (u64)&uvcb);
++	report(cc == 1 && uvcb.rc == UVC_RC_INV_CMD, "invalid command");
++}
++
++int main(void)
++{
++	bool has_uvc = test_facility(158);
++
++	report_prefix_push("uvc");
++	if (!has_uvc) {
++		report_skip("Ultravisor call facility is not available");
++		goto done;
++	}
++
++	page = (unsigned long)alloc_page();
++	test_priv();
++	test_invalid();
++	test_query();
++	test_sharing();
++	free_page((void *)page);
++done:
++	report_prefix_pop();
++	return report_summary();
++}
 -- 
 2.25.1
 
