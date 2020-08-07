@@ -2,31 +2,31 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 75FBC23E986
-	for <lists+kvm@lfdr.de>; Fri,  7 Aug 2020 10:47:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1B91623E97F
+	for <lists+kvm@lfdr.de>; Fri,  7 Aug 2020 10:47:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727987AbgHGIq6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        id S1728050AbgHGIq6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
         Fri, 7 Aug 2020 04:46:58 -0400
 Received: from mga06.intel.com ([134.134.136.31]:65145 "EHLO mga06.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727981AbgHGIqy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 7 Aug 2020 04:46:54 -0400
-IronPort-SDR: mjLd4oKi7pji6zI2iwk5GBWVHWkqWxfFbQWm33YDuRstjsFGruQKe+FAxZkjvx188mHvde8K4y
- m5iMdCNj3Pzw==
-X-IronPort-AV: E=McAfee;i="6000,8403,9705"; a="214565732"
+        id S1727942AbgHGIq5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 7 Aug 2020 04:46:57 -0400
+IronPort-SDR: HkTtbA8K4qqtuVg5p/uqdZhL4Go0wz8cae8WxBnLrtsUwo3fAiSGsBf4Z+0xree9sgAm7eXGM/
+ Xval5DkM3UdQ==
+X-IronPort-AV: E=McAfee;i="6000,8403,9705"; a="214565734"
 X-IronPort-AV: E=Sophos;i="5.75,445,1589266800"; 
-   d="scan'208";a="214565732"
+   d="scan'208";a="214565734"
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Aug 2020 01:46:54 -0700
-IronPort-SDR: yH1muHlAK2pbJ2xEbXcQhXqLLn6ZXISE8u1S7WhCCdXDl3h1XE656dZ9vaGmkLo/8YaMB/nFG9
- gs5D3oYTrN2w==
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Aug 2020 01:46:56 -0700
+IronPort-SDR: GbC13P0kZW6dyIqBs8R85hTPlUpzOuVOCZuTKi2tyI/Zdu8WVh2ZiapSht5xQCvP9StdF92u21
+ mi5j/c6eWrOw==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.75,445,1589266800"; 
-   d="scan'208";a="307317172"
+   d="scan'208";a="307317184"
 Received: from chenyi-pc.sh.intel.com ([10.239.159.72])
-  by orsmga002.jf.intel.com with ESMTP; 07 Aug 2020 01:46:51 -0700
+  by orsmga002.jf.intel.com with ESMTP; 07 Aug 2020 01:46:54 -0700
 From:   Chenyi Qiang <chenyi.qiang@intel.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>,
         Sean Christopherson <sean.j.christopherson@intel.com>,
@@ -36,9 +36,9 @@ To:     Paolo Bonzini <pbonzini@redhat.com>,
         Joerg Roedel <joro@8bytes.org>,
         Xiaoyao Li <xiaoyao.li@intel.com>
 Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [RFC 4/7] KVM: MMU: Refactor pkr_mask to cache condition
-Date:   Fri,  7 Aug 2020 16:48:38 +0800
-Message-Id: <20200807084841.7112-5-chenyi.qiang@intel.com>
+Subject: [RFC 5/7] KVM: MMU: Add support for PKS emulation
+Date:   Fri,  7 Aug 2020 16:48:39 +0800
+Message-Id: <20200807084841.7112-6-chenyi.qiang@intel.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20200807084841.7112-1-chenyi.qiang@intel.com>
 References: <20200807084841.7112-1-chenyi.qiang@intel.com>
@@ -47,76 +47,146 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-pkr_mask bitmap indicates if protection key checks are needed for user
-pages currently. It is indexed by page fault error code bits [4:1] with
-PFEC.RSVD replaced by the ACC_USER_MASK from the page tables. Refactor
-it by reverting to the use of PFEC.RSVD. After that, PKS and PKU can
-share the same bitmap.
+Advertise pkr_mask to cache the conditions where pretection key checks
+for supervisor pages are needed. When the accessed pages are those with
+a translation for which the U/S flag is 0 in at least one
+paging-structure entry controlling the translation, they are the
+supervisor pages and PKRS enforces the access rights check.
 
 Signed-off-by: Chenyi Qiang <chenyi.qiang@intel.com>
 ---
- arch/x86/kvm/mmu.h     | 10 ++++++----
- arch/x86/kvm/mmu/mmu.c | 16 ++++++++++------
- 2 files changed, 16 insertions(+), 10 deletions(-)
+ arch/x86/include/asm/kvm_host.h |  8 +++---
+ arch/x86/kvm/mmu.h              | 12 ++++++---
+ arch/x86/kvm/mmu/mmu.c          | 44 +++++++++++++++++----------------
+ 3 files changed, 35 insertions(+), 29 deletions(-)
 
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index 6b739d0d1c97..736e56e023d5 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -422,10 +422,10 @@ struct kvm_mmu {
+ 	u8 permissions[16];
+ 
+ 	/*
+-	* The pkru_mask indicates if protection key checks are needed.  It
+-	* consists of 16 domains indexed by page fault error code bits [4:1],
+-	* with PFEC.RSVD replaced by ACC_USER_MASK from the page tables.
+-	* Each domain has 2 bits which are ANDed with AD and WD from PKRU.
++	* The pkr_mask indicates if protection key checks are needed.
++	* It consists of 16 domains indexed by page fault error code
++	* bits[4:1]. Each domain has 2 bits which are ANDed with AD
++	* and WD from PKRU/PKRS.
+ 	*/
+ 	u32 pkr_mask;
+ 
 diff --git a/arch/x86/kvm/mmu.h b/arch/x86/kvm/mmu.h
-index 0c2fdf0abf22..7fb4c63d5704 100644
+index 7fb4c63d5704..b840b2d9ee9f 100644
 --- a/arch/x86/kvm/mmu.h
 +++ b/arch/x86/kvm/mmu.h
-@@ -202,11 +202,13 @@ static inline u8 permission_fault(struct kvm_vcpu *vcpu, struct kvm_mmu *mmu,
- 		* index of the protection domain, so pte_pkey * 2 is
- 		* is the index of the first bit for the domain.
+@@ -195,15 +195,19 @@ static inline u8 permission_fault(struct kvm_vcpu *vcpu, struct kvm_mmu *mmu,
+ 	WARN_ON(pfec & (PFERR_PK_MASK | PFERR_RSVD_MASK));
+ 	if (unlikely(mmu->pkr_mask)) {
+ 		u32 pkr_bits, offset;
++		u64 pkrs;
+ 
+ 		/*
+-		* PKRU defines 32 bits, there are 16 domains and 2
+-		* attribute bits per domain in pkru.  pte_pkey is the
+-		* index of the protection domain, so pte_pkey * 2 is
+-		* is the index of the first bit for the domain.
++		* PKRU and PKRS both define 32 bits. There are 16 domains
++		* and 2 attribute bits per domain in them. pte_key is the
++		* index of the protection domain, so pte_pkey * 2 is the
++		* index of the first bit for the domain. The choice of
++		* PKRU and PKRS is determined by the accessed pages.
  		*/
--		pkr_bits = (vcpu->arch.pkru >> (pte_pkey * 2)) & 3;
-+		if (pte_access & PT_USER_MASK)
-+			pkr_bits = (vcpu->arch.pkru >> (pte_pkey * 2)) & 3;
-+		else
-+			pkr_bits = 0;
+ 		if (pte_access & PT_USER_MASK)
+ 			pkr_bits = (vcpu->arch.pkru >> (pte_pkey * 2)) & 3;
++		else if (!kvm_get_msr(vcpu, MSR_IA32_PKRS, &pkrs))
++			pkr_bits = (pkrs >> (pte_pkey * 2)) & 3;
+ 		else
+ 			pkr_bits = 0;
  
--		/* clear present bit, replace PFEC.RSVD with ACC_USER_MASK. */
--		offset = (pfec & ~1) +
--			((pte_access & PT_USER_MASK) << (PFERR_RSVD_BIT - PT_USER_SHIFT));
-+		/* clear present bit */
-+		offset = (pfec & ~1);
- 
- 		pkr_bits &= mmu->pkr_mask >> offset;
- 		errcode |= -pkr_bits & PFERR_PK_MASK;
 diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 481442f5e27a..333b4da739f8 100644
+index 333b4da739f8..845aea86b138 100644
 --- a/arch/x86/kvm/mmu/mmu.c
 +++ b/arch/x86/kvm/mmu/mmu.c
-@@ -4737,21 +4737,25 @@ static void update_pkr_bitmask(struct kvm_vcpu *vcpu, struct kvm_mmu *mmu,
+@@ -4693,28 +4693,29 @@ static void update_permission_bitmask(struct kvm_vcpu *vcpu,
+ }
  
- 	for (bit = 0; bit < ARRAY_SIZE(mmu->permissions); ++bit) {
- 		unsigned pfec, pkey_bits;
--		bool check_pkey, check_write, ff, uf, wf, pte_user;
-+		bool check_pkey, check_write, ff, uf, wf, rsvdf;
+ /*
+-* PKU is an additional mechanism by which the paging controls access to
+-* user-mode addresses based on the value in the PKRU register.  Protection
+-* key violations are reported through a bit in the page fault error code.
++* Protection Keys (PKEY) is an additional mechanism by which
++* the paging controls access to user-mode/supervisor-mode address
++* based on the values in PKEY registers (PKRU/PKRS). Protection key
++* violations are reported through a bit in the page fault error code.
+ * Unlike other bits of the error code, the PK bit is not known at the
+ * call site of e.g. gva_to_gpa; it must be computed directly in
+-* permission_fault based on two bits of PKRU, on some machine state (CR4,
+-* CR0, EFER, CPL), and on other bits of the error code and the page tables.
++* permission_fault based on two bits of PKRU/PKRS, on some machine
++* state (CR4, CR0, EFER, CPL), and on other bits of the error code
++* and the page tables.
+ *
+ * In particular the following conditions come from the error code, the
+ * page tables and the machine state:
+-* - PK is always zero unless CR4.PKE=1 and EFER.LMA=1
++* - PK is always zero unless CR4.PKE=1/CR4.PKS=1 and EFER.LMA=1
+ * - PK is always zero if RSVD=1 (reserved bit set) or F=1 (instruction fetch)
+-* - PK is always zero if U=0 in the page tables
+-* - PKRU.WD is ignored if CR0.WP=0 and the access is a supervisor access.
++* - (PKRU/PKRS).WD is ignored if CR0.WP=0 and the access is a supervisor access.
+ *
+-* The PKRU bitmask caches the result of these four conditions.  The error
+-* code (minus the P bit) and the page table's U bit form an index into the
+-* PKRU bitmask.  Two bits of the PKRU bitmask are then extracted and ANDed
+-* with the two bits of the PKRU register corresponding to the protection key.
+-* For the first three conditions above the bits will be 00, thus masking
+-* away both AD and WD.  For all reads or if the last condition holds, WD
+-* only will be masked away.
++* The pkr_mask caches the result of these three conditions. The error
++* code (minus the P bit) forms an index into the pkr_mask. Both PKU and
++* PKS shares the same bitmask. Two bits of the pkr_mask are then extracted
++* and ANDed with the two bits of the PKEY register corresponding to
++* the protection key. For the first two conditions above the bits will be 00,
++* thus masking away both AD and WD. For all reads or if the last condition
++* holds, WD only will be masked away.
+ */
+ static void update_pkr_bitmask(struct kvm_vcpu *vcpu, struct kvm_mmu *mmu,
+ 				bool ept)
+@@ -4727,8 +4728,9 @@ static void update_pkr_bitmask(struct kvm_vcpu *vcpu, struct kvm_mmu *mmu,
+ 		return;
+ 	}
  
- 		pfec = bit << 1;
- 		ff = pfec & PFERR_FETCH_MASK;
- 		uf = pfec & PFERR_USER_MASK;
- 		wf = pfec & PFERR_WRITE_MASK;
- 
--		/* PFEC.RSVD is replaced by ACC_USER_MASK. */
--		pte_user = pfec & PFERR_RSVD_MASK;
-+		/*
-+		 * PFERR_RSVD_MASK bit is not set if the
-+		 * access is subject to PK restrictions.
-+		 */
-+		rsvdf = pfec & PFERR_RSVD_MASK;
+-	/* PKEY is enabled only if CR4.PKE and EFER.LMA are both set. */
+-	if (!kvm_read_cr4_bits(vcpu, X86_CR4_PKE) || !is_long_mode(vcpu)) {
++	/* PKEY is enabled only if CR4.PKE/CR4.PKS and EFER.LMA are both set. */
++	if ((!kvm_read_cr4_bits(vcpu, X86_CR4_PKE) &&
++	    !kvm_read_cr4_bits(vcpu, X86_CR4_PKS)) || !is_long_mode(vcpu)) {
+ 		mmu->pkr_mask = 0;
+ 		return;
+ 	}
+@@ -4757,14 +4759,14 @@ static void update_pkr_bitmask(struct kvm_vcpu *vcpu, struct kvm_mmu *mmu,
+ 		check_pkey = (!ff && !rsvdf);
  
  		/*
--		 * Only need to check the access which is not an
--		 * instruction fetch and is to a user page.
-+		 * need to check the access which is not an
-+		 * instruction fetch and is not a rsvd fault.
+-		 * write access is controlled by PKRU if it is a
+-		 * user access or CR0.WP = 1.
++		 * write access is controlled by PKRU/PKRS if
++		 * it is a user access or CR0.WP = 1.
  		 */
--		check_pkey = (!ff && pte_user);
-+		check_pkey = (!ff && !rsvdf);
-+
- 		/*
- 		 * write access is controlled by PKRU if it is a
- 		 * user access or CR0.WP = 1.
+ 		check_write = check_pkey && wf && (uf || wp);
+ 
+-		/* PKRU.AD stops both read and write access. */
++		/* PKRU/PKRS.AD stops both read and write access. */
+ 		pkey_bits = !!check_pkey;
+-		/* PKRU.WD stops write access. */
++		/* PKRU/PKRS.WD stops write access. */
+ 		pkey_bits |= (!!check_write) << 1;
+ 
+ 		mmu->pkr_mask |= (pkey_bits & 3) << pfec;
 -- 
 2.17.1
 
