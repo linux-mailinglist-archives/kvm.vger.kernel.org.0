@@ -2,160 +2,187 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 88B8D23F45C
-	for <lists+kvm@lfdr.de>; Fri,  7 Aug 2020 23:30:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1C6C123F4F6
+	for <lists+kvm@lfdr.de>; Sat,  8 Aug 2020 00:49:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727962AbgHGVa2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 7 Aug 2020 17:30:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53510 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727800AbgHGV3r (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 7 Aug 2020 17:29:47 -0400
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 32BC1C061A32
-        for <kvm@vger.kernel.org>; Fri,  7 Aug 2020 14:29:44 -0700 (PDT)
-Received: by mail-yb1-xb49.google.com with SMTP id v65so4333964ybv.9
-        for <kvm@vger.kernel.org>; Fri, 07 Aug 2020 14:29:44 -0700 (PDT)
+        id S1726096AbgHGWto (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 7 Aug 2020 18:49:44 -0400
+Received: from smtp-fw-9102.amazon.com ([207.171.184.29]:11202 "EHLO
+        smtp-fw-9102.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726015AbgHGWto (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 7 Aug 2020 18:49:44 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
-         :cc;
-        bh=iVslrzv4xFzBXNEn359Z/Whm6d2iMTLeHC3W31lAdWA=;
-        b=PMRwb4NmL4IuF15MfQo+H9K6Qn15ZHpQlFswnPN/N1ayXiu4uDc5kMokYO7brGLnRA
-         34RvfsEoemKACz3SSygAzLYTNbPPn+yIpaRuSfUJO3w/L09IMlBjOoCkem7/IpMbKm91
-         3tnCRlvu1GYumA3TL/IePEohcsP++2ix3zFqbldToEgq6dgZMV4QKsaTJNHgQklhmjho
-         RiYMb0G9JJB5PuWtxMP2x+5xImZ7zwdyFPtjEb+0+uDgMjrZjvWSbKKrc2w0PINSFFvQ
-         2uMQCw5nkyPclDnu8N0xl4fHSznqCH2Buiusi1bTDSmqxwryDPA95mriJfyN/ApwQxy2
-         NuDw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
-         :references:subject:from:to:cc;
-        bh=iVslrzv4xFzBXNEn359Z/Whm6d2iMTLeHC3W31lAdWA=;
-        b=mXibgS12B4M1GnII7E/adfDkp2E4yLIrQuNJXVCdyoFojg13dujpOwnhR65SQTaC5p
-         vuDyjzf0jymay+Tls20BLFYyk4QZKNMIG4Ax4JxXpJztRUCGkhQ32t6CjCNo5x3dYJ8R
-         qMpGzSyOH12zcwrcqkNwRr3QXTndMiF8kHwcz6+5hQkId2F9IcyMCH9ci8cmZIh1A9l7
-         KYamSHBNUt96EwRtcCbe3KgCOb/5JL4JJsP+yZPA6p/nfiQ1TpXtr9FAfhi6c6JqSR1Y
-         87plozuNVryNYLspjOOl22W/sbsY3v5BIiNYILdtEFwe6t0HDTta4rc62yxBbWcVFOWK
-         w+jg==
-X-Gm-Message-State: AOAM531iMmV9QuyJrzHvCh4KMZ88agdZ4mxQtYkFZpnqlW7f47Oi5sJb
-        RylnCk4HD53IXFltzCil4bVsrXt9XOo=
-X-Google-Smtp-Source: ABdhPJxcSm5w8AA6P4+MwGuTbTjPOW9Gn09XxR/9hjwAMXQFwA18Lv9fE2jFeD1Vp1hTVPD0RBmh1mdiBy15
-X-Received: by 2002:a25:37c8:: with SMTP id e191mr20472648yba.230.1596835783402;
- Fri, 07 Aug 2020 14:29:43 -0700 (PDT)
-Date:   Fri,  7 Aug 2020 14:29:14 -0700
-In-Reply-To: <20200807212916.2883031-1-jwadams@google.com>
-Message-Id: <20200807212916.2883031-6-jwadams@google.com>
-Mime-Version: 1.0
-References: <20200807212916.2883031-1-jwadams@google.com>
-X-Mailer: git-send-email 2.28.0.236.gb10cc79966-goog
-Subject: [RFC PATCH 5/7] core/metricfs: expose scheduler stat information
- through metricfs
-From:   Jonathan Adams <jwadams@google.com>
-To:     linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org
-Cc:     netdev@vger.kernel.org, kvm@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Greg KH <gregkh@linuxfoundation.org>,
-        Jim Mattson <jmattson@google.com>,
-        David Rientjes <rientjes@google.com>,
-        Jonathan Adams <jwadams@google.com>
-Content-Type: text/plain; charset="UTF-8"
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1596840582; x=1628376582;
+  h=subject:to:cc:references:from:message-id:date:
+   mime-version:in-reply-to:content-transfer-encoding;
+  bh=ymAMh1uYJwmR8Z+7K8kVcLgaiY4RtSTog7q6+LGyDfA=;
+  b=tO0moJWh/3H/Ku/ObG6GEhlPyQvLXB3WBGSbU7/fBFIpdEWKd/+fWUd3
+   wTN8nTgxRRIhqDvDPHwJK2rwKdfv3NjlD2x5ov5T7jh5ecHePtzYy4+Am
+   7os/r6FiGqZZXupxf/NTxN1i9ylcd12ddYn37D3wQKZ5A95ug6FpP+16E
+   g=;
+IronPort-SDR: 5nXe8FGeP1ZdjSX7taMpRDxwD4WiMxRNXWzZKqbV8taBX+Lii8ZweYuY4WBerfNr2MKszPVYyI
+ 3/uFuMhYgm9A==
+X-IronPort-AV: E=Sophos;i="5.75,447,1589241600"; 
+   d="scan'208";a="66445969"
+Received: from sea32-co-svc-lb4-vlan3.sea.corp.amazon.com (HELO email-inbound-relay-1d-474bcd9f.us-east-1.amazon.com) ([10.47.23.38])
+  by smtp-border-fw-out-9102.sea19.amazon.com with ESMTP; 07 Aug 2020 22:49:25 +0000
+Received: from EX13MTAUWC001.ant.amazon.com (iad55-ws-svc-p15-lb9-vlan3.iad.amazon.com [10.40.159.166])
+        by email-inbound-relay-1d-474bcd9f.us-east-1.amazon.com (Postfix) with ESMTPS id 9DA99A2422;
+        Fri,  7 Aug 2020 22:49:22 +0000 (UTC)
+Received: from EX13D20UWC001.ant.amazon.com (10.43.162.244) by
+ EX13MTAUWC001.ant.amazon.com (10.43.162.135) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.2; Fri, 7 Aug 2020 22:49:22 +0000
+Received: from 38f9d3867b82.ant.amazon.com (10.43.162.228) by
+ EX13D20UWC001.ant.amazon.com (10.43.162.244) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.2; Fri, 7 Aug 2020 22:49:20 +0000
+Subject: Re: [PATCH 1/6] KVM: x86: Add ioctl for accepting a userspace
+ provided MSR list
+To:     Jim Mattson <jmattson@google.com>
+CC:     Aaron Lewis <aaronlewis@google.com>,
+        Peter Shier <pshier@google.com>,
+        Oliver Upton <oupton@google.com>,
+        kvm list <kvm@vger.kernel.org>
+References: <20200804042043.3592620-1-aaronlewis@google.com>
+ <20200804042043.3592620-2-aaronlewis@google.com>
+ <183f3ebd-0872-8758-6770-a5769a87011d@amazon.com>
+ <CALMp9eRgkENN94x7fpuFcRa-X_9tL0Vp0m453rwJdJ-_6qsy5w@mail.gmail.com>
+From:   Alexander Graf <graf@amazon.com>
+Message-ID: <d67073a5-51e3-82b1-6a85-3574eb6c9c56@amazon.com>
+Date:   Sat, 8 Aug 2020 00:49:17 +0200
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:68.0)
+ Gecko/20100101 Thunderbird/68.11.0
+MIME-Version: 1.0
+In-Reply-To: <CALMp9eRgkENN94x7fpuFcRa-X_9tL0Vp0m453rwJdJ-_6qsy5w@mail.gmail.com>
+Content-Language: en-US
+X-Originating-IP: [10.43.162.228]
+X-ClientProxiedBy: EX13D42UWB001.ant.amazon.com (10.43.161.35) To
+ EX13D20UWC001.ant.amazon.com (10.43.162.244)
+Content-Type: text/plain; charset="utf-8"; format="flowed"
+Content-Transfer-Encoding: base64
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add metricfs support for displaying percpu scheduler counters.
-The top directory is /sys/kernel/debug/metricfs/stat (analogous
-to /proc/stat).  Then there is a subdirectory for each scheduler
-stat.  For example:
-
-    cat /sys/kernel/debug/metricfs/stat/user/values
-
-Signed-off-by: Jonathan Adams <jwadams@google.com>
-
----
-
-jwadams@google.com: rebased to 5.8-pre6
-	This is work originally done by another engineer at
-	google, who would rather not have their name associated with this
-	patchset. They're okay with me sending it under my name.
----
- fs/proc/stat.c | 57 ++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 57 insertions(+)
-
-diff --git a/fs/proc/stat.c b/fs/proc/stat.c
-index 46b3293015fe..deb378507b0b 100644
---- a/fs/proc/stat.c
-+++ b/fs/proc/stat.c
-@@ -13,6 +13,7 @@
- #include <linux/irqnr.h>
- #include <linux/sched/cputime.h>
- #include <linux/tick.h>
-+#include <linux/metricfs.h>
- 
- #ifndef arch_irq_stat_cpu
- #define arch_irq_stat_cpu(cpu) 0
-@@ -237,3 +238,59 @@ static int __init proc_stat_init(void)
- 	return 0;
- }
- fs_initcall(proc_stat_init);
-+
-+#ifdef CONFIG_METRICFS
-+#define METRICFS_ITEM(name, field, desc) \
-+static void \
-+metricfs_##name(struct metric_emitter *e, int cpu) \
-+{ \
-+	int64_t v = kcpustat_field(&kcpustat_cpu(cpu), field, cpu); \
-+	METRIC_EMIT_PERCPU_INT(e, cpu, v); \
-+} \
-+METRIC_EXPORT_PERCPU_COUNTER(name, desc, metricfs_##name)
-+
-+#define METRICFS_FUNC_ITEM(name, func, desc) \
-+static void \
-+metricfs_##name(struct metric_emitter *e, int cpu) \
-+{ \
-+	struct kernel_cpustat cpustat; \
-+	int64_t v; \
-+	kcpustat_cpu_fetch(&cpustat, cpu); \
-+	v = func(&cpustat, cpu); \
-+	METRIC_EMIT_PERCPU_INT(e, cpu, v); \
-+} \
-+METRIC_EXPORT_PERCPU_COUNTER(name, desc, metricfs_##name)
-+
-+METRICFS_ITEM(user, CPUTIME_USER, "time in user mode (nsec)");
-+METRICFS_ITEM(nice, CPUTIME_NICE, "time in user mode niced (nsec)");
-+METRICFS_ITEM(system, CPUTIME_SYSTEM, "time in system calls (nsec)");
-+METRICFS_ITEM(irq, CPUTIME_IRQ, "time in interrupts (nsec)");
-+METRICFS_ITEM(softirq, CPUTIME_SOFTIRQ, "time in softirqs (nsec)");
-+METRICFS_ITEM(steal, CPUTIME_STEAL, "time in involuntary wait (nsec)");
-+METRICFS_ITEM(guest, CPUTIME_GUEST, "time in guest mode (nsec)");
-+METRICFS_ITEM(guest_nice, CPUTIME_GUEST_NICE,
-+	"time in guest mode niced (nsec)");
-+METRICFS_FUNC_ITEM(idle, get_idle_time, "time in idle (nsec)");
-+METRICFS_FUNC_ITEM(iowait, get_iowait_time, "time in iowait (nsec)");
-+
-+static int __init init_stat_metricfs(void)
-+{
-+	struct metricfs_subsys *subsys;
-+
-+	subsys = metricfs_create_subsys("stat", NULL);
-+	metric_init_user(subsys);
-+	metric_init_nice(subsys);
-+	metric_init_system(subsys);
-+	metric_init_irq(subsys);
-+	metric_init_softirq(subsys);
-+	metric_init_steal(subsys);
-+	metric_init_guest(subsys);
-+	metric_init_guest_nice(subsys);
-+	metric_init_idle(subsys);
-+	metric_init_iowait(subsys);
-+
-+	return 0;
-+}
-+module_init(init_stat_metricfs);
-+
-+#endif
--- 
-2.28.0.236.gb10cc79966-goog
+CgpPbiAwNy4wOC4yMCAyMzoxNiwgSmltIE1hdHRzb24gd3JvdGU6Cj4gCj4gT24gRnJpLCBBdWcg
+NywgMjAyMCBhdCA5OjEyIEFNIEFsZXhhbmRlciBHcmFmIDxncmFmQGFtYXpvbi5jb20+IHdyb3Rl
+Ogo+Pgo+Pgo+Pgo+PiBPbiAwNC4wOC4yMCAwNjoyMCwgQWFyb24gTGV3aXMgd3JvdGU6Cj4+PiBD
+QVVUSU9OOiBUaGlzIGVtYWlsIG9yaWdpbmF0ZWQgZnJvbSBvdXRzaWRlIG9mIHRoZSBvcmdhbml6
+YXRpb24uIERvIG5vdCBjbGljayBsaW5rcyBvciBvcGVuIGF0dGFjaG1lbnRzIHVubGVzcyB5b3Ug
+Y2FuIGNvbmZpcm0gdGhlIHNlbmRlciBhbmQga25vdyB0aGUgY29udGVudCBpcyBzYWZlLgo+Pj4K
+Pj4+Cj4+Pgo+Pj4gQWRkIEtWTV9TRVRfRVhJVF9NU1JTIGlvY3RsIHRvIGFsbG93IHVzZXJzcGFj
+ZSB0byBwYXNzIGluIGEgbGlzdCBvZiBNU1JzCj4+PiB0aGF0IGZvcmNlIGFuIGV4aXQgdG8gdXNl
+cnNwYWNlIHdoZW4gcmRtc3Igb3Igd3Jtc3IgYXJlIHVzZWQgYnkgdGhlCj4+PiBndWVzdC4KPj4+
+Cj4+PiBLVk1fU0VUX0VYSVRfTVNSUyB3aWxsIG5lZWQgdG8gYmUgY2FsbGVkIGJlZm9yZSBhbnkg
+dkNQVXMgYXJlCj4+PiBjcmVhdGVkIHRvIHByb3RlY3QgdGhlICd1c2VyX2V4aXRfbXNycycgbGlz
+dCBmcm9tIGJlaW5nIG11dGF0ZWQgd2hpbGUKPj4+IHZDUFVzIGFyZSBydW5uaW5nLgo+Pj4KPj4+
+IEFkZCBLVk1fQ0FQX1NFVF9NU1JfRVhJVFMgdG8gaWRlbnRpZnkgdGhlIGZlYXR1cmUgZXhpc3Rz
+Lgo+Pj4KPj4+IFNpZ25lZC1vZmYtYnk6IEFhcm9uIExld2lzIDxhYXJvbmxld2lzQGdvb2dsZS5j
+b20+Cj4+PiBSZXZpZXdlZC1ieTogT2xpdmVyIFVwdG9uIDxvdXB0b25AZ29vZ2xlLmNvbT4KPj4+
+IC0tLQo+Pj4gICAgRG9jdW1lbnRhdGlvbi92aXJ0L2t2bS9hcGkucnN0ICB8IDI0ICsrKysrKysr
+KysrKysrKysrKysKPj4+ICAgIGFyY2gveDg2L2luY2x1ZGUvYXNtL2t2bV9ob3N0LmggfCAgMiAr
+Kwo+Pj4gICAgYXJjaC94ODYva3ZtL3g4Ni5jICAgICAgICAgICAgICB8IDQxICsrKysrKysrKysr
+KysrKysrKysrKysrKysrKysrKysrKwo+Pj4gICAgaW5jbHVkZS91YXBpL2xpbnV4L2t2bS5oICAg
+ICAgICB8ICAyICsrCj4+PiAgICA0IGZpbGVzIGNoYW5nZWQsIDY5IGluc2VydGlvbnMoKykKPj4+
+Cj4+PiBkaWZmIC0tZ2l0IGEvRG9jdW1lbnRhdGlvbi92aXJ0L2t2bS9hcGkucnN0IGIvRG9jdW1l
+bnRhdGlvbi92aXJ0L2t2bS9hcGkucnN0Cj4+PiBpbmRleCAzMjA3ODhmODFhMDUuLjdkODE2N2Mx
+NjVhYSAxMDA2NDQKPj4+IC0tLSBhL0RvY3VtZW50YXRpb24vdmlydC9rdm0vYXBpLnJzdAo+Pj4g
+KysrIGIvRG9jdW1lbnRhdGlvbi92aXJ0L2t2bS9hcGkucnN0Cj4+PiBAQCAtMTAwNiw2ICsxMDA2
+LDMwIEBAIHN1Y2ggYXMgbWlncmF0aW9uLgo+Pj4gICAgOlBhcmFtZXRlcnM6IHN0cnVjdCBrdm1f
+dmNwdV9ldmVudCAob3V0KQo+Pj4gICAgOlJldHVybnM6IDAgb24gc3VjY2VzcywgLTEgb24gZXJy
+b3IKPj4+Cj4+PiArNC4zMiBLVk1fU0VUX0VYSVRfTVNSUwo+Pj4gKy0tLS0tLS0tLS0tLS0tLS0t
+LQo+Pj4gKwo+Pj4gKzpDYXBhYmlsaXR5OiBLVk1fQ0FQX1NFVF9NU1JfRVhJVFMKPj4+ICs6QXJj
+aGl0ZWN0dXJlczogeDg2Cj4+PiArOlR5cGU6IHZtIGlvY3RsCj4+PiArOlBhcmFtZXRlcnM6IHN0
+cnVjdCBrdm1fbXNyX2xpc3QgKGluKQo+Pj4gKzpSZXR1cm5zOiAwIG9uIHN1Y2Nlc3MsIC0xIG9u
+IGVycm9yCj4+PiArCj4+PiArU2V0cyB0aGUgdXNlcnNwYWNlIE1TUiBsaXN0IHdoaWNoIGlzIHVz
+ZWQgdG8gdHJhY2sgd2hpY2ggTVNScyBLVk0gc2hvdWxkIHNlbmQKPj4+ICt0byB1c2Vyc3BhY2Ug
+dG8gYmUgc2VydmljZWQgd2hlbiB0aGUgZ3Vlc3QgZXhlY3V0ZXMgcmRtc3Igb3Igd3Jtc3IuCj4+
+Cj4+IFVuZm9ydHVuYXRlbHkgdGhpcyBkb2Vzbid0IHNvbHZlIHRoZSB3aG9sZSAiaWdub3JlX21z
+cnMiIG1lc3MgdGhhdCB3ZQo+PiBoYXZlIHRvZGF5LiBIb3cgY2FuIEkganVzdCBzYXkgInRlbGwg
+dXNlciBzcGFjZSBhYm91dCB1bmhhbmRsZWQgTVNScyI/Cj4+IEFuZCBpZiBJIGFkZCB0aGF0IG9u
+IHRvcCBvZiB0aGlzIG1lY2hhbmlzbSwgaG93IGRvIHdlIG5vdCBtYWtlIHRoZSBsaXN0Cj4+IG9m
+IE1TUnMgdGhhdCBhcmUgaGFuZGxlZCBpbi1rZXJuZWwgYW4gQUJJPwo+IAo+IEp1bXBpbmcgaW4g
+Zm9yIEFhcm9uLCB3aG8gaXMgb3V0IHRoaXMgYWZ0ZXJub29uLi4uCgpBd2Vzb21lLCB0aGFua3Mg
+Zm9yIHRoZSBzdXBlciBxdWljayByZXBseSEKCj4gCj4gVGhpcyBwYXRjaCBkb2Vzbid0IGF0dGVt
+cHQgdG8gc29sdmUgeW91ciBwcm9ibGVtLCAidGVsbCB1c2VyIHNwYWNlCj4gYWJvdXQgdW5oYW5k
+bGVkIE1TUnMuIiBJdCBhdHRlbXB0cyB0byBzb2x2ZSBvdXIgcHJvYmxlbSwgInRlbGwgdXNlcgo+
+IHNwYWNlIGFib3V0IGEgc3BlY2lmaWMgc2V0IG9mIE1TUnMsIGV2ZW4gaWYga3ZtIGxlYXJucyB0
+byBoYW5kbGUgdGhlbQo+IGluIHRoZSBmdXR1cmUuIiBUaGlzIGlzLCBpbiBmYWN0LCB3aGF0IHdl
+IHJlYWxseSB3YW50ZWQgdG8gZG8gd2hlbgo+IFBldGVyIEhvcm55YWNrIGltcGxlbWVudGVkIHRo
+ZSAidGVsbCB1c2VyIHNwYWNlIGFib3V0IHVuaGFuZGxlZCBNU1JzIgo+IGNoYW5nZXMgaW4gMjAx
+NS4gV2UganVzdCBkaWRuJ3QgcmVhbGl6ZSBpdCBhdCB0aGUgdGltZS4KCk9rLCBsZXQncyB0YWtl
+IGEgc3RlcCBiYWNrIHRoZW4uIFdoYXQgZXhhY3RseSBhcmUgeW91IHRyeWluZyB0byBzb2x2ZSAK
+YW5kIHdoaWNoIE1TUnMgZG8geW91IGNhcmUgYWJvdXQ/CgpNeSBtYWluIHByb2JsZW0gd2l0aCBh
+IGRlbnkgbGlzdCBhcHByb2FjaCBpcyB0aGF0IGl0J3MgKHByYWN0aWNhbGx5KSAKaW1wb3NzaWJs
+ZSB0byBtYXAgdGhlIGFsbG93IGxpc3QgdXNlIGNhc2Ugb250byBpdC4gSXQgaXMgaG93ZXZlciB0
+cml2aWFsIAp0byBvbmx5IGRlbnkgYSBmZXcgc2VsZWN0IE1TUnMgZXhwbGljaXRseSB3aXRoIGFu
+IGFsbG93IGxpc3QgYXBwcm9hY2guIEkgCmRvbid0IHdhbnQgdG8gaW50cm9kdWNlIHlldCBhbm90
+aGVyIEFCSSB0byBLVk0gaW4gMiB5ZWFycyB0byB0aGVuIGhhdmUgCmJvdGggOikuCgo+IFRob3Vn
+aCB5b3VyIHByb3Bvc2FsIGRvZXMgcGFydGlhbGx5IHNvbHZlIG91ciBwcm9ibGVtLCBpdCdzIGEg
+bG90Cj4gZWFzaWVyIHRvIHNwZWNpZnkgYSBzbWFsbCBzZXQgb2YgTVNScyBieSBpbmNsdXNpb24g
+dGhhbiBpdCBpcyBieQo+IGV4Y2x1c2lvbi4gKFdoZXJlIHlvdXIgcHJvcG9zYWwgZmFsbHMgc2hv
+cnQgb2Ygb3VyIG5lZWRzIGlzIHdoZW4KPiB1c2Vyc3BhY2Ugd2FudHMgdG8gaGFuZGxlIGFuIE1T
+UiB0aGF0IGt2bSB3b3VsZCBub3QgdHlwaWNhbGx5Cj4gaW50ZXJjZXB0IGF0IGFsbC4pCgpUaGUg
+b25seSBNU1JzIHRoYXQgS1ZNIGRvZXMgbm90IGludGVyY2VwdCBhcmUgdGhlIG9uZXMgZXhwbGlj
+aXRseSAKc3BlY2lmaWVkIGFzIHBhc3MtdGhyb3VnaAoKPiAKPj4+ICsKPj4+ICtUaGlzIGlvY3Rs
+IG5lZWRzIHRvIGJlIGNhbGxlZCBiZWZvcmUgdkNQVXMgYXJlIHNldHVwIG90aGVyd2lzZSB0aGUg
+bGlzdCBvZiBNU1JzCj4+PiArd2lsbCBub3QgYmUgYWNjZXB0ZWQgYW5kIGFuIEVJTlZBTCBlcnJv
+ciB3aWxsIGJlIHJldHVybmVkLiAgQWxzbywgaWYgYSBsaXN0IG9mCj4+PiArTVNScyBoYXMgYWxy
+ZWFkeSBiZWVuIHN1cHBsaWVkLCBhbmQgdGhpcyBpb2N0bCBpcyBjYWxsZWQgYWdhaW4gYW4gRUVY
+SVNUIGVycm9yCj4+PiArd2lsbCBiZSByZXR1cm5lZC4KPj4+ICsKPj4+ICs6Ogo+Pj4gKwo+Pj4g
+KyAgc3RydWN0IGt2bV9tc3JfbGlzdCB7Cj4+PiArICBfX3UzMiBubXNyczsKPj4+ICsgIF9fdTMy
+IGluZGljZXNbMF07Cj4+PiArfTsKPj4+ICsKPj4+ICAgIFg4NjoKPj4+ICAgIF5eXl4KPj4+Cj4+
+PiBkaWZmIC0tZ2l0IGEvYXJjaC94ODYvaW5jbHVkZS9hc20va3ZtX2hvc3QuaCBiL2FyY2gveDg2
+L2luY2x1ZGUvYXNtL2t2bV9ob3N0LmgKPj4+IGluZGV4IGJlNTM2M2IyMTU0MC4uNTEwMDU1NDcx
+ZGQwIDEwMDY0NAo+Pj4gLS0tIGEvYXJjaC94ODYvaW5jbHVkZS9hc20va3ZtX2hvc3QuaAo+Pj4g
+KysrIGIvYXJjaC94ODYvaW5jbHVkZS9hc20va3ZtX2hvc3QuaAo+Pj4gQEAgLTEwMDQsNiArMTAw
+NCw4IEBAIHN0cnVjdCBrdm1fYXJjaCB7Cj4+Pgo+Pj4gICAgICAgICAgIHN0cnVjdCBrdm1fcG11
+X2V2ZW50X2ZpbHRlciAqcG11X2V2ZW50X2ZpbHRlcjsKPj4+ICAgICAgICAgICBzdHJ1Y3QgdGFz
+a19zdHJ1Y3QgKm54X2xwYWdlX3JlY292ZXJ5X3RocmVhZDsKPj4+ICsKPj4+ICsgICAgICAgc3Ry
+dWN0IGt2bV9tc3JfbGlzdCAqdXNlcl9leGl0X21zcnM7Cj4+PiAgICB9Owo+Pj4KPj4+ICAgIHN0
+cnVjdCBrdm1fdm1fc3RhdCB7Cj4+PiBkaWZmIC0tZ2l0IGEvYXJjaC94ODYva3ZtL3g4Ni5jIGIv
+YXJjaC94ODYva3ZtL3g4Ni5jCj4+PiBpbmRleCA4OGM1OTNmODNiMjguLjQ2YTBmYjllMDg2OSAx
+MDA2NDQKPj4+IC0tLSBhL2FyY2gveDg2L2t2bS94ODYuYwo+Pj4gKysrIGIvYXJjaC94ODYva3Zt
+L3g4Ni5jCj4+PiBAQCAtMzQxOSw2ICszNDE5LDQyIEBAIHN0YXRpYyBpbmxpbmUgYm9vbCBrdm1f
+Y2FuX213YWl0X2luX2d1ZXN0KHZvaWQpCj4+PiAgICAgICAgICAgICAgICAgICBib290X2NwdV9o
+YXMoWDg2X0ZFQVRVUkVfQVJBVCk7Cj4+PiAgICB9Cj4+Pgo+Pj4gK3N0YXRpYyBpbnQga3ZtX3Zt
+X2lvY3RsX3NldF9leGl0X21zcnMoc3RydWN0IGt2bSAqa3ZtLAo+Pj4gKyAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICBzdHJ1Y3Qga3ZtX21zcl9saXN0IF9fdXNlciAqdXNlcl9t
+c3JfbGlzdCkKPj4+ICt7Cj4+PiArICAgICAgIHN0cnVjdCBrdm1fbXNyX2xpc3QgKm1zcl9saXN0
+LCBoZHI7Cj4+PiArICAgICAgIHNpemVfdCBpbmRpY2VzX3NpemU7Cj4+PiArCj4+PiArICAgICAg
+IGlmIChrdm0tPmFyY2gudXNlcl9leGl0X21zcnMgIT0gTlVMTCkKPj4+ICsgICAgICAgICAgICAg
+ICByZXR1cm4gLUVFWElTVDsKPj4+ICsKPj4+ICsgICAgICAgaWYgKGt2bS0+Y3JlYXRlZF92Y3B1
+cykKPj4+ICsgICAgICAgICAgICAgICByZXR1cm4gLUVJTlZBTDsKPj4KPj4gV2hhdCBpZiB3ZSBu
+ZWVkIHRvIGNoYW5nZSB0aGUgc2V0IG9mIHVzZXIgc3BhY2UgaGFuZGxlZCBNU1JzCj4+IGR5bmFt
+aWNhbGx5LCBmb3IgZXhhbXBsZSBiZWNhdXNlIGEgZmVhdHVyZSBoYXMgYmVlbiBlbmFibGVkIHRo
+cm91Z2ggYQo+PiBwcmV2aW91cyBNU1I/Cj4gCj4gSXQncyBuZXZlciBiZWVuIGFuIGlzc3VlIGZv
+ciB1cywgYW5kIHRoaXMgYXBwcm9hY2ggYXZvaWRzIHRoZQo+IG1lc3NpbmVzcyBvZiBoYXZpbmcg
+dG8gYmFjayBvdXQgdGhlIG9sZCBjaGFuZ2VzIHRvIHRoZSBNU1IgcGVybWlzc2lvbnMKPiBiaXRt
+YXBzLCB3aGljaCBpcyBmcmF1Z2h0LiBJdCBjYW4gYmUgZG9uZSwgYnV0IEkgd291bGQgcXVlc3Rp
+b24gdGhlCj4gUk9JIG9uIHRoZSBhZGRpdGlvbmFsIGNvbXBsZXhpdHkuIEluIGFueSBjYXNlLCBJ
+IHRoaW5rIGEgVkNQVSBpb2N0bAo+IHdvdWxkIGJlIG1vcmUgYXBwcm9wcmlhdGUgdGhhbiBhIFZN
+IGlvY3RsIGlmIGR5bmFtaWMgbW9kaWZpY2F0aW9ucwo+IHdlcmUgYWxsb3dlZC4gRm9yIGluc3Rh
+bmNlLCBpbiB5b3VyIGV4YW1wbGUsIHRoZSBwcmV2aW91cyBNU1Igd3JpdGUKPiB0aGF0IGVuYWJs
+ZWQgYSBmZWF0dXJlIHJlcXVpcmluZyBhIG5ldyB1c2VyIHNwYWNlIE1TUiBleGl0IHdvdWxkCj4g
+bGlrZWx5IGFwcGx5IG9ubHkgdG8gdGhlIFZDUFUgb24gd2hpY2ggdGhhdCBwcmV2aW91cyBNU1Ig
+d3JpdGUKPiBoYXBwZW5lZC4KCk15IGdlbmVyYWwgcnVsZSBvZiB0aHVtYiB3aXRoIFBQQyBoYXMg
+YWx3YXlzIGJlZW4gdG8gbWFrZSBhcyBtdWNoIHZDUFUgCnNwZWNpZmljIGFzIHBvc3NpYmxlLiBY
+ODYgS1ZNIGlzIGEgYml0IGRpZmZlcmVudCB0aGVyZSAtIGFuZCBJIGd1ZXNzIGl0IApkb2VzIGhl
+bHAgZm9yIG1lbW9yeSBjb25zdW1wdGlvbiA6KS4KCj4gCj4+PiArCj4+PiArICAgICAgIGlmIChj
+b3B5X2Zyb21fdXNlcigmaGRyLCB1c2VyX21zcl9saXN0LCBzaXplb2YoaGRyKSkpCj4+PiArICAg
+ICAgICAgICAgICAgcmV0dXJuIC1FRkFVTFQ7Cj4+PiArCj4+PiArICAgICAgIGlmIChoZHIubm1z
+cnMgPj0gTUFYX0lPX01TUlMpCj4+Cj4+IFRoaXMgY29uc3RhbnQgaXMgbm90IGRlZmluZWQgaW5z
+aWRlIHRoZSBzY29wZSBvZiB0aGlzIHBhdGNoLiBJcyB5b3VyCj4+IHBhdGNoc2V0IGZ1bGx5IGJp
+c2VjdGFibGU/IFBsZWFzZSBtYWtlIHN1cmUgdGhhdCBldmVyeSBwYXRjaCBidWlsZHMKPj4gc3Vj
+Y2Vzc2Z1bGx5IG9uIGl0cyBvd24gOikuCj4gCj4gSSBjYW4ndCB2b3VjaCBmb3IgdGhpcyBwYXRj
+aHNldCBiZWluZyBmdWxseSBiaXNlY3RhYmxlLCBidXQgdGhpcwo+IHBhcnRpY3VsYXIgY29uc3Rh
+bnQgd2FzIG1vdmVkIHRvIHg4Ni5jIH4xMyB5ZWFycyBhZ28sIGluIGNvbW1pdAo+IDMxM2EzZGM3
+NWRhMjAgKCJLVk06IFBvcnRhYmlsaXR5OiBzcGxpdCBrdm1fdmNwdV9pb2N0bCIpLiBJdCBzaG91
+bGQKPiBub3QgY2F1c2UgYW55IGJ1aWxkIGlzc3Vlcy4gOikKClVnaCwgc29ycnksIG15IGJhZCA6
+KS4KCgpBbGV4CgoKCkFtYXpvbiBEZXZlbG9wbWVudCBDZW50ZXIgR2VybWFueSBHbWJICktyYXVz
+ZW5zdHIuIDM4CjEwMTE3IEJlcmxpbgpHZXNjaGFlZnRzZnVlaHJ1bmc6IENocmlzdGlhbiBTY2hs
+YWVnZXIsIEpvbmF0aGFuIFdlaXNzCkVpbmdldHJhZ2VuIGFtIEFtdHNnZXJpY2h0IENoYXJsb3R0
+ZW5idXJnIHVudGVyIEhSQiAxNDkxNzMgQgpTaXR6OiBCZXJsaW4KVXN0LUlEOiBERSAyODkgMjM3
+IDg3OQoKCg==
 
