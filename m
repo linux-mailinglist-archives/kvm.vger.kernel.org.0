@@ -2,170 +2,94 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7549223E782
-	for <lists+kvm@lfdr.de>; Fri,  7 Aug 2020 09:03:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8972623E949
+	for <lists+kvm@lfdr.de>; Fri,  7 Aug 2020 10:41:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726377AbgHGHDf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 7 Aug 2020 03:03:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33536 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725805AbgHGHDd (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 7 Aug 2020 03:03:33 -0400
-Received: from mail-pl1-x642.google.com (mail-pl1-x642.google.com [IPv6:2607:f8b0:4864:20::642])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 35ED6C061574;
-        Fri,  7 Aug 2020 00:03:32 -0700 (PDT)
-Received: by mail-pl1-x642.google.com with SMTP id g19so644779plq.0;
-        Fri, 07 Aug 2020 00:03:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:mime-version:content-disposition
-         :in-reply-to;
-        bh=cXiFY40k3YE3h5GKxLLu7Lb8Z/u2Pasapw1Qrti5SeE=;
-        b=X6fzQY++CFlxidAbfDEoYwyNQPvjwSGUESo4p2YC1IKHcFg7zpA2t7N9Vb87Y42fKi
-         DUaNkHibnMqukp7+NPMT/rpER1zd/81jp3zk6l9Kgmd65OD+kFgb3W09WZ21KMdpgFms
-         JSrDF6WOdZoz+7E228lncn2P6O7DeQZsdC0BzDWXHjfu9BWP+EJnLa9jQy/IkD0ZizDg
-         vFg+48Y7V4JvEQVF01oVfLaPyX5cMtBZxpb7NtZdQyQ0SKe28evlEweXLACRL5dvhy/k
-         g68uGYVXVT1cPJ2vF5tvugJ9wxC2HSe66353jwffcRVjpT3q2pHFTpDBv58ncc0+Jj58
-         MDhA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:mime-version
-         :content-disposition:in-reply-to;
-        bh=cXiFY40k3YE3h5GKxLLu7Lb8Z/u2Pasapw1Qrti5SeE=;
-        b=h9IpzftF8HRqmeqb9uoQlspCKbXDlRb/EOw01Jfy2k6fRZ17gb4urczDnNMPds+INR
-         KBaJ/Le5ePvluvnFDWyDzbVJsuTq25YZxEPKhxqHbjnVmrN7OUpvXze+VwmJYlSdFCNm
-         /NtRTfczXxbwSDUH8jKjb4ayMsJGS8W+wm0ozu7JWhRzKAcek7Z593V8gNro6JdVIU8n
-         oDhpN2IC3JT1EVmuwTx5GEAC1fGXtmH+toPuEcVSx7u0oDZLFfan7E4YQA3rcm+Qyf+q
-         wGQ01yEupDJmWuJp6tVLBZGtM80ZNugxC1kIOYlAoDi5nwph1xG6l4O3oIlFEg3s9QyJ
-         Gx8g==
-X-Gm-Message-State: AOAM531VxWrcLDwga5RT3DwhpIw1j7jh83wSUMq65ZFuu3MjrkdMH9Kk
-        BhCgQCLylXn52qkLufx9CkjcPXxC+ww=
-X-Google-Smtp-Source: ABdhPJwERHoyeYBSjOxRiDHETwlDme8Ekxn6cWsbmS65/Py/JR56kSzaY5kLJCW9JzCEyCKwhmIQMg==
-X-Received: by 2002:a17:902:bc49:: with SMTP id t9mr11269864plz.20.1596783811704;
-        Fri, 07 Aug 2020 00:03:31 -0700 (PDT)
-Received: from thinkpad (104.36.148.139.aurocloud.com. [104.36.148.139])
-        by smtp.gmail.com with ESMTPSA id e15sm6897268pfj.167.2020.08.07.00.03.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 07 Aug 2020 00:03:31 -0700 (PDT)
-Date:   Fri, 7 Aug 2020 00:04:00 -0700
-From:   Rustam Kovhaev <rkovhaev@gmail.com>
-To:     kvm@vger.kernel.org, ebiggers@kernel.org
-Cc:     linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
-        syzkaller-bugs@googlegroups.com, viro@zeniv.linux.org.uk
-Subject: Re: memory leak in do_eventfd
-Message-ID: <20200807070400.GA10331@thinkpad>
+        id S1727910AbgHGIj4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 7 Aug 2020 04:39:56 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:41139 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726382AbgHGIj4 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 7 Aug 2020 04:39:56 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1596789595;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=OlUdNVLkFbE86ANY/tbMVg0aRxa7c4aH/HL6yZUmDFI=;
+        b=E6LRou5/49j++c8iZu6QbxelATJTmRSj4RBYngCMTXnIcmqUxYKB3ZKbY8bcnQDDEOJmTC
+        E6l+2aledGjnGebMAJAU/HbM9yz3QbiPobnIx0N+vhcP1qQR1z9Q24OCk/HofVX8g/HFMA
+        mFDsD/gQhQAwjjMFgjiRaA40xu+C8zs=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-191-eRSuRYPAOOacnDWMSEeuCw-1; Fri, 07 Aug 2020 04:39:53 -0400
+X-MC-Unique: eRSuRYPAOOacnDWMSEeuCw-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E24928005B0;
+        Fri,  7 Aug 2020 08:39:51 +0000 (UTC)
+Received: from vitty.brq.redhat.com (unknown [10.40.195.139])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 950025C1D2;
+        Fri,  7 Aug 2020 08:39:48 +0000 (UTC)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Eduardo Habkost <ehabkost@redhat.com>,
+        Jon Doron <arilou@gmail.com>, linux-kernel@vger.kernel.org
+Subject: [PATCH 0/7] KVM: x86: hyper-v: make KVM_GET_SUPPORTED_HV_CPUID more useful
+Date:   Fri,  7 Aug 2020 10:39:39 +0200
+Message-Id: <20200807083946.377654-1-vkuznets@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200605042402.GO2667@sol.localdomain>
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jun 04, 2020 at 09:24:02PM -0700, Eric Biggers wrote:
-> [+Cc kvm mailing list]
-> 
-> On Wed, May 20, 2020 at 06:12:17PM -0700, syzbot wrote:
-> > Hello,
-> > 
-> > syzbot found the following crash on:
-> > 
-> > HEAD commit:    5a9ffb95 Merge tag '5.7-rc5-smb3-fixes' of git://git.samba..
-> > git tree:       upstream
-> > console output: https://syzkaller.appspot.com/x/log.txt?x=10b72a02100000
-> > kernel config:  https://syzkaller.appspot.com/x/.config?x=f8295ae5b3f8268d
-> > dashboard link: https://syzkaller.appspot.com/bug?extid=f196caa45793d6374707
-> > compiler:       gcc (GCC) 9.0.0 20181231 (experimental)
-> > syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=17585b76100000
-> > C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=12500a02100000
-> > 
-> > IMPORTANT: if you fix the bug, please add the following tag to the commit:
-> > Reported-by: syzbot+f196caa45793d6374707@syzkaller.appspotmail.com
-> > 
-> > BUG: memory leak
-> > unreferenced object 0xffff888117169ac0 (size 64):
-> >   comm "syz-executor012", pid 6609, jiffies 4294942172 (age 13.720s)
-> >   hex dump (first 32 bytes):
-> >     01 00 00 00 ff ff ff ff 00 00 00 00 00 c9 ff ff  ................
-> >     d0 9a 16 17 81 88 ff ff d0 9a 16 17 81 88 ff ff  ................
-> >   backtrace:
-> >     [<00000000351bb234>] kmalloc include/linux/slab.h:555 [inline]
-> >     [<00000000351bb234>] do_eventfd+0x35/0xf0 fs/eventfd.c:418
-> >     [<00000000c2f69a77>] __do_sys_eventfd fs/eventfd.c:443 [inline]
-> >     [<00000000c2f69a77>] __se_sys_eventfd fs/eventfd.c:441 [inline]
-> >     [<00000000c2f69a77>] __x64_sys_eventfd+0x14/0x20 fs/eventfd.c:441
-> >     [<0000000086d6f989>] do_syscall_64+0x6e/0x220 arch/x86/entry/common.c:295
-> >     [<000000006c5bcb63>] entry_SYSCALL_64_after_hwframe+0x44/0xa9
-> > 
-> > BUG: memory leak
-> > unreferenced object 0xffff888117169100 (size 64):
-> >   comm "syz-executor012", pid 6609, jiffies 4294942172 (age 13.720s)
-> >   hex dump (first 32 bytes):
-> >     e8 99 dd 00 00 c9 ff ff e8 99 dd 00 00 c9 ff ff  ................
-> >     00 00 00 20 00 00 00 00 00 00 00 00 00 00 00 00  ... ............
-> >   backtrace:
-> >     [<00000000436d2955>] kmalloc include/linux/slab.h:555 [inline]
-> >     [<00000000436d2955>] kzalloc include/linux/slab.h:669 [inline]
-> >     [<00000000436d2955>] kvm_assign_ioeventfd_idx+0x4f/0x270 arch/x86/kvm/../../../virt/kvm/eventfd.c:798
-> >     [<00000000e89390cc>] kvm_assign_ioeventfd arch/x86/kvm/../../../virt/kvm/eventfd.c:934 [inline]
-> >     [<00000000e89390cc>] kvm_ioeventfd+0xbb/0x194 arch/x86/kvm/../../../virt/kvm/eventfd.c:961
-> >     [<00000000ba9f6732>] kvm_vm_ioctl+0x1e6/0x1030 arch/x86/kvm/../../../virt/kvm/kvm_main.c:3670
-> >     [<000000005da94937>] vfs_ioctl fs/ioctl.c:47 [inline]
-> >     [<000000005da94937>] ksys_ioctl+0xa6/0xd0 fs/ioctl.c:771
-> >     [<00000000a583d097>] __do_sys_ioctl fs/ioctl.c:780 [inline]
-> >     [<00000000a583d097>] __se_sys_ioctl fs/ioctl.c:778 [inline]
-> >     [<00000000a583d097>] __x64_sys_ioctl+0x1a/0x20 fs/ioctl.c:778
-> >     [<0000000086d6f989>] do_syscall_64+0x6e/0x220 arch/x86/entry/common.c:295
-> >     [<000000006c5bcb63>] entry_SYSCALL_64_after_hwframe+0x44/0xa9
-> > 
+KVM_GET_SUPPORTED_HV_CPUID was initially implemented as a vCPU ioctl but
+this is not very useful when VMM is just trying to query which Hyper-V
+features are supported by the host prior to creating VM/vCPUs. The data
+in KVM_GET_SUPPORTED_HV_CPUID is mostly static with a few exceptions but
+it seems we can change this. Add support for KVM_GET_SUPPORTED_HV_CPUID as
+a system ioctl as well.
 
-i had to slightly change syzbot reproducer to reproduce this bug in my
-lab:
-	root@syzkaller:~# diff repro_fixed.c repro_syz.c
-	371c371
-	<   inject_fault(2);
-	---
-	>   inject_fault(4);
+QEMU specific description:
+In some cases QEMU needs to collect the information about which Hyper-V
+features are supported by KVM and pass it up the stack. For non-hyper-v
+features this is done with system-wide KVM_GET_SUPPORTED_CPUID/
+KVM_GET_MSRS ioctls but Hyper-V specific features don't get in the output
+(as Hyper-V CPUIDs intersect with KVM's). In QEMU, CPU feature expansion
+happens before any KVM vcpus are created so KVM_GET_SUPPORTED_HV_CPUID
+can't be used in its current shape.
 
-the memleak happens when kmalloc() fails in kvm_io_bus_unregister_dev()
-i also confirmed the leak by running ftrace - eventfd_free_ctx() was
-not executed when we got to kvm_vm_release()
+Vitaly Kuznetsov (7):
+  KVM: x86: hyper-v: Mention SynDBG CPUID leaves in api.rst
+  KVM: x86: hyper-v: disallow configuring SynIC timers with no SynIC
+  KVM: x86: hyper-v: make KVM_GET_SUPPORTED_HV_CPUID output independent
+    of eVMCS enablement
+  KVM: x86: hyper-v: always advertise HV_STIMER_DIRECT_MODE_AVAILABLE
+  KVM: x86: hyper-v: drop now unneeded vcpu parameter from
+    kvm_vcpu_ioctl_get_hv_cpuid()
+  KVM: x86: hyper-v: allow KVM_GET_SUPPORTED_HV_CPUID as a system ioctl
+  KVM: selftests: test KVM_GET_SUPPORTED_HV_CPUID as a system ioctl
 
-it seems like we should call kvm_iodevice_destructor(), because there
-could be other devices linked to the bus that's being removed when that
-particular kmalloc() failure happens
+ Documentation/virt/kvm/api.rst                | 12 +--
+ arch/x86/include/asm/kvm_host.h               |  2 +-
+ arch/x86/kvm/hyperv.c                         | 30 ++++----
+ arch/x86/kvm/hyperv.h                         |  3 +-
+ arch/x86/kvm/vmx/evmcs.c                      |  8 +-
+ arch/x86/kvm/vmx/evmcs.h                      |  2 +-
+ arch/x86/kvm/x86.c                            | 44 ++++++-----
+ include/uapi/linux/kvm.h                      |  4 +-
+ .../testing/selftests/kvm/include/kvm_util.h  |  2 +
+ tools/testing/selftests/kvm/lib/kvm_util.c    | 26 +++++++
+ .../selftests/kvm/x86_64/hyperv_cpuid.c       | 77 +++++++++----------
+ 11 files changed, 120 insertions(+), 90 deletions(-)
 
-i did not want to modify callers of kvm_io_bus_unregister_dev() and i
-tested the patch below that fixed the leak, but i am not sure if it
-completely breaks other things in KVM, i would really appreciate if
-someone can review it:
-
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 0a68c9d3d3ab..b1996989d576 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -4268,7 +4268,7 @@ int kvm_io_bus_register_dev(struct kvm *kvm, enum kvm_bus bus_idx, gpa_t addr,
- void kvm_io_bus_unregister_dev(struct kvm *kvm, enum kvm_bus bus_idx,
- 			       struct kvm_io_device *dev)
- {
--	int i;
-+	int i, j;
- 	struct kvm_io_bus *new_bus, *bus;
- 
- 	bus = kvm_get_bus(kvm, bus_idx);
-@@ -4298,6 +4298,13 @@ void kvm_io_bus_unregister_dev(struct kvm *kvm, enum kvm_bus bus_idx,
- broken:
- 	rcu_assign_pointer(kvm->buses[bus_idx], new_bus);
- 	synchronize_srcu_expedited(&kvm->srcu);
-+	if (!new_bus) {
-+		for (j = 0; j < bus->dev_count; j++) {
-+			if (j == i)
-+				continue;
-+			kvm_iodevice_destructor(bus->range[j].dev);
-+		}
-+	}
- 	kfree(bus);
- 	return;
- }
+-- 
+2.25.4
 
