@@ -2,270 +2,298 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2F67C23E55A
+	by mail.lfdr.de (Postfix) with ESMTP id 9D31323E55B
 	for <lists+kvm@lfdr.de>; Fri,  7 Aug 2020 02:47:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726900AbgHGArf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 6 Aug 2020 20:47:35 -0400
-Received: from mail-dm6nam12on2084.outbound.protection.outlook.com ([40.107.243.84]:14497
+        id S1726925AbgHGArk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 6 Aug 2020 20:47:40 -0400
+Received: from mail-dm6nam12on2072.outbound.protection.outlook.com ([40.107.243.72]:41569
         "EHLO NAM12-DM6-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726890AbgHGArd (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 6 Aug 2020 20:47:33 -0400
+        id S1726897AbgHGAri (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 6 Aug 2020 20:47:38 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=gvL6Hq1ZE8XXf4+wAgQa3hF3QLtrkSiAYiD5D3gtMVPfvcKvnNEnd4JJaOcEyzV3ZnSJaDxHr5DEsMOnCc2WiCclkjyWPbT9IU5bF4D5pzvV+em/BOLK1S3ZIThtrxoBZSpNYFe3V44BdNXNeOH/G1xJXEk4bYy7p5UXlgpL0V9G5GCr7dq1Tma2M448Wws3zC50Zpb7gRATFG5HEix+KTD3Ws7G6l65IBTXAJE+RQCypIJOd9C2UDoJyEVf+SfIIjCeECFw4CJjIet2pfAQtCAQU7GW9H4ct/atNnfaKEjy3HOV8HpoV93v65WVeoEUN3hBVX95ESJxSrQQTkhPJA==
+ b=FdEUvzbTj26WUSMlPVWi62mcdatjtL8qeIGUW67b7B9Gk62c5sAxAKAFVSdCLY4BSy4Ii/BS4iYpjE5YrLIhtvLaTg4V91x5o0BkAzEisv12I/e5GTon69LDOdGD/HN0fAZMWqnuiNrUgnP8Syc7N7PfpQbu4aMcrD1P1gq3yK8vtSw5a76FbrlJiEDxli9TfU5XN1mrO02c+dHGeLVCttX/KPv1O3kbcA/DoAOYq4WY2VmoBMRYqzn64anrpUneuDQDZHkC59yZfaNkACrUbD4Ke8RyKpndnAw6mtExoQnIz9zyRWOnkBfVVnR4N3BJ2BhIGeLlIfBrtipQlOXfvw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=2JAO9IwuArf4iNlvGYie7oELfhsQUOp2WXm/dj6OfnE=;
- b=obt3XHUJAgc6+t/13bV3GiNCInZmu8f6BNddU5Ubs1XPmuO08cCbU9kVBW4RLqbPNo7MaF14kt5yggbIG+4q9GBuZR6Jvyu2zbJ1v6RAAyyw5GoJekmxFAa/ID1hRp4BUrYFEvDa4KwmpTUtGBA8vqvPDGNYct2NUw6VEqGSieavMKohKGLjlE8jvBG/xp87AAAaQA2egWfoN+xUrvIKuvSPs/5haHl+ErThM3WL+G16jTeSkic9Y5Vrf8AY3W4eW+TqONsWAJ3HkYDc1uxvHSyrAvt+ooSYzPJRP2Ae25I8f9HNzXkj/Wpr9vHmYF187HI8ml1ltihBc6FXMKoGlQ==
+ bh=PtVMDA17QHF58Sc1VHOQOPfkSjBakAfLYn119R2gy94=;
+ b=nd/sD4jE2JkOJS0QwPZppbE37XmU8TENHxTJPVfeRNFGrQSpKFAIbw9njp8cg/5etw2xMM5hdzioz5jp8B3VzipB1wgx87fkSgF3KlpFWvx61USLOoIDvF9JMlceFyEtShM7vpZ212g4jAALvIjkI5x8Fz2heINP/5nuQRx2ajAUSP1+QGnhuaL3GLc/iLCga6HSKD79DhUdUIRUyefe7d6lUbQgs7sqL+Ll+wO0taiJYP3u/0SKNyj6QuWpLpT8tATYd5dLjT4G45HQv/pRLFzXi4fBRHMRrrdcvhQ1gj4KCn+HnjksKwHRyFvwy4zpscXeuPYCU8+sn9p4kTiAAw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
  header.d=amd.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=2JAO9IwuArf4iNlvGYie7oELfhsQUOp2WXm/dj6OfnE=;
- b=omFEPVcZ90dR5bFa9pzFpm7bM+5giEcccV3H0nOUqlhrS+jHkASzHAv/F9hHTBuqwQ3+rX8L6lDeNnwqrtKWHnfACkmhBnKNh2CguDQAmckTSQWyAdd61Wr+6OEc//8G3cbzMwOnEwt4ifE0NsFqJ285wFRWbOKmZOg/Ja0zFs0=
+ bh=PtVMDA17QHF58Sc1VHOQOPfkSjBakAfLYn119R2gy94=;
+ b=A1qjkMfYMeJ2WJh9h6v43rmG5nRjPqE28TRq+oIzJ2YYekrP8FfJeaWVnCshUspxNDMwV3TRdOWHvUfvVkxPc84UexQghYFnz1TW/iWQ6OEQ6nkdGMGLsfoqfJydIP5CONedrRD/NuwGUXJQhGetzASpMf4v8Q4QVwfTKDWJY4g=
 Authentication-Results: tencent.com; dkim=none (message not signed)
  header.d=none;tencent.com; dmarc=none action=none header.from=amd.com;
 Received: from SN1PR12MB2560.namprd12.prod.outlook.com (2603:10b6:802:26::19)
  by SA0PR12MB4479.namprd12.prod.outlook.com (2603:10b6:806:95::24) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3261.19; Fri, 7 Aug
- 2020 00:47:29 +0000
+ 2020 00:47:35 +0000
 Received: from SN1PR12MB2560.namprd12.prod.outlook.com
  ([fe80::691c:c75:7cc2:7f2c]) by SN1PR12MB2560.namprd12.prod.outlook.com
  ([fe80::691c:c75:7cc2:7f2c%6]) with mapi id 15.20.3239.023; Fri, 7 Aug 2020
- 00:47:29 +0000
-Subject: [PATCH v4 10/12] KVM: X86: Rename and move the function
- vmx_handle_memory_failure to x86.c
+ 00:47:35 +0000
+Subject: [PATCH v4 11/12] KVM: X86: Move handling of INVPCID types to x86
 From:   Babu Moger <babu.moger@amd.com>
 To:     pbonzini@redhat.com, vkuznets@redhat.com, wanpengli@tencent.com,
         sean.j.christopherson@intel.com, jmattson@google.com
 Cc:     kvm@vger.kernel.org, joro@8bytes.org, x86@kernel.org,
         linux-kernel@vger.kernel.org, mingo@redhat.com, bp@alien8.de,
         hpa@zytor.com, tglx@linutronix.de
-Date:   Thu, 06 Aug 2020 19:47:27 -0500
-Message-ID: <159676124786.12805.2925649566619758811.stgit@bmoger-ubuntu>
+Date:   Thu, 06 Aug 2020 19:47:34 -0500
+Message-ID: <159676125434.12805.10237694695339928467.stgit@bmoger-ubuntu>
 In-Reply-To: <159676101387.12805.18038347880482984693.stgit@bmoger-ubuntu>
 References: <159676101387.12805.18038347880482984693.stgit@bmoger-ubuntu>
 User-Agent: StGit/0.17.1-dirty
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SN2PR01CA0084.prod.exchangelabs.com (2603:10b6:800::52) To
- SN1PR12MB2560.namprd12.prod.outlook.com (2603:10b6:802:26::19)
+X-ClientProxiedBy: SN4PR0201CA0017.namprd02.prod.outlook.com
+ (2603:10b6:803:2b::27) To SN1PR12MB2560.namprd12.prod.outlook.com
+ (2603:10b6:802:26::19)
 MIME-Version: 1.0
 X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from [127.0.1.1] (165.204.77.1) by SN2PR01CA0084.prod.exchangelabs.com (2603:10b6:800::52) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3261.19 via Frontend Transport; Fri, 7 Aug 2020 00:47:28 +0000
+Received: from [127.0.1.1] (165.204.77.1) by SN4PR0201CA0017.namprd02.prod.outlook.com (2603:10b6:803:2b::27) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3261.18 via Frontend Transport; Fri, 7 Aug 2020 00:47:34 +0000
 X-Originating-IP: [165.204.77.1]
 X-MS-PublicTrafficType: Email
 X-MS-Office365-Filtering-HT: Tenant
-X-MS-Office365-Filtering-Correlation-Id: b582a267-5ba5-4834-1cf3-08d83a6b7612
+X-MS-Office365-Filtering-Correlation-Id: dab1bbd3-c345-4e97-1cd4-08d83a6b79e2
 X-MS-TrafficTypeDiagnostic: SA0PR12MB4479:
 X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <SA0PR12MB4479EB1A1AE1A95C37C4599495490@SA0PR12MB4479.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:8882;
+X-Microsoft-Antispam-PRVS: <SA0PR12MB44792854FE7DC177046A07E495490@SA0PR12MB4479.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:7691;
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: pqoqLb8TIZGbZvVlkibggfJhTYERvf0wVvDLAVBZ35U7RaOJp+jcolJSITT1fh2WVh2J0ujdl19pK9VbqclnfAF1cQVBwjrO+qBP0M3BwuLJxSxt7T+mTEuNR3YnBUApVk0W+7SSUK9LZaAi5+WT99DE4k9UrQUIXoFOMLsNt024GWRB8SGO6PyTYVhBvNi7e5X9WE2KMlgkDY6Fgout9BY7YLT1MIo/MyEndwrXJzTHCyVl5N8zoeH0piJCmKWOMqApTi5q+px9nV6l06hLml4sgM7UOTZJ7DzpO0b2CELfyoW9KVxjpI/Mpjsaq5Cs
+X-Microsoft-Antispam-Message-Info: lf0SdhK1IPpR793PDLBfWN552Ff/PuDnKv53otHllYjtKxl651gQyU68sR1LYXGK9gaN3QYB1kTltl1sZyE4QrYULQ/OgZMkCsXFdIUECUUv1FpsYmlC1AS4c5GLTQ8MDHzlHKOtkTiKqPgnHPQOh9W1PQrkgmhjPV11BuBumOlnNRZiaemvjBD5m8X4WIWFfPuPZnWLttQgNxIXJ1sx+SJjQ7EtX8jgKymTSBgjBeHdPMb95G2eoBZfWeZoVjzDhgZHS0jrOTps6Pgz6kUKVYP0MzMpLi1cLYET0rSRJPnK/e9SF2sKiLXWj3AL3g7HTdZm2yEdz5qk2en7GZdd7w==
 X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN1PR12MB2560.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFTY:;SFS:(4636009)(7916004)(39860400002)(396003)(376002)(346002)(136003)(366004)(5660300002)(6486002)(52116002)(2906002)(16576012)(4326008)(83380400001)(7416002)(956004)(44832011)(33716001)(26005)(9686003)(8676002)(66476007)(66556008)(103116003)(66946007)(8936002)(86362001)(16526019)(186003)(478600001)(316002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData: t1xg3c4BfAeXvSX4lmMmAuWzitBrqxXYbOVz8jw28utG/Yb4YbGRO5zEjH7G0ixpgqfxwTy46Pwk1l8YC8GoRU96ezRRbFulHkW8dy8DH7JwYTMHL9Q2swOcD9c4EvSx/qXBM5c0kC3iYSSjRVWQ26z9/jzLWXBZq5O6sYAG3rRi+3PgCw5zbTPBPAXUhHsI11x1ryNanSo3Xd0EToyOjzPrVZqRVJC4BQkUMQ9wstTbJOSUaSvlG777tYe0PtPEwsxPQjHcLI36lfFi9cc7ARfbgGIZBMm+FBV8i6HDTp4qjGNUGguyJrMnTfZZz4WuY0bLSiwPqIQjCoZV9cbIMGdAzndzmixVOUjb52kYCu8AnbZP8YVE+YF9IWP3TBnZKkfRVciS0LF64QkSMhSHTN7lNa6hSs14N+mtrkpxiiX+i7+giXlr6Ho0I/Wpn2kd/vMAgSbhVQFEIobh6RI8Lin0SgIhLIIYmBi4mfXaygxZo1e2yiYU7RGqhm3yS5Wi3rgLv0SqJc0FCBAY84LelA/2G+hVzVcKRalCcnxhHvBFXvzOU+cSUvuuo9/KE84LXkg+1fl6iXfAyTD6MN7eUTWrjKnYZaW3sKldQFel/HgORDTP5htE2FCpEclwAuhmA4nNdQtj36ZDqW5ksBeRwg==
+X-MS-Exchange-AntiSpam-MessageData: ryC6bF8NhTjv2eObez4g+z5nbltwLX/tT+Lxm48gt50z9ckSWR0nzjJl/L9PCynLG3k1ktyOTmM9GXKeUSUzD40M7Yco2HkOBjU20Vl0U3EDq3Moth76xmqJ+2RMCc8a9LU2wQFoGsAYw7sRqUn1AZ3rF8xS0460BcWOKIYNGI9E6sSAi40+mBIScdDykcyfJGp2Nff9YMr/IQOocSl4oDSa7D9ujwgKnQm3IEDRSqpPBbN8dCRtUmjvg8wfpNKN4JmLnPifNfhiLIxa8+Kj67tmh03clcOmu9eEheaGpp78r2hT9mnijs98lFB7M+uZvVAC+TaN7Sfk0hevnObwjqpV12BAADRa0AtC87XWTtty7xswcjY7djcPGYNcQnTSaGtGdWjJXpBif3SIqvd5pzY2X6GWRG0Rujz4ZEJNDxGugXSLbe/BJnUSp9A+2p1HC3VdV5fjUbcCu83mtIetzCwEnwoyGC5D+xsb8km+Da6n8aVaSNquffR1bu7Lh3dzLGY4QUuMD/vezUaEmkHZvxNd3fTPhuTNkNI8BTumeHGQ+N+v3NOyr7Q4f45vH//z3C/vgio26BlB0R7IgYHoKxhqPIX2+FCP8mS8lKm18wELxlvso0BAWsD3i/QANy/O0UwwXVJDdXqsdMV7Hc/AVQ==
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: b582a267-5ba5-4834-1cf3-08d83a6b7612
+X-MS-Exchange-CrossTenant-Network-Message-Id: dab1bbd3-c345-4e97-1cd4-08d83a6b79e2
 X-MS-Exchange-CrossTenant-AuthSource: SN1PR12MB2560.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Aug 2020 00:47:29.2014
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Aug 2020 00:47:35.7636
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: r7l6P09MHePrPByys7ZQO0YkDymO2/UzLf9bcDuWqoP3yXSmQ8Xf5IGqk4SoeKmt
+X-MS-Exchange-CrossTenant-UserPrincipalName: afeCjAXn8qiiLuIFSd8vGlj+H7VS2xVUQFwfdSkhZVmBQb5qYMu5mMsecUFQjwlZ
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR12MB4479
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Handling of kvm_read/write_guest_virt*() errors can be moved to common
-code. The same code can be used by both VMX and SVM.
+INVPCID instruction handling is mostly same across both VMX and
+SVM. So, move the code to common x86.c.
 
 Signed-off-by: Babu Moger <babu.moger@amd.com>
+Reviewed-by: Jim Mattson <jmattson@google.com>
 ---
- arch/x86/kvm/vmx/nested.c |   12 ++++++------
- arch/x86/kvm/vmx/vmx.c    |   29 +----------------------------
- arch/x86/kvm/vmx/vmx.h    |    2 --
- arch/x86/kvm/x86.c        |   28 ++++++++++++++++++++++++++++
- arch/x86/kvm/x86.h        |    2 ++
- 5 files changed, 37 insertions(+), 36 deletions(-)
+ arch/x86/kvm/vmx/vmx.c |   68 +-----------------------------------------
+ arch/x86/kvm/x86.c     |   78 ++++++++++++++++++++++++++++++++++++++++++++++++
+ arch/x86/kvm/x86.h     |    1 +
+ 3 files changed, 80 insertions(+), 67 deletions(-)
 
-diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index d4a4cec034d0..32b7d9c07645 100644
---- a/arch/x86/kvm/vmx/nested.c
-+++ b/arch/x86/kvm/vmx/nested.c
-@@ -4640,7 +4640,7 @@ static int nested_vmx_get_vmptr(struct kvm_vcpu *vcpu, gpa_t *vmpointer,
- 
- 	r = kvm_read_guest_virt(vcpu, gva, vmpointer, sizeof(*vmpointer), &e);
- 	if (r != X86EMUL_CONTINUE) {
--		*ret = vmx_handle_memory_failure(vcpu, r, &e);
-+		*ret = kvm_handle_memory_failure(vcpu, r, &e);
- 		return -EINVAL;
- 	}
- 
-@@ -4951,7 +4951,7 @@ static int handle_vmread(struct kvm_vcpu *vcpu)
- 		/* _system ok, nested_vmx_check_permission has verified cpl=0 */
- 		r = kvm_write_guest_virt_system(vcpu, gva, &value, len, &e);
- 		if (r != X86EMUL_CONTINUE)
--			return vmx_handle_memory_failure(vcpu, r, &e);
-+			return kvm_handle_memory_failure(vcpu, r, &e);
- 	}
- 
- 	return nested_vmx_succeed(vcpu);
-@@ -5024,7 +5024,7 @@ static int handle_vmwrite(struct kvm_vcpu *vcpu)
- 			return 1;
- 		r = kvm_read_guest_virt(vcpu, gva, &value, len, &e);
- 		if (r != X86EMUL_CONTINUE)
--			return vmx_handle_memory_failure(vcpu, r, &e);
-+			return kvm_handle_memory_failure(vcpu, r, &e);
- 	}
- 
- 	field = kvm_register_readl(vcpu, (((instr_info) >> 28) & 0xf));
-@@ -5190,7 +5190,7 @@ static int handle_vmptrst(struct kvm_vcpu *vcpu)
- 	r = kvm_write_guest_virt_system(vcpu, gva, (void *)&current_vmptr,
- 					sizeof(gpa_t), &e);
- 	if (r != X86EMUL_CONTINUE)
--		return vmx_handle_memory_failure(vcpu, r, &e);
-+		return kvm_handle_memory_failure(vcpu, r, &e);
- 
- 	return nested_vmx_succeed(vcpu);
- }
-@@ -5244,7 +5244,7 @@ static int handle_invept(struct kvm_vcpu *vcpu)
- 		return 1;
- 	r = kvm_read_guest_virt(vcpu, gva, &operand, sizeof(operand), &e);
- 	if (r != X86EMUL_CONTINUE)
--		return vmx_handle_memory_failure(vcpu, r, &e);
-+		return kvm_handle_memory_failure(vcpu, r, &e);
- 
- 	/*
- 	 * Nested EPT roots are always held through guest_mmu,
-@@ -5326,7 +5326,7 @@ static int handle_invvpid(struct kvm_vcpu *vcpu)
- 		return 1;
- 	r = kvm_read_guest_virt(vcpu, gva, &operand, sizeof(operand), &e);
- 	if (r != X86EMUL_CONTINUE)
--		return vmx_handle_memory_failure(vcpu, r, &e);
-+		return kvm_handle_memory_failure(vcpu, r, &e);
- 
- 	if (operand.vpid >> 16)
- 		return nested_vmx_failValid(vcpu,
 diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 13745f2a5ecd..ff7920844702 100644
+index ff7920844702..02652edce9d1 100644
 --- a/arch/x86/kvm/vmx/vmx.c
 +++ b/arch/x86/kvm/vmx/vmx.c
-@@ -1597,33 +1597,6 @@ static int skip_emulated_instruction(struct kvm_vcpu *vcpu)
- 	return 1;
- }
+@@ -5473,16 +5473,11 @@ static int handle_invpcid(struct kvm_vcpu *vcpu)
+ {
+ 	u32 vmx_instruction_info;
+ 	unsigned long type;
+-	bool pcid_enabled;
+ 	gva_t gva;
+-	struct x86_exception e;
+-	unsigned i;
+-	unsigned long roots_to_free = 0;
+ 	struct {
+ 		u64 pcid;
+ 		u64 gla;
+ 	} operand;
+-	int r;
  
--/*
-- * Handles kvm_read/write_guest_virt*() result and either injects #PF or returns
-- * KVM_EXIT_INTERNAL_ERROR for cases not currently handled by KVM. Return value
-- * indicates whether exit to userspace is needed.
-- */
--int vmx_handle_memory_failure(struct kvm_vcpu *vcpu, int r,
--			      struct x86_exception *e)
--{
--	if (r == X86EMUL_PROPAGATE_FAULT) {
--		kvm_inject_emulated_page_fault(vcpu, e);
+ 	if (!guest_cpuid_has(vcpu, X86_FEATURE_INVPCID)) {
+ 		kvm_queue_exception(vcpu, UD_VECTOR);
+@@ -5505,68 +5500,7 @@ static int handle_invpcid(struct kvm_vcpu *vcpu)
+ 				sizeof(operand), &gva))
+ 		return 1;
+ 
+-	r = kvm_read_guest_virt(vcpu, gva, &operand, sizeof(operand), &e);
+-	if (r != X86EMUL_CONTINUE)
+-		return kvm_handle_memory_failure(vcpu, r, &e);
+-
+-	if (operand.pcid >> 12 != 0) {
+-		kvm_inject_gp(vcpu, 0);
 -		return 1;
 -	}
 -
--	/*
--	 * In case kvm_read/write_guest_virt*() failed with X86EMUL_IO_NEEDED
--	 * while handling a VMX instruction KVM could've handled the request
--	 * correctly by exiting to userspace and performing I/O but there
--	 * doesn't seem to be a real use-case behind such requests, just return
--	 * KVM_EXIT_INTERNAL_ERROR for now.
--	 */
--	vcpu->run->exit_reason = KVM_EXIT_INTERNAL_ERROR;
--	vcpu->run->internal.suberror = KVM_INTERNAL_ERROR_EMULATION;
--	vcpu->run->internal.ndata = 0;
+-	pcid_enabled = kvm_read_cr4_bits(vcpu, X86_CR4_PCIDE);
 -
--	return 0;
--}
+-	switch (type) {
+-	case INVPCID_TYPE_INDIV_ADDR:
+-		if ((!pcid_enabled && (operand.pcid != 0)) ||
+-		    is_noncanonical_address(operand.gla, vcpu)) {
+-			kvm_inject_gp(vcpu, 0);
+-			return 1;
+-		}
+-		kvm_mmu_invpcid_gva(vcpu, operand.gla, operand.pcid);
+-		return kvm_skip_emulated_instruction(vcpu);
 -
- /*
-  * Recognizes a pending MTF VM-exit and records the nested state for later
-  * delivery.
-@@ -5534,7 +5507,7 @@ static int handle_invpcid(struct kvm_vcpu *vcpu)
+-	case INVPCID_TYPE_SINGLE_CTXT:
+-		if (!pcid_enabled && (operand.pcid != 0)) {
+-			kvm_inject_gp(vcpu, 0);
+-			return 1;
+-		}
+-
+-		if (kvm_get_active_pcid(vcpu) == operand.pcid) {
+-			kvm_mmu_sync_roots(vcpu);
+-			kvm_make_request(KVM_REQ_TLB_FLUSH_CURRENT, vcpu);
+-		}
+-
+-		for (i = 0; i < KVM_MMU_NUM_PREV_ROOTS; i++)
+-			if (kvm_get_pcid(vcpu, vcpu->arch.mmu->prev_roots[i].pgd)
+-			    == operand.pcid)
+-				roots_to_free |= KVM_MMU_ROOT_PREVIOUS(i);
+-
+-		kvm_mmu_free_roots(vcpu, vcpu->arch.mmu, roots_to_free);
+-		/*
+-		 * If neither the current cr3 nor any of the prev_roots use the
+-		 * given PCID, then nothing needs to be done here because a
+-		 * resync will happen anyway before switching to any other CR3.
+-		 */
+-
+-		return kvm_skip_emulated_instruction(vcpu);
+-
+-	case INVPCID_TYPE_ALL_NON_GLOBAL:
+-		/*
+-		 * Currently, KVM doesn't mark global entries in the shadow
+-		 * page tables, so a non-global flush just degenerates to a
+-		 * global flush. If needed, we could optimize this later by
+-		 * keeping track of global entries in shadow page tables.
+-		 */
+-
+-		/* fall-through */
+-	case INVPCID_TYPE_ALL_INCL_GLOBAL:
+-		kvm_mmu_unload(vcpu);
+-		return kvm_skip_emulated_instruction(vcpu);
+-
+-	default:
+-		BUG(); /* We have already checked above that type <= 3 */
+-	}
++	return kvm_handle_invpcid(vcpu, type, gva);
+ }
  
- 	r = kvm_read_guest_virt(vcpu, gva, &operand, sizeof(operand), &e);
- 	if (r != X86EMUL_CONTINUE)
--		return vmx_handle_memory_failure(vcpu, r, &e);
-+		return kvm_handle_memory_failure(vcpu, r, &e);
- 
- 	if (operand.pcid >> 12 != 0) {
- 		kvm_inject_gp(vcpu, 0);
-diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
-index 639798e4a6ca..adac99d9cbc8 100644
---- a/arch/x86/kvm/vmx/vmx.h
-+++ b/arch/x86/kvm/vmx/vmx.h
-@@ -353,8 +353,6 @@ struct shared_msr_entry *find_msr_entry(struct vcpu_vmx *vmx, u32 msr);
- void pt_update_intercept_for_msr(struct vcpu_vmx *vmx);
- void vmx_update_host_rsp(struct vcpu_vmx *vmx, unsigned long host_rsp);
- int vmx_find_msr_index(struct vmx_msrs *m, u32 msr);
--int vmx_handle_memory_failure(struct kvm_vcpu *vcpu, int r,
--			      struct x86_exception *e);
- 
- #define POSTED_INTR_ON  0
- #define POSTED_INTR_SN  1
+ static int handle_pml_full(struct kvm_vcpu *vcpu)
 diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 88c593f83b28..5806f606dd23 100644
+index 5806f606dd23..8dcd68058327 100644
 --- a/arch/x86/kvm/x86.c
 +++ b/arch/x86/kvm/x86.c
-@@ -10699,6 +10699,34 @@ u64 kvm_spec_ctrl_valid_bits(struct kvm_vcpu *vcpu)
+@@ -70,6 +70,7 @@
+ #include <asm/irq_remapping.h>
+ #include <asm/mshyperv.h>
+ #include <asm/hypervisor.h>
++#include <asm/tlbflush.h>
+ #include <asm/intel_pt.h>
+ #include <asm/emulate_prefix.h>
+ #include <clocksource/hyperv_timer.h>
+@@ -10727,6 +10728,83 @@ int kvm_handle_memory_failure(struct kvm_vcpu *vcpu, int r,
  }
- EXPORT_SYMBOL_GPL(kvm_spec_ctrl_valid_bits);
+ EXPORT_SYMBOL_GPL(kvm_handle_memory_failure);
  
-+/*
-+ * Handles kvm_read/write_guest_virt*() result and either injects #PF or returns
-+ * KVM_EXIT_INTERNAL_ERROR for cases not currently handled by KVM. Return value
-+ * indicates whether exit to userspace is needed.
-+ */
-+int kvm_handle_memory_failure(struct kvm_vcpu *vcpu, int r,
-+			      struct x86_exception *e)
++int kvm_handle_invpcid(struct kvm_vcpu *vcpu, unsigned long type, gva_t gva)
 +{
-+	if (r == X86EMUL_PROPAGATE_FAULT) {
-+		kvm_inject_emulated_page_fault(vcpu, e);
++	bool pcid_enabled;
++	struct x86_exception e;
++	unsigned i;
++	unsigned long roots_to_free = 0;
++	struct {
++		u64 pcid;
++		u64 gla;
++	} operand;
++	int r;
++
++	r = kvm_read_guest_virt(vcpu, gva, &operand, sizeof(operand), &e);
++	if (r != X86EMUL_CONTINUE)
++		return kvm_handle_memory_failure(vcpu, r, &e);
++
++	if (operand.pcid >> 12 != 0) {
++		kvm_inject_gp(vcpu, 0);
 +		return 1;
 +	}
 +
-+	/*
-+	 * In case kvm_read/write_guest_virt*() failed with X86EMUL_IO_NEEDED
-+	 * while handling a VMX instruction KVM could've handled the request
-+	 * correctly by exiting to userspace and performing I/O but there
-+	 * doesn't seem to be a real use-case behind such requests, just return
-+	 * KVM_EXIT_INTERNAL_ERROR for now.
-+	 */
-+	vcpu->run->exit_reason = KVM_EXIT_INTERNAL_ERROR;
-+	vcpu->run->internal.suberror = KVM_INTERNAL_ERROR_EMULATION;
-+	vcpu->run->internal.ndata = 0;
++	pcid_enabled = kvm_read_cr4_bits(vcpu, X86_CR4_PCIDE);
 +
-+	return 0;
++	switch (type) {
++	case INVPCID_TYPE_INDIV_ADDR:
++		if ((!pcid_enabled && (operand.pcid != 0)) ||
++		    is_noncanonical_address(operand.gla, vcpu)) {
++			kvm_inject_gp(vcpu, 0);
++			return 1;
++		}
++		kvm_mmu_invpcid_gva(vcpu, operand.gla, operand.pcid);
++		return kvm_skip_emulated_instruction(vcpu);
++
++	case INVPCID_TYPE_SINGLE_CTXT:
++		if (!pcid_enabled && (operand.pcid != 0)) {
++			kvm_inject_gp(vcpu, 0);
++			return 1;
++		}
++
++		if (kvm_get_active_pcid(vcpu) == operand.pcid) {
++			kvm_mmu_sync_roots(vcpu);
++			kvm_make_request(KVM_REQ_TLB_FLUSH_CURRENT, vcpu);
++		}
++
++		for (i = 0; i < KVM_MMU_NUM_PREV_ROOTS; i++)
++			if (kvm_get_pcid(vcpu, vcpu->arch.mmu->prev_roots[i].pgd)
++			    == operand.pcid)
++				roots_to_free |= KVM_MMU_ROOT_PREVIOUS(i);
++
++		kvm_mmu_free_roots(vcpu, vcpu->arch.mmu, roots_to_free);
++		/*
++		 * If neither the current cr3 nor any of the prev_roots use the
++		 * given PCID, then nothing needs to be done here because a
++		 * resync will happen anyway before switching to any other CR3.
++		 */
++
++		return kvm_skip_emulated_instruction(vcpu);
++
++	case INVPCID_TYPE_ALL_NON_GLOBAL:
++		/*
++		 * Currently, KVM doesn't mark global entries in the shadow
++		 * page tables, so a non-global flush just degenerates to a
++		 * global flush. If needed, we could optimize this later by
++		 * keeping track of global entries in shadow page tables.
++		 */
++
++		/* fall-through */
++	case INVPCID_TYPE_ALL_INCL_GLOBAL:
++		kvm_mmu_unload(vcpu);
++		return kvm_skip_emulated_instruction(vcpu);
++
++	default:
++		BUG(); /* We have already checked above that type <= 3 */
++	}
 +}
-+EXPORT_SYMBOL_GPL(kvm_handle_memory_failure);
++EXPORT_SYMBOL_GPL(kvm_handle_invpcid);
 +
  EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_exit);
  EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_fast_mmio);
  EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_inj_virq);
 diff --git a/arch/x86/kvm/x86.h b/arch/x86/kvm/x86.h
-index 6eb62e97e59f..a8995806431d 100644
+index a8995806431d..c6b728f1fed2 100644
 --- a/arch/x86/kvm/x86.h
 +++ b/arch/x86/kvm/x86.h
-@@ -365,5 +365,7 @@ void kvm_load_guest_xsave_state(struct kvm_vcpu *vcpu);
- void kvm_load_host_xsave_state(struct kvm_vcpu *vcpu);
- u64 kvm_spec_ctrl_valid_bits(struct kvm_vcpu *vcpu);
+@@ -367,5 +367,6 @@ u64 kvm_spec_ctrl_valid_bits(struct kvm_vcpu *vcpu);
  bool kvm_vcpu_exit_request(struct kvm_vcpu *vcpu);
-+int kvm_handle_memory_failure(struct kvm_vcpu *vcpu, int r,
-+			      struct x86_exception *e);
+ int kvm_handle_memory_failure(struct kvm_vcpu *vcpu, int r,
+ 			      struct x86_exception *e);
++int kvm_handle_invpcid(struct kvm_vcpu *vcpu, unsigned long type, gva_t gva);
  
  #endif
 
