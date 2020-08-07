@@ -2,129 +2,105 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2CE6323E98D
-	for <lists+kvm@lfdr.de>; Fri,  7 Aug 2020 10:48:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8C91723E978
+	for <lists+kvm@lfdr.de>; Fri,  7 Aug 2020 10:46:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727828AbgHGIsb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 7 Aug 2020 04:48:31 -0400
-Received: from Galois.linutronix.de ([193.142.43.55]:35086 "EHLO
-        galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726729AbgHGIsa (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 7 Aug 2020 04:48:30 -0400
-From:   Thomas Gleixner <tglx@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020; t=1596790107;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=MBF7RuxtgMye0FeTHS4/I2QgvfUn5rqfABUW3RbrEFA=;
-        b=U9oLfO4Fm3GXtP9BGZ1UlYHmiESlcNyJleCppysP/SHrBFitqdd0yWg5QWy6rVoVQHZYBx
-        SwZYMagWZTS18JVVzhhb8jtFjuE0vhrpwiE1LKhh1SDn2dqIdOkvLEY4HoO9MbWCpLtmN8
-        /y8VkMj+kWOwMyHVOmAj/BSPK7PcgZ3pGxvTyzdjWLWgQBmeNvw4zxK6diPigqWiut2kMn
-        tPVOed3oAlGL29ApZ2fsPZMPgarDxRy1Xovohoab6Dro/s+X4bJel+7AzG767hGGNeOweY
-        MCwDc2D1qLXzcFnau+d7gYDQAUZOAEfWyhz16VP3x5uCDmC3/RpU1SqXnT5Pxw==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020e; t=1596790107;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=MBF7RuxtgMye0FeTHS4/I2QgvfUn5rqfABUW3RbrEFA=;
-        b=45PXI7tN0bIu6GaA71iC+tzQwVOKfU7CU4tMg5Aau4ktHfZWtUjjvlZGw8aPKO2mKPNek9
-        Sxjhsd+t5bh6REDA==
-To:     "Dey\, Megha" <megha.dey@intel.com>,
-        Jason Gunthorpe <jgg@mellanox.com>
-Cc:     Marc Zyngier <maz@kernel.org>,
-        "Jiang\, Dave" <dave.jiang@intel.com>,
-        "vkoul\@kernel.org" <vkoul@kernel.org>,
-        "bhelgaas\@google.com" <bhelgaas@google.com>,
-        "rafael\@kernel.org" <rafael@kernel.org>,
-        "gregkh\@linuxfoundation.org" <gregkh@linuxfoundation.org>,
-        "hpa\@zytor.com" <hpa@zytor.com>,
-        "alex.williamson\@redhat.com" <alex.williamson@redhat.com>,
-        "Pan\, Jacob jun" <jacob.jun.pan@intel.com>,
-        "Raj\, Ashok" <ashok.raj@intel.com>,
-        "Liu\, Yi L" <yi.l.liu@intel.com>,
-        "Lu\, Baolu" <baolu.lu@intel.com>,
-        "Tian\, Kevin" <kevin.tian@intel.com>,
-        "Kumar\, Sanjay K" <sanjay.k.kumar@intel.com>,
-        "Luck\, Tony" <tony.luck@intel.com>,
-        "Lin\, Jing" <jing.lin@intel.com>,
-        "Williams\, Dan J" <dan.j.williams@intel.com>,
-        "kwankhede\@nvidia.com" <kwankhede@nvidia.com>,
-        "eric.auger\@redhat.com" <eric.auger@redhat.com>,
-        "parav\@mellanox.com" <parav@mellanox.com>,
-        "Hansen\, Dave" <dave.hansen@intel.com>,
-        "netanelg\@mellanox.com" <netanelg@mellanox.com>,
-        "shahafs\@mellanox.com" <shahafs@mellanox.com>,
-        "yan.y.zhao\@linux.intel.com" <yan.y.zhao@linux.intel.com>,
-        "pbonzini\@redhat.com" <pbonzini@redhat.com>,
-        "Ortiz\, Samuel" <samuel.ortiz@intel.com>,
-        "Hossain\, Mona" <mona.hossain@intel.com>,
-        "dmaengine\@vger.kernel.org" <dmaengine@vger.kernel.org>,
-        "linux-kernel\@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "x86\@kernel.org" <x86@kernel.org>,
-        "linux-pci\@vger.kernel.org" <linux-pci@vger.kernel.org>,
-        "kvm\@vger.kernel.org" <kvm@vger.kernel.org>
-Subject: Re: [PATCH RFC v2 02/18] irq/dev-msi: Add support for a new DEV_MSI irq domain
-In-Reply-To: <78a0cdd6-ba05-e153-b25e-2c0fe8c1e7b9@intel.com>
-References: <159534667974.28840.2045034360240786644.stgit@djiang5-desk3.ch.intel.com> <159534734833.28840.10067945890695808535.stgit@djiang5-desk3.ch.intel.com> <878sfbxtzi.wl-maz@kernel.org> <20200722195928.GN2021248@mellanox.com> <96a1eb5ccc724790b5404a642583919d@intel.com> <20200805221548.GK19097@mellanox.com> <70465fd3a7ae428a82e19f98daa779e8@intel.com> <20200805225330.GL19097@mellanox.com> <630e6a4dc17b49aba32675377f5a50e0@intel.com> <20200806001927.GM19097@mellanox.com> <c6a1c065ab9b46bbaf9f5713462085a5@intel.com> <87tuxfhf9u.fsf@nanos.tec.linutronix.de> <014ffe59-38d3-b770-e065-dfa2d589adc6@intel.com> <87h7tfh6fc.fsf@nanos.tec.linutronix.de> <78a0cdd6-ba05-e153-b25e-2c0fe8c1e7b9@intel.com>
-Date:   Fri, 07 Aug 2020 10:48:26 +0200
-Message-ID: <87364yhmed.fsf@nanos.tec.linutronix.de>
-MIME-Version: 1.0
-Content-Type: text/plain
+        id S1727120AbgHGIqp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 7 Aug 2020 04:46:45 -0400
+Received: from mga06.intel.com ([134.134.136.31]:65145 "EHLO mga06.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726382AbgHGIqo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 7 Aug 2020 04:46:44 -0400
+IronPort-SDR: CbtsCIDR6q+mkLh1K2pvuEuwRTwq93Tbc25iLu/0YtEctwWGifAZkn1MrAunKGF+UCmJ4hxFzb
+ Z/1n2xfN7DTQ==
+X-IronPort-AV: E=McAfee;i="6000,8403,9705"; a="214565716"
+X-IronPort-AV: E=Sophos;i="5.75,445,1589266800"; 
+   d="scan'208";a="214565716"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Aug 2020 01:46:44 -0700
+IronPort-SDR: M0ulD5ZOVtxaO1LRSJ0sZZJarJy5PFWv+Z8cUPzeo/eSTZwi67YNWYRrSpWzW3czYvyq3tC7AB
+ C9q4dWuK/M/g==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.75,445,1589266800"; 
+   d="scan'208";a="307317136"
+Received: from chenyi-pc.sh.intel.com ([10.239.159.72])
+  by orsmga002.jf.intel.com with ESMTP; 07 Aug 2020 01:46:41 -0700
+From:   Chenyi Qiang <chenyi.qiang@intel.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Xiaoyao Li <xiaoyao.li@intel.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [RFC 0/7] KVM: PKS Virtualization support
+Date:   Fri,  7 Aug 2020 16:48:34 +0800
+Message-Id: <20200807084841.7112-1-chenyi.qiang@intel.com>
+X-Mailer: git-send-email 2.17.1
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Megha,
+This RFC series introduce the KVM support for PKS which have dependency
+on PKS kernel patches for some definitions. The latest kernel patch set
+can be found at
+https://lore.kernel.org/lkml/20200717072056.73134-1-ira.weiny@intel.com/
 
-"Dey, Megha" <megha.dey@intel.com> writes:
-> On 8/6/2020 1:21 PM, Thomas Gleixner wrote:
->> If you expect or know that there are other devices coming up with IMS
->> integrated then most of that code can be made a common library. But for
->> this to make sense, you really want to make sure that these other
->> devices do not require yet another horrible layer of indirection.
->
-> Yes Thomas, for now this may look odd since there is only one device
-> using this IRQ domain. But there will be other devices following suit,
-> hence I have added all the IRQ chip/domain bits in a separate file in
-> drivers/irqchip in the next version of patches. I'll submit the
-> patches shortly and it will be great if I can get more feedback on it.
+---
 
-Again. The common domain makes only sense if it provides actual
-functionality and resource management at the domain level. The IMS slot
-management CANNOT happen at the common domain level simply because IMS
-is strictly per device. So your "common" domain is just a shim layer
-which pretends to be common and requires warts at the side to do the IMS
-management at the device level.
+Protection Keys for Supervisor Pages(PKS) is a feature that extends the
+Protection Keys architecture to support thread-specific permission
+restrictions on supervisor pages.
 
-Let's see what you came up with this time :)
+PKS works similar to an existing feature named PKU(protecting user pages).
+They both perform an additional check after all legacy access
+permissions checks are done. If violated, #PF occurs and PFEC.PK bit will
+be set. PKS introduces MSR IA32_PKRS to manage supervisor protection key
+rights. The MSR contains 16 pairs of ADi and WDi bits. Each pair
+advertises on a group of pages with the same key which is set in the
+leaf paging-structure entries(bits[62:59]). Currently, IA32_PKRS is not
+supported by XSAVES architecture.
 
->> A side note: I just read back on the specification and stumbled over
->> the following gem:
->>
->>   "IMS may also optionally support per-message masking and pending bit
->>    status, similar to the per-vector mask and pending bit array in the
->>    PCI Express MSI-X capability."
->>
->> Optionally? Please tell the hardware folks to make this mandatory. We
->> have enough pain with non maskable MSI interrupts already so introducing
->> yet another non maskable interrupt trainwreck is not an option.
->>
->> It's more than a decade now that I tell HW people not to repeat the
->> non-maskable MSI failure, but obviously they still think that
->> non-maskable interrupts are a brilliant idea. I know that HW folks
->> believe that everything they omit can be fixed in software, but they
->> have to finally understand that this particular issue _cannot_ be fixed
->> at all.
->
-> hmm, I asked the hardware folks and they have informed me that all IMS
-> devices will support per vector masking/pending bit. This will be
-> updated in the next SIOV spec which will be published soon.
+This patchset aims to add the virtualization of PKS in KVM. It
+implemented PKS CPUID enumeration, vmentry/vmexit configuration, MSR
+exposure, nested supported etc. Currently, PKS is not yet supported for
+shadow paging. 
 
-I seriously hope so...
+Detailed information about PKS can be found in the latest Intel 64 and
+IA-32 Architectures Software Developer's Manual.
 
-Thanks,
+Chenyi Qiang (7):
+  KVM: VMX: Introduce PKS VMCS fields
+  KVM: VMX: Expose IA32_PKRS MSR
+  KVM: MMU: Rename the pkru to pkr
+  KVM: MMU: Refactor pkr_mask to cache condition
+  KVM: MMU: Add support for PKS emulation
+  KVM: X86: Expose PKS to guest and userspace
+  KVM: VMX: Enable PKS for nested VM
 
-        tglx
+ arch/x86/include/asm/kvm_host.h | 13 ++---
+ arch/x86/include/asm/pkeys.h    |  1 +
+ arch/x86/include/asm/vmx.h      |  6 +++
+ arch/x86/kvm/cpuid.c            |  3 +-
+ arch/x86/kvm/mmu.h              | 36 +++++++------
+ arch/x86/kvm/mmu/mmu.c          | 78 +++++++++++++++-------------
+ arch/x86/kvm/vmx/capabilities.h |  6 +++
+ arch/x86/kvm/vmx/nested.c       | 33 ++++++++++++
+ arch/x86/kvm/vmx/vmcs.h         |  1 +
+ arch/x86/kvm/vmx/vmcs12.c       |  2 +
+ arch/x86/kvm/vmx/vmcs12.h       |  6 ++-
+ arch/x86/kvm/vmx/vmx.c          | 91 +++++++++++++++++++++++++++++++--
+ arch/x86/kvm/vmx/vmx.h          |  1 +
+ arch/x86/kvm/x86.c              |  7 ++-
+ arch/x86/kvm/x86.h              |  6 +++
+ arch/x86/mm/pkeys.c             |  6 +++
+ include/linux/pkeys.h           |  4 ++
+ 17 files changed, 234 insertions(+), 66 deletions(-)
+
+-- 
+2.17.1
+
