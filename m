@@ -2,320 +2,113 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8FB6923EED1
-	for <lists+kvm@lfdr.de>; Fri,  7 Aug 2020 16:13:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 30E4923EEFF
+	for <lists+kvm@lfdr.de>; Fri,  7 Aug 2020 16:26:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726664AbgHGONM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 7 Aug 2020 10:13:12 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:59830 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726640AbgHGONH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 7 Aug 2020 10:13:07 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1596809584;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=pOFRF28EbT8Q3R4fTExC5nvCZHNOSRSF8WWCt3CjB0k=;
-        b=fMHGjRdisvyVGqN8WrO88pBhAl9njzUMEKFgyh6v2mGVmY1w17asmq6qTFbUU2Hmfwf0Q9
-        +wmyOKDczbyZiIcTz0kZotM8Aa4PlBjVUPUv6QYAxH5+uwiV76s/mvgJQXWrvOLvc40ZQn
-        Vg4Okl7xAjZWhe1r5DY4SJAgEZt36w0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-10-pV_Oz-YmPESgVmV-2N53Gw-1; Fri, 07 Aug 2020 10:13:02 -0400
-X-MC-Unique: pV_Oz-YmPESgVmV-2N53Gw-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7B8DD100AA21;
-        Fri,  7 Aug 2020 14:13:01 +0000 (UTC)
-Received: from vitty.brq.redhat.com (unknown [10.40.195.139])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 1D46C5C1D3;
-        Fri,  7 Aug 2020 14:12:50 +0000 (UTC)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Peter Xu <peterx@redhat.com>, Michael Tsirkin <mst@redhat.com>,
-        Julia Suvorova <jsuvorov@redhat.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Andrew Jones <drjones@redhat.com>, linux-kernel@vger.kernel.org
-Subject: [PATCH v2 3/3] KVM: selftests: add KVM_MEM_PCI_HOLE test
-Date:   Fri,  7 Aug 2020 16:12:32 +0200
-Message-Id: <20200807141232.402895-4-vkuznets@redhat.com>
-In-Reply-To: <20200807141232.402895-1-vkuznets@redhat.com>
-References: <20200807141232.402895-1-vkuznets@redhat.com>
+        id S1726095AbgHGO0J (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 7 Aug 2020 10:26:09 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:15584 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1725815AbgHGO0I (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 7 Aug 2020 10:26:08 -0400
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 077E2T5P039928;
+        Fri, 7 Aug 2020 10:26:06 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=12G63m6nNUgCxJtOgPkzXIunifSEIVC0Gdm1Kr5ju1s=;
+ b=gr1HUEKms1mv9AqL8ggWBTQ58s6WG7idRLg+G/5EbIth69Vzb1RwDBvx7GuBVAvIAc2e
+ jyrbQs+u23QTMTB+B9TmkEB82i89neQl2WmuvneCBAM0oj3S2bVoj7Js4P4HevHYaEzG
+ /2/k6PU1irClBB47uqMWftd5uG63SjV4BGaunLzN9U6YvY1PcZ56UeMzlWXneEqLk9FP
+ NlbovIg0e/R1hSDtymap1SjMxOWMzlq9TXpaQ38yOELsJPbj2xD1Wo/yQe+2O7bm3iua
+ 9zPo2X2wBvNs8qvF74Hl1WF26G21yLm4qDFAmrU6eXnTGmWY1XYi8cCNyOwoQJ3+0PSr BA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 32rjd9xnkx-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 07 Aug 2020 10:26:06 -0400
+Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 077E2iMk041530;
+        Fri, 7 Aug 2020 10:26:05 -0400
+Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com [159.122.73.71])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 32rjd9xnjv-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 07 Aug 2020 10:26:05 -0400
+Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
+        by ppma02fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 077EPlOT020463;
+        Fri, 7 Aug 2020 14:26:02 GMT
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
+        by ppma02fra.de.ibm.com with ESMTP id 32n018c4tg-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 07 Aug 2020 14:26:02 +0000
+Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
+        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 077EPxl326214762
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 7 Aug 2020 14:26:00 GMT
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id CD1AE42042;
+        Fri,  7 Aug 2020 14:25:59 +0000 (GMT)
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 51C974203F;
+        Fri,  7 Aug 2020 14:25:59 +0000 (GMT)
+Received: from oc3016276355.ibm.com (unknown [9.145.47.252])
+        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Fri,  7 Aug 2020 14:25:59 +0000 (GMT)
+Subject: Re: [PATCH v1 0/1] s390: virtio-ccw: PV needs VIRTIO I/O device
+ protection
+To:     Cornelia Huck <cohuck@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, pasic@linux.ibm.com,
+        borntraeger@de.ibm.com, frankja@linux.ibm.com, mst@redhat.com,
+        jasowang@redhat.com, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org,
+        virtualization@lists.linux-foundation.org
+References: <1596723782-12798-1-git-send-email-pmorel@linux.ibm.com>
+ <20200806174744.595b9c8c.cohuck@redhat.com>
+From:   Pierre Morel <pmorel@linux.ibm.com>
+Message-ID: <7a79725f-14d9-5b1a-f0e0-77c3ce596420@linux.ibm.com>
+Date:   Fri, 7 Aug 2020 16:25:59 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+In-Reply-To: <20200806174744.595b9c8c.cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
+ definitions=2020-08-07_09:2020-08-06,2020-08-07 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 suspectscore=0
+ bulkscore=0 lowpriorityscore=0 phishscore=0 priorityscore=1501
+ adultscore=0 clxscore=1015 malwarescore=0 spamscore=0 mlxlogscore=999
+ impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2006250000 definitions=main-2008070097
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Test the newly introduced KVM_MEM_PCI_HOLE memslots:
-- Reads from all pages return '0xff'
-- Writes to all pages cause KVM_EXIT_MMIO
 
-Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
----
- tools/testing/selftests/kvm/Makefile          |   1 +
- .../testing/selftests/kvm/include/kvm_util.h  |   1 +
- tools/testing/selftests/kvm/lib/kvm_util.c    |  81 +++++++------
- .../kvm/x86_64/memory_slot_pci_hole.c         | 112 ++++++++++++++++++
- 4 files changed, 162 insertions(+), 33 deletions(-)
- create mode 100644 tools/testing/selftests/kvm/x86_64/memory_slot_pci_hole.c
 
-diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-index 4a166588d99f..a6fe303fbf6a 100644
---- a/tools/testing/selftests/kvm/Makefile
-+++ b/tools/testing/selftests/kvm/Makefile
-@@ -41,6 +41,7 @@ LIBKVM_s390x = lib/s390x/processor.c lib/s390x/ucall.c
- TEST_GEN_PROGS_x86_64 = x86_64/cr4_cpuid_sync_test
- TEST_GEN_PROGS_x86_64 += x86_64/evmcs_test
- TEST_GEN_PROGS_x86_64 += x86_64/hyperv_cpuid
-+TEST_GEN_PROGS_x86_64 += x86_64/memory_slot_pci_hole
- TEST_GEN_PROGS_x86_64 += x86_64/mmio_warning_test
- TEST_GEN_PROGS_x86_64 += x86_64/platform_info_test
- TEST_GEN_PROGS_x86_64 += x86_64/set_sregs_test
-diff --git a/tools/testing/selftests/kvm/include/kvm_util.h b/tools/testing/selftests/kvm/include/kvm_util.h
-index 919e161dd289..8e7bec7bd287 100644
---- a/tools/testing/selftests/kvm/include/kvm_util.h
-+++ b/tools/testing/selftests/kvm/include/kvm_util.h
-@@ -59,6 +59,7 @@ enum vm_mem_backing_src_type {
- 	VM_MEM_SRC_ANONYMOUS,
- 	VM_MEM_SRC_ANONYMOUS_THP,
- 	VM_MEM_SRC_ANONYMOUS_HUGETLB,
-+	VM_MEM_SRC_NONE,
- };
- 
- int kvm_check_cap(long cap);
-diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
-index 74776ee228f2..46bb28ea34ec 100644
---- a/tools/testing/selftests/kvm/lib/kvm_util.c
-+++ b/tools/testing/selftests/kvm/lib/kvm_util.c
-@@ -453,8 +453,11 @@ static void __vm_mem_region_delete(struct kvm_vm *vm,
- 		    "rc: %i errno: %i", ret, errno);
- 
- 	sparsebit_free(&region->unused_phy_pages);
--	ret = munmap(region->mmap_start, region->mmap_size);
--	TEST_ASSERT(ret == 0, "munmap failed, rc: %i errno: %i", ret, errno);
-+	if (region->mmap_start) {
-+		ret = munmap(region->mmap_start, region->mmap_size);
-+		TEST_ASSERT(ret == 0, "munmap failed, rc: %i errno: %i", ret,
-+			    errno);
-+	}
- 
- 	free(region);
- }
-@@ -643,34 +646,42 @@ void vm_userspace_mem_region_add(struct kvm_vm *vm,
- 	alignment = 1;
- #endif
- 
--	if (src_type == VM_MEM_SRC_ANONYMOUS_THP)
--		alignment = max(huge_page_size, alignment);
--
--	/* Add enough memory to align up if necessary */
--	if (alignment > 1)
--		region->mmap_size += alignment;
--
--	region->mmap_start = mmap(NULL, region->mmap_size,
--				  PROT_READ | PROT_WRITE,
--				  MAP_PRIVATE | MAP_ANONYMOUS
--				  | (src_type == VM_MEM_SRC_ANONYMOUS_HUGETLB ? MAP_HUGETLB : 0),
--				  -1, 0);
--	TEST_ASSERT(region->mmap_start != MAP_FAILED,
--		    "test_malloc failed, mmap_start: %p errno: %i",
--		    region->mmap_start, errno);
--
--	/* Align host address */
--	region->host_mem = align(region->mmap_start, alignment);
--
--	/* As needed perform madvise */
--	if (src_type == VM_MEM_SRC_ANONYMOUS || src_type == VM_MEM_SRC_ANONYMOUS_THP) {
--		ret = madvise(region->host_mem, npages * vm->page_size,
--			     src_type == VM_MEM_SRC_ANONYMOUS ? MADV_NOHUGEPAGE : MADV_HUGEPAGE);
--		TEST_ASSERT(ret == 0, "madvise failed,\n"
--			    "  addr: %p\n"
--			    "  length: 0x%lx\n"
--			    "  src_type: %x",
--			    region->host_mem, npages * vm->page_size, src_type);
-+	if (src_type != VM_MEM_SRC_NONE) {
-+		if (src_type == VM_MEM_SRC_ANONYMOUS_THP)
-+			alignment = max(huge_page_size, alignment);
-+
-+		/* Add enough memory to align up if necessary */
-+		if (alignment > 1)
-+			region->mmap_size += alignment;
-+
-+		region->mmap_start = mmap(NULL, region->mmap_size,
-+			  PROT_READ | PROT_WRITE,
-+			  MAP_PRIVATE | MAP_ANONYMOUS
-+			  | (src_type == VM_MEM_SRC_ANONYMOUS_HUGETLB ?
-+			     MAP_HUGETLB : 0), -1, 0);
-+		TEST_ASSERT(region->mmap_start != MAP_FAILED,
-+			    "test_malloc failed, mmap_start: %p errno: %i",
-+			    region->mmap_start, errno);
-+
-+		/* Align host address */
-+		region->host_mem = align(region->mmap_start, alignment);
-+
-+		/* As needed perform madvise */
-+		if (src_type == VM_MEM_SRC_ANONYMOUS ||
-+		    src_type == VM_MEM_SRC_ANONYMOUS_THP) {
-+			ret = madvise(region->host_mem, npages * vm->page_size,
-+				      src_type == VM_MEM_SRC_ANONYMOUS ?
-+				      MADV_NOHUGEPAGE : MADV_HUGEPAGE);
-+			TEST_ASSERT(ret == 0, "madvise failed,\n"
-+				    "  addr: %p\n"
-+				    "  length: 0x%lx\n"
-+				    "  src_type: %x",
-+				    region->host_mem, npages * vm->page_size,
-+				    src_type);
-+		}
-+	} else {
-+		region->mmap_start = NULL;
-+		region->host_mem = NULL;
- 	}
- 
- 	region->unused_phy_pages = sparsebit_alloc();
-@@ -1076,9 +1087,13 @@ void *addr_gpa2hva(struct kvm_vm *vm, vm_paddr_t gpa)
- 	list_for_each_entry(region, &vm->userspace_mem_regions, list) {
- 		if ((gpa >= region->region.guest_phys_addr)
- 			&& (gpa <= (region->region.guest_phys_addr
--				+ region->region.memory_size - 1)))
--			return (void *) ((uintptr_t) region->host_mem
--				+ (gpa - region->region.guest_phys_addr));
-+				+ region->region.memory_size - 1))) {
-+			if (region->host_mem)
-+				return (void *) ((uintptr_t) region->host_mem
-+				 + (gpa - region->region.guest_phys_addr));
-+			else
-+				return NULL;
-+		}
- 	}
- 
- 	TEST_FAIL("No vm physical memory at 0x%lx", gpa);
-diff --git a/tools/testing/selftests/kvm/x86_64/memory_slot_pci_hole.c b/tools/testing/selftests/kvm/x86_64/memory_slot_pci_hole.c
-new file mode 100644
-index 000000000000..f5fa80dfcba7
---- /dev/null
-+++ b/tools/testing/selftests/kvm/x86_64/memory_slot_pci_hole.c
-@@ -0,0 +1,112 @@
-+// SPDX-License-Identifier: GPL-2.0
-+#define _GNU_SOURCE /* for program_invocation_short_name */
-+#include <fcntl.h>
-+#include <pthread.h>
-+#include <sched.h>
-+#include <signal.h>
-+#include <stdio.h>
-+#include <stdlib.h>
-+#include <string.h>
-+#include <sys/ioctl.h>
-+
-+#include <linux/compiler.h>
-+
-+#include <test_util.h>
-+#include <kvm_util.h>
-+#include <processor.h>
-+
-+#define VCPU_ID 0
-+
-+#define MEM_REGION_GPA		0xc0000000
-+#define MEM_REGION_SIZE		0x4000
-+#define MEM_REGION_SLOT		10
-+
-+static void guest_code(void)
-+{
-+	uint8_t val;
-+
-+	/* First byte in the first page */
-+	val = READ_ONCE(*((uint8_t *)MEM_REGION_GPA));
-+	GUEST_ASSERT(val == 0xff);
-+
-+	GUEST_SYNC(1);
-+
-+	/* Random byte in the second page */
-+	val = READ_ONCE(*((uint8_t *)MEM_REGION_GPA + 5000));
-+	GUEST_ASSERT(val == 0xff);
-+
-+	GUEST_SYNC(2);
-+
-+	/* Write to the first page */
-+	WRITE_ONCE(*((uint64_t *)MEM_REGION_GPA + 1024/8), 0xdeafbeef);
-+
-+	GUEST_SYNC(3);
-+
-+	/* Write to the second page */
-+	WRITE_ONCE(*((uint64_t *)MEM_REGION_GPA + 8000/8), 0xdeafbeef);
-+
-+	GUEST_SYNC(4);
-+
-+	GUEST_DONE();
-+}
-+
-+int main(int argc, char *argv[])
-+{
-+	struct kvm_vm *vm;
-+	struct kvm_run *run;
-+	struct ucall uc;
-+	int stage, rv;
-+
-+	rv = kvm_check_cap(KVM_CAP_PCI_HOLE_MEM);
-+	if (!rv) {
-+		print_skip("KVM_CAP_PCI_HOLE_MEM not supported");
-+		exit(KSFT_SKIP);
-+	}
-+
-+	vm = vm_create_default(VCPU_ID, 0, guest_code);
-+
-+	run = vcpu_state(vm, VCPU_ID);
-+
-+	vcpu_set_cpuid(vm, VCPU_ID, kvm_get_supported_cpuid());
-+
-+	vm_userspace_mem_region_add(vm, VM_MEM_SRC_NONE,
-+				    MEM_REGION_GPA, MEM_REGION_SLOT,
-+				    MEM_REGION_SIZE / getpagesize(),
-+				    KVM_MEM_PCI_HOLE);
-+
-+	virt_map(vm, MEM_REGION_GPA, MEM_REGION_GPA,
-+		 MEM_REGION_SIZE / getpagesize(), 0);
-+
-+	for (stage = 1;; stage++) {
-+		_vcpu_run(vm, VCPU_ID);
-+
-+		if (stage == 3 || stage == 5) {
-+			TEST_ASSERT(run->exit_reason == KVM_EXIT_MMIO,
-+			   "Write to PCI_HOLE page should cause KVM_EXIT_MMIO");
-+			continue;
-+		}
-+
-+		TEST_ASSERT(run->exit_reason == KVM_EXIT_IO,
-+			    "Stage %d: unexpected exit reason: %u (%s),\n",
-+			    stage, run->exit_reason,
-+			    exit_reason_str(run->exit_reason));
-+
-+		switch (get_ucall(vm, VCPU_ID, &uc)) {
-+		case UCALL_ABORT:
-+			TEST_FAIL("%s at %s:%ld", (const char *)uc.args[0],
-+				  __FILE__, uc.args[1]);
-+			/* NOT REACHED */
-+		case UCALL_SYNC:
-+			break;
-+		case UCALL_DONE:
-+			goto done;
-+		default:
-+			TEST_FAIL("Unknown ucall %lu", uc.cmd);
-+		}
-+	}
-+
-+done:
-+	kvm_vm_free(vm);
-+
-+	return 0;
-+}
+On 2020-08-06 17:47, Cornelia Huck wrote:
+> On Thu,  6 Aug 2020 16:23:01 +0200
+...
+> This does work, and I'm tempted to queue this patch, but I'm wondering
+> whether we need to give up on a cross-architecture solution already
+> (especially keeping in mind that ccw is the only transport that is
+> really architecture-specific).
+> 
+> I know that we've gone through a few rounds already, and I'm not sure
+> whether we've been there already, but:
+> 
+> Could virtio_finalize_features() call an optional
+> arch_has_restricted_memory_access() function and do the enforcing of
+> IOMMU_PLATFORM? That would catch all transports, and things should work
+> once an architecture opts in. That direction also shouldn't be a
+> problem if virtio is a module.
+
+Yes thanks, I rework it in this direction.
+
+
 -- 
-2.25.4
-
+Pierre Morel
+IBM Lab Boeblingen
