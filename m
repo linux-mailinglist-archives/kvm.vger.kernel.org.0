@@ -2,75 +2,85 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id CB6F623F5DB
-	for <lists+kvm@lfdr.de>; Sat,  8 Aug 2020 04:02:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0037223F5E6
+	for <lists+kvm@lfdr.de>; Sat,  8 Aug 2020 04:06:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726191AbgHHCCT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 7 Aug 2020 22:02:19 -0400
-Received: from mail.kernel.org ([198.145.29.99]:38298 "EHLO mail.kernel.org"
+        id S1726448AbgHHCGV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 7 Aug 2020 22:06:21 -0400
+Received: from vps0.lunn.ch ([185.16.172.187]:47030 "EHLO vps0.lunn.ch"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726166AbgHHCCT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 7 Aug 2020 22:02:19 -0400
-Received: from paulmck-ThinkPad-P72.home (unknown [50.45.173.55])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 556122177B;
-        Sat,  8 Aug 2020 02:02:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1596852139;
-        bh=M7e8nNoyl6EfhVREHZ1cwRCgUZ9WV4iuP8Lr8RQENGQ=;
-        h=Date:From:To:Cc:Subject:Reply-To:References:In-Reply-To:From;
-        b=P+dL/kbC21xqwm4MeFcFFSwlJ8q4EKHQOUFMZjB0clfwtOtL2iLnEJEn9LZc8S9Xm
-         YpXGoVETQhbTrhLcofm0J6lSLgmQIkCpxR1GSK1KepipeMyS8s09o/xiC2YMhWrnTk
-         RK3f+Zm6nEK3efxqfgK4HpiawCrPuv7jYcYNTLM4=
-Received: by paulmck-ThinkPad-P72.home (Postfix, from userid 1000)
-        id 3563935206C1; Fri,  7 Aug 2020 19:02:19 -0700 (PDT)
-Date:   Fri, 7 Aug 2020 19:02:19 -0700
-From:   "Paul E. McKenney" <paulmck@kernel.org>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     kvm@vger.kernel.org
-Subject: Re: Guest OS migration and lost IPIs
-Message-ID: <20200808020219.GA4295@paulmck-ThinkPad-P72>
-Reply-To: paulmck@kernel.org
-References: <20200805000720.GA7516@paulmck-ThinkPad-P72>
- <191fd6d6-a66e-06b1-aa6e-9a0f12efcfc8@redhat.com>
+        id S1726262AbgHHCGV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 7 Aug 2020 22:06:21 -0400
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94)
+        (envelope-from <andrew@lunn.ch>)
+        id 1k4EFV-008g5y-NR; Sat, 08 Aug 2020 04:06:17 +0200
+Date:   Sat, 8 Aug 2020 04:06:17 +0200
+From:   Andrew Lunn <andrew@lunn.ch>
+To:     Jonathan Adams <jwadams@google.com>
+Cc:     linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        netdev@vger.kernel.org, kvm@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Greg KH <gregkh@linuxfoundation.org>,
+        Jim Mattson <jmattson@google.com>,
+        David Rientjes <rientjes@google.com>
+Subject: Re: [RFC PATCH 0/7] metricfs metric file system and examples
+Message-ID: <20200808020617.GD2028541@lunn.ch>
+References: <20200807212916.2883031-1-jwadams@google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <191fd6d6-a66e-06b1-aa6e-9a0f12efcfc8@redhat.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
+In-Reply-To: <20200807212916.2883031-1-jwadams@google.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Aug 07, 2020 at 02:36:17PM +0200, Paolo Bonzini wrote:
-> On 05/08/20 02:07, Paul E. McKenney wrote:
-> > 
-> > We are seeing occasional odd hangs, but only in cases where guest OSes
-> > are being migrated.  Migrating more often makes the hangs happen more
-> > frequently.
-> > 
-> > Added debug showed that the hung CPU is stuck trying to send an IPI (e.g.,
-> > smp_call_function_single()).  The hung CPU thinks that it has sent the
-> > IPI, but the destination CPU has interrupts enabled (-not- disabled,
-> > enabled, as in ready, willing, and able to take interrupts).  In fact,
-> > the destination CPU usually is going about its business as if nothing
-> > was wrong, which makes me suspect that the IPI got lost somewhere along
-> > the way.
-> > 
-> > I bumbled a bit through the qemu and KVM source, and didn't find anything
-> > synchronizing IPIs and migrations, though given that I know pretty much
-> > nothing about either qemu or KVM, this doesn't count for much.
-> 
-> The code migrating the interrupt controller is in
-> kvm_x86_ops.sync_pir_to_irr (which calls vmx_sync_pir_to_irr) and
-> kvm_apic_get_state.  kvm_apic_get_state is called after CPUs are stopped.
-> 
-> It's possible that we're missing a kvm_x86_ops.sync_pir_to_irr call
-> somewhere.  It would be surprising but it would explain the symptoms
-> very well.
+> net/dev/stats/tx_bytes/annotations
+>   DESCRIPTION net\ device\ transmited\ bytes\ count
+>   CUMULATIVE
+> net/dev/stats/tx_bytes/fields
+>   interface value
+>   str int
+> net/dev/stats/tx_bytes/values
+>   lo 4394430608
+>   eth0 33353183843
+>   eth1 16228847091
 
-Thank you for the info, Paolo!  I will see what I can find.  ;-)
+This is a rather small system. Have you tested it at scale? An
+Ethernet switch with 64 physical interfaces, and say 32 VLAN
+interfaces stack on top. So this one file will contain 2048 entries?
 
-							Thanx, Paul
+And generally, you are not interested in one statistic, but many
+statistics. So you will need to cat each file, not just one file. And
+the way this is implemented:
+
++static void dev_stats_emit(struct metric_emitter *e,
++                          struct net_device *dev,
++                          struct metric_def *metricd)
++{
++       struct rtnl_link_stats64 temp;
++       const struct rtnl_link_stats64 *stats = dev_get_stats(dev, &temp);
++
++       if (stats) {
++               __u8 *ptr = (((__u8 *)stats) + metricd->off);
++
++               METRIC_EMIT_INT(e, *(__u64 *)ptr, dev->name, NULL);
++       }
++}
+
+means you are going to be calling dev_get_stats() for each file, and
+there are 23 files if i counted correctly. So dev_get_stats() will be
+called 47104 times, in this made up example. And this is not always
+cheap, these counts can be atomic.
+
+So i personally don't think netdev statistics is a good idea, i doubt
+it scales.
+
+I also think you are looking at the wrong set of netdev counters. I
+would be more interested in ethtool -S counters. But it appears you
+make the assumption that each object you are collecting metrics for
+has the same set of counters. This is untrue for network interfaces,
+where each driver can export whatever counters it wants, and they can
+be dynamic.
+
+	Andrew
