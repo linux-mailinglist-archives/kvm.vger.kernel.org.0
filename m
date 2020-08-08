@@ -2,134 +2,92 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A2BDE23F6A1
-	for <lists+kvm@lfdr.de>; Sat,  8 Aug 2020 07:47:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8859F23F7A5
+	for <lists+kvm@lfdr.de>; Sat,  8 Aug 2020 14:48:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726398AbgHHFq7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 8 Aug 2020 01:46:59 -0400
-Received: from mail.kernel.org ([198.145.29.99]:55858 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726084AbgHHFq7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 8 Aug 2020 01:46:59 -0400
-Received: from localhost (83-86-89-107.cable.dynamic.v4.ziggo.nl [83.86.89.107])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 9988B20855;
-        Sat,  8 Aug 2020 05:46:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1596865618;
-        bh=xrVQkv5zXrjsh+ypiZ3p5okFdR9ZJ5Lla8NwIloJgBI=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=CgH8+piv/FhjLc1XCHrjSAoGsFzXSiTjchCTJpTmdb7KYDgvaTH4CvLKnWvs6XlaQ
-         b7cOFyjsFr9xG3zkHajvVq9H68GMEHYwxveiWdsvGyuSOOnqcrKeRGmVs6acF5xJ15
-         rCoVwXYodi0la1FI3AzCbhMCNMefhV5ZEA/6HVRs=
-Date:   Sat, 8 Aug 2020 07:46:55 +0200
-From:   Greg KH <gregkh@linuxfoundation.org>
-To:     Jonathan Adams <jwadams@google.com>
-Cc:     linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        netdev@vger.kernel.org, kvm@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        David Rientjes <rientjes@google.com>
-Subject: Re: [RFC PATCH 4/7] core/metricfs: expose softirq information
- through metricfs
-Message-ID: <20200808054655.GE1037591@kroah.com>
-References: <20200807212916.2883031-1-jwadams@google.com>
- <20200807212916.2883031-5-jwadams@google.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200807212916.2883031-5-jwadams@google.com>
+        id S1726202AbgHHMsI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 8 Aug 2020 08:48:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52880 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726125AbgHHMsF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 8 Aug 2020 08:48:05 -0400
+Received: from mail-pg1-x544.google.com (mail-pg1-x544.google.com [IPv6:2607:f8b0:4864:20::544])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 80E1BC061756;
+        Sat,  8 Aug 2020 05:48:05 -0700 (PDT)
+Received: by mail-pg1-x544.google.com with SMTP id m34so2398182pgl.11;
+        Sat, 08 Aug 2020 05:48:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=sender:from:to:cc:subject:date:message-id;
+        bh=VeTKxr8w7VLVr4PGx0bAYjFSbETGJkL04gDai2o4qs4=;
+        b=U5CvQ/2Cnvhn7c6MOZlq7QCryWur+muKFaIQcI4LrT4XcYibOrpe8G/L+GO091zjeJ
+         FPxWh6HfuUcjO5icElHQhTK6rt03FgKfwaMz2DPDgXdibBViPLJI5h9Xkk1kGXDNXnip
+         9wRtjiMv6fxak8aeKsSbqth4OGZGT8a6P60vYdAYNdCz6mrRNlPvhsgUbeQN8KwIwBUZ
+         lTarmCI5MVKr/1/QvBOMj1o2ryOzc/BCYXvlBfIiDvNwGeqfpIUwt2O6hVB+SZVoHYUF
+         RYMNO3Dd4ifXPSDwTbqtwTtUud2ZI4dm0ReMGCUZVSa+M0fRwfrd59W1463IzyusXAXt
+         zoUw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:sender:from:to:cc:subject:date:message-id;
+        bh=VeTKxr8w7VLVr4PGx0bAYjFSbETGJkL04gDai2o4qs4=;
+        b=ay6+gGoiAAu7wFqa9sBeGkHZ6tFUIn6pySykOqri/TQLgB1beidPayMDlpcNsqGIXs
+         wk08Iilm8lAcVOMe2DE7MPLcgwHgwhb8Nn82KBYnR6q2xZYnOleIBau6Kt9kH3Y0pQ6q
+         KL79f9X0TOdiFMV/RaR+2xX59YdNhqFZe2zohOj+lQW+JFUfH67GsC0aRwh/LkuOf8Vv
+         YKPAKkwQTdfuRA/PSqLCf96XOf7+St786WvFvDJ31oNypQuEZy19XrrbmO6vRzfpgwpi
+         Rx/cctKdZRBxQaMKz+I3rRT28F3xl3jNEfF5vSM3Zk+F2Vl9L8cOFiT+M2l6Wb9fZLru
+         vUkw==
+X-Gm-Message-State: AOAM530Dbxab4tiyBAYGQplnwESpBWdCvaVO8RnMXToXcLsW4BGy3r7K
+        a8P7UNGjIxppdkKK9wZcO0M=
+X-Google-Smtp-Source: ABdhPJxhzrk/tqVULXH30q6hg12JI5TtBQTTTXXABv1XWrscmxSMa2C+RDwJcctCkcGojQ5FGR80lw==
+X-Received: by 2002:a63:1a49:: with SMTP id a9mr15391246pgm.110.1596890884864;
+        Sat, 08 Aug 2020 05:48:04 -0700 (PDT)
+Received: from software.domain.org (28.144.92.34.bc.googleusercontent.com. [34.92.144.28])
+        by smtp.gmail.com with ESMTPSA id k12sm14023458pjp.38.2020.08.08.05.48.01
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Sat, 08 Aug 2020 05:48:04 -0700 (PDT)
+From:   Huacai Chen <chenhc@lemote.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
+Cc:     kvm@vger.kernel.org, linux-mips@vger.kernel.org,
+        Fuxin Zhang <zhangfx@lemote.com>,
+        Huacai Chen <chenhuacai@gmail.com>,
+        Jiaxun Yang <jiaxun.yang@flygoat.com>,
+        Huacai Chen <chenhc@lemote.com>, stable@vger.kernel.org
+Subject: [PATCH] MIPS: VZ: Only include loongson_regs.h for CPU_LOONGSON64
+Date:   Sat,  8 Aug 2020 20:50:52 +0800
+Message-Id: <1596891052-24052-1-git-send-email-chenhc@lemote.com>
+X-Mailer: git-send-email 2.7.0
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Aug 07, 2020 at 02:29:13PM -0700, Jonathan Adams wrote:
-> Add metricfs support for displaying percpu softirq counters.  The
-> top directory is /sys/kernel/debug/metricfs/softirq.  Then there
-> is a subdirectory for each softirq type.  For example:
-> 
->     cat /sys/kernel/debug/metricfs/softirq/NET_RX/values
-> 
-> Signed-off-by: Jonathan Adams <jwadams@google.com>
-> 
-> ---
-> 
-> jwadams@google.com: rebased to 5.8-pre6
-> 	This is work originally done by another engineer at
-> 	google, who would rather not have their name associated with this
-> 	patchset. They're okay with me sending it under my name.
-> ---
->  kernel/softirq.c | 45 +++++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 45 insertions(+)
-> 
-> diff --git a/kernel/softirq.c b/kernel/softirq.c
-> index c4201b7f42b1..1ae3a540b789 100644
-> --- a/kernel/softirq.c
-> +++ b/kernel/softirq.c
-> @@ -25,6 +25,8 @@
->  #include <linux/smpboot.h>
->  #include <linux/tick.h>
->  #include <linux/irq.h>
-> +#include <linux/jump_label.h>
-> +#include <linux/metricfs.h>
->  
->  #define CREATE_TRACE_POINTS
->  #include <trace/events/irq.h>
-> @@ -738,3 +740,46 @@ unsigned int __weak arch_dynirq_lower_bound(unsigned int from)
->  {
->  	return from;
->  }
-> +
-> +#ifdef CONFIG_METRICFS
-> +
-> +#define METRICFS_ITEM(name) \
-> +static void \
-> +metricfs_##name(struct metric_emitter *e, int cpu) \
-> +{ \
-> +	int64_t v = kstat_softirqs_cpu(name##_SOFTIRQ, cpu); \
-> +	METRIC_EMIT_PERCPU_INT(e, cpu, v); \
-> +} \
-> +METRIC_EXPORT_PERCPU_COUNTER(name, #name " softirq", metricfs_##name)
-> +
-> +METRICFS_ITEM(HI);
-> +METRICFS_ITEM(TIMER);
-> +METRICFS_ITEM(NET_TX);
-> +METRICFS_ITEM(NET_RX);
-> +METRICFS_ITEM(BLOCK);
-> +METRICFS_ITEM(IRQ_POLL);
-> +METRICFS_ITEM(TASKLET);
-> +METRICFS_ITEM(SCHED);
-> +METRICFS_ITEM(HRTIMER);
-> +METRICFS_ITEM(RCU);
-> +
-> +static int __init init_softirq_metricfs(void)
-> +{
-> +	struct metricfs_subsys *subsys;
-> +
-> +	subsys = metricfs_create_subsys("softirq", NULL);
-> +	metric_init_HI(subsys);
-> +	metric_init_TIMER(subsys);
-> +	metric_init_NET_TX(subsys);
-> +	metric_init_NET_RX(subsys);
-> +	metric_init_BLOCK(subsys);
-> +	metric_init_IRQ_POLL(subsys);
-> +	metric_init_TASKLET(subsys);
-> +	metric_init_SCHED(subsys);
-> +	metric_init_RCU(subsys);
-> +
-> +	return 0;
-> +}
-> +module_init(init_softirq_metricfs);
+Only Loongson64 platform has and needs loongson_regs.h, including it
+unconditionally will cause build errors.
 
-I like the "simple" ways these look, and think you will be better off
-just adding this type of api to debugfs.  That way people can use them
-anywhere they currently use debugfs.
+Fixes: 7f2a83f1c2a941ebfee5 ("KVM: MIPS: Add CPUCFG emulation for Loongson-3")
+Cc: stable@vger.kernel.org
+Reported-by: kernel test robot <lkp@intel.com>
+Signed-off-by: Huacai Chen <chenhc@lemote.com>
+---
+ arch/mips/kvm/vz.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-But note, we already have simple ways of exporting single variable data
-in debugfs, so why do we need yet-another-macro for them?
+diff --git a/arch/mips/kvm/vz.c b/arch/mips/kvm/vz.c
+index 3932f76..a474578 100644
+--- a/arch/mips/kvm/vz.c
++++ b/arch/mips/kvm/vz.c
+@@ -29,7 +29,9 @@
+ #include <linux/kvm_host.h>
+ 
+ #include "interrupt.h"
++#ifdef CONFIG_CPU_LOONGSON64
+ #include "loongson_regs.h"
++#endif
+ 
+ #include "trace.h"
+ 
+-- 
+2.7.0
 
-thanks,
-
-greg k-h
