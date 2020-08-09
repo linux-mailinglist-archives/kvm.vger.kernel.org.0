@@ -2,114 +2,84 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 71A7D23FD10
-	for <lists+kvm@lfdr.de>; Sun,  9 Aug 2020 09:02:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9E35523FD40
+	for <lists+kvm@lfdr.de>; Sun,  9 Aug 2020 09:53:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726241AbgHIHCo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 9 Aug 2020 03:02:44 -0400
-Received: from wout2-smtp.messagingengine.com ([64.147.123.25]:34473 "EHLO
-        wout2-smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726097AbgHIHCn (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Sun, 9 Aug 2020 03:02:43 -0400
-Received: from compute1.internal (compute1.nyi.internal [10.202.2.41])
-        by mailout.west.internal (Postfix) with ESMTP id D8A3432B;
-        Sun,  9 Aug 2020 03:02:41 -0400 (EDT)
-Received: from mailfrontend2 ([10.202.2.163])
-  by compute1.internal (MEProxy); Sun, 09 Aug 2020 03:02:42 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kroah.com; h=
-        date:from:to:cc:subject:message-id:references:mime-version
-        :content-type:content-transfer-encoding:in-reply-to; s=fm1; bh=C
-        ZZOeMqfhadfPcRVRLEsanj8bFOrmOCOkNkjdY/+IQw=; b=iOlq4ZByc7Alv9IH/
-        yhYW0x3s7Bg8eWaVfeo/Urd0lYZaiuGV3OLcOyZdiqDhxFcRkbxUmF6gswCweMqC
-        7H5+QcvNBooe/L00C7Mpc+hod3aXMEjU5bVXIAoAQ7KeyVOqebp0Oss8vUrF8hWP
-        Z7VS6hN4m4XRB8X9pA8J7TGD+PfzkqXXaSy8zf5wywp73Jirq0oVNvukADpIC+ZB
-        D8LVCS2cijO6uROZM5huLStFPSkKSOTtWTi2j1BYPW7nI78eWNpCtyJUrU0CSS0U
-        4p3jFOIkRHMcPRS3YBn9xw8oZVjzisxD/AMusBHhpQ2QIEgmrUKzOx6ErkC2ioS3
-        wErFA==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-        messagingengine.com; h=cc:content-transfer-encoding:content-type
-        :date:from:in-reply-to:message-id:mime-version:references
-        :subject:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
-        :x-sasl-enc; s=fm3; bh=CZZOeMqfhadfPcRVRLEsanj8bFOrmOCOkNkjdY/+I
-        Qw=; b=jm9i3TlHGIxgFq4x28OBgYxE4Ndx5ZDsWD9O8paOB4pbvcR+ItUHgXSmy
-        K9X1bd0uwQ6dIaPL2p3rxo3fLcos/tBJdBjRz+LRlPCl/cLR9ktCYHrZFTxO4l/H
-        wMa/OMN9km4YAneQ/Z4L4nmTt6bWVipVgIVWRKVOXBHPgiy6O9Vfjj9pyUqKXl3m
-        dQMie/g293HIK9W2mOEUhtujomGKx1SZES00sLpwEQBa7bkDkqZx3E8roV5legz/
-        nICVoXEChozdkh4xJrR7tvG+c6bgWewMYPf9oD0tJY9op5E9bhsmxHGNapGBK03U
-        jsUHikABVxrZHZCKBRUkp4NAVptig==
-X-ME-Sender: <xms:kJ8vX1wjCiwkkWiKHZsHc5aYJ0R-Ht9w0wkUr1xJ9Rxeih6fpzsEtg>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeduiedrkeehgdduudegucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
-    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
-    cujfgurhepfffhvffukfhfgggtugfgjgesthekredttddtjeenucfhrhhomhepifhrvghg
-    ucfmjfcuoehgrhgvgheskhhrohgrhhdrtghomheqnecuggftrfgrthhtvghrnhepueehke
-    ehlefffeeiudetfeekjeffvdeuheejjeffheeludfgteekvdelkeduuddvnecukfhppeek
-    fedrkeeirdekledruddtjeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmh
-    grihhlfhhrohhmpehgrhgvgheskhhrohgrhhdrtghomh
-X-ME-Proxy: <xmx:kJ8vX1TS24QAOAXGvSUmBnHO1gdjX3hfK8wzv6qlWv4_u97GV9w_2A>
-    <xmx:kJ8vX_VdYMUy8kyLNmvMi-btXBBKzXfKSzD72Kex5-LmXFMZTWtpIA>
-    <xmx:kJ8vX3iLMfdG1CgjYqQL1V7sMnsl3M80JnhCQgGMpTH5TpqzuyDrrQ>
-    <xmx:kZ8vX50X93O7uC7azEGm0ugsvxktCsnocNNZ3kxNlS2LL5_uI4DGXw>
-Received: from localhost (83-86-89-107.cable.dynamic.v4.ziggo.nl [83.86.89.107])
-        by mail.messagingengine.com (Postfix) with ESMTPA id 639D1306005F;
-        Sun,  9 Aug 2020 03:02:40 -0400 (EDT)
-Date:   Sun, 9 Aug 2020 09:02:35 +0200
-From:   Greg KH <greg@kroah.com>
-To:     Jiaxun Yang <jiaxun.yang@flygoat.com>
-Cc:     Huacai Chen <chenhc@lemote.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        kvm@vger.kernel.org, linux-mips@vger.kernel.org,
-        Fuxin Zhang <zhangfx@lemote.com>,
-        Huacai Chen <chenhuacai@gmail.com>, stable@vger.kernel.org
-Subject: Re: [PATCH] MIPS: VZ: Only include loongson_regs.h for CPU_LOONGSON64
-Message-ID: <20200809070235.GA1098081@kroah.com>
-References: <1596891052-24052-1-git-send-email-chenhc@lemote.com>
- <20200808153123.GC369184@kroah.com>
- <2b2937d0-eae6-a489-07bd-c40ded02ce89@flygoat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <2b2937d0-eae6-a489-07bd-c40ded02ce89@flygoat.com>
+        id S1726291AbgHIHxI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 9 Aug 2020 03:53:08 -0400
+Received: from mga07.intel.com ([134.134.136.100]:53373 "EHLO mga07.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725710AbgHIHxH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 9 Aug 2020 03:53:07 -0400
+IronPort-SDR: uTdu0WnETwMpV9IgQMY5EeiXwdG9hh+RGX6AXRfNfi0tI564tCm62gTP2m+CeFRSyUxZg5jHMc
+ 668zncq4hQZw==
+X-IronPort-AV: E=McAfee;i="6000,8403,9707"; a="217734909"
+X-IronPort-AV: E=Sophos;i="5.75,452,1589266800"; 
+   d="scan'208";a="217734909"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Aug 2020 00:53:06 -0700
+IronPort-SDR: kF4gYMiUwIdTNdNaYqdtwFP1fqW6C8uXoxz0o5s5VIQlgpCFsT3o1PWBhgtAOPKC+3AJaIgy8A
+ c8wzo7x1WjaA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.75,452,1589266800"; 
+   d="scan'208";a="277033463"
+Received: from unknown (HELO localhost.localdomain.bj.intel.com) ([10.238.156.127])
+  by fmsmga008.fm.intel.com with ESMTP; 09 Aug 2020 00:53:01 -0700
+From:   Cathy Zhang <cathy.zhang@intel.com>
+To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org, x86@kernel.org
+Cc:     pbonzini@redhat.com, sean.j.christopherson@intel.com,
+        gregkh@linuxfoundation.org, tglx@linutronix.de,
+        tony.luck@intel.com, dave.hansen@intel.com,
+        kyung.min.park@intel.com, ricardo.neri-calderon@linux.intel.com,
+        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
+        joro@8bytes.org, mingo@redhat.com, bp@alien8.de, hpa@zytor.com,
+        jpoimboe@redhat.com, ak@linux.intel.com, ravi.v.shankar@intel.com,
+        Cathy Zhang <cathy.zhang@intel.com>
+Subject: [PATCH v3 0/2] Expose new features for Intel processor
+Date:   Sun,  9 Aug 2020 15:47:20 +0800
+Message-Id: <1596959242-2372-1-git-send-email-cathy.zhang@intel.com>
+X-Mailer: git-send-email 1.8.3.1
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, Aug 08, 2020 at 11:35:54PM +0800, Jiaxun Yang wrote:
-> 
-> 
-> 在 2020/8/8 下午11:31, Greg KH 写道:
-> > On Sat, Aug 08, 2020 at 08:50:52PM +0800, Huacai Chen wrote:
-> > > Only Loongson64 platform has and needs loongson_regs.h, including it
-> > > unconditionally will cause build errors.
-> > > 
-> > > Fixes: 7f2a83f1c2a941ebfee5 ("KVM: MIPS: Add CPUCFG emulation for Loongson-3")
-> > > Cc: stable@vger.kernel.org
-> > > Reported-by: kernel test robot <lkp@intel.com>
-> > > Signed-off-by: Huacai Chen <chenhc@lemote.com>
-> > > ---
-> > >   arch/mips/kvm/vz.c | 2 ++
-> > >   1 file changed, 2 insertions(+)
-> > > 
-> > > diff --git a/arch/mips/kvm/vz.c b/arch/mips/kvm/vz.c
-> > > index 3932f76..a474578 100644
-> > > --- a/arch/mips/kvm/vz.c
-> > > +++ b/arch/mips/kvm/vz.c
-> > > @@ -29,7 +29,9 @@
-> > >   #include <linux/kvm_host.h>
-> > >   #include "interrupt.h"
-> > > +#ifdef CONFIG_CPU_LOONGSON64
-> > >   #include "loongson_regs.h"
-> > > +#endif
-> > The fix for this should be in the .h file, no #ifdef should be needed in
-> > a .c file.
-> 
-> The header file can only be reached when CONFIG_CPU_LOONGSON64 is
-> selected...
-> Otherwise the include path of this file won't be a part of CFLAGS.
+This patchset is to expose two new features, SERIALIZE and
+TSX suspend load tracking to KVM CPUID for processors which 
+support them. KVM reports this information and guest can 
+make use of them finally.
 
-That sounds like you should fix up the path of this file in the
-#include line as well :)
+Detailed information on the instructions and CPUID feature
+flags can be found in the latest "extensions" manual [1].
+
+This series applies on top of TIP tree as it depends on
+
+https://git.kernel.org/pub/scm/linux/kernel/git/tip/tip.git/commit/?id=85b23fbc7d88f8c6e3951721802d7845bc39663d
+
+Changes since v2:
+  * Combine the two kvm patches into a single one.
+  * Provide features' overview introduction in kvm patch commit message.
+  * Get the latest kernel patches.
+  * Change definition from TSX_LDTRK to TSXLDTRK for TSX new feature.
+  * Change kernel patches Author to the owner.
+  * Remove SERIALIZE enumeration patch.
+
+Reference:
+[1]. https://software.intel.com/content/dam/develop/public/us/en/documents/architecture-instruction-set-extensions-programming-reference.pdf
+
+Cathy Zhang (1):
+  x86/kvm: Expose new features for supported cpuid
+
+Kyung Min Park (1):
+  x86/cpufeatures: Enumerate TSX suspend load address tracking
+    instructions
+
+ arch/x86/include/asm/cpufeatures.h | 1 +
+ arch/x86/kvm/cpuid.c               | 3 ++-
+ 2 files changed, 3 insertions(+), 1 deletion(-)
+
+-- 
+1.8.3.1
+
