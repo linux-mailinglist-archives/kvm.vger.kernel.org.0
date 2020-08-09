@@ -2,157 +2,94 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5B52C23FD76
-	for <lists+kvm@lfdr.de>; Sun,  9 Aug 2020 10:55:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 46B6023FF2B
+	for <lists+kvm@lfdr.de>; Sun,  9 Aug 2020 18:13:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726338AbgHIIzt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 9 Aug 2020 04:55:49 -0400
-Received: from ozlabs.org ([203.11.71.1]:41911 "EHLO ozlabs.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725710AbgHIIzt (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 9 Aug 2020 04:55:49 -0400
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (No client certificate requested)
-        by mail.ozlabs.org (Postfix) with ESMTPSA id 4BPXxX4yzfz9sTN;
-        Sun,  9 Aug 2020 18:55:44 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=canb.auug.org.au;
-        s=201702; t=1596963345;
-        bh=h9z3S1P7kfySisJHeRwXBAFE9LjBOYSWlgVqiTJ4IvA=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=kCuB6cXsY2PBOhTveHFLDGQ3Ifgt56128+kdMJJ+a0ScbZdHk9H8W9BiHeor3iveQ
-         yHTi2pSUXOW8hs138SUC4K1k1WmNV5jf/PXn0yQVTp2rQrhK1ce0jmk05o5KITtNFt
-         ir4VSnygpDivRuMgGYDfmQoi5vw7nyddRmBcMd+m/U/8eCAa1w2lQfeM2tHFi5wj5L
-         zuZE9S8CT5L3+G0pEldCZEHrWe7uCAEP6VUME5U8piPuDVbaJlrfBbiv3pAMmuViWW
-         W947iUSbA/APznQdJ0eYPcN5kL7gK6s5TltB3/g0/7byAkYYdlB3qrNQMfol3ymtEf
-         qOuWeSxE7YHFg==
-Date:   Sun, 9 Aug 2020 18:55:43 +1000
-From:   Stephen Rothwell <sfr@canb.auug.org.au>
-To:     Christoffer Dall <cdall@cs.columbia.edu>,
-        Marc Zyngier <maz@kernel.org>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, KVM <kvm@vger.kernel.org>,
-        Linux Next Mailing List <linux-next@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Sean Christopherson <sean.j.christopherson@intel.com>
-Subject: Re: linux-next: manual merge of the kvm-arm tree with the kvm tree
-Message-ID: <20200809185543.4dffd5e1@canb.auug.org.au>
-In-Reply-To: <20200713144036.7afe4e76@canb.auug.org.au>
-References: <20200713144036.7afe4e76@canb.auug.org.au>
+        id S1726382AbgHIQNf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 9 Aug 2020 12:13:35 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:53287 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726175AbgHIQNQ (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Sun, 9 Aug 2020 12:13:16 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1596989594;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=mg/sYUoBZz1byLWR2WieaEgLigz8B2nOGaHe6iDN1Yo=;
+        b=S70c/ofMbOcM/tviHBXg8TuFmE8zmGAYpUxcdgwjc04MPUVF49/UG5c9d3x3J2wHmttRwl
+        cHutnWZmJ1+ak4O5arPnBVxDhGxvWv/DwxVwknF/6cQd3d6TBCrVlj4wyWZSXW3x8FXaIz
+        VYPQ/kMJHMg/VUkcivgC2BCLQI3bMVM=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-361-pPX_3Ts9MB-s1YDxsNBAVA-1; Sun, 09 Aug 2020 12:13:11 -0400
+X-MC-Unique: pPX_3Ts9MB-s1YDxsNBAVA-1
+Received: by mail-wr1-f70.google.com with SMTP id t12so3246545wrp.0
+        for <kvm@vger.kernel.org>; Sun, 09 Aug 2020 09:13:11 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=mg/sYUoBZz1byLWR2WieaEgLigz8B2nOGaHe6iDN1Yo=;
+        b=kmlx27FktWGlSmmjjztMyMxG9vHgWcXpdi6khp6D792HgTTx+HlUEjGvoiCoBzrB9n
+         Hh0fZXFi2DQBw0VuBFVfVLjKOPrY665+BJ0Iq+dlDwkqnP6lp093P0AnIreiSJXBhIhe
+         BFVvIna8iisovaG7g/K80gd62+t0HaotSf5QIv/nf04kN3+SW9Ddz7atEHBXRAkk8MRf
+         L3553mBwc590c4FLEHuhnVVnN7Tyj7S81RiG1G0vmVAwaBL8q5vI4WBlj16RiQ3CSvWX
+         /MPMwUpfpU1nhGbRehFTUxltIwLMd5MbaoHqr9q4p2QivYa79oRM5yEPDeQ3vxobnfb/
+         3XEw==
+X-Gm-Message-State: AOAM530UtY7f3QBKJZnq/PHjQw/yHnQZEphsI7Sia26X6AQTm2naMVUq
+        8TQqi+2CqqzqAuQRB/UP6UX5Us2l2YrhlYx4+BlrlHmmMXZFun4ZAQRZTsMDNdKgAMKzy23Ot4b
+        qvo3mEpBEUD8d
+X-Received: by 2002:a7b:cb19:: with SMTP id u25mr20628922wmj.113.1596989590718;
+        Sun, 09 Aug 2020 09:13:10 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzoaRt4v6dETBL0JGQT56R5w6T3hYkaDa6PIHuw8DyoGUmzXuvVwqp9ViRh/pLxUaOaLGmzkA==
+X-Received: by 2002:a7b:cb19:: with SMTP id u25mr20628892wmj.113.1596989590465;
+        Sun, 09 Aug 2020 09:13:10 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:8deb:6d34:4b78:b801? ([2001:b07:6468:f312:8deb:6d34:4b78:b801])
+        by smtp.gmail.com with ESMTPSA id y84sm18313519wmg.38.2020.08.09.09.13.09
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 09 Aug 2020 09:13:09 -0700 (PDT)
+Subject: Re: [GIT PULL] KVM/arm64 updates for 5.9
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     Alexander Graf <graf@amazon.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Andrew Scull <ascull@google.com>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Christoffer Dall <christoffer.dall@arm.com>,
+        David Brazdil <dbrazdil@google.com>,
+        Eric Auger <eric.auger@redhat.com>,
+        Gavin Shan <gshan@redhat.com>,
+        James Morse <james.morse@arm.com>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Peng Hao <richard.peng@oppo.com>,
+        Quentin Perret <qperret@google.com>,
+        Will Deacon <will@kernel.org>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, kernel-team@android.com
+References: <20200805175700.62775-1-maz@kernel.org>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <cb8e16e4-ed3c-6cf8-4f21-57d2e6184fb8@redhat.com>
+Date:   Sun, 9 Aug 2020 18:13:08 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.9.0
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/t9+.IJT4cacetod67OCrUOy";
- protocol="application/pgp-signature"; micalg=pgp-sha256
+In-Reply-To: <20200805175700.62775-1-maz@kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
---Sig_/t9+.IJT4cacetod67OCrUOy
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+On 05/08/20 19:56, Marc Zyngier wrote:
+>   git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvmarm-5.9
 
-Hi all,
+Pulled, thanks.
 
-On Mon, 13 Jul 2020 14:40:36 +1000 Stephen Rothwell <sfr@canb.auug.org.au> =
-wrote:
->
-> Today's linux-next merge of the kvm-arm tree got a conflict in:
->=20
->   arch/arm64/kvm/mmu.c
->=20
-> between commit:
->=20
->   c1a33aebe91d ("KVM: arm64: Use common KVM implementation of MMU memory =
-caches")
->=20
-> from the kvm tree and commit:
->=20
->   a0e50aa3f4a8 ("KVM: arm64: Factor out stage 2 page table data from stru=
-ct kvm")
->=20
-> from the kvm-arm tree.
->=20
-> I fixed it up (see below) and can carry the fix as necessary. This
-> is now fixed as far as linux-next is concerned, but any non trivial
-> conflicts should be mentioned to your upstream maintainer when your tree
-> is submitted for merging.  You may also want to consider cooperating
-> with the maintainer of the conflicting tree to minimise any particularly
-> complex conflicts.
->=20
-> diff --cc arch/arm64/kvm/mmu.c
-> index 838aad520f1c,cd14c831d56f..000000000000
-> --- a/arch/arm64/kvm/mmu.c
-> +++ b/arch/arm64/kvm/mmu.c
-> @@@ -124,11 -127,44 +127,12 @@@ static void stage2_dissolve_pud(struct=20
->   	put_page(virt_to_page(pudp));
->   }
->  =20
-> - static void clear_stage2_pgd_entry(struct kvm *kvm, pgd_t *pgd, phys_ad=
-dr_t addr)
->  -static int mmu_topup_memory_cache(struct kvm_mmu_memory_cache *cache,
->  -				  int min, int max)
->  -{
->  -	void *page;
->  -
->  -	BUG_ON(max > KVM_NR_MEM_OBJS);
->  -	if (cache->nobjs >=3D min)
->  -		return 0;
->  -	while (cache->nobjs < max) {
->  -		page =3D (void *)__get_free_page(GFP_PGTABLE_USER);
->  -		if (!page)
->  -			return -ENOMEM;
->  -		cache->objects[cache->nobjs++] =3D page;
->  -	}
->  -	return 0;
->  -}
->  -
->  -static void mmu_free_memory_cache(struct kvm_mmu_memory_cache *mc)
->  -{
->  -	while (mc->nobjs)
->  -		free_page((unsigned long)mc->objects[--mc->nobjs]);
->  -}
->  -
->  -static void *mmu_memory_cache_alloc(struct kvm_mmu_memory_cache *mc)
->  -{
->  -	void *p;
->  -
->  -	BUG_ON(!mc || !mc->nobjs);
->  -	p =3D mc->objects[--mc->nobjs];
->  -	return p;
->  -}
->  -
-> + static void clear_stage2_pgd_entry(struct kvm_s2_mmu *mmu, pgd_t *pgd, =
-phys_addr_t addr)
->   {
-> + 	struct kvm *kvm =3D mmu->kvm;
->   	p4d_t *p4d_table __maybe_unused =3D stage2_p4d_offset(kvm, pgd, 0UL);
->   	stage2_pgd_clear(kvm, pgd);
-> - 	kvm_tlb_flush_vmid_ipa(kvm, addr);
-> + 	kvm_tlb_flush_vmid_ipa(mmu, addr, S2_NO_LEVEL_HINT);
->   	stage2_p4d_free(kvm, p4d_table);
->   	put_page(virt_to_page(pgd));
->   }
+Paolo
 
-This is now a conflict between the kvm-arm tree and Linus' tree.
-
---=20
-Cheers,
-Stephen Rothwell
-
---Sig_/t9+.IJT4cacetod67OCrUOy
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAl8vug8ACgkQAVBC80lX
-0Gz/uQgAnukH8JtyH6V0NhbMs9W+6b8VYhrKRWS1Z7gwWtudqjazLJhxLwkxlBSJ
-l0HFSyx7+1TmHikuaYLxNrjv30bxalSTqu+i4RlCyaJXkSo+j5qppFBTb//TLXAK
-4CSh/yGO9p2yHk/VC8mc6yOofysn1j8JVK24Iz1VyoUQLj5WbCp1VSeERxd9KBjb
-v5v3W4yVKAu1LUYYbfKCNZJ7hhd/0g0UNOPCYTFQoQOfwaHpCLfdMd5UZEELScIc
-MOqbE78Kf1/b5gVUVnsbB8TT55UocqIIiFBrWgN5tRGQS5hRUT9GuCYCikvCaIRo
-y4i89ZYPa7EZgC31fHI3wE4wUqw8QA==
-=Y8xT
------END PGP SIGNATURE-----
-
---Sig_/t9+.IJT4cacetod67OCrUOy--
