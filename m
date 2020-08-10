@@ -2,113 +2,244 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C685D24045A
-	for <lists+kvm@lfdr.de>; Mon, 10 Aug 2020 11:57:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 20A05240479
+	for <lists+kvm@lfdr.de>; Mon, 10 Aug 2020 12:08:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726564AbgHJJ5O (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 10 Aug 2020 05:57:14 -0400
-Received: from smtp-fw-9102.amazon.com ([207.171.184.29]:59274 "EHLO
-        smtp-fw-9102.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726430AbgHJJ5N (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 10 Aug 2020 05:57:13 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.de; i=@amazon.de; q=dns/txt; s=amazon201209;
-  t=1597053434; x=1628589434;
-  h=subject:to:cc:references:from:message-id:date:
-   mime-version:in-reply-to:content-transfer-encoding;
-  bh=fgsFSgHthR1f7WWfooMBWx4lK2mZmhBHIFfrqDvnW3A=;
-  b=jqwS+cN5JVZhyhV+0EhC6RZgRcTaMbT+soxl2XDaYbhiP09zCYEKS+BV
-   7itQbwfVpF8cIK2PdiSI2CnmLQXuK/IhMj/w5pK2zqGB1t22N/uzJoOiv
-   HV6KqJrx54s5zrQ0JdNsO3PIGBz96/go/nimdRrROHxlb8aCh+sv8Ux4m
-   U=;
-IronPort-SDR: oDdE0v8ZPK5Lkk7yWvz3oUN9YB/R8fiwPqgiI3yviaucVfVSB0zLRy1fm+BvPtfKkoVYNjbbS5
- zt7lO9XkxXog==
-X-IronPort-AV: E=Sophos;i="5.75,457,1589241600"; 
-   d="scan'208";a="66803826"
-Received: from sea32-co-svc-lb4-vlan3.sea.corp.amazon.com (HELO email-inbound-relay-2a-6e2fc477.us-west-2.amazon.com) ([10.47.23.38])
-  by smtp-border-fw-out-9102.sea19.amazon.com with ESMTP; 10 Aug 2020 09:57:11 +0000
-Received: from EX13MTAUWC001.ant.amazon.com (pdx4-ws-svc-p6-lb7-vlan2.pdx.amazon.com [10.170.41.162])
-        by email-inbound-relay-2a-6e2fc477.us-west-2.amazon.com (Postfix) with ESMTPS id BDB1EA1DD4;
-        Mon, 10 Aug 2020 09:57:09 +0000 (UTC)
-Received: from EX13D20UWC001.ant.amazon.com (10.43.162.244) by
- EX13MTAUWC001.ant.amazon.com (10.43.162.135) with Microsoft SMTP Server (TLS)
- id 15.0.1497.2; Mon, 10 Aug 2020 09:57:09 +0000
-Received: from 38f9d3867b82.ant.amazon.com (10.43.161.71) by
- EX13D20UWC001.ant.amazon.com (10.43.162.244) with Microsoft SMTP Server (TLS)
- id 15.0.1497.2; Mon, 10 Aug 2020 09:57:04 +0000
-Subject: Re: [PATCH v6 10/18] nitro_enclaves: Add logic for getting the
- enclave image load info
-To:     Andra Paraschiv <andraprs@amazon.com>,
-        linux-kernel <linux-kernel@vger.kernel.org>
-CC:     Anthony Liguori <aliguori@amazon.com>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Colm MacCarthaigh <colmmacc@amazon.com>,
-        "David Duncan" <davdunc@amazon.com>,
-        Bjoern Doebel <doebel@amazon.de>,
-        "David Woodhouse" <dwmw@amazon.co.uk>,
-        Frank van der Linden <fllinden@amazon.com>,
-        Greg KH <gregkh@linuxfoundation.org>,
-        Karen Noel <knoel@redhat.com>,
-        "Martin Pohlack" <mpohlack@amazon.de>,
-        Matt Wilson <msw@amazon.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Balbir Singh <sblbir@amazon.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Stewart Smith <trawets@amazon.com>,
-        Uwe Dannowski <uwed@amazon.de>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        kvm <kvm@vger.kernel.org>,
-        ne-devel-upstream <ne-devel-upstream@amazon.com>
-References: <20200805091017.86203-1-andraprs@amazon.com>
- <20200805091017.86203-11-andraprs@amazon.com>
-From:   Alexander Graf <graf@amazon.de>
-Message-ID: <70ec8010-cb3b-50a8-5472-a96c5aa2cf8d@amazon.de>
-Date:   Mon, 10 Aug 2020 11:57:02 +0200
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:68.0)
- Gecko/20100101 Thunderbird/68.11.0
+        id S1726401AbgHJKIP convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Mon, 10 Aug 2020 06:08:15 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:20124 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726092AbgHJKIP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 10 Aug 2020 06:08:15 -0400
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-474-KOYHSci-PpmpWRVer1iS1A-1; Mon, 10 Aug 2020 06:08:09 -0400
+X-MC-Unique: KOYHSci-PpmpWRVer1iS1A-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3056FE919;
+        Mon, 10 Aug 2020 10:08:08 +0000 (UTC)
+Received: from bahia.lan (ovpn-112-38.ams2.redhat.com [10.36.112.38])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 7CFA88FA3E;
+        Mon, 10 Aug 2020 10:08:06 +0000 (UTC)
+Subject: [PATCH] KVM: PPC: Book3S HV: XICS: Replace the 'destroy' method by a
+ 'release' method
+From:   Greg Kurz <groug@kaod.org>
+To:     Paul Mackerras <paulus@ozlabs.org>
+Cc:     David Gibson <david@gibson.dropbear.id.au>,
+        =?utf-8?q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>,
+        kvm-ppc@vger.kernel.org, kvm@vger.kernel.org
+Date:   Mon, 10 Aug 2020 12:08:05 +0200
+Message-ID: <159705408550.1308430.10165736270896374279.stgit@bahia.lan>
+User-Agent: StGit/0.21
 MIME-Version: 1.0
-In-Reply-To: <20200805091017.86203-11-andraprs@amazon.com>
-Content-Language: en-US
-X-Originating-IP: [10.43.161.71]
-X-ClientProxiedBy: EX13D23UWC002.ant.amazon.com (10.43.162.22) To
- EX13D20UWC001.ant.amazon.com (10.43.162.244)
-Content-Type: text/plain; charset="windows-1252"; format="flowed"
-Content-Transfer-Encoding: quoted-printable
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+Authentication-Results: relay.mimecast.com;
+        auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=groug@kaod.org
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: kaod.org
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8BIT
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Similarly to what was done with XICS-on-XIVE and XIVE native KVM devices
+with commit 5422e95103cf ("KVM: PPC: Book3S HV: XIVE: Replace the 'destroy'
+method by a 'release' method"), convert the historical XICS KVM device to
+implement the 'release' method. This is needed to run nested guests with
+an in-kernel IRQ chip. A typical POWER9 guest can select XICS or XIVE
+during boot, which requires to be able to destroy and to re-create the
+KVM device. Only the historical XICS KVM device is available under pseries
+at the current time and it still uses the legacy 'destroy' method.
 
+Switching to 'release' means that vCPUs might still be running when the
+device is destroyed. In order to avoid potential use-after-free, the
+kvmppc_xics structure is allocated on first usage and kept around until
+the VM exits. The same pointer is used each time a KVM XICS device is
+being created, but this is okay since we only have one per VM.
 
-On 05.08.20 11:10, Andra Paraschiv wrote:
-> Before setting the memory regions for the enclave, the enclave image
-> needs to be placed in memory. After the memory regions are set, this
-> memory cannot be used anymore by the VM, being carved out.
-> =
+Clear the ICP of each vCPU with vcpu->mutex held. This ensures that the
+next time the vCPU resumes execution, it won't be going into the XICS
+code anymore.
 
-> Add ioctl command logic to get the offset in enclave memory where to
-> place the enclave image. Then the user space tooling copies the enclave
-> image in the memory using the given memory offset.
-> =
+Signed-off-by: Greg Kurz <groug@kaod.org>
+---
+ arch/powerpc/include/asm/kvm_host.h |    1 
+ arch/powerpc/kvm/book3s.c           |    4 +-
+ arch/powerpc/kvm/book3s_xics.c      |   86 ++++++++++++++++++++++++++++-------
+ 3 files changed, 72 insertions(+), 19 deletions(-)
 
-> Signed-off-by: Andra Paraschiv <andraprs@amazon.com>
-
-Reviewed-by: Alexander Graf <graf@amazon.com>
-
-
-Alex
-
-
-
-Amazon Development Center Germany GmbH
-Krausenstr. 38
-10117 Berlin
-Geschaeftsfuehrung: Christian Schlaeger, Jonathan Weiss
-Eingetragen am Amtsgericht Charlottenburg unter HRB 149173 B
-Sitz: Berlin
-Ust-ID: DE 289 237 879
-
+diff --git a/arch/powerpc/include/asm/kvm_host.h b/arch/powerpc/include/asm/kvm_host.h
+index e020d269416d..974adda2ec94 100644
+--- a/arch/powerpc/include/asm/kvm_host.h
++++ b/arch/powerpc/include/asm/kvm_host.h
+@@ -325,6 +325,7 @@ struct kvm_arch {
+ #endif
+ #ifdef CONFIG_KVM_XICS
+ 	struct kvmppc_xics *xics;
++	struct kvmppc_xics *xics_device;
+ 	struct kvmppc_xive *xive;    /* Current XIVE device in use */
+ 	struct {
+ 		struct kvmppc_xive *native;
+diff --git a/arch/powerpc/kvm/book3s.c b/arch/powerpc/kvm/book3s.c
+index 41fedec69ac3..56618c2770e1 100644
+--- a/arch/powerpc/kvm/book3s.c
++++ b/arch/powerpc/kvm/book3s.c
+@@ -878,13 +878,15 @@ void kvmppc_core_destroy_vm(struct kvm *kvm)
+ 
+ #ifdef CONFIG_KVM_XICS
+ 	/*
+-	 * Free the XIVE devices which are not directly freed by the
++	 * Free the XIVE and XICS devices which are not directly freed by the
+ 	 * device 'release' method
+ 	 */
+ 	kfree(kvm->arch.xive_devices.native);
+ 	kvm->arch.xive_devices.native = NULL;
+ 	kfree(kvm->arch.xive_devices.xics_on_xive);
+ 	kvm->arch.xive_devices.xics_on_xive = NULL;
++	kfree(kvm->arch.xics_device);
++	kvm->arch.xics_device = NULL;
+ #endif /* CONFIG_KVM_XICS */
+ }
+ 
+diff --git a/arch/powerpc/kvm/book3s_xics.c b/arch/powerpc/kvm/book3s_xics.c
+index 381bf8dea193..5fee5a11550d 100644
+--- a/arch/powerpc/kvm/book3s_xics.c
++++ b/arch/powerpc/kvm/book3s_xics.c
+@@ -1334,47 +1334,97 @@ static int xics_has_attr(struct kvm_device *dev, struct kvm_device_attr *attr)
+ 	return -ENXIO;
+ }
+ 
+-static void kvmppc_xics_free(struct kvm_device *dev)
++/*
++ * Called when device fd is closed. kvm->lock is held.
++ */
++static void kvmppc_xics_release(struct kvm_device *dev)
+ {
+ 	struct kvmppc_xics *xics = dev->private;
+ 	int i;
+ 	struct kvm *kvm = xics->kvm;
++	struct kvm_vcpu *vcpu;
++
++	pr_devel("Releasing xics device\n");
++
++	/*
++	 * Since this is the device release function, we know that
++	 * userspace does not have any open fd referring to the
++	 * device.  Therefore there can not be any of the device
++	 * attribute set/get functions being executed concurrently,
++	 * and similarly, the connect_vcpu and set/clr_mapped
++	 * functions also cannot be being executed.
++	 */
+ 
+ 	debugfs_remove(xics->dentry);
+ 
++	/*
++	 * We should clean up the vCPU interrupt presenters first.
++	 */
++	kvm_for_each_vcpu(i, vcpu, kvm) {
++		/*
++		 * Take vcpu->mutex to ensure that no one_reg get/set ioctl
++		 * (i.e. kvmppc_xics_[gs]et_icp) can be done concurrently.
++		 * Holding the vcpu->mutex also means that execution is
++		 * excluded for the vcpu until the ICP was freed. When the vcpu
++		 * can execute again, vcpu->arch.icp and vcpu->arch.irq_type
++		 * have been cleared and the vcpu will not be going into the
++		 * XICS code anymore.
++		 */
++		mutex_lock(&vcpu->mutex);
++		kvmppc_xics_free_icp(vcpu);
++		mutex_unlock(&vcpu->mutex);
++	}
++
+ 	if (kvm)
+ 		kvm->arch.xics = NULL;
+ 
+-	for (i = 0; i <= xics->max_icsid; i++)
++	for (i = 0; i <= xics->max_icsid; i++) {
+ 		kfree(xics->ics[i]);
+-	kfree(xics);
++		xics->ics[i] = NULL;
++	}
++	/*
++	 * A reference of the kvmppc_xics pointer is now kept under
++	 * the xics_device pointer of the machine for reuse. It is
++	 * freed when the VM is destroyed for now until we fix all the
++	 * execution paths.
++	 */
+ 	kfree(dev);
+ }
+ 
++static struct kvmppc_xics *kvmppc_xics_get_device(struct kvm *kvm)
++{
++	struct kvmppc_xics **kvm_xics_device = &kvm->arch.xics_device;
++	struct kvmppc_xics *xics = *kvm_xics_device;
++
++	if (!xics) {
++		xics = kzalloc(sizeof(*xics), GFP_KERNEL);
++		*kvm_xics_device = xics;
++	} else {
++		memset(xics, 0, sizeof(*xics));
++	}
++
++	return xics;
++}
++
+ static int kvmppc_xics_create(struct kvm_device *dev, u32 type)
+ {
+ 	struct kvmppc_xics *xics;
+ 	struct kvm *kvm = dev->kvm;
+-	int ret = 0;
+ 
+-	xics = kzalloc(sizeof(*xics), GFP_KERNEL);
++	pr_devel("Creating xics for partition\n");
++
++	/* Already there ? */
++	if (kvm->arch.xics)
++		return -EEXIST;
++
++	xics = kvmppc_xics_get_device(kvm);
+ 	if (!xics)
+ 		return -ENOMEM;
+ 
+ 	dev->private = xics;
+ 	xics->dev = dev;
+ 	xics->kvm = kvm;
+-
+-	/* Already there ? */
+-	if (kvm->arch.xics)
+-		ret = -EEXIST;
+-	else
+-		kvm->arch.xics = xics;
+-
+-	if (ret) {
+-		kfree(xics);
+-		return ret;
+-	}
++	kvm->arch.xics = xics;
+ 
+ #ifdef CONFIG_KVM_BOOK3S_HV_POSSIBLE
+ 	if (cpu_has_feature(CPU_FTR_ARCH_206) &&
+@@ -1399,7 +1449,7 @@ struct kvm_device_ops kvm_xics_ops = {
+ 	.name = "kvm-xics",
+ 	.create = kvmppc_xics_create,
+ 	.init = kvmppc_xics_init,
+-	.destroy = kvmppc_xics_free,
++	.release = kvmppc_xics_release,
+ 	.set_attr = xics_set_attr,
+ 	.get_attr = xics_get_attr,
+ 	.has_attr = xics_has_attr,
+@@ -1415,7 +1465,7 @@ int kvmppc_xics_connect_vcpu(struct kvm_device *dev, struct kvm_vcpu *vcpu,
+ 		return -EPERM;
+ 	if (xics->kvm != vcpu->kvm)
+ 		return -EPERM;
+-	if (vcpu->arch.irq_type)
++	if (vcpu->arch.irq_type != KVMPPC_IRQ_DEFAULT)
+ 		return -EBUSY;
+ 
+ 	r = kvmppc_xics_create_icp(vcpu, xcpu);
 
 
