@@ -2,84 +2,75 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E9A9D240410
-	for <lists+kvm@lfdr.de>; Mon, 10 Aug 2020 11:32:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6A7D8240443
+	for <lists+kvm@lfdr.de>; Mon, 10 Aug 2020 11:53:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726712AbgHJJcp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 10 Aug 2020 05:32:45 -0400
-Received: from elvis.franken.de ([193.175.24.41]:41814 "EHLO elvis.franken.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725984AbgHJJco (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 10 Aug 2020 05:32:44 -0400
-Received: from uucp (helo=alpha)
-        by elvis.franken.de with local-bsmtp (Exim 3.36 #1)
-        id 1k54AZ-000764-00; Mon, 10 Aug 2020 11:32:39 +0200
-Received: by alpha.franken.de (Postfix, from userid 1000)
-        id 12CD8C0CA2; Mon, 10 Aug 2020 11:31:59 +0200 (CEST)
-Date:   Mon, 10 Aug 2020 11:31:59 +0200
-From:   Thomas Bogendoerfer <tsbogend@alpha.franken.de>
-To:     Greg KH <greg@kroah.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Jiaxun Yang <jiaxun.yang@flygoat.com>,
-        Huacai Chen <chenhc@lemote.com>,
-        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        kvm@vger.kernel.org, linux-mips@vger.kernel.org,
-        Fuxin Zhang <zhangfx@lemote.com>,
-        Huacai Chen <chenhuacai@gmail.com>, stable@vger.kernel.org
-Subject: Re: [PATCH] MIPS: VZ: Only include loongson_regs.h for CPU_LOONGSON64
-Message-ID: <20200810093158.GA6026@alpha.franken.de>
-References: <1596891052-24052-1-git-send-email-chenhc@lemote.com>
- <20200808153123.GC369184@kroah.com>
- <2b2937d0-eae6-a489-07bd-c40ded02ce89@flygoat.com>
- <20200809070235.GA1098081@kroah.com>
- <5ffc7bb1-8e3f-227a-7ad0-cec5fc32a96a@redhat.com>
- <20200810074417.GA1529187@kroah.com>
- <5522eef8-0da5-7f73-b2f8-2d0c19bb5819@redhat.com>
- <20200810090310.GA1837172@kroah.com>
+        id S1726657AbgHJJxL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 10 Aug 2020 05:53:11 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:59029 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1725846AbgHJJxL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 10 Aug 2020 05:53:11 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1597053190;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=IP2F52KSt4X5jHWk8vXdUJy0v08nuP4eh32SzgUyWLQ=;
+        b=Puhkvom7/Ha2u57uDdC64uV6BPDMXL1grpfx95YRxtwI3gn7Q6kjUJymoqe9ky6cv078gQ
+        x681d0Vth8SY6oWmnxjBYSPANBhlhu2X6xUehD8wXV2vq81YilOSBtXbw2xyr4vJ7ncq49
+        3u0Ycc/dFp8Dufz/W2PTVVp0NxOFUXA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-303-YaRtKwn5MtufzxMRwcQp1Q-1; Mon, 10 Aug 2020 05:53:08 -0400
+X-MC-Unique: YaRtKwn5MtufzxMRwcQp1Q-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 437EC19057B1;
+        Mon, 10 Aug 2020 09:53:07 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (unknown [10.40.194.63])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 9BE9089539;
+        Mon, 10 Aug 2020 09:53:05 +0000 (UTC)
+Date:   Mon, 10 Aug 2020 11:53:02 +0200
+From:   Andrew Jones <drjones@redhat.com>
+To:     Aaron Lewis <aaronlewis@google.com>
+Cc:     jmattson@google.com, graf@amazon.com, pshier@google.com,
+        oupton@google.com, kvm@vger.kernel.org
+Subject: Re: [PATCH 6/6] selftests: kvm: Add test to exercise userspace MSR
+ list
+Message-ID: <20200810095302.ixmtlowbplabgj3g@kamzik.brq.redhat.com>
+References: <20200804042043.3592620-1-aaronlewis@google.com>
+ <20200804042043.3592620-7-aaronlewis@google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200810090310.GA1837172@kroah.com>
-User-Agent: Mutt/1.5.23 (2014-03-12)
+In-Reply-To: <20200804042043.3592620-7-aaronlewis@google.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Aug 10, 2020 at 11:03:10AM +0200, Greg KH wrote:
-> On Mon, Aug 10, 2020 at 10:56:48AM +0200, Paolo Bonzini wrote:
-> > On 10/08/20 09:44, Greg KH wrote:
-> > >> There is more #ifdef CONFIG_CPU_LOONGSON64 in arch/mips/kvm/vz.c, and
-> > >> more #include "loongson_regs.h" in arch/mips.  So while I agree with
-> > >> Greg that this idiom is quite unusual, it seems to be the expected way
-> > >> to use this header.  I queued the patch.
-> > > Or you all could fix it up to work properly like all other #include
-> > > lines in the kernel source tree.  There's no reason mips should be
-> > > "special" here, right?
-> > 
-> > It's not just this #include, there's a couple dozen mach-* directories;
-> > changing how they work would be up to the MIPS maintainers (CCed), and
-> > it would certainly not be a patch that can be merged in stable@ kernels.
-> > 
-> > arch/mips/kernel/cpu-probe.c has the same
-> > 
-> > #ifdef CONFIG_CPU_LOONGSON64
-> > #include <loongson_regs.h>
-> > 
-> > for example, so apparently they're good with this.  So if I don't pick
-> > up the patch to fix the build it would be in all likelihood merged by
-> > MIPS maintainers.  The only difference will be how long the build
-> > remains broken and the fact that they need to worry about KVM despite
-> > the presence of a specific maintainer.
-> 
-> Ok, fair enough, but in the long-run, this should probably be fixed up
-> "properly" if this arch is still being maintained.
+On Mon, Aug 03, 2020 at 09:20:43PM -0700, Aaron Lewis wrote:
+> diff --git a/tools/testing/selftests/kvm/lib/x86_64/ucall.c b/tools/testing/selftests/kvm/lib/x86_64/ucall.c
+> index da4d89ad5419..a3489973e290 100644
+> --- a/tools/testing/selftests/kvm/lib/x86_64/ucall.c
+> +++ b/tools/testing/selftests/kvm/lib/x86_64/ucall.c
+> @@ -40,6 +40,9 @@ uint64_t get_ucall(struct kvm_vm *vm, uint32_t vcpu_id, struct ucall *uc)
+>  	struct kvm_run *run = vcpu_state(vm, vcpu_id);
+>  	struct ucall ucall = {};
+>  
+> +	if (uc)
+> +		memset(uc, 0, sizeof(*uc));
+> +
+>  	if (run->exit_reason == KVM_EXIT_IO && run->io.port == UCALL_PIO_PORT) {
+>  		struct kvm_regs regs;
+>
 
-I have it on my todo list. My plan is to move stuff out of mach-* directories,
-which aren't needed there. This should solve issues like the one here.
+This is a fix that should be in a separate patch, and please patch the
+other architectures too.
 
-Thomas.
+Thanks,
+drew  
 
--- 
-Crap can work. Given enough thrust pigs will fly, but it's not necessarily a
-good idea.                                                [ RFC1925, 2.3 ]
