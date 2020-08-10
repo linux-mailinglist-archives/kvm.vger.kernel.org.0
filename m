@@ -2,104 +2,71 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E8E3A240553
-	for <lists+kvm@lfdr.de>; Mon, 10 Aug 2020 13:25:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B0C1B2405B9
+	for <lists+kvm@lfdr.de>; Mon, 10 Aug 2020 14:21:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726608AbgHJLZL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 10 Aug 2020 07:25:11 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:55424 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726379AbgHJLVl (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 10 Aug 2020 07:21:41 -0400
+        id S1726518AbgHJMVX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 10 Aug 2020 08:21:23 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:20197 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726141AbgHJMVX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 10 Aug 2020 08:21:23 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1597058494;
+        s=mimecast20190719; t=1597062082;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=1wbjRsGzwJSEIgmC6+jZ5HmKMMdsjr2TIwdTADa3P68=;
-        b=KJCkJkb0jjDc5tCbiZLFEeDefar3p3nzvGoOgPEWWPsPSYw1iTonmAL1/i0LKaFlUhuRDp
-        BzCNj8XPpltMuGLEmHlfsB5xA4rQ584zPNRdKJES/b5h2q3ISLXVEVr73Ia4+E5L7G3HIa
-        PR7lGCi5k69zElt5JvmEhT8rf1EyyFE=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-48-mx_32Rv_NMuDkcyHGVZWyA-1; Mon, 10 Aug 2020 07:21:32 -0400
-X-MC-Unique: mx_32Rv_NMuDkcyHGVZWyA-1
-Received: by mail-wr1-f69.google.com with SMTP id z12so4099672wrl.16
-        for <kvm@vger.kernel.org>; Mon, 10 Aug 2020 04:21:32 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=1wbjRsGzwJSEIgmC6+jZ5HmKMMdsjr2TIwdTADa3P68=;
-        b=pG/CRQ0tZcRzDHkbEo3iMBadfnbjWbipj7g3wvjOpsbIGD6OkQbgxE4nlmX+zVyu9M
-         16IWmB4vklYhFcO8LHCNWhk8r/1UwqNM13mgmt8bvc0SlX0ktdubkGTkzjwkiuGX3m68
-         r3dmefvJTW8Fghb1Uqe+l1B/5Xc1e5wPcxhgJs5SGsHJifUsN2RifKW+19hIlvF9ysT3
-         FP9PXdF+R0XwGRNo5ZmrckZAduK36WuLOPARk2wTtU7u9T105+7MrxMumw0rO7c50z5G
-         0B45YufMLgkdr7Hjx8k8J81EyD2oA7jVg3olmTvtbvoWgY+cgun1uEhQyCE0u08ECKCg
-         W5Rg==
-X-Gm-Message-State: AOAM532d1FsC8/Za0OBUMl939PBGlMOq6rDrSAiD7ammjhv4uFOEINyl
-        NRuLJ/rnYZK14/tTQbOWa632qSAV6tN5qcswKCSPQyUkOEOXf8pMIGYgTml+77m2MfJtxAufXR1
-        n4k4mlBhcgBT2
-X-Received: by 2002:a1c:4d12:: with SMTP id o18mr24714532wmh.55.1597058491536;
-        Mon, 10 Aug 2020 04:21:31 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJy4UxkLVkYR0qaII68uf1rniVKRN+p8dcjGLxPoccx8ZjhNhB4Iqyr7JqQEeHpxQbiDZVqm6Q==
-X-Received: by 2002:a1c:4d12:: with SMTP id o18mr24714515wmh.55.1597058491320;
-        Mon, 10 Aug 2020 04:21:31 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:5d6c:f50:4462:5103? ([2001:b07:6468:f312:5d6c:f50:4462:5103])
-        by smtp.gmail.com with ESMTPSA id o125sm23557595wma.27.2020.08.10.04.21.30
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 10 Aug 2020 04:21:30 -0700 (PDT)
-Subject: Re: [PATCH] kvm: selftests: fix spelling mistake: "missmatch" ->
- "missmatch"
-To:     Colin King <colin.king@canonical.com>,
-        Shuah Khan <shuah@kernel.org>, kvm@vger.kernel.org,
-        linux-kselftest@vger.kernel.org
-Cc:     kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20200810101647.62039-1-colin.king@canonical.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <bb65571b-555d-c5e6-1242-a12881a13e01@redhat.com>
-Date:   Mon, 10 Aug 2020 13:21:30 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.9.0
+        bh=y1hpAo8jOj/yDLKvC5VWu1jpmDePmTfuaoB+d+CeDGM=;
+        b=HSsmQdtpNbl+EFxXIftqXazX30v68zPibllZ5jEjasMzZeuDXssY6MNIuNE4RM8A0fy0Uz
+        OLa06Nu8DtBw1OzdA1l4R6z1wDjGNoMtVRy/g54ZSqiC1KCarFeJlBTwFceITa8cLOe5qE
+        AF40OH6IC5XbzH3YFeaSTZVWMbjhVLU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-221-yccNOuLJMHKSJlMd3Y4YQw-1; Mon, 10 Aug 2020 08:21:18 -0400
+X-MC-Unique: yccNOuLJMHKSJlMd3Y4YQw-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2A319101C8A0;
+        Mon, 10 Aug 2020 12:21:17 +0000 (UTC)
+Received: from gondolin (ovpn-112-218.ams2.redhat.com [10.36.112.218])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id B73005D9D7;
+        Mon, 10 Aug 2020 12:21:12 +0000 (UTC)
+Date:   Mon, 10 Aug 2020 14:21:09 +0200
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Janosch Frank <frankja@linux.ibm.com>
+Cc:     kvm@vger.kernel.org, thuth@redhat.com, linux-s390@vger.kernel.org,
+        david@redhat.com, borntraeger@de.ibm.com, imbrenda@linux.ibm.com
+Subject: Re: [kvm-unit-tests PATCH v2 1/3] s390x: Add custom pgm cleanup
+ function
+Message-ID: <20200810142109.77cac24c.cohuck@redhat.com>
+In-Reply-To: <20200807111555.11169-2-frankja@linux.ibm.com>
+References: <20200807111555.11169-1-frankja@linux.ibm.com>
+        <20200807111555.11169-2-frankja@linux.ibm.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-In-Reply-To: <20200810101647.62039-1-colin.king@canonical.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 10/08/20 12:16, Colin King wrote:
-> From: Colin Ian King <colin.king@canonical.com>
+On Fri,  7 Aug 2020 07:15:53 -0400
+Janosch Frank <frankja@linux.ibm.com> wrote:
+
+> Sometimes we need to do cleanup which we don't necessarily want to add
+> to interrupt.c, so let's add a way to register a cleanup function.
 > 
-> There is a spelling mistake in an error message. Fix it.
-> 
-> Signed-off-by: Colin Ian King <colin.king@canonical.com>
+> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+> Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+> Reviewed-by: Thomas Huth <thuth@redhat.com>
 > ---
->  tools/testing/selftests/kvm/lib/sparsebit.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/tools/testing/selftests/kvm/lib/sparsebit.c b/tools/testing/selftests/kvm/lib/sparsebit.c
-> index 031ba3c932ed..59ffba902e61 100644
-> --- a/tools/testing/selftests/kvm/lib/sparsebit.c
-> +++ b/tools/testing/selftests/kvm/lib/sparsebit.c
-> @@ -1866,7 +1866,7 @@ void sparsebit_validate_internal(struct sparsebit *s)
->  		 * of total bits set.
->  		 */
->  		if (s->num_set != total_bits_set) {
-> -			fprintf(stderr, "Number of bits set missmatch,\n"
-> +			fprintf(stderr, "Number of bits set mismatch,\n"
->  				"  s->num_set: 0x%lx total_bits_set: 0x%lx",
->  				s->num_set, total_bits_set);
->  
-> 
+>  lib/s390x/asm/interrupt.h |  1 +
+>  lib/s390x/interrupt.c     | 12 +++++++++++-
+>  2 files changed, 12 insertions(+), 1 deletion(-)
 
-If you have a script that generates the commit message, that needs a
-fix. :)  Queued though.
-
-Paolo
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
 
