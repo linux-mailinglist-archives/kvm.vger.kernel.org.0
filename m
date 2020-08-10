@@ -2,117 +2,276 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6D9652406A7
-	for <lists+kvm@lfdr.de>; Mon, 10 Aug 2020 15:37:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 927BB2406E8
+	for <lists+kvm@lfdr.de>; Mon, 10 Aug 2020 15:44:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726787AbgHJNhJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 10 Aug 2020 09:37:09 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:39906 "EHLO
+        id S1726771AbgHJNoZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 10 Aug 2020 09:44:25 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:48890 "EHLO
         us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726518AbgHJNhJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 10 Aug 2020 09:37:09 -0400
+        with ESMTP id S1726571AbgHJNoZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 10 Aug 2020 09:44:25 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1597066627;
+        s=mimecast20190719; t=1597067062;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=b/qxK5C6ePLAWVdlOOgywCTwX3DZjSUnV1UIiKmwyDg=;
-        b=ByifV7GicXk5g52Pd+PddF/ZmZK90SKpSc/SKRlwYM/GN8KH32yHm/6q2oqeWaLLDBSCvl
-        SUiU2qsPS8uc7juaP78BHWvoJvgx7ZkRQGSvE+NBUpgSJvHtHdZq3Qo5gZyuKRN5KOgd9+
-        300ONfMR68viGohDoqV31stCwn6QHSs=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-20-LxSi600yNwOX21OLxCDt-A-1; Mon, 10 Aug 2020 09:37:05 -0400
-X-MC-Unique: LxSi600yNwOX21OLxCDt-A-1
-Received: by mail-wm1-f70.google.com with SMTP id z10so2865278wmi.8
-        for <kvm@vger.kernel.org>; Mon, 10 Aug 2020 06:37:05 -0700 (PDT)
+        bh=V1Ht/xtTouLriwLsm/eS0eaCM+WZCELWGcwFNPhIusQ=;
+        b=gosXJgalIVH8JMV9L1vcKOuyYe0w8e3uHReyEWU88nEIgElUYoXBhRdemC0sJobVFflKlZ
+        eGo5vf5NsunsNYQtmQvptpQBx5ovQbD6RE14IgpGWiebbYXXIpMoyfCCcZpXzrhafRzi0W
+        XzjzCARamvCHDJHAZAHRLQT02hkFtzs=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-563-dZQ6v5HYMDutIRUqSszLcg-1; Mon, 10 Aug 2020 09:44:21 -0400
+X-MC-Unique: dZQ6v5HYMDutIRUqSszLcg-1
+Received: by mail-wm1-f69.google.com with SMTP id f74so2890209wmf.1
+        for <kvm@vger.kernel.org>; Mon, 10 Aug 2020 06:44:21 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=b/qxK5C6ePLAWVdlOOgywCTwX3DZjSUnV1UIiKmwyDg=;
-        b=Ag/ptTYrKBf8vrpnn+aTnBKBFfO7Zz9nRFk3SJrLms7D7Fj1pBPgr81IjJO2pilNBt
-         LC0o7K4AiHoWwt3BMw22Gw6tubmeepSCdVx01C3v9IU5aE4UeCdW8ExfSqHF+/ce6fZi
-         FK0OFgPaSLm1oQcFfsxA7E1Pavyulz/LSx0AggFKbgzShD4vANoPnfkMmc137+UP3N1j
-         FVFdHSMZy53iYJUhJYU/D8nh2lHXISdZW4agassId41TSB8ahqa/XLKe/ixrsAtE/j5z
-         fwXxxTcxAIaT6ZcFMpuPlHgL1TRlDZOhHHXYdlSC/pbTdgzCToz5Xx3nKpx2vGNt3rFt
-         pW9w==
-X-Gm-Message-State: AOAM530xWbvl5icGJ+cs3bV3i57AYZP53PAYdh4wQ8pWs8EzTqbEBp5A
-        46GZeBoPItNkyvVXp1nlXRiqqZjY9HO2TVB1/g4EqcmZV1OBUXTAvwXnydmzAUdxu1oX7opktP2
-        Wd5+T8j8EWujE
-X-Received: by 2002:a1c:5f44:: with SMTP id t65mr23851975wmb.99.1597066624610;
-        Mon, 10 Aug 2020 06:37:04 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyntbXKihSaGm5opEK+za7CdlaF4OJ93oO4OKkytJl8FaoN1WxNcKI6KM/HsYZNiaqGUVp/wQ==
-X-Received: by 2002:a1c:5f44:: with SMTP id t65mr23851960wmb.99.1597066624455;
-        Mon, 10 Aug 2020 06:37:04 -0700 (PDT)
-Received: from redhat.com (bzq-109-67-41-16.red.bezeqint.net. [109.67.41.16])
-        by smtp.gmail.com with ESMTPSA id f12sm21591802wmc.46.2020.08.10.06.37.02
+         :mime-version:content-disposition:in-reply-to;
+        bh=V1Ht/xtTouLriwLsm/eS0eaCM+WZCELWGcwFNPhIusQ=;
+        b=BA522n36gcH5qSQh4QsbtwkKB6RjIq/dZER58zMENYd4X1o7jUCid1kDFexnZ63Ocd
+         w9tMnjbSOKs9NgE4Xgs3Lm30m6fsQfhTGi/7Fk6WesOFwk1WrXR8ba9v+9WD/gBrxLZp
+         Vhgw1Y74WUCEyjiu0OjT8gSs4QjDblM/J38Gd5g2vdrhhMDlTnLx3R4u1r0C3QmKn5jq
+         Z+y6mOpUnjyDDsR41mgSHgHljMc71mwQBtVQhu6F3JNbfp7PTIgNMuvjciBclpLW23J4
+         Xt4H1/RQyC0hq+OPRX2b//QwYxHcnBSBAMHJtnny83V5iK4R6ImLT8g4JVlbQQQLC4hv
+         ivuw==
+X-Gm-Message-State: AOAM530/YG+bOrIRNWIObU6eYXz7vqfwhoaJE8Ys5Hnuw0aeUsk0bsPg
+        5pz7IoCQc8HyLwQtAU5zNlJ7L40SEq9cOpW85co5xkk1QrGQ+RSURoyZQYLkaaMKmTHbmGPV6m3
+        SRn0zNfDOwTNF
+X-Received: by 2002:adf:bb83:: with SMTP id q3mr1711996wrg.58.1597067060157;
+        Mon, 10 Aug 2020 06:44:20 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJynhZhPGH/raEuBPiKR+cj/1IcMJN4rJhlv/0a7x4pg7k/Q9IZEP+R7MmFeP+iRyWhw2v+v5w==
+X-Received: by 2002:adf:bb83:: with SMTP id q3mr1711966wrg.58.1597067059858;
+        Mon, 10 Aug 2020 06:44:19 -0700 (PDT)
+Received: from redhat.com ([192.117.173.58])
+        by smtp.gmail.com with ESMTPSA id g25sm20355599wmh.35.2020.08.10.06.44.17
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 10 Aug 2020 06:37:03 -0700 (PDT)
-Date:   Mon, 10 Aug 2020 09:37:00 -0400
+        Mon, 10 Aug 2020 06:44:18 -0700 (PDT)
+Date:   Mon, 10 Aug 2020 09:44:15 -0400
 From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Jason Wang <jasowang@redhat.com>
-Cc:     "Zhu, Lingshan" <lingshan.zhu@intel.com>,
-        alex.williamson@redhat.com, pbonzini@redhat.com,
-        sean.j.christopherson@intel.com, wanpengli@tencent.com,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        kvm@vger.kernel.org, eli@mellanox.com, shahafs@mellanox.com,
-        parav@mellanox.com
-Subject: Re: [PATCH V5 1/6] vhost: introduce vhost_vring_call
-Message-ID: <20200810093630-mutt-send-email-mst@kernel.org>
-References: <20200731065533.4144-1-lingshan.zhu@intel.com>
- <20200731065533.4144-2-lingshan.zhu@intel.com>
- <5e646141-ca8d-77a5-6f41-d30710d91e6d@redhat.com>
- <d51dd4e3-7513-c771-104c-b61f9ee70f30@intel.com>
- <156b8d71-6870-c163-fdfa-35bf4701987d@redhat.com>
- <20200804052050-mutt-send-email-mst@kernel.org>
- <14fd2bf1-e9c1-a192-bd6c-f1ee5fd227f6@redhat.com>
+To:     Guennadi Liakhovetski <guennadi.liakhovetski@linux.intel.com>
+Cc:     kvm@vger.kernel.org, linux-remoteproc@vger.kernel.org,
+        virtualization@lists.linux-foundation.org,
+        sound-open-firmware@alsa-project.org,
+        Pierre-Louis Bossart <pierre-louis.bossart@linux.intel.com>,
+        Liam Girdwood <liam.r.girdwood@linux.intel.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Ohad Ben-Cohen <ohad@wizery.com>,
+        Bjorn Andersson <bjorn.andersson@linaro.org>,
+        Mathieu Poirier <mathieu.poirier@linaro.org>,
+        Vincent Whitchurch <vincent.whitchurch@axis.com>
+Subject: Re: [PATCH v4 4/4] vhost: add an RPMsg API
+Message-ID: <20200810094013-mutt-send-email-mst@kernel.org>
+References: <20200722150927.15587-1-guennadi.liakhovetski@linux.intel.com>
+ <20200722150927.15587-5-guennadi.liakhovetski@linux.intel.com>
+ <20200804102132-mutt-send-email-mst@kernel.org>
+ <20200804151916.GC19025@ubuntu>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <14fd2bf1-e9c1-a192-bd6c-f1ee5fd227f6@redhat.com>
+In-Reply-To: <20200804151916.GC19025@ubuntu>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Aug 05, 2020 at 10:16:16AM +0800, Jason Wang wrote:
-> 
-> On 2020/8/4 下午5:21, Michael S. Tsirkin wrote:
-> > > > > >    +struct vhost_vring_call {
-> > > > > > +    struct eventfd_ctx *ctx;
-> > > > > > +    struct irq_bypass_producer producer;
-> > > > > > +    spinlock_t ctx_lock;
-> > > > > It's not clear to me why we need ctx_lock here.
-> > > > > 
-> > > > > Thanks
-> > > > Hi Jason,
-> > > > 
-> > > > we use this lock to protect the eventfd_ctx and irq from race conditions,
-> > > We don't support irq notification from vDPA device driver in this version,
-> > > do we still have race condition?
+On Tue, Aug 04, 2020 at 05:19:17PM +0200, Guennadi Liakhovetski wrote:
+> On Tue, Aug 04, 2020 at 10:27:08AM -0400, Michael S. Tsirkin wrote:
+> > On Wed, Jul 22, 2020 at 05:09:27PM +0200, Guennadi Liakhovetski wrote:
+> > > Linux supports running the RPMsg protocol over the VirtIO transport
+> > > protocol, but currently there is only support for VirtIO clients and
+> > > no support for a VirtIO server. This patch adds a vhost-based RPMsg
+> > > server implementation.
 > > > 
-> > > Thanks
-> > Jason I'm not sure what you are trying to say here.
+> > > Signed-off-by: Guennadi Liakhovetski <guennadi.liakhovetski@linux.intel.com>
+> > > ---
+> > >  drivers/vhost/Kconfig       |   7 +
+> > >  drivers/vhost/Makefile      |   3 +
+> > >  drivers/vhost/rpmsg.c       | 375 ++++++++++++++++++++++++++++++++++++
+> > >  drivers/vhost/vhost_rpmsg.h |  74 +++++++
+> > >  4 files changed, 459 insertions(+)
+> > >  create mode 100644 drivers/vhost/rpmsg.c
+> > >  create mode 100644 drivers/vhost/vhost_rpmsg.h
+> > > 
+> > > diff --git a/drivers/vhost/Kconfig b/drivers/vhost/Kconfig
+> > > index d3688c6afb87..602421bf1d03 100644
+> > > --- a/drivers/vhost/Kconfig
+> > > +++ b/drivers/vhost/Kconfig
+> > > @@ -38,6 +38,13 @@ config VHOST_NET
+> > >  	  To compile this driver as a module, choose M here: the module will
+> > >  	  be called vhost_net.
+> > >  
+> > > +config VHOST_RPMSG
+> > > +	tristate
+> > 
+> > So this lacks a description line so it does not appear
+> > in menuconfig. How is user supposed to set it?
+> > I added a one-line description.
 > 
+> That was on purpose. I don't think there's any value in this API stand-alone, 
+> so I let users select it as needed. But we can change that too, id desired.
+
+I guess the patches actually selecting this 
+are separate then?
+
+> > > +	depends on VHOST
+> > 
+> > Other drivers select VHOST instead. Any reason not to
+> > do it like this here?
 > 
-> I meant we change the API from V4 so driver won't notify us if irq is
-> changed.
+> I have
 > 
-> Then it looks to me there's no need for the ctx_lock, everyhing could be
-> synchronized with vq mutex.
+> +	select VHOST
+> +	select VHOST_RPMSG
+> 
+> in my client driver patch.
+
+Any issues selecting from here so others get it for free?
+If this is selected then dependencies are ignored ...
+
+> > > +	help
+> > > +	  Vhost RPMsg API allows vhost drivers to communicate with VirtIO
+> > > +	  drivers, using the RPMsg over VirtIO protocol.
+> > > +
+> > 
+> > >  config VHOST_SCSI
+> > >  	tristate "VHOST_SCSI TCM fabric driver"
+> > >  	depends on TARGET_CORE && EVENTFD
+> > > diff --git a/drivers/vhost/Makefile b/drivers/vhost/Makefile
+> > > index f3e1897cce85..9cf459d59f97 100644
+> > > --- a/drivers/vhost/Makefile
+> > > +++ b/drivers/vhost/Makefile
+> > > @@ -2,6 +2,9 @@
+> > >  obj-$(CONFIG_VHOST_NET) += vhost_net.o
+> > >  vhost_net-y := net.o
+> > >  
+> > > +obj-$(CONFIG_VHOST_RPMSG) += vhost_rpmsg.o
+> > > +vhost_rpmsg-y := rpmsg.o
+> > > +
+> > >  obj-$(CONFIG_VHOST_SCSI) += vhost_scsi.o
+> > >  vhost_scsi-y := scsi.o
+> > >  
+> > > diff --git a/drivers/vhost/rpmsg.c b/drivers/vhost/rpmsg.c
+> > > new file mode 100644
+> > > index 000000000000..d7ab48414224
+> > > --- /dev/null
+> > > +++ b/drivers/vhost/rpmsg.c
+> > > @@ -0,0 +1,375 @@
+> > > +// SPDX-License-Identifier: GPL-2.0-only
+> > > +/*
+> > > + * Copyright(c) 2020 Intel Corporation. All rights reserved.
+> > > + *
+> > > + * Author: Guennadi Liakhovetski <guennadi.liakhovetski@linux.intel.com>
+> > > + *
+> > > + * Vhost RPMsg VirtIO interface. It provides a set of functions to match the
+> > > + * guest side RPMsg VirtIO API, provided by drivers/rpmsg/virtio_rpmsg_bus.c
+> > > + * These functions handle creation of 2 virtual queues, handling of endpoint
+> > > + * addresses, sending a name-space announcement to the guest as well as any
+> > > + * user messages. This API can be used by any vhost driver to handle RPMsg
+> > > + * specific processing.
+> > > + * Specific vhost drivers, using this API will use their own VirtIO device
+> > > + * IDs, that should then also be added to the ID table in virtio_rpmsg_bus.c
+> > > + */
+> > > +
+> > > +#include <linux/compat.h>
+> > > +#include <linux/file.h>
+> > > +#include <linux/miscdevice.h>
+> > > +#include <linux/module.h>
+> > > +#include <linux/mutex.h>
+> > > +#include <linux/vhost.h>
+> > > +#include <linux/virtio_rpmsg.h>
+> > > +#include <uapi/linux/rpmsg.h>
+> > > +
+> > > +#include "vhost.h"
+> > > +#include "vhost_rpmsg.h"
+> > > +
+> > > +/*
+> > > + * All virtio-rpmsg virtual queue kicks always come with just one buffer -
+> > > + * either input or output
+> > > + */
+> > > +static int vhost_rpmsg_get_single(struct vhost_virtqueue *vq)
+> > > +{
+> > > +	struct vhost_rpmsg *vr = container_of(vq->dev, struct vhost_rpmsg, dev);
+> > > +	unsigned int out, in;
+> > > +	int head = vhost_get_vq_desc(vq, vq->iov, ARRAY_SIZE(vq->iov), &out, &in,
+> > > +				     NULL, NULL);
+> > > +	if (head < 0) {
+> > > +		vq_err(vq, "%s(): error %d getting buffer\n",
+> > > +		       __func__, head);
+> > > +		return head;
+> > > +	}
+> > > +
+> > > +	/* Nothing new? */
+> > > +	if (head == vq->num)
+> > > +		return head;
+> > > +
+> > > +	if (vq == &vr->vq[VIRTIO_RPMSG_RESPONSE] && (out || in != 1)) {
+> > 
+> > This in != 1 looks like a dependency on a specific message layout.
+> > virtio spec says to avoid these. Using iov iters it's not too hard to do
+> > ...
+> 
+> This is an RPMsg VirtIO implementation, and it has to match the virtio_rpmsg_bus.c 
+> driver, and that one has specific VirtIO queue and message usage patterns.
+
+That could be fine for legacy virtio, but now you are claiming support
+for virtio 1, so need to fix these assumptions in the device.
+
+
+> > > +		vq_err(vq,
+> > > +		       "%s(): invalid %d input and %d output in response queue\n",
+> > > +		       __func__, in, out);
+> > > +		goto return_buf;
+> > > +	}
+> > > +
+> > > +	if (vq == &vr->vq[VIRTIO_RPMSG_REQUEST] && (in || out != 1)) {
+> > > +		vq_err(vq,
+> > > +		       "%s(): invalid %d input and %d output in request queue\n",
+> > > +		       __func__, in, out);
+> > > +		goto return_buf;
+> > > +	}
+> > > +
+> > > +	return head;
+> > > +
+> > > +return_buf:
+> > > +	/*
+> > > +	 * FIXME: might need to return the buffer using vhost_add_used()
+> > > +	 * or vhost_discard_vq_desc(). vhost_discard_vq_desc() is
+> > > +	 * described as "being useful for error handling," but it makes
+> > > +	 * the thus discarded buffers "unseen," so next time we look we
+> > > +	 * retrieve them again?
+> > 
+> > 
+> > Yes. It's your decision what to do on error. if you also signal
+> > an eventfd using vq_err, then discarding will
+> > make it so userspace can poke at ring and hopefully fix it ...
+> 
+> I assume the user-space in this case is QEMU. Would it be the safest to use 
+> vhost_add_used() then?
+
+Your call.
+
+> > > +	 */
+> > > +	return -EINVAL;
+> > > +}
+> 
+> [snip]
+> 
+> > > +	return 0;
+> > > +
+> > > +return_buf:
+> > > +	/*
+> > > +	 * FIXME: vhost_discard_vq_desc() or vhost_add_used(), see comment in
+> > > +	 * vhost_rpmsg_get_single()
+> > > +	 */
+> > 
+> > What's to be done with this FIXME?
+> 
+> This is the same question as above - I just wasn't sure which error handling 
+> was appropriate here, don't think many vhost drivers do any od this...
 > 
 > Thanks
-
-Jason do you want to post a cleanup patch simplifying code along these
-lines?
-
-Thanks,
-
-
-> > 
-> > 
+> Guennadi
 
