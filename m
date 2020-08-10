@@ -2,112 +2,99 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 37DDB2403CB
-	for <lists+kvm@lfdr.de>; Mon, 10 Aug 2020 11:03:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D0F7E2403D8
+	for <lists+kvm@lfdr.de>; Mon, 10 Aug 2020 11:09:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726524AbgHJJDC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 10 Aug 2020 05:03:02 -0400
-Received: from wout4-smtp.messagingengine.com ([64.147.123.20]:57861 "EHLO
-        wout4-smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725846AbgHJJDC (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 10 Aug 2020 05:03:02 -0400
-Received: from compute1.internal (compute1.nyi.internal [10.202.2.41])
-        by mailout.west.internal (Postfix) with ESMTP id C72B6962;
-        Mon, 10 Aug 2020 05:03:00 -0400 (EDT)
-Received: from mailfrontend2 ([10.202.2.163])
-  by compute1.internal (MEProxy); Mon, 10 Aug 2020 05:03:01 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kroah.com; h=
-        date:from:to:cc:subject:message-id:references:mime-version
-        :content-type:in-reply-to; s=fm1; bh=VG6tNsG0RQy55zYOkAinJYjKMdZ
-        FHRBkeUHlia4o90M=; b=HDUdAe1hVoXJfEe99XTPijxWUPe7Sc5+uB1fr54TKNA
-        sU/OOE9R0rk3/bl4QZK+Qcd2wyXSlwPiPgUpI4l5z0Ab0FtIvxKbz0Of3yawIWxm
-        i31StgLWMs0B4hDbjMgwmNjhin8iC1pTHymVTFG812IlXmAflxDCypkRmdH2StJq
-        h0SL5uLeUUVfInkhvHzHVIfwsO6x5yBW5IQVPKdhGYirYNKLj2fk8se3Vded5qg7
-        yO1/eZMRTRjPMip8LZO/1WRLfhT5txyK75zVUxdrQsyep75CAal75MVEKbs4mCqA
-        6oaDn/ve5MK3IN9DRDfeN9Ztqgkd9O1we/D/R2QsMnQ==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-        messagingengine.com; h=cc:content-type:date:from:in-reply-to
-        :message-id:mime-version:references:subject:to:x-me-proxy
-        :x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; bh=VG6tNs
-        G0RQy55zYOkAinJYjKMdZFHRBkeUHlia4o90M=; b=VIt7RVIGkeGHcN5Ka5USZR
-        ozufruCDfUR88DUnZubD8SaeOpzNgGsRaVkzzrkeECfIFTRZjZ+8aqaHO14Xs4vq
-        xkfaCjCTsgggAWBMUyQ+F4qNA+ZfgFkLVcjt2MHtTnIWTNWQz6ZJq2tBDD8n4rrx
-        TiolRIMwmNkaqhCWdMw8zJqEzTxLIsvEVxbjYq/SjGzMZCFTx31meKOQCp7O/e+k
-        dv8jLyWNWrQ2H+y5wHjtnYkUmgVVf0Wr95qQ9kbryz3SfSV5Piir6H5izm5US5Kb
-        Di7ikJZOXvahgi5njY+OCJXBpUiUzDkMfJIAQ/i4SPwKXyIQfEJWdk49e6U/+alw
-        ==
-X-ME-Sender: <xms:Qw0xX6_5FGk5EsZbJdmlMHWBUj6GCcaDdZTKzsisvx-_0EN1mu_8lA>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeduiedrkeekgdduudcutefuodetggdotefrodftvf
-    curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
-    uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenuc
-    fjughrpeffhffvuffkfhggtggujgesthdtredttddtvdenucfhrhhomhepifhrvghgucfm
-    jfcuoehgrhgvgheskhhrohgrhhdrtghomheqnecuggftrfgrthhtvghrnhepveeuheejgf
-    ffgfeivddukedvkedtleelleeghfeljeeiueeggeevueduudekvdetnecukfhppeekfedr
-    keeirdekledruddtjeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrih
-    hlfhhrohhmpehgrhgvgheskhhrohgrhhdrtghomh
-X-ME-Proxy: <xmx:Qw0xX6uli82vHuT6rXOnT00jQ06sdFuNokCNgYz_TM4B7ZJOFSbpdw>
-    <xmx:Qw0xXwCEUfZ6N9WlR6r7Q-rxnTogrJMqIJJMortSPu2eGOp2g-aQWA>
-    <xmx:Qw0xXyegMBLWo8jbAzkjhQ_218Ng3FYMM-zu4BiFv_fAgH2GWNFruw>
-    <xmx:RA0xX7AoAEczNCxsY9Wiqb8UmBOAL_F8iValxWJFJxQwKHRo0oF-cA>
-Received: from localhost (83-86-89-107.cable.dynamic.v4.ziggo.nl [83.86.89.107])
-        by mail.messagingengine.com (Postfix) with ESMTPA id 3A1633060067;
-        Mon, 10 Aug 2020 05:02:59 -0400 (EDT)
-Date:   Mon, 10 Aug 2020 11:03:10 +0200
-From:   Greg KH <greg@kroah.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Jiaxun Yang <jiaxun.yang@flygoat.com>,
-        Huacai Chen <chenhc@lemote.com>,
-        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        kvm@vger.kernel.org, linux-mips@vger.kernel.org,
-        Fuxin Zhang <zhangfx@lemote.com>,
-        Huacai Chen <chenhuacai@gmail.com>, stable@vger.kernel.org
-Subject: Re: [PATCH] MIPS: VZ: Only include loongson_regs.h for CPU_LOONGSON64
-Message-ID: <20200810090310.GA1837172@kroah.com>
-References: <1596891052-24052-1-git-send-email-chenhc@lemote.com>
- <20200808153123.GC369184@kroah.com>
- <2b2937d0-eae6-a489-07bd-c40ded02ce89@flygoat.com>
- <20200809070235.GA1098081@kroah.com>
- <5ffc7bb1-8e3f-227a-7ad0-cec5fc32a96a@redhat.com>
- <20200810074417.GA1529187@kroah.com>
- <5522eef8-0da5-7f73-b2f8-2d0c19bb5819@redhat.com>
+        id S1726664AbgHJJJ1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 10 Aug 2020 05:09:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34642 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726637AbgHJJJ0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 10 Aug 2020 05:09:26 -0400
+Received: from mail-oi1-x242.google.com (mail-oi1-x242.google.com [IPv6:2607:f8b0:4864:20::242])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 86A6FC061756;
+        Mon, 10 Aug 2020 02:09:26 -0700 (PDT)
+Received: by mail-oi1-x242.google.com with SMTP id k4so8277384oik.2;
+        Mon, 10 Aug 2020 02:09:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=2ZxKqwz9lSZTNdM2JRyLmnn11T86+ZQVjo9KIOGVrW4=;
+        b=eGgTbNUubrz/u1OgSKbdEfsjnghjDcxJZk0fj4J3j12p6Zx9zpUoyQKXdeAWpAZDEc
+         cBDLcDjgyf4U1xRh2+1Bwqv8PWULp8GObJ6AMcCbZbXf0cM83BtqPnMbg17YRq3lGo0S
+         w2Ak9UqbwCoQwVUsSzUlWaNcScDVbAwRgY9YbswxyOLqvIBTl0Vo6EJgcRO3KbX0xLgI
+         ROCYhUiDMmw3AL6a6gu2BtqpudvPdFTKcZdDCcVd2gIhCZfoRMxwO8suEcACaMyaHFW6
+         kJZ2+5XuFBSM3E+iu48kiaO1S9fsswNJJSC4M9K7nw/rHabYR2eqgBNdJodnc7BZCITM
+         10yA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=2ZxKqwz9lSZTNdM2JRyLmnn11T86+ZQVjo9KIOGVrW4=;
+        b=Xxg6hpPOOr0PIQawBBAmVfu50jDMIXvGYoiRiSH9bSygOLsa0OP6L12RJp6mRxQk7K
+         Lkbsfgb8vvlASIHldNQX7tUXZKQuC7vsceKFJA2Uft4qgGtEWPWVZKpHQiQxaNb0a/8c
+         OyWseqfwap6LuYER9hzmzt9jzBnbaxrSbKqPyhUI5AQL2claa1A3VI8raU0lVq8ZHCgr
+         XuZLXSUvyAVF/X+IYGS5+z20yJvJSa6sCiCJF/y3KsAzZy0+PHItCR3+IXL90blAXO5B
+         /ra3TwycR2Nk1yWfxikiZ0O7IV7h4OH7kgdOIt/wcwaEu0OLj97uJAxYLfChMT9sfbxa
+         w1Bw==
+X-Gm-Message-State: AOAM530KdheUXm7rPvy60epJnIjjxWqhFJz6o7vFlagVYscbIYAvWrTx
+        qbl62VQnplhYD4yL///XePFPbHl7fpWF5IqZ0ZE=
+X-Google-Smtp-Source: ABdhPJwfhjPB+jeMEcc887Gg1iNHtrWt6npYussAD28jb9UDfIo8XUrJcs4DK8UKQPtVyMqBL+ASS7uym4zCva59C24=
+X-Received: by 2002:aca:4f52:: with SMTP id d79mr25847oib.141.1597050565914;
+ Mon, 10 Aug 2020 02:09:25 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <5522eef8-0da5-7f73-b2f8-2d0c19bb5819@redhat.com>
+References: <1596521448-4010-1-git-send-email-wanpengli@tencent.com> <20200804211914.GB31916@linux.intel.com>
+In-Reply-To: <20200804211914.GB31916@linux.intel.com>
+From:   Wanpeng Li <kernellwp@gmail.com>
+Date:   Mon, 10 Aug 2020 17:09:15 +0800
+Message-ID: <CANRm+CzfLYKUkdWOsFdXL+M1ZFcn_pGPzKuOXAEabEySatcFkA@mail.gmail.com>
+Subject: Re: [PATCH 1/2] KVM: LAPIC: Return 0 when getting the tscdeadline
+ timer if the lapic is hw disabled
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Aug 10, 2020 at 10:56:48AM +0200, Paolo Bonzini wrote:
-> On 10/08/20 09:44, Greg KH wrote:
-> >> There is more #ifdef CONFIG_CPU_LOONGSON64 in arch/mips/kvm/vz.c, and
-> >> more #include "loongson_regs.h" in arch/mips.  So while I agree with
-> >> Greg that this idiom is quite unusual, it seems to be the expected way
-> >> to use this header.  I queued the patch.
-> > Or you all could fix it up to work properly like all other #include
-> > lines in the kernel source tree.  There's no reason mips should be
-> > "special" here, right?
-> 
-> It's not just this #include, there's a couple dozen mach-* directories;
-> changing how they work would be up to the MIPS maintainers (CCed), and
-> it would certainly not be a patch that can be merged in stable@ kernels.
-> 
-> arch/mips/kernel/cpu-probe.c has the same
-> 
-> #ifdef CONFIG_CPU_LOONGSON64
-> #include <loongson_regs.h>
-> 
-> for example, so apparently they're good with this.  So if I don't pick
-> up the patch to fix the build it would be in all likelihood merged by
-> MIPS maintainers.  The only difference will be how long the build
-> remains broken and the fact that they need to worry about KVM despite
-> the presence of a specific maintainer.
+On Wed, 5 Aug 2020 at 05:19, Sean Christopherson
+<sean.j.christopherson@intel.com> wrote:
+>
+> On Tue, Aug 04, 2020 at 02:10:47PM +0800, Wanpeng Li wrote:
+> > From: Wanpeng Li <wanpengli@tencent.com>
+> >
+> > Return 0 when getting the tscdeadline timer if the lapic is hw disabled
+> >
+> > Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
+> > Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
+> > ---
+> >  arch/x86/kvm/lapic.c | 2 +-
+> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> >
+> > diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+> > index cfb8504..d89ab48 100644
+> > --- a/arch/x86/kvm/lapic.c
+> > +++ b/arch/x86/kvm/lapic.c
+> > @@ -2182,7 +2182,7 @@ u64 kvm_get_lapic_tscdeadline_msr(struct kvm_vcpu *vcpu)
+> >  {
+> >       struct kvm_lapic *apic = vcpu->arch.apic;
+> >
+> > -     if (!lapic_in_kernel(vcpu) ||
+> > +     if (!kvm_apic_present(vcpu) ||
+> >               !apic_lvtt_tscdeadline(apic))
+>
+> Paolo, want want to fix up the indentation when applying?
+>
+>         if (!kvm_apic_present(vcpu) || !apic_lvtt_tscdeadline(apic)
 
-Ok, fair enough, but in the long-run, this should probably be fixed up
-"properly" if this arch is still being maintained.
+Agreed, Paolo do you need I send another version or you can fix up
+when applying?
 
-thanks,
-
-greg k-h
+    Wanpeng
