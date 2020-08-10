@@ -2,86 +2,113 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 935DC2413AA
-	for <lists+kvm@lfdr.de>; Tue, 11 Aug 2020 01:17:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 30B162413F5
+	for <lists+kvm@lfdr.de>; Tue, 11 Aug 2020 01:50:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726949AbgHJXRT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 10 Aug 2020 19:17:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51912 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726722AbgHJXRT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 10 Aug 2020 19:17:19 -0400
-Received: from mail-oo1-xc42.google.com (mail-oo1-xc42.google.com [IPv6:2607:f8b0:4864:20::c42])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E015DC061756
-        for <kvm@vger.kernel.org>; Mon, 10 Aug 2020 16:17:18 -0700 (PDT)
-Received: by mail-oo1-xc42.google.com with SMTP id j16so2248607ooc.7
-        for <kvm@vger.kernel.org>; Mon, 10 Aug 2020 16:17:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=oDXx5xJz1b+wcw5C/YeihMWCNkvCnSl6ZWGflH/Camk=;
-        b=G2WMPWEnEgkIw8rUO76xQAEFBkE1B8TahPRJXZpA0yt9brxalzEaXGQ0isAPxwO9iL
-         Ema06xXbSyN/MsFCpcnyGBHNYrNTGO1SboHfjBYbaONgXoSEEwOY/SgM9HYLrh4HY2E1
-         8jsIMI1TPmSvy9HKsJ943JNmid7GT/yJzmPFS2P1+eHAumMNv/8wkuFlnpm29MFVDWwg
-         0BoGzPjEhxhaXjom8490dHZSWwUed5trgNt+x3AnoG2BhoTl1sLhBBNYTP8LqSQ3AnDT
-         j9kkK8Maa1QKY4Yq7H6nYdZNSxzNHWzlff3jrlK4Td/TXQ9hWuCg9t/RJjw95nZD4EAY
-         8EQQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=oDXx5xJz1b+wcw5C/YeihMWCNkvCnSl6ZWGflH/Camk=;
-        b=lQZXxA+jqwR7xEiQHYJRMfzEQ/ojChSDVyawBAehdg5d9Q59QjHSXgi+q1b7IbqfJP
-         KqYRm8OYR0YKjnRYzungTEF2KYT3WkFHDzQIR7PKQnM0rtVvVU3NxeQ2oZZ+XUOVEeL1
-         fHe7M6RRUzdxt9LP5QXuYJUqDbAXDj0GDSnCZgEnd9VBX79S4+i1QOES677CE/4Z1jrq
-         8UooHyKPn5iFsMHvy/6yfG/8vtfErQuxWjOv5HrCA9uzFuUoNjdK8QyBtgxEe5rG0rb3
-         wmcAiXJ+ghgMvzq32b1IWWiNyMXe1LppByPMcHKwKoMWbTqBMLPWXaX1xz87M9Y5+4ja
-         rVJw==
-X-Gm-Message-State: AOAM532CcmXWmWDshbjSpcicXTUWwjuRxDjCtO16Ra4CI1U2zlv0MCAQ
-        0NKj4ksNtH6NBVBzzvfZFO7SY3T95j0kTnv0gk7htA==
-X-Google-Smtp-Source: ABdhPJzvzcF7MszhID1v28AVOZi5aWdqtP6b/SmecyE0nDYFxNGBZOHaye1qL2jOOIvYdQSFoNObyXBOJTJ89w+wQyE=
-X-Received: by 2002:a4a:3015:: with SMTP id q21mr2815185oof.55.1597101437923;
- Mon, 10 Aug 2020 16:17:17 -0700 (PDT)
+        id S1727844AbgHJXum (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 10 Aug 2020 19:50:42 -0400
+Received: from mga14.intel.com ([192.55.52.115]:27710 "EHLO mga14.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726913AbgHJXum (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 10 Aug 2020 19:50:42 -0400
+IronPort-SDR: tx1ywy8nT1Yrkz20UFB5LSgjyMApr5mMMPVq6emU3v+YhnkIl48gN3GW58nq7XKz8+lGZevhtc
+ VQPUFs1nry7A==
+X-IronPort-AV: E=McAfee;i="6000,8403,9709"; a="152858418"
+X-IronPort-AV: E=Sophos;i="5.75,458,1589266800"; 
+   d="scan'208";a="152858418"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Aug 2020 16:50:42 -0700
+IronPort-SDR: Y2pPC4qJbAiiOxD1cy+sIfpsDauasB7V3WzgaLYzFTFPpIha+K/PrlSrro13YxMlQebkBPWxZZ
+ sgQv6Ih2ePhw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.75,458,1589266800"; 
+   d="scan'208";a="494968925"
+Received: from ziranzha-mobl.ccr.corp.intel.com (HELO [10.255.28.102]) ([10.255.28.102])
+  by fmsmga005.fm.intel.com with ESMTP; 10 Aug 2020 16:50:36 -0700
+Subject: Re: [PATCH v3 2/2] x86/kvm: Expose new features for supported cpuid
+To:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, x86@kernel.org
+Cc:     sean.j.christopherson@intel.com, gregkh@linuxfoundation.org,
+        tglx@linutronix.de, tony.luck@intel.com, dave.hansen@intel.com,
+        kyung.min.park@intel.com, ricardo.neri-calderon@linux.intel.com,
+        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
+        joro@8bytes.org, mingo@redhat.com, bp@alien8.de, hpa@zytor.com,
+        jpoimboe@redhat.com, ak@linux.intel.com, ravi.v.shankar@intel.com
+References: <1596959242-2372-1-git-send-email-cathy.zhang@intel.com>
+ <1596959242-2372-3-git-send-email-cathy.zhang@intel.com>
+ <d7e9fb9a-e392-73b1-5fc8-3876cb30665c@redhat.com>
+From:   "Zhang, Cathy" <cathy.zhang@intel.com>
+Message-ID: <27965021-2ec7-aa30-5526-5a6b293b2066@intel.com>
+Date:   Tue, 11 Aug 2020 07:50:35 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-References: <20200807084841.7112-1-chenyi.qiang@intel.com> <20200807084841.7112-2-chenyi.qiang@intel.com>
-In-Reply-To: <20200807084841.7112-2-chenyi.qiang@intel.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Mon, 10 Aug 2020 16:17:06 -0700
-Message-ID: <CALMp9eSse8jkSC2B=7s7jbtQ1gnOgZokuhDgeu3-E93pi+g+Xg@mail.gmail.com>
-Subject: Re: [RFC 1/7] KVM: VMX: Introduce PKS VMCS fields
-To:     Chenyi Qiang <chenyi.qiang@intel.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Xiaoyao Li <xiaoyao.li@intel.com>,
-        kvm list <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <d7e9fb9a-e392-73b1-5fc8-3876cb30665c@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Aug 7, 2020 at 1:46 AM Chenyi Qiang <chenyi.qiang@intel.com> wrote:
+On 8/10/2020 1:14 AM, Paolo Bonzini wrote:
+> On 09/08/20 09:47, Cathy Zhang wrote:
+>> Expose the SERIALIZE and TSX Suspend Load Address Tracking
+>> features in KVM CPUID, so when running on processors which
+>> support them, KVM could pass this information to guests and
+>> they can make use of these features accordingly.
+>>
+>> SERIALIZE is a faster serializing instruction which does not modify
+>> registers, arithmetic flags or memory, will not cause VM exit. It's
+>> availability is indicated by CPUID.(EAX=7,ECX=0):ECX[bit 14].
+>>
+>> TSX suspend load tracking instruction aims to give a way to choose
+>> which memory accesses do not need to be tracked in the TSX read set.
+>> It's availability is indicated as CPUID.(EAX=7,ECX=0):EDX[bit 16].
+>>
+>> Those instructions are currently documented in the the latest "extensions"
+>> manual (ISE). It will appear in the "main" manual (SDM) in the future.
+>>
+>> Signed-off-by: Cathy Zhang <cathy.zhang@intel.com>
+>> Reviewed-by: Tony Luck <tony.luck@intel.com>
+>> ---
+>> Changes since v2:
+>>   * Merge two patches into a single one. (Luck, Tony)
+>>   * Add overview introduction for features. (Sean Christopherson)
+>>   * Refactor commit message to explain why expose feature bits. (Luck, Tony)
+>> ---
+>>   arch/x86/kvm/cpuid.c | 3 ++-
+>>   1 file changed, 2 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+>> index 8a294f9..dcf48cc 100644
+>> --- a/arch/x86/kvm/cpuid.c
+>> +++ b/arch/x86/kvm/cpuid.c
+>> @@ -341,7 +341,8 @@ void kvm_set_cpu_caps(void)
+>>   	kvm_cpu_cap_mask(CPUID_7_EDX,
+>>   		F(AVX512_4VNNIW) | F(AVX512_4FMAPS) | F(SPEC_CTRL) |
+>>   		F(SPEC_CTRL_SSBD) | F(ARCH_CAPABILITIES) | F(INTEL_STIBP) |
+>> -		F(MD_CLEAR) | F(AVX512_VP2INTERSECT) | F(FSRM)
+>> +		F(MD_CLEAR) | F(AVX512_VP2INTERSECT) | F(FSRM) |
+>> +		F(SERIALIZE) | F(TSXLDTRK)
+>>   	);
+>>   
+>>   	/* TSC_ADJUST and ARCH_CAPABILITIES are emulated in software. */
+>>
+> TSXLDTRK is not going to be in 5.9 as far as I can see, so I split back
+> again the patches (this is why I prefer them to be split, sorry Tony :))
+> and committed the SERIALIZE part.
 >
-> PKS(Protection Keys for Supervisor Pages) is a feature that extends the
-> Protection Key architecture to support thread-specific permission
-> restrictions on supervisor pages.
->
-> A new PKS MSR(PKRS) is defined in kernel to support PKS, which holds a
-> set of permissions associated with each protection domian.
->
-> Two VMCS fields {HOST,GUEST}_IA32_PKRS are introduced in
-> {host,guest}-state area to store the value of PKRS.
->
-> Every VM exit saves PKRS into guest-state area.
-> If VM_EXIT_LOAD_IA32_PKRS = 1, VM exit loads PKRS from the host-state
-> area.
-> If VM_ENTRY_LOAD_IA32_PKRS = 1, VM entry loads PKRS from the guest-state
-> area.
->
-> Signed-off-by: Chenyi Qiang <chenyi.qiang@intel.com>
-Reviewed-by: Jim Mattson <jmattson@google.com>
+> Paolo
+
+Hello Paolo,
+
+As you suggest, I will split the kvm patch into two parts, SERIALIZE and 
+TSXLDTRK, and this series will include three patches then, 2 kvm patches 
+and 1 kernel patch. SERIALIZE could get merged into 5.9, but TSXLDTRK 
+should wait for the next release. I just want to double confirm with 
+you, please help correct me if I'm wrong.
+
