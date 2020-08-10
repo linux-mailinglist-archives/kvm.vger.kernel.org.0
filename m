@@ -2,314 +2,360 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0A84C240A46
-	for <lists+kvm@lfdr.de>; Mon, 10 Aug 2020 17:40:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A31D9240ABD
+	for <lists+kvm@lfdr.de>; Mon, 10 Aug 2020 17:45:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729253AbgHJPkJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 10 Aug 2020 11:40:09 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:30032 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1729242AbgHJPkE (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 10 Aug 2020 11:40:04 -0400
-Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 07AFXJHL135405;
-        Mon, 10 Aug 2020 11:40:03 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=9iaasE7bqA/+lfmM9b3d8bnypz13NWUi2CkTr/h9VCc=;
- b=Vvfm8FYw4D1sn3Z4/k5J2B8HPr23aIElulyni9YqHcdIedaPDsrcn3MPqHYyPejDkUta
- PcvYtJReTt0m+ifMqZ/XV6BQzi2MvWfFi+vII37bg0xRcIFz+Rz8cvc5c7voZxtF34n/
- 0zKwi3FJCQ2NxQk+r9kcTAZzCXCU6ITKd5o/KJjd2dwONSXu2FlTTusUFV5IJ5CUJZQV
- qWWcrhgaQeQzBJBvKVPUyRHP2ZvorguaeIhhYShH7S8vNCObEAtuD7VkExdBduaEDZNp
- kpdkagKI1D3tA1Lp41Uzc2HURDi/aiZ2jeLvRw/Cwfib6WbFbMt9imzLXtzNsv8mtQ/Z jg== 
+        id S1727003AbgHJPpy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 10 Aug 2020 11:45:54 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:34866 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726406AbgHJPpy (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 10 Aug 2020 11:45:54 -0400
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 07AFVikc065629;
+        Mon, 10 Aug 2020 11:45:52 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : in-reply-to : references : mime-version :
+ content-transfer-encoding; s=pp1;
+ bh=D+ASZcqKtcFDX3Oet0jclC1hytDntn4V5JUbCOXSux8=;
+ b=HDSBOPMMAsd4mT/eOYpkj/nTHbx+dRa+MfIhMM/ifse6KeQQdn8ppopmjdVMcZ1qQ3o6
+ MTZoLKwIGWyKBCVaq0upZ2SrVYoiU3nTcmlUEF1p3BQCwzAITJ1pEebOOW4PGOYF8WF6
+ r0rPsyitU9yctrXGrul8pZ0hBR3e5yDXAGln/E4YIfPuotqLdDI2jBtgczw1EJ0T2qpw
+ 8zKKRn0OUiHH7rwS6v/LCZ6wbCjIMBUlhl0H8o+MDsZAiN4Fp9fnv2iigzDrohmKVykZ
+ 4ZN7mtMzx0Y2pc+5kjV+n8ZlQg9GdtkNy9Z6G+wm2njiu7o4wERaVnkE2dH1vBpOmYQk iw== 
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 32sraqy6fp-1
+        by mx0b-001b2d01.pphosted.com with ESMTP id 32src0ytew-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 10 Aug 2020 11:40:02 -0400
-Received: from m0187473.ppops.net (m0187473.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 07AFXTYh135890;
-        Mon, 10 Aug 2020 11:40:02 -0400
-Received: from ppma01dal.us.ibm.com (83.d6.3fa9.ip4.static.sl-reverse.com [169.63.214.131])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 32sraqy6f7-1
+        Mon, 10 Aug 2020 11:45:52 -0400
+Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 07AFcnFB088490;
+        Mon, 10 Aug 2020 11:45:52 -0400
+Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 32src0yte0-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 10 Aug 2020 11:40:02 -0400
-Received: from pps.filterd (ppma01dal.us.ibm.com [127.0.0.1])
-        by ppma01dal.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 07AFQASM017327;
-        Mon, 10 Aug 2020 15:40:01 GMT
-Received: from b03cxnp08026.gho.boulder.ibm.com (b03cxnp08026.gho.boulder.ibm.com [9.17.130.18])
-        by ppma01dal.us.ibm.com with ESMTP id 32skp8y1st-1
+        Mon, 10 Aug 2020 11:45:52 -0400
+Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
+        by ppma03fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 07AFdqkg009418;
+        Mon, 10 Aug 2020 15:45:50 GMT
+Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
+        by ppma03fra.de.ibm.com with ESMTP id 32skp81fu0-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 10 Aug 2020 15:40:01 +0000
-Received: from b03ledav002.gho.boulder.ibm.com (b03ledav002.gho.boulder.ibm.com [9.17.130.233])
-        by b03cxnp08026.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 07AFdrDA983642
+        Mon, 10 Aug 2020 15:45:49 +0000
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
+        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 07AFjl7g30278132
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 10 Aug 2020 15:39:53 GMT
-Received: from b03ledav002.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id A0B5D136061;
-        Mon, 10 Aug 2020 15:39:57 +0000 (GMT)
-Received: from b03ledav002.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id A61E713604F;
-        Mon, 10 Aug 2020 15:39:56 +0000 (GMT)
-Received: from cpe-172-100-175-116.stny.res.rr.com (unknown [9.85.191.76])
-        by b03ledav002.gho.boulder.ibm.com (Postfix) with ESMTP;
-        Mon, 10 Aug 2020 15:39:56 +0000 (GMT)
-Subject: Re: [PATCH v9 00/15] s390/vfio-ap: dynamic configuration support
-To:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Cc:     freude@linux.ibm.com, borntraeger@de.ibm.com, cohuck@redhat.com,
-        mjrosato@linux.ibm.com, pasic@linux.ibm.com,
-        alex.williamson@redhat.com, kwankhede@nvidia.com,
-        fiuczy@linux.ibm.com
-References: <20200720150344.24488-1-akrowiak@linux.ibm.com>
-From:   Tony Krowiak <akrowiak@linux.ibm.com>
-Message-ID: <d99e13e1-d2e9-6ceb-c2ba-128971b0703d@linux.ibm.com>
-Date:   Mon, 10 Aug 2020 11:39:56 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+        Mon, 10 Aug 2020 15:45:47 GMT
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 1CD3EA4054;
+        Mon, 10 Aug 2020 15:45:47 +0000 (GMT)
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 4E41AA405F;
+        Mon, 10 Aug 2020 15:45:46 +0000 (GMT)
+Received: from linux01.pok.stglabs.ibm.com (unknown [9.114.17.81])
+        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Mon, 10 Aug 2020 15:45:46 +0000 (GMT)
+From:   Janosch Frank <frankja@linux.ibm.com>
+To:     kvm@vger.kernel.org
+Cc:     thuth@redhat.com, linux-s390@vger.kernel.org, david@redhat.com,
+        borntraeger@de.ibm.com, cohuck@redhat.com, imbrenda@linux.ibm.com
+Subject: [kvm-unit-tests PATCH v3] s390x: Ultravisor guest API test
+Date:   Mon, 10 Aug 2020 11:45:41 -0400
+Message-Id: <20200810154541.32974-1-frankja@linux.ibm.com>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20200810173205.2daaaca1.cohuck@redhat.com>
+References: <20200810173205.2daaaca1.cohuck@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200720150344.24488-1-akrowiak@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
- definitions=2020-08-10_12:2020-08-06,2020-08-10 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 phishscore=0
- suspectscore=3 priorityscore=1501 impostorscore=0 bulkscore=0 adultscore=0
- malwarescore=0 spamscore=0 mlxscore=0 lowpriorityscore=0 mlxlogscore=999
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
- definitions=main-2008100115
+ definitions=2020-08-10_11:2020-08-06,2020-08-10 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ mlxlogscore=999 malwarescore=0 priorityscore=1501 impostorscore=0
+ spamscore=0 phishscore=0 mlxscore=0 bulkscore=0 adultscore=0
+ suspectscore=3 clxscore=1015 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2006250000 definitions=main-2008100113
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-PING, PING
+Test the error conditions of guest 2 Ultravisor calls, namely:
+     * Query Ultravisor information
+     * Set shared access
+     * Remove shared access
 
-On 7/20/20 11:03 AM, Tony Krowiak wrote:
-> The current design for AP pass-through does not support making dynamic
-> changes to the AP matrix of a running guest resulting in a few
-> deficiencies this patch series is intended to mitigate:
->
-> 1. Adapters, domains and control domains can not be added to or removed
->     from a running guest. In order to modify a guest's AP configuration,
->     the guest must be terminated; only then can AP resources be assigned
->     to or unassigned from the guest's matrix mdev. The new AP
->     configuration becomes available to the guest when it is subsequently
->     restarted.
->
-> 2. The AP bus's /sys/bus/ap/apmask and /sys/bus/ap/aqmask interfaces can
->     be modified by a root user without any restrictions. A change to
->     either mask can result in AP queue devices being unbound from the
->     vfio_ap device driver and bound to a zcrypt device driver even if a
->     guest is using the queues, thus giving the host access to the guest's
->     private crypto data and vice versa.
->
-> 3. The APQNs derived from the Cartesian product of the APIDs of the
->     adapters and APQIs of the domains assigned to a matrix mdev must
->     reference an AP queue device bound to the vfio_ap device driver. The
->     AP architecture allows assignment of AP resources that are not
->     available to the system, so this artificial restriction is not
->     compliant with the architecture.
->
-> 4. The AP configuration profile can be dynamically changed for the linux
->     host after a KVM guest is started. For example, a new domain can be
->     dynamically added to the configuration profile via the SE or an HMC
->     connected to a DPM enabled lpar. Likewise, AP adapters can be
->     dynamically configured (online state) and deconfigured (standby state)
->     using the SE, an SCLP command or an HMC connected to a DPM enabled
->     lpar. This can result in inadvertent sharing of AP queues between the
->     guest and host.
->
-> 5. A root user can manually unbind an AP queue device representing a
->     queue in use by a KVM guest via the vfio_ap device driver's sysfs
->     unbind attribute. In this case, the guest will be using a queue that
->     is not bound to the driver which violates the device model.
->
-> This patch series introduces the following changes to the current design
-> to alleviate the shortcomings described above as well as to implement
-> more of the AP architecture:
->
-> 1. A root user will be prevented from making changes to the AP bus's
->     /sys/bus/ap/apmask or /sys/bus/ap/aqmask if the ownership of an APQN
->     changes from the vfio_ap device driver to a zcrypt driver when the
->     APQN is assigned to a matrix mdev.
->
-> 2. Allow a root user to hot plug/unplug AP adapters, domains and control
->     domains using the matrix mdev's assign/unassign attributes.
->
-> 4. Allow assignment of an AP adapter or domain to a matrix mdev even if
->     it results in assignment of an APQN that does not reference an AP
->     queue device bound to the vfio_ap device driver, as long as the APQN
->     is not reserved for use by the default zcrypt drivers (also known as
->     over-provisioning of AP resources). Allowing over-provisioning of AP
->     resources better models the architecture which does not preclude
->     assigning AP resources that are not yet available in the system. Such
->     APQNs, however, will not be assigned to the guest using the matrix
->     mdev; only APQNs referencing AP queue devices bound to the vfio_ap
->     device driver will actually get assigned to the guest.
->
-> 5. Handle dynamic changes to the AP device model.
->
-> 1. Rationale for changes to AP bus's apmask/aqmask interfaces:
-> ----------------------------------------------------------
-> Due to the extremely sensitive nature of cryptographic data, it is
-> imperative that great care be taken to ensure that such data is secured.
-> Allowing a root user, either inadvertently or maliciously, to configure
-> these masks such that a queue is shared between the host and a guest is
-> not only avoidable, it is advisable. It was suggested that this scenario
-> is better handled in user space with management software, but that does
-> not preclude a malicious administrator from using the sysfs interfaces
-> to gain access to a guest's crypto data. It was also suggested that this
-> scenario could be avoided by taking access to the adapter away from the
-> guest and zeroing out the queues prior to the vfio_ap driver releasing the
-> device; however, stealing an adapter in use from a guest as a by-product
-> of an operation is bad and will likely cause problems for the guest
-> unnecessarily. It was decided that the most effective solution with the
-> least number of negative side effects is to prevent the situation at the
-> source.
->
-> 2. Rationale for hot plug/unplug using matrix mdev sysfs interfaces:
-> ----------------------------------------------------------------
-> Allowing a user to hot plug/unplug AP resources using the matrix mdev
-> sysfs interfaces circumvents the need to terminate the guest in order to
-> modify its AP configuration. Allowing dynamic configuration makes
-> reconfiguring a guest's AP matrix much less disruptive.
->
-> 3. Rationale for allowing over-provisioning of AP resources:
-> -----------------------------------------------------------
-> Allowing assignment of AP resources to a matrix mdev and ultimately to a
-> guest better models the AP architecture. The architecture does not
-> preclude assignment of unavailable AP resources. If a queue subsequently
-> becomes available while a guest using the matrix mdev to which its APQN
-> is assigned, the guest will be given access to it. If an APQN
-> is dynamically unassigned from the underlying host system, it will
-> automatically become unavailable to the guest.
->
-> Change log v8-v9:
-> ----------------
-> * Fixed errors flagged by the kernel test robot
->
-> * Fixed issue with guest losing queues when a new queue is probed due to
->    manual bind operation.
->
-> Change log v7-v8:
-> ----------------
-> * Now logging a message when an attempt to reserve APQNs for the zcrypt
->    drivers will result in taking a queue away from a KVM guest to provide
->    the sysadmin a way to ascertain why the sysfs operation failed.
->
-> * Created locked and unlocked versions of the ap_parse_mask_str() function.
->
-> * Now using new interface provided by an AP bus patch -
->    s390/ap: introduce new ap function ap_get_qdev() - to retrieve
->    struct ap_queue representing an AP queue device. This patch is not a
->    part of this series but is a prerequisite for this series.
->
-> Change log v6-v7:
-> ----------------
-> * Added callbacks to AP bus:
->    - on_config_changed: Notifies implementing drivers that
->      the AP configuration has changed since last AP device scan.
->    - on_scan_complete: Notifies implementing drivers that the device scan
->      has completed.
->    - implemented on_config_changed and on_scan_complete callbacks for
->      vfio_ap device driver.
->    - updated vfio_ap device driver's probe and remove callbacks to handle
->      dynamic changes to the AP device model.
-> * Added code to filter APQNs when assigning AP resources to a KVM guest's
->    CRYCB
->
-> Change log v5-v6:
-> ----------------
-> * Fixed a bug in ap_bus.c introduced with patch 2/7 of the v5
->    series. Harald Freudenberer pointed out that the mutex lock
->    for ap_perms_mutex in the apmask_store and aqmask_store functions
->    was not being freed.
->
-> * Removed patch 6/7 which added logging to the vfio_ap driver
->    to expedite acceptance of this series. The logging will be introduced
->    with a separate patch series to allow more time to explore options
->    such as DBF logging vs. tracepoints.
->
-> * Added 3 patches related to ensuring that APQNs that do not reference
->    AP queue devices bound to the vfio_ap device driver are not assigned
->    to the guest CRYCB:
->
->    Patch 4: Filter CRYCB bits for unavailable queue devices
->    Patch 5: sysfs attribute to display the guest CRYCB
->    Patch 6: update guest CRYCB in vfio_ap probe and remove callbacks
->
-> * Added a patch (Patch 9) to version the vfio_ap module.
->
-> * Reshuffled patches to allow the in_use callback implementation to
->    invoke the vfio_ap_mdev_verify_no_sharing() function introduced in
->    patch 2.
->
-> Change log v4-v5:
-> ----------------
-> * Added a patch to provide kernel s390dbf debug logs for VFIO AP
->
-> Change log v3->v4:
-> -----------------
-> * Restored patches preventing root user from changing ownership of
->    APQNs from zcrypt drivers to the vfio_ap driver if the APQN is
->    assigned to an mdev.
->
-> * No longer enforcing requirement restricting guest access to
->    queues represented by a queue device bound to the vfio_ap
->    device driver.
->
-> * Removed shadow CRYCB and now directly updating the guest CRYCB
->    from the matrix mdev's matrix.
->
-> * Rebased the patch series on top of 'vfio: ap: AP Queue Interrupt
->    Control' patches.
->
-> * Disabled bind/unbind sysfs interfaces for vfio_ap driver
->
-> Change log v2->v3:
-> -----------------
-> * Allow guest access to an AP queue only if the queue is bound to
->    the vfio_ap device driver.
->
-> * Removed the patch to test CRYCB masks before taking the vCPUs
->    out of SIE. Now checking the shadow CRYCB in the vfio_ap driver.
->
-> Change log v1->v2:
-> -----------------
-> * Removed patches preventing root user from unbinding AP queues from
->    the vfio_ap device driver
-> * Introduced a shadow CRYCB in the vfio_ap driver to manage dynamic
->    changes to the AP guest configuration due to root user interventions
->    or hardware anomalies.
->
-> Harald Freudenberger (1):
->    s390/zcrypt: Notify driver on config changed and scan complete
->      callbacks
->
-> Tony Krowiak (14):
->    s390/vfio-ap: add version vfio_ap module
->    s390/vfio-ap: use new AP bus interface to search for queue devices
->    s390/vfio-ap: manage link between queue struct and matrix mdev
->    s390/zcrypt: driver callback to indicate resource in use
->    s390/vfio-ap: implement in-use callback for vfio_ap driver
->    s390/vfio-ap: introduce shadow APCB
->    s390/vfio-ap: sysfs attribute to display the guest's matrix
->    s390/vfio-ap: filter matrix for unavailable queue devices
->    s390/vfio-ap: allow assignment of unavailable AP queues to mdev device
->    s390/vfio-ap: allow configuration of matrix mdev in use by a KVM guest
->    s390/vfio-ap: allow hot plug/unplug of AP resources using mdev device
->    s390/vfio-ap: handle host AP config change notification
->    s390/vfio-ap: handle AP bus scan completed notification
->    s390/vfio-ap: handle probe/remove not due to host AP config changes
->
->   drivers/s390/crypto/ap_bus.c          |  323 +++++--
->   drivers/s390/crypto/ap_bus.h          |   16 +
->   drivers/s390/crypto/vfio_ap_drv.c     |   36 +-
->   drivers/s390/crypto/vfio_ap_ops.c     | 1216 ++++++++++++++++++++-----
->   drivers/s390/crypto/vfio_ap_private.h |   23 +-
->   5 files changed, 1294 insertions(+), 320 deletions(-)
->
+Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+Acked-by: Thomas Huth <thuth@redhat.com>
+Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+---
+ lib/s390x/asm/uv.h  |  74 ++++++++++++++++++++++
+ s390x/Makefile      |   1 +
+ s390x/unittests.cfg |   3 +
+ s390x/uv-guest.c    | 150 ++++++++++++++++++++++++++++++++++++++++++++
+ 4 files changed, 228 insertions(+)
+ create mode 100644 lib/s390x/asm/uv.h
+ create mode 100644 s390x/uv-guest.c
+
+diff --git a/lib/s390x/asm/uv.h b/lib/s390x/asm/uv.h
+new file mode 100644
+index 0000000..4c2fc48
+--- /dev/null
++++ b/lib/s390x/asm/uv.h
+@@ -0,0 +1,74 @@
++/*
++ * s390x Ultravisor related definitions
++ *
++ * Copyright (c) 2020 IBM Corp
++ *
++ * Authors:
++ *  Janosch Frank <frankja@linux.ibm.com>
++ *
++ * This code is free software; you can redistribute it and/or modify it
++ * under the terms of the GNU General Public License version 2.
++ */
++#ifndef UV_H
++#define UV_H
++
++#define UVC_RC_EXECUTED		0x0001
++#define UVC_RC_INV_CMD		0x0002
++#define UVC_RC_INV_STATE	0x0003
++#define UVC_RC_INV_LEN		0x0005
++#define UVC_RC_NO_RESUME	0x0007
++
++#define UVC_CMD_QUI			0x0001
++#define UVC_CMD_SET_SHARED_ACCESS	0x1000
++#define UVC_CMD_REMOVE_SHARED_ACCESS	0x1001
++
++/* Bits in installed uv calls */
++enum uv_cmds_inst {
++	BIT_UVC_CMD_QUI = 0,
++	BIT_UVC_CMD_SET_SHARED_ACCESS = 8,
++	BIT_UVC_CMD_REMOVE_SHARED_ACCESS = 9,
++};
++
++struct uv_cb_header {
++	u16 len;
++	u16 cmd;	/* Command Code */
++	u16 rc;		/* Response Code */
++	u16 rrc;	/* Return Reason Code */
++} __attribute__((packed))  __attribute__((aligned(8)));
++
++struct uv_cb_qui {
++	struct uv_cb_header header;
++	u64 reserved08;
++	u64 inst_calls_list[4];
++	u64 reserved30[15];
++} __attribute__((packed))  __attribute__((aligned(8)));
++
++struct uv_cb_share {
++	struct uv_cb_header header;
++	u64 reserved08[3];
++	u64 paddr;
++	u64 reserved28;
++} __attribute__((packed))  __attribute__((aligned(8)));
++
++static inline int uv_call(unsigned long r1, unsigned long r2)
++{
++	int cc;
++
++	/*
++	 * The brc instruction will take care of the cc 2/3 case where
++	 * we need to continue the execution because we were
++	 * interrupted. The inline assembly will only return on
++	 * success/error i.e. cc 0/1.
++	*/
++	asm volatile(
++		"0:	.insn rrf,0xB9A40000,%[r1],%[r2],0,0\n"
++		"		brc	3,0b\n"
++		"		ipm	%[cc]\n"
++		"		srl	%[cc],28\n"
++		: [cc] "=d" (cc)
++		: [r1] "a" (r1), [r2] "a" (r2)
++		: "memory", "cc");
++	return cc;
++}
++
++#endif
+diff --git a/s390x/Makefile b/s390x/Makefile
+index 0f54bf4..c2213ad 100644
+--- a/s390x/Makefile
++++ b/s390x/Makefile
+@@ -18,6 +18,7 @@ tests += $(TEST_DIR)/skrf.elf
+ tests += $(TEST_DIR)/smp.elf
+ tests += $(TEST_DIR)/sclp.elf
+ tests += $(TEST_DIR)/css.elf
++tests += $(TEST_DIR)/uv-guest.elf
+ tests_binary = $(patsubst %.elf,%.bin,$(tests))
+ 
+ all: directories test_cases test_cases_binary
+diff --git a/s390x/unittests.cfg b/s390x/unittests.cfg
+index b35269b..6d50c63 100644
+--- a/s390x/unittests.cfg
++++ b/s390x/unittests.cfg
+@@ -92,3 +92,6 @@ extra_params = -device virtio-net-ccw
+ [skrf]
+ file = skrf.elf
+ smp = 2
++
++[uv-guest]
++file = uv-guest.elf
+diff --git a/s390x/uv-guest.c b/s390x/uv-guest.c
+new file mode 100644
+index 0000000..d47333e
+--- /dev/null
++++ b/s390x/uv-guest.c
+@@ -0,0 +1,150 @@
++/*
++ * Guest Ultravisor Call tests
++ *
++ * Copyright (c) 2020 IBM Corp
++ *
++ * Authors:
++ *  Janosch Frank <frankja@linux.ibm.com>
++ *
++ * This code is free software; you can redistribute it and/or modify it
++ * under the terms of the GNU General Public License version 2.
++ */
++
++#include <libcflat.h>
++#include <alloc_page.h>
++#include <asm/page.h>
++#include <asm/asm-offsets.h>
++#include <asm/interrupt.h>
++#include <asm/facility.h>
++#include <asm/uv.h>
++
++static unsigned long page;
++
++static void test_priv(void)
++{
++	struct uv_cb_header uvcb = {};
++
++	report_prefix_push("privileged");
++
++	report_prefix_push("query");
++	uvcb.cmd = UVC_CMD_QUI;
++	uvcb.len = sizeof(struct uv_cb_qui);
++	expect_pgm_int();
++	enter_pstate();
++	uv_call(0, (u64)&uvcb);
++	check_pgm_int_code(PGM_INT_CODE_PRIVILEGED_OPERATION);
++	report_prefix_pop();
++
++	report_prefix_push("share");
++	uvcb.cmd = UVC_CMD_SET_SHARED_ACCESS;
++	uvcb.len = sizeof(struct uv_cb_share);
++	expect_pgm_int();
++	enter_pstate();
++	uv_call(0, (u64)&uvcb);
++	check_pgm_int_code(PGM_INT_CODE_PRIVILEGED_OPERATION);
++	report_prefix_pop();
++
++	report_prefix_push("unshare");
++	uvcb.cmd = UVC_CMD_REMOVE_SHARED_ACCESS;
++	uvcb.len = sizeof(struct uv_cb_share);
++	expect_pgm_int();
++	enter_pstate();
++	uv_call(0, (u64)&uvcb);
++	check_pgm_int_code(PGM_INT_CODE_PRIVILEGED_OPERATION);
++	report_prefix_pop();
++
++	report_prefix_pop();
++}
++
++static void test_query(void)
++{
++	struct uv_cb_qui uvcb = {
++		.header.cmd = UVC_CMD_QUI,
++		.header.len = sizeof(uvcb) - 8,
++	};
++	int cc;
++
++	report_prefix_push("query");
++	cc = uv_call(0, (u64)&uvcb);
++	report(cc == 1 && uvcb.header.rc == UVC_RC_INV_LEN, "length");
++
++	uvcb.header.len = sizeof(uvcb);
++	cc = uv_call(0, (u64)&uvcb);
++	report(cc == 0 && uvcb.header.rc == UVC_RC_EXECUTED, "successful query");
++
++	/*
++	 * These bits have been introduced with the very first
++	 * Ultravisor version and are expected to always be available
++	 * because they are basic building blocks.
++	 */
++	report(uvcb.inst_calls_list[0] & (1UL << (63 - BIT_UVC_CMD_QUI)),
++	       "query indicated");
++	report(uvcb.inst_calls_list[0] & (1UL << (63 - BIT_UVC_CMD_SET_SHARED_ACCESS)),
++	       "share indicated");
++	report(uvcb.inst_calls_list[0] & (1UL << (63 - BIT_UVC_CMD_REMOVE_SHARED_ACCESS)),
++	       "unshare indicated");
++	report_prefix_pop();
++}
++
++static void test_sharing(void)
++{
++	struct uv_cb_share uvcb = {
++		.header.cmd = UVC_CMD_SET_SHARED_ACCESS,
++		.header.len = sizeof(uvcb) - 8,
++		.paddr = page,
++	};
++	int cc;
++
++	report_prefix_push("share");
++	cc = uv_call(0, (u64)&uvcb);
++	report(cc == 1 && uvcb.header.rc == UVC_RC_INV_LEN, "length");
++	uvcb.header.len = sizeof(uvcb);
++	cc = uv_call(0, (u64)&uvcb);
++	report(cc == 0 && uvcb.header.rc == UVC_RC_EXECUTED, "share");
++	report_prefix_pop();
++
++	report_prefix_push("unshare");
++	uvcb.header.cmd = UVC_CMD_REMOVE_SHARED_ACCESS;
++	uvcb.header.len -= 8;
++	cc = uv_call(0, (u64)&uvcb);
++	report(cc == 1 && uvcb.header.rc == UVC_RC_INV_LEN, "length");
++	uvcb.header.len = sizeof(uvcb);
++	cc = uv_call(0, (u64)&uvcb);
++	report(cc == 0 && uvcb.header.rc == UVC_RC_EXECUTED, "unshare");
++	report_prefix_pop();
++
++	report_prefix_pop();
++}
++
++static void test_invalid(void)
++{
++	struct uv_cb_header uvcb = {
++		.len = 16,
++		.cmd = 0x4242,
++	};
++	int cc;
++
++	cc = uv_call(0, (u64)&uvcb);
++	report(cc == 1 && uvcb.rc == UVC_RC_INV_CMD, "invalid command");
++}
++
++int main(void)
++{
++	bool has_uvc = test_facility(158);
++
++	report_prefix_push("uvc");
++	if (!has_uvc) {
++		report_skip("Ultravisor call facility is not available");
++		goto done;
++	}
++
++	page = (unsigned long)alloc_page();
++	test_priv();
++	test_invalid();
++	test_query();
++	test_sharing();
++	free_page((void *)page);
++done:
++	report_prefix_pop();
++	return report_summary();
++}
+-- 
+2.25.1
 
