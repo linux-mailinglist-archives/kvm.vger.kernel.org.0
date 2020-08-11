@@ -2,202 +2,314 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5E9E6241ED7
-	for <lists+kvm@lfdr.de>; Tue, 11 Aug 2020 19:02:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AC3FA241F7F
+	for <lists+kvm@lfdr.de>; Tue, 11 Aug 2020 20:00:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729148AbgHKRBv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 11 Aug 2020 13:01:51 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:57012 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1729181AbgHKRA5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 11 Aug 2020 13:00:57 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1597165255;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=8f8+cJ+l1fMhcVKWX+3dHLkMxd5ok8TAOd+bF0aoOT0=;
-        b=TTwsPrNZcMAsn2BRpCNjwwqhYhHgJdx/7T7gaqCx66+HiHNM3ifwX8qvY0Jmptp5xvgD4L
-        GFHVIk0WAIzAeumHwZ5AdtB+BwqS9MfNcvLbtAups/frlvLwtHebBe9zbrjoCS42ROM/du
-        k4BpmppfjbD4FY2ZUqABBFaFxcAxFJg=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-182-N10_X-MaNOazefTjWZZngg-1; Tue, 11 Aug 2020 13:00:47 -0400
-X-MC-Unique: N10_X-MaNOazefTjWZZngg-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 698498015FC;
-        Tue, 11 Aug 2020 17:00:42 +0000 (UTC)
-Received: from x1.home (ovpn-112-71.phx2.redhat.com [10.3.112.71])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id E35812DE99;
-        Tue, 11 Aug 2020 17:00:36 +0000 (UTC)
-Date:   Tue, 11 Aug 2020 11:00:36 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     "Tian, Kevin" <kevin.tian@intel.com>,
-        Jason Gunthorpe <jgg@nvidia.com>
-Cc:     "Jiang, Dave" <dave.jiang@intel.com>,
-        "vkoul@kernel.org" <vkoul@kernel.org>,
-        "Dey, Megha" <megha.dey@intel.com>,
-        "maz@kernel.org" <maz@kernel.org>,
-        "bhelgaas@google.com" <bhelgaas@google.com>,
-        "rafael@kernel.org" <rafael@kernel.org>,
-        "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        "hpa@zytor.com" <hpa@zytor.com>,
-        "Pan, Jacob jun" <jacob.jun.pan@intel.com>,
-        "Raj, Ashok" <ashok.raj@intel.com>,
-        "Liu, Yi L" <yi.l.liu@intel.com>, "Lu, Baolu" <baolu.lu@intel.com>,
-        "Kumar, Sanjay K" <sanjay.k.kumar@intel.com>,
-        "Luck, Tony" <tony.luck@intel.com>,
-        "Lin, Jing" <jing.lin@intel.com>,
-        "Williams, Dan J" <dan.j.williams@intel.com>,
-        "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
-        "eric.auger@redhat.com" <eric.auger@redhat.com>,
-        "parav@mellanox.com" <parav@mellanox.com>,
-        "Hansen, Dave" <dave.hansen@intel.com>,
-        "netanelg@mellanox.com" <netanelg@mellanox.com>,
-        "shahafs@mellanox.com" <shahafs@mellanox.com>,
-        "yan.y.zhao@linux.intel.com" <yan.y.zhao@linux.intel.com>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "Ortiz, Samuel" <samuel.ortiz@intel.com>,
-        "Hossain, Mona" <mona.hossain@intel.com>,
-        "dmaengine@vger.kernel.org" <dmaengine@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "x86@kernel.org" <x86@kernel.org>,
-        "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-Subject: Re: [PATCH RFC v2 00/18] Add VFIO mediated device support and
- DEV-MSI support for the idxd driver
-Message-ID: <20200811110036.7d337837@x1.home>
-In-Reply-To: <MWHPR11MB16452EBE866E330A7E000AFC8C440@MWHPR11MB1645.namprd11.prod.outlook.com>
-References: <159534667974.28840.2045034360240786644.stgit@djiang5-desk3.ch.intel.com>
-        <20200721164527.GD2021248@mellanox.com>
-        <CY4PR11MB1638103EC73DD9C025F144C98C780@CY4PR11MB1638.namprd11.prod.outlook.com>
-        <20200724001930.GS2021248@mellanox.com>
-        <20200805192258.5ee7a05b@x1.home>
-        <20200807121955.GS16789@nvidia.com>
-        <MWHPR11MB16452EBE866E330A7E000AFC8C440@MWHPR11MB1645.namprd11.prod.outlook.com>
-Organization: Red Hat
+        id S1726173AbgHKSAb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 11 Aug 2020 14:00:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55142 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725860AbgHKSA3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 11 Aug 2020 14:00:29 -0400
+Received: from mail-pg1-x544.google.com (mail-pg1-x544.google.com [IPv6:2607:f8b0:4864:20::544])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EC57FC06174A
+        for <kvm@vger.kernel.org>; Tue, 11 Aug 2020 10:51:13 -0700 (PDT)
+Received: by mail-pg1-x544.google.com with SMTP id p37so2897360pgl.3
+        for <kvm@vger.kernel.org>; Tue, 11 Aug 2020 10:51:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=h8yzjR5gEjQGMLEaibHXBXnKMny1lSuxkpUOmeC6vEU=;
+        b=t3lDSUE+2+HwSfXuLVJ38b9cnV6JNuDjePJceg/TqsDckbI1r8+98LhPYI616wk/aC
+         LmXfw/kUfXvJx3ECTfOtqsvwIVVuIFvwMH4XnvA5n+u82AQ6014Valf+WbvX7ak/0tZB
+         c4+GODifQkSNPgxwpZ+GrBQFPGVKt9I21EABDUnZ3BS0VRre2KmfigK2q25Qi5XmPFah
+         xLyfBwErS6w9oIpXUQwxG/nHcl2K2i7kHDOrKN37gwyDGv1yMg4cjzLPgTuWj1EOZ4Ce
+         nJVEcxCFWmih5ULPUnU9nHf1j1qN86ibaogKCGxYDRPjsdFs4JmHVe2pbergOajzYGxT
+         QeDw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=h8yzjR5gEjQGMLEaibHXBXnKMny1lSuxkpUOmeC6vEU=;
+        b=aI+dSdS6W6p7wa6li6bZHjwlceenhR/2a6voQYwrkZzPlo+mJoK2F8nIjjLTX6sWcK
+         ibSIv+X314bFkor5/vvUAB27svpl0CGKUZVgrTw4S4XxOE7J2MeYOFDC67H74lejUrgP
+         Ml+LyE8U7Zk3vSNhTTxjXrNE+ebSA+u8xfObGsFSOx5pqzfZlyjcJyWf5kCOQGE6F0+V
+         u/ACy1ddTWXJxUFF6e+WgJDsdD7WmKPEYuHEuPCCJ6cCQbJ9uhOZlzNzkjwIP0vqXFFN
+         dvih0FqtxWW57r37djOkoxhSoOVCo9CMvOpunPX3xSOCtBj238nBV+roqjz0MfzQmq4x
+         oo1g==
+X-Gm-Message-State: AOAM532tYx1SCrez008/zTQk3VD091R6bN3EvAPg0RbPwo9l1BSWfZdz
+        +3/YhozUPAGhlZbGm+T2YDs1rA==
+X-Google-Smtp-Source: ABdhPJyotbMCWph1W/tWysui9KuDDamAnq5tkcelaBCdPTwpkq8ezkcZuGs9kuFkZXhcXy0b9aM13w==
+X-Received: by 2002:a63:5012:: with SMTP id e18mr1718125pgb.169.1597168273223;
+        Tue, 11 Aug 2020 10:51:13 -0700 (PDT)
+Received: from xps15 (S0106002369de4dac.cg.shawcable.net. [68.147.8.254])
+        by smtp.gmail.com with ESMTPSA id d17sm3444493pjr.40.2020.08.11.10.51.11
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 11 Aug 2020 10:51:12 -0700 (PDT)
+Date:   Tue, 11 Aug 2020 11:51:10 -0600
+From:   Mathieu Poirier <mathieu.poirier@linaro.org>
+To:     Guennadi Liakhovetski <guennadi.liakhovetski@linux.intel.com>
+Cc:     kvm@vger.kernel.org, linux-remoteproc@vger.kernel.org,
+        virtualization@lists.linux-foundation.org,
+        sound-open-firmware@alsa-project.org,
+        Pierre-Louis Bossart <pierre-louis.bossart@linux.intel.com>,
+        Liam Girdwood <liam.r.girdwood@linux.intel.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Ohad Ben-Cohen <ohad@wizery.com>,
+        Bjorn Andersson <bjorn.andersson@linaro.org>,
+        Vincent Whitchurch <vincent.whitchurch@axis.com>
+Subject: Re: [PATCH v4 2/4] rpmsg: move common structures and defines to
+ headers
+Message-ID: <20200811175110.GA3253363@xps15>
+References: <20200722150927.15587-1-guennadi.liakhovetski@linux.intel.com>
+ <20200722150927.15587-3-guennadi.liakhovetski@linux.intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200722150927.15587-3-guennadi.liakhovetski@linux.intel.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 10 Aug 2020 07:32:24 +0000
-"Tian, Kevin" <kevin.tian@intel.com> wrote:
+On Wed, Jul 22, 2020 at 05:09:25PM +0200, Guennadi Liakhovetski wrote:
+> virtio_rpmsg_bus.c keeps RPMsg protocol structure declarations and
+> common defines like the ones, needed for name-space announcements,
+> internal. Move them to common headers instead.
+> 
+> Signed-off-by: Guennadi Liakhovetski <guennadi.liakhovetski@linux.intel.com>
+> ---
+>  drivers/rpmsg/virtio_rpmsg_bus.c | 78 +-----------------------------
+>  include/linux/virtio_rpmsg.h     | 83 ++++++++++++++++++++++++++++++++
 
-> > From: Jason Gunthorpe <jgg@nvidia.com>
-> > Sent: Friday, August 7, 2020 8:20 PM
-> > 
-> > On Wed, Aug 05, 2020 at 07:22:58PM -0600, Alex Williamson wrote:
-> >   
-> > > If you see this as an abuse of the framework, then let's identify those
-> > > specific issues and come up with a better approach.  As we've discussed
-> > > before, things like basic PCI config space emulation are acceptable
-> > > overhead and low risk (imo) and some degree of register emulation is
-> > > well within the territory of an mdev driver.  
-> > 
-> > What troubles me is that idxd already has a direct userspace interface
-> > to its HW, and does userspace DMA. The purpose of this mdev is to
-> > provide a second direct userspace interface that is a little different
-> > and trivially plugs into the virtualization stack.  
+I am ambivalent about whether virtio_rpmsg.h should go under
+include/linux/rpmsg/ or just stay where you have it.  Not that it matters
+much...  I will let Bjorn make the final call on this.
+
+If it does stay here, it will need to be added to MAINTAINERS.
+
+For the v5.10 merge window only:
+
+Reviewed-by: Mathieu Poirier <mathieu.poirier@linaro.org>
+
+>  include/uapi/linux/rpmsg.h       |  3 ++
+>  3 files changed, 88 insertions(+), 76 deletions(-)
+>  create mode 100644 include/linux/virtio_rpmsg.h
 > 
-> No. Userspace DMA and subdevice passthrough (what mdev provides)
-> are two distinct usages IMO (at least in idxd context). and this might 
-> be the main divergence between us, thus let me put more words here. 
-> If we could reach consensus in this matter, which direction to go 
-> would be clearer.
-> 
-> First, a passthrough interface requires some unique requirements 
-> which are not commonly observed in an userspace DMA interface, e.g.:
-> 
-> - Tracking DMA dirty pages for live migration;
-> - A set of interfaces for using SVA inside guest;
-> 	* PASID allocation/free (on some platforms);
-> 	* bind/unbind guest mm/page table (nested translation);
-> 	* invalidate IOMMU cache/iotlb for guest page table changes;
-> 	* report page request from device to guest;
-> 	* forward page response from guest to device;
-> - Configuring irqbypass for posted interrupt;
-> - ...
-> 
-> Second, a passthrough interface requires delegating raw controllability
-> of subdevice to guest driver, while the same delegation might not be
-> required for implementing an userspace DMA interface (especially for
-> modern devices which support SVA). For example, idxd allows following
-> setting per wq (guest driver may configure them in any combination):
-> 	- put in dedicated or shared mode;
-> 	- enable/disable SVA;
-> 	- Associate guest-provided PASID to MSI/IMS entry;
-> 	- set threshold;
-> 	- allow/deny privileged access;
-> 	- allocate/free interrupt handle (enlightened for guest);
-> 	- collect error status;
-> 	- ...
-> 
-> We plan to support idxd userspace DMA with SVA. The driver just needs 
-> to prepare a wq with a predefined configuration (e.g. shared, SVA, 
-> etc.), bind the process mm to IOMMU (non-nested) and then map 
-> the portal to userspace. The goal that userspace can do DMA to 
-> associated wq doesn't change the fact that the wq is still *owned* 
-> and *controlled* by kernel driver. However as far as passthrough 
-> is concerned, the wq is considered 'owned' by the guest driver thus 
-> we need an interface which can support low-level *controllability* 
-> from guest driver. It is sort of a mess in uAPI when mixing the
-> two together.
-> 
-> Based on above two reasons, we see distinct requirements between 
-> userspace DMA and passthrough interfaces, at least in idxd context 
-> (though other devices may have less distinction in-between). Therefore,
-> we didn't see the value/necessity of reinventing the wheel that mdev 
-> already handles well to evolve an simple application-oriented usespace 
-> DMA interface to a complex guest-driver-oriented passthrough interface. 
-> The complexity of doing so would incur far more kernel-side changes 
-> than the portion of emulation code that you've been concerned about...
+> diff --git a/drivers/rpmsg/virtio_rpmsg_bus.c b/drivers/rpmsg/virtio_rpmsg_bus.c
+> index 9006fc7f73d0..9d5dd3f0a648 100644
+> --- a/drivers/rpmsg/virtio_rpmsg_bus.c
+> +++ b/drivers/rpmsg/virtio_rpmsg_bus.c
+> @@ -26,7 +26,9 @@
+>  #include <linux/virtio_byteorder.h>
+>  #include <linux/virtio_ids.h>
+>  #include <linux/virtio_config.h>
+> +#include <linux/virtio_rpmsg.h>
+>  #include <linux/wait.h>
+> +#include <uapi/linux/rpmsg.h>
 >  
-> > 
-> > I don't think VFIO should be the only entry point to
-> > virtualization. If we say the universe of devices doing user space DMA
-> > must also implement a VFIO mdev to plug into virtualization then it
-> > will be alot of mdevs.  
+>  #include "rpmsg_internal.h"
+>  
+> @@ -70,58 +72,6 @@ struct virtproc_info {
+>  	struct rpmsg_endpoint *ns_ept;
+>  };
+>  
+> -/* The feature bitmap for virtio rpmsg */
+> -#define VIRTIO_RPMSG_F_NS	0 /* RP supports name service notifications */
+> -
+> -/**
+> - * struct rpmsg_hdr - common header for all rpmsg messages
+> - * @src: source address
+> - * @dst: destination address
+> - * @reserved: reserved for future use
+> - * @len: length of payload (in bytes)
+> - * @flags: message flags
+> - * @data: @len bytes of message payload data
+> - *
+> - * Every message sent(/received) on the rpmsg bus begins with this header.
+> - */
+> -struct rpmsg_hdr {
+> -	__virtio32 src;
+> -	__virtio32 dst;
+> -	__virtio32 reserved;
+> -	__virtio16 len;
+> -	__virtio16 flags;
+> -	u8 data[];
+> -} __packed;
+> -
+> -/**
+> - * struct rpmsg_ns_msg - dynamic name service announcement message
+> - * @name: name of remote service that is published
+> - * @addr: address of remote service that is published
+> - * @flags: indicates whether service is created or destroyed
+> - *
+> - * This message is sent across to publish a new service, or announce
+> - * about its removal. When we receive these messages, an appropriate
+> - * rpmsg channel (i.e device) is created/destroyed. In turn, the ->probe()
+> - * or ->remove() handler of the appropriate rpmsg driver will be invoked
+> - * (if/as-soon-as one is registered).
+> - */
+> -struct rpmsg_ns_msg {
+> -	char name[RPMSG_NAME_SIZE];
+> -	__virtio32 addr;
+> -	__virtio32 flags;
+> -} __packed;
+> -
+> -/**
+> - * enum rpmsg_ns_flags - dynamic name service announcement flags
+> - *
+> - * @RPMSG_NS_CREATE: a new remote service was just created
+> - * @RPMSG_NS_DESTROY: a known remote service was just destroyed
+> - */
+> -enum rpmsg_ns_flags {
+> -	RPMSG_NS_CREATE		= 0,
+> -	RPMSG_NS_DESTROY	= 1,
+> -};
+> -
+>  /**
+>   * @vrp: the remote processor this channel belongs to
+>   */
+> @@ -134,27 +84,6 @@ struct virtio_rpmsg_channel {
+>  #define to_virtio_rpmsg_channel(_rpdev) \
+>  	container_of(_rpdev, struct virtio_rpmsg_channel, rpdev)
+>  
+> -/*
+> - * We're allocating buffers of 512 bytes each for communications. The
+> - * number of buffers will be computed from the number of buffers supported
+> - * by the vring, upto a maximum of 512 buffers (256 in each direction).
+> - *
+> - * Each buffer will have 16 bytes for the msg header and 496 bytes for
+> - * the payload.
+> - *
+> - * This will utilize a maximum total space of 256KB for the buffers.
+> - *
+> - * We might also want to add support for user-provided buffers in time.
+> - * This will allow bigger buffer size flexibility, and can also be used
+> - * to achieve zero-copy messaging.
+> - *
+> - * Note that these numbers are purely a decision of this driver - we
+> - * can change this without changing anything in the firmware of the remote
+> - * processor.
+> - */
+> -#define MAX_RPMSG_NUM_BUFS	(512)
+> -#define MAX_RPMSG_BUF_SIZE	(512)
+> -
+>  /*
+>   * Local addresses are dynamically allocated on-demand.
+>   * We do not dynamically assign addresses from the low 1024 range,
+> @@ -162,9 +91,6 @@ struct virtio_rpmsg_channel {
+>   */
+>  #define RPMSG_RESERVED_ADDRESSES	(1024)
+>  
+> -/* Address 53 is reserved for advertising remote services */
+> -#define RPMSG_NS_ADDR			(53)
+> -
+>  static void virtio_rpmsg_destroy_ept(struct rpmsg_endpoint *ept);
+>  static int virtio_rpmsg_send(struct rpmsg_endpoint *ept, void *data, int len);
+>  static int virtio_rpmsg_sendto(struct rpmsg_endpoint *ept, void *data, int len,
+> diff --git a/include/linux/virtio_rpmsg.h b/include/linux/virtio_rpmsg.h
+> new file mode 100644
+> index 000000000000..fcb523831e73
+> --- /dev/null
+> +++ b/include/linux/virtio_rpmsg.h
+> @@ -0,0 +1,83 @@
+> +/* SPDX-License-Identifier: GPL-2.0 */
+> +
+> +#ifndef _LINUX_VIRTIO_RPMSG_H
+> +#define _LINUX_VIRTIO_RPMSG_H
+> +
+> +#include <linux/mod_devicetable.h>
+> +#include <linux/types.h>
+> +#include <linux/virtio_types.h>
+> +
+> +/**
+> + * struct rpmsg_hdr - common header for all rpmsg messages
+> + * @src: source address
+> + * @dst: destination address
+> + * @reserved: reserved for future use
+> + * @len: length of payload (in bytes)
+> + * @flags: message flags
+> + * @data: @len bytes of message payload data
+> + *
+> + * Every message sent(/received) on the rpmsg bus begins with this header.
+> + */
+> +struct rpmsg_hdr {
+> +	__virtio32 src;
+> +	__virtio32 dst;
+> +	__virtio32 reserved;
+> +	__virtio16 len;
+> +	__virtio16 flags;
+> +	u8 data[];
+> +} __packed;
+> +
+> +/**
+> + * struct rpmsg_ns_msg - dynamic name service announcement message
+> + * @name: name of remote service that is published
+> + * @addr: address of remote service that is published
+> + * @flags: indicates whether service is created or destroyed
+> + *
+> + * This message is sent across to publish a new service, or announce
+> + * about its removal. When we receive these messages, an appropriate
+> + * rpmsg channel (i.e device) is created/destroyed. In turn, the ->probe()
+> + * or ->remove() handler of the appropriate rpmsg driver will be invoked
+> + * (if/as-soon-as one is registered).
+> + */
+> +struct rpmsg_ns_msg {
+> +	char name[RPMSG_NAME_SIZE];
+> +	__virtio32 addr;
+> +	__virtio32 flags;
+> +} __packed;
+> +
+> +/**
+> + * enum rpmsg_ns_flags - dynamic name service announcement flags
+> + *
+> + * @RPMSG_NS_CREATE: a new remote service was just created
+> + * @RPMSG_NS_DESTROY: a known remote service was just destroyed
+> + */
+> +enum rpmsg_ns_flags {
+> +	RPMSG_NS_CREATE		= 0,
+> +	RPMSG_NS_DESTROY	= 1,
+> +};
+> +
+> +/*
+> + * We're allocating buffers of 512 bytes each for communications. The
+> + * number of buffers will be computed from the number of buffers supported
+> + * by the vring, upto a maximum of 512 buffers (256 in each direction).
+> + *
+> + * Each buffer will have 16 bytes for the msg header and 496 bytes for
+> + * the payload.
+> + *
+> + * This will utilize a maximum total space of 256KB for the buffers.
+> + *
+> + * We might also want to add support for user-provided buffers in time.
+> + * This will allow bigger buffer size flexibility, and can also be used
+> + * to achieve zero-copy messaging.
+> + *
+> + * Note that these numbers are purely a decision of this driver - we
+> + * can change this without changing anything in the firmware of the remote
+> + * processor.
+> + */
+> +#define MAX_RPMSG_NUM_BUFS	512
+> +#define MAX_RPMSG_BUF_SIZE	512
+> +
+> +/* Address 53 is reserved for advertising remote services */
+> +#define RPMSG_NS_ADDR		53
+> +
+> +#endif
+> diff --git a/include/uapi/linux/rpmsg.h b/include/uapi/linux/rpmsg.h
+> index e14c6dab4223..d669c04ef289 100644
+> --- a/include/uapi/linux/rpmsg.h
+> +++ b/include/uapi/linux/rpmsg.h
+> @@ -24,4 +24,7 @@ struct rpmsg_endpoint_info {
+>  #define RPMSG_CREATE_EPT_IOCTL	_IOW(0xb5, 0x1, struct rpmsg_endpoint_info)
+>  #define RPMSG_DESTROY_EPT_IOCTL	_IO(0xb5, 0x2)
+>  
+> +/* The feature bitmap for virtio rpmsg */
+> +#define VIRTIO_RPMSG_F_NS	0 /* RP supports name service notifications */
+> +
+>  #endif
+> -- 
+> 2.27.0
 > 
-> Certainly VFIO will not be the only entry point. and This has to be a 
-> case-by-case decision.  If an userspace DMA interface can be easily 
-> adapted to be a passthrough one, it might be the choice. But for idxd, 
-> we see mdev a much better fit here, given the big difference between 
-> what userspace DMA requires and what guest driver requires in this hw.
-> 
-> > 
-> > I would prefer to see that the existing userspace interface have the
-> > extra needed bits for virtualization (eg by having appropriate
-> > internal kernel APIs to make this easy) and all the emulation to build
-> > the synthetic PCI device be done in userspace.  
-> 
-> In the end what decides the direction is the amount of changes that
-> we have to put in kernel, not whether we call it 'emulation'. For idxd,
-> adding special passthrough requirements (guest SVA, dirty tracking,
-> etc.) and raw controllability to the simple userspace DMA interface 
-> is for sure making kernel more complex than reusing the mdev
-> framework (plus some degree of emulation mockup behind). Not to
-> mention the merit of uAPI compatibility with mdev...
-
-I agree with a lot of this argument, exposing a device through a
-userspace interface versus allowing user access to a device through a
-userspace interface are different levels of abstraction and control.
-In an ideal world, perhaps we could compose one from the other, but I
-don't think the existence of one is proof that the other is redundant.
-That's not to say that mdev/vfio isn't ripe for abuse in this space,
-but I'm afraid the test for that abuse is probably much more subtle.
-
-I'll also remind folks that LPC is coming up in just a couple short
-weeks and this might be something we should discuss (virtually)
-in-person.  uconf CfPs are currently open. </plug>   Thanks,
-
-Alex
-
