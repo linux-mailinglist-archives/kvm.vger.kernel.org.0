@@ -2,139 +2,90 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1DC44241406
-	for <lists+kvm@lfdr.de>; Tue, 11 Aug 2020 02:05:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2EC7324140F
+	for <lists+kvm@lfdr.de>; Tue, 11 Aug 2020 02:18:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727049AbgHKAFu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 10 Aug 2020 20:05:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59306 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726733AbgHKAFt (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 10 Aug 2020 20:05:49 -0400
-Received: from mail-oo1-xc43.google.com (mail-oo1-xc43.google.com [IPv6:2607:f8b0:4864:20::c43])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 411CDC06174A
-        for <kvm@vger.kernel.org>; Mon, 10 Aug 2020 17:05:49 -0700 (PDT)
-Received: by mail-oo1-xc43.google.com with SMTP id k63so2267972oob.1
-        for <kvm@vger.kernel.org>; Mon, 10 Aug 2020 17:05:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=T9Idy/BmZn9IZefa6c48sS4dzGuqqOJAnrsSY8u5SVQ=;
-        b=Wlo1xYvYDQB5UdyjcPcvxlvHWnFaytS+xrKwjKz+c3yku1J3VSzdkf+McpueHAXTOH
-         w+jVamW/qb6ODfCIJ8mZIpKlaeJZYnSdrnIBqRjQgZYtalgRpnRhvILtJPBfbqaqMlCU
-         hGIPrr1tO1awZoW20/BaHmI8ZjVfnDh18iT6dNj2sd31L925WN9HEfthswKfyd4pQzX0
-         torZq8FO2aECeynPebqR3fNvIcw6aLqMK6jKxOeSOqlGW0PFDRNQ0m11KZtpXnJqCpIV
-         pYhrBJtKgQbmQ6/kveBVncPdslrJeYhquqAoCtV9WD8mUfCziuKCjKwna4qznykCZWAf
-         giHA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=T9Idy/BmZn9IZefa6c48sS4dzGuqqOJAnrsSY8u5SVQ=;
-        b=dHfGU2SQ/2enUwrGM7D2WuqqR7yaLvhioK2HjEKiG60imh5sxpQLAuoL8SoL79OpUx
-         4Zi792jTeea1ia/1aFvkm0wYB6D+wyiWbZ3xCbzdYPnNzoOwK4IImCu+woNYGLvroZ8d
-         5xuTv2S9u/HzJ7WX9IqpjRO8adi4FK8SyMsv6dMGuGB2buHq65jzGS8As5Xgd4UHhkty
-         zXVkHxapOFfV7ffK050/6PNa7FUuzX1CrE6kaTStQH6YVDuEYvrLO8SCqrpgn1aNyZdR
-         jQDxWLk6WyuoUSFuhukwKISk9xJnNL3DcU6D4TXBHDReMZu6Gs0ywbMphf3QOnwEygq5
-         Rubg==
-X-Gm-Message-State: AOAM533Z3/FzBt5uHHrzVFeyBnZHpKzI5QHHhBBDbYZLBpNYHndm1zOf
-        HxCD0bqmJVXi/BKjiYwDDZMsHxlRTGZmP4APKMc5og==
-X-Google-Smtp-Source: ABdhPJxrKKgXuoMLuGb+Q0QiKVucIghYoqyd+lUBC1Ps0+X8ZsbGk0mjC6WsyUHWRr3Bc/Dyf7pIPhjh2yOG7Aq8IQU=
-X-Received: by 2002:a4a:9c0f:: with SMTP id y15mr2933051ooj.81.1597104347968;
- Mon, 10 Aug 2020 17:05:47 -0700 (PDT)
+        id S1727810AbgHKASl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 10 Aug 2020 20:18:41 -0400
+Received: from mga07.intel.com ([134.134.136.100]:51176 "EHLO mga07.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726733AbgHKASk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 10 Aug 2020 20:18:40 -0400
+IronPort-SDR: +xpmmPFEFMBjfLrEOey0zxjlg6bq84P2ntTOTljTHsWB70fOo9uJNDqMxB2eyi0Z4NzNruRfxZ
+ Ty2h8plq3Pbg==
+X-IronPort-AV: E=McAfee;i="6000,8403,9709"; a="217975322"
+X-IronPort-AV: E=Sophos;i="5.75,458,1589266800"; 
+   d="scan'208";a="217975322"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Aug 2020 17:18:39 -0700
+IronPort-SDR: AYJ9db4E945V2WtApKiuVM8pT5M9W3BAKjBmVMvHTzmF6iAw4mktxTnYYrXWBju9Jp4WrFJ/NR
+ 4NoU01x+yWTQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.75,458,1589266800"; 
+   d="scan'208";a="317540213"
+Received: from zhangj4-mobl1.ccr.corp.intel.com (HELO [10.255.28.102]) ([10.255.28.102])
+  by fmsmga004.fm.intel.com with ESMTP; 10 Aug 2020 17:18:33 -0700
+Subject: Re: [PATCH v3 2/2] x86/kvm: Expose new features for supported cpuid
+To:     "Luck, Tony" <tony.luck@intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "x86@kernel.org" <x86@kernel.org>
+Cc:     "Christopherson, Sean J" <sean.j.christopherson@intel.com>,
+        "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "Hansen, Dave" <dave.hansen@intel.com>,
+        "Park, Kyung Min" <kyung.min.park@intel.com>,
+        "ricardo.neri-calderon@linux.intel.com" 
+        <ricardo.neri-calderon@linux.intel.com>,
+        "vkuznets@redhat.com" <vkuznets@redhat.com>,
+        "wanpengli@tencent.com" <wanpengli@tencent.com>,
+        "jmattson@google.com" <jmattson@google.com>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "mingo@redhat.com" <mingo@redhat.com>,
+        "bp@alien8.de" <bp@alien8.de>, "hpa@zytor.com" <hpa@zytor.com>,
+        "jpoimboe@redhat.com" <jpoimboe@redhat.com>,
+        "ak@linux.intel.com" <ak@linux.intel.com>,
+        "Shankar, Ravi V" <ravi.v.shankar@intel.com>
+References: <1596959242-2372-1-git-send-email-cathy.zhang@intel.com>
+ <1596959242-2372-3-git-send-email-cathy.zhang@intel.com>
+ <d7e9fb9a-e392-73b1-5fc8-3876cb30665c@redhat.com>
+ <27965021-2ec7-aa30-5526-5a6b293b2066@intel.com>
+ <e92df7bb267c478f8dfa28a31fc59d95@intel.com>
+From:   "Zhang, Cathy" <cathy.zhang@intel.com>
+Message-ID: <8f5d3b35-2478-c030-e51d-3183dbcaf4a6@intel.com>
+Date:   Tue, 11 Aug 2020 08:18:32 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-References: <20200807084841.7112-1-chenyi.qiang@intel.com> <20200807084841.7112-8-chenyi.qiang@intel.com>
-In-Reply-To: <20200807084841.7112-8-chenyi.qiang@intel.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Mon, 10 Aug 2020 17:05:36 -0700
-Message-ID: <CALMp9eTAo3WO5Vk_LptTDZLzymJ_96=UhRipyzTXXLxWJRGdXg@mail.gmail.com>
-Subject: Re: [RFC 7/7] KVM: VMX: Enable PKS for nested VM
-To:     Chenyi Qiang <chenyi.qiang@intel.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Xiaoyao Li <xiaoyao.li@intel.com>,
-        kvm list <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <e92df7bb267c478f8dfa28a31fc59d95@intel.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Aug 7, 2020 at 1:47 AM Chenyi Qiang <chenyi.qiang@intel.com> wrote:
+On 8/11/2020 7:59 AM, Luck, Tony wrote:
+>> As you suggest, I will split the kvm patch into two parts, SERIALIZE and
+>> TSXLDTRK, and this series will include three patches then, 2 kvm patches
+>> and 1 kernel patch. SERIALIZE could get merged into 5.9, but TSXLDTRK
+>> should wait for the next release. I just want to double confirm with
+>> you, please help correct me if I'm wrong.
+> Paolo is saying that he has applied the SERIALIZE part to his KVM tree.
 >
-> PKS MSR passes through guest directly. Configure the MSR to match the
-> L0/L1 settings so that nested VM runs PKS properly.
+> https://git.kernel.org/pub/scm/virt/kvm/kvm.git/commit/?h=queue&id=43bd9ef42b3b862c97f1f4e86bf3ace890bef924
 >
-> Signed-off-by: Chenyi Qiang <chenyi.qiang@intel.com>
-> ---
->  arch/x86/kvm/vmx/nested.c | 32 ++++++++++++++++++++++++++++++++
->  arch/x86/kvm/vmx/vmcs12.c |  2 ++
->  arch/x86/kvm/vmx/vmcs12.h |  6 +++++-
->  arch/x86/kvm/vmx/vmx.c    | 10 ++++++++++
->  arch/x86/kvm/vmx/vmx.h    |  1 +
->  5 files changed, 50 insertions(+), 1 deletion(-)
+> Next step for you is a two part series.
 >
-> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-> index df2c2e733549..1f9823d21ecd 100644
-> --- a/arch/x86/kvm/vmx/nested.c
-> +++ b/arch/x86/kvm/vmx/nested.c
-> @@ -647,6 +647,12 @@ static inline bool nested_vmx_prepare_msr_bitmap(struct kvm_vcpu *vcpu,
->                                         MSR_IA32_PRED_CMD,
->                                         MSR_TYPE_W);
+> Part 1: Add TSXLDTRK to cpufeatures.h
+> Part 2: Add TSXLDTRK to arch/x86/kvm/cpuid.c (on top of the version that Paolo committed with SERIALIZE)
 >
-> +       if (!msr_write_intercepted_l01(vcpu, MSR_IA32_PKRS))
-> +               nested_vmx_disable_intercept_for_msr(
-> +                                       msr_bitmap_l1, msr_bitmap_l0,
-> +                                       MSR_IA32_PKRS,
-> +                                       MSR_TYPE_R | MSR_TYPE_W);
-
-What if L1 intercepts only *reads* of MSR_IA32_PKRS?
-
->         kvm_vcpu_unmap(vcpu, &to_vmx(vcpu)->nested.msr_bitmap_map, false);
+> Paolo: The 5.9 merge window is still open this week. Will you send the KVM serialize patch to Linus
+> before this merge window closes?  Or do you have it queued for v5.10?
 >
->         return true;
-
-> @@ -2509,6 +2519,11 @@ static int prepare_vmcs02(struct kvm_vcpu *vcpu, struct vmcs12 *vmcs12,
->         if (kvm_mpx_supported() && (!vmx->nested.nested_run_pending ||
->             !(vmcs12->vm_entry_controls & VM_ENTRY_LOAD_BNDCFGS)))
->                 vmcs_write64(GUEST_BNDCFGS, vmx->nested.vmcs01_guest_bndcfgs);
-> +
-> +       if (kvm_cpu_cap_has(X86_FEATURE_PKS) &&
-
-Is the above check superfluous? I would assume that the L1 guest can't
-set VM_ENTRY_LOAD_IA32_PKRS unless this is true.
-
-> +           (!vmx->nested.nested_run_pending ||
-> +            !(vmcs12->vm_entry_controls & VM_ENTRY_LOAD_IA32_PKRS)))
-> +               vmcs_write64(GUEST_IA32_PKRS, vmx->nested.vmcs01_guest_pkrs);
-
-This doesn't seem right to me. On the target of a live migration, with
-L2 active at the time the snapshot was taken (i.e.,
-vmx->nested.nested_run_pending=0), it looks like we're going to try to
-overwrite the current L2 PKRS value with L1's PKRS value (except that
-in this situation, vmx->nested.vmcs01_guest_pkrs should actually be
-0). Am I missing something?
-
->         vmx_set_rflags(vcpu, vmcs12->guest_rflags);
->
->         /* EXCEPTION_BITMAP and CR0_GUEST_HOST_MASK should basically be the
-
-
-> @@ -3916,6 +3943,8 @@ static void sync_vmcs02_to_vmcs12_rare(struct kvm_vcpu *vcpu,
->                 vmcs_readl(GUEST_PENDING_DBG_EXCEPTIONS);
->         if (kvm_mpx_supported())
->                 vmcs12->guest_bndcfgs = vmcs_read64(GUEST_BNDCFGS);
-> +       if (kvm_cpu_cap_has(X86_FEATURE_PKS))
-
-Shouldn't we be checking to see if the *virtual* CPU supports PKS
-before writing anything into vmcs12->guest_ia32_pkrs?
-
-> +               vmcs12->guest_ia32_pkrs = vmcs_read64(GUEST_IA32_PKRS);
->
->         vmx->nested.need_sync_vmcs02_to_vmcs12_rare = false;
->  }
+> -Tony
+Got it! Thanks for the explanation, Tony!
