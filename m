@@ -2,115 +2,202 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B10A0241DEB
-	for <lists+kvm@lfdr.de>; Tue, 11 Aug 2020 18:11:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5E9E6241ED7
+	for <lists+kvm@lfdr.de>; Tue, 11 Aug 2020 19:02:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729080AbgHKQLG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 11 Aug 2020 12:11:06 -0400
-Received: from hqnvemgate26.nvidia.com ([216.228.121.65]:14353 "EHLO
-        hqnvemgate26.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728797AbgHKQLF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 11 Aug 2020 12:11:05 -0400
-Received: from hqpgpgate102.nvidia.com (Not Verified[216.228.121.13]) by hqnvemgate26.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
-        id <B5f32c30c0000>; Tue, 11 Aug 2020 09:10:52 -0700
-Received: from hqmail.nvidia.com ([172.20.161.6])
-  by hqpgpgate102.nvidia.com (PGP Universal service);
-  Tue, 11 Aug 2020 09:11:05 -0700
-X-PGP-Universal: processed;
-        by hqpgpgate102.nvidia.com on Tue, 11 Aug 2020 09:11:05 -0700
-Received: from [10.2.60.121] (10.124.1.5) by HQMAIL107.nvidia.com
- (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Tue, 11 Aug
- 2020 16:10:56 +0000
-Subject: Re: VDPA Debug/Statistics
-To:     "Michael S. Tsirkin" <mst@redhat.com>, Eli Cohen <elic@nvidia.com>
-CC:     Jason Wang <jasowang@redhat.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "virtualization@lists.linux-foundation.org" 
-        <virtualization@lists.linux-foundation.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        id S1729148AbgHKRBv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 11 Aug 2020 13:01:51 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:57012 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1729181AbgHKRA5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 11 Aug 2020 13:00:57 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1597165255;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=8f8+cJ+l1fMhcVKWX+3dHLkMxd5ok8TAOd+bF0aoOT0=;
+        b=TTwsPrNZcMAsn2BRpCNjwwqhYhHgJdx/7T7gaqCx66+HiHNM3ifwX8qvY0Jmptp5xvgD4L
+        GFHVIk0WAIzAeumHwZ5AdtB+BwqS9MfNcvLbtAups/frlvLwtHebBe9zbrjoCS42ROM/du
+        k4BpmppfjbD4FY2ZUqABBFaFxcAxFJg=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-182-N10_X-MaNOazefTjWZZngg-1; Tue, 11 Aug 2020 13:00:47 -0400
+X-MC-Unique: N10_X-MaNOazefTjWZZngg-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 698498015FC;
+        Tue, 11 Aug 2020 17:00:42 +0000 (UTC)
+Received: from x1.home (ovpn-112-71.phx2.redhat.com [10.3.112.71])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id E35812DE99;
+        Tue, 11 Aug 2020 17:00:36 +0000 (UTC)
+Date:   Tue, 11 Aug 2020 11:00:36 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     "Tian, Kevin" <kevin.tian@intel.com>,
+        Jason Gunthorpe <jgg@nvidia.com>
+Cc:     "Jiang, Dave" <dave.jiang@intel.com>,
+        "vkoul@kernel.org" <vkoul@kernel.org>,
+        "Dey, Megha" <megha.dey@intel.com>,
+        "maz@kernel.org" <maz@kernel.org>,
+        "bhelgaas@google.com" <bhelgaas@google.com>,
+        "rafael@kernel.org" <rafael@kernel.org>,
+        "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "hpa@zytor.com" <hpa@zytor.com>,
+        "Pan, Jacob jun" <jacob.jun.pan@intel.com>,
+        "Raj, Ashok" <ashok.raj@intel.com>,
+        "Liu, Yi L" <yi.l.liu@intel.com>, "Lu, Baolu" <baolu.lu@intel.com>,
+        "Kumar, Sanjay K" <sanjay.k.kumar@intel.com>,
+        "Luck, Tony" <tony.luck@intel.com>,
+        "Lin, Jing" <jing.lin@intel.com>,
+        "Williams, Dan J" <dan.j.williams@intel.com>,
+        "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
+        "eric.auger@redhat.com" <eric.auger@redhat.com>,
+        "parav@mellanox.com" <parav@mellanox.com>,
+        "Hansen, Dave" <dave.hansen@intel.com>,
+        "netanelg@mellanox.com" <netanelg@mellanox.com>,
+        "shahafs@mellanox.com" <shahafs@mellanox.com>,
+        "yan.y.zhao@linux.intel.com" <yan.y.zhao@linux.intel.com>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "Ortiz, Samuel" <samuel.ortiz@intel.com>,
+        "Hossain, Mona" <mona.hossain@intel.com>,
+        "dmaengine@vger.kernel.org" <dmaengine@vger.kernel.org>,
         "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "eli@mellanox.com" <eli@mellanox.com>,
-        "lulu@redhat.com" <lulu@redhat.com>,
-        Majd Dibbiny <majd@nvidia.com>,
-        "Maor Dickman" <maord@nvidia.com>,
-        Shahaf Shuler <shahafs@mellanox.com>,
-        "Parav Pandit" <parav@mellanox.com>
-References: <BN8PR12MB342559414BE03DFC992AD03DAB450@BN8PR12MB3425.namprd12.prod.outlook.com>
- <20200811073144-mutt-send-email-mst@kernel.org>
- <BN8PR12MB34259F2AE1FDAF2D40E48C5BAB450@BN8PR12MB3425.namprd12.prod.outlook.com>
- <20200811083803-mutt-send-email-mst@kernel.org>
-From:   Roopa Prabhu <roopa@nvidia.com>
-Message-ID: <16cef93e-7421-a151-65ab-ba21e44cd00f@nvidia.com>
-Date:   Tue, 11 Aug 2020 09:10:52 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        "x86@kernel.org" <x86@kernel.org>,
+        "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Subject: Re: [PATCH RFC v2 00/18] Add VFIO mediated device support and
+ DEV-MSI support for the idxd driver
+Message-ID: <20200811110036.7d337837@x1.home>
+In-Reply-To: <MWHPR11MB16452EBE866E330A7E000AFC8C440@MWHPR11MB1645.namprd11.prod.outlook.com>
+References: <159534667974.28840.2045034360240786644.stgit@djiang5-desk3.ch.intel.com>
+        <20200721164527.GD2021248@mellanox.com>
+        <CY4PR11MB1638103EC73DD9C025F144C98C780@CY4PR11MB1638.namprd11.prod.outlook.com>
+        <20200724001930.GS2021248@mellanox.com>
+        <20200805192258.5ee7a05b@x1.home>
+        <20200807121955.GS16789@nvidia.com>
+        <MWHPR11MB16452EBE866E330A7E000AFC8C440@MWHPR11MB1645.namprd11.prod.outlook.com>
+Organization: Red Hat
 MIME-Version: 1.0
-In-Reply-To: <20200811083803-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-Originating-IP: [10.124.1.5]
-X-ClientProxiedBy: HQMAIL105.nvidia.com (172.20.187.12) To
- HQMAIL107.nvidia.com (172.20.187.13)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
-        t=1597162252; bh=EK1sbFulOF0V9vRXAL3GbYbkOAW9ujbZSox8NAhaWus=;
-        h=X-PGP-Universal:Subject:To:CC:References:From:Message-ID:Date:
-         User-Agent:MIME-Version:In-Reply-To:Content-Type:
-         Content-Transfer-Encoding:Content-Language:X-Originating-IP:
-         X-ClientProxiedBy;
-        b=gS19uwfsH12QJJzg9ZODa7mhQbKSP1lVW35d0TgX5+PAr7ToMbjpXXuaq/R2J2vnZ
-         sEYD47GIu0nqR+rJQtdkjFLU+Yl83CqM3MN7b7BonSD8L5BanYpKbg81YS7Nz8UXL7
-         YlKbwRcNK5liipinpMS67fkeNt6gw9WLVwW6mG+z5419Q78JxjOSAY+U4XHVbghojA
-         PHyzitc4Y9iftdDW7ymuUOn22mRkk3QQ9KI/LJ80d4bAZc6GChOwJkxndt4l4gPuHU
-         fEmP4ctUu244HPPdLw8pmcBQNnlxbwGUPeM1l0YgXZJr830nTrYW/lb0oD+9sa+XmV
-         61sTlM6BQOFDA==
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Mon, 10 Aug 2020 07:32:24 +0000
+"Tian, Kevin" <kevin.tian@intel.com> wrote:
 
-On 8/11/20 5:44 AM, Michael S. Tsirkin wrote:
-> External email: Use caution opening links or attachments
->
->
-> On Tue, Aug 11, 2020 at 11:58:23AM +0000, Eli Cohen wrote:
->> On Tue, Aug 11, 2020 at 11:26:20AM +0000, Eli Cohen wrote:
->>> Hi All
->>>
->>> Currently, the only statistics we get for a VDPA instance comes from the virtio_net device instance. Since VDPA involves hardware acceleration, there can be quite a lot of information that can be fetched from the underlying device. Currently there is no generic method to fetch this information.
->>>
->>> One way of doing this can be to create a the host, a net device for
->>> each VDPA instance, and use it to get this information or do some
->>> configuration. Ethtool can be used in such a case
->>>
->>> I would like to hear what you think about this or maybe you have some other ideas to address this topic.
->>>
->>> Thanks,
->>> Eli
->> Something I'm not sure I understand is how are vdpa instances created on mellanox cards? There's a devlink command for that, is that right?
->> Can that be extended for stats?
->>
->> Currently any VF will be probed as VDPA device. We're adding devlink support but I am not sure if devlink is suitable for displaying statistics. We will discuss internally but I wanted to know why you guys think.
-> OK still things like specifying the mac are managed through rtnetlink,
-> right?
->
-> Right now it does not look like you can mix stats and vf, they are
-> handled separately:
->
->          if (rtnl_fill_stats(skb, dev))
->                  goto nla_put_failure;
->
->          if (rtnl_fill_vf(skb, dev, ext_filter_mask))
->                  goto nla_put_failure;
->
-> but ability to query vf stats on the host sounds useful generally.
->
-> As another option, we could use a vdpa specific way to retrieve stats,
-> and teach qemu to report them.
+> > From: Jason Gunthorpe <jgg@nvidia.com>
+> > Sent: Friday, August 7, 2020 8:20 PM
+> > 
+> > On Wed, Aug 05, 2020 at 07:22:58PM -0600, Alex Williamson wrote:
+> >   
+> > > If you see this as an abuse of the framework, then let's identify those
+> > > specific issues and come up with a better approach.  As we've discussed
+> > > before, things like basic PCI config space emulation are acceptable
+> > > overhead and low risk (imo) and some degree of register emulation is
+> > > well within the territory of an mdev driver.  
+> > 
+> > What troubles me is that idxd already has a direct userspace interface
+> > to its HW, and does userspace DMA. The purpose of this mdev is to
+> > provide a second direct userspace interface that is a little different
+> > and trivially plugs into the virtualization stack.  
+> 
+> No. Userspace DMA and subdevice passthrough (what mdev provides)
+> are two distinct usages IMO (at least in idxd context). and this might 
+> be the main divergence between us, thus let me put more words here. 
+> If we could reach consensus in this matter, which direction to go 
+> would be clearer.
+> 
+> First, a passthrough interface requires some unique requirements 
+> which are not commonly observed in an userspace DMA interface, e.g.:
+> 
+> - Tracking DMA dirty pages for live migration;
+> - A set of interfaces for using SVA inside guest;
+> 	* PASID allocation/free (on some platforms);
+> 	* bind/unbind guest mm/page table (nested translation);
+> 	* invalidate IOMMU cache/iotlb for guest page table changes;
+> 	* report page request from device to guest;
+> 	* forward page response from guest to device;
+> - Configuring irqbypass for posted interrupt;
+> - ...
+> 
+> Second, a passthrough interface requires delegating raw controllability
+> of subdevice to guest driver, while the same delegation might not be
+> required for implementing an userspace DMA interface (especially for
+> modern devices which support SVA). For example, idxd allows following
+> setting per wq (guest driver may configure them in any combination):
+> 	- put in dedicated or shared mode;
+> 	- enable/disable SVA;
+> 	- Associate guest-provided PASID to MSI/IMS entry;
+> 	- set threshold;
+> 	- allow/deny privileged access;
+> 	- allocate/free interrupt handle (enlightened for guest);
+> 	- collect error status;
+> 	- ...
+> 
+> We plan to support idxd userspace DMA with SVA. The driver just needs 
+> to prepare a wq with a predefined configuration (e.g. shared, SVA, 
+> etc.), bind the process mm to IOMMU (non-nested) and then map 
+> the portal to userspace. The goal that userspace can do DMA to 
+> associated wq doesn't change the fact that the wq is still *owned* 
+> and *controlled* by kernel driver. However as far as passthrough 
+> is concerned, the wq is considered 'owned' by the guest driver thus 
+> we need an interface which can support low-level *controllability* 
+> from guest driver. It is sort of a mess in uAPI when mixing the
+> two together.
+> 
+> Based on above two reasons, we see distinct requirements between 
+> userspace DMA and passthrough interfaces, at least in idxd context 
+> (though other devices may have less distinction in-between). Therefore,
+> we didn't see the value/necessity of reinventing the wheel that mdev 
+> already handles well to evolve an simple application-oriented usespace 
+> DMA interface to a complex guest-driver-oriented passthrough interface. 
+> The complexity of doing so would incur far more kernel-side changes 
+> than the portion of emulation code that you've been concerned about...
+>  
+> > 
+> > I don't think VFIO should be the only entry point to
+> > virtualization. If we say the universe of devices doing user space DMA
+> > must also implement a VFIO mdev to plug into virtualization then it
+> > will be alot of mdevs.  
+> 
+> Certainly VFIO will not be the only entry point. and This has to be a 
+> case-by-case decision.  If an userspace DMA interface can be easily 
+> adapted to be a passthrough one, it might be the choice. But for idxd, 
+> we see mdev a much better fit here, given the big difference between 
+> what userspace DMA requires and what guest driver requires in this hw.
+> 
+> > 
+> > I would prefer to see that the existing userspace interface have the
+> > extra needed bits for virtualization (eg by having appropriate
+> > internal kernel APIs to make this easy) and all the emulation to build
+> > the synthetic PCI device be done in userspace.  
+> 
+> In the end what decides the direction is the amount of changes that
+> we have to put in kernel, not whether we call it 'emulation'. For idxd,
+> adding special passthrough requirements (guest SVA, dirty tracking,
+> etc.) and raw controllability to the simple userspace DMA interface 
+> is for sure making kernel more complex than reusing the mdev
+> framework (plus some degree of emulation mockup behind). Not to
+> mention the merit of uAPI compatibility with mdev...
 
-If you are looking for a place to add additional stats, please, check 
-the RTM_*STATS api
+I agree with a lot of this argument, exposing a device through a
+userspace interface versus allowing user access to a device through a
+userspace interface are different levels of abstraction and control.
+In an ideal world, perhaps we could compose one from the other, but I
+don't think the existence of one is proof that the other is redundant.
+That's not to say that mdev/vfio isn't ripe for abuse in this space,
+but I'm afraid the test for that abuse is probably much more subtle.
 
-https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git/tree/net/core/rtnetlink.c#n5351
-(Its a place where new interface and protocol stats are being added)
+I'll also remind folks that LPC is coming up in just a couple short
+weeks and this might be something we should discuss (virtually)
+in-person.  uconf CfPs are currently open. </plug>   Thanks,
+
+Alex
+
