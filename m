@@ -2,99 +2,109 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9C14D2418EB
-	for <lists+kvm@lfdr.de>; Tue, 11 Aug 2020 11:31:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7D387241921
+	for <lists+kvm@lfdr.de>; Tue, 11 Aug 2020 11:53:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728471AbgHKJbp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 11 Aug 2020 05:31:45 -0400
-Received: from mail.loongson.cn ([114.242.206.163]:39742 "EHLO loongson.cn"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1728397AbgHKJbo (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 11 Aug 2020 05:31:44 -0400
-Received: from bogon.localdomain (unknown [113.200.148.30])
-        by mail.loongson.cn (Coremail) with SMTP id AQAAf9DxT9x6ZTJfGGAHAA--.60S2;
-        Tue, 11 Aug 2020 17:31:38 +0800 (CST)
-From:   Xingxing Su <suxingxing@loongson.cn>
-To:     Huacai Chen <chenhc@lemote.com>,
-        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     kvm@vger.kernel.org, linux-mips@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH RESEND] KVM: MIPS/VZ: Fix build error caused by 'kvm_run' cleanup
-Date:   Tue, 11 Aug 2020 17:31:37 +0800
-Message-Id: <1597138297-2105-1-git-send-email-suxingxing@loongson.cn>
-X-Mailer: git-send-email 2.1.0
+        id S1728451AbgHKJxf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 11 Aug 2020 05:53:35 -0400
+Received: from Galois.linutronix.de ([193.142.43.55]:56888 "EHLO
+        galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728274AbgHKJxf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 11 Aug 2020 05:53:35 -0400
+From:   Thomas Gleixner <tglx@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020; t=1597139612;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=34NxuTHuuaxlTrp0QBpYwXdJxhoYhWgkXsT79ACXhBI=;
+        b=yXFv45j/NkN12I89hPKrRRt3y6IsbXp2z30BW9LR1+SIMEFThp1pdeaQ4LM9L9tiAa69no
+        OxF24BGPWPyOplVt5AYdHm0lzBQPC7WqiZBg7GprfATjSKTVoHqu7aZNMhwmN8VMuE7VzF
+        PU4DBYxA9+atj4AOLidlBQ71941w/45ny6a9eL9yMvPKZHRm08ocVrwOr4tN6lc2EbCfi2
+        dFobLLI83Tl6TLwvgx01ezVcJ6H2SRevkfo3LB4VAsKYpsUY5bPf3nqv2pfT6ZqSxqVVCZ
+        MUc+cyl80tzreWSxW2glFKK9WZ4rsz6Zwwl0yY+5FvSLfHBKxEcOyFg3+KRE+g==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020e; t=1597139612;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=34NxuTHuuaxlTrp0QBpYwXdJxhoYhWgkXsT79ACXhBI=;
+        b=neMWOMBKOlsGBQxKGobT2vLvpDelklSE+tFhByonXtY94FggYvZ0ZvmMgZA35XKqEp1WwM
+        Hbwv0AiwaKv3KDAA==
+To:     "Dey\, Megha" <megha.dey@intel.com>,
+        Jason Gunthorpe <jgg@nvidia.com>,
+        "gregkh\@linuxfoundation.org" <gregkh@linuxfoundation.org>
+Cc:     Marc Zyngier <maz@kernel.org>,
+        "Jiang\, Dave" <dave.jiang@intel.com>,
+        "vkoul\@kernel.org" <vkoul@kernel.org>,
+        "bhelgaas\@google.com" <bhelgaas@google.com>,
+        "rafael\@kernel.org" <rafael@kernel.org>,
+        "hpa\@zytor.com" <hpa@zytor.com>,
+        "alex.williamson\@redhat.com" <alex.williamson@redhat.com>,
+        "Pan\, Jacob jun" <jacob.jun.pan@intel.com>,
+        "Raj\, Ashok" <ashok.raj@intel.com>,
+        "Liu\, Yi L" <yi.l.liu@intel.com>,
+        "Lu\, Baolu" <baolu.lu@intel.com>,
+        "Tian\, Kevin" <kevin.tian@intel.com>,
+        "Kumar\, Sanjay K" <sanjay.k.kumar@intel.com>,
+        "Luck\, Tony" <tony.luck@intel.com>,
+        "Lin\, Jing" <jing.lin@intel.com>,
+        "Williams\, Dan J" <dan.j.williams@intel.com>,
+        "kwankhede\@nvidia.com" <kwankhede@nvidia.com>,
+        "eric.auger\@redhat.com" <eric.auger@redhat.com>,
+        "parav\@mellanox.com" <parav@mellanox.com>,
+        "Hansen\, Dave" <dave.hansen@intel.com>,
+        "netanelg\@mellanox.com" <netanelg@mellanox.com>,
+        "shahafs\@mellanox.com" <shahafs@mellanox.com>,
+        "yan.y.zhao\@linux.intel.com" <yan.y.zhao@linux.intel.com>,
+        "pbonzini\@redhat.com" <pbonzini@redhat.com>,
+        "Ortiz\, Samuel" <samuel.ortiz@intel.com>,
+        "Hossain\, Mona" <mona.hossain@intel.com>,
+        "dmaengine\@vger.kernel.org" <dmaengine@vger.kernel.org>,
+        "linux-kernel\@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "x86\@kernel.org" <x86@kernel.org>,
+        "linux-pci\@vger.kernel.org" <linux-pci@vger.kernel.org>,
+        "kvm\@vger.kernel.org" <kvm@vger.kernel.org>,
+        xen-devel@lists.xenproject.org,
+        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        Juergen Gross <jgross@suse.com>
+Subject: Re: [PATCH RFC v2 02/18] irq/dev-msi: Add support for a new DEV_MSI irq domain
+In-Reply-To: <87ft8uxjga.fsf@nanos>
+References: <87h7tcgbs2.fsf@nanos.tec.linutronix.de> <87ft8uxjga.fsf@nanos>
+Date:   Tue, 11 Aug 2020 11:53:31 +0200
+Message-ID: <87d03x5x0k.fsf@nanos.tec.linutronix.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=y
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: AQAAf9DxT9x6ZTJfGGAHAA--.60S2
-X-Coremail-Antispam: 1UD129KBjDUn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7v73
-        VFW2AGmfu7bjvjm3AaLaJ3UjIYCTnIWjp_UUUYl7k0a2IF6F4UM7kC6x804xWl14x267AK
-        xVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0rVWrJVCq3wAFIxvE14AKwVWUJVWUGw
-        A2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK021l84ACjcxK6xIIjxv20xvE14v26r4j
-        6ryUM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4j6F4UM28EF7xvwVC2z280aVAFwI0_Cr
-        1j6rxdM28EF7xvwVC2z280aVCY1x0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv
-        0487M2AExVAIFx02aVAFz4v204v7Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2
-        IY67AKxVWUGVWUXwAv7VC2z280aVAFwI0_Cr0_Gr1UMcvjeVCFs4IE7xkEbVWUJVW8JwAC
-        jcxG0xvY0x0EwIxGrwAKzVC20s0267AEwI8IwI0ExsIj0wCY02Avz4vE14v_GFWl42xK82
-        IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC2
-        0s026x8GjcxK67AKxVWUJVWUGwC2zVAF1VAY17CE14v26r126r1DMIIYrxkI7VAKI48JMI
-        IF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r1j6r4UMIIF
-        0xvE42xK8VAvwI8IcIk0rVWrJr0_WFyUJwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I
-        8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjxUzMa0DUUUU
-X-CM-SenderInfo: pvx0x0xj0l0wo6or00hjvr0hdfq/1tbiAQAFC13QvMLodgACsg
+Content-Type: text/plain
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Commit c34b26b98caca48ec9ee9 ("KVM: MIPS: clean up redundant 'kvm_run'
-parameters") remove the 'kvm_run' parameter in kvm_vz_gpsi_lwc2.
+Thomas Gleixner <tglx@linutronix.de> writes:
 
-The following build error:
+CC+: XEN folks
 
-arch/mips/kvm/vz.c: In function ‘kvm_trap_vz_handle_gpsi’:
-arch/mips/kvm/vz.c:1243:43: error: ‘run’ undeclared (first use in this function)
-   er = kvm_vz_gpsi_lwc2(inst, opc, cause, run, vcpu);
-                                           ^~~
-arch/mips/kvm/vz.c:1243:43: note: each undeclared identifier is reported only 
-once for each function it appears in
-scripts/Makefile.build:283: recipe for target 'arch/mips/kvm/vz.o' failed
-make[2]: *** [arch/mips/kvm/vz.o] Error 1
-scripts/Makefile.build:500: recipe for target 'arch/mips/kvm' failed
-make[1]: *** [arch/mips/kvm] Error 2
-Makefile:1785: recipe for target 'arch/mips' failed
-make: *** [arch/mips] Error 2
+> Thomas Gleixner <tglx@linutronix.de> writes:
+>> The infrastructure itself is not more than a thin wrapper around the
+>> existing msi domain infrastructure and might even share code with
+>> platform-msi.
+>
+> And the annoying fact that you need XEN support which opens another can
+> of worms...
 
-Signed-off-by: Xingxing Su <suxingxing@loongson.cn>
----
- +cc Paolo Bonzini <pbonzini@redhat.com> and kvm@vger.kernel.org.
+which needs some real cleanup first.
 
- arch/mips/kvm/vz.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+x86 still does not associate the irq domain to devices at device
+discovery time, i.e. the device::msi_domain pointer is never populated.
 
-diff --git a/arch/mips/kvm/vz.c b/arch/mips/kvm/vz.c
-index 3932f76..49c6a2a 100644
---- a/arch/mips/kvm/vz.c
-+++ b/arch/mips/kvm/vz.c
-@@ -1142,7 +1142,6 @@ static enum emulation_result kvm_vz_gpsi_cache(union mips_instruction inst,
- #ifdef CONFIG_CPU_LOONGSON64
- static enum emulation_result kvm_vz_gpsi_lwc2(union mips_instruction inst,
- 					      u32 *opc, u32 cause,
--					      struct kvm_run *run,
- 					      struct kvm_vcpu *vcpu)
- {
- 	unsigned int rs, rd;
-@@ -1240,7 +1239,7 @@ static enum emulation_result kvm_trap_vz_handle_gpsi(u32 cause, u32 *opc,
- #endif
- #ifdef CONFIG_CPU_LOONGSON64
- 	case lwc2_op:
--		er = kvm_vz_gpsi_lwc2(inst, opc, cause, run, vcpu);
-+		er = kvm_vz_gpsi_lwc2(inst, opc, cause, vcpu);
- 		break;
- #endif
- 	case spec3_op:
--- 
-2.1.0
+So to support this new fangled device MSI stuff we'd need yet more
+x86/xen specific arch_*msi_irqs() indirection and hackery, which is not
+going to happen.
 
+The right thing to do is to convert XEN MSI support over to proper irq
+domains. This allows to populate device::msi_domain which makes a lot of
+things simpler and also more consistent.
+
+Thanks,
+
+        tglx
