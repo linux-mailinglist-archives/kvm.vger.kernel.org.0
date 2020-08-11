@@ -2,110 +2,108 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 746DF2414C9
-	for <lists+kvm@lfdr.de>; Tue, 11 Aug 2020 04:05:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 47B4D241511
+	for <lists+kvm@lfdr.de>; Tue, 11 Aug 2020 04:54:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728094AbgHKCE7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 10 Aug 2020 22:04:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49240 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728038AbgHKCE6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 10 Aug 2020 22:04:58 -0400
-Received: from mail-oi1-x234.google.com (mail-oi1-x234.google.com [IPv6:2607:f8b0:4864:20::234])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 638ABC06174A
-        for <kvm@vger.kernel.org>; Mon, 10 Aug 2020 19:04:58 -0700 (PDT)
-Received: by mail-oi1-x234.google.com with SMTP id k4so10838366oik.2
-        for <kvm@vger.kernel.org>; Mon, 10 Aug 2020 19:04:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:from:date:message-id:subject:to:cc;
-        bh=SgoaiMSEPufkLOGCw9jkAaNspUy5psHt4V7wQ1xC+iI=;
-        b=Zde9Z/LUgA0FPTB4+lMGD5TnRUgLGUfxB6n3/XW7kz26jsdEDb9soSb5U8Cu8M4rI1
-         zihq8OZNBAs/0ZBzFk9q43zApcCh0p5KZUk25yRzMlRwgLzG1Yqna4zu36Cp3Yj29iG1
-         fbLkAioLScdWwZYpiWNhJ6RnnxCKWsFqtGeo+pM4lg0aUes51/qHxgYO6seVeog7tFKm
-         ZsY6/Mj+sewpwIolxxhaSJNwXEljB6IJX+aYWphddiPaBGVXpoFVslYl+rXUl0pJxcTm
-         gvnk1Y+pHb130YVlkHUPzkK592PtkRcasn5qi+AIyz8W9sg+XAfbArdY/uzgUBSsrygS
-         4iPw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
-        bh=SgoaiMSEPufkLOGCw9jkAaNspUy5psHt4V7wQ1xC+iI=;
-        b=qLSnMHTHH5ZwQ5CAW1y7izTBn6KcoC2WrvaioLMNrRqa/UW4P8xygnAqSgZ2UGB0I2
-         Q7vBI4pfbUTktAWomVfIy1Rv4ZFSL0uu2+fYSUJ8VGXAgTdah7f8qW7TSp3ppMjHmTDv
-         dNrWeL0lwj51nVIv4m1+FKAtRIJ9StzmLHVJNSXxUtwnMhvTGSGO3DqHrWwnyVSX1Lak
-         bZyTbxZS393VK584TCEDZ4TQ9nlW/hkTxG0Z2+Leh9NOKNCA/UpNxaBxEQz1RaImovBw
-         QtI6JPrU/lyynhvei7XOyULQSM1Fc4+dHs4lq5Q1HDJ/o1IjH7U1ek290lv/R4CT6aWB
-         9Qhg==
-X-Gm-Message-State: AOAM5333P3VO0pnsH4MPQCFBQXlvavkJHl3gyGM0rtzj46XKyuCaWZkJ
-        NW2zzRVLxwOTj3dpDay2Clmwo0+WdIipGLNHwFwe+4Hd
-X-Google-Smtp-Source: ABdhPJzyAu8fWc36adPx1WXlOzn2sipVKrEpN7J8aIO6Dmgb+Gx3nZNBSkYlRX4FpWjmIw0i/yB1/l+a+hCq8LPjA7I=
-X-Received: by 2002:a05:6808:8d6:: with SMTP id k22mr1818378oij.5.1597111497548;
- Mon, 10 Aug 2020 19:04:57 -0700 (PDT)
+        id S1728179AbgHKCyD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 10 Aug 2020 22:54:03 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:57309 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726831AbgHKCyD (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 10 Aug 2020 22:54:03 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1597114442;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=QkQRU8e1rT0qyUbw+JJg0ZU52Alo7Rsy9OtRuJe42bU=;
+        b=aORUiqIvBcHB5yyfRP/WSyqx/KKMfF2nIHkRvtMGL6yEoFkgQzoAGKRQOw9vauEOmlaVed
+        2MEkYFl8LpPhu12iWU6KxEu7AMcqy/VWPtej/qxgWJtiUioLfz5FChHraTZw/yQLQe226Z
+        lAwYjGC3nb9tDTzcdB9m2AVrSbzIjbY=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-177-nBBoDX1iNRmQDYLbImgUYw-1; Mon, 10 Aug 2020 22:54:00 -0400
+X-MC-Unique: nBBoDX1iNRmQDYLbImgUYw-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7B44418A0F01;
+        Tue, 11 Aug 2020 02:53:59 +0000 (UTC)
+Received: from [10.72.13.186] (ovpn-13-186.pek2.redhat.com [10.72.13.186])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 9DAB9101E7F9;
+        Tue, 11 Aug 2020 02:53:49 +0000 (UTC)
+Subject: Re: [PATCH V5 1/6] vhost: introduce vhost_vring_call
+To:     "Michael S. Tsirkin" <mst@redhat.com>
+Cc:     "Zhu, Lingshan" <lingshan.zhu@intel.com>,
+        alex.williamson@redhat.com, pbonzini@redhat.com,
+        sean.j.christopherson@intel.com, wanpengli@tencent.com,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        kvm@vger.kernel.org, eli@mellanox.com, shahafs@mellanox.com,
+        parav@mellanox.com
+References: <20200731065533.4144-1-lingshan.zhu@intel.com>
+ <20200731065533.4144-2-lingshan.zhu@intel.com>
+ <5e646141-ca8d-77a5-6f41-d30710d91e6d@redhat.com>
+ <d51dd4e3-7513-c771-104c-b61f9ee70f30@intel.com>
+ <156b8d71-6870-c163-fdfa-35bf4701987d@redhat.com>
+ <20200804052050-mutt-send-email-mst@kernel.org>
+ <14fd2bf1-e9c1-a192-bd6c-f1ee5fd227f6@redhat.com>
+ <20200810093630-mutt-send-email-mst@kernel.org>
+From:   Jason Wang <jasowang@redhat.com>
+Message-ID: <b669a4c6-f3d7-6cf0-0f7e-8058628c0138@redhat.com>
+Date:   Tue, 11 Aug 2020 10:53:48 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-From:   Wanpeng Li <kernellwp@gmail.com>
-Date:   Tue, 11 Aug 2020 10:04:46 +0800
-Message-ID: <CANRm+Cx597FNRUCyVz1D=B6Vs2GX3Sw57X7Muk+yMpi_hb+v1w@mail.gmail.com>
-Subject: IPI broadcast latency in the guest is worse when AVIC is enabled
-To:     Suravee Suthikulpanit <Suravee.Suthikulpanit@amd.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm <kvm@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20200810093630-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi all,
 
-We found that the IPI broadcast latency in the guest when AVIC=1,
-exposing xapic is worse than when AVIC=0, exposing xapic. The host is
-AMD ROME, 2 sockets, 96 cores, 192 threads, the VM is 180 vCPUs. The
-guest boots with kvm-hint-dedicated=on, --overcommit cpu-pm=on, -smp
-180,sockets=2,cores=45,threads=2, l3-cache=on qemu command-line, the
-pCPU which vCPU is running on is isolated. Both the guest and host
-kernel are 5.8 Linus' tree. (Note, if you fails to boot with
---overcommit cpu-pm=on, you can comments out commit e72436bc3a52, I
-have a report here, https://lkml.org/lkml/2020/7/8/308)
-
-IPI microbenchmark(https://lkml.org/lkml/2017/12/19/141, Destination
-Shorthand is All excluding self)
-
-avic0_xapic:   12313907508.50 ns
-avic1_xapic:   19106424733.30 ns
-avic0_x2apic: 13073988486.00 ns
-
-
-ebizzy -M  (Destination Shorthand is All excluding self)
-
-avic0_xapic
-9416 records/s
-real 10.00 s
-user  4.80 s
-sys  1693.25 s
-
-avic1_xapic
-18157 records/s
-real 10.00 s
-user 10.69 s
-sys  1779.80 s
-
-avic0_x2apic
-74507 records/s
-real 10.00 s
-user 48.98 s
-sys  1752.12 s
+On 2020/8/10 下午9:37, Michael S. Tsirkin wrote:
+> On Wed, Aug 05, 2020 at 10:16:16AM +0800, Jason Wang wrote:
+>> On 2020/8/4 下午5:21, Michael S. Tsirkin wrote:
+>>>>>>>     +struct vhost_vring_call {
+>>>>>>> +    struct eventfd_ctx *ctx;
+>>>>>>> +    struct irq_bypass_producer producer;
+>>>>>>> +    spinlock_t ctx_lock;
+>>>>>> It's not clear to me why we need ctx_lock here.
+>>>>>>
+>>>>>> Thanks
+>>>>> Hi Jason,
+>>>>>
+>>>>> we use this lock to protect the eventfd_ctx and irq from race conditions,
+>>>> We don't support irq notification from vDPA device driver in this version,
+>>>> do we still have race condition?
+>>>>
+>>>> Thanks
+>>> Jason I'm not sure what you are trying to say here.
+>>
+>> I meant we change the API from V4 so driver won't notify us if irq is
+>> changed.
+>>
+>> Then it looks to me there's no need for the ctx_lock, everyhing could be
+>> synchronized with vq mutex.
+>>
+>> Thanks
+> Jason do you want to post a cleanup patch simplifying code along these
+> lines?
 
 
-./hackbench -l 1000000  (Destination Shorthand is Destination)
+Ling Shan promised to post a patch to fix this.
 
-avic0_xapic
-Time: 121.339
+Thanks
 
-avic1_xapic
-Time: 117.840
 
-avic0_x2apic
-Time: 118.753
+>
+> Thanks,
+>
+>
+>>>
 
-Any thoughts?
-
-    Wanpeng
