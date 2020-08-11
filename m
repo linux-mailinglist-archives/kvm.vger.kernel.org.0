@@ -2,67 +2,89 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2746324183B
-	for <lists+kvm@lfdr.de>; Tue, 11 Aug 2020 10:29:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B2BF324184A
+	for <lists+kvm@lfdr.de>; Tue, 11 Aug 2020 10:32:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728347AbgHKI3D (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 11 Aug 2020 04:29:03 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:54654 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1728224AbgHKI3D (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 11 Aug 2020 04:29:03 -0400
+        id S1728336AbgHKIcW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 11 Aug 2020 04:32:22 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:58771 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1728320AbgHKIcW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 11 Aug 2020 04:32:22 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1597134542;
+        s=mimecast20190719; t=1597134741;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=Krbl59lVgdIaVHFIqHsULDB7P5tPQ/ZmDROWkw57zBg=;
-        b=P5X8U21PXOWHBQFX4JAU0I1ryQ4GnEZOeqgeNyFl3Wy0oqwdlUIgRONGHkI6M0uR/zgYLG
-        1AK8FAIc7+ezBn6jt2WatU9ztJqvpvEdOvYXx22pYxB3EXMrdzpMaqFTEYvlWKivrMw9RQ
-        xl2KlgEORI6XpxXsYythkwLdIYnvKSM=
-Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
- [209.85.208.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-212-WvBAqCruMnONmQn016SbiA-1; Tue, 11 Aug 2020 04:28:58 -0400
-X-MC-Unique: WvBAqCruMnONmQn016SbiA-1
-Received: by mail-ed1-f71.google.com with SMTP id p26so4285907edt.11
-        for <kvm@vger.kernel.org>; Tue, 11 Aug 2020 01:28:58 -0700 (PDT)
+        bh=113l6rTObZmAfNhvroTdwAx0MPPacy2TWww2KjZvjFE=;
+        b=Bu1id6STBDZHupKP9WghdjZGj32KVUbB7DJBKUjBfHgwzCTJ1biieEVVcRZJQk1sk2sgOY
+        dIQ8hboBda+YANOBJx1Pxp3H4aZeFb/I3l3uk0Fj4ZBexXjsLeceSwr/pDdYXhOoMCLpjF
+        GLJiTJ3sjTq/p9x356+JanyGzuACpm8=
+Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
+ [209.85.208.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-129-yP0etY7POo2chh936vHttg-1; Tue, 11 Aug 2020 04:32:19 -0400
+X-MC-Unique: yP0etY7POo2chh936vHttg-1
+Received: by mail-ed1-f72.google.com with SMTP id x12so4347212eds.4
+        for <kvm@vger.kernel.org>; Tue, 11 Aug 2020 01:32:19 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=Krbl59lVgdIaVHFIqHsULDB7P5tPQ/ZmDROWkw57zBg=;
-        b=id7j44hdRb99AQY8tU/Bcqf9MPnl7ugnscbcp5w+adrACOrlOm3ANqqucQCs/A2U6R
-         U8YkvAcXE4aFuN7Qh0SdCCq0lh0QYbGYU7NGfxQ6Jm7uCe32S1n5e7l+uJnL7x+gDSjY
-         qCfDIhSmcozEhMj/IbSzfj3wmeuoLVPo5WXqvkw/kOocqVyDVrdVKExqXnBWCUmkd7d2
-         7f7s1ADlz7897UQIji4AVaQ0cBecOtzfoRuaLosaoJFwTvfJ/ITVpKvaETm9zcNwYJuf
-         hiNewyeQfMHlmfg59W6O5ct+KCVts1xzNy9OLGa2L0+v/MYMyFxfqMICYQdaW61LUmPR
-         MeQg==
-X-Gm-Message-State: AOAM533SZ+r76oR1CyYeYtklLI8ITBxlBxkP+PinbYPwjzcuwmTAx4Sc
-        0+Co8SFmEhkcQYyRcPrjDyL1GPdwYx3HUyGZmUQqJAnOiLlxMpoF/hpicHqS4a5wvJZT/an51It
-        eepn7IvbR6lZ3
-X-Received: by 2002:a17:906:c406:: with SMTP id u6mr26518301ejz.47.1597134537428;
-        Tue, 11 Aug 2020 01:28:57 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwQoSfGdOEJTj0vof5G8y97JMED6X5COIn9LMmeJ/9OtCYydJfL+5UrjguBX6GLh128ND/pmw==
-X-Received: by 2002:a17:906:c406:: with SMTP id u6mr26518290ejz.47.1597134537250;
-        Tue, 11 Aug 2020 01:28:57 -0700 (PDT)
+        bh=113l6rTObZmAfNhvroTdwAx0MPPacy2TWww2KjZvjFE=;
+        b=JOA/Rb2GxfeV3g1SyO5zGRiYiPAE3L8YAJhT4OYTLw/7bFudrNDI7IskkWkzBkwwBc
+         Qyq0bqVHnaDQaNfNMvmFGidHrh5odC9byxp8vQvrmO/WP+uBU+d0YlpTQn1CLQUjz3az
+         PflxOiXnMVnJBqLAFffnxKQbZQI/zhWmutCs41sgCIbWDG3c8ogR0fMFwCaqvO487YOU
+         WYOAnyBhZATDe8jssdQWOGXcti5G4IR9RD87PwpjeNO96N2pOYqgwQUp7FSAW6FY9IpI
+         qQxlEQa9af8Vd1yLb2TF2JSJWHJOXAQ2ihrA5+jEIv4enVGQkRl+X9lzEzoNOf7buj7N
+         /4PQ==
+X-Gm-Message-State: AOAM5331OQYJ/PPWqXsMnAav7KJw8+XmYqMlFQZENfBITVuTwkufdtpt
+        F9rhRiMkuyiTrL56XXASweafV5UKpjpkcTnAO8zACd6o9O3CY5UYQKe/dsZPBYAxv/i075m77uc
+        r3fmhYqRZC+AU
+X-Received: by 2002:a17:906:1c0e:: with SMTP id k14mr24859823ejg.479.1597134738249;
+        Tue, 11 Aug 2020 01:32:18 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJybotlmCqqppRaJBarXLrP9vGvqFoSrT6KeBVeAUKEclQWSoGUzHpi4cyfpXTfE0GXpnUywlA==
+X-Received: by 2002:a17:906:1c0e:: with SMTP id k14mr24859805ejg.479.1597134738030;
+        Tue, 11 Aug 2020 01:32:18 -0700 (PDT)
 Received: from [192.168.178.58] ([151.21.12.249])
-        by smtp.gmail.com with ESMTPSA id e14sm14003787edl.86.2020.08.11.01.28.56
+        by smtp.gmail.com with ESMTPSA id d11sm13983189edm.87.2020.08.11.01.32.16
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 11 Aug 2020 01:28:56 -0700 (PDT)
-Subject: Re: IPI broadcast latency in the guest is worse when AVIC is enabled
-To:     Wanpeng Li <kernellwp@gmail.com>,
-        Suravee Suthikulpanit <Suravee.Suthikulpanit@amd.com>
-Cc:     kvm <kvm@vger.kernel.org>, Wei Huang <wei@redhat.com>
-References: <CANRm+Cx597FNRUCyVz1D=B6Vs2GX3Sw57X7Muk+yMpi_hb+v1w@mail.gmail.com>
+        Tue, 11 Aug 2020 01:32:17 -0700 (PDT)
+Subject: Re: [PATCH v3 2/2] x86/kvm: Expose new features for supported cpuid
+To:     "Luck, Tony" <tony.luck@intel.com>,
+        "Zhang, Cathy" <cathy.zhang@intel.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "x86@kernel.org" <x86@kernel.org>
+Cc:     "Christopherson, Sean J" <sean.j.christopherson@intel.com>,
+        "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "Hansen, Dave" <dave.hansen@intel.com>,
+        "Park, Kyung Min" <kyung.min.park@intel.com>,
+        "ricardo.neri-calderon@linux.intel.com" 
+        <ricardo.neri-calderon@linux.intel.com>,
+        "vkuznets@redhat.com" <vkuznets@redhat.com>,
+        "wanpengli@tencent.com" <wanpengli@tencent.com>,
+        "jmattson@google.com" <jmattson@google.com>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "mingo@redhat.com" <mingo@redhat.com>,
+        "bp@alien8.de" <bp@alien8.de>, "hpa@zytor.com" <hpa@zytor.com>,
+        "jpoimboe@redhat.com" <jpoimboe@redhat.com>,
+        "ak@linux.intel.com" <ak@linux.intel.com>,
+        "Shankar, Ravi V" <ravi.v.shankar@intel.com>
+References: <1596959242-2372-1-git-send-email-cathy.zhang@intel.com>
+ <1596959242-2372-3-git-send-email-cathy.zhang@intel.com>
+ <d7e9fb9a-e392-73b1-5fc8-3876cb30665c@redhat.com>
+ <27965021-2ec7-aa30-5526-5a6b293b2066@intel.com>
+ <e92df7bb267c478f8dfa28a31fc59d95@intel.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <95c26b17-66c6-0050-053b-faa4d63a2347@redhat.com>
-Date:   Tue, 11 Aug 2020 10:28:55 +0200
+Message-ID: <450cca92-259f-4fb5-1f95-596e8862ba3b@redhat.com>
+Date:   Tue, 11 Aug 2020 10:32:15 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.9.0
 MIME-Version: 1.0
-In-Reply-To: <CANRm+Cx597FNRUCyVz1D=B6Vs2GX3Sw57X7Muk+yMpi_hb+v1w@mail.gmail.com>
+In-Reply-To: <e92df7bb267c478f8dfa28a31fc59d95@intel.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -71,25 +93,19 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 11/08/20 04:04, Wanpeng Li wrote:
-> We found that the IPI broadcast latency in the guest when AVIC=1,
-> exposing xapic is worse than when AVIC=0, exposing xapic. The host is
-> AMD ROME, 2 sockets, 96 cores, 192 threads, the VM is 180 vCPUs. The
-> guest boots with kvm-hint-dedicated=on, --overcommit cpu-pm=on, -smp
-> 180,sockets=2,cores=45,threads=2, l3-cache=on qemu command-line, the
-> pCPU which vCPU is running on is isolated. Both the guest and host
-> kernel are 5.8 Linus' tree. (Note, if you fails to boot with
-> --overcommit cpu-pm=on, you can comments out commit e72436bc3a52, I
-> have a report here, https://lkml.org/lkml/2020/7/8/308)
+On 11/08/20 01:59, Luck, Tony wrote:
 > 
-> IPI microbenchmark(https://lkml.org/lkml/2017/12/19/141, Destination
-> Shorthand is All excluding self)
+> Part 1: Add TSXLDTRK to cpufeatures.h Part 2: Add TSXLDTRK to
+> arch/x86/kvm/cpuid.c (on top of the version that Paolo committed with
+> SERIALIZE)
 > 
-> avic0_xapic:   12313907508.50 ns
-> avic1_xapic:   19106424733.30 ns
-> avic0_x2apic: 13073988486.00 ns
+> Paolo: The 5.9 merge window is still open this week. Will you send
+> the KVM serialize patch to Linus before this merge window closes?  Or
+> do you have it queued for v5.10?
 
-I think it depends on the microarchitecture implementation of AVIC?
+Yes, I am sending it today together with the bulk of ARM and PPC
+changes.  I just wanted to soak the branch in linux-next for a day or
+two, just in case I screwed up the ARM and PPC pull requests.
 
 Paolo
 
