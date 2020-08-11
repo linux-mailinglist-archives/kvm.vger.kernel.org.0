@@ -2,50 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 99EC2241AB6
-	for <lists+kvm@lfdr.de>; Tue, 11 Aug 2020 13:58:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 21FA9241B21
+	for <lists+kvm@lfdr.de>; Tue, 11 Aug 2020 14:45:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728849AbgHKL61 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 11 Aug 2020 07:58:27 -0400
-Received: from hqnvemgate26.nvidia.com ([216.228.121.65]:15065 "EHLO
-        hqnvemgate26.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728469AbgHKL6Z (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 11 Aug 2020 07:58:25 -0400
-Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by hqnvemgate26.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
-        id <B5f3287d40000>; Tue, 11 Aug 2020 04:58:12 -0700
-Received: from hqmail.nvidia.com ([172.20.161.6])
-  by hqpgpgate101.nvidia.com (PGP Universal service);
-  Tue, 11 Aug 2020 04:58:25 -0700
-X-PGP-Universal: processed;
-        by hqpgpgate101.nvidia.com on Tue, 11 Aug 2020 04:58:25 -0700
-Received: from HQMAIL111.nvidia.com (172.20.187.18) by HQMAIL107.nvidia.com
- (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Tue, 11 Aug
- 2020 11:58:25 +0000
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (104.47.58.174)
- by HQMAIL111.nvidia.com (172.20.187.18) with Microsoft SMTP Server (TLS) id
- 15.0.1473.3 via Frontend Transport; Tue, 11 Aug 2020 11:58:25 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Hl90s2MeFEmcQGDLUIC5C48oxHaBHpAq3hgYpWpFEgCmDSExArKZuXmeBxZWt+3Xdg5XbS/bZSXjE88hzPPEhLCUVVuSls93qfM/noXjyo8dSW8JX3WmNuykdeO4I1yv/j+VSGOxNxtAq9RmBkmpOlTDTfKclbF0amKzc+zZV62vWVUgErIqw/AvUm4gzoPYBs63SsTreffquO+ElJSYCjvdC7kIS36l9KZgBqQIwUpX/VLWQU2y3oT8LPQcbufDEFz7h+DORYjQ80lzocc79OB7wzkSlRvmW7TN26f9kowcsrgSAB6lJIFKtY87AUN53FWOGucpOTtpeFuwS79ryg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=f6ZQZFJWx5F3kfEGWwVFTMFrnC4Q9OeREi5+g2wW5p8=;
- b=GM9+pX9Zb1BP4m9K53TxSicqY7Aqij/dbmkT3S3UUkHjMQdSaIHaQ8r2y9CqxwfXfXSWgw+FStquKuHnduNzMG5BHBFHmkvREaii80J2FskPpnW1UXdFa+HVHKE9BTg0E+QPC8KdsdvnIt5L2Pi6kG/YFgUEuVrk5OFLCZ+MB3X/XXMx9qrY4cpPPiZ8dfwtjnWAEo+b4HrKK87eCuJy7kwsychS+QlwOQrBmp4m+64C+14ukbxpIpwLRGoZ/qgNYIfYM1MVf7ul9at+UOqxGmj2cQAijGE8YXwki2hyQEioaXwwXScXQ7nzcJKUTE8ychPfh93LrNNAaRC0Bjlwbw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-Received: from BN8PR12MB3425.namprd12.prod.outlook.com (2603:10b6:408:61::28)
- by BN8PR12MB3124.namprd12.prod.outlook.com (2603:10b6:408:41::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3261.19; Tue, 11 Aug
- 2020 11:58:23 +0000
-Received: from BN8PR12MB3425.namprd12.prod.outlook.com
- ([fe80::8941:c1aa:1ab4:2e39]) by BN8PR12MB3425.namprd12.prod.outlook.com
- ([fe80::8941:c1aa:1ab4:2e39%6]) with mapi id 15.20.3261.024; Tue, 11 Aug 2020
- 11:58:23 +0000
-From:   Eli Cohen <elic@nvidia.com>
-To:     "Michael S. Tsirkin" <mst@redhat.com>
-CC:     Jason Wang <jasowang@redhat.com>,
+        id S1728675AbgHKMoz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 11 Aug 2020 08:44:55 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:43165 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726829AbgHKMow (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 11 Aug 2020 08:44:52 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1597149891;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=4gObRQ0Fq7QQ6hAOg5wupZW2BNQ64paK3yGpxjhjhBc=;
+        b=ZYEouhJQ0gCp2Xdme9aoM4vokldNKdRGTS7dJDphyXW1burB1shOTOH+z5FJxpAiUBx1qf
+        gohF51eVxt7+mMHsQiHCU4ZAIgSTl8rQ/Owj1isiJBLkG15EQSjthDGMBbk08YCZczMZjj
+        wxKjuy6n82j+LOLtphl8kVBQmUQI1Vg=
+Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
+ [209.85.218.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-424--cwDBJZMMduOCWVWDUf1TA-1; Tue, 11 Aug 2020 08:44:49 -0400
+X-MC-Unique: -cwDBJZMMduOCWVWDUf1TA-1
+Received: by mail-ej1-f72.google.com with SMTP id y10so5117664ejd.1
+        for <kvm@vger.kernel.org>; Tue, 11 Aug 2020 05:44:49 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=4gObRQ0Fq7QQ6hAOg5wupZW2BNQ64paK3yGpxjhjhBc=;
+        b=GSWV7RXVwsFaAokPpd4XsBy4SkH1/utgcI1mRBQVk7KAea+Hg/8+kYokXgEqxuI6TU
+         RWyr+7cv7bZVyXRc3YQpVjjf+eWG1Ym26nIYNlp8SUkFl/cPQ8Q6D4ABxfADKY+QdhDY
+         Q3MECLPh1FPI8c2S6upl1YZbz3npLiYjtoKHfuPpcFANhozbEptYd2wDOIcrSMJ6DrG2
+         elx8A6flIxknAdvVacR7vECRWbWNhBrevwdlTTgBNhYQSndNnp+tpGmyudGFtr3SYDEs
+         VjsyfNsW18bLdqvgaKyJXUWPlA2O3NjI2VJ/zbqxuuO2Nx3gtkzhHCPsFPS/w43YzIC+
+         4gmw==
+X-Gm-Message-State: AOAM5302gbc6PXAZRMKfvws5xzi2aRzLH0kMKnnXeSozQLmLLBWOuOkc
+        d8FWpj8wo3h5ZjDzXAmxr+UMauMjs3mTcrKn8YjTGdEBFZhC1gjBxmKsjA6foWxra+ceg3NWv6v
+        LmAqFZvwUuF67
+X-Received: by 2002:a05:6402:1218:: with SMTP id c24mr25203360edw.44.1597149888549;
+        Tue, 11 Aug 2020 05:44:48 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzIaQixLajacpoqLdEsULPbWw/H9fIINTYi9tun3K98B+6Mv/G3SkYZ35zHOyX7A3SBCMINnQ==
+X-Received: by 2002:a05:6402:1218:: with SMTP id c24mr25203332edw.44.1597149888269;
+        Tue, 11 Aug 2020 05:44:48 -0700 (PDT)
+Received: from redhat.com ([147.161.12.106])
+        by smtp.gmail.com with ESMTPSA id q11sm14418807edn.12.2020.08.11.05.44.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 11 Aug 2020 05:44:47 -0700 (PDT)
+Date:   Tue, 11 Aug 2020 08:44:43 -0400
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Eli Cohen <elic@nvidia.com>
+Cc:     Jason Wang <jasowang@redhat.com>,
         "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
         "virtualization@lists.linux-foundation.org" 
         <virtualization@lists.linux-foundation.org>,
@@ -54,109 +61,63 @@ CC:     Jason Wang <jasowang@redhat.com>,
         "eli@mellanox.com" <eli@mellanox.com>,
         "lulu@redhat.com" <lulu@redhat.com>,
         Majd Dibbiny <majd@nvidia.com>,
-        "Maor Dickman" <maord@nvidia.com>,
+        Maor Dickman <maord@nvidia.com>,
         Shahaf Shuler <shahafs@mellanox.com>,
-        "Parav Pandit" <parav@mellanox.com>
-Subject: RE: VDPA Debug/Statistics
-Thread-Topic: VDPA Debug/Statistics
-Thread-Index: AdZv0SSA/p/JVf9BSJCSJo3Lye0OEAAAhW8AAADKLnA=
-Date:   Tue, 11 Aug 2020 11:58:23 +0000
-Message-ID: <BN8PR12MB34259F2AE1FDAF2D40E48C5BAB450@BN8PR12MB3425.namprd12.prod.outlook.com>
+        Parav Pandit <parav@mellanox.com>
+Subject: Re: VDPA Debug/Statistics
+Message-ID: <20200811083803-mutt-send-email-mst@kernel.org>
 References: <BN8PR12MB342559414BE03DFC992AD03DAB450@BN8PR12MB3425.namprd12.prod.outlook.com>
  <20200811073144-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20200811073144-mutt-send-email-mst@kernel.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: redhat.com; dkim=none (message not signed)
- header.d=none;redhat.com; dmarc=none action=none header.from=nvidia.com;
-x-originating-ip: [37.142.159.249]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 026cd186-1bf4-4009-e71a-08d83dedd97f
-x-ms-traffictypediagnostic: BN8PR12MB3124:
-x-ld-processed: 43083d15-7273-40c1-b7db-39efd9ccc17a,ExtAddr
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <BN8PR12MB3124703A07615E0E89BE17FBAB450@BN8PR12MB3124.namprd12.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:9508;
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: X1hjGoI4Gc0Qa5CD/tIjZJA6amEcMKuBQAV9AjcXtDaEgvXSuUai0ke20qNvXstkWGvellE/043d1773gVwVLb8xUy/mWMuMj25YXNZfw1MmjIAnPCadbvpFZbZkeN4pVcvS6YReWwf+cqmlOfxK1P/TplRdpcNcnsg431nmHfy/gWmKy3iKKh6S/NB6v2MXhef9L9zfqTi0ScEy32HG1QFJmg1JUWVp+oJobfdH8kTglIw7VNbM0r4kBIsymlCC06i3QHXwUQNBObDNziU2sUCblJJ7BQXYH2PGc4Zos90QhQftqklbE4JsXjbRvtg29Uhh+mlW4HUqMHgyC9/xOQ==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN8PR12MB3425.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFTY:;SFS:(4636009)(376002)(136003)(346002)(366004)(39860400002)(396003)(66556008)(64756008)(8676002)(76116006)(66476007)(66946007)(83380400001)(8936002)(66446008)(33656002)(71200400001)(86362001)(107886003)(6506007)(55016002)(3480700007)(5660300002)(4326008)(52536014)(54906003)(9686003)(2906002)(186003)(7696005)(478600001)(6916009)(316002)(26005);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata: noRbEu3USd1MGB51yHIvemE1J7PRpaItdSmVAp86UqEKCW4AV49uUd+Ukslk2KMJt7R7jWW1Gtx/a2oYeUdlJ6Et9yb4j6ZkCoxWHM0r9mFpoOCCtDcS2z2aCPLLk2kyJbjRz8rndh02qzOuUKsoM9wEPBjCX79UcxNFsryCRMRIpreMPW+8bipsdebdBJ3s1oXjMdte9ciF6MnjV+zsukdQnB70M1oPX8Hsn0JQu2go7TOaLTVH5yV3hkBW5vfY73uxr4wGhLmSMuhjQADyefTwiDVvxn2hzPcL3RHgLs4/h2Bd11VxHaWBRyPJC0DJVrJNiWMOeCFDS5ezqHhpZewvcZvTFnpDhdyybOHKZBAywz+AJq2bT2uXOC1Bg5GM/IIoxjib2eySKoQp+Zjc+RKAVS7V+nQbIoth9pWdZ5QV7tIot7ogVFJw4hFs3fLzpgz0f/HA/gH1WZ68wN07ynlfLfqN/lG9fuKfQjRfga8A+iPKBVculbOCCg4/dqllkSMF9Xht7rHPYNC2DsXhTgRVnxbk6l+HMgmU9zLdVAkNcefF6vf3iSOH5OeZboKVfoPZoecG/nXeYzBUNHT4RTO6XTgEeOS3FDR3mZotd7l+CUZEJMQrH7IK6qPpIDvyTjfNvTDRPMSNHDPgwNuxBA==
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+ <BN8PR12MB34259F2AE1FDAF2D40E48C5BAB450@BN8PR12MB3425.namprd12.prod.outlook.com>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BN8PR12MB3425.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 026cd186-1bf4-4009-e71a-08d83dedd97f
-X-MS-Exchange-CrossTenant-originalarrivaltime: 11 Aug 2020 11:58:23.8017
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: Sh1TaJTzGiy8CvE8uUte9TOYrCoCQpdTsHeDQ+GkJ6XGj8cuf+fZlK1bIAMc97Gm
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN8PR12MB3124
-X-OriginatorOrg: Nvidia.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
-        t=1597147092; bh=f6ZQZFJWx5F3kfEGWwVFTMFrnC4Q9OeREi5+g2wW5p8=;
-        h=X-PGP-Universal:ARC-Seal:ARC-Message-Signature:
-         ARC-Authentication-Results:From:To:CC:Subject:Thread-Topic:
-         Thread-Index:Date:Message-ID:References:In-Reply-To:
-         Accept-Language:Content-Language:X-MS-Has-Attach:
-         X-MS-TNEF-Correlator:authentication-results:x-originating-ip:
-         x-ms-publictraffictype:x-ms-office365-filtering-correlation-id:
-         x-ms-traffictypediagnostic:x-ld-processed:
-         x-ms-exchange-transport-forked:x-microsoft-antispam-prvs:
-         x-ms-oob-tlc-oobclassifiers:x-ms-exchange-senderadcheck:
-         x-microsoft-antispam:x-microsoft-antispam-message-info:
-         x-forefront-antispam-report:x-ms-exchange-antispam-messagedata:
-         Content-Type:Content-Transfer-Encoding:MIME-Version:
-         X-MS-Exchange-CrossTenant-AuthAs:
-         X-MS-Exchange-CrossTenant-AuthSource:
-         X-MS-Exchange-CrossTenant-Network-Message-Id:
-         X-MS-Exchange-CrossTenant-originalarrivaltime:
-         X-MS-Exchange-CrossTenant-fromentityheader:
-         X-MS-Exchange-CrossTenant-id:X-MS-Exchange-CrossTenant-mailboxtype:
-         X-MS-Exchange-CrossTenant-userprincipalname:
-         X-MS-Exchange-Transport-CrossTenantHeadersStamped:X-OriginatorOrg;
-        b=P3BLAikVvSqIO4qoEGqR+PzaHyg8fkItfWCpFRUPAiAdUGC/23op/TjdPeuOIfTry
-         TfamnzXlZJ32YDtruH72hPOuxZhj169FHCyo3ijBA2kHCEi4HnNpbNbfG/wYKHUw46
-         E3tOcrxihMCr/7jjWvniyA1pjPO/QnBscpPDsnyIipgr5dY6G8gWYT6rs/fkIfbLxD
-         5/f1f2/LTwKcB424Mna6eJWNXgbwE77wXZW7Syfbs+k3DIziuMW8jbUqbzks+3hoz7
-         R56NrpybVphvduVmzPVTwWGOwPQgRShYzkLfKxL+tnq8X+duGreosCgw0g1U3ESHZk
-         ph5MLpq2haKZw==
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <BN8PR12MB34259F2AE1FDAF2D40E48C5BAB450@BN8PR12MB3425.namprd12.prod.outlook.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Aug 11, 2020 at 11:26:20AM +0000, Eli Cohen wrote:
-> Hi All
->=20
-> Currently, the only statistics we get for a VDPA instance comes from the =
-virtio_net device instance. Since VDPA involves hardware acceleration, ther=
-e can be quite a lot of information that can be fetched from the underlying=
- device. Currently there is no generic method to fetch this information.
->=20
-> One way of doing this can be to create a the host, a net device for=20
-> each VDPA instance, and use it to get this information or do some=20
-> configuration. Ethtool can be used in such a case
->=20
-> I would like to hear what you think about this or maybe you have some oth=
-er ideas to address this topic.
->=20
-> Thanks,
-> Eli
+On Tue, Aug 11, 2020 at 11:58:23AM +0000, Eli Cohen wrote:
+> On Tue, Aug 11, 2020 at 11:26:20AM +0000, Eli Cohen wrote:
+> > Hi All
+> > 
+> > Currently, the only statistics we get for a VDPA instance comes from the virtio_net device instance. Since VDPA involves hardware acceleration, there can be quite a lot of information that can be fetched from the underlying device. Currently there is no generic method to fetch this information.
+> > 
+> > One way of doing this can be to create a the host, a net device for 
+> > each VDPA instance, and use it to get this information or do some 
+> > configuration. Ethtool can be used in such a case
+> > 
+> > I would like to hear what you think about this or maybe you have some other ideas to address this topic.
+> > 
+> > Thanks,
+> > Eli
+> 
+> Something I'm not sure I understand is how are vdpa instances created on mellanox cards? There's a devlink command for that, is that right?
+> Can that be extended for stats?
+> 
+> Currently any VF will be probed as VDPA device. We're adding devlink support but I am not sure if devlink is suitable for displaying statistics. We will discuss internally but I wanted to know why you guys think.
 
-Something I'm not sure I understand is how are vdpa instances created on me=
-llanox cards? There's a devlink command for that, is that right?
-Can that be extended for stats?
+OK still things like specifying the mac are managed through rtnetlink,
+right?
 
-Currently any VF will be probed as VDPA device. We're adding devlink suppor=
-t but I am not sure if devlink is suitable for displaying statistics. We wi=
-ll discuss internally but I wanted to know why you guys think.
+Right now it does not look like you can mix stats and vf, they are
+handled separately:
 
---
-MST
+        if (rtnl_fill_stats(skb, dev))
+                goto nla_put_failure;
+
+        if (rtnl_fill_vf(skb, dev, ext_filter_mask))
+                goto nla_put_failure;
+
+but ability to query vf stats on the host sounds useful generally.
+
+As another option, we could use a vdpa specific way to retrieve stats,
+and teach qemu to report them.
+
+
+
+
+> --
+> MST
 
