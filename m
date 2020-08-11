@@ -2,648 +2,312 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 636A824188E
-	for <lists+kvm@lfdr.de>; Tue, 11 Aug 2020 10:53:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 06957241899
+	for <lists+kvm@lfdr.de>; Tue, 11 Aug 2020 10:56:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728366AbgHKIxQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 11 Aug 2020 04:53:16 -0400
-Received: from smtp-fw-6002.amazon.com ([52.95.49.90]:7648 "EHLO
-        smtp-fw-6002.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728301AbgHKIxQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 11 Aug 2020 04:53:16 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1597135993; x=1628671993;
-  h=subject:to:cc:references:from:message-id:date:
-   mime-version:in-reply-to:content-transfer-encoding;
-  bh=FWbjcIIy9qAWHz0N9NIDChWuYfhn60RXzI91q5ZsV00=;
-  b=OxNlOOM7ZtaWD7Fyor/VkZQD5YCpsQLGMq4+3+9h5joiAYl91eMTq4vX
-   cwGRvX4CDKmIm9oQWgwXo1B6JQfTNaPYmzoGF5EIzEt4qgl59M4lKNK6y
-   xxfxzZJ3O0xbzhnaKNx+rBVgN8RkU7FLfl25nuRc+cIDlHsWvm1f/9AZo
-   E=;
-IronPort-SDR: 5fHRMBgd32gqLJBJ4ktyTqAtYinZhL9bdwbr4uTUWZJN1GNp7bmkksfdt/kVYZ+GrV661gO/yV
- 9hD4f/w60mxQ==
-X-IronPort-AV: E=Sophos;i="5.75,460,1589241600"; 
-   d="scan'208";a="47156287"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-1a-7d76a15f.us-east-1.amazon.com) ([10.43.8.6])
-  by smtp-border-fw-out-6002.iad6.amazon.com with ESMTP; 11 Aug 2020 08:53:11 +0000
-Received: from EX13MTAUEB002.ant.amazon.com (iad55-ws-svc-p15-lb9-vlan3.iad.amazon.com [10.40.159.166])
-        by email-inbound-relay-1a-7d76a15f.us-east-1.amazon.com (Postfix) with ESMTPS id F2397A18C4;
-        Tue, 11 Aug 2020 08:53:08 +0000 (UTC)
-Received: from EX13D16EUB001.ant.amazon.com (10.43.166.28) by
- EX13MTAUEB002.ant.amazon.com (10.43.60.12) with Microsoft SMTP Server (TLS)
- id 15.0.1497.2; Tue, 11 Aug 2020 08:53:08 +0000
-Received: from 38f9d34ed3b1.ant.amazon.com (10.43.161.85) by
- EX13D16EUB001.ant.amazon.com (10.43.166.28) with Microsoft SMTP Server (TLS)
- id 15.0.1497.2; Tue, 11 Aug 2020 08:52:59 +0000
-Subject: Re: [PATCH v6 09/18] nitro_enclaves: Add logic for setting an enclave
- vCPU
-To:     Alexander Graf <graf@amazon.de>,
-        linux-kernel <linux-kernel@vger.kernel.org>
-CC:     Anthony Liguori <aliguori@amazon.com>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Colm MacCarthaigh <colmmacc@amazon.com>,
-        "David Duncan" <davdunc@amazon.com>,
-        Bjoern Doebel <doebel@amazon.de>,
-        "David Woodhouse" <dwmw@amazon.co.uk>,
-        Frank van der Linden <fllinden@amazon.com>,
-        Greg KH <gregkh@linuxfoundation.org>,
-        Karen Noel <knoel@redhat.com>,
-        "Martin Pohlack" <mpohlack@amazon.de>,
-        Matt Wilson <msw@amazon.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Balbir Singh <sblbir@amazon.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Stewart Smith <trawets@amazon.com>,
-        Uwe Dannowski <uwed@amazon.de>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        kvm <kvm@vger.kernel.org>,
-        ne-devel-upstream <ne-devel-upstream@amazon.com>
-References: <20200805091017.86203-1-andraprs@amazon.com>
- <20200805091017.86203-10-andraprs@amazon.com>
- <7adb6707-4101-8f47-6497-fe086dcc11f3@amazon.de>
-From:   "Paraschiv, Andra-Irina" <andraprs@amazon.com>
-Message-ID: <3e0b47e0-50b7-06c3-f9c4-7f7445c5d694@amazon.com>
-Date:   Tue, 11 Aug 2020 11:52:54 +0300
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:78.0)
- Gecko/20100101 Thunderbird/78.1.0
+        id S1728416AbgHKI41 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 11 Aug 2020 04:56:27 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:41616 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1728390AbgHKI4Z (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 11 Aug 2020 04:56:25 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1597136183;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type;
+        bh=d88xcVVVwUczUwSPBmg1oFZLtRXHohyyivhvTCzox5c=;
+        b=ZfVtKnrQy2+ll3udE0z7QQEMpTxd+3kCFg6tYlIVwODRNFzv41YlFM1QhKh5LGaKeTlxUr
+        ChU1DgfQVncsFdzArq7T2nopNrIvHOZxf29VsqZbEIGe6SvVc+99jW6mqk560hXo6sKGBI
+        rDRm1/ar03FyecR5sD8HEzOTafw4hfU=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-242-V_UW6fNtPv6fYYUKeTOIEQ-1; Tue, 11 Aug 2020 04:56:21 -0400
+X-MC-Unique: V_UW6fNtPv6fYYUKeTOIEQ-1
+Received: by mail-wm1-f69.google.com with SMTP id h205so621023wmf.0
+        for <kvm@vger.kernel.org>; Tue, 11 Aug 2020 01:56:21 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:mime-version
+         :content-disposition;
+        bh=d88xcVVVwUczUwSPBmg1oFZLtRXHohyyivhvTCzox5c=;
+        b=DFepOHYPPOh0xwaIfDya2vRXbW64dPsOkiGywHeCG7E0nDYaJ3GeKWK5M1KSk6++zm
+         rpknsD53VQATOJmgqR+6RxQ3Wm5fsS4PrGikohxgfXMINQLHmf2sRYbmak5aA/NrVBIi
+         6TkP42uQqyW2r5/2BDk0Fdnu/sLsgIcaok0HqOCv2QEEZjuicYvvSKAjAgrBM2jaLt6l
+         wZyVqyOM7N4IWIYO48BlDo7Pc2VXNk9irC2EJzErpH6Do8MpbWmhTNb/+yb5AxGj6Tay
+         jqLu4AQM2K9GphTh8ZC5QCH/fVS85rRyK9WePFavwjWRhVW+0Jh9L4G202N7XYPPXRmq
+         FjdQ==
+X-Gm-Message-State: AOAM531VLfpzWSd7Ey3fKBFsISrHUhbnjO/aCiMFnrNcU/eSAvBTr9xT
+        oRkbUd2sNhx5wFvKJ1tnBwK8KrYvKbmllosEoIkwgtUvfUkixp1dQ3F3tBV1/VYrSoYymsPPULs
+        ayR9da2NFjbqb
+X-Received: by 2002:adf:f248:: with SMTP id b8mr30092861wrp.247.1597136180005;
+        Tue, 11 Aug 2020 01:56:20 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJytzwO8E3CNR4SmeuTaD5pfM/K8artOAdX7C77z9smbpOM/a84oJwE9y6glNyYTcgPnJ5upKw==
+X-Received: by 2002:adf:f248:: with SMTP id b8mr30092826wrp.247.1597136179687;
+        Tue, 11 Aug 2020 01:56:19 -0700 (PDT)
+Received: from redhat.com (bzq-79-180-0-181.red.bezeqint.net. [79.180.0.181])
+        by smtp.gmail.com with ESMTPSA id c4sm25337308wrt.41.2020.08.11.01.56.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 11 Aug 2020 01:56:18 -0700 (PDT)
+Date:   Tue, 11 Aug 2020 04:56:13 -0400
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+        alex.dewar@gmx.co.uk, andy.shevchenko@gmail.com, cohuck@redhat.com,
+        colin.king@canonical.com, dan.carpenter@oracle.com,
+        david@redhat.com, elic@nvidia.com, eli@mellanox.com,
+        gustavoars@kernel.org, jasowang@redhat.com, leonro@mellanox.com,
+        liao.pingfang@zte.com.cn, lingshan.zhu@intel.com, lkp@intel.com,
+        lulu@redhat.com, maorg@mellanox.com, maxg@mellanox.com,
+        meirl@mellanox.com, michaelgur@mellanox.com, mst@redhat.com,
+        parav@mellanox.com, rong.a.chen@intel.com, saeedm@mellanox.com,
+        stable@vger.kernel.org, tariqt@mellanox.com, vgoyal@redhat.com,
+        wang.yi59@zte.com.cn, wenan.mao@linux.alibaba.com
+Subject: [GIT PULL] virtio: features, fixes
+Message-ID: <20200811045613-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <7adb6707-4101-8f47-6497-fe086dcc11f3@amazon.de>
-Content-Language: en-US
-X-Originating-IP: [10.43.161.85]
-X-ClientProxiedBy: EX13D25UWB004.ant.amazon.com (10.43.161.180) To
- EX13D16EUB001.ant.amazon.com (10.43.166.28)
-Content-Type: text/plain; charset="windows-1252"; format="flowed"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+X-Mutt-Fcc: =sent
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+OK, some patches in the series add buggy code which is then fixed by
+follow-up patches, but none of the bugs fixed are severe regressions on
+common configs (e.g. compiler warnings, lockdep/rt errors, or bugs in
+new drivers). So I thought it's more important to preserve the credit
+for the fixes.
 
+I had to pull 5 patches from git://git.kernel.org/pub/scm/linux/kernel/git/mellanox/linux mlx5-next
+to get the mlx5 things to work, this seems to be how mellanox guys are
+always managing things, and they told me they are ok with it.
 
-On 10/08/2020 10:33, Alexander Graf wrote:
->
->
-> On 05.08.20 11:10, Andra Paraschiv wrote:
->> An enclave, before being started, has its resources set. One of its
->> resources is CPU.
->>
->> A NE CPU pool is set and enclave CPUs are chosen from it. Offline the
->> CPUs from the NE CPU pool during the pool setup and online them back
->> during the NE CPU pool teardown. The CPU offline is necessary so that
->> there would not be more vCPUs than physical CPUs available to the
->> primary / parent VM. In that case the CPUs would be overcommitted and
->> would change the initial configuration of the primary / parent VM of
->> having dedicated vCPUs to physical CPUs.
->>
->> The enclave CPUs need to be full cores and from the same NUMA node. CPU
->> 0 and its siblings have to remain available to the primary / parent VM.
->>
->> Add ioctl command logic for setting an enclave vCPU.
->>
->> Signed-off-by: Alexandru Vasile <lexnv@amazon.com>
->> Signed-off-by: Andra Paraschiv <andraprs@amazon.com>
->> ---
->> Changelog
->>
->> v5 -> v6
->>
->> * Check CPUs are from the same NUMA node before going through CPU
->> =A0=A0 siblings during the NE CPU pool setup.
->> * Update documentation to kernel-doc format.
->>
->> v4 -> v5
->>
->> * Set empty string in case of invalid NE CPU pool.
->> * Clear NE CPU pool mask on pool setup failure.
->> * Setup NE CPU cores out of the NE CPU pool.
->> * Early exit on NE CPU pool setup if enclave(s) already running.
->> * Remove sanity checks for situations that shouldn't happen, only if
->> =A0=A0 buggy system or broken logic at all.
->> * Add check for maximum vCPU id possible before looking into the CPU
->> =A0=A0 pool.
->> * Remove log on copy_from_user() / copy_to_user() failure and on admin
->> =A0=A0 capability check for setting the NE CPU pool.
->> * Update the ioctl call to not create a file descriptor for the vCPU.
->> * Split the CPU pool usage logic in 2 separate functions - one to get a
->> =A0=A0 CPU from the pool and the other to check the given CPU is =
+The following changes since commit bcf876870b95592b52519ed4aafcf9d95999bc9c:
 
->> available in
->> =A0=A0 the pool.
->>
->> v3 -> v4
->>
->> * Setup the NE CPU pool at runtime via a sysfs file for the kernel
->> =A0=A0 parameter.
->> * Check enclave CPUs to be from the same NUMA node.
->> * Use dev_err instead of custom NE log pattern.
->> * Update the NE ioctl call to match the decoupling from the KVM API.
->>
->> v2 -> v3
->>
->> * Remove the WARN_ON calls.
->> * Update static calls sanity checks.
->> * Update kzfree() calls to kfree().
->> * Remove file ops that do nothing for now - open, ioctl and release.
->>
->> v1 -> v2
->>
->> * Add log pattern for NE.
->> * Update goto labels to match their purpose.
->> * Remove the BUG_ON calls.
->> * Check if enclave state is init when setting enclave vCPU.
->> ---
->> =A0 drivers/virt/nitro_enclaves/ne_misc_dev.c | 575 ++++++++++++++++++++=
-++
->> =A0 1 file changed, 575 insertions(+)
->>
->> diff --git a/drivers/virt/nitro_enclaves/ne_misc_dev.c =
+  Linux 5.8 (2020-08-02 14:21:45 -0700)
 
->> b/drivers/virt/nitro_enclaves/ne_misc_dev.c
->> index 6c8c12f65666..4787bc59d39d 100644
->> --- a/drivers/virt/nitro_enclaves/ne_misc_dev.c
->> +++ b/drivers/virt/nitro_enclaves/ne_misc_dev.c
->> @@ -57,8 +57,11 @@
->> =A0=A0 * TODO: Update logic to create new sysfs entries instead of using
->> =A0=A0 * a kernel parameter e.g. if multiple sysfs files needed.
->> =A0=A0 */
->> +static int ne_set_kernel_param(const char *val, const struct =
+are available in the Git repository at:
 
->> kernel_param *kp);
->> +
->> =A0 static const struct kernel_param_ops ne_cpu_pool_ops =3D {
->> =A0=A0=A0=A0=A0 .get=A0=A0=A0 =3D param_get_string,
->> +=A0=A0=A0 .set=A0=A0=A0 =3D ne_set_kernel_param,
->> =A0 };
->> =A0 =A0 static char ne_cpus[NE_CPUS_SIZE];
->> @@ -87,6 +90,575 @@ struct ne_cpu_pool {
->> =A0 =A0 static struct ne_cpu_pool ne_cpu_pool;
->> =A0 +/**
->> + * ne_check_enclaves_created() - Verify if at least one enclave has =
+  https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git tags/for_linus
 
->> been created.
->> + * @void:=A0=A0=A0 No parameters provided.
->> + *
->> + * Context: Process context.
->> + * Return:
->> + * * True if at least one enclave is created.
->> + * * False otherwise.
->> + */
->> +static bool ne_check_enclaves_created(void)
->> +{
->> +=A0=A0=A0 struct ne_pci_dev *ne_pci_dev =3D NULL;
->> +=A0=A0=A0 /* TODO: Find another way to get the NE PCI device reference.=
- */
->> +=A0=A0=A0 struct pci_dev *pdev =3D pci_get_device(PCI_VENDOR_ID_AMAZON, =
+for you to fetch changes up to 8a7c3213db068135e816a6a517157de6443290d6:
 
->> PCI_DEVICE_ID_NE, NULL);
->
-> Can we just make this a global ref count instead?
+  vdpa/mlx5: fix up endian-ness for mtu (2020-08-10 10:38:55 -0400)
 
-I think we can use here as well the misc dev parent approach mentioned =
+----------------------------------------------------------------
+virtio: fixes, features
 
-in the previous patches in this series. If no parent dev set, early exit.
+IRQ bypass support for vdpa and IFC
+MLX5 vdpa driver
+Endian-ness fixes for virtio drivers
+Misc other fixes
 
->
->> +=A0=A0=A0 bool ret =3D false;
->> +
->> +=A0=A0=A0 if (!pdev)
->> +=A0=A0=A0=A0=A0=A0=A0 return ret;
->> +
->> +=A0=A0=A0 ne_pci_dev =3D pci_get_drvdata(pdev);
->> +=A0=A0=A0 if (!ne_pci_dev) {
->> +=A0=A0=A0=A0=A0=A0=A0 pci_dev_put(pdev);
->> +
->> +=A0=A0=A0=A0=A0=A0=A0 return ret;
->> +=A0=A0=A0 }
->> +
->> +=A0=A0=A0 mutex_lock(&ne_pci_dev->enclaves_list_mutex);
->> +
->> +=A0=A0=A0 if (!list_empty(&ne_pci_dev->enclaves_list))
->> +=A0=A0=A0=A0=A0=A0=A0 ret =3D true;
->> +
->> +=A0=A0=A0 mutex_unlock(&ne_pci_dev->enclaves_list_mutex);
->> +
->> +=A0=A0=A0 pci_dev_put(pdev);
->> +
->> +=A0=A0=A0 return ret;
->> +}
->> +
->> +/**
->> + * ne_setup_cpu_pool() - Set the NE CPU pool after handling sanity =
+Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 
->> checks such
->> + *=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 as not sharing CPU cores with th=
-e primary / parent VM
->> + *=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 or not using CPU 0, which should=
- remain available for
->> + *=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 the primary / parent VM. Offline=
- the CPUs from the
->> + *=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 pool after the checks passed.
->> + * @ne_cpu_list:=A0=A0=A0 The CPU list used for setting NE CPU pool.
->> + *
->> + * Context: Process context.
->> + * Return:
->> + * * 0 on success.
->> + * * Negative return value on failure.
->> + */
->> +static int ne_setup_cpu_pool(const char *ne_cpu_list)
->> +{
->> +=A0=A0=A0 int core_id =3D -1;
->> +=A0=A0=A0 unsigned int cpu =3D 0;
->> +=A0=A0=A0 cpumask_var_t cpu_pool =3D NULL;
->> +=A0=A0=A0 unsigned int cpu_sibling =3D 0;
->> +=A0=A0=A0 unsigned int i =3D 0;
->> +=A0=A0=A0 int numa_node =3D -1;
->> +=A0=A0=A0 int rc =3D -EINVAL;
->> +
->> +=A0=A0=A0 if (!ne_cpu_list)
->> +=A0=A0=A0=A0=A0=A0=A0 return 0;
->> +
->> +=A0=A0=A0 if (!zalloc_cpumask_var(&cpu_pool, GFP_KERNEL))
->> +=A0=A0=A0=A0=A0=A0=A0 return -ENOMEM;
->> +
->> +=A0=A0=A0 mutex_lock(&ne_cpu_pool.mutex);
->> +
->> +=A0=A0=A0 rc =3D cpulist_parse(ne_cpu_list, cpu_pool);
->> +=A0=A0=A0 if (rc < 0) {
->> +=A0=A0=A0=A0=A0=A0=A0 pr_err("%s: Error in cpulist parse [rc=3D%d]\n", =
+----------------------------------------------------------------
+Alex Dewar (1):
+      vdpa/mlx5: Fix uninitialised variable in core/mr.c
 
->> ne_misc_dev.name, rc);
->> +
->> +=A0=A0=A0=A0=A0=A0=A0 goto free_pool_cpumask;
->> +=A0=A0=A0 }
->> +
->> +=A0=A0=A0 cpu =3D cpumask_any(cpu_pool);
->> +=A0=A0=A0 if (cpu >=3D nr_cpu_ids) {
->> +=A0=A0=A0=A0=A0=A0=A0 pr_err("%s: No CPUs available in CPU pool\n", =
+Colin Ian King (1):
+      vdpa/mlx5: fix memory allocation failure checks
 
->> ne_misc_dev.name);
->> +
->> +=A0=A0=A0=A0=A0=A0=A0 rc =3D -EINVAL;
->> +
->> +=A0=A0=A0=A0=A0=A0=A0 goto free_pool_cpumask;
->> +=A0=A0=A0 }
->> +
->> +=A0=A0=A0 /*
->> +=A0=A0=A0=A0 * Check if the CPUs from the NE CPU pool are from the same=
- NUMA =
+Dan Carpenter (2):
+      vdpa/mlx5: Fix pointer math in mlx5_vdpa_get_config()
+      vdpa: Fix pointer math bug in vdpasim_get_config()
 
->> node.
->> +=A0=A0=A0=A0 */
->> +=A0=A0=A0 for_each_cpu(cpu, cpu_pool) {
->> +=A0=A0=A0=A0=A0=A0=A0 if (numa_node < 0) {
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 numa_node =3D cpu_to_node(cpu);
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 if (numa_node < 0) {
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 pr_err("%s: Invalid NUMA =
-node %d\n",
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 ne_m=
-isc_dev.name, numa_node);
->> +
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 rc =3D -EINVAL;
->> +
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 goto free_pool_cpumask;
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 }
->> +=A0=A0=A0=A0=A0=A0=A0 } else {
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 if (numa_node !=3D cpu_to_node(cpu)) {
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 pr_err("%s: CPUs with dif=
-ferent NUMA nodes\n",
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 ne_m=
-isc_dev.name);
->> +
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 rc =3D -EINVAL;
->> +
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 goto free_pool_cpumask;
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 }
->> +=A0=A0=A0=A0=A0=A0=A0 }
->> +=A0=A0=A0 }
->> +
->> +=A0=A0=A0 /*
->> +=A0=A0=A0=A0 * Check if CPU 0 and its siblings are included in the prov=
-ided =
+Eli Cohen (9):
+      net/mlx5: Support setting access rights of dma addresses
+      net/mlx5: Add VDPA interface type to supported enumerations
+      net/mlx5: Add interface changes required for VDPA
+      net/vdpa: Use struct for set/get vq state
+      vdpa: Modify get_vq_state() to return error code
+      vdpa/mlx5: Add hardware descriptive header file
+      vdpa/mlx5: Add support library for mlx5 VDPA implementation
+      vdpa/mlx5: Add shared memory registration code
+      vdpa/mlx5: Add VDPA driver for supported mlx5 devices
 
->> CPU pool
->> +=A0=A0=A0=A0 * They should remain available for the primary / parent VM.
->> +=A0=A0=A0=A0 */
->> +=A0=A0=A0 if (cpumask_test_cpu(0, cpu_pool)) {
->> +=A0=A0=A0=A0=A0=A0=A0 pr_err("%s: CPU 0 has to remain available\n", =
+Gustavo A. R. Silva (1):
+      vhost: Use flex_array_size() helper in copy_from_user()
 
->> ne_misc_dev.name);
->> +
->> +=A0=A0=A0=A0=A0=A0=A0 rc =3D -EINVAL;
->> +
->> +=A0=A0=A0=A0=A0=A0=A0 goto free_pool_cpumask;
->> +=A0=A0=A0 }
->> +
->> +=A0=A0=A0 for_each_cpu(cpu_sibling, topology_sibling_cpumask(0)) {
->> +=A0=A0=A0=A0=A0=A0=A0 if (cpumask_test_cpu(cpu_sibling, cpu_pool)) {
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 pr_err("%s: CPU sibling %d for CPU 0 =
-is in CPU pool\n",
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 ne_misc_dev.name=
-, cpu_sibling);
->> +
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 rc =3D -EINVAL;
->> +
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 goto free_pool_cpumask;
->> +=A0=A0=A0=A0=A0=A0=A0 }
->> +=A0=A0=A0 }
->> +
->> +=A0=A0=A0 /*
->> +=A0=A0=A0=A0 * Check if CPU siblings are included in the provided CPU p=
-ool. The
->> +=A0=A0=A0=A0 * expectation is that CPU cores are made available in the =
-CPU =
+Jason Wang (6):
+      vhost: vdpa: remove per device feature whitelist
+      vhost-vdpa: refine ioctl pre-processing
+      vhost: generialize backend features setting/getting
+      vhost-vdpa: support get/set backend features
+      vhost-vdpa: support IOTLB batching hints
+      vdpasim: support batch updating
 
->> pool for
->> +=A0=A0=A0=A0 * enclaves.
->> +=A0=A0=A0=A0 */
->> +=A0=A0=A0 for_each_cpu(cpu, cpu_pool) {
->> +=A0=A0=A0=A0=A0=A0=A0 for_each_cpu(cpu_sibling, topology_sibling_cpumas=
-k(cpu)) {
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 if (!cpumask_test_cpu(cpu_sibling, cp=
-u_pool)) {
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 pr_err("%s: CPU %d is not=
- in CPU pool\n",
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 ne_m=
-isc_dev.name, cpu_sibling);
->> +
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 rc =3D -EINVAL;
->> +
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 goto free_pool_cpumask;
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 }
->> +=A0=A0=A0=A0=A0=A0=A0 }
->> +=A0=A0=A0 }
->> +
->> +=A0=A0=A0 ne_cpu_pool.avail_cores_size =3D nr_cpu_ids / smp_num_sibling=
-s;
->> +
->> +=A0=A0=A0 ne_cpu_pool.avail_cores =3D kcalloc(ne_cpu_pool.avail_cores_s=
-ize,
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 sizeof(=
-*ne_cpu_pool.avail_cores),
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 GFP_KER=
-NEL);
->> +=A0=A0=A0 if (!ne_cpu_pool.avail_cores) {
->> +=A0=A0=A0=A0=A0=A0=A0 rc =3D -ENOMEM;
->> +
->> +=A0=A0=A0=A0=A0=A0=A0 goto free_pool_cpumask;
->> +=A0=A0=A0 }
->> +
->> +=A0=A0=A0 for (i =3D 0; i < ne_cpu_pool.avail_cores_size; i++)
->> +=A0=A0=A0=A0=A0=A0=A0 if (!zalloc_cpumask_var(&ne_cpu_pool.avail_cores[=
-i], =
+Liao Pingfang (1):
+      virtio_pci_modern: Fix the comment of virtio_pci_find_capability()
 
->> GFP_KERNEL)) {
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 rc =3D -ENOMEM;
->> +
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 goto free_cores_cpumask;
->> +=A0=A0=A0=A0=A0=A0=A0 }
->> +
->> +=A0=A0=A0 /* Split the NE CPU pool in CPU cores. */
->> +=A0=A0=A0 for_each_cpu(cpu, cpu_pool) {
->> +=A0=A0=A0=A0=A0=A0=A0 core_id =3D topology_core_id(cpu);
->> +=A0=A0=A0=A0=A0=A0=A0 if (core_id < 0 || core_id >=3D ne_cpu_pool.avail=
-_cores_size) {
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 pr_err("%s: Invalid core id=A0 %d\n",
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 ne_misc_dev.name=
-, core_id);
->> +
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 rc =3D -EINVAL;
->> +
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 goto clear_cpumask;
->> +=A0=A0=A0=A0=A0=A0=A0 }
->> +
->> +=A0=A0=A0=A0=A0=A0=A0 cpumask_set_cpu(cpu, ne_cpu_pool.avail_cores[core=
-_id]);
->> +=A0=A0=A0 }
->> +
->> +=A0=A0=A0 /*
->> +=A0=A0=A0=A0 * CPUs that are given to enclave(s) should not be consider=
-ed =
+Mao Wenan (1):
+      virtio_ring: Avoid loop when vq is broken in virtqueue_poll
 
->> online
->> +=A0=A0=A0=A0 * by Linux anymore, as the hypervisor will degrade them to =
+Maor Gottlieb (2):
+      net/mlx5: Export resource dump interface
+      net/mlx5: Add support in query QP, CQ and MKEY segments
 
->> floating.
->> +=A0=A0=A0=A0 * The physical CPUs (full cores) are carved out of the pri=
-mary =
+Max Gurtovoy (2):
+      vdpasim: protect concurrent access to iommu iotlb
+      vdpa: remove hard coded virtq num
 
->> / parent
->> +=A0=A0=A0=A0 * VM and given to the enclave VM. The same number of vCPUs =
+Meir Lichtinger (1):
+      RDMA/mlx5: ConnectX-7 new capabilities to set relaxed ordering by UMR
 
->> would run
->> +=A0=A0=A0=A0 * on less pCPUs for the primary / parent VM.
->> +=A0=A0=A0=A0 *
->> +=A0=A0=A0=A0 * We offline them here, to not degrade performance and exp=
-ose =
+Michael Guralnik (2):
+      net/mlx5: Enable QP number request when creating IPoIB underlay QP
+      net/mlx5: Enable count action for rules with allow action
 
->> correct
->> +=A0=A0=A0=A0 * topology to Linux and user space.
->> +=A0=A0=A0=A0 */
->> +=A0=A0=A0 for_each_cpu(cpu, cpu_pool) {
->> +=A0=A0=A0=A0=A0=A0=A0 rc =3D remove_cpu(cpu);
->> +=A0=A0=A0=A0=A0=A0=A0 if (rc !=3D 0) {
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 pr_err("%s: CPU %d is not offlined [r=
-c=3D%d]\n",
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 ne_misc_dev.name=
-, cpu, rc);
->> +
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 goto online_cpus;
->> +=A0=A0=A0=A0=A0=A0=A0 }
->> +=A0=A0=A0 }
->> +
->> +=A0=A0=A0 free_cpumask_var(cpu_pool);
->> +
->> +=A0=A0=A0 ne_cpu_pool.numa_node =3D numa_node;
->> +
->> +=A0=A0=A0 mutex_unlock(&ne_cpu_pool.mutex);
->> +
->> +=A0=A0=A0 return 0;
->> +
->> +online_cpus:
->> +=A0=A0=A0 for_each_cpu(cpu, cpu_pool)
->> +=A0=A0=A0=A0=A0=A0=A0 add_cpu(cpu);
->> +clear_cpumask:
->> +=A0=A0=A0 for (i =3D 0; i < ne_cpu_pool.avail_cores_size; i++)
->> +=A0=A0=A0=A0=A0=A0=A0 cpumask_clear(ne_cpu_pool.avail_cores[i]);
->> +free_cores_cpumask:
->> +=A0=A0=A0 for (i =3D 0; i < ne_cpu_pool.avail_cores_size; i++)
->> +=A0=A0=A0=A0=A0=A0=A0 free_cpumask_var(ne_cpu_pool.avail_cores[i]);
->> +=A0=A0=A0 kfree(ne_cpu_pool.avail_cores);
->> +=A0=A0=A0 ne_cpu_pool.avail_cores_size =3D 0;
->> +free_pool_cpumask:
->> +=A0=A0=A0 free_cpumask_var(cpu_pool);
->> +=A0=A0=A0 mutex_unlock(&ne_cpu_pool.mutex);
->> +
->> +=A0=A0=A0 return rc;
->> +}
->> +
->> +/**
->> + * ne_teardown_cpu_pool() - Online the CPUs from the NE CPU pool and =
+Michael S. Tsirkin (44):
+      virtio: VIRTIO_F_IOMMU_PLATFORM -> VIRTIO_F_ACCESS_PLATFORM
+      virtio: virtio_has_iommu_quirk -> virtio_has_dma_quirk
+      virtio_balloon: fix sparse warning
+      virtio_ring: sparse warning fixup
+      virtio: allow __virtioXX, __leXX in config space
+      virtio_9p: correct tags for config space fields
+      virtio_balloon: correct tags for config space fields
+      virtio_blk: correct tags for config space fields
+      virtio_console: correct tags for config space fields
+      virtio_crypto: correct tags for config space fields
+      virtio_fs: correct tags for config space fields
+      virtio_gpu: correct tags for config space fields
+      virtio_input: correct tags for config space fields
+      virtio_iommu: correct tags for config space fields
+      virtio_mem: correct tags for config space fields
+      virtio_net: correct tags for config space fields
+      virtio_pmem: correct tags for config space fields
+      virtio_scsi: correct tags for config space fields
+      virtio_config: disallow native type fields
+      mlxbf-tmfifo: sparse tags for config access
+      vdpa: make sure set_features is invoked for legacy
+      vhost/vdpa: switch to new helpers
+      virtio_vdpa: legacy features handling
+      vdpa_sim: fix endian-ness of config space
+      virtio_config: cread/write cleanup
+      virtio_config: rewrite using _Generic
+      virtio_config: disallow native type fields (again)
+      virtio_config: LE config space accessors
+      virtio_caif: correct tags for config space fields
+      virtio_config: add virtio_cread_le_feature
+      virtio_balloon: use LE config space accesses
+      virtio_input: convert to LE accessors
+      virtio_fs: convert to LE accessors
+      virtio_crypto: convert to LE accessors
+      virtio_pmem: convert to LE accessors
+      drm/virtio: convert to LE accessors
+      virtio_mem: convert to LE accessors
+      virtio-iommu: convert to LE accessors
+      virtio_config: drop LE option from config space
+      virtio_net: use LE accessors for speed/duplex
+      Merge branch 'mlx5-next' of git://git.kernel.org/.../mellanox/linux into HEAD
+      virtio_config: fix up warnings on parisc
+      vdpa_sim: init iommu lock
+      vdpa/mlx5: fix up endian-ness for mtu
 
->> cleanup the
->> + *=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 CPU pool.
->> + * @void:=A0=A0=A0 No parameters provided.
->> + *
->> + * Context: Process context.
->> + */
->> +static void ne_teardown_cpu_pool(void)
->> +{
->> +=A0=A0=A0 unsigned int cpu =3D 0;
->> +=A0=A0=A0 unsigned int i =3D 0;
->> +=A0=A0=A0 int rc =3D -EINVAL;
->> +
->> +=A0=A0=A0 mutex_lock(&ne_cpu_pool.mutex);
->> +
->> +=A0=A0=A0 if (!ne_cpu_pool.avail_cores_size) {
->> +=A0=A0=A0=A0=A0=A0=A0 mutex_unlock(&ne_cpu_pool.mutex);
->> +
->> +=A0=A0=A0=A0=A0=A0=A0 return;
->> +=A0=A0=A0 }
->> +
->> +=A0=A0=A0 for (i =3D 0; i < ne_cpu_pool.avail_cores_size; i++) {
->> +=A0=A0=A0=A0=A0=A0=A0 for_each_cpu(cpu, ne_cpu_pool.avail_cores[i]) {
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 rc =3D add_cpu(cpu);
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 if (rc !=3D 0)
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 pr_err("%s: CPU %d is not=
- onlined [rc=3D%d]\n",
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 ne_m=
-isc_dev.name, cpu, rc);
->> +=A0=A0=A0=A0=A0=A0=A0 }
->> +
->> +=A0=A0=A0=A0=A0=A0=A0 cpumask_clear(ne_cpu_pool.avail_cores[i]);
->> +
->> +=A0=A0=A0=A0=A0=A0=A0 free_cpumask_var(ne_cpu_pool.avail_cores[i]);
->> +=A0=A0=A0 }
->> +
->> +=A0=A0=A0 kfree(ne_cpu_pool.avail_cores);
->> +=A0=A0=A0 ne_cpu_pool.avail_cores_size =3D 0;
->> +
->> +=A0=A0=A0 mutex_unlock(&ne_cpu_pool.mutex);
->> +}
->> +
->> +/**
->> + * ne_set_kernel_param() - Set the NE CPU pool value via the NE =
+Parav Pandit (2):
+      net/mlx5: Avoid RDMA file inclusion in core driver
+      net/mlx5: Avoid eswitch header inclusion in fs core layer
 
->> kernel parameter.
->> + * @val:=A0=A0=A0 NE CPU pool string value.
->> + * @kp :=A0=A0=A0 NE kernel parameter associated with the NE CPU pool.
->> + *
->> + * Context: Process context.
->> + * Return:
->> + * * 0 on success.
->> + * * Negative return value on failure.
->> + */
->> +static int ne_set_kernel_param(const char *val, const struct =
+Tariq Toukan (1):
+      net/mlx5: kTLS, Improve TLS params layout structures
 
->> kernel_param *kp)
->> +{
->> +=A0=A0=A0 char error_val[] =3D "";
->> +=A0=A0=A0 int rc =3D -EINVAL;
->> +
->> +=A0=A0=A0 if (!capable(CAP_SYS_ADMIN))
->> +=A0=A0=A0=A0=A0=A0=A0 return -EPERM;
->> +
->> +=A0=A0=A0 if (ne_check_enclaves_created()) {
->> +=A0=A0=A0=A0=A0=A0=A0 pr_err("%s: The CPU pool is used by enclave(s)\n"=
-, =
+Zhu Lingshan (7):
+      vhost: introduce vhost_vring_call
+      kvm: detect assigned device via irqbypass manager
+      vDPA: add get_vq_irq() in vdpa_config_ops
+      vhost_vdpa: implement IRQ offloading in vhost_vdpa
+      ifcvf: implement vdpa_config_ops.get_vq_irq()
+      irqbypass: do not start cons/prod when failed connect
+      vDPA: dont change vq irq after DRIVER_OK
 
->> ne_misc_dev.name);
->> +
->> +=A0=A0=A0=A0=A0=A0=A0 return -EPERM;
->> +=A0=A0=A0 }
->> +
->> +=A0=A0=A0 ne_teardown_cpu_pool();
->> +
->> +=A0=A0=A0 rc =3D ne_setup_cpu_pool(val);
->> +=A0=A0=A0 if (rc < 0) {
->> +=A0=A0=A0=A0=A0=A0=A0 pr_err("%s: Error in setup CPU pool [rc=3D%d]\n", =
-
->> ne_misc_dev.name, rc);
->> +
->> +=A0=A0=A0=A0=A0=A0=A0 param_set_copystring(error_val, kp);
->> +
->> +=A0=A0=A0=A0=A0=A0=A0 return rc;
->> +=A0=A0=A0 }
->> +
->> +=A0=A0=A0 return param_set_copystring(val, kp);
->> +}
->> +
->> +/**
->> + * ne_get_cpu_from_cpu_pool() - Get a CPU from the NE CPU pool, =
-
->> either from the
->> + *=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 remaining sibling(s) of=
- a CPU core or the first
->> + *=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 sibling of a new CPU co=
-re.
->> + * @ne_enclave :=A0=A0=A0 Private data associated with the current encl=
-ave.
->> + *
->> + * Context: Process context. This function is called with the =
-
->> ne_enclave mutex held.
->> + * Return:
->> + * * vCPU id.
->> + * * 0, if no CPU available in the pool.
->> + */
->> +static unsigned int ne_get_cpu_from_cpu_pool(struct ne_enclave =
-
->> *ne_enclave)
->> +{
->> +=A0=A0=A0 int core_id =3D -1;
->> +=A0=A0=A0 unsigned int cpu =3D 0;
->> +=A0=A0=A0 unsigned int i =3D 0;
->> +=A0=A0=A0 unsigned int vcpu_id =3D 0;
->> +
->> +=A0=A0=A0 /* There are CPU siblings available to choose from. */
->> +=A0=A0=A0 for (i =3D 0; i < ne_enclave->avail_cpu_cores_size; i++)
->> +=A0=A0=A0=A0=A0=A0=A0 for_each_cpu(cpu, ne_enclave->avail_cpu_cores[i])
->
-> This is really hard to read. I think what you want to say here is =
-
-> something along these lines:
->
-> /*
-> =A0* If previously allocated a thread of a core to this enclave, we first
-> =A0* return its sibling(s) for new allocations, so that we can donate a
-> =A0* full core.
-> =A0*/
-> for (i =3D 0; i < ne_enclave->nr_parent_cores; i++) {
-> =A0=A0=A0 for_each_cpu(cpu, ne->enclave->parent_cores[i].reserved_sibling=
-s) {
-> =A0=A0=A0=A0=A0=A0=A0 if (!ne_cpu_donated(cpu)) {
-> =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 [...]
-> =A0=A0=A0=A0=A0=A0=A0 }
-> =A0=A0=A0 }
-> }
->
-> Similarly for other places in this file where you do cpu mask logic. =
-
-> It always needs to be very obvious what the respective mask is for, =
-
-> because you have ~3 semantically different ones.
-
-That's true, the motivation for all this logic is to split the NE CPU =
-
-pool in threads / siblings per core and give to an enclave either the =
-
-first sibling of a core or the remaining ones, till full core(s) is =
-
-(are) given.
-
-I'll update the naming, codebase logic and comments to make it more =
-
-clear, this deserves it, indeed.
-
-Thanks,
-Andra
-
-
-
-Amazon Development Center (Romania) S.R.L. registered office: 27A Sf. Lazar=
- Street, UBC5, floor 2, Iasi, Iasi County, 700045, Romania. Registered in R=
-omania. Registration number J22/2621/2005.
+ arch/um/drivers/virtio_uml.c                       |    2 +-
+ arch/x86/kvm/x86.c                                 |   12 +-
+ drivers/crypto/virtio/virtio_crypto_core.c         |   46 +-
+ drivers/gpu/drm/virtio/virtgpu_kms.c               |   16 +-
+ drivers/gpu/drm/virtio/virtgpu_object.c            |    2 +-
+ drivers/gpu/drm/virtio/virtgpu_vq.c                |    4 +-
+ drivers/iommu/virtio-iommu.c                       |   34 +-
+ drivers/net/ethernet/mellanox/mlx5/core/alloc.c    |   11 +-
+ .../ethernet/mellanox/mlx5/core/diag/rsc_dump.c    |    6 +
+ .../ethernet/mellanox/mlx5/core/diag/rsc_dump.h    |   33 +-
+ drivers/net/ethernet/mellanox/mlx5/core/en/txrx.h  |    2 +-
+ .../ethernet/mellanox/mlx5/core/en_accel/ktls.h    |    2 +-
+ .../ethernet/mellanox/mlx5/core/en_accel/ktls_tx.c |   14 +-
+ .../mellanox/mlx5/core/en_accel/tls_rxtx.c         |    2 +-
+ drivers/net/ethernet/mellanox/mlx5/core/eswitch.h  |   10 -
+ drivers/net/ethernet/mellanox/mlx5/core/fs_core.c  |    2 +-
+ drivers/net/ethernet/mellanox/mlx5/core/fs_core.h  |   10 +
+ .../net/ethernet/mellanox/mlx5/core/ipoib/ipoib.c  |    7 +
+ drivers/net/ethernet/mellanox/mlx5/core/main.c     |    3 +
+ drivers/net/virtio_net.c                           |    9 +-
+ drivers/nvdimm/virtio_pmem.c                       |    4 +-
+ drivers/platform/mellanox/mlxbf-tmfifo.c           |   13 +-
+ drivers/scsi/virtio_scsi.c                         |    4 +-
+ drivers/vdpa/Kconfig                               |   19 +
+ drivers/vdpa/Makefile                              |    1 +
+ drivers/vdpa/ifcvf/ifcvf_base.c                    |    4 +-
+ drivers/vdpa/ifcvf/ifcvf_base.h                    |    6 +-
+ drivers/vdpa/ifcvf/ifcvf_main.c                    |   31 +-
+ drivers/vdpa/mlx5/Makefile                         |    4 +
+ drivers/vdpa/mlx5/core/mlx5_vdpa.h                 |   91 +
+ drivers/vdpa/mlx5/core/mlx5_vdpa_ifc.h             |  168 ++
+ drivers/vdpa/mlx5/core/mr.c                        |  486 +++++
+ drivers/vdpa/mlx5/core/resources.c                 |  284 +++
+ drivers/vdpa/mlx5/net/main.c                       |   76 +
+ drivers/vdpa/mlx5/net/mlx5_vnet.c                  | 1974 ++++++++++++++++++++
+ drivers/vdpa/mlx5/net/mlx5_vnet.h                  |   24 +
+ drivers/vdpa/vdpa.c                                |    4 +
+ drivers/vdpa/vdpa_sim/vdpa_sim.c                   |  124 +-
+ drivers/vhost/Kconfig                              |    1 +
+ drivers/vhost/net.c                                |   22 +-
+ drivers/vhost/vdpa.c                               |  183 +-
+ drivers/vhost/vhost.c                              |   39 +-
+ drivers/vhost/vhost.h                              |   11 +-
+ drivers/virtio/virtio_balloon.c                    |   30 +-
+ drivers/virtio/virtio_input.c                      |   32 +-
+ drivers/virtio/virtio_mem.c                        |   30 +-
+ drivers/virtio/virtio_pci_modern.c                 |    1 +
+ drivers/virtio/virtio_ring.c                       |    7 +-
+ drivers/virtio/virtio_vdpa.c                       |    9 +-
+ fs/fuse/virtio_fs.c                                |    4 +-
+ include/linux/mlx5/cq.h                            |    1 -
+ include/linux/mlx5/device.h                        |   13 +-
+ include/linux/mlx5/driver.h                        |    2 +
+ include/linux/mlx5/mlx5_ifc.h                      |  134 +-
+ include/linux/mlx5/qp.h                            |    2 +-
+ include/linux/mlx5/rsc_dump.h                      |   51 +
+ include/linux/vdpa.h                               |   66 +-
+ include/linux/virtio_caif.h                        |    6 +-
+ include/linux/virtio_config.h                      |  191 +-
+ include/linux/virtio_ring.h                        |   19 +-
+ include/uapi/linux/vhost.h                         |    2 +
+ include/uapi/linux/vhost_types.h                   |   11 +
+ include/uapi/linux/virtio_9p.h                     |    4 +-
+ include/uapi/linux/virtio_balloon.h                |   10 +-
+ include/uapi/linux/virtio_blk.h                    |   26 +-
+ include/uapi/linux/virtio_config.h                 |   10 +-
+ include/uapi/linux/virtio_console.h                |    8 +-
+ include/uapi/linux/virtio_crypto.h                 |   26 +-
+ include/uapi/linux/virtio_fs.h                     |    2 +-
+ include/uapi/linux/virtio_gpu.h                    |    8 +-
+ include/uapi/linux/virtio_input.h                  |   18 +-
+ include/uapi/linux/virtio_iommu.h                  |   12 +-
+ include/uapi/linux/virtio_mem.h                    |   14 +-
+ include/uapi/linux/virtio_net.h                    |    8 +-
+ include/uapi/linux/virtio_pmem.h                   |    4 +-
+ include/uapi/linux/virtio_scsi.h                   |   20 +-
+ tools/virtio/linux/virtio_config.h                 |    6 +-
+ virt/lib/irqbypass.c                               |   16 +-
+ 78 files changed, 4116 insertions(+), 487 deletions(-)
+ create mode 100644 drivers/vdpa/mlx5/Makefile
+ create mode 100644 drivers/vdpa/mlx5/core/mlx5_vdpa.h
+ create mode 100644 drivers/vdpa/mlx5/core/mlx5_vdpa_ifc.h
+ create mode 100644 drivers/vdpa/mlx5/core/mr.c
+ create mode 100644 drivers/vdpa/mlx5/core/resources.c
+ create mode 100644 drivers/vdpa/mlx5/net/main.c
+ create mode 100644 drivers/vdpa/mlx5/net/mlx5_vnet.c
+ create mode 100644 drivers/vdpa/mlx5/net/mlx5_vnet.h
+ create mode 100644 include/linux/mlx5/rsc_dump.h
 
