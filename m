@@ -2,122 +2,143 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 21FA9241B21
-	for <lists+kvm@lfdr.de>; Tue, 11 Aug 2020 14:45:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 74CCA241C8A
+	for <lists+kvm@lfdr.de>; Tue, 11 Aug 2020 16:37:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728675AbgHKMoz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 11 Aug 2020 08:44:55 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:43165 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726829AbgHKMow (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 11 Aug 2020 08:44:52 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1597149891;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=4gObRQ0Fq7QQ6hAOg5wupZW2BNQ64paK3yGpxjhjhBc=;
-        b=ZYEouhJQ0gCp2Xdme9aoM4vokldNKdRGTS7dJDphyXW1burB1shOTOH+z5FJxpAiUBx1qf
-        gohF51eVxt7+mMHsQiHCU4ZAIgSTl8rQ/Owj1isiJBLkG15EQSjthDGMBbk08YCZczMZjj
-        wxKjuy6n82j+LOLtphl8kVBQmUQI1Vg=
-Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
- [209.85.218.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-424--cwDBJZMMduOCWVWDUf1TA-1; Tue, 11 Aug 2020 08:44:49 -0400
-X-MC-Unique: -cwDBJZMMduOCWVWDUf1TA-1
-Received: by mail-ej1-f72.google.com with SMTP id y10so5117664ejd.1
-        for <kvm@vger.kernel.org>; Tue, 11 Aug 2020 05:44:49 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=4gObRQ0Fq7QQ6hAOg5wupZW2BNQ64paK3yGpxjhjhBc=;
-        b=GSWV7RXVwsFaAokPpd4XsBy4SkH1/utgcI1mRBQVk7KAea+Hg/8+kYokXgEqxuI6TU
-         RWyr+7cv7bZVyXRc3YQpVjjf+eWG1Ym26nIYNlp8SUkFl/cPQ8Q6D4ABxfADKY+QdhDY
-         Q3MECLPh1FPI8c2S6upl1YZbz3npLiYjtoKHfuPpcFANhozbEptYd2wDOIcrSMJ6DrG2
-         elx8A6flIxknAdvVacR7vECRWbWNhBrevwdlTTgBNhYQSndNnp+tpGmyudGFtr3SYDEs
-         VjsyfNsW18bLdqvgaKyJXUWPlA2O3NjI2VJ/zbqxuuO2Nx3gtkzhHCPsFPS/w43YzIC+
-         4gmw==
-X-Gm-Message-State: AOAM5302gbc6PXAZRMKfvws5xzi2aRzLH0kMKnnXeSozQLmLLBWOuOkc
-        d8FWpj8wo3h5ZjDzXAmxr+UMauMjs3mTcrKn8YjTGdEBFZhC1gjBxmKsjA6foWxra+ceg3NWv6v
-        LmAqFZvwUuF67
-X-Received: by 2002:a05:6402:1218:: with SMTP id c24mr25203360edw.44.1597149888549;
-        Tue, 11 Aug 2020 05:44:48 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzIaQixLajacpoqLdEsULPbWw/H9fIINTYi9tun3K98B+6Mv/G3SkYZ35zHOyX7A3SBCMINnQ==
-X-Received: by 2002:a05:6402:1218:: with SMTP id c24mr25203332edw.44.1597149888269;
-        Tue, 11 Aug 2020 05:44:48 -0700 (PDT)
-Received: from redhat.com ([147.161.12.106])
-        by smtp.gmail.com with ESMTPSA id q11sm14418807edn.12.2020.08.11.05.44.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 11 Aug 2020 05:44:47 -0700 (PDT)
-Date:   Tue, 11 Aug 2020 08:44:43 -0400
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Eli Cohen <elic@nvidia.com>
-Cc:     Jason Wang <jasowang@redhat.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "virtualization@lists.linux-foundation.org" 
-        <virtualization@lists.linux-foundation.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "eli@mellanox.com" <eli@mellanox.com>,
-        "lulu@redhat.com" <lulu@redhat.com>,
-        Majd Dibbiny <majd@nvidia.com>,
-        Maor Dickman <maord@nvidia.com>,
-        Shahaf Shuler <shahafs@mellanox.com>,
-        Parav Pandit <parav@mellanox.com>
-Subject: Re: VDPA Debug/Statistics
-Message-ID: <20200811083803-mutt-send-email-mst@kernel.org>
-References: <BN8PR12MB342559414BE03DFC992AD03DAB450@BN8PR12MB3425.namprd12.prod.outlook.com>
- <20200811073144-mutt-send-email-mst@kernel.org>
- <BN8PR12MB34259F2AE1FDAF2D40E48C5BAB450@BN8PR12MB3425.namprd12.prod.outlook.com>
+        id S1728901AbgHKOha (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 11 Aug 2020 10:37:30 -0400
+Received: from relay5.mymailcheap.com ([159.100.248.207]:60781 "EHLO
+        relay5.mymailcheap.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728768AbgHKOh2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 11 Aug 2020 10:37:28 -0400
+Received: from relay1.mymailcheap.com (relay1.mymailcheap.com [144.217.248.100])
+        by relay5.mymailcheap.com (Postfix) with ESMTPS id 06B2826071
+        for <kvm@vger.kernel.org>; Tue, 11 Aug 2020 14:37:25 +0000 (UTC)
+Received: from filter2.mymailcheap.com (filter2.mymailcheap.com [91.134.140.82])
+        by relay1.mymailcheap.com (Postfix) with ESMTPS id 5C7D73F157;
+        Tue, 11 Aug 2020 10:37:21 -0400 (EDT)
+Received: from localhost (localhost [127.0.0.1])
+        by filter2.mymailcheap.com (Postfix) with ESMTP id 9E8C12A519;
+        Tue, 11 Aug 2020 16:37:20 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=mymailcheap.com;
+        s=default; t=1597156640;
+        bh=bXc7xBpBIAdgGWKI9L7OApvPNwyc9K8uObnQFmxO8XU=;
+        h=Subject:To:Cc:References:From:Date:In-Reply-To:From;
+        b=kfQ+lddzJYmk38CUbI6xRW8N/EkdSusBzzHq6M9JmTZI/a1lEx7UxJmkpJttBT8vK
+         aIwcMG2gJrtro8HgPJQ/xeCQyGLFFG2qpZq+yRO7panrgwj5Wn0DlVS5o6J3NN/C3f
+         mCHrMyhYC/9nbZL5dfAftF7bIJiNjyAKjdvwDNUg=
+X-Virus-Scanned: Debian amavisd-new at filter2.mymailcheap.com
+Received: from filter2.mymailcheap.com ([127.0.0.1])
+        by localhost (filter2.mymailcheap.com [127.0.0.1]) (amavisd-new, port 10024)
+        with ESMTP id Mx0csHCMu3-a; Tue, 11 Aug 2020 16:37:18 +0200 (CEST)
+Received: from mail20.mymailcheap.com (mail20.mymailcheap.com [51.83.111.147])
+        (using TLSv1.2 with cipher ADH-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by filter2.mymailcheap.com (Postfix) with ESMTPS;
+        Tue, 11 Aug 2020 16:37:18 +0200 (CEST)
+Received: from [213.133.102.83] (ml.mymailcheap.com [213.133.102.83])
+        by mail20.mymailcheap.com (Postfix) with ESMTP id 056F240EDE;
+        Tue, 11 Aug 2020 14:37:17 +0000 (UTC)
+Authentication-Results: mail20.mymailcheap.com;
+        dkim=pass (1024-bit key; unprotected) header.d=flygoat.com header.i=@flygoat.com header.b="DsqJFQ4Q";
+        dkim-atps=neutral
+AI-Spam-Status: Not processed
+Received: from [0.0.0.0] (n11212042148.netvigator.com [112.120.42.148])
+        (using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+         key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits))
+        (No client certificate requested)
+        by mail20.mymailcheap.com (Postfix) with ESMTPSA id F109440855;
+        Tue, 11 Aug 2020 14:37:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=flygoat.com;
+        s=default; t=1597156629;
+        bh=bXc7xBpBIAdgGWKI9L7OApvPNwyc9K8uObnQFmxO8XU=;
+        h=Subject:To:Cc:References:From:Date:In-Reply-To:From;
+        b=DsqJFQ4QjXiLBwBTBjv+hXFNDY3Sh6tAt1GDHLYGY+lC0GSn8YA3EWYH8HjJRC1Cm
+         hc67z0QMOPKFwgfYxwuL9AyBJRRd2Q5EOslRV//ycGIJmqVa+IVmbJTHF8DINAoJPI
+         oAWOFHrDlNZnDjK3+GYJmUK9/nMNJ+SLGavplZoo=
+Subject: Re: [PATCH RESEND] KVM: MIPS/VZ: Fix build error caused by 'kvm_run'
+ cleanup
+To:     Xingxing Su <suxingxing@loongson.cn>,
+        Huacai Chen <chenhc@lemote.com>,
+        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-mips@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <1597138297-2105-1-git-send-email-suxingxing@loongson.cn>
+From:   Jiaxun Yang <jiaxun.yang@flygoat.com>
+Message-ID: <49a63b59-c03e-b9f5-03d6-ef268f5a6555@flygoat.com>
+Date:   Tue, 11 Aug 2020 22:37:00 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <BN8PR12MB34259F2AE1FDAF2D40E48C5BAB450@BN8PR12MB3425.namprd12.prod.outlook.com>
+In-Reply-To: <1597138297-2105-1-git-send-email-suxingxing@loongson.cn>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-Rspamd-Queue-Id: 056F240EDE
+X-Spamd-Result: default: False [1.40 / 10.00];
+         ARC_NA(0.00)[];
+         RCVD_VIA_SMTP_AUTH(0.00)[];
+         R_DKIM_ALLOW(0.00)[flygoat.com:s=default];
+         MID_RHS_MATCH_FROM(0.00)[];
+         FROM_HAS_DN(0.00)[];
+         TO_DN_SOME(0.00)[];
+         FREEMAIL_ENVRCPT(0.00)[gmail.com];
+         TO_MATCH_ENVRCPT_ALL(0.00)[];
+         TAGGED_RCPT(0.00)[];
+         MIME_GOOD(-0.10)[text/plain];
+         R_SPF_SOFTFAIL(0.00)[~all:c];
+         ML_SERVERS(-3.10)[213.133.102.83];
+         DKIM_TRACE(0.00)[flygoat.com:+];
+         DMARC_POLICY_ALLOW(0.00)[flygoat.com,none];
+         RCPT_COUNT_SEVEN(0.00)[8];
+         RCVD_IN_DNSWL_NONE(0.00)[213.133.102.83:from];
+         DMARC_POLICY_ALLOW_WITH_FAILURES(0.00)[];
+         FREEMAIL_TO(0.00)[loongson.cn,lemote.com,alpha.franken.de,gmail.com,redhat.com];
+         RCVD_NO_TLS_LAST(0.10)[];
+         FROM_EQ_ENVFROM(0.00)[];
+         MIME_TRACE(0.00)[0:+];
+         ASN(0.00)[asn:24940, ipnet:213.133.96.0/19, country:DE];
+         RCVD_COUNT_TWO(0.00)[2];
+         SUSPICIOUS_RECIPS(1.50)[];
+         HFILTER_HELO_BAREIP(3.00)[213.133.102.83,1]
+X-Rspamd-Server: mail20.mymailcheap.com
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Aug 11, 2020 at 11:58:23AM +0000, Eli Cohen wrote:
-> On Tue, Aug 11, 2020 at 11:26:20AM +0000, Eli Cohen wrote:
-> > Hi All
-> > 
-> > Currently, the only statistics we get for a VDPA instance comes from the virtio_net device instance. Since VDPA involves hardware acceleration, there can be quite a lot of information that can be fetched from the underlying device. Currently there is no generic method to fetch this information.
-> > 
-> > One way of doing this can be to create a the host, a net device for 
-> > each VDPA instance, and use it to get this information or do some 
-> > configuration. Ethtool can be used in such a case
-> > 
-> > I would like to hear what you think about this or maybe you have some other ideas to address this topic.
-> > 
-> > Thanks,
-> > Eli
-> 
-> Something I'm not sure I understand is how are vdpa instances created on mellanox cards? There's a devlink command for that, is that right?
-> Can that be extended for stats?
-> 
-> Currently any VF will be probed as VDPA device. We're adding devlink support but I am not sure if devlink is suitable for displaying statistics. We will discuss internally but I wanted to know why you guys think.
-
-OK still things like specifying the mac are managed through rtnetlink,
-right?
-
-Right now it does not look like you can mix stats and vf, they are
-handled separately:
-
-        if (rtnl_fill_stats(skb, dev))
-                goto nla_put_failure;
-
-        if (rtnl_fill_vf(skb, dev, ext_filter_mask))
-                goto nla_put_failure;
-
-but ability to query vf stats on the host sounds useful generally.
-
-As another option, we could use a vdpa specific way to retrieve stats,
-and teach qemu to report them.
 
 
+在 2020/8/11 下午5:31, Xingxing Su 写道:
+> Commit c34b26b98caca48ec9ee9 ("KVM: MIPS: clean up redundant 'kvm_run'
+> parameters") remove the 'kvm_run' parameter in kvm_vz_gpsi_lwc2.
+>
+> The following build error:
+>
+> arch/mips/kvm/vz.c: In function ‘kvm_trap_vz_handle_gpsi’:
+> arch/mips/kvm/vz.c:1243:43: error: ‘run’ undeclared (first use in this function)
+>     er = kvm_vz_gpsi_lwc2(inst, opc, cause, run, vcpu);
+>                                             ^~~
+> arch/mips/kvm/vz.c:1243:43: note: each undeclared identifier is reported only
+> once for each function it appears in
+> scripts/Makefile.build:283: recipe for target 'arch/mips/kvm/vz.o' failed
+> make[2]: *** [arch/mips/kvm/vz.o] Error 1
+> scripts/Makefile.build:500: recipe for target 'arch/mips/kvm' failed
+> make[1]: *** [arch/mips/kvm] Error 2
+> Makefile:1785: recipe for target 'arch/mips' failed
+> make: *** [arch/mips] Error 2
+>
+> Signed-off-by: Xingxing Su <suxingxing@loongson.cn>
 
+That have already quened in Paolo's KVM tree.
 
-> --
-> MST
+Thanks.
 
+- Jiaxun
+
+> ---
+>   +cc Paolo Bonzini <pbonzini@redhat.com> and kvm@vger.kernel.org.
+>
+>
