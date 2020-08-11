@@ -2,108 +2,103 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 47B4D241511
-	for <lists+kvm@lfdr.de>; Tue, 11 Aug 2020 04:54:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A10FD241588
+	for <lists+kvm@lfdr.de>; Tue, 11 Aug 2020 06:20:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728179AbgHKCyD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 10 Aug 2020 22:54:03 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:57309 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726831AbgHKCyD (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 10 Aug 2020 22:54:03 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1597114442;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=QkQRU8e1rT0qyUbw+JJg0ZU52Alo7Rsy9OtRuJe42bU=;
-        b=aORUiqIvBcHB5yyfRP/WSyqx/KKMfF2nIHkRvtMGL6yEoFkgQzoAGKRQOw9vauEOmlaVed
-        2MEkYFl8LpPhu12iWU6KxEu7AMcqy/VWPtej/qxgWJtiUioLfz5FChHraTZw/yQLQe226Z
-        lAwYjGC3nb9tDTzcdB9m2AVrSbzIjbY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-177-nBBoDX1iNRmQDYLbImgUYw-1; Mon, 10 Aug 2020 22:54:00 -0400
-X-MC-Unique: nBBoDX1iNRmQDYLbImgUYw-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7B44418A0F01;
-        Tue, 11 Aug 2020 02:53:59 +0000 (UTC)
-Received: from [10.72.13.186] (ovpn-13-186.pek2.redhat.com [10.72.13.186])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 9DAB9101E7F9;
-        Tue, 11 Aug 2020 02:53:49 +0000 (UTC)
-Subject: Re: [PATCH V5 1/6] vhost: introduce vhost_vring_call
-To:     "Michael S. Tsirkin" <mst@redhat.com>
-Cc:     "Zhu, Lingshan" <lingshan.zhu@intel.com>,
-        alex.williamson@redhat.com, pbonzini@redhat.com,
-        sean.j.christopherson@intel.com, wanpengli@tencent.com,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        kvm@vger.kernel.org, eli@mellanox.com, shahafs@mellanox.com,
-        parav@mellanox.com
-References: <20200731065533.4144-1-lingshan.zhu@intel.com>
- <20200731065533.4144-2-lingshan.zhu@intel.com>
- <5e646141-ca8d-77a5-6f41-d30710d91e6d@redhat.com>
- <d51dd4e3-7513-c771-104c-b61f9ee70f30@intel.com>
- <156b8d71-6870-c163-fdfa-35bf4701987d@redhat.com>
- <20200804052050-mutt-send-email-mst@kernel.org>
- <14fd2bf1-e9c1-a192-bd6c-f1ee5fd227f6@redhat.com>
- <20200810093630-mutt-send-email-mst@kernel.org>
-From:   Jason Wang <jasowang@redhat.com>
-Message-ID: <b669a4c6-f3d7-6cf0-0f7e-8058628c0138@redhat.com>
-Date:   Tue, 11 Aug 2020 10:53:48 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        id S1726317AbgHKETU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 11 Aug 2020 00:19:20 -0400
+Received: from bilbo.ozlabs.org ([203.11.71.1]:33701 "EHLO ozlabs.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725837AbgHKETU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 11 Aug 2020 00:19:20 -0400
+Received: by ozlabs.org (Postfix, from userid 1007)
+        id 4BQfjf3pLbz9sTS; Tue, 11 Aug 2020 14:19:18 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+        d=gibson.dropbear.id.au; s=201602; t=1597119558;
+        bh=2NZiS/B9GDmUuTZl+DIdhj2fNIhZ6RGfvaIFICHqFSM=;
+        h=From:To:Cc:Subject:Date:From;
+        b=WH64YnKMptRO4Eox2YloZbysBg7ADBHWYMCYZMpjNkFkZ7mEP/KxNx5G3tL1CKXQu
+         uhBEtjcHOmb30U2vTPlkz9eIoTSffzJN8sLu7PUF5NjsEsY4f3vQru3UoQGzwgIqFU
+         0ONoy5meOvv+eWlw4dGBg3SCcKueEgHNmY1/1gNM=
+From:   David Gibson <david@gibson.dropbear.id.au>
+To:     paulus@samba.org, mpe@ellerman.id.au
+Cc:     linuxppc-dev@lists.ozlabs.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, kvm-ppc@vger.kernel.org,
+        David Gibson <david@gibson.dropbear.id.au>
+Subject: [PATCH] powerpc: kvm: Increase HDEC threshold to enter guest
+Date:   Tue, 11 Aug 2020 14:08:34 +1000
+Message-Id: <20200811040834.45930-1-david@gibson.dropbear.id.au>
+X-Mailer: git-send-email 2.26.2
 MIME-Version: 1.0
-In-Reply-To: <20200810093630-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Before entering a guest, we need to set the HDEC to pull us out again
+when the guest's time is up.  This needs some care, though, because the
+HDEC is edge triggered, which means that if it expires before entering the
+guest, the interrupt will be lost, meaning we stay in the guest
+indefinitely (in practice, until the the hard lockup detector pulls us out
+with an NMI).
 
-On 2020/8/10 下午9:37, Michael S. Tsirkin wrote:
-> On Wed, Aug 05, 2020 at 10:16:16AM +0800, Jason Wang wrote:
->> On 2020/8/4 下午5:21, Michael S. Tsirkin wrote:
->>>>>>>     +struct vhost_vring_call {
->>>>>>> +    struct eventfd_ctx *ctx;
->>>>>>> +    struct irq_bypass_producer producer;
->>>>>>> +    spinlock_t ctx_lock;
->>>>>> It's not clear to me why we need ctx_lock here.
->>>>>>
->>>>>> Thanks
->>>>> Hi Jason,
->>>>>
->>>>> we use this lock to protect the eventfd_ctx and irq from race conditions,
->>>> We don't support irq notification from vDPA device driver in this version,
->>>> do we still have race condition?
->>>>
->>>> Thanks
->>> Jason I'm not sure what you are trying to say here.
->>
->> I meant we change the API from V4 so driver won't notify us if irq is
->> changed.
->>
->> Then it looks to me there's no need for the ctx_lock, everyhing could be
->> synchronized with vq mutex.
->>
->> Thanks
-> Jason do you want to post a cleanup patch simplifying code along these
-> lines?
+For the POWER9, independent threads mode specific path, we attempt to
+prevent that, by testing time has already expired before setting the HDEC
+in kvmhv_load_regs_and_go().  However, that doesn't account for the case
+where the timer expires between that test and the actual guest entry.
+Preliminary instrumentation suggests that can take as long as 1.5µs under
+certain load conditions, and simply checking the HDEC value we're going to
+load is positive isn't enough to guarantee that leeway.
 
+That test here is sometimes masked by a test in kvmhv_p9_guest_entry(), its
+caller.  That checks that the remaining time is at 1µs.  However as noted
+above that doesn't appear to be sufficient in all circumstances even
+from the point HDEC is set, let alone this earlier point.
 
-Ling Shan promised to post a patch to fix this.
+Therefore, increase the threshold we check for in both locations to 4µs
+(2048 timebase ticks).  This is a pretty crude approach, but it addresses
+a real problem where guest load can trigger a host hard lockup.
 
-Thanks
+We're hoping to refine this in future by gathering more data on exactly
+how long these paths can take, and possibly by moving the check closer to
+the actual guest entry point to reduce the variance.  Getting the details
+for that might take some time however.
 
+NOTE: For reasons I haven't yet tracked down yet, I haven't actually
+managed to reproduce this on current upstream.  I have reproduced it on
+RHEL kernels without obvious differences in this area.  I'm still trying
+to determine what the cause of that difference is, but I think it's worth
+applying this change as a precaution in the interim.
 
->
-> Thanks,
->
->
->>>
+Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+---
+ arch/powerpc/kvm/book3s_hv.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
+index 0f83f39a2bd2..65a92dd890cb 100644
+--- a/arch/powerpc/kvm/book3s_hv.c
++++ b/arch/powerpc/kvm/book3s_hv.c
+@@ -3435,7 +3435,7 @@ static int kvmhv_load_hv_regs_and_go(struct kvm_vcpu *vcpu, u64 time_limit,
+ 	unsigned long host_pidr = mfspr(SPRN_PID);
+ 
+ 	hdec = time_limit - mftb();
+-	if (hdec < 0)
++	if (hdec < 2048)
+ 		return BOOK3S_INTERRUPT_HV_DECREMENTER;
+ 	mtspr(SPRN_HDEC, hdec);
+ 
+@@ -3564,7 +3564,7 @@ int kvmhv_p9_guest_entry(struct kvm_vcpu *vcpu, u64 time_limit,
+ 
+ 	dec = mfspr(SPRN_DEC);
+ 	tb = mftb();
+-	if (dec < 512)
++	if (dec < 2048)
+ 		return BOOK3S_INTERRUPT_HV_DECREMENTER;
+ 	local_paca->kvm_hstate.dec_expires = dec + tb;
+ 	if (local_paca->kvm_hstate.dec_expires < time_limit)
+-- 
+2.26.2
 
