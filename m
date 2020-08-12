@@ -2,144 +2,163 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id CCE3E242E4B
-	for <lists+kvm@lfdr.de>; Wed, 12 Aug 2020 19:51:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 58044242E61
+	for <lists+kvm@lfdr.de>; Wed, 12 Aug 2020 20:04:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726518AbgHLRvd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 12 Aug 2020 13:51:33 -0400
-Received: from mga11.intel.com ([192.55.52.93]:8711 "EHLO mga11.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726013AbgHLRvc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 12 Aug 2020 13:51:32 -0400
-IronPort-SDR: SetiZDw/HCyivUTQmI71Wi+DwV83LWLpBzQq87qJFMpfuwKEm6V+mkHq/GcGeNJNkCa3emO5ds
- yAppI9f+2Gug==
-X-IronPort-AV: E=McAfee;i="6000,8403,9711"; a="151683229"
-X-IronPort-AV: E=Sophos;i="5.76,305,1592895600"; 
-   d="scan'208";a="151683229"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Aug 2020 10:51:30 -0700
-IronPort-SDR: PaPn9eCBmBUz7md84VtPMA8A3zjis7ZWdVqCjt3lbfKIJiErQswbDanNY8VDImLLGFsDqt1LBW
- GkZ/ERpujdJw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.76,305,1592895600"; 
-   d="scan'208";a="277905359"
-Received: from sjchrist-coffee.jf.intel.com ([10.54.74.160])
-  by fmsmga008.fm.intel.com with ESMTP; 12 Aug 2020 10:51:30 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Liran Alon <liran.alon@oracle.com>
-Subject: [PATCH] KVM: nVMX: Morph notification vector IRQ on nested VM-Enter to pending PI
-Date:   Wed, 12 Aug 2020 10:51:29 -0700
-Message-Id: <20200812175129.12172-1-sean.j.christopherson@intel.com>
-X-Mailer: git-send-email 2.28.0
+        id S1726567AbgHLSEM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 12 Aug 2020 14:04:12 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:58106 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726512AbgHLSEL (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 12 Aug 2020 14:04:11 -0400
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 07CI2GHJ165546;
+        Wed, 12 Aug 2020 14:04:08 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=SRzTkpxr5LdPeSrEjmAc06YCSZqbsTO5DEVlTIu4cU0=;
+ b=b4ZpXqdpAH2PFfAAoDPtHG0UcBz+cEHJ6ggcX7qzNo7jsAFL34dqGN7sb62kkEvBfJdD
+ dPv4SlBxymgPimGCPt6TV92Ze9d5H/A0uSKpGpsyFToE31FoKhN5sPLwa6ECOkml1k1z
+ 2+358E3niYhsNS8joH4WDNO0C37ZKVtIb9K0LSLjebMIzIEDeRYzlIpCJpKwxyAgKRTi
+ bFQ1nxhUW8cFoZ8dE/AjxZEJgC0Tg/I6E9JwVebdKq3kCBuXj2B7MaL0Umx2AFrfjolE
+ AE6PrInBUu6QQMVs4qlYWmH/FcWOSi9lC5aUoSwPL9qgXKyPwyd4iPdXk98/8b4F7e+Y aw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 32v83c61ne-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 12 Aug 2020 14:04:07 -0400
+Received: from m0098404.ppops.net (m0098404.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 07CI3hY0173359;
+        Wed, 12 Aug 2020 14:04:07 -0400
+Received: from ppma04dal.us.ibm.com (7a.29.35a9.ip4.static.sl-reverse.com [169.53.41.122])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 32v83c61kx-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 12 Aug 2020 14:04:06 -0400
+Received: from pps.filterd (ppma04dal.us.ibm.com [127.0.0.1])
+        by ppma04dal.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 07CHj3ZL001961;
+        Wed, 12 Aug 2020 18:04:05 GMT
+Received: from b03cxnp08027.gho.boulder.ibm.com (b03cxnp08027.gho.boulder.ibm.com [9.17.130.19])
+        by ppma04dal.us.ibm.com with ESMTP id 32skp9cdh2-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 12 Aug 2020 18:04:05 +0000
+Received: from b03ledav006.gho.boulder.ibm.com (b03ledav006.gho.boulder.ibm.com [9.17.130.237])
+        by b03cxnp08027.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 07CI406h31654290
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 12 Aug 2020 18:04:01 GMT
+Received: from b03ledav006.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 9811FC6063;
+        Wed, 12 Aug 2020 18:04:03 +0000 (GMT)
+Received: from b03ledav006.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id E5054C6055;
+        Wed, 12 Aug 2020 18:04:01 +0000 (GMT)
+Received: from oc4221205838.ibm.com (unknown [9.163.7.238])
+        by b03ledav006.gho.boulder.ibm.com (Postfix) with ESMTP;
+        Wed, 12 Aug 2020 18:04:01 +0000 (GMT)
+Subject: Re: [PATCH] PCI: Introduce flag for detached virtual functions
+To:     Alex Williamson <alex.williamson@redhat.com>
+Cc:     bhelgaas@google.com, schnelle@linux.ibm.com, pmorel@linux.ibm.com,
+        mpe@ellerman.id.au, oohall@gmail.com, linux-s390@vger.kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-pci@vger.kernel.org
+References: <1597243817-3468-1-git-send-email-mjrosato@linux.ibm.com>
+ <1597243817-3468-2-git-send-email-mjrosato@linux.ibm.com>
+ <20200812104351.3668cc0f@x1.home>
+From:   Matthew Rosato <mjrosato@linux.ibm.com>
+Message-ID: <05c46459-7d00-c01c-6387-68bc7d6c4f63@linux.ibm.com>
+Date:   Wed, 12 Aug 2020 14:04:01 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20200812104351.3668cc0f@x1.home>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
+ definitions=2020-08-12_13:2020-08-11,2020-08-12 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999 mlxscore=0
+ lowpriorityscore=0 spamscore=0 bulkscore=0 impostorscore=0 phishscore=0
+ malwarescore=0 clxscore=1015 suspectscore=0 adultscore=0
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2006250000 definitions=main-2008120114
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On successful nested VM-Enter, check for pending interrupts and convert
-the highest priority interrupt to a pending posted interrupt if it
-matches L2's notification vector.  If the vCPU receives a notification
-interrupt before nested VM-Enter (assuming L1 disables IRQs before doing
-VM-Enter), the pending interrupt (for L1) should be recognized and
-processed as a posted interrupt when interrupts become unblocked after
-VM-Enter to L2.
+On 8/12/20 12:43 PM, Alex Williamson wrote:
+> On Wed, 12 Aug 2020 10:50:17 -0400
+> Matthew Rosato <mjrosato@linux.ibm.com> wrote:
+> 
+>> s390x has the notion of providing VFs to the kernel in a manner
+>> where the associated PF is inaccessible other than via firmware.
+>> These are not treated as typical VFs and access to them is emulated
+>> by underlying firmware which can still access the PF.  After
+>> abafbc55 however these detached VFs were no longer able to work
+>> with vfio-pci as the firmware does not provide emulation of the
+>> PCI_COMMAND_MEMORY bit.  In this case, let's explicitly recognize
+>> these detached VFs so that vfio-pci can allow memory access to
+>> them again.
+>>
+>> Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
+>> Reviewed-by: Pierre Morel <pmorel@linux.ibm.com>
+>> Reviewed-by: Niklas Schnelle <schnelle@linux.ibm.com>
+>> ---
+>>   arch/s390/pci/pci.c                | 8 ++++++++
+>>   drivers/vfio/pci/vfio_pci_config.c | 3 ++-
+>>   include/linux/pci.h                | 1 +
+>>   3 files changed, 11 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/arch/s390/pci/pci.c b/arch/s390/pci/pci.c
+>> index 3902c9f..04ac76d 100644
+>> --- a/arch/s390/pci/pci.c
+>> +++ b/arch/s390/pci/pci.c
+>> @@ -581,6 +581,14 @@ int pcibios_enable_device(struct pci_dev *pdev, int mask)
+>>   {
+>>   	struct zpci_dev *zdev = to_zpci(pdev);
+>>   
+>> +	/*
+>> +	 * If we have a VF on a non-multifunction bus, it must be a VF that is
+>> +	 * detached from its parent PF.  We rely on firmware emulation to
+>> +	 * provide underlying PF details.
+>> +	 */
+>> +	if (zdev->vfn && !zdev->zbus->multifunction)
+>> +		pdev->detached_vf = 1;
+>> +
+>>   	zpci_debug_init_device(zdev, dev_name(&pdev->dev));
+>>   	zpci_fmb_enable_device(zdev);
+>>   
+>> diff --git a/drivers/vfio/pci/vfio_pci_config.c b/drivers/vfio/pci/vfio_pci_config.c
+>> index d98843f..17845fc 100644
+>> --- a/drivers/vfio/pci/vfio_pci_config.c
+>> +++ b/drivers/vfio/pci/vfio_pci_config.c
+>> @@ -406,7 +406,8 @@ bool __vfio_pci_memory_enabled(struct vfio_pci_device *vdev)
+>>   	 * PF SR-IOV capability, there's therefore no need to trigger
+>>   	 * faults based on the virtual value.
+>>   	 */
+>> -	return pdev->is_virtfn || (cmd & PCI_COMMAND_MEMORY);
+>> +	return pdev->is_virtfn || pdev->detached_vf ||
+>> +	       (cmd & PCI_COMMAND_MEMORY);
+>>   }
+>>   
+>>   /*
+> 
+> Wouldn't we also want to enable the is_virtfn related code in
+> vfio_basic_config_read() and at least the initial setting of the
+> command register in vfio_config_init()?  Otherwise we're extending the
+> incomplete emulation out to userspace.  Thanks,
+> 
 
-This fixes a bug where L1/L2 will get stuck in an infinite loop if L1 is
-trying to inject an interrupt into L2 by setting the appropriate bit in
-L2's PIR and sending a self-IPI prior to VM-Enter (as opposed to KVM's
-method of manually moving the vector from PIR->vIRR/RVI).  KVM will
-observe the IPI while the vCPU is in L1 context and so won't immediately
-morph it to a posted interrupt for L2.  The pending interrupt will be
-seen by vmx_check_nested_events(), cause KVM to force an immediate exit
-after nested VM-Enter, and eventually be reflected to L1 as a VM-Exit.
-After handling the VM-Exit, L1 will see that L2 has a pending interrupt
-in PIR, send another IPI, and repeat until L2 is killed.
+We had discussed doing this internally and I ultimately left it out of 
+this patch to keep the changes small...  But I agree that it makes sense 
+to fix the emulation for userspace.  I can add the changes you suggest + 
+would also need to change vfio_restore_bar() with:
 
-Note, posted interrupts require virtual interrupt deliveriy, and virtual
-interrupt delivery requires exit-on-interrupt, ergo interrupts will be
-unconditionally unmasked on VM-Enter if posted interrupts are enabled.
+-       if (pdev->is_virtfn)
++       if (pdev->is_virtfn || pdev->detached_vf)
+                 return;
 
-Fixes: 705699a13994 ("KVM: nVMX: Enable nested posted interrupt processing")
-Cc: stable@vger.kernel.org
-Cc: Liran Alon <liran.alon@oracle.com>
-Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
----
+to prevent the config changes from tripping the restore code.
 
-I am by no means 100% confident this the a complete, correct fix.  I also
-don't like exporting two low level LAPIC functions.  But, the fix does
-appear to work as intended.
-
- arch/x86/kvm/lapic.c      | 7 +++++++
- arch/x86/kvm/lapic.h      | 1 +
- arch/x86/kvm/vmx/nested.c | 8 ++++++++
- 3 files changed, 16 insertions(+)
-
-diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-index 5ccbee7165a21..ce37376bc96ec 100644
---- a/arch/x86/kvm/lapic.c
-+++ b/arch/x86/kvm/lapic.c
-@@ -488,6 +488,12 @@ static inline void apic_clear_irr(int vec, struct kvm_lapic *apic)
- 	}
- }
- 
-+void kvm_apic_clear_irr(struct kvm_vcpu *vcpu, int vec)
-+{
-+	apic_clear_irr(vec, vcpu->arch.apic);
-+}
-+EXPORT_SYMBOL_GPL(kvm_apic_clear_irr);
-+
- static inline void apic_set_isr(int vec, struct kvm_lapic *apic)
- {
- 	struct kvm_vcpu *vcpu;
-@@ -2461,6 +2467,7 @@ int kvm_apic_has_interrupt(struct kvm_vcpu *vcpu)
- 	__apic_update_ppr(apic, &ppr);
- 	return apic_has_interrupt_for_ppr(apic, ppr);
- }
-+EXPORT_SYMBOL_GPL(kvm_apic_has_interrupt);
- 
- int kvm_apic_accept_pic_intr(struct kvm_vcpu *vcpu)
- {
-diff --git a/arch/x86/kvm/lapic.h b/arch/x86/kvm/lapic.h
-index 754f29beb83e3..4fb86e3a9dd3d 100644
---- a/arch/x86/kvm/lapic.h
-+++ b/arch/x86/kvm/lapic.h
-@@ -89,6 +89,7 @@ int kvm_lapic_reg_read(struct kvm_lapic *apic, u32 offset, int len,
- bool kvm_apic_match_dest(struct kvm_vcpu *vcpu, struct kvm_lapic *source,
- 			   int shorthand, unsigned int dest, int dest_mode);
- int kvm_apic_compare_prio(struct kvm_vcpu *vcpu1, struct kvm_vcpu *vcpu2);
-+void kvm_apic_clear_irr(struct kvm_vcpu *vcpu, int vec);
- bool __kvm_apic_update_irr(u32 *pir, void *regs, int *max_irr);
- bool kvm_apic_update_irr(struct kvm_vcpu *vcpu, u32 *pir, int *max_irr);
- void kvm_apic_update_ppr(struct kvm_vcpu *vcpu);
-diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index 23b58c28a1c92..2acf33b110b5c 100644
---- a/arch/x86/kvm/vmx/nested.c
-+++ b/arch/x86/kvm/vmx/nested.c
-@@ -3528,6 +3528,14 @@ static int nested_vmx_run(struct kvm_vcpu *vcpu, bool launch)
- 	if (unlikely(status != NVMX_VMENTRY_SUCCESS))
- 		goto vmentry_failed;
- 
-+	/* Emulate processing of posted interrupts on VM-Enter. */
-+	if (nested_cpu_has_posted_intr(vmcs12) &&
-+	    kvm_apic_has_interrupt(vcpu) == vmx->nested.posted_intr_nv) {
-+		vmx->nested.pi_pending = true;
-+		kvm_make_request(KVM_REQ_EVENT, vcpu);
-+		kvm_apic_clear_irr(vcpu, vmx->nested.posted_intr_nv);
-+	}
-+
- 	/* Hide L1D cache contents from the nested guest.  */
- 	vmx->vcpu.arch.l1tf_flush_l1d = true;
- 
--- 
-2.28.0
+I'll send a V2 with this included.
 
