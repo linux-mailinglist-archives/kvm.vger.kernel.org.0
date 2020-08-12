@@ -2,73 +2,78 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 611AD242A80
-	for <lists+kvm@lfdr.de>; Wed, 12 Aug 2020 15:41:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2E2B5242A9B
+	for <lists+kvm@lfdr.de>; Wed, 12 Aug 2020 15:51:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727873AbgHLNld (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 12 Aug 2020 09:41:33 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:30777 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726804AbgHLNlb (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 12 Aug 2020 09:41:31 -0400
+        id S1727979AbgHLNvW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 12 Aug 2020 09:51:22 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:48607 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726804AbgHLNvV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 12 Aug 2020 09:51:21 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1597239689;
+        s=mimecast20190719; t=1597240278;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=dNPM/DXVd+hsYv1RDubHUxvCynTtgxX6FLHW6tCPxqU=;
-        b=LHfYg/HgbFrjabzMwPnjxItlmWZS2cjB944XeHIp2mhQNxB5j4pbYaJLLpKGaLNOtg1oT+
-        klq+5mKuu1i511yFsHIKPTcVIpOewjLsA5OzkntUTAA//hzQaX+LlrTyrvLPkOU5t1KsRL
-        wdU/K87GKZoA0NsixWoPBBFrZmKDmts=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-228-vi0bUIV2MommglXH2I3Xdw-1; Wed, 12 Aug 2020 09:41:26 -0400
-X-MC-Unique: vi0bUIV2MommglXH2I3Xdw-1
-Received: by mail-wm1-f71.google.com with SMTP id k204so725050wmb.3
-        for <kvm@vger.kernel.org>; Wed, 12 Aug 2020 06:41:26 -0700 (PDT)
+        bh=BDAp+ggb7oSFGFdMC5id6rMGnPA4tyUwDxMCjaPImAI=;
+        b=QOp9nkTSYPgDP0VrKtPbiegh7+X1SSF5eWR0GjGkkp0BDDA8qjfJiVM61QzEZFSyhmhbMB
+        CS7oYPttpqeRUGGlk4oEBLaYlCA9kka48LgPSHoDuEdoBJI0SQ3NBTjjPKDkVND7dreJLZ
+        6Oem+5/XCMiWmkH8uDAn1+sHmC1PIEc=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-451-cCD58XPvNzK3FPuYJL6F2A-1; Wed, 12 Aug 2020 09:51:16 -0400
+X-MC-Unique: cCD58XPvNzK3FPuYJL6F2A-1
+Received: by mail-wm1-f69.google.com with SMTP id q15so904019wmj.6
+        for <kvm@vger.kernel.org>; Wed, 12 Aug 2020 06:51:16 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=dNPM/DXVd+hsYv1RDubHUxvCynTtgxX6FLHW6tCPxqU=;
-        b=VB7706RMW9TX4hEhPYhVsi39i+GJRtr4HSDSXS16QJk+AlFUIbD3leYEufz5lsSMG6
-         ejhRM9zvdUt1GX2QBHa2VHzxENDQoYKJOr51gTsiUync4klISCTcxHMuisqSX4ADsNHi
-         uXLZYQLymw4tlrvoReBp7533Vh/BZWxP2p5AxRSevnnh4mPRM4fTouqIAAKFnAwnKUU4
-         v8Wu8NlQxnZkuGNSUdJG1BWlYgJ99SGKdPZ6rbkAc+xI4W8ZGQjwSQaGS67LahQaYysa
-         2nWEj+dJKbOVrIVHlVI1HHTjc2wQJfn8FuMe9pedOj4VYnis0AVvlpGjFMbYcF4kcNHc
-         lqXA==
-X-Gm-Message-State: AOAM533xzk1v0zWSHAAeHatLigYlV5a3bFU2IJfQGfqzbRDlL60SFf59
-        qG2hPCa9jMFEvyEAGjMq1U93ABwXTmLs2uS2NOkFPmKzpkXM5hNCxVFGX08XWVL2MitSOLA6vl7
-        8pzmtlk6/YGgK
-X-Received: by 2002:a05:6000:12c1:: with SMTP id l1mr32294086wrx.270.1597239685348;
-        Wed, 12 Aug 2020 06:41:25 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzsZAyLlGMKkmspkC3Ujq3SXzql6HdlBCQz4aqSQCFcEI2BkaH+Mm2AfMOpYonmRerOxlObdQ==
-X-Received: by 2002:a05:6000:12c1:: with SMTP id l1mr32294056wrx.270.1597239685013;
-        Wed, 12 Aug 2020 06:41:25 -0700 (PDT)
+        bh=BDAp+ggb7oSFGFdMC5id6rMGnPA4tyUwDxMCjaPImAI=;
+        b=e1tzvrrKBugPWHa1aXM1u/6qLkd3+4X4biWDqjJqetlvYdZ+SGXB1Z9SRATtMXwTDW
+         XYKOS+ifigQ0RWDWGwXJRR1SoDGlSwAUml8sFLKtKefA0WhWQmxANX+zpGRDIHRKAQKq
+         YuTsZeSO9L50sLmzBQ8umMedSRIkJivhL+it309LjTLOqxA37xPLhSBa430G5BrJD2Cm
+         jgDaXJsAmgsJGj2WlZMx8cBqVxyX7+xxF/XBhw82/3cd1FNlYVL/b9kfjXHdpoGNszc6
+         IQdw2VWyX4Mi2cSugMM6CkCNPdbo/FUjpyL2/P8XbFq7J8SokOGGJY6p4W8yussF69sw
+         3F2g==
+X-Gm-Message-State: AOAM532yEhYiO6aZ7gLkhVxuAP7eEHB+kzhMRm78iw0sIi6ikGgnLL3d
+        Z1ZCiBnrf0a28zlabZh9DEzo1hu4cuiHs0MJGPb2x4vvKiDrqzh47a3TIP6y9X0VJtnFK9txbVw
+        fihuoAX/pvxfI
+X-Received: by 2002:a5d:6381:: with SMTP id p1mr33077723wru.112.1597240275476;
+        Wed, 12 Aug 2020 06:51:15 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyV0DY2n7laMwZDQQRC9n0q+OBfOQbVOA063aLwgQMFyxIvC6lgf++6/c9GE8CTPUAZapSlfw==
+X-Received: by 2002:a5d:6381:: with SMTP id p1mr33077708wru.112.1597240275211;
+        Wed, 12 Aug 2020 06:51:15 -0700 (PDT)
 Received: from ?IPv6:2001:b07:6468:f312:fcdc:39e8:d361:7e30? ([2001:b07:6468:f312:fcdc:39e8:d361:7e30])
-        by smtp.gmail.com with ESMTPSA id q5sm4188720wrp.60.2020.08.12.06.41.24
+        by smtp.gmail.com with ESMTPSA id h11sm4322603wrb.68.2020.08.12.06.51.14
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 12 Aug 2020 06:41:24 -0700 (PDT)
-Subject: Re: [PATCH v3 0/5] KVM_{GET,SET}_TSC_OFFSET ioctls
-To:     Jim Mattson <jmattson@google.com>, Oliver Upton <oupton@google.com>
-Cc:     kvm list <kvm@vger.kernel.org>, Peter Shier <pshier@google.com>,
+        Wed, 12 Aug 2020 06:51:14 -0700 (PDT)
+Subject: Re: [PATCH] KVM: x86/pmu: Add '.exclude_hv = 1' for guest perf_event
+To:     peterz@infradead.org
+Cc:     Like Xu <like.xu@linux.intel.com>, Yao <yao.jin@linux.intel.com>,
         Sean Christopherson <sean.j.christopherson@intel.com>,
-        Peter Hornyack <peterhornyack@google.com>
-References: <20200722032629.3687068-1-oupton@google.com>
- <CAOQ_QsgeN4DCghH6ibb68C+P0ETr77s2s7Us+uxF6E6LFx62tw@mail.gmail.com>
- <CAOQ_QshUE_OQmAuWd6SzdfXvn7Y6SVukcC1669Re0TRGCoeEgg@mail.gmail.com>
- <f97789f6-43b4-a607-5af8-4f522f753761@redhat.com>
- <CAOQ_QsjsmVpbi92o_Dz0GzAmU_Oq=Z4KFjZ8BY5dLQr7YmbrFg@mail.gmail.com>
- <CALMp9eQ4zPoRfPQJ2c7H-hyqCWu+B6fjXk+7SsEOvK7aR49ZJg@mail.gmail.com>
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Arnaldo Carvalho de Melo <acme@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>
+References: <20200812050722.25824-1-like.xu@linux.intel.com>
+ <5c41978e-8341-a179-b724-9aa6e7e8a073@redhat.com>
+ <20200812111115.GO2674@hirez.programming.kicks-ass.net>
+ <65eddd3c-c901-1c5a-681f-f0cb07b5fbb1@redhat.com>
+ <20200812133150.GQ2674@hirez.programming.kicks-ass.net>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <7dce49db-9175-bfe0-8374-d433a7589de9@redhat.com>
-Date:   Wed, 12 Aug 2020 15:41:23 +0200
+Message-ID: <40005c08-27ec-edcd-503e-9d2eaac7d2a4@redhat.com>
+Date:   Wed, 12 Aug 2020 15:51:13 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.9.0
 MIME-Version: 1.0
-In-Reply-To: <CALMp9eQ4zPoRfPQJ2c7H-hyqCWu+B6fjXk+7SsEOvK7aR49ZJg@mail.gmail.com>
+In-Reply-To: <20200812133150.GQ2674@hirez.programming.kicks-ass.net>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -77,59 +82,71 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 06/08/20 00:01, Jim Mattson wrote:
->>> but perhaps I'm missing something obvious.
->> Not necessarily obvious, but I can think of a rather contrived example
->> where the sync heuristics break down. If we're running nested and get
->> migrated in the middle of a VMM setting up TSCs, it's possible that
->> enough time will pass that we believe subsequent writes to not be of
->> the same TSC generation.
->
-> An example that has been biting us frequently in self-tests: migrate a
-> VM with less than a second accumulated in its TSC. At the destination,
-> the TSCs are zeroed.
-
-Yeah, good point about selftests.  But this would be about the sync
-heuristics messing up, and I don't understand how these ioctls improve
-things.
-
->> My immediate reaction was that we should just migrate the heuristics
->> state somehow
+On 12/08/20 15:31, peterz@infradead.org wrote:
+> This isn't about x86, I want these checks in generic code. We have the
+> flag, it needs checking.
 > 
-> Yeah, I completely agree. I believe this series fixes the
-> userspace-facing issues and your suggestion would address the
-> guest-facing issues.
+> unpriv users have no busniess getting anything from a possible hv.
 
-I still don't understand how these ioctls are any better for userspace
-than migrating MSR_IA32_TSC.  The host TSC is different between source
-and destination, so the TSC offset will be different.
+Ah ok if it's generic that sounds good.
 
-I am all for improving migration of TSC state, but I think we should do
-it right, so we should migrate a host clock / TSC pair: then the
-destination host can use TSC frequency and host clock to compute the new
-TSC value.  In fact, such a pair is exactly the data that the syncing
-heuristics track for each "generation" of syncing.
+>> That would be the case of an unprivileged user that wants to measure
+>> performance of its guests.
+> 
+> An unpriv user can run guests?
 
-To migrate the synchronization state, instead, we only need to migrate
-the "already_matched" (vcpu->arch.this_tsc_generation ==
-kvm->arch.cur_tsc_generation) state.
+Sure, on most distros /dev/kvm is either 0666 or 0660, usually with
+group kvm if it's 0660.  To run a guest you might have to be in group
+kvm, but it does not require either root or CAP_SOMETHING.
 
-Putting all of this together, it would be something like this:
+>>> Also, exclude_host is really poorly defined:
+>>>
+>>>   https://lkml.kernel.org/r/20200806091827.GY2674@hirez.programming.kicks-ass.net
+>>>
+>>>   "Suppose we have nested virt:
+>>>
+>>> 	  L0-hv
+>>> 	  |
+>>> 	  G0/L1-hv
+>>> 	     |
+>>> 	     G1
+>>>
+>>>   And we're running in G0, then:
+>>>
+>>>   - 'exclude_hv' would exclude L0 events
+>>>   - 'exclude_host' would ... exclude L1-hv events?
+>>>   - 'exclude_guest' would ... exclude G1 events?
+>>
+>> From the point of view of G0, L0 *does not exist at all*.  You just
+>> cannot see L0 events if you're running in G0.
+> 
+> On x86, probably, in general, I'm not at all sure, we have that
+> exclude_hv flag after all.
 
-- a VM-wide KVM_CLOCK/KVM_SET_CLOCK needs to migrate
-vcpu->arch.cur_tsc_{nsec,write} in addition to the current kvmclock
-value (it's unrelated, but I don't think it's worth creating a new
-ioctl).  A new flag is set if these fields are set in the struct.  If
-the flag is set, KVM_SET_CLOCK copies the fields back, bumps the
-generation and clears kvm->arch.nr_vcpus_matched_tsc.
+No, and you can quote me on that: exclude_hv is *not* about excluding
+the hypervisor from a guest.  It's about excluding the part of _your_
+kernel which runs in a "more privileged" level (EL2 on ARM, HV on POWER).
 
-- a VCPU-wide KVM_GET_TSC_INFO returns a host clock / guest TSC pair
-plus the "already matched" state.  KVM_SET_TSC_INFO will only use the
-host clock / TSC pair if "already matched" is false, to compute the
-destination-side TSC offset but not otherwise doing anything with it; or
-if "already matched" is true, it will ignore the pair, compute the TSC
-offset from the data in kvm->arch, and update
-kvm->arch.nr_vcpus_matched_tsc.
+>> exclude_host/exclude_guest are the right definition.
+> 
+> For what?
+
+I meant in the nested virt case you drew above.
+
+> I still think exclude_host is absolute shit. If you set it,
+> you'll not get anything even without virt.
+
+If you dislike the name you can change it to only_guest.  Anybody who
+does not do virt just leaves it zero and is happy.  Anybody who does not
+do virt and sets it gets what they expect (or deserve).  But this
+definition is the same as exclude_host, and it's the correct one.
+
+> If, as you seem to imply above, that unpriv users can create guests,
+> then maybe so, but if I look at /dev/kvm it seems to have 0660
+> permissions and thus really requires privileges.
+
+Since you can be non-root and you don't need any capability either, it
+doesn't require what the kernel considers to be privilege.
 
 Paolo
 
