@@ -2,33 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A18572429E0
-	for <lists+kvm@lfdr.de>; Wed, 12 Aug 2020 14:57:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EC608242A02
+	for <lists+kvm@lfdr.de>; Wed, 12 Aug 2020 15:05:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728027AbgHLM46 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 12 Aug 2020 08:56:58 -0400
-Received: from mga18.intel.com ([134.134.136.126]:57977 "EHLO mga18.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727977AbgHLM45 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 12 Aug 2020 08:56:57 -0400
-IronPort-SDR: 4c5hsD7oNS8j//x5JDjKNcMPAzIj5A8mLL+QGUxVwCuJi6xKFhLRaI6U7GH13MjstRj+o/qXGv
- 66Psvvn9itQw==
-X-IronPort-AV: E=McAfee;i="6000,8403,9710"; a="141565529"
-X-IronPort-AV: E=Sophos;i="5.76,304,1592895600"; 
-   d="scan'208";a="141565529"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Aug 2020 05:56:56 -0700
-IronPort-SDR: vb0plur+z9CHm3M4u+Sb1rVDBOrjsBMYZgDSSGvqYZ3vcsJFEZaJHxUVfkcENt3E4Dl3uuh9P+
- na8O+ccUp+uA==
-X-IronPort-AV: E=Sophos;i="5.76,304,1592895600"; 
-   d="scan'208";a="469812685"
-Received: from likexu-mobl1.ccr.corp.intel.com (HELO [10.255.29.234]) ([10.255.29.234])
-  by orsmga005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Aug 2020 05:56:52 -0700
-Reply-To: like.xu@intel.com
+        id S1728021AbgHLNEw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 12 Aug 2020 09:04:52 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:30767 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726404AbgHLNEv (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 12 Aug 2020 09:04:51 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1597237488;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=3Fsgrw+mRjbdWES2GWusstFr/mr6OnkInf7T7tR1iuA=;
+        b=favdMBuQM9Qaxvle70A5xo/Fd9S0vPlNLvGEK9NCHXzp6ykG+AkaSdAg6qiStJqLpeDEdZ
+        LwH6mwijs1cHTZVlpBSjzy0LqnduARdSreTJZnQYPCbClMsudze5ITlP0rW1Xhee7kfjAQ
+        fZQrRkQ2C0rbJbUnFde6BRz8V/91IFE=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-64-fv-95usfPJCJLvpgMGA1cQ-1; Wed, 12 Aug 2020 09:04:47 -0400
+X-MC-Unique: fv-95usfPJCJLvpgMGA1cQ-1
+Received: by mail-wm1-f72.google.com with SMTP id s4so694945wmh.1
+        for <kvm@vger.kernel.org>; Wed, 12 Aug 2020 06:04:46 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=3Fsgrw+mRjbdWES2GWusstFr/mr6OnkInf7T7tR1iuA=;
+        b=VOmy6E608Tbg9b1RxKdEVce3z3vU4PY3lfVCa56oKblJo+Q2EbaTB+bxOPwCri+cVc
+         0vBmHsqdb0ud+CQeAnoaljdMNcwkoqNQdSQTbv92Cz57qbiDhTJ9a/0SVTZAwdaWO40Z
+         cR3ZmdgO4O9aPfKMcOeyXpryHMY3XFjYnIRqIVwl9AzJTZphIziceK7ICyaveYPFvrp/
+         YPYLXSo4VOlDQWY4ALt1I00fPbDRIhIT1Xt8R3gM9LKA5XauHcgCAU9jcZHiNN7EqiUL
+         qqq6g5KGKoDM55biAO0gKFhVdVaj1soc33zcDYe5m8trZ++DpDBmxhkXejW5/hM1GqTA
+         nEKA==
+X-Gm-Message-State: AOAM5326HeUIDVTci2mD01jswg2qvEfpaqXthWdFZyyo8h9pF8QmzPEX
+        onAd4Nj4t5kjyTw+Dzbvds7K0lKt2TAvA2kpxNcfPTpEcfGIvl9wfvZq6zbEA7QJn6J0iHcJue+
+        8Pn49mz3R6PCP
+X-Received: by 2002:adf:ab55:: with SMTP id r21mr32322666wrc.332.1597237485850;
+        Wed, 12 Aug 2020 06:04:45 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyJcm6bs/kye85/P+Jyuc7cEjwoDZlomX2S0Ug3Q7nIk7qrF3w/nV2klKWLtDnO1ChUHk9xzA==
+X-Received: by 2002:adf:ab55:: with SMTP id r21mr32322639wrc.332.1597237485611;
+        Wed, 12 Aug 2020 06:04:45 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:fcdc:39e8:d361:7e30? ([2001:b07:6468:f312:fcdc:39e8:d361:7e30])
+        by smtp.gmail.com with ESMTPSA id k204sm3938274wma.21.2020.08.12.06.04.44
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 12 Aug 2020 06:04:45 -0700 (PDT)
 Subject: Re: [PATCH] KVM: x86/pmu: Add '.exclude_hv = 1' for guest perf_event
-To:     Paolo Bonzini <pbonzini@redhat.com>, peterz@infradead.org
+To:     like.xu@intel.com, peterz@infradead.org
 Cc:     Like Xu <like.xu@linux.intel.com>, Yao <yao.jin@linux.intel.com>,
         Sean Christopherson <sean.j.christopherson@intel.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
@@ -42,116 +66,36 @@ References: <20200812050722.25824-1-like.xu@linux.intel.com>
  <5c41978e-8341-a179-b724-9aa6e7e8a073@redhat.com>
  <20200812111115.GO2674@hirez.programming.kicks-ass.net>
  <65eddd3c-c901-1c5a-681f-f0cb07b5fbb1@redhat.com>
-From:   "Xu, Like" <like.xu@intel.com>
-Organization: Intel OTC
-Message-ID: <b55afd09-77c8-398b-309b-6bd9f9cfc876@intel.com>
-Date:   Wed, 12 Aug 2020 20:56:50 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+ <b55afd09-77c8-398b-309b-6bd9f9cfc876@intel.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <8bdc60d5-c9ef-4e8f-6b73-b7bd012d9d30@redhat.com>
+Date:   Wed, 12 Aug 2020 15:04:44 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.9.0
 MIME-Version: 1.0
-In-Reply-To: <65eddd3c-c901-1c5a-681f-f0cb07b5fbb1@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <b55afd09-77c8-398b-309b-6bd9f9cfc876@intel.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2020/8/12 19:32, Paolo Bonzini wrote:
-> On 12/08/20 13:11, peterz@infradead.org wrote:
->>> x86 does not have a hypervisor privilege level, so it never uses
->> Arguably it does when Xen, but I don't think we support that, so *phew*.
-> Yeah, I suppose you could imagine having paravirtualized perf counters
-> where the Xen privileged domain could ask Xen to run perf counters on
-> itself.
->
->>> exclude_hv; exclude_host already excludes all root mode activity for
->>> both ring0 and ring3.
->> Right, but we want to tighten the permission checks and not excluding_hv
->> is just sloppy.
-> I would just document that it's ignored as it doesn't make sense.  ARM64
-> does that too, for new processors where the kernel is not itself split
-> between supervisor and hypervisor privilege levels.
->
-> There are people that are trying to run Linux-based firmware and have
-> SMM handlers as part of the kernel.  Perhaps they could use exclude_hv
-> to exclude the SMM handlers from perf (if including them is possible at
-> all).
-Hi Paolo,
+On 12/08/20 14:56, Xu, Like wrote:
+> 
+> My proposal is to define:
+> the "hypervisor privilege levels" events in the KVM/x86 context as
+> all the host kernel events plus /dev/kvm user space events.
 
-My proposal is to define:
-the "hypervisor privilege levels" events in the KVM/x86 context as
-all the host kernel events plus /dev/kvm user space events.
+What are "/dev/kvm user space events"?  In any case, this patch should
+be included only in the series that adds exclude_hv support in arch/x86.
 
-If we add ".exclude_hv = 1" in the pmc_reprogram_counter(),
-do you see any side effect to cover the above usages?
+Paolo
 
-The fact that exclude_hv has never been used in x86 does help
-the generic perf code to handle permission checks in a more concise way.
-
-Thanks,
-Like Xu
->> The thing is, we very much do not want to allow unpriv user to be able
->> to create: exclude_host=1, exclude_guest=0 counters (they currently
->> can).
-> That would be the case of an unprivileged user that wants to measure
-> performance of its guests.  It's a scenario that makes a lot of sense,
-> are you worried about side channels?  Can perf-events on guests leak
-> more about the host than perf-events on a random userspace program?
->
->> Also, exclude_host is really poorly defined:
->>
->>    https://lkml.kernel.org/r/20200806091827.GY2674@hirez.programming.kicks-ass.net
->>
->>    "Suppose we have nested virt:
->>
->> 	  L0-hv
->> 	  |
->> 	  G0/L1-hv
->> 	     |
->> 	     G1
->>
->>    And we're running in G0, then:
->>
->>    - 'exclude_hv' would exclude L0 events
->>    - 'exclude_host' would ... exclude L1-hv events?
->>    - 'exclude_guest' would ... exclude G1 events?
->  From the point of view of G0, L0 *does not exist at all*.  You just
-> cannot see L0 events if you're running in G0.
->
-> exclude_host/exclude_guest are the right definition.
->
->>    Then the next question is, if G0 is a host, does the L1-hv run in
->>    G0 userspace or G0 kernel space?
-> It's mostly kernel, but sometimes you're interested in events from QEMU
-> or whoever else has opened /dev/kvm.  In that case you care about G0
-> userspace too.
->
->> The way it is implemented, you basically have to always set
->> exclude_host=0, even if there is no virt at all and you want to measure
->> your own userspace thing -- which is just weird.
-> I understand regretting having exclude_guest that way; include_guest
-> (defaulting to 0!) would have made more sense.  But defaulting to
-> exclude_host==0 makes sense: if there is no virt at all, memset(0) does
-> the right thing so it does not seem weird to me.
->
->> I suppose the 'best' option at this point is something like:
->>
->> 	/*
->> 	 * comment that explains the trainwreck.
->> 	 */
->> 	if (!exclude_host && !exclude_guest)
->> 		exclude_guest = 1;
->>
->> 	if ((!exclude_hv || !exclude_guest) && !perf_allow_kernel())
->> 		return -EPERM;
->>
->> But that takes away the possibility of actually having:
->> 'exclude_host=0, exclude_guest=0' to create an event that measures both,
->> which also sucks.
-> In fact both of the above "if"s suck. :(
->
-> Paolo
->
+> If we add ".exclude_hv = 1" in the pmc_reprogram_counter(),
+> do you see any side effect to cover the above usages?
+> 
+> The fact that exclude_hv has never been used in x86 does help
+> the generic perf code to handle permission checks in a more concise way.
 
