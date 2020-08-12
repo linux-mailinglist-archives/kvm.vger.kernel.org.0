@@ -2,43 +2,70 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5F36B242449
-	for <lists+kvm@lfdr.de>; Wed, 12 Aug 2020 05:28:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 05701242456
+	for <lists+kvm@lfdr.de>; Wed, 12 Aug 2020 05:35:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726586AbgHLD2q (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 11 Aug 2020 23:28:46 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:32141 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726473AbgHLD2p (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 11 Aug 2020 23:28:45 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1597202923;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=+AS7Kge0pM+bEArqAEDXssI6szpmV4WhiwYSaipqxiU=;
-        b=B3/gTjjSCgOE/p05RUYC721QgdtF4jp0xFEY55qQx77A3dGNrqfNpr8Bqhq7Pst3Rww+pg
-        TK53f89fRqcIEjiXiTVKvDFFi+YIZvT17eFycK1TsreuGfLpLjuagYMUzoM6dB2pBsziBc
-        Ys8bES3PzFdwRbAAJiOjiSXR4ruSG5k=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-98-Qmblxh4hMV-GBzs8Mry_hw-1; Tue, 11 Aug 2020 23:28:38 -0400
-X-MC-Unique: Qmblxh4hMV-GBzs8Mry_hw-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BB9578017FB;
-        Wed, 12 Aug 2020 03:28:34 +0000 (UTC)
-Received: from [10.72.12.118] (ovpn-12-118.pek2.redhat.com [10.72.12.118])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 5D23C5F1EF;
-        Wed, 12 Aug 2020 03:28:15 +0000 (UTC)
-Subject: Re: [PATCH RFC v2 00/18] Add VFIO mediated device support and DEV-MSI
- support for the idxd driver
-To:     "Tian, Kevin" <kevin.tian@intel.com>,
-        Jason Gunthorpe <jgg@nvidia.com>,
-        Alex Williamson <alex.williamson@redhat.com>
-Cc:     "Jiang, Dave" <dave.jiang@intel.com>,
+        id S1726489AbgHLDfs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 11 Aug 2020 23:35:48 -0400
+Received: from mga18.intel.com ([134.134.136.126]:37703 "EHLO mga18.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726333AbgHLDfs (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 11 Aug 2020 23:35:48 -0400
+IronPort-SDR: vzWgV3GZDYxTaGPSx6usdHR7H14WxjrUzy5z/Aqg5bDFbyeGbBiy0RqRJplDrKbIahIx+Ir/20
+ gnG/Al82Ap/w==
+X-IronPort-AV: E=McAfee;i="6000,8403,9710"; a="141492776"
+X-IronPort-AV: E=Sophos;i="5.76,302,1592895600"; 
+   d="scan'208";a="141492776"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Aug 2020 20:35:46 -0700
+IronPort-SDR: zRnKIecbbxvlOBMwn4bP59lZVKSt6L1HvwLorTd/DWC3bpTiAPSYPk8ITlMg3DJTgbn50aFNK0
+ X4mR40yLTQZg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.76,302,1592895600"; 
+   d="scan'208";a="290901974"
+Received: from orsmsx606-2.jf.intel.com (HELO ORSMSX606.amr.corp.intel.com) ([10.22.229.86])
+  by orsmga003.jf.intel.com with ESMTP; 11 Aug 2020 20:35:46 -0700
+Received: from orsmsx612.amr.corp.intel.com (10.22.229.25) by
+ ORSMSX606.amr.corp.intel.com (10.22.229.19) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.1713.5; Tue, 11 Aug 2020 20:35:46 -0700
+Received: from ORSEDG002.ED.cps.intel.com (10.7.248.5) by
+ orsmsx612.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id 15.1.1713.5
+ via Frontend Transport; Tue, 11 Aug 2020 20:35:46 -0700
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (104.47.70.103)
+ by edgegateway.intel.com (134.134.137.101) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Tue, 11 Aug 2020 20:35:44 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=mLpr4vLz9vObUzqkDykC9EDQ4B5OeSDn2xdIMiKmDZ4tSgjtBJuSGx4KhlUVBi9zBB6sIXjWhSFJjMaxTtRkXwMTbknQM06Ze9B+1ytjd1055Y8DNC+Bd6XlVeu03rjq4Ze90F9lbhi3w4w5HTQUEBuNKa0s7rwcv2KjX5jKNa9t9rYpPq0Spaq/a4ItG436GavgwAcU3WkSLQgJRqS9CJUYFe8hoQdRCXFwW1KWJtdJHO1LVmYlR71X8/NQEPXSspZclf951DFocWNIkR0XPRSrdNrsLXTR9L7RH84XvGi+k221yknZbjKsLTBQjoOT5lTZ+mJM7fcnQJOm7IdMRg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=b5o64O+z66IJsTsAJJosdgRdvPhnWXG7eApOu7cZ4nI=;
+ b=W10ykzHA9tn+JMX1J9KsMGl465HQfFFg9+gwaim21ahZyGowDb90CHvu+Se6WBzQTFT2gwkiZXOKnIwDnBuJQPWOyL61ov5v22bKPyDVKQKaTJV1paRFkTk7C0M8qOXWzs1inl9z5mhB424c/qcavRPrTbnoqioOGb0hzA1dHiJK5Ad/pXSeacz7/N3b/wEUlChdkXuxO6oxcxCsufLTA6/AHt2dn4M3mTIb0RNf8dpxId/mNGmVOIMeEB7cbC7aQ6UYXl1gxIJBiBy7BdnfOtnkdvYe9ArLO2T21Wh76dzLCi18C7XtuE92rVs4zmnAhVxJElfc5gjt14kArT06lw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=intel.onmicrosoft.com;
+ s=selector2-intel-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=b5o64O+z66IJsTsAJJosdgRdvPhnWXG7eApOu7cZ4nI=;
+ b=P7E6p5trOcAdHXF/gke///FMtAaILXpvNa7xVk5rxuwbuoKQHaytKxhzO/Sqs2XKWMmRssfkmrKabft3EoT2x5Qc0XwXcOttIdrvN0Rwxy8K3dV0uRJsUrf+QYsXvWzwYcQAVb8JL3s6k8hqyqBAutJXCegWdEKU6wmJO7fpQCA=
+Received: from MWHPR11MB1645.namprd11.prod.outlook.com (2603:10b6:301:b::12)
+ by MWHPR11MB1647.namprd11.prod.outlook.com (2603:10b6:301:d::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3261.17; Wed, 12 Aug
+ 2020 03:35:39 +0000
+Received: from MWHPR11MB1645.namprd11.prod.outlook.com
+ ([fe80::6dfe:feb8:25f1:ac9c]) by MWHPR11MB1645.namprd11.prod.outlook.com
+ ([fe80::6dfe:feb8:25f1:ac9c%7]) with mapi id 15.20.3261.025; Wed, 12 Aug 2020
+ 03:35:39 +0000
+From:   "Tian, Kevin" <kevin.tian@intel.com>
+To:     Alex Williamson <alex.williamson@redhat.com>
+CC:     Jason Gunthorpe <jgg@nvidia.com>,
+        "Jiang, Dave" <dave.jiang@intel.com>,
         "vkoul@kernel.org" <vkoul@kernel.org>,
         "Dey, Megha" <megha.dey@intel.com>,
         "maz@kernel.org" <maz@kernel.org>,
@@ -69,154 +96,102 @@ Cc:     "Jiang, Dave" <dave.jiang@intel.com>,
         "x86@kernel.org" <x86@kernel.org>,
         "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
         "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Subject: RE: [PATCH RFC v2 00/18] Add VFIO mediated device support and DEV-MSI
+ support for the idxd driver
+Thread-Topic: [PATCH RFC v2 00/18] Add VFIO mediated device support and
+ DEV-MSI support for the idxd driver
+Thread-Index: AQHWX3hut2htBlMVB0qfW0Pa+gZbC6kSPbuAgABwW8CAAzMrAIAUgAoAgAJJ4oCABDO9YIACZAIAgACUIGCAAAy5AIAAD1+w
+Date:   Wed, 12 Aug 2020 03:35:39 +0000
+Message-ID: <MWHPR11MB16455FFA478EFA54F728D9198C420@MWHPR11MB1645.namprd11.prod.outlook.com>
 References: <159534667974.28840.2045034360240786644.stgit@djiang5-desk3.ch.intel.com>
- <20200721164527.GD2021248@mellanox.com>
- <CY4PR11MB1638103EC73DD9C025F144C98C780@CY4PR11MB1638.namprd11.prod.outlook.com>
- <20200724001930.GS2021248@mellanox.com> <20200805192258.5ee7a05b@x1.home>
- <20200807121955.GS16789@nvidia.com>
- <MWHPR11MB16452EBE866E330A7E000AFC8C440@MWHPR11MB1645.namprd11.prod.outlook.com>
-From:   Jason Wang <jasowang@redhat.com>
-Message-ID: <b59ce5b0-5530-1f30-9852-409f7c9f630a@redhat.com>
-Date:   Wed, 12 Aug 2020 11:28:12 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
-MIME-Version: 1.0
-In-Reply-To: <MWHPR11MB16452EBE866E330A7E000AFC8C440@MWHPR11MB1645.namprd11.prod.outlook.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
+        <20200721164527.GD2021248@mellanox.com>
+        <CY4PR11MB1638103EC73DD9C025F144C98C780@CY4PR11MB1638.namprd11.prod.outlook.com>
+        <20200724001930.GS2021248@mellanox.com> <20200805192258.5ee7a05b@x1.home>
+        <20200807121955.GS16789@nvidia.com>
+        <MWHPR11MB16452EBE866E330A7E000AFC8C440@MWHPR11MB1645.namprd11.prod.outlook.com>
+        <20200811110036.7d337837@x1.home>
+        <MWHPR11MB16451E4BEC7BF29C241FD69C8C420@MWHPR11MB1645.namprd11.prod.outlook.com>
+ <20200811203618.41aa6031@x1.home>
+In-Reply-To: <20200811203618.41aa6031@x1.home>
+Accept-Language: en-US
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+dlp-version: 11.5.1.3
+dlp-product: dlpe-windows
+dlp-reaction: no-action
+authentication-results: redhat.com; dkim=none (message not signed)
+ header.d=none;redhat.com; dmarc=none action=none header.from=intel.com;
+x-originating-ip: [192.198.147.202]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 3f2dc017-2e19-4e60-b1bf-08d83e70c870
+x-ms-traffictypediagnostic: MWHPR11MB1647:
+x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr,ExtFwd
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <MWHPR11MB1647E76B5B247C591808590D8C420@MWHPR11MB1647.namprd11.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:9508;
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: gDd60CZ2S/O4MxAOvHkLbgsgAAuBTCflVY6RKVymx0yEnK6X3rwkRBGOpyKlA0sSggHR2DFgmUqQ5H7kiK7apDQalFeYPbIQ3Ha5fKM2n7NamBX0nZm8/yKo1qPkUT9gWh466R0YkoocBLVrHiG3ynBKBultsDspX51Dtb/UPjfs0KjAzEQYRYIJmlc+kBsz8o7Gu7h4NwHWvqeBsivaKM6eidJkR84YrSXv9hq/W4Jv9DvX1PYy5kNQY3uCfjUKPImOoJXKdm1ASyOCEdS8PruW8vUsxhNokogA+L8T2zc4D5RlLsoUIa2/9IMDxGiXgBKAxArPmQ4hn1ZWhf/B3A==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MWHPR11MB1645.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFTY:;SFS:(4636009)(396003)(346002)(376002)(366004)(39860400002)(136003)(6916009)(7696005)(7416002)(9686003)(6506007)(26005)(4326008)(8676002)(76116006)(8936002)(52536014)(5660300002)(478600001)(33656002)(2906002)(54906003)(55016002)(186003)(71200400001)(66556008)(64756008)(316002)(66946007)(66446008)(66476007)(86362001);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata: ZwrlrQkm5qmGf7SjwShgxUO1LSF4RhT2KN6Qifn9mSMhik2bfPbVcPyRAK2VXh8POtUOt7Lenea8VwAYAT60icQ2Xmh1WBUgcItLJ/ozLShuSI7rgns5VLQwkpFw4aWUCSCr5nYrQ2ONleE6d0TD1OIxZ5ZL2joZcJ/U+deqIPF4aZqB/dITatwTbPRDkXpHgMZh12F70xqtBTbNy/QlKNMqNQkrA6UpXdFVXUNtuR/1hFReAnowkfq1PEWNz68r88FzS0vvlGdsvCeG4ZDt90w9DytA9Q4ZSRvO8ys//zYkZuOHZYc9RgQ4hvUemdbEr4KWs5pl8k8INXglKInSkjAy3xf9vCP5ihlJrm3e7c6sfC0gJQ/uUJmWE2fhuZKVng/swMduB8BmG7mmOxUDluFiumbPHEEYqVl8kNW0+esvPNLYt4lrb/1YXT1WcsLxcQDV/EBtCxvMmzVFpDlsEJRaYBZPBVUHXTEAeALwfbHiKwwoIuKjeMr0W8xRaG03iC6F0zG1b7D6JAIhS5cYgR2qs29AkAp9728/tT5lCP7OJ8NJYuIylA7HXrixRPEYxlIU7ZtfRC0YgarmxAKTbXuzXqkiIsUqmolFPRSXjPmtwHxpbOsG8yd2X73M7yEy0Kg7hsJKgPMHi8ylLJS+qQ==
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: MWHPR11MB1645.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 3f2dc017-2e19-4e60-b1bf-08d83e70c870
+X-MS-Exchange-CrossTenant-originalarrivaltime: 12 Aug 2020 03:35:39.2113
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: Z4YDs/1+15MIllGJcXucg9I+e6sLBICd1kR6SQG3Y9yQvMi4ZbyNdbnDeXdHwahj6TvZ2CTe5wSI5a92ci0Y+g==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MWHPR11MB1647
+X-OriginatorOrg: intel.com
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+> From: Alex Williamson <alex.williamson@redhat.com>
+> Sent: Wednesday, August 12, 2020 10:36 AM
+> On Wed, 12 Aug 2020 01:58:00 +0000
+> "Tian, Kevin" <kevin.tian@intel.com> wrote:
+>=20
+> > >
+> > > I'll also remind folks that LPC is coming up in just a couple short
+> > > weeks and this might be something we should discuss (virtually)
+> > > in-person.  uconf CfPs are currently open. </plug>   Thanks,
+> > >
+> >
+> > Yes, LPC is a good place to reach consensus. btw I saw there is
+> > already one VFIO topic called "device assignment/sub-assignment".
+> > Do you think whether this can be covered under that topic, or
+> > makes more sense to be a new one?
+>=20
+> All the things listed in the CFP are only potential topics to get ideas
+> flowing, there is currently no proposal to talk about sub-assignment.
+> I'd suggest submitting separate topics for each and if we run into time
+> constraints we can ask that they might be combined together.  Thanks,
+>=20
 
-On 2020/8/10 下午3:32, Tian, Kevin wrote:
->> From: Jason Gunthorpe <jgg@nvidia.com>
->> Sent: Friday, August 7, 2020 8:20 PM
->>
->> On Wed, Aug 05, 2020 at 07:22:58PM -0600, Alex Williamson wrote:
->>
->>> If you see this as an abuse of the framework, then let's identify those
->>> specific issues and come up with a better approach.  As we've discussed
->>> before, things like basic PCI config space emulation are acceptable
->>> overhead and low risk (imo) and some degree of register emulation is
->>> well within the territory of an mdev driver.
->> What troubles me is that idxd already has a direct userspace interface
->> to its HW, and does userspace DMA. The purpose of this mdev is to
->> provide a second direct userspace interface that is a little different
->> and trivially plugs into the virtualization stack.
-> No. Userspace DMA and subdevice passthrough (what mdev provides)
-> are two distinct usages IMO (at least in idxd context). and this might
-> be the main divergence between us, thus let me put more words here.
-> If we could reach consensus in this matter, which direction to go
-> would be clearer.
->
-> First, a passthrough interface requires some unique requirements
-> which are not commonly observed in an userspace DMA interface, e.g.:
->
-> - Tracking DMA dirty pages for live migration;
-> - A set of interfaces for using SVA inside guest;
-> 	* PASID allocation/free (on some platforms);
-> 	* bind/unbind guest mm/page table (nested translation);
-> 	* invalidate IOMMU cache/iotlb for guest page table changes;
-> 	* report page request from device to guest;
-> 	* forward page response from guest to device;
-> - Configuring irqbypass for posted interrupt;
-> - ...
->
-> Second, a passthrough interface requires delegating raw controllability
-> of subdevice to guest driver, while the same delegation might not be
-> required for implementing an userspace DMA interface (especially for
-> modern devices which support SVA). For example, idxd allows following
-> setting per wq (guest driver may configure them in any combination):
-> 	- put in dedicated or shared mode;
-> 	- enable/disable SVA;
-> 	- Associate guest-provided PASID to MSI/IMS entry;
-> 	- set threshold;
-> 	- allow/deny privileged access;
-> 	- allocate/free interrupt handle (enlightened for guest);
-> 	- collect error status;
-> 	- ...
->
-> We plan to support idxd userspace DMA with SVA. The driver just needs
-> to prepare a wq with a predefined configuration (e.g. shared, SVA,
-> etc.), bind the process mm to IOMMU (non-nested) and then map
-> the portal to userspace. The goal that userspace can do DMA to
-> associated wq doesn't change the fact that the wq is still *owned*
-> and *controlled* by kernel driver. However as far as passthrough
-> is concerned, the wq is considered 'owned' by the guest driver thus
-> we need an interface which can support low-level *controllability*
-> from guest driver. It is sort of a mess in uAPI when mixing the
-> two together.
+Done.
+--
+title: Criteria of using VFIO mdev (vs. userspace DMA)
 
-
-So for userspace drivers like DPDK, it can use both of the two uAPIs?
-
-
->
-> Based on above two reasons, we see distinct requirements between
-> userspace DMA and passthrough interfaces, at least in idxd context
-> (though other devices may have less distinction in-between). Therefore,
-> we didn't see the value/necessity of reinventing the wheel that mdev
-> already handles well to evolve an simple application-oriented usespace
-> DMA interface to a complex guest-driver-oriented passthrough interface.
-> The complexity of doing so would incur far more kernel-side changes
-> than the portion of emulation code that you've been concerned about...
->   
->> I don't think VFIO should be the only entry point to
->> virtualization. If we say the universe of devices doing user space DMA
->> must also implement a VFIO mdev to plug into virtualization then it
->> will be alot of mdevs.
-> Certainly VFIO will not be the only entry point. and This has to be a
-> case-by-case decision.
-
-
-The problem is that if we tie all controls via VFIO uAPI, the other 
-subsystem like vDPA is likely to duplicate them. I wonder if there is a 
-way to decouple the vSVA out of VFIO uAPI?
-
-
->   If an userspace DMA interface can be easily
-> adapted to be a passthrough one, it might be the choice.
-
-
-It's not that easy even for VFIO which requires a lot of new uAPIs and 
-infrastructures(e.g mdev) to be invented.
-
-
-> But for idxd,
-> we see mdev a much better fit here, given the big difference between
-> what userspace DMA requires and what guest driver requires in this hw.
-
-
-A weak point for mdev is that it can't serve kernel subsystem other than 
-VFIO. In this case, you need some other infrastructures (like [1]) to do 
-this.
-
-(For idxd, you probably don't need this, but it's pretty common in the 
-case of networking or storage device.)
+Content:
+VFIO mdev provides a framework for subdevice assignment and reuses=20
+existing VFIO uAPI  to handle common passthrough-related requirements.=20
+However, subdevice (e.g. ADI defined in Intel Scalable IOV) might not be=20
+a PCI endpoint (e.g. just a work queue), thus requires some degree of=20
+emulation/mediation in kernel to fit into VFIO device API. Then there is=20
+a concern on putting emulation in kernel and how to judge abuse of=20
+mdev framework by simply using it as an easy path to hook into=20
+virtualization stack. An associated open is about differentiating mdev=20
+from userspace DMA framework (such as uacce), and whether building=20
+passthrough features on top of userspace DMA framework is a better=20
+choice than using mdev.=20
 
 Thanks
-
-[1] https://patchwork.kernel.org/patch/11280547/
-
-
->
->> I would prefer to see that the existing userspace interface have the
->> extra needed bits for virtualization (eg by having appropriate
->> internal kernel APIs to make this easy) and all the emulation to build
->> the synthetic PCI device be done in userspace.
-> In the end what decides the direction is the amount of changes that
-> we have to put in kernel, not whether we call it 'emulation'. For idxd,
-> adding special passthrough requirements (guest SVA, dirty tracking,
-> etc.) and raw controllability to the simple userspace DMA interface
-> is for sure making kernel more complex than reusing the mdev
-> framework (plus some degree of emulation mockup behind). Not to
-> mention the merit of uAPI compatibility with mdev...
->
-> Thanks
-> Kevin
->
-
+Kevin
