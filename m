@@ -2,163 +2,134 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E3753242A63
-	for <lists+kvm@lfdr.de>; Wed, 12 Aug 2020 15:32:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 611AD242A80
+	for <lists+kvm@lfdr.de>; Wed, 12 Aug 2020 15:41:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728108AbgHLNcV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 12 Aug 2020 09:32:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37608 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727921AbgHLNcU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 12 Aug 2020 09:32:20 -0400
-Received: from merlin.infradead.org (merlin.infradead.org [IPv6:2001:8b0:10b:1231::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 363F2C06174A;
-        Wed, 12 Aug 2020 06:32:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=merlin.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=/1yLg7wLxOieDTHuV1+QBNxA0Zsi0S/5XXV3uZhAujE=; b=vW3XuBHqyaPnhcVdiv1s45fxSR
-        B+4bL34CxRPANM/uvlEJDJsv5+UWQ6QREqWWrhFINjvVSx8ZhEM/Ug5d+diB28ApUJsplefzFQizU
-        78G9GWuRcggLewM71Qn1IDbAlRZc9VXSU/ROAw3JFaO0oMzDEWGjuRmCwnSkJCYdPPu12vKrMD+Iw
-        9wQ6+jc6H1uz5a7kyCWbZawzxVyL4+pmXh6jPOXVDiUkS/Zl6b2a9tZ7EqHcXDAVxi8yAs3DjMHeB
-        48FzkYG9XWl018sLJU7ltfauo3IFHURiCU7jzzFDUBuSfQBAlCpfpgLuhkWiDfcC7qExvTFy/JaGS
-        eV9dtNZQ==;
-Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=noisy.programming.kicks-ass.net)
-        by merlin.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1k5qrC-0004VV-TW; Wed, 12 Aug 2020 13:31:55 +0000
-Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (Client did not present a certificate)
-        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 9D6B43060C5;
-        Wed, 12 Aug 2020 15:31:50 +0200 (CEST)
-Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
-        id 54DB42B76E7EB; Wed, 12 Aug 2020 15:31:50 +0200 (CEST)
-Date:   Wed, 12 Aug 2020 15:31:50 +0200
-From:   peterz@infradead.org
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Like Xu <like.xu@linux.intel.com>, Yao <yao.jin@linux.intel.com>,
+        id S1727873AbgHLNld (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 12 Aug 2020 09:41:33 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:30777 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726804AbgHLNlb (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 12 Aug 2020 09:41:31 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1597239689;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=dNPM/DXVd+hsYv1RDubHUxvCynTtgxX6FLHW6tCPxqU=;
+        b=LHfYg/HgbFrjabzMwPnjxItlmWZS2cjB944XeHIp2mhQNxB5j4pbYaJLLpKGaLNOtg1oT+
+        klq+5mKuu1i511yFsHIKPTcVIpOewjLsA5OzkntUTAA//hzQaX+LlrTyrvLPkOU5t1KsRL
+        wdU/K87GKZoA0NsixWoPBBFrZmKDmts=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-228-vi0bUIV2MommglXH2I3Xdw-1; Wed, 12 Aug 2020 09:41:26 -0400
+X-MC-Unique: vi0bUIV2MommglXH2I3Xdw-1
+Received: by mail-wm1-f71.google.com with SMTP id k204so725050wmb.3
+        for <kvm@vger.kernel.org>; Wed, 12 Aug 2020 06:41:26 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=dNPM/DXVd+hsYv1RDubHUxvCynTtgxX6FLHW6tCPxqU=;
+        b=VB7706RMW9TX4hEhPYhVsi39i+GJRtr4HSDSXS16QJk+AlFUIbD3leYEufz5lsSMG6
+         ejhRM9zvdUt1GX2QBHa2VHzxENDQoYKJOr51gTsiUync4klISCTcxHMuisqSX4ADsNHi
+         uXLZYQLymw4tlrvoReBp7533Vh/BZWxP2p5AxRSevnnh4mPRM4fTouqIAAKFnAwnKUU4
+         v8Wu8NlQxnZkuGNSUdJG1BWlYgJ99SGKdPZ6rbkAc+xI4W8ZGQjwSQaGS67LahQaYysa
+         2nWEj+dJKbOVrIVHlVI1HHTjc2wQJfn8FuMe9pedOj4VYnis0AVvlpGjFMbYcF4kcNHc
+         lqXA==
+X-Gm-Message-State: AOAM533xzk1v0zWSHAAeHatLigYlV5a3bFU2IJfQGfqzbRDlL60SFf59
+        qG2hPCa9jMFEvyEAGjMq1U93ABwXTmLs2uS2NOkFPmKzpkXM5hNCxVFGX08XWVL2MitSOLA6vl7
+        8pzmtlk6/YGgK
+X-Received: by 2002:a05:6000:12c1:: with SMTP id l1mr32294086wrx.270.1597239685348;
+        Wed, 12 Aug 2020 06:41:25 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzsZAyLlGMKkmspkC3Ujq3SXzql6HdlBCQz4aqSQCFcEI2BkaH+Mm2AfMOpYonmRerOxlObdQ==
+X-Received: by 2002:a05:6000:12c1:: with SMTP id l1mr32294056wrx.270.1597239685013;
+        Wed, 12 Aug 2020 06:41:25 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:fcdc:39e8:d361:7e30? ([2001:b07:6468:f312:fcdc:39e8:d361:7e30])
+        by smtp.gmail.com with ESMTPSA id q5sm4188720wrp.60.2020.08.12.06.41.24
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 12 Aug 2020 06:41:24 -0700 (PDT)
+Subject: Re: [PATCH v3 0/5] KVM_{GET,SET}_TSC_OFFSET ioctls
+To:     Jim Mattson <jmattson@google.com>, Oliver Upton <oupton@google.com>
+Cc:     kvm list <kvm@vger.kernel.org>, Peter Shier <pshier@google.com>,
         Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Arnaldo Carvalho de Melo <acme@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>
-Subject: Re: [PATCH] KVM: x86/pmu: Add '.exclude_hv = 1' for guest perf_event
-Message-ID: <20200812133150.GQ2674@hirez.programming.kicks-ass.net>
-References: <20200812050722.25824-1-like.xu@linux.intel.com>
- <5c41978e-8341-a179-b724-9aa6e7e8a073@redhat.com>
- <20200812111115.GO2674@hirez.programming.kicks-ass.net>
- <65eddd3c-c901-1c5a-681f-f0cb07b5fbb1@redhat.com>
+        Peter Hornyack <peterhornyack@google.com>
+References: <20200722032629.3687068-1-oupton@google.com>
+ <CAOQ_QsgeN4DCghH6ibb68C+P0ETr77s2s7Us+uxF6E6LFx62tw@mail.gmail.com>
+ <CAOQ_QshUE_OQmAuWd6SzdfXvn7Y6SVukcC1669Re0TRGCoeEgg@mail.gmail.com>
+ <f97789f6-43b4-a607-5af8-4f522f753761@redhat.com>
+ <CAOQ_QsjsmVpbi92o_Dz0GzAmU_Oq=Z4KFjZ8BY5dLQr7YmbrFg@mail.gmail.com>
+ <CALMp9eQ4zPoRfPQJ2c7H-hyqCWu+B6fjXk+7SsEOvK7aR49ZJg@mail.gmail.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <7dce49db-9175-bfe0-8374-d433a7589de9@redhat.com>
+Date:   Wed, 12 Aug 2020 15:41:23 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.9.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <65eddd3c-c901-1c5a-681f-f0cb07b5fbb1@redhat.com>
+In-Reply-To: <CALMp9eQ4zPoRfPQJ2c7H-hyqCWu+B6fjXk+7SsEOvK7aR49ZJg@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Aug 12, 2020 at 01:32:58PM +0200, Paolo Bonzini wrote:
-> On 12/08/20 13:11, peterz@infradead.org wrote:
-> > Right, but we want to tighten the permission checks and not excluding_hv
-> > is just sloppy.
+On 06/08/20 00:01, Jim Mattson wrote:
+>>> but perhaps I'm missing something obvious.
+>> Not necessarily obvious, but I can think of a rather contrived example
+>> where the sync heuristics break down. If we're running nested and get
+>> migrated in the middle of a VMM setting up TSCs, it's possible that
+>> enough time will pass that we believe subsequent writes to not be of
+>> the same TSC generation.
+>
+> An example that has been biting us frequently in self-tests: migrate a
+> VM with less than a second accumulated in its TSC. At the destination,
+> the TSCs are zeroed.
+
+Yeah, good point about selftests.  But this would be about the sync
+heuristics messing up, and I don't understand how these ioctls improve
+things.
+
+>> My immediate reaction was that we should just migrate the heuristics
+>> state somehow
 > 
-> I would just document that it's ignored as it doesn't make sense.  ARM64
-> does that too, for new processors where the kernel is not itself split
-> between supervisor and hypervisor privilege levels.
+> Yeah, I completely agree. I believe this series fixes the
+> userspace-facing issues and your suggestion would address the
+> guest-facing issues.
 
-This isn't about x86, I want these checks in generic code. We have the
-flag, it needs checking.
+I still don't understand how these ioctls are any better for userspace
+than migrating MSR_IA32_TSC.  The host TSC is different between source
+and destination, so the TSC offset will be different.
 
-unpriv users have no busniess getting anything from a possible hv.
+I am all for improving migration of TSC state, but I think we should do
+it right, so we should migrate a host clock / TSC pair: then the
+destination host can use TSC frequency and host clock to compute the new
+TSC value.  In fact, such a pair is exactly the data that the syncing
+heuristics track for each "generation" of syncing.
 
-> > The thing is, we very much do not want to allow unpriv user to be able
-> > to create: exclude_host=1, exclude_guest=0 counters (they currently
-> > can).
-> 
-> That would be the case of an unprivileged user that wants to measure
-> performance of its guests.  It's a scenario that makes a lot of sense,
-> are you worried about side channels?  Can perf-events on guests leak
-> more about the host than perf-events on a random userspace program?
+To migrate the synchronization state, instead, we only need to migrate
+the "already_matched" (vcpu->arch.this_tsc_generation ==
+kvm->arch.cur_tsc_generation) state.
 
-An unpriv user can run guests?
+Putting all of this together, it would be something like this:
 
-> > Also, exclude_host is really poorly defined:
-> > 
-> >   https://lkml.kernel.org/r/20200806091827.GY2674@hirez.programming.kicks-ass.net
-> > 
-> >   "Suppose we have nested virt:
-> > 
-> > 	  L0-hv
-> > 	  |
-> > 	  G0/L1-hv
-> > 	     |
-> > 	     G1
-> > 
-> >   And we're running in G0, then:
-> > 
-> >   - 'exclude_hv' would exclude L0 events
-> >   - 'exclude_host' would ... exclude L1-hv events?
-> >   - 'exclude_guest' would ... exclude G1 events?
-> 
-> From the point of view of G0, L0 *does not exist at all*.  You just
-> cannot see L0 events if you're running in G0.
+- a VM-wide KVM_CLOCK/KVM_SET_CLOCK needs to migrate
+vcpu->arch.cur_tsc_{nsec,write} in addition to the current kvmclock
+value (it's unrelated, but I don't think it's worth creating a new
+ioctl).  A new flag is set if these fields are set in the struct.  If
+the flag is set, KVM_SET_CLOCK copies the fields back, bumps the
+generation and clears kvm->arch.nr_vcpus_matched_tsc.
 
-On x86, probably, in general, I'm not at all sure, we have that
-exclude_hv flag after all.
+- a VCPU-wide KVM_GET_TSC_INFO returns a host clock / guest TSC pair
+plus the "already matched" state.  KVM_SET_TSC_INFO will only use the
+host clock / TSC pair if "already matched" is false, to compute the
+destination-side TSC offset but not otherwise doing anything with it; or
+if "already matched" is true, it will ignore the pair, compute the TSC
+offset from the data in kvm->arch, and update
+kvm->arch.nr_vcpus_matched_tsc.
 
-> exclude_host/exclude_guest are the right definition.
-
-For what? I still think exclude_host is absolute shit. If you set it,
-you'll not get anything even without virt.
-
-Run a native linux kernel, no kvm loaded, create a counter with
-exclude_host=1 and you'll get nothing, that's just really confusing IMO.
-There is no host, so excluding it should not affect anything.
-
-> >   Then the next question is, if G0 is a host, does the L1-hv run in
-> >   G0 userspace or G0 kernel space?
-> 
-> It's mostly kernel, but sometimes you're interested in events from QEMU
-> or whoever else has opened /dev/kvm.  In that case you care about G0
-> userspace too.
-
-I really don't think userspace helpers should be consideed part of
-the host, but whatever.
-
-> > The way it is implemented, you basically have to always set
-> > exclude_host=0, even if there is no virt at all and you want to measure
-> > your own userspace thing -- which is just weird.
-> 
-> I understand regretting having exclude_guest that way; include_guest
-> (defaulting to 0!) would have made more sense.  But defaulting to
-> exclude_host==0 makes sense: if there is no virt at all, memset(0) does
-> the right thing so it does not seem weird to me.
-
-Sure, but having exclude_host affect anything outside of kvm is still
-dodgy as heck.
-
-> > I suppose the 'best' option at this point is something like:
-> > 
-> > 	/*
-> > 	 * comment that explains the trainwreck.
-> > 	 */
-> > 	if (!exclude_host && !exclude_guest)
-> > 		exclude_guest = 1;
-> > 
-> > 	if ((!exclude_hv || !exclude_guest) && !perf_allow_kernel())
-> > 		return -EPERM;
-> > 
-> > But that takes away the possibility of actually having:
-> > 'exclude_host=0, exclude_guest=0' to create an event that measures both,
-> > which also sucks.
-> 
-> In fact both of the above "if"s suck. :(
-
-If, as you seem to imply above, that unpriv users can create guests,
-then maybe so, but if I look at /dev/kvm it seems to have 0660
-permissions and thus really requires privileges.
+Paolo
 
