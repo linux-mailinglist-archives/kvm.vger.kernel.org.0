@@ -2,108 +2,91 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A4FC2243B41
-	for <lists+kvm@lfdr.de>; Thu, 13 Aug 2020 16:10:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 463A3243B69
+	for <lists+kvm@lfdr.de>; Thu, 13 Aug 2020 16:19:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726567AbgHMOKc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 13 Aug 2020 10:10:32 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:54508 "EHLO
+        id S1726576AbgHMOTa (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 13 Aug 2020 10:19:30 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:53921 "EHLO
         us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726102AbgHMOKb (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 13 Aug 2020 10:10:31 -0400
+        by vger.kernel.org with ESMTP id S1726522AbgHMOT0 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 13 Aug 2020 10:19:26 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1597327829;
+        s=mimecast20190719; t=1597328365;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=rUbuth9YsAKh0CAOKDQ5MQczPX5161xmlduVV3vT8TM=;
-        b=SxESRVCU3YHs3aVZ1Iu32VmWG4k+OAXQRUwmop3bZEd9nniv5W0UAAuF7z6konKdheJzI/
-        FB14lwiCfz5ibr1BKpzAsQPU8OfmEgjJkvF+gfJo8pPdv3OoPuAKX68Y20cjRCSWfwKhiy
-        9dvQwpSpo5fEJv4XpY43iSJMbnHbdkA=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-301-HmJjLCOoMmKlmpX_U7lmJw-1; Thu, 13 Aug 2020 10:10:28 -0400
-X-MC-Unique: HmJjLCOoMmKlmpX_U7lmJw-1
-Received: by mail-wm1-f69.google.com with SMTP id c186so2004782wmd.9
-        for <kvm@vger.kernel.org>; Thu, 13 Aug 2020 07:10:28 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=rUbuth9YsAKh0CAOKDQ5MQczPX5161xmlduVV3vT8TM=;
-        b=CHg0cIWYyGI0LP4GVuHAnTk9QqJoavGHju1YDTipZB08h8jgXPAghfS+dTbnDZjNHD
-         18wEC/8ph8P+BSrXaTV/z6q/0aTvM424b21i/SK1IwzkIEBdQDoohsTtfeydYE258FZK
-         JNnXRIcuEfN9zsrrMnX2vbYiQygxRygnVjlGEdtsXyYKkxrcMJI+jBGuwSA+JEBbzKvi
-         HWAWiqzwGletAt/5db3nkgr4RZlNGXPtbKRew/P43TylhUoixIGrW26BvF5krvAv1zgz
-         Od7xmz8rlYsgVA/xHOx50L2CuhvS/FLo+gP+X6X/6zKtOomt5rKeF/HCGZ/mvIKTNLuX
-         WAvg==
-X-Gm-Message-State: AOAM5311hx743tPGENQfwiiEsFbgvXx8+BjzW0w2YD7jZssMPmnC4r+J
-        +6WKBURkLe8886PX2+RmGvtDQhtHkJzdMAh1yifIov6oiy+XBdq5bZxNBYud1qX4a9YCayGQNv6
-        g4Ee5+yAbOtBL
-X-Received: by 2002:a1c:3c87:: with SMTP id j129mr4485456wma.176.1597327827020;
-        Thu, 13 Aug 2020 07:10:27 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxfcHDY8aqtPDjUrHw9QpQSceS/wlBCck79TPwzjfMd/JIYRTJ5uKRTxFiNJ91HMcVXAf4w7w==
-X-Received: by 2002:a1c:3c87:: with SMTP id j129mr4485434wma.176.1597327826767;
-        Thu, 13 Aug 2020 07:10:26 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:51ad:9349:1ff0:923e? ([2001:b07:6468:f312:51ad:9349:1ff0:923e])
-        by smtp.gmail.com with ESMTPSA id 32sm11176734wrh.18.2020.08.13.07.10.25
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 13 Aug 2020 07:10:26 -0700 (PDT)
-Subject: Re: [RFC PATCH 6/7] core/metricfs: expose x86-specific irq
- information through metricfs
-To:     Thomas Gleixner <tglx@linutronix.de>,
-        Jonathan Adams <jwadams@google.com>,
-        linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org
-Cc:     netdev@vger.kernel.org, kvm@vger.kernel.org,
-        Greg KH <gregkh@linuxfoundation.org>,
-        Jim Mattson <jmattson@google.com>,
-        David Rientjes <rientjes@google.com>
-References: <20200807212916.2883031-1-jwadams@google.com>
- <20200807212916.2883031-7-jwadams@google.com>
- <87mu2yluso.fsf@nanos.tec.linutronix.de>
- <2500b04e-a890-2621-2f19-be08dfe2e862@redhat.com>
- <87a6yylp4x.fsf@nanos.tec.linutronix.de>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <ffeac3eb-fbd5-a605-c6a5-0456813bd918@redhat.com>
-Date:   Thu, 13 Aug 2020 16:10:25 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.9.0
+        bh=EVVaCgXcjbFi+DRQRD3jHW6JoaEa6ENlRJBReAb9qcI=;
+        b=IG4ael9Tt5byEovJ/w2Ga/vLtqsxujck9BOf85u2DxpePnMeeF7lwt6rbMm4oF+vCCHnfC
+        5sGdv3WWkJJNdebBFhYbbL7RfayitM6zrl7CS0YJhFfetEHdhHmH4/veroQwKgX5DttxoN
+        Lrzi/3lZNkvyjJh4I9VxkV3K7pTlhXA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-188-gEz4EjWENFClGnnKKDc-Pw-1; Thu, 13 Aug 2020 10:19:21 -0400
+X-MC-Unique: gEz4EjWENFClGnnKKDc-Pw-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E922B1005504;
+        Thu, 13 Aug 2020 14:19:19 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (unknown [10.40.192.72])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 2621D1014160;
+        Thu, 13 Aug 2020 14:19:17 +0000 (UTC)
+Date:   Thu, 13 Aug 2020 16:19:15 +0200
+From:   Andrew Jones <drjones@redhat.com>
+To:     Peng Liang <liangpeng10@huawei.com>
+Cc:     kvmarm@lists.cs.columbia.edu, zhang.zhanghailiang@huawei.com,
+        kvm@vger.kernel.org, maz@kernel.org, will@kernel.org
+Subject: Re: [RFC 0/4] kvm: arm64: emulate ID registers
+Message-ID: <20200813141915.wagalfqn67azowu5@kamzik.brq.redhat.com>
+References: <20200813060517.2360048-1-liangpeng10@huawei.com>
 MIME-Version: 1.0
-In-Reply-To: <87a6yylp4x.fsf@nanos.tec.linutronix.de>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200813060517.2360048-1-liangpeng10@huawei.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 13/08/20 14:13, Thomas Gleixner wrote:
->>>> Add metricfs support for displaying percpu irq counters for x86.
->>>> The top directory is /sys/kernel/debug/metricfs/irq_x86.
->>>> Then there is a subdirectory for each x86-specific irq counter.
->>>> For example:
->>>>
->>>>    cat /sys/kernel/debug/metricfs/irq_x86/TLB/values
->>> What is 'TLB'? I'm not aware of any vector which is named TLB.
->> There's a "TLB" entry in /proc/interrupts.
-> It's TLB shootdowns and not TLB.
+On Thu, Aug 13, 2020 at 02:05:13PM +0800, Peng Liang wrote:
+> In AArch64, guest will read the same values of the ID regsiters with
+> host.  Both of them read the values from arm64_ftr_regs.  This patch
+> series add support to emulate and configure ID registers so that we can
+> control the value of ID registers that guest read.
+> 
+> Peng Liang (4):
+>   arm64: add a helper function to traverse arm64_ftr_regs
+>   kvm: arm64: emulate the ID registers
+>   kvm: arm64: make ID registers configurable
+>   kvm: arm64: add KVM_CAP_ARM_CPU_FEATURE extension
+> 
+>  arch/arm64/include/asm/cpufeature.h |  2 ++
+>  arch/arm64/include/asm/kvm_host.h   |  2 ++
+>  arch/arm64/kernel/cpufeature.c      | 13 ++++++++
+>  arch/arm64/kvm/arm.c                | 21 ++++++++++++
+>  arch/arm64/kvm/sys_regs.c           | 50 ++++++++++++++++++++++-------
+>  include/uapi/linux/kvm.h            | 12 +++++++
+>  6 files changed, 89 insertions(+), 11 deletions(-)
+> 
+> -- 
+> 2.18.4
+> 
 
-Yes but it's using the shortcut name on the left of the table.
+Hi Peng,
 
-> +METRICFS_ITEM(LOC, apic_timer_irqs, "Local timer interrupts");
-> +METRICFS_ITEM(SPU, irq_spurious_count, "Spurious interrupts");
-> +METRICFS_ITEM(PMI, apic_perf_irqs, "Performance monitoring interrupts");
-> +METRICFS_ITEM(IWI, apic_irq_work_irqs, "IRQ work interrupts");
-> +METRICFS_ITEM(RTR, icr_read_retry_count, "APIC ICR read retries");
-> +#endif
-> +METRICFS_ITEM(PLT, x86_platform_ipis, "Platform interrupts");
-> +#ifdef CONFIG_SMP
-> +METRICFS_ITEM(RES, irq_resched_count, "Rescheduling interrupts");
-> +METRICFS_ITEM(CAL, irq_call_count, "Function call interrupts");
-> +METRICFS_ITEM(TLB, irq_tlb_count, "TLB shootdowns");
+After having looked at the QEMU series I don't believe this is the right
+approach to CPU models. As stated in my reply [*] this approach appears
+to just be shifting the problem wholesale to the user. On the KVM side,
+I think we should start by auditing all the ID registers to see what
+should be masked and what should be under user control. Then, we need
+to consider what MIDR a guest that can migrate between hosts of different
+MIDRs should have. And that'll require addressing the errata problem in
+one way or another.
 
-Paolo
+[*] https://lists.gnu.org/archive/html/qemu-devel/2020-08/msg02587.html
+
+Thanks,
+drew
 
