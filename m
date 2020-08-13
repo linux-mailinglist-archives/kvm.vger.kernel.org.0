@@ -2,134 +2,137 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5D60A2437FD
-	for <lists+kvm@lfdr.de>; Thu, 13 Aug 2020 11:52:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 59641243824
+	for <lists+kvm@lfdr.de>; Thu, 13 Aug 2020 12:00:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726167AbgHMJwQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 13 Aug 2020 05:52:16 -0400
-Received: from mail.kernel.org ([198.145.29.99]:34810 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726048AbgHMJwQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 13 Aug 2020 05:52:16 -0400
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 8007E2074D;
-        Thu, 13 Aug 2020 09:52:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1597312335;
-        bh=giRbKmVntSvhX0nekqsc2yIFsJh4IIaldkUru1ENsns=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=bOr02JwIBVdUa8K5PnV6OvNBmNQeTBwVv2R41g7G+wFneiPUkpse7fn9GEhD697Fb
-         YyK6vUOhi3h4jH+YifCYKpUu675MuCOZpLy8yZTYvSqwE/a9KN/opFWXYG7VkZWE6O
-         llMX/Np1Wl4h5mYcY0gbk4k4uXrMY71HQyVag5HE=
-Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
-        by disco-boy.misterjones.org with esmtpsa (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
-        (Exim 4.92)
-        (envelope-from <maz@kernel.org>)
-        id 1k69u9-001kVc-Mc; Thu, 13 Aug 2020 10:52:13 +0100
+        id S1726578AbgHMKAI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 13 Aug 2020 06:00:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57262 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726048AbgHMKAI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 13 Aug 2020 06:00:08 -0400
+Received: from mail-il1-x144.google.com (mail-il1-x144.google.com [IPv6:2607:f8b0:4864:20::144])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 40323C061757;
+        Thu, 13 Aug 2020 03:00:08 -0700 (PDT)
+Received: by mail-il1-x144.google.com with SMTP id p13so5051676ilh.4;
+        Thu, 13 Aug 2020 03:00:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=HBBtCO4sYM5cGR1OJM1rAIGM4XRmcSnzOKplJZRaOEc=;
+        b=Xe+P9dZ0OSVuCym8sAxPQNreP5MjursDti/gFYeaftd5qnAd6Izt9VC+6bixwPH+pv
+         WxzgGszSAp1+JVOTYygBvRvTfPXfVeH7BvOsgua8WFWP7gxiFq6yUFNye6tPXa6LJYd8
+         xZtWUurhXUagXKlmKNSyLG2E2wbNBaQG8wfES3yYNLqlWlMwbv1Xm6HhqSVbfXxTCas2
+         l8YndA9nsuJ69i8eJHq6Yv5g4tO+8OSg3LvQapOGcDpQ7/6aXjWEU7oELCHeUClUN3Zy
+         H4aaDimtP0/uG2xaHn4OhukVIEeb1SkQK89TQjXvIp11Aa4Lj/C8JPXkhZSOmRohjb8P
+         FxAQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=HBBtCO4sYM5cGR1OJM1rAIGM4XRmcSnzOKplJZRaOEc=;
+        b=TSbkyh9eyGUMJO215Dj9KYDuOyK4/Umrmh8OzJ0MAash/5Wt3QwyswqExymvtG5zrG
+         QY2v9PswHunSfuNQlR1+vM3UD4OfDrRViTvHtUDjV/Bit58+nrCZwKoPuVomtSPMzlz8
+         wVF3ZDtN85YLgOQW6DulyJTV8k/TUWbeWVfpczOyp1jPfVx1tiVLTvN/NcwBg6jb9QL+
+         NFM5um62LcQi83fpG7Y0j1+WesbCp4S7DOzRpEXbk92M3fXVOVXCzz1ymXSHysjRkLZw
+         kXvDVCSk/PVwTC4uxlBXE4Xe9e96KCvh+I0Jigk12IpGKJ4WnPiClc+ZhZZ5wSGuNbCv
+         Azhg==
+X-Gm-Message-State: AOAM531ds8nsczKKoWNFk+MEccAImUqE8q/nYtS2AYl6oUBq7EwFOkoR
+        N/+GawOrUsjya/LxuTU0I3GkFp9RMih+pThfC/g=
+X-Google-Smtp-Source: ABdhPJyt8lWpNkTHkUK9B0ljcj5r7jnaP8ULbYH0x7eFYLRekeCXt/sOJIy9rXNdFS4t8tfgET7/n+I6kpIRkxRD+w8=
+X-Received: by 2002:a92:4a02:: with SMTP id m2mr4077272ilf.258.1597312807549;
+ Thu, 13 Aug 2020 03:00:07 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-Date:   Thu, 13 Aug 2020 10:52:13 +0100
-From:   Marc Zyngier <maz@kernel.org>
-To:     Peng Liang <liangpeng10@huawei.com>
-Cc:     kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, will@kernel.org,
-        zhang.zhanghailiang@huawei.com, xiexiangyou@huawei.com
-Subject: Re: [RFC 3/4] kvm: arm64: make ID registers configurable
-In-Reply-To: <20200813060517.2360048-4-liangpeng10@huawei.com>
-References: <20200813060517.2360048-1-liangpeng10@huawei.com>
- <20200813060517.2360048-4-liangpeng10@huawei.com>
-User-Agent: Roundcube Webmail/1.4.5
-Message-ID: <73a299dd67053f094498dd98a65fbc71@kernel.org>
-X-Sender: maz@kernel.org
-X-SA-Exim-Connect-IP: 51.254.78.96
-X-SA-Exim-Rcpt-To: liangpeng10@huawei.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, will@kernel.org, zhang.zhanghailiang@huawei.com, xiexiangyou@huawei.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+References: <1597260071-2219-1-git-send-email-mjrosato@linux.ibm.com>
+ <1597260071-2219-2-git-send-email-mjrosato@linux.ibm.com> <CAOSf1CFjaVoeTyk=cLmWhBB6YQrHQkcD8Aj=ZYrB4kYc-rqLiw@mail.gmail.com>
+ <2a862199-16c8-2141-d27f-79761c1b1b25@linux.ibm.com>
+In-Reply-To: <2a862199-16c8-2141-d27f-79761c1b1b25@linux.ibm.com>
+From:   "Oliver O'Halloran" <oohall@gmail.com>
+Date:   Thu, 13 Aug 2020 19:59:56 +1000
+Message-ID: <CAOSf1CE6UyL9P31S=rAG=VZKs-JL4Kbq3VMZNhyojHbkPHSw0Q@mail.gmail.com>
+Subject: Re: [PATCH v2] PCI: Introduce flag for detached virtual functions
+To:     Niklas Schnelle <schnelle@linux.ibm.com>
+Cc:     Matthew Rosato <mjrosato@linux.ibm.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Bjorn Helgaas <bhelgaas@google.com>, pmorel@linux.ibm.com,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        linux-s390@vger.kernel.org,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        KVM list <kvm@vger.kernel.org>,
+        linux-pci <linux-pci@vger.kernel.org>,
+        Alexey Kardashevskiy <aik@ozlabs.ru>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2020-08-13 07:05, Peng Liang wrote:
-> It's time to make ID registers configurable.  When userspace (but not
-> guest) want to set the values of ID registers, save the value in
-> kvm_arch_vcpu so that guest can read the modified values.
-> 
-> Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
-> Signed-off-by: Peng Liang <liangpeng10@huawei.com>
-> ---
->  arch/arm64/kvm/sys_regs.c | 23 ++++++++++++++++-------
->  1 file changed, 16 insertions(+), 7 deletions(-)
-> 
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index 776c2757a01e..f98635489966 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -1111,6 +1111,14 @@ static u64 kvm_get_id_reg(struct kvm_vcpu *vcpu, 
-> u64 id)
->  	return ri->sys_val;
->  }
-> 
-> +static void kvm_set_id_reg(struct kvm_vcpu *vcpu, u64 id, u64 value)
-> +{
-> +	struct id_reg_info *ri = kvm_id_reg(vcpu, id);
-> +
-> +	BUG_ON(!ri);
-> +	ri->sys_val = value;
-> +}
-> +
->  /* Read a sanitised cpufeature ID register by sys_reg_desc */
->  static u64 read_id_reg(struct kvm_vcpu *vcpu,
->  		struct sys_reg_desc const *r, bool raz)
-> @@ -1252,10 +1260,6 @@ static int set_id_aa64zfr0_el1(struct kvm_vcpu 
-> *vcpu,
-> 
->  /*
->   * cpufeature ID register user accessors
-> - *
-> - * For now, these registers are immutable for userspace, so no values
-> - * are stored, and for set_id_reg() we don't allow the effective value
-> - * to be changed.
->   */
->  static int __get_id_reg(struct kvm_vcpu *vcpu,
->  			const struct sys_reg_desc *rd, void __user *uaddr,
-> @@ -1279,9 +1283,14 @@ static int __set_id_reg(struct kvm_vcpu *vcpu,
->  	if (err)
->  		return err;
-> 
-> -	/* This is what we mean by invariant: you can't change it. */
-> -	if (val != read_id_reg(vcpu, rd, raz))
-> -		return -EINVAL;
-> +	if (raz) {
-> +		if (val != read_id_reg(vcpu, rd, raz))
-> +			return -EINVAL;
-> +	} else {
-> +		u32 reg_id = sys_reg((u32)rd->Op0, (u32)rd->Op1, (u32)rd->CRn,
-> +				     (u32)rd->CRm, (u32)rd->Op2);
-> +		kvm_set_id_reg(vcpu, reg_id, val);
-> +	}
-> 
->  	return 0;
->  }
+On Thu, Aug 13, 2020 at 7:00 PM Niklas Schnelle <schnelle@linux.ibm.com> wrote:
+>
+>
+> On 8/13/20 3:55 AM, Oliver O'Halloran wrote:
+> > On Thu, Aug 13, 2020 at 5:21 AM Matthew Rosato <mjrosato@linux.ibm.com> wrote:
+> >> *snip*
+> >> diff --git a/arch/s390/pci/pci.c b/arch/s390/pci/pci.c
+> >> index 3902c9f..04ac76d 100644
+> >> --- a/arch/s390/pci/pci.c
+> >> +++ b/arch/s390/pci/pci.c
+> >> @@ -581,6 +581,14 @@ int pcibios_enable_device(struct pci_dev *pdev, int mask)
+> >>  {
+> >>         struct zpci_dev *zdev = to_zpci(pdev);
+> >>
+> >> +       /*
+> >> +        * If we have a VF on a non-multifunction bus, it must be a VF that is
+> >> +        * detached from its parent PF.  We rely on firmware emulation to
+> >> +        * provide underlying PF details.
+> >> +        */
+> >> +       if (zdev->vfn && !zdev->zbus->multifunction)
+> >> +               pdev->detached_vf = 1;
+> >
+> > The enable hook seems like it's a bit too late for this sort of
+> > screwing around with the pci_dev. Anything in the setup path that
+> > looks at ->detached_vf would see it cleared while anything that looks
+> > after the device is enabled will see it set. Can this go into
+> > pcibios_add_device() or a fixup instead?
+> >
+>
+> This particular check could go into pcibios_add_device() yes.
+> We're also currently working on a slight rework of how
+> we establish the VF to parent PF linking including the sysfs
+> part of that. The latter sadly can only go after the sysfs
+> for the virtfn has been created and that only happens
+> after all fixups. We would like to do both together because
+> the latter sets pdev->is_virtfn which I think is closely related.
+>
+> I was thinking of starting another discussion
+> about adding a hook that is executed just after the sysfs entries
+> for the PCI device are created but haven't yet.
 
-This cannot work. If userspace can override an idreg, it cannot
-conflict with anything the HW is capable of. It also cannot
-conflict with features that the host doesn't want to expose
-to the guest.
+if all you need is sysfs then pcibios_bus_add_device() or a bus
+notifier should work
 
-Another thing is that you now have features that do not
-match the MIDR (you can describe an A57 with SVE, for example).
-This will trigger issues in guests, as the combination isn't expected.
+> That said pcibios_enable_device() is called before drivers
+> like vfio-pci are enabled
 
-And then there is the eternal story about errata workarounds.
-If you can override the ID regs, how can the guest mitigate
-errata that you are now hiding from it?
+Hmm, is that an s390 thing? I was under the impression that drivers
+handled enabling the device rather than assuming the platform did it
+for them. Granted it's usually one of the first things a driver does,
+but there's still scope for surprising behaviour.
 
-Thanks,
+> and so as long as all uses of pdev->detached_vf
+> are in drivers it should be early enough. AFAIK almost everything
+> dealing with VFs before that is already skipped with pdev->no_vf_scan
+> though.
 
-         M.
--- 
-Jazz is not dead. It just smells funny...
+I'm sure it works fine in your particular case. My main gripe is that
+you're adding a flag in a generic structure so people reading the code
+without that context may make assumptions about when it's valid to
+use. The number of pcibios_* hooks we have means that working out when
+and where something happens in the pci setup path usually involves
+going on a ~magical journey~ through generic and arch specific code.
+It's not *that* bad once you've worked out how it all fits together,
+but it's still a pain. If we can initialise stuff before the pci_dev
+is added to the bus it's usually for the better.
+
+Oliver
