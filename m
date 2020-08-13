@@ -2,93 +2,134 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3767824376F
-	for <lists+kvm@lfdr.de>; Thu, 13 Aug 2020 11:14:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5D60A2437FD
+	for <lists+kvm@lfdr.de>; Thu, 13 Aug 2020 11:52:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726419AbgHMJOa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 13 Aug 2020 05:14:30 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:58634 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726048AbgHMJO3 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 13 Aug 2020 05:14:29 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1597310068;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=6Z5XW7mWY8zQjZYUVfkbmt75rJ+EgHpK68scfbUtXRs=;
-        b=V4NewsJ1FgQDnnoubTrP3JBK4u8yzJ73Bf5eTNN2JuFxhXjDIKnXZ5xafoF8FbeHiNju3e
-        qn9Y6pchLOJFkvj/L70IdSe2Ev8q5VQayX24e0U8UfxOvMWOdG1Sysr8XDlDLfQgb/4PBU
-        waQs6OI7C68kdLtNvkmt2oOwgXVBnaQ=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-217-j--nvjLKM0uRSgYCMAAlfw-1; Thu, 13 Aug 2020 05:14:25 -0400
-X-MC-Unique: j--nvjLKM0uRSgYCMAAlfw-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        id S1726167AbgHMJwQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 13 Aug 2020 05:52:16 -0400
+Received: from mail.kernel.org ([198.145.29.99]:34810 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726048AbgHMJwQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 13 Aug 2020 05:52:16 -0400
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CBE46E91A;
-        Thu, 13 Aug 2020 09:14:23 +0000 (UTC)
-Received: from kamzik.brq.redhat.com (unknown [10.40.192.72])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id E1F3219D7B;
-        Thu, 13 Aug 2020 09:14:20 +0000 (UTC)
-Date:   Thu, 13 Aug 2020 11:14:17 +0200
-From:   Andrew Jones <drjones@redhat.com>
-To:     Peng Liang <liangpeng10@huawei.com>
-Cc:     kvmarm@lists.cs.columbia.edu, zhang.zhanghailiang@huawei.com,
-        kvm@vger.kernel.org, maz@kernel.org, will@kernel.org
-Subject: Re: [RFC 0/4] kvm: arm64: emulate ID registers
-Message-ID: <20200813091417.othxkpko42y3thr4@kamzik.brq.redhat.com>
-References: <20200813060517.2360048-1-liangpeng10@huawei.com>
+        by mail.kernel.org (Postfix) with ESMTPSA id 8007E2074D;
+        Thu, 13 Aug 2020 09:52:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1597312335;
+        bh=giRbKmVntSvhX0nekqsc2yIFsJh4IIaldkUru1ENsns=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=bOr02JwIBVdUa8K5PnV6OvNBmNQeTBwVv2R41g7G+wFneiPUkpse7fn9GEhD697Fb
+         YyK6vUOhi3h4jH+YifCYKpUu675MuCOZpLy8yZTYvSqwE/a9KN/opFWXYG7VkZWE6O
+         llMX/Np1Wl4h5mYcY0gbk4k4uXrMY71HQyVag5HE=
+Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
+        by disco-boy.misterjones.org with esmtpsa (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+        (Exim 4.92)
+        (envelope-from <maz@kernel.org>)
+        id 1k69u9-001kVc-Mc; Thu, 13 Aug 2020 10:52:13 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200813060517.2360048-1-liangpeng10@huawei.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Content-Transfer-Encoding: 7bit
+Date:   Thu, 13 Aug 2020 10:52:13 +0100
+From:   Marc Zyngier <maz@kernel.org>
+To:     Peng Liang <liangpeng10@huawei.com>
+Cc:     kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, will@kernel.org,
+        zhang.zhanghailiang@huawei.com, xiexiangyou@huawei.com
+Subject: Re: [RFC 3/4] kvm: arm64: make ID registers configurable
+In-Reply-To: <20200813060517.2360048-4-liangpeng10@huawei.com>
+References: <20200813060517.2360048-1-liangpeng10@huawei.com>
+ <20200813060517.2360048-4-liangpeng10@huawei.com>
+User-Agent: Roundcube Webmail/1.4.5
+Message-ID: <73a299dd67053f094498dd98a65fbc71@kernel.org>
+X-Sender: maz@kernel.org
+X-SA-Exim-Connect-IP: 51.254.78.96
+X-SA-Exim-Rcpt-To: liangpeng10@huawei.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, will@kernel.org, zhang.zhanghailiang@huawei.com, xiexiangyou@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Aug 13, 2020 at 02:05:13PM +0800, Peng Liang wrote:
-> In AArch64, guest will read the same values of the ID regsiters with
-> host.  Both of them read the values from arm64_ftr_regs.  This patch
-> series add support to emulate and configure ID registers so that we can
-> control the value of ID registers that guest read.
+On 2020-08-13 07:05, Peng Liang wrote:
+> It's time to make ID registers configurable.  When userspace (but not
+> guest) want to set the values of ID registers, save the value in
+> kvm_arch_vcpu so that guest can read the modified values.
 > 
-> Peng Liang (4):
->   arm64: add a helper function to traverse arm64_ftr_regs
->   kvm: arm64: emulate the ID registers
->   kvm: arm64: make ID registers configurable
->   kvm: arm64: add KVM_CAP_ARM_CPU_FEATURE extension
+> Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
+> Signed-off-by: Peng Liang <liangpeng10@huawei.com>
+> ---
+>  arch/arm64/kvm/sys_regs.c | 23 ++++++++++++++++-------
+>  1 file changed, 16 insertions(+), 7 deletions(-)
 > 
->  arch/arm64/include/asm/cpufeature.h |  2 ++
->  arch/arm64/include/asm/kvm_host.h   |  2 ++
->  arch/arm64/kernel/cpufeature.c      | 13 ++++++++
->  arch/arm64/kvm/arm.c                | 21 ++++++++++++
->  arch/arm64/kvm/sys_regs.c           | 50 ++++++++++++++++++++++-------
->  include/uapi/linux/kvm.h            | 12 +++++++
->  6 files changed, 89 insertions(+), 11 deletions(-)
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index 776c2757a01e..f98635489966 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -1111,6 +1111,14 @@ static u64 kvm_get_id_reg(struct kvm_vcpu *vcpu, 
+> u64 id)
+>  	return ri->sys_val;
+>  }
 > 
-> -- 
-> 2.18.4
+> +static void kvm_set_id_reg(struct kvm_vcpu *vcpu, u64 id, u64 value)
+> +{
+> +	struct id_reg_info *ri = kvm_id_reg(vcpu, id);
+> +
+> +	BUG_ON(!ri);
+> +	ri->sys_val = value;
+> +}
+> +
+>  /* Read a sanitised cpufeature ID register by sys_reg_desc */
+>  static u64 read_id_reg(struct kvm_vcpu *vcpu,
+>  		struct sys_reg_desc const *r, bool raz)
+> @@ -1252,10 +1260,6 @@ static int set_id_aa64zfr0_el1(struct kvm_vcpu 
+> *vcpu,
 > 
-> _______________________________________________
-> kvmarm mailing list
-> kvmarm@lists.cs.columbia.edu
-> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
->
+>  /*
+>   * cpufeature ID register user accessors
+> - *
+> - * For now, these registers are immutable for userspace, so no values
+> - * are stored, and for set_id_reg() we don't allow the effective value
+> - * to be changed.
+>   */
+>  static int __get_id_reg(struct kvm_vcpu *vcpu,
+>  			const struct sys_reg_desc *rd, void __user *uaddr,
+> @@ -1279,9 +1283,14 @@ static int __set_id_reg(struct kvm_vcpu *vcpu,
+>  	if (err)
+>  		return err;
+> 
+> -	/* This is what we mean by invariant: you can't change it. */
+> -	if (val != read_id_reg(vcpu, rd, raz))
+> -		return -EINVAL;
+> +	if (raz) {
+> +		if (val != read_id_reg(vcpu, rd, raz))
+> +			return -EINVAL;
+> +	} else {
+> +		u32 reg_id = sys_reg((u32)rd->Op0, (u32)rd->Op1, (u32)rd->CRn,
+> +				     (u32)rd->CRm, (u32)rd->Op2);
+> +		kvm_set_id_reg(vcpu, reg_id, val);
+> +	}
+> 
+>  	return 0;
+>  }
 
-Hi Peng,
+This cannot work. If userspace can override an idreg, it cannot
+conflict with anything the HW is capable of. It also cannot
+conflict with features that the host doesn't want to expose
+to the guest.
 
-I'm glad to see an effort has started in trying to prepare for CPU models,
-allowing migration beyond identical hosts. How have you tested this
-series? I.e. what userspace did you use and with what additional patches?
-KVM changes like these are also easily tested with KVM selftests[*]. Have
-you considered posting a selftest?
+Another thing is that you now have features that do not
+match the MIDR (you can describe an A57 with SVE, for example).
+This will trigger issues in guests, as the combination isn't expected.
 
-[*] Linux repo: tools/testing/selftests/kvm/
+And then there is the eternal story about errata workarounds.
+If you can override the ID regs, how can the guest mitigate
+errata that you are now hiding from it?
 
 Thanks,
-drew
 
+         M.
+-- 
+Jazz is not dead. It just smells funny...
