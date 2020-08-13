@@ -2,225 +2,123 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1F2B4243728
-	for <lists+kvm@lfdr.de>; Thu, 13 Aug 2020 11:06:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 72B4B24374E
+	for <lists+kvm@lfdr.de>; Thu, 13 Aug 2020 11:09:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726204AbgHMJGM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 13 Aug 2020 05:06:12 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:20018 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726102AbgHMJGL (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 13 Aug 2020 05:06:11 -0400
+        id S1726467AbgHMJJh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 13 Aug 2020 05:09:37 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:23752 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726053AbgHMJJg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 13 Aug 2020 05:09:36 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1597309569;
+        s=mimecast20190719; t=1597309775;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=3LDLWpRdM45y3CGQzUX0l93Jm/pS9Hjp6XgzZQT5/zs=;
-        b=cj3kghKyMiEoCFy+GUshcgQqBo5s6gpP+aIP/dyr4pOga6jOy0k0pukllXIZK9fy8J9tmz
-        1+7O1tXsxmSZH3FDniJUDVeb/8e62xwciZGzXPXawDSzhZGVgMRhA+SxPg660rQsrdhA9L
-        bt0m/sPq8iokmAepuC93ClXRgGStpF4=
+        bh=huCoVCoxH7DGOX1gt2J0Q8XYRcnSSnTcRRYMzxvz/ZQ=;
+        b=d2YMDOEriSop8yL3mq/vpn/7MJsioeFs0emfLO/1dyCfbvO+5FVD8HftPhET1mSA9QD0NJ
+        X/Agkh+zFhnoxz4v8U14K8vKZO13tHgtpZ8qMQc63+bCvnh0HiluJpjDzX46NyAlln4IVM
+        b/OLMn3KT2faVoxSWt2TzTqT/iWnlk0=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-66-yJwGlSVoNoWtdvO_3P6uzw-1; Thu, 13 Aug 2020 05:06:05 -0400
-X-MC-Unique: yJwGlSVoNoWtdvO_3P6uzw-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+ us-mta-457-gEA45nlrMSC5q-0uUalZsQ-1; Thu, 13 Aug 2020 05:09:34 -0400
+X-MC-Unique: gEA45nlrMSC5q-0uUalZsQ-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0784D101C8A0;
-        Thu, 13 Aug 2020 09:06:04 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8CCFE79EC1;
+        Thu, 13 Aug 2020 09:09:32 +0000 (UTC)
 Received: from kamzik.brq.redhat.com (unknown [10.40.192.72])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id CDE811001281;
-        Thu, 13 Aug 2020 09:06:01 +0000 (UTC)
-Date:   Thu, 13 Aug 2020 11:05:58 +0200
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 82C6117150;
+        Thu, 13 Aug 2020 09:09:30 +0000 (UTC)
+Date:   Thu, 13 Aug 2020 11:09:27 +0200
 From:   Andrew Jones <drjones@redhat.com>
 To:     Peng Liang <liangpeng10@huawei.com>
 Cc:     kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, maz@kernel.org,
         will@kernel.org, zhang.zhanghailiang@huawei.com,
         xiexiangyou@huawei.com
-Subject: Re: [RFC 2/4] kvm: arm64: emulate the ID registers
-Message-ID: <20200813090558.3eqwoxp7m6jmknft@kamzik.brq.redhat.com>
+Subject: Re: [RFC 3/4] kvm: arm64: make ID registers configurable
+Message-ID: <20200813090927.busuifugzatw5sem@kamzik.brq.redhat.com>
 References: <20200813060517.2360048-1-liangpeng10@huawei.com>
- <20200813060517.2360048-3-liangpeng10@huawei.com>
+ <20200813060517.2360048-4-liangpeng10@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200813060517.2360048-3-liangpeng10@huawei.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+In-Reply-To: <20200813060517.2360048-4-liangpeng10@huawei.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Aug 13, 2020 at 02:05:15PM +0800, Peng Liang wrote:
-> To emulate the ID registers, we need a place to storage the values of
-> the ID regsiters.  Maybe putting in kvm_arch_vcpu is a good idea.
-> 
-> This commit has no functional changes but only code refactor.  When
-> initializing a vcpu, get the values of the ID registers from
-> arm64_ftr_regs and storage them in kvm_arch_vcpu.  And we just read
-> the value from kvm_arch_vcpu when getting/setting the value of the ID
-> regs.
+On Thu, Aug 13, 2020 at 02:05:16PM +0800, Peng Liang wrote:
+> It's time to make ID registers configurable.  When userspace (but not
+> guest) want to set the values of ID registers, save the value in
+> kvm_arch_vcpu so that guest can read the modified values.
 > 
 > Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
 > Signed-off-by: Peng Liang <liangpeng10@huawei.com>
 > ---
->  arch/arm64/include/asm/kvm_host.h |  2 ++
->  arch/arm64/kvm/arm.c              | 20 ++++++++++++++++++++
->  arch/arm64/kvm/sys_regs.c         | 27 +++++++++++++++++++++++----
->  include/uapi/linux/kvm.h          | 11 +++++++++++
->  4 files changed, 56 insertions(+), 4 deletions(-)
+>  arch/arm64/kvm/sys_regs.c | 23 ++++++++++++++++-------
+>  1 file changed, 16 insertions(+), 7 deletions(-)
 > 
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index f81151ad3d3c..7f7bd36702f7 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -336,6 +336,8 @@ struct kvm_vcpu_arch {
->  		u64 last_steal;
->  		gpa_t base;
->  	} steal;
-> +
-> +	struct id_registers idregs;
->  };
->  
->  /* Pointer to the vcpu's SVE FFR for sve_{save,load}_state() */
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index 73e12869afe3..18ebbe1c64ee 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-> @@ -262,6 +262,24 @@ int kvm_arch_vcpu_precreate(struct kvm *kvm, unsigned int id)
->  	return 0;
->  }
->  
-> +static int get_cpu_ftr(u32 id, u64 val, void *argp)
-> +{
-> +	struct id_registers *idregs = argp;
-> +
-> +	/*
-> +	 * (Op0, Op1, CRn, CRm, Op2) of ID registers is (3, 0, 0, crm, op2),
-> +	 * where 1<=crm<8, 0<=op2<8.
-> +	 */
-> +	if (sys_reg_Op0(id) == 3 && sys_reg_Op1(id) == 0 &&
-> +	    sys_reg_CRn(id) == 0 && sys_reg_CRm(id) > 0) {
-> +		idregs->regs[idregs->num].sys_id = id;
-> +		idregs->regs[idregs->num].sys_val = val;
-> +		idregs->num++;
-
-This num++ means we should ensure get_cpu_ftr() is only used once per
-VCPU, but we don't need 'num'. The index can be derived: (crm<<3)|op2
-
-> +	}
-> +
-> +	return 0;
-> +}
-> +
->  int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
->  {
->  	int err;
-> @@ -285,6 +303,8 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
->  	if (err)
->  		return err;
->  
-> +	arm64_cpu_ftr_regs_traverse(get_cpu_ftr, &vcpu->arch.idregs);
-> +
->  	return create_hyp_mappings(vcpu, vcpu + 1, PAGE_HYP);
->  }
->  
 > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index 138961d7ebe3..776c2757a01e 100644
+> index 776c2757a01e..f98635489966 100644
 > --- a/arch/arm64/kvm/sys_regs.c
 > +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -1092,13 +1092,32 @@ static bool access_arch_timer(struct kvm_vcpu *vcpu,
->  	return true;
+> @@ -1111,6 +1111,14 @@ static u64 kvm_get_id_reg(struct kvm_vcpu *vcpu, u64 id)
+>  	return ri->sys_val;
 >  }
 >  
-> +static struct id_reg_info *kvm_id_reg(struct kvm_vcpu *vcpu, u64 id)
-> +{
-> +	int i;
-> +
-> +	for (i = 0; i < vcpu->arch.idregs.num; ++i) {
-> +		if (vcpu->arch.idregs.regs[i].sys_id == id)
-> +			return &vcpu->arch.idregs.regs[i];
-
-With a derived index we don't need to search. Just do
-
- if (sys_reg_Op0(id) != 3 || sys_reg_Op1(id) != 0 ||
-     sys_reg_CRn(id) != 0 || sys_reg_CRm(id) == 0)
-      return NULL;
-
- return &vcpu->arch.idregs.regs[(sys_reg_CRm(id)<<3) | sys_reg_Op2(id)]; 
- 
-
-> +	}
-> +	return NULL;
-> +}
-> +
-> +static u64 kvm_get_id_reg(struct kvm_vcpu *vcpu, u64 id)
+> +static void kvm_set_id_reg(struct kvm_vcpu *vcpu, u64 id, u64 value)
 > +{
 > +	struct id_reg_info *ri = kvm_id_reg(vcpu, id);
 > +
 > +	BUG_ON(!ri);
-> +	return ri->sys_val;
+> +	ri->sys_val = value;
 > +}
 > +
 >  /* Read a sanitised cpufeature ID register by sys_reg_desc */
-> -static u64 read_id_reg(const struct kvm_vcpu *vcpu,
-> +static u64 read_id_reg(struct kvm_vcpu *vcpu,
+>  static u64 read_id_reg(struct kvm_vcpu *vcpu,
 >  		struct sys_reg_desc const *r, bool raz)
->  {
->  	u32 id = sys_reg((u32)r->Op0, (u32)r->Op1,
->  			 (u32)r->CRn, (u32)r->CRm, (u32)r->Op2);
-> -	u64 val = raz ? 0 : read_sanitised_ftr_reg(id);
-> +	u64 val = raz ? 0 : kvm_get_id_reg(vcpu, id);
+> @@ -1252,10 +1260,6 @@ static int set_id_aa64zfr0_el1(struct kvm_vcpu *vcpu,
 >  
->  	if (id == SYS_ID_AA64PFR0_EL1) {
->  		if (!vcpu_has_sve(vcpu))
-> @@ -1238,7 +1257,7 @@ static int set_id_aa64zfr0_el1(struct kvm_vcpu *vcpu,
->   * are stored, and for set_id_reg() we don't allow the effective value
->   * to be changed.
->   */
-> -static int __get_id_reg(const struct kvm_vcpu *vcpu,
-> +static int __get_id_reg(struct kvm_vcpu *vcpu,
->  			const struct sys_reg_desc *rd, void __user *uaddr,
->  			bool raz)
->  {
-> @@ -1248,7 +1267,7 @@ static int __get_id_reg(const struct kvm_vcpu *vcpu,
->  	return reg_to_user(uaddr, &val, id);
->  }
->  
-> -static int __set_id_reg(const struct kvm_vcpu *vcpu,
-> +static int __set_id_reg(struct kvm_vcpu *vcpu,
->  			const struct sys_reg_desc *rd, void __user *uaddr,
->  			bool raz)
->  {
-> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-> index f6d86033c4fa..1029444d04aa 100644
-> --- a/include/uapi/linux/kvm.h
-> +++ b/include/uapi/linux/kvm.h
-> @@ -1272,6 +1272,17 @@ struct kvm_vfio_spapr_tce {
->  	__s32	tablefd;
->  };
->  
-> +#define ID_REG_MAX_NUMS 64
-> +struct id_reg_info {
-> +	uint64_t sys_id;
-> +	uint64_t sys_val;
-
-I'm not sure the 'sys_' prefix is necessary.
-
-> +};
-> +
-> +struct id_registers {
-> +	struct id_reg_info regs[ID_REG_MAX_NUMS];
-> +	uint64_t num;
-> +};
-> +
-
-This is arch specific, so there should be ARMv8 in the names.
-
 >  /*
->   * ioctls for VM fds
+>   * cpufeature ID register user accessors
+> - *
+> - * For now, these registers are immutable for userspace, so no values
+> - * are stored, and for set_id_reg() we don't allow the effective value
+> - * to be changed.
 >   */
+>  static int __get_id_reg(struct kvm_vcpu *vcpu,
+>  			const struct sys_reg_desc *rd, void __user *uaddr,
+> @@ -1279,9 +1283,14 @@ static int __set_id_reg(struct kvm_vcpu *vcpu,
+>  	if (err)
+>  		return err;
+>  
+> -	/* This is what we mean by invariant: you can't change it. */
+> -	if (val != read_id_reg(vcpu, rd, raz))
+> -		return -EINVAL;
+> +	if (raz) {
+> +		if (val != read_id_reg(vcpu, rd, raz))
+> +			return -EINVAL;
+> +	} else {
+> +		u32 reg_id = sys_reg((u32)rd->Op0, (u32)rd->Op1, (u32)rd->CRn,
+> +				     (u32)rd->CRm, (u32)rd->Op2);
+> +		kvm_set_id_reg(vcpu, reg_id, val);
+
+So userspace can set the ID registers to whatever they want? I think each
+register should have its own sanity checks applied before accepting the
+input.
+
+Thanks,
+drew
+
+> +	}
+>  
+>  	return 0;
+>  }
 > -- 
 > 2.18.4
 > 
