@@ -2,146 +2,109 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id ED65A243255
-	for <lists+kvm@lfdr.de>; Thu, 13 Aug 2020 03:59:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id ED00424334D
+	for <lists+kvm@lfdr.de>; Thu, 13 Aug 2020 06:26:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726637AbgHMB7w (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 12 Aug 2020 21:59:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40368 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726155AbgHMB7w (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 12 Aug 2020 21:59:52 -0400
-Received: from mail-io1-xd42.google.com (mail-io1-xd42.google.com [IPv6:2607:f8b0:4864:20::d42])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E247DC061383;
-        Wed, 12 Aug 2020 18:59:51 -0700 (PDT)
-Received: by mail-io1-xd42.google.com with SMTP id g19so5644375ioh.8;
-        Wed, 12 Aug 2020 18:59:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=AWlgNe2+Iuz2XZY+IWyCSEAywNgsaZh/vBUAUBWEudE=;
-        b=Qea7J4MdsvRPrHK6vTNWamS8TgqAEQ6cKstvXGPzmsMiUHwANlkDob7c9pZbOtmMYw
-         ZwFbcxqH4sPVaixbvycEnZk5pasYJl1YY9RbUy9OPesAHl4PfkcvvfWQbY0/0oFxc0DC
-         HmzVWYyUrTOlIZBtm7mt+Em+7pZ3e/NRvy09Zv3bK37DizNvYxT3npc+CaL/WzUMIg8w
-         BvMJ0mJBOc6IpxJCV1SanMXijeM7gVs0JVM98GYV3wcZOVpLgCviSf5rCDKoqWXNpBkD
-         2twh1f5Ui4A5Wo4cY9JUKY7wWaVZcjeEklH91fStzkysVrmhietZ+hGYc62Lp1aN55RJ
-         O96g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=AWlgNe2+Iuz2XZY+IWyCSEAywNgsaZh/vBUAUBWEudE=;
-        b=muD7aJPLAYcDt9MfF0ddEja+yUB3d4dew2+sL2oI7RVo45gRA8P90+IrytnFM9b7GI
-         +miEPvX3Eu7Gy4Z9u/QA0mUIwSY7Of8bCAb4O5GE46zYTBiwPpqlnlFLT7bpGLC+vZ6M
-         v5Gzp0xBc/O9vyyFM8PfFDvDwdiKVHggEFX4eUMEkXKapwsR7D48ds/Tv9WXdMRohDmA
-         EkDX3Ikqj091TLCyZNw7SGYjqfLx6fNOa85PpasEeU1oGs1hYQJ7rhN318XWy4mj1DsF
-         oBxXFhgdHCiJ1/VyMJYoFOl5EZRRZ1T2fhA2Wo6NhUyJv576rpZUqSQkXqIrGIzTBGyy
-         vWBw==
-X-Gm-Message-State: AOAM533enrEdVFs457UzqcVNOLPVBA1lxd80q85egp9UGt/1UFsjesQW
-        Aw1CPGSU3N63kva4Zm867jcI+6uU3bV4/Fe9SJQ=
-X-Google-Smtp-Source: ABdhPJwiyW9N2P4bEdzpAt0SnW2GcUA7DC9arjWeKmn0pLfqFHuvzaNC3wHKUia8DJmWLIkGq1LuuNacL7O0TGkylMs=
-X-Received: by 2002:a5e:db0d:: with SMTP id q13mr2552009iop.87.1597283991322;
- Wed, 12 Aug 2020 18:59:51 -0700 (PDT)
+        id S1725810AbgHMEZP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 13 Aug 2020 00:25:15 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:50563 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1725298AbgHMEZP (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 13 Aug 2020 00:25:15 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1597292714;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=5PPbrW4CSztn1ObcO69vjUZRVg4SYJU7VAI203g9mjo=;
+        b=V/oQmgxAQ4bKpLike9JZ5IyBH+VTlZe5YxHVZ1ZVsVPfTO4ExhlstHDRPsU9eB2B3VR18+
+        RDXtEWvuUYn2pCFWmlsAx2guz2jsf1r0PLHWKRG6yVdEkKoFFhMPKUWwO4+9M4D4INv1p7
+        PsheV82zCVihjqlxZsNpDqvqMfkWeuM=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-468-vb4WYu46NBKDrN8lTjFs7w-1; Thu, 13 Aug 2020 00:25:12 -0400
+X-MC-Unique: vb4WYu46NBKDrN8lTjFs7w-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8811C107ACCA;
+        Thu, 13 Aug 2020 04:25:09 +0000 (UTC)
+Received: from [10.72.13.44] (ovpn-13-44.pek2.redhat.com [10.72.13.44])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 6B8B919D7B;
+        Thu, 13 Aug 2020 04:24:52 +0000 (UTC)
+Subject: Re: device compatibility interface for live migration with assigned
+ devices
+To:     Yan Zhao <yan.y.zhao@intel.com>, Jiri Pirko <jiri@mellanox.com>
+Cc:     Cornelia Huck <cohuck@redhat.com>, kvm@vger.kernel.org,
+        libvir-list@redhat.com, qemu-devel@nongnu.org,
+        kwankhede@nvidia.com, eauger@redhat.com, xin-ran.wang@intel.com,
+        eskultet@redhat.com, openstack-discuss@lists.openstack.org,
+        shaohe.feng@intel.com, kevin.tian@intel.com,
+        Parav Pandit <parav@mellanox.com>, jian-feng.ding@intel.com,
+        dgilbert@redhat.com, zhenyuw@linux.intel.com, hejie.xu@intel.com,
+        bao.yumeng@zte.com.cn,
+        Alex Williamson <alex.williamson@redhat.com>,
+        smooney@redhat.com, intel-gvt-dev@lists.freedesktop.org,
+        berrange@redhat.com, corbet@lwn.net, dinechin@redhat.com,
+        devel@ovirt.org
+References: <20200727162321.7097070e@x1.home>
+ <20200729080503.GB28676@joy-OptiPlex-7040>
+ <20200804183503.39f56516.cohuck@redhat.com>
+ <c178a0d3-269d-1620-22b1-9010f602d8ff@redhat.com>
+ <20200805021654.GB30485@joy-OptiPlex-7040>
+ <2624b12f-3788-7e2b-2cb7-93534960bcb7@redhat.com>
+ <20200805075647.GB2177@nanopsycho>
+ <eb1d01c2-fbad-36b6-10cf-9e03483a736b@redhat.com>
+ <20200805093338.GC30485@joy-OptiPlex-7040> <20200805105319.GF2177@nanopsycho>
+ <20200810074631.GA29059@joy-OptiPlex-7040>
+From:   Jason Wang <jasowang@redhat.com>
+Message-ID: <e6e75807-0614-bd75-aeb6-64d643e029d3@redhat.com>
+Date:   Thu, 13 Aug 2020 12:24:50 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-References: <1597260071-2219-1-git-send-email-mjrosato@linux.ibm.com>
- <1597260071-2219-2-git-send-email-mjrosato@linux.ibm.com> <20200812143254.2f080c38@x1.home>
-In-Reply-To: <20200812143254.2f080c38@x1.home>
-From:   "Oliver O'Halloran" <oohall@gmail.com>
-Date:   Thu, 13 Aug 2020 11:59:40 +1000
-Message-ID: <CAOSf1CFh4ygZeeqpjpbWFWxJJEpDjHD+Q_L4dUaU_3wx7_35pg@mail.gmail.com>
-Subject: Re: [PATCH v2] PCI: Introduce flag for detached virtual functions
-To:     Alex Williamson <alex.williamson@redhat.com>
-Cc:     Matthew Rosato <mjrosato@linux.ibm.com>,
-        Bjorn Helgaas <bhelgaas@google.com>, schnelle@linux.ibm.com,
-        pmorel@linux.ibm.com, Michael Ellerman <mpe@ellerman.id.au>,
-        linux-s390@vger.kernel.org,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        KVM list <kvm@vger.kernel.org>,
-        linux-pci <linux-pci@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20200810074631.GA29059@joy-OptiPlex-7040>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Aug 13, 2020 at 6:33 AM Alex Williamson
-<alex.williamson@redhat.com> wrote:
+
+On 2020/8/10 下午3:46, Yan Zhao wrote:
+>> driver is it handled by?
+> It looks that the devlink is for network device specific, and in
+> devlink.h, it says
+> include/uapi/linux/devlink.h - Network physical device Netlink
+> interface,
+
+
+Actually not, I think there used to have some discussion last year and 
+the conclusion is to remove this comment.
+
+It supports IB and probably vDPA in the future.
+
+
+>   I feel like it's not very appropriate for a GPU driver to use
+> this interface. Is that right?
+
+
+I think not though most of the users are switch or ethernet devices. It 
+doesn't prevent you from inventing new abstractions.
+
+Note that devlink is based on netlink, netlink has been widely used by 
+various subsystems other than networking.
+
+Thanks
+
+
 >
-> On Wed, 12 Aug 2020 15:21:11 -0400
-> Matthew Rosato <mjrosato@linux.ibm.com> wrote:
+> Thanks
+> Yan
+>   
 >
-> > @@ -521,7 +522,8 @@ static int vfio_basic_config_read(struct vfio_pci_device *vdev, int pos,
-> >       count = vfio_default_config_read(vdev, pos, count, perm, offset, val);
-> >
-> >       /* Mask in virtual memory enable for SR-IOV devices */
-> > -     if (offset == PCI_COMMAND && vdev->pdev->is_virtfn) {
-> > +     if ((offset == PCI_COMMAND) &&
-> > +         (vdev->pdev->is_virtfn || vdev->pdev->detached_vf)) {
-> >               u16 cmd = le16_to_cpu(*(__le16 *)&vdev->vconfig[PCI_COMMAND]);
-> >               u32 tmp_val = le32_to_cpu(*val);
-> >
-> > @@ -1734,7 +1736,8 @@ int vfio_config_init(struct vfio_pci_device *vdev)
-> >                                vconfig[PCI_INTERRUPT_PIN]);
-> >
-> >               vconfig[PCI_INTERRUPT_PIN] = 0; /* Gratuitous for good VFs */
-> > -
-> > +     }
-> > +     if (pdev->is_virtfn || pdev->detached_vf) {
-> >               /*
-> >                * VFs do no implement the memory enable bit of the COMMAND
-> >                * register therefore we'll not have it set in our initial
-> > diff --git a/include/linux/pci.h b/include/linux/pci.h
-> > index 8355306..23a6972 100644
-> > --- a/include/linux/pci.h
-> > +++ b/include/linux/pci.h
-> > @@ -445,6 +445,7 @@ struct pci_dev {
-> >       unsigned int    is_probed:1;            /* Device probing in progress */
-> >       unsigned int    link_active_reporting:1;/* Device capable of reporting link active */
-> >       unsigned int    no_vf_scan:1;           /* Don't scan for VFs after IOV enablement */
-> > +     unsigned int    detached_vf:1;          /* VF without local PF access */
->
-> Is there too much implicit knowledge in defining a "detached VF"?  For
-> example, why do we know that we can skip the portion of
-> vfio_config_init() that copies the vendor and device IDs from the
-> struct pci_dev into the virtual config space?  It's true on s390x, but
-> I think that's because we know that firmware emulates those registers
-> for us.
->
-> We also skip the INTx pin register sanity checking.  Do we do
-> that because we haven't installed the broken device into an s390x
-> system?  Because we know firmware manages that for us too?  Or simply
-> because s390x doesn't support INTx anyway, and therefore it's another
-> architecture implicit decision?
 
-Agreed. Any hacks we put in for normal VFs are going to be needed for
-the passed-though VF case. Only applying the memory space enable
-workaround doesn't make sense to me either.
-
-> If detached_vf is really equivalent to is_virtfn for all cases that
-> don't care about referencing physfn on the pci_dev, then we should
-> probably have a macro to that effect.
-
-A pci_is_virtfn() helper would be better than open coding both checks
-everywhere. That said, it might be solving the wrong problem. The
-union between ->physfn and ->sriov has always seemed like a footgun to
-me so we might be better off switching the users who want a physfn to
-a helper instead. i.e.
-
-struct pci_dev *pci_get_vf_physfn(struct pci_dev *vf)
-{
-        if (!vf->is_virtfn)
-                return NULL;
-
-        return vf->physfn;
-}
-
-...
-
-pf = pci_get_vf_physfn(vf)
-if (pf)
-    /* do pf things */
-
-Then we can just use ->is_virtfn for the normal and detached cases.
-
-Oliver
