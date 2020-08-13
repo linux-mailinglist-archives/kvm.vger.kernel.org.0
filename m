@@ -2,450 +2,228 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7105D243C2E
-	for <lists+kvm@lfdr.de>; Thu, 13 Aug 2020 17:07:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A2186243C49
+	for <lists+kvm@lfdr.de>; Thu, 13 Aug 2020 17:13:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726787AbgHMPHk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 13 Aug 2020 11:07:40 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:50471 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726596AbgHMPH1 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 13 Aug 2020 11:07:27 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1597331244;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=hPwFbRncPFmh8nq5xgCiG+oj3R4ni3pZQolykm6RrZs=;
-        b=M7Q83hXzvn+DFUC8Px+nNjUgfzhdpHqGGujMfRfjtbhw4XQqFky9iJ7WKU84vuK/gQgnhE
-        FrPeGjUTOIZDi3j9hDYRYHUFxFG3Ub777/RUwhBj2xz9xcuGJaDZhdDItRqgZF4o01bNF1
-        hoahMgZi5cEjGZq0dEIYprwGjmLqA6w=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-479-tbFqeL__PTmS8vdEaApjCQ-1; Thu, 13 Aug 2020 11:07:19 -0400
-X-MC-Unique: tbFqeL__PTmS8vdEaApjCQ-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6AC4D1019624;
-        Thu, 13 Aug 2020 15:07:17 +0000 (UTC)
-Received: from [10.36.113.93] (ovpn-113-93.ams2.redhat.com [10.36.113.93])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 0DAC95D990;
-        Thu, 13 Aug 2020 15:07:07 +0000 (UTC)
-Subject: Re: [PATCH v6 05/15] vfio: Add PASID allocation/free support
-To:     Liu Yi L <yi.l.liu@intel.com>, alex.williamson@redhat.com,
-        baolu.lu@linux.intel.com, joro@8bytes.org
-Cc:     kevin.tian@intel.com, jacob.jun.pan@linux.intel.com,
-        ashok.raj@intel.com, jun.j.tian@intel.com, yi.y.sun@intel.com,
-        jean-philippe@linaro.org, peterx@redhat.com, hao.wu@intel.com,
-        stefanha@gmail.com, iommu@lists.linux-foundation.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <1595917664-33276-1-git-send-email-yi.l.liu@intel.com>
- <1595917664-33276-6-git-send-email-yi.l.liu@intel.com>
-From:   Auger Eric <eric.auger@redhat.com>
-Message-ID: <16e0aeac-d767-bca7-bf02-cb5eff5a92b7@redhat.com>
-Date:   Thu, 13 Aug 2020 17:07:06 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+        id S1726658AbgHMPNo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 13 Aug 2020 11:13:44 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:11852 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726606AbgHMPNi (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 13 Aug 2020 11:13:38 -0400
+Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 07DF5pXY118111;
+        Thu, 13 Aug 2020 11:13:32 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : in-reply-to : references : date : message-id : mime-version :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=d2Xh4CzTpXGwFwql5dl6Any6PsEvUVR3zuEI4zsEaMs=;
+ b=DMW21KN9GCsCjQ+gPvxXEtuMmKRL1sY3MhJVPijPUyCjI++VCJNsjBzGNJ1XK3ioSWWd
+ YyUTrdZZx/phXZ7gFVokPWWyVZ3WgD6UM/QaTU+DcqEPGK3f5uH+2wOyOn+zDTvMI1IZ
+ s1Vi86mhL4sKt2R/IscnvMRD7mQDAN/tJFL1iSq8G+faliAtlAxyJaz7fO37ODc9NKIp
+ Cs6QfbLYxTIjnrSPoPL3ToI5gH5lZJNfFX54Kb5QaBgVM4TSt0AmyxjuT3ykNtDI9ObU
+ +b2BM7PifodSXH8kscFY7hMe2PY0IdEUMOty1lDsNREalXusaALTm+joUnwXyomBPQoP gw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 32sraty0au-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 13 Aug 2020 11:13:29 -0400
+Received: from m0187473.ppops.net (m0187473.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 07DEZ6px119299;
+        Thu, 13 Aug 2020 11:13:28 -0400
+Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com [159.122.73.71])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 32sraty08h-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 13 Aug 2020 11:13:28 -0400
+Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
+        by ppma02fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 07DF9JG3014761;
+        Thu, 13 Aug 2020 15:13:23 GMT
+Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
+        by ppma02fra.de.ibm.com with ESMTP id 32skp7ugsm-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 13 Aug 2020 15:13:23 +0000
+Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
+        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 07DFDK4T28377386
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 13 Aug 2020 15:13:20 GMT
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 311A611C05B;
+        Thu, 13 Aug 2020 15:13:20 +0000 (GMT)
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id A1BCA11C04C;
+        Thu, 13 Aug 2020 15:13:19 +0000 (GMT)
+Received: from marcibm (unknown [9.145.178.142])
+        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
+        Thu, 13 Aug 2020 15:13:19 +0000 (GMT)
+From:   Marc Hartmayer <mhartmay@linux.ibm.com>
+To:     Cornelia Huck <cohuck@redhat.com>,
+        Marc Hartmayer <mhartmay@linux.ibm.com>
+Cc:     kvm@vger.kernel.org, Thomas Huth <thuth@redhat.com>,
+        David Hildenbrand <david@redhat.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Andrew Jones <drjones@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        linux-s390@vger.kernel.org
+Subject: Re: [kvm-unit-tests RFC v2 4/4] s390x: add Protected VM support
+In-Reply-To: <20200813162234.01db539f.cohuck@redhat.com>
+References: <20200812092705.17774-1-mhartmay@linux.ibm.com> <20200812092705.17774-5-mhartmay@linux.ibm.com> <20200813135642.4f493049.cohuck@redhat.com> <87d03uhevw.fsf@linux.ibm.com> <20200813162234.01db539f.cohuck@redhat.com>
+Date:   Thu, 13 Aug 2020 17:13:17 +0200
+Message-ID: <87a6yyh94i.fsf@linux.ibm.com>
 MIME-Version: 1.0
-In-Reply-To: <1595917664-33276-6-git-send-email-yi.l.liu@intel.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Content-Transfer-Encoding: quoted-printable
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
+ definitions=2020-08-13_13:2020-08-13,2020-08-13 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 phishscore=0
+ suspectscore=2 priorityscore=1501 impostorscore=0 bulkscore=0 adultscore=0
+ malwarescore=0 spamscore=0 mlxscore=0 lowpriorityscore=0 mlxlogscore=999
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
+ definitions=main-2008130110
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Yi,
+On Thu, Aug 13, 2020 at 04:22 PM +0200, Cornelia Huck <cohuck@redhat.com> w=
+rote:
+> On Thu, 13 Aug 2020 15:08:51 +0200
+> Marc Hartmayer <mhartmay@linux.ibm.com> wrote:
+>
+>> On Thu, Aug 13, 2020 at 01:56 PM +0200, Cornelia Huck <cohuck@redhat.com=
+> wrote:
+>> > On Wed, 12 Aug 2020 11:27:05 +0200
+>> > Marc Hartmayer <mhartmay@linux.ibm.com> wrote:
+>> >=20=20
+>> >> Add support for Protected Virtual Machine (PVM) tests. For starting a
+>> >> PVM guest we must be able to generate a PVM image by using the
+>> >> `genprotimg` tool from the s390-tools collection. This requires the
+>> >> ability to pass a machine-specific host-key document, so the option
+>> >> `--host-key-document` is added to the configure script.
+>> >>=20
+>> >> Signed-off-by: Marc Hartmayer <mhartmay@linux.ibm.com>
+>> >> ---
+>> >>  configure               |  8 ++++++++
+>> >>  s390x/Makefile          | 17 +++++++++++++++--
+>> >>  s390x/selftest.parmfile |  1 +
+>> >>  s390x/unittests.cfg     |  1 +
+>> >>  scripts/s390x/func.bash | 18 ++++++++++++++++++
+>> >>  5 files changed, 43 insertions(+), 2 deletions(-)
+>> >>  create mode 100644 s390x/selftest.parmfile
+>> >>  create mode 100644 scripts/s390x/func.bash
+>> >>=20
+>> >> diff --git a/configure b/configure
+>> >> index f9d030fd2f03..aa528af72534 100755
+>> >> --- a/configure
+>> >> +++ b/configure
+>> >> @@ -18,6 +18,7 @@ u32_long=3D
+>> >>  vmm=3D"qemu"
+>> >>  errata_force=3D0
+>> >>  erratatxt=3D"$srcdir/errata.txt"
+>> >> +host_key_document=3D
+>> >>=20=20
+>> >>  usage() {
+>> >>      cat <<-EOF
+>> >> @@ -40,6 +41,8 @@ usage() {
+>> >>  	                           no environ is provided by the user (enab=
+led by default)
+>> >>  	    --erratatxt=3DFILE       specify a file to use instead of errat=
+a.txt. Use
+>> >>  	                           '--erratatxt=3D' to ensure no file is us=
+ed.
+>> >> +	    --host-key-document=3DHOST_KEY_DOCUMENT
+>> >> +	                           host-key-document to use (s390x only)=20=
+=20
+>> >
+>> > Maybe a bit more verbose? If I see only this option, I have no idea
+>> > what it is used for and where to get it.=20=20
+>>=20
+>> =E2=80=9CSpecifies the machine-specific host-key document required to cr=
+eate a
+>> PVM image using the `genprotimg` tool from the s390-tools collection
+>> (s390x only)=E2=80=9D
+>>=20
+>> Better?
+>
+> "specify the machine-specific host-key document for creating a PVM
+> image with 'genprotimg' (s390x only)"
+>
+> I think you can figure out where to get genprotimg if you actually know
+> that you want it ;)
+>
+> (...)
+>
+>> >> diff --git a/scripts/s390x/func.bash b/scripts/s390x/func.bash
+>> >> new file mode 100644
+>> >> index 000000000000..5c682cb47f73
+>> >> --- /dev/null
+>> >> +++ b/scripts/s390x/func.bash
+>> >> @@ -0,0 +1,18 @@
+>> >> +# Run Protected VM test
+>> >> +function arch_cmd()
+>> >> +{
+>> >> +	local cmd=3D$1
+>> >> +	local testname=3D$2
+>> >> +	local groups=3D$3
+>> >> +	local smp=3D$4
+>> >> +	local kernel=3D$5
+>> >> +	local opts=3D$6
+>> >> +	local arch=3D$7
+>> >> +	local check=3D$8
+>> >> +	local accel=3D$9
+>> >> +	local timeout=3D${10}
+>> >> +
+>> >> +	kernel=3D${kernel%.elf}.pv.bin
+>> >> +	# do not run PV test cases by default
+>> >> +	"$cmd" "${testname}_PV" "$groups pv nodefault" "$smp" "$kernel" "$o=
+pts" "$arch" "$check" "$accel" "$timeout"=20=20
+>> >
+>> > If we don't run this test, can we maybe print some informative message
+>> > like "PV tests not run; specify --host-key-document to enable" or so?
+>> > (At whichever point that makes the most sense.)=20=20
+>>=20
+>> Currently, the output looks like this:
+>>=20
+>> $ ./run_tests.sh=20=20=20=20
+>> PASS selftest-setup (14 tests)
+>> SKIP selftest-setup_PV (test marked as manual run only)
+>> PASS intercept (20 tests)
+>> SKIP intercept_PV (test marked as manual run only)
+>> =E2=80=A6
+>>=20
+>> And if you=E2=80=99re trying to run the PV tests without specifying the =
+host-key
+>> document it results in:
+>>=20
+>> $ ./run_tests.sh -a
+>> PASS selftest-setup (14 tests)
+>> FAIL selftest-setup_PV=20
+>> PASS intercept (20 tests)
+>> FAIL intercept_PV=20
+>> =E2=80=A6
+>>=20
+>> But if you like I can return a hint that the PVM image was not
+>> generated. Should the PV test case then be skipped?
+>
+> Yes, I was expecting something like
+>
+> SKIP selftest-setup_PV (no host-key document specified)
+> SKIP intercept_PV (no host-key document specified)
+>
+> so that you get a hint what you may want to set up.
 
-On 7/28/20 8:27 AM, Liu Yi L wrote:
-> Shared Virtual Addressing (a.k.a Shared Virtual Memory) allows sharing
-> multiple process virtual address spaces with the device for simplified
-> programming model. PASID is used to tag an virtual address space in DMA
-> requests and to identify the related translation structure in IOMMU. When
-> a PASID-capable device is assigned to a VM, we want the same capability
-> of using PASID to tag guest process virtual address spaces to achieve
-> virtual SVA (vSVA).
-> 
-> PASID management for guest is vendor specific. Some vendors (e.g. Intel
-> VT-d) requires system-wide managed PASIDs across all devices, regardless
-> of whether a device is used by host or assigned to guest. Other vendors
-> (e.g. ARM SMMU) may allow PASIDs managed per-device thus could be fully
-> delegated to the guest for assigned devices.
-> 
-> For system-wide managed PASIDs, this patch introduces a vfio module to
-> handle explicit PASID alloc/free requests from guest. Allocated PASIDs
-> are associated to a process (or, mm_struct) in IOASID core. A vfio_mm
-> object is introduced to track mm_struct. Multiple VFIO containers within
-> a process share the same vfio_mm object.
-> 
-> A quota mechanism is provided to prevent malicious user from exhausting
-> available PASIDs. Currently the quota is a global parameter applied to
-> all VFIO devices. In the future per-device quota might be supported too.
-> 
-> Cc: Kevin Tian <kevin.tian@intel.com>
-> CC: Jacob Pan <jacob.jun.pan@linux.intel.com>
-> Cc: Eric Auger <eric.auger@redhat.com>
-> Cc: Jean-Philippe Brucker <jean-philippe@linaro.org>
-> Cc: Joerg Roedel <joro@8bytes.org>
-> Cc: Lu Baolu <baolu.lu@linux.intel.com>
-> Suggested-by: Alex Williamson <alex.williamson@redhat.com>
-> Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
-> ---
-> v5 -> v6:
-> *) address comments from Eric. Add vfio_unlink_pasid() to be consistent
->    with vfio_unlink_dma(). Add a comment in vfio_pasid_exit().
-> 
-> v4 -> v5:
-> *) address comments from Eric Auger.
-> *) address the comments from Alex on the pasid free range support. Added
->    per vfio_mm pasid r-b tree.
->    https://lore.kernel.org/kvm/20200709082751.320742ab@x1.home/
-> 
-> v3 -> v4:
-> *) fix lock leam in vfio_mm_get_from_task()
-> *) drop pasid_quota field in struct vfio_mm
-> *) vfio_mm_get_from_task() returns ERR_PTR(-ENOTTY) when !CONFIG_VFIO_PASID
-> 
-> v1 -> v2:
-> *) added in v2, split from the pasid alloc/free support of v1
-> ---
->  drivers/vfio/Kconfig      |   5 +
->  drivers/vfio/Makefile     |   1 +
->  drivers/vfio/vfio_pasid.c | 248 ++++++++++++++++++++++++++++++++++++++++++++++
->  include/linux/vfio.h      |  28 ++++++
->  4 files changed, 282 insertions(+)
->  create mode 100644 drivers/vfio/vfio_pasid.c
-> 
-> diff --git a/drivers/vfio/Kconfig b/drivers/vfio/Kconfig
-> index fd17db9..3d8a108 100644
-> --- a/drivers/vfio/Kconfig
-> +++ b/drivers/vfio/Kconfig
-> @@ -19,6 +19,11 @@ config VFIO_VIRQFD
->  	depends on VFIO && EVENTFD
->  	default n
->  
-> +config VFIO_PASID
-> +	tristate
-> +	depends on IOASID && VFIO
-> +	default n
-> +
->  menuconfig VFIO
->  	tristate "VFIO Non-Privileged userspace driver framework"
->  	depends on IOMMU_API
-> diff --git a/drivers/vfio/Makefile b/drivers/vfio/Makefile
-> index de67c47..bb836a3 100644
-> --- a/drivers/vfio/Makefile
-> +++ b/drivers/vfio/Makefile
-> @@ -3,6 +3,7 @@ vfio_virqfd-y := virqfd.o
->  
->  obj-$(CONFIG_VFIO) += vfio.o
->  obj-$(CONFIG_VFIO_VIRQFD) += vfio_virqfd.o
-> +obj-$(CONFIG_VFIO_PASID) += vfio_pasid.o
->  obj-$(CONFIG_VFIO_IOMMU_TYPE1) += vfio_iommu_type1.o
->  obj-$(CONFIG_VFIO_IOMMU_SPAPR_TCE) += vfio_iommu_spapr_tce.o
->  obj-$(CONFIG_VFIO_SPAPR_EEH) += vfio_spapr_eeh.o
-> diff --git a/drivers/vfio/vfio_pasid.c b/drivers/vfio/vfio_pasid.c
-> new file mode 100644
-> index 0000000..befcf29
-> --- /dev/null
-> +++ b/drivers/vfio/vfio_pasid.c
-> @@ -0,0 +1,248 @@
-> +// SPDX-License-Identifier: GPL-2.0-only
-> +/*
-> + * Copyright (C) 2020 Intel Corporation.
-> + *     Author: Liu Yi L <yi.l.liu@intel.com>
-> + *
-> + */
-> +
-> +#include <linux/vfio.h>
-> +#include <linux/eventfd.h>
-not needed
-> +#include <linux/file.h>
-> +#include <linux/module.h>
-> +#include <linux/slab.h>
-> +#include <linux/sched/mm.h>
-> +
-> +#define DRIVER_VERSION  "0.1"
-> +#define DRIVER_AUTHOR   "Liu Yi L <yi.l.liu@intel.com>"
-> +#define DRIVER_DESC     "PASID management for VFIO bus drivers"
-> +
-> +#define VFIO_DEFAULT_PASID_QUOTA	1000
-> +static int pasid_quota = VFIO_DEFAULT_PASID_QUOTA;
-> +module_param_named(pasid_quota, pasid_quota, uint, 0444);
-> +MODULE_PARM_DESC(pasid_quota,
-> +		 "Set the quota for max number of PASIDs that an application is allowed to request (default 1000)");
-> +
-> +struct vfio_mm_token {
-> +	unsigned long long val;
-> +};
-> +
-> +struct vfio_mm {
-> +	struct kref		kref;
-> +	int			ioasid_sid;
-> +	struct mutex		pasid_lock;
-> +	struct rb_root		pasid_list;
-> +	struct list_head	next;
-> +	struct vfio_mm_token	token;
-> +};
-> +
-> +static struct mutex		vfio_mm_lock;
-> +static struct list_head		vfio_mm_list;
-> +
-> +struct vfio_pasid {
-> +	struct rb_node		node;
-> +	ioasid_t		pasid;
-> +};
-> +
-> +static void vfio_remove_all_pasids(struct vfio_mm *vmm);
-> +
-> +/* called with vfio.vfio_mm_lock held */
-> +static void vfio_mm_release(struct kref *kref)
-> +{
-> +	struct vfio_mm *vmm = container_of(kref, struct vfio_mm, kref);
-> +
-> +	list_del(&vmm->next);
-> +	mutex_unlock(&vfio_mm_lock);
-> +	vfio_remove_all_pasids(vmm);
-> +	ioasid_free_set(vmm->ioasid_sid, true);
-> +	kfree(vmm);
-> +}
-> +
-> +void vfio_mm_put(struct vfio_mm *vmm)
-> +{
-> +	kref_put_mutex(&vmm->kref, vfio_mm_release, &vfio_mm_lock);
-> +}
-> +
-> +static void vfio_mm_get(struct vfio_mm *vmm)
-> +{
-> +	kref_get(&vmm->kref);
-> +}
-> +
-> +struct vfio_mm *vfio_mm_get_from_task(struct task_struct *task)
-> +{
-> +	struct mm_struct *mm = get_task_mm(task);
-> +	struct vfio_mm *vmm;
-> +	unsigned long long val = (unsigned long long)mm;
-> +	int ret;
-> +
-> +	mutex_lock(&vfio_mm_lock);
-> +	/* Search existing vfio_mm with current mm pointer */
-> +	list_for_each_entry(vmm, &vfio_mm_list, next) {
-> +		if (vmm->token.val == val) {
-> +			vfio_mm_get(vmm);
-> +			goto out;
-> +		}
-> +	}
-> +
-> +	vmm = kzalloc(sizeof(*vmm), GFP_KERNEL);
-> +	if (!vmm) {
-> +		vmm = ERR_PTR(-ENOMEM);
-> +		goto out;
-> +	}
-> +
-> +	/*
-> +	 * IOASID core provides a 'IOASID set' concept to track all
-> +	 * PASIDs associated with a token. Here we use mm_struct as
-> +	 * the token and create a IOASID set per mm_struct. All the
-> +	 * containers of the process share the same IOASID set.
-> +	 */
-> +	ret = ioasid_alloc_set((struct ioasid_set *)mm, pasid_quota,
-> +			       &vmm->ioasid_sid);
-> +	if (ret) {
-> +		kfree(vmm);
-> +		vmm = ERR_PTR(ret);
-> +		goto out;
-> +	}
-> +
-> +	kref_init(&vmm->kref);
-> +	vmm->token.val = val;
-> +	mutex_init(&vmm->pasid_lock);
-> +	vmm->pasid_list = RB_ROOT;
-> +
-> +	list_add(&vmm->next, &vfio_mm_list);> +out:
-> +	mutex_unlock(&vfio_mm_lock);
-> +	mmput(mm);
-> +	return vmm;
-> +}
-> +
-> +/*
-> + * Find PASID within @min and @max
-> + */
-> +static struct vfio_pasid *vfio_find_pasid(struct vfio_mm *vmm,
-> +					  ioasid_t min, ioasid_t max)
-> +{
-> +	struct rb_node *node = vmm->pasid_list.rb_node;
-> +
-> +	while (node) {
-> +		struct vfio_pasid *vid = rb_entry(node,
-> +						struct vfio_pasid, node);
-> +
-> +		if (max < vid->pasid)
-> +			node = node->rb_left;
-> +		else if (min > vid->pasid)
-> +			node = node->rb_right;
-> +		else
-> +			return vid;
-> +	}
-> +
-> +	return NULL;
-> +}
-> +
-> +static void vfio_link_pasid(struct vfio_mm *vmm, struct vfio_pasid *new)
-> +{
-> +	struct rb_node **link = &vmm->pasid_list.rb_node, *parent = NULL;
-> +	struct vfio_pasid *vid;
-> +
-> +	while (*link) {
-> +		parent = *link;
-> +		vid = rb_entry(parent, struct vfio_pasid, node);
-> +
-> +		if (new->pasid <= vid->pasid)
-> +			link = &(*link)->rb_left;
-> +		else
-> +			link = &(*link)->rb_right;
-> +	}
-> +
-> +	rb_link_node(&new->node, parent, link);
-> +	rb_insert_color(&new->node, &vmm->pasid_list);
-> +}
-> +
-> +static void vfio_unlink_pasid(struct vfio_mm *vmm, struct vfio_pasid *old)
-> +{
-> +	rb_erase(&old->node, &vmm->pasid_list);
-> +}
-> +
-> +static void vfio_remove_pasid(struct vfio_mm *vmm, struct vfio_pasid *vid)
-> +{
-> +	vfio_unlink_pasid(vmm, vid);
-> +	ioasid_free(vid->pasid);
-> +	kfree(vid);
-> +}
-> +
-> +static void vfio_remove_all_pasids(struct vfio_mm *vmm)
-> +{
-> +	struct rb_node *node;
-> +
-> +	mutex_lock(&vmm->pasid_lock);
-> +	while ((node = rb_first(&vmm->pasid_list)))
-> +		vfio_remove_pasid(vmm, rb_entry(node, struct vfio_pasid, node));
-> +	mutex_unlock(&vmm->pasid_lock);
-> +}
-> +
-> +int vfio_pasid_alloc(struct vfio_mm *vmm, int min, int max)
-> +{
-> +	ioasid_t pasid;
-> +	struct vfio_pasid *vid;
-> +
-> +	pasid = ioasid_alloc(vmm->ioasid_sid, min, max, NULL);
-> +	if (pasid == INVALID_IOASID)
-> +		return -ENOSPC;
-> +
-> +	vid = kzalloc(sizeof(*vid), GFP_KERNEL);
-> +	if (!vid) {
-> +		ioasid_free(pasid);
-> +		return -ENOMEM;
-> +	}
-> +
-> +	vid->pasid = pasid;
-> +
-> +	mutex_lock(&vmm->pasid_lock);
-> +	vfio_link_pasid(vmm, vid);
-> +	mutex_unlock(&vmm->pasid_lock);
-> +
-> +	return pasid;
-> +}
-> +
-> +void vfio_pasid_free_range(struct vfio_mm *vmm,
-> +			   ioasid_t min, ioasid_t max)
-> +{
-> +	struct vfio_pasid *vid = NULL;
-> +
-> +	/*
-> +	 * IOASID core will notify PASID users (e.g. IOMMU driver) to
-> +	 * teardown necessary structures depending on the to-be-freed
-> +	 * PASID.
-> +	 */
-> +	mutex_lock(&vmm->pasid_lock);
-> +	while ((vid = vfio_find_pasid(vmm, min, max)) != NULL)
-> +		vfio_remove_pasid(vmm, vid);
-> +	mutex_unlock(&vmm->pasid_lock);
-> +}
-> +
-> +static int __init vfio_pasid_init(void)
-> +{
-> +	mutex_init(&vfio_mm_lock);
-> +	INIT_LIST_HEAD(&vfio_mm_list);
-> +	return 0;
-> +}
-> +
-> +static void __exit vfio_pasid_exit(void)
-> +{
-> +	/*
-> +	 * VFIO_PASID is supposed to be referenced by VFIO_IOMMU_TYPE1
-> +	 * and may be other module. once vfio_pasid_exit() is triggered,
-> +	 * that means its user (e.g. VFIO_IOMMU_TYPE1) has been removed.
-> +	 * All the vfio_mm instances should have been released. If not,
-> +	 * means there is vfio_mm leak, should be a bug of user module.
-> +	 * So just warn here.
-> +	 */
-> +	WARN_ON(!list_empty(&vfio_mm_list));
-> +}
-> +
-> +module_init(vfio_pasid_init);
-> +module_exit(vfio_pasid_exit);
-> +
-> +MODULE_VERSION(DRIVER_VERSION);
-> +MODULE_LICENSE("GPL v2");
-> +MODULE_AUTHOR(DRIVER_AUTHOR);
-> +MODULE_DESCRIPTION(DRIVER_DESC);
-> diff --git a/include/linux/vfio.h b/include/linux/vfio.h
-> index 38d3c6a..31472a9 100644
-> --- a/include/linux/vfio.h
-> +++ b/include/linux/vfio.h
-> @@ -97,6 +97,34 @@ extern int vfio_register_iommu_driver(const struct vfio_iommu_driver_ops *ops);
->  extern void vfio_unregister_iommu_driver(
->  				const struct vfio_iommu_driver_ops *ops);
->  
-> +struct vfio_mm;
-> +#if IS_ENABLED(CONFIG_VFIO_PASID)
-> +extern struct vfio_mm *vfio_mm_get_from_task(struct task_struct *task);
-> +extern void vfio_mm_put(struct vfio_mm *vmm);
-> +extern int vfio_pasid_alloc(struct vfio_mm *vmm, int min, int max);
-> +extern void vfio_pasid_free_range(struct vfio_mm *vmm,
-> +				  ioasid_t min, ioasid_t max);
-> +#else
-> +static inline struct vfio_mm *vfio_mm_get_from_task(struct task_struct *task)
-> +{
-> +	return ERR_PTR(-ENOTTY);
-> +}
-> +
-> +static inline void vfio_mm_put(struct vfio_mm *vmm)
-> +{
-> +}
-> +
-> +static inline int vfio_pasid_alloc(struct vfio_mm *vmm, int min, int max)
-> +{
-> +	return -ENOTTY;
-> +}
-> +
-> +static inline void vfio_pasid_free_range(struct vfio_mm *vmm,
-> +					  ioasid_t min, ioasid_t max)
-> +{
-> +}
-> +#endif /* CONFIG_VFIO_PASID */
-> +
->  /*
->   * External user API
->   */
-> 
-Besides looks good to me
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
+Okay, I=E2=80=99ll add this and remove the marker that PV tests aren=E2=80=
+=99t executed
+by default. Because when someone builds the PV images, he will most
+likely want to run the PV test cases as well.
 
-Thanks
+>
+--=20
+Kind regards / Beste Gr=C3=BC=C3=9Fe
+   Marc Hartmayer
 
-Eric
-
+IBM Deutschland Research & Development GmbH
+Vorsitzender des Aufsichtsrats: Gregor Pillen=20
+Gesch=C3=A4ftsf=C3=BChrung: Dirk Wittkopp
+Sitz der Gesellschaft: B=C3=B6blingen
+Registergericht: Amtsgericht Stuttgart, HRB 243294
