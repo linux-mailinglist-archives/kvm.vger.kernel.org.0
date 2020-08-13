@@ -2,128 +2,108 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 66342243578
-	for <lists+kvm@lfdr.de>; Thu, 13 Aug 2020 09:53:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 69F14243555
+	for <lists+kvm@lfdr.de>; Thu, 13 Aug 2020 09:50:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726174AbgHMHxI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 13 Aug 2020 03:53:08 -0400
-Received: from smtpout1.mo804.mail-out.ovh.net ([79.137.123.220]:45379 "EHLO
-        smtpout1.mo804.mail-out.ovh.net" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726072AbgHMHxH (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 13 Aug 2020 03:53:07 -0400
-X-Greylist: delayed 545 seconds by postgrey-1.27 at vger.kernel.org; Thu, 13 Aug 2020 03:53:06 EDT
-Received: from mxplan5.mail.ovh.net (unknown [10.109.146.44])
-        by mo804.mail-out.ovh.net (Postfix) with ESMTPS id B511756B4AAC;
-        Thu, 13 Aug 2020 09:43:58 +0200 (CEST)
-Received: from kaod.org (37.59.142.96) by DAG8EX1.mxp5.local (172.16.2.71)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.1979.3; Thu, 13 Aug
- 2020 09:43:57 +0200
-Authentication-Results: garm.ovh; auth=pass (GARM-96R001a338f13f-8b53-4c2c-ba13-6cfdcd9e7581,
-                    56FC6CFA6F9FB878813463EC2CBCCD0911300B36) smtp.auth=groug@kaod.org
-Date:   Thu, 13 Aug 2020 09:43:56 +0200
-From:   Greg Kurz <groug@kaod.org>
-To:     "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-CC:     David Gibson <david@gibson.dropbear.id.au>, <pair@us.ibm.com>,
-        "Cornelia Huck" <cohuck@redhat.com>, <brijesh.singh@amd.com>,
-        <frankja@linux.ibm.com>, <kvm@vger.kernel.org>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        "David Hildenbrand" <david@redhat.com>, <qemu-devel@nongnu.org>,
-        <mdroth@linux.vnet.ibm.com>, <pasic@linux.ibm.com>,
+        id S1726691AbgHMHuA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 13 Aug 2020 03:50:00 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:50770 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726758AbgHMHuA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 13 Aug 2020 03:50:00 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1597304998;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=Kaq2R4nboxZyJOpBLh6Q79Q/Zmc5nyjPKXGnwrfzCDQ=;
+        b=ihB/Ju/0470zlM6YyoSqq3I87InFmuKnggaz2mYRf7eSmU8I5wmFaUHKytqWCCZBE1uf2I
+        MyH0plmoHqpuIZc4BJYedfNeIoeTjj+5eRS7pFzpFzHsm9CJRDEC+KnpvvRU4FiWD4aOb0
+        t6DWoxEEmt8O096hRCI6ujhmnz67SBo=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-121-8b2iphWlMlyNdH57T0AsUg-1; Thu, 13 Aug 2020 03:49:50 -0400
+X-MC-Unique: 8b2iphWlMlyNdH57T0AsUg-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 28A5E1800D41;
+        Thu, 13 Aug 2020 07:49:49 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (unknown [10.40.192.72])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 60CAD614F6;
+        Thu, 13 Aug 2020 07:49:44 +0000 (UTC)
+Date:   Thu, 13 Aug 2020 09:49:40 +0200
+From:   Andrew Jones <drjones@redhat.com>
+To:     Marc Hartmayer <mhartmay@linux.ibm.com>
+Cc:     kvm@vger.kernel.org, Thomas Huth <thuth@redhat.com>,
+        David Hildenbrand <david@redhat.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
         Christian Borntraeger <borntraeger@de.ibm.com>,
-        <qemu-s390x@nongnu.org>, <qemu-ppc@nongnu.org>,
-        "Daniel P. =?UTF-8?B?QmVycmFuZ8Op?=" <berrange@redhat.com>,
-        <marcel.apfelbaum@gmail.com>, Thomas Huth <thuth@redhat.com>,
-        <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>,
-        <ehabkost@redhat.com>
-Subject: Re: [for-5.2 v4 09/10] host trust limitation: Alter virtio default
- properties for protected guests
-Message-ID: <20200813094356.651f323c@bahia.lan>
-In-Reply-To: <20200727150514.GQ3040@work-vm>
-References: <20200724025744.69644-1-david@gibson.dropbear.id.au>
-        <20200724025744.69644-10-david@gibson.dropbear.id.au>
-        <20200727150514.GQ3040@work-vm>
-X-Mailer: Claws Mail 3.17.6 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+        linux-s390@vger.kernel.org
+Subject: Re: [kvm-unit-tests RFC v2 2/4] scripts: add support for
+ architecture dependent functions
+Message-ID: <20200813074940.73xzr6nq4xktjhpu@kamzik.brq.redhat.com>
+References: <20200812092705.17774-1-mhartmay@linux.ibm.com>
+ <20200812092705.17774-3-mhartmay@linux.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [37.59.142.96]
-X-ClientProxiedBy: DAG2EX1.mxp5.local (172.16.2.11) To DAG8EX1.mxp5.local
- (172.16.2.71)
-X-Ovh-Tracer-GUID: f5836199-13f5-4a5c-840c-5c8b35579b5f
-X-Ovh-Tracer-Id: 17239216424127404499
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduiedrleefgdduvdehucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepfffhvffukfgjfhfogggtgfhisehtjeertdertddvnecuhfhrohhmpefirhgvghcumfhurhiiuceoghhrohhugheskhgrohgurdhorhhgqeenucggtffrrghtthgvrhhnpeefuddtieejjeevheekieeltefgleetkeetheettdeifeffvefhffelffdtfeeljeenucfkpheptddrtddrtddrtddpfeejrdehledrudegvddrleeinecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepmhigphhlrghnhedrmhgrihhlrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpehgrhhouhhgsehkrghougdrohhrghdprhgtphhtthhopegvhhgrsghkohhsthesrhgvughhrghtrdgtohhm
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200812092705.17774-3-mhartmay@linux.ibm.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 27 Jul 2020 16:05:14 +0100
-"Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
+On Wed, Aug 12, 2020 at 11:27:03AM +0200, Marc Hartmayer wrote:
+> This is necessary to keep architecture dependent code separate from
+> common code.
+> 
+> Signed-off-by: Marc Hartmayer <mhartmay@linux.ibm.com>
+> ---
+>  README.md           | 3 ++-
+>  scripts/common.bash | 5 +++++
+>  2 files changed, 7 insertions(+), 1 deletion(-)
+> 
+> diff --git a/README.md b/README.md
+> index 48be206c6db1..24d4bdaaee0d 100644
+> --- a/README.md
+> +++ b/README.md
+> @@ -134,7 +134,8 @@ all unit tests.
+>  ## Directory structure
+>  
+>      .:                  configure script, top-level Makefile, and run_tests.sh
+> -    ./scripts:          helper scripts for building and running tests
+> +    ./scripts:          general architecture neutral helper scripts for building and running tests
+> +    ./scripts/<ARCH>:   architecture dependent helper scripts for building and running tests
+>      ./lib:              general architecture neutral services for the tests
+>      ./lib/<ARCH>:       architecture dependent services for the tests
+>      ./<ARCH>:           the sources of the tests and the created objects/images
+> diff --git a/scripts/common.bash b/scripts/common.bash
+> index 96655c9ffd1f..f9c15fd304bd 100644
+> --- a/scripts/common.bash
+> +++ b/scripts/common.bash
+> @@ -52,3 +52,8 @@ function for_each_unittest()
+>  	fi
+>  	exec {fd}<&-
+>  }
+> +
+> +ARCH_FUNC=scripts/${ARCH}/func.bash
 
-> * David Gibson (david@gibson.dropbear.id.au) wrote:
-> > The default behaviour for virtio devices is not to use the platforms normal
-> > DMA paths, but instead to use the fact that it's running in a hypervisor
-> > to directly access guest memory.  That doesn't work if the guest's memory
-> > is protected from hypervisor access, such as with AMD's SEV or POWER's PEF.
-> > 
-> > So, if a host trust limitation mechanism is enabled, then apply the
-> > iommu_platform=on option so it will go through normal DMA mechanisms.
-> > Those will presumably have some way of marking memory as shared with the
-> > hypervisor or hardware so that DMA will work.
-> > 
-> > Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-> 
-> Good, it's just too easy to forget them at the moment and get hopelessly
-> confused.
-> 
-> 
-> Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> 
-> > ---
-> >  hw/core/machine.c | 11 +++++++++++
-> >  1 file changed, 11 insertions(+)
-> > 
-> > diff --git a/hw/core/machine.c b/hw/core/machine.c
-> > index b599b0ba65..2a723bf07b 100644
-> > --- a/hw/core/machine.c
-> > +++ b/hw/core/machine.c
-> > @@ -28,6 +28,8 @@
-> >  #include "hw/mem/nvdimm.h"
-> >  #include "migration/vmstate.h"
-> >  #include "exec/host-trust-limitation.h"
-> > +#include "hw/virtio/virtio.h"
-> > +#include "hw/virtio/virtio-pci.h"
-> >  
-> >  GlobalProperty hw_compat_5_0[] = {
-> >      { "virtio-balloon-device", "page-poison", "false" },
-> > @@ -1161,6 +1163,15 @@ void machine_run_board_init(MachineState *machine)
-> >           * areas.
-> >           */
-> >          machine_set_mem_merge(OBJECT(machine), false, &error_abort);
-> > +
-> > +        /*
-> > +         * Virtio devices can't count on directly accessing guest
-> > +         * memory, so they need iommu_platform=on to use normal DMA
-> > +         * mechanisms.  That requires disabling legacy virtio support
-> > +         * for virtio pci devices
-> > +         */
-> > +        object_register_sugar_prop(TYPE_VIRTIO_PCI, "disable-legacy", "on");
+The use of ${ARCH} adds a dependency on config.mak. It works now because
+in the two places we source common.bash we source config.mak first, but
+I'd prefer we make that dependency explicit. We could probably just
+source it again from this file.
 
-What about non-transitional devices (eg. vhost-user-fs-pci) ? They don't know
-about "disable-legacy" since they don't need it.
+Thanks,
+drew
 
-> > +        object_register_sugar_prop(TYPE_VIRTIO_DEVICE, "iommu_platform", "on");
-> >      }
-> >  
-> >      machine_class->init(machine);
-> > -- 
-> > 2.26.2
-> > 
-> --
-> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-> 
+> +if [ -f "${ARCH_FUNC}" ]; then
+> +	source "${ARCH_FUNC}"
+> +fi
+> -- 
+> 2.25.4
 > 
 
