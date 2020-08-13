@@ -2,176 +2,156 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 27FAD2435F8
-	for <lists+kvm@lfdr.de>; Thu, 13 Aug 2020 10:30:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 81AD8243707
+	for <lists+kvm@lfdr.de>; Thu, 13 Aug 2020 11:00:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726144AbgHMIaU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 13 Aug 2020 04:30:20 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:57923 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726100AbgHMIaU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 13 Aug 2020 04:30:20 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1597307417;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=KqhI5Q8sClvpgxYuJqBvjt7ffftT1d+Bz/45Zz2EEQc=;
-        b=FCMALU8uAeQdVzkxiyr6mWuDv0gh2U4eZvKvIeswsM/0x4w2rnHHM8FtxCUOPi7YyezfFv
-        nWxDyL4Mh58dRL/8egeVPbm+wkroim8tlGqMti8qa9OvOXpYAgI9eGGMxeR9/K/8jXG48I
-        QMq27cOIDIMf48xNo7RXammI563oKqM=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-387-AIFhAaiZO1aHAiZnflsoTQ-1; Thu, 13 Aug 2020 04:30:15 -0400
-X-MC-Unique: AIFhAaiZO1aHAiZnflsoTQ-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B56FE800D55;
-        Thu, 13 Aug 2020 08:30:14 +0000 (UTC)
-Received: from kamzik.brq.redhat.com (unknown [10.40.192.72])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 21D79100AE54;
-        Thu, 13 Aug 2020 08:30:02 +0000 (UTC)
-Date:   Thu, 13 Aug 2020 10:30:00 +0200
-From:   Andrew Jones <drjones@redhat.com>
-To:     Marc Hartmayer <mhartmay@linux.ibm.com>
-Cc:     kvm@vger.kernel.org, Thomas Huth <thuth@redhat.com>,
-        David Hildenbrand <david@redhat.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        linux-s390@vger.kernel.org
-Subject: Re: [kvm-unit-tests RFC v2 3/4] run_tests/mkstandalone: add arch
- dependent function to `for_each_unittest`
-Message-ID: <20200813083000.e4bscohuhgl3jdv4@kamzik.brq.redhat.com>
-References: <20200812092705.17774-1-mhartmay@linux.ibm.com>
- <20200812092705.17774-4-mhartmay@linux.ibm.com>
+        id S1726334AbgHMJAm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 13 Aug 2020 05:00:42 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:7756 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726048AbgHMJAk (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 13 Aug 2020 05:00:40 -0400
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 07D8X4sf187654;
+        Thu, 13 Aug 2020 05:00:33 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=RNVxaGhJE62uYyK1T5cbH64KJh6t1reKdoD/1B05iHs=;
+ b=OIXZj9FLA7fXm9rXKu+Wu03qld/AJtDoOsL02Ihi6rtiu+w/iyf42OElVlWTob4N3t+T
+ WFw+a6J0wEENbxJ00i+w/KYR5uwcW4rIzLRtSlx4lW8XiPcqRZAG1MfSvQVclfBBFfrI
+ zIfHVktbIPFbNjEt0k43JkWI+vGXq1Li3/jwzVbiDBpdgpbxo50p9orHHUWmqbXstO8R
+ QMgs+czR1aAkkd8U8I5Sz7lN6djBHIs0H7H1unggzV5sRDO8cRmyqcG9hQrX+P5KKgT0
+ oGDtE+O4SfW4r6D6dtnQhWoJ0FSLTSy/TdYlHTxZ1Q5F295vhcJZdTVqxtNi3eT1xCg3 1A== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 32vcsyp7uu-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 13 Aug 2020 05:00:32 -0400
+Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 07D8XEdF188447;
+        Thu, 13 Aug 2020 05:00:32 -0400
+Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com [149.81.74.108])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 32vcsyp7s9-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 13 Aug 2020 05:00:32 -0400
+Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
+        by ppma05fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 07D8uPhb012111;
+        Thu, 13 Aug 2020 09:00:29 GMT
+Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
+        by ppma05fra.de.ibm.com with ESMTP id 32skp83a2d-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 13 Aug 2020 09:00:29 +0000
+Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
+        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 07D90QHx61669846
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 13 Aug 2020 09:00:26 GMT
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 81ADD4C059;
+        Thu, 13 Aug 2020 09:00:25 +0000 (GMT)
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id CA2264C076;
+        Thu, 13 Aug 2020 09:00:24 +0000 (GMT)
+Received: from oc5500677777.ibm.com (unknown [9.145.93.1])
+        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Thu, 13 Aug 2020 09:00:24 +0000 (GMT)
+Subject: Re: [PATCH v2] PCI: Introduce flag for detached virtual functions
+To:     "Oliver O'Halloran" <oohall@gmail.com>,
+        Matthew Rosato <mjrosato@linux.ibm.com>
+Cc:     Alex Williamson <alex.williamson@redhat.com>,
+        Bjorn Helgaas <bhelgaas@google.com>, pmorel@linux.ibm.com,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        linux-s390@vger.kernel.org,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        KVM list <kvm@vger.kernel.org>,
+        linux-pci <linux-pci@vger.kernel.org>,
+        Alexey Kardashevskiy <aik@ozlabs.ru>
+References: <1597260071-2219-1-git-send-email-mjrosato@linux.ibm.com>
+ <1597260071-2219-2-git-send-email-mjrosato@linux.ibm.com>
+ <CAOSf1CFjaVoeTyk=cLmWhBB6YQrHQkcD8Aj=ZYrB4kYc-rqLiw@mail.gmail.com>
+From:   Niklas Schnelle <schnelle@linux.ibm.com>
+Message-ID: <2a862199-16c8-2141-d27f-79761c1b1b25@linux.ibm.com>
+Date:   Thu, 13 Aug 2020 11:00:24 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200812092705.17774-4-mhartmay@linux.ibm.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+In-Reply-To: <CAOSf1CFjaVoeTyk=cLmWhBB6YQrHQkcD8Aj=ZYrB4kYc-rqLiw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
+ definitions=2020-08-13_06:2020-08-13,2020-08-13 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ clxscore=1011 adultscore=0 mlxlogscore=999 malwarescore=0 phishscore=0
+ bulkscore=0 suspectscore=0 spamscore=0 impostorscore=0 mlxscore=0
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2006250000 definitions=main-2008130060
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Aug 12, 2020 at 11:27:04AM +0200, Marc Hartmayer wrote:
-> This allows us, for example, to auto generate a new test case based on
-> an existing test case.
+
+
+On 8/13/20 3:55 AM, Oliver O'Halloran wrote:
+> On Thu, Aug 13, 2020 at 5:21 AM Matthew Rosato <mjrosato@linux.ibm.com> wrote:
+>>
+>> s390x has the notion of providing VFs to the kernel in a manner
+>> where the associated PF is inaccessible other than via firmware.
+>> These are not treated as typical VFs and access to them is emulated
+>> by underlying firmware which can still access the PF.  After
+>> abafbc55 however these detached VFs were no longer able to work
+>> with vfio-pci as the firmware does not provide emulation of the
+>> PCI_COMMAND_MEMORY bit.  In this case, let's explicitly recognize
+>> these detached VFs so that vfio-pci can allow memory access to
+>> them again.
 > 
-> Signed-off-by: Marc Hartmayer <mhartmay@linux.ibm.com>
-> ---
->  run_tests.sh            |  2 +-
->  scripts/common.bash     | 13 +++++++++++++
->  scripts/mkstandalone.sh |  2 +-
->  3 files changed, 15 insertions(+), 2 deletions(-)
+> Hmm, cool. I think we have a similar feature on pseries so that's
+> probably broken too.
 > 
-> diff --git a/run_tests.sh b/run_tests.sh
-> index 24aba9cc3a98..23658392c488 100755
-> --- a/run_tests.sh
-> +++ b/run_tests.sh
-> @@ -160,7 +160,7 @@ trap "wait; exit 130" SIGINT
->     # preserve stdout so that process_test_output output can write TAP to it
->     exec 3>&1
->     test "$tap_output" == "yes" && exec > /dev/null
-> -   for_each_unittest $config run_task
-> +   for_each_unittest $config run_task arch_cmd
+>> Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
+>> ---
+>>  arch/s390/pci/pci.c                |  8 ++++++++
+>>  drivers/vfio/pci/vfio_pci_config.c | 11 +++++++----
+>>  include/linux/pci.h                |  1 +
+>>  3 files changed, 16 insertions(+), 4 deletions(-)
+>>
+>> diff --git a/arch/s390/pci/pci.c b/arch/s390/pci/pci.c
+>> index 3902c9f..04ac76d 100644
+>> --- a/arch/s390/pci/pci.c
+>> +++ b/arch/s390/pci/pci.c
+>> @@ -581,6 +581,14 @@ int pcibios_enable_device(struct pci_dev *pdev, int mask)
+>>  {
+>>         struct zpci_dev *zdev = to_zpci(pdev);
+>>
+>> +       /*
+>> +        * If we have a VF on a non-multifunction bus, it must be a VF that is
+>> +        * detached from its parent PF.  We rely on firmware emulation to
+>> +        * provide underlying PF details.
+>> +        */
+>> +       if (zdev->vfn && !zdev->zbus->multifunction)
+>> +               pdev->detached_vf = 1;
+> 
+> The enable hook seems like it's a bit too late for this sort of
+> screwing around with the pci_dev. Anything in the setup path that
+> looks at ->detached_vf would see it cleared while anything that looks
+> after the device is enabled will see it set. Can this go into
+> pcibios_add_device() or a fixup instead?
+> 
 
-Let's just require that arch cmd hook be specified by the "$arch_cmd"
-variable. Then we don't need to pass it to for_each_unittest.
+This particular check could go into pcibios_add_device() yes.
+We're also currently working on a slight rework of how
+we establish the VF to parent PF linking including the sysfs
+part of that. The latter sadly can only go after the sysfs
+for the virtfn has been created and that only happens
+after all fixups. We would like to do both together because
+the latter sets pdev->is_virtfn which I think is closely related.
 
->  ) | postprocess_suite_output
->  
->  # wait until all tasks finish
-> diff --git a/scripts/common.bash b/scripts/common.bash
-> index f9c15fd304bd..62931a40b79a 100644
-> --- a/scripts/common.bash
-> +++ b/scripts/common.bash
-> @@ -1,8 +1,15 @@
-> +function arch_cmd()
-> +{
-> +	# Dummy function, can be overwritten by architecture dependent
-> +	# code
-> +	return
-> +}
-
-This dummy function appears unused and can be dropped.
-
->  
->  function for_each_unittest()
->  {
->  	local unittests="$1"
->  	local cmd="$2"
-> +	local arch_cmd="${3-}"
->  	local testname
->  	local smp
->  	local kernel
-> @@ -19,6 +26,9 @@ function for_each_unittest()
->  		if [[ "$line" =~ ^\[(.*)\]$ ]]; then
->  			if [ -n "${testname}" ]; then
->  				"$cmd" "$testname" "$groups" "$smp" "$kernel" "$opts" "$arch" "$check" "$accel" "$timeout"
-> +				if [ "${arch_cmd}" ]; then
-> +					"${arch_cmd}" "$cmd" "$testname" "$groups" "$smp" "$kernel" "$opts" "$arch" "$check" "$accel" "$timeout"
-> +				fi
-
-Rather than assuming we should run both $cmd ... and $arch_cmd $cmd ...,
-let's just run $arch_cmd $cmd ..., when it exists. If $arch_cmd wants to
-run $cmd ... first, then it can do so itself.
-
->  			fi
->  			testname=${BASH_REMATCH[1]}
->  			smp=1
-> @@ -49,6 +59,9 @@ function for_each_unittest()
->  	done
->  	if [ -n "${testname}" ]; then
->  		"$cmd" "$testname" "$groups" "$smp" "$kernel" "$opts" "$arch" "$check" "$accel" "$timeout"
-> +		if [ "${arch_cmd}" ]; then
-> +			"${arch_cmd}" "$cmd" "$testname" "$groups" "$smp" "$kernel" "$opts" "$arch" "$check" "$accel" "$timeout"
-> +		fi
->  	fi
->  	exec {fd}<&-
->  }
-> diff --git a/scripts/mkstandalone.sh b/scripts/mkstandalone.sh
-> index cefdec30cb33..3b18c0cf090b 100755
-> --- a/scripts/mkstandalone.sh
-> +++ b/scripts/mkstandalone.sh
-> @@ -128,4 +128,4 @@ fi
->  
->  mkdir -p tests
->  
-> -for_each_unittest $cfg mkstandalone
-> +for_each_unittest $cfg mkstandalone arch_cmd
-> -- 
-> 2.25.4
->
-
-In summary, I think this patch should just be
-
-diff --git a/scripts/common.bash b/scripts/common.bash
-index 9a6ebbd7f287..b409b0529ea6 100644
---- a/scripts/common.bash
-+++ b/scripts/common.bash
-@@ -17,7 +17,7 @@ function for_each_unittest()
- 
-        while read -r -u $fd line; do
-                if [[ "$line" =~ ^\[(.*)\]$ ]]; then
--                       "$cmd" "$testname" "$groups" "$smp" "$kernel" "$opts" "$arch" "$check" "$accel" "$timeout"
-+                       "$arch_cmd" "$cmd" "$testname" "$groups" "$smp" "$kernel" "$opts" "$arch" "$check" "$accel" "$timeout"
-                        testname=${BASH_REMATCH[1]}
-                        smp=1
-                        kernel=""
-@@ -45,6 +45,6 @@ function for_each_unittest()
-                        timeout=${BASH_REMATCH[1]}
-                fi
-        done
--       "$cmd" "$testname" "$groups" "$smp" "$kernel" "$opts" "$arch" "$check" "$accel" "$timeout"
-+       "$arch_cmd" "$cmd" "$testname" "$groups" "$smp" "$kernel" "$opts" "$arch" "$check" "$accel" "$timeout"
-        exec {fd}<&-
- }
- 
-
-Thanks,
-drew
-
+I was thinking of starting another discussion
+about adding a hook that is executed just after the sysfs entries
+for the PCI device are created but haven't yet.
+That said pcibios_enable_device() is called before drivers
+like vfio-pci are enabled and so as long as all uses of pdev->detached_vf
+are in drivers it should be early enough. AFAIK almost everything
+dealing with VFs before that is already skipped with pdev->no_vf_scan
+though.
