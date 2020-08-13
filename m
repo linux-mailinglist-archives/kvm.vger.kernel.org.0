@@ -2,157 +2,129 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BD903243C9B
-	for <lists+kvm@lfdr.de>; Thu, 13 Aug 2020 17:34:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6CF3B243CB1
+	for <lists+kvm@lfdr.de>; Thu, 13 Aug 2020 17:41:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726842AbgHMPeY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 13 Aug 2020 11:34:24 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:51548 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726679AbgHMPeX (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 13 Aug 2020 11:34:23 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1597332862;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=J23PbI5Z1GJaE4z5vFx4HSX5EA2ITg6BdXAol9Sx6UQ=;
-        b=jKVREhTlFnW5kQTt3Gk6+pErC48igFcexr5ELHRzS1qCcsMPqaoPBaLgHI02g7elpst9ff
-        CsHnTnbNcFtIFY+R+JgejUeUw82XASEZGLDUlxqKQFNbfERAaTF4CdVJlKDsYeGfnRKh8O
-        JfeEX3Zk13s8zH4LKBKzjsk6xY6e0ZA=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-471-6m1jfj4qMD6kA-M_xaKmEA-1; Thu, 13 Aug 2020 11:34:18 -0400
-X-MC-Unique: 6m1jfj4qMD6kA-M_xaKmEA-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C46CD807320;
-        Thu, 13 Aug 2020 15:34:15 +0000 (UTC)
-Received: from gondolin (ovpn-112-216.ams2.redhat.com [10.36.112.216])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 4127F5C1A3;
-        Thu, 13 Aug 2020 15:33:50 +0000 (UTC)
-Date:   Thu, 13 Aug 2020 17:33:47 +0200
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Sean Mooney <smooney@redhat.com>
-Cc:     Jiri Pirko <jiri@mellanox.com>, Yan Zhao <yan.y.zhao@intel.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        kvm@vger.kernel.org, libvir-list@redhat.com, qemu-devel@nongnu.org,
-        kwankhede@nvidia.com, eauger@redhat.com, xin-ran.wang@intel.com,
-        corbet@lwn.net, openstack-discuss@lists.openstack.org,
-        shaohe.feng@intel.com, kevin.tian@intel.com, eskultet@redhat.com,
-        jian-feng.ding@intel.com, dgilbert@redhat.com,
-        zhenyuw@linux.intel.com, hejie.xu@intel.com, bao.yumeng@zte.com.cn,
-        intel-gvt-dev@lists.freedesktop.org, berrange@redhat.com,
-        dinechin@redhat.com, devel@ovirt.org,
-        Parav Pandit <parav@mellanox.com>,
-        Eric Farman <farman@linux.ibm.com>
-Subject: Re: device compatibility interface for live migration with assigned
- devices
-Message-ID: <20200813173347.239801fa.cohuck@redhat.com>
-In-Reply-To: <20200807135942.5d56a202.cohuck@redhat.com>
-References: <20200727072440.GA28676@joy-OptiPlex-7040>
-        <20200727162321.7097070e@x1.home>
-        <20200729080503.GB28676@joy-OptiPlex-7040>
-        <20200804183503.39f56516.cohuck@redhat.com>
-        <c178a0d3-269d-1620-22b1-9010f602d8ff@redhat.com>
-        <20200805021654.GB30485@joy-OptiPlex-7040>
-        <2624b12f-3788-7e2b-2cb7-93534960bcb7@redhat.com>
-        <20200805075647.GB2177@nanopsycho>
-        <eb1d01c2-fbad-36b6-10cf-9e03483a736b@redhat.com>
-        <20200805093338.GC30485@joy-OptiPlex-7040>
-        <20200805105319.GF2177@nanopsycho>
-        <4cf2824c803c96496e846c5b06767db305e9fb5a.camel@redhat.com>
-        <20200807135942.5d56a202.cohuck@redhat.com>
-Organization: Red Hat GmbH
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+        id S1726786AbgHMPk7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 13 Aug 2020 11:40:59 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:60028 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726131AbgHMPk6 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 13 Aug 2020 11:40:58 -0400
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 07DFVrD8134486;
+        Thu, 13 Aug 2020 11:40:52 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id; s=pp1;
+ bh=Dvgq+CZDKhUP01c00QbT4Vc/o4cdqzwBrzo+M+z0pfs=;
+ b=MXl677QCSmPqHzfhKEUjnIKgCnDjglOFx/8nrLck4kGTCBE9NRFKwLhsbganywtycp8w
+ v6/06HWYqE8pipQbHqwcQJpnUnYEHpMUjgBw+axmjwhoWhuPg/euufttbSqIqvnS0GZh
+ FPvqGWiB5LSoZ40uW4AZRfg9TeHvv6PR/dG+C7aZiZnHSefE9hm7vbFOrKp28ebfIn08
+ 7+DpU5R0Iter99hTVmriBn1li9Kwk6usXqe5HMZEoqop8CJUVW3IaD9WqEA84uHQ4dky
+ aYXPzA/7/5+Ngv5TqkS8mQtbhmZuYi/2wklPez3goZncYbu8/f2rsucrVel/ATqbVpXx Gg== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 32w706366d-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 13 Aug 2020 11:40:51 -0400
+Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 07DFVxmQ135117;
+        Thu, 13 Aug 2020 11:40:50 -0400
+Received: from ppma03dal.us.ibm.com (b.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.11])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 32w706365v-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 13 Aug 2020 11:40:50 -0400
+Received: from pps.filterd (ppma03dal.us.ibm.com [127.0.0.1])
+        by ppma03dal.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 07DFLCHB002809;
+        Thu, 13 Aug 2020 15:40:50 GMT
+Received: from b01cxnp22033.gho.pok.ibm.com (b01cxnp22033.gho.pok.ibm.com [9.57.198.23])
+        by ppma03dal.us.ibm.com with ESMTP id 32skp9nx30-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 13 Aug 2020 15:40:50 +0000
+Received: from b01ledav005.gho.pok.ibm.com (b01ledav005.gho.pok.ibm.com [9.57.199.110])
+        by b01cxnp22033.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 07DFenh651773752
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 13 Aug 2020 15:40:49 GMT
+Received: from b01ledav005.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 2BA04AE063;
+        Thu, 13 Aug 2020 15:40:49 +0000 (GMT)
+Received: from b01ledav005.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id A6DA1AE066;
+        Thu, 13 Aug 2020 15:40:46 +0000 (GMT)
+Received: from oc4221205838.ibm.com (unknown [9.163.7.238])
+        by b01ledav005.gho.pok.ibm.com (Postfix) with ESMTP;
+        Thu, 13 Aug 2020 15:40:46 +0000 (GMT)
+From:   Matthew Rosato <mjrosato@linux.ibm.com>
+To:     alex.williamson@redhat.com, bhelgaas@google.com
+Cc:     schnelle@linux.ibm.com, pmorel@linux.ibm.com, mpe@ellerman.id.au,
+        oohall@gmail.com, linux-s390@vger.kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-pci@vger.kernel.org
+Subject: [PATCH v3] PCI: Identifying detached virtual functions
+Date:   Thu, 13 Aug 2020 11:40:42 -0400
+Message-Id: <1597333243-29483-1-git-send-email-mjrosato@linux.ibm.com>
+X-Mailer: git-send-email 1.8.3.1
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
+ definitions=2020-08-13_14:2020-08-13,2020-08-13 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 clxscore=1015
+ mlxscore=0 bulkscore=0 priorityscore=1501 impostorscore=0 phishscore=0
+ lowpriorityscore=0 suspectscore=0 adultscore=0 malwarescore=0
+ mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2006250000 definitions=main-2008130114
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 7 Aug 2020 13:59:42 +0200
-Cornelia Huck <cohuck@redhat.com> wrote:
+Changes for v3:
+- Moved detached_vf setting to pcibios_bus_add_device
+- Extended the change in vfio_config_init to be generic (include 
+  vendor / device ID / INTx emulation)
+- Added a dev_is_vf macro in the same style as dev_is_pf to
+  encapsualate the checking of is_virtfn || detached_vf
 
-> On Wed, 05 Aug 2020 12:35:01 +0100
-> Sean Mooney <smooney@redhat.com> wrote:
-> 
-> > On Wed, 2020-08-05 at 12:53 +0200, Jiri Pirko wrote:  
-> > > Wed, Aug 05, 2020 at 11:33:38AM CEST, yan.y.zhao@intel.com wrote:    
-> 
-> (...)
-> 
-> > > >    software_version: device driver's version.
-> > > >               in <major>.<minor>[.bugfix] scheme, where there is no
-> > > > 	       compatibility across major versions, minor versions have
-> > > > 	       forward compatibility (ex. 1-> 2 is ok, 2 -> 1 is not) and
-> > > > 	       bugfix version number indicates some degree of internal
-> > > > 	       improvement that is not visible to the user in terms of
-> > > > 	       features or compatibility,
-> > > > 
-> > > > vendor specific attributes: each vendor may define different attributes
-> > > >   device id : device id of a physical devices or mdev's parent pci device.
-> > > >               it could be equal to pci id for pci devices
-> > > >   aggregator: used together with mdev_type. e.g. aggregator=2 together
-> > > >               with i915-GVTg_V5_4 means 2*1/4=1/2 of a gen9 Intel
-> > > > 	       graphics device.
-> > > >   remote_url: for a local NVMe VF, it may be configured with a remote
-> > > >               url of a remote storage and all data is stored in the
-> > > > 	       remote side specified by the remote url.
-> > > >   ...    
-> > just a minor not that i find ^ much more simmple to understand then
-> > the current proposal with self and compatiable.
-> > if i have well defiend attibute that i can parse and understand that allow
-> > me to calulate the what is and is not compatible that is likely going to
-> > more useful as you wont have to keep maintianing a list of other compatible
-> > devices every time a new sku is released.
-> > 
-> > in anycase thank for actully shareing ^ as it make it simpler to reson about what
-> > you have previously proposed.  
-> 
-> So, what would be the most helpful format? A 'software_version' field
-> that follows the conventions outlined above, and other (possibly
-> optional) fields that have to match?
+Changes for v2:
+- Added code to vfio_basic_config_read() and vfio_config_init() to
+  extend emulation to userspace
+- Added detached_vf check to vfio_bar_restore()
+- @Niklas/@Pierre, I removed your review tags since I made changes,
+  please have another look
 
-Just to get a different perspective, I've been trying to come up with
-what would be useful for a very different kind of device, namely
-vfio-ccw. (Adding Eric to cc: for that.)
 
-software_version makes sense for everybody, so it should be a standard
-attribute.
+As discussed previously in a qemu-devel thread:
 
-For the vfio-ccw type, we have only one vendor driver (vfio-ccw_IO).
+https://www.mail-archive.com/qemu-devel@nongnu.org/msg725141.html
 
-Given a subchannel A, we want to make sure that subchannel B has a
-reasonable chance of being compatible. I guess that means:
+s390x has the notion of unlinked VFs being available at the LPAR-level
+(Virtual Functions where the kernel does not have access to the associated
+Physical Function).  These devices are currently not marked as is_virtfn.
+There seems to be some precedent (ex: in powerpc, eeh_debugfs_break_device())
+where pdev->is_virtfn && pdev->physfn == 0 is used to detect these sort of
+detached VFs.  We toyed with the idea of doing this but it causes additional
+fallout as various other areas of kernel code have an expectation that
+is_virtfn=1 implies there is a linked PF available to the kernel. 
 
-- same subchannel type (I/O)
-- same chpid type (e.g. all FICON; I assume there are no 'mixed' setups
-  -- Eric?)
-- same number of chpids? Maybe we can live without that and just inject
-  some machine checks, I don't know. Same chpid numbers is something we
-  cannot guarantee, especially if we want to migrate cross-CEC (to
-  another machine.)
+In the s390x case, the firmware layer underneath handles the VF emulation
+as it still has access to the PF that the LPAR (and thus the kernel) cannot
+see.  But one thing this firmware layer does not do is emulate the
+PCI_COMMAND_MEMORY bit, which was OK until vfio-pci started enforcing it
+via abafbc55.  The vfio-pci check is waived for VFs as of ebfa440c, but
+vfio-pci can't actually tell that these particular devices are VFs.
 
-Other possibly interesting information is not available at the
-subchannel level (vfio-ccw is a subchannel driver.)
+The proposed patch attempts to identify these detached VFs and subsequently
+provide this information to vfio-pci so that it knows to also accept the
+lack of PCI_COMMAND_MEMORY for these sorts of devices.  For now the bit is
+only set for s390x but other architectures could opt in to it as well if
+needed.
 
-So, looking at a concrete subchannel on one of my machines, it would
-look something like the following:
+Matthew Rosato (1):
+  PCI: Introduce flag for detached virtual functions
 
-<common>
-software_version=1.0.0
-type=vfio-ccw          <-- would be vfio-pci on the example above
-<vfio-ccw specific>
-subchannel_type=0
-<vfio-ccw_IO specific>
-chpid_type=0x1a
-chpid_mask=0xf0        <-- not sure if needed/wanted
+ arch/s390/pci/pci_bus.c            | 13 +++++++++++++
+ drivers/vfio/pci/vfio_pci_config.c |  8 ++++----
+ include/linux/pci.h                |  4 ++++
+ 3 files changed, 21 insertions(+), 4 deletions(-)
 
-Does that make sense?
+-- 
+1.8.3.1
 
