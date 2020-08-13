@@ -2,139 +2,176 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 778C52435DA
-	for <lists+kvm@lfdr.de>; Thu, 13 Aug 2020 10:19:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 27FAD2435F8
+	for <lists+kvm@lfdr.de>; Thu, 13 Aug 2020 10:30:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726419AbgHMITL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 13 Aug 2020 04:19:11 -0400
-Received: from smtpout1.mo804.mail-out.ovh.net ([79.137.123.220]:34373 "EHLO
-        smtpout1.mo804.mail-out.ovh.net" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726048AbgHMITL (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 13 Aug 2020 04:19:11 -0400
-Received: from mxplan5.mail.ovh.net (unknown [10.108.16.141])
-        by mo804.mail-out.ovh.net (Postfix) with ESMTPS id 9B2EE56B7D75;
-        Thu, 13 Aug 2020 10:19:08 +0200 (CEST)
-Received: from kaod.org (37.59.142.101) by DAG8EX1.mxp5.local (172.16.2.71)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.1979.3; Thu, 13 Aug
- 2020 10:19:07 +0200
-Authentication-Results: garm.ovh; auth=pass (GARM-101G004206af493-e3f7-496e-8ef0-21b805489ea6,
-                    56FC6CFA6F9FB878813463EC2CBCCD0911300B36) smtp.auth=groug@kaod.org
-Date:   Thu, 13 Aug 2020 10:19:06 +0200
-From:   Greg Kurz <groug@kaod.org>
-To:     "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-CC:     <pair@us.ibm.com>, <brijesh.singh@amd.com>,
-        <frankja@linux.ibm.com>, <kvm@vger.kernel.org>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
+        id S1726144AbgHMIaU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 13 Aug 2020 04:30:20 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:57923 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726100AbgHMIaU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 13 Aug 2020 04:30:20 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1597307417;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=KqhI5Q8sClvpgxYuJqBvjt7ffftT1d+Bz/45Zz2EEQc=;
+        b=FCMALU8uAeQdVzkxiyr6mWuDv0gh2U4eZvKvIeswsM/0x4w2rnHHM8FtxCUOPi7YyezfFv
+        nWxDyL4Mh58dRL/8egeVPbm+wkroim8tlGqMti8qa9OvOXpYAgI9eGGMxeR9/K/8jXG48I
+        QMq27cOIDIMf48xNo7RXammI563oKqM=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-387-AIFhAaiZO1aHAiZnflsoTQ-1; Thu, 13 Aug 2020 04:30:15 -0400
+X-MC-Unique: AIFhAaiZO1aHAiZnflsoTQ-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B56FE800D55;
+        Thu, 13 Aug 2020 08:30:14 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (unknown [10.40.192.72])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 21D79100AE54;
+        Thu, 13 Aug 2020 08:30:02 +0000 (UTC)
+Date:   Thu, 13 Aug 2020 10:30:00 +0200
+From:   Andrew Jones <drjones@redhat.com>
+To:     Marc Hartmayer <mhartmay@linux.ibm.com>
+Cc:     kvm@vger.kernel.org, Thomas Huth <thuth@redhat.com>,
+        David Hildenbrand <david@redhat.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
         Cornelia Huck <cohuck@redhat.com>,
-        David Hildenbrand <david@redhat.com>, <qemu-devel@nongnu.org>,
-        <ehabkost@redhat.com>, <mdroth@linux.vnet.ibm.com>,
-        <pasic@linux.ibm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
         Christian Borntraeger <borntraeger@de.ibm.com>,
-        <qemu-s390x@nongnu.org>, <qemu-ppc@nongnu.org>,
-        <marcel.apfelbaum@gmail.com>, <pbonzini@redhat.com>,
-        Thomas Huth <thuth@redhat.com>,
-        Daniel =?UTF-8?B?UC5CZXJyYW5nw6k=?= <berrange@redhat.com>,
-        Richard Henderson <rth@twiddle.net>,
-        David Gibson <david@gibson.dropbear.id.au>
-Subject: Re: [for-5.2 v4 09/10] host trust limitation: Alter virtio default
- properties for protected guests
-Message-ID: <20200813101906.799efe55@bahia.lan>
-In-Reply-To: <20200813094356.651f323c@bahia.lan>
-References: <20200724025744.69644-1-david@gibson.dropbear.id.au>
-        <20200724025744.69644-10-david@gibson.dropbear.id.au>
-        <20200727150514.GQ3040@work-vm>
-        <20200813094356.651f323c@bahia.lan>
-X-Mailer: Claws Mail 3.17.6 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+        linux-s390@vger.kernel.org
+Subject: Re: [kvm-unit-tests RFC v2 3/4] run_tests/mkstandalone: add arch
+ dependent function to `for_each_unittest`
+Message-ID: <20200813083000.e4bscohuhgl3jdv4@kamzik.brq.redhat.com>
+References: <20200812092705.17774-1-mhartmay@linux.ibm.com>
+ <20200812092705.17774-4-mhartmay@linux.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [37.59.142.101]
-X-ClientProxiedBy: DAG4EX1.mxp5.local (172.16.2.31) To DAG8EX1.mxp5.local
- (172.16.2.71)
-X-Ovh-Tracer-GUID: 7c42f844-0aae-44c2-bb35-5ab0c4b8b78d
-X-Ovh-Tracer-Id: 17833128628167940563
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduiedrleeggddtgecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpeffhffvuffkjghfofggtgfgihesthejredtredtvdenucfhrhhomhepifhrvghgucfmuhhriicuoehgrhhouhhgsehkrghougdrohhrgheqnecuggftrfgrthhtvghrnhepfedutdeijeejveehkeeileetgfelteekteehtedtieefffevhffflefftdefleejnecukfhppedtrddtrddtrddtpdefjedrheelrddugedvrddutddunecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepmhigphhlrghnhedrmhgrihhlrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpehgrhhouhhgsehkrghougdrohhrghdprhgtphhtthhopegurghvihgusehgihgsshhonhdrughrohhpsggvrghrrdhiugdrrghu
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200812092705.17774-4-mhartmay@linux.ibm.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 13 Aug 2020 09:43:56 +0200
-Greg Kurz <groug@kaod.org> wrote:
+On Wed, Aug 12, 2020 at 11:27:04AM +0200, Marc Hartmayer wrote:
+> This allows us, for example, to auto generate a new test case based on
+> an existing test case.
+> 
+> Signed-off-by: Marc Hartmayer <mhartmay@linux.ibm.com>
+> ---
+>  run_tests.sh            |  2 +-
+>  scripts/common.bash     | 13 +++++++++++++
+>  scripts/mkstandalone.sh |  2 +-
+>  3 files changed, 15 insertions(+), 2 deletions(-)
+> 
+> diff --git a/run_tests.sh b/run_tests.sh
+> index 24aba9cc3a98..23658392c488 100755
+> --- a/run_tests.sh
+> +++ b/run_tests.sh
+> @@ -160,7 +160,7 @@ trap "wait; exit 130" SIGINT
+>     # preserve stdout so that process_test_output output can write TAP to it
+>     exec 3>&1
+>     test "$tap_output" == "yes" && exec > /dev/null
+> -   for_each_unittest $config run_task
+> +   for_each_unittest $config run_task arch_cmd
 
-> On Mon, 27 Jul 2020 16:05:14 +0100
-> "Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
-> 
-> > * David Gibson (david@gibson.dropbear.id.au) wrote:
-> > > The default behaviour for virtio devices is not to use the platforms normal
-> > > DMA paths, but instead to use the fact that it's running in a hypervisor
-> > > to directly access guest memory.  That doesn't work if the guest's memory
-> > > is protected from hypervisor access, such as with AMD's SEV or POWER's PEF.
-> > > 
-> > > So, if a host trust limitation mechanism is enabled, then apply the
-> > > iommu_platform=on option so it will go through normal DMA mechanisms.
-> > > Those will presumably have some way of marking memory as shared with the
-> > > hypervisor or hardware so that DMA will work.
-> > > 
-> > > Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-> > 
-> > Good, it's just too easy to forget them at the moment and get hopelessly
-> > confused.
-> > 
-> > 
-> > Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> > 
-> > > ---
-> > >  hw/core/machine.c | 11 +++++++++++
-> > >  1 file changed, 11 insertions(+)
-> > > 
-> > > diff --git a/hw/core/machine.c b/hw/core/machine.c
-> > > index b599b0ba65..2a723bf07b 100644
-> > > --- a/hw/core/machine.c
-> > > +++ b/hw/core/machine.c
-> > > @@ -28,6 +28,8 @@
-> > >  #include "hw/mem/nvdimm.h"
-> > >  #include "migration/vmstate.h"
-> > >  #include "exec/host-trust-limitation.h"
-> > > +#include "hw/virtio/virtio.h"
-> > > +#include "hw/virtio/virtio-pci.h"
-> > >  
-> > >  GlobalProperty hw_compat_5_0[] = {
-> > >      { "virtio-balloon-device", "page-poison", "false" },
-> > > @@ -1161,6 +1163,15 @@ void machine_run_board_init(MachineState *machine)
-> > >           * areas.
-> > >           */
-> > >          machine_set_mem_merge(OBJECT(machine), false, &error_abort);
-> > > +
-> > > +        /*
-> > > +         * Virtio devices can't count on directly accessing guest
-> > > +         * memory, so they need iommu_platform=on to use normal DMA
-> > > +         * mechanisms.  That requires disabling legacy virtio support
-> > > +         * for virtio pci devices
-> > > +         */
-> > > +        object_register_sugar_prop(TYPE_VIRTIO_PCI, "disable-legacy", "on");
-> 
-> What about non-transitional devices (eg. vhost-user-fs-pci) ? They don't know
-> about "disable-legacy" since they don't need it.
-> 
+Let's just require that arch cmd hook be specified by the "$arch_cmd"
+variable. Then we don't need to pass it to for_each_unittest.
 
-Ok, it looks like we should add a bool argument to object_register_sugar_prop()
-that sets the .optional field of GlobalProperty.
+>  ) | postprocess_suite_output
+>  
+>  # wait until all tasks finish
+> diff --git a/scripts/common.bash b/scripts/common.bash
+> index f9c15fd304bd..62931a40b79a 100644
+> --- a/scripts/common.bash
+> +++ b/scripts/common.bash
+> @@ -1,8 +1,15 @@
+> +function arch_cmd()
+> +{
+> +	# Dummy function, can be overwritten by architecture dependent
+> +	# code
+> +	return
+> +}
 
-> > > +        object_register_sugar_prop(TYPE_VIRTIO_DEVICE, "iommu_platform", "on");
-> > >      }
-> > >  
-> > >      machine_class->init(machine);
-> > > -- 
-> > > 2.26.2
-> > > 
-> > --
-> > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-> > 
-> > 
-> 
-> 
+This dummy function appears unused and can be dropped.
+
+>  
+>  function for_each_unittest()
+>  {
+>  	local unittests="$1"
+>  	local cmd="$2"
+> +	local arch_cmd="${3-}"
+>  	local testname
+>  	local smp
+>  	local kernel
+> @@ -19,6 +26,9 @@ function for_each_unittest()
+>  		if [[ "$line" =~ ^\[(.*)\]$ ]]; then
+>  			if [ -n "${testname}" ]; then
+>  				"$cmd" "$testname" "$groups" "$smp" "$kernel" "$opts" "$arch" "$check" "$accel" "$timeout"
+> +				if [ "${arch_cmd}" ]; then
+> +					"${arch_cmd}" "$cmd" "$testname" "$groups" "$smp" "$kernel" "$opts" "$arch" "$check" "$accel" "$timeout"
+> +				fi
+
+Rather than assuming we should run both $cmd ... and $arch_cmd $cmd ...,
+let's just run $arch_cmd $cmd ..., when it exists. If $arch_cmd wants to
+run $cmd ... first, then it can do so itself.
+
+>  			fi
+>  			testname=${BASH_REMATCH[1]}
+>  			smp=1
+> @@ -49,6 +59,9 @@ function for_each_unittest()
+>  	done
+>  	if [ -n "${testname}" ]; then
+>  		"$cmd" "$testname" "$groups" "$smp" "$kernel" "$opts" "$arch" "$check" "$accel" "$timeout"
+> +		if [ "${arch_cmd}" ]; then
+> +			"${arch_cmd}" "$cmd" "$testname" "$groups" "$smp" "$kernel" "$opts" "$arch" "$check" "$accel" "$timeout"
+> +		fi
+>  	fi
+>  	exec {fd}<&-
+>  }
+> diff --git a/scripts/mkstandalone.sh b/scripts/mkstandalone.sh
+> index cefdec30cb33..3b18c0cf090b 100755
+> --- a/scripts/mkstandalone.sh
+> +++ b/scripts/mkstandalone.sh
+> @@ -128,4 +128,4 @@ fi
+>  
+>  mkdir -p tests
+>  
+> -for_each_unittest $cfg mkstandalone
+> +for_each_unittest $cfg mkstandalone arch_cmd
+> -- 
+> 2.25.4
+>
+
+In summary, I think this patch should just be
+
+diff --git a/scripts/common.bash b/scripts/common.bash
+index 9a6ebbd7f287..b409b0529ea6 100644
+--- a/scripts/common.bash
++++ b/scripts/common.bash
+@@ -17,7 +17,7 @@ function for_each_unittest()
+ 
+        while read -r -u $fd line; do
+                if [[ "$line" =~ ^\[(.*)\]$ ]]; then
+-                       "$cmd" "$testname" "$groups" "$smp" "$kernel" "$opts" "$arch" "$check" "$accel" "$timeout"
++                       "$arch_cmd" "$cmd" "$testname" "$groups" "$smp" "$kernel" "$opts" "$arch" "$check" "$accel" "$timeout"
+                        testname=${BASH_REMATCH[1]}
+                        smp=1
+                        kernel=""
+@@ -45,6 +45,6 @@ function for_each_unittest()
+                        timeout=${BASH_REMATCH[1]}
+                fi
+        done
+-       "$cmd" "$testname" "$groups" "$smp" "$kernel" "$opts" "$arch" "$check" "$accel" "$timeout"
++       "$arch_cmd" "$cmd" "$testname" "$groups" "$smp" "$kernel" "$opts" "$arch" "$check" "$accel" "$timeout"
+        exec {fd}<&-
+ }
+ 
+
+Thanks,
+drew
 
