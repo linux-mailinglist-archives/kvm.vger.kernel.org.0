@@ -2,221 +2,191 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C023E2433AC
-	for <lists+kvm@lfdr.de>; Thu, 13 Aug 2020 07:42:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 457892433C1
+	for <lists+kvm@lfdr.de>; Thu, 13 Aug 2020 08:02:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726587AbgHMFmc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 13 Aug 2020 01:42:32 -0400
-Received: from mga01.intel.com ([192.55.52.88]:38244 "EHLO mga01.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726419AbgHMFmb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 13 Aug 2020 01:42:31 -0400
-IronPort-SDR: 8rj2DNYUa5pX/AJsfTOcIuxKj9u7GLW4cjVLIAsl4lzYb41Qt6Crxw72qo0laXVX/qphOHS+ja
- j4rUKaOONuyA==
-X-IronPort-AV: E=McAfee;i="6000,8403,9711"; a="172208396"
-X-IronPort-AV: E=Sophos;i="5.76,307,1592895600"; 
-   d="scan'208";a="172208396"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Aug 2020 22:42:28 -0700
-IronPort-SDR: UAu1nWg8cg0oe32jLfPDU535WAJwe6w+2OZ6jYpW2ZjiEYt4U7q2a5sCruWPKMNx2/f/g/uImF
- lBlrpy/ymLKw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.76,307,1592895600"; 
-   d="scan'208";a="325304257"
-Received: from cqiang-mobl.ccr.corp.intel.com (HELO [10.238.2.93]) ([10.238.2.93])
-  by orsmga008.jf.intel.com with ESMTP; 12 Aug 2020 22:42:26 -0700
-Subject: Re: [RFC 2/7] KVM: VMX: Expose IA32_PKRS MSR
-To:     Jim Mattson <jmattson@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Xiaoyao Li <xiaoyao.li@intel.com>,
-        kvm list <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>
-References: <20200807084841.7112-1-chenyi.qiang@intel.com>
- <20200807084841.7112-3-chenyi.qiang@intel.com>
- <CALMp9eQiyRxJ0jkvVi+fWMZcDQbvyCcuTwH1wrYV-u_E004Bhg@mail.gmail.com>
-From:   Chenyi Qiang <chenyi.qiang@intel.com>
-Message-ID: <34b083be-b9d5-fd85-b42d-af0549e3b002@intel.com>
-Date:   Thu, 13 Aug 2020 13:42:04 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+        id S1726576AbgHMGCi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 13 Aug 2020 02:02:38 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:36233 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726253AbgHMGCh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 13 Aug 2020 02:02:37 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1597298555;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=vY8vnehO56XjlQrEEeygaT/MkeY3wULexFdzVU37Xfc=;
+        b=S2Ds+7rty5t9Ma3eeyVgzvoNyhyvvRuqiFWSYHUSIO72nMnAp2RyXO2SiGEbaK+VqcaJLW
+        upoZPnnbbvDxYcEdRMW+Min2bWFkv/aR9vO2EDU4Yj9k9Aq8yla/PACFVBHwExSXOomdJv
+        J1rYti89Z0BTkrVNhPsPBwXUV1khKQg=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-84-iMb9FvaNOg2PnYpJQ4BiPA-1; Thu, 13 Aug 2020 02:02:31 -0400
+X-MC-Unique: iMb9FvaNOg2PnYpJQ4BiPA-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E3A591005504;
+        Thu, 13 Aug 2020 06:02:27 +0000 (UTC)
+Received: from [10.72.13.44] (ovpn-13-44.pek2.redhat.com [10.72.13.44])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id A26415D9E8;
+        Thu, 13 Aug 2020 06:02:00 +0000 (UTC)
+Subject: Re: [PATCH RFC v2 00/18] Add VFIO mediated device support and DEV-MSI
+ support for the idxd driver
+To:     "Tian, Kevin" <kevin.tian@intel.com>,
+        Jason Gunthorpe <jgg@nvidia.com>,
+        Alex Williamson <alex.williamson@redhat.com>
+Cc:     "Jiang, Dave" <dave.jiang@intel.com>,
+        "vkoul@kernel.org" <vkoul@kernel.org>,
+        "Dey, Megha" <megha.dey@intel.com>,
+        "maz@kernel.org" <maz@kernel.org>,
+        "bhelgaas@google.com" <bhelgaas@google.com>,
+        "rafael@kernel.org" <rafael@kernel.org>,
+        "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "hpa@zytor.com" <hpa@zytor.com>,
+        "Pan, Jacob jun" <jacob.jun.pan@intel.com>,
+        "Raj, Ashok" <ashok.raj@intel.com>,
+        "Liu, Yi L" <yi.l.liu@intel.com>, "Lu, Baolu" <baolu.lu@intel.com>,
+        "Kumar, Sanjay K" <sanjay.k.kumar@intel.com>,
+        "Luck, Tony" <tony.luck@intel.com>,
+        "Lin, Jing" <jing.lin@intel.com>,
+        "Williams, Dan J" <dan.j.williams@intel.com>,
+        "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
+        "eric.auger@redhat.com" <eric.auger@redhat.com>,
+        "parav@mellanox.com" <parav@mellanox.com>,
+        "Hansen, Dave" <dave.hansen@intel.com>,
+        "netanelg@mellanox.com" <netanelg@mellanox.com>,
+        "shahafs@mellanox.com" <shahafs@mellanox.com>,
+        "yan.y.zhao@linux.intel.com" <yan.y.zhao@linux.intel.com>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "Ortiz, Samuel" <samuel.ortiz@intel.com>,
+        "Hossain, Mona" <mona.hossain@intel.com>,
+        "dmaengine@vger.kernel.org" <dmaengine@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "x86@kernel.org" <x86@kernel.org>,
+        "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+References: <159534667974.28840.2045034360240786644.stgit@djiang5-desk3.ch.intel.com>
+ <20200721164527.GD2021248@mellanox.com>
+ <CY4PR11MB1638103EC73DD9C025F144C98C780@CY4PR11MB1638.namprd11.prod.outlook.com>
+ <20200724001930.GS2021248@mellanox.com> <20200805192258.5ee7a05b@x1.home>
+ <20200807121955.GS16789@nvidia.com>
+ <MWHPR11MB16452EBE866E330A7E000AFC8C440@MWHPR11MB1645.namprd11.prod.outlook.com>
+ <b59ce5b0-5530-1f30-9852-409f7c9f630a@redhat.com>
+ <MWHPR11MB1645DDC2C87D533B2A09A2D58C420@MWHPR11MB1645.namprd11.prod.outlook.com>
+ <ecc76dfb-7047-c1ab-e244-d73f05688f20@redhat.com>
+ <MWHPR11MB1645F911EFB993C9067B58DD8C430@MWHPR11MB1645.namprd11.prod.outlook.com>
+From:   Jason Wang <jasowang@redhat.com>
+Message-ID: <e3f45862-c3a5-8bac-e04d-7be0e76908a9@redhat.com>
+Date:   Thu, 13 Aug 2020 14:01:58 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <CALMp9eQiyRxJ0jkvVi+fWMZcDQbvyCcuTwH1wrYV-u_E004Bhg@mail.gmail.com>
+In-Reply-To: <MWHPR11MB1645F911EFB993C9067B58DD8C430@MWHPR11MB1645.namprd11.prod.outlook.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
-
-On 8/13/2020 5:21 AM, Jim Mattson wrote:
-> On Fri, Aug 7, 2020 at 1:46 AM Chenyi Qiang <chenyi.qiang@intel.com> wrote:
+On 2020/8/13 下午1:26, Tian, Kevin wrote:
+>> From: Jason Wang <jasowang@redhat.com>
+>> Sent: Thursday, August 13, 2020 12:34 PM
 >>
->> Protection Keys for Supervisor Pages (PKS) uses IA32_PKRS MSR (PKRS) at
->> index 0x6E1 to allow software to manage supervisor protection key
->> rights. For performance consideration, PKRS intercept will be disabled
->> so that the guest can access the PKRS without VM exits.
->> PKS introduces dedicated control fields in VMCS to switch PKRS, which
->> only does the retore part. In addition, every VM exit saves PKRS into
->> the guest-state area in VMCS, while VM enter won't save the host value
->> due to the expectation that the host won't change the MSR often. Update
->> the host's value in VMCS manually if the MSR has been changed by the
->> kernel since the last time the VMCS was run.
->> The function get_current_pkrs() in arch/x86/mm/pkeys.c exports the
->> per-cpu variable pkrs_cache to avoid frequent rdmsr of PKRS.
 >>
->> Signed-off-by: Chenyi Qiang <chenyi.qiang@intel.com>
->> ---
-> 
->> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
->> index 11e4df560018..df2c2e733549 100644
->> --- a/arch/x86/kvm/vmx/nested.c
->> +++ b/arch/x86/kvm/vmx/nested.c
->> @@ -289,6 +289,7 @@ static void vmx_sync_vmcs_host_state(struct vcpu_vmx *vmx,
->>          dest->ds_sel = src->ds_sel;
->>          dest->es_sel = src->es_sel;
->>   #endif
->> +       dest->pkrs = src->pkrs;
-> 
-> Why isn't this (and other PKRS code) inside the #ifdef CONFIG_X86_64?
-> PKRS isn't usable outside of long mode, is it?
-> 
-
-Yes, I'm also thinking about whether to put all pks code into 
-CONFIG_X86_64. The kernel implementation also wrap its pks code inside 
-CONFIG_ARCH_HAS_SUPERVISOR_PKEYS which has dependency with CONFIG_X86_64.
-However, maybe this can help when host kernel disable PKS but the guest 
-enable it. What do you think about this?
-
-
->>   }
+>> On 2020/8/12 下午12:05, Tian, Kevin wrote:
+>>>> The problem is that if we tie all controls via VFIO uAPI, the other
+>>>> subsystem like vDPA is likely to duplicate them. I wonder if there is a
+>>>> way to decouple the vSVA out of VFIO uAPI?
+>>> vSVA is a per-device (either pdev or mdev) feature thus naturally should
+>>> be managed by its device driver (VFIO or vDPA). From this angle some
+>>> duplication is inevitable given VFIO and vDPA are orthogonal passthrough
+>>> frameworks. Within the kernel the majority of vSVA handling is done by
+>>> IOMMU and IOASID modules thus most logic are shared.
 >>
->>   static void vmx_switch_vmcs(struct kvm_vcpu *vcpu, struct loaded_vmcs *vmcs)
->> diff --git a/arch/x86/kvm/vmx/vmcs.h b/arch/x86/kvm/vmx/vmcs.h
->> index 7a3675fddec2..39ec3d0c844b 100644
->> --- a/arch/x86/kvm/vmx/vmcs.h
->> +++ b/arch/x86/kvm/vmx/vmcs.h
->> @@ -40,6 +40,7 @@ struct vmcs_host_state {
->>   #ifdef CONFIG_X86_64
->>          u16           ds_sel, es_sel;
->>   #endif
->> +       u32           pkrs;
-> 
-> One thing that does seem odd throughout is that PKRS is a 64-bit
-> resource, but we store and pass around only 32-bits. Yes, the top 32
-> bits are currently reserved, but the same can be said of, say, cr4, a
-> few lines above this. Yet, we store and pass around cr4 as 64-bits.
-> How do we decide?
-> 
+>> So why not introduce vSVA uAPI at IOMMU or IOASID layer?
+> One may ask a similar question why IOMMU doesn't expose map/unmap
+> as uAPI...
 
-IMO, If the high part of PKRS is zero-reserved, it's OK to use u32. I 
-define it as u32 just to follow the definition pkrs_cache in kernel code.
 
->>   };
+I think this is probably a good idea as well. If there's anything missed 
+in the infrastructure, we can invent. Besides vhost-vDPA, there are 
+other subsystems that relaying their uAPI to IOMMU API. Duplicating 
+uAPIs is usually a hint of the codes duplication. Simple map/unmap could 
+be easy but vSVA uAPI is much more complicated.
+
+
+>
 >>
->>   struct vmcs_controls_shadow {
-> 
->> @@ -1163,6 +1164,20 @@ void vmx_prepare_switch_to_guest(struct kvm_vcpu *vcpu)
->>           */
->>          host_state->ldt_sel = kvm_read_ldt();
+>>>>>     If an userspace DMA interface can be easily
+>>>>> adapted to be a passthrough one, it might be the choice.
+>>>> It's not that easy even for VFIO which requires a lot of new uAPIs and
+>>>> infrastructures(e.g mdev) to be invented.
+>>>>
+>>>>
+>>>>> But for idxd,
+>>>>> we see mdev a much better fit here, given the big difference between
+>>>>> what userspace DMA requires and what guest driver requires in this hw.
+>>>> A weak point for mdev is that it can't serve kernel subsystem other than
+>>>> VFIO. In this case, you need some other infrastructures (like [1]) to do
+>>>> this.
+>>> mdev is not exclusive from kernel usages. It's perfectly fine for a driver
+>>> to reserve some work queues for host usages, while wrapping others
+>>> into mdevs.
 >>
->> +       /*
->> +        * Update the host pkrs vmcs field before vcpu runs.
->> +        * The setting of VM_EXIT_LOAD_IA32_PKRS can ensure
->> +        * kvm_cpu_cap_has(X86_FEATURE_PKS) &&
->> +        * guest_cpuid_has(vcpu, X86_FEATURE_VMX).
->> +        */
->> +       if (vm_exit_controls_get(vmx) & VM_EXIT_LOAD_IA32_PKRS) {
->> +               host_pkrs = get_current_pkrs();
->> +               if (unlikely(host_pkrs != host_state->pkrs)) {
->> +                       vmcs_write64(HOST_IA32_PKRS, host_pkrs);
->> +                       host_state->pkrs = host_pkrs;
->> +               }
->> +       }
->> +
->>   #ifdef CONFIG_X86_64
->>          savesegment(ds, host_state->ds_sel);
->>          savesegment(es, host_state->es_sel);
->> @@ -1951,6 +1966,13 @@ static int vmx_get_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
->>                  else
->>                          msr_info->data = vmx->pt_desc.guest.addr_a[index / 2];
->>                  break;
->> +       case MSR_IA32_PKRS:
->> +               if (!kvm_cpu_cap_has(X86_FEATURE_PKS) ||
->> +                   (!msr_info->host_initiated &&
->> +                   !guest_cpuid_has(vcpu, X86_FEATURE_PKS)))
-> 
-> Could this be simplified if we required
-> kvm_cpu_cap_has(X86_FEATURE_PKS) as a prerequisite for
-> guest_cpuid_has(vcpu, X86_FEATURE_PKS)? If not, what is the expected
-> behavior if guest_cpuid_has(vcpu, X86_FEATURE_PKS) is true and
-> kvm_cpu_cap_has(X86_FEATURE_PKS)  is false?
-> 
-
-Yes, kvm_cpu_cap_has() is a prerequisite for guest_cpuid_has() as we 
-have done the check in vmx_cpuid_update(). Here I add the 
-kvm_cpu_cap_has() check to ensure the vmcs_read(GUEST_IA32_PKRS) can 
-execute correctly in case of the userspace access.
-
->> +                       return 1;
->> +               msr_info->data = vmcs_read64(GUEST_IA32_PKRS);
->> +               break;
->>          case MSR_TSC_AUX:
->>                  if (!msr_info->host_initiated &&
->>                      !guest_cpuid_has(vcpu, X86_FEATURE_RDTSCP))
-> 
->> @@ -7230,6 +7267,26 @@ static void update_intel_pt_cfg(struct kvm_vcpu *vcpu)
->>                  vmx->pt_desc.ctl_bitmask &= ~(0xfULL << (32 + i * 4));
->>   }
+>> I meant you may want slices to be an independent device from the kernel
+>> point of view:
 >>
->> +static void vmx_update_pkrs_cfg(struct kvm_vcpu *vcpu)
->> +{
->> +       struct vcpu_vmx *vmx = to_vmx(vcpu);
->> +       unsigned long *msr_bitmap = vmx->vmcs01.msr_bitmap;
->> +       bool pks_supported = guest_cpuid_has(vcpu, X86_FEATURE_PKS);
->> +
->> +       /*
->> +        * set intercept for PKRS when the guest doesn't support pks
->> +        */
->> +       vmx_set_intercept_for_msr(msr_bitmap, MSR_IA32_PKRS, MSR_TYPE_RW, !pks_supported);
->> +
->> +       if (pks_supported) {
->> +               vm_entry_controls_setbit(vmx, VM_ENTRY_LOAD_IA32_PKRS);
->> +               vm_exit_controls_setbit(vmx, VM_EXIT_LOAD_IA32_PKRS);
->> +       } else {
->> +               vm_entry_controls_clearbit(vmx, VM_ENTRY_LOAD_IA32_PKRS);
->> +               vm_exit_controls_clearbit(vmx, VM_EXIT_LOAD_IA32_PKRS);
->> +       }
->> +}
-> 
-> Not just your change, but it is unclear to me what the expected
-> behavior is when CPUID bits are modified while the guest is running.
-> For example, it seems that this code results in immediate behavioral
-> changes for an L1 guest; however, if an L2 guest is active, then there
-> are no behavioral changes until the next emulated VM-entry from L1 to
-> L2. Is that right?
-> 
-
-I don't know if there is a way to deal with the CPUID modification in 
-KVM while the guest is running. Some CPUID modification like 
-X86_FEATURE_OSPKE happens when the guest sets CR4_PKE. But I'm not 
-familiar with your case.
-
-Paolo
-
-What's your opinion?
+>> E.g for ethernet devices, you may want 10K mdevs to be passed to guest.
+>>
+>> Similarly, you may want 10K net devices which is connected to the kernel
+>> networking subsystems.
+>>
+>> In this case it's not simply reserving queues but you need some other
+>> type of device abstraction. There could be some kind of duplication
+>> between this and mdev.
+>>
+> yes, some abstraction required but isn't it what the driver should
+> care about instead of mdev framework itself?
 
 
-> On a more general note, do you have any kvm-unit-tests that exercise
-> the new code?
-> 
+With mdev you present a "PCI" device, but what's kind of device it tries 
+to present to kernel? If it's still PCI, there's duplication with mdev, 
+if it's something new, maybe we can switch to that API.
 
-Yes, I'll attach the kvm-unit-tests in next version.
+
+> If the driver reports
+> the same set of resource to both mdev and networking, it needs to
+> make sure when the resource is claimed in one interface then it
+> should be marked in-use in another. e.g. each mdev includes a
+> available_intances attribute. the driver could report 10k available
+> instances initially and then update it to 5K when another 5K is used
+> for net devices later.
+
+
+Right but this probably means you need another management layer under mdev.
+
+
+>
+> Mdev definitely has its usage limitations. Some may be improved
+> in the future, some may not. But those are distracting from the
+> original purpose of this thread (mdev vs. userspace DMA) and better
+> be discussed in other places e.g. LPC...
+
+
+Ok.
+
+Thanks
+
+
+>
+> Thanks
+> Kevin
+
