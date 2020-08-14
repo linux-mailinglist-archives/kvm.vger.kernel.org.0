@@ -2,107 +2,157 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 37D222441D1
-	for <lists+kvm@lfdr.de>; Fri, 14 Aug 2020 01:59:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 74E2324427A
+	for <lists+kvm@lfdr.de>; Fri, 14 Aug 2020 02:19:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726623AbgHMX7n (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 13 Aug 2020 19:59:43 -0400
-Received: from mga14.intel.com ([192.55.52.115]:25117 "EHLO mga14.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726526AbgHMX7n (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 13 Aug 2020 19:59:43 -0400
-IronPort-SDR: ui1FfeLzvUMBC53GarRORti6/Csus1obBqNlOKdJDUfREcYyEYZlprLqbsKtpZnmqDNUJZ8qiC
- pbW/UtA8tjJg==
-X-IronPort-AV: E=McAfee;i="6000,8403,9712"; a="153564185"
-X-IronPort-AV: E=Sophos;i="5.76,310,1592895600"; 
-   d="scan'208";a="153564185"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Aug 2020 16:59:42 -0700
-IronPort-SDR: ozi2KAtml8F61J6OauJYnHc5KFeCKaePUjMuYNDLVUrn6U49nkuYERNi0NTCdnJFvpK74ntBs/
- X8TRa34IqidA==
-X-IronPort-AV: E=Sophos;i="5.76,310,1592895600"; 
-   d="scan'208";a="470398296"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.160])
-  by orsmga005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Aug 2020 16:59:42 -0700
-Date:   Thu, 13 Aug 2020 16:59:40 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
+        id S1726564AbgHNASp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 13 Aug 2020 20:18:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48452 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726205AbgHNASp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 13 Aug 2020 20:18:45 -0400
+Received: from mail-ot1-x342.google.com (mail-ot1-x342.google.com [IPv6:2607:f8b0:4864:20::342])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3EA87C061757
+        for <kvm@vger.kernel.org>; Thu, 13 Aug 2020 17:18:44 -0700 (PDT)
+Received: by mail-ot1-x342.google.com with SMTP id k12so6347358otr.1
+        for <kvm@vger.kernel.org>; Thu, 13 Aug 2020 17:18:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=hKfJ4LgeNuEVsNPK0fxwjlcUz38msr/6A2je+U6U0Y8=;
+        b=m3DhFcC5UztW8hDI3X8qGWqY3h3ItlQv220e38BgtICdknliB2RqzibWjWfQQiME5o
+         gNNE1LDU79i9jyeMEL9TsUHnM9j9jlEnEyMLoPgffLJxT3TsQo9qKwsIxyU/UEdEYlQc
+         W1rg2c778DF5to3bGgaH0UtUVXWOkIvIdX9T89/SG8EnLjdb5DDHopX6bIFyW7I/lZ0O
+         gTaMPDSYZ6CaZDLL1BhXsUc77Wr7Z3zSPoRwmgFC9THPPVkcUvqtg6DL2CV9qGNoL3Qc
+         21q6Jssj/sUg7a+lyiFulI8Hxx7ItSrrI0lCaUf8wC9KISaZJcwqESo/2blgrUA71W0M
+         7MSA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=hKfJ4LgeNuEVsNPK0fxwjlcUz38msr/6A2je+U6U0Y8=;
+        b=U/xFF3mV8CX7tktH2Lwb3EVTLR8VPWGydwS7J+WHjhGbxKYILBqHng0Y3lKtgyz+M7
+         1/Usc48a3x+CLoFQkkKpuNGlpeJDafsA2df8sMMPmx1yZBci/47vFAgU4+icdM/9WPvL
+         h1FLcYNi3aUIfKluIodA4kLo7bX3ieMQSdLcu3JxC9yqb8UuqrAV6uMHNGhwzQ92O2Yh
+         LS+0BxzYMuiaGN//115TwVNsYBl8zr0qEWZbqtSJUsfPnICVSRAxDeDEX4G1T5g1Sobc
+         zV/0fEn0bjyVXhAIGLRF01g9cTzoE2OxySQgodzmDV9nYJoUHFk2p10koudTPzr9ZFxu
+         erfA==
+X-Gm-Message-State: AOAM532cViyH/SKZ0Swjr10neIT66NoxtxXS5+xBUF+GI2JXJSepWuHF
+        IUl3Mv+E0KMu71OvXnx5j3su0Kl8BoOG14P02Zg=
+X-Google-Smtp-Source: ABdhPJzdMQUX/o4IUi+lPaKaSfsLV8Ucg8IPwUsIcgBSFHkm2jw00pGtxrfikZS8fBDEUPxaobWMGOAr8l79kqH23rc=
+X-Received: by 2002:a9d:c44:: with SMTP id 62mr234343otr.185.1597364323235;
+ Thu, 13 Aug 2020 17:18:43 -0700 (PDT)
+MIME-Version: 1.0
+References: <20200806151433.2747952-1-oupton@google.com> <20200806151433.2747952-2-oupton@google.com>
+In-Reply-To: <20200806151433.2747952-2-oupton@google.com>
+From:   Wanpeng Li <kernellwp@gmail.com>
+Date:   Fri, 14 Aug 2020 08:18:32 +0800
+Message-ID: <CANRm+CxmRBWmWOaGTf=miYRFnrH9hXsq2zJN739ZGFiwkSf2Yw@mail.gmail.com>
+Subject: Re: [PATCH v3 1/4] kvm: x86: encapsulate wrmsr(MSR_KVM_SYSTEM_TIME)
+ emulation in helper fn
 To:     Oliver Upton <oupton@google.com>
-Cc:     kvm list <kvm@vger.kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
+Cc:     kvm <kvm@vger.kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
         Jim Mattson <jmattson@google.com>,
         Peter Shier <pshier@google.com>
-Subject: Re: [PATCH] kvm: nVMX: flush TLB when decoded insn != VM-exit reason
-Message-ID: <20200813235940.GA4327@linux.intel.com>
-References: <20200616224305.44242-1-oupton@google.com>
- <20200813170331.GI29439@linux.intel.com>
- <CAOQ_QsiVV7Btj5yJ5Dpqxf3V7OuHY3N9b1xW6rrZjyv6dOC8ig@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAOQ_QsiVV7Btj5yJ5Dpqxf3V7OuHY3N9b1xW6rrZjyv6dOC8ig@mail.gmail.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Aug 13, 2020 at 03:44:08PM -0500, Oliver Upton wrote:
-> On Thu, Aug 13, 2020 at 12:03 PM Sean Christopherson
-> > > +      *
-> > > +      * Rather than synthesizing a VM-exit into L1 for every possible
-> > > +      * instruction just flush the TLB, resume L2, and let hardware generate
-> > > +      * the appropriate VM-exit.
-> > > +      */
-> > > +     vmx_flush_tlb_gva(vcpu, kvm_rip_read(vcpu));
-> >
-> > This is wrong, it should flush kvm_get_linear_rip(vcpu).
-> >
-> 
-> I do not believe that the aim of this patch will work anymore, since:
-> 
-> 1dbf5d68af6f ("KVM: VMX: Add guest physical address check in EPT
-> violation and misconfig")
-> 
-> Since it is possible to get into the emulator on any instruction that
-> induces an EPT violation, we'd wind up looping when we believe the
-> instruction needs to exit to L1 (TLB flush, resume guest, hit the same
-> EPT violation. Rinse, wash, repeat).
+On Fri, 7 Aug 2020 at 01:56, Oliver Upton <oupton@google.com> wrote:
+>
+> No functional change intended.
+>
+> Reviewed-by: Jim Mattson <jmattson@google.com>
+> Reviewed-by: Peter Shier <pshier@google.com>
+> Signed-off-by: Oliver Upton <oupton@google.com>
 
-kvm_get_linear_rip() doesn't walk any page tables, it simply accounts for a
-non-zero CS.base when !64-bit mode.  If we really wanted to, this could use
-the emulation context's cached _eip, but I don't see any value in that since
-both GUEST_CS_* and GUEST_RIP will already be cached by KVM.
+Reviewed-by: Wanpeng Li <wanpengli@tencent.com>
 
-unsigned long kvm_get_linear_rip(struct kvm_vcpu *vcpu)
-{
-        if (is_64_bit_mode(vcpu))
-                return kvm_rip_read(vcpu);
-        return (u32)(get_segment_base(vcpu, VCPU_SREG_CS) +
-                     kvm_rip_read(vcpu));
-}
-
-
-
-> 
-> > > +     return X86EMUL_RETRY_INSTR;
-> > >  }
-> > >
-> > >  #ifdef CONFIG_X86_64
-> > > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> > > index 00c88c2f34e4..2ab47485100f 100644
-> > > --- a/arch/x86/kvm/x86.c
-> > > +++ b/arch/x86/kvm/x86.c
-> > > @@ -6967,7 +6967,7 @@ int x86_emulate_instruction(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
-> > >
-> > >       r = x86_emulate_insn(ctxt);
-> > >
-> > > -     if (r == EMULATION_INTERCEPTED)
-> > > +     if (r == EMULATION_INTERCEPTED || r == EMULATION_RETRY_INSTR)
-> > >               return 1;
-> > >
-> > >       if (r == EMULATION_FAILED) {
-> > > --
-> > > 2.27.0.290.gba653c62da-goog
-> > >
+> ---
+>  arch/x86/kvm/x86.c | 58 +++++++++++++++++++++++++---------------------
+>  1 file changed, 32 insertions(+), 26 deletions(-)
+>
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index dc4370394ab8..5ba713108686 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -1822,6 +1822,34 @@ static void kvm_write_wall_clock(struct kvm *kvm, gpa_t wall_clock)
+>         kvm_write_guest(kvm, wall_clock, &version, sizeof(version));
+>  }
+>
+> +static void kvm_write_system_time(struct kvm_vcpu *vcpu, gpa_t system_time,
+> +                                 bool old_msr, bool host_initiated)
+> +{
+> +       struct kvm_arch *ka = &vcpu->kvm->arch;
+> +
+> +       if (vcpu->vcpu_id == 0 && !host_initiated) {
+> +               if (ka->boot_vcpu_runs_old_kvmclock && old_msr)
+> +                       kvm_make_request(KVM_REQ_MASTERCLOCK_UPDATE, vcpu);
+> +
+> +               ka->boot_vcpu_runs_old_kvmclock = old_msr;
+> +       }
+> +
+> +       vcpu->arch.time = system_time;
+> +       kvm_make_request(KVM_REQ_GLOBAL_CLOCK_UPDATE, vcpu);
+> +
+> +       /* we verify if the enable bit is set... */
+> +       vcpu->arch.pv_time_enabled = false;
+> +       if (!(system_time & 1))
+> +               return;
+> +
+> +       if (!kvm_gfn_to_hva_cache_init(vcpu->kvm,
+> +                                      &vcpu->arch.pv_time, system_time & ~1ULL,
+> +                                      sizeof(struct pvclock_vcpu_time_info)))
+> +               vcpu->arch.pv_time_enabled = true;
+> +
+> +       return;
+> +}
+> +
+>  static uint32_t div_frac(uint32_t dividend, uint32_t divisor)
+>  {
+>         do_shl32_div32(dividend, divisor);
+> @@ -2973,33 +3001,11 @@ int kvm_set_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+>                 kvm_write_wall_clock(vcpu->kvm, data);
+>                 break;
+>         case MSR_KVM_SYSTEM_TIME_NEW:
+> -       case MSR_KVM_SYSTEM_TIME: {
+> -               struct kvm_arch *ka = &vcpu->kvm->arch;
+> -
+> -               if (vcpu->vcpu_id == 0 && !msr_info->host_initiated) {
+> -                       bool tmp = (msr == MSR_KVM_SYSTEM_TIME);
+> -
+> -                       if (ka->boot_vcpu_runs_old_kvmclock != tmp)
+> -                               kvm_make_request(KVM_REQ_MASTERCLOCK_UPDATE, vcpu);
+> -
+> -                       ka->boot_vcpu_runs_old_kvmclock = tmp;
+> -               }
+> -
+> -               vcpu->arch.time = data;
+> -               kvm_make_request(KVM_REQ_GLOBAL_CLOCK_UPDATE, vcpu);
+> -
+> -               /* we verify if the enable bit is set... */
+> -               vcpu->arch.pv_time_enabled = false;
+> -               if (!(data & 1))
+> -                       break;
+> -
+> -               if (!kvm_gfn_to_hva_cache_init(vcpu->kvm,
+> -                    &vcpu->arch.pv_time, data & ~1ULL,
+> -                    sizeof(struct pvclock_vcpu_time_info)))
+> -                       vcpu->arch.pv_time_enabled = true;
+> -
+> +               kvm_write_system_time(vcpu, data, false, msr_info->host_initiated);
+> +               break;
+> +       case MSR_KVM_SYSTEM_TIME:
+> +               kvm_write_system_time(vcpu, data, true, msr_info->host_initiated);
+>                 break;
+> -       }
+>         case MSR_KVM_ASYNC_PF_EN:
+>                 if (kvm_pv_enable_async_pf(vcpu, data))
+>                         return 1;
+> --
+> 2.28.0.236.gb10cc79966-goog
+>
