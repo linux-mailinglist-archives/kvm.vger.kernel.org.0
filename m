@@ -2,135 +2,163 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B78BD244B78
-	for <lists+kvm@lfdr.de>; Fri, 14 Aug 2020 16:56:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BD5BF244BA9
+	for <lists+kvm@lfdr.de>; Fri, 14 Aug 2020 17:10:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727074AbgHNO4s (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 14 Aug 2020 10:56:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41892 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726283AbgHNO4r (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 14 Aug 2020 10:56:47 -0400
-Received: from mail-lj1-x242.google.com (mail-lj1-x242.google.com [IPv6:2a00:1450:4864:20::242])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AC6D5C061384
-        for <kvm@vger.kernel.org>; Fri, 14 Aug 2020 07:56:46 -0700 (PDT)
-Received: by mail-lj1-x242.google.com with SMTP id g6so10193943ljn.11
-        for <kvm@vger.kernel.org>; Fri, 14 Aug 2020 07:56:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=OgA6SrPAUjCdolRY2JhUIZZhYF8rz+ttqIgta94WnP8=;
-        b=mQYTdoPehrn+9H87tyrSXLEVW+1LEUedGw19sOGac8Oukbb5Ot79FqlCypTW0wpJN6
-         lFsplqEV0m7bXoaUJIqMwivrRJr2aMmkN3HWsh//qMAT5lckRNessDPsi9XnYA204/lH
-         cZZR5g/SQbDnl1oXMk0+Z2zihnv0Lc8PS7gFFiwjac34EO/0sJtJRSjUtjWKcnSlWpdB
-         pc5hhjdzi3ldDJ5HAm8Y5VnjjOLZKU1E2zVeLfCZ5fi8K92t0+t/nt4/HcEa72oLbVD4
-         p5poczeDrm3WqnqTfZrZpx8F2MnuEUpXP5r2EagA+iZZ/rL+F2k62tDVOc2mW5ZWpo38
-         j+aA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=OgA6SrPAUjCdolRY2JhUIZZhYF8rz+ttqIgta94WnP8=;
-        b=h9rDZgOV/A0UgCBOSMkQxZV6s+n3orjk8ZOCo8Z3TfvkcGpElokc7FbKmwECQkaL9R
-         aA2jTEP7vuIChJ/UUxhU97eBb6LtZgReET8QdV+5q6+Xi2SJfS6CqqDkJ5rddv+z8Ddz
-         bPzaLu0L6i6+MSmKmUgMiB8kJ18p4A6eiGBc8hRcEefGgTc6arx1/hbfSYvrxzFfPlZD
-         kDcPMEp7kU8YuN5PThGlNyJlIEsKSqaDFA5oyUkUsg7NqYRx5hhwjQ2yI1sP7Dqvq3WP
-         6Jqqw+ivlSl76gRtRsk9I2HDrvTaAHTgPEXSB/VV+LeSWDUceZYQRz1NEzuz78UXQiBs
-         t24A==
-X-Gm-Message-State: AOAM533sd5kQ5eYsquLO1/Y2IKyScvSnlzXDbs4RGZ3GOxxRtKd+14Kh
-        BJ0XehFvLZLYF5llLQWCoRJpLzakSL6Ul1VMv/XgZ5j/OmY=
-X-Google-Smtp-Source: ABdhPJwyK62wMUx7kfHCUx6DoBqGFw4lcayMuTkCGwVyvDDoQ+gJPoYnCWrUHUPERodp9xG4uUN9XQ/7G/ka5s8/YAc=
-X-Received: by 2002:a2e:4c02:: with SMTP id z2mr1523264lja.177.1597417004725;
- Fri, 14 Aug 2020 07:56:44 -0700 (PDT)
+        id S1726898AbgHNPKR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 14 Aug 2020 11:10:17 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:28434 "EHLO
+        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726270AbgHNPKR (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 14 Aug 2020 11:10:17 -0400
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 07EF5mpX176841
+        for <kvm@vger.kernel.org>; Fri, 14 Aug 2020 11:10:15 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : mime-version : content-transfer-encoding; s=pp1;
+ bh=UBY2P5ekcgoY8kYJVVlfVycQIuOjU1fhSxJBnYhyneE=;
+ b=FlIm1bn6tVBtVEZQzrs3v8uJWt7M9pUcNVmTOxk6vOV7vLWd0iJ8tP/gK/aJfXI8/2lC
+ G9g3hW5E/6RaDwMPnmfy51rT/mXXtnDDTQRqVxNviPOxOwS5/iZsqLIZnCPZ8nvYKchs
+ SmY/J5HPDBexH5TZ+ZHoiUFY/GVLPU/vFy8QYNCzeKspCApbbIzyTv+nnG5ZCwyaFPcB
+ MsbJbds5hMx+XZCg6jwgKNeaA2O0bYoISo1QA8L2+wnpB5JKjD4ykPDyxlexXcG2D1qP
+ Deoej20NFws+dUMa8c+5QSXtXtpPy35Hq0lGcHLuMHv/YlITDh3Awx3v0ZQHn6DgDqGY Hg== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 32w6tccahb-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Fri, 14 Aug 2020 11:10:15 -0400
+Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 07EF9kEG191265
+        for <kvm@vger.kernel.org>; Fri, 14 Aug 2020 11:10:15 -0400
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 32w6tccaft-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 14 Aug 2020 11:10:15 -0400
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 07EF17e0023777;
+        Fri, 14 Aug 2020 15:10:13 GMT
+Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
+        by ppma03ams.nl.ibm.com with ESMTP id 32skp8eqqt-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 14 Aug 2020 15:10:13 +0000
+Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
+        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 07EFAAhL24838452
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 14 Aug 2020 15:10:10 GMT
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 6FB42A4057;
+        Fri, 14 Aug 2020 15:10:10 +0000 (GMT)
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id EC5A5A404D;
+        Fri, 14 Aug 2020 15:10:09 +0000 (GMT)
+Received: from ibm-vm.ibmuc.com (unknown [9.145.4.223])
+        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Fri, 14 Aug 2020 15:10:09 +0000 (GMT)
+From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
+To:     kvm@vger.kernel.org, pbonzini@redhat.com
+Cc:     frankja@linux.ibm.com, david@redhat.com, thuth@redhat.com,
+        cohuck@redhat.com, lvivier@redhat.com
+Subject: [kvm-unit-tests RFC v1 0/5] Rewrite the allocators
+Date:   Fri, 14 Aug 2020 17:10:04 +0200
+Message-Id: <20200814151009.55845-1-imbrenda@linux.ibm.com>
+X-Mailer: git-send-email 2.26.2
 MIME-Version: 1.0
-References: <20200616224305.44242-1-oupton@google.com> <20200813170331.GI29439@linux.intel.com>
- <CAOQ_QsiVV7Btj5yJ5Dpqxf3V7OuHY3N9b1xW6rrZjyv6dOC8ig@mail.gmail.com> <20200813235940.GA4327@linux.intel.com>
-In-Reply-To: <20200813235940.GA4327@linux.intel.com>
-From:   Oliver Upton <oupton@google.com>
-Date:   Fri, 14 Aug 2020 09:56:33 -0500
-Message-ID: <CAOQ_Qsj2jw+tGkJkRdaQXPrSKhzu-b=SPneBToCz2DrMM3ZYOg@mail.gmail.com>
-Subject: Re: [PATCH] kvm: nVMX: flush TLB when decoded insn != VM-exit reason
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     kvm list <kvm@vger.kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        Peter Shier <pshier@google.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
+ definitions=2020-08-14_09:2020-08-14,2020-08-14 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 suspectscore=2
+ malwarescore=0 priorityscore=1501 mlxlogscore=999 clxscore=1015
+ adultscore=0 spamscore=0 mlxscore=0 phishscore=0 lowpriorityscore=0
+ impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2006250000 definitions=main-2008140114
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Aug 13, 2020 at 6:59 PM Sean Christopherson
-<sean.j.christopherson@intel.com> wrote:
->
-> On Thu, Aug 13, 2020 at 03:44:08PM -0500, Oliver Upton wrote:
-> > On Thu, Aug 13, 2020 at 12:03 PM Sean Christopherson
-> > > > +      *
-> > > > +      * Rather than synthesizing a VM-exit into L1 for every possible
-> > > > +      * instruction just flush the TLB, resume L2, and let hardware generate
-> > > > +      * the appropriate VM-exit.
-> > > > +      */
-> > > > +     vmx_flush_tlb_gva(vcpu, kvm_rip_read(vcpu));
-> > >
-> > > This is wrong, it should flush kvm_get_linear_rip(vcpu).
-> > >
-> >
-> > I do not believe that the aim of this patch will work anymore, since:
-> >
-> > 1dbf5d68af6f ("KVM: VMX: Add guest physical address check in EPT
-> > violation and misconfig")
-> >
-> > Since it is possible to get into the emulator on any instruction that
-> > induces an EPT violation, we'd wind up looping when we believe the
-> > instruction needs to exit to L1 (TLB flush, resume guest, hit the same
-> > EPT violation. Rinse, wash, repeat).
->
-> kvm_get_linear_rip() doesn't walk any page tables, it simply accounts for a
-> non-zero CS.base when !64-bit mode.  If we really wanted to, this could use
-> the emulation context's cached _eip, but I don't see any value in that since
-> both GUEST_CS_* and GUEST_RIP will already be cached by KVM.
->
-> unsigned long kvm_get_linear_rip(struct kvm_vcpu *vcpu)
-> {
->         if (is_64_bit_mode(vcpu))
->                 return kvm_rip_read(vcpu);
->         return (u32)(get_segment_base(vcpu, VCPU_SREG_CS) +
->                      kvm_rip_read(vcpu));
-> }
+The KVM unit tests are increasingly being used to test more than just
+KVM.  They are being used to test TCG, qemu I/O device emulation, other
+hypervisors, and even actual hardeware.
 
-Sorry, I was a tad imprecise. I haven't any issues with your
-suggestion. Rather, I believe that my overall patch is ineffective.
+The existing memory allocators are becoming more and more inadequate to
+the needs of the upcoming unit tests (but also some existing ones, see
+below).
 
-Suppose we had an EPT violation for a GPA that exceeded the guest's
-MAXPHYADDR. Let's also say that the EPT violation occurred on the
-memory operand of an LMSW instruction. Per the aforementioned patch,
-we will dive into the emulator. Since we check intercepts before
-reading the operand out of memory, we will fall through to the default
-case, set intercepted = true, flush TLB and resume.
+Some important features that are lacking:
+* ability to perform a small physical page allocation with a big
+  alignment withtout wasting huge amounts of memory
+* ability to allocate physical pages from specific pools/areaas (e.g.
+  below 16M, or 4G, etc)
+* ability to reserve arbitrary pages (if free), removing them from the
+  free pool
 
->
->
->
-> >
-> > > > +     return X86EMUL_RETRY_INSTR;
-> > > >  }
-> > > >
-> > > >  #ifdef CONFIG_X86_64
-> > > > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> > > > index 00c88c2f34e4..2ab47485100f 100644
-> > > > --- a/arch/x86/kvm/x86.c
-> > > > +++ b/arch/x86/kvm/x86.c
-> > > > @@ -6967,7 +6967,7 @@ int x86_emulate_instruction(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
-> > > >
-> > > >       r = x86_emulate_insn(ctxt);
-> > > >
-> > > > -     if (r == EMULATION_INTERCEPTED)
-> > > > +     if (r == EMULATION_INTERCEPTED || r == EMULATION_RETRY_INSTR)
-> > > >               return 1;
-> > > >
-> > > >       if (r == EMULATION_FAILED) {
-> > > > --
-> > > > 2.27.0.290.gba653c62da-goog
-> > > >
+Some other features that are nice, but not so fundamental:
+* no need for the generic allocator to keep track of metadata
+  (i.e. allocation size), this is now handled by the lower level
+  allocators
+* coalescing small blocks into bigger ones, to allow contiguous memory
+  freed in small blocks in a random order to be used for large
+  allocations again
+
+This is achieved in the following ways:
+
+For the virtual allocator:
+* only the virtul allocator needs one extra page of metadata, but only
+  for allocations that wouldn't fit in one page
+
+For the page allocator:
+* page allocator has up to 4 memory pools, each pool has a metadata
+  area; the metadata has a byte for each page in the area, describing
+  the order of the block it belongs to, and whether it is free
+* if there are no free blocks of the desired size, a bigger block is
+  split until we reach the required size; the unused parts of the block
+  are put back in the free lists
+* if an allocation needs an allocation with a larger alignment than its
+  size, a larger block of (at least) the required order is split; the
+  unused parts put back in the free lists
+* if the allocation could not be satisfied, the next allowed area is
+  searched; the allocation fails only when all allowed areas have been
+  tried
+* new functions to perform allocations from specific areas; the areas
+  are arch-dependent and should be set up by the arch code
+* for now x86 has a memory area for "low" memory under 4GB and one for
+  the rest, while s390x has one for under 2GB and one for the rest;
+  suggestions more fine grained areas are welcome
+* upon freeing a block, an attempt is made to coalesce it into the
+  appropriate neighbour (if it is free), and so on for the resulting
+  larger block thus obtained
+
+For the physical allocator:
+* the minimum alignment is now handled manually, since it has been
+  removed from the common struct
+
+
+This patchset addresses some current but otherwise unsolvable issues on
+s390x, such as the need to allocate a block under 2GB for each SMP CPU
+upon CPU activation.
+
+This patch has been tested on s390x, amd64 and i386. It has also been
+compiled on aarch64.
+
+Claudio Imbrenda (5):
+  lib/vmalloc: vmalloc support for handling allocation metadata
+  lib/alloc_page: complete rewrite of the page allocator
+  lib/alloc: simplify free and malloc
+  lib/alloc.h: remove align_min from struct alloc_ops
+  lib/alloc_page: allow reserving arbitrary memory ranges
+
+ lib/alloc.h      |   3 +-
+ lib/alloc_page.h |  81 +++++++-
+ lib/alloc.c      |  42 +---
+ lib/alloc_page.c | 510 ++++++++++++++++++++++++++++++++++++++---------
+ lib/alloc_phys.c |   9 +-
+ lib/arm/setup.c  |   2 +-
+ lib/s390x/sclp.c |  11 +-
+ lib/s390x/smp.c  |   6 +-
+ lib/vmalloc.c    | 121 +++++++++--
+ s390x/smp.c      |   4 +-
+ 10 files changed, 617 insertions(+), 172 deletions(-)
+
+-- 
+2.26.2
+
