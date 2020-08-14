@@ -2,253 +2,110 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 22083244308
-	for <lists+kvm@lfdr.de>; Fri, 14 Aug 2020 04:31:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C34E024430B
+	for <lists+kvm@lfdr.de>; Fri, 14 Aug 2020 04:34:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726605AbgHNCbn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 13 Aug 2020 22:31:43 -0400
-Received: from mga03.intel.com ([134.134.136.65]:19576 "EHLO mga03.intel.com"
+        id S1726663AbgHNCeK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 13 Aug 2020 22:34:10 -0400
+Received: from mga18.intel.com ([134.134.136.126]:23203 "EHLO mga18.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726564AbgHNCbl (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 13 Aug 2020 22:31:41 -0400
-IronPort-SDR: 9e+vowRjs2rFQyRTkFKXLTUI4XOwBIUhpBi/7QhnTjtvYk82l5pnnvfOS0j5V/ix3hNRh7aetQ
- 2BSNJ0UCdeKg==
-X-IronPort-AV: E=McAfee;i="6000,8403,9712"; a="154312955"
+        id S1726570AbgHNCeK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 13 Aug 2020 22:34:10 -0400
+IronPort-SDR: s9edopWJtEwbSWPxKhescR3UxUeDqtbKe0ArYLuR6gMZvxdiBXsU1iRaS0M3ia12d//dSrvqjj
+ Uf7NJg37+fRw==
+X-IronPort-AV: E=McAfee;i="6000,8403,9712"; a="141974250"
 X-IronPort-AV: E=Sophos;i="5.76,310,1592895600"; 
-   d="scan'208";a="154312955"
+   d="scan'208";a="141974250"
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Aug 2020 19:31:40 -0700
-IronPort-SDR: ydc8MNxHm9rtDWYJvuO+/MVKf91Tex9qic1ifmv9UoBWFpnHtjznmUFTTpKtFdwL3V0OJJ3b9y
- 6zMAvo2/mkwA==
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Aug 2020 19:34:09 -0700
+IronPort-SDR: 4x3/4P/u0xjbCeCodErI8a0w4AFEf7lBlU2baOIMDWcZ5ijkfhArb0MfI1VRiV6EN8ryzIBps4
+ 6Iq/kQAa4FLA==
+X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.76,310,1592895600"; 
-   d="scan'208";a="470432319"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.160])
-  by orsmga005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Aug 2020 19:31:40 -0700
-Date:   Thu, 13 Aug 2020 19:31:39 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+   d="scan'208";a="325595790"
+Received: from cqiang-mobl.ccr.corp.intel.com (HELO [10.238.2.93]) ([10.238.2.93])
+  by orsmga008.jf.intel.com with ESMTP; 13 Aug 2020 19:34:07 -0700
+Subject: Re: [RFC 6/7] KVM: X86: Expose PKS to guest and userspace
+To:     Jim Mattson <jmattson@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Peter Xu <peterx@redhat.com>, Michael Tsirkin <mst@redhat.com>,
-        Julia Suvorova <jsuvorov@redhat.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Andrew Jones <drjones@redhat.com>, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 2/3] KVM: x86: introduce KVM_MEM_PCI_HOLE memory
-Message-ID: <20200814023139.GB4845@linux.intel.com>
-References: <20200807141232.402895-1-vkuznets@redhat.com>
- <20200807141232.402895-3-vkuznets@redhat.com>
+        Joerg Roedel <joro@8bytes.org>,
+        Xiaoyao Li <xiaoyao.li@intel.com>,
+        kvm list <kvm@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>
+References: <20200807084841.7112-1-chenyi.qiang@intel.com>
+ <20200807084841.7112-7-chenyi.qiang@intel.com>
+ <CALMp9eQ=QUZ04_26eXBGHqvQYnsN6JEgiV=ZSSrE395KLX-atA@mail.gmail.com>
+From:   Chenyi Qiang <chenyi.qiang@intel.com>
+Message-ID: <66cc68ea-a599-ffd5-9fc9-dd9c0749e3c8@intel.com>
+Date:   Fri, 14 Aug 2020 10:33:45 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200807141232.402895-3-vkuznets@redhat.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+In-Reply-To: <CALMp9eQ=QUZ04_26eXBGHqvQYnsN6JEgiV=ZSSrE395KLX-atA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Aug 07, 2020 at 04:12:31PM +0200, Vitaly Kuznetsov wrote:
-> PCIe config space can (depending on the configuration) be quite big but
-> usually is sparsely populated. Guest may scan it by accessing individual
-> device's page which, when device is missing, is supposed to have 'pci
-> hole' semantics: reads return '0xff' and writes get discarded. Compared
-> to the already existing KVM_MEM_READONLY, VMM doesn't need to allocate
-> real memory and stuff it with '0xff'.
+
+
+On 8/14/2020 3:04 AM, Jim Mattson wrote:
+> On Fri, Aug 7, 2020 at 1:47 AM Chenyi Qiang <chenyi.qiang@intel.com> wrote:
+>>
+>> Existence of PKS is enumerated via CPUID.(EAX=7H,ECX=0):ECX[31]. It is
+>> enabled by setting CR4.PKS when long mode is active. PKS is only
+>> implemented when EPT is enabled and requires the support of VM_{ENTRY,
+>> EXIT}_LOAD_IA32_PKRS currently.
+>>
+>> Signed-off-by: Chenyi Qiang <chenyi.qiang@intel.com>
 > 
-> Suggested-by: Michael S. Tsirkin <mst@redhat.com>
-> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
-> ---
->  Documentation/virt/kvm/api.rst  | 18 ++++++++++-----
->  arch/x86/include/uapi/asm/kvm.h |  1 +
->  arch/x86/kvm/mmu/mmu.c          |  5 ++++-
->  arch/x86/kvm/mmu/paging_tmpl.h  |  3 +++
->  arch/x86/kvm/x86.c              | 10 ++++++---
->  include/linux/kvm_host.h        |  3 +++
->  include/uapi/linux/kvm.h        |  2 ++
->  virt/kvm/kvm_main.c             | 39 +++++++++++++++++++++++++++------
->  8 files changed, 64 insertions(+), 17 deletions(-)
+>> @@ -967,7 +969,8 @@ int kvm_set_cr4(struct kvm_vcpu *vcpu, unsigned long cr4)
+>>   {
+>>          unsigned long old_cr4 = kvm_read_cr4(vcpu);
+>>          unsigned long pdptr_bits = X86_CR4_PGE | X86_CR4_PSE | X86_CR4_PAE |
+>> -                                  X86_CR4_SMEP | X86_CR4_SMAP | X86_CR4_PKE;
+>> +                                  X86_CR4_SMEP | X86_CR4_SMAP | X86_CR4_PKE |
+>> +                                  X86_CR4_PKS;
 > 
-> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-> index 644e5326aa50..dc4172352635 100644
-> --- a/Documentation/virt/kvm/api.rst
-> +++ b/Documentation/virt/kvm/api.rst
-> @@ -1241,6 +1241,7 @@ yet and must be cleared on entry.
->    /* for kvm_memory_region::flags */
->    #define KVM_MEM_LOG_DIRTY_PAGES	(1UL << 0)
->    #define KVM_MEM_READONLY	(1UL << 1)
-> +  #define KVM_MEM_PCI_HOLE		(1UL << 2)
->  
->  This ioctl allows the user to create, modify or delete a guest physical
->  memory slot.  Bits 0-15 of "slot" specify the slot id and this value
-> @@ -1268,12 +1269,17 @@ It is recommended that the lower 21 bits of guest_phys_addr and userspace_addr
->  be identical.  This allows large pages in the guest to be backed by large
->  pages in the host.
->  
-> -The flags field supports two flags: KVM_MEM_LOG_DIRTY_PAGES and
-> -KVM_MEM_READONLY.  The former can be set to instruct KVM to keep track of
-> -writes to memory within the slot.  See KVM_GET_DIRTY_LOG ioctl to know how to
-> -use it.  The latter can be set, if KVM_CAP_READONLY_MEM capability allows it,
-> -to make a new slot read-only.  In this case, writes to this memory will be
-> -posted to userspace as KVM_EXIT_MMIO exits.
-> +The flags field supports the following flags: KVM_MEM_LOG_DIRTY_PAGES,
-> +KVM_MEM_READONLY, KVM_MEM_PCI_HOLE:
-> +- KVM_MEM_LOG_DIRTY_PAGES: log writes.  Use KVM_GET_DIRTY_LOG to retreive
-> +  the log.
-> +- KVM_MEM_READONLY: exit to userspace with KVM_EXIT_MMIO on writes.  Only
-> +  available when KVM_CAP_READONLY_MEM is present.
-> +- KVM_MEM_PCI_HOLE: always return 0xff on reads, exit to userspace with
-> +  KVM_EXIT_MMIO on writes.  Only available when KVM_CAP_PCI_HOLE_MEM is
-> +  present.  When setting the memory region 'userspace_addr' must be NULL.
-> +  This flag is mutually exclusive with KVM_MEM_LOG_DIRTY_PAGES and with
-> +  KVM_MEM_READONLY.
->  
->  When the KVM_CAP_SYNC_MMU capability is available, changes in the backing of
->  the memory region are automatically reflected into the guest.  For example, an
-> diff --git a/arch/x86/include/uapi/asm/kvm.h b/arch/x86/include/uapi/asm/kvm.h
-> index 17c5a038f42d..cf80a26d74f5 100644
-> --- a/arch/x86/include/uapi/asm/kvm.h
-> +++ b/arch/x86/include/uapi/asm/kvm.h
-> @@ -48,6 +48,7 @@
->  #define __KVM_HAVE_XSAVE
->  #define __KVM_HAVE_XCRS
->  #define __KVM_HAVE_READONLY_MEM
-> +#define __KVM_HAVE_PCI_HOLE_MEM
->  
->  /* Architectural interrupt line count. */
->  #define KVM_NR_INTERRUPTS 256
-> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> index fef6956393f7..4a2a7fface1e 100644
-> --- a/arch/x86/kvm/mmu/mmu.c
-> +++ b/arch/x86/kvm/mmu/mmu.c
-> @@ -3254,7 +3254,7 @@ static int kvm_mmu_hugepage_adjust(struct kvm_vcpu *vcpu, gfn_t gfn,
->  		return PG_LEVEL_4K;
->  
->  	slot = gfn_to_memslot_dirty_bitmap(vcpu, gfn, true);
-> -	if (!slot)
-> +	if (!slot || (slot->flags & KVM_MEM_PCI_HOLE))
-
-This is unnecessary since you're setting disallow_lpage in
-kvm_alloc_memslot_metadata().
-
->  		return PG_LEVEL_4K;
->  
->  	max_level = min(max_level, max_huge_page_level);
-> @@ -4105,6 +4105,9 @@ static int direct_page_fault(struct kvm_vcpu *vcpu, gpa_t gpa, u32 error_code,
->  
->  	slot = kvm_vcpu_gfn_to_memslot(vcpu, gfn);
->  
-> +	if (!write && slot && (slot->flags & KVM_MEM_PCI_HOLE))
-
-I'm confused.  Why does this short circuit reads but not writes?
-
-> +		return RET_PF_EMULATE;
-> +
->  	if (try_async_pf(vcpu, slot, prefault, gfn, gpa, &pfn, write,
->  			 &map_writable))
->  		return RET_PF_RETRY;
-> diff --git a/arch/x86/kvm/mmu/paging_tmpl.h b/arch/x86/kvm/mmu/paging_tmpl.h
-> index 5c6a895f67c3..27abd69e69f6 100644
-> --- a/arch/x86/kvm/mmu/paging_tmpl.h
-> +++ b/arch/x86/kvm/mmu/paging_tmpl.h
-> @@ -836,6 +836,9 @@ static int FNAME(page_fault)(struct kvm_vcpu *vcpu, gpa_t addr, u32 error_code,
->  
->  	slot = kvm_vcpu_gfn_to_memslot(vcpu, walker.gfn);
->  
-> +	if (!write_fault && slot && (slot->flags & KVM_MEM_PCI_HOLE))
-> +		return RET_PF_EMULATE;
-> +
->  	if (try_async_pf(vcpu, slot, prefault, walker.gfn, addr, &pfn,
->  			 write_fault, &map_writable))
->  		return RET_PF_RETRY;
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index dc4370394ab8..538bc58a22db 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -3515,6 +3515,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
->  	case KVM_CAP_EXCEPTION_PAYLOAD:
->  	case KVM_CAP_SET_GUEST_DEBUG:
->  	case KVM_CAP_LAST_CPU:
-> +	case KVM_CAP_PCI_HOLE_MEM:
->  		r = 1;
->  		break;
->  	case KVM_CAP_SYNC_REGS:
-> @@ -10114,9 +10115,11 @@ static int kvm_alloc_memslot_metadata(struct kvm_memory_slot *slot,
->  		ugfn = slot->userspace_addr >> PAGE_SHIFT;
->  		/*
->  		 * If the gfn and userspace address are not aligned wrt each
-> -		 * other, disable large page support for this slot.
-> +		 * other, disable large page support for this slot. Also,
-> +		 * disable large page support for KVM_MEM_PCI_HOLE slots.
->  		 */
-> -		if ((slot->base_gfn ^ ugfn) & (KVM_PAGES_PER_HPAGE(level) - 1)) {
-> +		if ((slot->flags & KVM_MEM_PCI_HOLE) || ((slot->base_gfn ^ ugfn) &
-> +				      (KVM_PAGES_PER_HPAGE(level) - 1))) {
->  			unsigned long j;
->  
->  			for (j = 0; j < lpages; ++j)
-> @@ -10178,7 +10181,8 @@ static void kvm_mmu_slot_apply_flags(struct kvm *kvm,
->  	 * Nothing to do for RO slots or CREATE/MOVE/DELETE of a slot.
->  	 * See comments below.
->  	 */
-> -	if ((change != KVM_MR_FLAGS_ONLY) || (new->flags & KVM_MEM_READONLY))
-> +	if ((change != KVM_MR_FLAGS_ONLY) ||
-> +	    (new->flags & (KVM_MEM_READONLY | KVM_MEM_PCI_HOLE)))
->  		return;
->  
->  	/*
-> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-> index 989afcbe642f..de1faa64a8ef 100644
-> --- a/include/linux/kvm_host.h
-> +++ b/include/linux/kvm_host.h
-> @@ -1081,6 +1081,9 @@ __gfn_to_memslot(struct kvm_memslots *slots, gfn_t gfn)
->  static inline unsigned long
->  __gfn_to_hva_memslot(struct kvm_memory_slot *slot, gfn_t gfn)
->  {
-> +	/* Should never be called with a KVM_MEM_PCI_HOLE slot */
-> +	BUG_ON(!slot->userspace_addr);
-
-So _technically_, userspace can hit this by allowing virtual address 0,
-which is very much non-standard, but theoretically legal.  It'd probably be
-better to use a value that can't possibly be a valid userspace_addr, e.g. a
-non-canonical value.
-
-> +
->  	return slot->userspace_addr + (gfn - slot->base_gfn) * PAGE_SIZE;
->  }
->  
-
-...
-
-> @@ -2318,6 +2338,11 @@ static int __kvm_read_guest_page(struct kvm_memory_slot *slot, gfn_t gfn,
->  	int r;
->  	unsigned long addr;
->  
-> +	if (unlikely(slot && (slot->flags & KVM_MEM_PCI_HOLE))) {
-> +		memset(data, 0xff, len);
-> +		return 0;
-> +	}
-
-This feels wrong, shouldn't we be treating PCI_HOLE as MMIO?  Given that
-this is performance oriented, I would think we'd want to leverage the
-GPA from the VMCS instead of doing a full translation.
-
-That brings up a potential alternative to adding a memslot flag.  What if
-we instead add a KVM_MMIO_BUS device similar to coalesced MMIO?  I think
-it'd be about the same amount of KVM code, and it would provide userspace
-with more flexibility, e.g. I assume it would allow handling even writes
-wholly within the kernel for certain ranges and/or use cases, and it'd
-allow stuffing a value other than 0xff (though I have no idea if there is
-a use case for this).
-
-Speaking of which, why do writes go to userspace in this series?
-
-> +
->  	addr = gfn_to_hva_memslot_prot(slot, gfn, NULL);
->  	if (kvm_is_error_hva(addr))
->  		return -EFAULT;
-> -- 
-> 2.25.4
+> This list already seems overly long, but I don't think CR4.PKS belongs
+> here. In volume 3 of the SDM, section 4.4.1, it says:
 > 
+> - If PAE paging would be in use following an execution of MOV to CR0
+> or MOV to CR4 (see Section 4.1.1) and the instruction is modifying any
+> of CR0.CD, CR0.NW, CR0.PG, CR4.PAE, CR4.PGE, CR4.PSE, or CR4.SMEP;
+> then the PDPTEs are loaded from the address in CR3.
+> 
+> CR4.PKS is not in the list of CR4 bits that result in a PDPTE load.
+> Since it has no effect on PAE paging, I would be surprised if it did
+> result in a PDPTE load.
+> 
+
+Oh, My mistake.
+
+>>          if (kvm_valid_cr4(vcpu, cr4))
+>>                  return 1;
+>> @@ -1202,7 +1205,7 @@ static const u32 msrs_to_save_all[] = {
+>>          MSR_IA32_RTIT_ADDR1_A, MSR_IA32_RTIT_ADDR1_B,
+>>          MSR_IA32_RTIT_ADDR2_A, MSR_IA32_RTIT_ADDR2_B,
+>>          MSR_IA32_RTIT_ADDR3_A, MSR_IA32_RTIT_ADDR3_B,
+>> -       MSR_IA32_UMWAIT_CONTROL,
+>> +       MSR_IA32_UMWAIT_CONTROL, MSR_IA32_PKRS,
+> 
+> Should MSR_IA32_PKRS be added to the switch statement in
+> kvm_init_msr_list()? Something like...
+> 
+> case MSR_IA32_PKRS:
+>          if (!kvm_cpu_cap_has(X86_FEATURE_PKRS))
+>                  continue;
+>          break;
+> 
+
+Yes, this should be added.
