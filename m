@@ -2,96 +2,234 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D52D12448CE
-	for <lists+kvm@lfdr.de>; Fri, 14 Aug 2020 13:29:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 58F2A244939
+	for <lists+kvm@lfdr.de>; Fri, 14 Aug 2020 13:49:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726796AbgHNL3T (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 14 Aug 2020 07:29:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38038 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726213AbgHNL3S (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 14 Aug 2020 07:29:18 -0400
-Received: from mail-yb1-xb33.google.com (mail-yb1-xb33.google.com [IPv6:2607:f8b0:4864:20::b33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A02AEC061384
-        for <kvm@vger.kernel.org>; Fri, 14 Aug 2020 04:29:17 -0700 (PDT)
-Received: by mail-yb1-xb33.google.com with SMTP id e187so5025784ybc.5
-        for <kvm@vger.kernel.org>; Fri, 14 Aug 2020 04:29:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:reply-to:from:date:message-id:subject:to
-         :content-transfer-encoding;
-        bh=Duxa+mmNF3T3C2WDKsmzowR2OzvdY892XFjTPp0RWRI=;
-        b=CSC8pIK/V9tCgnP0P7V6gYuNnTUcyU6DWCFveVuPzoVSmqd8ERAeTRu4vmnMYBOBCF
-         tjIQWoF0l3HF/ZE+vRYIGJZY0ne21SeUEIi6qts4iIfadoqWi2DmywCkE8gU8ZieO7mq
-         RT5Svavexu6pMd6MtomowSrfl3rCweyWp8vnVvbXlu+86NoaxvYzJ8Wb+YYqtm+sL0qC
-         0diRzo9F2spdoeFOwEc7wkdkMBH6+6TIInmXE0IQrOysYgnmgNvGDPc7isO9IjbJQYov
-         Q7M+SyWwwo30UIxb6kwsaL9NjqSqG/z+mhVLruY/jNM4Iw3fCO6BOvOCmcJbl4htlDTq
-         i98w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:reply-to:from:date:message-id
-         :subject:to:content-transfer-encoding;
-        bh=Duxa+mmNF3T3C2WDKsmzowR2OzvdY892XFjTPp0RWRI=;
-        b=K7Ss4VjNZtRcoiK2Riqac3kCf2V7QCOmj3gPm3K65azWm2iu+4u+CzDfWamrKoMoth
-         DztHK+GMdYS8osmpbvtCNk0HcAGQPnA/WaFS1Hk+MXWylLJMxjNanCjrfO4Jbp09hDMU
-         fYZZYspLoVRgXZM9ByP1UgQeHMgOe/BDYUVuDOyAMlwtLxsuToQ9ljP8ED0cxD8r75LV
-         15F8KHsm2DCNLV4EQVjiwRdOsCVLq6KGXntp2vHn4JI+Ca2q5cIA1vyFFVNO+zVmkExg
-         9S065rp8L8rdHGawi/6tc94iVeZoMBeOKdklQmUnCRA5ZRC1cCWOYliKuzxVOodZYJ9J
-         kPeg==
-X-Gm-Message-State: AOAM530WyNNb0u8RyIdPu19cFP+2Wfyvmw0Jf0Uc0hdy9eZbZ/qJ4ytA
-        Pqxb8AhLmfk1YBvwf4ddMNmUrmYeDWXMK6n1kyw=
-X-Google-Smtp-Source: ABdhPJz22S5Fp3II8TbvRhZyh+YLcyl2/lwHOUXtaE6yYsZbWbrhDPm8/2cLR/6cEc07QBjGbqfIRtaUG0H9MK/BWPs=
-X-Received: by 2002:a25:1943:: with SMTP id 64mr3170684ybz.14.1597404554803;
- Fri, 14 Aug 2020 04:29:14 -0700 (PDT)
+        id S1726313AbgHNLt3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 14 Aug 2020 07:49:29 -0400
+Received: from szxga08-in.huawei.com ([45.249.212.255]:40280 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726265AbgHNLt2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 14 Aug 2020 07:49:28 -0400
+Received: from DGGEMM405-HUB.china.huawei.com (unknown [172.30.72.57])
+        by Forcepoint Email with ESMTP id DE60DC661D09D9596E6C;
+        Fri, 14 Aug 2020 19:49:24 +0800 (CST)
+Received: from dggema765-chm.china.huawei.com (10.1.198.207) by
+ DGGEMM405-HUB.china.huawei.com (10.3.20.213) with Microsoft SMTP Server (TLS)
+ id 14.3.487.0; Fri, 14 Aug 2020 19:49:24 +0800
+Received: from [10.174.185.187] (10.174.185.187) by
+ dggema765-chm.china.huawei.com (10.1.198.207) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
+ 15.1.1913.5; Fri, 14 Aug 2020 19:49:24 +0800
+Subject: Re: [RFC 2/4] kvm: arm64: emulate the ID registers
+To:     Andrew Jones <drjones@redhat.com>
+References: <20200813060517.2360048-1-liangpeng10@huawei.com>
+ <20200813060517.2360048-3-liangpeng10@huawei.com>
+ <20200813090558.3eqwoxp7m6jmknft@kamzik.brq.redhat.com>
+CC:     <kvmarm@lists.cs.columbia.edu>, <kvm@vger.kernel.org>,
+        <maz@kernel.org>, <will@kernel.org>,
+        Zhanghailiang <zhang.zhanghailiang@huawei.com>,
+        xiexiangyou 00584000 <xiexiangyou@huawei.com>,
+        zhukeqian 00502301 <zhukeqian1@huawei.com>
+From:   Peng Liang <liangpeng10@huawei.com>
+Message-ID: <a9eddc75-2c70-58bb-6373-7328be5774e1@huawei.com>
+Date:   Fri, 14 Aug 2020 19:49:23 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.1.1
 MIME-Version: 1.0
-Received: by 2002:a26:1284:0:0:0:0:0 with HTTP; Fri, 14 Aug 2020 04:29:14
- -0700 (PDT)
-Reply-To: sctnld11170@tlen.pl
-From:   "Mr. Scott Donald" <mariam.cook20145@gmail.com>
-Date:   Fri, 14 Aug 2020 04:29:14 -0700
-Message-ID: <CAEyMmcmx8L3Gbe7KPQ3-BPQ2-pfjo3Ghis5pnZJaD-UpkDP99g@mail.gmail.com>
-Subject: Hello. Please
-To:     undisclosed-recipients:;
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20200813090558.3eqwoxp7m6jmknft@kamzik.brq.redhat.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.174.185.187]
+X-ClientProxiedBy: dggeme703-chm.china.huawei.com (10.1.199.99) To
+ dggema765-chm.china.huawei.com (10.1.198.207)
+X-CFilter-Loop: Reflected
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
---=20
-Dear Friend,
+On 8/13/2020 5:05 PM, Andrew Jones wrote:
+> On Thu, Aug 13, 2020 at 02:05:15PM +0800, Peng Liang wrote:
+>> To emulate the ID registers, we need a place to storage the values of
+>> the ID regsiters.  Maybe putting in kvm_arch_vcpu is a good idea.
+>>
+>> This commit has no functional changes but only code refactor.  When
+>> initializing a vcpu, get the values of the ID registers from
+>> arm64_ftr_regs and storage them in kvm_arch_vcpu.  And we just read
+>> the value from kvm_arch_vcpu when getting/setting the value of the ID
+>> regs.
+>>
+>> Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
+>> Signed-off-by: Peng Liang <liangpeng10@huawei.com>
+>> ---
+>>  arch/arm64/include/asm/kvm_host.h |  2 ++
+>>  arch/arm64/kvm/arm.c              | 20 ++++++++++++++++++++
+>>  arch/arm64/kvm/sys_regs.c         | 27 +++++++++++++++++++++++----
+>>  include/uapi/linux/kvm.h          | 11 +++++++++++
+>>  4 files changed, 56 insertions(+), 4 deletions(-)
+>>
+>> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+>> index f81151ad3d3c..7f7bd36702f7 100644
+>> --- a/arch/arm64/include/asm/kvm_host.h
+>> +++ b/arch/arm64/include/asm/kvm_host.h
+>> @@ -336,6 +336,8 @@ struct kvm_vcpu_arch {
+>>  		u64 last_steal;
+>>  		gpa_t base;
+>>  	} steal;
+>> +
+>> +	struct id_registers idregs;
+>>  };
+>>  
+>>  /* Pointer to the vcpu's SVE FFR for sve_{save,load}_state() */
+>> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+>> index 73e12869afe3..18ebbe1c64ee 100644
+>> --- a/arch/arm64/kvm/arm.c
+>> +++ b/arch/arm64/kvm/arm.c
+>> @@ -262,6 +262,24 @@ int kvm_arch_vcpu_precreate(struct kvm *kvm, unsigned int id)
+>>  	return 0;
+>>  }
+>>  
+>> +static int get_cpu_ftr(u32 id, u64 val, void *argp)
+>> +{
+>> +	struct id_registers *idregs = argp;
+>> +
+>> +	/*
+>> +	 * (Op0, Op1, CRn, CRm, Op2) of ID registers is (3, 0, 0, crm, op2),
+>> +	 * where 1<=crm<8, 0<=op2<8.
+>> +	 */
+>> +	if (sys_reg_Op0(id) == 3 && sys_reg_Op1(id) == 0 &&
+>> +	    sys_reg_CRn(id) == 0 && sys_reg_CRm(id) > 0) {
+>> +		idregs->regs[idregs->num].sys_id = id;
+>> +		idregs->regs[idregs->num].sys_val = val;
+>> +		idregs->num++;
+> 
+> This num++ means we should ensure get_cpu_ftr() is only used once per
+> VCPU, but we don't need 'num'. The index can be derived: (crm<<3)|op2
+> 
+>> +	}
+>> +
+>> +	return 0;
+>> +}
+>> +
+>>  int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
+>>  {
+>>  	int err;
+>> @@ -285,6 +303,8 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
+>>  	if (err)
+>>  		return err;
+>>  
+>> +	arm64_cpu_ftr_regs_traverse(get_cpu_ftr, &vcpu->arch.idregs);
+>> +
+>>  	return create_hyp_mappings(vcpu, vcpu + 1, PAGE_HYP);
+>>  }
+>>  
+>> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+>> index 138961d7ebe3..776c2757a01e 100644
+>> --- a/arch/arm64/kvm/sys_regs.c
+>> +++ b/arch/arm64/kvm/sys_regs.c
+>> @@ -1092,13 +1092,32 @@ static bool access_arch_timer(struct kvm_vcpu *vcpu,
+>>  	return true;
+>>  }
+>>  
+>> +static struct id_reg_info *kvm_id_reg(struct kvm_vcpu *vcpu, u64 id)
+>> +{
+>> +	int i;
+>> +
+>> +	for (i = 0; i < vcpu->arch.idregs.num; ++i) {
+>> +		if (vcpu->arch.idregs.regs[i].sys_id == id)
+>> +			return &vcpu->arch.idregs.regs[i];
+> 
+> With a derived index we don't need to search. Just do
+> 
+>  if (sys_reg_Op0(id) != 3 || sys_reg_Op1(id) != 0 ||
+>      sys_reg_CRn(id) != 0 || sys_reg_CRm(id) == 0)
+>       return NULL;
+> 
+>  return &vcpu->arch.idregs.regs[(sys_reg_CRm(id)<<3) | sys_reg_Op2(id)]; 
+>  
+> 
 
-I'm Mr. Scott Donald a Successful businessMan dealing with
-Exportation, I got your mail contact through search to let you know my
-intension and my Ugly Situation Am a dying Man here in Los Angeles
-California Hospital Bed in (USA), I Lost my Wife and my only Daughter
-for Covid-19 and I also have a problem in my Health and I can die
-anytime I Know,
+Thank you for your suggestions.
 
-I have a project that I am about to hand over to you. and I already
-instructed the Bankia S.A. Madrid, Spain(BSA) to transfer my fund sum
-of =C2=A33,7M GBP. Equivalent to =E2=82=AC4,077,033.91 EUR, to you as to en=
-able you
-to give 50% of this fund to Charitable Home in your State and take 50%
-don't think otherwise and why would anybody send someone you barely
-know to help you deliver a message, help me do this for the happiness
-of my soul and for God to mercy me and my Family and give Us a good
-place.
+>> +	}
+>> +	return NULL;
+>> +}
+>> +
+>> +static u64 kvm_get_id_reg(struct kvm_vcpu *vcpu, u64 id)
+>> +{
+>> +	struct id_reg_info *ri = kvm_id_reg(vcpu, id);
+>> +
+>> +	BUG_ON(!ri);
+>> +	return ri->sys_val;
+>> +}
+>> +
+>>  /* Read a sanitised cpufeature ID register by sys_reg_desc */
+>> -static u64 read_id_reg(const struct kvm_vcpu *vcpu,
+>> +static u64 read_id_reg(struct kvm_vcpu *vcpu,
+>>  		struct sys_reg_desc const *r, bool raz)
+>>  {
+>>  	u32 id = sys_reg((u32)r->Op0, (u32)r->Op1,
+>>  			 (u32)r->CRn, (u32)r->CRm, (u32)r->Op2);
+>> -	u64 val = raz ? 0 : read_sanitised_ftr_reg(id);
+>> +	u64 val = raz ? 0 : kvm_get_id_reg(vcpu, id);
+>>  
+>>  	if (id == SYS_ID_AA64PFR0_EL1) {
+>>  		if (!vcpu_has_sve(vcpu))
+>> @@ -1238,7 +1257,7 @@ static int set_id_aa64zfr0_el1(struct kvm_vcpu *vcpu,
+>>   * are stored, and for set_id_reg() we don't allow the effective value
+>>   * to be changed.
+>>   */
+>> -static int __get_id_reg(const struct kvm_vcpu *vcpu,
+>> +static int __get_id_reg(struct kvm_vcpu *vcpu,
+>>  			const struct sys_reg_desc *rd, void __user *uaddr,
+>>  			bool raz)
+>>  {
+>> @@ -1248,7 +1267,7 @@ static int __get_id_reg(const struct kvm_vcpu *vcpu,
+>>  	return reg_to_user(uaddr, &val, id);
+>>  }
+>>  
+>> -static int __set_id_reg(const struct kvm_vcpu *vcpu,
+>> +static int __set_id_reg(struct kvm_vcpu *vcpu,
+>>  			const struct sys_reg_desc *rd, void __user *uaddr,
+>>  			bool raz)
+>>  {
+>> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+>> index f6d86033c4fa..1029444d04aa 100644
+>> --- a/include/uapi/linux/kvm.h
+>> +++ b/include/uapi/linux/kvm.h
+>> @@ -1272,6 +1272,17 @@ struct kvm_vfio_spapr_tce {
+>>  	__s32	tablefd;
+>>  };
+>>  
+>> +#define ID_REG_MAX_NUMS 64
+>> +struct id_reg_info {
+>> +	uint64_t sys_id;
+>> +	uint64_t sys_val;
+> 
+> I'm not sure the 'sys_' prefix is necessary.
+> 
+>> +};
+>> +
+>> +struct id_registers {
+>> +	struct id_reg_info regs[ID_REG_MAX_NUMS];
+>> +	uint64_t num;
+>> +};
+>> +
+> 
+> This is arch specific, so there should be ARMv8 in the names.
 
-please, do as I said there was someone from your State that I deeply
-love so very very much and I miss her so badly I have no means to
-reach any Charitable Home there. that is why I go for a personal
-search of the Country and State and I got your mail contact through
-search to let you know my Bitterness and please, help me is getting
-Dark I ask my Doctor to help me keep you notice failure for me to
-reach you in person Your urgent Response, here is my Doctor Whats-app
-Number for urgent notice +13019692737
+Some names are not very suitable, I'll change them.
 
-Hope To Hear From You. I'm sending this email to you for the second
-time yet no response from you.
+> 
+>>  /*
+>>   * ioctls for VM fds
+>>   */
+>> -- 
+>> 2.18.4
+>>
+> 
+> .
+> 
 
-My Regards.
-
-Mr. Scott Donald
-CEO
