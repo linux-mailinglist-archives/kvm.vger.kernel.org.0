@@ -2,254 +2,239 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id F2B8E2449FC
-	for <lists+kvm@lfdr.de>; Fri, 14 Aug 2020 14:51:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8BC76244A21
+	for <lists+kvm@lfdr.de>; Fri, 14 Aug 2020 15:06:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728170AbgHNMvv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 14 Aug 2020 08:51:51 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:24817 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1728055AbgHNMvu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 14 Aug 2020 08:51:50 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1597409507;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=Rk6ITuCn7zU0e7A2NQrTHTju/fxpAw6G/R1jmaxYFto=;
-        b=VTaooTQBzPfWCKdzptkMCcQQ813tMEkMZUwlf4UUrk6Ry4WOp0xpUyxnc7xC7ZDlMAb6iY
-        OcYBm24rVkGtXJpjRhXcCJxog+pMkMZfzRAKRHBBhvzbhCSpNP/9sXpsZtS3OYWrBlSs4Y
-        zBJYKvJZtnLBKaWuULdaDDfD05F7jk4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-178-b-7UvObSNSCX7uE_UBnHhA-1; Fri, 14 Aug 2020 08:51:43 -0400
-X-MC-Unique: b-7UvObSNSCX7uE_UBnHhA-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 442B5106B81C;
-        Fri, 14 Aug 2020 12:51:42 +0000 (UTC)
-Received: from kamzik.brq.redhat.com (unknown [10.40.192.63])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id B73255C1C2;
-        Fri, 14 Aug 2020 12:51:38 +0000 (UTC)
-Date:   Fri, 14 Aug 2020 14:51:35 +0200
-From:   Andrew Jones <drjones@redhat.com>
-To:     Peng Liang <liangpeng10@huawei.com>
-Cc:     kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, maz@kernel.org,
-        will@kernel.org, Zhanghailiang <zhang.zhanghailiang@huawei.com>,
-        xiexiangyou 00584000 <xiexiangyou@huawei.com>,
-        zhukeqian 00502301 <zhukeqian1@huawei.com>
-Subject: Re: [RFC 2/4] kvm: arm64: emulate the ID registers
-Message-ID: <20200814125135.i2uz74vqunwik4fz@kamzik.brq.redhat.com>
-References: <20200813060517.2360048-1-liangpeng10@huawei.com>
- <20200813060517.2360048-3-liangpeng10@huawei.com>
- <20200813090558.3eqwoxp7m6jmknft@kamzik.brq.redhat.com>
- <20200813100200.mvcumaeifnqezelm@kamzik.brq.redhat.com>
- <bc64b90c-db51-02cf-28af-0af2fddc3e90@huawei.com>
+        id S1726945AbgHNNGr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 14 Aug 2020 09:06:47 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:39558 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726139AbgHNNGp (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 14 Aug 2020 09:06:45 -0400
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 07ED2AuZ139660;
+        Fri, 14 Aug 2020 09:06:44 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : in-reply-to : references : date : message-id : mime-version :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=v45GiFYyi6zned0O6yfjwXviSuIpFQP0lrJJKKfZ1Eo=;
+ b=JOG4sEiUVntBRYEewKGdeaF2QRuIOkerETRWfKza0X/GRlSa2sDluB+H1GIxcH89jY+2
+ 1kpvafakf6phAWhrseA0Zd07mzklUONGC1BOW75qR1wkGLPSGu/4wD/xE2Li3YJbH87b
+ JDSSdJ3YOrjwHiuxlHdNU6D8r8+Mw4MQvN9CFvD22p+Xm28pW8atxR9S+81y+geu5CDL
+ aPpcSVRFNeRUw50YLpShe1gVERJufEnOzA2eePMFYFXZIxFSoGQQ9nvHSKkREbhWrF/2
+ FXfIVIOd2Z3/c7ZnjpgTLA9etL9v6bznimUa1tfndCkn/ywdvlin1/BMKfAQYwm/n5c6 SQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 32w30r7bms-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 14 Aug 2020 09:06:44 -0400
+Received: from m0098394.ppops.net (m0098394.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 07ED4nUJ153006;
+        Fri, 14 Aug 2020 09:06:44 -0400
+Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com [159.122.73.71])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 32w30r7bkq-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 14 Aug 2020 09:06:44 -0400
+Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
+        by ppma02fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 07ED5UK9008167;
+        Fri, 14 Aug 2020 13:06:41 GMT
+Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
+        by ppma02fra.de.ibm.com with ESMTP id 32skp7v3qu-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 14 Aug 2020 13:06:41 +0000
+Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
+        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 07ED5AKw63439334
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 14 Aug 2020 13:05:10 GMT
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id A92FC4C040;
+        Fri, 14 Aug 2020 13:06:38 +0000 (GMT)
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 37C9B4C04E;
+        Fri, 14 Aug 2020 13:06:38 +0000 (GMT)
+Received: from marcibm (unknown [9.145.57.205])
+        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
+        Fri, 14 Aug 2020 13:06:38 +0000 (GMT)
+From:   Marc Hartmayer <mhartmay@linux.ibm.com>
+To:     Andrew Jones <drjones@redhat.com>,
+        Marc Hartmayer <mhartmay@linux.ibm.com>
+Cc:     kvm@vger.kernel.org, Thomas Huth <thuth@redhat.com>,
+        David Hildenbrand <david@redhat.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        linux-s390@vger.kernel.org
+Subject: Re: [kvm-unit-tests RFC v2 3/4] run_tests/mkstandalone: add arch dependent function to `for_each_unittest`
+In-Reply-To: <20200813083000.e4bscohuhgl3jdv4@kamzik.brq.redhat.com>
+References: <20200812092705.17774-1-mhartmay@linux.ibm.com> <20200812092705.17774-4-mhartmay@linux.ibm.com> <20200813083000.e4bscohuhgl3jdv4@kamzik.brq.redhat.com>
+Date:   Fri, 14 Aug 2020 15:06:36 +0200
+Message-ID: <87h7t51in7.fsf@linux.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <bc64b90c-db51-02cf-28af-0af2fddc3e90@huawei.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
+ definitions=2020-08-14_07:2020-08-14,2020-08-14 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 mlxscore=0
+ adultscore=0 clxscore=1015 lowpriorityscore=0 phishscore=0 suspectscore=2
+ impostorscore=0 mlxlogscore=999 spamscore=0 priorityscore=1501
+ malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2006250000 definitions=main-2008140096
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Aug 14, 2020 at 07:49:43PM +0800, Peng Liang wrote:
-> On 8/13/2020 6:02 PM, Andrew Jones wrote:
-> > On Thu, Aug 13, 2020 at 11:05:58AM +0200, Andrew Jones wrote:
-> >> On Thu, Aug 13, 2020 at 02:05:15PM +0800, Peng Liang wrote:
-> >>> To emulate the ID registers, we need a place to storage the values of
-> >>> the ID regsiters.  Maybe putting in kvm_arch_vcpu is a good idea.
-> >>>
-> >>> This commit has no functional changes but only code refactor.  When
-> >>> initializing a vcpu, get the values of the ID registers from
-> >>> arm64_ftr_regs and storage them in kvm_arch_vcpu.  And we just read
-> >>> the value from kvm_arch_vcpu when getting/setting the value of the ID
-> >>> regs.
-> >>>
-> >>> Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
-> >>> Signed-off-by: Peng Liang <liangpeng10@huawei.com>
-> >>> ---
-> >>>  arch/arm64/include/asm/kvm_host.h |  2 ++
-> >>>  arch/arm64/kvm/arm.c              | 20 ++++++++++++++++++++
-> >>>  arch/arm64/kvm/sys_regs.c         | 27 +++++++++++++++++++++++----
-> >>>  include/uapi/linux/kvm.h          | 11 +++++++++++
-> >>>  4 files changed, 56 insertions(+), 4 deletions(-)
-> >>>
-> >>> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> >>> index f81151ad3d3c..7f7bd36702f7 100644
-> >>> --- a/arch/arm64/include/asm/kvm_host.h
-> >>> +++ b/arch/arm64/include/asm/kvm_host.h
-> >>> @@ -336,6 +336,8 @@ struct kvm_vcpu_arch {
-> >>>  		u64 last_steal;
-> >>>  		gpa_t base;
-> >>>  	} steal;
-> >>> +
-> >>> +	struct id_registers idregs;
-> >>>  };
-> >>>  
-> >>>  /* Pointer to the vcpu's SVE FFR for sve_{save,load}_state() */
-> >>> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> >>> index 73e12869afe3..18ebbe1c64ee 100644
-> >>> --- a/arch/arm64/kvm/arm.c
-> >>> +++ b/arch/arm64/kvm/arm.c
-> >>> @@ -262,6 +262,24 @@ int kvm_arch_vcpu_precreate(struct kvm *kvm, unsigned int id)
-> >>>  	return 0;
-> >>>  }
-> >>>  
-> >>> +static int get_cpu_ftr(u32 id, u64 val, void *argp)
-> >>> +{
-> >>> +	struct id_registers *idregs = argp;
-> >>> +
-> >>> +	/*
-> >>> +	 * (Op0, Op1, CRn, CRm, Op2) of ID registers is (3, 0, 0, crm, op2),
-> >>> +	 * where 1<=crm<8, 0<=op2<8.
-> >>> +	 */
-> >>> +	if (sys_reg_Op0(id) == 3 && sys_reg_Op1(id) == 0 &&
-> >>> +	    sys_reg_CRn(id) == 0 && sys_reg_CRm(id) > 0) {
-> >>> +		idregs->regs[idregs->num].sys_id = id;
-> >>> +		idregs->regs[idregs->num].sys_val = val;
-> >>> +		idregs->num++;
-> >>
-> >> This num++ means we should ensure get_cpu_ftr() is only used once per
-> >> VCPU, but we don't need 'num'. The index can be derived: (crm<<3)|op2
-> >>
-> >>> +	}
-> >>> +
-> >>> +	return 0;
-> >>> +}
-> >>> +
-> >>>  int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
-> >>>  {
-> >>>  	int err;
-> >>> @@ -285,6 +303,8 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
-> >>>  	if (err)
-> >>>  		return err;
-> >>>  
-> >>> +	arm64_cpu_ftr_regs_traverse(get_cpu_ftr, &vcpu->arch.idregs);
-> >>> +
-> >>>  	return create_hyp_mappings(vcpu, vcpu + 1, PAGE_HYP);
-> >>>  }
-> >>>  
-> >>> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> >>> index 138961d7ebe3..776c2757a01e 100644
-> >>> --- a/arch/arm64/kvm/sys_regs.c
-> >>> +++ b/arch/arm64/kvm/sys_regs.c
-> >>> @@ -1092,13 +1092,32 @@ static bool access_arch_timer(struct kvm_vcpu *vcpu,
-> >>>  	return true;
-> >>>  }
-> >>>  
-> >>> +static struct id_reg_info *kvm_id_reg(struct kvm_vcpu *vcpu, u64 id)
-> >>> +{
-> >>> +	int i;
-> >>> +
-> >>> +	for (i = 0; i < vcpu->arch.idregs.num; ++i) {
-> >>> +		if (vcpu->arch.idregs.regs[i].sys_id == id)
-> >>> +			return &vcpu->arch.idregs.regs[i];
-> >>
-> >> With a derived index we don't need to search. Just do
-> >>
-> >>  if (sys_reg_Op0(id) != 3 || sys_reg_Op1(id) != 0 ||
-> >>      sys_reg_CRn(id) != 0 || sys_reg_CRm(id) == 0)
-> >>       return NULL;
-> >>
-> >>  return &vcpu->arch.idregs.regs[(sys_reg_CRm(id)<<3) | sys_reg_Op2(id)]; 
-> >>  
-> >>
-> >>> +	}
-> >>> +	return NULL;
-> >>> +}
-> >>> +
-> >>> +static u64 kvm_get_id_reg(struct kvm_vcpu *vcpu, u64 id)
-> >>> +{
-> >>> +	struct id_reg_info *ri = kvm_id_reg(vcpu, id);
-> >>> +
-> >>> +	BUG_ON(!ri);
-> >>> +	return ri->sys_val;
-> >>> +}
-> >>> +
-> >>>  /* Read a sanitised cpufeature ID register by sys_reg_desc */
-> >>> -static u64 read_id_reg(const struct kvm_vcpu *vcpu,
-> >>> +static u64 read_id_reg(struct kvm_vcpu *vcpu,
-> >>>  		struct sys_reg_desc const *r, bool raz)
-> >>>  {
-> >>>  	u32 id = sys_reg((u32)r->Op0, (u32)r->Op1,
-> >>>  			 (u32)r->CRn, (u32)r->CRm, (u32)r->Op2);
-> >>> -	u64 val = raz ? 0 : read_sanitised_ftr_reg(id);
-> >>> +	u64 val = raz ? 0 : kvm_get_id_reg(vcpu, id);
-> >>>  
-> >>>  	if (id == SYS_ID_AA64PFR0_EL1) {
-> >>>  		if (!vcpu_has_sve(vcpu))
-> >>> @@ -1238,7 +1257,7 @@ static int set_id_aa64zfr0_el1(struct kvm_vcpu *vcpu,
-> >>>   * are stored, and for set_id_reg() we don't allow the effective value
-> >>>   * to be changed.
-> >>>   */
-> >>> -static int __get_id_reg(const struct kvm_vcpu *vcpu,
-> >>> +static int __get_id_reg(struct kvm_vcpu *vcpu,
-> >>>  			const struct sys_reg_desc *rd, void __user *uaddr,
-> >>>  			bool raz)
-> >>>  {
-> >>> @@ -1248,7 +1267,7 @@ static int __get_id_reg(const struct kvm_vcpu *vcpu,
-> >>>  	return reg_to_user(uaddr, &val, id);
-> >>>  }
-> >>>  
-> >>> -static int __set_id_reg(const struct kvm_vcpu *vcpu,
-> >>> +static int __set_id_reg(struct kvm_vcpu *vcpu,
-> >>>  			const struct sys_reg_desc *rd, void __user *uaddr,
-> >>>  			bool raz)
-> >>>  {
-> >>> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-> >>> index f6d86033c4fa..1029444d04aa 100644
-> >>> --- a/include/uapi/linux/kvm.h
-> >>> +++ b/include/uapi/linux/kvm.h
-> >>> @@ -1272,6 +1272,17 @@ struct kvm_vfio_spapr_tce {
-> >>>  	__s32	tablefd;
-> >>>  };
-> >>>  
-> >>> +#define ID_REG_MAX_NUMS 64
-> >>> +struct id_reg_info {
-> >>> +	uint64_t sys_id;
-> >>> +	uint64_t sys_val;
-> >>
-> >> I'm not sure the 'sys_' prefix is necessary.
-> >>
-> >>> +};
-> >>> +
-> >>> +struct id_registers {
-> >>> +	struct id_reg_info regs[ID_REG_MAX_NUMS];
-> >>> +	uint64_t num;
-> >>> +};
-> >>> +
-> >>
-> >> This is arch specific, so there should be ARMv8 in the names.
-> > 
-> > Also, why are id_reg_info and id_registers UAPI?
-> > 
-> > Thanks,
-> > drew
-> > 
-> 
-> id_reg_info is for information of an ID register, and id_registers contains
-> all the ID registers.
+On Thu, Aug 13, 2020 at 10:30 AM +0200, Andrew Jones <drjones@redhat.com> w=
+rote:
+> On Wed, Aug 12, 2020 at 11:27:04AM +0200, Marc Hartmayer wrote:
+>> This allows us, for example, to auto generate a new test case based on
+>> an existing test case.
+>>=20
+>> Signed-off-by: Marc Hartmayer <mhartmay@linux.ibm.com>
+>> ---
+>>  run_tests.sh            |  2 +-
+>>  scripts/common.bash     | 13 +++++++++++++
+>>  scripts/mkstandalone.sh |  2 +-
+>>  3 files changed, 15 insertions(+), 2 deletions(-)
+>>=20
+>> diff --git a/run_tests.sh b/run_tests.sh
+>> index 24aba9cc3a98..23658392c488 100755
+>> --- a/run_tests.sh
+>> +++ b/run_tests.sh
+>> @@ -160,7 +160,7 @@ trap "wait; exit 130" SIGINT
+>>     # preserve stdout so that process_test_output output can write TAP t=
+o it
+>>     exec 3>&1
+>>     test "$tap_output" =3D=3D "yes" && exec > /dev/null
+>> -   for_each_unittest $config run_task
+>> +   for_each_unittest $config run_task arch_cmd
+>
+> Let's just require that arch cmd hook be specified by the "$arch_cmd"
+> variable. Then we don't need to pass it to for_each_unittest.
 
-Obviously. But why is that UAPI? What user interface is using them?
+Where is it then specified?
 
-> 
+>
+>>  ) | postprocess_suite_output
+>>=20=20
+>>  # wait until all tasks finish
+>> diff --git a/scripts/common.bash b/scripts/common.bash
+>> index f9c15fd304bd..62931a40b79a 100644
+>> --- a/scripts/common.bash
+>> +++ b/scripts/common.bash
+>> @@ -1,8 +1,15 @@
+>> +function arch_cmd()
+>> +{
+>> +	# Dummy function, can be overwritten by architecture dependent
+>> +	# code
+>> +	return
+>> +}
+>
+> This dummy function appears unused and can be dropped.
+
+So what is then used if the function is not defined by the architecture
+specific code?
+
+>
+>>=20=20
+>>  function for_each_unittest()
+>>  {
+>>  	local unittests=3D"$1"
+>>  	local cmd=3D"$2"
+>> +	local arch_cmd=3D"${3-}"
+>>  	local testname
+>>  	local smp
+>>  	local kernel
+>> @@ -19,6 +26,9 @@ function for_each_unittest()
+>>  		if [[ "$line" =3D~ ^\[(.*)\]$ ]]; then
+>>  			if [ -n "${testname}" ]; then
+>>  				"$cmd" "$testname" "$groups" "$smp" "$kernel" "$opts" "$arch" "$che=
+ck" "$accel" "$timeout"
+>> +				if [ "${arch_cmd}" ]; then
+>> +					"${arch_cmd}" "$cmd" "$testname" "$groups" "$smp" "$kernel" "$opts=
+" "$arch" "$check" "$accel" "$timeout"
+>> +				fi
+>
+> Rather than assuming we should run both $cmd ... and $arch_cmd $cmd ...,
+> let's just run $arch_cmd $cmd ..., when it exists. If $arch_cmd wants to
+> run $cmd ... first, then it can do so itself.
+
+Yep, makes sense.
+
+>
+>>  			fi
+>>  			testname=3D${BASH_REMATCH[1]}
+>>  			smp=3D1
+>> @@ -49,6 +59,9 @@ function for_each_unittest()
+>>  	done
+>>  	if [ -n "${testname}" ]; then
+>>  		"$cmd" "$testname" "$groups" "$smp" "$kernel" "$opts" "$arch" "$check=
+" "$accel" "$timeout"
+>> +		if [ "${arch_cmd}" ]; then
+>> +			"${arch_cmd}" "$cmd" "$testname" "$groups" "$smp" "$kernel" "$opts" =
+"$arch" "$check" "$accel" "$timeout"
+>> +		fi
+>>  	fi
+>>  	exec {fd}<&-
+>>  }
+>> diff --git a/scripts/mkstandalone.sh b/scripts/mkstandalone.sh
+>> index cefdec30cb33..3b18c0cf090b 100755
+>> --- a/scripts/mkstandalone.sh
+>> +++ b/scripts/mkstandalone.sh
+>> @@ -128,4 +128,4 @@ fi
+>>=20=20
+>>  mkdir -p tests
+>>=20=20
+>> -for_each_unittest $cfg mkstandalone
+>> +for_each_unittest $cfg mkstandalone arch_cmd
+>> --=20
+>> 2.25.4
+>>
+>
+> In summary, I think this patch should just be
+>
+> diff --git a/scripts/common.bash b/scripts/common.bash
+> index 9a6ebbd7f287..b409b0529ea6 100644
+> --- a/scripts/common.bash
+> +++ b/scripts/common.bash
+> @@ -17,7 +17,7 @@ function for_each_unittest()
+>=20=20
+>         while read -r -u $fd line; do
+>                 if [[ "$line" =3D~ ^\[(.*)\]$ ]]; then
+> -                       "$cmd" "$testname" "$groups" "$smp" "$kernel" "$o=
+pts" "$arch" "$check" "$accel" "$timeout"
+> +                       "$arch_cmd" "$cmd" "$testname" "$groups" "$smp" "=
+$kernel" "$opts" "$arch" "$check" "$accel" "$timeout"
+
+If we remove the $arch_cmd variable we can directly use:
+
+arch_cmd "$cmd" =E2=80=A6
+
+>                         testname=3D${BASH_REMATCH[1]}
+>                         smp=3D1
+>                         kernel=3D""
+> @@ -45,6 +45,6 @@ function for_each_unittest()
+>                         timeout=3D${BASH_REMATCH[1]}
+>                 fi
+>         done
+> -       "$cmd" "$testname" "$groups" "$smp" "$kernel" "$opts" "$arch" "$c=
+heck" "$accel" "$timeout"
+> +       "$arch_cmd" "$cmd" "$testname" "$groups" "$smp" "$kernel" "$opts"=
+ "$arch" "$check" "$accel" "$timeout"
+>         exec {fd}<&-
+>  }
+>=20=20
+>
 > Thanks,
-> Peng
-> 
-> >>
-> >>>  /*
-> >>>   * ioctls for VM fds
-> >>>   */
-> >>> -- 
-> >>> 2.18.4
-> >>>
-> >>
-> > 
-> > .
-> > 
-> 
+> drew
+>
+--=20
+Kind regards / Beste Gr=C3=BC=C3=9Fe
+   Marc Hartmayer
 
+IBM Deutschland Research & Development GmbH
+Vorsitzender des Aufsichtsrats: Gregor Pillen=20
+Gesch=C3=A4ftsf=C3=BChrung: Dirk Wittkopp
+Sitz der Gesellschaft: B=C3=B6blingen
+Registergericht: Amtsgericht Stuttgart, HRB 243294
