@@ -2,42 +2,42 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 58F2A244939
-	for <lists+kvm@lfdr.de>; Fri, 14 Aug 2020 13:49:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DC45624493B
+	for <lists+kvm@lfdr.de>; Fri, 14 Aug 2020 13:49:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726313AbgHNLt3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 14 Aug 2020 07:49:29 -0400
-Received: from szxga08-in.huawei.com ([45.249.212.255]:40280 "EHLO huawei.com"
+        id S1726967AbgHNLtf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 14 Aug 2020 07:49:35 -0400
+Received: from szxga03-in.huawei.com ([45.249.212.189]:3014 "EHLO huawei.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726265AbgHNLt2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 14 Aug 2020 07:49:28 -0400
-Received: from DGGEMM405-HUB.china.huawei.com (unknown [172.30.72.57])
-        by Forcepoint Email with ESMTP id DE60DC661D09D9596E6C;
-        Fri, 14 Aug 2020 19:49:24 +0800 (CST)
+        id S1726265AbgHNLtd (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 14 Aug 2020 07:49:33 -0400
+Received: from DGGEMM402-HUB.china.huawei.com (unknown [172.30.72.56])
+        by Forcepoint Email with ESMTP id 449D8406FB90134A6F63;
+        Fri, 14 Aug 2020 19:49:31 +0800 (CST)
 Received: from dggema765-chm.china.huawei.com (10.1.198.207) by
- DGGEMM405-HUB.china.huawei.com (10.3.20.213) with Microsoft SMTP Server (TLS)
- id 14.3.487.0; Fri, 14 Aug 2020 19:49:24 +0800
+ DGGEMM402-HUB.china.huawei.com (10.3.20.210) with Microsoft SMTP Server (TLS)
+ id 14.3.487.0; Fri, 14 Aug 2020 19:49:30 +0800
 Received: from [10.174.185.187] (10.174.185.187) by
  dggema765-chm.china.huawei.com (10.1.198.207) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
- 15.1.1913.5; Fri, 14 Aug 2020 19:49:24 +0800
-Subject: Re: [RFC 2/4] kvm: arm64: emulate the ID registers
+ 15.1.1913.5; Fri, 14 Aug 2020 19:49:30 +0800
+Subject: Re: [RFC 4/4] kvm: arm64: add KVM_CAP_ARM_CPU_FEATURE extension
 To:     Andrew Jones <drjones@redhat.com>
 References: <20200813060517.2360048-1-liangpeng10@huawei.com>
- <20200813060517.2360048-3-liangpeng10@huawei.com>
- <20200813090558.3eqwoxp7m6jmknft@kamzik.brq.redhat.com>
+ <20200813060517.2360048-5-liangpeng10@huawei.com>
+ <20200813091032.blyfvuiti7m2xw5i@kamzik.brq.redhat.com>
+From:   Peng Liang <liangpeng10@huawei.com>
 CC:     <kvmarm@lists.cs.columbia.edu>, <kvm@vger.kernel.org>,
         <maz@kernel.org>, <will@kernel.org>,
         Zhanghailiang <zhang.zhanghailiang@huawei.com>,
         xiexiangyou 00584000 <xiexiangyou@huawei.com>,
         zhukeqian 00502301 <zhukeqian1@huawei.com>
-From:   Peng Liang <liangpeng10@huawei.com>
-Message-ID: <a9eddc75-2c70-58bb-6373-7328be5774e1@huawei.com>
-Date:   Fri, 14 Aug 2020 19:49:23 +0800
+Message-ID: <9bd25141-8cff-ac92-29a5-66c499d26273@huawei.com>
+Date:   Fri, 14 Aug 2020 19:49:29 +0800
 User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
  Thunderbird/78.1.1
 MIME-Version: 1.0
-In-Reply-To: <20200813090558.3eqwoxp7m6jmknft@kamzik.brq.redhat.com>
+In-Reply-To: <20200813091032.blyfvuiti7m2xw5i@kamzik.brq.redhat.com>
 Content-Type: text/plain; charset="utf-8"
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -50,186 +50,54 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 8/13/2020 5:05 PM, Andrew Jones wrote:
-> On Thu, Aug 13, 2020 at 02:05:15PM +0800, Peng Liang wrote:
->> To emulate the ID registers, we need a place to storage the values of
->> the ID regsiters.  Maybe putting in kvm_arch_vcpu is a good idea.
->>
->> This commit has no functional changes but only code refactor.  When
->> initializing a vcpu, get the values of the ID registers from
->> arm64_ftr_regs and storage them in kvm_arch_vcpu.  And we just read
->> the value from kvm_arch_vcpu when getting/setting the value of the ID
->> regs.
+On 8/13/2020 5:10 PM, Andrew Jones wrote:
+> On Thu, Aug 13, 2020 at 02:05:17PM +0800, Peng Liang wrote:
+>> Add KVM_CAP_ARM_CPU_FEATURE extension for userpace to check whether KVM
+>> supports to set CPU features in AArch64.
 >>
 >> Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
 >> Signed-off-by: Peng Liang <liangpeng10@huawei.com>
 >> ---
->>  arch/arm64/include/asm/kvm_host.h |  2 ++
->>  arch/arm64/kvm/arm.c              | 20 ++++++++++++++++++++
->>  arch/arm64/kvm/sys_regs.c         | 27 +++++++++++++++++++++++----
->>  include/uapi/linux/kvm.h          | 11 +++++++++++
->>  4 files changed, 56 insertions(+), 4 deletions(-)
+>>  arch/arm64/kvm/arm.c     | 1 +
+>>  include/uapi/linux/kvm.h | 1 +
+>>  2 files changed, 2 insertions(+)
 >>
->> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
->> index f81151ad3d3c..7f7bd36702f7 100644
->> --- a/arch/arm64/include/asm/kvm_host.h
->> +++ b/arch/arm64/include/asm/kvm_host.h
->> @@ -336,6 +336,8 @@ struct kvm_vcpu_arch {
->>  		u64 last_steal;
->>  		gpa_t base;
->>  	} steal;
->> +
->> +	struct id_registers idregs;
->>  };
->>  
->>  /* Pointer to the vcpu's SVE FFR for sve_{save,load}_state() */
 >> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
->> index 73e12869afe3..18ebbe1c64ee 100644
+>> index 18ebbe1c64ee..72b9e8fc606f 100644
 >> --- a/arch/arm64/kvm/arm.c
 >> +++ b/arch/arm64/kvm/arm.c
->> @@ -262,6 +262,24 @@ int kvm_arch_vcpu_precreate(struct kvm *kvm, unsigned int id)
->>  	return 0;
->>  }
->>  
->> +static int get_cpu_ftr(u32 id, u64 val, void *argp)
->> +{
->> +	struct id_registers *idregs = argp;
->> +
->> +	/*
->> +	 * (Op0, Op1, CRn, CRm, Op2) of ID registers is (3, 0, 0, crm, op2),
->> +	 * where 1<=crm<8, 0<=op2<8.
->> +	 */
->> +	if (sys_reg_Op0(id) == 3 && sys_reg_Op1(id) == 0 &&
->> +	    sys_reg_CRn(id) == 0 && sys_reg_CRm(id) > 0) {
->> +		idregs->regs[idregs->num].sys_id = id;
->> +		idregs->regs[idregs->num].sys_val = val;
->> +		idregs->num++;
-> 
-> This num++ means we should ensure get_cpu_ftr() is only used once per
-> VCPU, but we don't need 'num'. The index can be derived: (crm<<3)|op2
-> 
->> +	}
->> +
->> +	return 0;
->> +}
->> +
->>  int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
->>  {
->>  	int err;
->> @@ -285,6 +303,8 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
->>  	if (err)
->>  		return err;
->>  
->> +	arm64_cpu_ftr_regs_traverse(get_cpu_ftr, &vcpu->arch.idregs);
->> +
->>  	return create_hyp_mappings(vcpu, vcpu + 1, PAGE_HYP);
->>  }
->>  
->> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
->> index 138961d7ebe3..776c2757a01e 100644
->> --- a/arch/arm64/kvm/sys_regs.c
->> +++ b/arch/arm64/kvm/sys_regs.c
->> @@ -1092,13 +1092,32 @@ static bool access_arch_timer(struct kvm_vcpu *vcpu,
->>  	return true;
->>  }
->>  
->> +static struct id_reg_info *kvm_id_reg(struct kvm_vcpu *vcpu, u64 id)
->> +{
->> +	int i;
->> +
->> +	for (i = 0; i < vcpu->arch.idregs.num; ++i) {
->> +		if (vcpu->arch.idregs.regs[i].sys_id == id)
->> +			return &vcpu->arch.idregs.regs[i];
-> 
-> With a derived index we don't need to search. Just do
-> 
->  if (sys_reg_Op0(id) != 3 || sys_reg_Op1(id) != 0 ||
->      sys_reg_CRn(id) != 0 || sys_reg_CRm(id) == 0)
->       return NULL;
-> 
->  return &vcpu->arch.idregs.regs[(sys_reg_CRm(id)<<3) | sys_reg_Op2(id)]; 
->  
-> 
-
-Thank you for your suggestions.
-
->> +	}
->> +	return NULL;
->> +}
->> +
->> +static u64 kvm_get_id_reg(struct kvm_vcpu *vcpu, u64 id)
->> +{
->> +	struct id_reg_info *ri = kvm_id_reg(vcpu, id);
->> +
->> +	BUG_ON(!ri);
->> +	return ri->sys_val;
->> +}
->> +
->>  /* Read a sanitised cpufeature ID register by sys_reg_desc */
->> -static u64 read_id_reg(const struct kvm_vcpu *vcpu,
->> +static u64 read_id_reg(struct kvm_vcpu *vcpu,
->>  		struct sys_reg_desc const *r, bool raz)
->>  {
->>  	u32 id = sys_reg((u32)r->Op0, (u32)r->Op1,
->>  			 (u32)r->CRn, (u32)r->CRm, (u32)r->Op2);
->> -	u64 val = raz ? 0 : read_sanitised_ftr_reg(id);
->> +	u64 val = raz ? 0 : kvm_get_id_reg(vcpu, id);
->>  
->>  	if (id == SYS_ID_AA64PFR0_EL1) {
->>  		if (!vcpu_has_sve(vcpu))
->> @@ -1238,7 +1257,7 @@ static int set_id_aa64zfr0_el1(struct kvm_vcpu *vcpu,
->>   * are stored, and for set_id_reg() we don't allow the effective value
->>   * to be changed.
->>   */
->> -static int __get_id_reg(const struct kvm_vcpu *vcpu,
->> +static int __get_id_reg(struct kvm_vcpu *vcpu,
->>  			const struct sys_reg_desc *rd, void __user *uaddr,
->>  			bool raz)
->>  {
->> @@ -1248,7 +1267,7 @@ static int __get_id_reg(const struct kvm_vcpu *vcpu,
->>  	return reg_to_user(uaddr, &val, id);
->>  }
->>  
->> -static int __set_id_reg(const struct kvm_vcpu *vcpu,
->> +static int __set_id_reg(struct kvm_vcpu *vcpu,
->>  			const struct sys_reg_desc *rd, void __user *uaddr,
->>  			bool raz)
->>  {
+>> @@ -194,6 +194,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+>>  	case KVM_CAP_ARM_IRQ_LINE_LAYOUT_2:
+>>  	case KVM_CAP_ARM_NISV_TO_USER:
+>>  	case KVM_CAP_ARM_INJECT_EXT_DABT:
+>> +	case KVM_CAP_ARM_CPU_FEATURE:
+>>  		r = 1;
+>>  		break;
+>>  	case KVM_CAP_ARM_SET_DEVICE_ADDR:
 >> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
->> index f6d86033c4fa..1029444d04aa 100644
+>> index 1029444d04aa..0eca4f7c7fef 100644
 >> --- a/include/uapi/linux/kvm.h
 >> +++ b/include/uapi/linux/kvm.h
->> @@ -1272,6 +1272,17 @@ struct kvm_vfio_spapr_tce {
->>  	__s32	tablefd;
->>  };
+>> @@ -1035,6 +1035,7 @@ struct kvm_ppc_resize_hpt {
+>>  #define KVM_CAP_LAST_CPU 184
+>>  #define KVM_CAP_SMALLER_MAXPHYADDR 185
+>>  #define KVM_CAP_S390_DIAG318 186
+>> +#define KVM_CAP_ARM_CPU_FEATURE 187
 >>  
->> +#define ID_REG_MAX_NUMS 64
->> +struct id_reg_info {
->> +	uint64_t sys_id;
->> +	uint64_t sys_val;
-> 
-> I'm not sure the 'sys_' prefix is necessary.
-> 
->> +};
->> +
->> +struct id_registers {
->> +	struct id_reg_info regs[ID_REG_MAX_NUMS];
->> +	uint64_t num;
->> +};
->> +
-> 
-> This is arch specific, so there should be ARMv8 in the names.
-
-Some names are not very suitable, I'll change them.
-
-> 
->>  /*
->>   * ioctls for VM fds
->>   */
+>>  #ifdef KVM_CAP_IRQ_ROUTING
+>>  
 >> -- 
 >> 2.18.4
 >>
 > 
+> All new caps should be documented in Documentation/virt/kvm/api.rst
+> 
+> Thanks,
+> drew 
+> 
 > .
 > 
+Sorry, I'll document it.
 
+Thanks,
+Peng
