@@ -2,338 +2,133 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3F7CC24429C
-	for <lists+kvm@lfdr.de>; Fri, 14 Aug 2020 02:58:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1518F2442C6
+	for <lists+kvm@lfdr.de>; Fri, 14 Aug 2020 03:40:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726574AbgHNA6l (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 13 Aug 2020 20:58:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54534 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726205AbgHNA6k (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 13 Aug 2020 20:58:40 -0400
-Received: from mail-oo1-xc42.google.com (mail-oo1-xc42.google.com [IPv6:2607:f8b0:4864:20::c42])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BCB4AC061757
-        for <kvm@vger.kernel.org>; Thu, 13 Aug 2020 17:58:40 -0700 (PDT)
-Received: by mail-oo1-xc42.google.com with SMTP id g18so1613896ooa.0
-        for <kvm@vger.kernel.org>; Thu, 13 Aug 2020 17:58:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=1rcVENdUjrJnJzPB2lzf5pwuSjnxNkJ88qDIek0Xf6k=;
-        b=Vav8XYUeYdcrh+zFDvBuyH6WenRPrE7HijvhZ7etxmSypAtmg/ozxZhh+qYIKG4UVj
-         /ftML4pyUsmdSOvsaxUReoYCyaSfsk+CiHtQks7rq+ppa2/VIkA0YLhRJMKGIhL7JeaW
-         cAkGOHuMYcZzSslLf5aH4Ujicfg7XrRRV3mzkEoOhmsiQN2fPiPsjb+gDCT59zSBrhSG
-         7KbZLhFTw8ee7PA14GCoKEFCjOQAoUU/1c3q48N0FhUcmDwVLWMaPLkPfIXX+d1o7W5o
-         MWCzzC/ZMRHYzggYJGaMBty0cnmuUhilrJvV0rzBLWmc2uLZv34nYvCvWepNUJYwhm3v
-         MzgQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=1rcVENdUjrJnJzPB2lzf5pwuSjnxNkJ88qDIek0Xf6k=;
-        b=cuF1+JyOgjoYxMyGfNujT3srNe+rIp0OKavUpT+DUhQau4afChpY2whmGwECxGvBFm
-         B/YFn3ZZQJrgE9kvRH4PvSrU4tr1fLlDF567zOig5X8SoG6bIUJjgCi8D7mCrH3HRhCG
-         0bBx2qFwPX+VXIDgAGHBuXPcwDn7NPmSszFkikHeFsfi3Hi8U4ejaLHeW7mbpatRZoek
-         sttEuwLIk3v38lK/plvDxraUiiwis8+i5prWUpzUwogmx9qbeHukvOXwO/HiOnn5UNjR
-         cDvY25qlAqRhJMOaZ6nGZT+xilm/ufTWxfVIes2n8g/tq7z5ARXkkRQnRjy953qgRNkU
-         u6fQ==
-X-Gm-Message-State: AOAM531TyC1Vdm5zS5IciAxnhNTxA9As0uhezG/gcrRSAgNyMnJrxwBR
-        QKJU1loO3wx80tJWiRdbU6Rhsvdsuij+kpJHQjI=
-X-Google-Smtp-Source: ABdhPJxoPWhSDNe3wNFzZuwJAWVjoLbJzJSWeYlM1ZPwFB4iakCMovSHtmoE9DxYz+bd4l4ISmXADF4vvOH+OMy/j7A=
-X-Received: by 2002:a4a:2f4b:: with SMTP id p72mr72724oop.39.1597366719653;
- Thu, 13 Aug 2020 17:58:39 -0700 (PDT)
-MIME-Version: 1.0
-References: <20200806151433.2747952-1-oupton@google.com> <20200806151433.2747952-4-oupton@google.com>
-In-Reply-To: <20200806151433.2747952-4-oupton@google.com>
-From:   Wanpeng Li <kernellwp@gmail.com>
-Date:   Fri, 14 Aug 2020 08:58:28 +0800
-Message-ID: <CANRm+CwZxhv95yCH+niWuZQ3UQACuK0EKesj8neR9OmHZ8PAvg@mail.gmail.com>
-Subject: Re: [PATCH v3 3/4] kvm: x86: only provide PV features if enabled in
- guest's CPUID
-To:     Oliver Upton <oupton@google.com>
-Cc:     kvm <kvm@vger.kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
+        id S1726641AbgHNBkQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 13 Aug 2020 21:40:16 -0400
+Received: from mga03.intel.com ([134.134.136.65]:15604 "EHLO mga03.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726546AbgHNBkP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 13 Aug 2020 21:40:15 -0400
+IronPort-SDR: sw0LBl4GtSKKiuNby4RfQAjj3KETIgFTrOxaZdumOCQDlYOVJoeyn0JhWr8lu96NCMneLsGupm
+ D5vhZaqmFkHQ==
+X-IronPort-AV: E=McAfee;i="6000,8403,9712"; a="154309079"
+X-IronPort-AV: E=Sophos;i="5.76,310,1592895600"; 
+   d="scan'208";a="154309079"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Aug 2020 18:40:15 -0700
+IronPort-SDR: nn2/a2uT0dfmJs5glicqz7PZfMhJpugjrmgjWvIyz7YuOXGxPzQe/4+tNLDXxM2PX95RhtOOBc
+ WiIigei2EWPA==
+X-IronPort-AV: E=Sophos;i="5.76,310,1592895600"; 
+   d="scan'208";a="470421279"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.160])
+  by orsmga005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Aug 2020 18:40:15 -0700
+Date:   Thu, 13 Aug 2020 18:40:14 -0700
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Peter Shier <pshier@google.com>
-Content-Type: text/plain; charset="UTF-8"
+        Peter Xu <peterx@redhat.com>, Michael Tsirkin <mst@redhat.com>,
+        Julia Suvorova <jsuvorov@redhat.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Andrew Jones <drjones@redhat.com>, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 1/3] KVM: x86: move kvm_vcpu_gfn_to_memslot() out of
+ try_async_pf()
+Message-ID: <20200814014014.GA4845@linux.intel.com>
+References: <20200807141232.402895-1-vkuznets@redhat.com>
+ <20200807141232.402895-2-vkuznets@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200807141232.402895-2-vkuznets@redhat.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 7 Aug 2020 at 01:54, Oliver Upton <oupton@google.com> wrote:
->
-> KVM unconditionally provides PV features to the guest, regardless of the
-> configured CPUID. An unwitting guest that doesn't check
-> KVM_CPUID_FEATURES before use could access paravirt features that
-> userspace did not intend to provide. Fix this by checking the guest's
-> CPUID before performing any paravirtual operations.
->
-> Introduce a capability, KVM_CAP_ENFORCE_PV_FEATURE_CPUID, to gate the
-> aforementioned enforcement. Migrating a VM from a host w/o this patch to
-> a host with this patch could silently change the ABI exposed to the
-> guest, warranting that we default to the old behavior and opt-in for
-> the new one.
->
-> Reviewed-by: Jim Mattson <jmattson@google.com>
-> Reviewed-by: Peter Shier <pshier@google.com>
-> Signed-off-by: Oliver Upton <oupton@google.com>
+On Fri, Aug 07, 2020 at 04:12:30PM +0200, Vitaly Kuznetsov wrote:
+> No functional change intended. Slot flags will need to be analyzed
+> prior to try_async_pf() when KVM_MEM_PCI_HOLE is implemented.
+
+Why?  Wouldn't it be just as easy, and arguably more appropriate, to add
+KVM_PFN_ERR_PCI_HOLE and update handle_abornmal_pfn() accordinaly?
+
+> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
 > ---
->  Documentation/virt/kvm/api.rst  | 11 ++++++
->  arch/x86/include/asm/kvm_host.h |  6 +++
->  arch/x86/kvm/cpuid.h            | 16 ++++++++
->  arch/x86/kvm/x86.c              | 67 ++++++++++++++++++++++++++++++---
->  include/uapi/linux/kvm.h        |  1 +
->  5 files changed, 96 insertions(+), 5 deletions(-)
->
-> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-> index 644e5326aa50..e8fc6e34f344 100644
-> --- a/Documentation/virt/kvm/api.rst
-> +++ b/Documentation/virt/kvm/api.rst
-> @@ -6155,3 +6155,14 @@ KVM can therefore start protected VMs.
->  This capability governs the KVM_S390_PV_COMMAND ioctl and the
->  KVM_MP_STATE_LOAD MP_STATE. KVM_SET_MP_STATE can fail for protected
->  guests when the state change is invalid.
-> +
-> +
-> +8.24 KVM_CAP_ENFORCE_PV_CPUID
-> +-----------------------------
-> +
-> +Architectures: x86
-> +
-> +When enabled, KVM will disable paravirtual features provided to the
-> +guest according to the bits in the KVM_CPUID_FEATURES CPUID leaf
-> +(0x40000001). Otherwise, a guest may use the paravirtual features
-> +regardless of what has actually been exposed through the CPUID leaf.
-> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> index 5ab3af7275d8..a641c3840a1e 100644
-> --- a/arch/x86/include/asm/kvm_host.h
-> +++ b/arch/x86/include/asm/kvm_host.h
-> @@ -788,6 +788,12 @@ struct kvm_vcpu_arch {
->
->         /* AMD MSRC001_0015 Hardware Configuration */
->         u64 msr_hwcr;
-> +
-> +       /*
-> +        * Indicates whether PV emulation should be disabled if not present in
-> +        * the guest's cpuid.
-> +        */
-> +       bool enforce_pv_feature_cpuid;
->  };
->
->  struct kvm_lpage_info {
-> diff --git a/arch/x86/kvm/cpuid.h b/arch/x86/kvm/cpuid.h
-> index 3a923ae15f2f..c364c2877583 100644
-> --- a/arch/x86/kvm/cpuid.h
-> +++ b/arch/x86/kvm/cpuid.h
-> @@ -5,6 +5,7 @@
->  #include "x86.h"
->  #include <asm/cpu.h>
->  #include <asm/processor.h>
-> +#include <uapi/asm/kvm_para.h>
->
->  extern u32 kvm_cpu_caps[NCAPINTS] __read_mostly;
->  void kvm_set_cpu_caps(void);
-> @@ -308,4 +309,19 @@ static inline bool page_address_valid(struct kvm_vcpu *vcpu, gpa_t gpa)
->         return PAGE_ALIGNED(gpa) && !(gpa >> cpuid_maxphyaddr(vcpu));
+>  arch/x86/kvm/mmu/mmu.c         | 14 ++++++++------
+>  arch/x86/kvm/mmu/paging_tmpl.h |  7 +++++--
+>  2 files changed, 13 insertions(+), 8 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index 862bf418214e..fef6956393f7 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -4042,11 +4042,10 @@ static bool kvm_arch_setup_async_pf(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
+>  				  kvm_vcpu_gfn_to_hva(vcpu, gfn), &arch);
 >  }
->
-> +static __always_inline bool guest_pv_has(struct kvm_vcpu *vcpu,
-> +                                          unsigned int kvm_feature)
-> +{
-> +       struct kvm_cpuid_entry2 *cpuid;
+>  
+> -static bool try_async_pf(struct kvm_vcpu *vcpu, bool prefault, gfn_t gfn,
+> -			 gpa_t cr2_or_gpa, kvm_pfn_t *pfn, bool write,
+> -			 bool *writable)
+> +static bool try_async_pf(struct kvm_vcpu *vcpu, struct kvm_memory_slot *slot,
+> +			 bool prefault, gfn_t gfn, gpa_t cr2_or_gpa,
+> +			 kvm_pfn_t *pfn, bool write, bool *writable)
+>  {
+> -	struct kvm_memory_slot *slot = kvm_vcpu_gfn_to_memslot(vcpu, gfn);
+>  	bool async;
+>  
+>  	/* Don't expose private memslots to L2. */
+> @@ -4082,7 +4081,7 @@ static int direct_page_fault(struct kvm_vcpu *vcpu, gpa_t gpa, u32 error_code,
+>  	bool exec = error_code & PFERR_FETCH_MASK;
+>  	bool lpage_disallowed = exec && is_nx_huge_page_enabled();
+>  	bool map_writable;
+> -
+> +	struct kvm_memory_slot *slot;
+>  	gfn_t gfn = gpa >> PAGE_SHIFT;
+>  	unsigned long mmu_seq;
+>  	kvm_pfn_t pfn;
+> @@ -4104,7 +4103,10 @@ static int direct_page_fault(struct kvm_vcpu *vcpu, gpa_t gpa, u32 error_code,
+>  	mmu_seq = vcpu->kvm->mmu_notifier_seq;
+>  	smp_rmb();
+>  
+> -	if (try_async_pf(vcpu, prefault, gfn, gpa, &pfn, write, &map_writable))
+> +	slot = kvm_vcpu_gfn_to_memslot(vcpu, gfn);
 > +
-> +       if (!vcpu->arch.enforce_pv_feature_cpuid)
-> +               return true;
+> +	if (try_async_pf(vcpu, slot, prefault, gfn, gpa, &pfn, write,
+> +			 &map_writable))
+>  		return RET_PF_RETRY;
+>  
+>  	if (handle_abnormal_pfn(vcpu, is_tdp ? 0 : gpa, gfn, pfn, ACC_ALL, &r))
+> diff --git a/arch/x86/kvm/mmu/paging_tmpl.h b/arch/x86/kvm/mmu/paging_tmpl.h
+> index 0172a949f6a7..5c6a895f67c3 100644
+> --- a/arch/x86/kvm/mmu/paging_tmpl.h
+> +++ b/arch/x86/kvm/mmu/paging_tmpl.h
+> @@ -779,6 +779,7 @@ static int FNAME(page_fault)(struct kvm_vcpu *vcpu, gpa_t addr, u32 error_code,
+>  	int write_fault = error_code & PFERR_WRITE_MASK;
+>  	int user_fault = error_code & PFERR_USER_MASK;
+>  	struct guest_walker walker;
+> +	struct kvm_memory_slot *slot;
+>  	int r;
+>  	kvm_pfn_t pfn;
+>  	unsigned long mmu_seq;
+> @@ -833,8 +834,10 @@ static int FNAME(page_fault)(struct kvm_vcpu *vcpu, gpa_t addr, u32 error_code,
+>  	mmu_seq = vcpu->kvm->mmu_notifier_seq;
+>  	smp_rmb();
+>  
+> -	if (try_async_pf(vcpu, prefault, walker.gfn, addr, &pfn, write_fault,
+> -			 &map_writable))
+> +	slot = kvm_vcpu_gfn_to_memslot(vcpu, walker.gfn);
 > +
-> +       cpuid = kvm_find_cpuid_entry(vcpu, KVM_CPUID_FEATURES, 0);
-> +       if (!cpuid)
-> +               return false;
-> +
-> +       return cpuid->eax & (1u << kvm_feature);
-> +}
-> +
->  #endif
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 683ce68d96b2..9900a846dfc0 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -2763,6 +2763,14 @@ static int kvm_pv_enable_async_pf(struct kvm_vcpu *vcpu, u64 data)
->         if (data & 0x30)
->                 return 1;
->
-> +       if (!guest_pv_has(vcpu, KVM_FEATURE_ASYNC_PF_VMEXIT) &&
-> +           (data & KVM_ASYNC_PF_DELIVERY_AS_PF_VMEXIT))
-> +               return 1;
-> +
-> +       if (!guest_pv_has(vcpu, KVM_FEATURE_ASYNC_PF_INT) &&
-> +           (data & KVM_ASYNC_PF_DELIVERY_AS_INT))
-> +               return 1;
-> +
->         if (!lapic_in_kernel(vcpu))
->                 return 1;
->
-> @@ -2840,10 +2848,12 @@ static void record_steal_time(struct kvm_vcpu *vcpu)
->          * Doing a TLB flush here, on the guest's behalf, can avoid
->          * expensive IPIs.
->          */
-> -       trace_kvm_pv_tlb_flush(vcpu->vcpu_id,
-> -               st->preempted & KVM_VCPU_FLUSH_TLB);
-> -       if (xchg(&st->preempted, 0) & KVM_VCPU_FLUSH_TLB)
-> -               kvm_vcpu_flush_tlb_guest(vcpu);
-> +       if (guest_pv_has(vcpu, KVM_FEATURE_PV_TLB_FLUSH)) {
-
-Is it expensive to recalculate it every time if vcpu is
-sched_in/sched_out frequently?
-
-> +               trace_kvm_pv_tlb_flush(vcpu->vcpu_id,
-> +                                      st->preempted & KVM_VCPU_FLUSH_TLB);
-> +               if (xchg(&st->preempted, 0) & KVM_VCPU_FLUSH_TLB)
-> +                       kvm_vcpu_flush_tlb_guest(vcpu);
-> +       }
->
->         vcpu->arch.st.preempted = 0;
->
-> @@ -2998,30 +3008,54 @@ int kvm_set_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
->                 vcpu->arch.smi_count = data;
->                 break;
->         case MSR_KVM_WALL_CLOCK_NEW:
-> +               if (!guest_pv_has(vcpu, KVM_FEATURE_CLOCKSOURCE2))
-> +                       return 1;
-> +
-> +               kvm_write_wall_clock(vcpu->kvm, data);
-> +               break;
->         case MSR_KVM_WALL_CLOCK:
-> +               if (!guest_pv_has(vcpu, KVM_FEATURE_CLOCKSOURCE))
-> +                       return 1;
-> +
->                 kvm_write_wall_clock(vcpu->kvm, data);
->                 break;
->         case MSR_KVM_SYSTEM_TIME_NEW:
-> +               if (!guest_pv_has(vcpu, KVM_FEATURE_CLOCKSOURCE2))
-> +                       return 1;
-> +
->                 kvm_write_system_time(vcpu, data, false, msr_info->host_initiated);
->                 break;
->         case MSR_KVM_SYSTEM_TIME:
-> -               kvm_write_system_time(vcpu, data, true, msr_info->host_initiated);
-> +               if (!guest_pv_has(vcpu, KVM_FEATURE_CLOCKSOURCE))
-> +                       return 1;
-> +
-> +               kvm_write_system_time(vcpu, data, true,  msr_info->host_initiated);
->                 break;
->         case MSR_KVM_ASYNC_PF_EN:
-> +               if (!guest_pv_has(vcpu, KVM_FEATURE_ASYNC_PF))
-> +                       return 1;
-> +
->                 if (kvm_pv_enable_async_pf(vcpu, data))
->                         return 1;
->                 break;
->         case MSR_KVM_ASYNC_PF_INT:
-> +               if (!guest_pv_has(vcpu, KVM_FEATURE_ASYNC_PF_INT))
-> +                       return 1;
-> +
->                 if (kvm_pv_enable_async_pf_int(vcpu, data))
->                         return 1;
->                 break;
->         case MSR_KVM_ASYNC_PF_ACK:
-> +               if (!guest_pv_has(vcpu, KVM_FEATURE_ASYNC_PF))
-> +                       return 1;
->                 if (data & 0x1) {
->                         vcpu->arch.apf.pageready_pending = false;
->                         kvm_check_async_pf_completion(vcpu);
->                 }
->                 break;
->         case MSR_KVM_STEAL_TIME:
-> +               if (!guest_pv_has(vcpu, KVM_FEATURE_STEAL_TIME))
-> +                       return 1;
->
->                 if (unlikely(!sched_info_on()))
->                         return 1;
-> @@ -3038,11 +3072,17 @@ int kvm_set_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
->
->                 break;
->         case MSR_KVM_PV_EOI_EN:
-> +               if (!guest_pv_has(vcpu, KVM_FEATURE_PV_EOI))
-> +                       return 1;
-> +
->                 if (kvm_lapic_enable_pv_eoi(vcpu, data, sizeof(u8)))
->                         return 1;
->                 break;
->
->         case MSR_KVM_POLL_CONTROL:
-> +               if (!guest_pv_has(vcpu, KVM_FEATURE_POLL_CONTROL))
-> +                       return 1;
-> +
->                 /* only enable bit supported */
->                 if (data & (-1ULL << 1))
->                         return 1;
-> @@ -3522,6 +3562,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
->         case KVM_CAP_EXCEPTION_PAYLOAD:
->         case KVM_CAP_SET_GUEST_DEBUG:
->         case KVM_CAP_LAST_CPU:
-> +       case KVM_CAP_ENFORCE_PV_FEATURE_CPUID:
->                 r = 1;
->                 break;
->         case KVM_CAP_SYNC_REGS:
-> @@ -4389,6 +4430,11 @@ static int kvm_vcpu_ioctl_enable_cap(struct kvm_vcpu *vcpu,
->
->                 return kvm_x86_ops.enable_direct_tlbflush(vcpu);
->
-> +       case KVM_CAP_ENFORCE_PV_FEATURE_CPUID:
-> +               vcpu->arch.enforce_pv_feature_cpuid = cap->args[0];
-> +
-> +               return 0;
-> +
->         default:
->                 return -EINVAL;
->         }
-> @@ -7723,11 +7769,16 @@ int kvm_emulate_hypercall(struct kvm_vcpu *vcpu)
->                 goto out;
->         }
->
-> +       ret = -KVM_ENOSYS;
-> +
->         switch (nr) {
->         case KVM_HC_VAPIC_POLL_IRQ:
->                 ret = 0;
->                 break;
->         case KVM_HC_KICK_CPU:
-> +               if (!guest_pv_has(vcpu, KVM_FEATURE_PV_UNHALT))
-> +                       break;
-> +
->                 kvm_pv_kick_cpu_op(vcpu->kvm, a0, a1);
->                 kvm_sched_yield(vcpu->kvm, a1);
->                 ret = 0;
-> @@ -7738,9 +7789,15 @@ int kvm_emulate_hypercall(struct kvm_vcpu *vcpu)
->                 break;
->  #endif
->         case KVM_HC_SEND_IPI:
-> +               if (!guest_pv_has(vcpu, KVM_FEATURE_PV_SEND_IPI))
-> +                       break;
-> +
->                 ret = kvm_pv_send_ipi(vcpu->kvm, a0, a1, a2, a3, op_64_bit);
->                 break;
->         case KVM_HC_SCHED_YIELD:
-> +               if (!guest_pv_has(vcpu, KVM_FEATURE_PV_SCHED_YIELD))
-> +                       break;
-> +
->                 kvm_sched_yield(vcpu->kvm, a0);
->                 ret = 0;
->                 break;
-> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-> index f6d86033c4fa..48c2d5c10b1e 100644
-> --- a/include/uapi/linux/kvm.h
-> +++ b/include/uapi/linux/kvm.h
-> @@ -1035,6 +1035,7 @@ struct kvm_ppc_resize_hpt {
->  #define KVM_CAP_LAST_CPU 184
->  #define KVM_CAP_SMALLER_MAXPHYADDR 185
->  #define KVM_CAP_S390_DIAG318 186
-> +#define KVM_CAP_ENFORCE_PV_FEATURE_CPUID 187
->
->  #ifdef KVM_CAP_IRQ_ROUTING
->
-> --
-> 2.28.0.236.gb10cc79966-goog
->
+> +	if (try_async_pf(vcpu, slot, prefault, walker.gfn, addr, &pfn,
+> +			 write_fault, &map_writable))
+>  		return RET_PF_RETRY;
+>  
+>  	if (handle_abnormal_pfn(vcpu, addr, walker.gfn, pfn, walker.pte_access, &r))
+> -- 
+> 2.25.4
+> 
