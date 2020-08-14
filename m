@@ -2,98 +2,96 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B69B92447B7
-	for <lists+kvm@lfdr.de>; Fri, 14 Aug 2020 12:09:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D52D12448CE
+	for <lists+kvm@lfdr.de>; Fri, 14 Aug 2020 13:29:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726640AbgHNKJl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 14 Aug 2020 06:09:41 -0400
-Received: from mga02.intel.com ([134.134.136.20]:39212 "EHLO mga02.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726012AbgHNKJk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 14 Aug 2020 06:09:40 -0400
-IronPort-SDR: v9olPLzJFE8/D8EMOYiRzvBhLxyrqkWLDiVOc4HoyjvaYaCwpZ9V+Y+NH4RlhBbvm5TiXUaFaJ
- /W9bzwc20Hyg==
-X-IronPort-AV: E=McAfee;i="6000,8403,9712"; a="142225727"
-X-IronPort-AV: E=Sophos;i="5.76,311,1592895600"; 
-   d="scan'208";a="142225727"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Aug 2020 03:09:40 -0700
-IronPort-SDR: Ybx8mk0552li0bdHdUB5/dPO86kL96paT7UAUsymjTxWeEEFMaHNyg4TVfG+hdQR/GllgXHLp9
- 0J1o/mhb1tUA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.76,311,1592895600"; 
-   d="scan'208";a="325687704"
-Received: from cqiang-mobl.ccr.corp.intel.com (HELO [10.238.2.93]) ([10.238.2.93])
-  by orsmga008.jf.intel.com with ESMTP; 14 Aug 2020 03:09:37 -0700
-Subject: Re: [RFC 7/7] KVM: VMX: Enable PKS for nested VM
-To:     Jim Mattson <jmattson@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Xiaoyao Li <xiaoyao.li@intel.com>,
-        kvm list <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>
-References: <20200807084841.7112-1-chenyi.qiang@intel.com>
- <20200807084841.7112-8-chenyi.qiang@intel.com>
- <CALMp9eTAo3WO5Vk_LptTDZLzymJ_96=UhRipyzTXXLxWJRGdXg@mail.gmail.com>
- <1481a482-c20b-5531-736c-de0c5d3d611c@intel.com>
- <CALMp9eQ5HhhXaEVKwnn6N6xxd2QOkNkE7ysiwq+3P=HB-Y1uzg@mail.gmail.com>
-From:   Chenyi Qiang <chenyi.qiang@intel.com>
-Message-ID: <ae2191a7-a165-3b50-2c8d-e2ddb4505455@intel.com>
-Date:   Fri, 14 Aug 2020 18:07:52 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+        id S1726796AbgHNL3T (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 14 Aug 2020 07:29:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38038 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726213AbgHNL3S (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 14 Aug 2020 07:29:18 -0400
+Received: from mail-yb1-xb33.google.com (mail-yb1-xb33.google.com [IPv6:2607:f8b0:4864:20::b33])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A02AEC061384
+        for <kvm@vger.kernel.org>; Fri, 14 Aug 2020 04:29:17 -0700 (PDT)
+Received: by mail-yb1-xb33.google.com with SMTP id e187so5025784ybc.5
+        for <kvm@vger.kernel.org>; Fri, 14 Aug 2020 04:29:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:reply-to:from:date:message-id:subject:to
+         :content-transfer-encoding;
+        bh=Duxa+mmNF3T3C2WDKsmzowR2OzvdY892XFjTPp0RWRI=;
+        b=CSC8pIK/V9tCgnP0P7V6gYuNnTUcyU6DWCFveVuPzoVSmqd8ERAeTRu4vmnMYBOBCF
+         tjIQWoF0l3HF/ZE+vRYIGJZY0ne21SeUEIi6qts4iIfadoqWi2DmywCkE8gU8ZieO7mq
+         RT5Svavexu6pMd6MtomowSrfl3rCweyWp8vnVvbXlu+86NoaxvYzJ8Wb+YYqtm+sL0qC
+         0diRzo9F2spdoeFOwEc7wkdkMBH6+6TIInmXE0IQrOysYgnmgNvGDPc7isO9IjbJQYov
+         Q7M+SyWwwo30UIxb6kwsaL9NjqSqG/z+mhVLruY/jNM4Iw3fCO6BOvOCmcJbl4htlDTq
+         i98w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:reply-to:from:date:message-id
+         :subject:to:content-transfer-encoding;
+        bh=Duxa+mmNF3T3C2WDKsmzowR2OzvdY892XFjTPp0RWRI=;
+        b=K7Ss4VjNZtRcoiK2Riqac3kCf2V7QCOmj3gPm3K65azWm2iu+4u+CzDfWamrKoMoth
+         DztHK+GMdYS8osmpbvtCNk0HcAGQPnA/WaFS1Hk+MXWylLJMxjNanCjrfO4Jbp09hDMU
+         fYZZYspLoVRgXZM9ByP1UgQeHMgOe/BDYUVuDOyAMlwtLxsuToQ9ljP8ED0cxD8r75LV
+         15F8KHsm2DCNLV4EQVjiwRdOsCVLq6KGXntp2vHn4JI+Ca2q5cIA1vyFFVNO+zVmkExg
+         9S065rp8L8rdHGawi/6tc94iVeZoMBeOKdklQmUnCRA5ZRC1cCWOYliKuzxVOodZYJ9J
+         kPeg==
+X-Gm-Message-State: AOAM530WyNNb0u8RyIdPu19cFP+2Wfyvmw0Jf0Uc0hdy9eZbZ/qJ4ytA
+        Pqxb8AhLmfk1YBvwf4ddMNmUrmYeDWXMK6n1kyw=
+X-Google-Smtp-Source: ABdhPJz22S5Fp3II8TbvRhZyh+YLcyl2/lwHOUXtaE6yYsZbWbrhDPm8/2cLR/6cEc07QBjGbqfIRtaUG0H9MK/BWPs=
+X-Received: by 2002:a25:1943:: with SMTP id 64mr3170684ybz.14.1597404554803;
+ Fri, 14 Aug 2020 04:29:14 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <CALMp9eQ5HhhXaEVKwnn6N6xxd2QOkNkE7ysiwq+3P=HB-Y1uzg@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Received: by 2002:a26:1284:0:0:0:0:0 with HTTP; Fri, 14 Aug 2020 04:29:14
+ -0700 (PDT)
+Reply-To: sctnld11170@tlen.pl
+From:   "Mr. Scott Donald" <mariam.cook20145@gmail.com>
+Date:   Fri, 14 Aug 2020 04:29:14 -0700
+Message-ID: <CAEyMmcmx8L3Gbe7KPQ3-BPQ2-pfjo3Ghis5pnZJaD-UpkDP99g@mail.gmail.com>
+Subject: Hello. Please
+To:     undisclosed-recipients:;
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+--=20
+Dear Friend,
 
+I'm Mr. Scott Donald a Successful businessMan dealing with
+Exportation, I got your mail contact through search to let you know my
+intension and my Ugly Situation Am a dying Man here in Los Angeles
+California Hospital Bed in (USA), I Lost my Wife and my only Daughter
+for Covid-19 and I also have a problem in my Health and I can die
+anytime I Know,
 
-On 8/14/2020 1:52 AM, Jim Mattson wrote:
-> On Wed, Aug 12, 2020 at 9:54 PM Chenyi Qiang <chenyi.qiang@intel.com> wrote:
->>
->>
->>
->> On 8/11/2020 8:05 AM, Jim Mattson wrote:
->>> On Fri, Aug 7, 2020 at 1:47 AM Chenyi Qiang <chenyi.qiang@intel.com> wrote:
->>>>
->>>> PKS MSR passes through guest directly. Configure the MSR to match the
->>>> L0/L1 settings so that nested VM runs PKS properly.
->>>>
->>>> Signed-off-by: Chenyi Qiang <chenyi.qiang@intel.com>
->>>> ---
-> 
->>>> +           (!vmx->nested.nested_run_pending ||
->>>> +            !(vmcs12->vm_entry_controls & VM_ENTRY_LOAD_IA32_PKRS)))
->>>> +               vmcs_write64(GUEST_IA32_PKRS, vmx->nested.vmcs01_guest_pkrs);
->>>
->>> This doesn't seem right to me. On the target of a live migration, with
->>> L2 active at the time the snapshot was taken (i.e.,
->>> vmx->nested.nested_run_pending=0), it looks like we're going to try to
->>> overwrite the current L2 PKRS value with L1's PKRS value (except that
->>> in this situation, vmx->nested.vmcs01_guest_pkrs should actually be
->>> 0). Am I missing something?
->>>
->>
->> We overwrite the L2 PKRS with L1's value when L2 doesn't support PKS.
->> Because the L1's VM_ENTRY_LOAD_IA32_PKRS is off, we need to migrate L1's
->> PKRS to L2.
-> 
-> I'm thinking of the case where vmx->nested.nested_run_pending is
-> false, and we are processing a KVM_SET_NESTED_STATE ioctl, yet
-> VM_ENTRY_LOAD_IA32_PKRS *is* set in the vmcs12.
-> 
+I have a project that I am about to hand over to you. and I already
+instructed the Bankia S.A. Madrid, Spain(BSA) to transfer my fund sum
+of =C2=A33,7M GBP. Equivalent to =E2=82=AC4,077,033.91 EUR, to you as to en=
+able you
+to give 50% of this fund to Charitable Home in your State and take 50%
+don't think otherwise and why would anybody send someone you barely
+know to help you deliver a message, help me do this for the happiness
+of my soul and for God to mercy me and my Family and give Us a good
+place.
 
-Oh, I miss this case. What I'm still confused here is that the 
-restoration for GUEST_IA32_DEBUGCTL and GUEST_BNDCFGS have the same 
-issue, right? or I miss something.
+please, do as I said there was someone from your State that I deeply
+love so very very much and I miss her so badly I have no means to
+reach any Charitable Home there. that is why I go for a personal
+search of the Country and State and I got your mail contact through
+search to let you know my Bitterness and please, help me is getting
+Dark I ask my Doctor to help me keep you notice failure for me to
+reach you in person Your urgent Response, here is my Doctor Whats-app
+Number for urgent notice +13019692737
+
+Hope To Hear From You. I'm sending this email to you for the second
+time yet no response from you.
+
+My Regards.
+
+Mr. Scott Donald
+CEO
