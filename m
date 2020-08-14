@@ -2,219 +2,218 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2603B2449AA
-	for <lists+kvm@lfdr.de>; Fri, 14 Aug 2020 14:20:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 370032449C1
+	for <lists+kvm@lfdr.de>; Fri, 14 Aug 2020 14:30:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726268AbgHNMUR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 14 Aug 2020 08:20:17 -0400
-Received: from mail.kernel.org ([198.145.29.99]:45440 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726185AbgHNMUQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 14 Aug 2020 08:20:16 -0400
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id E1A7B20B1F;
-        Fri, 14 Aug 2020 12:20:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1597407615;
-        bh=WRJyherRjLrCaZgbzjavfajQO8Ry3yRQJoXHt7KW0Fs=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=tCCUfWdFl60w2kum7ODRJLIRWxzhrBW63N0ZniMzJMnD2Tdh4kbUd0ar+GnSK4tWK
-         yu9a/mnnBNbV7Bv6a5qNWWtmb2yeDX7XcQTM1BWTHtGx5QdpMHyIsnjrAFmz3NmGko
-         eOPTHtTikh3N2fC8928L216OwCvbVPWrQVgmEqTc=
-Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
-        by disco-boy.misterjones.org with esmtpsa (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
-        (Exim 4.92)
-        (envelope-from <maz@kernel.org>)
-        id 1k6Ygv-0029eY-6N; Fri, 14 Aug 2020 13:20:13 +0100
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-Date:   Fri, 14 Aug 2020 13:20:13 +0100
-From:   Marc Zyngier <maz@kernel.org>
-To:     Peng Liang <liangpeng10@huawei.com>
-Cc:     kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, will@kernel.org,
-        zhang.zhanghailiang@huawei.com, xiexiangyou@huawei.com
-Subject: Re: [RFC 2/4] kvm: arm64: emulate the ID registers
-In-Reply-To: <20200813060517.2360048-3-liangpeng10@huawei.com>
-References: <20200813060517.2360048-1-liangpeng10@huawei.com>
- <20200813060517.2360048-3-liangpeng10@huawei.com>
-User-Agent: Roundcube Webmail/1.4.7
-Message-ID: <08de5a7ea8d371a5328044cb2039ea83@kernel.org>
-X-Sender: maz@kernel.org
-X-SA-Exim-Connect-IP: 51.254.78.96
-X-SA-Exim-Rcpt-To: liangpeng10@huawei.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, will@kernel.org, zhang.zhanghailiang@huawei.com, xiexiangyou@huawei.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+        id S1728204AbgHNMaP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 14 Aug 2020 08:30:15 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:51845 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1728080AbgHNMaM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 14 Aug 2020 08:30:12 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1597408210;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=1es+FhXf2z4s1o6I95UCtDQxtUvu4w172t+j0+i0n8o=;
+        b=cANsGgRImAlfXI4T3iieulp+71Li+jbblthuG1s9UQyYhG/HJjo9xu1LVIJRovpqpJuJ3R
+        gGsBFEFam7ltoiKrUydie6mOdLnAhwNHQf6Vb91LrV8TGXhtepQh5RHey3iXdbJBmWFw/e
+        9APLBFPohyEjvXU+E+WfDhsujaMy8sQ=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-545---y2vRhoMbq2ir_F210oSA-1; Fri, 14 Aug 2020 08:30:05 -0400
+X-MC-Unique: --y2vRhoMbq2ir_F210oSA-1
+Received: by mail-wr1-f72.google.com with SMTP id 89so3313041wrr.15
+        for <kvm@vger.kernel.org>; Fri, 14 Aug 2020 05:30:05 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:message-id:subject:from:to:cc:date:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=1es+FhXf2z4s1o6I95UCtDQxtUvu4w172t+j0+i0n8o=;
+        b=MPfARpiH34Iiwp13r6rZMop/smQbIQoE96+dEWs3jWSsPEat+s1Qa9AkODcsZsIiGh
+         66HdQCYrZp1tyxx8g0Bb3oppq+rHZVHrCClof4lq7hnAhDZyoSZwq+r21Jjs3+qA0hcQ
+         noe4gJO2QctWkjA2RNqlWj+ZxXlTq1HAyMTMSbBjiqhE7AxFKD61OTXAuFJOECGyGmxD
+         fBg8Y9P0yP9wEZKczW8KFnD2lKUcVtl9g3VA72s9DRAvRuehGWHj2jVn0kp2pN9nhKAl
+         Y63f0ALPC7/kbymZFcO+aPMKz9ETT1jU14h1um2myhiOS3aLaG0dRb4xCZw5QyPMoAeP
+         +Tig==
+X-Gm-Message-State: AOAM533C9GwLua2MuGI/SPq+UZ4ueNfJS4TSrtZmjDnrkTH8TAW4X9Uc
+        jgNMnnTq2EAuxsjQWedNzur4ae9YS8EeeY/zSjC5Zrk/859fsdLkwDqYEYd0v3iuRe5g25GD3ta
+        4hi6NPYTyoGRW
+X-Received: by 2002:a1c:9909:: with SMTP id b9mr2354768wme.98.1597408204294;
+        Fri, 14 Aug 2020 05:30:04 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzgh08eJQ+zuIOVbZA25ftPbBneCLgohlliBAPXoRqIxCkWEgig17fG/vnPhy7CGR0+dWUICw==
+X-Received: by 2002:a1c:9909:: with SMTP id b9mr2354734wme.98.1597408203987;
+        Fri, 14 Aug 2020 05:30:03 -0700 (PDT)
+Received: from pop-os ([2001:470:1f1d:1ea:4fde:6f63:1f5a:12b1])
+        by smtp.gmail.com with ESMTPSA id v8sm14694061wmb.24.2020.08.14.05.30.01
+        (version=TLS1_2 cipher=ECDHE-ECDSA-CHACHA20-POLY1305 bits=256/256);
+        Fri, 14 Aug 2020 05:30:03 -0700 (PDT)
+Message-ID: <a4f4a3cf76b87346a4cc4c39c116f575eaab9bac.camel@redhat.com>
+Subject: Re: device compatibility interface for live migration with assigned
+ devices
+From:   Sean Mooney <smooney@redhat.com>
+To:     Yan Zhao <yan.y.zhao@intel.com>, Jason Wang <jasowang@redhat.com>
+Cc:     Jiri Pirko <jiri@mellanox.com>, Cornelia Huck <cohuck@redhat.com>,
+        kvm@vger.kernel.org, libvir-list@redhat.com, qemu-devel@nongnu.org,
+        kwankhede@nvidia.com, eauger@redhat.com, xin-ran.wang@intel.com,
+        eskultet@redhat.com, openstack-discuss@lists.openstack.org,
+        shaohe.feng@intel.com, kevin.tian@intel.com,
+        Parav Pandit <parav@mellanox.com>, jian-feng.ding@intel.com,
+        dgilbert@redhat.com, zhenyuw@linux.intel.com, hejie.xu@intel.com,
+        bao.yumeng@zte.com.cn,
+        Alex Williamson <alex.williamson@redhat.com>,
+        intel-gvt-dev@lists.freedesktop.org, berrange@redhat.com,
+        corbet@lwn.net, dinechin@redhat.com, devel@ovirt.org
+Date:   Fri, 14 Aug 2020 13:30:00 +0100
+In-Reply-To: <20200814051601.GD15344@joy-OptiPlex-7040>
+References: <20200804183503.39f56516.cohuck@redhat.com>
+         <c178a0d3-269d-1620-22b1-9010f602d8ff@redhat.com>
+         <20200805021654.GB30485@joy-OptiPlex-7040>
+         <2624b12f-3788-7e2b-2cb7-93534960bcb7@redhat.com>
+         <20200805075647.GB2177@nanopsycho>
+         <eb1d01c2-fbad-36b6-10cf-9e03483a736b@redhat.com>
+         <20200805093338.GC30485@joy-OptiPlex-7040>
+         <20200805105319.GF2177@nanopsycho>
+         <20200810074631.GA29059@joy-OptiPlex-7040>
+         <e6e75807-0614-bd75-aeb6-64d643e029d3@redhat.com>
+         <20200814051601.GD15344@joy-OptiPlex-7040>
+Content-Type: text/plain; charset="UTF-8"
+X-Mailer: Evolution 3.28.5-0ubuntu0.18.04.2 
+Mime-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2020-08-13 07:05, Peng Liang wrote:
-> To emulate the ID registers, we need a place to storage the values of
-> the ID regsiters.  Maybe putting in kvm_arch_vcpu is a good idea.
+On Fri, 2020-08-14 at 13:16 +0800, Yan Zhao wrote:
+> On Thu, Aug 13, 2020 at 12:24:50PM +0800, Jason Wang wrote:
+> > 
+> > On 2020/8/10 下午3:46, Yan Zhao wrote:
+> > > > driver is it handled by?
+> > > 
+> > > It looks that the devlink is for network device specific, and in
+> > > devlink.h, it says
+> > > include/uapi/linux/devlink.h - Network physical device Netlink
+> > > interface,
+> > 
+> > 
+> > Actually not, I think there used to have some discussion last year and the
+> > conclusion is to remove this comment.
+> > 
+> > It supports IB and probably vDPA in the future.
+> > 
 > 
-> This commit has no functional changes but only code refactor.  When
-> initializing a vcpu, get the values of the ID registers from
-> arm64_ftr_regs and storage them in kvm_arch_vcpu.  And we just read
-> the value from kvm_arch_vcpu when getting/setting the value of the ID
-> regs.
+> hmm... sorry, I didn't find the referred discussion. only below discussion
+> regarding to why to add devlink.
 > 
-> Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
-> Signed-off-by: Peng Liang <liangpeng10@huawei.com>
-> ---
->  arch/arm64/include/asm/kvm_host.h |  2 ++
->  arch/arm64/kvm/arm.c              | 20 ++++++++++++++++++++
->  arch/arm64/kvm/sys_regs.c         | 27 +++++++++++++++++++++++----
->  include/uapi/linux/kvm.h          | 11 +++++++++++
->  4 files changed, 56 insertions(+), 4 deletions(-)
+> https://www.mail-archive.com/netdev@vger.kernel.org/msg95801.html
+> 	>This doesn't seem to be too much related to networking? Why can't something
+> 	>like this be in sysfs?
+> 	
+> 	It is related to networking quite bit. There has been couple of
+> 	iteration of this, including sysfs and configfs implementations. There
+> 	has been a consensus reached that this should be done by netlink. I
+> 	believe netlink is really the best for this purpose. Sysfs is not a good
+> 	idea
 > 
-> diff --git a/arch/arm64/include/asm/kvm_host.h
-> b/arch/arm64/include/asm/kvm_host.h
-> index f81151ad3d3c..7f7bd36702f7 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -336,6 +336,8 @@ struct kvm_vcpu_arch {
->  		u64 last_steal;
->  		gpa_t base;
->  	} steal;
-> +
-> +	struct id_registers idregs;
+> https://www.mail-archive.com/netdev@vger.kernel.org/msg96102.html
+> 	>there is already a way to change eth/ib via
+> 	>echo 'eth' > /sys/bus/pci/drivers/mlx4_core/0000:02:00.0/mlx4_port1
+> 	>
+> 	>sounds like this is another way to achieve the same?
+> 	
+> 	It is. However the current way is driver-specific, not correct.
+> 	For mlx5, we need the same, it cannot be done in this way. Do devlink is
+> 	the correct way to go.
+im not sure i agree with that.
+standardising a filesystem based api that is used across all vendors is also a valid
+option.  that said if devlink is the right choice form a kerenl perspective by all
+means use it but i have not heard a convincing argument for why it actually better.
+with tthat said we have been uing tools like ethtool to manage aspect of nics for decades
+so its not that strange an idea to use a tool and binary protocoal rather then a text
+based interface for this but there are advantages to both approches.
+> 
+> https://lwn.net/Articles/674867/
+> 	There a is need for some userspace API that would allow to expose things
+> 	that are not directly related to any device class like net_device of
+> 	ib_device, but rather chip-wide/switch-ASIC-wide stuff.
+> 
+> 	Use cases:
+> 	1) get/set of port type (Ethernet/InfiniBand)
+> 	2) monitoring of hardware messages to and from chip
+> 	3) setting up port splitters - split port into multiple ones and squash again,
+> 	   enables usage of splitter cable
+> 	4) setting up shared buffers - shared among multiple ports within one chip
+> 
+> 
+> 
+> we actually can also retrieve the same information through sysfs, .e.g
+> 
+> > - [path to device]
+> 
+>   |--- migration
+>   |     |--- self
+>   |     |   |---device_api
+>   |	|   |---mdev_type
+>   |	|   |---software_version
+>   |	|   |---device_id
+>   |	|   |---aggregator
+>   |     |--- compatible
+>   |     |   |---device_api
+>   |	|   |---mdev_type
+>   |	|   |---software_version
+>   |	|   |---device_id
+>   |	|   |---aggregator
+> 
+> 
+> 
+> > 
+> > >   I feel like it's not very appropriate for a GPU driver to use
+> > > this interface. Is that right?
+> > 
+> > 
+> > I think not though most of the users are switch or ethernet devices. It
+> > doesn't prevent you from inventing new abstractions.
+> 
+> so need to patch devlink core and the userspace devlink tool?
+> e.g. devlink migration
+and devlink python libs if openstack was to use it directly.
+we do have caes where we just frok a process and execaute a comannd in a shell
+with or without elevated privladge but we really dont like doing that due to 
+the performacne impacat and security implciations so where we can use python bindign
+over c apis we do. pyroute2 is the only python lib i know off of the top of my head
+that support devlink so we would need to enhacne it to support this new devlink api.
+there may be otherss i have not really looked in the past since we dont need to use
+devlink at all today.
+> 
+> > Note that devlink is based on netlink, netlink has been widely used by
+> > various subsystems other than networking.
+> 
+> the advantage of netlink I see is that it can monitor device status and
+> notify upper layer that migration database needs to get updated.
+> But not sure whether openstack would like to use this capability.
+> As Sean said, it's heavy for openstack. it's heavy for vendor driver
+> as well :)
+> 
+> And devlink monitor now listens the notification and dumps the state
+> changes. If we want to use it, need to let it forward the notification
+> and dumped info to openstack, right?
+i dont think we would use direct devlink monitoring in nova even if it was avaiable.
+we could but we already poll libvirt and the system for other resouce periodicly.
+we likely wouldl just add monitoriv via devlink to that periodic task.
+we certenly would not use it to detect a migration or a need to update a migration database(not sure what that is)
 
-System registers are to be stored in the sysreg file. I've already
-spent enough time moving them out of the various subsystems.
+in reality if we can consume this info indirectly via a libvirt api that will
+be the appcoh we will take at least for the libvirt driver in nova. for cyborg
+they may take a different appoch. we already use pyroute2 in 2 projects, os-vif and
+neutron and it does have devlink support so the burden of using devlink is not that
+high for openstack but its a less frineadly interface for configuration tools like
+ansiable vs a filesystem based approch.
+> 
+> Thanks
+> Yan
+> 
 
->  };
-> 
->  /* Pointer to the vcpu's SVE FFR for sve_{save,load}_state() */
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index 73e12869afe3..18ebbe1c64ee 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-> @@ -262,6 +262,24 @@ int kvm_arch_vcpu_precreate(struct kvm *kvm,
-> unsigned int id)
->  	return 0;
->  }
-> 
-> +static int get_cpu_ftr(u32 id, u64 val, void *argp)
-> +{
-> +	struct id_registers *idregs = argp;
-> +
-> +	/*
-> +	 * (Op0, Op1, CRn, CRm, Op2) of ID registers is (3, 0, 0, crm, op2),
-> +	 * where 1<=crm<8, 0<=op2<8.
-> +	 */
-> +	if (sys_reg_Op0(id) == 3 && sys_reg_Op1(id) == 0 &&
-> +	    sys_reg_CRn(id) == 0 && sys_reg_CRm(id) > 0) {
-> +		idregs->regs[idregs->num].sys_id = id;
-> +		idregs->regs[idregs->num].sys_val = val;
-> +		idregs->num++;
-> +	}
-> +
-> +	return 0;
-> +}
-> +
->  int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
->  {
->  	int err;
-> @@ -285,6 +303,8 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
->  	if (err)
->  		return err;
-> 
-> +	arm64_cpu_ftr_regs_traverse(get_cpu_ftr, &vcpu->arch.idregs);
-> +
->  	return create_hyp_mappings(vcpu, vcpu + 1, PAGE_HYP);
->  }
-> 
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index 138961d7ebe3..776c2757a01e 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -1092,13 +1092,32 @@ static bool access_arch_timer(struct kvm_vcpu 
-> *vcpu,
->  	return true;
->  }
-> 
-> +static struct id_reg_info *kvm_id_reg(struct kvm_vcpu *vcpu, u64 id)
-> +{
-> +	int i;
-> +
-> +	for (i = 0; i < vcpu->arch.idregs.num; ++i) {
-> +		if (vcpu->arch.idregs.regs[i].sys_id == id)
-> +			return &vcpu->arch.idregs.regs[i];
-> +	}
-> +	return NULL;
-> +}
-> +
-> +static u64 kvm_get_id_reg(struct kvm_vcpu *vcpu, u64 id)
-> +{
-> +	struct id_reg_info *ri = kvm_id_reg(vcpu, id);
-> +
-> +	BUG_ON(!ri);
-> +	return ri->sys_val;
-> +}
-> +
->  /* Read a sanitised cpufeature ID register by sys_reg_desc */
-> -static u64 read_id_reg(const struct kvm_vcpu *vcpu,
-> +static u64 read_id_reg(struct kvm_vcpu *vcpu,
->  		struct sys_reg_desc const *r, bool raz)
->  {
->  	u32 id = sys_reg((u32)r->Op0, (u32)r->Op1,
->  			 (u32)r->CRn, (u32)r->CRm, (u32)r->Op2);
-> -	u64 val = raz ? 0 : read_sanitised_ftr_reg(id);
-> +	u64 val = raz ? 0 : kvm_get_id_reg(vcpu, id);
-> 
->  	if (id == SYS_ID_AA64PFR0_EL1) {
->  		if (!vcpu_has_sve(vcpu))
-> @@ -1238,7 +1257,7 @@ static int set_id_aa64zfr0_el1(struct kvm_vcpu 
-> *vcpu,
->   * are stored, and for set_id_reg() we don't allow the effective value
->   * to be changed.
->   */
-> -static int __get_id_reg(const struct kvm_vcpu *vcpu,
-> +static int __get_id_reg(struct kvm_vcpu *vcpu,
->  			const struct sys_reg_desc *rd, void __user *uaddr,
->  			bool raz)
->  {
-> @@ -1248,7 +1267,7 @@ static int __get_id_reg(const struct kvm_vcpu 
-> *vcpu,
->  	return reg_to_user(uaddr, &val, id);
->  }
-> 
-> -static int __set_id_reg(const struct kvm_vcpu *vcpu,
-> +static int __set_id_reg(struct kvm_vcpu *vcpu,
->  			const struct sys_reg_desc *rd, void __user *uaddr,
->  			bool raz)
->  {
-> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-> index f6d86033c4fa..1029444d04aa 100644
-> --- a/include/uapi/linux/kvm.h
-> +++ b/include/uapi/linux/kvm.h
-> @@ -1272,6 +1272,17 @@ struct kvm_vfio_spapr_tce {
->  	__s32	tablefd;
->  };
-> 
-> +#define ID_REG_MAX_NUMS 64
-> +struct id_reg_info {
-> +	uint64_t sys_id;
-> +	uint64_t sys_val;
-> +};
-> +
-> +struct id_registers {
-> +	struct id_reg_info regs[ID_REG_MAX_NUMS];
-> +	uint64_t num;
-> +};
-> +
->  /*
->   * ioctls for VM fds
->   */
-
-No way this is an acceptable interface. We have the one-reg interface,
-which takes a system register encoding.
-
-         M.
--- 
-Jazz is not dead. It just smells funny...
