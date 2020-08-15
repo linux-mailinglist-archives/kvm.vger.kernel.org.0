@@ -2,154 +2,143 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9C1B22451F2
-	for <lists+kvm@lfdr.de>; Sat, 15 Aug 2020 23:32:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4D26124548B
+	for <lists+kvm@lfdr.de>; Sun, 16 Aug 2020 00:28:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726977AbgHOVch (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 15 Aug 2020 17:32:37 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:39288 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726912AbgHOVca (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 15 Aug 2020 17:32:30 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1597527147;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=r0QF9s7ohj4aNl8eau7he4E9tQctsoC4pp/nsapCJL4=;
-        b=CT+5vwiQTLnHtPepWrbzAXpGG7+YeR8TJ4+mb+o9ykDxZI0MwUxUhWFceqGGrpSZMLhSFU
-        iR5aWZADL2p3XqFsxb33ASJMxVAV5OZm7iD2JOEWvbvDJfpZFN4yy+JTAfw3/d72KFboAA
-        UqV6yuNt1olejz3TFUv8Ozr2akC+pQI=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-3-XMeVB9CSPX2lvLUrfoyLuA-1; Sat, 15 Aug 2020 12:30:55 -0400
-X-MC-Unique: XMeVB9CSPX2lvLUrfoyLuA-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        id S1728550AbgHOW2N (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 15 Aug 2020 18:28:13 -0400
+Received: from lavender.maple.relay.mailchannels.net ([23.83.214.99]:16643
+        "EHLO lavender.maple.relay.mailchannels.net" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726598AbgHOW2N (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Sat, 15 Aug 2020 18:28:13 -0400
+X-Sender-Id: dreamhost|x-authsender|contact@kevinloughlin.org
+Received: from relay.mailchannels.net (localhost [127.0.0.1])
+        by relay.mailchannels.net (Postfix) with ESMTP id 995824012B1
+        for <kvm@vger.kernel.org>; Sat, 15 Aug 2020 21:08:59 +0000 (UTC)
+Received: from pdx1-sub0-mail-a66.g.dreamhost.com (100-96-7-27.trex.outbound.svc.cluster.local [100.96.7.27])
+        (Authenticated sender: dreamhost)
+        by relay.mailchannels.net (Postfix) with ESMTPA id DC08D4011B0
+        for <kvm@vger.kernel.org>; Sat, 15 Aug 2020 21:08:58 +0000 (UTC)
+X-Sender-Id: dreamhost|x-authsender|contact@kevinloughlin.org
+Received: from pdx1-sub0-mail-a66.g.dreamhost.com (pop.dreamhost.com
+ [64.90.62.162])
+        (using TLSv1.2 with cipher DHE-RSA-AES256-GCM-SHA384)
+        by 0.0.0.0:2500 (trex/5.18.8);
+        Sat, 15 Aug 2020 21:08:59 +0000
+X-MC-Relay: Neutral
+X-MailChannels-SenderId: dreamhost|x-authsender|contact@kevinloughlin.org
+X-MailChannels-Auth-Id: dreamhost
+X-Language-Industry: 437238696730d39f_1597525739345_1753357456
+X-MC-Loop-Signature: 1597525739345:2317480423
+X-MC-Ingress-Time: 1597525739344
+Received: from pdx1-sub0-mail-a66.g.dreamhost.com (localhost [127.0.0.1])
+        by pdx1-sub0-mail-a66.g.dreamhost.com (Postfix) with ESMTP id 7E99A7F60C
+        for <kvm@vger.kernel.org>; Sat, 15 Aug 2020 14:08:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha1; c=relaxed; d=kevinloughlin.org; h=
+        mime-version:references:in-reply-to:from:date:message-id:subject
+        :to:content-type; s=kevinloughlin.org; bh=PLLn71yw70w+FHnL0XBKkp
+        560eM=; b=6C4BA3NPhwRIRcojG45mKQYOq4VpVu/YmyO9/ZOv/rTwsCcQYFGMEo
+        8Owh4Xg8D9o+Qvu5Vi0U/jZVhnZbntiuis9Y5x957lMitfsXFGyj1Gd6+i3pOQgO
+        eqVLPqiO/2KuCn2ch0zBlNviOWtVlAV8YnMexxLAcOpGGEgPMJvNk=
+Received: from mail-io1-f52.google.com (mail-io1-f52.google.com [209.85.166.52])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 38FBE1015DC2;
-        Sat, 15 Aug 2020 16:30:38 +0000 (UTC)
-Received: from [10.36.113.93] (ovpn-113-93.ams2.redhat.com [10.36.113.93])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id C147E7A426;
-        Sat, 15 Aug 2020 16:30:28 +0000 (UTC)
-Subject: Re: [PATCH v6 09/15] iommu/vt-d: Check ownership for PASIDs from
- user-space
-To:     Liu Yi L <yi.l.liu@intel.com>, alex.williamson@redhat.com,
-        baolu.lu@linux.intel.com, joro@8bytes.org
-Cc:     kevin.tian@intel.com, jacob.jun.pan@linux.intel.com,
-        ashok.raj@intel.com, jun.j.tian@intel.com, yi.y.sun@intel.com,
-        jean-philippe@linaro.org, peterx@redhat.com, hao.wu@intel.com,
-        stefanha@gmail.com, iommu@lists.linux-foundation.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <1595917664-33276-1-git-send-email-yi.l.liu@intel.com>
- <1595917664-33276-10-git-send-email-yi.l.liu@intel.com>
-From:   Auger Eric <eric.auger@redhat.com>
-Message-ID: <0db97d4a-7c74-9fac-0763-0ed56dcc5eaa@redhat.com>
-Date:   Sat, 15 Aug 2020 18:30:27 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+        (Authenticated sender: contact@kevinloughlin.org)
+        by pdx1-sub0-mail-a66.g.dreamhost.com (Postfix) with ESMTPSA id C2F227F608
+        for <kvm@vger.kernel.org>; Sat, 15 Aug 2020 14:08:56 -0700 (PDT)
+Received: by mail-io1-f52.google.com with SMTP id t15so14064520iob.3
+        for <kvm@vger.kernel.org>; Sat, 15 Aug 2020 14:08:56 -0700 (PDT)
+X-Gm-Message-State: AOAM532bpYX3LlEW9dI80F+CaE4XyG5/Sqa/5H9ytLLJtWzHYhq6bD0M
+        zukctH3LiERQqrPNhAmNrJUntD149aFEUqDCCSM=
+X-Google-Smtp-Source: ABdhPJxENn7VLRN4pk9tFxIoQ4tl0D4rU4bksdA2SyL9YI/OiCqpq+IK3jjL353gLWoc+5mYq/pyuHefOhdAWX5CSs0=
+X-Received: by 2002:a6b:da0d:: with SMTP id x13mr6983127iob.138.1597525735864;
+ Sat, 15 Aug 2020 14:08:55 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <1595917664-33276-10-git-send-email-yi.l.liu@intel.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+References: <d49ad8fb155e2ebc6e54d8b83c335926@kevinloughlin.org> <20200720154901.GB20375@linux.intel.com>
+In-Reply-To: <20200720154901.GB20375@linux.intel.com>
+X-DH-BACKEND: pdx1-sub0-mail-a66
+From:   Kevin Loughlin <contact@kevinloughlin.org>
+Date:   Sat, 15 Aug 2020 17:08:45 -0400
+X-Gmail-Original-Message-ID: <CAB30WPe1F6D3e=AkR=QiSAhCib6X5ufJnZjaHQD0wTo79_+Z2g@mail.gmail.com>
+Message-ID: <CAB30WPe1F6D3e=AkR=QiSAhCib6X5ufJnZjaHQD0wTo79_+Z2g@mail.gmail.com>
+Subject: Re: x86 MMU: RMap Interface
+To:     kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+X-VR-OUT-STATUS: OK
+X-VR-OUT-SCORE: 0
+X-VR-OUT-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduiedrleelgdduheekucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuggftfghnshhusghstghrihgsvgdpffftgfetoffjqffuvfenuceurghilhhouhhtmecufedttdenucenucfjughrpeggfhgjhfffkffuvfgtsehttdertddttdejnecuhfhrohhmpefmvghvihhnucfnohhughhhlhhinhcuoegtohhnthgrtghtsehkvghvihhnlhhouhhghhhlihhnrdhorhhgqeenucggtffrrghtthgvrhhnpeffjefhtdelvdfhteevfeefvdfhjefgheetheetgefftdeghffgvedtvdevhfdvheenucfkphepvddtledrkeehrdduieeirdehvdenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhhouggvpehsmhhtphdphhgvlhhopehmrghilhdqihhouddqfhehvddrghhoohhglhgvrdgtohhmpdhinhgvthepvddtledrkeehrdduieeirdehvddprhgvthhurhhnqdhprghthhepmfgvvhhinhcunfhouhhghhhlihhnuceotghonhhtrggttheskhgvvhhinhhlohhughhhlhhinhdrohhrgheqpdhmrghilhhfrhhomheptghonhhtrggttheskhgvvhhinhhlohhughhhlhhinhdrohhrghdpnhhrtghpthhtohepkhhvmhesvhhgvghrrdhkvghrnhgvlhdrohhrgh
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Yi,
+Given this info, am I correct in saying that all non-MMIO guest pages
+are (1) added to the rmap upon being marked present, and (2) removed
+from the rmap upon being marked non-present?
 
-On 7/28/20 8:27 AM, Liu Yi L wrote:
-> When an IOMMU domain with nesting attribute is used for guest SVA, a
-> system-wide PASID is allocated for binding with the device and the domain.
-> For security reason, we need to check the PASID passed from user-space.
-> e.g. page table bind/unbind and PASID related cache invalidation.
-> 
-> Cc: Kevin Tian <kevin.tian@intel.com>
-> CC: Jacob Pan <jacob.jun.pan@linux.intel.com>
-> Cc: Alex Williamson <alex.williamson@redhat.com>
-> Cc: Eric Auger <eric.auger@redhat.com>
-> Cc: Jean-Philippe Brucker <jean-philippe@linaro.org>
-> Cc: Joerg Roedel <joro@8bytes.org>
-> Cc: Lu Baolu <baolu.lu@linux.intel.com>
-> Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
-> Signed-off-by: Jacob Pan <jacob.jun.pan@linux.intel.com>
-> ---
->  drivers/iommu/intel/iommu.c | 10 ++++++++++
->  drivers/iommu/intel/svm.c   |  7 +++++--
->  2 files changed, 15 insertions(+), 2 deletions(-)
-> 
-> diff --git a/drivers/iommu/intel/iommu.c b/drivers/iommu/intel/iommu.c
-> index b2fe54e..88f4647 100644
-> --- a/drivers/iommu/intel/iommu.c
-> +++ b/drivers/iommu/intel/iommu.c
-> @@ -5436,6 +5436,7 @@ intel_iommu_sva_invalidate(struct iommu_domain *domain, struct device *dev,
->  		int granu = 0;
->  		u64 pasid = 0;
->  		u64 addr = 0;
-> +		void *pdata;
->  
->  		granu = to_vtd_granularity(cache_type, inv_info->granularity);
->  		if (granu == -EINVAL) {
-> @@ -5456,6 +5457,15 @@ intel_iommu_sva_invalidate(struct iommu_domain *domain, struct device *dev,
->  			 (inv_info->granu.addr_info.flags & IOMMU_INV_ADDR_FLAGS_PASID))
->  			pasid = inv_info->granu.addr_info.pasid;
->  
-> +		pdata = ioasid_find(dmar_domain->ioasid_sid, pasid, NULL);
-> +		if (!pdata) {
-> +			ret = -EINVAL;
-> +			goto out_unlock;
-> +		} else if (IS_ERR(pdata)) {
-> +			ret = PTR_ERR(pdata);
-> +			goto out_unlock;
-> +		}
-> +
->  		switch (BIT(cache_type)) {
->  		case IOMMU_CACHE_INV_TYPE_IOTLB:
->  			/* HW will ignore LSB bits based on address mask */
-> diff --git a/drivers/iommu/intel/svm.c b/drivers/iommu/intel/svm.c
-> index c85b8d5..b9b29ad 100644
-> --- a/drivers/iommu/intel/svm.c
-> +++ b/drivers/iommu/intel/svm.c
-> @@ -323,7 +323,7 @@ int intel_svm_bind_gpasid(struct iommu_domain *domain, struct device *dev,
->  	dmar_domain = to_dmar_domain(domain);
->  
->  	mutex_lock(&pasid_mutex);
-> -	svm = ioasid_find(INVALID_IOASID_SET, data->hpasid, NULL);
-> +	svm = ioasid_find(dmar_domain->ioasid_sid, data->hpasid, NULL);
-A question about the locking strategy. We don't take the
-device_domain_lock here. Could you clarify whether it is safe?
+I primarily ask because I'm observing behavior (running x86-64 guest
+with TDP/EPT enabled) wherein multiple SPTEs appear to be added to the
+rmap for the same GFN<->PFN mapping (sometimes later followed by
+multiple removals of the same GFN<->PFN mapping). My understanding was
+that, for a given guest, each GFN<->PFN mapping corresponds to exactly
+one rmap entry (and vice versa). Is this incorrect?
 
+I observe the behavior I mentioned whether I log upon rmap updates, or
+upon mmu_spte_set() (for non-present->present) and
+mmu_clear_track_bits() (for present->non-present). Perhaps I'm missing
+a more obvious interface for logging when the PFNs backing guest pages
+are marked as present/non-present?
 
->  	if (IS_ERR(svm)) {
->  		ret = PTR_ERR(svm);
->  		goto out;
-> @@ -440,6 +440,7 @@ int intel_svm_unbind_gpasid(struct iommu_domain *domain,
->  			    struct device *dev, u32 pasid)
->  {
->  	struct intel_iommu *iommu = intel_svm_device_to_iommu(dev);
-> +	struct dmar_domain *dmar_domain;
->  	struct intel_svm_dev *sdev;
->  	struct intel_svm *svm;
->  	int ret = -EINVAL;
-> @@ -447,8 +448,10 @@ int intel_svm_unbind_gpasid(struct iommu_domain *domain,
->  	if (WARN_ON(!iommu))
->  		return -EINVAL;
->  
-> +	dmar_domain = to_dmar_domain(domain);
-> +
->  	mutex_lock(&pasid_mutex);
-> -	svm = ioasid_find(INVALID_IOASID_SET, pasid, NULL);
-> +	svm = ioasid_find(dmar_domain->ioasid_sid, pasid, NULL);
-same here.
->  	if (!svm) {
->  		ret = -EINVAL;
->  		goto out;
-> 
-Thanks
+Best wishes, and thanks again for the help,
 
-Eric
+Kevin
 
+On Mon, Jul 20, 2020 at 11:49 AM Sean Christopherson
+<sean.j.christopherson@intel.com> wrote:
+>
+> On Sun, Jul 19, 2020 at 06:32:22PM -0400, contact@kevinloughlin.org wrote:
+> > Hi,
+> >
+> > I'm a bit confused by the interface for interacting with the page rmap. For
+> > context, on a TDP-enabled x86-64 host, I'm logging each time a GFN->PFN
+> > mapping is created/modified/removed for a non-MMIO page (kernel version
+> > 5.4).
+> >
+> > First, my understanding is that the page rmap is a mapping of non-MMIO PFNs
+> > back to the GFNs that use them. The interface for creating an rmap entry
+> > (and thus, a new GFN->PFN mapping) appears to be rmap_add() and is quite
+> > straightforward. However, rmap_remove() does not appear to be the (only)
+> > function for removing an entry from the page rmap. For instance,
+> > kvm_zap_rmapp()---used by the mmu_notifier for invalidations---jumps
+> > straight to pte_list_remove(), while drop_spte() uses rmap_remove().
+>
+> The rmaps are associated with the memslot, the drop_spte() path allows KVM
+> to clean up SPTEs without having to guarantee the validity of the memslot
+> that was used to create the SPTE.
+>
+> > Would it be fair to say that mmu_spte_clear_track_bits() is found on all
+> > paths for removing an entry from the page rmap?
+>
+> Yes, that should hold true.
+>
+> > Second, for updates to the frame numbers in an existing SPTE, there are both
+> > mmu_set_spte() and mmu_spte_set(). Could someone please clarify the
+> > difference between these functions?
+>
+> mmu_set_spte() is the higher level helper that is used during a page fault
+> or prefetch to convert a host PFN and basic access permissions into a SPTE
+> value, handle large/huge page interactions and accounting, add the rmap,
+> etc..., and of course eventually update the SPTE.
+>
+> mmu_spte_set() is a low level helper that does nothing more than write a
+> SPTE.  It's just a wrapper to __set_spte() that also WARNs if the old SPTE
+> is present.
+>
+> > Finally, much of the logic between the page rmap and parent PTE rmaps
+> > (understandably) overlaps. However, with TDP-enabled, I'm not entirely sure
+> > what the role of the parent PTE rmaps is relative to the page rmap. Could
+> > someone possibly clarify?
+>
+> KVM needs the backpointers to remove the SPTE for a shadow page, which
+> exists in the parent shadow page, when the child is zapped, e.g. if a L2 SP
+> is removed, its SPTE in a L3 SP needs to be updated.
