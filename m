@@ -2,38 +2,39 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A17A5245772
-	for <lists+kvm@lfdr.de>; Sun, 16 Aug 2020 13:52:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D5A91245781
+	for <lists+kvm@lfdr.de>; Sun, 16 Aug 2020 14:02:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727071AbgHPLwY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 16 Aug 2020 07:52:24 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:41126 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726022AbgHPLwN (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Sun, 16 Aug 2020 07:52:13 -0400
+        id S1728536AbgHPMCR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 16 Aug 2020 08:02:17 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:60271 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726308AbgHPMBS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 16 Aug 2020 08:01:18 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1597578729;
+        s=mimecast20190719; t=1597579275;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=7OLC89jOoEoJHyExqjmcWiWlu8IwCSnO9Y8nKZy7mHo=;
-        b=e6NQQl9YcnmDEa0/j0b8SjN1W3ltUhgr5MiHcxeS1WCqPCWD8PWCib9nxkGJ2NnxTEYV8f
-        t4TZzKNlH4zPFJquwq3q2SohmZfu8AdjEs7HOqFmnfAWJDXJrkWnks00KSGMC8Lwq/wex9
-        R+ajvqTr44BKEYXWPfeN/+ak8hlgEjc=
+        bh=ksAEekms9m8D7GB2Y4X47go1iynsQ0sEnvHZpgyZDbQ=;
+        b=AxtVoLgW7kNuBUSmpCrN0AK4yqduQTTHs+UVVhxaEwLOvjHq7LkTVptaIEP2UhmveYLWSl
+        2wwz6lSqWug5Ibk3fJlGpBPXdV33sEn7AnjnvN5U+NjR5wSIf0uO4DmGHLDPEtnI635UUK
+        KBgcuFLRy55O8BMieWD4D6jmbZtSqUQ=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-328-AijQ1lieOIqtjUfgma6l5g-1; Sun, 16 Aug 2020 07:52:03 -0400
-X-MC-Unique: AijQ1lieOIqtjUfgma6l5g-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+ us-mta-26-3swd7j7wMDOUMWr8sVuKRg-1; Sun, 16 Aug 2020 08:01:11 -0400
+X-MC-Unique: 3swd7j7wMDOUMWr8sVuKRg-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DEFCD1015DC3;
-        Sun, 16 Aug 2020 11:52:00 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6F7101DDE4;
+        Sun, 16 Aug 2020 12:01:09 +0000 (UTC)
 Received: from [10.36.113.93] (ovpn-113-93.ams2.redhat.com [10.36.113.93])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 227817B9FA;
-        Sun, 16 Aug 2020 11:51:50 +0000 (UTC)
-Subject: Re: [PATCH v6 14/15] vfio: Document dual stage control
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 8246D757F3;
+        Sun, 16 Aug 2020 12:01:05 +0000 (UTC)
+Subject: Re: [PATCH v6 15/15] iommu/vt-d: Support reporting nesting capability
+ info
 To:     Liu Yi L <yi.l.liu@intel.com>, alex.williamson@redhat.com,
         baolu.lu@linux.intel.com, joro@8bytes.org
 Cc:     kevin.tian@intel.com, jacob.jun.pan@linux.intel.com,
@@ -42,18 +43,18 @@ Cc:     kevin.tian@intel.com, jacob.jun.pan@linux.intel.com,
         stefanha@gmail.com, iommu@lists.linux-foundation.org,
         kvm@vger.kernel.org, linux-kernel@vger.kernel.org
 References: <1595917664-33276-1-git-send-email-yi.l.liu@intel.com>
- <1595917664-33276-15-git-send-email-yi.l.liu@intel.com>
+ <1595917664-33276-16-git-send-email-yi.l.liu@intel.com>
 From:   Auger Eric <eric.auger@redhat.com>
-Message-ID: <aa1297cb-2bde-0cea-70a4-fc8f56d745e6@redhat.com>
-Date:   Sun, 16 Aug 2020 13:51:49 +0200
+Message-ID: <7fe337fa-abbc-82be-c8e8-b9e2a6179b90@redhat.com>
+Date:   Sun, 16 Aug 2020 14:01:03 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <1595917664-33276-15-git-send-email-yi.l.liu@intel.com>
+In-Reply-To: <1595917664-33276-16-git-send-email-yi.l.liu@intel.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
@@ -62,11 +63,9 @@ X-Mailing-List: kvm@vger.kernel.org
 Hi Yi,
 
 On 7/28/20 8:27 AM, Liu Yi L wrote:
-> From: Eric Auger <eric.auger@redhat.com>
-> 
-> The VFIO API was enhanced to support nested stage control: a bunch of> new ioctls and usage guideline.
-> 
-> Let's document the process to follow to set up nested mode.
+> This patch reports nesting info, and only supports the case where all
+> the physical iomms have the same CAP/ECAP MASKS.
+s/iomms/iommus
 > 
 > Cc: Kevin Tian <kevin.tian@intel.com>
 > CC: Jacob Pan <jacob.jun.pan@linux.intel.com>
@@ -75,124 +74,157 @@ On 7/28/20 8:27 AM, Liu Yi L wrote:
 > Cc: Jean-Philippe Brucker <jean-philippe@linaro.org>
 > Cc: Joerg Roedel <joro@8bytes.org>
 > Cc: Lu Baolu <baolu.lu@linux.intel.com>
-> Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-> Signed-off-by: Eric Auger <eric.auger@redhat.com>
 > Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
+> Signed-off-by: Jacob Pan <jacob.jun.pan@linux.intel.com>
 > ---
-> v5 -> v6:
-> *) tweak per Eric's comments.
-> 
-> v3 -> v4:
-> *) add review-by from Stefan Hajnoczi
-> 
 > v2 -> v3:
-> *) address comments from Stefan Hajnoczi
-> 
-> v1 -> v2:
-> *) new in v2, compared with Eric's original version, pasid table bind
->    and fault reporting is removed as this series doesn't cover them.
->    Original version from Eric.
->    https://lkml.org/lkml/2020/3/20/700
+> *) remove cap/ecap_mask in iommu_nesting_info.
 > ---
->  Documentation/driver-api/vfio.rst | 75 +++++++++++++++++++++++++++++++++++++++
->  1 file changed, 75 insertions(+)
+>  drivers/iommu/intel/iommu.c | 81 +++++++++++++++++++++++++++++++++++++++++++--
+>  include/linux/intel-iommu.h | 16 +++++++++
+>  2 files changed, 95 insertions(+), 2 deletions(-)
 > 
-> diff --git a/Documentation/driver-api/vfio.rst b/Documentation/driver-api/vfio.rst
-> index f1a4d3c..c0d43f0 100644
-> --- a/Documentation/driver-api/vfio.rst
-> +++ b/Documentation/driver-api/vfio.rst
-> @@ -239,6 +239,81 @@ group and can access them as follows::
->  	/* Gratuitous device reset and go... */
->  	ioctl(device, VFIO_DEVICE_RESET);
+> diff --git a/drivers/iommu/intel/iommu.c b/drivers/iommu/intel/iommu.c
+> index 88f4647..0835804 100644
+> --- a/drivers/iommu/intel/iommu.c
+> +++ b/drivers/iommu/intel/iommu.c
+> @@ -5660,12 +5660,16 @@ static inline bool iommu_pasid_support(void)
+>  static inline bool nested_mode_support(void)
+>  {
+>  	struct dmar_drhd_unit *drhd;
+> -	struct intel_iommu *iommu;
+> +	struct intel_iommu *iommu, *prev = NULL;
+>  	bool ret = true;
 >  
-> +IOMMU Dual Stage Control
-> +------------------------
+>  	rcu_read_lock();
+>  	for_each_active_iommu(iommu, drhd) {
+> -		if (!sm_supported(iommu) || !ecap_nest(iommu->ecap)) {
+> +		if (!prev)
+> +			prev = iommu;
+> +		if (!sm_supported(iommu) || !ecap_nest(iommu->ecap) ||
+> +		    (VTD_CAP_MASK & (iommu->cap ^ prev->cap)) ||
+> +		    (VTD_ECAP_MASK & (iommu->ecap ^ prev->ecap))) {
+>  			ret = false;
+>  			break;
+So this changes the behavior of DOMAIN_ATTR_NESTING. Shouldn't it have a
+Fixes tag as well? And maybe add the capability getter in a separate patch?
+>  		}
+> @@ -6081,6 +6085,78 @@ intel_iommu_domain_set_attr(struct iommu_domain *domain,
+>  	return ret;
+>  }
+>  
+> +static int intel_iommu_get_nesting_info(struct iommu_domain *domain,
+> +					struct iommu_nesting_info *info)
+> +{
+> +	struct dmar_domain *dmar_domain = to_dmar_domain(domain);
+> +	u64 cap = VTD_CAP_MASK, ecap = VTD_ECAP_MASK;
+> +	struct device_domain_info *domain_info;
+> +	struct iommu_nesting_info_vtd vtd;
+> +	unsigned long flags;
+> +	unsigned int size;
 > +
-> +Some IOMMUs support 2 stages/levels of translation. Stage corresponds
-> +to the ARM terminology while level corresponds to Intel's terminology.
-> +In the following text we use either without distinction.
+> +	if (domain->type != IOMMU_DOMAIN_UNMANAGED ||
+> +	    !(dmar_domain->flags & DOMAIN_FLAG_NESTING_MODE))
+> +		return -ENODEV;
 > +
-> +This is useful when the guest is exposed with a virtual IOMMU and some
-> +devices are assigned to the guest through VFIO. Then the guest OS can
-> +use stage-1 (GIOVA -> GPA or GVA->GPA), while the hypervisor uses stage
-> +2 for VM isolation (GPA -> HPA).
+> +	if (!info)
+> +		return -EINVAL;
 > +
-> +Under dual stage translation, the guest gets ownership of the stage-1 page
-> +tables and also owns stage-1 configuration structures. The hypervisor owns
-> +the root configuration structure (for security reason), including stage-2
-> +configuration.
-This is only true for vtd. On ARM the stage2 cfg is the Context
-Descriptor table (aka PASID table). root cfg only store the GPA of the
-CD table.
- This works as long as configuration structures and page table
-> +formats are compatible between the virtual IOMMU and the physical IOMMU.
+> +	size = sizeof(struct iommu_nesting_info) +
+> +		sizeof(struct iommu_nesting_info_vtd);
+> +	/*
+> +	 * if provided buffer size is smaller than expected, should
+> +	 * return 0 and also the expected buffer size to caller.
+> +	 */
+> +	if (info->argsz < size) {
+> +		info->argsz = size;
+> +		return 0;
+> +	}
 > +
-> +Assuming the HW supports it, this nested mode is selected by choosing the
-> +VFIO_TYPE1_NESTING_IOMMU type through:
+> +	spin_lock_irqsave(&device_domain_lock, flags);
+> +	/*
+> +	 * arbitrary select the first domain_info as all nesting
+> +	 * related capabilities should be consistent across iommu
+> +	 * units.
+> +	 */
+> +	domain_info = list_first_entry(&dmar_domain->devices,
+> +				       struct device_domain_info, link);
+> +	cap &= domain_info->iommu->cap;
+> +	ecap &= domain_info->iommu->ecap;
+> +	spin_unlock_irqrestore(&device_domain_lock, flags);
 > +
-> +    ioctl(container, VFIO_SET_IOMMU, VFIO_TYPE1_NESTING_IOMMU);
+> +	info->format = IOMMU_PASID_FORMAT_INTEL_VTD;
+> +	info->features = IOMMU_NESTING_FEAT_SYSWIDE_PASID |
+> +			 IOMMU_NESTING_FEAT_BIND_PGTBL |
+> +			 IOMMU_NESTING_FEAT_CACHE_INVLD;
+> +	info->addr_width = dmar_domain->gaw;
+> +	info->pasid_bits = ilog2(intel_pasid_max_id);
+> +	info->padding = 0;
+> +	vtd.flags = 0;
+> +	vtd.padding = 0;
+> +	vtd.cap_reg = cap;
+> +	vtd.ecap_reg = ecap;
 > +
-> +This forces the hypervisor to use the stage-2, leaving stage-1 available
-> +for guest usage. The stage-1 format and binding method are vendor specific
-. There are reported in the nesting capability ...
-> +and reported in nesting cap (VFIO_IOMMU_TYPE1_INFO_CAP_NESTING) through
-> +VFIO_IOMMU_GET_INFO:
+> +	memcpy(info->data, &vtd, sizeof(vtd));
+> +	return 0;
+> +}
 > +
-> +    ioctl(container->fd, VFIO_IOMMU_GET_INFO, &nesting_info);
-> +
-> +The nesting cap info is available only after NESTING_IOMMU is selected.
-> +If underlying IOMMU doesn't support nesting, VFIO_SET_IOMMU fails and
-If the underlying
-> +userspace should try other IOMMU types. Details of the nesting cap info
-> +can be found in Documentation/userspace-api/iommu.rst.
-> +
-> +The stage-1 page table can be bound to the IOMMU in two methods: directly> +or indirectly. Direct binding requires userspace to notify VFIO of every
-Not sure we shall use this direct/indirect terminology. I don't think
-this is part of either ARM or Intel SPEC.
+> +static int intel_iommu_domain_get_attr(struct iommu_domain *domain,
+> +				       enum iommu_attr attr, void *data)
+> +{
+> +	switch (attr) {
+> +	case DOMAIN_ATTR_NESTING:
+> +	{
+> +		struct iommu_nesting_info *info =
+> +				(struct iommu_nesting_info *)data;
 
-Suggestion: On Intel, the stage1 page table info are mediated by the
-userspace for each PASID. On ARM, the userspace directly passes the GPA
-of the whole PASID table. Currently only Intel's binding is supported.
-> +guest stage-1 page table binding, while indirect binding allows userspace
-> +to bind once with an intermediate structure (e.g. PASID table) which
-> +indirectly links to guest stage-1 page tables. The actual binding method
-> +depends on IOMMU vendor. Currently only the direct binding capability (
-> +IOMMU_NESTING_FEAT_BIND_PGTBL) is supported:
+don't you need to hold a device_domain_lock earlier to make sure domain
+attributes can't change behind your back (unmanaged type and nested mode)?
 > +
-> +    nesting_op->flags = VFIO_IOMMU_NESTING_OP_BIND_PGTBL;
-> +    memcpy(&nesting_op->data, &bind_data, sizeof(bind_data));
-> +    ioctl(container->fd, VFIO_IOMMU_NESTING_OP, nesting_op);
+> +		return intel_iommu_get_nesting_info(domain, info);
+> +	}
+> +	default:
+> +		return -ENOENT;
+> +	}
+> +}
 > +
-> +When multiple stage-1 page tables are supported on a device, each page
-> +table is associated with a PASID (Process Address Space ID) to differentiate
-> +with each other. In such case, userspace should include PASID in the
-> +bind_data when issuing direct binding request.
+>  /*
+>   * Check that the device does not live on an external facing PCI port that is
+>   * marked as untrusted. Such devices should not be able to apply quirks and
+> @@ -6103,6 +6179,7 @@ const struct iommu_ops intel_iommu_ops = {
+>  	.domain_alloc		= intel_iommu_domain_alloc,
+>  	.domain_free		= intel_iommu_domain_free,
+>  	.domain_set_attr	= intel_iommu_domain_set_attr,
+> +	.domain_get_attr	= intel_iommu_domain_get_attr,
+>  	.attach_dev		= intel_iommu_attach_device,
+>  	.detach_dev		= intel_iommu_detach_device,
+>  	.aux_attach_dev		= intel_iommu_aux_attach_device,
+> diff --git a/include/linux/intel-iommu.h b/include/linux/intel-iommu.h
+> index f98146b..5acf795 100644
+> --- a/include/linux/intel-iommu.h
+> +++ b/include/linux/intel-iommu.h
+> @@ -197,6 +197,22 @@
+>  #define ecap_max_handle_mask(e) ((e >> 20) & 0xf)
+>  #define ecap_sc_support(e)	((e >> 7) & 0x1) /* Snooping Control */
+>  
+> +/* Nesting Support Capability Alignment */
+> +#define VTD_CAP_FL1GP		BIT_ULL(56)
+> +#define VTD_CAP_FL5LP		BIT_ULL(60)
+> +#define VTD_ECAP_PRS		BIT_ULL(29)
+> +#define VTD_ECAP_ERS		BIT_ULL(30)
+> +#define VTD_ECAP_SRS		BIT_ULL(31)
+> +#define VTD_ECAP_EAFS		BIT_ULL(34)
+> +#define VTD_ECAP_PASID		BIT_ULL(40)
 > +
-> +PASID could be managed per-device or system-wide which, again, depends on
-> +IOMMU vendor and is reported in nesting cap info. When system-wide policy
-> +is reported (IOMMU_NESTING_FEAT_SYSWIDE_PASID), e.g. as by Intel platforms,
-> +userspace *must* allocate PASID from VFIO before attempting binding of
-> +stage-1 page table:
+> +/* Only capabilities marked in below MASKs are reported */
+> +#define VTD_CAP_MASK		(VTD_CAP_FL1GP | VTD_CAP_FL5LP)
 > +
-> +    req.flags = VFIO_IOMMU_ALLOC_PASID;
-> +    ioctl(container, VFIO_IOMMU_PASID_REQUEST, &req);
+> +#define VTD_ECAP_MASK		(VTD_ECAP_PRS | VTD_ECAP_ERS | \
+> +				 VTD_ECAP_SRS | VTD_ECAP_EAFS | \
+> +				 VTD_ECAP_PASID)
 > +
-> +Once the stage-1 page table is bound to the IOMMU, the guest is allowed to
-> +fully manage its mapping at its disposal. The IOMMU walks nested stage-1
-> +and stage-2 page tables when serving DMA requests from assigned device, and
-> +may cache the stage-1 mapping in the IOTLB. When required (IOMMU_NESTING_
-> +FEAT_CACHE_INVLD), userspace *must* forward guest stage-1 invalidation to
-> +the host, so the IOTLB is invalidated:
-> +
-> +    nesting_op->flags = VFIO_IOMMU_NESTING_OP_CACHE_INVLD;
-> +    memcpy(&nesting_op->data, &cache_inv_data, sizeof(cache_inv_data));
-> +    ioctl(container->fd, VFIO_IOMMU_NESTING_OP, nesting_op);
-> +
-> +Forwarded invalidations can happen at various granularity levels (page
-> +level, context level, etc.)
-> +
->  VFIO User API
->  -------------------------------------------------------------------------------
+>  /* Virtual command interface capability */
+>  #define vccap_pasid(v)		(((v) & DMA_VCS_PAS)) /* PASID allocation */
 >  
 > 
 Thanks
