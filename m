@@ -2,139 +2,112 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4AE93246732
-	for <lists+kvm@lfdr.de>; Mon, 17 Aug 2020 15:14:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7401E246CE7
+	for <lists+kvm@lfdr.de>; Mon, 17 Aug 2020 18:32:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728834AbgHQNOk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 17 Aug 2020 09:14:40 -0400
-Received: from smtp-fw-9101.amazon.com ([207.171.184.25]:44636 "EHLO
-        smtp-fw-9101.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728471AbgHQNNm (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 17 Aug 2020 09:13:42 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1597670022; x=1629206022;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=6YI3EwlP0gXnpO1U7PwzG0Q7DKDFtmgrYc94LiTchSQ=;
-  b=BoZDT5r/F1T8XRYZFJxDQ1IO/1hWHNqrg6zkX/HQQp+IsvAWq+EkJygH
-   N1lDQ6JVbElg5NT7vHEnykHdyH2uIqfbx/wSsXc88gtNHYWxa7Q6VjSD0
-   JX0grtUeH5bTbnAekS41ogtP+iOw2kunCpuXltPOVeD0z4CfY9/OnzJ+y
-   0=;
-X-IronPort-AV: E=Sophos;i="5.76,322,1592870400"; 
-   d="scan'208";a="60331119"
-Received: from sea32-co-svc-lb4-vlan3.sea.corp.amazon.com (HELO email-inbound-relay-1e-303d0b0e.us-east-1.amazon.com) ([10.47.23.38])
-  by smtp-border-fw-out-9101.sea19.amazon.com with ESMTP; 17 Aug 2020 13:13:26 +0000
-Received: from EX13MTAUEA002.ant.amazon.com (iad55-ws-svc-p15-lb9-vlan2.iad.amazon.com [10.40.159.162])
-        by email-inbound-relay-1e-303d0b0e.us-east-1.amazon.com (Postfix) with ESMTPS id E3761A2098;
-        Mon, 17 Aug 2020 13:13:23 +0000 (UTC)
-Received: from EX13D16EUB001.ant.amazon.com (10.43.166.28) by
- EX13MTAUEA002.ant.amazon.com (10.43.61.77) with Microsoft SMTP Server (TLS)
- id 15.0.1497.2; Mon, 17 Aug 2020 13:13:22 +0000
-Received: from 38f9d34ed3b1.ant.amazon.com (10.43.161.85) by
- EX13D16EUB001.ant.amazon.com (10.43.166.28) with Microsoft SMTP Server (TLS)
- id 15.0.1497.2; Mon, 17 Aug 2020 13:13:13 +0000
-From:   Andra Paraschiv <andraprs@amazon.com>
-To:     linux-kernel <linux-kernel@vger.kernel.org>
-CC:     Anthony Liguori <aliguori@amazon.com>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Colm MacCarthaigh <colmmacc@amazon.com>,
-        "David Duncan" <davdunc@amazon.com>,
-        Bjoern Doebel <doebel@amazon.de>,
-        "David Woodhouse" <dwmw@amazon.co.uk>,
-        Frank van der Linden <fllinden@amazon.com>,
-        Alexander Graf <graf@amazon.de>,
-        Greg KH <gregkh@linuxfoundation.org>,
-        "Karen Noel" <knoel@redhat.com>,
-        Martin Pohlack <mpohlack@amazon.de>,
-        Matt Wilson <msw@amazon.com>,
+        id S2388719AbgHQQcg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 17 Aug 2020 12:32:36 -0400
+Received: from mga03.intel.com ([134.134.136.65]:10701 "EHLO mga03.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1731243AbgHQQcJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 17 Aug 2020 12:32:09 -0400
+IronPort-SDR: OgIy0tFYSB8VRyYiBcpQMHC9GDDfYcELHRgBZhGW0HcidjHM+hJ0MZQGuk208kf2oX4zN908ie
+ ou2w8V/yiuNg==
+X-IronPort-AV: E=McAfee;i="6000,8403,9716"; a="154720042"
+X-IronPort-AV: E=Sophos;i="5.76,324,1592895600"; 
+   d="scan'208";a="154720042"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Aug 2020 09:32:08 -0700
+IronPort-SDR: gNGa53ARN2B7I6Gdco4Cf5OlcSb1BwI/csVdhVxHYKUn7DGgGs7yaKNfcMPwlAdWh87KZIXCG+
+ eiiPc4lUjVHA==
+X-IronPort-AV: E=Sophos;i="5.76,324,1592895600"; 
+   d="scan'208";a="440920616"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.160])
+  by orsmga004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Aug 2020 09:32:08 -0700
+Date:   Mon, 17 Aug 2020 09:32:07 -0700
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     "Michael S. Tsirkin" <mst@redhat.com>
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Balbir Singh <sblbir@amazon.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        "Stefan Hajnoczi" <stefanha@redhat.com>,
-        Stewart Smith <trawets@amazon.com>,
-        "Uwe Dannowski" <uwed@amazon.de>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        kvm <kvm@vger.kernel.org>,
-        ne-devel-upstream <ne-devel-upstream@amazon.com>,
-        Andra Paraschiv <andraprs@amazon.com>
-Subject: [PATCH v7 18/18] MAINTAINERS: Add entry for the Nitro Enclaves driver
-Date:   Mon, 17 Aug 2020 16:10:03 +0300
-Message-ID: <20200817131003.56650-19-andraprs@amazon.com>
-X-Mailer: git-send-email 2.20.1 (Apple Git-117)
-In-Reply-To: <20200817131003.56650-1-andraprs@amazon.com>
-References: <20200817131003.56650-1-andraprs@amazon.com>
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Peter Xu <peterx@redhat.com>,
+        Julia Suvorova <jsuvorov@redhat.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Andrew Jones <drjones@redhat.com>, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 2/3] KVM: x86: introduce KVM_MEM_PCI_HOLE memory
+Message-ID: <20200817163207.GC22407@linux.intel.com>
+References: <20200807141232.402895-1-vkuznets@redhat.com>
+ <20200807141232.402895-3-vkuznets@redhat.com>
+ <20200814023139.GB4845@linux.intel.com>
+ <20200814102850-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-X-Originating-IP: [10.43.161.85]
-X-ClientProxiedBy: EX13D03UWA001.ant.amazon.com (10.43.160.141) To
- EX13D16EUB001.ant.amazon.com (10.43.166.28)
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200814102850-mutt-send-email-mst@kernel.org>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Signed-off-by: Andra Paraschiv <andraprs@amazon.com>
----
-Changelog
+On Fri, Aug 14, 2020 at 10:30:14AM -0400, Michael S. Tsirkin wrote:
+> On Thu, Aug 13, 2020 at 07:31:39PM -0700, Sean Christopherson wrote:
+> > > @@ -2318,6 +2338,11 @@ static int __kvm_read_guest_page(struct kvm_memory_slot *slot, gfn_t gfn,
+> > >  	int r;
+> > >  	unsigned long addr;
+> > >  
+> > > +	if (unlikely(slot && (slot->flags & KVM_MEM_PCI_HOLE))) {
+> > > +		memset(data, 0xff, len);
+> > > +		return 0;
+> > > +	}
+> > 
+> > This feels wrong, shouldn't we be treating PCI_HOLE as MMIO?  Given that
+> > this is performance oriented, I would think we'd want to leverage the
+> > GPA from the VMCS instead of doing a full translation.
+> > 
+> > That brings up a potential alternative to adding a memslot flag.  What if
+> > we instead add a KVM_MMIO_BUS device similar to coalesced MMIO?  I think
+> > it'd be about the same amount of KVM code, and it would provide userspace
+> > with more flexibility, e.g. I assume it would allow handling even writes
+> > wholly within the kernel for certain ranges and/or use cases, and it'd
+> > allow stuffing a value other than 0xff (though I have no idea if there is
+> > a use case for this).
+> 
+> I still think down the road the way to go is to map
+> valid RO page full of 0xff to avoid exit on read.
+> I don't think a KVM_MMIO_BUS device will allow this, will it?
 
-v6 -> v7
+No, it would not, but adding KVM_MEM_PCI_HOLE doesn't get us any closer to
+solving that problem either.
 
-* No changes.
+What if we add a flag to allow routing all GFNs in a memslot to a single
+HVA?  At a glance, it doesn't seem to heinous.  It would have several of the
+same touchpoints as this series, e.g. __kvm_set_memory_region() and
+kvm_alloc_memslot_metadata().
 
-v5 -> v6
+The functional changes (for x86) would be a few lines in
+__gfn_to_hva_memslot() and some new logic in kvm_handle_hva_range().  The
+biggest concern is probably the fragility of such an implementation, as KVM
+has a habit of open coding operations on memslots.
 
-* No changes.
+The new flags could then be paired with KVM_MEM_READONLY to yield the desired
+behavior of reading out 0xff for an arbitrary range without requiring copious
+memslots and/or host pages.
 
-v4 -> v5
-
-* No changes.
-
-v3 -> v4
-
-* No changes.
-
-v2 -> v3
-
-* Update file entries to be in alphabetical order.
-
-v1 -> v2
-
-* No changes.
----
- MAINTAINERS | 13 +++++++++++++
- 1 file changed, 13 insertions(+)
-
-diff --git a/MAINTAINERS b/MAINTAINERS
-index deaafb617361..06247ca41e5e 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -12268,6 +12268,19 @@ S:	Maintained
- T:	git git://git.kernel.org/pub/scm/linux/kernel/git/lftan/nios2.git
- F:	arch/nios2/
- 
-+NITRO ENCLAVES (NE)
-+M:	Andra Paraschiv <andraprs@amazon.com>
-+M:	Alexandru Vasile <lexnv@amazon.com>
-+M:	Alexandru Ciobotaru <alcioa@amazon.com>
-+L:	linux-kernel@vger.kernel.org
-+S:	Supported
-+W:	https://aws.amazon.com/ec2/nitro/nitro-enclaves/
-+F:	Documentation/nitro_enclaves/
-+F:	drivers/virt/nitro_enclaves/
-+F:	include/linux/nitro_enclaves.h
-+F:	include/uapi/linux/nitro_enclaves.h
-+F:	samples/nitro_enclaves/
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index 852fc8274bdd..875243a0ab36 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -1103,6 +1103,9 @@ __gfn_to_memslot(struct kvm_memslots *slots, gfn_t gfn)
+ static inline unsigned long
+ __gfn_to_hva_memslot(struct kvm_memory_slot *slot, gfn_t gfn)
+ {
++       if (unlikely(slot->flags & KVM_MEM_SINGLE_HVA))
++               return slot->userspace_addr;
 +
- NOHZ, DYNTICKS SUPPORT
- M:	Frederic Weisbecker <fweisbec@gmail.com>
- M:	Thomas Gleixner <tglx@linutronix.de>
--- 
-2.20.1 (Apple Git-117)
-
-
-
-
-Amazon Development Center (Romania) S.R.L. registered office: 27A Sf. Lazar Street, UBC5, floor 2, Iasi, Iasi County, 700045, Romania. Registered in Romania. Registration number J22/2621/2005.
+        return slot->userspace_addr + (gfn - slot->base_gfn) * PAGE_SIZE;
+ }
 
