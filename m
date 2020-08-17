@@ -2,111 +2,102 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E8DEF246D15
-	for <lists+kvm@lfdr.de>; Mon, 17 Aug 2020 18:44:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9F7ED246D1D
+	for <lists+kvm@lfdr.de>; Mon, 17 Aug 2020 18:45:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731315AbgHQQoj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 17 Aug 2020 12:44:39 -0400
-Received: from mga09.intel.com ([134.134.136.24]:9535 "EHLO mga09.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2388942AbgHQQml (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 17 Aug 2020 12:42:41 -0400
-IronPort-SDR: G/mvlPr0YEVJMQSW3lC7tu1tUoPN1z4awacrZokwdT+LhPPi0DYgTa4+1fZODSbg1nibE2rWBV
- m8YYYuZ4fcdg==
-X-IronPort-AV: E=McAfee;i="6000,8403,9716"; a="155837544"
-X-IronPort-AV: E=Sophos;i="5.76,324,1592895600"; 
-   d="scan'208";a="155837544"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Aug 2020 09:42:39 -0700
-IronPort-SDR: ltuQkmVJs+n7F9YPld+E7pKAdJGKal06TEtUMPoSF5+9iDdqVHPFsO0n0Dt4w+BXDRZG+Z4GWP
- 707tjQZCV7gg==
-X-IronPort-AV: E=Sophos;i="5.76,324,1592895600"; 
-   d="scan'208";a="440922800"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.160])
-  by orsmga004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Aug 2020 09:42:39 -0700
-Date:   Mon, 17 Aug 2020 09:42:38 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Yang Weijiang <weijiang.yang@intel.com>
-Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, shuah@kernel.org,
-        peterx@redhat.com, linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH] selftests: kvm: Fix an unexpected failure with newer gcc
- compiler
-Message-ID: <20200817164238.GD22407@linux.intel.com>
-References: <20200814132105.5122-1-weijiang.yang@intel.com>
+        id S1731350AbgHQQpo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 17 Aug 2020 12:45:44 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:30362 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1731334AbgHQQpR (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 17 Aug 2020 12:45:17 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1597682691;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=oTFLoSbAaNF6t5dzCxc16vAyZiDDd9zdkB1y58oKTUY=;
+        b=avA6gGcsbb3cjIqOwh2wnuVqt8XH6LUFpqCCQzdBweR7g5+0UQy5hnsFfNaAz4fShwqsqO
+        C11SJrYDqcU2TL6c/2XyY+1EkrY/xo0ZcZ6KNVdoVgbcvJIZk/Zy/siracUMKQBEvOtusj
+        +eo/Uo4gFJ/lf+QijyV6CEOFU0gaV7Q=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-157-v2iqDyrLMhSIEGZjltk-lw-1; Mon, 17 Aug 2020 12:44:50 -0400
+X-MC-Unique: v2iqDyrLMhSIEGZjltk-lw-1
+Received: by mail-wm1-f70.google.com with SMTP id u144so6220443wmu.3
+        for <kvm@vger.kernel.org>; Mon, 17 Aug 2020 09:44:49 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=oTFLoSbAaNF6t5dzCxc16vAyZiDDd9zdkB1y58oKTUY=;
+        b=FDVRFhiyiMAZyLnj84UgT0QdkD0dkqC5+PJQFLrgHBAMW2tki3joblG3NQoBw2KoFI
+         88GwdLJIxUHS5aTAPLjAhqLWt1P6k9rSnpjPrXlYvYOQKg0FLHf78k8CFk4qnLIxUrnv
+         3CHeV4Iz9k+81y6qIxlPyhgUmwKR4FpoGoSfn5Y7m6+c2vVAS0IcYy4GeCvi5Filana+
+         wUHj/cxls/EPeMAqRcf/47f0ab00AVORT/vWI6eoAHjBxHN1WpeSxphVBdywEJ4wcRrc
+         y1mExqx7YMJD+CpD5Hpj6jrzAh9hg6Gwld6NYmmimbXItM9Uhi5KHTFnVDJlXxt63/bt
+         1YiQ==
+X-Gm-Message-State: AOAM532kb4tmesjuAS28sjhlpRH48Htk8sWRqeVrbeUfPfq27ofbUs6J
+        E7FRt/Lox6vSIe1Gi8PTPeageUpOp7Hi4r6JTbtSBp1CPNC5D16Cpb55zXcKkhaeBEdqZyIimlS
+        oXeb/J3Ct42IR
+X-Received: by 2002:adf:d84c:: with SMTP id k12mr16153156wrl.250.1597682688991;
+        Mon, 17 Aug 2020 09:44:48 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJx9z+61qLXvJIfe2RpsdttP3Uze5pUx21sYHDZjSv/cPtrwcUY/vTywhO1uiI1WW8RxgSFuHw==
+X-Received: by 2002:adf:d84c:: with SMTP id k12mr16153141wrl.250.1597682688740;
+        Mon, 17 Aug 2020 09:44:48 -0700 (PDT)
+Received: from [192.168.10.150] ([93.56.170.5])
+        by smtp.gmail.com with ESMTPSA id v29sm32751778wrv.51.2020.08.17.09.44.47
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 17 Aug 2020 09:44:48 -0700 (PDT)
+Subject: Re: [kvm-unit-tests RFC v1 0/5] Rewrite the allocators
+To:     Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org
+Cc:     frankja@linux.ibm.com, david@redhat.com, thuth@redhat.com,
+        cohuck@redhat.com, lvivier@redhat.com
+References: <20200814151009.55845-1-imbrenda@linux.ibm.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <6b2ac9ac-7ef0-9371-a22b-6bd525ae6953@redhat.com>
+Date:   Mon, 17 Aug 2020 18:44:47 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.9.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200814132105.5122-1-weijiang.yang@intel.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+In-Reply-To: <20200814151009.55845-1-imbrenda@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Aug 14, 2020 at 09:21:05PM +0800, Yang Weijiang wrote:
-> If debug_regs.c is built with newer gcc, e.g., 8.3.1 on my side, then the generated
-> binary looks like over-optimized by gcc:
+On 14/08/20 17:10, Claudio Imbrenda wrote:
 > 
-> asm volatile("ss_start: "
->              "xor %%rax,%%rax\n\t"
->              "cpuid\n\t"
->              "movl $0x1a0,%%ecx\n\t"
->              "rdmsr\n\t"
->              : : : "rax", "ecx");
+> The existing memory allocators are becoming more and more inadequate to
+> the needs of the upcoming unit tests (but also some existing ones, see
+> below).
 > 
-> is translated to :
+> Some important features that are lacking:
+> * ability to perform a small physical page allocation with a big
+>   alignment withtout wasting huge amounts of memory
+> * ability to allocate physical pages from specific pools/areaas (e.g.
+>   below 16M, or 4G, etc)
+> * ability to reserve arbitrary pages (if free), removing them from the
+>   free pool
 > 
->   000000000040194e <ss_start>:
->   40194e:       31 c0                   xor    %eax,%eax     <----- rax->eax?
->   401950:       0f a2                   cpuid
->   401952:       b9 a0 01 00 00          mov    $0x1a0,%ecx
->   401957:       0f 32                   rdmsr
-> 
-> As you can see rax is replaced with eax in taret binary code.
+> Some other features that are nice, but not so fundamental:
+> * no need for the generic allocator to keep track of metadata
+>   (i.e. allocation size), this is now handled by the lower level
+>   allocators
+> * coalescing small blocks into bigger ones, to allow contiguous memory
+>   freed in small blocks in a random order to be used for large
+>   allocations again
 
-It's an optimization.  `xor rax, rax` and `xor eax, eax` yield the exact
-same result, as writing the lower 32 bits of a GPR in 64-bit mode clears
-the upper 32 bits.  Using the eax variant avoids the REX prefix and saves
-a byte of code.
+I haven't reviewed the patches in detail, but the deficiencies of the
+page allocator are of course known and it's welcome that you're
+attempting to fix them!
 
-> But if I replace %%rax with %%r8 or any GPR from r8~15, then I get below
-> expected binary:
-> 
-> 0000000000401950 <ss_start>:
->   401950:       45 31 ff                xor    %r15d,%r15d
+Thanks,
 
-This is not replacing %rax with %r15, it's replacing it with %r15d, which
-is the equivalent of %eax.  But that's beside the point.  Encoding GPRs
-r8-r15 requires a REX prefix, so even though you avoid REX.W you still need
-REX.R, and thus end up with a 3 byte instruction.
+Paolo
 
->   401953:       0f a2                   cpuid
-
-Note, CPUID consumes EAX.  It doesn't look like the code actually consumes
-the CPUID output, but switching to r15 is at best bizarre.
-
->   401955:       b9 a0 01 00 00          mov    $0x1a0,%ecx
->   40195a:       0f 32                   rdmsr
-> 
-> The difference is the length of xor instruction(2 Byte vs 3 Byte),
-> so this makes below hard-coded instruction length cannot pass runtime check:
-> 
->         /* Instruction lengths starting at ss_start */
->         int ss_size[4] = {
->                 3,              /* xor */   <-------- 2 or 3?
->                 2,              /* cpuid */
->                 5,              /* mov */
->                 2,              /* rdmsr */
->         };
-> Note:
-> Use 8.2.1 or older gcc, it generates expected 3 bytes xor target code.
-> 
-> I use the default Makefile to build the binaries, and I cannot figure out why this
-> happens, so it comes this patch, maybe you have better solution to resolve the
-> issue. If you know how things work in this way, please let me know, thanks!
-
-Use `xor %%eax, %%eax`.  That should always generate a 2 byte instruction.
-Encoding a 64-bit operation would technically be legal, but I doubt any
-compiler would do that in practice.
