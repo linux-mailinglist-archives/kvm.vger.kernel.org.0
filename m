@@ -2,225 +2,190 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C70A9245A98
-	for <lists+kvm@lfdr.de>; Mon, 17 Aug 2020 04:04:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 205C0245AA4
+	for <lists+kvm@lfdr.de>; Mon, 17 Aug 2020 04:13:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726793AbgHQCE1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 16 Aug 2020 22:04:27 -0400
-Received: from mga02.intel.com ([134.134.136.20]:7782 "EHLO mga02.intel.com"
+        id S1726754AbgHQCM7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 16 Aug 2020 22:12:59 -0400
+Received: from mga01.intel.com ([192.55.52.88]:48970 "EHLO mga01.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726422AbgHQCE0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 16 Aug 2020 22:04:26 -0400
-IronPort-SDR: fLPgklD5sJkW3bGjWB/ZtLVeCw1hy0DnOwB/y6XKyA1GWkbAfOmfzke08ZDjYT/JB3at4jf/PO
- 5pNlVB7NJRIw==
-X-IronPort-AV: E=McAfee;i="6000,8403,9715"; a="142452868"
+        id S1726368AbgHQCM4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 16 Aug 2020 22:12:56 -0400
+IronPort-SDR: KSkSoYR4chvZP7gSTv7x8j1SVkKc9bAFT+BgIs5D9VHYM48QH9UJl9/4nGZEUeMtIB0V4eFqwO
+ B5xX7wWrkRqQ==
+X-IronPort-AV: E=McAfee;i="6000,8403,9715"; a="172677203"
 X-IronPort-AV: E=Sophos;i="5.76,322,1592895600"; 
-   d="scan'208";a="142452868"
+   d="scan'208";a="172677203"
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Aug 2020 19:04:25 -0700
-IronPort-SDR: S5k/19kCClm6ovv+d8ah7luP6CsvMjkNkmihpCmBdO7vghlRIgRTwLImn67Da2z4j6FdZHShkl
- WoFhGsjd97KQ==
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Aug 2020 19:12:56 -0700
+IronPort-SDR: 9ipYxT8Pn5lg+60KITjwmE4sViwsRl3doUC2/3ZF820G9KvYCsntBANKL++w2zBHri0ieVC1ZL
+ 00IRtOgsj85w==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.76,322,1592895600"; 
-   d="scan'208";a="326271212"
-Received: from joy-optiplex-7040.sh.intel.com (HELO joy-OptiPlex-7040) ([10.239.13.16])
-  by orsmga008.jf.intel.com with ESMTP; 16 Aug 2020 19:04:19 -0700
-Date:   Mon, 17 Aug 2020 09:52:43 +0800
-From:   Yan Zhao <yan.y.zhao@intel.com>
-To:     Sean Mooney <smooney@redhat.com>
-Cc:     Jason Wang <jasowang@redhat.com>, Jiri Pirko <jiri@mellanox.com>,
-        Cornelia Huck <cohuck@redhat.com>, kvm@vger.kernel.org,
-        libvir-list@redhat.com, qemu-devel@nongnu.org,
-        kwankhede@nvidia.com, eauger@redhat.com, xin-ran.wang@intel.com,
-        eskultet@redhat.com, openstack-discuss@lists.openstack.org,
-        shaohe.feng@intel.com, kevin.tian@intel.com,
-        Parav Pandit <parav@mellanox.com>, jian-feng.ding@intel.com,
-        dgilbert@redhat.com, zhenyuw@linux.intel.com, hejie.xu@intel.com,
-        bao.yumeng@zte.com.cn,
-        Alex Williamson <alex.williamson@redhat.com>,
-        intel-gvt-dev@lists.freedesktop.org, berrange@redhat.com,
-        corbet@lwn.net, dinechin@redhat.com, devel@ovirt.org
-Subject: Re: device compatibility interface for live migration with assigned
- devices
-Message-ID: <20200817015243.GE15344@joy-OptiPlex-7040>
-Reply-To: Yan Zhao <yan.y.zhao@intel.com>
-References: <20200805021654.GB30485@joy-OptiPlex-7040>
- <2624b12f-3788-7e2b-2cb7-93534960bcb7@redhat.com>
- <20200805075647.GB2177@nanopsycho>
- <eb1d01c2-fbad-36b6-10cf-9e03483a736b@redhat.com>
- <20200805093338.GC30485@joy-OptiPlex-7040>
- <20200805105319.GF2177@nanopsycho>
- <20200810074631.GA29059@joy-OptiPlex-7040>
- <e6e75807-0614-bd75-aeb6-64d643e029d3@redhat.com>
- <20200814051601.GD15344@joy-OptiPlex-7040>
- <a4f4a3cf76b87346a4cc4c39c116f575eaab9bac.camel@redhat.com>
+   d="scan'208";a="370428437"
+Received: from unknown (HELO fmsmsx604.amr.corp.intel.com) ([10.18.84.214])
+  by orsmga001.jf.intel.com with ESMTP; 16 Aug 2020 19:12:55 -0700
+Received: from fmsmsx604.amr.corp.intel.com (10.18.126.84) by
+ fmsmsx604.amr.corp.intel.com (10.18.126.84) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.1713.5; Sun, 16 Aug 2020 19:12:52 -0700
+Received: from fmsmsx103.amr.corp.intel.com (10.18.124.201) by
+ fmsmsx604.amr.corp.intel.com (10.18.126.84) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id 15.1.1713.5
+ via Frontend Transport; Sun, 16 Aug 2020 19:12:52 -0700
+Received: from FMSEDG001.ED.cps.intel.com (10.1.192.133) by
+ FMSMSX103.amr.corp.intel.com (10.18.124.201) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Sun, 16 Aug 2020 19:12:51 -0700
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (104.47.58.170)
+ by edgegateway.intel.com (192.55.55.68) with Microsoft SMTP Server (TLS) id
+ 14.3.439.0; Sun, 16 Aug 2020 19:12:48 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=R1K8oV+qYr3UEUWiaPRp/5+lEqpVVWmnAfpT+IzG3kpim0XLGf7dPR+GdGFr6jvKWuq59bLYbwhmQf4X5jEIezDpcjCAdzyzaBkoxMW2S4cecCBksqSB+BKoeIcNQAp6A2o9ak7Xl5/CXygJ0L358yJN02O+UDsmMbVB6Di5m3/y7+Hzo3/W1KFBtWLy4EHuVKtmHpV5stLcLPi/b80NqFdsGczoWl++I28qMtWWC88XRTuaiUhUpiw3pHs9uUfBAs/ANPdCbkhL7YwVP9KFJZVgHgMY/PlZnJHXvyaAxxn7shF18yWBp3uRZ5XOLiSAU9jirTT/1xRcOgW3l+uSTQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=rpRcjphMc/8RrOhtA7SllUEb1auoZ0lLAdbGViWnv3I=;
+ b=Jpa96gvFlonCH/CCRo+NAz4dkHf6zr+9ggsLMZyQ7sTwrJsxNKxCyqCqpWm91qzj9p/4Gd5nUgI2cDoOhkGUlginhwLr1Ip1xlRfBjttYsjw8mTiEBKWR7fll8V/lyYFtc9adBwwWld4u4sEF09Qk5OSkFnu5NThlZkaekZtVpQNNalgJU7dgUeSl/hsW16F3sogpXEoXuyBL/Zv2UagZbmzHpPh8OoWyLgWum5lQWQ9uW6bg7W1qOj2pg04NWwERWIGJJMjh46UBbKfvlY8W3QrhWPtF8XB/5JkJj+Tg3YE2VACXwGMkJUMYtofworoRZhBqCfyNW/3n4xXZK5V/w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=intel.onmicrosoft.com;
+ s=selector2-intel-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=rpRcjphMc/8RrOhtA7SllUEb1auoZ0lLAdbGViWnv3I=;
+ b=sXyWCwueiNwlhOksOVG8fCTUvkm9SOgoTl37tr3nvSGukbpQyZjhDqNfa3iziNAr9Ouy3yhH4xwlbhG13DjK/WvtoUDm8p55/vLhbQU9QEOu4ld/oypTV0xjKoomS9DrVN/NVMioxIfjPnjEwVYGIkKUemmusXqA5mB6LFf05gs=
+Received: from MWHPR11MB1645.namprd11.prod.outlook.com (2603:10b6:301:b::12)
+ by MWHPR1101MB2094.namprd11.prod.outlook.com (2603:10b6:301:4e::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3283.18; Mon, 17 Aug
+ 2020 02:12:44 +0000
+Received: from MWHPR11MB1645.namprd11.prod.outlook.com
+ ([fe80::6dfe:feb8:25f1:ac9c]) by MWHPR11MB1645.namprd11.prod.outlook.com
+ ([fe80::6dfe:feb8:25f1:ac9c%7]) with mapi id 15.20.3283.027; Mon, 17 Aug 2020
+ 02:12:44 +0000
+From:   "Tian, Kevin" <kevin.tian@intel.com>
+To:     Jason Gunthorpe <jgg@nvidia.com>
+CC:     Alex Williamson <alex.williamson@redhat.com>,
+        "Jiang, Dave" <dave.jiang@intel.com>,
+        "vkoul@kernel.org" <vkoul@kernel.org>,
+        "Dey, Megha" <megha.dey@intel.com>,
+        "maz@kernel.org" <maz@kernel.org>,
+        "bhelgaas@google.com" <bhelgaas@google.com>,
+        "rafael@kernel.org" <rafael@kernel.org>,
+        "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "hpa@zytor.com" <hpa@zytor.com>,
+        "Pan, Jacob jun" <jacob.jun.pan@intel.com>,
+        "Raj, Ashok" <ashok.raj@intel.com>,
+        "Liu, Yi L" <yi.l.liu@intel.com>, "Lu, Baolu" <baolu.lu@intel.com>,
+        "Kumar, Sanjay K" <sanjay.k.kumar@intel.com>,
+        "Luck, Tony" <tony.luck@intel.com>,
+        "Lin, Jing" <jing.lin@intel.com>,
+        "Williams, Dan J" <dan.j.williams@intel.com>,
+        "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
+        "eric.auger@redhat.com" <eric.auger@redhat.com>,
+        "parav@mellanox.com" <parav@mellanox.com>,
+        "Hansen, Dave" <dave.hansen@intel.com>,
+        "netanelg@mellanox.com" <netanelg@mellanox.com>,
+        "shahafs@mellanox.com" <shahafs@mellanox.com>,
+        "yan.y.zhao@linux.intel.com" <yan.y.zhao@linux.intel.com>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "Ortiz, Samuel" <samuel.ortiz@intel.com>,
+        "Hossain, Mona" <mona.hossain@intel.com>,
+        "dmaengine@vger.kernel.org" <dmaengine@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "x86@kernel.org" <x86@kernel.org>,
+        "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Subject: RE: [PATCH RFC v2 00/18] Add VFIO mediated device support and DEV-MSI
+ support for the idxd driver
+Thread-Topic: [PATCH RFC v2 00/18] Add VFIO mediated device support and
+ DEV-MSI support for the idxd driver
+Thread-Index: AQHWX3hut2htBlMVB0qfW0Pa+gZbC6kSPbuAgABwW8CAAzMrAIAUgAoAgAJJ4oCABDO9YIAG4akAgAPzRxA=
+Date:   Mon, 17 Aug 2020 02:12:44 +0000
+Message-ID: <MWHPR11MB16456D49F2F2E9646F0841488C5F0@MWHPR11MB1645.namprd11.prod.outlook.com>
+References: <159534667974.28840.2045034360240786644.stgit@djiang5-desk3.ch.intel.com>
+ <20200721164527.GD2021248@mellanox.com>
+ <CY4PR11MB1638103EC73DD9C025F144C98C780@CY4PR11MB1638.namprd11.prod.outlook.com>
+ <20200724001930.GS2021248@mellanox.com> <20200805192258.5ee7a05b@x1.home>
+ <20200807121955.GS16789@nvidia.com>
+ <MWHPR11MB16452EBE866E330A7E000AFC8C440@MWHPR11MB1645.namprd11.prod.outlook.com>
+ <20200814133522.GE1152540@nvidia.com>
+In-Reply-To: <20200814133522.GE1152540@nvidia.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+dlp-version: 11.5.1.3
+dlp-product: dlpe-windows
+dlp-reaction: no-action
+authentication-results: nvidia.com; dkim=none (message not signed)
+ header.d=none;nvidia.com; dmarc=none action=none header.from=intel.com;
+x-originating-ip: [192.198.147.195]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: d5401b0f-19c5-4679-b40d-08d842530749
+x-ms-traffictypediagnostic: MWHPR1101MB2094:
+x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr,ExtFwd
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <MWHPR1101MB2094538ECCBA3D4EEB0157D18C5F0@MWHPR1101MB2094.namprd11.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:8882;
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: 3qw3iICC0+BJ6GMZZB1vRDw/4SNE732NzDG3OycrjPfYfQ0GT+9eJfR5LCDP6jq9rtNT17Co28VVrkdRf2yIxtd6o0DROBb2bqgV3lMdEkcHofMOBWsN68JW8HDraP+nFmABL8ka3U0t+cADiazo41PkAWt6POLVXb3XibWKc7XS3p7CmZZmqwcCIIuVaCdXu3GJzG9zGv04usfzsCq4iawjQofnE1XIWoO9/bVkR+a4rd29b6wqd/pMsGFkLopGYFJEvXS6pgjX8r0eHqSsPXvyXmgXMlN6T6HrevVV7awNo1TxyBworDZyZ2SygghxqLvrJzt2+in6w/1Yb91mpg==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MWHPR11MB1645.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(376002)(366004)(396003)(136003)(346002)(39860400002)(6506007)(478600001)(26005)(6916009)(7416002)(7696005)(4326008)(9686003)(186003)(2906002)(8936002)(66946007)(64756008)(76116006)(66476007)(66446008)(55016002)(8676002)(54906003)(86362001)(33656002)(71200400001)(66556008)(52536014)(5660300002)(316002);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata: RMF+B6Kvg11cV7qWbUZkjoeWpAlIOENJZqw8IauDu2ppxlGhiQoUp1gWozs5PmKVAQSxCn8hvhcmahCUamNhOWw8z9sTyIJKT7RuqhvugjJZl0s7/BL0JWimwGyziPADeBcdzc9OJGA98dozxWaiDxLkClaqZphKSoPJf7bX8vccnCMoyL8IIk86GylWN/fITXRGgSDPExUQ//eAWVhFFlRGwUFB/0k9WaCXy12ndI62v10G6SigIFttQPjds1Lg7ZW1NLQYdUxC42b4thADRwTy4Ir4RnavablvoA0uOraWz0lXhsGIl1YCbiQVY9CFSZ6S0BAADTXwHAAP1WVXclBpiYx4naPcx0011rjMCZdshdEetU7Hu6x0u/4E/hPxjvi91+9hxIpUv/XK3wULDReIEVwNAyoroKurDlMDGH89h8ogV0YZS8/ragZKlqJTGYRMMWFcihf3CqcvlTemWoauapVIfk/LvmG5hMjSY6+PVc+f7f4mW+qEXD+/ZpKO1j9s5taBdQOjDhM25XhazO+4aGuIPX4bhYKlDltBvskjO2qVvufU9SyfMIunMM0e5yrTDGctrEbPygyl9vRx+SRPEOvby7D4gGkzusOri7Hr1RB3+X6rA7RA2GzoLadmqQFizmP/RL6yRtth67k9hA==
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <a4f4a3cf76b87346a4cc4c39c116f575eaab9bac.camel@redhat.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: MWHPR11MB1645.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: d5401b0f-19c5-4679-b40d-08d842530749
+X-MS-Exchange-CrossTenant-originalarrivaltime: 17 Aug 2020 02:12:44.2635
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: bKJx4V4JxaYDTDFJNAnA/5Sc+VQuBvKpXXkfLFj0nVqb9cpNC/JqgNLU5P4vkJu14oAlzP0/Ey20hXtOqap08g==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MWHPR1101MB2094
+X-OriginatorOrg: intel.com
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Aug 14, 2020 at 01:30:00PM +0100, Sean Mooney wrote:
-> On Fri, 2020-08-14 at 13:16 +0800, Yan Zhao wrote:
-> > On Thu, Aug 13, 2020 at 12:24:50PM +0800, Jason Wang wrote:
-> > > 
-> > > On 2020/8/10 下午3:46, Yan Zhao wrote:
-> > > > > driver is it handled by?
-> > > > 
-> > > > It looks that the devlink is for network device specific, and in
-> > > > devlink.h, it says
-> > > > include/uapi/linux/devlink.h - Network physical device Netlink
-> > > > interface,
-> > > 
-> > > 
-> > > Actually not, I think there used to have some discussion last year and the
-> > > conclusion is to remove this comment.
-> > > 
-> > > It supports IB and probably vDPA in the future.
-> > > 
-> > 
-> > hmm... sorry, I didn't find the referred discussion. only below discussion
-> > regarding to why to add devlink.
-> > 
-> > https://www.mail-archive.com/netdev@vger.kernel.org/msg95801.html
-> > 	>This doesn't seem to be too much related to networking? Why can't something
-> > 	>like this be in sysfs?
-> > 	
-> > 	It is related to networking quite bit. There has been couple of
-> > 	iteration of this, including sysfs and configfs implementations. There
-> > 	has been a consensus reached that this should be done by netlink. I
-> > 	believe netlink is really the best for this purpose. Sysfs is not a good
-> > 	idea
-> > 
-> > https://www.mail-archive.com/netdev@vger.kernel.org/msg96102.html
-> > 	>there is already a way to change eth/ib via
-> > 	>echo 'eth' > /sys/bus/pci/drivers/mlx4_core/0000:02:00.0/mlx4_port1
-> > 	>
-> > 	>sounds like this is another way to achieve the same?
-> > 	
-> > 	It is. However the current way is driver-specific, not correct.
-> > 	For mlx5, we need the same, it cannot be done in this way. Do devlink is
-> > 	the correct way to go.
-> im not sure i agree with that.
-> standardising a filesystem based api that is used across all vendors is also a valid
-> option.  that said if devlink is the right choice form a kerenl perspective by all
-> means use it but i have not heard a convincing argument for why it actually better.
-> with tthat said we have been uing tools like ethtool to manage aspect of nics for decades
-> so its not that strange an idea to use a tool and binary protocoal rather then a text
-> based interface for this but there are advantages to both approches.
+> From: Jason Gunthorpe
+> Sent: Friday, August 14, 2020 9:35 PM
+>=20
+> On Mon, Aug 10, 2020 at 07:32:24AM +0000, Tian, Kevin wrote:
+>=20
+> > > I would prefer to see that the existing userspace interface have the
+> > > extra needed bits for virtualization (eg by having appropriate
+> > > internal kernel APIs to make this easy) and all the emulation to buil=
+d
+> > > the synthetic PCI device be done in userspace.
 > >
-Yes, I agree with you.
+> > In the end what decides the direction is the amount of changes that
+> > we have to put in kernel, not whether we call it 'emulation'.
+>=20
+> No, this is not right. The decision should be based on what will end
+> up more maintable in the long run.
+>=20
+> Yes it would be more code to dis-aggregate some of the things
+> currently only bundled as uAPI inside VFIO (eg your vSVA argument
+> above) but once it is disaggregated the maintability of the whole
+> solution will be better overall, and more drivers will be able to use
+> this functionality.
+>=20
 
-> > https://lwn.net/Articles/674867/
-> > 	There a is need for some userspace API that would allow to expose things
-> > 	that are not directly related to any device class like net_device of
-> > 	ib_device, but rather chip-wide/switch-ASIC-wide stuff.
-> > 
-> > 	Use cases:
-> > 	1) get/set of port type (Ethernet/InfiniBand)
-> > 	2) monitoring of hardware messages to and from chip
-> > 	3) setting up port splitters - split port into multiple ones and squash again,
-> > 	   enables usage of splitter cable
-> > 	4) setting up shared buffers - shared among multiple ports within one chip
-> > 
-> > 
-> > 
-> > we actually can also retrieve the same information through sysfs, .e.g
-> > 
-> > > - [path to device]
-> > 
-> >   |--- migration
-> >   |     |--- self
-> >   |     |   |---device_api
-> >   |	|   |---mdev_type
-> >   |	|   |---software_version
-> >   |	|   |---device_id
-> >   |	|   |---aggregator
-> >   |     |--- compatible
-> >   |     |   |---device_api
-> >   |	|   |---mdev_type
-> >   |	|   |---software_version
-> >   |	|   |---device_id
-> >   |	|   |---aggregator
-> > 
-> > 
-> > 
-> > > 
-> > > >   I feel like it's not very appropriate for a GPU driver to use
-> > > > this interface. Is that right?
-> > > 
-> > > 
-> > > I think not though most of the users are switch or ethernet devices. It
-> > > doesn't prevent you from inventing new abstractions.
-> > 
-> > so need to patch devlink core and the userspace devlink tool?
-> > e.g. devlink migration
-> and devlink python libs if openstack was to use it directly.
-> we do have caes where we just frok a process and execaute a comannd in a shell
-> with or without elevated privladge but we really dont like doing that due to 
-> the performacne impacat and security implciations so where we can use python bindign
-> over c apis we do. pyroute2 is the only python lib i know off of the top of my head
-> that support devlink so we would need to enhacne it to support this new devlink api.
-> there may be otherss i have not really looked in the past since we dont need to use
-> devlink at all today.
-> > 
-> > > Note that devlink is based on netlink, netlink has been widely used by
-> > > various subsystems other than networking.
-> > 
-> > the advantage of netlink I see is that it can monitor device status and
-> > notify upper layer that migration database needs to get updated.
-> > But not sure whether openstack would like to use this capability.
-> > As Sean said, it's heavy for openstack. it's heavy for vendor driver
-> > as well :)
-> > 
-> > And devlink monitor now listens the notification and dumps the state
-> > changes. If we want to use it, need to let it forward the notification
-> > and dumped info to openstack, right?
-> i dont think we would use direct devlink monitoring in nova even if it was avaiable.
-> we could but we already poll libvirt and the system for other resouce periodicly.
-so, if we use file system based approach, could openstack periodically check and
-update the migration info?
-e.g.
-every minute, read /sys/<path to device>/migration/self/*, and if there
-are any file disappearing or appearing or content changes, just let the
-placement know.
+Disaggregation is an orthogonal topic to the main divergence in=20
+this thread, which is passthrough vs. userspace DMA. I gave detail
+explanation about the difference between the two in last reply.
+the possibility of dis-aggregating something between passthrough
+frameworks (e.g. VFIO and vDPA) is not the reason for growing=20
+every userspace DMA framework to be a passthrough framework.
+Doing that is instead hurting maintainability in general...
 
-Then when about to start migration, check source device's
-/sys/<path to src device>/migration/compatible/* and searches the
-placement if there are existing device matching to it,
-if yes, create vm with the device and migrate to it;
-if not, and if it's an mdev, try to create a matching one and migrate to
-it.
-(to create a matching mdev, I guess openstack can follow below sequence:
-1. find a target device with the same device id (e.g. parent pci id)
-2. create an mdev with matching mdev type
-3. adjust other vendor specific attributes
-4. if 2 or 3 fails, go to 1 again
-)
-
-is this approach feasible?
-
-
-> we likely wouldl just add monitoriv via devlink to that periodic task.
-> we certenly would not use it to detect a migration or a need to update a migration database(not sure what that is)
-by migration database, I meant the traits in the placement. :)
-
-if a periodic monitoring or devlink is required, then periodically
-monitor sysfs is also viable, right?
-> 
-> in reality if we can consume this info indirectly via a libvirt api that will
-> be the appcoh we will take at least for the libvirt driver in nova. for cyborg
-> they may take a different appoch. we already use pyroute2 in 2 projects, os-vif and
-> neutron and it does have devlink support so the burden of using devlink is not that
-> high for openstack but its a less frineadly interface for configuration tools like
-> ansiable vs a filesystem based approch.
-> > 
-
- 
+Thanks
+Kevin
