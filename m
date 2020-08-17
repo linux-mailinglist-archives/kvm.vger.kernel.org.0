@@ -2,80 +2,83 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 15A4A246641
-	for <lists+kvm@lfdr.de>; Mon, 17 Aug 2020 14:24:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6C9EA2466AC
+	for <lists+kvm@lfdr.de>; Mon, 17 Aug 2020 14:52:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728182AbgHQMYh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 17 Aug 2020 08:24:37 -0400
-Received: from szxga05-in.huawei.com ([45.249.212.191]:9751 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726151AbgHQMYf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 17 Aug 2020 08:24:35 -0400
-Received: from DGGEMS401-HUB.china.huawei.com (unknown [172.30.72.60])
-        by Forcepoint Email with ESMTP id 832306C4C976C8803297;
-        Mon, 17 Aug 2020 20:24:30 +0800 (CST)
-Received: from DESKTOP-5IS4806.china.huawei.com (10.174.187.22) by
- DGGEMS401-HUB.china.huawei.com (10.3.19.201) with Microsoft SMTP Server id
- 14.3.487.0; Mon, 17 Aug 2020 20:24:20 +0800
-From:   Keqian Zhu <zhukeqian1@huawei.com>
-To:     <linux-kernel@vger.kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>,
-        <kvmarm@lists.cs.columbia.edu>, <kvm@vger.kernel.org>
-CC:     Marc Zyngier <maz@kernel.org>, Steven Price <steven.price@arm.com>,
-        "Andrew Jones" <drjones@redhat.com>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        "Will Deacon" <will@kernel.org>, James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        <wanghaibin.wang@huawei.com>, Keqian Zhu <zhukeqian1@huawei.com>
-Subject: [PATCH 2/2] clocksource: arm_arch_timer: Correct fault programming of CNTKCTL_EL1.EVNTI
-Date:   Mon, 17 Aug 2020 20:24:15 +0800
-Message-ID: <20200817122415.6568-3-zhukeqian1@huawei.com>
-X-Mailer: git-send-email 2.8.4.windows.1
-In-Reply-To: <20200817122415.6568-1-zhukeqian1@huawei.com>
-References: <20200817122415.6568-1-zhukeqian1@huawei.com>
+        id S1728424AbgHQMwQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 17 Aug 2020 08:52:16 -0400
+Received: from mail.kernel.org ([198.145.29.99]:40734 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726265AbgHQMwN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 17 Aug 2020 08:52:13 -0400
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id BA53020789;
+        Mon, 17 Aug 2020 12:52:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1597668732;
+        bh=LCkDhp0yrQ1H4GBGLsPDHG1MxDxVdl9KXyWjwLTvWPI=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=pUHLfV+s8fddXGPPQLHHqlb1z8AbfUZG7NYwsP6qnq5K2IVfcprGJsRrncpdFA9ra
+         0yWmrmbHicohobmmQJY+O/OkOVFL+9FwbcCNn8IymvQarItwreniFbq0rqYpjzwCEx
+         WpS6O+f+OLhmp7XvP9Rx93u16E0rFw/5ea5eTJsA=
+Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
+        by disco-boy.misterjones.org with esmtpsa (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+        (Exim 4.92)
+        (envelope-from <maz@kernel.org>)
+        id 1k7ecV-003ZH0-B9; Mon, 17 Aug 2020 13:52:11 +0100
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.174.187.22]
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Content-Transfer-Encoding: 7bit
+Date:   Mon, 17 Aug 2020 13:52:11 +0100
+From:   Marc Zyngier <maz@kernel.org>
+To:     Keqian Zhu <zhukeqian1@huawei.com>
+Cc:     linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+        Steven Price <steven.price@arm.com>,
+        Andrew Jones <drjones@redhat.com>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        wanghaibin.wang@huawei.com
+Subject: Re: [PATCH 1/2] clocksource: arm_arch_timer: Simplify and fix count
+ reader code logic
+In-Reply-To: <20200817122415.6568-2-zhukeqian1@huawei.com>
+References: <20200817122415.6568-1-zhukeqian1@huawei.com>
+ <20200817122415.6568-2-zhukeqian1@huawei.com>
+User-Agent: Roundcube Webmail/1.4.7
+Message-ID: <267c5f9151c39fd2dcd0ce0b09d96545@kernel.org>
+X-Sender: maz@kernel.org
+X-SA-Exim-Connect-IP: 51.254.78.96
+X-SA-Exim-Rcpt-To: zhukeqian1@huawei.com, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, steven.price@arm.com, drjones@redhat.com, catalin.marinas@arm.com, will@kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, wanghaibin.wang@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-ARM virtual counter supports event stream, it can only trigger an event
-when the trigger bit (the value of CNTKCTL_EL1.EVNTI) of CNTVCT_EL0 changes,
-so the actual period of event stream is 2^(cntkctl_evnti + 1). For example,
-when the trigger bit is 0, then virtual counter trigger an event for every
-two cycles.
+On 2020-08-17 13:24, Keqian Zhu wrote:
+> In commit 0ea415390cd3 (clocksource/arm_arch_timer: Use 
+> arch_timer_read_counter
+> to access stable counters), we separate stable and normal count reader. 
+> Actually
+> the stable reader can correctly lead us to normal reader if we has no
+> workaround.
 
-Signed-off-by: Marc Zyngier <maz@kernel.org>
-Signed-off-by: Keqian Zhu <zhukeqian1@huawei.com>
----
- drivers/clocksource/arm_arch_timer.c | 10 +++++++---
- 1 file changed, 7 insertions(+), 3 deletions(-)
+Resulting in an unnecessary overhead on non-broken systems that can run
+without CONFIG_ARM_ARCH_TIMER_OOL_WORKAROUND. Not happening.
 
-diff --git a/drivers/clocksource/arm_arch_timer.c b/drivers/clocksource/arm_arch_timer.c
-index 6e11c60..4140a37 100644
---- a/drivers/clocksource/arm_arch_timer.c
-+++ b/drivers/clocksource/arm_arch_timer.c
-@@ -794,10 +794,14 @@ static void arch_timer_configure_evtstream(void)
- {
- 	int evt_stream_div, pos;
- 
--	/* Find the closest power of two to the divisor */
--	evt_stream_div = arch_timer_rate / ARCH_TIMER_EVT_STREAM_FREQ;
-+	/*
-+	 * Find the closest power of two to the divisor. As the event
-+	 * stream can at most be generated at half the frequency of the
-+	 * counter, use half the frequency when computing the divider.
-+	 */
-+	evt_stream_div = arch_timer_rate / ARCH_TIMER_EVT_STREAM_FREQ / 2;
- 	pos = fls(evt_stream_div);
--	if (pos > 1 && !(evt_stream_div & (1 << (pos - 2))))
-+	if ((pos == 1) || (pos > 1 && !(evt_stream_div & (1 << (pos - 2)))))
- 		pos--;
- 	/* enable event stream */
- 	arch_timer_evtstrm_enable(min(pos, 15));
+> Besides, in erratum_set_next_event_tval_generic(), we use normal 
+> reader, it is
+> obviously wrong, so just revert this commit to solve this problem by 
+> the way.
+
+If you want to fix something, post a patch that does exactly that.
+
+         M.
 -- 
-1.8.3.1
-
+Jazz is not dead. It just smells funny...
