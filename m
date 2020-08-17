@@ -2,121 +2,145 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 80A58247028
-	for <lists+kvm@lfdr.de>; Mon, 17 Aug 2020 20:04:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9C785247021
+	for <lists+kvm@lfdr.de>; Mon, 17 Aug 2020 20:03:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730856AbgHQSEe (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 17 Aug 2020 14:04:34 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:55060 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S2389187AbgHQSBJ (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 17 Aug 2020 14:01:09 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1597687265;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=qqyeS+9IC/amrYQ+e7XmNFqASQdZw1AwC4c5vP7yh44=;
-        b=bdX7lSmt9KSC1C//3nxqh/AWgfkgjbadz+deHMGFpGcXC0N17Mk1HMCMhrgcb2BxlIKlQv
-        bAey/qjaZ6P9DhLMBYVMnd3b6IjR47Z7tSodoGPkT01/2cU7VNRi2Vxp/jju4TEghJ1D6R
-        +D83pfdB3oex7v+hYJcuK61eL92+W0I=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-39-D9Kij50nNXK7sLcJoOaa4g-1; Mon, 17 Aug 2020 14:01:03 -0400
-X-MC-Unique: D9Kij50nNXK7sLcJoOaa4g-1
-Received: by mail-wr1-f69.google.com with SMTP id d6so7334967wrv.23
-        for <kvm@vger.kernel.org>; Mon, 17 Aug 2020 11:01:03 -0700 (PDT)
+        id S2389926AbgHQSCi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 17 Aug 2020 14:02:38 -0400
+Received: from mail-io1-f71.google.com ([209.85.166.71]:33341 "EHLO
+        mail-io1-f71.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2390219AbgHQSC0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 17 Aug 2020 14:02:26 -0400
+Received: by mail-io1-f71.google.com with SMTP id k4so4304779iop.0
+        for <kvm@vger.kernel.org>; Mon, 17 Aug 2020 11:02:25 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=qqyeS+9IC/amrYQ+e7XmNFqASQdZw1AwC4c5vP7yh44=;
-        b=E48UFYbAnKHBJesO1GWA2fK7wPv5m5YU9jelPMpqTLU00qj2HxGCHFBY/h2yPqjoGA
-         302BlrT57x317e/PJ+txAN82EZ1Whm86a3NG9Q57/6ng/mu9B1hsUoajlVmBJbNrOUHT
-         JR3pjKqBRCoYsQYVeI0i5t9oSA44o1lMhi+181bhPK4RPJtg5gMq1tujdsXh5yG3E6a1
-         44Jyen38eUwqAvan7PbGucG/a5ZqxL+8TsFhOiOz1LXtWF4iwGKRDW/Km+wU96/6PKqm
-         //aJM63D6ajRoc0ioW+TRB3eIPG/jI8r7KVdkUTAIiNuUt7buiz/Wi8tDRSenH4wbeIY
-         +PtA==
-X-Gm-Message-State: AOAM532HIBuHYGG7IeXfJ2g7E808qvurQYVFsGTYKxBEFadQuAJhPKSX
-        KRgkCtdOIYfgk69nt+fvTdo1L7bhkiNW+j1RktYJnC0llSRLYueESMUiSgN93wGNrVgU25vzKDK
-        IduPAuc3/lPJp
-X-Received: by 2002:a5d:4c47:: with SMTP id n7mr16354153wrt.91.1597687262367;
-        Mon, 17 Aug 2020 11:01:02 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxAhxieT6QpX/fLPoPSTQkaGqwRYwftZmk8+5FwC8rtE7g/Sg70OBuAvNPg+GbA63ZR+JjROg==
-X-Received: by 2002:a5d:4c47:: with SMTP id n7mr16354132wrt.91.1597687262126;
-        Mon, 17 Aug 2020 11:01:02 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:a0d1:fc42:c610:f977? ([2001:b07:6468:f312:a0d1:fc42:c610:f977])
-        by smtp.gmail.com with ESMTPSA id a10sm31354680wro.35.2020.08.17.11.01.01
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 17 Aug 2020 11:01:01 -0700 (PDT)
-Subject: Re: [PATCH v3 7/9] KVM: VMX: Add guest physical address check in EPT
- violation and misconfig
-To:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        Mohammed Gamal <mgamal@redhat.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
-        joro@8bytes.org
-References: <20200710154811.418214-1-mgamal@redhat.com>
- <20200710154811.418214-8-mgamal@redhat.com>
- <20200715230006.GF12349@linux.intel.com>
- <20200817172233.GF22407@linux.intel.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <f3595331-07e2-55d8-d390-4f421d8e5561@redhat.com>
-Date:   Mon, 17 Aug 2020 20:01:00 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.9.0
+        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
+        bh=tdstDYSYTI5mx+wadHLvUsUrcY6mmO9LIjUm2tyK4JE=;
+        b=Bad5JXCRXwgD+FQAyqAoq6b1zUoor95d8SaHqLQbfbaSL7zPo1DxHxQ42CBrwxIPze
+         dk7wQlTpwe3ZiCIqrS5i8JwcrAYgXDwJU2fA/lbv0G/qZT7g2Bnlo2Mmw8/3LxhIfa/C
+         5FRhCaq4uhah34M276Y+1C8yLDoS+vPP5SgVhk3hSoQd4QvjtFNJXr3suGLG6gfTXx3I
+         5RwXMu8xlSr2S2rwdA8UPXdQD1h87b7yp/Mj3nc+vIxjF/cWB6EEYaHw784ceAgOisir
+         XFUZDgkI6eNTILjYhwDG0yliUR5/s4tPEQxA9owGboKIMal57YAW3Y5Bu00NFEPd4x/f
+         bXpQ==
+X-Gm-Message-State: AOAM533jyRYqzSZWNMafJjLVeQYAq+Uj8AZdcFfB+xI6ShiwRGrivfJA
+        swH8ur35xOad0j/qPRKyUFOqW/qbFn91yRkNA+hKmRsFpv3k
+X-Google-Smtp-Source: ABdhPJxEPSlkDU5ympvihcaPeuAhl+IcY8niForAvT0ZObG4abivk7xeG5W9PV/609tegxGpfi5tPf/+UB4bOtBe6EMfUuuvw5Vq
 MIME-Version: 1.0
-In-Reply-To: <20200817172233.GF22407@linux.intel.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+X-Received: by 2002:a92:c709:: with SMTP id a9mr13434633ilp.183.1597687345200;
+ Mon, 17 Aug 2020 11:02:25 -0700 (PDT)
+Date:   Mon, 17 Aug 2020 11:02:25 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000ac45c705ad169245@google.com>
+Subject: KASAN: use-after-free Write in paging32_walk_addr_generic
+From:   syzbot <syzbot+47665dbce263479409c8@syzkaller.appspotmail.com>
+To:     bp@alien8.de, hpa@zytor.com, jmattson@google.com, joro@8bytes.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        mingo@redhat.com, pbonzini@redhat.com,
+        sean.j.christopherson@intel.com, syzkaller-bugs@googlegroups.com,
+        tglx@linutronix.de, vkuznets@redhat.com, wanpengli@tencent.com,
+        x86@kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 17/08/20 19:22, Sean Christopherson wrote:
->> This splats when running the PKU unit test, although the test still passed.
->> I haven't yet spent the brain power to determine if this is a benign warning,
->> i.e. simply unexpected, or if permission_fault() fault truly can't handle PK
->> faults.
+Hello,
 
-It's more or less unexpected; the error is in the caller.  This is not
-an error code but an access mask so only U/F/W bits are valid.  Patch
-sent, thanks.
+syzbot found the following issue on:
 
-Paolo
+HEAD commit:    9123e3a7 Linux 5.9-rc1
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=1355e34a900000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=3d400a47d1416652
+dashboard link: https://syzkaller.appspot.com/bug?extid=47665dbce263479409c8
+compiler:       gcc (GCC) 10.1.0-syz 20200507
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=11e059f6900000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=170f8ab4900000
 
->>   WARNING: CPU: 25 PID: 5465 at arch/x86/kvm/mmu.h:197 paging64_walk_addr_generic+0x594/0x750 [kvm]
->>   Hardware name: Intel Corporation WilsonCity/WilsonCity, BIOS WLYDCRB1.SYS.0014.D62.2001092233 01/09/2020
->>   RIP: 0010:paging64_walk_addr_generic+0x594/0x750 [kvm]
->>   Code: <0f> 0b e9 db fe ff ff 44 8b 43 04 4c 89 6c 24 30 8b 13 41 39 d0 89
->>   RSP: 0018:ff53778fc623fb60 EFLAGS: 00010202
->>   RAX: 0000000000000001 RBX: ff53778fc623fbf0 RCX: 0000000000000007
->>   RDX: 0000000000000001 RSI: 0000000000000002 RDI: ff4501efba818000
->>   RBP: 0000000000000020 R08: 0000000000000005 R09: 00000000004000e7
->>   R10: 0000000000000001 R11: 0000000000000000 R12: 0000000000000007
->>   R13: ff4501efba818388 R14: 10000000004000e7 R15: 0000000000000000
->>   FS:  00007f2dcf31a700(0000) GS:ff4501f1c8040000(0000) knlGS:0000000000000000
->>   CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
->>   CR2: 0000000000000000 CR3: 0000001dea475005 CR4: 0000000000763ee0
->>   DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
->>   DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
->>   PKRU: 55555554
->>   Call Trace:
->>    paging64_gva_to_gpa+0x3f/0xb0 [kvm]
->>    kvm_fixup_and_inject_pf_error+0x48/0xa0 [kvm]
->>    handle_exception_nmi+0x4fc/0x5b0 [kvm_intel]
->>    kvm_arch_vcpu_ioctl_run+0x911/0x1c10 [kvm]
->>    kvm_vcpu_ioctl+0x23e/0x5d0 [kvm]
->>    ksys_ioctl+0x92/0xb0
->>    __x64_sys_ioctl+0x16/0x20
->>    do_syscall_64+0x3e/0xb0
->>    entry_SYSCALL_64_after_hwframe+0x44/0xa9
->>   ---[ end trace d17eb998aee991da ]---
-> 
-> Looks like this series got pulled for 5.9, has anyone looked into this?
-> 
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+47665dbce263479409c8@syzkaller.appspotmail.com
 
+L1TF CPU bug present and SMT on, data leak possible. See CVE-2018-3646 and https://www.kernel.org/doc/html/latest/admin-guide/hw-vuln/l1tf.html for details.
+==================================================================
+BUG: KASAN: use-after-free in instrument_atomic_write include/linux/instrumented.h:71 [inline]
+BUG: KASAN: use-after-free in paging32_cmpxchg_gpte arch/x86/kvm/mmu/paging_tmpl.h:181 [inline]
+BUG: KASAN: use-after-free in paging32_update_accessed_dirty_bits arch/x86/kvm/mmu/paging_tmpl.h:287 [inline]
+BUG: KASAN: use-after-free in paging32_walk_addr_generic+0x155d/0x1980 arch/x86/kvm/mmu/paging_tmpl.h:457
+Write of size 4 at addr ffff888000105000 by task syz-executor735/6849
+
+CPU: 1 PID: 6849 Comm: syz-executor735 Not tainted 5.9.0-rc1-syzkaller #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
+Call Trace:
+ __dump_stack lib/dump_stack.c:77 [inline]
+ dump_stack+0x18f/0x20d lib/dump_stack.c:118
+ print_address_description.constprop.0.cold+0xae/0x497 mm/kasan/report.c:383
+ __kasan_report mm/kasan/report.c:513 [inline]
+ kasan_report.cold+0x1f/0x37 mm/kasan/report.c:530
+ check_memory_region_inline mm/kasan/generic.c:186 [inline]
+ check_memory_region+0x13d/0x180 mm/kasan/generic.c:192
+ instrument_atomic_write include/linux/instrumented.h:71 [inline]
+ paging32_cmpxchg_gpte arch/x86/kvm/mmu/paging_tmpl.h:181 [inline]
+ paging32_update_accessed_dirty_bits arch/x86/kvm/mmu/paging_tmpl.h:287 [inline]
+ paging32_walk_addr_generic+0x155d/0x1980 arch/x86/kvm/mmu/paging_tmpl.h:457
+ paging32_walk_addr arch/x86/kvm/mmu/paging_tmpl.h:514 [inline]
+ paging32_gva_to_gpa+0xb2/0x1d0 arch/x86/kvm/mmu/paging_tmpl.h:958
+ vcpu_mmio_gva_to_gpa arch/x86/kvm/x86.c:5758 [inline]
+ emulator_read_write_onepage+0x2f3/0xa70 arch/x86/kvm/x86.c:5874
+ emulator_read_write+0x1c4/0x5a0 arch/x86/kvm/x86.c:5934
+ emulator_write_emulated arch/x86/kvm/x86.c:5971 [inline]
+ emulator_fix_hypercall+0x132/0x190 arch/x86/kvm/x86.c:7763
+ em_hypercall+0x5d/0x130 arch/x86/kvm/emulate.c:3803
+ x86_emulate_insn+0x5e8/0x3d20 arch/x86/kvm/emulate.c:5676
+ x86_emulate_instruction+0x752/0x1e00 arch/x86/kvm/x86.c:7017
+ kvm_emulate_instruction arch/x86/kvm/x86.c:7085 [inline]
+ handle_ud+0xa8/0x240 arch/x86/kvm/x86.c:5718
+ handle_exception_nmi+0xaf7/0x1270 arch/x86/kvm/vmx/vmx.c:4761
+ vmx_handle_exit+0x293/0x14c0 arch/x86/kvm/vmx/vmx.c:6118
+ vcpu_enter_guest+0x14d6/0x3b60 arch/x86/kvm/x86.c:8641
+ vcpu_run arch/x86/kvm/x86.c:8706 [inline]
+ kvm_arch_vcpu_ioctl_run+0x440/0x1780 arch/x86/kvm/x86.c:8923
+ kvm_vcpu_ioctl+0x467/0xdf0 arch/x86/kvm/../../../virt/kvm/kvm_main.c:3229
+ vfs_ioctl fs/ioctl.c:48 [inline]
+ __do_sys_ioctl fs/ioctl.c:753 [inline]
+ __se_sys_ioctl fs/ioctl.c:739 [inline]
+ __x64_sys_ioctl+0x193/0x200 fs/ioctl.c:739
+ do_syscall_64+0x2d/0x70 arch/x86/entry/common.c:46
+ entry_SYSCALL_64_after_hwframe+0x44/0xa9
+RIP: 0033:0x443639
+Code: 18 89 d0 c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 0f 83 9b 0b fc ff c3 66 2e 0f 1f 84 00 00 00 00
+RSP: 002b:00007ffcf07dea38 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
+RAX: ffffffffffffffda RBX: 00007ffcf07dea40 RCX: 0000000000443639
+RDX: 0000000000000000 RSI: 000000000000ae80 RDI: 0000000000000006
+RBP: 0000000000000000 R08: 0000000000000000 R09: 00000000004011b0
+R10: 0000000000000012 R11: 0000000000000246 R12: 0000000000404660
+R13: 00000000004046f0 R14: 0000000000000000 R15: 0000000000000000
+
+The buggy address belongs to the page:
+page:000000000c451483 refcount:0 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x105
+flags: 0x7ffe0000000000()
+raw: 007ffe0000000000 ffffea0000004148 ffffea0000004148 0000000000000000
+raw: 0000000000000000 0000000000000000 00000000ffffffff 0000000000000000
+page dumped because: kasan: bad access detected
+
+Memory state around the buggy address:
+ ffff888000104f00: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
+ ffff888000104f80: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
+>ffff888000105000: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
+                   ^
+ ffff888000105080: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
+ ffff888000105100: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
+==================================================================
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+syzbot can test patches for this issue, for details see:
+https://goo.gl/tpsmEJ#testing-patches
