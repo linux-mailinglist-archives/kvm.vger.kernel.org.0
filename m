@@ -2,59 +2,59 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C4779245B37
-	for <lists+kvm@lfdr.de>; Mon, 17 Aug 2020 05:49:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 868D8245B3A
+	for <lists+kvm@lfdr.de>; Mon, 17 Aug 2020 05:49:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727792AbgHQDs7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 16 Aug 2020 23:48:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38264 "EHLO
+        id S1727827AbgHQDt1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 16 Aug 2020 23:49:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38334 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726729AbgHQDs6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 16 Aug 2020 23:48:58 -0400
+        with ESMTP id S1727818AbgHQDtX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 16 Aug 2020 23:49:23 -0400
 Received: from vultr.net.flygoat.com (vultr.net.flygoat.com [IPv6:2001:19f0:6001:3633:5400:2ff:fe8c:553])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 02382C061388;
-        Sun, 16 Aug 2020 20:48:58 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7456BC061388
+        for <kvm@vger.kernel.org>; Sun, 16 Aug 2020 20:49:23 -0700 (PDT)
 Received: from localhost.localdomain (unknown [IPv6:2001:da8:20f:4430:250:56ff:fe9a:7470])
-        by vultr.net.flygoat.com (Postfix) with ESMTPSA id 736DC1FF02;
-        Mon, 17 Aug 2020 03:48:53 +0000 (UTC)
+        by vultr.net.flygoat.com (Postfix) with ESMTPSA id C704E1FF2E;
+        Mon, 17 Aug 2020 03:49:13 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=flygoat.com; s=vultr;
-        t=1597636137; bh=DG4HaU9QQ7zmJ9disDopHNWXYPU0r4P16T3M3Oeh0v8=;
+        t=1597636158; bh=tkpc/JTygn6o+xCIvRDfTn+uT6G2NyWz4hNvpeTgZbU=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=k7y+m7oobNcnyEw8zisBtP5mbOJfk/nHNionO299OhfazRxuu1Ik2h3aNwJc0Bjtr
-         YC2DWMLXLRBqTZbz7U8lYyavuysFGo5mny+x/JaD9jIgpg7g12zWVVJEEiPa2RkGnL
-         VZjeiI8j6CNaMDpspo/a2gLkFHXrj3vkRi702ZdnuOWfg9VC0VeLIkcs47lw8qERPD
-         IdnxQZ3MLRoWhKzEh3MDNzEIC3bw6MMlsQuYQSKhm2EklZRF8lqNZQEA7tp/dBlKMO
-         v3kPsV0ARo+o12jsFEKkG6SjKdbHoxW1YcLLc5kZJe2iaowOfvacCUFIc/Hu8sOmJE
-         iEtXFe9m5XvvA==
+        b=MfoazQ/PgCh5GA96W/lf7BkTN1v5bd84tXxLgIDPZgMuONl2mddmPNlnANRxUOzrT
+         OBJLeZgqcHNpCbVSVcu5rojv87oL9nSB14ZwwdYDaCSK1qRX5sj7zXHWJ4agS/uCP8
+         CgaKmzZQm5Yaa6yjR4K4ypZG5CtTJ/FyrI5hyaao1swL1Il4LeDMysgprbnJMRcnUJ
+         J9LEQm4qPNSyl4qroyAUa7yhJKKSPBRp2hH+eWYyjpCWai8oU0CEyFoGS25Zuv6mVb
+         JP21CW1cN4lMqB61AXAcWOe08rxIccIOu08WPeXyeLLKHyYJMC1WYEs1OGFIjxo23u
+         M0qE42HcTiI2A==
 From:   Jiaxun Yang <jiaxun.yang@flygoat.com>
 To:     linux-mips@vger.kernel.org
 Cc:     Jiaxun Yang <jiaxun.yang@flygoat.com>,
         Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
         Huacai Chen <chenhc@lemote.com>,
         Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        Paul Burton <paulburton@kernel.org>,
         Serge Semin <Sergey.Semin@baikalelectronics.ru>,
+        Paul Burton <paulburton@kernel.org>,
         WANG Xuerui <git@xen0n.name>,
+        Alexey Malahov <Alexey.Malahov@baikalelectronics.ru>,
         =?UTF-8?q?=E5=91=A8=E7=90=B0=E6=9D=B0=20=28Zhou=20Yanjie=29?= 
         <zhouyanjie@wanyeetech.com>,
         Liangliang Huang <huanglllzu@gmail.com>,
         afzal mohammed <afzal.mohd.ma@gmail.com>,
-        Peter Xu <peterx@redhat.com>,
         "Peter Zijlstra (Intel)" <peterz@infradead.org>,
+        Peter Xu <peterx@redhat.com>,
         Sergey Korolev <s.korolev@ndmsystems.com>,
-        Alexey Malahov <Alexey.Malahov@baikalelectronics.ru>,
-        Anup Patel <anup.patel@wdc.com>, Marc Zyngier <maz@kernel.org>,
-        "Rafael J. Wysocki" <rafael@kernel.org>,
-        Michael Kelley <mikelley@microsoft.com>,
+        Marc Zyngier <maz@kernel.org>, Anup Patel <anup.patel@wdc.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
         Steven Price <steven.price@arm.com>,
         Atish Patra <atish.patra@wdc.com>,
         Ming Lei <ming.lei@redhat.com>,
         Daniel Jordan <daniel.m.jordan@oracle.com>,
         Mike Leach <mike.leach@linaro.org>,
+        Ulf Hansson <ulf.hansson@linaro.org>,
         linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Subject: [PATCH 4/7] MIPS: Loongson64: Remove custom count sync procudure
-Date:   Mon, 17 Aug 2020 11:46:43 +0800
-Message-Id: <20200817034701.3515721-5-jiaxun.yang@flygoat.com>
+Subject: [PATCH 5/7] MIPS: cevt-r4k: Don't handle IRQ if clockevent is not enabled
+Date:   Mon, 17 Aug 2020 11:46:44 +0800
+Message-Id: <20200817034701.3515721-6-jiaxun.yang@flygoat.com>
 X-Mailer: git-send-email 2.28.0.rc1
 In-Reply-To: <20200817034701.3515721-1-jiaxun.yang@flygoat.com>
 References: <20200817034701.3515721-1-jiaxun.yang@flygoat.com>
@@ -65,98 +65,42 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Now we have hotplug aware reliable sync-r4k, we can simply use
-that instead of our IPI based implementation.
+Some platforms may have shared Cause.TI, bailing out in IRQ handler
+when clock event is not enabled can give another clock device a chance.
 
 Signed-off-by: Jiaxun Yang <jiaxun.yang@flygoat.com>
 ---
- arch/mips/include/asm/smp.h |  1 -
- arch/mips/loongson64/smp.c  | 32 ++------------------------------
- 2 files changed, 2 insertions(+), 31 deletions(-)
+ arch/mips/kernel/cevt-r4k.c | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
 
-diff --git a/arch/mips/include/asm/smp.h b/arch/mips/include/asm/smp.h
-index 5d9ff61004ca..2300cc0bba34 100644
---- a/arch/mips/include/asm/smp.h
-+++ b/arch/mips/include/asm/smp.h
-@@ -52,7 +52,6 @@ extern int __cpu_logical_map[NR_CPUS];
- #define SMP_CALL_FUNCTION	0x2
- /* Octeon - Tell another core to flush its icache */
- #define SMP_ICACHE_FLUSH	0x4
--#define SMP_ASK_C0COUNT		0x8
+diff --git a/arch/mips/kernel/cevt-r4k.c b/arch/mips/kernel/cevt-r4k.c
+index f0c52d751d0a..d396b1011fee 100644
+--- a/arch/mips/kernel/cevt-r4k.c
++++ b/arch/mips/kernel/cevt-r4k.c
+@@ -142,6 +142,15 @@ irqreturn_t c0_compare_interrupt(int irq, void *dev_id)
+ 	if (handle_perf_irq(r2))
+ 		return IRQ_HANDLED;
  
- /* Mask of CPUs which are currently definitely operating coherently */
- extern cpumask_t cpu_coherent_mask;
-diff --git a/arch/mips/loongson64/smp.c b/arch/mips/loongson64/smp.c
-index e744e1bee49e..d6a3a7c3d1b2 100644
---- a/arch/mips/loongson64/smp.c
-+++ b/arch/mips/loongson64/smp.c
-@@ -32,7 +32,6 @@ static void *ipi_clear0_regs[16];
- static void *ipi_status0_regs[16];
- static void *ipi_en0_regs[16];
- static void *ipi_mailbox_buf[16];
--static uint32_t core0_c0count[NR_CPUS];
++	cd = &per_cpu(mips_clockevent_device, cpu);
++	/*
++	 * If the clockevent have not enabled, then no need to check the rest.
++	 * Some platforms may have shared Cause.TI, bailing out here can
++	 * give another clock device a chance.
++	 */
++	if (clockevent_state_detached(cd) || clockevent_state_shutdown(cd))
++		return IRQ_NONE;
++
+ 	/*
+ 	 * The same applies to performance counter interrupts.	But with the
+ 	 * above we now know that the reason we got here must be a timer
+@@ -150,7 +159,6 @@ irqreturn_t c0_compare_interrupt(int irq, void *dev_id)
+ 	if (!r2 || (read_c0_cause() & CAUSEF_TI)) {
+ 		/* Clear Count/Compare Interrupt */
+ 		write_c0_compare(read_c0_compare());
+-		cd = &per_cpu(mips_clockevent_device, cpu);
+ 		cd->event_handler(cd);
  
- /* read a 32bit value from ipi register */
- #define loongson3_ipi_read32(addr) readl(addr)
-@@ -307,8 +306,8 @@ loongson3_send_ipi_mask(const struct cpumask *mask, unsigned int action)
- 
- static irqreturn_t loongson3_ipi_interrupt(int irq, void *dev_id)
- {
--	int i, cpu = smp_processor_id();
--	unsigned int action, c0count;
-+	int cpu = smp_processor_id();
-+	unsigned int action;
- 
- 	action = ipi_read_clear(cpu);
- 
-@@ -321,15 +320,6 @@ static irqreturn_t loongson3_ipi_interrupt(int irq, void *dev_id)
- 		irq_exit();
- 	}
- 
--	if (action & SMP_ASK_C0COUNT) {
--		BUG_ON(cpu != 0);
--		c0count = read_c0_count();
--		c0count = c0count ? c0count : 1;
--		for (i = 1; i < nr_cpu_ids; i++)
--			core0_c0count[i] = c0count;
--		__wbflush(); /* Let others see the result ASAP */
--	}
--
- 	return IRQ_HANDLED;
- }
- 
-@@ -340,7 +330,6 @@ static irqreturn_t loongson3_ipi_interrupt(int irq, void *dev_id)
- static void loongson3_init_secondary(void)
- {
- 	int i;
--	uint32_t initcount;
- 	unsigned int cpu = smp_processor_id();
- 	unsigned int imask = STATUSF_IP7 | STATUSF_IP6 |
- 			     STATUSF_IP3 | STATUSF_IP2;
-@@ -356,23 +345,6 @@ static void loongson3_init_secondary(void)
- 		     cpu_logical_map(cpu) % loongson_sysconf.cores_per_package);
- 	cpu_data[cpu].package =
- 		cpu_logical_map(cpu) / loongson_sysconf.cores_per_package;
--
--	i = 0;
--	core0_c0count[cpu] = 0;
--	loongson3_send_ipi_single(0, SMP_ASK_C0COUNT);
--	while (!core0_c0count[cpu]) {
--		i++;
--		cpu_relax();
--	}
--
--	if (i > MAX_LOOPS)
--		i = MAX_LOOPS;
--	if (cpu_data[cpu].package)
--		initcount = core0_c0count[cpu] + i;
--	else /* Local access is faster for loops */
--		initcount = core0_c0count[cpu] + i/2;
--
--	write_c0_count(initcount);
- }
- 
- static void loongson3_smp_finish(void)
+ 		return IRQ_HANDLED;
 -- 
 2.28.0.rc1
 
