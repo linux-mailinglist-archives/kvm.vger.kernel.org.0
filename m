@@ -2,106 +2,115 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DE87C246EA4
-	for <lists+kvm@lfdr.de>; Mon, 17 Aug 2020 19:34:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 22A0D246EC1
+	for <lists+kvm@lfdr.de>; Mon, 17 Aug 2020 19:36:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729923AbgHQReV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 17 Aug 2020 13:34:21 -0400
-Received: from mga04.intel.com ([192.55.52.120]:14710 "EHLO mga04.intel.com"
+        id S1730249AbgHQRgJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 17 Aug 2020 13:36:09 -0400
+Received: from mga05.intel.com ([192.55.52.43]:63451 "EHLO mga05.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730675AbgHQReK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 17 Aug 2020 13:34:10 -0400
-IronPort-SDR: waWDAcoRZtBPoTZNoJChtvzVFCGzIAR4Zzidbs57rf6CZW/F42is/z/d9I9On8PHy33Bc4U7Sn
- v1RG3JHVj+oQ==
-X-IronPort-AV: E=McAfee;i="6000,8403,9716"; a="152168693"
+        id S1729520AbgHQRfw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 17 Aug 2020 13:35:52 -0400
+IronPort-SDR: iZ2pkLIWgHb+zSuTuzJMGbddugSrXX70XPqpsjqLko2eejEvPfli81J6y/rN7E6UxP3FtY0SSz
+ QVvI0H+0g4iA==
+X-IronPort-AV: E=McAfee;i="6000,8403,9716"; a="239586575"
 X-IronPort-AV: E=Sophos;i="5.76,324,1592895600"; 
-   d="scan'208";a="152168693"
+   d="scan'208";a="239586575"
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Aug 2020 10:34:09 -0700
-IronPort-SDR: HG2n+zw0gztWeeAYlTL7GL50fhqL0ogiM+soswTPuxhFIdIgz7fb+V7+CAtYNSPFNaOfJDxqVP
- 3ldHTtml9dxQ==
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Aug 2020 10:35:49 -0700
+IronPort-SDR: dvvwDmsrt5UqQV5AB+zOhs+Tfvhkis/zHiIHAJtkctXled78/ujgaUwhZDPT5n18ytZP9lc6x4
+ Z05Ok352CRRA==
 X-IronPort-AV: E=Sophos;i="5.76,324,1592895600"; 
-   d="scan'208";a="319787242"
+   d="scan'208";a="292499642"
 Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.160])
-  by fmsmga004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Aug 2020 10:34:08 -0700
-Date:   Mon, 17 Aug 2020 10:34:07 -0700
+  by orsmga003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Aug 2020 10:35:49 -0700
+Date:   Mon, 17 Aug 2020 10:35:48 -0700
 From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Oliver Upton <oupton@google.com>
-Cc:     kvm list <kvm@vger.kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        Peter Shier <pshier@google.com>
-Subject: Re: [PATCH] kvm: nVMX: flush TLB when decoded insn != VM-exit reason
-Message-ID: <20200817173407.GG22407@linux.intel.com>
-References: <20200616224305.44242-1-oupton@google.com>
- <20200813170331.GI29439@linux.intel.com>
- <CAOQ_QsiVV7Btj5yJ5Dpqxf3V7OuHY3N9b1xW6rrZjyv6dOC8ig@mail.gmail.com>
- <20200813235940.GA4327@linux.intel.com>
- <CAOQ_Qsj2jw+tGkJkRdaQXPrSKhzu-b=SPneBToCz2DrMM3ZYOg@mail.gmail.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        peterx@redhat.com, Yang Weijiang <weijiang.yang@intel.com>,
+        stable@vger.kernel.org
+Subject: Re: [PATCH] selftests: kvm: Use a shorter encoding to clear RAX
+Message-ID: <20200817173548.GH22407@linux.intel.com>
+References: <20200817172034.26673-1-pbonzini@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAOQ_Qsj2jw+tGkJkRdaQXPrSKhzu-b=SPneBToCz2DrMM3ZYOg@mail.gmail.com>
+In-Reply-To: <20200817172034.26673-1-pbonzini@redhat.com>
 User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Aug 14, 2020 at 09:56:33AM -0500, Oliver Upton wrote:
-> On Thu, Aug 13, 2020 at 6:59 PM Sean Christopherson
-> <sean.j.christopherson@intel.com> wrote:
-> >
-> > On Thu, Aug 13, 2020 at 03:44:08PM -0500, Oliver Upton wrote:
-> > > On Thu, Aug 13, 2020 at 12:03 PM Sean Christopherson
-> > > > > +      *
-> > > > > +      * Rather than synthesizing a VM-exit into L1 for every possible
-> > > > > +      * instruction just flush the TLB, resume L2, and let hardware generate
-> > > > > +      * the appropriate VM-exit.
-> > > > > +      */
-> > > > > +     vmx_flush_tlb_gva(vcpu, kvm_rip_read(vcpu));
-> > > >
-> > > > This is wrong, it should flush kvm_get_linear_rip(vcpu).
-> > > >
-> > >
-> > > I do not believe that the aim of this patch will work anymore, since:
-> > >
-> > > 1dbf5d68af6f ("KVM: VMX: Add guest physical address check in EPT
-> > > violation and misconfig")
-> > >
-> > > Since it is possible to get into the emulator on any instruction that
-> > > induces an EPT violation, we'd wind up looping when we believe the
-> > > instruction needs to exit to L1 (TLB flush, resume guest, hit the same
-> > > EPT violation. Rinse, wash, repeat).
-> >
-> > kvm_get_linear_rip() doesn't walk any page tables, it simply accounts for a
-> > non-zero CS.base when !64-bit mode.  If we really wanted to, this could use
-> > the emulation context's cached _eip, but I don't see any value in that since
-> > both GUEST_CS_* and GUEST_RIP will already be cached by KVM.
-> >
-> > unsigned long kvm_get_linear_rip(struct kvm_vcpu *vcpu)
-> > {
-> >         if (is_64_bit_mode(vcpu))
-> >                 return kvm_rip_read(vcpu);
-> >         return (u32)(get_segment_base(vcpu, VCPU_SREG_CS) +
-> >                      kvm_rip_read(vcpu));
-> > }
-> 
-> Sorry, I was a tad imprecise. I haven't any issues with your
-> suggestion. Rather, I believe that my overall patch is ineffective.
-> 
-> Suppose we had an EPT violation for a GPA that exceeded the guest's
-> MAXPHYADDR. Let's also say that the EPT violation occurred on the
-> memory operand of an LMSW instruction. Per the aforementioned patch,
-> we will dive into the emulator. Since we check intercepts before
-> reading the operand out of memory, we will fall through to the default
-> case, set intercepted = true, flush TLB and resume.
+On Mon, Aug 17, 2020 at 01:20:34PM -0400, Paolo Bonzini wrote:
+> From: Yang Weijiang <weijiang.yang@intel.com>
 
-Hrm.  The new invocation of kvm_emulate_instruction() feels incomplete from
-the perspective that it doesn't have a flag that states "this should always
-cause a #PF, freak out if it doesn't".  Such a flag would allow keeping this
-approach as this interception logic could bail early if it is set, knowing
-that the emulator will inject a #PF or bail to userspace (or something like
-that).
+This shouldn't be here without Weijiang's SOB.
+
+> If debug_regs.c is built with newer binutils, the resulting binary is "optimized"
+> by the assembler:
+> 
+> asm volatile("ss_start: "
+>              "xor %%rax,%%rax\n\t"
+>              "cpuid\n\t"
+>              "movl $0x1a0,%%ecx\n\t"
+>              "rdmsr\n\t"
+>              : : : "rax", "ecx");
+> 
+> is translated to :
+> 
+>   000000000040194e <ss_start>:
+>   40194e:       31 c0                   xor    %eax,%eax     <----- rax->eax?
+>   401950:       0f a2                   cpuid
+>   401952:       b9 a0 01 00 00          mov    $0x1a0,%ecx
+>   401957:       0f 32                   rdmsr
+> 
+> As you can see rax is replaced with eax in target binary code.
+> This causes a difference is the length of xor instruction (2 Byte vs 3 Byte),
+> and makes the hard-coded instruction length check fail:
+> 
+>         /* Instruction lengths starting at ss_start */
+>         int ss_size[4] = {
+>                 3,              /* xor */   <-------- 2 or 3?
+>                 2,              /* cpuid */
+>                 5,              /* mov */
+>                 2,              /* rdmsr */
+>         };
+> 
+> Encode the shorter version directly and, while at it, fix the "clobbers"
+> of the asm.
+> 
+> Reported-by: Yang Weijiang <weijiang.yang@intel.com>
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+
+Reviewed-by: Sean Christopherson <sean.j.christopherson@intel.com>
+
+> ---
+>  tools/testing/selftests/kvm/x86_64/debug_regs.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/tools/testing/selftests/kvm/x86_64/debug_regs.c b/tools/testing/selftests/kvm/x86_64/debug_regs.c
+> index 8162c58a1234..b8d14f9db5f9 100644
+> --- a/tools/testing/selftests/kvm/x86_64/debug_regs.c
+> +++ b/tools/testing/selftests/kvm/x86_64/debug_regs.c
+> @@ -40,11 +40,11 @@ static void guest_code(void)
+>  
+>  	/* Single step test, covers 2 basic instructions and 2 emulated */
+>  	asm volatile("ss_start: "
+> -		     "xor %%rax,%%rax\n\t"
+> +		     "xor %%eax,%%eax\n\t"
+>  		     "cpuid\n\t"
+>  		     "movl $0x1a0,%%ecx\n\t"
+>  		     "rdmsr\n\t"
+> -		     : : : "rax", "ecx");
+> +		     : : : "eax", "ebx", "ecx", "edx");
+>  
+>  	/* DR6.BD test */
+>  	asm volatile("bd_start: mov %%dr0, %%rax" : : : "rax");
+> -- 
+> 2.26.2
+> 
