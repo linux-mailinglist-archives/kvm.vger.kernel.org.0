@@ -2,207 +2,285 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 94CFF24795A
-	for <lists+kvm@lfdr.de>; Mon, 17 Aug 2020 23:57:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BF796247B7D
+	for <lists+kvm@lfdr.de>; Tue, 18 Aug 2020 02:26:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729076AbgHQV4p (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 17 Aug 2020 17:56:45 -0400
-Received: from mail-dm6nam10on2072.outbound.protection.outlook.com ([40.107.93.72]:28385
-        "EHLO NAM10-DM6-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1729044AbgHQV4k (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 17 Aug 2020 17:56:40 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=j1jI5Xg/H1THE485nYLxfh/HaRDr/rBsgzHlCSj1NG4HhrKjoySra9boHoMIa6HkeB9i9g4judlYHL88wkpcGF+NakzulaUszoNGawurlbVnbX0tY9AbRU3LAAcNmeuha+oPt6qKMk0KAiVjeehJzgUFqUELIR4+3XvUAEptWrOYjTlrvfNLkts+uFmAaS3BUzUCoN84SSzKP7n8zqAfUPtC46qRNuTzkVegT7UzKmoAZgMI1KjWNb5L8thOUrjy2RRYPfOZ7ScN/teTavxpEfoIZLbTNkFOkVBqVampja9Lt/XXW7pkxvPn2U4njYymyQ2zASCGoArxrzC8gKTZ8g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=NPoQi+9ysdKHHF0b+5LwYxUGgwRkjASCIqQ7mS9L1to=;
- b=RQ996x2icwN3p8VCUvXamX549MmwXqB1/Tbpp1NRMRgKkR+8lHCd3Pe216tBzXC6cieNrMp7HfWOr5GqSeILAMiB2tnltojvDSu/zAwHQ8TCCkdnL2PD4078mFZAYuD4Q0TgQ63iDhrItBoS8ZS/pqFehsAjP9jRGxy6hrs43A8BUvWxBN00H9Juo9jsfieLbr//ZsyqqqhQG3kMKxvA3Jy3kt96gZOky+Aj5NBvuRFvOahVv/aA8XUA6Tb9VSvDbeTJLy6L/tT1mSGznWJ6aZf68UojXLRlwH8WxaBlOF3uUyT4FofNglgVL1MYllPHlCyCivfAQxzC4xpfOFKZWA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
+        id S1726878AbgHRA0E (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 17 Aug 2020 20:26:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60904 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726592AbgHRA0B (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 17 Aug 2020 20:26:01 -0400
+Received: from mail-pj1-x1049.google.com (mail-pj1-x1049.google.com [IPv6:2607:f8b0:4864:20::1049])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2CC12C061389
+        for <kvm@vger.kernel.org>; Mon, 17 Aug 2020 17:26:01 -0700 (PDT)
+Received: by mail-pj1-x1049.google.com with SMTP id gf16so11316031pjb.7
+        for <kvm@vger.kernel.org>; Mon, 17 Aug 2020 17:26:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=NPoQi+9ysdKHHF0b+5LwYxUGgwRkjASCIqQ7mS9L1to=;
- b=KgiUcOJj86gHqr4n4XaYoGV8peXgiDGV40uyeLeyotaMKRDsguZB4YjHv23xjcKJEY8yrqqy4wRAu/A55dBmLoETclKgTtEXjaXWd/8mUShF7MRebawQ8HBSh1C1jRQbXAa5gUQ7n8fb6mQZTWY57TwG0OhOSmN0BrmGRo2HIns=
-Authentication-Results: amd.com; dkim=none (message not signed)
- header.d=none;amd.com; dmarc=none action=none header.from=amd.com;
-Received: from SN1PR12MB2560.namprd12.prod.outlook.com (2603:10b6:802:26::19)
- by SA0PR12MB4526.namprd12.prod.outlook.com (2603:10b6:806:98::23) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3283.20; Mon, 17 Aug
- 2020 21:56:35 +0000
-Received: from SN1PR12MB2560.namprd12.prod.outlook.com
- ([fe80::ccd9:728:9577:200d]) by SN1PR12MB2560.namprd12.prod.outlook.com
- ([fe80::ccd9:728:9577:200d%4]) with mapi id 15.20.3283.027; Mon, 17 Aug 2020
- 21:56:35 +0000
-Subject: RE: [PATCH v4 00/12] SVM cleanup and INVPCID support for the AMD
- guests
-To:     "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "vkuznets@redhat.com" <vkuznets@redhat.com>,
-        "wanpengli@tencent.com" <wanpengli@tencent.com>,
-        "sean.j.christopherson@intel.com" <sean.j.christopherson@intel.com>,
-        "jmattson@google.com" <jmattson@google.com>
-Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "x86@kernel.org" <x86@kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "mingo@redhat.com" <mingo@redhat.com>,
-        "bp@alien8.de" <bp@alien8.de>, "hpa@zytor.com" <hpa@zytor.com>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        "Moger, Babu" <Babu.Moger@amd.com>
-References: <159676101387.12805.18038347880482984693.stgit@bmoger-ubuntu>
-From:   Babu Moger <babu.moger@amd.com>
-Message-ID: <d8b4b64f-b5d8-6763-0ef9-ac467ff7e47e@amd.com>
-Date:   Mon, 17 Aug 2020 16:56:33 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
-In-Reply-To: <159676101387.12805.18038347880482984693.stgit@bmoger-ubuntu>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: SN4PR0801CA0022.namprd08.prod.outlook.com
- (2603:10b6:803:29::32) To SN1PR12MB2560.namprd12.prod.outlook.com
- (2603:10b6:802:26::19)
-MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from [10.236.31.79] (165.204.77.1) by SN4PR0801CA0022.namprd08.prod.outlook.com (2603:10b6:803:29::32) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3283.16 via Frontend Transport; Mon, 17 Aug 2020 21:56:34 +0000
-X-Originating-IP: [165.204.77.1]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-HT: Tenant
-X-MS-Office365-Filtering-Correlation-Id: eab0312a-c589-43f9-3bea-08d842f868b6
-X-MS-TrafficTypeDiagnostic: SA0PR12MB4526:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <SA0PR12MB452610D73AFFCC7529190E6C955F0@SA0PR12MB4526.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:3383;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: NmM/VbHxCEUy46ZXHZMesYx5X5+O5MJ9T9bUH249ceulCcFW7pjK9tbf66nlc8Um7gzcva6MaQsWWoty1J61sLuRSCebzgjaPxouwkIM5WfxvhdG6PLO2zd5PKd8UkA0Oted1MQMVOQi5ZEfcqJURIri6GGT0fvExfiRUdc7JHIP0G0ShUXGI6LzCgyvAKpVfQ32jWBM78nzgRda8d5WiqnWAqOTlWzDyqHVfQTu9qstoyriWpplfDoFv1HzF2sz8Ga8RGUNLPkkvoq0j5I1B70kOh2YIX1LI9HLXyfUWxgJv+d/5SCxqw6NCCXh0zOP9WwQSyMM4VToUXkXdsLQsKQ1SVQ9FlR0Zyg/Ph6OXNJWZ15nN9xTeoZAs9v/oSPyqaOBDktcZhT6g9TIl/VfY9y5cgktjgL5NHcoxzQGCSm15AJb6AwWEbVXmL1w51dj5BnG2Mjp3azkcP0VgPmMhw==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN1PR12MB2560.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(396003)(39860400002)(376002)(346002)(136003)(366004)(2616005)(16576012)(2906002)(956004)(44832011)(66556008)(66476007)(66946007)(110136005)(54906003)(316002)(8676002)(52116002)(5660300002)(83380400001)(31696002)(16526019)(186003)(86362001)(31686004)(7416002)(26005)(53546011)(478600001)(6486002)(4326008)(36756003)(966005)(8936002)(43740500002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData: B9xVL8PSHpL76MnIYk0SoMaCJm5XY58lplJ/gz6dRG59hF2YYAcn209DV0+3HWXJ5owx3/bn7dhvXyCJevXZ52IOgamITx0U1Mq3I85nN1rcXUZPDy3DpEw6SXTfLJ0gWv/2w+A29UP36PEZrTf+JGoC3BGtdUGJiH8AAi6lR8ydn8l7JPztl+F9wsl1EdV+lzPQlPaZt51+LjaIHiIOgUQA9uBvQsFNyU8PgYG6XYlUViaHxaV8VSjuAe67HUc9zUltfS2Gp/14dpphhcpmT4MfqzXfL+IcaInDtcROL8WlYd9WtzoTeQa7BHMcaw6bJPIug47wDR14oKPYGn2pdA6tjeDMLvmqmPsWjUGVulX8NapIpCeibrwpBSAh0OcW7vv6Au1wKrqAUnCAKWRMvLDp0dAoos/hS1NNdnXG21OH/6yK9CP0XGU9+XqEKO5Nb+jlEdnUiV3khuB5MUZSFu/D00ngj02mvPz96uiSxFr4TYgCV6jUDrnqn3c9xP4IS3+GGowEBC32aoWFxmQi7pAwgIgQjh/LkxdtoxYt9axg37afxybN1XP+dVziFea1E+F6aDny++WrgpAxbZg8Pv/bbL4p9kQJsqcshk6IQSfVtmL32rRORbPbMsv+G0kYD5sWBMZDK5OofBF1JYRG1A==
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: eab0312a-c589-43f9-3bea-08d842f868b6
-X-MS-Exchange-CrossTenant-AuthSource: SN1PR12MB2560.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Aug 2020 21:56:35.2409
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Lf6ltPkRS6filNLI3WVLMu60NjCHlO2shKDtJMn888523wORVIlgM+jSCPg0Er9y
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR12MB4526
+        d=google.com; s=20161025;
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=8e+ox54HeK88rWVSIgwtx//BruEjCGyJapM29hBKsLs=;
+        b=Kh+APvoW+7VppqIfU0DKewAtfFxv/pb4x3K8GZBVNs3LprUDdDaDUhSrfaOdIjYLQv
+         DMJfUL71DMo1EiUbmHR9VAWo6NYtD94AtenYyp4j34gHOo/jv8QlOrVc7jCfkcfOyG+C
+         6lor/JoAOHm0G4Lw6pfzR58wadYJmcEvSgG0YbyOsuVMvTN3U6gRRICQKs+dNgInGwjC
+         VgtPAzq2sW40wXNTkG3emGLTMVhBfI/sis1GJ8HCIhV3OPv8YvHLxyj+pbU3v27Kr+QN
+         wL9Kimxd9W4Dgqm+coiP8YQMByZOLQly3rjkLHVp7hKlQBGmcXJ0KXlaFReRt6ZpNFGJ
+         zevg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=8e+ox54HeK88rWVSIgwtx//BruEjCGyJapM29hBKsLs=;
+        b=JCB9/wZCQ/o/fkeLFiFsl27A17jiRWAAtrHx0onH+TJO7kEMwRzACaqrekePMjSdHe
+         MMCesvW4nBo9iCta+ZUpRRsyzWBzCYBqpGiKEvL/JLPKgJhywbqcZCGf3oTtJm9ZyWEt
+         SmHm01fINC+ip/LsYpF3tEy/xN3sbio2/DZvgUoNZb3xjjoLgLF3HRJ2AfTX0WPloSkb
+         ZcAFFVHfqhV3Z8zmQmiIjNFNraNrNQyvniiyEcMC1LZ9Vz4U0/EEBW+tpzvhLLmNA4bf
+         oOYlELaL3qTlxY0fn2c/vXo2SdIb1Gxh8izgSISjksaIERxYYsF3BTu2PjAnMmf1tI60
+         watg==
+X-Gm-Message-State: AOAM5338KM+njCVxa4cdfX+dBjtzyUXM5Rgat7yEA5kHEBMubJTPefyP
+        REF5Dr2EKf5iuqmXdJKdbZSCVKv5eQCoTfL2TpdFaNFVbOaiPYj07JMRKIh7Eh+ehNnrfN4208f
+        U8RQ8K0EhvSRLmEbDKgdqskwGk3T+fHtBTgHQ9YuglWmLqs0PBbINITPHlQ==
+X-Google-Smtp-Source: ABdhPJwqh6wVv3hpbQdwkFV2FcUx5H3CMt90SRBihCQuFvk5n/4I9GB8rDMIMxJ7TB+z9a7ekRGflmBGUdk=
+X-Received: by 2002:a63:6a47:: with SMTP id f68mr11669331pgc.358.1597710360297;
+ Mon, 17 Aug 2020 17:26:00 -0700 (PDT)
+Date:   Mon, 17 Aug 2020 17:25:37 -0700
+Message-Id: <20200818002537.207910-1-pshier@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.28.0.220.ged08abb693-goog
+Subject: [kvm-unit-tests PATCH] x86: vmx: Add test for MTF on a guest
+ MOV-to-CR0 that enables PAE
+From:   Peter Shier <pshier@google.com>
+To:     kvm@vger.kernel.org
+Cc:     pbonzini@redhat.com, Peter Shier <pshier@google.com>,
+        Jim Mattson <jmattson@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Paolo and others,  Any comments on this series?
+Verify that when L2 guest enables PAE paging and L0 intercept of L2
+MOV to CR0 reflects MTF exit to L1, subsequent resume to L2 correctly
+preserves PDPTE array specified by L2 CR3.
 
-> -----Original Message-----
-> From: Moger, Babu <Babu.Moger@amd.com>
-> Sent: Thursday, August 6, 2020 7:46 PM
-> To: pbonzini@redhat.com; vkuznets@redhat.com; wanpengli@tencent.com;
-> sean.j.christopherson@intel.com; jmattson@google.com
-> Cc: kvm@vger.kernel.org; joro@8bytes.org; x86@kernel.org; linux-
-> kernel@vger.kernel.org; mingo@redhat.com; bp@alien8.de;
-> hpa@zytor.com; tglx@linutronix.de
-> Subject: [PATCH v4 00/12] SVM cleanup and INVPCID support for the AMD
-> guests
-> 
-> The following series adds the support for PCID/INVPCID on AMD guests.
-> While doing it re-structured the vmcb_control_area data structure to
-> combine all the intercept vectors into one 32 bit array. Makes it easy for
-> future additions. Re-arranged few pcid related code to make it common
-> between SVM and VMX.
-> 
-> INVPCID interceptions are added only when the guest is running with
-> shadow page table enabled. In this case the hypervisor needs to handle the
-> tlbflush based on the type of invpcid instruction.
-> 
-> For the guests with nested page table (NPT) support, the INVPCID feature
-> works as running it natively. KVM does not need to do any special handling.
-> 
-> AMD documentation for INVPCID feature is available at "AMD64 Architecture
-> Programmer’s Manual Volume 2: System Programming, Pub. 24593 Rev.
-> 3.34(or later)"
-> 
-> The documentation can be obtained at the links below:
-> Link: https://www.amd.com/system/files/TechDocs/24593.pdf
-> Link: https://bugzilla.kernel.org/show_bug.cgi?id=206537
-> ---
-> v4:
->  1. Changed the functions __set_intercept/__clr_intercept/__is_intercept to
->     to vmcb_set_intercept/vmcb_clr_intercept/vmcb_is_intercept by passing
->     vmcb_control_area structure(Suggested by Paolo).
->  2. Rearranged the commit 7a35e515a7055 ("KVM: VMX: Properly handle
-> kvm_read/write_guest_virt*())
->     to make it common across both SVM/VMX(Suggested by Jim Mattson).
->  3. Took care of few other comments from Jim Mattson. Dropped
-> "Reviewed-by"
->     on few patches which I have changed since v3.
-> 
-> v3:
-> 
-> https://lore.kernel.org/lkml/159597929496.12744.14654593948763926416.stgi
-> t@bmoger-ubuntu/
->  1. Addressing the comments from Jim Mattson. Follow the v2 link below
->     for the context.
->  2. Introduced the generic __set_intercept, __clr_intercept and is_intercept
->     using native __set_bit, clear_bit and test_bit.
->  3. Combined all the intercepts vectors into single 32 bit array.
->  4. Removed set_intercept_cr, clr_intercept_cr, set_exception_intercepts,
->     clr_exception_intercept etc. Used the generic set_intercept and
->     clr_intercept where applicable.
->  5. Tested both L1 guest and l2 nested guests.
-> 
-> v2:
-> 
-> https://lore.kernel.org/lkml/159234483706.6230.13753828995249423191.stgit
-> @bmoger-ubuntu/
->   - Taken care of few comments from Jim Mattson.
->   - KVM interceptions added only when tdp is off. No interceptions
->     when tdp is on.
->   - Reverted the fault priority to original order in VMX.
-> 
-> v1:
-> 
-> https://lore.kernel.org/lkml/159191202523.31436.11959784252237488867.stgi
-> t@bmoger-ubuntu/
-> 
-> Babu Moger (12):
->       KVM: SVM: Introduce vmcb_set_intercept, vmcb_clr_intercept and
-> vmcb_is_intercept
->       KVM: SVM: Change intercept_cr to generic intercepts
->       KVM: SVM: Change intercept_dr to generic intercepts
->       KVM: SVM: Modify intercept_exceptions to generic intercepts
->       KVM: SVM: Modify 64 bit intercept field to two 32 bit vectors
->       KVM: SVM: Add new intercept vector in vmcb_control_area
->       KVM: nSVM: Cleanup nested_state data structure
->       KVM: SVM: Remove set_cr_intercept, clr_cr_intercept and
-> is_cr_intercept
->       KVM: SVM: Remove set_exception_intercept and
-> clr_exception_intercept
->       KVM: X86: Rename and move the function vmx_handle_memory_failure
-> to x86.c
->       KVM: X86: Move handling of INVPCID types to x86
->       KVM:SVM: Enable INVPCID feature on AMD
-> 
-> 
->  arch/x86/include/asm/svm.h      |  117 +++++++++++++++++++++++++-------
-> ---
->  arch/x86/include/uapi/asm/svm.h |    2 +
->  arch/x86/kvm/svm/nested.c       |   66 +++++++++-----------
->  arch/x86/kvm/svm/svm.c          |  131 ++++++++++++++++++++++++++-------
-> ------
->  arch/x86/kvm/svm/svm.h          |   87 +++++++++-----------------
->  arch/x86/kvm/trace.h            |   21 ++++--
->  arch/x86/kvm/vmx/nested.c       |   12 ++--
->  arch/x86/kvm/vmx/vmx.c          |   95 ----------------------------
->  arch/x86/kvm/vmx/vmx.h          |    2 -
->  arch/x86/kvm/x86.c              |  106 ++++++++++++++++++++++++++++++++
->  arch/x86/kvm/x86.h              |    3 +
->  11 files changed, 364 insertions(+), 278 deletions(-)
-> 
-> --
+Signed-off-by: Jim Mattson <jmattson@google.com>
+Reviewed-by:   Peter Shier <pshier@google.com>
+Signed-off-by: Peter Shier <pshier@google.com>
+---
+ lib/x86/asm/page.h |   8 +++
+ x86/vmx_tests.c    | 171 +++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 179 insertions(+)
+
+diff --git a/lib/x86/asm/page.h b/lib/x86/asm/page.h
+index 7e2a3dd4b90a..1359eb74cde4 100644
+--- a/lib/x86/asm/page.h
++++ b/lib/x86/asm/page.h
+@@ -36,10 +36,18 @@ typedef unsigned long pgd_t;
+ #define PT64_NX_MASK		(1ull << 63)
+ #define PT_ADDR_MASK		GENMASK_ULL(51, 12)
+ 
++#define PDPTE64_PAGE_SIZE_MASK	  (1ull << 7)
++#define PDPTE64_RSVD_MASK	  GENMASK_ULL(51, cpuid_maxphyaddr())
++
+ #define PT_AD_MASK              (PT_ACCESSED_MASK | PT_DIRTY_MASK)
+ 
++#define PAE_PDPTE_RSVD_MASK     (GENMASK_ULL(63, cpuid_maxphyaddr()) |	\
++				 GENMASK_ULL(8, 5) | GENMASK_ULL(2, 1))
++
++
+ #ifdef __x86_64__
+ #define	PAGE_LEVEL	4
++#define	PDPT_LEVEL	3
+ #define	PGDIR_WIDTH	9
+ #define	PGDIR_MASK	511
+ #else
+diff --git a/x86/vmx_tests.c b/x86/vmx_tests.c
+index 32e3d4f47b33..372e5efb6b5f 100644
+--- a/x86/vmx_tests.c
++++ b/x86/vmx_tests.c
+@@ -5250,6 +5250,176 @@ static void vmx_mtf_test(void)
+ 	enter_guest();
+ }
+ 
++extern char vmx_mtf_pdpte_guest_begin;
++extern char vmx_mtf_pdpte_guest_end;
++
++asm("vmx_mtf_pdpte_guest_begin:\n\t"
++    "mov %cr0, %rax\n\t"    /* save CR0 with PG=1                 */
++    "vmcall\n\t"            /* on return from this CR0.PG=0       */
++    "mov %rax, %cr0\n\t"    /* restore CR0.PG=1 to enter PAE mode */
++    "vmcall\n\t"
++    "retq\n\t"
++    "vmx_mtf_pdpte_guest_end:");
++
++static void vmx_mtf_pdpte_test(void)
++{
++	void *test_mtf_pdpte_guest;
++	pteval_t *pdpt;
++	u32 guest_ar_cs;
++	u64 guest_efer;
++	pteval_t *pte;
++	u64 guest_cr0;
++	u64 guest_cr3;
++	u64 guest_cr4;
++	u64 ent_ctls;
++	int i;
++
++	if (setup_ept(false))
++		return;
++
++	if (!(ctrl_cpu_rev[0].clr & CPU_MTF)) {
++		printf("CPU does not support 'monitor trap flag.'\n");
++		return;
++	}
++
++	if (!(ctrl_cpu_rev[1].clr & CPU_URG)) {
++		printf("CPU does not support 'unrestricted guest.'\n");
++		return;
++	}
++
++	vmcs_write(EXC_BITMAP, ~0);
++	vmcs_write(CPU_EXEC_CTRL1, vmcs_read(CPU_EXEC_CTRL1) | CPU_URG);
++
++	/*
++	 * Copy the guest code to an identity-mapped page.
++	 */
++	test_mtf_pdpte_guest = alloc_page();
++	memcpy(test_mtf_pdpte_guest, &vmx_mtf_pdpte_guest_begin,
++	       &vmx_mtf_pdpte_guest_end - &vmx_mtf_pdpte_guest_begin);
++
++	test_set_guest(test_mtf_pdpte_guest);
++
++	enter_guest();
++	skip_exit_vmcall();
++
++	/*
++	 * Put the guest in non-paged 32-bit protected mode, ready to enter
++	 * PAE mode when CR0.PG is set. CR4.PAE will already have been set
++	 * when the guest started out in long mode.
++	 */
++	ent_ctls = vmcs_read(ENT_CONTROLS);
++	vmcs_write(ENT_CONTROLS, ent_ctls & ~ENT_GUEST_64);
++
++	guest_efer = vmcs_read(GUEST_EFER);
++	vmcs_write(GUEST_EFER, guest_efer & ~(EFER_LMA | EFER_LME));
++
++	/*
++	 * Set CS access rights bits for 32-bit protected mode:
++	 * 3:0    B execute/read/accessed
++	 * 4      1 code or data
++	 * 6:5    0 descriptor privilege level
++	 * 7      1 present
++	 * 11:8   0 reserved
++	 * 12     0 available for use by system software
++	 * 13     0 64 bit mode not active
++	 * 14     1 default operation size 32-bit segment
++	 * 15     1 page granularity: segment limit in 4K units
++	 * 16     0 segment usable
++	 * 31:17  0 reserved
++	 */
++	guest_ar_cs = vmcs_read(GUEST_AR_CS);
++	vmcs_write(GUEST_AR_CS, 0xc09b);
++
++	guest_cr0 = vmcs_read(GUEST_CR0);
++	vmcs_write(GUEST_CR0, guest_cr0 & ~X86_CR0_PG);
++
++	guest_cr4 = vmcs_read(GUEST_CR4);
++	vmcs_write(GUEST_CR4, guest_cr4 & ~X86_CR4_PCIDE);
++
++	guest_cr3 = vmcs_read(GUEST_CR3);
++
++	/*
++	 * Turn the 4-level page table into a PAE page table by following the 0th
++	 * PML4 entry to a PDPT page, and grab the first four PDPTEs from that
++	 * page.
++	 *
++	 * Why does this work?
++	 *
++	 * PAE uses 32-bit addressing which implies:
++	 * Bits 11:0   page offset
++	 * Bits 20:12  entry into 512-entry page table
++	 * Bits 29:21  entry into a 512-entry directory table
++	 * Bits 31:30  entry into the page directory pointer table.
++	 * Bits 63:32  zero
++	 *
++	 * As only 2 bits are needed to select the PDPTEs for the entire
++	 * 32-bit address space, take the first 4 PDPTEs in the level 3 page
++	 * directory pointer table. It doesn't matter which of these PDPTEs
++	 * are present because they must cover the guest code given that it
++	 * has already run successfully.
++	 *
++	 * Get a pointer to PTE for GVA=0 in the page directory pointer table
++	 */
++	pte = get_pte_level((pgd_t *)(guest_cr3 & ~X86_CR3_PCID_MASK), 0, PDPT_LEVEL);
++
++	/*
++	 * Need some memory for the 4-entry PAE page directory pointer
++	 * table. Use the end of the identity-mapped page where the guest code
++	 * is stored. There is definitely space as the guest code is only a
++	 * few bytes.
++	 */
++	pdpt = test_mtf_pdpte_guest + PAGE_SIZE - 4 * sizeof(pteval_t);
++
++	/*
++	 * Copy the first four PDPTEs into the PAE page table with reserved
++	 * bits cleared. Note that permission bits from the PML4E and PDPTE
++	 * are not propagated.
++	 */
++	for (i = 0; i < 4; i++) {
++		TEST_ASSERT_EQ_MSG(0, (pte[i] & PDPTE64_RSVD_MASK),
++				   "PDPTE has invalid reserved bits");
++		TEST_ASSERT_EQ_MSG(0, (pte[i] & PDPTE64_PAGE_SIZE_MASK),
++				   "Cannot use 1GB super pages for PAE");
++		pdpt[i] = pte[i] & ~(PAE_PDPTE_RSVD_MASK);
++	}
++	vmcs_write(GUEST_CR3, virt_to_phys(pdpt));
++
++	enable_mtf();
++	enter_guest();
++	assert_exit_reason(VMX_MTF);
++	disable_mtf();
++
++	/*
++	 * The four PDPTEs should have been loaded into the VMCS when
++	 * the guest set CR0.PG to enter PAE mode.
++	 */
++	for (i = 0; i < 4; i++) {
++		u64 pdpte = vmcs_read(GUEST_PDPTE + 2 * i);
++
++		report(pdpte == pdpt[i], "PDPTE%d is 0x%lx (expected 0x%lx)",
++		       i, pdpte, pdpt[i]);
++	}
++
++	/*
++	 * Now, try to enter the guest in PAE mode. If the PDPTEs in the
++	 * vmcs are wrong, this will fail.
++	 */
++	enter_guest();
++	skip_exit_vmcall();
++
++	/*
++	 * Return guest to 64-bit mode and wrap up.
++	 */
++	vmcs_write(ENT_CONTROLS, ent_ctls);
++	vmcs_write(GUEST_EFER, guest_efer);
++	vmcs_write(GUEST_AR_CS, guest_ar_cs);
++	vmcs_write(GUEST_CR0, guest_cr0);
++	vmcs_write(GUEST_CR4, guest_cr4);
++	vmcs_write(GUEST_CR3, guest_cr3);
++
++	enter_guest();
++}
++
+ /*
+  * Tests for VM-execution control fields
+  */
+@@ -10112,5 +10282,6 @@ struct vmx_test vmx_tests[] = {
+ 	TEST(atomic_switch_overflow_msrs_test),
+ 	TEST(rdtsc_vmexit_diff_test),
+ 	TEST(vmx_mtf_test),
++	TEST(vmx_mtf_pdpte_test),
+ 	{ NULL, NULL, NULL, NULL, NULL, {0} },
+ };
+-- 
+2.28.0.220.ged08abb693-goog
+
