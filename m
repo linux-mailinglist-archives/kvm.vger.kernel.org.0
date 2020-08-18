@@ -2,142 +2,82 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2B12E248C73
-	for <lists+kvm@lfdr.de>; Tue, 18 Aug 2020 19:06:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B7894248CAB
+	for <lists+kvm@lfdr.de>; Tue, 18 Aug 2020 19:14:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728379AbgHRRGJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 18 Aug 2020 13:06:09 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:24321 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1728122AbgHRRFY (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 18 Aug 2020 13:05:24 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1597770321;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=4KjP4tLJ3k//LfnATZoQR9lS9r+FC1/WEhYpN5z380g=;
-        b=N7CkjNRtevWJeyx4S0Ri2o0DfYAKBbyDsZPbVJCtqLTwr2nv/Kdbod1mQb8qAUFiIkkYbA
-        TNBkaNNW1Q0D6UPNFv4h0wzaaBhro2+IwpbCE+Lj+gvWpuDNfb9rJJPv1i36NLqspb3jqH
-        PZs25MzOijeF2Qy5Zm0UAJFUx5jsRoU=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-26-A2YfTMEGMxuGzVpdCGTHtQ-1; Tue, 18 Aug 2020 13:05:20 -0400
-X-MC-Unique: A2YfTMEGMxuGzVpdCGTHtQ-1
-Received: by mail-wm1-f70.google.com with SMTP id k204so6343081wmb.3
-        for <kvm@vger.kernel.org>; Tue, 18 Aug 2020 10:05:20 -0700 (PDT)
+        id S1728431AbgHRRO4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 18 Aug 2020 13:14:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49818 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726836AbgHRROx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 18 Aug 2020 13:14:53 -0400
+Received: from mail-oi1-x243.google.com (mail-oi1-x243.google.com [IPv6:2607:f8b0:4864:20::243])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 017F3C061389
+        for <kvm@vger.kernel.org>; Tue, 18 Aug 2020 10:14:53 -0700 (PDT)
+Received: by mail-oi1-x243.google.com with SMTP id l84so18545528oig.10
+        for <kvm@vger.kernel.org>; Tue, 18 Aug 2020 10:14:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=wLSk1hD5x0b5ZJUN9D3Cg3DfYbJfyYbM3G81BYYFQKo=;
+        b=NPoGE5tUdBrIJBQksCkBv0tPeUHDQRhSR88FZmTNzpbfTtbrRQpIKVQa+8I8XmsdfE
+         namhSoNBJ3LhM15FzlcIxdGUojHZ+ViCdL6kl3lwvlRcGeU6jSBz0abQHX37zaaflUBE
+         rvkyeS4+tBI1gAbYeswwdm2OWt9kZLkAPDTyBtZ7U2ov4TUjl5N1Sxg412i9kJ3pPwyi
+         k52UuEovr48fyByhXbLnH9/HRXZPu/Hn1OCsJwSxHEFgQFGU7Ibx0+iQrbsTgPQB+6oN
+         l6xJvb9bbXqHscpjel1yJ2wzqm2PJowxqSi1fxUCdtbcOvYZJ0kN+Ob70E2pWCycMOjO
+         ImLg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=4KjP4tLJ3k//LfnATZoQR9lS9r+FC1/WEhYpN5z380g=;
-        b=MY8W/I75qVcBBn9cnnG9c/W5vhL+YBj2OaFa71u45kUvK/itPVsdg/ozNRn+fQbmGW
-         mrIx64w48e0AsLc1+BR39hIfNTXYAH8acIbC6vfg7SK4HJG9/A6zFF3cnxw+jGMnX1bP
-         VCAPA1TcXU7RWyVypVN/ETZ6PNWsOGT1ycJgGSCHIYq1F3i8VGWu3XCkeV19CYLWoEZ8
-         yVmVtmzoJJLeikTb+DV5bHRwvrPvwL++yeOC/Ee5M62SCJfiZOJUK0/d3fA+Bc0a2TX+
-         jpZHUUygtQ/soAcwrhrJnJ1JLV21YeI5gDR+9MLccsi866AnkkoMB0PFEBU1bjZHor8v
-         JglQ==
-X-Gm-Message-State: AOAM533lH8dbbLhgFNJ/V9DawMxvDrOyf4AD07EA5qEp0Hgdh+3sz7Vb
-        hbaD9F5HAJsdDKjxsxAL7RbctN5kg0b17yE+oeiT2L8L+HF43tSsOVTyIQa3/6ScCJvuzo+FeJc
-        FOuGR4wD5LZNB
-X-Received: by 2002:a1c:9952:: with SMTP id b79mr857686wme.68.1597770318667;
-        Tue, 18 Aug 2020 10:05:18 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxJU6TWMw/VYVpnpZqdnTB8Di51Urdb66TwCceH6QwuuehUW2mW7IXuxEigHeEneYQy0GJBaw==
-X-Received: by 2002:a1c:9952:: with SMTP id b79mr857644wme.68.1597770318432;
-        Tue, 18 Aug 2020 10:05:18 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:38e0:ccf8:ca85:3d9b? ([2001:b07:6468:f312:38e0:ccf8:ca85:3d9b])
-        by smtp.gmail.com with ESMTPSA id t25sm719265wmj.18.2020.08.18.10.05.16
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 18 Aug 2020 10:05:17 -0700 (PDT)
-Subject: Re: [PATCH RFC v2 00/18] Add VFIO mediated device support and DEV-MSI
- support for the idxd driver
-To:     Jason Gunthorpe <jgg@nvidia.com>
-Cc:     "Tian, Kevin" <kevin.tian@intel.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        "Jiang, Dave" <dave.jiang@intel.com>,
-        "vkoul@kernel.org" <vkoul@kernel.org>,
-        "Dey, Megha" <megha.dey@intel.com>,
-        "maz@kernel.org" <maz@kernel.org>,
-        "bhelgaas@google.com" <bhelgaas@google.com>,
-        "rafael@kernel.org" <rafael@kernel.org>,
-        "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        "hpa@zytor.com" <hpa@zytor.com>,
-        "Pan, Jacob jun" <jacob.jun.pan@intel.com>,
-        "Raj, Ashok" <ashok.raj@intel.com>,
-        "Liu, Yi L" <yi.l.liu@intel.com>, "Lu, Baolu" <baolu.lu@intel.com>,
-        "Kumar, Sanjay K" <sanjay.k.kumar@intel.com>,
-        "Luck, Tony" <tony.luck@intel.com>,
-        "Lin, Jing" <jing.lin@intel.com>,
-        "Williams, Dan J" <dan.j.williams@intel.com>,
-        "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
-        "eric.auger@redhat.com" <eric.auger@redhat.com>,
-        "parav@mellanox.com" <parav@mellanox.com>,
-        "Hansen, Dave" <dave.hansen@intel.com>,
-        "netanelg@mellanox.com" <netanelg@mellanox.com>,
-        "shahafs@mellanox.com" <shahafs@mellanox.com>,
-        "yan.y.zhao@linux.intel.com" <yan.y.zhao@linux.intel.com>,
-        "Ortiz, Samuel" <samuel.ortiz@intel.com>,
-        "Hossain, Mona" <mona.hossain@intel.com>,
-        "dmaengine@vger.kernel.org" <dmaengine@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "x86@kernel.org" <x86@kernel.org>,
-        "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-References: <20200724001930.GS2021248@mellanox.com>
- <20200805192258.5ee7a05b@x1.home> <20200807121955.GS16789@nvidia.com>
- <MWHPR11MB16452EBE866E330A7E000AFC8C440@MWHPR11MB1645.namprd11.prod.outlook.com>
- <20200814133522.GE1152540@nvidia.com>
- <MWHPR11MB16456D49F2F2E9646F0841488C5F0@MWHPR11MB1645.namprd11.prod.outlook.com>
- <20200818004343.GG1152540@nvidia.com>
- <MWHPR11MB164579D1BBBB0F7164B07A228C5C0@MWHPR11MB1645.namprd11.prod.outlook.com>
- <20200818115003.GM1152540@nvidia.com>
- <0711a4ce-1e64-a0cb-3e6d-f6653284e2e3@redhat.com>
- <20200818164903.GA1152540@nvidia.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <07fca197-3587-a45e-640b-bab0858067e2@redhat.com>
-Date:   Tue, 18 Aug 2020 19:05:16 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.9.0
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=wLSk1hD5x0b5ZJUN9D3Cg3DfYbJfyYbM3G81BYYFQKo=;
+        b=r78HdgjDsXVLZPgmbt+ifTBfsU1utsIUhIZLre9HbdcNq+aOnn22iTgJ3HUsrBMAvD
+         yMZegikjRXBgleqOZwn65svZIrCwP8c6otW5ePmtSxRWAhLAwS6JfxeS4fyel0jnPWJJ
+         fKeHcsxDIUaYOB3xSXbf8oxebVfcAXWTgIRej029QJzchWWLm0MlRdeUA5/rL83ki9cH
+         ZViCcCY+RGTimuPM5YJLwn3gCQyJ8ro0DyWxhz9zzlP0NHEjGX8nFLXVxzhXWkryEhT2
+         1bSctjethd0g2pFPPfZiVhCMCqJEYm7ipHr2Fc4NlDbVkzdxOezV+whYxefMD8+hhFRF
+         vVHg==
+X-Gm-Message-State: AOAM531A1TOnfD0OPosGXV3Eb1Re6QdrdHIWxesJPTIrccBHygzjM9xw
+        VFpsDtK5jKAPoxUERa8L2qbh+mO4QjUGpxC5+t6IKw==
+X-Google-Smtp-Source: ABdhPJwqVlfdnsPMs2BhFGJmHLxP6lIYCdQr4TMKMKAQfon8w/FZ5n1e3XAcrNxc1W/QLoFXufiY0TO7wk+M9IHr36Y=
+X-Received: by 2002:aca:670b:: with SMTP id z11mr731427oix.6.1597770890340;
+ Tue, 18 Aug 2020 10:14:50 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200818164903.GA1152540@nvidia.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+References: <20200818004314.216856-1-pshier@google.com> <20200818152048.GA15390@linux.intel.com>
+In-Reply-To: <20200818152048.GA15390@linux.intel.com>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Tue, 18 Aug 2020 10:14:39 -0700
+Message-ID: <CALMp9eS5UOPGF0v2vt9aMPEZT7_a6ruJx9n_DLKkjiEb_kCWag@mail.gmail.com>
+Subject: Re: [PATCH] KVM: nVMX: Update VMCS02 when L2 PAE PDPTE updates detected
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     Peter Shier <pshier@google.com>, kvm list <kvm@vger.kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 18/08/20 18:49, Jason Gunthorpe wrote:
-> On Tue, Aug 18, 2020 at 06:27:21PM +0200, Paolo Bonzini wrote:
->> On 18/08/20 13:50, Jason Gunthorpe wrote:
->>> For instance, what about suspend/resume of containers using idxd?
->>> Wouldn't you want to have the same basic approach of controlling the
->>> wq from userspace that virtualization uses?
->>
->> The difference is that VFIO more or less standardizes the approach you
->> use for live migration.  With another interface you'd have to come up
->> with something for every driver, and add support in CRIU for every
->> driver as well.
-> 
-> VFIO is very unsuitable for use as some general userspace. It only 1:1
-> with a single process and just can't absorb what the existing idxd
-> userspace is doing.
+On Tue, Aug 18, 2020 at 8:20 AM Sean Christopherson
+<sean.j.christopherson@intel.com> wrote:
 
-The point of mdev is that it's not 1:1 anymore.
+> I'd prefer to handle this on the switch from L2->L1.  It avoids adding a
+> kvm_x86_ops and yet another sequence of four VMWRITEs, e.g. I think this
+> will do the trick.
+>
+> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+> index 9c74a732b08d..67465f0ca1b9 100644
+> --- a/arch/x86/kvm/vmx/nested.c
+> +++ b/arch/x86/kvm/vmx/nested.c
+> @@ -4356,6 +4356,9 @@ void nested_vmx_vmexit(struct kvm_vcpu *vcpu, u32 vm_exit_reason,
+>         if (kvm_check_request(KVM_REQ_TLB_FLUSH_CURRENT, vcpu))
+>                 kvm_vcpu_flush_tlb_current(vcpu);
+>
+> +       if (enable_ept && is_pae_paging(vcpu))
+> +               ept_load_pdptrs(vcpu);
+> +
 
-Paolo
-
-> So VFIO is already not a solution for normal userspace idxd where CRIU
-> becomes interesting. Not sure what you are trying to say?
-> 
-> My point was the opposite, if you want to enable CRIU for idxd then
-> you probably need all the same stuff as for qemu/VFIO except in the
-> normal idxd user API.
-> 
-> Jason
-> 
-
+Are the mmu->pdptrs[] guaranteed to be valid at this point? If L2 has
+PAE paging enabled, and it has modified CR3 without a VM-exit, where
+are the current PDPTE values read from the vmcs02 into mmu->pdptrs[]?
