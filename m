@@ -2,127 +2,117 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B853A248DE8
-	for <lists+kvm@lfdr.de>; Tue, 18 Aug 2020 20:24:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 298EC248DEE
+	for <lists+kvm@lfdr.de>; Tue, 18 Aug 2020 20:25:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726716AbgHRSYC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 18 Aug 2020 14:24:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32816 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726435AbgHRSYA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 18 Aug 2020 14:24:00 -0400
-Received: from mail-oi1-x243.google.com (mail-oi1-x243.google.com [IPv6:2607:f8b0:4864:20::243])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 54ADBC061389
-        for <kvm@vger.kernel.org>; Tue, 18 Aug 2020 11:24:00 -0700 (PDT)
-Received: by mail-oi1-x243.google.com with SMTP id b22so18746540oic.8
-        for <kvm@vger.kernel.org>; Tue, 18 Aug 2020 11:24:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=4uE3xXRtqRfEn1OYDBHpEdtWV2R53NDeV7+oyoOPFlY=;
-        b=Ez7FjKya15XLVptzGK9jhY368i4dW4wH9c4TXuNDpfUxnWcft1abxC/w1ocfrnabnE
-         uHHCi23vYrA9iXfhytDd3m4m4QD1AiDrN4hYkfbZtC/PDPxKVpaate4C833r6qmeIfKa
-         ZIPjGG8eFKud0nhBUNAgJ3mpGczd8HCErDrGSt4htMFD01+W1vsCTaGm7/1yRH5R7Xrw
-         e2lO4yx8cm4TkZY9foBk/Y1jfGGb76zmrH1E/LlQax2YbtSEXkXxuiAbcY09uJ8bjAVW
-         JDMc92qNJ/OSV47kxD6GndcGrfrF31glQCXEWSR7xN4XX+tZMg/rtlWsbYx9cm7QMuFl
-         7Ggw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=4uE3xXRtqRfEn1OYDBHpEdtWV2R53NDeV7+oyoOPFlY=;
-        b=dY6IVPGCurUjaGtIb57CW/FRH/5FuH7YXqpqM74GSPncE9OoNmKpLIAuQjmLWcotr6
-         Oa4LXBqBRAc/Y+Nh8AegHJpTD+HTQ8b7ThtUNPgYxx3IAOPwSqx0ayBi28booNTh6q0x
-         kr1/xFEay1whlrgCxvynS7rnoi4DK/fAmgvZr5M4a739bKqV6TfBQMGB2bOidAwcxb/2
-         LvwFT6k+tldB9LmCKB2wWt0lNjv9QkbydVn3fgmAOzfrS4mJkrdcJa1MFp89GRoz9LV8
-         OsoYFTVxxZSr5OgpypxOdZLAJ3NCPqbIMeg0nqiftIHqAtIhHph6RLEArPU3K+3e3Nk9
-         sDoQ==
-X-Gm-Message-State: AOAM530NZw1NqQC/+qaKMcZgnBq2as1B3AlwFq5dq/FthdrAaft9q+Gg
-        4u3NskYWFUPIgcX/b+9ONgetNjp/NxKio3arAJ72Ug==
-X-Google-Smtp-Source: ABdhPJyuGN7XZ1Z8Z2FMh8+bnDzSw7T3BCgIA3pJkT3cia0BthIccdwP/UkkDsnnZI8xefCeiZqFqvqEeMH9fkn0tUg=
-X-Received: by 2002:aca:670b:: with SMTP id z11mr919784oix.6.1597775039443;
- Tue, 18 Aug 2020 11:23:59 -0700 (PDT)
+        id S1726640AbgHRSZx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 18 Aug 2020 14:25:53 -0400
+Received: from userp2120.oracle.com ([156.151.31.85]:48418 "EHLO
+        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726588AbgHRSZw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 18 Aug 2020 14:25:52 -0400
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+        by userp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 07IIGuC9081131;
+        Tue, 18 Aug 2020 18:25:48 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2020-01-29;
+ bh=AC7xeNy8QSk3IKTpZxGdhu4R7meRkplPsYfpRMyJUUo=;
+ b=RAFJOJYJf7THJirklm/Z2f1xq972LdXdtl9Z3iwDWAUbx+qOEsRjkza3IlghmeaOu4G3
+ 8frPf6LPPeCKPsZAE7m0RoyyyZt5LUsQrXgeRvM8OO7j7J9IWRD1NEjEqNUO2luypcGV
+ 7vHLPM9wd+2wr1JkYdeZ5yP60GqGo2+072EHQhOItcDhiAWsvYSz6HobeHQPQNQOytcR
+ 2RpYBMyjsdPzkYTr4PQy8Eb9qM+FnZIysr8gi2WOHOseYA9/gaEKRomnIBW5AwnH5L72
+ CnAvc2qULUwWO5Y5v3w/8P0RsE0lSfKzXZv9Sd5dNXGZ5M4Rw0xt9VZSA2XzyWF6Vb54 ww== 
+Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
+        by userp2120.oracle.com with ESMTP id 32x8bn6ejv-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
+        Tue, 18 Aug 2020 18:25:48 +0000
+Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
+        by aserp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 07IIHkWp162068;
+        Tue, 18 Aug 2020 18:25:47 GMT
+Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
+        by aserp3020.oracle.com with ESMTP id 32xsm3g3e3-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 18 Aug 2020 18:25:47 +0000
+Received: from abhmp0011.oracle.com (abhmp0011.oracle.com [141.146.116.17])
+        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 07IIPkMP001456;
+        Tue, 18 Aug 2020 18:25:46 GMT
+Received: from localhost.localdomain (/10.159.130.22)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Tue, 18 Aug 2020 11:25:46 -0700
+Subject: Re: [kvm-unit-tests PATCH] x86: svm: low CR3 bits are not MBZ
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Jim Mattson <jmattson@google.com>
+Cc:     Nadav Amit <namit@vmware.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+References: <20200713043908.39605-1-namit@vmware.com>
+ <ce87fd51-8e27-e5ff-3a90-06cddbf47636@oracle.com>
+ <CCEF21D4-57C3-4843-9443-BE46501FFE8C@vmware.com>
+ <abe9138a-6c61-22e1-f0a6-fcd5d06ef3f1@oracle.com>
+ <6CD095D7-EF7F-49C2-98EF-F72D019817B2@vmware.com>
+ <fe76d847-5106-bc09-e4cf-498fb51e5255@oracle.com>
+ <9DC37B0B-597A-4B31-8397-B6E4764EEA37@vmware.com>
+ <ab9f1669-a295-1022-a62a-8b64c90f6dcb@oracle.com>
+ <CALMp9eSoRSKBvNwjm5fpPG2XDJnnC1b-tm68P-K_Jnyab4aPMg@mail.gmail.com>
+ <4bb7c975-70dd-0247-3824-973229f3337b@oracle.com>
+ <02cab471-0023-08f9-1722-2d42a3686a50@redhat.com>
+From:   Krish Sadhukhan <krish.sadhukhan@oracle.com>
+Message-ID: <605458bd-b4a5-69ca-99e1-3494f5a67d09@oracle.com>
+Date:   Tue, 18 Aug 2020 11:25:37 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-References: <20200807084841.7112-1-chenyi.qiang@intel.com> <20200807084841.7112-3-chenyi.qiang@intel.com>
- <CALMp9eQiyRxJ0jkvVi+fWMZcDQbvyCcuTwH1wrYV-u_E004Bhg@mail.gmail.com>
- <34b083be-b9d5-fd85-b42d-af0549e3b002@intel.com> <CALMp9eS=dO7=JvvmGp-nt-LBO9evH-bLd2LQMO9wdYJ5V6S0_Q@mail.gmail.com>
- <268b0ee4-e56f-981c-c03e-6dca8a4e99da@intel.com>
-In-Reply-To: <268b0ee4-e56f-981c-c03e-6dca8a4e99da@intel.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Tue, 18 Aug 2020 11:23:47 -0700
-Message-ID: <CALMp9eSAkzGPp4zPVakypR1McSJtJ1x4j1zAAj1sM1bHxd01zg@mail.gmail.com>
-Subject: Re: [RFC 2/7] KVM: VMX: Expose IA32_PKRS MSR
-To:     Chenyi Qiang <chenyi.qiang@intel.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Xiaoyao Li <xiaoyao.li@intel.com>,
-        kvm list <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <02cab471-0023-08f9-1722-2d42a3686a50@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9717 signatures=668679
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 suspectscore=0
+ malwarescore=0 mlxscore=0 phishscore=0 spamscore=0 mlxlogscore=999
+ bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2006250000 definitions=main-2008180126
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9717 signatures=668679
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxscore=0 lowpriorityscore=0
+ impostorscore=0 suspectscore=0 adultscore=0 spamscore=0 malwarescore=0
+ mlxlogscore=999 priorityscore=1501 bulkscore=0 clxscore=1015 phishscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
+ definitions=main-2008180126
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Aug 18, 2020 at 12:28 AM Chenyi Qiang <chenyi.qiang@intel.com> wrote:
->
->
->
-> On 8/14/2020 1:31 AM, Jim Mattson wrote:
-> > On Wed, Aug 12, 2020 at 10:42 PM Chenyi Qiang <chenyi.qiang@intel.com> wrote:
-> >>
-> >>
-> >>
-> >> On 8/13/2020 5:21 AM, Jim Mattson wrote:
-> >>> On Fri, Aug 7, 2020 at 1:46 AM Chenyi Qiang <chenyi.qiang@intel.com> wrote:
-> >>>>
-> >>>> Protection Keys for Supervisor Pages (PKS) uses IA32_PKRS MSR (PKRS) at
-> >>>> index 0x6E1 to allow software to manage supervisor protection key
-> >>>> rights. For performance consideration, PKRS intercept will be disabled
-> >>>> so that the guest can access the PKRS without VM exits.
-> >>>> PKS introduces dedicated control fields in VMCS to switch PKRS, which
-> >>>> only does the retore part. In addition, every VM exit saves PKRS into
-> >>>> the guest-state area in VMCS, while VM enter won't save the host value
-> >>>> due to the expectation that the host won't change the MSR often. Update
-> >>>> the host's value in VMCS manually if the MSR has been changed by the
-> >>>> kernel since the last time the VMCS was run.
-> >>>> The function get_current_pkrs() in arch/x86/mm/pkeys.c exports the
-> >>>> per-cpu variable pkrs_cache to avoid frequent rdmsr of PKRS.
-> >>>>
-> >>>> Signed-off-by: Chenyi Qiang <chenyi.qiang@intel.com>
-> >>>> ---
-> >>>
-> >>>> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-> >>>> index 11e4df560018..df2c2e733549 100644
-> >>>> --- a/arch/x86/kvm/vmx/nested.c
-> >>>> +++ b/arch/x86/kvm/vmx/nested.c
-> >>>> @@ -289,6 +289,7 @@ static void vmx_sync_vmcs_host_state(struct vcpu_vmx *vmx,
-> >>>>           dest->ds_sel = src->ds_sel;
-> >>>>           dest->es_sel = src->es_sel;
-> >>>>    #endif
-> >>>> +       dest->pkrs = src->pkrs;
-> >>>
-> >>> Why isn't this (and other PKRS code) inside the #ifdef CONFIG_X86_64?
-> >>> PKRS isn't usable outside of long mode, is it?
-> >>>
-> >>
-> >> Yes, I'm also thinking about whether to put all pks code into
-> >> CONFIG_X86_64. The kernel implementation also wrap its pks code inside
-> >> CONFIG_ARCH_HAS_SUPERVISOR_PKEYS which has dependency with CONFIG_X86_64.
-> >> However, maybe this can help when host kernel disable PKS but the guest
-> >> enable it. What do you think about this?
-> >
-> > I see no problem in exposing PKRS to the guest even if the host
-> > doesn't have CONFIG_ARCH_HAS_SUPERVISOR_PKEYS.
-> >
->
-> Yes, but I would prefer to keep it outside CONFIG_X86_64. PKS code has
-> several code blocks and putting them under x86_64 may end up being a
-> mess. In addition, PKU KVM related code isn't under CONFIG_X86_64 as
-> well. So, is it really necessary to put inside?
 
-I'll let someone who actually cares about the i386 build answer that question.
+On 8/17/20 11:38 PM, Paolo Bonzini wrote:
+> On 05/08/20 01:13, Krish Sadhukhan wrote:
+>> I did some experiments on the processor behavior on an Epyc 2 system via
+>> KVM:
+>>
+>> Â Â  1. MBZ bits:Â  VMRUN passes even if these bits are set to 1 and
+>> guest is exiting with exit code of Â Â Â  Â Â Â  Â Â  SVM_EXIT_VMMCALL.
+>> According to the APM, this settting should constitute an invalid guest
+>> state and hence I should get and exit code of SVM_EXIT_ERR. There's no
+>> KVM check in place for these CR3 bits, so the check is all done in
+>> hardware.
+>>
+>> Â Â  2. non-MBZ reserved bits:Â  Based on Nadav Amit's suggestion, I set
+>> the 'not present' bit in an upper level NPT in order to trigger an NPF
+>> and I did get an exit code of SVM_EXIT_NPF when I set any of these bits.
+>> I am hoping that the processor has done the consistency check before it
+>> tripped on NPF and not the other way around, so that our test is useful :
+>>
+>> Â Â Â  In PAE-legacy and non-PAE-legacy modes, the guest doesn't exit
+>> with SVM_EXIT_VMMCALL when these bits are set to 0. I am not sure if I
+>> am missing any special setting for the PAE-legacy and non-PAE-legacy
+>> modes. In long-mode, however, the processor seems to behave as per APM,
+>> i.e., guest exits with SVM_EXIT_VMMCALL when these bits are set to 0.
+> Are you going to send patches for this?
+
+
+Yes, I am working on it. I need to complete some more investigation.
+
+>
+> Thanks,
+>
+> Paolo
+>
