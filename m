@@ -2,509 +2,325 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7E06C248FF6
-	for <lists+kvm@lfdr.de>; Tue, 18 Aug 2020 23:16:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1CCF8248FF7
+	for <lists+kvm@lfdr.de>; Tue, 18 Aug 2020 23:16:30 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726970AbgHRVQZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 18 Aug 2020 17:16:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59548 "EHLO
+        id S1726978AbgHRVQ3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 18 Aug 2020 17:16:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59564 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726961AbgHRVQV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 18 Aug 2020 17:16:21 -0400
-Received: from mail-pj1-x104a.google.com (mail-pj1-x104a.google.com [IPv6:2607:f8b0:4864:20::104a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 57494C061389
-        for <kvm@vger.kernel.org>; Tue, 18 Aug 2020 14:16:21 -0700 (PDT)
-Received: by mail-pj1-x104a.google.com with SMTP id e2so133968pjm.3
-        for <kvm@vger.kernel.org>; Tue, 18 Aug 2020 14:16:21 -0700 (PDT)
+        with ESMTP id S1726953AbgHRVQZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 18 Aug 2020 17:16:25 -0400
+Received: from mail-pg1-x54a.google.com (mail-pg1-x54a.google.com [IPv6:2607:f8b0:4864:20::54a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1BFD2C061342
+        for <kvm@vger.kernel.org>; Tue, 18 Aug 2020 14:16:25 -0700 (PDT)
+Received: by mail-pg1-x54a.google.com with SMTP id x15so12820672pgx.17
+        for <kvm@vger.kernel.org>; Tue, 18 Aug 2020 14:16:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
-        h=sender:date:in-reply-to:message-id:mime-version:references:subject
-         :from:to:cc;
-        bh=ug0YG9WZLCRRLkKsFyd/5Zy/2eV0CmUmGD25RpFa9Lk=;
-        b=c4A+Eh3zQRg8o0KCORz6wenlIeo6Lo/J7gvgi3xwx5+D51SEgAANFkuCXrzVMrGflU
-         +JGU1GODZLDGPEHSzGvqsKfhQKztlkF/aUh1g5Oj8h5zbpaXWJMwc5BRLm/kvUGoagyw
-         +twXN054xAv0P/vhpzZ24T9rGXOsO7a84QmqIVBpTm3N9bft0DpZUPQk46wPfPBLoik2
-         3jccJawPvPtHslSz5g3E6Rt+hGzLM+w57edl6IhereDYYneEo/r/24hOnEl9+OoDlWti
-         i8yDJJn4hiPzSpQK0vsesltEwfkFaAJKc2/sK2RETind8a1lWKK+cQrfwhQSNXPnNZxB
-         6rsA==
+        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
+         :cc;
+        bh=HrScsnWLiikVbmrdrVpFUjt5CmEvjeWGGXLmlB6OhN8=;
+        b=PBPseKbc7ngtWYEi4OAJPFqEBiHUllQQiKRZtnNDN3vuNfOwZ34KBtAv9itM0ZVQY/
+         LD1q4Blzz31thY4x9eWqIPJ6zA9zJk4g8YJRicBVnI4LRgVF+Ufyhx9c8fMZa2muvnRf
+         fR3/DR4TNrcoFf6Szp1hm4NOR10I5XWwojqt0TWkTL4vImCVD4FVhNvQICIgmtmNeFAX
+         ykNef35LEslhzTDGeESuX9Dy4+lNA9WUMK1t5dM9aE4VcCT9nQADWINi1Jzg3Elh9MwH
+         HkUa3S26XsVNvQLIL+VbJppaJdIs6VgsGoEgPTQPocYhI6/tZwNAOfacTV9SP50Pwozv
+         mw8A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:date:in-reply-to:message-id:mime-version
+        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=ug0YG9WZLCRRLkKsFyd/5Zy/2eV0CmUmGD25RpFa9Lk=;
-        b=BNGIaUO+G9460eNnkte7/cEQ+h51SmnbaAjnQKbiWkunU+I6+ccoA/tXwMl2nQJ8n5
-         gI/ZOpKdRt3G7lFtym44p37YCkDmX5z/NHiRvOPSasTPQmep8Yh8Jiw4GBh//bcKM2GF
-         bcBbiOscmY9qeGrR3C2KCgAJ2fvbomXefCNZJdUC4TiSLvs+Y68Aq9U3tPb/lZmKB+9A
-         arfZhuUeaKgNHJVHe4p6viTtvg60RgEmbmwhw3X7kVYC2ux7bCSGfxkxKq2iQ0BoRgwF
-         MKNUhNajmrqfbEB9H/4fXmg6gagwdB7/OvivIB3wCvKumzS790+3aG3hA0P28l/ItltP
-         42Mg==
-X-Gm-Message-State: AOAM5306BxxJeE1myU442OhpfFGc+HgOGAcBSOujBKFr8GwEsyAIoGs6
-        ZnKJl5TWbj7aaiFXcnNkZeIeYoDFldJay//o
-X-Google-Smtp-Source: ABdhPJyKnxMmjoRYBmJOyFEanHrgpW1p/dK0YkpQY89Ytn5kk9t2t1xdCKtqGU4z20CZM0pBuw8cOXjrugEkUuEU
-X-Received: from aaronlewis1.sea.corp.google.com ([2620:15c:100:202:a28c:fdff:fed8:8d46])
- (user=aaronlewis job=sendgmr) by 2002:a17:90a:ee8d:: with SMTP id
- i13mr1468856pjz.19.1597785380796; Tue, 18 Aug 2020 14:16:20 -0700 (PDT)
-Date:   Tue, 18 Aug 2020 14:15:24 -0700
+        bh=HrScsnWLiikVbmrdrVpFUjt5CmEvjeWGGXLmlB6OhN8=;
+        b=QQOL+70RA35uROPsfTdJl2Cxp0F8Su97pn1w/LMs/9YqXMGjdoobaChtKvcZhMrcXd
+         5/sukEFJ0QD1M4YkckKM8qc2tMUiakMKPlGMesBhVKtigVfpbfeTteDkFeDdnzSsws8t
+         J0NPg299ut71yu6bshW8koIQZ0nIRiLJ0TXHrbiIw59UM3GxNZlsdPUBraIETN9lVtxM
+         ufWWzQ/AHksHLMMXsc/tapxJsuOVfP0eqVOHcOv75P1mx7LrjJBg/KKr2YtrVEJ809UY
+         WnoK80uuuIl2TstiIzvBrFu3KyidUh9X6xEli6x4o9CDHOMGnmdAxWPCRcE03BYIrlqS
+         tcLA==
+X-Gm-Message-State: AOAM533IzL91qyPOScbGaahP+TQo7n8DpPqJJl7NRg203uiPg08n7WDp
+        kLYJOp33UkpCqMYUZXO/lTTJyCjvPx6q5m7u
+X-Google-Smtp-Source: ABdhPJwXn1yz+8TYV4wY5VZ3gwv8S8ARbKta8E9R7w5z/iM4gOgPdra1Xqq8vnLoMEamQMI2KH0gg+VFM+H+z+sk
+X-Received: by 2002:a62:4e07:: with SMTP id c7mr15956053pfb.10.1597785383235;
+ Tue, 18 Aug 2020 14:16:23 -0700 (PDT)
+Date:   Tue, 18 Aug 2020 14:15:25 -0700
 In-Reply-To: <20200818211533.849501-1-aaronlewis@google.com>
-Message-Id: <20200818211533.849501-3-aaronlewis@google.com>
+Message-Id: <20200818211533.849501-4-aaronlewis@google.com>
 Mime-Version: 1.0
 References: <20200818211533.849501-1-aaronlewis@google.com>
 X-Mailer: git-send-email 2.28.0.220.ged08abb693-goog
-Subject: [PATCH v3 02/12] KVM: x86: Introduce allow list for MSR emulation
+Subject: [PATCH v3 03/12] KVM: selftests: Add test for user space MSR handling
 From:   Aaron Lewis <aaronlewis@google.com>
 To:     jmattson@google.com, graf@amazon.com
 Cc:     pshier@google.com, oupton@google.com, kvm@vger.kernel.org,
-        Aaron Lewis <aaronlewis@google.com>,
-        KarimAllah Ahmed <karahmed@amazon.de>
+        Aaron Lewis <aaronlewis@google.com>
 Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-It's not desireable to have all MSRs always handled by KVM kernel space. Some
-MSRs would be useful to handle in user space to either emulate behavior (like
-uCode updates) or differentiate whether they are valid based on the CPU model.
+Now that we have the ability to handle MSRs from user space and also to
+select which ones we do want to prevent in-kernel KVM code from handling,
+let's add a selftest to show case and verify the API.
 
-To allow user space to specify which MSRs it wants to see handled by KVM,
-this patch introduces a new ioctl to push allow lists of bitmaps into
-KVM. Based on these bitmaps, KVM can then decide whether to reject MSR access.
-With the addition of KVM_CAP_X86_USER_SPACE_MSR it can also deflect the
-denied MSR events to user space to operate on.
-
-If no allowlist is populated, MSR handling stays identical to before.
-
-Signed-off-by: KarimAllah Ahmed <karahmed@amazon.de>
 Signed-off-by: Alexander Graf <graf@amazon.com>
 
 ---
 
 v2 -> v3:
 
-  - document flags for KVM_X86_ADD_MSR_ALLOWLIST
-  - generalize exit path, always unlock when returning
   - s/KVM_CAP_ADD_MSR_ALLOWLIST/KVM_CAP_X86_MSR_ALLOWLIST/g
-  - Add KVM_X86_CLEAR_MSR_ALLOWLIST
-
-v3 -> v4:
-  - lock allow check and clearing
-  - free bitmaps on clear
-
-v4 -> v5:
-
-  - use srcu
+  - Add test to clear whitelist
+  - Adjust to reply-less API
+  - Fix asserts
+  - Actually trap on MSR_IA32_POWER_CTL writes
 
 ---
- Documentation/virt/kvm/api.rst  |  91 ++++++++++++++++++
- arch/x86/include/asm/kvm_host.h |  10 ++
- arch/x86/include/uapi/asm/kvm.h |  15 +++
- arch/x86/kvm/x86.c              | 160 ++++++++++++++++++++++++++++++++
- include/uapi/linux/kvm.h        |   5 +
- 5 files changed, 281 insertions(+)
+ tools/testing/selftests/kvm/Makefile          |   1 +
+ .../selftests/kvm/x86_64/user_msr_test.c      | 221 ++++++++++++++++++
+ 2 files changed, 222 insertions(+)
+ create mode 100644 tools/testing/selftests/kvm/x86_64/user_msr_test.c
 
-diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-index aad51c33fcae..91ce3e4b5b2e 100644
---- a/Documentation/virt/kvm/api.rst
-+++ b/Documentation/virt/kvm/api.rst
-@@ -4704,6 +4704,82 @@ KVM_PV_VM_VERIFY
-   Verify the integrity of the unpacked image. Only if this succeeds,
-   KVM is allowed to start protected VCPUs.
- 
-+4.126 KVM_X86_ADD_MSR_ALLOWLIST
-+-------------------------------
+diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
+index 4a166588d99f..80d5c348354c 100644
+--- a/tools/testing/selftests/kvm/Makefile
++++ b/tools/testing/selftests/kvm/Makefile
+@@ -55,6 +55,7 @@ TEST_GEN_PROGS_x86_64 += x86_64/vmx_set_nested_state_test
+ TEST_GEN_PROGS_x86_64 += x86_64/vmx_tsc_adjust_test
+ TEST_GEN_PROGS_x86_64 += x86_64/xss_msr_test
+ TEST_GEN_PROGS_x86_64 += x86_64/debug_regs
++TEST_GEN_PROGS_x86_64 += x86_64/user_msr_test
+ TEST_GEN_PROGS_x86_64 += clear_dirty_log_test
+ TEST_GEN_PROGS_x86_64 += demand_paging_test
+ TEST_GEN_PROGS_x86_64 += dirty_log_test
+diff --git a/tools/testing/selftests/kvm/x86_64/user_msr_test.c b/tools/testing/selftests/kvm/x86_64/user_msr_test.c
+new file mode 100644
+index 000000000000..999544c674be
+--- /dev/null
++++ b/tools/testing/selftests/kvm/x86_64/user_msr_test.c
+@@ -0,0 +1,221 @@
++// SPDX-License-Identifier: GPL-2.0-only
++/*
++ * tests for KVM_CAP_X86_USER_SPACE_MSR and KVM_X86_ADD_MSR_ALLOWLIST
++ *
++ * Copyright (C) 2020, Amazon Inc.
++ *
++ * This is a functional test to verify that we can deflect MSR events
++ * into user space.
++ */
++#define _GNU_SOURCE /* for program_invocation_short_name */
++#include <fcntl.h>
++#include <stdio.h>
++#include <stdlib.h>
++#include <string.h>
++#include <sys/ioctl.h>
 +
-+:Capability: KVM_CAP_X86_MSR_ALLOWLIST
-+:Architectures: x86
-+:Type: vm ioctl
-+:Parameters: struct kvm_msr_allowlist
-+:Returns: 0 on success, < 0 on error
++#include "test_util.h"
 +
-+::
++#include "kvm_util.h"
++#include "processor.h"
 +
-+  struct kvm_msr_allowlist {
-+         __u32 flags;
-+         __u32 nmsrs; /* number of msrs in bitmap */
-+         __u32 base;  /* base address for the MSRs bitmap */
-+         __u32 pad;
++#define VCPU_ID                  5
 +
-+         __u8 bitmap[0]; /* a set bit allows that the operation set in flags */
-+  };
++u32 msr_reads, msr_writes;
 +
-+flags values:
-+
-+KVM_MSR_ALLOW_READ
-+
-+  Filter read accesses to MSRs using the given bitmap. A 0 in the bitmap
-+  indicates that a read should immediately fail, while a 1 indicates that
-+  a read should be handled by the normal KVM MSR emulation logic.
-+
-+KVM_MSR_ALLOW_WRITE
-+
-+  Filter write accesses to MSRs using the given bitmap. A 0 in the bitmap
-+  indicates that a write should immediately fail, while a 1 indicates that
-+  a write should be handled by the normal KVM MSR emulation logic.
-+
-+KVM_MSR_ALLOW_READ | KVM_MSR_ALLOW_WRITE
-+
-+  Filter booth read and write accesses to MSRs using the given bitmap. A 0
-+  in the bitmap indicates that both reads and writes should immediately fail,
-+  while a 1 indicates that reads and writes should be handled by the normal
-+  KVM MSR emulation logic.
-+
-+This ioctl allows user space to define a set of bitmaps of MSR ranges to
-+specify whether a certain MSR access is allowed or not.
-+
-+If this ioctl has never been invoked, MSR accesses are not guarded and the
-+old KVM in-kernel emulation behavior is fully preserved.
-+
-+As soon as the first allow list was specified, only allowed MSR accesses
-+are permitted inside of KVM's MSR code.
-+
-+Each allowlist specifies a range of MSRs to potentially allow access on.
-+The range goes from MSR index [base .. base+nmsrs]. The flags field
-+indicates whether reads, writes or both reads and writes are permitted
-+by setting a 1 bit in the bitmap for the corresponding MSR index.
-+
-+If an MSR access is not permitted through the allow list, it generates a
-+#GP inside the guest. When combined with KVM_CAP_X86_USER_SPACE_MSR, that
-+allows user space to deflect and potentially handle various MSR accesses
-+into user space.
-+
-+4.124 KVM_X86_CLEAR_MSR_ALLOWLIST
-+---------------------------------
-+
-+:Capability: KVM_CAP_X86_MSR_ALLOWLIST
-+:Architectures: x86
-+:Type: vcpu ioctl
-+:Parameters: none
-+:Returns: 0
-+
-+This ioctl resets all internal MSR allow lists. After this call, no allow
-+list is present and the guest would execute as if no allow lists were set,
-+so all MSRs are considered allowed and thus handled by the in-kernel MSR
-+emulation logic.
-+
-+No vCPU may be in running state when calling this ioctl.
-+
- 
- 5. The kvm_run structure
- ========================
-@@ -6221,3 +6297,18 @@ writes to user space. It can be enabled on a VM level. If enabled, MSR
- accesses that would usually trigger a #GP by KVM into the guest will
- instead get bounced to user space through the KVM_EXIT_X86_RDMSR and
- KVM_EXIT_X86_WRMSR exit notifications.
-+
-+8.25 KVM_CAP_X86_MSR_ALLOWLIST
-+------------------------------
-+
-+:Architectures: x86
-+
-+This capability indicates that KVM supports emulation of only select MSR
-+registers. With this capability exposed, KVM exports two new VM ioctls:
-+KVM_X86_ADD_MSR_ALLOWLIST which user space can call to specify bitmaps of MSR
-+ranges that KVM should emulate in kernel space and KVM_X86_CLEAR_MSR_ALLOWLIST
-+which user space can call to remove all MSR allow lists from the VM context.
-+
-+In combination with KVM_CAP_X86_USER_SPACE_MSR, this allows user space to
-+trap and emulate MSRs that are outside of the scope of KVM as well as
-+limit the attack surface on KVM's MSR emulation code.
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 02a102c60dff..1ee8468c913c 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -860,6 +860,13 @@ struct kvm_hv {
- 	struct kvm_hv_syndbg hv_syndbg;
- };
- 
-+struct msr_bitmap_range {
-+	u32 flags;
-+	u32 nmsrs;
-+	u32 base;
-+	unsigned long *bitmap;
++struct range_desc {
++       struct kvm_msr_allowlist allow;
++       void (*populate)(struct kvm_msr_allowlist *range);
 +};
 +
- enum kvm_irqchip_mode {
- 	KVM_IRQCHIP_NONE,
- 	KVM_IRQCHIP_KERNEL,       /* created with KVM_CREATE_IRQCHIP */
-@@ -964,6 +971,9 @@ struct kvm_arch {
- 	/* Deflect RDMSR and WRMSR to user space when they trigger a #GP */
- 	bool user_space_msr_enabled;
- 
-+	struct msr_bitmap_range msr_allowlist_ranges[10];
-+	int msr_allowlist_ranges_count;
++static void populate_c0000000_read(struct kvm_msr_allowlist *range)
++{
++       u8 *bitmap = range->bitmap;
++       u32 idx = MSR_SYSCALL_MASK & (KVM_MSR_ALLOWLIST_MAX_LEN - 1);
 +
- 	struct kvm_pmu_event_filter *pmu_event_filter;
- 	struct task_struct *nx_lpage_recovery_thread;
- };
-diff --git a/arch/x86/include/uapi/asm/kvm.h b/arch/x86/include/uapi/asm/kvm.h
-index 0780f97c1850..c33fb1d72d52 100644
---- a/arch/x86/include/uapi/asm/kvm.h
-+++ b/arch/x86/include/uapi/asm/kvm.h
-@@ -192,6 +192,21 @@ struct kvm_msr_list {
- 	__u32 indices[0];
- };
- 
-+#define KVM_MSR_ALLOW_READ  (1 << 0)
-+#define KVM_MSR_ALLOW_WRITE (1 << 1)
++       bitmap[idx / 8] &= ~(1 << (idx % 8));
++}
 +
-+/* Maximum size of the of the bitmap in bytes */
-+#define KVM_MSR_ALLOWLIST_MAX_LEN 0x600
++static void populate_00000000_write(struct kvm_msr_allowlist *range)
++{
++       u8 *bitmap = range->bitmap;
++       u32 idx = MSR_IA32_POWER_CTL & (KVM_MSR_ALLOWLIST_MAX_LEN - 1);
 +
-+/* for KVM_X86_ADD_MSR_ALLOWLIST */
-+struct kvm_msr_allowlist {
-+	__u32 flags;
-+	__u32 nmsrs; /* number of msrs in bitmap */
-+	__u32 base;  /* base address for the MSRs bitmap */
-+	__u32 pad;
++       bitmap[idx / 8] &= ~(1 << (idx % 8));
++}
 +
-+	__u8 bitmap[0]; /* a set bit allows that the operation set in flags */
++struct range_desc ranges[] = {
++       {
++               .allow = {
++                       .flags = KVM_MSR_ALLOW_READ,
++                       .base = 0x00000000,
++                       .nmsrs = KVM_MSR_ALLOWLIST_MAX_LEN * BITS_PER_BYTE,
++               },
++       }, {
++               .allow = {
++                       .flags = KVM_MSR_ALLOW_WRITE,
++                       .base = 0x00000000,
++                       .nmsrs = KVM_MSR_ALLOWLIST_MAX_LEN * BITS_PER_BYTE,
++               },
++               .populate = populate_00000000_write,
++       }, {
++               .allow = {
++                       .flags = KVM_MSR_ALLOW_READ | KVM_MSR_ALLOW_WRITE,
++                       .base = 0x40000000,
++                       .nmsrs = KVM_MSR_ALLOWLIST_MAX_LEN * BITS_PER_BYTE,
++               },
++       }, {
++               .allow = {
++                       .flags = KVM_MSR_ALLOW_READ,
++                       .base = 0xc0000000,
++                       .nmsrs = KVM_MSR_ALLOWLIST_MAX_LEN * BITS_PER_BYTE,
++               },
++               .populate = populate_c0000000_read,
++       }, {
++               .allow = {
++                       .flags = KVM_MSR_ALLOW_WRITE,
++                       .base = 0xc0000000,
++                       .nmsrs = KVM_MSR_ALLOWLIST_MAX_LEN * BITS_PER_BYTE,
++               },
++       },
 +};
- 
- struct kvm_cpuid_entry {
- 	__u32 function;
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 5d94a95fb66b..c46a709be532 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -1486,6 +1486,39 @@ void kvm_enable_efer_bits(u64 mask)
- }
- EXPORT_SYMBOL_GPL(kvm_enable_efer_bits);
- 
-+static bool kvm_msr_allowed(struct kvm_vcpu *vcpu, u32 index, u32 type)
++
++static void guest_msr_calls(bool trapped)
 +{
-+	struct kvm *kvm = vcpu->kvm;
-+	struct msr_bitmap_range *ranges = kvm->arch.msr_allowlist_ranges;
-+	u32 count = kvm->arch.msr_allowlist_ranges_count;
-+	u32 i;
-+	bool r = false;
-+	int idx;
++       /* This goes into the in-kernel emulation */
++       wrmsr(MSR_SYSCALL_MASK, 0);
 +
-+	/* MSR allowlist not set up, allow everything */
-+	if (!count)
-+		return true;
++       if (trapped) {
++               /* This goes into user space emulation */
++               GUEST_ASSERT(rdmsr(MSR_SYSCALL_MASK) == MSR_SYSCALL_MASK);
++       } else {
++               GUEST_ASSERT(rdmsr(MSR_SYSCALL_MASK) != MSR_SYSCALL_MASK);
++       }
 +
-+	/* Prevent collision with clear_msr_allowlist */
-+	idx = srcu_read_lock(&kvm->srcu);
++       /* If trapped == true, this goes into user space emulation */
++       wrmsr(MSR_IA32_POWER_CTL, 0x1234);
 +
-+	for (i = 0; i < count; i++) {
-+		u32 start = ranges[i].base;
-+		u32 end = start + ranges[i].nmsrs;
-+		u32 flags = ranges[i].flags;
-+		unsigned long *bitmap = ranges[i].bitmap;
-+
-+		if ((index >= start) && (index < end) && (flags & type)) {
-+			r = !!test_bit(index - start, bitmap);
-+			break;
-+		}
-+	}
-+
-+	srcu_read_unlock(&kvm->srcu, idx);
-+
-+	return r;
++       /* This goes into the in-kernel emulation */
++       rdmsr(MSR_IA32_POWER_CTL);
 +}
 +
- /*
-  * Write @data into the MSR specified by @index.  Select MSR specific fault
-  * checks are bypassed if @host_initiated is %true.
-@@ -1497,6 +1530,9 @@ static int __kvm_set_msr(struct kvm_vcpu *vcpu, u32 index, u64 data,
- {
- 	struct msr_data msr;
- 
-+	if (!host_initiated && !kvm_msr_allowed(vcpu, index, KVM_MSR_ALLOW_WRITE))
-+		return -ENOENT;
-+
- 	switch (index) {
- 	case MSR_FS_BASE:
- 	case MSR_GS_BASE:
-@@ -1553,6 +1589,9 @@ int __kvm_get_msr(struct kvm_vcpu *vcpu, u32 index, u64 *data,
- 	struct msr_data msr;
- 	int ret;
- 
-+	if (!host_initiated && !kvm_msr_allowed(vcpu, index, KVM_MSR_ALLOW_READ))
-+		return -ENOENT;
-+
- 	msr.index = index;
- 	msr.host_initiated = host_initiated;
- 
-@@ -3590,6 +3629,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- 	case KVM_CAP_SET_GUEST_DEBUG:
- 	case KVM_CAP_LAST_CPU:
- 	case KVM_CAP_X86_USER_SPACE_MSR:
-+	case KVM_CAP_X86_MSR_ALLOWLIST:
- 		r = 1;
- 		break;
- 	case KVM_CAP_SYNC_REGS:
-@@ -5118,6 +5158,116 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
- 	return r;
- }
- 
-+static bool msr_range_overlaps(struct kvm *kvm, struct msr_bitmap_range *range)
++static void guest_code(void)
 +{
-+	struct msr_bitmap_range *ranges = kvm->arch.msr_allowlist_ranges;
-+	u32 i, count = kvm->arch.msr_allowlist_ranges_count;
-+	bool r = false;
++       guest_msr_calls(true);
 +
-+	for (i = 0; i < count; i++) {
-+		u32 start = max(range->base, ranges[i].base);
-+		u32 end = min(range->base + range->nmsrs,
-+			      ranges[i].base + ranges[i].nmsrs);
++       /*
++        * Disable allow listing, so that the kernel
++        * handles everything in the next round
++        */
++       GUEST_SYNC(0);
 +
-+		if ((start < end) && (range->flags & ranges[i].flags)) {
-+			r = true;
-+			break;
-+		}
-+	}
++       guest_msr_calls(false);
 +
-+	return r;
++       GUEST_DONE();
 +}
 +
-+static int kvm_vm_ioctl_add_msr_allowlist(struct kvm *kvm, void __user *argp)
++static int handle_ucall(struct kvm_vm *vm)
 +{
-+	struct msr_bitmap_range *ranges = kvm->arch.msr_allowlist_ranges;
-+	struct kvm_msr_allowlist __user *user_msr_allowlist = argp;
-+	struct msr_bitmap_range range;
-+	struct kvm_msr_allowlist kernel_msr_allowlist;
-+	unsigned long *bitmap = NULL;
-+	size_t bitmap_size;
-+	int r = 0;
++       struct ucall uc;
 +
-+	if (copy_from_user(&kernel_msr_allowlist, user_msr_allowlist,
-+			   sizeof(kernel_msr_allowlist))) {
-+		r = -EFAULT;
-+		goto out;
-+	}
++       switch (get_ucall(vm, VCPU_ID, &uc)) {
++       case UCALL_ABORT:
++               TEST_FAIL("Guest assertion not met");
++               break;
++       case UCALL_SYNC:
++               vm_ioctl(vm, KVM_X86_CLEAR_MSR_ALLOWLIST, NULL);
++               break;
++       case UCALL_DONE:
++               return 1;
++       default:
++               TEST_FAIL("Unknown ucall %lu", uc.cmd);
++       }
 +
-+	bitmap_size = BITS_TO_LONGS(kernel_msr_allowlist.nmsrs) * sizeof(long);
-+	if (bitmap_size > KVM_MSR_ALLOWLIST_MAX_LEN) {
-+		r = -EINVAL;
-+		goto out;
-+	}
-+
-+	bitmap = memdup_user(user_msr_allowlist->bitmap, bitmap_size);
-+	if (IS_ERR(bitmap)) {
-+		r = PTR_ERR(bitmap);
-+		goto out;
-+	}
-+
-+	range = (struct msr_bitmap_range) {
-+		.flags = kernel_msr_allowlist.flags,
-+		.base = kernel_msr_allowlist.base,
-+		.nmsrs = kernel_msr_allowlist.nmsrs,
-+		.bitmap = bitmap,
-+	};
-+
-+	if (range.flags & ~(KVM_MSR_ALLOW_READ | KVM_MSR_ALLOW_WRITE)) {
-+		r = -EINVAL;
-+		goto out;
-+	}
-+
-+	/*
-+	 * Protect from concurrent calls to this function that could trigger
-+	 * a TOCTOU violation on kvm->arch.msr_allowlist_ranges_count.
-+	 */
-+	mutex_lock(&kvm->lock);
-+
-+	if (kvm->arch.msr_allowlist_ranges_count >=
-+	    ARRAY_SIZE(kvm->arch.msr_allowlist_ranges)) {
-+		r = -E2BIG;
-+		goto out_locked;
-+	}
-+
-+	if (msr_range_overlaps(kvm, &range)) {
-+		r = -EINVAL;
-+		goto out_locked;
-+	}
-+
-+	/* Everything ok, add this range identifier to our global pool */
-+	ranges[kvm->arch.msr_allowlist_ranges_count] = range;
-+	/* Make sure we filled the array before we tell anyone to walk it */
-+	smp_wmb();
-+	kvm->arch.msr_allowlist_ranges_count++;
-+
-+out_locked:
-+	mutex_unlock(&kvm->lock);
-+out:
-+	if (r)
-+		kfree(bitmap);
-+
-+	return r;
++       return 0;
 +}
 +
-+static int kvm_vm_ioctl_clear_msr_allowlist(struct kvm *kvm)
++static void handle_rdmsr(struct kvm_run *run)
 +{
-+	int i;
-+	u32 count = kvm->arch.msr_allowlist_ranges_count;
-+	struct msr_bitmap_range ranges[10];
-+
-+	mutex_lock(&kvm->lock);
-+	kvm->arch.msr_allowlist_ranges_count = 0;
-+	memcpy(ranges, kvm->arch.msr_allowlist_ranges, count * sizeof(ranges[0]));
-+	mutex_unlock(&kvm->lock);
-+	synchronize_srcu(&kvm->srcu);
-+
-+	for (i = 0; i < count; i++)
-+		kfree(ranges[i].bitmap);
-+
-+	return 0;
++       run->msr.data = run->msr.index;
++       msr_reads++;
 +}
 +
- long kvm_arch_vm_ioctl(struct file *filp,
- 		       unsigned int ioctl, unsigned long arg)
- {
-@@ -5424,6 +5574,12 @@ long kvm_arch_vm_ioctl(struct file *filp,
- 	case KVM_SET_PMU_EVENT_FILTER:
- 		r = kvm_vm_ioctl_set_pmu_event_filter(kvm, argp);
- 		break;
-+	case KVM_X86_ADD_MSR_ALLOWLIST:
-+		r = kvm_vm_ioctl_add_msr_allowlist(kvm, argp);
-+		break;
-+	case KVM_X86_CLEAR_MSR_ALLOWLIST:
-+		r = kvm_vm_ioctl_clear_msr_allowlist(kvm);
-+		break;
- 	default:
- 		r = -ENOTTY;
- 	}
-@@ -10123,6 +10279,8 @@ void kvm_arch_pre_destroy_vm(struct kvm *kvm)
- 
- void kvm_arch_destroy_vm(struct kvm *kvm)
- {
-+	int i;
++static void handle_wrmsr(struct kvm_run *run)
++{
++       /* ignore */
++       msr_writes++;
++}
 +
- 	if (current->mm == kvm->mm) {
- 		/*
- 		 * Free memory regions allocated on behalf of userspace,
-@@ -10139,6 +10297,8 @@ void kvm_arch_destroy_vm(struct kvm *kvm)
- 	}
- 	if (kvm_x86_ops.vm_destroy)
- 		kvm_x86_ops.vm_destroy(kvm);
-+	for (i = 0; i < kvm->arch.msr_allowlist_ranges_count; i++)
-+		kfree(kvm->arch.msr_allowlist_ranges[i].bitmap);
- 	kvm_pic_destroy(kvm);
- 	kvm_ioapic_destroy(kvm);
- 	kvm_free_vcpus(kvm);
-diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-index 6470c0c1e77a..374021dc4e61 100644
---- a/include/uapi/linux/kvm.h
-+++ b/include/uapi/linux/kvm.h
-@@ -1045,6 +1045,7 @@ struct kvm_ppc_resize_hpt {
- #define KVM_CAP_SMALLER_MAXPHYADDR 185
- #define KVM_CAP_S390_DIAG318 186
- #define KVM_CAP_X86_USER_SPACE_MSR 187
-+#define KVM_CAP_X86_MSR_ALLOWLIST 188
- 
- #ifdef KVM_CAP_IRQ_ROUTING
- 
-@@ -1546,6 +1547,10 @@ struct kvm_pv_cmd {
- /* Available with KVM_CAP_S390_PROTECTED */
- #define KVM_S390_PV_COMMAND		_IOWR(KVMIO, 0xc5, struct kvm_pv_cmd)
- 
-+/* Available with KVM_CAP_X86_MSR_ALLOWLIST */
-+#define KVM_X86_ADD_MSR_ALLOWLIST      _IOW(KVMIO,  0xc6, struct kvm_msr_allowlist)
-+#define KVM_X86_CLEAR_MSR_ALLOWLIST    _IO(KVMIO,  0xc7)
++int main(int argc, char *argv[])
++{
++       struct kvm_enable_cap cap = {
++               .cap = KVM_CAP_X86_USER_SPACE_MSR,
++               .args[0] = 1,
++       };
++       struct kvm_vm *vm;
++       struct kvm_run *run;
++       int rc;
++       int i;
 +
- /* Secure Encrypted Virtualization command */
- enum sev_cmd_id {
- 	/* Guest initialization commands */
++       /* Tell stdout not to buffer its content */
++       setbuf(stdout, NULL);
++
++       /* Create VM */
++       vm = vm_create_default(VCPU_ID, 0, guest_code);
++       vcpu_set_cpuid(vm, VCPU_ID, kvm_get_supported_cpuid());
++       run = vcpu_state(vm, VCPU_ID);
++
++       rc = kvm_check_cap(KVM_CAP_X86_USER_SPACE_MSR);
++       TEST_ASSERT(rc, "KVM_CAP_X86_USER_SPACE_MSR is available");
++       vm_enable_cap(vm, &cap);
++
++       rc = kvm_check_cap(KVM_CAP_X86_MSR_ALLOWLIST);
++       TEST_ASSERT(rc, "KVM_CAP_X86_MSR_ALLOWLIST is available");
++
++       /* Set up MSR allowlist */
++       for (i = 0; i < ARRAY_SIZE(ranges); i++) {
++               struct kvm_msr_allowlist *a = &ranges[i].allow;
++               u32 bitmap_size = a->nmsrs / BITS_PER_BYTE;
++               struct kvm_msr_allowlist *range = malloc(sizeof(*a) + bitmap_size);
++
++               TEST_ASSERT(range, "range alloc failed (%ld bytes)\n", sizeof(*a) + bitmap_size);
++
++               *range = *a;
++
++               /* Allow everything by default */
++               memset(range->bitmap, 0xff, bitmap_size);
++
++               if (ranges[i].populate)
++                       ranges[i].populate(range);
++
++               vm_ioctl(vm, KVM_X86_ADD_MSR_ALLOWLIST, range);
++       }
++
++       while (1) {
++               rc = _vcpu_run(vm, VCPU_ID);
++
++               TEST_ASSERT(rc == 0, "vcpu_run failed: %d\n", rc);
++
++               switch (run->exit_reason) {
++               case KVM_EXIT_X86_RDMSR:
++                       handle_rdmsr(run);
++                       break;
++               case KVM_EXIT_X86_WRMSR:
++                       handle_wrmsr(run);
++                       break;
++               case KVM_EXIT_IO:
++                       if (handle_ucall(vm))
++                               goto done;
++                       break;
++               }
++
++       }
++
++done:
++       TEST_ASSERT(msr_reads == 1, "Handled 1 rdmsr in user space");
++       TEST_ASSERT(msr_writes == 1, "Handled 1 wrmsr in user space");
++
++       kvm_vm_free(vm);
++
++       return 0;
++}
 -- 
 2.28.0.220.ged08abb693-goog
 
