@@ -2,132 +2,151 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 70B11248195
-	for <lists+kvm@lfdr.de>; Tue, 18 Aug 2020 11:14:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B56282481BB
+	for <lists+kvm@lfdr.de>; Tue, 18 Aug 2020 11:16:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726451AbgHRJOC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 18 Aug 2020 05:14:02 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:26412 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726165AbgHRJN7 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 18 Aug 2020 05:13:59 -0400
+        id S1726539AbgHRJQz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 18 Aug 2020 05:16:55 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:26439 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726353AbgHRJQy (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 18 Aug 2020 05:16:54 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1597742036;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+        s=mimecast20190719; t=1597742212;
+        h=from:from:reply-to:reply-to:subject:subject:date:date:
+         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+         content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=yNYUKzkrnV8NK/br9GHQs0zaO6FCvgguT47+sGQtDzA=;
-        b=IPhtPNrwHBjmq6mEz+0LH3KP2IJ8c4o78YoLXXLz2M1Tn2/3ZO3LusdSSumJ9sHBn1AuBC
-        H6jVLj7xaQiJsSm1hAHZVPTZdHw6nWlyDm/xjkiI4PWgKcJ6S/HBhqY+SPqihFtHzXDs1w
-        WKhp2m9tDJFejSUjdgJdz6ZQVeKJURY=
+        bh=HVFj7FoFlCmRwOr98i1isDMUsMu/x19B/RyjX8oAjpw=;
+        b=FOBDaVOkaJoVHuBc9FFlVFwWgLFhqCfetCXvPeYtY0tN+hcrXoiy67ol4nKQpHbxS7fgrj
+        0WW/3GcJhjQWVaJl7+VBm8sv1SV+U8Ze750L6GuOfijAfoZm/6YzO/JDu0LhamcdkLSx9h
+        dvZRY45bsIK97J55l+pqRS2+WBY0sh4=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-526-yNoXktQCO5-uSXSX3l5G_w-1; Tue, 18 Aug 2020 05:13:52 -0400
-X-MC-Unique: yNoXktQCO5-uSXSX3l5G_w-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+ us-mta-248-hPDVDA2kNsyMqa_cPBHKPg-1; Tue, 18 Aug 2020 05:16:50 -0400
+X-MC-Unique: hPDVDA2kNsyMqa_cPBHKPg-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A7C0F81F02B;
-        Tue, 18 Aug 2020 09:13:51 +0000 (UTC)
-Received: from kamzik.brq.redhat.com (unknown [10.40.192.141])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 8432A600DA;
-        Tue, 18 Aug 2020 09:13:46 +0000 (UTC)
-Date:   Tue, 18 Aug 2020 11:13:43 +0200
-From:   Andrew Jones <drjones@redhat.com>
-To:     Marc Hartmayer <mhartmay@linux.ibm.com>
-Cc:     kvm@vger.kernel.org, Thomas Huth <thuth@redhat.com>,
-        David Hildenbrand <david@redhat.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 48C781006701;
+        Tue, 18 Aug 2020 09:16:48 +0000 (UTC)
+Received: from redhat.com (unknown [10.36.110.26])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 43F0D5D757;
+        Tue, 18 Aug 2020 09:16:31 +0000 (UTC)
+Date:   Tue, 18 Aug 2020 10:16:28 +0100
+From:   Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To:     Jason Wang <jasowang@redhat.com>
+Cc:     Yan Zhao <yan.y.zhao@intel.com>, kvm@vger.kernel.org,
+        libvir-list@redhat.com, qemu-devel@nongnu.org,
+        kwankhede@nvidia.com, eauger@redhat.com, xin-ran.wang@intel.com,
+        corbet@lwn.net, openstack-discuss@lists.openstack.org,
+        shaohe.feng@intel.com, kevin.tian@intel.com,
+        Parav Pandit <parav@mellanox.com>, jian-feng.ding@intel.com,
+        dgilbert@redhat.com, zhenyuw@linux.intel.com, hejie.xu@intel.com,
+        bao.yumeng@zte.com.cn,
+        Alex Williamson <alex.williamson@redhat.com>,
+        eskultet@redhat.com, smooney@redhat.com,
+        intel-gvt-dev@lists.freedesktop.org,
         Cornelia Huck <cohuck@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        linux-s390@vger.kernel.org
-Subject: Re: [kvm-unit-tests RFC v2 3/4] run_tests/mkstandalone: add arch
- dependent function to `for_each_unittest`
-Message-ID: <20200818091343.vp7eiyrrz34tyiy3@kamzik.brq.redhat.com>
-References: <20200812092705.17774-1-mhartmay@linux.ibm.com>
- <20200812092705.17774-4-mhartmay@linux.ibm.com>
- <20200813083000.e4bscohuhgl3jdv4@kamzik.brq.redhat.com>
- <87h7t51in7.fsf@linux.ibm.com>
- <20200814132957.szwmbw6w26fhkroo@kamzik.brq.redhat.com>
- <87ft8k497k.fsf@linux.ibm.com>
+        Jiri Pirko <jiri@mellanox.com>, dinechin@redhat.com,
+        devel@ovirt.org
+Subject: Re: device compatibility interface for live migration with assigned
+ devices
+Message-ID: <20200818091628.GC20215@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20200805075647.GB2177@nanopsycho>
+ <eb1d01c2-fbad-36b6-10cf-9e03483a736b@redhat.com>
+ <20200805093338.GC30485@joy-OptiPlex-7040>
+ <20200805105319.GF2177@nanopsycho>
+ <20200810074631.GA29059@joy-OptiPlex-7040>
+ <e6e75807-0614-bd75-aeb6-64d643e029d3@redhat.com>
+ <20200814051601.GD15344@joy-OptiPlex-7040>
+ <a51209fe-a8c6-941f-ff54-7be06d73bc44@redhat.com>
+ <20200818085527.GB20215@redhat.com>
+ <3a073222-dcfe-c02d-198b-29f6a507b2e1@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <87ft8k497k.fsf@linux.ibm.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+In-Reply-To: <3a073222-dcfe-c02d-198b-29f6a507b2e1@redhat.com>
+User-Agent: Mutt/1.14.5 (2020-06-23)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Aug 18, 2020 at 11:03:27AM +0200, Marc Hartmayer wrote:
-> On Fri, Aug 14, 2020 at 03:29 PM +0200, Andrew Jones <drjones@redhat.com> wrote:
-> > On Fri, Aug 14, 2020 at 03:06:36PM +0200, Marc Hartmayer wrote:
-> >> On Thu, Aug 13, 2020 at 10:30 AM +0200, Andrew Jones <drjones@redhat.com> wrote:
-> >> > On Wed, Aug 12, 2020 at 11:27:04AM +0200, Marc Hartmayer wrote:
-> >> >> This allows us, for example, to auto generate a new test case based on
-> >> >> an existing test case.
-> >> >> 
-> >> >> Signed-off-by: Marc Hartmayer <mhartmay@linux.ibm.com>
-> >> >> ---
-> >> >>  run_tests.sh            |  2 +-
-> >> >>  scripts/common.bash     | 13 +++++++++++++
-> >> >>  scripts/mkstandalone.sh |  2 +-
-> >> >>  3 files changed, 15 insertions(+), 2 deletions(-)
-> >> >> 
-> >> >> diff --git a/run_tests.sh b/run_tests.sh
-> >> >> index 24aba9cc3a98..23658392c488 100755
-> >> >> --- a/run_tests.sh
-> >> >> +++ b/run_tests.sh
-> >> >> @@ -160,7 +160,7 @@ trap "wait; exit 130" SIGINT
-> >> >>     # preserve stdout so that process_test_output output can write TAP to it
-> >> >>     exec 3>&1
-> >> >>     test "$tap_output" == "yes" && exec > /dev/null
-> >> >> -   for_each_unittest $config run_task
-> >> >> +   for_each_unittest $config run_task arch_cmd
-> >> >
-> >> > Let's just require that arch cmd hook be specified by the "$arch_cmd"
-> >> > variable. Then we don't need to pass it to for_each_unittest.
-> >> 
-> >> Where is it then specified?
-> >
-> > Just using it that way in the source is enough. We should probably call
-> > it $ARCH_CMD to indicate that it's a special variable. Also, we could
-> > return it from a $(arch_cmd) function, which is how $(migration_cmd) and
-> > $(timeout_cmd) work.
-> 
-> My first approach was different…
-> 
-> First we source the (common) functions that could be overridden by
-> architecture dependent code, and then source the architecture dependent
-> code. But I’m not sure which approach is cleaner - if you prefer your
-> proposed solution with the global variables I can change it.
+Your mail came through as HTML-only so all the quoting and attribution
+is mangled / lost now :-(
 
-I prefer my proposed solution. It's not necessary to provide and
-source an arch-neutral function that will never do anything. And,
-it will never do anything, because the function is supposed to be
-arch-specific. If an arch doesn't implement the function, then
-we don't need to call anything at all.
+On Tue, Aug 18, 2020 at 05:01:51PM +0800, Jason Wang wrote:
+>    On 2020/8/18 下午4:55, Daniel P. Berrangé wrote:
+> 
+>  On Tue, Aug 18, 2020 at 11:24:30AM +0800, Jason Wang wrote:
+> 
+>  On 2020/8/14 下午1:16, Yan Zhao wrote:
+> 
+>  On Thu, Aug 13, 2020 at 12:24:50PM +0800, Jason Wang wrote:
+> 
+>  On 2020/8/10 下午3:46, Yan Zhao wrote:
 
-Thanks,
-drew
+>  we actually can also retrieve the same information through sysfs, .e.g
+> 
+>  |- [path to device]
+>     |--- migration
+>     |     |--- self
+>     |     |   |---device_api
+>     |    |   |---mdev_type
+>     |    |   |---software_version
+>     |    |   |---device_id
+>     |    |   |---aggregator
+>     |     |--- compatible
+>     |     |   |---device_api
+>     |    |   |---mdev_type
+>     |    |   |---software_version
+>     |    |   |---device_id
+>     |    |   |---aggregator
+> 
+> 
+>  Yes but:
+> 
+>  - You need one file per attribute (one syscall for one attribute)
+>  - Attribute is coupled with kobject
+> 
+>  All of above seems unnecessary.
+> 
+>  Another point, as we discussed in another thread, it's really hard to make
+>  sure the above API work for all types of devices and frameworks. So having a
+>  vendor specific API looks much better.
+> 
+>  From the POV of userspace mgmt apps doing device compat checking / migration,
+>  we certainly do NOT want to use different vendor specific APIs. We want to
+>  have an API that can be used / controlled in a standard manner across vendors.
+> 
+>    Yes, but it could be hard. E.g vDPA will chose to use devlink (there's a
+>    long debate on sysfs vs devlink). So if we go with sysfs, at least two
+>    APIs needs to be supported ...
 
-> 
-> Thanks for the feedback!
-> 
-> […snip]
-> 
-> -- 
-> Kind regards / Beste Grüße
->    Marc Hartmayer
-> 
-> IBM Deutschland Research & Development GmbH
-> Vorsitzender des Aufsichtsrats: Gregor Pillen 
-> Geschäftsführung: Dirk Wittkopp
-> Sitz der Gesellschaft: Böblingen
-> Registergericht: Amtsgericht Stuttgart, HRB 243294
-> 
+NB, I was not questioning devlink vs sysfs directly. If devlink is related
+to netlink, I can't say I'm enthusiastic as IMKE sysfs is easier to deal
+with. I don't know enough about devlink to have much of an opinion though.
+The key point was that I don't want the userspace APIs we need to deal with
+to be vendor specific.
+
+What I care about is that we have a *standard* userspace API for performing
+device compatibility checking / state migration, for use by QEMU/libvirt/
+OpenStack, such that we can write code without countless vendor specific
+code paths.
+
+If there is vendor specific stuff on the side, that's fine as we can ignore
+that, but the core functionality for device compat / migration needs to be
+standardized.
+
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
 
