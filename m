@@ -2,314 +2,164 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 07D6624906C
-	for <lists+kvm@lfdr.de>; Tue, 18 Aug 2020 23:57:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DB14C24916A
+	for <lists+kvm@lfdr.de>; Wed, 19 Aug 2020 01:24:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726875AbgHRV5T (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 18 Aug 2020 17:57:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37686 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726366AbgHRV5S (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 18 Aug 2020 17:57:18 -0400
-Received: from mail-ot1-x342.google.com (mail-ot1-x342.google.com [IPv6:2607:f8b0:4864:20::342])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A675BC061389
-        for <kvm@vger.kernel.org>; Tue, 18 Aug 2020 14:57:18 -0700 (PDT)
-Received: by mail-ot1-x342.google.com with SMTP id h16so17505365oti.7
-        for <kvm@vger.kernel.org>; Tue, 18 Aug 2020 14:57:18 -0700 (PDT)
+        id S1727087AbgHRXYz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 18 Aug 2020 19:24:55 -0400
+Received: from smtp-fw-33001.amazon.com ([207.171.190.10]:63739 "EHLO
+        smtp-fw-33001.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726809AbgHRXYy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 18 Aug 2020 19:24:54 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=ggFzDp3G+GLHC4dkLqfnes8gOcGU+TNSaWBHS+/lmg4=;
-        b=uDfzq3NCMaQVYWLdVrM8xaIBvujTv1k9Ax4+py+yyYd3VtyzofqKRiEs/mF40hftJb
-         M0p66V0iPJDoquPUddiayJWfbf++BIfg2QyuXNOYloz5N5lAtCkyEdYTT1J4ZvJsytTk
-         BcMDObRW5z4rJis/BxF8/HUO+PK63oez77IZnMXWamVmMw7czS63JzsxCtPF2p4RqJra
-         mzHvhzu7VMprHxnQ1dZO1r2enWSxKBFcyjstyKrIY8K/XLRy/sp8mUB1zsOuzlBuoPyY
-         hvS6kxH3OgdYdOk1yKyoKevV3HX7/rLchC2XfSRpSyDMfT+ofXqNpsdHxdGt0Yc+1N6c
-         vkjw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=ggFzDp3G+GLHC4dkLqfnes8gOcGU+TNSaWBHS+/lmg4=;
-        b=lWVJfZFcjv4sQ9K2DDgixGXUPl2eB8EQIgCyck6YD8weONMg7yzsjm9Cp9FjajLf3+
-         JiU3bFis8vKTw/w1ew7hR7QqufakY9bIfcXJR28HnOPVKTLg2RGNxgwZXx5T5McZPUYJ
-         YSYmx4aS0HvYL4kcbXzcQJALU43U0eMfoQLHuOuPWyHPmjvDPVwHwommN2I9w0KZ2vnZ
-         lWUeMLJozJ+yuinDfPoororPtP03JEx2gA0+BULsjQFhO4kfY0hr6qmT49sztQX5vYmt
-         BL7ZrzTEEKEKXBhD1pmWTUlDvx9MSyp2K29ZlhHlMh512Hzohq6ialPe4rwNGzFHfLE9
-         KMCg==
-X-Gm-Message-State: AOAM5337wCB0chmRIlbQNfkVdm8X64qv23/+jbuTzcJY3b5ZcrI89RnF
-        5kLeWFLzG7tx1lbVMNgl5VI2fJLF/b0OGpQ95tQi+w==
-X-Google-Smtp-Source: ABdhPJzEubI10T154p6cfPK9hT4s9iDw3X0qIaV+wf0FObh6DgnxMuxLOzxS2046fBP6VzEr3QmZRL6uW5WByrS6nxU=
-X-Received: by 2002:a9d:ae9:: with SMTP id 96mr16170284otq.241.1597787837667;
- Tue, 18 Aug 2020 14:57:17 -0700 (PDT)
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1597793093; x=1629329093;
+  h=subject:to:cc:references:from:message-id:date:
+   mime-version:in-reply-to:content-transfer-encoding;
+  bh=jR5nOW7+DwOgmrIAsVN7fuyxto6g5YRtj8aNKuXqjKc=;
+  b=FGckmiDNnFy6v2QnBRlmQYFzElLpbZR0uild+S/Sknnpxg2AhN0DFk2N
+   mscjWlz2hznBmryWIulGW1Brhxbkf+TUOu3/wzWVyqjpH+v4ghklh0H55
+   Wvl8xt3YIBTjBdP4GTGY4m6Zix2Y6PqeCvA+i8t1yYAiUrsM9cvf3jotD
+   Q=;
+X-IronPort-AV: E=Sophos;i="5.76,329,1592870400"; 
+   d="scan'208";a="67808757"
+Received: from sea32-co-svc-lb4-vlan3.sea.corp.amazon.com (HELO email-inbound-relay-1a-821c648d.us-east-1.amazon.com) ([10.47.23.38])
+  by smtp-border-fw-out-33001.sea14.amazon.com with ESMTP; 18 Aug 2020 23:24:19 +0000
+Received: from EX13MTAUWC001.ant.amazon.com (iad55-ws-svc-p15-lb9-vlan2.iad.amazon.com [10.40.159.162])
+        by email-inbound-relay-1a-821c648d.us-east-1.amazon.com (Postfix) with ESMTPS id 7E7F3A1826;
+        Tue, 18 Aug 2020 23:24:15 +0000 (UTC)
+Received: from EX13D20UWC001.ant.amazon.com (10.43.162.244) by
+ EX13MTAUWC001.ant.amazon.com (10.43.162.135) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.2; Tue, 18 Aug 2020 23:24:14 +0000
+Received: from 38f9d3867b82.ant.amazon.com (10.43.162.228) by
+ EX13D20UWC001.ant.amazon.com (10.43.162.244) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.2; Tue, 18 Aug 2020 23:24:11 +0000
+Subject: Re: [PATCH v2 1/2] KVM: arm64: Add PMU event filtering infrastructure
+To:     Marc Zyngier <maz@kernel.org>, Auger Eric <eric.auger@redhat.com>
+CC:     Mark Rutland <mark.rutland@arm.com>, <kvm@vger.kernel.org>,
+        "Suzuki K Poulose" <suzuki.poulose@arm.com>,
+        James Morse <james.morse@arm.com>,
+        <linux-arm-kernel@lists.infradead.org>,
+        Robin Murphy <robin.murphy@arm.com>,
+        <kvmarm@lists.cs.columbia.edu>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>
+References: <20200309124837.19908-1-maz@kernel.org>
+ <20200309124837.19908-2-maz@kernel.org>
+ <70e712fc-6789-2384-c21c-d932b5e1a32f@redhat.com>
+ <0027398587e8746a6a7459682330855f@kernel.org>
+ <7c9e2e55-95c8-a212-e566-c48f5d3bc417@redhat.com>
+ <470c88271ef8c4f92ecf990b7b86658e@kernel.org>
+From:   Alexander Graf <graf@amazon.com>
+Message-ID: <0647b63c-ac27-8ec9-c9da-9a5e5163cb5d@amazon.com>
+Date:   Wed, 19 Aug 2020 01:24:09 +0200
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:68.0)
+ Gecko/20100101 Thunderbird/68.11.0
 MIME-Version: 1.0
-References: <20200804042043.3592620-1-aaronlewis@google.com>
- <20200804042043.3592620-5-aaronlewis@google.com> <617a3e8d-755e-c7b1-7927-d8c9f1da2c58@amazon.com>
- <CAAAPnDEga3t1fWY3RN9gVMFOwa09dXTzktUft0MTC4_BR_acAg@mail.gmail.com>
-In-Reply-To: <CAAAPnDEga3t1fWY3RN9gVMFOwa09dXTzktUft0MTC4_BR_acAg@mail.gmail.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Tue, 18 Aug 2020 14:57:06 -0700
-Message-ID: <CALMp9eSQOfMc-WkByks-0q7jo5WooxpRkDBvP4tu8MqUw8hPjw@mail.gmail.com>
-Subject: Re: [PATCH 4/6] KVM: x86: Ensure the MSR bitmap never clears
- userspace tracked MSRs
-To:     Aaron Lewis <aaronlewis@google.com>
-Cc:     Alexander Graf <graf@amazon.com>, kvm list <kvm@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <470c88271ef8c4f92ecf990b7b86658e@kernel.org>
+Content-Language: en-US
+X-Originating-IP: [10.43.162.228]
+X-ClientProxiedBy: EX13D17UWC003.ant.amazon.com (10.43.162.206) To
+ EX13D20UWC001.ant.amazon.com (10.43.162.244)
+Content-Type: text/plain; charset="utf-8"; format="flowed"
+Content-Transfer-Encoding: base64
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Aug 18, 2020 at 2:34 PM Aaron Lewis <aaronlewis@google.com> wrote:
->
-> On Fri, Aug 7, 2020 at 4:03 PM Alexander Graf <graf@amazon.com> wrote:
-> >
-> >
-> >
-> > On 04.08.20 06:20, Aaron Lewis wrote:
-> > >
-> > > SDM volume 3: 24.6.9 "MSR-Bitmap Address" and APM volume 2: 15.11 "MS
-> > > intercepts" describe MSR permission bitmaps.  Permission bitmaps are
-> > > used to control whether an execution of rdmsr or wrmsr will cause a
-> > > vm exit.  For userspace tracked MSRs it is required they cause a vm
-> > > exit, so the host is able to forward the MSR to userspace.  This change
-> > > adds vmx/svm support to ensure the permission bitmap is properly set to
-> > > cause a vm_exit to the host when rdmsr or wrmsr is used by one of the
-> > > userspace tracked MSRs.  Also, to avoid repeatedly setting them,
-> > > kvm_make_request() is used to coalesce these into a single call.
-> >
-> > I might have some fundamental misunderstanding here:
-> >
-> > 1) You force that the list of trapped MSRs is set before vCPU creation,
-> > so at the point of vCPU creation, you know already which MSRs should
-> > trap to user space
-> >
-> > 2) MSR intercept bitmaps are (AFAIK) all set to "trap by default". That
-> > means any MSR that we want the guest to get direct access to needs
-> > explicit opt-in through bitmap modifications.
-> >
-> > That means if you simply check whether an MSR is supposed to trap to
-> > user space in the bitmap set path, you don't need any of the complicated
-> > logic below, no?
-> >
-> >
-> > Alex
-> >
->
-> Yes, I think that should work as well.  However, calling it after the
-> fact like we do does have a nice advantage of allowing us to coalesce
-> the calls and limit the number of times we need to search the list.
+SGkgTWFyYywKCk9uIDEwLjAzLjIwIDE5OjAwLCBNYXJjIFp5bmdpZXIgd3JvdGU6Cj4gT24gMjAy
+MC0wMy0xMCAxNzo0MCwgQXVnZXIgRXJpYyB3cm90ZToKPj4gSGkgTWFyYywKPj4KPj4gT24gMy8x
+MC8yMCAxMjowMyBQTSwgTWFyYyBaeW5naWVyIHdyb3RlOgo+Pj4gSGkgRXJpYywKPj4+Cj4+PiBP
+biAyMDIwLTAzLTA5IDE4OjA1LCBBdWdlciBFcmljIHdyb3RlOgo+Pj4+IEhpIE1hcmMsCj4+Pj4K
+Pj4+PiBPbiAzLzkvMjAgMTo0OCBQTSwgTWFyYyBaeW5naWVyIHdyb3RlOgo+Pj4+PiBJdCBjYW4g
+YmUgZGVzaXJhYmxlIHRvIGV4cG9zZSBhIFBNVSB0byBhIGd1ZXN0LCBhbmQgeWV0IG5vdCB3YW50
+IHRoZQo+Pj4+PiBndWVzdCB0byBiZSBhYmxlIHRvIGNvdW50IHNvbWUgb2YgdGhlIGltcGxlbWVu
+dGVkIGV2ZW50cyAoYmVjYXVzZSB0aGlzCj4+Pj4+IHdvdWxkIGdpdmUgaW5mb3JtYXRpb24gb24g
+c2hhcmVkIHJlc291cmNlcywgZm9yIGV4YW1wbGUuCj4+Pj4+Cj4+Pj4+IEZvciB0aGlzLCBsZXQn
+cyBleHRlbmQgdGhlIFBNVXYzIGRldmljZSBBUEksIGFuZCBvZmZlciBhIHdheSB0byAKPj4+Pj4g
+c2V0dXAgYQo+Pj4+PiBiaXRtYXAgb2YgdGhlIGFsbG93ZWQgZXZlbnRzICh0aGUgZGVmYXVsdCBi
+ZWluZyBubyBiaXRtYXAsIGFuZCB0aHVzIG5vCj4+Pj4+IGZpbHRlcmluZykuCj4+Pj4+Cj4+Pj4+
+IFVzZXJzcGFjZSBjYW4gdGh1cyBhbGxvdy9kZW55IHJhbmdlcyBvZiBldmVudC4gVGhlIGRlZmF1
+bHQgcG9saWN5Cj4+Pj4+IGRlcGVuZHMgb24gdGhlICJwb2xhcml0eSIgb2YgdGhlIGZpcnN0IGZp
+bHRlciBzZXR1cCAoZGVmYXVsdCBkZW55IAo+Pj4+PiBpZiB0aGUKPj4+Pj4gZmlsdGVyIGFsbG93
+cyBldmVudHMsIGFuZCBkZWZhdWx0IGFsbG93IGlmIHRoZSBmaWx0ZXIgZGVuaWVzIGV2ZW50cyku
+Cj4+Pj4+IFRoaXMgYWxsb3dzIHRvIHNldHVwIGV4YWN0bHkgd2hhdCBpcyBhbGxvd2VkIGZvciBh
+IGdpdmVuIGd1ZXN0Lgo+Pj4+Pgo+Pj4+PiBOb3RlIHRoYXQgYWx0aG91Z2ggdGhlIGlvY3RsIGlz
+IHBlci12Y3B1LCB0aGUgbWFwIG9mIGFsbG93ZWQgZXZlbnRzIGlzCj4+Pj4+IGdsb2JhbCB0byB0
+aGUgVk0gKGl0IGNhbiBiZSBzZXR1cCBmcm9tIGFueSB2Y3B1IHVudGlsIHRoZSB2Y3B1IFBNVSBp
+cwo+Pj4+PiBpbml0aWFsaXplZCkuCj4+Pj4+Cj4+Pj4+IFNpZ25lZC1vZmYtYnk6IE1hcmMgWnlu
+Z2llciA8bWF6QGtlcm5lbC5vcmc+Cj4+Pj4+IC0tLQo+Pj4+PiDCoGFyY2gvYXJtNjQvaW5jbHVk
+ZS9hc20va3ZtX2hvc3QuaCB8wqAgNiArKysKPj4+Pj4gwqBhcmNoL2FybTY0L2luY2x1ZGUvdWFw
+aS9hc20va3ZtLmggfCAxNiArKysrKysKPj4+Pj4gwqB2aXJ0L2t2bS9hcm0vYXJtLmPCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgfMKgIDIgKwo+Pj4+PiDCoHZpcnQva3ZtL2FybS9wbXUu
+Y8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCB8IDg0IAo+Pj4+PiArKysrKysrKysrKysr
+KysrKysrKysrKysrLS0tLS0tCj4+Pj4+IMKgNCBmaWxlcyBjaGFuZ2VkLCA5MiBpbnNlcnRpb25z
+KCspLCAxNiBkZWxldGlvbnMoLSkKPj4+Pj4KPj4+Pj4gZGlmZiAtLWdpdCBhL2FyY2gvYXJtNjQv
+aW5jbHVkZS9hc20va3ZtX2hvc3QuaAo+Pj4+PiBiL2FyY2gvYXJtNjQvaW5jbHVkZS9hc20va3Zt
+X2hvc3QuaAo+Pj4+PiBpbmRleCA1N2ZkNDZhY2QwNTguLjhlNjNjNjE4Njg4ZCAxMDA2NDQKPj4+
+Pj4gLS0tIGEvYXJjaC9hcm02NC9pbmNsdWRlL2FzbS9rdm1faG9zdC5oCj4+Pj4+ICsrKyBiL2Fy
+Y2gvYXJtNjQvaW5jbHVkZS9hc20va3ZtX2hvc3QuaAo+Pj4+PiBAQCAtOTEsNiArOTEsMTIgQEAg
+c3RydWN0IGt2bV9hcmNoIHsKPj4+Pj4gwqDCoMKgwqDCoCAqIHN1cHBvcnRlZC4KPj4+Pj4gwqDC
+oMKgwqDCoCAqLwo+Pj4+PiDCoMKgwqDCoCBib29sIHJldHVybl9uaXN2X2lvX2Fib3J0X3RvX3Vz
+ZXI7Cj4+Pj4+ICsKPj4+Pj4gK8KgwqDCoCAvKgo+Pj4+PiArwqDCoMKgwqAgKiBWTS13aWRlIFBN
+VSBmaWx0ZXIsIGltcGxlbWVudGVkIGFzIGEgYml0bWFwIGFuZCBiaWcgZW5vdWdoCj4+Pj4+ICvC
+oMKgwqDCoCAqIGZvciB1cCB0byA2NTUzNiBldmVudHMKPj4+Pj4gK8KgwqDCoMKgICovCj4+Pj4+
+ICvCoMKgwqAgdW5zaWduZWQgbG9uZyAqcG11X2ZpbHRlcjsKPj4+Pj4gwqB9Owo+Pj4+Pgo+Pj4+
+PiDCoCNkZWZpbmUgS1ZNX05SX01FTV9PQkpTwqDCoMKgwqAgNDAKPj4+Pj4gZGlmZiAtLWdpdCBh
+L2FyY2gvYXJtNjQvaW5jbHVkZS91YXBpL2FzbS9rdm0uaAo+Pj4+PiBiL2FyY2gvYXJtNjQvaW5j
+bHVkZS91YXBpL2FzbS9rdm0uaAo+Pj4+PiBpbmRleCBiYTg1YmIyM2YwNjAuLjdiMTUxMWQ2Y2U0
+NCAxMDA2NDQKPj4+Pj4gLS0tIGEvYXJjaC9hcm02NC9pbmNsdWRlL3VhcGkvYXNtL2t2bS5oCj4+
+Pj4+ICsrKyBiL2FyY2gvYXJtNjQvaW5jbHVkZS91YXBpL2FzbS9rdm0uaAo+Pj4+PiBAQCAtMTU5
+LDYgKzE1OSwyMSBAQCBzdHJ1Y3Qga3ZtX3N5bmNfcmVncyB7Cj4+Pj4+IMKgc3RydWN0IGt2bV9h
+cmNoX21lbW9yeV9zbG90IHsKPj4+Pj4gwqB9Owo+Pj4+Pgo+Pj4+PiArLyoKPj4+Pj4gKyAqIFBN
+VSBmaWx0ZXIgc3RydWN0dXJlLiBEZXNjcmliZSBhIHJhbmdlIG9mIGV2ZW50cyB3aXRoIGEgcGFy
+dGljdWxhcgo+Pj4+PiArICogYWN0aW9uLiBUbyBiZSB1c2VkIHdpdGggS1ZNX0FSTV9WQ1BVX1BN
+VV9WM19GSUxURVIuCj4+Pj4+ICsgKi8KPj4+Pj4gK3N0cnVjdCBrdm1fcG11X2V2ZW50X2ZpbHRl
+ciB7Cj4+Pj4+ICvCoMKgwqAgX191MTbCoMKgwqAgYmFzZV9ldmVudDsKPj4+Pj4gK8KgwqDCoCBf
+X3UxNsKgwqDCoCBuZXZlbnRzOwo+Pj4+PiArCj4+Pj4+ICsjZGVmaW5lIEtWTV9QTVVfRVZFTlRf
+QUxMT1fCoMKgwqAgMAo+Pj4+PiArI2RlZmluZSBLVk1fUE1VX0VWRU5UX0RFTlnCoMKgwqAgMQo+
+Pj4+PiArCj4+Pj4+ICvCoMKgwqAgX191OMKgwqDCoCBhY3Rpb247Cj4+Pj4+ICvCoMKgwqAgX191
+OMKgwqDCoCBwYWRbM107Cj4+Pj4+ICt9Owo+Pj4+PiArCj4+Pj4+IMKgLyogZm9yIEtWTV9HRVQv
+U0VUX1ZDUFVfRVZFTlRTICovCj4+Pj4+IMKgc3RydWN0IGt2bV92Y3B1X2V2ZW50cyB7Cj4+Pj4+
+IMKgwqDCoMKgIHN0cnVjdCB7Cj4+Pj4+IEBAIC0zMjksNiArMzQ0LDcgQEAgc3RydWN0IGt2bV92
+Y3B1X2V2ZW50cyB7Cj4+Pj4+IMKgI2RlZmluZSBLVk1fQVJNX1ZDUFVfUE1VX1YzX0NUUkzCoMKg
+wqAgMAo+Pj4+PiDCoCNkZWZpbmXCoMKgIEtWTV9BUk1fVkNQVV9QTVVfVjNfSVJRwqDCoMKgIDAK
+Pj4+Pj4gwqAjZGVmaW5lwqDCoCBLVk1fQVJNX1ZDUFVfUE1VX1YzX0lOSVTCoMKgwqAgMQo+Pj4+
+PiArI2RlZmluZcKgwqAgS1ZNX0FSTV9WQ1BVX1BNVV9WM19GSUxURVLCoMKgwqAgMgo+Pj4+PiDC
+oCNkZWZpbmUgS1ZNX0FSTV9WQ1BVX1RJTUVSX0NUUkzCoMKgwqDCoMKgwqDCoCAxCj4+Pj4+IMKg
+I2RlZmluZcKgwqAgS1ZNX0FSTV9WQ1BVX1RJTUVSX0lSUV9WVElNRVLCoMKgwqDCoMKgwqDCoCAw
+Cj4+Pj4+IMKgI2RlZmluZcKgwqAgS1ZNX0FSTV9WQ1BVX1RJTUVSX0lSUV9QVElNRVLCoMKgwqDC
+oMKgwqDCoCAxCj4+Pj4+IGRpZmYgLS1naXQgYS92aXJ0L2t2bS9hcm0vYXJtLmMgYi92aXJ0L2t2
+bS9hcm0vYXJtLmMKPj4+Pj4gaW5kZXggZWRhN2I2MjRlYWI4Li44ZDg0OWFjODhhNDQgMTAwNjQ0
+Cj4+Pj4+IC0tLSBhL3ZpcnQva3ZtL2FybS9hcm0uYwo+Pj4+PiArKysgYi92aXJ0L2t2bS9hcm0v
+YXJtLmMKPj4+Pj4gQEAgLTE2NCw2ICsxNjQsOCBAQCB2b2lkIGt2bV9hcmNoX2Rlc3Ryb3lfdm0o
+c3RydWN0IGt2bSAqa3ZtKQo+Pj4+PiDCoMKgwqDCoCBmcmVlX3BlcmNwdShrdm0tPmFyY2gubGFz
+dF92Y3B1X3Jhbik7Cj4+Pj4+IMKgwqDCoMKgIGt2bS0+YXJjaC5sYXN0X3ZjcHVfcmFuID0gTlVM
+TDsKPj4+Pj4KPj4+Pj4gK8KgwqDCoCBiaXRtYXBfZnJlZShrdm0tPmFyY2gucG11X2ZpbHRlcik7
+Cj4+Pj4+ICsKPj4+Pj4gwqDCoMKgwqAgZm9yIChpID0gMDsgaSA8IEtWTV9NQVhfVkNQVVM7ICsr
+aSkgewo+Pj4+PiDCoMKgwqDCoMKgwqDCoMKgIGlmIChrdm0tPnZjcHVzW2ldKSB7Cj4+Pj4+IMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBrdm1fdmNwdV9kZXN0cm95KGt2bS0+dmNwdXNbaV0pOwo+
+Pj4+PiBkaWZmIC0tZ2l0IGEvdmlydC9rdm0vYXJtL3BtdS5jIGIvdmlydC9rdm0vYXJtL3BtdS5j
+Cj4+Pj4+IGluZGV4IGYwZDAzMTJjMGE1NS4uOWYwZmQwMjI0ZDViIDEwMDY0NAo+Pj4+PiAtLS0g
+YS92aXJ0L2t2bS9hcm0vcG11LmMKPj4+Pj4gKysrIGIvdmlydC9rdm0vYXJtL3BtdS5jCj4+Pj4+
+IEBAIC01NzksMTAgKzU3OSwxOSBAQCBzdGF0aWMgdm9pZCBrdm1fcG11X2NyZWF0ZV9wZXJmX2V2
+ZW50KHN0cnVjdAo+Pj4+PiBrdm1fdmNwdSAqdmNwdSwgdTY0IHNlbGVjdF9pZHgpCj4+Pj4+Cj4+
+Pj4+IMKgwqDCoMKgIGt2bV9wbXVfc3RvcF9jb3VudGVyKHZjcHUsIHBtYyk7Cj4+Pj4+IMKgwqDC
+oMKgIGV2ZW50c2VsID0gZGF0YSAmIEFSTVY4X1BNVV9FVlRZUEVfRVZFTlQ7Cj4+Pj4+ICvCoMKg
+wqAgaWYgKHBtYy0+aWR4ID09IEFSTVY4X1BNVV9DWUNMRV9JRFgpCj4+Pj4+ICvCoMKgwqDCoMKg
+wqDCoCBldmVudHNlbCA9IEFSTVY4X1BNVVYzX1BFUkZDVFJfQ1BVX0NZQ0xFUzsKPj4+PiBuaXQ6
+Cj4+Pj4gwqDCoMKgwqBpZiAocG1jLT5pZHggPT0gQVJNVjhfUE1VX0NZQ0xFX0lEWCkKPj4+PiDC
+oMKgwqDCoMKgwqDCoCBldmVudHNlbCA9IEFSTVY4X1BNVVYzX1BFUkZDVFJfQ1BVX0NZQ0xFUzsK
+Pj4+PiDCoMKgwqDCoGVsc2UKPj4+PiDCoMKgwqDCoMKgwqDCoCBldmVudHNlbCA9IGRhdGEgJiBB
+Uk1WOF9QTVVfRVZUWVBFX0VWRU5UOwo+Pj4KPj4+IFlvdSBkb24ndCBsaWtlIGl0PyA7LSkKPj4g
+PyBldmVudHNldCBzZXQgb25seSBvbmNlIGluc3RlYWQgb2YgMiB0aW1lcwo+IAo+IFRoZSBjb21w
+aWxlciBkb2VzIHRoZSByaWdodCB0aGluZywgYnV0IHNvcmUsIEknbGwgY2hhbmdlIGl0LgoKSSBo
+YXZlbid0IHNlZW4gYSB2MyBmb2xsb3ctdXAgYWZ0ZXIgdGhpcy4gRG8geW91IGhhcHBlbiB0byBo
+YXZlIHRoYXQgCnNvbWV3aGVyZSBpbiBhIGxvY2FsIGJyYW5jaCBhbmQganVzdCBuZWVkIHRvIHNl
+bmQgaXQgb3V0IG9yIHdvdWxkIHlvdSAKcHJlZmVyIGlmIEkgcGljayB1cCB2MiBhbmQgYWRkcmVz
+cyB0aGUgY29tbWVudHM/CgoKVGhhbmtzLAoKQWxleAoKCgpBbWF6b24gRGV2ZWxvcG1lbnQgQ2Vu
+dGVyIEdlcm1hbnkgR21iSApLcmF1c2Vuc3RyLiAzOAoxMDExNyBCZXJsaW4KR2VzY2hhZWZ0c2Z1
+ZWhydW5nOiBDaHJpc3RpYW4gU2NobGFlZ2VyLCBKb25hdGhhbiBXZWlzcwpFaW5nZXRyYWdlbiBh
+bSBBbXRzZ2VyaWNodCBDaGFybG90dGVuYnVyZyB1bnRlciBIUkIgMTQ5MTczIEIKU2l0ejogQmVy
+bGluClVzdC1JRDogREUgMjg5IDIzNyA4NzkKCgo=
 
-Also, if we do decide to let the userspace MSR list change after vCPUs
-are created (and it's a VM-wide ioctl), it will be nice to just send
-the request to all vCPUs to update their MSR permission bitmaps before
-the next VM-entry.
-
-> > >
-> > > Signed-off-by: Aaron Lewis <aaronlewis@google.com>
-> > > Reviewed-by: Oliver Upton <oupton@google.com>
-> > > ---
-> > >   arch/x86/include/asm/kvm_host.h |  3 ++
-> > >   arch/x86/kvm/svm/svm.c          | 49 ++++++++++++++++++++++++++-------
-> > >   arch/x86/kvm/vmx/vmx.c          | 13 ++++++++-
-> > >   arch/x86/kvm/x86.c              | 16 +++++++++++
-> > >   4 files changed, 70 insertions(+), 11 deletions(-)
-> > >
-> > > diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> > > index 510055471dd0..07a85f5f0b8a 100644
-> > > --- a/arch/x86/include/asm/kvm_host.h
-> > > +++ b/arch/x86/include/asm/kvm_host.h
-> > > @@ -87,6 +87,7 @@
-> > >   #define KVM_REQ_HV_TLB_FLUSH \
-> > >          KVM_ARCH_REQ_FLAGS(27, KVM_REQUEST_NO_WAKEUP)
-> > >   #define KVM_REQ_APF_READY              KVM_ARCH_REQ(28)
-> > > +#define KVM_REQ_USER_MSR_UPDATE KVM_ARCH_REQ(29)
-> > >
-> > >   #define CR0_RESERVED_BITS                                               \
-> > >          (~(unsigned long)(X86_CR0_PE | X86_CR0_MP | X86_CR0_EM | X86_CR0_TS \
-> > > @@ -1271,6 +1272,8 @@ struct kvm_x86_ops {
-> > >          int (*enable_direct_tlbflush)(struct kvm_vcpu *vcpu);
-> > >
-> > >          void (*migrate_timers)(struct kvm_vcpu *vcpu);
-> > > +
-> > > +       void (*set_user_msr_intercept)(struct kvm_vcpu *vcpu, u32 msr);
-> > >   };
-> > >
-> > >   struct kvm_x86_nested_ops {
-> > > diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-> > > index eb673b59f7b7..c560d283b2af 100644
-> > > --- a/arch/x86/kvm/svm/svm.c
-> > > +++ b/arch/x86/kvm/svm/svm.c
-> > > @@ -583,13 +583,27 @@ static bool msr_write_intercepted(struct kvm_vcpu *vcpu, u32 msr)
-> > >          return !!test_bit(bit_write,  &tmp);
-> > >   }
-> > >
-> > > +static void __set_msr_interception(u32 *msrpm, u32 msr, int read, int write,
-> > > +                                  u32 offset)
-> > > +{
-> > > +       u8 bit_read, bit_write;
-> > > +       unsigned long tmp;
-> > > +
-> > > +       bit_read  = 2 * (msr & 0x0f);
-> > > +       bit_write = 2 * (msr & 0x0f) + 1;
-> > > +       tmp       = msrpm[offset];
-> > > +
-> > > +       read  ? clear_bit(bit_read,  &tmp) : set_bit(bit_read,  &tmp);
-> > > +       write ? clear_bit(bit_write, &tmp) : set_bit(bit_write, &tmp);
-> > > +
-> > > +       msrpm[offset] = tmp;
-> > > +}
-> > > +
-> > >   static void set_msr_interception(struct kvm_vcpu *vcpu, u32 msr, int read,
-> > >                                   int write)
-> > >   {
-> > >          struct vcpu_svm *svm = to_svm(vcpu);
-> > >          u32 *msrpm = svm->msrpm;
-> > > -       u8 bit_read, bit_write;
-> > > -       unsigned long tmp;
-> > >          u32 offset;
-> > >
-> > >          /*
-> > > @@ -598,17 +612,30 @@ static void set_msr_interception(struct kvm_vcpu *vcpu, u32 msr, int read,
-> > >           */
-> > >          WARN_ON(!valid_msr_intercept(msr));
-> > >
-> > > -       offset    = svm_msrpm_offset(msr);
-> > > -       bit_read  = 2 * (msr & 0x0f);
-> > > -       bit_write = 2 * (msr & 0x0f) + 1;
-> > > -       tmp       = msrpm[offset];
-> > > -
-> > > +       offset = svm_msrpm_offset(msr);
-> > >          BUG_ON(offset == MSR_INVALID);
-> > >
-> > > -       read  ? clear_bit(bit_read,  &tmp) : set_bit(bit_read,  &tmp);
-> > > -       write ? clear_bit(bit_write, &tmp) : set_bit(bit_write, &tmp);
-> > > +       __set_msr_interception(msrpm, msr, read, write, offset);
-> > >
-> > > -       msrpm[offset] = tmp;
-> > > +       if (read || write)
-> > > +               kvm_make_request(KVM_REQ_USER_MSR_UPDATE, vcpu);
-> > > +}
-> > > +
-> > > +static void set_user_msr_interception(struct kvm_vcpu *vcpu, u32 msr, int read,
-> > > +                                     int write)
-> > > +{
-> > > +       struct vcpu_svm *svm = to_svm(vcpu);
-> > > +       u32 *msrpm = svm->msrpm;
-> > > +       u32 offset;
-> > > +
-> > > +       offset = svm_msrpm_offset(msr);
-> > > +       if (offset != MSR_INVALID)
-> > > +               __set_msr_interception(msrpm, msr, read, write, offset);
-> > > +}
-> > > +
-> > > +void svm_set_user_msr_intercept(struct kvm_vcpu *vcpu, u32 msr)
-> > > +{
-> > > +       set_user_msr_interception(vcpu, msr, 0, 0);
-> > >   }
-> > >
-> > >   static void svm_vcpu_init_msrpm(struct kvm_vcpu *vcpu, u32 *msrpm)
-> > > @@ -4088,6 +4115,8 @@ static struct kvm_x86_ops svm_x86_ops __initdata = {
-> > >          .need_emulation_on_page_fault = svm_need_emulation_on_page_fault,
-> > >
-> > >          .apic_init_signal_blocked = svm_apic_init_signal_blocked,
-> > > +
-> > > +       .set_user_msr_intercept = svm_set_user_msr_intercept,
-> > >   };
-> > >
-> > >   static struct kvm_x86_init_ops svm_init_ops __initdata = {
-> > > diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> > > index 1313e47a5a1e..3d3d9eaeca64 100644
-> > > --- a/arch/x86/kvm/vmx/vmx.c
-> > > +++ b/arch/x86/kvm/vmx/vmx.c
-> > > @@ -3728,6 +3728,10 @@ static __always_inline void vmx_disable_intercept_for_msr(struct kvm_vcpu *vcpu,
-> > >                          __clear_bit(msr, msr_bitmap + 0xc00 / f);
-> > >
-> > >          }
-> > > +
-> > > +       if (type & MSR_TYPE_R || type & MSR_TYPE_W) {
-> > > +               kvm_make_request(KVM_REQ_USER_MSR_UPDATE, vcpu);
-> > > +       }
-> > >   }
-> > >
-> > >   static __always_inline void vmx_enable_intercept_for_msr(struct kvm_vcpu *vcpu,
-> > > @@ -3795,7 +3799,7 @@ static u8 vmx_msr_bitmap_mode(struct kvm_vcpu *vcpu)
-> > >   }
-> > >
-> > >   static void vmx_update_msr_bitmap_x2apic(struct kvm_vcpu *vcpu,
-> > > -                                        unsigned long *msr_bitmap, u8 mode)
-> > > +                                       unsigned long *msr_bitmap, u8 mode)
-> > >   {
-> > >          int msr;
-> > >
-> > > @@ -3819,6 +3823,11 @@ static void vmx_update_msr_bitmap_x2apic(struct kvm_vcpu *vcpu,
-> > >          }
-> > >   }
-> > >
-> > > +void vmx_set_user_msr_intercept(struct kvm_vcpu *vcpu, u32 msr)
-> > > +{
-> > > +       vmx_enable_intercept_for_msr(vcpu, msr, MSR_TYPE_RW);
-> > > +}
-> > > +
-> > >   void vmx_update_msr_bitmap(struct kvm_vcpu *vcpu)
-> > >   {
-> > >          struct vcpu_vmx *vmx = to_vmx(vcpu);
-> > > @@ -7965,6 +7974,8 @@ static struct kvm_x86_ops vmx_x86_ops __initdata = {
-> > >          .need_emulation_on_page_fault = vmx_need_emulation_on_page_fault,
-> > >          .apic_init_signal_blocked = vmx_apic_init_signal_blocked,
-> > >          .migrate_timers = vmx_migrate_timers,
-> > > +
-> > > +       .set_user_msr_intercept = vmx_set_user_msr_intercept,
-> > >   };
-> > >
-> > >   static __init int hardware_setup(void)
-> > > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> > > index 47619b49818a..45bf59f94d34 100644
-> > > --- a/arch/x86/kvm/x86.c
-> > > +++ b/arch/x86/kvm/x86.c
-> > > @@ -3537,6 +3537,19 @@ bool kvm_msr_user_exit(struct kvm *kvm, u32 index)
-> > >   }
-> > >   EXPORT_SYMBOL_GPL(kvm_msr_user_exit);
-> > >
-> > > +static void kvm_set_user_msr_intercepts(struct kvm_vcpu *vcpu)
-> > > +{
-> > > +       struct kvm_msr_list *msr_list = vcpu->kvm->arch.user_exit_msrs;
-> > > +       u32 i, msr;
-> > > +
-> > > +       if (msr_list) {
-> > > +               for (i = 0; i < msr_list->nmsrs; i++) {
-> > > +                       msr = msr_list->indices[i];
-> > > +                       kvm_x86_ops.set_user_msr_intercept(vcpu, msr);
-> > > +               }
-> > > +       }
-> > > +}
-> > > +
-> > >   int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
-> > >   {
-> > >          int r = 0;
-> > > @@ -8553,6 +8566,9 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
-> > >                          kvm_vcpu_update_apicv(vcpu);
-> > >                  if (kvm_check_request(KVM_REQ_APF_READY, vcpu))
-> > >                          kvm_check_async_pf_completion(vcpu);
-> > > +
-> > > +               if (kvm_check_request(KVM_REQ_USER_MSR_UPDATE, vcpu))
-> > > +                       kvm_set_user_msr_intercepts(vcpu);
-> > >          }
-> > >
-> > >          if (kvm_check_request(KVM_REQ_EVENT, vcpu) || req_int_win) {
-> > > --
-> > > 2.28.0.163.g6104cc2f0b6-goog
-> > >
-> >
-> >
-> >
-> > Amazon Development Center Germany GmbH
-> > Krausenstr. 38
-> > 10117 Berlin
-> > Geschaeftsfuehrung: Christian Schlaeger, Jonathan Weiss
-> > Eingetragen am Amtsgericht Charlottenburg unter HRB 149173 B
-> > Sitz: Berlin
-> > Ust-ID: DE 289 237 879
-> >
-> >
