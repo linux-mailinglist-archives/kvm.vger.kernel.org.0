@@ -2,145 +2,108 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 50E4A24814E
-	for <lists+kvm@lfdr.de>; Tue, 18 Aug 2020 11:03:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E1663248158
+	for <lists+kvm@lfdr.de>; Tue, 18 Aug 2020 11:06:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726568AbgHRJDh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 18 Aug 2020 05:03:37 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:5530 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726043AbgHRJDh (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 18 Aug 2020 05:03:37 -0400
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 07I8Xj1P088845;
-        Tue, 18 Aug 2020 05:03:36 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : in-reply-to : references : date : message-id : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=jsd16TsVP1LXEEs6ZppSlgaKKt0JaYPxy1LtKDNq3zc=;
- b=ZY0l4bTNw1RnuRp1s+eBnP7DIOTuJw1Hw6/fYIgU4dkd06hvns0Phd72R0bbHnlK2lu0
- h9tz5vppQCnMT4JoskduvAGr0FrtDi+fqNr5o99HjvBY1069DyvmzF/xNRQiAgcWiQvm
- 841+dOCPTr2J4cV40RTtgiJKjy6L3u3OwevECQ2D6kpPYAihje9hVk8QscklLj6cDXhs
- 0fmsi282YqyxYQwqtsk+af1FIRNTslSBQFbEsYx3w6FT2g0nPTkxhpSxnqSCwxzjuK6J
- 9EQtKhHhpcZc9rprpHYfugKM0nwnQcLLnao7vE243yu7dX+erkucuTAy9Nf2TPvLAI5E fw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3304r32k0k-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 18 Aug 2020 05:03:36 -0400
-Received: from m0098393.ppops.net (m0098393.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 07I8kE3a129043;
-        Tue, 18 Aug 2020 05:03:36 -0400
-Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3304r32jxg-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 18 Aug 2020 05:03:36 -0400
-Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
-        by ppma04ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 07I90l1U012126;
-        Tue, 18 Aug 2020 09:03:32 GMT
-Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
-        by ppma04ams.nl.ibm.com with ESMTP id 3304cc0eey-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 18 Aug 2020 09:03:32 +0000
-Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
-        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 07I93U4x57016688
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 18 Aug 2020 09:03:30 GMT
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id E18D84C05A;
-        Tue, 18 Aug 2020 09:03:29 +0000 (GMT)
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 6615A4C046;
-        Tue, 18 Aug 2020 09:03:29 +0000 (GMT)
-Received: from marcibm (unknown [9.145.52.109])
-        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
-        Tue, 18 Aug 2020 09:03:29 +0000 (GMT)
-From:   Marc Hartmayer <mhartmay@linux.ibm.com>
-To:     Andrew Jones <drjones@redhat.com>,
-        Marc Hartmayer <mhartmay@linux.ibm.com>
-Cc:     kvm@vger.kernel.org, Thomas Huth <thuth@redhat.com>,
-        David Hildenbrand <david@redhat.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        linux-s390@vger.kernel.org
-Subject: Re: [kvm-unit-tests RFC v2 3/4] run_tests/mkstandalone: add arch dependent function to `for_each_unittest`
-In-Reply-To: <20200814132957.szwmbw6w26fhkroo@kamzik.brq.redhat.com>
-References: <20200812092705.17774-1-mhartmay@linux.ibm.com> <20200812092705.17774-4-mhartmay@linux.ibm.com> <20200813083000.e4bscohuhgl3jdv4@kamzik.brq.redhat.com> <87h7t51in7.fsf@linux.ibm.com> <20200814132957.szwmbw6w26fhkroo@kamzik.brq.redhat.com>
-Date:   Tue, 18 Aug 2020 11:03:27 +0200
-Message-ID: <87ft8k497k.fsf@linux.ibm.com>
+        id S1726605AbgHRJGo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 18 Aug 2020 05:06:44 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:53789 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726473AbgHRJGo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 18 Aug 2020 05:06:44 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1597741603;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=7T9mpdruf8/QbUxmM0HKIFYsILTP2sJfo1DUZlpHsno=;
+        b=f1bSGFXcw8iFqBoFMDZT7kmVP9X55zfYHd8+mqKOHEWCm8C3eEfIxNBs8CyS2Ft8EiduHr
+        6BztyuflYYYw39yPU8//G/dUGI6SNZz0aw8plW5ADhEUep17wg/u073stFNt0SKmvzjR2w
+        K14LhMSt27XVeAGXG5vG5RCBAbCebpI=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-342-vpgG3SJYObuxw_q781AWlQ-1; Tue, 18 Aug 2020 05:06:41 -0400
+X-MC-Unique: vpgG3SJYObuxw_q781AWlQ-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EC45C81F02B;
+        Tue, 18 Aug 2020 09:06:38 +0000 (UTC)
+Received: from gondolin (ovpn-112-221.ams2.redhat.com [10.36.112.221])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 9ED7F5C716;
+        Tue, 18 Aug 2020 09:06:19 +0000 (UTC)
+Date:   Tue, 18 Aug 2020 11:06:17 +0200
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     "Daniel P. =?UTF-8?B?QmVycmFuZ8Op?=" <berrange@redhat.com>
+Cc:     Jason Wang <jasowang@redhat.com>, Yan Zhao <yan.y.zhao@intel.com>,
+        kvm@vger.kernel.org, libvir-list@redhat.com, qemu-devel@nongnu.org,
+        kwankhede@nvidia.com, eauger@redhat.com, xin-ran.wang@intel.com,
+        corbet@lwn.net, openstack-discuss@lists.openstack.org,
+        shaohe.feng@intel.com, kevin.tian@intel.com,
+        Parav Pandit <parav@mellanox.com>, jian-feng.ding@intel.com,
+        dgilbert@redhat.com, zhenyuw@linux.intel.com, hejie.xu@intel.com,
+        bao.yumeng@zte.com.cn,
+        Alex Williamson <alex.williamson@redhat.com>,
+        eskultet@redhat.com, smooney@redhat.com,
+        intel-gvt-dev@lists.freedesktop.org,
+        Jiri Pirko <jiri@mellanox.com>, dinechin@redhat.com,
+        devel@ovirt.org
+Subject: Re: device compatibility interface for live migration with assigned
+ devices
+Message-ID: <20200818110617.05def37c.cohuck@redhat.com>
+In-Reply-To: <20200818085527.GB20215@redhat.com>
+References: <20200805021654.GB30485@joy-OptiPlex-7040>
+        <2624b12f-3788-7e2b-2cb7-93534960bcb7@redhat.com>
+        <20200805075647.GB2177@nanopsycho>
+        <eb1d01c2-fbad-36b6-10cf-9e03483a736b@redhat.com>
+        <20200805093338.GC30485@joy-OptiPlex-7040>
+        <20200805105319.GF2177@nanopsycho>
+        <20200810074631.GA29059@joy-OptiPlex-7040>
+        <e6e75807-0614-bd75-aeb6-64d643e029d3@redhat.com>
+        <20200814051601.GD15344@joy-OptiPlex-7040>
+        <a51209fe-a8c6-941f-ff54-7be06d73bc44@redhat.com>
+        <20200818085527.GB20215@redhat.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
- definitions=2020-08-18_06:2020-08-18,2020-08-18 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- spamscore=0 mlxlogscore=999 bulkscore=0 suspectscore=2 priorityscore=1501
- malwarescore=0 impostorscore=0 adultscore=0 clxscore=1015 phishscore=0
- mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2006250000 definitions=main-2008180060
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Aug 14, 2020 at 03:29 PM +0200, Andrew Jones <drjones@redhat.com> w=
-rote:
-> On Fri, Aug 14, 2020 at 03:06:36PM +0200, Marc Hartmayer wrote:
->> On Thu, Aug 13, 2020 at 10:30 AM +0200, Andrew Jones <drjones@redhat.com=
-> wrote:
->> > On Wed, Aug 12, 2020 at 11:27:04AM +0200, Marc Hartmayer wrote:
->> >> This allows us, for example, to auto generate a new test case based on
->> >> an existing test case.
->> >>=20
->> >> Signed-off-by: Marc Hartmayer <mhartmay@linux.ibm.com>
->> >> ---
->> >>  run_tests.sh            |  2 +-
->> >>  scripts/common.bash     | 13 +++++++++++++
->> >>  scripts/mkstandalone.sh |  2 +-
->> >>  3 files changed, 15 insertions(+), 2 deletions(-)
->> >>=20
->> >> diff --git a/run_tests.sh b/run_tests.sh
->> >> index 24aba9cc3a98..23658392c488 100755
->> >> --- a/run_tests.sh
->> >> +++ b/run_tests.sh
->> >> @@ -160,7 +160,7 @@ trap "wait; exit 130" SIGINT
->> >>     # preserve stdout so that process_test_output output can write TA=
-P to it
->> >>     exec 3>&1
->> >>     test "$tap_output" =3D=3D "yes" && exec > /dev/null
->> >> -   for_each_unittest $config run_task
->> >> +   for_each_unittest $config run_task arch_cmd
->> >
->> > Let's just require that arch cmd hook be specified by the "$arch_cmd"
->> > variable. Then we don't need to pass it to for_each_unittest.
->>=20
->> Where is it then specified?
->
-> Just using it that way in the source is enough. We should probably call
-> it $ARCH_CMD to indicate that it's a special variable. Also, we could
-> return it from a $(arch_cmd) function, which is how $(migration_cmd) and
-> $(timeout_cmd) work.
+On Tue, 18 Aug 2020 09:55:27 +0100
+Daniel P. Berrang=C3=A9 <berrange@redhat.com> wrote:
 
-My first approach was different=E2=80=A6
+> On Tue, Aug 18, 2020 at 11:24:30AM +0800, Jason Wang wrote:
+> > Another point, as we discussed in another thread, it's really hard to m=
+ake
+> > sure the above API work for all types of devices and frameworks. So hav=
+ing a
+> > vendor specific API looks much better. =20
+>=20
+> From the POV of userspace mgmt apps doing device compat checking / migrat=
+ion,
+> we certainly do NOT want to use different vendor specific APIs. We want to
+> have an API that can be used / controlled in a standard manner across ven=
+dors.
 
-First we source the (common) functions that could be overridden by
-architecture dependent code, and then source the architecture dependent
-code. But I=E2=80=99m not sure which approach is cleaner - if you prefer yo=
-ur
-proposed solution with the global variables I can change it.
+As we certainly will need to have different things to check for
+different device types and vendor drivers, would it still be fine to
+have differing (say) attributes, as long as they are presented (and can
+be discovered) in a standardized way?
 
-Thanks for the feedback!
+(See e.g. what I came up with for vfio-ccw in a different branch of
+this thread.)
 
-[=E2=80=A6snip]
+E.g.
+version=3D
+<type>.type_specific_value0=3D
+<type>.type_specific_value1=3D
+<vendor_driver>.vendor_driver_specific_value0=3D
 
---=20
-Kind regards / Beste Gr=C3=BC=C3=9Fe
-   Marc Hartmayer
+with a type or vendor driver having some kind of
+get_supported_attributes method?
 
-IBM Deutschland Research & Development GmbH
-Vorsitzender des Aufsichtsrats: Gregor Pillen=20
-Gesch=C3=A4ftsf=C3=BChrung: Dirk Wittkopp
-Sitz der Gesellschaft: B=C3=B6blingen
-Registergericht: Amtsgericht Stuttgart, HRB 243294
