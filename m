@@ -2,112 +2,180 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5DD93247F72
-	for <lists+kvm@lfdr.de>; Tue, 18 Aug 2020 09:28:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 64B252480F9
+	for <lists+kvm@lfdr.de>; Tue, 18 Aug 2020 10:56:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726731AbgHRH2R (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 18 Aug 2020 03:28:17 -0400
-Received: from mga14.intel.com ([192.55.52.115]:53935 "EHLO mga14.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726324AbgHRH2Q (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 18 Aug 2020 03:28:16 -0400
-IronPort-SDR: Pov9nzS9vx2mEpfuRSEg8ZyFR0zjKpEHl2PEmQspg4HqU15I/+eA9z8Bf0uoipN2n9gfoxsMO1
- SD78ggcwdPnQ==
-X-IronPort-AV: E=McAfee;i="6000,8403,9716"; a="154114728"
-X-IronPort-AV: E=Sophos;i="5.76,326,1592895600"; 
-   d="scan'208";a="154114728"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Aug 2020 00:28:15 -0700
-IronPort-SDR: uoxytRL5DoN/WFFOd/KhbsIuNFOqFF3c86pmgiZqpA5gEbqlj7fB4cyqkBGl/W1afXyK4Cft8a
- iR/EjnVIqJIg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.76,326,1592895600"; 
-   d="scan'208";a="326652332"
-Received: from cqiang-mobl.ccr.corp.intel.com (HELO [10.238.2.93]) ([10.238.2.93])
-  by orsmga008.jf.intel.com with ESMTP; 18 Aug 2020 00:28:13 -0700
-Subject: Re: [RFC 2/7] KVM: VMX: Expose IA32_PKRS MSR
-To:     Jim Mattson <jmattson@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Xiaoyao Li <xiaoyao.li@intel.com>,
-        kvm list <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>
-References: <20200807084841.7112-1-chenyi.qiang@intel.com>
- <20200807084841.7112-3-chenyi.qiang@intel.com>
- <CALMp9eQiyRxJ0jkvVi+fWMZcDQbvyCcuTwH1wrYV-u_E004Bhg@mail.gmail.com>
- <34b083be-b9d5-fd85-b42d-af0549e3b002@intel.com>
- <CALMp9eS=dO7=JvvmGp-nt-LBO9evH-bLd2LQMO9wdYJ5V6S0_Q@mail.gmail.com>
-From:   Chenyi Qiang <chenyi.qiang@intel.com>
-Message-ID: <268b0ee4-e56f-981c-c03e-6dca8a4e99da@intel.com>
-Date:   Tue, 18 Aug 2020 15:27:51 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+        id S1726576AbgHRI4S (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 18 Aug 2020 04:56:18 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:58260 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726145AbgHRI4R (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 18 Aug 2020 04:56:17 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1597740975;
+        h=from:from:reply-to:reply-to:subject:subject:date:date:
+         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+         content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=YPZgXjQb52VhFVEetq2acOCAcagkGxS79k5We/M/mtA=;
+        b=TVx9dwSHAb8B/cjYJcHZVgvA2lMeiWHHaxav1M1Vws496YMF9eAXXdHYhfUxmyaLdw1UEz
+        z4t0mHNp5Gow4cciIluThDFRbDuTb6a5rsX/ADUPb3uriQ1lm81s/TGZd8BksH+kLh1dsO
+        vvKOsoHy6DkCwqpKvBTfX44rmp/HoHk=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-446-hyHtzCccOgKC8v6NfJ3lGw-1; Tue, 18 Aug 2020 04:55:48 -0400
+X-MC-Unique: hyHtzCccOgKC8v6NfJ3lGw-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4E5AA81F012;
+        Tue, 18 Aug 2020 08:55:46 +0000 (UTC)
+Received: from redhat.com (unknown [10.36.110.26])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 68EC654596;
+        Tue, 18 Aug 2020 08:55:30 +0000 (UTC)
+Date:   Tue, 18 Aug 2020 09:55:27 +0100
+From:   Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To:     Jason Wang <jasowang@redhat.com>
+Cc:     Yan Zhao <yan.y.zhao@intel.com>, kvm@vger.kernel.org,
+        libvir-list@redhat.com, qemu-devel@nongnu.org,
+        kwankhede@nvidia.com, eauger@redhat.com, xin-ran.wang@intel.com,
+        corbet@lwn.net, openstack-discuss@lists.openstack.org,
+        shaohe.feng@intel.com, kevin.tian@intel.com,
+        Parav Pandit <parav@mellanox.com>, jian-feng.ding@intel.com,
+        dgilbert@redhat.com, zhenyuw@linux.intel.com, hejie.xu@intel.com,
+        bao.yumeng@zte.com.cn,
+        Alex Williamson <alex.williamson@redhat.com>,
+        eskultet@redhat.com, smooney@redhat.com,
+        intel-gvt-dev@lists.freedesktop.org,
+        Cornelia Huck <cohuck@redhat.com>,
+        Jiri Pirko <jiri@mellanox.com>, dinechin@redhat.com,
+        devel@ovirt.org
+Subject: Re: device compatibility interface for live migration with assigned
+ devices
+Message-ID: <20200818085527.GB20215@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20200805021654.GB30485@joy-OptiPlex-7040>
+ <2624b12f-3788-7e2b-2cb7-93534960bcb7@redhat.com>
+ <20200805075647.GB2177@nanopsycho>
+ <eb1d01c2-fbad-36b6-10cf-9e03483a736b@redhat.com>
+ <20200805093338.GC30485@joy-OptiPlex-7040>
+ <20200805105319.GF2177@nanopsycho>
+ <20200810074631.GA29059@joy-OptiPlex-7040>
+ <e6e75807-0614-bd75-aeb6-64d643e029d3@redhat.com>
+ <20200814051601.GD15344@joy-OptiPlex-7040>
+ <a51209fe-a8c6-941f-ff54-7be06d73bc44@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <CALMp9eS=dO7=JvvmGp-nt-LBO9evH-bLd2LQMO9wdYJ5V6S0_Q@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <a51209fe-a8c6-941f-ff54-7be06d73bc44@redhat.com>
+User-Agent: Mutt/1.14.5 (2020-06-23)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-
-On 8/14/2020 1:31 AM, Jim Mattson wrote:
-> On Wed, Aug 12, 2020 at 10:42 PM Chenyi Qiang <chenyi.qiang@intel.com> wrote:
->>
->>
->>
->> On 8/13/2020 5:21 AM, Jim Mattson wrote:
->>> On Fri, Aug 7, 2020 at 1:46 AM Chenyi Qiang <chenyi.qiang@intel.com> wrote:
->>>>
->>>> Protection Keys for Supervisor Pages (PKS) uses IA32_PKRS MSR (PKRS) at
->>>> index 0x6E1 to allow software to manage supervisor protection key
->>>> rights. For performance consideration, PKRS intercept will be disabled
->>>> so that the guest can access the PKRS without VM exits.
->>>> PKS introduces dedicated control fields in VMCS to switch PKRS, which
->>>> only does the retore part. In addition, every VM exit saves PKRS into
->>>> the guest-state area in VMCS, while VM enter won't save the host value
->>>> due to the expectation that the host won't change the MSR often. Update
->>>> the host's value in VMCS manually if the MSR has been changed by the
->>>> kernel since the last time the VMCS was run.
->>>> The function get_current_pkrs() in arch/x86/mm/pkeys.c exports the
->>>> per-cpu variable pkrs_cache to avoid frequent rdmsr of PKRS.
->>>>
->>>> Signed-off-by: Chenyi Qiang <chenyi.qiang@intel.com>
->>>> ---
->>>
->>>> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
->>>> index 11e4df560018..df2c2e733549 100644
->>>> --- a/arch/x86/kvm/vmx/nested.c
->>>> +++ b/arch/x86/kvm/vmx/nested.c
->>>> @@ -289,6 +289,7 @@ static void vmx_sync_vmcs_host_state(struct vcpu_vmx *vmx,
->>>>           dest->ds_sel = src->ds_sel;
->>>>           dest->es_sel = src->es_sel;
->>>>    #endif
->>>> +       dest->pkrs = src->pkrs;
->>>
->>> Why isn't this (and other PKRS code) inside the #ifdef CONFIG_X86_64?
->>> PKRS isn't usable outside of long mode, is it?
->>>
->>
->> Yes, I'm also thinking about whether to put all pks code into
->> CONFIG_X86_64. The kernel implementation also wrap its pks code inside
->> CONFIG_ARCH_HAS_SUPERVISOR_PKEYS which has dependency with CONFIG_X86_64.
->> However, maybe this can help when host kernel disable PKS but the guest
->> enable it. What do you think about this?
+On Tue, Aug 18, 2020 at 11:24:30AM +0800, Jason Wang wrote:
 > 
-> I see no problem in exposing PKRS to the guest even if the host
-> doesn't have CONFIG_ARCH_HAS_SUPERVISOR_PKEYS.
+> On 2020/8/14 下午1:16, Yan Zhao wrote:
+> > On Thu, Aug 13, 2020 at 12:24:50PM +0800, Jason Wang wrote:
+> > > On 2020/8/10 下午3:46, Yan Zhao wrote:
+> > > > > driver is it handled by?
+> > > > It looks that the devlink is for network device specific, and in
+> > > > devlink.h, it says
+> > > > include/uapi/linux/devlink.h - Network physical device Netlink
+> > > > interface,
+> > > 
+> > > Actually not, I think there used to have some discussion last year and the
+> > > conclusion is to remove this comment.
+> > > 
+> > > It supports IB and probably vDPA in the future.
+> > > 
+> > hmm... sorry, I didn't find the referred discussion. only below discussion
+> > regarding to why to add devlink.
+> > 
+> > https://www.mail-archive.com/netdev@vger.kernel.org/msg95801.html
+> > 	>This doesn't seem to be too much related to networking? Why can't something
+> > 	>like this be in sysfs?
+> > 	
+> > 	It is related to networking quite bit. There has been couple of
+> > 	iteration of this, including sysfs and configfs implementations. There
+> > 	has been a consensus reached that this should be done by netlink. I
+> > 	believe netlink is really the best for this purpose. Sysfs is not a good
+> > 	idea
 > 
+> 
+> See the discussion here:
+> 
+> https://patchwork.ozlabs.org/project/netdev/patch/20191115223355.1277139-1-jeffrey.t.kirsher@intel.com/
+> 
+> 
+> > 
+> > https://www.mail-archive.com/netdev@vger.kernel.org/msg96102.html
+> > 	>there is already a way to change eth/ib via
+> > 	>echo 'eth' > /sys/bus/pci/drivers/mlx4_core/0000:02:00.0/mlx4_port1
+> > 	>
+> > 	>sounds like this is another way to achieve the same?
+> > 	
+> > 	It is. However the current way is driver-specific, not correct.
+> > 	For mlx5, we need the same, it cannot be done in this way. Do devlink is
+> > 	the correct way to go.
+> > 
+> > https://lwn.net/Articles/674867/
+> > 	There a is need for some userspace API that would allow to expose things
+> > 	that are not directly related to any device class like net_device of
+> > 	ib_device, but rather chip-wide/switch-ASIC-wide stuff.
+> > 
+> > 	Use cases:
+> > 	1) get/set of port type (Ethernet/InfiniBand)
+> > 	2) monitoring of hardware messages to and from chip
+> > 	3) setting up port splitters - split port into multiple ones and squash again,
+> > 	   enables usage of splitter cable
+> > 	4) setting up shared buffers - shared among multiple ports within one chip
+> > 
+> > 
+> > 
+> > we actually can also retrieve the same information through sysfs, .e.g
+> > 
+> > |- [path to device]
+> >    |--- migration
+> >    |     |--- self
+> >    |     |   |---device_api
+> >    |	|   |---mdev_type
+> >    |	|   |---software_version
+> >    |	|   |---device_id
+> >    |	|   |---aggregator
+> >    |     |--- compatible
+> >    |     |   |---device_api
+> >    |	|   |---mdev_type
+> >    |	|   |---software_version
+> >    |	|   |---device_id
+> >    |	|   |---aggregator
+> > 
+> 
+> Yes but:
+> 
+> - You need one file per attribute (one syscall for one attribute)
+> - Attribute is coupled with kobject
+> 
+> All of above seems unnecessary.
+> 
+> Another point, as we discussed in another thread, it's really hard to make
+> sure the above API work for all types of devices and frameworks. So having a
+> vendor specific API looks much better.
 
-Yes, but I would prefer to keep it outside CONFIG_X86_64. PKS code has 
-several code blocks and putting them under x86_64 may end up being a 
-mess. In addition, PKU KVM related code isn't under CONFIG_X86_64 as 
-well. So, is it really necessary to put inside?
+From the POV of userspace mgmt apps doing device compat checking / migration,
+we certainly do NOT want to use different vendor specific APIs. We want to
+have an API that can be used / controlled in a standard manner across vendors.
+
+
+
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+
