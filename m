@@ -2,121 +2,171 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 37C3A24A85A
-	for <lists+kvm@lfdr.de>; Wed, 19 Aug 2020 23:20:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C704B24A877
+	for <lists+kvm@lfdr.de>; Wed, 19 Aug 2020 23:26:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727093AbgHSVUA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 19 Aug 2020 17:20:00 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:43638 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726689AbgHSVT6 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 19 Aug 2020 17:19:58 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1597871997;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=d8aaFslZMGhZl5AC1zF/8lKFp9QgGd2sl23QtosnVQs=;
-        b=aAO2YJ898gJTDzy7m6xXzq7tZhLOi+z4ki8tHhYLkx455sDzGlCXrjIYYv6IFVXv1bMkmN
-        OybTV9KA/NNbEe5hqC826IXX0a8Q5KtiWBFpNYPqug14vKTVSRC5lIaBVBWA+DUKSiq2lD
-        z6eEkyMeazEZKs7iQzblzy/CUvBjDMw=
-Received: from mail-qv1-f71.google.com (mail-qv1-f71.google.com
- [209.85.219.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-36-G6S4uz8KMA6Hy3mRV26AuQ-1; Wed, 19 Aug 2020 17:19:55 -0400
-X-MC-Unique: G6S4uz8KMA6Hy3mRV26AuQ-1
-Received: by mail-qv1-f71.google.com with SMTP id k17so16500515qvj.12
-        for <kvm@vger.kernel.org>; Wed, 19 Aug 2020 14:19:55 -0700 (PDT)
+        id S1727843AbgHSV0Q (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 19 Aug 2020 17:26:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58500 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727097AbgHSV0M (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 19 Aug 2020 17:26:12 -0400
+Received: from mail-ot1-x343.google.com (mail-ot1-x343.google.com [IPv6:2607:f8b0:4864:20::343])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7F5D6C061383
+        for <kvm@vger.kernel.org>; Wed, 19 Aug 2020 14:26:12 -0700 (PDT)
+Received: by mail-ot1-x343.google.com with SMTP id v6so20235828ota.13
+        for <kvm@vger.kernel.org>; Wed, 19 Aug 2020 14:26:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=nIUorchxEqSUbrKFSXauXIdexeZ+y78f0sS0GWpnDMU=;
+        b=sACXdxPyni7vFFPMXlG14vAyrsQ90Tzwn5qsmxLoYZtf+qU+nGF5JvdDQYNRRoDuZO
+         Kdi+LQIkpqVrO3VICfaF0IHleMBXVxC2ptqvIukbkJcKIyqVl8CslrKIRek2ZK/MD2cG
+         6uR8RacEpULjcicv4UhibrqMJ4v1cIjjGTf+2VZXALVYwnC1VJcO+4wqI4HwFcEzkF6h
+         wePJKUDBmOqtCZqOPSa0rSbJ4WSqzky0hac6zBBcPKiIC/0m4sGrXfHDPu4dxNXe6e39
+         pbMCs17AzP8t8Nc1EYOxFXRKzKuc84XtOSMC+5GlUBnHnAs1AEi0r8EupqomGOjLAjPc
+         Ss0w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=d8aaFslZMGhZl5AC1zF/8lKFp9QgGd2sl23QtosnVQs=;
-        b=D830bdIfrpk/vLGVCPZ3ljBd589rZ1KpKTksKK5TViAFSIAlI9OyEqJp0Tg3kg0dfj
-         KvKnv1Ue/OlUGUyqJ0fsnPT2lGHYcdm2MQeV0CTxw+dMlnbVi2QJZJukLXxyq9cLWOvp
-         FBaijIbcsLsdiQgX/461A5QQDw6W1CSzUfof73tDipb2Qiwe5BB4ok3ho3UTuKpnfzVK
-         2Nr8w/5FcmlGfCYFvfhuUI30qkVNC8zLOA5K9BjpACVhlg5JRiGWEdfe2ZuyAWWFIQxr
-         Di3mVqiHVLArKUn8H5wiu9gOLpO0L2Yv2oOVfF/j9hK0chavGnjTGQieeWq4mHIHPA3j
-         TRKw==
-X-Gm-Message-State: AOAM531FGoYNu0NZtSnvwOvJySZkyT/cMJ7mFE23CSRDkGRtUO+byal2
-        +mj+ilpU7iFaHb4wuO2FYk5cSwEvQnfank3n7jGLRftrylOfzHvsTDb5l7JbUMp0oCkLvQZti7r
-        HAKMsMMB7815L
-X-Received: by 2002:a0c:b52b:: with SMTP id d43mr176167qve.158.1597871995082;
-        Wed, 19 Aug 2020 14:19:55 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwZf9ipn4932x+sExi1EY3BDhNG2nHiznmd/NazsmDhrrID6yRlma/qKP18WfWZY0hWvSKjuw==
-X-Received: by 2002:a0c:b52b:: with SMTP id d43mr176150qve.158.1597871994866;
-        Wed, 19 Aug 2020 14:19:54 -0700 (PDT)
-Received: from redhat.redhat.com (ip68-103-222-6.ks.ok.cox.net. [68.103.222.6])
-        by smtp.gmail.com with ESMTPSA id d198sm25876478qke.129.2020.08.19.14.19.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 19 Aug 2020 14:19:54 -0700 (PDT)
-From:   Connor Kuehl <ckuehl@redhat.com>
-To:     corbet@lwn.net, pbonzini@redhat.com
-Cc:     kvm@vger.kernel.org, linux-doc@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH] docs: kvm: fix referenced ioctl symbol
-Date:   Wed, 19 Aug 2020 16:19:52 -0500
-Message-Id: <20200819211952.251984-1-ckuehl@redhat.com>
-X-Mailer: git-send-email 2.25.4
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=nIUorchxEqSUbrKFSXauXIdexeZ+y78f0sS0GWpnDMU=;
+        b=EYv3W2BcUDiqBV4q0EzJfEsGlk8UN3OMQuRTrHD988vtzsSl4Vkhkbg8H5aLg1DI2j
+         8W379p5KRdBWzYge+wXT1IUuXJZMeZxNE219iaIUdEoTpP8U1tuEnx92sURlkTxy1e0P
+         7OoLMo+lwDP/aOyrSctNuXtn762MgARvBd8qgLBKHU0+orSdMyAEwhi3Tr10qatw6wOU
+         TncishpkghqWDJoHo344QK9APMKqeLQlwUbviUFGGWjycl4qexjfj9e0KCK+aQlkZNai
+         3hThqu3S9TjBzZvT7WKkyyG24JTUj9/LUPIEazjE4iWRPGe339DWMfieqi3DBMrmYMCc
+         VWPw==
+X-Gm-Message-State: AOAM5330PbrjFd8RT8Ezik9Bw9Ecj3NSLFDwoC+ROCMjPFB0/rBC6ZL+
+        V5o1Rm5SnGkm/7ZT9nJ3Nr0xJ4rukSgv/IHhyoVtAQ==
+X-Google-Smtp-Source: ABdhPJzDEhYWtgbxFIoNbIl6nvUXg6m1nwP+Cma508GkraFee4w2YnO9D79RG930cyfq42GIoecoDC3qxMMYBsZFJeo=
+X-Received: by 2002:a9d:ae9:: with SMTP id 96mr19469993otq.241.1597872371444;
+ Wed, 19 Aug 2020 14:26:11 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20200803211423.29398-1-graf@amazon.com>
+In-Reply-To: <20200803211423.29398-1-graf@amazon.com>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Wed, 19 Aug 2020 14:25:59 -0700
+Message-ID: <CALMp9eRHmhmKP21jmBr13n3DvttPg9OQEn5Zn0LxyiKiq2uTkA@mail.gmail.com>
+Subject: Re: [PATCH v4 0/3] Allow user space to restrict and augment MSR emulation
+To:     Alexander Graf <graf@amazon.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        KarimAllah Raslan <karahmed@amazon.de>,
+        Aaron Lewis <aaronlewis@google.com>,
+        kvm list <kvm@vger.kernel.org>, linux-doc@vger.kernel.org,
+        LKML <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The actual symbol that is exported and usable is
-'KVM_MEMORY_ENCRYPT_OP', not 'KVM_MEM_ENCRYPT_OP'
+On Mon, Aug 3, 2020 at 2:14 PM Alexander Graf <graf@amazon.com> wrote:
+>
+> While tying to add support for the MSR_CORE_THREAD_COUNT MSR in KVM,
+> I realized that we were still in a world where user space has no control
+> over what happens with MSR emulation in KVM.
+>
+> That is bad for multiple reasons. In my case, I wanted to emulate the
+> MSR in user space, because it's a CPU specific register that does not
+> exist on older CPUs and that really only contains informational data that
+> is on the package level, so it's a natural fit for user space to provide
+> it.
+>
+> However, it is also bad on a platform compatibility level. Currrently,
+> KVM has no way to expose different MSRs based on the selected target CPU
+> type.
+>
+> This patch set introduces a way for user space to indicate to KVM which
+> MSRs should be handled in kernel space. With that, we can solve part of
+> the platform compatibility story. Or at least we can not handle AMD specific
+> MSRs on an Intel platform and vice versa.
+>
+> In addition, it introduces a way for user space to get into the loop
+> when an MSR access would generate a #GP fault, such as when KVM finds an
+> MSR that is not handled by the in-kernel MSR emulation or when the guest
+> is trying to access reserved registers.
+>
+> In combination with the allow list, the user space trapping allows us
+> to emulate arbitrary MSRs in user space, paving the way for target CPU
+> specific MSR implementations from user space.
 
-$ git grep -l KVM_MEM_ENCRYPT_OP
-Documentation/virt/kvm/amd-memory-encryption.rst
+This is somewhat misleading. If you don't modify the MSR permission
+bitmaps, as Aaron has done, you cannot emulate *arbitrary* MSRs in
+userspace. You can only emulate MSRs that kvm is going to intercept.
+Moreover, since the set of intercepted MSRs evolves over time, this
+isn't a stable API.
 
-$ git grep -l KVM_MEMORY_ENCRYPT_OP
-Documentation/virt/kvm/api.rst
-arch/x86/kvm/x86.c
-include/uapi/linux/kvm.h
-tools/include/uapi/linux/kvm.h
-
-While we're in there, update the KVM API category for
-KVM_MEMORY_ENCRYPT_OP. It is called on a VM file descriptor.
-
-Signed-off-by: Connor Kuehl <ckuehl@redhat.com>
----
- Documentation/virt/kvm/amd-memory-encryption.rst | 6 +++---
- Documentation/virt/kvm/api.rst                   | 2 +-
- 2 files changed, 4 insertions(+), 4 deletions(-)
-
-diff --git a/Documentation/virt/kvm/amd-memory-encryption.rst b/Documentation/virt/kvm/amd-memory-encryption.rst
-index 2d44388438cc..09a8f2a34e39 100644
---- a/Documentation/virt/kvm/amd-memory-encryption.rst
-+++ b/Documentation/virt/kvm/amd-memory-encryption.rst
-@@ -53,11 +53,11 @@ key management interface to perform common hypervisor activities such as
- encrypting bootstrap code, snapshot, migrating and debugging the guest. For more
- information, see the SEV Key Management spec [api-spec]_
- 
--The main ioctl to access SEV is KVM_MEM_ENCRYPT_OP.  If the argument
--to KVM_MEM_ENCRYPT_OP is NULL, the ioctl returns 0 if SEV is enabled
-+The main ioctl to access SEV is KVM_MEMORY_ENCRYPT_OP.  If the argument
-+to KVM_MEMORY_ENCRYPT_OP is NULL, the ioctl returns 0 if SEV is enabled
- and ``ENOTTY` if it is disabled (on some older versions of Linux,
- the ioctl runs normally even with a NULL argument, and therefore will
--likely return ``EFAULT``).  If non-NULL, the argument to KVM_MEM_ENCRYPT_OP
-+likely return ``EFAULT``).  If non-NULL, the argument to KVM_MEMORY_ENCRYPT_OP
- must be a struct kvm_sev_cmd::
- 
-        struct kvm_sev_cmd {
-diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-index eb3a1316f03e..506c8426c583 100644
---- a/Documentation/virt/kvm/api.rst
-+++ b/Documentation/virt/kvm/api.rst
-@@ -4211,7 +4211,7 @@ H_GET_CPU_CHARACTERISTICS hypercall.
- 
- :Capability: basic
- :Architectures: x86
--:Type: system
-+:Type: vm
- :Parameters: an opaque platform specific structure (in/out)
- :Returns: 0 on success; -1 on error
- 
--- 
-2.25.4
-
+> v1 -> v2:
+>
+>   - s/ETRAP_TO_USER_SPACE/ENOENT/g
+>   - deflect all #GP injection events to user space, not just unknown MSRs.
+>     That was we can also deflect allowlist errors later
+>   - fix emulator case
+>   - new patch: KVM: x86: Introduce allow list for MSR emulation
+>   - new patch: KVM: selftests: Add test for user space MSR handling
+>
+> v2 -> v3:
+>
+>   - return r if r == X86EMUL_IO_NEEDED
+>   - s/KVM_EXIT_RDMSR/KVM_EXIT_X86_RDMSR/g
+>   - s/KVM_EXIT_WRMSR/KVM_EXIT_X86_WRMSR/g
+>   - Use complete_userspace_io logic instead of reply field
+>   - Simplify trapping code
+>   - document flags for KVM_X86_ADD_MSR_ALLOWLIST
+>   - generalize exit path, always unlock when returning
+>   - s/KVM_CAP_ADD_MSR_ALLOWLIST/KVM_CAP_X86_MSR_ALLOWLIST/g
+>   - Add KVM_X86_CLEAR_MSR_ALLOWLIST
+>   - Add test to clear whitelist
+>   - Adjust to reply-less API
+>   - Fix asserts
+>   - Actually trap on MSR_IA32_POWER_CTL writes
+>
+> v3 -> v4:
+>
+>   - Mention exit reasons in re-enter mandatory section of API documentation
+>   - Clear padding bytes
+>   - Generalize get/set deflect functions
+>   - Remove redundant pending_user_msr field
+>   - lock allow check and clearing
+>   - free bitmaps on clear
+>
+> Alexander Graf (3):
+>   KVM: x86: Deflect unknown MSR accesses to user space
+>   KVM: x86: Introduce allow list for MSR emulation
+>   KVM: selftests: Add test for user space MSR handling
+>
+>  Documentation/virt/kvm/api.rst                | 157 ++++++++++-
+>  arch/x86/include/asm/kvm_host.h               |  13 +
+>  arch/x86/include/uapi/asm/kvm.h               |  15 +
+>  arch/x86/kvm/emulate.c                        |  18 +-
+>  arch/x86/kvm/x86.c                            | 259 +++++++++++++++++-
+>  include/trace/events/kvm.h                    |   2 +-
+>  include/uapi/linux/kvm.h                      |  15 +
+>  tools/testing/selftests/kvm/Makefile          |   1 +
+>  .../selftests/kvm/x86_64/user_msr_test.c      | 221 +++++++++++++++
+>  9 files changed, 692 insertions(+), 9 deletions(-)
+>  create mode 100644 tools/testing/selftests/kvm/x86_64/user_msr_test.c
+>
+> --
+> 2.17.1
+>
+>
+>
+>
+> Amazon Development Center Germany GmbH
+> Krausenstr. 38
+> 10117 Berlin
+> Geschaeftsfuehrung: Christian Schlaeger, Jonathan Weiss
+> Eingetragen am Amtsgericht Charlottenburg unter HRB 149173 B
+> Sitz: Berlin
+> Ust-ID: DE 289 237 879
+>
+>
+>
