@@ -2,39 +2,39 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B4CE6249A84
-	for <lists+kvm@lfdr.de>; Wed, 19 Aug 2020 12:38:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3AC44249A8C
+	for <lists+kvm@lfdr.de>; Wed, 19 Aug 2020 12:39:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726466AbgHSKik (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 19 Aug 2020 06:38:40 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:25651 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726970AbgHSKij (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 19 Aug 2020 06:38:39 -0400
+        id S1727915AbgHSKjp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 19 Aug 2020 06:39:45 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:57977 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727901AbgHSKjg (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 19 Aug 2020 06:39:36 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1597833517;
+        s=mimecast20190719; t=1597833574;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-        bh=vTm4LIu/uDcl4VM/DtyOEI/Isl41SLMaSK6netra+4k=;
-        b=EQsSZjFNWcTX0qhaM95McEvESTF29ql8hrdxi56KMjtH3q+8wj5i8GIXM4vc+4MPNdd5bm
-        hBmBetAPsNIzfPRsYGXewFNCB8iuJhxoKala+ynBbLLyPeBPLZ8N3CD0a4qJQBoVxioLPu
-        3W1JUL+1KvcFtRciqNv2Htm6b4XMT4E=
+        bh=/z/BW5gb9KyQ8VVul1eAAbi1Z26u5gCTAYYCmNOc5mA=;
+        b=a0U4Di6BWbAawDUdnM104H47zHWx/YvZ8Y14seRV7pc1BvEVhDUJlONz5fBOmeUd6P6j+e
+        6exaf7zwUpW+Krmpu4J9Q8xdAUFijYZAH8WdDJUhHQhWFR1FIjZE5vQBUVVORIJ0ui0Ggk
+        Q6fy6MUcqC6kn6Ol1yNVWvmyXrseEMc=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-343-vKWlhbcTMFqiH5zvtUzZyQ-1; Wed, 19 Aug 2020 06:38:35 -0400
-X-MC-Unique: vKWlhbcTMFqiH5zvtUzZyQ-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+ us-mta-267-P72P3bpNOsyMCFhl7v5iTw-1; Wed, 19 Aug 2020 06:39:30 -0400
+X-MC-Unique: P72P3bpNOsyMCFhl7v5iTw-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A0A07186A569;
-        Wed, 19 Aug 2020 10:38:34 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B621A1008549;
+        Wed, 19 Aug 2020 10:39:29 +0000 (UTC)
 Received: from [10.36.114.11] (ovpn-114-11.ams2.redhat.com [10.36.114.11])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 9A53A27CB7;
-        Wed, 19 Aug 2020 10:38:32 +0000 (UTC)
-Subject: Re: [kvm-unit-tests PATCH 2/4] scripts: add support for architecture
- dependent functions
+        by smtp.corp.redhat.com (Postfix) with ESMTP id DD6505DA30;
+        Wed, 19 Aug 2020 10:39:27 +0000 (UTC)
+Subject: Re: [kvm-unit-tests PATCH 3/4] run_tests/mkstandalone: add arch_cmd
+ hook
 To:     Marc Hartmayer <mhartmay@linux.ibm.com>, kvm@vger.kernel.org
 Cc:     Thomas Huth <thuth@redhat.com>,
         Janosch Frank <frankja@linux.ibm.com>,
@@ -44,7 +44,7 @@ Cc:     Thomas Huth <thuth@redhat.com>,
         Christian Borntraeger <borntraeger@de.ibm.com>,
         linux-s390@vger.kernel.org
 References: <20200818130424.20522-1-mhartmay@linux.ibm.com>
- <20200818130424.20522-3-mhartmay@linux.ibm.com>
+ <20200818130424.20522-4-mhartmay@linux.ibm.com>
 From:   David Hildenbrand <david@redhat.com>
 Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  mQINBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
@@ -91,65 +91,64 @@ Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  jPrnvUsUUsjRoRNJjKKA/REq+sAnhkNPPZ/NNMjaZ5b8Tovi8C0tmxiCHaQYqj7G2rgnT0kt
  WNyWQQ==
 Organization: Red Hat GmbH
-Message-ID: <b1c9e414-4972-4572-a6db-fcc9d63c1b1c@redhat.com>
-Date:   Wed, 19 Aug 2020 12:38:31 +0200
+Message-ID: <61b2aa71-6b2d-acbf-204d-e3d9909fe30b@redhat.com>
+Date:   Wed, 19 Aug 2020 12:39:27 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <20200818130424.20522-3-mhartmay@linux.ibm.com>
+In-Reply-To: <20200818130424.20522-4-mhartmay@linux.ibm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On 18.08.20 15:04, Marc Hartmayer wrote:
-> This is necessary to keep architecture dependent code separate from
-> common code.
+> This allows us, for example, to auto generate a new test case based on
+> an existing test case.
+
+An example would have been nice :)
+
 > 
 > Signed-off-by: Marc Hartmayer <mhartmay@linux.ibm.com>
 > ---
->  README.md           | 3 ++-
->  scripts/common.bash | 8 ++++++++
->  2 files changed, 10 insertions(+), 1 deletion(-)
+>  scripts/common.bash | 9 +++++++--
+>  1 file changed, 7 insertions(+), 2 deletions(-)
 > 
-> diff --git a/README.md b/README.md
-> index 48be206c6db1..24d4bdaaee0d 100644
-> --- a/README.md
-> +++ b/README.md
-> @@ -134,7 +134,8 @@ all unit tests.
->  ## Directory structure
->  
->      .:                  configure script, top-level Makefile, and run_tests.sh
-> -    ./scripts:          helper scripts for building and running tests
-> +    ./scripts:          general architecture neutral helper scripts for building and running tests
-> +    ./scripts/<ARCH>:   architecture dependent helper scripts for building and running tests
->      ./lib:              general architecture neutral services for the tests
->      ./lib/<ARCH>:       architecture dependent services for the tests
->      ./<ARCH>:           the sources of the tests and the created objects/images
 > diff --git a/scripts/common.bash b/scripts/common.bash
-> index 96655c9ffd1f..c7acdf14a835 100644
+> index c7acdf14a835..a6044b7c6c35 100644
 > --- a/scripts/common.bash
 > +++ b/scripts/common.bash
-> @@ -1,3 +1,4 @@
-> +source config.mak
->  
->  function for_each_unittest()
->  {
-> @@ -52,3 +53,10 @@ function for_each_unittest()
+> @@ -19,7 +19,7 @@ function for_each_unittest()
+>  	while read -r -u $fd line; do
+>  		if [[ "$line" =~ ^\[(.*)\]$ ]]; then
+>  			if [ -n "${testname}" ]; then
+> -				"$cmd" "$testname" "$groups" "$smp" "$kernel" "$opts" "$arch" "$check" "$accel" "$timeout"
+> +				$(arch_cmd) "$cmd" "$testname" "$groups" "$smp" "$kernel" "$opts" "$arch" "$check" "$accel" "$timeout"
+>  			fi
+>  			testname=${BASH_REMATCH[1]}
+>  			smp=1
+> @@ -49,11 +49,16 @@ function for_each_unittest()
+>  		fi
+>  	done
+>  	if [ -n "${testname}" ]; then
+> -		"$cmd" "$testname" "$groups" "$smp" "$kernel" "$opts" "$arch" "$check" "$accel" "$timeout"
+> +		$(arch_cmd) "$cmd" "$testname" "$groups" "$smp" "$kernel" "$opts" "$arch" "$check" "$accel" "$timeout"
 >  	fi
 >  	exec {fd}<&-
 >  }
+>  
+> +function arch_cmd()
+> +{
+> +	[ "${ARCH_CMD}" ] && echo "${ARCH_CMD}"
+> +}
 > +
-> +# The current file has to be the only file sourcing the arch helper
-> +# file
-> +ARCH_FUNC=scripts/${ARCH}/func.bash
-> +if [ -f "${ARCH_FUNC}" ]; then
-> +	source "${ARCH_FUNC}"
-> +fi
+>  # The current file has to be the only file sourcing the arch helper
+>  # file
+>  ARCH_FUNC=scripts/${ARCH}/func.bash
 > 
 
 Reviewed-by: David Hildenbrand <david@redhat.com>
