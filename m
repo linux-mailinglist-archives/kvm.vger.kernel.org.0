@@ -2,159 +2,145 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3AC44249A8C
-	for <lists+kvm@lfdr.de>; Wed, 19 Aug 2020 12:39:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C183C249A8B
+	for <lists+kvm@lfdr.de>; Wed, 19 Aug 2020 12:39:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727915AbgHSKjp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 19 Aug 2020 06:39:45 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:57977 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727901AbgHSKjg (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 19 Aug 2020 06:39:36 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1597833574;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-        bh=/z/BW5gb9KyQ8VVul1eAAbi1Z26u5gCTAYYCmNOc5mA=;
-        b=a0U4Di6BWbAawDUdnM104H47zHWx/YvZ8Y14seRV7pc1BvEVhDUJlONz5fBOmeUd6P6j+e
-        6exaf7zwUpW+Krmpu4J9Q8xdAUFijYZAH8WdDJUhHQhWFR1FIjZE5vQBUVVORIJ0ui0Ggk
-        Q6fy6MUcqC6kn6Ol1yNVWvmyXrseEMc=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-267-P72P3bpNOsyMCFhl7v5iTw-1; Wed, 19 Aug 2020 06:39:30 -0400
-X-MC-Unique: P72P3bpNOsyMCFhl7v5iTw-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        id S1727905AbgHSKjl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 19 Aug 2020 06:39:41 -0400
+Received: from mail.kernel.org ([198.145.29.99]:53662 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726970AbgHSKj3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 19 Aug 2020 06:39:29 -0400
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B621A1008549;
-        Wed, 19 Aug 2020 10:39:29 +0000 (UTC)
-Received: from [10.36.114.11] (ovpn-114-11.ams2.redhat.com [10.36.114.11])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id DD6505DA30;
-        Wed, 19 Aug 2020 10:39:27 +0000 (UTC)
-Subject: Re: [kvm-unit-tests PATCH 3/4] run_tests/mkstandalone: add arch_cmd
- hook
-To:     Marc Hartmayer <mhartmay@linux.ibm.com>, kvm@vger.kernel.org
-Cc:     Thomas Huth <thuth@redhat.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Andrew Jones <drjones@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        linux-s390@vger.kernel.org
-References: <20200818130424.20522-1-mhartmay@linux.ibm.com>
- <20200818130424.20522-4-mhartmay@linux.ibm.com>
-From:   David Hildenbrand <david@redhat.com>
-Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
- 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
- WNyWQQ==
-Organization: Red Hat GmbH
-Message-ID: <61b2aa71-6b2d-acbf-204d-e3d9909fe30b@redhat.com>
-Date:   Wed, 19 Aug 2020 12:39:27 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        by mail.kernel.org (Postfix) with ESMTPSA id C2E0A207BB;
+        Wed, 19 Aug 2020 10:39:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1597833568;
+        bh=JgOkHxljjlEWKjxvXyX8OX88anY1gmQPeYvF0aYkVZY=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=ldlYV90L+TJeBv/oCYia0+kUrpDf9tyew8a2EUELuBeF80woiLZndfWQCVUdUyBSS
+         N1DTigmOO7l9XxQ2dRmzjPyA+Q05Ra75uXQj9/9WSC4th8n3Yvvh4+tJly3SuzHWWR
+         184F36ZpNWf0FzJZwWu5hoSC7VhKdhhGlXTYICOg=
+Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
+        by disco-boy.misterjones.org with esmtpsa (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+        (Exim 4.92)
+        (envelope-from <maz@kernel.org>)
+        id 1k8LV9-004Aa2-By; Wed, 19 Aug 2020 11:39:27 +0100
 MIME-Version: 1.0
-In-Reply-To: <20200818130424.20522-4-mhartmay@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Date:   Wed, 19 Aug 2020 11:39:27 +0100
+From:   Marc Zyngier <maz@kernel.org>
+To:     Jianyong Wu <Jianyong.Wu@arm.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Peng Hao <richard.peng@oppo.com>, kernel-team@android.com,
+        kvm@vger.kernel.org, Will Deacon <will@kernel.org>,
+        Catalin Marinas <Catalin.Marinas@arm.com>,
+        Alexander Graf <graf@amazon.com>, kvmarm@lists.cs.columbia.edu,
+        linux-arm-kernel@lists.infradead.org
+Subject: Re: [PATCH 47/56] KVM: arm64: timers: Move timer registers to the
+ sys_regs file
+In-Reply-To: <HE1PR0802MB25552F2502B47554C6B53CADF45D0@HE1PR0802MB2555.eurprd08.prod.outlook.com>
+References: <20200805175700.62775-1-maz@kernel.org>
+ <20200805175700.62775-48-maz@kernel.org>
+ <HE1PR0802MB2555B630F149E07AF11846DEF45D0@HE1PR0802MB2555.eurprd08.prod.outlook.com>
+ <551eac52dcd3b19ae6db45dd6f6e168b@kernel.org>
+ <HE1PR0802MB25552F2502B47554C6B53CADF45D0@HE1PR0802MB2555.eurprd08.prod.outlook.com>
+User-Agent: Roundcube Webmail/1.4.7
+Message-ID: <5dd5ccf145b366e562782f117f25d880@kernel.org>
+X-Sender: maz@kernel.org
+X-SA-Exim-Connect-IP: 51.254.78.96
+X-SA-Exim-Rcpt-To: Jianyong.Wu@arm.com, pbonzini@redhat.com, richard.peng@oppo.com, kernel-team@android.com, kvm@vger.kernel.org, will@kernel.org, Catalin.Marinas@arm.com, graf@amazon.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 18.08.20 15:04, Marc Hartmayer wrote:
-> This allows us, for example, to auto generate a new test case based on
-> an existing test case.
-
-An example would have been nice :)
-
+On 2020-08-19 11:18, Jianyong Wu wrote:
+>> -----Original Message-----
+>> From: Marc Zyngier <maz@kernel.org>
+>> Sent: Wednesday, August 19, 2020 6:00 PM
+>> To: Jianyong Wu <Jianyong.Wu@arm.com>
+>> Cc: Paolo Bonzini <pbonzini@redhat.com>; Peng Hao
+>> <richard.peng@oppo.com>; kernel-team@android.com;
+>> kvm@vger.kernel.org; Will Deacon <will@kernel.org>; Catalin Marinas
+>> <Catalin.Marinas@arm.com>; Alexander Graf <graf@amazon.com>;
+>> kvmarm@lists.cs.columbia.edu; linux-arm-kernel@lists.infradead.org
+>> Subject: Re: [PATCH 47/56] KVM: arm64: timers: Move timer registers to 
+>> the
+>> sys_regs file
+>> 
+>> On 2020-08-19 10:24, Jianyong Wu wrote:
+>> > Hi Marc,
+>> >
+>> > -----Original Message-----
+>> > From: kvmarm-bounces@lists.cs.columbia.edu
+>> > <kvmarm-bounces@lists.cs.columbia.edu> On Behalf Of Marc Zyngier
+>> > Sent: Thursday, August 6, 2020 1:57 AM
+>> > To: Paolo Bonzini <pbonzini@redhat.com>
+>> > Cc: Peng Hao <richard.peng@oppo.com>; kernel-team@android.com;
+>> > kvm@vger.kernel.org; Will Deacon <will@kernel.org>; Catalin Marinas
+>> > <Catalin.Marinas@arm.com>; Alexander Graf <graf@amazon.com>;
+>> > kvmarm@lists.cs.columbia.edu; linux-arm-kernel@lists.infradead.org
+>> > Subject: [PATCH 47/56] KVM: arm64: timers: Move timer registers to the
+>> > sys_regs file
+>> >
+>> > Move the timer gsisters to the sysreg file. This will further help
+>> > when they are directly changed by a nesting hypervisor in the VNCR
+>> > page.
+>> >
+>> > This requires moving the initialisation of the timer struct so that
+>> > some of the helpers (such as arch_timer_ctx_index) can work correctly
+>> > at an early stage.
+>> >
+>> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+>> > ---
+>> >  arch/arm64/include/asm/kvm_host.h |   6 ++
+>> >  arch/arm64/kvm/arch_timer.c       | 155 +++++++++++++++++++++++-------
+>> >  arch/arm64/kvm/trace_arm.h        |   8 +-
+>> >  include/kvm/arm_arch_timer.h      |  11 +--
+>> >  4 files changed, 136 insertions(+), 44 deletions(-)
+>> >
+>> > +static u64 timer_get_offset(struct arch_timer_context *ctxt) {
+>> > +	struct kvm_vcpu *vcpu = ctxt->vcpu;
+>> > +
+>> > +	switch(arch_timer_ctx_index(ctxt)) {
+>> > +	case TIMER_VTIMER:
+>> > +		return __vcpu_sys_reg(vcpu, CNTVOFF_EL2);
+>> > +	default:
+>> > +		return 0;
+>> > +	}
+>> > +}
+>> > +
+>> > Can I export this helper? As in my ptp_kvm implementation I need get
+>> > VCNT offset value separately not just give me a result of VCNT.
+>> 
+>> Sorry, you need to give me a bit more context. What do you need the 
+>> offset
+>> for exactly?
 > 
-> Signed-off-by: Marc Hartmayer <mhartmay@linux.ibm.com>
-> ---
->  scripts/common.bash | 9 +++++++--
->  1 file changed, 7 insertions(+), 2 deletions(-)
-> 
-> diff --git a/scripts/common.bash b/scripts/common.bash
-> index c7acdf14a835..a6044b7c6c35 100644
-> --- a/scripts/common.bash
-> +++ b/scripts/common.bash
-> @@ -19,7 +19,7 @@ function for_each_unittest()
->  	while read -r -u $fd line; do
->  		if [[ "$line" =~ ^\[(.*)\]$ ]]; then
->  			if [ -n "${testname}" ]; then
-> -				"$cmd" "$testname" "$groups" "$smp" "$kernel" "$opts" "$arch" "$check" "$accel" "$timeout"
-> +				$(arch_cmd) "$cmd" "$testname" "$groups" "$smp" "$kernel" "$opts" "$arch" "$check" "$accel" "$timeout"
->  			fi
->  			testname=${BASH_REMATCH[1]}
->  			smp=1
-> @@ -49,11 +49,16 @@ function for_each_unittest()
->  		fi
->  	done
->  	if [ -n "${testname}" ]; then
-> -		"$cmd" "$testname" "$groups" "$smp" "$kernel" "$opts" "$arch" "$check" "$accel" "$timeout"
-> +		$(arch_cmd) "$cmd" "$testname" "$groups" "$smp" "$kernel" "$opts" "$arch" "$check" "$accel" "$timeout"
->  	fi
->  	exec {fd}<&-
->  }
->  
-> +function arch_cmd()
-> +{
-> +	[ "${ARCH_CMD}" ] && echo "${ARCH_CMD}"
-> +}
-> +
->  # The current file has to be the only file sourcing the arch helper
->  # file
->  ARCH_FUNC=scripts/${ARCH}/func.bash
-> 
+> Yeah,
+> In my ptp_kvm implementation, I need acquire wall time and counter
+> cycle in the same time in host. After get host counter cycle, I need
+> subtract it by VCNT offset to obtain VCNT. See
+> https://lkml.org/lkml/2020/6/19/441
+> https://lkml.org/lkml/2020/6/19/441
+> But now I can't get the VCNT offset easily like before using "
+> vcpu_vtimer(vcpu)->cntvoff" and I can't use the helper like
+> "kvm_arm_timer_read" as I need acquire the counter cycle in the same
+> time with the host wall time.
 
-Reviewed-by: David Hildenbrand <david@redhat.com>
+I must be missing something. CNTVOFF_EL2 is now implemented as
+a standard system register, and has the same visibility as any
+other vcpu sysreg.
 
+Why doesn't vcpu_read_sys_reg(vcpu, CNTVOFF_EL2) work for you?
+
+         M.
 -- 
-Thanks,
-
-David / dhildenb
-
+Jazz is not dead. It just smells funny...
