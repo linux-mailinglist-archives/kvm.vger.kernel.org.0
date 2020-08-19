@@ -2,75 +2,126 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 75FEB24A8E3
-	for <lists+kvm@lfdr.de>; Thu, 20 Aug 2020 00:09:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 224B624A940
+	for <lists+kvm@lfdr.de>; Thu, 20 Aug 2020 00:23:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727049AbgHSWJR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 19 Aug 2020 18:09:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37000 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726209AbgHSWJQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 19 Aug 2020 18:09:16 -0400
-Received: from mail-ot1-x342.google.com (mail-ot1-x342.google.com [IPv6:2607:f8b0:4864:20::342])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DA569C061757
-        for <kvm@vger.kernel.org>; Wed, 19 Aug 2020 15:09:16 -0700 (PDT)
-Received: by mail-ot1-x342.google.com with SMTP id q9so20340024oth.5
-        for <kvm@vger.kernel.org>; Wed, 19 Aug 2020 15:09:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=P2aZms47v6extSBzv//sF/AtrAyAelQrYrDctYBpr04=;
-        b=KEYsVedFdZOQOSKvm37iFMygyWYKzyeKVhW7GTGsl2VQmKBUg/hkZq15rfVRQfC5eu
-         dUtnTcGVi3clYiP8Mj5/69CXlvkgXFTYDkUlcWkoQ9qBcKDdXnK7v5CcO25kpXzKE5xS
-         UoFKnLSkqfQ+sQDk6RybtzVcijHxCY5agHtf1D0MUFmQi8DMQy/bw26109HhW7KpI7KN
-         F0tQYmHfj9dQhoyiwlrrYHPfIlB78enPqA7h59oq5DS6DdzqdUwcmXqOjNqtzotEtrrQ
-         vgk5zbQjOqe3nwzXchl3hOB6/KvfHZuUlrSKoIgZyzXCwG73zgJnYCtd14yyyX7tvkYG
-         /gXw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=P2aZms47v6extSBzv//sF/AtrAyAelQrYrDctYBpr04=;
-        b=X6HzMTtq8sDAOUFlUXMGOdYi7m2yp5VB1R9lHV5FzXhPzeEaGkdUTPLY7Mk2ME+uxI
-         bx4kmqhyAV7kRmdT1Vry2KEu3N7YNp4LjUsZYF28OkceUBMKhaTCjM0g36ACkkDkL4iK
-         jxkMtNS7w3/U5zAvupQhfScjEo9h/bIRk3MKLGqE7pmWIt+CsRqN2Efy7xXY09FLun1J
-         5Qe0wXtkbNEbfH84hm0rzJyDz0OI9OkiBKUaN0TSXl3j/wjRk/LGDC7x2frc+k6tphOh
-         ZCCPuogX2RXaR35K18OUBTsw3l921PP+lXbf2zMWi/XgPuWJyn6tlwq8Kxd0O7RArt1E
-         ZcLA==
-X-Gm-Message-State: AOAM532VOIRHnPr3rE0Xp7K381i9eD9ZYm4vZWLDeQtb19FVNlxI62QQ
-        rRG2JB5tuC8o2YG1aRpuzuynYw44C+e5hoP46uOXng==
-X-Google-Smtp-Source: ABdhPJzt1m4Jk/Vfsw/369PYrT54BgnJK9X0NCnwn7bI4EEVd9vbywxvaU0LIHS+rgWiI+SfMc+IIrkD07Q745+LHBc=
-X-Received: by 2002:a9d:ae9:: with SMTP id 96mr18674otq.241.1597874955900;
- Wed, 19 Aug 2020 15:09:15 -0700 (PDT)
+        id S1727902AbgHSWXB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 19 Aug 2020 18:23:01 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:36689 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1727879AbgHSWVI (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 19 Aug 2020 18:21:08 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1597875667;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=zV4eGv1HmKEw4dEdYXRQk1b4dOpAiZN4WqAP4p4F6ZQ=;
+        b=VpZvoGgb6vGgOFSoPIGh9slZmVOSWEZgV8PmmmwOsxCARvekSTsLM1xWIxY4x//Pguwdiy
+        bpQyMRH9xzvy+4zxhx/lG7Dxd1Xb0a2+0eLwgFy4mg8GGX3zQOOTf8eDwCMKZ29++/57Eh
+        1HTyaGm2yBHgjiGfWGs24FriO1groT8=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-558-ol9Li3MSNCuugzCmQy-YSw-1; Wed, 19 Aug 2020 18:21:02 -0400
+X-MC-Unique: ol9Li3MSNCuugzCmQy-YSw-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E74B2425CC;
+        Wed, 19 Aug 2020 22:21:00 +0000 (UTC)
+Received: from horse.redhat.com (ovpn-115-197.rdu2.redhat.com [10.10.115.197])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 5F50C5C896;
+        Wed, 19 Aug 2020 22:20:54 +0000 (UTC)
+Received: by horse.redhat.com (Postfix, from userid 10451)
+        id D2A592255A0; Wed, 19 Aug 2020 18:20:53 -0400 (EDT)
+From:   Vivek Goyal <vgoyal@redhat.com>
+To:     linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-nvdimm@lists.01.org, virtio-fs@redhat.com
+Cc:     vgoyal@redhat.com, miklos@szeredi.hu, stefanha@redhat.com,
+        dgilbert@redhat.com, dan.j.williams@intel.com,
+        Sebastien Boeuf <sebastien.boeuf@intel.com>,
+        "Michael S . Tsirkin" <mst@redhat.com>, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org
+Subject: [PATCH v3 03/18] virtio: Add get_shm_region method
+Date:   Wed, 19 Aug 2020 18:19:41 -0400
+Message-Id: <20200819221956.845195-4-vgoyal@redhat.com>
+In-Reply-To: <20200819221956.845195-1-vgoyal@redhat.com>
+References: <20200819221956.845195-1-vgoyal@redhat.com>
 MIME-Version: 1.0
-References: <20200803211423.29398-1-graf@amazon.com> <CALMp9eRHmhmKP21jmBr13n3DvttPg9OQEn5Zn0LxyiKiq2uTkA@mail.gmail.com>
- <B0FD5408-E2C1-444C-AFCE-7C622EA75F66@amazon.de>
-In-Reply-To: <B0FD5408-E2C1-444C-AFCE-7C622EA75F66@amazon.de>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Wed, 19 Aug 2020 15:09:04 -0700
-Message-ID: <CALMp9eS5+mV2SC-v4gusocrWtXpm-QzGoOTDGhFS9NEmuVNTDw@mail.gmail.com>
-Subject: Re: [PATCH v4 0/3] Allow user space to restrict and augment MSR emulation
-To:     "Graf (AWS), Alexander" <graf@amazon.de>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        "Raslan, KarimAllah" <karahmed@amazon.de>,
-        Aaron Lewis <aaronlewis@google.com>,
-        kvm list <kvm@vger.kernel.org>,
-        "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Aug 19, 2020 at 2:46 PM Graf (AWS), Alexander <graf@amazon.de> wrote:
+From: Sebastien Boeuf <sebastien.boeuf@intel.com>
 
-> Special MSRs like EFER also irritate me a bit. We can't really trap on them - most code paths just know they're handled in kernel. Maybe I'll add some sanity checks as well...
+Virtio defines 'shared memory regions' that provide a continuously
+shared region between the host and guest.
 
-Why can't we intercept EFER?
+Provide a method to find a particular region on a device.
+
+Signed-off-by: Sebastien Boeuf <sebastien.boeuf@intel.com>
+Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Acked-by: Michael S. Tsirkin <mst@redhat.com>
+Cc: kvm@vger.kernel.org
+Cc: virtualization@lists.linux-foundation.org
+Cc: "Michael S. Tsirkin" <mst@redhat.com>
+---
+ include/linux/virtio_config.h | 17 +++++++++++++++++
+ 1 file changed, 17 insertions(+)
+
+diff --git a/include/linux/virtio_config.h b/include/linux/virtio_config.h
+index 8fe857e27ef3..4b8e38c5c4d8 100644
+--- a/include/linux/virtio_config.h
++++ b/include/linux/virtio_config.h
+@@ -11,6 +11,11 @@
+ 
+ struct irq_affinity;
+ 
++struct virtio_shm_region {
++	u64 addr;
++	u64 len;
++};
++
+ /**
+  * virtio_config_ops - operations for configuring a virtio device
+  * Note: Do not assume that a transport implements all of the operations
+@@ -66,6 +71,7 @@ struct irq_affinity;
+  *      the caller can then copy.
+  * @set_vq_affinity: set the affinity for a virtqueue (optional).
+  * @get_vq_affinity: get the affinity for a virtqueue (optional).
++ * @get_shm_region: get a shared memory region based on the index.
+  */
+ typedef void vq_callback_t(struct virtqueue *);
+ struct virtio_config_ops {
+@@ -89,6 +95,8 @@ struct virtio_config_ops {
+ 			       const struct cpumask *cpu_mask);
+ 	const struct cpumask *(*get_vq_affinity)(struct virtio_device *vdev,
+ 			int index);
++	bool (*get_shm_region)(struct virtio_device *vdev,
++			       struct virtio_shm_region *region, u8 id);
+ };
+ 
+ /* If driver didn't advertise the feature, it will never appear. */
+@@ -251,6 +259,15 @@ int virtqueue_set_affinity(struct virtqueue *vq, const struct cpumask *cpu_mask)
+ 	return 0;
+ }
+ 
++static inline
++bool virtio_get_shm_region(struct virtio_device *vdev,
++			   struct virtio_shm_region *region, u8 id)
++{
++	if (!vdev->config->get_shm_region)
++		return false;
++	return vdev->config->get_shm_region(vdev, region, id);
++}
++
+ static inline bool virtio_is_little_endian(struct virtio_device *vdev)
+ {
+ 	return virtio_has_feature(vdev, VIRTIO_F_VERSION_1) ||
+-- 
+2.25.4
+
