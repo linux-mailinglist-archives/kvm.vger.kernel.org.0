@@ -2,279 +2,88 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6561F249845
-	for <lists+kvm@lfdr.de>; Wed, 19 Aug 2020 10:31:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E20DC24985F
+	for <lists+kvm@lfdr.de>; Wed, 19 Aug 2020 10:42:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726617AbgHSIby (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 19 Aug 2020 04:31:54 -0400
-Received: from mga05.intel.com ([192.55.52.43]:29695 "EHLO mga05.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725804AbgHSIbw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 19 Aug 2020 04:31:52 -0400
-IronPort-SDR: rwxx89IJkhwdMT9hBD1x7R/f2MczJRXzhmmcNol8goMHuD+10vIwleryLFsiBBQQmCH5gyJKN/
- VCeasmvseHgA==
-X-IronPort-AV: E=McAfee;i="6000,8403,9717"; a="239901285"
-X-IronPort-AV: E=Sophos;i="5.76,330,1592895600"; 
-   d="scan'208";a="239901285"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Aug 2020 01:31:52 -0700
-IronPort-SDR: P8GhNJa0pybFsVFQeXBZ6VfyAfT5bR3D7EMcPE0izClM8QfXnJdSbMVU00yMqLcYFboM63w4EJ
- v51ElA0fF7ww==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.76,330,1592895600"; 
-   d="scan'208";a="327017546"
-Received: from joy-optiplex-7040.sh.intel.com (HELO joy-OptiPlex-7040) ([10.239.13.16])
-  by orsmga008.jf.intel.com with ESMTP; 19 Aug 2020 01:31:45 -0700
-Date:   Wed, 19 Aug 2020 16:13:39 +0800
-From:   Yan Zhao <yan.y.zhao@intel.com>
-To:     Jason Wang <jasowang@redhat.com>
-Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "libvir-list@redhat.com" <libvir-list@redhat.com>,
-        "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
-        Kirti Wankhede <kwankhede@nvidia.com>,
-        "eauger@redhat.com" <eauger@redhat.com>,
-        "xin-ran.wang@intel.com" <xin-ran.wang@intel.com>,
-        "corbet@lwn.net" <corbet@lwn.net>,
-        "openstack-discuss@lists.openstack.org" 
-        <openstack-discuss@lists.openstack.org>,
-        "shaohe.feng@intel.com" <shaohe.feng@intel.com>,
-        "kevin.tian@intel.com" <kevin.tian@intel.com>,
-        Parav Pandit <parav@mellanox.com>,
-        "jian-feng.ding@intel.com" <jian-feng.ding@intel.com>,
-        "dgilbert@redhat.com" <dgilbert@redhat.com>,
-        "zhenyuw@linux.intel.com" <zhenyuw@linux.intel.com>,
-        "hejie.xu@intel.com" <hejie.xu@intel.com>,
-        "bao.yumeng@zte.com.cn" <bao.yumeng@zte.com.cn>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        "eskultet@redhat.com" <eskultet@redhat.com>,
-        Parav Pandit <parav@nvidia.com>,
-        "sm ooney@redhat.com" <smooney@redhat.com>,
-        "intel-gvt-dev@lists.freedesktop.org" 
-        <intel-gvt-dev@lists.freedesktop.org>,
-        Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Jiri Pirko <jiri@mellanox.com>,
-        "dinechin@redhat.com" <dinechin@redhat.com>,
-        "devel@ovirt.org" <devel@ovirt.org>
-Subject: Re: [ovirt-devel] Re: device compatibility interface for live
- migration with assigned devices
-Message-ID: <20200819081338.GC21172@joy-OptiPlex-7040>
-Reply-To: Yan Zhao <yan.y.zhao@intel.com>
-References: <a51209fe-a8c6-941f-ff54-7be06d73bc44@redhat.com>
- <20200818085527.GB20215@redhat.com>
- <3a073222-dcfe-c02d-198b-29f6a507b2e1@redhat.com>
- <20200818091628.GC20215@redhat.com>
- <20200818113652.5d81a392.cohuck@redhat.com>
- <BY5PR12MB4322C9D1A66C4657776A1383DC5C0@BY5PR12MB4322.namprd12.prod.outlook.com>
- <20200819033035.GA21172@joy-OptiPlex-7040>
- <e20812b7-994b-b7f9-2df4-a78c4d116c7f@redhat.com>
- <20200819065951.GB21172@joy-OptiPlex-7040>
- <d6f9a51e-80b3-44c5-2656-614b327dc080@redhat.com>
+        id S1726735AbgHSImU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 19 Aug 2020 04:42:20 -0400
+Received: from smtp-fw-4101.amazon.com ([72.21.198.25]:54074 "EHLO
+        smtp-fw-4101.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725903AbgHSImU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 19 Aug 2020 04:42:20 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1597826540; x=1629362540;
+  h=subject:to:cc:references:from:message-id:date:
+   mime-version:in-reply-to:content-transfer-encoding;
+  bh=n+Vll29VHoW+ze73ZQgQsHQkyv7rVwIbGR0mhywMB+k=;
+  b=aPAYitvPJDw4ZIaIlJFfImv20fpt1W8SyPUKFLJiG9wx5VIEUJKCBpoL
+   zc2bkA7/2NYEyILNXqwWNg2BQhv1Uq9E5FbfyJy6k9kYmJD4eo6skNKd4
+   NscxxJUfGLflYxyaLItzCe08jW+6cjVxXGzuQmJDKlzq+zlbjeaHYzsAL
+   Y=;
+X-IronPort-AV: E=Sophos;i="5.76,330,1592870400"; 
+   d="scan'208";a="48751602"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-1a-7d76a15f.us-east-1.amazon.com) ([10.43.8.6])
+  by smtp-border-fw-out-4101.iad4.amazon.com with ESMTP; 19 Aug 2020 08:42:18 +0000
+Received: from EX13MTAUWC001.ant.amazon.com (iad55-ws-svc-p15-lb9-vlan3.iad.amazon.com [10.40.159.166])
+        by email-inbound-relay-1a-7d76a15f.us-east-1.amazon.com (Postfix) with ESMTPS id 93089A0567;
+        Wed, 19 Aug 2020 08:42:16 +0000 (UTC)
+Received: from EX13D20UWC001.ant.amazon.com (10.43.162.244) by
+ EX13MTAUWC001.ant.amazon.com (10.43.162.135) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.2; Wed, 19 Aug 2020 08:42:15 +0000
+Received: from 38f9d3867b82.ant.amazon.com (10.43.162.228) by
+ EX13D20UWC001.ant.amazon.com (10.43.162.244) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.2; Wed, 19 Aug 2020 08:42:14 +0000
+Subject: Re: [PATCH v3 01/12] KVM: x86: Deflect unknown MSR accesses to user
+ space
+To:     Aaron Lewis <aaronlewis@google.com>, <jmattson@google.com>
+CC:     <pshier@google.com>, <oupton@google.com>, <kvm@vger.kernel.org>
+References: <20200818211533.849501-1-aaronlewis@google.com>
+ <20200818211533.849501-2-aaronlewis@google.com>
+From:   Alexander Graf <graf@amazon.com>
+Message-ID: <6a54e6a1-8572-b1fd-21c8-1f0ec0e4dd77@amazon.com>
+Date:   Wed, 19 Aug 2020 10:42:09 +0200
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:68.0)
+ Gecko/20100101 Thunderbird/68.11.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <d6f9a51e-80b3-44c5-2656-614b327dc080@redhat.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
+In-Reply-To: <20200818211533.849501-2-aaronlewis@google.com>
+Content-Language: en-US
+X-Originating-IP: [10.43.162.228]
+X-ClientProxiedBy: EX13D36UWB003.ant.amazon.com (10.43.161.118) To
+ EX13D20UWC001.ant.amazon.com (10.43.162.244)
+Content-Type: text/plain; charset="utf-8"; format="flowed"
+Content-Transfer-Encoding: base64
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Aug 19, 2020 at 03:39:50PM +0800, Jason Wang wrote:
-> 
-> On 2020/8/19 下午2:59, Yan Zhao wrote:
-> > On Wed, Aug 19, 2020 at 02:57:34PM +0800, Jason Wang wrote:
-> > > On 2020/8/19 上午11:30, Yan Zhao wrote:
-> > > > hi All,
-> > > > could we decide that sysfs is the interface that every VFIO vendor driver
-> > > > needs to provide in order to support vfio live migration, otherwise the
-> > > > userspace management tool would not list the device into the compatible
-> > > > list?
-> > > > 
-> > > > if that's true, let's move to the standardizing of the sysfs interface.
-> > > > (1) content
-> > > > common part: (must)
-> > > >      - software_version: (in major.minor.bugfix scheme)
-> > > 
-> > > This can not work for devices whose features can be negotiated/advertised
-> > > independently. (E.g virtio devices)
-> > > 
-> > sorry, I don't understand here, why virtio devices need to use vfio interface?
-> 
-> 
-> I don't see any reason that virtio devices can't be used by VFIO. Do you?
-> 
-> Actually, virtio devices have been used by VFIO for many years:
-> 
-> - passthrough a hardware virtio devices to userspace(VM) drivers
-> - using virtio PMD inside guest
->
-So, what's different for it vs passing through a physical hardware via VFIO?
-even though the features are negotiated dynamically, could you explain
-why it would cause software_version not work?
+CgpPbiAxOC4wOC4yMCAyMzoxNSwgQWFyb24gTGV3aXMgd3JvdGU6Cj4gCj4gTVNScyBhcmUgd2Vp
+cmQuIFNvbWUgb2YgdGhlbSBhcmUgbm9ybWFsIGNvbnRyb2wgcmVnaXN0ZXJzLCBzdWNoIGFzIEVG
+RVIuCj4gU29tZSBob3dldmVyIGFyZSByZWdpc3RlcnMgdGhhdCByZWFsbHkgYXJlIG1vZGVsIHNw
+ZWNpZmljLCBub3QgdmVyeQo+IGludGVyZXN0aW5nIHRvIHZpcnR1YWxpemF0aW9uIHdvcmtsb2Fk
+cywgYW5kIG5vdCBwZXJmb3JtYW5jZSBjcml0aWNhbC4KPiBPdGhlcnMgYWdhaW4gYXJlIHJlYWxs
+eSBqdXN0IHdpbmRvd3MgaW50byBwYWNrYWdlIGNvbmZpZ3VyYXRpb24uCj4gCj4gT3V0IG9mIHRo
+ZXNlIE1TUnMsIG9ubHkgdGhlIGZpcnN0IGNhdGVnb3J5IGlzIG5lY2Vzc2FyeSB0byBpbXBsZW1l
+bnQgaW4KPiBrZXJuZWwgc3BhY2UuIFJhcmVseSBhY2Nlc3NlZCBNU1JzLCBNU1JzIHRoYXQgc2hv
+dWxkIGJlIGZpbmUgdHVuZXMgYWdhaW5zdAo+IGNlcnRhaW4gQ1BVIG1vZGVscyBhbmQgTVNScyB0
+aGF0IGNvbnRhaW4gaW5mb3JtYXRpb24gb24gdGhlIHBhY2thZ2UgbGV2ZWwKPiBhcmUgbXVjaCBi
+ZXR0ZXIgc3VpdGVkIGZvciB1c2VyIHNwYWNlIHRvIHByb2Nlc3MuIEhvd2V2ZXIsIG92ZXIgdGlt
+ZSB3ZSBoYXZlCj4gYWNjdW11bGF0ZWQgYSBsb3Qgb2YgTVNScyB0aGF0IGFyZSBub3QgdGhlIGZp
+cnN0IGNhdGVnb3J5LCBidXQgc3RpbGwgaGFuZGxlZAo+IGJ5IGluLWtlcm5lbCBLVk0gY29kZS4K
+PiAKPiBUaGlzIHBhdGNoIGFkZHMgYSBnZW5lcmljIGludGVyZmFjZSB0byBoYW5kbGUgV1JNU1Ig
+YW5kIFJETVNSIGZyb20gdXNlcgo+IHNwYWNlLiBXaXRoIHRoaXMsIGFueSBmdXR1cmUgTVNSIHRo
+YXQgaXMgcGFydCBvZiB0aGUgbGF0dGVyIGNhdGVnb3JpZXMgY2FuCj4gYmUgaGFuZGxlZCBpbiB1
+c2VyIHNwYWNlLgo+IAo+IEZ1cnRoZXJtb3JlLCBpdCBhbGxvd3MgdXMgdG8gcmVwbGFjZSB0aGUg
+ZXhpc3RpbmcgImlnbm9yZV9tc3JzIiBsb2dpYyB3aXRoCj4gc29tZXRoaW5nIHRoYXQgYXBwbGll
+cyBwZXItVk0gcmF0aGVyIHRoYW4gb24gdGhlIGZ1bGwgc3lzdGVtLiBUaGF0IHdheSB5b3UKPiBj
+YW4gcnVuIHByb2R1Y3RpdmUgVk1zIGluIHBhcmFsbGVsIHRvIGV4cGVyaW1lbnRhbCBvbmVzIHdo
+ZXJlIHlvdSBkb24ndCBjYXJlCj4gYWJvdXQgcHJvcGVyIE1TUiBoYW5kbGluZy4KPiAKPiBTaWdu
+ZWQtb2ZmLWJ5OiBBbGV4YW5kZXIgR3JhZiA8Z3JhZkBhbWF6b24uY29tPgo+IFJldmlld2VkLWJ5
+OiBKaW0gTWF0dHNvbiA8am1hdHRzb25AZ29vZ2xlLmNvbT4KCllvdSBuZWVkIHRvIGFkZCB5b3Vy
+IFNpZ25lZC1vZmYtYnkgbGluZSBoZXJlIGFzIHdlbGwgOikuCgoKQWxleAoKCgpBbWF6b24gRGV2
+ZWxvcG1lbnQgQ2VudGVyIEdlcm1hbnkgR21iSApLcmF1c2Vuc3RyLiAzOAoxMDExNyBCZXJsaW4K
+R2VzY2hhZWZ0c2Z1ZWhydW5nOiBDaHJpc3RpYW4gU2NobGFlZ2VyLCBKb25hdGhhbiBXZWlzcwpF
+aW5nZXRyYWdlbiBhbSBBbXRzZ2VyaWNodCBDaGFybG90dGVuYnVyZyB1bnRlciBIUkIgMTQ5MTcz
+IEIKU2l0ejogQmVybGluClVzdC1JRDogREUgMjg5IDIzNyA4NzkKCgo=
 
-
-> 
-> > I think this thread is discussing about vfio related devices.
-> > 
-> > > >      - device_api: vfio-pci or vfio-ccw ...
-> > > >      - type: mdev type for mdev device or
-> > > >              a signature for physical device which is a counterpart for
-> > > > 	   mdev type.
-> > > > 
-> > > > device api specific part: (must)
-> > > >     - pci id: pci id of mdev parent device or pci id of physical pci
-> > > >       device (device_api is vfio-pci)API here.
-> > > 
-> > > So this assumes a PCI device which is probably not true.
-> > > 
-> > for device_api of vfio-pci, why it's not true?
-> > 
-> > for vfio-ccw, it's subchannel_type.
-> 
-> 
-> Ok but having two different attributes for the same file is not good idea.
-> How mgmt know there will be a 3rd type?
-that's why some attributes need to be common. e.g.
-device_api: it's common because mgmt need to know it's a pci device or a
-            ccw device. and the api type is already defined vfio.h.
-	    (The field is agreed by and actually suggested by Alex in previous mail)
-type: mdev_type for mdev. if mgmt does not understand it, it would not
-      be able to create one compatible mdev device.
-software_version: mgmt can compare the major and minor if it understands
-      this fields.
-> 
-> 
-> > 
-> > > >     - subchannel_type (device_api is vfio-ccw)
-> > > > vendor driver specific part: (optional)
-> > > >     - aggregator
-> > > >     - chpid_type
-> > > >     - remote_url
-> > > 
-> > > For "remote_url", just wonder if it's better to integrate or reuse the
-> > > existing NVME management interface instead of duplicating it here. Otherwise
-> > > it could be a burden for mgmt to learn. E.g vendor A may use "remote_url"
-> > > but vendor B may use a different attribute.
-> > > 
-> > it's vendor driver specific.
-> > vendor specific attributes are inevitable, and that's why we are
-> > discussing here of a way to standardizing of it.
-> 
-> 
-> Well, then you will end up with a very long list to discuss. E.g for
-> networking devices, you will have "mac", "v(x)lan" and a lot of other.
-> 
-> Note that "remote_url" is not vendor specific but NVME (class/subsystem)
-> specific.
-> 
-yes, it's just NVMe specific. I added it as an example to show what is
-vendor specific.
-if one attribute is vendor specific across all vendors, then it's not vendor specific,
-it's already common attribute, right?
-
-> The point is that if vendor/class specific part is unavoidable, why not
-> making all of the attributes vendor specific?
->
-some parts need to be common, as I listed above.
-
-> 
-> > our goal is that mgmt can use it without understanding the meaning of vendor
-> > specific attributes.
-> 
-> 
-> I'm not sure this is the correct design of uAPI. Is there something similar
-> in the existing uAPIs?
-> 
-> And it might be hard to work for virtio devices.
-> 
-> 
-> > 
-> > > > NOTE: vendors are free to add attributes in this part with a
-> > > > restriction that this attribute is able to be configured with the same
-> > > > name in sysfs too. e.g.
-> > > 
-> > > Sysfs works well for common attributes belongs to a class, but I'm not sure
-> > > it can work well for device/vendor specific attributes. Does this mean mgmt
-> > > need to iterate all the attributes in both src and dst?
-> > > 
-> > no. just attributes under migration directory.
-> > 
-> > > > for aggregator, there must be a sysfs attribute in device node
-> > > > /sys/devices/pci0000:00/0000:00:02.0/882cc4da-dede-11e7-9180-078a62063ab1/intel_vgpu/aggregator,
-> > > > so that the userspace tool is able to configure the target device
-> > > > according to source device's aggregator attribute.
-> > > > 
-> > > > 
-> > > > (2) where and structure
-> > > > proposal 1:
-> > > > |- [path to device]
-> > > >     |--- migration
-> > > >     |     |--- self
-> > > >     |     |    |-software_version
-> > > >     |     |    |-device_api
-> > > >     |     |    |-type
-> > > >     |     |    |-[pci_id or subchannel_type]
-> > > >     |     |    |-<aggregator or chpid_type>
-> > > >     |     |--- compatible
-> > > >     |     |    |-software_version
-> > > >     |     |    |-device_api
-> > > >     |     |    |-type
-> > > >     |     |    |-[pci_id or subchannel_type]
-> > > >     |     |    |-<aggregator or chpid_type>
-> > > > multiple compatible is allowed.
-> > > > attributes should be ASCII text files, preferably with only one value
-> > > > per file.
-> > > > 
-> > > > 
-> > > > proposal 2: use bin_attribute.
-> > > > |- [path to device]
-> > > >     |--- migration
-> > > >     |     |--- self
-> > > >     |     |--- compatible
-> > > > 
-> > > > so we can continue use multiline format. e.g.
-> > > > cat compatible
-> > > >     software_version=0.1.0
-> > > >     device_api=vfio_pci
-> > > >     type=i915-GVTg_V5_{val1:int:1,2,4,8}
-> > > >     pci_id=80865963
-> > > >     aggregator={val1}/2
-> > > 
-> > > So basically two questions:
-> > > 
-> > > - how hard to standardize sysfs API for dealing with compatibility check (to
-> > > make it work for most types of devices)
-> > sorry, I just know we are in the process of standardizing of it :)
-> 
-> 
-> It's not easy. As I said, the current design can't work for virtio devices
-> and it's not hard to find other examples. I remember some Intel devices have
-> bitmask based capability registers.
-> 
-some Intel devices have bitmask based capability registers.
-so what?
-we have defined pci_id to identify the devices.
-even two different devices have equal PCI IDs, we still allow them to
-add vendor specific fields. e.g.
-for QAT, they can add alg_set to identify hardware supported algorithms.
-
-> 
-> > 
-> > > - how hard for the mgmt to learn with a vendor specific attributes (vs
-> > > existing management API)
-> > what is existing management API?
-> 
-> 
-> It depends on the type of devices. E.g for NVME, we've already had one
-> (/sys/kernel/config/nvme)?
->
-if the device is binding to vfio or vfio-mdev, I believe this interface
-is not there.
-
-
-Thanks
-Yan
