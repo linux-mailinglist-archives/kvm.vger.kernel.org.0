@@ -2,70 +2,115 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2D104249A4C
-	for <lists+kvm@lfdr.de>; Wed, 19 Aug 2020 12:26:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C4202249A73
+	for <lists+kvm@lfdr.de>; Wed, 19 Aug 2020 12:35:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727053AbgHSK0F (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 19 Aug 2020 06:26:05 -0400
-Received: from smtp-fw-2101.amazon.com ([72.21.196.25]:6220 "EHLO
-        smtp-fw-2101.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726642AbgHSK0E (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 19 Aug 2020 06:26:04 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1597832764; x=1629368764;
-  h=subject:to:cc:references:from:message-id:date:
-   mime-version:in-reply-to:content-transfer-encoding;
-  bh=KCodnIdrXI52KBO8fW6zf2JPgwR/SXg5pDPELvzDbk0=;
-  b=V6TEAv8MiOjF6nB+UIhUUIIZkHLO6O0r4cxY4INDoVeOnULc5YG2yfN2
-   RKg/GdbfBK2rctJN0MTU4zlryh0WYvOVOiqX8Au23chrRrNBGYOL4Wj8Z
-   Ol1QoJDu/z+oQ2pSszATxfa9nLqj0Ww9z6ZMmelVBSI3p9pDhRpRWN4IV
-   g=;
-X-IronPort-AV: E=Sophos;i="5.76,331,1592870400"; 
-   d="scan'208";a="48579822"
-Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO email-inbound-relay-1e-62350142.us-east-1.amazon.com) ([10.43.8.2])
-  by smtp-border-fw-out-2101.iad2.amazon.com with ESMTP; 19 Aug 2020 10:26:03 +0000
-Received: from EX13MTAUWC002.ant.amazon.com (iad55-ws-svc-p15-lb9-vlan2.iad.amazon.com [10.40.159.162])
-        by email-inbound-relay-1e-62350142.us-east-1.amazon.com (Postfix) with ESMTPS id EB06AA1D67;
-        Wed, 19 Aug 2020 10:26:00 +0000 (UTC)
-Received: from EX13D20UWC001.ant.amazon.com (10.43.162.244) by
- EX13MTAUWC002.ant.amazon.com (10.43.162.240) with Microsoft SMTP Server (TLS)
- id 15.0.1497.2; Wed, 19 Aug 2020 10:26:00 +0000
-Received: from 38f9d3867b82.ant.amazon.com (10.43.162.85) by
- EX13D20UWC001.ant.amazon.com (10.43.162.244) with Microsoft SMTP Server (TLS)
- id 15.0.1497.2; Wed, 19 Aug 2020 10:25:58 +0000
-Subject: Re: [PATCH v3 05/12] KVM: x86: Add support for exiting to userspace
- on rdmsr or wrmsr
-To:     Aaron Lewis <aaronlewis@google.com>, <jmattson@google.com>
-CC:     <pshier@google.com>, <oupton@google.com>, <kvm@vger.kernel.org>
-References: <20200818211533.849501-1-aaronlewis@google.com>
- <20200818211533.849501-6-aaronlewis@google.com>
-From:   Alexander Graf <graf@amazon.com>
-Message-ID: <92dc58cc-2137-d063-1999-be3847485605@amazon.com>
-Date:   Wed, 19 Aug 2020 12:25:56 +0200
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:68.0)
- Gecko/20100101 Thunderbird/68.11.0
+        id S1727063AbgHSKf3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 19 Aug 2020 06:35:29 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:48280 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726752AbgHSKf0 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 19 Aug 2020 06:35:26 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1597833325;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=PnoCx8H0Y0jXZ99fNW246pF/90n/rcQUi5ywk+AjrA8=;
+        b=Vh21mvNka2O2jM9mWGpvviaBkc6VUpl4jTS7UM+7xaXXPJrJH+KmR6u5JpmtZ5mHohh4D7
+        drKOnbCw7NssYE90WL827vv4sX5pLfz/+aQqACVn30SxlmNjndg4ORyHyYH9guBO+R0oig
+        BBmGNe7ZXFb+no6JH5FaqZztsw23n2U=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-196-zIhIGe_TNMOOtfQZjx92gA-1; Wed, 19 Aug 2020 06:35:21 -0400
+X-MC-Unique: zIhIGe_TNMOOtfQZjx92gA-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9318C100670A;
+        Wed, 19 Aug 2020 10:35:20 +0000 (UTC)
+Received: from gondolin (ovpn-112-216.ams2.redhat.com [10.36.112.216])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id DB4827BE89;
+        Wed, 19 Aug 2020 10:35:15 +0000 (UTC)
+Date:   Wed, 19 Aug 2020 12:34:43 +0200
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Marc Hartmayer <mhartmay@linux.ibm.com>
+Cc:     <kvm@vger.kernel.org>, Thomas Huth <thuth@redhat.com>,
+        David Hildenbrand <david@redhat.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Andrew Jones <drjones@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        linux-s390@vger.kernel.org
+Subject: Re: [kvm-unit-tests PATCH 4/4] s390x: add Protected VM support
+Message-ID: <20200819123443.2287abc3.cohuck@redhat.com>
+In-Reply-To: <20200818130424.20522-5-mhartmay@linux.ibm.com>
+References: <20200818130424.20522-1-mhartmay@linux.ibm.com>
+        <20200818130424.20522-5-mhartmay@linux.ibm.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-In-Reply-To: <20200818211533.849501-6-aaronlewis@google.com>
-Content-Language: en-US
-X-Originating-IP: [10.43.162.85]
-X-ClientProxiedBy: EX13D44UWB004.ant.amazon.com (10.43.161.205) To
- EX13D20UWC001.ant.amazon.com (10.43.162.244)
-Content-Type: text/plain; charset="utf-8"; format="flowed"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-CgpPbiAxOC4wOC4yMCAyMzoxNSwgQWFyb24gTGV3aXMgd3JvdGU6Cj4gCj4gQWRkIHN1cHBvcnQg
-Zm9yIGV4aXRpbmcgdG8gdXNlcnNwYWNlIG9uIGEgcmRtc3Igb3Igd3Jtc3IgaW5zdHJ1Y3Rpb24g
-aWYKPiB0aGUgTVNSIGJlaW5nIHJlYWQgZnJvbSBvciB3cml0dGVuIHRvIGlzIGluIHRoZSB1c2Vy
-X2V4aXRfbXNycyBsaXN0Lgo+IAo+IFNpZ25lZC1vZmYtYnk6IEFhcm9uIExld2lzIDxhYXJvbmxl
-d2lzQGdvb2dsZS5jb20+CgpBZ2FpbiwgdGhpcyBwYXRjaCBzaG91bGQgYmUgcmVkdW5kYW50IHdp
-dGggdGhlIGFsbG93IGxpc3Q/CgpBbGV4CgoKCkFtYXpvbiBEZXZlbG9wbWVudCBDZW50ZXIgR2Vy
-bWFueSBHbWJICktyYXVzZW5zdHIuIDM4CjEwMTE3IEJlcmxpbgpHZXNjaGFlZnRzZnVlaHJ1bmc6
-IENocmlzdGlhbiBTY2hsYWVnZXIsIEpvbmF0aGFuIFdlaXNzCkVpbmdldHJhZ2VuIGFtIEFtdHNn
-ZXJpY2h0IENoYXJsb3R0ZW5idXJnIHVudGVyIEhSQiAxNDkxNzMgQgpTaXR6OiBCZXJsaW4KVXN0
-LUlEOiBERSAyODkgMjM3IDg3OQoKCg==
+On Tue, 18 Aug 2020 15:04:24 +0200
+Marc Hartmayer <mhartmay@linux.ibm.com> wrote:
+
+> Add support for Protected Virtual Machine (PVM) tests. For starting a
+> PVM guest we must be able to generate a PVM image by using the
+> `genprotimg` tool from the s390-tools collection. This requires the
+> ability to pass a machine-specific host-key document, so the option
+> `--host-key-document` is added to the configure script.
+> 
+> Signed-off-by: Marc Hartmayer <mhartmay@linux.ibm.com>
+> ---
+>  configure               |  9 +++++++++
+>  s390x/Makefile          | 17 +++++++++++++++--
+>  s390x/selftest.parmfile |  1 +
+>  s390x/unittests.cfg     |  1 +
+>  scripts/s390x/func.bash | 35 +++++++++++++++++++++++++++++++++++
+>  5 files changed, 61 insertions(+), 2 deletions(-)
+>  create mode 100644 s390x/selftest.parmfile
+>  create mode 100644 scripts/s390x/func.bash
+
+(...)
+
+> +function arch_cmd_s390x()
+> +{
+> +	local cmd=$1
+> +	local testname=$2
+> +	local groups=$3
+> +	local smp=$4
+> +	local kernel=$5
+> +	local opts=$6
+> +	local arch=$7
+> +	local check=$8
+> +	local accel=$9
+> +	local timeout=${10}
+> +
+> +	# run the normal test case
+> +	"$cmd" "${testname}" "$groups" "$smp" "$kernel" "$opts" "$arch" "$check" "$accel" "$timeout"
+> +
+> +	# run PV test case
+> +	kernel=${kernel%.elf}.pv.bin
+> +	if [ ! -f "${kernel}" ]; then
+> +		if [ -z "${HOST_KEY_DOCUMENT}" ]; then
+> +			print_result 'SKIP' $testname '(no host-key document specified)'
+> +			return 2
+> +		fi
+> +
+> +		print_result 'SKIP' $testname '(PVM image was not created)'
+
+When can that happen? Don't we already fail earlier if we specified a
+host key document, but genprotimg does not work?
+
+> +		return 2
+> +	fi
+> +	"$cmd" "${testname}_PV" "$groups pv" "$smp" "$kernel" "$opts" "$arch" "$check" "$accel" "$timeout"
+> +}
 
