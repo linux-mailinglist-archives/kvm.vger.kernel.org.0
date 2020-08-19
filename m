@@ -2,41 +2,41 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7145F24A2A1
-	for <lists+kvm@lfdr.de>; Wed, 19 Aug 2020 17:17:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D2B4524A2A3
+	for <lists+kvm@lfdr.de>; Wed, 19 Aug 2020 17:17:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728664AbgHSPRT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 19 Aug 2020 11:17:19 -0400
+        id S1726897AbgHSPRk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 19 Aug 2020 11:17:40 -0400
 Received: from mail-bn7nam10on2044.outbound.protection.outlook.com ([40.107.92.44]:48186
         "EHLO NAM10-BN7-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726899AbgHSPRH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 19 Aug 2020 11:17:07 -0400
+        id S1726894AbgHSPRT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 19 Aug 2020 11:17:19 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=QWWAcdH4KXUZKQzT6yc7tnQTHG2eps9E/YMxztDc0piKCbjAxxdDRsQc4JvPKHApCVQoOfDAHNALfrsGaZqmR7pQzyCC0W+InMJAXd5U/5R7CeGwUOrxJdBF01d4pgzFRDspLLL4+zmElpB8B5fDD/EzvOIjf334Pox3FBtL0ioAATch+fTU4tMp7u48WWBdb/y+TaGQrjIw045PkY9obALrGE06kpi38Y1y/NGk2OBUlLMaGWsCxegcO9S3Mp1+ly9rUK1DXFKG7yhncikf8to/SZvmaqHuJJCeOb50meETa8SsxxIZxiFa7UHancRxS9G6G0XR+BF+R0VzGLZUQg==
+ b=SgYvMlTpXo3Zdt7iH1O78yenxFhS40Yr6XOLsU/wmgXPZhUGu6BCYYX2C6JWrblPxBuLMX7TnowC6V/CYVWE+1q98PXkv2mP9nsZYL5yPiokw8zvP+zMACD8lDk8L5Z2gtZQHWlwDeTajb5kdm0QqPBluBGsg5KKRlv7N+8HFPcgdaGO9UI77BExQyAnkfN64Du1rYcEbbwRn626sc9j5L6zR6io76HqRqooUxfRgd4BNnUTMDNzrs6mZZDkVWxz7cF50WvNKuSYgUvxfjfaT9V74xP73zP1iwS/bKMWc+pLgf8bW0qJnH/tY0Ghuwj3o2s4PXpY/G6AziI5rD0KRw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=VaKGJyweKaytkfpqj2e0PU0xmX+dpQkYsSUqtutHKgM=;
- b=i4rUieP1mMQ1BptpDPHu9684l65XG1HPPfGjlqF6Q0YJenpHQYOxNoA2zgwd7GBV6XDXT73wtvE+J8LnpdYbAs8+wYD6+YbvEnO0j8QHSn5VSokaJDtamedTFtALZgXRU2F19J1Sj7y+QLtAB+lcptJ1hkViKXaR2jY1SLsXmnUxHgm++PPyHIFic2xkCYgPHGKa7EbN450XCRd3FKbfcAgljnkN7Qu+rQ+n09TqzH9JAgj8Lzahk549FweCJ7ODCKBnEYPLtotiKIKUTZV6/NZz973gv4KYso16wgn141IVPi6EWwf1dICXSKgzibsvtDcXgKpKd0Rh6gSE+4AoIQ==
+ bh=ZFKwKTr1cZPT09GMIL93Z0ukKNniqRmLsiDSLh8BJ/E=;
+ b=j8/GZrJbo/OMSmlXAoNJB7ascSPiiU2eISXbRBEv9e+SmFc+5hRLahWzbcNF/JwJoJ+P9j1xLII1r+PrfBD5copIFbqx1TFo11yM/auNdbJOpoOACYki3YX5EqnN0/QUvQ0RQ4AH6ALm0JXmTtRQcJUJJgffTtXJ1TlTkh9MAYFhE3032QSaOtU5vUhQyIuO1aq2o+GZqmNnZnDMvweDXwlI8/9nLV+JRZpdkRoHqQb5pL0LMLuDKBJxDEW2rYtGWncW5soJg4psX6bQ6zkScdJBQjstLW9/jrrnisAZWwK0NpPxHRy0QZjPoHH75Bb5pHPDlyHt/gCNFt0kMnxaMg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
  header.d=amd.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=VaKGJyweKaytkfpqj2e0PU0xmX+dpQkYsSUqtutHKgM=;
- b=doyoLTjhf4f6bkTV8ZxaIIhLjkVF6GLQi32PlnckP/WsbfMo3jNB6rRDubk0zCJBQNq3RzyPz7PSmZ2RdhI+GEPshidxnpvSZHwSs/Gcj72yVyySzA7o5AqTjy00jlHwnoaNF0R/wginSCLmD8AZapudjCzAO8xobPgDKD+4bpM=
+ bh=ZFKwKTr1cZPT09GMIL93Z0ukKNniqRmLsiDSLh8BJ/E=;
+ b=nZ1Pz+3w7nDXBzltJhgKwwVNY5A5B11dv3xfjQVyYQndmS/XyfklxnjLNz7zhBBEe2+8eLaWjYRMgT5b+PF0vphtxQ0Arg2mJLt+ZhqBHJScG17ot93ZqymZT4a0kqtAfsi/c8ySSflUJS/gY+T7susFAwmNCY8bqSAoQYgnBrg=
 Authentication-Results: vger.kernel.org; dkim=none (message not signed)
  header.d=none;vger.kernel.org; dmarc=none action=none header.from=amd.com;
 Received: from DM5PR12MB1307.namprd12.prod.outlook.com (2603:10b6:3:79::21) by
  DM6PR12MB3227.namprd12.prod.outlook.com (2603:10b6:5:18d::14) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.3305.24; Wed, 19 Aug 2020 15:16:57 +0000
+ 15.20.3305.24; Wed, 19 Aug 2020 15:16:59 +0000
 Received: from DM5PR12MB1307.namprd12.prod.outlook.com
  ([fe80::15d7:c2da:d92a:2162]) by DM5PR12MB1307.namprd12.prod.outlook.com
  ([fe80::15d7:c2da:d92a:2162%11]) with mapi id 15.20.3283.028; Wed, 19 Aug
- 2020 15:16:57 +0000
+ 2020 15:16:58 +0000
 From:   eric van tassell <Eric.VanTassell@amd.com>
 To:     kvm@vger.kernel.org
 Cc:     linux-kernel@vger.kernel.org, bp@alien8.de, hpa@zytor.com,
@@ -45,9 +45,9 @@ Cc:     linux-kernel@vger.kernel.org, bp@alien8.de, hpa@zytor.com,
         tglx@linutronix.de, vkuznets@redhat.com, wanpengli@tencent.com,
         x86@kernel.org, rientjes@google.com, junaids@google.com,
         evantass@amd.com
-Subject: [Patch v2 1/4] KVM:MMU: Introduce the pin_page() callback
-Date:   Wed, 19 Aug 2020 10:17:39 -0500
-Message-Id: <20200819151742.7892-2-Eric.VanTassell@amd.com>
+Subject: [Patch v2 2/4] KVM:SVM: Implement pin_page support
+Date:   Wed, 19 Aug 2020 10:17:40 -0500
+Message-Id: <20200819151742.7892-3-Eric.VanTassell@amd.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20200819151742.7892-1-Eric.VanTassell@amd.com>
 References: <20200819151742.7892-1-Eric.VanTassell@amd.com>
@@ -57,199 +57,191 @@ X-ClientProxiedBy: DM5PR19CA0045.namprd19.prod.outlook.com
  (2603:10b6:3:79::21)
 MIME-Version: 1.0
 X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from evt-speedway-83bc.amd.com (165.204.78.2) by DM5PR19CA0045.namprd19.prod.outlook.com (2603:10b6:3:9a::31) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3305.24 via Frontend Transport; Wed, 19 Aug 2020 15:16:56 +0000
+Received: from evt-speedway-83bc.amd.com (165.204.78.2) by DM5PR19CA0045.namprd19.prod.outlook.com (2603:10b6:3:9a::31) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3305.24 via Frontend Transport; Wed, 19 Aug 2020 15:16:57 +0000
 X-Mailer: git-send-email 2.17.1
 X-Originating-IP: [165.204.78.2]
 X-MS-PublicTrafficType: Email
 X-MS-Office365-Filtering-HT: Tenant
-X-MS-Office365-Filtering-Correlation-Id: 9f639cf6-edbf-4ff1-2d0f-08d84452e9dc
+X-MS-Office365-Filtering-Correlation-Id: 5f22a8c5-2942-4058-8f9f-08d84452ea8d
 X-MS-TrafficTypeDiagnostic: DM6PR12MB3227:
 X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <DM6PR12MB3227543FC5E01C5F0A77E098E75D0@DM6PR12MB3227.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:8882;
+X-Microsoft-Antispam-PRVS: <DM6PR12MB322759B0E2A793F37EF0D787E75D0@DM6PR12MB3227.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:2733;
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: GaSvrHAMZGNVvPkRrTSrfj189Dc22maaJdbBVJslHIp61o4JKf+N69Zg5oMrW0q17fieSYNvu0m3SGzsL6hKEqtLFbaLwGWjhm9JaZ+NKYcaob+yI7vednSyj5XA7J4mpd42RKQdVVI/nTMpoT7ys5TD9clg0V5KkIuHYRwJdywtjybg5MaTt1zpyrzGvVHCJPSj5lpO4rdUX90Y16a/bDWzkTmm3UBDxGAn6Spo0197obO4635zdNuzBxZQnXrlOkk8jNJMF8SCElc24OZCMndBf59II8c06Z7W8eQpg3ieTiYQPDPEnX5thdqlEuWZ
+X-Microsoft-Antispam-Message-Info: vIb8Icni/FRFt12bcktDjauqC49muDWQPioTm3NeegfspZFMY+VEoYT85JLOuGi2F/BE1LUwmloz3qETubfyu3B1vpXm5sxri6F9tJlJmC6aqcRlcjfH2VIau4zD20bIoFplND53lRmwVfhxrZBEzhFcktzQswYhfLo/oZIX+gxrQgZxqezW8vu8UUF5wQ1jCyHNLloe2YPYJQo2SmJvYEREnhWC3fAQwyCtYo+SZ9zqkR3eulYhz3/SPXVZUzeXpvcudaFfzoG4A6BZ5Gn8J1oF7BuJ/Rx+zbrNCDjA157ezuSb/zHVQcxxhcEzPMlo
 X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM5PR12MB1307.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(346002)(376002)(136003)(396003)(366004)(39860400002)(66556008)(66476007)(8676002)(66946007)(26005)(86362001)(1076003)(5660300002)(478600001)(6486002)(36756003)(316002)(83380400001)(6666004)(7416002)(2906002)(8936002)(6916009)(4326008)(2616005)(7696005)(16526019)(52116002)(186003)(956004);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData: E357RBRZowO273PDBhEUmo+B2tNkvt26FTm0WMJwPZlPWlTE2Y9/4JZ4x+x1+ZEBkppQ2me1IPwBVSGsWeQaS3jcoGI/k/G/RgB/s/L70Vi02EbtCS6dwuoElSAlWywhgrlt8ab3q+0zN0pbUo5YSiDjrs/wGDqgJkzwoJ7czfoBJBT1f+eV3c1NpuxJpyxppJSJdFdkQ1H6E/0LWD0q1lBGJZg77O3mu4OVWU1ieW93tMUxsx76Ly17Av+K2LrM9nUTMFSNAElkJL7dLu0VocZXtAuXHxjf/QZsjainoyVyodOmV6hkaqPwWm7VIKhXlDOlz9i2Lcu09uD+OQ62TIuvFU+5LzI8jwtxKvYW69p6Oi1QKeMESSWsfAgph/ZdJD9sAS13lYSr1wI7mgogqT4KqO3Ik9qyiXL3TZ2Dpc8PlaAI36daY3Na9MSBNgn1/6fTJyXGJiVDTS0CixS0bgrVFvoQl7anMYh1EZzTa040tp+3osRERmFPb+57Ok2R9gIHNVnWV87PExgnzi1QSWiB2XKU+8XGaAjBc/EVfNdzQ7KzrJxWXJTC8sQ8Uo9L800EHPSLtDnwTt6gTYslX1eeN4P2b8KtX9lBnDi34vw/0Ky9M+DCIeZdvIHo2kesfRa7ZeZBsYooL7e4hcj43g==
+X-MS-Exchange-AntiSpam-MessageData: P9P2rqwReD1+e81dfCh2GfH1EHIUkwcwSREnad2HW+eOuuYyjvHmFWtu5ELstD27rdDZCnVvROWX9My5xm+QatxZrvmXHpbEBgQjO6q6Ey2l8qmZqqxIlYq57p5Ym14czGvcymt0jKSYSBscOZDqhloJ4k4LchUesDJmgUdSKVCZ82EFR1njAsD9WQrRRIZ202lln9d+FSCXsWH0/P2iXz5UC+eztSDueWmbeOCPMc5keTw+hpjRrZVKsg3kOpUKP+mJjWcf5hZ1R9u3iZWSdf/BdvA3EDv5CX2tjCbk63APlE+wPZL6s4AfghYn9x6haj9Fg3mY6b1XB5E3Or++L2845JrvMgLify/Rry9dBziAQAzZokEnKiVLmtOEXhEVLACBJPqGmd+RuM5PJFL7a+XarJDdqaan8YRc/tL9T1rOTb7WMU+FSwiu5hPt57rVrLCokXX3Fn/ORYlejHePKGecUFxJNBWYFikBkminkHnfi2LNW4Zqb3AkfMtCDJgq6vBK+E8u+XA8VCwp5YqrfC8TqK1ff2OKktoVm/mF4KbhcZN+OfNDIcvWPO4EKX0eEjWvyiSHXMCrTCL1G71kCl1yEMWdFkT67NJxL7yLLTrQRUMhJgnzt2A3IBLowImHaaaZJzr1+u1jie6pdnYTww==
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 9f639cf6-edbf-4ff1-2d0f-08d84452e9dc
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5f22a8c5-2942-4058-8f9f-08d84452ea8d
 X-MS-Exchange-CrossTenant-AuthSource: DM5PR12MB1307.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Aug 2020 15:16:57.6612
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Aug 2020 15:16:58.7597
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 2mt7HUv/gDMoA1yakRHrbZTxzzn2JjJi+3n6K37wElrhcAfIMSLYdYX4epJrFfioR2INDElMomlDlOFro0DtRg==
+X-MS-Exchange-CrossTenant-UserPrincipalName: swbdO479WyydJKz9R2WOLnrMNe5AQeZaFe2IBHffuBqKJWr/sos1QDCTxpbgA/ov+Q89HmNELPSeHJ54TiIsrw==
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB3227
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This generic callback will be called just before setting the spte.
+Improve SEV guest startup time from O(n) to a constant by deferring
+guest page pinning until the pages are used to satisfy nested page faults.
 
-Check the return code where not previously checked since this operation can
-return an error.
+Implement the code to do the pinning (sev_get_page) and the notifier
+sev_pin_page().
 
-Defer pinning of SEV guest pages until they're used in order to reduce SEV
-guest startup time by eliminating the compute cycles required to pin all
-the pages up front. Additionally, we want to reduce memory pressure due to
-guests that reserve but only sparsely access a large amount of memory.
+Track the pinned pages with xarray so they can be released during guest
+termination.
 
 Co-developed-by: Brijesh Singh <brijesh.singh@amd.com>
 Signed-off-by: eric van tassell <Eric.VanTassell@amd.com>
 ---
- arch/x86/include/asm/kvm_host.h |  3 +++
- arch/x86/kvm/mmu/mmu.c          | 30 ++++++++++++++++++++++++++----
- arch/x86/kvm/mmu/paging_tmpl.h  | 27 ++++++++++++++++-----------
- 3 files changed, 45 insertions(+), 15 deletions(-)
+ arch/x86/kvm/svm/sev.c | 68 ++++++++++++++++++++++++++++++++++++++++++
+ arch/x86/kvm/svm/svm.c |  2 ++
+ arch/x86/kvm/svm/svm.h |  3 ++
+ 3 files changed, 73 insertions(+)
 
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 5aaef036627f..767653fa3245 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -1227,6 +1227,9 @@ struct kvm_x86_ops {
- 	int (*enable_direct_tlbflush)(struct kvm_vcpu *vcpu);
+diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+index f7f1f4ecf08e..8d56d1afb33e 100644
+--- a/arch/x86/kvm/svm/sev.c
++++ b/arch/x86/kvm/svm/sev.c
+@@ -184,6 +184,8 @@ static int sev_guest_init(struct kvm *kvm, struct kvm_sev_cmd *argp)
+ 	sev->asid = asid;
+ 	INIT_LIST_HEAD(&sev->regions_list);
  
- 	void (*migrate_timers)(struct kvm_vcpu *vcpu);
++	xa_init(&sev->pages_xarray);
 +
-+	int (*pin_page)(struct kvm_vcpu *vcpu, gfn_t gfn, kvm_pfn_t pfn,
-+			int level, u64 *spte);
- };
+ 	return 0;
  
- struct kvm_x86_nested_ops {
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index fa506aaaf019..2b60fdb79b86 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -3004,6 +3004,22 @@ static int set_spte(struct kvm_vcpu *vcpu, u64 *sptep,
- 		spte |= kvm_x86_ops.get_mt_mask(vcpu, gfn,
- 			kvm_is_mmio_pfn(pfn));
+ e_free:
+@@ -415,6 +417,43 @@ static unsigned long get_num_contig_pages(unsigned long idx,
+ 	return pages;
+ }
  
-+	if (kvm_x86_ops.pin_page && !kvm_is_mmio_pfn(pfn)) {
-+		ret = kvm_x86_ops.pin_page(vcpu, gfn, pfn, level, &spte);
-+		if (ret) {
-+			if (WARN_ON_ONCE(ret > 0))
-+				/*
-+				 * pin_page() should return 0 on success
-+				 * and non-zero preferably less than zero,
-+				 * for failure.  We check for any unanticipated
-+				 * positive return values here.
-+				 */
-+				ret = -EINVAL;
++static int sev_get_page(struct kvm *kvm, gfn_t gfn, kvm_pfn_t pfn)
++{
++	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
++	struct xarray *xa = &sev->pages_xarray;
++	struct page *page = pfn_to_page(pfn);
++	int ret;
 +
-+			return ret;
-+		}
++	/* store page at index = gfn */
++	ret = xa_insert(xa, gfn, page, GFP_ATOMIC);
++	if (ret == -EBUSY) {
++		/*
++		 * If xa_insert returned -EBUSY, the  gfn was already associated
++		 * with a struct page *.
++		 */
++		struct page *cur_page;
++
++		cur_page = xa_load(xa, gfn);
++		/* If cur_page == page, no change is needed, so return 0 */
++		if (cur_page == page)
++			return 0;
++
++		/* Release the page that was stored at index = gfn */
++		put_page(cur_page);
++
++		/* Return result of attempting to store page at index = gfn */
++		ret = xa_err(xa_store(xa, gfn, page, GFP_ATOMIC));
++		WARN_ON(ret != 0);
 +	}
 +
- 	if (host_writable)
- 		spte |= SPTE_HOST_WRITEABLE;
- 	else
-@@ -3086,6 +3102,9 @@ static int mmu_set_spte(struct kvm_vcpu *vcpu, u64 *sptep,
- 
- 	set_spte_ret = set_spte(vcpu, sptep, pte_access, level, gfn, pfn,
- 				speculative, true, host_writable);
-+	if (set_spte_ret < 0)
-+		return set_spte_ret;
++	if (ret)
++		return ret;
 +
- 	if (set_spte_ret & SET_SPTE_WRITE_PROTECTED_PT) {
- 		if (write_fault)
- 			ret = RET_PF_EMULATE;
-@@ -3134,7 +3153,7 @@ static int direct_pte_prefetch_many(struct kvm_vcpu *vcpu,
- 	struct page *pages[PTE_PREFETCH_NUM];
- 	struct kvm_memory_slot *slot;
- 	unsigned int access = sp->role.access;
--	int i, ret;
-+	int i, ret, error_ret = 0;
- 	gfn_t gfn;
- 
- 	gfn = kvm_mmu_page_get_gfn(sp, start - sp->spt);
-@@ -3147,12 +3166,15 @@ static int direct_pte_prefetch_many(struct kvm_vcpu *vcpu,
- 		return -1;
- 
- 	for (i = 0; i < ret; i++, gfn++, start++) {
--		mmu_set_spte(vcpu, start, access, 0, sp->role.level, gfn,
--			     page_to_pfn(pages[i]), true, true);
-+		ret = mmu_set_spte(vcpu, start, access, 0, sp->role.level, gfn,
-+				   page_to_pfn(pages[i]), true, true);
-+		if (ret < 0 && error_ret == 0) /* only track 1st fail */
-+			error_ret = ret;
- 		put_page(pages[i]);
- 	}
- 
--	return 0;
-+	/* If there was an error for any gfn, return non-0. */
-+	return error_ret;
- }
- 
- static void __direct_pte_prefetch(struct kvm_vcpu *vcpu,
-diff --git a/arch/x86/kvm/mmu/paging_tmpl.h b/arch/x86/kvm/mmu/paging_tmpl.h
-index 0172a949f6a7..a777bb43dfa0 100644
---- a/arch/x86/kvm/mmu/paging_tmpl.h
-+++ b/arch/x86/kvm/mmu/paging_tmpl.h
-@@ -532,6 +532,7 @@ FNAME(prefetch_gpte)(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp,
- 	unsigned pte_access;
- 	gfn_t gfn;
- 	kvm_pfn_t pfn;
-+	int set_spte_ret;
- 
- 	if (FNAME(prefetch_invalid_gpte)(vcpu, sp, spte, gpte))
- 		return false;
-@@ -550,11 +551,12 @@ FNAME(prefetch_gpte)(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp,
- 	 * we call mmu_set_spte() with host_writable = true because
- 	 * pte_prefetch_gfn_to_pfn always gets a writable pfn.
- 	 */
--	mmu_set_spte(vcpu, spte, pte_access, 0, PG_LEVEL_4K, gfn, pfn,
--		     true, true);
-+	set_spte_ret = mmu_set_spte(vcpu, spte, pte_access, 0,
-+				    PG_LEVEL_4K, gfn, pfn, true, true);
- 
- 	kvm_release_pfn_clean(pfn);
--	return true;
++	get_page(page);
 +
-+	return set_spte_ret >= 0;
- }
++	return 0;
++}
++
+ static int sev_launch_update_data(struct kvm *kvm, struct kvm_sev_cmd *argp)
+ {
+ 	unsigned long vaddr, vaddr_end, next_vaddr, npages, pages, size, i;
+@@ -1085,6 +1124,8 @@ void sev_vm_destroy(struct kvm *kvm)
+ 	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
+ 	struct list_head *head = &sev->regions_list;
+ 	struct list_head *pos, *q;
++	XA_STATE(xas, &sev->pages_xarray, 0);
++	struct page *xa_page;
  
- static void FNAME(update_pte)(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp,
-@@ -1011,7 +1013,8 @@ static int FNAME(sync_page)(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp)
- 	int i, nr_present = 0;
- 	bool host_writable;
- 	gpa_t first_pte_gpa;
--	int set_spte_ret = 0;
-+	int ret;
-+	int accum_set_spte_flags = 0;
- 
- 	/* direct kvm_mmu_page can not be unsync. */
- 	BUG_ON(sp->role.direct);
-@@ -1064,17 +1067,19 @@ static int FNAME(sync_page)(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp)
- 			continue;
+ 	if (!sev_guest(kvm))
+ 		return;
+@@ -1109,6 +1150,12 @@ void sev_vm_destroy(struct kvm *kvm)
  		}
- 
--		nr_present++;
--
- 		host_writable = sp->spt[i] & SPTE_HOST_WRITEABLE;
- 
--		set_spte_ret |= set_spte(vcpu, &sp->spt[i],
--					 pte_access, PG_LEVEL_4K,
--					 gfn, spte_to_pfn(sp->spt[i]),
--					 true, false, host_writable);
-+		ret = set_spte(vcpu, &sp->spt[i], pte_access,
-+			       PG_LEVEL_4K, gfn,
-+			       spte_to_pfn(sp->spt[i]), true, false,
-+			       host_writable);
-+		if (ret >= 0) {
-+			nr_present++;
-+			accum_set_spte_flags |= ret;
-+		}
  	}
  
--	if (set_spte_ret & SET_SPTE_NEED_REMOTE_TLB_FLUSH)
-+	if (accum_set_spte_flags & SET_SPTE_NEED_REMOTE_TLB_FLUSH)
- 		kvm_flush_remote_tlbs(vcpu->kvm);
++	/* Release each pinned page that SEV tracked in sev->pages_xarray. */
++	xas_for_each(&xas, xa_page, ULONG_MAX) {
++		put_page(xa_page);
++	}
++	xa_destroy(&sev->pages_xarray);
++
+ 	mutex_unlock(&kvm->lock);
  
- 	return nr_present;
+ 	sev_unbind_asid(kvm, sev->handle);
+@@ -1193,3 +1240,24 @@ void pre_sev_run(struct vcpu_svm *svm, int cpu)
+ 	svm->vmcb->control.tlb_ctl = TLB_CONTROL_FLUSH_ASID;
+ 	vmcb_mark_dirty(svm->vmcb, VMCB_ASID);
+ }
++
++int sev_pin_page(struct kvm_vcpu *vcpu, gfn_t gfn, kvm_pfn_t pfn,
++		 int level, u64 *spte)
++{
++	int rc;
++
++	if (!sev_guest(vcpu->kvm))
++		return 0;
++
++	rc = sev_get_page(vcpu->kvm, gfn, pfn);
++	if (rc)
++		return rc;
++
++	/*
++	 * Flush any cached lines of the page being added since "ownership" of
++	 * it will be transferred from the host to an encrypted guest.
++	 */
++	clflush_cache_range(__va(pfn << PAGE_SHIFT), page_level_size(level));
++
++	return 0;
++}
+diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+index 535ad311ad02..adb308631416 100644
+--- a/arch/x86/kvm/svm/svm.c
++++ b/arch/x86/kvm/svm/svm.c
+@@ -4130,6 +4130,8 @@ static struct kvm_x86_ops svm_x86_ops __initdata = {
+ 	.need_emulation_on_page_fault = svm_need_emulation_on_page_fault,
+ 
+ 	.apic_init_signal_blocked = svm_apic_init_signal_blocked,
++
++	.pin_page = sev_pin_page,
+ };
+ 
+ static struct kvm_x86_init_ops svm_init_ops __initdata = {
+diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
+index 121b198b51e9..278c46bc52aa 100644
+--- a/arch/x86/kvm/svm/svm.h
++++ b/arch/x86/kvm/svm/svm.h
+@@ -65,6 +65,7 @@ struct kvm_sev_info {
+ 	int fd;			/* SEV device fd */
+ 	unsigned long pages_locked; /* Number of pages locked */
+ 	struct list_head regions_list;  /* List of registered regions */
++	struct xarray pages_xarray; /* List of PFN locked */
+ };
+ 
+ struct kvm_svm {
+@@ -488,5 +489,7 @@ int svm_unregister_enc_region(struct kvm *kvm,
+ void pre_sev_run(struct vcpu_svm *svm, int cpu);
+ int __init sev_hardware_setup(void);
+ void sev_hardware_teardown(void);
++int sev_pin_page(struct kvm_vcpu *vcpu, gfn_t gfn, kvm_pfn_t pfn,
++		 int level, u64 *spte);
+ 
+ #endif
 -- 
 2.17.1
 
