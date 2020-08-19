@@ -2,93 +2,116 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D26752498D0
-	for <lists+kvm@lfdr.de>; Wed, 19 Aug 2020 10:56:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 62CFE2498D7
+	for <lists+kvm@lfdr.de>; Wed, 19 Aug 2020 10:56:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727792AbgHSI4D (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 19 Aug 2020 04:56:03 -0400
-Received: from smtp-fw-6001.amazon.com ([52.95.48.154]:31188 "EHLO
-        smtp-fw-6001.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727781AbgHSIxw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 19 Aug 2020 04:53:52 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1597827231; x=1629363231;
-  h=subject:to:cc:references:from:message-id:date:
-   mime-version:in-reply-to:content-transfer-encoding;
-  bh=Qiqi6G1Enlghvpshg3m6bdM1gK//pU2NSsB7zQgFc58=;
-  b=QSf2yM18vaIxIzLDvk8bO/r+wdZaX1BSyeTvo1/OwXnAR/TE1QnRvQhY
-   OEBG2pxCwVFfxnQINy6HCAlrsDWcS+GX/D7owHyv/Kj63M0IR+AGtxz3r
-   wt2Bur9S+unSqW3iMfdC32CoqOMrqm6DgcYtAoxezS3YPfvMPHuBo8Ie4
-   o=;
-X-IronPort-AV: E=Sophos;i="5.76,330,1592870400"; 
-   d="scan'208";a="50090133"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-2c-168cbb73.us-west-2.amazon.com) ([10.43.8.6])
-  by smtp-border-fw-out-6001.iad6.amazon.com with ESMTP; 19 Aug 2020 08:53:50 +0000
-Received: from EX13MTAUWC002.ant.amazon.com (pdx4-ws-svc-p6-lb7-vlan2.pdx.amazon.com [10.170.41.162])
-        by email-inbound-relay-2c-168cbb73.us-west-2.amazon.com (Postfix) with ESMTPS id 42DE5A039D;
-        Wed, 19 Aug 2020 08:53:49 +0000 (UTC)
-Received: from EX13D20UWC001.ant.amazon.com (10.43.162.244) by
- EX13MTAUWC002.ant.amazon.com (10.43.162.240) with Microsoft SMTP Server (TLS)
- id 15.0.1497.2; Wed, 19 Aug 2020 08:53:48 +0000
-Received: from 38f9d3867b82.ant.amazon.com (10.43.160.156) by
- EX13D20UWC001.ant.amazon.com (10.43.162.244) with Microsoft SMTP Server (TLS)
- id 15.0.1497.2; Wed, 19 Aug 2020 08:53:46 +0000
-Subject: Re: [PATCH v3 02/12] KVM: x86: Introduce allow list for MSR emulation
-To:     Aaron Lewis <aaronlewis@google.com>, <jmattson@google.com>
-CC:     <pshier@google.com>, <oupton@google.com>, <kvm@vger.kernel.org>,
-        KarimAllah Ahmed <karahmed@amazon.de>
-References: <20200818211533.849501-1-aaronlewis@google.com>
- <20200818211533.849501-3-aaronlewis@google.com>
-From:   Alexander Graf <graf@amazon.com>
-Message-ID: <f2b3b8c4-a1ee-843c-e94f-71a8993ea6c6@amazon.com>
-Date:   Wed, 19 Aug 2020 10:53:43 +0200
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:68.0)
- Gecko/20100101 Thunderbird/68.11.0
+        id S1727783AbgHSI4M (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 19 Aug 2020 04:56:12 -0400
+Received: from foss.arm.com ([217.140.110.172]:58728 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726630AbgHSIys (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 19 Aug 2020 04:54:48 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 30EB231B;
+        Wed, 19 Aug 2020 01:54:47 -0700 (PDT)
+Received: from [192.168.1.179] (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id C32DD3F6CF;
+        Wed, 19 Aug 2020 01:54:45 -0700 (PDT)
+Subject: Re: [RFC PATCH 0/5] KVM: arm64: Add pvtime LPT support
+To:     Marc Zyngier <maz@kernel.org>, Keqian Zhu <zhukeqian1@huawei.com>
+Cc:     linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        wanghaibin.wang@huawei.com
+References: <20200817084110.2672-1-zhukeqian1@huawei.com>
+ <8308f52e4c906cad710575724f9e3855@kernel.org>
+From:   Steven Price <steven.price@arm.com>
+Message-ID: <f14cfd5b-c103-5d56-82fb-59d0371c6f21@arm.com>
+Date:   Wed, 19 Aug 2020 09:54:40 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <20200818211533.849501-3-aaronlewis@google.com>
-Content-Language: en-US
-X-Originating-IP: [10.43.160.156]
-X-ClientProxiedBy: EX13D36UWA002.ant.amazon.com (10.43.160.24) To
- EX13D20UWC001.ant.amazon.com (10.43.162.244)
-Content-Type: text/plain; charset="utf-8"; format="flowed"
-Content-Transfer-Encoding: base64
+In-Reply-To: <8308f52e4c906cad710575724f9e3855@kernel.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-GB
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-CgpPbiAxOC4wOC4yMCAyMzoxNSwgQWFyb24gTGV3aXMgd3JvdGU6Cj4gCj4gSXQncyBub3QgZGVz
-aXJlYWJsZSB0byBoYXZlIGFsbCBNU1JzIGFsd2F5cyBoYW5kbGVkIGJ5IEtWTSBrZXJuZWwgc3Bh
-Y2UuIFNvbWUKPiBNU1JzIHdvdWxkIGJlIHVzZWZ1bCB0byBoYW5kbGUgaW4gdXNlciBzcGFjZSB0
-byBlaXRoZXIgZW11bGF0ZSBiZWhhdmlvciAobGlrZQo+IHVDb2RlIHVwZGF0ZXMpIG9yIGRpZmZl
-cmVudGlhdGUgd2hldGhlciB0aGV5IGFyZSB2YWxpZCBiYXNlZCBvbiB0aGUgQ1BVIG1vZGVsLgo+
-IAo+IFRvIGFsbG93IHVzZXIgc3BhY2UgdG8gc3BlY2lmeSB3aGljaCBNU1JzIGl0IHdhbnRzIHRv
-IHNlZSBoYW5kbGVkIGJ5IEtWTSwKPiB0aGlzIHBhdGNoIGludHJvZHVjZXMgYSBuZXcgaW9jdGwg
-dG8gcHVzaCBhbGxvdyBsaXN0cyBvZiBiaXRtYXBzIGludG8KPiBLVk0uIEJhc2VkIG9uIHRoZXNl
-IGJpdG1hcHMsIEtWTSBjYW4gdGhlbiBkZWNpZGUgd2hldGhlciB0byByZWplY3QgTVNSIGFjY2Vz
-cy4KPiBXaXRoIHRoZSBhZGRpdGlvbiBvZiBLVk1fQ0FQX1g4Nl9VU0VSX1NQQUNFX01TUiBpdCBj
-YW4gYWxzbyBkZWZsZWN0IHRoZQo+IGRlbmllZCBNU1IgZXZlbnRzIHRvIHVzZXIgc3BhY2UgdG8g
-b3BlcmF0ZSBvbi4KPiAKPiBJZiBubyBhbGxvd2xpc3QgaXMgcG9wdWxhdGVkLCBNU1IgaGFuZGxp
-bmcgc3RheXMgaWRlbnRpY2FsIHRvIGJlZm9yZS4KPiAKPiBTaWduZWQtb2ZmLWJ5OiBLYXJpbUFs
-bGFoIEFobWVkIDxrYXJhaG1lZEBhbWF6b24uZGU+Cj4gU2lnbmVkLW9mZi1ieTogQWxleGFuZGVy
-IEdyYWYgPGdyYWZAYW1hem9uLmNvbT4KClNhbWUgaGVyZSwgU29CIGxpbmUgaXMgbWlzc2luZy4K
-CkkgYWxzbyBzZWUgdGhhdCB5b3UgZGlkbid0IGFkZHJlc3MgdGhlIG5pdHMgeW91IGhhZCBvbiB0
-aGlzIHBhdGNoOgoKWy4uLl0KCiA+PiArICBGaWx0ZXIgYm9vdGggcmVhZCBhbmQgd3JpdGUgYWNj
-ZXNzZXMgdG8gTVNScyB1c2luZyB0aGUgZ2l2ZW4gCmJpdG1hcC4gQSAwCiA+PiArICBpbiB0aGUg
-Yml0bWFwIGluZGljYXRlcyB0aGF0IGJvdGggcmVhZHMgYW5kIHdyaXRlcyBzaG91bGQgCmltbWVk
-aWF0ZWx5IGZhaWwsCiA+PiArICB3aGlsZSBhIDEgaW5kaWNhdGVzIHRoYXQgcmVhZHMgYW5kIHdy
-aXRlcyBzaG91bGQgYmUgaGFuZGxlZCBieSAKdGhlIG5vcm1hbAogPj4gKyAgS1ZNIE1TUiBlbXVs
-YXRpb24gbG9naWMuCiA+CiA+IG5pdDogRmlsdGVyIGJvdGgKClsuLi5dCgogPj4gKy8qIE1heGlt
-dW0gc2l6ZSBvZiB0aGUgb2YgdGhlIGJpdG1hcCBpbiBieXRlcyAqLwogPgogPiBuaXQ6ICJvZiB0
-aGUiIGlzIHJlcGVhdGVkIHR3aWNlCgoKCkZlZWwgZnJlZSB0byBjaGFuZ2UgdGhlbSBpbiB5b3Vy
-IHBhdGNoIHNldGFuZCBhZGQgYSBub3RlIGJldHdlZW4gdGhlIFNvQiAKbGluZXM6CgpTaWduZWQt
-b2ZmLWJ5OiBLYXJpbUFsbGFoIEFobWVkIDxrYXJhaG1lZEBhbWF6b24uZGUKU2lnbmVkLW9mZi1i
-eTogQWxleGFuZGVyIEdyYWYgPGdyYWZAYW1hem9uLmNvbT4KW2Fhcm9ubGV3aXM6IHMvb2YgdGhl
-IG9mIHRoZS9vZiB0aGUvLCBzL2Jvb3RoL2JvdGgvXQpTaWduZWQtb2ZmLWJ5OiBBYXJvbiBMZXdp
-cyA8YWFyb25sZXdpc0Bnb29nbGUuY29tPgoKCkFsZXgKCgoKQW1hem9uIERldmVsb3BtZW50IENl
-bnRlciBHZXJtYW55IEdtYkgKS3JhdXNlbnN0ci4gMzgKMTAxMTcgQmVybGluCkdlc2NoYWVmdHNm
-dWVocnVuZzogQ2hyaXN0aWFuIFNjaGxhZWdlciwgSm9uYXRoYW4gV2Vpc3MKRWluZ2V0cmFnZW4g
-YW0gQW10c2dlcmljaHQgQ2hhcmxvdHRlbmJ1cmcgdW50ZXIgSFJCIDE0OTE3MyBCClNpdHo6IEJl
-cmxpbgpVc3QtSUQ6IERFIDI4OSAyMzcgODc5CgoK
+On 18/08/2020 15:41, Marc Zyngier wrote:
+> On 2020-08-17 09:41, Keqian Zhu wrote:
+>> Hi all,
+>>
+>> This patch series picks up the LPT pvtime feature originally developed
+>> by Steven Price: https://patchwork.kernel.org/cover/10726499/
+>>
+>> Backgroud:
+>>
+>> There is demand for cross-platform migration, which means we have to
+>> solve different CPU features and arch counter frequency between hosts.
+>> This patch series can solve the latter problem.
+>>
+>> About LPT:
+>>
+>> This implements support for Live Physical Time (LPT) which provides the
+>> guest with a method to derive a stable counter of time during which the
+>> guest is executing even when the guest is being migrated between hosts
+>> with different physical counter frequencies.
+>>
+>> Changes on Steven Price's work:
+>> 1. LPT structure: use symmatical semantics of scale multiplier, and use
+>>    fraction bits instead of "shift" to make everything clear.
+>> 2. Structure allocation: host kernel does not allocates the LPT 
+>> structure,
+>>    instead it is allocated by userspace through VM attributes. The 
+>> save/restore
+>>    functionality can be removed.
+>> 3. Since LPT structure just need update once for each guest run, add a 
+>> flag to
+>>    indicate the update status. This has two benifits: 1) avoid 
+>> multiple update
+>>    by each vCPUs. 2) If the update flag is not set, then return NOT 
+>> SUPPORT for
+>>    coressponding guest HVC call.
+>> 4. Add VM device attributes interface for userspace configuration.
+>> 5. Add a base LPT read/write layer to reduce code.
+>> 6. Support ptimer scaling.
+>> 7. Support timer event stream translation.
+>>
+>> Things need concern:
+>> 1. https://developer.arm.com/docs/den0057/a needs update.
+> 
+> LPT was explicitly removed from the spec because it doesn't really
+> solve the problem, specially for the firmware: EFI knows
+> nothing about this, for example. How is it going to work?
+> Also, nobody was ever able to explain how this would work for
+> nested virt.
+> 
+> ARMv8.4 and ARMv8.6 have the feature set that is required to solve
+> this problem without adding more PV to the kernel.
 
+Hi Marc,
+
+These are good points, however we do still have the situation that CPUs 
+that don't have ARMv8.4/8.6 clearly cannot implement this. I presume the 
+use-case Keqian is looking at predates the necessary support in the CPU 
+- Keqian if you can provide more details on the architecture(s) involved 
+that would be helpful.
+
+Nested virt is indeed more of an issue - we did have some ideas around 
+using SDEI that never made it to the spec. However I would argue that 
+the most pragmatic approach would be to not support the combination of 
+nested virt and LPT. Hopefully that can wait until the counter scaling 
+support is available and not require PV.
+
+We are discussing (re-)releasing the spec with the LPT parts added. If 
+you have fundamental objections then please me know.
+
+Thanks,
+
+Steve
