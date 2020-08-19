@@ -2,116 +2,119 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 62CFE2498D7
-	for <lists+kvm@lfdr.de>; Wed, 19 Aug 2020 10:56:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B4E052498DF
+	for <lists+kvm@lfdr.de>; Wed, 19 Aug 2020 10:57:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727783AbgHSI4M (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 19 Aug 2020 04:56:12 -0400
-Received: from foss.arm.com ([217.140.110.172]:58728 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726630AbgHSIys (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 19 Aug 2020 04:54:48 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 30EB231B;
-        Wed, 19 Aug 2020 01:54:47 -0700 (PDT)
-Received: from [192.168.1.179] (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id C32DD3F6CF;
-        Wed, 19 Aug 2020 01:54:45 -0700 (PDT)
-Subject: Re: [RFC PATCH 0/5] KVM: arm64: Add pvtime LPT support
-To:     Marc Zyngier <maz@kernel.org>, Keqian Zhu <zhukeqian1@huawei.com>
-Cc:     linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        wanghaibin.wang@huawei.com
-References: <20200817084110.2672-1-zhukeqian1@huawei.com>
- <8308f52e4c906cad710575724f9e3855@kernel.org>
-From:   Steven Price <steven.price@arm.com>
-Message-ID: <f14cfd5b-c103-5d56-82fb-59d0371c6f21@arm.com>
-Date:   Wed, 19 Aug 2020 09:54:40 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
-MIME-Version: 1.0
-In-Reply-To: <8308f52e4c906cad710575724f9e3855@kernel.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-GB
-Content-Transfer-Encoding: 8bit
+        id S1727935AbgHSI5J (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 19 Aug 2020 04:57:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55020 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727114AbgHSIzn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 19 Aug 2020 04:55:43 -0400
+Received: from mail-pl1-x644.google.com (mail-pl1-x644.google.com [IPv6:2607:f8b0:4864:20::644])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0B331C061342;
+        Wed, 19 Aug 2020 01:55:41 -0700 (PDT)
+Received: by mail-pl1-x644.google.com with SMTP id y6so10506842plt.3;
+        Wed, 19 Aug 2020 01:55:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id;
+        bh=nDuiQiXTW962b08Ia0CPUyPMivpXBTRFVOWfM281t2I=;
+        b=RaUObfPy9UGdUIMrmSu4v87RasnxOvjPoiDncMq5aYZjysFwPh6YqhgU4iv93cylyn
+         6RiJkNEaH4sDneCCrfnuE/KV0QI0wS8QPKXaTUAfY9th/MDkoj34WxdhG5dYgejmGC2W
+         CwzXXVGEDQdC9HFn1Y4hGYfwlwSLfU2IGVgMMobwATo4JiHupC1dav8/ZPt4Bgsc8DeI
+         uA4zQXbLq+oBLGrUq/AodY6T7xCEOuF+MuiIXVhs6/9aglNYHhrwUE/Aad5ZOqTcVZ7M
+         z8R+lzf+PjZnyuQ19L1PkpAJWvM+Y6K+z7UHtntlkzapeqOXbz+Tl6VjUOgaz5rXFi7k
+         c+VA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=nDuiQiXTW962b08Ia0CPUyPMivpXBTRFVOWfM281t2I=;
+        b=Ct3JjnRL1m1BBKlsfGq0ICsRSp+yO7HfHSOwRxjyFUu3445nzmnCvzo41T2ydCcIfC
+         TVKMYVxe30NT4VpLtQs5tVhf1+4DNJ5gUU9fUnqSjXvS5kG7jdambitPy1qw0giLcM4f
+         t7wPk4Qc+xMezMQ8QVbV5cnzTwkXV2ccnu5j3nFAGO7PDqb77o+jLap4e5Or34WQ++en
+         PuND8jZeTGURE3S2Rk4naICvyj0qdJJmeXDBxFdoKCsjavsiyOCwvycZRwkuEIqpVCxW
+         vd1jweMVh6zKc3Am1HbNM12TGytmYwGKHcHhMJD03yvZxytPMvYs4b3Pza7WOcT/Y4XQ
+         Jylw==
+X-Gm-Message-State: AOAM5324nQ16BgW/dOtI3C73sqot5y1H8F34ag93R5i8awM+/b7B15MR
+        gJLWW+ieBiGHps2ChsCwnuwTeV3oZyc=
+X-Google-Smtp-Source: ABdhPJyZ2JC161afsEyKpInkW87mBHllTI27riaA07jogoWCDLFoujX/REj5Fq8SGRgRid1pyYIwRQ==
+X-Received: by 2002:a17:90a:9405:: with SMTP id r5mr3416942pjo.74.1597827341075;
+        Wed, 19 Aug 2020 01:55:41 -0700 (PDT)
+Received: from localhost.localdomain ([103.7.29.6])
+        by smtp.googlemail.com with ESMTPSA id m15sm20209991pgr.2.2020.08.19.01.55.38
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Wed, 19 Aug 2020 01:55:40 -0700 (PDT)
+From:   Wanpeng Li <kernellwp@gmail.com>
+X-Google-Original-From: Wanpeng Li <wanpengli@tencent.com>
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>
+Subject: [PATCH 1/2] KVM: LAPIC: Fix updating DFR missing apic map recalculation
+Date:   Wed, 19 Aug 2020 16:55:26 +0800
+Message-Id: <1597827327-25055-1-git-send-email-wanpengli@tencent.com>
+X-Mailer: git-send-email 2.7.4
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 18/08/2020 15:41, Marc Zyngier wrote:
-> On 2020-08-17 09:41, Keqian Zhu wrote:
->> Hi all,
->>
->> This patch series picks up the LPT pvtime feature originally developed
->> by Steven Price: https://patchwork.kernel.org/cover/10726499/
->>
->> Backgroud:
->>
->> There is demand for cross-platform migration, which means we have to
->> solve different CPU features and arch counter frequency between hosts.
->> This patch series can solve the latter problem.
->>
->> About LPT:
->>
->> This implements support for Live Physical Time (LPT) which provides the
->> guest with a method to derive a stable counter of time during which the
->> guest is executing even when the guest is being migrated between hosts
->> with different physical counter frequencies.
->>
->> Changes on Steven Price's work:
->> 1. LPT structure: use symmatical semantics of scale multiplier, and use
->>    fraction bits instead of "shift" to make everything clear.
->> 2. Structure allocation: host kernel does not allocates the LPT 
->> structure,
->>    instead it is allocated by userspace through VM attributes. The 
->> save/restore
->>    functionality can be removed.
->> 3. Since LPT structure just need update once for each guest run, add a 
->> flag to
->>    indicate the update status. This has two benifits: 1) avoid 
->> multiple update
->>    by each vCPUs. 2) If the update flag is not set, then return NOT 
->> SUPPORT for
->>    coressponding guest HVC call.
->> 4. Add VM device attributes interface for userspace configuration.
->> 5. Add a base LPT read/write layer to reduce code.
->> 6. Support ptimer scaling.
->> 7. Support timer event stream translation.
->>
->> Things need concern:
->> 1. https://developer.arm.com/docs/den0057/a needs update.
-> 
-> LPT was explicitly removed from the spec because it doesn't really
-> solve the problem, specially for the firmware: EFI knows
-> nothing about this, for example. How is it going to work?
-> Also, nobody was ever able to explain how this would work for
-> nested virt.
-> 
-> ARMv8.4 and ARMv8.6 have the feature set that is required to solve
-> this problem without adding more PV to the kernel.
+From: Wanpeng Li <wanpengli@tencent.com>
 
-Hi Marc,
+There is missing apic map recalculation after updating DFR, if it is 
+INIT RESET, in x2apic mode, local apic is software enabled before. 
+This patch fix it by introducing the function kvm_apic_set_dfr() to 
+be called in INIT RESET handling path.
 
-These are good points, however we do still have the situation that CPUs 
-that don't have ARMv8.4/8.6 clearly cannot implement this. I presume the 
-use-case Keqian is looking at predates the necessary support in the CPU 
-- Keqian if you can provide more details on the architecture(s) involved 
-that would be helpful.
+Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
+---
+ arch/x86/kvm/lapic.c | 15 ++++++++++-----
+ 1 file changed, 10 insertions(+), 5 deletions(-)
 
-Nested virt is indeed more of an issue - we did have some ideas around 
-using SDEI that never made it to the spec. However I would argue that 
-the most pragmatic approach would be to not support the combination of 
-nested virt and LPT. Hopefully that can wait until the counter scaling 
-support is available and not require PV.
+diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+index 5ccbee7..248095a 100644
+--- a/arch/x86/kvm/lapic.c
++++ b/arch/x86/kvm/lapic.c
+@@ -310,6 +310,12 @@ static inline void kvm_apic_set_ldr(struct kvm_lapic *apic, u32 id)
+ 	atomic_set_release(&apic->vcpu->kvm->arch.apic_map_dirty, DIRTY);
+ }
+ 
++static inline void kvm_apic_set_dfr(struct kvm_lapic *apic, u32 val)
++{
++	kvm_lapic_set_reg(apic, APIC_DFR, val);
++	atomic_set_release(&apic->vcpu->kvm->arch.apic_map_dirty, DIRTY);
++}
++
+ static inline u32 kvm_apic_calc_x2apic_ldr(u32 id)
+ {
+ 	return ((id >> 4) << 16) | (1 << (id & 0xf));
+@@ -1984,10 +1990,9 @@ int kvm_lapic_reg_write(struct kvm_lapic *apic, u32 reg, u32 val)
+ 		break;
+ 
+ 	case APIC_DFR:
+-		if (!apic_x2apic_mode(apic)) {
+-			kvm_lapic_set_reg(apic, APIC_DFR, val | 0x0FFFFFFF);
+-			atomic_set_release(&apic->vcpu->kvm->arch.apic_map_dirty, DIRTY);
+-		} else
++		if (!apic_x2apic_mode(apic))
++			kvm_apic_set_dfr(apic, val | 0x0FFFFFFF);
++		else
+ 			ret = 1;
+ 		break;
+ 
+@@ -2303,7 +2308,7 @@ void kvm_lapic_reset(struct kvm_vcpu *vcpu, bool init_event)
+ 			     SET_APIC_DELIVERY_MODE(0, APIC_MODE_EXTINT));
+ 	apic_manage_nmi_watchdog(apic, kvm_lapic_get_reg(apic, APIC_LVT0));
+ 
+-	kvm_lapic_set_reg(apic, APIC_DFR, 0xffffffffU);
++	kvm_apic_set_dfr(apic, 0xffffffffU);
+ 	apic_set_spiv(apic, 0xff);
+ 	kvm_lapic_set_reg(apic, APIC_TASKPRI, 0);
+ 	if (!apic_x2apic_mode(apic))
+-- 
+2.7.4
 
-We are discussing (re-)releasing the spec with the LPT parts added. If 
-you have fundamental objections then please me know.
-
-Thanks,
-
-Steve
