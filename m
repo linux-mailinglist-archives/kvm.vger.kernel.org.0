@@ -2,71 +2,55 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4CBDC2492FB
-	for <lists+kvm@lfdr.de>; Wed, 19 Aug 2020 04:46:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B99C0249313
+	for <lists+kvm@lfdr.de>; Wed, 19 Aug 2020 04:54:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727122AbgHSCqZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 18 Aug 2020 22:46:25 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:33647 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726605AbgHSCqY (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 18 Aug 2020 22:46:24 -0400
+        id S1726852AbgHSCyd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 18 Aug 2020 22:54:33 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:30080 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726718AbgHSCyc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 18 Aug 2020 22:54:32 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1597805182;
+        s=mimecast20190719; t=1597805670;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=YHzwrXrXbLwizcmmmBRfV2cYeOLa+iyjDJxZ2l+hNLM=;
-        b=V1QK719Ad0Tx6SjM3hFNcukadhH/ZCKgMmuwJX8BaBba+e1ORdIq6T6hyfyRA7MtquegNe
-        11quf+6NDrF1n4DO/z/OuQuwXN+JOqmoXxYL5bxjJJHo5Sx+Xy+D37wFywnb1LaSBQZjuj
-        SIhWEFEVEhdYmoOoc7wkYn8ZhtowSqk=
+        bh=OyfXHDOh3tadbBcQyUmurCPsA+lHPesiQMeXAJCp/nc=;
+        b=OiJFqrqUeN8hDTapH/ujMRVmOQtv/EPJs7ua6I52WuT2TPZrnonb0zYfwvpgDQpMxvnmWH
+        0xmAYRwY+wdzM+UCytm7+tKTTHNEwEdvUNR+Xn5Kht88CtZ5cTzYL1jUq5Qh6a1W+fml5J
+        xt6ILlqrzTjQVHSS9lWmZXdByLxBjv4=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-445-6L_flAJUOaWxJy5I7WQLeA-1; Tue, 18 Aug 2020 22:46:20 -0400
-X-MC-Unique: 6L_flAJUOaWxJy5I7WQLeA-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+ us-mta-207-Ay-EfPfqMQ6MMOO5kbt_wg-1; Tue, 18 Aug 2020 22:54:29 -0400
+X-MC-Unique: Ay-EfPfqMQ6MMOO5kbt_wg-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8390F81F028;
-        Wed, 19 Aug 2020 02:46:18 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7656381F030;
+        Wed, 19 Aug 2020 02:54:26 +0000 (UTC)
 Received: from [10.72.13.88] (ovpn-13-88.pek2.redhat.com [10.72.13.88])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 759E15D9E4;
-        Wed, 19 Aug 2020 02:45:59 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id D15481B47B;
+        Wed, 19 Aug 2020 02:54:08 +0000 (UTC)
 Subject: Re: device compatibility interface for live migration with assigned
  devices
-To:     Parav Pandit <parav@nvidia.com>,
+To:     Cornelia Huck <cohuck@redhat.com>,
         =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>
-Cc:     Yan Zhao <yan.y.zhao@intel.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "libvir-list@redhat.com" <libvir-list@redhat.com>,
-        "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
-        Kirti Wankhede <kwankhede@nvidia.com>,
-        "eauger@redhat.com" <eauger@redhat.com>,
-        "xin-ran.wang@intel.com" <xin-ran.wang@intel.com>,
-        "corbet@lwn.net" <corbet@lwn.net>,
-        "openstack-discuss@lists.openstack.org" 
-        <openstack-discuss@lists.openstack.org>,
-        "shaohe.feng@intel.com" <shaohe.feng@intel.com>,
-        "kevin.tian@intel.com" <kevin.tian@intel.com>,
-        Parav Pandit <parav@mellanox.com>,
-        "jian-feng.ding@intel.com" <jian-feng.ding@intel.com>,
-        "dgilbert@redhat.com" <dgilbert@redhat.com>,
-        "zhenyuw@linux.intel.com" <zhenyuw@linux.intel.com>,
-        "hejie.xu@intel.com" <hejie.xu@intel.com>,
-        "bao.yumeng@zte.com.cn" <bao.yumeng@zte.com.cn>,
+Cc:     Yan Zhao <yan.y.zhao@intel.com>, kvm@vger.kernel.org,
+        libvir-list@redhat.com, qemu-devel@nongnu.org,
+        kwankhede@nvidia.com, eauger@redhat.com, xin-ran.wang@intel.com,
+        corbet@lwn.net, openstack-discuss@lists.openstack.org,
+        shaohe.feng@intel.com, kevin.tian@intel.com,
+        Parav Pandit <parav@mellanox.com>, jian-feng.ding@intel.com,
+        dgilbert@redhat.com, zhenyuw@linux.intel.com, hejie.xu@intel.com,
+        bao.yumeng@zte.com.cn,
         Alex Williamson <alex.williamson@redhat.com>,
-        "eskultet@redhat.com" <eskultet@redhat.com>,
-        "smooney@redhat.com" <smooney@redhat.com>,
-        "intel-gvt-dev@lists.freedesktop.org" 
-        <intel-gvt-dev@lists.freedesktop.org>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Jiri Pirko <jiri@mellanox.com>,
-        "dinechin@redhat.com" <dinechin@redhat.com>,
-        "devel@ovirt.org" <devel@ovirt.org>
-References: <20200805021654.GB30485@joy-OptiPlex-7040>
- <2624b12f-3788-7e2b-2cb7-93534960bcb7@redhat.com>
- <20200805075647.GB2177@nanopsycho>
+        eskultet@redhat.com, smooney@redhat.com,
+        intel-gvt-dev@lists.freedesktop.org,
+        Jiri Pirko <jiri@mellanox.com>, dinechin@redhat.com,
+        devel@ovirt.org
+References: <20200805075647.GB2177@nanopsycho>
  <eb1d01c2-fbad-36b6-10cf-9e03483a736b@redhat.com>
  <20200805093338.GC30485@joy-OptiPlex-7040> <20200805105319.GF2177@nanopsycho>
  <20200810074631.GA29059@joy-OptiPlex-7040>
@@ -75,154 +59,135 @@ References: <20200805021654.GB30485@joy-OptiPlex-7040>
  <a51209fe-a8c6-941f-ff54-7be06d73bc44@redhat.com>
  <20200818085527.GB20215@redhat.com>
  <3a073222-dcfe-c02d-198b-29f6a507b2e1@redhat.com>
- <BY5PR12MB43222059335C96F7B050CFDCDC5C0@BY5PR12MB4322.namprd12.prod.outlook.com>
+ <20200818091628.GC20215@redhat.com>
+ <20200818113652.5d81a392.cohuck@redhat.com>
 From:   Jason Wang <jasowang@redhat.com>
-Message-ID: <934c8d2a-a34e-6c68-0e53-5de2a8f49d19@redhat.com>
-Date:   Wed, 19 Aug 2020 10:45:57 +0800
+Message-ID: <e862b946-6688-0a75-47ae-9ca16a759c38@redhat.com>
+Date:   Wed, 19 Aug 2020 10:54:07 +0800
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <BY5PR12MB43222059335C96F7B050CFDCDC5C0@BY5PR12MB4322.namprd12.prod.outlook.com>
+In-Reply-To: <20200818113652.5d81a392.cohuck@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
-On 2020/8/18 下午5:32, Parav Pandit wrote:
-> Hi Jason,
+On 2020/8/18 下午5:36, Cornelia Huck wrote:
+> On Tue, 18 Aug 2020 10:16:28 +0100
+> Daniel P. Berrangé <berrange@redhat.com> wrote:
 >
-> From: Jason Wang <jasowang@redhat.com>
-> Sent: Tuesday, August 18, 2020 2:32 PM
->
->
-> On 2020/8/18 下午4:55, Daniel P. Berrangé wrote:
-> On Tue, Aug 18, 2020 at 11:24:30AM +0800, Jason Wang wrote:
-> On 2020/8/14 下午1:16, Yan Zhao wrote:
-> On Thu, Aug 13, 2020 at 12:24:50PM +0800, Jason Wang wrote:
-> On 2020/8/10 下午3:46, Yan Zhao wrote:
-> driver is it handled by?
-> It looks that the devlink is for network device specific, and in
-> devlink.h, it says
-> include/uapi/linux/devlink.h - Network physical device Netlink
-> interface,
-> Actually not, I think there used to have some discussion last year and the
-> conclusion is to remove this comment.
->
-> [...]
->
->> Yes, but it could be hard. E.g vDPA will chose to use devlink (there's a long debate on sysfs vs devlink). So if we go with sysfs, at least two APIs needs to be supported ...
-> We had internal discussion and proposal on this topic.
-> I wanted Eli Cohen to be back from vacation on Wed 8/19, but since this is active discussion right now, I will share the thoughts anyway.
->
-> Here are the initial round of thoughts and proposal.
->
-> User requirements:
-> ---------------------------
-> 1. User might want to create one or more vdpa devices per PCI PF/VF/SF.
-> 2. User might want to create one or more vdpa devices of type net/blk or other type.
-> 3. User needs to look and dump at the health of the queues for debug purpose.
-> 4. During vdpa net device creation time, user may have to provide a MAC address and/or VLAN.
-> 5. User should be able to set/query some of the attributes for debug/compatibility check
-> 6. When user wants to create vdpa device, it needs to know which device supports creation.
-> 7. User should be able to see the queue statistics of doorbells, wqes etc regardless of class type
+>> On Tue, Aug 18, 2020 at 05:01:51PM +0800, Jason Wang wrote:
+>>>     On 2020/8/18 下午4:55, Daniel P. Berrangé wrote:
+>>>
+>>>   On Tue, Aug 18, 2020 at 11:24:30AM +0800, Jason Wang wrote:
+>>>
+>>>   On 2020/8/14 下午1:16, Yan Zhao wrote:
+>>>
+>>>   On Thu, Aug 13, 2020 at 12:24:50PM +0800, Jason Wang wrote:
+>>>
+>>>   On 2020/8/10 下午3:46, Yan Zhao wrote:
+>>>   we actually can also retrieve the same information through sysfs, .e.g
+>>>
+>>>   |- [path to device]
+>>>      |--- migration
+>>>      |     |--- self
+>>>      |     |   |---device_api
+>>>      |    |   |---mdev_type
+>>>      |    |   |---software_version
+>>>      |    |   |---device_id
+>>>      |    |   |---aggregator
+>>>      |     |--- compatible
+>>>      |     |   |---device_api
+>>>      |    |   |---mdev_type
+>>>      |    |   |---software_version
+>>>      |    |   |---device_id
+>>>      |    |   |---aggregator
+>>>
+>>>
+>>>   Yes but:
+>>>
+>>>   - You need one file per attribute (one syscall for one attribute)
+>>>   - Attribute is coupled with kobject
+> Is that really that bad? You have the device with an embedded kobject
+> anyway, and you can just put things into an attribute group?
 
 
-Note that wqes is probably not something common in all of the vendors.
+Yes, but all of this could be done via devlink(netlink) as well with low 
+overhead.
 
 
 >
-> To address above requirements, there is a need of vendor agnostic tool, so that user can create/config/delete vdpa device(s) regardless of the vendor.
+> [Also, I think that self/compatible split in the example makes things
+> needlessly complex. Shouldn't semantic versioning and matching already
+> cover nearly everything?
+
+
+That's my question as well. E.g for virtio, versioning may not even 
+work, some of features are negotiated independently:
+
+Source features: A, B, C
+Dest features: A, B, C, E
+
+We just need to make sure the dest features is a superset of source then 
+all set.
+
+
+>   I would expect very few cases that are more
+> complex than that. Maybe the aggregation stuff, but I don't think we
+> need that self/compatible split for that, either.]
 >
-> Hence,
-> We should have a tool that lets user do it.
+>>>   All of above seems unnecessary.
+>>>
+>>>   Another point, as we discussed in another thread, it's really hard to make
+>>>   sure the above API work for all types of devices and frameworks. So having a
+>>>   vendor specific API looks much better.
+>>>
+>>>   From the POV of userspace mgmt apps doing device compat checking / migration,
+>>>   we certainly do NOT want to use different vendor specific APIs. We want to
+>>>   have an API that can be used / controlled in a standard manner across vendors.
+>>>
+>>>     Yes, but it could be hard. E.g vDPA will chose to use devlink (there's a
+>>>     long debate on sysfs vs devlink). So if we go with sysfs, at least two
+>>>     APIs needs to be supported ...
+>> NB, I was not questioning devlink vs sysfs directly. If devlink is related
+>> to netlink, I can't say I'm enthusiastic as IMKE sysfs is easier to deal
+>> with. I don't know enough about devlink to have much of an opinion though.
+>> The key point was that I don't want the userspace APIs we need to deal with
+>> to be vendor specific.
+>  From what I've seen of devlink, it seems quite nice; but I understand
+> why sysfs might be easier to deal with (especially as there's likely
+> already a lot of code using it.)
 >
-> Examples:
-> -------------
-> (a) List parent devices which supports creating vdpa devices.
-> It also shows which class types supported by this parent device.
-> In below command two parent devices support vdpa device creation.
-> First is PCI VF whose bdf is 03.00:5.
-> Second is PCI SF whose name is mlx5_sf.1
->
-> $ vdpa list pd
+> I understand that some users would like devlink because it is already
+> widely used for network drivers (and some others), but I don't think
+> the majority of devices used with vfio are network (although certainly
+> a lot of them are.)
 
 
-What did "pd" mean?
-
-
-> pci/0000:03.00:5
->    class_supports
->      net vdpa
-> virtbus/mlx5_sf.1
-
-
-So creating mlx5_sf.1 is the charge of devlink?
-
-
->    class_supports
->      net
->
-> (b) Now add a vdpa device and show the device.
-> $ vdpa dev add pci/0000:03.00:5 type net
-
-
-So if you want to create devices types other than vdpa on 
-pci/0000:03.00:5 it needs some synchronization with devlink?
-
-
-> $ vdpa dev show
-> vdpa0@pci/0000:03.00:5 type net state inactive maxqueues 8 curqueues 4
->
-> (c) vdpa dev show features vdpa0
-> iommu platform
-> version 1
->
-> (d) dump vdpa statistics
-> $ vdpa dev stats show vdpa0
-> kickdoorbells 10
-> wqes 100
->
-> (e) Now delete a vdpa device previously created.
-> $ vdpa dev del vdpa0
->
-> Design overview:
-> -----------------------
-> 1. Above example tool runs over netlink socket interface.
-> 2. This enables users to return meaningful error strings in addition to code so that user can be more informed.
-> Often this is missing in ioctl()/configfs/sysfs interfaces.
-> 3. This tool over netlink enables syscaller tests to be more usable like other subsystems to keep kernel robust
-> 4. This provides vendor agnostic view of all vdpa capable parent and vdpa devices.
->
-> 5. Each driver which supports vdpa device creation, registers the parent device along with supported classes.
->
-> FAQs:
-> --------
-> 1. Why not using devlink?
-> Ans: Because as vdpa echo system grows, devlink will fall short of extending vdpa specific params, attributes, stats.
-
-
-This should be fine but it's still not clear to me the difference 
-between a vdpa netlink and a vdpa object in devlink.
+Note that though devlink could be popular only in network devices, 
+netlink is widely used by a lot of subsystesm (e.g SCSI).
 
 Thanks
 
 
 >
-> 2. Why not use sysfs?
-> Ans:
-> (a) Because running syscaller infrastructure can run well over netlink sockets like it runs for several subsystem.
-> (b) it lacks the ability to return error messages. Doing via kernel log is just doesn't work.
-> (c) Why not using some ioctl()? It will reinvent the wheel of netlink that has TLV formats for several attributes.
->
-> 3. Why not configs?
-> It follows same limitation as that of sysfs.
->
-> Low level design and driver APIS:
-> --------------------------------------------
-> Will post once we discuss this further.
+>> What I care about is that we have a *standard* userspace API for performing
+>> device compatibility checking / state migration, for use by QEMU/libvirt/
+>> OpenStack, such that we can write code without countless vendor specific
+>> code paths.
+>>
+>> If there is vendor specific stuff on the side, that's fine as we can ignore
+>> that, but the core functionality for device compat / migration needs to be
+>> standardized.
+> To summarize:
+> - choose one of sysfs or devlink
+> - have a common interface, with a standardized way to add
+>    vendor-specific attributes
+> ?
 
