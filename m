@@ -2,116 +2,93 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 972742498AC
-	for <lists+kvm@lfdr.de>; Wed, 19 Aug 2020 10:53:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D26752498D0
+	for <lists+kvm@lfdr.de>; Wed, 19 Aug 2020 10:56:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726840AbgHSIwt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 19 Aug 2020 04:52:49 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:27892 "EHLO
-        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727030AbgHSIvs (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 19 Aug 2020 04:51:48 -0400
-Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 07J8XFV6070490;
-        Wed, 19 Aug 2020 04:51:38 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=S+nsWlwf+U8EP6ck/CPDu7nHuTHsUi9kQOKDLthEZ9Q=;
- b=niSdGqNeGZ9z/4yhvg5wOGNU03UEjPnZ5q9uYkK5QyIwjvUVG+54rYq+f0/dwzXdPOtZ
- tNkJO2QMpIQ8czSZPvO+jn33v0pasbPNusJdL+gwsEFJsUDRaGrpQ9TsrU0lDvxvT6j9
- EY6gzahMWidXzHi1evQzdMDuP2PhadIFJVk0QUwEp8526YLCMZP5b7v0sWgaiH80hey+
- e7C4P+flw6+DduFgUEgTTltCwcfbFBlmQZIBSXVkrIAL8DslUWkIPnP96aFLRxsWjAEK
- 8BNU8o0RigFLyaY12uwNz9hkGtDnVLFztexUkoU31bMRITpqU4T+iLo4P1AzkSofgkmh /w== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3304r4ag78-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 19 Aug 2020 04:51:38 -0400
-Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 07J8YQdb073315;
-        Wed, 19 Aug 2020 04:51:38 -0400
-Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com [159.122.73.71])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3304r4ag6h-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 19 Aug 2020 04:51:38 -0400
-Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
-        by ppma02fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 07J8oHjh026071;
-        Wed, 19 Aug 2020 08:51:36 GMT
-Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
-        by ppma02fra.de.ibm.com with ESMTP id 3304bbs0pq-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 19 Aug 2020 08:51:36 +0000
-Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
-        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 07J8pXnY32113038
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 19 Aug 2020 08:51:33 GMT
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 7BA6511C04A;
-        Wed, 19 Aug 2020 08:51:33 +0000 (GMT)
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id DE1B311C04C;
-        Wed, 19 Aug 2020 08:51:32 +0000 (GMT)
-Received: from oc3016276355.ibm.com (unknown [9.145.33.131])
-        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Wed, 19 Aug 2020 08:51:32 +0000 (GMT)
-Subject: Re: [PATCH v8 2/2] s390: virtio: PV needs VIRTIO I/O device
- protection
-To:     Cornelia Huck <cohuck@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, pasic@linux.ibm.com,
-        borntraeger@de.ibm.com, frankja@linux.ibm.com, mst@redhat.com,
-        jasowang@redhat.com, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, thomas.lendacky@amd.com,
-        david@gibson.dropbear.id.au, linuxram@us.ibm.com,
-        hca@linux.ibm.com, gor@linux.ibm.com
-References: <1597762711-3550-1-git-send-email-pmorel@linux.ibm.com>
- <1597762711-3550-3-git-send-email-pmorel@linux.ibm.com>
- <20200818192233.6c80798e.cohuck@redhat.com>
-From:   Pierre Morel <pmorel@linux.ibm.com>
-Message-ID: <2a0e6ac5-1238-fd7b-f39f-6fad767b1493@linux.ibm.com>
-Date:   Wed, 19 Aug 2020 10:51:32 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        id S1727792AbgHSI4D (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 19 Aug 2020 04:56:03 -0400
+Received: from smtp-fw-6001.amazon.com ([52.95.48.154]:31188 "EHLO
+        smtp-fw-6001.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727781AbgHSIxw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 19 Aug 2020 04:53:52 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1597827231; x=1629363231;
+  h=subject:to:cc:references:from:message-id:date:
+   mime-version:in-reply-to:content-transfer-encoding;
+  bh=Qiqi6G1Enlghvpshg3m6bdM1gK//pU2NSsB7zQgFc58=;
+  b=QSf2yM18vaIxIzLDvk8bO/r+wdZaX1BSyeTvo1/OwXnAR/TE1QnRvQhY
+   OEBG2pxCwVFfxnQINy6HCAlrsDWcS+GX/D7owHyv/Kj63M0IR+AGtxz3r
+   wt2Bur9S+unSqW3iMfdC32CoqOMrqm6DgcYtAoxezS3YPfvMPHuBo8Ie4
+   o=;
+X-IronPort-AV: E=Sophos;i="5.76,330,1592870400"; 
+   d="scan'208";a="50090133"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-2c-168cbb73.us-west-2.amazon.com) ([10.43.8.6])
+  by smtp-border-fw-out-6001.iad6.amazon.com with ESMTP; 19 Aug 2020 08:53:50 +0000
+Received: from EX13MTAUWC002.ant.amazon.com (pdx4-ws-svc-p6-lb7-vlan2.pdx.amazon.com [10.170.41.162])
+        by email-inbound-relay-2c-168cbb73.us-west-2.amazon.com (Postfix) with ESMTPS id 42DE5A039D;
+        Wed, 19 Aug 2020 08:53:49 +0000 (UTC)
+Received: from EX13D20UWC001.ant.amazon.com (10.43.162.244) by
+ EX13MTAUWC002.ant.amazon.com (10.43.162.240) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.2; Wed, 19 Aug 2020 08:53:48 +0000
+Received: from 38f9d3867b82.ant.amazon.com (10.43.160.156) by
+ EX13D20UWC001.ant.amazon.com (10.43.162.244) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.2; Wed, 19 Aug 2020 08:53:46 +0000
+Subject: Re: [PATCH v3 02/12] KVM: x86: Introduce allow list for MSR emulation
+To:     Aaron Lewis <aaronlewis@google.com>, <jmattson@google.com>
+CC:     <pshier@google.com>, <oupton@google.com>, <kvm@vger.kernel.org>,
+        KarimAllah Ahmed <karahmed@amazon.de>
+References: <20200818211533.849501-1-aaronlewis@google.com>
+ <20200818211533.849501-3-aaronlewis@google.com>
+From:   Alexander Graf <graf@amazon.com>
+Message-ID: <f2b3b8c4-a1ee-843c-e94f-71a8993ea6c6@amazon.com>
+Date:   Wed, 19 Aug 2020 10:53:43 +0200
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:68.0)
+ Gecko/20100101 Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <20200818192233.6c80798e.cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <20200818211533.849501-3-aaronlewis@google.com>
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
- definitions=2020-08-19_04:2020-08-19,2020-08-19 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 phishscore=0
- lowpriorityscore=0 clxscore=1015 impostorscore=0 bulkscore=0
- priorityscore=1501 suspectscore=0 mlxlogscore=804 mlxscore=0 adultscore=0
- spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2006250000 definitions=main-2008190073
+X-Originating-IP: [10.43.160.156]
+X-ClientProxiedBy: EX13D36UWA002.ant.amazon.com (10.43.160.24) To
+ EX13D20UWC001.ant.amazon.com (10.43.162.244)
+Content-Type: text/plain; charset="utf-8"; format="flowed"
+Content-Transfer-Encoding: base64
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+CgpPbiAxOC4wOC4yMCAyMzoxNSwgQWFyb24gTGV3aXMgd3JvdGU6Cj4gCj4gSXQncyBub3QgZGVz
+aXJlYWJsZSB0byBoYXZlIGFsbCBNU1JzIGFsd2F5cyBoYW5kbGVkIGJ5IEtWTSBrZXJuZWwgc3Bh
+Y2UuIFNvbWUKPiBNU1JzIHdvdWxkIGJlIHVzZWZ1bCB0byBoYW5kbGUgaW4gdXNlciBzcGFjZSB0
+byBlaXRoZXIgZW11bGF0ZSBiZWhhdmlvciAobGlrZQo+IHVDb2RlIHVwZGF0ZXMpIG9yIGRpZmZl
+cmVudGlhdGUgd2hldGhlciB0aGV5IGFyZSB2YWxpZCBiYXNlZCBvbiB0aGUgQ1BVIG1vZGVsLgo+
+IAo+IFRvIGFsbG93IHVzZXIgc3BhY2UgdG8gc3BlY2lmeSB3aGljaCBNU1JzIGl0IHdhbnRzIHRv
+IHNlZSBoYW5kbGVkIGJ5IEtWTSwKPiB0aGlzIHBhdGNoIGludHJvZHVjZXMgYSBuZXcgaW9jdGwg
+dG8gcHVzaCBhbGxvdyBsaXN0cyBvZiBiaXRtYXBzIGludG8KPiBLVk0uIEJhc2VkIG9uIHRoZXNl
+IGJpdG1hcHMsIEtWTSBjYW4gdGhlbiBkZWNpZGUgd2hldGhlciB0byByZWplY3QgTVNSIGFjY2Vz
+cy4KPiBXaXRoIHRoZSBhZGRpdGlvbiBvZiBLVk1fQ0FQX1g4Nl9VU0VSX1NQQUNFX01TUiBpdCBj
+YW4gYWxzbyBkZWZsZWN0IHRoZQo+IGRlbmllZCBNU1IgZXZlbnRzIHRvIHVzZXIgc3BhY2UgdG8g
+b3BlcmF0ZSBvbi4KPiAKPiBJZiBubyBhbGxvd2xpc3QgaXMgcG9wdWxhdGVkLCBNU1IgaGFuZGxp
+bmcgc3RheXMgaWRlbnRpY2FsIHRvIGJlZm9yZS4KPiAKPiBTaWduZWQtb2ZmLWJ5OiBLYXJpbUFs
+bGFoIEFobWVkIDxrYXJhaG1lZEBhbWF6b24uZGU+Cj4gU2lnbmVkLW9mZi1ieTogQWxleGFuZGVy
+IEdyYWYgPGdyYWZAYW1hem9uLmNvbT4KClNhbWUgaGVyZSwgU29CIGxpbmUgaXMgbWlzc2luZy4K
+CkkgYWxzbyBzZWUgdGhhdCB5b3UgZGlkbid0IGFkZHJlc3MgdGhlIG5pdHMgeW91IGhhZCBvbiB0
+aGlzIHBhdGNoOgoKWy4uLl0KCiA+PiArICBGaWx0ZXIgYm9vdGggcmVhZCBhbmQgd3JpdGUgYWNj
+ZXNzZXMgdG8gTVNScyB1c2luZyB0aGUgZ2l2ZW4gCmJpdG1hcC4gQSAwCiA+PiArICBpbiB0aGUg
+Yml0bWFwIGluZGljYXRlcyB0aGF0IGJvdGggcmVhZHMgYW5kIHdyaXRlcyBzaG91bGQgCmltbWVk
+aWF0ZWx5IGZhaWwsCiA+PiArICB3aGlsZSBhIDEgaW5kaWNhdGVzIHRoYXQgcmVhZHMgYW5kIHdy
+aXRlcyBzaG91bGQgYmUgaGFuZGxlZCBieSAKdGhlIG5vcm1hbAogPj4gKyAgS1ZNIE1TUiBlbXVs
+YXRpb24gbG9naWMuCiA+CiA+IG5pdDogRmlsdGVyIGJvdGgKClsuLi5dCgogPj4gKy8qIE1heGlt
+dW0gc2l6ZSBvZiB0aGUgb2YgdGhlIGJpdG1hcCBpbiBieXRlcyAqLwogPgogPiBuaXQ6ICJvZiB0
+aGUiIGlzIHJlcGVhdGVkIHR3aWNlCgoKCkZlZWwgZnJlZSB0byBjaGFuZ2UgdGhlbSBpbiB5b3Vy
+IHBhdGNoIHNldGFuZCBhZGQgYSBub3RlIGJldHdlZW4gdGhlIFNvQiAKbGluZXM6CgpTaWduZWQt
+b2ZmLWJ5OiBLYXJpbUFsbGFoIEFobWVkIDxrYXJhaG1lZEBhbWF6b24uZGUKU2lnbmVkLW9mZi1i
+eTogQWxleGFuZGVyIEdyYWYgPGdyYWZAYW1hem9uLmNvbT4KW2Fhcm9ubGV3aXM6IHMvb2YgdGhl
+IG9mIHRoZS9vZiB0aGUvLCBzL2Jvb3RoL2JvdGgvXQpTaWduZWQtb2ZmLWJ5OiBBYXJvbiBMZXdp
+cyA8YWFyb25sZXdpc0Bnb29nbGUuY29tPgoKCkFsZXgKCgoKQW1hem9uIERldmVsb3BtZW50IENl
+bnRlciBHZXJtYW55IEdtYkgKS3JhdXNlbnN0ci4gMzgKMTAxMTcgQmVybGluCkdlc2NoYWVmdHNm
+dWVocnVuZzogQ2hyaXN0aWFuIFNjaGxhZWdlciwgSm9uYXRoYW4gV2Vpc3MKRWluZ2V0cmFnZW4g
+YW0gQW10c2dlcmljaHQgQ2hhcmxvdHRlbmJ1cmcgdW50ZXIgSFJCIDE0OTE3MyBCClNpdHo6IEJl
+cmxpbgpVc3QtSUQ6IERFIDI4OSAyMzcgODc5CgoK
 
-
-On 2020-08-18 19:22, Cornelia Huck wrote:
-
->> + */
->> +int arch_has_restricted_memory_access(struct virtio_device *dev)
->> +{
->> +	if (!is_prot_virt_guest())
->> +		return 0;
-> 
-> If you just did a
-> 
-> return is_prot_virt_guest();
-> 
-> and did the virtio feature stuff in the virtio core, this function
-> would be short and sweet :)
-
-
-yes, the smaller the better, thanks
-
-Pierre
-
--- 
-Pierre Morel
-IBM Lab Boeblingen
