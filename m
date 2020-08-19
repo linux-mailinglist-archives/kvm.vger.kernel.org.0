@@ -2,173 +2,362 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 921FD24A1C5
-	for <lists+kvm@lfdr.de>; Wed, 19 Aug 2020 16:30:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3432924A1CE
+	for <lists+kvm@lfdr.de>; Wed, 19 Aug 2020 16:36:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728600AbgHSOap (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 19 Aug 2020 10:30:45 -0400
-Received: from smtp-fw-33001.amazon.com ([207.171.190.10]:43334 "EHLO
-        smtp-fw-33001.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728120AbgHSOab (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 19 Aug 2020 10:30:31 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1597847430; x=1629383430;
-  h=subject:to:cc:references:from:message-id:date:
-   mime-version:in-reply-to:content-transfer-encoding;
-  bh=5lhoalPfLZwfYbnBN5/CZyt8ZrJ+63q3RaCX+V8ERS4=;
-  b=Z+t3YNBTIqMEtUIl/IhjgeasNYHGYzk9a6sgoRHS1usqK5MfmhfTGKnv
-   5y0UIAccnQGt5bvrai59aO96mmmHAw1FlqKk9B/B2pBrhu5s91QzIIhl7
-   lzKVT82bngrwdXc28cwFAGdcrwAQLJSBevzxgPzvyePzzhxp8mWwZQivi
-   A=;
-X-IronPort-AV: E=Sophos;i="5.76,331,1592870400"; 
-   d="scan'208";a="67997637"
-Received: from sea32-co-svc-lb4-vlan3.sea.corp.amazon.com (HELO email-inbound-relay-2b-859fe132.us-west-2.amazon.com) ([10.47.23.38])
-  by smtp-border-fw-out-33001.sea14.amazon.com with ESMTP; 19 Aug 2020 14:30:26 +0000
-Received: from EX13MTAUEA002.ant.amazon.com (pdx4-ws-svc-p6-lb7-vlan2.pdx.amazon.com [10.170.41.162])
-        by email-inbound-relay-2b-859fe132.us-west-2.amazon.com (Postfix) with ESMTPS id BBAF0225302;
-        Wed, 19 Aug 2020 14:30:24 +0000 (UTC)
-Received: from EX13D16EUB003.ant.amazon.com (10.43.166.99) by
- EX13MTAUEA002.ant.amazon.com (10.43.61.77) with Microsoft SMTP Server (TLS)
- id 15.0.1497.2; Wed, 19 Aug 2020 14:30:24 +0000
-Received: from 38f9d34ed3b1.ant.amazon.com (10.43.160.100) by
- EX13D16EUB003.ant.amazon.com (10.43.166.99) with Microsoft SMTP Server (TLS)
- id 15.0.1497.2; Wed, 19 Aug 2020 14:30:15 +0000
-Subject: Re: [PATCH v7 00/18] Add support for Nitro Enclaves
-To:     Greg KH <gregkh@linuxfoundation.org>,
-        Alexander Graf <graf@amazon.de>
-CC:     linux-kernel <linux-kernel@vger.kernel.org>,
-        Anthony Liguori <aliguori@amazon.com>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Colm MacCarthaigh <colmmacc@amazon.com>,
-        David Duncan <davdunc@amazon.com>,
-        Bjoern Doebel <doebel@amazon.de>,
-        David Woodhouse <dwmw@amazon.co.uk>,
-        "Frank van der Linden" <fllinden@amazon.com>,
-        Karen Noel <knoel@redhat.com>,
-        "Martin Pohlack" <mpohlack@amazon.de>,
-        Matt Wilson <msw@amazon.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Balbir Singh <sblbir@amazon.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Stewart Smith <trawets@amazon.com>,
-        Uwe Dannowski <uwed@amazon.de>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        kvm <kvm@vger.kernel.org>,
-        ne-devel-upstream <ne-devel-upstream@amazon.com>
-References: <20200817131003.56650-1-andraprs@amazon.com>
- <14477cc7-926e-383d-527b-b53d088ca13d@amazon.de>
- <20200819112657.GA475121@kroah.com>
-From:   "Paraschiv, Andra-Irina" <andraprs@amazon.com>
-Message-ID: <3c0923a0-7676-0d19-9b32-f2648e7966ca@amazon.com>
-Date:   Wed, 19 Aug 2020 17:30:05 +0300
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:78.0)
- Gecko/20100101 Thunderbird/78.1.1
+        id S1727049AbgHSOgW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 19 Aug 2020 10:36:22 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:50666 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726953AbgHSOgS (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 19 Aug 2020 10:36:18 -0400
+Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 07JEW3kN121176
+        for <kvm@vger.kernel.org>; Wed, 19 Aug 2020 10:36:13 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type; s=pp1; bh=bliVcbvQc9UJX3pNyc97T+FzJ7tpiaJf93yu3qEKPD0=;
+ b=Ebp7efWIMKjx0IgYz0jojAycwE83lTvYgdQ+2bv5kpeBVJ0yrk/IviG/fb8TGx9E7AbV
+ TniWLjhPY2lz0OZi0IY4M76RaLufpMtRlYdAyBq3jevt33V3iCgxS7Qcpnt/0zYUsBPt
+ uDd/UMXkYQrHKaXDZEMj5lzVTtTbzAQN9io8kHl+b7pdoByvlU6vEWlQOSKZOcRyVhdm
+ nGHp0auxNrQFcSorctGvZHlzRNlMEJvuHo7ND56GfQj7lOaJ7JuhJ16sV9AW1gYZQFMf
+ fDgme2HZWphWMa2uFWk9wrgnHRfFg/ubkYQ6RlymImfyejyFzsEplGIe8zZlYIRIIcNU nw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 330ucnjqr5-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Wed, 19 Aug 2020 10:36:13 -0400
+Received: from m0098414.ppops.net (m0098414.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 07JEXSle126360
+        for <kvm@vger.kernel.org>; Wed, 19 Aug 2020 10:36:13 -0400
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 330ucnjqq6-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 19 Aug 2020 10:36:12 -0400
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 07JEVRDb019541;
+        Wed, 19 Aug 2020 14:36:11 GMT
+Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
+        by ppma03ams.nl.ibm.com with ESMTP id 3304um1ydq-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 19 Aug 2020 14:36:11 +0000
+Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
+        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 07JEa9sW64029080
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 19 Aug 2020 14:36:09 GMT
+Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id E754052050;
+        Wed, 19 Aug 2020 14:36:08 +0000 (GMT)
+Received: from localhost.localdomain (unknown [9.145.70.234])
+        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 8E3A65204E;
+        Wed, 19 Aug 2020 14:36:08 +0000 (GMT)
+Subject: Re: [kvm-unit-tests RFC v1 1/5] lib/vmalloc: vmalloc support for
+ handling allocation metadata
+To:     Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org,
+        pbonzini@redhat.com
+Cc:     david@redhat.com, thuth@redhat.com, cohuck@redhat.com,
+        lvivier@redhat.com
+References: <20200814151009.55845-1-imbrenda@linux.ibm.com>
+ <20200814151009.55845-2-imbrenda@linux.ibm.com>
+From:   Janosch Frank <frankja@linux.ibm.com>
+Autocrypt: addr=frankja@linux.ibm.com; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <a0d00459-cc91-b87d-5fae-063a4967e29f@linux.ibm.com>
+Date:   Wed, 19 Aug 2020 16:36:07 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.0
 MIME-Version: 1.0
-In-Reply-To: <20200819112657.GA475121@kroah.com>
-Content-Language: en-US
-X-Originating-IP: [10.43.160.100]
-X-ClientProxiedBy: EX13D17UWC001.ant.amazon.com (10.43.162.188) To
- EX13D16EUB003.ant.amazon.com (10.43.166.99)
-Content-Type: text/plain; charset="utf-8"; format="flowed"
-Content-Transfer-Encoding: base64
+In-Reply-To: <20200814151009.55845-2-imbrenda@linux.ibm.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="8wwIxzN3xW3rjOg4uleHdMNyxwcxgbeMH"
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
+ definitions=2020-08-19_07:2020-08-19,2020-08-19 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ phishscore=0 priorityscore=1501 adultscore=0 malwarescore=0
+ impostorscore=0 suspectscore=2 mlxscore=0 mlxlogscore=999 clxscore=1015
+ bulkscore=0 spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2006250000 definitions=main-2008190124
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-CgpPbiAxOS8wOC8yMDIwIDE0OjI2LCBHcmVnIEtIIHdyb3RlOgo+Cj4gT24gV2VkLCBBdWcgMTks
-IDIwMjAgYXQgMDE6MTU6NTlQTSArMDIwMCwgQWxleGFuZGVyIEdyYWYgd3JvdGU6Cj4+Cj4+IE9u
-IDE3LjA4LjIwIDE1OjA5LCBBbmRyYSBQYXJhc2NoaXYgd3JvdGU6Cj4+PiBOaXRybyBFbmNsYXZl
-cyAoTkUpIGlzIGEgbmV3IEFtYXpvbiBFbGFzdGljIENvbXB1dGUgQ2xvdWQgKEVDMikgY2FwYWJp
-bGl0eQo+Pj4gdGhhdCBhbGxvd3MgY3VzdG9tZXJzIHRvIGNhcnZlIG91dCBpc29sYXRlZCBjb21w
-dXRlIGVudmlyb25tZW50cyB3aXRoaW4gRUMyCj4+PiBpbnN0YW5jZXMgWzFdLgo+Pj4KPj4+IEZv
-ciBleGFtcGxlLCBhbiBhcHBsaWNhdGlvbiB0aGF0IHByb2Nlc3NlcyBzZW5zaXRpdmUgZGF0YSBh
-bmQgcnVucyBpbiBhIFZNLAo+Pj4gY2FuIGJlIHNlcGFyYXRlZCBmcm9tIG90aGVyIGFwcGxpY2F0
-aW9ucyBydW5uaW5nIGluIHRoZSBzYW1lIFZNLiBUaGlzCj4+PiBhcHBsaWNhdGlvbiB0aGVuIHJ1
-bnMgaW4gYSBzZXBhcmF0ZSBWTSB0aGFuIHRoZSBwcmltYXJ5IFZNLCBuYW1lbHkgYW4gZW5jbGF2
-ZS4KPj4+Cj4+PiBBbiBlbmNsYXZlIHJ1bnMgYWxvbmdzaWRlIHRoZSBWTSB0aGF0IHNwYXduZWQg
-aXQuIFRoaXMgc2V0dXAgbWF0Y2hlcyBsb3cgbGF0ZW5jeQo+Pj4gYXBwbGljYXRpb25zIG5lZWRz
-LiBUaGUgcmVzb3VyY2VzIHRoYXQgYXJlIGFsbG9jYXRlZCBmb3IgdGhlIGVuY2xhdmUsIHN1Y2gg
-YXMKPj4+IG1lbW9yeSBhbmQgQ1BVcywgYXJlIGNhcnZlZCBvdXQgb2YgdGhlIHByaW1hcnkgVk0u
-IEVhY2ggZW5jbGF2ZSBpcyBtYXBwZWQgdG8gYQo+Pj4gcHJvY2VzcyBydW5uaW5nIGluIHRoZSBw
-cmltYXJ5IFZNLCB0aGF0IGNvbW11bmljYXRlcyB3aXRoIHRoZSBORSBkcml2ZXIgdmlhIGFuCj4+
-PiBpb2N0bCBpbnRlcmZhY2UuCj4+Pgo+Pj4gSW4gdGhpcyBzZW5zZSwgdGhlcmUgYXJlIHR3byBj
-b21wb25lbnRzOgo+Pj4KPj4+IDEuIEFuIGVuY2xhdmUgYWJzdHJhY3Rpb24gcHJvY2VzcyAtIGEg
-dXNlciBzcGFjZSBwcm9jZXNzIHJ1bm5pbmcgaW4gdGhlIHByaW1hcnkKPj4+IFZNIGd1ZXN0IHRo
-YXQgdXNlcyB0aGUgcHJvdmlkZWQgaW9jdGwgaW50ZXJmYWNlIG9mIHRoZSBORSBkcml2ZXIgdG8g
-c3Bhd24gYW4KPj4+IGVuY2xhdmUgVk0gKHRoYXQncyAyIGJlbG93KS4KPj4+Cj4+PiBUaGVyZSBp
-cyBhIE5FIGVtdWxhdGVkIFBDSSBkZXZpY2UgZXhwb3NlZCB0byB0aGUgcHJpbWFyeSBWTS4gVGhl
-IGRyaXZlciBmb3IgdGhpcwo+Pj4gbmV3IFBDSSBkZXZpY2UgaXMgaW5jbHVkZWQgaW4gdGhlIE5F
-IGRyaXZlci4KPj4+Cj4+PiBUaGUgaW9jdGwgbG9naWMgaXMgbWFwcGVkIHRvIFBDSSBkZXZpY2Ug
-Y29tbWFuZHMgZS5nLiB0aGUgTkVfU1RBUlRfRU5DTEFWRSBpb2N0bAo+Pj4gbWFwcyB0byBhbiBl
-bmNsYXZlIHN0YXJ0IFBDSSBjb21tYW5kLiBUaGUgUENJIGRldmljZSBjb21tYW5kcyBhcmUgdGhl
-bgo+Pj4gdHJhbnNsYXRlZCBpbnRvICBhY3Rpb25zIHRha2VuIG9uIHRoZSBoeXBlcnZpc29yIHNp
-ZGU7IHRoYXQncyB0aGUgTml0cm8KPj4+IGh5cGVydmlzb3IgcnVubmluZyBvbiB0aGUgaG9zdCB3
-aGVyZSB0aGUgcHJpbWFyeSBWTSBpcyBydW5uaW5nLiBUaGUgTml0cm8KPj4+IGh5cGVydmlzb3Ig
-aXMgYmFzZWQgb24gY29yZSBLVk0gdGVjaG5vbG9neS4KPj4+Cj4+PiAyLiBUaGUgZW5jbGF2ZSBp
-dHNlbGYgLSBhIFZNIHJ1bm5pbmcgb24gdGhlIHNhbWUgaG9zdCBhcyB0aGUgcHJpbWFyeSBWTSB0
-aGF0Cj4+PiBzcGF3bmVkIGl0LiBNZW1vcnkgYW5kIENQVXMgYXJlIGNhcnZlZCBvdXQgb2YgdGhl
-IHByaW1hcnkgVk0gYW5kIGFyZSBkZWRpY2F0ZWQKPj4+IGZvciB0aGUgZW5jbGF2ZSBWTS4gQW4g
-ZW5jbGF2ZSBkb2VzIG5vdCBoYXZlIHBlcnNpc3RlbnQgc3RvcmFnZSBhdHRhY2hlZC4KPj4+Cj4+
-PiBUaGUgbWVtb3J5IHJlZ2lvbnMgY2FydmVkIG91dCBvZiB0aGUgcHJpbWFyeSBWTSBhbmQgZ2l2
-ZW4gdG8gYW4gZW5jbGF2ZSBuZWVkIHRvCj4+PiBiZSBhbGlnbmVkIDIgTWlCIC8gMSBHaUIgcGh5
-c2ljYWxseSBjb250aWd1b3VzIG1lbW9yeSByZWdpb25zIChvciBtdWx0aXBsZSBvZgo+Pj4gdGhp
-cyBzaXplIGUuZy4gOCBNaUIpLiBUaGUgbWVtb3J5IGNhbiBiZSBhbGxvY2F0ZWQgZS5nLiBieSB1
-c2luZyBodWdldGxiZnMgZnJvbQo+Pj4gdXNlciBzcGFjZSBbMl1bM10uIFRoZSBtZW1vcnkgc2l6
-ZSBmb3IgYW4gZW5jbGF2ZSBuZWVkcyB0byBiZSBhdCBsZWFzdCA2NCBNaUIuCj4+PiBUaGUgZW5j
-bGF2ZSBtZW1vcnkgYW5kIENQVXMgbmVlZCB0byBiZSBmcm9tIHRoZSBzYW1lIE5VTUEgbm9kZS4K
-Pj4+Cj4+PiBBbiBlbmNsYXZlIHJ1bnMgb24gZGVkaWNhdGVkIGNvcmVzLiBDUFUgMCBhbmQgaXRz
-IENQVSBzaWJsaW5ncyBuZWVkIHRvIHJlbWFpbgo+Pj4gYXZhaWxhYmxlIGZvciB0aGUgcHJpbWFy
-eSBWTS4gQSBDUFUgcG9vbCBoYXMgdG8gYmUgc2V0IGZvciBORSBwdXJwb3NlcyBieSBhbgo+Pj4g
-dXNlciB3aXRoIGFkbWluIGNhcGFiaWxpdHkuIFNlZSB0aGUgY3B1IGxpc3Qgc2VjdGlvbiBmcm9t
-IHRoZSBrZXJuZWwKPj4+IGRvY3VtZW50YXRpb24gWzRdIGZvciBob3cgYSBDUFUgcG9vbCBmb3Jt
-YXQgbG9va3MuCj4+Pgo+Pj4gQW4gZW5jbGF2ZSBjb21tdW5pY2F0ZXMgd2l0aCB0aGUgcHJpbWFy
-eSBWTSB2aWEgYSBsb2NhbCBjb21tdW5pY2F0aW9uIGNoYW5uZWwsCj4+PiB1c2luZyB2aXJ0aW8t
-dnNvY2sgWzVdLiBUaGUgcHJpbWFyeSBWTSBoYXMgdmlydGlvLXBjaSB2c29jayBlbXVsYXRlZCBk
-ZXZpY2UsCj4+PiB3aGlsZSB0aGUgZW5jbGF2ZSBWTSBoYXMgYSB2aXJ0aW8tbW1pbyB2c29jayBl
-bXVsYXRlZCBkZXZpY2UuIFRoZSB2c29jayBkZXZpY2UKPj4+IHVzZXMgZXZlbnRmZCBmb3Igc2ln
-bmFsaW5nLiBUaGUgZW5jbGF2ZSBWTSBzZWVzIHRoZSB1c3VhbCBpbnRlcmZhY2VzIC0gbG9jYWwK
-Pj4+IEFQSUMgYW5kIElPQVBJQyAtIHRvIGdldCBpbnRlcnJ1cHRzIGZyb20gdmlydGlvLXZzb2Nr
-IGRldmljZS4gVGhlIHZpcnRpby1tbWlvCj4+PiBkZXZpY2UgaXMgcGxhY2VkIGluIG1lbW9yeSBi
-ZWxvdyB0aGUgdHlwaWNhbCA0IEdpQi4KPj4+Cj4+PiBUaGUgYXBwbGljYXRpb24gdGhhdCBydW5z
-IGluIHRoZSBlbmNsYXZlIG5lZWRzIHRvIGJlIHBhY2thZ2VkIGluIGFuIGVuY2xhdmUKPj4+IGlt
-YWdlIHRvZ2V0aGVyIHdpdGggdGhlIE9TICggZS5nLiBrZXJuZWwsIHJhbWRpc2ssIGluaXQgKSB0
-aGF0IHdpbGwgcnVuIGluIHRoZQo+Pj4gZW5jbGF2ZSBWTS4gVGhlIGVuY2xhdmUgVk0gaGFzIGl0
-cyBvd24ga2VybmVsIGFuZCBmb2xsb3dzIHRoZSBzdGFuZGFyZCBMaW51eAo+Pj4gYm9vdCBwcm90
-b2NvbC4KPj4+Cj4+PiBUaGUga2VybmVsIGJ6SW1hZ2UsIHRoZSBrZXJuZWwgY29tbWFuZCBsaW5l
-LCB0aGUgcmFtZGlzayhzKSBhcmUgcGFydCBvZiB0aGUKPj4+IEVuY2xhdmUgSW1hZ2UgRm9ybWF0
-IChFSUYpOyBwbHVzIGFuIEVJRiBoZWFkZXIgaW5jbHVkaW5nIG1ldGFkYXRhIHN1Y2ggYXMgbWFn
-aWMKPj4+IG51bWJlciwgZWlmIHZlcnNpb24sIGltYWdlIHNpemUgYW5kIENSQy4KPj4+Cj4+PiBI
-YXNoIHZhbHVlcyBhcmUgY29tcHV0ZWQgZm9yIHRoZSBlbnRpcmUgZW5jbGF2ZSBpbWFnZSAoRUlG
-KSwgdGhlIGtlcm5lbCBhbmQKPj4+IHJhbWRpc2socykuIFRoYXQncyB1c2VkLCBmb3IgZXhhbXBs
-ZSwgdG8gY2hlY2sgdGhhdCB0aGUgZW5jbGF2ZSBpbWFnZSB0aGF0IGlzCj4+PiBsb2FkZWQgaW4g
-dGhlIGVuY2xhdmUgVk0gaXMgdGhlIG9uZSB0aGF0IHdhcyBpbnRlbmRlZCB0byBiZSBydW4uCj4+
-Pgo+Pj4gVGhlc2UgY3J5cHRvIG1lYXN1cmVtZW50cyBhcmUgaW5jbHVkZWQgaW4gYSBzaWduZWQg
-YXR0ZXN0YXRpb24gZG9jdW1lbnQKPj4+IGdlbmVyYXRlZCBieSB0aGUgTml0cm8gSHlwZXJ2aXNv
-ciBhbmQgZnVydGhlciB1c2VkIHRvIHByb3ZlIHRoZSBpZGVudGl0eSBvZiB0aGUKPj4+IGVuY2xh
-dmU7IEtNUyBpcyBhbiBleGFtcGxlIG9mIHNlcnZpY2UgdGhhdCBORSBpcyBpbnRlZ3JhdGVkIHdp
-dGggYW5kIHRoYXQgY2hlY2tzCj4+PiB0aGUgYXR0ZXN0YXRpb24gZG9jLgo+Pj4KPj4+IFRoZSBl
-bmNsYXZlIGltYWdlIChFSUYpIGlzIGxvYWRlZCBpbiB0aGUgZW5jbGF2ZSBtZW1vcnkgYXQgb2Zm
-c2V0IDggTWlCLiBUaGUKPj4+IGluaXQgcHJvY2VzcyBpbiB0aGUgZW5jbGF2ZSBjb25uZWN0cyB0
-byB0aGUgdnNvY2sgQ0lEIG9mIHRoZSBwcmltYXJ5IFZNIGFuZCBhCj4+PiBwcmVkZWZpbmVkIHBv
-cnQgLSA5MDAwIC0gdG8gc2VuZCBhIGhlYXJ0YmVhdCB2YWx1ZSAtIDB4YjcuIFRoaXMgbWVjaGFu
-aXNtIGlzCj4+PiB1c2VkIHRvIGNoZWNrIGluIHRoZSBwcmltYXJ5IFZNIHRoYXQgdGhlIGVuY2xh
-dmUgaGFzIGJvb3RlZC4KPj4+Cj4+PiBJZiB0aGUgZW5jbGF2ZSBWTSBjcmFzaGVzIG9yIGdyYWNl
-ZnVsbHkgZXhpdHMsIGFuIGludGVycnVwdCBldmVudCBpcyByZWNlaXZlZCBieQo+Pj4gdGhlIE5F
-IGRyaXZlci4gVGhpcyBldmVudCBpcyBzZW50IGZ1cnRoZXIgdG8gdGhlIHVzZXIgc3BhY2UgZW5j
-bGF2ZSBwcm9jZXNzCj4+PiBydW5uaW5nIGluIHRoZSBwcmltYXJ5IFZNIHZpYSBhIHBvbGwgbm90
-aWZpY2F0aW9uIG1lY2hhbmlzbS4gVGhlbiB0aGUgdXNlciBzcGFjZQo+Pj4gZW5jbGF2ZSBwcm9j
-ZXNzIGNhbiBleGl0Lgo+Pj4KPj4+IFRoYW5rIHlvdS4KPj4+Cj4+IFRoaXMgdmVyc2lvbiByZWFk
-cyB2ZXJ5IHdlbGwsIHRoYW5rcyBhIGxvdCBBbmRyYSEKCkdsYWQgdGhhdCB0aGUgcmV2aWV3IGV4
-cGVyaWVuY2UgaGFzIGJlZW4gaW1wcm92ZWQgYW5kIHRoZSBwYXRjaCBzZXJpZXMgCmlzIGluIGEg
-YmV0dGVyIHNoYXBlLgoKPj4KPj4gR3JlZywgd291bGQgeW91IG1pbmQgdG8gaGF2ZSBhbm90aGVy
-IGxvb2sgb3ZlciBpdD8KPiBXaWxsIGRvLCBpdCdzIGluIG15IHRvLXJldmlldyBxdWV1ZSwgYmVo
-aW5kIGxvdHMgb2Ygb3RoZXIgcGF0Y2hlcy4uLgo+CgoKVGhhbmtzIGJvdGggZm9yIHRha2luZyB0
-aW1lIHRvIGdvIHRocm91Z2ggdGhlIHBhdGNoIHNlcmllcy4KCkFuZHJhCgoKCkFtYXpvbiBEZXZl
-bG9wbWVudCBDZW50ZXIgKFJvbWFuaWEpIFMuUi5MLiByZWdpc3RlcmVkIG9mZmljZTogMjdBIFNm
-LiBMYXphciBTdHJlZXQsIFVCQzUsIGZsb29yIDIsIElhc2ksIElhc2kgQ291bnR5LCA3MDAwNDUs
-IFJvbWFuaWEuIFJlZ2lzdGVyZWQgaW4gUm9tYW5pYS4gUmVnaXN0cmF0aW9uIG51bWJlciBKMjIv
-MjYyMS8yMDA1Lgo=
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--8wwIxzN3xW3rjOg4uleHdMNyxwcxgbeMH
+Content-Type: multipart/mixed; boundary="ZJxaFT0HsLwHjzfuOlESWnzIyoRFdoAIM"
+
+--ZJxaFT0HsLwHjzfuOlESWnzIyoRFdoAIM
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+
+On 8/14/20 5:10 PM, Claudio Imbrenda wrote:
+
+LGTM, some smaller nits/questions below:
+
+Commit message?
+
+> Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+> ---
+>  lib/vmalloc.c | 105 +++++++++++++++++++++++++++++++++++++++++++++-----=
+
+>  1 file changed, 95 insertions(+), 10 deletions(-)
+>=20
+> diff --git a/lib/vmalloc.c b/lib/vmalloc.c
+> index e0c7b6b..aca0876 100644
+> --- a/lib/vmalloc.c
+> +++ b/lib/vmalloc.c
+> @@ -15,6 +15,13 @@
+>  #include <bitops.h>
+>  #include "vmalloc.h"
+> =20
+> +#define VM_MAGIC 0x7E57C0DE
+> +
+> +struct metadata {
+> +	unsigned long npages;
+> +	unsigned long magic;
+> +};
+> +
+>  static struct spinlock lock;
+>  static void *vfree_top =3D 0;
+>  static void *page_root;
+> @@ -25,8 +32,14 @@ static void *page_root;
+>   *
+>   * nr is the number of pages to allocate
+>   * alignment_pages is the alignment of the allocation *in pages*
+> + * metadata indicates whether an extra (unaligned) page needs to be al=
+located
+> + * right before the main (aligned) allocation.
+> + *
+> + * The return value points to the first allocated virtual page, which =
+will
+> + * be the (potentially unaligned) metadata page if the metadata flag i=
+s
+> + * specified.
+>   */
+> -void *alloc_vpages_aligned(ulong nr, unsigned int align_order)
+> +static void *do_alloc_vpages(ulong nr, unsigned int align_order, bool =
+metadata)
+>  {
+>  	uintptr_t ptr;
+> =20
+> @@ -34,6 +47,8 @@ void *alloc_vpages_aligned(ulong nr, unsigned int ali=
+gn_order)
+>  	ptr =3D (uintptr_t)vfree_top;
+>  	ptr -=3D PAGE_SIZE * nr;
+>  	ptr &=3D GENMASK_ULL(63, PAGE_SHIFT + align_order);
+> +	if (metadata)
+> +		ptr -=3D PAGE_SIZE;
+>  	vfree_top =3D (void *)ptr;
+>  	spin_unlock(&lock);
+> =20
+> @@ -41,6 +56,11 @@ void *alloc_vpages_aligned(ulong nr, unsigned int al=
+ign_order)
+>  	return (void *)ptr;
+>  }
+> =20
+> +void *alloc_vpages_aligned(ulong nr, unsigned int align_order)
+> +{
+> +	return do_alloc_vpages(nr, align_order, false);
+> +}
+> +
+>  void *alloc_vpages(ulong nr)
+>  {
+>  	return alloc_vpages_aligned(nr, 0);
+> @@ -69,35 +89,100 @@ void *vmap(phys_addr_t phys, size_t size)
+>  	return mem;
+>  }
+> =20
+> +/*
+> + * Allocate one page, for an object with specified alignment.
+> + * The resulting pointer will be aligned to the required alignment, bu=
+t
+> + * intentionally not page-aligned.
+> + */
+> +static void *vm_alloc_one_page(size_t alignment)
+> +{
+> +	void *p;
+> +
+> +	assert(alignment >=3D sizeof(uintptr_t));
+> +	assert(alignment < PAGE_SIZE);
+> +	p =3D alloc_vpage();
+> +	install_page(page_root, virt_to_phys(alloc_page()), p);
+> +	/* write the magic at the beginning of the page */
+> +	*(uintptr_t *)p =3D VM_MAGIC;
+> +	return (void*)((uintptr_t)p + alignment);
+
+s/(void*)/(void *)/
+
+> +}
+> +
+> +static struct metadata *get_metadata(void *p)
+> +{
+> +	struct metadata *m =3D p;
+> +
+> +	return m - 1;
+> +}
+
+So the metadata is not at the start of the metadata page, but at the
+end? We have it at the beginning for the one page case and at the end
+for the multi page case with metadata on an extra page.
+
+> +
+>  /*
+>   * Allocate virtual memory, with the specified minimum alignment.
+> + * If the allocation fits in one page, only one page is allocated. Oth=
+erwise
+> + * enough pages are allocated for the object, plus one to keep metadat=
+a
+> + * information about the allocation.
+>   */
+>  static void *vm_memalign(size_t alignment, size_t size)
+>  {
+> +	struct metadata *m;
+>  	phys_addr_t pa;
+> -	void *mem, *p;
+> +	uintptr_t p;
+> +	void *mem;
+> +	size_t i;
+> =20
+> +	if (!size)
+> +		return NULL;
+>  	assert(is_power_of_2(alignment));
+> =20
+> +	if (alignment < sizeof(uintptr_t))
+> +		alignment =3D sizeof(uintptr_t);
+> +	/* it fits in one page, allocate only one page */
+> +	if (alignment + size <=3D PAGE_SIZE)
+> +		return vm_alloc_one_page(alignment);
+
+Don't we also need to take the metadata into account in any size
+calculation for one page?
+
+>  	size =3D PAGE_ALIGN(size) / PAGE_SIZE;
+>  	alignment =3D get_order(PAGE_ALIGN(alignment) / PAGE_SIZE);
+> -	mem =3D p =3D alloc_vpages_aligned(size, alignment);
+> -	while (size--) {
+> +	mem =3D do_alloc_vpages(size, alignment, true);
+> +	p =3D (uintptr_t)mem;
+> +	/* skip the metadata page */
+> +	mem =3D (void *)(p + PAGE_SIZE);
+> +	/*
+> +	 * time to actually allocate the physical pages to back our virtual
+> +	 * allocation; note that we need to allocate one extra page (for the
+> +	 * metadata), hence the <=3D
+> +	 */
+> +	for (i =3D 0; i <=3D size; i++, p +=3D PAGE_SIZE) {
+>  		pa =3D virt_to_phys(alloc_page());
+>  		assert(pa);
+> -		install_page(page_root, pa, p);
+> -		p +=3D PAGE_SIZE;
+> +		install_page(page_root, pa, (void *)p);
+>  	}
+> +	m =3D get_metadata(mem);
+> +	m->npages =3D size;
+> +	m->magic =3D VM_MAGIC;
+>  	return mem;
+>  }
+> =20
+>  static void vm_free(void *mem, size_t size)
+>  {
+> -	while (size) {
+> -		free_page(phys_to_virt(virt_to_pte_phys(page_root, mem)));
+> -		mem +=3D PAGE_SIZE;
+> -		size -=3D PAGE_SIZE;
+> +	struct metadata *m;
+> +	uintptr_t ptr, end;
+> +
+> +	/* the pointer is not page-aligned, it was a single-page allocation *=
+/
+> +	if (!IS_ALIGNED((uintptr_t)mem, PAGE_SIZE)) {
+> +		ptr =3D virt_to_pte_phys(page_root, mem) & PAGE_MASK;
+> +		assert(*(uintptr_t *)ptr =3D=3D VM_MAGIC);
+> +		free_page(phys_to_virt(ptr));
+> +		return;
+>  	}
+> +
+> +	/* the pointer is page-aligned, it was a multi-page allocation */
+> +	m =3D get_metadata(mem);
+> +	assert(m->magic =3D=3D VM_MAGIC);
+> +	assert(m->npages > 0);
+> +	/* free all the pages including the metadata page */
+> +	ptr =3D (uintptr_t)mem - PAGE_SIZE;
+> +	end =3D ptr + m->npages * PAGE_SIZE;
+> +	for ( ; ptr < end; ptr +=3D PAGE_SIZE)
+> +		free_page(phys_to_virt(virt_to_pte_phys(page_root, (void *)ptr)));
+> +	/* free the last one separately to avoid overflow issues */
+> +	free_page(phys_to_virt(virt_to_pte_phys(page_root, (void *)ptr)));
+>  }
+> =20
+>  static struct alloc_ops vmalloc_ops =3D {
+>=20
+
+
+
+--ZJxaFT0HsLwHjzfuOlESWnzIyoRFdoAIM--
+
+--8wwIxzN3xW3rjOg4uleHdMNyxwcxgbeMH
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEwGNS88vfc9+v45Yq41TmuOI4ufgFAl89ONcACgkQ41TmuOI4
+ufiNSRAAwPbjIG9JVN0oY4xUUmK8PWwODWIGCja3AYFkxjp/MH06zAc9gGMGNvW0
+yr2aszsEMo1+1KdQUBpbNmgoXsA5rGngIh2KLD8abNks1CaXsGe0M1p97w+CVGhl
+UvREaQZG8Npo8i/vTDK38eO4Sh9zq036p912F6z1D9YO8nALLos14FZSo4KfcaJg
+LhFdiQlyG2pP1pMMA6jSnaGLeKzq8qXgfBQcf9F76P23gVIlu/D5GPySozWfn3D2
+jO6RPNpTu2xs295YX6Uu+OE5Nw8CQOlvwV33wxJ/LVhCtSGajNPCprtmvAIIA+0+
+el2ln/roL75LUGbSiv6BwcgNYe7LTRLwsajufN4RRNFtOPkNvIjMxLI1gKhSwL0t
+Wph9Wjtozd5CebrrMPjxyi6s/xN/mk31Lqht2oe8rtFqufHGLI3L8p/Cpw+ZvPoG
+6ANkgxEHvmfcJ5doipwaSBqoK1dgfFI5UcNokGzpaK6CnFRMD7ton3t5kXg/HCMc
+dALh1EItLa+Bi8813VlKox3PHeVKlSapmy1TwsRCvWWoti+d8YiK2I1fP+EQ0PQK
+m6bG0yQ91Mi7FUGnFZOxmI3gQQqzDHagP+u00m6nCSmsMrD5A9FuoDn+jHXQG7XB
+76xGWQGwT7tq59LhTvWQtkv48ebHNF/ICiad2NH/wsfHXn/4QXo=
+=24fT
+-----END PGP SIGNATURE-----
+
+--8wwIxzN3xW3rjOg4uleHdMNyxwcxgbeMH--
 
