@@ -2,145 +2,223 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E278E24A942
-	for <lists+kvm@lfdr.de>; Thu, 20 Aug 2020 00:23:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D5D7424A9B1
+	for <lists+kvm@lfdr.de>; Thu, 20 Aug 2020 00:49:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728047AbgHSWXF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 19 Aug 2020 18:23:05 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:29715 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727046AbgHSWVG (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 19 Aug 2020 18:21:06 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1597875665;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=GQQRLRSw4j8HkEfa+DKkvenAI5uYOUqQOX/jVMQ+gzs=;
-        b=WusOttw9AC1QQ9AFk77hZq0UAfQlzam8uB34OaxFhQnTksLnc2wxQth6erOSqsxXqux+TE
-        fLo9CoqhQf2BB6/5lMQCDDRaKPiTF/bVg4fsJz3VRdFEys+9f5JRLb4FLGMPPT1zuBlfLL
-        0jX2Sh/Y7tTIW3YBR2MontVjjdRtSVc=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-274-9qBezfhxN2WzK8QymfmESA-1; Wed, 19 Aug 2020 18:21:03 -0400
-X-MC-Unique: 9qBezfhxN2WzK8QymfmESA-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 85F681007465;
-        Wed, 19 Aug 2020 22:21:01 +0000 (UTC)
-Received: from horse.redhat.com (ovpn-115-197.rdu2.redhat.com [10.10.115.197])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 61CA25C3E0;
-        Wed, 19 Aug 2020 22:21:01 +0000 (UTC)
-Received: by horse.redhat.com (Postfix, from userid 10451)
-        id E25162256B5; Wed, 19 Aug 2020 18:20:53 -0400 (EDT)
-From:   Vivek Goyal <vgoyal@redhat.com>
-To:     linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-nvdimm@lists.01.org, virtio-fs@redhat.com
-Cc:     vgoyal@redhat.com, miklos@szeredi.hu, stefanha@redhat.com,
-        dgilbert@redhat.com, dan.j.williams@intel.com,
-        Sebastien Boeuf <sebastien.boeuf@intel.com>,
-        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        "Michael S. Tsirkin" <mst@redhat.com>
-Subject: [PATCH v3 05/18] virtio: Implement get_shm_region for MMIO transport
-Date:   Wed, 19 Aug 2020 18:19:43 -0400
-Message-Id: <20200819221956.845195-6-vgoyal@redhat.com>
-In-Reply-To: <20200819221956.845195-1-vgoyal@redhat.com>
-References: <20200819221956.845195-1-vgoyal@redhat.com>
+        id S1726681AbgHSWtq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 19 Aug 2020 18:49:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43326 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726209AbgHSWtq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 19 Aug 2020 18:49:46 -0400
+Received: from mail-ot1-x344.google.com (mail-ot1-x344.google.com [IPv6:2607:f8b0:4864:20::344])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 02591C061757
+        for <kvm@vger.kernel.org>; Wed, 19 Aug 2020 15:49:46 -0700 (PDT)
+Received: by mail-ot1-x344.google.com with SMTP id v21so20402143otj.9
+        for <kvm@vger.kernel.org>; Wed, 19 Aug 2020 15:49:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=ds+P+VHRELlOlxwCcpje+JSh+rcyjYH+UGSM76wH/9E=;
+        b=NkvpzUvyGrJIQ6ExDre3XeXzkd5E3jCipnWnngYwXMMC5zhk6lT/8CzBvZcaGTzSqJ
+         C9qyl1mrN07B+1j4iDrTQXSRFS4jvOdFYXRzI0NQIDUw2T4wpjSDcYXp22KGObMYmCtb
+         XitVqbVwrHuOcdqScdmFklF6h975vRjoaiWs/22Jl2umA+IvEZcB/VASfJuBFxzFYmhj
+         IweDKQP7gjNoXG+sVohGL6xcnQ74hEckifqyPHvfWaGphHM82TvEIQ5XTflUPG9gvrB0
+         3f7qNhR24pJucsLKVu9hIf/+BP0e45H/YvFQWt6G0RCoXAQMOrKeq19NbbtRBJrNdaAg
+         l0ng==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=ds+P+VHRELlOlxwCcpje+JSh+rcyjYH+UGSM76wH/9E=;
+        b=bDnYUWfj/Py2fh1Q2RFhyAVuhchIPSQDX6OqWkTJesTeUIcULlcnRJ6IgM/DW9dVWg
+         YEwXti7K0bEjo00/S1cGeQ2ZrYjm4eMxGreiyzVjruqGCF+5XIaaliSv7+s/QFnwAKlU
+         EMo7sTU4OYQ4/+MJjQ2CbzNpID4g0rL992hWFIyMmnpwti7GYfbuhdkL8eL55mmQOu+t
+         FiH53M2yjfL2ZhYbb3CVOIaIUEeIXw2b/mUJbDFHNHECDX9PmI20kIY/o4BAYPyZ46kQ
+         aaCAThtvLgvS5UiYsWhQ8FKC9Or2oaMmP0ObrVC6RzlIDvC4X2o9U3NFYHKDb7Mf4L6g
+         aVgQ==
+X-Gm-Message-State: AOAM53020WmDfJ7cICrjhD/TnRaatdsI2xL8kwNpDEWy5mVSPF9mkYL9
+        dK38iVFMW6tR934HF2oQrk0ebnhnN4yOu8gvhDulMQ==
+X-Google-Smtp-Source: ABdhPJwb6yqXEEEEpisR2SPyN/wGvpBUVrove8z9LRQxEWLp1kan8BFylLm3VVXt3g2H6JMx961NCShr4ScSovIkwU0=
+X-Received: by 2002:a9d:22ca:: with SMTP id y68mr133348ota.56.1597877385026;
+ Wed, 19 Aug 2020 15:49:45 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+References: <20200803211423.29398-1-graf@amazon.com> <20200803211423.29398-3-graf@amazon.com>
+In-Reply-To: <20200803211423.29398-3-graf@amazon.com>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Wed, 19 Aug 2020 15:49:32 -0700
+Message-ID: <CALMp9eS3Y845mPMD6H+5nmYDMvhPcDcFCWUXpLiscxo_9--EYQ@mail.gmail.com>
+Subject: Re: [PATCH v4 2/3] KVM: x86: Introduce allow list for MSR emulation
+To:     Alexander Graf <graf@amazon.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        KarimAllah Raslan <karahmed@amazon.de>,
+        Aaron Lewis <aaronlewis@google.com>,
+        kvm list <kvm@vger.kernel.org>, linux-doc@vger.kernel.org,
+        LKML <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Sebastien Boeuf <sebastien.boeuf@intel.com>
+On Mon, Aug 3, 2020 at 2:14 PM Alexander Graf <graf@amazon.com> wrote:
 
-On MMIO a new set of registers is defined for finding SHM
-regions.  Add their definitions and use them to find the region.
+> --- a/arch/x86/include/asm/kvm_host.h
+> +++ b/arch/x86/include/asm/kvm_host.h
+> @@ -901,6 +901,13 @@ struct kvm_hv {
+>         struct kvm_hv_syndbg hv_syndbg;
+>  };
+>
+> +struct msr_bitmap_range {
+> +       u32 flags;
+> +       u32 nmsrs;
+> +       u32 base;
+> +       unsigned long *bitmap;
+> +};
+> +
+>  enum kvm_irqchip_mode {
+>         KVM_IRQCHIP_NONE,
+>         KVM_IRQCHIP_KERNEL,       /* created with KVM_CREATE_IRQCHIP */
+> @@ -1005,6 +1012,9 @@ struct kvm_arch {
+>         /* Deflect RDMSR and WRMSR to user space when they trigger a #GP */
+>         bool user_space_msr_enabled;
+>
+> +       struct msr_bitmap_range msr_allowlist_ranges[10];
 
-Signed-off-by: Sebastien Boeuf <sebastien.boeuf@intel.com>
-Cc: kvm@vger.kernel.org
-Cc: virtualization@lists.linux-foundation.org
-Cc: "Michael S. Tsirkin" <mst@redhat.com>
----
- drivers/virtio/virtio_mmio.c     | 31 +++++++++++++++++++++++++++++++
- include/uapi/linux/virtio_mmio.h | 11 +++++++++++
- 2 files changed, 42 insertions(+)
+Why 10? I think this is the only use of this constant, but a macro
+would still be nice, especially since the number appears to be
+arbitrary.
 
-diff --git a/drivers/virtio/virtio_mmio.c b/drivers/virtio/virtio_mmio.c
-index 627ac0487494..238383ff1064 100644
---- a/drivers/virtio/virtio_mmio.c
-+++ b/drivers/virtio/virtio_mmio.c
-@@ -498,6 +498,36 @@ static const char *vm_bus_name(struct virtio_device *vdev)
- 	return vm_dev->pdev->name;
- }
- 
-+static bool vm_get_shm_region(struct virtio_device *vdev,
-+			      struct virtio_shm_region *region, u8 id)
-+{
-+	struct virtio_mmio_device *vm_dev = to_virtio_mmio_device(vdev);
-+	u64 len, addr;
-+
-+	/* Select the region we're interested in */
-+	writel(id, vm_dev->base + VIRTIO_MMIO_SHM_SEL);
-+
-+	/* Read the region size */
-+	len = (u64) readl(vm_dev->base + VIRTIO_MMIO_SHM_LEN_LOW);
-+	len |= (u64) readl(vm_dev->base + VIRTIO_MMIO_SHM_LEN_HIGH) << 32;
-+
-+	region->len = len;
-+
-+	/* Check if region length is -1. If that's the case, the shared memory
-+	 * region does not exist and there is no need to proceed further.
-+	 */
-+	if (len == ~(u64)0)
-+		return false;
-+
-+	/* Read the region base address */
-+	addr = (u64) readl(vm_dev->base + VIRTIO_MMIO_SHM_BASE_LOW);
-+	addr |= (u64) readl(vm_dev->base + VIRTIO_MMIO_SHM_BASE_HIGH) << 32;
-+
-+	region->addr = addr;
-+
-+	return true;
-+}
-+
- static const struct virtio_config_ops virtio_mmio_config_ops = {
- 	.get		= vm_get,
- 	.set		= vm_set,
-@@ -510,6 +540,7 @@ static const struct virtio_config_ops virtio_mmio_config_ops = {
- 	.get_features	= vm_get_features,
- 	.finalize_features = vm_finalize_features,
- 	.bus_name	= vm_bus_name,
-+	.get_shm_region = vm_get_shm_region,
- };
- 
- 
-diff --git a/include/uapi/linux/virtio_mmio.h b/include/uapi/linux/virtio_mmio.h
-index c4b09689ab64..0650f91bea6c 100644
---- a/include/uapi/linux/virtio_mmio.h
-+++ b/include/uapi/linux/virtio_mmio.h
-@@ -122,6 +122,17 @@
- #define VIRTIO_MMIO_QUEUE_USED_LOW	0x0a0
- #define VIRTIO_MMIO_QUEUE_USED_HIGH	0x0a4
- 
-+/* Shared memory region id */
-+#define VIRTIO_MMIO_SHM_SEL             0x0ac
-+
-+/* Shared memory region length, 64 bits in two halves */
-+#define VIRTIO_MMIO_SHM_LEN_LOW         0x0b0
-+#define VIRTIO_MMIO_SHM_LEN_HIGH        0x0b4
-+
-+/* Shared memory region base address, 64 bits in two halves */
-+#define VIRTIO_MMIO_SHM_BASE_LOW        0x0b8
-+#define VIRTIO_MMIO_SHM_BASE_HIGH       0x0bc
-+
- /* Configuration atomicity value */
- #define VIRTIO_MMIO_CONFIG_GENERATION	0x0fc
- 
--- 
-2.25.4
+> diff --git a/arch/x86/include/uapi/asm/kvm.h b/arch/x86/include/uapi/asm/kvm.h
+> index 0780f97c1850..c33fb1d72d52 100644
+> --- a/arch/x86/include/uapi/asm/kvm.h
+> +++ b/arch/x86/include/uapi/asm/kvm.h
+> @@ -192,6 +192,21 @@ struct kvm_msr_list {
+>         __u32 indices[0];
+>  };
+>
+> +#define KVM_MSR_ALLOW_READ  (1 << 0)
+> +#define KVM_MSR_ALLOW_WRITE (1 << 1)
+> +
+> +/* Maximum size of the of the bitmap in bytes */
+> +#define KVM_MSR_ALLOWLIST_MAX_LEN 0x600
 
+Wouldn't 0x400 be a more natural size, since both Intel and AMD MSR
+permission bitmaps cover ranges of 8192 MSRs?
+
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index e1139124350f..25e58ceb19de 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -1472,6 +1472,38 @@ void kvm_enable_efer_bits(u64 mask)
+>  }
+>  EXPORT_SYMBOL_GPL(kvm_enable_efer_bits);
+>
+> +static bool kvm_msr_allowed(struct kvm_vcpu *vcpu, u32 index, u32 type)
+
+In another thread, when I suggested that a function should return
+bool, you said, "'I'm not a big fan of bool returning APIs unless they
+have an "is" in their name.' This function doesn't have "is" in its
+name. :-)
+
+> +{
+> +       struct kvm *kvm = vcpu->kvm;
+> +       struct msr_bitmap_range *ranges = kvm->arch.msr_allowlist_ranges;
+> +       u32 count = kvm->arch.msr_allowlist_ranges_count;
+
+Shouldn't the read of kvm->arch.msr_allowlist_ranges_count be guarded
+by the mutex, below?
+
+> +       u32 i;
+> +       bool r = false;
+> +
+> +       /* MSR allowlist not set up, allow everything */
+> +       if (!count)
+> +               return true;
+> +
+> +       /* Prevent collision with clear_msr_allowlist */
+> +       mutex_lock(&kvm->lock);
+> +
+> +       for (i = 0; i < count; i++) {
+> +               u32 start = ranges[i].base;
+> +               u32 end = start + ranges[i].nmsrs;
+> +               u32 flags = ranges[i].flags;
+> +               unsigned long *bitmap = ranges[i].bitmap;
+> +
+> +               if ((index >= start) && (index < end) && (flags & type)) {
+> +                       r = !!test_bit(index - start, bitmap);
+
+The !! seems gratuitous, since r is of type bool.
+
+> @@ -1483,6 +1515,9 @@ static int __kvm_set_msr(struct kvm_vcpu *vcpu, u32 index, u64 data,
+>  {
+>         struct msr_data msr;
+>
+> +       if (!host_initiated && !kvm_msr_allowed(vcpu, index, KVM_MSR_ALLOW_WRITE))
+> +               return -ENOENT;
+
+Perhaps -EPERM is more appropriate here?
+
+>         switch (index) {
+>         case MSR_FS_BASE:
+>         case MSR_GS_BASE:
+> @@ -1528,6 +1563,9 @@ int __kvm_get_msr(struct kvm_vcpu *vcpu, u32 index, u64 *data,
+>         struct msr_data msr;
+>         int ret;
+>
+> +       if (!host_initiated && !kvm_msr_allowed(vcpu, index, KVM_MSR_ALLOW_READ))
+> +               return -ENOENT;
+
+...and here?
+
+> +static bool msr_range_overlaps(struct kvm *kvm, struct msr_bitmap_range *range)
+
+Another bool function with no "is"? :-)
+
+> +{
+> +       struct msr_bitmap_range *ranges = kvm->arch.msr_allowlist_ranges;
+> +       u32 i, count = kvm->arch.msr_allowlist_ranges_count;
+> +       bool r = false;
+> +
+> +       for (i = 0; i < count; i++) {
+> +               u32 start = max(range->base, ranges[i].base);
+> +               u32 end = min(range->base + range->nmsrs,
+> +                             ranges[i].base + ranges[i].nmsrs);
+> +
+> +               if ((start < end) && (range->flags & ranges[i].flags)) {
+> +                       r = true;
+> +                       break;
+> +               }
+> +       }
+> +
+> +       return r;
+> +}
+
+This seems like an awkward constraint. Would it be possible to allow
+overlapping ranges as long as the access types don't clash? So, for
+example, could I specify an allow list for READ of MSRs 0-0x1ffff and
+an allow list for WRITE of MSRs 0-0x1ffff? Actually, I don't see why
+you have to prohibit overlapping ranges at all.
+
+
+> +static int kvm_vm_ioctl_clear_msr_allowlist(struct kvm *kvm)
+> +{
+> +       int i;
+
+Nit: In earlier code, you use u32 for this index. (I'm actually a fan
+of int, myself.)
+
+
+> @@ -10086,6 +10235,8 @@ void kvm_arch_pre_destroy_vm(struct kvm *kvm)
+>
+>  void kvm_arch_destroy_vm(struct kvm *kvm)
+>  {
+> +       int i;
+
+It's 50/50 now, u32 vs. int. :-)
