@@ -2,54 +2,55 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5BD2E2491BC
-	for <lists+kvm@lfdr.de>; Wed, 19 Aug 2020 02:19:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3D7072491E0
+	for <lists+kvm@lfdr.de>; Wed, 19 Aug 2020 02:42:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726703AbgHSATu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 18 Aug 2020 20:19:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59630 "EHLO
+        id S1726834AbgHSAmS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 18 Aug 2020 20:42:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35492 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726367AbgHSATu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 18 Aug 2020 20:19:50 -0400
-Received: from mail-oi1-x241.google.com (mail-oi1-x241.google.com [IPv6:2607:f8b0:4864:20::241])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 81D45C061389
-        for <kvm@vger.kernel.org>; Tue, 18 Aug 2020 17:19:49 -0700 (PDT)
-Received: by mail-oi1-x241.google.com with SMTP id j7so19546885oij.9
-        for <kvm@vger.kernel.org>; Tue, 18 Aug 2020 17:19:49 -0700 (PDT)
+        with ESMTP id S1725554AbgHSAmR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 18 Aug 2020 20:42:17 -0400
+Received: from mail-oo1-xc41.google.com (mail-oo1-xc41.google.com [IPv6:2607:f8b0:4864:20::c41])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 66C66C061389
+        for <kvm@vger.kernel.org>; Tue, 18 Aug 2020 17:42:17 -0700 (PDT)
+Received: by mail-oo1-xc41.google.com with SMTP id g1so4542060oop.11
+        for <kvm@vger.kernel.org>; Tue, 18 Aug 2020 17:42:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=3xf/uVvZRRPeQ5/ctm4JBgh76ZQxD/OxXmeSi3iyGm0=;
-        b=GVDz5iCieJACXORAqyVyYzT+TPbkZfyvvHXpFJEw5mkQxg6M1YuGz5W/rbqsayHrEq
-         VCqaJKHV/Wy5Ygf1kC18Tr6K6sKk1r7FNlQiFa6pvbAA74vTf1HdpgdfE4Ar7F+igwyO
-         0mJK+Fups0GcazFj0fQFShIIb98SKYFKpYn27LPIFqIw4qh9DWx6lhbs/vWz1rn6T9z0
-         ++VwAcDgROtVKA6bun4PVR49WEA+zOADOoFnwHNEEVSU6WZ6zuUx+OXvEHkPnUklgequ
-         tysSt+o+obK3aML0nuelOTcNo4QP7eJftcqTOv1W0JJ0bQpq3TwkF1Uy3KIduWMft1se
-         Hf+Q==
+        bh=2iDmf61km0EySghrVvZ8BtblrH0VgNfjX6iJCh3hYqw=;
+        b=Cd4TCK+YEAiKq4UCiaMU9zxYVlCFu4s0Z2uj0r3PI0TLKX/GdpZTb7xV7/bjFH6Oi9
+         gE29YCumisLozUwG29XnNGXE6FZxbGbBhG1uMcUtDnmw+3yXjw+Udn4aLszZU/kppPu0
+         1QPeG565e14GBXNOz5rnnxeUL6xkrrg6Kj7FMN1542kL+myJ6TBBXIOtz5Owx4DHS8jO
+         ji/mg9IJdauwUNh1EiAENXTncwiaDZlO2J+hbWn5V+UoxWSOasPx5g8uq6Ct9/hPFm4W
+         iUA0wh+H17oelQ4Vs7nYe49AQfi7grBY0JUuOQhgkKAVeGVWmEZ/D9Valjs+iRztyOA2
+         FpXQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=3xf/uVvZRRPeQ5/ctm4JBgh76ZQxD/OxXmeSi3iyGm0=;
-        b=YBUf5aW54d8giXJjfOsTpC0zki0p6eId9ETEb/Gaoy+1oiKrVOGKS5M1f9Ngax/q4v
-         o3tFSPbmz5DXDoTyuXxxl2mj6MKEL0znSyS+sqZ3XQruH2zvw8yFf35CXlCjk7X8FSFY
-         sJ4vleqDk6lzdeU9duQ/vjMMwFRojIq9LsdD7YvePBcdavLmIwdZKPWIGkNz+kQakqrN
-         zBhJ04b0iA0YklwnuNifgh8hqAx/YiztuU6O6usicjoHzzC88GsZTvWzOhNr4nnNG9Qm
-         4xrzx4ZP2JDwULytIzelBYzCwozl6+nNSAf5f2MM3bd9Y0NJSux+gZ6+tPpGL1p82EH5
-         OLOw==
-X-Gm-Message-State: AOAM530nv/p7Cs9iyAsyVzla9hZ9iUZeTkds+a3uSKsqFQi6sj5PIvkP
-        943ODFGkz2jzB/e8oLpu3HzathOQdUsKi/QjLRI=
-X-Google-Smtp-Source: ABdhPJxW0uPyquBxs5kFM0bn0v2hiG/70BXVU37YrwXN7+lLKAcqhzkeJsp73PVH2VbOCPZ7opemGn3Vv51EUY4Pdvs=
-X-Received: by 2002:aca:4f52:: with SMTP id d79mr1665980oib.141.1597796388909;
- Tue, 18 Aug 2020 17:19:48 -0700 (PDT)
+        bh=2iDmf61km0EySghrVvZ8BtblrH0VgNfjX6iJCh3hYqw=;
+        b=OHt0FuIY38kyNmG5woXZ2qQHHi0Fx+SzwmW+LALae8qXPBZuesIvXtIr4fPIW5Y38M
+         GFBKDyoGD9qilskAYLr0rgVd5S/m1jht8OaTEnaECSot/NoiXZ/7Xy0dt6OGna6+yqwJ
+         wbmOcWGVsmg1kthxoqEqGgRo0Nfi5XAOycRphJC/gGzmMAgHqtf0XV9wUKOvI78Cz5Kr
+         NPEwI4saVzvYA+97RSv9PEZ4QIkZqxnmpJAlJDPU1rL15FL10GHzHKP3c6NTEfoMXdks
+         9jGygAgimdh8UpDNeYXbOsFg+ixI1LSH3wAQBBUTUp7srzR99zk14zliFJUtlyD7FfSU
+         weLQ==
+X-Gm-Message-State: AOAM532Lq5sueoeJffo/ysURJI9upfvwgCdAWoC2nGv0cUxtR6uLYVmc
+        vTNUOeLoRzwlSWnHiSlSfIj/Kj5SUl1c2VMbc/4=
+X-Google-Smtp-Source: ABdhPJwgznEsa2teOHCfeweGiEoPmmTFwbEHeNf22bBgF8IOEFCGKNlTEaHEAxjx9vqz09bM2VznFXURKDJnTfDVMCs=
+X-Received: by 2002:a4a:2f4b:: with SMTP id p72mr17044267oop.39.1597797736674;
+ Tue, 18 Aug 2020 17:42:16 -0700 (PDT)
 MIME-Version: 1.0
-References: <20200818152429.1923996-1-oupton@google.com> <20200818152429.1923996-3-oupton@google.com>
-In-Reply-To: <20200818152429.1923996-3-oupton@google.com>
+References: <20200818152429.1923996-1-oupton@google.com> <20200818152429.1923996-4-oupton@google.com>
+In-Reply-To: <20200818152429.1923996-4-oupton@google.com>
 From:   Wanpeng Li <kernellwp@gmail.com>
-Date:   Wed, 19 Aug 2020 08:19:37 +0800
-Message-ID: <CANRm+CxMRA2j8uc-gnqxJtq5UEffaHcqqXcpOHSJrUVE+=r+XQ@mail.gmail.com>
-Subject: Re: [PATCH v4 2/4] kvm: x86: set wall_clock in kvm_write_wall_clock()
+Date:   Wed, 19 Aug 2020 08:42:04 +0800
+Message-ID: <CANRm+CwEoxLbZqrE5t9QZd8TdQ1MY+BMZfUqaWnmp05GjLLqRg@mail.gmail.com>
+Subject: Re: [PATCH v4 3/4] kvm: x86: only provide PV features if enabled in
+ guest's CPUID
 To:     Oliver Upton <oupton@google.com>
 Cc:     kvm <kvm@vger.kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
         Sean Christopherson <sean.j.christopherson@intel.com>,
@@ -63,8 +64,17 @@ X-Mailing-List: kvm@vger.kernel.org
 
 On Tue, 18 Aug 2020 at 23:24, Oliver Upton <oupton@google.com> wrote:
 >
-> Small change to avoid meaningless duplication in the subsequent patch.
-> No functional change intended.
+> KVM unconditionally provides PV features to the guest, regardless of the
+> configured CPUID. An unwitting guest that doesn't check
+> KVM_CPUID_FEATURES before use could access paravirt features that
+> userspace did not intend to provide. Fix this by checking the guest's
+> CPUID before performing any paravirtual operations.
+>
+> Introduce a capability, KVM_CAP_ENFORCE_PV_FEATURE_CPUID, to gate the
+> aforementioned enforcement. Migrating a VM from a host w/o this patch to
+> a host with this patch could silently change the ABI exposed to the
+> guest, warranting that we default to the old behavior and opt-in for
+> the new one.
 >
 > Reviewed-by: Jim Mattson <jmattson@google.com>
 > Reviewed-by: Peter Shier <pshier@google.com>
@@ -72,32 +82,280 @@ On Tue, 18 Aug 2020 at 23:24, Oliver Upton <oupton@google.com> wrote:
 
 Reviewed-by: Wanpeng Li <wanpengli@tencent.com>
 
-> Change-Id: I77ab9cdad239790766b7a49d5cbae5e57a3005ea
+> Change-Id: I202a0926f65035b872bfe8ad15307c026de59a98
 > ---
->  arch/x86/kvm/x86.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
+>  Documentation/virt/kvm/api.rst  | 11 ++++++
+>  arch/x86/include/asm/kvm_host.h | 15 ++++++++
+>  arch/x86/kvm/cpuid.c            |  7 ++++
+>  arch/x86/kvm/cpuid.h            | 10 +++++
+>  arch/x86/kvm/x86.c              | 67 ++++++++++++++++++++++++++++++---
+>  include/uapi/linux/kvm.h        |  1 +
+>  6 files changed, 106 insertions(+), 5 deletions(-)
 >
+> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+> index eb3a1316f03e..c9e4f092f743 100644
+> --- a/Documentation/virt/kvm/api.rst
+> +++ b/Documentation/virt/kvm/api.rst
+> @@ -6159,3 +6159,14 @@ KVM can therefore start protected VMs.
+>  This capability governs the KVM_S390_PV_COMMAND ioctl and the
+>  KVM_MP_STATE_LOAD MP_STATE. KVM_SET_MP_STATE can fail for protected
+>  guests when the state change is invalid.
+> +
+> +
+> +8.24 KVM_CAP_ENFORCE_PV_CPUID
+> +-----------------------------
+> +
+> +Architectures: x86
+> +
+> +When enabled, KVM will disable paravirtual features provided to the
+> +guest according to the bits in the KVM_CPUID_FEATURES CPUID leaf
+> +(0x40000001). Otherwise, a guest may use the paravirtual features
+> +regardless of what has actually been exposed through the CPUID leaf.
+> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> index 5ab3af7275d8..e0c65e319bdf 100644
+> --- a/arch/x86/include/asm/kvm_host.h
+> +++ b/arch/x86/include/asm/kvm_host.h
+> @@ -788,6 +788,21 @@ struct kvm_vcpu_arch {
+>
+>         /* AMD MSRC001_0015 Hardware Configuration */
+>         u64 msr_hwcr;
+> +
+> +       /* pv related cpuid info */
+> +       struct {
+> +               /*
+> +                * value of the eax register in the KVM_CPUID_FEATURES CPUID
+> +                * leaf.
+> +                */
+> +               u32 features;
+> +
+> +               /*
+> +                * indicates whether pv emulation should be disabled if features
+> +                * are not present in the guest's cpuid
+> +                */
+> +               bool enforce;
+> +       } pv_cpuid;
+>  };
+>
+>  struct kvm_lpage_info {
+> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+> index 3fd6eec202d7..48fb2ea74906 100644
+> --- a/arch/x86/kvm/cpuid.c
+> +++ b/arch/x86/kvm/cpuid.c
+> @@ -107,6 +107,13 @@ void kvm_update_cpuid_runtime(struct kvm_vcpu *vcpu)
+>                 (best->eax & (1 << KVM_FEATURE_PV_UNHALT)))
+>                 best->eax &= ~(1 << KVM_FEATURE_PV_UNHALT);
+>
+> +       /*
+> +        * save the feature bitmap to avoid cpuid lookup for every PV
+> +        * operation
+> +        */
+> +       if (best)
+> +               vcpu->arch.pv_cpuid.features = best->eax;
+> +
+>         if (!kvm_check_has_quirk(vcpu->kvm, KVM_X86_QUIRK_MISC_ENABLE_NO_MWAIT)) {
+>                 best = kvm_find_cpuid_entry(vcpu, 0x1, 0);
+>                 if (best)
+> diff --git a/arch/x86/kvm/cpuid.h b/arch/x86/kvm/cpuid.h
+> index 3a923ae15f2f..4e2d2e767984 100644
+> --- a/arch/x86/kvm/cpuid.h
+> +++ b/arch/x86/kvm/cpuid.h
+> @@ -5,6 +5,7 @@
+>  #include "x86.h"
+>  #include <asm/cpu.h>
+>  #include <asm/processor.h>
+> +#include <uapi/asm/kvm_para.h>
+>
+>  extern u32 kvm_cpu_caps[NCAPINTS] __read_mostly;
+>  void kvm_set_cpu_caps(void);
+> @@ -308,4 +309,13 @@ static inline bool page_address_valid(struct kvm_vcpu *vcpu, gpa_t gpa)
+>         return PAGE_ALIGNED(gpa) && !(gpa >> cpuid_maxphyaddr(vcpu));
+>  }
+>
+> +static __always_inline bool guest_pv_has(struct kvm_vcpu *vcpu,
+> +                                        unsigned int kvm_feature)
+> +{
+> +       if (!vcpu->arch.pv_cpuid.enforce)
+> +               return true;
+> +
+> +       return vcpu->arch.pv_cpuid.features & (1u << kvm_feature);
+> +}
+> +
+>  #endif
 > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index b7ba8eb0c91b..e16c71fe1b48 100644
+> index e16c71fe1b48..941ab75cf572 100644
 > --- a/arch/x86/kvm/x86.c
 > +++ b/arch/x86/kvm/x86.c
-> @@ -1791,6 +1791,8 @@ static void kvm_write_wall_clock(struct kvm *kvm, gpa_t wall_clock)
->         struct pvclock_wall_clock wc;
->         u64 wall_nsec;
+> @@ -2764,6 +2764,14 @@ static int kvm_pv_enable_async_pf(struct kvm_vcpu *vcpu, u64 data)
+>         if (data & 0x30)
+>                 return 1;
 >
-> +       kvm->arch.wall_clock = wall_clock;
+> +       if (!guest_pv_has(vcpu, KVM_FEATURE_ASYNC_PF_VMEXIT) &&
+> +           (data & KVM_ASYNC_PF_DELIVERY_AS_PF_VMEXIT))
+> +               return 1;
 > +
->         if (!wall_clock)
->                 return;
+> +       if (!guest_pv_has(vcpu, KVM_FEATURE_ASYNC_PF_INT) &&
+> +           (data & KVM_ASYNC_PF_DELIVERY_AS_INT))
+> +               return 1;
+> +
+>         if (!lapic_in_kernel(vcpu))
+>                 return 1;
 >
-> @@ -2998,7 +3000,6 @@ int kvm_set_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+> @@ -2841,10 +2849,12 @@ static void record_steal_time(struct kvm_vcpu *vcpu)
+>          * Doing a TLB flush here, on the guest's behalf, can avoid
+>          * expensive IPIs.
+>          */
+> -       trace_kvm_pv_tlb_flush(vcpu->vcpu_id,
+> -               st->preempted & KVM_VCPU_FLUSH_TLB);
+> -       if (xchg(&st->preempted, 0) & KVM_VCPU_FLUSH_TLB)
+> -               kvm_vcpu_flush_tlb_guest(vcpu);
+> +       if (guest_pv_has(vcpu, KVM_FEATURE_PV_TLB_FLUSH)) {
+> +               trace_kvm_pv_tlb_flush(vcpu->vcpu_id,
+> +                                      st->preempted & KVM_VCPU_FLUSH_TLB);
+> +               if (xchg(&st->preempted, 0) & KVM_VCPU_FLUSH_TLB)
+> +                       kvm_vcpu_flush_tlb_guest(vcpu);
+> +       }
+>
+>         vcpu->arch.st.preempted = 0;
+>
+> @@ -2999,30 +3009,54 @@ int kvm_set_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+>                 vcpu->arch.smi_count = data;
 >                 break;
 >         case MSR_KVM_WALL_CLOCK_NEW:
+> +               if (!guest_pv_has(vcpu, KVM_FEATURE_CLOCKSOURCE2))
+> +                       return 1;
+> +
+> +               kvm_write_wall_clock(vcpu->kvm, data);
+> +               break;
 >         case MSR_KVM_WALL_CLOCK:
-> -               vcpu->kvm->arch.wall_clock = data;
+> +               if (!guest_pv_has(vcpu, KVM_FEATURE_CLOCKSOURCE))
+> +                       return 1;
+> +
 >                 kvm_write_wall_clock(vcpu->kvm, data);
 >                 break;
 >         case MSR_KVM_SYSTEM_TIME_NEW:
+> +               if (!guest_pv_has(vcpu, KVM_FEATURE_CLOCKSOURCE2))
+> +                       return 1;
+> +
+>                 kvm_write_system_time(vcpu, data, false, msr_info->host_initiated);
+>                 break;
+>         case MSR_KVM_SYSTEM_TIME:
+> -               kvm_write_system_time(vcpu, data, true, msr_info->host_initiated);
+> +               if (!guest_pv_has(vcpu, KVM_FEATURE_CLOCKSOURCE))
+> +                       return 1;
+> +
+> +               kvm_write_system_time(vcpu, data, true,  msr_info->host_initiated);
+>                 break;
+>         case MSR_KVM_ASYNC_PF_EN:
+> +               if (!guest_pv_has(vcpu, KVM_FEATURE_ASYNC_PF))
+> +                       return 1;
+> +
+>                 if (kvm_pv_enable_async_pf(vcpu, data))
+>                         return 1;
+>                 break;
+>         case MSR_KVM_ASYNC_PF_INT:
+> +               if (!guest_pv_has(vcpu, KVM_FEATURE_ASYNC_PF_INT))
+> +                       return 1;
+> +
+>                 if (kvm_pv_enable_async_pf_int(vcpu, data))
+>                         return 1;
+>                 break;
+>         case MSR_KVM_ASYNC_PF_ACK:
+> +               if (!guest_pv_has(vcpu, KVM_FEATURE_ASYNC_PF))
+> +                       return 1;
+>                 if (data & 0x1) {
+>                         vcpu->arch.apf.pageready_pending = false;
+>                         kvm_check_async_pf_completion(vcpu);
+>                 }
+>                 break;
+>         case MSR_KVM_STEAL_TIME:
+> +               if (!guest_pv_has(vcpu, KVM_FEATURE_STEAL_TIME))
+> +                       return 1;
+>
+>                 if (unlikely(!sched_info_on()))
+>                         return 1;
+> @@ -3039,11 +3073,17 @@ int kvm_set_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+>
+>                 break;
+>         case MSR_KVM_PV_EOI_EN:
+> +               if (!guest_pv_has(vcpu, KVM_FEATURE_PV_EOI))
+> +                       return 1;
+> +
+>                 if (kvm_lapic_enable_pv_eoi(vcpu, data, sizeof(u8)))
+>                         return 1;
+>                 break;
+>
+>         case MSR_KVM_POLL_CONTROL:
+> +               if (!guest_pv_has(vcpu, KVM_FEATURE_POLL_CONTROL))
+> +                       return 1;
+> +
+>                 /* only enable bit supported */
+>                 if (data & (-1ULL << 1))
+>                         return 1;
+> @@ -3523,6 +3563,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+>         case KVM_CAP_EXCEPTION_PAYLOAD:
+>         case KVM_CAP_SET_GUEST_DEBUG:
+>         case KVM_CAP_LAST_CPU:
+> +       case KVM_CAP_ENFORCE_PV_FEATURE_CPUID:
+>                 r = 1;
+>                 break;
+>         case KVM_CAP_SYNC_REGS:
+> @@ -4390,6 +4431,11 @@ static int kvm_vcpu_ioctl_enable_cap(struct kvm_vcpu *vcpu,
+>
+>                 return kvm_x86_ops.enable_direct_tlbflush(vcpu);
+>
+> +       case KVM_CAP_ENFORCE_PV_FEATURE_CPUID:
+> +               vcpu->arch.pv_cpuid.enforce = cap->args[0];
+> +
+> +               return 0;
+> +
+>         default:
+>                 return -EINVAL;
+>         }
+> @@ -7724,11 +7770,16 @@ int kvm_emulate_hypercall(struct kvm_vcpu *vcpu)
+>                 goto out;
+>         }
+>
+> +       ret = -KVM_ENOSYS;
+> +
+>         switch (nr) {
+>         case KVM_HC_VAPIC_POLL_IRQ:
+>                 ret = 0;
+>                 break;
+>         case KVM_HC_KICK_CPU:
+> +               if (!guest_pv_has(vcpu, KVM_FEATURE_PV_UNHALT))
+> +                       break;
+> +
+>                 kvm_pv_kick_cpu_op(vcpu->kvm, a0, a1);
+>                 kvm_sched_yield(vcpu->kvm, a1);
+>                 ret = 0;
+> @@ -7739,9 +7790,15 @@ int kvm_emulate_hypercall(struct kvm_vcpu *vcpu)
+>                 break;
+>  #endif
+>         case KVM_HC_SEND_IPI:
+> +               if (!guest_pv_has(vcpu, KVM_FEATURE_PV_SEND_IPI))
+> +                       break;
+> +
+>                 ret = kvm_pv_send_ipi(vcpu->kvm, a0, a1, a2, a3, op_64_bit);
+>                 break;
+>         case KVM_HC_SCHED_YIELD:
+> +               if (!guest_pv_has(vcpu, KVM_FEATURE_PV_SCHED_YIELD))
+> +                       break;
+> +
+>                 kvm_sched_yield(vcpu->kvm, a0);
+>                 ret = 0;
+>                 break;
+> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+> index f6d86033c4fa..48c2d5c10b1e 100644
+> --- a/include/uapi/linux/kvm.h
+> +++ b/include/uapi/linux/kvm.h
+> @@ -1035,6 +1035,7 @@ struct kvm_ppc_resize_hpt {
+>  #define KVM_CAP_LAST_CPU 184
+>  #define KVM_CAP_SMALLER_MAXPHYADDR 185
+>  #define KVM_CAP_S390_DIAG318 186
+> +#define KVM_CAP_ENFORCE_PV_FEATURE_CPUID 187
+>
+>  #ifdef KVM_CAP_IRQ_ROUTING
+>
 > --
 > 2.28.0.220.ged08abb693-goog
 >
