@@ -2,349 +2,201 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A917624AC0F
-	for <lists+kvm@lfdr.de>; Thu, 20 Aug 2020 02:20:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 01BAE24AC3C
+	for <lists+kvm@lfdr.de>; Thu, 20 Aug 2020 02:33:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726868AbgHTAUO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 19 Aug 2020 20:20:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57248 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726673AbgHTAUM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 19 Aug 2020 20:20:12 -0400
-Received: from mail-ej1-x644.google.com (mail-ej1-x644.google.com [IPv6:2a00:1450:4864:20::644])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 87C0DC061757
-        for <kvm@vger.kernel.org>; Wed, 19 Aug 2020 17:20:11 -0700 (PDT)
-Received: by mail-ej1-x644.google.com with SMTP id o18so538209eje.7
-        for <kvm@vger.kernel.org>; Wed, 19 Aug 2020 17:20:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=ALU6b4Z2nrBS10m+LDFgzQCHLua9Z/qjoJeUgWzlspg=;
-        b=EcZCHM8cYv8XneQNJzeruMGgCpTlZE7JfEd5FbiWEI7VW5EidJYFVYsB+zisV3uvgp
-         c+wQnOuBmjsG/hw9CLrZPN66inJSvtMarLg0ITU0/bPAEQ/1ea6MD0lfxRcY/dv0l8B+
-         Di4ShGlbVoUtI525v5K0xXaXJZPaELvy0Y4zYL2fcboiOY2OcxMyXG7dcZAJrhATugoh
-         jE20fihWi9KsNJBzxa24CtcbOUgs1ZiDSj3cj6NRyP8JNDttbQtJFMfsXjwf1in/OklR
-         hikv9HrfG1IiBM9QkLbWi94b5oKVQDxRWHyAKdtwRSl4Kyu/uj8jxzZuP00GRzEq6hY4
-         Xpkw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=ALU6b4Z2nrBS10m+LDFgzQCHLua9Z/qjoJeUgWzlspg=;
-        b=oyFyzn4ttbuwsZ6K9U0I4moQelKNcmfP4uzLtdutOlVuZv82Hwg5aRkx46NZKnBSy4
-         9PeLRmufEQvfCUFQHLIfAVdCVPRn1jzrnUNStxCrHMjzWwrlF1y+02IhpNQpVALbfccU
-         6fyUuUS4XeWPWcFpSxPMtu7UBWnUNDgOheuPoxp39qkxVvjwsC8uX65PuhX/te+fAZUx
-         aQKVN1Qz9WV7r/fVnx7wU19TBXpq9L2luJH/FjgpsFdzy9z+rlwmhaOUahkMISKmErZx
-         Lwzy7E4OglNLiCr4JGY0VUFjfh0TjyIf9oXSbS4YL3tAwGdP/JJzOTz24pV2NQIl8ISR
-         ksmA==
-X-Gm-Message-State: AOAM530XSfomhJGVq4bIwqM6jUkJdOkwlhmrr7yq6SaVUwNZdaljYNKE
-        1n9V8cNocmO1NqnFNQXQUbguBS3Yjyjyossv8H0Cow==
-X-Google-Smtp-Source: ABdhPJxSKeFM1QwFzWhtVNkbCoAd8X9Th3Da1XgI/FkhD3YGCjktBNVLUNdZ6QCtvRTe+gr5sw2+4ApIXKWreSB6ymY=
-X-Received: by 2002:a17:906:7698:: with SMTP id o24mr869118ejm.182.1597882810007;
- Wed, 19 Aug 2020 17:20:10 -0700 (PDT)
+        id S1726835AbgHTAdZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 19 Aug 2020 20:33:25 -0400
+Received: from mga02.intel.com ([134.134.136.20]:7945 "EHLO mga02.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726609AbgHTAdY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 19 Aug 2020 20:33:24 -0400
+IronPort-SDR: FS7mmm+PJnRX0kjTa7YnWN9OZVoKxE0TLCZ87E2iTz/eOzCE4P2YC5E6C0/aCtUXY5JEPIdCpn
+ UXUYj6jbYpNA==
+X-IronPort-AV: E=McAfee;i="6000,8403,9718"; a="143031671"
+X-IronPort-AV: E=Sophos;i="5.76,332,1592895600"; 
+   d="scan'208";a="143031671"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Aug 2020 17:33:23 -0700
+IronPort-SDR: gHgmTiZOP2ECOe79zhr7KaaCp4SRRAatx8FwyHbiE4er4rQQL0yeODlz+FwXB1tj3OY5VhPnw0
+ NGQk5njwWUwg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.76,332,1592895600"; 
+   d="scan'208";a="327250487"
+Received: from joy-optiplex-7040.sh.intel.com (HELO joy-OptiPlex-7040) ([10.239.13.16])
+  by orsmga008.jf.intel.com with ESMTP; 19 Aug 2020 17:33:17 -0700
+Date:   Thu, 20 Aug 2020 08:18:10 +0800
+From:   Yan Zhao <yan.y.zhao@intel.com>
+To:     Alex Williamson <alex.williamson@redhat.com>
+Cc:     Parav Pandit <parav@nvidia.com>, Cornelia Huck <cohuck@redhat.com>,
+        Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "libvir-list@redhat.com" <libvir-list@redhat.com>,
+        "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+        Kirti Wankhede <kwankhede@nvidia.com>,
+        "eauger@redhat.com" <eauger@redhat.com>,
+        "xin-ran.wang@intel.com" <xin-ran.wang@intel.com>,
+        "corbet@lwn.net" <corbet@lwn.net>,
+        "openstack-discuss@lists.openstack.org" 
+        <openstack-discuss@lists.openstack.org>,
+        "shaohe.feng@intel.com" <shaohe.feng@intel.com>,
+        "kevin.tian@intel.com" <kevin.tian@intel.com>,
+        Parav Pandit <parav@mellanox.com>,
+        "jian-feng.ding@intel.com" <jian-feng.ding@intel.com>,
+        "dgilbert@redhat.com" <dgilbert@redhat.com>,
+        "zhenyuw@linux.intel.com" <zhenyuw@linux.intel.com>,
+        "hejie.xu@intel.com" <hejie.xu@intel.com>,
+        "bao.yumeng@zte.com.cn" <bao.yumeng@zte.com.cn>,
+        "eskultet@redhat.com" <eskultet@redhat.com>,
+        "smooney@redhat.com" <smooney@redhat.com>,
+        "intel-gvt-dev@lists.freedesktop.org" 
+        <intel-gvt-dev@lists.freedesktop.org>,
+        Jiri Pirko <jiri@mellanox.com>,
+        "dinechin@redhat.com" <dinechin@redhat.com>,
+        "devel@ovirt.org" <devel@ovirt.org>
+Subject: Re: device compatibility interface for live migration with assigned
+ devices
+Message-ID: <20200820001810.GD21172@joy-OptiPlex-7040>
+Reply-To: Yan Zhao <yan.y.zhao@intel.com>
+References: <e6e75807-0614-bd75-aeb6-64d643e029d3@redhat.com>
+ <20200814051601.GD15344@joy-OptiPlex-7040>
+ <a51209fe-a8c6-941f-ff54-7be06d73bc44@redhat.com>
+ <20200818085527.GB20215@redhat.com>
+ <3a073222-dcfe-c02d-198b-29f6a507b2e1@redhat.com>
+ <20200818091628.GC20215@redhat.com>
+ <20200818113652.5d81a392.cohuck@redhat.com>
+ <BY5PR12MB4322C9D1A66C4657776A1383DC5C0@BY5PR12MB4322.namprd12.prod.outlook.com>
+ <20200819033035.GA21172@joy-OptiPlex-7040>
+ <20200819115021.004427a3@x1.home>
 MIME-Version: 1.0
-References: <20200807155648.8602-1-graf@amazon.com> <20200807155648.8602-4-graf@amazon.com>
-In-Reply-To: <20200807155648.8602-4-graf@amazon.com>
-From:   Aaron Lewis <aaronlewis@google.com>
-Date:   Wed, 19 Aug 2020 17:19:58 -0700
-Message-ID: <CAAAPnDFhMNDU3zfy2Yvd=Mq=xGpKGm9z3i+O64GOn2qbyZjqGQ@mail.gmail.com>
-Subject: Re: [PATCH v5 3/3] KVM: selftests: Add test for user space MSR handling
-To:     Alexander Graf <graf@amazon.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        KarimAllah Raslan <karahmed@amazon.de>,
-        kvm list <kvm@vger.kernel.org>, linux-doc@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200819115021.004427a3@x1.home>
+User-Agent: Mutt/1.9.4 (2018-02-28)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Aug 7, 2020 at 8:57 AM Alexander Graf <graf@amazon.com> wrote:
->
-> Now that we have the ability to handle MSRs from user space and also to
-> select which ones we do want to prevent in-kernel KVM code from handling,
-> let's add a selftest to show case and verify the API.
->
-> Signed-off-by: Alexander Graf <graf@amazon.com>
->
-> ---
->
-> v2 -> v3:
->
->   - s/KVM_CAP_ADD_MSR_ALLOWLIST/KVM_CAP_X86_MSR_ALLOWLIST/g
->   - Add test to clear whitelist
->   - Adjust to reply-less API
->   - Fix asserts
->   - Actually trap on MSR_IA32_POWER_CTL writes
-> ---
->  tools/testing/selftests/kvm/Makefile          |   1 +
->  .../selftests/kvm/x86_64/user_msr_test.c      | 221 ++++++++++++++++++
->  2 files changed, 222 insertions(+)
->  create mode 100644 tools/testing/selftests/kvm/x86_64/user_msr_test.c
->
+On Wed, Aug 19, 2020 at 11:50:21AM -0600, Alex Williamson wrote:
+<...>
+> > > > > What I care about is that we have a *standard* userspace API for
+> > > > > performing device compatibility checking / state migration, for use by
+> > > > > QEMU/libvirt/ OpenStack, such that we can write code without countless
+> > > > > vendor specific code paths.
+> > > > >
+> > > > > If there is vendor specific stuff on the side, that's fine as we can
+> > > > > ignore that, but the core functionality for device compat / migration
+> > > > > needs to be standardized.  
+> > > > 
+> > > > To summarize:
+> > > > - choose one of sysfs or devlink
+> > > > - have a common interface, with a standardized way to add
+> > > >   vendor-specific attributes
+> > > > ?  
+> > > 
+> > > Please refer to my previous email which has more example and details.  
+> > hi Parav,
+> > the example is based on a new vdpa tool running over netlink, not based
+> > on devlink, right?
+> > For vfio migration compatibility, we have to deal with both mdev and physical
+> > pci devices, I don't think it's a good idea to write a new tool for it, given
+> > we are able to retrieve the same info from sysfs and there's already an
+> > mdevctl from Alex (https://github.com/mdevctl/mdevctl).
+> > 
+> > hi All,
+> > could we decide that sysfs is the interface that every VFIO vendor driver
+> > needs to provide in order to support vfio live migration, otherwise the
+> > userspace management tool would not list the device into the compatible
+> > list?
+> > 
+> > if that's true, let's move to the standardizing of the sysfs interface.
+> > (1) content
+> > common part: (must)
+> >    - software_version: (in major.minor.bugfix scheme)
+> >    - device_api: vfio-pci or vfio-ccw ...
+> >    - type: mdev type for mdev device or
+> >            a signature for physical device which is a counterpart for
+> > 	   mdev type.
+> > 
+> > device api specific part: (must)
+> >   - pci id: pci id of mdev parent device or pci id of physical pci
+> >     device (device_api is vfio-pci)
+> 
+> As noted previously, the parent PCI ID should not matter for an mdev
+> device, if a vendor has a dependency on matching the parent device PCI
+> ID, that's a vendor specific restriction.  An mdev device can also
+> expose a vfio-pci device API without the parent device being PCI.  For
+> a physical PCI device, shouldn't the PCI ID be encompassed in the
+> signature?  Thanks,
+> 
+you are right. I need to put the PCI ID as a vendor specific field.
+I didn't do that because I wanted all fields in vendor specific to be
+configurable by management tools, so they can configure the target device
+according to the value of a vendor specific field even they don't know
+the meaning of the field.
+But maybe they can just ignore the field when they can't find a matching
+writable field to configure the target.
 
-Please add user_msr_test to .gitignore.
+Thanks
+Yan
 
-> diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-> index 4a166588d99f..80d5c348354c 100644
-> --- a/tools/testing/selftests/kvm/Makefile
-> +++ b/tools/testing/selftests/kvm/Makefile
-> @@ -55,6 +55,7 @@ TEST_GEN_PROGS_x86_64 += x86_64/vmx_set_nested_state_test
->  TEST_GEN_PROGS_x86_64 += x86_64/vmx_tsc_adjust_test
->  TEST_GEN_PROGS_x86_64 += x86_64/xss_msr_test
->  TEST_GEN_PROGS_x86_64 += x86_64/debug_regs
-> +TEST_GEN_PROGS_x86_64 += x86_64/user_msr_test
->  TEST_GEN_PROGS_x86_64 += clear_dirty_log_test
->  TEST_GEN_PROGS_x86_64 += demand_paging_test
->  TEST_GEN_PROGS_x86_64 += dirty_log_test
-> diff --git a/tools/testing/selftests/kvm/x86_64/user_msr_test.c b/tools/testing/selftests/kvm/x86_64/user_msr_test.c
-> new file mode 100644
-> index 000000000000..7b149424690d
-> --- /dev/null
-> +++ b/tools/testing/selftests/kvm/x86_64/user_msr_test.c
-> @@ -0,0 +1,221 @@
-> +// SPDX-License-Identifier: GPL-2.0-only
-> +/*
-> + * tests for KVM_CAP_X86_USER_SPACE_MSR and KVM_X86_ADD_MSR_ALLOWLIST
-> + *
-> + * Copyright (C) 2020, Amazon Inc.
-> + *
-> + * This is a functional test to verify that we can deflect MSR events
-> + * into user space.
-> + */
-> +#define _GNU_SOURCE /* for program_invocation_short_name */
-> +#include <fcntl.h>
-> +#include <stdio.h>
-> +#include <stdlib.h>
-> +#include <string.h>
-> +#include <sys/ioctl.h>
-> +
-> +#include "test_util.h"
-> +
-> +#include "kvm_util.h"
-> +#include "processor.h"
-> +
-> +#define VCPU_ID                  5
-> +
-> +u32 msr_reads, msr_writes;
-> +
-> +struct range_desc {
-> +       struct kvm_msr_allowlist allow;
-> +       void (*populate)(struct kvm_msr_allowlist *range);
-> +};
-> +
-> +static void populate_c0000000_read(struct kvm_msr_allowlist *range)
-> +{
-> +       u8 *bitmap = range->bitmap;
-> +       u32 idx = MSR_SYSCALL_MASK & (KVM_MSR_ALLOWLIST_MAX_LEN - 1);
-> +
-> +       bitmap[idx / 8] &= ~(1 << (idx % 8));
-> +}
-> +
-> +static void populate_00000000_write(struct kvm_msr_allowlist *range)
-> +{
-> +       u8 *bitmap = range->bitmap;
-> +       u32 idx = MSR_IA32_POWER_CTL & (KVM_MSR_ALLOWLIST_MAX_LEN - 1);
-> +
-> +       bitmap[idx / 8] &= ~(1 << (idx % 8));
-> +}
-> +
-> +struct range_desc ranges[] = {
-> +       {
-> +               .allow = {
-> +                       .flags = KVM_MSR_ALLOW_READ,
-> +                       .base = 0x00000000,
-> +                       .nmsrs = KVM_MSR_ALLOWLIST_MAX_LEN * BITS_PER_BYTE,
-> +               },
-> +       }, {
-> +               .allow = {
-> +                       .flags = KVM_MSR_ALLOW_WRITE,
-> +                       .base = 0x00000000,
-> +                       .nmsrs = KVM_MSR_ALLOWLIST_MAX_LEN * BITS_PER_BYTE,
-> +               },
-> +               .populate = populate_00000000_write,
-> +       }, {
-> +               .allow = {
-> +                       .flags = KVM_MSR_ALLOW_READ | KVM_MSR_ALLOW_WRITE,
-> +                       .base = 0x40000000,
-> +                       .nmsrs = KVM_MSR_ALLOWLIST_MAX_LEN * BITS_PER_BYTE,
-> +               },
-> +       }, {
-> +               .allow = {
-> +                       .flags = KVM_MSR_ALLOW_READ,
-> +                       .base = 0xc0000000,
-> +                       .nmsrs = KVM_MSR_ALLOWLIST_MAX_LEN * BITS_PER_BYTE,
-> +               },
-> +               .populate = populate_c0000000_read,
-> +       }, {
-> +               .allow = {
-> +                       .flags = KVM_MSR_ALLOW_WRITE,
-> +                       .base = 0xc0000000,
-> +                       .nmsrs = KVM_MSR_ALLOWLIST_MAX_LEN * BITS_PER_BYTE,
-> +               },
-> +       },
-> +};
-> +
-> +static void guest_msr_calls(bool trapped)
-> +{
-> +       /* This goes into the in-kernel emulation */
-> +       wrmsr(MSR_SYSCALL_MASK, 0);
-> +
-> +       if (trapped) {
-> +               /* This goes into user space emulation */
-> +               GUEST_ASSERT(rdmsr(MSR_SYSCALL_MASK) == MSR_SYSCALL_MASK);
-> +       } else {
-> +               GUEST_ASSERT(rdmsr(MSR_SYSCALL_MASK) != MSR_SYSCALL_MASK);
-> +       }
-> +
-> +       /* If trapped == true, this goes into user space emulation */
-> +       wrmsr(MSR_IA32_POWER_CTL, 0x1234);
-> +
-> +       /* This goes into the in-kernel emulation */
-> +       rdmsr(MSR_IA32_POWER_CTL);
-> +}
-> +
-> +static void guest_code(void)
-> +{
-> +       guest_msr_calls(true);
-> +
-> +       /*
-> +        * Disable allow listing, so that the kernel
-> +        * handles everything in the next round
-> +        */
-> +       GUEST_SYNC(0);
-> +
-> +       guest_msr_calls(false);
-> +
-> +       GUEST_DONE();
-> +}
-> +
-> +static int handle_ucall(struct kvm_vm *vm)
-> +{
-> +       struct ucall uc;
-> +
-> +       switch (get_ucall(vm, VCPU_ID, &uc)) {
-> +       case UCALL_ABORT:
-> +               TEST_FAIL("Guest assertion not met");
-> +               break;
-> +       case UCALL_SYNC:
-> +               vm_ioctl(vm, KVM_X86_CLEAR_MSR_ALLOWLIST, NULL);
-> +               break;
-> +       case UCALL_DONE:
-> +               return 1;
-> +       default:
-> +               TEST_FAIL("Unknown ucall %lu", uc.cmd);
-> +       }
-> +
-> +       return 0;
-> +}
-> +
-> +static void handle_rdmsr(struct kvm_run *run)
-> +{
-> +       run->msr.data = run->msr.index;
-> +       msr_reads++;
-> +}
-> +
-> +static void handle_wrmsr(struct kvm_run *run)
-> +{
-> +       /* ignore */
-> +       msr_writes++;
-> +}
-> +
-> +int main(int argc, char *argv[])
-> +{
-> +       struct kvm_enable_cap cap = {
-> +               .cap = KVM_CAP_X86_USER_SPACE_MSR,
-> +               .args[0] = 1,
-> +       };
-> +       struct kvm_vm *vm;
-> +       struct kvm_run *run;
-> +       int rc;
-> +       int i;
-> +
-> +       /* Tell stdout not to buffer its content */
-> +       setbuf(stdout, NULL);
-> +
-> +       /* Create VM */
-> +       vm = vm_create_default(VCPU_ID, 0, guest_code);
-> +       vcpu_set_cpuid(vm, VCPU_ID, kvm_get_supported_cpuid());
-> +       run = vcpu_state(vm, VCPU_ID);
-> +
-> +       rc = kvm_check_cap(KVM_CAP_X86_USER_SPACE_MSR);
-> +       TEST_ASSERT(rc, "KVM_CAP_X86_USER_SPACE_MSR is available");
-> +       vm_enable_cap(vm, &cap);
-> +
-> +       rc = kvm_check_cap(KVM_CAP_X86_MSR_ALLOWLIST);
-> +       TEST_ASSERT(rc, "KVM_CAP_X86_MSR_ALLOWLIST is available");
-> +
-> +       /* Set up MSR allowlist */
-> +       for (i = 0; i < ARRAY_SIZE(ranges); i++) {
-> +               struct kvm_msr_allowlist *a = &ranges[i].allow;
-> +               u32 bitmap_size = a->nmsrs / BITS_PER_BYTE;
-> +               struct kvm_msr_allowlist *range = malloc(sizeof(*a) + bitmap_size);
-> +
-> +               TEST_ASSERT(range, "range alloc failed (%ld bytes)\n", sizeof(*a) + bitmap_size);
-> +
-> +               *range = *a;
-> +
-> +               /* Allow everything by default */
-> +               memset(range->bitmap, 0xff, bitmap_size);
-> +
-> +               if (ranges[i].populate)
-> +                       ranges[i].populate(range);
-> +
-> +               vm_ioctl(vm, KVM_X86_ADD_MSR_ALLOWLIST, range);
-> +       }
-> +
-> +       while (1) {
-> +               rc = _vcpu_run(vm, VCPU_ID);
-> +
-> +               TEST_ASSERT(rc == 0, "vcpu_run failed: %d\n", rc);
-> +
-> +               switch (run->exit_reason) {
-> +               case KVM_EXIT_X86_RDMSR:
-> +                       handle_rdmsr(run);
-> +                       break;
-> +               case KVM_EXIT_X86_WRMSR:
-> +                       handle_wrmsr(run);
-> +                       break;
-> +               case KVM_EXIT_IO:
-> +                       if (handle_ucall(vm))
-> +                               goto done;
-> +                       break;
-> +               }
-> +
-> +       }
-> +
-> +done:
-> +       TEST_ASSERT(msr_reads == 1, "Handled 1 rdmsr in user space");
-> +       TEST_ASSERT(msr_writes == 1, "Handled 1 wrmsr in user space");
-> +
-> +       kvm_vm_free(vm);
-> +
-> +       return 0;
-> +}
-> --
-> 2.17.1
->
->
->
->
-> Amazon Development Center Germany GmbH
-> Krausenstr. 38
-> 10117 Berlin
-> Geschaeftsfuehrung: Christian Schlaeger, Jonathan Weiss
-> Eingetragen am Amtsgericht Charlottenburg unter HRB 149173 B
-> Sitz: Berlin
-> Ust-ID: DE 289 237 879
->
->
->
+
+> >   - subchannel_type (device_api is vfio-ccw) 
+> >  
+> > vendor driver specific part: (optional)
+> >   - aggregator
+> >   - chpid_type
+> >   - remote_url
+> > 
+> > NOTE: vendors are free to add attributes in this part with a
+> > restriction that this attribute is able to be configured with the same
+> > name in sysfs too. e.g.
+> > for aggregator, there must be a sysfs attribute in device node
+> > /sys/devices/pci0000:00/0000:00:02.0/882cc4da-dede-11e7-9180-078a62063ab1/intel_vgpu/aggregator,
+> > so that the userspace tool is able to configure the target device
+> > according to source device's aggregator attribute.
+> > 
+> > 
+> > (2) where and structure
+> > proposal 1:
+> > |- [path to device]
+> >   |--- migration
+> >   |     |--- self
+> >   |     |    |-software_version
+> >   |     |    |-device_api
+> >   |     |    |-type
+> >   |     |    |-[pci_id or subchannel_type]
+> >   |     |    |-<aggregator or chpid_type>
+> >   |     |--- compatible
+> >   |     |    |-software_version
+> >   |     |    |-device_api
+> >   |     |    |-type
+> >   |     |    |-[pci_id or subchannel_type]
+> >   |     |    |-<aggregator or chpid_type>
+> > multiple compatible is allowed.
+> > attributes should be ASCII text files, preferably with only one value
+> > per file.
+> > 
+> > 
+> > proposal 2: use bin_attribute.
+> > |- [path to device]
+> >   |--- migration
+> >   |     |--- self
+> >   |     |--- compatible
+> > 
+> > so we can continue use multiline format. e.g.
+> > cat compatible
+> >   software_version=0.1.0
+> >   device_api=vfio_pci
+> >   type=i915-GVTg_V5_{val1:int:1,2,4,8}
+> >   pci_id=80865963
+> >   aggregator={val1}/2
+> > 
+> > Thanks
+> > Yan
+> > 
+> 
