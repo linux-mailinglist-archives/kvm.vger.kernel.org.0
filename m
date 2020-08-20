@@ -2,121 +2,196 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 89AFF24AC75
-	for <lists+kvm@lfdr.de>; Thu, 20 Aug 2020 02:58:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 11F8B24AC9E
+	for <lists+kvm@lfdr.de>; Thu, 20 Aug 2020 03:29:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726617AbgHTA6T (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 19 Aug 2020 20:58:19 -0400
-Received: from mail-dm6nam12on2077.outbound.protection.outlook.com ([40.107.243.77]:41727
-        "EHLO NAM12-DM6-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726362AbgHTA6S (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 19 Aug 2020 20:58:18 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=gT5Mf4lrgu8ztFetERwUSBQUNAwf53qv9zLmQ6XpFORSRm0WMhdUV+Qj846CXQtMs3bOOBC9BqY0WXwAWQZ54EZPFVy+RO5034T11dgC5JYaNiarLkBK6j8/glowD1hoZENkOuYF6vgQvJ4BmW735ggww0p0eeJhkMRJb6DWDuAoeNdjHx0qfcVZqJO9R+LxUJvY/z1/wXuS1qdEna3dirQKCQVZhce/9F6XJCLQB4RVhoJaB0qHkQB+du7eglaww2Q2TZuEWGsGZTakGT/foS6Sxx5ygMI9onSOpOAGNiZvoDOIQNJNUKJDqe4+nIMUVNvn6bKOV6aJPA3ED+gGGA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=qB4Gvxs2ekOMHSs4Q78o7/uZtse43SwLvsiZWG3g+1I=;
- b=GK1RJxbJb8VQ2H7yqT9cO14yAl2krOdUczi39ihfrk7ggymZ3DrTWraMOBEO++aV8KTDW/XXKPiFi41bTUsL3JneWwCfQWJ9jGv3O0qaWadWPsQigppHQmJF8jpE1fhqmvq/8DxaDlUJd/V2w0nfxi3dVQGETfLCKoOlATGM1RECr76BBVFnbP5B6/7Ad2EFWWbn1CJKgo+/TP6wyGNHFhRzry91KtpIJmLYFrCOB5coKJRqtR87rupdDE46eM6TDxHHrMzzismwNEAXwZUNYUxWu7B2LFjE6rdsz4NqJAmriI4az02xUKJHMJyqUWPBthga4Hcn5ubT3AB4RITK6g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=vmware.com; dmarc=pass action=none header.from=vmware.com;
- dkim=pass header.d=vmware.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=vmware.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=qB4Gvxs2ekOMHSs4Q78o7/uZtse43SwLvsiZWG3g+1I=;
- b=cKDYxejtCxMUoR/JPlnEHqBo4F89zEW5opTWZDiNMjetHjAAo/l9+nbUgO3GB+hxXqwCNceWJ+rSzUHKqcmta0T7Iye3E9oc1QHzXGRu17FlRS9FheXSlsQyki2rricaxX8obYSiUFBhysAlnwarmHA7vT2Vg22xvfSd/nfHT7o=
-Received: from BY5PR05MB7191.namprd05.prod.outlook.com (2603:10b6:a03:1d9::14)
- by BYAPR05MB4968.namprd05.prod.outlook.com (2603:10b6:a03:9c::18) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3305.17; Thu, 20 Aug
- 2020 00:58:13 +0000
-Received: from BY5PR05MB7191.namprd05.prod.outlook.com
- ([fe80::8c61:2805:f039:b511]) by BY5PR05MB7191.namprd05.prod.outlook.com
- ([fe80::8c61:2805:f039:b511%8]) with mapi id 15.20.3305.023; Thu, 20 Aug 2020
- 00:58:13 +0000
-From:   Mike Stunes <mstunes@vmware.com>
-To:     Joerg Roedel <joro@8bytes.org>
-CC:     "x86@kernel.org" <x86@kernel.org>, Joerg Roedel <jroedel@suse.de>,
-        "hpa@zytor.com" <hpa@zytor.com>, Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Jiri Slaby <jslaby@suse.cz>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Juergen Gross <jgross@suse.com>,
-        Kees Cook <keescook@chromium.org>,
-        David Rientjes <rientjes@google.com>,
-        Cfir Cohen <cfir@google.com>,
-        Erdem Aktas <erdemaktas@google.com>,
-        Masami Hiramatsu <mhiramat@kernel.org>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Martin Radev <martin.b.radev@gmail.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "virtualization@lists.linux-foundation.org" 
-        <virtualization@lists.linux-foundation.org>
-Subject: Re: [PATCH v5 00/75] x86: SEV-ES Guest Support
-Thread-Topic: [PATCH v5 00/75] x86: SEV-ES Guest Support
-Thread-Index: AQHWYdQMsnCBwIAXv0SX/F24aOvyxqkfXZuAgAC4HICAALeWgIAdUbMAgAI3S4A=
-Date:   Thu, 20 Aug 2020 00:58:13 +0000
-Message-ID: <6F9275F4-D5A4-4D30-8729-A57989568CA7@vmware.com>
-References: <20200724160336.5435-1-joro@8bytes.org>
- <B65392F4-FD42-4AA3-8AA8-6C0C0D1FF007@vmware.com>
- <20200730122645.GA3257@8bytes.org>
- <F5603CBB-31FB-4EE8-B67A-A1F2DBEE28D8@vmware.com>
- <20200818150746.GA3319@8bytes.org>
-In-Reply-To: <20200818150746.GA3319@8bytes.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-mailer: Apple Mail (2.3608.120.23.2.1)
-authentication-results: 8bytes.org; dkim=none (message not signed)
- header.d=none;8bytes.org; dmarc=none action=none header.from=vmware.com;
-x-originating-ip: [2601:600:9e7f:eac1:5987:639b:294e:d744]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 63464a6d-1b90-4794-6353-08d844a41d92
-x-ms-traffictypediagnostic: BYAPR05MB4968:
-x-microsoft-antispam-prvs: <BYAPR05MB4968BBBF8EB9E9BCB192D06EC85A0@BYAPR05MB4968.namprd05.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:4941;
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: BUSAzkb4TbHrcSdmFlpuWxRWpALFoJjMUvt6J1gMEAOAkP8IHDZgMsWvO34G5O2zzqNYVjGJB6EkIXVz2mP8n5ehxlJb4HDjzh9XrffG2XI2qAG6LNNVpGUJF0//mZK40HrYGlokAiWGFhLps+VlePzQByXwtwR1O3R8FqwwWTOrDemzulF1aPtVHdHQXylzko5ZqVRQEse09dsrhEYfXgBxVcAszkZNxpQlhQbt/UTrLbN+ydWLi/W1gZ7aLeltSW5gmr7+OH75JW+QGMsmmOk22Ou57Gi223O6t5f2I3ey106uEBoneo+zB4RD93XinDGRpIcBv4q5ScWQH+pj5/7No5XnmTASF/QGsDeusoEMaWqNbme2BIniRIatCiqWgBkh+xy8fm3odezmlDp3Xw==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BY5PR05MB7191.namprd05.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(346002)(366004)(376002)(396003)(39860400002)(136003)(5660300002)(66446008)(66476007)(66946007)(66556008)(8676002)(64756008)(4744005)(76116006)(86362001)(966005)(53546011)(2616005)(316002)(186003)(71200400001)(2906002)(6916009)(4326008)(36756003)(6512007)(45080400002)(478600001)(6506007)(54906003)(8936002)(6486002)(7416002)(33656002);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata: rhIRUr7HJAZbCvOz5n07kmjWnTADQq9/ojBZIQ1bJlCKdDa3YAcFtL93HQS6bln7f7nsn9GhUvWvVoZhHFXmWtuNUSaAum3vODbk9xM4OL9ESiL7MDikgIj+NS34FXdQ7q8wsNG+gA3+IESExjLBxWKueKwizQmIbMNYRAUTPa83weNSPq5H9Hocr+udeXcM/4fINXD1PhYf6hhJKfBGmzleKDxLU1gWibl6gT5M3OgIJiElgG660UIbedLq4mZsG3NLPQ2XiONhlD/KkGBUn7ibw63eDQHSEEBPiUAgXZU5d9j7N3891Qd27QIauPnjjUQpNZCs7+iJ3ETxVEpITRJErYIk7f8w/b4lkScPNRw62bHUKKX6iMPnnBQ+v7ECzlQaOraIEG4KeK27yp3nY6qAieL4Fi5JC3H8/jwRqfOeDUUG7SLf79lascNh+q4H++HocrqZnt/yyPXF75BM20W5d1nDklWMgzQqwc+AQl0Ewx7QFMHdEZB6z+2fCCleQ+iroQKOAuFyTqxeD4XLnCv9pPUuOGBM6jaoxDv8PNQfqFLMblEOS77Sd0BIboLmNEOgW6PFI5yHDjxSnS87R4VXbKG9UDVirLtRpxND0/6x+BspafCEJaOsMIkPx6NFYRlTtQhQmvGavvlIYxhuQZk713VxmygH19B/vd16XXacwqXO+AaYQtif/5LQS1ThEJooHbZKZI9VnDIJRP3TCA==
-x-ms-exchange-transport-forked: True
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <66EEDEA3E2BFF249AC116C3A22162711@namprd05.prod.outlook.com>
-Content-Transfer-Encoding: base64
-MIME-Version: 1.0
-X-OriginatorOrg: vmware.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BY5PR05MB7191.namprd05.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 63464a6d-1b90-4794-6353-08d844a41d92
-X-MS-Exchange-CrossTenant-originalarrivaltime: 20 Aug 2020 00:58:13.2949
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b39138ca-3cee-4b4a-a4d6-cd83d9dd62f0
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: u7zemQLtlBWa53RU12pTAZcd1DuPuhotqVlv42x0kDl9E3Ygzg5wmcgHISIG0/5RFgDvxNLylbWEDwcRstgzBw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR05MB4968
+        id S1726716AbgHTB3R (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 19 Aug 2020 21:29:17 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:43344 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726707AbgHTB3O (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 19 Aug 2020 21:29:14 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1597886952;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=Mv65M1+t+HPSl/WRfYZMesR9s3J7YwA43eBtlMjfynM=;
+        b=dkGib0eY81Kw0+YUS4GeTHdbIwRg4eo9DNtv9g48yRXq9NPnfxTYe333BaXIVPvaHgiA6Z
+        GL9p41+xkHne256gk5UGHFnFcSJ+UkMu2aoLcmyySPCZaPy+3YqCC1um2VcXE51fHc0plT
+        YnJLuVpKqHccF6V9t6owaba5btFp59A=
+Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
+ [209.85.218.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-43-jI6AqBgnPEqpIrBcJ8NYKw-1; Wed, 19 Aug 2020 21:29:10 -0400
+X-MC-Unique: jI6AqBgnPEqpIrBcJ8NYKw-1
+Received: by mail-ej1-f71.google.com with SMTP id bx27so232113ejc.15
+        for <kvm@vger.kernel.org>; Wed, 19 Aug 2020 18:29:10 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:message-id:subject:from:to:cc:date:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=Mv65M1+t+HPSl/WRfYZMesR9s3J7YwA43eBtlMjfynM=;
+        b=omfNbCtYf+0wtG3J5QQH6LrcaWusTBjwKS3xq9eQxrqAp4PRaHW+Pze4gZjPDe12FG
+         3HAcffpMhWPfhbpID96nt2nB44cTgOU8aVdPvG1IGC2peDKB5VbEB23bs2wQvOM2HMGI
+         h76wqGn7quPwasqrOLYR0xv3LR9YrWb/A4zHeUh/3tr9EU9KLeUAeKnumRxY5DTlT+35
+         VG90way8bxYfeOEJI4UwVRdzEqU/yBAmRFJSvSefYfot2T1cwEoiXf4Q0x62i9JjpCCF
+         iwdRIVBtDXyvV9bAH/CZaERsz+vTP+sR7kfcuLlo/DM6L2O6o1j4lkm3QQK+rT9TSbmZ
+         hCxA==
+X-Gm-Message-State: AOAM533rRfGALeNt+m64C+CTZWLRU4DBjLVemus5LagBMHwVF4dCHwGF
+        BBsLfI/Mruerej2QlKcWhbf1KQzMV/gZHBL/2OTrPYJZQEfWfDrU+QNa454/rVFUlg82lWgbNtL
+        t5gVlqm0iXuHz
+X-Received: by 2002:a17:906:4356:: with SMTP id z22mr1078926ejm.414.1597886949030;
+        Wed, 19 Aug 2020 18:29:09 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwoyKfjf0D7MrJMX9479zeQtARXzClfhI3mERBVAU5/JYOmhYh4Jk1gt0aNrlay6m1myoOVsg==
+X-Received: by 2002:a17:906:4356:: with SMTP id z22mr1078909ejm.414.1597886948787;
+        Wed, 19 Aug 2020 18:29:08 -0700 (PDT)
+Received: from pop-os ([51.37.51.98])
+        by smtp.gmail.com with ESMTPSA id m12sm287263edv.94.2020.08.19.18.29.07
+        (version=TLS1_2 cipher=ECDHE-ECDSA-CHACHA20-POLY1305 bits=256/256);
+        Wed, 19 Aug 2020 18:29:08 -0700 (PDT)
+Message-ID: <242591bb809b68c618f62fdc93d4f8ae7b146b6d.camel@redhat.com>
+Subject: Re: device compatibility interface for live migration with assigned
+ devices
+From:   Sean Mooney <smooney@redhat.com>
+To:     Yan Zhao <yan.y.zhao@intel.com>, Cornelia Huck <cohuck@redhat.com>
+Cc:     "Daniel P." =?ISO-8859-1?Q?Berrang=E9?= <berrange@redhat.com>,
+        kvm@vger.kernel.org, libvir-list@redhat.com,
+        Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org,
+        kwankhede@nvidia.com, eauger@redhat.com, xin-ran.wang@intel.com,
+        corbet@lwn.net, openstack-discuss@lists.openstack.org,
+        shaohe.feng@intel.com, kevin.tian@intel.com,
+        Parav Pandit <parav@mellanox.com>, jian-feng.ding@intel.com,
+        dgilbert@redhat.com, zhenyuw@linux.intel.com, hejie.xu@intel.com,
+        bao.yumeng@zte.com.cn,
+        Alex Williamson <alex.williamson@redhat.com>,
+        intel-gvt-dev@lists.freedesktop.org, eskultet@redhat.com,
+        Jiri Pirko <jiri@mellanox.com>, dinechin@redhat.com,
+        devel@ovirt.org
+Date:   Thu, 20 Aug 2020 02:29:07 +0100
+In-Reply-To: <20200820003922.GE21172@joy-OptiPlex-7040>
+References: <20200805093338.GC30485@joy-OptiPlex-7040>
+         <20200805105319.GF2177@nanopsycho>
+         <20200810074631.GA29059@joy-OptiPlex-7040>
+         <e6e75807-0614-bd75-aeb6-64d643e029d3@redhat.com>
+         <20200814051601.GD15344@joy-OptiPlex-7040>
+         <a51209fe-a8c6-941f-ff54-7be06d73bc44@redhat.com>
+         <20200818085527.GB20215@redhat.com>
+         <3a073222-dcfe-c02d-198b-29f6a507b2e1@redhat.com>
+         <20200818091628.GC20215@redhat.com>
+         <20200818113652.5d81a392.cohuck@redhat.com>
+         <20200820003922.GE21172@joy-OptiPlex-7040>
+Content-Type: text/plain; charset="UTF-8"
+X-Mailer: Evolution 3.28.5-0ubuntu0.18.04.2 
+Mime-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-SGkgSm9lcmcsDQoNCj4gT24gQXVnIDE4LCAyMDIwLCBhdCA4OjA3IEFNLCBKb2VyZyBSb2VkZWwg
-PGpvcm9AOGJ5dGVzLm9yZz4gd3JvdGU6DQo+IA0KPiBDYW4geW91IHBsZWFzZSB0ZXN0IHdoZXRo
-ZXINCj4gDQo+IAlodHRwczovL25hbTA0LnNhZmVsaW5rcy5wcm90ZWN0aW9uLm91dGxvb2suY29t
-Lz91cmw9aHR0cHMlM0ElMkYlMkZnaXQua2VybmVsLm9yZyUyRnB1YiUyRnNjbSUyRmxpbnV4JTJG
-a2VybmVsJTJGZ2l0JTJGam9ybyUyRmxpbnV4LmdpdCUyRmxvZyUyRiUzRmglM0RzZXYtZXMtY2xp
-ZW50LXRpcC01LjkmYW1wO2RhdGE9MDIlN0MwMSU3Q21zdHVuZXMlNDB2bXdhcmUuY29tJTdDNzE1
-ZTllNjQzM2JjNDQ5ZDM0ZWUwOGQ4NDM4ODc4ZWIlN0NiMzkxMzhjYTNjZWU0YjRhYTRkNmNkODNk
-OWRkNjJmMCU3QzAlN0MwJTdDNjM3MzMzNjAwNzE2OTE4NDYzJmFtcDtzZGF0YT1ldGxhN1NHZzRI
-bW1KcWhKNEFJdWwwNDNWRE5WdmxsbG5idGZkYzBaJTJCQ1UlM0QmYW1wO3Jlc2VydmVkPTANCj4g
-DQo+IHN0aWxsIHRyaWdnZXJzIHRoaXMgaXNzdWUgb24geW91ciBzaWRlPw0KDQpZZXMsIEkgc3Rp
-bGwgc2VlIHRoZSBpc3N1ZSDigJQgQVBzIGFyZSBvZmZsaW5lIGFmdGVyIGJvb3QuIEnigJlsbCBz
-cGVuZCBzb21lIHRpbWUgc2VlaW5nIGlmIEkgY2FuIGZpZ3VyZSBvdXQgd2hhdCB0aGUgcHJvYmxl
-bSBpcy4gVGhhbmtzIQ0KDQpNaWtl
+On Thu, 2020-08-20 at 08:39 +0800, Yan Zhao wrote:
+> On Tue, Aug 18, 2020 at 11:36:52AM +0200, Cornelia Huck wrote:
+> > On Tue, 18 Aug 2020 10:16:28 +0100
+> > Daniel P. Berrangé <berrange@redhat.com> wrote:
+> > 
+> > > On Tue, Aug 18, 2020 at 05:01:51PM +0800, Jason Wang wrote:
+> > > >    On 2020/8/18 下午4:55, Daniel P. Berrangé wrote:
+> > > > 
+> > > >  On Tue, Aug 18, 2020 at 11:24:30AM +0800, Jason Wang wrote:
+> > > > 
+> > > >  On 2020/8/14 下午1:16, Yan Zhao wrote:
+> > > > 
+> > > >  On Thu, Aug 13, 2020 at 12:24:50PM +0800, Jason Wang wrote:
+> > > > 
+> > > >  On 2020/8/10 下午3:46, Yan Zhao wrote:  
+> > > >  we actually can also retrieve the same information through sysfs, .e.g
+> > > > 
+> > > >  |- [path to device]
+> > > >     |--- migration
+> > > >     |     |--- self
+> > > >     |     |   |---device_api
+> > > >     |    |   |---mdev_type
+> > > >     |    |   |---software_version
+> > > >     |    |   |---device_id
+> > > >     |    |   |---aggregator
+> > > >     |     |--- compatible
+> > > >     |     |   |---device_api
+> > > >     |    |   |---mdev_type
+> > > >     |    |   |---software_version
+> > > >     |    |   |---device_id
+> > > >     |    |   |---aggregator
+> > > > 
+> > > > 
+> > > >  Yes but:
+> > > > 
+> > > >  - You need one file per attribute (one syscall for one attribute)
+> > > >  - Attribute is coupled with kobject
+> > 
+> > Is that really that bad? You have the device with an embedded kobject
+> > anyway, and you can just put things into an attribute group?
+> > 
+> > [Also, I think that self/compatible split in the example makes things
+> > needlessly complex. Shouldn't semantic versioning and matching already
+> > cover nearly everything? I would expect very few cases that are more
+> > complex than that. Maybe the aggregation stuff, but I don't think we
+> > need that self/compatible split for that, either.]
+> 
+> Hi Cornelia,
+> 
+> The reason I want to declare compatible list of attributes is that
+> sometimes it's not a simple 1:1 matching of source attributes and target attributes
+> as I demonstrated below,
+> source mdev of (mdev_type i915-GVTg_V5_2 + aggregator 1) is compatible to
+> target mdev of (mdev_type i915-GVTg_V5_4 + aggregator 2),
+>                (mdev_type i915-GVTg_V5_8 + aggregator 4)
+the way you are doing the nameing is till really confusing by the way
+if this has not already been merged in the kernel can you chagne the mdev
+so that mdev_type i915-GVTg_V5_2 is 2 of mdev_type i915-GVTg_V5_1 instead of half the device
+
+currently you need to deived the aggratod by the number at the end of the mdev type to figure out
+how much of the phsicial device is being used with is a very unfridly api convention
+
+the way aggrator are being proposed in general is not really someting i like but i thin this at least
+is something that should be able to correct.
+
+with the complexity in the mdev type name + aggrator i suspect that this will never be support
+in openstack nova directly requireing integration via cyborg unless we can pre partion the
+device in to mdevs staicaly and just ignore this.
+
+this is way to vendor sepecif to integrate into something like openstack in nova unless we can guarentee
+taht how aggreator work will be portable across vendors genericly.
+
+> 
+> and aggragator may be just one of such examples that 1:1 matching does not
+> fit.
+for openstack nova i dont see us support anything beyond the 1:1 case where the mdev type does not change.
+
+i woudl really prefer if there was just one mdev type that repsented the minimal allcatable unit and the
+aggragaotr where used to create compostions of that. i.e instad of i915-GVTg_V5_2 beign half the device,
+have 1 mdev type i915-GVTg and if the device support 8 of them then we can aggrate 4 of i915-GVTg
+
+if you want to have muplie mdev type to model the different amoutn of the resouce e.g. i915-GVTg_small i915-GVTg_large
+that is totlaly fine too or even i915-GVTg_4 indcating it sis 4 of i915-GVTg
+
+failing that i would just expose an mdev type per composable resouce and allow us to compose them a the user level with
+some other construct mudeling a attament to the device. e.g. create composed mdev or somethig that is an aggreateion of
+multiple sub resouces each of which is an mdev. so kind of like how bond port work. we would create an mdev for each of
+the sub resouces and then create a bond or aggrated mdev by reference the other mdevs by uuid then attach only the
+aggreated mdev to the instance.
+
+the current aggrator syntax and sematic however make me rather uncofrotable when i think about orchestating vms on top
+of it even to boot them let alone migrate them.
+> 
+> So, we explicitly list out self/compatible attributes, and management
+> tools only need to check if self attributes is contained compatible
+> attributes.
+> 
+> or do you mean only compatible list is enough, and the management tools
+> need to find out self list by themselves?
+> But I think provide a self list is easier for management tools.
+> 
+> Thanks
+> Yan
+> 
+
