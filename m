@@ -2,95 +2,187 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7C26724C73F
-	for <lists+kvm@lfdr.de>; Thu, 20 Aug 2020 23:44:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BA3C424C754
+	for <lists+kvm@lfdr.de>; Thu, 20 Aug 2020 23:49:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728021AbgHTVoM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 20 Aug 2020 17:44:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57536 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727968AbgHTVoJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 20 Aug 2020 17:44:09 -0400
-Received: from mail-ot1-x342.google.com (mail-ot1-x342.google.com [IPv6:2607:f8b0:4864:20::342])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 03050C061386
-        for <kvm@vger.kernel.org>; Thu, 20 Aug 2020 14:44:08 -0700 (PDT)
-Received: by mail-ot1-x342.google.com with SMTP id c4so10448otf.12
-        for <kvm@vger.kernel.org>; Thu, 20 Aug 2020 14:44:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=JYwHUMqrgisA2MC9phgyUn1/pNwWsiB0gxz1VRA/k7U=;
-        b=qRTJ34s9UkOAnZaN8ZPr0d9ptggsR0srmk4FHFiwxaPgrwPW65Uv4h8OJZMvJEcN4k
-         atZXkG4wSxcl+XsWGOvXHY7lWD3jNyIpWol1leSAgdXjtxxffsJDaov4iQEjpoq1lf02
-         OePZRyyoMmNKPmwP4/WNNuafraSZD/dPy1S+zycbpE1tr8OkfpA3JtUqhBT8YJ1/MJA0
-         wplcl5+UQ8Y8vjlefu7xs+DRfdyS9fqSXXH9YnlYK3zHAtaROi2l1OzNOgnFjfGj+NI5
-         rtpSrST4mPzyNubWEsIrkhHCQa38sJr6cz/40TvVG/c0xfFAsO3fC8MtFvw24bxxLrXS
-         Zurw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=JYwHUMqrgisA2MC9phgyUn1/pNwWsiB0gxz1VRA/k7U=;
-        b=VuNJEG0I+MmmIXu8GoyGBjrm70fJCVlB5/gTK3c4mnbntxQ18N++fAW2tqQcAZUH3s
-         LKIoHqG7jXQfCSyzml5lhVNoX/rA/07eKnWMegytiQiY3Qms707eQI6h4b6mJ/Nrp+Yg
-         /+G7dBQ5dlUdIhWw6M8PyfBsIvt/mumo3+3BmPhpOSBalwrbMzOYPF6IlaFstKN2A6CQ
-         A/wUVHG4diQwpF2GaZsZVOkeNogqJv/+Rq8aNPbbUa/+FXFIR+R9Dt3OyRZrnTotRXyq
-         TLeCcnUkWA42YCyVjP3PMuXBzgswtu2cqfVjOn+XGVOb8W/vzu+6o7THzyRBVuJyxBgA
-         /HsA==
-X-Gm-Message-State: AOAM533o/Cq4SjFE1PZXy2/acJJxy7RpfkKmDc9k5pB6VZrQUR4T/RlN
-        YkI/eDgMZ3M894bMPC4r0fZLBIrSyo50zH/1rdqbjQ==
-X-Google-Smtp-Source: ABdhPJwlOoE+a01uhmSNQmRIKx7rD3ktKBhwaFSOIAol1TcsX1kjG+yaIUwY1dec23S16b3xJbV9RzNwat2fKYyWVsA=
-X-Received: by 2002:a9d:65ca:: with SMTP id z10mr513440oth.295.1597959847966;
- Thu, 20 Aug 2020 14:44:07 -0700 (PDT)
+        id S1727090AbgHTVtq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 20 Aug 2020 17:49:46 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:40769 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1727011AbgHTVtp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 20 Aug 2020 17:49:45 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1597960183;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=W/SGQdOIGqJRv/JTZUfj1nigkzEJpxbggpHyJJW2C1s=;
+        b=bMHghtW55HrEODGyI7uAve/V0fU0c8yqTSXhCpWyuTGC1sqU3AKaf4IvKqtzgZosPesCTq
+        4Kqw7P+oVP/wn/fsPn6vrqVeUunn46MPZXkoqsWdr8EdoK9hry+IopVz5UL04MpxA6KwLY
+        A9BhUindv8yaYgQOHPP5OZDwGQItq68=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-131-uzFfsYIJMcmgsgWzc7zHIQ-1; Thu, 20 Aug 2020 17:49:24 -0400
+X-MC-Unique: uzFfsYIJMcmgsgWzc7zHIQ-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EB9781015C9C;
+        Thu, 20 Aug 2020 21:49:02 +0000 (UTC)
+Received: from x1.home (ovpn-112-71.phx2.redhat.com [10.3.112.71])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id E9E5E7B90C;
+        Thu, 20 Aug 2020 21:48:53 +0000 (UTC)
+Date:   Thu, 20 Aug 2020 15:48:53 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Liu Yi L <yi.l.liu@intel.com>
+Cc:     eric.auger@redhat.com, baolu.lu@linux.intel.com, joro@8bytes.org,
+        kevin.tian@intel.com, jacob.jun.pan@linux.intel.com,
+        ashok.raj@intel.com, jun.j.tian@intel.com, yi.y.sun@intel.com,
+        jean-philippe@linaro.org, peterx@redhat.com, hao.wu@intel.com,
+        stefanha@gmail.com, iommu@lists.linux-foundation.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v6 12/15] vfio/type1: Add vSVA support for IOMMU-backed
+ mdevs
+Message-ID: <20200820154853.21b660d2@x1.home>
+In-Reply-To: <1595917664-33276-13-git-send-email-yi.l.liu@intel.com>
+References: <1595917664-33276-1-git-send-email-yi.l.liu@intel.com>
+        <1595917664-33276-13-git-send-email-yi.l.liu@intel.com>
+Organization: Red Hat
 MIME-Version: 1.0
-References: <20200820133339.372823-1-mlevitsk@redhat.com> <20200820133339.372823-5-mlevitsk@redhat.com>
-In-Reply-To: <20200820133339.372823-5-mlevitsk@redhat.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Thu, 20 Aug 2020 14:43:56 -0700
-Message-ID: <CALMp9eRNLjj5cs1xj44WVRoKK0ZrcGXn7ffdH+bEeDHkLE9nSA@mail.gmail.com>
-Subject: Re: [PATCH v2 4/7] KVM: x86: allow kvm_x86_ops.set_efer to return a value
-To:     Maxim Levitsky <mlevitsk@redhat.com>
-Cc:     kvm list <kvm@vger.kernel.org>,
-        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
-        Ingo Molnar <mingo@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        "open list:X86 ARCHITECTURE (32-BIT AND 64-BIT)" 
-        <linux-kernel@vger.kernel.org>, "H. Peter Anvin" <hpa@zytor.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Aug 20, 2020 at 6:34 AM Maxim Levitsky <mlevitsk@redhat.com> wrote:
->
-> This will be used later to return an error when setting this msr fails.
->
-> For VMX, it already has an error condition when EFER is
-> not in the shared MSR list, so return an error in this case.
->
-> Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+On Mon, 27 Jul 2020 23:27:41 -0700
+Liu Yi L <yi.l.liu@intel.com> wrote:
+
+> Recent years, mediated device pass-through framework (e.g. vfio-mdev)
+> is used to achieve flexible device sharing across domains (e.g. VMs).
+> Also there are hardware assisted mediated pass-through solutions from
+> platform vendors. e.g. Intel VT-d scalable mode which supports Intel
+> Scalable I/O Virtualization technology. Such mdevs are called IOMMU-
+> backed mdevs as there are IOMMU enforced DMA isolation for such mdevs.
+> In kernel, IOMMU-backed mdevs are exposed to IOMMU layer by aux-domain
+
+Or a physical IOMMU backing device.
+
+> concept, which means mdevs are protected by an iommu domain which is
+> auxiliary to the domain that the kernel driver primarily uses for DMA
+> API. Details can be found in the KVM presentation as below:
+> 
+> https://events19.linuxfoundation.org/wp-content/uploads/2017/12/\
+> Hardware-Assisted-Mediated-Pass-Through-with-VFIO-Kevin-Tian-Intel.pdf
+
+I think letting the line exceed 80 columns is preferable so that it's
+clickable.  Thanks,
+
+Alex
+
+> This patch extends NESTING_IOMMU ops to IOMMU-backed mdev devices. The
+> main requirement is to use the auxiliary domain associated with mdev.
+> 
+> Cc: Kevin Tian <kevin.tian@intel.com>
+> CC: Jacob Pan <jacob.jun.pan@linux.intel.com>
+> CC: Jun Tian <jun.j.tian@intel.com>
+> Cc: Alex Williamson <alex.williamson@redhat.com>
+> Cc: Eric Auger <eric.auger@redhat.com>
+> Cc: Jean-Philippe Brucker <jean-philippe@linaro.org>
+> Cc: Joerg Roedel <joro@8bytes.org>
+> Cc: Lu Baolu <baolu.lu@linux.intel.com>
+> Reviewed-by: Eric Auger <eric.auger@redhat.com>
+> Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
 > ---
+> v5 -> v6:
+> *) add review-by from Eric Auger.
+> 
+> v1 -> v2:
+> *) check the iommu_device to ensure the handling mdev is IOMMU-backed
+> ---
+>  drivers/vfio/vfio_iommu_type1.c | 40 ++++++++++++++++++++++++++++++++++++----
+>  1 file changed, 36 insertions(+), 4 deletions(-)
+> 
+> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
+> index bf95a0f..9d8f252 100644
+> --- a/drivers/vfio/vfio_iommu_type1.c
+> +++ b/drivers/vfio/vfio_iommu_type1.c
+> @@ -2379,20 +2379,41 @@ static int vfio_iommu_resv_refresh(struct vfio_iommu *iommu,
+>  	return ret;
+>  }
+>  
+> +static struct device *vfio_get_iommu_device(struct vfio_group *group,
+> +					    struct device *dev)
+> +{
+> +	if (group->mdev_group)
+> +		return vfio_mdev_get_iommu_device(dev);
+> +	else
+> +		return dev;
+> +}
+> +
+>  static int vfio_dev_bind_gpasid_fn(struct device *dev, void *data)
+>  {
+>  	struct domain_capsule *dc = (struct domain_capsule *)data;
+>  	unsigned long arg = *(unsigned long *)dc->data;
+> +	struct device *iommu_device;
+> +
+> +	iommu_device = vfio_get_iommu_device(dc->group, dev);
+> +	if (!iommu_device)
+> +		return -EINVAL;
+>  
+> -	return iommu_uapi_sva_bind_gpasid(dc->domain, dev, (void __user *)arg);
+> +	return iommu_uapi_sva_bind_gpasid(dc->domain, iommu_device,
+> +					  (void __user *)arg);
+>  }
+>  
+>  static int vfio_dev_unbind_gpasid_fn(struct device *dev, void *data)
+>  {
+>  	struct domain_capsule *dc = (struct domain_capsule *)data;
+>  	unsigned long arg = *(unsigned long *)dc->data;
+> +	struct device *iommu_device;
+>  
+> -	iommu_uapi_sva_unbind_gpasid(dc->domain, dev, (void __user *)arg);
+> +	iommu_device = vfio_get_iommu_device(dc->group, dev);
+> +	if (!iommu_device)
+> +		return -EINVAL;
+> +
+> +	iommu_uapi_sva_unbind_gpasid(dc->domain, iommu_device,
+> +				     (void __user *)arg);
+>  	return 0;
+>  }
+>  
+> @@ -2401,8 +2422,13 @@ static int __vfio_dev_unbind_gpasid_fn(struct device *dev, void *data)
+>  	struct domain_capsule *dc = (struct domain_capsule *)data;
+>  	struct iommu_gpasid_bind_data *unbind_data =
+>  				(struct iommu_gpasid_bind_data *)dc->data;
+> +	struct device *iommu_device;
+> +
+> +	iommu_device = vfio_get_iommu_device(dc->group, dev);
+> +	if (!iommu_device)
+> +		return -EINVAL;
+>  
+> -	iommu_sva_unbind_gpasid(dc->domain, dev, unbind_data);
+> +	iommu_sva_unbind_gpasid(dc->domain, iommu_device, unbind_data);
+>  	return 0;
+>  }
+>  
+> @@ -3060,8 +3086,14 @@ static int vfio_dev_cache_invalidate_fn(struct device *dev, void *data)
+>  {
+>  	struct domain_capsule *dc = (struct domain_capsule *)data;
+>  	unsigned long arg = *(unsigned long *)dc->data;
+> +	struct device *iommu_device;
+> +
+> +	iommu_device = vfio_get_iommu_device(dc->group, dev);
+> +	if (!iommu_device)
+> +		return -EINVAL;
+>  
+> -	iommu_uapi_cache_invalidate(dc->domain, dev, (void __user *)arg);
+> +	iommu_uapi_cache_invalidate(dc->domain, iommu_device,
+> +				    (void __user *)arg);
+>  	return 0;
+>  }
+>  
 
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -1471,7 +1471,8 @@ static int set_efer(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
->         efer &= ~EFER_LMA;
->         efer |= vcpu->arch.efer & EFER_LMA;
->
-> -       kvm_x86_ops.set_efer(vcpu, efer);
-> +       if (kvm_x86_ops.set_efer(vcpu, efer))
-> +               return 1;
-
-This seems like a userspace ABI change to me. Previously, it looks
-like userspace could always use KVM_SET_MSRS to set MSR_EFER to 0 or
-EFER_SCE, and it would always succeed. Now, it looks like it will fail
-on CPUs that don't support EFER in hardware. (Perhaps it should fail,
-but it didn't before, AFAICT.)
