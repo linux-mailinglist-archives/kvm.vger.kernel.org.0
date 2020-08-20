@@ -2,216 +2,148 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D854B24AD31
-	for <lists+kvm@lfdr.de>; Thu, 20 Aug 2020 05:14:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 82B2C24AD4B
+	for <lists+kvm@lfdr.de>; Thu, 20 Aug 2020 05:28:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726698AbgHTDOD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 19 Aug 2020 23:14:03 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:25670 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726435AbgHTDOC (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 19 Aug 2020 23:14:02 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1597893240;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=1uL6oaieNOxO0lNuxORuGUFqqOmdlfIgO2Muo0Z8fB0=;
-        b=CbTARlYqCO9CjqFPwD2dA/hNNYXR6QTmBKAP0LNBBDUiqM/8LKcfZxORyeii6idnhAX3VN
-        IOYV0Jp3Y7UVnDHMQzQYoU1fvcTJhiWORLGV9FheAlXDsKDZ6Swl0/ZQFNqSGVdA1FjSSY
-        uGPa+waTXXllbY05Fry2U2uAq+KAz0M=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-487-AueevQPFNxOMCGZ_BIsASA-1; Wed, 19 Aug 2020 23:13:58 -0400
-X-MC-Unique: AueevQPFNxOMCGZ_BIsASA-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A0140802B47;
-        Thu, 20 Aug 2020 03:13:54 +0000 (UTC)
-Received: from x1.home (ovpn-112-71.phx2.redhat.com [10.3.112.71])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 75CD27A40D;
-        Thu, 20 Aug 2020 03:13:46 +0000 (UTC)
-Date:   Wed, 19 Aug 2020 21:13:45 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Yan Zhao <yan.y.zhao@intel.com>
-Cc:     Parav Pandit <parav@nvidia.com>, Cornelia Huck <cohuck@redhat.com>,
-        "Daniel P. =?UTF-8?B?QmVycmFuZ8Op?=" <berrange@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "libvir-list@redhat.com" <libvir-list@redhat.com>,
-        "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
-        Kirti Wankhede <kwankhede@nvidia.com>,
-        "eauger@redhat.com" <eauger@redhat.com>,
-        "xin-ran.wang@intel.com" <xin-ran.wang@intel.com>,
-        "corbet@lwn.net" <corbet@lwn.net>,
-        "openstack-discuss@lists.openstack.org" 
-        <openstack-discuss@lists.openstack.org>,
-        "shaohe.feng@intel.com" <shaohe.feng@intel.com>,
-        "kevin.tian@intel.com" <kevin.tian@intel.com>,
-        Parav Pandit <parav@mellanox.com>,
-        "jian-feng.ding@intel.com" <jian-feng.ding@intel.com>,
-        "dgilbert@redhat.com" <dgilbert@redhat.com>,
-        "zhenyuw@linux.intel.com" <zhenyuw@linux.intel.com>,
-        "hejie.xu@intel.com" <hejie.xu@intel.com>,
-        "bao.yumeng@zte.com.cn" <bao.yumeng@zte.com.cn>,
-        "eskultet@redhat.com" <eskultet@redhat.com>,
-        "smooney@redhat.com" <smooney@redhat.com>,
-        "intel-gvt-dev@lists.freedesktop.org" 
-        <intel-gvt-dev@lists.freedesktop.org>,
-        Jiri Pirko <jiri@mellanox.com>,
-        "dinechin@redhat.com" <dinechin@redhat.com>,
-        "devel@ovirt.org" <devel@ovirt.org>
+        id S1726861AbgHTD2g (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 19 Aug 2020 23:28:36 -0400
+Received: from mga05.intel.com ([192.55.52.43]:10221 "EHLO mga05.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726809AbgHTD2f (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 19 Aug 2020 23:28:35 -0400
+IronPort-SDR: PGs0VnP9Q1TicahVMsoHD0/9N2eIIKocxRNW5aongPBryfRNNieGKlywvJTgoy2X+wCRAdQybB
+ ovZYAVn0ceiQ==
+X-IronPort-AV: E=McAfee;i="6000,8403,9718"; a="240057695"
+X-IronPort-AV: E=Sophos;i="5.76,332,1592895600"; 
+   d="scan'208";a="240057695"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Aug 2020 20:28:34 -0700
+IronPort-SDR: 5Ny6jA7KhA8lJCsOir9TP57QNBIByN+QNcAZddSmKuJ1rbdS7J8N1MrhVKpYdsnjbRggx0kBQc
+ 89JhrB8/QU8Q==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.76,332,1592895600"; 
+   d="scan'208";a="327281803"
+Received: from joy-optiplex-7040.sh.intel.com (HELO joy-OptiPlex-7040) ([10.239.13.16])
+  by orsmga008.jf.intel.com with ESMTP; 19 Aug 2020 20:28:28 -0700
+Date:   Thu, 20 Aug 2020 11:16:21 +0800
+From:   Yan Zhao <yan.y.zhao@intel.com>
+To:     Alex Williamson <alex.williamson@redhat.com>
+Cc:     Cornelia Huck <cohuck@redhat.com>,
+        Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
+        kvm@vger.kernel.org, libvir-list@redhat.com,
+        Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org,
+        kwankhede@nvidia.com, eauger@redhat.com, xin-ran.wang@intel.com,
+        corbet@lwn.net, openstack-discuss@lists.openstack.org,
+        shaohe.feng@intel.com, kevin.tian@intel.com,
+        Parav Pandit <parav@mellanox.com>, jian-feng.ding@intel.com,
+        dgilbert@redhat.com, zhenyuw@linux.intel.com, hejie.xu@intel.com,
+        bao.yumeng@zte.com.cn, smooney@redhat.com,
+        intel-gvt-dev@lists.freedesktop.org, eskultet@redhat.com,
+        Jiri Pirko <jiri@mellanox.com>, dinechin@redhat.com,
+        devel@ovirt.org
 Subject: Re: device compatibility interface for live migration with assigned
  devices
-Message-ID: <20200819211345.0d9daf03@x1.home>
-In-Reply-To: <20200820001810.GD21172@joy-OptiPlex-7040>
-References: <e6e75807-0614-bd75-aeb6-64d643e029d3@redhat.com>
-        <20200814051601.GD15344@joy-OptiPlex-7040>
-        <a51209fe-a8c6-941f-ff54-7be06d73bc44@redhat.com>
-        <20200818085527.GB20215@redhat.com>
-        <3a073222-dcfe-c02d-198b-29f6a507b2e1@redhat.com>
-        <20200818091628.GC20215@redhat.com>
-        <20200818113652.5d81a392.cohuck@redhat.com>
-        <BY5PR12MB4322C9D1A66C4657776A1383DC5C0@BY5PR12MB4322.namprd12.prod.outlook.com>
-        <20200819033035.GA21172@joy-OptiPlex-7040>
-        <20200819115021.004427a3@x1.home>
-        <20200820001810.GD21172@joy-OptiPlex-7040>
-Organization: Red Hat
+Message-ID: <20200820031621.GA24997@joy-OptiPlex-7040>
+Reply-To: Yan Zhao <yan.y.zhao@intel.com>
+References: <20200810074631.GA29059@joy-OptiPlex-7040>
+ <e6e75807-0614-bd75-aeb6-64d643e029d3@redhat.com>
+ <20200814051601.GD15344@joy-OptiPlex-7040>
+ <a51209fe-a8c6-941f-ff54-7be06d73bc44@redhat.com>
+ <20200818085527.GB20215@redhat.com>
+ <3a073222-dcfe-c02d-198b-29f6a507b2e1@redhat.com>
+ <20200818091628.GC20215@redhat.com>
+ <20200818113652.5d81a392.cohuck@redhat.com>
+ <20200820003922.GE21172@joy-OptiPlex-7040>
+ <20200819212234.223667b3@x1.home>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20200819212234.223667b3@x1.home>
+User-Agent: Mutt/1.9.4 (2018-02-28)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 20 Aug 2020 08:18:10 +0800
-Yan Zhao <yan.y.zhao@intel.com> wrote:
-
-> On Wed, Aug 19, 2020 at 11:50:21AM -0600, Alex Williamson wrote:
-> <...>
-> > > > > > What I care about is that we have a *standard* userspace API for
-> > > > > > performing device compatibility checking / state migration, for use by
-> > > > > > QEMU/libvirt/ OpenStack, such that we can write code without countless
-> > > > > > vendor specific code paths.
-> > > > > >
-> > > > > > If there is vendor specific stuff on the side, that's fine as we can
-> > > > > > ignore that, but the core functionality for device compat / migration
-> > > > > > needs to be standardized.    
-> > > > > 
-> > > > > To summarize:
-> > > > > - choose one of sysfs or devlink
-> > > > > - have a common interface, with a standardized way to add
-> > > > >   vendor-specific attributes
-> > > > > ?    
-> > > > 
-> > > > Please refer to my previous email which has more example and details.    
-> > > hi Parav,
-> > > the example is based on a new vdpa tool running over netlink, not based
-> > > on devlink, right?
-> > > For vfio migration compatibility, we have to deal with both mdev and physical
-> > > pci devices, I don't think it's a good idea to write a new tool for it, given
-> > > we are able to retrieve the same info from sysfs and there's already an
-> > > mdevctl from Alex (https://github.com/mdevctl/mdevctl).
-> > > 
-> > > hi All,
-> > > could we decide that sysfs is the interface that every VFIO vendor driver
-> > > needs to provide in order to support vfio live migration, otherwise the
-> > > userspace management tool would not list the device into the compatible
-> > > list?
-> > > 
-> > > if that's true, let's move to the standardizing of the sysfs interface.
-> > > (1) content
-> > > common part: (must)
-> > >    - software_version: (in major.minor.bugfix scheme)
-> > >    - device_api: vfio-pci or vfio-ccw ...
-> > >    - type: mdev type for mdev device or
-> > >            a signature for physical device which is a counterpart for
-> > > 	   mdev type.
-> > > 
-> > > device api specific part: (must)
-> > >   - pci id: pci id of mdev parent device or pci id of physical pci
-> > >     device (device_api is vfio-pci)  
-> > 
-> > As noted previously, the parent PCI ID should not matter for an mdev
-> > device, if a vendor has a dependency on matching the parent device PCI
-> > ID, that's a vendor specific restriction.  An mdev device can also
-> > expose a vfio-pci device API without the parent device being PCI.  For
-> > a physical PCI device, shouldn't the PCI ID be encompassed in the
-> > signature?  Thanks,
-> >   
-> you are right. I need to put the PCI ID as a vendor specific field.
-> I didn't do that because I wanted all fields in vendor specific to be
-> configurable by management tools, so they can configure the target device
-> according to the value of a vendor specific field even they don't know
-> the meaning of the field.
-> But maybe they can just ignore the field when they can't find a matching
-> writable field to configure the target.
-
-
-If fields can be ignored, what's the point of reporting them?  Seems
-it's no longer a requirement.  Thanks,
-
-Alex
-
-
-> > >   - subchannel_type (device_api is vfio-ccw) 
-> > >  
-> > > vendor driver specific part: (optional)
-> > >   - aggregator
-> > >   - chpid_type
-> > >   - remote_url
-> > > 
-> > > NOTE: vendors are free to add attributes in this part with a
-> > > restriction that this attribute is able to be configured with the same
-> > > name in sysfs too. e.g.
-> > > for aggregator, there must be a sysfs attribute in device node
-> > > /sys/devices/pci0000:00/0000:00:02.0/882cc4da-dede-11e7-9180-078a62063ab1/intel_vgpu/aggregator,
-> > > so that the userspace tool is able to configure the target device
-> > > according to source device's aggregator attribute.
-> > > 
-> > > 
-> > > (2) where and structure
-> > > proposal 1:
-> > > |- [path to device]
-> > >   |--- migration
-> > >   |     |--- self
-> > >   |     |    |-software_version
-> > >   |     |    |-device_api
-> > >   |     |    |-type
-> > >   |     |    |-[pci_id or subchannel_type]
-> > >   |     |    |-<aggregator or chpid_type>
-> > >   |     |--- compatible
-> > >   |     |    |-software_version
-> > >   |     |    |-device_api
-> > >   |     |    |-type
-> > >   |     |    |-[pci_id or subchannel_type]
-> > >   |     |    |-<aggregator or chpid_type>
-> > > multiple compatible is allowed.
-> > > attributes should be ASCII text files, preferably with only one value
-> > > per file.
-> > > 
-> > > 
-> > > proposal 2: use bin_attribute.
-> > > |- [path to device]
-> > >   |--- migration
-> > >   |     |--- self
-> > >   |     |--- compatible
-> > > 
-> > > so we can continue use multiline format. e.g.
-> > > cat compatible
-> > >   software_version=0.1.0
-> > >   device_api=vfio_pci
-> > >   type=i915-GVTg_V5_{val1:int:1,2,4,8}
-> > >   pci_id=80865963
-> > >   aggregator={val1}/2
-> > > 
-> > > Thanks
-> > > Yan
-> > >   
-> >   
+On Wed, Aug 19, 2020 at 09:22:34PM -0600, Alex Williamson wrote:
+> On Thu, 20 Aug 2020 08:39:22 +0800
+> Yan Zhao <yan.y.zhao@intel.com> wrote:
 > 
+> > On Tue, Aug 18, 2020 at 11:36:52AM +0200, Cornelia Huck wrote:
+> > > On Tue, 18 Aug 2020 10:16:28 +0100
+> > > Daniel P. Berrangé <berrange@redhat.com> wrote:
+> > >   
+> > > > On Tue, Aug 18, 2020 at 05:01:51PM +0800, Jason Wang wrote:  
+> > > > >    On 2020/8/18 下午4:55, Daniel P. Berrangé wrote:
+> > > > > 
+> > > > >  On Tue, Aug 18, 2020 at 11:24:30AM +0800, Jason Wang wrote:
+> > > > > 
+> > > > >  On 2020/8/14 下午1:16, Yan Zhao wrote:
+> > > > > 
+> > > > >  On Thu, Aug 13, 2020 at 12:24:50PM +0800, Jason Wang wrote:
+> > > > > 
+> > > > >  On 2020/8/10 下午3:46, Yan Zhao wrote:    
+> > > >   
+> > > > >  we actually can also retrieve the same information through sysfs, .e.g
+> > > > > 
+> > > > >  |- [path to device]
+> > > > >     |--- migration
+> > > > >     |     |--- self
+> > > > >     |     |   |---device_api
+> > > > >     |    |   |---mdev_type
+> > > > >     |    |   |---software_version
+> > > > >     |    |   |---device_id
+> > > > >     |    |   |---aggregator
+> > > > >     |     |--- compatible
+> > > > >     |     |   |---device_api
+> > > > >     |    |   |---mdev_type
+> > > > >     |    |   |---software_version
+> > > > >     |    |   |---device_id
+> > > > >     |    |   |---aggregator
+> > > > > 
+> > > > > 
+> > > > >  Yes but:
+> > > > > 
+> > > > >  - You need one file per attribute (one syscall for one attribute)
+> > > > >  - Attribute is coupled with kobject  
+> > > 
+> > > Is that really that bad? You have the device with an embedded kobject
+> > > anyway, and you can just put things into an attribute group?
+> > > 
+> > > [Also, I think that self/compatible split in the example makes things
+> > > needlessly complex. Shouldn't semantic versioning and matching already
+> > > cover nearly everything? I would expect very few cases that are more
+> > > complex than that. Maybe the aggregation stuff, but I don't think we
+> > > need that self/compatible split for that, either.]  
+> > Hi Cornelia,
+> > 
+> > The reason I want to declare compatible list of attributes is that
+> > sometimes it's not a simple 1:1 matching of source attributes and target attributes
+> > as I demonstrated below,
+> > source mdev of (mdev_type i915-GVTg_V5_2 + aggregator 1) is compatible to
+> > target mdev of (mdev_type i915-GVTg_V5_4 + aggregator 2),
+> >                (mdev_type i915-GVTg_V5_8 + aggregator 4)
+> > 
+> > and aggragator may be just one of such examples that 1:1 matching does not
+> > fit.
+> 
+> If you're suggesting that we need a new 'compatible' set for every
+> aggregation, haven't we lost the purpose of aggregation?  For example,
+> rather than having N mdev types to represent all the possible
+> aggregation values, we have a single mdev type with N compatible
+> migration entries, one for each possible aggregation value.  BTW, how do
+> we have multiple compatible directories?  compatible0001,
+> compatible0002? Thanks,
+> 
+do you think the bin_attribute I proposed yesterday good?
+Then we can have a single compatible with a variable in the mdev_type and
+aggregator.
 
+   mdev_type=i915-GVTg_V5_{val1:int:2,4,8}
+   aggregator={val1}/2
+
+Thanks
+Yan
