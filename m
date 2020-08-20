@@ -2,149 +2,172 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B468424AD3F
-	for <lists+kvm@lfdr.de>; Thu, 20 Aug 2020 05:22:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 47BF824AD58
+	for <lists+kvm@lfdr.de>; Thu, 20 Aug 2020 05:32:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726887AbgHTDWw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 19 Aug 2020 23:22:52 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:41543 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726837AbgHTDWv (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 19 Aug 2020 23:22:51 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1597893770;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=tLd/qISkb4SgY+sj5n1JVIOSU5FSzdkPJ0PTVDiEVxM=;
-        b=H0CtUhhPqaDR8dBNokbOMRfU30P39AsIYUpdraeA2h/vE1OalCXngHfukQXExY+/B3id4F
-        QVtvaf7cPB7ZO9ZiPXlCtSJtb1nPFm/nUxcAdOdcaW0EFewX+HqF4X694cRcULvZ/HLblV
-        GpBHo8fDw9n26rgA2GbTKqgjO5owkcw=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-322-GzGRLPngP9iBA0IYQ712nw-1; Wed, 19 Aug 2020 23:22:45 -0400
-X-MC-Unique: GzGRLPngP9iBA0IYQ712nw-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0036085C705;
-        Thu, 20 Aug 2020 03:22:43 +0000 (UTC)
-Received: from x1.home (ovpn-112-71.phx2.redhat.com [10.3.112.71])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 32A215C88B;
-        Thu, 20 Aug 2020 03:22:35 +0000 (UTC)
-Date:   Wed, 19 Aug 2020 21:22:34 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Yan Zhao <yan.y.zhao@intel.com>
-Cc:     Cornelia Huck <cohuck@redhat.com>,
-        "Daniel P. =?UTF-8?B?QmVycmFuZ8Op?=" <berrange@redhat.com>,
-        kvm@vger.kernel.org, libvir-list@redhat.com,
-        Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org,
-        kwankhede@nvidia.com, eauger@redhat.com, xin-ran.wang@intel.com,
-        corbet@lwn.net, openstack-discuss@lists.openstack.org,
-        shaohe.feng@intel.com, kevin.tian@intel.com,
-        Parav Pandit <parav@mellanox.com>, jian-feng.ding@intel.com,
-        dgilbert@redhat.com, zhenyuw@linux.intel.com, hejie.xu@intel.com,
-        bao.yumeng@zte.com.cn, smooney@redhat.com,
-        intel-gvt-dev@lists.freedesktop.org, eskultet@redhat.com,
-        Jiri Pirko <jiri@mellanox.com>, dinechin@redhat.com,
-        devel@ovirt.org
-Subject: Re: device compatibility interface for live migration with assigned
- devices
-Message-ID: <20200819212234.223667b3@x1.home>
-In-Reply-To: <20200820003922.GE21172@joy-OptiPlex-7040>
-References: <20200805093338.GC30485@joy-OptiPlex-7040>
-        <20200805105319.GF2177@nanopsycho>
-        <20200810074631.GA29059@joy-OptiPlex-7040>
-        <e6e75807-0614-bd75-aeb6-64d643e029d3@redhat.com>
-        <20200814051601.GD15344@joy-OptiPlex-7040>
-        <a51209fe-a8c6-941f-ff54-7be06d73bc44@redhat.com>
-        <20200818085527.GB20215@redhat.com>
-        <3a073222-dcfe-c02d-198b-29f6a507b2e1@redhat.com>
-        <20200818091628.GC20215@redhat.com>
-        <20200818113652.5d81a392.cohuck@redhat.com>
-        <20200820003922.GE21172@joy-OptiPlex-7040>
-Organization: Red Hat
+        id S1726816AbgHTDcp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 19 Aug 2020 23:32:45 -0400
+Received: from mga06.intel.com ([134.134.136.31]:60344 "EHLO mga06.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726698AbgHTDcn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 19 Aug 2020 23:32:43 -0400
+IronPort-SDR: 4SRboyQGcOy9J7mluKLMzczxS02sZUQlSlNLLRBDGjDXHIzvYu23P5G52r8kXlfr3FxHtFVHcW
+ RMfPKjWDdmDg==
+X-IronPort-AV: E=McAfee;i="6000,8403,9718"; a="216765273"
+X-IronPort-AV: E=Sophos;i="5.76,332,1592895600"; 
+   d="scan'208";a="216765273"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Aug 2020 20:32:42 -0700
+IronPort-SDR: axVaO01PiEwdrsY0XR0Zs3O9fWoXIXfcdqJr+2+0OrOhS2gTJz67WfqAXaLG9BdFPh2R/m8ouo
+ ZkY7Asw5Ghhg==
+X-IronPort-AV: E=Sophos;i="5.76,332,1592895600"; 
+   d="scan'208";a="472477121"
+Received: from likexu-mobl1.ccr.corp.intel.com (HELO [10.238.4.128]) ([10.238.4.128])
+  by orsmga005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Aug 2020 20:32:36 -0700
+Subject: Re: [PATCH v1 01/11] perf/x86/core: Support KVM to assign a dedicated
+ counter for guest PEBS
+To:     Peter Zijlstra <peterz@infradead.org>,
+        "Paolo Bonzini (KVM Super Maintainer)" <pbonzini@redhat.com>
+Cc:     "Kang, Luwei" <luwei.kang@intel.com>,
+        "Liang, Kan" <kan.liang@linux.intel.com>,
+        "x86@kernel.org" <x86@kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "mingo@redhat.com" <mingo@redhat.com>,
+        "acme@kernel.org" <acme@kernel.org>,
+        "mark.rutland@arm.com" <mark.rutland@arm.com>,
+        "alexander.shishkin@linux.intel.com" 
+        <alexander.shishkin@linux.intel.com>,
+        "jolsa@redhat.com" <jolsa@redhat.com>,
+        "namhyung@kernel.org" <namhyung@kernel.org>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "bp@alien8.de" <bp@alien8.de>, "hpa@zytor.com" <hpa@zytor.com>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "Christopherson, Sean J" <sean.j.christopherson@intel.com>,
+        "vkuznets@redhat.com" <vkuznets@redhat.com>,
+        "wanpengli@tencent.com" <wanpengli@tencent.com>,
+        "jmattson@google.com" <jmattson@google.com>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "pawan.kumar.gupta@linux.intel.com" 
+        <pawan.kumar.gupta@linux.intel.com>,
+        "ak@linux.intel.com" <ak@linux.intel.com>,
+        "thomas.lendacky@amd.com" <thomas.lendacky@amd.com>,
+        "Yu, Fenghua" <fenghua.yu@intel.com>,
+        "Wang, Wei W" <wei.w.wang@intel.com>,
+        "Kleen, Andi" <andi.kleen@intel.com>
+References: <1583431025-19802-1-git-send-email-luwei.kang@intel.com>
+ <1583431025-19802-2-git-send-email-luwei.kang@intel.com>
+ <20200306135317.GD12561@hirez.programming.kicks-ass.net>
+ <b72cb68e-1a0a-eeff-21b4-ce412e939cfd@linux.intel.com>
+ <20200309100443.GG12561@hirez.programming.kicks-ass.net>
+ <97ce1ba4-d75a-8db2-ea2f-7d334942b4e6@linux.intel.com>
+ <20200309150526.GI12561@hirez.programming.kicks-ass.net>
+ <DM5PR1101MB22667E832B3E9C1EF5389F2280810@DM5PR1101MB2266.namprd11.prod.outlook.com>
+From:   Like Xu <like.xu@linux.intel.com>
+Organization: Intel OTC
+Message-ID: <34cb1d8c-d7c0-0dc1-49b2-072147f37379@linux.intel.com>
+Date:   Thu, 20 Aug 2020 11:32:32 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+In-Reply-To: <DM5PR1101MB22667E832B3E9C1EF5389F2280810@DM5PR1101MB2266.namprd11.prod.outlook.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 20 Aug 2020 08:39:22 +0800
-Yan Zhao <yan.y.zhao@intel.com> wrote:
+Hi Peter,
 
-> On Tue, Aug 18, 2020 at 11:36:52AM +0200, Cornelia Huck wrote:
-> > On Tue, 18 Aug 2020 10:16:28 +0100
-> > Daniel P. Berrang=C3=A9 <berrange@redhat.com> wrote:
-> >  =20
-> > > On Tue, Aug 18, 2020 at 05:01:51PM +0800, Jason Wang wrote: =20
-> > > >    On 2020/8/18 =E4=B8=8B=E5=8D=884:55, Daniel P. Berrang=C3=A9 wro=
-te:
-> > > >=20
-> > > >  On Tue, Aug 18, 2020 at 11:24:30AM +0800, Jason Wang wrote:
-> > > >=20
-> > > >  On 2020/8/14 =E4=B8=8B=E5=8D=881:16, Yan Zhao wrote:
-> > > >=20
-> > > >  On Thu, Aug 13, 2020 at 12:24:50PM +0800, Jason Wang wrote:
-> > > >=20
-> > > >  On 2020/8/10 =E4=B8=8B=E5=8D=883:46, Yan Zhao wrote:   =20
-> > >  =20
-> > > >  we actually can also retrieve the same information through sysfs, =
-.e.g
-> > > >=20
-> > > >  |- [path to device]
-> > > >     |--- migration
-> > > >     |     |--- self
-> > > >     |     |   |---device_api
-> > > >     |    |   |---mdev_type
-> > > >     |    |   |---software_version
-> > > >     |    |   |---device_id
-> > > >     |    |   |---aggregator
-> > > >     |     |--- compatible
-> > > >     |     |   |---device_api
-> > > >     |    |   |---mdev_type
-> > > >     |    |   |---software_version
-> > > >     |    |   |---device_id
-> > > >     |    |   |---aggregator
-> > > >=20
-> > > >=20
-> > > >  Yes but:
-> > > >=20
-> > > >  - You need one file per attribute (one syscall for one attribute)
-> > > >  - Attribute is coupled with kobject =20
-> >=20
-> > Is that really that bad? You have the device with an embedded kobject
-> > anyway, and you can just put things into an attribute group?
-> >=20
-> > [Also, I think that self/compatible split in the example makes things
-> > needlessly complex. Shouldn't semantic versioning and matching already
-> > cover nearly everything? I would expect very few cases that are more
-> > complex than that. Maybe the aggregation stuff, but I don't think we
-> > need that self/compatible split for that, either.] =20
-> Hi Cornelia,
->=20
-> The reason I want to declare compatible list of attributes is that
-> sometimes it's not a simple 1:1 matching of source attributes and target =
-attributes
-> as I demonstrated below,
-> source mdev of (mdev_type i915-GVTg_V5_2 + aggregator 1) is compatible to
-> target mdev of (mdev_type i915-GVTg_V5_4 + aggregator 2),
->                (mdev_type i915-GVTg_V5_8 + aggregator 4)
->=20
-> and aggragator may be just one of such examples that 1:1 matching does not
-> fit.
+On 2020/6/12 13:28, Kang, Luwei wrote:
+>>>> Suppose your KVM thing claims counter 0/2 (ICL/SKL) for some random
+>>>> PEBS event, and then the host wants to use PREC_DIST.. Then one of
+>>>> them will be screwed for no reason what so ever.
+>>>>
+>>>
+>>> The multiplexing should be triggered.
+>>>
+>>> For host, if both user A and user B requires PREC_DIST, the
+>>> multiplexing should be triggered for them.
+>>> Now, the user B is KVM. I don't think there is difference. The
+>>> multiplexing should still be triggered. Why it is screwed?
+>>
+>> Becuase if KVM isn't PREC_DIST we should be able to reschedule it to a
+>> different counter.
+>>
+>>>> How is that not destroying scheduling freedom? Any other situation
+>>>> we'd have moved the !PREC_DIST PEBS event to another counter.
+>>>>
+>>>
+>>> All counters are equivalent for them. It doesn't matter if we move it
+>>> to another counter. There is no impact for the user.
+>>
+>> But we cannot move it to another counter, because you're pinning it.
+> 
+> Hi Peter,
+> 
+> To avoid the pinning counters, I have tried to do some evaluation about
+> patching the PEBS record for guest in KVM. In this approach, about ~30%
+> time increased on guest PEBS PMI handler latency (
+> e.g.perf record -e branch-loads:p -c 1000 ~/Tools/br_instr a).
+> 
+> Some implementation details as below:
+> 1. Patching the guest PEBS records "Applicable Counters" filed when the guest
+>       required counter is not the same with the host. Because the guest PEBS
+>       driver will drop these PEBS records if the "Applicable Counters" not the
+>       same with the required counter index.
+> 2. Traping the guest driver's behavior(VM-exit) of disabling PEBS.
+>       It happens before reading PEBS records (e.g. PEBS PMI handler, before
+>       application exit and so on)
+> 3. To patch the Guest PEBS records in KVM, we need to get the HPA of the
+>       guest PEBS buffer.
+>       <1> Trapping the guest write of IA32_DS_AREA register and get the GVA
+>               of guest DS_AREA.
+>       <2> Translate the DS AREA GVA to GPA(kvm_mmu_gva_to_gpa_read)
+>               and get the GVA of guest PEBS buffer from DS AREA
+>               (kvm_vcpu_read_guest_atomic).
+>       <3> Although we have got the GVA of PEBS buffer, we need to do the
+>               address translation(GVA->GPA->HPA) for each page. Because we can't
+>               assume the GPAs of Guest PEBS buffer are always continuous.
+> 	
+> But we met another issue about the PEBS counter reset field in DS AREA.
+> pebs_event_reset in DS area has to be set for auto reload, which is per
+> counter. Guest and Host may use different counters. Let's say guest wants to
+> use counter 0, but host assign counter 1 to guest. Guest sets the reset value to
+> pebs_event_reset[0]. However, since counter 1 is the one which is eventually
+> scheduled, HW will use  pebs_event_reset[1] as reset value.
+> 
+> We can't copy the value of the guest pebs_event_reset[0] to
+> pebs_event_reset[1] directly(Patching DS AREA) because the guest driver may
+> confused, and we can't assume the guest counter 0 and 1 are not used for this
+> PEBS task at the same time. And what's more, KVM can't aware the guest
+> read/write to the DS AREA because it just a general memory for guest.
+> 
+> What is your opinion or do you have a better proposal?
 
-If you're suggesting that we need a new 'compatible' set for every
-aggregation, haven't we lost the purpose of aggregation?  For example,
-rather than having N mdev types to represent all the possible
-aggregation values, we have a single mdev type with N compatible
-migration entries, one for each possible aggregation value.  BTW, how do
-we have multiple compatible directories?  compatible0001,
-compatible0002? Thanks,
+Do we have any update or clear attitude
+on this "patching the PEBS record for guest in KVM" proposal ？
 
-Alex
+Thanks,
+Like Xu
+
+> 
+> Thanks,
+> Luwei Kang
+> 
+>>
+>>> In the new proposal, KVM user is treated the same as other host events
+>>> with event constraint. The scheduler is free to choose whether or not
+>>> to assign a counter for it.
+>>
+>> That's what it does, I understand that. I'm saying that that is creating artificial
+>> contention.
+>>
+>>
+>> Why is this needed anyway? Can't we force the guest to flush and then move it
+>> over to a new counter?
 
