@@ -2,435 +2,345 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C408024C5B5
-	for <lists+kvm@lfdr.de>; Thu, 20 Aug 2020 20:38:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5495524C667
+	for <lists+kvm@lfdr.de>; Thu, 20 Aug 2020 21:52:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727073AbgHTSiU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 20 Aug 2020 14:38:20 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:53993 "EHLO
+        id S1728055AbgHTTwW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 20 Aug 2020 15:52:22 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:53155 "EHLO
         us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726701AbgHTSiR (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 20 Aug 2020 14:38:17 -0400
+        by vger.kernel.org with ESMTP id S1726666AbgHTTwU (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 20 Aug 2020 15:52:20 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1597948694;
+        s=mimecast20190719; t=1597953138;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=hwDTQto2EJFjavZgAL+q7WDXNOyGUc1xSFD1wpx2kLM=;
-        b=BU4zao03S9BVMmHfVDRNUoMiRmlqAH1DsrKSo6/PNWHWAspu0KBLkXF3wKXkQgi6L5TWTa
-        /VctUXvAHeBsnpapBAGhAzDHD617K5i42fnnFwd1nK+Hx5UjWwxxsC7+siCJkrNWLtbeH4
-        Ec77EU7PrW+7BlGkLkZhXUscIv20TiQ=
+        bh=xV5oiRutngq5sGeUP5Pr4zwGl9MLYzLTFhmZ9SAoRwo=;
+        b=Yvq2etjTQeHKsgOFpHDcP+DpwjQ1sJA7C2E0MkuXVwvk8rr35lFwerWOiAEJSnyxpmEzDE
+        fHDSWZ9RHTbErSbpJGpNpxd4SR0Jf98hwbBm4xGEhcpnnYI+jDnDjxTOTZyEya06d8tJrM
+        Ei7EiL0HwiJ8yGBlVxhe8IX5rRU2lgU=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-472-H15DHBhXN3C346x-puNliA-1; Thu, 20 Aug 2020 14:38:08 -0400
-X-MC-Unique: H15DHBhXN3C346x-puNliA-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+ us-mta-32-fuoMkhJgNB-NybrvGLR7Ag-1; Thu, 20 Aug 2020 15:52:14 -0400
+X-MC-Unique: fuoMkhJgNB-NybrvGLR7Ag-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 904C210082E6;
-        Thu, 20 Aug 2020 18:38:06 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 446A58030B7;
+        Thu, 20 Aug 2020 19:52:12 +0000 (UTC)
 Received: from x1.home (ovpn-112-71.phx2.redhat.com [10.3.112.71])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 744E019D7D;
-        Thu, 20 Aug 2020 18:38:02 +0000 (UTC)
-Date:   Thu, 20 Aug 2020 12:38:02 -0600
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 2B599747B0;
+        Thu, 20 Aug 2020 19:52:05 +0000 (UTC)
+Date:   Thu, 20 Aug 2020 13:52:04 -0600
 From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Ming Mao <maoming.maoming@huawei.com>
-Cc:     <linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>,
-        <cohuck@redhat.com>, <jianjay.zhou@huawei.com>,
-        <weidong.huang@huawei.com>, <peterx@redhat.com>,
-        <aarcange@redhat.com>
-Subject: Re: [PATCH V2] vfio dma_map/unmap: optimized for hugetlbfs pages
-Message-ID: <20200820123802.724afd4a@x1.home>
-In-Reply-To: <20200814023729.2270-1-maoming.maoming@huawei.com>
-References: <20200814023729.2270-1-maoming.maoming@huawei.com>
+To:     Liu Yi L <yi.l.liu@intel.com>
+Cc:     eric.auger@redhat.com, baolu.lu@linux.intel.com, joro@8bytes.org,
+        kevin.tian@intel.com, jacob.jun.pan@linux.intel.com,
+        ashok.raj@intel.com, jun.j.tian@intel.com, yi.y.sun@intel.com,
+        jean-philippe@linaro.org, peterx@redhat.com, hao.wu@intel.com,
+        stefanha@gmail.com, iommu@lists.linux-foundation.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v6 04/15] vfio/type1: Report iommu nesting info to
+ userspace
+Message-ID: <20200820135204.4fc3e9a3@x1.home>
+In-Reply-To: <1595917664-33276-5-git-send-email-yi.l.liu@intel.com>
+References: <1595917664-33276-1-git-send-email-yi.l.liu@intel.com>
+        <1595917664-33276-5-git-send-email-yi.l.liu@intel.com>
 Organization: Red Hat
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 14 Aug 2020 10:37:29 +0800
-Ming Mao <maoming.maoming@huawei.com> wrote:
+On Mon, 27 Jul 2020 23:27:33 -0700
+Liu Yi L <yi.l.liu@intel.com> wrote:
 
-> In the original process of pinning/unpinning pages for VFIO-devices,
-> to make sure the pages are contiguous, we have to check them one by one.
-> As a result, dma_map/unmap could spend a long time.
-> Using the hugetlb pages, we can avoid this problem.
-> All pages in hugetlb pages are contiguous.And the hugetlb
-> page should not be split.So we can delete the for loops and use
-> some operations(such as atomic_add,page_ref_add) instead.
+> This patch exports iommu nesting capability info to user space through
+> VFIO. Userspace is expected to check this info for supported uAPIs (e.g.
+> PASID alloc/free, bind page table, and cache invalidation) and the vendor
+> specific format information for first level/stage page table that will be
+> bound to.
 > 
-> Signed-off-by: Ming Mao <maoming.maoming@huawei.com>
+> The nesting info is available only after container set to be NESTED type.
+> Current implementation imposes one limitation - one nesting container
+> should include at most one iommu group. The philosophy of vfio container
+> is having all groups/devices within the container share the same IOMMU
+> context. When vSVA is enabled, one IOMMU context could include one 2nd-
+> level address space and multiple 1st-level address spaces. While the
+> 2nd-level address space is reasonably sharable by multiple groups, blindly
+> sharing 1st-level address spaces across all groups within the container
+> might instead break the guest expectation. In the future sub/super container
+> concept might be introduced to allow partial address space sharing within
+> an IOMMU context. But for now let's go with this restriction by requiring
+> singleton container for using nesting iommu features. Below link has the
+> related discussion about this decision.
+> 
+> https://lore.kernel.org/kvm/20200515115924.37e6996d@w520.home/
+> 
+> This patch also changes the NESTING type container behaviour. Something
+> that would have succeeded before will now fail: Before this series, if
+> user asked for a VFIO_IOMMU_TYPE1_NESTING, it would have succeeded even
+> if the SMMU didn't support stage-2, as the driver would have silently
+> fallen back on stage-1 mappings (which work exactly the same as stage-2
+> only since there was no nesting supported). After the series, we do check
+> for DOMAIN_ATTR_NESTING so if user asks for VFIO_IOMMU_TYPE1_NESTING and
+> the SMMU doesn't support stage-2, the ioctl fails. But it should be a good
+> fix and completely harmless. Detail can be found in below link as well.
+> 
+> https://lore.kernel.org/kvm/20200717090900.GC4850@myrica/
+> 
+> Cc: Kevin Tian <kevin.tian@intel.com>
+> CC: Jacob Pan <jacob.jun.pan@linux.intel.com>
+> Cc: Alex Williamson <alex.williamson@redhat.com>
+> Cc: Eric Auger <eric.auger@redhat.com>
+> Cc: Jean-Philippe Brucker <jean-philippe@linaro.org>
+> Cc: Joerg Roedel <joro@8bytes.org>
+> Cc: Lu Baolu <baolu.lu@linux.intel.com>
+> Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
 > ---
->  drivers/vfio/vfio_iommu_type1.c | 233 +++++++++++++++++++++++++++++++-
->  1 file changed, 230 insertions(+), 3 deletions(-)
+> v5 -> v6:
+> *) address comments against v5 from Eric Auger.
+> *) don't report nesting cap to userspace if the nesting_info->format is
+>    invalid.
+> 
+> v4 -> v5:
+> *) address comments from Eric Auger.
+> *) return struct iommu_nesting_info for VFIO_IOMMU_TYPE1_INFO_CAP_NESTING as
+>    cap is much "cheap", if needs extension in future, just define another cap.
+>    https://lore.kernel.org/kvm/20200708132947.5b7ee954@x1.home/
+> 
+> v3 -> v4:
+> *) address comments against v3.
+> 
+> v1 -> v2:
+> *) added in v2
+> ---
+>  drivers/vfio/vfio_iommu_type1.c | 106 +++++++++++++++++++++++++++++++++++-----
+>  include/uapi/linux/vfio.h       |  19 +++++++
+>  2 files changed, 113 insertions(+), 12 deletions(-)
 > 
 > diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-> index 5e556ac91..8957013c1 100644
+> index 3bd70ff..18ff0c3 100644
 > --- a/drivers/vfio/vfio_iommu_type1.c
 > +++ b/drivers/vfio/vfio_iommu_type1.c
-> @@ -415,6 +415,46 @@ static int put_pfn(unsigned long pfn, int prot)
->  	return 0;
->  }
+> @@ -62,18 +62,20 @@ MODULE_PARM_DESC(dma_entry_limit,
+>  		 "Maximum number of user DMA mappings per container (65535).");
 >  
-> +/*
-> + * put pfns for a hugetlb page
-> + * @start:the PAGE_SIZE-page we start to put,can be any page in this hugetlb page
-> + * @npage:the number of PAGE_SIZE-pages need to put
-> + * @prot:IOMMU_READ/WRITE
-> + */
-> +static int hugetlb_put_pfn(unsigned long start, unsigned int npage, int prot)
-> +{
-> +	struct page *page;
-> +	struct page *head;
-> +
-> +	if (!npage || !pfn_valid(start))
-> +		return 0;
-> +
-> +	page = pfn_to_page(start);
-> +	if (!page || !PageHuge(page))
-> +		return 0;
-> +	head = compound_head(page);
-> +	/*
-> +	 * The last page should be in this hugetlb page.
-> +	 * The number of putting pages should be equal to the number
-> +	 * of getting pages.So the hugepage pinned refcount and the normal
-> +	 * page refcount can not be smaller than npage.
-> +	 */
-> +	if ((head != compound_head(pfn_to_page(start + npage - 1)))
-> +	    || (page_ref_count(head) < npage)
-> +	    || (compound_pincount(page) < npage))
-> +		return 0;
-> +
-> +	if ((prot & IOMMU_WRITE) && !PageDirty(page))
-> +		set_page_dirty_lock(page);
-> +
-> +	atomic_sub(npage, compound_pincount_ptr(head));
-> +	if (page_ref_sub_and_test(head, npage))
-> +		__put_page(head);
-> +
-> +	mod_node_page_state(page_pgdat(head), NR_FOLL_PIN_RELEASED, npage);
-> +	return 1;
-> +}
-> +
->  static int follow_fault_pfn(struct vm_area_struct *vma, struct mm_struct *mm,
->  			    unsigned long vaddr, unsigned long *pfn,
->  			    bool write_fault)
-> @@ -479,6 +519,105 @@ static int vaddr_get_pfn(struct mm_struct *mm, unsigned long vaddr,
->  	return ret;
->  }
+>  struct vfio_iommu {
+> -	struct list_head	domain_list;
+> -	struct list_head	iova_list;
+> -	struct vfio_domain	*external_domain; /* domain for external user */
+> -	struct mutex		lock;
+> -	struct rb_root		dma_list;
+> -	struct blocking_notifier_head notifier;
+> -	unsigned int		dma_avail;
+> -	uint64_t		pgsize_bitmap;
+> -	bool			v2;
+> -	bool			nesting;
+> -	bool			dirty_page_tracking;
+> -	bool			pinned_page_dirty_scope;
+> +	struct list_head		domain_list;
+> +	struct list_head		iova_list;
+> +	/* domain for external user */
+> +	struct vfio_domain		*external_domain;
+> +	struct mutex			lock;
+> +	struct rb_root			dma_list;
+> +	struct blocking_notifier_head	notifier;
+> +	unsigned int			dma_avail;
+> +	uint64_t			pgsize_bitmap;
+> +	bool				v2;
+> +	bool				nesting;
+> +	bool				dirty_page_tracking;
+> +	bool				pinned_page_dirty_scope;
+> +	struct iommu_nesting_info	*nesting_info;
+>  };
 >  
-> +static bool is_hugetlbpage(unsigned long pfn)
+>  struct vfio_domain {
+> @@ -130,6 +132,9 @@ struct vfio_regions {
+>  #define IS_IOMMU_CAP_DOMAIN_IN_CONTAINER(iommu)	\
+>  					(!list_empty(&iommu->domain_list))
+>  
+> +#define CONTAINER_HAS_DOMAIN(iommu)	(((iommu)->external_domain) || \
+> +					 (!list_empty(&(iommu)->domain_list)))
+> +
+>  #define DIRTY_BITMAP_BYTES(n)	(ALIGN(n, BITS_PER_TYPE(u64)) / BITS_PER_BYTE)
+>  
+>  /*
+> @@ -1929,6 +1934,13 @@ static void vfio_iommu_iova_insert_copy(struct vfio_iommu *iommu,
+>  
+>  	list_splice_tail(iova_copy, iova);
+>  }
+> +
+> +static void vfio_iommu_release_nesting_info(struct vfio_iommu *iommu)
 > +{
-> +	struct page *page;
-> +
-> +	if (!pfn_valid(pfn))
-> +		return false;
-> +
-> +	page = pfn_to_page(pfn);
-> +	/* only check for hugetlb pages */
-> +	if (!page || !PageHuge(page))
-> +		return false;
-> +
-> +	return true;
-
-
-return page && PageHuge(page);
-
-
+> +	kfree(iommu->nesting_info);
+> +	iommu->nesting_info = NULL;
 > +}
 > +
-> +/*
-> + * get the number of residual PAGE_SIZE-pages in a hugetlb page
-> + * (including the page which pointed by this address)
-> + * @address: we count residual pages from this address to the end of
-> + * a hugetlb page
-> + * @order: the order of the same hugetlb page
-> + */
-> +static long
-> +hugetlb_get_residual_pages(unsigned long address, unsigned int order)
-> +{
-> +	unsigned long hugetlb_npage;
-> +	unsigned long hugetlb_mask;
-> +
-> +	if (!order)
-> +		return -1;
-
-Use a real errno please.
-
-> +
-> +	hugetlb_npage = _AC(1, UL) << order;
-
-This doesn't seem an appropriate use of _AC(), 1UL << order should be
-fine.
-
-> +	hugetlb_mask = (hugetlb_npage << PAGE_SHIFT) - 1;
-> +	address = ALIGN_DOWN(address, PAGE_SIZE);
-
-hugetlb_mask doesn't need to be in bytes, it could be in pages
-(hugetlb_npage - 1), then we could simply convert address to pfn
-(address >> PAGE_SHIFT), then we avoid the shift below:
-
-return hugetlb_npage - ((address >> PAGE_SHIFT) & (hugetlb_npage - 1));
-
-> +
-> +	/*
-> +	 * Since we count the page pointed by this address, the number of
-> +	 * residual PAGE_SIZE-pages is greater than or equal to 1.
-> +	 */
-> +	return hugetlb_npage - ((address & hugetlb_mask) >> PAGE_SHIFT);
-> +}
-> +
-> +static unsigned int
-> +hugetlb_page_get_externally_pinned_num(struct vfio_dma *dma,
-> +				unsigned long start,
-> +				unsigned long npage)
-> +{
-> +	struct vfio_pfn *vpfn;
-> +	struct rb_node *node;
-> +	unsigned long end = start + npage - 1;
-> +	unsigned int num = 0;
-> +
-> +	if (!dma || !npage)
-> +		return 0;
-> +
-> +	/* If we find a page in dma->pfn_list, this page has been pinned externally */
-> +	for (node = rb_first(&dma->pfn_list); node; node = rb_next(node)) {
-> +		vpfn = rb_entry(node, struct vfio_pfn, node);
-> +		if ((vpfn->pfn >= start) && (vpfn->pfn <= end))
-> +			num++;
+>  static int vfio_iommu_type1_attach_group(void *iommu_data,
+>  					 struct iommu_group *iommu_group)
+>  {
+> @@ -1959,6 +1971,12 @@ static int vfio_iommu_type1_attach_group(void *iommu_data,
+>  		}
+>  	}
+>  
+> +	/* Nesting type container can include only one group */
+> +	if (iommu->nesting && CONTAINER_HAS_DOMAIN(iommu)) {
+> +		mutex_unlock(&iommu->lock);
+> +		return -EINVAL;
 > +	}
 > +
-> +	return num;
-> +}
-> +
-> +static long hugetlb_page_vaddr_get_pfn(unsigned long vaddr, long npage,
-> +						unsigned long pfn)
-> +{
-> +	long hugetlb_residual_npage;
-> +	long contiguous_npage;
-> +	struct page *head = compound_head(pfn_to_page(pfn));
-> +
-> +	/*
-> +	 * If pfn is valid,
-> +	 * hugetlb_residual_npage is greater than or equal to 1.
-> +	 */
-> +	hugetlb_residual_npage = hugetlb_get_residual_pages(vaddr,
-> +						compound_order(head));
-> +	if (hugetlb_residual_npage < 0)
-> +		return -1;
-
-Forward the errno
-
-> +
-> +	/* The page of vaddr has been gotten by vaddr_get_pfn */
-> +	contiguous_npage = min_t(long, (hugetlb_residual_npage - 1), npage);
-> +	if (!contiguous_npage)
-> +		return 0;
-> +	/*
-> +	 * Unlike THP, the splitting should not happen for hugetlb pages.
-> +	 * Since PG_reserved is not relevant for compound pages, and the pfn of
-> +	 * PAGE_SIZE page which in hugetlb pages is valid,
-> +	 * it is not necessary to check rsvd for hugetlb pages.
-> +	 * We do not need to alloc pages because of vaddr and we can finish all
-> +	 * work by a single operation to the head page.
-> +	 */
-> +	atomic_add(contiguous_npage, compound_pincount_ptr(head));
-> +	page_ref_add(head, contiguous_npage);
-> +	mod_node_page_state(page_pgdat(head), NR_FOLL_PIN_ACQUIRED, contiguous_npage);
-> +
-> +	return contiguous_npage;
-> +}
->  /*
->   * Attempt to pin pages.  We really don't want to track all the pfns and
->   * the iommu can only map chunks of consecutive pfns anyway, so get the
-> @@ -492,6 +631,7 @@ static long vfio_pin_pages_remote(struct vfio_dma *dma, unsigned long vaddr,
->  	long ret, pinned = 0, lock_acct = 0;
->  	bool rsvd;
->  	dma_addr_t iova = vaddr - dma->vaddr + dma->iova;
-> +	long contiguous_npage;
->  
->  	/* This code path is only user initiated */
->  	if (!current->mm)
-> @@ -523,7 +663,8 @@ static long vfio_pin_pages_remote(struct vfio_dma *dma, unsigned long vaddr,
->  
->  	/* Lock all the consecutive pages from pfn_base */
->  	for (vaddr += PAGE_SIZE, iova += PAGE_SIZE; pinned < npage;
-> -	     pinned++, vaddr += PAGE_SIZE, iova += PAGE_SIZE) {
-> +	     pinned += contiguous_npage, vaddr += contiguous_npage * PAGE_SIZE,
-> +	     iova += contiguous_npage * PAGE_SIZE) {
->  		ret = vaddr_get_pfn(current->mm, vaddr, dma->prot, &pfn);
->  		if (ret)
->  			break;
-> @@ -545,6 +686,54 @@ static long vfio_pin_pages_remote(struct vfio_dma *dma, unsigned long vaddr,
->  			}
->  			lock_acct++;
->  		}
-> +
-> +		contiguous_npage = 0;
-> +		/*
-> +		 * It is not necessary to get pages one by one for hugetlb pages.
-> +		 * All PAGE_SIZE-pages in hugetlb pages are contiguous.
-> +		 * If npage - pinned is 1, all pages are pinned.
-> +		 */
-
-I really don't like this result of trying to squeeze hugepages into the
-end of the existing algorithm.  We currently pin the first page, then
-pin each next page until we find one that is not contiguous or we hit
-our desired length or limit.  As I understand the modified algorithm,
-for each next page, after we've pinned it, we test if it's a hugetlbfs
-page, then pin the remainder of the pages via a different mechanism, up
-to the desired length or limit, continuing by again pinning the next
-individual page and repeating the hugetlbfs test.  This means we're
-typically starting from the second page and mixing pages pinned
-individually vs via the hugepage.
-
-Would it be cleaner to move hugetlbfs handling to the start of the
-loop?  In the single page case, we pin the next page in order to
-determine if it's contiugous, unpinning if it's not.  In the hugetlbfs
-case, we can determine from the initial page the extent of the
-contiguous range.
-
-Moving to the head of the loop might not be sufficient to achieve the
-simplification I'm looking for, but I think we need to cleanup the
-various off-by-one or off-by-two corrections that occur in this
-implementation, they're hard to follow.
+>  	group = kzalloc(sizeof(*group), GFP_KERNEL);
+>  	domain = kzalloc(sizeof(*domain), GFP_KERNEL);
+>  	if (!group || !domain) {
+> @@ -2029,6 +2047,32 @@ static int vfio_iommu_type1_attach_group(void *iommu_data,
+>  	if (ret)
+>  		goto out_domain;
 
 
-> +		if ((npage - pinned > 1) && is_hugetlbpage(pfn)) {
-> +			/*
-> +			 * We must use the vaddr to get the contiguous pages.
-> +			 * Because it is possible that the page of vaddr
-> +			 * is the last PAGE_SIZE-page. In this case, vaddr + PAGE_SIZE
-> +			 * is in another hugetlb page.
-> +			 * And the left pages is npage - pinned - 1(vaddr).
-> +			 */
-> +			contiguous_npage = hugetlb_page_vaddr_get_pfn(vaddr,
-> +							npage - pinned - 1, pfn);
-> +			if (contiguous_npage < 0) {
-> +				put_pfn(pfn, dma->prot);
-> +				ret = -EINVAL;
-
-This should return the errno from hugetlb_page_vaddr_get_pfn() rather
-than inventing one.
-
-> +				goto unpin_out;
-> +			}
-> +			/*
-> +			 * If contiguous_npage is 0, the vaddr is the last PAGE_SIZE-page
-> +			 * of a hugetlb page.
-> +			 * We should continue and find the next one.
-> +			 */
-> +			if (!contiguous_npage) {
-> +				/* set 1 for the vaddr */
-> +				contiguous_npage = 1;
-> +				continue;
-> +			}
-> +			lock_acct += contiguous_npage - hugetlb_page_get_externally_pinned_num(dma,
-> +					pfn, contiguous_npage);
-> +
-> +			if (!dma->lock_cap &&
-> +			    current->mm->locked_vm + lock_acct > limit) {
-> +				for (; contiguous_npage; pfn++, contiguous_npage--)
-> +					put_pfn(pfn, dma->prot);
-
-This seems really asymmetric to the pinning, where we've used hugetlbfs
-mechanisms to make the pinned pages, but we're releasing them
-individually.  Ideally we should use the same mechanism per page.
-
-> +				pr_warn("%s: RLIMIT_MEMLOCK (%ld) exceeded\n",
-> +					__func__, limit << PAGE_SHIFT);
-> +				ret = -ENOMEM;
-> +				goto unpin_out;
-> +			}
-> +		}
-> +
-> +		/* add for the vaddr */
-> +		contiguous_npage++;
->  	}
->  
->  out:
-> @@ -569,13 +758,38 @@ static long vfio_unpin_pages_remote(struct vfio_dma *dma, dma_addr_t iova,
->  {
->  	long unlocked = 0, locked = 0;
->  	long i;
-> +	long hugetlb_residual_npage;
-> +	long contiguous_npage;
-> +	struct page *head;
->  
-> -	for (i = 0; i < npage; i++, iova += PAGE_SIZE) {
-> +	for (i = 0; i < npage; i += contiguous_npage, iova += contiguous_npage * PAGE_SIZE) {
-> +		if (is_hugetlbpage(pfn)) {
-> +			/*
-> +			 * Since pfn is valid,
-> +			 * hugetlb_residual_npage is greater than or equal to 1.
-> +			 */
-> +			head = compound_head(pfn_to_page(pfn));
-> +			hugetlb_residual_npage = hugetlb_get_residual_pages(iova,
-> +									compound_order(head));
-> +			contiguous_npage = min_t(long, hugetlb_residual_npage, (npage - i));
-> +
-> +			/* try the slow path if failed */
-> +			if (!hugetlb_put_pfn(pfn, contiguous_npage, dma->prot))
-> +				goto slow_path;
-> +
-> +			pfn += contiguous_npage;
-> +			unlocked += contiguous_npage;
-> +			locked += hugetlb_page_get_externally_pinned_num(dma, pfn,
-> +									contiguous_npage);
-> +			continue;
-> +		}
-> +slow_path:
->  		if (put_pfn(pfn++, dma->prot)) {
->  			unlocked++;
->  			if (vfio_find_vpfn(dma, iova))
->  				locked++;
->  		}
-> +		contiguous_npage = 1;
->  	}
->  
->  	if (do_accounting)
-> @@ -893,6 +1107,9 @@ static long vfio_unmap_unpin(struct vfio_iommu *iommu, struct vfio_dma *dma,
->  	while (iova < end) {
->  		size_t unmapped, len;
->  		phys_addr_t phys, next;
-> +		long hugetlb_residual_npage;
-> +		long contiguous_npage;
-> +		struct page *head;
->  
->  		phys = iommu_iova_to_phys(domain->domain, iova);
->  		if (WARN_ON(!phys)) {
-> @@ -906,10 +1123,20 @@ static long vfio_unmap_unpin(struct vfio_iommu *iommu, struct vfio_dma *dma,
->  		 * largest contiguous physical memory chunk to unmap.
->  		 */
->  		for (len = PAGE_SIZE;
-> -		     !domain->fgsp && iova + len < end; len += PAGE_SIZE) {
-> +		    !domain->fgsp && iova + len < end; len += PAGE_SIZE * contiguous_npage) {
->  			next = iommu_iova_to_phys(domain->domain, iova + len);
->  			if (next != phys + len)
->  				break;
-> +
-> +			if (((dma->size - len) >> PAGE_SHIFT)
-> +				&& is_hugetlbpage(next >> PAGE_SHIFT)) {
-> +				head = compound_head(pfn_to_page(next >> PAGE_SHIFT));
-> +				hugetlb_residual_npage = hugetlb_get_residual_pages(iova + len,
-> +									compound_order(head));
-> +				contiguous_npage = min_t(long, ((dma->size - len) >> PAGE_SHIFT),
-> +								hugetlb_residual_npage);
-
-Same idea here as above, we're again starting from the 2nd page to
-determine hugetlbfs pages, it feels very ad hoc.  Thanks,
+I think that currently a user can configure a VFIO_TYPE1_NESTING_IOMMU
+IOMMU type with a non-IOMMU backed mdev.  Does that make any sort of
+sense or is this a bug?  Thanks,
 
 Alex
 
-> +			} else
-> +				contiguous_npage = 1;
->  		}
 >  
->  		/*
+> +	/* Nesting cap info is available only after attaching */
+> +	if (iommu->nesting) {
+> +		struct iommu_nesting_info tmp = { .argsz = 0, };
+> +
+> +		/* First get the size of vendor specific nesting info */
+> +		ret = iommu_domain_get_attr(domain->domain,
+> +					    DOMAIN_ATTR_NESTING,
+> +					    &tmp);
+> +		if (ret)
+> +			goto out_detach;
+> +
+> +		iommu->nesting_info = kzalloc(tmp.argsz, GFP_KERNEL);
+> +		if (!iommu->nesting_info) {
+> +			ret = -ENOMEM;
+> +			goto out_detach;
+> +		}
+> +
+> +		/* Now get the nesting info */
+> +		iommu->nesting_info->argsz = tmp.argsz;
+> +		ret = iommu_domain_get_attr(domain->domain,
+> +					    DOMAIN_ATTR_NESTING,
+> +					    iommu->nesting_info);
+> +		if (ret)
+> +			goto out_detach;
+> +	}
+> +
+>  	/* Get aperture info */
+>  	iommu_domain_get_attr(domain->domain, DOMAIN_ATTR_GEOMETRY, &geo);
+>  
+> @@ -2138,6 +2182,7 @@ static int vfio_iommu_type1_attach_group(void *iommu_data,
+>  	return 0;
+>  
+>  out_detach:
+> +	vfio_iommu_release_nesting_info(iommu);
+>  	vfio_iommu_detach_group(domain, group);
+>  out_domain:
+>  	iommu_domain_free(domain->domain);
+> @@ -2338,6 +2383,8 @@ static void vfio_iommu_type1_detach_group(void *iommu_data,
+>  					vfio_iommu_unmap_unpin_all(iommu);
+>  				else
+>  					vfio_iommu_unmap_unpin_reaccount(iommu);
+> +
+> +				vfio_iommu_release_nesting_info(iommu);
+>  			}
+>  			iommu_domain_free(domain->domain);
+>  			list_del(&domain->next);
+> @@ -2546,6 +2593,39 @@ static int vfio_iommu_migration_build_caps(struct vfio_iommu *iommu,
+>  	return vfio_info_add_capability(caps, &cap_mig.header, sizeof(cap_mig));
+>  }
+>  
+> +static int vfio_iommu_add_nesting_cap(struct vfio_iommu *iommu,
+> +				      struct vfio_info_cap *caps)
+> +{
+> +	struct vfio_info_cap_header *header;
+> +	struct vfio_iommu_type1_info_cap_nesting *nesting_cap;
+> +	size_t size;
+> +
+> +	/* when nesting_info is null, no need go further */
+> +	if (!iommu->nesting_info)
+> +		return 0;
+> +
+> +	/* when @format of nesting_info is 0, fail the call */
+> +	if (iommu->nesting_info->format == 0)
+> +		return -ENOENT;
+> +
+> +	size = offsetof(struct vfio_iommu_type1_info_cap_nesting, info) +
+> +	       iommu->nesting_info->argsz;
+> +
+> +	header = vfio_info_cap_add(caps, size,
+> +				   VFIO_IOMMU_TYPE1_INFO_CAP_NESTING, 1);
+> +	if (IS_ERR(header))
+> +		return PTR_ERR(header);
+> +
+> +	nesting_cap = container_of(header,
+> +				   struct vfio_iommu_type1_info_cap_nesting,
+> +				   header);
+> +
+> +	memcpy(&nesting_cap->info, iommu->nesting_info,
+> +	       iommu->nesting_info->argsz);
+> +
+> +	return 0;
+> +}
+> +
+>  static int vfio_iommu_type1_get_info(struct vfio_iommu *iommu,
+>  				     unsigned long arg)
+>  {
+> @@ -2581,6 +2661,8 @@ static int vfio_iommu_type1_get_info(struct vfio_iommu *iommu,
+>  	if (!ret)
+>  		ret = vfio_iommu_iova_build_caps(iommu, &caps);
+>  
+> +	ret = vfio_iommu_add_nesting_cap(iommu, &caps);
+> +
+>  	mutex_unlock(&iommu->lock);
+>  
+>  	if (ret)
+> diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
+> index 9204705..0cf3d6d 100644
+> --- a/include/uapi/linux/vfio.h
+> +++ b/include/uapi/linux/vfio.h
+> @@ -14,6 +14,7 @@
+>  
+>  #include <linux/types.h>
+>  #include <linux/ioctl.h>
+> +#include <linux/iommu.h>
+>  
+>  #define VFIO_API_VERSION	0
+>  
+> @@ -1039,6 +1040,24 @@ struct vfio_iommu_type1_info_cap_migration {
+>  	__u64	max_dirty_bitmap_size;		/* in bytes */
+>  };
+>  
+> +/*
+> + * The nesting capability allows to report the related capability
+> + * and info for nesting iommu type.
+> + *
+> + * The structures below define version 1 of this capability.
+> + *
+> + * Userspace selected VFIO_TYPE1_NESTING_IOMMU type should check
+> + * this capability to get supported features.
+> + *
+> + * @info: the nesting info provided by IOMMU driver.
+> + */
+> +#define VFIO_IOMMU_TYPE1_INFO_CAP_NESTING  3
+> +
+> +struct vfio_iommu_type1_info_cap_nesting {
+> +	struct	vfio_info_cap_header header;
+> +	struct iommu_nesting_info info;
+> +};
+> +
+>  #define VFIO_IOMMU_GET_INFO _IO(VFIO_TYPE, VFIO_BASE + 12)
+>  
+>  /**
 
