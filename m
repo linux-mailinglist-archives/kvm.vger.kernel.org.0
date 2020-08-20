@@ -2,42 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 702FB24B587
-	for <lists+kvm@lfdr.de>; Thu, 20 Aug 2020 12:25:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4FCA824B681
+	for <lists+kvm@lfdr.de>; Thu, 20 Aug 2020 12:36:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731309AbgHTKY5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 20 Aug 2020 06:24:57 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:29302 "EHLO
+        id S1731588AbgHTKfs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 20 Aug 2020 06:35:48 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:23721 "EHLO
         us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1731709AbgHTKXS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 20 Aug 2020 06:23:18 -0400
+        with ESMTP id S1727863AbgHTKSl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 20 Aug 2020 06:18:41 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1597918996;
+        s=mimecast20190719; t=1597918714;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=6DrPsxamb6fxr2VuGH8LdCoENsK+kekbSzDauKSHHQ8=;
-        b=HQ7f8rs7wzleapYUPDA9hC9Rd4iiOdfybA+jJa1+Wd1UrSeH9p767PpTmrdc244dQw9DzE
-        XFUvcPfyI5Ch5fjzGisMDx+9ohKyv9Q7TeiE4BOeSmrZsghL3UTdw1Og2MfmZukp/R32kB
-        MAV5FGewuMrGOhUY3LIdusTu40A+eac=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-441-DH713AW0OcaxK4khNv7WLw-1; Thu, 20 Aug 2020 06:23:15 -0400
-X-MC-Unique: DH713AW0OcaxK4khNv7WLw-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5DC8D100746D;
-        Thu, 20 Aug 2020 10:23:13 +0000 (UTC)
-Received: from starship (unknown [10.35.206.173])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id D1930101417C;
-        Thu, 20 Aug 2020 10:23:09 +0000 (UTC)
-Message-ID: <2b8faaead6f7744dc10b4701bd1583a2b494d4f4.camel@redhat.com>
-Subject: Re: [PATCH 2/8] KVM: nSVM: rename nested 'vmcb' to vmcb_gpa in few
- places
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
+        bh=Ks6Vmm7jkQp97PF98e15DQTqLGcM4ICVk2CkEB67KBg=;
+        b=DoxlEh7UIMQKyS7uMYVKXK75YTxHksvQT5LhuS6lXW4hKY/7N/NCUhRdKgyFv3/vScY8cP
+        s4ycKOHUOr0hNwLuk7HJXoiip7H4TbZ2Ci1KJFqjHsSXCwjZK8vGEig8+o5nsnPh/6QFUF
+        cqeNb5ZDd9YOXZvaTHrESZ6RjFNsfW4=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-349-Y3148KjFPtShyDzkcQVpAQ-1; Thu, 20 Aug 2020 06:18:32 -0400
+X-MC-Unique: Y3148KjFPtShyDzkcQVpAQ-1
+Received: by mail-wm1-f72.google.com with SMTP id p23so797723wmc.2
+        for <kvm@vger.kernel.org>; Thu, 20 Aug 2020 03:18:32 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=Ks6Vmm7jkQp97PF98e15DQTqLGcM4ICVk2CkEB67KBg=;
+        b=F0dJozvaJjoUfKEhZIxgi8YoBSovMsL5oVjqDNz/K6SztlCMgClWHwrPXrzQHoqkeH
+         IDiloiOPYuu5iRqcwF8DA54gTO4j44jY+pyxnqQAZfsqAbCWGTWKB8ztG2b9RC3PRUcD
+         2uvrhHXU0sa8f6uYkzOYaK9d4SuRvz87i1ABPBFKl2tLpDTLA0Dn0Dp+rKdo/9HH+wns
+         8I0WKvlbr/+uh8Bx376PJYP78qd9SZBk+KY90mfEf8+2ccbsPv2nr+l2P+PRNoZn3mHG
+         5sZCYwKU3PKxF1CEMZMKHqMVyZbgRPphqKr2rEKPR7UBrPMzBV48GnanOhFYjAc8VRks
+         GNDA==
+X-Gm-Message-State: AOAM530ng4objlvtP1DQF4Mcj5We9ZyW20ZcJUIwQSzThXoL8wg7MIry
+        Z9YzOPzF12iLnV7GBJeSPVKYcNiubcVtyaDx1p1fMtq1YR+0OhlZGgrl4KgF8OlBATDj2KQr4vD
+        8npH46m40Sr4d
+X-Received: by 2002:a1c:de41:: with SMTP id v62mr2939602wmg.163.1597918711332;
+        Thu, 20 Aug 2020 03:18:31 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwbot6hubXE5I5zNDOSnTrvtsfmtrg53QJyDVNw19vVjiZS7ReblTt/IIGb0cMLxSkI2HCmCw==
+X-Received: by 2002:a1c:de41:: with SMTP id v62mr2939573wmg.163.1597918711112;
+        Thu, 20 Aug 2020 03:18:31 -0700 (PDT)
+Received: from [192.168.10.150] ([93.56.170.5])
+        by smtp.gmail.com with ESMTPSA id m14sm3267389wrx.76.2020.08.20.03.18.30
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 20 Aug 2020 03:18:30 -0700 (PDT)
+Subject: Re: [PATCH 8/8] KVM: nSVM: read only changed fields of the nested
+ guest data area
+To:     Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org
 Cc:     Jim Mattson <jmattson@google.com>, Joerg Roedel <joro@8bytes.org>,
         Borislav Petkov <bp@alien8.de>,
         Thomas Gleixner <tglx@linutronix.de>,
@@ -49,49 +65,48 @@ Cc:     Jim Mattson <jmattson@google.com>, Joerg Roedel <joro@8bytes.org>,
         Ingo Molnar <mingo@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Sean Christopherson <sean.j.christopherson@intel.com>
-Date:   Thu, 20 Aug 2020 13:23:07 +0300
-In-Reply-To: <2e8185af-08fc-18c3-c1ca-fa1f7d4665dd@redhat.com>
 References: <20200820091327.197807-1-mlevitsk@redhat.com>
-         <20200820091327.197807-3-mlevitsk@redhat.com>
-         <f6bf9494-f337-2e53-6e6c-e0b8a847ec8d@redhat.com>
-         <608fe03082dc5e4db142afe3c0eb5f7c165f342b.camel@redhat.com>
-         <2e8185af-08fc-18c3-c1ca-fa1f7d4665dd@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.3 (3.36.3-1.fc32) 
+ <20200820091327.197807-9-mlevitsk@redhat.com>
+ <53afbfba-427e-72f5-73a6-faea7606e78e@redhat.com>
+ <33166884f54569ab47cc17a4c3e01f9dbc96401a.camel@redhat.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <be88aaae-c776-32d2-fa69-00c6aace787d@redhat.com>
+Date:   Thu, 20 Aug 2020 12:18:28 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.9.0
 MIME-Version: 1.0
+In-Reply-To: <33166884f54569ab47cc17a4c3e01f9dbc96401a.camel@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 2020-08-20 at 12:19 +0200, Paolo Bonzini wrote:
-> On 20/08/20 12:00, Maxim Levitsky wrote:
-> > > Please use vmcb12_gpa, and svm->nested.vmcb12 for the VMCB in patch 6.
-> > > 
-> > > (You probably also what to have local variables named vmcb12 in patch 6
-> > > to avoid too-long lines).
-> > The limit was raised to 100 chars recently, thats why I allowed some lines to
-> > go over 80 characters to avoid adding too much noise.
-> > 
+On 20/08/20 12:05, Maxim Levitsky wrote:
+>> You probably should set clean to 0 also if the guest doesn't have the
+>> VMCBCLEAN feature (so, you first need an extra patch to add the
+>> VMCBCLEAN feature to cpufeatures.h).  It's probably best to cache the
+>> guest vmcbclean in struct vcpu_svm, too.
+> Right, I totally forgot about this one.
 > 
-> True, but having svm->nested.vmcb12->control repeated all over isn't
-> pretty. :)
-I fully agree that adding local variable is a good idea anyway.
+> One thing why I made this patch optional, is that I can instead drop it,
+> and not 'read back' the saved area on vmexit, this will probably be faster
+> that what this optimization does. What do you think? Is this patch worth it?
+> (I submitted it because I already implemented this and wanted to hear opinion
+> on this).
 
-I was just noting that svm->nested.vmcb is already about the nested
-(e.g vmcb12) thus I was thinking that naming this field vmcb12 would be
-redundant and not accepted this way.
+Yeah, good point.  It's one copy either way, either on vmexit (and
+partly on vmentry depending on clean bits) or on vmentry.  I had not
+considered the need to copy from vmcb02 to the cached vmcb12 on vmexit. :(
 
-Best regards,
-	Maxim Levitsky
+Let's shelve this for a bit, and revisit it once we have separate vmcb01
+and vmcb02.  Then we might still use the clean bits to avoid copying
+data from vmcb12 to vmcb02, including avoiding consistency checks
+because we know the vmcb02 data is legit.
 
-> 
-> Since you're going to touch all lines anyway, adding the local variable
-> is a good idea.
-> 
-> Paolo
-> 
+Patches 1-5 are still worthwhile, so you can clean them up and send them.
 
+Paolo
 
