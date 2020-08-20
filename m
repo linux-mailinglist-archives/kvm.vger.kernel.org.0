@@ -2,102 +2,133 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 70E6F24C788
-	for <lists+kvm@lfdr.de>; Fri, 21 Aug 2020 00:04:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EF58C24C7C1
+	for <lists+kvm@lfdr.de>; Fri, 21 Aug 2020 00:29:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727112AbgHTWEQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 20 Aug 2020 18:04:16 -0400
-Received: from smtp-fw-2101.amazon.com ([72.21.196.25]:1983 "EHLO
-        smtp-fw-2101.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726792AbgHTWEO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 20 Aug 2020 18:04:14 -0400
+        id S1728140AbgHTW3L (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 20 Aug 2020 18:29:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36382 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726666AbgHTW3J (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 20 Aug 2020 18:29:09 -0400
+Received: from mail-oi1-x242.google.com (mail-oi1-x242.google.com [IPv6:2607:f8b0:4864:20::242])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2E25FC061385
+        for <kvm@vger.kernel.org>; Thu, 20 Aug 2020 15:29:08 -0700 (PDT)
+Received: by mail-oi1-x242.google.com with SMTP id l204so3315346oib.3
+        for <kvm@vger.kernel.org>; Thu, 20 Aug 2020 15:29:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1597961055; x=1629497055;
-  h=subject:to:cc:references:from:message-id:date:
-   mime-version:in-reply-to:content-transfer-encoding;
-  bh=pw24Zr42cZmLKRsD+2aFYQavUtybjHRIEYdQYd41bB0=;
-  b=HoiFzrfUefLQbChK5uh/OrBvHhVA460iRsklum7x0DdKMvlUbXSH1iu2
-   rB68RLMFwayazwDBFy5QQJs9pEeSNVmt/KHC/mZp9e0is7NC56GzOPA8/
-   C9ZsmvTCPsOco7lXLvo8JkoZNegsi25WgfPEDmTSxCA9WLIMZ0WIJtjD9
-   Y=;
-X-IronPort-AV: E=Sophos;i="5.76,334,1592870400"; 
-   d="scan'208";a="48915141"
-Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO email-inbound-relay-1d-5dd976cd.us-east-1.amazon.com) ([10.43.8.2])
-  by smtp-border-fw-out-2101.iad2.amazon.com with ESMTP; 20 Aug 2020 22:04:14 +0000
-Received: from EX13MTAUWC001.ant.amazon.com (iad55-ws-svc-p15-lb9-vlan2.iad.amazon.com [10.40.159.162])
-        by email-inbound-relay-1d-5dd976cd.us-east-1.amazon.com (Postfix) with ESMTPS id 2CA9BA2014;
-        Thu, 20 Aug 2020 22:04:13 +0000 (UTC)
-Received: from EX13D20UWC001.ant.amazon.com (10.43.162.244) by
- EX13MTAUWC001.ant.amazon.com (10.43.162.135) with Microsoft SMTP Server (TLS)
- id 15.0.1497.2; Thu, 20 Aug 2020 22:04:12 +0000
-Received: from 38f9d3867b82.ant.amazon.com (10.43.160.229) by
- EX13D20UWC001.ant.amazon.com (10.43.162.244) with Microsoft SMTP Server (TLS)
- id 15.0.1497.2; Thu, 20 Aug 2020 22:04:11 +0000
-Subject: Re: [PATCH v3 07/12] KVM: x86: Ensure the MSR bitmap never clears
- userspace tracked MSRs
-To:     Aaron Lewis <aaronlewis@google.com>
-CC:     Jim Mattson <jmattson@google.com>, kvm list <kvm@vger.kernel.org>
-References: <20200818211533.849501-1-aaronlewis@google.com>
- <20200818211533.849501-8-aaronlewis@google.com>
- <522d8a2f-8047-32f6-a329-c9ace7bf3693@amazon.com>
- <CAAAPnDFEKOQjTKcmkFjP6hr6dgmR-61NL_W9=7Fs0THdOOJ7+Q@mail.gmail.com>
-From:   Alexander Graf <graf@amazon.com>
-Message-ID: <d75a3862-d4f4-e057-5d45-9edcb3f9b696@amazon.com>
-Date:   Fri, 21 Aug 2020 00:04:09 +0200
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:68.0)
- Gecko/20100101 Thunderbird/68.11.0
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=ZbJOUvrr39DetrYaNu8Aw1l2Kc1EsYm0qqTkYiF+RSo=;
+        b=Hci9tzMkgpaQuMlJUp4nYpZIfjvAvpqgcTFkVPGOowL4s/Dp4Y+zsFMDfKIHQKQr6w
+         BYc6r1UWA2pUZaMx7UJHBii6uVyEqD9Nq2qJSlXTxOFkJo80PhV/TAyKEKlkQ7vsG81s
+         0AW2X5fECPIDYTL4WCtN4rCQQwE/QgG/gYAquXDvveK1Pd3UN6hxB536gbphKKUeXYPl
+         8Z2BZ/FATbuZ50CPT99Zx/h76UyrMN71rMjiPC/FrBwndZd8M0SOc9wC26Cx3irqW7GI
+         2BPoVgCHfuqXyENu2ITfnl1Vlw8wGEf0lCeegVJVUSQW8fLd5O6rrLiwX4jqtP5J+M/I
+         RhpQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=ZbJOUvrr39DetrYaNu8Aw1l2Kc1EsYm0qqTkYiF+RSo=;
+        b=G2nTBO5mP7VaayZ+zgl7GnfDsm3PrytnTq/GG8+hH2UWbvEm5OECTvugf3v13lS9fO
+         VPNyLzK4sZMWw6155TJyaPqNqnSnyK0edF+NDykMkKg5eb5VPBfXJR6gN/5L7agnDrJY
+         sV+TwGCcbyjsU7kuVYF3ONRZ5XlI+joEf1/sFDRgoeMndiIRHIjqBlSvp3gUz+LaS6kG
+         fSvtFyLOXXfc8f8667/fOYmfbjzBHA245R581NpGlziobxIAIHzLtPEju+zuy/P/0FUH
+         GyBD3gaW5pllxUS0Z9+Wz92XptnFYnB/SRuiLW3YSTUtfzZO/LgiBLEz6r26BrPIOXD7
+         KZJw==
+X-Gm-Message-State: AOAM531TqZdNOIzn9mbWqhNbXZswYg69bqp9By4GK4/GQVvyaBrkHRF8
+        wkT9UPMGkyu2EVQxG8w+Eo6HVpkqJBNVr23Dd6A6wQ==
+X-Google-Smtp-Source: ABdhPJznspehsQ9XINRb2DinTqmDlgR+ebrK8fz4JZp0gfn35JVCSsp6iME6moNsRLZt2vYVSESkMFc5K74ezzZf7i0=
+X-Received: by 2002:aca:670b:: with SMTP id z11mr80750oix.6.1597962547012;
+ Thu, 20 Aug 2020 15:29:07 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <CAAAPnDFEKOQjTKcmkFjP6hr6dgmR-61NL_W9=7Fs0THdOOJ7+Q@mail.gmail.com>
-Content-Language: en-US
-X-Originating-IP: [10.43.160.229]
-X-ClientProxiedBy: EX13D19UWA001.ant.amazon.com (10.43.160.169) To
- EX13D20UWC001.ant.amazon.com (10.43.162.244)
-Content-Type: text/plain; charset="utf-8"; format="flowed"
-Content-Transfer-Encoding: base64
+References: <20200818211533.849501-1-aaronlewis@google.com>
+ <20200818211533.849501-5-aaronlewis@google.com> <b8bbbd5d-9411-407d-7757-f31e1ee54ae2@amazon.com>
+ <CALMp9eT5_zq52kzQjSM2gK=oQ1UMFNZhNgK0px=Y2FLzxHxqhA@mail.gmail.com> <c9ea8956-69e1-ae28-888a-06f230a84a53@amazon.com>
+In-Reply-To: <c9ea8956-69e1-ae28-888a-06f230a84a53@amazon.com>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Thu, 20 Aug 2020 15:28:55 -0700
+Message-ID: <CALMp9eQ0xSQi3UsnZDDtQj-A9FiNZZ9SmDmuK5cJ5uXhYB5Y7w@mail.gmail.com>
+Subject: Re: [PATCH v3 04/12] KVM: x86: Add ioctl for accepting a userspace
+ provided MSR list
+To:     Alexander Graf <graf@amazon.com>
+Cc:     Aaron Lewis <aaronlewis@google.com>,
+        Peter Shier <pshier@google.com>,
+        Oliver Upton <oupton@google.com>,
+        kvm list <kvm@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-CgpPbiAyMC4wOC4yMCAwMjoxOCwgQWFyb24gTGV3aXMgd3JvdGU6Cj4gCj4gT24gV2VkLCBBdWcg
-MTksIDIwMjAgYXQgODoyNiBBTSBBbGV4YW5kZXIgR3JhZiA8Z3JhZkBhbWF6b24uY29tPiB3cm90
-ZToKPj4KPj4KPj4KPj4gT24gMTguMDguMjAgMjM6MTUsIEFhcm9uIExld2lzIHdyb3RlOgo+Pj4K
-Pj4+IFNETSB2b2x1bWUgMzogMjQuNi45ICJNU1ItQml0bWFwIEFkZHJlc3MiIGFuZCBBUE0gdm9s
-dW1lIDI6IDE1LjExICJNUwo+Pj4gaW50ZXJjZXB0cyIgZGVzY3JpYmUgTVNSIHBlcm1pc3Npb24g
-Yml0bWFwcy4gIFBlcm1pc3Npb24gYml0bWFwcyBhcmUKPj4+IHVzZWQgdG8gY29udHJvbCB3aGV0
-aGVyIGFuIGV4ZWN1dGlvbiBvZiByZG1zciBvciB3cm1zciB3aWxsIGNhdXNlIGEKPj4+IHZtIGV4
-aXQuICBGb3IgdXNlcnNwYWNlIHRyYWNrZWQgTVNScyBpdCBpcyByZXF1aXJlZCB0aGV5IGNhdXNl
-IGEgdm0KPj4+IGV4aXQsIHNvIHRoZSBob3N0IGlzIGFibGUgdG8gZm9yd2FyZCB0aGUgTVNSIHRv
-IHVzZXJzcGFjZS4gIFRoaXMgY2hhbmdlCj4+PiBhZGRzIHZteC9zdm0gc3VwcG9ydCB0byBlbnN1
-cmUgdGhlIHBlcm1pc3Npb24gYml0bWFwIGlzIHByb3Blcmx5IHNldCB0bwo+Pj4gY2F1c2UgYSB2
-bV9leGl0IHRvIHRoZSBob3N0IHdoZW4gcmRtc3Igb3Igd3Jtc3IgaXMgdXNlZCBieSBvbmUgb2Yg
-dGhlCj4+PiB1c2Vyc3BhY2UgdHJhY2tlZCBNU1JzLiAgQWxzbywgdG8gYXZvaWQgcmVwZWF0ZWRs
-eSBzZXR0aW5nIHRoZW0sCj4+PiBrdm1fbWFrZV9yZXF1ZXN0KCkgaXMgdXNlZCB0byBjb2FsZXNj
-ZSB0aGVzZSBpbnRvIGEgc2luZ2xlIGNhbGwuCj4+Pgo+Pj4gU2lnbmVkLW9mZi1ieTogQWFyb24g
-TGV3aXMgPGFhcm9ubGV3aXNAZ29vZ2xlLmNvbT4KPj4+IFJldmlld2VkLWJ5OiBPbGl2ZXIgVXB0
-b24gPG91cHRvbkBnb29nbGUuY29tPgo+Pgo+PiBUaGlzIGlzIGluY29tcGxldGUsIGFzIGl0IGRv
-ZXNuJ3QgY292ZXIgYWxsIG9mIHRoZSB4MmFwaWMgcmVnaXN0ZXJzLgo+PiBUaGVyZSBhcmUgYWxz
-byBhIGZldyBNU1JzIHRoYXQgSUlSQyBhcmUgaGFuZGxlZCBkaWZmZXJlbnRseSBmcm9tIHRoaXMK
-Pj4gbG9naWMsIHN1Y2ggYXMgRUZFUi4KPj4KPj4gSSdtIHJlYWxseSBjdXJpb3VzIGlmIHRoaXMg
-aXMgd29ydGggdGhlIGVmZm9ydD8gSSB3b3VsZCBiZSBpbmNsaW5lZCB0bwo+PiBzYXkgdGhhdCBN
-U1JzIHRoYXQgS1ZNIGhhcyBkaXJlY3QgYWNjZXNzIGZvciBuZWVkIHNwZWNpYWwgaGFuZGxpbmcg
-b25lCj4+IHdheSBvciBhbm90aGVyLgo+Pgo+IAo+IENhbiB5b3UgcGxlYXNlIGVsYWJvcmF0ZSBv
-biB0aGlzPyAgSXQgd2FzIG15IHVuZGVyc3RhbmRpbmcgdGhhdCB0aGUKPiBwZXJtaXNzaW9uIGJp
-dG1hcCBjb3ZlcnMgdGhlIHgyYXBpYyByZWdpc3RlcnMuICBBbHNvLCBJ4oCZbSBub3Qgc3VyZSBo
-b3cKClNvIHgyYXBpYyBNU1IgcGFzc3Rocm91Z2ggaXMgY29uZmlndXJlZCBzcGVjaWFsbHk6Cgog
-Cmh0dHBzOi8vZ2l0Lmtlcm5lbC5vcmcvcHViL3NjbS9saW51eC9rZXJuZWwvZ2l0L3RvcnZhbGRz
-L2xpbnV4LmdpdC90cmVlL2FyY2gveDg2L2t2bS92bXgvdm14LmMjbjM3OTYKCmFuZCBJIHRoaW5r
-IG5vdCBoYW5kbGVkIGJ5IHRoaXMgcGF0Y2g/Cgo+IEVGRVIgaXMgaGFuZGxlZCBkaWZmZXJlbnRs
-eSwgYnV0IEkgc2VlIHRoZXJlIGlzIGEgc2VwYXJhdGUKPiBjb252ZXJzYXRpb24gb24gdGhhdC4K
-CkVGRVIgaXMgYSByZWFsbHkgc3BlY2lhbCBiZWFzdCBpbiBWVC4KCj4gVGhpcyBlZmZvcnQgZG9l
-cyBzZWVtIHdvcnRod2hpbGUgYXMgaXQgZW5zdXJlcyB1c2Vyc3BhY2UgaXMgYWJsZSB0bwo+IG1h
-bmFnZSB0aGUgTVNScyBpdCBpcyByZXF1ZXN0aW5nLCBhbmQgd2lsbCByZW1haW4gdGhhdCB3YXkg
-aW4gdGhlCj4gZnV0dXJlLgoKSSBjb3VsZG4ndCBzZWUgd2h5IGFueSBvZiB0aGUgcGFzc3Rocm91
-Z2ggTVNScyBhcmUgcmVsZXZhbnQgdG8gdXNlciAKc3BhY2UsIGJ1dCBJIHRlbmQgdG8gYWdyZWUg
-dGhhdCBpdCBtYWtlcyBldmVyeXRoaW5nIG1vcmUgY29uc2lzdGVudC4KCgpBbGV4CgoKCkFtYXpv
-biBEZXZlbG9wbWVudCBDZW50ZXIgR2VybWFueSBHbWJICktyYXVzZW5zdHIuIDM4CjEwMTE3IEJl
-cmxpbgpHZXNjaGFlZnRzZnVlaHJ1bmc6IENocmlzdGlhbiBTY2hsYWVnZXIsIEpvbmF0aGFuIFdl
-aXNzCkVpbmdldHJhZ2VuIGFtIEFtdHNnZXJpY2h0IENoYXJsb3R0ZW5idXJnIHVudGVyIEhSQiAx
-NDkxNzMgQgpTaXR6OiBCZXJsaW4KVXN0LUlEOiBERSAyODkgMjM3IDg3OQoKCg==
+On Thu, Aug 20, 2020 at 2:49 PM Alexander Graf <graf@amazon.com> wrote:
 
+> The only real downside I can see is that we just wasted ~8kb of RAM.
+> Nothing I would really get hung up on though.
+
+I also suspect that the MSR permission bitmap modifications are going
+to be a bit more expensive with 4kb (6kb on AMD) of pertinent
+allow-bitmaps than they would be with a few bytes of pertinent
+deny-bitmaps.
+
+> If you really desperately believe a deny list is a better fit for your
+> use case, we could redesign the interface differently:
+>
+> struct msr_set_accesslist {
+> #define MSR_ACCESSLIST_DEFAULT_ALLOW 0
+> #define MSR_ACCESSLIST_DEFAULT_DENY  1
+>      u32 flags;
+>      struct {
+>          u32 flags;
+>          u32 nmsrs; /* MSRs in bitmap */
+>          u32 base; /* first MSR address to bitmap */
+>          void *bitmap; /* pointer to bitmap, 1 means allow, 0 deny */
+>      } lists[10];
+> };
+>
+> which means in your use case, you can do
+>
+> u64 deny = 0;
+> struct msr_set_accesslist access = {
+>      .flags = MSR_ACCESSLIST_DEFAULT_ALLOW,
+>      .lists = {
+>          {
+>              .nmsrs = 1,
+>              .base = IA32_ARCH_CAPABILITIES,
+>              .bitmap = &deny,
+>          }, {
+>          {
+>              .nmsrs = 1,
+>              .base = HV_X64_MSR_REFERENCE_TSC,
+>              .bitmap = &deny,
+>          }, {
+>          {
+>              .nmsrs = 1,
+>              /* can probably be combined with the ones below? */
+>              .base = MSR_GOOGLE_TRUE_TIME,
+>              .bitmap = &deny,
+>          }, {
+>          {
+>              .nmsrs = 1,
+>              .base = MSR_GOOGLE_FDR_TRACE,
+>              .bitmap = &deny,
+>          }, {
+>          {
+>              .nmsrs = 1,
+>              .base = MSR_GOOGLE_HBI,
+>              .bitmap = &deny,
+>          },
+>      }
+> };
+>
+> msr_set_accesslist(kvm_fd, &access);
+>
+> while I can do the same dance as before, but with a single call rather
+> than multiple ones.
+>
+> What do you think?
+
+I like it. I think this suits our use case well.
