@@ -2,308 +2,96 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 06E1424BEE4
-	for <lists+kvm@lfdr.de>; Thu, 20 Aug 2020 15:35:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 92A2E24C009
+	for <lists+kvm@lfdr.de>; Thu, 20 Aug 2020 16:06:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729128AbgHTNen (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 20 Aug 2020 09:34:43 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:40722 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1729995AbgHTNeT (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 20 Aug 2020 09:34:19 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1597930456;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=8VU4qgZe11B9Uppa4qqmNI/wjTXLTZepIN/QKYu7cww=;
-        b=ZvRtjb6NA9NwtwatiVsg4MIxIiwwJoS1n9iHxI5ZZ1w9tpKapGckbNt+/sGjIjujOdAxrk
-        xDCJbr87MzF6H6GarnxOSFjqOwjjpsMXso0U4hMl46WXM4l1lW8Z6re3Wqk7G7ejCdqsjT
-        4pRutqlE2PSGE6sWoag7xeUnFg7iQKc=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-399-7pE37AvlOres1Y53hcCR_A-1; Thu, 20 Aug 2020 09:34:13 -0400
-X-MC-Unique: 7pE37AvlOres1Y53hcCR_A-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7021418BFEC1;
-        Thu, 20 Aug 2020 13:34:11 +0000 (UTC)
-Received: from localhost.localdomain (unknown [10.35.206.173])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 0BDB816E21;
-        Thu, 20 Aug 2020 13:34:07 +0000 (UTC)
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     kvm@vger.kernel.org
-Cc:     x86@kernel.org (maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)),
-        Jim Mattson <jmattson@google.com>,
-        Ingo Molnar <mingo@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        linux-kernel@vger.kernel.org (open list:X86 ARCHITECTURE (32-BIT AND
-        64-BIT)), "H. Peter Anvin" <hpa@zytor.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>
-Subject: [PATCH v2 7/7] KVM: nSVM: implement ondemand allocation of the nested state
-Date:   Thu, 20 Aug 2020 16:33:39 +0300
-Message-Id: <20200820133339.372823-8-mlevitsk@redhat.com>
-In-Reply-To: <20200820133339.372823-1-mlevitsk@redhat.com>
-References: <20200820133339.372823-1-mlevitsk@redhat.com>
+        id S1728023AbgHTOGe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 20 Aug 2020 10:06:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42520 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727868AbgHTOAy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 20 Aug 2020 10:00:54 -0400
+Received: from mail-oi1-x243.google.com (mail-oi1-x243.google.com [IPv6:2607:f8b0:4864:20::243])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 27EECC061385
+        for <kvm@vger.kernel.org>; Thu, 20 Aug 2020 07:00:54 -0700 (PDT)
+Received: by mail-oi1-x243.google.com with SMTP id a24so1928419oia.6
+        for <kvm@vger.kernel.org>; Thu, 20 Aug 2020 07:00:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:reply-to:from:date:message-id:subject:to;
+        bh=YyCJJVppVowTxkE+zlT+lHTZu0h5h64AtApwEArmpFs=;
+        b=OjeIJ/+WMDcS5SCcyCxBg3JqOTjxegpIMl5EmE5wWj4IquRsu/FVWQ9p1/fE5shZxk
+         T+57swwFpNPVXZ0BjEOdfup4M+zeY4NDsfh/SxSWJrcQyqOF8/B0E1m+8kvDVpsTn2vX
+         V+dLmcs1t6vGnUnjaM36kPp0zCKewScJW7V/0JcUdtlM6V6wN6qxDiRFbNERxLsxH2UQ
+         VYZkS7WQ+n5U18C7Kla83mNhafTsPBuSJwLcvopJ1mHGHr1JVYFGvXUUjHlYaVG2VTGE
+         //89If4sg8o2QxpYxq+S3aoJOo8f4Rjp989ExV5Z7Ujq8hoMIRJ9lt9rvWYK7dHpQGbK
+         JOJQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:reply-to:from:date:message-id
+         :subject:to;
+        bh=YyCJJVppVowTxkE+zlT+lHTZu0h5h64AtApwEArmpFs=;
+        b=s3pqO7pTCYIk7nALBlzaS0IV9JMU73Z06GUd9iCXST+iwwIPZSWuZo4v6e5oA2mIs+
+         ES9Mnug5RhXVI9zwzp8wrmi7R+6b+ov/bMx7ILNlsmSNViCjN1kKwyMLn5csmKUfMJgX
+         XKlgG+6Dh+ePfZSo6KgJ0XmKclOZlzXVAsA6/en9TBMQbTDJksRwlwppWQqvuMl81Bbz
+         jPMf+1qMISWq91bI+/sSHabSty6fAD6DKVKP0m8xeghlxcCI2UhmQ9Q5aUTaV48H4im6
+         uRGw+u3A+2qNPiOYfrAqFhQ/JZ4s/TiRzS/oYoXVgJ3uU33Nh5Nj5r6UtbaGZo8E6v7g
+         st4w==
+X-Gm-Message-State: AOAM532jofXsvZMS+w4kyNPr9P+mppQjzrpBgx1HXHD4/gSSrpAMiWro
+        R7g2sbDxEyWnPwhzgnIbtgteadB5xbXsq9v9pmw=
+X-Google-Smtp-Source: ABdhPJzymFE/0mnZKCIDpI1QOSTljiX0U6oVAZFLaRizDe5LbsQFGtDY1jonr2LR8O99YAe7Gb+FERtJw2kSSLSPA0w=
+X-Received: by 2002:a54:4195:: with SMTP id 21mr1678155oiy.64.1597932053458;
+ Thu, 20 Aug 2020 07:00:53 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+Received: by 2002:a4a:d254:0:0:0:0:0 with HTTP; Thu, 20 Aug 2020 07:00:52
+ -0700 (PDT)
+Reply-To: kone.compaore20@gmail.com
+From:   Kone Compaore <gblaisecompaore@gmail.com>
+Date:   Thu, 20 Aug 2020 07:00:52 -0700
+Message-ID: <CAH5Hv75MFKyxr9zxdnVjiXD=3=VyGVV7Zne7pmKo4A64PA5W5Q@mail.gmail.com>
+Subject: Greetings from Kone
+To:     undisclosed-recipients:;
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This way we don't waste memory on VMs which don't enable
-nesting virtualization
+Greetings to you and your family.
 
-Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
----
- arch/x86/kvm/svm/nested.c | 43 ++++++++++++++++++++++++++++++
- arch/x86/kvm/svm/svm.c    | 56 +++++++++++++++++++++------------------
- arch/x86/kvm/svm/svm.h    |  6 +++++
- 3 files changed, 79 insertions(+), 26 deletions(-)
+My name is Mr. Kone Compaore, the auditing general with the bank,
+Africa Develop bank (ADB) Ouagadougou, Burkina Faso, in West Africa. I
+am contacting you to seek our honesty and sincere cooperation in
+confidential manner to transfer the sum of 10.5 (Ten million five
+hundred thousand Dollars) to your existing or new bank account.
 
-diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
-index f5b17920a2ca..c7c7df58ef38 100644
---- a/arch/x86/kvm/svm/nested.c
-+++ b/arch/x86/kvm/svm/nested.c
-@@ -473,6 +473,9 @@ int nested_svm_vmrun(struct vcpu_svm *svm)
- 
- 	nested_vmcb = map.hva;
- 
-+	if (WARN_ON(!svm->nested.initialized))
-+		return 1;
-+
- 	if (!nested_vmcb_checks(svm, nested_vmcb)) {
- 		nested_vmcb->control.exit_code    = SVM_EXIT_ERR;
- 		nested_vmcb->control.exit_code_hi = 0;
-@@ -686,6 +689,46 @@ int nested_svm_vmexit(struct vcpu_svm *svm)
- 	return 0;
- }
- 
-+int svm_allocate_nested(struct vcpu_svm *svm)
-+{
-+	struct page *hsave_page;
-+
-+	if (svm->nested.initialized)
-+		return 0;
-+
-+	hsave_page = alloc_page(GFP_KERNEL_ACCOUNT);
-+	if (!hsave_page)
-+		goto free_page1;
-+
-+	svm->nested.hsave = page_address(hsave_page);
-+	clear_page(svm->nested.hsave);
-+
-+	svm->nested.msrpm = svm_vcpu_alloc_msrpm();
-+	if (!svm->nested.msrpm)
-+		goto free_page2;
-+
-+	svm->nested.initialized = true;
-+	return 0;
-+free_page2:
-+	__free_page(hsave_page);
-+free_page1:
-+	return 1;
-+}
-+
-+void svm_free_nested(struct vcpu_svm *svm)
-+{
-+	if (!svm->nested.initialized)
-+		return;
-+
-+	svm_vcpu_free_msrpm(svm->nested.msrpm);
-+	svm->nested.msrpm = NULL;
-+
-+	__free_page(virt_to_page(svm->nested.hsave));
-+	svm->nested.hsave = NULL;
-+
-+	svm->nested.initialized = false;
-+}
-+
- /*
-  * Forcibly leave nested mode in order to be able to reset the VCPU later on.
-  */
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index 2ac13420055d..fdd41053c42b 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -266,6 +266,7 @@ static int get_max_npt_level(void)
- int svm_set_efer(struct kvm_vcpu *vcpu, u64 efer)
- {
- 	struct vcpu_svm *svm = to_svm(vcpu);
-+	u64 old_efer = vcpu->arch.efer;
- 	vcpu->arch.efer = efer;
- 
- 	if (!npt_enabled) {
-@@ -276,14 +277,31 @@ int svm_set_efer(struct kvm_vcpu *vcpu, u64 efer)
- 			efer &= ~EFER_LME;
- 	}
- 
--	if (!(efer & EFER_SVME)) {
--		svm_leave_nested(svm);
--		svm_set_gif(svm, true);
-+	if ((old_efer & EFER_SVME) != (efer & EFER_SVME)) {
-+		if (!(efer & EFER_SVME)) {
-+			svm_leave_nested(svm);
-+			svm_set_gif(svm, true);
-+
-+			/*
-+			 * Free the nested state unless we are in SMM, in which
-+			 * case the exit from SVM mode is only for duration of the SMI
-+			 * handler
-+			 */
-+			if (!is_smm(&svm->vcpu))
-+				svm_free_nested(svm);
-+
-+		} else {
-+			if (svm_allocate_nested(svm))
-+				goto error;
-+		}
- 	}
- 
- 	svm->vmcb->save.efer = efer | EFER_SVME;
- 	vmcb_mark_dirty(svm->vmcb, VMCB_CR);
- 	return 0;
-+error:
-+	vcpu->arch.efer = old_efer;
-+	return 1;
- }
- 
- static int is_external_interrupt(u32 info)
-@@ -610,7 +628,7 @@ static void set_msr_interception(u32 *msrpm, unsigned msr,
- 	msrpm[offset] = tmp;
- }
- 
--static u32 *svm_vcpu_alloc_msrpm(void)
-+u32 *svm_vcpu_alloc_msrpm(void)
- {
- 	int i;
- 	u32 *msrpm;
-@@ -630,7 +648,7 @@ static u32 *svm_vcpu_alloc_msrpm(void)
- 	return msrpm;
- }
- 
--static void svm_vcpu_free_msrpm(u32 *msrpm)
-+void svm_vcpu_free_msrpm(u32 *msrpm)
- {
- 	__free_pages(virt_to_page(msrpm), MSRPM_ALLOC_ORDER);
- }
-@@ -1184,7 +1202,6 @@ static int svm_create_vcpu(struct kvm_vcpu *vcpu)
- {
- 	struct vcpu_svm *svm;
- 	struct page *vmcb_page;
--	struct page *hsave_page;
- 	int err;
- 
- 	BUILD_BUG_ON(offsetof(struct vcpu_svm, vcpu) != 0);
-@@ -1195,13 +1212,9 @@ static int svm_create_vcpu(struct kvm_vcpu *vcpu)
- 	if (!vmcb_page)
- 		goto out;
- 
--	hsave_page = alloc_page(GFP_KERNEL_ACCOUNT);
--	if (!hsave_page)
--		goto free_page1;
--
- 	err = avic_init_vcpu(svm);
- 	if (err)
--		goto free_page2;
-+		goto out;
- 
- 	/* We initialize this flag to true to make sure that the is_running
- 	 * bit would be set the first time the vcpu is loaded.
-@@ -1209,16 +1222,9 @@ static int svm_create_vcpu(struct kvm_vcpu *vcpu)
- 	if (irqchip_in_kernel(vcpu->kvm) && kvm_apicv_activated(vcpu->kvm))
- 		svm->avic_is_running = true;
- 
--	svm->nested.hsave = page_address(hsave_page);
--	clear_page(svm->nested.hsave);
--
- 	svm->msrpm = svm_vcpu_alloc_msrpm();
- 	if (!svm->msrpm)
--		goto free_page2;
--
--	svm->nested.msrpm = svm_vcpu_alloc_msrpm();
--	if (!svm->nested.msrpm)
--		goto free_page3;
-+		goto free_page;
- 
- 	svm->vmcb = page_address(vmcb_page);
- 	clear_page(svm->vmcb);
-@@ -1231,11 +1237,7 @@ static int svm_create_vcpu(struct kvm_vcpu *vcpu)
- 
- 	return 0;
- 
--free_page3:
--	svm_vcpu_free_msrpm(svm->msrpm);
--free_page2:
--	__free_page(hsave_page);
--free_page1:
-+free_page:
- 	__free_page(vmcb_page);
- out:
- 	return err;
-@@ -1260,10 +1262,10 @@ static void svm_free_vcpu(struct kvm_vcpu *vcpu)
- 	 */
- 	svm_clear_current_vmcb(svm->vmcb);
- 
-+	svm_free_nested(svm);
-+
- 	__free_page(pfn_to_page(__sme_clr(svm->vmcb_pa) >> PAGE_SHIFT));
- 	__free_pages(virt_to_page(svm->msrpm), MSRPM_ALLOC_ORDER);
--	__free_page(virt_to_page(svm->nested.hsave));
--	__free_pages(virt_to_page(svm->nested.msrpm), MSRPM_ALLOC_ORDER);
- }
- 
- static void svm_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
-@@ -3922,6 +3924,8 @@ static int svm_pre_leave_smm(struct kvm_vcpu *vcpu, const char *smstate)
- 					 gpa_to_gfn(vmcb12_gpa), &map) == -EINVAL)
- 				return 1;
- 
-+			svm_allocate_nested(svm);
-+
- 			ret = enter_svm_guest_mode(svm, vmcb12_gpa, map.hva);
- 			kvm_vcpu_unmap(&svm->vcpu, &map, true);
- 		}
-diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
-index 468c58a91534..eae7e3a8752f 100644
---- a/arch/x86/kvm/svm/svm.h
-+++ b/arch/x86/kvm/svm/svm.h
-@@ -97,6 +97,8 @@ struct svm_nested_state {
- 
- 	/* cache for control fields of the guest */
- 	struct vmcb_control_area ctl;
-+
-+	bool initialized;
- };
- 
- struct vcpu_svm {
-@@ -349,6 +351,8 @@ static inline bool gif_set(struct vcpu_svm *svm)
- #define MSR_INVALID				0xffffffffU
- 
- u32 svm_msrpm_offset(u32 msr);
-+u32 *svm_vcpu_alloc_msrpm(void);
-+void svm_vcpu_free_msrpm(u32 *msrpm);
- int svm_set_efer(struct kvm_vcpu *vcpu, u64 efer);
- void svm_set_cr0(struct kvm_vcpu *vcpu, unsigned long cr0);
- int svm_set_cr4(struct kvm_vcpu *vcpu, unsigned long cr4);
-@@ -390,6 +394,8 @@ static inline bool nested_exit_on_nmi(struct vcpu_svm *svm)
- int enter_svm_guest_mode(struct vcpu_svm *svm, u64 vmcb_gpa,
- 			 struct vmcb *nested_vmcb);
- void svm_leave_nested(struct vcpu_svm *svm);
-+void svm_free_nested(struct vcpu_svm *svm);
-+int svm_allocate_nested(struct vcpu_svm *svm);
- int nested_svm_vmrun(struct vcpu_svm *svm);
- void nested_svm_vmloadsave(struct vmcb *from_vmcb, struct vmcb *to_vmcb);
- int nested_svm_vmexit(struct vcpu_svm *svm);
--- 
-2.26.2
+This money belongs to one of our bank client, a Libyan oil exporter
+who was working with the former Libyan government; I learn t that he
+was killed by the revolutionary forces since October 2011. Our bank is
+planning to transfer this entire fund into the government public
+treasury as unclaimed fund if nobody comes to claim the money from our
+bank after four years without account activities .
 
+We did not know each other before, but due to the fact that the
+deceased is a foreigner, the bank will welcome any claim from a
+foreigner without any suspect, that is why I decided to look for
+someone whim I can trust to come and claim the fund from our bank.
+
+I will endorse your name in the deceased client file here in my office
+which will indicate to that the deceased is your legal joint account
+business partner or family member next of kin to the deceased and
+officially the bank will transfer the fund to your bank account within
+seven working days in accordance to our banking inheritance rules and
+fund claim regulation.
+
+I will share 40% for you and 60% for me after the fund is transferred
+to your bank account, we need to act fast to complete this transaction
+within seven days. I will come to your country to collect my share
+after the fund is transferred to your bank account in your country. I
+hope that you will not disappoint me after the fund is transferred to
+your bank account in your country.
+
+Waiting for your urgent response today
+Yours sincerely
+
+Kone Compaore
