@@ -2,42 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8A8C824BA8A
-	for <lists+kvm@lfdr.de>; Thu, 20 Aug 2020 14:12:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EFE2424BA5D
+	for <lists+kvm@lfdr.de>; Thu, 20 Aug 2020 14:09:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729435AbgHTML1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 20 Aug 2020 08:11:27 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:45175 "EHLO
+        id S1729727AbgHTMF7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 20 Aug 2020 08:05:59 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:39104 "EHLO
         us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1729684AbgHTJ5u (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 20 Aug 2020 05:57:50 -0400
+        with ESMTP id S1730352AbgHTJ6s (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 20 Aug 2020 05:58:48 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1597917469;
+        s=mimecast20190719; t=1597917527;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=YoVO4gW0BRJ7HVJTZG7bVtpLlKCCH4sMRqpGZB6/kqg=;
-        b=CF6T3UjQwL/+ZJ1WJV/6RLmRabghWF1c44oRb1VWMYikHDQ90BCPTaejn1HMM7MBiWrRGt
-        gMkFFBIod5xf/KdDk18ZNxd/3qawvftujruSfb3DRk44eOo6iTrh80Mnz01f6IAR4uS01r
-        37aTrjHpVP7OrCeYooY3TL3ySTeLD1o=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-219-JbrHxTMeO-Cw-DjQMoCjVQ-1; Thu, 20 Aug 2020 05:57:47 -0400
-X-MC-Unique: JbrHxTMeO-Cw-DjQMoCjVQ-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 01C018030A3;
-        Thu, 20 Aug 2020 09:57:46 +0000 (UTC)
-Received: from starship (unknown [10.35.206.173])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 8129A5E1DD;
-        Thu, 20 Aug 2020 09:57:42 +0000 (UTC)
-Message-ID: <d09c5cff2557bb6bb2102c57860c65f673bb72f0.camel@redhat.com>
-Subject: Re: [PATCH 8/8] KVM: nSVM: read only changed fields of the nested
- guest data area
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
+        bh=t8lvvw/yYxKRmz+hdWa2YvTezmPK88L9XFePRdHjAeE=;
+        b=UFEeVnKfiyhT+nLdQ6pjJYWn2q135LQaRv+HpdQyx+3Y2N3XVARHE3hMby6shW5zvZ5/AO
+        MslKa0U4nSYbEzMDDGVY42YyZ3v43HyFhclhSFdAlW/PsfND47/fb5JRZaLqx3LutmaAIN
+        K2o4CmbsQ0ffyK7YpP62HQwxakU3Yz4=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-23-e9b3nTbcNKCwQLZQZxmQvw-1; Thu, 20 Aug 2020 05:58:45 -0400
+X-MC-Unique: e9b3nTbcNKCwQLZQZxmQvw-1
+Received: by mail-wr1-f70.google.com with SMTP id o10so468402wrs.21
+        for <kvm@vger.kernel.org>; Thu, 20 Aug 2020 02:58:44 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=t8lvvw/yYxKRmz+hdWa2YvTezmPK88L9XFePRdHjAeE=;
+        b=LKli0o9U5no3SW7xAp+GsQTmw96QKLB6cOuqae/3I2wNKYZ7rSBKeonrMDCeMcbLEY
+         KJ0X4MHQCeL0lYEJlbFfc/JaPhXC5ouuljVbJJl1xvBmFxpHDkbwJly1vXdyU54qab2T
+         ksqqwbSjAkP/r3AtcDlA0LJ3SvYNUnSZM2g6rhRBkVJT32ce5DF3dwWmbLdpyRVUVQxl
+         MaPD/A50zM8PTDjvGGZ1ZksJpiEQMDVOkd7lFsV1UM9qvVvrHyyB+KIKwx5KF9sDDyzY
+         VEdde8I3MMbN0elb7900YiXF6ylaNuNgMMObgYjhHcb7z41lSszWvN9rnQEWJVUcIp9W
+         fXAQ==
+X-Gm-Message-State: AOAM530Sr8YW8oZA+eKtbO36WewoQykeZGDFn4P8rYHEVr2opabgcZZ0
+        +J0YIRFB9wx1GPAdlyWwZQnf8mZQMFj+4sGh1ipNkJdgBBZMgnlTV1dWzi4D9zk8d+RfVvufbZg
+        Yjm96EyzIDbi9
+X-Received: by 2002:a7b:c00c:: with SMTP id c12mr2892897wmb.54.1597917524020;
+        Thu, 20 Aug 2020 02:58:44 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxQG2uYPWfBztaiUxqZyq+dbAAl1wn0Yf6pusnnn3jC/iiRZELY2R1ZcTSp/HyzwfQlSLGT+Q==
+X-Received: by 2002:a7b:c00c:: with SMTP id c12mr2892879wmb.54.1597917523784;
+        Thu, 20 Aug 2020 02:58:43 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:1cc0:4e4e:f1a9:1745? ([2001:b07:6468:f312:1cc0:4e4e:f1a9:1745])
+        by smtp.gmail.com with ESMTPSA id t14sm3517781wrg.38.2020.08.20.02.58.42
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 20 Aug 2020 02:58:43 -0700 (PDT)
+Subject: Re: [PATCH 5/8] KVM: nSVM: implement ondemand allocation of the
+ nested state
+To:     Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org
 Cc:     Jim Mattson <jmattson@google.com>, Joerg Roedel <joro@8bytes.org>,
         Borislav Petkov <bp@alien8.de>,
         Thomas Gleixner <tglx@linutronix.de>,
@@ -49,46 +65,45 @@ Cc:     Jim Mattson <jmattson@google.com>, Joerg Roedel <joro@8bytes.org>,
         Ingo Molnar <mingo@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Sean Christopherson <sean.j.christopherson@intel.com>
-Date:   Thu, 20 Aug 2020 12:57:41 +0300
-In-Reply-To: <766e669d-9b0b-aad6-b1d2-19ef77cbb791@redhat.com>
 References: <20200820091327.197807-1-mlevitsk@redhat.com>
-         <20200820091327.197807-9-mlevitsk@redhat.com>
-         <766e669d-9b0b-aad6-b1d2-19ef77cbb791@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.3 (3.36.3-1.fc32) 
+ <20200820091327.197807-6-mlevitsk@redhat.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <476eecc8-a861-203c-40f5-46707d8c0237@redhat.com>
+Date:   Thu, 20 Aug 2020 11:58:41 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.9.0
 MIME-Version: 1.0
+In-Reply-To: <20200820091327.197807-6-mlevitsk@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 2020-08-20 at 11:55 +0200, Paolo Bonzini wrote:
-> On 20/08/20 11:13, Maxim Levitsky wrote:
-> > diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-> > index 06668e0f93e7..f0bb7f622dca 100644
-> > --- a/arch/x86/kvm/svm/svm.c
-> > +++ b/arch/x86/kvm/svm/svm.c
-> > @@ -3924,7 +3924,7 @@ static int svm_pre_leave_smm(struct kvm_vcpu *vcpu, const char *smstate)
-> >  		if (kvm_vcpu_map(&svm->vcpu, gpa_to_gfn(vmcb_gpa), &map) == -EINVAL)
-> >  			return 1;
-> >  
-> > -		load_nested_vmcb(svm, map.hva, vmcb);
-> > +		load_nested_vmcb(svm, map.hva, vmcb_gpa);
-> >  		ret = enter_svm_guest_mode(svm);
-> >  
-> 
-> Wrong patch?
+On 20/08/20 11:13, Maxim Levitsky wrote:
+> @@ -3912,6 +3914,14 @@ static int svm_pre_leave_smm(struct kvm_vcpu *vcpu, const char *smstate)
+>  	vmcb_gpa = GET_SMSTATE(u64, smstate, 0x7ee0);
+>  
+>  	if (guest) {
+> +		/*
+> +		 * This can happen if SVM was not enabled prior to #SMI,
+> +		 * but guest corrupted the #SMI state and marked it as
+> +		 * enabled it there
+> +		 */
+> +		if (!svm->nested.initialized)
+> +			return 1;
+> +
+>  		if (kvm_vcpu_map(&svm->vcpu, gpa_to_gfn(vmcb_gpa), &map) == -EINVAL)
+>  			return 1;
 
-Absolutely. I reordered the refactoring patches to be at the beginning,
-and didn't test this enough.
+This can also happen if you live migrate while in SMM (EFER.SVME=0).
+You need to check for the SVME bit in the SMM state save area, and:
 
-Best regards,
-	Maxim Levitsky
+1) triple fault if it is clear
 
-> 
-> Paolo
-> 
+2) call svm_allocate_nested if it is set.
 
+Paolo
 
