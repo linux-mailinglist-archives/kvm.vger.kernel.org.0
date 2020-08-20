@@ -2,177 +2,122 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8128A24C6FF
-	for <lists+kvm@lfdr.de>; Thu, 20 Aug 2020 23:06:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AA21E24C703
+	for <lists+kvm@lfdr.de>; Thu, 20 Aug 2020 23:09:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728652AbgHTVGh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 20 Aug 2020 17:06:37 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:32013 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1728644AbgHTVGf (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 20 Aug 2020 17:06:35 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1597957593;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=rG+0Ph4uNEh5HoJiSQCxU0AdH7yPtWs/ChEMaNuJT88=;
-        b=bFX43kJrONhCsUeroo8HWhd1TDHdbgb2ZNxiRF//pwkYX4XyqVwbKZfd6Aon1IckiDS3Av
-        OiAhwF6jZXuFWtVnTXkJ6BIh+y/Tebe3EDGRBmUckLrHff2ogUSXSgur0X0A4fbjgmyqVy
-        C7vufOd4Ao1uiUhRvJRk2eG6z1ocCfI=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-216-HhsWVm-ENXCQUNs4rYgzZA-1; Thu, 20 Aug 2020 17:06:29 -0400
-X-MC-Unique: HhsWVm-ENXCQUNs4rYgzZA-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DDA09107464C;
-        Thu, 20 Aug 2020 21:06:26 +0000 (UTC)
-Received: from x1.home (ovpn-112-71.phx2.redhat.com [10.3.112.71])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id EC8685C1BD;
-        Thu, 20 Aug 2020 21:06:19 +0000 (UTC)
-Date:   Thu, 20 Aug 2020 15:06:19 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Liu Yi L <yi.l.liu@intel.com>
-Cc:     eric.auger@redhat.com, baolu.lu@linux.intel.com, joro@8bytes.org,
-        kevin.tian@intel.com, jacob.jun.pan@linux.intel.com,
-        ashok.raj@intel.com, jun.j.tian@intel.com, yi.y.sun@intel.com,
-        jean-philippe@linaro.org, peterx@redhat.com, hao.wu@intel.com,
-        stefanha@gmail.com, iommu@lists.linux-foundation.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v6 08/15] iommu: Pass domain to sva_unbind_gpasid()
-Message-ID: <20200820150619.5dc1ec7a@x1.home>
-In-Reply-To: <1595917664-33276-9-git-send-email-yi.l.liu@intel.com>
-References: <1595917664-33276-1-git-send-email-yi.l.liu@intel.com>
-        <1595917664-33276-9-git-send-email-yi.l.liu@intel.com>
-Organization: Red Hat
+        id S1728684AbgHTVJd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 20 Aug 2020 17:09:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52238 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726806AbgHTVJa (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 20 Aug 2020 17:09:30 -0400
+Received: from mail-pg1-x542.google.com (mail-pg1-x542.google.com [IPv6:2607:f8b0:4864:20::542])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4B13FC061386
+        for <kvm@vger.kernel.org>; Thu, 20 Aug 2020 14:09:30 -0700 (PDT)
+Received: by mail-pg1-x542.google.com with SMTP id j21so1724240pgi.9
+        for <kvm@vger.kernel.org>; Thu, 20 Aug 2020 14:09:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=UjiSaglQ75jI6j88glVf44Uda/sc/Nr405Wx3MU9i90=;
+        b=KFYniuhUyJt0GJ/A5NuqlGTAZAU0+V6ncRNsqE69SnlvmWq3pPM1dcbNXIRc0yOFfS
+         ntNdLnM8VpRXyXQP28VGNro2B+sblcS3igMaecVpFUisMoLpkoaihi/0QtfLnd9fSxle
+         qS3nnwfCInkPpXuf33rVOZB3rs20oebdgTRl4=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=UjiSaglQ75jI6j88glVf44Uda/sc/Nr405Wx3MU9i90=;
+        b=U7xDWm2R2z6ZRXDEHZ8/r7f3iRc4InzE/ZEq7DqUknSExLuC5Nqs8i+7x7Z4vmAg8r
+         0OVHqbTiuSAK4zUejBUjnp7uJKmyJ2vRKqEKPLzXspT9G8D/yrA7OM+6HjivQEh08gtJ
+         CtZD2MsguTa979vUU1LDGnqHium53E3r0yZ+KQG3jidwsFT5n4w6TJap55uxdebH60lJ
+         0PDH5jPGjTvMmDCJUpE7zCW2y1FSTEyhNKIfKjDzYAX3S1p2j3KBGnOIfYqf+pV1/pjq
+         4OtE2P9Zq0tzcKca1goN3hpJ8DKxl1/Vd9MCSfB3v/gvLNku3LFXPm9SF2xg6K82gbbO
+         Ry1Q==
+X-Gm-Message-State: AOAM533wnZGXvJNDyIz0mZlQs0Ldh2x3uPC8EQhJ6UmFKo1ZMX84SK6O
+        yD1l2bgUkxJLVgoHNQTF+9QHU84vsGHXvQ==
+X-Google-Smtp-Source: ABdhPJzOdlZPLpvYzaIPGI9VzyzZNO0QSe5HCusBzEZ5k6gseQIYvoR42UFn1kWQeXXeIPfqkQAIZw==
+X-Received: by 2002:a63:b51a:: with SMTP id y26mr456024pge.376.1597957769546;
+        Thu, 20 Aug 2020 14:09:29 -0700 (PDT)
+Received: from www.outflux.net (smtp.outflux.net. [198.145.64.163])
+        by smtp.gmail.com with ESMTPSA id g5sm3824348pfh.168.2020.08.20.14.09.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 20 Aug 2020 14:09:16 -0700 (PDT)
+Date:   Thu, 20 Aug 2020 14:09:15 -0700
+From:   Kees Cook <keescook@chromium.org>
+To:     Thomas Gleixner <tglx@linutronix.de>
+Cc:     Kyle Huey <me@kylehuey.com>,
+        Robert O'Callahan <rocallahan@gmail.com>,
+        LKML <linux-kernel@vger.kernel.org>,
+        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
+        linux-arch@vger.kernel.org, Will Deacon <will@kernel.org>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Keno Fischer <keno@juliacomputing.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        kvm list <kvm@vger.kernel.org>,
+        Gabriel Krisman Bertazi <krisman@collabora.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>
+Subject: Re: [REGRESSION] x86/entry: Tracer no longer has opportunity to
+ change the syscall number at entry via orig_ax
+Message-ID: <202008201404.6A0D5736@keescook>
+References: <CAP045Arc1Vdh+n2j2ELE3q7XfagLjyqXji9ZD0jqwVB-yuzq-g@mail.gmail.com>
+ <87blj6ifo8.fsf@nanos.tec.linutronix.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87blj6ifo8.fsf@nanos.tec.linutronix.de>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 27 Jul 2020 23:27:37 -0700
-Liu Yi L <yi.l.liu@intel.com> wrote:
-
-> From: Yi Sun <yi.y.sun@intel.com>
+On Wed, Aug 19, 2020 at 09:44:39PM +0200, Thomas Gleixner wrote:
+> On Wed, Aug 19 2020 at 10:14, Kyle Huey wrote:
+> > tl;dr: after 27d6b4d14f5c3ab21c4aef87dd04055a2d7adf14 ptracer
+> > modifications to orig_ax in a syscall entry trace stop are not honored
+> > and this breaks our code.
 > 
-> Current interface is good enough for SVA virtualization on an assigned
-> physical PCI device, but when it comes to mediated devices, a physical
-> device may attached with multiple aux-domains. Also, for guest unbind,
+> My fault and I have no idead why none of the silly test cases
+> noticed. Fix below.
 
-s/may/may be/
+Hmm, which were you trying? Looking just now, I see that the seccomp
+selftests were failing for all their syscall-changing tests.
 
-> the PASID to be unbind should be allocated to the VM. This check requires
-> to know the ioasid_set which is associated with the domain.
+Regardless, I can confirm both the failure and the fix.
+
+Reported-by: Kyle Huey <me@kylehuey.com>
+Tested-by: Kees Cook <keescook@chromium.org>
+Acked-by: Kees Cook <keescook@chromium.org>
+
+
+kernelci.org is *so* close to having the kernel selftests actually
+running with their builds. :)
+
+https://github.com/kernelci/kernelci-core/issues/331
+
+-Kees
+
 > 
-> So this interface needs to pass in domain info. Then the iommu driver is
-> able to know which domain will be used for the 2nd stage translation of
-> the nesting mode and also be able to do PASID ownership check. This patch
-> passes @domain per the above reason. Also, the prototype of &pasid is
-> changed frnt" to "u32" as the below link.
-
-s/frnt"/from an "int"/
- 
-> https://lore.kernel.org/kvm/27ac7880-bdd3-2891-139e-b4a7cd18420b@redhat.com/
-
-This is really confusing, the link is to Eric's comment asking that the
-conversion from (at the time) int to ioasid_t be included in the commit
-log.  The text here implies that it's pointing to some sort of
-justification for the change, which it isn't.  It just notes that it
-happened, not why it happened, with a mostly irrelevant link.
-
-> Cc: Kevin Tian <kevin.tian@intel.com>
-> CC: Jacob Pan <jacob.jun.pan@linux.intel.com>
-> Cc: Alex Williamson <alex.williamson@redhat.com>
-> Cc: Eric Auger <eric.auger@redhat.com>
-> Cc: Jean-Philippe Brucker <jean-philippe@linaro.org>
-> Cc: Joerg Roedel <joro@8bytes.org>
-> Cc: Lu Baolu <baolu.lu@linux.intel.com>
-> Reviewed-by: Eric Auger <eric.auger@redhat.com>
-> Signed-off-by: Yi Sun <yi.y.sun@intel.com>
-> Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
+> Thanks,
+> 
+>         tglx
 > ---
-> v5 -> v6:
-> *) use "u32" prototype for @pasid.
-> *) add review-by from Eric Auger.
-
-I'd probably hold off on adding Eric's R-b given the additional change
-in this version FWIW.  Thanks,
-
-Alex
- 
-> v2 -> v3:
-> *) pass in domain info only
-> *) use u32 for pasid instead of int type
-> 
-> v1 -> v2:
-> *) added in v2.
-> ---
->  drivers/iommu/intel/svm.c   | 3 ++-
->  drivers/iommu/iommu.c       | 2 +-
->  include/linux/intel-iommu.h | 3 ++-
->  include/linux/iommu.h       | 3 ++-
->  4 files changed, 7 insertions(+), 4 deletions(-)
-> 
-> diff --git a/drivers/iommu/intel/svm.c b/drivers/iommu/intel/svm.c
-> index c27d16a..c85b8d5 100644
-> --- a/drivers/iommu/intel/svm.c
-> +++ b/drivers/iommu/intel/svm.c
-> @@ -436,7 +436,8 @@ int intel_svm_bind_gpasid(struct iommu_domain *domain, struct device *dev,
->  	return ret;
+> diff --git a/kernel/entry/common.c b/kernel/entry/common.c
+> index 9852e0d62d95..fcae019158ca 100644
+> --- a/kernel/entry/common.c
+> +++ b/kernel/entry/common.c
+> @@ -65,7 +65,8 @@ static long syscall_trace_enter(struct pt_regs *regs, long syscall,
+>  
+>  	syscall_enter_audit(regs, syscall);
+>  
+> -	return ret ? : syscall;
+> +	/* The above might have changed the syscall number */
+> +	return ret ? : syscall_get_nr(current, regs);
 >  }
 >  
-> -int intel_svm_unbind_gpasid(struct device *dev, int pasid)
-> +int intel_svm_unbind_gpasid(struct iommu_domain *domain,
-> +			    struct device *dev, u32 pasid)
->  {
->  	struct intel_iommu *iommu = intel_svm_device_to_iommu(dev);
->  	struct intel_svm_dev *sdev;
-> diff --git a/drivers/iommu/iommu.c b/drivers/iommu/iommu.c
-> index 1ce2a61..bee79d7 100644
-> --- a/drivers/iommu/iommu.c
-> +++ b/drivers/iommu/iommu.c
-> @@ -2145,7 +2145,7 @@ int iommu_sva_unbind_gpasid(struct iommu_domain *domain, struct device *dev,
->  	if (unlikely(!domain->ops->sva_unbind_gpasid))
->  		return -ENODEV;
->  
-> -	return domain->ops->sva_unbind_gpasid(dev, data->hpasid);
-> +	return domain->ops->sva_unbind_gpasid(domain, dev, data->hpasid);
->  }
->  EXPORT_SYMBOL_GPL(iommu_sva_unbind_gpasid);
->  
-> diff --git a/include/linux/intel-iommu.h b/include/linux/intel-iommu.h
-> index 0d0ab32..f98146b 100644
-> --- a/include/linux/intel-iommu.h
-> +++ b/include/linux/intel-iommu.h
-> @@ -738,7 +738,8 @@ extern int intel_svm_enable_prq(struct intel_iommu *iommu);
->  extern int intel_svm_finish_prq(struct intel_iommu *iommu);
->  int intel_svm_bind_gpasid(struct iommu_domain *domain, struct device *dev,
->  			  struct iommu_gpasid_bind_data *data);
-> -int intel_svm_unbind_gpasid(struct device *dev, int pasid);
-> +int intel_svm_unbind_gpasid(struct iommu_domain *domain,
-> +			    struct device *dev, u32 pasid);
->  struct iommu_sva *intel_svm_bind(struct device *dev, struct mm_struct *mm,
->  				 void *drvdata);
->  void intel_svm_unbind(struct iommu_sva *handle);
-> diff --git a/include/linux/iommu.h b/include/linux/iommu.h
-> index b1ff702..80467fc 100644
-> --- a/include/linux/iommu.h
-> +++ b/include/linux/iommu.h
-> @@ -303,7 +303,8 @@ struct iommu_ops {
->  	int (*sva_bind_gpasid)(struct iommu_domain *domain,
->  			struct device *dev, struct iommu_gpasid_bind_data *data);
->  
-> -	int (*sva_unbind_gpasid)(struct device *dev, int pasid);
-> +	int (*sva_unbind_gpasid)(struct iommu_domain *domain,
-> +				 struct device *dev, u32 pasid);
->  
->  	int (*def_domain_type)(struct device *dev);
->  
+>  noinstr long syscall_enter_from_user_mode(struct pt_regs *regs, long syscall)
 
+-- 
+Kees Cook
