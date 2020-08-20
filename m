@@ -2,167 +2,110 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3F38324C82F
-	for <lists+kvm@lfdr.de>; Fri, 21 Aug 2020 01:06:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 73DE624C8E8
+	for <lists+kvm@lfdr.de>; Fri, 21 Aug 2020 01:59:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728586AbgHTXGk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 20 Aug 2020 19:06:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42240 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728368AbgHTXGi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 20 Aug 2020 19:06:38 -0400
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C6BD4C061385
-        for <kvm@vger.kernel.org>; Thu, 20 Aug 2020 16:06:37 -0700 (PDT)
-Received: by mail-yb1-xb49.google.com with SMTP id n19so195636ybf.0
-        for <kvm@vger.kernel.org>; Thu, 20 Aug 2020 16:06:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=sender:date:message-id:mime-version:subject:from:to:cc;
-        bh=TsA9eo6gus4tmwAOJeW6cMJwIWxsbvKQsdWBenQmfc8=;
-        b=ZVw4lRp2WPxpzwrLYPQ0zYWa9MejRcHXz4yw3Ny9ZuSw2wukA594d5J9LRW73sepsz
-         soyDdk+y5dHIFTka/pZCRhDk9DFitmVjpX8BnWSoMKwtntf5I5/LOV2FCUGBs4PzBcad
-         AGO86s3IonSfEkvL5qbfuMIJVh5z5RHNeQzAI80W/glhMzSYOLe5HPezJt52iNL30QUR
-         0gacfFjg7ElRimXFb+3FzQGdxcRCk3yEA0Zd8z6WfEhrFCmu1q1ObKTZ/BO10RV0bV7b
-         1l9ig1ZybvI6DJLVCehieMUoEjJvgzG5t7Ki0Mug03OwdvaimRYon7iTd1/DKGDNfKSl
-         //+g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:date:message-id:mime-version:subject:from
-         :to:cc;
-        bh=TsA9eo6gus4tmwAOJeW6cMJwIWxsbvKQsdWBenQmfc8=;
-        b=QMjPeTow1wMUIhW44DLnpiypwVfcaDYGnsMawhxcssLLQ221KaPQN4ovzDTAkaxdXD
-         iaQM63/GQvQV/4fMebLy4G1rKBTsHWTy3hOLAZvr3xhWsXbga6A7KDMgI2FfpLztLfJm
-         08SK8yZHCDfNRatO5Pv7m90ZRd50dD0AcmHwpg7s7ydTQ2kDa5zXqJpOIlAxXEtNRFop
-         yUlWtFuDo4dD6z+m8M5MUKezYdOhgFhhGh3LLBfSjZoeQuYK/EGVC4C1sj4pyC4vuCXD
-         VT5PzfkuWOuSMUlpR5dtBqZpvRfJn4kErtNE1RwhBFWawyI7e+/KhAS/iobucCjcRyDb
-         QktQ==
-X-Gm-Message-State: AOAM531A/ZXkXMAfmck76eJLy/K3Y4w+ZfzfrRMoXwn5aMsCEPbjZYCX
-        qG5T3esr7QzWmPZuGp5JfZ1QfKY5kXGtUwyNsQBNqS3OT2L3GvZsYOL5BVTJSltsnLQpzKlTdDo
-        FbmYu4wCRO1J4cvjUfbJldF2f1qICJYG6pG8pyl4cy4KxCqsRqO1cLaKQQw==
-X-Google-Smtp-Source: ABdhPJxApaoxhQoGQMNnAMKhy7xJ6k4Mc68ZmUsGWnOwK2JJ4w7jNisP4PMnNLJ09HJpamsMsjMnsd8cb8g=
-X-Received: from pshier-linuxworkstation.sea.corp.google.com
- ([2620:15c:100:202:a28c:fdff:fee1:c360]) (user=pshier job=sendgmr) by
- 2002:a25:d486:: with SMTP id m128mr121838ybf.188.1597964796987; Thu, 20 Aug
- 2020 16:06:36 -0700 (PDT)
-Date:   Thu, 20 Aug 2020 16:05:45 -0700
-Message-Id: <20200820230545.2411347-1-pshier@google.com>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.28.0.297.g1956fa8f8d-goog
-Subject: [PATCH v2] KVM: nVMX: Update VMCS02 when L2 PAE PDPTE updates detected
-From:   Peter Shier <pshier@google.com>
-To:     kvm@vger.kernel.org
-Cc:     pbonzini@redhat.com, Peter Shier <pshier@google.com>,
-        Jim Mattson <jmattson@google.com>
-Content-Type: text/plain; charset="UTF-8"
+        id S1727030AbgHTX7D (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 20 Aug 2020 19:59:03 -0400
+Received: from mga05.intel.com ([192.55.52.43]:1281 "EHLO mga05.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726781AbgHTX7C (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 20 Aug 2020 19:59:02 -0400
+IronPort-SDR: 1gH3P7y+0jRLpyWFHxukNsYOdnBA3vtwb9SW5V2bif97KwMIaIauZZgq3o87YxlGGOugdYm/fI
+ 2KHVCg8EV4lw==
+X-IronPort-AV: E=McAfee;i="6000,8403,9719"; a="240248220"
+X-IronPort-AV: E=Sophos;i="5.76,335,1592895600"; 
+   d="scan'208";a="240248220"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Aug 2020 16:59:02 -0700
+IronPort-SDR: RWiz/TJ/VEb3K9p6RXb1DzWDYSN04H8fJccFaxyu/TxVFHlU4BpCap3QPTgDxCba7vXJBVelql
+ OgBA7xDsRwTQ==
+X-IronPort-AV: E=Sophos;i="5.76,335,1592895600"; 
+   d="scan'208";a="472840913"
+Received: from sjchrist-ice.jf.intel.com (HELO sjchrist-ice) ([10.54.31.34])
+  by orsmga005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Aug 2020 16:59:01 -0700
+Date:   Thu, 20 Aug 2020 16:59:00 -0700
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Eric van Tassell <evantass@amd.com>
+Cc:     eric van tassell <Eric.VanTassell@amd.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "Singh, Brijesh" <Brijesh.Singh@amd.com>,
+        "Grimm, Jon" <Jon.Grimm@amd.com>, kvm@vger.kernel.org,
+        bp@alien8.de, hpa@zytor.com, mingo@redhat.com, jmattson@google.com,
+        joro@8bytes.org, pbonzini@redhat.com, tglx@linutronix.de,
+        vkuznets@redhat.com, wanpengli@tencent.com, x86@kernel.org
+Subject: Re: [Patch 2/4] KVM:SVM: Introduce set_spte_notify support
+Message-ID: <20200820235900.GA13886@sjchrist-ice>
+References: <20200724235448.106142-1-Eric.VanTassell@amd.com>
+ <20200724235448.106142-3-Eric.VanTassell@amd.com>
+ <20200731202502.GG31451@linux.intel.com>
+ <3dbf468e-2573-be5b-9160-9bb51d56882c@amd.com>
+ <20200803162730.GB3151@linux.intel.com>
+ <775a71bb-bd1d-ff34-a740-e10a88cc668c@amd.com>
+ <20200819160557.GD20459@linux.intel.com>
+ <fdead941-6dec-ec97-5eea-9461b7e5d89a@amd.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <fdead941-6dec-ec97-5eea-9461b7e5d89a@amd.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-When L2 uses PAE, L0 intercepts of L2 writes to CR0/CR3/CR4 call
-load_pdptrs to read the possibly updated PDPTEs from the guest
-physical address referenced by CR3.  It loads them into
-vcpu->arch.walk_mmu->pdptrs and sets VCPU_EXREG_PDPTR in
-vcpu->arch.regs_dirty.
+On Thu, Aug 20, 2020 at 12:05:00PM -0500, Eric van Tassell wrote:
+> 
+> 
+> On 8/19/20 11:05 AM, Sean Christopherson wrote:
+> > On Wed, Aug 19, 2020 at 11:03:48AM -0500, Eric van Tassell wrote:
+> > > 
+> > > 
+> > > On 8/3/20 11:27 AM, Sean Christopherson wrote:
+> > > > On Sun, Aug 02, 2020 at 03:53:54PM -0500, Eric van Tassell wrote:
+> > > > > 
+> > > > > On 7/31/20 3:25 PM, Sean Christopherson wrote:
+> > > > > > On Fri, Jul 24, 2020 at 06:54:46PM -0500, eric van tassell wrote:
+> > > > > > > Improve SEV guest startup time from O(n) to a constant by deferring
+> > > > > > > guest page pinning until the pages are used to satisfy nested page faults.
+> > > > > > > 
+> > > > > > > Implement the code to do the pinning (sev_get_page) and the notifier
+> > > > > > > sev_set_spte_notify().
+> > > > > > > 
+> > > > > > > Track the pinned pages with xarray so they can be released during guest
+> > > > > > > termination.
+> > > > > > 
+> > > > > > I like that SEV is trying to be a better citizen, but this is trading one
+> > > > > > hack for another.
+> > > > > > 
+> > > > > >    - KVM goes through a lot of effort to ensure page faults don't need to
+> > > > > >      allocate memory, and this throws all that effort out the window.
+> > > > > > 
+> > > > > can you elaborate on that?
+> > > > 
+> > > > mmu_topup_memory_caches() is called from the page fault handlers before
+> > > > acquiring mmu_lock to pre-allocate shadow pages, PTE list descriptors, GFN
+> > > > arrays, etc... that may be needed to handle the page fault.  This allows
+> > > > using standard GFP flags for the allocation and obviates the need for error
+> > > > handling in the consumers.
+> > > > 
+> > > 
+> > > I see what you meant. The issue that causes us to use this approach is that
+> > > we need to be able to unpin the pages when the VM exits.
+> > 
+> > Yes, but using a software available flag in the SPTE to track pinned pages
+> > should be very doable.
+> > 
+> 
+> The issue, as I understand it, is that when spte(s) get zapped/unzapped, the
+> flags are lost so we'd have to have some mechanism to, before zapping, cache
+> the pfn <-> spte mapping
 
-At the subsequent assumed reentry into L2, the mmu will call
-vmx_load_mmu_pgd which calls ept_load_pdptrs. ept_load_pdptrs sees
-VCPU_EXREG_PDPTR set in vcpu->arch.regs_dirty and loads
-VMCS02.GUEST_PDPTRn from vcpu->arch.walk_mmu->pdptrs[]. This all works
-if the L2 CRn write intercept always resumes L2.
+The issue is that code doesn't exist :-)  
 
-The resume path calls vmx_check_nested_events which checks for
-exceptions, MTF, and expired VMX preemption timers. If
-vmx_check_nested_events finds any of these conditions pending it will
-reflect the corresponding exit into L1. Live migration at this point
-would also cause a missed immediate reentry into L2.
-
-After L1 exits, vmx_vcpu_run calls vmx_register_cache_reset which
-clears VCPU_EXREG_PDPTR in vcpu->arch.regs_dirty.  When L2 next
-resumes, ept_load_pdptrs finds VCPU_EXREG_PDPTR clear in
-vcpu->arch.regs_dirty and does not load VMCS02.GUEST_PDPTRn from
-vcpu->arch.walk_mmu->pdptrs[]. prepare_vmcs02 will then load
-VMCS02.GUEST_PDPTRn from vmcs12->pdptr0/1/2/3 which contain the stale
-values stored at last L2 exit. A repro of this bug showed L2 entering
-triple fault immediately due to the bad VMCS02.GUEST_PDPTRn values.
-
-When L2 is in PAE paging mode add a call to ept_load_pdptrs before
-leaving L2. This will update VMCS02.GUEST_PDPTRn if they are dirty in
-vcpu->arch.walk_mmu->pdptrs[].
-
-Tested:
-kvm-unit-tests with new directed test: vmx_mtf_pdpte_test.
-Verified that test fails without the fix.
-
-Also ran Google internal VMM with an Ubuntu 16.04 4.4.0-83 guest running a
-custom hypervisor with a 32-bit Windows XP L2 guest using PAE. Prior to fix
-would repro readily. Ran 14 simultaneous L2s for 140 iterations with no
-failures.
-
-Signed-off-by: Peter Shier <pshier@google.com>
-Reviewed-by: Jim Mattson <jmattson@google.com>
----
-v1 -> v2:
-
-* Per Sean's suggestion removed the new x86 op and calling ept_load_pdptrs from
-  nested_vmx_vmexit
-
- arch/x86/kvm/vmx/nested.c | 7 +++++++
- arch/x86/kvm/vmx/vmx.c    | 4 ++--
- arch/x86/kvm/vmx/vmx.h    | 1 +
- 3 files changed, 10 insertions(+), 2 deletions(-)
-
-diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index 23b58c28a1c9..4d46025213e9 100644
---- a/arch/x86/kvm/vmx/nested.c
-+++ b/arch/x86/kvm/vmx/nested.c
-@@ -4404,6 +4404,13 @@ void nested_vmx_vmexit(struct kvm_vcpu *vcpu, u32 vm_exit_reason,
- 	if (kvm_check_request(KVM_REQ_TLB_FLUSH_CURRENT, vcpu))
- 		kvm_vcpu_flush_tlb_current(vcpu);
- 
-+	/*
-+	 * Ensure that the VMCS02 PDPTR fields are up-to-date before switching
-+	 * to L1.
-+	 */
-+	if (enable_ept && is_pae_paging(vcpu))
-+		vmx_ept_load_pdptrs(vcpu);
-+
- 	leave_guest_mode(vcpu);
- 
- 	if (nested_cpu_has_preemption_timer(vmcs12))
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 46ba2e03a892..19a599bebd5c 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -2971,7 +2971,7 @@ static void vmx_flush_tlb_guest(struct kvm_vcpu *vcpu)
- 	vpid_sync_context(to_vmx(vcpu)->vpid);
- }
- 
--static void ept_load_pdptrs(struct kvm_vcpu *vcpu)
-+void vmx_ept_load_pdptrs(struct kvm_vcpu *vcpu)
- {
- 	struct kvm_mmu *mmu = vcpu->arch.walk_mmu;
- 
-@@ -3114,7 +3114,7 @@ static void vmx_load_mmu_pgd(struct kvm_vcpu *vcpu, unsigned long pgd,
- 			guest_cr3 = vcpu->arch.cr3;
- 		else /* vmcs01.GUEST_CR3 is already up-to-date. */
- 			update_guest_cr3 = false;
--		ept_load_pdptrs(vcpu);
-+		vmx_ept_load_pdptrs(vcpu);
- 	} else {
- 		guest_cr3 = pgd;
- 	}
-diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
-index 26175a4759fa..a2f82127c170 100644
---- a/arch/x86/kvm/vmx/vmx.h
-+++ b/arch/x86/kvm/vmx/vmx.h
-@@ -356,7 +356,7 @@ void vmx_update_host_rsp(struct vcpu_vmx *vmx, unsigned long host_rsp);
- int vmx_find_msr_index(struct vmx_msrs *m, u32 msr);
- int vmx_handle_memory_failure(struct kvm_vcpu *vcpu, int r,
- 			      struct x86_exception *e);
-+void vmx_ept_load_pdptrs(struct kvm_vcpu *vcpu);
- 
- #define POSTED_INTR_ON  0
- #define POSTED_INTR_SN  1
--- 
+The idea is to leave the pfn in the spte itself when a pinned spte is zapped,
+and use software available bits in the spte to indicate the page is pinned
+and has zap.  When the VM is destroyed, remove all sptes and drop the page
+reference for pinned pages.
