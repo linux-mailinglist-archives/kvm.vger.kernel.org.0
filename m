@@ -2,133 +2,113 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id EF58C24C7C1
-	for <lists+kvm@lfdr.de>; Fri, 21 Aug 2020 00:29:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 634AC24C7CD
+	for <lists+kvm@lfdr.de>; Fri, 21 Aug 2020 00:36:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728140AbgHTW3L (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 20 Aug 2020 18:29:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36382 "EHLO
+        id S1728376AbgHTWf6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 20 Aug 2020 18:35:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37452 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726666AbgHTW3J (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 20 Aug 2020 18:29:09 -0400
+        with ESMTP id S1726666AbgHTWf5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 20 Aug 2020 18:35:57 -0400
 Received: from mail-oi1-x242.google.com (mail-oi1-x242.google.com [IPv6:2607:f8b0:4864:20::242])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2E25FC061385
-        for <kvm@vger.kernel.org>; Thu, 20 Aug 2020 15:29:08 -0700 (PDT)
-Received: by mail-oi1-x242.google.com with SMTP id l204so3315346oib.3
-        for <kvm@vger.kernel.org>; Thu, 20 Aug 2020 15:29:08 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 71B57C061385
+        for <kvm@vger.kernel.org>; Thu, 20 Aug 2020 15:35:57 -0700 (PDT)
+Received: by mail-oi1-x242.google.com with SMTP id h3so3279764oie.11
+        for <kvm@vger.kernel.org>; Thu, 20 Aug 2020 15:35:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=ZbJOUvrr39DetrYaNu8Aw1l2Kc1EsYm0qqTkYiF+RSo=;
-        b=Hci9tzMkgpaQuMlJUp4nYpZIfjvAvpqgcTFkVPGOowL4s/Dp4Y+zsFMDfKIHQKQr6w
-         BYc6r1UWA2pUZaMx7UJHBii6uVyEqD9Nq2qJSlXTxOFkJo80PhV/TAyKEKlkQ7vsG81s
-         0AW2X5fECPIDYTL4WCtN4rCQQwE/QgG/gYAquXDvveK1Pd3UN6hxB536gbphKKUeXYPl
-         8Z2BZ/FATbuZ50CPT99Zx/h76UyrMN71rMjiPC/FrBwndZd8M0SOc9wC26Cx3irqW7GI
-         2BPoVgCHfuqXyENu2ITfnl1Vlw8wGEf0lCeegVJVUSQW8fLd5O6rrLiwX4jqtP5J+M/I
-         RhpQ==
+         :cc:content-transfer-encoding;
+        bh=FmMIo8IyiREh96JgFipUSZ+7AJ0OSUn/XGVI1YhMu/0=;
+        b=vAncOIMujCgfELDl/4+VX+Bl7dfAI7Ht7h4Naxer2dzWlROnCr1TcDqSCzs96uWExg
+         i3gh0lloIFBcCMrh87i8hts7bgYJY+Jk7YgRrfJjNX+Ico05lsSZbrVmhrgaIG/egFem
+         60v3LmUXtVfWx7b8s9bgNR1dBOHeI5oC+h9ulE2ynaxGT+0xuXsdL/fwiVYjXOhxnn8l
+         PY1e/oL8dJwWFRbL5hPN57h/wEPxYoVFJTxjtCIzpyKziKHY1QQwK/nI8AKgj4ii6iE/
+         fSuoikTcHbLzTJLre8BbT8Bq242mLf7pv67vPAUEGVS2jm1K38oZkwS7M5zY+2k0OR/0
+         6cHA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=ZbJOUvrr39DetrYaNu8Aw1l2Kc1EsYm0qqTkYiF+RSo=;
-        b=G2nTBO5mP7VaayZ+zgl7GnfDsm3PrytnTq/GG8+hH2UWbvEm5OECTvugf3v13lS9fO
-         VPNyLzK4sZMWw6155TJyaPqNqnSnyK0edF+NDykMkKg5eb5VPBfXJR6gN/5L7agnDrJY
-         sV+TwGCcbyjsU7kuVYF3ONRZ5XlI+joEf1/sFDRgoeMndiIRHIjqBlSvp3gUz+LaS6kG
-         fSvtFyLOXXfc8f8667/fOYmfbjzBHA245R581NpGlziobxIAIHzLtPEju+zuy/P/0FUH
-         GyBD3gaW5pllxUS0Z9+Wz92XptnFYnB/SRuiLW3YSTUtfzZO/LgiBLEz6r26BrPIOXD7
-         KZJw==
-X-Gm-Message-State: AOAM531TqZdNOIzn9mbWqhNbXZswYg69bqp9By4GK4/GQVvyaBrkHRF8
-        wkT9UPMGkyu2EVQxG8w+Eo6HVpkqJBNVr23Dd6A6wQ==
-X-Google-Smtp-Source: ABdhPJznspehsQ9XINRb2DinTqmDlgR+ebrK8fz4JZp0gfn35JVCSsp6iME6moNsRLZt2vYVSESkMFc5K74ezzZf7i0=
-X-Received: by 2002:aca:670b:: with SMTP id z11mr80750oix.6.1597962547012;
- Thu, 20 Aug 2020 15:29:07 -0700 (PDT)
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=FmMIo8IyiREh96JgFipUSZ+7AJ0OSUn/XGVI1YhMu/0=;
+        b=VjUDAAbQIieEps/HEMexX2QJP65ceAp1X836vlx9us10/MABuZ29Tyj9emIIY4/tWY
+         qPWsMz5r0VQPFVvyVc+QV+koLmDCDTryQhVAeG9N0ZSaLZZS+a6q7yBu+PgSCOOCSr4J
+         cjYSIuZm3XSfNCMeb9rS8rkzasP0OU0ys4uLC+lVdEMW2dWTRtukJvcrWhVTEmTBoGYX
+         eoeyxPOQui3yfD7vgnRQOF8iV8ykxcxf7TMLVq4QC6VSuz887ZrUV94nn6iSeTT+EMpK
+         ZUY1UVGERgmczV3NDmVBesBAdrX1T63N0CKDAGRHjYIf4FaxofMW7j99YLzRZn+BR9Xz
+         DgbQ==
+X-Gm-Message-State: AOAM530j5PWXa+UYC+lKTTUqRDSHU9RdJnAV984hfXDecxc3n6LFXHoy
+        PAZkWrx7EmpEmqskKf0dQ4dlfqYrTXKDJzHQ1sS0oNKs4U9joQ==
+X-Google-Smtp-Source: ABdhPJzmAWwTE2XJx1BJGYAjE68tTYAk2VUVG6fKf7spWLVQm4IQJAQQzBhpOBPzNYiAb+XiZQVifpyWiY51gRu/G14=
+X-Received: by 2002:aca:b942:: with SMTP id j63mr98265oif.28.1597962956479;
+ Thu, 20 Aug 2020 15:35:56 -0700 (PDT)
 MIME-Version: 1.0
 References: <20200818211533.849501-1-aaronlewis@google.com>
- <20200818211533.849501-5-aaronlewis@google.com> <b8bbbd5d-9411-407d-7757-f31e1ee54ae2@amazon.com>
- <CALMp9eT5_zq52kzQjSM2gK=oQ1UMFNZhNgK0px=Y2FLzxHxqhA@mail.gmail.com> <c9ea8956-69e1-ae28-888a-06f230a84a53@amazon.com>
-In-Reply-To: <c9ea8956-69e1-ae28-888a-06f230a84a53@amazon.com>
+ <20200818211533.849501-8-aaronlewis@google.com> <522d8a2f-8047-32f6-a329-c9ace7bf3693@amazon.com>
+ <CAAAPnDFEKOQjTKcmkFjP6hr6dgmR-61NL_W9=7Fs0THdOOJ7+Q@mail.gmail.com> <d75a3862-d4f4-e057-5d45-9edcb3f9b696@amazon.com>
+In-Reply-To: <d75a3862-d4f4-e057-5d45-9edcb3f9b696@amazon.com>
 From:   Jim Mattson <jmattson@google.com>
-Date:   Thu, 20 Aug 2020 15:28:55 -0700
-Message-ID: <CALMp9eQ0xSQi3UsnZDDtQj-A9FiNZZ9SmDmuK5cJ5uXhYB5Y7w@mail.gmail.com>
-Subject: Re: [PATCH v3 04/12] KVM: x86: Add ioctl for accepting a userspace
- provided MSR list
+Date:   Thu, 20 Aug 2020 15:35:45 -0700
+Message-ID: <CALMp9eRQ3FYOW08tbLJ79KJ32dD8K7djSoze9rcV0tuGbfVgLw@mail.gmail.com>
+Subject: Re: [PATCH v3 07/12] KVM: x86: Ensure the MSR bitmap never clears
+ userspace tracked MSRs
 To:     Alexander Graf <graf@amazon.com>
-Cc:     Aaron Lewis <aaronlewis@google.com>,
-        Peter Shier <pshier@google.com>,
-        Oliver Upton <oupton@google.com>,
-        kvm list <kvm@vger.kernel.org>
+Cc:     Aaron Lewis <aaronlewis@google.com>, kvm list <kvm@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Aug 20, 2020 at 2:49 PM Alexander Graf <graf@amazon.com> wrote:
+On Thu, Aug 20, 2020 at 3:04 PM Alexander Graf <graf@amazon.com> wrote:
+>
+>
+>
+> On 20.08.20 02:18, Aaron Lewis wrote:
+> >
+> > On Wed, Aug 19, 2020 at 8:26 AM Alexander Graf <graf@amazon.com> wrote:
+> >>
+> >>
+> >>
+> >> On 18.08.20 23:15, Aaron Lewis wrote:
+> >>>
+> >>> SDM volume 3: 24.6.9 "MSR-Bitmap Address" and APM volume 2: 15.11 "MS
+> >>> intercepts" describe MSR permission bitmaps.  Permission bitmaps are
+> >>> used to control whether an execution of rdmsr or wrmsr will cause a
+> >>> vm exit.  For userspace tracked MSRs it is required they cause a vm
+> >>> exit, so the host is able to forward the MSR to userspace.  This chan=
+ge
+> >>> adds vmx/svm support to ensure the permission bitmap is properly set =
+to
+> >>> cause a vm_exit to the host when rdmsr or wrmsr is used by one of the
+> >>> userspace tracked MSRs.  Also, to avoid repeatedly setting them,
+> >>> kvm_make_request() is used to coalesce these into a single call.
+> >>>
+> >>> Signed-off-by: Aaron Lewis <aaronlewis@google.com>
+> >>> Reviewed-by: Oliver Upton <oupton@google.com>
+> >>
+> >> This is incomplete, as it doesn't cover all of the x2apic registers.
+> >> There are also a few MSRs that IIRC are handled differently from this
+> >> logic, such as EFER.
+> >>
+> >> I'm really curious if this is worth the effort? I would be inclined to
+> >> say that MSRs that KVM has direct access for need special handling one
+> >> way or another.
+> >>
+> >
+> > Can you please elaborate on this?  It was my understanding that the
+> > permission bitmap covers the x2apic registers.  Also, I=E2=80=99m not s=
+ure how
+>
+> So x2apic MSR passthrough is configured specially:
+>
+>
+> https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/a=
+rch/x86/kvm/vmx/vmx.c#n3796
+>
+> and I think not handled by this patch?
 
-> The only real downside I can see is that we just wasted ~8kb of RAM.
-> Nothing I would really get hung up on though.
-
-I also suspect that the MSR permission bitmap modifications are going
-to be a bit more expensive with 4kb (6kb on AMD) of pertinent
-allow-bitmaps than they would be with a few bytes of pertinent
-deny-bitmaps.
-
-> If you really desperately believe a deny list is a better fit for your
-> use case, we could redesign the interface differently:
->
-> struct msr_set_accesslist {
-> #define MSR_ACCESSLIST_DEFAULT_ALLOW 0
-> #define MSR_ACCESSLIST_DEFAULT_DENY  1
->      u32 flags;
->      struct {
->          u32 flags;
->          u32 nmsrs; /* MSRs in bitmap */
->          u32 base; /* first MSR address to bitmap */
->          void *bitmap; /* pointer to bitmap, 1 means allow, 0 deny */
->      } lists[10];
-> };
->
-> which means in your use case, you can do
->
-> u64 deny = 0;
-> struct msr_set_accesslist access = {
->      .flags = MSR_ACCESSLIST_DEFAULT_ALLOW,
->      .lists = {
->          {
->              .nmsrs = 1,
->              .base = IA32_ARCH_CAPABILITIES,
->              .bitmap = &deny,
->          }, {
->          {
->              .nmsrs = 1,
->              .base = HV_X64_MSR_REFERENCE_TSC,
->              .bitmap = &deny,
->          }, {
->          {
->              .nmsrs = 1,
->              /* can probably be combined with the ones below? */
->              .base = MSR_GOOGLE_TRUE_TIME,
->              .bitmap = &deny,
->          }, {
->          {
->              .nmsrs = 1,
->              .base = MSR_GOOGLE_FDR_TRACE,
->              .bitmap = &deny,
->          }, {
->          {
->              .nmsrs = 1,
->              .base = MSR_GOOGLE_HBI,
->              .bitmap = &deny,
->          },
->      }
-> };
->
-> msr_set_accesslist(kvm_fd, &access);
->
-> while I can do the same dance as before, but with a single call rather
-> than multiple ones.
->
-> What do you think?
-
-I like it. I think this suits our use case well.
+By happenstance only, I think, since there is also a call there to
+vmx_disable_intercept_for_msr() for the TPR when x2APIC is enabled.
