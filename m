@@ -2,214 +2,133 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5E9CD24BB64
-	for <lists+kvm@lfdr.de>; Thu, 20 Aug 2020 14:28:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EE2DD24BCD6
+	for <lists+kvm@lfdr.de>; Thu, 20 Aug 2020 14:54:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730659AbgHTM2N (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 20 Aug 2020 08:28:13 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:48545 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1730119AbgHTM2G (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 20 Aug 2020 08:28:06 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1597926484;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=U+EKqHWsk01YkJj3wPmRDZ+g8oOUui84dZ5XwbpxkVc=;
-        b=fFGtlbpUaNsv3OlgSvEUC+K4Nns4QWWRQ+c4im4EV9t0ZmYCtr3n8IFFPbZ3bAsCcY8jhC
-        UIQVee/vrFNyOBlKFEnhaf2kw6+1USGywJpnumlng7DVizx/GTo6KH5l5XDI9dU3bbN57K
-        o0nqTDQUwjmhdCdkD56yqrTTWxd5kRE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-503-D72bZbJcN-iK6OAgEc8XzQ-1; Thu, 20 Aug 2020 08:27:59 -0400
-X-MC-Unique: D72bZbJcN-iK6OAgEc8XzQ-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        id S1730243AbgHTMxp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 20 Aug 2020 08:53:45 -0400
+Received: from mail.kernel.org ([198.145.29.99]:40958 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1729236AbgHTJnX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 20 Aug 2020 05:43:23 -0400
+Received: from willie-the-truck (236.31.169.217.in-addr.arpa [217.169.31.236])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 31B651074643;
-        Thu, 20 Aug 2020 12:27:57 +0000 (UTC)
-Received: from gondolin (ovpn-112-251.ams2.redhat.com [10.36.112.251])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 383C974E2A;
-        Thu, 20 Aug 2020 12:27:43 +0000 (UTC)
-Date:   Thu, 20 Aug 2020 14:27:40 +0200
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Jason Wang <jasowang@redhat.com>
-Cc:     Yan Zhao <yan.y.zhao@intel.com>,
+        by mail.kernel.org (Postfix) with ESMTPSA id C285F20724;
+        Thu, 20 Aug 2020 09:43:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1597916602;
+        bh=CnunxCsOvBU/gUFXe+EXz0IAGG4b1qj7pIVDUrpfZWg=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=LxUe/5zOhpUu0yX3QPQi/2NIS3QBRStNZyzIAXegfpS5FX55TPD3T3rBBxX49W404
+         pxpLHhvfzBFfEL+qweR6QBJe8n8M0SifTa+Y0PGkqpTqM1J2zqQNThqD9utBYHkaWm
+         UJ3W7NW4FCAaIbpLQhWuXnyKqLZ+xGPa//aVByaE=
+Date:   Thu, 20 Aug 2020 10:43:15 +0100
+From:   Will Deacon <will@kernel.org>
+To:     Jianyong Wu <Jianyong.Wu@arm.com>
+Cc:     "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "yangbo.lu@nxp.com" <yangbo.lu@nxp.com>,
+        "john.stultz@linaro.org" <john.stultz@linaro.org>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "sean.j.christopherson@intel.com" <sean.j.christopherson@intel.com>,
+        "maz@kernel.org" <maz@kernel.org>,
+        "richardcochran@gmail.com" <richardcochran@gmail.com>,
+        Mark Rutland <Mark.Rutland@arm.com>,
+        Suzuki Poulose <Suzuki.Poulose@arm.com>,
+        Steven Price <Steven.Price@arm.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-arm-kernel@lists.infradead.org" 
+        <linux-arm-kernel@lists.infradead.org>,
+        "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>,
         "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "libvir-list@redhat.com" <libvir-list@redhat.com>,
-        "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
-        Kirti Wankhede <kwankhede@nvidia.com>,
-        "eauger@redhat.com" <eauger@redhat.com>,
-        "xin-ran.wang@intel.com" <xin-ran.wang@intel.com>,
-        "corbet@lwn.net" <corbet@lwn.net>,
-        "openstack-discuss@lists.openstack.org" 
-        <openstack-discuss@lists.openstack.org>,
-        "shaohe.feng@intel.com" <shaohe.feng@intel.com>,
-        "kevin.tian@intel.com" <kevin.tian@intel.com>,
-        Parav Pandit <parav@mellanox.com>,
-        "jian-feng.ding@intel.com" <jian-feng.ding@intel.com>,
-        "dgilbert@redhat.com" <dgilbert@redhat.com>,
-        "zhenyuw@linux.intel.com" <zhenyuw@linux.intel.com>,
-        "hejie.xu@intel.com" <hejie.xu@intel.com>,
-        "bao.yumeng@zte.com.cn" <bao.yumeng@zte.com.cn>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Parav Pandit <parav@nvidia.com>,
-        "sm ooney@redhat.com" <smooney@redhat.com>,
-        "intel-gvt-dev@lists.freedesktop.org" 
-        <intel-gvt-dev@lists.freedesktop.org>,
-        "Daniel P. =?UTF-8?B?QmVycmFuZ8Op?=" <berrange@redhat.com>,
-        "eskultet@redhat.com" <eskultet@redhat.com>,
-        Jiri Pirko <jiri@mellanox.com>,
-        "dinechin@redhat.com" <dinechin@redhat.com>,
-        "devel@ovirt.org" <devel@ovirt.org>
-Subject: Re: [ovirt-devel] Re: device compatibility interface for live
- migration with assigned devices
-Message-ID: <20200820142740.6513884d.cohuck@redhat.com>
-In-Reply-To: <c1d580dd-5c0c-21bc-19a6-f776617d4ec2@redhat.com>
-References: <a51209fe-a8c6-941f-ff54-7be06d73bc44@redhat.com>
-        <20200818085527.GB20215@redhat.com>
-        <3a073222-dcfe-c02d-198b-29f6a507b2e1@redhat.com>
-        <20200818091628.GC20215@redhat.com>
-        <20200818113652.5d81a392.cohuck@redhat.com>
-        <BY5PR12MB4322C9D1A66C4657776A1383DC5C0@BY5PR12MB4322.namprd12.prod.outlook.com>
-        <20200819033035.GA21172@joy-OptiPlex-7040>
-        <e20812b7-994b-b7f9-2df4-a78c4d116c7f@redhat.com>
-        <20200819065951.GB21172@joy-OptiPlex-7040>
-        <d6f9a51e-80b3-44c5-2656-614b327dc080@redhat.com>
-        <20200819081338.GC21172@joy-OptiPlex-7040>
-        <c1d580dd-5c0c-21bc-19a6-f776617d4ec2@redhat.com>
-Organization: Red Hat GmbH
+        Steve Capper <Steve.Capper@arm.com>,
+        Kaly Xin <Kaly.Xin@arm.com>, Justin He <Justin.He@arm.com>,
+        Wei Chen <Wei.Chen@arm.com>, nd <nd@arm.com>
+Subject: Re: [PATCH v13 2/9] arm/arm64: KVM: Advertise KVM UID to guests via
+ SMCCC
+Message-ID: <20200820094314.GA18838@willie-the-truck>
+References: <20200619130120.40556-1-jianyong.wu@arm.com>
+ <20200619130120.40556-3-jianyong.wu@arm.com>
+ <HE1PR0802MB255577943C260898A6C686ABF4720@HE1PR0802MB2555.eurprd08.prod.outlook.com>
+ <20200727113821.GB20437@willie-the-truck>
+ <HE1PR0802MB25551F426910F76E95523383F4730@HE1PR0802MB2555.eurprd08.prod.outlook.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <HE1PR0802MB25551F426910F76E95523383F4730@HE1PR0802MB2555.eurprd08.prod.outlook.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 19 Aug 2020 17:28:38 +0800
-Jason Wang <jasowang@redhat.com> wrote:
+On Tue, Jul 28, 2020 at 01:07:14AM +0000, Jianyong Wu wrote:
+> 
+> 
+> > -----Original Message-----
+> > From: Will Deacon <will@kernel.org>
+> > Sent: Monday, July 27, 2020 7:38 PM
+> > To: Jianyong Wu <Jianyong.Wu@arm.com>
+> > Cc: netdev@vger.kernel.org; yangbo.lu@nxp.com; john.stultz@linaro.org;
+> > tglx@linutronix.de; pbonzini@redhat.com; sean.j.christopherson@intel.com;
+> > maz@kernel.org; richardcochran@gmail.com; Mark Rutland
+> > <Mark.Rutland@arm.com>; Suzuki Poulose <Suzuki.Poulose@arm.com>;
+> > Steven Price <Steven.Price@arm.com>; linux-kernel@vger.kernel.org; linux-
+> > arm-kernel@lists.infradead.org; kvmarm@lists.cs.columbia.edu;
+> > kvm@vger.kernel.org; Steve Capper <Steve.Capper@arm.com>; Kaly Xin
+> > <Kaly.Xin@arm.com>; Justin He <Justin.He@arm.com>; Wei Chen
+> > <Wei.Chen@arm.com>; nd <nd@arm.com>
+> > Subject: Re: [PATCH v13 2/9] arm/arm64: KVM: Advertise KVM UID to guests
+> > via SMCCC
+> > 
+> > On Mon, Jul 27, 2020 at 03:45:37AM +0000, Jianyong Wu wrote:
+> > > > From: Will Deacon <will@kernel.org>
+> > > >
+> > > > We can advertise ourselves to guests as KVM and provide a basic
+> > > > features bitmap for discoverability of future hypervisor services.
+> > > >
+> > > > Cc: Marc Zyngier <maz@kernel.org>
+> > > > Signed-off-by: Will Deacon <will@kernel.org>
+> > > > Signed-off-by: Jianyong Wu <jianyong.wu@arm.com>
+> > > > ---
+> > > >  arch/arm64/kvm/hypercalls.c | 29 +++++++++++++++++++----------
+> > > >  1 file changed, 19 insertions(+), 10 deletions(-)
+> > > >
+> > > > diff --git a/arch/arm64/kvm/hypercalls.c
+> > > > b/arch/arm64/kvm/hypercalls.c index 550dfa3e53cd..db6dce3d0e23
+> > > > 100644
+> > > > --- a/arch/arm64/kvm/hypercalls.c
+> > > > +++ b/arch/arm64/kvm/hypercalls.c
+> > > > @@ -12,13 +12,13 @@
+> > > >  int kvm_hvc_call_handler(struct kvm_vcpu *vcpu)  {
+> > > >  	u32 func_id = smccc_get_function(vcpu);
+> > > > -	long val = SMCCC_RET_NOT_SUPPORTED;
+> > > > +	u32 val[4] = {SMCCC_RET_NOT_SUPPORTED};
+> > >
+> > > There is a risk as this u32 value will return here and a u64 value
+> > > will be obtained in guest. For example, The val[0] is initialized as
+> > > -1 of 0xffffffff and the guest get 0xffffffff then it will be compared
+> > > with -1 of 0xffffffffffffffff Also this problem exists for the
+> > > transfer of address in u64 type. So the following assignment to "val"
+> > > should be split into two
+> > > u32 value and assign to val[0] and val[1] respectively.
+> > > WDYT?
+> > 
+> > Yes, I think you're right that this is a bug, but isn't the solution just to make
+> > that an array of 'long'?
+> > 
+> > 	long val [4];
+> > 
+> > That will sign-extend the negative error codes as required, while leaving the
+> > explicitly unsigned UID constants alone.
+> 
+> Ok, that's much better. I will fix it at next version.
+> 
+> By the way, I wonder when will you update this patch set. I see someone like me
+> adopt this patch set as code base and need rebase it every time, so expect your update.
 
-> On 2020/8/19 =E4=B8=8B=E5=8D=884:13, Yan Zhao wrote:
-> > On Wed, Aug 19, 2020 at 03:39:50PM +0800, Jason Wang wrote: =20
-> >> On 2020/8/19 =E4=B8=8B=E5=8D=882:59, Yan Zhao wrote: =20
-> >>> On Wed, Aug 19, 2020 at 02:57:34PM +0800, Jason Wang wrote: =20
-> >>>> On 2020/8/19 =E4=B8=8A=E5=8D=8811:30, Yan Zhao wrote: =20
-> >>>>> hi All,
-> >>>>> could we decide that sysfs is the interface that every VFIO vendor =
-driver
-> >>>>> needs to provide in order to support vfio live migration, otherwise=
- the
-> >>>>> userspace management tool would not list the device into the compat=
-ible
-> >>>>> list?
-> >>>>>
-> >>>>> if that's true, let's move to the standardizing of the sysfs interf=
-ace.
-> >>>>> (1) content
-> >>>>> common part: (must)
-> >>>>>       - software_version: (in major.minor.bugfix scheme) =20
-> >>>> This can not work for devices whose features can be negotiated/adver=
-tised
-> >>>> independently. (E.g virtio devices)
+I'm not working on it, so please feel free to include it along with the
+patches that add an upstream user.
 
-I thought the 'software_version' was supposed to describe kind of a
-'protocol version' for the data we transmit? I.e., you add a new field,
-you bump the version number.
-
-> >>>> =20
-> >>> sorry, I don't understand here, why virtio devices need to use vfio i=
-nterface? =20
-> >>
-> >> I don't see any reason that virtio devices can't be used by VFIO. Do y=
-ou?
-> >>
-> >> Actually, virtio devices have been used by VFIO for many years:
-> >>
-> >> - passthrough a hardware virtio devices to userspace(VM) drivers
-> >> - using virtio PMD inside guest
-> >> =20
-> > So, what's different for it vs passing through a physical hardware via =
-VFIO? =20
->=20
->=20
-> The difference is in the guest, the device could be either real hardware=
-=20
-> or emulated ones.
->=20
->=20
-> > even though the features are negotiated dynamically, could you explain
-> > why it would cause software_version not work? =20
->=20
->=20
-> Virtio device 1 supports feature A, B, C
-> Virtio device 2 supports feature B, C, D
->=20
-> So you can't migrate a guest from device 1 to device 2. And it's=20
-> impossible to model the features with versions.
-
-We're talking about the features offered by the device, right? Would it
-be sufficient to mandate that the target device supports the same
-features or a superset of the features supported by the source device?
-
->=20
->=20
-> >
-> > =20
-> >>> I think this thread is discussing about vfio related devices.
-> >>> =20
-> >>>>>       - device_api: vfio-pci or vfio-ccw ...
-> >>>>>       - type: mdev type for mdev device or
-> >>>>>               a signature for physical device which is a counterpar=
-t for
-> >>>>> 	   mdev type.
-> >>>>>
-> >>>>> device api specific part: (must)
-> >>>>>      - pci id: pci id of mdev parent device or pci id of physical p=
-ci
-> >>>>>        device (device_api is vfio-pci)API here. =20
-> >>>> So this assumes a PCI device which is probably not true.
-> >>>> =20
-> >>> for device_api of vfio-pci, why it's not true?
-> >>>
-> >>> for vfio-ccw, it's subchannel_type. =20
-> >>
-> >> Ok but having two different attributes for the same file is not good i=
-dea.
-> >> How mgmt know there will be a 3rd type? =20
-> > that's why some attributes need to be common. e.g.
-> > device_api: it's common because mgmt need to know it's a pci device or a
-> >              ccw device. and the api type is already defined vfio.h.
-> > 	    (The field is agreed by and actually suggested by Alex in previous=
- mail)
-> > type: mdev_type for mdev. if mgmt does not understand it, it would not
-> >        be able to create one compatible mdev device.
-> > software_version: mgmt can compare the major and minor if it understands
-> >        this fields. =20
->=20
->=20
-> I think it would be helpful if you can describe how mgmt is expected to=20
-> work step by step with the proposed sysfs API. This can help people to=20
-> understand.
-
-My proposal would be:
-- check that device_api matches
-- check possible device_api specific attributes
-- check that type matches [I don't think the combination of mdev types
-  and another attribute to determine compatibility is a good idea;
-  actually, the current proposal confuses me every time I look at it]
-- check that software_version is compatible, assuming semantic
-  versioning
-- check possible type-specific attributes
-
->=20
-> Thanks for the patience. Since sysfs is uABI, when accepted, we need=20
-> support it forever. That's why we need to be careful.
-
-Nod.
-
-(...)
-
+Will
