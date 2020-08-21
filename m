@@ -2,230 +2,140 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id EBBE024D7B6
-	for <lists+kvm@lfdr.de>; Fri, 21 Aug 2020 16:53:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DD4E724D8B6
+	for <lists+kvm@lfdr.de>; Fri, 21 Aug 2020 17:36:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726847AbgHUOxx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 21 Aug 2020 10:53:53 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:29621 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725828AbgHUOxw (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 21 Aug 2020 10:53:52 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1598021630;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=2+G3KHb4rQe19R7RlyzME5Iwtog78d40PK1swrnN7NE=;
-        b=YIPVxIORz7ZXjDZiZ/ZRHbZ/4MJWuVOSR4TK2CFh5j6lq7s4PS0pco8+zaI6fxl7g2S7V7
-        xFYxxR+zgmkAeyOjqsSp2ZK6iirqosKg7k7BuJafyWjgPXmeFQ41H4YBZBhym5+AWtznbu
-        hsdGoDIeGSWsSsdJrrklduo1W/Q2ynw=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-580-5OzMXm_lMzmwxIZutT_EsQ-1; Fri, 21 Aug 2020 10:53:48 -0400
-X-MC-Unique: 5OzMXm_lMzmwxIZutT_EsQ-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8BB17801AFB;
-        Fri, 21 Aug 2020 14:53:30 +0000 (UTC)
-Received: from gondolin (ovpn-113-4.ams2.redhat.com [10.36.113.4])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 293B75DE50;
-        Fri, 21 Aug 2020 14:52:58 +0000 (UTC)
-Date:   Fri, 21 Aug 2020 16:52:55 +0200
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Jason Wang <jasowang@redhat.com>
-Cc:     Yan Zhao <yan.y.zhao@intel.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "libvir-list@redhat.com" <libvir-list@redhat.com>,
-        "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
-        Kirti Wankhede <kwankhede@nvidia.com>,
-        "eauger@redhat.com" <eauger@redhat.com>,
-        "xin-ran.wang@intel.com" <xin-ran.wang@intel.com>,
-        "corbet@lwn.net" <corbet@lwn.net>,
-        "openstack-discuss@lists.openstack.org" 
-        <openstack-discuss@lists.openstack.org>,
-        "shaohe.feng@intel.com" <shaohe.feng@intel.com>,
-        "kevin.tian@intel.com" <kevin.tian@intel.com>,
-        Parav Pandit <parav@mellanox.com>,
-        "jian-feng.ding@intel.com" <jian-feng.ding@intel.com>,
-        "dgilbert@redhat.com" <dgilbert@redhat.com>,
-        "zhenyuw@linux.intel.com" <zhenyuw@linux.intel.com>,
-        "hejie.xu@intel.com" <hejie.xu@intel.com>,
-        "bao.yumeng@zte.com.cn" <bao.yumeng@zte.com.cn>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Parav Pandit <parav@nvidia.com>,
-        "sm ooney@redhat.com" <smooney@redhat.com>,
-        "intel-gvt-dev@lists.freedesktop.org" 
-        <intel-gvt-dev@lists.freedesktop.org>,
-        "Daniel P. =?UTF-8?B?QmVycmFuZ8Op?=" <berrange@redhat.com>,
-        "eskultet@redhat.com" <eskultet@redhat.com>,
-        Jiri Pirko <jiri@mellanox.com>,
-        "dinechin@redhat.com" <dinechin@redhat.com>,
-        "devel@ovirt.org" <devel@ovirt.org>
-Subject: Re: [ovirt-devel] Re: device compatibility interface for live
- migration with assigned devices
-Message-ID: <20200821165255.53e26628.cohuck@redhat.com>
-In-Reply-To: <ea0e84c5-733a-2bdb-4c1e-95fd16698ed8@redhat.com>
-References: <a51209fe-a8c6-941f-ff54-7be06d73bc44@redhat.com>
-        <20200818085527.GB20215@redhat.com>
-        <3a073222-dcfe-c02d-198b-29f6a507b2e1@redhat.com>
-        <20200818091628.GC20215@redhat.com>
-        <20200818113652.5d81a392.cohuck@redhat.com>
-        <BY5PR12MB4322C9D1A66C4657776A1383DC5C0@BY5PR12MB4322.namprd12.prod.outlook.com>
-        <20200819033035.GA21172@joy-OptiPlex-7040>
-        <e20812b7-994b-b7f9-2df4-a78c4d116c7f@redhat.com>
-        <20200819065951.GB21172@joy-OptiPlex-7040>
-        <d6f9a51e-80b3-44c5-2656-614b327dc080@redhat.com>
-        <20200819081338.GC21172@joy-OptiPlex-7040>
-        <c1d580dd-5c0c-21bc-19a6-f776617d4ec2@redhat.com>
-        <20200820142740.6513884d.cohuck@redhat.com>
-        <ea0e84c5-733a-2bdb-4c1e-95fd16698ed8@redhat.com>
-Organization: Red Hat GmbH
+        id S1728325AbgHUPgO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 21 Aug 2020 11:36:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54738 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725873AbgHUPgJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 21 Aug 2020 11:36:09 -0400
+Received: from mail-io1-xd42.google.com (mail-io1-xd42.google.com [IPv6:2607:f8b0:4864:20::d42])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9C211C061573;
+        Fri, 21 Aug 2020 08:36:09 -0700 (PDT)
+Received: by mail-io1-xd42.google.com with SMTP id g14so2145496iom.0;
+        Fri, 21 Aug 2020 08:36:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=dTsdEvmeR7/8ARBPzPDo5H4/RL/HljTYjHOoJ2D+HGk=;
+        b=oG3H/4qgY6IZeh11qQCNeaOyHtavKEMR464ybkKS9cibi3xG6UiYZmHGSxprqoeKZx
+         30qLE+paOBcBV6sGjUUx+ZmfjBIm1uFKSughgeRlfmwNpycy7r27utMOzY5z9LnVTPhg
+         MYNQFCDeltwbaRNXh3WgmACm9hLemnauKbxaK5+06YZsGuRkiX31H8W1SNLrSg7KPxKs
+         2Lg8QE5GpJ+9iznDvRuhrf7egkMRLyZyYAdRhUgg27xW+r2/BZCiurF3bUjYUeOwfIBL
+         PosLFU3dezoIHJEnGujK3dYDsEi0ulTKnMSrOBL41xPp0//84XYxMhWKjkd3RnTtMWkZ
+         ln+Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=dTsdEvmeR7/8ARBPzPDo5H4/RL/HljTYjHOoJ2D+HGk=;
+        b=G5sIOXzjbpF+p3tgjl7yS53Ab8wDuyDTEkH0SX7Ga49o8NZP7K6O4r/vUa1CSy60hq
+         coNv8LUbiuFlP5S45WXFS/MdPMK8M5cdYljarFNOIxOhzNPCk6gWMKAlcmmBUZ0ERzkT
+         xuFqCexfma3GevcgMBLGkT84f8OmOsQpwgX+JfNiwjxcx1efzFfuyheU9Oxvp5OklTOs
+         oxECqNswjUt+ItFArouHUHaHhT1s95pzfwj4ARSmTHbCxRG3HazqhBcsSwSzjYpO/xXM
+         zhHidxXax/W7sgICLC9CsIQjTTnuu2rsQdu7fjeU+kPnmccIqBKtyCNbfHCcDW+FZXpI
+         bmlg==
+X-Gm-Message-State: AOAM532FXLFxIkieijBphE9Mebg3g+vrp/kSSIjdZ3csRCDQnHhMNkCb
+        GTAO5lwJdehhHKiRxnsOkrNLjEXA4F9vXS8cpA==
+X-Google-Smtp-Source: ABdhPJw4zUY2nPRkcrI1iVgkAlff3Y8KRk0bZpGsMIrVoKZ6EshwlsivnB6CcpyYk4rmRXNlUneDcikzsDIJQXjIIao=
+X-Received: by 2002:a5d:841a:: with SMTP id i26mr2754197ion.144.1598024168875;
+ Fri, 21 Aug 2020 08:36:08 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+References: <20200821105229.18938-1-pbonzini@redhat.com> <20200821142152.GA6330@sjchrist-ice>
+In-Reply-To: <20200821142152.GA6330@sjchrist-ice>
+From:   Brian Gerst <brgerst@gmail.com>
+Date:   Fri, 21 Aug 2020 11:35:57 -0400
+Message-ID: <CAMzpN2h79bi5dd7PxjY45xYy71UdYomKa1t2gNxLtRpDkMs+Lw@mail.gmail.com>
+Subject: Re: [PATCH v2] x86/entry/64: Do not use RDPID in paranoid entry to
+ accomodate KVM
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        kvm list <kvm@vger.kernel.org>,
+        "the arch/x86 maintainers" <x86@kernel.org>,
+        Dave Hansen <dave.hansen@intel.com>,
+        Chang Seok Bae <chang.seok.bae@intel.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Sasha Levin <sashal@kernel.org>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Andy Lutomirski <luto@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 21 Aug 2020 11:14:41 +0800
-Jason Wang <jasowang@redhat.com> wrote:
+On Fri, Aug 21, 2020 at 10:22 AM Sean Christopherson
+<sean.j.christopherson@intel.com> wrote:
+>
+> On Fri, Aug 21, 2020 at 06:52:29AM -0400, Paolo Bonzini wrote:
+> > From: Sean Christopherson <sean.j.christopherson@intel.com>
+> >
+> > Don't use RDPID in the paranoid entry flow, as it can consume a KVM
+> > guest's MSR_TSC_AUX value if an NMI arrives during KVM's run loop.
+> >
+> > In general, the kernel does not need TSC_AUX because it can just use
+> > __this_cpu_read(cpu_number) to read the current processor id.  It can
+> > also just block preemption and thread migration at its will, therefore
+> > it has no need for the atomic rdtsc+vgetcpu provided by RDTSCP.  For this
+> > reason, as a performance optimization, KVM loads the guest's TSC_AUX when
+> > a CPU first enters its run loop.  On AMD's SVM, it doesn't restore the
+> > host's value until the CPU exits the run loop; VMX is even more aggressive
+> > and defers restoring the host's value until the CPU returns to userspace.
+> >
+> > This optimization obviously relies on the kernel not consuming TSC_AUX,
+> > which falls apart if an NMI arrives during the run loop and uses RDPID.
+> > Removing it would be painful, as both SVM and VMX would need to context
+> > switch the MSR on every VM-Enter (for a cost of 2x WRMSR), whereas using
+> > LSL instead RDPID is a minor blip.
+> >
+> > Both SAVE_AND_SET_GSBASE and GET_PERCPU_BASE are only used in paranoid entry,
+> > therefore the patch can just remove the RDPID alternative.
+> >
+> > Fixes: eaad981291ee3 ("x86/entry/64: Introduce the FIND_PERCPU_BASE macro")
+> > Cc: Dave Hansen <dave.hansen@intel.com>
+> > Cc: Chang Seok Bae <chang.seok.bae@intel.com>
+> > Cc: Peter Zijlstra <peterz@infradead.org>
+> > Cc: Sasha Levin <sashal@kernel.org>
+> > Cc: Paolo Bonzini <pbonzini@redhat.com>
+> > Cc: kvm@vger.kernel.org
+> > Reported-by: Tom Lendacky <thomas.lendacky@amd.com>
+> > Debugged-by: Tom Lendacky <thomas.lendacky@amd.com>
+> > Suggested-by: Andy Lutomirski <luto@kernel.org>
+> > Suggested-by: Peter Zijlstra <peterz@infradead.org>
+> > Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+> > Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> > ---
+> >  arch/x86/entry/calling.h | 10 ++++++----
+> >  1 file changed, 6 insertions(+), 4 deletions(-)
+> >
+> > diff --git a/arch/x86/entry/calling.h b/arch/x86/entry/calling.h
+> > index 98e4d8886f11..ae9b0d4615b3 100644
+> > --- a/arch/x86/entry/calling.h
+> > +++ b/arch/x86/entry/calling.h
+> > @@ -374,12 +374,14 @@ For 32-bit we have the following conventions - kernel is built with
+> >   * Fetch the per-CPU GSBASE value for this processor and put it in @reg.
+> >   * We normally use %gs for accessing per-CPU data, but we are setting up
+> >   * %gs here and obviously can not use %gs itself to access per-CPU data.
+> > + *
+> > + * Do not use RDPID, because KVM loads guest's TSC_AUX on vm-entry and
+> > + * may not restore the host's value until the CPU returns to userspace.
+> > + * Thus the kernel would consume a guest's TSC_AUX if an NMI arrives
+> > + * while running KVM's run loop.
+> >   */
+> >  .macro GET_PERCPU_BASE reg:req
+> > -     ALTERNATIVE \
+> > -             "LOAD_CPU_AND_NODE_SEG_LIMIT \reg", \
+> > -             "RDPID  \reg", \
+>
+> This was the only user of the RDPID macro, I assume we want to yank that out
+> as well?
 
-> On 2020/8/20 =E4=B8=8B=E5=8D=888:27, Cornelia Huck wrote:
-> > On Wed, 19 Aug 2020 17:28:38 +0800
-> > Jason Wang <jasowang@redhat.com> wrote:
-> > =20
-> >> On 2020/8/19 =E4=B8=8B=E5=8D=884:13, Yan Zhao wrote: =20
-> >>> On Wed, Aug 19, 2020 at 03:39:50PM +0800, Jason Wang wrote: =20
-> >>>> On 2020/8/19 =E4=B8=8B=E5=8D=882:59, Yan Zhao wrote: =20
-> >>>>> On Wed, Aug 19, 2020 at 02:57:34PM +0800, Jason Wang wrote: =20
-> >>>>>> On 2020/8/19 =E4=B8=8A=E5=8D=8811:30, Yan Zhao wrote: =20
-> >>>>>>> hi All,
-> >>>>>>> could we decide that sysfs is the interface that every VFIO vendo=
-r driver
-> >>>>>>> needs to provide in order to support vfio live migration, otherwi=
-se the
-> >>>>>>> userspace management tool would not list the device into the comp=
-atible
-> >>>>>>> list?
-> >>>>>>>
-> >>>>>>> if that's true, let's move to the standardizing of the sysfs inte=
-rface.
-> >>>>>>> (1) content
-> >>>>>>> common part: (must)
-> >>>>>>>        - software_version: (in major.minor.bugfix scheme) =20
-> >>>>>> This can not work for devices whose features can be negotiated/adv=
-ertised
-> >>>>>> independently. (E.g virtio devices) =20
-> > I thought the 'software_version' was supposed to describe kind of a
-> > 'protocol version' for the data we transmit? I.e., you add a new field,
-> > you bump the version number. =20
->=20
->=20
-> Ok, but since we mandate backward compatibility of uABI, is this really=20
-> worth to have a version for sysfs? (Searching on sysfs shows no examples=
-=20
-> like this)
+No.  That one should be kept until the minimum binutils version is
+raised to one that supports the RDPID opcode.
 
-I was not thinking about the sysfs interface, but rather about the data
-that is sent over while migrating. E.g. we find out that sending some
-auxiliary data is a good idea and bump to version 1.1.0; version 1.0.0
-cannot deal with the extra data, but version 1.1.0 can deal with the
-older data stream.
-
-(...)
-
-> >>>>>>>        - device_api: vfio-pci or vfio-ccw ...
-> >>>>>>>        - type: mdev type for mdev device or
-> >>>>>>>                a signature for physical device which is a counter=
-part for
-> >>>>>>> 	   mdev type.
-> >>>>>>>
-> >>>>>>> device api specific part: (must)
-> >>>>>>>       - pci id: pci id of mdev parent device or pci id of physica=
-l pci
-> >>>>>>>         device (device_api is vfio-pci)API here. =20
-> >>>>>> So this assumes a PCI device which is probably not true.
-> >>>>>>    =20
-> >>>>> for device_api of vfio-pci, why it's not true?
-> >>>>>
-> >>>>> for vfio-ccw, it's subchannel_type. =20
-> >>>> Ok but having two different attributes for the same file is not good=
- idea.
-> >>>> How mgmt know there will be a 3rd type? =20
-> >>> that's why some attributes need to be common. e.g.
-> >>> device_api: it's common because mgmt need to know it's a pci device o=
-r a
-> >>>               ccw device. and the api type is already defined vfio.h.
-> >>> 	    (The field is agreed by and actually suggested by Alex in previo=
-us mail)
-> >>> type: mdev_type for mdev. if mgmt does not understand it, it would not
-> >>>         be able to create one compatible mdev device.
-> >>> software_version: mgmt can compare the major and minor if it understa=
-nds
-> >>>         this fields. =20
-> >>
-> >> I think it would be helpful if you can describe how mgmt is expected to
-> >> work step by step with the proposed sysfs API. This can help people to
-> >> understand. =20
-> > My proposal would be:
-> > - check that device_api matches
-> > - check possible device_api specific attributes
-> > - check that type matches [I don't think the combination of mdev types
-> >    and another attribute to determine compatibility is a good idea; =20
->=20
->=20
-> Any reason for this? Actually if we only use mdev type to detect the=20
-> compatibility, it would be much more easier. Otherwise, we are actually=20
-> re-inventing mdev types.
->=20
-> E.g can we have the same mdev types with different device_api and other=20
-> attributes?
-
-In the end, the mdev type is represented as a string; but I'm not sure
-we can expect that two types with the same name, but a different
-device_api are related in any way.
-
-If we e.g. compare vfio-pci and vfio-ccw, they are fundamentally
-different.
-
-I was mostly concerned about the aggregation proposal, where type A +
-aggregation value b might be compatible with type B + aggregation value
-a.
-
->=20
->=20
-> >    actually, the current proposal confuses me every time I look at it]
-> > - check that software_version is compatible, assuming semantic
-> >    versioning
-> > - check possible type-specific attributes =20
->=20
->=20
-> I'm not sure if this is too complicated. And I suspect there will be=20
-> vendor specific attributes:
->=20
-> - for compatibility check: I think we should either modeling everything=20
-> via mdev type or making it totally vendor specific. Having something in=20
-> the middle will bring a lot of burden
-
-FWIW, I'm for a strict match on mdev type, and flexibility in per-type
-attributes.
-
-> - for provisioning: it's still not clear. As shown in this proposal, for=
-=20
-> NVME we may need to set remote_url, but unless there will be a subclass=20
-> (NVME) in the mdev (which I guess not), we can't prevent vendor from=20
-> using another attribute name, in this case, tricks like attributes=20
-> iteration in some sub directory won't work. So even if we had some=20
-> common API for compatibility check, the provisioning API is still vendor=
-=20
-> specific ...
-
-Yes, I'm not sure how to deal with the "same thing for different
-vendors" problem. We can try to make sure that in-kernel drivers play
-nicely, but not much more.
-
+--
+Brian Gerst
