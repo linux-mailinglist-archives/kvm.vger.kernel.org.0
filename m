@@ -2,175 +2,191 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6717524D5D0
-	for <lists+kvm@lfdr.de>; Fri, 21 Aug 2020 15:08:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 40AF524D5D3
+	for <lists+kvm@lfdr.de>; Fri, 21 Aug 2020 15:09:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728017AbgHUNIv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 21 Aug 2020 09:08:51 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:20060 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726345AbgHUNIt (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 21 Aug 2020 09:08:49 -0400
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 07LD3lYP105348;
-        Fri, 21 Aug 2020 09:08:44 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=XHpFRlBvLhzPbNUy/WcR7Iba8tVUXqJsA+kYx9ImcwQ=;
- b=EMRP2UcRsr3sZwUzXHOWWexcYGjU2w0YVHsaQkP68KAgzlTSDrRFQB5khT8JiiaQIrAS
- pEQwHETzP1EQvf2nmoNReYSShT4NJEjjD00afwBF7hv9e9SQ+NFxBT50uH0NZUnfD6E6
- 5N0m8RJGkhESMM5KwK0nMsJlLJk8lSWCNC6/GhhCShzJlWIu4R8FdjIeHAYYSGx/GXRs
- KICBhHfeSx6Z1CklvxIMMbpCNo/yPbQD7yz6bGrWv8IWFPaV3xXYNGQYqQu64rlIbW4j
- EHMJqEL5sD3gC5RpSjTjpAt9BAQ3XJi95JcG5TToHEiyEbNwMbMGdb+IqKfOMtbBenZB sg== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3328e9ay0d-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 21 Aug 2020 09:08:44 -0400
-Received: from m0098396.ppops.net (m0098396.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 07LD40OG106366;
-        Fri, 21 Aug 2020 09:08:43 -0400
-Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3328e9axxh-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 21 Aug 2020 09:08:43 -0400
-Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
-        by ppma03fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 07LD4U0d020685;
-        Fri, 21 Aug 2020 13:08:41 GMT
-Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
-        by ppma03fra.de.ibm.com with ESMTP id 3304c92pmj-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 21 Aug 2020 13:08:40 +0000
-Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
-        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 07LD8bGS61604294
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 21 Aug 2020 13:08:37 GMT
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id A7057A405D;
-        Fri, 21 Aug 2020 13:08:37 +0000 (GMT)
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 0BFC6A4055;
-        Fri, 21 Aug 2020 13:08:37 +0000 (GMT)
-Received: from oc3016276355.ibm.com (unknown [9.145.168.20])
-        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Fri, 21 Aug 2020 13:08:36 +0000 (GMT)
-Subject: Re: [PATCH v9 1/2] virtio: let arch advertise guest's memory access
- restrictions
-To:     Cornelia Huck <cohuck@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, pasic@linux.ibm.com,
-        borntraeger@de.ibm.com, frankja@linux.ibm.com, mst@redhat.com,
-        jasowang@redhat.com, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, thomas.lendacky@amd.com,
-        david@gibson.dropbear.id.au, linuxram@us.ibm.com,
-        hca@linux.ibm.com, gor@linux.ibm.com
-References: <1597854198-2871-1-git-send-email-pmorel@linux.ibm.com>
- <1597854198-2871-2-git-send-email-pmorel@linux.ibm.com>
- <20200821135906.1c6bede3.cohuck@redhat.com>
-From:   Pierre Morel <pmorel@linux.ibm.com>
-Message-ID: <91c83bba-9a75-4ed4-b682-fcdce26edd54@linux.ibm.com>
-Date:   Fri, 21 Aug 2020 15:08:36 +0200
+        id S1727839AbgHUNJs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 21 Aug 2020 09:09:48 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:24706 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726345AbgHUNJs (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 21 Aug 2020 09:09:48 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1598015385;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=Od+bO6wwGHZOpfyUe8CiRlpyX1hZ1GD4+OWd3dAX8YA=;
+        b=gg9KI9cJ2eYnFwo3olOh5V8O1ZyjI3tmwF4QAvJz685AQ8cJWGGqwi+kDKH+QYYGxTdERF
+        lhgIX33Y8RjZzpjKVNMrO5Sn7hVSy7youYVbfmQVapVVlNsxjHDRhXqktkpeIetKSakfWJ
+        o2gCRVYG21gOdB8h2WG+hQTS5JWZtHU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-350-mXq3zwf3MwmX4df6JT2Brg-1; Fri, 21 Aug 2020 09:09:44 -0400
+X-MC-Unique: mXq3zwf3MwmX4df6JT2Brg-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E550B18BA282;
+        Fri, 21 Aug 2020 13:09:41 +0000 (UTC)
+Received: from [10.36.113.93] (ovpn-113-93.ams2.redhat.com [10.36.113.93])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 8D35877DC2;
+        Fri, 21 Aug 2020 13:09:31 +0000 (UTC)
+Subject: Re: [PATCH v6 08/15] iommu: Pass domain to sva_unbind_gpasid()
+To:     Alex Williamson <alex.williamson@redhat.com>,
+        Liu Yi L <yi.l.liu@intel.com>
+Cc:     baolu.lu@linux.intel.com, joro@8bytes.org, kevin.tian@intel.com,
+        jacob.jun.pan@linux.intel.com, ashok.raj@intel.com,
+        jun.j.tian@intel.com, yi.y.sun@intel.com, jean-philippe@linaro.org,
+        peterx@redhat.com, hao.wu@intel.com, stefanha@gmail.com,
+        iommu@lists.linux-foundation.org, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <1595917664-33276-1-git-send-email-yi.l.liu@intel.com>
+ <1595917664-33276-9-git-send-email-yi.l.liu@intel.com>
+ <20200820150619.5dc1ec7a@x1.home>
+From:   Auger Eric <eric.auger@redhat.com>
+Message-ID: <7db3f15c-09e3-6a52-352a-c9a499895922@redhat.com>
+Date:   Fri, 21 Aug 2020 15:09:29 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <20200821135906.1c6bede3.cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <20200820150619.5dc1ec7a@x1.home>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
- definitions=2020-08-21_08:2020-08-21,2020-08-21 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999 spamscore=0
- malwarescore=0 mlxscore=0 lowpriorityscore=0 suspectscore=0 adultscore=0
- priorityscore=1501 impostorscore=0 phishscore=0 clxscore=1015 bulkscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
- definitions=main-2008210120
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Hi,
 
-
-On 2020-08-21 13:59, Cornelia Huck wrote:
-> On Wed, 19 Aug 2020 18:23:17 +0200
-> Pierre Morel <pmorel@linux.ibm.com> wrote:
+On 8/20/20 11:06 PM, Alex Williamson wrote:
+> On Mon, 27 Jul 2020 23:27:37 -0700
+> Liu Yi L <yi.l.liu@intel.com> wrote:
 > 
->> An architecture may restrict host access to guest memory.
-> 
-> "e.g. IBM s390 Secure Execution or AMD SEV"
-> 
-> Just to make clearer what you are referring to?
-
-yes, thanks
-
-> 
+>> From: Yi Sun <yi.y.sun@intel.com>
 >>
->> Provide a new Kconfig entry the architecture can select,
->> CONFIG_ARCH_HAS_RESTRICTED_VIRTIO_MEMORY_ACCESS, when it provides
->> the arch_has_restricted_virtio_memory_access callback to advertise
+>> Current interface is good enough for SVA virtualization on an assigned
+>> physical PCI device, but when it comes to mediated devices, a physical
+>> device may attached with multiple aux-domains. Also, for guest unbind,
 > 
-> s/advertise/advertise to/
-
-OK
-
+> s/may/may be/
 > 
->> VIRTIO common code when the architecture restricts memory access
->> from the host.
-> 
-> "The common code can then fail the probe for any device where
-> VIRTIO_F_IOMMU_PLATFORM is required, but not set."
-> 
-> ?
-
-Yes, better thanks
-
-> 
+>> the PASID to be unbind should be allocated to the VM. This check requires
+>> to know the ioasid_set which is associated with the domain.
 >>
->> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+>> So this interface needs to pass in domain info. Then the iommu driver is
+>> able to know which domain will be used for the 2nd stage translation of
+>> the nesting mode and also be able to do PASID ownership check. This patch
+>> passes @domain per the above reason. Also, the prototype of &pasid is
+>> changed frnt" to "u32" as the below link.
+> 
+> s/frnt"/from an "int"/
+>  
+>> https://lore.kernel.org/kvm/27ac7880-bdd3-2891-139e-b4a7cd18420b@redhat.com/
+> 
+> This is really confusing, the link is to Eric's comment asking that the
+> conversion from (at the time) int to ioasid_t be included in the commit
+> log.  The text here implies that it's pointing to some sort of
+> justification for the change, which it isn't.  It just notes that it
+> happened, not why it happened, with a mostly irrelevant link.
+> 
+>> Cc: Kevin Tian <kevin.tian@intel.com>
+>> CC: Jacob Pan <jacob.jun.pan@linux.intel.com>
+>> Cc: Alex Williamson <alex.williamson@redhat.com>
+>> Cc: Eric Auger <eric.auger@redhat.com>
+>> Cc: Jean-Philippe Brucker <jean-philippe@linaro.org>
+>> Cc: Joerg Roedel <joro@8bytes.org>
+>> Cc: Lu Baolu <baolu.lu@linux.intel.com>
+>> Reviewed-by: Eric Auger <eric.auger@redhat.com>
+>> Signed-off-by: Yi Sun <yi.y.sun@intel.com>
+>> Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
 >> ---
->>   drivers/virtio/Kconfig        |  6 ++++++
->>   drivers/virtio/virtio.c       | 15 +++++++++++++++
->>   include/linux/virtio_config.h |  9 +++++++++
->>   3 files changed, 30 insertions(+)
+>> v5 -> v6:
+>> *) use "u32" prototype for @pasid.
+>> *) add review-by from Eric Auger.
+> 
+> I'd probably hold off on adding Eric's R-b given the additional change
+> in this version FWIW.  Thanks,
+
+Yep I did not notice that change given the R-b was applied ;-)
+
+Thanks
+
+Eric
+> 
+> Alex
+>  
+>> v2 -> v3:
+>> *) pass in domain info only
+>> *) use u32 for pasid instead of int type
 >>
->> diff --git a/drivers/virtio/Kconfig b/drivers/virtio/Kconfig
->> index 5809e5f5b157..509f3b4d8ba1 100644
->> --- a/drivers/virtio/Kconfig
->> +++ b/drivers/virtio/Kconfig
->> @@ -6,6 +6,12 @@ config VIRTIO
->>   	  bus, such as CONFIG_VIRTIO_PCI, CONFIG_VIRTIO_MMIO, CONFIG_RPMSG
->>   	  or CONFIG_S390_GUEST.
->>   
->> +config ARCH_HAS_RESTRICTED_VIRTIO_MEMORY_ACCESS
->> +	bool
->> +	help
->> +	  This option is selected by any architecture enforcing
->> +	  VIRTIO_F_IOMMU_PLATFORM
+>> v1 -> v2:
+>> *) added in v2.
+>> ---
+>>  drivers/iommu/intel/svm.c   | 3 ++-
+>>  drivers/iommu/iommu.c       | 2 +-
+>>  include/linux/intel-iommu.h | 3 ++-
+>>  include/linux/iommu.h       | 3 ++-
+>>  4 files changed, 7 insertions(+), 4 deletions(-)
+>>
+>> diff --git a/drivers/iommu/intel/svm.c b/drivers/iommu/intel/svm.c
+>> index c27d16a..c85b8d5 100644
+>> --- a/drivers/iommu/intel/svm.c
+>> +++ b/drivers/iommu/intel/svm.c
+>> @@ -436,7 +436,8 @@ int intel_svm_bind_gpasid(struct iommu_domain *domain, struct device *dev,
+>>  	return ret;
+>>  }
+>>  
+>> -int intel_svm_unbind_gpasid(struct device *dev, int pasid)
+>> +int intel_svm_unbind_gpasid(struct iommu_domain *domain,
+>> +			    struct device *dev, u32 pasid)
+>>  {
+>>  	struct intel_iommu *iommu = intel_svm_device_to_iommu(dev);
+>>  	struct intel_svm_dev *sdev;
+>> diff --git a/drivers/iommu/iommu.c b/drivers/iommu/iommu.c
+>> index 1ce2a61..bee79d7 100644
+>> --- a/drivers/iommu/iommu.c
+>> +++ b/drivers/iommu/iommu.c
+>> @@ -2145,7 +2145,7 @@ int iommu_sva_unbind_gpasid(struct iommu_domain *domain, struct device *dev,
+>>  	if (unlikely(!domain->ops->sva_unbind_gpasid))
+>>  		return -ENODEV;
+>>  
+>> -	return domain->ops->sva_unbind_gpasid(dev, data->hpasid);
+>> +	return domain->ops->sva_unbind_gpasid(domain, dev, data->hpasid);
+>>  }
+>>  EXPORT_SYMBOL_GPL(iommu_sva_unbind_gpasid);
+>>  
+>> diff --git a/include/linux/intel-iommu.h b/include/linux/intel-iommu.h
+>> index 0d0ab32..f98146b 100644
+>> --- a/include/linux/intel-iommu.h
+>> +++ b/include/linux/intel-iommu.h
+>> @@ -738,7 +738,8 @@ extern int intel_svm_enable_prq(struct intel_iommu *iommu);
+>>  extern int intel_svm_finish_prq(struct intel_iommu *iommu);
+>>  int intel_svm_bind_gpasid(struct iommu_domain *domain, struct device *dev,
+>>  			  struct iommu_gpasid_bind_data *data);
+>> -int intel_svm_unbind_gpasid(struct device *dev, int pasid);
+>> +int intel_svm_unbind_gpasid(struct iommu_domain *domain,
+>> +			    struct device *dev, u32 pasid);
+>>  struct iommu_sva *intel_svm_bind(struct device *dev, struct mm_struct *mm,
+>>  				 void *drvdata);
+>>  void intel_svm_unbind(struct iommu_sva *handle);
+>> diff --git a/include/linux/iommu.h b/include/linux/iommu.h
+>> index b1ff702..80467fc 100644
+>> --- a/include/linux/iommu.h
+>> +++ b/include/linux/iommu.h
+>> @@ -303,7 +303,8 @@ struct iommu_ops {
+>>  	int (*sva_bind_gpasid)(struct iommu_domain *domain,
+>>  			struct device *dev, struct iommu_gpasid_bind_data *data);
+>>  
+>> -	int (*sva_unbind_gpasid)(struct device *dev, int pasid);
+>> +	int (*sva_unbind_gpasid)(struct iommu_domain *domain,
+>> +				 struct device *dev, u32 pasid);
+>>  
+>>  	int (*def_domain_type)(struct device *dev);
+>>  
 > 
-> "This option is selected if the architecture may need to enforce
-> VIRTIO_F_IOMMU_PLATFORM."
-> 
-> ?
 
-yes, better thanks
-
-> 
->> +
->>   menuconfig VIRTIO_MENU
->>   	bool "Virtio drivers"
->>   	default y
-> 
-> (...)
-> 
-> Reviewed-by: Cornelia Huck <cohuck@redhat.com>
-> 
-
-I will make the rewordings.
-
-Thanks,
-Pierre
-
--- 
-Pierre Morel
-IBM Lab Boeblingen
