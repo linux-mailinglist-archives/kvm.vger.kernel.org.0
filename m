@@ -2,124 +2,146 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9FFA024D5AF
-	for <lists+kvm@lfdr.de>; Fri, 21 Aug 2020 15:04:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5C13B24D5C8
+	for <lists+kvm@lfdr.de>; Fri, 21 Aug 2020 15:07:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728648AbgHUNEH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 21 Aug 2020 09:04:07 -0400
-Received: from mail.kernel.org ([198.145.29.99]:48594 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728550AbgHUNEC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 21 Aug 2020 09:04:02 -0400
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 9F875207BB;
-        Fri, 21 Aug 2020 13:04:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1598015041;
-        bh=DeoU78c4cCMt4c0DHxrKqY/OoGbtGgM/fQoFevJ5aMk=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=neW4qDo7Ci/DSqpkZHHrVNEafyyrQuQIkuO48DXFaDnBdYpYwAuK35iTl7G5iXM4q
-         ixA+pWThuS2zwmTkMck0XVeE/LLnQRuzKEil8W3+dA8aK/AO1JpYMNVs5E/4vDjn5F
-         S2KdxqBvkJ9bmUxfZ/F70sbUOnFCIP0ijtMxtA6Y=
-Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
-        by disco-boy.misterjones.org with esmtpsa (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
-        (Exim 4.92)
-        (envelope-from <maz@kernel.org>)
-        id 1k96i8-004rqt-7c; Fri, 21 Aug 2020 14:04:00 +0100
+        id S1727889AbgHUNHS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 21 Aug 2020 09:07:18 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:19412 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726975AbgHUNHR (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 21 Aug 2020 09:07:17 -0400
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 07LD3cod085946;
+        Fri, 21 Aug 2020 09:07:08 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=rCX53BW9XWck10T5IMGv9OVxfYJ84h/kfh43uFw0aFQ=;
+ b=rEWUNxN4NrA6aHediaUELPUNMJvgvQiDvTC6KTeQIJxnuOb6Va8ZFE0kC9/mhfm+KO1i
+ nyNI81g3sdX2xXyVa9iBJG1dRGClBHzr3pGsKl5E57DRFGQWIVZJTsQjuK7CSsRlGuot
+ NXh6VJJCbKVkmBpkx6TVffhpNBZ9r0Qp86f6mqW6wR893ZYxi9yfZzMD2L5zpSIsylxW
+ GFDDdEwJw1HG7Zp3JB1+UnXdrhcB1vfX5mBseE0cGjctQaTXdQK2jiBKJNz99vPG6xRj
+ Z3e0V6BPM6NMJML3mjFrC9i8VbEimpkRlpkUHtrnMOJkGUiKg9PtfJbYkJ4I8wP4iVoM RQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 331yc8qbt6-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 21 Aug 2020 09:07:07 -0400
+Received: from m0098393.ppops.net (m0098393.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 07LD4TUx089473;
+        Fri, 21 Aug 2020 09:07:07 -0400
+Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com [149.81.74.108])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 331yc8qbrd-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 21 Aug 2020 09:07:07 -0400
+Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
+        by ppma05fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 07LD59oq008635;
+        Fri, 21 Aug 2020 13:07:04 GMT
+Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
+        by ppma05fra.de.ibm.com with ESMTP id 3304bujpcw-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 21 Aug 2020 13:07:03 +0000
+Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
+        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 07LD5VHw459264
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 21 Aug 2020 13:05:31 GMT
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 845A9A404D;
+        Fri, 21 Aug 2020 13:07:00 +0000 (GMT)
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id DAC77A4051;
+        Fri, 21 Aug 2020 13:06:59 +0000 (GMT)
+Received: from oc3016276355.ibm.com (unknown [9.145.168.20])
+        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Fri, 21 Aug 2020 13:06:59 +0000 (GMT)
+Subject: Re: [PATCH v9 2/2] s390: virtio: PV needs VIRTIO I/O device
+ protection
+To:     Cornelia Huck <cohuck@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, pasic@linux.ibm.com,
+        borntraeger@de.ibm.com, frankja@linux.ibm.com, mst@redhat.com,
+        jasowang@redhat.com, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, thomas.lendacky@amd.com,
+        david@gibson.dropbear.id.au, linuxram@us.ibm.com,
+        hca@linux.ibm.com, gor@linux.ibm.com
+References: <1597854198-2871-1-git-send-email-pmorel@linux.ibm.com>
+ <1597854198-2871-3-git-send-email-pmorel@linux.ibm.com>
+ <20200821140510.3849410c.cohuck@redhat.com>
+From:   Pierre Morel <pmorel@linux.ibm.com>
+Message-ID: <19f742f8-8cc2-8f5a-90b0-c33e7b6a45b9@linux.ibm.com>
+Date:   Fri, 21 Aug 2020 15:06:59 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
+In-Reply-To: <20200821140510.3849410c.cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Date:   Fri, 21 Aug 2020 14:04:00 +0100
-From:   Marc Zyngier <maz@kernel.org>
-To:     Andrew Jones <drjones@redhat.com>, pbonzini@redhat.com
-Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
-        steven.price@arm.com
-Subject: Re: [PATCH v2 0/6] KVM: arm64: pvtime: Fixes and a new cap
-In-Reply-To: <20200819125026.fsbzvim74qp7sene@kamzik.brq.redhat.com>
-References: <20200804170604.42662-1-drjones@redhat.com>
- <20200819125026.fsbzvim74qp7sene@kamzik.brq.redhat.com>
-User-Agent: Roundcube Webmail/1.4.7
-Message-ID: <c09b29a336cca62f9822c59fcacb207d@kernel.org>
-X-Sender: maz@kernel.org
-X-SA-Exim-Connect-IP: 51.254.78.96
-X-SA-Exim-Rcpt-To: drjones@redhat.com, pbonzini@redhat.com, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, steven.price@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
+ definitions=2020-08-21_06:2020-08-21,2020-08-21 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 mlxlogscore=999
+ bulkscore=0 adultscore=0 clxscore=1015 spamscore=0 malwarescore=0
+ lowpriorityscore=0 suspectscore=0 impostorscore=0 phishscore=0
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2006250000 definitions=main-2008210115
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2020-08-19 13:50, Andrew Jones wrote:
-> On Tue, Aug 04, 2020 at 07:05:58PM +0200, Andrew Jones wrote:
->> v2:
->>   - ARM_SMCCC_HV_PV_TIME_FEATURES now also returns 
->> SMCCC_RET_NOT_SUPPORTED
->>     when steal time is not supported
->>   - Added READ_ONCE() for the run_delay read
->>   - Reworked kvm_put/get_guest to not require type as a parameter
->>   - Added some more text to the documentation for KVM_CAP_STEAL_TIME
->>   - Enough changed that I didn't pick up Steven's r-b's
->> 
->> 
->> The first four patches in the series are fixes that come from testing
->> and reviewing pvtime code while writing the QEMU support[*]. The last
->> patch is only a convenience for userspace, and I wouldn't be 
->> heartbroken
->> if it wasn't deemed worth it. The QEMU patches are currently written
->> without the cap. However, if the cap is accepted, then I'll change the
->> QEMU code to use it.
->> 
->> Thanks,
->> drew
->> 
->> [*] 
->> https://lists.gnu.org/archive/html/qemu-devel/2020-07/msg03856.html
->>     (a v2 of this series will also be posted shortly)
->> 
->> Andrew Jones (6):
->>   KVM: arm64: pvtime: steal-time is only supported when configured
->>   KVM: arm64: pvtime: Fix potential loss of stolen time
->>   KVM: arm64: Drop type input from kvm_put_guest
->>   KVM: arm64: pvtime: Fix stolen time accounting across migration
->>   KVM: Documentation: Minor fixups
->>   arm64/x86: KVM: Introduce steal-time cap
->> 
->>  Documentation/virt/kvm/api.rst    | 22 ++++++++++++++++++----
->>  arch/arm64/include/asm/kvm_host.h |  2 +-
->>  arch/arm64/kvm/arm.c              |  3 +++
->>  arch/arm64/kvm/pvtime.c           | 29 +++++++++++++----------------
->>  arch/x86/kvm/x86.c                |  3 +++
->>  include/linux/kvm_host.h          | 31 
->> ++++++++++++++++++++++++++-----
->>  include/uapi/linux/kvm.h          |  1 +
->>  7 files changed, 65 insertions(+), 26 deletions(-)
->> 
->> --
->> 2.25.4
->> 
->> _______________________________________________
->> kvmarm mailing list
->> kvmarm@lists.cs.columbia.edu
->> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
->> 
-> 
-> Hi Marc,
-> 
-> Gentle ping. I'd like to to switch the QEMU code to using the proposed
-> KVM cap, if the cap is accepted.
 
-I'm fine with it. To be honest, this series is mostly fixes, except
-for that last patch.
 
-Paolo, are you OK with me sending the whole thing as fixes, including
-the UAPI patch? At least we'd have something consistent for 5.9.
+On 2020-08-21 14:05, Cornelia Huck wrote:
+> On Wed, 19 Aug 2020 18:23:18 +0200
+> Pierre Morel <pmorel@linux.ibm.com> wrote:
+> 
+>> If protected virtualization is active on s390, VIRTIO has retricted
+> 
+> s/retricted/only restricted/
+> 
+>> access to the guest memory.
+>> Define CONFIG_ARCH_HAS_RESTRICTED_VIRTIO_MEMORY_ACCESS and export
+>> arch_has_restricted_virtio_memory_access to advertize VIRTIO if that's
+>> the case, preventing a host error on access attempt.
+>>
+>> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+>> ---
+>>   arch/s390/Kconfig   |  1 +
+>>   arch/s390/mm/init.c | 11 +++++++++++
+>>   2 files changed, 12 insertions(+)
+> 
+> (...)
+> 
+>> diff --git a/arch/s390/mm/init.c b/arch/s390/mm/init.c
+>> index 6dc7c3b60ef6..8febd73ed6ca 100644
+>> --- a/arch/s390/mm/init.c
+>> +++ b/arch/s390/mm/init.c
+>> @@ -45,6 +45,7 @@
+>>   #include <asm/kasan.h>
+>>   #include <asm/dma-mapping.h>
+>>   #include <asm/uv.h>
+>> +#include <linux/virtio_config.h>
+> 
+> I don't think you need this include anymore.
+
+right,
+> 
+>>   
+>>   pgd_t swapper_pg_dir[PTRS_PER_PGD] __section(.bss..swapper_pg_dir);
+>>   
+> 
+> (...)
+> 
+> With the nit fixed,
+> 
+> Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+> 
 
 Thanks,
 
-         M.
+Pierre
+
 -- 
-Jazz is not dead. It just smells funny...
+Pierre Morel
+IBM Lab Boeblingen
