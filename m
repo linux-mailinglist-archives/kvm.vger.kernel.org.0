@@ -2,58 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 831CA24E1B0
-	for <lists+kvm@lfdr.de>; Fri, 21 Aug 2020 22:01:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7A35124E1B5
+	for <lists+kvm@lfdr.de>; Fri, 21 Aug 2020 22:01:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727003AbgHUT4g (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 21 Aug 2020 15:56:36 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:3948 "EHLO
-        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726306AbgHUT4c (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 21 Aug 2020 15:56:32 -0400
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 07LJWxB5023963;
-        Fri, 21 Aug 2020 15:56:29 -0400
+        id S1726870AbgHUUAy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 21 Aug 2020 16:00:54 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:9182 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726716AbgHUT4g (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 21 Aug 2020 15:56:36 -0400
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 07LJVk0Z093455;
+        Fri, 21 Aug 2020 15:56:32 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
  : date : message-id : in-reply-to : references : mime-version :
  content-transfer-encoding; s=pp1;
- bh=1PGyV5xOIEUjK9z3Jg4QxXcPpDhZXcE3sZY/Qjg8gwg=;
- b=m/hgqOb6xYkIo2JBgQ4vwLXlYtOPuBTDm8FJSm5gXVV9YWphk4Tn+cBZcQhbwU+kSQYq
- dplXEUnQEnSiZCqEVhbLVXA96AUXd3g//V3V14reif3WsA958GtJPaXKa6VYFx4e2v6K
- hQubKbUzI7Ov5DmYwv2rhwKhc2jk7b1idk7Qj+DX4uIo6kUVPHRiIMr5+2rFdA6+PzIs
- Mv9P3WkjmgPXCQsYHCqzwtO38cBwiyEQCu/KrBrPRPYicvzeDNvp5vf+GlDre3xubmut
- i/iJISzCa0EVrpylb+/2j/fSKquUAQIuH6QlPf1CkcDJ+qsBS4KCE4vXy5cX2g9D7VOR 4Q== 
+ bh=ry+9IDY5zB19YSm8+z1lF5SU9BlVwA+BNZHqaYs5rdY=;
+ b=tiwESppU6yU8NsPK5fO4v1nAQLTXife7mk/v0n+FYwVzvoFz6v7U9k6L3OXm08o4NB5I
+ TfJ+lT3ym/mNt+/3bvLhv4jH4Y6TNEEx4b7MQ54rTGAe+EaBqZ5V2hqZ2i8xLlmkXG1f
+ 7r5uhlfZQvUDw/u0lgaeXzeZ/D3R3ZARMZUUttPVTf25j1Tskc5psc/6znnQrulkdWv/
+ kjfg/3rnxu1tPVNuDLzaPqzN0NNVNV7sp+QYyIP7E45r213DBmlo66YMiH8sLDOZd7lr
+ 5pc1EOiESw5pQwqZWFC3/2umbdg7owXwxkL0EoAay3z9GkUgOpOJAwPwd9Vs5d8/tl31 qw== 
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 332dw6vavh-1
+        by mx0a-001b2d01.pphosted.com with ESMTP id 332kse9gb6-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 21 Aug 2020 15:56:29 -0400
-Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 07LJYAfO027332;
-        Fri, 21 Aug 2020 15:56:29 -0400
+        Fri, 21 Aug 2020 15:56:32 -0400
+Received: from m0098394.ppops.net (m0098394.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 07LJW442095640;
+        Fri, 21 Aug 2020 15:56:32 -0400
 Received: from ppma03wdc.us.ibm.com (ba.79.3fa9.ip4.static.sl-reverse.com [169.63.121.186])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 332dw6vava-1
+        by mx0a-001b2d01.pphosted.com with ESMTP id 332kse9gau-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 21 Aug 2020 15:56:29 -0400
+        Fri, 21 Aug 2020 15:56:31 -0400
 Received: from pps.filterd (ppma03wdc.us.ibm.com [127.0.0.1])
-        by ppma03wdc.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 07LJsM76005387;
-        Fri, 21 Aug 2020 19:56:28 GMT
-Received: from b03cxnp07029.gho.boulder.ibm.com (b03cxnp07029.gho.boulder.ibm.com [9.17.130.16])
-        by ppma03wdc.us.ibm.com with ESMTP id 3304ceprww-1
+        by ppma03wdc.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 07LJsM2b005384;
+        Fri, 21 Aug 2020 19:56:30 GMT
+Received: from b03cxnp08026.gho.boulder.ibm.com (b03cxnp08026.gho.boulder.ibm.com [9.17.130.18])
+        by ppma03wdc.us.ibm.com with ESMTP id 3304ceprx3-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 21 Aug 2020 19:56:28 +0000
+        Fri, 21 Aug 2020 19:56:30 +0000
 Received: from b03ledav004.gho.boulder.ibm.com (b03ledav004.gho.boulder.ibm.com [9.17.130.235])
-        by b03cxnp07029.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 07LJuPFW47841588
+        by b03cxnp08026.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 07LJuNQv53870954
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 21 Aug 2020 19:56:25 GMT
+        Fri, 21 Aug 2020 19:56:23 GMT
 Received: from b03ledav004.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id C41F778060;
+        by IMSVA (Postfix) with ESMTP id 8C7D67805E;
+        Fri, 21 Aug 2020 19:56:27 +0000 (GMT)
+Received: from b03ledav004.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id EA3D27805C;
         Fri, 21 Aug 2020 19:56:25 +0000 (GMT)
-Received: from b03ledav004.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 475C27805C;
-        Fri, 21 Aug 2020 19:56:24 +0000 (GMT)
 Received: from cpe-172-100-175-116.stny.res.rr.com.com (unknown [9.85.191.76])
         by b03ledav004.gho.boulder.ibm.com (Postfix) with ESMTP;
-        Fri, 21 Aug 2020 19:56:24 +0000 (GMT)
+        Fri, 21 Aug 2020 19:56:25 +0000 (GMT)
 From:   Tony Krowiak <akrowiak@linux.ibm.com>
 To:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
         kvm@vger.kernel.org
@@ -62,10 +62,11 @@ Cc:     freude@linux.ibm.com, borntraeger@de.ibm.com, cohuck@redhat.com,
         alex.williamson@redhat.com, kwankhede@nvidia.com,
         fiuczy@linux.ibm.com, frankja@linux.ibm.com, david@redhat.com,
         imbrenda@linux.ibm.com, hca@linux.ibm.com, gor@linux.ibm.com,
-        Tony Krowiak <akrowiak@linux.ibm.com>
-Subject: [PATCH v10 01/16] s390/vfio-ap: add version vfio_ap module
-Date:   Fri, 21 Aug 2020 15:56:01 -0400
-Message-Id: <20200821195616.13554-2-akrowiak@linux.ibm.com>
+        Tony Krowiak <akrowiak@linux.ibm.com>,
+        kernel test robot <lkp@intel.com>
+Subject: [PATCH v10 02/16] s390/vfio-ap: use new AP bus interface to search for queue devices
+Date:   Fri, 21 Aug 2020 15:56:02 -0400
+Message-Id: <20200821195616.13554-3-akrowiak@linux.ibm.com>
 X-Mailer: git-send-email 2.21.1
 In-Reply-To: <20200821195616.13554-1-akrowiak@linux.ibm.com>
 References: <20200821195616.13554-1-akrowiak@linux.ibm.com>
@@ -74,42 +75,248 @@ Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
  definitions=2020-08-21_09:2020-08-21,2020-08-21 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015
- priorityscore=1501 suspectscore=3 mlxlogscore=999 spamscore=0
- impostorscore=0 mlxscore=0 adultscore=0 lowpriorityscore=0 malwarescore=0
- phishscore=0 bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2006250000 definitions=main-2008210183
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ suspectscore=11 adultscore=0 mlxlogscore=978 phishscore=0 clxscore=1015
+ malwarescore=0 bulkscore=0 spamscore=0 priorityscore=1501 mlxscore=0
+ impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2006250000 definitions=main-2008210178
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Let's set a version for the vfio_ap module so that automated regression
-tests can determine whether dynamic configuration tests can be run or
-not.
+This patch refactor's the vfio_ap device driver to use the AP bus's
+ap_get_qdev() function to retrieve the vfio_ap_queue struct containing
+information about a queue that is bound to the vfio_ap device driver.
+The bus's ap_get_qdev() function retrieves the queue device from a
+hashtable keyed by APQN. This is much more efficient than looping over
+the list of devices attached to the AP bus by several orders of
+magnitude.
 
 Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
+Reported-by: kernel test robot <lkp@intel.com>
 ---
- drivers/s390/crypto/vfio_ap_drv.c | 2 ++
- 1 file changed, 2 insertions(+)
+ drivers/s390/crypto/vfio_ap_drv.c     | 27 ++-------
+ drivers/s390/crypto/vfio_ap_ops.c     | 86 +++++++++++++++------------
+ drivers/s390/crypto/vfio_ap_private.h |  8 ++-
+ 3 files changed, 59 insertions(+), 62 deletions(-)
 
 diff --git a/drivers/s390/crypto/vfio_ap_drv.c b/drivers/s390/crypto/vfio_ap_drv.c
-index be2520cc010b..f4ceb380dd61 100644
+index f4ceb380dd61..24cdef60039a 100644
 --- a/drivers/s390/crypto/vfio_ap_drv.c
 +++ b/drivers/s390/crypto/vfio_ap_drv.c
-@@ -17,10 +17,12 @@
+@@ -53,15 +53,9 @@ MODULE_DEVICE_TABLE(vfio_ap, ap_queue_ids);
+  */
+ static int vfio_ap_queue_dev_probe(struct ap_device *apdev)
+ {
+-	struct vfio_ap_queue *q;
+-
+-	q = kzalloc(sizeof(*q), GFP_KERNEL);
+-	if (!q)
+-		return -ENOMEM;
+-	dev_set_drvdata(&apdev->device, q);
+-	q->apqn = to_ap_queue(&apdev->device)->qid;
+-	q->saved_isc = VFIO_AP_ISC_INVALID;
+-	return 0;
++	struct ap_queue *queue = to_ap_queue(&apdev->device);
++
++	return vfio_ap_mdev_probe_queue(queue);
+ }
  
- #define VFIO_AP_ROOT_NAME "vfio_ap"
- #define VFIO_AP_DEV_NAME "matrix"
-+#define VFIO_AP_MODULE_VERSION "1.2.0"
+ /**
+@@ -72,18 +66,9 @@ static int vfio_ap_queue_dev_probe(struct ap_device *apdev)
+  */
+ static void vfio_ap_queue_dev_remove(struct ap_device *apdev)
+ {
+-	struct vfio_ap_queue *q;
+-	int apid, apqi;
+-
+-	mutex_lock(&matrix_dev->lock);
+-	q = dev_get_drvdata(&apdev->device);
+-	dev_set_drvdata(&apdev->device, NULL);
+-	apid = AP_QID_CARD(q->apqn);
+-	apqi = AP_QID_QUEUE(q->apqn);
+-	vfio_ap_mdev_reset_queue(apid, apqi, 1);
+-	vfio_ap_irq_disable(q);
+-	kfree(q);
+-	mutex_unlock(&matrix_dev->lock);
++	struct ap_queue *queue = to_ap_queue(&apdev->device);
++
++	vfio_ap_mdev_remove_queue(queue);
+ }
  
- MODULE_AUTHOR("IBM Corporation");
- MODULE_DESCRIPTION("VFIO AP device driver, Copyright IBM Corp. 2018");
- MODULE_LICENSE("GPL v2");
-+MODULE_VERSION(VFIO_AP_MODULE_VERSION);
+ static void vfio_ap_matrix_dev_release(struct device *dev)
+diff --git a/drivers/s390/crypto/vfio_ap_ops.c b/drivers/s390/crypto/vfio_ap_ops.c
+index e0bde8518745..ad3925f04f61 100644
+--- a/drivers/s390/crypto/vfio_ap_ops.c
++++ b/drivers/s390/crypto/vfio_ap_ops.c
+@@ -26,43 +26,26 @@
  
- static struct ap_driver vfio_ap_drv;
+ static int vfio_ap_mdev_reset_queues(struct mdev_device *mdev);
  
+-static int match_apqn(struct device *dev, const void *data)
+-{
+-	struct vfio_ap_queue *q = dev_get_drvdata(dev);
+-
+-	return (q->apqn == *(int *)(data)) ? 1 : 0;
+-}
+-
+ /**
+- * vfio_ap_get_queue: Retrieve a queue with a specific APQN from a list
+- * @matrix_mdev: the associated mediated matrix
++ * vfio_ap_get_queue: Retrieve a queue with a specific APQN.
+  * @apqn: The queue APQN
+  *
+- * Retrieve a queue with a specific APQN from the list of the
+- * devices of the vfio_ap_drv.
+- * Verify that the APID and the APQI are set in the matrix.
++ * Retrieve a queue with a specific APQN from the AP queue devices attached to
++ * the AP bus.
+  *
+- * Returns the pointer to the associated vfio_ap_queue
++ * Returns the pointer to the vfio_ap_queue with the specified APQN, or NULL.
+  */
+-static struct vfio_ap_queue *vfio_ap_get_queue(
+-					struct ap_matrix_mdev *matrix_mdev,
+-					int apqn)
++static struct vfio_ap_queue *vfio_ap_get_queue(unsigned long apqn)
+ {
++	struct ap_queue *queue;
+ 	struct vfio_ap_queue *q;
+-	struct device *dev;
+ 
+-	if (!test_bit_inv(AP_QID_CARD(apqn), matrix_mdev->matrix.apm))
+-		return NULL;
+-	if (!test_bit_inv(AP_QID_QUEUE(apqn), matrix_mdev->matrix.aqm))
++	queue = ap_get_qdev(apqn);
++	if (!queue)
+ 		return NULL;
+ 
+-	dev = driver_find_device(&matrix_dev->vfio_ap_drv->driver, NULL,
+-				 &apqn, match_apqn);
+-	if (!dev)
+-		return NULL;
+-	q = dev_get_drvdata(dev);
+-	q->matrix_mdev = matrix_mdev;
+-	put_device(dev);
++	q = dev_get_drvdata(&queue->ap_dev.device);
++	put_device(&queue->ap_dev.device);
+ 
+ 	return q;
+ }
+@@ -144,7 +127,7 @@ static void vfio_ap_free_aqic_resources(struct vfio_ap_queue *q)
+  * Returns if ap_aqic function failed with invalid, deconfigured or
+  * checkstopped AP.
+  */
+-struct ap_queue_status vfio_ap_irq_disable(struct vfio_ap_queue *q)
++static struct ap_queue_status vfio_ap_irq_disable(struct vfio_ap_queue *q)
+ {
+ 	struct ap_qirq_ctrl aqic_gisa = {};
+ 	struct ap_queue_status status;
+@@ -293,10 +276,11 @@ static int handle_pqap(struct kvm_vcpu *vcpu)
+ 	matrix_mdev = container_of(vcpu->kvm->arch.crypto.pqap_hook,
+ 				   struct ap_matrix_mdev, pqap_hook);
+ 
+-	q = vfio_ap_get_queue(matrix_mdev, apqn);
++	q = vfio_ap_get_queue(apqn);
+ 	if (!q)
+ 		goto out_unlock;
+ 
++	q->matrix_mdev = matrix_mdev;
+ 	status = vcpu->run->s.regs.gprs[1];
+ 
+ 	/* If IR bit(16) is set we enable the interrupt */
+@@ -1116,20 +1100,15 @@ static int vfio_ap_mdev_group_notifier(struct notifier_block *nb,
+ 
+ static void vfio_ap_irq_disable_apqn(int apqn)
+ {
+-	struct device *dev;
+ 	struct vfio_ap_queue *q;
+ 
+-	dev = driver_find_device(&matrix_dev->vfio_ap_drv->driver, NULL,
+-				 &apqn, match_apqn);
+-	if (dev) {
+-		q = dev_get_drvdata(dev);
++	q = vfio_ap_get_queue(apqn);
++	if (q)
+ 		vfio_ap_irq_disable(q);
+-		put_device(dev);
+-	}
+ }
+ 
+-int vfio_ap_mdev_reset_queue(unsigned int apid, unsigned int apqi,
+-			     unsigned int retry)
++static int vfio_ap_mdev_reset_queue(unsigned int apid, unsigned int apqi,
++				    unsigned int retry)
+ {
+ 	struct ap_queue_status status;
+ 	int retry2 = 2;
+@@ -1302,3 +1281,34 @@ void vfio_ap_mdev_unregister(void)
+ {
+ 	mdev_unregister_device(&matrix_dev->device);
+ }
++
++int vfio_ap_mdev_probe_queue(struct ap_queue *queue)
++{
++	struct vfio_ap_queue *q;
++
++	q = kzalloc(sizeof(*q), GFP_KERNEL);
++	if (!q)
++		return -ENOMEM;
++
++	dev_set_drvdata(&queue->ap_dev.device, q);
++	q->apqn = queue->qid;
++	q->saved_isc = VFIO_AP_ISC_INVALID;
++
++	return 0;
++}
++
++void vfio_ap_mdev_remove_queue(struct ap_queue *queue)
++{
++	struct vfio_ap_queue *q;
++	int apid, apqi;
++
++	mutex_lock(&matrix_dev->lock);
++	q = dev_get_drvdata(&queue->ap_dev.device);
++	dev_set_drvdata(&queue->ap_dev.device, NULL);
++	apid = AP_QID_CARD(q->apqn);
++	apqi = AP_QID_QUEUE(q->apqn);
++	vfio_ap_mdev_reset_queue(apid, apqi, 1);
++	vfio_ap_irq_disable(q);
++	kfree(q);
++	mutex_unlock(&matrix_dev->lock);
++}
+diff --git a/drivers/s390/crypto/vfio_ap_private.h b/drivers/s390/crypto/vfio_ap_private.h
+index f46dde56b464..a2aa05bec718 100644
+--- a/drivers/s390/crypto/vfio_ap_private.h
++++ b/drivers/s390/crypto/vfio_ap_private.h
+@@ -18,6 +18,7 @@
+ #include <linux/delay.h>
+ #include <linux/mutex.h>
+ #include <linux/kvm_host.h>
++#include <linux/hashtable.h>
+ 
+ #include "ap_bus.h"
+ 
+@@ -90,8 +91,6 @@ struct ap_matrix_mdev {
+ 
+ extern int vfio_ap_mdev_register(void);
+ extern void vfio_ap_mdev_unregister(void);
+-int vfio_ap_mdev_reset_queue(unsigned int apid, unsigned int apqi,
+-			     unsigned int retry);
+ 
+ struct vfio_ap_queue {
+ 	struct ap_matrix_mdev *matrix_mdev;
+@@ -100,5 +99,8 @@ struct vfio_ap_queue {
+ #define VFIO_AP_ISC_INVALID 0xff
+ 	unsigned char saved_isc;
+ };
+-struct ap_queue_status vfio_ap_irq_disable(struct vfio_ap_queue *q);
++
++int vfio_ap_mdev_probe_queue(struct ap_queue *queue);
++void vfio_ap_mdev_remove_queue(struct ap_queue *queue);
++
+ #endif /* _VFIO_AP_PRIVATE_H_ */
 -- 
 2.21.1
 
