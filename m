@@ -2,120 +2,120 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DB33D24D1F7
-	for <lists+kvm@lfdr.de>; Fri, 21 Aug 2020 12:07:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 31F6B24D341
+	for <lists+kvm@lfdr.de>; Fri, 21 Aug 2020 12:53:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728524AbgHUKH2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 21 Aug 2020 06:07:28 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:60989 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1728149AbgHUKH0 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 21 Aug 2020 06:07:26 -0400
+        id S1728046AbgHUKx1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 21 Aug 2020 06:53:27 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:59636 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726975AbgHUKwi (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 21 Aug 2020 06:52:38 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1598004444;
+        s=mimecast20190719; t=1598007155;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=t1P7azXYfV0jqkCDnkRHD/0D9waQRA2iINzYrxU+tRY=;
-        b=ffYSNC/bfCibarzulhf/9U/JGV+mm1HIecfBgrKY8U0RkOYDJVH5VyWmt7ZThxk8STA57q
-        VBIHK4rw092buo0dF9QBWBkoi0FNWecLU4B132RlHb0+fDVhtGodqQGUoqFnQTSLHYNeJe
-        h9S+4yLNDmlb6WyXicgAYsoPiam44Uo=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-105-VhHpPJdTM5qvwSIu4HLoDA-1; Fri, 21 Aug 2020 06:07:22 -0400
-X-MC-Unique: VhHpPJdTM5qvwSIu4HLoDA-1
-Received: by mail-wm1-f70.google.com with SMTP id a5so632145wmj.5
-        for <kvm@vger.kernel.org>; Fri, 21 Aug 2020 03:07:22 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=t1P7azXYfV0jqkCDnkRHD/0D9waQRA2iINzYrxU+tRY=;
-        b=T04UQGkigPtLlZTrNCX1E5bPZcW2kXGbGRxgw8fS+TLHpr23qHo4A7BGqpipcLu/2Q
-         htzGTXKb7qEyOveXsDwfyKgbtNiw5XeH43g/j2bxAOZ2F6Hnsywq/nFTS0DG4yj7s1Mk
-         TnyDD+vu7sNei2f4LM70bw1G/78yrTF2CTXp4OtJSc65W0kw7+HxAR+s4Fq/CjCX1E4H
-         Uudccu2gGs38IJUY1Wp3350eR2DMP+3y96lMQyEq4zTAjsUTvsSnDZWbHMh5uTxw3mkT
-         K98Bgp5AmkzSJVtNqKXrfPsqzY6k0XkUGULvFZV6VbJoXMYgzGfjQxEhFp0zTYEUhPNt
-         1X0A==
-X-Gm-Message-State: AOAM531dPkS36tWwbHY2ju+nO4ZnIfJVqQyHWsqn+fy14gae57Icnm/w
-        X20Sn4cTcUHAnAOxicjd4fPostYWZ7B/NzCyj1K7KxSry1/nvevejw60gfPtY4PQJCICt4qheeH
-        tTdLlxhCl9r1S
-X-Received: by 2002:adf:a1c6:: with SMTP id v6mr2014131wrv.197.1598004441009;
-        Fri, 21 Aug 2020 03:07:21 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyA7I+I679TgdT0CtRYE0nBissWAZ9ibzm/ankI+puja2IVFWbi9ACrxHMTwGvzeT2GN8gU3A==
-X-Received: by 2002:adf:a1c6:: with SMTP id v6mr2014105wrv.197.1598004440766;
-        Fri, 21 Aug 2020 03:07:20 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:1cc0:4e4e:f1a9:1745? ([2001:b07:6468:f312:1cc0:4e4e:f1a9:1745])
-        by smtp.gmail.com with ESMTPSA id f9sm3174815wrm.62.2020.08.21.03.07.19
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 21 Aug 2020 03:07:20 -0700 (PDT)
-Subject: Re: [PATCH] x86/entry/64: Disallow RDPID in paranoid entry if KVM is
- enabled
-To:     Borislav Petkov <bp@alien8.de>
-Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, x86@kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org,
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=m+sWpLL8B15YiBoZkjZFY9ODFpvPLxIevI4EtwVXHWs=;
+        b=El0qSMCJGzsYDAaoaZMJq8enBQysbCREZe9LIdwAow3Yyskwb2ZnpSP892PQcb0mX6fVEo
+        LyTFs3+BCcjbt0S3ZMQ+OdfZ3k0rtQbBhyRVtTzWL+6IOTiiVkgGVwrvTTBok6dCAph6wm
+        3Zq2sfuCJdM2XFoos1fCSwKPw12BdcI=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-475-Arr460QEMU-dEeMrVD4xNw-1; Fri, 21 Aug 2020 06:52:33 -0400
+X-MC-Unique: Arr460QEMU-dEeMrVD4xNw-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3B9761885D89;
+        Fri, 21 Aug 2020 10:52:31 +0000 (UTC)
+Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 397977C533;
+        Fri, 21 Aug 2020 10:52:30 +0000 (UTC)
+From:   Paolo Bonzini <pbonzini@redhat.com>
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     x86@kernel.org,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
         Dave Hansen <dave.hansen@intel.com>,
         Chang Seok Bae <chang.seok.bae@intel.com>,
         Peter Zijlstra <peterz@infradead.org>,
-        Sasha Levin <sashal@kernel.org>, kvm@vger.kernel.org,
-        Tom Lendacky <thomas.lendacky@amd.com>
-References: <20200821025050.32573-1-sean.j.christopherson@intel.com>
- <20200821074743.GB12181@zn.tnic>
- <3eb94913-662d-5423-21b1-eaf75635142a@redhat.com>
- <20200821081633.GD12181@zn.tnic>
- <3b4ba9e9-dbf6-a094-0684-e68248050758@redhat.com>
- <20200821092237.GF12181@zn.tnic>
- <1442e559-dde4-70f6-85ac-58109cf81c16@redhat.com>
- <20200821094802.GG12181@zn.tnic>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <81985f69-190d-eea6-f1ff-206a43b06851@redhat.com>
-Date:   Fri, 21 Aug 2020 12:07:18 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.9.0
+        Sasha Levin <sashal@kernel.org>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Andy Lutomirski <luto@kernel.org>
+Subject: [PATCH v2] x86/entry/64: Do not use RDPID in paranoid entry to accomodate KVM
+Date:   Fri, 21 Aug 2020 06:52:29 -0400
+Message-Id: <20200821105229.18938-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200821094802.GG12181@zn.tnic>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 21/08/20 11:48, Borislav Petkov wrote:
->> It's not like we grab MSRs every day.  The user-return notifier restores
->> 6 MSRs (7 on very old processors).  The last two that were added were
->> MSR_TSC_AUX itself in 2009 (!) and MSR_IA32_TSX_CTRL last year.
-> What about "If it is a shared resource, there better be an agreement
-> about sharing it." is not clear?
-> 
-> It doesn't matter how many or which resources - there needs to be a
-> contract for shared use so that shared use is possible. It is that
-> simple.
+From: Sean Christopherson <sean.j.christopherson@intel.com>
 
-Sure, and I'll make sure to have that discussion the next time we add a
-shared MSR in 2029.
+Don't use RDPID in the paranoid entry flow, as it can consume a KVM
+guest's MSR_TSC_AUX value if an NMI arrives during KVM's run loop.
 
-In the meanwhile:
+In general, the kernel does not need TSC_AUX because it can just use
+__this_cpu_read(cpu_number) to read the current processor id.  It can
+also just block preemption and thread migration at its will, therefore
+it has no need for the atomic rdtsc+vgetcpu provided by RDTSCP.  For this
+reason, as a performance optimization, KVM loads the guest's TSC_AUX when
+a CPU first enters its run loop.  On AMD's SVM, it doesn't restore the
+host's value until the CPU exits the run loop; VMX is even more aggressive
+and defers restoring the host's value until the CPU returns to userspace.
 
-* for the syscall MSRs, patches to share them were reviewed by hpa and
-peterz so I guess there's no problem.
+This optimization obviously relies on the kernel not consuming TSC_AUX,
+which falls apart if an NMI arrives during the run loop and uses RDPID.
+Removing it would be painful, as both SVM and VMX would need to context
+switch the MSR on every VM-Enter (for a cost of 2x WRMSR), whereas using
+LSL instead RDPID is a minor blip.
 
-* for MSR_TSC_AUX, which is the one that is causing problems, everybody
-seems to agree with just using LSL (in the lack specific numbers on
-performance improvements from RDPID).
+Both SAVE_AND_SET_GSBASE and GET_PERCPU_BASE are only used in paranoid entry,
+therefore the patch can just remove the RDPID alternative.
 
-* for MSR_IA32_TSX_CTRL.RTM_DISABLE, which is the only one that was
-added in the last 10 years, I'm pretty sure there are no plans for using
-the Trusty Sidechannel eXtension in the kernel.  So that should be fine
-too.  (The CPUID_CLEAR bit of the MSR is not shared).
+Fixes: eaad981291ee3 ("x86/entry/64: Introduce the FIND_PERCPU_BASE macro")
+Cc: Dave Hansen <dave.hansen@intel.com>
+Cc: Chang Seok Bae <chang.seok.bae@intel.com>
+Cc: Peter Zijlstra <peterz@infradead.org>
+Cc: Sasha Levin <sashal@kernel.org>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: kvm@vger.kernel.org
+Reported-by: Tom Lendacky <thomas.lendacky@amd.com>
+Debugged-by: Tom Lendacky <thomas.lendacky@amd.com>
+Suggested-by: Andy Lutomirski <luto@kernel.org>
+Suggested-by: Peter Zijlstra <peterz@infradead.org>
+Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ arch/x86/entry/calling.h | 10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
 
-Thanks,
-
-Paolo
+diff --git a/arch/x86/entry/calling.h b/arch/x86/entry/calling.h
+index 98e4d8886f11..ae9b0d4615b3 100644
+--- a/arch/x86/entry/calling.h
++++ b/arch/x86/entry/calling.h
+@@ -374,12 +374,14 @@ For 32-bit we have the following conventions - kernel is built with
+  * Fetch the per-CPU GSBASE value for this processor and put it in @reg.
+  * We normally use %gs for accessing per-CPU data, but we are setting up
+  * %gs here and obviously can not use %gs itself to access per-CPU data.
++ *
++ * Do not use RDPID, because KVM loads guest's TSC_AUX on vm-entry and
++ * may not restore the host's value until the CPU returns to userspace.
++ * Thus the kernel would consume a guest's TSC_AUX if an NMI arrives
++ * while running KVM's run loop.
+  */
+ .macro GET_PERCPU_BASE reg:req
+-	ALTERNATIVE \
+-		"LOAD_CPU_AND_NODE_SEG_LIMIT \reg", \
+-		"RDPID	\reg", \
+-		X86_FEATURE_RDPID
++	LOAD_CPU_AND_NODE_SEG_LIMIT \reg
+ 	andq	$VDSO_CPUNODE_MASK, \reg
+ 	movq	__per_cpu_offset(, \reg, 8), \reg
+ .endm
+-- 
+2.26.2
 
