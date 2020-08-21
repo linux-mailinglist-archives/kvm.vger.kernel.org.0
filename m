@@ -2,236 +2,133 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id F3B6E24CB31
-	for <lists+kvm@lfdr.de>; Fri, 21 Aug 2020 05:15:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A02D524CBB9
+	for <lists+kvm@lfdr.de>; Fri, 21 Aug 2020 05:54:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727783AbgHUDP2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 20 Aug 2020 23:15:28 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:51880 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726983AbgHUDP1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 20 Aug 2020 23:15:27 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1597979725;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=kfQKLX4LdG6hGr+rFiwuG1CAQOaTZt5wRoJTG69ORcc=;
-        b=hR/v1igIPBXXNF4kphVISL5/ZWGqQa23nQMe0MQ/iRlC1ISDNUA9uB0Kj8AYJmb0p5VT1j
-        /NU+NnILyCs4UmyQRI1yb+wYS5pnSH+XaAyiPpDPnplTq+W1boZHyvtsxU+2SXWZjOzK6g
-        Q+UW6ZsjWe7l/GTYnU4/sPo6TlTR2Ok=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-226-bp_koaGWNuycNf8mEvoJrg-1; Thu, 20 Aug 2020 23:15:21 -0400
-X-MC-Unique: bp_koaGWNuycNf8mEvoJrg-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CFCF9107464D;
-        Fri, 21 Aug 2020 03:15:18 +0000 (UTC)
-Received: from [10.72.13.182] (ovpn-13-182.pek2.redhat.com [10.72.13.182])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 5FFE77BE98;
-        Fri, 21 Aug 2020 03:14:43 +0000 (UTC)
-Subject: Re: [ovirt-devel] Re: device compatibility interface for live
- migration with assigned devices
-To:     Cornelia Huck <cohuck@redhat.com>
-Cc:     Yan Zhao <yan.y.zhao@intel.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "libvir-list@redhat.com" <libvir-list@redhat.com>,
-        "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
-        Kirti Wankhede <kwankhede@nvidia.com>,
-        "eauger@redhat.com" <eauger@redhat.com>,
-        "xin-ran.wang@intel.com" <xin-ran.wang@intel.com>,
-        "corbet@lwn.net" <corbet@lwn.net>,
-        "openstack-discuss@lists.openstack.org" 
-        <openstack-discuss@lists.openstack.org>,
-        "shaohe.feng@intel.com" <shaohe.feng@intel.com>,
-        "kevin.tian@intel.com" <kevin.tian@intel.com>,
-        Parav Pandit <parav@mellanox.com>,
-        "jian-feng.ding@intel.com" <jian-feng.ding@intel.com>,
-        "dgilbert@redhat.com" <dgilbert@redhat.com>,
-        "zhenyuw@linux.intel.com" <zhenyuw@linux.intel.com>,
-        "hejie.xu@intel.com" <hejie.xu@intel.com>,
-        "bao.yumeng@zte.com.cn" <bao.yumeng@zte.com.cn>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Parav Pandit <parav@nvidia.com>,
-        "sm ooney@redhat.com" <smooney@redhat.com>,
-        "intel-gvt-dev@lists.freedesktop.org" 
-        <intel-gvt-dev@lists.freedesktop.org>,
-        =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
-        "eskultet@redhat.com" <eskultet@redhat.com>,
-        Jiri Pirko <jiri@mellanox.com>,
-        "dinechin@redhat.com" <dinechin@redhat.com>,
-        "devel@ovirt.org" <devel@ovirt.org>
-References: <a51209fe-a8c6-941f-ff54-7be06d73bc44@redhat.com>
- <20200818085527.GB20215@redhat.com>
- <3a073222-dcfe-c02d-198b-29f6a507b2e1@redhat.com>
- <20200818091628.GC20215@redhat.com>
- <20200818113652.5d81a392.cohuck@redhat.com>
- <BY5PR12MB4322C9D1A66C4657776A1383DC5C0@BY5PR12MB4322.namprd12.prod.outlook.com>
- <20200819033035.GA21172@joy-OptiPlex-7040>
- <e20812b7-994b-b7f9-2df4-a78c4d116c7f@redhat.com>
- <20200819065951.GB21172@joy-OptiPlex-7040>
- <d6f9a51e-80b3-44c5-2656-614b327dc080@redhat.com>
- <20200819081338.GC21172@joy-OptiPlex-7040>
- <c1d580dd-5c0c-21bc-19a6-f776617d4ec2@redhat.com>
- <20200820142740.6513884d.cohuck@redhat.com>
-From:   Jason Wang <jasowang@redhat.com>
-Message-ID: <ea0e84c5-733a-2bdb-4c1e-95fd16698ed8@redhat.com>
-Date:   Fri, 21 Aug 2020 11:14:41 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        id S1727793AbgHUDyd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 20 Aug 2020 23:54:33 -0400
+Received: from szxga04-in.huawei.com ([45.249.212.190]:10296 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1727066AbgHUDyc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 20 Aug 2020 23:54:32 -0400
+Received: from DGGEMS404-HUB.china.huawei.com (unknown [172.30.72.59])
+        by Forcepoint Email with ESMTP id 4D20C79887F5437BBDF7;
+        Fri, 21 Aug 2020 11:54:29 +0800 (CST)
+Received: from [10.174.187.22] (10.174.187.22) by
+ DGGEMS404-HUB.china.huawei.com (10.3.19.204) with Microsoft SMTP Server id
+ 14.3.487.0; Fri, 21 Aug 2020 11:54:23 +0800
+Subject: Re: [RFC PATCH 0/5] KVM: arm64: Add pvtime LPT support
+To:     Steven Price <steven.price@arm.com>, Marc Zyngier <maz@kernel.org>
+References: <20200817084110.2672-1-zhukeqian1@huawei.com>
+ <8308f52e4c906cad710575724f9e3855@kernel.org>
+ <f14cfd5b-c103-5d56-82fb-59d0371c6f21@arm.com>
+CC:     <linux-kernel@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>,
+        <kvmarm@lists.cs.columbia.edu>, <kvm@vger.kernel.org>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        <wanghaibin.wang@huawei.com>, <xiexiangyou@huawei.com>,
+        <yebiaoxiang@huawei.com>
+From:   zhukeqian <zhukeqian1@huawei.com>
+Message-ID: <177a273d-3312-ec33-de0c-fd38b49f153b@huawei.com>
+Date:   Fri, 21 Aug 2020 11:54:22 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
+ Thunderbird/45.7.1
 MIME-Version: 1.0
-In-Reply-To: <20200820142740.6513884d.cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+In-Reply-To: <f14cfd5b-c103-5d56-82fb-59d0371c6f21@arm.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.174.187.22]
+X-CFilter-Loop: Reflected
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
-On 2020/8/20 下午8:27, Cornelia Huck wrote:
-> On Wed, 19 Aug 2020 17:28:38 +0800
-> Jason Wang <jasowang@redhat.com> wrote:
->
->> On 2020/8/19 下午4:13, Yan Zhao wrote:
->>> On Wed, Aug 19, 2020 at 03:39:50PM +0800, Jason Wang wrote:
->>>> On 2020/8/19 下午2:59, Yan Zhao wrote:
->>>>> On Wed, Aug 19, 2020 at 02:57:34PM +0800, Jason Wang wrote:
->>>>>> On 2020/8/19 上午11:30, Yan Zhao wrote:
->>>>>>> hi All,
->>>>>>> could we decide that sysfs is the interface that every VFIO vendor driver
->>>>>>> needs to provide in order to support vfio live migration, otherwise the
->>>>>>> userspace management tool would not list the device into the compatible
->>>>>>> list?
->>>>>>>
->>>>>>> if that's true, let's move to the standardizing of the sysfs interface.
->>>>>>> (1) content
->>>>>>> common part: (must)
->>>>>>>        - software_version: (in major.minor.bugfix scheme)
->>>>>> This can not work for devices whose features can be negotiated/advertised
->>>>>> independently. (E.g virtio devices)
-> I thought the 'software_version' was supposed to describe kind of a
-> 'protocol version' for the data we transmit? I.e., you add a new field,
-> you bump the version number.
 
-
-Ok, but since we mandate backward compatibility of uABI, is this really 
-worth to have a version for sysfs? (Searching on sysfs shows no examples 
-like this)
-
-
->
->>>>>>   
->>>>> sorry, I don't understand here, why virtio devices need to use vfio interface?
->>>> I don't see any reason that virtio devices can't be used by VFIO. Do you?
->>>>
->>>> Actually, virtio devices have been used by VFIO for many years:
->>>>
->>>> - passthrough a hardware virtio devices to userspace(VM) drivers
->>>> - using virtio PMD inside guest
->>>>   
->>> So, what's different for it vs passing through a physical hardware via VFIO?
+On 2020/8/19 16:54, Steven Price wrote:
+> On 18/08/2020 15:41, Marc Zyngier wrote:
+>> On 2020-08-17 09:41, Keqian Zhu wrote:
+>>> Hi all,
+>>>
+>>> This patch series picks up the LPT pvtime feature originally developed
+>>> by Steven Price: https://patchwork.kernel.org/cover/10726499/
+>>>
+>>> Backgroud:
+>>>
+>>> There is demand for cross-platform migration, which means we have to
+>>> solve different CPU features and arch counter frequency between hosts.
+>>> This patch series can solve the latter problem.
+>>>
+>>> About LPT:
+>>>
+>>> This implements support for Live Physical Time (LPT) which provides the
+>>> guest with a method to derive a stable counter of time during which the
+>>> guest is executing even when the guest is being migrated between hosts
+>>> with different physical counter frequencies.
+>>>
+>>> Changes on Steven Price's work:
+>>> 1. LPT structure: use symmatical semantics of scale multiplier, and use
+>>>    fraction bits instead of "shift" to make everything clear.
+>>> 2. Structure allocation: host kernel does not allocates the LPT structure,
+>>>    instead it is allocated by userspace through VM attributes. The save/restore
+>>>    functionality can be removed.
+>>> 3. Since LPT structure just need update once for each guest run, add a flag to
+>>>    indicate the update status. This has two benifits: 1) avoid multiple update
+>>>    by each vCPUs. 2) If the update flag is not set, then return NOT SUPPORT for
+>>>    coressponding guest HVC call.
+>>> 4. Add VM device attributes interface for userspace configuration.
+>>> 5. Add a base LPT read/write layer to reduce code.
+>>> 6. Support ptimer scaling.
+>>> 7. Support timer event stream translation.
+>>>
+>>> Things need concern:
+>>> 1. https://developer.arm.com/docs/den0057/a needs update.
 >>
->> The difference is in the guest, the device could be either real hardware
->> or emulated ones.
+>> LPT was explicitly removed from the spec because it doesn't really
+>> solve the problem, specially for the firmware: EFI knows
+>> nothing about this, for example. How is it going to work?
+>> Also, nobody was ever able to explain how this would work for
+>> nested virt.
 >>
->>
->>> even though the features are negotiated dynamically, could you explain
->>> why it would cause software_version not work?
->>
->> Virtio device 1 supports feature A, B, C
->> Virtio device 2 supports feature B, C, D
->>
->> So you can't migrate a guest from device 1 to device 2. And it's
->> impossible to model the features with versions.
-> We're talking about the features offered by the device, right? Would it
-> be sufficient to mandate that the target device supports the same
-> features or a superset of the features supported by the source device?
+>> ARMv8.4 and ARMv8.6 have the feature set that is required to solve
+>> this problem without adding more PV to the kernel.
+> 
+> Hi Marc,
+> 
+> These are good points, however we do still have the situation that CPUs that don't have ARMv8.4/8.6 clearly cannot implement this. I presume the use-case Keqian is looking at predates the necessary support in the CPU - Keqian if you can provide more details on the architecture(s) involved that would be helpful.
+> 
+> Nested virt is indeed more of an issue - we did have some ideas around using SDEI that never made it to the spec. However I would argue that the most pragmatic approach would be to not support the combination of nested virt and LPT. Hopefully that can wait until the counter scaling support is available and not require PV.
+> 
+> We are discussing (re-)releasing the spec with the LPT parts added. If you have fundamental objections then please me know.
+> 
+> Thanks,
+> 
+> Steve
+> .
+> 
+Hi Marc and Steven,
 
+In fact, I have realize a demo which utilize v8.6-ECV to present a constant timer freq to guest. It seems
+work well, but this approach has some shortcoming:
 
-Yes.
+1. Guest access to cntvct cntv_ctl cntv_tval cntv_cval must trap to EL2. Every trap will take about
+   hundreds of nano-seconds. For every timer interrupt, there is about 5~6 traps, so it will spend
+   several us (this seems not a serious problem :-) ). But trap will cause big deviation for nano-sleep.
+2. We have to make cntfrq be a context of guest. However, only the highest exception level has right to
+   modify cntfrq. It means we have to add a new SMC call.
+3. cntkctl controls event stream freq, so KVM should also translate the guest access of cntkctl. However
+   we cannot trap guest access of that. Any solution for this problem?
 
+I think LPT as a software solution can solve these problems. However, as Marc said, UEFI knows nothing about
+LPT, and it will access vtimer/counter directly. The key point is how serious the impact is on UEFI.
 
->
->>
->>>   
->>>>> I think this thread is discussing about vfio related devices.
->>>>>   
->>>>>>>        - device_api: vfio-pci or vfio-ccw ...
->>>>>>>        - type: mdev type for mdev device or
->>>>>>>                a signature for physical device which is a counterpart for
->>>>>>> 	   mdev type.
->>>>>>>
->>>>>>> device api specific part: (must)
->>>>>>>       - pci id: pci id of mdev parent device or pci id of physical pci
->>>>>>>         device (device_api is vfio-pci)API here.
->>>>>> So this assumes a PCI device which is probably not true.
->>>>>>   
->>>>> for device_api of vfio-pci, why it's not true?
->>>>>
->>>>> for vfio-ccw, it's subchannel_type.
->>>> Ok but having two different attributes for the same file is not good idea.
->>>> How mgmt know there will be a 3rd type?
->>> that's why some attributes need to be common. e.g.
->>> device_api: it's common because mgmt need to know it's a pci device or a
->>>               ccw device. and the api type is already defined vfio.h.
->>> 	    (The field is agreed by and actually suggested by Alex in previous mail)
->>> type: mdev_type for mdev. if mgmt does not understand it, it would not
->>>         be able to create one compatible mdev device.
->>> software_version: mgmt can compare the major and minor if it understands
->>>         this fields.
->>
->> I think it would be helpful if you can describe how mgmt is expected to
->> work step by step with the proposed sysfs API. This can help people to
->> understand.
-> My proposal would be:
-> - check that device_api matches
-> - check possible device_api specific attributes
-> - check that type matches [I don't think the combination of mdev types
->    and another attribute to determine compatibility is a good idea;
+I can see that some UEFI runtime services and drivers/applications will access timer/counter.
+For runtime services, it is OK. Because we can translate the result which return from UEFI for Linux.
+For drivers/applications, they will feel time goes faster or slower after migration. This is a problem indeed :-)
 
-
-Any reason for this? Actually if we only use mdev type to detect the 
-compatibility, it would be much more easier. Otherwise, we are actually 
-re-inventing mdev types.
-
-E.g can we have the same mdev types with different device_api and other 
-attributes?
-
-
->    actually, the current proposal confuses me every time I look at it]
-> - check that software_version is compatible, assuming semantic
->    versioning
-> - check possible type-specific attributes
-
-
-I'm not sure if this is too complicated. And I suspect there will be 
-vendor specific attributes:
-
-- for compatibility check: I think we should either modeling everything 
-via mdev type or making it totally vendor specific. Having something in 
-the middle will bring a lot of burden
-- for provisioning: it's still not clear. As shown in this proposal, for 
-NVME we may need to set remote_url, but unless there will be a subclass 
-(NVME) in the mdev (which I guess not), we can't prevent vendor from 
-using another attribute name, in this case, tricks like attributes 
-iteration in some sub directory won't work. So even if we had some 
-common API for compatibility check, the provisioning API is still vendor 
-specific ...
-
-Thanks
-
-
-
->
->> Thanks for the patience. Since sysfs is uABI, when accepted, we need
->> support it forever. That's why we need to be careful.
-> Nod.
->
-> (...)
-
+Thanks,
+Keqian
