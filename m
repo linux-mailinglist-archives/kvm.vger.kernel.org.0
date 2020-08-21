@@ -2,68 +2,74 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id AE71624CFE0
-	for <lists+kvm@lfdr.de>; Fri, 21 Aug 2020 09:47:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 509BB24D048
+	for <lists+kvm@lfdr.de>; Fri, 21 Aug 2020 10:05:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728063AbgHUHrp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 21 Aug 2020 03:47:45 -0400
-Received: from mail.skyhub.de ([5.9.137.197]:55462 "EHLO mail.skyhub.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725908AbgHUHro (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 21 Aug 2020 03:47:44 -0400
-Received: from zn.tnic (p200300ec2f0eda00b4e1d8975031aaf0.dip0.t-ipconnect.de [IPv6:2003:ec:2f0e:da00:b4e1:d897:5031:aaf0])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 522451EC013E;
-        Fri, 21 Aug 2020 09:47:43 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1597996063;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=x0qqa/IvqrLY60Nv10kXxs4ZIliJBY04I896OOhUGRs=;
-        b=juC3rw6mRkclVIO9LDa0WrzWnTCqKSyhGOm2CZ5oQY1OW1o37YT2e/7Q/fzIblYhrqVhXM
-        cAzBNBKLHa+HLide6l50783CgJZIn/YZbkq+OmkwWjwMTgzUOMiDlUaNEiKoBboXSnGqd/
-        aXtqVIr/+gWx0Una9QOIpG/Md4MpqeI=
-Date:   Fri, 21 Aug 2020 09:47:43 +0200
-From:   Borislav Petkov <bp@alien8.de>
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     Andy Lutomirski <luto@kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, x86@kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org,
-        Dave Hansen <dave.hansen@intel.com>,
-        Chang Seok Bae <chang.seok.bae@intel.com>,
+        id S1726974AbgHUIFm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 21 Aug 2020 04:05:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41202 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726661AbgHUIFk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 21 Aug 2020 04:05:40 -0400
+Received: from theia.8bytes.org (8bytes.org [IPv6:2a01:238:4383:600:38bc:a715:4b6d:a889])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 19349C061385;
+        Fri, 21 Aug 2020 01:05:39 -0700 (PDT)
+Received: by theia.8bytes.org (Postfix, from userid 1000)
+        id 744CF2AC; Fri, 21 Aug 2020 10:05:34 +0200 (CEST)
+Date:   Fri, 21 Aug 2020 10:05:31 +0200
+From:   Joerg Roedel <joro@8bytes.org>
+To:     Mike Stunes <mstunes@vmware.com>
+Cc:     "x86@kernel.org" <x86@kernel.org>, Joerg Roedel <jroedel@suse.de>,
+        "hpa@zytor.com" <hpa@zytor.com>, Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
         Peter Zijlstra <peterz@infradead.org>,
-        Sasha Levin <sashal@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        Tom Lendacky <thomas.lendacky@amd.com>
-Subject: Re: [PATCH] x86/entry/64: Disallow RDPID in paranoid entry if KVM is
- enabled
-Message-ID: <20200821074743.GB12181@zn.tnic>
-References: <20200821025050.32573-1-sean.j.christopherson@intel.com>
+        Jiri Slaby <jslaby@suse.cz>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Juergen Gross <jgross@suse.com>,
+        Kees Cook <keescook@chromium.org>,
+        David Rientjes <rientjes@google.com>,
+        Cfir Cohen <cfir@google.com>,
+        Erdem Aktas <erdemaktas@google.com>,
+        Masami Hiramatsu <mhiramat@kernel.org>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Martin Radev <martin.b.radev@gmail.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "virtualization@lists.linux-foundation.org" 
+        <virtualization@lists.linux-foundation.org>
+Subject: Re: [PATCH v5 00/75] x86: SEV-ES Guest Support
+Message-ID: <20200821080531.GC3319@8bytes.org>
+References: <20200724160336.5435-1-joro@8bytes.org>
+ <B65392F4-FD42-4AA3-8AA8-6C0C0D1FF007@vmware.com>
+ <20200730122645.GA3257@8bytes.org>
+ <F5603CBB-31FB-4EE8-B67A-A1F2DBEE28D8@vmware.com>
+ <20200818150746.GA3319@8bytes.org>
+ <6F9275F4-D5A4-4D30-8729-A57989568CA7@vmware.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20200821025050.32573-1-sean.j.christopherson@intel.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <6F9275F4-D5A4-4D30-8729-A57989568CA7@vmware.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Aug 20, 2020 at 07:50:50PM -0700, Sean Christopherson wrote:
-> +	 * Disallow RDPID if KVM is enabled as it may consume a guest's TSC_AUX
-> +	 * if an NMI arrives in KVM's run loop.  KVM loads guest's TSC_AUX on
-> +	 * VM-Enter and may not restore the host's value until the CPU returns
-> +	 * to userspace, i.e. KVM depends on the kernel not using TSC_AUX.
->  	 */
+Hi Mike,
 
-And frankly, this is really unfair. The kernel should be able to use any
-MSR. IOW, KVM needs to be fixed here. I'm sure it context-switches other
-MSRs so one more MSR is not a big deal.
+On Thu, Aug 20, 2020 at 12:58:13AM +0000, Mike Stunes wrote:
+> Yes, I still see the issue — APs are offline after boot. I’ll spend
+> some time seeing if I can figure out what the problem is. Thanks!
 
--- 
-Regards/Gruss,
-    Boris.
+Tom and a few others debugged another FSGSBASE issue yesterday, which I
+think might also be the cause for the AP startup problems you are
+seeing (if you test on Rome).
 
-https://people.kernel.org/tglx/notes-about-netiquette
+Can you try to disable support for RDPID in the guest, but keep fsgsbase
+enabled?
+
+Thanks,
+
+	Joerg
