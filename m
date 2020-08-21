@@ -2,140 +2,118 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DD4E724D8B6
-	for <lists+kvm@lfdr.de>; Fri, 21 Aug 2020 17:36:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E014124D964
+	for <lists+kvm@lfdr.de>; Fri, 21 Aug 2020 18:08:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728325AbgHUPgO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 21 Aug 2020 11:36:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54738 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725873AbgHUPgJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 21 Aug 2020 11:36:09 -0400
-Received: from mail-io1-xd42.google.com (mail-io1-xd42.google.com [IPv6:2607:f8b0:4864:20::d42])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9C211C061573;
-        Fri, 21 Aug 2020 08:36:09 -0700 (PDT)
-Received: by mail-io1-xd42.google.com with SMTP id g14so2145496iom.0;
-        Fri, 21 Aug 2020 08:36:09 -0700 (PDT)
+        id S1725958AbgHUQIO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 21 Aug 2020 12:08:14 -0400
+Received: from smtp-fw-33001.amazon.com ([207.171.190.10]:28951 "EHLO
+        smtp-fw-33001.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725834AbgHUQIL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 21 Aug 2020 12:08:11 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=dTsdEvmeR7/8ARBPzPDo5H4/RL/HljTYjHOoJ2D+HGk=;
-        b=oG3H/4qgY6IZeh11qQCNeaOyHtavKEMR464ybkKS9cibi3xG6UiYZmHGSxprqoeKZx
-         30qLE+paOBcBV6sGjUUx+ZmfjBIm1uFKSughgeRlfmwNpycy7r27utMOzY5z9LnVTPhg
-         MYNQFCDeltwbaRNXh3WgmACm9hLemnauKbxaK5+06YZsGuRkiX31H8W1SNLrSg7KPxKs
-         2Lg8QE5GpJ+9iznDvRuhrf7egkMRLyZyYAdRhUgg27xW+r2/BZCiurF3bUjYUeOwfIBL
-         PosLFU3dezoIHJEnGujK3dYDsEi0ulTKnMSrOBL41xPp0//84XYxMhWKjkd3RnTtMWkZ
-         ln+Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=dTsdEvmeR7/8ARBPzPDo5H4/RL/HljTYjHOoJ2D+HGk=;
-        b=G5sIOXzjbpF+p3tgjl7yS53Ab8wDuyDTEkH0SX7Ga49o8NZP7K6O4r/vUa1CSy60hq
-         coNv8LUbiuFlP5S45WXFS/MdPMK8M5cdYljarFNOIxOhzNPCk6gWMKAlcmmBUZ0ERzkT
-         xuFqCexfma3GevcgMBLGkT84f8OmOsQpwgX+JfNiwjxcx1efzFfuyheU9Oxvp5OklTOs
-         oxECqNswjUt+ItFArouHUHaHhT1s95pzfwj4ARSmTHbCxRG3HazqhBcsSwSzjYpO/xXM
-         zhHidxXax/W7sgICLC9CsIQjTTnuu2rsQdu7fjeU+kPnmccIqBKtyCNbfHCcDW+FZXpI
-         bmlg==
-X-Gm-Message-State: AOAM532FXLFxIkieijBphE9Mebg3g+vrp/kSSIjdZ3csRCDQnHhMNkCb
-        GTAO5lwJdehhHKiRxnsOkrNLjEXA4F9vXS8cpA==
-X-Google-Smtp-Source: ABdhPJw4zUY2nPRkcrI1iVgkAlff3Y8KRk0bZpGsMIrVoKZ6EshwlsivnB6CcpyYk4rmRXNlUneDcikzsDIJQXjIIao=
-X-Received: by 2002:a5d:841a:: with SMTP id i26mr2754197ion.144.1598024168875;
- Fri, 21 Aug 2020 08:36:08 -0700 (PDT)
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1598026091; x=1629562091;
+  h=subject:to:cc:references:from:message-id:date:
+   mime-version:in-reply-to:content-transfer-encoding;
+  bh=n/ZfqN75zK4wbDJNTwSI0gUUOSKPihuaxr+WJSXC0is=;
+  b=SVyYw2rXYXZigeUC3rrCyszyXMzGpIUELYjzFZciqStLSW7qFeH/YxnP
+   lm3hWhlKt5MfhnlL/2CyymQtzFf3vqUhV2jLlja6q9/JD8uDiXGVp9aEg
+   G1jbeasAkaT9UBvgT11wvnschSdR380eFlQecFYZcILuubS8dYJpKLnqC
+   s=;
+X-IronPort-AV: E=Sophos;i="5.76,337,1592870400"; 
+   d="scan'208";a="68703958"
+Received: from sea32-co-svc-lb4-vlan3.sea.corp.amazon.com (HELO email-inbound-relay-2c-6f38efd9.us-west-2.amazon.com) ([10.47.23.38])
+  by smtp-border-fw-out-33001.sea14.amazon.com with ESMTP; 21 Aug 2020 16:07:54 +0000
+Received: from EX13MTAUWC002.ant.amazon.com (pdx4-ws-svc-p6-lb7-vlan3.pdx.amazon.com [10.170.41.166])
+        by email-inbound-relay-2c-6f38efd9.us-west-2.amazon.com (Postfix) with ESMTPS id E98ACA044A;
+        Fri, 21 Aug 2020 16:07:53 +0000 (UTC)
+Received: from EX13D20UWC001.ant.amazon.com (10.43.162.244) by
+ EX13MTAUWC002.ant.amazon.com (10.43.162.240) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.2; Fri, 21 Aug 2020 16:07:53 +0000
+Received: from 38f9d3867b82.ant.amazon.com (10.43.161.145) by
+ EX13D20UWC001.ant.amazon.com (10.43.162.244) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.2; Fri, 21 Aug 2020 16:07:52 +0000
+Subject: Re: [PATCH v3 07/12] KVM: x86: Ensure the MSR bitmap never clears
+ userspace tracked MSRs
+To:     Aaron Lewis <aaronlewis@google.com>,
+        Jim Mattson <jmattson@google.com>
+CC:     kvm list <kvm@vger.kernel.org>
+References: <20200818211533.849501-1-aaronlewis@google.com>
+ <20200818211533.849501-8-aaronlewis@google.com>
+ <522d8a2f-8047-32f6-a329-c9ace7bf3693@amazon.com>
+ <CAAAPnDFEKOQjTKcmkFjP6hr6dgmR-61NL_W9=7Fs0THdOOJ7+Q@mail.gmail.com>
+ <d75a3862-d4f4-e057-5d45-9edcb3f9b696@amazon.com>
+ <CALMp9eRQ3FYOW08tbLJ79KJ32dD8K7djSoze9rcV0tuGbfVgLw@mail.gmail.com>
+ <CAAAPnDGiBw7U6G61kGuAJOn+vSonvkhm_RQ_nL5_G-4yNSdPPw@mail.gmail.com>
+From:   Alexander Graf <graf@amazon.com>
+Message-ID: <161f8df0-9667-8f52-6230-a073590d4646@amazon.com>
+Date:   Fri, 21 Aug 2020 18:07:49 +0200
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:68.0)
+ Gecko/20100101 Thunderbird/68.11.0
 MIME-Version: 1.0
-References: <20200821105229.18938-1-pbonzini@redhat.com> <20200821142152.GA6330@sjchrist-ice>
-In-Reply-To: <20200821142152.GA6330@sjchrist-ice>
-From:   Brian Gerst <brgerst@gmail.com>
-Date:   Fri, 21 Aug 2020 11:35:57 -0400
-Message-ID: <CAMzpN2h79bi5dd7PxjY45xYy71UdYomKa1t2gNxLtRpDkMs+Lw@mail.gmail.com>
-Subject: Re: [PATCH v2] x86/entry/64: Do not use RDPID in paranoid entry to
- accomodate KVM
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        kvm list <kvm@vger.kernel.org>,
-        "the arch/x86 maintainers" <x86@kernel.org>,
-        Dave Hansen <dave.hansen@intel.com>,
-        Chang Seok Bae <chang.seok.bae@intel.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Sasha Levin <sashal@kernel.org>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Andy Lutomirski <luto@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <CAAAPnDGiBw7U6G61kGuAJOn+vSonvkhm_RQ_nL5_G-4yNSdPPw@mail.gmail.com>
+Content-Language: en-US
+X-Originating-IP: [10.43.161.145]
+X-ClientProxiedBy: EX13P01UWB003.ant.amazon.com (10.43.161.209) To
+ EX13D20UWC001.ant.amazon.com (10.43.162.244)
+Content-Type: text/plain; charset="utf-8"; format="flowed"
+Content-Transfer-Encoding: base64
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Aug 21, 2020 at 10:22 AM Sean Christopherson
-<sean.j.christopherson@intel.com> wrote:
->
-> On Fri, Aug 21, 2020 at 06:52:29AM -0400, Paolo Bonzini wrote:
-> > From: Sean Christopherson <sean.j.christopherson@intel.com>
-> >
-> > Don't use RDPID in the paranoid entry flow, as it can consume a KVM
-> > guest's MSR_TSC_AUX value if an NMI arrives during KVM's run loop.
-> >
-> > In general, the kernel does not need TSC_AUX because it can just use
-> > __this_cpu_read(cpu_number) to read the current processor id.  It can
-> > also just block preemption and thread migration at its will, therefore
-> > it has no need for the atomic rdtsc+vgetcpu provided by RDTSCP.  For this
-> > reason, as a performance optimization, KVM loads the guest's TSC_AUX when
-> > a CPU first enters its run loop.  On AMD's SVM, it doesn't restore the
-> > host's value until the CPU exits the run loop; VMX is even more aggressive
-> > and defers restoring the host's value until the CPU returns to userspace.
-> >
-> > This optimization obviously relies on the kernel not consuming TSC_AUX,
-> > which falls apart if an NMI arrives during the run loop and uses RDPID.
-> > Removing it would be painful, as both SVM and VMX would need to context
-> > switch the MSR on every VM-Enter (for a cost of 2x WRMSR), whereas using
-> > LSL instead RDPID is a minor blip.
-> >
-> > Both SAVE_AND_SET_GSBASE and GET_PERCPU_BASE are only used in paranoid entry,
-> > therefore the patch can just remove the RDPID alternative.
-> >
-> > Fixes: eaad981291ee3 ("x86/entry/64: Introduce the FIND_PERCPU_BASE macro")
-> > Cc: Dave Hansen <dave.hansen@intel.com>
-> > Cc: Chang Seok Bae <chang.seok.bae@intel.com>
-> > Cc: Peter Zijlstra <peterz@infradead.org>
-> > Cc: Sasha Levin <sashal@kernel.org>
-> > Cc: Paolo Bonzini <pbonzini@redhat.com>
-> > Cc: kvm@vger.kernel.org
-> > Reported-by: Tom Lendacky <thomas.lendacky@amd.com>
-> > Debugged-by: Tom Lendacky <thomas.lendacky@amd.com>
-> > Suggested-by: Andy Lutomirski <luto@kernel.org>
-> > Suggested-by: Peter Zijlstra <peterz@infradead.org>
-> > Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
-> > Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> > ---
-> >  arch/x86/entry/calling.h | 10 ++++++----
-> >  1 file changed, 6 insertions(+), 4 deletions(-)
-> >
-> > diff --git a/arch/x86/entry/calling.h b/arch/x86/entry/calling.h
-> > index 98e4d8886f11..ae9b0d4615b3 100644
-> > --- a/arch/x86/entry/calling.h
-> > +++ b/arch/x86/entry/calling.h
-> > @@ -374,12 +374,14 @@ For 32-bit we have the following conventions - kernel is built with
-> >   * Fetch the per-CPU GSBASE value for this processor and put it in @reg.
-> >   * We normally use %gs for accessing per-CPU data, but we are setting up
-> >   * %gs here and obviously can not use %gs itself to access per-CPU data.
-> > + *
-> > + * Do not use RDPID, because KVM loads guest's TSC_AUX on vm-entry and
-> > + * may not restore the host's value until the CPU returns to userspace.
-> > + * Thus the kernel would consume a guest's TSC_AUX if an NMI arrives
-> > + * while running KVM's run loop.
-> >   */
-> >  .macro GET_PERCPU_BASE reg:req
-> > -     ALTERNATIVE \
-> > -             "LOAD_CPU_AND_NODE_SEG_LIMIT \reg", \
-> > -             "RDPID  \reg", \
->
-> This was the only user of the RDPID macro, I assume we want to yank that out
-> as well?
+CgpPbiAyMS4wOC4yMCAxNjoyNywgQWFyb24gTGV3aXMgd3JvdGU6Cj4gCj4gT24gVGh1LCBBdWcg
+MjAsIDIwMjAgYXQgMzozNSBQTSBKaW0gTWF0dHNvbiA8am1hdHRzb25AZ29vZ2xlLmNvbT4gd3Jv
+dGU6Cj4+Cj4+IE9uIFRodSwgQXVnIDIwLCAyMDIwIGF0IDM6MDQgUE0gQWxleGFuZGVyIEdyYWYg
+PGdyYWZAYW1hem9uLmNvbT4gd3JvdGU6Cj4+Pgo+Pj4KPj4+Cj4+PiBPbiAyMC4wOC4yMCAwMjox
+OCwgQWFyb24gTGV3aXMgd3JvdGU6Cj4+Pj4KPj4+PiBPbiBXZWQsIEF1ZyAxOSwgMjAyMCBhdCA4
+OjI2IEFNIEFsZXhhbmRlciBHcmFmIDxncmFmQGFtYXpvbi5jb20+IHdyb3RlOgo+Pj4+Pgo+Pj4+
+Pgo+Pj4+Pgo+Pj4+PiBPbiAxOC4wOC4yMCAyMzoxNSwgQWFyb24gTGV3aXMgd3JvdGU6Cj4+Pj4+
+Pgo+Pj4+Pj4gU0RNIHZvbHVtZSAzOiAyNC42LjkgIk1TUi1CaXRtYXAgQWRkcmVzcyIgYW5kIEFQ
+TSB2b2x1bWUgMjogMTUuMTEgIk1TCj4+Pj4+PiBpbnRlcmNlcHRzIiBkZXNjcmliZSBNU1IgcGVy
+bWlzc2lvbiBiaXRtYXBzLiAgUGVybWlzc2lvbiBiaXRtYXBzIGFyZQo+Pj4+Pj4gdXNlZCB0byBj
+b250cm9sIHdoZXRoZXIgYW4gZXhlY3V0aW9uIG9mIHJkbXNyIG9yIHdybXNyIHdpbGwgY2F1c2Ug
+YQo+Pj4+Pj4gdm0gZXhpdC4gIEZvciB1c2Vyc3BhY2UgdHJhY2tlZCBNU1JzIGl0IGlzIHJlcXVp
+cmVkIHRoZXkgY2F1c2UgYSB2bQo+Pj4+Pj4gZXhpdCwgc28gdGhlIGhvc3QgaXMgYWJsZSB0byBm
+b3J3YXJkIHRoZSBNU1IgdG8gdXNlcnNwYWNlLiAgVGhpcyBjaGFuZ2UKPj4+Pj4+IGFkZHMgdm14
+L3N2bSBzdXBwb3J0IHRvIGVuc3VyZSB0aGUgcGVybWlzc2lvbiBiaXRtYXAgaXMgcHJvcGVybHkg
+c2V0IHRvCj4+Pj4+PiBjYXVzZSBhIHZtX2V4aXQgdG8gdGhlIGhvc3Qgd2hlbiByZG1zciBvciB3
+cm1zciBpcyB1c2VkIGJ5IG9uZSBvZiB0aGUKPj4+Pj4+IHVzZXJzcGFjZSB0cmFja2VkIE1TUnMu
+ICBBbHNvLCB0byBhdm9pZCByZXBlYXRlZGx5IHNldHRpbmcgdGhlbSwKPj4+Pj4+IGt2bV9tYWtl
+X3JlcXVlc3QoKSBpcyB1c2VkIHRvIGNvYWxlc2NlIHRoZXNlIGludG8gYSBzaW5nbGUgY2FsbC4K
+Pj4+Pj4+Cj4+Pj4+PiBTaWduZWQtb2ZmLWJ5OiBBYXJvbiBMZXdpcyA8YWFyb25sZXdpc0Bnb29n
+bGUuY29tPgo+Pj4+Pj4gUmV2aWV3ZWQtYnk6IE9saXZlciBVcHRvbiA8b3VwdG9uQGdvb2dsZS5j
+b20+Cj4+Pj4+Cj4+Pj4+IFRoaXMgaXMgaW5jb21wbGV0ZSwgYXMgaXQgZG9lc24ndCBjb3ZlciBh
+bGwgb2YgdGhlIHgyYXBpYyByZWdpc3RlcnMuCj4+Pj4+IFRoZXJlIGFyZSBhbHNvIGEgZmV3IE1T
+UnMgdGhhdCBJSVJDIGFyZSBoYW5kbGVkIGRpZmZlcmVudGx5IGZyb20gdGhpcwo+Pj4+PiBsb2dp
+Yywgc3VjaCBhcyBFRkVSLgo+Pj4+Pgo+Pj4+PiBJJ20gcmVhbGx5IGN1cmlvdXMgaWYgdGhpcyBp
+cyB3b3J0aCB0aGUgZWZmb3J0PyBJIHdvdWxkIGJlIGluY2xpbmVkIHRvCj4+Pj4+IHNheSB0aGF0
+IE1TUnMgdGhhdCBLVk0gaGFzIGRpcmVjdCBhY2Nlc3MgZm9yIG5lZWQgc3BlY2lhbCBoYW5kbGlu
+ZyBvbmUKPj4+Pj4gd2F5IG9yIGFub3RoZXIuCj4+Pj4+Cj4+Pj4KPj4+PiBDYW4geW91IHBsZWFz
+ZSBlbGFib3JhdGUgb24gdGhpcz8gIEl0IHdhcyBteSB1bmRlcnN0YW5kaW5nIHRoYXQgdGhlCj4+
+Pj4gcGVybWlzc2lvbiBiaXRtYXAgY292ZXJzIHRoZSB4MmFwaWMgcmVnaXN0ZXJzLiAgQWxzbywg
+SeKAmW0gbm90IHN1cmUgaG93Cj4+Pgo+Pj4gU28geDJhcGljIE1TUiBwYXNzdGhyb3VnaCBpcyBj
+b25maWd1cmVkIHNwZWNpYWxseToKPj4+Cj4+Pgo+Pj4gaHR0cHM6Ly9naXQua2VybmVsLm9yZy9w
+dWIvc2NtL2xpbnV4L2tlcm5lbC9naXQvdG9ydmFsZHMvbGludXguZ2l0L3RyZWUvYXJjaC94ODYv
+a3ZtL3ZteC92bXguYyNuMzc5Ngo+Pj4KPj4+IGFuZCBJIHRoaW5rIG5vdCBoYW5kbGVkIGJ5IHRo
+aXMgcGF0Y2g/Cj4+Cj4+IEJ5IGhhcHBlbnN0YW5jZSBvbmx5LCBJIHRoaW5rLCBzaW5jZSB0aGVy
+ZSBpcyBhbHNvIGEgY2FsbCB0aGVyZSB0bwo+PiB2bXhfZGlzYWJsZV9pbnRlcmNlcHRfZm9yX21z
+cigpIGZvciB0aGUgVFBSIHdoZW4geDJBUElDIGlzIGVuYWJsZWQuCj4gCj4gSWYgd2Ugd2FudCB0
+byBiZSBtb3JlIGV4cGxpY2l0IGFib3V0IGl0IHdlIGNvdWxkIGFkZAo+IGt2bV9tYWtlX3JlcXVl
+c3QoS1ZNX1JFUV9VU0VSX01TUl9VUERBVEUsIHZjcHUpIEFmdGVyIHRoZSBiaXRtYXAgaXMKPiBt
+b2RpZmllZCwgYnV0IHRoYXQgZG9lc24ndCBzZWVtIHRvIGJlIG5lY2Vzc2FyeSBhcyBKaW0gcG9p
+bnRlZCBvdXQgYXMKPiB0aGVyZSBhcmUgY2FsbHMgdG8gdm14X2Rpc2FibGVfaW50ZXJjZXB0X2Zv
+cl9tc3IoKSB0aGVyZSB3aGljaCB3aWxsCj4gc2V0IHRoZSB1cGRhdGUgcmVxdWVzdCBmb3IgdXMu
+ICBBbmQgd2Ugb25seSBoYXZlIHRvIHdvcnJ5IGFib3V0IHRoYXQKPiBpZiB0aGUgYml0bWFwIGlz
+IGNsZWFyZWQgd2hpY2ggbWVhbnMgTVNSX0JJVE1BUF9NT0RFX1gyQVBJQ19BUElDViBpcwo+IHNl
+dCwgYW5kIHRoYXQgZmxhZyBjYW4gb25seSBiZSBzZXQgaWYgTVNSX0JJVE1BUF9NT0RFX1gyQVBJ
+QyBpcyBzZXQuCj4gU28sIEFGQUlDVCB0aGF0IGlzIGNvdmVyZWQgYnkgbXkgY2hhbmdlcy4KPiAK
+CkkgZG9uJ3QgdW5kZXJzdGFuZCAtIGZvciBtb3N0IHgyQVBJQyBNU1JzLCAKdm14X3tlbixkaXN9
+YWJsZV9pbnRlcmNlcHRfZm9yX21zcigpIG5ldmVyIGdldHMgY2FsbGVkLCBubz8KCgpBbGV4CgoK
+CkFtYXpvbiBEZXZlbG9wbWVudCBDZW50ZXIgR2VybWFueSBHbWJICktyYXVzZW5zdHIuIDM4CjEw
+MTE3IEJlcmxpbgpHZXNjaGFlZnRzZnVlaHJ1bmc6IENocmlzdGlhbiBTY2hsYWVnZXIsIEpvbmF0
+aGFuIFdlaXNzCkVpbmdldHJhZ2VuIGFtIEFtdHNnZXJpY2h0IENoYXJsb3R0ZW5idXJnIHVudGVy
+IEhSQiAxNDkxNzMgQgpTaXR6OiBCZXJsaW4KVXN0LUlEOiBERSAyODkgMjM3IDg3OQoKCg==
 
-No.  That one should be kept until the minimum binutils version is
-raised to one that supports the RDPID opcode.
-
---
-Brian Gerst
