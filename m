@@ -2,190 +2,124 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B1A9524D525
-	for <lists+kvm@lfdr.de>; Fri, 21 Aug 2020 14:38:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9FFA024D5AF
+	for <lists+kvm@lfdr.de>; Fri, 21 Aug 2020 15:04:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728644AbgHUMil (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 21 Aug 2020 08:38:41 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:9648 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1728570AbgHUMig (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 21 Aug 2020 08:38:36 -0400
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 07LCZ0jN064077
-        for <kvm@vger.kernel.org>; Fri, 21 Aug 2020 08:38:35 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=pp1;
- bh=0xJWh1SRE2g5KAH6f/ZgdLqFd0PQlVheqF0a1wd2OUs=;
- b=NxCpapQEHDJo3r/OZNhhskNU8w3mNHztj/qDrSEBjVNnot3JtJGAdPL8WyKF/9gMMQmw
- Jo2tT6jWNV/l6PvcbBiiTnbt3hS8KqYIbm2RPB+zSwGEzlkjcJLRalJ85sm4HbaK/EmC
- 5zOrOfPFv5d+H1x7PbmqcXJpGaMImMX7uAiND32Nzg/vsonP7eijXGXN/LUJcPtrr5US
- fBjN0putywOK76t1+bEtiXfAmcAWwGo1Wg3OFWQva9hybpBjfrQ0VTOE+3msnXQCZ4G3
- 0RI7zu9m9219gn/EeZ9Ge7B5DT1ybMM/IHhbu4TbQU68WsJ6AxYzXJEJmVs8538ombyg ow== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 332b8an839-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Fri, 21 Aug 2020 08:38:35 -0400
-Received: from m0098404.ppops.net (m0098404.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 07LCZ0LO064094
-        for <kvm@vger.kernel.org>; Fri, 21 Aug 2020 08:38:35 -0400
-Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 332b8an82f-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 21 Aug 2020 08:38:35 -0400
-Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
-        by ppma06ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 07LCWDtR027238;
-        Fri, 21 Aug 2020 12:38:33 GMT
-Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
-        by ppma06ams.nl.ibm.com with ESMTP id 330tbvu2ch-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 21 Aug 2020 12:38:32 +0000
-Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
-        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 07LCcUt921758230
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 21 Aug 2020 12:38:30 GMT
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id B65664C040;
-        Fri, 21 Aug 2020 12:38:30 +0000 (GMT)
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 5908D4C064;
-        Fri, 21 Aug 2020 12:38:30 +0000 (GMT)
-Received: from marcibm.ibmuc.com (unknown [9.145.60.23])
-        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Fri, 21 Aug 2020 12:38:30 +0000 (GMT)
-From:   Marc Hartmayer <mhartmay@linux.ibm.com>
-To:     <kvm@vger.kernel.org>
-Cc:     Thomas Huth <thuth@redhat.com>,
-        David Hildenbrand <david@redhat.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Andrew Jones <drjones@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Subject: [kvm-unit-tests PATCH 2/2] Use same test names in the default and the TAP13 output format
-Date:   Fri, 21 Aug 2020 14:37:44 +0200
-Message-Id: <20200821123744.33173-3-mhartmay@linux.ibm.com>
-X-Mailer: git-send-email 2.26.2
-In-Reply-To: <20200821123744.33173-1-mhartmay@linux.ibm.com>
-References: <20200821123744.33173-1-mhartmay@linux.ibm.com>
+        id S1728648AbgHUNEH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 21 Aug 2020 09:04:07 -0400
+Received: from mail.kernel.org ([198.145.29.99]:48594 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728550AbgHUNEC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 21 Aug 2020 09:04:02 -0400
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 9F875207BB;
+        Fri, 21 Aug 2020 13:04:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1598015041;
+        bh=DeoU78c4cCMt4c0DHxrKqY/OoGbtGgM/fQoFevJ5aMk=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=neW4qDo7Ci/DSqpkZHHrVNEafyyrQuQIkuO48DXFaDnBdYpYwAuK35iTl7G5iXM4q
+         ixA+pWThuS2zwmTkMck0XVeE/LLnQRuzKEil8W3+dA8aK/AO1JpYMNVs5E/4vDjn5F
+         S2KdxqBvkJ9bmUxfZ/F70sbUOnFCIP0ijtMxtA6Y=
+Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
+        by disco-boy.misterjones.org with esmtpsa (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+        (Exim 4.92)
+        (envelope-from <maz@kernel.org>)
+        id 1k96i8-004rqt-7c; Fri, 21 Aug 2020 14:04:00 +0100
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
- definitions=2020-08-21_06:2020-08-21,2020-08-21 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 clxscore=1015
- suspectscore=1 mlxscore=0 bulkscore=0 mlxlogscore=999 lowpriorityscore=0
- priorityscore=1501 impostorscore=0 adultscore=0 spamscore=0 malwarescore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
- definitions=main-2008210115
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Content-Transfer-Encoding: 7bit
+Date:   Fri, 21 Aug 2020 14:04:00 +0100
+From:   Marc Zyngier <maz@kernel.org>
+To:     Andrew Jones <drjones@redhat.com>, pbonzini@redhat.com
+Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
+        steven.price@arm.com
+Subject: Re: [PATCH v2 0/6] KVM: arm64: pvtime: Fixes and a new cap
+In-Reply-To: <20200819125026.fsbzvim74qp7sene@kamzik.brq.redhat.com>
+References: <20200804170604.42662-1-drjones@redhat.com>
+ <20200819125026.fsbzvim74qp7sene@kamzik.brq.redhat.com>
+User-Agent: Roundcube Webmail/1.4.7
+Message-ID: <c09b29a336cca62f9822c59fcacb207d@kernel.org>
+X-Sender: maz@kernel.org
+X-SA-Exim-Connect-IP: 51.254.78.96
+X-SA-Exim-Rcpt-To: drjones@redhat.com, pbonzini@redhat.com, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, steven.price@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Use the same test names in the TAP13 output as in the default output
-format. This makes the output more consistent. To achieve this, we
-need to pass the test name as an argument to the function
-`process_test_output`.
+On 2020-08-19 13:50, Andrew Jones wrote:
+> On Tue, Aug 04, 2020 at 07:05:58PM +0200, Andrew Jones wrote:
+>> v2:
+>>   - ARM_SMCCC_HV_PV_TIME_FEATURES now also returns 
+>> SMCCC_RET_NOT_SUPPORTED
+>>     when steal time is not supported
+>>   - Added READ_ONCE() for the run_delay read
+>>   - Reworked kvm_put/get_guest to not require type as a parameter
+>>   - Added some more text to the documentation for KVM_CAP_STEAL_TIME
+>>   - Enough changed that I didn't pick up Steven's r-b's
+>> 
+>> 
+>> The first four patches in the series are fixes that come from testing
+>> and reviewing pvtime code while writing the QEMU support[*]. The last
+>> patch is only a convenience for userspace, and I wouldn't be 
+>> heartbroken
+>> if it wasn't deemed worth it. The QEMU patches are currently written
+>> without the cap. However, if the cap is accepted, then I'll change the
+>> QEMU code to use it.
+>> 
+>> Thanks,
+>> drew
+>> 
+>> [*] 
+>> https://lists.gnu.org/archive/html/qemu-devel/2020-07/msg03856.html
+>>     (a v2 of this series will also be posted shortly)
+>> 
+>> Andrew Jones (6):
+>>   KVM: arm64: pvtime: steal-time is only supported when configured
+>>   KVM: arm64: pvtime: Fix potential loss of stolen time
+>>   KVM: arm64: Drop type input from kvm_put_guest
+>>   KVM: arm64: pvtime: Fix stolen time accounting across migration
+>>   KVM: Documentation: Minor fixups
+>>   arm64/x86: KVM: Introduce steal-time cap
+>> 
+>>  Documentation/virt/kvm/api.rst    | 22 ++++++++++++++++++----
+>>  arch/arm64/include/asm/kvm_host.h |  2 +-
+>>  arch/arm64/kvm/arm.c              |  3 +++
+>>  arch/arm64/kvm/pvtime.c           | 29 +++++++++++++----------------
+>>  arch/x86/kvm/x86.c                |  3 +++
+>>  include/linux/kvm_host.h          | 31 
+>> ++++++++++++++++++++++++++-----
+>>  include/uapi/linux/kvm.h          |  1 +
+>>  7 files changed, 65 insertions(+), 26 deletions(-)
+>> 
+>> --
+>> 2.25.4
+>> 
+>> _______________________________________________
+>> kvmarm mailing list
+>> kvmarm@lists.cs.columbia.edu
+>> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+>> 
+> 
+> Hi Marc,
+> 
+> Gentle ping. I'd like to to switch the QEMU code to using the proposed
+> KVM cap, if the cap is accepted.
 
-Before this change:
-$ ./run_tests.sh
-PASS selftest-setup (14 tests)
-...
+I'm fine with it. To be honest, this series is mostly fixes, except
+for that last patch.
 
-vs.
+Paolo, are you OK with me sending the whole thing as fixes, including
+the UAPI patch? At least we'd have something consistent for 5.9.
 
-$ ./run_tests.sh -t
-TAP version 13
-ok 1 - selftest: true
-ok 2 - selftest: argc == 3
-...
+Thanks,
 
-After this change:
-$ ./run_tests.sh
-PASS selftest-setup (14 tests)
-...
-
-vs.
-
-$ ./run_tests.sh -t
-TAP version 13
-ok 1 - selftest-setup: true
-ok 2 - selftest-setup: argc == 3
-...
-
-While at it, introduce a local variable `kernel` in
-`RUNTIME_log_stdout` since this makes the function easier to read.
-
-Signed-off-by: Marc Hartmayer <mhartmay@linux.ibm.com>
----
- run_tests.sh         | 15 +++++++++------
- scripts/runtime.bash |  6 +++---
- 2 files changed, 12 insertions(+), 9 deletions(-)
-
-diff --git a/run_tests.sh b/run_tests.sh
-index 01e36dcfa06e..b5812336866f 100755
---- a/run_tests.sh
-+++ b/run_tests.sh
-@@ -81,18 +81,19 @@ if [[ $tap_output == "no" ]]; then
-     postprocess_suite_output() { cat; }
- else
-     process_test_output() {
-+        local testname="$1"
-         CR=$'\r'
-         while read -r line; do
-             line="${line%$CR}"
-             case "${line:0:4}" in
-                 PASS)
--                    echo "ok TEST_NUMBER - ${line#??????}" >&3
-+                    echo "ok TEST_NUMBER - ${testname}:${line#*:*:}" >&3
-                     ;;
-                 FAIL)
--                    echo "not ok TEST_NUMBER - ${line#??????}" >&3
-+                    echo "not ok TEST_NUMBER - ${testname}:${line#*:*:}" >&3
-                     ;;
-                 SKIP)
--                    echo "ok TEST_NUMBER - ${line#??????} # skip" >&3
-+                    echo "ok TEST_NUMBER - ${testname}:${line#*:*:} # skip" >&3
-                     ;;
-                 *)
-                     ;;
-@@ -114,12 +115,14 @@ else
-     }
- fi
- 
--RUNTIME_log_stderr () { process_test_output; }
-+RUNTIME_log_stderr () { process_test_output "$1"; }
- RUNTIME_log_stdout () {
-+    local testname="$1"
-     if [ "$PRETTY_PRINT_STACKS" = "yes" ]; then
--        ./scripts/pretty_print_stacks.py $1 | process_test_output
-+        local kernel="$2"
-+        ./scripts/pretty_print_stacks.py "$kernel" | process_test_output "$testname"
-     else
--        process_test_output
-+        process_test_output "$testname"
-     fi
- }
- 
-diff --git a/scripts/runtime.bash b/scripts/runtime.bash
-index caa4c5ba18cc..294e6b15a5e2 100644
---- a/scripts/runtime.bash
-+++ b/scripts/runtime.bash
-@@ -140,10 +140,10 @@ function run()
-     # extra_params in the config file may contain backticks that need to be
-     # expanded, so use eval to start qemu.  Use "> >(foo)" instead of a pipe to
-     # preserve the exit status.
--    summary=$(eval $cmdline 2> >(RUNTIME_log_stderr) \
--                             > >(tee >(RUNTIME_log_stdout $kernel) | extract_summary))
-+    summary=$(eval $cmdline 2> >(RUNTIME_log_stderr $testname) \
-+                             > >(tee >(RUNTIME_log_stdout $testname $kernel) | extract_summary))
-     ret=$?
--    [ "$STANDALONE" != "yes" ] && echo > >(RUNTIME_log_stdout $kernel)
-+    [ "$STANDALONE" != "yes" ] && echo > >(RUNTIME_log_stdout $testname $kernel)
- 
-     if [ $ret -eq 0 ]; then
-         print_result "PASS" $testname "$summary"
+         M.
 -- 
-2.25.4
-
+Jazz is not dead. It just smells funny...
