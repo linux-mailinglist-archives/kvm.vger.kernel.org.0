@@ -2,140 +2,135 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6511024D722
-	for <lists+kvm@lfdr.de>; Fri, 21 Aug 2020 16:15:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 06F2424D729
+	for <lists+kvm@lfdr.de>; Fri, 21 Aug 2020 16:17:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727091AbgHUOPS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 21 Aug 2020 10:15:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42166 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726993AbgHUOPR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 21 Aug 2020 10:15:17 -0400
-Received: from mail-il1-x143.google.com (mail-il1-x143.google.com [IPv6:2607:f8b0:4864:20::143])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0442CC061573;
-        Fri, 21 Aug 2020 07:15:16 -0700 (PDT)
-Received: by mail-il1-x143.google.com with SMTP id f75so1213794ilh.3;
-        Fri, 21 Aug 2020 07:15:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=xxeM5gPH8yu6tWCUWA1p+lgxDN3K/oRI20zeA1Ye/AM=;
-        b=KnVRt/vE7Gs2dug2IuD45cFSjkQWwTvYY56745j/humEhcsfWutRa14n9MbdjyRi16
-         mZZLqIG70csF2R8txo+gsW2/2WaMHQOI0THY6qEIBRaf0giypShRsTgqWXbaXfxtrqnS
-         fEEVCqfrZ/eFL5WcG4dHc5CPLIRV5ri6J0xN3vtRXlcr5gCbrMLP27ZHCZG3eLNK4/Eo
-         tWRwVWrVNBPQE7MOkz3fcC6slrgW3Yu47hfDJqiXAO73rhN6BDcYj9Ljg0oomPfxAfSu
-         oKAL1ivvSUW4RikdrSu/1IIt4brxlfJdk7xqim9Pp1+C5z0EuS8Y2JIBQ69idqiCNpy/
-         GQGQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=xxeM5gPH8yu6tWCUWA1p+lgxDN3K/oRI20zeA1Ye/AM=;
-        b=MC+TOoPhFXCXux77w0IKfNKNainSXUYIhOyGOZsdqTAj6vVHTYN0WfiAQlL2cPXNRz
-         ChMITcqg6MTM8F+F7UgYNOJCWKitTt3Fvxpjm204IuGbcrnun9i569OHkJRRheUUpc7h
-         C5DBE19Su5X9IVz56Ywm6Gko2Yhlselwwg6p478vwF0TCs/61/MheWKiDZU3sTkcnb+A
-         49wKfkd1kEIHhORK/WKmCSRcFEbBpQIHjAQs9gjmnckMS5Meh16ecVgry6SJIy3AjWez
-         26tyPQ+raYn5ph1tGzdpEsLGvWLZIr8ZGNYJNbmMd5fy7ouOWTGeOdVFktv5637NTDkf
-         Q5dg==
-X-Gm-Message-State: AOAM532ADP2bz0GGI7NVjeplD7cuGKcWctbgEccKAzSq7Vbcs72V5OKQ
-        J6AGmNy2bWpavG1LedpTWW4Js8878R1p6WCAVA==
-X-Google-Smtp-Source: ABdhPJyJUfcxBK680ROxAoGVyv9OizagGjY0D4DfMhVrIVx3Li6gsgsunS6nsQDGSkscpuaVtnT18ZdO0zasYN1N0vI=
-X-Received: by 2002:a92:4f:: with SMTP id 76mr2608119ila.11.1598019313716;
- Fri, 21 Aug 2020 07:15:13 -0700 (PDT)
+        id S1726974AbgHUORD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 21 Aug 2020 10:17:03 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:53650 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726440AbgHUORD (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 21 Aug 2020 10:17:03 -0400
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 07LE22SG189458
+        for <kvm@vger.kernel.org>; Fri, 21 Aug 2020 10:17:01 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : in-reply-to : references : date : message-id : mime-version :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=zRIdx6EuooxuSC9Ok857ggmmuGSrrc9/lzb9XZURCXI=;
+ b=W9ooIEqj6fJ8M0MYEQwCA7zA8OG/3TSWb4hk5lvZZynosGicPd6B5dXvvywRQqMtTscv
+ R6ALQonYDJWEmNt+HqeMu8kjdPM3FhNdtccsyvoFhU7HNr2vdDsTAxQVjDE+jgZK2Bys
+ CTF+EZkXHztuN9GC0v/lvaDknwhD0bF8M1fQjXv2CSjac5zn5Mi7p42vV0LIQHMTNX0W
+ ISvgPgskTNnyXcQQyNGu1GO319xhgKna/SMIXtfEOmj3kS7eGAVMdiApivLQ/9fkwkT4
+ 21TuAZU54dE3pf2hcpOGfkcahfcuxQmDmr4RFPHnU7V3BLz0AGKw9rv3ttkaVUsVTA1M 0Q== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3327xu5wtv-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Fri, 21 Aug 2020 10:17:01 -0400
+Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 07LE2foI193757
+        for <kvm@vger.kernel.org>; Fri, 21 Aug 2020 10:17:01 -0400
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3327xu5wt2-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 21 Aug 2020 10:17:01 -0400
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 07LEFXkN032251;
+        Fri, 21 Aug 2020 14:16:59 GMT
+Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
+        by ppma03ams.nl.ibm.com with ESMTP id 3304um4dtp-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 21 Aug 2020 14:16:59 +0000
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
+        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 07LEGugA60162492
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 21 Aug 2020 14:16:57 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id D473BAE053;
+        Fri, 21 Aug 2020 14:16:56 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 6BACAAE055;
+        Fri, 21 Aug 2020 14:16:56 +0000 (GMT)
+Received: from marcibm (unknown [9.145.60.23])
+        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
+        Fri, 21 Aug 2020 14:16:56 +0000 (GMT)
+From:   Marc Hartmayer <mhartmay@linux.ibm.com>
+To:     Janosch Frank <frankja@linux.ibm.com>,
+        Marc Hartmayer <mhartmay@linux.ibm.com>, kvm@vger.kernel.org
+Cc:     Thomas Huth <thuth@redhat.com>,
+        David Hildenbrand <david@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Andrew Jones <drjones@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [kvm-unit-tests PATCH 2/2] Use same test names in the default and the TAP13 output format
+In-Reply-To: <86d94ab0-9554-3af8-96c5-825c373615ef@linux.ibm.com>
+References: <20200821123744.33173-1-mhartmay@linux.ibm.com> <20200821123744.33173-3-mhartmay@linux.ibm.com> <86d94ab0-9554-3af8-96c5-825c373615ef@linux.ibm.com>
+Date:   Fri, 21 Aug 2020 16:16:54 +0200
+Message-ID: <875z9cf5ih.fsf@linux.ibm.com>
 MIME-Version: 1.0
-References: <20200821105229.18938-1-pbonzini@redhat.com>
-In-Reply-To: <20200821105229.18938-1-pbonzini@redhat.com>
-From:   Brian Gerst <brgerst@gmail.com>
-Date:   Fri, 21 Aug 2020 10:15:02 -0400
-Message-ID: <CAMzpN2ixJ_nWMdgnLf9zuDpvuJFZOepWtyX3bxg7OgMTW0j4pA@mail.gmail.com>
-Subject: Re: [PATCH v2] x86/entry/64: Do not use RDPID in paranoid entry to
- accomodate KVM
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        kvm list <kvm@vger.kernel.org>,
-        "the arch/x86 maintainers" <x86@kernel.org>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Dave Hansen <dave.hansen@intel.com>,
-        Chang Seok Bae <chang.seok.bae@intel.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Sasha Levin <sashal@kernel.org>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Andy Lutomirski <luto@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
+ definitions=2020-08-21_08:2020-08-21,2020-08-21 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0
+ impostorscore=0 mlxscore=0 phishscore=0 adultscore=0 suspectscore=2
+ spamscore=0 priorityscore=1501 mlxlogscore=999 lowpriorityscore=0
+ bulkscore=0 clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2006250000 definitions=main-2008210125
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Aug 21, 2020 at 6:56 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
+On Fri, Aug 21, 2020 at 04:05 PM +0200, Janosch Frank <frankja@linux.ibm.co=
+m> wrote:
+> On 8/21/20 2:37 PM, Marc Hartmayer wrote:
+>> Use the same test names in the TAP13 output as in the default output
+>> format. This makes the output more consistent. To achieve this, we
+>> need to pass the test name as an argument to the function
+>> `process_test_output`.
+>>=20
+>> Before this change:
+>> $ ./run_tests.sh
+>> PASS selftest-setup (14 tests)
+>> ...
+>>=20
+>> vs.
+>>=20
+>> $ ./run_tests.sh -t
+>> TAP version 13
+>> ok 1 - selftest: true
+>> ok 2 - selftest: argc =3D=3D 3
+>> ...
+>>=20
+>> After this change:
+>> $ ./run_tests.sh
+>> PASS selftest-setup (14 tests)
+>> ...
+>>=20
+>> vs.
+>>=20
+>> $ ./run_tests.sh -t
+>> TAP version 13
+>> ok 1 - selftest-setup: true
+>> ok 2 - selftest-setup: argc =3D=3D 3
 >
-> From: Sean Christopherson <sean.j.christopherson@intel.com>
+> This doesn't work for me, we can't just drop prefixes.
 >
-> Don't use RDPID in the paranoid entry flow, as it can consume a KVM
-> guest's MSR_TSC_AUX value if an NMI arrives during KVM's run loop.
->
-> In general, the kernel does not need TSC_AUX because it can just use
-> __this_cpu_read(cpu_number) to read the current processor id.  It can
-> also just block preemption and thread migration at its will, therefore
-> it has no need for the atomic rdtsc+vgetcpu provided by RDTSCP.  For this
-> reason, as a performance optimization, KVM loads the guest's TSC_AUX when
-> a CPU first enters its run loop.  On AMD's SVM, it doesn't restore the
-> host's value until the CPU exits the run loop; VMX is even more aggressive
-> and defers restoring the host's value until the CPU returns to userspace.
->
-> This optimization obviously relies on the kernel not consuming TSC_AUX,
-> which falls apart if an NMI arrives during the run loop and uses RDPID.
-> Removing it would be painful, as both SVM and VMX would need to context
-> switch the MSR on every VM-Enter (for a cost of 2x WRMSR), whereas using
-> LSL instead RDPID is a minor blip.
->
-> Both SAVE_AND_SET_GSBASE and GET_PERCPU_BASE are only used in paranoid entry,
-> therefore the patch can just remove the RDPID alternative.
->
-> Fixes: eaad981291ee3 ("x86/entry/64: Introduce the FIND_PERCPU_BASE macro")
-> Cc: Dave Hansen <dave.hansen@intel.com>
-> Cc: Chang Seok Bae <chang.seok.bae@intel.com>
-> Cc: Peter Zijlstra <peterz@infradead.org>
-> Cc: Sasha Levin <sashal@kernel.org>
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Cc: kvm@vger.kernel.org
-> Reported-by: Tom Lendacky <thomas.lendacky@amd.com>
-> Debugged-by: Tom Lendacky <thomas.lendacky@amd.com>
-> Suggested-by: Andy Lutomirski <luto@kernel.org>
-> Suggested-by: Peter Zijlstra <peterz@infradead.org>
-> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
->  arch/x86/entry/calling.h | 10 ++++++----
->  1 file changed, 6 insertions(+), 4 deletions(-)
->
-> diff --git a/arch/x86/entry/calling.h b/arch/x86/entry/calling.h
-> index 98e4d8886f11..ae9b0d4615b3 100644
-> --- a/arch/x86/entry/calling.h
-> +++ b/arch/x86/entry/calling.h
-> @@ -374,12 +374,14 @@ For 32-bit we have the following conventions - kernel is built with
->   * Fetch the per-CPU GSBASE value for this processor and put it in @reg.
->   * We normally use %gs for accessing per-CPU data, but we are setting up
->   * %gs here and obviously can not use %gs itself to access per-CPU data.
-> + *
-> + * Do not use RDPID, because KVM loads guest's TSC_AUX on vm-entry and
-> + * may not restore the host's value until the CPU returns to userspace.
-> + * Thus the kernel would consume a guest's TSC_AUX if an NMI arrives
-> + * while running KVM's run loop.
->   */
->  .macro GET_PERCPU_BASE reg:req
-> -       ALTERNATIVE \
-> -               "LOAD_CPU_AND_NODE_SEG_LIMIT \reg", \
-> -               "RDPID  \reg", \
-> -               X86_FEATURE_RDPID
-> +       LOAD_CPU_AND_NODE_SEG_LIMIT \reg
->         andq    $VDSO_CPUNODE_MASK, \reg
->         movq    __per_cpu_offset(, \reg, 8), \reg
->  .endm
+> I.e. it needs to be "testname: prefix1: prefix2: prefixn: Test text"
+> selftest-setup: selftest: true
 
-LOAD_CPU_AND_NODE_SEG_LIMIT can be merged into this, as its only
-purpose was to work around using CPP macros in an alternative.
+Okay, I=E2=80=99ll fix that.
 
---
-Brian Gerst
+[=E2=80=A6snip]
+
+--=20
+Kind regards / Beste Gr=C3=BC=C3=9Fe
+   Marc Hartmayer
+
+IBM Deutschland Research & Development GmbH
+Vorsitzender des Aufsichtsrats: Gregor Pillen=20
+Gesch=C3=A4ftsf=C3=BChrung: Dirk Wittkopp
+Sitz der Gesellschaft: B=C3=B6blingen
+Registergericht: Amtsgericht Stuttgart, HRB 243294
