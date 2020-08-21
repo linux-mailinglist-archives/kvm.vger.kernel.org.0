@@ -2,110 +2,114 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C8EE124E1B8
-	for <lists+kvm@lfdr.de>; Fri, 21 Aug 2020 22:01:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 831CA24E1B0
+	for <lists+kvm@lfdr.de>; Fri, 21 Aug 2020 22:01:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727787AbgHUUBF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 21 Aug 2020 16:01:05 -0400
-Received: from terminus.zytor.com ([198.137.202.136]:45731 "EHLO
-        mail.zytor.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726772AbgHUT4f (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 21 Aug 2020 15:56:35 -0400
-Received: from [IPv6:2601:646:8600:3281:31ed:317b:19eb:7465] ([IPv6:2601:646:8600:3281:31ed:317b:19eb:7465])
-        (authenticated bits=0)
-        by mail.zytor.com (8.15.2/8.15.2) with ESMTPSA id 07LJu1g2490486
-        (version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
-        Fri, 21 Aug 2020 12:56:01 -0700
-DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 07LJu1g2490486
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
-        s=2020072401; t=1598039762;
-        bh=YhPQH5SfS558trRCShnnsO2tTvQs+aQ7LNSaONIhSVQ=;
-        h=Date:In-Reply-To:References:Subject:To:CC:From:From;
-        b=JhIrT7IfAsETgop44uuwFTNUnMwupA0yzOfUgEhoBRrWZ+s1qh5LWta4eL4B6uuxf
-         QAyCo2COB2ZV7dIR2I2cEQ3Rve1ZuNwUMgUINAmd8p4qi/0hQd0Pwe3631KXUQZtT2
-         r5ODdcEls1s7kJt1fEiOEa29FqIkAqGUT7MNzvPUyMQliMzmu+IxEj0ELjydA/6fW0
-         YfYBnTjdD48WBubISraGGRNPKRXf2/nCf0kb9n44Lp8O4vwqhk+LRQwKJ5H1o+evHC
-         fcy+jtKalN/exSfRIRsJsk2/oaJhUeUDx884p33xMmmuBGdb4ka2kyhfq2Ur9ll1dR
-         1gTGLtKjy6GcA==
-Date:   Fri, 21 Aug 2020 12:55:53 -0700
-User-Agent: K-9 Mail for Android
-In-Reply-To: <87r1s0gxfj.fsf@nanos.tec.linutronix.de>
-References: <20200821025050.32573-1-sean.j.christopherson@intel.com> <20200821074743.GB12181@zn.tnic> <3eb94913-662d-5423-21b1-eaf75635142a@redhat.com> <87r1s0gxfj.fsf@nanos.tec.linutronix.de>
+        id S1727003AbgHUT4g (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 21 Aug 2020 15:56:36 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:3948 "EHLO
+        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726306AbgHUT4c (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 21 Aug 2020 15:56:32 -0400
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 07LJWxB5023963;
+        Fri, 21 Aug 2020 15:56:29 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : in-reply-to : references : mime-version :
+ content-transfer-encoding; s=pp1;
+ bh=1PGyV5xOIEUjK9z3Jg4QxXcPpDhZXcE3sZY/Qjg8gwg=;
+ b=m/hgqOb6xYkIo2JBgQ4vwLXlYtOPuBTDm8FJSm5gXVV9YWphk4Tn+cBZcQhbwU+kSQYq
+ dplXEUnQEnSiZCqEVhbLVXA96AUXd3g//V3V14reif3WsA958GtJPaXKa6VYFx4e2v6K
+ hQubKbUzI7Ov5DmYwv2rhwKhc2jk7b1idk7Qj+DX4uIo6kUVPHRiIMr5+2rFdA6+PzIs
+ Mv9P3WkjmgPXCQsYHCqzwtO38cBwiyEQCu/KrBrPRPYicvzeDNvp5vf+GlDre3xubmut
+ i/iJISzCa0EVrpylb+/2j/fSKquUAQIuH6QlPf1CkcDJ+qsBS4KCE4vXy5cX2g9D7VOR 4Q== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 332dw6vavh-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 21 Aug 2020 15:56:29 -0400
+Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 07LJYAfO027332;
+        Fri, 21 Aug 2020 15:56:29 -0400
+Received: from ppma03wdc.us.ibm.com (ba.79.3fa9.ip4.static.sl-reverse.com [169.63.121.186])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 332dw6vava-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 21 Aug 2020 15:56:29 -0400
+Received: from pps.filterd (ppma03wdc.us.ibm.com [127.0.0.1])
+        by ppma03wdc.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 07LJsM76005387;
+        Fri, 21 Aug 2020 19:56:28 GMT
+Received: from b03cxnp07029.gho.boulder.ibm.com (b03cxnp07029.gho.boulder.ibm.com [9.17.130.16])
+        by ppma03wdc.us.ibm.com with ESMTP id 3304ceprww-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 21 Aug 2020 19:56:28 +0000
+Received: from b03ledav004.gho.boulder.ibm.com (b03ledav004.gho.boulder.ibm.com [9.17.130.235])
+        by b03cxnp07029.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 07LJuPFW47841588
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 21 Aug 2020 19:56:25 GMT
+Received: from b03ledav004.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id C41F778060;
+        Fri, 21 Aug 2020 19:56:25 +0000 (GMT)
+Received: from b03ledav004.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 475C27805C;
+        Fri, 21 Aug 2020 19:56:24 +0000 (GMT)
+Received: from cpe-172-100-175-116.stny.res.rr.com.com (unknown [9.85.191.76])
+        by b03ledav004.gho.boulder.ibm.com (Postfix) with ESMTP;
+        Fri, 21 Aug 2020 19:56:24 +0000 (GMT)
+From:   Tony Krowiak <akrowiak@linux.ibm.com>
+To:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+Cc:     freude@linux.ibm.com, borntraeger@de.ibm.com, cohuck@redhat.com,
+        mjrosato@linux.ibm.com, pasic@linux.ibm.com,
+        alex.williamson@redhat.com, kwankhede@nvidia.com,
+        fiuczy@linux.ibm.com, frankja@linux.ibm.com, david@redhat.com,
+        imbrenda@linux.ibm.com, hca@linux.ibm.com, gor@linux.ibm.com,
+        Tony Krowiak <akrowiak@linux.ibm.com>
+Subject: [PATCH v10 01/16] s390/vfio-ap: add version vfio_ap module
+Date:   Fri, 21 Aug 2020 15:56:01 -0400
+Message-Id: <20200821195616.13554-2-akrowiak@linux.ibm.com>
+X-Mailer: git-send-email 2.21.1
+In-Reply-To: <20200821195616.13554-1-akrowiak@linux.ibm.com>
+References: <20200821195616.13554-1-akrowiak@linux.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [PATCH] x86/entry/64: Disallow RDPID in paranoid entry if KVM is enabled
-To:     Thomas Gleixner <tglx@linutronix.de>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Sean Christopherson <sean.j.christopherson@intel.com>
-CC:     Andy Lutomirski <luto@kernel.org>, Ingo Molnar <mingo@redhat.com>,
-        x86@kernel.org, linux-kernel@vger.kernel.org,
-        Dave Hansen <dave.hansen@intel.com>,
-        Chang Seok Bae <chang.seok.bae@intel.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Sasha Levin <sashal@kernel.org>, kvm@vger.kernel.org,
-        Tom Lendacky <thomas.lendacky@amd.com>
-From:   hpa@zytor.com
-Message-ID: <5120CF63-12EB-4701-B303-C0A96201F5A2@zytor.com>
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
+ definitions=2020-08-21_09:2020-08-21,2020-08-21 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015
+ priorityscore=1501 suspectscore=3 mlxlogscore=999 spamscore=0
+ impostorscore=0 mlxscore=0 adultscore=0 lowpriorityscore=0 malwarescore=0
+ phishscore=0 bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2006250000 definitions=main-2008210183
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On August 21, 2020 2:28:32 AM PDT, Thomas Gleixner <tglx@linutronix=2Ede> w=
-rote:
->On Fri, Aug 21 2020 at 10:09, Paolo Bonzini wrote:
->> On 21/08/20 09:47, Borislav Petkov wrote:
->>> On Thu, Aug 20, 2020 at 07:50:50PM -0700, Sean Christopherson wrote:
->>>> +	 * Disallow RDPID if KVM is enabled as it may consume a guest's
->TSC_AUX
->>>> +	 * if an NMI arrives in KVM's run loop=2E  KVM loads guest's
->TSC_AUX on
->>>> +	 * VM-Enter and may not restore the host's value until the CPU
->returns
->>>> +	 * to userspace, i=2Ee=2E KVM depends on the kernel not using
->TSC_AUX=2E
->>>>  	 */
->>> And frankly, this is really unfair=2E The kernel should be able to use
->any
->>> MSR=2E IOW, KVM needs to be fixed here=2E I'm sure it context-switches
->other
->>> MSRs so one more MSR is not a big deal=2E
->>
->> The only MSR that KVM needs to context-switch manually are XSS and
->> SPEC_CTRL=2E  They tend to be the same on host and guest in which case
->> they can be optimized away=2E
->>
->> All the other MSRs (EFER and PAT are those that come to mind) are
->> handled by the microcode and thus they don't have the slowness of
->> RDMSR/WRMSR
->>
->> One more MSR *is* a big deal: KVM's vmentry+vmexit cost is around
->1000
->> cycles, adding 100 clock cycles for 2 WRMSRs is a 10% increase=2E
->
->We all know that MSRs are slow, but as a general rule I have to make it
->entirely clear that the kernel has precedence over KVM=2E
->
->If the kernel wants to use an MSR for it's own purposes then KVM has to
->deal with that and not the other way round=2E Preventing the kernel from
->using a facility freely is not an option ever=2E
->
->The insanities of KVM performance optimizations have bitten us more
->than
->once=2E
->
->For this particular case at hand I don't care much and we should just
->rip the whole RDPID thing out unconditionally=2E We still have zero
->numbers about the performance difference vs=2E LSL=2E
->
->Thanks,
->
->        tglx
+Let's set a version for the vfio_ap module so that automated regression
+tests can determine whether dynamic configuration tests can be run or
+not.
 
-It is hardly going to be a performance difference for paranoid entry, whic=
-h is hopefully rare enough that it falls into the noise=2E
---=20
-Sent from my Android device with K-9 Mail=2E Please excuse my brevity=2E
+Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
+---
+ drivers/s390/crypto/vfio_ap_drv.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/drivers/s390/crypto/vfio_ap_drv.c b/drivers/s390/crypto/vfio_ap_drv.c
+index be2520cc010b..f4ceb380dd61 100644
+--- a/drivers/s390/crypto/vfio_ap_drv.c
++++ b/drivers/s390/crypto/vfio_ap_drv.c
+@@ -17,10 +17,12 @@
+ 
+ #define VFIO_AP_ROOT_NAME "vfio_ap"
+ #define VFIO_AP_DEV_NAME "matrix"
++#define VFIO_AP_MODULE_VERSION "1.2.0"
+ 
+ MODULE_AUTHOR("IBM Corporation");
+ MODULE_DESCRIPTION("VFIO AP device driver, Copyright IBM Corp. 2018");
+ MODULE_LICENSE("GPL v2");
++MODULE_VERSION(VFIO_AP_MODULE_VERSION);
+ 
+ static struct ap_driver vfio_ap_drv;
+ 
+-- 
+2.21.1
+
