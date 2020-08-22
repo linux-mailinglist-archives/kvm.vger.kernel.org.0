@@ -2,137 +2,173 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id EFD3724E672
-	for <lists+kvm@lfdr.de>; Sat, 22 Aug 2020 10:46:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3D30B24E6E4
+	for <lists+kvm@lfdr.de>; Sat, 22 Aug 2020 12:32:02 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726169AbgHVIq4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 22 Aug 2020 04:46:56 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:37504 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725877AbgHVIqz (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Sat, 22 Aug 2020 04:46:55 -0400
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 07M8X2NR070835
-        for <kvm@vger.kernel.org>; Sat, 22 Aug 2020 04:46:55 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=to : cc : from : subject
- : message-id : date : mime-version : content-type :
- content-transfer-encoding; s=pp1;
- bh=aebO1AEz5Y4iv14O44y6TGomlwHUh6VEtAU/ECiLH0s=;
- b=fsrqbQQoWm5QySb125pyU4hthgt9Yj9yxkzpsQkDmMtgSBVGrGdJ4OZWNtndEImIx3RL
- qghGsc8GLYDC3bYfUNlm9l/ufWPpYxYVhHLWRkUDk8WkBi7P5ukQOib1v16FmX2YqDve
- ru9kNkenhZZjOEhdQQl6lxvMsIopwetoNLU8g6rYJ3X2dxdnquRDUIP3zeEkI5ZrLMvU
- rE8a/Nr49lAk3psAnZoSnQAIK8w3672xui7/3n+yHaV3+9gPqDrDoO0j7Idc7ZVFKmvr
- VmzCwQLzNXHe9fEQxbttqim3zDnw3/kHLFXnyR/O83PyWCjoySbwibPrmX/FLwOPWyiW oA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 332yehgpmu-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Sat, 22 Aug 2020 04:46:54 -0400
-Received: from m0098404.ppops.net (m0098404.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 07M8h83j131678
-        for <kvm@vger.kernel.org>; Sat, 22 Aug 2020 04:46:54 -0400
-Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 332yehgpm4-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Sat, 22 Aug 2020 04:46:54 -0400
-Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
-        by ppma06ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 07M8hWxp008176;
-        Sat, 22 Aug 2020 08:46:52 GMT
-Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
-        by ppma06ams.nl.ibm.com with ESMTP id 332uk687e4-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Sat, 22 Aug 2020 08:46:52 +0000
-Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
-        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 07M8ko9c29098442
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Sat, 22 Aug 2020 08:46:50 GMT
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 29737A404D;
-        Sat, 22 Aug 2020 08:46:50 +0000 (GMT)
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id D28DAA4040;
-        Sat, 22 Aug 2020 08:46:49 +0000 (GMT)
-Received: from oc5500677777.ibm.com (unknown [9.145.31.56])
-        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Sat, 22 Aug 2020 08:46:49 +0000 (GMT)
-To:     Alex Williamson <alex.williamson@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>
-Cc:     kvm@vger.kernel.org, Matthew Rosato <mjrosato@linux.ibm.com>
-From:   Niklas Schnelle <schnelle@linux.ibm.com>
-Subject: vfio-pci regression on x86_64 and Kernel v5.9-rc1
-Message-ID: <6d0a5da6-0deb-17c5-f8f5-f8113437c2d6@linux.ibm.com>
-Date:   Sat, 22 Aug 2020 10:46:49 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
- definitions=2020-08-22_06:2020-08-21,2020-08-22 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 mlxscore=0
- malwarescore=0 phishscore=0 lowpriorityscore=0 mlxlogscore=999
- impostorscore=0 priorityscore=1501 adultscore=0 bulkscore=0 spamscore=0
- clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2006250000 definitions=main-2008220090
+        id S1727889AbgHVKb6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 22 Aug 2020 06:31:58 -0400
+Received: from mail.kernel.org ([198.145.29.99]:41548 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726728AbgHVKb6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 22 Aug 2020 06:31:58 -0400
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 5377A206BE;
+        Sat, 22 Aug 2020 10:31:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1598092317;
+        bh=ocK8X0Jkb3+E68Wyft6gMd42NDDxBZpEPNLe3L8tiFA=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=lU3SZupPsSEbWsG7BWE6VTh2YeVqi1JjfQ/B7k1YaBj4wCWceoVYs8S7/7FqLnRCe
+         qQTBV2o0mNpFLA69hKO29VM9/VBk/bBM8e9t9c2PqeTatcLsVPuwMIUdUEOPq1Iudh
+         8SZnFRe+DyqO6vfRuPulTfb9bBOMn0WYzDIg3vOo=
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=wait-a-minute.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+        (Exim 4.92)
+        (envelope-from <maz@kernel.org>)
+        id 1k9QoV-0058m9-8B; Sat, 22 Aug 2020 11:31:55 +0100
+Date:   Sat, 22 Aug 2020 11:31:54 +0100
+Message-ID: <87h7svm0o5.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Steven Price <steven.price@arm.com>
+Cc:     Keqian Zhu <zhukeqian1@huawei.com>, linux-kernel@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        wanghaibin.wang@huawei.com
+Subject: Re: [RFC PATCH 0/5] KVM: arm64: Add pvtime LPT support
+In-Reply-To: <f14cfd5b-c103-5d56-82fb-59d0371c6f21@arm.com>
+References: <20200817084110.2672-1-zhukeqian1@huawei.com>
+        <8308f52e4c906cad710575724f9e3855@kernel.org>
+        <f14cfd5b-c103-5d56-82fb-59d0371c6f21@arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL/10.8 EasyPG/1.0.0 Emacs/26.3
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: steven.price@arm.com, zhukeqian1@huawei.com, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, catalin.marinas@arm.com, will@kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, wanghaibin.wang@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Alex, Hi Cornelia,
+Hi Steven,
 
-yesterday I wanted to test a variant of Matthew's patch for our detached VF
-problem on an x86_64 system, to make sure we don't break anything there.
-However I seem to have stumbled over a vfio-pci regression in v5.9-rc1
-(without the patch), it works fine on 5.8.1. 
-I haven't done a bisect yet but will as soon as I get to it.
+On Wed, 19 Aug 2020 09:54:40 +0100,
+Steven Price <steven.price@arm.com> wrote:
+>=20
+> On 18/08/2020 15:41, Marc Zyngier wrote:
+> > On 2020-08-17 09:41, Keqian Zhu wrote:
+> >> Hi all,
+> >>=20
+> >> This patch series picks up the LPT pvtime feature originally developed
+> >> by Steven Price: https://patchwork.kernel.org/cover/10726499/
+> >>=20
+> >> Backgroud:
+> >>=20
+> >> There is demand for cross-platform migration, which means we have to
+> >> solve different CPU features and arch counter frequency between hosts.
+> >> This patch series can solve the latter problem.
+> >>=20
+> >> About LPT:
+> >>=20
+> >> This implements support for Live Physical Time (LPT) which provides the
+> >> guest with a method to derive a stable counter of time during which the
+> >> guest is executing even when the guest is being migrated between hosts
+> >> with different physical counter frequencies.
+> >>=20
+> >> Changes on Steven Price's work:
+> >> 1. LPT structure: use symmatical semantics of scale multiplier, and use
+> >> =C2=A0=C2=A0 fraction bits instead of "shift" to make everything clear.
+> >> 2. Structure allocation: host kernel does not allocates the LPT
+> >> structure,
+> >> =C2=A0=C2=A0 instead it is allocated by userspace through VM attribute=
+s. The
+> >> save/restore
+> >> =C2=A0=C2=A0 functionality can be removed.
+> >> 3. Since LPT structure just need update once for each guest run,
+> >> add a flag to
+> >> =C2=A0=C2=A0 indicate the update status. This has two benifits: 1) avo=
+id
+> >> multiple update
+> >> =C2=A0=C2=A0 by each vCPUs. 2) If the update flag is not set, then ret=
+urn NOT
+> >> SUPPORT for
+> >> =C2=A0=C2=A0 coressponding guest HVC call.
+> >> 4. Add VM device attributes interface for userspace configuration.
+> >> 5. Add a base LPT read/write layer to reduce code.
+> >> 6. Support ptimer scaling.
+> >> 7. Support timer event stream translation.
+> >>=20
+> >> Things need concern:
+> >> 1. https://developer.arm.com/docs/den0057/a needs update.
+> >=20
+> > LPT was explicitly removed from the spec because it doesn't really
+> > solve the problem, specially for the firmware: EFI knows
+> > nothing about this, for example. How is it going to work?
+> > Also, nobody was ever able to explain how this would work for
+> > nested virt.
+> >=20
+> > ARMv8.4 and ARMv8.6 have the feature set that is required to solve
+> > this problem without adding more PV to the kernel.
+>=20
+> Hi Marc,
+>=20
+> These are good points, however we do still have the situation that
+> CPUs that don't have ARMv8.4/8.6 clearly cannot implement this. I
+> presume the use-case Keqian is looking at predates the necessary
+> support in the CPU - Keqian if you can provide more details on the
+> architecture(s) involved that would be helpful.
 
-The problem occurs immediately when attaching or booting a KVM VM with
-a vfio-pci pass-through. With virsh I get:
+My take on this is that it is a fictional use case. In my experience,
+migration happens across *identical* systems, and *any* difference
+visible to guests will cause things to go wrong. Errata management
+gets in the way, as usual (name *one* integration that isn't broken
+one way or another!).
 
-% sudo virsh start ubuntu20.04
-[sudo] password for XXXXXX:
-error: Failed to start domain ubuntu20.04
-error: internal error: qemu unexpectedly closed the monitor: 2020-08-22T08:21:12.663319Z qemu-system-x86_64: -device vfio-pci,host=0000:03:10.2,id=hostdev0,bus=pci.6,addr=0x0: VFIO_MAP_DMA failed: Cannot allocate memory
-2020-08-22T08:21:12.663344Z qemu-system-x86_64: -device vfio-pci,host=0000:03:10.2,id=hostdev0,bus=pci.6,addr=0x0: VFIO_MAP_DMA failed: Cannot allocate memory
-2020-08-22T08:21:12.663360Z qemu-system-x86_64: -device vfio-pci,host=0000:03:10.2,id=hostdev0,bus=pci.6,addr=0x0: VFIO_MAP_DMA failed: Cannot allocate memory
-2020-08-22T08:21:12.667207Z qemu-system-x86_64: -device vfio-pci,host=0000:03:10.2,id=hostdev0,bus=pci.6,addr=0x0: VFIO_MAP_DMA failed: Cannot allocate memory
-2020-08-22T08:21:12.667265Z qemu-system-x86_64: -device vfio-pci,host=0000:03:10.2,id=hostdev0,bus=pci.6,addr=0x0: vfio 0000:03:10.2: failed to setup container for group 54: memory listener initialization failed: Region pc.ram: vfio_dma_map(0x55ceedea1610, 0x0, 0xa0000, 0x7efcc7e00000) = -12 (Cannot allocate memory)
+Allowing migration across heterogeneous hosts requires a solution to
+the errata management problem, which everyone (including me) has
+decided to ignore so far (and I claim that not having a constant timer
+frequency exposed to guests is an architecture bug).
 
-and in dmesg:
+> Nested virt is indeed more of an issue - we did have some ideas around
+> using SDEI that never made it to the spec.
 
-[  379.368222] VFIO - User Level meta-driver version: 0.3
-[  379.435459] ixgbe 0000:03:00.0 enp3s0: VF Reset msg received from vf 1
-[  379.663384] cgroup: cgroup: disabling cgroup2 socket matching due to net_prio or net_cls activation
-[  379.764947] vfio_pin_pages_remote: RLIMIT_MEMLOCK (9663676416) exceeded
-[  379.764972] vfio_pin_pages_remote: RLIMIT_MEMLOCK (9663676416) exceeded
-[  379.764989] vfio_pin_pages_remote: RLIMIT_MEMLOCK (9663676416) exceeded
-[  379.768836] vfio_pin_pages_remote: RLIMIT_MEMLOCK (9663676416) exceeded
-[  379.979310] ixgbevf 0000:03:10.2: enabling device (0000 -> 0002)
-[  379.979505] ixgbe 0000:03:00.0 enp3s0: VF Reset msg received from vf 1
-[  379.992624] ixgbevf 0000:03:10.2: 2e:7a:3e:95:5d:be
-[  379.992627] ixgbevf 0000:03:10.2: MAC: 1
-[  379.992629] ixgbevf 0000:03:10.2: Intel(R) 82599 Virtual Function
-[  379.993594] ixgbevf 0000:03:10.2 enp3s0v1: renamed from eth1
-[  380.043490] ixgbevf 0000:03:10.2: NIC Link is Up 1 Gbps
-[  380.045081] IPv6: ADDRCONF(NETDEV_CHANGE): enp3s0v1: link becomes ready
+SDEI? Sigh... Why would SDEI be useful for NV and not for !NV?
 
-This does not seem to be device related, I initially tried with
-a VF of an Intel 82599 10 Gigabit NIC but also tried other
-physical PCI devices. I also initially tried increasing the ulimit
-but looking at the code it seems the limit is actually 9663676416 bytes
-so that should be plenty.
+> However I would argue that the most pragmatic approach would be to
+> not support the combination of nested virt and LPT. Hopefully that
+> can wait until the counter scaling support is available and not
+> require PV.
 
-Simply rebooting into v5.8.1 (official Arch Linux Kernel but that's
-pretty much exactly Greg's stable series and I based my config on its config)
-fixes the issue and the same setup works perfectly.
-In most documentation people only use Intel boxes for pass-through
-so I should mention that this is a AMD Ryzen 9 3900X
-with Starship/Matisse IOMMU and my Kernel command line contains
-"amd_iommu=on iommu=pt".
-Does any of this ring a bell for you or do we definitely need
-a full bisect or any other information?
+And have yet another set of band aids that paper over the fact that we
+can't get a consistent story on virtualization? No, thank you.
 
-Best regards,
-Niklas Schnelle
+NV is (IMHO) much more important than LPT as it has a chance of
+getting used. LPT is just another tick box, and the fact that ARM is
+ready to ignore sideline a decent portion of the architecture is a
+clear sign that it hasn't been thought out.
+
+> We are discussing (re-)releasing the spec with the LPT parts added. If
+> you have fundamental objections then please me know.
+
+I do, see above. I'm stating that the use case doesn't really exist
+given the state of the available HW and the fragmentation of the
+architecture, and that ignoring the most important innovation in the
+virtualization architecture since ARMv7 is at best short-sighted.
+
+Time scaling is just an instance of the errata management problem, and
+that is the issue that needs solving. Papering over part of the
+problem is not helping.
+
+	M.
+
+--=20
+Without deviation from the norm, progress is not possible.
