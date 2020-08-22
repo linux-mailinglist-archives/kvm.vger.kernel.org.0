@@ -2,118 +2,130 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4FFE224E4F2
-	for <lists+kvm@lfdr.de>; Sat, 22 Aug 2020 05:40:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9617E24E4FC
+	for <lists+kvm@lfdr.de>; Sat, 22 Aug 2020 06:03:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726817AbgHVDku (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 21 Aug 2020 23:40:50 -0400
-Received: from mga18.intel.com ([134.134.136.126]:27132 "EHLO mga18.intel.com"
+        id S1725856AbgHVEBQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 22 Aug 2020 00:01:16 -0400
+Received: from mga17.intel.com ([192.55.52.151]:41402 "EHLO mga17.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726588AbgHVDkt (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 21 Aug 2020 23:40:49 -0400
-IronPort-SDR: XI8iZwOPVRae2SmO+ZrWvqBwxj/r8G/3aocDDZ2He1icgfqhzknynFypuWlhlsC39tZyYJlNQt
- CGEdwDtgDiog==
-X-IronPort-AV: E=McAfee;i="6000,8403,9720"; a="143314513"
+        id S1725300AbgHVEBQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 22 Aug 2020 00:01:16 -0400
+IronPort-SDR: yUu/cx37u8efnEV/L08bDndAWiX+xQj219NXoVRS8CBOOpm1bZC7pNK4mGaVRURiRsmNtvwSwe
+ oqT6Wm/8Asfg==
+X-IronPort-AV: E=McAfee;i="6000,8403,9720"; a="135742831"
 X-IronPort-AV: E=Sophos;i="5.76,339,1592895600"; 
-   d="scan'208";a="143314513"
+   d="scan'208";a="135742831"
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Aug 2020 20:40:48 -0700
-IronPort-SDR: mOIn+FLsb6AuSFKJaaWlUZqjfnGTlLWwIYCCjdzZV6hPJlZXc7LShklM3zKdnwjO/NhfmTI97Y
- 6923My5/k4Fw==
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Aug 2020 21:01:15 -0700
+IronPort-SDR: az/BSV7RSyZiBINLupZ52ug5lb0TI9qqa2rKE/pCL8zqRRJ579VSDUbWOtN+3nvF/BVZOPCYbT
+ zlOpPpkOZn0w==
 X-IronPort-AV: E=Sophos;i="5.76,339,1592895600"; 
-   d="scan'208";a="401644126"
+   d="scan'208";a="498728955"
 Received: from sjchrist-ice.jf.intel.com (HELO sjchrist-ice) ([10.54.31.34])
-  by fmsmga001-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Aug 2020 20:40:47 -0700
-Date:   Fri, 21 Aug 2020 20:40:46 -0700
+  by fmsmga005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Aug 2020 21:01:15 -0700
+Date:   Fri, 21 Aug 2020 21:01:14 -0700
 From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Jim Mattson <jmattson@google.com>
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+To:     Wanpeng Li <kernellwp@gmail.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
-        kvm list <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH] KVM: VMX: fix crash cleanup when KVM wasn't used
-Message-ID: <20200822034046.GE4769@sjchrist-ice>
-References: <20200401081348.1345307-1-vkuznets@redhat.com>
- <CALMp9eROXAOg_g=R8JRVfywY7uQXzBtVxKJYXq0dUcob-BfR-g@mail.gmail.com>
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>
+Subject: Re: [PATCH] KVM: LAPIC: Don't kick vCPU which is injecting
+ already-expired timer
+Message-ID: <20200822040114.GF4769@sjchrist-ice>
+References: <1598001454-11709-1-git-send-email-wanpengli@tencent.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CALMp9eROXAOg_g=R8JRVfywY7uQXzBtVxKJYXq0dUcob-BfR-g@mail.gmail.com>
+In-Reply-To: <1598001454-11709-1-git-send-email-wanpengli@tencent.com>
 User-Agent: Mutt/1.9.4 (2018-02-28)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Aug 20, 2020 at 01:08:22PM -0700, Jim Mattson wrote:
-> On Wed, Apr 1, 2020 at 1:13 AM Vitaly Kuznetsov <vkuznets@redhat.com> wrote:
-> > ---
-> >  arch/x86/kvm/vmx/vmx.c | 12 +++++++-----
-> >  1 file changed, 7 insertions(+), 5 deletions(-)
-> >
-> > diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> > index 3aba51d782e2..39a5dde12b79 100644
-> > --- a/arch/x86/kvm/vmx/vmx.c
-> > +++ b/arch/x86/kvm/vmx/vmx.c
-> > @@ -2257,10 +2257,6 @@ static int hardware_enable(void)
-> >             !hv_get_vp_assist_page(cpu))
-> >                 return -EFAULT;
-> >
-> > -       INIT_LIST_HEAD(&per_cpu(loaded_vmcss_on_cpu, cpu));
-> > -       INIT_LIST_HEAD(&per_cpu(blocked_vcpu_on_cpu, cpu));
-> > -       spin_lock_init(&per_cpu(blocked_vcpu_on_cpu_lock, cpu));
-> > -
-> >         r = kvm_cpu_vmxon(phys_addr);
-> >         if (r)
-> >                 return r;
-> > @@ -8006,7 +8002,7 @@ module_exit(vmx_exit);
-> >
-> >  static int __init vmx_init(void)
-> >  {
-> > -       int r;
-> > +       int r, cpu;
-> >
-> >  #if IS_ENABLED(CONFIG_HYPERV)
-> >         /*
-> > @@ -8060,6 +8056,12 @@ static int __init vmx_init(void)
-> >                 return r;
-> >         }
-> >
-> > +       for_each_possible_cpu(cpu) {
-> > +               INIT_LIST_HEAD(&per_cpu(loaded_vmcss_on_cpu, cpu));
-> > +               INIT_LIST_HEAD(&per_cpu(blocked_vcpu_on_cpu, cpu));
-> > +               spin_lock_init(&per_cpu(blocked_vcpu_on_cpu_lock, cpu));
-> > +       }
+On Fri, Aug 21, 2020 at 05:17:34PM +0800, Wanpeng Li wrote:
+> From: Wanpeng Li <wanpengli@tencent.com>
 > 
-> Just above this chunk, we have:
-> 
-> r = vmx_setup_l1d_flush(vmentry_l1d_flush_param);
-> if (r) {
->         vmx_exit();
-> ...
-> 
-> If we take that early exit, because vmx_setup_l1d_flush() fails, we
-> won't initialize loaded_vmcss_on_cpu. However, vmx_exit() calls
-> kvm_exit(), which calls on_each_cpu(hardware_disable_nolock, NULL, 1).
-> Hardware_disable_nolock() then calls kvm_arch_hardware_disable(),
-> which calls kvm_x86_ops.hardware_disable() [the vmx.c
-> hardware_disable()], which calls vmclear_local_loaded_vmcss().
-> 
-> I believe that vmclear_local_loaded_vmcss() will then try to
-> dereference a NULL pointer, since per_cpu(loaded_vmcss_on_cpu, cpu) is
-> uninitialzed.
+> The kick after setting KVM_REQ_PENDING_TIMER is used to handle the timer 
+> fires on a different pCPU which vCPU is running on, we don't need this 
+> kick when injecting already-expired timer, this kick is expensive since 
+> memory barrier, rcu, preemption disable/enable operations. This patch 
+> reduces the overhead by don't kick vCPU which is injecting already-expired 
+> timer.
 
-I agree the code is a mess (kvm_init() and kvm_exit() included), but I'm
-pretty sure hardware_disable_nolock() is guaranteed to be a nop as it's
-impossible for kvm_usage_count to be non-zero if vmx_init() hasn't
-finished.
+This should also call out the VMX preemption timer case, which also passes
+from_timer_fn=false but doesn't need a kick because kvm_lapic_expired_hv_timer()
+is called from the target vCPU.
+ 
+> Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
+> ---
+>  arch/x86/kvm/lapic.c | 2 +-
+>  arch/x86/kvm/x86.c   | 5 +++--
+>  arch/x86/kvm/x86.h   | 2 +-
+>  3 files changed, 5 insertions(+), 4 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+> index 248095a..5b5ae66 100644
+> --- a/arch/x86/kvm/lapic.c
+> +++ b/arch/x86/kvm/lapic.c
+> @@ -1642,7 +1642,7 @@ static void apic_timer_expired(struct kvm_lapic *apic, bool from_timer_fn)
+>  	}
+>  
+>  	atomic_inc(&apic->lapic_timer.pending);
+> -	kvm_set_pending_timer(vcpu);
+> +	kvm_set_pending_timer(vcpu, from_timer_fn);
 
-> >  #ifdef CONFIG_KEXEC_CORE
-> >         rcu_assign_pointer(crash_vmclear_loaded_vmcss,
-> >                            crash_vmclear_local_loaded_vmcss);
-> > --
-> > 2.25.1
-> >
+My vote would be to open code kvm_set_pending_timer() here and drop the
+helper, i.e.
+
+	kvm_make_request(KVM_REQ_PENDING_TIMER, vcpu);
+	if (from_timer_fn)
+		kvm_vcpu_kick(vcpu);
+
+with that and an updated changelog:
+
+Reviewed-by: Sean Christopherson <sean.j.christopherson@intel.com>
+
+>  }
+>  
+>  static void start_sw_tscdeadline(struct kvm_lapic *apic)
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 599d732..2a45405 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -1778,10 +1778,11 @@ static s64 get_kvmclock_base_ns(void)
+>  }
+>  #endif
+>  
+> -void kvm_set_pending_timer(struct kvm_vcpu *vcpu)
+> +void kvm_set_pending_timer(struct kvm_vcpu *vcpu, bool should_kick)
+>  {
+>  	kvm_make_request(KVM_REQ_PENDING_TIMER, vcpu);
+> -	kvm_vcpu_kick(vcpu);
+> +	if (should_kick)
+> +		kvm_vcpu_kick(vcpu);
+>  }
+>  
+>  static void kvm_write_wall_clock(struct kvm *kvm, gpa_t wall_clock)
+> diff --git a/arch/x86/kvm/x86.h b/arch/x86/kvm/x86.h
+> index 995ab69..0eaae9c 100644
+> --- a/arch/x86/kvm/x86.h
+> +++ b/arch/x86/kvm/x86.h
+> @@ -246,7 +246,7 @@ static inline bool kvm_vcpu_latch_init(struct kvm_vcpu *vcpu)
+>  	return is_smm(vcpu) || kvm_x86_ops.apic_init_signal_blocked(vcpu);
+>  }
+>  
+> -void kvm_set_pending_timer(struct kvm_vcpu *vcpu);
+> +void kvm_set_pending_timer(struct kvm_vcpu *vcpu, bool should_kick);
+>  void kvm_inject_realmode_interrupt(struct kvm_vcpu *vcpu, int irq, int inc_eip);
+>  
+>  void kvm_write_tsc(struct kvm_vcpu *vcpu, struct msr_data *msr);
+> -- 
+> 2.7.4
+> 
