@@ -2,109 +2,137 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1A43E24E63A
-	for <lists+kvm@lfdr.de>; Sat, 22 Aug 2020 10:06:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EFD3724E672
+	for <lists+kvm@lfdr.de>; Sat, 22 Aug 2020 10:46:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725995AbgHVIGz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 22 Aug 2020 04:06:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37908 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725864AbgHVIGx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 22 Aug 2020 04:06:53 -0400
-Received: from mail-wm1-x344.google.com (mail-wm1-x344.google.com [IPv6:2a00:1450:4864:20::344])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 31502C061573;
-        Sat, 22 Aug 2020 01:06:53 -0700 (PDT)
-Received: by mail-wm1-x344.google.com with SMTP id t2so3593051wma.0;
-        Sat, 22 Aug 2020 01:06:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=sender:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=nhZfeKpNSacQbwTrkcUeaFzZcY4FZUsrUpQMtrkrP2c=;
-        b=YQV7DnC3V8PvPvptXW/BVERjjxjrNXBeychEiMxzqTFY+lGLNxR6aSk0ypAfQYyhL9
-         XbSFgUa3IJsKKPTIzvHWGogGn662txyC9Q5euywi/Hhl8+mXePCd4GU4cEhe9RR9ORT9
-         gLukSaM27MjShgntoLgntSyeUglxKzb6ErnHy+FcKVKGSShxCvX6FCuOoDG8oaeCa4Ak
-         9QtOUzLAm/T77bXmFkuH0hwP4gZoG4Fju/V4uRRgB8voNUFQwE8CT04iZ5e3UFmDqanX
-         yYj4jQ8enMcsa8GHKeSe2nmP1qi/Sgwxnxjqy5HuuwER3IXdGBV1m9UDsWHbO0lhbthX
-         vsXQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
-         :mime-version:content-transfer-encoding;
-        bh=nhZfeKpNSacQbwTrkcUeaFzZcY4FZUsrUpQMtrkrP2c=;
-        b=bqzhF1u9LX9Mf9KRCiaTdD/oIeoJuUh1/ZOKGykiDaAX1r3g7Pkdr4biw3M+IUPpU2
-         4Itt9iGswp1QvNjmc5OLpsfS7/4RHTx1qBHXEvUzndfFqn7FtPZnQh/Dx3cZ/G+zuWwG
-         4EmCMd4q4g3E3ww7OlM/OuiEYP1vtRZytG1+Uj8tzd2UZcO9d8LsRyE/44W8aC2OyBzF
-         PJhE6UJIL6/usNUFXLqMlUlgTi3Ls7NUpYBUgeUkTxl7mqGfDZTGQyyzsWF93Ol+C6Vr
-         1NmzA0XaDMO+i1EGEU3GjHxk2o2jx2x7aVp4B+AGLA5LCjAb8FW/9QqNN8lsTOvHC7bj
-         OgAw==
-X-Gm-Message-State: AOAM530t/tk/X5G6HVP2961c52PHnY+ADouY+cunFiyRvi31ffh9P8v5
-        YTxT8wX/ELYdWjdLg2q6EoE=
-X-Google-Smtp-Source: ABdhPJwYvtwRWEsSBMuzGRA2zYq/qq1QawjKPThni5wD8n7e8wcqJTjonTZVOCpTdhfeRZ487YrRXw==
-X-Received: by 2002:a7b:c095:: with SMTP id r21mr7134017wmh.152.1598083611868;
-        Sat, 22 Aug 2020 01:06:51 -0700 (PDT)
-Received: from donizetti.lan ([2001:b07:6468:f312:1cc0:4e4e:f1a9:1745])
-        by smtp.gmail.com with ESMTPSA id i4sm8804892wrw.26.2020.08.22.01.06.50
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 22 Aug 2020 01:06:51 -0700 (PDT)
-From:   Paolo Bonzini <pbonzini@redhat.com>
-To:     torvalds@linux-foundation.org
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org, maz@kernel.org
-Subject: [GIT PULL] KVM changes for Linux 5.9-rc2
-Date:   Sat, 22 Aug 2020 10:06:47 +0200
-Message-Id: <20200822080647.722819-1-pbonzini@redhat.com>
-X-Mailer: git-send-email 2.26.2
+        id S1726169AbgHVIq4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 22 Aug 2020 04:46:56 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:37504 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1725877AbgHVIqz (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Sat, 22 Aug 2020 04:46:55 -0400
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 07M8X2NR070835
+        for <kvm@vger.kernel.org>; Sat, 22 Aug 2020 04:46:55 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=to : cc : from : subject
+ : message-id : date : mime-version : content-type :
+ content-transfer-encoding; s=pp1;
+ bh=aebO1AEz5Y4iv14O44y6TGomlwHUh6VEtAU/ECiLH0s=;
+ b=fsrqbQQoWm5QySb125pyU4hthgt9Yj9yxkzpsQkDmMtgSBVGrGdJ4OZWNtndEImIx3RL
+ qghGsc8GLYDC3bYfUNlm9l/ufWPpYxYVhHLWRkUDk8WkBi7P5ukQOib1v16FmX2YqDve
+ ru9kNkenhZZjOEhdQQl6lxvMsIopwetoNLU8g6rYJ3X2dxdnquRDUIP3zeEkI5ZrLMvU
+ rE8a/Nr49lAk3psAnZoSnQAIK8w3672xui7/3n+yHaV3+9gPqDrDoO0j7Idc7ZVFKmvr
+ VmzCwQLzNXHe9fEQxbttqim3zDnw3/kHLFXnyR/O83PyWCjoySbwibPrmX/FLwOPWyiW oA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 332yehgpmu-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Sat, 22 Aug 2020 04:46:54 -0400
+Received: from m0098404.ppops.net (m0098404.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 07M8h83j131678
+        for <kvm@vger.kernel.org>; Sat, 22 Aug 2020 04:46:54 -0400
+Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 332yehgpm4-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Sat, 22 Aug 2020 04:46:54 -0400
+Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
+        by ppma06ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 07M8hWxp008176;
+        Sat, 22 Aug 2020 08:46:52 GMT
+Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
+        by ppma06ams.nl.ibm.com with ESMTP id 332uk687e4-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Sat, 22 Aug 2020 08:46:52 +0000
+Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
+        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 07M8ko9c29098442
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Sat, 22 Aug 2020 08:46:50 GMT
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 29737A404D;
+        Sat, 22 Aug 2020 08:46:50 +0000 (GMT)
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id D28DAA4040;
+        Sat, 22 Aug 2020 08:46:49 +0000 (GMT)
+Received: from oc5500677777.ibm.com (unknown [9.145.31.56])
+        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Sat, 22 Aug 2020 08:46:49 +0000 (GMT)
+To:     Alex Williamson <alex.williamson@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>
+Cc:     kvm@vger.kernel.org, Matthew Rosato <mjrosato@linux.ibm.com>
+From:   Niklas Schnelle <schnelle@linux.ibm.com>
+Subject: vfio-pci regression on x86_64 and Kernel v5.9-rc1
+Message-ID: <6d0a5da6-0deb-17c5-f8f5-f8113437c2d6@linux.ibm.com>
+Date:   Sat, 22 Aug 2020 10:46:49 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
+ definitions=2020-08-22_06:2020-08-21,2020-08-22 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 mlxscore=0
+ malwarescore=0 phishscore=0 lowpriorityscore=0 mlxlogscore=999
+ impostorscore=0 priorityscore=1501 adultscore=0 bulkscore=0 spamscore=0
+ clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2006250000 definitions=main-2008220090
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Linus,
+Hi Alex, Hi Cornelia,
 
-The following changes since commit e792415c5d3e0eb52527cce228a72e4392f8cae2:
+yesterday I wanted to test a variant of Matthew's patch for our detached VF
+problem on an x86_64 system, to make sure we don't break anything there.
+However I seem to have stumbled over a vfio-pci regression in v5.9-rc1
+(without the patch), it works fine on 5.8.1. 
+I haven't done a bisect yet but will as soon as I get to it.
 
-  KVM: MIPS/VZ: Fix build error caused by 'kvm_run' cleanup (2020-08-11 07:19:41 -0400)
+The problem occurs immediately when attaching or booting a KVM VM with
+a vfio-pci pass-through. With virsh I get:
 
-are available in the Git repository at:
+% sudo virsh start ubuntu20.04
+[sudo] password for XXXXXX:
+error: Failed to start domain ubuntu20.04
+error: internal error: qemu unexpectedly closed the monitor: 2020-08-22T08:21:12.663319Z qemu-system-x86_64: -device vfio-pci,host=0000:03:10.2,id=hostdev0,bus=pci.6,addr=0x0: VFIO_MAP_DMA failed: Cannot allocate memory
+2020-08-22T08:21:12.663344Z qemu-system-x86_64: -device vfio-pci,host=0000:03:10.2,id=hostdev0,bus=pci.6,addr=0x0: VFIO_MAP_DMA failed: Cannot allocate memory
+2020-08-22T08:21:12.663360Z qemu-system-x86_64: -device vfio-pci,host=0000:03:10.2,id=hostdev0,bus=pci.6,addr=0x0: VFIO_MAP_DMA failed: Cannot allocate memory
+2020-08-22T08:21:12.667207Z qemu-system-x86_64: -device vfio-pci,host=0000:03:10.2,id=hostdev0,bus=pci.6,addr=0x0: VFIO_MAP_DMA failed: Cannot allocate memory
+2020-08-22T08:21:12.667265Z qemu-system-x86_64: -device vfio-pci,host=0000:03:10.2,id=hostdev0,bus=pci.6,addr=0x0: vfio 0000:03:10.2: failed to setup container for group 54: memory listener initialization failed: Region pc.ram: vfio_dma_map(0x55ceedea1610, 0x0, 0xa0000, 0x7efcc7e00000) = -12 (Cannot allocate memory)
 
-  https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus
+and in dmesg:
 
-for you to fetch changes up to b5331379bc62611d1026173a09c73573384201d9:
+[  379.368222] VFIO - User Level meta-driver version: 0.3
+[  379.435459] ixgbe 0000:03:00.0 enp3s0: VF Reset msg received from vf 1
+[  379.663384] cgroup: cgroup: disabling cgroup2 socket matching due to net_prio or net_cls activation
+[  379.764947] vfio_pin_pages_remote: RLIMIT_MEMLOCK (9663676416) exceeded
+[  379.764972] vfio_pin_pages_remote: RLIMIT_MEMLOCK (9663676416) exceeded
+[  379.764989] vfio_pin_pages_remote: RLIMIT_MEMLOCK (9663676416) exceeded
+[  379.768836] vfio_pin_pages_remote: RLIMIT_MEMLOCK (9663676416) exceeded
+[  379.979310] ixgbevf 0000:03:10.2: enabling device (0000 -> 0002)
+[  379.979505] ixgbe 0000:03:00.0 enp3s0: VF Reset msg received from vf 1
+[  379.992624] ixgbevf 0000:03:10.2: 2e:7a:3e:95:5d:be
+[  379.992627] ixgbevf 0000:03:10.2: MAC: 1
+[  379.992629] ixgbevf 0000:03:10.2: Intel(R) 82599 Virtual Function
+[  379.993594] ixgbevf 0000:03:10.2 enp3s0v1: renamed from eth1
+[  380.043490] ixgbevf 0000:03:10.2: NIC Link is Up 1 Gbps
+[  380.045081] IPv6: ADDRCONF(NETDEV_CHANGE): enp3s0v1: link becomes ready
 
-  KVM: arm64: Only reschedule if MMU_NOTIFIER_RANGE_BLOCKABLE is not set (2020-08-21 18:06:43 -0400)
+This does not seem to be device related, I initially tried with
+a VF of an Intel 82599 10 Gigabit NIC but also tried other
+physical PCI devices. I also initially tried increasing the ulimit
+but looking at the code it seems the limit is actually 9663676416 bytes
+so that should be plenty.
 
-----------------------------------------------------------------
-* PAE and PKU bugfixes for x86
-* selftests fix for new binutils
-* MMU notifier fix for arm64
+Simply rebooting into v5.8.1 (official Arch Linux Kernel but that's
+pretty much exactly Greg's stable series and I based my config on its config)
+fixes the issue and the same setup works perfectly.
+In most documentation people only use Intel boxes for pass-through
+so I should mention that this is a AMD Ryzen 9 3900X
+with Starship/Matisse IOMMU and my Kernel command line contains
+"amd_iommu=on iommu=pt".
+Does any of this ring a bell for you or do we definitely need
+a full bisect or any other information?
 
-----------------------------------------------------------------
-Jim Mattson (2):
-      kvm: x86: Toggling CR4.SMAP does not load PDPTEs in PAE mode
-      kvm: x86: Toggling CR4.PKE does not load PDPTEs in PAE mode
-
-Paolo Bonzini (1):
-      KVM: x86: fix access code passed to gva_to_gpa
-
-Will Deacon (2):
-      KVM: Pass MMU notifier range flags to kvm_unmap_hva_range()
-      KVM: arm64: Only reschedule if MMU_NOTIFIER_RANGE_BLOCKABLE is not set
-
-Yang Weijiang (1):
-      selftests: kvm: Use a shorter encoding to clear RAX
-
- arch/arm64/include/asm/kvm_host.h               |  2 +-
- arch/arm64/kvm/mmu.c                            | 19 ++++++++++++++-----
- arch/mips/include/asm/kvm_host.h                |  2 +-
- arch/mips/kvm/mmu.c                             |  3 ++-
- arch/powerpc/include/asm/kvm_host.h             |  3 ++-
- arch/powerpc/kvm/book3s.c                       |  3 ++-
- arch/powerpc/kvm/e500_mmu_host.c                |  3 ++-
- arch/x86/include/asm/kvm_host.h                 |  3 ++-
- arch/x86/kvm/mmu/mmu.c                          |  3 ++-
- arch/x86/kvm/x86.c                              |  6 ++++--
- tools/testing/selftests/kvm/x86_64/debug_regs.c |  4 ++--
- virt/kvm/kvm_main.c                             |  3 ++-
- 12 files changed, 36 insertions(+), 18 deletions(-)
+Best regards,
+Niklas Schnelle
