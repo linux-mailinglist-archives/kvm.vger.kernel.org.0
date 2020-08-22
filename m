@@ -2,121 +2,118 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C372524E4D4
-	for <lists+kvm@lfdr.de>; Sat, 22 Aug 2020 05:28:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4FFE224E4F2
+	for <lists+kvm@lfdr.de>; Sat, 22 Aug 2020 05:40:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726796AbgHVD2S (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 21 Aug 2020 23:28:18 -0400
-Received: from mga06.intel.com ([134.134.136.31]:34089 "EHLO mga06.intel.com"
+        id S1726817AbgHVDku (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 21 Aug 2020 23:40:50 -0400
+Received: from mga18.intel.com ([134.134.136.126]:27132 "EHLO mga18.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726387AbgHVD2Q (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 21 Aug 2020 23:28:16 -0400
-IronPort-SDR: P2scfH/5s7YMOzHGQSjHvKjCVIjAbA8M36yW95HBmoRUlaQ6pP7pKVAOza3TmRlX1a8KEZkMIR
- lD9SsQ7u8QQw==
-X-IronPort-AV: E=McAfee;i="6000,8403,9720"; a="217211107"
+        id S1726588AbgHVDkt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 21 Aug 2020 23:40:49 -0400
+IronPort-SDR: XI8iZwOPVRae2SmO+ZrWvqBwxj/r8G/3aocDDZ2He1icgfqhzknynFypuWlhlsC39tZyYJlNQt
+ CGEdwDtgDiog==
+X-IronPort-AV: E=McAfee;i="6000,8403,9720"; a="143314513"
 X-IronPort-AV: E=Sophos;i="5.76,339,1592895600"; 
-   d="scan'208";a="217211107"
+   d="scan'208";a="143314513"
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Aug 2020 20:28:15 -0700
-IronPort-SDR: nsM4aCt2i5lvTdCGU7pXH7jlQrUjfp44RDbCGqRMWk9MTj5iDgwwXx9dd0Tb+1RZAt/DwterPF
- 8johV+E/B4Mw==
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Aug 2020 20:40:48 -0700
+IronPort-SDR: mOIn+FLsb6AuSFKJaaWlUZqjfnGTlLWwIYCCjdzZV6hPJlZXc7LShklM3zKdnwjO/NhfmTI97Y
+ 6923My5/k4Fw==
 X-IronPort-AV: E=Sophos;i="5.76,339,1592895600"; 
-   d="scan'208";a="280417981"
+   d="scan'208";a="401644126"
 Received: from sjchrist-ice.jf.intel.com (HELO sjchrist-ice) ([10.54.31.34])
-  by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Aug 2020 20:28:15 -0700
-Date:   Fri, 21 Aug 2020 20:28:13 -0700
+  by fmsmga001-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Aug 2020 20:40:47 -0700
+Date:   Fri, 21 Aug 2020 20:40:46 -0700
 From:   Sean Christopherson <sean.j.christopherson@intel.com>
 To:     Jim Mattson <jmattson@google.com>
-Cc:     Chenyi Qiang <chenyi.qiang@intel.com>,
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Xiaoyao Li <xiaoyao.li@intel.com>,
         kvm list <kvm@vger.kernel.org>,
         LKML <linux-kernel@vger.kernel.org>
-Subject: Re: [RFC 2/7] KVM: VMX: Expose IA32_PKRS MSR
-Message-ID: <20200822032813.GC4769@sjchrist-ice>
-References: <20200807084841.7112-1-chenyi.qiang@intel.com>
- <20200807084841.7112-3-chenyi.qiang@intel.com>
- <CALMp9eQiyRxJ0jkvVi+fWMZcDQbvyCcuTwH1wrYV-u_E004Bhg@mail.gmail.com>
- <34b083be-b9d5-fd85-b42d-af0549e3b002@intel.com>
- <CALMp9eS=dO7=JvvmGp-nt-LBO9evH-bLd2LQMO9wdYJ5V6S0_Q@mail.gmail.com>
- <268b0ee4-e56f-981c-c03e-6dca8a4e99da@intel.com>
- <CALMp9eSAkzGPp4zPVakypR1McSJtJ1x4j1zAAj1sM1bHxd01zg@mail.gmail.com>
+Subject: Re: [PATCH] KVM: VMX: fix crash cleanup when KVM wasn't used
+Message-ID: <20200822034046.GE4769@sjchrist-ice>
+References: <20200401081348.1345307-1-vkuznets@redhat.com>
+ <CALMp9eROXAOg_g=R8JRVfywY7uQXzBtVxKJYXq0dUcob-BfR-g@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CALMp9eSAkzGPp4zPVakypR1McSJtJ1x4j1zAAj1sM1bHxd01zg@mail.gmail.com>
+In-Reply-To: <CALMp9eROXAOg_g=R8JRVfywY7uQXzBtVxKJYXq0dUcob-BfR-g@mail.gmail.com>
 User-Agent: Mutt/1.9.4 (2018-02-28)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Aug 18, 2020 at 11:23:47AM -0700, Jim Mattson wrote:
-> On Tue, Aug 18, 2020 at 12:28 AM Chenyi Qiang <chenyi.qiang@intel.com> wrote:
+On Thu, Aug 20, 2020 at 01:08:22PM -0700, Jim Mattson wrote:
+> On Wed, Apr 1, 2020 at 1:13 AM Vitaly Kuznetsov <vkuznets@redhat.com> wrote:
+> > ---
+> >  arch/x86/kvm/vmx/vmx.c | 12 +++++++-----
+> >  1 file changed, 7 insertions(+), 5 deletions(-)
 > >
+> > diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> > index 3aba51d782e2..39a5dde12b79 100644
+> > --- a/arch/x86/kvm/vmx/vmx.c
+> > +++ b/arch/x86/kvm/vmx/vmx.c
+> > @@ -2257,10 +2257,6 @@ static int hardware_enable(void)
+> >             !hv_get_vp_assist_page(cpu))
+> >                 return -EFAULT;
 > >
+> > -       INIT_LIST_HEAD(&per_cpu(loaded_vmcss_on_cpu, cpu));
+> > -       INIT_LIST_HEAD(&per_cpu(blocked_vcpu_on_cpu, cpu));
+> > -       spin_lock_init(&per_cpu(blocked_vcpu_on_cpu_lock, cpu));
+> > -
+> >         r = kvm_cpu_vmxon(phys_addr);
+> >         if (r)
+> >                 return r;
+> > @@ -8006,7 +8002,7 @@ module_exit(vmx_exit);
 > >
-> > On 8/14/2020 1:31 AM, Jim Mattson wrote:
-> > > On Wed, Aug 12, 2020 at 10:42 PM Chenyi Qiang <chenyi.qiang@intel.com> wrote:
-> > >>
-> > >>
-> > >>
-> > >> On 8/13/2020 5:21 AM, Jim Mattson wrote:
-> > >>> On Fri, Aug 7, 2020 at 1:46 AM Chenyi Qiang <chenyi.qiang@intel.com> wrote:
-> > >>>>
-> > >>>> Protection Keys for Supervisor Pages (PKS) uses IA32_PKRS MSR (PKRS) at
-> > >>>> index 0x6E1 to allow software to manage supervisor protection key
-> > >>>> rights. For performance consideration, PKRS intercept will be disabled
-> > >>>> so that the guest can access the PKRS without VM exits.
-> > >>>> PKS introduces dedicated control fields in VMCS to switch PKRS, which
-> > >>>> only does the retore part. In addition, every VM exit saves PKRS into
-> > >>>> the guest-state area in VMCS, while VM enter won't save the host value
-> > >>>> due to the expectation that the host won't change the MSR often. Update
-> > >>>> the host's value in VMCS manually if the MSR has been changed by the
-> > >>>> kernel since the last time the VMCS was run.
-> > >>>> The function get_current_pkrs() in arch/x86/mm/pkeys.c exports the
-> > >>>> per-cpu variable pkrs_cache to avoid frequent rdmsr of PKRS.
-> > >>>>
-> > >>>> Signed-off-by: Chenyi Qiang <chenyi.qiang@intel.com>
-> > >>>> ---
-> > >>>
-> > >>>> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-> > >>>> index 11e4df560018..df2c2e733549 100644
-> > >>>> --- a/arch/x86/kvm/vmx/nested.c
-> > >>>> +++ b/arch/x86/kvm/vmx/nested.c
-> > >>>> @@ -289,6 +289,7 @@ static void vmx_sync_vmcs_host_state(struct vcpu_vmx *vmx,
-> > >>>>           dest->ds_sel = src->ds_sel;
-> > >>>>           dest->es_sel = src->es_sel;
-> > >>>>    #endif
-> > >>>> +       dest->pkrs = src->pkrs;
-> > >>>
-> > >>> Why isn't this (and other PKRS code) inside the #ifdef CONFIG_X86_64?
-> > >>> PKRS isn't usable outside of long mode, is it?
-> > >>>
-> > >>
-> > >> Yes, I'm also thinking about whether to put all pks code into
-> > >> CONFIG_X86_64. The kernel implementation also wrap its pks code inside
-> > >> CONFIG_ARCH_HAS_SUPERVISOR_PKEYS which has dependency with CONFIG_X86_64.
-> > >> However, maybe this can help when host kernel disable PKS but the guest
-> > >> enable it. What do you think about this?
-> > >
-> > > I see no problem in exposing PKRS to the guest even if the host
-> > > doesn't have CONFIG_ARCH_HAS_SUPERVISOR_PKEYS.
-> > >
+> >  static int __init vmx_init(void)
+> >  {
+> > -       int r;
+> > +       int r, cpu;
 > >
-> > Yes, but I would prefer to keep it outside CONFIG_X86_64. PKS code has
-> > several code blocks and putting them under x86_64 may end up being a
-> > mess. In addition, PKU KVM related code isn't under CONFIG_X86_64 as
-> > well. So, is it really necessary to put inside?
+> >  #if IS_ENABLED(CONFIG_HYPERV)
+> >         /*
+> > @@ -8060,6 +8056,12 @@ static int __init vmx_init(void)
+> >                 return r;
+> >         }
+> >
+> > +       for_each_possible_cpu(cpu) {
+> > +               INIT_LIST_HEAD(&per_cpu(loaded_vmcss_on_cpu, cpu));
+> > +               INIT_LIST_HEAD(&per_cpu(blocked_vcpu_on_cpu, cpu));
+> > +               spin_lock_init(&per_cpu(blocked_vcpu_on_cpu_lock, cpu));
+> > +       }
 > 
-> I'll let someone who actually cares about the i386 build answer that question.
+> Just above this chunk, we have:
+> 
+> r = vmx_setup_l1d_flush(vmentry_l1d_flush_param);
+> if (r) {
+>         vmx_exit();
+> ...
+> 
+> If we take that early exit, because vmx_setup_l1d_flush() fails, we
+> won't initialize loaded_vmcss_on_cpu. However, vmx_exit() calls
+> kvm_exit(), which calls on_each_cpu(hardware_disable_nolock, NULL, 1).
+> Hardware_disable_nolock() then calls kvm_arch_hardware_disable(),
+> which calls kvm_x86_ops.hardware_disable() [the vmx.c
+> hardware_disable()], which calls vmclear_local_loaded_vmcss().
+> 
+> I believe that vmclear_local_loaded_vmcss() will then try to
+> dereference a NULL pointer, since per_cpu(loaded_vmcss_on_cpu, cpu) is
+> uninitialzed.
 
-Ha, I care about the i386 build to the extent that it doesn't break.  I
-don't care at all shaving cycles/memory for things like this.  Given how
-long some KVM i386 bugs have gone unnoticed I'm not sure there's anyone that
-cares about KVM i386 these days :-)
+I agree the code is a mess (kvm_init() and kvm_exit() included), but I'm
+pretty sure hardware_disable_nolock() is guaranteed to be a nop as it's
+impossible for kvm_usage_count to be non-zero if vmx_init() hasn't
+finished.
+
+> >  #ifdef CONFIG_KEXEC_CORE
+> >         rcu_assign_pointer(crash_vmclear_loaded_vmcss,
+> >                            crash_vmclear_local_loaded_vmcss);
+> > --
+> > 2.25.1
+> >
