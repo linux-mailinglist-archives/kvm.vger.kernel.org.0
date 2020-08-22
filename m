@@ -2,52 +2,75 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 51B2924E90A
-	for <lists+kvm@lfdr.de>; Sat, 22 Aug 2020 19:33:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 98E0E24E947
+	for <lists+kvm@lfdr.de>; Sat, 22 Aug 2020 20:31:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728400AbgHVRcS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 22 Aug 2020 13:32:18 -0400
-Received: from mail.kernel.org ([198.145.29.99]:56058 "EHLO mail.kernel.org"
+        id S1728609AbgHVSbe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 22 Aug 2020 14:31:34 -0400
+Received: from orcam.me.uk ([81.187.245.177]:32992 "EHLO orcam.me.uk"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727856AbgHVRcP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 22 Aug 2020 13:32:15 -0400
-Subject: Re: [GIT PULL] KVM changes for Linux 5.9-rc2
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1598117535;
-        bh=8K0jUsGXkC83DrDlS2QiLNPUAJsU7P/a/bjYxNJzG5s=;
-        h=From:In-Reply-To:References:Date:To:Cc:From;
-        b=Bvo4VNWyvgEs3kERSEWP8hhgzFAI26YvP5JJPOrnD3ioTMDf0zidTAHmVJA3AEuRt
-         wB4CqH7Ew8iEGiycv5b9JxhXi9sIlK06SlUP9X9WpHBgry1kL/6UxfyBr7I07u6mXp
-         +C5twnxR6ZuGSA1yhfYt22oSK2Xhhi71esliEE8A=
-From:   pr-tracker-bot@kernel.org
-In-Reply-To: <20200822080647.722819-1-pbonzini@redhat.com>
-References: <20200822080647.722819-1-pbonzini@redhat.com>
-X-PR-Tracked-List-Id: <kvm.vger.kernel.org>
-X-PR-Tracked-Message-Id: <20200822080647.722819-1-pbonzini@redhat.com>
-X-PR-Tracked-Remote: https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus
-X-PR-Tracked-Commit-Id: b5331379bc62611d1026173a09c73573384201d9
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: b2d9e99622796576eb6faa236b2d1f592cc43ace
-Message-Id: <159811753509.17427.9520000885402685829.pr-tracker-bot@kernel.org>
-Date:   Sat, 22 Aug 2020 17:32:15 +0000
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     torvalds@linux-foundation.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, maz@kernel.org
+        id S1727893AbgHVSbe (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 22 Aug 2020 14:31:34 -0400
+X-Greylist: delayed 400 seconds by postgrey-1.27 at vger.kernel.org; Sat, 22 Aug 2020 14:31:33 EDT
+Received: from bugs.linux-mips.org (eddie.linux-mips.org [IPv6:2a01:4f8:201:92aa::3])
+        by orcam.me.uk (Postfix) with ESMTPS id CC3F02BE086;
+        Sat, 22 Aug 2020 19:24:49 +0100 (BST)
+Date:   Sat, 22 Aug 2020 19:24:47 +0100 (BST)
+From:   "Maciej W. Rozycki" <macro@linux-mips.org>
+To:     Thomas Bogendoerfer <tsbogend@alpha.franken.de>
+cc:     Greg KH <greg@kroah.com>, Paolo Bonzini <pbonzini@redhat.com>,
+        Jiaxun Yang <jiaxun.yang@flygoat.com>,
+        Huacai Chen <chenhc@lemote.com>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        kvm@vger.kernel.org, linux-mips@vger.kernel.org,
+        Fuxin Zhang <zhangfx@lemote.com>,
+        Huacai Chen <chenhuacai@gmail.com>, stable@vger.kernel.org
+Subject: Re: [PATCH] MIPS: VZ: Only include loongson_regs.h for
+ CPU_LOONGSON64
+In-Reply-To: <20200810093158.GA6026@alpha.franken.de>
+Message-ID: <alpine.LFD.2.21.2008221913550.3460685@eddie.linux-mips.org>
+References: <1596891052-24052-1-git-send-email-chenhc@lemote.com> <20200808153123.GC369184@kroah.com> <2b2937d0-eae6-a489-07bd-c40ded02ce89@flygoat.com> <20200809070235.GA1098081@kroah.com> <5ffc7bb1-8e3f-227a-7ad0-cec5fc32a96a@redhat.com>
+ <20200810074417.GA1529187@kroah.com> <5522eef8-0da5-7f73-b2f8-2d0c19bb5819@redhat.com> <20200810090310.GA1837172@kroah.com> <20200810093158.GA6026@alpha.franken.de>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The pull request you sent on Sat, 22 Aug 2020 10:06:47 +0200:
+On Mon, 10 Aug 2020, Thomas Bogendoerfer wrote:
 
-> https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus
+> > > It's not just this #include, there's a couple dozen mach-* directories;
+> > > changing how they work would be up to the MIPS maintainers (CCed), and
+> > > it would certainly not be a patch that can be merged in stable@ kernels.
+> > > 
+> > > arch/mips/kernel/cpu-probe.c has the same
+> > > 
+> > > #ifdef CONFIG_CPU_LOONGSON64
+> > > #include <loongson_regs.h>
+> > > 
+> > > for example, so apparently they're good with this.  So if I don't pick
+> > > up the patch to fix the build it would be in all likelihood merged by
+> > > MIPS maintainers.  The only difference will be how long the build
+> > > remains broken and the fact that they need to worry about KVM despite
+> > > the presence of a specific maintainer.
+> > 
+> > Ok, fair enough, but in the long-run, this should probably be fixed up
+> > "properly" if this arch is still being maintained.
+> 
+> I have it on my todo list. My plan is to move stuff out of mach-* directories,
+> which aren't needed there. This should solve issues like the one here.
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/b2d9e99622796576eb6faa236b2d1f592cc43ace
+ Correct, it looks like another maintainer's oversight.
 
-Thank you!
+ The asm/mach-<platform>/ directories are there for platform variants of 
+generic stuff found in asm/mach-generic/.  So if something is not there in 
+asm/mach-generic/, then it must not be in any other asm/mach-<plaftorm>/ 
+subdirectory either.
 
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+ Regular platform headers need to go under asm/<plaftorm>/.  Compare 
+asm/mach-dec/ vs asm/dec/, or asm/mach-sibyte/ vs asm/sibyte/, and so on.  
+So this `loongson_regs.h' piece belongs to asm/loongson64/ rather than 
+asm/mach-loongson64/.
+
+  Maciej
