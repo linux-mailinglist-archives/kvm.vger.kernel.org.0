@@ -2,17 +2,17 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 613FC24EF9E
-	for <lists+kvm@lfdr.de>; Sun, 23 Aug 2020 21:57:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A5D8F24EF98
+	for <lists+kvm@lfdr.de>; Sun, 23 Aug 2020 21:55:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726706AbgHWT5r (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 23 Aug 2020 15:57:47 -0400
-Received: from d40993.acod.regrucolo.ru ([176.99.6.231]:46076 "EHLO
+        id S1726529AbgHWTzD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 23 Aug 2020 15:55:03 -0400
+Received: from d40993.acod.regrucolo.ru ([176.99.6.231]:33630 "EHLO
         d40993.acod.regrucolo.ru" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725887AbgHWT5q (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 23 Aug 2020 15:57:46 -0400
+        with ESMTP id S1726059AbgHWTzB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 23 Aug 2020 15:55:01 -0400
 Received: by d40993.acod.regrucolo.ru (Postfix, from userid 502)
-        id 401D033871A; Sun, 23 Aug 2020 22:48:48 +0300 (MSK)
+        id 91A70338723; Sun, 23 Aug 2020 22:48:48 +0300 (MSK)
 To:     kvm@vger.kernel.org
 Subject: =?UTF-8?B?TW9kaTog0KDQtdCz0LjRgdGC0YDQsNGG0LjQvtC90L3QsNGPINC40L3RhNC+0YDQvNCw0YbQuNGP?=
 X-PHP-Originating-Script: 502:tools.php
@@ -25,7 +25,7 @@ MIME-Version: 1.0
 X-MID:  0.50 (23.08.2020 22:48:48)
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Message-Id: <20200823194848.401D033871A@d40993.acod.regrucolo.ru>
+Message-Id: <20200823194848.91A70338723@d40993.acod.regrucolo.ru>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
@@ -33,15 +33,15 @@ X-Mailing-List: kvm@vger.kernel.org
 
 Информационное сообщение сайта Modi
 ------------------------------------------
-Hannah left you a message. Click here https://sites.google.com/view/tt259?684kw3,
+Hannah left you a message. Click here https://sites.google.com/view/tt259?rzbkfm,
 
 Ваша регистрационная информация:
 
 ID пользователя: 
 Имя: Hannah left you a message.
-Фамилия: Click here https://sites.google.com/view/tt259?684kw3
+Фамилия: Click here https://sites.google.com/view/tt259?rzbkfm
 E-Mail: kvm@vger.kernel.org
-Пароль: 684kw3
+Пароль: rzbkfm
 
 Вы можете изменить пароль в личном кабинете.
 
