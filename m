@@ -2,75 +2,50 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 98E0E24E947
-	for <lists+kvm@lfdr.de>; Sat, 22 Aug 2020 20:31:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 613FC24EF9E
+	for <lists+kvm@lfdr.de>; Sun, 23 Aug 2020 21:57:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728609AbgHVSbe (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 22 Aug 2020 14:31:34 -0400
-Received: from orcam.me.uk ([81.187.245.177]:32992 "EHLO orcam.me.uk"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727893AbgHVSbe (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 22 Aug 2020 14:31:34 -0400
-X-Greylist: delayed 400 seconds by postgrey-1.27 at vger.kernel.org; Sat, 22 Aug 2020 14:31:33 EDT
-Received: from bugs.linux-mips.org (eddie.linux-mips.org [IPv6:2a01:4f8:201:92aa::3])
-        by orcam.me.uk (Postfix) with ESMTPS id CC3F02BE086;
-        Sat, 22 Aug 2020 19:24:49 +0100 (BST)
-Date:   Sat, 22 Aug 2020 19:24:47 +0100 (BST)
-From:   "Maciej W. Rozycki" <macro@linux-mips.org>
-To:     Thomas Bogendoerfer <tsbogend@alpha.franken.de>
-cc:     Greg KH <greg@kroah.com>, Paolo Bonzini <pbonzini@redhat.com>,
-        Jiaxun Yang <jiaxun.yang@flygoat.com>,
-        Huacai Chen <chenhc@lemote.com>,
-        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        kvm@vger.kernel.org, linux-mips@vger.kernel.org,
-        Fuxin Zhang <zhangfx@lemote.com>,
-        Huacai Chen <chenhuacai@gmail.com>, stable@vger.kernel.org
-Subject: Re: [PATCH] MIPS: VZ: Only include loongson_regs.h for
- CPU_LOONGSON64
-In-Reply-To: <20200810093158.GA6026@alpha.franken.de>
-Message-ID: <alpine.LFD.2.21.2008221913550.3460685@eddie.linux-mips.org>
-References: <1596891052-24052-1-git-send-email-chenhc@lemote.com> <20200808153123.GC369184@kroah.com> <2b2937d0-eae6-a489-07bd-c40ded02ce89@flygoat.com> <20200809070235.GA1098081@kroah.com> <5ffc7bb1-8e3f-227a-7ad0-cec5fc32a96a@redhat.com>
- <20200810074417.GA1529187@kroah.com> <5522eef8-0da5-7f73-b2f8-2d0c19bb5819@redhat.com> <20200810090310.GA1837172@kroah.com> <20200810093158.GA6026@alpha.franken.de>
+        id S1726706AbgHWT5r (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 23 Aug 2020 15:57:47 -0400
+Received: from d40993.acod.regrucolo.ru ([176.99.6.231]:46076 "EHLO
+        d40993.acod.regrucolo.ru" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725887AbgHWT5q (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 23 Aug 2020 15:57:46 -0400
+Received: by d40993.acod.regrucolo.ru (Postfix, from userid 502)
+        id 401D033871A; Sun, 23 Aug 2020 22:48:48 +0300 (MSK)
+To:     kvm@vger.kernel.org
+Subject: =?UTF-8?B?TW9kaTog0KDQtdCz0LjRgdGC0YDQsNGG0LjQvtC90L3QsNGPINC40L3RhNC+0YDQvNCw0YbQuNGP?=
+X-PHP-Originating-Script: 502:tools.php
+From:   noreply@modi.ru
+Reply-To: noreply@modi.ru
+X-EVENT_NAME: NEW_USER_WITH_PASS
+X-Priority: 3 (Normal)
+Date:   Sun, 23 Aug 2020 22:48:48 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+X-MID:  0.50 (23.08.2020 22:48:48)
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Message-Id: <20200823194848.401D033871A@d40993.acod.regrucolo.ru>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 10 Aug 2020, Thomas Bogendoerfer wrote:
+Информационное сообщение сайта Modi
+------------------------------------------
+Hannah left you a message. Click here https://sites.google.com/view/tt259?684kw3,
 
-> > > It's not just this #include, there's a couple dozen mach-* directories;
-> > > changing how they work would be up to the MIPS maintainers (CCed), and
-> > > it would certainly not be a patch that can be merged in stable@ kernels.
-> > > 
-> > > arch/mips/kernel/cpu-probe.c has the same
-> > > 
-> > > #ifdef CONFIG_CPU_LOONGSON64
-> > > #include <loongson_regs.h>
-> > > 
-> > > for example, so apparently they're good with this.  So if I don't pick
-> > > up the patch to fix the build it would be in all likelihood merged by
-> > > MIPS maintainers.  The only difference will be how long the build
-> > > remains broken and the fact that they need to worry about KVM despite
-> > > the presence of a specific maintainer.
-> > 
-> > Ok, fair enough, but in the long-run, this should probably be fixed up
-> > "properly" if this arch is still being maintained.
-> 
-> I have it on my todo list. My plan is to move stuff out of mach-* directories,
-> which aren't needed there. This should solve issues like the one here.
+Ваша регистрационная информация:
 
- Correct, it looks like another maintainer's oversight.
+ID пользователя: 
+Имя: Hannah left you a message.
+Фамилия: Click here https://sites.google.com/view/tt259?684kw3
+E-Mail: kvm@vger.kernel.org
+Пароль: 684kw3
 
- The asm/mach-<platform>/ directories are there for platform variants of 
-generic stuff found in asm/mach-generic/.  So if something is not there in 
-asm/mach-generic/, then it must not be in any other asm/mach-<plaftorm>/ 
-subdirectory either.
+Вы можете изменить пароль в личном кабинете.
 
- Regular platform headers need to go under asm/<plaftorm>/.  Compare 
-asm/mach-dec/ vs asm/dec/, or asm/mach-sibyte/ vs asm/sibyte/, and so on.  
-So this `loongson_regs.h' piece belongs to asm/loongson64/ rather than 
-asm/mach-loongson64/.
+Сообщение сгенерировано автоматически.
 
-  Maciej
+
+
