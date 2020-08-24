@@ -2,20 +2,23 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B9D8224F74B
-	for <lists+kvm@lfdr.de>; Mon, 24 Aug 2020 11:12:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BB4D124F716
+	for <lists+kvm@lfdr.de>; Mon, 24 Aug 2020 11:08:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728573AbgHXJLq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 24 Aug 2020 05:11:46 -0400
-Received: from 8bytes.org ([81.169.241.247]:37890 "EHLO theia.8bytes.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730505AbgHXI4Q (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 24 Aug 2020 04:56:16 -0400
+        id S1730422AbgHXJHi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 24 Aug 2020 05:07:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37556 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730532AbgHXI40 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 24 Aug 2020 04:56:26 -0400
+Received: from theia.8bytes.org (8bytes.org [IPv6:2a01:238:4383:600:38bc:a715:4b6d:a889])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9F042C061795;
+        Mon, 24 Aug 2020 01:56:21 -0700 (PDT)
 Received: from cap.home.8bytes.org (p4ff2bb8d.dip0.t-ipconnect.de [79.242.187.141])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
         (No client certificate requested)
-        by theia.8bytes.org (Postfix) with ESMTPSA id 77E0A48C;
-        Mon, 24 Aug 2020 10:56:11 +0200 (CEST)
+        by theia.8bytes.org (Postfix) with ESMTPSA id 6575736B;
+        Mon, 24 Aug 2020 10:56:12 +0200 (CEST)
 From:   Joerg Roedel <joro@8bytes.org>
 To:     x86@kernel.org
 Cc:     Joerg Roedel <joro@8bytes.org>, Joerg Roedel <jroedel@suse.de>,
@@ -36,9 +39,9 @@ Cc:     Joerg Roedel <joro@8bytes.org>, Joerg Roedel <jroedel@suse.de>,
         Martin Radev <martin.b.radev@gmail.com>,
         linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         virtualization@lists.linux-foundation.org
-Subject: [PATCH v6 41/76] x86/sev-es: Compile early handler code into kernel image
-Date:   Mon, 24 Aug 2020 10:54:36 +0200
-Message-Id: <20200824085511.7553-42-joro@8bytes.org>
+Subject: [PATCH v6 42/76] x86/sev-es: Setup early #VC handler
+Date:   Mon, 24 Aug 2020 10:54:37 +0200
+Message-Id: <20200824085511.7553-43-joro@8bytes.org>
 X-Mailer: git-send-email 2.28.0
 In-Reply-To: <20200824085511.7553-1-joro@8bytes.org>
 References: <20200824085511.7553-1-joro@8bytes.org>
@@ -51,275 +54,160 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Joerg Roedel <jroedel@suse.de>
 
-Setup sev-es.c and include the code from the
-pre-decompression stage to also build it into the image of the running
-kernel. Temporarily add __maybe_unused annotations to avoid build
-warnings until the functions get used.
+Setup an early handler for #VC exceptions. There is no GHCB mapped
+yet, so just re-use the vc_no_ghcb_handler. It can only handle CPUID
+exit-codes, but that should be enough to get the kernel through
+verify_cpu() and __startup_64() until it runs on virtual addresses.
 
 Signed-off-by: Joerg Roedel <jroedel@suse.de>
-Link: https://lore.kernel.org/r/20200724160336.5435-41-joro@8bytes.org
+Link: https://lore.kernel.org/r/20200724160336.5435-42-joro@8bytes.org
 ---
- arch/x86/kernel/Makefile        |   1 +
- arch/x86/kernel/sev-es-shared.c |  21 ++--
- arch/x86/kernel/sev-es.c        | 163 ++++++++++++++++++++++++++++++++
- 3 files changed, 175 insertions(+), 10 deletions(-)
- create mode 100644 arch/x86/kernel/sev-es.c
+ arch/x86/include/asm/setup.h  |  1 +
+ arch/x86/include/asm/sev-es.h |  3 +++
+ arch/x86/kernel/head64.c      |  1 +
+ arch/x86/kernel/head_64.S     | 34 +++++++++++++++++++++++++++++++++
+ arch/x86/kernel/idt.c         | 36 +++++++++++++++++++++++++++++++++++
+ 5 files changed, 75 insertions(+)
 
-diff --git a/arch/x86/kernel/Makefile b/arch/x86/kernel/Makefile
-index e77261db2391..23bc0f830f18 100644
---- a/arch/x86/kernel/Makefile
-+++ b/arch/x86/kernel/Makefile
-@@ -145,6 +145,7 @@ obj-$(CONFIG_UNWINDER_ORC)		+= unwind_orc.o
- obj-$(CONFIG_UNWINDER_FRAME_POINTER)	+= unwind_frame.o
- obj-$(CONFIG_UNWINDER_GUESS)		+= unwind_guess.o
+diff --git a/arch/x86/include/asm/setup.h b/arch/x86/include/asm/setup.h
+index cafae86813ae..0ce6453c9272 100644
+--- a/arch/x86/include/asm/setup.h
++++ b/arch/x86/include/asm/setup.h
+@@ -53,6 +53,7 @@ extern unsigned long __startup_secondary_64(void);
+ extern void startup_64_setup_env(unsigned long physbase);
+ extern void early_idt_setup_early_handler(unsigned long physaddr);
+ extern void early_load_idt(void);
++extern void early_idt_setup(unsigned long physbase);
+ extern void __init do_early_exception(struct pt_regs *regs, int trapnr);
  
-+obj-$(CONFIG_AMD_MEM_ENCRYPT)		+= sev-es.o
- ###
- # 64 bit specific files
- ifeq ($(CONFIG_X86_64),y)
-diff --git a/arch/x86/kernel/sev-es-shared.c b/arch/x86/kernel/sev-es-shared.c
-index a6b41910b8ab..18619279a46f 100644
---- a/arch/x86/kernel/sev-es-shared.c
-+++ b/arch/x86/kernel/sev-es-shared.c
-@@ -9,7 +9,7 @@
-  * and is included directly into both code-bases.
-  */
- 
--static void sev_es_terminate(unsigned int reason)
-+static void __maybe_unused sev_es_terminate(unsigned int reason)
- {
- 	u64 val = GHCB_SEV_TERMINATE;
- 
-@@ -27,7 +27,7 @@ static void sev_es_terminate(unsigned int reason)
- 		asm volatile("hlt\n" : : : "memory");
+ #ifdef CONFIG_X86_INTEL_MID
+diff --git a/arch/x86/include/asm/sev-es.h b/arch/x86/include/asm/sev-es.h
+index 7c0807b84546..ec0e112a742b 100644
+--- a/arch/x86/include/asm/sev-es.h
++++ b/arch/x86/include/asm/sev-es.h
+@@ -73,4 +73,7 @@ static inline u64 lower_bits(u64 val, unsigned int bits)
+ 	return (val & mask);
  }
  
--static bool sev_es_negotiate_protocol(void)
-+static bool __maybe_unused sev_es_negotiate_protocol(void)
- {
- 	u64 val;
- 
-@@ -46,7 +46,7 @@ static bool sev_es_negotiate_protocol(void)
- 	return true;
- }
- 
--static void vc_ghcb_invalidate(struct ghcb *ghcb)
-+static void __maybe_unused vc_ghcb_invalidate(struct ghcb *ghcb)
- {
- 	memset(ghcb->save.valid_bitmap, 0, sizeof(ghcb->save.valid_bitmap));
- }
-@@ -58,9 +58,9 @@ static bool vc_decoding_needed(unsigned long exit_code)
- 		 exit_code <= SVM_EXIT_LAST_EXCP);
- }
- 
--static enum es_result vc_init_em_ctxt(struct es_em_ctxt *ctxt,
--				      struct pt_regs *regs,
--				      unsigned long exit_code)
-+static enum es_result __maybe_unused vc_init_em_ctxt(struct es_em_ctxt *ctxt,
-+						     struct pt_regs *regs,
-+						     unsigned long exit_code)
- {
- 	enum es_result ret = ES_OK;
- 
-@@ -73,7 +73,7 @@ static enum es_result vc_init_em_ctxt(struct es_em_ctxt *ctxt,
- 	return ret;
- }
- 
--static void vc_finish_insn(struct es_em_ctxt *ctxt)
-+static void __maybe_unused vc_finish_insn(struct es_em_ctxt *ctxt)
- {
- 	ctxt->regs->ip += ctxt->insn.length;
- }
-@@ -325,7 +325,8 @@ static enum es_result vc_ioio_exitinfo(struct es_em_ctxt *ctxt, u64 *exitinfo)
- 	return ES_OK;
- }
- 
--static enum es_result vc_handle_ioio(struct ghcb *ghcb, struct es_em_ctxt *ctxt)
-+static enum es_result __maybe_unused
-+vc_handle_ioio(struct ghcb *ghcb, struct es_em_ctxt *ctxt)
- {
- 	struct pt_regs *regs = ctxt->regs;
- 	u64 exit_info_1, exit_info_2;
-@@ -433,8 +434,8 @@ static enum es_result vc_handle_ioio(struct ghcb *ghcb, struct es_em_ctxt *ctxt)
- 	return ret;
- }
- 
--static enum es_result vc_handle_cpuid(struct ghcb *ghcb,
--				      struct es_em_ctxt *ctxt)
-+static enum es_result __maybe_unused vc_handle_cpuid(struct ghcb *ghcb,
-+						     struct es_em_ctxt *ctxt)
- {
- 	struct pt_regs *regs = ctxt->regs;
- 	u32 cr4 = native_read_cr4();
-diff --git a/arch/x86/kernel/sev-es.c b/arch/x86/kernel/sev-es.c
-new file mode 100644
-index 000000000000..0b698b653c0b
---- /dev/null
-+++ b/arch/x86/kernel/sev-es.c
-@@ -0,0 +1,163 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * AMD Memory Encryption Support
-+ *
-+ * Copyright (C) 2019 SUSE
-+ *
-+ * Author: Joerg Roedel <jroedel@suse.de>
-+ */
++/* Early IDT entry points for #VC handler */
++extern void vc_no_ghcb(void);
 +
-+#include <linux/kernel.h>
-+#include <linux/mm.h>
-+
+ #endif
+diff --git a/arch/x86/kernel/head64.c b/arch/x86/kernel/head64.c
+index 41514ec1e6f0..250fae33bf66 100644
+--- a/arch/x86/kernel/head64.c
++++ b/arch/x86/kernel/head64.c
+@@ -39,6 +39,7 @@
+ #include <asm/realmode.h>
+ #include <asm/extable.h>
+ #include <asm/trapnr.h>
 +#include <asm/sev-es.h>
-+#include <asm/insn-eval.h>
-+#include <asm/fpu/internal.h>
-+#include <asm/processor.h>
-+#include <asm/trap_pf.h>
-+#include <asm/trapnr.h>
-+#include <asm/svm.h>
+ 
+ /*
+  * Manage page tables very early on.
+diff --git a/arch/x86/kernel/head_64.S b/arch/x86/kernel/head_64.S
+index 4622940134a5..12bf6f11fd83 100644
+--- a/arch/x86/kernel/head_64.S
++++ b/arch/x86/kernel/head_64.S
+@@ -95,6 +95,13 @@ SYM_CODE_START_NOALIGN(startup_64)
+ .Lon_kernel_cs:
+ 	UNWIND_HINT_EMPTY
+ 
++	/* Setup IDT - Needed for SEV-ES */
++	pushq	%rsi
++	/* early_idt_setup - physbase as first parameter */
++	leaq	_text(%rip), %rdi
++	call	early_idt_setup
++	popq	%rsi
 +
-+static inline u64 sev_es_rd_ghcb_msr(void)
+ 	/* Sanitize CPU configuration */
+ 	call verify_cpu
+ 
+@@ -363,6 +370,33 @@ SYM_CODE_START_LOCAL(early_idt_handler_common)
+ 	jmp restore_regs_and_return_to_kernel
+ SYM_CODE_END(early_idt_handler_common)
+ 
++#ifdef CONFIG_AMD_MEM_ENCRYPT
++/*
++ * VC Exception handler used during very early boot. The
++ * early_idt_handler_array can't be used because it returns via the
++ * paravirtualized INTERRUPT_RETURN and pv-ops don't work that early.
++ */
++SYM_CODE_START_NOALIGN(vc_no_ghcb)
++	UNWIND_HINT_IRET_REGS offset=8
++
++	/* Build pt_regs */
++	PUSH_AND_CLEAR_REGS
++
++	/* Call C handler */
++	movq    %rsp, %rdi
++	movq	ORIG_RAX(%rsp), %rsi
++	call    do_vc_no_ghcb
++
++	/* Unwind pt_regs */
++	POP_REGS
++
++	/* Remove Error Code */
++	addq    $8, %rsp
++
++	/* Pure iret required here - don't use INTERRUPT_RETURN */
++	iretq
++SYM_CODE_END(vc_no_ghcb)
++#endif
+ 
+ #define SYM_DATA_START_PAGE_ALIGNED(name)			\
+ 	SYM_START(name, SYM_L_GLOBAL, .balign PAGE_SIZE)
+diff --git a/arch/x86/kernel/idt.c b/arch/x86/kernel/idt.c
+index e2777cc264f5..0d560a1218e1 100644
+--- a/arch/x86/kernel/idt.c
++++ b/arch/x86/kernel/idt.c
+@@ -11,6 +11,7 @@
+ #include <asm/desc.h>
+ #include <asm/hw_irq.h>
+ #include <asm/setup.h>
++#include <asm/sev-es.h>
+ 
+ struct idt_data {
+ 	unsigned int	vector;
+@@ -408,3 +409,38 @@ void early_load_idt(void)
+ {
+ 	load_idt(&idt_descr);
+ }
++
++#ifdef CONFIG_AMD_MEM_ENCRYPT
++static void set_early_idt_handler(gate_desc *idt, int n, void *handler)
 +{
-+	return native_read_msr(MSR_AMD64_SEV_ES_GHCB);
-+}
++	struct idt_data data;
++	gate_desc desc;
 +
-+static inline void sev_es_wr_ghcb_msr(u64 val)
++	init_idt_data(&data, n, handler);
++	idt_init_desc(&desc, &data);
++	native_write_idt_entry(idt, n, &desc);
++}
++#endif
++
++static struct desc_ptr early_idt_descr __initdata = {
++	.size		= IDT_TABLE_SIZE - 1,
++	.address	= 0 /* Needs physical address of idt_table - initialized at runtime. */,
++};
++
++void __init early_idt_setup(unsigned long physbase)
 +{
-+	u32 low, high;
++	void __maybe_unused *handler;
++	gate_desc *idt;
 +
-+	low  = (u32)(val);
-+	high = (u32)(val >> 32);
++	idt = fixup_pointer(idt_table, physbase);
 +
-+	native_write_msr(MSR_AMD64_SEV_ES_GHCB, low, high);
++#ifdef CONFIG_AMD_MEM_ENCRYPT
++	/* VMM Communication Exception */
++	handler = fixup_pointer(vc_no_ghcb, physbase);
++	set_early_idt_handler(idt, X86_TRAP_VC, handler);
++#endif
++
++	/* Initialize IDT descriptor and load IDT */
++	early_idt_descr.address = (unsigned long)idt;
++	native_load_idt(&early_idt_descr);
 +}
-+
-+static int vc_fetch_insn_kernel(struct es_em_ctxt *ctxt,
-+				unsigned char *buffer)
-+{
-+	return copy_from_kernel_nofault(buffer, (unsigned char *)ctxt->regs->ip, MAX_INSN_SIZE);
-+}
-+
-+static enum es_result vc_decode_insn(struct es_em_ctxt *ctxt)
-+{
-+	char buffer[MAX_INSN_SIZE];
-+	enum es_result ret;
-+	int res;
-+
-+	res = vc_fetch_insn_kernel(ctxt, buffer);
-+	if (unlikely(res == -EFAULT)) {
-+		ctxt->fi.vector     = X86_TRAP_PF;
-+		ctxt->fi.error_code = 0;
-+		ctxt->fi.cr2        = ctxt->regs->ip;
-+		return ES_EXCEPTION;
-+	}
-+
-+	insn_init(&ctxt->insn, buffer, MAX_INSN_SIZE - res, 1);
-+	insn_get_length(&ctxt->insn);
-+
-+	ret = ctxt->insn.immediate.got ? ES_OK : ES_DECODE_FAILED;
-+
-+	return ret;
-+}
-+
-+static enum es_result vc_write_mem(struct es_em_ctxt *ctxt,
-+				   char *dst, char *buf, size_t size)
-+{
-+	unsigned long error_code = X86_PF_PROT | X86_PF_WRITE;
-+	char __user *target = (char __user *)dst;
-+	u64 d8;
-+	u32 d4;
-+	u16 d2;
-+	u8  d1;
-+
-+	switch (size) {
-+	case 1:
-+		memcpy(&d1, buf, 1);
-+		if (put_user(d1, target))
-+			goto fault;
-+		break;
-+	case 2:
-+		memcpy(&d2, buf, 2);
-+		if (put_user(d2, target))
-+			goto fault;
-+		break;
-+	case 4:
-+		memcpy(&d4, buf, 4);
-+		if (put_user(d4, target))
-+			goto fault;
-+		break;
-+	case 8:
-+		memcpy(&d8, buf, 8);
-+		if (put_user(d8, target))
-+			goto fault;
-+		break;
-+	default:
-+		WARN_ONCE(1, "%s: Invalid size: %zu\n", __func__, size);
-+		return ES_UNSUPPORTED;
-+	}
-+
-+	return ES_OK;
-+
-+fault:
-+	if (user_mode(ctxt->regs))
-+		error_code |= X86_PF_USER;
-+
-+	ctxt->fi.vector = X86_TRAP_PF;
-+	ctxt->fi.error_code = error_code;
-+	ctxt->fi.cr2 = (unsigned long)dst;
-+
-+	return ES_EXCEPTION;
-+}
-+
-+static enum es_result vc_read_mem(struct es_em_ctxt *ctxt,
-+				  char *src, char *buf, size_t size)
-+{
-+	unsigned long error_code = X86_PF_PROT;
-+	char __user *s = (char __user *)src;
-+	u64 d8;
-+	u32 d4;
-+	u16 d2;
-+	u8  d1;
-+
-+	switch (size) {
-+	case 1:
-+		if (get_user(d1, s))
-+			goto fault;
-+		memcpy(buf, &d1, 1);
-+		break;
-+	case 2:
-+		if (get_user(d2, s))
-+			goto fault;
-+		memcpy(buf, &d2, 2);
-+		break;
-+	case 4:
-+		if (get_user(d4, s))
-+			goto fault;
-+		memcpy(buf, &d4, 4);
-+		break;
-+	case 8:
-+		if (get_user(d8, s))
-+			goto fault;
-+		memcpy(buf, &d8, 8);
-+		break;
-+	default:
-+		WARN_ONCE(1, "%s: Invalid size: %zu\n", __func__, size);
-+		return ES_UNSUPPORTED;
-+	}
-+
-+	return ES_OK;
-+
-+fault:
-+	if (user_mode(ctxt->regs))
-+		error_code |= X86_PF_USER;
-+
-+	ctxt->fi.vector = X86_TRAP_PF;
-+	ctxt->fi.error_code = error_code;
-+	ctxt->fi.cr2 = (unsigned long)src;
-+
-+	return ES_EXCEPTION;
-+}
-+
-+/* Include code shared with pre-decompression boot stage */
-+#include "sev-es-shared.c"
 -- 
 2.28.0
 
