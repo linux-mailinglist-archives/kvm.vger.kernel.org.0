@@ -2,143 +2,170 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 700BF25072D
-	for <lists+kvm@lfdr.de>; Mon, 24 Aug 2020 20:09:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DD7792507C4
+	for <lists+kvm@lfdr.de>; Mon, 24 Aug 2020 20:34:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726632AbgHXSJZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 24 Aug 2020 14:09:25 -0400
-Received: from smtp-fw-9101.amazon.com ([207.171.184.25]:34201 "EHLO
-        smtp-fw-9101.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726336AbgHXSJY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 24 Aug 2020 14:09:24 -0400
+        id S1726809AbgHXSeq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 24 Aug 2020 14:34:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43924 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726466AbgHXSep (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 24 Aug 2020 14:34:45 -0400
+Received: from mail-oo1-xc44.google.com (mail-oo1-xc44.google.com [IPv6:2607:f8b0:4864:20::c44])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 62A3BC061573
+        for <kvm@vger.kernel.org>; Mon, 24 Aug 2020 11:34:44 -0700 (PDT)
+Received: by mail-oo1-xc44.google.com with SMTP id j19so2129189oor.2
+        for <kvm@vger.kernel.org>; Mon, 24 Aug 2020 11:34:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1598292562; x=1629828562;
-  h=subject:to:cc:references:from:message-id:date:
-   mime-version:in-reply-to:content-transfer-encoding;
-  bh=LtlBrMnWW4Uz/mEU68MhqDmtkeF0KLXFD9TyIG9/7LQ=;
-  b=derJKgQQP80UgJzYcj/el9WS1U0C3oknVJfg9+EWQDd/oWTv5jqXw4Ce
-   SQ+CjVrd+p/mO40AxtUQrj8yr8r07fUTJddONXaXbWxjnkNrLGVt8WptJ
-   RGTq+kt0yv/82r+t+3ZASL/JP9q90Ge2RXo5Ki5lud8ThZmb6QdypzQ+H
-   U=;
-X-IronPort-AV: E=Sophos;i="5.76,349,1592870400"; 
-   d="scan'208";a="62296127"
-Received: from sea32-co-svc-lb4-vlan3.sea.corp.amazon.com (HELO email-inbound-relay-1d-2c665b5d.us-east-1.amazon.com) ([10.47.23.38])
-  by smtp-border-fw-out-9101.sea19.amazon.com with ESMTP; 24 Aug 2020 18:09:19 +0000
-Received: from EX13MTAUWC001.ant.amazon.com (iad55-ws-svc-p15-lb9-vlan2.iad.amazon.com [10.40.159.162])
-        by email-inbound-relay-1d-2c665b5d.us-east-1.amazon.com (Postfix) with ESMTPS id AF35AA209F;
-        Mon, 24 Aug 2020 18:09:17 +0000 (UTC)
-Received: from EX13D20UWC001.ant.amazon.com (10.43.162.244) by
- EX13MTAUWC001.ant.amazon.com (10.43.162.135) with Microsoft SMTP Server (TLS)
- id 15.0.1497.2; Mon, 24 Aug 2020 18:09:17 +0000
-Received: from Alexanders-MacBook-Air.local (10.43.161.34) by
- EX13D20UWC001.ant.amazon.com (10.43.162.244) with Microsoft SMTP Server (TLS)
- id 15.0.1497.2; Mon, 24 Aug 2020 18:09:10 +0000
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=7ftDcadPZ+90zpG6SMikhbMveZ60yu7NIA4sBtLqsA8=;
+        b=TkRdR9ozUEkkNul3+YvoCqKvXEjbTc1PG188nVBM3Fkk8wGLt9N68sLUMdpzKta7t8
+         DIbfTHBzfgCwpYidFOR9rYPpSndEAawR0iuXiTrNcTeQmmKoF2M1jH8NZCZI3mf4CzFk
+         TOoXTozAjsts9dhcjd4MB7qSZ+/NGlG5OvsJXDwDVxsPSjKOY4FrDHICnubNEX1jDXlt
+         9bz5xfBQtRkMYqP1aVad195GtH8AXFO3cp15sTdhEXoa648dxB4gXcJ+lcYSzh4RGdRb
+         GPHRQWz1swFPVzdVKc0Z6QKuV+j1QVN1YVvCEe/uvSadVbxGQpJGYWul10YyfgPXfGvT
+         apkg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=7ftDcadPZ+90zpG6SMikhbMveZ60yu7NIA4sBtLqsA8=;
+        b=f29TdLpbU52ytNNE6UpDnvQ/7xKV/xt3xgXhUCXJEehOTOtcAnXEjUntfLIUy4b1fc
+         wlzYexxJBZRz4SQjnILFJPm78NbwuMSdyJznYbHeHgVARl7qz96ZghXCrch+dXaDl5Gj
+         zcKemAVlbtI4OFZOZb9bn8XnvMNFcDlVWdxdyI01QhWRB6zshblX13YZH62LcDGaAHdm
+         RgX/obJU1PLKAaKbJ8ub6mH2iK5BDNBHWh/aForjzEevJSF0Y6u4eHCk2Mys4cAqUFb/
+         67OWFZt5k1b4MjnVuAbbT1ql1kqDugClG68VlY1Mbq+37QU6hXfluNRBwkGvJiRk+LsC
+         9r7w==
+X-Gm-Message-State: AOAM532J52dVFp2KnS4lmJ2ooylqgU6Hoofl6s1ldSFAIEiII2VW5Xhm
+        RxnNehwiajweJhR3/XaAMejIDRPCC7YxyDku5PSJfA==
+X-Google-Smtp-Source: ABdhPJwtvesBMFQ7mP6f+hBOhW+1UDL8BuEJIFbtYIiC+TO/19qwdm04S6G0SHClSM5WrCPptEhGeCO386mGiQJ4Maw=
+X-Received: by 2002:a4a:87c8:: with SMTP id c8mr4578139ooi.81.1598294083309;
+ Mon, 24 Aug 2020 11:34:43 -0700 (PDT)
+MIME-Version: 1.0
+References: <20200818211533.849501-1-aaronlewis@google.com>
+ <20200818211533.849501-6-aaronlewis@google.com> <CALMp9eQoPcMRmt8EAfh9AFF8vskbkWogXc5o3m6-f8fX5RndwA@mail.gmail.com>
+ <bd7c54ae-73d1-0200-fbe7-10c8df408f8b@amazon.com> <CALMp9eSXS+b62C-kXjwPBeYF36ajYeGg2kBmsubz9s5V6C-83A@mail.gmail.com>
+ <CALMp9eTUV9Z7hL_qtdKYvqYmm8wT1_oGaRLp55i3ttg1qLyecQ@mail.gmail.com>
+ <cf256ff0-8336-06fc-b475-8ca00782c4ce@amazon.com> <CALMp9eQd4cmK2_2oEnTX7VUEA0N9gsEkdpKhLyWpQzWCQm4w-w@mail.gmail.com>
+ <8851792a-d9f2-fe0c-33e7-cae7f3bb3919@amazon.com>
+In-Reply-To: <8851792a-d9f2-fe0c-33e7-cae7f3bb3919@amazon.com>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Mon, 24 Aug 2020 11:34:30 -0700
+Message-ID: <CALMp9eT_ymfa3QtKp4BSh7LutVAydDxQSzwLTC=t-UB=RRX1iQ@mail.gmail.com>
 Subject: Re: [PATCH v3 05/12] KVM: x86: Add support for exiting to userspace
  on rdmsr or wrmsr
-To:     Jim Mattson <jmattson@google.com>
-CC:     Aaron Lewis <aaronlewis@google.com>,
+To:     Alexander Graf <graf@amazon.com>
+Cc:     Aaron Lewis <aaronlewis@google.com>,
         Peter Shier <pshier@google.com>,
         Oliver Upton <oupton@google.com>,
         kvm list <kvm@vger.kernel.org>
-References: <20200818211533.849501-1-aaronlewis@google.com>
- <20200818211533.849501-6-aaronlewis@google.com>
- <CALMp9eQoPcMRmt8EAfh9AFF8vskbkWogXc5o3m6-f8fX5RndwA@mail.gmail.com>
- <bd7c54ae-73d1-0200-fbe7-10c8df408f8b@amazon.com>
- <CALMp9eSXS+b62C-kXjwPBeYF36ajYeGg2kBmsubz9s5V6C-83A@mail.gmail.com>
- <CALMp9eTUV9Z7hL_qtdKYvqYmm8wT1_oGaRLp55i3ttg1qLyecQ@mail.gmail.com>
- <cf256ff0-8336-06fc-b475-8ca00782c4ce@amazon.com>
- <CALMp9eQd4cmK2_2oEnTX7VUEA0N9gsEkdpKhLyWpQzWCQm4w-w@mail.gmail.com>
-From:   Alexander Graf <graf@amazon.com>
-Message-ID: <8851792a-d9f2-fe0c-33e7-cae7f3bb3919@amazon.com>
-Date:   Mon, 24 Aug 2020 20:09:08 +0200
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.16; rv:78.0)
- Gecko/20100101 Thunderbird/78.1.1
-MIME-Version: 1.0
-In-Reply-To: <CALMp9eQd4cmK2_2oEnTX7VUEA0N9gsEkdpKhLyWpQzWCQm4w-w@mail.gmail.com>
-Content-Language: en-US
-X-Originating-IP: [10.43.161.34]
-X-ClientProxiedBy: EX13D06UWA004.ant.amazon.com (10.43.160.164) To
- EX13D20UWC001.ant.amazon.com (10.43.162.244)
-Content-Type: text/plain; charset="utf-8"; format="flowed"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-CgpPbiAyNC4wOC4yMCAxOToyMywgSmltIE1hdHRzb24gd3JvdGU6Cj4gCj4gT24gU3VuLCBBdWcg
-MjMsIDIwMjAgYXQgNjozNSBQTSBBbGV4YW5kZXIgR3JhZiA8Z3JhZkBhbWF6b24uY29tPiB3cm90
-ZToKPj4KPj4KPj4KPj4gT24gMjEuMDguMjAgMTk6NTgsIEppbSBNYXR0c29uIHdyb3RlOgo+Pj4K
-Pj4+IE9uIFRodSwgQXVnIDIwLCAyMDIwIGF0IDM6NTUgUE0gSmltIE1hdHRzb24gPGptYXR0c29u
-QGdvb2dsZS5jb20+IHdyb3RlOgo+Pj4+Cj4+Pj4gT24gVGh1LCBBdWcgMjAsIDIwMjAgYXQgMjo1
-OSBQTSBBbGV4YW5kZXIgR3JhZiA8Z3JhZkBhbWF6b24uY29tPiB3cm90ZToKPj4+Pgo+Pj4+PiBE
-byB3ZSByZWFsbHkgbmVlZCB0byBkbyBhbGwgb2YgdGhpcyBkYW5jZSBvZiBkaWZmZXJlbnRpYXRp
-bmcgaW4ga2VybmVsCj4+Pj4+IHNwYWNlIGJldHdlZW4gYW4gZXhpdCB0aGF0J3MgdGhlcmUgYmVj
-YXVzZSB1c2VyIHNwYWNlIGFza2VkIGZvciB0aGUgZXhpdAo+Pj4+PiBhbmQgYW4gTVNSIGFjY2Vz
-cyB0aGF0IHdvdWxkIGp1c3QgZ2VuZXJhdGUgYSAjR1A/Cj4+Pj4+Cj4+Pj4+IEF0IHRoZSBlbmQg
-b2YgdGhlIGRheSwgdXNlciBzcGFjZSAqa25vd3MqIHdoaWNoIE1TUnMgaXQgYXNrZWQgdG8KPj4+
-Pj4gcmVjZWl2ZS4gSXQgY2FuIGZpbHRlciBmb3IgdGhlbSBzdXBlciBlYXNpbHkuCj4+Pj4KPj4+
-PiBJZiBubyBvbmUgZWxzZSBoYXMgYW4gb3BpbmlvbiwgSSBjYW4gbGV0IHRoaXMgZ28uIDotKQo+
-Pj4+Cj4+Pj4gSG93ZXZlciwgdG8gbWFrZSB0aGUgcmlnaHQgZGVjaXNpb24gaW4ga3ZtX2VtdWxh
-dGVfe3JkbXNyLHdybXNyfQo+Pj4+ICh3aXRob3V0IHRoZSB1bmZvcnR1bmF0ZSBiZWZvcmUgYW5k
-IGFmdGVyIGNoZWNrcyB0aGF0IEFhcm9uIGFkZGVkKSwKPj4+PiBrdm1fe2dldCxzZXR9X21zciBz
-aG91bGQgYXQgbGVhc3QgZGlzdGluZ3Vpc2ggYmV0d2VlbiAicGVybWlzc2lvbgo+Pj4+IGRlbmll
-ZCIgYW5kICJyYWlzZSAjR1AsIiBzbyBJIGNhbiBwcm92aWRlIGEgZGVueSBsaXN0IHdpdGhvdXQg
-YXNraW5nCj4+Pj4gZm9yIHVzZXJzcGFjZSBleGl0cyBvbiAjR1AuCj4+Pgo+Pj4gQWN0dWFsbHks
-IEkgdGhpbmsgdGhpcyB3aG9sZSBkaXNjdXNzaW9uIGlzIG1vb3QuIFlvdSBubyBsb25nZXIgbmVl
-ZAo+Pj4gdGhlIGZpcnN0IGlvY3RsIChhc2sgZm9yIGEgdXNlcnNwYWNlIGV4aXQgb24gI0dQKS4g
-VGhlIGFsbG93L2RlbnkgbGlzdAo+Pj4gaXMgc3VmZmljaWVudC4gTW9yZW92ZXIsIHRoZSBhbGxv
-dy9kZW55IGxpc3QgY2hlY2tzIGNhbiBiZSBpbgo+Pj4ga3ZtX2VtdWxhdGVfe3JkbXNyLHdybXNy
-fSBiZWZvcmUgdGhlIGNhbGwgdG8ga3ZtX3tnZXQsc2V0fV9tc3IsIHNvIHdlCj4+PiBuZWVkbid0
-IGJlIGNvbmNlcm5lZCB3aXRoIGRpc3Rpbmd1aXNoYWJsZSBlcnJvciB2YWx1ZXMgZWl0aGVyLgo+
-Pj4KPj4KPj4gSSBhbHNvIGNhcmUgYWJvdXQgY2FzZXMgd2hlcmUgSSBhbGxvdyBpbi1rZXJuZWwg
-aGFuZGxpbmcsIGJ1dCBmb3IKPj4gd2hhdGV2ZXIgcmVhc29uIHRoZXJlIHN0aWxsIHdvdWxkIGJl
-IGEgI0dQIGluamVjdGVkIGludG8gdGhlIGd1ZXN0LiBJCj4+IHdhbnQgdG8gcmVjb3JkIHRob3Nl
-IGV2ZW50cyBhbmQgYmUgYWJsZSB0byBsYXRlciBoYXZlIGRhdGEgdGhhdCB0ZWxsIG1lCj4+IHdo
-eSBzb21ldGhpbmcgd2VudCB3cm9uZy4KPj4KPj4gU28geWVzLCBmb3IgeW91ciB1c2UgY2FzZSB5
-b3UgZG8gbm90IGNhcmUgYWJvdXQgdGhlIGRpc3RpbmN0aW9uIGJldHdlZW4KPj4gImRlbnkgTVNS
-IGFjY2VzcyIgYW5kICJyZXBvcnQgaW52YWxpZCBNU1IgYWNjZXNzIi4gSG93ZXZlciwgSSBkbyBj
-YXJlIDopLgo+IAo+IEluIHRoYXQgY2FzZSwgSSdtIGdvaW5nIHRvIGNvbnRpbnVlIHRvIGhvbGQg
-YSBoYXJkIGxpbmUgb24gdGhlCj4gZGlzdGluY3Rpb24gYmV0d2VlbiBhICNHUCBmb3IgYW4gaW52
-YWxpZCBNU1IgYWNjZXNzIGFuZCB0aGUgI0dQIGZvciBhbgo+IHVua25vd24gTVNSLiBJZiwgZm9y
-IGluc3RhbmNlLCB5b3Ugd2FudGVkIHRvIGltcGxlbWVudCBpZ25vcmVfbXNycyBpbgo+IHVzZXJz
-cGFjZSwgYXMgeW91J3ZlIHByb3Bvc2VkIGluIHRoZSBwYXN0LCB0aGlzIHdvdWxkIGJlIGV4dHJl
-bWVseQo+IGhlbHBmdWwuIFdpdGhvdXQgaXQsIHVzZXJzcGFjZSBnZXRzIGFuIGV4aXQgYmVjYXVz
-ZSAoMSkgdGhlIE1TUiBhY2Nlc3MKPiBpc24ndCBpbiB0aGUgYWxsb3cgbGlzdCwgKDIpIHRoZSBN
-U1IgYWNjZXNzIGlzIGludmFsaWQsIG9yICgzKSB0aGUgTVNSCj4gaXMgdW5rbm93biB0byBrdm0u
-IEFzIHlvdSd2ZSBwb2ludGVkIG91dCwgaXQgaXMgZWFzeSBmb3IgdXNlcnNwYWNlIHRvCj4gZGlz
-dGluZ3Vpc2ggKDEpIGZyb20gdGhlIG90aGVycywgc2luY2UgaXQgcHJvdmlkZWQgdGhlIGFsbG93
-L2RlbnkgbGlzdAo+IGluIHRoZSBmaXJzdCBwbGFjZS4gQnV0IGhvdyBkbyB5b3UgZGlzdGluZ3Vp
-c2ggKDIpIGZyb20gKDMpIHdpdGhvdXQKPiByZXBsaWNhdGluZyB0aGUgbG9naWMgaW4gdGhlIGtl
-cm5lbD8KPiAKPj4gTXkgc3RhbmNlIG9uIHRoaXMgaXMgYWdhaW4gdGhhdCBpdCdzIHRyaXZpYWwg
-dG8gaGFuZGxlIGEgZmV3IGludmFsaWQgTVNSCj4+ICNHUHMgZnJvbSB1c2VyIHNwYWNlIGFuZCBq
-dXN0IG5vdCByZXBvcnQgYW55dGhpbmcuIEl0IHNob3VsZCBjb21lIGF0Cj4+IGFsbW9zdCBuZWds
-aWdpYmxlIHBlcmZvcm1hbmNlIGNvc3QsIG5vPwo+IAo+IFllcywgdGhlIHBlcmZvcm1hbmNlIGNv
-c3Qgc2hvdWxkIGJlIG5lZ2xpZ2libGUsIGJ1dCB3aGF0IGlzIHRoZSBwb2ludD8KPiBXZSdyZSB0
-cnlpbmcgdG8gZGVzaWduIGEgZ29vZCBBUEkgaGVyZSwgYXJlbid0IHdlPwo+IAo+PiBBcyBmb3Ig
-eW91ciBhcmd1bWVudGF0aW9uIGFib3ZlLCB3ZSBoYXZlIGEgc2Vjb25kIGNhbGwgY2hhaW4gaW50
-bwo+PiBrdm1fe2dldCxzZXR9X21zciBmcm9tIHRoZSB4ODYgZW11bGF0b3Igd2hpY2ggeW91J2Qg
-YWxzbyBuZWVkIHRvIGNvdmVyLgo+Pgo+PiBPbmUgdGhpbmcgd2UgY291bGQgZG8gSSBndWVzcyBp
-cyB0byBhZGQgYSBwYXJhbWV0ZXIgdG8gRU5BQkxFX0NBUCBvbgo+PiBLVk1fQ0FQX1g4Nl9VU0VS
-X1NQQUNFX01TUiBzbyB0aGF0IGl0IG9ubHkgYm91bmNlcyBvbiBjZXJ0YWluIHJldHVybgo+PiB2
-YWx1ZXMsIHN1Y2ggYXMgLUVOT0VOVC4gSSBzdGlsbCBmYWlsIHRvIHNlZSBjYXNlcyB3aGVyZSB0
-aGF0J3MKPj4gZ2VudWluZWx5IGJlbmVmaWNpYWwgdGhvdWdoLgo+IAo+IEknZCBsaWtlIHRvIHNl
-ZSB0d28gY29tcGxldGVseSBpbmRlcGVuZGVudCBBUElzLCBzbyB0aGF0IEkgY2FuIGp1c3QKPiBy
-ZXF1ZXN0IGEgYm91bmNlIG9uIC1FUEVSTSB0aHJvdWdoIGEgZGVueSBsaXN0LiAgSSB0aGluayBp
-dCdzIHVzZWZ1bAoKV2hlcmUgd291bGQgdGhhdCBib3VuY2UgdG8/IFdoaWNoIHVzZXIgc3BhY2Ug
-ZXZlbnQgZG9lcyB0aGF0IHRyaWdnZXI/IApZZXQgYW5vdGhlciBvbmU/IFdvdWxkbid0IDQgZXhp
-dCByZWFzb25zIGp1c3QgZm9yIE1TUiB0cmFwcyBiZSBhIGJpdCAKbXVjaD8gOikKCj4gdG8gZGlz
-dGluZ3Vpc2ggYmV0d2VlbiAtRU5PRU5UIGFuZCAtRUlOVkFMLCBidXQgSSBoYXZlIG5vIGlzc3Vl
-cyB3aWgKPiBib3RoIGNhdXNpbmcgYW4gZXhpdCB0byB1c2Vyc3BhY2UsIGlmIHVzZXJzcGFjZSBo
-YXMgcmVxdWVzdGVkIGV4aXRzIG9uCj4gTVNSICNHUHMuCgpTbyBpbWFnaW5lIHdlIHRvb2sgdGhl
-IGZpcnN0IGFyZ3VtZW50IHRvIEVOQUJMRV9DQVAgYXMgZmlsdGVyOgoKICAgKDE8PDApIFJFUE9S
-VF9FTk9FTlQKICAgKDE8PDEpIFJFUE9SVF9FSU5WQUwKICAgKDE8PDIpIFJFUE9SVF9FUEVSTQog
-ICAoMTw8MzEpIFJFUE9SVF9BTlkKClRoZW4gd2UgYWxzbyBhZGQgdGhlIHJlYXNvbiB0byB0aGUg
-a3ZtX3J1biBleGl0IHJlc3BvbnNlIGFuZCB1c2VyIHNwYWNlIApjYW4gZGlmZmVyZW50aWF0ZSBl
-YXNpbHkgYmV0d2VlbiB0aGUgZGlmZmVyZW50IGV2ZW50cy4KCgpBbGV4CgoKCkFtYXpvbiBEZXZl
-bG9wbWVudCBDZW50ZXIgR2VybWFueSBHbWJICktyYXVzZW5zdHIuIDM4CjEwMTE3IEJlcmxpbgpH
-ZXNjaGFlZnRzZnVlaHJ1bmc6IENocmlzdGlhbiBTY2hsYWVnZXIsIEpvbmF0aGFuIFdlaXNzCkVp
-bmdldHJhZ2VuIGFtIEFtdHNnZXJpY2h0IENoYXJsb3R0ZW5idXJnIHVudGVyIEhSQiAxNDkxNzMg
-QgpTaXR6OiBCZXJsaW4KVXN0LUlEOiBERSAyODkgMjM3IDg3OQoKCg==
+On Mon, Aug 24, 2020 at 11:09 AM Alexander Graf <graf@amazon.com> wrote:
+>
+>
+>
+> On 24.08.20 19:23, Jim Mattson wrote:
+> >
+> > On Sun, Aug 23, 2020 at 6:35 PM Alexander Graf <graf@amazon.com> wrote:
+> >>
+> >>
+> >>
+> >> On 21.08.20 19:58, Jim Mattson wrote:
+> >>>
+> >>> On Thu, Aug 20, 2020 at 3:55 PM Jim Mattson <jmattson@google.com> wrote:
+> >>>>
+> >>>> On Thu, Aug 20, 2020 at 2:59 PM Alexander Graf <graf@amazon.com> wrote:
+> >>>>
+> >>>>> Do we really need to do all of this dance of differentiating in kernel
+> >>>>> space between an exit that's there because user space asked for the exit
+> >>>>> and an MSR access that would just generate a #GP?
+> >>>>>
+> >>>>> At the end of the day, user space *knows* which MSRs it asked to
+> >>>>> receive. It can filter for them super easily.
+> >>>>
+> >>>> If no one else has an opinion, I can let this go. :-)
+> >>>>
+> >>>> However, to make the right decision in kvm_emulate_{rdmsr,wrmsr}
+> >>>> (without the unfortunate before and after checks that Aaron added),
+> >>>> kvm_{get,set}_msr should at least distinguish between "permission
+> >>>> denied" and "raise #GP," so I can provide a deny list without asking
+> >>>> for userspace exits on #GP.
+> >>>
+> >>> Actually, I think this whole discussion is moot. You no longer need
+> >>> the first ioctl (ask for a userspace exit on #GP). The allow/deny list
+> >>> is sufficient. Moreover, the allow/deny list checks can be in
+> >>> kvm_emulate_{rdmsr,wrmsr} before the call to kvm_{get,set}_msr, so we
+> >>> needn't be concerned with distinguishable error values either.
+> >>>
+> >>
+> >> I also care about cases where I allow in-kernel handling, but for
+> >> whatever reason there still would be a #GP injected into the guest. I
+> >> want to record those events and be able to later have data that tell me
+> >> why something went wrong.
+> >>
+> >> So yes, for your use case you do not care about the distinction between
+> >> "deny MSR access" and "report invalid MSR access". However, I do care :).
+> >
+> > In that case, I'm going to continue to hold a hard line on the
+> > distinction between a #GP for an invalid MSR access and the #GP for an
+> > unknown MSR. If, for instance, you wanted to implement ignore_msrs in
+> > userspace, as you've proposed in the past, this would be extremely
+> > helpful. Without it, userspace gets an exit because (1) the MSR access
+> > isn't in the allow list, (2) the MSR access is invalid, or (3) the MSR
+> > is unknown to kvm. As you've pointed out, it is easy for userspace to
+> > distinguish (1) from the others, since it provided the allow/deny list
+> > in the first place. But how do you distinguish (2) from (3) without
+> > replicating the logic in the kernel?
+> >
+> >> My stance on this is again that it's trivial to handle a few invalid MSR
+> >> #GPs from user space and just not report anything. It should come at
+> >> almost negligible performance cost, no?
+> >
+> > Yes, the performance cost should be negligible, but what is the point?
+> > We're trying to design a good API here, aren't we?
+> >
+> >> As for your argumentation above, we have a second call chain into
+> >> kvm_{get,set}_msr from the x86 emulator which you'd also need to cover.
+> >>
+> >> One thing we could do I guess is to add a parameter to ENABLE_CAP on
+> >> KVM_CAP_X86_USER_SPACE_MSR so that it only bounces on certain return
+> >> values, such as -ENOENT. I still fail to see cases where that's
+> >> genuinely beneficial though.
+> >
+> > I'd like to see two completely independent APIs, so that I can just
+> > request a bounce on -EPERM through a deny list.  I think it's useful
+>
+> Where would that bounce to? Which user space event does that trigger?
+> Yet another one? Wouldn't 4 exit reasons just for MSR traps be a bit
+> much? :)
 
+All of the exits are either KVM_EXIT_X86_RDMSR or KVM_EXIT_X86_WRMSR.
+Or, we could put the direction in the msr struct and just have one
+exit reason.
+
+> > to distinguish between -ENOENT and -EINVAL, but I have no issues wih
+> > both causing an exit to userspace, if userspace has requested exits on
+> > MSR #GPs.
+>
+> So imagine we took the first argument to ENABLE_CAP as filter:
+>
+>    (1<<0) REPORT_ENOENT
+>    (1<<1) REPORT_EINVAL
+>    (1<<2) REPORT_EPERM
+>    (1<<31) REPORT_ANY
+>
+> Then we also add the reason to the kvm_run exit response and user space
+> can differentiate easily between the different events.
+
+I think this works well. I still have to call both APIs to satisfy my
+use case, but I'm willing to cave on that request. (I just realized
+that there is a very good use case for an allow/deny list *without*
+exits to userspace: prohibiting kvm from doing cross-vendor MSR
+emulation.)
