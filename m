@@ -2,78 +2,133 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D07E724FBD5
-	for <lists+kvm@lfdr.de>; Mon, 24 Aug 2020 12:45:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F287124FCB8
+	for <lists+kvm@lfdr.de>; Mon, 24 Aug 2020 13:39:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727815AbgHXKpO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 24 Aug 2020 06:45:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54946 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727120AbgHXKpD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 24 Aug 2020 06:45:03 -0400
-Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C58A6C061573;
-        Mon, 24 Aug 2020 03:45:02 -0700 (PDT)
-Received: from zn.tnic (p200300ec2f07f0001d1adc8210ec988a.dip0.t-ipconnect.de [IPv6:2003:ec:2f07:f000:1d1a:dc82:10ec:988a])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id D6E3B1EC0104;
-        Mon, 24 Aug 2020 12:44:58 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1598265899;
+        id S1726862AbgHXLj1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 24 Aug 2020 07:39:27 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:25323 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1727039AbgHXLiv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 24 Aug 2020 07:38:51 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1598269120;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=iXpxuVriWvU3M3aiYmzDwnWWzJtCErVklAPMKOlDAEk=;
-        b=fS2e3eFO6CT56yvF10hoqjXs05VZge7E7YK1yU71Tg6skRgdi5uFdlZePV2aXb+A2JVG8w
-        LyNrQAcyd0zTiPuZS95AOdUdLmUxPHPWU6WBmtTXBqKg/pnqunuyP9VEdcHY9yhudf1fd1
-        xRi8B0HFEmL11S+NQIPPeaaVRUJeIPI=
-Date:   Mon, 24 Aug 2020 12:44:51 +0200
-From:   Borislav Petkov <bp@alien8.de>
-To:     Joerg Roedel <joro@8bytes.org>
-Cc:     x86@kernel.org, Joerg Roedel <jroedel@suse.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>, hpa@zytor.com,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Jiri Slaby <jslaby@suse.cz>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Juergen Gross <jgross@suse.com>,
-        Kees Cook <keescook@chromium.org>,
-        David Rientjes <rientjes@google.com>,
-        Cfir Cohen <cfir@google.com>,
-        Erdem Aktas <erdemaktas@google.com>,
-        Masami Hiramatsu <mhiramat@kernel.org>,
-        Mike Stunes <mstunes@vmware.com>,
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=pzjKU5jnp1RJd2a0FpfszIcQQz0Dkjh8zuJQbNIELbM=;
+        b=MjR1xAiEme6dkPdXrPxv7G9BRH2lSuLaISaeRsekYBfM2XE+ofjsRLCTsIUjKrDqVLerCg
+        6dO183afhb+OjESoYM48qNAun4EOdxO/WZLT/TSkezQvKHA9ekMc0ev1n5MvpkFaNy6Ukn
+        t/goYA2yy9CZjPoU1aEM0s6zbBigS2Y=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-4-1KtA7Q0RNkaNe3byvgOyFw-1; Mon, 24 Aug 2020 07:38:38 -0400
+X-MC-Unique: 1KtA7Q0RNkaNe3byvgOyFw-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 93E35100746A;
+        Mon, 24 Aug 2020 11:38:36 +0000 (UTC)
+Received: from starship (unknown [10.35.206.221])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 3F8695D9DD;
+        Mon, 24 Aug 2020 11:38:03 +0000 (UTC)
+Message-ID: <53b774c8f3ae94fb5161ee6d3005ac3b04f63052.camel@redhat.com>
+Subject: Re: [PATCH v2 2/7] KVM: nSVM: rename nested 'vmcb' to vmcb12_gpa in
+ few places
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     Jim Mattson <jmattson@google.com>
+Cc:     kvm list <kvm@vger.kernel.org>,
+        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
+        Ingo Molnar <mingo@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        "open list:X86 ARCHITECTURE (32-BIT AND 64-BIT)" 
+        <linux-kernel@vger.kernel.org>, "H. Peter Anvin" <hpa@zytor.com>,
         Sean Christopherson <sean.j.christopherson@intel.com>,
-        Martin Radev <martin.b.radev@gmail.com>,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org
-Subject: Re: [PATCH v6 02/76] KVM: SVM: Add GHCB definitions
-Message-ID: <20200824104451.GA4732@zn.tnic>
-References: <20200824085511.7553-1-joro@8bytes.org>
- <20200824085511.7553-3-joro@8bytes.org>
+        Joerg Roedel <joro@8bytes.org>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Date:   Mon, 24 Aug 2020 14:37:53 +0300
+In-Reply-To: <CALMp9eQycCn-wTUfFkqH3M7vzsRsYphO=GU8EwHt3tomnp=mng@mail.gmail.com>
+References: <20200820133339.372823-1-mlevitsk@redhat.com>
+         <20200820133339.372823-3-mlevitsk@redhat.com>
+         <CALMp9eQycCn-wTUfFkqH3M7vzsRsYphO=GU8EwHt3tomnp=mng@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.3 (3.36.3-1.fc32) 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20200824085511.7553-3-joro@8bytes.org>
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Aug 24, 2020 at 10:53:57AM +0200, Joerg Roedel wrote:
->  static inline void __unused_size_checks(void)
->  {
-> -	BUILD_BUG_ON(sizeof(struct vmcb_save_area) != 0x298);
-> +	BUILD_BUG_ON(sizeof(struct vmcb_save_area) != 1032);
->  	BUILD_BUG_ON(sizeof(struct vmcb_control_area) != 256);
-> +	BUILD_BUG_ON(sizeof(struct ghcb) != 4096);
+On Thu, 2020-08-20 at 14:00 -0700, Jim Mattson wrote:
+> On Thu, Aug 20, 2020 at 6:33 AM Maxim Levitsky <mlevitsk@redhat.com> wrote:
+> > No functional changes.
+> > 
+> > Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+> > ---
+> >  arch/x86/kvm/svm/nested.c | 10 +++++-----
+> >  arch/x86/kvm/svm/svm.c    | 13 +++++++------
+> >  arch/x86/kvm/svm/svm.h    |  2 +-
+> >  3 files changed, 13 insertions(+), 12 deletions(-)
+> > 
+> > diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
+> > index fb68467e6049..f5b17920a2ca 100644
+> > --- a/arch/x86/kvm/svm/nested.c
+> > +++ b/arch/x86/kvm/svm/nested.c
+> > @@ -431,7 +431,7 @@ int enter_svm_guest_mode(struct vcpu_svm *svm, u64 vmcb_gpa,
+> For consistency, should the vmcb_gpa argument be renamed to vmcb12_gpa as well?
 
-Could those naked numbers be proper, meaningfully named defines?
+I went over all nested.c and renamed all mentions of vmcb which refer to guest's vmcb to vmcb12,
+and mentions of nested_vmcb to vmcb12 as well. I hope I didn't made this patch too much larger.
+I updated the patch subject too.
+> 
+> 
+> > @@ -579,7 +579,7 @@ int nested_svm_vmexit(struct vcpu_svm *svm)
+> > 
+> >         /* Exit Guest-Mode */
+> >         leave_guest_mode(&svm->vcpu);
+> > -       svm->nested.vmcb = 0;
+> > +       svm->nested.vmcb12_gpa = 0;
+> Perhaps in a follow-up change, this could be set to an illegal value
+> rather than 0?
+Or rather not reset this address at all, as I did later in the 
+caching pathes which I dropped for now.
 
--- 
-Regards/Gruss,
-    Boris.
+> 
+> 
+> > @@ -1018,7 +1018,7 @@ static int svm_get_nested_state(struct kvm_vcpu *vcpu,
+> > 
+> >         /* First fill in the header and copy it out.  */
+> >         if (is_guest_mode(vcpu)) {
+> > -               kvm_state.hdr.svm.vmcb_pa = svm->nested.vmcb;
+> > +               kvm_state.hdr.svm.vmcb_pa = svm->nested.vmcb12_gpa;
+> It's unfortunate that we have "_pa" on the LHS on "_gpa" on the RHS. Oh, well.
+I was afraid to touch this struct since it is user visible. I noticed it.
 
-https://people.kernel.org/tglx/notes-about-netiquette
+> 
+> 
+> > diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+> > index 562a79e3e63a..d33013b9b4d7 100644
+> > --- a/arch/x86/kvm/svm/svm.c
+> > +++ b/arch/x86/kvm/svm/svm.c
+> > @@ -1102,7 +1102,7 @@ static void init_vmcb(struct vcpu_svm *svm)
+> >         }
+> >         svm->asid_generation = 0;
+> > 
+> > -       svm->nested.vmcb = 0;
+> > +       svm->nested.vmcb12_gpa = 0;
+> Here, too, perhaps this could be changed from 0 to an illegal value in
+> a follow-up change.
+> 
+> Reviewed-by: Jim Mattson <jmattson@google.com>
+> 
+
+Thanks for the review,
+	Best regards,
+		Maxim Levitsky
+
