@@ -2,46 +2,68 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A3DFF24F69F
-	for <lists+kvm@lfdr.de>; Mon, 24 Aug 2020 11:02:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C0B9524F79D
+	for <lists+kvm@lfdr.de>; Mon, 24 Aug 2020 11:18:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727807AbgHXJB7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 24 Aug 2020 05:01:59 -0400
-Received: from 8bytes.org ([81.169.241.247]:39014 "EHLO theia.8bytes.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729805AbgHXI4k (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 24 Aug 2020 04:56:40 -0400
-Received: from cap.home.8bytes.org (p4ff2bb8d.dip0.t-ipconnect.de [79.242.187.141])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
-        (No client certificate requested)
-        by theia.8bytes.org (Postfix) with ESMTPSA id 7614E7D9;
-        Mon, 24 Aug 2020 10:56:32 +0200 (CEST)
-From:   Joerg Roedel <joro@8bytes.org>
-To:     x86@kernel.org
-Cc:     Joerg Roedel <joro@8bytes.org>, Joerg Roedel <jroedel@suse.de>,
-        Martin Radev <martin.b.radev@gmail.com>,
-        Kees Cook <keescook@chromium.org>, hpa@zytor.com,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Jiri Slaby <jslaby@suse.cz>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Juergen Gross <jgross@suse.com>,
-        David Rientjes <rientjes@google.com>,
-        Cfir Cohen <cfir@google.com>,
-        Erdem Aktas <erdemaktas@google.com>,
-        Masami Hiramatsu <mhiramat@kernel.org>,
-        Mike Stunes <mstunes@vmware.com>,
+        id S1728928AbgHXJSK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 24 Aug 2020 05:18:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41222 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727790AbgHXJSC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 24 Aug 2020 05:18:02 -0400
+Received: from mail-pf1-x443.google.com (mail-pf1-x443.google.com [IPv6:2607:f8b0:4864:20::443])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D4318C061573;
+        Mon, 24 Aug 2020 02:18:02 -0700 (PDT)
+Received: by mail-pf1-x443.google.com with SMTP id x25so4501391pff.4;
+        Mon, 24 Aug 2020 02:18:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=rMbx9PJ3DCBK5KCbc3Tq72JFtt/jZJ3a0mHSBLV/+uA=;
+        b=AnqeJkTdPwAVQxkz4xsNAtHq1yAHzh39+X/LXN7tfivOxU91cTAYJkDJJEjAHalmTR
+         JZlcvmT0jYOFVX6LkmIh6yFcYtztGmbUR6o6yzTt2BxiUbPXknRCADhyi23jcFSPn4uw
+         M71l9lbogTqNOdr1bUTHbUybuPAn+BIlK1zzCStEEaaRqb7iMr0gqZvvHFJO39zu68h7
+         3y9YUX1d1+rSQqgmOEVJ5qdyprOkA23HJUvmKtbuFOwVLNgYGmxJLg6a+sS7/fE7N5Eq
+         mksxmBPLx7hej4N+hF4XWBKcKl1DxvAZHPO+gnF2uzOwJWB6Lgc0gxCpW6QyWAHddreL
+         MUQQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=rMbx9PJ3DCBK5KCbc3Tq72JFtt/jZJ3a0mHSBLV/+uA=;
+        b=OHIupXePxRwVVrsdOC5YHTAS+bM7EKbiHE1B37fZI+imbKYAVEj3WKQohJeUDMPaPF
+         OicXOl4AqJwYKuMS7pOWf3LlNVBnIGtt2MVEIEcIML82dDTmaMfWDeFJm/Z2jcdMouW5
+         KBVJOUVu2u/sHDRAvOLJpcnNt1tAHKD27RF+tThMYR/y6g9EBydAfM9excyMkKP3lCQW
+         IqozGWVg40NtKNhf09s+ga41o5cyyWGSRZDp+fbXFm6kpVbNYWRWMrmqXzBfxFCuhPDB
+         VT3PZyhLZvKZiZBag62tZqAY2GnsU6aVRGM0Xc5+3zZE0gIE4F4QcTBDID9hPTm3EE6S
+         e86Q==
+X-Gm-Message-State: AOAM532VmLXjOzxpDUbNSIegrEXvH6Z5tTKv9Kep1OiRYyuC5GI2hX0U
+        +R2yvjtVSBhA6UQRwWChB7xQgY2MCVQnpg==
+X-Google-Smtp-Source: ABdhPJwH15eOuacRsnIJtiFTkzCC9mVtco/DG7gF2PFLarQs3vCzzD3G4wVhpqSTXi5lRLlEgpy9XQ==
+X-Received: by 2002:a63:4b63:: with SMTP id k35mr2965491pgl.235.1598260682241;
+        Mon, 24 Aug 2020 02:18:02 -0700 (PDT)
+Received: from localhost ([121.0.29.56])
+        by smtp.gmail.com with ESMTPSA id 62sm10342504pfx.47.2020.08.24.02.18.01
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Mon, 24 Aug 2020 02:18:01 -0700 (PDT)
+From:   Lai Jiangshan <jiangshanlai@gmail.com>
+To:     linux-kernel@vger.kernel.org
+Cc:     Lai Jiangshan <laijs@linux.alibaba.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
         Sean Christopherson <sean.j.christopherson@intel.com>,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org
-Subject: [PATCH v6 76/76] x86/sev-es: Check required CPU features for SEV-ES
-Date:   Mon, 24 Aug 2020 10:55:11 +0200
-Message-Id: <20200824085511.7553-77-joro@8bytes.org>
-X-Mailer: git-send-email 2.28.0
-In-Reply-To: <20200824085511.7553-1-joro@8bytes.org>
-References: <20200824085511.7553-1-joro@8bytes.org>
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
+        kvm@vger.kernel.org
+Subject: [PATCH] kvm x86/mmu: use KVM_REQ_MMU_SYNC to sync when needed
+Date:   Mon, 24 Aug 2020 18:18:25 +0800
+Message-Id: <20200824101825.4106-1-jiangshanlai@gmail.com>
+X-Mailer: git-send-email 2.19.1.6.gb485710b
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
@@ -49,120 +71,32 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Martin Radev <martin.b.radev@gmail.com>
+From: Lai Jiangshan <laijs@linux.alibaba.com>
 
-Make sure the machine supports RDRAND, otherwise there is no trusted
-source of of randomness in the system.
+8c8560b83390("KVM: x86/mmu: Use KVM_REQ_TLB_FLUSH_CURRENT for MMU specific flushes)
+changed it without giving any reason in the changelog.
 
-To also check this in the pre-decompression stage, make has_cpuflag
-not depend on CONFIG_RANDOMIZE_BASE anymore.
+In theory, the syncing is needed, and need to be fixed by reverting
+this part of change.
 
-Signed-off-by: Martin Radev <martin.b.radev@gmail.com>
-Signed-off-by: Joerg Roedel <jroedel@suse.de>
-Reviewed-by: Kees Cook <keescook@chromium.org>
-Link: https://lore.kernel.org/r/20200724160336.5435-76-joro@8bytes.org
+Signed-off-by: Lai Jiangshan <laijs@linux.alibaba.com>
 ---
- arch/x86/boot/compressed/cpuflags.c |  4 ----
- arch/x86/boot/compressed/misc.h     |  5 +++--
- arch/x86/boot/compressed/sev-es.c   |  3 +++
- arch/x86/kernel/sev-es-shared.c     | 15 +++++++++++++++
- arch/x86/kernel/sev-es.c            |  3 +++
- 5 files changed, 24 insertions(+), 6 deletions(-)
+ arch/x86/kvm/mmu/mmu.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/arch/x86/boot/compressed/cpuflags.c b/arch/x86/boot/compressed/cpuflags.c
-index 6448a8196d32..0cc1323896d1 100644
---- a/arch/x86/boot/compressed/cpuflags.c
-+++ b/arch/x86/boot/compressed/cpuflags.c
-@@ -1,6 +1,4 @@
- // SPDX-License-Identifier: GPL-2.0
--#ifdef CONFIG_RANDOMIZE_BASE
--
- #include "../cpuflags.c"
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index 4e03841f053d..9a93de921f2b 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -2468,7 +2468,7 @@ static struct kvm_mmu_page *kvm_mmu_get_page(struct kvm_vcpu *vcpu,
+ 		}
  
- bool has_cpuflag(int flag)
-@@ -9,5 +7,3 @@ bool has_cpuflag(int flag)
+ 		if (sp->unsync_children)
+-			kvm_make_request(KVM_REQ_TLB_FLUSH_CURRENT, vcpu);
++			kvm_make_request(KVM_REQ_MMU_SYNC, vcpu);
  
- 	return test_bit(flag, cpu.flags);
- }
--
--#endif
-diff --git a/arch/x86/boot/compressed/misc.h b/arch/x86/boot/compressed/misc.h
-index c0e0ffeee50a..6d31f1b4c4d1 100644
---- a/arch/x86/boot/compressed/misc.h
-+++ b/arch/x86/boot/compressed/misc.h
-@@ -85,8 +85,6 @@ void choose_random_location(unsigned long input,
- 			    unsigned long *output,
- 			    unsigned long output_size,
- 			    unsigned long *virt_addr);
--/* cpuflags.c */
--bool has_cpuflag(int flag);
- #else
- static inline void choose_random_location(unsigned long input,
- 					  unsigned long input_size,
-@@ -97,6 +95,9 @@ static inline void choose_random_location(unsigned long input,
- }
- #endif
- 
-+/* cpuflags.c */
-+bool has_cpuflag(int flag);
-+
- #ifdef CONFIG_X86_64
- extern int set_page_decrypted(unsigned long address);
- extern int set_page_encrypted(unsigned long address);
-diff --git a/arch/x86/boot/compressed/sev-es.c b/arch/x86/boot/compressed/sev-es.c
-index b522c18c0588..eb1a8b5cc753 100644
---- a/arch/x86/boot/compressed/sev-es.c
-+++ b/arch/x86/boot/compressed/sev-es.c
-@@ -145,6 +145,9 @@ void sev_es_shutdown_ghcb(void)
- 	if (!boot_ghcb)
- 		return;
- 
-+	if (!sev_es_check_cpu_features())
-+		error("SEV-ES CPU Features missing.");
-+
- 	/*
- 	 * GHCB Page must be flushed from the cache and mapped encrypted again.
- 	 * Otherwise the running kernel will see strange cache effects when
-diff --git a/arch/x86/kernel/sev-es-shared.c b/arch/x86/kernel/sev-es-shared.c
-index 92d77b725ccb..ce86d2c9ca7b 100644
---- a/arch/x86/kernel/sev-es-shared.c
-+++ b/arch/x86/kernel/sev-es-shared.c
-@@ -9,6 +9,21 @@
-  * and is included directly into both code-bases.
-  */
- 
-+#ifndef __BOOT_COMPRESSED
-+#define error(v)	pr_err(v)
-+#define has_cpuflag(f)	boot_cpu_has(f)
-+#endif
-+
-+static bool __init sev_es_check_cpu_features(void)
-+{
-+	if (!has_cpuflag(X86_FEATURE_RDRAND)) {
-+		error("RDRAND instruction not supported - no trusted source of randomness available\n");
-+		return false;
-+	}
-+
-+	return true;
-+}
-+
- static void sev_es_terminate(unsigned int reason)
- {
- 	u64 val = GHCB_SEV_TERMINATE;
-diff --git a/arch/x86/kernel/sev-es.c b/arch/x86/kernel/sev-es.c
-index 2d73f5abe04b..6eadd678d1c6 100644
---- a/arch/x86/kernel/sev-es.c
-+++ b/arch/x86/kernel/sev-es.c
-@@ -670,6 +670,9 @@ void __init sev_es_init_vc_handling(void)
- 	if (!sev_es_active())
- 		return;
- 
-+	if (!sev_es_check_cpu_features())
-+		panic("SEV-ES CPU Features missing");
-+
- 	/* Enable SEV-ES special handling */
- 	static_branch_enable(&sev_es_enable_key);
+ 		__clear_sp_write_flooding_count(sp);
  
 -- 
-2.28.0
+2.19.1.6.gb485710b
 
