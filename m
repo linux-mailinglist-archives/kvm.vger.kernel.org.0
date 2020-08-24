@@ -2,22 +2,22 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BB4D124F716
-	for <lists+kvm@lfdr.de>; Mon, 24 Aug 2020 11:08:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 591BD24F746
+	for <lists+kvm@lfdr.de>; Mon, 24 Aug 2020 11:11:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730422AbgHXJHi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 24 Aug 2020 05:07:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37556 "EHLO
+        id S1729392AbgHXJLB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 24 Aug 2020 05:11:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37532 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730532AbgHXI40 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 24 Aug 2020 04:56:26 -0400
+        with ESMTP id S1730240AbgHXI4U (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 24 Aug 2020 04:56:20 -0400
 Received: from theia.8bytes.org (8bytes.org [IPv6:2a01:238:4383:600:38bc:a715:4b6d:a889])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9F042C061795;
-        Mon, 24 Aug 2020 01:56:21 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 97B1BC061755;
+        Mon, 24 Aug 2020 01:56:19 -0700 (PDT)
 Received: from cap.home.8bytes.org (p4ff2bb8d.dip0.t-ipconnect.de [79.242.187.141])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
         (No client certificate requested)
-        by theia.8bytes.org (Postfix) with ESMTPSA id 6575736B;
+        by theia.8bytes.org (Postfix) with ESMTPSA id E29D2F91;
         Mon, 24 Aug 2020 10:56:12 +0200 (CEST)
 From:   Joerg Roedel <joro@8bytes.org>
 To:     x86@kernel.org
@@ -39,9 +39,9 @@ Cc:     Joerg Roedel <joro@8bytes.org>, Joerg Roedel <jroedel@suse.de>,
         Martin Radev <martin.b.radev@gmail.com>,
         linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         virtualization@lists.linux-foundation.org
-Subject: [PATCH v6 42/76] x86/sev-es: Setup early #VC handler
-Date:   Mon, 24 Aug 2020 10:54:37 +0200
-Message-Id: <20200824085511.7553-43-joro@8bytes.org>
+Subject: [PATCH v6 43/76] x86/sev-es: Setup GHCB based boot #VC handler
+Date:   Mon, 24 Aug 2020 10:54:38 +0200
+Message-Id: <20200824085511.7553-44-joro@8bytes.org>
 X-Mailer: git-send-email 2.28.0
 In-Reply-To: <20200824085511.7553-1-joro@8bytes.org>
 References: <20200824085511.7553-1-joro@8bytes.org>
@@ -54,160 +54,266 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Joerg Roedel <jroedel@suse.de>
 
-Setup an early handler for #VC exceptions. There is no GHCB mapped
-yet, so just re-use the vc_no_ghcb_handler. It can only handle CPUID
-exit-codes, but that should be enough to get the kernel through
-verify_cpu() and __startup_64() until it runs on virtual addresses.
+Add the infrastructure to handle #VC exceptions when the kernel runs
+on virtual addresses and has a GHCB mapped. This handler will be used
+until the runtime #VC handler takes over.
 
 Signed-off-by: Joerg Roedel <jroedel@suse.de>
-Link: https://lore.kernel.org/r/20200724160336.5435-42-joro@8bytes.org
+Link: https://lore.kernel.org/r/20200724160336.5435-43-joro@8bytes.org
 ---
- arch/x86/include/asm/setup.h  |  1 +
- arch/x86/include/asm/sev-es.h |  3 +++
- arch/x86/kernel/head64.c      |  1 +
- arch/x86/kernel/head_64.S     | 34 +++++++++++++++++++++++++++++++++
- arch/x86/kernel/idt.c         | 36 +++++++++++++++++++++++++++++++++++
- 5 files changed, 75 insertions(+)
+ arch/x86/include/asm/segment.h  |   2 +-
+ arch/x86/include/asm/sev-es.h   |   1 +
+ arch/x86/kernel/head64.c        |   6 ++
+ arch/x86/kernel/sev-es-shared.c |  14 ++--
+ arch/x86/kernel/sev-es.c        | 116 ++++++++++++++++++++++++++++++++
+ arch/x86/mm/extable.c           |   1 +
+ 6 files changed, 132 insertions(+), 8 deletions(-)
 
-diff --git a/arch/x86/include/asm/setup.h b/arch/x86/include/asm/setup.h
-index cafae86813ae..0ce6453c9272 100644
---- a/arch/x86/include/asm/setup.h
-+++ b/arch/x86/include/asm/setup.h
-@@ -53,6 +53,7 @@ extern unsigned long __startup_secondary_64(void);
- extern void startup_64_setup_env(unsigned long physbase);
- extern void early_idt_setup_early_handler(unsigned long physaddr);
- extern void early_load_idt(void);
-+extern void early_idt_setup(unsigned long physbase);
- extern void __init do_early_exception(struct pt_regs *regs, int trapnr);
+diff --git a/arch/x86/include/asm/segment.h b/arch/x86/include/asm/segment.h
+index 517920928989..7fdd4facfce7 100644
+--- a/arch/x86/include/asm/segment.h
++++ b/arch/x86/include/asm/segment.h
+@@ -226,7 +226,7 @@
+ #define NUM_EXCEPTION_VECTORS		32
  
- #ifdef CONFIG_X86_INTEL_MID
+ /* Bitmask of exception vectors which push an error code on the stack: */
+-#define EXCEPTION_ERRCODE_MASK		0x00027d00
++#define EXCEPTION_ERRCODE_MASK		0x20027d00
+ 
+ #define GDT_SIZE			(GDT_ENTRIES*8)
+ #define GDT_ENTRY_TLS_ENTRIES		3
 diff --git a/arch/x86/include/asm/sev-es.h b/arch/x86/include/asm/sev-es.h
-index 7c0807b84546..ec0e112a742b 100644
+index ec0e112a742b..824e9e6b067c 100644
 --- a/arch/x86/include/asm/sev-es.h
 +++ b/arch/x86/include/asm/sev-es.h
-@@ -73,4 +73,7 @@ static inline u64 lower_bits(u64 val, unsigned int bits)
- 	return (val & mask);
- }
+@@ -75,5 +75,6 @@ static inline u64 lower_bits(u64 val, unsigned int bits)
  
-+/* Early IDT entry points for #VC handler */
-+extern void vc_no_ghcb(void);
-+
+ /* Early IDT entry points for #VC handler */
+ extern void vc_no_ghcb(void);
++extern bool handle_vc_boot_ghcb(struct pt_regs *regs);
+ 
  #endif
 diff --git a/arch/x86/kernel/head64.c b/arch/x86/kernel/head64.c
-index 41514ec1e6f0..250fae33bf66 100644
+index 250fae33bf66..ce2d8284edb9 100644
 --- a/arch/x86/kernel/head64.c
 +++ b/arch/x86/kernel/head64.c
-@@ -39,6 +39,7 @@
- #include <asm/realmode.h>
- #include <asm/extable.h>
- #include <asm/trapnr.h>
-+#include <asm/sev-es.h>
- 
- /*
-  * Manage page tables very early on.
-diff --git a/arch/x86/kernel/head_64.S b/arch/x86/kernel/head_64.S
-index 4622940134a5..12bf6f11fd83 100644
---- a/arch/x86/kernel/head_64.S
-+++ b/arch/x86/kernel/head_64.S
-@@ -95,6 +95,13 @@ SYM_CODE_START_NOALIGN(startup_64)
- .Lon_kernel_cs:
- 	UNWIND_HINT_EMPTY
- 
-+	/* Setup IDT - Needed for SEV-ES */
-+	pushq	%rsi
-+	/* early_idt_setup - physbase as first parameter */
-+	leaq	_text(%rip), %rdi
-+	call	early_idt_setup
-+	popq	%rsi
-+
- 	/* Sanitize CPU configuration */
- 	call verify_cpu
- 
-@@ -363,6 +370,33 @@ SYM_CODE_START_LOCAL(early_idt_handler_common)
- 	jmp restore_regs_and_return_to_kernel
- SYM_CODE_END(early_idt_handler_common)
+@@ -403,6 +403,12 @@ void __init do_early_exception(struct pt_regs *regs, int trapnr)
+ 	    early_make_pgtable(native_read_cr2()))
+ 		return;
  
 +#ifdef CONFIG_AMD_MEM_ENCRYPT
-+/*
-+ * VC Exception handler used during very early boot. The
-+ * early_idt_handler_array can't be used because it returns via the
-+ * paravirtualized INTERRUPT_RETURN and pv-ops don't work that early.
-+ */
-+SYM_CODE_START_NOALIGN(vc_no_ghcb)
-+	UNWIND_HINT_IRET_REGS offset=8
-+
-+	/* Build pt_regs */
-+	PUSH_AND_CLEAR_REGS
-+
-+	/* Call C handler */
-+	movq    %rsp, %rdi
-+	movq	ORIG_RAX(%rsp), %rsi
-+	call    do_vc_no_ghcb
-+
-+	/* Unwind pt_regs */
-+	POP_REGS
-+
-+	/* Remove Error Code */
-+	addq    $8, %rsp
-+
-+	/* Pure iret required here - don't use INTERRUPT_RETURN */
-+	iretq
-+SYM_CODE_END(vc_no_ghcb)
++	if (trapnr == X86_TRAP_VC &&
++	    handle_vc_boot_ghcb(regs))
++		return;
 +#endif
- 
- #define SYM_DATA_START_PAGE_ALIGNED(name)			\
- 	SYM_START(name, SYM_L_GLOBAL, .balign PAGE_SIZE)
-diff --git a/arch/x86/kernel/idt.c b/arch/x86/kernel/idt.c
-index e2777cc264f5..0d560a1218e1 100644
---- a/arch/x86/kernel/idt.c
-+++ b/arch/x86/kernel/idt.c
-@@ -11,6 +11,7 @@
- #include <asm/desc.h>
- #include <asm/hw_irq.h>
- #include <asm/setup.h>
-+#include <asm/sev-es.h>
- 
- struct idt_data {
- 	unsigned int	vector;
-@@ -408,3 +409,38 @@ void early_load_idt(void)
- {
- 	load_idt(&idt_descr);
++
+ 	early_fixup_exception(regs, trapnr);
  }
+ 
+diff --git a/arch/x86/kernel/sev-es-shared.c b/arch/x86/kernel/sev-es-shared.c
+index 18619279a46f..aa77f2eb8d88 100644
+--- a/arch/x86/kernel/sev-es-shared.c
++++ b/arch/x86/kernel/sev-es-shared.c
+@@ -9,7 +9,7 @@
+  * and is included directly into both code-bases.
+  */
+ 
+-static void __maybe_unused sev_es_terminate(unsigned int reason)
++static void sev_es_terminate(unsigned int reason)
+ {
+ 	u64 val = GHCB_SEV_TERMINATE;
+ 
+@@ -27,7 +27,7 @@ static void __maybe_unused sev_es_terminate(unsigned int reason)
+ 		asm volatile("hlt\n" : : : "memory");
+ }
+ 
+-static bool __maybe_unused sev_es_negotiate_protocol(void)
++static bool sev_es_negotiate_protocol(void)
+ {
+ 	u64 val;
+ 
+@@ -46,7 +46,7 @@ static bool __maybe_unused sev_es_negotiate_protocol(void)
+ 	return true;
+ }
+ 
+-static void __maybe_unused vc_ghcb_invalidate(struct ghcb *ghcb)
++static void vc_ghcb_invalidate(struct ghcb *ghcb)
+ {
+ 	memset(ghcb->save.valid_bitmap, 0, sizeof(ghcb->save.valid_bitmap));
+ }
+@@ -58,9 +58,9 @@ static bool vc_decoding_needed(unsigned long exit_code)
+ 		 exit_code <= SVM_EXIT_LAST_EXCP);
+ }
+ 
+-static enum es_result __maybe_unused vc_init_em_ctxt(struct es_em_ctxt *ctxt,
+-						     struct pt_regs *regs,
+-						     unsigned long exit_code)
++static enum es_result vc_init_em_ctxt(struct es_em_ctxt *ctxt,
++				      struct pt_regs *regs,
++				      unsigned long exit_code)
+ {
+ 	enum es_result ret = ES_OK;
+ 
+@@ -73,7 +73,7 @@ static enum es_result __maybe_unused vc_init_em_ctxt(struct es_em_ctxt *ctxt,
+ 	return ret;
+ }
+ 
+-static void __maybe_unused vc_finish_insn(struct es_em_ctxt *ctxt)
++static void vc_finish_insn(struct es_em_ctxt *ctxt)
+ {
+ 	ctxt->regs->ip += ctxt->insn.length;
+ }
+diff --git a/arch/x86/kernel/sev-es.c b/arch/x86/kernel/sev-es.c
+index 0b698b653c0b..bb3e702a71eb 100644
+--- a/arch/x86/kernel/sev-es.c
++++ b/arch/x86/kernel/sev-es.c
+@@ -7,7 +7,9 @@
+  * Author: Joerg Roedel <jroedel@suse.de>
+  */
+ 
++#include <linux/sched/debug.h>	/* For show_regs() */
+ #include <linux/kernel.h>
++#include <linux/printk.h>
+ #include <linux/mm.h>
+ 
+ #include <asm/sev-es.h>
+@@ -18,6 +20,18 @@
+ #include <asm/trapnr.h>
+ #include <asm/svm.h>
+ 
++/* For early boot hypervisor communication in SEV-ES enabled guests */
++static struct ghcb boot_ghcb_page __bss_decrypted __aligned(PAGE_SIZE);
 +
-+#ifdef CONFIG_AMD_MEM_ENCRYPT
-+static void set_early_idt_handler(gate_desc *idt, int n, void *handler)
++/*
++ * Needs to be in the .data section because we need it NULL before bss is
++ * cleared
++ */
++static struct ghcb __initdata *boot_ghcb;
++
++/* Needed in vc_early_forward_exception */
++void do_early_exception(struct pt_regs *regs, int trapnr);
++
+ static inline u64 sev_es_rd_ghcb_msr(void)
+ {
+ 	return native_read_msr(MSR_AMD64_SEV_ES_GHCB);
+@@ -161,3 +175,105 @@ static enum es_result vc_read_mem(struct es_em_ctxt *ctxt,
+ 
+ /* Include code shared with pre-decompression boot stage */
+ #include "sev-es-shared.c"
++
++/*
++ * This function runs on the first #VC exception after the kernel
++ * switched to virtual addresses.
++ */
++static bool __init sev_es_setup_ghcb(void)
 +{
-+	struct idt_data data;
-+	gate_desc desc;
++	/* First make sure the hypervisor talks a supported protocol. */
++	if (!sev_es_negotiate_protocol())
++		return false;
 +
-+	init_idt_data(&data, n, handler);
-+	idt_init_desc(&desc, &data);
-+	native_write_idt_entry(idt, n, &desc);
++	/*
++	 * Clear the boot_ghcb. The first exception comes in before the bss
++	 * section is cleared.
++	 */
++	memset(&boot_ghcb_page, 0, PAGE_SIZE);
++
++	/* Alright - Make the boot-ghcb public */
++	boot_ghcb = &boot_ghcb_page;
++
++	return true;
 +}
-+#endif
 +
-+static struct desc_ptr early_idt_descr __initdata = {
-+	.size		= IDT_TABLE_SIZE - 1,
-+	.address	= 0 /* Needs physical address of idt_table - initialized at runtime. */,
-+};
-+
-+void __init early_idt_setup(unsigned long physbase)
++static void __init vc_early_forward_exception(struct es_em_ctxt *ctxt)
 +{
-+	void __maybe_unused *handler;
-+	gate_desc *idt;
++	int trapnr = ctxt->fi.vector;
 +
-+	idt = fixup_pointer(idt_table, physbase);
++	if (trapnr == X86_TRAP_PF)
++		native_write_cr2(ctxt->fi.cr2);
 +
-+#ifdef CONFIG_AMD_MEM_ENCRYPT
-+	/* VMM Communication Exception */
-+	handler = fixup_pointer(vc_no_ghcb, physbase);
-+	set_early_idt_handler(idt, X86_TRAP_VC, handler);
-+#endif
-+
-+	/* Initialize IDT descriptor and load IDT */
-+	early_idt_descr.address = (unsigned long)idt;
-+	native_load_idt(&early_idt_descr);
++	ctxt->regs->orig_ax = ctxt->fi.error_code;
++	do_early_exception(ctxt->regs, trapnr);
 +}
++
++static enum es_result vc_handle_exitcode(struct es_em_ctxt *ctxt,
++					 struct ghcb *ghcb,
++					 unsigned long exit_code)
++{
++	enum es_result result;
++
++	switch (exit_code) {
++	default:
++		/*
++		 * Unexpected #VC exception
++		 */
++		result = ES_UNSUPPORTED;
++	}
++
++	return result;
++}
++
++bool __init handle_vc_boot_ghcb(struct pt_regs *regs)
++{
++	unsigned long exit_code = regs->orig_ax;
++	struct es_em_ctxt ctxt;
++	enum es_result result;
++
++	/* Do initial setup or terminate the guest */
++	if (unlikely(boot_ghcb == NULL && !sev_es_setup_ghcb()))
++		sev_es_terminate(GHCB_SEV_ES_REASON_GENERAL_REQUEST);
++
++	vc_ghcb_invalidate(boot_ghcb);
++
++	result = vc_init_em_ctxt(&ctxt, regs, exit_code);
++	if (result == ES_OK)
++		result = vc_handle_exitcode(&ctxt, boot_ghcb, exit_code);
++
++	/* Done - now check the result */
++	switch (result) {
++	case ES_OK:
++		vc_finish_insn(&ctxt);
++		break;
++	case ES_UNSUPPORTED:
++		early_printk("PANIC: Unsupported exit-code 0x%02lx in early #VC exception (IP: 0x%lx)\n",
++				exit_code, regs->ip);
++		goto fail;
++	case ES_VMM_ERROR:
++		early_printk("PANIC: Failure in communication with VMM (exit-code 0x%02lx IP: 0x%lx)\n",
++				exit_code, regs->ip);
++		goto fail;
++	case ES_DECODE_FAILED:
++		early_printk("PANIC: Failed to decode instruction (exit-code 0x%02lx IP: 0x%lx)\n",
++				exit_code, regs->ip);
++		goto fail;
++	case ES_EXCEPTION:
++		vc_early_forward_exception(&ctxt);
++		break;
++	case ES_RETRY:
++		/* Nothing to do */
++		break;
++	default:
++		BUG();
++	}
++
++	return true;
++
++fail:
++	show_regs(regs);
++
++	while (true)
++		halt();
++}
+diff --git a/arch/x86/mm/extable.c b/arch/x86/mm/extable.c
+index 1d6cb07f4f86..3966749d07ac 100644
+--- a/arch/x86/mm/extable.c
++++ b/arch/x86/mm/extable.c
+@@ -5,6 +5,7 @@
+ #include <xen/xen.h>
+ 
+ #include <asm/fpu/internal.h>
++#include <asm/sev-es.h>
+ #include <asm/traps.h>
+ #include <asm/kdebug.h>
+ 
 -- 
 2.28.0
 
