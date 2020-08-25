@@ -2,150 +2,102 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4906625165F
-	for <lists+kvm@lfdr.de>; Tue, 25 Aug 2020 12:14:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 15B0825168D
+	for <lists+kvm@lfdr.de>; Tue, 25 Aug 2020 12:21:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729800AbgHYKN4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 25 Aug 2020 06:13:56 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:27555 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1729796AbgHYKNy (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 25 Aug 2020 06:13:54 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1598350433;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=IfBjE/lnsE6zqa6amkpr22aF2GJzSWSxCKj8gx+aUU8=;
-        b=eE5YCzAa3gSQ/bw7+QxfyiPsqIrY5JgNq3TiI+A3UBkbCJBEUt7ES/GtVi5QfIW2LrGkDA
-        rw5MB3MDeoM9PqS/IHGst5Mah4lZUAREjfs8YrEWarJy4waRh+vi6ptIQHSwgwBvSl0hwH
-        HBNnL8c9xuYvrOY7UECK7b0nYTQMOcA=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-104-Arl8Ua1PPfOCKcnBE9UipA-1; Tue, 25 Aug 2020 06:13:49 -0400
-X-MC-Unique: Arl8Ua1PPfOCKcnBE9UipA-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 54D2E18BA282;
-        Tue, 25 Aug 2020 10:13:46 +0000 (UTC)
-Received: from gondolin (ovpn-112-248.ams2.redhat.com [10.36.112.248])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id E6D2319144;
-        Tue, 25 Aug 2020 10:13:36 +0000 (UTC)
-Date:   Tue, 25 Aug 2020 12:13:34 +0200
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Tony Krowiak <akrowiak@linux.ibm.com>
-Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, freude@linux.ibm.com, borntraeger@de.ibm.com,
-        mjrosato@linux.ibm.com, pasic@linux.ibm.com,
-        alex.williamson@redhat.com, kwankhede@nvidia.com,
-        fiuczy@linux.ibm.com, frankja@linux.ibm.com, david@redhat.com,
-        imbrenda@linux.ibm.com, hca@linux.ibm.com, gor@linux.ibm.com,
-        kernel test robot <lkp@intel.com>
-Subject: Re: [PATCH v10 02/16] s390/vfio-ap: use new AP bus interface to
- search for queue devices
-Message-ID: <20200825121334.0ff35d7a.cohuck@redhat.com>
-In-Reply-To: <20200821195616.13554-3-akrowiak@linux.ibm.com>
-References: <20200821195616.13554-1-akrowiak@linux.ibm.com>
-        <20200821195616.13554-3-akrowiak@linux.ibm.com>
-Organization: Red Hat GmbH
+        id S1729857AbgHYKVS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 25 Aug 2020 06:21:18 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:15010 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1729680AbgHYKVA (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 25 Aug 2020 06:21:00 -0400
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 07PACij1119387
+        for <kvm@vger.kernel.org>; Tue, 25 Aug 2020 06:20:59 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : mime-version : content-transfer-encoding; s=pp1;
+ bh=2EmO7GuAkt2CBeoiQu48W4AhvFHCdNqQkoc/pOSQtkw=;
+ b=aN2LZosWPFpvcR2gQ7wDO95i5AC/Km8NJyliG1DKg42fge6Xjp/od6DP49u0+Vmy9WNr
+ XCLMGftmVlhSKrxvQ/JXzX1ouZYixNpdrmT9lYJ6mZmf+A5AOkBVFd5cx7OamBkUDX4E
+ bZiW24B0kciJ2d8n5qly5+VWXdkAOxNg8hAGbwMgNCL80obc+98cFksxXxA4/kLxVlhg
+ b9NnMLQgnjTAsMuFYMXMkECAq1OL706dqr2WG3dKeB0rbcTrV2fKYYWtU0W6GF+Nc+/U
+ ZMhageIiGKL2hQFjAP4k03mctynuQeOxGmnL0r+AnO4jnphx5+3o0C3px9uFnoGvJGLn Qg== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3350pjr6hm-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Tue, 25 Aug 2020 06:20:59 -0400
+Received: from m0098393.ppops.net (m0098393.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 07PAG6wS127460
+        for <kvm@vger.kernel.org>; Tue, 25 Aug 2020 06:20:58 -0400
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3350pjr6h2-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 25 Aug 2020 06:20:58 -0400
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 07PAFvws001176;
+        Tue, 25 Aug 2020 10:20:56 GMT
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
+        by ppma03ams.nl.ibm.com with ESMTP id 332ujkua9g-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 25 Aug 2020 10:20:55 +0000
+Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
+        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 07PAKrFc30212602
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 25 Aug 2020 10:20:53 GMT
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id A80A6A404D;
+        Tue, 25 Aug 2020 10:20:53 +0000 (GMT)
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 3F911A4040;
+        Tue, 25 Aug 2020 10:20:53 +0000 (GMT)
+Received: from marcibm.ibmuc.com (unknown [9.145.56.167])
+        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Tue, 25 Aug 2020 10:20:53 +0000 (GMT)
+From:   Marc Hartmayer <mhartmay@linux.ibm.com>
+To:     <kvm@vger.kernel.org>
+Cc:     Thomas Huth <thuth@redhat.com>,
+        David Hildenbrand <david@redhat.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Andrew Jones <drjones@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Subject: [kvm-unit-tests PATCH v2 0/2] Use same test names in the default and the TAP13 output format
+Date:   Tue, 25 Aug 2020 12:20:34 +0200
+Message-Id: <20200825102036.17232-1-mhartmay@linux.ibm.com>
+X-Mailer: git-send-email 2.26.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
+ definitions=2020-08-25_02:2020-08-24,2020-08-25 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 spamscore=0
+ adultscore=0 priorityscore=1501 mlxscore=0 malwarescore=0
+ lowpriorityscore=0 mlxlogscore=999 suspectscore=0 bulkscore=0 phishscore=0
+ clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2006250000 definitions=main-2008250073
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 21 Aug 2020 15:56:02 -0400
-Tony Krowiak <akrowiak@linux.ibm.com> wrote:
+For everybody's convenience there is a branch:
+https://gitlab.com/mhartmay/kvm-unit-tests/-/tree/tap_v2
 
-> This patch refactor's the vfio_ap device driver to use the AP bus's
+Changelog:
+v1 -> v2:
+ + added r-b's to patch 1
+ + patch 2:
+  - I've not added Andrew's r-b since I've worked in the comment from
+    Janosch (don't drop the first prefix)
 
-s/refactor's/refactors/
+Marc Hartmayer (2):
+  runtime.bash: remove outdated comment
+  Use same test names in the default and the TAP13 output format
 
-> ap_get_qdev() function to retrieve the vfio_ap_queue struct containing
-> information about a queue that is bound to the vfio_ap device driver.
-> The bus's ap_get_qdev() function retrieves the queue device from a
-> hashtable keyed by APQN. This is much more efficient than looping over
-> the list of devices attached to the AP bus by several orders of
-> magnitude.
-> 
-> Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
-> Reported-by: kernel test robot <lkp@intel.com>
-> ---
->  drivers/s390/crypto/vfio_ap_drv.c     | 27 ++-------
->  drivers/s390/crypto/vfio_ap_ops.c     | 86 +++++++++++++++------------
->  drivers/s390/crypto/vfio_ap_private.h |  8 ++-
->  3 files changed, 59 insertions(+), 62 deletions(-)
-> 
+ run_tests.sh         | 15 +++++++++------
+ scripts/runtime.bash |  9 +++------
+ 2 files changed, 12 insertions(+), 12 deletions(-)
 
-(...)
-
-> diff --git a/drivers/s390/crypto/vfio_ap_ops.c b/drivers/s390/crypto/vfio_ap_ops.c
-> index e0bde8518745..ad3925f04f61 100644
-> --- a/drivers/s390/crypto/vfio_ap_ops.c
-> +++ b/drivers/s390/crypto/vfio_ap_ops.c
-> @@ -26,43 +26,26 @@
->  
->  static int vfio_ap_mdev_reset_queues(struct mdev_device *mdev);
->  
-> -static int match_apqn(struct device *dev, const void *data)
-> -{
-> -	struct vfio_ap_queue *q = dev_get_drvdata(dev);
-> -
-> -	return (q->apqn == *(int *)(data)) ? 1 : 0;
-> -}
-> -
->  /**
-> - * vfio_ap_get_queue: Retrieve a queue with a specific APQN from a list
-> - * @matrix_mdev: the associated mediated matrix
-> + * vfio_ap_get_queue: Retrieve a queue with a specific APQN.
->   * @apqn: The queue APQN
->   *
-> - * Retrieve a queue with a specific APQN from the list of the
-> - * devices of the vfio_ap_drv.
-> - * Verify that the APID and the APQI are set in the matrix.
-> + * Retrieve a queue with a specific APQN from the AP queue devices attached to
-> + * the AP bus.
->   *
-> - * Returns the pointer to the associated vfio_ap_queue
-> + * Returns the pointer to the vfio_ap_queue with the specified APQN, or NULL.
->   */
-> -static struct vfio_ap_queue *vfio_ap_get_queue(
-> -					struct ap_matrix_mdev *matrix_mdev,
-> -					int apqn)
-> +static struct vfio_ap_queue *vfio_ap_get_queue(unsigned long apqn)
->  {
-> +	struct ap_queue *queue;
->  	struct vfio_ap_queue *q;
-> -	struct device *dev;
->  
-> -	if (!test_bit_inv(AP_QID_CARD(apqn), matrix_mdev->matrix.apm))
-> -		return NULL;
-> -	if (!test_bit_inv(AP_QID_QUEUE(apqn), matrix_mdev->matrix.aqm))
-
-I think you should add some explanation to the patch description why
-testing the matrix bitmasks is not needed anymore.
-
-> +	queue = ap_get_qdev(apqn);
-> +	if (!queue)
->  		return NULL;
->  
-> -	dev = driver_find_device(&matrix_dev->vfio_ap_drv->driver, NULL,
-> -				 &apqn, match_apqn);
-> -	if (!dev)
-> -		return NULL;
-> -	q = dev_get_drvdata(dev);
-> -	q->matrix_mdev = matrix_mdev;
-> -	put_device(dev);
-> +	q = dev_get_drvdata(&queue->ap_dev.device);
-> +	put_device(&queue->ap_dev.device);
->  
->  	return q;
->  }
-
-(...)
+-- 
+2.25.4
 
