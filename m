@@ -2,71 +2,96 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B0D14251208
-	for <lists+kvm@lfdr.de>; Tue, 25 Aug 2020 08:24:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6B525251323
+	for <lists+kvm@lfdr.de>; Tue, 25 Aug 2020 09:26:30 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729023AbgHYGY3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 25 Aug 2020 02:24:29 -0400
-Received: from mx2.suse.de ([195.135.220.15]:39740 "EHLO mx2.suse.de"
+        id S1729416AbgHYH02 convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Tue, 25 Aug 2020 03:26:28 -0400
+Received: from mail.kernel.org ([198.145.29.99]:58256 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726940AbgHYGY2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 25 Aug 2020 02:24:28 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.221.27])
-        by mx2.suse.de (Postfix) with ESMTP id A98B5AC23;
-        Tue, 25 Aug 2020 06:24:57 +0000 (UTC)
-Date:   Tue, 25 Aug 2020 08:24:23 +0200
-From:   Joerg Roedel <jroedel@suse.de>
-To:     Mike Stunes <mstunes@vmware.com>
-Cc:     Joerg Roedel <joro@8bytes.org>, "x86@kernel.org" <x86@kernel.org>,
-        "hpa@zytor.com" <hpa@zytor.com>, Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Jiri Slaby <jslaby@suse.cz>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Juergen Gross <jgross@suse.com>,
-        Kees Cook <keescook@chromium.org>,
-        David Rientjes <rientjes@google.com>,
-        Cfir Cohen <cfir@google.com>,
-        Erdem Aktas <erdemaktas@google.com>,
-        Masami Hiramatsu <mhiramat@kernel.org>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Martin Radev <martin.b.radev@gmail.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "virtualization@lists.linux-foundation.org" 
-        <virtualization@lists.linux-foundation.org>
-Subject: Re: [PATCH v6 00/76] x86: SEV-ES Guest Support
-Message-ID: <20200825062423.GS3354@suse.de>
-References: <20200824085511.7553-1-joro@8bytes.org>
- <D0B35ACA-7220-45DD-B524-0AFD6BE7BA3D@vmware.com>
+        id S1729322AbgHYH02 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 25 Aug 2020 03:26:28 -0400
+From:   bugzilla-daemon@bugzilla.kernel.org
+Authentication-Results: mail.kernel.org; dkim=permerror (bad message/signature format)
+To:     kvm@vger.kernel.org
+Subject: [Bug 209025] The "VFIO_MAP_DMA failed: Cannot allocate memory" bug
+ is back
+Date:   Tue, 25 Aug 2020 07:26:26 +0000
+X-Bugzilla-Reason: None
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Product: Virtualization
+X-Bugzilla-Component: kvm
+X-Bugzilla-Version: unspecified
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: high
+X-Bugzilla-Who: niklas@komani.de
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: cc
+Message-ID: <bug-209025-28872-zSYm1afPfK@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-209025-28872@https.bugzilla.kernel.org/>
+References: <bug-209025-28872@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8BIT
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <D0B35ACA-7220-45DD-B524-0AFD6BE7BA3D@vmware.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Mike,
+https://bugzilla.kernel.org/show_bug.cgi?id=209025
 
-On Tue, Aug 25, 2020 at 12:21:03AM +0000, Mike Stunes wrote:
-> Thanks for the new update! I still see the same FSGSBASE behavior on our platform.
-> 
-> That is, APs come up offline; masking out either FSGSBASE or RDPID from the
-> guest's CPUID results in all CPUs online.
-> 
-> Is that still expected with this patch set? (As you mentioned in an earlier reply,
-> I’m testing on a Rome system.)
+Niklas Schnelle (niklas@komani.de) changed:
 
-The RDPID fix (removing RDPID usage from paranoid_entry) is probably not
-yet merged into the base you have been using. But removing RDPID from
-CPUID should make things work until the fix is merged.
+           What    |Removed                     |Added
+----------------------------------------------------------------------------
+                 CC|                            |axboe@kernel.dk,
+                   |                            |niklas@komani.de
 
-Regards,
+--- Comment #5 from Niklas Schnelle (niklas@komani.de) ---
+Hi,
 
-	Joerg
+it's me Niklas from the KVM mailinglist discussion and yes
+this is a very old pre-IBM, pre any work, Bugzilla account :D
+
+I too did a bisect yesterday and also
+encountered a few commits that had KVM in a very weird state
+where not even the UEFI in the VM would boot, funnily enough
+a BIOS based FreeBSD VM did still boot.
+
+Anyway my bisect was successful and reverting the found
+commit makes things work even on v5.9-rc2.
+
+That said it is quite a strange result but I guess it makes
+sense as that also deals with locked/pinned memory.
+I'm assuming this might use the same accounting mechanism?
+
+f74441e6311a28f0ee89b9c8e296a33730f812fc is the first bad commit
+commit f74441e6311a28f0ee89b9c8e296a33730f812fc
+Author: Jens Axboe <axboe@kernel.dk>
+Date:   Wed Aug 5 13:00:44 2020 -0600
+
+    io_uring: account locked memory before potential error case
+
+    The tear down path will always unaccount the memory, so ensure that we
+    have accounted it before hitting any of them.
+
+    Reported-by: Tomáš Chaloupka <chalucha@gmail.com>
+    Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
+    Signed-off-by: Jens Axboe <axboe@kernel.dk>
+
+ fs/io_uring.c | 18 ++++++++++--------
+ 1 file changed, 10 insertions(+), 8 deletions(-)
+
+I've added Jens to the Bugzilla CC list not sure if he'll see
+that though.
+
+-- 
+You are receiving this mail because:
+You are watching the assignee of the bug.
