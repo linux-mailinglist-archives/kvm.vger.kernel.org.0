@@ -2,96 +2,69 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6B525251323
-	for <lists+kvm@lfdr.de>; Tue, 25 Aug 2020 09:26:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2882D25153E
+	for <lists+kvm@lfdr.de>; Tue, 25 Aug 2020 11:22:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729416AbgHYH02 convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Tue, 25 Aug 2020 03:26:28 -0400
-Received: from mail.kernel.org ([198.145.29.99]:58256 "EHLO mail.kernel.org"
+        id S1729053AbgHYJWa (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 25 Aug 2020 05:22:30 -0400
+Received: from 8bytes.org ([81.169.241.247]:39304 "EHLO theia.8bytes.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729322AbgHYH02 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 25 Aug 2020 03:26:28 -0400
-From:   bugzilla-daemon@bugzilla.kernel.org
-Authentication-Results: mail.kernel.org; dkim=permerror (bad message/signature format)
-To:     kvm@vger.kernel.org
-Subject: [Bug 209025] The "VFIO_MAP_DMA failed: Cannot allocate memory" bug
- is back
-Date:   Tue, 25 Aug 2020 07:26:26 +0000
-X-Bugzilla-Reason: None
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Product: Virtualization
-X-Bugzilla-Component: kvm
-X-Bugzilla-Version: unspecified
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: high
-X-Bugzilla-Who: niklas@komani.de
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: cc
-Message-ID: <bug-209025-28872-zSYm1afPfK@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-209025-28872@https.bugzilla.kernel.org/>
-References: <bug-209025-28872@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8BIT
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+        id S1728377AbgHYJW3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 25 Aug 2020 05:22:29 -0400
+Received: by theia.8bytes.org (Postfix, from userid 1000)
+        id 840D829A; Tue, 25 Aug 2020 11:22:27 +0200 (CEST)
+Date:   Tue, 25 Aug 2020 11:22:24 +0200
+From:   Joerg Roedel <joro@8bytes.org>
+To:     Borislav Petkov <bp@alien8.de>
+Cc:     x86@kernel.org, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>, hpa@zytor.com,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Jiri Slaby <jslaby@suse.cz>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Juergen Gross <jgross@suse.com>,
+        Kees Cook <keescook@chromium.org>,
+        David Rientjes <rientjes@google.com>,
+        Cfir Cohen <cfir@google.com>,
+        Erdem Aktas <erdemaktas@google.com>,
+        Masami Hiramatsu <mhiramat@kernel.org>,
+        Mike Stunes <mstunes@vmware.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Martin Radev <martin.b.radev@gmail.com>,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org
+Subject: Re: [PATCH v6 02/76] KVM: SVM: Add GHCB definitions
+Message-ID: <20200825092224.GF3319@8bytes.org>
+References: <20200824085511.7553-1-joro@8bytes.org>
+ <20200824085511.7553-3-joro@8bytes.org>
+ <20200824104451.GA4732@zn.tnic>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200824104451.GA4732@zn.tnic>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=209025
+On Mon, Aug 24, 2020 at 12:44:51PM +0200, Borislav Petkov wrote:
+> On Mon, Aug 24, 2020 at 10:53:57AM +0200, Joerg Roedel wrote:
+> >  static inline void __unused_size_checks(void)
+> >  {
+> > -	BUILD_BUG_ON(sizeof(struct vmcb_save_area) != 0x298);
+> > +	BUILD_BUG_ON(sizeof(struct vmcb_save_area) != 1032);
+> >  	BUILD_BUG_ON(sizeof(struct vmcb_control_area) != 256);
+> > +	BUILD_BUG_ON(sizeof(struct ghcb) != 4096);
+> 
+> Could those naked numbers be proper, meaningfully named defines?
 
-Niklas Schnelle (niklas@komani.de) changed:
+I don't think so, if I look at the history of these checks their whole
+purpose seems to be to alert the developer/maintainer when their size
+changes and that they might not fit on the stack anymore. But that is
+taken care of in patch 1.
 
-           What    |Removed                     |Added
-----------------------------------------------------------------------------
-                 CC|                            |axboe@kernel.dk,
-                   |                            |niklas@komani.de
+Regards,
 
---- Comment #5 from Niklas Schnelle (niklas@komani.de) ---
-Hi,
-
-it's me Niklas from the KVM mailinglist discussion and yes
-this is a very old pre-IBM, pre any work, Bugzilla account :D
-
-I too did a bisect yesterday and also
-encountered a few commits that had KVM in a very weird state
-where not even the UEFI in the VM would boot, funnily enough
-a BIOS based FreeBSD VM did still boot.
-
-Anyway my bisect was successful and reverting the found
-commit makes things work even on v5.9-rc2.
-
-That said it is quite a strange result but I guess it makes
-sense as that also deals with locked/pinned memory.
-I'm assuming this might use the same accounting mechanism?
-
-f74441e6311a28f0ee89b9c8e296a33730f812fc is the first bad commit
-commit f74441e6311a28f0ee89b9c8e296a33730f812fc
-Author: Jens Axboe <axboe@kernel.dk>
-Date:   Wed Aug 5 13:00:44 2020 -0600
-
-    io_uring: account locked memory before potential error case
-
-    The tear down path will always unaccount the memory, so ensure that we
-    have accounted it before hitting any of them.
-
-    Reported-by: Tomáš Chaloupka <chalucha@gmail.com>
-    Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
-    Signed-off-by: Jens Axboe <axboe@kernel.dk>
-
- fs/io_uring.c | 18 ++++++++++--------
- 1 file changed, 10 insertions(+), 8 deletions(-)
-
-I've added Jens to the Bugzilla CC list not sure if he'll see
-that though.
-
--- 
-You are receiving this mail because:
-You are watching the assignee of the bug.
+	Joerg
