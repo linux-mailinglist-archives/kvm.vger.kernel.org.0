@@ -2,143 +2,107 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2C6DC256EFE
-	for <lists+kvm@lfdr.de>; Sun, 30 Aug 2020 17:22:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 213F525704D
+	for <lists+kvm@lfdr.de>; Sun, 30 Aug 2020 21:51:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726035AbgH3PWK convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Sun, 30 Aug 2020 11:22:10 -0400
-Received: from mail.kernel.org ([198.145.29.99]:33130 "EHLO mail.kernel.org"
+        id S1726388AbgH3Tvu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 30 Aug 2020 15:51:50 -0400
+Received: from mail.skyhub.de ([5.9.137.197]:58460 "EHLO mail.skyhub.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725993AbgH3PWH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 30 Aug 2020 11:22:07 -0400
-From:   bugzilla-daemon@bugzilla.kernel.org
-Authentication-Results: mail.kernel.org; dkim=permerror (bad message/signature format)
-To:     kvm@vger.kernel.org
-Subject: [Bug 209079] New: CPU 0/KVM: page allocation failure on 5.8 kernel
-Date:   Sun, 30 Aug 2020 15:22:06 +0000
-X-Bugzilla-Reason: None
-X-Bugzilla-Type: new
-X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Product: Virtualization
-X-Bugzilla-Component: kvm
-X-Bugzilla-Version: unspecified
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: kernel@martin.schrodt.org
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: bug_id short_desc product version
- cf_kernel_version rep_platform op_sys cf_tree bug_status bug_severity
- priority component assigned_to reporter cf_regression
-Message-ID: <bug-209079-28872@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8BIT
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
-MIME-Version: 1.0
+        id S1726179AbgH3Tvt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 30 Aug 2020 15:51:49 -0400
+Received: from zn.tnic (p200300ec2f2960001ce4724d13ad870d.dip0.t-ipconnect.de [IPv6:2003:ec:2f29:6000:1ce4:724d:13ad:870d])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id C728A1EC02F2
+        for <kvm@vger.kernel.org>; Sun, 30 Aug 2020 21:51:47 +0200 (CEST)
+Received: from deliver ([unix socket])
+         by localhost (Cyrus v2.4.17-caldav-beta9-Debian-2.4.17+caldav~beta9-3) with LMTPA;
+         Tue, 25 Aug 2020 02:54:03 +0200
+X-Sieve: CMU Sieve 2.4
+Received: from mga05.intel.com (mga05.intel.com [192.55.52.43])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPS id 7C4371EC0104
+        for <bp@alien8.de>; Tue, 25 Aug 2020 02:54:02 +0200 (CEST)
+IronPort-SDR: Qm41XyvUdsCSrQhNRf+47AbQL7sw3zCPIs8LOeNO3ui2mKLyVEdAN+WHtIyJUeTyEVlys75bzX
+ r9wujGgZTM/A==
+X-IronPort-AV: E=McAfee;i="6000,8403,9723"; a="240834166"
+X-IronPort-AV: E=Sophos;i="5.76,350,1592895600"; 
+   d="scan'208";a="240834166"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Aug 2020 17:54:01 -0700
+IronPort-SDR: LLvBxzWhq25bkfXbFZVAzsoS6K+kmlkkiBeJ32HBDUnIVB596K7Tkalkp+Brgga3IuQliKmDeW
+ WVSd/+KMtAuQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.76,350,1592895600"; 
+   d="scan'208";a="281351941"
+Received: from unknown (HELO localhost.localdomain.bj.intel.com) ([10.238.156.127])
+  by fmsmga008.fm.intel.com with ESMTP; 24 Aug 2020 17:53:57 -0700
+From:   Cathy Zhang <cathy.zhang@intel.com>
+To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org, x86@kernel.org
+Cc:     pbonzini@redhat.com, sean.j.christopherson@intel.com,
+        gregkh@linuxfoundation.org, tglx@linutronix.de,
+        tony.luck@intel.com, dave.hansen@intel.com,
+        kyung.min.park@intel.com, ricardo.neri-calderon@linux.intel.com,
+        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
+        joro@8bytes.org, mingo@redhat.com, bp@alien8.de, hpa@zytor.com,
+        jpoimboe@redhat.com, ak@linux.intel.com, ravi.v.shankar@intel.com,
+        Cathy Zhang <cathy.zhang@intel.com>
+Subject: [PATCH v4 2/2] x86/kvm: Expose TSX Suspend Load Tracking feature
+Date:   Tue, 25 Aug 2020 08:47:58 +0800
+Message-Id: <1598316478-23337-3-git-send-email-cathy.zhang@intel.com>
+X-Mailer: git-send-email 1.8.3.1
+In-Reply-To: <1598316478-23337-1-git-send-email-cathy.zhang@intel.com>
+References: <1598316478-23337-1-git-send-email-cathy.zhang@intel.com>
+Authentication-Results: mail.skyhub.de;
+        dmarc=pass (policy=none) header.from=intel.com;
+        spf=pass (mail.skyhub.de: domain of cathy.zhang@intel.com designates 192.55.52.43 as permitted sender) smtp.mailfrom=cathy.zhang@intel.com
+X-Spamd-Bar: ----------
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=209079
+TSX suspend load tracking instruction is supported by
+Intel processor, Sapphire Rapids. It aims to give a
+way to choose which memory accesses do not need to be
+tracked in the TSX read set. It's availability is indicated
+as CPUID.(EAX=7,ECX=0):EDX[bit 16].
 
-            Bug ID: 209079
-           Summary: CPU 0/KVM: page allocation failure on 5.8 kernel
-           Product: Virtualization
-           Version: unspecified
-    Kernel Version: 5.8.5-arch1-1
-          Hardware: All
-                OS: Linux
-              Tree: Mainline
-            Status: NEW
-          Severity: normal
-          Priority: P1
-         Component: kvm
-          Assignee: virtualization_kvm@kernel-bugs.osdl.org
-          Reporter: kernel@martin.schrodt.org
-        Regression: No
+Expose TSX Suspend Load Address Tracking feature in KVM
+CPUID, so KVM could pass this information to guests and
+they can make use of this feature accordingly.
 
-When starting my KVM-VM in the current 5.8 kernel, it won't start, complaining:
+Signed-off-by: Cathy Zhang <cathy.zhang@intel.com>
+Reviewed-by: Tony Luck <tony.luck@intel.com>
+---
+Changes since v3:
+ * Remove SERIALIZE part and refactor commit message..
 
-> internal error: qemu unexpectedly closed the monitor:
-> 2020-08-30T15:16:10.389012Z qemu-system-x86_64: kvm_init_vcpu failed: Cannot
-> allocate memory
+Changes since v2:
+ * Merge two patches into a single one. (Luck, Tony)
+ * Add overview introduction for features. (Sean Christopherson)
+ * Refactor commit message to explain why expose feature bits. (Luck, Tony)
+---
+ arch/x86/kvm/cpuid.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-The same VM works fine in a 5.7 kernel. I tried an earlier 5.8 kernel too, same
-outcome.
-
-dmesg shows the following:
-
-[Sun Aug 30 17:16:09 2020] CPU 0/KVM: page allocation failure: order:0,
-mode:0x400cc4(GFP_KERNEL_ACCOUNT|GFP_DMA32),
-nodemask=(null),cpuset=emulator,mems_allowed=1
-[Sun Aug 30 17:16:09 2020] CPU: 11 PID: 16473 Comm: CPU 0/KVM Tainted: P       
-   OE     5.8.5-arch1-1 #1
-[Sun Aug 30 17:16:09 2020] Hardware name: To Be Filled By O.E.M. To Be Filled
-By O.E.M./X399 Phantom Gaming 6, BIOS P1.10 11/15/2018
-[Sun Aug 30 17:16:09 2020] Call Trace:
-[Sun Aug 30 17:16:09 2020]  dump_stack+0x6b/0x88
-[Sun Aug 30 17:16:09 2020]  warn_alloc.cold+0x78/0xdc
-[Sun Aug 30 17:16:09 2020]  __alloc_pages_slowpath.constprop.0+0xd14/0xd50
-[Sun Aug 30 17:16:09 2020]  __alloc_pages_nodemask+0x2e4/0x310
-[Sun Aug 30 17:16:09 2020]  alloc_mmu_pages+0x27/0x90 [kvm]
-[Sun Aug 30 17:16:09 2020]  kvm_mmu_create+0x100/0x140 [kvm]
-[Sun Aug 30 17:16:09 2020]  kvm_arch_vcpu_create+0x48/0x360 [kvm]
-[Sun Aug 30 17:16:09 2020]  kvm_vm_ioctl+0xa2d/0xe60 [kvm]
-[Sun Aug 30 17:16:09 2020]  ksys_ioctl+0x82/0xc0
-[Sun Aug 30 17:16:09 2020]  __x64_sys_ioctl+0x16/0x20
-[Sun Aug 30 17:16:09 2020]  do_syscall_64+0x44/0x70
-[Sun Aug 30 17:16:09 2020]  entry_SYSCALL_64_after_hwframe+0x44/0xa9
-[Sun Aug 30 17:16:09 2020] RIP: 0033:0x7f4e8ba7cf6b
-[Sun Aug 30 17:16:09 2020] Code: 89 d8 49 8d 3c 1c 48 f7 d8 49 39 c4 72 b5 e8
-1c ff ff ff 85 c0 78 ba 4c 89 e0 5b 5d 41 5c c3 f3 0f 1e fa b8 10 00 00 00 0f
-05 <48> 3d 01 f0 ff ff 73 01 c3 48 8b 0d d5 ae 0c 00 f7 d8 64 89 01 48
-[Sun Aug 30 17:16:09 2020] RSP: 002b:00007f4e6bffe6b8 EFLAGS: 00000246
-ORIG_RAX: 0000000000000010
-[Sun Aug 30 17:16:09 2020] RAX: ffffffffffffffda RBX: 000000000000ae41 RCX:
-00007f4e8ba7cf6b
-[Sun Aug 30 17:16:09 2020] RDX: 0000000000000000 RSI: 000000000000ae41 RDI:
-0000000000000019
-[Sun Aug 30 17:16:09 2020] RBP: 0000563079828020 R08: 0000000000000000 R09:
-0000563079844010
-[Sun Aug 30 17:16:09 2020] R10: 0000000000000000 R11: 0000000000000246 R12:
-0000000000000000
-[Sun Aug 30 17:16:09 2020] R13: 00007fff52f4494f R14: 0000000000000000 R15:
-00007f4e6bfff640
-[Sun Aug 30 17:16:09 2020] Mem-Info:
-[Sun Aug 30 17:16:09 2020] active_anon:414866 inactive_anon:28099
-isolated_anon:0
-                            active_file:31776 inactive_file:88136
-isolated_file:0
-                            unevictable:32 dirty:521 writeback:0
-                            slab_reclaimable:19827 slab_unreclaimable:137048
-                            mapped:142120 shmem:28302 pagetables:6905 bounce:0
-                            free:6992691 free_pcp:4628 free_cma:0
-
-System is a Threadripper 1920x, on ASRock Phantom Gaming 6 X399 board with 32GB
-RAM, which is a NUMA architecture, having 2 nodes
-
-➜  numactl -H
-available: 2 nodes (0-1)
-node 0 cpus: 0 1 2 3 4 5 12 13 14 15 16 17
-node 0 size: 15966 MB
-node 0 free: 12860 MB
-node 1 cpus: 6 7 8 9 10 11 18 19 20 21 22 23
-node 1 size: 16112 MB
-node 1 free: 14559 MB
-node distances:
-node   0   1 
-  0:  10  16 
-  1:  16  10 
-
-The VM is configured to only allocate memory on node 1.
-
-Happy to provide more information!
-
+diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+index 3fd6eec..7456f9a 100644
+--- a/arch/x86/kvm/cpuid.c
++++ b/arch/x86/kvm/cpuid.c
+@@ -371,7 +371,7 @@ void kvm_set_cpu_caps(void)
+ 		F(AVX512_4VNNIW) | F(AVX512_4FMAPS) | F(SPEC_CTRL) |
+ 		F(SPEC_CTRL_SSBD) | F(ARCH_CAPABILITIES) | F(INTEL_STIBP) |
+ 		F(MD_CLEAR) | F(AVX512_VP2INTERSECT) | F(FSRM) |
+-		F(SERIALIZE)
++		F(SERIALIZE) | F(TSXLDTRK)
+ 	);
+ 
+ 	/* TSC_ADJUST and ARCH_CAPABILITIES are emulated in software. */
 -- 
-You are receiving this mail because:
-You are watching the assignee of the bug.
+1.8.3.1
+
