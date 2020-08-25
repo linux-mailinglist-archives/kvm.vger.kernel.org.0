@@ -2,190 +2,194 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 75CE525168B
-	for <lists+kvm@lfdr.de>; Tue, 25 Aug 2020 12:21:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 73D4F25169B
+	for <lists+kvm@lfdr.de>; Tue, 25 Aug 2020 12:25:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729813AbgHYKVC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 25 Aug 2020 06:21:02 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:6380 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1729785AbgHYKVA (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 25 Aug 2020 06:21:00 -0400
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 07PA2NR7032213
-        for <kvm@vger.kernel.org>; Tue, 25 Aug 2020 06:20:59 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=pp1;
- bh=iXGQiCsj/iZ6TkRCiKyFTECVMQvEu6ZG2QSUuZeqDO4=;
- b=LedAgo201ZhfW9xSsM9PBl3kc5LEiwn4wqkdVVgdbAY09h4Zcip5S/tt49H1fvi6kSZT
- +S+e5KOdWbdQJuHQqs8webOUPDEpvNoje3GVLL+adjWxEsI2k4Ip1tpu7fFQcONTrBlk
- fRy+maD7s88rSXhEzVBbiNky/WXKdYoM6gK2sExfrA+qcsR4LtBxPEYNt6eds4N245lf
- Uu7qIE02aX+hPoXm6TNQuhYpYmZhW+wyjWJhjyxj8d9nZd7ws+Fn1o/ymK3i4WgfDJCn
- 0fFopHi9j1BHavWhDETN7efmltza+XJjhFyeWi2jStxgoPYJtLIvvzUO/CNzt4Kth56b aQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 33508js4av-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Tue, 25 Aug 2020 06:20:59 -0400
-Received: from m0098399.ppops.net (m0098399.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 07PA5SU2042992
-        for <kvm@vger.kernel.org>; Tue, 25 Aug 2020 06:20:59 -0400
-Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 33508js4ac-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 25 Aug 2020 06:20:59 -0400
-Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
-        by ppma03ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 07PAG17n001194;
-        Tue, 25 Aug 2020 10:20:57 GMT
-Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
-        by ppma03ams.nl.ibm.com with ESMTP id 332ujkua9j-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 25 Aug 2020 10:20:57 +0000
-Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
-        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 07PAKsYi31850772
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 25 Aug 2020 10:20:54 GMT
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id A43E9A405B;
-        Tue, 25 Aug 2020 10:20:54 +0000 (GMT)
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 45EE2A4053;
-        Tue, 25 Aug 2020 10:20:54 +0000 (GMT)
-Received: from marcibm.ibmuc.com (unknown [9.145.56.167])
-        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Tue, 25 Aug 2020 10:20:54 +0000 (GMT)
-From:   Marc Hartmayer <mhartmay@linux.ibm.com>
-To:     <kvm@vger.kernel.org>
-Cc:     Thomas Huth <thuth@redhat.com>,
-        David Hildenbrand <david@redhat.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Andrew Jones <drjones@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Subject: [kvm-unit-tests PATCH v2 2/2] Use same test names in the default and the TAP13 output format
-Date:   Tue, 25 Aug 2020 12:20:36 +0200
-Message-Id: <20200825102036.17232-3-mhartmay@linux.ibm.com>
-X-Mailer: git-send-email 2.26.2
-In-Reply-To: <20200825102036.17232-1-mhartmay@linux.ibm.com>
-References: <20200825102036.17232-1-mhartmay@linux.ibm.com>
+        id S1729710AbgHYKZ0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 25 Aug 2020 06:25:26 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:41939 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1729746AbgHYKZU (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 25 Aug 2020 06:25:20 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1598351118;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=TQO2UOBn1MOgRwNvmVPJopGiZ9cQGSGDLytuuuQO4uY=;
+        b=aUyypsbIhKih0uTusA7/7Ws72wgFbHriGf7Ibweun7P94d1D/6qvQzC/iJtQRTiL3XHxap
+        IgoOdgTR8wgXN/aBG4gFHqKB0VXNfE+bUan7IBZqbMWsI0eX5GAa4ah+ETpOnHjbcLLsdB
+        hTV/rLMlObmMXpEcs3VYRYfOO4BlBJk=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-477-jCTQBosbMsSI6ipAkSitDQ-1; Tue, 25 Aug 2020 06:25:14 -0400
+X-MC-Unique: jCTQBosbMsSI6ipAkSitDQ-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 02B8381F01D;
+        Tue, 25 Aug 2020 10:25:13 +0000 (UTC)
+Received: from gondolin (ovpn-112-248.ams2.redhat.com [10.36.112.248])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id BD36419144;
+        Tue, 25 Aug 2020 10:25:03 +0000 (UTC)
+Date:   Tue, 25 Aug 2020 12:25:01 +0200
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Tony Krowiak <akrowiak@linux.ibm.com>
+Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, freude@linux.ibm.com, borntraeger@de.ibm.com,
+        mjrosato@linux.ibm.com, pasic@linux.ibm.com,
+        alex.williamson@redhat.com, kwankhede@nvidia.com,
+        fiuczy@linux.ibm.com, frankja@linux.ibm.com, david@redhat.com,
+        imbrenda@linux.ibm.com, hca@linux.ibm.com, gor@linux.ibm.com
+Subject: Re: [PATCH v10 03/16] s390/vfio-ap: manage link between queue
+ struct and matrix mdev
+Message-ID: <20200825122501.624474df.cohuck@redhat.com>
+In-Reply-To: <20200821195616.13554-4-akrowiak@linux.ibm.com>
+References: <20200821195616.13554-1-akrowiak@linux.ibm.com>
+        <20200821195616.13554-4-akrowiak@linux.ibm.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
- definitions=2020-08-25_02:2020-08-24,2020-08-25 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- priorityscore=1501 impostorscore=0 spamscore=0 clxscore=1015 mlxscore=0
- mlxlogscore=999 phishscore=0 adultscore=0 suspectscore=1 bulkscore=0
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2006250000 definitions=main-2008250073
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Use the same test names in the TAP13 output as in the default output
-format. This makes the output more consistent. To achieve this, we
-need to pass the test name as an argument to the function
-`process_test_output`.
+On Fri, 21 Aug 2020 15:56:03 -0400
+Tony Krowiak <akrowiak@linux.ibm.com> wrote:
 
-Before this change:
-$ ./run_tests.sh
-PASS selftest-setup (14 tests)
-...
+> Let's create links between each queue device bound to the vfio_ap device
+> driver and the matrix mdev to which the queue is assigned. The idea is to
+> facilitate efficient retrieval of the objects representing the queue
+> devices and matrix mdevs as well as to verify that a queue assigned to
+> a matrix mdev is bound to the driver.
+> 
+> The links will be created as follows:
+> 
+>    * When the queue device is probed, if its APQN is assigned to a matrix
+>      mdev, the structures representing the queue device and the matrix mdev
+>      will be linked.
+> 
+>    * When an adapter or domain is assigned to a matrix mdev, for each new
+>      APQN assigned that references a queue device bound to the vfio_ap
+>      device driver, the structures representing the queue device and the
+>      matrix mdev will be linked.
+> 
+> The links will be removed as follows:
+> 
+>    * When the queue device is removed, if its APQN is assigned to a matrix
+>      mdev, the structures representing the queue device and the matrix mdev
+>      will be unlinked.
+> 
+>    * When an adapter or domain is unassigned from a matrix mdev, for each
+>      APQN unassigned that references a queue device bound to the vfio_ap
+>      device driver, the structures representing the queue device and the
+>      matrix mdev will be unlinked.
+> 
+> Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
+> ---
+>  drivers/s390/crypto/vfio_ap_ops.c     | 132 +++++++++++++++++++++++++-
+>  drivers/s390/crypto/vfio_ap_private.h |   2 +
+>  2 files changed, 129 insertions(+), 5 deletions(-)
+> 
 
-vs.
+(...)
 
-$ ./run_tests.sh -t
-TAP version 13
-ok 1 - selftest: true
-ok 2 - selftest: argc == 3
-...
+> @@ -548,6 +557,87 @@ static int vfio_ap_mdev_verify_no_sharing(struct ap_matrix_mdev *matrix_mdev)
+>  	return 0;
+>  }
+>  
+> +enum qlink_type {
 
-After this change:
-$ ./run_tests.sh
-PASS selftest-setup (14 tests)
-...
+<bikeshed>I think this is less of a type, and more of an action, so
+maybe call this 'qlink_action' (and the function parameter below
+'action'?)</bikeshed>
 
-vs.
+> +	LINK_APID,
+> +	LINK_APQI,
+> +	UNLINK_APID,
+> +	UNLINK_APQI,
+> +};
+> +
+> +static void vfio_ap_mdev_link_queue(struct ap_matrix_mdev *matrix_mdev,
+> +				    unsigned long apid, unsigned long apqi)
+> +{
+> +	struct vfio_ap_queue *q;
+> +
+> +	q = vfio_ap_get_queue(AP_MKQID(apid, apqi));
+> +	if (q) {
+> +		q->matrix_mdev = matrix_mdev;
+> +		hash_add(matrix_mdev->qtable,
+> +			 &q->mdev_qnode, q->apqn);
+> +	}
+> +}
+> +
+> +static void vfio_ap_mdev_unlink_queue(unsigned long apid, unsigned long apqi)
+> +{
+> +	struct vfio_ap_queue *q;
+> +
+> +	q = vfio_ap_get_queue(AP_MKQID(apid, apqi));
+> +	if (q) {
+> +		q->matrix_mdev = NULL;
+> +		hash_del(&q->mdev_qnode);
+> +	}
+> +}
+> +
+> +/**
+> + * vfio_ap_mdev_link_queues
+> + *
+> + * @matrix_mdev: The matrix mdev to link.
+> + * @type:	 The type of @qlink_id.
+> + * @qlink_id:	 The APID or APQI of the queues to link.
+> + *
+> + * Sets or clears the links between the queues with the specified @qlink_id
+> + * and the @matrix_mdev:
+> + *     @type == LINK_APID: Set the links between the @matrix_mdev and the
+> + *                         queues with the specified @qlink_id (APID)
+> + *     @type == LINK_APQI: Set the links between the @matrix_mdev and the
+> + *                         queues with the specified @qlink_id (APQI)
+> + *     @type == UNLINK_APID: Clear the links between the @matrix_mdev and the
+> + *                           queues with the specified @qlink_id (APID)
+> + *     @type == UNLINK_APQI: Clear the links between the @matrix_mdev and the
+> + *                           queues with the specified @qlink_id (APQI)
+> + */
+> +static void vfio_ap_mdev_link_queues(struct ap_matrix_mdev *matrix_mdev,
+> +				     enum qlink_type type,
+> +				     unsigned long qlink_id)
+> +{
+> +	unsigned long id;
+> +
+> +	switch (type) {
+> +	case LINK_APID:
+> +		for_each_set_bit_inv(id, matrix_mdev->matrix.aqm,
+> +				     matrix_mdev->matrix.aqm_max + 1)
+> +			vfio_ap_mdev_link_queue(matrix_mdev, qlink_id, id);
+> +		break;
+> +	case UNLINK_APID:
+> +		for_each_set_bit_inv(id, matrix_mdev->matrix.aqm,
+> +				     matrix_mdev->matrix.aqm_max + 1)
+> +			vfio_ap_mdev_unlink_queue(qlink_id, id);
+> +		break;
+> +	case LINK_APQI:
+> +		for_each_set_bit_inv(id, matrix_mdev->matrix.apm,
+> +				     matrix_mdev->matrix.apm_max + 1)
+> +			vfio_ap_mdev_link_queue(matrix_mdev, id, qlink_id);
+> +		break;
+> +	case UNLINK_APQI:
+> +		for_each_set_bit_inv(id, matrix_mdev->matrix.apm,
+> +				     matrix_mdev->matrix.apm_max + 1)
+> +			vfio_ap_mdev_link_queue(matrix_mdev, id, qlink_id);
+> +		break;
+> +	default:
+> +		WARN_ON_ONCE(1);
+> +	}
+> +}
+> +
 
-$ ./run_tests.sh -t
-TAP version 13
-ok 1 - selftest-setup: selftest: true
-ok 2 - selftest-setup: selftest: argc == 3
-...
+(...)
 
-While at it, introduce a local variable `kernel` in
-`RUNTIME_log_stdout` since this makes the function easier to read.
-
-Signed-off-by: Marc Hartmayer <mhartmay@linux.ibm.com>
----
- run_tests.sh         | 15 +++++++++------
- scripts/runtime.bash |  6 +++---
- 2 files changed, 12 insertions(+), 9 deletions(-)
-
-diff --git a/run_tests.sh b/run_tests.sh
-index 01e36dcfa06e..f49dd864524e 100755
---- a/run_tests.sh
-+++ b/run_tests.sh
-@@ -81,18 +81,19 @@ if [[ $tap_output == "no" ]]; then
-     postprocess_suite_output() { cat; }
- else
-     process_test_output() {
-+        local testname="$1"
-         CR=$'\r'
-         while read -r line; do
-             line="${line%$CR}"
-             case "${line:0:4}" in
-                 PASS)
--                    echo "ok TEST_NUMBER - ${line#??????}" >&3
-+                    echo "ok TEST_NUMBER - ${testname}: ${line#??????}" >&3
-                     ;;
-                 FAIL)
--                    echo "not ok TEST_NUMBER - ${line#??????}" >&3
-+                    echo "not ok TEST_NUMBER - ${testname}: ${line#??????}" >&3
-                     ;;
-                 SKIP)
--                    echo "ok TEST_NUMBER - ${line#??????} # skip" >&3
-+                    echo "ok TEST_NUMBER - ${testname}: ${line#??????} # skip" >&3
-                     ;;
-                 *)
-                     ;;
-@@ -114,12 +115,14 @@ else
-     }
- fi
- 
--RUNTIME_log_stderr () { process_test_output; }
-+RUNTIME_log_stderr () { process_test_output "$1"; }
- RUNTIME_log_stdout () {
-+    local testname="$1"
-     if [ "$PRETTY_PRINT_STACKS" = "yes" ]; then
--        ./scripts/pretty_print_stacks.py $1 | process_test_output
-+        local kernel="$2"
-+        ./scripts/pretty_print_stacks.py "$kernel" | process_test_output "$testname"
-     else
--        process_test_output
-+        process_test_output "$testname"
-     fi
- }
- 
-diff --git a/scripts/runtime.bash b/scripts/runtime.bash
-index caa4c5ba18cc..294e6b15a5e2 100644
---- a/scripts/runtime.bash
-+++ b/scripts/runtime.bash
-@@ -140,10 +140,10 @@ function run()
-     # extra_params in the config file may contain backticks that need to be
-     # expanded, so use eval to start qemu.  Use "> >(foo)" instead of a pipe to
-     # preserve the exit status.
--    summary=$(eval $cmdline 2> >(RUNTIME_log_stderr) \
--                             > >(tee >(RUNTIME_log_stdout $kernel) | extract_summary))
-+    summary=$(eval $cmdline 2> >(RUNTIME_log_stderr $testname) \
-+                             > >(tee >(RUNTIME_log_stdout $testname $kernel) | extract_summary))
-     ret=$?
--    [ "$STANDALONE" != "yes" ] && echo > >(RUNTIME_log_stdout $kernel)
-+    [ "$STANDALONE" != "yes" ] && echo > >(RUNTIME_log_stdout $testname $kernel)
- 
-     if [ $ret -eq 0 ]; then
-         print_result "PASS" $testname "$summary"
--- 
-2.25.4
+I have not reviewed this deeply, but at a glance, it seems fine.
 
