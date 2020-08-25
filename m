@@ -2,76 +2,89 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 490DE25192D
-	for <lists+kvm@lfdr.de>; Tue, 25 Aug 2020 15:05:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 467D7251980
+	for <lists+kvm@lfdr.de>; Tue, 25 Aug 2020 15:25:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727781AbgHYNFx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 25 Aug 2020 09:05:53 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:27411 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725792AbgHYNFw (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 25 Aug 2020 09:05:52 -0400
+        id S1726119AbgHYNZe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 25 Aug 2020 09:25:34 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:31212 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726024AbgHYNZb (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 25 Aug 2020 09:25:31 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1598360751;
+        s=mimecast20190719; t=1598361930;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=44/rFMQFZre8hi2KWPAM7jK3g3yR2EVE42MjQnT9WTk=;
-        b=QLEDpf1dXoLdUO9KKLWclsZuqPUxNZg06Ora59qIv1iAtJw66brvSeUbq16AEvb2gqg9hM
-        9qq3uODIT4YAdgcbvaCu9VSnc/vz1z2lwK88+tEUrbV9aV29lChsJNeTWa5Pwroh84Z0xc
-        K1plRjekP6Em3nA72ayJkHxo+k3rquQ=
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=JuTgDJaLKyxfB/Zin1h3t6CxB9MPl+QVGUzCfRQcU30=;
+        b=MTGQ9vtYbIPGUdiIiPF4NVeMTE+e+n9Ns8GtLqIuLJ048CsUwozXHnPRW3YRohJMNFdvA8
+        1yC6dEEOK3s7ElZaVGfWUxlD3ZSagIO3C6JwjNO/BiA5F6J+j14P05ZM+q7XXwlYZh6kRE
+        p5YarKk4JJ2cNREd65M4hQn60+llIn4=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-386-uof_C0V9OaSdF-Gh1snzxw-1; Tue, 25 Aug 2020 09:05:50 -0400
-X-MC-Unique: uof_C0V9OaSdF-Gh1snzxw-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+ us-mta-144-z6qhuXG2NPyQQ8W8wFUfjg-1; Tue, 25 Aug 2020 09:25:26 -0400
+X-MC-Unique: z6qhuXG2NPyQQ8W8wFUfjg-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 21FBD84639C;
-        Tue, 25 Aug 2020 13:05:49 +0000 (UTC)
-Received: from steredhat.redhat.com (ovpn-113-152.ams2.redhat.com [10.36.113.152])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 053F960C0F;
-        Tue, 25 Aug 2020 13:05:44 +0000 (UTC)
-From:   Stefano Garzarella <sgarzare@redhat.com>
-To:     Jason Wang <jasowang@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>
-Cc:     linux-kernel@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org
-Subject: [PATCH] vhost-iotlb: fix vhost_iotlb_itree_next() documentation
-Date:   Tue, 25 Aug 2020 15:05:43 +0200
-Message-Id: <20200825130543.43308-1-sgarzare@redhat.com>
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A3F21AE400;
+        Tue, 25 Aug 2020 13:25:25 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-112-152.ams2.redhat.com [10.36.112.152])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id ED21D5D9CA;
+        Tue, 25 Aug 2020 13:25:17 +0000 (UTC)
+Subject: Re: [kvm-unit-tests PATCH v2 1/2] runtime.bash: remove outdated
+ comment
+To:     Marc Hartmayer <mhartmay@linux.ibm.com>, kvm@vger.kernel.org
+Cc:     David Hildenbrand <david@redhat.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Andrew Jones <drjones@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+References: <20200825102036.17232-1-mhartmay@linux.ibm.com>
+ <20200825102036.17232-2-mhartmay@linux.ibm.com>
+From:   Thomas Huth <thuth@redhat.com>
+Message-ID: <2ca7975d-e578-e450-5b77-78851a8ad9c1@redhat.com>
+Date:   Tue, 25 Aug 2020 15:25:11 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+In-Reply-To: <20200825102036.17232-2-mhartmay@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This patch contains trivial changes for the vhost_iotlb_itree_next()
-documentation, fixing the function name and the description of
-first argument (@map).
+On 25/08/2020 12.20, Marc Hartmayer wrote:
+> Since commit 6e1d3752d7ca ("tap13: list testcases individually") the
+> comment is no longer valid. Therefore let's remove it.
+> 
+> Reviewed-by: Andrew Jones <drjones@redhat.com>
+> Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+> Signed-off-by: Marc Hartmayer <mhartmay@linux.ibm.com>
+> ---
+>  scripts/runtime.bash | 3 ---
+>  1 file changed, 3 deletions(-)
+> 
+> diff --git a/scripts/runtime.bash b/scripts/runtime.bash
+> index c88e246245a6..caa4c5ba18cc 100644
+> --- a/scripts/runtime.bash
+> +++ b/scripts/runtime.bash
+> @@ -53,9 +53,6 @@ skip_nodefault()
+>  
+>  function print_result()
+>  {
+> -    # output test results in a TAP format
+> -    # https://testanything.org/tap-version-13-specification.html
+> -
+>      local status="$1"
+>      local testname="$2"
+>      local summary="$3"
+> 
 
-Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
----
- drivers/vhost/iotlb.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/vhost/iotlb.c b/drivers/vhost/iotlb.c
-index 1f0ca6e44410..34aec4ba331e 100644
---- a/drivers/vhost/iotlb.c
-+++ b/drivers/vhost/iotlb.c
-@@ -159,8 +159,8 @@ vhost_iotlb_itree_first(struct vhost_iotlb *iotlb, u64 start, u64 last)
- EXPORT_SYMBOL_GPL(vhost_iotlb_itree_first);
- 
- /**
-- * vhost_iotlb_itree_first - return the next overlapped range
-- * @iotlb: the IOTLB
-+ * vhost_iotlb_itree_next - return the next overlapped range
-+ * @map: the starting map node
-  * @start: start of IOVA range
-  * @end: end of IOVA range
-  */
--- 
-2.26.2
+Reviewed-by: Thomas Huth <thuth@redhat.com>
 
