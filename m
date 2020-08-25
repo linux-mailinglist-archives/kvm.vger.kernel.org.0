@@ -2,84 +2,94 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B4868251757
-	for <lists+kvm@lfdr.de>; Tue, 25 Aug 2020 13:20:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 67F5C25184D
+	for <lists+kvm@lfdr.de>; Tue, 25 Aug 2020 14:11:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729885AbgHYLUk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 25 Aug 2020 07:20:40 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:44116 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1729698AbgHYLUh (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 25 Aug 2020 07:20:37 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1598354436;
-        h=from:from:reply-to:reply-to:subject:subject:date:date:
-         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-         content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=v7PH/g/qmmHwC1P1FPXIiByjl600OpCg+L9T/HcoPQc=;
-        b=YG4KTR4R07Mci6JppwZW+UKEWCawc7C7UTjC11yOQ5Os8mk3qANvoUgBj8JZ8n9uj7wSMX
-        cG5vjX7JYCnzKfM1sxgYww0527SboongrUOd3RG0IngAvb1zn8dHmLHzgiTQZb5YEbzHyv
-        V05liNyOzfAWoDLxeUzlYx482BLRlM0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-99-91Pbf2XBOOK899pe8pqaCA-1; Tue, 25 Aug 2020 07:20:34 -0400
-X-MC-Unique: 91Pbf2XBOOK899pe8pqaCA-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9D121189E601;
-        Tue, 25 Aug 2020 11:20:33 +0000 (UTC)
-Received: from redhat.com (ovpn-114-231.ams2.redhat.com [10.36.114.231])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 6074A21E79;
-        Tue, 25 Aug 2020 11:20:32 +0000 (UTC)
-Date:   Tue, 25 Aug 2020 12:20:29 +0100
-From:   Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To:     Eduardo Habkost <ehabkost@redhat.com>
-Cc:     qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
-        kvm@vger.kernel.org
-Subject: Re: [PATCH v2 41/58] kvm: Move QOM macros to kvm.h
-Message-ID: <20200825112029.GH107278@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20200820001236.1284548-1-ehabkost@redhat.com>
- <20200820001236.1284548-42-ehabkost@redhat.com>
+        id S1728506AbgHYMLl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 25 Aug 2020 08:11:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39784 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729051AbgHYMLg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 25 Aug 2020 08:11:36 -0400
+Received: from mail-il1-x144.google.com (mail-il1-x144.google.com [IPv6:2607:f8b0:4864:20::144])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9F5ABC061574;
+        Tue, 25 Aug 2020 05:11:35 -0700 (PDT)
+Received: by mail-il1-x144.google.com with SMTP id e11so10164244ils.10;
+        Tue, 25 Aug 2020 05:11:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=Y0fqJAi2q1wLdvWz2fG2+Ma0IiMVbAmyb/CXLp46wV4=;
+        b=J+lbKQ8ZWXW+rZRvfI0n3+KbSsRmAQiWkv4Q0JtH2LcPvtJx/FaQlbnZqhY6vZkVM6
+         zpkNW+fpbwGHhSYAmUcQFwBvrzvbxs+iuOAY+ZbHdmAbnJaUfh72Key3s8Y2Tsy/Doe7
+         1acNNB5bLjwpS4+OnuQkyOiltLS0ruy7wYM7s74NbMNylzrX9dcHPGhTJb5erEWxR209
+         kJMoCDzdw4SjO9ysuZf75VZOLfgt/C6fxlIpJkvpW2hq4o3Wp45AeMhiuXEEtljuRjVg
+         mQvRKtuoD4RpOrS2atQMK1UX+7d4FPJII4PzV6M7BdTDPp7rRAE5UQFjJer8OtfmtQ28
+         +D3g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=Y0fqJAi2q1wLdvWz2fG2+Ma0IiMVbAmyb/CXLp46wV4=;
+        b=ELpJHIT20DJHHZE4oIf7sbYRcxJRFe8fq90Y/069K8QauOLzxQuFGYW/dLKxD5/39M
+         7ddCou5lwaS9n0rQWKPIxULs6Q/0iYSGRWt0HR96zd/N90YkzuwiPQro9IYyKPsWvGoB
+         ZHNEBTalqMKQMb7ubO56fkHF2jO7uG84oi+Uco4VmNdLms/D0YWUxm94iptVVfaZeNcA
+         IVU14ZCOMgheRblwy9jDRyRyIar8F8hUIOPa3tNM42l73nPnAIL35Ns/blTUHu+YolqP
+         rWuHrVxCv7+9qoBvHJB0jity0H3tfPso7N+ACvL8iIn8iEbM1h9A+8FVi68+IUPzHs1g
+         5Lcw==
+X-Gm-Message-State: AOAM530RJ4j+psQuxuyFtbN9R48xJH6zz3PncvGLVFB+CAVpP5lY1pqN
+        +kP8zYLdPkPw1qQGOQ9LJK+emLF/GnoZ6+NScZXuMXKPdZ8Y
+X-Google-Smtp-Source: ABdhPJw1wsBg30NMrUWDxgSVJ06a4iXUNVqdmIBtQII2d10y4Id3bTjHiUJHWlyU+nUBrC+CAOUV4AcEleFyg4koMKk=
+X-Received: by 2002:a92:5a8c:: with SMTP id b12mr8199951ilg.27.1598357494861;
+ Tue, 25 Aug 2020 05:11:34 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20200820001236.1284548-42-ehabkost@redhat.com>
-User-Agent: Mutt/1.14.6 (2020-07-11)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+References: <20200821105229.18938-1-pbonzini@redhat.com> <20200821142152.GA6330@sjchrist-ice>
+ <CAMzpN2h79bi5dd7PxjY45xYy71UdYomKa1t2gNxLtRpDkMs+Lw@mail.gmail.com> <874kor57jm.fsf@nanos.tec.linutronix.de>
+In-Reply-To: <874kor57jm.fsf@nanos.tec.linutronix.de>
+From:   Brian Gerst <brgerst@gmail.com>
+Date:   Tue, 25 Aug 2020 08:11:23 -0400
+Message-ID: <CAMzpN2jQofGQ18PsEobeqfGX6ux=xuun_SQZhY=E3n1pzvEoAQ@mail.gmail.com>
+Subject: Re: [PATCH v2] x86/entry/64: Do not use RDPID in paranoid entry to
+ accomodate KVM
+To:     Thomas Gleixner <tglx@linutronix.de>
+Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        kvm list <kvm@vger.kernel.org>,
+        "the arch/x86 maintainers" <x86@kernel.org>,
+        Dave Hansen <dave.hansen@intel.com>,
+        Chang Seok Bae <chang.seok.bae@intel.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Sasha Levin <sashal@kernel.org>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Andy Lutomirski <luto@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Aug 19, 2020 at 08:12:19PM -0400, Eduardo Habkost wrote:
-> Move QOM macros close to the KVMState typedef.
-> 
-> This will make future conversion to OBJECT_DECLARE* easier.
-> 
-> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-> ---
-> Changes series v1 -> v2: new patch in series v2
-> 
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Cc: kvm@vger.kernel.org
-> Cc: qemu-devel@nongnu.org
-> ---
->  include/sysemu/kvm.h     | 6 ++++++
->  include/sysemu/kvm_int.h | 5 -----
->  2 files changed, 6 insertions(+), 5 deletions(-)
+On Tue, Aug 25, 2020 at 6:44 AM Thomas Gleixner <tglx@linutronix.de> wrote:
+>
+> On Fri, Aug 21 2020 at 11:35, Brian Gerst wrote:
+> > On Fri, Aug 21, 2020 at 10:22 AM Sean Christopherson
+> >> >  .macro GET_PERCPU_BASE reg:req
+> >> > -     ALTERNATIVE \
+> >> > -             "LOAD_CPU_AND_NODE_SEG_LIMIT \reg", \
+> >> > -             "RDPID  \reg", \
+> >>
+> >> This was the only user of the RDPID macro, I assume we want to yank that out
+> >> as well?
+> >
+> > No.  That one should be kept until the minimum binutils version is
+> > raised to one that supports the RDPID opcode.
+>
+> The macro is unused and nothing in the kernel can use RDPID as we just
+> established.
 
-Reviewed-by: Daniel P. Berrangé <berrange@redhat.com>
+It is opencoded in vdso_read_cpunode(), but the RDPID macro can't be
+used there.  So you are correct, it can be removed.
 
-
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
-
+--
+Brian Gerst
