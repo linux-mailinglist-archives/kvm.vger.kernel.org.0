@@ -2,112 +2,141 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E068F251A15
-	for <lists+kvm@lfdr.de>; Tue, 25 Aug 2020 15:47:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4FE2E251A22
+	for <lists+kvm@lfdr.de>; Tue, 25 Aug 2020 15:49:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726473AbgHYNqv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 25 Aug 2020 09:46:51 -0400
-Received: from mga05.intel.com ([192.55.52.43]:6166 "EHLO mga05.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725926AbgHYNlO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 25 Aug 2020 09:41:14 -0400
-IronPort-SDR: nZRc+bCrGYq3nfE/yaSjx1um1LnOQzfDM5DS6ELMHZJXWMUMhwo5/mh8WewR0QAypvQOcOOIU+
- 01xDnWGB5bkg==
-X-IronPort-AV: E=McAfee;i="6000,8403,9723"; a="240925804"
-X-IronPort-AV: E=Sophos;i="5.76,352,1592895600"; 
-   d="scan'208";a="240925804"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Aug 2020 06:41:13 -0700
-IronPort-SDR: 15vXcXLW0R3ZxvbOzXHfgHkl51eK0GaGcbh/iSVDLHo9hh998TBv28JBK9iB4gZg035GuYUmg+
- H8EL31jZFJ3A==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.76,352,1592895600"; 
-   d="scan'208";a="299093769"
-Received: from gliakhov-mobl2.ger.corp.intel.com (HELO ubuntu) ([10.252.54.8])
-  by orsmga006.jf.intel.com with ESMTP; 25 Aug 2020 06:41:10 -0700
-Date:   Tue, 25 Aug 2020 15:41:10 +0200
-From:   Guennadi Liakhovetski <guennadi.liakhovetski@linux.intel.com>
-To:     "Michael S. Tsirkin" <mst@redhat.com>
-Cc:     kvm@vger.kernel.org, linux-remoteproc@vger.kernel.org,
-        virtualization@lists.linux-foundation.org,
-        sound-open-firmware@alsa-project.org,
-        Pierre-Louis Bossart <pierre-louis.bossart@linux.intel.com>,
-        Liam Girdwood <liam.r.girdwood@linux.intel.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Ohad Ben-Cohen <ohad@wizery.com>,
-        Bjorn Andersson <bjorn.andersson@linaro.org>,
-        Mathieu Poirier <mathieu.poirier@linaro.org>,
-        Vincent Whitchurch <vincent.whitchurch@axis.com>
-Subject: Re: [PATCH v4 4/4] vhost: add an RPMsg API
-Message-ID: <20200825134109.GA9822@ubuntu>
-References: <20200722150927.15587-1-guennadi.liakhovetski@linux.intel.com>
- <20200722150927.15587-5-guennadi.liakhovetski@linux.intel.com>
- <20200804102132-mutt-send-email-mst@kernel.org>
- <20200804151916.GC19025@ubuntu>
- <20200810094013-mutt-send-email-mst@kernel.org>
- <20200812123243.GA10218@ubuntu>
+        id S1726027AbgHYNt3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 25 Aug 2020 09:49:29 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:2124 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1725468AbgHYNt3 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 25 Aug 2020 09:49:29 -0400
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 07PDVwt4080456
+        for <kvm@vger.kernel.org>; Tue, 25 Aug 2020 09:49:28 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : in-reply-to : references : date : message-id : mime-version :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=BKHuCQ+EnJ4ITV61tsX3y5kt3cp4aCHcqle7JQTyaXw=;
+ b=Hc83hbjR+kch2dDKwvF5A9vU4U4fk78SefLaDGapy3ujIXNZ97Gbi2z/vie5FWTJzzWT
+ isKK5cGqpoqpM+9RfQ/Zaxlzezd8iTg2suzHh5x+pW/4dsLJKWijYmYD2H8O0et6wPlG
+ Klpun9GmwGnBKkmg9lFSEBuEbe7uijHArJGpIcgUSLQ4ldwsXvwPTXnTgAzbM7z71oa6
+ NDrX1B5Q1bqZKTHQlGiA3TrKYGRGxsL09BnXJVxGEJk71mGzau2fJkDhoLs25NA9iMvG
+ oKH87Ed4HOpCRsVy/C+5uu/yWJfEXWkm3/W7GDVQCwEjw+tgVDUh/4pKMHb/ehVjQ6EG yA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3353f50w15-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Tue, 25 Aug 2020 09:49:28 -0400
+Received: from m0098394.ppops.net (m0098394.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 07PDW0JT080673
+        for <kvm@vger.kernel.org>; Tue, 25 Aug 2020 09:49:28 -0400
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3353f50w05-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 25 Aug 2020 09:49:27 -0400
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 07PDfvOO015377;
+        Tue, 25 Aug 2020 13:49:25 GMT
+Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
+        by ppma03ams.nl.ibm.com with ESMTP id 332ujkugfa-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 25 Aug 2020 13:49:25 +0000
+Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com [9.149.105.60])
+        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 07PDnNME19071416
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 25 Aug 2020 13:49:23 GMT
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 35C7042047;
+        Tue, 25 Aug 2020 13:49:23 +0000 (GMT)
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 058844204B;
+        Tue, 25 Aug 2020 13:49:23 +0000 (GMT)
+Received: from marcibm (unknown [9.145.56.167])
+        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
+        Tue, 25 Aug 2020 13:49:22 +0000 (GMT)
+From:   Marc Hartmayer <mhartmay@linux.ibm.com>
+To:     Cornelia Huck <cohuck@redhat.com>
+Cc:     kvm@vger.kernel.org
+Subject: Re: [kvm-unit-tests PATCH v2 2/2] Use same test names in the
+ default and the TAP13 output format
+In-Reply-To: <20200825141312.07f52184.cohuck@redhat.com>
+References: <20200825102036.17232-1-mhartmay@linux.ibm.com>
+ <20200825102036.17232-3-mhartmay@linux.ibm.com>
+ <20200825141312.07f52184.cohuck@redhat.com>
+Date:   Tue, 25 Aug 2020 15:49:22 +0200
+Message-ID: <875z96kf8d.fsf@linux.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200812123243.GA10218@ubuntu>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
+ definitions=2020-08-25_04:2020-08-25,2020-08-25 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ lowpriorityscore=0 adultscore=0 clxscore=1015 malwarescore=0
+ impostorscore=0 phishscore=0 suspectscore=2 bulkscore=0 mlxlogscore=999
+ mlxscore=0 spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2006250000 definitions=main-2008250098
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Michael,
+On Tue, Aug 25, 2020 at 02:13 PM +0200, Cornelia Huck <cohuck@redhat.com> w=
+rote:
+> On Tue, 25 Aug 2020 12:20:36 +0200
+> Marc Hartmayer <mhartmay@linux.ibm.com> wrote:
+>
+>> Use the same test names in the TAP13 output as in the default output
+>> format. This makes the output more consistent. To achieve this, we
+>> need to pass the test name as an argument to the function
+>> `process_test_output`.
+>>=20
+>> Before this change:
+>> $ ./run_tests.sh
+>> PASS selftest-setup (14 tests)
+>> ...
+>>=20
+>> vs.
+>>=20
+>> $ ./run_tests.sh -t
+>> TAP version 13
+>> ok 1 - selftest: true
+>> ok 2 - selftest: argc =3D=3D 3
+>> ...
+>>=20
+>> After this change:
+>> $ ./run_tests.sh
+>> PASS selftest-setup (14 tests)
+>> ...
+>>=20
+>> vs.
+>>=20
+>> $ ./run_tests.sh -t
+>> TAP version 13
+>> ok 1 - selftest-setup: selftest: true
+>> ok 2 - selftest-setup: selftest: argc =3D=3D 3
+>> ...
+>>=20
+>> While at it, introduce a local variable `kernel` in
+>> `RUNTIME_log_stdout` since this makes the function easier to read.
+>>=20
+>> Signed-off-by: Marc Hartmayer <mhartmay@linux.ibm.com>
+>> ---
+>>  run_tests.sh         | 15 +++++++++------
+>>  scripts/runtime.bash |  6 +++---
+>>  2 files changed, 12 insertions(+), 9 deletions(-)
+>
+> Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+>
 
-...back from holidays and still unsure what your preferred solution 
-for the message layout would be:
+Thanks.
 
-On Wed, Aug 12, 2020 at 02:32:43PM +0200, Guennadi Liakhovetski wrote:
-> Hi Michael,
-> 
-> Thanks for a review.
-> 
-> On Mon, Aug 10, 2020 at 09:44:15AM -0400, Michael S. Tsirkin wrote:
-> > On Tue, Aug 04, 2020 at 05:19:17PM +0200, Guennadi Liakhovetski wrote:
+--=20
+Kind regards / Beste Gr=C3=BC=C3=9Fe
+   Marc Hartmayer
 
-[snip]
-
-> > > > > +static int vhost_rpmsg_get_single(struct vhost_virtqueue *vq)
-> > > > > +{
-> > > > > +	struct vhost_rpmsg *vr = container_of(vq->dev, struct vhost_rpmsg, dev);
-> > > > > +	unsigned int out, in;
-> > > > > +	int head = vhost_get_vq_desc(vq, vq->iov, ARRAY_SIZE(vq->iov), &out, &in,
-> > > > > +				     NULL, NULL);
-> > > > > +	if (head < 0) {
-> > > > > +		vq_err(vq, "%s(): error %d getting buffer\n",
-> > > > > +		       __func__, head);
-> > > > > +		return head;
-> > > > > +	}
-> > > > > +
-> > > > > +	/* Nothing new? */
-> > > > > +	if (head == vq->num)
-> > > > > +		return head;
-> > > > > +
-> > > > > +	if (vq == &vr->vq[VIRTIO_RPMSG_RESPONSE] && (out || in != 1)) {
-> > > > 
-> > > > This in != 1 looks like a dependency on a specific message layout.
-> > > > virtio spec says to avoid these. Using iov iters it's not too hard to do
-> > > > ...
-> > > 
-> > > This is an RPMsg VirtIO implementation, and it has to match the virtio_rpmsg_bus.c 
-> > > driver, and that one has specific VirtIO queue and message usage patterns.
-> > 
-> > That could be fine for legacy virtio, but now you are claiming support
-> > for virtio 1, so need to fix these assumptions in the device.
-> 
-> I can just deop these checks without changing anything else, that still would work. 
-> I could also make this work with "any" layout - either ignoring any left-over 
-> buffers or maybe even getting them one by one. But I wouldn't even be able to test 
-> those modes without modifying / breaking the current virtio-rpmsg driver. What's 
-> the preferred solution?
-
-Could you elaborate a bit please?
-
-Thanks
-Guennadi
+IBM Deutschland Research & Development GmbH
+Vorsitzender des Aufsichtsrats: Gregor Pillen=20
+Gesch=C3=A4ftsf=C3=BChrung: Dirk Wittkopp
+Sitz der Gesellschaft: B=C3=B6blingen
+Registergericht: Amtsgericht Stuttgart, HRB 243294
