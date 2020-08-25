@@ -2,31 +2,31 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3AD46250DDF
-	for <lists+kvm@lfdr.de>; Tue, 25 Aug 2020 02:54:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 50363250DDC
+	for <lists+kvm@lfdr.de>; Tue, 25 Aug 2020 02:54:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728227AbgHYAx5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 24 Aug 2020 20:53:57 -0400
+        id S1728298AbgHYAx6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 24 Aug 2020 20:53:58 -0400
 Received: from mga07.intel.com ([134.134.136.100]:44396 "EHLO mga07.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
         id S1726090AbgHYAx5 (ORCPT <rfc822;kvm@vger.kernel.org>);
         Mon, 24 Aug 2020 20:53:57 -0400
-IronPort-SDR: s/5ZfokiSKpQq8n8WseAR4E+QzvMF4ydRlp5prEJ++FlTnHz5tUZuZe892EBUFWw60FS/gjrkh
- RKYQL8bapG4A==
-X-IronPort-AV: E=McAfee;i="6000,8403,9723"; a="220284855"
+IronPort-SDR: eEKKEPnG26OHp9W1S7axK2BgdVUetKgcbKa6xPud2DD1JG0MNn6s462v8n0SpSsH6VOGdJ1GmR
+ bny+b+hDENbg==
+X-IronPort-AV: E=McAfee;i="6000,8403,9723"; a="220284886"
 X-IronPort-AV: E=Sophos;i="5.76,350,1592895600"; 
-   d="scan'208";a="220284855"
+   d="scan'208";a="220284886"
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Aug 2020 17:53:52 -0700
-IronPort-SDR: CjSlxqYRBr9+F4QcLIAi6bJu3kzeaxyz8Q5SQtD+YbMYl3ZrSkJ2cmcPRpOZpRHry3x38tzrAx
- i932oJdbbDNQ==
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Aug 2020 17:53:57 -0700
+IronPort-SDR: RkzjqVXa4XtddFfE0FLjtOwfipdWaiXtJo6k/WMnOGWBl6I0QXHA/AMuQ64IFcyspZ3kBZE5Hr
+ K4RSBuancGOg==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.76,350,1592895600"; 
-   d="scan'208";a="281351912"
+   d="scan'208";a="281351924"
 Received: from unknown (HELO localhost.localdomain.bj.intel.com) ([10.238.156.127])
-  by fmsmga008.fm.intel.com with ESMTP; 24 Aug 2020 17:53:47 -0700
+  by fmsmga008.fm.intel.com with ESMTP; 24 Aug 2020 17:53:52 -0700
 From:   Cathy Zhang <cathy.zhang@intel.com>
 To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org, x86@kernel.org
 Cc:     pbonzini@redhat.com, sean.j.christopherson@intel.com,
@@ -37,47 +37,59 @@ Cc:     pbonzini@redhat.com, sean.j.christopherson@intel.com,
         joro@8bytes.org, mingo@redhat.com, bp@alien8.de, hpa@zytor.com,
         jpoimboe@redhat.com, ak@linux.intel.com, ravi.v.shankar@intel.com,
         Cathy Zhang <cathy.zhang@intel.com>
-Subject: [PATCH v4 0/2] Expose new feature for Intel processor
-Date:   Tue, 25 Aug 2020 08:47:56 +0800
-Message-Id: <1598316478-23337-1-git-send-email-cathy.zhang@intel.com>
+Subject: [PATCH v4 1/2] x86/cpufeatures: Enumerate TSX suspend load address tracking instructions
+Date:   Tue, 25 Aug 2020 08:47:57 +0800
+Message-Id: <1598316478-23337-2-git-send-email-cathy.zhang@intel.com>
 X-Mailer: git-send-email 1.8.3.1
+In-Reply-To: <1598316478-23337-1-git-send-email-cathy.zhang@intel.com>
+References: <1598316478-23337-1-git-send-email-cathy.zhang@intel.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This patchset is to introduce TSX suspend load tracking feature 
-and expose it to KVM CPUID for processors which support it. KVM 
-reports this information and guests can make use of it finally.
+From: Kyung Min Park <kyung.min.park@intel.com>
 
-Detailed information on the instruction and CPUID feature
-flag can be found in the latest "extensions" manual [1].
+Intel TSX suspend load tracking instructions aim to give a way to
+choose which memory accesses do not need to be tracked in the TSX
+read set. Add TSX suspend load tracking CPUID feature flag TSXLDTRK
+for enumeration.
 
+A processor supports Intel TSX suspend load address tracking if
+CPUID.0x07.0x0:EDX[16] is present. Two instructions XSUSLDTRK, XRESLDTRK
+are available when this feature is present.
+
+The CPU feature flag is shown as "tsxldtrk" in /proc/cpuinfo.
+
+This instruction is currently documented in the the latest "extensions"
+manual (ISE). It will appear in the "main" manual (SDM) in the future.
+
+Signed-off-by: Kyung Min Park <kyung.min.park@intel.com>
+Signed-off-by: Cathy Zhang <cathy.zhang@intel.com>
+Reviewed-by: Tony Luck <tony.luck@intel.com>
+---
 Changes since v3:
-  * Remove SERIALIZE part from kvm patch and update commit message 
+ * N/A
 
 Changes since v2:
-  * Combine the two kvm patches into a single one.
-  * Provide features' overview introduction in kvm patch commit message.
-  * Get the latest kernel patches.
-  * Change definition from TSX_LDTRK to TSXLDTRK for TSX new feature.
-  * Change kernel patches Author to the owner.
-  * Remove SERIALIZE enumeration patch.
-
-Reference:
-[1]. https://software.intel.com/content/dam/develop/public/us/en/documents/architecture-instruction-set-extensions-programming-reference.pdf
-
-Cathy Zhang (1):
-  x86/kvm: Expose TSX Suspend Load Tracking feature
-
-Kyung Min Park (1):
-  x86/cpufeatures: Enumerate TSX suspend load address tracking
-    instructions
-
+ * Shorten documentation names for readability. Links to documentation
+   can be found in the cover letter. (Dave Hansen)
+---
  arch/x86/include/asm/cpufeatures.h | 1 +
- arch/x86/kvm/cpuid.c               | 2 +-
- 2 files changed, 2 insertions(+), 1 deletion(-)
+ 1 file changed, 1 insertion(+)
 
+diff --git a/arch/x86/include/asm/cpufeatures.h b/arch/x86/include/asm/cpufeatures.h
+index 2901d5d..83fc9d3 100644
+--- a/arch/x86/include/asm/cpufeatures.h
++++ b/arch/x86/include/asm/cpufeatures.h
+@@ -368,6 +368,7 @@
+ #define X86_FEATURE_MD_CLEAR		(18*32+10) /* VERW clears CPU buffers */
+ #define X86_FEATURE_TSX_FORCE_ABORT	(18*32+13) /* "" TSX_FORCE_ABORT */
+ #define X86_FEATURE_SERIALIZE		(18*32+14) /* SERIALIZE instruction */
++#define X86_FEATURE_TSXLDTRK		(18*32+16) /* TSX Suspend Load Address Tracking */
+ #define X86_FEATURE_PCONFIG		(18*32+18) /* Intel PCONFIG */
+ #define X86_FEATURE_ARCH_LBR		(18*32+19) /* Intel ARCH LBR */
+ #define X86_FEATURE_SPEC_CTRL		(18*32+26) /* "" Speculation Control (IBRS + IBPB) */
 -- 
 1.8.3.1
 
