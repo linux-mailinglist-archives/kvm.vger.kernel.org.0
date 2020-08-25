@@ -2,69 +2,101 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2882D25153E
-	for <lists+kvm@lfdr.de>; Tue, 25 Aug 2020 11:22:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 952AF25163B
+	for <lists+kvm@lfdr.de>; Tue, 25 Aug 2020 12:04:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729053AbgHYJWa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 25 Aug 2020 05:22:30 -0400
-Received: from 8bytes.org ([81.169.241.247]:39304 "EHLO theia.8bytes.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728377AbgHYJW3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 25 Aug 2020 05:22:29 -0400
-Received: by theia.8bytes.org (Postfix, from userid 1000)
-        id 840D829A; Tue, 25 Aug 2020 11:22:27 +0200 (CEST)
-Date:   Tue, 25 Aug 2020 11:22:24 +0200
-From:   Joerg Roedel <joro@8bytes.org>
-To:     Borislav Petkov <bp@alien8.de>
-Cc:     x86@kernel.org, Joerg Roedel <jroedel@suse.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>, hpa@zytor.com,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Jiri Slaby <jslaby@suse.cz>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Juergen Gross <jgross@suse.com>,
-        Kees Cook <keescook@chromium.org>,
-        David Rientjes <rientjes@google.com>,
-        Cfir Cohen <cfir@google.com>,
-        Erdem Aktas <erdemaktas@google.com>,
-        Masami Hiramatsu <mhiramat@kernel.org>,
-        Mike Stunes <mstunes@vmware.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Martin Radev <martin.b.radev@gmail.com>,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org
-Subject: Re: [PATCH v6 02/76] KVM: SVM: Add GHCB definitions
-Message-ID: <20200825092224.GF3319@8bytes.org>
-References: <20200824085511.7553-1-joro@8bytes.org>
- <20200824085511.7553-3-joro@8bytes.org>
- <20200824104451.GA4732@zn.tnic>
+        id S1729648AbgHYKEv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 25 Aug 2020 06:04:51 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:52936 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729562AbgHYKEt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 25 Aug 2020 06:04:49 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1598349888;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=1guKzsu1f7vE3cUpyLB5EkhBDdCRY0IBR0GpJ2ik82Y=;
+        b=XLdbJh5/XPCWJj2RZyEQvVL4DJNrQSeE/TdfsihjM1mvxWojbcFVdF2lErDOVfvzuB1xtw
+        QOlJCxhUqZqm4t/tI6n2RCpChgQ/iNTsOVHm+njKgpfBz7bxYN/sPr3xwq1q0lTC5QVNlo
+        yQucMC9kDgOlhxNiEhE2D8+Phjq289c=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-4-gjMOj3BUPVuF33NDiuVR3w-1; Tue, 25 Aug 2020 06:04:46 -0400
+X-MC-Unique: gjMOj3BUPVuF33NDiuVR3w-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 732A2800050;
+        Tue, 25 Aug 2020 10:04:44 +0000 (UTC)
+Received: from gondolin (ovpn-112-248.ams2.redhat.com [10.36.112.248])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id B8F1D5C1CF;
+        Tue, 25 Aug 2020 10:04:34 +0000 (UTC)
+Date:   Tue, 25 Aug 2020 12:04:32 +0200
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Tony Krowiak <akrowiak@linux.ibm.com>
+Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, freude@linux.ibm.com, borntraeger@de.ibm.com,
+        mjrosato@linux.ibm.com, pasic@linux.ibm.com,
+        alex.williamson@redhat.com, kwankhede@nvidia.com,
+        fiuczy@linux.ibm.com, frankja@linux.ibm.com, david@redhat.com,
+        imbrenda@linux.ibm.com, hca@linux.ibm.com, gor@linux.ibm.com
+Subject: Re: [PATCH v10 01/16] s390/vfio-ap: add version vfio_ap module
+Message-ID: <20200825120432.13a1b444.cohuck@redhat.com>
+In-Reply-To: <20200821195616.13554-2-akrowiak@linux.ibm.com>
+References: <20200821195616.13554-1-akrowiak@linux.ibm.com>
+        <20200821195616.13554-2-akrowiak@linux.ibm.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200824104451.GA4732@zn.tnic>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Aug 24, 2020 at 12:44:51PM +0200, Borislav Petkov wrote:
-> On Mon, Aug 24, 2020 at 10:53:57AM +0200, Joerg Roedel wrote:
-> >  static inline void __unused_size_checks(void)
-> >  {
-> > -	BUILD_BUG_ON(sizeof(struct vmcb_save_area) != 0x298);
-> > +	BUILD_BUG_ON(sizeof(struct vmcb_save_area) != 1032);
-> >  	BUILD_BUG_ON(sizeof(struct vmcb_control_area) != 256);
-> > +	BUILD_BUG_ON(sizeof(struct ghcb) != 4096);
+On Fri, 21 Aug 2020 15:56:01 -0400
+Tony Krowiak <akrowiak@linux.ibm.com> wrote:
+
+> Let's set a version for the vfio_ap module so that automated regression
+> tests can determine whether dynamic configuration tests can be run or
+> not.
 > 
-> Could those naked numbers be proper, meaningfully named defines?
+> Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
+> ---
+>  drivers/s390/crypto/vfio_ap_drv.c | 2 ++
+>  1 file changed, 2 insertions(+)
+> 
+> diff --git a/drivers/s390/crypto/vfio_ap_drv.c b/drivers/s390/crypto/vfio_ap_drv.c
+> index be2520cc010b..f4ceb380dd61 100644
+> --- a/drivers/s390/crypto/vfio_ap_drv.c
+> +++ b/drivers/s390/crypto/vfio_ap_drv.c
+> @@ -17,10 +17,12 @@
+>  
+>  #define VFIO_AP_ROOT_NAME "vfio_ap"
+>  #define VFIO_AP_DEV_NAME "matrix"
+> +#define VFIO_AP_MODULE_VERSION "1.2.0"
+>  
+>  MODULE_AUTHOR("IBM Corporation");
+>  MODULE_DESCRIPTION("VFIO AP device driver, Copyright IBM Corp. 2018");
+>  MODULE_LICENSE("GPL v2");
+> +MODULE_VERSION(VFIO_AP_MODULE_VERSION);
+>  
+>  static struct ap_driver vfio_ap_drv;
+>  
 
-I don't think so, if I look at the history of these checks their whole
-purpose seems to be to alert the developer/maintainer when their size
-changes and that they might not fit on the stack anymore. But that is
-taken care of in patch 1.
+Setting a version manually has some drawbacks:
+- tools wanting to check for capabilities need to keep track which
+  versions support which features
+- you need to remember to actually bump the version when adding a new,
+  visible feature
+(- selective downstream backports may get into a pickle, but that's
+arguably not your problem)
 
-Regards,
+Is there no way for a tool to figure out whether this is supported?
+E.g., via existence of a sysfs file, or via a known error that will
+occur. If not, it's maybe better to expose known capabilities via a
+generic interface.
 
-	Joerg
