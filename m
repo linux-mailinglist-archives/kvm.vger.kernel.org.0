@@ -2,133 +2,174 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4A87B25365B
-	for <lists+kvm@lfdr.de>; Wed, 26 Aug 2020 20:14:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8696D253716
+	for <lists+kvm@lfdr.de>; Wed, 26 Aug 2020 20:27:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726798AbgHZSOj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 26 Aug 2020 14:14:39 -0400
-Received: from foss.arm.com ([217.140.110.172]:49688 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726241AbgHZSOh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 26 Aug 2020 14:14:37 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id EF4DA101E;
-        Wed, 26 Aug 2020 11:14:36 -0700 (PDT)
-Received: from [10.57.40.122] (unknown [10.57.40.122])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 6133E3F71F;
-        Wed, 26 Aug 2020 11:14:31 -0700 (PDT)
+        id S1728020AbgHZS1h (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 26 Aug 2020 14:27:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39624 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727950AbgHZS0y (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 26 Aug 2020 14:26:54 -0400
+Received: from mail-wr1-x443.google.com (mail-wr1-x443.google.com [IPv6:2a00:1450:4864:20::443])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 99B2EC061574;
+        Wed, 26 Aug 2020 11:26:53 -0700 (PDT)
+Received: by mail-wr1-x443.google.com with SMTP id x7so2834378wro.3;
+        Wed, 26 Aug 2020 11:26:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=Bu4pOYOLpF8hHIWAO8QllDzn4fIcc5GK3Fq1pOjr02M=;
+        b=aATDp49DrNEi4o+dQ3aZilAVzYRQBAblxtl0UNdBGXKSmVRdFgpISE1zQyc7cNSsZ9
+         lW/EYpEmbA0Lu3HCV4gTg4WJlfsP9Ucv3zSATOZO1HiWK3Xl7zEtjeqoNbC6i1Ns4mAR
+         ZRq0r3vG4sM3xbUlDy8LPAizO4V/iBIepvQgRwBNTOXvKWuZklWHI7dz6KPp6mM5pW+8
+         e4/LtEjr5E3izgeXPBOlpPbB1jJpfchAVzL6KSrkYYKPwTjqCaTuOMWV4ujlyA488gay
+         4N7boVhG1b57UDIcUR6HQBrmSeSXAtmip16JCAoNV2oOOh9NdAZhe34FxbbIB/ucho4E
+         KVLQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=Bu4pOYOLpF8hHIWAO8QllDzn4fIcc5GK3Fq1pOjr02M=;
+        b=KMT3IIu+WYoS+2TjRhO2ASZGjQ1stICBN3bZz98cCXy0H5V67NQ9cx/0nOnoyDSFVm
+         S655VKHuuHugwYv6oXlhqHAByKuf6g8UUnhlBQmzjyGbF3hJ/p9JJiExDo0bf89WiDag
+         Yw5NLd7sb68w9XhQfUPMfGr3ncvRTfx3eVfjw4pny56QIvH94z20taUQz/EJbMEsCnEy
+         t/Qfid7r+pKyeJ2ANjAVh1hW+yv5SwPj48uzAGJQvi5wfZ8LO7JxQeJeKHI0UjO7imNr
+         2Yw4eaRjV4a9cQKGwYJGQX6/6mThq332GBJ7q2XvoHCqi/SSbPRKTHUEBKP71pyjOUZP
+         N+vA==
+X-Gm-Message-State: AOAM531uRpkhojzPLxSEH8WtuRUSROfEwKZQb6eE1hYseE3DBJtR+792
+        tOnaQh44sFPlvNC7RGw8S0tBJn/ndQxIGB5CSpc=
+X-Google-Smtp-Source: ABdhPJw6XRhfFzc0ep7oxhqIsPm6hA1ZYk5Rt4Z7Rf4kNW/IcW2BOalXNQMof7JDtDOsechyJwXMAwWd0bJeEtpmfUE=
+X-Received: by 2002:a5d:6085:: with SMTP id w5mr16385547wrt.362.1598466412249;
+ Wed, 26 Aug 2020 11:26:52 -0700 (PDT)
+MIME-Version: 1.0
+References: <20191221150402.13868-1-murphyt7@tcd.ie> <465815ae-9292-f37a-59b9-03949cb68460@deltatee.com>
+ <20200529124523.GA11817@infradead.org> <CGME20200529190523eucas1p2c086133e707257c0cdc002f502d4f51d@eucas1p2.samsung.com>
+ <33137cfb-603c-86e8-1091-f36117ecfaf3@deltatee.com> <ef2150d5-7b6a-df25-c10d-e43316fe7812@samsung.com>
+ <b9140772-0370-a858-578c-af503a06d8e9@deltatee.com> <CALQxJuutRaeX89k2o4ffTKYRMizmMu0XbRnzpFuSSrkQR02jKg@mail.gmail.com>
+In-Reply-To: <CALQxJuutRaeX89k2o4ffTKYRMizmMu0XbRnzpFuSSrkQR02jKg@mail.gmail.com>
+From:   Alex Deucher <alexdeucher@gmail.com>
+Date:   Wed, 26 Aug 2020 14:26:40 -0400
+Message-ID: <CADnq5_PRuPtpzR-pCgXARRXVaC0vO=HdcGUkGQr7sDqUmq7G_Q@mail.gmail.com>
 Subject: Re: [PATCH 0/8] Convert the intel iommu driver to the dma-iommu api
-To:     Tom Murphy <murphyt7@tcd.ie>, iommu@lists.linux-foundation.org
-Cc:     Heiko Stuebner <heiko@sntech.de>, kvm@vger.kernel.org,
+To:     Tom Murphy <murphyt7@tcd.ie>
+Cc:     Logan Gunthorpe <logang@deltatee.com>, kvm@vger.kernel.org,
         David Airlie <airlied@linux.ie>,
-        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
-        dri-devel@lists.freedesktop.org,
+        Maling list - DRI developers 
+        <dri-devel@lists.freedesktop.org>,
         Bjorn Andersson <bjorn.andersson@linaro.org>,
         linux-tegra@vger.kernel.org, Julien Grall <julien.grall@arm.com>,
         Thierry Reding <thierry.reding@gmail.com>,
         Will Deacon <will@kernel.org>,
+        Marek Szyprowski <m.szyprowski@samsung.com>,
         Jean-Philippe Brucker <jean-philippe@linaro.org>,
         linux-samsung-soc@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
         Krzysztof Kozlowski <krzk@kernel.org>,
         Jonathan Hunter <jonathanh@nvidia.com>,
+        Christoph Hellwig <hch@infradead.org>,
         linux-rockchip@lists.infradead.org, Andy Gross <agross@kernel.org>,
-        linux-arm-kernel@lists.infradead.org, linux-s390@vger.kernel.org,
-        linux-arm-msm@vger.kernel.org, intel-gfx@lists.freedesktop.org,
-        Jani Nikula <jani.nikula@linux.intel.com>,
+        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
+        linux-s390@vger.kernel.org,
+        linux-arm-msm <linux-arm-msm@vger.kernel.org>,
+        Intel Graphics Development <intel-gfx@lists.freedesktop.org>,
         Alex Williamson <alex.williamson@redhat.com>,
         linux-mediatek@lists.infradead.org,
         Rodrigo Vivi <rodrigo.vivi@intel.com>,
         Matthias Brugger <matthias.bgg@gmail.com>,
         Thomas Gleixner <tglx@linutronix.de>,
-        virtualization@lists.linux-foundation.org,
+        "open list:VIRTIO CORE, NET..." 
+        <virtualization@lists.linux-foundation.org>,
         Gerald Schaefer <gerald.schaefer@de.ibm.com>,
         David Woodhouse <dwmw2@infradead.org>,
         Cornelia Huck <cohuck@redhat.com>,
-        linux-kernel@vger.kernel.org, Kukjin Kim <kgene@kernel.org>,
-        Daniel Vetter <daniel@ffwll.ch>
-References: <20191221150402.13868-1-murphyt7@tcd.ie>
-From:   Robin Murphy <robin.murphy@arm.com>
-Message-ID: <03caf286-09e8-a072-8d3a-b6bcca991516@arm.com>
-Date:   Wed, 26 Aug 2020 19:14:28 +0100
-User-Agent: Mozilla/5.0 (Windows NT 10.0; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
-MIME-Version: 1.0
-In-Reply-To: <20191221150402.13868-1-murphyt7@tcd.ie>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-GB
-Content-Transfer-Encoding: 8bit
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        "list@263.net:IOMMU DRIVERS <iommu@lists.linux-foundation.org>, Joerg
+        Roedel <joro@8bytes.org>," <iommu@lists.linux-foundation.org>,
+        Kukjin Kim <kgene@kernel.org>,
+        Robin Murphy <robin.murphy@arm.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Tom,
+On Mon, Aug 24, 2020 at 2:56 AM Tom Murphy <murphyt7@tcd.ie> wrote:
+>
+> Hi Logan/All,
+>
+> I have added a check for the sg_dma_len == 0 :
+> """
+>  } __sgt_iter(struct scatterlist *sgl, bool dma) {
+>         struct sgt_iter s = { .sgp = sgl };
+>
+> +       if (sgl && sg_dma_len(sgl) == 0)
+> +           s.sgp = NULL;
+>
+>         if (s.sgp) {
+>             .....
+> """
+> at location [1].
+> but it doens't fix the problem.
+>
+> You're right though, this change does need to be made, this code
+> doesn't handle pages of sg_dma_len(sg) == 0 correctly
+> So my guess is that we have more bugs in other parts of the i915
+> driver (or there is a problem with my "sg_dma_len == 0" fix above).
+> I have been trying to spot where else the code might be buggy but I
+> haven't had any luck so far.
+>
+> I'm doing a microconfernce (at LPC 2020) this wednesdays [1] on this
+> if you're interested in attending.
+> I'm hoping I can chat about it with a few people and find how can
+> reproduce and fix this issues. I don't have any more time I can give
+> to this unfortunately and it would be a shame for the work to go to
+> waste.
+>
+> [0] https://github.com/torvalds/linux/blob/d012a7190fc1fd72ed48911e77ca97ba4521bccd/drivers/gpu/drm/i915/i915_scatterlist.h#L28
+> [1] https://linuxplumbersconf.org/event/7/contributions/846/
+>
+> On Fri, 29 May 2020 at 22:21, Logan Gunthorpe <logang@deltatee.com> wrote:
+> >
+> >
+> >
+> > On 2020-05-29 3:11 p.m., Marek Szyprowski wrote:
+> > > Patches are pending:
+> > > https://lore.kernel.org/linux-iommu/20200513132114.6046-1-m.szyprowski@samsung.com/T/
+> >
+> > Cool, nice! Though, I still don't think that fixes the issue in
+> > i915_scatterlist.h given it still ignores sg_dma_len() and strictly
+> > relies on sg_next()/sg_is_last() to stop iterating -- and I suspect this
+> > is the bug that got in Tom's way.
+> >
+> > >> However, as Robin pointed out, there are other ugly tricks like stopping
+> > >> iterating through the SGL when sg_dma_len() is zero. For example, the
+> > >> AMD driver appears to use drm_prime_sg_to_page_addr_arrays() which does
+> > >> this trick and thus likely isn't buggy (otherwise, I'd expect someone to
+> > >> have complained by now seeing AMD has already switched to IOMMU-DMA.
 
-On 2019-12-21 15:03, Tom Murphy wrote:
-> This patchset converts the intel iommu driver to the dma-iommu api.
-> 
-> While converting the driver I exposed a bug in the intel i915 driver which causes a huge amount of artifacts on the screen of my laptop. You can see a picture of it here:
-> https://github.com/pippy360/kernelPatches/blob/master/IMG_20191219_225922.jpg
-> 
-> This issue is most likely in the i915 driver and is most likely caused by the driver not respecting the return value of the dma_map_ops::map_sg function. You can see the driver ignoring the return value here:
-> https://github.com/torvalds/linux/blob/7e0165b2f1a912a06e381e91f0f4e495f4ac3736/drivers/gpu/drm/i915/gem/i915_gem_dmabuf.c#L51
-> 
-> Previously this didn’t cause issues because the intel map_sg always returned the same number of elements as the input scatter gather list but with the change to this dma-iommu api this is no longer the case. I wasn’t able to track the bug down to a specific line of code unfortunately.
-> 
-> Could someone from the intel team look at this?
-> 
-> 
-> I have been testing on a lenovo x1 carbon 5th generation. Let me know if there’s any more information you need.
-> 
-> To allow my patch set to be tested I have added a patch (patch 8/8) in this series to disable combining sg segments in the dma-iommu api which fixes the bug but it doesn't fix the actual problem.
-> 
-> As part of this patch series I copied the intel bounce buffer code to the dma-iommu path. The addition of the bounce buffer code took me by surprise. I did most of my development on this patch series before the bounce buffer code was added and my reimplementation in the dma-iommu path is very rushed and not properly tested but I’m running out of time to work on this patch set.
-> 
-> On top of that I also didn’t port over the intel tracing code from this commit:
-> https://github.com/torvalds/linux/commit/3b53034c268d550d9e8522e613a14ab53b8840d8#diff-6b3e7c4993f05e76331e463ab1fc87e1
-> So all the work in that commit is now wasted. The code will need to be removed and reimplemented in the dma-iommu path. I would like to take the time to do this but I really don’t have the time at the moment and I want to get these changes out before the iommu code changes any more.
+We ran into the same issue with amdgpu and radeon when the AMD IOMMU
+driver was converted and had to fix it as well.  The relevant fixes
+were:
+https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=42e67b479eab6d26459b80b4867298232b0435e7
+https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=0199172f933342d8b1011aae2054a695c25726f4
+https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=47f7826c520ecd92ffbffe59ecaa2fe61e42ec70
+https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=c0f83d164fb8f3a2b7bc379a6c1e27d1123a9eab
 
-Further to what we just discussed at LPC, I've realised that tracepoints 
-are actually something I could do with *right now* for debugging my Arm 
-DMA ops series, so if I'm going to hack something up anyway I may as 
-well take responsibility for polishing it into a proper patch as well :)
+Alex
 
-Robin.
-
-> 
-> Tom Murphy (8):
->    iommu/vt-d: clean up 32bit si_domain assignment
->    iommu/vt-d: Use default dma_direct_* mapping functions for direct
->      mapped devices
->    iommu/vt-d: Remove IOVA handling code from non-dma_ops path
->    iommu: Handle freelists when using deferred flushing in iommu drivers
->    iommu: Add iommu_dma_free_cpu_cached_iovas function
->    iommu: allow the dma-iommu api to use bounce buffers
->    iommu/vt-d: Convert intel iommu driver to the iommu ops
->    DO NOT MERGE: iommu: disable list appending in dma-iommu
-> 
->   drivers/iommu/Kconfig           |   1 +
->   drivers/iommu/amd_iommu.c       |  14 +-
->   drivers/iommu/arm-smmu-v3.c     |   3 +-
->   drivers/iommu/arm-smmu.c        |   3 +-
->   drivers/iommu/dma-iommu.c       | 183 +++++--
->   drivers/iommu/exynos-iommu.c    |   3 +-
->   drivers/iommu/intel-iommu.c     | 936 ++++----------------------------
->   drivers/iommu/iommu.c           |  39 +-
->   drivers/iommu/ipmmu-vmsa.c      |   3 +-
->   drivers/iommu/msm_iommu.c       |   3 +-
->   drivers/iommu/mtk_iommu.c       |   3 +-
->   drivers/iommu/mtk_iommu_v1.c    |   3 +-
->   drivers/iommu/omap-iommu.c      |   3 +-
->   drivers/iommu/qcom_iommu.c      |   3 +-
->   drivers/iommu/rockchip-iommu.c  |   3 +-
->   drivers/iommu/s390-iommu.c      |   3 +-
->   drivers/iommu/tegra-gart.c      |   3 +-
->   drivers/iommu/tegra-smmu.c      |   3 +-
->   drivers/iommu/virtio-iommu.c    |   3 +-
->   drivers/vfio/vfio_iommu_type1.c |   2 +-
->   include/linux/dma-iommu.h       |   3 +
->   include/linux/intel-iommu.h     |   1 -
->   include/linux/iommu.h           |  32 +-
->   23 files changed, 345 insertions(+), 908 deletions(-)
-> 
+> > >
+> > > I'm not sure that this is a trick. Stopping at zero sg_dma_len() was
+> > > somewhere documented.
+> >
+> > Well whatever you want to call it, it is ugly to have some drivers doing
+> > one thing with the returned value and others assuming there's an extra
+> > zero at the end. It just causes confusion for people reading/copying the
+> > code. It would be better if they are all consistent. However, I concede
+> > stopping at zero should not be broken, presently.
+> >
+> > Logan
+> _______________________________________________
+> dri-devel mailing list
+> dri-devel@lists.freedesktop.org
+> https://lists.freedesktop.org/mailman/listinfo/dri-devel
