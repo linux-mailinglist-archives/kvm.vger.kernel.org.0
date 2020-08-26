@@ -2,239 +2,276 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 82D0C253819
-	for <lists+kvm@lfdr.de>; Wed, 26 Aug 2020 21:16:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 534A5253841
+	for <lists+kvm@lfdr.de>; Wed, 26 Aug 2020 21:24:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727041AbgHZTQ3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 26 Aug 2020 15:16:29 -0400
-Received: from mail-co1nam11on2076.outbound.protection.outlook.com ([40.107.220.76]:57728
-        "EHLO NAM11-CO1-obe.outbound.protection.outlook.com"
+        id S1726851AbgHZTYg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 26 Aug 2020 15:24:36 -0400
+Received: from mail-mw2nam10on2055.outbound.protection.outlook.com ([40.107.94.55]:4065
+        "EHLO NAM10-MW2-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726936AbgHZTPt (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 26 Aug 2020 15:15:49 -0400
+        id S1726790AbgHZTYf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 26 Aug 2020 15:24:35 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=QQay5lsvAOOcfMXr2w37htCLflt09EieoGw1y7GXnXastzoDsoOkUkbV/zM0quae+Wf65dLpa7NgWENnYFAeVJSc79g5gbTrt2ZANENmHXXnumMa0AMoDxyTU87umwh+yPJvsavmAzE9l2Wl6+bpcx7QaEWfY7v/RSG9uZi+kdaEbGRAHrEe04SH6QRCyMu6AxTqVOrzGa09M5FHdnxw8Go7qyhRJaZSha91j0YsGYLiSjNrqK26Ux3b0H/Yv/b1PLBA+qr9NThiIqtBffKsBHnk6tmgxpiqSfC/TWsCHGAV0/SCsPJM0urXMnXJzj9NFCvhmVU8keYjhbpPtYdQWw==
+ b=WtjZri9JtxDB97vPpnafp7vKJYW4ja3OgDHtIQnSB7VQT5ciB8RgyHd9rh/8v1VbMvJNqBMVtXoUU8MeMZ8DL5TEWNWFhDBepr8tTs92W6pCyI2r3gL646wpJ4mjTvXL2RdQDeYqTRDsVkJNcALdLgC2fT0c3KV3GhnAsz7cSkShc0W0TLen+U2PzlvH8CYSVwm4uPvZwRj3bldy845yYGGzQ8yHyIdwLE2t5ge1StkU+wVqGxIyYjxZ8RcIviYB9bcGv9JDF2k49mpvx2GlFsR2NJZPD/212/QGWgCrKPx/Mj0/itYnA2LZaukBnFiYfnma61ImqAHOpWaf4uvZVw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=OkAXNOlTrAqAiZAxtVv7rpz3P8AgatFSU4lWiD+EO5o=;
- b=JXXWGJ7F5vmuET23QUGhneVZNS8TFUugK9PS/xx2DTVtPnNf6naU94NZvW9W3YY37jY5cAYAIRmwR8ag2hjmvxez7LKHU2CAzByxPqspObU4LNg/gM6oNW9HEyANfjwgWQsy++UsL6fIAlITG46l8nz3+mW5UFFoG9mOXcdQ1FuRG7gPT92Fl4gZSlSoB2Jjm/kY8n9ghvX17kqibRSfGPx234PQAFEK4KJEVEem2nWBV2wv0crCGLwiqXw7pco1sE+/ArMQognQ1WK1jn8QTc9fZD3MYuhDl9oJrf1bpoXivRuWa57a+J5evwj9zcf1C3w0+5Mi6cybC30x0LXkrg==
+ bh=ILvPigiAOF9JYcifou24gmexah1gvAGHFPjwUT30giM=;
+ b=GVuiuubEbv0CjG8qlJvh8stqkBgGfG07Pl49Z1PWL5SwxrmnUcrYaCuZ3gMFkIpnl0V9wWiFx83NKBa2OlNQmAe7MD+Waxg5crqUIPr/HGH4OAMd8fISDP48OMiWa9exXyDo9BYQLFS/z2IQL8jrzHo/H1Xf+QLNjZZrp6Zljmaq9RNVkiWAq6U8N3tk+mJSGT7W7hqP1XxtT/ApiQyTqskWClX3iWGv8RQqNb3khJYHdeUkzdNx0ycQb3afFTA6z0Z0soY5uUHayqowHv46B+DDUn7O/iz9fHUAX6SLfphi2L3ukA+EfLuM2b7rtTGCeppvRKIDAVhI0INZavVv3Q==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
  header.d=amd.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=OkAXNOlTrAqAiZAxtVv7rpz3P8AgatFSU4lWiD+EO5o=;
- b=FLlue/haI+AwinNSv2pHukpp8HzvOhr8ev28OWVm9tM1JXd0CSc51oWBywHFbMEw8DgtwWGEUR1sIzu5SKg7X7qXpnNEvNqjQgVbBhQEoBBEMkEzabpXQIEJuzSjHviQz4vz/Aneb5cFZZrHPNE6uomuOL4gyibY9YQKq6lS3y4=
-Authentication-Results: tencent.com; dkim=none (message not signed)
- header.d=none;tencent.com; dmarc=none action=none header.from=amd.com;
-Received: from SN1PR12MB2560.namprd12.prod.outlook.com (2603:10b6:802:26::19)
- by SN1PR12MB2384.namprd12.prod.outlook.com (2603:10b6:802:25::25) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3305.26; Wed, 26 Aug
- 2020 19:15:19 +0000
-Received: from SN1PR12MB2560.namprd12.prod.outlook.com
- ([fe80::ccd9:728:9577:200d]) by SN1PR12MB2560.namprd12.prod.outlook.com
- ([fe80::ccd9:728:9577:200d%4]) with mapi id 15.20.3305.026; Wed, 26 Aug 2020
- 19:15:19 +0000
-Subject: [PATCH v5 12/12] KVM:SVM: Enable INVPCID feature on AMD
-From:   Babu Moger <babu.moger@amd.com>
-To:     pbonzini@redhat.com, vkuznets@redhat.com,
-        sean.j.christopherson@intel.com, jmattson@google.com
-Cc:     wanpengli@tencent.com, kvm@vger.kernel.org, joro@8bytes.org,
-        x86@kernel.org, linux-kernel@vger.kernel.org, babu.moger@amd.com,
-        mingo@redhat.com, bp@alien8.de, hpa@zytor.com, tglx@linutronix.de
-Date:   Wed, 26 Aug 2020 14:15:17 -0500
-Message-ID: <159846931719.18873.17261041399321750933.stgit@bmoger-ubuntu>
-In-Reply-To: <159846887637.18873.14677728679411578606.stgit@bmoger-ubuntu>
-References: <159846887637.18873.14677728679411578606.stgit@bmoger-ubuntu>
-User-Agent: StGit/0.17.1-dirty
-Content-Type: text/plain; charset="utf-8"
+ bh=ILvPigiAOF9JYcifou24gmexah1gvAGHFPjwUT30giM=;
+ b=JPwIO50N8LBlBj38xwF+01zBg+HwRAcYUSMFjHtVU8ly11wv8DZjryT/TqS+m+XGY23q7ZxLbPooyVDqp2KnTkgrFSRljl4KfAdtx/v2TbIioQD+NJ36/czEzgp4wUnEYbFUiw1cr9DHUzkJ63i4CMFVi33LzmDm2D/T4r3Ko1k=
+Authentication-Results: redhat.com; dkim=none (message not signed)
+ header.d=none;redhat.com; dmarc=none action=none header.from=amd.com;
+Received: from DM5PR12MB1355.namprd12.prod.outlook.com (2603:10b6:3:6e::7) by
+ DM6PR12MB2985.namprd12.prod.outlook.com (2603:10b6:5:116::18) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.3305.26; Wed, 26 Aug 2020 19:24:31 +0000
+Received: from DM5PR12MB1355.namprd12.prod.outlook.com
+ ([fe80::299a:8ed2:23fc:6346]) by DM5PR12MB1355.namprd12.prod.outlook.com
+ ([fe80::299a:8ed2:23fc:6346%3]) with mapi id 15.20.3305.032; Wed, 26 Aug 2020
+ 19:24:31 +0000
+Subject: Re: [PATCH 1/4] sev/i386: Add initial support for SEV-ES
+To:     Connor Kuehl <ckuehl@redhat.com>, qemu-devel@nongnu.org,
+        kvm@vger.kernel.org
+Cc:     Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Eduardo Habkost <ehabkost@redhat.com>,
+        Richard Henderson <rth@twiddle.net>,
+        Jiri Slaby <jslaby@suse.cz>,
+        Marcelo Tosatti <mtosatti@redhat.com>,
+        "Michael S . Tsirkin" <mst@redhat.com>
+References: <cover.1598382343.git.thomas.lendacky@amd.com>
+ <88dc46aaedd17a3509d7546a622a9754dad895cb.1598382343.git.thomas.lendacky@amd.com>
+ <9cd2e58f-dfa2-e2ae-4886-dc194318c411@redhat.com>
+From:   Tom Lendacky <thomas.lendacky@amd.com>
+Message-ID: <661cc790-f1de-56ab-cd9f-14f087851eb6@amd.com>
+Date:   Wed, 26 Aug 2020 14:24:28 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
+In-Reply-To: <9cd2e58f-dfa2-e2ae-4886-dc194318c411@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: DM5PR16CA0046.namprd16.prod.outlook.com
- (2603:10b6:4:15::32) To SN1PR12MB2560.namprd12.prod.outlook.com
- (2603:10b6:802:26::19)
+X-ClientProxiedBy: SN4PR0701CA0029.namprd07.prod.outlook.com
+ (2603:10b6:803:2d::14) To DM5PR12MB1355.namprd12.prod.outlook.com
+ (2603:10b6:3:6e::7)
 MIME-Version: 1.0
 X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from 255.255.255.255 (255.255.255.255) by DM5PR16CA0046.namprd16.prod.outlook.com (2603:10b6:4:15::32) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3326.19 via Frontend Transport; Wed, 26 Aug 2020 19:15:18 +0000
-X-Originating-IP: [165.204.77.1]
+Received: from 255.255.255.255 (255.255.255.255) by SN4PR0701CA0029.namprd07.prod.outlook.com (2603:10b6:803:2d::14) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3326.19 via Frontend Transport; Wed, 26 Aug 2020 19:24:30 +0000
+X-Originating-IP: [67.79.209.213]
 X-MS-PublicTrafficType: Email
 X-MS-Office365-Filtering-HT: Tenant
-X-MS-Office365-Filtering-Correlation-Id: 240ce38b-b4c6-47b4-7eb9-08d849f45f34
-X-MS-TrafficTypeDiagnostic: SN1PR12MB2384:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <SN1PR12MB238481CD610A33066BFC2FB695540@SN1PR12MB2384.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
+X-MS-Office365-Filtering-Correlation-Id: 2c4b9eea-52f1-49e2-6e66-08d849f5a82c
+X-MS-TrafficTypeDiagnostic: DM6PR12MB2985:
+X-Microsoft-Antispam-PRVS: <DM6PR12MB298595736207263AB43239A8EC540@DM6PR12MB2985.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:7219;
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: QWdUFG5EbscY2A2qWFiHbnGnw8GJdi1QYIbfT5pob1rcxff4628eY7FWQt6RLY7RifZuQ7lkeqRYlOVAmJ54LHGGcT8Dv6/6z2Fa5IvrfQC6q6ippC8EJ/VS30bzrMn3CsYrIdViF6XeTD8kbFC+pFUox4XXIjuE3WORAsdLz0jkRSyVe0QHcFSCSuNwIOYpIQSGR61nr2Q8UZBsgxsDPkXERGTK9MAz8QSKvwVOFqISA6vwuXIe2TDzR0v4Mwqghg1e4XdTMhBVbAa6PLzsOWQ+2TrHHiDW1KY8zD6+qIvNq8jgffaxHVuCB3b4lNedeLkcngncspivo4Eq2YK03Lxsh1n2dZ52/XwzaTSLJc19ZRUOpwRNHh3G56Wt/f+Unwrl9dtEIwPbXLIfRZYEoA==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN1PR12MB2560.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(7916004)(346002)(366004)(136003)(376002)(396003)(39860400002)(103116003)(4326008)(186003)(966005)(66946007)(5660300002)(66476007)(66556008)(44832011)(86362001)(33716001)(9686003)(52116002)(7416002)(83380400001)(6486002)(8936002)(8676002)(16576012)(2906002)(316002)(26005)(478600001)(956004);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData: M4Xm76KyeYBCR+u4Aud0xIBFf6+LZxcd9bFgXh3hOPHh1DBwkVgWxD/P00L0+wrbywO7zy+KXplXRLDA0U/J+pkSDVkH1ckzL8PIz4LjiVCR/V7WrwcNrvg5b7KZdMpvmperVccXyhAOguzcmTiBQ3XpWFBZxcZ5H9Bpw2y3dv0HDzolBhE5elj5FkmzKS3PFy0hELBLOoKEs1/iMan1nAszWSOwWS010Rzc4mt/OlOYhmiG6pnZYFw8qNfRBIdy7nItbEFW2yBSQZOx9idOZ+il9wLxfvAUHtTJmYn/pXbT0CXUe6fsEwPggaS+uXUfPEN3Lr+CkF6sRp433NCKGUu2vG21cKM5Wg+DrXQM3dU4Nm1FFVYCjBeAOP+aY8aUQP541H/ThnNNlvpiRFfOnQjzSXqUqijjkYScvL1EgISCxWxEJHUe/A/3FyemDru2OphKkYr3KyoKTJ4xhwyjP2NnNdYwEBOK/RrGwKmJg2J47AXUaNSeE+FmCZ1eL+gOy0CejKlp9BCCgW+sJy3fqS3d4QYZkjQ/+QpunSRDFUCMeM1VzNr2gNpgEJKqEPCqBTXN+k5nSRBBMFPl6sc/Wmpzd1vhRHGSmvKS6D/SRXxqKbvmKxGqyquAzJfK9GEp3owuXotdsO95zV/tc4EVUg==
+X-Microsoft-Antispam-Message-Info: w/sedoGysyEEgkBqkdBq4vn9IF3KQaY8D127Lp9dHn7+B2VLNgSEsH+Sg8eL6wjigE+TjAGtivGDluB5BwhunK5xRs3xXUgwP8EY0u34y2tNhx5cqKGYFBnLU/cQffNbvbLVLHboF4kygEKn2Zf4QYGg7y4wG50WT6spQYilgXTVG66j5ejS8VR1EFQLJjBSEjP9evFh5dvask4p3G+zanecFnFY18XHI1VI4o6W7MawQI7syrJzFeeHOFFbQvE008BI7Tujopr5PsVCTBE56JB6IAz0kUFdp02/dU5EdQnq9XaMSxYi35DD8S2+mlkARmJ+5m4krMDyktKv88cF40LoKngc6ovz0RooepxeVn2Ug8U0wlVl/41j1RuuXlq8KCeLIrNT8ZpZlHdhpgMJosqcfTIN8P0h3GIT4D1ghnI=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM5PR12MB1355.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(136003)(376002)(39860400002)(366004)(396003)(346002)(31696002)(478600001)(66556008)(86362001)(66946007)(2906002)(66476007)(5660300002)(316002)(31686004)(36756003)(16576012)(6486002)(4326008)(186003)(7416002)(2616005)(54906003)(53546011)(8936002)(26005)(956004)(52116002)(8676002)(83380400001)(43740500002)(309714004);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData: 91Eoyx+U6NJUK2o6AgZMQNAqpBNBeHB4j0C01x0m7j0NYlI6Fxx2dzFilFqB8/jk9KO4sUY3kxJOm7gD9ArYlIls9pI0xUghL02yOCtq0w0HoiRGf8EnClNL5ZRoaDziqXschMDr7H7YvQ0vEm6M1NCLKQM8CMZMCyZDK0P5eABpknddkkHk1ixgQg3znRAddNDqBr3aJkDuY0AB5wI81de88W1G5VyQG2u6hKPS4+D2hyKLMyTsbbELSn8oWnr11Hkonc/LLQSAyrQ6gbZCjRqGOJbscU0Uk0LeAabezARdZGJQh+VIfRnA/u8hbGKK9JXadXhcldrLWzIdIZZ3Z3Hv33v+OQW/p1NdWVtAE96dcwG0HVgB0RywUOtKeL1PVJZ3iSW3hwE1TUFwAiDwQ9LWRXSia+joOB99RwYnWU8W8k5Zw3c7cguDWeKSK008oWvpThAecGVBWrrAKw2Wz4+ZSM3CAiIZeOIhbXrDTzc4wVPvHCQ3G3NKGCGBrOBDURBM5olZiU/g5gJJdkTusX21Y5SXHhbbxMTBBYvhrG2tMurQMAAigTQaDEAtJ13EY3Dl7vOum5N8q+5zcJyag+dbS2FQHKzicsk6+lowyQjM/1jSCY378fifiWeitCdBoNhYsgfjyo3FxIhFaiXMuw==
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 240ce38b-b4c6-47b4-7eb9-08d849f45f34
-X-MS-Exchange-CrossTenant-AuthSource: SN1PR12MB2560.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 2c4b9eea-52f1-49e2-6e66-08d849f5a82c
+X-MS-Exchange-CrossTenant-AuthSource: DM5PR12MB1355.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Aug 2020 19:15:19.2647
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Aug 2020 19:24:31.2153
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: ZwMkEbIYL7uksKNYLIf3hbk3d0PfonZ5oZ3wlhAO2U2PauXnnS7WkGiS9AHjxbEB
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN1PR12MB2384
+X-MS-Exchange-CrossTenant-UserPrincipalName: x8G1d0ewGNtJYCe6jxEH9UHplbOE2wngqK9mVIiBDPVlP9QK0jMnybGST0oq3A5ccixsLOR08VAo8XreNrUFAg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB2985
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The following intercept bit has been added to support VMEXIT
-for INVPCID instruction:
-Code    Name            Cause
-A2h     VMEXIT_INVPCID  INVPCID instruction
+On 8/26/20 2:07 PM, Connor Kuehl wrote:
+> On 8/25/20 2:05 PM, Tom Lendacky wrote:
+>> From: Tom Lendacky <thomas.lendacky@amd.com>
+>>
+>> Provide initial support for SEV-ES. This includes creating a function to
+>> indicate the guest is an SEV-ES guest (which will return false until all
+>> support is in place), performing the proper SEV initialization and
+>> ensuring that the guest CPU state is measured as part of the launch.
+>>
+>> Co-developed-by: Jiri Slaby <jslaby@suse.cz>
+>> Signed-off-by: Jiri Slaby <jslaby@suse.cz>
+>> Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
+> 
+> Hi Tom!
 
-The following bit has been added to the VMCB layout control area
-to control intercept of INVPCID:
-Byte Offset     Bit(s)    Function
-14h             2         intercept INVPCID
+Hi Connor,
 
-Enable the interceptions when the the guest is running with shadow
-page table enabled and handle the tlbflush based on the invpcid
-instruction type.
+> 
+> Overall I think the patch set looks good. I mainly just have 1 question 
+> regarding some error handling and a couple of checkpatch related messages.
 
-For the guests with nested page table (NPT) support, the INVPCID
-feature works as running it natively. KVM does not need to do any
-special handling in this case.
+Ugh, I was positive I ran checkpatch, but obviously I didn't.
 
-AMD documentation for INVPCID feature is available at "AMD64
-Architecture Programmer’s Manual Volume 2: System Programming,
-Pub. 24593 Rev. 3.34(or later)"
+> 
+>> ---
+>>   target/i386/cpu.c      |  1 +
+>>   target/i386/sev-stub.c |  5 +++++
+>>   target/i386/sev.c      | 46 ++++++++++++++++++++++++++++++++++++++++--
+>>   target/i386/sev_i386.h |  1 +
+>>   4 files changed, 51 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+>> index 588f32e136..bbbe581d35 100644
+>> --- a/target/i386/cpu.c
+>> +++ b/target/i386/cpu.c
+>> @@ -5969,6 +5969,7 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t 
+>> index, uint32_t count,
+>>           break;
+>>       case 0x8000001F:
+>>           *eax = sev_enabled() ? 0x2 : 0;
+>> +        *eax |= sev_es_enabled() ? 0x8 : 0;
+>>           *ebx = sev_get_cbit_position();
+>>           *ebx |= sev_get_reduced_phys_bits() << 6;
+>>           *ecx = 0;
+>> diff --git a/target/i386/sev-stub.c b/target/i386/sev-stub.c
+>> index 88e3f39a1e..040ac90563 100644
+>> --- a/target/i386/sev-stub.c
+>> +++ b/target/i386/sev-stub.c
+>> @@ -49,3 +49,8 @@ SevCapability *sev_get_capabilities(Error **errp)
+>>       error_setg(errp, "SEV is not available in this QEMU");
+>>       return NULL;
+>>   }
+>> +
+>> +bool sev_es_enabled(void)
+> 
+> I don't think this bothers checkpatch, but it'd be consistent with the 
+> rest of your series if this function put the return type on the line above.
 
-The documentation can be obtained at the links below:
-Link: https://www.amd.com/system/files/TechDocs/24593.pdf
-Link: https://bugzilla.kernel.org/show_bug.cgi?id=206537
+I was being consistent with the file that it is in where all the other 
+functions are defined this way.
 
-Signed-off-by: Babu Moger <babu.moger@amd.com>
-Reviewed-by: Jim Mattson <jmattson@google.com>
----
- arch/x86/include/uapi/asm/svm.h |    2 ++
- arch/x86/kvm/svm/svm.c          |   51 +++++++++++++++++++++++++++++++++++++++
- 2 files changed, 53 insertions(+)
+> 
+>> +{
+>> +    return false;
+>> +}
+>> diff --git a/target/i386/sev.c b/target/i386/sev.c
+>> index c3ecf86704..6c9cd0854b 100644
+>> --- a/target/i386/sev.c
+>> +++ b/target/i386/sev.c
+>> @@ -359,6 +359,12 @@ sev_enabled(void)
+>>       return !!sev_guest;
+>>   }
+>> +bool
+>> +sev_es_enabled(void)
+>> +{
+>> +    return false;
+>> +}
+>> +
+>>   uint64_t
+>>   sev_get_me_mask(void)
+>>   {
+>> @@ -578,6 +584,22 @@ sev_launch_update_data(SevGuestState *sev, uint8_t 
+>> *addr, uint64_t len)
+>>       return ret;
+>>   }
+>> +static int
+>> +sev_launch_update_vmsa(SevGuestState *sev)
+>> +{
+>> +    int ret, fw_error;
+>> +
+>> +    ret = sev_ioctl(sev->sev_fd, KVM_SEV_LAUNCH_UPDATE_VMSA, NULL, 
+>> &fw_error);
+>> +    if (ret) {
+>> +        error_report("%s: LAUNCH_UPDATE_VMSA ret=%d fw_error=%d '%s'",
+>> +                __func__, ret, fw_error, fw_error_to_str(fw_error));
+>> +        goto err;
+>> +    }
+>> +
+>> +err:
+>> +    return ret;
+>> +}
+>> +
+>>   static void
+>>   sev_launch_get_measure(Notifier *notifier, void *unused)
+>>   {
+>> @@ -590,6 +612,14 @@ sev_launch_get_measure(Notifier *notifier, void 
+>> *unused)
+>>           return;
+>>       }
+>> +    if (sev_es_enabled()) {
+>> +        /* measure all the VM save areas before getting launch_measure */
+>> +        ret = sev_launch_update_vmsa(sev);
+>> +        if (ret) {
+>> +            exit(1);
+> 
+> Disclaimer: I'm still learning the QEMU source code, sorry if this comes 
+> across as naive.
+> 
+> Is exit() what we want here? I was looking around the rest of the source 
+> code and unfortunately the machine_init_done_notifiers mechanism doesn't 
+> allow for a return value to indicate an error, so I'm wondering if there's 
+> a more appropriate place in the initialization code to handle these 
+> fallible operations and if so, propagate the error down. This way if there 
+> are other resources that need to be cleaned up on the way out, they can 
+> be. Thoughts?
 
-diff --git a/arch/x86/include/uapi/asm/svm.h b/arch/x86/include/uapi/asm/svm.h
-index 2e8a30f06c74..522d42dfc28c 100644
---- a/arch/x86/include/uapi/asm/svm.h
-+++ b/arch/x86/include/uapi/asm/svm.h
-@@ -76,6 +76,7 @@
- #define SVM_EXIT_MWAIT_COND    0x08c
- #define SVM_EXIT_XSETBV        0x08d
- #define SVM_EXIT_RDPRU         0x08e
-+#define SVM_EXIT_INVPCID       0x0a2
- #define SVM_EXIT_NPF           0x400
- #define SVM_EXIT_AVIC_INCOMPLETE_IPI		0x401
- #define SVM_EXIT_AVIC_UNACCELERATED_ACCESS	0x402
-@@ -171,6 +172,7 @@
- 	{ SVM_EXIT_MONITOR,     "monitor" }, \
- 	{ SVM_EXIT_MWAIT,       "mwait" }, \
- 	{ SVM_EXIT_XSETBV,      "xsetbv" }, \
-+	{ SVM_EXIT_INVPCID,     "invpcid" }, \
- 	{ SVM_EXIT_NPF,         "npf" }, \
- 	{ SVM_EXIT_AVIC_INCOMPLETE_IPI,		"avic_incomplete_ipi" }, \
- 	{ SVM_EXIT_AVIC_UNACCELERATED_ACCESS,   "avic_unaccelerated_access" }, \
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index 96617b61e531..5c6b8d0f7628 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -813,6 +813,9 @@ static __init void svm_set_cpu_caps(void)
- 	if (boot_cpu_has(X86_FEATURE_LS_CFG_SSBD) ||
- 	    boot_cpu_has(X86_FEATURE_AMD_SSBD))
- 		kvm_cpu_cap_set(X86_FEATURE_VIRT_SSBD);
-+
-+	/* Enable INVPCID feature */
-+	kvm_cpu_cap_check_and_set(X86_FEATURE_INVPCID);
- }
- 
- static __init int svm_hardware_setup(void)
-@@ -985,6 +988,21 @@ static u64 svm_write_l1_tsc_offset(struct kvm_vcpu *vcpu, u64 offset)
- 	return svm->vmcb->control.tsc_offset;
- }
- 
-+static void svm_check_invpcid(struct vcpu_svm *svm)
-+{
-+	/*
-+	 * Intercept INVPCID instruction only if shadow page table is
-+	 * enabled. Interception is not required with nested page table
-+	 * enabled.
-+	 */
-+	if (kvm_cpu_cap_has(X86_FEATURE_INVPCID)) {
-+		if (!npt_enabled)
-+			svm_set_intercept(svm, INTERCEPT_INVPCID);
-+		else
-+			svm_clr_intercept(svm, INTERCEPT_INVPCID);
-+	}
-+}
-+
- static void init_vmcb(struct vcpu_svm *svm)
- {
- 	struct vmcb_control_area *control = &svm->vmcb->control;
-@@ -1114,6 +1132,8 @@ static void init_vmcb(struct vcpu_svm *svm)
- 		svm_clr_intercept(svm, INTERCEPT_PAUSE);
- 	}
- 
-+	svm_check_invpcid(svm);
-+
- 	if (kvm_vcpu_apicv_active(&svm->vcpu))
- 		avic_init_vmcb(svm);
- 
-@@ -2730,6 +2750,33 @@ static int mwait_interception(struct vcpu_svm *svm)
- 	return nop_interception(svm);
- }
- 
-+static int invpcid_interception(struct vcpu_svm *svm)
-+{
-+	struct kvm_vcpu *vcpu = &svm->vcpu;
-+	unsigned long type;
-+	gva_t gva;
-+
-+	if (!guest_cpuid_has(vcpu, X86_FEATURE_INVPCID)) {
-+		kvm_queue_exception(vcpu, UD_VECTOR);
-+		return 1;
-+	}
-+
-+	/*
-+	 * For an INVPCID intercept:
-+	 * EXITINFO1 provides the linear address of the memory operand.
-+	 * EXITINFO2 provides the contents of the register operand.
-+	 */
-+	type = svm->vmcb->control.exit_info_2;
-+	gva = svm->vmcb->control.exit_info_1;
-+
-+	if (type > 3) {
-+		kvm_inject_gp(vcpu, 0);
-+		return 1;
-+	}
-+
-+	return kvm_handle_invpcid(vcpu, type, gva);
-+}
-+
- static int (*const svm_exit_handlers[])(struct vcpu_svm *svm) = {
- 	[SVM_EXIT_READ_CR0]			= cr_interception,
- 	[SVM_EXIT_READ_CR3]			= cr_interception,
-@@ -2792,6 +2839,7 @@ static int (*const svm_exit_handlers[])(struct vcpu_svm *svm) = {
- 	[SVM_EXIT_MWAIT]			= mwait_interception,
- 	[SVM_EXIT_XSETBV]			= xsetbv_interception,
- 	[SVM_EXIT_RDPRU]			= rdpru_interception,
-+	[SVM_EXIT_INVPCID]                      = invpcid_interception,
- 	[SVM_EXIT_NPF]				= npf_interception,
- 	[SVM_EXIT_RSM]                          = rsm_interception,
- 	[SVM_EXIT_AVIC_INCOMPLETE_IPI]		= avic_incomplete_ipi_interception,
-@@ -3622,6 +3670,9 @@ static void svm_vcpu_after_set_cpuid(struct kvm_vcpu *vcpu)
- 	svm->nrips_enabled = kvm_cpu_cap_has(X86_FEATURE_NRIPS) &&
- 			     guest_cpuid_has(&svm->vcpu, X86_FEATURE_NRIPS);
- 
-+	/* Check again if INVPCID interception if required */
-+	svm_check_invpcid(svm);
-+
- 	if (!kvm_vcpu_apicv_active(vcpu))
- 		return;
- 
+I was following the existing method of terminating that is being performed 
+in this file. I'll see if others have an idea about how to handle these 
+types of errors, which could probably be addressed as a separate patch series.
 
+Thanks,
+Tom
+
+> 
+>> +        }
+>> +    }
+>> +
+>>       measurement = g_new0(struct kvm_sev_launch_measure, 1);
+>>       /* query the measurement blob length */
+>> @@ -684,7 +714,7 @@ sev_guest_init(const char *id)
+>>   {
+>>       SevGuestState *sev;
+>>       char *devname;
+>> -    int ret, fw_error;
+>> +    int ret, fw_error, cmd;
+>>       uint32_t ebx;
+>>       uint32_t host_cbitpos;
+>>       struct sev_user_data_status status = {};
+>> @@ -745,8 +775,20 @@ sev_guest_init(const char *id)
+>>       sev->api_major = status.api_major;
+>>       sev->api_minor = status.api_minor;
+>> +    if (sev_es_enabled()) {
+>> +        if (!(status.flags & SEV_STATUS_FLAGS_CONFIG_ES)) {
+>> +            error_report("%s: guest policy requires SEV-ES, but "
+>> +                         "host SEV-ES support unavailable",
+>> +                         __func__);
+>> +            goto err;
+>> +        }
+>> +        cmd = KVM_SEV_ES_INIT;
+>> +    } else {
+>> +        cmd = KVM_SEV_INIT;
+>> +    }
+>> +
+>>       trace_kvm_sev_init();
+>> -    ret = sev_ioctl(sev->sev_fd, KVM_SEV_INIT, NULL, &fw_error);
+>> +    ret = sev_ioctl(sev->sev_fd, cmd, NULL, &fw_error);
+>>       if (ret) {
+>>           error_report("%s: failed to initialize ret=%d fw_error=%d '%s'",
+>>                        __func__, ret, fw_error, fw_error_to_str(fw_error));
+>> diff --git a/target/i386/sev_i386.h b/target/i386/sev_i386.h
+>> index 4db6960f60..4f9a5e9b21 100644
+>> --- a/target/i386/sev_i386.h
+>> +++ b/target/i386/sev_i386.h
+>> @@ -29,6 +29,7 @@
+>>   #define SEV_POLICY_SEV          0x20
+>>   extern bool sev_enabled(void);
+>> +extern bool sev_es_enabled(void);
+>>   extern uint64_t sev_get_me_mask(void);
+>>   extern SevInfo *sev_get_info(void);
+>>   extern uint32_t sev_get_cbit_position(void);
+>>
+> 
