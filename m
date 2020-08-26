@@ -2,159 +2,155 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8EA1A252750
-	for <lists+kvm@lfdr.de>; Wed, 26 Aug 2020 08:37:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 777C925278C
+	for <lists+kvm@lfdr.de>; Wed, 26 Aug 2020 08:42:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727003AbgHZGg1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 26 Aug 2020 02:36:27 -0400
-Received: from mailout1.w1.samsung.com ([210.118.77.11]:38043 "EHLO
-        mailout1.w1.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726934AbgHZGf4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 26 Aug 2020 02:35:56 -0400
-Received: from eucas1p1.samsung.com (unknown [182.198.249.206])
-        by mailout1.w1.samsung.com (KnoxPortal) with ESMTP id 20200826063546euoutp01adb9b3b28bd4ff76d48ebaac18d96acb~uve3MmoS42034920349euoutp01Y
-        for <kvm@vger.kernel.org>; Wed, 26 Aug 2020 06:35:46 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.w1.samsung.com 20200826063546euoutp01adb9b3b28bd4ff76d48ebaac18d96acb~uve3MmoS42034920349euoutp01Y
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1598423746;
-        bh=i9tfBl9XK1ZIcmVNmOj760Z4Av4MmZkmEeWSykU107Y=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=MDWa/v2UN64kd/Pdh2+Eqeqoqxov2kLfJNAWiAuYfPUDZdGsjK6rzp0jDh/Ieviln
-         FTtvqfiaz8SXSMsHICUOsl47/oAzIj4oVOeTnycj3hrxaX9nk4J4vuowAU11CNovOv
-         MRLIevFWqldfH/vPZ87AN+jaPiLfdmm0deNKsdu8=
-Received: from eusmges2new.samsung.com (unknown [203.254.199.244]) by
-        eucas1p2.samsung.com (KnoxPortal) with ESMTP id
-        20200826063546eucas1p248e3327a2574966e6260f8ea4243a18c~uve27uU5X0403504035eucas1p2_;
-        Wed, 26 Aug 2020 06:35:46 +0000 (GMT)
-Received: from eucas1p2.samsung.com ( [182.198.249.207]) by
-        eusmges2new.samsung.com (EUCPMTA) with SMTP id 59.BD.05997.2C2064F5; Wed, 26
-        Aug 2020 07:35:46 +0100 (BST)
-Received: from eusmtrp1.samsung.com (unknown [182.198.249.138]) by
-        eucas1p2.samsung.com (KnoxPortal) with ESMTPA id
-        20200826063546eucas1p268558dcd08ac9b43843f9f5e23da227d~uve2fzbFv0398703987eucas1p2r;
-        Wed, 26 Aug 2020 06:35:46 +0000 (GMT)
-Received: from eusmgms1.samsung.com (unknown [182.198.249.179]) by
-        eusmtrp1.samsung.com (KnoxPortal) with ESMTP id
-        20200826063546eusmtrp1324e39600c0b1709cb7b91c674f0a758~uve2fFvRB1167511675eusmtrp1M;
-        Wed, 26 Aug 2020 06:35:46 +0000 (GMT)
-X-AuditID: cbfec7f4-65dff7000000176d-ed-5f4602c23e0d
-Received: from eusmtip2.samsung.com ( [203.254.199.222]) by
-        eusmgms1.samsung.com (EUCPMTA) with SMTP id B0.E0.06314.1C2064F5; Wed, 26
-        Aug 2020 07:35:45 +0100 (BST)
-Received: from AMDC2765.digital.local (unknown [106.120.51.73]) by
-        eusmtip2.samsung.com (KnoxPortal) with ESMTPA id
-        20200826063545eusmtip2148831d8e511c634dd22bec68983ea60~uve14XvZb0092300923eusmtip2U;
-        Wed, 26 Aug 2020 06:35:45 +0000 (GMT)
-From:   Marek Szyprowski <m.szyprowski@samsung.com>
-To:     dri-devel@lists.freedesktop.org, iommu@lists.linux-foundation.org,
-        linaro-mm-sig@lists.linaro.org, linux-kernel@vger.kernel.org
-Cc:     Marek Szyprowski <m.szyprowski@samsung.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
-        linux-arm-kernel@lists.infradead.org,
-        David Airlie <airlied@linux.ie>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Kirti Wankhede <kwankhede@nvidia.com>, kvm@vger.kernel.org
-Subject: [PATCH v9 30/32] samples: vfio-mdev/mbochs: fix common struct
- sg_table related issues
-Date:   Wed, 26 Aug 2020 08:33:14 +0200
-Message-Id: <20200826063316.23486-31-m.szyprowski@samsung.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20200826063316.23486-1-m.szyprowski@samsung.com>
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFtrMKsWRmVeSWpSXmKPExsWy7djP87qHmNziDT68kLXoPXeSyWLjjPWs
-        Fv+3TWS2uPL1PZvFytVHmSwW7Le2mDO10GLL6bmMFl+uPGSy2PT4GqvF5V1z2CzWHrnLbnHw
-        wxNWB16PNfPWMHrs/baAxWP7twesHve7jzN5bF5S73H732Nmj8k3ljN67L7ZwObR2/yOzaNv
-        yypGj8+b5AK4o7hsUlJzMstSi/TtErgyfm/bxF6wRLDi1o78BsaNfF2MnBwSAiYSbe2XGbsY
-        uTiEBFYwSnx/tZYFwvnCKHHnxE4WkCohgc+MEp++x8N0rO9bDdWxnFGid9d0JriOM1fmMoNU
-        sQkYSnS97WIDsUUEWhklTvTygBQxC1xjknj79x1rFyMHh7BAgsSnV6kgNSwCqhLPph8C6+UV
-        sJOY1/qIDWKbvMTqDQfA4pxA8ePd/VDxfewSO4/EQNguEnfetjFC2MISr45vYYewZSROT+4B
-        e0dCoJlR4uG5tewQTg+jxOWmGVAd1hJ3zv1iAzmIWUBTYv0ufYiwo0T3uknMIGEJAT6JG28F
-        QcLMQOakbdOhwrwSHW1CENVqErOOr4Nbe/DCJWYI20Oie+N5Nkj4TGSUeDP9IfMERvlZCMsW
-        MDKuYhRPLS3OTU8tNspLLdcrTswtLs1L10vOz93ECExKp/8d/7KDcdefpEOMAhyMSjy8C9hc
-        44VYE8uKK3MPMUpwMCuJ8DqdPR0nxJuSWFmVWpQfX1Sak1p8iFGag0VJnNd40ctYIYH0xJLU
-        7NTUgtQimCwTB6dUA+OU74IBMS0vucr3ZHVH7+uVTr/jXntVNFgm02oxx793fImpnqG6U+9d
-        nXLmWK0Cd1/XLLNPN7RVfHZLvj188cKthwerP+04vObfls4Xz0yyUwraz23gsP6T2K9V7Vjt
-        vNJp3+8+s5yO9+F+rHIymgFcyzy1tIv/Fb07a1S6v2N+wExW7m2BHEosxRmJhlrMRcWJAKtM
-        O5tGAwAA
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFprGIsWRmVeSWpSXmKPExsVy+t/xe7oHmdziDb6vtbToPXeSyWLjjPWs
-        Fv+3TWS2uPL1PZvFytVHmSwW7Le2mDO10GLL6bmMFl+uPGSy2PT4GqvF5V1z2CzWHrnLbnHw
-        wxNWB16PNfPWMHrs/baAxWP7twesHve7jzN5bF5S73H732Nmj8k3ljN67L7ZwObR2/yOzaNv
-        yypGj8+b5AK4o/RsivJLS1IVMvKLS2yVog0tjPQMLS30jEws9QyNzWOtjEyV9O1sUlJzMstS
-        i/TtEvQyfm/bxF6wRLDi1o78BsaNfF2MnBwSAiYS6/tWM3YxcnEICSxllPj5aSIrREJG4uS0
-        BihbWOLPtS42iKJPjBKHf19jB0mwCRhKdL2FSIgIdDJKTOv+CJZgFrjHJLF3nR+ILSwQJ/Gi
-        /ysbiM0ioCrxbPohZhCbV8BOYl7rIzaIDfISqzccAItzAsWPd/eDxYUEbCVOr53BPIGRbwEj
-        wypGkdTS4tz03GJDveLE3OLSvHS95PzcTYzAONl27OfmHYyXNgYfYhTgYFTi4V3A5hovxJpY
-        VlyZe4hRgoNZSYTX6ezpOCHelMTKqtSi/Pii0pzU4kOMpkBHTWSWEk3OB8ZwXkm8oamhuYWl
-        obmxubGZhZI4b4fAwRghgfTEktTs1NSC1CKYPiYOTqkGRsu2U4X6kaYfvvde3DRTdfW1pKJj
-        l2V3bww7cEX3+YmKl0rMtrNUezkDopax21noP7DjmaHGtro+5aG64EVHpZfTQtITnsZH2mzy
-        DCqQmsTD6HZt0cTgpAtaNzdGlxSt3+reNuf2Y8MfLVczbF8tnp4c8cMk0EhskYlH7ZJPbQdC
-        XHfadyrdVWIpzkg01GIuKk4EAOSPyuupAgAA
-X-CMS-MailID: 20200826063546eucas1p268558dcd08ac9b43843f9f5e23da227d
-X-Msg-Generator: CA
-Content-Type: text/plain; charset="utf-8"
-X-RootMTR: 20200826063546eucas1p268558dcd08ac9b43843f9f5e23da227d
-X-EPHeader: CA
-CMS-TYPE: 201P
-X-CMS-RootMailID: 20200826063546eucas1p268558dcd08ac9b43843f9f5e23da227d
-References: <20200826063316.23486-1-m.szyprowski@samsung.com>
-        <CGME20200826063546eucas1p268558dcd08ac9b43843f9f5e23da227d@eucas1p2.samsung.com>
+        id S1726040AbgHZGmQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 26 Aug 2020 02:42:16 -0400
+Received: from mga09.intel.com ([134.134.136.24]:56298 "EHLO mga09.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725980AbgHZGmQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 26 Aug 2020 02:42:16 -0400
+IronPort-SDR: Io11W9nWA7mcs6ZmEB2b3r9NlLZpsQpzvdR+0z38ZIE3kyQHceKmEUjvTSytTjQvIxtA9BPzCP
+ TvtKJp3g4y7g==
+X-IronPort-AV: E=McAfee;i="6000,8403,9724"; a="157282802"
+X-IronPort-AV: E=Sophos;i="5.76,354,1592895600"; 
+   d="scan'208";a="157282802"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Aug 2020 23:42:15 -0700
+IronPort-SDR: 9HZ8FwCzB5Y9XCTO3PAbkdbuTxhtxX9FV8y59Qjh/8B7YakVeZGCd6Si8JfUYycA34ckU0HKFR
+ TRIWjEQXU1Ww==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.76,354,1592895600"; 
+   d="scan'208";a="329122213"
+Received: from joy-optiplex-7040.sh.intel.com (HELO joy-OptiPlex-7040) ([10.239.13.16])
+  by orsmga008.jf.intel.com with ESMTP; 25 Aug 2020 23:42:09 -0700
+Date:   Wed, 26 Aug 2020 14:41:17 +0800
+From:   Yan Zhao <yan.y.zhao@intel.com>
+To:     Cornelia Huck <cohuck@redhat.com>
+Cc:     Alex Williamson <alex.williamson@redhat.com>,
+        Daniel =?iso-8859-1?Q?P=2EBerrang=E9?= <berrange@redhat.com>,
+        kvm@vger.kernel.org, libvir-list@redhat.com,
+        Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org,
+        kwankhede@nvidia.com, eauger@redhat.com, xin-ran.wang@intel.com,
+        corbet@lwn.net, openstack-discuss@lists.openstack.org,
+        shaohe.feng@intel.com, kevin.tian@intel.com,
+        Parav Pandit <parav@mellanox.com>, jian-feng.ding@intel.com,
+        dgilbert@redhat.com, zhenyuw@linux.intel.com, hejie.xu@intel.com,
+        bao.yumeng@zte.com.cn, smooney@redhat.com,
+        intel-gvt-dev@lists.freedesktop.org, eskultet@redhat.com,
+        Jiri Pirko <jiri@mellanox.com>, dinechin@redhat.com,
+        devel@ovirt.org
+Subject: Re: device compatibility interface for live migration with assigned
+ devices
+Message-ID: <20200826064117.GA22243@joy-OptiPlex-7040>
+Reply-To: Yan Zhao <yan.y.zhao@intel.com>
+References: <20200814051601.GD15344@joy-OptiPlex-7040>
+ <a51209fe-a8c6-941f-ff54-7be06d73bc44@redhat.com>
+ <20200818085527.GB20215@redhat.com>
+ <3a073222-dcfe-c02d-198b-29f6a507b2e1@redhat.com>
+ <20200818091628.GC20215@redhat.com>
+ <20200818113652.5d81a392.cohuck@redhat.com>
+ <20200820003922.GE21172@joy-OptiPlex-7040>
+ <20200819212234.223667b3@x1.home>
+ <20200820031621.GA24997@joy-OptiPlex-7040>
+ <20200825163925.1c19b0f0.cohuck@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200825163925.1c19b0f0.cohuck@redhat.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The Documentation/DMA-API-HOWTO.txt states that the dma_map_sg() function
-returns the number of the created entries in the DMA address space.
-However the subsequent calls to the dma_sync_sg_for_{device,cpu}() and
-dma_unmap_sg must be called with the original number of the entries
-passed to the dma_map_sg().
+On Tue, Aug 25, 2020 at 04:39:25PM +0200, Cornelia Huck wrote:
+<...>
+> > do you think the bin_attribute I proposed yesterday good?
+> > Then we can have a single compatible with a variable in the mdev_type and
+> > aggregator.
+> > 
+> >    mdev_type=i915-GVTg_V5_{val1:int:2,4,8}
+> >    aggregator={val1}/2
+> 
+> I'm not really a fan of binary attributes other than in cases where we
+> have some kind of binary format to begin with.
+> 
+> IIUC, we basically have:
+> - different partitioning (expressed in the mdev_type)
+> - different number of partitions (expressed via the aggregator)
+> - devices being compatible if the partitioning:aggregator ratio is the
+>   same
+> 
+> (The multiple mdev_type variants seem to come from avoiding extra
+> creation parameters, IIRC?)
+> 
+> Would it be enough to export
+> base_type=i915-GVTg_V5
+> aggregation_ratio=<integer>
+> 
+> to express the various combinations that are compatible without the
+> need for multiple sets of attributes?
 
-struct sg_table is a common structure used for describing a non-contiguous
-memory buffer, used commonly in the DRM and graphics subsystems. It
-consists of a scatterlist with memory pages and DMA addresses (sgl entry),
-as well as the number of scatterlist entries: CPU pages (orig_nents entry)
-and DMA mapped pages (nents entry).
+yes. I agree we need to decouple the mdev type name and aggregator for
+compatibility detection purpose.
 
-It turned out that it was a common mistake to misuse nents and orig_nents
-entries, calling DMA-mapping functions with a wrong number of entries or
-ignoring the number of mapped entries returned by the dma_map_sg()
-function.
+please allow me to put some words to describe the history and
+motivation of introducing aggregator.
 
-To avoid such issues, lets use a common dma-mapping wrappers operating
-directly on the struct sg_table objects and use scatterlist page
-iterators where possible. This, almost always, hides references to the
-nents and orig_nents entries, making the code robust, easier to follow
-and copy/paste safe.
+initially, we have fixed mdev_type
+i915-GVTg_V5_1,
+i915-GVTg_V5_2,
+i915-GVTg_V5_4,
+i915-GVTg_V5_8,
+the digital after i915-GVTg_V5 representing the max number of instances
+allowed to be created for this type. They also identify how many
+resources are to be allocated for each type.
 
-While touching this code, also add missing call to dma_unmap_sgtable.
+They are so far so good for current intel vgpus, i.e., cutting the
+physical GPU into several virtual pieces and sharing them among several
+VMs in pure mediation way.
+fixed types are provided in advance as we thought it can meet needs from
+most users and users can know the hardware capability they acquired
+from the type name. the bigger in number, the smaller piece of physical
+hardware.
 
-Signed-off-by: Marek Szyprowski <m.szyprowski@samsung.com>
----
- samples/vfio-mdev/mbochs.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+Then, when it comes to scalable IOV in near future, one physical hardware
+is able to be cut into a large number of units in hardware layer
+The single unit to be assigned into guest can be very small while one to
+several units are grouped into an mdev.
 
-diff --git a/samples/vfio-mdev/mbochs.c b/samples/vfio-mdev/mbochs.c
-index 3cc5e5921682..e03068917273 100644
---- a/samples/vfio-mdev/mbochs.c
-+++ b/samples/vfio-mdev/mbochs.c
-@@ -846,7 +846,7 @@ static struct sg_table *mbochs_map_dmabuf(struct dma_buf_attachment *at,
- 	if (sg_alloc_table_from_pages(sg, dmabuf->pages, dmabuf->pagecount,
- 				      0, dmabuf->mode.size, GFP_KERNEL) < 0)
- 		goto err2;
--	if (!dma_map_sg(at->dev, sg->sgl, sg->nents, direction))
-+	if (dma_map_sgtable(at->dev, sg, direction, 0))
- 		goto err3;
- 
- 	return sg;
-@@ -868,6 +868,7 @@ static void mbochs_unmap_dmabuf(struct dma_buf_attachment *at,
- 
- 	dev_dbg(dev, "%s: %d\n", __func__, dmabuf->id);
- 
-+	dma_unmap_sgtable(at->dev, sg, direction, 0);
- 	sg_free_table(sg);
- 	kfree(sg);
- }
--- 
-2.17.1
+The fixed type scheme is then cumbersome. 
+Therefore, a new attribute aggregator is introduced to specify the number
+of resources to be assigned based on the base resource specified in type
+name. e.g.
+if type name is dsa-1dwq, and aggregator is 30, then the assignable
+resources to guest is 30 wqs in a single created mdev.
+if type name is dsa-2dwq, and aggregator is 15, then the assignable
+resources to guest is also 30wqs in a single created mdev.
+(in this example, the rule to define type name is different to the case
+in GVT. here 1 wq means wq number is 1. yes, they are current reality.
+:) )
+
+
+previously, we want to regard the two mdevs created with dsa-1dwq x 30 and
+dsa-2dwq x 15 as compatible, because the two mdevs consist equal resources.
+
+But, as it's a burden to upper layer, we agree that if this condition
+happens, we still treat the two as incompatible.
+
+To fix it, either the driver should expose dsa-1dwq only, or the target
+dsa-2dwq needs to be destroyed and reallocated via dsa-1dwq x 30.
+
+Does it make sense?
+
+Thanks
+Yan
+
+
+
+
 
