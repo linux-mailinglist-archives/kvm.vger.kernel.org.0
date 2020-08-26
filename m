@@ -2,563 +2,133 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id CAC44253624
-	for <lists+kvm@lfdr.de>; Wed, 26 Aug 2020 19:46:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4A87B25365B
+	for <lists+kvm@lfdr.de>; Wed, 26 Aug 2020 20:14:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726939AbgHZRq6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 26 Aug 2020 13:46:58 -0400
-Received: from mga07.intel.com ([134.134.136.100]:49544 "EHLO mga07.intel.com"
+        id S1726798AbgHZSOj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 26 Aug 2020 14:14:39 -0400
+Received: from foss.arm.com ([217.140.110.172]:49688 "EHLO foss.arm.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726838AbgHZRqy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 26 Aug 2020 13:46:54 -0400
-IronPort-SDR: lePd1CBZT3l/cjuyz3QTuhWI6iC6NnJo6KTBxGacLPnOBhUlU4apSy9n1n/HlJmrCotKmIZWsq
- XI/JGifj8lBg==
-X-IronPort-AV: E=McAfee;i="6000,8403,9725"; a="220607130"
-X-IronPort-AV: E=Sophos;i="5.76,356,1592895600"; 
-   d="scan'208";a="220607130"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Aug 2020 10:46:52 -0700
-IronPort-SDR: JmN1hmb5l/QgUn4Z5TmadFtHuG17AGzh8FETqtsWLgKyY2CwxyY0zkQDH1lXLdrMtk1kELUvyU
- i3s5uYM3C6gw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.76,356,1592895600"; 
-   d="scan'208";a="299553496"
-Received: from gliakhov-mobl2.ger.corp.intel.com (HELO ubuntu.ger.corp.intel.com) ([10.252.54.141])
-  by orsmga006.jf.intel.com with ESMTP; 26 Aug 2020 10:46:49 -0700
-From:   Guennadi Liakhovetski <guennadi.liakhovetski@linux.intel.com>
-To:     kvm@vger.kernel.org
-Cc:     linux-remoteproc@vger.kernel.org,
-        virtualization@lists.linux-foundation.org,
-        sound-open-firmware@alsa-project.org,
-        Pierre-Louis Bossart <pierre-louis.bossart@linux.intel.com>,
-        Liam Girdwood <liam.r.girdwood@linux.intel.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Ohad Ben-Cohen <ohad@wizery.com>,
+        id S1726241AbgHZSOh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 26 Aug 2020 14:14:37 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id EF4DA101E;
+        Wed, 26 Aug 2020 11:14:36 -0700 (PDT)
+Received: from [10.57.40.122] (unknown [10.57.40.122])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 6133E3F71F;
+        Wed, 26 Aug 2020 11:14:31 -0700 (PDT)
+Subject: Re: [PATCH 0/8] Convert the intel iommu driver to the dma-iommu api
+To:     Tom Murphy <murphyt7@tcd.ie>, iommu@lists.linux-foundation.org
+Cc:     Heiko Stuebner <heiko@sntech.de>, kvm@vger.kernel.org,
+        David Airlie <airlied@linux.ie>,
+        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
+        dri-devel@lists.freedesktop.org,
         Bjorn Andersson <bjorn.andersson@linaro.org>,
-        Mathieu Poirier <mathieu.poirier@linaro.org>,
-        Vincent Whitchurch <vincent.whitchurch@axis.com>
-Subject: [PATCH v5 4/4] vhost: add an RPMsg API
-Date:   Wed, 26 Aug 2020 19:46:36 +0200
-Message-Id: <20200826174636.23873-5-guennadi.liakhovetski@linux.intel.com>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200826174636.23873-1-guennadi.liakhovetski@linux.intel.com>
-References: <20200826174636.23873-1-guennadi.liakhovetski@linux.intel.com>
+        linux-tegra@vger.kernel.org, Julien Grall <julien.grall@arm.com>,
+        Thierry Reding <thierry.reding@gmail.com>,
+        Will Deacon <will@kernel.org>,
+        Jean-Philippe Brucker <jean-philippe@linaro.org>,
+        linux-samsung-soc@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
+        Krzysztof Kozlowski <krzk@kernel.org>,
+        Jonathan Hunter <jonathanh@nvidia.com>,
+        linux-rockchip@lists.infradead.org, Andy Gross <agross@kernel.org>,
+        linux-arm-kernel@lists.infradead.org, linux-s390@vger.kernel.org,
+        linux-arm-msm@vger.kernel.org, intel-gfx@lists.freedesktop.org,
+        Jani Nikula <jani.nikula@linux.intel.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        linux-mediatek@lists.infradead.org,
+        Rodrigo Vivi <rodrigo.vivi@intel.com>,
+        Matthias Brugger <matthias.bgg@gmail.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        virtualization@lists.linux-foundation.org,
+        Gerald Schaefer <gerald.schaefer@de.ibm.com>,
+        David Woodhouse <dwmw2@infradead.org>,
+        Cornelia Huck <cohuck@redhat.com>,
+        linux-kernel@vger.kernel.org, Kukjin Kim <kgene@kernel.org>,
+        Daniel Vetter <daniel@ffwll.ch>
+References: <20191221150402.13868-1-murphyt7@tcd.ie>
+From:   Robin Murphy <robin.murphy@arm.com>
+Message-ID: <03caf286-09e8-a072-8d3a-b6bcca991516@arm.com>
+Date:   Wed, 26 Aug 2020 19:14:28 +0100
+User-Agent: Mozilla/5.0 (Windows NT 10.0; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
+In-Reply-To: <20191221150402.13868-1-murphyt7@tcd.ie>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-GB
 Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Linux supports running the RPMsg protocol over the VirtIO transport
-protocol, but currently there is only support for VirtIO clients and
-no support for a VirtIO server. This patch adds a vhost-based RPMsg
-server implementation.
+Hi Tom,
 
-Signed-off-by: Guennadi Liakhovetski <guennadi.liakhovetski@linux.intel.com>
----
- drivers/vhost/Kconfig       |   7 +
- drivers/vhost/Makefile      |   3 +
- drivers/vhost/rpmsg.c       | 373 ++++++++++++++++++++++++++++++++++++
- drivers/vhost/vhost_rpmsg.h |  74 +++++++
- 4 files changed, 457 insertions(+)
- create mode 100644 drivers/vhost/rpmsg.c
- create mode 100644 drivers/vhost/vhost_rpmsg.h
+On 2019-12-21 15:03, Tom Murphy wrote:
+> This patchset converts the intel iommu driver to the dma-iommu api.
+> 
+> While converting the driver I exposed a bug in the intel i915 driver which causes a huge amount of artifacts on the screen of my laptop. You can see a picture of it here:
+> https://github.com/pippy360/kernelPatches/blob/master/IMG_20191219_225922.jpg
+> 
+> This issue is most likely in the i915 driver and is most likely caused by the driver not respecting the return value of the dma_map_ops::map_sg function. You can see the driver ignoring the return value here:
+> https://github.com/torvalds/linux/blob/7e0165b2f1a912a06e381e91f0f4e495f4ac3736/drivers/gpu/drm/i915/gem/i915_gem_dmabuf.c#L51
+> 
+> Previously this didn’t cause issues because the intel map_sg always returned the same number of elements as the input scatter gather list but with the change to this dma-iommu api this is no longer the case. I wasn’t able to track the bug down to a specific line of code unfortunately.
+> 
+> Could someone from the intel team look at this?
+> 
+> 
+> I have been testing on a lenovo x1 carbon 5th generation. Let me know if there’s any more information you need.
+> 
+> To allow my patch set to be tested I have added a patch (patch 8/8) in this series to disable combining sg segments in the dma-iommu api which fixes the bug but it doesn't fix the actual problem.
+> 
+> As part of this patch series I copied the intel bounce buffer code to the dma-iommu path. The addition of the bounce buffer code took me by surprise. I did most of my development on this patch series before the bounce buffer code was added and my reimplementation in the dma-iommu path is very rushed and not properly tested but I’m running out of time to work on this patch set.
+> 
+> On top of that I also didn’t port over the intel tracing code from this commit:
+> https://github.com/torvalds/linux/commit/3b53034c268d550d9e8522e613a14ab53b8840d8#diff-6b3e7c4993f05e76331e463ab1fc87e1
+> So all the work in that commit is now wasted. The code will need to be removed and reimplemented in the dma-iommu path. I would like to take the time to do this but I really don’t have the time at the moment and I want to get these changes out before the iommu code changes any more.
 
-diff --git a/drivers/vhost/Kconfig b/drivers/vhost/Kconfig
-index 587fbae06182..046b948fc411 100644
---- a/drivers/vhost/Kconfig
-+++ b/drivers/vhost/Kconfig
-@@ -38,6 +38,13 @@ config VHOST_NET
- 	  To compile this driver as a module, choose M here: the module will
- 	  be called vhost_net.
- 
-+config VHOST_RPMSG
-+	tristate
-+	select VHOST
-+	help
-+	  Vhost RPMsg API allows vhost drivers to communicate with VirtIO
-+	  drivers, using the RPMsg over VirtIO protocol.
-+
- config VHOST_SCSI
- 	tristate "VHOST_SCSI TCM fabric driver"
- 	depends on TARGET_CORE && EVENTFD
-diff --git a/drivers/vhost/Makefile b/drivers/vhost/Makefile
-index f3e1897cce85..9cf459d59f97 100644
---- a/drivers/vhost/Makefile
-+++ b/drivers/vhost/Makefile
-@@ -2,6 +2,9 @@
- obj-$(CONFIG_VHOST_NET) += vhost_net.o
- vhost_net-y := net.o
- 
-+obj-$(CONFIG_VHOST_RPMSG) += vhost_rpmsg.o
-+vhost_rpmsg-y := rpmsg.o
-+
- obj-$(CONFIG_VHOST_SCSI) += vhost_scsi.o
- vhost_scsi-y := scsi.o
- 
-diff --git a/drivers/vhost/rpmsg.c b/drivers/vhost/rpmsg.c
-new file mode 100644
-index 000000000000..c26d7a4afc6d
---- /dev/null
-+++ b/drivers/vhost/rpmsg.c
-@@ -0,0 +1,373 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * Copyright(c) 2020 Intel Corporation. All rights reserved.
-+ *
-+ * Author: Guennadi Liakhovetski <guennadi.liakhovetski@linux.intel.com>
-+ *
-+ * Vhost RPMsg VirtIO interface. It provides a set of functions to match the
-+ * guest side RPMsg VirtIO API, provided by drivers/rpmsg/virtio_rpmsg_bus.c
-+ * These functions handle creation of 2 virtual queues, handling of endpoint
-+ * addresses, sending a name-space announcement to the guest as well as any
-+ * user messages. This API can be used by any vhost driver to handle RPMsg
-+ * specific processing.
-+ * Specific vhost drivers, using this API will use their own VirtIO device
-+ * IDs, that should then also be added to the ID table in virtio_rpmsg_bus.c
-+ */
-+
-+#include <linux/compat.h>
-+#include <linux/file.h>
-+#include <linux/miscdevice.h>
-+#include <linux/module.h>
-+#include <linux/mutex.h>
-+#include <linux/vhost.h>
-+#include <linux/virtio_rpmsg.h>
-+#include <uapi/linux/rpmsg.h>
-+
-+#include "vhost.h"
-+#include "vhost_rpmsg.h"
-+
-+/*
-+ * All virtio-rpmsg virtual queue kicks always come with just one buffer -
-+ * either input or output, but we can also handle split messages
-+ */
-+static int vhost_rpmsg_get_msg(struct vhost_virtqueue *vq, unsigned int *cnt)
-+{
-+	struct vhost_rpmsg *vr = container_of(vq->dev, struct vhost_rpmsg, dev);
-+	unsigned int out, in;
-+	int head = vhost_get_vq_desc(vq, vq->iov, ARRAY_SIZE(vq->iov), &out, &in,
-+				     NULL, NULL);
-+	if (head < 0) {
-+		vq_err(vq, "%s(): error %d getting buffer\n",
-+		       __func__, head);
-+		return head;
-+	}
-+
-+	/* Nothing new? */
-+	if (head == vq->num)
-+		return head;
-+
-+	if (vq == &vr->vq[VIRTIO_RPMSG_RESPONSE]) {
-+		if (out) {
-+			vq_err(vq, "%s(): invalid %d output in response queue\n",
-+			       __func__, out);
-+			goto return_buf;
-+		}
-+
-+		*cnt = in;
-+	}
-+
-+	if (vq == &vr->vq[VIRTIO_RPMSG_REQUEST]) {
-+		if (in) {
-+			vq_err(vq, "%s(): invalid %d input in request queue\n",
-+		       __func__, in);
-+			goto return_buf;
-+		}
-+
-+		*cnt = out;
-+	}
-+
-+	return head;
-+
-+return_buf:
-+	vhost_add_used(vq, head, 0);
-+
-+	return -EINVAL;
-+}
-+
-+static const struct vhost_rpmsg_ept *vhost_rpmsg_ept_find(struct vhost_rpmsg *vr, int addr)
-+{
-+	unsigned int i;
-+
-+	for (i = 0; i < vr->n_epts; i++)
-+		if (vr->ept[i].addr == addr)
-+			return vr->ept + i;
-+
-+	return NULL;
-+}
-+
-+/*
-+ * if len < 0, then for reading a request, the complete virtual queue buffer
-+ * size is prepared, for sending a response, the length in the iterator is used
-+ */
-+int vhost_rpmsg_start_lock(struct vhost_rpmsg *vr, struct vhost_rpmsg_iter *iter,
-+			   unsigned int qid, ssize_t len)
-+	__acquires(vq->mutex)
-+{
-+	struct vhost_virtqueue *vq = vr->vq + qid;
-+	unsigned int cnt;
-+	ssize_t ret;
-+	size_t tmp;
-+
-+	if (qid >= VIRTIO_RPMSG_NUM_OF_VQS)
-+		return -EINVAL;
-+
-+	iter->vq = vq;
-+
-+	mutex_lock(&vq->mutex);
-+	vhost_disable_notify(&vr->dev, vq);
-+
-+	iter->head = vhost_rpmsg_get_msg(vq, &cnt);
-+	if (iter->head == vq->num)
-+		iter->head = -EAGAIN;
-+
-+	if (iter->head < 0) {
-+		ret = iter->head;
-+		goto unlock;
-+	}
-+
-+	tmp = iov_length(vq->iov, cnt);
-+	if (tmp < sizeof(iter->rhdr)) {
-+		vq_err(vq, "%s(): size %zu too small\n", __func__, tmp);
-+		ret = -ENOBUFS;
-+		goto return_buf;
-+	}
-+
-+	switch (qid) {
-+	case VIRTIO_RPMSG_REQUEST:
-+		if (len >= 0) {
-+			if (tmp < sizeof(iter->rhdr) + len) {
-+				ret = -ENOBUFS;
-+				goto return_buf;
-+			}
-+
-+			tmp = len + sizeof(iter->rhdr);
-+		}
-+
-+		/* len is now the size of the payload */
-+		iov_iter_init(&iter->iov_iter, WRITE, vq->iov, cnt, tmp);
-+
-+		/* Read the RPMSG header with endpoint addresses */
-+		tmp = copy_from_iter(&iter->rhdr, sizeof(iter->rhdr), &iter->iov_iter);
-+		if (tmp != sizeof(iter->rhdr)) {
-+			vq_err(vq, "%s(): got %zu instead of %zu\n", __func__,
-+			       tmp, sizeof(iter->rhdr));
-+			ret = -EIO;
-+			goto return_buf;
-+		}
-+
-+		iter->ept = vhost_rpmsg_ept_find(vr, vhost32_to_cpu(vq, iter->rhdr.dst));
-+		if (!iter->ept) {
-+			vq_err(vq, "%s(): no endpoint with address %d\n",
-+			       __func__, vhost32_to_cpu(vq, iter->rhdr.dst));
-+			ret = -ENOENT;
-+			goto return_buf;
-+		}
-+
-+		/* Let the endpoint read the payload */
-+		if (iter->ept->read) {
-+			ret = iter->ept->read(vr, iter);
-+			if (ret < 0)
-+				goto return_buf;
-+
-+			iter->rhdr.len = cpu_to_vhost16(vq, ret);
-+		} else {
-+			iter->rhdr.len = 0;
-+		}
-+
-+		/* Prepare for the response phase */
-+		iter->rhdr.dst = iter->rhdr.src;
-+		iter->rhdr.src = cpu_to_vhost32(vq, iter->ept->addr);
-+
-+		break;
-+	case VIRTIO_RPMSG_RESPONSE:
-+		if (!iter->ept && iter->rhdr.dst != cpu_to_vhost32(vq, RPMSG_NS_ADDR)) {
-+			/*
-+			 * Usually the iterator is configured when processing a
-+			 * message on the request queue, but it's also possible
-+			 * to send a message on the response queue without a
-+			 * preceding request, in that case the iterator must
-+			 * contain source and destination addresses.
-+			 */
-+			iter->ept = vhost_rpmsg_ept_find(vr, vhost32_to_cpu(vq, iter->rhdr.src));
-+			if (!iter->ept) {
-+				ret = -ENOENT;
-+				goto return_buf;
-+			}
-+		}
-+
-+		if (len >= 0) {
-+			if (tmp < sizeof(iter->rhdr) + len) {
-+				ret = -ENOBUFS;
-+				goto return_buf;
-+			}
-+
-+			iter->rhdr.len = cpu_to_vhost16(vq, len);
-+			tmp = len + sizeof(iter->rhdr);
-+		}
-+
-+		/* len is now the size of the payload */
-+		iov_iter_init(&iter->iov_iter, READ, vq->iov, cnt, tmp);
-+
-+		/* Write the RPMSG header with endpoint addresses */
-+		tmp = copy_to_iter(&iter->rhdr, sizeof(iter->rhdr), &iter->iov_iter);
-+		if (tmp != sizeof(iter->rhdr)) {
-+			ret = -EIO;
-+			goto return_buf;
-+		}
-+
-+		/* Let the endpoint write the payload */
-+		if (iter->ept && iter->ept->write) {
-+			ret = iter->ept->write(vr, iter);
-+			if (ret < 0)
-+				goto return_buf;
-+		}
-+
-+		break;
-+	}
-+
-+	return 0;
-+
-+return_buf:
-+	vhost_add_used(vq, iter->head, 0);
-+unlock:
-+	vhost_enable_notify(&vr->dev, vq);
-+	mutex_unlock(&vq->mutex);
-+
-+	return ret;
-+}
-+EXPORT_SYMBOL_GPL(vhost_rpmsg_start_lock);
-+
-+size_t vhost_rpmsg_copy(struct vhost_rpmsg *vr, struct vhost_rpmsg_iter *iter,
-+			void *data, size_t size)
-+{
-+	/*
-+	 * We could check for excess data, but copy_{to,from}_iter() don't do
-+	 * that either
-+	 */
-+	if (iter->vq == vr->vq + VIRTIO_RPMSG_RESPONSE)
-+		return copy_to_iter(data, size, &iter->iov_iter);
-+
-+	return copy_from_iter(data, size, &iter->iov_iter);
-+}
-+EXPORT_SYMBOL_GPL(vhost_rpmsg_copy);
-+
-+int vhost_rpmsg_finish_unlock(struct vhost_rpmsg *vr,
-+			      struct vhost_rpmsg_iter *iter)
-+	__releases(vq->mutex)
-+{
-+	if (iter->head >= 0)
-+		vhost_add_used_and_signal(iter->vq->dev, iter->vq, iter->head,
-+					  vhost16_to_cpu(iter->vq, iter->rhdr.len) +
-+					  sizeof(iter->rhdr));
-+
-+	vhost_enable_notify(&vr->dev, iter->vq);
-+	mutex_unlock(&iter->vq->mutex);
-+
-+	return iter->head;
-+}
-+EXPORT_SYMBOL_GPL(vhost_rpmsg_finish_unlock);
-+
-+/*
-+ * Return false to terminate the external loop only if we fail to obtain either
-+ * a request or a response buffer
-+ */
-+static bool handle_rpmsg_req_single(struct vhost_rpmsg *vr,
-+				    struct vhost_virtqueue *vq)
-+{
-+	struct vhost_rpmsg_iter iter;
-+	int ret = vhost_rpmsg_start_lock(vr, &iter, VIRTIO_RPMSG_REQUEST, -EINVAL);
-+	if (!ret)
-+		ret = vhost_rpmsg_finish_unlock(vr, &iter);
-+	if (ret < 0) {
-+		if (ret != -EAGAIN)
-+			vq_err(vq, "%s(): RPMSG processing failed %d\n",
-+			       __func__, ret);
-+		return false;
-+	}
-+
-+	if (!iter.ept->write)
-+		return true;
-+
-+	ret = vhost_rpmsg_start_lock(vr, &iter, VIRTIO_RPMSG_RESPONSE, -EINVAL);
-+	if (!ret)
-+		ret = vhost_rpmsg_finish_unlock(vr, &iter);
-+	if (ret < 0) {
-+		vq_err(vq, "%s(): RPMSG finalising failed %d\n", __func__, ret);
-+		return false;
-+	}
-+
-+	return true;
-+}
-+
-+static void handle_rpmsg_req_kick(struct vhost_work *work)
-+{
-+	struct vhost_virtqueue *vq = container_of(work, struct vhost_virtqueue,
-+						  poll.work);
-+	struct vhost_rpmsg *vr = container_of(vq->dev, struct vhost_rpmsg, dev);
-+
-+	while (handle_rpmsg_req_single(vr, vq))
-+		;
-+}
-+
-+/*
-+ * initialise two virtqueues with an array of endpoints,
-+ * request and response callbacks
-+ */
-+void vhost_rpmsg_init(struct vhost_rpmsg *vr, const struct vhost_rpmsg_ept *ept,
-+		      unsigned int n_epts)
-+{
-+	unsigned int i;
-+
-+	for (i = 0; i < ARRAY_SIZE(vr->vq); i++)
-+		vr->vq_p[i] = &vr->vq[i];
-+
-+	/* vq[0]: host -> guest, vq[1]: host <- guest */
-+	vr->vq[VIRTIO_RPMSG_REQUEST].handle_kick = handle_rpmsg_req_kick;
-+	vr->vq[VIRTIO_RPMSG_RESPONSE].handle_kick = NULL;
-+
-+	vr->ept = ept;
-+	vr->n_epts = n_epts;
-+
-+	vhost_dev_init(&vr->dev, vr->vq_p, VIRTIO_RPMSG_NUM_OF_VQS,
-+		       UIO_MAXIOV, 0, 0, true, NULL);
-+}
-+EXPORT_SYMBOL_GPL(vhost_rpmsg_init);
-+
-+void vhost_rpmsg_destroy(struct vhost_rpmsg *vr)
-+{
-+	if (vhost_dev_has_owner(&vr->dev))
-+		vhost_poll_flush(&vr->vq[VIRTIO_RPMSG_REQUEST].poll);
-+
-+	vhost_dev_cleanup(&vr->dev);
-+}
-+EXPORT_SYMBOL_GPL(vhost_rpmsg_destroy);
-+
-+/* send namespace */
-+int vhost_rpmsg_ns_announce(struct vhost_rpmsg *vr, const char *name, unsigned int src)
-+{
-+	struct vhost_virtqueue *vq = &vr->vq[VIRTIO_RPMSG_RESPONSE];
-+	struct vhost_rpmsg_iter iter = {
-+		.rhdr = {
-+			.src = 0,
-+			.dst = cpu_to_vhost32(vq, RPMSG_NS_ADDR),
-+			.flags = cpu_to_vhost16(vq, RPMSG_NS_CREATE), /* rpmsg_recv_single() */
-+		},
-+	};
-+	struct rpmsg_ns_msg ns = {
-+		.addr = cpu_to_vhost32(vq, src),
-+		.flags = cpu_to_vhost32(vq, RPMSG_NS_CREATE), /* for rpmsg_ns_cb() */
-+	};
-+	int ret = vhost_rpmsg_start_lock(vr, &iter, VIRTIO_RPMSG_RESPONSE, sizeof(ns));
-+
-+	if (ret < 0)
-+		return ret;
-+
-+	strlcpy(ns.name, name, sizeof(ns.name));
-+
-+	ret = vhost_rpmsg_copy(vr, &iter, &ns, sizeof(ns));
-+	if (ret != sizeof(ns))
-+		vq_err(iter.vq, "%s(): added %d instead of %zu bytes\n",
-+		       __func__, ret, sizeof(ns));
-+
-+	ret = vhost_rpmsg_finish_unlock(vr, &iter);
-+	if (ret < 0)
-+		vq_err(iter.vq, "%s(): namespace announcement failed: %d\n",
-+		       __func__, ret);
-+
-+	return ret;
-+}
-+EXPORT_SYMBOL_GPL(vhost_rpmsg_ns_announce);
-+
-+MODULE_LICENSE("GPL v2");
-+MODULE_AUTHOR("Intel, Inc.");
-+MODULE_DESCRIPTION("Vhost RPMsg API");
-diff --git a/drivers/vhost/vhost_rpmsg.h b/drivers/vhost/vhost_rpmsg.h
-new file mode 100644
-index 000000000000..30072cecb8a0
---- /dev/null
-+++ b/drivers/vhost/vhost_rpmsg.h
-@@ -0,0 +1,74 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+/*
-+ * Copyright(c) 2020 Intel Corporation. All rights reserved.
-+ *
-+ * Author: Guennadi Liakhovetski <guennadi.liakhovetski@linux.intel.com>
-+ */
-+
-+#ifndef VHOST_RPMSG_H
-+#define VHOST_RPMSG_H
-+
-+#include <linux/uio.h>
-+#include <linux/virtio_rpmsg.h>
-+
-+#include "vhost.h"
-+
-+/* RPMsg uses two VirtQueues: one for each direction */
-+enum {
-+	VIRTIO_RPMSG_RESPONSE,	/* RPMsg response (host->guest) buffers */
-+	VIRTIO_RPMSG_REQUEST,	/* RPMsg request (guest->host) buffers */
-+	/* Keep last */
-+	VIRTIO_RPMSG_NUM_OF_VQS,
-+};
-+
-+struct vhost_rpmsg_ept;
-+
-+struct vhost_rpmsg_iter {
-+	struct iov_iter iov_iter;
-+	struct rpmsg_hdr rhdr;
-+	struct vhost_virtqueue *vq;
-+	const struct vhost_rpmsg_ept *ept;
-+	int head;
-+	void *priv;
-+};
-+
-+struct vhost_rpmsg {
-+	struct vhost_dev dev;
-+	struct vhost_virtqueue vq[VIRTIO_RPMSG_NUM_OF_VQS];
-+	struct vhost_virtqueue *vq_p[VIRTIO_RPMSG_NUM_OF_VQS];
-+	const struct vhost_rpmsg_ept *ept;
-+	unsigned int n_epts;
-+};
-+
-+struct vhost_rpmsg_ept {
-+	ssize_t (*read)(struct vhost_rpmsg *, struct vhost_rpmsg_iter *);
-+	ssize_t (*write)(struct vhost_rpmsg *, struct vhost_rpmsg_iter *);
-+	int addr;
-+};
-+
-+static inline size_t vhost_rpmsg_iter_len(const struct vhost_rpmsg_iter *iter)
-+{
-+	return iter->rhdr.len;
-+}
-+
-+#define VHOST_RPMSG_ITER(_vq, _src, _dst) {			\
-+	.rhdr = {						\
-+			.src = cpu_to_vhost32(_vq, _src),	\
-+			.dst = cpu_to_vhost32(_vq, _dst),	\
-+		},						\
-+	}
-+
-+void vhost_rpmsg_init(struct vhost_rpmsg *vr, const struct vhost_rpmsg_ept *ept,
-+		      unsigned int n_epts);
-+void vhost_rpmsg_destroy(struct vhost_rpmsg *vr);
-+int vhost_rpmsg_ns_announce(struct vhost_rpmsg *vr, const char *name,
-+			    unsigned int src);
-+int vhost_rpmsg_start_lock(struct vhost_rpmsg *vr,
-+			   struct vhost_rpmsg_iter *iter,
-+			   unsigned int qid, ssize_t len);
-+size_t vhost_rpmsg_copy(struct vhost_rpmsg *vr, struct vhost_rpmsg_iter *iter,
-+			void *data, size_t size);
-+int vhost_rpmsg_finish_unlock(struct vhost_rpmsg *vr,
-+			      struct vhost_rpmsg_iter *iter);
-+
-+#endif
--- 
-2.28.0
+Further to what we just discussed at LPC, I've realised that tracepoints 
+are actually something I could do with *right now* for debugging my Arm 
+DMA ops series, so if I'm going to hack something up anyway I may as 
+well take responsibility for polishing it into a proper patch as well :)
 
+Robin.
+
+> 
+> Tom Murphy (8):
+>    iommu/vt-d: clean up 32bit si_domain assignment
+>    iommu/vt-d: Use default dma_direct_* mapping functions for direct
+>      mapped devices
+>    iommu/vt-d: Remove IOVA handling code from non-dma_ops path
+>    iommu: Handle freelists when using deferred flushing in iommu drivers
+>    iommu: Add iommu_dma_free_cpu_cached_iovas function
+>    iommu: allow the dma-iommu api to use bounce buffers
+>    iommu/vt-d: Convert intel iommu driver to the iommu ops
+>    DO NOT MERGE: iommu: disable list appending in dma-iommu
+> 
+>   drivers/iommu/Kconfig           |   1 +
+>   drivers/iommu/amd_iommu.c       |  14 +-
+>   drivers/iommu/arm-smmu-v3.c     |   3 +-
+>   drivers/iommu/arm-smmu.c        |   3 +-
+>   drivers/iommu/dma-iommu.c       | 183 +++++--
+>   drivers/iommu/exynos-iommu.c    |   3 +-
+>   drivers/iommu/intel-iommu.c     | 936 ++++----------------------------
+>   drivers/iommu/iommu.c           |  39 +-
+>   drivers/iommu/ipmmu-vmsa.c      |   3 +-
+>   drivers/iommu/msm_iommu.c       |   3 +-
+>   drivers/iommu/mtk_iommu.c       |   3 +-
+>   drivers/iommu/mtk_iommu_v1.c    |   3 +-
+>   drivers/iommu/omap-iommu.c      |   3 +-
+>   drivers/iommu/qcom_iommu.c      |   3 +-
+>   drivers/iommu/rockchip-iommu.c  |   3 +-
+>   drivers/iommu/s390-iommu.c      |   3 +-
+>   drivers/iommu/tegra-gart.c      |   3 +-
+>   drivers/iommu/tegra-smmu.c      |   3 +-
+>   drivers/iommu/virtio-iommu.c    |   3 +-
+>   drivers/vfio/vfio_iommu_type1.c |   2 +-
+>   include/linux/dma-iommu.h       |   3 +
+>   include/linux/intel-iommu.h     |   1 -
+>   include/linux/iommu.h           |  32 +-
+>   23 files changed, 345 insertions(+), 908 deletions(-)
+> 
