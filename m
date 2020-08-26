@@ -2,104 +2,149 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E8A182530BF
-	for <lists+kvm@lfdr.de>; Wed, 26 Aug 2020 15:57:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9F85F2531E9
+	for <lists+kvm@lfdr.de>; Wed, 26 Aug 2020 16:50:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730541AbgHZN5F (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 26 Aug 2020 09:57:05 -0400
-Received: from szxga02-in.huawei.com ([45.249.212.188]:3075 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1730520AbgHZN5B (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 26 Aug 2020 09:57:01 -0400
-Received: from dggeml406-hub.china.huawei.com (unknown [172.30.72.56])
-        by Forcepoint Email with ESMTP id 280655977C8843E0192B;
-        Wed, 26 Aug 2020 21:56:54 +0800 (CST)
-Received: from DGGEML423-HUB.china.huawei.com (10.1.199.40) by
- dggeml406-hub.china.huawei.com (10.3.17.50) with Microsoft SMTP Server (TLS)
- id 14.3.487.0; Wed, 26 Aug 2020 21:56:53 +0800
-Received: from DGGEML524-MBX.china.huawei.com ([169.254.1.71]) by
- dggeml423-hub.china.huawei.com ([10.1.199.40]) with mapi id 14.03.0487.000;
- Wed, 26 Aug 2020 21:56:43 +0800
-From:   "Maoming (maoming, Cloud Infrastructure Service Product Dept.)" 
-        <maoming.maoming@huawei.com>
-To:     Peter Xu <peterx@redhat.com>
-CC:     "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "cohuck@redhat.com" <cohuck@redhat.com>,
-        "Zhoujian (jay)" <jianjay.zhou@huawei.com>,
-        "Huangweidong (C)" <weidong.huang@huawei.com>,
-        "aarcange@redhat.com" <aarcange@redhat.com>,
-        wangyunjian <wangyunjian@huawei.com>
-Subject: =?utf-8?B?562U5aSNOiBbUEFUQ0ggVjJdIHZmaW8gZG1hX21hcC91bm1hcDogb3B0aW1p?=
- =?utf-8?Q?zed_for_hugetlbfs_pages?=
-Thread-Topic: [PATCH V2] vfio dma_map/unmap: optimized for hugetlbfs pages
-Thread-Index: AQHWcePn246e6Z2xQkKwoyKqsTP1MqlI20CAgAGejeA=
-Date:   Wed, 26 Aug 2020 13:56:43 +0000
-Message-ID: <8B561EC9A4D13649A62CF60D3A8E8CB28C2D9ABB@dggeml524-mbx.china.huawei.com>
-References: <20200814023729.2270-1-maoming.maoming@huawei.com>
- <20200825205907.GB8235@xz-x1>
-In-Reply-To: <20200825205907.GB8235@xz-x1>
-Accept-Language: en-US
-Content-Language: zh-CN
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.174.151.129]
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+        id S1726946AbgHZOuG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 26 Aug 2020 10:50:06 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:56720 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727897AbgHZOt7 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 26 Aug 2020 10:49:59 -0400
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 07QEiHGV129989;
+        Wed, 26 Aug 2020 10:49:54 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=FAa4RpnCZuYK+s+ZNYXHPAGY6k5np3T/aNePxfajimw=;
+ b=mUgBvapbVqImeBl2yNFuD1RSCWJlJFK4C3Fhw6W02LUIcwhlD/KEvTn4dtF9CPusMO8A
+ xHnoY0GfNPbY5be7dHMof775eYY1i7k9X/74sWA+mmK2+EJbdEOnLBCfvd4G8wfQnUBO
+ PAKkwv+kNPaSI3s1gvQUyb+j58nh6qT45OSKHwz9gpz/CrxOnZi0e1PdTy5zlBvTnnLe
+ +oEJHnNga72aWe6qUsmbRilPh8Jdq4QHnwMBbXuwZUFyiLk2vuYB81rpFZlx8CthBnQE
+ qT4CetzXBwq94aWKisyWpIlb+HFFkkz/Ph7VQU91ET7ERYXqEUxqys+Z0Xd1mfDlWbjK xQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 335srnr5mm-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 26 Aug 2020 10:49:54 -0400
+Received: from m0098396.ppops.net (m0098396.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 07QEjegj133786;
+        Wed, 26 Aug 2020 10:49:54 -0400
+Received: from ppma02wdc.us.ibm.com (aa.5b.37a9.ip4.static.sl-reverse.com [169.55.91.170])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 335srnr5m0-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 26 Aug 2020 10:49:53 -0400
+Received: from pps.filterd (ppma02wdc.us.ibm.com [127.0.0.1])
+        by ppma02wdc.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 07QEmXBB014148;
+        Wed, 26 Aug 2020 14:49:52 GMT
+Received: from b03cxnp08027.gho.boulder.ibm.com (b03cxnp08027.gho.boulder.ibm.com [9.17.130.19])
+        by ppma02wdc.us.ibm.com with ESMTP id 332ujqamn5-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 26 Aug 2020 14:49:52 +0000
+Received: from b03ledav001.gho.boulder.ibm.com (b03ledav001.gho.boulder.ibm.com [9.17.130.232])
+        by b03cxnp08027.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 07QEnjss33292604
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 26 Aug 2020 14:49:46 GMT
+Received: from b03ledav001.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 014B46E053;
+        Wed, 26 Aug 2020 14:49:49 +0000 (GMT)
+Received: from b03ledav001.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id AEEAC6E050;
+        Wed, 26 Aug 2020 14:49:47 +0000 (GMT)
+Received: from cpe-172-100-175-116.stny.res.rr.com (unknown [9.85.170.64])
+        by b03ledav001.gho.boulder.ibm.com (Postfix) with ESMTP;
+        Wed, 26 Aug 2020 14:49:47 +0000 (GMT)
+Subject: Re: [PATCH v10 01/16] s390/vfio-ap: add version vfio_ap module
+To:     Cornelia Huck <cohuck@redhat.com>
+Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, freude@linux.ibm.com, borntraeger@de.ibm.com,
+        mjrosato@linux.ibm.com, pasic@linux.ibm.com,
+        alex.williamson@redhat.com, kwankhede@nvidia.com,
+        fiuczy@linux.ibm.com, frankja@linux.ibm.com, david@redhat.com,
+        imbrenda@linux.ibm.com, hca@linux.ibm.com, gor@linux.ibm.com
+References: <20200821195616.13554-1-akrowiak@linux.ibm.com>
+ <20200821195616.13554-2-akrowiak@linux.ibm.com>
+ <20200825120432.13a1b444.cohuck@redhat.com>
+From:   Tony Krowiak <akrowiak@linux.ibm.com>
+Message-ID: <ca016eca-1ee7-2d0f-c2ec-3ef147b6216a@linux.ibm.com>
+Date:   Wed, 26 Aug 2020 10:49:47 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-X-CFilter-Loop: Reflected
+In-Reply-To: <20200825120432.13a1b444.cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
+ definitions=2020-08-26_09:2020-08-26,2020-08-26 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0
+ lowpriorityscore=0 phishscore=0 mlxlogscore=999 priorityscore=1501
+ bulkscore=0 impostorscore=0 clxscore=1015 adultscore=0 suspectscore=3
+ mlxscore=0 spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2006250000 definitions=main-2008260110
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-DQoNCg0KDQotLS0tLemCruS7tuWOn+S7ti0tLS0tDQrlj5Hku7bkuro6IFBldGVyIFh1IFttYWls
-dG86cGV0ZXJ4QHJlZGhhdC5jb21dIA0K5Y+R6YCB5pe26Ze0OiAyMDIw5bm0OOaciDI25pelIDQ6
-NTkNCuaUtuS7tuS6ujogTWFvbWluZyAobWFvbWluZywgQ2xvdWQgSW5mcmFzdHJ1Y3R1cmUgU2Vy
-dmljZSBQcm9kdWN0IERlcHQuKSA8bWFvbWluZy5tYW9taW5nQGh1YXdlaS5jb20+DQrmioTpgIE6
-IGxpbnV4LWtlcm5lbEB2Z2VyLmtlcm5lbC5vcmc7IGt2bUB2Z2VyLmtlcm5lbC5vcmc7IGFsZXgu
-d2lsbGlhbXNvbkByZWRoYXQuY29tOyBjb2h1Y2tAcmVkaGF0LmNvbTsgWmhvdWppYW4gKGpheSkg
-PGppYW5qYXkuemhvdUBodWF3ZWkuY29tPjsgSHVhbmd3ZWlkb25nIChDKSA8d2VpZG9uZy5odWFu
-Z0BodWF3ZWkuY29tPjsgYWFyY2FuZ2VAcmVkaGF0LmNvbQ0K5Li76aKYOiBSZTogW1BBVENIIFYy
-XSB2ZmlvIGRtYV9tYXAvdW5tYXA6IG9wdGltaXplZCBmb3IgaHVnZXRsYmZzIHBhZ2VzDQoNCk9u
-IEZyaSwgQXVnIDE0LCAyMDIwIGF0IDEwOjM3OjI5QU0gKzA4MDAsIE1pbmcgTWFvIHdyb3RlOg0K
-PiArc3RhdGljIGxvbmcgaHVnZXRsYl9wYWdlX3ZhZGRyX2dldF9wZm4odW5zaWduZWQgbG9uZyB2
-YWRkciwgbG9uZyBucGFnZSwNCj4gKwkJCQkJCXVuc2lnbmVkIGxvbmcgcGZuKQ0KPiArew0KPiAr
-CWxvbmcgaHVnZXRsYl9yZXNpZHVhbF9ucGFnZTsNCj4gKwlsb25nIGNvbnRpZ3VvdXNfbnBhZ2U7
-DQo+ICsJc3RydWN0IHBhZ2UgKmhlYWQgPSBjb21wb3VuZF9oZWFkKHBmbl90b19wYWdlKHBmbikp
-Ow0KPiArDQo+ICsJLyoNCj4gKwkgKiBJZiBwZm4gaXMgdmFsaWQsDQo+ICsJICogaHVnZXRsYl9y
-ZXNpZHVhbF9ucGFnZSBpcyBncmVhdGVyIHRoYW4gb3IgZXF1YWwgdG8gMS4NCj4gKwkgKi8NCj4g
-KwlodWdldGxiX3Jlc2lkdWFsX25wYWdlID0gaHVnZXRsYl9nZXRfcmVzaWR1YWxfcGFnZXModmFk
-ZHIsDQo+ICsJCQkJCQljb21wb3VuZF9vcmRlcihoZWFkKSk7DQo+ICsJaWYgKGh1Z2V0bGJfcmVz
-aWR1YWxfbnBhZ2UgPCAwKQ0KPiArCQlyZXR1cm4gLTE7DQo+ICsNCj4gKwkvKiBUaGUgcGFnZSBv
-ZiB2YWRkciBoYXMgYmVlbiBnb3R0ZW4gYnkgdmFkZHJfZ2V0X3BmbiAqLw0KPiArCWNvbnRpZ3Vv
-dXNfbnBhZ2UgPSBtaW5fdChsb25nLCAoaHVnZXRsYl9yZXNpZHVhbF9ucGFnZSAtIDEpLCBucGFn
-ZSk7DQo+ICsJaWYgKCFjb250aWd1b3VzX25wYWdlKQ0KPiArCQlyZXR1cm4gMDsNCj4gKwkvKg0K
-PiArCSAqIFVubGlrZSBUSFAsIHRoZSBzcGxpdHRpbmcgc2hvdWxkIG5vdCBoYXBwZW4gZm9yIGh1
-Z2V0bGIgcGFnZXMuDQo+ICsJICogU2luY2UgUEdfcmVzZXJ2ZWQgaXMgbm90IHJlbGV2YW50IGZv
-ciBjb21wb3VuZCBwYWdlcywgYW5kIHRoZSBwZm4gb2YNCj4gKwkgKiBQQUdFX1NJWkUgcGFnZSB3
-aGljaCBpbiBodWdldGxiIHBhZ2VzIGlzIHZhbGlkLA0KPiArCSAqIGl0IGlzIG5vdCBuZWNlc3Nh
-cnkgdG8gY2hlY2sgcnN2ZCBmb3IgaHVnZXRsYiBwYWdlcy4NCj4gKwkgKiBXZSBkbyBub3QgbmVl
-ZCB0byBhbGxvYyBwYWdlcyBiZWNhdXNlIG9mIHZhZGRyIGFuZCB3ZSBjYW4gZmluaXNoIGFsbA0K
-PiArCSAqIHdvcmsgYnkgYSBzaW5nbGUgb3BlcmF0aW9uIHRvIHRoZSBoZWFkIHBhZ2UuDQo+ICsJ
-ICovDQo+ICsJYXRvbWljX2FkZChjb250aWd1b3VzX25wYWdlLCBjb21wb3VuZF9waW5jb3VudF9w
-dHIoaGVhZCkpOw0KPiArCXBhZ2VfcmVmX2FkZChoZWFkLCBjb250aWd1b3VzX25wYWdlKTsNCj4g
-Kwltb2Rfbm9kZV9wYWdlX3N0YXRlKHBhZ2VfcGdkYXQoaGVhZCksIE5SX0ZPTExfUElOX0FDUVVJ
-UkVELCANCj4gK2NvbnRpZ3VvdXNfbnBhZ2UpOw0KDQpJIHRoaW5rIEkgYXNrZWQgdGhpcyBxdWVz
-dGlvbiBpbiB2MSwgYnV0IEkgZGlkbid0IGdldCBhbnkgYW5zd2VyLi4uIFNvIEknbSB0cnlpbmcg
-YWdhaW4uLi4NCg0KQ291bGQgSSBhc2sgd2h5IG1hbnVhbCByZWZlcmVuY2luZyBvZiBwYWdlcyBp
-cyBkb25lIGhlcmUgcmF0aGVyIHRoYW4gdXNpbmcNCnBpbl91c2VyX3BhZ2VzX3JlbW90ZSgpIGp1
-c3QgbGlrZSB3aGF0IHdlJ3ZlIGRvbmUgd2l0aCB2YWRkcl9nZXRfcGZuKCksIGFuZCBsZXQNCnRy
-eV9ncmFiX3BhZ2UoKSB0byBkbyB0aGUgcGFnZSByZWZlcmVuY2UgYW5kIGFjY291bnRpbmdzPw0K
-DQpJIGZlZWwgbGlrZSB0aGlzIGF0IGxlYXN0IGlzIGFnYWluc3QgdGhlIEZPTExfUElOIHdvcmtm
-bG93IG9mIGd1cCwgYmVjYXVzZSB0aG9zZSBGT0xMX1BJTiBwYXRocyB3ZXJlIGJ5cGFzc2VkLCBh
-ZmFpY3QuDQoNCg0KSGksDQpNeSBhcG9sb2dpZXMgZm9yIG5vdCBhbnN3ZXJpbmcgeW91ciBxdWVz
-dGlvbi4NCkFzIEkgdW5kZXJzdGFuZCwgcGluX3VzZXJfcGFnZXNfcmVtb3RlKCkgbWlnaHQgc3Bl
-bmQgbXVjaCB0aW1lLg0KQmVjYXVzZSBhbGwgUEFHRV9TSVpFLXBhZ2VzIGluIGEgaHVnZXRsYiBw
-YWdlIGFyZSBwaW5uZWQgb25lIGJ5IG9uZSBpbiBwaW5fdXNlcl9wYWdlc19yZW1vdGUoKSBhbmQg
-dHJ5X2dyYWJfcGFnZSgpLg0KU28gSSB0aGluayBtYXliZSB3ZSBjYW4gdXNlIHRoZXNlIHNpbXBs
-ZSBjb2RlIHRvIGRvIGFsbCB3b3JrLg0KQW0gSSB3cm9uZz8gQW5kIGlzIHRoZXJlIHNvbWV0aGlu
-ZyBlbHNlIHdlIGNhbiB1c2U/IEZvciBleGFtcGxlIDpwaW5fdXNlcl9wYWdlc19mYXN0KCkNCg0K
-DQo+ICsNCj4gKwlyZXR1cm4gY29udGlndW91c19ucGFnZTsNCj4gK30NCg0KLS0NClBldGVyIFh1
-DQoNCg==
+
+
+On 8/25/20 6:04 AM, Cornelia Huck wrote:
+> On Fri, 21 Aug 2020 15:56:01 -0400
+> Tony Krowiak <akrowiak@linux.ibm.com> wrote:
+>
+>> Let's set a version for the vfio_ap module so that automated regression
+>> tests can determine whether dynamic configuration tests can be run or
+>> not.
+>>
+>> Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
+>> ---
+>>   drivers/s390/crypto/vfio_ap_drv.c | 2 ++
+>>   1 file changed, 2 insertions(+)
+>>
+>> diff --git a/drivers/s390/crypto/vfio_ap_drv.c b/drivers/s390/crypto/vfio_ap_drv.c
+>> index be2520cc010b..f4ceb380dd61 100644
+>> --- a/drivers/s390/crypto/vfio_ap_drv.c
+>> +++ b/drivers/s390/crypto/vfio_ap_drv.c
+>> @@ -17,10 +17,12 @@
+>>   
+>>   #define VFIO_AP_ROOT_NAME "vfio_ap"
+>>   #define VFIO_AP_DEV_NAME "matrix"
+>> +#define VFIO_AP_MODULE_VERSION "1.2.0"
+>>   
+>>   MODULE_AUTHOR("IBM Corporation");
+>>   MODULE_DESCRIPTION("VFIO AP device driver, Copyright IBM Corp. 2018");
+>>   MODULE_LICENSE("GPL v2");
+>> +MODULE_VERSION(VFIO_AP_MODULE_VERSION);
+>>   
+>>   static struct ap_driver vfio_ap_drv;
+>>   
+> Setting a version manually has some drawbacks:
+> - tools wanting to check for capabilities need to keep track which
+>    versions support which features
+> - you need to remember to actually bump the version when adding a new,
+>    visible feature
+> (- selective downstream backports may get into a pickle, but that's
+> arguably not your problem)
+>
+> Is there no way for a tool to figure out whether this is supported?
+> E.g., via existence of a sysfs file, or via a known error that will
+> occur. If not, it's maybe better to expose known capabilities via a
+> generic interface.
+
+This patch series introduces a new mediated device sysfs attribute,
+guest_matrix, so the automated tests could check for the existence
+of that interface. The problem I have with that is it will work for
+this version of the vfio_ap device driver - which may be all that is
+ever needed - but does not account for future enhancements
+which may need to be detected by tooling or automated tests.
+It seems to me that regardless of how a tool detects whether
+a feature is supported or not, it will have to keep track of that
+somehow.
+
+Can you provide more details about this generic interface of
+which you speak?
+
+>
+
