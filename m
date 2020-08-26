@@ -2,97 +2,108 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 11525253575
-	for <lists+kvm@lfdr.de>; Wed, 26 Aug 2020 18:52:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 77ADA253617
+	for <lists+kvm@lfdr.de>; Wed, 26 Aug 2020 19:46:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727075AbgHZQwi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 26 Aug 2020 12:52:38 -0400
-Received: from mta-02.yadro.com ([89.207.88.252]:60794 "EHLO mta-01.yadro.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726739AbgHZQw3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 26 Aug 2020 12:52:29 -0400
-Received: from localhost (unknown [127.0.0.1])
-        by mta-01.yadro.com (Postfix) with ESMTP id F3AB757516;
-        Wed, 26 Aug 2020 16:52:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=yadro.com; h=
-        in-reply-to:content-disposition:content-type:content-type
-        :mime-version:references:message-id:subject:subject:from:from
-        :date:date:received:received:received; s=mta-01; t=1598460736;
-         x=1600275137; bh=i99MIP9MUcyxXBxy+VjBvjNwuYnvlahI7EoiTWJZp0Y=; b=
-        uYiTsfW/tP45enGN0RS4Sb92Hr4hAiLXZ0xH+dRAczCmcNPNaPD9aufqUnzhDtFe
-        GLduaml5o0z4Cuhp7I1ZNZhzuNaXkgU+Laxb1LSuKHhgPvbrq+HNFF/wAfhsPtyw
-        eDLAkZkQHhfqAX0mwlByOvgwNCNuVqRO43SURqjp8fc=
-X-Virus-Scanned: amavisd-new at yadro.com
-Received: from mta-01.yadro.com ([127.0.0.1])
-        by localhost (mta-01.yadro.com [127.0.0.1]) (amavisd-new, port 10024)
-        with ESMTP id ulN_RArD99Qg; Wed, 26 Aug 2020 19:52:16 +0300 (MSK)
-Received: from T-EXCH-02.corp.yadro.com (t-exch-02.corp.yadro.com [172.17.10.102])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mta-01.yadro.com (Postfix) with ESMTPS id E42CC574F6;
-        Wed, 26 Aug 2020 19:52:16 +0300 (MSK)
-Received: from localhost (172.17.204.212) by T-EXCH-02.corp.yadro.com
- (172.17.10.102) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384_P384) id 15.1.669.32; Wed, 26
- Aug 2020 19:52:16 +0300
-Date:   Wed, 26 Aug 2020 19:52:15 +0300
-From:   Roman Bolshakov <r.bolshakov@yadro.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-CC:     <kvm@vger.kernel.org>
-Subject: Re: [kvm-unit-tests PATCH 0/7] Add support for generic ELF
- cross-compiler
-Message-ID: <20200826165215.GA16356@SPB-NB-133.local>
-References: <20200810130618.16066-1-r.bolshakov@yadro.com>
+        id S1726740AbgHZRql (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 26 Aug 2020 13:46:41 -0400
+Received: from mga07.intel.com ([134.134.136.100]:49544 "EHLO mga07.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726187AbgHZRqk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 26 Aug 2020 13:46:40 -0400
+IronPort-SDR: gpce1UmP34tPutiLd6xAsI70/cckO4WHcFg4mgpJVMcM1r/4+y8Ll/1UP2jFdhFWcdLiC2k3pm
+ Im9ForHRWGhg==
+X-IronPort-AV: E=McAfee;i="6000,8403,9725"; a="220607111"
+X-IronPort-AV: E=Sophos;i="5.76,356,1592895600"; 
+   d="scan'208";a="220607111"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga006.jf.intel.com ([10.7.209.51])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Aug 2020 10:46:40 -0700
+IronPort-SDR: NvVKc6XJtzEuvejT10T0ZfgUmLOsrZhgFX0TcsLcHbcsrq3JnXyqD5FwhmIvmidyChl+uEYnqe
+ KndxEbdQSPsg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.76,356,1592895600"; 
+   d="scan'208";a="299553450"
+Received: from gliakhov-mobl2.ger.corp.intel.com (HELO ubuntu.ger.corp.intel.com) ([10.252.54.141])
+  by orsmga006.jf.intel.com with ESMTP; 26 Aug 2020 10:46:37 -0700
+From:   Guennadi Liakhovetski <guennadi.liakhovetski@linux.intel.com>
+To:     kvm@vger.kernel.org
+Cc:     linux-remoteproc@vger.kernel.org,
+        virtualization@lists.linux-foundation.org,
+        sound-open-firmware@alsa-project.org,
+        Pierre-Louis Bossart <pierre-louis.bossart@linux.intel.com>,
+        Liam Girdwood <liam.r.girdwood@linux.intel.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Ohad Ben-Cohen <ohad@wizery.com>,
+        Bjorn Andersson <bjorn.andersson@linaro.org>,
+        Mathieu Poirier <mathieu.poirier@linaro.org>,
+        Vincent Whitchurch <vincent.whitchurch@axis.com>
+Subject: [PATCH v5 0/4] Add a vhost RPMsg API
+Date:   Wed, 26 Aug 2020 19:46:32 +0200
+Message-Id: <20200826174636.23873-1-guennadi.liakhovetski@linux.intel.com>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20200810130618.16066-1-r.bolshakov@yadro.com>
-X-Originating-IP: [172.17.204.212]
-X-ClientProxiedBy: T-EXCH-01.corp.yadro.com (172.17.10.101) To
- T-EXCH-02.corp.yadro.com (172.17.10.102)
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Aug 10, 2020 at 04:06:11PM +0300, Roman Bolshakov wrote:
-> The series introduces a way to build the tests with generic i686-pc-elf
-> and x86_64-pc-elf GCC target. It also fixes build on macOS and
-> introduces a way to specify enhanced getopt. Build instructions for macOS
-> have been updated to reflect the changes.
-> 
-> Roman Bolshakov (7):
->   x86: Makefile: Allow division on x86_64-elf binutils
->   x86: Replace instruction prefixes with spaces
->   x86: Makefile: Fix linkage of realmode on x86_64-elf binutils
->   lib: Bundle debugreg.h from the kernel
->   lib: x86: Use portable format macros for uint32_t
->   configure: Add an option to specify getopt
->   README: Update build instructions for macOS
-> 
->  README.macOS.md        | 71 +++++++++++++++++++++++++-----------
->  configure              | 13 +++++++
->  lib/pci.c              |  2 +-
->  lib/x86/asm/debugreg.h | 81 ++++++++++++++++++++++++++++++++++++++++++
->  run_tests.sh           |  2 +-
->  x86/Makefile           |  2 ++
->  x86/Makefile.common    |  3 +-
->  x86/asyncpf.c          |  2 +-
->  x86/cstart.S           |  4 +--
->  x86/cstart64.S         |  4 +--
->  x86/emulator.c         | 38 ++++++++++----------
->  x86/msr.c              |  3 +-
->  x86/s3.c               |  2 +-
->  13 files changed, 178 insertions(+), 49 deletions(-)
->  create mode 100644 lib/x86/asm/debugreg.h
-> 
-> -- 
-> 2.26.1
-> 
+Hi,
 
-Hi Paolo,
+Next update:
 
-could you please take a look?
+v5:
+- don't hard-code message layout
 
-Best Regards,
-Roman
+v4:
+- add endianness conversions to comply with the VirtIO standard
+
+v3:
+- address several checkpatch warnings
+- address comments from Mathieu Poirier
+
+v2:
+- update patch #5 with a correct vhost_dev_init() prototype
+- drop patch #6 - it depends on a different patch, that is currently
+  an RFC
+- address comments from Pierre-Louis Bossart:
+  * remove "default n" from Kconfig
+
+Linux supports RPMsg over VirtIO for "remote processor" / AMP use
+cases. It can however also be used for virtualisation scenarios,
+e.g. when using KVM to run Linux on both the host and the guests.
+This patch set adds a wrapper API to facilitate writing vhost
+drivers for such RPMsg-based solutions. The first use case is an
+audio DSP virtualisation project, currently under development, ready
+for review and submission, available at
+https://github.com/thesofproject/linux/pull/1501/commits
+
+Thanks
+Guennadi
+
+Guennadi Liakhovetski (4):
+  vhost: convert VHOST_VSOCK_SET_RUNNING to a generic ioctl
+  rpmsg: move common structures and defines to headers
+  rpmsg: update documentation
+  vhost: add an RPMsg API
+
+ Documentation/rpmsg.txt          |   6 +-
+ drivers/rpmsg/virtio_rpmsg_bus.c |  78 +------
+ drivers/vhost/Kconfig            |   7 +
+ drivers/vhost/Makefile           |   3 +
+ drivers/vhost/rpmsg.c            | 373 +++++++++++++++++++++++++++++++
+ drivers/vhost/vhost_rpmsg.h      |  74 ++++++
+ include/linux/virtio_rpmsg.h     |  83 +++++++
+ include/uapi/linux/rpmsg.h       |   3 +
+ include/uapi/linux/vhost.h       |   4 +-
+ 9 files changed, 551 insertions(+), 80 deletions(-)
+ create mode 100644 drivers/vhost/rpmsg.c
+ create mode 100644 drivers/vhost/vhost_rpmsg.h
+ create mode 100644 include/linux/virtio_rpmsg.h
+
+-- 
+2.28.0
+
