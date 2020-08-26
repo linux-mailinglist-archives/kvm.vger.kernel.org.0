@@ -2,149 +2,142 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9F85F2531E9
-	for <lists+kvm@lfdr.de>; Wed, 26 Aug 2020 16:50:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 312B325335D
+	for <lists+kvm@lfdr.de>; Wed, 26 Aug 2020 17:17:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726946AbgHZOuG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 26 Aug 2020 10:50:06 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:56720 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727897AbgHZOt7 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 26 Aug 2020 10:49:59 -0400
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 07QEiHGV129989;
-        Wed, 26 Aug 2020 10:49:54 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=FAa4RpnCZuYK+s+ZNYXHPAGY6k5np3T/aNePxfajimw=;
- b=mUgBvapbVqImeBl2yNFuD1RSCWJlJFK4C3Fhw6W02LUIcwhlD/KEvTn4dtF9CPusMO8A
- xHnoY0GfNPbY5be7dHMof775eYY1i7k9X/74sWA+mmK2+EJbdEOnLBCfvd4G8wfQnUBO
- PAKkwv+kNPaSI3s1gvQUyb+j58nh6qT45OSKHwz9gpz/CrxOnZi0e1PdTy5zlBvTnnLe
- +oEJHnNga72aWe6qUsmbRilPh8Jdq4QHnwMBbXuwZUFyiLk2vuYB81rpFZlx8CthBnQE
- qT4CetzXBwq94aWKisyWpIlb+HFFkkz/Ph7VQU91ET7ERYXqEUxqys+Z0Xd1mfDlWbjK xQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 335srnr5mm-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 26 Aug 2020 10:49:54 -0400
-Received: from m0098396.ppops.net (m0098396.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 07QEjegj133786;
-        Wed, 26 Aug 2020 10:49:54 -0400
-Received: from ppma02wdc.us.ibm.com (aa.5b.37a9.ip4.static.sl-reverse.com [169.55.91.170])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 335srnr5m0-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 26 Aug 2020 10:49:53 -0400
-Received: from pps.filterd (ppma02wdc.us.ibm.com [127.0.0.1])
-        by ppma02wdc.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 07QEmXBB014148;
-        Wed, 26 Aug 2020 14:49:52 GMT
-Received: from b03cxnp08027.gho.boulder.ibm.com (b03cxnp08027.gho.boulder.ibm.com [9.17.130.19])
-        by ppma02wdc.us.ibm.com with ESMTP id 332ujqamn5-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 26 Aug 2020 14:49:52 +0000
-Received: from b03ledav001.gho.boulder.ibm.com (b03ledav001.gho.boulder.ibm.com [9.17.130.232])
-        by b03cxnp08027.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 07QEnjss33292604
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 26 Aug 2020 14:49:46 GMT
-Received: from b03ledav001.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 014B46E053;
-        Wed, 26 Aug 2020 14:49:49 +0000 (GMT)
-Received: from b03ledav001.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id AEEAC6E050;
-        Wed, 26 Aug 2020 14:49:47 +0000 (GMT)
-Received: from cpe-172-100-175-116.stny.res.rr.com (unknown [9.85.170.64])
-        by b03ledav001.gho.boulder.ibm.com (Postfix) with ESMTP;
-        Wed, 26 Aug 2020 14:49:47 +0000 (GMT)
-Subject: Re: [PATCH v10 01/16] s390/vfio-ap: add version vfio_ap module
-To:     Cornelia Huck <cohuck@redhat.com>
-Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, freude@linux.ibm.com, borntraeger@de.ibm.com,
-        mjrosato@linux.ibm.com, pasic@linux.ibm.com,
-        alex.williamson@redhat.com, kwankhede@nvidia.com,
-        fiuczy@linux.ibm.com, frankja@linux.ibm.com, david@redhat.com,
-        imbrenda@linux.ibm.com, hca@linux.ibm.com, gor@linux.ibm.com
-References: <20200821195616.13554-1-akrowiak@linux.ibm.com>
- <20200821195616.13554-2-akrowiak@linux.ibm.com>
- <20200825120432.13a1b444.cohuck@redhat.com>
-From:   Tony Krowiak <akrowiak@linux.ibm.com>
-Message-ID: <ca016eca-1ee7-2d0f-c2ec-3ef147b6216a@linux.ibm.com>
-Date:   Wed, 26 Aug 2020 10:49:47 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+        id S1728041AbgHZPRi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 26 Aug 2020 11:17:38 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:58773 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726750AbgHZPPk (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 26 Aug 2020 11:15:40 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1598454937;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=U5sNgrzn5FhTxLM1sS1TXXuO7hObBpky+B+k/luMmaw=;
+        b=UeiB8mkhlR2jym4z/QqalwwuDQ0FETfHGzLL5Td9bbpbvPy8jym6RmMkuMOAV1XNPdxgRH
+        y8MRKvm0P7OU+J/mjd7Mx6fSBcb4eGQSLKJsDw8Skn1bKXRCwkrdCM222HSjjcVKo+d4KK
+        H1fGb2/6XkPOUWIuzEpuZR7yHpCh5w8=
+Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com
+ [209.85.222.198]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-356-hxNwlLznMDeRbvI45TXYtQ-1; Wed, 26 Aug 2020 11:15:24 -0400
+X-MC-Unique: hxNwlLznMDeRbvI45TXYtQ-1
+Received: by mail-qk1-f198.google.com with SMTP id n128so1934157qke.2
+        for <kvm@vger.kernel.org>; Wed, 26 Aug 2020 08:15:14 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=U5sNgrzn5FhTxLM1sS1TXXuO7hObBpky+B+k/luMmaw=;
+        b=nrqbBJNoP4+oTROqMvAcpuwezmgkJWO6X3Qvji/OQo/3YgNbG16B4Cx/Fks5jY1EQe
+         RWs1bq81ckf2KINk5fAcWWiKYVXW9VbGtng6NJvIhjB9gEKMSKKFA+FJkfLItcsTpjJg
+         hD1uZ4DplG13gksWzU6qyUKweoOcJX/ARc6dVR4lYTs2WjfWHCbXgj2z2KhBDPolLGTF
+         gXrg6Q0Le4M3oLGmzdCb7WqM8rxx3gFI3MzsgtFdDSmBAoCrMuUsUxmbzgpKYY0F8agJ
+         yqM+6cXnIaejPetO3ZJuQ1uFZlvmd/pseF6GAGF5v/Qo1EN/8N8wIWUuvL32sgFDCBB1
+         4kDw==
+X-Gm-Message-State: AOAM532PEXRHhT6GFt36TeECycEkH47UcLWecUq0eIBnPwej1sLzgvug
+        /ShlITaA88KbZ+k22QnqpZNTGUOMIBpxIqk28KEvWGABb+X7dIVSuyGqjaEak50mbUYscGNbJbO
+        naFKrqshkyJrx
+X-Received: by 2002:ad4:41c9:: with SMTP id a9mr14376484qvq.171.1598454912565;
+        Wed, 26 Aug 2020 08:15:12 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJx8D+KxCEvE3v1gysX35rDUKFgHfo42TjV0oOlLWCA309rI6rx4ComNW4vhIgH0v5SazHqK1Q==
+X-Received: by 2002:ad4:41c9:: with SMTP id a9mr14376450qvq.171.1598454912268;
+        Wed, 26 Aug 2020 08:15:12 -0700 (PDT)
+Received: from xz-x1 (bras-vprn-toroon474qw-lp130-11-70-53-122-15.dsl.bell.ca. [70.53.122.15])
+        by smtp.gmail.com with ESMTPSA id g21sm2218058qts.18.2020.08.26.08.15.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 26 Aug 2020 08:15:10 -0700 (PDT)
+Date:   Wed, 26 Aug 2020 11:15:09 -0400
+From:   Peter Xu <peterx@redhat.com>
+To:     "Maoming (maoming, Cloud Infrastructure Service Product Dept.)" 
+        <maoming.maoming@huawei.com>
+Cc:     "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "cohuck@redhat.com" <cohuck@redhat.com>,
+        "Zhoujian (jay)" <jianjay.zhou@huawei.com>,
+        "Huangweidong (C)" <weidong.huang@huawei.com>,
+        "aarcange@redhat.com" <aarcange@redhat.com>,
+        wangyunjian <wangyunjian@huawei.com>
+Subject: Re: =?utf-8?B?562U5aSNOiBbUEFUQw==?= =?utf-8?Q?H?= V2] vfio
+ dma_map/unmap: optimized for hugetlbfs pages
+Message-ID: <20200826151509.GD8235@xz-x1>
+References: <20200814023729.2270-1-maoming.maoming@huawei.com>
+ <20200825205907.GB8235@xz-x1>
+ <8B561EC9A4D13649A62CF60D3A8E8CB28C2D9ABB@dggeml524-mbx.china.huawei.com>
 MIME-Version: 1.0
-In-Reply-To: <20200825120432.13a1b444.cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
- definitions=2020-08-26_09:2020-08-26,2020-08-26 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0
- lowpriorityscore=0 phishscore=0 mlxlogscore=999 priorityscore=1501
- bulkscore=0 impostorscore=0 clxscore=1015 adultscore=0 suspectscore=3
- mlxscore=0 spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2006250000 definitions=main-2008260110
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <8B561EC9A4D13649A62CF60D3A8E8CB28C2D9ABB@dggeml524-mbx.china.huawei.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Wed, Aug 26, 2020 at 01:56:43PM +0000, Maoming (maoming, Cloud Infrastructure Service Product Dept.) wrote:
+> > +	/*
+> > +	 * Unlike THP, the splitting should not happen for hugetlb pages.
+> > +	 * Since PG_reserved is not relevant for compound pages, and the pfn of
+> > +	 * PAGE_SIZE page which in hugetlb pages is valid,
+> > +	 * it is not necessary to check rsvd for hugetlb pages.
+> > +	 * We do not need to alloc pages because of vaddr and we can finish all
+> > +	 * work by a single operation to the head page.
+> > +	 */
+> > +	atomic_add(contiguous_npage, compound_pincount_ptr(head));
+> > +	page_ref_add(head, contiguous_npage);
+> > +	mod_node_page_state(page_pgdat(head), NR_FOLL_PIN_ACQUIRED, 
+> > +contiguous_npage);
+> 
+> I think I asked this question in v1, but I didn't get any answer... So I'm trying again...
+> 
+> Could I ask why manual referencing of pages is done here rather than using
+> pin_user_pages_remote() just like what we've done with vaddr_get_pfn(), and let
+> try_grab_page() to do the page reference and accountings?
+> 
+> I feel like this at least is against the FOLL_PIN workflow of gup, because those FOLL_PIN paths were bypassed, afaict.
+> 
+> 
+> Hi,
+> My apologies for not answering your question.
+> As I understand, pin_user_pages_remote() might spend much time.
+> Because all PAGE_SIZE-pages in a hugetlb page are pinned one by one in pin_user_pages_remote() and try_grab_page().
+> So I think maybe we can use these simple code to do all work.
+> Am I wrong? And is there something else we can use? For example :pin_user_pages_fast()
 
+Yeah I can understand your concern, however so far it's not about the perf but
+correctness.  Documentation/core-api/pin_user_pages.rst tells us that we should
+always use pin_user_page*() APIs to pin DMA pages (with FOLL_LONGTERM).  That's
+something we should follow for now, otherwise the major logic of either
+FOLL_PIN or FULL_LONGTERM could be bypassed without being noticed.
 
-On 8/25/20 6:04 AM, Cornelia Huck wrote:
-> On Fri, 21 Aug 2020 15:56:01 -0400
-> Tony Krowiak <akrowiak@linux.ibm.com> wrote:
->
->> Let's set a version for the vfio_ap module so that automated regression
->> tests can determine whether dynamic configuration tests can be run or
->> not.
->>
->> Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
->> ---
->>   drivers/s390/crypto/vfio_ap_drv.c | 2 ++
->>   1 file changed, 2 insertions(+)
->>
->> diff --git a/drivers/s390/crypto/vfio_ap_drv.c b/drivers/s390/crypto/vfio_ap_drv.c
->> index be2520cc010b..f4ceb380dd61 100644
->> --- a/drivers/s390/crypto/vfio_ap_drv.c
->> +++ b/drivers/s390/crypto/vfio_ap_drv.c
->> @@ -17,10 +17,12 @@
->>   
->>   #define VFIO_AP_ROOT_NAME "vfio_ap"
->>   #define VFIO_AP_DEV_NAME "matrix"
->> +#define VFIO_AP_MODULE_VERSION "1.2.0"
->>   
->>   MODULE_AUTHOR("IBM Corporation");
->>   MODULE_DESCRIPTION("VFIO AP device driver, Copyright IBM Corp. 2018");
->>   MODULE_LICENSE("GPL v2");
->> +MODULE_VERSION(VFIO_AP_MODULE_VERSION);
->>   
->>   static struct ap_driver vfio_ap_drv;
->>   
-> Setting a version manually has some drawbacks:
-> - tools wanting to check for capabilities need to keep track which
->    versions support which features
-> - you need to remember to actually bump the version when adding a new,
->    visible feature
-> (- selective downstream backports may get into a pickle, but that's
-> arguably not your problem)
->
-> Is there no way for a tool to figure out whether this is supported?
-> E.g., via existence of a sysfs file, or via a known error that will
-> occur. If not, it's maybe better to expose known capabilities via a
-> generic interface.
+I'm not sure whether the perf issue is a big one.  So have you tried the pin
+page APIs first and did some measurement?  There is indeed a tight loop in
+follow_hugetlb_page() however not sure how much it'll affect VFIO_IOMMU_MAP_DMA
+in general.  Even if we want to do something, it seems to be more suitable to
+be done inside follow_hugetlb_page() rather than in vfio, imho.
 
-This patch series introduces a new mediated device sysfs attribute,
-guest_matrix, so the automated tests could check for the existence
-of that interface. The problem I have with that is it will work for
-this version of the vfio_ap device driver - which may be all that is
-ever needed - but does not account for future enhancements
-which may need to be detected by tooling or automated tests.
-It seems to me that regardless of how a tool detects whether
-a feature is supported or not, it will have to keep track of that
-somehow.
+Another comment is about the design of the whole patch - I think Alex commented
+on that too on the awkwardness on appending the hugetlbfs logic to the end of
+the existing logic.  Considering that current logic of vfio_pin_pages_remote()
+is "let's pin some pages as long as continuous", not sure whether we can make
+it into:
 
-Can you provide more details about this generic interface of
-which you speak?
+vfio_pin_pages_remote()
+{
+  if (PageHuge(first_page))
+    vfio_pin_pages_hugetlbfs();
+  else
+    vfio_pin_pages_normal();
+}
 
->
+The thing is, if the 1st page is normal page, then the follow-up pages
+shouldn't normally be hugetlbfs pages so they won't be physically continuous.
+Vice versa.  In other words, each call to vfio_pin_pages_remote() should only
+handle only one type of page after all.  So maybe we can diverge them at the
+beginning of the call directly.
+
+-- 
+Peter Xu
 
