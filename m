@@ -2,54 +2,54 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1BFE1253927
-	for <lists+kvm@lfdr.de>; Wed, 26 Aug 2020 22:38:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0AFA1253948
+	for <lists+kvm@lfdr.de>; Wed, 26 Aug 2020 22:45:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726876AbgHZUif (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 26 Aug 2020 16:38:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60090 "EHLO
+        id S1726878AbgHZUpO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 26 Aug 2020 16:45:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32894 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726838AbgHZUie (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 26 Aug 2020 16:38:34 -0400
-Received: from mail-oi1-x242.google.com (mail-oi1-x242.google.com [IPv6:2607:f8b0:4864:20::242])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ACC58C061756
-        for <kvm@vger.kernel.org>; Wed, 26 Aug 2020 13:38:33 -0700 (PDT)
-Received: by mail-oi1-x242.google.com with SMTP id z195so2722913oia.6
-        for <kvm@vger.kernel.org>; Wed, 26 Aug 2020 13:38:33 -0700 (PDT)
+        with ESMTP id S1726739AbgHZUpN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 26 Aug 2020 16:45:13 -0400
+Received: from mail-oi1-x243.google.com (mail-oi1-x243.google.com [IPv6:2607:f8b0:4864:20::243])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7E874C061574
+        for <kvm@vger.kernel.org>; Wed, 26 Aug 2020 13:45:13 -0700 (PDT)
+Received: by mail-oi1-x243.google.com with SMTP id e6so2741201oii.4
+        for <kvm@vger.kernel.org>; Wed, 26 Aug 2020 13:45:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=6RDmTeskOQgqjH7Bwa9ilUHRa8YVRzYGClEJYJQLJEs=;
-        b=Ncib95Z0vslOOUIyFxuviDs0j+tBfe5FDoorlEI4kUHJBZv+l7A+C1TbJPzR25/WjW
-         AVFG/Ml7nQJFKgucAJce4V7Yd/QfZZI3tKY9DdcDLrvUQxBHXTAExIg5vRU36ClMmfQv
-         UiDSu5XzVvJFOjf4XmcYqS5uf185wpBop6AjhfzUtSl7XKHDK8/f+OlFhtik6whAojDK
-         3xYlxMTP/2aMJ05MjhL8C5iU4SfPsbZGZ5aRnNwnNLsRxD81hi+tFe7vjbpbEKJ6bPrs
-         Y1UCLVyOj6NK9naOKWU+opF0FdOBrQSlQ8rG2jJEqn945yuYMOw6ZANhCMGmHAQbMCMD
-         GsTA==
+        bh=QnLfeoLcCvYGQhSXCHvu6ntO3iZypCG03j0v0V/lE60=;
+        b=oEpPptmh8R/ckvOynlZJ0jBvRyvSgLg+QaTk85AvfB5WWtFS64+ArAY6dtSzIgW24p
+         UzviT/lXocVLE2aWZpLhJA+/l9NktOLBwDMVhswDM/teObIMU1J+8LDfA4qnVFaoBFrC
+         b/ucW8ynwOUH2jpcdHHAKtea59hSC+gyN2xU/o0yaIY+s+7jqQaNFGqo3rOR1Omq3mQp
+         /g31ng79Q59TbpLRpyYVd/s/Gwj6PiQuxNyXkK6WlSw+oWKm7VHGRU5VUkWSO5vGQO0c
+         WWjwA7GB3h0CfFeEjJfxmJJsxgD9PnFMkojRobSrFawZwkOYgCpR094C3Tu4v/aBfWBM
+         LwOg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=6RDmTeskOQgqjH7Bwa9ilUHRa8YVRzYGClEJYJQLJEs=;
-        b=p4NiTPHvNCfApx3gVl4JrWC6sBLHQozhv7sjF2mI9jmXsDdhWtpoRf4Ld/pWXjT3Jk
-         EDnZhHz5epKRsOd2ksNZKPKnJW/1hvPBMILh1gUNpEWkxEOsce/36+tqTkPrzxw9smf/
-         jGrhpCKIrOPtWEGEiIqy0xHECzZ/UlwOQq68xt984kYwU+/ZUUK1+SQ1EyK3GBAUC1xy
-         uv4tTPnWQM3rzDocBYsvIEdiCGszYRwxjyz42b28YNQ19J9OEQmyGFdtMXSiMUaTvc9D
-         5LrszGkDGtN26ILwDL5lGO4HGotzuBFUWezbRktCWEeNhxvu3lDnMB67reWEMpk+xxPC
-         VgxA==
-X-Gm-Message-State: AOAM5301HPX74eDfSoSda74EKoGrttyXDEQ10orsTq8teNHM/ifATwd4
-        EhlF1k9mhnjvpVkWeyR0ZKNDzw51e/S2dnx8kFjieQ==
-X-Google-Smtp-Source: ABdhPJy6hwY95r78yIoeS5ram8XOf7QjXY5PDWluJU3+L70Px0lQMsNtKZKlaCwQW/hQeMV41R65lk9NEeH70RX44Vc=
-X-Received: by 2002:a54:4795:: with SMTP id o21mr5056157oic.13.1598474312866;
- Wed, 26 Aug 2020 13:38:32 -0700 (PDT)
+        bh=QnLfeoLcCvYGQhSXCHvu6ntO3iZypCG03j0v0V/lE60=;
+        b=EPZ9KZEbU3bN/6876imvWRoPg9QtWc1x+LtemD4xsEQTzZHd4ig5jd20RQZTyTFI6E
+         OymXm8hHEjwobkYcn84GoXQVTR7qtZX7r/Hb0Z+1T8txTIBrx3vGE4TWMsUbSvu3OFke
+         BOHw97LXicTfxuUjAx1dAYDFXthX2qjAw0SYNBq1x4yKWM1yxHy8UEMuv14EvIbQlMb8
+         kPS8cMeh1ON1g9gYkp1zNHF9QYy1sePswOhBL15vYaqa16f53SQfc6W4TfMXZHTXhlvE
+         +9T1gddo/ZvhxJ2EF6x4zzf9/A7neA0vi/CRYT2rKHvXe7ZQ90VHKHzBwkTR15JlKO/l
+         Znvg==
+X-Gm-Message-State: AOAM530bXIDTGKXwl8Wp9oSFZjGAogLktqBnESiJoptgvef8XN2hCVia
+        BA1Igd1Dxqy+Bg6DhSPW0IReHM7iwky8cVieYorUaQ==
+X-Google-Smtp-Source: ABdhPJztiKIs+AKmRQMjj8AupE0RfyXrDjWJ/I5FIYrFSEg+06xO6+xJgEtk14F9HUsJ3uBQwaGnAQSaytfPXKIFy8I=
+X-Received: by 2002:aca:b942:: with SMTP id j63mr4826397oif.28.1598474712710;
+ Wed, 26 Aug 2020 13:45:12 -0700 (PDT)
 MIME-Version: 1.0
-References: <159846887637.18873.14677728679411578606.stgit@bmoger-ubuntu> <159846923918.18873.8521340533771523718.stgit@bmoger-ubuntu>
-In-Reply-To: <159846923918.18873.8521340533771523718.stgit@bmoger-ubuntu>
+References: <159846887637.18873.14677728679411578606.stgit@bmoger-ubuntu> <159846924650.18873.2599714820148493539.stgit@bmoger-ubuntu>
+In-Reply-To: <159846924650.18873.2599714820148493539.stgit@bmoger-ubuntu>
 From:   Jim Mattson <jmattson@google.com>
-Date:   Wed, 26 Aug 2020 13:38:21 -0700
-Message-ID: <CALMp9eSM6joAKAHPeJWZB8srCxJPJyTxgpwjAzpJuCLm0LmvyA@mail.gmail.com>
-Subject: Re: [PATCH v5 02/12] KVM: SVM: Change intercept_cr to generic intercepts
+Date:   Wed, 26 Aug 2020 13:45:01 -0700
+Message-ID: <CALMp9eTo_HMPcobJos-KMKBCjOuT=P+j9=WSh7Cf3JrQb3xftQ@mail.gmail.com>
+Subject: Re: [PATCH v5 03/12] KVM: SVM: Change intercept_dr to generic intercepts
 To:     Babu Moger <babu.moger@amd.com>
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
@@ -69,9 +69,9 @@ X-Mailing-List: kvm@vger.kernel.org
 
 On Wed, Aug 26, 2020 at 12:14 PM Babu Moger <babu.moger@amd.com> wrote:
 >
-> Change intercept_cr to generic intercepts in vmcb_control_area.
-> Use the new vmcb_set_intercept, vmcb_clr_intercept and vmcb_is_intercept
-> where applicable.
+> Modify intercept_dr to generic intercepts in vmcb_control_area. Use
+> the generic vmcb_set_intercept, vmcb_clr_intercept and vmcb_is_intercept
+> to set/clear/test the intercept_dr bits.
 >
 > Signed-off-by: Babu Moger <babu.moger@amd.com>
 Reviewed-by: Jim Mattson <jmattson@google.com>
