@@ -2,91 +2,140 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 84928254103
-	for <lists+kvm@lfdr.de>; Thu, 27 Aug 2020 10:38:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 104A42541EC
+	for <lists+kvm@lfdr.de>; Thu, 27 Aug 2020 11:22:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728110AbgH0IiS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 27 Aug 2020 04:38:18 -0400
-Received: from mail.wangsu.com ([123.103.51.198]:44116 "EHLO wangsu.com"
+        id S1728369AbgH0JWk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 27 Aug 2020 05:22:40 -0400
+Received: from szxga05-in.huawei.com ([45.249.212.191]:10272 "EHLO huawei.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727935AbgH0IiR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 27 Aug 2020 04:38:17 -0400
-Received: from SZYJSSONGSH (unknown [218.17.157.35])
-        by app1 (Coremail) with SMTP id xjNnewDHqY4RaUdf3PsUAA--.105S2;
-        Thu, 27 Aug 2020 16:04:33 +0800 (CST)
-From:   "song" <songsh@wangsu.com>
-To:     <kvm@vger.kernel.org>
-Subject: =?gb2312?B?s7e72DogaG93IHRvIGNoYW5nZSB0aGUgZGVmYXVsdCBwZXJtaXNzaQ==?=
-        =?gb2312?B?b25zIG9mIHRoZSBpbnN0YW5jZSdzIGxvZw==?=
-Date:   Thu, 27 Aug 2020 16:04:32 +0800
-Message-ID: <!&!GAAAAAAAAAAZue5YDctfS6GMeKSG2nARwoAAABgAAAAAAAAAGbnuWA3LX0uhjHikhtpwEYR6IgAAAAAAEAAAAAlInp3O82lPqyaOV4kBf5IBAAAAAA==@wangsu.com>
+        id S1728228AbgH0JWh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 27 Aug 2020 05:22:37 -0400
+Received: from DGGEMS402-HUB.china.huawei.com (unknown [172.30.72.59])
+        by Forcepoint Email with ESMTP id D58A74862EF1E1423524;
+        Thu, 27 Aug 2020 17:22:34 +0800 (CST)
+Received: from huawei.com (10.174.187.31) by DGGEMS402-HUB.china.huawei.com
+ (10.3.19.202) with Microsoft SMTP Server id 14.3.487.0; Thu, 27 Aug 2020
+ 17:22:25 +0800
+From:   Yifei Jiang <jiangyifei@huawei.com>
+To:     <qemu-devel@nongnu.org>, <qemu-riscv@nongnu.org>
+CC:     <kvm-riscv@lists.infradead.org>, <kvm@vger.kernel.org>,
+        <libvir-list@redhat.com>, <anup.patel@wdc.com>,
+        <palmer@dabbelt.com>, <Alistair.Francis@wdc.com>,
+        <sagark@eecs.berkeley.edu>, <kbastian@mail.uni-paderborn.de>,
+        <victor.zhangxiaofeng@huawei.com>, <wu.wubin@huawei.com>,
+        <zhang.zhanghailiang@huawei.com>, <dengkai1@huawei.com>,
+        <yinyipeng1@huawei.com>, Yifei Jiang <jiangyifei@huawei.com>
+Subject: [PATCH RFC v3 00/14] Add riscv kvm accel support
+Date:   Thu, 27 Aug 2020 17:21:23 +0800
+Message-ID: <20200827092137.479-1-jiangyifei@huawei.com>
+X-Mailer: git-send-email 2.26.2.windows.1
 MIME-Version: 1.0
-Content-Type: multipart/mixed;
-        boundary="----=_NextPart_000_0006_01D67C8B.C1870CC0"
-X-Mailer: Microsoft Outlook 16.0
-Expiry-Date: Sat, 29 Aug 2020 16:04:30 +0800
-X-MS-TNEF-Correlator: 0000000019B9EE580DCB5F4BA18C78A486DA7011A47A2200
-X-CM-TRANSID: xjNnewDHqY4RaUdf3PsUAA--.105S2
-X-Coremail-Antispam: 1UD129KBjDUn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7v73
-        VFW2AGmfu7bjvjm3AaLaJ3UjIYCTnIWjp_UUUYf7k0a2IF6F4UM7kC6x804xWl1xkIjI8I
-        6I8E6xAIw20EY4v20xvaj40_Wr0E3s1l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxSw2
-        x7M28EF7xvwVC0I7IYx2IY67AKxVWDJVCq3wA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxVW0
-        oVCq3wA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
-        Cq3wAS0I0E0xvYzxvE52x082IY62kv0487M2AExVA0xI801c8C04v7Mc02F40EFcxC0VAK
-        zVAqx4xG6I80ewAv7VCjz48v1sIEY20_WFWUJr1UMcvjeVCFs4IE7xkEbVWUJVW8JwACjc
-        xG0xvY0x0EwIxGrwACY4xI67k04243AVAKzVAKj4xxM4xvF2IEb7IF0Fy26I8I3I1lc2xS
-        Y4AK67AK6r43MxAIw28IcxkI7VAKI48JMxAIw28IcVCjz48v1sIEY20_WFWUJr1UMxC20s
-        026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_
-        JrI_JrWlx4CE17CEb7AF67AKxVWUJVWUXwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14
-        v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVWUJVW8JwCI42IY6xAIw20EY4v20xva
-        j40_Zr0_Wr1UMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Jr
-        0_GrUvcSsGvfC2KfnxnUUI43ZEXa7IUUiL05UUUUU==
-X-CM-SenderInfo: 5vrqw2nk6zt0xjvxhudrp/
+Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
+X-Originating-IP: [10.174.187.31]
+X-CFilter-Loop: Reflected
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This is a multipart message in MIME format.
+This series adds both riscv32 and riscv64 kvm support, and implements
+migration based on riscv. It is based on temporarily unaccepted kvm:
+https://github.com/kvm-riscv/linux
 
-------=_NextPart_000_0006_01D67C8B.C1870CC0
-Content-Type: text/plain;
-	charset="gb2312"
-Content-Transfer-Encoding: base64
+Compared to RFC v2, the migration is supported in this series. The new
+added migration feature also requires the following patches:
+[1]
+[PATCH RFC 0/2] Add log dirty support
+https://www.mail-archive.com/linux-kernel@vger.kernel.org/msg2284945.html
 
-c29uZyC9q7O3u9jTyrz+obBob3cgdG8gY2hhbmdlIHRoZSBkZWZhdWx0IHBlcm1pc3Npb25zIG9m
-IHRoZSBpbnN0YW5jZSdzDQpsb2ehsaGjDQo=
+[2]
+[PATCH] target/riscv: raise exception to HS-mode at get_physical_address
+https://patchew.org/QEMU/20200824084158.1769-1-jiangyifei@huawei.com/
 
-------=_NextPart_000_0006_01D67C8B.C1870CC0
-Content-Type: application/ms-tnef;
-	name="winmail.dat"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment;
-	filename="winmail.dat"
+Several steps to use this:
+1. Build emulation
+$ ./configure --target-list=riscv64-softmmu
+$ make -j$(nproc)
 
-eJ8+IiEIAQaQCAAEAAAAAAABAAEAAQeQBgAIAAAAqAMAAAAAAACrAAEIgAcAEwAAAElQTS5PdXRs
-b29rLlJlY2FsbACCBgEDkAYApAQAABsAAAADACYAAQAAAAIBMQABAAAA5AAAAFBDREZFQjA5AAEA
-AgB+AAAAAAAAADihuxAF5RAaobsIACsqVsIAAG1zcHN0LmRsbAAAAAAATklUQfm/uAEAqgA32W4A
-AAAARQA6AFwAUAByAG8AZwByAGEAbQAgAEYAaQBsAGUAcwBcAG8AdQB0AGwAbwBvAGsAXABzAG8A
-bgBnAHMAaAAuAHAAcwB0AAAAGAAAAAAAAAAZue5YDctfS6GMeKSG2nARwoAAABgAAAAAAAAAGbnu
-WA3LX0uhjHikhtpwEYR6IgAAAAAAEAAAAAlInp3O82lPqyaOV4kBf5IBAAAAAB4AcAABAAAARAAA
-AAEFs7e72DogaG93IHRvIGNoYW5nZSB0aGUgZGVmYXVsdCBwZXJtaXNzaW9ucyBvZiB0aGUgaW5z
-dGFuY2UncyBsb2cACwABDgEAAAADABQOAQAAAB4AKA4BAAAALQAAADAwMDAwMDAyAXNvbmdzaEB3
-YW5nc3UuY29tAXNvbmdzaEB3YW5nc3UuY29tAAAAAB4AKQ4BAAAALQAAADAwMDAwMDAyAXNvbmdz
-aEB3YW5nc3UuY29tAXNvbmdzaEB3YW5nc3UuY29tAAAAAAIBAGgBAAAAEAAAAAlInp3O82lPqyaO
-V4kBf5IDAAFoEQAAAB4AAmgBAAAACQAAAElQTS5Ob3RlAAAAAAsAA2gAAAAAAwAEaAAAAAADAIaA
-CCAGAAAAAADAAAAAAAAARgAAAAAahQAAAQAAAAsAHw4BAAAAAgH4DwEAAAAQAAAAGbnuWA3LX0uh
-jHikhtpwEQIB+g8BAAAAEAAAABm57lgNy19LoYx4pIbacBEDAP4PBQAAAAIBCRABAAAALwEAACsB
-AADsAQAATFpGdefmGWQDAAoAcmNwZzEyNSIyA0N0ZXgFQmJp/mQEAAMwAQMB9wqAAqQD4wkCAGNo
-CsBzZXQw/iAHEwKAEHMAUARWCFUHsu8SRQ5RAwERRzIGAAbDEkVOMwRGEUkTX2Y0EN4xjDM0BgAH
-cHN1bgKAtxJTCO8J9zsbXw4wNRJCnQxgYwBQCwkBZDM2EdDDC6YDMGh0bWwAIRiFVwwBIEUR0HMC
-IGcDMCd6YgswJwyhIkAWUCJANzMiMSKhZDgjcSLhY2HjIjEA4CdmZSJxAFAiQIgwaG8H4HRvIBFh
-NSIAZSVgaCXwAQFhdapsBUBwBJBtBAFpAiBZBCBvZiYDC4BzAZBu2GNlJwQgGvBnJLUk4d0k0mEW
-UCBFArF9IUgKogUKgH0rsAADAA00/T+lDgMADzT9P6UOAgEUNAEAAAAQAAAATklUQfm/uAEAqgA3
-2W4AAAIBfwABAAAAMQAAADAwMDAwMDAwMTlCOUVFNTgwRENCNUY0QkExOEM3OEE0ODZEQTcwMTFB
-NDdBMjIwMAAAAAADAAYQcf7duAMABxBFAAAAAwAQEAAAAAADABEQAAAAAB4ACBABAAAARgAAAFNP
-Tke9q7O3u9jTyrz+obBIT1dUT0NIQU5HRVRIRURFRkFVTFRQRVJNSVNTSU9OU09GVEhFSU5TVEFO
-Q0VTTE9HobGhowAAACoh
+2. Build kernel
+https://github.com/kvm-riscv/linux
 
-------=_NextPart_000_0006_01D67C8B.C1870CC0--
+3. Build QEMU VM
+I cross built in riscv toolchain.
+$ PKG_CONFIG_LIBDIR=<toolchain pkgconfig path>
+$ export PKG_CONFIG_SYSROOT_DIR=<toolchain sysroot path>
+$ ./configure --target-list=riscv64-softmmu --enable-kvm \
+--cross-prefix=riscv64-linux-gnu- --disable-libiscsi --disable-glusterfs \
+--disable-libusb --disable-usb-redir --audio-drv-list= --disable-opengl \
+--disable-libxml2
+$ make -j$(nproc)
+
+4. Start emulation
+$ ./qemu-system-riscv64 -M virt -m 4096M -cpu rv64,x-h=true -nographic \
+        -name guest=riscv-hyp,debug-threads=on \
+        -smp 4 \
+        -bios ./fw_jump.bin \
+        -kernel ./Image \
+        -drive file=./hyp.img,format=raw,id=hd0 \
+        -device virtio-blk-device,drive=hd0 \
+        -append "root=/dev/vda rw console=ttyS0 earlycon=sbi"
+
+5. Start kvm-acceled QEMU VM in emulation
+$ ./qemu-system-riscv64 -M virt,accel=kvm -m 1024M -cpu host -nographic \
+        -name guest=riscv-guset \
+        -smp 2 \
+        -bios none \
+        -kernel ./Image \
+        -drive file=./guest.img,format=raw,id=hd0 \
+        -device virtio-blk-device,drive=hd0 \
+        -append "root=/dev/vda rw console=ttyS0 earlycon=sbi"
+
+This following link describes the details about live migration steps:
+https://gitee.com/openeuler/qemu/wikis/Live%20migration?sort_id=2767831
+
+Changes since RFC v2
+1. Fix checkpatch error at target/riscv/sbi_ecall_interface.h.
+2. Add riscv migration support.
+
+Changes since RFC v1
+1. Add separate SBI ecall interface header.
+2. Add riscv32 kvm accel support.
+
+Yifei Jiang (14):
+  linux-header: Update linux/kvm.h
+  target/riscv: Add target/riscv/kvm.c to place the public kvm interface
+  target/riscv: Implement function kvm_arch_init_vcpu
+  target/riscv: Implement kvm_arch_get_registers
+  arget/riscv: Implement kvm_arch_put_registers
+  target/riscv: Support start kernel directly by KVM
+  hw/riscv: PLIC update external interrupt by KVM when kvm enabled
+  target/riscv: Handler KVM_EXIT_RISCV_SBI exit
+  target/riscv: Add host cpu type
+  target/riscv: Add sifive_plic vmstate
+  target/riscv: Support riscv cpu vmstate
+  target/riscv: Add kvm_riscv_get/put_regs_timer
+  target/riscv: Implement virtual time adjusting with vm state changing
+  target/riscv: Support virtual time context synchronization
+
+ configure                          |   1 +
+ hw/riscv/sifive_plic.c             |  55 ++-
+ hw/riscv/virt.c                    |   8 +
+ include/hw/riscv/sifive_plic.h     |   1 +
+ linux-headers/linux/kvm.h          |   8 +
+ target/riscv/cpu.c                 |  41 +-
+ target/riscv/cpu.h                 |  10 +
+ target/riscv/kvm.c                 | 599 +++++++++++++++++++++++++++++
+ target/riscv/kvm_riscv.h           |  25 ++
+ target/riscv/meson.build           |   1 +
+ target/riscv/sbi_ecall_interface.h |  72 ++++
+ 11 files changed, 809 insertions(+), 12 deletions(-)
+ create mode 100644 target/riscv/kvm.c
+ create mode 100644 target/riscv/kvm_riscv.h
+ create mode 100644 target/riscv/sbi_ecall_interface.h
+
+-- 
+2.19.1
+
 
