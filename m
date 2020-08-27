@@ -2,118 +2,138 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 819EF2543A7
-	for <lists+kvm@lfdr.de>; Thu, 27 Aug 2020 12:23:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 75A2C2543CA
+	for <lists+kvm@lfdr.de>; Thu, 27 Aug 2020 12:33:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728437AbgH0KX0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 27 Aug 2020 06:23:26 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:34097 "EHLO
+        id S1728063AbgH0KdG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 27 Aug 2020 06:33:06 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:47750 "EHLO
         us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726093AbgH0KXZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 27 Aug 2020 06:23:25 -0400
+        with ESMTP id S1727793AbgH0KdF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 27 Aug 2020 06:33:05 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1598523803;
+        s=mimecast20190719; t=1598524384;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=+kLy6tLm5kHK6ubmxV4JMC+Ts5+1/ugqr6zlczEOapo=;
-        b=ddkHhs8USk7aO6x5hxM8tUkQiDO64nIFQZd9dcE9BsGs9rLnSJbCfrfaF1a0mBURxZScY0
-        6m2G0X5vxJuN1nx7W5afqS0v54Cf9ZGFrkbOQNUedGhsYVaRGKLoGxnOKwESoO/bXiraXS
-        +pQZeDUv0ZS5/JY/SxqNLhgVA2VsCNc=
+        bh=xVl6R1XwWuiNXr6HJxlhlEi6Bd9mQNsLml7GXEW9cbY=;
+        b=WlTMP+L/3Vp6xUDqo/yjQGTsu8ar4gsVsU3KZfHO+/rAheXFotGTks4kiYw02Z37MTzBWC
+        D1yUS/6XimJu/YQX5w+NgPttKDNkdVMY76qmdFVUBMicMrru6i6I7sJ/Go6Uath0ghmxTB
+        2oIQTUTdrtUpIzGAhk2lWV2BUhODz4k=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-478-aVScZKfANIKVFLxVfpsGkQ-1; Thu, 27 Aug 2020 06:23:20 -0400
-X-MC-Unique: aVScZKfANIKVFLxVfpsGkQ-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+ us-mta-275-bdNbO0IPPrq-tf0swTDF9Q-1; Thu, 27 Aug 2020 06:33:00 -0400
+X-MC-Unique: bdNbO0IPPrq-tf0swTDF9Q-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2D6AD800683;
-        Thu, 27 Aug 2020 10:23:18 +0000 (UTC)
-Received: from starship (unknown [10.35.206.185])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 92A581944D;
-        Thu, 27 Aug 2020 10:23:13 +0000 (UTC)
-Message-ID: <cb1b39bc000d96da154d9e6132ee88b448a27c59.camel@redhat.com>
-Subject: Re: [PATCH v2 4/7] KVM: x86: allow kvm_x86_ops.set_efer to return a
- value
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        Jim Mattson <jmattson@google.com>
-Cc:     kvm list <kvm@vger.kernel.org>,
-        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
-        Ingo Molnar <mingo@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        "open list:X86 ARCHITECTURE (32-BIT AND 64-BIT)" 
-        <linux-kernel@vger.kernel.org>, "H. Peter Anvin" <hpa@zytor.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Date:   Thu, 27 Aug 2020 13:23:12 +0300
-In-Reply-To: <20200821004350.GB13886@sjchrist-ice>
-References: <20200820133339.372823-1-mlevitsk@redhat.com>
-         <20200820133339.372823-5-mlevitsk@redhat.com>
-         <CALMp9eRNLjj5cs1xj44WVRoKK0ZrcGXn7ffdH+bEeDHkLE9nSA@mail.gmail.com>
-         <20200821004350.GB13886@sjchrist-ice>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.3 (3.36.3-1.fc32) 
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 84F94803F58;
+        Thu, 27 Aug 2020 10:32:46 +0000 (UTC)
+Received: from gondolin (ovpn-113-237.ams2.redhat.com [10.36.113.237])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id E5D97196F3;
+        Thu, 27 Aug 2020 10:32:42 +0000 (UTC)
+Date:   Thu, 27 Aug 2020 12:32:40 +0200
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Tony Krowiak <akrowiak@linux.ibm.com>
+Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, freude@linux.ibm.com, borntraeger@de.ibm.com,
+        mjrosato@linux.ibm.com, pasic@linux.ibm.com,
+        alex.williamson@redhat.com, kwankhede@nvidia.com,
+        fiuczy@linux.ibm.com, frankja@linux.ibm.com, david@redhat.com,
+        imbrenda@linux.ibm.com, hca@linux.ibm.com, gor@linux.ibm.com
+Subject: Re: [PATCH v10 01/16] s390/vfio-ap: add version vfio_ap module
+Message-ID: <20200827123240.42e0c787.cohuck@redhat.com>
+In-Reply-To: <ca016eca-1ee7-2d0f-c2ec-3ef147b6216a@linux.ibm.com>
+References: <20200821195616.13554-1-akrowiak@linux.ibm.com>
+        <20200821195616.13554-2-akrowiak@linux.ibm.com>
+        <20200825120432.13a1b444.cohuck@redhat.com>
+        <ca016eca-1ee7-2d0f-c2ec-3ef147b6216a@linux.ibm.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 2020-08-20 at 17:43 -0700, Sean Christopherson wrote:
-> On Thu, Aug 20, 2020 at 02:43:56PM -0700, Jim Mattson wrote:
-> > On Thu, Aug 20, 2020 at 6:34 AM Maxim Levitsky <mlevitsk@redhat.com> wrote:
-> > > This will be used later to return an error when setting this msr fails.
-> > > 
-> > > For VMX, it already has an error condition when EFER is
-> > > not in the shared MSR list, so return an error in this case.
-> > > 
-> > > Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
-> > > ---
-> > > --- a/arch/x86/kvm/x86.c
-> > > +++ b/arch/x86/kvm/x86.c
-> > > @@ -1471,7 +1471,8 @@ static int set_efer(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
-> > >         efer &= ~EFER_LMA;
-> > >         efer |= vcpu->arch.efer & EFER_LMA;
-> > > 
-> > > -       kvm_x86_ops.set_efer(vcpu, efer);
-> > > +       if (kvm_x86_ops.set_efer(vcpu, efer))
-> > > +               return 1;
-> > 
-> > This seems like a userspace ABI change to me. Previously, it looks
-> > like userspace could always use KVM_SET_MSRS to set MSR_EFER to 0 or
-> > EFER_SCE, and it would always succeed. Now, it looks like it will fail
-> > on CPUs that don't support EFER in hardware. (Perhaps it should fail,
-> > but it didn't before, AFAICT.)
+On Wed, 26 Aug 2020 10:49:47 -0400
+Tony Krowiak <akrowiak@linux.ibm.com> wrote:
+
+> On 8/25/20 6:04 AM, Cornelia Huck wrote:
+> > On Fri, 21 Aug 2020 15:56:01 -0400
+> > Tony Krowiak <akrowiak@linux.ibm.com> wrote:
+> >  
+> >> Let's set a version for the vfio_ap module so that automated regression
+> >> tests can determine whether dynamic configuration tests can be run or
+> >> not.
+> >>
+> >> Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
+> >> ---
+> >>   drivers/s390/crypto/vfio_ap_drv.c | 2 ++
+> >>   1 file changed, 2 insertions(+)
+> >>
+> >> diff --git a/drivers/s390/crypto/vfio_ap_drv.c b/drivers/s390/crypto/vfio_ap_drv.c
+> >> index be2520cc010b..f4ceb380dd61 100644
+> >> --- a/drivers/s390/crypto/vfio_ap_drv.c
+> >> +++ b/drivers/s390/crypto/vfio_ap_drv.c
+> >> @@ -17,10 +17,12 @@
+> >>   
+> >>   #define VFIO_AP_ROOT_NAME "vfio_ap"
+> >>   #define VFIO_AP_DEV_NAME "matrix"
+> >> +#define VFIO_AP_MODULE_VERSION "1.2.0"
+> >>   
+> >>   MODULE_AUTHOR("IBM Corporation");
+> >>   MODULE_DESCRIPTION("VFIO AP device driver, Copyright IBM Corp. 2018");
+> >>   MODULE_LICENSE("GPL v2");
+> >> +MODULE_VERSION(VFIO_AP_MODULE_VERSION);
+> >>   
+> >>   static struct ap_driver vfio_ap_drv;
+> >>     
+> > Setting a version manually has some drawbacks:
+> > - tools wanting to check for capabilities need to keep track which
+> >    versions support which features
+> > - you need to remember to actually bump the version when adding a new,
+> >    visible feature
+> > (- selective downstream backports may get into a pickle, but that's
+> > arguably not your problem)
+> >
+> > Is there no way for a tool to figure out whether this is supported?
+> > E.g., via existence of a sysfs file, or via a known error that will
+> > occur. If not, it's maybe better to expose known capabilities via a
+> > generic interface.  
 > 
-> KVM emulates SYSCALL, presumably that also works when EFER doesn't exist in
-> hardware.
+> This patch series introduces a new mediated device sysfs attribute,
+> guest_matrix, so the automated tests could check for the existence
+> of that interface. The problem I have with that is it will work for
+> this version of the vfio_ap device driver - which may be all that is
+> ever needed - but does not account for future enhancements
+> which may need to be detected by tooling or automated tests.
+> It seems to me that regardless of how a tool detects whether
+> a feature is supported or not, it will have to keep track of that
+> somehow.
 
-This is a fair point.
-How about checking the return value only when '!msr_info->host_initiated' in set_efer?
+Which enhancements? If you change the interface in an incompatible way,
+you have a different problem anyway. If someone trying to use the
+enhanced version of the interface gets an error on a kernel providing
+an older version of the interface, that's a reasonable way to discover
+support.
 
-This way userspace initiated EFER write will work as it did before,
-but guest initiated write will fail 
-(and set_efer already checks and fails for many cases)
+I think "discover device driver capabilities by probing" is less
+burdensome and error prone than trying to match up capabilities with a
+version number. If you expose a version number, a tool would still have
+to probe that version number, and then consult with a list of features
+per version, which can easily go out of sync.
 
-I also digged a bit around the failure check in VMX, the 'find_msr_entry(vmx, MSR_EFER);'
-This one if I am not mistaken will only fail when host doesn't support EFER.
-I don't mind ignoring this error as well as it was before.
+> Can you provide more details about this generic interface of
+> which you speak?
 
-> 
-> The above also adds weirdness to nested VMX as vmx_set_efer() simply can't
-> fail.
-It will now fail on non 64 bit Intel CPUs that support VMX. I do think that
-we had these for a while. As I said I'll return 0 when find_msr_entry fails,
-thus return this behavior as it was on Intel.
-
-Best regards,
-	Maxim Levitsky
-
+If that is really needed, I'd probably do a driver sysfs attribute that
+exposes a list of documented capabilities (as integer values, or as a
+bit.) But since tools can simply check for guest_matrix to find out
+about support for this feature here, it seems like overkill to me --
+unless you have a multitude of features waiting in queue that need to
+be made discoverable.
 
