@@ -2,148 +2,110 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5A5E8255012
-	for <lists+kvm@lfdr.de>; Thu, 27 Aug 2020 22:33:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2B893255020
+	for <lists+kvm@lfdr.de>; Thu, 27 Aug 2020 22:40:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727015AbgH0Udj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 27 Aug 2020 16:33:39 -0400
-Received: from mail.kernel.org ([198.145.29.99]:45658 "EHLO mail.kernel.org"
+        id S1726794AbgH0UkW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 27 Aug 2020 16:40:22 -0400
+Received: from mga12.intel.com ([192.55.52.136]:18712 "EHLO mga12.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726120AbgH0Udi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 27 Aug 2020 16:33:38 -0400
-Received: from localhost (104.sub-72-107-126.myvzw.com [72.107.126.104])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id B08BA20825;
-        Thu, 27 Aug 2020 20:33:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1598560417;
-        bh=VHsROdKs2GEdTQFMnkMuUYNmQM5R5a6tmWKg4n+BRpI=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:From;
-        b=MYOLYhgB7+6C3asPTPP4/fTyye9AIK1HUr0ELcuS4+6DZiwJjOqeYc6sO0DfTud+6
-         sbcmnzXN6aGEIWGJaF3h+yhRZHckW8ylKPUywfBBJh6NXTNbeSFpg5YQf4n5SNNk1d
-         RZvwonxTZxp+afPkDp2zdcM9YXA7Chd+QjaPq3WY=
-Date:   Thu, 27 Aug 2020 15:33:35 -0500
-From:   Bjorn Helgaas <helgaas@kernel.org>
-To:     Alex Williamson <alex.williamson@redhat.com>
-Cc:     Matthew Rosato <mjrosato@linux.ibm.com>, bhelgaas@google.com,
-        schnelle@linux.ibm.com, pmorel@linux.ibm.com, mpe@ellerman.id.au,
-        oohall@gmail.com, linux-s390@vger.kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-pci@vger.kernel.org
-Subject: Re: [PATCH v3] PCI: Introduce flag for detached virtual functions
-Message-ID: <20200827203335.GA2101829@bjorn-Precision-5520>
+        id S1726120AbgH0UkW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 27 Aug 2020 16:40:22 -0400
+IronPort-SDR: piM6LJS9zU7mKyQXFa6eBBcjK5UCiuIwqdvgQJ/nMUOoNeiBK8Ds8Q2ThH8pLgiKi3njjikUSc
+ Dkuwh244CuCw==
+X-IronPort-AV: E=McAfee;i="6000,8403,9726"; a="136109503"
+X-IronPort-AV: E=Sophos;i="5.76,361,1592895600"; 
+   d="scan'208";a="136109503"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Aug 2020 13:40:22 -0700
+IronPort-SDR: a8Epu/Guyx6APMv+Sh/B1GyPQ9QA0SrYmmogmr/rAyd5mLaH3XRzPMl35Du5jMpJFqB/ApEObC
+ juwatNfz5BzQ==
+X-IronPort-AV: E=Sophos;i="5.76,361,1592895600"; 
+   d="scan'208";a="475378700"
+Received: from sjchrist-ice.jf.intel.com (HELO sjchrist-ice) ([10.54.31.34])
+  by orsmga005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Aug 2020 13:40:22 -0700
+Date:   Thu, 27 Aug 2020 13:40:20 -0700
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Jim Mattson <jmattson@google.com>
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+        kvm list <kvm@vger.kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Peter Shier <pshier@google.com>,
+        LKML <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v2] KVM: nVMX: fix the layout of struct
+ kvm_vmx_nested_state_hdr
+Message-ID: <20200827204020.GE22351@sjchrist-ice>
+References: <20200713162206.1930767-1-vkuznets@redhat.com>
+ <CALMp9eR+DYVH0UZvbNKUNArzPdf1mvAoxakzj++szaVCD0Fcpw@mail.gmail.com>
+ <CALMp9eRGStwpYbeHbxo79zF9EyQ=35wwhNt03rjMHMDD9a5G0A@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200827131748.46b3f8bc@x1.home>
+In-Reply-To: <CALMp9eRGStwpYbeHbxo79zF9EyQ=35wwhNt03rjMHMDD9a5G0A@mail.gmail.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Aug 27, 2020 at 01:17:48PM -0600, Alex Williamson wrote:
-> On Thu, 27 Aug 2020 13:31:38 -0500
-> Bjorn Helgaas <helgaas@kernel.org> wrote:
+On Thu, Aug 27, 2020 at 11:25:25AM -0700, Jim Mattson wrote:
+> On Mon, Jul 13, 2020 at 11:23 AM Jim Mattson <jmattson@google.com> wrote:
+> >
+> > On Mon, Jul 13, 2020 at 9:22 AM Vitaly Kuznetsov <vkuznets@redhat.com> wrote:
+> > >
+> > > Before commit 850448f35aaf ("KVM: nVMX: Fix VMX preemption timer
+> > > migration") struct kvm_vmx_nested_state_hdr looked like:
+> > >
+> > > struct kvm_vmx_nested_state_hdr {
+> > >         __u64 vmxon_pa;
+> > >         __u64 vmcs12_pa;
+> > >         struct {
+> > >                 __u16 flags;
+> > >         } smm;
+> > > }
+> > >
+> > > The ABI got broken by the above mentioned commit and an attempt
+> > > to fix that was made in commit 83d31e5271ac ("KVM: nVMX: fixes for
+> > > preemption timer migration") which made the structure look like:
+> > >
+> > > struct kvm_vmx_nested_state_hdr {
+> > >         __u64 vmxon_pa;
+> > >         __u64 vmcs12_pa;
+> > >         struct {
+> > >                 __u16 flags;
+> > >         } smm;
+> > >         __u32 flags;
+> > >         __u64 preemption_timer_deadline;
+> > > };
+> > >
+> > > The problem with this layout is that before both changes compilers were
+> > > allocating 24 bytes for this and although smm.flags is padded to 8 bytes,
+> > > it is initialized as a 2 byte value. Chances are that legacy userspaces
+> > > using old layout will be passing uninitialized bytes which will slip into
+> > > what is now known as 'flags'.
+> > >
+> > > Suggested-by: Sean Christopherson <sean.j.christopherson@intel.com>
+> > > Fixes: 850448f35aaf ("KVM: nVMX: Fix VMX preemption timer migration")
+> > > Fixes: 83d31e5271ac ("KVM: nVMX: fixes for preemption timer migration")
+> > > Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+> >
+> > Oops!
+> >
+> > Reviewed-by: Jim Mattson <jmattson@google.com>
 > 
-> > Re the subject line, this patch does a lot more than just "introduce a
-> > flag"; AFAICT it actually enables important VFIO functionality, e.g.,
-> > something like:
-> > 
-> >   vfio/pci: Enable MMIO access for s390 detached VFs
-> > 
-> > On Thu, Aug 13, 2020 at 11:40:43AM -0400, Matthew Rosato wrote:
-> > > s390x has the notion of providing VFs to the kernel in a manner
-> > > where the associated PF is inaccessible other than via firmware.
-> > > These are not treated as typical VFs and access to them is emulated
-> > > by underlying firmware which can still access the PF.  After
-> > > the referened commit however these detached VFs were no longer able
-> > > to work with vfio-pci as the firmware does not provide emulation of
-> > > the PCI_COMMAND_MEMORY bit.  In this case, let's explicitly recognize
-> > > these detached VFs so that vfio-pci can allow memory access to
-> > > them again.  
-> > 
-> > Out of curiosity, in what sense is the PF inaccessible?  Is it
-> > *impossible* for Linux to access the PF, or is it just not enumerated
-> > by clp_list_pci() so Linux doesn't know about it?
-> > 
-> > VFs do not implement PCI_COMMAND, so I guess "firmware does not
-> > provide emulation of PCI_COMMAND_MEMORY" means something like "we
-> > can't access the PF so we can't enable/disable PCI_COMMAND_MEMORY"?
-> > 
-> > s/referened/referenced/
-> > 
-> > > Fixes: abafbc551fdd ("vfio-pci: Invalidate mmaps and block MMIO access on disabled memory")
-> > > Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
-> > > ---
-> > >  arch/s390/pci/pci_bus.c            | 13 +++++++++++++
-> > >  drivers/vfio/pci/vfio_pci_config.c |  8 ++++----
-> > >  include/linux/pci.h                |  4 ++++
-> > >  3 files changed, 21 insertions(+), 4 deletions(-)
-> > > 
-> > > diff --git a/arch/s390/pci/pci_bus.c b/arch/s390/pci/pci_bus.c
-> > > index 642a993..1b33076 100644
-> > > --- a/arch/s390/pci/pci_bus.c
-> > > +++ b/arch/s390/pci/pci_bus.c
-> > > @@ -184,6 +184,19 @@ static inline int zpci_bus_setup_virtfn(struct zpci_bus *zbus,
-> > >  }
-> > >  #endif
-> > >  
-> > > +void pcibios_bus_add_device(struct pci_dev *pdev)
-> > > +{
-> > > +	struct zpci_dev *zdev = to_zpci(pdev);
-> > > +
-> > > +	/*
-> > > +	 * If we have a VF on a non-multifunction bus, it must be a VF that is
-> > > +	 * detached from its parent PF.  We rely on firmware emulation to
-> > > +	 * provide underlying PF details.  
-> > 
-> > What exactly does "multifunction bus" mean?  I'm familiar with
-> > multi-function *devices*, but not multi-function buses.
-> > 
-> > > +	 */
-> > > +	if (zdev->vfn && !zdev->zbus->multifunction)
-> > > +		pdev->detached_vf = 1;
-> > > +}
-> > > +
-> > >  static int zpci_bus_add_device(struct zpci_bus *zbus, struct zpci_dev *zdev)
-> > >  {
-> > >  	struct pci_bus *bus;
-> > > diff --git a/drivers/vfio/pci/vfio_pci_config.c b/drivers/vfio/pci/vfio_pci_config.c
-> > > index d98843f..98f93d1 100644
-> > > --- a/drivers/vfio/pci/vfio_pci_config.c
-> > > +++ b/drivers/vfio/pci/vfio_pci_config.c
-> > > @@ -406,7 +406,7 @@ bool __vfio_pci_memory_enabled(struct vfio_pci_device *vdev)
-> > >  	 * PF SR-IOV capability, there's therefore no need to trigger
-> > >  	 * faults based on the virtual value.
-> > >  	 */
-> > > -	return pdev->is_virtfn || (cmd & PCI_COMMAND_MEMORY);
-> > > +	return dev_is_vf(&pdev->dev) || (cmd & PCI_COMMAND_MEMORY);  
-> > 
-> > I'm not super keen on the idea of having two subtly different ways of
-> > identifying VFs.  I think that will be confusing.  This seems to be
-> > the critical line, so whatever we do here, it will be out of the
-> > ordinary and probably deserves a little comment.
-> > 
-> > If Linux doesn't see the PF, does pci_physfn(VF) return NULL, i.e., is
-> > VF->physfn NULL?
-> 
-> FWIW, pci_physfn() never returns NULL, it returns the provided pdev if
-> is_virtfn is not set.  This proposal wouldn't change that return value.
-> AIUI pci_physfn(), the caller needs to test that the returned device is
-> different from the provided device if there's really code that wants to
-> traverse to the PF.
+> Whatever happened to this?
 
-Oh, so this VF has is_virtfn==0.  That seems weird.  There are lots of
-other ways that a VF is different: Vendor/Device IDs are 0xffff, BARs
-are zeroes, etc.
+Paolo pushed an alternative solution for 5.8, commit 5e105c88ab485 ("KVM:
+nVMX: check for invalid hdr.vmx.flags").  His argument was that there was
+no point in adding proper padding since we already broke the ABI, i.e.
+damage done.
 
-It sounds like you're sweeping those under the rug by avoiding the
-normal enumeration path (e.g., you don't have to size the BARs), but
-if it actually is a VF, it seems like there might be fewer surprises
-if we treat it as one.
-
-Why don't you just set is_virtfn=1 since it *is* a VF, and then deal
-with the special cases where you want to touch the PF?
-
-Bjorn
+So rather than pad the struct, which doesn't magically fix the ABI for old
+userspace, just check for unsupported flags.  That gives decent odds of
+failing the ioctl() for old userspace if it's passing garbage (through no
+fault of its own), prevents new userspace from setting unsupported flags,
+and allows KVM to grow the struct by conditioning consumption of new fields
+on an associated flag.
