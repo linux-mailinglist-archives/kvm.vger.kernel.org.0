@@ -2,185 +2,109 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A67042549EA
-	for <lists+kvm@lfdr.de>; Thu, 27 Aug 2020 17:53:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BD997254A1D
+	for <lists+kvm@lfdr.de>; Thu, 27 Aug 2020 18:01:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726825AbgH0PxU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 27 Aug 2020 11:53:20 -0400
-Received: from mail-bn7nam10on2085.outbound.protection.outlook.com ([40.107.92.85]:2401
-        "EHLO NAM10-BN7-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726232AbgH0PxS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 27 Aug 2020 11:53:18 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=G4L7Dpz+wCu6jnDwkYgrxjhcL2XBdsn5v6BXnO78vJzB0UXYrRq9tASKEpMAwC72vzV5geF43SJ3TsyUdRar4kS3j2CErY2azVzFjghRPc7jhjyGq/CdbMG55mIXRyng1+X69uQHonfkAAKyf0sMfLyfdqjKNQ45bxMv9aiIFZrYuBFFGIuKvoKsJmYaxbjbJahChz7xlvrB92VES3+kWj+CAX9507DoJHB37Ejb2QaGbBRe4j0T1moCNDkzCUr2uyH3JGBD3Eqt8hIiBIuN0mCL52cyDL5a0Y1mGv4LExEH2Q0DniaK5+5ugGGlLKAw/iRZT2zMbHf0mYok+yvXSQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=TmX5UKo4Sh5d3rsLlCaDrFwq6J5U68wIG+U3QNRBYZU=;
- b=jWUZsoZKOwmBiL+tJnqxr5AK+dEKC1d5mgcDBPMZNoITnEYQd9xLC/BXo/ntC9F0f7nBmygmUdc0lXJkVPzTkXBguNaDFhiubJA704O0xUtdBIkbarRwnFAuJX5rmPiUL4IVE49LIs0LFXvpYpHReBa4KvJwbWBpb5C1Eel/s0wm/IndEH03gxyxjj/yS/Eqzyr/LOD6sGrKweuyEFWw1hV5TYh17jEWOGtRy4KsmrMaxdzul49exWPQ2pvJjkL869LmnSck82Hl6adwpPCidUOzv5VFEYMRw7tXhpvXqNOt5ZSgDW/X/PFRlB4MwIdRUp3dpFpJoU+P1BejzsKVwQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
+        id S1726939AbgH0QBT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 27 Aug 2020 12:01:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44312 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726234AbgH0QBR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 27 Aug 2020 12:01:17 -0400
+Received: from mail-qk1-x742.google.com (mail-qk1-x742.google.com [IPv6:2607:f8b0:4864:20::742])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A2D53C061264;
+        Thu, 27 Aug 2020 09:01:17 -0700 (PDT)
+Received: by mail-qk1-x742.google.com with SMTP id b14so6335526qkn.4;
+        Thu, 27 Aug 2020 09:01:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=TmX5UKo4Sh5d3rsLlCaDrFwq6J5U68wIG+U3QNRBYZU=;
- b=GROkznrgYWwfCDvgpuZRA3mrFC24mAWGejogCbv5GngpumrING2x9Ex/YxfSKrS2uH74SBW+c7Yod1O0XnLs3hSmW0Wpvuy3yA+iWSMF92TvBKY7tSOEQMcphWuDpwpHjuq68ZfgFsGbdNWZVcDJX+qV0fphldbm2MmpD1k02t4=
-Authentication-Results: redhat.com; dkim=none (message not signed)
- header.d=none;redhat.com; dmarc=none action=none header.from=amd.com;
-Received: from DM5PR12MB1355.namprd12.prod.outlook.com (2603:10b6:3:6e::7) by
- DM6PR12MB3082.namprd12.prod.outlook.com (2603:10b6:5:11b::12) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.3326.19; Thu, 27 Aug 2020 15:53:15 +0000
-Received: from DM5PR12MB1355.namprd12.prod.outlook.com
- ([fe80::299a:8ed2:23fc:6346]) by DM5PR12MB1355.namprd12.prod.outlook.com
- ([fe80::299a:8ed2:23fc:6346%3]) with mapi id 15.20.3305.032; Thu, 27 Aug 2020
- 15:53:15 +0000
-Subject: Re: [PATCH 0/4] SEV-ES guest support
-From:   Tom Lendacky <thomas.lendacky@amd.com>
-To:     qemu-devel@nongnu.org, kvm@vger.kernel.org
-Cc:     Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Eduardo Habkost <ehabkost@redhat.com>,
-        Richard Henderson <rth@twiddle.net>,
+        d=gmail.com; s=20161025;
+        h=sender:from:date:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=8moOsqRnYIhz4ZttMW9zwcBUEs7klx/rrFKF2mMjY8s=;
+        b=OYZTMqQJaSZueJVUNgDzpIsruyaBu+TLAQQdPAiItmnBT0Q8V/rihSpvpJcEUthbc6
+         geBvAlOovV3Ci6jklaFysg/H+C1ATiiH390HryGB1FmK5IsI24tgmgWVdrvtIDp5oHa0
+         0cIgc//70fiGXQuSM9otGWtsqS6fz9ddgNnBdeiTirTQ88KlzI7WT9xedMHnfLGGwRKR
+         UpXpnXkqjhNvJIbfTJgefsYcbCModlIQaGKvZE/VT56UQJiPEHYQPHqdxSvDxVRlKuyY
+         yqKywcMW9HlFYFN/P1EL0KZLOdiLEFvpy09wpXWlqUeMc0747ziToJPe79hIWxO3BYqF
+         caTg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:sender:from:date:to:cc:subject:message-id
+         :references:mime-version:content-disposition:in-reply-to;
+        bh=8moOsqRnYIhz4ZttMW9zwcBUEs7klx/rrFKF2mMjY8s=;
+        b=icR02EI1yyEH1Fy0Wlt3nyS0JHiDUDoa7GM4kP0KkDC/VW0avo+dG+i0bDbRCyLlGm
+         YjwBaiQ6ZX8/v9uHRy9KQWttdHBGJfw+K4oHIx/LFTGu2hSINcDKixy4sEDuVfRsXIKi
+         leYPmmPp5DPjhBtruwfc21vAnKJSrMPXtCUTow+lVKuz/JKUou9wLWGJlUMczDsdVCwg
+         LUe4YA5lY6xM6kXdG89x9wpwtc5/MQPPu/X78EFUuyIrEZq7vge/N8E/LLIchJd1uF23
+         M0wyeztEnco0CcLBJINj1KplbD96rxlsPnXHdoU4CXX6X0No1xNGtY99b48EZZPigHDW
+         rmQA==
+X-Gm-Message-State: AOAM531uoAINV3wvoKZmb9kdujJs6bledqLteJvf2deSIaBLs6wOKPi8
+        BeDtN3Hyzt9Vedo2S3YR0r4=
+X-Google-Smtp-Source: ABdhPJzdZ+ZP5PyVj/QsANQkew3oPOWo8PnejboP8Zc8k+cK1AZVqg4lvdxOYROjb+F7t8I2zaySgw==
+X-Received: by 2002:a37:9ad4:: with SMTP id c203mr4792839qke.420.1598544076808;
+        Thu, 27 Aug 2020 09:01:16 -0700 (PDT)
+Received: from rani.riverdale.lan ([2001:470:1f07:5f3::b55f])
+        by smtp.gmail.com with ESMTPSA id 19sm2087813qkj.123.2020.08.27.09.01.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 27 Aug 2020 09:01:16 -0700 (PDT)
+From:   Arvind Sankar <nivedita@alum.mit.edu>
+X-Google-Original-From: Arvind Sankar <arvind@rani.riverdale.lan>
+Date:   Thu, 27 Aug 2020 12:01:13 -0400
+To:     Borislav Petkov <bp@alien8.de>
+Cc:     Joerg Roedel <joro@8bytes.org>, x86@kernel.org,
+        Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>, hpa@zytor.com,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Peter Zijlstra <peterz@infradead.org>,
         Jiri Slaby <jslaby@suse.cz>,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        "Michael S . Tsirkin" <mst@redhat.com>,
-        "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-References: <cover.1598382343.git.thomas.lendacky@amd.com>
-Message-ID: <4a529793-5448-458e-d9a8-31a8aa39f67c@amd.com>
-Date:   Thu, 27 Aug 2020 10:53:13 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
-In-Reply-To: <cover.1598382343.git.thomas.lendacky@amd.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SN4PR0501CA0128.namprd05.prod.outlook.com
- (2603:10b6:803:42::45) To DM5PR12MB1355.namprd12.prod.outlook.com
- (2603:10b6:3:6e::7)
+        Dan Williams <dan.j.williams@intel.com>,
+        Juergen Gross <jgross@suse.com>,
+        Kees Cook <keescook@chromium.org>,
+        David Rientjes <rientjes@google.com>,
+        Cfir Cohen <cfir@google.com>,
+        Erdem Aktas <erdemaktas@google.com>,
+        Masami Hiramatsu <mhiramat@kernel.org>,
+        Mike Stunes <mstunes@vmware.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Martin Radev <martin.b.radev@gmail.com>,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org
+Subject: Re: [PATCH v6 02/76] KVM: SVM: Add GHCB definitions
+Message-ID: <20200827160113.GA721088@rani.riverdale.lan>
+References: <20200824085511.7553-1-joro@8bytes.org>
+ <20200824085511.7553-3-joro@8bytes.org>
+ <20200824104451.GA4732@zn.tnic>
+ <20200825092224.GF3319@8bytes.org>
+ <20200825110446.GC12107@zn.tnic>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from 255.255.255.255 (255.255.255.255) by SN4PR0501CA0128.namprd05.prod.outlook.com (2603:10b6:803:42::45) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3326.10 via Frontend Transport; Thu, 27 Aug 2020 15:53:14 +0000
-X-Originating-IP: [67.79.209.213]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-HT: Tenant
-X-MS-Office365-Filtering-Correlation-Id: d9366339-f740-49f6-0102-08d84aa14ef6
-X-MS-TrafficTypeDiagnostic: DM6PR12MB3082:
-X-Microsoft-Antispam-PRVS: <DM6PR12MB3082BA0F1F57149437EB15E0EC550@DM6PR12MB3082.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:6430;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 4HR5gJNRBl8EEAckCBu1CGHGVE8JaY0nv4+EK2GYL9TNQpg9pcDdwZxFLuGvAgm9Rfu+4dV1sA/QbkljiOmM7s2Cx7RXDuGcsHqTyyD6EdWnzH1baWf6UZOOBHAQ9vCzcWcam3ZqW3KhkKdZOPS5SFQRyAdPhaM/IN+pYwGDHJuADKz4ZNwmNd9gptpe4zk5njSYmKrZQqeUeEMCknp7Db2+zFsqSA/shGd1iHrldc+NMv1h9b7SDA9fBXCbLEnUbf8iBOBTNX7ADRTmN7BrjtnNfu5zPXRqZb/uZepPUa+gduhQ/DKL7SuBydjZFE8KktdyeEhkRjswXDmc89oky0h2ijIdrTgYFzUYMkV/mhu9vLzrax1Fm5ub1Uq6b7YvqMfqs1XHupfGKMLGP/KsEccKbAOW0yCMS+mUyb6ZmXrEPCqrFhnj9a6x4uEKQVddwlKry4ceI+yWPbjG1WsghA==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM5PR12MB1355.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(346002)(376002)(39860400002)(136003)(396003)(366004)(2906002)(5660300002)(6486002)(54906003)(36756003)(966005)(478600001)(31686004)(53546011)(186003)(83380400001)(52116002)(26005)(4326008)(8936002)(2616005)(8676002)(956004)(66556008)(7416002)(316002)(86362001)(16576012)(66946007)(31696002)(66476007)(43740500002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData: OTfGjScodq1nlHOiQ2ESv0QY0fcl+sS1OIrSRIkdxLKrzm5N3Ec804v950hiMmP+4w2VThstEpESClqFj3YtsulzE293xbog6cECUe7Lkpuxf18JZX7vwlRvyWnHfTbFnq4z3J3YWtGWtRh+Bdh9DuHkqkYoA4D03/QJcPW5G1h3cATdSqKoEh6hF12cK2vfiSBwL5AtOEs5YXNH50fnJXA/RAInisKmlVT4zHEiPPuhkp44eU0u/xW3yuvxBc9GQn/Im5QDIc/IeMsu1EGE0B91BHcFREizJ6PpBAuxmtNz1BONQtn7/7dmNRL49xdo2Uf2X74HUPw0a+ybK2QOXtp26C84BDRF5Mm7BYlqpEGMiJhUpnGV0hcyefwpqK9pVsVvXcQOxrb7wHpo51hYij+hV5e57MPyvktTxlTmUe+7g5G4FwngwFBNA29BiRIk5W5SJ1EVQZ3ZATprcc6gz59N76dZWw/lur4yB1zM2c9wWZAASgtw/exMINfg9zqE6+5jMRB7eWxeOfqynF3RLaFKNZiSbI8xEyJlrPZXuLI7CwqBlyawh7GHqRVlv4V+oB4aMm6ip2MLl4RfDCxGfrgo1gzdLtYzHCw1ddGYLmHNHbu7PT32eWH57d0VWP98utfADxE2gEQMNbmZ4vrm9Q==
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: d9366339-f740-49f6-0102-08d84aa14ef6
-X-MS-Exchange-CrossTenant-AuthSource: DM5PR12MB1355.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Aug 2020 15:53:15.0850
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: LWgjoN21iZTkyW5ibepV1eIGphzwFzq8Pb793CUYox6KQej2Gkda94Ukcm5iRb2DCtMLiXt/kMaq6QRk4uXEnw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB3082
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20200825110446.GC12107@zn.tnic>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 8/25/20 2:05 PM, Tom Lendacky wrote:
-> From: Tom Lendacky <thomas.lendacky@amd.com>
+On Tue, Aug 25, 2020 at 01:04:46PM +0200, Borislav Petkov wrote:
+> On Tue, Aug 25, 2020 at 11:22:24AM +0200, Joerg Roedel wrote:
+> > I don't think so, if I look at the history of these checks their whole
+> > purpose seems to be to alert the developer/maintainer when their size
+> > changes and that they might not fit on the stack anymore. But that is
+> > taken care of in patch 1.
 > 
-> This patch series provides support for launching an SEV-ES guest.
+> Why? What's wrong with:
+> 
+> 	BUILD_BUG_ON(sizeof(struct vmcb_save_area) != VMCB_SAVE_AREA_SIZE);
+> 	BUILD_BUG_ON(sizeof(struct vmcb_control_area) != VMCB_CONTROL_AREA_SIZE);
+> 	BUILD_BUG_ON(sizeof(struct ghcb) != PAGE_SIZE);
+> 
+> ?
+> 
+> -- 
+> Regards/Gruss,
+>     Boris.
+> 
+> https://people.kernel.org/tglx/notes-about-netiquette
 
-I've made the changes associated with the checkpatch script output. I'll 
-wait a few more days for other feedback before submitting a v2.
-
-Sorry about the miss in regards to running checkpatch.
-
-Thanks,
-Tom
-
-> 
-> Secure Encrypted Virtualization - Encrypted State (SEV-ES) expands on the
-> SEV support to protect the guest register state from the hypervisor. See
-> "AMD64 Architecture Programmer's Manual Volume 2: System Programming",
-> section "15.35 Encrypted State (SEV-ES)" [1].
-> 
-> In order to allow a hypervisor to perform functions on behalf of a guest,
-> there is architectural support for notifying a guest's operating system
-> when certain types of VMEXITs are about to occur. This allows the guest to
-> selectively share information with the hypervisor to satisfy the requested
-> function. The notification is performed using a new exception, the VMM
-> Communication exception (#VC). The information is shared through the
-> Guest-Hypervisor Communication Block (GHCB) using the VMGEXIT instruction.
-> The GHCB format and the protocol for using it is documented in "SEV-ES
-> Guest-Hypervisor Communication Block Standardization" [2].
-> 
-> The main areas of the Qemu code that are updated to support SEV-ES are
-> around the SEV guest launch process and AP booting in order to support
-> booting multiple vCPUs.
-> 
-> There are no new command line switches required. Instead, the desire for
-> SEV-ES is presented using the SEV policy object. Bit 2 of the SEV policy
-> object indicates that SEV-ES is required.
-> 
-> The SEV launch process is updated in two ways. The first is that a the
-> KVM_SEV_ES_INIT ioctl is used to initialize the guest instead of the
-> standard KVM_SEV_INIT ioctl. The second is that before the SEV launch
-> measurement is calculated, the LAUNCH_UPDATE_VMSA SEV API is invoked for
-> each vCPU that Qemu has created. Once the LAUNCH_UPDATE_VMSA API has been
-> invoked, no direct changes to the guest register state can be made.
-> 
-> AP booting poses some interesting challenges. The INIT-SIPI-SIPI sequence
-> is typically used to boot the APs. However, the hypervisor is not allowed
-> to update the guest registers. For the APs, the reset vector must be known
-> in advance. An OVMF method to provide a known reset vector address exists
-> by providing an SEV information block, identified by UUID, near the end of
-> the firmware [3]. OVMF will program the jump to the actual reset vector in
-> this area of memory. Since the memory location is known in advance, an AP
-> can be created with the known reset vector address as its starting CS:IP.
-> The GHCB document [2] talks about how SMP booting under SEV-ES is
-> performed.
-> 
-> [1] https://www.amd.com/system/files/TechDocs/24593.pdf
-> [2] https://developer.amd.com/wp-content/resources/56421.pdf
-> [3] 30937f2f98c4 ("OvmfPkg: Use the SEV-ES work area for the SEV-ES AP reset vector")
->      https://github.com/tianocore/edk2/commit/30937f2f98c42496f2f143fe8374ae7f7e684847
-> 
-> ---
-> 
-> These patches are based on commit:
-> d0ed6a69d3 ("Update version for v5.1.0 release")
-> 
-> (I tried basing on the latest Qemu commit, but I was having build issues
-> that level)
-> 
-> A version of the tree can be found at:
-> https://github.com/AMDESE/qemu/tree/sev-es-v9
-> 
-> Tom Lendacky (4):
->    sev/i386: Add initial support for SEV-ES
->    sev/i386: Allow AP booting under SEV-ES
->    sev/i386: Don't allow a system reset under an SEV-ES guest
->    sev/i386: Enable an SEV-ES guest based on SEV policy
-> 
->   accel/kvm/kvm-all.c       | 68 ++++++++++++++++++++++++++++
->   accel/stubs/kvm-stub.c    |  5 +++
->   hw/i386/pc_sysfw.c        | 10 ++++-
->   include/sysemu/cpus.h     |  2 +
->   include/sysemu/hw_accel.h |  4 ++
->   include/sysemu/kvm.h      | 18 ++++++++
->   include/sysemu/sev.h      |  2 +
->   softmmu/cpus.c            |  5 +++
->   softmmu/vl.c              |  5 ++-
->   target/i386/cpu.c         |  1 +
->   target/i386/kvm.c         |  2 +
->   target/i386/sev-stub.c    |  5 +++
->   target/i386/sev.c         | 95 ++++++++++++++++++++++++++++++++++++++-
->   target/i386/sev_i386.h    |  1 +
->   14 files changed, 219 insertions(+), 4 deletions(-)
-> 
+Wouldn't we rather just remove the checks?
