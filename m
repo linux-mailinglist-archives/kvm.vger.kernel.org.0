@@ -2,123 +2,100 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 35414254AB3
-	for <lists+kvm@lfdr.de>; Thu, 27 Aug 2020 18:27:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8375A254B7F
+	for <lists+kvm@lfdr.de>; Thu, 27 Aug 2020 19:04:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727835AbgH0Q1x (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 27 Aug 2020 12:27:53 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:54530 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726820AbgH0Q1t (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 27 Aug 2020 12:27:49 -0400
+        id S1726804AbgH0REs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 27 Aug 2020 13:04:48 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:37786 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726232AbgH0REr (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 27 Aug 2020 13:04:47 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1598545667;
+        s=mimecast20190719; t=1598547885;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=gDA1nnu33h9EoCIllQ/S4lYLXEMFrnx+yFYTlg2I2Kk=;
-        b=eJxzUleX1idhSmVyOPAcDwnxX5BmmUOmB1asOBaxIKq41VCFb0yz24DVzqNhxTCYMa0Vxg
-        VVkVMvMAGGIrg+eW58nQBv1o8ccdKk5s2J7xubkiUm6m4Zia0z2yLx+rFJRBFBK5MEoKl8
-        ClaYZ0m45yVvkAXymz2VXhcVRVA0x+8=
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=6skhDZK1eBFqInLIv6DlYJCfL20AefptLm3lM0sktaQ=;
+        b=KysYfwv++BEGcBPflnLlC/v8oNnYgrJ6UYCVvRORnSFF5J3Ge2PBT37wZEScUzp5jjn76j
+        Sy5t4SGWqd38h2Xrd5TgOaCBPsvt8sTI1qUQBO73ToKSu66BAvPgbQy8fPap9vTdOkKKeL
+        q4Y6NLkLaUCK90E+lhKRtijBnBKA8+A=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-418-XVyJHn2IPc-cIosfpYpRQA-1; Thu, 27 Aug 2020 12:27:44 -0400
-X-MC-Unique: XVyJHn2IPc-cIosfpYpRQA-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+ us-mta-43-vuJ0MpH5PuSgTyT0hBShIQ-1; Thu, 27 Aug 2020 13:04:41 -0400
+X-MC-Unique: vuJ0MpH5PuSgTyT0hBShIQ-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EDDB864080;
-        Thu, 27 Aug 2020 16:27:42 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1DF13107464C;
+        Thu, 27 Aug 2020 17:04:40 +0000 (UTC)
 Received: from localhost.localdomain (unknown [10.35.206.185])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 86D825C1DA;
-        Thu, 27 Aug 2020 16:27:39 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 2891919936;
+        Thu, 27 Aug 2020 17:04:34 +0000 (UTC)
 From:   Maxim Levitsky <mlevitsk@redhat.com>
 To:     kvm@vger.kernel.org
-Cc:     Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org (maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)),
+Cc:     Joerg Roedel <joro@8bytes.org>, Borislav Petkov <bp@alien8.de>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        linux-kernel@vger.kernel.org, Joerg Roedel <joro@8bytes.org>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org,
         Ingo Molnar <mingo@redhat.com>,
+        x86@kernel.org (maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)),
         Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
         Thomas Gleixner <tglx@linutronix.de>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
         Maxim Levitsky <mlevitsk@redhat.com>
-Subject: [PATCH 3/3] KVM: nSVM: more strict SMM checks when returning to nested guest
-Date:   Thu, 27 Aug 2020 19:27:20 +0300
-Message-Id: <20200827162720.278690-4-mlevitsk@redhat.com>
-In-Reply-To: <20200827162720.278690-1-mlevitsk@redhat.com>
-References: <20200827162720.278690-1-mlevitsk@redhat.com>
+Subject: [PATCH 0/8] KVM: nSVM: ondemand nested state allocation + smm fixes
+Date:   Thu, 27 Aug 2020 20:04:26 +0300
+Message-Id: <20200827170434.284680-1-mlevitsk@redhat.com>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Content-Transfer-Encoding: quoted-printable
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-* check that guest is 64 bit guest, otherwise the SVM related fields
-  in the smm state area are not defined
-
-* If the SMM area indicates that SMM interrupted a running guest,
-  check that EFER.SVME which is also saved in this area is set, otherwise
-  the guest might have tampered with SMM save area, and so indicate
-  emulation failure which should triple fault the guest.
-
-* Check that that guest CPUID supports SVM (due to the same issue as above)
-
-Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
----
- arch/x86/kvm/svm/svm.c | 29 ++++++++++++++++++-----------
- 1 file changed, 18 insertions(+), 11 deletions(-)
-
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index 03dd7bac80348..0cfb8c08e744e 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -3900,21 +3900,28 @@ static int svm_pre_enter_smm(struct kvm_vcpu *vcpu, char *smstate)
- static int svm_pre_leave_smm(struct kvm_vcpu *vcpu, const char *smstate)
- {
- 	struct vcpu_svm *svm = to_svm(vcpu);
--	struct vmcb *nested_vmcb;
- 	struct kvm_host_map map;
--	u64 guest;
--	u64 vmcb;
- 	int ret = 0;
- 
--	guest = GET_SMSTATE(u64, smstate, 0x7ed8);
--	vmcb = GET_SMSTATE(u64, smstate, 0x7ee0);
-+	if (guest_cpuid_has(vcpu, X86_FEATURE_LM)) {
-+		u64 saved_efer = GET_SMSTATE(u64, smstate, 0x7ed0);
-+		u64 guest = GET_SMSTATE(u64, smstate, 0x7ed8);
-+		u64 vmcb = GET_SMSTATE(u64, smstate, 0x7ee0);
- 
--	if (guest) {
--		if (kvm_vcpu_map(&svm->vcpu, gpa_to_gfn(vmcb), &map) == -EINVAL)
--			return 1;
--		nested_vmcb = map.hva;
--		ret = enter_svm_guest_mode(svm, vmcb, nested_vmcb);
--		kvm_vcpu_unmap(&svm->vcpu, &map, true);
-+		if (guest) {
-+			if (!guest_cpuid_has(vcpu, X86_FEATURE_SVM))
-+				return 1;
-+
-+			if (!(saved_efer && EFER_SVME))
-+				return 1;
-+
-+			if (kvm_vcpu_map(&svm->vcpu,
-+					 gpa_to_gfn(vmcb), &map) == -EINVAL)
-+				return 1;
-+
-+			ret = enter_svm_guest_mode(svm, vmcb, map.hva);
-+			kvm_vcpu_unmap(&svm->vcpu, &map, true);
-+		}
- 	}
- 
- 	return ret;
--- 
-2.26.2
+This patch series does some refactoring and implements on demand nested sta=
+te area=0D
+This way at least guests that don't use nesting won't waste memory=0D
+on nested state.=0D
+=0D
+This patch series is based on patch series '[PATCH 0/3] Few nSVM bugfixes'=
+=0D
+(patch #7 here should have beeing moved there as well to be honest)=0D
+=0D
+The series was tested with various nested guests, and it seems to work=0D
+as long as I disable the TSC deadline timer (this is unrelated to this=0D
+patch series)=0D
+=0D
+I addressed the review feedback from V2, and added few refactoring=0D
+patches to this series as suggested.=0D
+=0D
+Best regards,=0D
+        Maxim Levitsky=0D
+=0D
+Maxim Levitsky (8):=0D
+  KVM: SVM: rename a variable in the svm_create_vcpu=0D
+  KVM: nSVM: rename nested vmcb to vmcb12=0D
+  KVM: SVM: refactor msr permission bitmap allocation=0D
+  KVM: SVM: use __GFP_ZERO instead of clear_page=0D
+  KVM: SVM: refactor exit labels in svm_create_vcpu=0D
+  KVM: x86: allow kvm_x86_ops.set_efer to return a value=0D
+  KVM: emulator: more strict rsm checks.=0D
+  KVM: nSVM: implement ondemand allocation of the nested state=0D
+=0D
+ arch/x86/include/asm/kvm_host.h |   2 +-=0D
+ arch/x86/kvm/emulate.c          |  22 ++-=0D
+ arch/x86/kvm/svm/nested.c       | 267 ++++++++++++++++++--------------=0D
+ arch/x86/kvm/svm/svm.c          | 106 +++++++------=0D
+ arch/x86/kvm/svm/svm.h          |  10 +-=0D
+ arch/x86/kvm/vmx/vmx.c          |   9 +-=0D
+ arch/x86/kvm/x86.c              |   3 +-=0D
+ 7 files changed, 243 insertions(+), 176 deletions(-)=0D
+=0D
+-- =0D
+2.26.2=0D
+=0D
 
