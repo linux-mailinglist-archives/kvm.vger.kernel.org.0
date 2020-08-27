@@ -2,104 +2,109 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id F2CBB254BBF
-	for <lists+kvm@lfdr.de>; Thu, 27 Aug 2020 19:12:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4B75E254CFB
+	for <lists+kvm@lfdr.de>; Thu, 27 Aug 2020 20:25:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727902AbgH0RMk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 27 Aug 2020 13:12:40 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:31714 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1727895AbgH0RM0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 27 Aug 2020 13:12:26 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1598548345;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=KuENNcu03ZYZzJy2Hk5IZPtHrf6j8qPH04KuM2zt3fQ=;
-        b=dU3Eimudo5jCy1ZZ0o6Cu8aTXdEDandobFNW6YEkto2/LPgcW3QxhzML75UQ8NbFDRGbJh
-        8u0dgUjpM8wG17J8MVZylnv1Ut1c6WZVvsy/Xu/Ufa/pPOMuN0OH7S/z3DcvkVuTX7XEzI
-        +24N9Rp6CmhTiIntK1kg6r1AIUFihZU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-14-6nOjKZdDOG2TUs42Yrymxg-1; Thu, 27 Aug 2020 13:12:21 -0400
-X-MC-Unique: 6nOjKZdDOG2TUs42Yrymxg-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 057B01029D23;
-        Thu, 27 Aug 2020 17:12:20 +0000 (UTC)
-Received: from starship (unknown [10.35.206.185])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 713F35C1DA;
-        Thu, 27 Aug 2020 17:12:15 +0000 (UTC)
-Message-ID: <a9708f1038dbf921451e9ff00dafecc324c8b736.camel@redhat.com>
-Subject: Re: [PATCH 0/8] KVM: nSVM: ondemand nested state allocation + smm
- fixes
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     kvm@vger.kernel.org
-Cc:     Joerg Roedel <joro@8bytes.org>, Borislav Petkov <bp@alien8.de>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org,
-        Ingo Molnar <mingo@redhat.com>,
-        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Sean Christopherson <sean.j.christopherson@intel.com>
-Date:   Thu, 27 Aug 2020 20:12:14 +0300
-In-Reply-To: <20200827170434.284680-1-mlevitsk@redhat.com>
-References: <20200827170434.284680-1-mlevitsk@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.3 (3.36.3-1.fc32) 
+        id S1726853AbgH0SZh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 27 Aug 2020 14:25:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38648 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726197AbgH0SZh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 27 Aug 2020 14:25:37 -0400
+Received: from mail-oi1-x243.google.com (mail-oi1-x243.google.com [IPv6:2607:f8b0:4864:20::243])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 66E47C06121B
+        for <kvm@vger.kernel.org>; Thu, 27 Aug 2020 11:25:37 -0700 (PDT)
+Received: by mail-oi1-x243.google.com with SMTP id e6so5446064oii.4
+        for <kvm@vger.kernel.org>; Thu, 27 Aug 2020 11:25:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=gs0r/qLqNENIPIXNSy2JKQmS4bv6DjmNng0VSEeWxcY=;
+        b=Yjq8DqIPvwRF1E9Tr12e/y+mTnyhCpVETyEZh1fq/yZGhcgQPT6Tyy05F2WWlmnUC6
+         dfRnq6kYRM1bJlsf7G8zIQjSa1l+/9dq1QUzy+rRrArCwjrFRzFGXdXNT1s4RqnZrvBG
+         fCp8l1Zt4JFqK7OSoQc0KL29gj3eafs0XRL+2MYhejL2Qzf0tHo6kyFGelGZste+olQA
+         aeMQ+XYFNXBGgdnJTMWjA7l02SiGVMUXUUWdiUIhH+078YbZD42rlFX34bwocJASQLVn
+         Tns2Mc1c1xJ1+cux3uB1404kK/KDAdlN7SdWoJWh3bTIDlSqFLxs7CrzletDnTvusf+5
+         l53Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=gs0r/qLqNENIPIXNSy2JKQmS4bv6DjmNng0VSEeWxcY=;
+        b=SYEQxXaSnDFTlAUYiHQR/B7M/ahutHw6Ixq/z3aCFWusPbwzAkKeP9uHfB8gVuQH1e
+         tAAiibRroWmxZoHjC21CjWq4Hxgdii1LTbPOo5ONHBylCRz/dsJKIRZQKDk2kv3wf8pP
+         Qju4WzMfJkcHHjxOMzNWffPquOoDtgGPfX5OrzOxVR2TdYgzp6yVrsBE7uBvl8M+f22M
+         ThMfEuTSGra16TIKl0Iscp5YWY5iOQ40X+vIr+FdJIBrLTivqAWWrPDSdZ54rO6O+98m
+         22WszulnM0Qx+i4FihKuap9nTJj1jHuPeAaDe6MkCfgN4NUpqquITc4tAvVGwBsivldn
+         B4uA==
+X-Gm-Message-State: AOAM530FyvybxbJ7l6tB3Lqs17e7R5rB/sMyDdr22xGE7cvPaNpK5Gz3
+        CjsXRIEjRZcBYkV0YNtxj0QzJGE3Rjlss0b0WeIApw==
+X-Google-Smtp-Source: ABdhPJyki3MAfYcG3wS6NQGrmmLx/zt7ChQXHSU1crErA4qk+WA5f7w/hTN++agIsMk2QIir4G0Mgl+njaE7EkxXApY=
+X-Received: by 2002:aca:670b:: with SMTP id z11mr130883oix.6.1598552736210;
+ Thu, 27 Aug 2020 11:25:36 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+References: <20200713162206.1930767-1-vkuznets@redhat.com> <CALMp9eR+DYVH0UZvbNKUNArzPdf1mvAoxakzj++szaVCD0Fcpw@mail.gmail.com>
+In-Reply-To: <CALMp9eR+DYVH0UZvbNKUNArzPdf1mvAoxakzj++szaVCD0Fcpw@mail.gmail.com>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Thu, 27 Aug 2020 11:25:25 -0700
+Message-ID: <CALMp9eRGStwpYbeHbxo79zF9EyQ=35wwhNt03rjMHMDD9a5G0A@mail.gmail.com>
+Subject: Re: [PATCH v2] KVM: nVMX: fix the layout of struct kvm_vmx_nested_state_hdr
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc:     kvm list <kvm@vger.kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Peter Shier <pshier@google.com>,
+        LKML <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 2020-08-27 at 20:04 +0300, Maxim Levitsky wrote:
-> This patch series does some refactoring and implements on demand nested state area
-> This way at least guests that don't use nesting won't waste memory
-> on nested state.
-> 
-> This patch series is based on patch series '[PATCH 0/3] Few nSVM bugfixes'
-> (patch #7 here should have beeing moved there as well to be honest)
-> 
-> The series was tested with various nested guests, and it seems to work
-> as long as I disable the TSC deadline timer (this is unrelated to this
-> patch series)
-> 
-> I addressed the review feedback from V2, and added few refactoring
-> patches to this series as suggested.
-> 
-> Best regards,
->         Maxim Levitsky
-> 
-> Maxim Levitsky (8):
->   KVM: SVM: rename a variable in the svm_create_vcpu
->   KVM: nSVM: rename nested vmcb to vmcb12
->   KVM: SVM: refactor msr permission bitmap allocation
->   KVM: SVM: use __GFP_ZERO instead of clear_page
->   KVM: SVM: refactor exit labels in svm_create_vcpu
->   KVM: x86: allow kvm_x86_ops.set_efer to return a value
->   KVM: emulator: more strict rsm checks.
->   KVM: nSVM: implement ondemand allocation of the nested state
-> 
->  arch/x86/include/asm/kvm_host.h |   2 +-
->  arch/x86/kvm/emulate.c          |  22 ++-
->  arch/x86/kvm/svm/nested.c       | 267 ++++++++++++++++++--------------
->  arch/x86/kvm/svm/svm.c          | 106 +++++++------
->  arch/x86/kvm/svm/svm.h          |  10 +-
->  arch/x86/kvm/vmx/vmx.c          |   9 +-
->  arch/x86/kvm/x86.c              |   3 +-
->  7 files changed, 243 insertions(+), 176 deletions(-)
-> 
-> -- 
-> 2.26.2
-> 
-Ignore this one, I send this with wrong version.
+On Mon, Jul 13, 2020 at 11:23 AM Jim Mattson <jmattson@google.com> wrote:
+>
+> On Mon, Jul 13, 2020 at 9:22 AM Vitaly Kuznetsov <vkuznets@redhat.com> wrote:
+> >
+> > Before commit 850448f35aaf ("KVM: nVMX: Fix VMX preemption timer
+> > migration") struct kvm_vmx_nested_state_hdr looked like:
+> >
+> > struct kvm_vmx_nested_state_hdr {
+> >         __u64 vmxon_pa;
+> >         __u64 vmcs12_pa;
+> >         struct {
+> >                 __u16 flags;
+> >         } smm;
+> > }
+> >
+> > The ABI got broken by the above mentioned commit and an attempt
+> > to fix that was made in commit 83d31e5271ac ("KVM: nVMX: fixes for
+> > preemption timer migration") which made the structure look like:
+> >
+> > struct kvm_vmx_nested_state_hdr {
+> >         __u64 vmxon_pa;
+> >         __u64 vmcs12_pa;
+> >         struct {
+> >                 __u16 flags;
+> >         } smm;
+> >         __u32 flags;
+> >         __u64 preemption_timer_deadline;
+> > };
+> >
+> > The problem with this layout is that before both changes compilers were
+> > allocating 24 bytes for this and although smm.flags is padded to 8 bytes,
+> > it is initialized as a 2 byte value. Chances are that legacy userspaces
+> > using old layout will be passing uninitialized bytes which will slip into
+> > what is now known as 'flags'.
+> >
+> > Suggested-by: Sean Christopherson <sean.j.christopherson@intel.com>
+> > Fixes: 850448f35aaf ("KVM: nVMX: Fix VMX preemption timer migration")
+> > Fixes: 83d31e5271ac ("KVM: nVMX: fixes for preemption timer migration")
+> > Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+>
+> Oops!
+>
+> Reviewed-by: Jim Mattson <jmattson@google.com>
 
+Whatever happened to this?
