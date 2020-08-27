@@ -2,37 +2,37 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id F2CCE254BC1
-	for <lists+kvm@lfdr.de>; Thu, 27 Aug 2020 19:12:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1D71A254BC4
+	for <lists+kvm@lfdr.de>; Thu, 27 Aug 2020 19:13:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726299AbgH0RMr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 27 Aug 2020 13:12:47 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:31572 "EHLO
+        id S1727069AbgH0RMu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 27 Aug 2020 13:12:50 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:31157 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727946AbgH0RMm (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 27 Aug 2020 13:12:42 -0400
+        by vger.kernel.org with ESMTP id S1727959AbgH0RMo (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 27 Aug 2020 13:12:44 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1598548360;
+        s=mimecast20190719; t=1598548362;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=0eSuGan0/UkqgTX87tH1fFC/jOPqKwkNi+GUUV3aL8Q=;
-        b=B22SE1oKY/Ih8fEe7l69tzDVAOD04IgDqnipauyPXGbdBwek4NYK9/AFk+5p43erqI80Ew
-        LxZ5tptg+DtRa6dSav/Tj2Bi+oBSkDmdybpSby+8SHHFDoJlEuEM354U//Kpba0RjOHdN3
-        95mmadsbOXI1kOfcuz+fEzQd55HqcQ8=
+        bh=3ROoCGGpTRrb/9L2mOI1+wpaSOaUSIzU0RUeWqIshIE=;
+        b=FqjoyOY8x+Suc7MloE/NaJBvkvZunOYUugM8IhScL6iDgD2SYJ4YSmJ/CCBMYjXwTs7IyA
+        jLXJcJ/aGM2gcKiivvT1Ujf+P84ecNdD8mQFsvodYXaSuidk6RPmCP+dmN4849NkNQnyXm
+        W2v8kP2oKvfwTn+rZ4FK9hESmb85tno=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-60-p6cjgNmOOxyq1kUYVED_GQ-1; Thu, 27 Aug 2020 13:12:37 -0400
-X-MC-Unique: p6cjgNmOOxyq1kUYVED_GQ-1
+ us-mta-224-QE59aHs2P3CcbT05BHkdSA-1; Thu, 27 Aug 2020 13:12:41 -0400
+X-MC-Unique: QE59aHs2P3CcbT05BHkdSA-1
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 56EA710ABDBF;
-        Thu, 27 Aug 2020 17:12:35 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2D88E10ABDBF;
+        Thu, 27 Aug 2020 17:12:39 +0000 (UTC)
 Received: from localhost.localdomain (unknown [10.35.206.185])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 149485D9E8;
-        Thu, 27 Aug 2020 17:12:24 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id BA2105D9E8;
+        Thu, 27 Aug 2020 17:12:35 +0000 (UTC)
 From:   Maxim Levitsky <mlevitsk@redhat.com>
 To:     kvm@vger.kernel.org
 Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
@@ -47,9 +47,9 @@ Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
         Ingo Molnar <mingo@redhat.com>, Joerg Roedel <joro@8bytes.org>,
         Wanpeng Li <wanpengli@tencent.com>,
         Maxim Levitsky <mlevitsk@redhat.com>
-Subject: [PATCH v3 6/8] KVM: x86: allow kvm_x86_ops.set_efer to return a value
-Date:   Thu, 27 Aug 2020 20:11:43 +0300
-Message-Id: <20200827171145.374620-7-mlevitsk@redhat.com>
+Subject: [PATCH v3 7/8] KVM: emulator: more strict rsm checks.
+Date:   Thu, 27 Aug 2020 20:11:44 +0300
+Message-Id: <20200827171145.374620-8-mlevitsk@redhat.com>
 In-Reply-To: <20200827171145.374620-1-mlevitsk@redhat.com>
 References: <20200827171145.374620-1-mlevitsk@redhat.com>
 MIME-Version: 1.0
@@ -60,112 +60,69 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This will be used later to return an error when setting this msr fails.
+Don't ignore return values in rsm_load_state_64/32 to avoid
+loading invalid state from SMM state area if it was tampered with
+by the guest.
 
-Note that we ignore this return value for qemu initiated writes to
-avoid breaking backward compatibility.
+This is primarly intended to avoid letting guest set bits in EFER
+(like EFER.SVME when nesting is disabled) by manipulating SMM save area.
+
+The DR checks are probably redundant, since the code sets them to fixed
+value, but it won't hurt to have them
 
 Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
 ---
- arch/x86/include/asm/kvm_host.h | 2 +-
- arch/x86/kvm/svm/svm.c          | 3 ++-
- arch/x86/kvm/svm/svm.h          | 2 +-
- arch/x86/kvm/vmx/vmx.c          | 9 ++++++---
- arch/x86/kvm/x86.c              | 3 ++-
- 5 files changed, 12 insertions(+), 7 deletions(-)
+ arch/x86/kvm/emulate.c | 22 +++++++++++++++++-----
+ 1 file changed, 17 insertions(+), 5 deletions(-)
 
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 5303dbc5c9bce..b273c199b9a55 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -1069,7 +1069,7 @@ struct kvm_x86_ops {
- 	void (*get_cs_db_l_bits)(struct kvm_vcpu *vcpu, int *db, int *l);
- 	void (*set_cr0)(struct kvm_vcpu *vcpu, unsigned long cr0);
- 	int (*set_cr4)(struct kvm_vcpu *vcpu, unsigned long cr4);
--	void (*set_efer)(struct kvm_vcpu *vcpu, u64 efer);
-+	int (*set_efer)(struct kvm_vcpu *vcpu, u64 efer);
- 	void (*get_idt)(struct kvm_vcpu *vcpu, struct desc_ptr *dt);
- 	void (*set_idt)(struct kvm_vcpu *vcpu, struct desc_ptr *dt);
- 	void (*get_gdt)(struct kvm_vcpu *vcpu, struct desc_ptr *dt);
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index b617579095277..4c92432e33e27 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -263,7 +263,7 @@ static int get_max_npt_level(void)
- #endif
- }
+diff --git a/arch/x86/kvm/emulate.c b/arch/x86/kvm/emulate.c
+index d0e2825ae6174..1d450d7710d63 100644
+--- a/arch/x86/kvm/emulate.c
++++ b/arch/x86/kvm/emulate.c
+@@ -2505,9 +2505,14 @@ static int rsm_load_state_32(struct x86_emulate_ctxt *ctxt,
+ 		*reg_write(ctxt, i) = GET_SMSTATE(u32, smstate, 0x7fd0 + i * 4);
  
--void svm_set_efer(struct kvm_vcpu *vcpu, u64 efer)
-+int svm_set_efer(struct kvm_vcpu *vcpu, u64 efer)
- {
- 	struct vcpu_svm *svm = to_svm(vcpu);
- 	vcpu->arch.efer = efer;
-@@ -283,6 +283,7 @@ void svm_set_efer(struct kvm_vcpu *vcpu, u64 efer)
+ 	val = GET_SMSTATE(u32, smstate, 0x7fcc);
+-	ctxt->ops->set_dr(ctxt, 6, (val & DR6_VOLATILE) | DR6_FIXED_1);
++
++	if (ctxt->ops->set_dr(ctxt, 6, (val & DR6_VOLATILE) | DR6_FIXED_1))
++		return X86EMUL_UNHANDLEABLE;
++
+ 	val = GET_SMSTATE(u32, smstate, 0x7fc8);
+-	ctxt->ops->set_dr(ctxt, 7, (val & DR7_VOLATILE) | DR7_FIXED_1);
++
++	if (ctxt->ops->set_dr(ctxt, 7, (val & DR7_VOLATILE) | DR7_FIXED_1))
++		return X86EMUL_UNHANDLEABLE;
  
- 	svm->vmcb->save.efer = efer | EFER_SVME;
- 	vmcb_mark_dirty(svm->vmcb, VMCB_CR);
-+	return 0;
- }
+ 	selector =                 GET_SMSTATE(u32, smstate, 0x7fc4);
+ 	set_desc_base(&desc,       GET_SMSTATE(u32, smstate, 0x7f64));
+@@ -2560,16 +2565,23 @@ static int rsm_load_state_64(struct x86_emulate_ctxt *ctxt,
+ 	ctxt->eflags = GET_SMSTATE(u32, smstate, 0x7f70) | X86_EFLAGS_FIXED;
  
- static int is_external_interrupt(u32 info)
-diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
-index ab913468f9cbe..468c58a915347 100644
---- a/arch/x86/kvm/svm/svm.h
-+++ b/arch/x86/kvm/svm/svm.h
-@@ -349,7 +349,7 @@ static inline bool gif_set(struct vcpu_svm *svm)
- #define MSR_INVALID				0xffffffffU
+ 	val = GET_SMSTATE(u32, smstate, 0x7f68);
+-	ctxt->ops->set_dr(ctxt, 6, (val & DR6_VOLATILE) | DR6_FIXED_1);
++
++	if (ctxt->ops->set_dr(ctxt, 6, (val & DR6_VOLATILE) | DR6_FIXED_1))
++		return X86EMUL_UNHANDLEABLE;
++
+ 	val = GET_SMSTATE(u32, smstate, 0x7f60);
+-	ctxt->ops->set_dr(ctxt, 7, (val & DR7_VOLATILE) | DR7_FIXED_1);
++
++	if (ctxt->ops->set_dr(ctxt, 7, (val & DR7_VOLATILE) | DR7_FIXED_1))
++		return X86EMUL_UNHANDLEABLE;
  
- u32 svm_msrpm_offset(u32 msr);
--void svm_set_efer(struct kvm_vcpu *vcpu, u64 efer);
-+int svm_set_efer(struct kvm_vcpu *vcpu, u64 efer);
- void svm_set_cr0(struct kvm_vcpu *vcpu, unsigned long cr0);
- int svm_set_cr4(struct kvm_vcpu *vcpu, unsigned long cr4);
- void svm_flush_tlb(struct kvm_vcpu *vcpu);
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 46ba2e03a8926..c2b60d242c2bd 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -2862,13 +2862,15 @@ static void enter_rmode(struct kvm_vcpu *vcpu)
- 	kvm_mmu_reset_context(vcpu);
- }
+ 	cr0 =                       GET_SMSTATE(u64, smstate, 0x7f58);
+ 	cr3 =                       GET_SMSTATE(u64, smstate, 0x7f50);
+ 	cr4 =                       GET_SMSTATE(u64, smstate, 0x7f48);
+ 	ctxt->ops->set_smbase(ctxt, GET_SMSTATE(u32, smstate, 0x7f00));
+ 	val =                       GET_SMSTATE(u64, smstate, 0x7ed0);
+-	ctxt->ops->set_msr(ctxt, MSR_EFER, val & ~EFER_LMA);
++
++	if (ctxt->ops->set_msr(ctxt, MSR_EFER, val & ~EFER_LMA))
++		return X86EMUL_UNHANDLEABLE;
  
--void vmx_set_efer(struct kvm_vcpu *vcpu, u64 efer)
-+int vmx_set_efer(struct kvm_vcpu *vcpu, u64 efer)
- {
- 	struct vcpu_vmx *vmx = to_vmx(vcpu);
- 	struct shared_msr_entry *msr = find_msr_entry(vmx, MSR_EFER);
- 
--	if (!msr)
--		return;
-+	if (!msr) {
-+		/* Host doen't support EFER, nothing to do */
-+		return 0;
-+	}
- 
- 	vcpu->arch.efer = efer;
- 	if (efer & EFER_LMA) {
-@@ -2880,6 +2882,7 @@ void vmx_set_efer(struct kvm_vcpu *vcpu, u64 efer)
- 		msr->data = efer & ~EFER_LME;
- 	}
- 	setup_msrs(vmx);
-+	return 0;
- }
- 
- #ifdef CONFIG_X86_64
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 539ea1cd6020c..3fed4e4367b24 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -1471,7 +1471,8 @@ static int set_efer(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
- 	efer &= ~EFER_LMA;
- 	efer |= vcpu->arch.efer & EFER_LMA;
- 
--	kvm_x86_ops.set_efer(vcpu, efer);
-+	if (kvm_x86_ops.set_efer(vcpu, efer) && !msr_info->host_initiated)
-+		return 1;
- 
- 	/* Update reserved bits */
- 	if ((efer ^ old_efer) & EFER_NX)
+ 	selector =                  GET_SMSTATE(u32, smstate, 0x7e90);
+ 	rsm_set_desc_flags(&desc,   GET_SMSTATE(u32, smstate, 0x7e92) << 8);
 -- 
 2.26.2
 
