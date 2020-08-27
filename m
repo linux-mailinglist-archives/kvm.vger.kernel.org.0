@@ -2,164 +2,91 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DAE752540AB
-	for <lists+kvm@lfdr.de>; Thu, 27 Aug 2020 10:24:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 84928254103
+	for <lists+kvm@lfdr.de>; Thu, 27 Aug 2020 10:38:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728310AbgH0IYC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 27 Aug 2020 04:24:02 -0400
-Received: from szxga07-in.huawei.com ([45.249.212.35]:45902 "EHLO huawei.com"
+        id S1728110AbgH0IiS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 27 Aug 2020 04:38:18 -0400
+Received: from mail.wangsu.com ([123.103.51.198]:44116 "EHLO wangsu.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726395AbgH0IXz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 27 Aug 2020 04:23:55 -0400
-Received: from DGGEMS402-HUB.china.huawei.com (unknown [172.30.72.60])
-        by Forcepoint Email with ESMTP id 6EE67404E57DEB67FD5B;
-        Thu, 27 Aug 2020 16:23:53 +0800 (CST)
-Received: from huawei.com (10.174.187.31) by DGGEMS402-HUB.china.huawei.com
- (10.3.19.202) with Microsoft SMTP Server id 14.3.487.0; Thu, 27 Aug 2020
- 16:23:43 +0800
-From:   Yifei Jiang <jiangyifei@huawei.com>
-To:     <paul.walmsley@sifive.com>, <palmer@dabbelt.com>,
-        <aou@eecs.berkeley.edu>, <anup.patel@wdc.com>,
-        <alistair.francis@wdc.com>, <atish.patra@wdc.com>,
-        <deepa.kernel@gmail.com>
-CC:     <kvm-riscv@lists.infradead.org>, <kvm@vger.kernel.org>,
-        <linux-riscv@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
-        <victor.zhangxiaofeng@huawei.com>, <wu.wubin@huawei.com>,
-        <zhang.zhanghailiang@huawei.com>, <dengkai1@huawei.com>,
-        <yinyipeng1@huawei.com>, Yifei Jiang <jiangyifei@huawei.com>
-Subject: [PATCH RFC 2/2] target/kvm: Add interfaces needed for log dirty
-Date:   Thu, 27 Aug 2020 16:22:51 +0800
-Message-ID: <20200827082251.1591-3-jiangyifei@huawei.com>
-X-Mailer: git-send-email 2.26.2.windows.1
-In-Reply-To: <20200827082251.1591-1-jiangyifei@huawei.com>
-References: <20200827082251.1591-1-jiangyifei@huawei.com>
+        id S1727935AbgH0IiR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 27 Aug 2020 04:38:17 -0400
+Received: from SZYJSSONGSH (unknown [218.17.157.35])
+        by app1 (Coremail) with SMTP id xjNnewDHqY4RaUdf3PsUAA--.105S2;
+        Thu, 27 Aug 2020 16:04:33 +0800 (CST)
+From:   "song" <songsh@wangsu.com>
+To:     <kvm@vger.kernel.org>
+Subject: =?gb2312?B?s7e72DogaG93IHRvIGNoYW5nZSB0aGUgZGVmYXVsdCBwZXJtaXNzaQ==?=
+        =?gb2312?B?b25zIG9mIHRoZSBpbnN0YW5jZSdzIGxvZw==?=
+Date:   Thu, 27 Aug 2020 16:04:32 +0800
+Message-ID: <!&!GAAAAAAAAAAZue5YDctfS6GMeKSG2nARwoAAABgAAAAAAAAAGbnuWA3LX0uhjHikhtpwEYR6IgAAAAAAEAAAAAlInp3O82lPqyaOV4kBf5IBAAAAAA==@wangsu.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Type: text/plain
-X-Originating-IP: [10.174.187.31]
-X-CFilter-Loop: Reflected
+Content-Type: multipart/mixed;
+        boundary="----=_NextPart_000_0006_01D67C8B.C1870CC0"
+X-Mailer: Microsoft Outlook 16.0
+Expiry-Date: Sat, 29 Aug 2020 16:04:30 +0800
+X-MS-TNEF-Correlator: 0000000019B9EE580DCB5F4BA18C78A486DA7011A47A2200
+X-CM-TRANSID: xjNnewDHqY4RaUdf3PsUAA--.105S2
+X-Coremail-Antispam: 1UD129KBjDUn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7v73
+        VFW2AGmfu7bjvjm3AaLaJ3UjIYCTnIWjp_UUUYf7k0a2IF6F4UM7kC6x804xWl1xkIjI8I
+        6I8E6xAIw20EY4v20xvaj40_Wr0E3s1l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxSw2
+        x7M28EF7xvwVC0I7IYx2IY67AKxVWDJVCq3wA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxVW0
+        oVCq3wA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
+        Cq3wAS0I0E0xvYzxvE52x082IY62kv0487M2AExVA0xI801c8C04v7Mc02F40EFcxC0VAK
+        zVAqx4xG6I80ewAv7VCjz48v1sIEY20_WFWUJr1UMcvjeVCFs4IE7xkEbVWUJVW8JwACjc
+        xG0xvY0x0EwIxGrwACY4xI67k04243AVAKzVAKj4xxM4xvF2IEb7IF0Fy26I8I3I1lc2xS
+        Y4AK67AK6r43MxAIw28IcxkI7VAKI48JMxAIw28IcVCjz48v1sIEY20_WFWUJr1UMxC20s
+        026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_
+        JrI_JrWlx4CE17CEb7AF67AKxVWUJVWUXwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14
+        v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVWUJVW8JwCI42IY6xAIw20EY4v20xva
+        j40_Zr0_Wr1UMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Jr
+        0_GrUvcSsGvfC2KfnxnUUI43ZEXa7IUUiL05UUUUU==
+X-CM-SenderInfo: 5vrqw2nk6zt0xjvxhudrp/
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add two interfaces of log dirty for kvm_main.c, and detele the interface
-kvm_vm_ioctl_get_dirty_log which is redundantly defined.
+This is a multipart message in MIME format.
 
-CONFIG_KVM_GENERIC_DIRTYLOG_READ_PROTECT is added in defconfig.
+------=_NextPart_000_0006_01D67C8B.C1870CC0
+Content-Type: text/plain;
+	charset="gb2312"
+Content-Transfer-Encoding: base64
 
-Signed-off-by: Yifei Jiang <jiangyifei@huawei.com>
-Signed-off-by: Yipeng Yin <yinyipeng1@huawei.com>
----
- arch/riscv/configs/defconfig |  1 +
- arch/riscv/kvm/Kconfig       |  1 +
- arch/riscv/kvm/mmu.c         | 43 ++++++++++++++++++++++++++++++++++++
- arch/riscv/kvm/vm.c          |  6 -----
- 4 files changed, 45 insertions(+), 6 deletions(-)
+c29uZyC9q7O3u9jTyrz+obBob3cgdG8gY2hhbmdlIHRoZSBkZWZhdWx0IHBlcm1pc3Npb25zIG9m
+IHRoZSBpbnN0YW5jZSdzDQpsb2ehsaGjDQo=
 
-diff --git a/arch/riscv/configs/defconfig b/arch/riscv/configs/defconfig
-index d36e1000bbd3..857d799672c2 100644
---- a/arch/riscv/configs/defconfig
-+++ b/arch/riscv/configs/defconfig
-@@ -19,6 +19,7 @@ CONFIG_SOC_VIRT=y
- CONFIG_SMP=y
- CONFIG_VIRTUALIZATION=y
- CONFIG_KVM=y
-+CONFIG_KVM_GENERIC_DIRTYLOG_READ_PROTECT=y
- CONFIG_HOTPLUG_CPU=y
- CONFIG_MODULES=y
- CONFIG_MODULE_UNLOAD=y
-diff --git a/arch/riscv/kvm/Kconfig b/arch/riscv/kvm/Kconfig
-index 2356dc52ebb3..91fcffc70e5d 100644
---- a/arch/riscv/kvm/Kconfig
-+++ b/arch/riscv/kvm/Kconfig
-@@ -26,6 +26,7 @@ config KVM
- 	select KVM_MMIO
- 	select HAVE_KVM_VCPU_ASYNC_IOCTL
- 	select SRCU
-+	select KVM_GENERIC_DIRTYLOG_READ_PROTECT
- 	help
- 	  Support hosting virtualized guest machines.
- 
-diff --git a/arch/riscv/kvm/mmu.c b/arch/riscv/kvm/mmu.c
-index 88bce80ee983..df2a470c25e4 100644
---- a/arch/riscv/kvm/mmu.c
-+++ b/arch/riscv/kvm/mmu.c
-@@ -358,6 +358,43 @@ void stage2_wp_memory_region(struct kvm *kvm, int slot)
- 	kvm_flush_remote_tlbs(kvm);
- }
- 
-+/**
-+ * kvm_mmu_write_protect_pt_masked() - write protect dirty pages
-+ * @kvm:    The KVM pointer
-+ * @slot:   The memory slot associated with mask
-+ * @gfn_offset: The gfn offset in memory slot
-+ * @mask:   The mask of dirty pages at offset 'gfn_offset' in this memory
-+ *      slot to be write protected
-+ *
-+ * Walks bits set in mask write protects the associated pte's. Caller must
-+ * acquire kvm_mmu_lock.
-+ */
-+static void kvm_mmu_write_protect_pt_masked(struct kvm *kvm,
-+        struct kvm_memory_slot *slot,
-+        gfn_t gfn_offset, unsigned long mask)
-+{
-+    phys_addr_t base_gfn = slot->base_gfn + gfn_offset;
-+    phys_addr_t start = (base_gfn +  __ffs(mask)) << PAGE_SHIFT;
-+    phys_addr_t end = (base_gfn + __fls(mask) + 1) << PAGE_SHIFT;
-+
-+    stage2_wp_range(kvm, start, end);
-+}
-+
-+/*
-+ * kvm_arch_mmu_enable_log_dirty_pt_masked - enable dirty logging for selected
-+ * dirty pages.
-+ *
-+ * It calls kvm_mmu_write_protect_pt_masked to write protect selected pages to
-+ * enable dirty logging for them.
-+ */
-+void kvm_arch_mmu_enable_log_dirty_pt_masked(struct kvm *kvm,
-+        struct kvm_memory_slot *slot,
-+        gfn_t gfn_offset, unsigned long mask)
-+{
-+    kvm_mmu_write_protect_pt_masked(kvm, slot, gfn_offset, mask);
-+}
-+
-+
- int stage2_ioremap(struct kvm *kvm, gpa_t gpa, phys_addr_t hpa,
- 		   unsigned long size, bool writable)
- {
-@@ -433,6 +470,12 @@ void kvm_arch_sync_dirty_log(struct kvm *kvm, struct kvm_memory_slot *memslot)
- {
- }
- 
-+void kvm_arch_flush_remote_tlbs_memslot(struct kvm *kvm,
-+					struct kvm_memory_slot *memslot)
-+{
-+	kvm_flush_remote_tlbs(kvm);
-+}
-+
- void kvm_arch_free_memslot(struct kvm *kvm, struct kvm_memory_slot *free)
- {
- }
-diff --git a/arch/riscv/kvm/vm.c b/arch/riscv/kvm/vm.c
-index 4f2498198cb5..f7405676903b 100644
---- a/arch/riscv/kvm/vm.c
-+++ b/arch/riscv/kvm/vm.c
-@@ -12,12 +12,6 @@
- #include <linux/uaccess.h>
- #include <linux/kvm_host.h>
- 
--int kvm_vm_ioctl_get_dirty_log(struct kvm *kvm, struct kvm_dirty_log *log)
--{
--	/* TODO: To be added later. */
--	return -ENOTSUPP;
--}
--
- int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
- {
- 	int r;
--- 
-2.19.1
+------=_NextPart_000_0006_01D67C8B.C1870CC0
+Content-Type: application/ms-tnef;
+	name="winmail.dat"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment;
+	filename="winmail.dat"
 
+eJ8+IiEIAQaQCAAEAAAAAAABAAEAAQeQBgAIAAAAqAMAAAAAAACrAAEIgAcAEwAAAElQTS5PdXRs
+b29rLlJlY2FsbACCBgEDkAYApAQAABsAAAADACYAAQAAAAIBMQABAAAA5AAAAFBDREZFQjA5AAEA
+AgB+AAAAAAAAADihuxAF5RAaobsIACsqVsIAAG1zcHN0LmRsbAAAAAAATklUQfm/uAEAqgA32W4A
+AAAARQA6AFwAUAByAG8AZwByAGEAbQAgAEYAaQBsAGUAcwBcAG8AdQB0AGwAbwBvAGsAXABzAG8A
+bgBnAHMAaAAuAHAAcwB0AAAAGAAAAAAAAAAZue5YDctfS6GMeKSG2nARwoAAABgAAAAAAAAAGbnu
+WA3LX0uhjHikhtpwEYR6IgAAAAAAEAAAAAlInp3O82lPqyaOV4kBf5IBAAAAAB4AcAABAAAARAAA
+AAEFs7e72DogaG93IHRvIGNoYW5nZSB0aGUgZGVmYXVsdCBwZXJtaXNzaW9ucyBvZiB0aGUgaW5z
+dGFuY2UncyBsb2cACwABDgEAAAADABQOAQAAAB4AKA4BAAAALQAAADAwMDAwMDAyAXNvbmdzaEB3
+YW5nc3UuY29tAXNvbmdzaEB3YW5nc3UuY29tAAAAAB4AKQ4BAAAALQAAADAwMDAwMDAyAXNvbmdz
+aEB3YW5nc3UuY29tAXNvbmdzaEB3YW5nc3UuY29tAAAAAAIBAGgBAAAAEAAAAAlInp3O82lPqyaO
+V4kBf5IDAAFoEQAAAB4AAmgBAAAACQAAAElQTS5Ob3RlAAAAAAsAA2gAAAAAAwAEaAAAAAADAIaA
+CCAGAAAAAADAAAAAAAAARgAAAAAahQAAAQAAAAsAHw4BAAAAAgH4DwEAAAAQAAAAGbnuWA3LX0uh
+jHikhtpwEQIB+g8BAAAAEAAAABm57lgNy19LoYx4pIbacBEDAP4PBQAAAAIBCRABAAAALwEAACsB
+AADsAQAATFpGdefmGWQDAAoAcmNwZzEyNSIyA0N0ZXgFQmJp/mQEAAMwAQMB9wqAAqQD4wkCAGNo
+CsBzZXQw/iAHEwKAEHMAUARWCFUHsu8SRQ5RAwERRzIGAAbDEkVOMwRGEUkTX2Y0EN4xjDM0BgAH
+cHN1bgKAtxJTCO8J9zsbXw4wNRJCnQxgYwBQCwkBZDM2EdDDC6YDMGh0bWwAIRiFVwwBIEUR0HMC
+IGcDMCd6YgswJwyhIkAWUCJANzMiMSKhZDgjcSLhY2HjIjEA4CdmZSJxAFAiQIgwaG8H4HRvIBFh
+NSIAZSVgaCXwAQFhdapsBUBwBJBtBAFpAiBZBCBvZiYDC4BzAZBu2GNlJwQgGvBnJLUk4d0k0mEW
+UCBFArF9IUgKogUKgH0rsAADAA00/T+lDgMADzT9P6UOAgEUNAEAAAAQAAAATklUQfm/uAEAqgA3
+2W4AAAIBfwABAAAAMQAAADAwMDAwMDAwMTlCOUVFNTgwRENCNUY0QkExOEM3OEE0ODZEQTcwMTFB
+NDdBMjIwMAAAAAADAAYQcf7duAMABxBFAAAAAwAQEAAAAAADABEQAAAAAB4ACBABAAAARgAAAFNP
+Tke9q7O3u9jTyrz+obBIT1dUT0NIQU5HRVRIRURFRkFVTFRQRVJNSVNTSU9OU09GVEhFSU5TVEFO
+Q0VTTE9HobGhowAAACoh
+
+------=_NextPart_000_0006_01D67C8B.C1870CC0--
 
