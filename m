@@ -2,85 +2,91 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 09551255A3C
-	for <lists+kvm@lfdr.de>; Fri, 28 Aug 2020 14:33:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7378B255B88
+	for <lists+kvm@lfdr.de>; Fri, 28 Aug 2020 15:48:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729467AbgH1MdP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 28 Aug 2020 08:33:15 -0400
-Received: from 8bytes.org ([81.169.241.247]:39864 "EHLO theia.8bytes.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729298AbgH1MdI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 28 Aug 2020 08:33:08 -0400
-Received: by theia.8bytes.org (Postfix, from userid 1000)
-        id 1F45E2E1; Fri, 28 Aug 2020 14:33:07 +0200 (CEST)
-Date:   Fri, 28 Aug 2020 14:33:04 +0200
-From:   Joerg Roedel <joro@8bytes.org>
-To:     Arvind Sankar <nivedita@alum.mit.edu>
-Cc:     x86@kernel.org, Joerg Roedel <jroedel@suse.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>, hpa@zytor.com,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Jiri Slaby <jslaby@suse.cz>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Juergen Gross <jgross@suse.com>,
-        Kees Cook <keescook@chromium.org>,
-        David Rientjes <rientjes@google.com>,
-        Cfir Cohen <cfir@google.com>,
-        Erdem Aktas <erdemaktas@google.com>,
-        Masami Hiramatsu <mhiramat@kernel.org>,
-        Mike Stunes <mstunes@vmware.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Martin Radev <martin.b.radev@gmail.com>,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org
-Subject: Re: [PATCH v6 27/76] x86/sev-es: Add CPUID handling to #VC handler
-Message-ID: <20200828123304.GD13881@8bytes.org>
-References: <20200824085511.7553-1-joro@8bytes.org>
- <20200824085511.7553-28-joro@8bytes.org>
- <20200827224810.GA986963@rani.riverdale.lan>
+        id S1726828AbgH1NsH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 28 Aug 2020 09:48:07 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:46490 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726321AbgH1NsF (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 28 Aug 2020 09:48:05 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1598622484;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=PyImQr8Vv71Nkg4eGLf/31gz0soaKXkRyk+wNyHdUvU=;
+        b=a4BmW7igN0nosE1ZDkltWUilMgkuRliEVXXEi9fQcd78Vd/kOiK4g0bGGWR85ac1kYnMUq
+        92IcLl8l1kuSOdoWU+8W7JrU03gQ2EyWwG1WbR18xSBQAjXO0jHeq2ZJbdXWazeLR3LUWX
+        z6gkZjysSmlIiHm3AC/w7vK9Tf9TBA0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-574-Ets9HjX7NxWOzyPhwKwiwA-1; Fri, 28 Aug 2020 09:48:02 -0400
+X-MC-Unique: Ets9HjX7NxWOzyPhwKwiwA-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 37BBE8730A8;
+        Fri, 28 Aug 2020 13:47:59 +0000 (UTC)
+Received: from gondolin (ovpn-113-255.ams2.redhat.com [10.36.113.255])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id B5F055C1D0;
+        Fri, 28 Aug 2020 13:47:44 +0000 (UTC)
+Date:   Fri, 28 Aug 2020 15:47:41 +0200
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Yan Zhao <yan.y.zhao@intel.com>
+Cc:     Alex Williamson <alex.williamson@redhat.com>,
+        "Daniel =?UTF-8?B?UC5C?= =?UTF-8?B?ZXJyYW5nw6k=?=" 
+        <berrange@redhat.com>, kvm@vger.kernel.org, libvir-list@redhat.com,
+        Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org,
+        kwankhede@nvidia.com, eauger@redhat.com, xin-ran.wang@intel.com,
+        corbet@lwn.net, openstack-discuss@lists.openstack.org,
+        shaohe.feng@intel.com, kevin.tian@intel.com,
+        Parav Pandit <parav@mellanox.com>, jian-feng.ding@intel.com,
+        dgilbert@redhat.com, zhenyuw@linux.intel.com, hejie.xu@intel.com,
+        bao.yumeng@zte.com.cn, smooney@redhat.com,
+        intel-gvt-dev@lists.freedesktop.org, eskultet@redhat.com,
+        Jiri Pirko <jiri@mellanox.com>, dinechin@redhat.com,
+        devel@ovirt.org
+Subject: Re: device compatibility interface for live migration with assigned
+ devices
+Message-ID: <20200828154741.30cfc1a3.cohuck@redhat.com>
+In-Reply-To: <20200826064117.GA22243@joy-OptiPlex-7040>
+References: <20200814051601.GD15344@joy-OptiPlex-7040>
+        <a51209fe-a8c6-941f-ff54-7be06d73bc44@redhat.com>
+        <20200818085527.GB20215@redhat.com>
+        <3a073222-dcfe-c02d-198b-29f6a507b2e1@redhat.com>
+        <20200818091628.GC20215@redhat.com>
+        <20200818113652.5d81a392.cohuck@redhat.com>
+        <20200820003922.GE21172@joy-OptiPlex-7040>
+        <20200819212234.223667b3@x1.home>
+        <20200820031621.GA24997@joy-OptiPlex-7040>
+        <20200825163925.1c19b0f0.cohuck@redhat.com>
+        <20200826064117.GA22243@joy-OptiPlex-7040>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200827224810.GA986963@rani.riverdale.lan>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Aug 27, 2020 at 06:48:10PM -0400, Arvind Sankar wrote:
-> On Mon, Aug 24, 2020 at 10:54:22AM +0200, Joerg Roedel wrote:
-> > From: Tom Lendacky <thomas.lendacky@amd.com>
-> > 
-> > Handle #VC exceptions caused by CPUID instructions. These happen in
-> > early boot code when the KASLR code checks for RDTSC.
-> > 
-> > Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
-> > [ jroedel@suse.de: Adapt to #VC handling framework ]
-> > Co-developed-by: Joerg Roedel <jroedel@suse.de>
-> > Signed-off-by: Joerg Roedel <jroedel@suse.de>
-> > Link: https://lore.kernel.org/r/20200724160336.5435-27-joro@8bytes.org
-> > ---
-> > +
-> > +static enum es_result vc_handle_cpuid(struct ghcb *ghcb,
-> > +				      struct es_em_ctxt *ctxt)
-> > +{
-> > +	struct pt_regs *regs = ctxt->regs;
-> > +	u32 cr4 = native_read_cr4();
-> > +	enum es_result ret;
-> > +
-> > +	ghcb_set_rax(ghcb, regs->ax);
-> > +	ghcb_set_rcx(ghcb, regs->cx);
-> > +
-> > +	if (cr4 & X86_CR4_OSXSAVE)
+On Wed, 26 Aug 2020 14:41:17 +0800
+Yan Zhao <yan.y.zhao@intel.com> wrote:
+
+> previously, we want to regard the two mdevs created with dsa-1dwq x 30 and
+> dsa-2dwq x 15 as compatible, because the two mdevs consist equal resources.
 > 
-> Will this ever happen? trampoline_32bit_src will clear CR4 except for
-> PAE and possibly LA57, no?
+> But, as it's a burden to upper layer, we agree that if this condition
+> happens, we still treat the two as incompatible.
+> 
+> To fix it, either the driver should expose dsa-1dwq only, or the target
+> dsa-2dwq needs to be destroyed and reallocated via dsa-1dwq x 30.
 
-This same code is later re-used in the runtime handler and there the
-check is needed :)
-
-Regards,
-
-	Joerg
+AFAIU, these are mdev types, aren't they? So, basically, any management
+software needs to take care to use the matching mdev type on the target
+system for device creation?
 
