@@ -2,102 +2,67 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E1CEA2552B2
-	for <lists+kvm@lfdr.de>; Fri, 28 Aug 2020 03:49:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C56F92552FF
+	for <lists+kvm@lfdr.de>; Fri, 28 Aug 2020 04:23:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728193AbgH1Bt1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 27 Aug 2020 21:49:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50998 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726197AbgH1Bt0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 27 Aug 2020 21:49:26 -0400
-Received: from mail-io1-xd41.google.com (mail-io1-xd41.google.com [IPv6:2607:f8b0:4864:20::d41])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 345EDC061264;
-        Thu, 27 Aug 2020 18:49:25 -0700 (PDT)
-Received: by mail-io1-xd41.google.com with SMTP id l8so14003ios.2;
-        Thu, 27 Aug 2020 18:49:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=AuxkTqVq7yF2cLR6HeqahnZopzaHgO8OPP4mjEB1p/k=;
-        b=PN9yYyL4U/3wo7e66qiK4b+DxYiIE2tNSdJ1QM6y6NdGvVhy7cMLmg3Rz72+yJ48W+
-         iXITBxJq7GTKuxRnhJAEICDM8RtusSpCWOqlSf82SEW0QUGwqX4jxZz+xKWpZ1aQNGS3
-         daDj3FQEk4wT1/V82TdGadwCJl9OzsvMcq+wpcOwZJc9rzhJ96IQYjXBJWYsJ5pqM7vg
-         Tio7S4cZuz0jySy/qtstaV/t8GW5vbknrSvcMPh+813krFMDZiPqQhqbKxMc0zcFM0VJ
-         ShD2xJLTVebdKMwJOHZiPFqBAdkPq5b585X3uA5wYjxcqQElpi4RcGKHh4oPEqO+kFvo
-         65Pg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=AuxkTqVq7yF2cLR6HeqahnZopzaHgO8OPP4mjEB1p/k=;
-        b=lSUgKQaQ6pM/uKZhUrWFGFscIzpePFzqwht5BwQjF5hVucymwB/Zl9h7NTdHiR8Qew
-         CHQB0OXovPh/Fig7jk/eR16s2AsOBVLoA0WGFA6Re7j9PtRMqIqUi1WL/FbhjfrQTBsK
-         fSveIsHHK9+pCCJZ3YnGkGBYL1uWLhvkLXR331IqWOxrKKs5U58VQvKzkc+IikrRbr1J
-         jOtD9GKqvE5MvZoYxh7AAqOTZVVIbioD2nVXI3Jylx5aTWQ9rS6UQyLKSabQE4y9GDmZ
-         xJeq3KYwQ2gMRl7gazkffBD3FjJP9ZfAeQTjEDIAhR8wuzHkGEXMZ9zAtvvBEHgJ4j8+
-         LMqQ==
-X-Gm-Message-State: AOAM533ZEJxeRxomZXjY0gFVtt+LLYHxNdbyXa/VWFeBVGKWNS2lwiLo
-        y9tY6bbb2iecn6aZ59ywoB0GcM9QLma1Nvz0L2jZ6b5XS/V7nQ==
-X-Google-Smtp-Source: ABdhPJwx/DIu4zJ07VCu6FiVgahDko/FpmdmTd7xlfYVxx8Un8UKZNh/GZWHLRZjPDLEg7i+ACD8EDmZ1JsVkGd3H+o=
-X-Received: by 2002:a05:6638:24cf:: with SMTP id y15mr22673544jat.137.1598579364071;
- Thu, 27 Aug 2020 18:49:24 -0700 (PDT)
-MIME-Version: 1.0
-References: <20200824101825.4106-1-jiangshanlai@gmail.com>
-In-Reply-To: <20200824101825.4106-1-jiangshanlai@gmail.com>
-From:   Lai Jiangshan <jiangshanlai@gmail.com>
-Date:   Fri, 28 Aug 2020 09:49:13 +0800
-Message-ID: <CAJhGHyC1Ykq5V_2nFPLRz9JmtAiQu6aw4fCKo1LO7Qwzjvfg2g@mail.gmail.com>
-Subject: Re: [PATCH] kvm x86/mmu: use KVM_REQ_MMU_SYNC to sync when needed
-To:     LKML <linux-kernel@vger.kernel.org>,
-        Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     Lai Jiangshan <laijs@linux.alibaba.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        X86 ML <x86@kernel.org>, "H. Peter Anvin" <hpa@zytor.com>,
-        kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+        id S1728406AbgH1CXs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 27 Aug 2020 22:23:48 -0400
+Received: from mga14.intel.com ([192.55.52.115]:59192 "EHLO mga14.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727124AbgH1CXr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 27 Aug 2020 22:23:47 -0400
+IronPort-SDR: pB787b9SVTfxWrgsbQEwCJ5wjotTKH+lqJ/t4Lt8D+qRCX1jGLv0mOmTx6HBTwUw5fBpo8kcz8
+ fnfYGDCm8aUQ==
+X-IronPort-AV: E=McAfee;i="6000,8403,9726"; a="155854187"
+X-IronPort-AV: E=Sophos;i="5.76,362,1592895600"; 
+   d="scan'208";a="155854187"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Aug 2020 19:23:46 -0700
+IronPort-SDR: 7sl2RJih5fz+4j3xz5Ii1TF2EZ6NoXPDUZNOQ+4Iin7PK/Zme5IsgDZYw322s8keY5IRaGdvYf
+ htjG+3THcSlQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.76,362,1592895600"; 
+   d="scan'208";a="500863254"
+Received: from sqa-gate.sh.intel.com (HELO robert-ivt.tsp.org) ([10.239.48.212])
+  by fmsmga005.fm.intel.com with ESMTP; 27 Aug 2020 19:23:45 -0700
+From:   Robert Hoo <robert.hu@linux.intel.com>
+To:     pbonzini@redhat.com, sean.j.christopherson@intel.com,
+        wanpengli@tencent.com, kvm@vger.kernel.org
+Cc:     robert.hu@intel.com, Robert Hoo <robert.hu@linux.intel.com>
+Subject: KVM: x86: emulating RDPID failure shall return #UD rather than #GP
+Date:   Fri, 28 Aug 2020 10:23:42 +0800
+Message-Id: <1598581422-76264-1-git-send-email-robert.hu@linux.intel.com>
+X-Mailer: git-send-email 1.8.3.1
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Ping @Sean Christopherson
+Per Intel's SDM, RDPID takes a #UD if it is unsupported, which is more or
+less what KVM is emulating when MSR_TSC_AUX is not available.  In fact,
+there are no scenarios in which RDPID is supposed to #GP.
 
-On Mon, Aug 24, 2020 at 5:18 PM Lai Jiangshan <jiangshanlai@gmail.com> wrote:
->
-> From: Lai Jiangshan <laijs@linux.alibaba.com>
->
-> 8c8560b83390("KVM: x86/mmu: Use KVM_REQ_TLB_FLUSH_CURRENT for MMU specific flushes)
-> changed it without giving any reason in the changelog.
->
-> In theory, the syncing is needed, and need to be fixed by reverting
-> this part of change.
->
-> Signed-off-by: Lai Jiangshan <laijs@linux.alibaba.com>
-> ---
->  arch/x86/kvm/mmu/mmu.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> index 4e03841f053d..9a93de921f2b 100644
-> --- a/arch/x86/kvm/mmu/mmu.c
-> +++ b/arch/x86/kvm/mmu/mmu.c
-> @@ -2468,7 +2468,7 @@ static struct kvm_mmu_page *kvm_mmu_get_page(struct kvm_vcpu *vcpu,
->                 }
->
->                 if (sp->unsync_children)
-> -                       kvm_make_request(KVM_REQ_TLB_FLUSH_CURRENT, vcpu);
-> +                       kvm_make_request(KVM_REQ_MMU_SYNC, vcpu);
->
->                 __clear_sp_write_flooding_count(sp);
->
-> --
-> 2.19.1.6.gb485710b
->
+Fixes: fb6d4d340e (KVM: x86: emulate RDPID)
+Signed-off-by: Robert Hoo <robert.hu@linux.intel.com>
+---
+ arch/x86/kvm/emulate.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/arch/x86/kvm/emulate.c b/arch/x86/kvm/emulate.c
+index d0e2825..571cb86 100644
+--- a/arch/x86/kvm/emulate.c
++++ b/arch/x86/kvm/emulate.c
+@@ -3594,7 +3594,7 @@ static int em_rdpid(struct x86_emulate_ctxt *ctxt)
+ 	u64 tsc_aux = 0;
+ 
+ 	if (ctxt->ops->get_msr(ctxt, MSR_TSC_AUX, &tsc_aux))
+-		return emulate_gp(ctxt, 0);
++		return emulate_ud(ctxt);
+ 	ctxt->dst.val = tsc_aux;
+ 	return X86EMUL_CONTINUE;
+ }
+-- 
+1.8.3.1
+
