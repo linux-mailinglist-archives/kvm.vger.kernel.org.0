@@ -2,94 +2,78 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0669725604C
-	for <lists+kvm@lfdr.de>; Fri, 28 Aug 2020 20:13:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 094A7256061
+	for <lists+kvm@lfdr.de>; Fri, 28 Aug 2020 20:24:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727056AbgH1SNw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 28 Aug 2020 14:13:52 -0400
-Received: from mail.skyhub.de ([5.9.137.197]:32984 "EHLO mail.skyhub.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726010AbgH1SNw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 28 Aug 2020 14:13:52 -0400
-Received: from zn.tnic (p200300ec2f0ba60078cbaf9a215c2e9d.dip0.t-ipconnect.de [IPv6:2003:ec:2f0b:a600:78cb:af9a:215c:2e9d])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id EFDBB1EC03E3;
-        Fri, 28 Aug 2020 20:13:49 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1598638430;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=/jYI5IHuv43D+ZADrXsFhwBXIJnV8i1FIyxJtyua/Yg=;
-        b=KXRzfulyqoFzRZ+dj+HluE21PJnj0cjQ69UGDcWcPA264jRdoC9l65vRds3AZNoIGQLiw/
-        etQ7GAfkKPIWNnJokkDlepYsvcxMPquvY19el5NfnOAs2br3nC3Vjryk/KQaFohIqhnVUW
-        NNFAZll3B7FQ4406XApoT0w5nSGLFcY=
-Date:   Fri, 28 Aug 2020 20:13:46 +0200
-From:   Borislav Petkov <bp@alien8.de>
-To:     Joerg Roedel <joro@8bytes.org>
-Cc:     x86@kernel.org, Joerg Roedel <jroedel@suse.de>,
-        Kees Cook <keescook@chromium.org>, hpa@zytor.com,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Jiri Slaby <jslaby@suse.cz>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Juergen Gross <jgross@suse.com>,
-        David Rientjes <rientjes@google.com>,
-        Cfir Cohen <cfir@google.com>,
-        Erdem Aktas <erdemaktas@google.com>,
-        Masami Hiramatsu <mhiramat@kernel.org>,
-        Mike Stunes <mstunes@vmware.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Martin Radev <martin.b.radev@gmail.com>,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org
-Subject: Re: [PATCH v6 31/76] x86/head/64: Setup MSR_GS_BASE before calling
- into C code
-Message-ID: <20200828181346.GB19342@zn.tnic>
-References: <20200824085511.7553-1-joro@8bytes.org>
- <20200824085511.7553-32-joro@8bytes.org>
+        id S1728007AbgH1SYA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 28 Aug 2020 14:24:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35846 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726677AbgH1SX5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 28 Aug 2020 14:23:57 -0400
+Received: from mail-oo1-xc44.google.com (mail-oo1-xc44.google.com [IPv6:2607:f8b0:4864:20::c44])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 25AF1C06121B
+        for <kvm@vger.kernel.org>; Fri, 28 Aug 2020 11:23:57 -0700 (PDT)
+Received: by mail-oo1-xc44.google.com with SMTP id r6so508814oon.13
+        for <kvm@vger.kernel.org>; Fri, 28 Aug 2020 11:23:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=2iXkGuZDPH4c7YYMkQMRwiYMRp5lf9MC5NLMKzhRWWI=;
+        b=dYbDgKBbk0VjD6Y/A7wPhWL9z+uEz/dNKUmyetpjnIGuq277TcZgnKD/U2KIUTyLEQ
+         FUzpxvVBvO8f/VDWiixr0WMaqSsIKHUL8oMIje1HEtU0/eTy3Cx3aZ1JyufdJUql1l0O
+         rKqyYCs9I7gyhfJx309EBd9rXd274mgypn0ovu0XZjDgs+OqpCgo4mYxLz9X9MmaXB6j
+         cHUFuOFhKM0DUI165h9NviZX9SiCnkE83onyl/oFaC+eHobxPGWMH7tXqChHwDffmb1P
+         mxrF+mejSYCg/PSky2/fN1T18S5XzusIOBna49BqaBLgkGRKed9Hvi3zfIn+vQI4GFvj
+         N9Hg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=2iXkGuZDPH4c7YYMkQMRwiYMRp5lf9MC5NLMKzhRWWI=;
+        b=Jzaeq+Y9jVZwzEegP3H+HpNjN2kXNcRQ3M7VMtGezFVTg4RsuGMvh2cYter09N0bNQ
+         AyS1FAY2nBwCDwuHdCWpb3mSG6Muck/XcOzo9WCOwbV0kN1/cfyYDKDSOY6/BZQt+nmY
+         dZhi9uD117n0juZIqggHPgdqE/7lnuPHj22RCE585llJdOCrx7tdI/TQsdTi1OudYdfy
+         zyq3yg8iNnWB9JZWNtOp/yRj5sBymO7CGmFilew1gD/WWcQkP7QXB3fjLFSCUIDJGnD7
+         24eEdfl6W3CTDvVTCNHQ2HZI1plHAWPQSSBFnCIdE5Qtd3+o+oAwHJux5MPMgmcrOMyd
+         5DMw==
+X-Gm-Message-State: AOAM530Nx1I3zPjyrfK8EPCyIg2r3nWB8bhZyjVEbAx4Lec17oKBQQ4O
+        NFJuVNmNSa1/Oa+C0vyEbJWqUcLMKV56eUqRCZr9MA==
+X-Google-Smtp-Source: ABdhPJySAuOpV6dilUu/GNbZMtR+q2kM1vv4eGjjRdnlsLx632hTsZax7LCdUkUWwJqPAFjX2AzrVEdSEI0IuaThf9s=
+X-Received: by 2002:a4a:3015:: with SMTP id q21mr2381852oof.55.1598639035545;
+ Fri, 28 Aug 2020 11:23:55 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20200824085511.7553-32-joro@8bytes.org>
+References: <20200828085622.8365-1-chenyi.qiang@intel.com> <20200828085622.8365-3-chenyi.qiang@intel.com>
+In-Reply-To: <20200828085622.8365-3-chenyi.qiang@intel.com>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Fri, 28 Aug 2020 11:23:43 -0700
+Message-ID: <CALMp9eTDTeKQrCnYsSsMPF3-0N=GW7QPOQY8xg4oiCcmv8hgYA@mail.gmail.com>
+Subject: Re: [PATCH 2/5] KVM: nVMX: Verify the VMX controls MSRs with the
+ global capability when setting VMX MSRs
+To:     Chenyi Qiang <chenyi.qiang@intel.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Xiaoyao Li <xiaoyao.li@intel.com>,
+        kvm list <kvm@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Aug 24, 2020 at 10:54:26AM +0200, Joerg Roedel wrote:
-> diff --git a/arch/x86/kernel/head_64.S b/arch/x86/kernel/head_64.S
-> index 2b2e91627221..800053219054 100644
-> --- a/arch/x86/kernel/head_64.S
-> +++ b/arch/x86/kernel/head_64.S
-> @@ -78,6 +78,14 @@ SYM_CODE_START_NOALIGN(startup_64)
->  	call	startup_64_setup_env
->  	popq	%rsi
->  
-> +	/*
-> +	 * Setup %gs here already to make stack-protector work - it needs to be
-> +	 * setup again after the switch to kernel addresses. The address read
-> +	 * from initial_gs is a kernel address, so it needs to be adjusted first
-> +	 * for the identity mapping.
-> +	 */
-> +	movl	$MSR_GS_BASE,%ecx
+On Fri, Aug 28, 2020 at 1:54 AM Chenyi Qiang <chenyi.qiang@intel.com> wrote:
+>
+> When setting the nested VMX MSRs, verify it with the values in
+> vmcs_config.nested_vmx_msrs, which reflects the global capability of
+> VMX controls MSRs.
+>
+> Signed-off-by: Chenyi Qiang <chenyi.qiang@intel.com>
 
-I'm confused: is this missing those three lines:
-
-        movl    initial_gs(%rip),%eax
-        movl    initial_gs+4(%rip),%edx
-        wrmsr
-
-as it is done in secondary_startup_64 ?
-
-Or why would you otherwise put 0xc0000101 in %ecx and not do anything
-with it...
-
--- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
+You seem to have entirely missed the point of this code, which is to
+prevent userspace from adding features that have previously been
+removed for this vCPU (e.g as a side-effect of KVM_SET_CPUID).
