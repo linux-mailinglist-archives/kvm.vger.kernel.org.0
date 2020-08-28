@@ -2,53 +2,53 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 159162554B2
-	for <lists+kvm@lfdr.de>; Fri, 28 Aug 2020 08:54:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 78BF52554EB
+	for <lists+kvm@lfdr.de>; Fri, 28 Aug 2020 09:12:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726834AbgH1GyV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 28 Aug 2020 02:54:21 -0400
-Received: from mta-02.yadro.com ([89.207.88.252]:35910 "EHLO mta-01.yadro.com"
+        id S1728094AbgH1HMl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 28 Aug 2020 03:12:41 -0400
+Received: from mta-02.yadro.com ([89.207.88.252]:36892 "EHLO mta-01.yadro.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1725969AbgH1GyV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 28 Aug 2020 02:54:21 -0400
+        id S1725858AbgH1HMk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 28 Aug 2020 03:12:40 -0400
 Received: from localhost (unknown [127.0.0.1])
-        by mta-01.yadro.com (Postfix) with ESMTP id DE0805752C;
-        Fri, 28 Aug 2020 06:54:19 +0000 (UTC)
+        by mta-01.yadro.com (Postfix) with ESMTP id 2774357516;
+        Fri, 28 Aug 2020 07:12:39 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=yadro.com; h=
         in-reply-to:content-disposition:content-type:content-type
         :mime-version:references:message-id:subject:subject:from:from
-        :date:date:received:received:received; s=mta-01; t=1598597658;
-         x=1600412059; bh=QMs65RhVEG0A9ziXHBh7u6OK6hoUSKLGyEXZsuwPe+Q=; b=
-        TQrZkH5zwP6OUQ0LQZbyu5fUTk2ExEHqDT+0LIMrvLAIZvwzD8lgM9afA9AFSTBg
-        sNf2zeFZfOks1N/dBg0RCcIywfXoC3gbzX0gvqz2ztQcwNigS45lR5uAe27LRw7s
-        VVQELrPiwvxwZkT0nJA54tHpgJ3kF5TZm5/fTk3AlmE=
+        :date:date:received:received:received; s=mta-01; t=1598598757;
+         x=1600413158; bh=VQgTll1LKDY0usmNA2YOabLuAiRj3JWOLQvTwuQZbc0=; b=
+        ULYEMeeQsHqJCKei816R48x2HME986PT0xxswqc4uZnv6VBjP1Drr/E9LySZdZxb
+        /SaXnJE2N7p1OCqWrvHRXAAbESsWWegpFm2B7An1ZAAn8fMM/lpza4A7mGGX8ban
+        KMfpKvoX8JWiakhZJnyIpQ4hvSxnviEXoymGjAbMpA0=
 X-Virus-Scanned: amavisd-new at yadro.com
 Received: from mta-01.yadro.com ([127.0.0.1])
         by localhost (mta-01.yadro.com [127.0.0.1]) (amavisd-new, port 10024)
-        with ESMTP id SCM-P_xGRpcw; Fri, 28 Aug 2020 09:54:18 +0300 (MSK)
+        with ESMTP id ZB3QntHb7JDP; Fri, 28 Aug 2020 10:12:37 +0300 (MSK)
 Received: from T-EXCH-02.corp.yadro.com (t-exch-02.corp.yadro.com [172.17.10.102])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mta-01.yadro.com (Postfix) with ESMTPS id 42C04574E7;
-        Fri, 28 Aug 2020 09:54:18 +0300 (MSK)
+        by mta-01.yadro.com (Postfix) with ESMTPS id 8B55F574FE;
+        Fri, 28 Aug 2020 10:12:37 +0300 (MSK)
 Received: from localhost (172.17.204.212) by T-EXCH-02.corp.yadro.com
  (172.17.10.102) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384_P384) id 15.1.669.32; Fri, 28
- Aug 2020 09:54:18 +0300
-Date:   Fri, 28 Aug 2020 09:54:17 +0300
+ Aug 2020 10:12:37 +0300
+Date:   Fri, 28 Aug 2020 10:12:36 +0300
 From:   Roman Bolshakov <r.bolshakov@yadro.com>
 To:     Thomas Huth <thuth@redhat.com>
 CC:     <kvm@vger.kernel.org>, Cameron Esfahani <dirty@apple.com>
-Subject: Re: [kvm-unit-tests PATCH 1/7] x86: Makefile: Allow division on
- x86_64-elf binutils
-Message-ID: <20200828065417.GA54274@SPB-NB-133.local>
+Subject: Re: [kvm-unit-tests PATCH 6/7] configure: Add an option to specify
+ getopt
+Message-ID: <20200828071236.GB54274@SPB-NB-133.local>
 References: <20200810130618.16066-1-r.bolshakov@yadro.com>
- <20200810130618.16066-2-r.bolshakov@yadro.com>
- <ee81540c-9064-4650-8784-d4531eec042c@redhat.com>
+ <20200810130618.16066-7-r.bolshakov@yadro.com>
+ <ebccbbb2-dc9b-9ff4-c89c-8fdd6f463a50@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Disposition: inline
-In-Reply-To: <ee81540c-9064-4650-8784-d4531eec042c@redhat.com>
+In-Reply-To: <ebccbbb2-dc9b-9ff4-c89c-8fdd6f463a50@redhat.com>
 X-Originating-IP: [172.17.204.212]
 X-ClientProxiedBy: T-EXCH-01.corp.yadro.com (172.17.10.101) To
  T-EXCH-02.corp.yadro.com (172.17.10.102)
@@ -57,56 +57,45 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Aug 28, 2020 at 07:00:19AM +0200, Thomas Huth wrote:
+On Fri, Aug 28, 2020 at 07:55:53AM +0200, Thomas Huth wrote:
 > On 10/08/2020 15.06, Roman Bolshakov wrote:
-> > For compatibility with other SVR4 assemblers, '/' starts a comment on
-> > *-elf binutils target and thus division operator is not allowed [1][2].
-> > That breaks cstart64.S build:
+> > macOS is shipped with an old non-enhanced version of getopt and it
+> > doesn't support options used by run_tests.sh. Proper version of getopt
+> > is available from homebrew but it has to be added to PATH before invoking
+> > run_tests.sh. It's not convenient because it has to be done in each
+> > shell instance and there could be many if a multiplexor is used.
 > > 
-> >   x86/cstart64.S: Assembler messages:
-> >   x86/cstart64.S:294: Error: unbalanced parenthesis in operand 1.
-> > 
-> > The option is ignored on the Linux target of GNU binutils.
-> > 
-> > 1. https://sourceware.org/binutils/docs/as/i386_002dChars.html
-> > 2. https://sourceware.org/binutils/docs/as/i386_002dOptions.html#index-_002d_002ddivide-option_002c-i386
+> > The change provides a way to override getopt and halts ./configure if
+> > enhanced getopt can't be found.
 > > 
 > > Cc: Cameron Esfahani <dirty@apple.com>
 > > Signed-off-by: Roman Bolshakov <r.bolshakov@yadro.com>
 > > ---
-> >  x86/Makefile | 2 ++
-> >  1 file changed, 2 insertions(+)
-> > 
-> > diff --git a/x86/Makefile b/x86/Makefile
-> > index 8a007ab..22afbb9 100644
-> > --- a/x86/Makefile
-> > +++ b/x86/Makefile
-> > @@ -1 +1,3 @@
-> >  include $(SRCDIR)/$(TEST_DIR)/Makefile.$(ARCH)
-> > +
-> > +COMMON_CFLAGS += -Wa,--divide
+> >  configure    | 13 +++++++++++++
+> >  run_tests.sh |  2 +-
+> >  2 files changed, 14 insertions(+), 1 deletion(-)
 > 
-> Some weeks ago, I also played with an elf cross compiler and came to the
-> same conclusion, that we need this option there. Unfortunately, it does
-> not work with clang:
+> Is this still required with a newer version of bash? The one that ships
+> with macOS is just too old...
 > 
->  https://gitlab.com/huth/kvm-unit-tests/-/jobs/707986800#L1629
-> 
-> You could try to wrap it with "cc-option" instead ... or use a proper
-> check in the configure script to detect whether it's needed or not.
+> I assume that getopt is a builtin function in newer versions of the bash?
 > 
 
-Hi Thomas,
+Except it has `s` at the end. There's a getopts built-in in bash.
+I'll try to replace external getopt with getopts.
 
-Thanks for reviewing the series. I'll look into both options and will
-test with both gcc and clang afterwards. I can also update .travis.yml
-in a new patch to test the build on macOS.
-
-> And can you please put it next to the other COMMON_CFLAGS in
-> x86/Makefile.common instead of x86/Makefile?
+> Last time we discussed, we agreed that Bash v4.2 would be a reasonable
+> minimum for the kvm-unit-tests:
+> 
+>  https://www.spinics.net/lists/kvm/msg222139.html
+> 
+> Thus if the user installed bash from homebrew on macos, we should be fine?
+> 
+> Could you maybe replace this patch with a check for a minimum version of
+> bash instead?
 > 
 
-Sure.
+No problem, if getopts works.
 
-Regards,
+Thanks,
 Roman
