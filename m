@@ -2,165 +2,89 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 46F052555C6
-	for <lists+kvm@lfdr.de>; Fri, 28 Aug 2020 09:56:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 55B9D255601
+	for <lists+kvm@lfdr.de>; Fri, 28 Aug 2020 10:10:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728505AbgH1H4j (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 28 Aug 2020 03:56:39 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:60470 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727911AbgH1H4g (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 28 Aug 2020 03:56:36 -0400
+        id S1728604AbgH1IK3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 28 Aug 2020 04:10:29 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:60238 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1727971AbgH1IKW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 28 Aug 2020 04:10:22 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1598601395;
+        s=mimecast20190719; t=1598602221;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=CEVLNkNjXKJeTe+nVhlePDi5852O1LmQzJV/lWnP0DU=;
-        b=MBRvjC7oagTBkSLMss3SPk8fYqje8cJfhAx3yZPKOe2X7iFYe+D+Wxv/RCE07WKlUNcQlz
-        kOJkt1KZ6bO/d/JQvAIvgNDl6WdpkYzg+fRO1/OtWcCExXdlaWqaJ+hWclUw1++lKy2nAG
-        s4MyYcGbwIs+0WTqhjFqrm7prUS6tvk=
+        bh=xvafGB3h1uSuShOcxklJX4Q2Ef6CI/lwjYNIZ0zdVjc=;
+        b=IAJ0KU/y5M3VFQYb7/2GeCjUEQEkMijjGGhKGvBRTD7dtRO/0Eb30o7/ebdIk5/tWm3JYc
+        u9T8IJasvDzws8iDwRYVss7soKgmWRKyXwNDR+WwJ6UHM5YCkOj4Fx1MzgmrXKwLXEHSXi
+        zb2I7PpQp4HK/CfHlsUrrI6abjvzUSs=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-461-IKX_PXTBOxuZ-K49q3qUnQ-1; Fri, 28 Aug 2020 03:56:31 -0400
-X-MC-Unique: IKX_PXTBOxuZ-K49q3qUnQ-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+ us-mta-498-RHOgIQ7tOa6GJlcVJUT-kg-1; Fri, 28 Aug 2020 04:10:17 -0400
+X-MC-Unique: RHOgIQ7tOa6GJlcVJUT-kg-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A8130807337;
-        Fri, 28 Aug 2020 07:56:30 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-112-79.ams2.redhat.com [10.36.112.79])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 9DA5180925;
-        Fri, 28 Aug 2020 07:56:29 +0000 (UTC)
-Subject: Re: [kvm-unit-tests PATCH 1/7] x86: Makefile: Allow division on
- x86_64-elf binutils
-To:     Roman Bolshakov <r.bolshakov@yadro.com>
-Cc:     kvm@vger.kernel.org, Cameron Esfahani <dirty@apple.com>
-References: <20200810130618.16066-1-r.bolshakov@yadro.com>
- <20200810130618.16066-2-r.bolshakov@yadro.com>
- <ee81540c-9064-4650-8784-d4531eec042c@redhat.com>
- <20200828065417.GA54274@SPB-NB-133.local>
- <e3589b43-df3f-b413-a3b9-1f032da48571@redhat.com>
- <20200828074745.GC54274@SPB-NB-133.local>
-From:   Thomas Huth <thuth@redhat.com>
-Message-ID: <ec1e66df-21bc-4d85-05fc-1b54b5a2bf1f@redhat.com>
-Date:   Fri, 28 Aug 2020 09:56:28 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 204F5425E8;
+        Fri, 28 Aug 2020 08:10:15 +0000 (UTC)
+Received: from gondolin (ovpn-113-255.ams2.redhat.com [10.36.113.255])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 8F2C85D9F3;
+        Fri, 28 Aug 2020 08:10:05 +0000 (UTC)
+Date:   Fri, 28 Aug 2020 10:10:02 +0200
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Tony Krowiak <akrowiak@linux.ibm.com>
+Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, freude@linux.ibm.com, borntraeger@de.ibm.com,
+        mjrosato@linux.ibm.com, pasic@linux.ibm.com,
+        alex.williamson@redhat.com, kwankhede@nvidia.com,
+        fiuczy@linux.ibm.com, frankja@linux.ibm.com, david@redhat.com,
+        imbrenda@linux.ibm.com, hca@linux.ibm.com, gor@linux.ibm.com
+Subject: Re: [PATCH v10 01/16] s390/vfio-ap: add version vfio_ap module
+Message-ID: <20200828101002.57c0d81f.cohuck@redhat.com>
+In-Reply-To: <8b3eb14e-c388-3025-1bfb-2dc7fb820de3@linux.ibm.com>
+References: <20200821195616.13554-1-akrowiak@linux.ibm.com>
+        <20200821195616.13554-2-akrowiak@linux.ibm.com>
+        <20200825120432.13a1b444.cohuck@redhat.com>
+        <ca016eca-1ee7-2d0f-c2ec-3ef147b6216a@linux.ibm.com>
+        <20200827123240.42e0c787.cohuck@redhat.com>
+        <8b3eb14e-c388-3025-1bfb-2dc7fb820de3@linux.ibm.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-In-Reply-To: <20200828074745.GC54274@SPB-NB-133.local>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 28/08/2020 09.47, Roman Bolshakov wrote:
-> On Fri, Aug 28, 2020 at 09:24:10AM +0200, Thomas Huth wrote:
->> On 28/08/2020 08.54, Roman Bolshakov wrote:
->>> On Fri, Aug 28, 2020 at 07:00:19AM +0200, Thomas Huth wrote:
->>>> On 10/08/2020 15.06, Roman Bolshakov wrote:
->>>>> For compatibility with other SVR4 assemblers, '/' starts a comment on
->>>>> *-elf binutils target and thus division operator is not allowed [1][2].
->>>>> That breaks cstart64.S build:
->>>>>
->>>>>   x86/cstart64.S: Assembler messages:
->>>>>   x86/cstart64.S:294: Error: unbalanced parenthesis in operand 1.
->>>>>
->>>>> The option is ignored on the Linux target of GNU binutils.
->>>>>
->>>>> 1. https://sourceware.org/binutils/docs/as/i386_002dChars.html
->>>>> 2. https://sourceware.org/binutils/docs/as/i386_002dOptions.html#index-_002d_002ddivide-option_002c-i386
->>>>>
->>>>> Cc: Cameron Esfahani <dirty@apple.com>
->>>>> Signed-off-by: Roman Bolshakov <r.bolshakov@yadro.com>
->>>>> ---
->>>>>  x86/Makefile | 2 ++
->>>>>  1 file changed, 2 insertions(+)
->>>>>
->>>>> diff --git a/x86/Makefile b/x86/Makefile
->>>>> index 8a007ab..22afbb9 100644
->>>>> --- a/x86/Makefile
->>>>> +++ b/x86/Makefile
->>>>> @@ -1 +1,3 @@
->>>>>  include $(SRCDIR)/$(TEST_DIR)/Makefile.$(ARCH)
->>>>> +
->>>>> +COMMON_CFLAGS += -Wa,--divide
->>>>
->>>> Some weeks ago, I also played with an elf cross compiler and came to the
->>>> same conclusion, that we need this option there. Unfortunately, it does
->>>> not work with clang:
->>>>
->>>>  https://gitlab.com/huth/kvm-unit-tests/-/jobs/707986800#L1629
->>>>
->>>> You could try to wrap it with "cc-option" instead ... or use a proper
->>>> check in the configure script to detect whether it's needed or not.
->>>>
->>>
->>> Hi Thomas,
->>>
->>> Thanks for reviewing the series. I'll look into both options and will
->>> test with both gcc and clang afterwards. I can also update .travis.yml
->>> in a new patch to test the build on macOS.
->>
->> That would be great, thanks! Note that you need at least Clang v10 (the
->> one from Fedora 32 is fine) to compile the kvm-unit-tests.
->>
->> And if it's of any help, this was the stuff that I used in .travis.yml
->> for my experiments (might still be incomplete, though):
->>
->>     - os: osx
->>       osx_image: xcode12
->>       addons:
->>         homebrew:
->>           packages:
->>             - bash
->>             - coreutils
->>             - qemu
->>             - x86_64-elf-gcc
->>       env:
->>       - CONFIG="--cross-prefix=x86_64-elf-"
->>       - BUILD_DIR="build"
->>       - TESTS="umip"
->>       - ACCEL="tcg"
->>
->>     - os: osx
->>       osx_image: xcode12
->>       addons:
->>         homebrew:
->>           packages:
->>             - bash
->>             - coreutils
->>             - qemu
->>             - i386-elf-gcc
-> 
-> It's going to be i686-elf-gcc.
+On Thu, 27 Aug 2020 10:39:07 -0400
+Tony Krowiak <akrowiak@linux.ibm.com> wrote:
 
-Ah, there are two flavours? Ok, good to know.
+> Currently there are two tools that probably need to be aware of
+> the changes to these assignment interfaces:
+> * The hades test framework has tests that will fail if run against
+>  =C2=A0=C2=A0 these patches that should be skipped if over-provisioning is
+>  =C2=A0=C2=A0 allowed. There are also tests under development to test the
+>  =C2=A0=C2=A0 function introduced by these patches that will fail if run =
+against
+>  =C2=A0=C2=A0 an older version of the driver. These tests should be skipp=
+ed in
+>  =C2=A0=C2=A0 that case.
+> * There is a tool under development for configuring AP matrix
+>  =C2=A0=C2=A0 mediated devices that probably need to be aware of the chan=
+ge
+>  =C2=A0=C2=A0 introduced by this series.
+>=20
+> Since a tool would have to first determine whether a new sysfs
+> interface documenting facilities is available and it would only
+> expose one facility at this point, it seems reasonable for these tools
+> to check for the sysfs guest_matrix attribute to discern whether
+> over-provisioning is available or not. I'll go ahead and remove this
+> patch from the series.
 
->>       env:
->>       - CONFIG="--arch=i386 --cross-prefix=x86_64-elf-"
-> 
-> `--cross-prefix=i686-elf-`, respectively.
-> 
->>       - BUILD_DIR="build"
->>       - TESTS="umip"
->>       - ACCEL="tcg"
->>
-> 
-> Thanks, I'll use it as the basis. Do I need to add your Signed-off-by: here?
-> or Suggested-by: is enough?
-
-Suggested-by is fine.
-
-> IIRC all tests pass on TCG/5.1.
-
-Yes, please tweak the TEST="..:" lines accordingly, I just added one
-test there for my initial tries.
-
- Thomas
+Thanks for the explanation, that seems reasonable to me.
 
