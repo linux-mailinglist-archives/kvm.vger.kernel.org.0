@@ -2,508 +2,677 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1BD5225578F
-	for <lists+kvm@lfdr.de>; Fri, 28 Aug 2020 11:27:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7DB0A2558A7
+	for <lists+kvm@lfdr.de>; Fri, 28 Aug 2020 12:35:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728870AbgH1J1H (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 28 Aug 2020 05:27:07 -0400
-Received: from szxga05-in.huawei.com ([45.249.212.191]:10728 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1728444AbgH1J1G (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 28 Aug 2020 05:27:06 -0400
-Received: from DGGEMS411-HUB.china.huawei.com (unknown [172.30.72.59])
-        by Forcepoint Email with ESMTP id BCEBCAE7B377A3557E6A;
-        Fri, 28 Aug 2020 17:27:03 +0800 (CST)
-Received: from localhost (10.174.151.129) by DGGEMS411-HUB.china.huawei.com
- (10.3.19.211) with Microsoft SMTP Server id 14.3.487.0; Fri, 28 Aug 2020
- 17:26:57 +0800
-From:   Ming Mao <maoming.maoming@huawei.com>
-To:     <linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>,
-        <alex.williamson@redhat.com>
-CC:     <cohuck@redhat.com>, <jianjay.zhou@huawei.com>,
-        <weidong.huang@huawei.com>, <peterx@redhat.com>,
-        <aarcange@redhat.com>, <wangyunjian@huawei.com>,
-        Ming Mao <maoming.maoming@huawei.com>
-Subject: [PATCH V3] vfio dma_map/unmap: optimized for hugetlbfs pages
-Date:   Fri, 28 Aug 2020 17:26:49 +0800
-Message-ID: <20200828092649.853-1-maoming.maoming@huawei.com>
-X-Mailer: git-send-email 2.26.2.windows.1
+        id S1728269AbgH1Kep (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 28 Aug 2020 06:34:45 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:32429 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1728218AbgH1Keh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 28 Aug 2020 06:34:37 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1598610873;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=eyhyOZZeXyjOUxzIH0DtRTqoBLTjTp+jiU9M+24uIhg=;
+        b=W8woipnqE9IZRoPGEkJTj4CVjVs3Zn5tmXZURlO9GKFwrfNg/D9D+efyUQLqWegABJ/G6r
+        pKJOq677b8tAw+uo9vFZGVV2ngZ7dDhXM4U0+MdSVBmlQJN1QGaq9EEQUPSUuikqU6Q00z
+        bgQU2xdQsSbSkpuuYhdJSdUivUrBAnA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-21-njR1iMVoNSG-WNv5-XNFkQ-1; Fri, 28 Aug 2020 06:34:28 -0400
+X-MC-Unique: njR1iMVoNSG-WNv5-XNFkQ-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 712EC8712FE;
+        Fri, 28 Aug 2020 10:34:24 +0000 (UTC)
+Received: from gondolin (ovpn-113-255.ams2.redhat.com [10.36.113.255])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 1A4116716C;
+        Fri, 28 Aug 2020 10:34:12 +0000 (UTC)
+Date:   Fri, 28 Aug 2020 12:34:09 +0200
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Jason Wang <jasowang@redhat.com>
+Cc:     Kishon Vijay Abraham I <kishon@ti.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Ohad Ben-Cohen <ohad@wizery.com>,
+        Bjorn Andersson <bjorn.andersson@linaro.org>,
+        Jon Mason <jdmason@kudzu.us>,
+        Dave Jiang <dave.jiang@intel.com>,
+        Allen Hubbe <allenbh@gmail.com>,
+        Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>,
+        Bjorn Helgaas <bhelgaas@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-remoteproc@vger.kernel.org, linux-ntb@googlegroups.com,
+        linux-pci@vger.kernel.org, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org
+Subject: Re: [RFC PATCH 00/22] Enhance VHOST to enable SoC-to-SoC
+ communication
+Message-ID: <20200828123409.4cd2a812.cohuck@redhat.com>
+In-Reply-To: <c8739d7f-e12e-f6a2-7018-9eeaf6feb054@redhat.com>
+References: <20200702082143.25259-1-kishon@ti.com>
+        <20200702055026-mutt-send-email-mst@kernel.org>
+        <603970f5-3289-cd53-82a9-aa62b292c552@redhat.com>
+        <14c6cad7-9361-7fa4-e1c6-715ccc7e5f6b@ti.com>
+        <59fd6a0b-8566-44b7-3dae-bb52b468219b@redhat.com>
+        <ce9eb6a5-cd3a-a390-5684-525827b30f64@ti.com>
+        <da2b671c-b05d-a57f-7bdf-8b1043a41240@redhat.com>
+        <fee8a0fb-f862-03bd-5ede-8f105b6af529@ti.com>
+        <b2178e1d-2f5c-e8a3-72fb-70f2f8d6aa45@redhat.com>
+        <45a8a97c-2061-13ee-5da8-9877a4a3b8aa@ti.com>
+        <c8739d7f-e12e-f6a2-7018-9eeaf6feb054@redhat.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Type:   text/plain; charset=US-ASCII
-X-Originating-IP: [10.174.151.129]
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-In the original process of dma_map/unmap pages for VFIO-devices,
-to make sure the pages are contiguous, we have to check them one by one.
-As a result, dma_map/unmap could spend a long time.
-Using the hugetlb pages, we can avoid this problem.
-All pages in hugetlb pages are contiguous.And the hugetlb
-page should not be split.So we can delete the for loops.
+On Thu, 9 Jul 2020 14:26:53 +0800
+Jason Wang <jasowang@redhat.com> wrote:
 
-Signed-off-by: Ming Mao <maoming.maoming@huawei.com>
----
- drivers/vfio/vfio_iommu_type1.c | 393 +++++++++++++++++++++++++++++++-
- 1 file changed, 382 insertions(+), 11 deletions(-)
+[Let me note right at the beginning that I first noted this while
+listening to Kishon's talk at LPC on Wednesday. I might be very
+confused about the background here, so let me apologize beforehand for
+any confusion I might spread.]
 
-diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-index 5e556ac91..a689b9698 100644
---- a/drivers/vfio/vfio_iommu_type1.c
-+++ b/drivers/vfio/vfio_iommu_type1.c
-@@ -479,6 +479,303 @@ static int vaddr_get_pfn(struct mm_struct *mm, unsigned long vaddr,
- 	return ret;
- }
- 
-+static bool is_hugetlb_page(unsigned long pfn)
-+{
-+	struct page *page;
-+
-+	if (!pfn_valid(pfn))
-+		return false;
-+
-+	page = pfn_to_page(pfn);
-+	/* only check for hugetlb pages */
-+	return page && PageHuge(page);
-+}
-+
-+static bool vaddr_is_hugetlb_page(unsigned long vaddr, int prot)
-+{
-+	unsigned long pfn;
-+	int ret;
-+	bool result;
-+
-+	if (!current->mm)
-+		return false;
-+
-+	ret = vaddr_get_pfn(current->mm, vaddr, prot, &pfn);
-+	if (ret)
-+		return false;
-+
-+	result = is_hugetlb_page(pfn);
-+
-+	put_pfn(pfn, prot);
-+
-+	return result;
-+}
-+
-+/*
-+ * get the number of residual PAGE_SIZE-pages in a hugetlb page
-+ * (including the page which pointed by this address)
-+ * @address: we count residual pages from this address to the end of
-+ * a hugetlb page
-+ * @order: the order of the same hugetlb page
-+ */
-+static long
-+hugetlb_get_residual_pages(unsigned long address, unsigned int order)
-+{
-+	unsigned long hugetlb_npage;
-+	unsigned long hugetlb_mask;
-+
-+	if (!order)
-+		return -EINVAL;
-+
-+	hugetlb_npage = 1UL << order;
-+	hugetlb_mask = hugetlb_npage - 1;
-+	address = address >> PAGE_SHIFT;
-+
-+	/*
-+	 * Since we count the page pointed by this address, the number of
-+	 * residual PAGE_SIZE-pages is greater than or equal to 1.
-+	 */
-+	return hugetlb_npage - (address & hugetlb_mask);
-+}
-+
-+static unsigned int
-+hugetlb_page_get_externally_pinned_num(struct vfio_dma *dma,
-+				unsigned long start,
-+				unsigned long npage)
-+{
-+	struct vfio_pfn *vpfn;
-+	struct rb_node *node;
-+	unsigned long end;
-+	unsigned int num = 0;
-+
-+	if (!dma || !npage)
-+		return 0;
-+
-+	end = start + npage - 1;
-+	/* If we find a page in dma->pfn_list, this page has been pinned externally */
-+	for (node = rb_first(&dma->pfn_list); node; node = rb_next(node)) {
-+		vpfn = rb_entry(node, struct vfio_pfn, node);
-+		if ((vpfn->pfn >= start) && (vpfn->pfn <= end))
-+			num++;
-+	}
-+
-+	return num;
-+}
-+
-+static long hugetlb_page_vaddr_get_pfn(struct mm_struct *mm, unsigned long vaddr,
-+					int prot, long npage, unsigned long pfn)
-+{
-+	long hugetlb_residual_npage;
-+	struct page *head;
-+	int ret = 0;
-+	unsigned int contiguous_npage;
-+	struct page **pages = NULL;
-+	unsigned int flags = 0;
-+
-+	if ((npage < 0) || !pfn_valid(pfn))
-+		return -EINVAL;
-+
-+	/* all pages are done? */
-+	if (!npage)
-+		goto out;
-+	/*
-+	 * Since pfn is valid,
-+	 * hugetlb_residual_npage is greater than or equal to 1.
-+	 */
-+	head = compound_head(pfn_to_page(pfn));
-+	hugetlb_residual_npage = hugetlb_get_residual_pages(vaddr,
-+						compound_order(head));
-+	/* The page of vaddr has been gotten by vaddr_get_pfn */
-+	contiguous_npage = min_t(long, (hugetlb_residual_npage - 1), npage);
-+	/* There is on page left in this hugetlb page. */
-+	if (!contiguous_npage)
-+		goto out;
-+
-+	pages = kvmalloc_array(contiguous_npage, sizeof(struct page *), GFP_KERNEL);
-+	if (!pages)
-+		return -ENOMEM;
-+
-+	if (prot & IOMMU_WRITE)
-+		flags |= FOLL_WRITE;
-+
-+	mmap_read_lock(mm);
-+	/* The number of pages pinned may be less than contiguous_npage */
-+	ret = pin_user_pages_remote(NULL, mm, vaddr + PAGE_SIZE, contiguous_npage,
-+				flags | FOLL_LONGTERM, pages, NULL, NULL);
-+	mmap_read_unlock(mm);
-+out:
-+	if (pages)
-+		kvfree(pages);
-+	return ret;
-+}
-+
-+/*
-+ * put pfns for a hugetlb page
-+ * @start:the PAGE_SIZE-page we start to put,can be any page in this hugetlb page
-+ * @npage:the number of PAGE_SIZE-pages need to put
-+ * @prot:IOMMU_READ/WRITE
-+ */
-+static int hugetlb_put_pfn(unsigned long start, unsigned int npage, int prot)
-+{
-+	struct page *page;
-+	struct page *head;
-+
-+	if (!npage || !pfn_valid(start))
-+		return 0;
-+
-+	page = pfn_to_page(start);
-+	if (!page || !PageHuge(page))
-+		return 0;
-+	head = compound_head(page);
-+	/*
-+	 * The last page should be in this hugetlb page.
-+	 * The number of putting pages should be equal to the number
-+	 * of getting pages.So the hugepage pinned refcount and the normal
-+	 * page refcount can not be smaller than npage.
-+	 */
-+	if ((head != compound_head(pfn_to_page(start + npage - 1)))
-+		|| (page_ref_count(head) < npage)
-+		|| (compound_pincount(page) < npage))
-+		return 0;
-+
-+	if ((prot & IOMMU_WRITE) && !PageDirty(page))
-+		set_page_dirty_lock(page);
-+
-+	atomic_sub(npage, compound_pincount_ptr(head));
-+	if (page_ref_sub_and_test(head, npage))
-+		__put_page(head);
-+
-+	mod_node_page_state(page_pgdat(head), NR_FOLL_PIN_RELEASED, npage);
-+	return 1;
-+}
-+
-+static long vfio_pin_hugetlb_pages_remote(struct vfio_dma *dma, unsigned long vaddr,
-+				  long npage, unsigned long *pfn_base,
-+				  unsigned long limit)
-+{
-+	unsigned long pfn = 0;
-+	long ret, pinned = 0, lock_acct = 0;
-+	dma_addr_t iova = vaddr - dma->vaddr + dma->iova;
-+	long pinned_loop;
-+
-+	/* This code path is only user initiated */
-+	if (!current->mm)
-+		return -ENODEV;
-+
-+	ret = vaddr_get_pfn(current->mm, vaddr, dma->prot, pfn_base);
-+	if (ret)
-+		return ret;
-+
-+	pinned++;
-+	/*
-+	 * Since PG_reserved is not relevant for compound pages
-+	 * and the pfn of PAGE_SIZE-page which in hugetlb pages is valid,
-+	 * it is not necessary to check rsvd for hugetlb pages.
-+	 */
-+	if (!vfio_find_vpfn(dma, iova)) {
-+		if (!dma->lock_cap && current->mm->locked_vm + 1 > limit) {
-+			put_pfn(*pfn_base, dma->prot);
-+			pr_warn("%s: RLIMIT_MEMLOCK (%ld) exceeded\n", __func__,
-+				limit << PAGE_SHIFT);
-+			return -ENOMEM;
-+		}
-+		lock_acct++;
-+	}
-+
-+	/* Lock all the consecutive pages from pfn_base */
-+	for (vaddr += PAGE_SIZE, iova += PAGE_SIZE; pinned < npage;
-+	     pinned += pinned_loop, vaddr += pinned_loop * PAGE_SIZE,
-+	     iova += pinned_loop * PAGE_SIZE) {
-+		ret = vaddr_get_pfn(current->mm, vaddr, dma->prot, &pfn);
-+		if (ret)
-+			break;
-+
-+		if (pfn != *pfn_base + pinned ||
-+		    !is_hugetlb_page(pfn)) {
-+			put_pfn(pfn, dma->prot);
-+			break;
-+		}
-+
-+		pinned_loop = 1;
-+		/*
-+		 * It is possible that the page of vaddr is the last PAGE_SIZE-page.
-+		 * In this case, vaddr + PAGE_SIZE might be another hugetlb page.
-+		 */
-+		ret = hugetlb_page_vaddr_get_pfn(current->mm, vaddr, dma->prot,
-+						npage - pinned - pinned_loop, pfn);
-+		if (ret < 0) {
-+			put_pfn(pfn, dma->prot);
-+			break;
-+		}
-+
-+		pinned_loop += ret;
-+		lock_acct += pinned_loop - hugetlb_page_get_externally_pinned_num(dma,
-+			pfn, pinned_loop);
-+
-+		if (!dma->lock_cap &&
-+		    current->mm->locked_vm + lock_acct > limit) {
-+			hugetlb_put_pfn(pfn, pinned_loop, dma->prot);
-+			pr_warn("%s: RLIMIT_MEMLOCK (%ld) exceeded\n",
-+				__func__, limit << PAGE_SHIFT);
-+			ret = -ENOMEM;
-+			goto unpin_out;
-+		}
-+	}
-+
-+	ret = vfio_lock_acct(dma, lock_acct, false);
-+
-+unpin_out:
-+	if (ret) {
-+		for (pfn = *pfn_base ; pinned ; pfn++, pinned--)
-+			put_pfn(pfn, dma->prot);
-+		return ret;
-+	}
-+
-+	return pinned;
-+}
-+
-+static long vfio_unpin_hugetlb_pages_remote(struct vfio_dma *dma, dma_addr_t iova,
-+					unsigned long pfn, long npage,
-+					bool do_accounting)
-+{
-+	long unlocked = 0, locked = 0;
-+	long i;
-+	long hugetlb_residual_npage;
-+	long contiguous_npage;
-+	struct page *head;
-+
-+	for (i = 0; i < npage;
-+	     i += contiguous_npage, iova += contiguous_npage * PAGE_SIZE) {
-+		if (!is_hugetlb_page(pfn))
-+			goto slow_path;
-+
-+		head = compound_head(pfn_to_page(pfn));
-+		hugetlb_residual_npage = hugetlb_get_residual_pages(iova,
-+								compound_order(head));
-+		contiguous_npage = min_t(long, hugetlb_residual_npage, (npage - i));
-+
-+		if (hugetlb_put_pfn(pfn, contiguous_npage, dma->prot)) {
-+			pfn += contiguous_npage;
-+			unlocked += contiguous_npage;
-+			locked += hugetlb_page_get_externally_pinned_num(dma, pfn,
-+									contiguous_npage);
-+		}
-+	}
-+slow_path:
-+	for (; i < npage; i++, iova += PAGE_SIZE) {
-+		if (put_pfn(pfn++, dma->prot)) {
-+			unlocked++;
-+			if (vfio_find_vpfn(dma, iova))
-+				locked++;
-+		}
-+	}
-+
-+	if (do_accounting)
-+		vfio_lock_acct(dma, locked - unlocked, true);
-+
-+	return unlocked;
-+}
-+
- /*
-  * Attempt to pin pages.  We really don't want to track all the pfns and
-  * the iommu can only map chunks of consecutive pfns anyway, so get the
-@@ -777,7 +1074,14 @@ static long vfio_sync_unpin(struct vfio_dma *dma, struct vfio_domain *domain,
- 	iommu_tlb_sync(domain->domain, iotlb_gather);
- 
- 	list_for_each_entry_safe(entry, next, regions, list) {
--		unlocked += vfio_unpin_pages_remote(dma,
-+		if (is_hugetlb_page(entry->phys >> PAGE_SHIFT))
-+			unlocked += vfio_unpin_hugetlb_pages_remote(dma,
-+						    entry->iova,
-+						    entry->phys >> PAGE_SHIFT,
-+						    entry->len >> PAGE_SHIFT,
-+						    false);
-+		else
-+			unlocked += vfio_unpin_pages_remote(dma,
- 						    entry->iova,
- 						    entry->phys >> PAGE_SHIFT,
- 						    entry->len >> PAGE_SHIFT,
-@@ -848,7 +1152,13 @@ static size_t unmap_unpin_slow(struct vfio_domain *domain,
- 	size_t unmapped = iommu_unmap(domain->domain, *iova, len);
- 
- 	if (unmapped) {
--		*unlocked += vfio_unpin_pages_remote(dma, *iova,
-+		if (is_hugetlb_page(phys >> PAGE_SHIFT))
-+			*unlocked += vfio_unpin_hugetlb_pages_remote(dma, *iova,
-+						     phys >> PAGE_SHIFT,
-+						     unmapped >> PAGE_SHIFT,
-+						     false);
-+		else
-+			*unlocked += vfio_unpin_pages_remote(dma, *iova,
- 						     phys >> PAGE_SHIFT,
- 						     unmapped >> PAGE_SHIFT,
- 						     false);
-@@ -858,6 +1168,57 @@ static size_t unmap_unpin_slow(struct vfio_domain *domain,
- 	return unmapped;
- }
- 
-+static size_t get_contiguous_pages(struct vfio_domain *domain, dma_addr_t start,
-+				dma_addr_t end, phys_addr_t phys_base)
-+{
-+	size_t len;
-+	phys_addr_t next;
-+
-+	if (!domain)
-+		return 0;
-+
-+	for (len = PAGE_SIZE;
-+	     !domain->fgsp && start + len < end; len += PAGE_SIZE) {
-+		next = iommu_iova_to_phys(domain->domain, start + len);
-+		if (next != phys_base + len)
-+			break;
-+	}
-+
-+	return len;
-+}
-+
-+static size_t hugetlb_get_contiguous_pages(struct vfio_domain *domain, dma_addr_t start,
-+				dma_addr_t end, phys_addr_t phys_base)
-+{
-+	size_t len;
-+	phys_addr_t next;
-+	unsigned long contiguous_npage;
-+	dma_addr_t max_len;
-+	unsigned long hugetlb_residual_npage;
-+	struct page *head;
-+	unsigned long limit;
-+
-+	if (!domain)
-+		return 0;
-+
-+	max_len = end - start;
-+	for (len = PAGE_SIZE;
-+	     !domain->fgsp && start + len < end; len += contiguous_npage * PAGE_SIZE) {
-+		next = iommu_iova_to_phys(domain->domain, start + len);
-+		if ((next != phys_base + len) ||
-+		    !is_hugetlb_page(next >> PAGE_SHIFT))
-+			break;
-+
-+		head = compound_head(pfn_to_page(next >> PAGE_SHIFT));
-+		hugetlb_residual_npage = hugetlb_get_residual_pages(start + len,
-+								compound_order(head));
-+		limit = ALIGN((max_len - len), PAGE_SIZE) >> PAGE_SHIFT;
-+		contiguous_npage = min_t(unsigned long, hugetlb_residual_npage, limit);
-+	}
-+
-+	return len;
-+}
-+
- static long vfio_unmap_unpin(struct vfio_iommu *iommu, struct vfio_dma *dma,
- 			     bool do_accounting)
- {
-@@ -892,7 +1253,7 @@ static long vfio_unmap_unpin(struct vfio_iommu *iommu, struct vfio_dma *dma,
- 	iommu_iotlb_gather_init(&iotlb_gather);
- 	while (iova < end) {
- 		size_t unmapped, len;
--		phys_addr_t phys, next;
-+		phys_addr_t phys;
- 
- 		phys = iommu_iova_to_phys(domain->domain, iova);
- 		if (WARN_ON(!phys)) {
-@@ -905,12 +1266,10 @@ static long vfio_unmap_unpin(struct vfio_iommu *iommu, struct vfio_dma *dma,
- 		 * may require hardware cache flushing, try to find the
- 		 * largest contiguous physical memory chunk to unmap.
- 		 */
--		for (len = PAGE_SIZE;
--		     !domain->fgsp && iova + len < end; len += PAGE_SIZE) {
--			next = iommu_iova_to_phys(domain->domain, iova + len);
--			if (next != phys + len)
--				break;
--		}
-+		if (is_hugetlb_page(phys >> PAGE_SHIFT))
-+			len = hugetlb_get_contiguous_pages(domain, iova, end, phys);
-+		else
-+			len = get_contiguous_pages(domain, iova, end, phys);
- 
- 		/*
- 		 * First, try to use fast unmap/unpin. In case of failure,
-@@ -1243,7 +1602,15 @@ static int vfio_pin_map_dma(struct vfio_iommu *iommu, struct vfio_dma *dma,
- 
- 	while (size) {
- 		/* Pin a contiguous chunk of memory */
--		npage = vfio_pin_pages_remote(dma, vaddr + dma->size,
-+		if (vaddr_is_hugetlb_page(vaddr + dma->size, dma->prot)) {
-+			npage = vfio_pin_hugetlb_pages_remote(dma, vaddr + dma->size,
-+					      size >> PAGE_SHIFT, &pfn, limit);
-+			/* try the normal page if failed */
-+			if (npage <= 0)
-+				npage = vfio_pin_pages_remote(dma, vaddr + dma->size,
-+					      size >> PAGE_SHIFT, &pfn, limit);
-+		} else
-+			npage = vfio_pin_pages_remote(dma, vaddr + dma->size,
- 					      size >> PAGE_SHIFT, &pfn, limit);
- 		if (npage <= 0) {
- 			WARN_ON(!npage);
-@@ -1255,7 +1622,11 @@ static int vfio_pin_map_dma(struct vfio_iommu *iommu, struct vfio_dma *dma,
- 		ret = vfio_iommu_map(iommu, iova + dma->size, pfn, npage,
- 				     dma->prot);
- 		if (ret) {
--			vfio_unpin_pages_remote(dma, iova + dma->size, pfn,
-+			if (is_hugetlb_page(pfn))
-+				vfio_unpin_hugetlb_pages_remote(dma, iova + dma->size, pfn,
-+						npage, true);
-+			else
-+				vfio_unpin_pages_remote(dma, iova + dma->size, pfn,
- 						npage, true);
- 			break;
- 		}
--- 
-2.23.0
+> On 2020/7/8 =E4=B8=8B=E5=8D=889:13, Kishon Vijay Abraham I wrote:
+> > Hi Jason,
+> >
+> > On 7/8/2020 4:52 PM, Jason Wang wrote: =20
+> >> On 2020/7/7 =E4=B8=8B=E5=8D=8810:45, Kishon Vijay Abraham I wrote: =20
+> >>> Hi Jason,
+> >>>
+> >>> On 7/7/2020 3:17 PM, Jason Wang wrote: =20
+> >>>> On 2020/7/6 =E4=B8=8B=E5=8D=885:32, Kishon Vijay Abraham I wrote: =20
+> >>>>> Hi Jason,
+> >>>>>
+> >>>>> On 7/3/2020 12:46 PM, Jason Wang wrote: =20
+> >>>>>> On 2020/7/2 =E4=B8=8B=E5=8D=889:35, Kishon Vijay Abraham I wrote: =
+=20
+> >>>>>>> Hi Jason,
+> >>>>>>>
+> >>>>>>> On 7/2/2020 3:40 PM, Jason Wang wrote: =20
+> >>>>>>>> On 2020/7/2 =E4=B8=8B=E5=8D=885:51, Michael S. Tsirkin wrote: =20
+> >>>>>>>>> On Thu, Jul 02, 2020 at 01:51:21PM +0530, Kishon Vijay Abraham =
+I wrote: =20
+> >>>>>>>>>> This series enhances Linux Vhost support to enable SoC-to-SoC
+> >>>>>>>>>> communication over MMIO. This series enables rpmsg communicati=
+on between
+> >>>>>>>>>> two SoCs using both PCIe RC<->EP and HOST1-NTB-HOST2
+> >>>>>>>>>>
+> >>>>>>>>>> 1) Modify vhost to use standard Linux driver model
+> >>>>>>>>>> 2) Add support in vring to access virtqueue over MMIO
+> >>>>>>>>>> 3) Add vhost client driver for rpmsg
+> >>>>>>>>>> 4) Add PCIe RC driver (uses virtio) and PCIe EP driver (uses v=
+host) for
+> >>>>>>>>>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 rpmsg communication betw=
+een two SoCs connected to each other
+> >>>>>>>>>> 5) Add NTB Virtio driver and NTB Vhost driver for rpmsg commun=
+ication
+> >>>>>>>>>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 between two SoCs connect=
+ed via NTB
+> >>>>>>>>>> 6) Add configfs to configure the components
+> >>>>>>>>>>
+> >>>>>>>>>> UseCase1 :
+> >>>>>>>>>>
+> >>>>>>>>>>  =C2=A0=C2=A0=C2=A0=C2=A0 VHOST RPMSG=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 VIRTIO RPMSG
+> >>>>>>>>>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 +=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0 +
+> >>>>>>>>>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0 |
+> >>>>>>>>>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0 |
+> >>>>>>>>>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0 |
+> >>>>>>>>>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0 |
+> >>>>>>>>>> +-----v------+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 +------v-------+
+> >>>>>>>>>> |=C2=A0=C2=A0 Linux=C2=A0=C2=A0=C2=A0 |=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+ |=C2=A0=C2=A0=C2=A0=C2=A0 Linux=C2=A0=C2=A0=C2=A0 |
+> >>>>>>>>>> |=C2=A0 Endpoint=C2=A0 |=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 | Root Complex=
+ |
+> >>>>>>>>>> |=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0 <----------------->=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |
+> >>>>>>>>>> |=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0 |=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |
+> >>>>>>>>>> |=C2=A0=C2=A0=C2=A0 SOC1=C2=A0=C2=A0=C2=A0 |=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0 |=C2=A0=C2=A0=C2=A0=C2=A0 SOC2=C2=A0=C2=A0=C2=A0=C2=A0 |
+> >>>>>>>>>> +------------+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 +--------------+
+> >>>>>>>>>>
+> >>>>>>>>>> UseCase 2:
+> >>>>>>>>>>
+> >>>>>>>>>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 VHOST RPMSG=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 VI=
+RTIO RPMSG
+> >>>>>>>>>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0 +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0 +
+> >>>>>>>>>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0 |=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0 |
+> >>>>>>>>>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0 |=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0 |
+> >>>>>>>>>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0 |=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0 |
+> >>>>>>>>>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0 |=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0 |
+> >>>>>>>>>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 +------v------+=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 +------v------+
+> >>>>>>>>>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |
+> >>>>>>>>>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=C2=A0=C2=A0 HOST=
+1=C2=A0=C2=A0=C2=A0 |=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+ |=C2=A0=C2=A0=C2=A0 HOST2=C2=A0=C2=A0=C2=A0 |
+> >>>>>>>>>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |
+> >>>>>>>>>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 +------^------+=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 +------^------+
+> >>>>>>>>>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0 |=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0 |
+> >>>>>>>>>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0 |=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0 |
+> >>>>>>>>>> +-------------------------------------------------------------=
+--------+
+> >>>>>>>>>> |=C2=A0 +------v------+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0 +------v------+=C2=A0 |
+> >>>>>>>>>> |=C2=A0 |=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0 |=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0 |=C2=A0 |
+> >>>>>>>>>> |=C2=A0 |=C2=A0=C2=A0=C2=A0=C2=A0 EP=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0 |=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=C2=
+=A0=C2=A0=C2=A0 EP=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0 |
+> >>>>>>>>>> |=C2=A0 | CONTROLLER1 |=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0 | CONTROLLER2 |=C2=A0 |
+> >>>>>>>>>> |=C2=A0 |=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 <----------------------------------->=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0 |
+> >>>>>>>>>> |=C2=A0 |=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0 |=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0 |=C2=A0 |
+> >>>>>>>>>> |=C2=A0 |=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0 |=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0 |=C2=A0 |
+> >>>>>>>>>> |=C2=A0 |=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 |=C2=A0 SoC With Multiple EP Instances=C2=A0=C2=A0 |=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=
+=C2=A0 |
+> >>>>>>>>>> |=C2=A0 |=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 |=C2=A0 (Configured using NTB Function)=C2=A0 |=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0 |
+> >>>>>>>>>> |=C2=A0 +-------------+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0 +-------------+=C2=A0 |
+> >>>>>>>>>> +-------------------------------------------------------------=
+--------+
 
+First of all, to clarify the terminology:
+Is "vhost rpmsg" acting as what the virtio standard calls the 'device',
+and "virtio rpmsg" as the 'driver'? Or is the "vhost" part mostly just
+virtqueues + the exiting vhost interfaces?
+
+> >>>>>>>>>>
+> >>>>>>>>>> Software Layering:
+> >>>>>>>>>>
+> >>>>>>>>>> The high-level SW layering should look something like below. T=
+his series
+> >>>>>>>>>> adds support only for RPMSG VHOST, however something similar s=
+hould be
+> >>>>>>>>>> done for net and scsi. With that any vhost device (PCI, NTB, P=
+latform
+> >>>>>>>>>> device, user) can use any of the vhost client driver.
+> >>>>>>>>>>
+> >>>>>>>>>>
+> >>>>>>>>>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 +----------------+=
+=C2=A0 +-----------+=C2=A0 +------------+=C2=A0 +----------+
+> >>>>>>>>>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0 RPMSG VHOS=
+T=C2=A0=C2=A0 |=C2=A0 | NET VHOST |=C2=A0 | SCSI VHOST |=C2=A0 |=C2=A0=C2=
+=A0=C2=A0 X=C2=A0=C2=A0=C2=A0=C2=A0 |
+> >>>>>>>>>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 +-------^--------+=
+=C2=A0 +-----^-----+=C2=A0 +-----^------+=C2=A0 +----^-----+
+> >>>>>>>>>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |
+> >>>>>>>>>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |
+> >>>>>>>>>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |
+> >>>>>>>>>> +-----------v-----------------v--------------v--------------v-=
+---------+
+> >>>>>>>>>> |=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0 VHOST CORE=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+ |
+> >>>>>>>>>> +--------^---------------^--------------------^---------------=
+---^-----+
+> >>>>>>>>>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0 |=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 |
+> >>>>>>>>>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0 |=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 |
+> >>>>>>>>>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0 |=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 |
+> >>>>>>>>>> +--------v-------+=C2=A0 +----v------+=C2=A0 +----------v-----=
+-----+=C2=A0 +----v-----+
+> >>>>>>>>>> |=C2=A0 PCI EPF VHOST |=C2=A0 | NTB VHOST |=C2=A0 |PLATFORM DE=
+VICE VHOST|=C2=A0 |=C2=A0=C2=A0=C2=A0 X=C2=A0=C2=A0=C2=A0=C2=A0 |
+> >>>>>>>>>> +----------------+=C2=A0 +-----------+=C2=A0 +----------------=
+-----+=C2=A0 +----------+
+
+So, the upper half is basically various functionality types, e.g. a net
+device. What is the lower half, a hardware interface? Would it be
+equivalent to e.g. a normal PCI device?
+
+> >>>>>>>>>>
+> >>>>>>>>>> This was initially proposed here [1]
+> >>>>>>>>>>
+> >>>>>>>>>> [1] ->
+> >>>>>>>>>> https://lore.kernel.org/r/2cf00ec4-1ed6-f66e-6897-006d1a5b6390=
+@ti.com =20
+> >>>>>>>>> I find this very interesting. A huge patchset so will take a bit
+> >>>>>>>>> to review, but I certainly plan to do that. Thanks! =20
+> >>>>>>>> Yes, it would be better if there's a git branch for us to have a=
+ look. =20
+> >>>>>>> I've pushed the branch
+> >>>>>>> https://github.com/kishon/linux-wip.git vhost_rpmsg_pci_ntb_rfc =
+=20
+> >>>>>> Thanks
+> >>>>>>
+> >>>>>> =20
+> >>>>>>>> Btw, I'm not sure I get the big picture, but I vaguely feel some=
+ of the
+> >>>>>>>> work is
+> >>>>>>>> duplicated with vDPA (e.g the epf transport or vhost bus). =20
+> >>>>>>> This is about connecting two different HW systems both running Li=
+nux and
+> >>>>>>> doesn't necessarily involve virtualization. =20
+> >>>>>> Right, this is something similar to VOP
+> >>>>>> (Documentation/misc-devices/mic/mic_overview.rst). The different i=
+s the
+> >>>>>> hardware I guess and VOP use userspace application to implement th=
+e device. =20
+> >>>>> I'd also like to point out, this series tries to have communication=
+ between
+> >>>>> two
+> >>>>> SoCs in vendor agnostic way. Since this series solves for 2 usecase=
+s (PCIe
+> >>>>> RC<->EP and NTB), for the NTB case it directly plugs into NTB frame=
+work and
+> >>>>> any
+> >>>>> of the HW in NTB below should be able to use a virtio-vhost communi=
+cation
+> >>>>>
+> >>>>> #ls drivers/ntb/hw/
+> >>>>> amd=C2=A0 epf=C2=A0 idt=C2=A0 intel=C2=A0 mscc
+> >>>>>
+> >>>>> And similarly for the PCIe RC<->EP communication, this adds a gener=
+ic endpoint
+> >>>>> function driver and hence any SoC that supports configurable PCIe e=
+ndpoint can
+> >>>>> use virtio-vhost communication
+> >>>>>
+> >>>>> # ls drivers/pci/controller/dwc/*ep*
+> >>>>> drivers/pci/controller/dwc/pcie-designware-ep.c
+> >>>>> drivers/pci/controller/dwc/pcie-uniphier-ep.c
+> >>>>> drivers/pci/controller/dwc/pci-layerscape-ep.c =20
+> >>>> Thanks for those backgrounds.
+> >>>>
+> >>>> =20
+> >>>>>>>  =C2=A0=C2=A0=C2=A0 So there is no guest or host as in
+> >>>>>>> virtualization but two entirely different systems connected via P=
+CIe cable,
+> >>>>>>> one
+> >>>>>>> acting as guest and one as host. So one system will provide virtio
+> >>>>>>> functionality reserving memory for virtqueues and the other provi=
+des vhost
+> >>>>>>> functionality providing a way to access the virtqueues in virtio =
+memory.
+> >>>>>>> One is
+> >>>>>>> source and the other is sink and there is no intermediate entity.=
+ (vhost was
+> >>>>>>> probably intermediate entity in virtualization?) =20
+> >>>>>> (Not a native English speaker) but "vhost" could introduce some co=
+nfusion for
+> >>>>>> me since it was use for implementing virtio backend for userspace =
+drivers. I
+> >>>>>> guess "vringh" could be better. =20
+> >>>>> Initially I had named this vringh but later decided to choose vhost=
+ instead of
+> >>>>> vringh. vhost is still a virtio backend (not necessarily userspace)=
+ though it
+> >>>>> now resides in an entirely different system. Whatever virtio is for=
+ a frontend
+> >>>>> system, vhost can be that for a backend system. vring can be for ac=
+cessing
+> >>>>> virtqueue and can be used either in frontend or backend. =20
+
+I guess that clears up at least some of my questions from above...
+
+> >>>> Ok.
+> >>>>
+> >>>> =20
+> >>>>>>>> Have you considered to implement these through vDPA? =20
+> >>>>>>> IIUC vDPA only provides an interface to userspace and an in-kerne=
+l rpmsg
+> >>>>>>> driver
+> >>>>>>> or vhost net driver is not provided.
+> >>>>>>>
+> >>>>>>> The HW connection looks something like https://pasteboard.co/JfMV=
+VHC.jpg
+> >>>>>>> (usecase2 above), =20
+> >>>>>> I see.
+> >>>>>>
+> >>>>>> =20
+> >>>>>>>  =C2=A0=C2=A0=C2=A0 all the boards run Linux. The middle board pr=
+ovides NTB
+> >>>>>>> functionality and board on either side provides virtio/vhost
+> >>>>>>> functionality and
+> >>>>>>> transfer data using rpmsg.=20
+
+This setup looks really interesting (sometimes, it's really hard to
+imagine this in the abstract.)
+=20
+> >>>>>> So I wonder whether it's worthwhile for a new bus. Can we use
+> >>>>>> the existed virtio-bus/drivers? It might work as, except for
+> >>>>>> the epf transport, we can introduce a epf "vhost" transport
+> >>>>>> driver. =20
+> >>>>> IMHO we'll need two buses one for frontend and other for
+> >>>>> backend because the two components can then co-operate/interact
+> >>>>> with each other to provide a functionality. Though both will
+> >>>>> seemingly provide similar callbacks, they are both provide
+> >>>>> symmetrical or complimentary funcitonality and need not be same
+> >>>>> or identical.
+> >>>>>
+> >>>>> Having the same bus can also create sequencing issues.
+> >>>>>
+> >>>>> If you look at virtio_dev_probe() of virtio_bus
+> >>>>>
+> >>>>> device_features =3D dev->config->get_features(dev);
+> >>>>>
+> >>>>> Now if we use same bus for both front-end and back-end, both
+> >>>>> will try to get_features when there has been no set_features.
+> >>>>> Ideally vhost device should be initialized first with the set
+> >>>>> of features it supports. Vhost and virtio should use "status"
+> >>>>> and "features" complimentarily and not identically. =20
+> >>>> Yes, but there's no need for doing status/features passthrough
+> >>>> in epf vhost drivers.b
+> >>>>
+> >>>> =20
+> >>>>> virtio device (or frontend) cannot be initialized before vhost
+> >>>>> device (or backend) gets initialized with data such as
+> >>>>> features. Similarly vhost (backend)
+> >>>>> cannot access virqueues or buffers before virtio (frontend) sets
+> >>>>> VIRTIO_CONFIG_S_DRIVER_OK whereas that requirement is not there
+> >>>>> for virtio as the physical memory for virtqueues are created by
+> >>>>> virtio (frontend). =20
+> >>>> epf vhost drivers need to implement two devices: vhost(vringh)
+> >>>> device and virtio device (which is a mediated device). The
+> >>>> vhost(vringh) device is doing feature negotiation with the
+> >>>> virtio device via RC/EP or NTB. The virtio device is doing
+> >>>> feature negotiation with local virtio drivers. If there're
+> >>>> feature mismatch, epf vhost drivers and do mediation between
+> >>>> them. =20
+> >>> Here epf vhost should be initialized with a set of features for
+> >>> it to negotiate either as vhost device or virtio device no? Where
+> >>> should the initial feature set for epf vhost come from? =20
+> >>
+> >> I think it can work as:
+> >>
+> >> 1) Having an initial features (hard coded in the code) set X in
+> >> epf vhost 2) Using this X for both virtio device and vhost(vringh)
+> >> device 3) local virtio driver will negotiate with virtio device
+> >> with feature set Y 4) remote virtio driver will negotiate with
+> >> vringh device with feature set Z 5) mediate between feature Y and
+> >> feature Z since both Y and Z are a subset of X
+> >>
+> >> =20
+> > okay. I'm also thinking if we could have configfs for configuring
+> > this. Anyways we could find different approaches of configuring
+> > this. =20
+>=20
+>=20
+> Yes, and I think some management API is needed even in the design of=20
+> your "Software Layering". In that figure, rpmsg vhost need some
+> pre-set or hard-coded features.
+
+When I saw the plumbers talk, my first idea was "this needs to be a new
+transport". You have some hard-coded or pre-configured features, and
+then features are negotiated via a transport-specific means in the
+usual way. There's basically an extra/extended layer for this (and
+status, and whatever).
+
+Does that make any sense?
+
+>=20
+>=20
+> >>>>>> It will have virtqueues but only used for the communication
+> >>>>>> between itself and
+> >>>>>> uppter virtio driver. And it will have vringh queues which
+> >>>>>> will be probe by virtio epf transport drivers. And it needs to
+> >>>>>> do datacopy between virtqueue and
+> >>>>>> vringh queues.
+> >>>>>>
+> >>>>>> It works like:
+> >>>>>>
+> >>>>>> virtio drivers <- virtqueue/virtio-bus -> epf vhost drivers <-
+> >>>>>> vringh queue/epf> =20
+> >>>>>>
+> >>>>>> The advantages is that there's no need for writing new buses
+> >>>>>> and drivers. =20
+> >>>>> I think this will work however there is an addtional copy
+> >>>>> between vringh queue and virtqueue, =20
+> >>>> I think not? E.g in use case 1), if we stick to virtio bus, we
+> >>>> will have:
+> >>>>
+> >>>> virtio-rpmsg (EP) <- virtio ring(1) -> epf vhost driver (EP) <-
+> >>>> virtio ring(2) -> virtio pci (RC) <-> virtio rpmsg (RC) =20
+> >>> IIUC epf vhost driver (EP) will access virtio ring(2) using
+> >>> vringh? =20
+> >>
+> >> Yes.
+> >>
+> >> =20
+> >>> And virtio
+> >>> ring(2) is created by virtio pci (RC). =20
+> >>
+> >> Yes.
+> >>
+> >> =20
+> >>>> What epf vhost driver did is to read from virtio ring(1) about
+> >>>> the buffer len and addr and them DMA to Linux(RC)? =20
+> >>> okay, I made some optimization here where vhost-rpmsg using a
+> >>> helper writes a buffer from rpmsg's upper layer directly to
+> >>> remote Linux (RC) as against here were it has to be first written
+> >>> to virtio ring (1).
+> >>>
+> >>> Thinking how this would look for NTB
+> >>> virtio-rpmsg (HOST1) <- virtio ring(1) -> NTB(HOST1) <->
+> >>> NTB(HOST2)=C2=A0 <- virtio ring(2) -> virtio-rpmsg (HOST2)
+> >>>
+> >>> Here the NTB(HOST1) will access the virtio ring(2) using vringh? =20
+> >>
+> >> Yes, I think so it needs to use vring to access virtio ring (1) as
+> >> well. =20
+> > NTB(HOST1) and virtio ring(1) will be in the same system. So it
+> > doesn't have to use vring. virtio ring(1) is by the virtio device
+> > the NTB(HOST1) creates. =20
+>=20
+>=20
+> Right.
+>=20
+>=20
+> >> =20
+> >>> Do you also think this will work seamlessly with virtio_net.c,
+> >>> virtio_blk.c? =20
+> >>
+> >> Yes. =20
+> > okay, I haven't looked at this but the backend of virtio_blk should
+> > access an actual storage device no? =20
+>=20
+>=20
+> Good point, for non-peer device like storage. There's probably no
+> need for it to be registered on the virtio bus and it might be better
+> to behave as you proposed.
+
+I might be missing something; but if you expose something as a block
+device, it should have something it can access with block reads/writes,
+shouldn't it? Of course, that can be a variety of things.
+
+>=20
+> Just to make sure I understand the design, how is VHOST SCSI expected
+> to work in your proposal, does it have a device for file as a backend?
+>=20
+>=20
+> >> =20
+> >>> I'd like to get clarity on two things in the approach you
+> >>> suggested, one is features (since epf vhost should ideally be
+> >>> transparent to any virtio driver) =20
+> >>
+> >> We can have have an array of pre-defined features indexed by
+> >> virtio device id in the code.
+> >>
+> >> =20
+> >>> and the other is how certain inputs to virtio device such as
+> >>> number of buffers be determined. =20
+> >>
+> >> We can start from hard coded the value like 256, or introduce some
+> >> API for user to change the value.
+> >>
+> >> =20
+> >>> Thanks again for your suggestions! =20
+> >>
+> >> You're welcome.
+> >>
+> >> Note that I just want to check whether or not we can reuse the
+> >> virtio bus/driver. It's something similar to what you proposed in
+> >> Software Layering but we just replace "vhost core" with "virtio
+> >> bus" and move the vhost core below epf/ntb/platform transport. =20
+> > Got it. My initial design was based on my understanding of your
+> > comments [1]. =20
+>=20
+>=20
+> Yes, but that's just for a networking device. If we want something
+> more generic, it may require more thought (bus etc).
+
+I believe that we indeed need something bus-like to be able to support
+a variety of devices.
+
+>=20
+>=20
+> >
+> > I'll try to create something based on your proposed design here. =20
+>=20
+>=20
+> Sure, but for coding, we'd better wait for other's opinion here.
+
+Please tell me if my thoughts above make any sense... I have just
+started looking at that, so I might be completely off.
 
