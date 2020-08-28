@@ -2,101 +2,102 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DADCE255295
-	for <lists+kvm@lfdr.de>; Fri, 28 Aug 2020 03:35:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E1CEA2552B2
+	for <lists+kvm@lfdr.de>; Fri, 28 Aug 2020 03:49:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728256AbgH1BfU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 27 Aug 2020 21:35:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48778 "EHLO
+        id S1728193AbgH1Bt1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 27 Aug 2020 21:49:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50998 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726147AbgH1BfU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 27 Aug 2020 21:35:20 -0400
-Received: from mail-pj1-x1043.google.com (mail-pj1-x1043.google.com [IPv6:2607:f8b0:4864:20::1043])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3E648C061264;
-        Thu, 27 Aug 2020 18:35:20 -0700 (PDT)
-Received: by mail-pj1-x1043.google.com with SMTP id 2so3561540pjx.5;
-        Thu, 27 Aug 2020 18:35:20 -0700 (PDT)
+        with ESMTP id S1726197AbgH1Bt0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 27 Aug 2020 21:49:26 -0400
+Received: from mail-io1-xd41.google.com (mail-io1-xd41.google.com [IPv6:2607:f8b0:4864:20::d41])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 345EDC061264;
+        Thu, 27 Aug 2020 18:49:25 -0700 (PDT)
+Received: by mail-io1-xd41.google.com with SMTP id l8so14003ios.2;
+        Thu, 27 Aug 2020 18:49:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id;
-        bh=rxAwjBtuOkOHsCKI2ATmMoWk7nn27DCJ9baRXRPv7gw=;
-        b=fRHT5WZFbeMN+s2XVWB/NxbZCCyRDtI6J+tcc1/dyBOTnfX954wwDt3kriLkxSvyzM
-         p5zo85HxXxh3wTjsQ5b57HMd4x6/sq0M8kmBRo24B5PfrwE+6rngKdYU22ZH2PmEsbYN
-         tf/d/7IPgibKHH+/DjBwn8hyAZ6ccE2bFNzCoeUIrveT23AB7Dm/oPhej5AyFGNH2n1x
-         vjDk6zWGOfx50Np0VhiAGPPImXpKlR48Zwo0HtQStzP7Lqll037XWBGQdX4JFpds/PZJ
-         Zumtzf5UzA6ebwN2wGOVmZuYJzf6VXL9tw4eLOFGT8c7Bpo0X/aHtOGcS6ATBjvPFTta
-         K5mw==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=AuxkTqVq7yF2cLR6HeqahnZopzaHgO8OPP4mjEB1p/k=;
+        b=PN9yYyL4U/3wo7e66qiK4b+DxYiIE2tNSdJ1QM6y6NdGvVhy7cMLmg3Rz72+yJ48W+
+         iXITBxJq7GTKuxRnhJAEICDM8RtusSpCWOqlSf82SEW0QUGwqX4jxZz+xKWpZ1aQNGS3
+         daDj3FQEk4wT1/V82TdGadwCJl9OzsvMcq+wpcOwZJc9rzhJ96IQYjXBJWYsJ5pqM7vg
+         Tio7S4cZuz0jySy/qtstaV/t8GW5vbknrSvcMPh+813krFMDZiPqQhqbKxMc0zcFM0VJ
+         ShD2xJLTVebdKMwJOHZiPFqBAdkPq5b585X3uA5wYjxcqQElpi4RcGKHh4oPEqO+kFvo
+         65Pg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id;
-        bh=rxAwjBtuOkOHsCKI2ATmMoWk7nn27DCJ9baRXRPv7gw=;
-        b=TnW/k6GBKS+pRvUvKMK9iEc6zal91lglHa9MraFXv6/cu0YJpd2EBZvatIZi2taYVR
-         fWYLbjvIhNaXk0AtR+y577OKwdymLwASTDUOaUfkVcXir7RM3dRk1C3AzQqhZmMskPJa
-         ACZQSQU9oCJLfpPDISSIKzCscbNA17SuExtnGAdu0yGmQxL3W7f0TN2rY2iw4zfvdq/V
-         weY7sNpX6QouuZ0VZLXXaHDsaSJaMkD7MtSJBeiY1ZSt+MkcOcT4GW6DQlQe7SCmYj5k
-         YSSyL8mPHgAHeDyTUchvQfeHTIrQWBJuF/f2CemrUIIAyMSQ1MST3Dg6jC9kDf3dWtGD
-         Lf6Q==
-X-Gm-Message-State: AOAM530nvCC7eAeX+v2189FXXY4zEyp919nQJ9eoob+L50KPcgUNRszA
-        IbfHWnx/LL1u4NHOTeG2FnT2vAdOFBQ=
-X-Google-Smtp-Source: ABdhPJzariVnAqnB4Hk/D+KzhbrZIV+Xpa5zg7Et27t3/fcuC6vm7zCm93AbP6pLhCsbe69QM36Ehg==
-X-Received: by 2002:a17:90a:d597:: with SMTP id v23mr352068pju.24.1598578519288;
-        Thu, 27 Aug 2020 18:35:19 -0700 (PDT)
-Received: from localhost.localdomain ([103.7.29.6])
-        by smtp.googlemail.com with ESMTPSA id b6sm3309715pjz.33.2020.08.27.18.35.16
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 27 Aug 2020 18:35:18 -0700 (PDT)
-From:   Wanpeng Li <kernellwp@gmail.com>
-X-Google-Original-From: Wanpeng Li <wanpengli@tencent.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=AuxkTqVq7yF2cLR6HeqahnZopzaHgO8OPP4mjEB1p/k=;
+        b=lSUgKQaQ6pM/uKZhUrWFGFscIzpePFzqwht5BwQjF5hVucymwB/Zl9h7NTdHiR8Qew
+         CHQB0OXovPh/Fig7jk/eR16s2AsOBVLoA0WGFA6Re7j9PtRMqIqUi1WL/FbhjfrQTBsK
+         fSveIsHHK9+pCCJZ3YnGkGBYL1uWLhvkLXR331IqWOxrKKs5U58VQvKzkc+IikrRbr1J
+         jOtD9GKqvE5MvZoYxh7AAqOTZVVIbioD2nVXI3Jylx5aTWQ9rS6UQyLKSabQE4y9GDmZ
+         xJeq3KYwQ2gMRl7gazkffBD3FjJP9ZfAeQTjEDIAhR8wuzHkGEXMZ9zAtvvBEHgJ4j8+
+         LMqQ==
+X-Gm-Message-State: AOAM533ZEJxeRxomZXjY0gFVtt+LLYHxNdbyXa/VWFeBVGKWNS2lwiLo
+        y9tY6bbb2iecn6aZ59ywoB0GcM9QLma1Nvz0L2jZ6b5XS/V7nQ==
+X-Google-Smtp-Source: ABdhPJwx/DIu4zJ07VCu6FiVgahDko/FpmdmTd7xlfYVxx8Un8UKZNh/GZWHLRZjPDLEg7i+ACD8EDmZ1JsVkGd3H+o=
+X-Received: by 2002:a05:6638:24cf:: with SMTP id y15mr22673544jat.137.1598579364071;
+ Thu, 27 Aug 2020 18:49:24 -0700 (PDT)
+MIME-Version: 1.0
+References: <20200824101825.4106-1-jiangshanlai@gmail.com>
+In-Reply-To: <20200824101825.4106-1-jiangshanlai@gmail.com>
+From:   Lai Jiangshan <jiangshanlai@gmail.com>
+Date:   Fri, 28 Aug 2020 09:49:13 +0800
+Message-ID: <CAJhGHyC1Ykq5V_2nFPLRz9JmtAiQu6aw4fCKo1LO7Qwzjvfg2g@mail.gmail.com>
+Subject: Re: [PATCH] kvm x86/mmu: use KVM_REQ_MMU_SYNC to sync when needed
+To:     LKML <linux-kernel@vger.kernel.org>,
+        Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     Lai Jiangshan <laijs@linux.alibaba.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>
-Subject: [PATCH] KVM: LAPIC: Reset timer_advance_ns if timer mode switch
-Date:   Fri, 28 Aug 2020 09:35:08 +0800
-Message-Id: <1598578508-14134-1-git-send-email-wanpengli@tencent.com>
-X-Mailer: git-send-email 2.7.4
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        X86 ML <x86@kernel.org>, "H. Peter Anvin" <hpa@zytor.com>,
+        kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Wanpeng Li <wanpengli@tencent.com>
+Ping @Sean Christopherson
 
-per-vCPU timer_advance_ns should be set to 0 if timer mode is not tscdeadline 
-otherwise we waste cpu cycles in the function lapic_timer_int_injected(), 
-especially on AMD platform which doesn't support tscdeadline mode. We can 
-reset timer_advance_ns to the initial value if switch back to tscdealine 
-timer mode.
-
-Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
----
- arch/x86/kvm/lapic.c | 6 ++++++
- 1 file changed, 6 insertions(+)
-
-diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-index 654649b..abc296d 100644
---- a/arch/x86/kvm/lapic.c
-+++ b/arch/x86/kvm/lapic.c
-@@ -1499,10 +1499,16 @@ static void apic_update_lvtt(struct kvm_lapic *apic)
- 			kvm_lapic_set_reg(apic, APIC_TMICT, 0);
- 			apic->lapic_timer.period = 0;
- 			apic->lapic_timer.tscdeadline = 0;
-+			if (timer_mode == APIC_LVT_TIMER_TSCDEADLINE &&
-+				lapic_timer_advance_dynamic)
-+				apic->lapic_timer.timer_advance_ns = LAPIC_TIMER_ADVANCE_NS_INIT;
- 		}
- 		apic->lapic_timer.timer_mode = timer_mode;
- 		limit_periodic_timer_frequency(apic);
- 	}
-+	if (timer_mode != APIC_LVT_TIMER_TSCDEADLINE &&
-+		lapic_timer_advance_dynamic)
-+		apic->lapic_timer.timer_advance_ns = 0;
- }
- 
- /*
--- 
-2.7.4
-
+On Mon, Aug 24, 2020 at 5:18 PM Lai Jiangshan <jiangshanlai@gmail.com> wrote:
+>
+> From: Lai Jiangshan <laijs@linux.alibaba.com>
+>
+> 8c8560b83390("KVM: x86/mmu: Use KVM_REQ_TLB_FLUSH_CURRENT for MMU specific flushes)
+> changed it without giving any reason in the changelog.
+>
+> In theory, the syncing is needed, and need to be fixed by reverting
+> this part of change.
+>
+> Signed-off-by: Lai Jiangshan <laijs@linux.alibaba.com>
+> ---
+>  arch/x86/kvm/mmu/mmu.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index 4e03841f053d..9a93de921f2b 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -2468,7 +2468,7 @@ static struct kvm_mmu_page *kvm_mmu_get_page(struct kvm_vcpu *vcpu,
+>                 }
+>
+>                 if (sp->unsync_children)
+> -                       kvm_make_request(KVM_REQ_TLB_FLUSH_CURRENT, vcpu);
+> +                       kvm_make_request(KVM_REQ_MMU_SYNC, vcpu);
+>
+>                 __clear_sp_write_flooding_count(sp);
+>
+> --
+> 2.19.1.6.gb485710b
+>
