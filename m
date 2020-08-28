@@ -2,90 +2,111 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1308E255422
-	for <lists+kvm@lfdr.de>; Fri, 28 Aug 2020 07:56:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 159162554B2
+	for <lists+kvm@lfdr.de>; Fri, 28 Aug 2020 08:54:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727059AbgH1F4E (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 28 Aug 2020 01:56:04 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:37501 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725858AbgH1F4E (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 28 Aug 2020 01:56:04 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1598594162;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=8WfSS1tY+bLb7KnTMyymrfaeRnFVFOa+gLmOLZfJg4c=;
-        b=NCs9DwIrfhVpYJP49RrD77Bbcqjk/3XNbkHxUPA42X8ox22p+G/QVWtA26W4CKiScX4Svf
-        1nnMUTfQQuY17XtZH+JaBI567GPUXxkcHB3KB7ct9dku5Izhqae8fPMaQpvlNMdkzwzupY
-        1D0mDiLQ6NwK2/tciNrcmOoTCqysPt0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-132-h09BYIRsPsW9BYFg6-zX2Q-1; Fri, 28 Aug 2020 01:55:57 -0400
-X-MC-Unique: h09BYIRsPsW9BYFg6-zX2Q-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        id S1726834AbgH1GyV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 28 Aug 2020 02:54:21 -0400
+Received: from mta-02.yadro.com ([89.207.88.252]:35910 "EHLO mta-01.yadro.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1725969AbgH1GyV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 28 Aug 2020 02:54:21 -0400
+Received: from localhost (unknown [127.0.0.1])
+        by mta-01.yadro.com (Postfix) with ESMTP id DE0805752C;
+        Fri, 28 Aug 2020 06:54:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=yadro.com; h=
+        in-reply-to:content-disposition:content-type:content-type
+        :mime-version:references:message-id:subject:subject:from:from
+        :date:date:received:received:received; s=mta-01; t=1598597658;
+         x=1600412059; bh=QMs65RhVEG0A9ziXHBh7u6OK6hoUSKLGyEXZsuwPe+Q=; b=
+        TQrZkH5zwP6OUQ0LQZbyu5fUTk2ExEHqDT+0LIMrvLAIZvwzD8lgM9afA9AFSTBg
+        sNf2zeFZfOks1N/dBg0RCcIywfXoC3gbzX0gvqz2ztQcwNigS45lR5uAe27LRw7s
+        VVQELrPiwvxwZkT0nJA54tHpgJ3kF5TZm5/fTk3AlmE=
+X-Virus-Scanned: amavisd-new at yadro.com
+Received: from mta-01.yadro.com ([127.0.0.1])
+        by localhost (mta-01.yadro.com [127.0.0.1]) (amavisd-new, port 10024)
+        with ESMTP id SCM-P_xGRpcw; Fri, 28 Aug 2020 09:54:18 +0300 (MSK)
+Received: from T-EXCH-02.corp.yadro.com (t-exch-02.corp.yadro.com [172.17.10.102])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BA4A2189E615;
-        Fri, 28 Aug 2020 05:55:55 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-112-79.ams2.redhat.com [10.36.112.79])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id E0DAA5D9F1;
-        Fri, 28 Aug 2020 05:55:54 +0000 (UTC)
-Subject: Re: [kvm-unit-tests PATCH 6/7] configure: Add an option to specify
- getopt
-To:     Roman Bolshakov <r.bolshakov@yadro.com>, kvm@vger.kernel.org
-Cc:     Cameron Esfahani <dirty@apple.com>
+        by mta-01.yadro.com (Postfix) with ESMTPS id 42C04574E7;
+        Fri, 28 Aug 2020 09:54:18 +0300 (MSK)
+Received: from localhost (172.17.204.212) by T-EXCH-02.corp.yadro.com
+ (172.17.10.102) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384_P384) id 15.1.669.32; Fri, 28
+ Aug 2020 09:54:18 +0300
+Date:   Fri, 28 Aug 2020 09:54:17 +0300
+From:   Roman Bolshakov <r.bolshakov@yadro.com>
+To:     Thomas Huth <thuth@redhat.com>
+CC:     <kvm@vger.kernel.org>, Cameron Esfahani <dirty@apple.com>
+Subject: Re: [kvm-unit-tests PATCH 1/7] x86: Makefile: Allow division on
+ x86_64-elf binutils
+Message-ID: <20200828065417.GA54274@SPB-NB-133.local>
 References: <20200810130618.16066-1-r.bolshakov@yadro.com>
- <20200810130618.16066-7-r.bolshakov@yadro.com>
-From:   Thomas Huth <thuth@redhat.com>
-Message-ID: <ebccbbb2-dc9b-9ff4-c89c-8fdd6f463a50@redhat.com>
-Date:   Fri, 28 Aug 2020 07:55:53 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+ <20200810130618.16066-2-r.bolshakov@yadro.com>
+ <ee81540c-9064-4650-8784-d4531eec042c@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200810130618.16066-7-r.bolshakov@yadro.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <ee81540c-9064-4650-8784-d4531eec042c@redhat.com>
+X-Originating-IP: [172.17.204.212]
+X-ClientProxiedBy: T-EXCH-01.corp.yadro.com (172.17.10.101) To
+ T-EXCH-02.corp.yadro.com (172.17.10.102)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 10/08/2020 15.06, Roman Bolshakov wrote:
-> macOS is shipped with an old non-enhanced version of getopt and it
-> doesn't support options used by run_tests.sh. Proper version of getopt
-> is available from homebrew but it has to be added to PATH before invoking
-> run_tests.sh. It's not convenient because it has to be done in each
-> shell instance and there could be many if a multiplexor is used.
+On Fri, Aug 28, 2020 at 07:00:19AM +0200, Thomas Huth wrote:
+> On 10/08/2020 15.06, Roman Bolshakov wrote:
+> > For compatibility with other SVR4 assemblers, '/' starts a comment on
+> > *-elf binutils target and thus division operator is not allowed [1][2].
+> > That breaks cstart64.S build:
+> > 
+> >   x86/cstart64.S: Assembler messages:
+> >   x86/cstart64.S:294: Error: unbalanced parenthesis in operand 1.
+> > 
+> > The option is ignored on the Linux target of GNU binutils.
+> > 
+> > 1. https://sourceware.org/binutils/docs/as/i386_002dChars.html
+> > 2. https://sourceware.org/binutils/docs/as/i386_002dOptions.html#index-_002d_002ddivide-option_002c-i386
+> > 
+> > Cc: Cameron Esfahani <dirty@apple.com>
+> > Signed-off-by: Roman Bolshakov <r.bolshakov@yadro.com>
+> > ---
+> >  x86/Makefile | 2 ++
+> >  1 file changed, 2 insertions(+)
+> > 
+> > diff --git a/x86/Makefile b/x86/Makefile
+> > index 8a007ab..22afbb9 100644
+> > --- a/x86/Makefile
+> > +++ b/x86/Makefile
+> > @@ -1 +1,3 @@
+> >  include $(SRCDIR)/$(TEST_DIR)/Makefile.$(ARCH)
+> > +
+> > +COMMON_CFLAGS += -Wa,--divide
 > 
-> The change provides a way to override getopt and halts ./configure if
-> enhanced getopt can't be found.
+> Some weeks ago, I also played with an elf cross compiler and came to the
+> same conclusion, that we need this option there. Unfortunately, it does
+> not work with clang:
 > 
-> Cc: Cameron Esfahani <dirty@apple.com>
-> Signed-off-by: Roman Bolshakov <r.bolshakov@yadro.com>
-> ---
->  configure    | 13 +++++++++++++
->  run_tests.sh |  2 +-
->  2 files changed, 14 insertions(+), 1 deletion(-)
+>  https://gitlab.com/huth/kvm-unit-tests/-/jobs/707986800#L1629
+> 
+> You could try to wrap it with "cc-option" instead ... or use a proper
+> check in the configure script to detect whether it's needed or not.
+> 
 
-Is this still required with a newer version of bash? The one that ships
-with macOS is just too old...
+Hi Thomas,
 
-I assume that getopt is a builtin function in newer versions of the bash?
+Thanks for reviewing the series. I'll look into both options and will
+test with both gcc and clang afterwards. I can also update .travis.yml
+in a new patch to test the build on macOS.
 
-Last time we discussed, we agreed that Bash v4.2 would be a reasonable
-minimum for the kvm-unit-tests:
+> And can you please put it next to the other COMMON_CFLAGS in
+> x86/Makefile.common instead of x86/Makefile?
+> 
 
- https://www.spinics.net/lists/kvm/msg222139.html
+Sure.
 
-Thus if the user installed bash from homebrew on macos, we should be fine?
-
-Could you maybe replace this patch with a check for a minimum version of
-bash instead?
-
- Thomas
-
+Regards,
+Roman
