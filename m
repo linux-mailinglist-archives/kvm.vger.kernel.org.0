@@ -2,94 +2,107 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id F390B255C54
-	for <lists+kvm@lfdr.de>; Fri, 28 Aug 2020 16:24:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 19CE5255D7E
+	for <lists+kvm@lfdr.de>; Fri, 28 Aug 2020 17:10:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727048AbgH1OYK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 28 Aug 2020 10:24:10 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:26070 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726871AbgH1OYH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 28 Aug 2020 10:24:07 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1598624645;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=qm4yw14oZW1kOamiCPd98+q7tZwl+c/TO08c6jDr94k=;
-        b=C7j6jrItVMCieRNx3cbjEcKhJ1tODwxO2T/xYEhc1D6su05L+vrzTH0toqCEIdS4844INV
-        /gZOyYDW0JL9rRhyrUVeEjaekPpV12roYLzHNpJ4MqI1wd1IVTrybU0SilQ9svlfFnmNkt
-        7nnGiUCKlWwZI097KDfKzBwOe/YnBdE=
-Received: from mail-qv1-f70.google.com (mail-qv1-f70.google.com
- [209.85.219.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-352-CAo84l5HOGaxLjH1nhax0A-1; Fri, 28 Aug 2020 10:24:04 -0400
-X-MC-Unique: CAo84l5HOGaxLjH1nhax0A-1
-Received: by mail-qv1-f70.google.com with SMTP id l10so886455qvw.22
-        for <kvm@vger.kernel.org>; Fri, 28 Aug 2020 07:24:04 -0700 (PDT)
+        id S1726219AbgH1PJy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 28 Aug 2020 11:09:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33912 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726197AbgH1PJf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 28 Aug 2020 11:09:35 -0400
+Received: from mail-qk1-x742.google.com (mail-qk1-x742.google.com [IPv6:2607:f8b0:4864:20::742])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D9A7DC061264;
+        Fri, 28 Aug 2020 08:09:34 -0700 (PDT)
+Received: by mail-qk1-x742.google.com with SMTP id o12so1205822qki.13;
+        Fri, 28 Aug 2020 08:09:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=sender:from:date:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=W7kRTit/NoWCrV6s0X1OousX0dNQ2oe81sw0mMzwiVI=;
+        b=HSnWUujveg28vCj8uX2R+iiQq4k/5RDX/XgGqrmN9R/zNCTuyrRG1J0ms852pLywu8
+         lFqJ/BPTgfN0uGT9yMjeui+9d0az0yQ/8GBSYXbgXFjRAESD4TgKm/TWozU3jZhx0VV6
+         14LAQjW2igCplnEnQxePMQh3A0HyYqMMVOZ0cSReYqtKaPQMFMVMkQopL/BLOrCthcOM
+         MUG/vdrbZnbSR2JPm/mSTli0wwQ5RW1Rnb2QkBdSQFn5eWM+AraW9W6WPnhzkJDMyTEZ
+         +E8leqfNv+TU/gPyFFo7vQjDxadNKQDIxSpEgzgT45xPgDxiiHiR1ZXFXoVLt2FA+mn4
+         ubuA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=qm4yw14oZW1kOamiCPd98+q7tZwl+c/TO08c6jDr94k=;
-        b=aEjSOybQpspAN3IREdUv9Gbc9l9veQYeWeFY9DGhIc/74yRbS+teX+1J0iSV05y0e0
-         dqvNIC7u6N3JtgnKlzeS4t9ZWEJQvETAdNw4lxRrYD00/e6F7psEuNRc0+CzoIOE5iGS
-         K+7n5g4/J9bghtLc5SF0EWV1itd9ySHWoZM3mFfljxSNn5mIADd3P70UyxGnUVrGqOWI
-         raP86aVV9XG8OZcQY4wtVabUTwTGVG+10b2JBIrL1k/3MZusnNjh6HWEmQ4ypscTD8hH
-         EqnIOSIhFouG8ubGaEKKhIy1DypmQBiMXH5yIbG4uzeNBRHXaMu5tLy2a9ktww2OzIfc
-         Crbg==
-X-Gm-Message-State: AOAM532Yd44NBYZO2RN2BnYEr8iiDYy6Zlc995lHOQ2reOVKCDVsOTlI
-        9X71rypCQiv2IBZZPLgW15jIfJagWtjtVtI6yiASgR6Wvnl9PLuic0tZzP9aomXQaXwTk6RaZ1c
-        Sy2mnQ6wkxK7O
-X-Received: by 2002:a0c:dd05:: with SMTP id u5mr1964740qvk.143.1598624643650;
-        Fri, 28 Aug 2020 07:24:03 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyS2SFjk0+xV0FK90qlNWVxFACNOzmy1EjYy0Kne2/gImeDcKsxIYjVyoXkR34UqhH/MeqiCg==
-X-Received: by 2002:a0c:dd05:: with SMTP id u5mr1964698qvk.143.1598624643273;
-        Fri, 28 Aug 2020 07:24:03 -0700 (PDT)
-Received: from xz-x1 (bras-vprn-toroon474qw-lp130-11-70-53-122-15.dsl.bell.ca. [70.53.122.15])
-        by smtp.gmail.com with ESMTPSA id w3sm886056qkc.10.2020.08.28.07.24.01
+        h=x-gm-message-state:sender:from:date:to:cc:subject:message-id
+         :references:mime-version:content-disposition:in-reply-to;
+        bh=W7kRTit/NoWCrV6s0X1OousX0dNQ2oe81sw0mMzwiVI=;
+        b=lHLcqgyZLQ4kiCkjyD6jwcs+Kgw5miXpwkr7LNTTzKCJRxu6lta7mZVkLA2qiG+pGD
+         wxf2obMdQR4lwA+V3t+FRLIH2nrA8ewFCIRIYaw65nid5l3XZMxPNf6C8MsFb8dO5Jlx
+         lR2VZi04HAFyW4ndC9KP0Wf+/7/O2tHDvBMw3PozCnN56Ke75f5Z5X5bd8uKbyY9XbGd
+         5Dc5ILC2dICM7e/9ree2GTq+WzxZYcgTaNHyEZW6v2aBGupBLqrIgrxLlCLFfyrJhORH
+         KBT9ozfKOE+JrLpvn63Er8uEKLBFVXTcvxu2f0yPymxXFsNcKZArbhEskXWhilTAyTys
+         WR5Q==
+X-Gm-Message-State: AOAM531kmvKPKOhqTq9eh3IMuKdJpRkvnt1C5Ad7bg/qFJAfnRbe7BLF
+        fp8M/nKD1yiDztEbbsNtnjk=
+X-Google-Smtp-Source: ABdhPJzaqcYvGe3mmd+w2AvU76ady8UcKUmdn3DKwbjE+FvWDr6fLzH7sMY//enSc5x5fZp+ZMBmSQ==
+X-Received: by 2002:a37:ec6:: with SMTP id 189mr1686250qko.38.1598627371481;
+        Fri, 28 Aug 2020 08:09:31 -0700 (PDT)
+Received: from rani.riverdale.lan ([2001:470:1f07:5f3::b55f])
+        by smtp.gmail.com with ESMTPSA id x31sm1276971qtx.97.2020.08.28.08.09.30
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 28 Aug 2020 07:24:02 -0700 (PDT)
-Date:   Fri, 28 Aug 2020 10:24:00 -0400
-From:   Peter Xu <peterx@redhat.com>
-To:     "Maoming (maoming, Cloud Infrastructure Service Product Dept.)" 
-        <maoming.maoming@huawei.com>
-Cc:     "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "cohuck@redhat.com" <cohuck@redhat.com>,
-        "Zhoujian (jay)" <jianjay.zhou@huawei.com>,
-        "Huangweidong (C)" <weidong.huang@huawei.com>,
-        "aarcange@redhat.com" <aarcange@redhat.com>,
-        wangyunjian <wangyunjian@huawei.com>
-Subject: Re: =?utf-8?B?562U5aSNOiDnrZTlpI06IFtQQVRD?= =?utf-8?Q?H?= V2] vfio
- dma_map/unmap: optimized for hugetlbfs pages
-Message-ID: <20200828142400.GA3197@xz-x1>
-References: <20200814023729.2270-1-maoming.maoming@huawei.com>
- <20200825205907.GB8235@xz-x1>
- <8B561EC9A4D13649A62CF60D3A8E8CB28C2D9ABB@dggeml524-mbx.china.huawei.com>
- <20200826151509.GD8235@xz-x1>
- <8B561EC9A4D13649A62CF60D3A8E8CB28C2DBE7A@dggeml524-mbx.china.huawei.com>
+        Fri, 28 Aug 2020 08:09:30 -0700 (PDT)
+From:   Arvind Sankar <nivedita@alum.mit.edu>
+X-Google-Original-From: Arvind Sankar <arvind@rani.riverdale.lan>
+Date:   Fri, 28 Aug 2020 11:09:28 -0400
+To:     Joerg Roedel <joro@8bytes.org>
+Cc:     Arvind Sankar <nivedita@alum.mit.edu>, x86@kernel.org,
+        Joerg Roedel <jroedel@suse.de>, hpa@zytor.com,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Jiri Slaby <jslaby@suse.cz>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Juergen Gross <jgross@suse.com>,
+        Kees Cook <keescook@chromium.org>,
+        David Rientjes <rientjes@google.com>,
+        Cfir Cohen <cfir@google.com>,
+        Erdem Aktas <erdemaktas@google.com>,
+        Masami Hiramatsu <mhiramat@kernel.org>,
+        Mike Stunes <mstunes@vmware.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Martin Radev <martin.b.radev@gmail.com>,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org
+Subject: Re: [PATCH v6 13/76] x86/boot/compressed/64: Add IDT Infrastructure
+Message-ID: <20200828150928.GA1203097@rani.riverdale.lan>
+References: <20200824085511.7553-1-joro@8bytes.org>
+ <20200824085511.7553-14-joro@8bytes.org>
+ <20200827152657.GA669574@rani.riverdale.lan>
+ <20200828121226.GC13881@8bytes.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <8B561EC9A4D13649A62CF60D3A8E8CB28C2DBE7A@dggeml524-mbx.china.huawei.com>
+In-Reply-To: <20200828121226.GC13881@8bytes.org>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Aug 28, 2020 at 09:23:08AM +0000, Maoming (maoming, Cloud Infrastructure Service Product Dept.) wrote:
-> In hugetlb_put_pfn(), I delete unpin_user_pages_dirty_lock() and use some simple code to put hugetlb pages.
-> Is this right?
+On Fri, Aug 28, 2020 at 02:12:26PM +0200, Joerg Roedel wrote:
+> Hi Arvind,
+> 
+> On Thu, Aug 27, 2020 at 11:26:57AM -0400, Arvind Sankar wrote:
+> > On Mon, Aug 24, 2020 at 10:54:08AM +0200, Joerg Roedel wrote:
+> > > +	pushq	%rsi
+> > > +	call	load_stage1_idt
+> > > +	popq	%rsi
+> > > +
+> > 
+> > Do we need the functions later in the series or could this just use lidt
+> > directly?
+> 
+> The function also sets up the actual IDT entries in the table before
+> doing the lidt, so this needs to be a call to a C function. Setting up
+> IDT entries in assembly does not result in readable code.
+> 
 
-I think we should still use the APIs because of the the same reason.  However
-again I don't know the performance impact of that to your patch, but I still
-think that could be done inside gup itself when needed (e.g., a special path
-for hugetlbfs for [un]pinning continuous pages; though if that's the case that
-could be something to be discussed on -mm then as a separate patch, imho).
+Ah ok, I missed that in the later patches.
 
-Thanks,
-
--- 
-Peter Xu
-
+Thanks.
