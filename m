@@ -2,290 +2,508 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6779925577D
-	for <lists+kvm@lfdr.de>; Fri, 28 Aug 2020 11:23:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1BD5225578F
+	for <lists+kvm@lfdr.de>; Fri, 28 Aug 2020 11:27:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728709AbgH1JXe (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 28 Aug 2020 05:23:34 -0400
-Received: from szxga02-in.huawei.com ([45.249.212.188]:3076 "EHLO huawei.com"
+        id S1728870AbgH1J1H (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 28 Aug 2020 05:27:07 -0400
+Received: from szxga05-in.huawei.com ([45.249.212.191]:10728 "EHLO huawei.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1728016AbgH1JX1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 28 Aug 2020 05:23:27 -0400
-Received: from dggeml405-hub.china.huawei.com (unknown [172.30.72.55])
-        by Forcepoint Email with ESMTP id 62269E9A9CA422CC6D28;
-        Fri, 28 Aug 2020 17:23:24 +0800 (CST)
-Received: from DGGEML524-MBX.china.huawei.com ([169.254.1.71]) by
- dggeml405-hub.china.huawei.com ([10.3.17.49]) with mapi id 14.03.0487.000;
- Fri, 28 Aug 2020 17:23:17 +0800
-From:   "Maoming (maoming, Cloud Infrastructure Service Product Dept.)" 
-        <maoming.maoming@huawei.com>
-To:     Alex Williamson <alex.williamson@redhat.com>
-CC:     "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "cohuck@redhat.com" <cohuck@redhat.com>,
-        "Zhoujian (jay)" <jianjay.zhou@huawei.com>,
-        "Huangweidong (C)" <weidong.huang@huawei.com>,
-        "peterx@redhat.com" <peterx@redhat.com>,
-        "aarcange@redhat.com" <aarcange@redhat.com>,
-        wangyunjian <wangyunjian@huawei.com>
-Subject: =?gb2312?B?tPC4tDogW1BBVENIIFYyXSB2ZmlvIGRtYV9tYXAvdW5tYXA6IG9wdGltaXpl?=
- =?gb2312?Q?d_for_hugetlbfs_pages?=
-Thread-Topic: [PATCH V2] vfio dma_map/unmap: optimized for hugetlbfs pages
-Thread-Index: AQHWcePn246e6Z2xQkKwoyKqsTP1MqlA2C0AgAxwBSA=
-Date:   Fri, 28 Aug 2020 09:23:16 +0000
-Message-ID: <8B561EC9A4D13649A62CF60D3A8E8CB28C2DBE88@dggeml524-mbx.china.huawei.com>
-References: <20200814023729.2270-1-maoming.maoming@huawei.com>
- <20200820123802.724afd4a@x1.home>
-In-Reply-To: <20200820123802.724afd4a@x1.home>
-Accept-Language: en-US
-Content-Language: zh-CN
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.174.151.129]
-Content-Type: text/plain; charset="gb2312"
-Content-Transfer-Encoding: base64
+        id S1728444AbgH1J1G (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 28 Aug 2020 05:27:06 -0400
+Received: from DGGEMS411-HUB.china.huawei.com (unknown [172.30.72.59])
+        by Forcepoint Email with ESMTP id BCEBCAE7B377A3557E6A;
+        Fri, 28 Aug 2020 17:27:03 +0800 (CST)
+Received: from localhost (10.174.151.129) by DGGEMS411-HUB.china.huawei.com
+ (10.3.19.211) with Microsoft SMTP Server id 14.3.487.0; Fri, 28 Aug 2020
+ 17:26:57 +0800
+From:   Ming Mao <maoming.maoming@huawei.com>
+To:     <linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>,
+        <alex.williamson@redhat.com>
+CC:     <cohuck@redhat.com>, <jianjay.zhou@huawei.com>,
+        <weidong.huang@huawei.com>, <peterx@redhat.com>,
+        <aarcange@redhat.com>, <wangyunjian@huawei.com>,
+        Ming Mao <maoming.maoming@huawei.com>
+Subject: [PATCH V3] vfio dma_map/unmap: optimized for hugetlbfs pages
+Date:   Fri, 28 Aug 2020 17:26:49 +0800
+Message-ID: <20200828092649.853-1-maoming.maoming@huawei.com>
+X-Mailer: git-send-email 2.26.2.windows.1
 MIME-Version: 1.0
+Content-Transfer-Encoding: 7BIT
+Content-Type:   text/plain; charset=US-ASCII
+X-Originating-IP: [10.174.151.129]
 X-CFilter-Loop: Reflected
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-SGksIA0KVGhhbmtzIGZvciB0YWtpbmcgYSBsb29rLg0KU29tZSByZXBsaWVzIGJlbG93Og0KDQoN
-Ck9uIEZyaSwgMTQgQXVnIDIwMjAgMTA6Mzc6MjkgKzA4MDANCk1pbmcgTWFvIDxtYW9taW5nLm1h
-b21pbmdAaHVhd2VpLmNvbT4gd3JvdGU6DQoNCj4gSW4gdGhlIG9yaWdpbmFsIHByb2Nlc3Mgb2Yg
-cGlubmluZy91bnBpbm5pbmcgcGFnZXMgZm9yIFZGSU8tZGV2aWNlcywgDQo+IHRvIG1ha2Ugc3Vy
-ZSB0aGUgcGFnZXMgYXJlIGNvbnRpZ3VvdXMsIHdlIGhhdmUgdG8gY2hlY2sgdGhlbSBvbmUgYnkg
-b25lLg0KPiBBcyBhIHJlc3VsdCwgZG1hX21hcC91bm1hcCBjb3VsZCBzcGVuZCBhIGxvbmcgdGlt
-ZS4NCj4gVXNpbmcgdGhlIGh1Z2V0bGIgcGFnZXMsIHdlIGNhbiBhdm9pZCB0aGlzIHByb2JsZW0u
-DQo+IEFsbCBwYWdlcyBpbiBodWdldGxiIHBhZ2VzIGFyZSBjb250aWd1b3VzLkFuZCB0aGUgaHVn
-ZXRsYiBwYWdlIHNob3VsZCANCj4gbm90IGJlIHNwbGl0LlNvIHdlIGNhbiBkZWxldGUgdGhlIGZv
-ciBsb29wcyBhbmQgdXNlIHNvbWUgDQo+IG9wZXJhdGlvbnMoc3VjaCBhcyBhdG9taWNfYWRkLHBh
-Z2VfcmVmX2FkZCkgaW5zdGVhZC4NCj4gDQo+IFNpZ25lZC1vZmYtYnk6IE1pbmcgTWFvIDxtYW9t
-aW5nLm1hb21pbmdAaHVhd2VpLmNvbT4NCj4gLS0tDQo+ICBkcml2ZXJzL3ZmaW8vdmZpb19pb21t
-dV90eXBlMS5jIHwgMjMzIA0KPiArKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrLQ0KPiAg
-MSBmaWxlIGNoYW5nZWQsIDIzMCBpbnNlcnRpb25zKCspLCAzIGRlbGV0aW9ucygtKQ0KPiANCj4g
-ZGlmZiAtLWdpdCBhL2RyaXZlcnMvdmZpby92ZmlvX2lvbW11X3R5cGUxLmMgDQo+IGIvZHJpdmVy
-cy92ZmlvL3ZmaW9faW9tbXVfdHlwZTEuYyBpbmRleCA1ZTU1NmFjOTEuLjg5NTcwMTNjMSAxMDA2
-NDQNCj4gLS0tIGEvZHJpdmVycy92ZmlvL3ZmaW9faW9tbXVfdHlwZTEuYw0KPiArKysgYi9kcml2
-ZXJzL3ZmaW8vdmZpb19pb21tdV90eXBlMS5jDQo+IEBAIC00MTUsNiArNDE1LDQ2IEBAIHN0YXRp
-YyBpbnQgcHV0X3Bmbih1bnNpZ25lZCBsb25nIHBmbiwgaW50IHByb3QpDQo+ICAJcmV0dXJuIDA7
-DQo+ICB9DQo+ICANCj4gKy8qDQo+ICsgKiBwdXQgcGZucyBmb3IgYSBodWdldGxiIHBhZ2UNCj4g
-KyAqIEBzdGFydDp0aGUgUEFHRV9TSVpFLXBhZ2Ugd2Ugc3RhcnQgdG8gcHV0LGNhbiBiZSBhbnkg
-cGFnZSBpbiB0aGlzIA0KPiAraHVnZXRsYiBwYWdlDQo+ICsgKiBAbnBhZ2U6dGhlIG51bWJlciBv
-ZiBQQUdFX1NJWkUtcGFnZXMgbmVlZCB0byBwdXQNCj4gKyAqIEBwcm90OklPTU1VX1JFQUQvV1JJ
-VEUNCj4gKyAqLw0KPiArc3RhdGljIGludCBodWdldGxiX3B1dF9wZm4odW5zaWduZWQgbG9uZyBz
-dGFydCwgdW5zaWduZWQgaW50IG5wYWdlLCANCj4gK2ludCBwcm90KSB7DQo+ICsJc3RydWN0IHBh
-Z2UgKnBhZ2U7DQo+ICsJc3RydWN0IHBhZ2UgKmhlYWQ7DQo+ICsNCj4gKwlpZiAoIW5wYWdlIHx8
-ICFwZm5fdmFsaWQoc3RhcnQpKQ0KPiArCQlyZXR1cm4gMDsNCj4gKw0KPiArCXBhZ2UgPSBwZm5f
-dG9fcGFnZShzdGFydCk7DQo+ICsJaWYgKCFwYWdlIHx8ICFQYWdlSHVnZShwYWdlKSkNCj4gKwkJ
-cmV0dXJuIDA7DQo+ICsJaGVhZCA9IGNvbXBvdW5kX2hlYWQocGFnZSk7DQo+ICsJLyoNCj4gKwkg
-KiBUaGUgbGFzdCBwYWdlIHNob3VsZCBiZSBpbiB0aGlzIGh1Z2V0bGIgcGFnZS4NCj4gKwkgKiBU
-aGUgbnVtYmVyIG9mIHB1dHRpbmcgcGFnZXMgc2hvdWxkIGJlIGVxdWFsIHRvIHRoZSBudW1iZXIN
-Cj4gKwkgKiBvZiBnZXR0aW5nIHBhZ2VzLlNvIHRoZSBodWdlcGFnZSBwaW5uZWQgcmVmY291bnQg
-YW5kIHRoZSBub3JtYWwNCj4gKwkgKiBwYWdlIHJlZmNvdW50IGNhbiBub3QgYmUgc21hbGxlciB0
-aGFuIG5wYWdlLg0KPiArCSAqLw0KPiArCWlmICgoaGVhZCAhPSBjb21wb3VuZF9oZWFkKHBmbl90
-b19wYWdlKHN0YXJ0ICsgbnBhZ2UgLSAxKSkpDQo+ICsJICAgIHx8IChwYWdlX3JlZl9jb3VudCho
-ZWFkKSA8IG5wYWdlKQ0KPiArCSAgICB8fCAoY29tcG91bmRfcGluY291bnQocGFnZSkgPCBucGFn
-ZSkpDQo+ICsJCXJldHVybiAwOw0KPiArDQo+ICsJaWYgKChwcm90ICYgSU9NTVVfV1JJVEUpICYm
-ICFQYWdlRGlydHkocGFnZSkpDQo+ICsJCXNldF9wYWdlX2RpcnR5X2xvY2socGFnZSk7DQo+ICsN
-Cj4gKwlhdG9taWNfc3ViKG5wYWdlLCBjb21wb3VuZF9waW5jb3VudF9wdHIoaGVhZCkpOw0KPiAr
-CWlmIChwYWdlX3JlZl9zdWJfYW5kX3Rlc3QoaGVhZCwgbnBhZ2UpKQ0KPiArCQlfX3B1dF9wYWdl
-KGhlYWQpOw0KPiArDQo+ICsJbW9kX25vZGVfcGFnZV9zdGF0ZShwYWdlX3BnZGF0KGhlYWQpLCBO
-Ul9GT0xMX1BJTl9SRUxFQVNFRCwgbnBhZ2UpOw0KPiArCXJldHVybiAxOw0KPiArfQ0KPiArDQo+
-ICBzdGF0aWMgaW50IGZvbGxvd19mYXVsdF9wZm4oc3RydWN0IHZtX2FyZWFfc3RydWN0ICp2bWEs
-IHN0cnVjdCBtbV9zdHJ1Y3QgKm1tLA0KPiAgCQkJICAgIHVuc2lnbmVkIGxvbmcgdmFkZHIsIHVu
-c2lnbmVkIGxvbmcgKnBmbiwNCj4gIAkJCSAgICBib29sIHdyaXRlX2ZhdWx0KQ0KPiBAQCAtNDc5
-LDYgKzUxOSwxMDUgQEAgc3RhdGljIGludCB2YWRkcl9nZXRfcGZuKHN0cnVjdCBtbV9zdHJ1Y3Qg
-Km1tLCB1bnNpZ25lZCBsb25nIHZhZGRyLA0KPiAgCXJldHVybiByZXQ7DQo+ICB9DQo+ICANCj4g
-K3N0YXRpYyBib29sIGlzX2h1Z2V0bGJwYWdlKHVuc2lnbmVkIGxvbmcgcGZuKSB7DQo+ICsJc3Ry
-dWN0IHBhZ2UgKnBhZ2U7DQo+ICsNCj4gKwlpZiAoIXBmbl92YWxpZChwZm4pKQ0KPiArCQlyZXR1
-cm4gZmFsc2U7DQo+ICsNCj4gKwlwYWdlID0gcGZuX3RvX3BhZ2UocGZuKTsNCj4gKwkvKiBvbmx5
-IGNoZWNrIGZvciBodWdldGxiIHBhZ2VzICovDQo+ICsJaWYgKCFwYWdlIHx8ICFQYWdlSHVnZShw
-YWdlKSkNCj4gKwkJcmV0dXJuIGZhbHNlOw0KPiArDQo+ICsJcmV0dXJuIHRydWU7DQoNCg0KcmV0
-dXJuIHBhZ2UgJiYgUGFnZUh1Z2UocGFnZSk7DQoNCg0KDQpZZXMsdGhpcyBpcyBiZXR0ZXIuIEkg
-d2lsbCBmaXggaXQuDQoNCj4gK30NCj4gKw0KPiArLyoNCj4gKyAqIGdldCB0aGUgbnVtYmVyIG9m
-IHJlc2lkdWFsIFBBR0VfU0laRS1wYWdlcyBpbiBhIGh1Z2V0bGIgcGFnZQ0KPiArICogKGluY2x1
-ZGluZyB0aGUgcGFnZSB3aGljaCBwb2ludGVkIGJ5IHRoaXMgYWRkcmVzcykNCj4gKyAqIEBhZGRy
-ZXNzOiB3ZSBjb3VudCByZXNpZHVhbCBwYWdlcyBmcm9tIHRoaXMgYWRkcmVzcyB0byB0aGUgZW5k
-IG9mDQo+ICsgKiBhIGh1Z2V0bGIgcGFnZQ0KPiArICogQG9yZGVyOiB0aGUgb3JkZXIgb2YgdGhl
-IHNhbWUgaHVnZXRsYiBwYWdlICAqLyBzdGF0aWMgbG9uZyANCj4gK2h1Z2V0bGJfZ2V0X3Jlc2lk
-dWFsX3BhZ2VzKHVuc2lnbmVkIGxvbmcgYWRkcmVzcywgdW5zaWduZWQgaW50IG9yZGVyKSANCj4g
-K3sNCj4gKwl1bnNpZ25lZCBsb25nIGh1Z2V0bGJfbnBhZ2U7DQo+ICsJdW5zaWduZWQgbG9uZyBo
-dWdldGxiX21hc2s7DQo+ICsNCj4gKwlpZiAoIW9yZGVyKQ0KPiArCQlyZXR1cm4gLTE7DQoNClVz
-ZSBhIHJlYWwgZXJybm8gcGxlYXNlLg0KDQoNClllcywgSSB3aWxsIGZpeCBpdC4NCj4gKw0KPiAr
-CWh1Z2V0bGJfbnBhZ2UgPSBfQUMoMSwgVUwpIDw8IG9yZGVyOw0KDQpUaGlzIGRvZXNuJ3Qgc2Vl
-bSBhbiBhcHByb3ByaWF0ZSB1c2Ugb2YgX0FDKCksIDFVTCA8PCBvcmRlciBzaG91bGQgYmUgZmlu
-ZS4NCg0KDQoNClllcywgSSB3aWxsIGZpeCBpdC4NCj4gKwlodWdldGxiX21hc2sgPSAoaHVnZXRs
-Yl9ucGFnZSA8PCBQQUdFX1NISUZUKSAtIDE7DQo+ICsJYWRkcmVzcyA9IEFMSUdOX0RPV04oYWRk
-cmVzcywgUEFHRV9TSVpFKTsNCg0KaHVnZXRsYl9tYXNrIGRvZXNuJ3QgbmVlZCB0byBiZSBpbiBi
-eXRlcywgaXQgY291bGQgYmUgaW4gcGFnZXMgKGh1Z2V0bGJfbnBhZ2UgLSAxKSwgdGhlbiB3ZSBj
-b3VsZCBzaW1wbHkgY29udmVydCBhZGRyZXNzIHRvIHBmbiAoYWRkcmVzcyA+PiBQQUdFX1NISUZU
-KSwgdGhlbiB3ZSBhdm9pZCB0aGUgc2hpZnQgYmVsb3c6DQoNCnJldHVybiBodWdldGxiX25wYWdl
-IC0gKChhZGRyZXNzID4+IFBBR0VfU0hJRlQpICYgKGh1Z2V0bGJfbnBhZ2UgLSAxKSk7DQoNCg0K
-DQoNCg0KWWVzLHRoaXMgaXMgYmV0dGVyLiBJIHdpbGwgZml4IGl0Lg0KPiArDQo+ICsJLyoNCj4g
-KwkgKiBTaW5jZSB3ZSBjb3VudCB0aGUgcGFnZSBwb2ludGVkIGJ5IHRoaXMgYWRkcmVzcywgdGhl
-IG51bWJlciBvZg0KPiArCSAqIHJlc2lkdWFsIFBBR0VfU0laRS1wYWdlcyBpcyBncmVhdGVyIHRo
-YW4gb3IgZXF1YWwgdG8gMS4NCj4gKwkgKi8NCj4gKwlyZXR1cm4gaHVnZXRsYl9ucGFnZSAtICgo
-YWRkcmVzcyAmIGh1Z2V0bGJfbWFzaykgPj4gUEFHRV9TSElGVCk7IH0NCj4gKw0KPiArc3RhdGlj
-IHVuc2lnbmVkIGludA0KPiAraHVnZXRsYl9wYWdlX2dldF9leHRlcm5hbGx5X3Bpbm5lZF9udW0o
-c3RydWN0IHZmaW9fZG1hICpkbWEsDQo+ICsJCQkJdW5zaWduZWQgbG9uZyBzdGFydCwNCj4gKwkJ
-CQl1bnNpZ25lZCBsb25nIG5wYWdlKQ0KPiArew0KPiArCXN0cnVjdCB2ZmlvX3BmbiAqdnBmbjsN
-Cj4gKwlzdHJ1Y3QgcmJfbm9kZSAqbm9kZTsNCj4gKwl1bnNpZ25lZCBsb25nIGVuZCA9IHN0YXJ0
-ICsgbnBhZ2UgLSAxOw0KPiArCXVuc2lnbmVkIGludCBudW0gPSAwOw0KPiArDQo+ICsJaWYgKCFk
-bWEgfHwgIW5wYWdlKQ0KPiArCQlyZXR1cm4gMDsNCj4gKw0KPiArCS8qIElmIHdlIGZpbmQgYSBw
-YWdlIGluIGRtYS0+cGZuX2xpc3QsIHRoaXMgcGFnZSBoYXMgYmVlbiBwaW5uZWQgZXh0ZXJuYWxs
-eSAqLw0KPiArCWZvciAobm9kZSA9IHJiX2ZpcnN0KCZkbWEtPnBmbl9saXN0KTsgbm9kZTsgbm9k
-ZSA9IHJiX25leHQobm9kZSkpIHsNCj4gKwkJdnBmbiA9IHJiX2VudHJ5KG5vZGUsIHN0cnVjdCB2
-ZmlvX3Bmbiwgbm9kZSk7DQo+ICsJCWlmICgodnBmbi0+cGZuID49IHN0YXJ0KSAmJiAodnBmbi0+
-cGZuIDw9IGVuZCkpDQo+ICsJCQludW0rKzsNCj4gKwl9DQo+ICsNCj4gKwlyZXR1cm4gbnVtOw0K
-PiArfQ0KPiArDQo+ICtzdGF0aWMgbG9uZyBodWdldGxiX3BhZ2VfdmFkZHJfZ2V0X3Bmbih1bnNp
-Z25lZCBsb25nIHZhZGRyLCBsb25nIG5wYWdlLA0KPiArCQkJCQkJdW5zaWduZWQgbG9uZyBwZm4p
-DQo+ICt7DQo+ICsJbG9uZyBodWdldGxiX3Jlc2lkdWFsX25wYWdlOw0KPiArCWxvbmcgY29udGln
-dW91c19ucGFnZTsNCj4gKwlzdHJ1Y3QgcGFnZSAqaGVhZCA9IGNvbXBvdW5kX2hlYWQocGZuX3Rv
-X3BhZ2UocGZuKSk7DQo+ICsNCj4gKwkvKg0KPiArCSAqIElmIHBmbiBpcyB2YWxpZCwNCj4gKwkg
-KiBodWdldGxiX3Jlc2lkdWFsX25wYWdlIGlzIGdyZWF0ZXIgdGhhbiBvciBlcXVhbCB0byAxLg0K
-PiArCSAqLw0KPiArCWh1Z2V0bGJfcmVzaWR1YWxfbnBhZ2UgPSBodWdldGxiX2dldF9yZXNpZHVh
-bF9wYWdlcyh2YWRkciwNCj4gKwkJCQkJCWNvbXBvdW5kX29yZGVyKGhlYWQpKTsNCj4gKwlpZiAo
-aHVnZXRsYl9yZXNpZHVhbF9ucGFnZSA8IDApDQo+ICsJCXJldHVybiAtMTsNCg0KRm9yd2FyZCB0
-aGUgZXJybm8NCg0KDQoNCkkgd2lsbCBmaXggaXQuDQo+ICsNCj4gKwkvKiBUaGUgcGFnZSBvZiB2
-YWRkciBoYXMgYmVlbiBnb3R0ZW4gYnkgdmFkZHJfZ2V0X3BmbiAqLw0KPiArCWNvbnRpZ3VvdXNf
-bnBhZ2UgPSBtaW5fdChsb25nLCAoaHVnZXRsYl9yZXNpZHVhbF9ucGFnZSAtIDEpLCBucGFnZSk7
-DQo+ICsJaWYgKCFjb250aWd1b3VzX25wYWdlKQ0KPiArCQlyZXR1cm4gMDsNCj4gKwkvKg0KPiAr
-CSAqIFVubGlrZSBUSFAsIHRoZSBzcGxpdHRpbmcgc2hvdWxkIG5vdCBoYXBwZW4gZm9yIGh1Z2V0
-bGIgcGFnZXMuDQo+ICsJICogU2luY2UgUEdfcmVzZXJ2ZWQgaXMgbm90IHJlbGV2YW50IGZvciBj
-b21wb3VuZCBwYWdlcywgYW5kIHRoZSBwZm4gb2YNCj4gKwkgKiBQQUdFX1NJWkUgcGFnZSB3aGlj
-aCBpbiBodWdldGxiIHBhZ2VzIGlzIHZhbGlkLA0KPiArCSAqIGl0IGlzIG5vdCBuZWNlc3Nhcnkg
-dG8gY2hlY2sgcnN2ZCBmb3IgaHVnZXRsYiBwYWdlcy4NCj4gKwkgKiBXZSBkbyBub3QgbmVlZCB0
-byBhbGxvYyBwYWdlcyBiZWNhdXNlIG9mIHZhZGRyIGFuZCB3ZSBjYW4gZmluaXNoIGFsbA0KPiAr
-CSAqIHdvcmsgYnkgYSBzaW5nbGUgb3BlcmF0aW9uIHRvIHRoZSBoZWFkIHBhZ2UuDQo+ICsJICov
-DQo+ICsJYXRvbWljX2FkZChjb250aWd1b3VzX25wYWdlLCBjb21wb3VuZF9waW5jb3VudF9wdHIo
-aGVhZCkpOw0KPiArCXBhZ2VfcmVmX2FkZChoZWFkLCBjb250aWd1b3VzX25wYWdlKTsNCj4gKwlt
-b2Rfbm9kZV9wYWdlX3N0YXRlKHBhZ2VfcGdkYXQoaGVhZCksIE5SX0ZPTExfUElOX0FDUVVJUkVE
-LCANCj4gK2NvbnRpZ3VvdXNfbnBhZ2UpOw0KPiArDQo+ICsJcmV0dXJuIGNvbnRpZ3VvdXNfbnBh
-Z2U7DQo+ICt9DQo+ICAvKg0KPiAgICogQXR0ZW1wdCB0byBwaW4gcGFnZXMuICBXZSByZWFsbHkg
-ZG9uJ3Qgd2FudCB0byB0cmFjayBhbGwgdGhlIHBmbnMgYW5kDQo+ICAgKiB0aGUgaW9tbXUgY2Fu
-IG9ubHkgbWFwIGNodW5rcyBvZiBjb25zZWN1dGl2ZSBwZm5zIGFueXdheSwgc28gZ2V0IA0KPiB0
-aGUgQEAgLTQ5Miw2ICs2MzEsNyBAQCBzdGF0aWMgbG9uZyB2ZmlvX3Bpbl9wYWdlc19yZW1vdGUo
-c3RydWN0IHZmaW9fZG1hICpkbWEsIHVuc2lnbmVkIGxvbmcgdmFkZHIsDQo+ICAJbG9uZyByZXQs
-IHBpbm5lZCA9IDAsIGxvY2tfYWNjdCA9IDA7DQo+ICAJYm9vbCByc3ZkOw0KPiAgCWRtYV9hZGRy
-X3QgaW92YSA9IHZhZGRyIC0gZG1hLT52YWRkciArIGRtYS0+aW92YTsNCj4gKwlsb25nIGNvbnRp
-Z3VvdXNfbnBhZ2U7DQo+ICANCj4gIAkvKiBUaGlzIGNvZGUgcGF0aCBpcyBvbmx5IHVzZXIgaW5p
-dGlhdGVkICovDQo+ICAJaWYgKCFjdXJyZW50LT5tbSkNCj4gQEAgLTUyMyw3ICs2NjMsOCBAQCBz
-dGF0aWMgbG9uZyB2ZmlvX3Bpbl9wYWdlc19yZW1vdGUoc3RydWN0IHZmaW9fZG1hIA0KPiAqZG1h
-LCB1bnNpZ25lZCBsb25nIHZhZGRyLA0KPiAgDQo+ICAJLyogTG9jayBhbGwgdGhlIGNvbnNlY3V0
-aXZlIHBhZ2VzIGZyb20gcGZuX2Jhc2UgKi8NCj4gIAlmb3IgKHZhZGRyICs9IFBBR0VfU0laRSwg
-aW92YSArPSBQQUdFX1NJWkU7IHBpbm5lZCA8IG5wYWdlOw0KPiAtCSAgICAgcGlubmVkKyssIHZh
-ZGRyICs9IFBBR0VfU0laRSwgaW92YSArPSBQQUdFX1NJWkUpIHsNCj4gKwkgICAgIHBpbm5lZCAr
-PSBjb250aWd1b3VzX25wYWdlLCB2YWRkciArPSBjb250aWd1b3VzX25wYWdlICogUEFHRV9TSVpF
-LA0KPiArCSAgICAgaW92YSArPSBjb250aWd1b3VzX25wYWdlICogUEFHRV9TSVpFKSB7DQo+ICAJ
-CXJldCA9IHZhZGRyX2dldF9wZm4oY3VycmVudC0+bW0sIHZhZGRyLCBkbWEtPnByb3QsICZwZm4p
-Ow0KPiAgCQlpZiAocmV0KQ0KPiAgCQkJYnJlYWs7DQo+IEBAIC01NDUsNiArNjg2LDU0IEBAIHN0
-YXRpYyBsb25nIHZmaW9fcGluX3BhZ2VzX3JlbW90ZShzdHJ1Y3QgdmZpb19kbWEgKmRtYSwgdW5z
-aWduZWQgbG9uZyB2YWRkciwNCj4gIAkJCX0NCj4gIAkJCWxvY2tfYWNjdCsrOw0KPiAgCQl9DQo+
-ICsNCj4gKwkJY29udGlndW91c19ucGFnZSA9IDA7DQo+ICsJCS8qDQo+ICsJCSAqIEl0IGlzIG5v
-dCBuZWNlc3NhcnkgdG8gZ2V0IHBhZ2VzIG9uZSBieSBvbmUgZm9yIGh1Z2V0bGIgcGFnZXMuDQo+
-ICsJCSAqIEFsbCBQQUdFX1NJWkUtcGFnZXMgaW4gaHVnZXRsYiBwYWdlcyBhcmUgY29udGlndW91
-cy4NCj4gKwkJICogSWYgbnBhZ2UgLSBwaW5uZWQgaXMgMSwgYWxsIHBhZ2VzIGFyZSBwaW5uZWQu
-DQo+ICsJCSAqLw0KDQpJIHJlYWxseSBkb24ndCBsaWtlIHRoaXMgcmVzdWx0IG9mIHRyeWluZyB0
-byBzcXVlZXplIGh1Z2VwYWdlcyBpbnRvIHRoZSBlbmQgb2YgdGhlIGV4aXN0aW5nIGFsZ29yaXRo
-bS4gIFdlIGN1cnJlbnRseSBwaW4gdGhlIGZpcnN0IHBhZ2UsIHRoZW4gcGluIGVhY2ggbmV4dCBw
-YWdlIHVudGlsIHdlIGZpbmQgb25lIHRoYXQgaXMgbm90IGNvbnRpZ3VvdXMgb3Igd2UgaGl0IG91
-ciBkZXNpcmVkIGxlbmd0aCBvciBsaW1pdC4gIEFzIEkgdW5kZXJzdGFuZCB0aGUgbW9kaWZpZWQg
-YWxnb3JpdGhtLCBmb3IgZWFjaCBuZXh0IHBhZ2UsIGFmdGVyIHdlJ3ZlIHBpbm5lZCBpdCwgd2Ug
-dGVzdCBpZiBpdCdzIGEgaHVnZXRsYmZzIHBhZ2UsIHRoZW4gcGluIHRoZSByZW1haW5kZXIgb2Yg
-dGhlIHBhZ2VzIHZpYSBhIGRpZmZlcmVudCBtZWNoYW5pc20sIHVwIHRvIHRoZSBkZXNpcmVkIGxl
-bmd0aCBvciBsaW1pdCwgY29udGludWluZyBieSBhZ2FpbiBwaW5uaW5nIHRoZSBuZXh0IGluZGl2
-aWR1YWwgcGFnZSBhbmQgcmVwZWF0aW5nIHRoZSBodWdldGxiZnMgdGVzdC4gIFRoaXMgbWVhbnMg
-d2UncmUgdHlwaWNhbGx5IHN0YXJ0aW5nIGZyb20gdGhlIHNlY29uZCBwYWdlIGFuZCBtaXhpbmcg
-cGFnZXMgcGlubmVkIGluZGl2aWR1YWxseSB2cyB2aWEgdGhlIGh1Z2VwYWdlLg0KDQpXb3VsZCBp
-dCBiZSBjbGVhbmVyIHRvIG1vdmUgaHVnZXRsYmZzIGhhbmRsaW5nIHRvIHRoZSBzdGFydCBvZiB0
-aGUgbG9vcD8gIEluIHRoZSBzaW5nbGUgcGFnZSBjYXNlLCB3ZSBwaW4gdGhlIG5leHQgcGFnZSBp
-biBvcmRlciB0byBkZXRlcm1pbmUgaWYgaXQncyBjb250aXVnb3VzLCB1bnBpbm5pbmcgaWYgaXQn
-cyBub3QuICBJbiB0aGUgaHVnZXRsYmZzIGNhc2UsIHdlIGNhbiBkZXRlcm1pbmUgZnJvbSB0aGUg
-aW5pdGlhbCBwYWdlIHRoZSBleHRlbnQgb2YgdGhlIGNvbnRpZ3VvdXMgcmFuZ2UuDQoNCk1vdmlu
-ZyB0byB0aGUgaGVhZCBvZiB0aGUgbG9vcCBtaWdodCBub3QgYmUgc3VmZmljaWVudCB0byBhY2hp
-ZXZlIHRoZSBzaW1wbGlmaWNhdGlvbiBJJ20gbG9va2luZyBmb3IsIGJ1dCBJIHRoaW5rIHdlIG5l
-ZWQgdG8gY2xlYW51cCB0aGUgdmFyaW91cyBvZmYtYnktb25lIG9yIG9mZi1ieS10d28gY29ycmVj
-dGlvbnMgdGhhdCBvY2N1ciBpbiB0aGlzIGltcGxlbWVudGF0aW9uLCB0aGV5J3JlIGhhcmQgdG8g
-Zm9sbG93Lg0KDQoNCg0KDQoNClRoYW5rcyBmb3IgeW91ciBzdWdnZXN0aW9ucy4gSSB3aWxsIGZp
-eCBpdC4NCg0KPiArCQlpZiAoKG5wYWdlIC0gcGlubmVkID4gMSkgJiYgaXNfaHVnZXRsYnBhZ2Uo
-cGZuKSkgew0KPiArCQkJLyoNCj4gKwkJCSAqIFdlIG11c3QgdXNlIHRoZSB2YWRkciB0byBnZXQg
-dGhlIGNvbnRpZ3VvdXMgcGFnZXMuDQo+ICsJCQkgKiBCZWNhdXNlIGl0IGlzIHBvc3NpYmxlIHRo
-YXQgdGhlIHBhZ2Ugb2YgdmFkZHINCj4gKwkJCSAqIGlzIHRoZSBsYXN0IFBBR0VfU0laRS1wYWdl
-LiBJbiB0aGlzIGNhc2UsIHZhZGRyICsgUEFHRV9TSVpFDQo+ICsJCQkgKiBpcyBpbiBhbm90aGVy
-IGh1Z2V0bGIgcGFnZS4NCj4gKwkJCSAqIEFuZCB0aGUgbGVmdCBwYWdlcyBpcyBucGFnZSAtIHBp
-bm5lZCAtIDEodmFkZHIpLg0KPiArCQkJICovDQo+ICsJCQljb250aWd1b3VzX25wYWdlID0gaHVn
-ZXRsYl9wYWdlX3ZhZGRyX2dldF9wZm4odmFkZHIsDQo+ICsJCQkJCQkJbnBhZ2UgLSBwaW5uZWQg
-LSAxLCBwZm4pOw0KPiArCQkJaWYgKGNvbnRpZ3VvdXNfbnBhZ2UgPCAwKSB7DQo+ICsJCQkJcHV0
-X3BmbihwZm4sIGRtYS0+cHJvdCk7DQo+ICsJCQkJcmV0ID0gLUVJTlZBTDsNCg0KVGhpcyBzaG91
-bGQgcmV0dXJuIHRoZSBlcnJubyBmcm9tIGh1Z2V0bGJfcGFnZV92YWRkcl9nZXRfcGZuKCkgcmF0
-aGVyIHRoYW4gaW52ZW50aW5nIG9uZS4NCg0KDQoNCkkgd2lsbCBmaXggaXQuDQo+ICsJCQkJZ290
-byB1bnBpbl9vdXQ7DQo+ICsJCQl9DQo+ICsJCQkvKg0KPiArCQkJICogSWYgY29udGlndW91c19u
-cGFnZSBpcyAwLCB0aGUgdmFkZHIgaXMgdGhlIGxhc3QgUEFHRV9TSVpFLXBhZ2UNCj4gKwkJCSAq
-IG9mIGEgaHVnZXRsYiBwYWdlLg0KPiArCQkJICogV2Ugc2hvdWxkIGNvbnRpbnVlIGFuZCBmaW5k
-IHRoZSBuZXh0IG9uZS4NCj4gKwkJCSAqLw0KPiArCQkJaWYgKCFjb250aWd1b3VzX25wYWdlKSB7
-DQo+ICsJCQkJLyogc2V0IDEgZm9yIHRoZSB2YWRkciAqLw0KPiArCQkJCWNvbnRpZ3VvdXNfbnBh
-Z2UgPSAxOw0KPiArCQkJCWNvbnRpbnVlOw0KPiArCQkJfQ0KPiArCQkJbG9ja19hY2N0ICs9IGNv
-bnRpZ3VvdXNfbnBhZ2UgLSBodWdldGxiX3BhZ2VfZ2V0X2V4dGVybmFsbHlfcGlubmVkX251bShk
-bWEsDQo+ICsJCQkJCXBmbiwgY29udGlndW91c19ucGFnZSk7DQo+ICsNCj4gKwkJCWlmICghZG1h
-LT5sb2NrX2NhcCAmJg0KPiArCQkJICAgIGN1cnJlbnQtPm1tLT5sb2NrZWRfdm0gKyBsb2NrX2Fj
-Y3QgPiBsaW1pdCkgew0KPiArCQkJCWZvciAoOyBjb250aWd1b3VzX25wYWdlOyBwZm4rKywgY29u
-dGlndW91c19ucGFnZS0tKQ0KPiArCQkJCQlwdXRfcGZuKHBmbiwgZG1hLT5wcm90KTsNCg0KVGhp
-cyBzZWVtcyByZWFsbHkgYXN5bW1ldHJpYyB0byB0aGUgcGlubmluZywgd2hlcmUgd2UndmUgdXNl
-ZCBodWdldGxiZnMgbWVjaGFuaXNtcyB0byBtYWtlIHRoZSBwaW5uZWQgcGFnZXMsIGJ1dCB3ZSdy
-ZSByZWxlYXNpbmcgdGhlbSBpbmRpdmlkdWFsbHkuICBJZGVhbGx5IHdlIHNob3VsZCB1c2UgdGhl
-IHNhbWUgbWVjaGFuaXNtIHBlciBwYWdlLg0KDQoNCg0KWWVzLCB0aGlzIGlzIGJldHRlci4NCj4g
-KwkJCQlwcl93YXJuKCIlczogUkxJTUlUX01FTUxPQ0sgKCVsZCkgZXhjZWVkZWRcbiIsDQo+ICsJ
-CQkJCV9fZnVuY19fLCBsaW1pdCA8PCBQQUdFX1NISUZUKTsNCj4gKwkJCQlyZXQgPSAtRU5PTUVN
-Ow0KPiArCQkJCWdvdG8gdW5waW5fb3V0Ow0KPiArCQkJfQ0KPiArCQl9DQo+ICsNCj4gKwkJLyog
-YWRkIGZvciB0aGUgdmFkZHIgKi8NCj4gKwkJY29udGlndW91c19ucGFnZSsrOw0KPiAgCX0NCj4g
-IA0KPiAgb3V0Og0KPiBAQCAtNTY5LDEzICs3NTgsMzggQEAgc3RhdGljIGxvbmcgdmZpb191bnBp
-bl9wYWdlc19yZW1vdGUoc3RydWN0IA0KPiB2ZmlvX2RtYSAqZG1hLCBkbWFfYWRkcl90IGlvdmEs
-ICB7DQo+ICAJbG9uZyB1bmxvY2tlZCA9IDAsIGxvY2tlZCA9IDA7DQo+ICAJbG9uZyBpOw0KPiAr
-CWxvbmcgaHVnZXRsYl9yZXNpZHVhbF9ucGFnZTsNCj4gKwlsb25nIGNvbnRpZ3VvdXNfbnBhZ2U7
-DQo+ICsJc3RydWN0IHBhZ2UgKmhlYWQ7DQo+ICANCj4gLQlmb3IgKGkgPSAwOyBpIDwgbnBhZ2U7
-IGkrKywgaW92YSArPSBQQUdFX1NJWkUpIHsNCj4gKwlmb3IgKGkgPSAwOyBpIDwgbnBhZ2U7IGkg
-Kz0gY29udGlndW91c19ucGFnZSwgaW92YSArPSBjb250aWd1b3VzX25wYWdlICogUEFHRV9TSVpF
-KSB7DQo+ICsJCWlmIChpc19odWdldGxicGFnZShwZm4pKSB7DQo+ICsJCQkvKg0KPiArCQkJICog
-U2luY2UgcGZuIGlzIHZhbGlkLA0KPiArCQkJICogaHVnZXRsYl9yZXNpZHVhbF9ucGFnZSBpcyBn
-cmVhdGVyIHRoYW4gb3IgZXF1YWwgdG8gMS4NCj4gKwkJCSAqLw0KPiArCQkJaGVhZCA9IGNvbXBv
-dW5kX2hlYWQocGZuX3RvX3BhZ2UocGZuKSk7DQo+ICsJCQlodWdldGxiX3Jlc2lkdWFsX25wYWdl
-ID0gaHVnZXRsYl9nZXRfcmVzaWR1YWxfcGFnZXMoaW92YSwNCj4gKwkJCQkJCQkJCWNvbXBvdW5k
-X29yZGVyKGhlYWQpKTsNCj4gKwkJCWNvbnRpZ3VvdXNfbnBhZ2UgPSBtaW5fdChsb25nLCBodWdl
-dGxiX3Jlc2lkdWFsX25wYWdlLCAobnBhZ2UgLSANCj4gK2kpKTsNCj4gKw0KPiArCQkJLyogdHJ5
-IHRoZSBzbG93IHBhdGggaWYgZmFpbGVkICovDQo+ICsJCQlpZiAoIWh1Z2V0bGJfcHV0X3Bmbihw
-Zm4sIGNvbnRpZ3VvdXNfbnBhZ2UsIGRtYS0+cHJvdCkpDQo+ICsJCQkJZ290byBzbG93X3BhdGg7
-DQo+ICsNCj4gKwkJCXBmbiArPSBjb250aWd1b3VzX25wYWdlOw0KPiArCQkJdW5sb2NrZWQgKz0g
-Y29udGlndW91c19ucGFnZTsNCj4gKwkJCWxvY2tlZCArPSBodWdldGxiX3BhZ2VfZ2V0X2V4dGVy
-bmFsbHlfcGlubmVkX251bShkbWEsIHBmbiwNCj4gKwkJCQkJCQkJCWNvbnRpZ3VvdXNfbnBhZ2Up
-Ow0KPiArCQkJY29udGludWU7DQo+ICsJCX0NCj4gK3Nsb3dfcGF0aDoNCj4gIAkJaWYgKHB1dF9w
-Zm4ocGZuKyssIGRtYS0+cHJvdCkpIHsNCj4gIAkJCXVubG9ja2VkKys7DQo+ICAJCQlpZiAodmZp
-b19maW5kX3ZwZm4oZG1hLCBpb3ZhKSkNCj4gIAkJCQlsb2NrZWQrKzsNCj4gIAkJfQ0KPiArCQlj
-b250aWd1b3VzX25wYWdlID0gMTsNCj4gIAl9DQo+ICANCj4gIAlpZiAoZG9fYWNjb3VudGluZykN
-Cj4gQEAgLTg5Myw2ICsxMTA3LDkgQEAgc3RhdGljIGxvbmcgdmZpb191bm1hcF91bnBpbihzdHJ1
-Y3QgdmZpb19pb21tdSAqaW9tbXUsIHN0cnVjdCB2ZmlvX2RtYSAqZG1hLA0KPiAgCXdoaWxlIChp
-b3ZhIDwgZW5kKSB7DQo+ICAJCXNpemVfdCB1bm1hcHBlZCwgbGVuOw0KPiAgCQlwaHlzX2FkZHJf
-dCBwaHlzLCBuZXh0Ow0KPiArCQlsb25nIGh1Z2V0bGJfcmVzaWR1YWxfbnBhZ2U7DQo+ICsJCWxv
-bmcgY29udGlndW91c19ucGFnZTsNCj4gKwkJc3RydWN0IHBhZ2UgKmhlYWQ7DQo+ICANCj4gIAkJ
-cGh5cyA9IGlvbW11X2lvdmFfdG9fcGh5cyhkb21haW4tPmRvbWFpbiwgaW92YSk7DQo+ICAJCWlm
-IChXQVJOX09OKCFwaHlzKSkgew0KPiBAQCAtOTA2LDEwICsxMTIzLDIwIEBAIHN0YXRpYyBsb25n
-IHZmaW9fdW5tYXBfdW5waW4oc3RydWN0IHZmaW9faW9tbXUgKmlvbW11LCBzdHJ1Y3QgdmZpb19k
-bWEgKmRtYSwNCj4gIAkJICogbGFyZ2VzdCBjb250aWd1b3VzIHBoeXNpY2FsIG1lbW9yeSBjaHVu
-ayB0byB1bm1hcC4NCj4gIAkJICovDQo+ICAJCWZvciAobGVuID0gUEFHRV9TSVpFOw0KPiAtCQkg
-ICAgICFkb21haW4tPmZnc3AgJiYgaW92YSArIGxlbiA8IGVuZDsgbGVuICs9IFBBR0VfU0laRSkg
-ew0KPiArCQkgICAgIWRvbWFpbi0+ZmdzcCAmJiBpb3ZhICsgbGVuIDwgZW5kOyBsZW4gKz0gUEFH
-RV9TSVpFICogDQo+ICtjb250aWd1b3VzX25wYWdlKSB7DQo+ICAJCQluZXh0ID0gaW9tbXVfaW92
-YV90b19waHlzKGRvbWFpbi0+ZG9tYWluLCBpb3ZhICsgbGVuKTsNCj4gIAkJCWlmIChuZXh0ICE9
-IHBoeXMgKyBsZW4pDQo+ICAJCQkJYnJlYWs7DQo+ICsNCj4gKwkJCWlmICgoKGRtYS0+c2l6ZSAt
-IGxlbikgPj4gUEFHRV9TSElGVCkNCj4gKwkJCQkmJiBpc19odWdldGxicGFnZShuZXh0ID4+IFBB
-R0VfU0hJRlQpKSB7DQo+ICsJCQkJaGVhZCA9IGNvbXBvdW5kX2hlYWQocGZuX3RvX3BhZ2UobmV4
-dCA+PiBQQUdFX1NISUZUKSk7DQo+ICsJCQkJaHVnZXRsYl9yZXNpZHVhbF9ucGFnZSA9IGh1Z2V0
-bGJfZ2V0X3Jlc2lkdWFsX3BhZ2VzKGlvdmEgKyBsZW4sDQo+ICsJCQkJCQkJCQljb21wb3VuZF9v
-cmRlcihoZWFkKSk7DQo+ICsJCQkJY29udGlndW91c19ucGFnZSA9IG1pbl90KGxvbmcsICgoZG1h
-LT5zaXplIC0gbGVuKSA+PiBQQUdFX1NISUZUKSwNCj4gKwkJCQkJCQkJaHVnZXRsYl9yZXNpZHVh
-bF9ucGFnZSk7DQoNClNhbWUgaWRlYSBoZXJlIGFzIGFib3ZlLCB3ZSdyZSBhZ2FpbiBzdGFydGlu
-ZyBmcm9tIHRoZSAybmQgcGFnZSB0byBkZXRlcm1pbmUgaHVnZXRsYmZzIHBhZ2VzLCBpdCBmZWVs
-cyB2ZXJ5IGFkIGhvYy4gIFRoYW5rcywNCg0KQWxleA0KDQoNCg0KDQpJIHdpbGwgZml4IGl0Lg0K
-PiArCQkJfSBlbHNlDQo+ICsJCQkJY29udGlndW91c19ucGFnZSA9IDE7DQo+ICAJCX0NCj4gIA0K
-PiAgCQkvKg0KDQo=
+In the original process of dma_map/unmap pages for VFIO-devices,
+to make sure the pages are contiguous, we have to check them one by one.
+As a result, dma_map/unmap could spend a long time.
+Using the hugetlb pages, we can avoid this problem.
+All pages in hugetlb pages are contiguous.And the hugetlb
+page should not be split.So we can delete the for loops.
+
+Signed-off-by: Ming Mao <maoming.maoming@huawei.com>
+---
+ drivers/vfio/vfio_iommu_type1.c | 393 +++++++++++++++++++++++++++++++-
+ 1 file changed, 382 insertions(+), 11 deletions(-)
+
+diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
+index 5e556ac91..a689b9698 100644
+--- a/drivers/vfio/vfio_iommu_type1.c
++++ b/drivers/vfio/vfio_iommu_type1.c
+@@ -479,6 +479,303 @@ static int vaddr_get_pfn(struct mm_struct *mm, unsigned long vaddr,
+ 	return ret;
+ }
+ 
++static bool is_hugetlb_page(unsigned long pfn)
++{
++	struct page *page;
++
++	if (!pfn_valid(pfn))
++		return false;
++
++	page = pfn_to_page(pfn);
++	/* only check for hugetlb pages */
++	return page && PageHuge(page);
++}
++
++static bool vaddr_is_hugetlb_page(unsigned long vaddr, int prot)
++{
++	unsigned long pfn;
++	int ret;
++	bool result;
++
++	if (!current->mm)
++		return false;
++
++	ret = vaddr_get_pfn(current->mm, vaddr, prot, &pfn);
++	if (ret)
++		return false;
++
++	result = is_hugetlb_page(pfn);
++
++	put_pfn(pfn, prot);
++
++	return result;
++}
++
++/*
++ * get the number of residual PAGE_SIZE-pages in a hugetlb page
++ * (including the page which pointed by this address)
++ * @address: we count residual pages from this address to the end of
++ * a hugetlb page
++ * @order: the order of the same hugetlb page
++ */
++static long
++hugetlb_get_residual_pages(unsigned long address, unsigned int order)
++{
++	unsigned long hugetlb_npage;
++	unsigned long hugetlb_mask;
++
++	if (!order)
++		return -EINVAL;
++
++	hugetlb_npage = 1UL << order;
++	hugetlb_mask = hugetlb_npage - 1;
++	address = address >> PAGE_SHIFT;
++
++	/*
++	 * Since we count the page pointed by this address, the number of
++	 * residual PAGE_SIZE-pages is greater than or equal to 1.
++	 */
++	return hugetlb_npage - (address & hugetlb_mask);
++}
++
++static unsigned int
++hugetlb_page_get_externally_pinned_num(struct vfio_dma *dma,
++				unsigned long start,
++				unsigned long npage)
++{
++	struct vfio_pfn *vpfn;
++	struct rb_node *node;
++	unsigned long end;
++	unsigned int num = 0;
++
++	if (!dma || !npage)
++		return 0;
++
++	end = start + npage - 1;
++	/* If we find a page in dma->pfn_list, this page has been pinned externally */
++	for (node = rb_first(&dma->pfn_list); node; node = rb_next(node)) {
++		vpfn = rb_entry(node, struct vfio_pfn, node);
++		if ((vpfn->pfn >= start) && (vpfn->pfn <= end))
++			num++;
++	}
++
++	return num;
++}
++
++static long hugetlb_page_vaddr_get_pfn(struct mm_struct *mm, unsigned long vaddr,
++					int prot, long npage, unsigned long pfn)
++{
++	long hugetlb_residual_npage;
++	struct page *head;
++	int ret = 0;
++	unsigned int contiguous_npage;
++	struct page **pages = NULL;
++	unsigned int flags = 0;
++
++	if ((npage < 0) || !pfn_valid(pfn))
++		return -EINVAL;
++
++	/* all pages are done? */
++	if (!npage)
++		goto out;
++	/*
++	 * Since pfn is valid,
++	 * hugetlb_residual_npage is greater than or equal to 1.
++	 */
++	head = compound_head(pfn_to_page(pfn));
++	hugetlb_residual_npage = hugetlb_get_residual_pages(vaddr,
++						compound_order(head));
++	/* The page of vaddr has been gotten by vaddr_get_pfn */
++	contiguous_npage = min_t(long, (hugetlb_residual_npage - 1), npage);
++	/* There is on page left in this hugetlb page. */
++	if (!contiguous_npage)
++		goto out;
++
++	pages = kvmalloc_array(contiguous_npage, sizeof(struct page *), GFP_KERNEL);
++	if (!pages)
++		return -ENOMEM;
++
++	if (prot & IOMMU_WRITE)
++		flags |= FOLL_WRITE;
++
++	mmap_read_lock(mm);
++	/* The number of pages pinned may be less than contiguous_npage */
++	ret = pin_user_pages_remote(NULL, mm, vaddr + PAGE_SIZE, contiguous_npage,
++				flags | FOLL_LONGTERM, pages, NULL, NULL);
++	mmap_read_unlock(mm);
++out:
++	if (pages)
++		kvfree(pages);
++	return ret;
++}
++
++/*
++ * put pfns for a hugetlb page
++ * @start:the PAGE_SIZE-page we start to put,can be any page in this hugetlb page
++ * @npage:the number of PAGE_SIZE-pages need to put
++ * @prot:IOMMU_READ/WRITE
++ */
++static int hugetlb_put_pfn(unsigned long start, unsigned int npage, int prot)
++{
++	struct page *page;
++	struct page *head;
++
++	if (!npage || !pfn_valid(start))
++		return 0;
++
++	page = pfn_to_page(start);
++	if (!page || !PageHuge(page))
++		return 0;
++	head = compound_head(page);
++	/*
++	 * The last page should be in this hugetlb page.
++	 * The number of putting pages should be equal to the number
++	 * of getting pages.So the hugepage pinned refcount and the normal
++	 * page refcount can not be smaller than npage.
++	 */
++	if ((head != compound_head(pfn_to_page(start + npage - 1)))
++		|| (page_ref_count(head) < npage)
++		|| (compound_pincount(page) < npage))
++		return 0;
++
++	if ((prot & IOMMU_WRITE) && !PageDirty(page))
++		set_page_dirty_lock(page);
++
++	atomic_sub(npage, compound_pincount_ptr(head));
++	if (page_ref_sub_and_test(head, npage))
++		__put_page(head);
++
++	mod_node_page_state(page_pgdat(head), NR_FOLL_PIN_RELEASED, npage);
++	return 1;
++}
++
++static long vfio_pin_hugetlb_pages_remote(struct vfio_dma *dma, unsigned long vaddr,
++				  long npage, unsigned long *pfn_base,
++				  unsigned long limit)
++{
++	unsigned long pfn = 0;
++	long ret, pinned = 0, lock_acct = 0;
++	dma_addr_t iova = vaddr - dma->vaddr + dma->iova;
++	long pinned_loop;
++
++	/* This code path is only user initiated */
++	if (!current->mm)
++		return -ENODEV;
++
++	ret = vaddr_get_pfn(current->mm, vaddr, dma->prot, pfn_base);
++	if (ret)
++		return ret;
++
++	pinned++;
++	/*
++	 * Since PG_reserved is not relevant for compound pages
++	 * and the pfn of PAGE_SIZE-page which in hugetlb pages is valid,
++	 * it is not necessary to check rsvd for hugetlb pages.
++	 */
++	if (!vfio_find_vpfn(dma, iova)) {
++		if (!dma->lock_cap && current->mm->locked_vm + 1 > limit) {
++			put_pfn(*pfn_base, dma->prot);
++			pr_warn("%s: RLIMIT_MEMLOCK (%ld) exceeded\n", __func__,
++				limit << PAGE_SHIFT);
++			return -ENOMEM;
++		}
++		lock_acct++;
++	}
++
++	/* Lock all the consecutive pages from pfn_base */
++	for (vaddr += PAGE_SIZE, iova += PAGE_SIZE; pinned < npage;
++	     pinned += pinned_loop, vaddr += pinned_loop * PAGE_SIZE,
++	     iova += pinned_loop * PAGE_SIZE) {
++		ret = vaddr_get_pfn(current->mm, vaddr, dma->prot, &pfn);
++		if (ret)
++			break;
++
++		if (pfn != *pfn_base + pinned ||
++		    !is_hugetlb_page(pfn)) {
++			put_pfn(pfn, dma->prot);
++			break;
++		}
++
++		pinned_loop = 1;
++		/*
++		 * It is possible that the page of vaddr is the last PAGE_SIZE-page.
++		 * In this case, vaddr + PAGE_SIZE might be another hugetlb page.
++		 */
++		ret = hugetlb_page_vaddr_get_pfn(current->mm, vaddr, dma->prot,
++						npage - pinned - pinned_loop, pfn);
++		if (ret < 0) {
++			put_pfn(pfn, dma->prot);
++			break;
++		}
++
++		pinned_loop += ret;
++		lock_acct += pinned_loop - hugetlb_page_get_externally_pinned_num(dma,
++			pfn, pinned_loop);
++
++		if (!dma->lock_cap &&
++		    current->mm->locked_vm + lock_acct > limit) {
++			hugetlb_put_pfn(pfn, pinned_loop, dma->prot);
++			pr_warn("%s: RLIMIT_MEMLOCK (%ld) exceeded\n",
++				__func__, limit << PAGE_SHIFT);
++			ret = -ENOMEM;
++			goto unpin_out;
++		}
++	}
++
++	ret = vfio_lock_acct(dma, lock_acct, false);
++
++unpin_out:
++	if (ret) {
++		for (pfn = *pfn_base ; pinned ; pfn++, pinned--)
++			put_pfn(pfn, dma->prot);
++		return ret;
++	}
++
++	return pinned;
++}
++
++static long vfio_unpin_hugetlb_pages_remote(struct vfio_dma *dma, dma_addr_t iova,
++					unsigned long pfn, long npage,
++					bool do_accounting)
++{
++	long unlocked = 0, locked = 0;
++	long i;
++	long hugetlb_residual_npage;
++	long contiguous_npage;
++	struct page *head;
++
++	for (i = 0; i < npage;
++	     i += contiguous_npage, iova += contiguous_npage * PAGE_SIZE) {
++		if (!is_hugetlb_page(pfn))
++			goto slow_path;
++
++		head = compound_head(pfn_to_page(pfn));
++		hugetlb_residual_npage = hugetlb_get_residual_pages(iova,
++								compound_order(head));
++		contiguous_npage = min_t(long, hugetlb_residual_npage, (npage - i));
++
++		if (hugetlb_put_pfn(pfn, contiguous_npage, dma->prot)) {
++			pfn += contiguous_npage;
++			unlocked += contiguous_npage;
++			locked += hugetlb_page_get_externally_pinned_num(dma, pfn,
++									contiguous_npage);
++		}
++	}
++slow_path:
++	for (; i < npage; i++, iova += PAGE_SIZE) {
++		if (put_pfn(pfn++, dma->prot)) {
++			unlocked++;
++			if (vfio_find_vpfn(dma, iova))
++				locked++;
++		}
++	}
++
++	if (do_accounting)
++		vfio_lock_acct(dma, locked - unlocked, true);
++
++	return unlocked;
++}
++
+ /*
+  * Attempt to pin pages.  We really don't want to track all the pfns and
+  * the iommu can only map chunks of consecutive pfns anyway, so get the
+@@ -777,7 +1074,14 @@ static long vfio_sync_unpin(struct vfio_dma *dma, struct vfio_domain *domain,
+ 	iommu_tlb_sync(domain->domain, iotlb_gather);
+ 
+ 	list_for_each_entry_safe(entry, next, regions, list) {
+-		unlocked += vfio_unpin_pages_remote(dma,
++		if (is_hugetlb_page(entry->phys >> PAGE_SHIFT))
++			unlocked += vfio_unpin_hugetlb_pages_remote(dma,
++						    entry->iova,
++						    entry->phys >> PAGE_SHIFT,
++						    entry->len >> PAGE_SHIFT,
++						    false);
++		else
++			unlocked += vfio_unpin_pages_remote(dma,
+ 						    entry->iova,
+ 						    entry->phys >> PAGE_SHIFT,
+ 						    entry->len >> PAGE_SHIFT,
+@@ -848,7 +1152,13 @@ static size_t unmap_unpin_slow(struct vfio_domain *domain,
+ 	size_t unmapped = iommu_unmap(domain->domain, *iova, len);
+ 
+ 	if (unmapped) {
+-		*unlocked += vfio_unpin_pages_remote(dma, *iova,
++		if (is_hugetlb_page(phys >> PAGE_SHIFT))
++			*unlocked += vfio_unpin_hugetlb_pages_remote(dma, *iova,
++						     phys >> PAGE_SHIFT,
++						     unmapped >> PAGE_SHIFT,
++						     false);
++		else
++			*unlocked += vfio_unpin_pages_remote(dma, *iova,
+ 						     phys >> PAGE_SHIFT,
+ 						     unmapped >> PAGE_SHIFT,
+ 						     false);
+@@ -858,6 +1168,57 @@ static size_t unmap_unpin_slow(struct vfio_domain *domain,
+ 	return unmapped;
+ }
+ 
++static size_t get_contiguous_pages(struct vfio_domain *domain, dma_addr_t start,
++				dma_addr_t end, phys_addr_t phys_base)
++{
++	size_t len;
++	phys_addr_t next;
++
++	if (!domain)
++		return 0;
++
++	for (len = PAGE_SIZE;
++	     !domain->fgsp && start + len < end; len += PAGE_SIZE) {
++		next = iommu_iova_to_phys(domain->domain, start + len);
++		if (next != phys_base + len)
++			break;
++	}
++
++	return len;
++}
++
++static size_t hugetlb_get_contiguous_pages(struct vfio_domain *domain, dma_addr_t start,
++				dma_addr_t end, phys_addr_t phys_base)
++{
++	size_t len;
++	phys_addr_t next;
++	unsigned long contiguous_npage;
++	dma_addr_t max_len;
++	unsigned long hugetlb_residual_npage;
++	struct page *head;
++	unsigned long limit;
++
++	if (!domain)
++		return 0;
++
++	max_len = end - start;
++	for (len = PAGE_SIZE;
++	     !domain->fgsp && start + len < end; len += contiguous_npage * PAGE_SIZE) {
++		next = iommu_iova_to_phys(domain->domain, start + len);
++		if ((next != phys_base + len) ||
++		    !is_hugetlb_page(next >> PAGE_SHIFT))
++			break;
++
++		head = compound_head(pfn_to_page(next >> PAGE_SHIFT));
++		hugetlb_residual_npage = hugetlb_get_residual_pages(start + len,
++								compound_order(head));
++		limit = ALIGN((max_len - len), PAGE_SIZE) >> PAGE_SHIFT;
++		contiguous_npage = min_t(unsigned long, hugetlb_residual_npage, limit);
++	}
++
++	return len;
++}
++
+ static long vfio_unmap_unpin(struct vfio_iommu *iommu, struct vfio_dma *dma,
+ 			     bool do_accounting)
+ {
+@@ -892,7 +1253,7 @@ static long vfio_unmap_unpin(struct vfio_iommu *iommu, struct vfio_dma *dma,
+ 	iommu_iotlb_gather_init(&iotlb_gather);
+ 	while (iova < end) {
+ 		size_t unmapped, len;
+-		phys_addr_t phys, next;
++		phys_addr_t phys;
+ 
+ 		phys = iommu_iova_to_phys(domain->domain, iova);
+ 		if (WARN_ON(!phys)) {
+@@ -905,12 +1266,10 @@ static long vfio_unmap_unpin(struct vfio_iommu *iommu, struct vfio_dma *dma,
+ 		 * may require hardware cache flushing, try to find the
+ 		 * largest contiguous physical memory chunk to unmap.
+ 		 */
+-		for (len = PAGE_SIZE;
+-		     !domain->fgsp && iova + len < end; len += PAGE_SIZE) {
+-			next = iommu_iova_to_phys(domain->domain, iova + len);
+-			if (next != phys + len)
+-				break;
+-		}
++		if (is_hugetlb_page(phys >> PAGE_SHIFT))
++			len = hugetlb_get_contiguous_pages(domain, iova, end, phys);
++		else
++			len = get_contiguous_pages(domain, iova, end, phys);
+ 
+ 		/*
+ 		 * First, try to use fast unmap/unpin. In case of failure,
+@@ -1243,7 +1602,15 @@ static int vfio_pin_map_dma(struct vfio_iommu *iommu, struct vfio_dma *dma,
+ 
+ 	while (size) {
+ 		/* Pin a contiguous chunk of memory */
+-		npage = vfio_pin_pages_remote(dma, vaddr + dma->size,
++		if (vaddr_is_hugetlb_page(vaddr + dma->size, dma->prot)) {
++			npage = vfio_pin_hugetlb_pages_remote(dma, vaddr + dma->size,
++					      size >> PAGE_SHIFT, &pfn, limit);
++			/* try the normal page if failed */
++			if (npage <= 0)
++				npage = vfio_pin_pages_remote(dma, vaddr + dma->size,
++					      size >> PAGE_SHIFT, &pfn, limit);
++		} else
++			npage = vfio_pin_pages_remote(dma, vaddr + dma->size,
+ 					      size >> PAGE_SHIFT, &pfn, limit);
+ 		if (npage <= 0) {
+ 			WARN_ON(!npage);
+@@ -1255,7 +1622,11 @@ static int vfio_pin_map_dma(struct vfio_iommu *iommu, struct vfio_dma *dma,
+ 		ret = vfio_iommu_map(iommu, iova + dma->size, pfn, npage,
+ 				     dma->prot);
+ 		if (ret) {
+-			vfio_unpin_pages_remote(dma, iova + dma->size, pfn,
++			if (is_hugetlb_page(pfn))
++				vfio_unpin_hugetlb_pages_remote(dma, iova + dma->size, pfn,
++						npage, true);
++			else
++				vfio_unpin_pages_remote(dma, iova + dma->size, pfn,
+ 						npage, true);
+ 			break;
+ 		}
+-- 
+2.23.0
+
+
