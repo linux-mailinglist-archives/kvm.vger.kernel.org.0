@@ -2,85 +2,83 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6C4D225643A
-	for <lists+kvm@lfdr.de>; Sat, 29 Aug 2020 04:52:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B77762566CF
+	for <lists+kvm@lfdr.de>; Sat, 29 Aug 2020 12:24:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726952AbgH2Cvx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 28 Aug 2020 22:51:53 -0400
-Received: from mga06.intel.com ([134.134.136.31]:62212 "EHLO mga06.intel.com"
+        id S1727084AbgH2KYK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 29 Aug 2020 06:24:10 -0400
+Received: from mail.skyhub.de ([5.9.137.197]:44544 "EHLO mail.skyhub.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726460AbgH2Cvx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 28 Aug 2020 22:51:53 -0400
-IronPort-SDR: 8mTdMjcQdMH1UOY3aVTWyGXfW9ubOv8shkX3PYtroC0uPb+HkJD1mRcsPJ3av6H6oHkxSIasuO
- E9oL2O1xFUYA==
-X-IronPort-AV: E=McAfee;i="6000,8403,9727"; a="218325043"
-X-IronPort-AV: E=Sophos;i="5.76,366,1592895600"; 
-   d="scan'208";a="218325043"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Aug 2020 19:51:52 -0700
-IronPort-SDR: nXToNeIKugJp6cS9bPH9eXz6pmgmYpZ4D6j+NQLTaLUrOBzjDJPVuSJ4LHYpV2gQ97pLxJn0JR
- AtyedJXORm+g==
-X-IronPort-AV: E=Sophos;i="5.76,366,1592895600"; 
-   d="scan'208";a="475939800"
-Received: from jli113-mobl1.ccr.corp.intel.com (HELO [10.254.212.55]) ([10.254.212.55])
-  by orsmga005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Aug 2020 19:51:50 -0700
-Subject: Re: [PATCH 1/5] KVM: nVMX: Fix VMX controls MSRs setup when nested
- VMX enabled
-To:     Chenyi Qiang <chenyi.qiang@intel.com>,
-        Jim Mattson <jmattson@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        id S1726912AbgH2KYJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 29 Aug 2020 06:24:09 -0400
+Received: from zn.tnic (p200300ec2f204500b1cc6302500d80e4.dip0.t-ipconnect.de [IPv6:2003:ec:2f20:4500:b1cc:6302:500d:80e4])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 349451EC037C;
+        Sat, 29 Aug 2020 12:24:08 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1598696648;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=0e5Zbp/QkxjL0piLwdEzEuIspUR8YR+mw+xt+CuGFbo=;
+        b=cemrkeOyYLobGkpBpqH7LcdLGijcZM4qMxp+8Y6iPmt4RQgrJ+w3QjurTadaKt4T5PAHpr
+        AbBGZpfJ7E8D4qmUFDX4fvOJwOCBbarzWB3DpSUuIsgZKFjF8xQI+8k1TTHdvwPm0DdpfY
+        KCpf/sXGQEtE7nPpk4DEzijdYUnvtvM=
+Date:   Sat, 29 Aug 2020 12:24:05 +0200
+From:   Borislav Petkov <bp@alien8.de>
+To:     Joerg Roedel <joro@8bytes.org>
+Cc:     x86@kernel.org, Joerg Roedel <jroedel@suse.de>, hpa@zytor.com,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Jiri Slaby <jslaby@suse.cz>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Juergen Gross <jgross@suse.com>,
+        Kees Cook <keescook@chromium.org>,
+        David Rientjes <rientjes@google.com>,
+        Cfir Cohen <cfir@google.com>,
+        Erdem Aktas <erdemaktas@google.com>,
+        Masami Hiramatsu <mhiramat@kernel.org>,
+        Mike Stunes <mstunes@vmware.com>,
         Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm list <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>
-References: <20200828085622.8365-1-chenyi.qiang@intel.com>
- <20200828085622.8365-2-chenyi.qiang@intel.com>
- <CALMp9eThyqWuduU=JN+w3M3ANeCYN+7=s-gippzyu_GmvgtVGA@mail.gmail.com>
- <534a4ad5-b083-1278-a6ac-4a7e2b6b1600@intel.com>
-From:   Xiaoyao Li <xiaoyao.li@intel.com>
-Message-ID: <1fbfb77d-4f28-bcb6-a95c-f4ac7a313d2d@intel.com>
-Date:   Sat, 29 Aug 2020 10:51:47 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.12.0
+        Martin Radev <martin.b.radev@gmail.com>,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org
+Subject: Re: [PATCH v6 36/76] x86/head/64: Load IDT earlier
+Message-ID: <20200829102405.GA29091@zn.tnic>
+References: <20200824085511.7553-1-joro@8bytes.org>
+ <20200824085511.7553-37-joro@8bytes.org>
 MIME-Version: 1.0
-In-Reply-To: <534a4ad5-b083-1278-a6ac-4a7e2b6b1600@intel.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20200824085511.7553-37-joro@8bytes.org>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 8/29/2020 9:49 AM, Chenyi Qiang wrote:
-> 
-> 
-> On 8/29/2020 1:43 AM, Jim Mattson wrote:
->> On Fri, Aug 28, 2020 at 1:54 AM Chenyi Qiang <chenyi.qiang@intel.com> 
->> wrote:
->>>
->>> KVM supports the nested VM_{EXIT, ENTRY}_LOAD_IA32_PERF_GLOBAL_CTRL and
->>> VM_{ENTRY_LOAD, EXIT_CLEAR}_BNDCFGS, but they doesn't expose during
->>> the setup of nested VMX controls MSR.
->>>
->>
->> Aren't these features added conditionally in
->> nested_vmx_entry_exit_ctls_update() and
->> nested_vmx_pmu_entry_exit_ctls_update()?
->>
-> 
-> Yes, but I assume vmcs_config.nested should reflect the global 
-> capability of VMX MSR. KVM supports these two controls, so should be 
-> exposed here.
+On Mon, Aug 24, 2020 at 10:54:31AM +0200, Joerg Roedel wrote:
+> @@ -385,3 +386,25 @@ void __init alloc_intr_gate(unsigned int n, const void *addr)
+>  	if (!WARN_ON(test_and_set_bit(n, system_vectors)))
+>  		set_intr_gate(n, addr);
+>  }
+> +
+> +void __init early_idt_setup_early_handler(unsigned long physaddr)
 
-No. I prefer to say they are removed conditionally in 
-nested_vmx_entry_exit_ctls_update() and 
-nested_vmx_pmu_entry_exit_ctls_update().
+I wonder if you could drop one of the "early"es:
 
-Userspace calls vmx_get_msr_feature() to query what KVM supports for 
-these VMX MSR. In vmx_get_msr_feature(), it returns the value of 
-vmcs_config.nested. As KVM supports these two bits, we should advertise 
-them in vmcs_config.nested and report to userspace.
+idt_setup_early_handler()
+
+for example looks ok to me. Or
+
+early_setup_idt_handler()
+
+if you wanna have "early" as prefix...
+
+-- 
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
