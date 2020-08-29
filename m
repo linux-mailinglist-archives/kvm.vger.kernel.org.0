@@ -2,30 +2,33 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B77762566CF
-	for <lists+kvm@lfdr.de>; Sat, 29 Aug 2020 12:24:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 026EF2568D9
+	for <lists+kvm@lfdr.de>; Sat, 29 Aug 2020 17:55:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727084AbgH2KYK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 29 Aug 2020 06:24:10 -0400
-Received: from mail.skyhub.de ([5.9.137.197]:44544 "EHLO mail.skyhub.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726912AbgH2KYJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 29 Aug 2020 06:24:09 -0400
-Received: from zn.tnic (p200300ec2f204500b1cc6302500d80e4.dip0.t-ipconnect.de [IPv6:2003:ec:2f20:4500:b1cc:6302:500d:80e4])
+        id S1728397AbgH2Pze (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 29 Aug 2020 11:55:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37624 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728350AbgH2Pza (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 29 Aug 2020 11:55:30 -0400
+Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0B3FDC061239;
+        Sat, 29 Aug 2020 08:55:29 -0700 (PDT)
+Received: from zn.tnic (p200300ec2f20450061bc46564a6ab4aa.dip0.t-ipconnect.de [IPv6:2003:ec:2f20:4500:61bc:4656:4a6a:b4aa])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 349451EC037C;
-        Sat, 29 Aug 2020 12:24:08 +0200 (CEST)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id EDDB41EC037C;
+        Sat, 29 Aug 2020 17:55:27 +0200 (CEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1598696648;
+        t=1598716528;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=0e5Zbp/QkxjL0piLwdEzEuIspUR8YR+mw+xt+CuGFbo=;
-        b=cemrkeOyYLobGkpBpqH7LcdLGijcZM4qMxp+8Y6iPmt4RQgrJ+w3QjurTadaKt4T5PAHpr
-        AbBGZpfJ7E8D4qmUFDX4fvOJwOCBbarzWB3DpSUuIsgZKFjF8xQI+8k1TTHdvwPm0DdpfY
-        KCpf/sXGQEtE7nPpk4DEzijdYUnvtvM=
-Date:   Sat, 29 Aug 2020 12:24:05 +0200
+        bh=/hKrT6Agxsa0U42BH+OXVujqtR6Nrnq1ZKABoxchmnQ=;
+        b=S7HKF4Tptffv/o1WtKtqUzdKtdftwyIQBtMOCSEWGCYytv/FZEnVROCv9pXhDh6fn4saNE
+        ExIP/iUquIhslj/obBhSNv7pw8mAkwV0T+DA+QEsGeLvuXZWkElDhiFiSyTCZ1F9bUVRmw
+        l9HDLUPGTfCtTdr1HNIiZ5XGTFxKUmQ=
+Date:   Sat, 29 Aug 2020 17:55:25 +0200
 From:   Borislav Petkov <bp@alien8.de>
 To:     Joerg Roedel <joro@8bytes.org>
 Cc:     x86@kernel.org, Joerg Roedel <jroedel@suse.de>, hpa@zytor.com,
@@ -46,36 +49,75 @@ Cc:     x86@kernel.org, Joerg Roedel <jroedel@suse.de>, hpa@zytor.com,
         Martin Radev <martin.b.radev@gmail.com>,
         linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         virtualization@lists.linux-foundation.org
-Subject: Re: [PATCH v6 36/76] x86/head/64: Load IDT earlier
-Message-ID: <20200829102405.GA29091@zn.tnic>
+Subject: Re: [PATCH v6 38/76] x86/head/64: Set CR4.FSGSBASE early
+Message-ID: <20200829155525.GB29091@zn.tnic>
 References: <20200824085511.7553-1-joro@8bytes.org>
- <20200824085511.7553-37-joro@8bytes.org>
+ <20200824085511.7553-39-joro@8bytes.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20200824085511.7553-37-joro@8bytes.org>
+In-Reply-To: <20200824085511.7553-39-joro@8bytes.org>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Aug 24, 2020 at 10:54:31AM +0200, Joerg Roedel wrote:
-> @@ -385,3 +386,25 @@ void __init alloc_intr_gate(unsigned int n, const void *addr)
->  	if (!WARN_ON(test_and_set_bit(n, system_vectors)))
->  		set_intr_gate(n, addr);
->  }
+On Mon, Aug 24, 2020 at 10:54:33AM +0200, Joerg Roedel wrote:
+> From: Joerg Roedel <jroedel@suse.de>
+> 
+> Early exception handling will use rd/wrgsbase in paranoid_entry/exit.
+> Enable the feature to avoid #UD exceptions on boot APs.
+> 
+> Signed-off-by: Joerg Roedel <jroedel@suse.de>
+> Link: https://lore.kernel.org/r/20200724160336.5435-38-joro@8bytes.org
+> ---
+>  arch/x86/kernel/head_64.S | 7 +++++++
+>  1 file changed, 7 insertions(+)
+> 
+> diff --git a/arch/x86/kernel/head_64.S b/arch/x86/kernel/head_64.S
+> index 08412f308de3..4622940134a5 100644
+> --- a/arch/x86/kernel/head_64.S
+> +++ b/arch/x86/kernel/head_64.S
+> @@ -153,6 +153,13 @@ SYM_CODE_START(secondary_startup_64)
+>  	orl	$X86_CR4_LA57, %ecx
+>  1:
+>  #endif
 > +
-> +void __init early_idt_setup_early_handler(unsigned long physaddr)
+> +	ALTERNATIVE "jmp .Lstartup_write_cr4", "", X86_FEATURE_FSGSBASE
+> +
+> +	/* Early exception handling uses FSGSBASE on APs */
+> +	orl	$X86_CR4_FSGSBASE, %ecx
 
-I wonder if you could drop one of the "early"es:
+How is this supposed to work?
 
-idt_setup_early_handler()
+Alternatives haven't run that early yet and that piece of code looks
+like this:
 
-for example looks ok to me. Or
+ffffffff81000067:       eb 06                   jmp    ffffffff8100006f <secondary_startup_64+0x1f>
+ffffffff81000069:       81 c9 00 00 01 00       or     $0x10000,%ecx
+ffffffff8100006f:       0f 22 e1                mov    %rcx,%cr4
 
-early_setup_idt_handler()
+so we'll never set X86_CR4_FSGSBASE during early boot.
 
-if you wanna have "early" as prefix...
+Stopping a guest with gdb just before that shows the same thing:
+
+Dump of assembler code from 0x1000069 to 0x100007b:
+=> 0x0000000001000069:  eb 06   jmp    0x1000071
+   0x000000000100006b:  81 c9 00 00 01 00       or     $0x10000,%ecx
+   0x0000000001000071:  0f 22 e1        mov    %rcx,%cr4
+   0x0000000001000074:  48 03 05 95 ff 20 01    add    0x120ff95(%rip),%rax        # 0x2210010
+
+the unconditional JMP is there and it hasn't been patched out yet.
+
+If you really need to test CPUID flags, you need to do something similar
+to what verify_cpu does that early. And looking at that thing:
+
+ *      verify_cpu, returns the status of longmode and SSE in register %eax.
+ *              0: Success    1: Failure
+
+you could return the FSGSBASE CPUID bit there too and act accordingly.
+
+Hmm.
 
 -- 
 Regards/Gruss,
