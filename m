@@ -2,55 +2,55 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0B3D5256D29
-	for <lists+kvm@lfdr.de>; Sun, 30 Aug 2020 11:53:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2597F256D27
+	for <lists+kvm@lfdr.de>; Sun, 30 Aug 2020 11:53:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728772AbgH3JxG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 30 Aug 2020 05:53:06 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:57122 "EHLO
+        id S1728778AbgH3Jw6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 30 Aug 2020 05:52:58 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:37802 "EHLO
         us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726479AbgH3Jwp (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Sun, 30 Aug 2020 05:52:45 -0400
+        by vger.kernel.org with ESMTP id S1728758AbgH3Jwt (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Sun, 30 Aug 2020 05:52:49 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1598781164;
+        s=mimecast20190719; t=1598781168;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=shLz+NHIQw6ehBccBaS6HwdyHsjPr6eHCbl/kzv3/W0=;
-        b=fY3qqkYvo5KXyBMbko/yb7je8LUgVWdBn3+5Nt7+98z6+kjN+zyaTr3W/DB+8Vneh+XONh
-        6gvnzZiZr3iIAgW77PKIk4D2l98196Q8BJfgwvNKI4nXVspNhnJftq5WlmXbi/ntjwOTD2
-        kSD9DuJk93ydPZvr3ikYc4kFL6tD11c=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-346-hhvr8Fp4PdCToUXIRTIcAg-1; Sun, 30 Aug 2020 05:52:41 -0400
-X-MC-Unique: hhvr8Fp4PdCToUXIRTIcAg-1
-Received: by mail-wr1-f72.google.com with SMTP id l17so1873537wrw.11
-        for <kvm@vger.kernel.org>; Sun, 30 Aug 2020 02:52:41 -0700 (PDT)
+        bh=CMkU+ayG9L0but2trh3KXSaT/21HI/OkkHJggUMtR4s=;
+        b=PnBi0CKD0Fk34OoKMPYtPR3uJ1fw9UiacjHc+Zd+8ISGUDdPoj+d/xTSjPToUpiPpdbOXX
+        vFblvHoG+KruZ3DwrKfhwaqO+BWstShAZwQz47N2xQodwzNFcvUZT6E5ncdxN/zVEkKcVE
+        /5+mnEs9U3o9kpfA9a+EBxYg5w/M6a0=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-408-R_wG-zePMtStZi-mZNi5Nw-1; Sun, 30 Aug 2020 05:52:46 -0400
+X-MC-Unique: R_wG-zePMtStZi-mZNi5Nw-1
+Received: by mail-wr1-f70.google.com with SMTP id r15so1883636wrt.8
+        for <kvm@vger.kernel.org>; Sun, 30 Aug 2020 02:52:45 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=shLz+NHIQw6ehBccBaS6HwdyHsjPr6eHCbl/kzv3/W0=;
-        b=TdmM8Dw1tIm68nXnWIcj3sCBpZQNeG4sP9XwcGJ9kXmCe2Aw+1I+3b94ckijMrAVI4
-         nbe9eBCxfUS1yXXnyuuJlfWki/CzaNExQNH6VahVB139HfQ5oMF6clAK+e9Gw4wAagQB
-         zUcDDT2k7WcWWD76+ledTrZ4DxNjcWmbc6SeUYMP7FUyT1Z2tMyvxlyTBO2picT13hAW
-         N5+wRTH3krvKz/vXC+oTJ68amkPqwB1p/lRqqtlEYl2aEeIMm/+ewk6L39FAICtvJJ2c
-         EFTYquVwjeebUpkWQ+VZEtRr2QIrgS1kSPX/OgVwVR4nO9XFSKKltjRrJkgB/i+GTnvV
-         3mGQ==
-X-Gm-Message-State: AOAM5307DJEKTDR1Pk1y0FByzdpoH3rvBHQqyYDelG7w7Ye+MAsnXhZT
-        UFuFc30cAzK836l8tMrwDYUNZoFcJTnzSXxBdnK4eS04NYiiIB93+gQghYkGao5M6Relw/ULhMu
-        r+538oBdfRVB7
-X-Received: by 2002:a1c:e256:: with SMTP id z83mr1674898wmg.137.1598781160422;
-        Sun, 30 Aug 2020 02:52:40 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyu3YdiiJZJIOOb9YNtA+ULjbymzyuHXduF3D7yxpxJzNd5MhrgTQiao4swsuBo5MOq0oLLYw==
-X-Received: by 2002:a1c:e256:: with SMTP id z83mr1674885wmg.137.1598781160243;
-        Sun, 30 Aug 2020 02:52:40 -0700 (PDT)
+        bh=CMkU+ayG9L0but2trh3KXSaT/21HI/OkkHJggUMtR4s=;
+        b=nFlVh78J2NjuRU54Wl7epOk0ZorZffX6ptoCXw1oKvvVPp9m53j7G/6bNbyAPU05/a
+         IEmbf5UlSOTUmehXT3R2lFYEOViTNka9J7rmg9dowoMLy4DvLWoqML6J7i+iUsrwhlkV
+         zclHuPMZgc05QIC7CKt8RmnTwnTA1byzLWBO5S2GXzFF7dRLXRwUD+Lf6r4bTFjxNqPS
+         7nmlhThOnLn9JalKuwvEwQsejwkLfLUo6/WNWSxr15SvsYt9NRC+GAEedZPWv/ZRQtat
+         i5pbp1Bolszd3aZm5TePLDVcvQ6mQJp40lNLJEzZbjtoevyFQwd+DJzIbBIkmKWmgaFQ
+         L4tg==
+X-Gm-Message-State: AOAM5311tZNODy2y4fd86a4OwiQbuQ21cjh/r/BrpqgYqTeEt8D+eaWa
+        eFZQBMfWgqn7Cohg9gDUrW/aMVILht/jP0L5Pe18eCpPn173fUze0S3LiK4zzUXA4DiW3mEwSmo
+        COz3As2y2botw
+X-Received: by 2002:adf:b306:: with SMTP id j6mr5702939wrd.279.1598781164752;
+        Sun, 30 Aug 2020 02:52:44 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwXOhZ7ViZzfafJn3Iw5fXJyfwgbvXBQ0gQrqm4R0MlaFsmI3OelMzCKNjjMyQ2G3uYIpfUyw==
+X-Received: by 2002:adf:b306:: with SMTP id j6mr5702925wrd.279.1598781164574;
+        Sun, 30 Aug 2020 02:52:44 -0700 (PDT)
 Received: from ?IPv6:2001:b07:6468:f312:9d8:ed0a:2dde:9ff7? ([2001:b07:6468:f312:9d8:ed0a:2dde:9ff7])
-        by smtp.gmail.com with ESMTPSA id q6sm6274965wmq.19.2020.08.30.02.52.39
+        by smtp.gmail.com with ESMTPSA id t14sm7448920wrg.38.2020.08.30.02.52.43
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 30 Aug 2020 02:52:39 -0700 (PDT)
+        Sun, 30 Aug 2020 02:52:44 -0700 (PDT)
 Subject: Re: [PATCH v2] KVM: nVMX: fix the layout of struct
  kvm_vmx_nested_state_hdr
 To:     Sean Christopherson <sean.j.christopherson@intel.com>,
@@ -65,8 +65,8 @@ References: <20200713162206.1930767-1-vkuznets@redhat.com>
  <CALMp9eRGStwpYbeHbxo79zF9EyQ=35wwhNt03rjMHMDD9a5G0A@mail.gmail.com>
  <20200827204020.GE22351@sjchrist-ice>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <8ba02f98-045d-a089-cb7e-8d0b613f76e7@redhat.com>
-Date:   Sun, 30 Aug 2020 11:52:50 +0200
+Message-ID: <e9327d67-3342-8a6e-c981-a53acbd04e9b@redhat.com>
+Date:   Sun, 30 Aug 2020 11:52:55 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.9.0
 MIME-Version: 1.0
@@ -99,7 +99,7 @@ would have occupied the padding, for example.  The general solution we
 use is flags fields and checking them.
 
 (The original KVM_GET/SET_NESTED_STATE patches did add a generic flags
-fields, but not a VMX-specific one field).
+fields, but not a VMX-specific one).
 
 Paolo
 
