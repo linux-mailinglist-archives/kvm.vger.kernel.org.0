@@ -2,104 +2,143 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2597F256D27
-	for <lists+kvm@lfdr.de>; Sun, 30 Aug 2020 11:53:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2C6DC256EFE
+	for <lists+kvm@lfdr.de>; Sun, 30 Aug 2020 17:22:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728778AbgH3Jw6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 30 Aug 2020 05:52:58 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:37802 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1728758AbgH3Jwt (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Sun, 30 Aug 2020 05:52:49 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1598781168;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=CMkU+ayG9L0but2trh3KXSaT/21HI/OkkHJggUMtR4s=;
-        b=PnBi0CKD0Fk34OoKMPYtPR3uJ1fw9UiacjHc+Zd+8ISGUDdPoj+d/xTSjPToUpiPpdbOXX
-        vFblvHoG+KruZ3DwrKfhwaqO+BWstShAZwQz47N2xQodwzNFcvUZT6E5ncdxN/zVEkKcVE
-        /5+mnEs9U3o9kpfA9a+EBxYg5w/M6a0=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-408-R_wG-zePMtStZi-mZNi5Nw-1; Sun, 30 Aug 2020 05:52:46 -0400
-X-MC-Unique: R_wG-zePMtStZi-mZNi5Nw-1
-Received: by mail-wr1-f70.google.com with SMTP id r15so1883636wrt.8
-        for <kvm@vger.kernel.org>; Sun, 30 Aug 2020 02:52:45 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=CMkU+ayG9L0but2trh3KXSaT/21HI/OkkHJggUMtR4s=;
-        b=nFlVh78J2NjuRU54Wl7epOk0ZorZffX6ptoCXw1oKvvVPp9m53j7G/6bNbyAPU05/a
-         IEmbf5UlSOTUmehXT3R2lFYEOViTNka9J7rmg9dowoMLy4DvLWoqML6J7i+iUsrwhlkV
-         zclHuPMZgc05QIC7CKt8RmnTwnTA1byzLWBO5S2GXzFF7dRLXRwUD+Lf6r4bTFjxNqPS
-         7nmlhThOnLn9JalKuwvEwQsejwkLfLUo6/WNWSxr15SvsYt9NRC+GAEedZPWv/ZRQtat
-         i5pbp1Bolszd3aZm5TePLDVcvQ6mQJp40lNLJEzZbjtoevyFQwd+DJzIbBIkmKWmgaFQ
-         L4tg==
-X-Gm-Message-State: AOAM5311tZNODy2y4fd86a4OwiQbuQ21cjh/r/BrpqgYqTeEt8D+eaWa
-        eFZQBMfWgqn7Cohg9gDUrW/aMVILht/jP0L5Pe18eCpPn173fUze0S3LiK4zzUXA4DiW3mEwSmo
-        COz3As2y2botw
-X-Received: by 2002:adf:b306:: with SMTP id j6mr5702939wrd.279.1598781164752;
-        Sun, 30 Aug 2020 02:52:44 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwXOhZ7ViZzfafJn3Iw5fXJyfwgbvXBQ0gQrqm4R0MlaFsmI3OelMzCKNjjMyQ2G3uYIpfUyw==
-X-Received: by 2002:adf:b306:: with SMTP id j6mr5702925wrd.279.1598781164574;
-        Sun, 30 Aug 2020 02:52:44 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:9d8:ed0a:2dde:9ff7? ([2001:b07:6468:f312:9d8:ed0a:2dde:9ff7])
-        by smtp.gmail.com with ESMTPSA id t14sm7448920wrg.38.2020.08.30.02.52.43
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 30 Aug 2020 02:52:44 -0700 (PDT)
-Subject: Re: [PATCH v2] KVM: nVMX: fix the layout of struct
- kvm_vmx_nested_state_hdr
-To:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        Jim Mattson <jmattson@google.com>
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        kvm list <kvm@vger.kernel.org>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Peter Shier <pshier@google.com>,
-        LKML <linux-kernel@vger.kernel.org>
-References: <20200713162206.1930767-1-vkuznets@redhat.com>
- <CALMp9eR+DYVH0UZvbNKUNArzPdf1mvAoxakzj++szaVCD0Fcpw@mail.gmail.com>
- <CALMp9eRGStwpYbeHbxo79zF9EyQ=35wwhNt03rjMHMDD9a5G0A@mail.gmail.com>
- <20200827204020.GE22351@sjchrist-ice>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <e9327d67-3342-8a6e-c981-a53acbd04e9b@redhat.com>
-Date:   Sun, 30 Aug 2020 11:52:55 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.9.0
+        id S1726035AbgH3PWK convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Sun, 30 Aug 2020 11:22:10 -0400
+Received: from mail.kernel.org ([198.145.29.99]:33130 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725993AbgH3PWH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 30 Aug 2020 11:22:07 -0400
+From:   bugzilla-daemon@bugzilla.kernel.org
+Authentication-Results: mail.kernel.org; dkim=permerror (bad message/signature format)
+To:     kvm@vger.kernel.org
+Subject: [Bug 209079] New: CPU 0/KVM: page allocation failure on 5.8 kernel
+Date:   Sun, 30 Aug 2020 15:22:06 +0000
+X-Bugzilla-Reason: None
+X-Bugzilla-Type: new
+X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Product: Virtualization
+X-Bugzilla-Component: kvm
+X-Bugzilla-Version: unspecified
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: kernel@martin.schrodt.org
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: bug_id short_desc product version
+ cf_kernel_version rep_platform op_sys cf_tree bug_status bug_severity
+ priority component assigned_to reporter cf_regression
+Message-ID: <bug-209079-28872@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8BIT
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 MIME-Version: 1.0
-In-Reply-To: <20200827204020.GE22351@sjchrist-ice>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 27/08/20 22:40, Sean Christopherson wrote:
-> Paolo pushed an alternative solution for 5.8, commit 5e105c88ab485 ("KVM:
-> nVMX: check for invalid hdr.vmx.flags").  His argument was that there was
-> no point in adding proper padding since we already broke the ABI, i.e.
-> damage done.
-> 
-> So rather than pad the struct, which doesn't magically fix the ABI for old
-> userspace, just check for unsupported flags.  That gives decent odds of
-> failing the ioctl() for old userspace if it's passing garbage (through no
-> fault of its own), prevents new userspace from setting unsupported flags,
-> and allows KVM to grow the struct by conditioning consumption of new fields
-> on an associated flag.
+https://bugzilla.kernel.org/show_bug.cgi?id=209079
 
-In general userspace (as a hygiene/future-proofing measure) should
-generally zero the contents of structs before filling in some fields
-only.  There was no guarantee that smm wouldn't grow new fields that
-would have occupied the padding, for example.  The general solution we
-use is flags fields and checking them.
+            Bug ID: 209079
+           Summary: CPU 0/KVM: page allocation failure on 5.8 kernel
+           Product: Virtualization
+           Version: unspecified
+    Kernel Version: 5.8.5-arch1-1
+          Hardware: All
+                OS: Linux
+              Tree: Mainline
+            Status: NEW
+          Severity: normal
+          Priority: P1
+         Component: kvm
+          Assignee: virtualization_kvm@kernel-bugs.osdl.org
+          Reporter: kernel@martin.schrodt.org
+        Regression: No
 
-(The original KVM_GET/SET_NESTED_STATE patches did add a generic flags
-fields, but not a VMX-specific one).
+When starting my KVM-VM in the current 5.8 kernel, it won't start, complaining:
 
-Paolo
+> internal error: qemu unexpectedly closed the monitor:
+> 2020-08-30T15:16:10.389012Z qemu-system-x86_64: kvm_init_vcpu failed: Cannot
+> allocate memory
 
+The same VM works fine in a 5.7 kernel. I tried an earlier 5.8 kernel too, same
+outcome.
+
+dmesg shows the following:
+
+[Sun Aug 30 17:16:09 2020] CPU 0/KVM: page allocation failure: order:0,
+mode:0x400cc4(GFP_KERNEL_ACCOUNT|GFP_DMA32),
+nodemask=(null),cpuset=emulator,mems_allowed=1
+[Sun Aug 30 17:16:09 2020] CPU: 11 PID: 16473 Comm: CPU 0/KVM Tainted: P       
+   OE     5.8.5-arch1-1 #1
+[Sun Aug 30 17:16:09 2020] Hardware name: To Be Filled By O.E.M. To Be Filled
+By O.E.M./X399 Phantom Gaming 6, BIOS P1.10 11/15/2018
+[Sun Aug 30 17:16:09 2020] Call Trace:
+[Sun Aug 30 17:16:09 2020]  dump_stack+0x6b/0x88
+[Sun Aug 30 17:16:09 2020]  warn_alloc.cold+0x78/0xdc
+[Sun Aug 30 17:16:09 2020]  __alloc_pages_slowpath.constprop.0+0xd14/0xd50
+[Sun Aug 30 17:16:09 2020]  __alloc_pages_nodemask+0x2e4/0x310
+[Sun Aug 30 17:16:09 2020]  alloc_mmu_pages+0x27/0x90 [kvm]
+[Sun Aug 30 17:16:09 2020]  kvm_mmu_create+0x100/0x140 [kvm]
+[Sun Aug 30 17:16:09 2020]  kvm_arch_vcpu_create+0x48/0x360 [kvm]
+[Sun Aug 30 17:16:09 2020]  kvm_vm_ioctl+0xa2d/0xe60 [kvm]
+[Sun Aug 30 17:16:09 2020]  ksys_ioctl+0x82/0xc0
+[Sun Aug 30 17:16:09 2020]  __x64_sys_ioctl+0x16/0x20
+[Sun Aug 30 17:16:09 2020]  do_syscall_64+0x44/0x70
+[Sun Aug 30 17:16:09 2020]  entry_SYSCALL_64_after_hwframe+0x44/0xa9
+[Sun Aug 30 17:16:09 2020] RIP: 0033:0x7f4e8ba7cf6b
+[Sun Aug 30 17:16:09 2020] Code: 89 d8 49 8d 3c 1c 48 f7 d8 49 39 c4 72 b5 e8
+1c ff ff ff 85 c0 78 ba 4c 89 e0 5b 5d 41 5c c3 f3 0f 1e fa b8 10 00 00 00 0f
+05 <48> 3d 01 f0 ff ff 73 01 c3 48 8b 0d d5 ae 0c 00 f7 d8 64 89 01 48
+[Sun Aug 30 17:16:09 2020] RSP: 002b:00007f4e6bffe6b8 EFLAGS: 00000246
+ORIG_RAX: 0000000000000010
+[Sun Aug 30 17:16:09 2020] RAX: ffffffffffffffda RBX: 000000000000ae41 RCX:
+00007f4e8ba7cf6b
+[Sun Aug 30 17:16:09 2020] RDX: 0000000000000000 RSI: 000000000000ae41 RDI:
+0000000000000019
+[Sun Aug 30 17:16:09 2020] RBP: 0000563079828020 R08: 0000000000000000 R09:
+0000563079844010
+[Sun Aug 30 17:16:09 2020] R10: 0000000000000000 R11: 0000000000000246 R12:
+0000000000000000
+[Sun Aug 30 17:16:09 2020] R13: 00007fff52f4494f R14: 0000000000000000 R15:
+00007f4e6bfff640
+[Sun Aug 30 17:16:09 2020] Mem-Info:
+[Sun Aug 30 17:16:09 2020] active_anon:414866 inactive_anon:28099
+isolated_anon:0
+                            active_file:31776 inactive_file:88136
+isolated_file:0
+                            unevictable:32 dirty:521 writeback:0
+                            slab_reclaimable:19827 slab_unreclaimable:137048
+                            mapped:142120 shmem:28302 pagetables:6905 bounce:0
+                            free:6992691 free_pcp:4628 free_cma:0
+
+System is a Threadripper 1920x, on ASRock Phantom Gaming 6 X399 board with 32GB
+RAM, which is a NUMA architecture, having 2 nodes
+
+➜  numactl -H
+available: 2 nodes (0-1)
+node 0 cpus: 0 1 2 3 4 5 12 13 14 15 16 17
+node 0 size: 15966 MB
+node 0 free: 12860 MB
+node 1 cpus: 6 7 8 9 10 11 18 19 20 21 22 23
+node 1 size: 16112 MB
+node 1 free: 14559 MB
+node distances:
+node   0   1 
+  0:  10  16 
+  1:  16  10 
+
+The VM is configured to only allocate memory on node 1.
+
+Happy to provide more information!
+
+-- 
+You are receiving this mail because:
+You are watching the assignee of the bug.
