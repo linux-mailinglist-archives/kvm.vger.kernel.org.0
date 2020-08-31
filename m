@@ -2,176 +2,237 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B16E52571E9
-	for <lists+kvm@lfdr.de>; Mon, 31 Aug 2020 04:39:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B0ED82571FD
+	for <lists+kvm@lfdr.de>; Mon, 31 Aug 2020 05:08:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726960AbgHaCjs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 30 Aug 2020 22:39:48 -0400
-Received: from szxga02-in.huawei.com ([45.249.212.188]:3080 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726695AbgHaCjr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 30 Aug 2020 22:39:47 -0400
-Received: from DGGEMM403-HUB.china.huawei.com (unknown [172.30.72.56])
-        by Forcepoint Email with ESMTP id 7B494EEB1E8EDA7F4D5F;
-        Mon, 31 Aug 2020 10:39:42 +0800 (CST)
-Received: from DGGEMM421-HUB.china.huawei.com (10.1.198.38) by
- DGGEMM403-HUB.china.huawei.com (10.3.20.211) with Microsoft SMTP Server (TLS)
- id 14.3.487.0; Mon, 31 Aug 2020 10:39:42 +0800
-Received: from DGGEMM525-MBS.china.huawei.com ([169.254.5.119]) by
- dggemm421-hub.china.huawei.com ([10.1.198.38]) with mapi id 14.03.0487.000;
- Mon, 31 Aug 2020 10:39:35 +0800
-From:   Jiangyifei <jiangyifei@huawei.com>
-To:     Anup Patel <anup@brainfault.org>
-CC:     Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Anup Patel <anup.patel@wdc.com>,
-        Alistair Francis <alistair.francis@wdc.com>,
-        "Atish Patra" <atish.patra@wdc.com>,
-        "deepa.kernel@gmail.com" <deepa.kernel@gmail.com>,
-        "kvm-riscv@lists.infradead.org" <kvm-riscv@lists.infradead.org>,
-        KVM General <kvm@vger.kernel.org>,
-        linux-riscv <linux-riscv@lists.infradead.org>,
-        "linux-kernel@vger.kernel.org List" <linux-kernel@vger.kernel.org>,
-        "Zhangxiaofeng (F)" <victor.zhangxiaofeng@huawei.com>,
-        "Wubin (H)" <wu.wubin@huawei.com>,
-        Zhanghailiang <zhang.zhanghailiang@huawei.com>,
-        "dengkai (A)" <dengkai1@huawei.com>,
-        yinyipeng <yinyipeng1@huawei.com>,
-        "zhaosiqi (A)" <zhaosiqi3@huawei.com>
-Subject: RE: [PATCH RFC 2/2] target/kvm: Add interfaces needed for log dirty
-Thread-Topic: [PATCH RFC 2/2] target/kvm: Add interfaces needed for log dirty
-Thread-Index: AQHWfEtmTyNMW66okESUbG9EQ0iVQKlMb8AAgAUV7AA=
-Date:   Mon, 31 Aug 2020 02:39:35 +0000
-Message-ID: <3915816D913D8241BB43E932213F57D4ADD8F34F@dggemm525-mbs.china.huawei.com>
-References: <20200827082251.1591-1-jiangyifei@huawei.com>
- <20200827082251.1591-3-jiangyifei@huawei.com>
- <CAAhSdy36ZCubU-1+WzjMzBaR+RipgEhvRqd9AT+28=99-EUDaQ@mail.gmail.com>
-In-Reply-To: <CAAhSdy36ZCubU-1+WzjMzBaR+RipgEhvRqd9AT+28=99-EUDaQ@mail.gmail.com>
-Accept-Language: zh-CN, en-US
-Content-Language: zh-CN
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.174.187.31]
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+        id S1726858AbgHaDIX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 30 Aug 2020 23:08:23 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:36112 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726824AbgHaDIW (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Sun, 30 Aug 2020 23:08:22 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1598843299;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=qJUSyFAGtxYcMUIAK2A6tJE9bI47AKIWnz2EW0Z359s=;
+        b=Qjhs6I6n5QF1/8muEsP17oMYgikCOXJQmtfNQCMc4ZJtropPPHRuwGxEDCaQwmaSt1bxAn
+        KpHSLAASMRMuMkt/r205bJ/rBxKUMl+o3aeYh3PJu3B+2MOPDekGDAW0pFWrhRvAjBPVNe
+        QRitoROKiUSMnF8JQWvtTkPNx6Syyaw=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-457-luowdu28NMKyKl9wbnOv4A-1; Sun, 30 Aug 2020 23:08:17 -0400
+X-MC-Unique: luowdu28NMKyKl9wbnOv4A-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BB802807331;
+        Mon, 31 Aug 2020 03:08:13 +0000 (UTC)
+Received: from [10.72.13.227] (ovpn-13-227.pek2.redhat.com [10.72.13.227])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 31D353A40;
+        Mon, 31 Aug 2020 03:07:54 +0000 (UTC)
+Subject: Re: [ovirt-devel] Re: device compatibility interface for live
+ migration with assigned devices
+To:     Cornelia Huck <cohuck@redhat.com>
+Cc:     Yan Zhao <yan.y.zhao@intel.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "libvir-list@redhat.com" <libvir-list@redhat.com>,
+        "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+        Kirti Wankhede <kwankhede@nvidia.com>,
+        "eauger@redhat.com" <eauger@redhat.com>,
+        "xin-ran.wang@intel.com" <xin-ran.wang@intel.com>,
+        "corbet@lwn.net" <corbet@lwn.net>,
+        "openstack-discuss@lists.openstack.org" 
+        <openstack-discuss@lists.openstack.org>,
+        "shaohe.feng@intel.com" <shaohe.feng@intel.com>,
+        "kevin.tian@intel.com" <kevin.tian@intel.com>,
+        Parav Pandit <parav@mellanox.com>,
+        "jian-feng.ding@intel.com" <jian-feng.ding@intel.com>,
+        "dgilbert@redhat.com" <dgilbert@redhat.com>,
+        "zhenyuw@linux.intel.com" <zhenyuw@linux.intel.com>,
+        "hejie.xu@intel.com" <hejie.xu@intel.com>,
+        "bao.yumeng@zte.com.cn" <bao.yumeng@zte.com.cn>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Parav Pandit <parav@nvidia.com>,
+        "sm ooney@redhat.com" <smooney@redhat.com>,
+        "intel-gvt-dev@lists.freedesktop.org" 
+        <intel-gvt-dev@lists.freedesktop.org>,
+        =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
+        "eskultet@redhat.com" <eskultet@redhat.com>,
+        Jiri Pirko <jiri@mellanox.com>,
+        "dinechin@redhat.com" <dinechin@redhat.com>,
+        "devel@ovirt.org" <devel@ovirt.org>
+References: <a51209fe-a8c6-941f-ff54-7be06d73bc44@redhat.com>
+ <20200818085527.GB20215@redhat.com>
+ <3a073222-dcfe-c02d-198b-29f6a507b2e1@redhat.com>
+ <20200818091628.GC20215@redhat.com>
+ <20200818113652.5d81a392.cohuck@redhat.com>
+ <BY5PR12MB4322C9D1A66C4657776A1383DC5C0@BY5PR12MB4322.namprd12.prod.outlook.com>
+ <20200819033035.GA21172@joy-OptiPlex-7040>
+ <e20812b7-994b-b7f9-2df4-a78c4d116c7f@redhat.com>
+ <20200819065951.GB21172@joy-OptiPlex-7040>
+ <d6f9a51e-80b3-44c5-2656-614b327dc080@redhat.com>
+ <20200819081338.GC21172@joy-OptiPlex-7040>
+ <c1d580dd-5c0c-21bc-19a6-f776617d4ec2@redhat.com>
+ <20200820142740.6513884d.cohuck@redhat.com>
+ <ea0e84c5-733a-2bdb-4c1e-95fd16698ed8@redhat.com>
+ <20200821165255.53e26628.cohuck@redhat.com>
+From:   Jason Wang <jasowang@redhat.com>
+Message-ID: <b9739032-9bc0-ec48-a4c7-36c055b91702@redhat.com>
+Date:   Mon, 31 Aug 2020 11:07:53 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-X-CFilter-Loop: Reflected
+In-Reply-To: <20200821165255.53e26628.cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-DQo+IC0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQo+IEZyb206IEFudXAgUGF0ZWwgW21haWx0
-bzphbnVwQGJyYWluZmF1bHQub3JnXQ0KPiBTZW50OiBGcmlkYXksIEF1Z3VzdCAyOCwgMjAyMCAx
-Mjo1NCBQTQ0KPiBUbzogSmlhbmd5aWZlaSA8amlhbmd5aWZlaUBodWF3ZWkuY29tPg0KPiBDYzog
-UGF1bCBXYWxtc2xleSA8cGF1bC53YWxtc2xleUBzaWZpdmUuY29tPjsgUGFsbWVyIERhYmJlbHQN
-Cj4gPHBhbG1lckBkYWJiZWx0LmNvbT47IEFsYmVydCBPdSA8YW91QGVlY3MuYmVya2VsZXkuZWR1
-PjsgQW51cCBQYXRlbA0KPiA8YW51cC5wYXRlbEB3ZGMuY29tPjsgQWxpc3RhaXIgRnJhbmNpcyA8
-YWxpc3RhaXIuZnJhbmNpc0B3ZGMuY29tPjsgQXRpc2gNCj4gUGF0cmEgPGF0aXNoLnBhdHJhQHdk
-Yy5jb20+OyBkZWVwYS5rZXJuZWxAZ21haWwuY29tOw0KPiBrdm0tcmlzY3ZAbGlzdHMuaW5mcmFk
-ZWFkLm9yZzsgS1ZNIEdlbmVyYWwgPGt2bUB2Z2VyLmtlcm5lbC5vcmc+Ow0KPiBsaW51eC1yaXNj
-diA8bGludXgtcmlzY3ZAbGlzdHMuaW5mcmFkZWFkLm9yZz47IGxpbnV4LWtlcm5lbEB2Z2VyLmtl
-cm5lbC5vcmcgTGlzdA0KPiA8bGludXgta2VybmVsQHZnZXIua2VybmVsLm9yZz47IFpoYW5neGlh
-b2ZlbmcgKEYpDQo+IDx2aWN0b3Iuemhhbmd4aWFvZmVuZ0BodWF3ZWkuY29tPjsgV3ViaW4gKEgp
-IDx3dS53dWJpbkBodWF3ZWkuY29tPjsNCj4gWmhhbmdoYWlsaWFuZyA8emhhbmcuemhhbmdoYWls
-aWFuZ0BodWF3ZWkuY29tPjsgZGVuZ2thaSAoQSkNCj4gPGRlbmdrYWkxQGh1YXdlaS5jb20+OyB5
-aW55aXBlbmcgPHlpbnlpcGVuZzFAaHVhd2VpLmNvbT4NCj4gU3ViamVjdDogUmU6IFtQQVRDSCBS
-RkMgMi8yXSB0YXJnZXQva3ZtOiBBZGQgaW50ZXJmYWNlcyBuZWVkZWQgZm9yIGxvZyBkaXJ0eQ0K
-PiANCj4gT24gVGh1LCBBdWcgMjcsIDIwMjAgYXQgMTo1NCBQTSBZaWZlaSBKaWFuZyA8amlhbmd5
-aWZlaUBodWF3ZWkuY29tPiB3cm90ZToNCj4gPg0KPiA+IEFkZCB0d28gaW50ZXJmYWNlcyBvZiBs
-b2cgZGlydHkgZm9yIGt2bV9tYWluLmMsIGFuZCBkZXRlbGUgdGhlDQo+ID4gaW50ZXJmYWNlIGt2
-bV92bV9pb2N0bF9nZXRfZGlydHlfbG9nIHdoaWNoIGlzIHJlZHVuZGFudGx5IGRlZmluZWQuDQo+
-ID4NCj4gPiBDT05GSUdfS1ZNX0dFTkVSSUNfRElSVFlMT0dfUkVBRF9QUk9URUNUIGlzIGFkZGVk
-IGluIGRlZmNvbmZpZy4NCj4gPg0KPiA+IFNpZ25lZC1vZmYtYnk6IFlpZmVpIEppYW5nIDxqaWFu
-Z3lpZmVpQGh1YXdlaS5jb20+DQo+ID4gU2lnbmVkLW9mZi1ieTogWWlwZW5nIFlpbiA8eWlueWlw
-ZW5nMUBodWF3ZWkuY29tPg0KPiA+IC0tLQ0KPiA+ICBhcmNoL3Jpc2N2L2NvbmZpZ3MvZGVmY29u
-ZmlnIHwgIDEgKw0KPiA+ICBhcmNoL3Jpc2N2L2t2bS9LY29uZmlnICAgICAgIHwgIDEgKw0KPiA+
-ICBhcmNoL3Jpc2N2L2t2bS9tbXUuYyAgICAgICAgIHwgNDMNCj4gKysrKysrKysrKysrKysrKysr
-KysrKysrKysrKysrKysrKysrDQo+ID4gIGFyY2gvcmlzY3Yva3ZtL3ZtLmMgICAgICAgICAgfCAg
-NiAtLS0tLQ0KPiA+ICA0IGZpbGVzIGNoYW5nZWQsIDQ1IGluc2VydGlvbnMoKyksIDYgZGVsZXRp
-b25zKC0pDQo+ID4NCj4gPiBkaWZmIC0tZ2l0IGEvYXJjaC9yaXNjdi9jb25maWdzL2RlZmNvbmZp
-Zw0KPiA+IGIvYXJjaC9yaXNjdi9jb25maWdzL2RlZmNvbmZpZyBpbmRleCBkMzZlMTAwMGJiZDMu
-Ljg1N2Q3OTk2NzJjMiAxMDA2NDQNCj4gPiAtLS0gYS9hcmNoL3Jpc2N2L2NvbmZpZ3MvZGVmY29u
-ZmlnDQo+ID4gKysrIGIvYXJjaC9yaXNjdi9jb25maWdzL2RlZmNvbmZpZw0KPiA+IEBAIC0xOSw2
-ICsxOSw3IEBAIENPTkZJR19TT0NfVklSVD15DQo+ID4gIENPTkZJR19TTVA9eQ0KPiA+ICBDT05G
-SUdfVklSVFVBTElaQVRJT049eQ0KPiA+ICBDT05GSUdfS1ZNPXkNCj4gPiArQ09ORklHX0tWTV9H
-RU5FUklDX0RJUlRZTE9HX1JFQURfUFJPVEVDVD15DQo+ID4gIENPTkZJR19IT1RQTFVHX0NQVT15
-DQo+ID4gIENPTkZJR19NT0RVTEVTPXkNCj4gPiAgQ09ORklHX01PRFVMRV9VTkxPQUQ9eQ0KPiA+
-IGRpZmYgLS1naXQgYS9hcmNoL3Jpc2N2L2t2bS9LY29uZmlnIGIvYXJjaC9yaXNjdi9rdm0vS2Nv
-bmZpZyBpbmRleA0KPiA+IDIzNTZkYzUyZWJiMy4uOTFmY2ZmYzcwZTVkIDEwMDY0NA0KPiA+IC0t
-LSBhL2FyY2gvcmlzY3Yva3ZtL0tjb25maWcNCj4gPiArKysgYi9hcmNoL3Jpc2N2L2t2bS9LY29u
-ZmlnDQo+ID4gQEAgLTI2LDYgKzI2LDcgQEAgY29uZmlnIEtWTQ0KPiA+ICAgICAgICAgc2VsZWN0
-IEtWTV9NTUlPDQo+ID4gICAgICAgICBzZWxlY3QgSEFWRV9LVk1fVkNQVV9BU1lOQ19JT0NUTA0K
-PiA+ICAgICAgICAgc2VsZWN0IFNSQ1UNCj4gPiArICAgICAgIHNlbGVjdCBLVk1fR0VORVJJQ19E
-SVJUWUxPR19SRUFEX1BST1RFQ1QNCj4gPiAgICAgICAgIGhlbHANCj4gPiAgICAgICAgICAgU3Vw
-cG9ydCBob3N0aW5nIHZpcnR1YWxpemVkIGd1ZXN0IG1hY2hpbmVzLg0KPiA+DQo+ID4gZGlmZiAt
-LWdpdCBhL2FyY2gvcmlzY3Yva3ZtL21tdS5jIGIvYXJjaC9yaXNjdi9rdm0vbW11LmMgaW5kZXgN
-Cj4gPiA4OGJjZTgwZWU5ODMuLmRmMmE0NzBjMjVlNCAxMDA2NDQNCj4gPiAtLS0gYS9hcmNoL3Jp
-c2N2L2t2bS9tbXUuYw0KPiA+ICsrKyBiL2FyY2gvcmlzY3Yva3ZtL21tdS5jDQo+ID4gQEAgLTM1
-OCw2ICszNTgsNDMgQEAgdm9pZCBzdGFnZTJfd3BfbWVtb3J5X3JlZ2lvbihzdHJ1Y3Qga3ZtICpr
-dm0sDQo+IGludCBzbG90KQ0KPiA+ICAgICAgICAga3ZtX2ZsdXNoX3JlbW90ZV90bGJzKGt2bSk7
-DQo+ID4gIH0NCj4gPg0KPiA+ICsvKioNCj4gPiArICoga3ZtX21tdV93cml0ZV9wcm90ZWN0X3B0
-X21hc2tlZCgpIC0gd3JpdGUgcHJvdGVjdCBkaXJ0eSBwYWdlcw0KPiA+ICsgKiBAa3ZtOiAgICBU
-aGUgS1ZNIHBvaW50ZXINCj4gPiArICogQHNsb3Q6ICAgVGhlIG1lbW9yeSBzbG90IGFzc29jaWF0
-ZWQgd2l0aCBtYXNrDQo+ID4gKyAqIEBnZm5fb2Zmc2V0OiBUaGUgZ2ZuIG9mZnNldCBpbiBtZW1v
-cnkgc2xvdA0KPiA+ICsgKiBAbWFzazogICBUaGUgbWFzayBvZiBkaXJ0eSBwYWdlcyBhdCBvZmZz
-ZXQgJ2dmbl9vZmZzZXQnIGluIHRoaXMgbWVtb3J5DQo+ID4gKyAqICAgICAgc2xvdCB0byBiZSB3
-cml0ZSBwcm90ZWN0ZWQNCj4gPiArICoNCj4gPiArICogV2Fsa3MgYml0cyBzZXQgaW4gbWFzayB3
-cml0ZSBwcm90ZWN0cyB0aGUgYXNzb2NpYXRlZCBwdGUncy4gQ2FsbGVyDQo+ID4gK211c3QNCj4g
-PiArICogYWNxdWlyZSBrdm1fbW11X2xvY2suDQo+ID4gKyAqLw0KPiA+ICtzdGF0aWMgdm9pZCBr
-dm1fbW11X3dyaXRlX3Byb3RlY3RfcHRfbWFza2VkKHN0cnVjdCBrdm0gKmt2bSwNCj4gPiArICAg
-ICAgICBzdHJ1Y3Qga3ZtX21lbW9yeV9zbG90ICpzbG90LA0KPiA+ICsgICAgICAgIGdmbl90IGdm
-bl9vZmZzZXQsIHVuc2lnbmVkIGxvbmcgbWFzaykgew0KPiA+ICsgICAgcGh5c19hZGRyX3QgYmFz
-ZV9nZm4gPSBzbG90LT5iYXNlX2dmbiArIGdmbl9vZmZzZXQ7DQo+ID4gKyAgICBwaHlzX2FkZHJf
-dCBzdGFydCA9IChiYXNlX2dmbiArICBfX2ZmcyhtYXNrKSkgPDwgUEFHRV9TSElGVDsNCj4gPiAr
-ICAgIHBoeXNfYWRkcl90IGVuZCA9IChiYXNlX2dmbiArIF9fZmxzKG1hc2spICsgMSkgPDwgUEFH
-RV9TSElGVDsNCj4gPiArDQo+ID4gKyAgICBzdGFnZTJfd3BfcmFuZ2Uoa3ZtLCBzdGFydCwgZW5k
-KTsgfQ0KPiA+ICsNCj4gPiArLyoNCj4gPiArICoga3ZtX2FyY2hfbW11X2VuYWJsZV9sb2dfZGly
-dHlfcHRfbWFza2VkIC0gZW5hYmxlIGRpcnR5IGxvZ2dpbmcgZm9yDQo+ID4gK3NlbGVjdGVkDQo+
-ID4gKyAqIGRpcnR5IHBhZ2VzLg0KPiA+ICsgKg0KPiA+ICsgKiBJdCBjYWxscyBrdm1fbW11X3dy
-aXRlX3Byb3RlY3RfcHRfbWFza2VkIHRvIHdyaXRlIHByb3RlY3Qgc2VsZWN0ZWQNCj4gPiArcGFn
-ZXMgdG8NCj4gPiArICogZW5hYmxlIGRpcnR5IGxvZ2dpbmcgZm9yIHRoZW0uDQo+ID4gKyAqLw0K
-PiA+ICt2b2lkIGt2bV9hcmNoX21tdV9lbmFibGVfbG9nX2RpcnR5X3B0X21hc2tlZChzdHJ1Y3Qg
-a3ZtICprdm0sDQo+ID4gKyAgICAgICAgc3RydWN0IGt2bV9tZW1vcnlfc2xvdCAqc2xvdCwNCj4g
-PiArICAgICAgICBnZm5fdCBnZm5fb2Zmc2V0LCB1bnNpZ25lZCBsb25nIG1hc2spIHsNCj4gPiAr
-ICAgIGt2bV9tbXVfd3JpdGVfcHJvdGVjdF9wdF9tYXNrZWQoa3ZtLCBzbG90LCBnZm5fb2Zmc2V0
-LCBtYXNrKTsgfQ0KPiA+ICsNCj4gPiArDQo+ID4gIGludCBzdGFnZTJfaW9yZW1hcChzdHJ1Y3Qg
-a3ZtICprdm0sIGdwYV90IGdwYSwgcGh5c19hZGRyX3QgaHBhLA0KPiA+ICAgICAgICAgICAgICAg
-ICAgICB1bnNpZ25lZCBsb25nIHNpemUsIGJvb2wgd3JpdGFibGUpICB7IEBAIC00MzMsNg0KPiA+
-ICs0NzAsMTIgQEAgdm9pZCBrdm1fYXJjaF9zeW5jX2RpcnR5X2xvZyhzdHJ1Y3Qga3ZtICprdm0s
-IHN0cnVjdA0KPiA+IGt2bV9tZW1vcnlfc2xvdCAqbWVtc2xvdCkgIHsgIH0NCj4gPg0KPiA+ICt2
-b2lkIGt2bV9hcmNoX2ZsdXNoX3JlbW90ZV90bGJzX21lbXNsb3Qoc3RydWN0IGt2bSAqa3ZtLA0K
-PiA+ICsgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBzdHJ1Y3Qga3ZtX21l
-bW9yeV9zbG90DQo+ID4gKyptZW1zbG90KSB7DQo+ID4gKyAgICAgICBrdm1fZmx1c2hfcmVtb3Rl
-X3RsYnMoa3ZtKTsNCj4gPiArfQ0KPiA+ICsNCj4gPiAgdm9pZCBrdm1fYXJjaF9mcmVlX21lbXNs
-b3Qoc3RydWN0IGt2bSAqa3ZtLCBzdHJ1Y3Qga3ZtX21lbW9yeV9zbG90DQo+ID4gKmZyZWUpICB7
-ICB9IGRpZmYgLS1naXQgYS9hcmNoL3Jpc2N2L2t2bS92bS5jIGIvYXJjaC9yaXNjdi9rdm0vdm0u
-Yw0KPiA+IGluZGV4IDRmMjQ5ODE5OGNiNS4uZjc0MDU2NzY5MDNiIDEwMDY0NA0KPiA+IC0tLSBh
-L2FyY2gvcmlzY3Yva3ZtL3ZtLmMNCj4gPiArKysgYi9hcmNoL3Jpc2N2L2t2bS92bS5jDQo+ID4g
-QEAgLTEyLDEyICsxMiw2IEBADQo+ID4gICNpbmNsdWRlIDxsaW51eC91YWNjZXNzLmg+DQo+ID4g
-ICNpbmNsdWRlIDxsaW51eC9rdm1faG9zdC5oPg0KPiA+DQo+ID4gLWludCBrdm1fdm1faW9jdGxf
-Z2V0X2RpcnR5X2xvZyhzdHJ1Y3Qga3ZtICprdm0sIHN0cnVjdCBrdm1fZGlydHlfbG9nDQo+ID4g
-KmxvZykgLXsNCj4gPiAtICAgICAgIC8qIFRPRE86IFRvIGJlIGFkZGVkIGxhdGVyLiAqLw0KPiA+
-IC0gICAgICAgcmV0dXJuIC1FTk9UU1VQUDsNCj4gPiAtfQ0KPiA+IC0NCj4gPiAgaW50IGt2bV9h
-cmNoX2luaXRfdm0oc3RydWN0IGt2bSAqa3ZtLCB1bnNpZ25lZCBsb25nIHR5cGUpICB7DQo+ID4g
-ICAgICAgICBpbnQgcjsNCj4gPiAtLQ0KPiA+IDIuMTkuMQ0KPiA+DQo+ID4NCj4gDQo+IEkgYWxy
-ZWFkeSBoYXZlIGEgc2ltaWxhciBjaGFuZ2UgYXMgcGFydCBvZiB2MTQgS1ZNIFJJU0MtViBzZXJp
-ZXMuDQo+IA0KPiBMZXQgdXMgY29vcmRpbmF0ZSBiZXR0ZXIuIFBsZWFzZSBsZXQgdXMga25vdyBp
-bi1hZHZhbmNlIGZvciBhbnkgS1ZNIFJJU0MtVg0KPiBmZWF0dXJlIHlvdSBwbGFuIHRvIHdvcmsg
-b24uIE90aGVyd2lzZSwgdGhpcyBsZWFkcyB0byBlZmZvcnRzIHdhc3RlZCBhdCB5b3VyDQo+IGVu
-ZCBvciBhdCBvdXIgZW5kLg0KPiANCj4gUmVnYXJkcywNCj4gQW51cA0KDQpIaSBBbnVwLA0KDQpU
-aGFua3MgZm9yIGFjY2VwdGluZyBvdXIgcGF0Y2hlcy4NCg0KSW4gdGhlIG5leHQgZmV3IHdlZWtz
-IHdlIHBsYW4gdG8gd29yayBvbiB0aGUgZm9sbG93aW5nOg0KMS4gbWVtb3J5IHJldmVyc2UgbWFw
-cGluZyAocm1hcCksIHJlbGF0ZWQgdG8gbWlncmF0aW9uLg0KMi4gaXJxZmQuDQozLiBpbXBsbWVu
-dGFpb24gcmVsYXRlZCB0byB0aGUgZGVkaWNhdGVkIGNsb2NrIGV2ZW50IHNvdXJjZSBwcm9wb3Nh
-bC4NCg0KQmVzaWRlcywgd2UgYXJlIGF3YXJlIG9mIHRoYXQgeW91IGFyZSB3b3JraW5nIG9uIGly
-cSBjaGlwIGVtdWxhdGlvbiBpbiBLVk0uIE1lYW53aGlsZSwgb3VyIGltcGxlbWVudGFpdG9uIG9m
-IGlycWZkIGFuZCB0aGUgY2xvY2sgZXZlbnQgc291cmNlIGhhcyBkZXBlbmRlbmN5IG9uIHRoZSBp
-cnEgY2hpcCBhbmQgd2UgbWF5IHdlbGwgbW9kaWZ5IHRoZSBpcnEgY2hpcCBlbXVsYXRpb24gY29k
-ZS4gU28gY291bGQgeW91IHNoYXJlIHdpdGggdXMgYW55IGlkZWFzLCBwbGFucyBvciBwcm9ncmVz
-cyByZWdhcmRpbmcgeW91ciB3b3JrIHNpbmNlIHRoZXJlIG1pZ2h0IGJlIHBvdGVudGlhbCBjb2xs
-aXNpb24/DQoNCkxldCdzIHN0YXkgaW4gdG91Y2ggaW4gdGhlIGxvbmcgcnVuIGFuZCBjb29kaW5h
-dGUgYmV0dGVyLiBCVFcsIGNvdWxkIHlvdSBzaGFyZSB3aXRoIHVzIGlmIHRoZXJlJ3MgYW55IHJl
-Z3VsYXIgZGlzY3Vzc2lvbiBzZXNzaW9ucyBmb2N1c2VkIG9uIFJJU0MtViBLVk0/DQoNClJlZ2Fy
-ZHMsDQpZaWZlaQ0K
+
+On 2020/8/21 下午10:52, Cornelia Huck wrote:
+> On Fri, 21 Aug 2020 11:14:41 +0800
+> Jason Wang <jasowang@redhat.com> wrote:
+>
+>> On 2020/8/20 下午8:27, Cornelia Huck wrote:
+>>> On Wed, 19 Aug 2020 17:28:38 +0800
+>>> Jason Wang <jasowang@redhat.com> wrote:
+>>>   
+>>>> On 2020/8/19 下午4:13, Yan Zhao wrote:
+>>>>> On Wed, Aug 19, 2020 at 03:39:50PM +0800, Jason Wang wrote:
+>>>>>> On 2020/8/19 下午2:59, Yan Zhao wrote:
+>>>>>>> On Wed, Aug 19, 2020 at 02:57:34PM +0800, Jason Wang wrote:
+>>>>>>>> On 2020/8/19 上午11:30, Yan Zhao wrote:
+>>>>>>>>> hi All,
+>>>>>>>>> could we decide that sysfs is the interface that every VFIO vendor driver
+>>>>>>>>> needs to provide in order to support vfio live migration, otherwise the
+>>>>>>>>> userspace management tool would not list the device into the compatible
+>>>>>>>>> list?
+>>>>>>>>>
+>>>>>>>>> if that's true, let's move to the standardizing of the sysfs interface.
+>>>>>>>>> (1) content
+>>>>>>>>> common part: (must)
+>>>>>>>>>         - software_version: (in major.minor.bugfix scheme)
+>>>>>>>> This can not work for devices whose features can be negotiated/advertised
+>>>>>>>> independently. (E.g virtio devices)
+>>> I thought the 'software_version' was supposed to describe kind of a
+>>> 'protocol version' for the data we transmit? I.e., you add a new field,
+>>> you bump the version number.
+>>
+>> Ok, but since we mandate backward compatibility of uABI, is this really
+>> worth to have a version for sysfs? (Searching on sysfs shows no examples
+>> like this)
+> I was not thinking about the sysfs interface, but rather about the data
+> that is sent over while migrating. E.g. we find out that sending some
+> auxiliary data is a good idea and bump to version 1.1.0; version 1.0.0
+> cannot deal with the extra data, but version 1.1.0 can deal with the
+> older data stream.
+>
+> (...)
+
+
+Well, I think what data to transmit during migration is the duty of qemu 
+not kernel. And I suspect the idea of reading opaque data (with version) 
+from kernel and transmit them to dest is the best approach.
+
+
+>
+>>>>>>>>>         - device_api: vfio-pci or vfio-ccw ...
+>>>>>>>>>         - type: mdev type for mdev device or
+>>>>>>>>>                 a signature for physical device which is a counterpart for
+>>>>>>>>> 	   mdev type.
+>>>>>>>>>
+>>>>>>>>> device api specific part: (must)
+>>>>>>>>>        - pci id: pci id of mdev parent device or pci id of physical pci
+>>>>>>>>>          device (device_api is vfio-pci)API here.
+>>>>>>>> So this assumes a PCI device which is probably not true.
+>>>>>>>>      
+>>>>>>> for device_api of vfio-pci, why it's not true?
+>>>>>>>
+>>>>>>> for vfio-ccw, it's subchannel_type.
+>>>>>> Ok but having two different attributes for the same file is not good idea.
+>>>>>> How mgmt know there will be a 3rd type?
+>>>>> that's why some attributes need to be common. e.g.
+>>>>> device_api: it's common because mgmt need to know it's a pci device or a
+>>>>>                ccw device. and the api type is already defined vfio.h.
+>>>>> 	    (The field is agreed by and actually suggested by Alex in previous mail)
+>>>>> type: mdev_type for mdev. if mgmt does not understand it, it would not
+>>>>>          be able to create one compatible mdev device.
+>>>>> software_version: mgmt can compare the major and minor if it understands
+>>>>>          this fields.
+>>>> I think it would be helpful if you can describe how mgmt is expected to
+>>>> work step by step with the proposed sysfs API. This can help people to
+>>>> understand.
+>>> My proposal would be:
+>>> - check that device_api matches
+>>> - check possible device_api specific attributes
+>>> - check that type matches [I don't think the combination of mdev types
+>>>     and another attribute to determine compatibility is a good idea;
+>>
+>> Any reason for this? Actually if we only use mdev type to detect the
+>> compatibility, it would be much more easier. Otherwise, we are actually
+>> re-inventing mdev types.
+>>
+>> E.g can we have the same mdev types with different device_api and other
+>> attributes?
+> In the end, the mdev type is represented as a string; but I'm not sure
+> we can expect that two types with the same name, but a different
+> device_api are related in any way.
+>
+> If we e.g. compare vfio-pci and vfio-ccw, they are fundamentally
+> different.
+>
+> I was mostly concerned about the aggregation proposal, where type A +
+> aggregation value b might be compatible with type B + aggregation value
+> a.
+
+
+Yes, that looks pretty complicated.
+
+
+>
+>>
+>>>     actually, the current proposal confuses me every time I look at it]
+>>> - check that software_version is compatible, assuming semantic
+>>>     versioning
+>>> - check possible type-specific attributes
+>>
+>> I'm not sure if this is too complicated. And I suspect there will be
+>> vendor specific attributes:
+>>
+>> - for compatibility check: I think we should either modeling everything
+>> via mdev type or making it totally vendor specific. Having something in
+>> the middle will bring a lot of burden
+> FWIW, I'm for a strict match on mdev type, and flexibility in per-type
+> attributes.
+
+
+I'm not sure whether the above flexibility can work better than encoding 
+them to mdev type. If we really want ultra flexibility, we need making 
+the compatibility check totally vendor specific.
+
+
+>
+>> - for provisioning: it's still not clear. As shown in this proposal, for
+>> NVME we may need to set remote_url, but unless there will be a subclass
+>> (NVME) in the mdev (which I guess not), we can't prevent vendor from
+>> using another attribute name, in this case, tricks like attributes
+>> iteration in some sub directory won't work. So even if we had some
+>> common API for compatibility check, the provisioning API is still vendor
+>> specific ...
+> Yes, I'm not sure how to deal with the "same thing for different
+> vendors" problem. We can try to make sure that in-kernel drivers play
+> nicely, but not much more.
+
+
+Then it's actually a subclass of mdev I guess in the future.
+
+Thanks
+
+
