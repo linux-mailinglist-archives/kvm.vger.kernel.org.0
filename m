@@ -2,127 +2,94 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5B3DC257A16
-	for <lists+kvm@lfdr.de>; Mon, 31 Aug 2020 15:09:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4E0D8257A8C
+	for <lists+kvm@lfdr.de>; Mon, 31 Aug 2020 15:33:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727843AbgHaNJ0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 31 Aug 2020 09:09:26 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:27345 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1727786AbgHaNJY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 31 Aug 2020 09:09:24 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1598879361;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=l2GnCcv2WvVq5iCUqDhGffUDjlXCs353uZj6NC6srVM=;
-        b=Z/CcgAopq/6i6ULRgyXIVrRnhIm9JDBvCUJAdeGa+0yTuoQGBs0tWJV88IiDI++nIhJJ6i
-        hpAWQYlG1j4KsIrXemHcLPqm/jXD91JB2drGS8r/ryvucGj9CIbfMwzIJjFpeuixkjuYCL
-        c6JqcJp/8IyFbcCkJTGaicWG0i66eCk=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-526-RBwECqLmPfWb9yPtQ9H_-w-1; Mon, 31 Aug 2020 09:09:19 -0400
-X-MC-Unique: RBwECqLmPfWb9yPtQ9H_-w-1
-Received: by mail-wm1-f71.google.com with SMTP id c72so463453wme.4
-        for <kvm@vger.kernel.org>; Mon, 31 Aug 2020 06:09:19 -0700 (PDT)
+        id S1727822AbgHaNdf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 31 Aug 2020 09:33:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35962 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727845AbgHaN1I (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 31 Aug 2020 09:27:08 -0400
+Received: from mail-lj1-x244.google.com (mail-lj1-x244.google.com [IPv6:2a00:1450:4864:20::244])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 05695C0619E4
+        for <kvm@vger.kernel.org>; Mon, 31 Aug 2020 06:26:29 -0700 (PDT)
+Received: by mail-lj1-x244.google.com with SMTP id i10so6711895ljn.2
+        for <kvm@vger.kernel.org>; Mon, 31 Aug 2020 06:26:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:reply-to:sender:from:date:message-id:subject:to;
+        bh=o69Nac3LLMj5CDhyPqLcnP7WGq46U4gQb9HzFdG/MvE=;
+        b=GvS5ONqONS+SkRITeLOYK+nEKqeftr2e4zlw8iOljUdVaT4ei8mXK/eMe5gdebbxul
+         qejaiESAwrQo/TwRSbsV2RgWo1cR2hwlUx3zHZP6xDZHfKXln6WrMjydy1j5UDKStApO
+         83k6OMYB/O4HA/D4ksOUSzU9ZpUpEqmaButNQtqR6C29H3+mAHSKCbPlI067sUdB20EE
+         ixBTW9S1A2kyuIbzfdQN/JSL5cc/RZ+/MNHv7Yis6pX8HuuJNUwic97zwHx5MU4x4PUn
+         9VwFvJUStfi4hRDyGGDy0ijlpU3bNrs4tLAIT0WFfsT49jK8zJO72eI6R18XAB60K+Uk
+         aflg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=l2GnCcv2WvVq5iCUqDhGffUDjlXCs353uZj6NC6srVM=;
-        b=ImcXIxZ8qlCSi1FIHUY+3yZra6fQVWaz6ZNjXoBsSWY6Sj6nSpAfy7PDU3oqxV+lYT
-         k3sdVrvGcNg1x2gCMwIWpac2Q4JowTGpKs2Hg41Q+eN7z11ivsQFECimuvaTZIkQUK0m
-         RDIuHLouH7429vtsuiEaBkP29YFKGZlOzo3YezTLLrRdwSmTwoEnmwHJBN9RuR6Ab0JQ
-         dgD6/WSUzaVjLVGkPrf/omAGeAAREQrmpp38L89Zv8KTFn8oV5JYN/qRyNTfuPOdIfD6
-         HSDXXi8DTN65V3DPw0oHiTmMAvHlzYGiatplCBlqX7aCWfBnXnOHhLWTla8Oy4Q8JJIF
-         5KWA==
-X-Gm-Message-State: AOAM532F3MW3XIc6zEFK15EehwpmRwJ6iTFulegKuZ3r8OCEov7Z7foa
-        5S17thVNnpRJkGk/XFZUTegwSaDzDhuqh2QH9w7TKIluv7YURYDHoozmAur97AKRWbhe7ji6wZ1
-        LJfFn03nFCBOr
-X-Received: by 2002:adf:cc8c:: with SMTP id p12mr1710325wrj.92.1598879357917;
-        Mon, 31 Aug 2020 06:09:17 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJx/1+vKHyvkY7iAfm+ukdoRDuyURSwkR27pytCRbfzdoM7lD9CNUTZ+Lt7aTkXhxMzxGsxqHA==
-X-Received: by 2002:adf:cc8c:: with SMTP id p12mr1710303wrj.92.1598879357649;
-        Mon, 31 Aug 2020 06:09:17 -0700 (PDT)
-Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id k184sm11767549wme.1.2020.08.31.06.09.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 31 Aug 2020 06:09:16 -0700 (PDT)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Lai Jiangshan <jiangshanlai@gmail.com>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     Lai Jiangshan <laijs@linux.alibaba.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        X86 ML <x86@kernel.org>, "H. Peter Anvin" <hpa@zytor.com>,
-        kvm@vger.kernel.org
-Subject: Re: [PATCH] kvm x86/mmu: use KVM_REQ_MMU_SYNC to sync when needed
-In-Reply-To: <CAJhGHyC1Ykq5V_2nFPLRz9JmtAiQu6aw4fCKo1LO7Qwzjvfg2g@mail.gmail.com>
-References: <20200824101825.4106-1-jiangshanlai@gmail.com> <CAJhGHyC1Ykq5V_2nFPLRz9JmtAiQu6aw4fCKo1LO7Qwzjvfg2g@mail.gmail.com>
-Date:   Mon, 31 Aug 2020 15:09:15 +0200
-Message-ID: <875z8zx8qs.fsf@vitty.brq.redhat.com>
+        h=x-gm-message-state:mime-version:reply-to:sender:from:date
+         :message-id:subject:to;
+        bh=o69Nac3LLMj5CDhyPqLcnP7WGq46U4gQb9HzFdG/MvE=;
+        b=jd+BdgVUuQEbz4mkhjEDC5buoLk22TiJcgkN1K3YCthG7aeWok8BYjgAcNQqmjdwuj
+         Y5vzwq9VmGcpw8DNAddEuYod6HH1CvX+K50tJegYbY6j8xUkFjPoAyCTB7zmwvRUsLK6
+         fXn8tXjJf9DNz+ejpkucnEylMD0zGcKWHPgOCgQ1UZOuUu2asFXpo1QdjDI+1TCaW251
+         EFHXzpGATFDom9jeuToczrTfvuA5ntp0ktJomMgD02drjlASyrc7f5bcsmXM1+prVriV
+         0f/KqqH96i/C3r6hFhnU0I6xsEVtR9Hgkxuy16Dze4nIWBVaBGwDIAn5ePKB++LW74bb
+         HQ5g==
+X-Gm-Message-State: AOAM531ocDmXEARQnCEo4RcMWP1HFFbJJQ5EnK3pABazcZuhfMl0+MhH
+        FPjaiGbMrs2B07fPSGobw19vkiADSZcNYGe+kn0=
+X-Google-Smtp-Source: ABdhPJx5h73UdWdmqN0ZXklbmHxhGiANR3jS4fz3EetfufGWkyufJh3oSK0WTBZL+72KPBBqNF1EE+YcTj5isQyt2i4=
+X-Received: by 2002:a2e:5316:: with SMTP id h22mr714236ljb.167.1598880387154;
+ Mon, 31 Aug 2020 06:26:27 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain
+Reply-To: marie_avis12@yahoo.com
+Received: by 2002:a2e:9817:0:0:0:0:0 with HTTP; Mon, 31 Aug 2020 06:26:26
+ -0700 (PDT)
+From:   Miss Maris Avis <marie.avis11@gmail.com>
+Date:   Mon, 31 Aug 2020 13:26:26 +0000
+X-Google-Sender-Auth: aulnVZG-1gSOcZsrnz7-vOB6QCo
+Message-ID: <CADTVshPC=1cJsw0xvUiUZDDBg3VVdBcHJ+pk-zuvR4tycntngg@mail.gmail.com>
+Subject: Hello
+To:     undisclosed-recipients:;
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Lai Jiangshan <jiangshanlai@gmail.com> writes:
+My Dear,
 
-> Ping @Sean Christopherson
->
+My name is Miss Marie Avis the only daughter of Mr. Gabriel Avis, my
+Father was dealing in Cocoa and Timber in this country before his
+death,  It is my pleasure to contact you for a business venture which
+I intend to establish in your country. Though I have not met with you
+before but I believe one has to risk confiding before you can succeed
+sometimes in life.
 
-Let's try 'Beetlejuice' instead :-)
+I can confide in you for my brighter future since you are a human
+being like me. There is this huge amount of Ten Million five hundred
+thousand United States dollars. ($10.500.000.00) which my late Father
+kept for me in a suspense account with one of the bank here in Abidjan
+Cote d'Ivoire before he was assassinated by unknown persons, Now I
+have decided to invest these money in your country or anywhere safe
+enough for me.
 
-> On Mon, Aug 24, 2020 at 5:18 PM Lai Jiangshan <jiangshanlai@gmail.com> wrote:
->>
->> From: Lai Jiangshan <laijs@linux.alibaba.com>
->>
->> 8c8560b83390("KVM: x86/mmu: Use KVM_REQ_TLB_FLUSH_CURRENT for MMU specific flushes)
->> changed it without giving any reason in the changelog.
->>
->> In theory, the syncing is needed, and need to be fixed by reverting
->> this part of change.
+I want you to help me claim this fund from the bank and have it
+transfer into your personal account in your country for investment
+purposes in your country in these areas:
 
-Even if the original commit is not wordy enough this is hardly
-better. Are you seeing a particular scenario when a change in current
-vCPU's MMU requires flushing TLB entries for *other* contexts, ... (see
-below)
+1). Telecommunication
+2). The transport Industry
+3). Five Star Hotel
+4). Tourism
+5). Real Estate
 
->>
->> Signed-off-by: Lai Jiangshan <laijs@linux.alibaba.com>
->> ---
->>  arch/x86/kvm/mmu/mmu.c | 2 +-
->>  1 file changed, 1 insertion(+), 1 deletion(-)
->>
->> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
->> index 4e03841f053d..9a93de921f2b 100644
->> --- a/arch/x86/kvm/mmu/mmu.c
->> +++ b/arch/x86/kvm/mmu/mmu.c
->> @@ -2468,7 +2468,7 @@ static struct kvm_mmu_page *kvm_mmu_get_page(struct kvm_vcpu *vcpu,
->>                 }
->>
->>                 if (sp->unsync_children)
->> -                       kvm_make_request(KVM_REQ_TLB_FLUSH_CURRENT, vcpu);
->> +                       kvm_make_request(KVM_REQ_MMU_SYNC, vcpu);
+If you can be of assistance to me I will be pleased to offer you 20%
+of the total fund.
 
-... in particular, why are you reverting only this hunk? Please elaborate.
+I await your soonest response.
 
->>
->>                 __clear_sp_write_flooding_count(sp);
->>
->> --
->> 2.19.1.6.gb485710b
->>
->
-
--- 
-Vitaly
-
+Respectfully yours,
+Miss Marie Evis
+Tel: +225597438528
