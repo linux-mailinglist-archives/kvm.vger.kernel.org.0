@@ -2,112 +2,122 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 15657257E16
-	for <lists+kvm@lfdr.de>; Mon, 31 Aug 2020 17:59:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CBC94257E68
+	for <lists+kvm@lfdr.de>; Mon, 31 Aug 2020 18:14:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727919AbgHaP7R (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 31 Aug 2020 11:59:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59776 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727818AbgHaP7Q (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 31 Aug 2020 11:59:16 -0400
-Received: from mail-ej1-x631.google.com (mail-ej1-x631.google.com [IPv6:2a00:1450:4864:20::631])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 437F3C061573
-        for <kvm@vger.kernel.org>; Mon, 31 Aug 2020 08:59:16 -0700 (PDT)
-Received: by mail-ej1-x631.google.com with SMTP id i22so3326434eja.5
-        for <kvm@vger.kernel.org>; Mon, 31 Aug 2020 08:59:16 -0700 (PDT)
+        id S1727952AbgHaQOx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 31 Aug 2020 12:14:53 -0400
+Received: from mail-bn8nam12on2089.outbound.protection.outlook.com ([40.107.237.89]:40248
+        "EHLO NAM12-BN8-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726249AbgHaQOw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 31 Aug 2020 12:14:52 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=F+lnerySDbiAkfZDeLsatFXMGPCZv7NJ7Se35LybLSvw9ZRf8iADPEeqTc19bF27AeUlWfdz0SIMt9RKQ7MCQLn8kw0FWHHyTyZh6BPI5ADkEWFCOXw7KQ41AL9ZGm1iUnGApfyI5h8aY+X7Cstb2i/OUttIPOEKK+rDz6a9mkYeneqPFSyxrjMIjgrtKQALPpY9efldVaewvmLjRbhW78l592SciMbAFqLn4ahAR81RGiJReinimXFsH+u2iTrsMqsajhXkQBIa0h2ZB4vIGGpI6dFmfOe6n9XdF2L5ch9aDjzsDyqW3ocVwkxMd1jUOS1t7fiHztUhQzAE6zPW4w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=iS3zHGoFsDQ5I2P2002+yENliBKjn2sXrycXirXgzSQ=;
+ b=LOIIeDdtCQ/prIlFKq3xnhpFtElAfc+OcQgEVchbDOP9DkIMqv9aFuEC8/xY6WTF+FcBh1zFCNKppoutguAi6V/fwARDMAmgf7gJ3mScyh+41WNaNN6J4Y1Cfj+OtASakjS+a7ZfOoKTS2zjCEA1VQ5e/C9Dzt/Nr+K2tLoHHkrWnaGCnlj4j6ujmRvET4BQ6mlZTVoL7o4yt9hfOU4WGH9eZ9O+SbZA4CJQ9JdCwp190Kwo1OIKBwmW0DEvnyqKfsvXqgGk7isFu6a2w5K2G/e1jSTk0KPFYE2nuyR8BK/7rCNOfvMBAWdCbmIjiAY5Q1DJsmtBlcZe9gmlaebCoQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=mime-version:from:date:message-id:subject:to
-         :content-transfer-encoding;
-        bh=357mXB3JYBVjgoA+GRZINKp692bd2nd7RWi+dE3ZXVg=;
-        b=GKhVSXDfbECNGdKlh0y7I79pjWvh9JDFs2stP8hXHhuzVXwyyInufpIQ+Kzfw/5TZQ
-         1hy39eSFmiL3H4ObIjwbBu5tf4nFFAawrb6vYtMXrBD50Q/mL8tqyzbGliv5f75xwVO2
-         KL59m7AkopHNysBWc44BoGtELIU1ACYiSXqxM=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to
-         :content-transfer-encoding;
-        bh=357mXB3JYBVjgoA+GRZINKp692bd2nd7RWi+dE3ZXVg=;
-        b=FiQ5FKAs94xtK2fSGPyvgHW6kcvSUYDCP6E3hWZ/NZY5rOAX0nCeuILWzfz9lN2t8k
-         jkKRDlarzZFbkPEfyP5DvDCiqL8UeUgmPCGdPZmZCP7nR5613s83c7AoMN5tqFKHLTNi
-         EolIv+V7NGHuBj/JT8z0Ewguh74RDNzctn3l3lkM7eJwUbV+O3Yn9c+MndtmEyR+ZQPg
-         P24BGLxEaG56zLyQ1uWemsMDo+IlamtbEEBBvxheQlJ+ye5BSBJgQppH1gE75/Ikix5G
-         EHdwSbNlHbpkWIVTZhJ/o04/IIJeiM4KWVWcRqCaqhKfXAEhlsfp27PcHIX9+MfbdvZS
-         OX7w==
-X-Gm-Message-State: AOAM531qu/nkkEvqJm8LYehw4FHy1CAfA0cNt76oxjwrlTSQQFhIt6Pt
-        Q0BhDindwDxmY2oKZAgVa3998tZ/ZyS+sl4LWQwiApvgtbmNWQ==
-X-Google-Smtp-Source: ABdhPJyKQunXH+0vaVmTfhSaWpAaiynEDWPlfFMjvIGV6nXzYWSTaj7SZTpHjAz6tHDk4g12Jh1XxfXaPN8gbyqnnFg=
-X-Received: by 2002:a17:906:2acf:: with SMTP id m15mr1746404eje.257.1598889554139;
- Mon, 31 Aug 2020 08:59:14 -0700 (PDT)
+ d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=iS3zHGoFsDQ5I2P2002+yENliBKjn2sXrycXirXgzSQ=;
+ b=FnGZLGAFgSDaSuTXekZ9RD0KU47MSRLiFoazc4vDrKPs57TkaIsUzTMxoKQGap2sB54g00c3eqioCr61bQ8e5cuKu7kSJn294qeEJUPO98gMx+K49oRE/fnKTsj34NOHKQApltfS3SejozuDaXZ7TCoeaFOxaaZwtR8a3HvG/6Q=
+Authentication-Results: google.com; dkim=none (message not signed)
+ header.d=none;google.com; dmarc=none action=none header.from=amd.com;
+Received: from DM5PR12MB1355.namprd12.prod.outlook.com (2603:10b6:3:6e::7) by
+ DM6PR12MB4155.namprd12.prod.outlook.com (2603:10b6:5:221::15) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.3326.23; Mon, 31 Aug 2020 16:14:50 +0000
+Received: from DM5PR12MB1355.namprd12.prod.outlook.com
+ ([fe80::299a:8ed2:23fc:6346]) by DM5PR12MB1355.namprd12.prod.outlook.com
+ ([fe80::299a:8ed2:23fc:6346%3]) with mapi id 15.20.3326.025; Mon, 31 Aug 2020
+ 16:14:49 +0000
+Subject: Re: [PATCH 2/2] KVM: SVM: Don't flush cache of SEV-encrypted pages if
+ hardware enforces cache coherency across encryption domains
+To:     Krish Sadhukhan <krish.sadhukhan@oracle.com>, kvm@vger.kernel.org
+Cc:     pbonzini@redhat.com, jmattson@google.com
+References: <20200829005926.5477-1-krish.sadhukhan@oracle.com>
+ <20200829005926.5477-2-krish.sadhukhan@oracle.com>
+From:   Tom Lendacky <thomas.lendacky@amd.com>
+Message-ID: <ecf8a23a-8d7b-ed8d-e528-8298079d2df7@amd.com>
+Date:   Mon, 31 Aug 2020 11:14:47 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
+In-Reply-To: <20200829005926.5477-2-krish.sadhukhan@oracle.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: SN6PR04CA0091.namprd04.prod.outlook.com
+ (2603:10b6:805:f2::32) To DM5PR12MB1355.namprd12.prod.outlook.com
+ (2603:10b6:3:6e::7)
 MIME-Version: 1.0
-From:   Micah Morton <mortonm@chromium.org>
-Date:   Mon, 31 Aug 2020 08:59:03 -0700
-Message-ID: <CAJ-EccPKv+LUXfoqHg-T1XCUJE8aLzTsKwiQa1UojeYC4UPPVg@mail.gmail.com>
-Subject: Not enough IRQ lines on the 82093AA IOAPIC
-To:     kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from 255.255.255.255 (255.255.255.255) by SN6PR04CA0091.namprd04.prod.outlook.com (2603:10b6:805:f2::32) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3326.19 via Frontend Transport; Mon, 31 Aug 2020 16:14:49 +0000
+X-Originating-IP: [67.79.209.213]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-HT: Tenant
+X-MS-Office365-Filtering-Correlation-Id: c131adde-dcfd-414b-6f6e-08d84dc8fc43
+X-MS-TrafficTypeDiagnostic: DM6PR12MB4155:
+X-Microsoft-Antispam-PRVS: <DM6PR12MB415581A3916AF1B482CD1815EC510@DM6PR12MB4155.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:7219;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 7lhJXPyQUY+sjZbSrH4iktSU0kYT4AY1QzxrZYouAnXOew5geFj9Pyand37t+nOLluJbDpBK3YDvvbdRS2ldWrNBlpJ9xjnbQs9fPMQUqlNOQyK/aGU5qZQ8P0wygRgmknxcoDO/Kf/BZ1ZTaPslzLh9s1ing05oCBTAod5BkzHb9HlROmnWOGbfoGsoXVDdoOSJBtx6SlFoDxGvucefdhY03CXXKschZdDXX2EHayFG5YUkFi9uzpfDYOS1uqf7xxQLWs7S+WHulVnEfY2gyw/3Lfn5kgxaLHu5F/dQSXHP5F95eYXrcHUpS4cZKLA1EqX3Bod6PJ7WWMOXWSN/JIeyCeMEREf8Im2unCKIVji+flmtYsX+kRFnUUFQXJWV
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM5PR12MB1355.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(346002)(39860400002)(136003)(376002)(366004)(396003)(186003)(4326008)(8936002)(2906002)(36756003)(8676002)(478600001)(16576012)(66556008)(66476007)(5660300002)(26005)(83380400001)(52116002)(956004)(2616005)(66946007)(6486002)(86362001)(53546011)(316002)(31696002)(31686004)(43740500002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData: SHFo6XJl0K+pnVlXHcGGqgZeOrXqzE4rdXX8Fq8Z+v4okcJiwEei1hPUD7foHn37PheCcOAS+mD2CvWx3nEuTY0veKxmLNHK4HIe+6FuQ41TDecesZSQs/hXDzZQ/lAHc6ViZ0uwxD7Lgre6lG7gsamdsUq6pQcC8oCxplUTw/ExaoUQqYqBnflbbfBtLVUk+RIEwz1GXsC34jv/ECvv7qFYORpKnjqtQQdMAIN91+ImT3k0pAeiMFsaK2WZikAz0zC7PGjvnV5njD0iMHmq6G70/AaHkuaookzUdoPrzpWU8iK7BdJ/Mzse/o4IARzVSmHUfd1c5371SWcio7N5nGrwINsofza//ksz2oxOuF3+fSck3xUtn82zniRKjK6iybKyH1/rPIkxqXtil4EKQ/zZv3t9EFySe6M5/V5OEftoitU+9OSBtc+fiWzGjnP8iuLLKxH1Z7RsCUtNzyGOGXdNTGOcIlgvhsDQLKqlg9I3ZUAUoud4Ukd0+z44SMz//7yLBt169F1EXE6fSf6D9+O5YqmcH21HjHtNlLy6izZdomi2vWTBeqo/9dTdbksweO1RWm2lyIbHVA0EES1rCSkfX/De0DG11nBWvk+J0ppnr3b89ug22KvznZxVq3KUnms5A445I06r3CuHHvdrDQ==
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: c131adde-dcfd-414b-6f6e-08d84dc8fc43
+X-MS-Exchange-CrossTenant-AuthSource: DM5PR12MB1355.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 31 Aug 2020 16:14:49.6999
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: FM1Kokw67zk/ldqVQqShAv2FJqD4Jdbvn2SWF1LWteNn8I+ffMiQzKy1RdSS5IIAzp1wDSki2YLWzbTwjAaF4Q==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB4155
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-I've recently noticed that the IOAPIC
-(https://pdos.csail.mit.edu/6.828/2018/readings/ia32/ioapic.pdf) that
-kvm/QEMU emulate for providing interrupts to a guest VM is quite
-limited in terms of free/unused IRQs available for use (section 2.4 in
-the ioapic.pdf above gives descriptions). Essentially there are enough
-(4) shared PCI IRQ lines to go around for emulated/passthrough PCI
-devices -- but most/all the other lines have dedicated uses and are
-unavailable.
+On 8/28/20 7:59 PM, Krish Sadhukhan wrote:
+> Some hardware implementations may enforce cache coherency across encryption
+> domains. In such cases, it's not required to flush SEV-encrypted pages off
+> cache lines.
+> 
+> Signed-off-by: Krish Sadhukhan <krish.sadhukhan@oracle.com>
+> ---
+>   arch/x86/kvm/svm/sev.c | 3 ++-
+>   1 file changed, 2 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+> index 402dc4234e39..c8ed8a62d5ef 100644
+> --- a/arch/x86/kvm/svm/sev.c
+> +++ b/arch/x86/kvm/svm/sev.c
+> @@ -384,7 +384,8 @@ static void sev_clflush_pages(struct page *pages[], unsigned long npages)
+>   	uint8_t *page_virtual;
+>   	unsigned long i;
+>   
+> -	if (npages == 0 || pages == NULL)
+> +	if ((cpuid_eax(SVM_SME_CPUID_FUNC) & (1u << 10)) || npages == 0 ||
 
-
-I see evidence of device emulation code running into this lack of
-legacy IRQ slots on x86 kvm/QEMU, as here's an example of QEMU's
-emulated TPM choosing to use polling instead of interrupts since there
-are no available lines in the IOAPIC:
-https://www.qemu.org/docs/master/specs/tpm.html#acpi-interface . It
-seems there are other prospective projects that might run into this
-issue as well (https://www.mail-archive.com/qemu-devel@nongnu.org/msg585732=
-.html
-might be a good example if the i2c devices in question use interrupts
--- there may be better examples). From what I can tell, any emulated
-device someone wants to add to QEMU can=E2=80=99t use interrupts unless it =
-is
-an emulated PCI device. My particular interest is platform device
-passthrough on x86 kvm/QEMU/VFIO, which requires legacy IRQ forwarding
-via the emulated IOAPIC if the platform device uses interrupts.
-
-
-I=E2=80=99m mostly sending this email to see if I am missing any background
-context on this issue. Has this limitation of the 82093AA IOAPIC been
-surfaced before in KVM discussions?
-
-
-I recently sent a similar question on the vfio-users mailing list and
-got a suggestion to use multiple IOAPICs for the guest
-(https://www.redhat.com/archives/vfio-users/2020-August/msg00038.html).
-Does this seem like the most reasonable approach? Would it be easy
-enough to emulate multiple IOAPICs in kvm, assuming the guest OS can
-handle multiple? Here are a few other possible options:
-
-
-1) Update the 82093AA emulation to allow for more IRQs (while
-maintaining backwards compatibility to avoid breaking guests). Of
-course at this point you are no longer emulating a real piece of
-hardware. Not sure if there=E2=80=99s any precedent for that.
-
-2) Choose a new IOAPIC HW device to emulate in KVM (that has more IRQs
-and is widely supported). From what I=E2=80=99ve seen x86 IOAPICs feature >=
-100
-IRQ lines these days.
-
-3) Add a virtio/paravirtualized approach for the IOAPIC instead of
-emulating real hardware for the guest.
-
-Any advice on which of these options seems the most reasonable?
-
+Thanks for the patch. This should really be added as an X86_FEATURE bit, 
+and then check that feature here, as opposed to calling CPUID every time. 
+Also, there are other places in the kernel that this may be relevant, are 
+you investigating those areas, also (e.g. set_memory_encrypted() / 
+set_memory_decrypted())?
 
 Thanks,
-Micah
+Tom
+
+> +	    pages == NULL)
+>   		return;
+>   
+>   	for (i = 0; i < npages; i++) {
+> 
