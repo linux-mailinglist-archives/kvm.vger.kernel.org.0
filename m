@@ -2,46 +2,46 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5743F2581D2
-	for <lists+kvm@lfdr.de>; Mon, 31 Aug 2020 21:34:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 095312581D4
+	for <lists+kvm@lfdr.de>; Mon, 31 Aug 2020 21:34:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725872AbgHaTei (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 31 Aug 2020 15:34:38 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:50435 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1728938AbgHaTeg (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 31 Aug 2020 15:34:36 -0400
+        id S1729531AbgHaTel (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 31 Aug 2020 15:34:41 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:33585 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1729430AbgHaTej (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 31 Aug 2020 15:34:39 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1598902474;
+        s=mimecast20190719; t=1598902476;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=Dlm+r41ohHjW30i+MQ1d9KTTnOYk1vHfisVWqLyZbwo=;
-        b=bN8YIgLVy7MHkbnRYEl0FCPxUYtohCWB/Qz308Uv3OxeZPe5Op8yGKd7H2aq488q1D3YcH
-        df1B71+gRJhLVZNzMSZLhKjzDGRfBPiXiBsy52OlFlCd2WSD8Yw96xGVQP2OI2eOa/fwN/
-        GiIAlTsH/YAC8ppZ9NoAKnZDZEcPS0Y=
+        bh=TGiGuMkb/kt3ln7/bHWTnbLda6Wmue4f9drr7QeU4IY=;
+        b=QKI1V/KedQUbaNATlkEioApYihxZcEywI+F3LdZuhBp2594QDIHQLO/cNaHJeUvDQR2MgQ
+        OD8OSrloMw41gRr758TrXUbrxJo2WjmYcHmXKNA0Meq7q2WfwLTVdTsSMI1GJ+8o6s52hv
+        k71oc1DBgWJtvRFEYZ+VAVCGSE2af9Y=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-569-2z1t971-N1-8k9kKIHOPfA-1; Mon, 31 Aug 2020 15:34:29 -0400
-X-MC-Unique: 2z1t971-N1-8k9kKIHOPfA-1
+ us-mta-105-W7Q8DgKwPvCiInBKbhD9sg-1; Mon, 31 Aug 2020 15:34:32 -0400
+X-MC-Unique: W7Q8DgKwPvCiInBKbhD9sg-1
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4C3C3100747B;
-        Mon, 31 Aug 2020 19:34:28 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1B6BA18A224C;
+        Mon, 31 Aug 2020 19:34:31 +0000 (UTC)
 Received: from laptop.redhat.com (ovpn-112-112.ams2.redhat.com [10.36.112.112])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id D5ACA7EB69;
-        Mon, 31 Aug 2020 19:34:25 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id A3A3B7EB69;
+        Mon, 31 Aug 2020 19:34:28 +0000 (UTC)
 From:   Eric Auger <eric.auger@redhat.com>
 To:     eric.auger.pro@gmail.com, eric.auger@redhat.com,
         kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
         qemu-devel@nongnu.org, drjones@redhat.com, andrew.murray@arm.com,
         sudeep.holla@arm.com, maz@kernel.org, will@kernel.org,
         haibo.xu@linaro.org
-Subject: [kvm-unit-tests RFC 2/4] spe: Probing and Introspection Test
-Date:   Mon, 31 Aug 2020 21:34:12 +0200
-Message-Id: <20200831193414.6951-3-eric.auger@redhat.com>
+Subject: [kvm-unit-tests RFC 3/4] spe: Add profiling buffer test
+Date:   Mon, 31 Aug 2020 21:34:13 +0200
+Message-Id: <20200831193414.6951-4-eric.auger@redhat.com>
 In-Reply-To: <20200831193414.6951-1-eric.auger@redhat.com>
 References: <20200831193414.6951-1-eric.auger@redhat.com>
 MIME-Version: 1.0
@@ -52,218 +52,270 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Test whether Statistical Profiling Extensions (SPE) are
-supported and in the positive collect dimensioning data from
-the IDR registers. The First test only validates those.
+Add the code to prepare for profiling at EL1. The code under profiling
+is a simple loop doing memory addresses. We simply check the profiling
+buffer write position increases, ie. the buffer gets filled. No event
+is expected.
 
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
----
- arm/Makefile.common |   1 +
- arm/spe.c           | 163 ++++++++++++++++++++++++++++++++++++++++++++
- arm/unittests.cfg   |   8 +++
- 3 files changed, 172 insertions(+)
- create mode 100644 arm/spe.c
 
-diff --git a/arm/Makefile.common b/arm/Makefile.common
-index a123e85..4e7e4eb 100644
---- a/arm/Makefile.common
-+++ b/arm/Makefile.common
-@@ -8,6 +8,7 @@ tests-common  = $(TEST_DIR)/selftest.flat
- tests-common += $(TEST_DIR)/spinlock-test.flat
- tests-common += $(TEST_DIR)/pci-test.flat
- tests-common += $(TEST_DIR)/pmu.flat
-+tests-common += $(TEST_DIR)/spe.flat
- tests-common += $(TEST_DIR)/gic.flat
- tests-common += $(TEST_DIR)/psci.flat
- tests-common += $(TEST_DIR)/sieve.flat
+---
+
+To make sure no buffer full events is likely to be received, the number
+of to be collected events should be estimated. This needs to be done.
+Same for next patch. I tried to read PMSICR.COUNT after a single iteration
+but I get a value greated than the set interval so I wonder whether this
+is a bug or rather than reading this value gives unpredictable value.
+---
+ arm/spe.c               | 161 ++++++++++++++++++++++++++++++++++++++++
+ arm/unittests.cfg       |   8 ++
+ lib/arm64/asm/barrier.h |   1 +
+ 3 files changed, 170 insertions(+)
+
 diff --git a/arm/spe.c b/arm/spe.c
-new file mode 100644
-index 0000000..153c182
---- /dev/null
+index 153c182..7996f79 100644
+--- a/arm/spe.c
 +++ b/arm/spe.c
-@@ -0,0 +1,163 @@
-+/*
-+ * Copyright (C) 2020, Red Hat Inc, Eric Auger <eric.auger@redhat.com>
-+ *
-+ * This program is free software; you can redistribute it and/or modify it
-+ * under the terms of the GNU Lesser General Public License version 2.1 and
-+ * only version 2.1 as published by the Free Software Foundation.
-+ *
-+ * This program is distributed in the hope that it will be useful, but WITHOUT
-+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
-+ * for more details.
-+ */
-+#include "libcflat.h"
-+#include "errata.h"
-+#include "asm/barrier.h"
-+#include "asm/sysreg.h"
-+#include "asm/processor.h"
-+#include "alloc_page.h"
-+#include <bitops.h>
+@@ -14,9 +14,11 @@
+ #include "errata.h"
+ #include "asm/barrier.h"
+ #include "asm/sysreg.h"
++#include "asm/page.h"
+ #include "asm/processor.h"
+ #include "alloc_page.h"
+ #include <bitops.h>
++#include "alloc.h"
+ 
+ struct spe {
+ 	int min_interval;
+@@ -27,6 +29,10 @@ struct spe {
+ 	bool fe_cap;
+ 	int align;
+ 	void *buffer;
++	uint64_t pmbptr_el1;
++	uint64_t pmblimitr_el1;
++	uint64_t pmsirr_el1;
++	uint64_t pmscr_el1;
+ 	bool unique_record_size;
+ };
+ 
+@@ -36,6 +42,7 @@ static struct spe spe;
+ 
+ static bool spe_probe(void) { return false; }
+ static void test_spe_introspection(void) { }
++static void test_spe_buffer(void) { }
+ 
+ #else
+ 
+@@ -59,10 +66,35 @@ static void test_spe_introspection(void) { }
+ #define PMSIDR_EL1_COUNTSIZE_SHIFT	16
+ #define PMSIDR_EL1_COUNTSIZE_MASK	0xFUL
+ 
++#define PMSIRR_EL1_INTERVAL_SHIFT	8
++#define PMSIRR_EL1_INTERVAL_MASK	0xFFFFFF
 +
-+struct spe {
-+	int min_interval;
-+	int maxsize;
-+	int countsize;
-+	bool fl_cap;
-+	bool ft_cap;
-+	bool fe_cap;
-+	int align;
-+	void *buffer;
-+	bool unique_record_size;
-+};
++#define PMSFCR_EL1_FE			0x1
++#define PMSFCR_EL1_FT			0x2
++#define PMSFCR_EL1_FL			0x4
++#define PMSFCR_EL1_B			0x10000
++#define PMSFCR_EL1_LD			0x20000
++#define PMSFCR_EL1_ST			0x40000
 +
-+static struct spe spe;
++#define PMSCR_EL1	sys_reg(3, 0, 9, 9, 0)
++#define PMSICR_EL1	sys_reg(3, 0, 9, 9, 2)
++#define PMSIRR_EL1	sys_reg(3, 0, 9, 9, 3)
++#define PMSFCR_EL1	sys_reg(3, 0, 9, 9, 4)
++#define PMSEVFR_EL1	sys_reg(3, 0, 9, 9, 5)
+ #define PMSIDR_EL1	sys_reg(3, 0, 9, 9, 7)
+ 
++#define PMBLIMITR_EL1	sys_reg(3, 0, 9, 10, 0)
++#define PMBPTR_EL1	sys_reg(3, 0, 9, 10, 1)
++#define PMBSR_EL1	sys_reg(3, 0, 9, 10, 3)
+ #define PMBIDR_EL1	sys_reg(3, 0, 9, 10, 7)
+ 
++#define PMBLIMITR_EL1_E			0x1
 +
-+#ifdef __arm__
++#define PMSCR_EL1_E1SPE			0x2
++#define PMSCR_EL1_PA			0x10
++#define PMSCR_EL1_TS			0x20
++#define PMSCR_EL1_PCT			0x40
 +
-+static bool spe_probe(void) { return false; }
-+static void test_spe_introspection(void) { }
-+
-+#else
-+
-+#define ID_DFR0_PMSVER_SHIFT	32
-+#define ID_DFR0_PMSVER_MASK	0xF
-+
-+#define PMBIDR_EL1_ALIGN_MASK	0xF
-+#define PMBIDR_EL1_P		0x10
-+#define PMBIDR_EL1_F		0x20
-+
-+#define PMSIDR_EL1_FE		0x1
-+#define PMSIDR_EL1_FT		0x2
-+#define PMSIDR_EL1_FL		0x4
-+#define PMSIDR_EL1_ARCHINST	0x8
-+#define PMSIDR_EL1_LDS		0x10
-+#define PMSIDR_EL1_ERND		0x20
-+#define PMSIDR_EL1_INTERVAL_SHIFT	8
-+#define PMSIDR_EL1_INTERVAL_MASK	0xFUL
-+#define PMSIDR_EL1_MAXSIZE_SHIFT	12
-+#define PMSIDR_EL1_MAXSIZE_MASK		0xFUL
-+#define PMSIDR_EL1_COUNTSIZE_SHIFT	16
-+#define PMSIDR_EL1_COUNTSIZE_MASK	0xFUL
-+
-+#define PMSIDR_EL1	sys_reg(3, 0, 9, 9, 7)
-+
-+#define PMBIDR_EL1	sys_reg(3, 0, 9, 10, 7)
-+
-+static int min_interval(uint8_t idr_bits)
+ static int min_interval(uint8_t idr_bits)
+ {
+ 	switch (idr_bits) {
+@@ -138,6 +170,131 @@ static void test_spe_introspection(void)
+ 		"PMSIDR_EL1: Minimal sampling interval = %d", spe.min_interval);
+ }
+ 
++static void mem_access_loop(void *addr, int loop, uint64_t pmblimitr)
 +{
-+	switch (idr_bits) {
-+	case 0x0:
-+		return 256;
-+	case 0x2:
-+		return 512;
-+	case 0x3:
-+		return 768;
-+	case 0x4:
-+		return 1024;
-+	case 0x5:
-+		return 1536;
-+	case 0x6:
-+		return 2048;
-+	case 0x7:
-+		return 3072;
-+	case 0x8:
-+		return 4096;
-+	default:
-+		return -1;
-+	}
++asm volatile(
++	"	msr_s " xstr(PMBLIMITR_EL1) ", %[pmblimitr]\n"
++	"       isb\n"
++	"       mov     x10, %[loop]\n"
++	"1:     sub     x10, x10, #1\n"
++	"       ldr     x9, [%[addr]]\n"
++	"       cmp     x10, #0x0\n"
++	"       b.gt    1b\n"
++	"	bfxil   %[pmblimitr], xzr, 0, 1\n"
++	"	msr_s " xstr(PMBLIMITR_EL1) ", %[pmblimitr]\n"
++	"       isb\n"
++	:
++	: [addr] "r" (addr), [pmblimitr] "r" (pmblimitr), [loop] "r" (loop)
++	: "x8", "x9", "x10", "cc");
 +}
 +
-+static bool spe_probe(void)
++char null_buff[PAGE_SIZE] = {};
++
++static void reset(void)
 +{
-+	uint64_t pmbidr_el1, pmsidr_el1;
-+	uint8_t pmsver;
++	/* erase the profiling buffer, reset the start and limit addresses */
++	spe.pmbptr_el1 = (uint64_t)spe.buffer;
++	spe.pmblimitr_el1 = (uint64_t)(spe.buffer + PAGE_SIZE);
++	write_sysreg_s(spe.pmbptr_el1, PMBPTR_EL1);
++	write_sysreg_s(spe.pmblimitr_el1, PMBLIMITR_EL1);
++	isb();
 +
-+	pmsver = (get_id_aa64dfr0() >> ID_DFR0_PMSVER_SHIFT) & ID_DFR0_PMSVER_MASK;
++	/* Drain any buffered data */
++	psb_csync();
++	dsb(nsh);
 +
-+	report_info("PMSVer = %d", pmsver);
-+	if (!pmsver || pmsver > 2)
-+		return false;
++	memset(spe.buffer, 0, PAGE_SIZE);
 +
-+	pmbidr_el1 = read_sysreg_s(PMBIDR_EL1);
-+	if (pmbidr_el1 & PMBIDR_EL1_P) {
-+		report_info("MBIDR_EL1: Profiling buffer owned by this exception level");
-+		return false;
-+	}
++	/* reset the syndrome register */
++	write_sysreg_s(0, PMBSR_EL1);
 +
-+	spe.align = 1 << (pmbidr_el1 & PMBIDR_EL1_ALIGN_MASK);
++	/* SW must write 0 to PMSICR_EL1 before enabling sampling profiling */
++	write_sysreg_s(0, PMSICR_EL1);
 +
-+	pmsidr_el1 = read_sysreg_s(PMSIDR_EL1);
++	/* Filtering disabled */
++	write_sysreg_s(0, PMSFCR_EL1);
 +
-+	spe.min_interval = min_interval((pmsidr_el1 >> PMSIDR_EL1_INTERVAL_SHIFT) & PMSIDR_EL1_INTERVAL_MASK);
-+	spe.maxsize = 1 << ((pmsidr_el1 >> PMSIDR_EL1_MAXSIZE_SHIFT) & PMSIDR_EL1_MAXSIZE_MASK);
-+	spe.countsize = (pmsidr_el1 >> PMSIDR_EL1_COUNTSIZE_SHIFT) & PMSIDR_EL1_COUNTSIZE_MASK;
++	/* Interval Reload Register */
++	spe.pmsirr_el1 = (spe.min_interval & PMSIRR_EL1_INTERVAL_MASK) << PMSIRR_EL1_INTERVAL_SHIFT;
++	write_sysreg_s(spe.pmsirr_el1, PMSIRR_EL1);
 +
-+	spe.fl_cap = pmsidr_el1 & PMSIDR_EL1_FL;
-+	spe.ft_cap = pmsidr_el1 & PMSIDR_EL1_FT;
-+	spe.fe_cap = pmsidr_el1 & PMSIDR_EL1_FE;
++	/* Control Registrer */
++	spe.pmscr_el1 = PMSCR_EL1_E1SPE | PMSCR_EL1_TS | PMSCR_EL1_PCT | PMSCR_EL1_PA;
++	write_sysreg_s(spe.pmscr_el1, PMSCR_EL1);
 +
-+	report_info("Align= %d bytes, Min Interval=%d Single record Max Size = %d bytes",
-+			spe.align, spe.min_interval, spe.maxsize);
-+	report_info("Filtering Caps: Lat=%d Type=%d Events=%d", spe.fl_cap, spe.ft_cap, spe.fe_cap);
-+	if (spe.align == spe.maxsize) {
-+		report_info("Each record is exactly %d bytes", spe.maxsize);
-+		spe.unique_record_size = true;
-+	}
-+
-+	spe.buffer = alloc_pages(0);
-+
-+	return true;
++	/* Make sure the syndrome register is void */
++	write_sysreg_s(0, PMBSR_EL1);
 +}
 +
-+static void test_spe_introspection(void)
++static inline void drain(void)
 +{
-+	report(spe.countsize == 0x2, "PMSIDR_EL1: CountSize = 0b0010");
-+	report(spe.maxsize >= 16 && spe.maxsize <= 2048,
-+		"PMSIDR_EL1: Single record max size = %d bytes", spe.maxsize);
-+	report(spe.min_interval >= 256 && spe.min_interval <= 4096,
-+		"PMSIDR_EL1: Minimal sampling interval = %d", spe.min_interval);
++	/* ensure profiling data are written */
++	psb_csync();
++	dsb(nsh);
 +}
 +
-+#endif
-+
-+int main(int argc, char *argv[])
++static void test_spe_buffer(void)
 +{
-+	if (!spe_probe()) {
-+		printf("SPE not supported, test skipped...\n");
-+		return report_summary();
-+	}
++	uint64_t pmbsr_el1, val1, val2;
++	void *addr = malloc(10 * PAGE_SIZE);
 +
-+	if (argc < 2)
-+		report_abort("no test specified");
++	reset();
 +
-+	report_prefix_push("spe");
++	val1 = read_sysreg_s(PMBPTR_EL1);
++	val2 = read_sysreg_s(PMBLIMITR_EL1);
++	report(val1 == spe.pmbptr_el1 && val2 == spe.pmblimitr_el1,
++	       "PMBPTR_EL1, PMBLIMITR_EL1: reset");
 +
-+	if (strcmp(argv[1], "spe-introspection") == 0) {
++	val1 = read_sysreg_s(PMSIRR_EL1);
++	report(val1 == spe.pmsirr_el1, "PMSIRR_EL1: Sampling interval set to %d", spe.min_interval);
++
++	val1 = read_sysreg_s(PMSCR_EL1);
++	report(val1 == spe.pmscr_el1, "PMSCR_EL1: EL1 Statistical Profiling enabled");
++
++	val1 = read_sysreg_s(PMSFCR_EL1);
++	report(!val1, "PMSFCR_EL1: No Filter Control");
++
++	report(!memcmp(spe.buffer, null_buff, PAGE_SIZE),
++		       "Profiling buffer empty before profiling");
++
++	val1 = read_sysreg_s(PMBSR_EL1);
++	report(!val1, "PMBSR_EL1: Syndrome Register void before profiling");
++
++	mem_access_loop(addr, 1, spe.pmblimitr_el1 | PMBLIMITR_EL1_E);
++	drain();
++	val1 = read_sysreg_s(PMSICR_EL1);
++	/*
++	 * TODO: the value read in PMSICR_EL1.count currently seems not consistent with
++	 * programmed interval. Getting a good value would allow to estimate the number
++	 * of records to be collected in next step.
++	 */
++	report_info("count for a single iteration: PMSICR_EL1.count=%lld interval=%d",
++		    val1 & GENMASK_ULL(31, 0), spe.min_interval);
++
++	/* Stuff to profile */
++
++	mem_access_loop(addr, 1000000, spe.pmblimitr_el1 | PMBLIMITR_EL1_E);
++
++	/* end of stuff to profile */
++
++	drain();
++
++	report(memcmp(spe.buffer, null_buff, PAGE_SIZE), "Profiling buffer filled");
++
++	val1 = read_sysreg_s(PMBPTR_EL1);
++	val2 = val1 - (uint64_t)spe.buffer;
++	report(val1 > (uint64_t)spe.buffer,
++		"PMBPTR_EL1: Current write position has increased: 0x%lx -> 0x%lx (%ld bytes)",
++		(uint64_t)spe.buffer, val1, val2);
++	if (spe.unique_record_size)
++		report_info("This corresponds to %ld record(s) of %d bytes",
++			    val2 / spe.maxsize, spe.maxsize);
++	pmbsr_el1 = read_sysreg_s(PMBSR_EL1);
++	report(!pmbsr_el1, "PMBSR_EL1: no event");
++
++	free(addr);
++}
++
+ #endif
+ 
+ int main(int argc, char *argv[])
+@@ -156,6 +313,10 @@ int main(int argc, char *argv[])
+ 		report_prefix_push(argv[1]);
+ 		test_spe_introspection();
+ 		report_prefix_pop();
++	} else if (strcmp(argv[1], "spe-buffer") == 0) {
 +		report_prefix_push(argv[1]);
-+		test_spe_introspection();
++		test_spe_buffer();
 +		report_prefix_pop();
-+	} else {
-+		report_abort("Unknown sub-test '%s'", argv[1]);
-+	}
-+	return report_summary();
-+}
+ 	} else {
+ 		report_abort("Unknown sub-test '%s'", argv[1]);
+ 	}
 diff --git a/arm/unittests.cfg b/arm/unittests.cfg
-index f776b66..c070939 100644
+index c070939..bb0e84c 100644
 --- a/arm/unittests.cfg
 +++ b/arm/unittests.cfg
-@@ -134,6 +134,14 @@ extra_params = -append 'pmu-overflow-interrupt'
- #groups = pmu
- #accel = tcg
+@@ -142,6 +142,14 @@ extra_params = -append 'spe-introspection'
+ accel = kvm
+ arch = arm64
  
-+[spe-introspection]
++[spe-buffer]
 +file = spe.flat
 +groups = spe
 +arch = arm64
-+extra_params = -append 'spe-introspection'
++extra_params = -append 'spe-buffer'
 +accel = kvm
 +arch = arm64
 +
  # Test GIC emulation
  [gicv2-ipi]
  file = gic.flat
+diff --git a/lib/arm64/asm/barrier.h b/lib/arm64/asm/barrier.h
+index 0e1904c..f9ede15 100644
+--- a/lib/arm64/asm/barrier.h
++++ b/lib/arm64/asm/barrier.h
+@@ -23,5 +23,6 @@
+ #define smp_mb()	dmb(ish)
+ #define smp_rmb()	dmb(ishld)
+ #define smp_wmb()	dmb(ishst)
++#define psb_csync()	asm volatile("hint #17" : : : "memory")
+ 
+ #endif /* _ASMARM64_BARRIER_H_ */
 -- 
 2.21.3
 
