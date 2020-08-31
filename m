@@ -2,66 +2,71 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5D72E2579AB
-	for <lists+kvm@lfdr.de>; Mon, 31 Aug 2020 14:48:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5B3DC257A16
+	for <lists+kvm@lfdr.de>; Mon, 31 Aug 2020 15:09:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727930AbgHaMsX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 31 Aug 2020 08:48:23 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:33937 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726927AbgHaMsV (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 31 Aug 2020 08:48:21 -0400
+        id S1727843AbgHaNJ0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 31 Aug 2020 09:09:26 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:27345 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1727786AbgHaNJY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 31 Aug 2020 09:09:24 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1598878099;
+        s=mimecast20190719; t=1598879361;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=cnx3CjRYB9hGIWsNjQqszr2co7+0ihfxtc0QgvVHV+M=;
-        b=LNasvsZ7SbEDYQjMM8xGySdh47Bqssi4QRR6ArndKIreMwD47UyY/ENbizOi6N3MK23wz3
-        I7TKbXDI2orI6jBeu/uMcB2qDBnShIL7Tj7c+zuCf8IZwherbJ4BLcdrqzKtt4o/p5y9+c
-        zDg+mLx+uanv+ZI3VOSmYYDU9XzTgnE=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-484-1codpAUsPsWPQLHyynoZuQ-1; Mon, 31 Aug 2020 08:48:15 -0400
-X-MC-Unique: 1codpAUsPsWPQLHyynoZuQ-1
-Received: by mail-wr1-f69.google.com with SMTP id r15so3175982wrt.8
-        for <kvm@vger.kernel.org>; Mon, 31 Aug 2020 05:48:15 -0700 (PDT)
+        bh=l2GnCcv2WvVq5iCUqDhGffUDjlXCs353uZj6NC6srVM=;
+        b=Z/CcgAopq/6i6ULRgyXIVrRnhIm9JDBvCUJAdeGa+0yTuoQGBs0tWJV88IiDI++nIhJJ6i
+        hpAWQYlG1j4KsIrXemHcLPqm/jXD91JB2drGS8r/ryvucGj9CIbfMwzIJjFpeuixkjuYCL
+        c6JqcJp/8IyFbcCkJTGaicWG0i66eCk=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-526-RBwECqLmPfWb9yPtQ9H_-w-1; Mon, 31 Aug 2020 09:09:19 -0400
+X-MC-Unique: RBwECqLmPfWb9yPtQ9H_-w-1
+Received: by mail-wm1-f71.google.com with SMTP id c72so463453wme.4
+        for <kvm@vger.kernel.org>; Mon, 31 Aug 2020 06:09:19 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
          :message-id:mime-version;
-        bh=cnx3CjRYB9hGIWsNjQqszr2co7+0ihfxtc0QgvVHV+M=;
-        b=aAyCxCUsbOjeUmu/u0FZEVr60fnuhX7fKaZVMlonuNvrFQv3g3AUFtV8W+c27Qw324
-         ilVN6CbuvWLEeihn8SyE0M6pQ8vPwe3c5GHEDnp2K7f3JetvmeX9koigne1YTa6XpvDP
-         CiN/VDulGxiJ3l4uk/Hp9md52H1lV2c396Bugp0fhVSoUffTN+XdAvBW2nENqNBojcMH
-         JNhq+p8iYhBDv1qaw3kOLjtiHhtRb+D+ThnaoSSO7i44L74NCfI99RZGjtiSC34lb99G
-         mtR3g2Sf0fqtkWSohcMS++73DsJ8xYiTJkCqHNPFPwqKFpwuOtCCwZTctuEsr/gmllRj
-         5e8A==
-X-Gm-Message-State: AOAM530ZseR9QKhCCbjVPieVTfoiDnpxq+Nh2lDNiigkwXLosPDgPkMa
-        iewMhVA7Gdw6vBFvShtvP8wLlT3L+OqqpJmjqnH9onz1rYD2X0uBgCTyfm5FNtY2MdWcRLPsg6J
-        6l299HB2UMfOY
-X-Received: by 2002:a1c:2e17:: with SMTP id u23mr1319221wmu.73.1598878094354;
-        Mon, 31 Aug 2020 05:48:14 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwc3ks723eU0MJaIHVO/d8tt1FXCDACXwreTLs0dlEDnbVrsUC4Kux9ZLcT5gY6wvSD7o4bJg==
-X-Received: by 2002:a1c:2e17:: with SMTP id u23mr1319205wmu.73.1598878094196;
-        Mon, 31 Aug 2020 05:48:14 -0700 (PDT)
+        bh=l2GnCcv2WvVq5iCUqDhGffUDjlXCs353uZj6NC6srVM=;
+        b=ImcXIxZ8qlCSi1FIHUY+3yZra6fQVWaz6ZNjXoBsSWY6Sj6nSpAfy7PDU3oqxV+lYT
+         k3sdVrvGcNg1x2gCMwIWpac2Q4JowTGpKs2Hg41Q+eN7z11ivsQFECimuvaTZIkQUK0m
+         RDIuHLouH7429vtsuiEaBkP29YFKGZlOzo3YezTLLrRdwSmTwoEnmwHJBN9RuR6Ab0JQ
+         dgD6/WSUzaVjLVGkPrf/omAGeAAREQrmpp38L89Zv8KTFn8oV5JYN/qRyNTfuPOdIfD6
+         HSDXXi8DTN65V3DPw0oHiTmMAvHlzYGiatplCBlqX7aCWfBnXnOHhLWTla8Oy4Q8JJIF
+         5KWA==
+X-Gm-Message-State: AOAM532F3MW3XIc6zEFK15EehwpmRwJ6iTFulegKuZ3r8OCEov7Z7foa
+        5S17thVNnpRJkGk/XFZUTegwSaDzDhuqh2QH9w7TKIluv7YURYDHoozmAur97AKRWbhe7ji6wZ1
+        LJfFn03nFCBOr
+X-Received: by 2002:adf:cc8c:: with SMTP id p12mr1710325wrj.92.1598879357917;
+        Mon, 31 Aug 2020 06:09:17 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJx/1+vKHyvkY7iAfm+ukdoRDuyURSwkR27pytCRbfzdoM7lD9CNUTZ+Lt7aTkXhxMzxGsxqHA==
+X-Received: by 2002:adf:cc8c:: with SMTP id p12mr1710303wrj.92.1598879357649;
+        Mon, 31 Aug 2020 06:09:17 -0700 (PDT)
 Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id 62sm12384616wre.60.2020.08.31.05.48.13
+        by smtp.gmail.com with ESMTPSA id k184sm11767549wme.1.2020.08.31.06.09.16
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 31 Aug 2020 05:48:13 -0700 (PDT)
+        Mon, 31 Aug 2020 06:09:16 -0700 (PDT)
 From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Wanpeng Li <kernellwp@gmail.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
+To:     Lai Jiangshan <jiangshanlai@gmail.com>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     Lai Jiangshan <laijs@linux.alibaba.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>
-Subject: Re: [PATCH] KVM: LAPIC: Reset timer_advance_ns if timer mode switch
-In-Reply-To: <1598578508-14134-1-git-send-email-wanpengli@tencent.com>
-References: <1598578508-14134-1-git-send-email-wanpengli@tencent.com>
-Date:   Mon, 31 Aug 2020 14:48:12 +0200
-Message-ID: <87a6ybx9pv.fsf@vitty.brq.redhat.com>
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        X86 ML <x86@kernel.org>, "H. Peter Anvin" <hpa@zytor.com>,
+        kvm@vger.kernel.org
+Subject: Re: [PATCH] kvm x86/mmu: use KVM_REQ_MMU_SYNC to sync when needed
+In-Reply-To: <CAJhGHyC1Ykq5V_2nFPLRz9JmtAiQu6aw4fCKo1LO7Qwzjvfg2g@mail.gmail.com>
+References: <20200824101825.4106-1-jiangshanlai@gmail.com> <CAJhGHyC1Ykq5V_2nFPLRz9JmtAiQu6aw4fCKo1LO7Qwzjvfg2g@mail.gmail.com>
+Date:   Mon, 31 Aug 2020 15:09:15 +0200
+Message-ID: <875z8zx8qs.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 Sender: kvm-owner@vger.kernel.org
@@ -69,50 +74,54 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Wanpeng Li <kernellwp@gmail.com> writes:
+Lai Jiangshan <jiangshanlai@gmail.com> writes:
 
-> From: Wanpeng Li <wanpengli@tencent.com>
+> Ping @Sean Christopherson
 >
-> per-vCPU timer_advance_ns should be set to 0 if timer mode is not tscdeadline 
-> otherwise we waste cpu cycles in the function lapic_timer_int_injected(), 
 
-lapic_timer_int_injected is just a test, kvm_wait_lapic_expire()
-(__kvm_wait_lapic_expire()) maybe?
+Let's try 'Beetlejuice' instead :-)
 
-> especially on AMD platform which doesn't support tscdeadline mode. We can 
-> reset timer_advance_ns to the initial value if switch back to
-> tscdealine
+> On Mon, Aug 24, 2020 at 5:18 PM Lai Jiangshan <jiangshanlai@gmail.com> wrote:
+>>
+>> From: Lai Jiangshan <laijs@linux.alibaba.com>
+>>
+>> 8c8560b83390("KVM: x86/mmu: Use KVM_REQ_TLB_FLUSH_CURRENT for MMU specific flushes)
+>> changed it without giving any reason in the changelog.
+>>
+>> In theory, the syncing is needed, and need to be fixed by reverting
+>> this part of change.
 
-'tscdeadline'
+Even if the original commit is not wordy enough this is hardly
+better. Are you seeing a particular scenario when a change in current
+vCPU's MMU requires flushing TLB entries for *other* contexts, ... (see
+below)
 
-> timer mode.
+>>
+>> Signed-off-by: Lai Jiangshan <laijs@linux.alibaba.com>
+>> ---
+>>  arch/x86/kvm/mmu/mmu.c | 2 +-
+>>  1 file changed, 1 insertion(+), 1 deletion(-)
+>>
+>> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+>> index 4e03841f053d..9a93de921f2b 100644
+>> --- a/arch/x86/kvm/mmu/mmu.c
+>> +++ b/arch/x86/kvm/mmu/mmu.c
+>> @@ -2468,7 +2468,7 @@ static struct kvm_mmu_page *kvm_mmu_get_page(struct kvm_vcpu *vcpu,
+>>                 }
+>>
+>>                 if (sp->unsync_children)
+>> -                       kvm_make_request(KVM_REQ_TLB_FLUSH_CURRENT, vcpu);
+>> +                       kvm_make_request(KVM_REQ_MMU_SYNC, vcpu);
+
+... in particular, why are you reverting only this hunk? Please elaborate.
+
+>>
+>>                 __clear_sp_write_flooding_count(sp);
+>>
+>> --
+>> 2.19.1.6.gb485710b
+>>
 >
-> Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
-> ---
->  arch/x86/kvm/lapic.c | 6 ++++++
->  1 file changed, 6 insertions(+)
->
-> diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-> index 654649b..abc296d 100644
-> --- a/arch/x86/kvm/lapic.c
-> +++ b/arch/x86/kvm/lapic.c
-> @@ -1499,10 +1499,16 @@ static void apic_update_lvtt(struct kvm_lapic *apic)
->  			kvm_lapic_set_reg(apic, APIC_TMICT, 0);
->  			apic->lapic_timer.period = 0;
->  			apic->lapic_timer.tscdeadline = 0;
-> +			if (timer_mode == APIC_LVT_TIMER_TSCDEADLINE &&
-> +				lapic_timer_advance_dynamic)
-> +				apic->lapic_timer.timer_advance_ns = LAPIC_TIMER_ADVANCE_NS_INIT;
->  		}
->  		apic->lapic_timer.timer_mode = timer_mode;
->  		limit_periodic_timer_frequency(apic);
->  	}
-> +	if (timer_mode != APIC_LVT_TIMER_TSCDEADLINE &&
-> +		lapic_timer_advance_dynamic)
-> +		apic->lapic_timer.timer_advance_ns = 0;
->  }
->  
->  /*
 
 -- 
 Vitaly
