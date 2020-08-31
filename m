@@ -2,96 +2,176 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C8EBE2571DB
-	for <lists+kvm@lfdr.de>; Mon, 31 Aug 2020 04:29:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B16E52571E9
+	for <lists+kvm@lfdr.de>; Mon, 31 Aug 2020 04:39:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726858AbgHaC3J (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 30 Aug 2020 22:29:09 -0400
-Received: from mga01.intel.com ([192.55.52.88]:10698 "EHLO mga01.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726573AbgHaC3I (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 30 Aug 2020 22:29:08 -0400
-IronPort-SDR: Dbx3VU381Xa/aXxoVCgl88rZ6e72FhZPLkGEztSfNJfTc347QDwan0j5RtQoS8OoQLFgXk1dpK
- yk1vPSt+7S6g==
-X-IronPort-AV: E=McAfee;i="6000,8403,9729"; a="174949925"
-X-IronPort-AV: E=Sophos;i="5.76,374,1592895600"; 
-   d="scan'208";a="174949925"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Aug 2020 19:29:08 -0700
-IronPort-SDR: ig9Ov0e8B3bxE6l4ZMN9kDsqPqnIUQfDWZOo78hcn2EvtXM78vLfiJCEIXeA19KEqWefq21b3T
- Af+2Zw1v2Nog==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.76,374,1592895600"; 
-   d="scan'208";a="330557019"
-Received: from joy-optiplex-7040.sh.intel.com (HELO joy-OptiPlex-7040) ([10.239.13.16])
-  by orsmga008.jf.intel.com with ESMTP; 30 Aug 2020 19:29:02 -0700
-Date:   Mon, 31 Aug 2020 10:23:38 +0800
-From:   Yan Zhao <yan.y.zhao@intel.com>
-To:     Cornelia Huck <cohuck@redhat.com>
-Cc:     kvm@vger.kernel.org, libvir-list@redhat.com,
-        Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org,
-        kwankhede@nvidia.com, eauger@redhat.com, xin-ran.wang@intel.com,
-        corbet@lwn.net, openstack-discuss@lists.openstack.org,
-        shaohe.feng@intel.com, kevin.tian@intel.com,
-        Parav Pandit <parav@mellanox.com>, jian-feng.ding@intel.com,
-        dgilbert@redhat.com, zhenyuw@linux.intel.com, hejie.xu@intel.com,
-        bao.yumeng@zte.com.cn,
-        Alex Williamson <alex.williamson@redhat.com>,
-        smooney@redhat.com, intel-gvt-dev@lists.freedesktop.org,
-        Daniel =?iso-8859-1?Q?P=2EBerrang=E9?= <berrange@redhat.com>,
-        eskultet@redhat.com, Jiri Pirko <jiri@mellanox.com>,
-        dinechin@redhat.com, devel@ovirt.org
-Subject: Re: device compatibility interface for live migration with assigned
- devices
-Message-ID: <20200831022338.GA13784@joy-OptiPlex-7040>
-Reply-To: Yan Zhao <yan.y.zhao@intel.com>
-References: <20200818085527.GB20215@redhat.com>
- <3a073222-dcfe-c02d-198b-29f6a507b2e1@redhat.com>
- <20200818091628.GC20215@redhat.com>
- <20200818113652.5d81a392.cohuck@redhat.com>
- <20200820003922.GE21172@joy-OptiPlex-7040>
- <20200819212234.223667b3@x1.home>
- <20200820031621.GA24997@joy-OptiPlex-7040>
- <20200825163925.1c19b0f0.cohuck@redhat.com>
- <20200826064117.GA22243@joy-OptiPlex-7040>
- <20200828154741.30cfc1a3.cohuck@redhat.com>
+        id S1726960AbgHaCjs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 30 Aug 2020 22:39:48 -0400
+Received: from szxga02-in.huawei.com ([45.249.212.188]:3080 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726695AbgHaCjr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 30 Aug 2020 22:39:47 -0400
+Received: from DGGEMM403-HUB.china.huawei.com (unknown [172.30.72.56])
+        by Forcepoint Email with ESMTP id 7B494EEB1E8EDA7F4D5F;
+        Mon, 31 Aug 2020 10:39:42 +0800 (CST)
+Received: from DGGEMM421-HUB.china.huawei.com (10.1.198.38) by
+ DGGEMM403-HUB.china.huawei.com (10.3.20.211) with Microsoft SMTP Server (TLS)
+ id 14.3.487.0; Mon, 31 Aug 2020 10:39:42 +0800
+Received: from DGGEMM525-MBS.china.huawei.com ([169.254.5.119]) by
+ dggemm421-hub.china.huawei.com ([10.1.198.38]) with mapi id 14.03.0487.000;
+ Mon, 31 Aug 2020 10:39:35 +0800
+From:   Jiangyifei <jiangyifei@huawei.com>
+To:     Anup Patel <anup@brainfault.org>
+CC:     Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        Anup Patel <anup.patel@wdc.com>,
+        Alistair Francis <alistair.francis@wdc.com>,
+        "Atish Patra" <atish.patra@wdc.com>,
+        "deepa.kernel@gmail.com" <deepa.kernel@gmail.com>,
+        "kvm-riscv@lists.infradead.org" <kvm-riscv@lists.infradead.org>,
+        KVM General <kvm@vger.kernel.org>,
+        linux-riscv <linux-riscv@lists.infradead.org>,
+        "linux-kernel@vger.kernel.org List" <linux-kernel@vger.kernel.org>,
+        "Zhangxiaofeng (F)" <victor.zhangxiaofeng@huawei.com>,
+        "Wubin (H)" <wu.wubin@huawei.com>,
+        Zhanghailiang <zhang.zhanghailiang@huawei.com>,
+        "dengkai (A)" <dengkai1@huawei.com>,
+        yinyipeng <yinyipeng1@huawei.com>,
+        "zhaosiqi (A)" <zhaosiqi3@huawei.com>
+Subject: RE: [PATCH RFC 2/2] target/kvm: Add interfaces needed for log dirty
+Thread-Topic: [PATCH RFC 2/2] target/kvm: Add interfaces needed for log dirty
+Thread-Index: AQHWfEtmTyNMW66okESUbG9EQ0iVQKlMb8AAgAUV7AA=
+Date:   Mon, 31 Aug 2020 02:39:35 +0000
+Message-ID: <3915816D913D8241BB43E932213F57D4ADD8F34F@dggemm525-mbs.china.huawei.com>
+References: <20200827082251.1591-1-jiangyifei@huawei.com>
+ <20200827082251.1591-3-jiangyifei@huawei.com>
+ <CAAhSdy36ZCubU-1+WzjMzBaR+RipgEhvRqd9AT+28=99-EUDaQ@mail.gmail.com>
+In-Reply-To: <CAAhSdy36ZCubU-1+WzjMzBaR+RipgEhvRqd9AT+28=99-EUDaQ@mail.gmail.com>
+Accept-Language: zh-CN, en-US
+Content-Language: zh-CN
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.174.187.31]
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200828154741.30cfc1a3.cohuck@redhat.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
+X-CFilter-Loop: Reflected
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Aug 28, 2020 at 03:47:41PM +0200, Cornelia Huck wrote:
-> On Wed, 26 Aug 2020 14:41:17 +0800
-> Yan Zhao <yan.y.zhao@intel.com> wrote:
-> 
-> > previously, we want to regard the two mdevs created with dsa-1dwq x 30 and
-> > dsa-2dwq x 15 as compatible, because the two mdevs consist equal resources.
-> > 
-> > But, as it's a burden to upper layer, we agree that if this condition
-> > happens, we still treat the two as incompatible.
-> > 
-> > To fix it, either the driver should expose dsa-1dwq only, or the target
-> > dsa-2dwq needs to be destroyed and reallocated via dsa-1dwq x 30.
-> 
-> AFAIU, these are mdev types, aren't they? So, basically, any management
-> software needs to take care to use the matching mdev type on the target
-> system for device creation?
-dsa-1dwq is the mdev type.
-there's no dsa-2dwq yet. and I think no dsa-2dwq should be provided in
-future according to our discussion.
-
-GVT currently does not support aggregator also.
-how to add the the aggregator attribute is currently uder discussion,
-and up to now it is recommended to be a vendor specific attributes.
-
-https://lists.freedesktop.org/archives/intel-gvt-dev/2020-July/006854.html.
-
-Thanks
-Yan
+DQo+IC0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQo+IEZyb206IEFudXAgUGF0ZWwgW21haWx0
+bzphbnVwQGJyYWluZmF1bHQub3JnXQ0KPiBTZW50OiBGcmlkYXksIEF1Z3VzdCAyOCwgMjAyMCAx
+Mjo1NCBQTQ0KPiBUbzogSmlhbmd5aWZlaSA8amlhbmd5aWZlaUBodWF3ZWkuY29tPg0KPiBDYzog
+UGF1bCBXYWxtc2xleSA8cGF1bC53YWxtc2xleUBzaWZpdmUuY29tPjsgUGFsbWVyIERhYmJlbHQN
+Cj4gPHBhbG1lckBkYWJiZWx0LmNvbT47IEFsYmVydCBPdSA8YW91QGVlY3MuYmVya2VsZXkuZWR1
+PjsgQW51cCBQYXRlbA0KPiA8YW51cC5wYXRlbEB3ZGMuY29tPjsgQWxpc3RhaXIgRnJhbmNpcyA8
+YWxpc3RhaXIuZnJhbmNpc0B3ZGMuY29tPjsgQXRpc2gNCj4gUGF0cmEgPGF0aXNoLnBhdHJhQHdk
+Yy5jb20+OyBkZWVwYS5rZXJuZWxAZ21haWwuY29tOw0KPiBrdm0tcmlzY3ZAbGlzdHMuaW5mcmFk
+ZWFkLm9yZzsgS1ZNIEdlbmVyYWwgPGt2bUB2Z2VyLmtlcm5lbC5vcmc+Ow0KPiBsaW51eC1yaXNj
+diA8bGludXgtcmlzY3ZAbGlzdHMuaW5mcmFkZWFkLm9yZz47IGxpbnV4LWtlcm5lbEB2Z2VyLmtl
+cm5lbC5vcmcgTGlzdA0KPiA8bGludXgta2VybmVsQHZnZXIua2VybmVsLm9yZz47IFpoYW5neGlh
+b2ZlbmcgKEYpDQo+IDx2aWN0b3Iuemhhbmd4aWFvZmVuZ0BodWF3ZWkuY29tPjsgV3ViaW4gKEgp
+IDx3dS53dWJpbkBodWF3ZWkuY29tPjsNCj4gWmhhbmdoYWlsaWFuZyA8emhhbmcuemhhbmdoYWls
+aWFuZ0BodWF3ZWkuY29tPjsgZGVuZ2thaSAoQSkNCj4gPGRlbmdrYWkxQGh1YXdlaS5jb20+OyB5
+aW55aXBlbmcgPHlpbnlpcGVuZzFAaHVhd2VpLmNvbT4NCj4gU3ViamVjdDogUmU6IFtQQVRDSCBS
+RkMgMi8yXSB0YXJnZXQva3ZtOiBBZGQgaW50ZXJmYWNlcyBuZWVkZWQgZm9yIGxvZyBkaXJ0eQ0K
+PiANCj4gT24gVGh1LCBBdWcgMjcsIDIwMjAgYXQgMTo1NCBQTSBZaWZlaSBKaWFuZyA8amlhbmd5
+aWZlaUBodWF3ZWkuY29tPiB3cm90ZToNCj4gPg0KPiA+IEFkZCB0d28gaW50ZXJmYWNlcyBvZiBs
+b2cgZGlydHkgZm9yIGt2bV9tYWluLmMsIGFuZCBkZXRlbGUgdGhlDQo+ID4gaW50ZXJmYWNlIGt2
+bV92bV9pb2N0bF9nZXRfZGlydHlfbG9nIHdoaWNoIGlzIHJlZHVuZGFudGx5IGRlZmluZWQuDQo+
+ID4NCj4gPiBDT05GSUdfS1ZNX0dFTkVSSUNfRElSVFlMT0dfUkVBRF9QUk9URUNUIGlzIGFkZGVk
+IGluIGRlZmNvbmZpZy4NCj4gPg0KPiA+IFNpZ25lZC1vZmYtYnk6IFlpZmVpIEppYW5nIDxqaWFu
+Z3lpZmVpQGh1YXdlaS5jb20+DQo+ID4gU2lnbmVkLW9mZi1ieTogWWlwZW5nIFlpbiA8eWlueWlw
+ZW5nMUBodWF3ZWkuY29tPg0KPiA+IC0tLQ0KPiA+ICBhcmNoL3Jpc2N2L2NvbmZpZ3MvZGVmY29u
+ZmlnIHwgIDEgKw0KPiA+ICBhcmNoL3Jpc2N2L2t2bS9LY29uZmlnICAgICAgIHwgIDEgKw0KPiA+
+ICBhcmNoL3Jpc2N2L2t2bS9tbXUuYyAgICAgICAgIHwgNDMNCj4gKysrKysrKysrKysrKysrKysr
+KysrKysrKysrKysrKysrKysrDQo+ID4gIGFyY2gvcmlzY3Yva3ZtL3ZtLmMgICAgICAgICAgfCAg
+NiAtLS0tLQ0KPiA+ICA0IGZpbGVzIGNoYW5nZWQsIDQ1IGluc2VydGlvbnMoKyksIDYgZGVsZXRp
+b25zKC0pDQo+ID4NCj4gPiBkaWZmIC0tZ2l0IGEvYXJjaC9yaXNjdi9jb25maWdzL2RlZmNvbmZp
+Zw0KPiA+IGIvYXJjaC9yaXNjdi9jb25maWdzL2RlZmNvbmZpZyBpbmRleCBkMzZlMTAwMGJiZDMu
+Ljg1N2Q3OTk2NzJjMiAxMDA2NDQNCj4gPiAtLS0gYS9hcmNoL3Jpc2N2L2NvbmZpZ3MvZGVmY29u
+ZmlnDQo+ID4gKysrIGIvYXJjaC9yaXNjdi9jb25maWdzL2RlZmNvbmZpZw0KPiA+IEBAIC0xOSw2
+ICsxOSw3IEBAIENPTkZJR19TT0NfVklSVD15DQo+ID4gIENPTkZJR19TTVA9eQ0KPiA+ICBDT05G
+SUdfVklSVFVBTElaQVRJT049eQ0KPiA+ICBDT05GSUdfS1ZNPXkNCj4gPiArQ09ORklHX0tWTV9H
+RU5FUklDX0RJUlRZTE9HX1JFQURfUFJPVEVDVD15DQo+ID4gIENPTkZJR19IT1RQTFVHX0NQVT15
+DQo+ID4gIENPTkZJR19NT0RVTEVTPXkNCj4gPiAgQ09ORklHX01PRFVMRV9VTkxPQUQ9eQ0KPiA+
+IGRpZmYgLS1naXQgYS9hcmNoL3Jpc2N2L2t2bS9LY29uZmlnIGIvYXJjaC9yaXNjdi9rdm0vS2Nv
+bmZpZyBpbmRleA0KPiA+IDIzNTZkYzUyZWJiMy4uOTFmY2ZmYzcwZTVkIDEwMDY0NA0KPiA+IC0t
+LSBhL2FyY2gvcmlzY3Yva3ZtL0tjb25maWcNCj4gPiArKysgYi9hcmNoL3Jpc2N2L2t2bS9LY29u
+ZmlnDQo+ID4gQEAgLTI2LDYgKzI2LDcgQEAgY29uZmlnIEtWTQ0KPiA+ICAgICAgICAgc2VsZWN0
+IEtWTV9NTUlPDQo+ID4gICAgICAgICBzZWxlY3QgSEFWRV9LVk1fVkNQVV9BU1lOQ19JT0NUTA0K
+PiA+ICAgICAgICAgc2VsZWN0IFNSQ1UNCj4gPiArICAgICAgIHNlbGVjdCBLVk1fR0VORVJJQ19E
+SVJUWUxPR19SRUFEX1BST1RFQ1QNCj4gPiAgICAgICAgIGhlbHANCj4gPiAgICAgICAgICAgU3Vw
+cG9ydCBob3N0aW5nIHZpcnR1YWxpemVkIGd1ZXN0IG1hY2hpbmVzLg0KPiA+DQo+ID4gZGlmZiAt
+LWdpdCBhL2FyY2gvcmlzY3Yva3ZtL21tdS5jIGIvYXJjaC9yaXNjdi9rdm0vbW11LmMgaW5kZXgN
+Cj4gPiA4OGJjZTgwZWU5ODMuLmRmMmE0NzBjMjVlNCAxMDA2NDQNCj4gPiAtLS0gYS9hcmNoL3Jp
+c2N2L2t2bS9tbXUuYw0KPiA+ICsrKyBiL2FyY2gvcmlzY3Yva3ZtL21tdS5jDQo+ID4gQEAgLTM1
+OCw2ICszNTgsNDMgQEAgdm9pZCBzdGFnZTJfd3BfbWVtb3J5X3JlZ2lvbihzdHJ1Y3Qga3ZtICpr
+dm0sDQo+IGludCBzbG90KQ0KPiA+ICAgICAgICAga3ZtX2ZsdXNoX3JlbW90ZV90bGJzKGt2bSk7
+DQo+ID4gIH0NCj4gPg0KPiA+ICsvKioNCj4gPiArICoga3ZtX21tdV93cml0ZV9wcm90ZWN0X3B0
+X21hc2tlZCgpIC0gd3JpdGUgcHJvdGVjdCBkaXJ0eSBwYWdlcw0KPiA+ICsgKiBAa3ZtOiAgICBU
+aGUgS1ZNIHBvaW50ZXINCj4gPiArICogQHNsb3Q6ICAgVGhlIG1lbW9yeSBzbG90IGFzc29jaWF0
+ZWQgd2l0aCBtYXNrDQo+ID4gKyAqIEBnZm5fb2Zmc2V0OiBUaGUgZ2ZuIG9mZnNldCBpbiBtZW1v
+cnkgc2xvdA0KPiA+ICsgKiBAbWFzazogICBUaGUgbWFzayBvZiBkaXJ0eSBwYWdlcyBhdCBvZmZz
+ZXQgJ2dmbl9vZmZzZXQnIGluIHRoaXMgbWVtb3J5DQo+ID4gKyAqICAgICAgc2xvdCB0byBiZSB3
+cml0ZSBwcm90ZWN0ZWQNCj4gPiArICoNCj4gPiArICogV2Fsa3MgYml0cyBzZXQgaW4gbWFzayB3
+cml0ZSBwcm90ZWN0cyB0aGUgYXNzb2NpYXRlZCBwdGUncy4gQ2FsbGVyDQo+ID4gK211c3QNCj4g
+PiArICogYWNxdWlyZSBrdm1fbW11X2xvY2suDQo+ID4gKyAqLw0KPiA+ICtzdGF0aWMgdm9pZCBr
+dm1fbW11X3dyaXRlX3Byb3RlY3RfcHRfbWFza2VkKHN0cnVjdCBrdm0gKmt2bSwNCj4gPiArICAg
+ICAgICBzdHJ1Y3Qga3ZtX21lbW9yeV9zbG90ICpzbG90LA0KPiA+ICsgICAgICAgIGdmbl90IGdm
+bl9vZmZzZXQsIHVuc2lnbmVkIGxvbmcgbWFzaykgew0KPiA+ICsgICAgcGh5c19hZGRyX3QgYmFz
+ZV9nZm4gPSBzbG90LT5iYXNlX2dmbiArIGdmbl9vZmZzZXQ7DQo+ID4gKyAgICBwaHlzX2FkZHJf
+dCBzdGFydCA9IChiYXNlX2dmbiArICBfX2ZmcyhtYXNrKSkgPDwgUEFHRV9TSElGVDsNCj4gPiAr
+ICAgIHBoeXNfYWRkcl90IGVuZCA9IChiYXNlX2dmbiArIF9fZmxzKG1hc2spICsgMSkgPDwgUEFH
+RV9TSElGVDsNCj4gPiArDQo+ID4gKyAgICBzdGFnZTJfd3BfcmFuZ2Uoa3ZtLCBzdGFydCwgZW5k
+KTsgfQ0KPiA+ICsNCj4gPiArLyoNCj4gPiArICoga3ZtX2FyY2hfbW11X2VuYWJsZV9sb2dfZGly
+dHlfcHRfbWFza2VkIC0gZW5hYmxlIGRpcnR5IGxvZ2dpbmcgZm9yDQo+ID4gK3NlbGVjdGVkDQo+
+ID4gKyAqIGRpcnR5IHBhZ2VzLg0KPiA+ICsgKg0KPiA+ICsgKiBJdCBjYWxscyBrdm1fbW11X3dy
+aXRlX3Byb3RlY3RfcHRfbWFza2VkIHRvIHdyaXRlIHByb3RlY3Qgc2VsZWN0ZWQNCj4gPiArcGFn
+ZXMgdG8NCj4gPiArICogZW5hYmxlIGRpcnR5IGxvZ2dpbmcgZm9yIHRoZW0uDQo+ID4gKyAqLw0K
+PiA+ICt2b2lkIGt2bV9hcmNoX21tdV9lbmFibGVfbG9nX2RpcnR5X3B0X21hc2tlZChzdHJ1Y3Qg
+a3ZtICprdm0sDQo+ID4gKyAgICAgICAgc3RydWN0IGt2bV9tZW1vcnlfc2xvdCAqc2xvdCwNCj4g
+PiArICAgICAgICBnZm5fdCBnZm5fb2Zmc2V0LCB1bnNpZ25lZCBsb25nIG1hc2spIHsNCj4gPiAr
+ICAgIGt2bV9tbXVfd3JpdGVfcHJvdGVjdF9wdF9tYXNrZWQoa3ZtLCBzbG90LCBnZm5fb2Zmc2V0
+LCBtYXNrKTsgfQ0KPiA+ICsNCj4gPiArDQo+ID4gIGludCBzdGFnZTJfaW9yZW1hcChzdHJ1Y3Qg
+a3ZtICprdm0sIGdwYV90IGdwYSwgcGh5c19hZGRyX3QgaHBhLA0KPiA+ICAgICAgICAgICAgICAg
+ICAgICB1bnNpZ25lZCBsb25nIHNpemUsIGJvb2wgd3JpdGFibGUpICB7IEBAIC00MzMsNg0KPiA+
+ICs0NzAsMTIgQEAgdm9pZCBrdm1fYXJjaF9zeW5jX2RpcnR5X2xvZyhzdHJ1Y3Qga3ZtICprdm0s
+IHN0cnVjdA0KPiA+IGt2bV9tZW1vcnlfc2xvdCAqbWVtc2xvdCkgIHsgIH0NCj4gPg0KPiA+ICt2
+b2lkIGt2bV9hcmNoX2ZsdXNoX3JlbW90ZV90bGJzX21lbXNsb3Qoc3RydWN0IGt2bSAqa3ZtLA0K
+PiA+ICsgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBzdHJ1Y3Qga3ZtX21l
+bW9yeV9zbG90DQo+ID4gKyptZW1zbG90KSB7DQo+ID4gKyAgICAgICBrdm1fZmx1c2hfcmVtb3Rl
+X3RsYnMoa3ZtKTsNCj4gPiArfQ0KPiA+ICsNCj4gPiAgdm9pZCBrdm1fYXJjaF9mcmVlX21lbXNs
+b3Qoc3RydWN0IGt2bSAqa3ZtLCBzdHJ1Y3Qga3ZtX21lbW9yeV9zbG90DQo+ID4gKmZyZWUpICB7
+ICB9IGRpZmYgLS1naXQgYS9hcmNoL3Jpc2N2L2t2bS92bS5jIGIvYXJjaC9yaXNjdi9rdm0vdm0u
+Yw0KPiA+IGluZGV4IDRmMjQ5ODE5OGNiNS4uZjc0MDU2NzY5MDNiIDEwMDY0NA0KPiA+IC0tLSBh
+L2FyY2gvcmlzY3Yva3ZtL3ZtLmMNCj4gPiArKysgYi9hcmNoL3Jpc2N2L2t2bS92bS5jDQo+ID4g
+QEAgLTEyLDEyICsxMiw2IEBADQo+ID4gICNpbmNsdWRlIDxsaW51eC91YWNjZXNzLmg+DQo+ID4g
+ICNpbmNsdWRlIDxsaW51eC9rdm1faG9zdC5oPg0KPiA+DQo+ID4gLWludCBrdm1fdm1faW9jdGxf
+Z2V0X2RpcnR5X2xvZyhzdHJ1Y3Qga3ZtICprdm0sIHN0cnVjdCBrdm1fZGlydHlfbG9nDQo+ID4g
+KmxvZykgLXsNCj4gPiAtICAgICAgIC8qIFRPRE86IFRvIGJlIGFkZGVkIGxhdGVyLiAqLw0KPiA+
+IC0gICAgICAgcmV0dXJuIC1FTk9UU1VQUDsNCj4gPiAtfQ0KPiA+IC0NCj4gPiAgaW50IGt2bV9h
+cmNoX2luaXRfdm0oc3RydWN0IGt2bSAqa3ZtLCB1bnNpZ25lZCBsb25nIHR5cGUpICB7DQo+ID4g
+ICAgICAgICBpbnQgcjsNCj4gPiAtLQ0KPiA+IDIuMTkuMQ0KPiA+DQo+ID4NCj4gDQo+IEkgYWxy
+ZWFkeSBoYXZlIGEgc2ltaWxhciBjaGFuZ2UgYXMgcGFydCBvZiB2MTQgS1ZNIFJJU0MtViBzZXJp
+ZXMuDQo+IA0KPiBMZXQgdXMgY29vcmRpbmF0ZSBiZXR0ZXIuIFBsZWFzZSBsZXQgdXMga25vdyBp
+bi1hZHZhbmNlIGZvciBhbnkgS1ZNIFJJU0MtVg0KPiBmZWF0dXJlIHlvdSBwbGFuIHRvIHdvcmsg
+b24uIE90aGVyd2lzZSwgdGhpcyBsZWFkcyB0byBlZmZvcnRzIHdhc3RlZCBhdCB5b3VyDQo+IGVu
+ZCBvciBhdCBvdXIgZW5kLg0KPiANCj4gUmVnYXJkcywNCj4gQW51cA0KDQpIaSBBbnVwLA0KDQpU
+aGFua3MgZm9yIGFjY2VwdGluZyBvdXIgcGF0Y2hlcy4NCg0KSW4gdGhlIG5leHQgZmV3IHdlZWtz
+IHdlIHBsYW4gdG8gd29yayBvbiB0aGUgZm9sbG93aW5nOg0KMS4gbWVtb3J5IHJldmVyc2UgbWFw
+cGluZyAocm1hcCksIHJlbGF0ZWQgdG8gbWlncmF0aW9uLg0KMi4gaXJxZmQuDQozLiBpbXBsbWVu
+dGFpb24gcmVsYXRlZCB0byB0aGUgZGVkaWNhdGVkIGNsb2NrIGV2ZW50IHNvdXJjZSBwcm9wb3Nh
+bC4NCg0KQmVzaWRlcywgd2UgYXJlIGF3YXJlIG9mIHRoYXQgeW91IGFyZSB3b3JraW5nIG9uIGly
+cSBjaGlwIGVtdWxhdGlvbiBpbiBLVk0uIE1lYW53aGlsZSwgb3VyIGltcGxlbWVudGFpdG9uIG9m
+IGlycWZkIGFuZCB0aGUgY2xvY2sgZXZlbnQgc291cmNlIGhhcyBkZXBlbmRlbmN5IG9uIHRoZSBp
+cnEgY2hpcCBhbmQgd2UgbWF5IHdlbGwgbW9kaWZ5IHRoZSBpcnEgY2hpcCBlbXVsYXRpb24gY29k
+ZS4gU28gY291bGQgeW91IHNoYXJlIHdpdGggdXMgYW55IGlkZWFzLCBwbGFucyBvciBwcm9ncmVz
+cyByZWdhcmRpbmcgeW91ciB3b3JrIHNpbmNlIHRoZXJlIG1pZ2h0IGJlIHBvdGVudGlhbCBjb2xs
+aXNpb24/DQoNCkxldCdzIHN0YXkgaW4gdG91Y2ggaW4gdGhlIGxvbmcgcnVuIGFuZCBjb29kaW5h
+dGUgYmV0dGVyLiBCVFcsIGNvdWxkIHlvdSBzaGFyZSB3aXRoIHVzIGlmIHRoZXJlJ3MgYW55IHJl
+Z3VsYXIgZGlzY3Vzc2lvbiBzZXNzaW9ucyBmb2N1c2VkIG9uIFJJU0MtViBLVk0/DQoNClJlZ2Fy
+ZHMsDQpZaWZlaQ0K
