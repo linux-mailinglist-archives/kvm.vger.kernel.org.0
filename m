@@ -2,86 +2,93 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B545E258627
-	for <lists+kvm@lfdr.de>; Tue,  1 Sep 2020 05:25:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EEB8D258630
+	for <lists+kvm@lfdr.de>; Tue,  1 Sep 2020 05:27:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726192AbgIADZO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 31 Aug 2020 23:25:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55242 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725987AbgIADZO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 31 Aug 2020 23:25:14 -0400
-Received: from mail-oi1-x244.google.com (mail-oi1-x244.google.com [IPv6:2607:f8b0:4864:20::244])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 65B33C0612FE;
-        Mon, 31 Aug 2020 20:25:13 -0700 (PDT)
-Received: by mail-oi1-x244.google.com with SMTP id j21so2935301oii.10;
-        Mon, 31 Aug 2020 20:25:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=WswF+eY/uav4Y6QJBkqqfte8Y8u+EHxBxZsHaGmjFJY=;
-        b=jsAI596KQhVTKEwRIlLDcd0UBrvQ6A4UALEQdAbroJcdY5MRb35wWEcLhhkiS1ykB4
-         GEf9UTpSeGmk666SqUcAYtaseiK/ULBT1Thal+Ze6vb0VjggYUONHCYDJ1ZPFaK/0h7X
-         9qu4ZqsFs92C3Qbm+PnmFQRoRruHxvYaFDfah1O/DLkzV/NS690bKkFSShHxqu/+sutu
-         55nfQSfYyQ9vXOzQr7KFwMmPIwGJn30frbRsH0YLZfh2PxQ2482wv52jHGKlkroGKYkZ
-         sRL7eZQW7T8nvwZGlOF2w6AiW9DTIgCqULKNBa8/yDznw7p94QwoJNAgCBo7aqVODncS
-         wlqA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=WswF+eY/uav4Y6QJBkqqfte8Y8u+EHxBxZsHaGmjFJY=;
-        b=tw51vPP3GrWbd8UAx8OnTN699dkijEEC6Z2XBzv5M4QNubKRAMGkMPzYtWG7vaVkOB
-         amvbP1RM8MuVPVOyjSWVh7RUqs/55/OF1JdleYZzFvnlhPIJmdpKWAuhD6LAuT5BQ4si
-         EMdq+MHQhr4ds2Cdbq90T43OGUDR1sTpJdlPkzPjxW3NXFIs9nw7A6KWhiLGX5iyLf/T
-         /WPumTJkWS/86dp8V00EtetVF1H9HV5srwCSq/dh9+JdLm0ykdguTLrU01qB1n5lvRG6
-         V+G+E1l5w7cV0thQ/gcS44FkSnekO6ca3iqchunGh+tBWbtPael5h/ifWONWUU3QTdW3
-         8jrg==
-X-Gm-Message-State: AOAM532VQpelBQE6MSm+wAprEB9NQ9OcUfFlcnd+JCoLq0ID4s20f8oA
-        Jl1J/WKZgEcbKKeyP8E9jJ42H/KfN2GFGJsW1qo=
-X-Google-Smtp-Source: ABdhPJwX3CuPHma/90d6+Dt1FjXkU5q11qUWGRHuFk9S8I9vtGYmF64t9kSOHELsSS3kHs17pBd36jtMcp8oR50z36A=
-X-Received: by 2002:aca:cd93:: with SMTP id d141mr701oig.33.1598930712741;
- Mon, 31 Aug 2020 20:25:12 -0700 (PDT)
-MIME-Version: 1.0
-References: <1598578508-14134-1-git-send-email-wanpengli@tencent.com> <87a6ybx9pv.fsf@vitty.brq.redhat.com>
-In-Reply-To: <87a6ybx9pv.fsf@vitty.brq.redhat.com>
-From:   Wanpeng Li <kernellwp@gmail.com>
-Date:   Tue, 1 Sep 2020 11:25:01 +0800
-Message-ID: <CANRm+CwHiZjh3w94Xdd=ZQXP6XWysz87OG+LFR2ekQn5A2P7Dw@mail.gmail.com>
-Subject: Re: [PATCH] KVM: LAPIC: Reset timer_advance_ns if timer mode switch
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
+        id S1726085AbgIAD1f (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 31 Aug 2020 23:27:35 -0400
+Received: from mga11.intel.com ([192.55.52.93]:53807 "EHLO mga11.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725987AbgIAD1e (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 31 Aug 2020 23:27:34 -0400
+IronPort-SDR: 0Pruk1rPlL5Xawopc32WgO2aPCqCoS9bJRm5hObjHCLNHWI+XnpW0WhgCgdZA9xC8B7n5BUJHg
+ uUZE7gMrjvZg==
+X-IronPort-AV: E=McAfee;i="6000,8403,9730"; a="154612718"
+X-IronPort-AV: E=Sophos;i="5.76,377,1592895600"; 
+   d="scan'208";a="154612718"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Aug 2020 20:27:33 -0700
+IronPort-SDR: 5WXqUEtZhL4BvBIKLysmny32nVeoJfptYzJtDvuRr3H1p1Wea83NefoFITmEa4O39xr6bAA5gw
+ TM9iiTYL8syg==
+X-IronPort-AV: E=Sophos;i="5.76,377,1592895600"; 
+   d="scan'208";a="477021534"
+Received: from kblgvt-desktop.sh.intel.com (HELO [10.239.13.113]) ([10.239.13.113])
+  by orsmga005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Aug 2020 20:27:31 -0700
+Subject: Re: [PATCH 1/5] KVM: nVMX: Fix VMX controls MSRs setup when nested
+ VMX enabled
+To:     Chenyi Qiang <chenyi.qiang@intel.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
         Sean Christopherson <sean.j.christopherson@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
         Joerg Roedel <joro@8bytes.org>
-Content-Type: text/plain; charset="UTF-8"
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20200828085622.8365-1-chenyi.qiang@intel.com>
+ <20200828085622.8365-2-chenyi.qiang@intel.com>
+From:   Xiaoyao Li <xiaoyao.li@intel.com>
+Message-ID: <be1a078a-8107-3d51-b52a-76ac2372333b@intel.com>
+Date:   Tue, 1 Sep 2020 11:27:29 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.12.0
+MIME-Version: 1.0
+In-Reply-To: <20200828085622.8365-2-chenyi.qiang@intel.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 31 Aug 2020 at 20:48, Vitaly Kuznetsov <vkuznets@redhat.com> wrote:
->
-> Wanpeng Li <kernellwp@gmail.com> writes:
->
-> > From: Wanpeng Li <wanpengli@tencent.com>
-> >
-> > per-vCPU timer_advance_ns should be set to 0 if timer mode is not tscdeadline
-> > otherwise we waste cpu cycles in the function lapic_timer_int_injected(),
->
-> lapic_timer_int_injected is just a test, kvm_wait_lapic_expire()
-> (__kvm_wait_lapic_expire()) maybe?
+On 8/28/2020 4:56 PM, Chenyi Qiang wrote:
+> KVM supports the nested VM_{EXIT, ENTRY}_LOAD_IA32_PERF_GLOBAL_CTRL and
+> VM_{ENTRY_LOAD, EXIT_CLEAR}_BNDCFGS, but they doesn't expose during
+> the setup of nested VMX controls MSR.
+> 
+> Signed-off-by: Chenyi Qiang <chenyi.qiang@intel.com>
 
-Both the check in lapic_timer_int_injected(), the check in
-__kvm_wait_lapic_expire(), and these function calls, we can observe
-~1.3% world switch time reduce w/ this patch by
-kvm-unit-tests/vmexit.flat vmcall testing on AMD server. In addition,
-I think we should set apic->lapic_timer.expired_tscdeadline to 0 when
-switching between tscdeadline mode and other modes on Intel in order
-that we will not waste cpu cycles to tune advance value in
-adjust_lapic_timer_advance() for one time.
+Reviewed-by: Xiaoyao Li <xiaoyao.li@intel.com>
 
-Wanpeng
+> ---
+>   arch/x86/kvm/vmx/nested.c | 6 ++++--
+>   1 file changed, 4 insertions(+), 2 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+> index 23b58c28a1c9..6e0e71f4d45f 100644
+> --- a/arch/x86/kvm/vmx/nested.c
+> +++ b/arch/x86/kvm/vmx/nested.c
+> @@ -6310,7 +6310,8 @@ void nested_vmx_setup_ctls_msrs(struct nested_vmx_msrs *msrs, u32 ept_caps)
+>   #ifdef CONFIG_X86_64
+>   		VM_EXIT_HOST_ADDR_SPACE_SIZE |
+>   #endif
+> -		VM_EXIT_LOAD_IA32_PAT | VM_EXIT_SAVE_IA32_PAT;
+> +		VM_EXIT_LOAD_IA32_PAT | VM_EXIT_SAVE_IA32_PAT |
+> +		VM_EXIT_CLEAR_BNDCFGS | VM_EXIT_LOAD_IA32_PERF_GLOBAL_CTRL;
+>   	msrs->exit_ctls_high |=
+>   		VM_EXIT_ALWAYSON_WITHOUT_TRUE_MSR |
+>   		VM_EXIT_LOAD_IA32_EFER | VM_EXIT_SAVE_IA32_EFER |
+> @@ -6329,7 +6330,8 @@ void nested_vmx_setup_ctls_msrs(struct nested_vmx_msrs *msrs, u32 ept_caps)
+>   #ifdef CONFIG_X86_64
+>   		VM_ENTRY_IA32E_MODE |
+>   #endif
+> -		VM_ENTRY_LOAD_IA32_PAT;
+> +		VM_ENTRY_LOAD_IA32_PAT | VM_ENTRY_LOAD_BNDCFGS |
+> +		VM_ENTRY_LOAD_IA32_PERF_GLOBAL_CTRL;
+>   	msrs->entry_ctls_high |=
+>   		(VM_ENTRY_ALWAYSON_WITHOUT_TRUE_MSR | VM_ENTRY_LOAD_IA32_EFER);
+>   
+> 
+
