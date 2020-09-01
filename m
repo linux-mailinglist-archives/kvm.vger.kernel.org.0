@@ -2,307 +2,316 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 83EB0259B72
-	for <lists+kvm@lfdr.de>; Tue,  1 Sep 2020 19:02:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AD22D259D0B
+	for <lists+kvm@lfdr.de>; Tue,  1 Sep 2020 19:24:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732542AbgIARCD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 1 Sep 2020 13:02:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52700 "EHLO
+        id S1728577AbgIARXj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 1 Sep 2020 13:23:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43536 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729624AbgIAPUh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 1 Sep 2020 11:20:37 -0400
-Received: from mail-wm1-x343.google.com (mail-wm1-x343.google.com [IPv6:2a00:1450:4864:20::343])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EC138C061245
-        for <kvm@vger.kernel.org>; Tue,  1 Sep 2020 08:20:36 -0700 (PDT)
-Received: by mail-wm1-x343.google.com with SMTP id u18so1548274wmc.3
-        for <kvm@vger.kernel.org>; Tue, 01 Sep 2020 08:20:36 -0700 (PDT)
+        with ESMTP id S1729429AbgIARX0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 1 Sep 2020 13:23:26 -0400
+Received: from mail-pf1-x443.google.com (mail-pf1-x443.google.com [IPv6:2607:f8b0:4864:20::443])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 98603C061245
+        for <kvm@vger.kernel.org>; Tue,  1 Sep 2020 10:23:24 -0700 (PDT)
+Received: by mail-pf1-x443.google.com with SMTP id 17so1176924pfw.9
+        for <kvm@vger.kernel.org>; Tue, 01 Sep 2020 10:23:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=brainfault-org.20150623.gappssmtp.com; s=20150623;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=tMjitHZNBt8kTO+CIJfeM1vmU9I4HlH8A4gIVmfnjGY=;
-        b=L77kMGJfQTrk5Xl9ZAL/3+B/1OewqGvBlXziTF4NBfHE8AA6RzQ8TDLb7w+80PYJ1C
-         +MdodKJTlmLGE1Ud5RWtzEDWDGwCnMZd6z7JfaWfAVeJUykNoUbiPtpto3iUtFoGm2d8
-         L0N8dMqd64L3ggPPJKkETH6OTe9GwGpoKFPtYmCLrBXPFoV+1vhDKg0CiKem1ck6s1e6
-         FhZucW8W/2D81Uz6Vku81IbYLq+df1oVmRwZ+AWEA/Hz76WpfGzjaIGc6emPxBoMk6yf
-         mVoZmTd3g1Td51HqeAqHtmLR92TSSwGBYQMCIgGQO6aMPaZJyPU/D+7Qmkj3fEU1bo86
-         Vyaw==
+        d=linaro.org; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=BA7VyT9D2g57+Dcuw8cvEhh4rPTEMKU4wo81oxUGNrw=;
+        b=OvOn4u1TJ9XxBQ3PYp7dmHRrqJz4+fpuqiMyyn8pXdcJ8aod2wuK2zZlnMJLFU1Mn9
+         rhmv1EzNWGVxCGP0vU6zwGXj6SXUUg7GL7sbTDuxWDELzmewnrhv63N6993QtCVFRbgb
+         mftWm3IEK0CXt/C9gpRx+wv/lLWh1AqE5KIVhV+T9e3iar+A/e7X1u5ASBC4m0pA4uTe
+         eGRA/aeO/uXpmEmW9lJyaki9fY6d27bhBKEZ2V6nZMTrgAlfWAgQvn4GTqlGpvNW1AxF
+         BR2Vy38HufFlolKA8F3cFtxoS3J6QouzrKMTDgDnYR2qNxSsRpZJ/6cFsZ/dsvL1sYDI
+         vRMw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=tMjitHZNBt8kTO+CIJfeM1vmU9I4HlH8A4gIVmfnjGY=;
-        b=Dh9t2APEh+qrP0X7C9FfHW4M9fxaJsyxTB4242nZmr4CKmrX5EQ0TD1/d+QxiTYD7l
-         zn0HaXCt5SXv5N7Y/AOPFEA1zw8hukrSonDHFGqRGdSH4P6mHDBJUMhlWAjk4I3qXdXv
-         hYn7grcMANVN7FXnzEjr9e4PaNjRKP7ykyD7K/BJvyqts4ObNE8c1reh+T5AGAGOgwRy
-         CvZ8mCI3JGa5cCOpFPsmj2DKBQeXf17MPxCOVd3orX1uRvbByqbAmIivm6TImH2nVtBi
-         UMqbKuS/fc7Hb+SBA6ZfuUbQmaSt3PYBtA8Dx7icH4tbTzAVumoWiiXVNgbMbTJZ4F6Z
-         Fdug==
-X-Gm-Message-State: AOAM532LFReczqy8swfGJnR6JsKbFI4xjXED2+U7RCGyu9R+jO6purPy
-        uqQjyrXuUtUzZG5ZONaSwVAlxQ6XWbxURoTAsEdOXg==
-X-Google-Smtp-Source: ABdhPJzwYy9cK5sFQqzqHPjeGTpCHCF8czMdkOBH4/m0P0epqL9U/Qtv+eDqWf8ERuSUsKNU6Tu5jAJVE+A4tRub2bQ=
-X-Received: by 2002:a7b:c0c5:: with SMTP id s5mr2251524wmh.152.1598973635458;
- Tue, 01 Sep 2020 08:20:35 -0700 (PDT)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=BA7VyT9D2g57+Dcuw8cvEhh4rPTEMKU4wo81oxUGNrw=;
+        b=SExPv8HbIDmcrTHk9VhvuHh/xonuqsWkKFS6Jfta/kJEWHXev9Rm14aUXpoG8BsVR0
+         EAsAKu9YidwgOR1w3EM4tJPeInA32s6aBPrgSrE6SJSsOX3eoz5qoH5rL4Jmgg5mAFVn
+         ecW8YyVj4p/fjvcd9Dm4Qkvh9L1RC9uc6oV3thX6/sb/aR0diRBIFBmi8Oka005HDfbN
+         G31HrB50Q3BgLlzu1ncVBPpxKiR9P1zt76QLlrgaQVploqAOab8isD2rzL/+60Lm4vD6
+         LCrHVHA+oduNXuDCy/Vi5p+RmiKyru4FVQMujuYDFePIpeX5Ey7vyiiUJabTotZg68Eq
+         rPHA==
+X-Gm-Message-State: AOAM5307JvOX1LCRIX5LOEh+j010sRydgXqTqcERyQKYygWjb7McvDhu
+        VoTHdh1RqKhAaj+MeBCBG+3r2w==
+X-Google-Smtp-Source: ABdhPJxUAVGeCOMo4byNQ79M0LPSNBvS9XO0DGrI9UK+kRY6p14NCFRr59olfsl+GpPeAEitDNmQuA==
+X-Received: by 2002:aa7:8e86:0:b029:138:8ec9:6d05 with SMTP id a6-20020aa78e860000b02901388ec96d05mr2774996pfr.3.1598981004007;
+        Tue, 01 Sep 2020 10:23:24 -0700 (PDT)
+Received: from xps15 (S0106002369de4dac.cg.shawcable.net. [68.147.8.254])
+        by smtp.gmail.com with ESMTPSA id u3sm2077107pjn.29.2020.09.01.10.23.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 01 Sep 2020 10:23:23 -0700 (PDT)
+Date:   Tue, 1 Sep 2020 11:23:21 -0600
+From:   Mathieu Poirier <mathieu.poirier@linaro.org>
+To:     Guennadi Liakhovetski <guennadi.liakhovetski@linux.intel.com>
+Cc:     kvm@vger.kernel.org, linux-remoteproc@vger.kernel.org,
+        virtualization@lists.linux-foundation.org,
+        sound-open-firmware@alsa-project.org,
+        Pierre-Louis Bossart <pierre-louis.bossart@linux.intel.com>,
+        Liam Girdwood <liam.r.girdwood@linux.intel.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Ohad Ben-Cohen <ohad@wizery.com>,
+        Bjorn Andersson <bjorn.andersson@linaro.org>,
+        Vincent Whitchurch <vincent.whitchurch@axis.com>
+Subject: Re: [PATCH v6 2/4] rpmsg: move common structures and defines to
+ headers
+Message-ID: <20200901172321.GC236120@xps15>
+References: <20200901151153.28111-1-guennadi.liakhovetski@linux.intel.com>
+ <20200901151153.28111-3-guennadi.liakhovetski@linux.intel.com>
 MIME-Version: 1.0
-References: <20200827082251.1591-1-jiangyifei@huawei.com> <20200827082251.1591-3-jiangyifei@huawei.com>
- <CAAhSdy36ZCubU-1+WzjMzBaR+RipgEhvRqd9AT+28=99-EUDaQ@mail.gmail.com> <3915816D913D8241BB43E932213F57D4ADD8F34F@dggemm525-mbs.china.huawei.com>
-In-Reply-To: <3915816D913D8241BB43E932213F57D4ADD8F34F@dggemm525-mbs.china.huawei.com>
-From:   Anup Patel <anup@brainfault.org>
-Date:   Tue, 1 Sep 2020 20:50:23 +0530
-Message-ID: <CAAhSdy3jvCcA=DsR6NoZ4HRx9qXTC-Wwc+B3T79TKDtXBPd8Jw@mail.gmail.com>
-Subject: Re: [PATCH RFC 2/2] target/kvm: Add interfaces needed for log dirty
-To:     Jiangyifei <jiangyifei@huawei.com>
-Cc:     Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Anup Patel <anup.patel@wdc.com>,
-        Alistair Francis <alistair.francis@wdc.com>,
-        Atish Patra <atish.patra@wdc.com>,
-        "deepa.kernel@gmail.com" <deepa.kernel@gmail.com>,
-        "kvm-riscv@lists.infradead.org" <kvm-riscv@lists.infradead.org>,
-        KVM General <kvm@vger.kernel.org>,
-        linux-riscv <linux-riscv@lists.infradead.org>,
-        "linux-kernel@vger.kernel.org List" <linux-kernel@vger.kernel.org>,
-        "Zhangxiaofeng (F)" <victor.zhangxiaofeng@huawei.com>,
-        "Wubin (H)" <wu.wubin@huawei.com>,
-        Zhanghailiang <zhang.zhanghailiang@huawei.com>,
-        "dengkai (A)" <dengkai1@huawei.com>,
-        yinyipeng <yinyipeng1@huawei.com>,
-        "zhaosiqi (A)" <zhaosiqi3@huawei.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200901151153.28111-3-guennadi.liakhovetski@linux.intel.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Aug 31, 2020 at 8:09 AM Jiangyifei <jiangyifei@huawei.com> wrote:
->
->
-> > -----Original Message-----
-> > From: Anup Patel [mailto:anup@brainfault.org]
-> > Sent: Friday, August 28, 2020 12:54 PM
-> > To: Jiangyifei <jiangyifei@huawei.com>
-> > Cc: Paul Walmsley <paul.walmsley@sifive.com>; Palmer Dabbelt
-> > <palmer@dabbelt.com>; Albert Ou <aou@eecs.berkeley.edu>; Anup Patel
-> > <anup.patel@wdc.com>; Alistair Francis <alistair.francis@wdc.com>; Atis=
-h
-> > Patra <atish.patra@wdc.com>; deepa.kernel@gmail.com;
-> > kvm-riscv@lists.infradead.org; KVM General <kvm@vger.kernel.org>;
-> > linux-riscv <linux-riscv@lists.infradead.org>; linux-kernel@vger.kernel=
-.org List
-> > <linux-kernel@vger.kernel.org>; Zhangxiaofeng (F)
-> > <victor.zhangxiaofeng@huawei.com>; Wubin (H) <wu.wubin@huawei.com>;
-> > Zhanghailiang <zhang.zhanghailiang@huawei.com>; dengkai (A)
-> > <dengkai1@huawei.com>; yinyipeng <yinyipeng1@huawei.com>
-> > Subject: Re: [PATCH RFC 2/2] target/kvm: Add interfaces needed for log =
-dirty
-> >
-> > On Thu, Aug 27, 2020 at 1:54 PM Yifei Jiang <jiangyifei@huawei.com> wro=
-te:
-> > >
-> > > Add two interfaces of log dirty for kvm_main.c, and detele the
-> > > interface kvm_vm_ioctl_get_dirty_log which is redundantly defined.
-> > >
-> > > CONFIG_KVM_GENERIC_DIRTYLOG_READ_PROTECT is added in defconfig.
-> > >
-> > > Signed-off-by: Yifei Jiang <jiangyifei@huawei.com>
-> > > Signed-off-by: Yipeng Yin <yinyipeng1@huawei.com>
-> > > ---
-> > >  arch/riscv/configs/defconfig |  1 +
-> > >  arch/riscv/kvm/Kconfig       |  1 +
-> > >  arch/riscv/kvm/mmu.c         | 43
-> > ++++++++++++++++++++++++++++++++++++
-> > >  arch/riscv/kvm/vm.c          |  6 -----
-> > >  4 files changed, 45 insertions(+), 6 deletions(-)
-> > >
-> > > diff --git a/arch/riscv/configs/defconfig
-> > > b/arch/riscv/configs/defconfig index d36e1000bbd3..857d799672c2 10064=
-4
-> > > --- a/arch/riscv/configs/defconfig
-> > > +++ b/arch/riscv/configs/defconfig
-> > > @@ -19,6 +19,7 @@ CONFIG_SOC_VIRT=3Dy
-> > >  CONFIG_SMP=3Dy
-> > >  CONFIG_VIRTUALIZATION=3Dy
-> > >  CONFIG_KVM=3Dy
-> > > +CONFIG_KVM_GENERIC_DIRTYLOG_READ_PROTECT=3Dy
-> > >  CONFIG_HOTPLUG_CPU=3Dy
-> > >  CONFIG_MODULES=3Dy
-> > >  CONFIG_MODULE_UNLOAD=3Dy
-> > > diff --git a/arch/riscv/kvm/Kconfig b/arch/riscv/kvm/Kconfig index
-> > > 2356dc52ebb3..91fcffc70e5d 100644
-> > > --- a/arch/riscv/kvm/Kconfig
-> > > +++ b/arch/riscv/kvm/Kconfig
-> > > @@ -26,6 +26,7 @@ config KVM
-> > >         select KVM_MMIO
-> > >         select HAVE_KVM_VCPU_ASYNC_IOCTL
-> > >         select SRCU
-> > > +       select KVM_GENERIC_DIRTYLOG_READ_PROTECT
-> > >         help
-> > >           Support hosting virtualized guest machines.
-> > >
-> > > diff --git a/arch/riscv/kvm/mmu.c b/arch/riscv/kvm/mmu.c index
-> > > 88bce80ee983..df2a470c25e4 100644
-> > > --- a/arch/riscv/kvm/mmu.c
-> > > +++ b/arch/riscv/kvm/mmu.c
-> > > @@ -358,6 +358,43 @@ void stage2_wp_memory_region(struct kvm *kvm,
-> > int slot)
-> > >         kvm_flush_remote_tlbs(kvm);
-> > >  }
-> > >
-> > > +/**
-> > > + * kvm_mmu_write_protect_pt_masked() - write protect dirty pages
-> > > + * @kvm:    The KVM pointer
-> > > + * @slot:   The memory slot associated with mask
-> > > + * @gfn_offset: The gfn offset in memory slot
-> > > + * @mask:   The mask of dirty pages at offset 'gfn_offset' in this m=
-emory
-> > > + *      slot to be write protected
-> > > + *
-> > > + * Walks bits set in mask write protects the associated pte's. Calle=
-r
-> > > +must
-> > > + * acquire kvm_mmu_lock.
-> > > + */
-> > > +static void kvm_mmu_write_protect_pt_masked(struct kvm *kvm,
-> > > +        struct kvm_memory_slot *slot,
-> > > +        gfn_t gfn_offset, unsigned long mask) {
-> > > +    phys_addr_t base_gfn =3D slot->base_gfn + gfn_offset;
-> > > +    phys_addr_t start =3D (base_gfn +  __ffs(mask)) << PAGE_SHIFT;
-> > > +    phys_addr_t end =3D (base_gfn + __fls(mask) + 1) << PAGE_SHIFT;
-> > > +
-> > > +    stage2_wp_range(kvm, start, end); }
-> > > +
-> > > +/*
-> > > + * kvm_arch_mmu_enable_log_dirty_pt_masked - enable dirty logging fo=
-r
-> > > +selected
-> > > + * dirty pages.
-> > > + *
-> > > + * It calls kvm_mmu_write_protect_pt_masked to write protect selecte=
-d
-> > > +pages to
-> > > + * enable dirty logging for them.
-> > > + */
-> > > +void kvm_arch_mmu_enable_log_dirty_pt_masked(struct kvm *kvm,
-> > > +        struct kvm_memory_slot *slot,
-> > > +        gfn_t gfn_offset, unsigned long mask) {
-> > > +    kvm_mmu_write_protect_pt_masked(kvm, slot, gfn_offset, mask); }
-> > > +
-> > > +
-> > >  int stage2_ioremap(struct kvm *kvm, gpa_t gpa, phys_addr_t hpa,
-> > >                    unsigned long size, bool writable)  { @@ -433,6
-> > > +470,12 @@ void kvm_arch_sync_dirty_log(struct kvm *kvm, struct
-> > > kvm_memory_slot *memslot)  {  }
-> > >
-> > > +void kvm_arch_flush_remote_tlbs_memslot(struct kvm *kvm,
-> > > +                                       struct kvm_memory_slot
-> > > +*memslot) {
-> > > +       kvm_flush_remote_tlbs(kvm);
-> > > +}
-> > > +
-> > >  void kvm_arch_free_memslot(struct kvm *kvm, struct kvm_memory_slot
-> > > *free)  {  } diff --git a/arch/riscv/kvm/vm.c b/arch/riscv/kvm/vm.c
-> > > index 4f2498198cb5..f7405676903b 100644
-> > > --- a/arch/riscv/kvm/vm.c
-> > > +++ b/arch/riscv/kvm/vm.c
-> > > @@ -12,12 +12,6 @@
-> > >  #include <linux/uaccess.h>
-> > >  #include <linux/kvm_host.h>
-> > >
-> > > -int kvm_vm_ioctl_get_dirty_log(struct kvm *kvm, struct kvm_dirty_log
-> > > *log) -{
-> > > -       /* TODO: To be added later. */
-> > > -       return -ENOTSUPP;
-> > > -}
-> > > -
-> > >  int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)  {
-> > >         int r;
-> > > --
-> > > 2.19.1
-> > >
-> > >
-> >
-> > I already have a similar change as part of v14 KVM RISC-V series.
-> >
-> > Let us coordinate better. Please let us know in-advance for any KVM RIS=
-C-V
-> > feature you plan to work on. Otherwise, this leads to efforts wasted at=
- your
-> > end or at our end.
-> >
-> > Regards,
-> > Anup
->
-> Hi Anup,
->
-> Thanks for accepting our patches.
->
-> In the next few weeks we plan to work on the following:
-> 1. memory reverse mapping (rmap), related to migration.
+On Tue, Sep 01, 2020 at 05:11:51PM +0200, Guennadi Liakhovetski wrote:
+> virtio_rpmsg_bus.c keeps RPMsg protocol structure declarations and
+> common defines like the ones, needed for name-space announcements,
+> internal. Move them to common headers instead.
+> 
+> Signed-off-by: Guennadi Liakhovetski <guennadi.liakhovetski@linux.intel.com>
 
-This is fine.
+I already reviewed this patch and added my RB to it.  Please carry it in your
+next revision.
 
-> 2. irqfd.
+Thanks,
+Mathieu
 
-We had past discussion about doing in-kernel PLIC.
-
-Generally, in-kernel emulation of an interrupt controller provides the
-following benefits:
-1. Faster emulation of timer interrupts
-2. Faster emulation of ipi interrupts
-3. Irqfd for Vhost
-4. Pass-through interrupt routing
-5. Anything else ??
-
-For RISC-V, timer and ipi interrupts are handled locally by each HART
-so in-kernel PLIC emulation won't provide 1) and 2). Also, considering
-simplicity of PLIC we can't provide 4) as well. This means 3) might be
-the only benefit of in-kernel PLIC.
-
-There are already efforts underway to have a new interrupt-controller
-spec which has virtualization support and also supports MSIs. I think
-it is OKAY to have PLIC emulated in user-space for now. We will go
-for in-kernel emulation and irqfd support for the new interrupt controller.
-
-Does this sound okay ??
-
-(Please talk to Andrew Waterman and John Hauser for more details on
-new interrupt-controller spec)
-
-> 3. implmentaion related to the dedicated clock event source proposal.
-
-There are two SBI extensions required:
-1. Para-virt CPU steal accounting
-    This is for accounting stolen time by hypervisors.
-2. Para-virt time scaling
-    This is for migrating Guest/VM across Host with different timer frequen=
-cy.
-
-We are already doing 1) and we will be proposing an SBI extension for it in
-the UnixPlatformSpec mailing list soon.
-
-By "dedicated clock event source" I assume you meant something related
-to 2). I would suggest you to join UnixPlatformSpec mailing list on RISC-V
-foundation and propose your SBI spec related ideas over there.
-
->
-> Besides, we are aware of that you are working on irq chip emulation in KV=
-M. Meanwhile, our implementaiton of irqfd and the clock event source has de=
-pendency on the irq chip and we may well modify the irq chip emulation code=
-. So could you share with us any ideas, plans or progress regarding your wo=
-rk since there might be potential collision?
-
-Please see my comments on irqfd.
-
->
-> Let's stay in touch in the long run and coodinate better. BTW, could you =
-share with us if there's any regular discussion sessions focused on RISC-V =
-KVM?
-
-I have started an email discussion about having regular Hypervisor sync-up
-call on the UnixPlatformSpec mailing list. We can use this sync-up call for
-KVM RISC-V as well.
-
-Regards,
-Anup
+> ---
+>  drivers/rpmsg/virtio_rpmsg_bus.c | 78 +-----------------------------
+>  include/linux/rpmsg/virtio.h     | 83 ++++++++++++++++++++++++++++++++
+>  include/uapi/linux/rpmsg.h       |  3 ++
+>  3 files changed, 88 insertions(+), 76 deletions(-)
+>  create mode 100644 include/linux/rpmsg/virtio.h
+> 
+> diff --git a/drivers/rpmsg/virtio_rpmsg_bus.c b/drivers/rpmsg/virtio_rpmsg_bus.c
+> index 9006fc7f73d0..f39c426f9c5e 100644
+> --- a/drivers/rpmsg/virtio_rpmsg_bus.c
+> +++ b/drivers/rpmsg/virtio_rpmsg_bus.c
+> @@ -19,6 +19,7 @@
+>  #include <linux/mutex.h>
+>  #include <linux/of_device.h>
+>  #include <linux/rpmsg.h>
+> +#include <linux/rpmsg/virtio.h>
+>  #include <linux/scatterlist.h>
+>  #include <linux/slab.h>
+>  #include <linux/sched.h>
+> @@ -27,6 +28,7 @@
+>  #include <linux/virtio_ids.h>
+>  #include <linux/virtio_config.h>
+>  #include <linux/wait.h>
+> +#include <uapi/linux/rpmsg.h>
+>  
+>  #include "rpmsg_internal.h"
+>  
+> @@ -70,58 +72,6 @@ struct virtproc_info {
+>  	struct rpmsg_endpoint *ns_ept;
+>  };
+>  
+> -/* The feature bitmap for virtio rpmsg */
+> -#define VIRTIO_RPMSG_F_NS	0 /* RP supports name service notifications */
+> -
+> -/**
+> - * struct rpmsg_hdr - common header for all rpmsg messages
+> - * @src: source address
+> - * @dst: destination address
+> - * @reserved: reserved for future use
+> - * @len: length of payload (in bytes)
+> - * @flags: message flags
+> - * @data: @len bytes of message payload data
+> - *
+> - * Every message sent(/received) on the rpmsg bus begins with this header.
+> - */
+> -struct rpmsg_hdr {
+> -	__virtio32 src;
+> -	__virtio32 dst;
+> -	__virtio32 reserved;
+> -	__virtio16 len;
+> -	__virtio16 flags;
+> -	u8 data[];
+> -} __packed;
+> -
+> -/**
+> - * struct rpmsg_ns_msg - dynamic name service announcement message
+> - * @name: name of remote service that is published
+> - * @addr: address of remote service that is published
+> - * @flags: indicates whether service is created or destroyed
+> - *
+> - * This message is sent across to publish a new service, or announce
+> - * about its removal. When we receive these messages, an appropriate
+> - * rpmsg channel (i.e device) is created/destroyed. In turn, the ->probe()
+> - * or ->remove() handler of the appropriate rpmsg driver will be invoked
+> - * (if/as-soon-as one is registered).
+> - */
+> -struct rpmsg_ns_msg {
+> -	char name[RPMSG_NAME_SIZE];
+> -	__virtio32 addr;
+> -	__virtio32 flags;
+> -} __packed;
+> -
+> -/**
+> - * enum rpmsg_ns_flags - dynamic name service announcement flags
+> - *
+> - * @RPMSG_NS_CREATE: a new remote service was just created
+> - * @RPMSG_NS_DESTROY: a known remote service was just destroyed
+> - */
+> -enum rpmsg_ns_flags {
+> -	RPMSG_NS_CREATE		= 0,
+> -	RPMSG_NS_DESTROY	= 1,
+> -};
+> -
+>  /**
+>   * @vrp: the remote processor this channel belongs to
+>   */
+> @@ -134,27 +84,6 @@ struct virtio_rpmsg_channel {
+>  #define to_virtio_rpmsg_channel(_rpdev) \
+>  	container_of(_rpdev, struct virtio_rpmsg_channel, rpdev)
+>  
+> -/*
+> - * We're allocating buffers of 512 bytes each for communications. The
+> - * number of buffers will be computed from the number of buffers supported
+> - * by the vring, upto a maximum of 512 buffers (256 in each direction).
+> - *
+> - * Each buffer will have 16 bytes for the msg header and 496 bytes for
+> - * the payload.
+> - *
+> - * This will utilize a maximum total space of 256KB for the buffers.
+> - *
+> - * We might also want to add support for user-provided buffers in time.
+> - * This will allow bigger buffer size flexibility, and can also be used
+> - * to achieve zero-copy messaging.
+> - *
+> - * Note that these numbers are purely a decision of this driver - we
+> - * can change this without changing anything in the firmware of the remote
+> - * processor.
+> - */
+> -#define MAX_RPMSG_NUM_BUFS	(512)
+> -#define MAX_RPMSG_BUF_SIZE	(512)
+> -
+>  /*
+>   * Local addresses are dynamically allocated on-demand.
+>   * We do not dynamically assign addresses from the low 1024 range,
+> @@ -162,9 +91,6 @@ struct virtio_rpmsg_channel {
+>   */
+>  #define RPMSG_RESERVED_ADDRESSES	(1024)
+>  
+> -/* Address 53 is reserved for advertising remote services */
+> -#define RPMSG_NS_ADDR			(53)
+> -
+>  static void virtio_rpmsg_destroy_ept(struct rpmsg_endpoint *ept);
+>  static int virtio_rpmsg_send(struct rpmsg_endpoint *ept, void *data, int len);
+>  static int virtio_rpmsg_sendto(struct rpmsg_endpoint *ept, void *data, int len,
+> diff --git a/include/linux/rpmsg/virtio.h b/include/linux/rpmsg/virtio.h
+> new file mode 100644
+> index 000000000000..3ede1a4a68a3
+> --- /dev/null
+> +++ b/include/linux/rpmsg/virtio.h
+> @@ -0,0 +1,83 @@
+> +/* SPDX-License-Identifier: GPL-2.0 */
+> +
+> +#ifndef _LINUX_RPMSG_VIRTIO_H
+> +#define _LINUX_RPMSG_VIRTIO_H
+> +
+> +#include <linux/mod_devicetable.h>
+> +#include <linux/types.h>
+> +#include <linux/virtio_types.h>
+> +
+> +/**
+> + * struct rpmsg_hdr - common header for all rpmsg messages
+> + * @src: source address
+> + * @dst: destination address
+> + * @reserved: reserved for future use
+> + * @len: length of payload (in bytes)
+> + * @flags: message flags
+> + * @data: @len bytes of message payload data
+> + *
+> + * Every message sent(/received) on the rpmsg bus begins with this header.
+> + */
+> +struct rpmsg_hdr {
+> +	__virtio32 src;
+> +	__virtio32 dst;
+> +	__virtio32 reserved;
+> +	__virtio16 len;
+> +	__virtio16 flags;
+> +	u8 data[];
+> +} __packed;
+> +
+> +/**
+> + * struct rpmsg_ns_msg - dynamic name service announcement message
+> + * @name: name of remote service that is published
+> + * @addr: address of remote service that is published
+> + * @flags: indicates whether service is created or destroyed
+> + *
+> + * This message is sent across to publish a new service, or announce
+> + * about its removal. When we receive these messages, an appropriate
+> + * rpmsg channel (i.e device) is created/destroyed. In turn, the ->probe()
+> + * or ->remove() handler of the appropriate rpmsg driver will be invoked
+> + * (if/as-soon-as one is registered).
+> + */
+> +struct rpmsg_ns_msg {
+> +	char name[RPMSG_NAME_SIZE];
+> +	__virtio32 addr;
+> +	__virtio32 flags;
+> +} __packed;
+> +
+> +/**
+> + * enum rpmsg_ns_flags - dynamic name service announcement flags
+> + *
+> + * @RPMSG_NS_CREATE: a new remote service was just created
+> + * @RPMSG_NS_DESTROY: a known remote service was just destroyed
+> + */
+> +enum rpmsg_ns_flags {
+> +	RPMSG_NS_CREATE		= 0,
+> +	RPMSG_NS_DESTROY	= 1,
+> +};
+> +
+> +/*
+> + * We're allocating buffers of 512 bytes each for communications. The
+> + * number of buffers will be computed from the number of buffers supported
+> + * by the vring, upto a maximum of 512 buffers (256 in each direction).
+> + *
+> + * Each buffer will have 16 bytes for the msg header and 496 bytes for
+> + * the payload.
+> + *
+> + * This will utilize a maximum total space of 256KB for the buffers.
+> + *
+> + * We might also want to add support for user-provided buffers in time.
+> + * This will allow bigger buffer size flexibility, and can also be used
+> + * to achieve zero-copy messaging.
+> + *
+> + * Note that these numbers are purely a decision of this driver - we
+> + * can change this without changing anything in the firmware of the remote
+> + * processor.
+> + */
+> +#define MAX_RPMSG_NUM_BUFS	512
+> +#define MAX_RPMSG_BUF_SIZE	512
+> +
+> +/* Address 53 is reserved for advertising remote services */
+> +#define RPMSG_NS_ADDR		53
+> +
+> +#endif
+> diff --git a/include/uapi/linux/rpmsg.h b/include/uapi/linux/rpmsg.h
+> index e14c6dab4223..d669c04ef289 100644
+> --- a/include/uapi/linux/rpmsg.h
+> +++ b/include/uapi/linux/rpmsg.h
+> @@ -24,4 +24,7 @@ struct rpmsg_endpoint_info {
+>  #define RPMSG_CREATE_EPT_IOCTL	_IOW(0xb5, 0x1, struct rpmsg_endpoint_info)
+>  #define RPMSG_DESTROY_EPT_IOCTL	_IO(0xb5, 0x2)
+>  
+> +/* The feature bitmap for virtio rpmsg */
+> +#define VIRTIO_RPMSG_F_NS	0 /* RP supports name service notifications */
+> +
+>  #endif
+> -- 
+> 2.28.0
+> 
