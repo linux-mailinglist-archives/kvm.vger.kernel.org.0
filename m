@@ -2,35 +2,35 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 54FD5258AB9
-	for <lists+kvm@lfdr.de>; Tue,  1 Sep 2020 10:51:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 42FDF258ABD
+	for <lists+kvm@lfdr.de>; Tue,  1 Sep 2020 10:51:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727935AbgIAIvK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 1 Sep 2020 04:51:10 -0400
-Received: from mta-02.yadro.com ([89.207.88.252]:55006 "EHLO mta-01.yadro.com"
+        id S1727984AbgIAIvP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 1 Sep 2020 04:51:15 -0400
+Received: from mta-02.yadro.com ([89.207.88.252]:55022 "EHLO mta-01.yadro.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727089AbgIAIvI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 1 Sep 2020 04:51:08 -0400
+        id S1727824AbgIAIvK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 1 Sep 2020 04:51:10 -0400
 Received: from localhost (unknown [127.0.0.1])
-        by mta-01.yadro.com (Postfix) with ESMTP id 0399C5732F;
-        Tue,  1 Sep 2020 08:51:06 +0000 (UTC)
+        by mta-01.yadro.com (Postfix) with ESMTP id 3F610574EF;
+        Tue,  1 Sep 2020 08:51:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=yadro.com; h=
         content-type:content-type:content-transfer-encoding:mime-version
         :references:in-reply-to:x-mailer:message-id:date:date:subject
         :subject:from:from:received:received:received; s=mta-01; t=
-        1598950264; x=1600764665; bh=+2lWsZX/gRrm4AzavLRxhHDoo/GY5h4wfKb
-        /Xw6NKbk=; b=cU+7RcpNN+qY1FvsZYK6AxU1pJZG0ppxa/L4u5lD87zb5H+Hizu
-        4oddiUyMThGy149T9C23A767BeBOga41zmjt54tHSOaGh0b6lpm9yv6FvjtrFUhf
-        Vxc+4TWW/I/TMFs7OPEWrRgAkQIDICl8cCTtDNQ2lXPV345l0xNRTuSI=
+        1598950265; x=1600764666; bh=1UjTiYX6af8NytUxqP3QbMZW0l+4vplX4tl
+        p1B5XtAQ=; b=b12VXjEoPzcIHXn30OLwxtxT9rFMZIl40kTTFxYz74qBr7KZRD3
+        eC7L5nGd8Lg9BoBZZBGP3Py22BE6r0Sy2AGLgYvTaMKVCG1hH8bUGouNGpAMXZ10
+        2ylaD+rdue6jA5L34TTaG5o8UnrisM7QYYUWhOMU2t23axSh1D1Ds0f0=
 X-Virus-Scanned: amavisd-new at yadro.com
 Received: from mta-01.yadro.com ([127.0.0.1])
         by localhost (mta-01.yadro.com [127.0.0.1]) (amavisd-new, port 10024)
-        with ESMTP id x2t1_GzJ4rV9; Tue,  1 Sep 2020 11:51:04 +0300 (MSK)
+        with ESMTP id NSxvOgSibVvP; Tue,  1 Sep 2020 11:51:05 +0300 (MSK)
 Received: from T-EXCH-02.corp.yadro.com (t-exch-02.corp.yadro.com [172.17.10.102])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mta-01.yadro.com (Postfix) with ESMTPS id 7ED2252215;
-        Tue,  1 Sep 2020 11:51:04 +0300 (MSK)
+        by mta-01.yadro.com (Postfix) with ESMTPS id 08F5E57315;
+        Tue,  1 Sep 2020 11:51:05 +0300 (MSK)
 Received: from localhost (172.17.204.212) by T-EXCH-02.corp.yadro.com
  (172.17.10.102) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384_P384) id 15.1.669.32; Tue, 1 Sep
@@ -41,9 +41,9 @@ CC:     Thomas Huth <thuth@redhat.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
         Roman Bolshakov <r.bolshakov@yadro.com>,
         Cameron Esfahani <dirty@apple.com>
-Subject: [kvm-unit-tests PATCH v2 01/10] x86: Makefile: Allow division on x86_64-elf binutils
-Date:   Tue, 1 Sep 2020 11:50:47 +0300
-Message-ID: <20200901085056.33391-2-r.bolshakov@yadro.com>
+Subject: [kvm-unit-tests PATCH v2 02/10] x86: Replace instruction prefixes with spaces
+Date:   Tue, 1 Sep 2020 11:50:48 +0300
+Message-ID: <20200901085056.33391-3-r.bolshakov@yadro.com>
 X-Mailer: git-send-email 2.28.0
 In-Reply-To: <20200901085056.33391-1-r.bolshakov@yadro.com>
 References: <20200901085056.33391-1-r.bolshakov@yadro.com>
@@ -58,77 +58,176 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-For compatibility with other SVR4 assemblers, '/' starts a comment on
-*-elf binutils target and thus division operator is not allowed [1][2].
-That breaks cstart64.S build:
+There are three kinds of x86 prefix delimiters in GNU binutils:
+'/', '\\' and a space.
 
-  x86/cstart64.S: Assembler messages:
-  x86/cstart64.S:294: Error: unbalanced parenthesis in operand 1.
+The first works on Linux and few other platforms.  The second one is
+SVR-4 compatible and works on the generic elf target. The last kind is
+universal and works everywhere, it's also used in the GAS manual [1].
+Space delimiters fix the build errors on x86_64-elf binutils:
 
-configure should detect if --divide needs to be passed to assembler by
-compiling a small snippet where division is used inside parentheses.
+  x86/cstart64.S:217: Error: invalid character '/' in mnemonic
+  x86/cstart64.S:313: Error: invalid character '/' in mnemonic
 
-1. https://sourceware.org/binutils/docs/as/i386_002dChars.html
-2. https://sourceware.org/binutils/docs/as/i386_002dOptions.html#index-_002d_002ddivide-option_002c-i386
+1. https://sourceware.org/binutils/docs/as/i386_002dPrefixes.html
 
 Cc: Cameron Esfahani <dirty@apple.com>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
 Signed-off-by: Roman Bolshakov <r.bolshakov@yadro.com>
 ---
- configure           | 12 ++++++++++++
- x86/Makefile.common |  3 +++
- 2 files changed, 15 insertions(+)
+ x86/cstart.S   |  4 ++--
+ x86/cstart64.S |  4 ++--
+ x86/emulator.c | 38 +++++++++++++++++++-------------------
+ 3 files changed, 23 insertions(+), 23 deletions(-)
 
-diff --git a/configure b/configure
-index f9d030f..4eb504f 100755
---- a/configure
-+++ b/configure
-@@ -15,6 +15,7 @@ endian=""
- pretty_print_stacks=yes
- environ_default=yes
- u32_long=
-+wa_divide=
- vmm="qemu"
- errata_force=0
- erratatxt="$srcdir/errata.txt"
-@@ -156,6 +157,16 @@ EOF
- u32_long=$("$cross_prefix$cc" -E lib-test.c | grep -v '^#' | grep -q long && echo yes)
- rm -f lib-test.c
+diff --git a/x86/cstart.S b/x86/cstart.S
+index c0efc5f..489c561 100644
+--- a/x86/cstart.S
++++ b/x86/cstart.S
+@@ -149,7 +149,7 @@ save_id:
+ ap_start32:
+ 	setup_segments
+ 	mov $-4096, %esp
+-	lock/xaddl %esp, smp_stacktop
++	lock xaddl %esp, smp_stacktop
+ 	setup_percpu_area
+ 	call prepare_32
+ 	call reset_apic
+@@ -206,7 +206,7 @@ ap_init:
+ 	lea sipi_entry, %esi
+ 	xor %edi, %edi
+ 	mov $(sipi_end - sipi_entry), %ecx
+-	rep/movsb
++	rep movsb
+ 	mov $APIC_DEFAULT_PHYS_BASE, %eax
+ 	movl $(APIC_DEST_ALLBUT | APIC_DEST_PHYSICAL | APIC_DM_INIT | APIC_INT_ASSERT), APIC_ICR(%eax)
+ 	movl $(APIC_DEST_ALLBUT | APIC_DEST_PHYSICAL | APIC_DM_STARTUP), APIC_ICR(%eax)
+diff --git a/x86/cstart64.S b/x86/cstart64.S
+index 2d16688..25a296c 100644
+--- a/x86/cstart64.S
++++ b/x86/cstart64.S
+@@ -226,7 +226,7 @@ sipi_end:
+ ap_start32:
+ 	setup_segments
+ 	mov $-4096, %esp
+-	lock/xaddl %esp, smp_stacktop
++	lock xaddl %esp, smp_stacktop
+ 	setup_percpu_area
+ 	call prepare_64
+ 	ljmpl $8, $ap_start64
+@@ -323,7 +323,7 @@ ap_init:
+ 	lea sipi_entry, %rsi
+ 	xor %rdi, %rdi
+ 	mov $(sipi_end - sipi_entry), %rcx
+-	rep/movsb
++	rep movsb
+ 	mov $APIC_DEFAULT_PHYS_BASE, %eax
+ 	movl $(APIC_DEST_ALLBUT | APIC_DEST_PHYSICAL | APIC_DM_INIT | APIC_INT_ASSERT), APIC_ICR(%rax)
+ 	movl $(APIC_DEST_ALLBUT | APIC_DEST_PHYSICAL | APIC_DM_STARTUP), APIC_ICR(%rax)
+diff --git a/x86/emulator.c b/x86/emulator.c
+index 98743d1..e46d97e 100644
+--- a/x86/emulator.c
++++ b/x86/emulator.c
+@@ -61,71 +61,71 @@ static void test_cmps_one(unsigned char *m1, unsigned char *m3)
  
-+# check if slash can be used for division
-+if [ "$arch" = "i386" ] || [ "$arch" = "x86_64" ]; then
-+  cat << EOF > lib-test.S
-+foo:
-+    movl (8 / 2), %eax
-+EOF
-+  wa_divide=$("$cross_prefix$cc" -c lib-test.S >/dev/null 2>&1 || echo yes)
-+  rm -f lib-test.{o,S}
-+fi
-+
- # Are we in a separate build tree? If so, link the Makefile
- # and shared stuff so that 'make' and run_tests.sh work.
- if test ! -e Makefile; then
-@@ -205,6 +216,7 @@ PRETTY_PRINT_STACKS=$pretty_print_stacks
- ENVIRON_DEFAULT=$environ_default
- ERRATATXT=$erratatxt
- U32_LONG_FMT=$u32_long
-+WA_DIVIDE=$wa_divide
- EOF
+ 	rsi = m1; rdi = m3; rcx = 30;
+ 	asm volatile("xor %[tmp], %[tmp] \n\t"
+-		     "repe/cmpsb"
++		     "repe cmpsb"
+ 		     : "+S"(rsi), "+D"(rdi), "+c"(rcx), [tmp]"=&r"(tmp)
+ 		     : : "cc");
+ 	report(rcx == 0 && rsi == m1 + 30 && rdi == m3 + 30, "repe/cmpsb (1)");
  
- cat <<EOF > lib/config.h
-diff --git a/x86/Makefile.common b/x86/Makefile.common
-index 2ea9c9f..c3f7dc4 100644
---- a/x86/Makefile.common
-+++ b/x86/Makefile.common
-@@ -29,6 +29,9 @@ $(libcflat): LDFLAGS += -nostdlib
- $(libcflat): CFLAGS += -ffreestanding -I $(SRCDIR)/lib -I lib
+ 	rsi = m1; rdi = m3; rcx = 30;
+ 	asm volatile("or $1, %[tmp]\n\t" // clear ZF
+-		     "repe/cmpsb"
++		     "repe cmpsb"
+ 		     : "+S"(rsi), "+D"(rdi), "+c"(rcx), [tmp]"=&r"(tmp)
+ 		     : : "cc");
+ 	report(rcx == 0 && rsi == m1 + 30 && rdi == m3 + 30,
+-	       "repe/cmpsb (1.zf)");
++	       "repe cmpsb (1.zf)");
  
- COMMON_CFLAGS += -m$(bits)
-+ifneq ($(WA_DIVIDE),)
-+COMMON_CFLAGS += -Wa,--divide
-+endif
- COMMON_CFLAGS += -O1
+ 	rsi = m1; rdi = m3; rcx = 15;
+ 	asm volatile("xor %[tmp], %[tmp] \n\t"
+-		     "repe/cmpsw"
++		     "repe cmpsw"
+ 		     : "+S"(rsi), "+D"(rdi), "+c"(rcx), [tmp]"=&r"(tmp)
+ 		     : : "cc");
+-	report(rcx == 0 && rsi == m1 + 30 && rdi == m3 + 30, "repe/cmpsw (1)");
++	report(rcx == 0 && rsi == m1 + 30 && rdi == m3 + 30, "repe cmpsw (1)");
  
- # stack.o relies on frame pointers.
+ 	rsi = m1; rdi = m3; rcx = 7;
+ 	asm volatile("xor %[tmp], %[tmp] \n\t"
+-		     "repe/cmpsl"
++		     "repe cmpsl"
+ 		     : "+S"(rsi), "+D"(rdi), "+c"(rcx), [tmp]"=&r"(tmp)
+ 		     : : "cc");
+-	report(rcx == 0 && rsi == m1 + 28 && rdi == m3 + 28, "repe/cmpll (1)");
++	report(rcx == 0 && rsi == m1 + 28 && rdi == m3 + 28, "repe cmpll (1)");
+ 
+ 	rsi = m1; rdi = m3; rcx = 4;
+ 	asm volatile("xor %[tmp], %[tmp] \n\t"
+-		     "repe/cmpsq"
++		     "repe cmpsq"
+ 		     : "+S"(rsi), "+D"(rdi), "+c"(rcx), [tmp]"=&r"(tmp)
+ 		     : : "cc");
+-	report(rcx == 0 && rsi == m1 + 32 && rdi == m3 + 32, "repe/cmpsq (1)");
++	report(rcx == 0 && rsi == m1 + 32 && rdi == m3 + 32, "repe cmpsq (1)");
+ 
+ 	rsi = m1; rdi = m3; rcx = 130;
+ 	asm volatile("xor %[tmp], %[tmp] \n\t"
+-		     "repe/cmpsb"
++		     "repe cmpsb"
+ 		     : "+S"(rsi), "+D"(rdi), "+c"(rcx), [tmp]"=&r"(tmp)
+ 		     : : "cc");
+ 	report(rcx == 29 && rsi == m1 + 101 && rdi == m3 + 101,
+-	       "repe/cmpsb (2)");
++	       "repe cmpsb (2)");
+ 
+ 	rsi = m1; rdi = m3; rcx = 65;
+ 	asm volatile("xor %[tmp], %[tmp] \n\t"
+-		     "repe/cmpsw"
++		     "repe cmpsw"
+ 		     : "+S"(rsi), "+D"(rdi), "+c"(rcx), [tmp]"=&r"(tmp)
+ 		     : : "cc");
+ 	report(rcx == 14 && rsi == m1 + 102 && rdi == m3 + 102,
+-	       "repe/cmpsw (2)");
++	       "repe cmpsw (2)");
+ 
+ 	rsi = m1; rdi = m3; rcx = 32;
+ 	asm volatile("xor %[tmp], %[tmp] \n\t"
+-		     "repe/cmpsl"
++		     "repe cmpsl"
+ 		     : "+S"(rsi), "+D"(rdi), "+c"(rcx), [tmp]"=&r"(tmp)
+ 		     : : "cc");
+ 	report(rcx == 6 && rsi == m1 + 104 && rdi == m3 + 104,
+-	       "repe/cmpll (2)");
++	       "repe cmpll (2)");
+ 
+ 	rsi = m1; rdi = m3; rcx = 16;
+ 	asm volatile("xor %[tmp], %[tmp] \n\t"
+-		     "repe/cmpsq"
++		     "repe cmpsq"
+ 		     : "+S"(rsi), "+D"(rdi), "+c"(rcx), [tmp]"=&r"(tmp)
+ 		     : : "cc");
+ 	report(rcx == 3 && rsi == m1 + 104 && rdi == m3 + 104,
+-	       "repe/cmpsq (2)");
++	       "repe cmpsq (2)");
+ 
+ }
+ 
+@@ -304,8 +304,8 @@ static void test_ljmp(void *mem)
+     volatile int res = 1;
+ 
+     *(unsigned long**)m = &&jmpf;
+-    asm volatile ("data16/mov %%cs, %0":"=m"(*(m + sizeof(unsigned long))));
+-    asm volatile ("rex64/ljmp *%0"::"m"(*m));
++    asm volatile ("data16 mov %%cs, %0":"=m"(*(m + sizeof(unsigned long))));
++    asm volatile ("rex64 ljmp *%0"::"m"(*m));
+     res = 0;
+ jmpf:
+     report(res, "ljmp");
 -- 
 2.28.0
 
