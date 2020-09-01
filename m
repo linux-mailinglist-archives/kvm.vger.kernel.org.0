@@ -2,129 +2,193 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A8C52259F8D
-	for <lists+kvm@lfdr.de>; Tue,  1 Sep 2020 22:00:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5E02A259FC4
+	for <lists+kvm@lfdr.de>; Tue,  1 Sep 2020 22:16:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731162AbgIAUAg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 1 Sep 2020 16:00:36 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:46511 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727107AbgIAUAe (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 1 Sep 2020 16:00:34 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1598990432;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=Vc3R4m+8MTjsRaa5gUjV4LA0oqfm1u6CW8ImByjlE7A=;
-        b=OATQFdU2ghR72FVMuoJTeAM8fgO8hDXPKLHGnh7zIi921kJMJ6KpQdibH7qlMI+RxEVkeQ
-        cKUQwHXPylsKNNBmQa/LD/Y3S+bvL8GuVMPyRdZNctadImggpDIFca/bGXJUCMa4qrNmFI
-        mLYmuTIJLkJL/ADVMaANzJfyb9yoKVw=
-Received: from mail-qt1-f200.google.com (mail-qt1-f200.google.com
- [209.85.160.200]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-193-O9gPLIQ6PHGMfrPAm5yUWg-1; Tue, 01 Sep 2020 16:00:26 -0400
-X-MC-Unique: O9gPLIQ6PHGMfrPAm5yUWg-1
-Received: by mail-qt1-f200.google.com with SMTP id g1so1864043qtc.22
-        for <kvm@vger.kernel.org>; Tue, 01 Sep 2020 13:00:25 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=Vc3R4m+8MTjsRaa5gUjV4LA0oqfm1u6CW8ImByjlE7A=;
-        b=pc5pcwV89NagoWidDLI7JJN6Fill7tgsYLb/rIaC5aLjLa6sNS8oRdI0QWomaXaB3j
-         diuaaVyame9Es5xQvGXQ4ufc/8jSw9mf/IsW41hSRV4oLrQX827jg1HudvaAPpvTvAwb
-         wGfVucjNKYNq9ezBAfLI+fKJczgV9mInfCezi9KxO0OYkoY1IurRG/11m35VYgQuvOp8
-         sxIt8bNk2m5weJEK6WMol+tV0HIvq896bCe+XC4q5FjiUvO84YjrxCbavXAbnD896jhO
-         VIdX63Sovx72M7/z+uFC6BKLJK5vEfCVoLOKu7Z64B9+sqZcTjcAueRJLMzRzMykVgQu
-         0VDw==
-X-Gm-Message-State: AOAM530DhoskDwcoYTetcn0r4eKjH8l2iewdl7wDCQkij0c1TXUIn/qc
-        G44iGkWsvhFr3UZr2AeMOJQsrrpZtBz1zotbN/BKZcUVih7QCEYKddO7p2MFq+FkqKFkIqfPRo9
-        43LaKhy3LAzPt
-X-Received: by 2002:a37:64d4:: with SMTP id y203mr3623674qkb.359.1598990424706;
-        Tue, 01 Sep 2020 13:00:24 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyu0YmC5kC1aUFd9w+Ovk9eAmNQQBT7X2Nm9TKQFxFHF2t+4Nd1e2v1kCKNfsvGi8l6orS7/A==
-X-Received: by 2002:a37:64d4:: with SMTP id y203mr3623648qkb.359.1598990424405;
-        Tue, 01 Sep 2020 13:00:24 -0700 (PDT)
-Received: from xz-x1 (bras-vprn-toroon474qw-lp130-11-70-53-122-15.dsl.bell.ca. [70.53.122.15])
-        by smtp.gmail.com with ESMTPSA id x126sm2733262qkb.101.2020.09.01.13.00.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 01 Sep 2020 13:00:22 -0700 (PDT)
-Date:   Tue, 1 Sep 2020 16:00:21 -0400
-From:   Peter Xu <peterx@redhat.com>
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        id S1729348AbgIAUPg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 1 Sep 2020 16:15:36 -0400
+Received: from smtp-fw-2101.amazon.com ([72.21.196.25]:23808 "EHLO
+        smtp-fw-2101.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726323AbgIAUPf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 1 Sep 2020 16:15:35 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1598991335; x=1630527335;
+  h=from:to:cc:subject:date:message-id:mime-version;
+  bh=3EnOz/3Rmff/sgE96/Smy7EzDfB4zcQK8Cuf3LKrUSg=;
+  b=EMAd95arIFU/VydIlwl0eQurIUojnyuFqua0ooGUbhsX1dWt8ha8W4Vf
+   s2zU4ijBu4ciTkReChgWWx0UpjwwfRr3JQAZ2ugwuo/F4jRhCGSMT0/IC
+   RYV688ky/Bx6LwQ3tI9eDGfBl9gq/z2rFQIjM6vPD7sHTKR6KZAOL/09i
+   w=;
+X-IronPort-AV: E=Sophos;i="5.76,380,1592870400"; 
+   d="scan'208";a="51310818"
+Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO email-inbound-relay-2a-22cc717f.us-west-2.amazon.com) ([10.43.8.2])
+  by smtp-border-fw-out-2101.iad2.amazon.com with ESMTP; 01 Sep 2020 20:15:32 +0000
+Received: from EX13MTAUWC002.ant.amazon.com (pdx4-ws-svc-p6-lb7-vlan3.pdx.amazon.com [10.170.41.166])
+        by email-inbound-relay-2a-22cc717f.us-west-2.amazon.com (Postfix) with ESMTPS id 6E9C7A2028;
+        Tue,  1 Sep 2020 20:15:30 +0000 (UTC)
+Received: from EX13D20UWC001.ant.amazon.com (10.43.162.244) by
+ EX13MTAUWC002.ant.amazon.com (10.43.162.240) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.2; Tue, 1 Sep 2020 20:15:28 +0000
+Received: from u79c5a0a55de558.ant.amazon.com (10.43.160.229) by
+ EX13D20UWC001.ant.amazon.com (10.43.162.244) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.2; Tue, 1 Sep 2020 20:15:25 +0000
+From:   Alexander Graf <graf@amazon.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+CC:     Jonathan Corbet <corbet@lwn.net>,
         Sean Christopherson <sean.j.christopherson@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Michael Tsirkin <mst@redhat.com>,
-        Julia Suvorova <jsuvorov@redhat.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Andrew Jones <drjones@redhat.com>, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 0/3] KVM: x86: KVM_MEM_PCI_HOLE memory
-Message-ID: <20200901200021.GB3053@xz-x1>
-References: <20200807141232.402895-1-vkuznets@redhat.com>
- <20200825212526.GC8235@xz-x1>
- <87eenlwoaa.fsf@vitty.brq.redhat.com>
+        "Joerg Roedel" <joro@8bytes.org>,
+        KarimAllah Raslan <karahmed@amazon.de>,
+        Aaron Lewis <aaronlewis@google.com>,
+        Dan Carpenter <dan.carpenter@oracle.com>,
+        <kvm@vger.kernel.org>, <linux-doc@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>
+Subject: [PATCH v6 0/7] Allow user space to restrict and augment MSR emulation
+Date:   Tue, 1 Sep 2020 22:15:10 +0200
+Message-ID: <20200901201517.29086-1-graf@amazon.com>
+X-Mailer: git-send-email 2.17.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <87eenlwoaa.fsf@vitty.brq.redhat.com>
+Content-Type: text/plain
+X-Originating-IP: [10.43.160.229]
+X-ClientProxiedBy: EX13D18UWC001.ant.amazon.com (10.43.162.105) To
+ EX13D20UWC001.ant.amazon.com (10.43.162.244)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Sep 01, 2020 at 04:43:25PM +0200, Vitaly Kuznetsov wrote:
-> Peter Xu <peterx@redhat.com> writes:
-> 
-> > On Fri, Aug 07, 2020 at 04:12:29PM +0200, Vitaly Kuznetsov wrote:
-> >> When testing Linux kernel boot with QEMU q35 VM and direct kernel boot
-> >> I observed 8193 accesses to PCI hole memory. When such exit is handled
-> >> in KVM without exiting to userspace, it takes roughly 0.000001 sec.
-> >> Handling the same exit in userspace is six times slower (0.000006 sec) so
-> >> the overal; difference is 0.04 sec. This may be significant for 'microvm'
-> >> ideas.
-> >
-> > Sorry to comment so late, but just curious... have you looked at what's those
-> > 8000+ accesses to PCI holes and what they're used for?  What I can think of are
-> > some port IO reads (e.g. upon vendor ID field) during BIOS to scan the devices
-> > attached.  Though those should be far less than 8000+, and those should also be
-> > pio rather than mmio.
-> 
-> And sorry for replying late)
-> 
-> We explicitly want MMIO instead of PIO to speed things up, afaiu PIO
-> requires two exits per device (and we exit all the way to
-> QEMU). Julia/Michael know better about the size of the space.
-> 
-> >
-> > If this is only an overhead for virt (since baremetal mmios should be fast),
-> > I'm also thinking whether we can make it even better to skip those pci hole
-> > reads.  Because we know we're virt, so it also gives us possibility that we may
-> > provide those information in a better way than reading PCI holes in the guest?
-> 
-> This means let's invent a PV interface and if we decide to go down this
-> road, I'd even argue for abandoning PCI completely. E.g. we can do
-> something similar to Hyper-V's Vmbus.
+While tying to add support for the MSR_CORE_THREAD_COUNT MSR in KVM,
+I realized that we were still in a world where user space has no control
+over what happens with MSR emulation in KVM.
 
-My whole point was more about trying to understand the problem behind.
-Providing a fast path for reading pci holes seems to be reasonable as is,
-however it's just that I'm confused on why there're so many reads on the pci
-holes after all.  Another important question is I'm wondering how this series
-will finally help the use case of microvm.  I'm not sure I get the whole point
-of it, but... if microvm is the major use case of this, it would be good to
-provide some quick numbers on those if possible.
+That is bad for multiple reasons. In my case, I wanted to emulate the
+MSR in user space, because it's a CPU specific register that does not
+exist on older CPUs and that really only contains informational data that
+is on the package level, so it's a natural fit for user space to provide
+it.
 
-For example, IIUC microvm uses qboot (as a better alternative than seabios) for
-fast boot, and qboot has:
+However, it is also bad on a platform compatibility level. Currrently,
+KVM has no way to expose different MSRs based on the selected target CPU
+type.
 
-https://github.com/bonzini/qboot/blob/master/pci.c#L20
+This patch set introduces a way for user space to indicate to KVM which
+MSRs should be handled in kernel space. With that, we can solve part of
+the platform compatibility story. Or at least we can not handle AMD specific
+MSRs on an Intel platform and vice versa.
 
-I'm kind of curious whether qboot will still be used when this series is used
-with microvm VMs?  Since those are still at least PIO based.
+In addition, it introduces a way for user space to get into the loop
+when an MSR access would generate a #GP fault, such as when KVM finds an
+MSR that is not handled by the in-kernel MSR emulation or when the guest
+is trying to access reserved registers.
 
-Thanks,
+In combination with filtering, user space trapping allows us to emulate
+arbitrary MSRs in user space, paving the way for target CPU specific MSR
+implementations from user space.
+
+v1 -> v2:
+
+  - s/ETRAP_TO_USER_SPACE/ENOENT/g
+  - deflect all #GP injection events to user space, not just unknown MSRs.
+    That was we can also deflect allowlist errors later
+  - fix emulator case
+  - new patch: KVM: x86: Introduce allow list for MSR emulation
+  - new patch: KVM: selftests: Add test for user space MSR handling
+
+v2 -> v3:
+
+  - return r if r == X86EMUL_IO_NEEDED
+  - s/KVM_EXIT_RDMSR/KVM_EXIT_X86_RDMSR/g
+  - s/KVM_EXIT_WRMSR/KVM_EXIT_X86_WRMSR/g
+  - Use complete_userspace_io logic instead of reply field
+  - Simplify trapping code
+  - document flags for KVM_X86_ADD_MSR_ALLOWLIST
+  - generalize exit path, always unlock when returning
+  - s/KVM_CAP_ADD_MSR_ALLOWLIST/KVM_CAP_X86_MSR_ALLOWLIST/g
+  - Add KVM_X86_CLEAR_MSR_ALLOWLIST
+  - Add test to clear whitelist
+  - Adjust to reply-less API
+  - Fix asserts
+  - Actually trap on MSR_IA32_POWER_CTL writes
+
+v3 -> v4:
+
+  - Mention exit reasons in re-enter mandatory section of API documentation
+  - Clear padding bytes
+  - Generalize get/set deflect functions
+  - Remove redundant pending_user_msr field
+  - lock allow check and clearing
+  - free bitmaps on clear
+
+v4 -> v5:
+
+  - use srcu 
+
+v5 -> v6:
+
+  - Switch from allow list to filtering API with explicit fallback option
+  - Support and test passthrough MSR filtering
+  - Check for filter exit reason
+  - Add .gitignore
+  - send filter change notification
+  - change to atomic set_msr_filter ioctl with fallback flag
+  - use EPERM for filter blocks
+  - add bit for MSR user space deflection
+  - check for overflow of BITS_TO_LONGS (thanks Dan Carpenter!)
+  - s/int i;/u32 i;/
+  - remove overlap check
+  - Introduce exit reason mask to allow for future expansion and filtering
+  - s/emul_to_vcpu(ctxt)/vcpu/
+  - imported patch: KVM: x86: Prepare MSR bitmaps for userspace tracked MSRs
+  - new patch: KVM: x86: Add infrastructure for MSR filtering
+  - new patch: KVM: x86: SVM: Prevent MSR passthrough when MSR access is denied
+  - new patch: KVM: x86: VMX: Prevent MSR passthrough when MSR access is denied
+
+Aaron Lewis (1):
+  KVM: x86: Prepare MSR bitmaps for userspace tracked MSRs
+
+Alexander Graf (6):
+  KVM: x86: Deflect unknown MSR accesses to user space
+  KVM: x86: Add infrastructure for MSR filtering
+  KVM: x86: SVM: Prevent MSR passthrough when MSR access is denied
+  KVM: x86: VMX: Prevent MSR passthrough when MSR access is denied
+  KVM: x86: Introduce MSR filtering
+  KVM: selftests: Add test for user space MSR handling
+
+ Documentation/virt/kvm/api.rst                | 176 +++++++++-
+ arch/x86/include/asm/kvm_host.h               |  18 ++
+ arch/x86/include/uapi/asm/kvm.h               |  19 ++
+ arch/x86/kvm/emulate.c                        |  18 +-
+ arch/x86/kvm/svm/svm.c                        | 122 +++++--
+ arch/x86/kvm/svm/svm.h                        |   7 +
+ arch/x86/kvm/vmx/nested.c                     |   2 +-
+ arch/x86/kvm/vmx/vmx.c                        | 303 ++++++++++++------
+ arch/x86/kvm/vmx/vmx.h                        |   9 +-
+ arch/x86/kvm/x86.c                            | 267 ++++++++++++++-
+ arch/x86/kvm/x86.h                            |   1 +
+ include/trace/events/kvm.h                    |   2 +-
+ include/uapi/linux/kvm.h                      |  17 +
+ tools/testing/selftests/kvm/.gitignore        |   1 +
+ tools/testing/selftests/kvm/Makefile          |   1 +
+ .../selftests/kvm/x86_64/user_msr_test.c      | 224 +++++++++++++
+ 16 files changed, 1055 insertions(+), 132 deletions(-)
+ create mode 100644 tools/testing/selftests/kvm/x86_64/user_msr_test.c
 
 -- 
-Peter Xu
+2.17.1
+
+
+
+
+Amazon Development Center Germany GmbH
+Krausenstr. 38
+10117 Berlin
+Geschaeftsfuehrung: Christian Schlaeger, Jonathan Weiss
+Eingetragen am Amtsgericht Charlottenburg unter HRB 149173 B
+Sitz: Berlin
+Ust-ID: DE 289 237 879
+
+
 
