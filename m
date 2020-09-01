@@ -2,127 +2,200 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 24149259DA6
-	for <lists+kvm@lfdr.de>; Tue,  1 Sep 2020 19:52:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AABEF259F06
+	for <lists+kvm@lfdr.de>; Tue,  1 Sep 2020 21:13:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727989AbgIARwE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 1 Sep 2020 13:52:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47984 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726140AbgIARwB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 1 Sep 2020 13:52:01 -0400
-Received: from mail-ua1-x944.google.com (mail-ua1-x944.google.com [IPv6:2607:f8b0:4864:20::944])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 31482C061244
-        for <kvm@vger.kernel.org>; Tue,  1 Sep 2020 10:52:01 -0700 (PDT)
-Received: by mail-ua1-x944.google.com with SMTP id z12so694778uam.12
-        for <kvm@vger.kernel.org>; Tue, 01 Sep 2020 10:52:01 -0700 (PDT)
+        id S1728779AbgIATN2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 1 Sep 2020 15:13:28 -0400
+Received: from smtp-fw-4101.amazon.com ([72.21.198.25]:39005 "EHLO
+        smtp-fw-4101.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728130AbgIATN1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 1 Sep 2020 15:13:27 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:in-reply-to:message-id:references
-         :user-agent:mime-version;
-        bh=LM/90lickBJaNMACbOvycyEGn6a9FzKJ0U/uO72EduU=;
-        b=hju9hXEyZJ9W7EcArFXRkj//GhdBJx9t9WVyBsS5qVUMOPxI0SZi60FdZXd9DNc3/C
-         S273aVy9mrHuTApmUBWlWClB5O1A52+eO4vMMVNKleLtw+3LtnOSi1YNNS56WBHf3VYe
-         QDLb3WmoD2qGaP6w2RMuhDS75IjOokRPl9kWzfiKW2LoVixLj52+4FtQDVBupYZw3rp+
-         tctiPNIlTvR1Y+MbRfmljBqzIEFH/K0tjpopvEbxUiWQq1Fyw0dCDOEwp5hKgYfW8aPy
-         qUc22zx7ZSF3D4RlmvRYnFUgbqPz0l9KEmQoOSD7Ol59hMYh9qdzbEtk6EmTxiEnKoNa
-         L4nA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:in-reply-to:message-id
-         :references:user-agent:mime-version;
-        bh=LM/90lickBJaNMACbOvycyEGn6a9FzKJ0U/uO72EduU=;
-        b=BMTkwFnEZrJ7vyXLSqY7TpwUGJBWGBQ9g5iEoBkIm5s0PB0Cj8R/mt09c3C3g5rkWt
-         9XOQCtf0YShzg3p3XEIN5AN3k7jwjaPEdAFo9VM93+bnlgcbe8qqGW9i7y42Zrr0Ummo
-         WCWrlN0+Zthm83itVdu62D3+15i0ma/nxiPyeEW8CMtnivg1MOnqcBBX4/iUk/WB+ZPu
-         BGpCUVGQnepv8L9KqsmVQIcgjYKOEibUlz41vI4/zXWUZVuboCCo/rvt1pgYBmgKwgIS
-         xUaoDtVkR/PIM38w/MgVvJw54LmL1dpOqddJT5h3lTB6mjjkOmngQ40h0bb4vIBZPYR1
-         jyuA==
-X-Gm-Message-State: AOAM533HqZ77PPY/V0zAJEG/IkdtGb78JCDLrLc1hjaZJS0BqikhI19Z
-        vuvve1RtayEOnDY+yhOz+PSkwA==
-X-Google-Smtp-Source: ABdhPJwd4yAWigNFFp7I++YzQSE/wwvwyWSL4EWTSXtuXfgpD4jtXuOK2Hg4izfmGGMu0At/61qMYw==
-X-Received: by 2002:ab0:754d:: with SMTP id k13mr2444657uaq.75.1598982720150;
-        Tue, 01 Sep 2020 10:52:00 -0700 (PDT)
-Received: from eggly.attlocal.net (172-10-233-147.lightspeed.sntcca.sbcglobal.net. [172.10.233.147])
-        by smtp.gmail.com with ESMTPSA id 67sm242644vsl.13.2020.09.01.10.51.57
-        (version=TLS1 cipher=ECDHE-ECDSA-AES128-SHA bits=128/128);
-        Tue, 01 Sep 2020 10:51:59 -0700 (PDT)
-Date:   Tue, 1 Sep 2020 10:51:55 -0700 (PDT)
-From:   Hugh Dickins <hughd@google.com>
-X-X-Sender: hugh@eggly.anvils
-To:     "Maoming (maoming, Cloud Infrastructure Service Product Dept.)" 
-        <maoming.maoming@huawei.com>
-cc:     Hugh Dickins <hughd@google.com>,
-        Matthew Wilcox <willy@infradead.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "cohuck@redhat.com" <cohuck@redhat.com>,
-        "Zhoujian (jay)" <jianjay.zhou@huawei.com>,
-        "Huangweidong (C)" <weidong.huang@huawei.com>,
-        "peterx@redhat.com" <peterx@redhat.com>,
-        "aarcange@redhat.com" <aarcange@redhat.com>,
-        wangyunjian <wangyunjian@huawei.com>
-Subject: =?UTF-8?Q?Re=3A_=E7=AD=94=E5=A4=8D=3A_=5BPATCH_V3=5D_vfio_dma=5Fmap=2Funmap=3A_optimized_for_hugetlbfs_pages?=
-In-Reply-To: <8B561EC9A4D13649A62CF60D3A8E8CB28C2DC466@dggeml524-mbx.china.huawei.com>
-Message-ID: <alpine.LSU.2.11.2009011040560.2984@eggly.anvils>
-References: <20200828092649.853-1-maoming.maoming@huawei.com> <alpine.LSU.2.11.2008302332330.2382@eggly.anvils> <8B561EC9A4D13649A62CF60D3A8E8CB28C2DC466@dggeml524-mbx.china.huawei.com>
-User-Agent: Alpine 2.11 (LSU 23 2013-08-11)
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1598987606; x=1630523606;
+  h=subject:to:cc:references:from:message-id:date:
+   mime-version:in-reply-to:content-transfer-encoding;
+  bh=w7ftULaPpfhBrTyIGjw24JWJqunt94vLzHsPBbaDg1s=;
+  b=Yi2x1RwGjqWDCWDWfo4R7W4KxbwcjCgNc1uA8XSOCgSnwJJ3WNp0TPNx
+   AmFt8nTAlOR+Udyi6E/Wra2hStKViYnCOTESPxmCUCTcACl9hjuyTINhF
+   eOzFFbB70efAlleI9fKAwyOL+sKdsRFnGZp00M0v3Qk/6cMNEpjHhI13H
+   A=;
+X-IronPort-AV: E=Sophos;i="5.76,380,1592870400"; 
+   d="scan'208";a="51482452"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-1a-715bee71.us-east-1.amazon.com) ([10.43.8.6])
+  by smtp-border-fw-out-4101.iad4.amazon.com with ESMTP; 01 Sep 2020 19:13:19 +0000
+Received: from EX13MTAUWC001.ant.amazon.com (iad55-ws-svc-p15-lb9-vlan3.iad.amazon.com [10.40.159.166])
+        by email-inbound-relay-1a-715bee71.us-east-1.amazon.com (Postfix) with ESMTPS id 2AA89A2535;
+        Tue,  1 Sep 2020 19:13:15 +0000 (UTC)
+Received: from EX13D20UWC001.ant.amazon.com (10.43.162.244) by
+ EX13MTAUWC001.ant.amazon.com (10.43.162.135) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.2; Tue, 1 Sep 2020 19:13:15 +0000
+Received: from freeip.amazon.com (10.43.160.229) by
+ EX13D20UWC001.ant.amazon.com (10.43.162.244) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.2; Tue, 1 Sep 2020 19:13:12 +0000
+Subject: Re: [PATCH v3 02/12] KVM: x86: Introduce allow list for MSR emulation
+To:     Dan Carpenter <dan.carpenter@oracle.com>, <kbuild@lists.01.org>,
+        "Aaron Lewis" <aaronlewis@google.com>, <jmattson@google.com>
+CC:     <lkp@intel.com>, <kbuild-all@lists.01.org>, <pshier@google.com>,
+        <oupton@google.com>, <kvm@vger.kernel.org>,
+        KarimAllah Ahmed <karahmed@amazon.de>
+References: <20200831103933.GF8299@kadam>
+From:   Alexander Graf <graf@amazon.com>
+Message-ID: <79dd5f72-a332-a657-674d-f3a9c94146f1@amazon.com>
+Date:   Tue, 1 Sep 2020 21:13:10 +0200
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.16; rv:78.0)
+ Gecko/20100101 Thunderbird/78.2.0
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
+In-Reply-To: <20200831103933.GF8299@kadam>
+Content-Language: en-US
+X-Originating-IP: [10.43.160.229]
+X-ClientProxiedBy: EX13D35UWB002.ant.amazon.com (10.43.161.154) To
+ EX13D20UWC001.ant.amazon.com (10.43.162.244)
+Content-Type: text/plain; charset="windows-1252"; format="flowed"
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 1 Sep 2020, Maoming (maoming, Cloud Infrastructure Service Product Dept.) wrote:
-> > 
-> > > In the original process of dma_map/unmap pages for VFIO-devices, to
-> > > make sure the pages are contiguous, we have to check them one by one.
-> > > As a result, dma_map/unmap could spend a long time.
-> > > Using the hugetlb pages, we can avoid this problem.
-> > > All pages in hugetlb pages are contiguous.And the hugetlb page should
-> > > not be split.So we can delete the for loops.
-> > 
-> > I know nothing about VFIO, but I'm surprised that you're paying such attention
-> > to PageHuge hugetlbfs pages, rather than to PageCompound
-> > pages: which would also include Transparent Huge Pages, of the traditional
-> > anonymous kind, or the huge tmpfs kind, or the more general (not necessarily
-> > pmd-sized) kind that Matthew Wilcox is currently working on.
-> > 
-> > It's true that hugetlbfs is peculiar enough that whatever you write for it may
-> > need some tweaks to cover the THP case too, or vice versa; but wouldn't your
-> > patch be a lot better for covering all cases?
-> > 
-> > You mention above that "the hugetlb page should not be split":
-> > perhaps you have been worried that a THP could be split beneath you?
-> > That used to be a possibility some years ago, but nowadays a THP cannot be
-> > split while anyone is pinning it with an extra reference.
-> > 
-> > Hugh
-> > 
-> 
-> 
-> Thanks for your suggestions.
-> You mention that a THP cannot be split while anyone is pinning it.
-> Do you mean the check of can_split_huge_page()(in split_huge_page_to_list())?
 
-Partly, yes: but that's just a racy check to avoid doing wasted work in
-common cases; the more important check comes later in page_ref_freeze(),
-which either fails, or prevents anyone else taking a new reference to
-the THP (head or tails) while all the work on splitting is being done.
 
-> When we want to pin pages, vfio_pin_pages_remote() always gets a normal page first.
-> In this case, a THP cannot be split because of the increased reference.
-> Is this right?
+On 31.08.20 12:39, Dan Carpenter wrote:
+> =
 
-Yes.
+> Hi Aaron,
+> =
 
-> 
-> Maybe I can optimize for hugetlb pages as a first step,
-> and then cover all compound pages.
+> url:    https://github.com/0day-ci/linux/commits/Aaron-Lewis/Allow-usersp=
+ace-to-manage-MSRs/20200819-051903
+> base:   https://git.kernel.org/pub/scm/virt/kvm/kvm.git linux-next
+> config: x86_64-randconfig-m001-20200827 (attached as .config)
+> compiler: gcc-9 (Debian 9.3.0-15) 9.3.0
+> =
 
-Okay.  That's definitely a good way to start out - but you may find
-that the second step leads you to rewrite every line you wrote before!
+> If you fix the issue, kindly add following tag as appropriate
+> Reported-by: kernel test robot <lkp@intel.com>
+> Reported-by: Dan Carpenter <dan.carpenter@oracle.com>
 
-Hugh
+Thanks a bunch for looking at this! I'd squash in the change with the =
+
+actual patch as it's tiny, so I'm not sure how attribution would work in =
+
+that case.
+
+> =
+
+> smatch warnings:
+> arch/x86/kvm/x86.c:5248 kvm_vm_ioctl_add_msr_allowlist() error: 'bitmap' =
+dereferencing possible ERR_PTR()
+> =
+
+> # https://github.com/0day-ci/linux/commit/107c87325cf461b7b1bd07bb6ddbaf8=
+08a8d8a2a
+> git remote add linux-review https://github.com/0day-ci/linux
+> git fetch --no-tags linux-review Aaron-Lewis/Allow-userspace-to-manage-MS=
+Rs/20200819-051903
+> git checkout 107c87325cf461b7b1bd07bb6ddbaf808a8d8a2a
+> vim +/bitmap +5248 arch/x86/kvm/x86.c
+> =
+
+> 107c87325cf461 Aaron Lewis 2020-08-18  5181  static int kvm_vm_ioctl_add_=
+msr_allowlist(struct kvm *kvm, void __user *argp)
+> 107c87325cf461 Aaron Lewis 2020-08-18  5182  {
+> 107c87325cf461 Aaron Lewis 2020-08-18  5183     struct msr_bitmap_range *=
+ranges =3D kvm->arch.msr_allowlist_ranges;
+> 107c87325cf461 Aaron Lewis 2020-08-18  5184     struct kvm_msr_allowlist =
+__user *user_msr_allowlist =3D argp;
+> 107c87325cf461 Aaron Lewis 2020-08-18  5185     struct msr_bitmap_range r=
+ange;
+> 107c87325cf461 Aaron Lewis 2020-08-18  5186     struct kvm_msr_allowlist =
+kernel_msr_allowlist;
+> 107c87325cf461 Aaron Lewis 2020-08-18  5187     unsigned long *bitmap =3D=
+ NULL;
+> 107c87325cf461 Aaron Lewis 2020-08-18  5188     size_t bitmap_size;
+> 107c87325cf461 Aaron Lewis 2020-08-18  5189     int r =3D 0;
+> 107c87325cf461 Aaron Lewis 2020-08-18  5190
+> 107c87325cf461 Aaron Lewis 2020-08-18  5191     if (copy_from_user(&kerne=
+l_msr_allowlist, user_msr_allowlist,
+> 107c87325cf461 Aaron Lewis 2020-08-18  5192                        sizeof=
+(kernel_msr_allowlist))) {
+> 107c87325cf461 Aaron Lewis 2020-08-18  5193             r =3D -EFAULT;
+> 107c87325cf461 Aaron Lewis 2020-08-18  5194             goto out;
+> 107c87325cf461 Aaron Lewis 2020-08-18  5195     }
+> 107c87325cf461 Aaron Lewis 2020-08-18  5196
+> 107c87325cf461 Aaron Lewis 2020-08-18  5197     bitmap_size =3D BITS_TO_L=
+ONGS(kernel_msr_allowlist.nmsrs) * sizeof(long);
+>                                                                ^^^^^^^^^^=
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^n
+> On 32 bit systems the BITS_TO_LONGS() can integer overflow if
+> kernel_msr_allowlist.nmsrs is larger than ULONG_MAX - bits_per_long.  In
+> that case bitmap_size is zero.
+
+Nice catch! It should be enough to ...
+
+> =
+
+> 107c87325cf461 Aaron Lewis 2020-08-18  5198     if (bitmap_size > KVM_MSR=
+_ALLOWLIST_MAX_LEN) {
+
+... add a check for !bitmap_size here as well then, right?
+
+> 107c87325cf461 Aaron Lewis 2020-08-18  5199             r =3D -EINVAL;
+> 107c87325cf461 Aaron Lewis 2020-08-18  5200             goto out;
+> 107c87325cf461 Aaron Lewis 2020-08-18  5201     }
+> 107c87325cf461 Aaron Lewis 2020-08-18  5202
+> 107c87325cf461 Aaron Lewis 2020-08-18  5203     bitmap =3D memdup_user(us=
+er_msr_allowlist->bitmap, bitmap_size);
+> 107c87325cf461 Aaron Lewis 2020-08-18  5204     if (IS_ERR(bitmap)) {
+> 107c87325cf461 Aaron Lewis 2020-08-18  5205             r =3D PTR_ERR(bit=
+map);
+> 107c87325cf461 Aaron Lewis 2020-08-18  5206             goto out;
+>                                                          ^^^^^^^^
+> "out" is always a vague label name.  It's better style to return
+> directly instead of doing a complicated no-op.
+> =
+
+>          if (IS_ERR(bitmap))
+>                  return PTR_ERR(bitmap);
+
+I agree 100% :). In fact, I agree so much that I already did change it =
+
+for v6 last week, just did not send it out yet.
+
+> =
+
+> 107c87325cf461 Aaron Lewis 2020-08-18  5207     }
+> 107c87325cf461 Aaron Lewis 2020-08-18  5208
+> 107c87325cf461 Aaron Lewis 2020-08-18  5209     range =3D (struct msr_bit=
+map_range) {
+> 107c87325cf461 Aaron Lewis 2020-08-18  5210             .flags =3D kernel=
+_msr_allowlist.flags,
+> 107c87325cf461 Aaron Lewis 2020-08-18  5211             .base =3D kernel_=
+msr_allowlist.base,
+> 107c87325cf461 Aaron Lewis 2020-08-18  5212             .nmsrs =3D kernel=
+_msr_allowlist.nmsrs,
+> 107c87325cf461 Aaron Lewis 2020-08-18  5213             .bitmap =3D bitma=
+p,
+> =
+
+> In case of overflow then "bitmap" is 0x16 and .nmsrs is a very high
+> number.
+
+The overflow case should disappear with the additional check above, right?
+
+
+Alex
+
+
+
+Amazon Development Center Germany GmbH
+Krausenstr. 38
+10117 Berlin
+Geschaeftsfuehrung: Christian Schlaeger, Jonathan Weiss
+Eingetragen am Amtsgericht Charlottenburg unter HRB 149173 B
+Sitz: Berlin
+Ust-ID: DE 289 237 879
+
+
+
