@@ -2,57 +2,54 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D9B78258ABE
-	for <lists+kvm@lfdr.de>; Tue,  1 Sep 2020 10:51:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 65536258AC0
+	for <lists+kvm@lfdr.de>; Tue,  1 Sep 2020 10:51:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728019AbgIAIvR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 1 Sep 2020 04:51:17 -0400
-Received: from mta-02.yadro.com ([89.207.88.252]:55048 "EHLO mta-01.yadro.com"
+        id S1728035AbgIAIvS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 1 Sep 2020 04:51:18 -0400
+Received: from mta-02.yadro.com ([89.207.88.252]:55054 "EHLO mta-01.yadro.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727930AbgIAIvL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        id S1727089AbgIAIvL (ORCPT <rfc822;kvm@vger.kernel.org>);
         Tue, 1 Sep 2020 04:51:11 -0400
 Received: from localhost (unknown [127.0.0.1])
-        by mta-01.yadro.com (Postfix) with ESMTP id B2DDC52215;
-        Tue,  1 Sep 2020 08:51:08 +0000 (UTC)
+        by mta-01.yadro.com (Postfix) with ESMTP id C392652195;
+        Tue,  1 Sep 2020 08:51:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=yadro.com; h=
-        content-transfer-encoding:content-type:content-type:mime-version
+        content-type:content-type:content-transfer-encoding:mime-version
         :references:in-reply-to:x-mailer:message-id:date:date:subject
         :subject:from:from:received:received:received; s=mta-01; t=
-        1598950267; x=1600764668; bh=ZmM9ZWKttDorIzOM/FDHNNVOBMf5H7JT8Wp
-        NGiTYJnQ=; b=i0YD9MXbb4jANEeie5XRcA4BnH1vbqREY1VGWTgIvczgg6yu/MG
-        FN6qa4ezeBOiymLL5erKQeijhiaXuJFzdhS4DQOa5ydJ3RoxeFr1DlsVR7zNb6As
-        o8k7UKiXzgrEushzPSCSjbxzlY7mV3HjW6mwpFd5u2HYU9JI82MKi8DI=
+        1598950268; x=1600764669; bh=BNBYuBfEPgv86IqOtJm1CBAiXwwqlis6GlD
+        TxXzfZWs=; b=No4UZgH4vXgdMFVGEy33lZO6AsZ0lvBsDBGqQ4IIi2wrUpdzlBb
+        jZPRc3yU+yTNVQ6TZhYOBwrTyZPlNof2/75BprBRvVgi3YtsaMJjJLREGsHuLL4D
+        BncUoQ2rlZKE1p+E6hQya6cxYtXyChcXTCm1ZGKd2UK5QFNaAVJs/0QQ=
 X-Virus-Scanned: amavisd-new at yadro.com
 Received: from mta-01.yadro.com ([127.0.0.1])
         by localhost (mta-01.yadro.com [127.0.0.1]) (amavisd-new, port 10024)
-        with ESMTP id pJ1UgbhxzZ6c; Tue,  1 Sep 2020 11:51:07 +0300 (MSK)
+        with ESMTP id RaOKKxQkWjJO; Tue,  1 Sep 2020 11:51:08 +0300 (MSK)
 Received: from T-EXCH-02.corp.yadro.com (t-exch-02.corp.yadro.com [172.17.10.102])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mta-01.yadro.com (Postfix) with ESMTPS id 8CA425725D;
-        Tue,  1 Sep 2020 11:51:06 +0300 (MSK)
+        by mta-01.yadro.com (Postfix) with ESMTPS id 1EE0E574EC;
+        Tue,  1 Sep 2020 11:51:07 +0300 (MSK)
 Received: from localhost (172.17.204.212) by T-EXCH-02.corp.yadro.com
  (172.17.10.102) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384_P384) id 15.1.669.32; Tue, 1 Sep
- 2020 11:51:06 +0300
+ 2020 11:51:07 +0300
 From:   Roman Bolshakov <r.bolshakov@yadro.com>
 To:     <kvm@vger.kernel.org>
 CC:     Thomas Huth <thuth@redhat.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
         Roman Bolshakov <r.bolshakov@yadro.com>,
-        =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
-        Andrew Jones <drjones@redhat.com>,
-        Cameron Esfahani <dirty@apple.com>,
-        =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
-Subject: [kvm-unit-tests PATCH v2 05/10] lib: x86: Use portable format macros for uint32_t
-Date:   Tue, 1 Sep 2020 11:50:51 +0300
-Message-ID: <20200901085056.33391-6-r.bolshakov@yadro.com>
+        Cameron Esfahani <dirty@apple.com>
+Subject: [kvm-unit-tests PATCH v2 06/10] configure: Add an option to specify getopt
+Date:   Tue, 1 Sep 2020 11:50:52 +0300
+Message-ID: <20200901085056.33391-7-r.bolshakov@yadro.com>
 X-Mailer: git-send-email 2.28.0
 In-Reply-To: <20200901085056.33391-1-r.bolshakov@yadro.com>
 References: <20200901085056.33391-1-r.bolshakov@yadro.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 X-Originating-IP: [172.17.204.212]
 X-ClientProxiedBy: T-EXCH-01.corp.yadro.com (172.17.10.101) To
  T-EXCH-02.corp.yadro.com (172.17.10.102)
@@ -61,88 +58,87 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Compilation of the files fails on ARCH=i386 with i686-elf gcc because
-they use "%x" or "%d" format specifier that does not match the actual
-size of uint32_t:
+macOS is shipped with an old non-enhanced version of getopt and it
+doesn't support options used by run_tests.sh. Proper version of getopt
+is available from homebrew but it has to be added to PATH before invoking
+run_tests.sh. It's not convenient because it has to be done in each
+shell instance and there could be many if a multiplexor is used.
 
-x86/s3.c: In function ‘main’:
-x86/s3.c:53:35: error: format ‘%x’ expects argument of type ‘unsigned int’, but argument 2 has type ‘u32’ {aka ‘long unsigned int’}
-[-Werror=format=]
-   53 |  printf("PM1a event registers at %x\n", fadt->pm1a_evt_blk);
-      |                                  ~^     ~~~~~~~~~~~~~~~~~~
-      |                                   |         |
-      |                                   |         u32 {aka long unsigned int}
-      |                                   unsigned int
-      |                                  %lx
+The change provides a way to override getopt and halts ./configure if
+enhanced getopt can't be found.
 
-Use PRIx32 instead of "x" and PRId32 instead of "d" to take into account
-u32_long case.
-
-Cc: Alex Bennée <alex.bennee@linaro.org>
-Cc: Andrew Jones <drjones@redhat.com>
 Cc: Cameron Esfahani <dirty@apple.com>
-Cc: Radim Krčmář <rkrcmar@redhat.com>
 Signed-off-by: Roman Bolshakov <r.bolshakov@yadro.com>
 ---
- lib/pci.c     | 2 +-
- x86/asyncpf.c | 2 +-
- x86/msr.c     | 3 ++-
- x86/s3.c      | 2 +-
- 4 files changed, 5 insertions(+), 4 deletions(-)
+ configure    | 13 +++++++++++++
+ run_tests.sh |  2 +-
+ 2 files changed, 14 insertions(+), 1 deletion(-)
 
-diff --git a/lib/pci.c b/lib/pci.c
-index daa33e1..175caf0 100644
---- a/lib/pci.c
-+++ b/lib/pci.c
-@@ -248,7 +248,7 @@ void pci_bar_print(struct pci_dev *dev, int bar_num)
- 		printf("BAR#%d,%d [%" PRIx64 "-%" PRIx64 " ",
- 		       bar_num, bar_num + 1, start, end);
- 	} else {
--		printf("BAR#%d [%02x-%02x ",
-+		printf("BAR#%d [%02" PRIx32 "-%02" PRIx32 " ",
- 		       bar_num, (uint32_t)start, (uint32_t)end);
- 	}
+diff --git a/configure b/configure
+index 4eb504f..b85420b 100755
+--- a/configure
++++ b/configure
+@@ -8,6 +8,7 @@ objcopy=objcopy
+ objdump=objdump
+ ar=ar
+ addr2line=addr2line
++getopt=getopt
+ arch=`uname -m | sed -e 's/i.86/i386/;s/arm.*/arm/;s/ppc64.*/ppc64/'`
+ host=$arch
+ cross_prefix=
+@@ -32,6 +33,7 @@ usage() {
+ 	    --cross-prefix=PREFIX  cross compiler prefix
+ 	    --cc=CC		   c compiler to use ($cc)
+ 	    --ld=LD		   ld linker to use ($ld)
++	    --getopt=GETOPT	   enhanced getopt to use ($getopt)
+ 	    --prefix=PREFIX        where to install things ($prefix)
+ 	    --endian=ENDIAN        endianness to compile for (little or big, ppc64 only)
+ 	    --[enable|disable]-pretty-print-stacks
+@@ -77,6 +79,9 @@ while [[ "$1" = -* ]]; do
+ 	--ld)
+ 	    ld="$arg"
+ 	    ;;
++	--getopt)
++	    getopt="$arg"
++	    ;;
+ 	--enable-pretty-print-stacks)
+ 	    pretty_print_stacks=yes
+ 	    ;;
+@@ -167,6 +172,13 @@ EOF
+   rm -f lib-test.{o,S}
+ fi
  
-diff --git a/x86/asyncpf.c b/x86/asyncpf.c
-index 305a923..8239e16 100644
---- a/x86/asyncpf.c
-+++ b/x86/asyncpf.c
-@@ -78,7 +78,7 @@ static void pf_isr(struct ex_regs *r)
- 			phys = 0;
- 			break;
- 		default:
--			report(false, "unexpected async pf reason %d", reason);
-+			report(false, "unexpected async pf reason %" PRId32, reason);
- 			break;
- 	}
- }
-diff --git a/x86/msr.c b/x86/msr.c
-index f7539c3..ce5dabe 100644
---- a/x86/msr.c
-+++ b/x86/msr.c
-@@ -89,7 +89,8 @@ static void test_msr_rw(int msr_index, unsigned long long input, unsigned long l
-     wrmsr(msr_index, input);
-     r = rdmsr(msr_index);
-     if (expected != r) {
--        printf("testing %s: output = %#x:%#x expected = %#x:%#x\n", sptr,
-+        printf("testing %s: output = %#" PRIx32 ":%#" PRIx32
-+	       " expected = %#" PRIx32 ":%#" PRIx32 "\n", sptr,
-                (u32)(r >> 32), (u32)r, (u32)(expected >> 32), (u32)expected);
-     }
-     report(expected == r, "%s", sptr);
-diff --git a/x86/s3.c b/x86/s3.c
-index da2d00c..6e41d0c 100644
---- a/x86/s3.c
-+++ b/x86/s3.c
-@@ -50,7 +50,7 @@ int main(int argc, char **argv)
- 		*resume_vec++ = *addr;
- 	printf("copy resume code from %p\n", &resume_start);
++# require enhanced getopt
++$getopt -T > /dev/null
++if [ $? -ne 4 ]; then
++    echo "Enchanced getopt is not available"
++    exit 1
++fi
++
+ # Are we in a separate build tree? If so, link the Makefile
+ # and shared stuff so that 'make' and run_tests.sh work.
+ if test ! -e Makefile; then
+@@ -209,6 +221,7 @@ OBJCOPY=$cross_prefix$objcopy
+ OBJDUMP=$cross_prefix$objdump
+ AR=$cross_prefix$ar
+ ADDR2LINE=$cross_prefix$addr2line
++GETOPT=$getopt
+ TEST_DIR=$testdir
+ FIRMWARE=$firmware
+ ENDIAN=$endian
+diff --git a/run_tests.sh b/run_tests.sh
+index 01e36dc..c4f436b 100755
+--- a/run_tests.sh
++++ b/run_tests.sh
+@@ -35,7 +35,7 @@ RUNTIME_arch_run="./$TEST_DIR/run"
+ source scripts/runtime.bash
  
--	printf("PM1a event registers at %x\n", fadt->pm1a_evt_blk);
-+	printf("PM1a event registers at %" PRIx32 "\n", fadt->pm1a_evt_blk);
- 	outw(0x400, fadt->pm1a_evt_blk + 2);
- 
- 	/* Setup RTC alarm to wake up on the next second.  */
+ only_tests=""
+-args=`getopt -u -o ag:htj:v -l all,group:,help,tap13,parallel:,verbose -- $*`
++args=`$GETOPT -u -o ag:htj:v -l all,group:,help,tap13,parallel:,verbose -- $*`
+ [ $? -ne 0 ] && exit 2;
+ set -- $args;
+ while [ $# -gt 0 ]; do
 -- 
 2.28.0
 
