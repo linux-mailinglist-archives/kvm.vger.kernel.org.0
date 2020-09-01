@@ -2,176 +2,129 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8832A259F7A
-	for <lists+kvm@lfdr.de>; Tue,  1 Sep 2020 21:52:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A8C52259F8D
+	for <lists+kvm@lfdr.de>; Tue,  1 Sep 2020 22:00:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732765AbgIATwd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 1 Sep 2020 15:52:33 -0400
-Received: from smtp-fw-9101.amazon.com ([207.171.184.25]:64352 "EHLO
-        smtp-fw-9101.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727769AbgIATwc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 1 Sep 2020 15:52:32 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1598989952; x=1630525952;
-  h=subject:to:cc:references:from:message-id:date:
-   mime-version:in-reply-to:content-transfer-encoding;
-  bh=fRZXTd6tTanOj6fuNvwe2B5pe+PpMShYr5x63b3HgOc=;
-  b=QjoLyqfigj9MgCFCO6pUsZrKkpDOddOYIavVBrh1w16MwlLHe/PeIWZP
-   2EZSxlwFuvXkZaw87uPaJw9aYMZVv7/uYPhMm1yLRYlwQO96KiMAJ3Tki
-   lgxCshHga0A9fHigpoH6DaeDVl0T2mhq4qZuyx4whTSCVfFGzYxuzHgxk
-   w=;
-X-IronPort-AV: E=Sophos;i="5.76,380,1592870400"; 
-   d="scan'208";a="64597815"
-Received: from sea32-co-svc-lb4-vlan3.sea.corp.amazon.com (HELO email-inbound-relay-1d-5dd976cd.us-east-1.amazon.com) ([10.47.23.38])
-  by smtp-border-fw-out-9101.sea19.amazon.com with ESMTP; 01 Sep 2020 19:52:24 +0000
-Received: from EX13MTAUWC002.ant.amazon.com (iad55-ws-svc-p15-lb9-vlan2.iad.amazon.com [10.40.159.162])
-        by email-inbound-relay-1d-5dd976cd.us-east-1.amazon.com (Postfix) with ESMTPS id AB9A0A1A05;
-        Tue,  1 Sep 2020 19:52:19 +0000 (UTC)
-Received: from EX13D20UWC001.ant.amazon.com (10.43.162.244) by
- EX13MTAUWC002.ant.amazon.com (10.43.162.240) with Microsoft SMTP Server (TLS)
- id 15.0.1497.2; Tue, 1 Sep 2020 19:52:19 +0000
-Received: from freeip.amazon.com (10.43.161.34) by
- EX13D20UWC001.ant.amazon.com (10.43.162.244) with Microsoft SMTP Server (TLS)
- id 15.0.1497.2; Tue, 1 Sep 2020 19:52:15 +0000
-Subject: Re: [PATCH v4 2/3] KVM: x86: Introduce allow list for MSR emulation
-To:     Jim Mattson <jmattson@google.com>
-CC:     Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
+        id S1731162AbgIAUAg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 1 Sep 2020 16:00:36 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:46511 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727107AbgIAUAe (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 1 Sep 2020 16:00:34 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1598990432;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=Vc3R4m+8MTjsRaa5gUjV4LA0oqfm1u6CW8ImByjlE7A=;
+        b=OATQFdU2ghR72FVMuoJTeAM8fgO8hDXPKLHGnh7zIi921kJMJ6KpQdibH7qlMI+RxEVkeQ
+        cKUQwHXPylsKNNBmQa/LD/Y3S+bvL8GuVMPyRdZNctadImggpDIFca/bGXJUCMa4qrNmFI
+        mLYmuTIJLkJL/ADVMaANzJfyb9yoKVw=
+Received: from mail-qt1-f200.google.com (mail-qt1-f200.google.com
+ [209.85.160.200]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-193-O9gPLIQ6PHGMfrPAm5yUWg-1; Tue, 01 Sep 2020 16:00:26 -0400
+X-MC-Unique: O9gPLIQ6PHGMfrPAm5yUWg-1
+Received: by mail-qt1-f200.google.com with SMTP id g1so1864043qtc.22
+        for <kvm@vger.kernel.org>; Tue, 01 Sep 2020 13:00:25 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=Vc3R4m+8MTjsRaa5gUjV4LA0oqfm1u6CW8ImByjlE7A=;
+        b=pc5pcwV89NagoWidDLI7JJN6Fill7tgsYLb/rIaC5aLjLa6sNS8oRdI0QWomaXaB3j
+         diuaaVyame9Es5xQvGXQ4ufc/8jSw9mf/IsW41hSRV4oLrQX827jg1HudvaAPpvTvAwb
+         wGfVucjNKYNq9ezBAfLI+fKJczgV9mInfCezi9KxO0OYkoY1IurRG/11m35VYgQuvOp8
+         sxIt8bNk2m5weJEK6WMol+tV0HIvq896bCe+XC4q5FjiUvO84YjrxCbavXAbnD896jhO
+         VIdX63Sovx72M7/z+uFC6BKLJK5vEfCVoLOKu7Z64B9+sqZcTjcAueRJLMzRzMykVgQu
+         0VDw==
+X-Gm-Message-State: AOAM530DhoskDwcoYTetcn0r4eKjH8l2iewdl7wDCQkij0c1TXUIn/qc
+        G44iGkWsvhFr3UZr2AeMOJQsrrpZtBz1zotbN/BKZcUVih7QCEYKddO7p2MFq+FkqKFkIqfPRo9
+        43LaKhy3LAzPt
+X-Received: by 2002:a37:64d4:: with SMTP id y203mr3623674qkb.359.1598990424706;
+        Tue, 01 Sep 2020 13:00:24 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyu0YmC5kC1aUFd9w+Ovk9eAmNQQBT7X2Nm9TKQFxFHF2t+4Nd1e2v1kCKNfsvGi8l6orS7/A==
+X-Received: by 2002:a37:64d4:: with SMTP id y203mr3623648qkb.359.1598990424405;
+        Tue, 01 Sep 2020 13:00:24 -0700 (PDT)
+Received: from xz-x1 (bras-vprn-toroon474qw-lp130-11-70-53-122-15.dsl.bell.ca. [70.53.122.15])
+        by smtp.gmail.com with ESMTPSA id x126sm2733262qkb.101.2020.09.01.13.00.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 01 Sep 2020 13:00:22 -0700 (PDT)
+Date:   Tue, 1 Sep 2020 16:00:21 -0400
+From:   Peter Xu <peterx@redhat.com>
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
         Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        KarimAllah Raslan <karahmed@amazon.de>,
-        Aaron Lewis <aaronlewis@google.com>,
-        kvm list <kvm@vger.kernel.org>, <linux-doc@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>
-References: <20200803211423.29398-1-graf@amazon.com>
- <20200803211423.29398-3-graf@amazon.com>
- <CALMp9eS3Y845mPMD6H+5nmYDMvhPcDcFCWUXpLiscxo_9--EYQ@mail.gmail.com>
-From:   Alexander Graf <graf@amazon.com>
-Message-ID: <c69c5a53-04d4-a7f5-147f-209fe218eada@amazon.com>
-Date:   Tue, 1 Sep 2020 21:52:13 +0200
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.16; rv:78.0)
- Gecko/20100101 Thunderbird/78.2.0
+        Jim Mattson <jmattson@google.com>,
+        Michael Tsirkin <mst@redhat.com>,
+        Julia Suvorova <jsuvorov@redhat.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Andrew Jones <drjones@redhat.com>, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 0/3] KVM: x86: KVM_MEM_PCI_HOLE memory
+Message-ID: <20200901200021.GB3053@xz-x1>
+References: <20200807141232.402895-1-vkuznets@redhat.com>
+ <20200825212526.GC8235@xz-x1>
+ <87eenlwoaa.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <CALMp9eS3Y845mPMD6H+5nmYDMvhPcDcFCWUXpLiscxo_9--EYQ@mail.gmail.com>
-Content-Language: en-US
-X-Originating-IP: [10.43.161.34]
-X-ClientProxiedBy: EX13D07UWB004.ant.amazon.com (10.43.161.196) To
- EX13D20UWC001.ant.amazon.com (10.43.162.244)
-Content-Type: text/plain; charset="utf-8"; format="flowed"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <87eenlwoaa.fsf@vitty.brq.redhat.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-CgpPbiAyMC4wOC4yMCAwMDo0OSwgSmltIE1hdHRzb24gd3JvdGU6Cj4gCj4gT24gTW9uLCBBdWcg
-MywgMjAyMCBhdCAyOjE0IFBNIEFsZXhhbmRlciBHcmFmIDxncmFmQGFtYXpvbi5jb20+IHdyb3Rl
-Ogo+IAo+PiAtLS0gYS9hcmNoL3g4Ni9pbmNsdWRlL2FzbS9rdm1faG9zdC5oCj4+ICsrKyBiL2Fy
-Y2gveDg2L2luY2x1ZGUvYXNtL2t2bV9ob3N0LmgKPj4gQEAgLTkwMSw2ICs5MDEsMTMgQEAgc3Ry
-dWN0IGt2bV9odiB7Cj4+ICAgICAgICAgIHN0cnVjdCBrdm1faHZfc3luZGJnIGh2X3N5bmRiZzsK
-Pj4gICB9Owo+Pgo+PiArc3RydWN0IG1zcl9iaXRtYXBfcmFuZ2Ugewo+PiArICAgICAgIHUzMiBm
-bGFnczsKPj4gKyAgICAgICB1MzIgbm1zcnM7Cj4+ICsgICAgICAgdTMyIGJhc2U7Cj4+ICsgICAg
-ICAgdW5zaWduZWQgbG9uZyAqYml0bWFwOwo+PiArfTsKPj4gKwo+PiAgIGVudW0ga3ZtX2lycWNo
-aXBfbW9kZSB7Cj4+ICAgICAgICAgIEtWTV9JUlFDSElQX05PTkUsCj4+ICAgICAgICAgIEtWTV9J
-UlFDSElQX0tFUk5FTCwgICAgICAgLyogY3JlYXRlZCB3aXRoIEtWTV9DUkVBVEVfSVJRQ0hJUCAq
-Lwo+PiBAQCAtMTAwNSw2ICsxMDEyLDkgQEAgc3RydWN0IGt2bV9hcmNoIHsKPj4gICAgICAgICAg
-LyogRGVmbGVjdCBSRE1TUiBhbmQgV1JNU1IgdG8gdXNlciBzcGFjZSB3aGVuIHRoZXkgdHJpZ2dl
-ciBhICNHUCAqLwo+PiAgICAgICAgICBib29sIHVzZXJfc3BhY2VfbXNyX2VuYWJsZWQ7Cj4+Cj4+
-ICsgICAgICAgc3RydWN0IG1zcl9iaXRtYXBfcmFuZ2UgbXNyX2FsbG93bGlzdF9yYW5nZXNbMTBd
-Owo+IAo+IFdoeSAxMD8gSSB0aGluayB0aGlzIGlzIHRoZSBvbmx5IHVzZSBvZiB0aGlzIGNvbnN0
-YW50LCBidXQgYSBtYWNybwo+IHdvdWxkIHN0aWxsIGJlIG5pY2UsIGVzcGVjaWFsbHkgc2luY2Ug
-dGhlIG51bWJlciBhcHBlYXJzIHRvIGJlCj4gYXJiaXRyYXJ5Lgo+IAo+PiBkaWZmIC0tZ2l0IGEv
-YXJjaC94ODYvaW5jbHVkZS91YXBpL2FzbS9rdm0uaCBiL2FyY2gveDg2L2luY2x1ZGUvdWFwaS9h
-c20va3ZtLmgKPj4gaW5kZXggMDc4MGY5N2MxODUwLi5jMzNmYjFkNzJkNTIgMTAwNjQ0Cj4+IC0t
-LSBhL2FyY2gveDg2L2luY2x1ZGUvdWFwaS9hc20va3ZtLmgKPj4gKysrIGIvYXJjaC94ODYvaW5j
-bHVkZS91YXBpL2FzbS9rdm0uaAo+PiBAQCAtMTkyLDYgKzE5MiwyMSBAQCBzdHJ1Y3Qga3ZtX21z
-cl9saXN0IHsKPj4gICAgICAgICAgX191MzIgaW5kaWNlc1swXTsKPj4gICB9Owo+Pgo+PiArI2Rl
-ZmluZSBLVk1fTVNSX0FMTE9XX1JFQUQgICgxIDw8IDApCj4+ICsjZGVmaW5lIEtWTV9NU1JfQUxM
-T1dfV1JJVEUgKDEgPDwgMSkKPj4gKwo+PiArLyogTWF4aW11bSBzaXplIG9mIHRoZSBvZiB0aGUg
-Yml0bWFwIGluIGJ5dGVzICovCj4+ICsjZGVmaW5lIEtWTV9NU1JfQUxMT1dMSVNUX01BWF9MRU4g
-MHg2MDAKPiAKPiBXb3VsZG4ndCAweDQwMCBiZSBhIG1vcmUgbmF0dXJhbCBzaXplLCBzaW5jZSBi
-b3RoIEludGVsIGFuZCBBTUQgTVNSCj4gcGVybWlzc2lvbiBiaXRtYXBzIGNvdmVyIHJhbmdlcyBv
-ZiA4MTkyIE1TUnM/CgpZb3UgY2FuIGFsd2F5cyBtYWtlIHlvdXIgYml0bWFwcyAweDQwMCA6KS4g
-SSBoYWQgdG8gY2hvb3NlIHNvbWV0aGluZyAKdGhhdCBsaW1pdHMgb3VyIG1lbW9yeSBmb290cHJp
-bnQsIHNvIHRoYXQgdXNlciBzcGFjZSBjYW4ndCBhbGxvY2F0ZSAKaW5maW5pdGUgYW1vdW50cyBv
-ZiBtZW1vcnkuCgo+IAo+PiBkaWZmIC0tZ2l0IGEvYXJjaC94ODYva3ZtL3g4Ni5jIGIvYXJjaC94
-ODYva3ZtL3g4Ni5jCj4+IGluZGV4IGUxMTM5MTI0MzUwZi4uMjVlNThjZWIxOWRlIDEwMDY0NAo+
-PiAtLS0gYS9hcmNoL3g4Ni9rdm0veDg2LmMKPj4gKysrIGIvYXJjaC94ODYva3ZtL3g4Ni5jCj4+
-IEBAIC0xNDcyLDYgKzE0NzIsMzggQEAgdm9pZCBrdm1fZW5hYmxlX2VmZXJfYml0cyh1NjQgbWFz
-aykKPj4gICB9Cj4+ICAgRVhQT1JUX1NZTUJPTF9HUEwoa3ZtX2VuYWJsZV9lZmVyX2JpdHMpOwo+
-Pgo+PiArc3RhdGljIGJvb2wga3ZtX21zcl9hbGxvd2VkKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSwg
-dTMyIGluZGV4LCB1MzIgdHlwZSkKPiAKPiBJbiBhbm90aGVyIHRocmVhZCwgd2hlbiBJIHN1Z2dl
-c3RlZCB0aGF0IGEgZnVuY3Rpb24gc2hvdWxkIHJldHVybgo+IGJvb2wsIHlvdSBzYWlkLCAiJ0kn
-bSBub3QgYSBiaWcgZmFuIG9mIGJvb2wgcmV0dXJuaW5nIEFQSXMgdW5sZXNzIHRoZXkKPiBoYXZl
-IGFuICJpcyIgaW4gdGhlaXIgbmFtZS4nIFRoaXMgZnVuY3Rpb24gZG9lc24ndCBoYXZlICJpcyIg
-aW4gaXRzCj4gbmFtZS4gOi0pCgpJJ3ZlIGxlZnQgdGhpcyB1bmFuc3dlcmVkIGZvciB3YXkgdG9v
-IGxvbmcgOikuIElNSE8sIHBhc3NpdmUgaXMgZmluZSAKdG9vLCBhcyBpdCBpbXBsaWVzIGFuICJp
-cyIgaW4gbXkgYnJhaW4uIE9yIHRvIHB1dCBpdCBkaWZmZXJlbnRseToKCiAgIGJhZDogYm9vbCBr
-dm1fZ2V0X21zcigpCiAgIGJhZDogYm9vbCBrdm1fZ2V0X21zcl91c2VyX3NwYWNlKCkKICAgZ29v
-ZDogYm9vbCBrdm1fbXNyX2Jsb2NrZWQoKQogICBnb29kOiBib29sIGt2bV9tc3JfYWxsb3dlZCgp
-CiAgIGdvb2Q6IGJvb2wgaXNfa3ZtX21zcl9hbGxvd2VkKCkKCj4gCj4+ICt7Cj4+ICsgICAgICAg
-c3RydWN0IGt2bSAqa3ZtID0gdmNwdS0+a3ZtOwo+PiArICAgICAgIHN0cnVjdCBtc3JfYml0bWFw
-X3JhbmdlICpyYW5nZXMgPSBrdm0tPmFyY2gubXNyX2FsbG93bGlzdF9yYW5nZXM7Cj4+ICsgICAg
-ICAgdTMyIGNvdW50ID0ga3ZtLT5hcmNoLm1zcl9hbGxvd2xpc3RfcmFuZ2VzX2NvdW50Owo+IAo+
-IFNob3VsZG4ndCB0aGUgcmVhZCBvZiBrdm0tPmFyY2gubXNyX2FsbG93bGlzdF9yYW5nZXNfY291
-bnQgYmUgZ3VhcmRlZAo+IGJ5IHRoZSBtdXRleCwgYmVsb3c/Cj4gCj4+ICsgICAgICAgdTMyIGk7
-Cj4+ICsgICAgICAgYm9vbCByID0gZmFsc2U7Cj4+ICsKPj4gKyAgICAgICAvKiBNU1IgYWxsb3ds
-aXN0IG5vdCBzZXQgdXAsIGFsbG93IGV2ZXJ5dGhpbmcgKi8KPj4gKyAgICAgICBpZiAoIWNvdW50
-KQo+PiArICAgICAgICAgICAgICAgcmV0dXJuIHRydWU7Cj4+ICsKPj4gKyAgICAgICAvKiBQcmV2
-ZW50IGNvbGxpc2lvbiB3aXRoIGNsZWFyX21zcl9hbGxvd2xpc3QgKi8KPj4gKyAgICAgICBtdXRl
-eF9sb2NrKCZrdm0tPmxvY2spOwo+PiArCj4+ICsgICAgICAgZm9yIChpID0gMDsgaSA8IGNvdW50
-OyBpKyspIHsKPj4gKyAgICAgICAgICAgICAgIHUzMiBzdGFydCA9IHJhbmdlc1tpXS5iYXNlOwo+
-PiArICAgICAgICAgICAgICAgdTMyIGVuZCA9IHN0YXJ0ICsgcmFuZ2VzW2ldLm5tc3JzOwo+PiAr
-ICAgICAgICAgICAgICAgdTMyIGZsYWdzID0gcmFuZ2VzW2ldLmZsYWdzOwo+PiArICAgICAgICAg
-ICAgICAgdW5zaWduZWQgbG9uZyAqYml0bWFwID0gcmFuZ2VzW2ldLmJpdG1hcDsKPj4gKwo+PiAr
-ICAgICAgICAgICAgICAgaWYgKChpbmRleCA+PSBzdGFydCkgJiYgKGluZGV4IDwgZW5kKSAmJiAo
-ZmxhZ3MgJiB0eXBlKSkgewo+PiArICAgICAgICAgICAgICAgICAgICAgICByID0gISF0ZXN0X2Jp
-dChpbmRleCAtIHN0YXJ0LCBiaXRtYXApOwo+IAo+IFRoZSAhISBzZWVtcyBncmF0dWl0b3VzLCBz
-aW5jZSByIGlzIG9mIHR5cGUgYm9vbC4KPiAKPj4gQEAgLTE0ODMsNiArMTUxNSw5IEBAIHN0YXRp
-YyBpbnQgX19rdm1fc2V0X21zcihzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUsIHUzMiBpbmRleCwgdTY0
-IGRhdGEsCj4+ICAgewo+PiAgICAgICAgICBzdHJ1Y3QgbXNyX2RhdGEgbXNyOwo+Pgo+PiArICAg
-ICAgIGlmICghaG9zdF9pbml0aWF0ZWQgJiYgIWt2bV9tc3JfYWxsb3dlZCh2Y3B1LCBpbmRleCwg
-S1ZNX01TUl9BTExPV19XUklURSkpCj4+ICsgICAgICAgICAgICAgICByZXR1cm4gLUVOT0VOVDsK
-PiAKPiBQZXJoYXBzIC1FUEVSTSBpcyBtb3JlIGFwcHJvcHJpYXRlIGhlcmU/Cj4gCj4+ICAgICAg
-ICAgIHN3aXRjaCAoaW5kZXgpIHsKPj4gICAgICAgICAgY2FzZSBNU1JfRlNfQkFTRToKPj4gICAg
-ICAgICAgY2FzZSBNU1JfR1NfQkFTRToKPj4gQEAgLTE1MjgsNiArMTU2Myw5IEBAIGludCBfX2t2
-bV9nZXRfbXNyKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSwgdTMyIGluZGV4LCB1NjQgKmRhdGEsCj4+
-ICAgICAgICAgIHN0cnVjdCBtc3JfZGF0YSBtc3I7Cj4+ICAgICAgICAgIGludCByZXQ7Cj4+Cj4+
-ICsgICAgICAgaWYgKCFob3N0X2luaXRpYXRlZCAmJiAha3ZtX21zcl9hbGxvd2VkKHZjcHUsIGlu
-ZGV4LCBLVk1fTVNSX0FMTE9XX1JFQUQpKQo+PiArICAgICAgICAgICAgICAgcmV0dXJuIC1FTk9F
-TlQ7Cj4gCj4gLi4uYW5kIGhlcmU/Cj4gCj4+ICtzdGF0aWMgYm9vbCBtc3JfcmFuZ2Vfb3Zlcmxh
-cHMoc3RydWN0IGt2bSAqa3ZtLCBzdHJ1Y3QgbXNyX2JpdG1hcF9yYW5nZSAqcmFuZ2UpCj4gCj4g
-QW5vdGhlciBib29sIGZ1bmN0aW9uIHdpdGggbm8gImlzIj8gOi0pCj4gCj4+ICt7Cj4+ICsgICAg
-ICAgc3RydWN0IG1zcl9iaXRtYXBfcmFuZ2UgKnJhbmdlcyA9IGt2bS0+YXJjaC5tc3JfYWxsb3ds
-aXN0X3JhbmdlczsKPj4gKyAgICAgICB1MzIgaSwgY291bnQgPSBrdm0tPmFyY2gubXNyX2FsbG93
-bGlzdF9yYW5nZXNfY291bnQ7Cj4+ICsgICAgICAgYm9vbCByID0gZmFsc2U7Cj4+ICsKPj4gKyAg
-ICAgICBmb3IgKGkgPSAwOyBpIDwgY291bnQ7IGkrKykgewo+PiArICAgICAgICAgICAgICAgdTMy
-IHN0YXJ0ID0gbWF4KHJhbmdlLT5iYXNlLCByYW5nZXNbaV0uYmFzZSk7Cj4+ICsgICAgICAgICAg
-ICAgICB1MzIgZW5kID0gbWluKHJhbmdlLT5iYXNlICsgcmFuZ2UtPm5tc3JzLAo+PiArICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICByYW5nZXNbaV0uYmFzZSArIHJhbmdlc1tpXS5ubXNycyk7
-Cj4+ICsKPj4gKyAgICAgICAgICAgICAgIGlmICgoc3RhcnQgPCBlbmQpICYmIChyYW5nZS0+Zmxh
-Z3MgJiByYW5nZXNbaV0uZmxhZ3MpKSB7Cj4+ICsgICAgICAgICAgICAgICAgICAgICAgIHIgPSB0
-cnVlOwo+PiArICAgICAgICAgICAgICAgICAgICAgICBicmVhazsKPj4gKyAgICAgICAgICAgICAg
-IH0KPj4gKyAgICAgICB9Cj4+ICsKPj4gKyAgICAgICByZXR1cm4gcjsKPj4gK30KPiAKPiBUaGlz
-IHNlZW1zIGxpa2UgYW4gYXdrd2FyZCBjb25zdHJhaW50LiBXb3VsZCBpdCBiZSBwb3NzaWJsZSB0
-byBhbGxvdwo+IG92ZXJsYXBwaW5nIHJhbmdlcyBhcyBsb25nIGFzIHRoZSBhY2Nlc3MgdHlwZXMg
-ZG9uJ3QgY2xhc2g/IFNvLCBmb3IKPiBleGFtcGxlLCBjb3VsZCBJIHNwZWNpZnkgYW4gYWxsb3cg
-bGlzdCBmb3IgUkVBRCBvZiBNU1JzIDAtMHgxZmZmZiBhbmQKPiBhbiBhbGxvdyBsaXN0IGZvciBX
-UklURSBvZiBNU1JzIDAtMHgxZmZmZj8gQWN0dWFsbHksIEkgZG9uJ3Qgc2VlIHdoeQo+IHlvdSBo
-YXZlIHRvIHByb2hpYml0IG92ZXJsYXBwaW5nIHJhbmdlcyBhdCBhbGwuCgpJIHRlbmQgdG8gYWdy
-ZWUuIE5vdyB0aGF0IHRoZSBvcmRlciBpcyBvYnZpb3VzIHRocm91Z2ggdGhlIG5ldyBBUEksIHdl
-IApubyBsb25nZXIgbmVlZCB0byBjaGVjayBmb3Igb3ZlcmxhcHMuCgo+IAo+IAo+PiArc3RhdGlj
-IGludCBrdm1fdm1faW9jdGxfY2xlYXJfbXNyX2FsbG93bGlzdChzdHJ1Y3Qga3ZtICprdm0pCj4+
-ICt7Cj4+ICsgICAgICAgaW50IGk7Cj4gCj4gTml0OiBJbiBlYXJsaWVyIGNvZGUsIHlvdSB1c2Ug
-dTMyIGZvciB0aGlzIGluZGV4LiAoSSdtIGFjdHVhbGx5IGEgZmFuCj4gb2YgaW50LCBteXNlbGYu
-KQoKSSB1c3VhbGx5IHVzZSBpbnQgYXMgd2VsbCBiZWNhdXNlIGl0J3MgZWFzaWVyIHRvIHR5cGUs
-IGJ1dCBkb2luZyBzaWduZWQgCmluZGV4ZXMgaXMganVzdCBzbyB3cm9uZyBvbiBzbyBtYW55IGxl
-dmVscyA6KS4gSSdsbCBmaXggdGhlbSB1cCB0b28gYmUgCmFsbCB1MzIuCgoKQWxleAoKCgpBbWF6
-b24gRGV2ZWxvcG1lbnQgQ2VudGVyIEdlcm1hbnkgR21iSApLcmF1c2Vuc3RyLiAzOAoxMDExNyBC
-ZXJsaW4KR2VzY2hhZWZ0c2Z1ZWhydW5nOiBDaHJpc3RpYW4gU2NobGFlZ2VyLCBKb25hdGhhbiBX
-ZWlzcwpFaW5nZXRyYWdlbiBhbSBBbXRzZ2VyaWNodCBDaGFybG90dGVuYnVyZyB1bnRlciBIUkIg
-MTQ5MTczIEIKU2l0ejogQmVybGluClVzdC1JRDogREUgMjg5IDIzNyA4NzkKCgo=
+On Tue, Sep 01, 2020 at 04:43:25PM +0200, Vitaly Kuznetsov wrote:
+> Peter Xu <peterx@redhat.com> writes:
+> 
+> > On Fri, Aug 07, 2020 at 04:12:29PM +0200, Vitaly Kuznetsov wrote:
+> >> When testing Linux kernel boot with QEMU q35 VM and direct kernel boot
+> >> I observed 8193 accesses to PCI hole memory. When such exit is handled
+> >> in KVM without exiting to userspace, it takes roughly 0.000001 sec.
+> >> Handling the same exit in userspace is six times slower (0.000006 sec) so
+> >> the overal; difference is 0.04 sec. This may be significant for 'microvm'
+> >> ideas.
+> >
+> > Sorry to comment so late, but just curious... have you looked at what's those
+> > 8000+ accesses to PCI holes and what they're used for?  What I can think of are
+> > some port IO reads (e.g. upon vendor ID field) during BIOS to scan the devices
+> > attached.  Though those should be far less than 8000+, and those should also be
+> > pio rather than mmio.
+> 
+> And sorry for replying late)
+> 
+> We explicitly want MMIO instead of PIO to speed things up, afaiu PIO
+> requires two exits per device (and we exit all the way to
+> QEMU). Julia/Michael know better about the size of the space.
+> 
+> >
+> > If this is only an overhead for virt (since baremetal mmios should be fast),
+> > I'm also thinking whether we can make it even better to skip those pci hole
+> > reads.  Because we know we're virt, so it also gives us possibility that we may
+> > provide those information in a better way than reading PCI holes in the guest?
+> 
+> This means let's invent a PV interface and if we decide to go down this
+> road, I'd even argue for abandoning PCI completely. E.g. we can do
+> something similar to Hyper-V's Vmbus.
+
+My whole point was more about trying to understand the problem behind.
+Providing a fast path for reading pci holes seems to be reasonable as is,
+however it's just that I'm confused on why there're so many reads on the pci
+holes after all.  Another important question is I'm wondering how this series
+will finally help the use case of microvm.  I'm not sure I get the whole point
+of it, but... if microvm is the major use case of this, it would be good to
+provide some quick numbers on those if possible.
+
+For example, IIUC microvm uses qboot (as a better alternative than seabios) for
+fast boot, and qboot has:
+
+https://github.com/bonzini/qboot/blob/master/pci.c#L20
+
+I'm kind of curious whether qboot will still be used when this series is used
+with microvm VMs?  Since those are still at least PIO based.
+
+Thanks,
+
+-- 
+Peter Xu
 
