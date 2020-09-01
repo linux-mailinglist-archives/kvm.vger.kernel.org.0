@@ -2,111 +2,85 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2457F258E8B
-	for <lists+kvm@lfdr.de>; Tue,  1 Sep 2020 14:49:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id ABF7A258E87
+	for <lists+kvm@lfdr.de>; Tue,  1 Sep 2020 14:49:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727051AbgIAL5X (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 1 Sep 2020 07:57:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49506 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726858AbgIAL5I (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 1 Sep 2020 07:57:08 -0400
-Received: from mail-pj1-x1043.google.com (mail-pj1-x1043.google.com [IPv6:2607:f8b0:4864:20::1043])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BF5E7C061244;
-        Tue,  1 Sep 2020 04:57:06 -0700 (PDT)
-Received: by mail-pj1-x1043.google.com with SMTP id 2so501784pjx.5;
-        Tue, 01 Sep 2020 04:57:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=mFkdWLKZl5wBoxMfTFXNzpq7BQ7hhrLO443ZFVNRdhM=;
-        b=mTaZ4112TNRS4prIcuvRmJGJGSj4Hytxxx3g67T2HWEmdGS4Sar2bnfqM2bCTXhXpF
-         Ry6cpqaOTNxTH8V+QfxX/MS3ddxvv998ZwMfAGxPXd0VEiJHdyDF5X7YIvg7neqDRF+9
-         W5W3i9KBK2Uj+mJgyBIM91ipOGUBQxGPHE1bPANxntAh3EHs8RXG0TiuidiZzhf+lOnd
-         0LbCzi2uRJf5lwFUvo+93vHEuhMbGq+q900kmTiwBGzMp854HFB9DdamMTsxsavhGqgx
-         yNxbPRK5GOAxuYDmsHh+emMvtbjwQWTrkhrHCSoLpDNjDRfzx3GC8e0BdInIo29II0mf
-         XJBQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references;
-        bh=mFkdWLKZl5wBoxMfTFXNzpq7BQ7hhrLO443ZFVNRdhM=;
-        b=Md3ZCFH7MM8iRUOOUnKcepozyUAay5Ii1GEsInAMgKpY0MTNvvZnLI5emeYRUobCaK
-         S9kAL3Ug+AQcMZSnb1NnNzwC5liHdyocRDMWbVH3v3rkzIsv2iNJlWxWagYbo6IQ0rwP
-         golc+jbR4sqCjtedXR/K0mYiJXJi50aLIvPrtOrq/GpV1SLz2m1H4gqMmGVpjILg0qZM
-         s7Jbs6iW+s+h5BSJx/z/oNxbATtK0RKq3FCQT55p7OgO3WHGasglFCMRddJrrjo27b+U
-         MJr1Jv6Lb1sUO4whAr4Xeqg7uGgPV9wCCH+xHJg/apcYW+SRtwhiwnto1SVGQpkWudWO
-         Ea2A==
-X-Gm-Message-State: AOAM53382FZhfY8VTZfkM4Bvcb6MccCUQfst2w+/GdxiPnOvX2fRQDQN
-        G/JPxmyESGEiPQm6rbuCT28=
-X-Google-Smtp-Source: ABdhPJyIQFi+pQHQd7e1qoPG/l//rgpUvJ3nMYPB/HrYM4gbDtdJ2ivUedp4aXBUx+gVH4xyRFj2EA==
-X-Received: by 2002:a17:90a:5298:: with SMTP id w24mr1161850pjh.221.1598961426409;
-        Tue, 01 Sep 2020 04:57:06 -0700 (PDT)
-Received: from localhost.localdomain ([203.205.141.65])
-        by smtp.gmail.com with ESMTPSA id r2sm1854621pga.94.2020.09.01.04.56.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 01 Sep 2020 04:57:06 -0700 (PDT)
-From:   yulei.kernel@gmail.com
-X-Google-Original-From: yuleixzhang@tencent.com
-To:     pbonzini@redhat.com
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        sean.j.christopherson@intel.com, jmattson@google.com,
-        junaids@google.com, bgardon@google.com, vkuznets@redhat.com,
-        xiaoguangrong.eric@gmail.com, kernellwp@gmail.com,
-        lihaiwei.kernel@gmail.com, Yulei Zhang <yulei.kernel@gmail.com>,
-        Yulei Zhang <yuleixzhang@tencent.com>
-Subject: [RFC V2 9/9] Handle certain mmu exposed functions properly while turn on direct build EPT mode
-Date:   Tue,  1 Sep 2020 19:57:47 +0800
-Message-Id: <e179ea944f30d6a83a02ef17f2f2a367a3b7fedf.1598868204.git.yulei.kernel@gmail.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <cover.1598868203.git.yulei.kernel@gmail.com>
-References: <cover.1598868203.git.yulei.kernel@gmail.com>
+        id S1728031AbgIAMsa (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 1 Sep 2020 08:48:30 -0400
+Received: from szxga03-in.huawei.com ([45.249.212.189]:3496 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1727991AbgIAMKN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 1 Sep 2020 08:10:13 -0400
+Received: from dggeml406-hub.china.huawei.com (unknown [172.30.72.53])
+        by Forcepoint Email with ESMTP id 89EA5ACF72CEEA37BECC;
+        Tue,  1 Sep 2020 20:10:06 +0800 (CST)
+Received: from DGGEML524-MBX.china.huawei.com ([169.254.1.71]) by
+ dggeml406-hub.china.huawei.com ([10.3.17.50]) with mapi id 14.03.0487.000;
+ Tue, 1 Sep 2020 20:09:58 +0800
+From:   "Maoming (maoming, Cloud Infrastructure Service Product Dept.)" 
+        <maoming.maoming@huawei.com>
+To:     Hugh Dickins <hughd@google.com>
+CC:     Matthew Wilcox <willy@infradead.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "cohuck@redhat.com" <cohuck@redhat.com>,
+        "Zhoujian (jay)" <jianjay.zhou@huawei.com>,
+        "Huangweidong (C)" <weidong.huang@huawei.com>,
+        "peterx@redhat.com" <peterx@redhat.com>,
+        "aarcange@redhat.com" <aarcange@redhat.com>,
+        wangyunjian <wangyunjian@huawei.com>
+Subject: =?gb2312?B?tPC4tDogW1BBVENIIFYzXSB2ZmlvIGRtYV9tYXAvdW5tYXA6IG9wdGltaXpl?=
+ =?gb2312?Q?d_for_hugetlbfs_pages?=
+Thread-Topic: [PATCH V3] vfio dma_map/unmap: optimized for hugetlbfs pages
+Thread-Index: AQHWfR1kmRi9Q8RQ4keHVlEcbZc2qalRRsGAgAIMtzA=
+Date:   Tue, 1 Sep 2020 12:09:58 +0000
+Message-ID: <8B561EC9A4D13649A62CF60D3A8E8CB28C2DC466@dggeml524-mbx.china.huawei.com>
+References: <20200828092649.853-1-maoming.maoming@huawei.com>
+ <alpine.LSU.2.11.2008302332330.2382@eggly.anvils>
+In-Reply-To: <alpine.LSU.2.11.2008302332330.2382@eggly.anvils>
+Accept-Language: en-US
+Content-Language: zh-CN
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.174.151.129]
+Content-Type: text/plain; charset="gb2312"
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+X-CFilter-Loop: Reflected
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Yulei Zhang <yulei.kernel@gmail.com>
-
-Signed-off-by: Yulei Zhang <yuleixzhang@tencent.com>
----
- arch/x86/kvm/mmu/mmu.c | 9 +++++++++
- 1 file changed, 9 insertions(+)
-
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 6639d9c7012e..35bd87bf965f 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -1719,6 +1719,9 @@ bool kvm_mmu_slot_gfn_write_protect(struct kvm *kvm,
- 	int i;
- 	bool write_protected = false;
- 
-+	if (kvm->arch.global_root_hpa)
-+		return write_protected;
-+
- 	for (i = PG_LEVEL_4K; i <= KVM_MAX_HUGEPAGE_LEVEL; ++i) {
- 		rmap_head = __gfn_to_rmap(gfn, i, slot);
- 		write_protected |= __rmap_write_protect(kvm, rmap_head, true);
-@@ -5862,6 +5865,9 @@ static void kvm_zap_obsolete_pages(struct kvm *kvm)
-  */
- static void kvm_mmu_zap_all_fast(struct kvm *kvm)
- {
-+	if (kvm->arch.global_root_hpa)
-+		return;
-+
- 	lockdep_assert_held(&kvm->slots_lock);
- 
- 	spin_lock(&kvm->mmu_lock);
-@@ -5924,6 +5930,9 @@ void kvm_zap_gfn_range(struct kvm *kvm, gfn_t gfn_start, gfn_t gfn_end)
- 	struct kvm_memory_slot *memslot;
- 	int i;
- 
-+	if (kvm->arch.global_root_hpa)
-+		return;
-+
- 	spin_lock(&kvm->mmu_lock);
- 	for (i = 0; i < KVM_ADDRESS_SPACE_NUM; i++) {
- 		slots = __kvm_memslots(kvm, i);
--- 
-2.17.1
-
+DQo+IA0KPiA+IEluIHRoZSBvcmlnaW5hbCBwcm9jZXNzIG9mIGRtYV9tYXAvdW5tYXAgcGFnZXMg
+Zm9yIFZGSU8tZGV2aWNlcywgdG8NCj4gPiBtYWtlIHN1cmUgdGhlIHBhZ2VzIGFyZSBjb250aWd1
+b3VzLCB3ZSBoYXZlIHRvIGNoZWNrIHRoZW0gb25lIGJ5IG9uZS4NCj4gPiBBcyBhIHJlc3VsdCwg
+ZG1hX21hcC91bm1hcCBjb3VsZCBzcGVuZCBhIGxvbmcgdGltZS4NCj4gPiBVc2luZyB0aGUgaHVn
+ZXRsYiBwYWdlcywgd2UgY2FuIGF2b2lkIHRoaXMgcHJvYmxlbS4NCj4gPiBBbGwgcGFnZXMgaW4g
+aHVnZXRsYiBwYWdlcyBhcmUgY29udGlndW91cy5BbmQgdGhlIGh1Z2V0bGIgcGFnZSBzaG91bGQN
+Cj4gPiBub3QgYmUgc3BsaXQuU28gd2UgY2FuIGRlbGV0ZSB0aGUgZm9yIGxvb3BzLg0KPiANCj4g
+SSBrbm93IG5vdGhpbmcgYWJvdXQgVkZJTywgYnV0IEknbSBzdXJwcmlzZWQgdGhhdCB5b3UncmUg
+cGF5aW5nIHN1Y2ggYXR0ZW50aW9uDQo+IHRvIFBhZ2VIdWdlIGh1Z2V0bGJmcyBwYWdlcywgcmF0
+aGVyIHRoYW4gdG8gUGFnZUNvbXBvdW5kDQo+IHBhZ2VzOiB3aGljaCB3b3VsZCBhbHNvIGluY2x1
+ZGUgVHJhbnNwYXJlbnQgSHVnZSBQYWdlcywgb2YgdGhlIHRyYWRpdGlvbmFsDQo+IGFub255bW91
+cyBraW5kLCBvciB0aGUgaHVnZSB0bXBmcyBraW5kLCBvciB0aGUgbW9yZSBnZW5lcmFsIChub3Qg
+bmVjZXNzYXJpbHkNCj4gcG1kLXNpemVkKSBraW5kIHRoYXQgTWF0dGhldyBXaWxjb3ggaXMgY3Vy
+cmVudGx5IHdvcmtpbmcgb24uDQo+IA0KPiBJdCdzIHRydWUgdGhhdCBodWdldGxiZnMgaXMgcGVj
+dWxpYXIgZW5vdWdoIHRoYXQgd2hhdGV2ZXIgeW91IHdyaXRlIGZvciBpdCBtYXkNCj4gbmVlZCBz
+b21lIHR3ZWFrcyB0byBjb3ZlciB0aGUgVEhQIGNhc2UgdG9vLCBvciB2aWNlIHZlcnNhOyBidXQg
+d291bGRuJ3QgeW91cg0KPiBwYXRjaCBiZSBhIGxvdCBiZXR0ZXIgZm9yIGNvdmVyaW5nIGFsbCBj
+YXNlcz8NCj4gDQo+IFlvdSBtZW50aW9uIGFib3ZlIHRoYXQgInRoZSBodWdldGxiIHBhZ2Ugc2hv
+dWxkIG5vdCBiZSBzcGxpdCI6DQo+IHBlcmhhcHMgeW91IGhhdmUgYmVlbiB3b3JyaWVkIHRoYXQg
+YSBUSFAgY291bGQgYmUgc3BsaXQgYmVuZWF0aCB5b3U/DQo+IFRoYXQgdXNlZCB0byBiZSBhIHBv
+c3NpYmlsaXR5IHNvbWUgeWVhcnMgYWdvLCBidXQgbm93YWRheXMgYSBUSFAgY2Fubm90IGJlDQo+
+IHNwbGl0IHdoaWxlIGFueW9uZSBpcyBwaW5uaW5nIGl0IHdpdGggYW4gZXh0cmEgcmVmZXJlbmNl
+Lg0KPiANCj4gSHVnaA0KPiANCg0KDQpUaGFua3MgZm9yIHlvdXIgc3VnZ2VzdGlvbnMuDQpZb3Ug
+bWVudGlvbiB0aGF0IGEgVEhQIGNhbm5vdCBiZSBzcGxpdCB3aGlsZSBhbnlvbmUgaXMgcGlubmlu
+ZyBpdC4NCkRvIHlvdSBtZWFuIHRoZSBjaGVjayBvZiBjYW5fc3BsaXRfaHVnZV9wYWdlKCkoaW4g
+c3BsaXRfaHVnZV9wYWdlX3RvX2xpc3QoKSk/DQpXaGVuIHdlIHdhbnQgdG8gcGluIHBhZ2VzLCB2
+ZmlvX3Bpbl9wYWdlc19yZW1vdGUoKSBhbHdheXMgZ2V0cyBhIG5vcm1hbCBwYWdlIGZpcnN0Lg0K
+SW4gdGhpcyBjYXNlLCBhIFRIUCBjYW5ub3QgYmUgc3BsaXQgYmVjYXVzZSBvZiB0aGUgaW5jcmVh
+c2VkIHJlZmVyZW5jZS4NCklzIHRoaXMgcmlnaHQ/DQoNCk1heWJlIEkgY2FuIG9wdGltaXplIGZv
+ciBodWdldGxiIHBhZ2VzIGFzIGEgZmlyc3Qgc3RlcCwgYW5kIHRoZW4gY292ZXIgYWxsIGNvbXBv
+dW5kIHBhZ2VzLg0KDQoNCg0KDQoNCg==
