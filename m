@@ -2,475 +2,577 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0EFFB258A93
-	for <lists+kvm@lfdr.de>; Tue,  1 Sep 2020 10:43:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9BD93258AB7
+	for <lists+kvm@lfdr.de>; Tue,  1 Sep 2020 10:50:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726510AbgIAInW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 1 Sep 2020 04:43:22 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:39032 "EHLO
+        id S1726654AbgIAIuv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 1 Sep 2020 04:50:51 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:39090 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725949AbgIAInU (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 1 Sep 2020 04:43:20 -0400
+        by vger.kernel.org with ESMTP id S1727009AbgIAIum (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 1 Sep 2020 04:50:42 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1598949797;
+        s=mimecast20190719; t=1598950239;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=BXWvfmseZXM7zJTXi8vxDrVXnI0douR0gZyz9tmAnCk=;
-        b=Fdt1XhMyUMe92YuQKjY5jSvx0rMHu5raeqx138LhP1mPrSSBg3sbq1yf1mlfqMS4X3S3h/
-        tySSQAUPm0evsNu2mBal66Vh8PWd5V0fSZ4DSl9+65QIv3itXih4343z1cW/JDhAsRZirr
-        RtqslIv9a/S3Ytum2GXbfahzGHOjqnQ=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-454-g_WSfv1zN-uzAh2ZeIMFIQ-1; Tue, 01 Sep 2020 04:43:15 -0400
-X-MC-Unique: g_WSfv1zN-uzAh2ZeIMFIQ-1
-Received: by mail-wr1-f69.google.com with SMTP id j2so289458wrr.14
-        for <kvm@vger.kernel.org>; Tue, 01 Sep 2020 01:43:15 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=BXWvfmseZXM7zJTXi8vxDrVXnI0douR0gZyz9tmAnCk=;
-        b=KGxqFWF54m7v3i4PIHIpVkByvu63Dt2dwIbBeTjZomg6OTHOSgMS+YROR6B+ZM0kM7
-         yFiBdZwkHxKpqX5B5h2BCjb48vQt0Ek1V0S4DrKJ6MWJlZdnIN+W2XjnD5t3z2tYlTJf
-         aJhUs6iWUw1Dl9QQrw6MufMdLADkNTXg++NWre8xNZhACW4jPNpxhAIcO7GhiNaehmXq
-         ZLSK7TfV1X0+m45U3jYO+3541p5LxRvru54A5Z08GLIKY/bxKY0ip3u5a7nZb7wnJ4Qv
-         QQy0s/Hgwhu3cd6VU9tibSSDWESb+Dz1Qj/Pawh299hNR2/Io/U3t8Rup5cZkPzyffFL
-         ROtg==
-X-Gm-Message-State: AOAM531l94kwIGS1eVeUw4uVN6/IXcEHLNX/+6KskxYTDWBLG3fKVq1p
-        NErHEdjUgRpCobyWPSyK5m6kK3JaE5XSW6M/rsp53xqGDQjCP/boEizpoZmLBx3DTkJ3kVacsz+
-        RGwELSMbUbg1Q
-X-Received: by 2002:a7b:c397:: with SMTP id s23mr737573wmj.174.1598949794042;
-        Tue, 01 Sep 2020 01:43:14 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJw0KmxCv+f6eZkipN50+N1vOqijCmtcUHfI+A5+hYP1GrJ4GrHcFwlOfgKC2P/a9xM4o5O86Q==
-X-Received: by 2002:a7b:c397:: with SMTP id s23mr737551wmj.174.1598949793692;
-        Tue, 01 Sep 2020 01:43:13 -0700 (PDT)
-Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id g8sm803413wmd.12.2020.09.01.01.43.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 01 Sep 2020 01:43:12 -0700 (PDT)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Chenyi Qiang <chenyi.qiang@intel.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        bh=SVwS/DaWmpJpwWffyjIqRWr5IpfRP8LAnZK9XxzYBVQ=;
+        b=W6AlyAYwsgLO5fXBR0Z5qlx41+9XtIer3vJxiJnAvHytzA0Dq47XVo+AofugsL7+gWhvbf
+        518Lta3x2dBPNUup6yrI49JgPhXuk1zMv03iJbYVGDopqe42NcM5tsJchtK+3PA+JfKpYU
+        cBJZKhC/c5C0iFoetxX31reixt96GZE=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-39-vU_Z3x5GPcaM20rebD64nw-1; Tue, 01 Sep 2020 04:50:22 -0400
+X-MC-Unique: vU_Z3x5GPcaM20rebD64nw-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C1D02425E3;
+        Tue,  1 Sep 2020 08:50:19 +0000 (UTC)
+Received: from [10.72.13.164] (ovpn-13-164.pek2.redhat.com [10.72.13.164])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id A5E877DA44;
+        Tue,  1 Sep 2020 08:50:04 +0000 (UTC)
+Subject: Re: [RFC PATCH 00/22] Enhance VHOST to enable SoC-to-SoC
+ communication
+To:     Kishon Vijay Abraham I <kishon@ti.com>,
+        Cornelia Huck <cohuck@redhat.com>
+Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
+        Ohad Ben-Cohen <ohad@wizery.com>,
+        Bjorn Andersson <bjorn.andersson@linaro.org>,
+        Jon Mason <jdmason@kudzu.us>,
+        Dave Jiang <dave.jiang@intel.com>,
+        Allen Hubbe <allenbh@gmail.com>,
+        Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>,
+        Bjorn Helgaas <bhelgaas@google.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Xiaoyao Li <xiaoyao.li@intel.com>
-Subject: Re: [RFC v2 2/2] KVM: VMX: Enable bus lock VM exit
-In-Reply-To: <20200817014459.28782-3-chenyi.qiang@intel.com>
-References: <20200817014459.28782-1-chenyi.qiang@intel.com> <20200817014459.28782-3-chenyi.qiang@intel.com>
-Date:   Tue, 01 Sep 2020 10:43:12 +0200
-Message-ID: <87sgc1x4yn.fsf@vitty.brq.redhat.com>
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-remoteproc@vger.kernel.org, linux-ntb@googlegroups.com,
+        linux-pci@vger.kernel.org, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org
+References: <20200702082143.25259-1-kishon@ti.com>
+ <20200702055026-mutt-send-email-mst@kernel.org>
+ <603970f5-3289-cd53-82a9-aa62b292c552@redhat.com>
+ <14c6cad7-9361-7fa4-e1c6-715ccc7e5f6b@ti.com>
+ <59fd6a0b-8566-44b7-3dae-bb52b468219b@redhat.com>
+ <ce9eb6a5-cd3a-a390-5684-525827b30f64@ti.com>
+ <da2b671c-b05d-a57f-7bdf-8b1043a41240@redhat.com>
+ <fee8a0fb-f862-03bd-5ede-8f105b6af529@ti.com>
+ <b2178e1d-2f5c-e8a3-72fb-70f2f8d6aa45@redhat.com>
+ <45a8a97c-2061-13ee-5da8-9877a4a3b8aa@ti.com>
+ <c8739d7f-e12e-f6a2-7018-9eeaf6feb054@redhat.com>
+ <20200828123409.4cd2a812.cohuck@redhat.com>
+ <ac8f7e4f-9f46-919a-f5c2-89b07794f0ab@ti.com>
+From:   Jason Wang <jasowang@redhat.com>
+Message-ID: <9cd58cd1-0041-3d98-baf7-6e5bc2e7e317@redhat.com>
+Date:   Tue, 1 Sep 2020 16:50:03 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <ac8f7e4f-9f46-919a-f5c2-89b07794f0ab@ti.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Chenyi Qiang <chenyi.qiang@intel.com> writes:
 
-> Virtual Machine can exploit bus locks to degrade the performance of
-> system. Bus lock can be caused by split locked access to writeback(WB)
-> memory or by using locks on uncacheable(UC) memory. The bus lock is
-> typically >1000 cycles slower than an atomic operation within a cache
-> line. It also disrupts performance on other cores (which must wait for
-> the bus lock to be released before their memory operations can
-> complete).
+On 2020/9/1 下午1:24, Kishon Vijay Abraham I wrote:
+> Hi,
 >
-> To address the threat, bus lock VM exit is introduced to notify the VMM
-> when a bus lock was acquired, allowing it to enforce throttling or other
-> policy based mitigations.
+> On 28/08/20 4:04 pm, Cornelia Huck wrote:
+>> On Thu, 9 Jul 2020 14:26:53 +0800
+>> Jason Wang <jasowang@redhat.com> wrote:
+>>
+>> [Let me note right at the beginning that I first noted this while
+>> listening to Kishon's talk at LPC on Wednesday. I might be very
+>> confused about the background here, so let me apologize beforehand for
+>> any confusion I might spread.]
+>>
+>>> On 2020/7/8 下午9:13, Kishon Vijay Abraham I wrote:
+>>>> Hi Jason,
+>>>>
+>>>> On 7/8/2020 4:52 PM, Jason Wang wrote:
+>>>>> On 2020/7/7 下午10:45, Kishon Vijay Abraham I wrote:
+>>>>>> Hi Jason,
+>>>>>>
+>>>>>> On 7/7/2020 3:17 PM, Jason Wang wrote:
+>>>>>>> On 2020/7/6 下午5:32, Kishon Vijay Abraham I wrote:
+>>>>>>>> Hi Jason,
+>>>>>>>>
+>>>>>>>> On 7/3/2020 12:46 PM, Jason Wang wrote:
+>>>>>>>>> On 2020/7/2 下午9:35, Kishon Vijay Abraham I wrote:
+>>>>>>>>>> Hi Jason,
+>>>>>>>>>>
+>>>>>>>>>> On 7/2/2020 3:40 PM, Jason Wang wrote:
+>>>>>>>>>>> On 2020/7/2 下午5:51, Michael S. Tsirkin wrote:
+>>>>>>>>>>>> On Thu, Jul 02, 2020 at 01:51:21PM +0530, Kishon Vijay 
+>>>>>>>>>>>> Abraham I wrote:
+>>>>>>>>>>>>> This series enhances Linux Vhost support to enable SoC-to-SoC
+>>>>>>>>>>>>> communication over MMIO. This series enables rpmsg 
+>>>>>>>>>>>>> communication between
+>>>>>>>>>>>>> two SoCs using both PCIe RC<->EP and HOST1-NTB-HOST2
+>>>>>>>>>>>>>
+>>>>>>>>>>>>> 1) Modify vhost to use standard Linux driver model
+>>>>>>>>>>>>> 2) Add support in vring to access virtqueue over MMIO
+>>>>>>>>>>>>> 3) Add vhost client driver for rpmsg
+>>>>>>>>>>>>> 4) Add PCIe RC driver (uses virtio) and PCIe EP driver 
+>>>>>>>>>>>>> (uses vhost) for
+>>>>>>>>>>>>>          rpmsg communication between two SoCs connected to 
+>>>>>>>>>>>>> each other
+>>>>>>>>>>>>> 5) Add NTB Virtio driver and NTB Vhost driver for rpmsg 
+>>>>>>>>>>>>> communication
+>>>>>>>>>>>>>          between two SoCs connected via NTB
+>>>>>>>>>>>>> 6) Add configfs to configure the components
+>>>>>>>>>>>>>
+>>>>>>>>>>>>> UseCase1 :
+>>>>>>>>>>>>>
+>>>>>>>>>>>>>        VHOST RPMSG VIRTIO RPMSG
+>>>>>>>>>>>>> +                               +
+>>>>>>>>>>>>> |                               |
+>>>>>>>>>>>>> |                               |
+>>>>>>>>>>>>> |                               |
+>>>>>>>>>>>>> |                               |
+>>>>>>>>>>>>> +-----v------+ +------v-------+
+>>>>>>>>>>>>> |   Linux    |                 | Linux    |
+>>>>>>>>>>>>> |  Endpoint  |                 | Root Complex |
+>>>>>>>>>>>>> | <----------------->              |
+>>>>>>>>>>>>> |            | |              |
+>>>>>>>>>>>>> |    SOC1    |                 | SOC2     |
+>>>>>>>>>>>>> +------------+ +--------------+
+>>>>>>>>>>>>>
+>>>>>>>>>>>>> UseCase 2:
+>>>>>>>>>>>>>
+>>>>>>>>>>>>>            VHOST RPMSG VIRTIO RPMSG
+>>>>>>>>>>>>> + +
+>>>>>>>>>>>>> | |
+>>>>>>>>>>>>> | |
+>>>>>>>>>>>>> | |
+>>>>>>>>>>>>> | |
+>>>>>>>>>>>>> +------v------+ +------v------+
+>>>>>>>>>>>>>          | | |             |
+>>>>>>>>>>>>>          |    HOST1 |                                   | 
+>>>>>>>>>>>>> HOST2    |
+>>>>>>>>>>>>>          | | |             |
+>>>>>>>>>>>>> +------^------+ +------^------+
+>>>>>>>>>>>>> | |
+>>>>>>>>>>>>> | |
+>>>>>>>>>>>>> +---------------------------------------------------------------------+ 
+>>>>>>>>>>>>>
+>>>>>>>>>>>>> | +------v------+ +------v------+  |
+>>>>>>>>>>>>> |  | | |             |  |
+>>>>>>>>>>>>> |  |     EP |                                   | EP      
+>>>>>>>>>>>>> |  |
+>>>>>>>>>>>>> |  | CONTROLLER1 |                                   | 
+>>>>>>>>>>>>> CONTROLLER2 |  |
+>>>>>>>>>>>>> |  | <-----------------------------------> |  |
+>>>>>>>>>>>>> |  | | |             |  |
+>>>>>>>>>>>>> |  | | |             |  |
+>>>>>>>>>>>>> |  |             |  SoC With Multiple EP Instances   
+>>>>>>>>>>>>> |             |  |
+>>>>>>>>>>>>> |  |             |  (Configured using NTB Function)  
+>>>>>>>>>>>>> |             |  |
+>>>>>>>>>>>>> | +-------------+ +-------------+  |
+>>>>>>>>>>>>> +---------------------------------------------------------------------+ 
+>>>>>>>>>>>>>
+>>
+>> First of all, to clarify the terminology:
+>> Is "vhost rpmsg" acting as what the virtio standard calls the 'device',
+>> and "virtio rpmsg" as the 'driver'? Or is the "vhost" part mostly just
 >
-> A VMM can enable VM exit due to bus locks by setting a new "Bus Lock
-> Detection" VM-execution control(bit 30 of Secondary Processor-based VM
-> execution controls). If delivery of this VM exit was preempted by a
-> higher priority VM exit (e.g. EPT misconfiguration, EPT violation, APIC
-> access VM exit, APIC write VM exit, exception bitmap exiting), bit 26 of
-> exit reason in vmcs field is set to 1.
+> Right, vhost_rpmsg is 'device' and virtio_rpmsg is 'driver'.
+>> virtqueues + the exiting vhost interfaces?
 >
-> In current implementation, the KVM exposes this capability through
-> KVM_CAP_X86_BLD. The user can set it to enable the bus lock VM exit
-> (disabled by default). If bus locks in guest are detected by KVM, exit
-> to user space even when current exit reason is handled by KVM
-> internally. Set a new field KVM_RUN_BUS_LOCK in vcpu->run->flags to
-> inform the user space that there is a bus lock in guest and it is
-> preempted by a higher priority VM exit.
+> It's implemented to provide the full 'device' functionality.
+>>
+>>>>>>>>>>>>>
+>>>>>>>>>>>>> Software Layering:
+>>>>>>>>>>>>>
+>>>>>>>>>>>>> The high-level SW layering should look something like 
+>>>>>>>>>>>>> below. This series
+>>>>>>>>>>>>> adds support only for RPMSG VHOST, however something 
+>>>>>>>>>>>>> similar should be
+>>>>>>>>>>>>> done for net and scsi. With that any vhost device (PCI, 
+>>>>>>>>>>>>> NTB, Platform
+>>>>>>>>>>>>> device, user) can use any of the vhost client driver.
+>>>>>>>>>>>>>
+>>>>>>>>>>>>>
+>>>>>>>>>>>>>           +----------------+ +-----------+  +------------+ 
+>>>>>>>>>>>>> +----------+
+>>>>>>>>>>>>>           |  RPMSG VHOST   |  | NET VHOST |  | SCSI VHOST 
+>>>>>>>>>>>>> |  |    X     |
+>>>>>>>>>>>>>           +-------^--------+ +-----^-----+  +-----^------+ 
+>>>>>>>>>>>>> +----^-----+
+>>>>>>>>>>>>>                   | |              |              |
+>>>>>>>>>>>>>                   | |              |              |
+>>>>>>>>>>>>>                   | |              |              |
+>>>>>>>>>>>>> +-----------v-----------------v--------------v--------------v----------+ 
+>>>>>>>>>>>>>
+>>>>>>>>>>>>> |                            VHOST 
+>>>>>>>>>>>>> CORE                                |
+>>>>>>>>>>>>> +--------^---------------^--------------------^------------------^-----+ 
+>>>>>>>>>>>>>
+>>>>>>>>>>>>>                | |                    |                  |
+>>>>>>>>>>>>>                | |                    |                  |
+>>>>>>>>>>>>>                | |                    |                  |
+>>>>>>>>>>>>> +--------v-------+  +----v------+ +----------v----------+  
+>>>>>>>>>>>>> +----v-----+
+>>>>>>>>>>>>> |  PCI EPF VHOST |  | NTB VHOST | |PLATFORM DEVICE VHOST|  
+>>>>>>>>>>>>> |    X     |
+>>>>>>>>>>>>> +----------------+  +-----------+ +---------------------+  
+>>>>>>>>>>>>> +----------+
+>>
+>> So, the upper half is basically various functionality types, e.g. a net
+>> device. What is the lower half, a hardware interface? Would it be
+>> equivalent to e.g. a normal PCI device?
 >
-> Every bus lock acquired in non-root mode will be recorded in
-> vcpu->stat.bus_locks and exposed through debugfs when the bus lock
-> VM exit is enabled.
+> Right, the upper half should provide the functionality.
+> The bottom layer could be a HW interface (like PCIe device or NTB 
+> device) or it could be a SW interface (for accessing virtio ring in 
+> userspace) that could be used by Hypervisor.
 >
-> Document for Bus Lock VM exit is now available at the latest "Intel
-> Architecture Instruction Set Extensions Programming Reference".
+> The top half should be transparent to what type of device is actually 
+> using it.
 >
-> Document Link:
-> https://software.intel.com/content/www/us/en/develop/download/intel-architecture-instruction-set-extensions-programming-reference.html
+>>
+>>>>>>>>>>>>>
+>>>>>>>>>>>>> This was initially proposed here [1]
+>>>>>>>>>>>>>
+>>>>>>>>>>>>> [1] ->
+>>>>>>>>>>>>> https://lore.kernel.org/r/2cf00ec4-1ed6-f66e-6897-006d1a5b6390@ti.com 
+>>>>>>>>>>>>>
+>>>>>>>>>>>> I find this very interesting. A huge patchset so will take 
+>>>>>>>>>>>> a bit
+>>>>>>>>>>>> to review, but I certainly plan to do that. Thanks!
+>>>>>>>>>>> Yes, it would be better if there's a git branch for us to 
+>>>>>>>>>>> have a look.
+>>>>>>>>>> I've pushed the branch
+>>>>>>>>>> https://github.com/kishon/linux-wip.git vhost_rpmsg_pci_ntb_rfc
+>>>>>>>>> Thanks
+>>>>>>>>>
+>>>>>>>>>>> Btw, I'm not sure I get the big picture, but I vaguely feel 
+>>>>>>>>>>> some of the
+>>>>>>>>>>> work is
+>>>>>>>>>>> duplicated with vDPA (e.g the epf transport or vhost bus).
+>>>>>>>>>> This is about connecting two different HW systems both 
+>>>>>>>>>> running Linux and
+>>>>>>>>>> doesn't necessarily involve virtualization.
+>>>>>>>>> Right, this is something similar to VOP
+>>>>>>>>> (Documentation/misc-devices/mic/mic_overview.rst). The 
+>>>>>>>>> different is the
+>>>>>>>>> hardware I guess and VOP use userspace application to 
+>>>>>>>>> implement the device.
+>>>>>>>> I'd also like to point out, this series tries to have 
+>>>>>>>> communication between
+>>>>>>>> two
+>>>>>>>> SoCs in vendor agnostic way. Since this series solves for 2 
+>>>>>>>> usecases (PCIe
+>>>>>>>> RC<->EP and NTB), for the NTB case it directly plugs into NTB 
+>>>>>>>> framework and
+>>>>>>>> any
+>>>>>>>> of the HW in NTB below should be able to use a virtio-vhost 
+>>>>>>>> communication
+>>>>>>>>
+>>>>>>>> #ls drivers/ntb/hw/
+>>>>>>>> amd  epf  idt  intel  mscc
+>>>>>>>>
+>>>>>>>> And similarly for the PCIe RC<->EP communication, this adds a 
+>>>>>>>> generic endpoint
+>>>>>>>> function driver and hence any SoC that supports configurable 
+>>>>>>>> PCIe endpoint can
+>>>>>>>> use virtio-vhost communication
+>>>>>>>>
+>>>>>>>> # ls drivers/pci/controller/dwc/*ep*
+>>>>>>>> drivers/pci/controller/dwc/pcie-designware-ep.c
+>>>>>>>> drivers/pci/controller/dwc/pcie-uniphier-ep.c
+>>>>>>>> drivers/pci/controller/dwc/pci-layerscape-ep.c
+>>>>>>> Thanks for those backgrounds.
+>>>>>>>
+>>>>>>>>>>       So there is no guest or host as in
+>>>>>>>>>> virtualization but two entirely different systems connected 
+>>>>>>>>>> via PCIe cable,
+>>>>>>>>>> one
+>>>>>>>>>> acting as guest and one as host. So one system will provide 
+>>>>>>>>>> virtio
+>>>>>>>>>> functionality reserving memory for virtqueues and the other 
+>>>>>>>>>> provides vhost
+>>>>>>>>>> functionality providing a way to access the virtqueues in 
+>>>>>>>>>> virtio memory.
+>>>>>>>>>> One is
+>>>>>>>>>> source and the other is sink and there is no intermediate 
+>>>>>>>>>> entity. (vhost was
+>>>>>>>>>> probably intermediate entity in virtualization?)
+>>>>>>>>> (Not a native English speaker) but "vhost" could introduce 
+>>>>>>>>> some confusion for
+>>>>>>>>> me since it was use for implementing virtio backend for 
+>>>>>>>>> userspace drivers. I
+>>>>>>>>> guess "vringh" could be better.
+>>>>>>>> Initially I had named this vringh but later decided to choose 
+>>>>>>>> vhost instead of
+>>>>>>>> vringh. vhost is still a virtio backend (not necessarily 
+>>>>>>>> userspace) though it
+>>>>>>>> now resides in an entirely different system. Whatever virtio is 
+>>>>>>>> for a frontend
+>>>>>>>> system, vhost can be that for a backend system. vring can be 
+>>>>>>>> for accessing
+>>>>>>>> virtqueue and can be used either in frontend or backend.
+>>
+>> I guess that clears up at least some of my questions from above...
+>>
+>>>>>>> Ok.
+>>>>>>>
+>>>>>>>>>>> Have you considered to implement these through vDPA?
+>>>>>>>>>> IIUC vDPA only provides an interface to userspace and an 
+>>>>>>>>>> in-kernel rpmsg
+>>>>>>>>>> driver
+>>>>>>>>>> or vhost net driver is not provided.
+>>>>>>>>>>
+>>>>>>>>>> The HW connection looks something like 
+>>>>>>>>>> https://pasteboard.co/JfMVVHC.jpg
+>>>>>>>>>> (usecase2 above),
+>>>>>>>>> I see.
+>>>>>>>>>
+>>>>>>>>>>       all the boards run Linux. The middle board provides NTB
+>>>>>>>>>> functionality and board on either side provides virtio/vhost
+>>>>>>>>>> functionality and
+>>>>>>>>>> transfer data using rpmsg.
+>>
+>> This setup looks really interesting (sometimes, it's really hard to
+>> imagine this in the abstract.)
+>>>>>>>>> So I wonder whether it's worthwhile for a new bus. Can we use
+>>>>>>>>> the existed virtio-bus/drivers? It might work as, except for
+>>>>>>>>> the epf transport, we can introduce a epf "vhost" transport
+>>>>>>>>> driver.
+>>>>>>>> IMHO we'll need two buses one for frontend and other for
+>>>>>>>> backend because the two components can then co-operate/interact
+>>>>>>>> with each other to provide a functionality. Though both will
+>>>>>>>> seemingly provide similar callbacks, they are both provide
+>>>>>>>> symmetrical or complimentary funcitonality and need not be same
+>>>>>>>> or identical.
+>>>>>>>>
+>>>>>>>> Having the same bus can also create sequencing issues.
+>>>>>>>>
+>>>>>>>> If you look at virtio_dev_probe() of virtio_bus
+>>>>>>>>
+>>>>>>>> device_features = dev->config->get_features(dev);
+>>>>>>>>
+>>>>>>>> Now if we use same bus for both front-end and back-end, both
+>>>>>>>> will try to get_features when there has been no set_features.
+>>>>>>>> Ideally vhost device should be initialized first with the set
+>>>>>>>> of features it supports. Vhost and virtio should use "status"
+>>>>>>>> and "features" complimentarily and not identically.
+>>>>>>> Yes, but there's no need for doing status/features passthrough
+>>>>>>> in epf vhost drivers.b
+>>>>>>>
+>>>>>>>> virtio device (or frontend) cannot be initialized before vhost
+>>>>>>>> device (or backend) gets initialized with data such as
+>>>>>>>> features. Similarly vhost (backend)
+>>>>>>>> cannot access virqueues or buffers before virtio (frontend) sets
+>>>>>>>> VIRTIO_CONFIG_S_DRIVER_OK whereas that requirement is not there
+>>>>>>>> for virtio as the physical memory for virtqueues are created by
+>>>>>>>> virtio (frontend).
+>>>>>>> epf vhost drivers need to implement two devices: vhost(vringh)
+>>>>>>> device and virtio device (which is a mediated device). The
+>>>>>>> vhost(vringh) device is doing feature negotiation with the
+>>>>>>> virtio device via RC/EP or NTB. The virtio device is doing
+>>>>>>> feature negotiation with local virtio drivers. If there're
+>>>>>>> feature mismatch, epf vhost drivers and do mediation between
+>>>>>>> them.
+>>>>>> Here epf vhost should be initialized with a set of features for
+>>>>>> it to negotiate either as vhost device or virtio device no? Where
+>>>>>> should the initial feature set for epf vhost come from?
+>>>>>
+>>>>> I think it can work as:
+>>>>>
+>>>>> 1) Having an initial features (hard coded in the code) set X in
+>>>>> epf vhost 2) Using this X for both virtio device and vhost(vringh)
+>>>>> device 3) local virtio driver will negotiate with virtio device
+>>>>> with feature set Y 4) remote virtio driver will negotiate with
+>>>>> vringh device with feature set Z 5) mediate between feature Y and
+>>>>> feature Z since both Y and Z are a subset of X
+>>>>>
+>>>> okay. I'm also thinking if we could have configfs for configuring
+>>>> this. Anyways we could find different approaches of configuring
+>>>> this.
+>>>
+>>>
+>>> Yes, and I think some management API is needed even in the design of
+>>> your "Software Layering". In that figure, rpmsg vhost need some
+>>> pre-set or hard-coded features.
+>>
+>> When I saw the plumbers talk, my first idea was "this needs to be a new
+>> transport". You have some hard-coded or pre-configured features, and
+>> then features are negotiated via a transport-specific means in the
+>> usual way. There's basically an extra/extended layer for this (and
+>> status, and whatever).
 >
-> Co-developed-by: Xiaoyao Li <xiaoyao.li@intel.com>
-> Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
-> Signed-off-by: Chenyi Qiang <chenyi.qiang@intel.com>
-> ---
->  arch/x86/include/asm/kvm_host.h    |  9 ++++++++
->  arch/x86/include/asm/vmx.h         |  1 +
->  arch/x86/include/asm/vmxfeatures.h |  1 +
->  arch/x86/include/uapi/asm/kvm.h    |  1 +
->  arch/x86/include/uapi/asm/vmx.h    |  4 +++-
->  arch/x86/kvm/vmx/capabilities.h    |  6 +++++
->  arch/x86/kvm/vmx/vmx.c             | 33 ++++++++++++++++++++++++++-
->  arch/x86/kvm/vmx/vmx.h             |  2 +-
->  arch/x86/kvm/x86.c                 | 36 +++++++++++++++++++++++++++++-
->  arch/x86/kvm/x86.h                 |  5 +++++
->  include/uapi/linux/kvm.h           |  2 ++
->  11 files changed, 96 insertions(+), 4 deletions(-)
+> I think for PCIe root complex to PCIe endpoint communication it's 
+> still "Virtio Over PCI Bus", though existing layout cannot be used in 
+> this context (find virtio capability will fail for modern interface 
+> and loading queue status immediately after writing queue number is not 
+> possible for root complex to endpoint communication; setup_vq() in 
+> virtio_pci_legacy.c).
+
+
+Then you need something that is functional equivalent to virtio PCI 
+which is actually the concept of vDPA (e.g vDPA provides alternatives if 
+the queue_sel is hard in the EP implementation).
+
+
 >
-> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> index be5363b21540..bfabe2f15b30 100644
-> --- a/arch/x86/include/asm/kvm_host.h
-> +++ b/arch/x86/include/asm/kvm_host.h
-> @@ -829,6 +829,9 @@ struct kvm_vcpu_arch {
->  
->  	/* AMD MSRC001_0015 Hardware Configuration */
->  	u64 msr_hwcr;
-> +
-> +	/* Set when bus lock VM exit is preempted by a higher priority VM exit */
-> +	bool bus_lock_detected;
->  };
->  
->  struct kvm_lpage_info {
-> @@ -1002,6 +1005,9 @@ struct kvm_arch {
->  	bool guest_can_read_msr_platform_info;
->  	bool exception_payload_enabled;
->  
-> +	/* Set when bus lock vm exit is enabled by user */
-> +	bool bus_lock_exit;
-> +
->  	struct kvm_pmu_event_filter *pmu_event_filter;
->  	struct task_struct *nx_lpage_recovery_thread;
->  };
-> @@ -1051,6 +1057,7 @@ struct kvm_vcpu_stat {
->  	u64 req_event;
->  	u64 halt_poll_success_ns;
->  	u64 halt_poll_fail_ns;
-> +	u64 bus_locks;
->  };
->  
->  struct x86_instruction_info;
-> @@ -1388,6 +1395,8 @@ extern u8   kvm_tsc_scaling_ratio_frac_bits;
->  extern u64  kvm_max_tsc_scaling_ratio;
->  /* 1ull << kvm_tsc_scaling_ratio_frac_bits */
->  extern u64  kvm_default_tsc_scaling_ratio;
-> +/* bus lock detection supported */
-> +extern bool kvm_has_bus_lock_exit;
->  
->  extern u64 kvm_mce_cap_supported;
->  
-> diff --git a/arch/x86/include/asm/vmx.h b/arch/x86/include/asm/vmx.h
-> index cd7de4b401fe..93a880bc31a7 100644
-> --- a/arch/x86/include/asm/vmx.h
-> +++ b/arch/x86/include/asm/vmx.h
-> @@ -73,6 +73,7 @@
->  #define SECONDARY_EXEC_PT_USE_GPA		VMCS_CONTROL_BIT(PT_USE_GPA)
->  #define SECONDARY_EXEC_TSC_SCALING              VMCS_CONTROL_BIT(TSC_SCALING)
->  #define SECONDARY_EXEC_ENABLE_USR_WAIT_PAUSE	VMCS_CONTROL_BIT(USR_WAIT_PAUSE)
-> +#define SECONDARY_EXEC_BUS_LOCK_DETECTION	VMCS_CONTROL_BIT(BUS_LOCK_DETECTION)
->  
->  #define PIN_BASED_EXT_INTR_MASK                 VMCS_CONTROL_BIT(INTR_EXITING)
->  #define PIN_BASED_NMI_EXITING                   VMCS_CONTROL_BIT(NMI_EXITING)
-> diff --git a/arch/x86/include/asm/vmxfeatures.h b/arch/x86/include/asm/vmxfeatures.h
-> index 9915990fd8cf..e80523346274 100644
-> --- a/arch/x86/include/asm/vmxfeatures.h
-> +++ b/arch/x86/include/asm/vmxfeatures.h
-> @@ -83,5 +83,6 @@
->  #define VMX_FEATURE_TSC_SCALING		( 2*32+ 25) /* Scale hardware TSC when read in guest */
->  #define VMX_FEATURE_USR_WAIT_PAUSE	( 2*32+ 26) /* Enable TPAUSE, UMONITOR, UMWAIT in guest */
->  #define VMX_FEATURE_ENCLV_EXITING	( 2*32+ 28) /* "" VM-Exit on ENCLV (leaf dependent) */
-> +#define VMX_FEATURE_BUS_LOCK_DETECTION	( 2*32+ 30) /* VM-Exit when bus lock caused */
->  
->  #endif /* _ASM_X86_VMXFEATURES_H */
-> diff --git a/arch/x86/include/uapi/asm/kvm.h b/arch/x86/include/uapi/asm/kvm.h
-> index 0780f97c1850..a1471c05f7f9 100644
-> --- a/arch/x86/include/uapi/asm/kvm.h
-> +++ b/arch/x86/include/uapi/asm/kvm.h
-> @@ -111,6 +111,7 @@ struct kvm_ioapic_state {
->  #define KVM_NR_IRQCHIPS          3
->  
->  #define KVM_RUN_X86_SMM		 (1 << 0)
-> +#define KVM_RUN_BUS_LOCK         (1 << 1)
->  
->  /* for KVM_GET_REGS and KVM_SET_REGS */
->  struct kvm_regs {
-> diff --git a/arch/x86/include/uapi/asm/vmx.h b/arch/x86/include/uapi/asm/vmx.h
-> index b8ff9e8ac0d5..14c177c4afd5 100644
-> --- a/arch/x86/include/uapi/asm/vmx.h
-> +++ b/arch/x86/include/uapi/asm/vmx.h
-> @@ -88,6 +88,7 @@
->  #define EXIT_REASON_XRSTORS             64
->  #define EXIT_REASON_UMWAIT              67
->  #define EXIT_REASON_TPAUSE              68
-> +#define EXIT_REASON_BUS_LOCK            74
->  
->  #define VMX_EXIT_REASONS \
->  	{ EXIT_REASON_EXCEPTION_NMI,         "EXCEPTION_NMI" }, \
-> @@ -148,7 +149,8 @@
->  	{ EXIT_REASON_XSAVES,                "XSAVES" }, \
->  	{ EXIT_REASON_XRSTORS,               "XRSTORS" }, \
->  	{ EXIT_REASON_UMWAIT,                "UMWAIT" }, \
-> -	{ EXIT_REASON_TPAUSE,                "TPAUSE" }
-> +	{ EXIT_REASON_TPAUSE,                "TPAUSE" }, \
-> +	{ EXIT_REASON_BUS_LOCK,              "BUS_LOCK" }
->  
->  #define VMX_EXIT_REASON_FLAGS \
->  	{ VMX_EXIT_REASONS_FAILED_VMENTRY,	"FAILED_VMENTRY" }
-> diff --git a/arch/x86/kvm/vmx/capabilities.h b/arch/x86/kvm/vmx/capabilities.h
-> index 4bbd8b448d22..aa94535e6705 100644
-> --- a/arch/x86/kvm/vmx/capabilities.h
-> +++ b/arch/x86/kvm/vmx/capabilities.h
-> @@ -262,6 +262,12 @@ static inline bool cpu_has_vmx_tsc_scaling(void)
->  		SECONDARY_EXEC_TSC_SCALING;
->  }
->  
-> +static inline bool cpu_has_vmx_bus_lock_detection(void)
-> +{
-> +	return vmcs_config.cpu_based_2nd_exec_ctrl &
-> +	    SECONDARY_EXEC_BUS_LOCK_DETECTION;
-> +}
-> +
->  static inline bool cpu_has_vmx_apicv(void)
->  {
->  	return cpu_has_vmx_apic_register_virt() &&
-> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index 89c131eaedf2..1560e51d2d8e 100644
-> --- a/arch/x86/kvm/vmx/vmx.c
-> +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -2460,7 +2460,8 @@ static __init int setup_vmcs_config(struct vmcs_config *vmcs_conf,
->  			SECONDARY_EXEC_ENABLE_USR_WAIT_PAUSE |
->  			SECONDARY_EXEC_PT_USE_GPA |
->  			SECONDARY_EXEC_PT_CONCEAL_VMX |
-> -			SECONDARY_EXEC_ENABLE_VMFUNC;
-> +			SECONDARY_EXEC_ENABLE_VMFUNC |
-> +			SECONDARY_EXEC_BUS_LOCK_DETECTION;
->  		if (cpu_has_sgx())
->  			opt2 |= SECONDARY_EXEC_ENCLS_EXITING;
->  		if (adjust_vmx_controls(min2, opt2,
-> @@ -4247,6 +4248,9 @@ static void vmx_compute_secondary_exec_control(struct vcpu_vmx *vmx)
->  		}
->  	}
->  
-> +	if (!kvm_bus_lock_exit_enabled(vmx->vcpu.kvm))
-> +		exec_control &= ~SECONDARY_EXEC_BUS_LOCK_DETECTION;
-> +
->  	vmx->secondary_exec_control = exec_control;
->  }
->  
-> @@ -5661,6 +5665,16 @@ static int handle_encls(struct kvm_vcpu *vcpu)
->  	return 1;
->  }
->  
-> +static int handle_bus_lock(struct kvm_vcpu *vcpu)
-> +{
-> +	struct kvm_run *kvm_run = vcpu->run;
-> +
-> +	vcpu->stat.bus_locks++;
-> +
-> +	kvm_run->exit_reason = KVM_EXIT_BUS_LOCK;
-> +	return 0;
-> +}
-> +
->  /*
->   * The exit handlers return 1 if the exit was handled fully and guest execution
->   * may resume.  Otherwise they set the kvm_run parameter to indicate what needs
-> @@ -5717,6 +5731,7 @@ static int (*kvm_vmx_exit_handlers[])(struct kvm_vcpu *vcpu) = {
->  	[EXIT_REASON_VMFUNC]		      = handle_vmx_instruction,
->  	[EXIT_REASON_PREEMPTION_TIMER]	      = handle_preemption_timer,
->  	[EXIT_REASON_ENCLS]		      = handle_encls,
-> +	[EXIT_REASON_BUS_LOCK]                = handle_bus_lock,
->  };
->  
->  static const int kvm_vmx_max_exit_handlers =
-> @@ -6809,6 +6824,19 @@ static fastpath_t vmx_vcpu_run(struct kvm_vcpu *vcpu)
->  	if (unlikely(vmx->exit_reason.failed_vmentry))
->  		return EXIT_FASTPATH_NONE;
->  
-> +	/*
-> +	 * check the exit_reason to see if there is a bus lock
-> +	 * happened in guest.
-> +	 */
-> +	if (kvm_bus_lock_exit_enabled(vmx->vcpu.kvm)) {
-> +		if (vmx->exit_reason.bus_lock_detected) {
-> +			vcpu->stat.bus_locks++;
-> +			vcpu->arch.bus_lock_detected = true;
-> +		} else {
-> +			vcpu->arch.bus_lock_detected = false;
+> "Virtio Over NTB" should anyways be a new transport.
+>>
+>> Does that make any sense?
+>
+> yeah, in the approach I used the initial features are hard-coded in 
+> vhost-rpmsg (inherent to the rpmsg) but when we have to use adapter 
+> layer (vhost only for accessing virtio ring and use virtio drivers on 
+> both front end and backend), based on the functionality (e.g, rpmsg), 
+> the vhost should be configured with features (to be presented to the 
+> virtio) and that's why additional layer or APIs will be required.
 
-This is a fast path so I'm wondering if we can move bus_lock_detected
-clearing somewhere else.
 
-> +		}
-> +	}
-> +
->  	vmx->loaded_vmcs->launched = 1;
->  	vmx->idt_vectoring_info = vmcs_read32(IDT_VECTORING_INFO_FIELD);
->  
-> @@ -8060,6 +8088,9 @@ static __init int hardware_setup(void)
->  		kvm_tsc_scaling_ratio_frac_bits = 48;
->  	}
->  
-> +	if (cpu_has_vmx_bus_lock_detection())
-> +		kvm_has_bus_lock_exit = true;
-> +
->  	set_bit(0, vmx_vpid_bitmap); /* 0 is reserved for host */
->  
->  	if (enable_ept)
-> diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
-> index 06a91b224ef3..7e6d63a8589a 100644
-> --- a/arch/x86/kvm/vmx/vmx.h
-> +++ b/arch/x86/kvm/vmx/vmx.h
-> @@ -104,7 +104,7 @@ union vmx_exit_reason {
->  		u32	reserved23		: 1;
->  		u32	reserved24		: 1;
->  		u32	reserved25		: 1;
-> -		u32	reserved26		: 1;
-> +		u32	bus_lock_detected	: 1;
->  		u32	enclave_mode		: 1;
->  		u32	smi_pending_mtf		: 1;
->  		u32	smi_from_vmx_root	: 1;
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 88c593f83b28..00a54d0cd7da 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -133,6 +133,8 @@ u64  __read_mostly kvm_max_tsc_scaling_ratio;
->  EXPORT_SYMBOL_GPL(kvm_max_tsc_scaling_ratio);
->  u64 __read_mostly kvm_default_tsc_scaling_ratio;
->  EXPORT_SYMBOL_GPL(kvm_default_tsc_scaling_ratio);
-> +bool __read_mostly kvm_has_bus_lock_exit;
-> +EXPORT_SYMBOL_GPL(kvm_has_bus_lock_exit);
->  
->  /* tsc tolerance in parts per million - default to 1/2 of the NTP threshold */
->  static u32 __read_mostly tsc_tolerance_ppm = 250;
-> @@ -220,6 +222,7 @@ struct kvm_stats_debugfs_item debugfs_entries[] = {
->  	VCPU_STAT("l1d_flush", l1d_flush),
->  	VCPU_STAT("halt_poll_success_ns", halt_poll_success_ns),
->  	VCPU_STAT("halt_poll_fail_ns", halt_poll_fail_ns),
-> +	VCPU_STAT("bus_locks", bus_locks),
->  	VM_STAT("mmu_shadow_zapped", mmu_shadow_zapped),
->  	VM_STAT("mmu_pte_write", mmu_pte_write),
->  	VM_STAT("mmu_pte_updated", mmu_pte_updated),
-> @@ -3538,6 +3541,9 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
->  	case KVM_CAP_HYPERV_ENLIGHTENED_VMCS:
->  		r = kvm_x86_ops.nested_ops->enable_evmcs != NULL;
->  		break;
-> +	case KVM_CAP_X86_BUS_LOCK_EXIT:
-> +		r = kvm_has_bus_lock_exit;
-> +		break;
+A question here, if we go with vhost bus approach, does it mean the 
+virtio device can only be implemented in EP's userspace?
 
-I think we can always report KVM_CAP_X86_BUS_LOCK_EXIT as supported
-(meaning KVM itself supports it) ...
+Thanks
 
->  	default:
->  		break;
->  	}
-> @@ -4990,6 +4996,12 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
->  		kvm->arch.exception_payload_enabled = cap->args[0];
->  		r = 0;
->  		break;
-> +	case KVM_CAP_X86_BUS_LOCK_EXIT:
-> +		if (!kvm_has_bus_lock_exit)
-> +			return -EINVAL;
 
-... because userspace can check for -EINVAL when enabling the cap. Or we
-can return e.g. -EOPNOTSUPP here. I don't have a strong opinion on the matter..
-
-> +		kvm->arch.bus_lock_exit = cap->args[0];
-> +		r = 0;
-> +		break;
->  	default:
->  		r = -EINVAL;
->  		break;
-> @@ -7732,12 +7744,23 @@ static void post_kvm_run_save(struct kvm_vcpu *vcpu)
->  	struct kvm_run *kvm_run = vcpu->run;
->  
->  	kvm_run->if_flag = (kvm_get_rflags(vcpu) & X86_EFLAGS_IF) != 0;
-> -	kvm_run->flags = is_smm(vcpu) ? KVM_RUN_X86_SMM : 0;
->  	kvm_run->cr8 = kvm_get_cr8(vcpu);
->  	kvm_run->apic_base = kvm_get_apic_base(vcpu);
->  	kvm_run->ready_for_interrupt_injection =
->  		pic_in_kernel(vcpu->kvm) ||
->  		kvm_vcpu_ready_for_interrupt_injection(vcpu);
-> +
-> +	if (is_smm(vcpu))
-> +		kvm_run->flags |= KVM_RUN_X86_SMM;
-> +	else
-> +		kvm_run->flags &= ~KVM_RUN_X86_SMM;
-> +
-> +	if (vcpu->arch.bus_lock_detected &&
-> +	    kvm_run->exit_reason != KVM_EXIT_BUS_LOCK)
-> +		kvm_run->flags |= KVM_RUN_BUS_LOCK;
-> +	else
-> +		kvm_run->flags &= ~KVM_RUN_BUS_LOCK;
-> +
->  }
->  
->  static void update_cr8_intercept(struct kvm_vcpu *vcpu)
-> @@ -8597,6 +8620,17 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
->  		kvm_lapic_sync_from_vapic(vcpu);
->  
->  	r = kvm_x86_ops.handle_exit(vcpu, exit_fastpath);
-> +
-> +	/*
-> +	 * Even when current exit reason is handled by KVM
-> +	 * internally, we still needs to exit to user space
-> +	 * when bus lock detected to inform that there is a
-> +	 * bus lock in guest.
-> +	 */
-> +	if (r > 0 && vcpu->arch.bus_lock_detected) {
-> +		vcpu->run->exit_reason = KVM_EXIT_BUS_LOCK;
-> +		r = 0;
-
-Can we maybe reset bus_lock_detected here?
-
-> +	}
->  	return r;
->  
->  cancel_injection:
-> diff --git a/arch/x86/kvm/x86.h b/arch/x86/kvm/x86.h
-> index 6eb62e97e59f..d3b1095cc8fb 100644
-> --- a/arch/x86/kvm/x86.h
-> +++ b/arch/x86/kvm/x86.h
-> @@ -334,6 +334,11 @@ static inline bool kvm_cstate_in_guest(struct kvm *kvm)
->  	return kvm->arch.cstate_in_guest;
->  }
->  
-> +static inline bool kvm_bus_lock_exit_enabled(struct kvm *kvm)
-> +{
-> +	return kvm->arch.bus_lock_exit;
-> +}
-> +
->  DECLARE_PER_CPU(struct kvm_vcpu *, current_vcpu);
->  
->  static inline void kvm_before_interrupt(struct kvm_vcpu *vcpu)
-> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-> index 4fdf30316582..e66aa4bdaf24 100644
-> --- a/include/uapi/linux/kvm.h
-> +++ b/include/uapi/linux/kvm.h
-> @@ -248,6 +248,7 @@ struct kvm_hyperv_exit {
->  #define KVM_EXIT_IOAPIC_EOI       26
->  #define KVM_EXIT_HYPERV           27
->  #define KVM_EXIT_ARM_NISV         28
-> +#define KVM_EXIT_BUS_LOCK         29
->  
->  /* For KVM_EXIT_INTERNAL_ERROR */
->  /* Emulate instruction failed. */
-> @@ -1031,6 +1032,7 @@ struct kvm_ppc_resize_hpt {
->  #define KVM_CAP_PPC_SECURE_GUEST 181
->  #define KVM_CAP_HALT_POLL 182
->  #define KVM_CAP_ASYNC_PF_INT 183
-> +#define KVM_CAP_X86_BUS_LOCK_EXIT 184
->  
->  #ifdef KVM_CAP_IRQ_ROUTING
-
--- 
-Vitaly
+>>
+>>>
+>>>
+>>>>>>>>> It will have virtqueues but only used for the communication
+>>>>>>>>> between itself and
+>>>>>>>>> uppter virtio driver. And it will have vringh queues which
+>>>>>>>>> will be probe by virtio epf transport drivers. And it needs to
+>>>>>>>>> do datacopy between virtqueue and
+>>>>>>>>> vringh queues.
+>>>>>>>>>
+>>>>>>>>> It works like:
+>>>>>>>>>
+>>>>>>>>> virtio drivers <- virtqueue/virtio-bus -> epf vhost drivers <-
+>>>>>>>>> vringh queue/epf>
+>>>>>>>>>
+>>>>>>>>> The advantages is that there's no need for writing new buses
+>>>>>>>>> and drivers.
+>>>>>>>> I think this will work however there is an addtional copy
+>>>>>>>> between vringh queue and virtqueue,
+>>>>>>> I think not? E.g in use case 1), if we stick to virtio bus, we
+>>>>>>> will have:
+>>>>>>>
+>>>>>>> virtio-rpmsg (EP) <- virtio ring(1) -> epf vhost driver (EP) <-
+>>>>>>> virtio ring(2) -> virtio pci (RC) <-> virtio rpmsg (RC)
+>>>>>> IIUC epf vhost driver (EP) will access virtio ring(2) using
+>>>>>> vringh?
+>>>>>
+>>>>> Yes.
+>>>>>
+>>>>>> And virtio
+>>>>>> ring(2) is created by virtio pci (RC).
+>>>>>
+>>>>> Yes.
+>>>>>
+>>>>>>> What epf vhost driver did is to read from virtio ring(1) about
+>>>>>>> the buffer len and addr and them DMA to Linux(RC)?
+>>>>>> okay, I made some optimization here where vhost-rpmsg using a
+>>>>>> helper writes a buffer from rpmsg's upper layer directly to
+>>>>>> remote Linux (RC) as against here were it has to be first written
+>>>>>> to virtio ring (1).
+>>>>>>
+>>>>>> Thinking how this would look for NTB
+>>>>>> virtio-rpmsg (HOST1) <- virtio ring(1) -> NTB(HOST1) <->
+>>>>>> NTB(HOST2)  <- virtio ring(2) -> virtio-rpmsg (HOST2)
+>>>>>>
+>>>>>> Here the NTB(HOST1) will access the virtio ring(2) using vringh?
+>>>>>
+>>>>> Yes, I think so it needs to use vring to access virtio ring (1) as
+>>>>> well.
+>>>> NTB(HOST1) and virtio ring(1) will be in the same system. So it
+>>>> doesn't have to use vring. virtio ring(1) is by the virtio device
+>>>> the NTB(HOST1) creates.
+>>>
+>>>
+>>> Right.
+>>>
+>>>
+>>>>>> Do you also think this will work seamlessly with virtio_net.c,
+>>>>>> virtio_blk.c?
+>>>>>
+>>>>> Yes.
+>>>> okay, I haven't looked at this but the backend of virtio_blk should
+>>>> access an actual storage device no?
+>>>
+>>>
+>>> Good point, for non-peer device like storage. There's probably no
+>>> need for it to be registered on the virtio bus and it might be better
+>>> to behave as you proposed.
+>>
+>> I might be missing something; but if you expose something as a block
+>> device, it should have something it can access with block reads/writes,
+>> shouldn't it? Of course, that can be a variety of things.
+>>
+>>>
+>>> Just to make sure I understand the design, how is VHOST SCSI expected
+>>> to work in your proposal, does it have a device for file as a backend?
+>>>
+>>>
+>>>>>> I'd like to get clarity on two things in the approach you
+>>>>>> suggested, one is features (since epf vhost should ideally be
+>>>>>> transparent to any virtio driver)
+>>>>>
+>>>>> We can have have an array of pre-defined features indexed by
+>>>>> virtio device id in the code.
+>>>>>
+>>>>>> and the other is how certain inputs to virtio device such as
+>>>>>> number of buffers be determined.
+>>>>>
+>>>>> We can start from hard coded the value like 256, or introduce some
+>>>>> API for user to change the value.
+>>>>>
+>>>>>> Thanks again for your suggestions!
+>>>>>
+>>>>> You're welcome.
+>>>>>
+>>>>> Note that I just want to check whether or not we can reuse the
+>>>>> virtio bus/driver. It's something similar to what you proposed in
+>>>>> Software Layering but we just replace "vhost core" with "virtio
+>>>>> bus" and move the vhost core below epf/ntb/platform transport.
+>>>> Got it. My initial design was based on my understanding of your
+>>>> comments [1].
+>>>
+>>>
+>>> Yes, but that's just for a networking device. If we want something
+>>> more generic, it may require more thought (bus etc).
+>>
+>> I believe that we indeed need something bus-like to be able to support
+>> a variety of devices.
+>
+> I think we could still have adapter layers for different types of 
+> devices ([1]) and use existing virtio bus for both front end and back 
+> end. Using bus-like will however simplify adding support for new types 
+> of devices and adding adapters for devices will be slightly more complex.
+>
+> [1] -> Page 13 in 
+> https://linuxplumbersconf.org/event/7/contributions/849/attachments/642/1175/Virtio_for_PCIe_RC_EP_NTB.pdf
+>>
+>>>
+>>>
+>>>>
+>>>> I'll try to create something based on your proposed design here.
+>>>
+>>>
+>>> Sure, but for coding, we'd better wait for other's opinion here.
+>>
+>> Please tell me if my thoughts above make any sense... I have just
+>> started looking at that, so I might be completely off.
+>
+> I think your understanding is correct! Thanks for your inputs.
+>
+> Thanks
+> Kishon
 
