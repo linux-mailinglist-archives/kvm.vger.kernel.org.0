@@ -2,18 +2,21 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A88C7258ECD
-	for <lists+kvm@lfdr.de>; Tue,  1 Sep 2020 15:01:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 02BCC258F77
+	for <lists+kvm@lfdr.de>; Tue,  1 Sep 2020 15:50:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727901AbgIANAi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 1 Sep 2020 09:00:38 -0400
-Received: from 8bytes.org ([81.169.241.247]:40302 "EHLO theia.8bytes.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727943AbgIANAD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 1 Sep 2020 09:00:03 -0400
+        id S1728250AbgIANua (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 1 Sep 2020 09:50:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35534 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728020AbgIANau (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 1 Sep 2020 09:30:50 -0400
+Received: from theia.8bytes.org (8bytes.org [IPv6:2a01:238:4383:600:38bc:a715:4b6d:a889])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8B247C061245;
+        Tue,  1 Sep 2020 06:30:03 -0700 (PDT)
 Received: by theia.8bytes.org (Postfix, from userid 1000)
-        id 06AD2391; Tue,  1 Sep 2020 14:59:23 +0200 (CEST)
-Date:   Tue, 1 Sep 2020 14:59:22 +0200
+        id B2BB7391; Tue,  1 Sep 2020 15:29:52 +0200 (CEST)
+Date:   Tue, 1 Sep 2020 15:29:51 +0200
 From:   Joerg Roedel <joro@8bytes.org>
 To:     Borislav Petkov <bp@alien8.de>
 Cc:     x86@kernel.org, Joerg Roedel <jroedel@suse.de>, hpa@zytor.com,
@@ -34,34 +37,28 @@ Cc:     x86@kernel.org, Joerg Roedel <jroedel@suse.de>, hpa@zytor.com,
         Martin Radev <martin.b.radev@gmail.com>,
         linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         virtualization@lists.linux-foundation.org
-Subject: Re: [PATCH v6 42/76] x86/sev-es: Setup early #VC handler
-Message-ID: <20200901125922.GC22385@8bytes.org>
+Subject: Re: [PATCH v6 48/76] x86/entry/64: Add entry code for #VC handler
+Message-ID: <20200901132951.GD22385@8bytes.org>
 References: <20200824085511.7553-1-joro@8bytes.org>
- <20200824085511.7553-43-joro@8bytes.org>
- <20200831094541.GD27517@zn.tnic>
+ <20200824085511.7553-49-joro@8bytes.org>
+ <20200831113002.GH27517@zn.tnic>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200831094541.GD27517@zn.tnic>
+In-Reply-To: <20200831113002.GH27517@zn.tnic>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Aug 31, 2020 at 11:45:41AM +0200, Borislav Petkov wrote:
-> On Mon, Aug 24, 2020 at 10:54:37AM +0200, Joerg Roedel wrote:
-> > +#ifdef CONFIG_AMD_MEM_ENCRYPT
-> > +	/* VMM Communication Exception */
-> > +	handler = fixup_pointer(vc_no_ghcb, physbase);
-> > +	set_early_idt_handler(idt, X86_TRAP_VC, handler);
-> 
-> This function is used only once AFAICT - you might just as well add its
-> three-lined body here and save yourself the function definition and
-> ifdeffery above...
+On Mon, Aug 31, 2020 at 01:30:02PM +0200, Borislav Petkov wrote:
+> AFAICT, that STACK_TYPE_UNKNOWN gets set only by the plain
+> get_stack_info() function - not by the _noinstr() variant so you'd need
+> to check the return value of latter...
 
-True, but having a separate function might be handy when support for #VE
-and #HV is developed. Those might also need to setup their early
-handlers here, no?
+You are right, it needs to check the return value of
+get_stack_info_noinstr() instead of STACK_TYPE_UNKNOWN. Fixed that now.
+
 
 Regards,
 
