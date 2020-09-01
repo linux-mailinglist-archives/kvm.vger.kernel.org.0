@@ -2,138 +2,147 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A6BC4258B47
-	for <lists+kvm@lfdr.de>; Tue,  1 Sep 2020 11:18:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B21CD258B4B
+	for <lists+kvm@lfdr.de>; Tue,  1 Sep 2020 11:18:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726144AbgIAJSt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 1 Sep 2020 05:18:49 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:62650 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726064AbgIAJSo (ORCPT
+        id S1726244AbgIAJSu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 1 Sep 2020 05:18:50 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:34822 "EHLO
+        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1725848AbgIAJSo (ORCPT
         <rfc822;kvm@vger.kernel.org>); Tue, 1 Sep 2020 05:18:44 -0400
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 08192BNA072232;
-        Tue, 1 Sep 2020 05:18:44 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : mime-version : content-transfer-encoding; s=pp1;
- bh=YPtWkQi0eSQq6qd/NvhgsXggL4arpiXRt718grYJzIk=;
- b=sDtQLGkwgeaoTn8wTe9ZLOkPIvQBVuPyYppM0bBY9OrpnfXKkUX8STkfcG8VraTjkv7U
- sT4G04uHPI6c92/2N3GQtOK4eEEzo/XhYf0W2CZjX0q6fTARQpRPXeFGyd4EBMY0rkOj
- kCJIiStdbHZqtmxGYR6TeONplpohU1cmaW4WUkP6hJzBwNcfRcxSroYMwM904D85BjB8
- wESzRpuhIxHaZZlSGHih7KX/NB3U94H4tZr3xk460WNgAJPGg0Gjt7UCn4rfmPa7yqGs
- 8cikMglBU0JF7wCjShbbnkpRnI0PXQTBxRMoLesTRTCqx0QX9lRsFZzxGwQTqOZbppNp GA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 339gd0nwx1-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 01 Sep 2020 05:18:43 -0400
-Received: from m0098404.ppops.net (m0098404.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 08192CgC072408;
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 08191juC161425;
         Tue, 1 Sep 2020 05:18:43 -0400
-Received: from ppma04fra.de.ibm.com (6a.4a.5195.ip4.static.sl-reverse.com [149.81.74.106])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 339gd0nwv0-1
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : in-reply-to : references : mime-version :
+ content-transfer-encoding; s=pp1;
+ bh=Mo8KmB6saTrJHYx8XJzHO0sD/ITp9wiOPYwvnymwVUk=;
+ b=OQiNGzoFXulsu9r1A+OVa8oRe2JCWPvucU2EpaahoM/OJP7iev9ippfniiGJ31MAe55y
+ zjAppTkZIFUwbKogsnKzTepuvrmUe9O/+OEueDLg64v5pPIfWRIfjeiaytGRrFW/aT5i
+ GZ+Vf+o1xs1oeQbbDoJISIqT6kMdPZTiYCLr5FZD1OYPcLxREU1digEsAZJcrlzOhDPM
+ I3K4sRZzd78VQSrK76EX+PXrAS/Mov6zNFNo99IqzRqvuCdyDJ373oLwqRjSbwyioxi0
+ 0WE4nsnAQ/Sqa+G1nFYXQWWYyblma7hkImFjvCbtZi/gCHcK51W4yfWucdrJxJZgzspr lQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 339k4g8v36-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
         Tue, 01 Sep 2020 05:18:43 -0400
-Received: from pps.filterd (ppma04fra.de.ibm.com [127.0.0.1])
-        by ppma04fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 0819Cmpd004135;
-        Tue, 1 Sep 2020 09:18:40 GMT
-Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
-        by ppma04fra.de.ibm.com with ESMTP id 339ap7r9n9-1
+Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 0819HFch034128;
+        Tue, 1 Sep 2020 05:18:42 -0400
+Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com [149.81.74.108])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 339k4g8v22-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 01 Sep 2020 05:18:42 -0400
+Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
+        by ppma05fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 0819DB9p007935;
+        Tue, 1 Sep 2020 09:18:41 GMT
+Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
+        by ppma05fra.de.ibm.com with ESMTP id 337en81yb0-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
         Tue, 01 Sep 2020 09:18:40 +0000
 Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
-        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 0819Ibap11731408
+        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 0819IcWv60686776
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 1 Sep 2020 09:18:37 GMT
+        Tue, 1 Sep 2020 09:18:38 GMT
 Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 7DEB84C044;
+        by IMSVA (Postfix) with ESMTP id F314C4C044;
         Tue,  1 Sep 2020 09:18:37 +0000 (GMT)
 Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 117794C04E;
+        by IMSVA (Postfix) with ESMTP id 910AF4C04E;
         Tue,  1 Sep 2020 09:18:37 +0000 (GMT)
 Received: from localhost.localdomain.com (unknown [9.145.37.233])
         by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Tue,  1 Sep 2020 09:18:36 +0000 (GMT)
+        Tue,  1 Sep 2020 09:18:37 +0000 (GMT)
 From:   Janosch Frank <frankja@linux.ibm.com>
 To:     pbonzini@redhat.com
 Cc:     kvm@vger.kernel.org, frankja@linux.vnet.ibm.com, david@redhat.com,
         borntraeger@de.ibm.com, cohuck@redhat.com,
         linux-s390@vger.kernel.org, imbrenda@linux.ibm.com
-Subject: [kvm-unit-tests GIT PULL 0/3] s390x skrf and ultravisor patches
-Date:   Tue,  1 Sep 2020 11:18:20 +0200
-Message-Id: <20200901091823.14477-1-frankja@linux.ibm.com>
+Subject: [kvm-unit-tests GIT PULL 1/3] s390x: Add custom pgm cleanup function
+Date:   Tue,  1 Sep 2020 11:18:21 +0200
+Message-Id: <20200901091823.14477-2-frankja@linux.ibm.com>
 X-Mailer: git-send-email 2.25.4
+In-Reply-To: <20200901091823.14477-1-frankja@linux.ibm.com>
+References: <20200901091823.14477-1-frankja@linux.ibm.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
  definitions=2020-09-01_04:2020-09-01,2020-09-01 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 spamscore=0
- suspectscore=0 malwarescore=0 lowpriorityscore=0 bulkscore=0 clxscore=1015
- adultscore=0 priorityscore=1501 mlxlogscore=999 mlxscore=0 phishscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
- definitions=main-2009010075
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0
+ impostorscore=0 adultscore=0 spamscore=0 priorityscore=1501 clxscore=1015
+ bulkscore=0 lowpriorityscore=0 phishscore=0 mlxlogscore=999 suspectscore=1
+ mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2006250000 definitions=main-2009010075
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Paolo,
+Sometimes we need to do cleanup which we don't necessarily want to add
+to interrupt.c, so let's add a way to register a cleanup function.
 
-initially I wanted to wait with this pull until I picked more patches,
-but it doesn't look like that will happen soon and my vacation is
-getting closer. So here we go:
+Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+Message-Id: <20200807111555.11169-2-frankja@linux.ibm.com>
+Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+---
+ lib/s390x/asm/interrupt.h |  1 +
+ lib/s390x/interrupt.c     | 12 +++++++++++-
+ 2 files changed, 12 insertions(+), 1 deletion(-)
 
-The following changes since commit 1b53866b0b494277ab41c7c0cec4ee00969dd32e:
-
-  Merge tag 's390x-2020-31-07' of https://github.com/frankjaa/kvm-unit-tests into HEAD (2020-08-09 18:06:26 +0200)
-
-are available in the Git repository at:
-
-  git@gitlab.com:frankja/kvm-unit-tests.git tags/s390x-2020-01-09
-
-for you to fetch changes up to 2ea7afb64d34b5dd841334f72b99251ab56433cd:
-
-  s390x: Ultravisor guest API test (2020-08-11 03:19:46 -0400)
-
-----------------------------------------------------------------
-* Added first Ultravisor tests
-* Added SKRF key in PSW test
-* Added custom program exception cleanup hook
-----------------------------------------------------------------
-Janosch Frank (3):
-      s390x: Add custom pgm cleanup function
-      s390x: skrf: Add exception new skey test and add test to unittests.cfg
-      s390x: Ultravisor guest API test
-
- lib/s390x/asm/interrupt.h |   1 +
- lib/s390x/asm/uv.h        |  74 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- lib/s390x/interrupt.c     |  12 +++++++++++-
- s390x/Makefile            |   1 +
- s390x/skrf.c              |  79 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- s390x/unittests.cfg       |   7 +++++++
- s390x/uv-guest.c          | 150 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 7 files changed, 323 insertions(+), 1 deletion(-)
- create mode 100644 lib/s390x/asm/uv.h
- create mode 100644 s390x/uv-guest.c
-
-
-
-Janosch Frank (3):
-  s390x: Add custom pgm cleanup function
-  s390x: skrf: Add exception new skey test and add test to unittests.cfg
-  s390x: Ultravisor guest API test
-
- lib/s390x/asm/interrupt.h |   1 +
- lib/s390x/asm/uv.h        |  74 +++++++++++++++++++
- lib/s390x/interrupt.c     |  12 ++-
- s390x/Makefile            |   1 +
- s390x/skrf.c              |  79 ++++++++++++++++++++
- s390x/unittests.cfg       |   7 ++
- s390x/uv-guest.c          | 150 ++++++++++++++++++++++++++++++++++++++
- 7 files changed, 323 insertions(+), 1 deletion(-)
- create mode 100644 lib/s390x/asm/uv.h
- create mode 100644 s390x/uv-guest.c
-
+diff --git a/lib/s390x/asm/interrupt.h b/lib/s390x/asm/interrupt.h
+index 4cfade9..2772e6b 100644
+--- a/lib/s390x/asm/interrupt.h
++++ b/lib/s390x/asm/interrupt.h
+@@ -15,6 +15,7 @@
+ #define EXT_IRQ_EXTERNAL_CALL	0x1202
+ #define EXT_IRQ_SERVICE_SIG	0x2401
+ 
++void register_pgm_cleanup_func(void (*f)(void));
+ void handle_pgm_int(void);
+ void handle_ext_int(void);
+ void handle_mcck_int(void);
+diff --git a/lib/s390x/interrupt.c b/lib/s390x/interrupt.c
+index 243b9c2..a074505 100644
+--- a/lib/s390x/interrupt.c
++++ b/lib/s390x/interrupt.c
+@@ -16,6 +16,7 @@
+ 
+ static bool pgm_int_expected;
+ static bool ext_int_expected;
++static void (*pgm_cleanup_func)(void);
+ static struct lowcore *lc;
+ 
+ void expect_pgm_int(void)
+@@ -51,6 +52,11 @@ void check_pgm_int_code(uint16_t code)
+ 	       lc->pgm_int_code);
+ }
+ 
++void register_pgm_cleanup_func(void (*f)(void))
++{
++	pgm_cleanup_func = f;
++}
++
+ static void fixup_pgm_int(void)
+ {
+ 	switch (lc->pgm_int_code) {
+@@ -115,7 +121,11 @@ void handle_pgm_int(void)
+ 	}
+ 
+ 	pgm_int_expected = false;
+-	fixup_pgm_int();
++
++	if (pgm_cleanup_func)
++		(*pgm_cleanup_func)();
++	else
++		fixup_pgm_int();
+ }
+ 
+ void handle_ext_int(void)
 -- 
 2.25.4
 
