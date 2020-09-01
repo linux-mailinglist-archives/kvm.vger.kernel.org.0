@@ -2,85 +2,86 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 65DAA258601
-	for <lists+kvm@lfdr.de>; Tue,  1 Sep 2020 05:07:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B545E258627
+	for <lists+kvm@lfdr.de>; Tue,  1 Sep 2020 05:25:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726144AbgIADHI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 31 Aug 2020 23:07:08 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:42721 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1725993AbgIADHH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 31 Aug 2020 23:07:07 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1598929626;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=NiMSZ2Bp0rwp10xCJBRx9TIWLthoqJ/GxVfGBmzS4Dk=;
-        b=FFRfv6dirw3flLTjWX2gtKolwSSfxl85VRGWxQQ9PTmQwpRDI3nivSpHJf8FxSO77UQ4ja
-        ycSTy7ZGfgUEDR5wai/eIXDD1LtJplbo0zywQw99Ya5nWypUgJ7gAncQQH6Tx/bmHtm/pL
-        YZ43wEGJE2mYCBwhq29Gj7alTlF+l24=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-205-G9NcSATZMni7qWSgOVtv-A-1; Mon, 31 Aug 2020 23:07:04 -0400
-X-MC-Unique: G9NcSATZMni7qWSgOVtv-A-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EE84C1888A1E;
-        Tue,  1 Sep 2020 03:07:02 +0000 (UTC)
-Received: from [10.72.13.164] (ovpn-13-164.pek2.redhat.com [10.72.13.164])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id B891A7EB8A;
-        Tue,  1 Sep 2020 03:06:57 +0000 (UTC)
-Subject: Re: [PATCH net-next] vhost: fix typo in error message
-To:     Yunsheng Lin <linyunsheng@huawei.com>, mst@redhat.com
-Cc:     kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linuxarm@huawei.com
-References: <1598927949-201997-1-git-send-email-linyunsheng@huawei.com>
-From:   Jason Wang <jasowang@redhat.com>
-Message-ID: <26f844a5-c7de-cb0b-35eb-e6e30425ed35@redhat.com>
-Date:   Tue, 1 Sep 2020 11:06:55 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        id S1726192AbgIADZO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 31 Aug 2020 23:25:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55242 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725987AbgIADZO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 31 Aug 2020 23:25:14 -0400
+Received: from mail-oi1-x244.google.com (mail-oi1-x244.google.com [IPv6:2607:f8b0:4864:20::244])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 65B33C0612FE;
+        Mon, 31 Aug 2020 20:25:13 -0700 (PDT)
+Received: by mail-oi1-x244.google.com with SMTP id j21so2935301oii.10;
+        Mon, 31 Aug 2020 20:25:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=WswF+eY/uav4Y6QJBkqqfte8Y8u+EHxBxZsHaGmjFJY=;
+        b=jsAI596KQhVTKEwRIlLDcd0UBrvQ6A4UALEQdAbroJcdY5MRb35wWEcLhhkiS1ykB4
+         GEf9UTpSeGmk666SqUcAYtaseiK/ULBT1Thal+Ze6vb0VjggYUONHCYDJ1ZPFaK/0h7X
+         9qu4ZqsFs92C3Qbm+PnmFQRoRruHxvYaFDfah1O/DLkzV/NS690bKkFSShHxqu/+sutu
+         55nfQSfYyQ9vXOzQr7KFwMmPIwGJn30frbRsH0YLZfh2PxQ2482wv52jHGKlkroGKYkZ
+         sRL7eZQW7T8nvwZGlOF2w6AiW9DTIgCqULKNBa8/yDznw7p94QwoJNAgCBo7aqVODncS
+         wlqA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=WswF+eY/uav4Y6QJBkqqfte8Y8u+EHxBxZsHaGmjFJY=;
+        b=tw51vPP3GrWbd8UAx8OnTN699dkijEEC6Z2XBzv5M4QNubKRAMGkMPzYtWG7vaVkOB
+         amvbP1RM8MuVPVOyjSWVh7RUqs/55/OF1JdleYZzFvnlhPIJmdpKWAuhD6LAuT5BQ4si
+         EMdq+MHQhr4ds2Cdbq90T43OGUDR1sTpJdlPkzPjxW3NXFIs9nw7A6KWhiLGX5iyLf/T
+         /WPumTJkWS/86dp8V00EtetVF1H9HV5srwCSq/dh9+JdLm0ykdguTLrU01qB1n5lvRG6
+         V+G+E1l5w7cV0thQ/gcS44FkSnekO6ca3iqchunGh+tBWbtPael5h/ifWONWUU3QTdW3
+         8jrg==
+X-Gm-Message-State: AOAM532VQpelBQE6MSm+wAprEB9NQ9OcUfFlcnd+JCoLq0ID4s20f8oA
+        Jl1J/WKZgEcbKKeyP8E9jJ42H/KfN2GFGJsW1qo=
+X-Google-Smtp-Source: ABdhPJwX3CuPHma/90d6+Dt1FjXkU5q11qUWGRHuFk9S8I9vtGYmF64t9kSOHELsSS3kHs17pBd36jtMcp8oR50z36A=
+X-Received: by 2002:aca:cd93:: with SMTP id d141mr701oig.33.1598930712741;
+ Mon, 31 Aug 2020 20:25:12 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <1598927949-201997-1-git-send-email-linyunsheng@huawei.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+References: <1598578508-14134-1-git-send-email-wanpengli@tencent.com> <87a6ybx9pv.fsf@vitty.brq.redhat.com>
+In-Reply-To: <87a6ybx9pv.fsf@vitty.brq.redhat.com>
+From:   Wanpeng Li <kernellwp@gmail.com>
+Date:   Tue, 1 Sep 2020 11:25:01 +0800
+Message-ID: <CANRm+CwHiZjh3w94Xdd=ZQXP6XWysz87OG+LFR2ekQn5A2P7Dw@mail.gmail.com>
+Subject: Re: [PATCH] KVM: LAPIC: Reset timer_advance_ns if timer mode switch
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-On 2020/9/1 上午10:39, Yunsheng Lin wrote:
-> "enable" should be "disable" when the function name is
-> vhost_disable_notify(), which does the disabling work.
+On Mon, 31 Aug 2020 at 20:48, Vitaly Kuznetsov <vkuznets@redhat.com> wrote:
 >
-> Signed-off-by: Yunsheng Lin <linyunsheng@huawei.com>
-> ---
->   drivers/vhost/vhost.c | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
+> Wanpeng Li <kernellwp@gmail.com> writes:
 >
-> diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
-> index 5857d4e..b45519c 100644
-> --- a/drivers/vhost/vhost.c
-> +++ b/drivers/vhost/vhost.c
-> @@ -2537,7 +2537,7 @@ void vhost_disable_notify(struct vhost_dev *dev, struct vhost_virtqueue *vq)
->   	if (!vhost_has_feature(vq, VIRTIO_RING_F_EVENT_IDX)) {
->   		r = vhost_update_used_flags(vq);
->   		if (r)
-> -			vq_err(vq, "Failed to enable notification at %p: %d\n",
-> +			vq_err(vq, "Failed to disable notification at %p: %d\n",
->   			       &vq->used->flags, r);
->   	}
->   }
+> > From: Wanpeng Li <wanpengli@tencent.com>
+> >
+> > per-vCPU timer_advance_ns should be set to 0 if timer mode is not tscdeadline
+> > otherwise we waste cpu cycles in the function lapic_timer_int_injected(),
+>
+> lapic_timer_int_injected is just a test, kvm_wait_lapic_expire()
+> (__kvm_wait_lapic_expire()) maybe?
 
+Both the check in lapic_timer_int_injected(), the check in
+__kvm_wait_lapic_expire(), and these function calls, we can observe
+~1.3% world switch time reduce w/ this patch by
+kvm-unit-tests/vmexit.flat vmcall testing on AMD server. In addition,
+I think we should set apic->lapic_timer.expired_tscdeadline to 0 when
+switching between tscdeadline mode and other modes on Intel in order
+that we will not waste cpu cycles to tune advance value in
+adjust_lapic_timer_advance() for one time.
 
-Acked-by: Jason Wang <jasowang@redhat.com>
-
-
-
+Wanpeng
