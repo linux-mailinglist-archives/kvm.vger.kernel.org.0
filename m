@@ -2,34 +2,34 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 42537258AC1
-	for <lists+kvm@lfdr.de>; Tue,  1 Sep 2020 10:51:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DAAFE258AC6
+	for <lists+kvm@lfdr.de>; Tue,  1 Sep 2020 10:51:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728043AbgIAIvS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 1 Sep 2020 04:51:18 -0400
-Received: from mta-02.yadro.com ([89.207.88.252]:55068 "EHLO mta-01.yadro.com"
+        id S1726212AbgIAIvj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 1 Sep 2020 04:51:39 -0400
+Received: from mta-02.yadro.com ([89.207.88.252]:55074 "EHLO mta-01.yadro.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727943AbgIAIvM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        id S1727944AbgIAIvM (ORCPT <rfc822;kvm@vger.kernel.org>);
         Tue, 1 Sep 2020 04:51:12 -0400
 Received: from localhost (unknown [127.0.0.1])
-        by mta-01.yadro.com (Postfix) with ESMTP id DFE9C5732F;
-        Tue,  1 Sep 2020 08:51:10 +0000 (UTC)
+        by mta-01.yadro.com (Postfix) with ESMTP id 755B6574E8;
+        Tue,  1 Sep 2020 08:51:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=yadro.com; h=
         content-type:content-type:content-transfer-encoding:mime-version
         :references:in-reply-to:x-mailer:message-id:date:date:subject
         :subject:from:from:received:received:received; s=mta-01; t=
-        1598950269; x=1600764670; bh=R9U4A4Al/SFgblTs20VQHVUr7X1m/ISsT6o
-        3qGFtoAQ=; b=SJlNy+nHYcbHDINbw1i0YdP8PCdK3cdQ88hVUL+bHlInn7FU0tw
-        z4SJbKgU/RRnQb4f+0R4nL7WhkUTsG+02Q07zMZ/hA6Hz1BP0ESd0cWsw73mN7yc
-        NwHoVu9dkeAXnfSRgY/j9uBcASY/b2RzCzVmuwP2iSsekCIi71lpASbw=
+        1598950270; x=1600764671; bh=NdA+6+BccPWVUWOh/PnqUnf8ENv2nQ2zLip
+        qh3CRl4U=; b=wEcmqweAhG13lNAdk5sLG6cj9SYsYgriR5o/IHN9GVp2QjB+h6I
+        oMY303BKRMwPc91PJGJl7Cjajx7/fskKG2akcSiL+N7Sg2vDME6sDH1Q2AB93rgf
+        ERxszDJXudviOG+SUGJvJ33K8u/W4wL+JKn3jWUzkGnQxvckHiGrd1Lg=
 X-Virus-Scanned: amavisd-new at yadro.com
 Received: from mta-01.yadro.com ([127.0.0.1])
         by localhost (mta-01.yadro.com [127.0.0.1]) (amavisd-new, port 10024)
-        with ESMTP id LF4wWVIQ4ygM; Tue,  1 Sep 2020 11:51:09 +0300 (MSK)
+        with ESMTP id 8wbbdDAS809w; Tue,  1 Sep 2020 11:51:10 +0300 (MSK)
 Received: from T-EXCH-02.corp.yadro.com (t-exch-02.corp.yadro.com [172.17.10.102])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mta-01.yadro.com (Postfix) with ESMTPS id 3E286574F3;
+        by mta-01.yadro.com (Postfix) with ESMTPS id C16E35141E;
         Tue,  1 Sep 2020 11:51:08 +0300 (MSK)
 Received: from localhost (172.17.204.212) by T-EXCH-02.corp.yadro.com
  (172.17.10.102) with Microsoft SMTP Server (version=TLS1_2,
@@ -40,9 +40,9 @@ To:     <kvm@vger.kernel.org>
 CC:     Thomas Huth <thuth@redhat.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
         Roman Bolshakov <r.bolshakov@yadro.com>
-Subject: [kvm-unit-tests PATCH v2 08/10] travis.yml: Add CI for macOS
-Date:   Tue, 1 Sep 2020 11:50:54 +0300
-Message-ID: <20200901085056.33391-9-r.bolshakov@yadro.com>
+Subject: [kvm-unit-tests PATCH v2 09/10] travis.yml: Change matrix keyword to jobs
+Date:   Tue, 1 Sep 2020 11:50:55 +0300
+Message-ID: <20200901085056.33391-10-r.bolshakov@yadro.com>
 X-Mailer: git-send-email 2.28.0
 In-Reply-To: <20200901085056.33391-1-r.bolshakov@yadro.com>
 References: <20200901085056.33391-1-r.bolshakov@yadro.com>
@@ -57,70 +57,41 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Build the tests on macOS and test TCG. HVF doesn't work in travis.
+jobs keyword is used throughout Travis documentation and matrix is an
+alias for it (according to Travis config validation):
 
-sieve tests pass but they might timeout in travis, they were left out
-because of that.
+  root: key matrix is an alias for jobs, using jobs
 
-Suggested-by: Thomas Huth <thuth@redhat.com>
+At first glance it's not clear if they're the same and if jobs
+documentation applies to matrix. Changing keyword name should make it
+obvious.
+
+While at it, fix the Travis config warning:
+
+  root: deprecated key sudo (The key `sudo` has no effect anymore.)
+
 Signed-off-by: Roman Bolshakov <r.bolshakov@yadro.com>
 ---
- .travis.yml | 42 ++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 42 insertions(+)
+ .travis.yml | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
 diff --git a/.travis.yml b/.travis.yml
-index f0cfc82..7bd0205 100644
+index 7bd0205..f3a8899 100644
 --- a/.travis.yml
 +++ b/.travis.yml
-@@ -108,6 +108,48 @@ matrix:
-       - TESTS="sieve"
-       - ACCEL="tcg,firmware=s390x/run"
+@@ -1,11 +1,10 @@
+-sudo: true
+ dist: bionic
+ language: c
+ cache: ccache
+ git:
+   submodules: false
  
-+    - os: osx
-+      osx_image: xcode11.6
-+      addons:
-+        homebrew:
-+          packages:
-+            - bash
-+            - coreutils
-+            - gnu-getopt
-+            - qemu
-+            - x86_64-elf-gcc
-+      env:
-+      - CONFIG="--cross-prefix=x86_64-elf-
-+                --getopt=/usr/local/opt/gnu-getopt/bin/getopt"
-+      - BUILD_DIR="build"
-+      - TESTS="ioapic-split smptest smptest3 vmexit_cpuid vmexit_mov_from_cr8
-+               vmexit_mov_to_cr8 vmexit_inl_pmtimer vmexit_ipi vmexit_ipi_halt
-+               vmexit_ple_round_robin vmexit_tscdeadline
-+               vmexit_tscdeadline_immed eventinj msr port80 setjmp
-+               syscall tsc rmap_chain umip intel_iommu"
-+      - ACCEL="tcg"
-+
-+    - os: osx
-+      osx_image: xcode11.6
-+      addons:
-+        homebrew:
-+          packages:
-+            - bash
-+            - coreutils
-+            - gnu-getopt
-+            - qemu
-+            - i686-elf-gcc
-+      env:
-+      - CONFIG="--arch=i386 --cross-prefix=i686-elf-
-+                --getopt=/usr/local/opt/gnu-getopt/bin/getopt"
-+      - BUILD_DIR="build"
-+      - TESTS="cmpxchg8b vmexit_cpuid vmexit_mov_from_cr8 vmexit_mov_to_cr8
-+               vmexit_inl_pmtimer vmexit_ipi vmexit_ipi_halt
-+               vmexit_ple_round_robin vmexit_tscdeadline
-+               vmexit_tscdeadline_immed eventinj port80 setjmp tsc
-+               taskswitch umip"
-+      - ACCEL="tcg"
-+
- before_script:
-   - if [ "$ACCEL" = "kvm" ]; then
-       sudo chgrp kvm /usr/bin/qemu-system-* ;
+-matrix:
++jobs:
+   include:
+ 
+     - addons:
 -- 
 2.28.0
 
