@@ -2,50 +2,50 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C6EBA258EC3
-	for <lists+kvm@lfdr.de>; Tue,  1 Sep 2020 14:58:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 62C1C258E95
+	for <lists+kvm@lfdr.de>; Tue,  1 Sep 2020 14:50:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726929AbgIAM5l (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 1 Sep 2020 08:57:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49312 "EHLO
+        id S1727041AbgIAMuM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 1 Sep 2020 08:50:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49418 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727970AbgIALzx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 1 Sep 2020 07:55:53 -0400
-Received: from mail-pg1-x541.google.com (mail-pg1-x541.google.com [IPv6:2607:f8b0:4864:20::541])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 84299C061244;
-        Tue,  1 Sep 2020 04:55:53 -0700 (PDT)
-Received: by mail-pg1-x541.google.com with SMTP id w186so555014pgb.8;
-        Tue, 01 Sep 2020 04:55:53 -0700 (PDT)
+        with ESMTP id S1727961AbgIAL4u (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 1 Sep 2020 07:56:50 -0400
+Received: from mail-pj1-x1044.google.com (mail-pj1-x1044.google.com [IPv6:2607:f8b0:4864:20::1044])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D3BC4C061246;
+        Tue,  1 Sep 2020 04:56:32 -0700 (PDT)
+Received: by mail-pj1-x1044.google.com with SMTP id mm21so501855pjb.4;
+        Tue, 01 Sep 2020 04:56:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=XUvXk7uAdxOXCAYNYYSMpSlE9fm+Z9Gs2q1bnYBY42w=;
-        b=cL9oVCmw0qYQARPprOqleb2MVYCqsyuXh5Oqba2wRPIPl5nNywchx2ihKz+EXE8VMo
-         EIGXPscJ2EN8eWy5PZnVJJslq/IUjaIVsFqXSCcxQHkJG24GOb5DXRKsOVy9dsWX+69I
-         MqzTsrFmArCNwSX7fFVp0nOVbYK4WBvvPv2XTNj6b/AEVv0ORsnT8cTeNWafycwC2GKX
-         QCzMKLEwjnMM4NPYezW12Mv0MrMDkPxEDJd6rGX/vcvDOeP2Dq87d4X2xmCI281HL1nF
-         9Dan7DZxhVy94/qwb/30nw+WrU9/CTSD7omrJ/7M9xUzojsRF1k/6e2kdpmo/RvCSkAK
-         527Q==
+        bh=6PscAPz6fJLdJCbTjR01ipVe7lAs+7UBRAQ+T/hUa/I=;
+        b=BkBIHA6iylmK2/Gte+vvVSLgPmncidY9zzYNBNG9P3Qahsca2Doj2FbECMoQQX8tWC
+         kHN6QBfedZ2llxGqOk3xexWi9gDsBYGSIlttQh6U3BtFenZMjtI3pQCriJRMBXVdaWmV
+         gfsuodcbx8HwM24s4+LNhbpJiR59MTuaV8FEcBFh6UaglAoIsTT6OKKLhQBtIQ3JD/+Y
+         8YUE+9c6RXwqzy+Ss0l8EDBEQRTAsBqyss7SwHOrOyrNhMFqLupV/vc6G4XX37eUVPWu
+         da0MAMdVWuvOTP13pdBw6g7Q23xlDByXOzE1K0AvHVu6sRZXjZZfZOda0igPAX/njBDj
+         FkcA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references;
-        bh=XUvXk7uAdxOXCAYNYYSMpSlE9fm+Z9Gs2q1bnYBY42w=;
-        b=bzfSpjUqmDPhUg56CyeepQ6+S7jmQT7D/74hVknrArTfKUU3eP/qy+GKJt+yydDPxB
-         ShHoz/SFBv6JQMsxzKz3walbY7CvjUEiR58XuO+jbVojqV/eJMwi5bbWfr3E6Et9qw+v
-         tpFJaN7EHPXjhocl1bCkbw55dpWQ03vPSI7SkBuLEjKlyT53C1W2T7lAAztwHg1Bu58D
-         5ztYjVtWGZ3LXijd8buDIwmua54Byif6sTH6woFiP3OErgXXBgrU1JbfdH0ybKy7g/gl
-         S59zjJ2RSQgRqjHkW8UBZ9KK41CJTOiwN2QbYP24c2XkcGBH6j+45T/deF3KlnvPa3T4
-         QWng==
-X-Gm-Message-State: AOAM531k/EvT0i4bRfdNbPdmgy9qn9wKu17wp7HjojWCDq0HEfWVSXEH
-        0fudQl05B906Bq74oSY/TlI=
-X-Google-Smtp-Source: ABdhPJzBDeCYV5Lm44zND6Y+q8H6c+21x59KlXmQ6P3iNU3k8tMYoYGs4JxpfPdRzcM+Sr22z7iuVw==
-X-Received: by 2002:a05:6a00:806:: with SMTP id m6mr1572382pfk.184.1598961352974;
-        Tue, 01 Sep 2020 04:55:52 -0700 (PDT)
+        bh=6PscAPz6fJLdJCbTjR01ipVe7lAs+7UBRAQ+T/hUa/I=;
+        b=FN1hDaB2MuxM/XQwDR8xH80dx7gYJgIii9zaqKJep62iurPBhrlztyQ4iKS3D/3uh4
+         03Dp5denaHmOmwt/lhLAb+eH2s0hJ8NUIE5UE8xhDnIy4sBikT+MCjPkBktXAHqkFhq5
+         jkAHtP0exy5JzogWSWAXtROVwmUVMsEcgMRkNQERCm2dRhouHCWWI/6hMRo75nnqJa/y
+         99WcGgOJmG9lWyOMOdGq/gz3vigW57I+cObhu9W0LrM0Vd7QDGSFg8FAHb0JF0E6S+eH
+         4sa83Eh5WQuynsnGosSDVZM42+l8nXFeZ5UhkmUpnaJXyO/ahah/+EjKCXkVPNNKRqcc
+         XnPw==
+X-Gm-Message-State: AOAM533RnW53V8oEjoPA4Z2YtHotQ2eMphVgLWDfS3A+d+tK4OjnxkH2
+        Io9TkdnxrkLwEqM098qIn48=
+X-Google-Smtp-Source: ABdhPJyyX1YalBgcnSdcnKVOeaXxXVMHVXACebJC7SOJGm7YpRRxC5ouTKV6Ni+uKIPsId1VUyrK+w==
+X-Received: by 2002:a17:90a:5216:: with SMTP id v22mr1225391pjh.97.1598961392461;
+        Tue, 01 Sep 2020 04:56:32 -0700 (PDT)
 Received: from localhost.localdomain ([203.205.141.65])
-        by smtp.gmail.com with ESMTPSA id e18sm1836796pgr.53.2020.09.01.04.55.43
+        by smtp.gmail.com with ESMTPSA id 31sm931534pgo.17.2020.09.01.04.56.18
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 01 Sep 2020 04:55:52 -0700 (PDT)
+        Tue, 01 Sep 2020 04:56:32 -0700 (PDT)
 From:   yulei.kernel@gmail.com
 X-Google-Original-From: yuleixzhang@tencent.com
 To:     pbonzini@redhat.com
@@ -53,11 +53,10 @@ Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
         sean.j.christopherson@intel.com, jmattson@google.com,
         junaids@google.com, bgardon@google.com, vkuznets@redhat.com,
         xiaoguangrong.eric@gmail.com, kernellwp@gmail.com,
-        lihaiwei.kernel@gmail.com, Yulei Zhang <yulei.kernel@gmail.com>,
-        Yulei Zhang <yuleixzhang@tencent.com>
-Subject: [RFC V2 7/9] Add migration support when using direct build EPT
-Date:   Tue,  1 Sep 2020 19:56:40 +0800
-Message-Id: <155ee1e921d840e8ae3bfa746d612ca9d4961ca3.1598868204.git.yulei.kernel@gmail.com>
+        lihaiwei.kernel@gmail.com, Yulei Zhang <yuleixzhang@tencent.com>
+Subject: [RFC V2 8/9] Introduce kvm module parameter global_tdp to turn on the direct build EPT mode
+Date:   Tue,  1 Sep 2020 19:57:11 +0800
+Message-Id: <1c628ce7f4f068fccfaafdf1e2d30b96753ff370.1598868204.git.yulei.kernel@gmail.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <cover.1598868203.git.yulei.kernel@gmail.com>
 References: <cover.1598868203.git.yulei.kernel@gmail.com>
@@ -66,277 +65,99 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Yulei Zhang <yulei.kernel@gmail.com>
+From: Yulei Zhang <yuleixzhang@tencent.com>
 
-Make migration available in direct build ept mode whether
-pml enabled or not.
+Currently global_tdp is only supported on intel X86 system with ept
+supported, and it will turn off the smm mode when enable global_tdp.
 
 Signed-off-by: Yulei Zhang <yuleixzhang@tencent.com>
 ---
- arch/x86/include/asm/kvm_host.h |   2 +
- arch/x86/kvm/mmu/mmu.c          | 153 +++++++++++++++++++++++++++++++-
- arch/x86/kvm/x86.c              |  44 +++++----
- 3 files changed, 178 insertions(+), 21 deletions(-)
+ arch/x86/include/asm/kvm_host.h |  4 ++++
+ arch/x86/kvm/mmu/mmu.c          |  5 ++++-
+ arch/x86/kvm/x86.c              | 11 ++++++++++-
+ 3 files changed, 18 insertions(+), 2 deletions(-)
 
 diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index ab3cbef8c1aa..429a50c89268 100644
+index 429a50c89268..330cb254b34b 100644
 --- a/arch/x86/include/asm/kvm_host.h
 +++ b/arch/x86/include/asm/kvm_host.h
-@@ -1318,6 +1318,8 @@ void kvm_mmu_zap_all(struct kvm *kvm);
- void kvm_mmu_invalidate_mmio_sptes(struct kvm *kvm, u64 gen);
- unsigned long kvm_mmu_calculate_default_mmu_pages(struct kvm *kvm);
- void kvm_mmu_change_mmu_pages(struct kvm *kvm, unsigned long kvm_nr_mmu_pages);
-+void kvm_mmu_slot_direct_build_handle_wp(struct kvm *kvm,
-+					 struct kvm_memory_slot *memslot);
+@@ -1357,6 +1357,8 @@ extern u64  kvm_default_tsc_scaling_ratio;
  
- int load_pdptrs(struct kvm_vcpu *vcpu, struct kvm_mmu *mmu, unsigned long cr3);
- bool pdptrs_changed(struct kvm_vcpu *vcpu);
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 47d2a1c18f36..f03bf8efcefe 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -249,6 +249,8 @@ struct kvm_shadow_walk_iterator {
- static struct kmem_cache *pte_list_desc_cache;
- static struct kmem_cache *mmu_page_header_cache;
- static struct percpu_counter kvm_total_used_mmu_pages;
-+static int __kvm_write_protect_spte(struct kvm *kvm, struct kvm_memory_slot *slot,
-+				gfn_t gfn, int level);
+ extern u64 kvm_mce_cap_supported;
  
- static u64 __read_mostly shadow_nx_mask;
- static u64 __read_mostly shadow_x_mask;	/* mutual exclusive with nx_mask */
-@@ -1644,11 +1646,18 @@ static void kvm_mmu_write_protect_pt_masked(struct kvm *kvm,
- 				     gfn_t gfn_offset, unsigned long mask)
- {
- 	struct kvm_rmap_head *rmap_head;
-+	gfn_t gfn;
- 
- 	while (mask) {
--		rmap_head = __gfn_to_rmap(slot->base_gfn + gfn_offset + __ffs(mask),
--					  PG_LEVEL_4K, slot);
--		__rmap_write_protect(kvm, rmap_head, false);
-+		if (kvm->arch.global_root_hpa) {
-+			gfn = slot->base_gfn + gfn_offset + __ffs(mask);
-+
-+			__kvm_write_protect_spte(kvm, slot, gfn, PG_LEVEL_4K);
-+		} else {
-+			rmap_head = __gfn_to_rmap(slot->base_gfn + gfn_offset + __ffs(mask),
-+						  PG_LEVEL_4K, slot);
-+			__rmap_write_protect(kvm, rmap_head, false);
-+		}
- 
- 		/* clear the first set bit */
- 		mask &= mask - 1;
-@@ -6584,6 +6593,144 @@ void kvm_direct_tdp_release_global_root(struct kvm *kvm)
- 	return;
- }
- 
-+static int __kvm_write_protect_spte(struct kvm *kvm, struct kvm_memory_slot *slot,
-+				gfn_t gfn, int level)
-+{
-+	int ret = 0;
-+	/* add write protect on pte, tear down the page table if large page is enabled */
-+	struct kvm_shadow_walk_iterator iterator;
-+	unsigned long i;
-+	kvm_pfn_t pfn;
-+	struct page *page;
-+	u64 *sptep;
-+	u64 spte, t_spte;
-+
-+	for_each_direct_build_shadow_entry(iterator, kvm->arch.global_root_hpa,
-+			gfn << PAGE_SHIFT, max_tdp_level) {
-+		if (iterator.level == level) {
-+			break;
-+		}
-+	}
-+
-+	if (level != PG_LEVEL_4K) {
-+		sptep = iterator.sptep;
-+
-+		page = alloc_page(GFP_KERNEL | __GFP_ZERO);
-+		if (!page)
-+			return ret;
-+
-+		t_spte = page_to_phys(page) | PT_PRESENT_MASK | PT_WRITABLE_MASK |
-+			shadow_user_mask | shadow_x_mask | shadow_accessed_mask;
-+
-+		for (i = 0; i < KVM_PAGES_PER_HPAGE(level); i++) {
-+
-+			for_each_direct_build_shadow_entry(iterator, t_spte & PT64_BASE_ADDR_MASK,
-+					gfn << PAGE_SHIFT, level - 1) {
-+				if (iterator.level == PG_LEVEL_4K) {
-+					break;
-+				}
-+
-+				if (!is_shadow_present_pte(*iterator.sptep)) {
-+					struct page *page;
-+					page = alloc_page(GFP_KERNEL | __GFP_ZERO);
-+					if (!page) {
-+						__kvm_walk_global_page(kvm, t_spte & PT64_BASE_ADDR_MASK, level - 1);
-+						return ret;
-+					}
-+					spte = page_to_phys(page) | PT_PRESENT_MASK | PT_WRITABLE_MASK |
-+						shadow_user_mask | shadow_x_mask | shadow_accessed_mask;
-+					mmu_spte_set(iterator.sptep, spte);
-+				}
-+			}
-+
-+			pfn = gfn_to_pfn_try_write(slot, gfn);
-+			if ((pfn & KVM_PFN_ERR_FAULT) || is_noslot_pfn(pfn))
-+				return ret;
-+
-+			if (kvm_x86_ops.slot_enable_log_dirty)
-+				direct_build_tdp_set_spte(kvm, slot, iterator.sptep,
-+						ACC_ALL, iterator.level, gfn, pfn, false, false, true);
-+
-+			else
-+				direct_build_tdp_set_spte(kvm, slot, iterator.sptep,
-+						ACC_EXEC_MASK | ACC_USER_MASK, iterator.level, gfn, pfn, false, true, true);
-+			gfn++;
-+		}
-+		WARN_ON(!is_last_spte(*sptep, level));
-+		pfn = spte_to_pfn(*sptep);
-+		mmu_spte_clear_track_bits(sptep);
-+		kvm_release_pfn_clean(pfn);
-+		mmu_spte_set(sptep, t_spte);
-+	} else {
-+		if (kvm_x86_ops.slot_enable_log_dirty)
-+			spte_clear_dirty(iterator.sptep);
-+		else
-+			spte_write_protect(iterator.sptep, false);
-+	}
-+	return ret;
-+}
-+
-+static void __kvm_remove_wp_spte(struct kvm *kvm, struct kvm_memory_slot *slot,
-+					gfn_t gfn, int level)
-+{
-+	struct kvm_shadow_walk_iterator iterator;
-+	kvm_pfn_t pfn;
-+	u64 addr, spte;
-+
-+	for_each_direct_build_shadow_entry(iterator, kvm->arch.global_root_hpa,
-+			gfn << PAGE_SHIFT, max_tdp_level) {
-+		if (iterator.level == level)
-+			break;
-+	}
-+
-+	if (level != PG_LEVEL_4K) {
-+		if (is_shadow_present_pte(*iterator.sptep)) {
-+			addr = (*iterator.sptep) & PT64_BASE_ADDR_MASK;
-+
-+			pfn = gfn_to_pfn_try_write(slot, gfn);
-+			if ((pfn & KVM_PFN_ERR_FAULT) || is_noslot_pfn(pfn)) {
-+				printk("Failed to alloc page\n");
-+				return;
-+			}
-+			mmu_spte_clear_track_bits(iterator.sptep);
-+			direct_build_tdp_set_spte(kvm, slot, iterator.sptep,
-+					ACC_ALL, level, gfn, pfn, false, true, true);
-+
-+			__kvm_walk_global_page(kvm, addr, level - 1);
-+		}
-+	} else {
-+		if (is_shadow_present_pte(*iterator.sptep)) {
-+			if (kvm_x86_ops.slot_enable_log_dirty) {
-+				spte_set_dirty(iterator.sptep);
-+			} else {
-+				spte = (*iterator.sptep) | PT_WRITABLE_MASK;
-+				mmu_spte_update(iterator.sptep, spte);
-+			}
-+		}
-+	}
-+}
-+
-+void kvm_mmu_slot_direct_build_handle_wp(struct kvm *kvm,
-+					 struct kvm_memory_slot *memslot)
-+{
-+	gfn_t gfn = memslot->base_gfn;
-+	int host_level;
-+
-+	/* remove write mask from PTE */
-+	for (gfn = memslot->base_gfn; gfn < memslot->base_gfn + memslot->npages; ) {
-+
-+		host_level = direct_build_mapping_level(kvm, memslot, gfn);
-+
-+		if (memslot->flags & KVM_MEM_LOG_DIRTY_PAGES)
-+			__kvm_write_protect_spte(kvm, memslot, gfn, host_level);
-+		else
-+			__kvm_remove_wp_spte(kvm, memslot, gfn, host_level);
-+		gfn += KVM_PAGES_PER_HPAGE(host_level);
-+	}
-+
-+	kvm_flush_remote_tlbs(kvm);
-+}
++extern bool global_tdp;
 +
  /*
-  * Calculate mmu pages needed for kvm.
-  */
+  * EMULTYPE_NO_DECODE - Set when re-emulating an instruction (after completing
+  *			userspace I/O) to indicate that the emulation context
+@@ -1689,6 +1691,8 @@ static inline int kvm_cpu_get_apicid(int mps_cpu)
+ #endif
+ }
+ 
++inline bool boot_cpu_is_amd(void);
++
+ #define put_smstate(type, buf, offset, val)                      \
+ 	*(type *)((buf) + (offset) - 0x7e00) = val
+ 
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index f03bf8efcefe..6639d9c7012e 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -4573,7 +4573,7 @@ reset_shadow_zero_bits_mask(struct kvm_vcpu *vcpu, struct kvm_mmu *context)
+ }
+ EXPORT_SYMBOL_GPL(reset_shadow_zero_bits_mask);
+ 
+-static inline bool boot_cpu_is_amd(void)
++inline bool boot_cpu_is_amd(void)
+ {
+ 	WARN_ON_ONCE(!tdp_enabled);
+ 	return shadow_x_mask == 0;
+@@ -6497,6 +6497,9 @@ int kvm_direct_tdp_populate_page_table(struct kvm *kvm, struct kvm_memory_slot *
+ 	kvm_pfn_t pfn;
+ 	int host_level;
+ 
++	if (!global_tdp)
++		return 0;
++
+ 	if (!kvm->arch.global_root_hpa) {
+ 		struct page *page;
+ 		WARN_ON(!tdp_enabled);
 diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 599d73206299..ee898003f22f 100644
+index ee898003f22f..57d64f3239e1 100644
 --- a/arch/x86/kvm/x86.c
 +++ b/arch/x86/kvm/x86.c
-@@ -10196,9 +10196,12 @@ static void kvm_mmu_slot_apply_flags(struct kvm *kvm,
- 	 *		kvm_arch_flush_shadow_memslot()
- 	 */
- 	if ((old->flags & KVM_MEM_LOG_DIRTY_PAGES) &&
--	    !(new->flags & KVM_MEM_LOG_DIRTY_PAGES))
--		kvm_mmu_zap_collapsible_sptes(kvm, new);
--
-+	    !(new->flags & KVM_MEM_LOG_DIRTY_PAGES)) {
-+		if (kvm->arch.global_root_hpa)
-+			kvm_mmu_slot_direct_build_handle_wp(kvm, (struct kvm_memory_slot *)new);
-+		else
-+			kvm_mmu_zap_collapsible_sptes(kvm, new);
-+	}
- 	/*
- 	 * Enable or disable dirty logging for the slot.
- 	 *
-@@ -10228,25 +10231,30 @@ static void kvm_mmu_slot_apply_flags(struct kvm *kvm,
- 	 * is enabled the D-bit or the W-bit will be cleared.
- 	 */
- 	if (new->flags & KVM_MEM_LOG_DIRTY_PAGES) {
--		if (kvm_x86_ops.slot_enable_log_dirty) {
--			kvm_x86_ops.slot_enable_log_dirty(kvm, new);
-+		if (kvm->arch.global_root_hpa) {
-+			kvm_mmu_slot_direct_build_handle_wp(kvm, new);
- 		} else {
--			int level =
--				kvm_dirty_log_manual_protect_and_init_set(kvm) ?
--				PG_LEVEL_2M : PG_LEVEL_4K;
-+			if (kvm_x86_ops.slot_enable_log_dirty) {
-+				kvm_x86_ops.slot_enable_log_dirty(kvm, new);
-+			} else {
-+				int level =
-+					kvm_dirty_log_manual_protect_and_init_set(kvm) ?
-+					PG_LEVEL_2M : PG_LEVEL_4K;
+@@ -161,6 +161,9 @@ module_param(force_emulation_prefix, bool, S_IRUGO);
+ int __read_mostly pi_inject_timer = -1;
+ module_param(pi_inject_timer, bint, S_IRUGO | S_IWUSR);
  
--			/*
--			 * If we're with initial-all-set, we don't need
--			 * to write protect any small page because
--			 * they're reported as dirty already.  However
--			 * we still need to write-protect huge pages
--			 * so that the page split can happen lazily on
--			 * the first write to the huge page.
--			 */
--			kvm_mmu_slot_remove_write_access(kvm, new, level);
-+				/*
-+				 * If we're with initial-all-set, we don't need
-+				 * to write protect any small page because
-+				 * they're reported as dirty already.  However
-+				 * we still need to write-protect huge pages
-+				 * so that the page split can happen lazily on
-+				 * the first write to the huge page.
-+				 */
-+				kvm_mmu_slot_remove_write_access(kvm, new, level);
-+			}
- 		}
- 	} else {
--		if (kvm_x86_ops.slot_disable_log_dirty)
-+		if (kvm_x86_ops.slot_disable_log_dirty
-+			&& !kvm->arch.global_root_hpa)
- 			kvm_x86_ops.slot_disable_log_dirty(kvm, new);
- 	}
- }
++bool __read_mostly global_tdp;
++module_param_named(global_tdp, global_tdp, bool, S_IRUGO);
++
+ #define KVM_NR_SHARED_MSRS 16
+ 
+ struct kvm_shared_msrs_global {
+@@ -3539,7 +3542,10 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+ 		 * fringe case that is not enabled except via specific settings
+ 		 * of the module parameters.
+ 		 */
+-		r = kvm_x86_ops.has_emulated_msr(MSR_IA32_SMBASE);
++		if (global_tdp)
++			r = 0;
++		else
++			r = kvm_x86_ops.has_emulated_msr(MSR_IA32_SMBASE);
+ 		break;
+ 	case KVM_CAP_VAPIC:
+ 		r = !kvm_x86_ops.cpu_has_accelerated_tpr();
+@@ -9808,6 +9814,9 @@ int kvm_arch_hardware_setup(void *opaque)
+ 	if (r != 0)
+ 		return r;
+ 
++	if ((tdp_enabled == false) || boot_cpu_is_amd())
++		global_tdp = 0;
++
+ 	memcpy(&kvm_x86_ops, ops->runtime_ops, sizeof(kvm_x86_ops));
+ 
+ 	if (!kvm_cpu_cap_has(X86_FEATURE_XSAVES))
 -- 
 2.17.1
 
