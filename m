@@ -2,143 +2,162 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4E4C625A826
-	for <lists+kvm@lfdr.de>; Wed,  2 Sep 2020 10:59:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 315A425A924
+	for <lists+kvm@lfdr.de>; Wed,  2 Sep 2020 12:09:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726446AbgIBI72 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Sep 2020 04:59:28 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:45647 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726167AbgIBI71 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 2 Sep 2020 04:59:27 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1599037165;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=Ix8N6RQtX+ddzBGK9BdRX1rdzssF3CmlZhDLO9SMtGM=;
-        b=b9l+xXpd+F65EVf0Z/i3vo6vjpuVw5Ao9e5hHdX6vakZGazxq9C86hzZqeF9WRCrI2Vlp2
-        woRpit85edeueVJCjAtGrTAwcFlIQhYSm2A4M7iIBrdpNMgtk7ECUoraMLz3tDxqalmS9k
-        upxjpjkptnbtFovfXqqFm9H5w23vyeg=
-Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
- [209.85.208.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-160-rb_rFs2aMIqiyGhL-xkGtQ-1; Wed, 02 Sep 2020 04:59:23 -0400
-X-MC-Unique: rb_rFs2aMIqiyGhL-xkGtQ-1
-Received: by mail-ed1-f70.google.com with SMTP id n4so1876351edo.20
-        for <kvm@vger.kernel.org>; Wed, 02 Sep 2020 01:59:23 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=Ix8N6RQtX+ddzBGK9BdRX1rdzssF3CmlZhDLO9SMtGM=;
-        b=i+0Dz/h/FkN9BoKcRoPQzCXQjDCPc4kMi+2VsbbkhdpV5jxyojFntpqe0whmQAG1Gj
-         jyKEnLDftPMyBZh2GMyLv/2pMQFnlWU6ue1boBl/b35mZxdYdYirJTcgDFrgQyvNZccy
-         m/sxp9/xGgaZ3g4f5XJQCV0gc0FbFNCJT7QEMkGpS0vXFDU6KVnVp7+6quGgSeA7/+z1
-         y9WWqYPtmksddbhF4IvOKpxjrGJd7aU8A5JwqEY8VCCR2jMEWh2fZJE8YAnnZwjlsONF
-         j/nxMl6cq7WrY35mWjHDZ/XvK0Mt4aIiiNuOh+GVW66ERyspawXVlua/mRJIMYH17yn0
-         M3Ew==
-X-Gm-Message-State: AOAM532UkQZsiLN/+bhx8Mp1ysrNv7Oc9PJuLEPtisihKtZinnLXtMy/
-        POuJeZsF88TSobXzZIEMDa/36klxe0+HfF26dXW+bo5weM16zxA1gWeDdAec255KBgqMqKT5Lk4
-        w/KlEUMLiB1cC
-X-Received: by 2002:a17:906:95d1:: with SMTP id n17mr5566894ejy.324.1599037162128;
-        Wed, 02 Sep 2020 01:59:22 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzZ9uG5VoGFj8piU2aeDijZCJLsDj+NsJcm8DJsdt2rZ7X63rZbNnDbaKrAnU8VY81o7E9eaQ==
-X-Received: by 2002:a17:906:95d1:: with SMTP id n17mr5566871ejy.324.1599037161896;
-        Wed, 02 Sep 2020 01:59:21 -0700 (PDT)
-Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id f13sm3735188ejb.81.2020.09.02.01.59.20
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 02 Sep 2020 01:59:21 -0700 (PDT)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Peter Xu <peterx@redhat.com>
-Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Michael Tsirkin <mst@redhat.com>,
-        Julia Suvorova <jsuvorov@redhat.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Andrew Jones <drjones@redhat.com>, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 0/3] KVM: x86: KVM_MEM_PCI_HOLE memory
-In-Reply-To: <20200901200021.GB3053@xz-x1>
-References: <20200807141232.402895-1-vkuznets@redhat.com> <20200825212526.GC8235@xz-x1> <87eenlwoaa.fsf@vitty.brq.redhat.com> <20200901200021.GB3053@xz-x1>
-Date:   Wed, 02 Sep 2020 10:59:20 +0200
-Message-ID: <877dtcpn9z.fsf@vitty.brq.redhat.com>
+        id S1726493AbgIBKJN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Sep 2020 06:09:13 -0400
+Received: from foss.arm.com ([217.140.110.172]:34874 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726247AbgIBKJM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 2 Sep 2020 06:09:12 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 6E238D6E;
+        Wed,  2 Sep 2020 03:09:11 -0700 (PDT)
+Received: from [192.168.1.179] (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id EF5313F66F;
+        Wed,  2 Sep 2020 03:09:09 -0700 (PDT)
+Subject: Re: [RFC PATCH 0/5] KVM: arm64: Add pvtime LPT support
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     Keqian Zhu <zhukeqian1@huawei.com>, linux-kernel@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        wanghaibin.wang@huawei.com
+References: <20200817084110.2672-1-zhukeqian1@huawei.com>
+ <8308f52e4c906cad710575724f9e3855@kernel.org>
+ <f14cfd5b-c103-5d56-82fb-59d0371c6f21@arm.com> <87h7svm0o5.wl-maz@kernel.org>
+From:   Steven Price <steven.price@arm.com>
+Message-ID: <75ce4c12-f0e3-32c4-604f-9745980022e0@arm.com>
+Date:   Wed, 2 Sep 2020 11:09:04 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <87h7svm0o5.wl-maz@kernel.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-GB
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Peter Xu <peterx@redhat.com> writes:
+Hi Marc,
 
-> On Tue, Sep 01, 2020 at 04:43:25PM +0200, Vitaly Kuznetsov wrote:
->> Peter Xu <peterx@redhat.com> writes:
->> 
->> > On Fri, Aug 07, 2020 at 04:12:29PM +0200, Vitaly Kuznetsov wrote:
->> >> When testing Linux kernel boot with QEMU q35 VM and direct kernel boot
->> >> I observed 8193 accesses to PCI hole memory. When such exit is handled
->> >> in KVM without exiting to userspace, it takes roughly 0.000001 sec.
->> >> Handling the same exit in userspace is six times slower (0.000006 sec) so
->> >> the overal; difference is 0.04 sec. This may be significant for 'microvm'
->> >> ideas.
->> >
->> > Sorry to comment so late, but just curious... have you looked at what's those
->> > 8000+ accesses to PCI holes and what they're used for?  What I can think of are
->> > some port IO reads (e.g. upon vendor ID field) during BIOS to scan the devices
->> > attached.  Though those should be far less than 8000+, and those should also be
->> > pio rather than mmio.
->> 
->> And sorry for replying late)
->> 
->> We explicitly want MMIO instead of PIO to speed things up, afaiu PIO
->> requires two exits per device (and we exit all the way to
->> QEMU). Julia/Michael know better about the size of the space.
->> 
->> >
->> > If this is only an overhead for virt (since baremetal mmios should be fast),
->> > I'm also thinking whether we can make it even better to skip those pci hole
->> > reads.  Because we know we're virt, so it also gives us possibility that we may
->> > provide those information in a better way than reading PCI holes in the guest?
->> 
->> This means let's invent a PV interface and if we decide to go down this
->> road, I'd even argue for abandoning PCI completely. E.g. we can do
->> something similar to Hyper-V's Vmbus.
->
-> My whole point was more about trying to understand the problem behind.
-> Providing a fast path for reading pci holes seems to be reasonable as is,
-> however it's just that I'm confused on why there're so many reads on the pci
-> holes after all.  Another important question is I'm wondering how this series
-> will finally help the use case of microvm.  I'm not sure I get the whole point
-> of it, but... if microvm is the major use case of this, it would be good to
-> provide some quick numbers on those if possible.
->
-> For example, IIUC microvm uses qboot (as a better alternative than seabios) for
-> fast boot, and qboot has:
->
-> https://github.com/bonzini/qboot/blob/master/pci.c#L20
->
-> I'm kind of curious whether qboot will still be used when this series is used
-> with microvm VMs?  Since those are still at least PIO based.
+Sorry for the slow response, I've been on holiday.
 
-I'm afraid there is no 'grand plan' for everything at this moment :-(
-For traditional VMs 0.04 sec per boot is negligible and definitely not
-worth adding a feature, memory requirements are also very
-different. When it comes to microvm-style usage things change.
+On 22/08/2020 11:31, Marc Zyngier wrote:
+> Hi Steven,
+> 
+> On Wed, 19 Aug 2020 09:54:40 +0100,
+> Steven Price <steven.price@arm.com> wrote:
+>>
+>> On 18/08/2020 15:41, Marc Zyngier wrote:
+>>> On 2020-08-17 09:41, Keqian Zhu wrote:
+[...]
+>>>>
+>>>> Things need concern:
+>>>> 1. https://developer.arm.com/docs/den0057/a needs update.
+>>>
+>>> LPT was explicitly removed from the spec because it doesn't really
+>>> solve the problem, specially for the firmware: EFI knows
+>>> nothing about this, for example. How is it going to work?
+>>> Also, nobody was ever able to explain how this would work for
+>>> nested virt.
+>>>
+>>> ARMv8.4 and ARMv8.6 have the feature set that is required to solve
+>>> this problem without adding more PV to the kernel.
+>>
+>> Hi Marc,
+>>
+>> These are good points, however we do still have the situation that
+>> CPUs that don't have ARMv8.4/8.6 clearly cannot implement this. I
+>> presume the use-case Keqian is looking at predates the necessary
+>> support in the CPU - Keqian if you can provide more details on the
+>> architecture(s) involved that would be helpful.
+> 
+> My take on this is that it is a fictional use case. In my experience,
+> migration happens across *identical* systems, and *any* difference
+> visible to guests will cause things to go wrong. Errata management
+> gets in the way, as usual (name *one* integration that isn't broken
+> one way or another!).
 
-'8193' PCI hole accesses I mention in the PATCH0 blurb are just from
-Linux as I was doing direct kernel boot, we can't get better than that
-(if PCI is in the game of course). Firmware (qboot, seabios,...) can
-only add more. I *think* the plan is to eventually switch them all to
-MMCFG, at least for KVM guests, by default but we need something to put
-to the advertisement. 
+Keqian appears to have a use case - but obviously I don't know the 
+details. I guess Keqian needs to convince you of that.
 
-We can, in theory, short circuit PIO in KVM instead but:
-- We will need a complete different API
-- We will never be able to reach the speed of the exit-less 'single 0xff
-page' solution (see my RFC).
+> Allowing migration across heterogeneous hosts requires a solution to
+> the errata management problem, which everyone (including me) has
+> decided to ignore so far (and I claim that not having a constant timer
+> frequency exposed to guests is an architecture bug).
 
--- 
-Vitaly
+I agree - errata management needs to be solved before LPT. Between 
+restricted subsets of hosts this doesn't seem impossible, but I guess we 
+should stall LPT until a credible solution is proposed. I'm certainly 
+not proposing one at the moment.
 
+>> Nested virt is indeed more of an issue - we did have some ideas around
+>> using SDEI that never made it to the spec.
+> 
+> SDEI? Sigh... Why would SDEI be useful for NV and not for !NV?
+
+SDEI provides a way of injecting a synchronous exception on migration - 
+although that certainly isn't the only possible mechanism. For NV we 
+have the problem that a guest-guest may be running at the point of 
+migration. However it's not practical for the host hypervisor to provide 
+the necessary table directly to the guest-guest which means the 
+guest-hypervisor must update the tables before the guest-guest is 
+allowed to run on the new host. The only plausible route I could see for 
+this is injecting a synchronous exception into the guest (per VCPU) to 
+ensure any guest-guests running are exited at migration time.
+
+!NV is easier because we don't have to worry about multiple levels of 
+para-virtualisation.
+
+>> However I would argue that the most pragmatic approach would be to
+>> not support the combination of nested virt and LPT. Hopefully that
+>> can wait until the counter scaling support is available and not
+>> require PV.
+> 
+> And have yet another set of band aids that paper over the fact that we
+> can't get a consistent story on virtualization? No, thank you.
+> 
+> NV is (IMHO) much more important than LPT as it has a chance of
+> getting used. LPT is just another tick box, and the fact that ARM is
+> ready to ignore sideline a decent portion of the architecture is a
+> clear sign that it hasn't been thought out.
+
+Different people have different priorities. NV is definitely important 
+for many people. LPT may also be important if you've already got a bunch 
+of VMs running on machines and you want to be able to (gradually) 
+replace them with newer hosts which happen to have a different clock 
+frequency. Those VMs running now clearly aren't using NV.
+
+However, I have to admit it's not me that has the use-case, so I'll 
+leave it for others who might actually know the specifics to explain the 
+details.
+
+>> We are discussing (re-)releasing the spec with the LPT parts added. If
+>> you have fundamental objections then please me know.
+> 
+> I do, see above. I'm stating that the use case doesn't really exist
+> given the state of the available HW and the fragmentation of the
+> architecture, and that ignoring the most important innovation in the
+> virtualization architecture since ARMv7 is at best short-sighted.
+> 
+> Time scaling is just an instance of the errata management problem, and
+> that is the issue that needs solving. Papering over part of the
+> problem is not helping.
+
+I fully agree - errata management is definitely the first step that 
+needs solving. This is why I abandoned LPT originally because I don't 
+have a generic solution and the testing I did involved really ugly hacks 
+just to make the migration possible.
+
+For now I propose we (again) park LPT until some progress has been made 
+on errata management.
+
+Thanks,
+
+Steve
