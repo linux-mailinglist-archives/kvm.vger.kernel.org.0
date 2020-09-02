@@ -2,141 +2,93 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5CF1125A19D
-	for <lists+kvm@lfdr.de>; Wed,  2 Sep 2020 00:44:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A092D25A2C0
+	for <lists+kvm@lfdr.de>; Wed,  2 Sep 2020 03:49:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726355AbgIAWoe (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 1 Sep 2020 18:44:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36638 "EHLO
+        id S1726913AbgIBBtT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 1 Sep 2020 21:49:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37074 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726112AbgIAWoc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 1 Sep 2020 18:44:32 -0400
-Received: from mail-pj1-x1043.google.com (mail-pj1-x1043.google.com [IPv6:2607:f8b0:4864:20::1043])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 64452C061244;
-        Tue,  1 Sep 2020 15:44:32 -0700 (PDT)
-Received: by mail-pj1-x1043.google.com with SMTP id gf14so1307561pjb.5;
-        Tue, 01 Sep 2020 15:44:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=9XmGKtqMZMLQ9hQMtBa1Ufz6OppJVlM58zqrzvNIau0=;
-        b=Wm8zLJKGjq2YSmCaQlLYUDu3HOBpmpCT1asfOaseBMwE/Ktc3moPDs/NSBC7+IELNm
-         2QSJmWzNZfZMNxNq0/RPh85EdtMNwG1FdmzsqTYbvjJdZ1ze13Q+Yb3NXwdtikkUS40R
-         bPhJ25Hx1vUh50fT70hMUY/CN3kL86mprjWOu+FymUqoW60+aYy5bTOG5G7P3v4BHskW
-         jVFBmYb+YOW0S61t/mDVHFQR1dyJI1ssHdRMQ0Sau9uQ+BZbYiPyJ6Wm197SbW3wgr5g
-         LjOn0YMepl8Tp4e048eF96Buz//n4bGNLmHS3ts6cohrxlyKAL+AEuHnJ9m4t1014XwR
-         qY7Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=9XmGKtqMZMLQ9hQMtBa1Ufz6OppJVlM58zqrzvNIau0=;
-        b=ZHmR0kHDq3eFKMNO7Amn5UtZ3Ng1nc0sk6v5hZGjVTBjc4FVARJ4kIHvOeGGQZ+px+
-         jiYpy1U19Sa+K0LHLDh7NtWCABddkcfK5JSVu1EfL3iiDAHinXkxAH+q6l2IrQa2FrXC
-         kFB4sXJL7ZhhXFMidv1ywIQWsZ24F7Ceva2IbonD4513J789bL55tv/7R9CUzSAJAVmc
-         xGR2THhfXEXdtBTPpbZjlAOfr71KmqxRIUECCy+vPrUpkUx+uGinvPYqQmJ7jjIxFoNa
-         HzkI6DTANp6r8O1TXxo0DkZaGn6R1C1L0EIVfHBm/wPtTKfGxBYMFXrNiC3DxQR+mMPg
-         4v4g==
-X-Gm-Message-State: AOAM533kvOL1JNLOyBru8QnfiLB4Nvp38rQl+j5JB8pQm/1q9KcoqWcf
-        +66xFBSEzL7X41Wjd5zBpiwe6bmK+4b6Mw==
-X-Google-Smtp-Source: ABdhPJx+oFgQ6EEF5O/px1m0RBc5ZLs2Auj5dxq8hqCEVwiGmFMqLpDDRbKd7LRck1ECti7ORwfUCw==
-X-Received: by 2002:a17:902:7d86:b029:cf:85a7:8372 with SMTP id a6-20020a1709027d86b02900cf85a78372mr3806005plm.1.1599000271763;
-        Tue, 01 Sep 2020 15:44:31 -0700 (PDT)
-Received: from thinkpad (104.36.148.139.aurocloud.com. [104.36.148.139])
-        by smtp.gmail.com with ESMTPSA id l21sm3164337pgb.35.2020.09.01.15.44.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 01 Sep 2020 15:44:31 -0700 (PDT)
-Date:   Tue, 1 Sep 2020 15:45:14 -0700
-From:   Rustam Kovhaev <rkovhaev@gmail.com>
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, gregkh@linuxfoundation.org,
-        pbonzini@redhat.com, kvm@vger.kernel.org
-Subject: Re: [PATCH] KVM: fix memory leak in kvm_io_bus_unregister_dev()
-Message-ID: <20200901224514.GA239544@thinkpad>
-References: <20200830043405.268044-1-rkovhaev@gmail.com>
- <877dtdwjjt.fsf@vitty.brq.redhat.com>
+        with ESMTP id S1726122AbgIBBtR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 1 Sep 2020 21:49:17 -0400
+Received: from ozlabs.org (bilbo.ozlabs.org [IPv6:2401:3900:2:1::2])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 37355C061244;
+        Tue,  1 Sep 2020 18:49:17 -0700 (PDT)
+Received: by ozlabs.org (Postfix, from userid 1003)
+        id 4Bh6LK5jm1z9sSJ; Wed,  2 Sep 2020 11:49:13 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ozlabs.org; s=201707;
+        t=1599011353; bh=hTaXmDx448oQYoyezs5f5Rukwes/5nA+Fn7vM9Nl0n8=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=OOsMu7X2nDHa6F7OzcSZVptEYMumaeL2UkBfmg7M3+JbgDG/3FWooN3c4DWto5Sft
+         1Z27emBpzzXKPNtDQLGTVa2AMqqYC9XcDU3K2/tEaYeBQvjjwwNYZDPzEHlKW6O3rE
+         G9cRpY3uUQZyK5xgKIrAHh6LywbCfTti69J8sNigC22VUC7u9fXd1tTF7gyB87KKK/
+         gTnJtCaERj+NMBZgLfcMnGuIxf6gF90RM1xm25AVr3Soy4GuDuKzYd6Ko9tBIvrTql
+         q/VAKEPeI5Dp8lmfixFxXTCo/SYUDSXVyLhJ2zkocUYVOWAVABWF2RiGURS1UCBa+x
+         8fkzom8P1jefw==
+Date:   Wed, 2 Sep 2020 11:49:08 +1000
+From:   Paul Mackerras <paulus@ozlabs.org>
+To:     Ravi Bangoria <ravi.bangoria@linux.ibm.com>
+Cc:     mpe@ellerman.id.au, mikey@neuling.org, npiggin@gmail.com,
+        pbonzini@redhat.com, christophe.leroy@c-s.fr, jniethe5@gmail.com,
+        pedromfc@br.ibm.com, rogealve@br.ibm.com, kvm@vger.kernel.org,
+        kvm-ppc@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org, linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH 1/7] powerpc/watchpoint/kvm: Rename current DAWR macros
+ and variables
+Message-ID: <20200902014908.GA272502@thinks.paulus.ozlabs.org>
+References: <20200723102058.312282-1-ravi.bangoria@linux.ibm.com>
+ <20200723102058.312282-2-ravi.bangoria@linux.ibm.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <877dtdwjjt.fsf@vitty.brq.redhat.com>
+In-Reply-To: <20200723102058.312282-2-ravi.bangoria@linux.ibm.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Sep 01, 2020 at 06:25:42PM +0200, Vitaly Kuznetsov wrote:
-> Rustam Kovhaev <rkovhaev@gmail.com> writes:
-> 
-> > when kmalloc() fails in kvm_io_bus_unregister_dev(), before removing
-> > the bus, we should iterate over all other devices linked to it and call
-> > kvm_iodevice_destructor() for them
-> >
-> > Reported-and-tested-by: syzbot+f196caa45793d6374707@syzkaller.appspotmail.com
-> > Link: https://syzkaller.appspot.com/bug?extid=f196caa45793d6374707
-> > Signed-off-by: Rustam Kovhaev <rkovhaev@gmail.com>
-> > ---
-> >  virt/kvm/kvm_main.c | 7 ++++++-
-> >  1 file changed, 6 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> > index 67cd0b88a6b6..646aa7b82548 100644
-> > --- a/virt/kvm/kvm_main.c
-> > +++ b/virt/kvm/kvm_main.c
-> > @@ -4332,7 +4332,7 @@ int kvm_io_bus_register_dev(struct kvm *kvm, enum kvm_bus bus_idx, gpa_t addr,
-> >  void kvm_io_bus_unregister_dev(struct kvm *kvm, enum kvm_bus bus_idx,
-> >  			       struct kvm_io_device *dev)
-> >  {
-> > -	int i;
-> > +	int i, j;
-> >  	struct kvm_io_bus *new_bus, *bus;
-> >  
-> >  	bus = kvm_get_bus(kvm, bus_idx);
-> > @@ -4351,6 +4351,11 @@ void kvm_io_bus_unregister_dev(struct kvm *kvm, enum kvm_bus bus_idx,
-> >  			  GFP_KERNEL_ACCOUNT);
-> >  	if (!new_bus)  {
->                      ^^^ redundant space 
-> 
-> >  		pr_err("kvm: failed to shrink bus, removing it completely\n");
-> > +		for (j = 0; j < bus->dev_count; j++) {
-> > +			if (j == i)
-> > +				continue;
-> > +			kvm_iodevice_destructor(bus->range[j].dev);
-> > +		}
-> >  		goto broken;
-> 
-> The name of the label is really misleading (as it is not actually a
-> failure path), I'd even suggest we get rid of this goto completely,
-> something like
-> 
-> 	new_bus = kmalloc(struct_size(bus, range, bus->dev_count - 1),
-> 			  GFP_KERNEL_ACCOUNT);
-> 	if (new_bus)  {
-> 	       memcpy(new_bus, bus, sizeof(*bus) + i * sizeof(struct kvm_io_range));
-> 	       new_bus->dev_count--;
-> 	       memcpy(new_bus->range + i, bus->range + i + 1,
-> 	              (new_bus->dev_count - i) * sizeof(struct kvm_io_range));
->         } else {
-> 		pr_err("kvm: failed to shrink bus, removing it completely\n");
-> 		for (j = 0; j < bus->dev_count; j++) {
-> 			if (j == i)
-> 				continue;
-> 			kvm_iodevice_destructor(bus->range[j].dev);
-> 	}
-> 
-> 	rcu_assign_pointer(kvm->buses[bus_idx], new_bus);
-> 	synchronize_srcu_expedited(&kvm->srcu);
-> 	kfree(bus);
-> 	return;
-> 
-> 
-> >  	}
-> 
-> None of the above should block the fix IMO, so:
-> 
-> Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
-> 
-> -- 
-> Vitaly
-> 
-hi Vitaly, thank you for the review! i'll send the new patch
+On Thu, Jul 23, 2020 at 03:50:52PM +0530, Ravi Bangoria wrote:
+> Power10 is introducing second DAWR. Use real register names (with
+> suffix 0) from ISA for current macros and variables used by kvm.
+
+Most of this looks fine, but I think we should not change the existing
+names in arch/powerpc/include/uapi/asm/kvm.h (and therefore also
+Documentation/virt/kvm/api.rst).
+
+> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+> index 426f94582b7a..4dc18fe6a2bf 100644
+> --- a/Documentation/virt/kvm/api.rst
+> +++ b/Documentation/virt/kvm/api.rst
+> @@ -2219,8 +2219,8 @@ registers, find a list below:
+>    PPC     KVM_REG_PPC_BESCR               64
+>    PPC     KVM_REG_PPC_TAR                 64
+>    PPC     KVM_REG_PPC_DPDES               64
+> -  PPC     KVM_REG_PPC_DAWR                64
+> -  PPC     KVM_REG_PPC_DAWRX               64
+> +  PPC     KVM_REG_PPC_DAWR0               64
+> +  PPC     KVM_REG_PPC_DAWRX0              64
+>    PPC     KVM_REG_PPC_CIABR               64
+>    PPC     KVM_REG_PPC_IC                  64
+>    PPC     KVM_REG_PPC_VTB                 64
+...
+> diff --git a/arch/powerpc/include/uapi/asm/kvm.h b/arch/powerpc/include/uapi/asm/kvm.h
+> index 264e266a85bf..38d61b73f5ed 100644
+> --- a/arch/powerpc/include/uapi/asm/kvm.h
+> +++ b/arch/powerpc/include/uapi/asm/kvm.h
+> @@ -608,8 +608,8 @@ struct kvm_ppc_cpu_char {
+>  #define KVM_REG_PPC_BESCR	(KVM_REG_PPC | KVM_REG_SIZE_U64 | 0xa7)
+>  #define KVM_REG_PPC_TAR		(KVM_REG_PPC | KVM_REG_SIZE_U64 | 0xa8)
+>  #define KVM_REG_PPC_DPDES	(KVM_REG_PPC | KVM_REG_SIZE_U64 | 0xa9)
+> -#define KVM_REG_PPC_DAWR	(KVM_REG_PPC | KVM_REG_SIZE_U64 | 0xaa)
+> -#define KVM_REG_PPC_DAWRX	(KVM_REG_PPC | KVM_REG_SIZE_U64 | 0xab)
+> +#define KVM_REG_PPC_DAWR0	(KVM_REG_PPC | KVM_REG_SIZE_U64 | 0xaa)
+> +#define KVM_REG_PPC_DAWRX0	(KVM_REG_PPC | KVM_REG_SIZE_U64 | 0xab)
+>  #define KVM_REG_PPC_CIABR	(KVM_REG_PPC | KVM_REG_SIZE_U64 | 0xac)
+>  #define KVM_REG_PPC_IC		(KVM_REG_PPC | KVM_REG_SIZE_U64 | 0xad)
+>  #define KVM_REG_PPC_VTB		(KVM_REG_PPC | KVM_REG_SIZE_U64 | 0xae)
+
+The existing names are an API, and if you change them you will break
+compilation of existing userspace programs.  I don't see that adding
+the '0' on the end is so important that we need to break userspace.
+
+Paul.
