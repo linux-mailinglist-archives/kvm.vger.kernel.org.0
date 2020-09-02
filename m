@@ -2,38 +2,38 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E10C225ABA6
-	for <lists+kvm@lfdr.de>; Wed,  2 Sep 2020 15:03:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8251B25ABB5
+	for <lists+kvm@lfdr.de>; Wed,  2 Sep 2020 15:05:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726654AbgIBNDq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Sep 2020 09:03:46 -0400
-Received: from smtp-fw-9101.amazon.com ([207.171.184.25]:52893 "EHLO
-        smtp-fw-9101.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727807AbgIBNAa (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 2 Sep 2020 09:00:30 -0400
+        id S1727037AbgIBNFT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Sep 2020 09:05:19 -0400
+Received: from smtp-fw-6002.amazon.com ([52.95.49.90]:24332 "EHLO
+        smtp-fw-6002.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727035AbgIBNAT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 2 Sep 2020 09:00:19 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1599051630; x=1630587630;
+  t=1599051618; x=1630587618;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=1DoI56HXaC544N7Sf0PN0PANJQUmQ9eN9nXQFHzrxH0=;
-  b=HfI13r9kslZURNew9ft7PyYLG3XWYliHuG+oPB3IDFLQnXlAOi6busWX
-   ekHEqQL0ZdBD92xGsErKHWnKZnhgPupwp3qG4kuWeKTAHEfKZ+VcRNMtx
-   /Yq908HD+rt3JSjsq1JIqGis/fjUMwq/FiPxd2GCp1pfN+ZenioDSELnR
-   M=;
+  bh=2N8u+Uav87ogq3syQGltrwsOFjpVIOuSkUUzaXfoS7A=;
+  b=JoY4q+M2XaWsJDUvVLw1WUft2xzeD5ktUionhMsB8xd8RZZ3HK/oKtg7
+   PkN6BSZL8H4J16qW1RB/6mX0cemhs/bV3M3kZT75H9FPw1b0UfIeDEYNM
+   Nx+pui9tsq6+1b/N9fqaHNWxscb2vU0Y8WHlW8b+pYErc5rQfqYWtDKCy
+   Q=;
 X-IronPort-AV: E=Sophos;i="5.76,383,1592870400"; 
-   d="scan'208";a="64794765"
-Received: from sea32-co-svc-lb4-vlan3.sea.corp.amazon.com (HELO email-inbound-relay-2a-22cc717f.us-west-2.amazon.com) ([10.47.23.38])
-  by smtp-border-fw-out-9101.sea19.amazon.com with ESMTP; 02 Sep 2020 13:00:16 +0000
+   d="scan'208";a="51551980"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-2c-1968f9fa.us-west-2.amazon.com) ([10.43.8.6])
+  by smtp-border-fw-out-6002.iad6.amazon.com with ESMTP; 02 Sep 2020 13:00:16 +0000
 Received: from EX13MTAUWC001.ant.amazon.com (pdx4-ws-svc-p6-lb7-vlan3.pdx.amazon.com [10.170.41.166])
-        by email-inbound-relay-2a-22cc717f.us-west-2.amazon.com (Postfix) with ESMTPS id B56B7A20DF;
-        Wed,  2 Sep 2020 13:00:11 +0000 (UTC)
+        by email-inbound-relay-2c-1968f9fa.us-west-2.amazon.com (Postfix) with ESMTPS id DB7DEA2059;
+        Wed,  2 Sep 2020 13:00:14 +0000 (UTC)
 Received: from EX13D20UWC002.ant.amazon.com (10.43.162.163) by
  EX13MTAUWC001.ant.amazon.com (10.43.162.135) with Microsoft SMTP Server (TLS)
- id 15.0.1497.2; Wed, 2 Sep 2020 13:00:11 +0000
+ id 15.0.1497.2; Wed, 2 Sep 2020 13:00:14 +0000
 Received: from u79c5a0a55de558.ant.amazon.com (10.43.160.215) by
  EX13D20UWC002.ant.amazon.com (10.43.162.163) with Microsoft SMTP Server (TLS)
- id 15.0.1497.2; Wed, 2 Sep 2020 13:00:07 +0000
+ id 15.0.1497.2; Wed, 2 Sep 2020 13:00:11 +0000
 From:   Alexander Graf <graf@amazon.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 CC:     Jonathan Corbet <corbet@lwn.net>,
@@ -47,9 +47,9 @@ CC:     Jonathan Corbet <corbet@lwn.net>,
         Dan Carpenter <dan.carpenter@oracle.com>,
         <kvm@vger.kernel.org>, <linux-doc@vger.kernel.org>,
         <linux-kernel@vger.kernel.org>
-Subject: [PATCH v6 5/7] KVM: x86: VMX: Prevent MSR passthrough when MSR access is denied
-Date:   Wed, 2 Sep 2020 14:59:33 +0200
-Message-ID: <20200902125935.20646-6-graf@amazon.com>
+Subject: [PATCH v6 6/7] KVM: x86: Introduce MSR filtering
+Date:   Wed, 2 Sep 2020 14:59:34 +0200
+Message-ID: <20200902125935.20646-7-graf@amazon.com>
 X-Mailer: git-send-email 2.28.0.394.ge197136389
 In-Reply-To: <20200902125935.20646-1-graf@amazon.com>
 References: <20200902125935.20646-1-graf@amazon.com>
@@ -64,365 +64,517 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-We will introduce the concept of MSRs that may not be handled in kernel
-space soon. Some MSRs are directly passed through to the guest, effectively
-making them handled by KVM from user space's point of view.
+It's not desireable to have all MSRs always handled by KVM kernel space. Some
+MSRs would be useful to handle in user space to either emulate behavior (like
+uCode updates) or differentiate whether they are valid based on the CPU model.
 
-This patch introduces all logic required to ensure that MSRs that
-user space wants trapped are not marked as direct access for guests.
+To allow user space to specify which MSRs it wants to see handled by KVM,
+this patch introduces a new ioctl to push filter rules with bitmaps into
+KVM. Based on these bitmaps, KVM can then decide whether to reject MSR access.
+With the addition of KVM_CAP_X86_USER_SPACE_MSR it can also deflect the
+denied MSR events to user space to operate on.
+
+If no filter is populated, MSR handling stays identical to before.
 
 Signed-off-by: Alexander Graf <graf@amazon.com>
----
- arch/x86/kvm/vmx/vmx.c | 226 +++++++++++++++++++++++++++++++----------
- arch/x86/kvm/vmx/vmx.h |   7 ++
- 2 files changed, 181 insertions(+), 52 deletions(-)
 
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 1313e47a5a1e..6523f792652d 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -148,6 +148,26 @@ module_param_named(preemption_timer, enable_preemption_timer, bool, S_IRUGO);
- #define MSR_IA32_RTIT_OUTPUT_BASE_MASK \
- 	(~((1UL << cpuid_query_maxphyaddr(vcpu)) - 1) | 0x7f)
+---
+
+v2 -> v3:
+
+  - document flags for KVM_X86_ADD_MSR_ALLOWLIST
+  - generalize exit path, always unlock when returning
+  - s/KVM_CAP_ADD_MSR_ALLOWLIST/KVM_CAP_X86_MSR_ALLOWLIST/g
+  - Add KVM_X86_CLEAR_MSR_ALLOWLIST
+
+v3 -> v4:
+  - lock allow check and clearing
+  - free bitmaps on clear
+
+v4 -> v5:
+
+  - use srcu
+
+v5 -> v6:
+
+  - send filter change notification
+  - change to atomic set_msr_filter ioctl with fallback flag
+  - use EPERM for filter blocks
+  - add bit for MSR user space deflection
+  - check for overflow of BITS_TO_LONGS (thanks Dan Carpenter!)
+  - s/int i;/u32 i;/
+  - remove overlap check
+---
+ Documentation/virt/kvm/api.rst  | 103 +++++++++++++++++++++++
+ arch/x86/include/asm/kvm_host.h |  14 +++
+ arch/x86/include/uapi/asm/kvm.h |  21 ++++-
+ arch/x86/kvm/svm/svm.c          |   4 +-
+ arch/x86/kvm/x86.c              | 145 +++++++++++++++++++++++++++++++-
+ include/uapi/linux/kvm.h        |   5 ++
+ 6 files changed, 287 insertions(+), 5 deletions(-)
+
+diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+index 1aab18e8c0c3..cb2f60415639 100644
+--- a/Documentation/virt/kvm/api.rst
++++ b/Documentation/virt/kvm/api.rst
+@@ -4697,6 +4697,94 @@ KVM_PV_VM_VERIFY
+   Verify the integrity of the unpacked image. Only if this succeeds,
+   KVM is allowed to start protected VCPUs.
  
-+/*
-+ * List of MSRs that can be directly passed to the guest.
-+ * In addition to these x2apic and PT MSRs are handled specially.
-+ */
-+static u32 vmx_possible_passthrough_msrs[MAX_POSSIBLE_PASSGHROUGH_MSRS] = {
-+	MSR_IA32_SPEC_CTRL,
-+	MSR_IA32_PRED_CMD,
-+	MSR_IA32_TSC,
-+	MSR_FS_BASE,
-+	MSR_GS_BASE,
-+	MSR_KERNEL_GS_BASE,
-+	MSR_IA32_SYSENTER_CS,
-+	MSR_IA32_SYSENTER_ESP,
-+	MSR_IA32_SYSENTER_EIP,
-+	MSR_CORE_C1_RES,
-+	MSR_CORE_C3_RESIDENCY,
-+	MSR_CORE_C6_RESIDENCY,
-+	MSR_CORE_C7_RESIDENCY,
++4.126 KVM_X86_SET_MSR_FILTER
++----------------------------
++
++:Capability: KVM_X86_SET_MSR_FILTER
++:Architectures: x86
++:Type: vm ioctl
++:Parameters: struct kvm_msr_filter
++:Returns: 0 on success, < 0 on error
++
++::
++
++  struct kvm_msr_filter_range {
++  #define KVM_MSR_FILTER_READ  (1 << 0)
++  #define KVM_MSR_FILTER_WRITE (1 << 1)
++	__u32 flags;
++	__u32 nmsrs; /* number of msrs in bitmap */
++	__u32 base;  /* MSR index the bitmap starts at */
++	__u8 *bitmap; /* a 1 bit allows the operations in flags, 0 denies */
++  };
++  
++  struct kvm_msr_filter {
++  #define KVM_MSR_FILTER_DEFAULT_ALLOW (0 << 0)
++  #define KVM_MSR_FILTER_DEFAULT_DENY  (1 << 0)
++	__u32 flags;
++	struct kvm_msr_filter_range ranges[16];
++  };
++
++flags values:
++
++KVM_MSR_FILTER_READ
++
++  Filter read accesses to MSRs using the given bitmap. A 0 in the bitmap
++  indicates that a read should immediately fail, while a 1 indicates that
++  a read should be handled like without the filter.
++
++KVM_MSR_FILTER_WRITE
++
++  Filter write accesses to MSRs using the given bitmap. A 0 in the bitmap
++  indicates that a write should immediately fail, while a 1 indicates that
++  a write should be handled like without the filter.
++
++KVM_MSR_FILTER_READ | KVM_MSR_FILTER_WRITE
++
++  Filter booth read and write accesses to MSRs using the given bitmap. A 0
++  in the bitmap indicates that both reads and writes should immediately fail,
++  while a 1 indicates that reads and writes should be handled like without
++  the filter.
++
++KVM_MSR_FILTER_DEFAULT_ALLOW
++
++  If no filter range matches an MSR index that is getting accessed, KVM will
++  fall back to allowing access to the MSR.
++
++KVM_MSR_FILTER_DEFAULT_DENY
++
++  If no filter range matches an MSR index that is getting accessed, KVM will
++  fall back to rejecting access to the MSR. In this mode, all MSRs that should
++  be processed by KVM need to explicitly be marked as allowed in the bitmaps.
++
++This ioctl allows user space to define a up to 16 bitmaps of MSR ranges to
++specify whether a certain MSR access should be explicitly rejected or not.
++
++If this ioctl has never been invoked, MSR accesses are not guarded and the
++old KVM in-kernel emulation behavior is fully preserved.
++
++As soon as the filtering is in place, every MSR access is precessed through
++the filtering. If a bit is within one of the defined ranges, read and write
++accesses are guarded by the bitmap's value for the MSR index. If it is not
++defined in any range, whether MSR access is rejected is determined by the flags
++field of in the kvm_msr_filter struct: KVM_MSR_FILTER_DEFAULT_ALLOW and
++KVM_MSR_FILTER_DEFAULT_DENY.
++
++Calling this ioctl with an empty set of ranges (all nmsrs == 0) disables MSR
++filtering. In that mode, KVM_MSR_FILTER_DEFAULT_DENY no longer has any effect.
++
++Each bitmap range specifies a range of MSRs to potentially allow access on.
++The range goes from MSR index [base .. base+nmsrs]. The flags field
++indicates whether reads, writes or both reads and writes are filtered
++by setting a 1 bit in the bitmap for the corresponding MSR index.
++
++If an MSR access is not permitted through the filtering, it generates a
++#GP inside the guest. When combined with KVM_CAP_X86_USER_SPACE_MSR, that
++allows user space to deflect and potentially handle various MSR accesses
++into user space.
++
++If a vCPU is in running state while this ioctl is invoked, the vCPU may
++experience inconsistent filtering behavior on MSR accesses.
++
+ 
+ 5. The kvm_run structure
+ ========================
+@@ -5176,6 +5264,7 @@ receive MSR exit traps when a particular reason was requested during through
+ ENABLE_CAP. Currently valid exit reasons are:
+ 
+ 	KVM_MSR_EXIT_REASON_INVAL - access to invalid MSRs or reserved bits
++	KVM_MSR_EXIT_REASON_FILTER - access blocked by KVM_X86_SET_MSR_FILTER
+ 
+ For KVM_EXIT_X86_RDMSR, the "index" field tells user space which MSR the guest
+ wants to read. To respond to this request with a successful read, user space
+@@ -6220,3 +6309,17 @@ writes to user space. It can be enabled on a VM level. If enabled, MSR
+ accesses that would usually trigger a #GP by KVM into the guest will
+ instead get bounced to user space through the KVM_EXIT_X86_RDMSR and
+ KVM_EXIT_X86_WRMSR exit notifications.
++
++8.25 KVM_X86_SET_MSR_FILTER
++---------------------------
++
++:Architectures: x86
++
++This capability indicates that KVM supports that accesses to user defined MSRs
++may be rejected. With this capability exposed, KVM exports new VM ioctl
++KVM_X86_SET_MSR_FILTER which user space can call to specify bitmaps of MSR
++ranges that KVM should reject access to.
++
++In combination with KVM_CAP_X86_USER_SPACE_MSR, this allows user space to
++trap and emulate MSRs that are outside of the scope of KVM as well as
++limit the attack surface on KVM's MSR emulation code.
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index a9e3cc13bca6..64184469b0f8 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -87,6 +87,7 @@
+ #define KVM_REQ_HV_TLB_FLUSH \
+ 	KVM_ARCH_REQ_FLAGS(27, KVM_REQUEST_NO_WAKEUP)
+ #define KVM_REQ_APF_READY		KVM_ARCH_REQ(28)
++#define KVM_REQ_MSR_FILTER_CHANGED	KVM_ARCH_REQ(29)
+ 
+ #define CR0_RESERVED_BITS                                               \
+ 	(~(unsigned long)(X86_CR0_PE | X86_CR0_MP | X86_CR0_EM | X86_CR0_TS \
+@@ -901,6 +902,13 @@ struct kvm_hv {
+ 	struct kvm_hv_syndbg hv_syndbg;
+ };
+ 
++struct msr_bitmap_range {
++	u32 flags;
++	u32 nmsrs;
++	u32 base;
++	unsigned long *bitmap;
 +};
 +
- /*
-  * These 2 parameters are used to config the controls for Pause-Loop Exiting:
-  * ple_gap:    upper bound on the amount of time between two successive
-@@ -622,6 +642,41 @@ static inline bool report_flexpriority(void)
- 	return flexpriority_enabled;
- }
+ enum kvm_irqchip_mode {
+ 	KVM_IRQCHIP_NONE,
+ 	KVM_IRQCHIP_KERNEL,       /* created with KVM_CREATE_IRQCHIP */
+@@ -1005,6 +1013,12 @@ struct kvm_arch {
+ 	/* Deflect RDMSR and WRMSR to user space when they trigger a #GP */
+ 	u32 user_space_msr_mask;
  
-+static int possible_passthrough_msr_idx(u32 msr)
-+{
++	struct {
++		u8 count;
++		bool default_allow:1;
++		struct msr_bitmap_range ranges[16];
++	} msr_filter;
++
+ 	struct kvm_pmu_event_filter *pmu_event_filter;
+ 	struct task_struct *nx_lpage_recovery_thread;
+ };
+diff --git a/arch/x86/include/uapi/asm/kvm.h b/arch/x86/include/uapi/asm/kvm.h
+index 50650cfd235a..66bba91e1bb8 100644
+--- a/arch/x86/include/uapi/asm/kvm.h
++++ b/arch/x86/include/uapi/asm/kvm.h
+@@ -192,8 +192,25 @@ struct kvm_msr_list {
+ 	__u32 indices[0];
+ };
+ 
+-#define KVM_MSR_ALLOW_READ  (1 << 0)
+-#define KVM_MSR_ALLOW_WRITE (1 << 1)
++/* Maximum size of any access bitmap in bytes */
++#define KVM_MSR_FILTER_MAX_BITMAP_SIZE 0x600
++
++/* for KVM_X86_SET_MSR_FILTER */
++struct kvm_msr_filter_range {
++#define KVM_MSR_FILTER_READ  (1 << 0)
++#define KVM_MSR_FILTER_WRITE (1 << 1)
++	__u32 flags;
++	__u32 nmsrs; /* number of msrs in bitmap */
++	__u32 base;  /* MSR index the bitmap starts at */
++	__u8 *bitmap; /* a 1 bit allows the operations in flags, 0 denies */
++};
++
++struct kvm_msr_filter {
++#define KVM_MSR_FILTER_DEFAULT_ALLOW (0 << 0)
++#define KVM_MSR_FILTER_DEFAULT_DENY  (1 << 0)
++	__u32 flags;
++	struct kvm_msr_filter_range ranges[16];
++};
+ 
+ struct kvm_cpuid_entry {
+ 	__u32 function;
+diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+index 6a3f4017dd98..41e1eb77c3c0 100644
+--- a/arch/x86/kvm/svm/svm.c
++++ b/arch/x86/kvm/svm/svm.c
+@@ -624,10 +624,10 @@ static void set_msr_interception_nosync(struct kvm_vcpu *vcpu, u32 msr,
+ 	WARN_ON(!valid_msr_intercept(msr));
+ 
+ 	/* Enforce non allowed MSRs to trap */
+-	if (read && !kvm_msr_allowed(vcpu, msr, KVM_MSR_ALLOW_READ))
++	if (read && !kvm_msr_allowed(vcpu, msr, KVM_MSR_FILTER_READ))
+ 		read = 0;
+ 
+-	if (write && !kvm_msr_allowed(vcpu, msr, KVM_MSR_ALLOW_WRITE))
++	if (write && !kvm_msr_allowed(vcpu, msr, KVM_MSR_FILTER_WRITE))
+ 		write = 0;
+ 
+ 	offset    = svm_msrpm_offset(msr);
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 6024d1cdea5a..f9bacf5656f9 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -1474,7 +1474,35 @@ EXPORT_SYMBOL_GPL(kvm_enable_efer_bits);
+ 
+ bool kvm_msr_allowed(struct kvm_vcpu *vcpu, u32 index, u32 type)
+ {
+-	return true;
++	struct kvm *kvm = vcpu->kvm;
++	struct msr_bitmap_range *ranges = kvm->arch.msr_filter.ranges;
++	u32 count = kvm->arch.msr_filter.count;
 +	u32 i;
++	bool r = kvm->arch.msr_filter.default_allow;
++	int idx;
 +
-+	for (i = 0; i < ARRAY_SIZE(vmx_possible_passthrough_msrs); i++)
-+		if (vmx_possible_passthrough_msrs[i] == msr)
-+			return i;
-+
-+	return -ENOENT;
-+}
-+
-+static bool is_valid_passthrough_msr(u32 msr)
-+{
-+	bool r;
-+
-+	switch (msr) {
-+	case 0x800 ... 0x8ff:
-+		/* x2APIC MSRs. These are handled in vmx_update_msr_bitmap_x2apic() */
++	/* MSR filtering not set up, allow everything */
++	if (!count)
 +		return true;
-+	case MSR_IA32_RTIT_STATUS:
-+	case MSR_IA32_RTIT_OUTPUT_BASE:
-+	case MSR_IA32_RTIT_OUTPUT_MASK:
-+	case MSR_IA32_RTIT_CR3_MATCH:
-+	case MSR_IA32_RTIT_ADDR0_A ... MSR_IA32_RTIT_ADDR3_B:
-+		/* PT MSRs. These are handled in pt_update_intercept_for_msr() */
-+		return true;
++
++	/* Prevent collision with set_msr_filter */
++	idx = srcu_read_lock(&kvm->srcu);
++
++	for (i = 0; i < count; i++) {
++		u32 start = ranges[i].base;
++		u32 end = start + ranges[i].nmsrs;
++		u32 flags = ranges[i].flags;
++		unsigned long *bitmap = ranges[i].bitmap;
++
++		if ((index >= start) && (index < end) && (flags & type)) {
++			r = !!test_bit(index - start, bitmap);
++			break;
++		}
 +	}
 +
-+	r = possible_passthrough_msr_idx(msr) != -ENOENT;
++	srcu_read_unlock(&kvm->srcu, idx);
 +
-+	WARN(!r, "Invalid MSR %x, please adapt vmx_possible_passthrough_msrs[]", msr);
++	return r;
+ }
+ EXPORT_SYMBOL_GPL(kvm_msr_allowed);
+ 
+@@ -1489,6 +1517,9 @@ static int __kvm_set_msr(struct kvm_vcpu *vcpu, u32 index, u64 data,
+ {
+ 	struct msr_data msr;
+ 
++	if (!host_initiated && !kvm_msr_allowed(vcpu, index, KVM_MSR_FILTER_WRITE))
++		return -EPERM;
++
+ 	switch (index) {
+ 	case MSR_FS_BASE:
+ 	case MSR_GS_BASE:
+@@ -1534,6 +1565,9 @@ int __kvm_get_msr(struct kvm_vcpu *vcpu, u32 index, u64 *data,
+ 	struct msr_data msr;
+ 	int ret;
+ 
++	if (!host_initiated && !kvm_msr_allowed(vcpu, index, KVM_MSR_FILTER_READ))
++		return -EPERM;
++
+ 	msr.index = index;
+ 	msr.host_initiated = host_initiated;
+ 
+@@ -1580,6 +1614,8 @@ static int complete_emulated_wrmsr(struct kvm_vcpu *vcpu)
+ static u64 kvm_msr_reason(int r)
+ {
+ 	switch (r) {
++	case -EPERM:
++		return KVM_MSR_EXIT_REASON_FILTER;
+ 	default:
+ 		return KVM_MSR_EXIT_REASON_INVAL;
+ 	}
+@@ -3569,6 +3605,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+ 	case KVM_CAP_EXCEPTION_PAYLOAD:
+ 	case KVM_CAP_SET_GUEST_DEBUG:
+ 	case KVM_CAP_X86_USER_SPACE_MSR:
++	case KVM_CAP_X86_MSR_FILTER:
+ 		r = 1;
+ 		break;
+ 	case KVM_CAP_SYNC_REGS:
+@@ -5094,6 +5131,103 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
+ 	return r;
+ }
+ 
++static void kvm_clear_msr_filter(struct kvm *kvm)
++{
++	u32 i;
++	u32 count = kvm->arch.msr_filter.count;
++	struct msr_bitmap_range ranges[16];
++
++	mutex_lock(&kvm->lock);
++	kvm->arch.msr_filter.count = 0;
++	memcpy(ranges, kvm->arch.msr_filter.ranges, count * sizeof(ranges[0]));
++	mutex_unlock(&kvm->lock);
++	synchronize_srcu(&kvm->srcu);
++
++	for (i = 0; i < count; i++)
++		kfree(ranges[i].bitmap);
++}
++
++static int kvm_add_msr_filter(struct kvm *kvm, struct kvm_msr_filter_range *user_range)
++{
++	struct msr_bitmap_range *ranges = kvm->arch.msr_filter.ranges;
++	struct msr_bitmap_range range;
++	unsigned long *bitmap = NULL;
++	size_t bitmap_size;
++	int r;
++
++	if (!user_range->nmsrs)
++		return 0;
++
++	bitmap_size = BITS_TO_LONGS(user_range->nmsrs) * sizeof(long);
++	if (!bitmap_size || bitmap_size > KVM_MSR_FILTER_MAX_BITMAP_SIZE)
++		return -EINVAL;
++
++	bitmap = memdup_user((__user u8*)user_range->bitmap, bitmap_size);
++	if (IS_ERR(bitmap))
++		return PTR_ERR(bitmap);
++
++	range = (struct msr_bitmap_range) {
++		.flags = user_range->flags,
++		.base = user_range->base,
++		.nmsrs = user_range->nmsrs,
++		.bitmap = bitmap,
++	};
++
++	if (range.flags & ~(KVM_MSR_FILTER_READ | KVM_MSR_FILTER_WRITE)) {
++		r = -EINVAL;
++		goto err;
++	}
++
++	if (!range.flags) {
++		r = -EINVAL;
++		goto err;
++	}
++
++	/* Everything ok, add this range identifier to our global pool */
++	ranges[kvm->arch.msr_filter.count] = range;
++	/* Make sure we filled the array before we tell anyone to walk it */
++	smp_wmb();
++	kvm->arch.msr_filter.count++;
++
++	return 0;
++err:
++	kfree(bitmap);
++	return r;
++}
++
++static int kvm_vm_ioctl_set_msr_filter(struct kvm *kvm, void __user *argp)
++{
++	struct kvm_msr_filter __user *user_msr_filter = argp;
++	struct kvm_msr_filter filter;
++	bool default_allow;
++	int r = 0;
++	u32 i;
++
++	if (copy_from_user(&filter, user_msr_filter, sizeof(filter)))
++		return -EFAULT;
++
++	kvm_clear_msr_filter(kvm);
++
++	default_allow = !(filter.flags & KVM_MSR_FILTER_DEFAULT_DENY);
++	kvm->arch.msr_filter.default_allow = default_allow;
++
++	/*
++	 * Protect from concurrent calls to this function that could trigger
++	 * a TOCTOU violation on kvm->arch.msr_filter.count.
++	 */
++	mutex_lock(&kvm->lock);
++	for (i = 0; i < ARRAY_SIZE(filter.ranges); i++) {
++		r = kvm_add_msr_filter(kvm, &filter.ranges[i]);
++		if (r)
++			break;
++	}
++
++	kvm_make_all_cpus_request(kvm, KVM_REQ_MSR_FILTER_CHANGED);
++	mutex_unlock(&kvm->lock);
 +
 +	return r;
 +}
 +
- static inline int __find_msr_index(struct vcpu_vmx *vmx, u32 msr)
+ long kvm_arch_vm_ioctl(struct file *filp,
+ 		       unsigned int ioctl, unsigned long arg)
  {
- 	int i;
-@@ -3690,12 +3745,51 @@ void free_vpid(int vpid)
- 	spin_unlock(&vmx_vpid_lock);
- }
- 
-+static void vmx_clear_msr_bitmap_read(ulong *msr_bitmap, u32 msr)
-+{
-+	int f = sizeof(unsigned long);
-+
-+	if (msr <= 0x1fff)
-+		__clear_bit(msr, msr_bitmap + 0x000 / f);
-+	else if ((msr >= 0xc0000000) && (msr <= 0xc0001fff))
-+		__clear_bit(msr & 0x1fff, msr_bitmap + 0x400 / f);
-+}
-+
-+static void vmx_clear_msr_bitmap_write(ulong *msr_bitmap, u32 msr)
-+{
-+	int f = sizeof(unsigned long);
-+
-+	if (msr <= 0x1fff)
-+		__clear_bit(msr, msr_bitmap + 0x800 / f);
-+	else if ((msr >= 0xc0000000) && (msr <= 0xc0001fff))
-+		__clear_bit(msr & 0x1fff, msr_bitmap + 0xc00 / f);
-+}
-+
-+static void vmx_set_msr_bitmap_read(ulong *msr_bitmap, u32 msr)
-+{
-+	int f = sizeof(unsigned long);
-+
-+	if (msr <= 0x1fff)
-+		__set_bit(msr, msr_bitmap + 0x000 / f);
-+	else if ((msr >= 0xc0000000) && (msr <= 0xc0001fff))
-+		__set_bit(msr & 0x1fff, msr_bitmap + 0x400 / f);
-+}
-+
-+static void vmx_set_msr_bitmap_write(ulong *msr_bitmap, u32 msr)
-+{
-+	int f = sizeof(unsigned long);
-+
-+	if (msr <= 0x1fff)
-+		__set_bit(msr, msr_bitmap + 0x800 / f);
-+	else if ((msr >= 0xc0000000) && (msr <= 0xc0001fff))
-+		__set_bit(msr & 0x1fff, msr_bitmap + 0xc00 / f);
-+}
-+
- static __always_inline void vmx_disable_intercept_for_msr(struct kvm_vcpu *vcpu,
- 							  u32 msr, int type)
- {
- 	struct vcpu_vmx *vmx = to_vmx(vcpu);
- 	unsigned long *msr_bitmap = vmx->vmcs01.msr_bitmap;
--	int f = sizeof(unsigned long);
- 
- 	if (!cpu_has_vmx_msr_bitmap())
- 		return;
-@@ -3704,30 +3798,37 @@ static __always_inline void vmx_disable_intercept_for_msr(struct kvm_vcpu *vcpu,
- 		evmcs_touch_msr_bitmap();
- 
- 	/*
--	 * See Intel PRM Vol. 3, 20.6.9 (MSR-Bitmap Address). Early manuals
--	 * have the write-low and read-high bitmap offsets the wrong way round.
--	 * We can control MSRs 0x00000000-0x00001fff and 0xc0000000-0xc0001fff.
--	 */
--	if (msr <= 0x1fff) {
--		if (type & MSR_TYPE_R)
--			/* read-low */
--			__clear_bit(msr, msr_bitmap + 0x000 / f);
-+	 * Mark the desired intercept state in shadow bitmap, this is needed
-+	 * for resync when the MSR filters change.
-+	*/
-+	if (is_valid_passthrough_msr(msr)) {
-+		int idx = possible_passthrough_msr_idx(msr);
-+
-+		if (idx != -ENOENT) {
-+			if (type & MSR_TYPE_R)
-+				clear_bit(idx, vmx->shadow_msr_intercept.read);
-+			if (type & MSR_TYPE_W)
-+				clear_bit(idx, vmx->shadow_msr_intercept.write);
-+		}
-+	}
- 
--		if (type & MSR_TYPE_W)
--			/* write-low */
--			__clear_bit(msr, msr_bitmap + 0x800 / f);
-+	if ((type & MSR_TYPE_R) &&
-+	    !kvm_msr_allowed(vcpu, msr, KVM_MSR_FILTER_READ)) {
-+		vmx_set_msr_bitmap_read(msr_bitmap, msr);
-+		type &= ~MSR_TYPE_R;
-+	}
- 
--	} else if ((msr >= 0xc0000000) && (msr <= 0xc0001fff)) {
--		msr &= 0x1fff;
--		if (type & MSR_TYPE_R)
--			/* read-high */
--			__clear_bit(msr, msr_bitmap + 0x400 / f);
-+	if ((type & MSR_TYPE_W) &&
-+	    !kvm_msr_allowed(vcpu, msr, KVM_MSR_FILTER_WRITE)) {
-+		vmx_set_msr_bitmap_write(msr_bitmap, msr);
-+		type &= ~MSR_TYPE_W;
-+	}
- 
--		if (type & MSR_TYPE_W)
--			/* write-high */
--			__clear_bit(msr, msr_bitmap + 0xc00 / f);
-+	if (type & MSR_TYPE_R)
-+		vmx_clear_msr_bitmap_read(msr_bitmap, msr);
- 
--	}
-+	if (type & MSR_TYPE_W)
-+		vmx_clear_msr_bitmap_write(msr_bitmap, msr);
- }
- 
- static __always_inline void vmx_enable_intercept_for_msr(struct kvm_vcpu *vcpu,
-@@ -3735,7 +3836,6 @@ static __always_inline void vmx_enable_intercept_for_msr(struct kvm_vcpu *vcpu,
- {
- 	struct vcpu_vmx *vmx = to_vmx(vcpu);
- 	unsigned long *msr_bitmap = vmx->vmcs01.msr_bitmap;
--	int f = sizeof(unsigned long);
- 
- 	if (!cpu_has_vmx_msr_bitmap())
- 		return;
-@@ -3744,30 +3844,25 @@ static __always_inline void vmx_enable_intercept_for_msr(struct kvm_vcpu *vcpu,
- 		evmcs_touch_msr_bitmap();
- 
- 	/*
--	 * See Intel PRM Vol. 3, 20.6.9 (MSR-Bitmap Address). Early manuals
--	 * have the write-low and read-high bitmap offsets the wrong way round.
--	 * We can control MSRs 0x00000000-0x00001fff and 0xc0000000-0xc0001fff.
--	 */
--	if (msr <= 0x1fff) {
--		if (type & MSR_TYPE_R)
--			/* read-low */
--			__set_bit(msr, msr_bitmap + 0x000 / f);
--
--		if (type & MSR_TYPE_W)
--			/* write-low */
--			__set_bit(msr, msr_bitmap + 0x800 / f);
--
--	} else if ((msr >= 0xc0000000) && (msr <= 0xc0001fff)) {
--		msr &= 0x1fff;
--		if (type & MSR_TYPE_R)
--			/* read-high */
--			__set_bit(msr, msr_bitmap + 0x400 / f);
-+	 * Mark the desired intercept state in shadow bitmap, this is needed
-+	 * for resync when the MSR filter changes.
-+	*/
-+	if (is_valid_passthrough_msr(msr)) {
-+		int idx = possible_passthrough_msr_idx(msr);
-+
-+		if (idx != -ENOENT) {
-+			if (type & MSR_TYPE_R)
-+				set_bit(idx, vmx->shadow_msr_intercept.read);
-+			if (type & MSR_TYPE_W)
-+				set_bit(idx, vmx->shadow_msr_intercept.write);
-+		}
-+	}
- 
--		if (type & MSR_TYPE_W)
--			/* write-high */
--			__set_bit(msr, msr_bitmap + 0xc00 / f);
-+	if (type & MSR_TYPE_R)
-+		vmx_set_msr_bitmap_read(msr_bitmap, msr);
- 
--	}
-+	if (type & MSR_TYPE_W)
-+		vmx_set_msr_bitmap_write(msr_bitmap, msr);
- }
- 
- static __always_inline void vmx_set_intercept_for_msr(struct kvm_vcpu *vcpu,
-@@ -3794,15 +3889,14 @@ static u8 vmx_msr_bitmap_mode(struct kvm_vcpu *vcpu)
- 	return mode;
- }
- 
--static void vmx_update_msr_bitmap_x2apic(struct kvm_vcpu *vcpu,
--					 unsigned long *msr_bitmap, u8 mode)
-+static void vmx_update_msr_bitmap_x2apic(struct kvm_vcpu *vcpu, u8 mode)
- {
- 	int msr;
- 
--	for (msr = 0x800; msr <= 0x8ff; msr += BITS_PER_LONG) {
--		unsigned word = msr / BITS_PER_LONG;
--		msr_bitmap[word] = (mode & MSR_BITMAP_MODE_X2APIC_APICV) ? 0 : ~0;
--		msr_bitmap[word + (0x800 / sizeof(long))] = ~0;
-+	for (msr = 0x800; msr <= 0x8ff; msr++) {
-+		bool intercepted = !!(mode & MSR_BITMAP_MODE_X2APIC_APICV);
-+
-+		vmx_set_intercept_for_msr(vcpu, msr, MSR_TYPE_RW, intercepted);
+@@ -5400,6 +5534,9 @@ long kvm_arch_vm_ioctl(struct file *filp,
+ 	case KVM_SET_PMU_EVENT_FILTER:
+ 		r = kvm_vm_ioctl_set_pmu_event_filter(kvm, argp);
+ 		break;
++	case KVM_X86_SET_MSR_FILTER:
++		r = kvm_vm_ioctl_set_msr_filter(kvm, argp);
++		break;
+ 	default:
+ 		r = -ENOTTY;
+ 	}
+@@ -8547,6 +8684,8 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
+ 			kvm_vcpu_update_apicv(vcpu);
+ 		if (kvm_check_request(KVM_REQ_APF_READY, vcpu))
+ 			kvm_check_async_pf_completion(vcpu);
++		if (kvm_check_request(KVM_REQ_MSR_FILTER_CHANGED, vcpu))
++			kvm_x86_ops.msr_filter_changed(vcpu);
  	}
  
- 	if (mode & MSR_BITMAP_MODE_X2APIC) {
-@@ -3822,7 +3916,6 @@ static void vmx_update_msr_bitmap_x2apic(struct kvm_vcpu *vcpu,
- void vmx_update_msr_bitmap(struct kvm_vcpu *vcpu)
+ 	if (kvm_check_request(KVM_REQ_EVENT, vcpu) || req_int_win) {
+@@ -10105,6 +10244,8 @@ void kvm_arch_pre_destroy_vm(struct kvm *kvm)
+ 
+ void kvm_arch_destroy_vm(struct kvm *kvm)
  {
- 	struct vcpu_vmx *vmx = to_vmx(vcpu);
--	unsigned long *msr_bitmap = vmx->vmcs01.msr_bitmap;
- 	u8 mode = vmx_msr_bitmap_mode(vcpu);
- 	u8 changed = mode ^ vmx->msr_bitmap_mode;
- 
-@@ -3830,7 +3923,7 @@ void vmx_update_msr_bitmap(struct kvm_vcpu *vcpu)
- 		return;
- 
- 	if (changed & (MSR_BITMAP_MODE_X2APIC | MSR_BITMAP_MODE_X2APIC_APICV))
--		vmx_update_msr_bitmap_x2apic(vcpu, msr_bitmap, mode);
-+		vmx_update_msr_bitmap_x2apic(vcpu, mode);
- 
- 	vmx->msr_bitmap_mode = mode;
- }
-@@ -3871,6 +3964,29 @@ static bool vmx_guest_apic_has_interrupt(struct kvm_vcpu *vcpu)
- 	return ((rvi & 0xf0) > (vppr & 0xf0));
- }
- 
-+static void vmx_msr_filter_changed(struct kvm_vcpu *vcpu)
-+{
-+	struct vcpu_vmx *vmx = to_vmx(vcpu);
 +	u32 i;
 +
-+	/*
-+	 * Set intercept permissions for all potentially passed through MSRs
-+	 * again. They will automatically get filtered through the MSR filter,
-+	 * so we are back in sync after this.
-+	 */
-+	for (i = 0; i < ARRAY_SIZE(vmx_possible_passthrough_msrs); i++) {
-+		u32 msr = vmx_possible_passthrough_msrs[i];
-+		bool read = test_bit(i, vmx->shadow_msr_intercept.read);
-+		bool write = test_bit(i, vmx->shadow_msr_intercept.write);
-+
-+		vmx_set_intercept_for_msr(vcpu, msr, MSR_TYPE_R, read);
-+		vmx_set_intercept_for_msr(vcpu, msr, MSR_TYPE_W, write);
-+	}
-+
-+	pt_update_intercept_for_msr(vcpu);
-+	vmx_update_msr_bitmap_x2apic(vcpu, vmx_msr_bitmap_mode(vcpu));
-+}
-+
- static inline bool kvm_vcpu_trigger_posted_interrupt(struct kvm_vcpu *vcpu,
- 						     bool nested)
- {
-@@ -6901,6 +7017,10 @@ static int vmx_create_vcpu(struct kvm_vcpu *vcpu)
- 	if (err < 0)
- 		goto free_pml;
+ 	if (current->mm == kvm->mm) {
+ 		/*
+ 		 * Free memory regions allocated on behalf of userspace,
+@@ -10121,6 +10262,8 @@ void kvm_arch_destroy_vm(struct kvm *kvm)
+ 	}
+ 	if (kvm_x86_ops.vm_destroy)
+ 		kvm_x86_ops.vm_destroy(kvm);
++	for (i = 0; i < kvm->arch.msr_filter.count; i++)
++		kfree(kvm->arch.msr_filter.ranges[i].bitmap);
+ 	kvm_pic_destroy(kvm);
+ 	kvm_ioapic_destroy(kvm);
+ 	kvm_free_vcpus(kvm);
+diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+index a42841141cae..677d48f531f1 100644
+--- a/include/uapi/linux/kvm.h
++++ b/include/uapi/linux/kvm.h
+@@ -419,6 +419,7 @@ struct kvm_run {
+ 			__u8 error; /* user -> kernel */
+ 			__u8 pad[3];
+ #define KVM_MSR_EXIT_REASON_INVAL	(1 << 0)
++#define KVM_MSR_EXIT_REASON_FILTER	(1 << 1)
+ 			__u32 reason; /* kernel -> user */
+ 			__u32 index; /* kernel -> user */
+ 			__u64 data; /* kernel <-> user */
+@@ -1043,6 +1044,7 @@ struct kvm_ppc_resize_hpt {
+ #define KVM_CAP_HALT_POLL 182
+ #define KVM_CAP_ASYNC_PF_INT 183
+ #define KVM_CAP_X86_USER_SPACE_MSR 184
++#define KVM_CAP_X86_MSR_FILTER 185
  
-+	/* The MSR bitmap starts with all ones */
-+	bitmap_fill(vmx->shadow_msr_intercept.read, MAX_POSSIBLE_PASSGHROUGH_MSRS);
-+	bitmap_fill(vmx->shadow_msr_intercept.write, MAX_POSSIBLE_PASSGHROUGH_MSRS);
-+
- 	msr_bitmap = vmx->vmcs01.msr_bitmap;
- 	vmx_disable_intercept_for_msr(vcpu, MSR_IA32_TSC, MSR_TYPE_R);
- 	vmx_disable_intercept_for_msr(vcpu, MSR_FS_BASE, MSR_TYPE_RW);
-@@ -7965,6 +8085,8 @@ static struct kvm_x86_ops vmx_x86_ops __initdata = {
- 	.need_emulation_on_page_fault = vmx_need_emulation_on_page_fault,
- 	.apic_init_signal_blocked = vmx_apic_init_signal_blocked,
- 	.migrate_timers = vmx_migrate_timers,
-+
-+	.msr_filter_changed = vmx_msr_filter_changed,
- };
+ #ifdef KVM_CAP_IRQ_ROUTING
  
- static __init int hardware_setup(void)
-diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
-index b3c74f0fe8a1..05694d2fd4ff 100644
---- a/arch/x86/kvm/vmx/vmx.h
-+++ b/arch/x86/kvm/vmx/vmx.h
-@@ -300,6 +300,13 @@ struct vcpu_vmx {
- 	u64 ept_pointer;
+@@ -1544,6 +1546,9 @@ struct kvm_pv_cmd {
+ /* Available with KVM_CAP_S390_PROTECTED */
+ #define KVM_S390_PV_COMMAND		_IOWR(KVMIO, 0xc5, struct kvm_pv_cmd)
  
- 	struct pt_desc pt_desc;
++/* Available with KVM_CAP_X86_MSR_FILTER */
++#define KVM_X86_SET_MSR_FILTER	_IOW(KVMIO,  0xc6, struct kvm_msr_filter)
 +
-+	/* Save desired MSR intercept (read: pass-through) state */
-+#define MAX_POSSIBLE_PASSGHROUGH_MSRS	13
-+	struct {
-+		DECLARE_BITMAP(read, MAX_POSSIBLE_PASSGHROUGH_MSRS);
-+		DECLARE_BITMAP(write, MAX_POSSIBLE_PASSGHROUGH_MSRS);
-+	} shadow_msr_intercept;
- };
- 
- enum ept_pointers_status {
+ /* Secure Encrypted Virtualization command */
+ enum sev_cmd_id {
+ 	/* Guest initialization commands */
 -- 
 2.17.1
 
