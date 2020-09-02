@@ -2,140 +2,143 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 75FC025A6D2
-	for <lists+kvm@lfdr.de>; Wed,  2 Sep 2020 09:32:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4E4C625A826
+	for <lists+kvm@lfdr.de>; Wed,  2 Sep 2020 10:59:30 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726528AbgIBHcF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Sep 2020 03:32:05 -0400
-Received: from userp2130.oracle.com ([156.151.31.86]:53690 "EHLO
-        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726167AbgIBHcD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 2 Sep 2020 03:32:03 -0400
-Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
-        by userp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0827SsJw042596;
-        Wed, 2 Sep 2020 07:31:58 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
- : subject : message-id : references : mime-version : content-type :
- in-reply-to; s=corp-2020-01-29;
- bh=LOa0MTE9JnpSlmp0hUB9HpW3GCi056gX/ikmNfam33c=;
- b=SN0DRME4qRWm2a6B2mA/NOiyGDEXm7Bx/04N//GHQwMHXLSbOi0oMZTlsNtC3zbr7a6b
- 2KhBrDpZGlVHvBcKz2OCt1Y8T5zClfcTlTSooE75uJPpAByFX1Nsch5jFpMyaOO5M261
- mAab8zq81Ka8r6J9VKMWMwTkwJ+DxVeQ2gWhy8YTlcckccUXRKlnNBtPq00BGuIMxXHY
- 4DUVrkjA0ijmcP+h1EaBnRFyijVOsHD98wnHwkDBLUfQOuY4ueinybXwTn8KV5if5YX8
- VyCGq+mxLVmvV+v7MtpZb6YJYsEd9y7C0VK737OGp/AtRZt252PbgOtno+DFVQgA3pog xw== 
-Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
-        by userp2130.oracle.com with ESMTP id 337eer0txu-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
-        Wed, 02 Sep 2020 07:31:57 +0000
-Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
-        by aserp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0827UfK5055122;
-        Wed, 2 Sep 2020 07:31:57 GMT
-Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
-        by aserp3020.oracle.com with ESMTP id 3380x5ujbv-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 02 Sep 2020 07:31:57 +0000
-Received: from abhmp0012.oracle.com (abhmp0012.oracle.com [141.146.116.18])
-        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 0827VtcI011694;
-        Wed, 2 Sep 2020 07:31:56 GMT
-Received: from kadam (/41.57.98.10)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Wed, 02 Sep 2020 00:31:55 -0700
-Date:   Wed, 2 Sep 2020 10:31:48 +0300
-From:   Dan Carpenter <dan.carpenter@oracle.com>
-To:     Alexander Graf <graf@amazon.com>
-Cc:     kbuild@lists.01.org, Aaron Lewis <aaronlewis@google.com>,
-        jmattson@google.com, lkp@intel.com, kbuild-all@lists.01.org,
-        pshier@google.com, oupton@google.com, kvm@vger.kernel.org,
-        KarimAllah Ahmed <karahmed@amazon.de>
-Subject: Re: [PATCH v3 02/12] KVM: x86: Introduce allow list for MSR emulation
-Message-ID: <20200902073147.GI8321@kadam>
-References: <20200831103933.GF8299@kadam>
- <79dd5f72-a332-a657-674d-f3a9c94146f1@amazon.com>
+        id S1726446AbgIBI72 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Sep 2020 04:59:28 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:45647 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726167AbgIBI71 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 2 Sep 2020 04:59:27 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1599037165;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=Ix8N6RQtX+ddzBGK9BdRX1rdzssF3CmlZhDLO9SMtGM=;
+        b=b9l+xXpd+F65EVf0Z/i3vo6vjpuVw5Ao9e5hHdX6vakZGazxq9C86hzZqeF9WRCrI2Vlp2
+        woRpit85edeueVJCjAtGrTAwcFlIQhYSm2A4M7iIBrdpNMgtk7ECUoraMLz3tDxqalmS9k
+        upxjpjkptnbtFovfXqqFm9H5w23vyeg=
+Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
+ [209.85.208.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-160-rb_rFs2aMIqiyGhL-xkGtQ-1; Wed, 02 Sep 2020 04:59:23 -0400
+X-MC-Unique: rb_rFs2aMIqiyGhL-xkGtQ-1
+Received: by mail-ed1-f70.google.com with SMTP id n4so1876351edo.20
+        for <kvm@vger.kernel.org>; Wed, 02 Sep 2020 01:59:23 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=Ix8N6RQtX+ddzBGK9BdRX1rdzssF3CmlZhDLO9SMtGM=;
+        b=i+0Dz/h/FkN9BoKcRoPQzCXQjDCPc4kMi+2VsbbkhdpV5jxyojFntpqe0whmQAG1Gj
+         jyKEnLDftPMyBZh2GMyLv/2pMQFnlWU6ue1boBl/b35mZxdYdYirJTcgDFrgQyvNZccy
+         m/sxp9/xGgaZ3g4f5XJQCV0gc0FbFNCJT7QEMkGpS0vXFDU6KVnVp7+6quGgSeA7/+z1
+         y9WWqYPtmksddbhF4IvOKpxjrGJd7aU8A5JwqEY8VCCR2jMEWh2fZJE8YAnnZwjlsONF
+         j/nxMl6cq7WrY35mWjHDZ/XvK0Mt4aIiiNuOh+GVW66ERyspawXVlua/mRJIMYH17yn0
+         M3Ew==
+X-Gm-Message-State: AOAM532UkQZsiLN/+bhx8Mp1ysrNv7Oc9PJuLEPtisihKtZinnLXtMy/
+        POuJeZsF88TSobXzZIEMDa/36klxe0+HfF26dXW+bo5weM16zxA1gWeDdAec255KBgqMqKT5Lk4
+        w/KlEUMLiB1cC
+X-Received: by 2002:a17:906:95d1:: with SMTP id n17mr5566894ejy.324.1599037162128;
+        Wed, 02 Sep 2020 01:59:22 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzZ9uG5VoGFj8piU2aeDijZCJLsDj+NsJcm8DJsdt2rZ7X63rZbNnDbaKrAnU8VY81o7E9eaQ==
+X-Received: by 2002:a17:906:95d1:: with SMTP id n17mr5566871ejy.324.1599037161896;
+        Wed, 02 Sep 2020 01:59:21 -0700 (PDT)
+Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
+        by smtp.gmail.com with ESMTPSA id f13sm3735188ejb.81.2020.09.02.01.59.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 02 Sep 2020 01:59:21 -0700 (PDT)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     Peter Xu <peterx@redhat.com>
+Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Michael Tsirkin <mst@redhat.com>,
+        Julia Suvorova <jsuvorov@redhat.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Andrew Jones <drjones@redhat.com>, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 0/3] KVM: x86: KVM_MEM_PCI_HOLE memory
+In-Reply-To: <20200901200021.GB3053@xz-x1>
+References: <20200807141232.402895-1-vkuznets@redhat.com> <20200825212526.GC8235@xz-x1> <87eenlwoaa.fsf@vitty.brq.redhat.com> <20200901200021.GB3053@xz-x1>
+Date:   Wed, 02 Sep 2020 10:59:20 +0200
+Message-ID: <877dtcpn9z.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <79dd5f72-a332-a657-674d-f3a9c94146f1@amazon.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9731 signatures=668679
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxscore=0 spamscore=0 phishscore=0
- mlxlogscore=999 adultscore=0 suspectscore=0 bulkscore=0 malwarescore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
- definitions=main-2009020068
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9731 signatures=668679
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 clxscore=1015 priorityscore=1501
- lowpriorityscore=0 malwarescore=0 adultscore=0 spamscore=0 mlxscore=0
- phishscore=0 impostorscore=0 mlxlogscore=999 bulkscore=0 suspectscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
- definitions=main-2009020068
+Content-Type: text/plain
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Sep 01, 2020 at 09:13:10PM +0200, Alexander Graf wrote:
-> 
-> 
-> On 31.08.20 12:39, Dan Carpenter wrote:
-> > 
-> > Hi Aaron,
-> > 
-> > url:    https://github.com/0day-ci/linux/commits/Aaron-Lewis/Allow-userspace-to-manage-MSRs/20200819-051903
-> > base:   https://git.kernel.org/pub/scm/virt/kvm/kvm.git  linux-next
-> > config: x86_64-randconfig-m001-20200827 (attached as .config)
-> > compiler: gcc-9 (Debian 9.3.0-15) 9.3.0
-> > 
-> > If you fix the issue, kindly add following tag as appropriate
-> > Reported-by: kernel test robot <lkp@intel.com>
-> > Reported-by: Dan Carpenter <dan.carpenter@oracle.com>
-> 
-> Thanks a bunch for looking at this! I'd squash in the change with the actual
-> patch as it's tiny, so I'm not sure how attribution would work in that case.
+Peter Xu <peterx@redhat.com> writes:
 
-Yep.  No problem.  These are just a template that gets sent to everyone.
+> On Tue, Sep 01, 2020 at 04:43:25PM +0200, Vitaly Kuznetsov wrote:
+>> Peter Xu <peterx@redhat.com> writes:
+>> 
+>> > On Fri, Aug 07, 2020 at 04:12:29PM +0200, Vitaly Kuznetsov wrote:
+>> >> When testing Linux kernel boot with QEMU q35 VM and direct kernel boot
+>> >> I observed 8193 accesses to PCI hole memory. When such exit is handled
+>> >> in KVM without exiting to userspace, it takes roughly 0.000001 sec.
+>> >> Handling the same exit in userspace is six times slower (0.000006 sec) so
+>> >> the overal; difference is 0.04 sec. This may be significant for 'microvm'
+>> >> ideas.
+>> >
+>> > Sorry to comment so late, but just curious... have you looked at what's those
+>> > 8000+ accesses to PCI holes and what they're used for?  What I can think of are
+>> > some port IO reads (e.g. upon vendor ID field) during BIOS to scan the devices
+>> > attached.  Though those should be far less than 8000+, and those should also be
+>> > pio rather than mmio.
+>> 
+>> And sorry for replying late)
+>> 
+>> We explicitly want MMIO instead of PIO to speed things up, afaiu PIO
+>> requires two exits per device (and we exit all the way to
+>> QEMU). Julia/Michael know better about the size of the space.
+>> 
+>> >
+>> > If this is only an overhead for virt (since baremetal mmios should be fast),
+>> > I'm also thinking whether we can make it even better to skip those pci hole
+>> > reads.  Because we know we're virt, so it also gives us possibility that we may
+>> > provide those information in a better way than reading PCI holes in the guest?
+>> 
+>> This means let's invent a PV interface and if we decide to go down this
+>> road, I'd even argue for abandoning PCI completely. E.g. we can do
+>> something similar to Hyper-V's Vmbus.
+>
+> My whole point was more about trying to understand the problem behind.
+> Providing a fast path for reading pci holes seems to be reasonable as is,
+> however it's just that I'm confused on why there're so many reads on the pci
+> holes after all.  Another important question is I'm wondering how this series
+> will finally help the use case of microvm.  I'm not sure I get the whole point
+> of it, but... if microvm is the major use case of this, it would be good to
+> provide some quick numbers on those if possible.
+>
+> For example, IIUC microvm uses qboot (as a better alternative than seabios) for
+> fast boot, and qboot has:
+>
+> https://github.com/bonzini/qboot/blob/master/pci.c#L20
+>
+> I'm kind of curious whether qboot will still be used when this series is used
+> with microvm VMs?  Since those are still at least PIO based.
 
-> 
-> > 
-> > smatch warnings:
-> > arch/x86/kvm/x86.c:5248 kvm_vm_ioctl_add_msr_allowlist() error: 'bitmap' dereferencing possible ERR_PTR()
-> > 
-> > # https://github.com/0day-ci/linux/commit/107c87325cf461b7b1bd07bb6ddbaf808a8d8a2a
-> > git remote add linux-review https://github.com/0day-ci/linux git fetch
-> > --no-tags linux-review
-> > Aaron-Lewis/Allow-userspace-to-manage-MSRs/20200819-051903
-> > git checkout 107c87325cf461b7b1bd07bb6ddbaf808a8d8a2a
-> > vim +/bitmap +5248 arch/x86/kvm/x86.c
-> > 
-> > 107c87325cf461 Aaron Lewis 2020-08-18  5181  static int kvm_vm_ioctl_add_msr_allowlist(struct kvm *kvm, void __user *argp)
-> > 107c87325cf461 Aaron Lewis 2020-08-18  5182  {
-> > 107c87325cf461 Aaron Lewis 2020-08-18  5183     struct msr_bitmap_range *ranges = kvm->arch.msr_allowlist_ranges;
-> > 107c87325cf461 Aaron Lewis 2020-08-18  5184     struct kvm_msr_allowlist __user *user_msr_allowlist = argp;
-> > 107c87325cf461 Aaron Lewis 2020-08-18  5185     struct msr_bitmap_range range;
-> > 107c87325cf461 Aaron Lewis 2020-08-18  5186     struct kvm_msr_allowlist kernel_msr_allowlist;
-> > 107c87325cf461 Aaron Lewis 2020-08-18  5187     unsigned long *bitmap = NULL;
-> > 107c87325cf461 Aaron Lewis 2020-08-18  5188     size_t bitmap_size;
-> > 107c87325cf461 Aaron Lewis 2020-08-18  5189     int r = 0;
-> > 107c87325cf461 Aaron Lewis 2020-08-18  5190
-> > 107c87325cf461 Aaron Lewis 2020-08-18  5191     if (copy_from_user(&kernel_msr_allowlist, user_msr_allowlist,
-> > 107c87325cf461 Aaron Lewis 2020-08-18  5192                        sizeof(kernel_msr_allowlist))) {
-> > 107c87325cf461 Aaron Lewis 2020-08-18  5193             r = -EFAULT;
-> > 107c87325cf461 Aaron Lewis 2020-08-18  5194             goto out;
-> > 107c87325cf461 Aaron Lewis 2020-08-18  5195     }
-> > 107c87325cf461 Aaron Lewis 2020-08-18  5196
-> > 107c87325cf461 Aaron Lewis 2020-08-18  5197     bitmap_size = BITS_TO_LONGS(kernel_msr_allowlist.nmsrs) * sizeof(long);
-> >                                                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^n
-> > On 32 bit systems the BITS_TO_LONGS() can integer overflow if
-> > kernel_msr_allowlist.nmsrs is larger than ULONG_MAX - bits_per_long.  In
-> > that case bitmap_size is zero.
-> 
-> Nice catch! It should be enough to ...
-> 
-> > 
-> > 107c87325cf461 Aaron Lewis 2020-08-18  5198     if (bitmap_size > KVM_MSR_ALLOWLIST_MAX_LEN) {
-> 
-> ... add a check for !bitmap_size here as well then, right?
+I'm afraid there is no 'grand plan' for everything at this moment :-(
+For traditional VMs 0.04 sec per boot is negligible and definitely not
+worth adding a feature, memory requirements are also very
+different. When it comes to microvm-style usage things change.
 
-Yup.
+'8193' PCI hole accesses I mention in the PATCH0 blurb are just from
+Linux as I was doing direct kernel boot, we can't get better than that
+(if PCI is in the game of course). Firmware (qboot, seabios,...) can
+only add more. I *think* the plan is to eventually switch them all to
+MMCFG, at least for KVM guests, by default but we need something to put
+to the advertisement. 
 
-regards,
-dan carpenter
+We can, in theory, short circuit PIO in KVM instead but:
+- We will need a complete different API
+- We will never be able to reach the speed of the exit-less 'single 0xff
+page' solution (see my RFC).
+
+-- 
+Vitaly
 
