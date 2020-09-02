@@ -2,310 +2,261 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3644B25A512
-	for <lists+kvm@lfdr.de>; Wed,  2 Sep 2020 07:35:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B404625A6D5
+	for <lists+kvm@lfdr.de>; Wed,  2 Sep 2020 09:32:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726301AbgIBFfi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Sep 2020 01:35:38 -0400
-Received: from mga09.intel.com ([134.134.136.24]:59069 "EHLO mga09.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725774AbgIBFfg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 2 Sep 2020 01:35:36 -0400
-IronPort-SDR: hRqtPpql3UcQQ7G5XwOISIrxJXzX7Bazl8lAMau8uCcUZG2gmYhRxW9m2EXBQLcA9C7upebe9w
- pTGPwsSjPZog==
-X-IronPort-AV: E=McAfee;i="6000,8403,9731"; a="158319634"
-X-IronPort-AV: E=Sophos;i="5.76,381,1592895600"; 
-   d="scan'208";a="158319634"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Sep 2020 22:35:33 -0700
-IronPort-SDR: iNS57JezYLdfAiWG1Je6WEVQSAR4btHh7dXbPizec1y0IqzqgvgeLpuyvjASPaboxTmoDK7tOL
- QcmTmdTE2/Qg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.76,381,1592895600"; 
-   d="scan'208";a="405038746"
-Received: from thomasj2-mobl.ger.corp.intel.com (HELO ubuntu) ([10.252.35.216])
-  by fmsmga001.fm.intel.com with ESMTP; 01 Sep 2020 22:35:29 -0700
-Date:   Wed, 2 Sep 2020 07:35:27 +0200
-From:   Guennadi Liakhovetski <guennadi.liakhovetski@linux.intel.com>
-To:     Mathieu Poirier <mathieu.poirier@linaro.org>
-Cc:     kvm@vger.kernel.org, linux-remoteproc@vger.kernel.org,
-        virtualization@lists.linux-foundation.org,
-        sound-open-firmware@alsa-project.org,
-        Pierre-Louis Bossart <pierre-louis.bossart@linux.intel.com>,
-        Liam Girdwood <liam.r.girdwood@linux.intel.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Ohad Ben-Cohen <ohad@wizery.com>,
-        Bjorn Andersson <bjorn.andersson@linaro.org>,
-        Vincent Whitchurch <vincent.whitchurch@axis.com>
-Subject: Re: [PATCH v6 2/4] rpmsg: move common structures and defines to
- headers
-Message-ID: <20200902053527.GA31486@ubuntu>
-References: <20200901151153.28111-1-guennadi.liakhovetski@linux.intel.com>
- <20200901151153.28111-3-guennadi.liakhovetski@linux.intel.com>
- <20200901172321.GC236120@xps15>
+        id S1726637AbgIBHcm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Sep 2020 03:32:42 -0400
+Received: from smtpout1.mo804.mail-out.ovh.net ([79.137.123.220]:49367 "EHLO
+        smtpout1.mo804.mail-out.ovh.net" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726167AbgIBHcl (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 2 Sep 2020 03:32:41 -0400
+X-Greylist: delayed 390 seconds by postgrey-1.27 at vger.kernel.org; Wed, 02 Sep 2020 03:32:39 EDT
+Received: from mxplan5.mail.ovh.net (unknown [10.109.156.124])
+        by mo804.mail-out.ovh.net (Postfix) with ESMTPS id BBDF25D09F5E;
+        Wed,  2 Sep 2020 09:26:07 +0200 (CEST)
+Received: from kaod.org (37.59.142.100) by DAG4EX1.mxp5.local (172.16.2.31)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2044.4; Wed, 2 Sep 2020
+ 09:26:07 +0200
+Authentication-Results: garm.ovh; auth=pass (GARM-100R00329184cd7-05c0-4851-9ca5-2a03b9df3e53,
+                    725C0B02AD5EA5A9EE23B5614217EC25792C566F) smtp.auth=clg@kaod.org
+Subject: Re: [PATCH] KVM: PPC: Book3S HV: XICS: Replace the 'destroy' method
+ by a 'release' method
+To:     Greg Kurz <groug@kaod.org>, Paul Mackerras <paulus@ozlabs.org>
+CC:     David Gibson <david@gibson.dropbear.id.au>,
+        <kvm-ppc@vger.kernel.org>, <kvm@vger.kernel.org>
+References: <159705408550.1308430.10165736270896374279.stgit@bahia.lan>
+From:   =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <a7e1e908-3460-f6dc-78a8-8f69c031bcb0@kaod.org>
+Date:   Wed, 2 Sep 2020 09:26:06 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200901172321.GC236120@xps15>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <159705408550.1308430.10165736270896374279.stgit@bahia.lan>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [37.59.142.100]
+X-ClientProxiedBy: DAG7EX1.mxp5.local (172.16.2.61) To DAG4EX1.mxp5.local
+ (172.16.2.31)
+X-Ovh-Tracer-GUID: 2a95f13f-f070-4eb3-8752-452ed65dbce5
+X-Ovh-Tracer-Id: 5264426489863768995
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduiedrudefkedguddvtdcutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefuvfhfhffkffgfgggjtgfgihesthekredttdefjeenucfhrhhomhepveorughrihgtpgfnvggpifhorghtvghruceotghlgheskhgrohgurdhorhhgqeenucggtffrrghtthgvrhhnpeejkeduueduveelgeduueegkeelffevledujeetffeivdelvdfgkeeufeduheehfeenucfkpheptddrtddrtddrtddpfeejrdehledrudegvddruddttdenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehmgihplhgrnhehrdhmrghilhdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomheptghlgheskhgrohgurdhorhhgpdhrtghpthhtohepghhrohhugheskhgrohgurdhorhhg
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Mathew,
-
-On Tue, Sep 01, 2020 at 11:23:21AM -0600, Mathieu Poirier wrote:
-> On Tue, Sep 01, 2020 at 05:11:51PM +0200, Guennadi Liakhovetski wrote:
-> > virtio_rpmsg_bus.c keeps RPMsg protocol structure declarations and
-> > common defines like the ones, needed for name-space announcements,
-> > internal. Move them to common headers instead.
-> > 
-> > Signed-off-by: Guennadi Liakhovetski <guennadi.liakhovetski@linux.intel.com>
+On 8/10/20 12:08 PM, Greg Kurz wrote:
+> Similarly to what was done with XICS-on-XIVE and XIVE native KVM devices
+> with commit 5422e95103cf ("KVM: PPC: Book3S HV: XIVE: Replace the 'destroy'
+> method by a 'release' method"), convert the historical XICS KVM device to
+> implement the 'release' method. This is needed to run nested guests with
+> an in-kernel IRQ chip. A typical POWER9 guest can select XICS or XIVE
+> during boot, which requires to be able to destroy and to re-create the
+> KVM device. Only the historical XICS KVM device is available under pseries
+> at the current time and it still uses the legacy 'destroy' method.
 > 
-> I already reviewed this patch and added my RB to it.  Please carry it in your
-> next revision.
-
-But only as long as the patch doesn't change, right? And in fact it did change 
-this time - I renamed the header, moving it under include/linux/rpmsg, actually 
-also following your suggestion. Still, formally the patch has changed, so, I 
-didn't include your "Reviewed-by" in this version. And you anyway would be 
-reviewing the other patches in this series to, right?
-
-Thanks
-Guennadi
-
-> Thanks,
-> Mathieu
+> Switching to 'release' means that vCPUs might still be running when the
+> device is destroyed. In order to avoid potential use-after-free, the
+> kvmppc_xics structure is allocated on first usage and kept around until
+> the VM exits. The same pointer is used each time a KVM XICS device is
+> being created, but this is okay since we only have one per VM.
 > 
-> > ---
-> >  drivers/rpmsg/virtio_rpmsg_bus.c | 78 +-----------------------------
-> >  include/linux/rpmsg/virtio.h     | 83 ++++++++++++++++++++++++++++++++
-> >  include/uapi/linux/rpmsg.h       |  3 ++
-> >  3 files changed, 88 insertions(+), 76 deletions(-)
-> >  create mode 100644 include/linux/rpmsg/virtio.h
-> > 
-> > diff --git a/drivers/rpmsg/virtio_rpmsg_bus.c b/drivers/rpmsg/virtio_rpmsg_bus.c
-> > index 9006fc7f73d0..f39c426f9c5e 100644
-> > --- a/drivers/rpmsg/virtio_rpmsg_bus.c
-> > +++ b/drivers/rpmsg/virtio_rpmsg_bus.c
-> > @@ -19,6 +19,7 @@
-> >  #include <linux/mutex.h>
-> >  #include <linux/of_device.h>
-> >  #include <linux/rpmsg.h>
-> > +#include <linux/rpmsg/virtio.h>
-> >  #include <linux/scatterlist.h>
-> >  #include <linux/slab.h>
-> >  #include <linux/sched.h>
-> > @@ -27,6 +28,7 @@
-> >  #include <linux/virtio_ids.h>
-> >  #include <linux/virtio_config.h>
-> >  #include <linux/wait.h>
-> > +#include <uapi/linux/rpmsg.h>
-> >  
-> >  #include "rpmsg_internal.h"
-> >  
-> > @@ -70,58 +72,6 @@ struct virtproc_info {
-> >  	struct rpmsg_endpoint *ns_ept;
-> >  };
-> >  
-> > -/* The feature bitmap for virtio rpmsg */
-> > -#define VIRTIO_RPMSG_F_NS	0 /* RP supports name service notifications */
-> > -
-> > -/**
-> > - * struct rpmsg_hdr - common header for all rpmsg messages
-> > - * @src: source address
-> > - * @dst: destination address
-> > - * @reserved: reserved for future use
-> > - * @len: length of payload (in bytes)
-> > - * @flags: message flags
-> > - * @data: @len bytes of message payload data
-> > - *
-> > - * Every message sent(/received) on the rpmsg bus begins with this header.
-> > - */
-> > -struct rpmsg_hdr {
-> > -	__virtio32 src;
-> > -	__virtio32 dst;
-> > -	__virtio32 reserved;
-> > -	__virtio16 len;
-> > -	__virtio16 flags;
-> > -	u8 data[];
-> > -} __packed;
-> > -
-> > -/**
-> > - * struct rpmsg_ns_msg - dynamic name service announcement message
-> > - * @name: name of remote service that is published
-> > - * @addr: address of remote service that is published
-> > - * @flags: indicates whether service is created or destroyed
-> > - *
-> > - * This message is sent across to publish a new service, or announce
-> > - * about its removal. When we receive these messages, an appropriate
-> > - * rpmsg channel (i.e device) is created/destroyed. In turn, the ->probe()
-> > - * or ->remove() handler of the appropriate rpmsg driver will be invoked
-> > - * (if/as-soon-as one is registered).
-> > - */
-> > -struct rpmsg_ns_msg {
-> > -	char name[RPMSG_NAME_SIZE];
-> > -	__virtio32 addr;
-> > -	__virtio32 flags;
-> > -} __packed;
-> > -
-> > -/**
-> > - * enum rpmsg_ns_flags - dynamic name service announcement flags
-> > - *
-> > - * @RPMSG_NS_CREATE: a new remote service was just created
-> > - * @RPMSG_NS_DESTROY: a known remote service was just destroyed
-> > - */
-> > -enum rpmsg_ns_flags {
-> > -	RPMSG_NS_CREATE		= 0,
-> > -	RPMSG_NS_DESTROY	= 1,
-> > -};
-> > -
-> >  /**
-> >   * @vrp: the remote processor this channel belongs to
-> >   */
-> > @@ -134,27 +84,6 @@ struct virtio_rpmsg_channel {
-> >  #define to_virtio_rpmsg_channel(_rpdev) \
-> >  	container_of(_rpdev, struct virtio_rpmsg_channel, rpdev)
-> >  
-> > -/*
-> > - * We're allocating buffers of 512 bytes each for communications. The
-> > - * number of buffers will be computed from the number of buffers supported
-> > - * by the vring, upto a maximum of 512 buffers (256 in each direction).
-> > - *
-> > - * Each buffer will have 16 bytes for the msg header and 496 bytes for
-> > - * the payload.
-> > - *
-> > - * This will utilize a maximum total space of 256KB for the buffers.
-> > - *
-> > - * We might also want to add support for user-provided buffers in time.
-> > - * This will allow bigger buffer size flexibility, and can also be used
-> > - * to achieve zero-copy messaging.
-> > - *
-> > - * Note that these numbers are purely a decision of this driver - we
-> > - * can change this without changing anything in the firmware of the remote
-> > - * processor.
-> > - */
-> > -#define MAX_RPMSG_NUM_BUFS	(512)
-> > -#define MAX_RPMSG_BUF_SIZE	(512)
-> > -
-> >  /*
-> >   * Local addresses are dynamically allocated on-demand.
-> >   * We do not dynamically assign addresses from the low 1024 range,
-> > @@ -162,9 +91,6 @@ struct virtio_rpmsg_channel {
-> >   */
-> >  #define RPMSG_RESERVED_ADDRESSES	(1024)
-> >  
-> > -/* Address 53 is reserved for advertising remote services */
-> > -#define RPMSG_NS_ADDR			(53)
-> > -
-> >  static void virtio_rpmsg_destroy_ept(struct rpmsg_endpoint *ept);
-> >  static int virtio_rpmsg_send(struct rpmsg_endpoint *ept, void *data, int len);
-> >  static int virtio_rpmsg_sendto(struct rpmsg_endpoint *ept, void *data, int len,
-> > diff --git a/include/linux/rpmsg/virtio.h b/include/linux/rpmsg/virtio.h
-> > new file mode 100644
-> > index 000000000000..3ede1a4a68a3
-> > --- /dev/null
-> > +++ b/include/linux/rpmsg/virtio.h
-> > @@ -0,0 +1,83 @@
-> > +/* SPDX-License-Identifier: GPL-2.0 */
-> > +
-> > +#ifndef _LINUX_RPMSG_VIRTIO_H
-> > +#define _LINUX_RPMSG_VIRTIO_H
-> > +
-> > +#include <linux/mod_devicetable.h>
-> > +#include <linux/types.h>
-> > +#include <linux/virtio_types.h>
-> > +
-> > +/**
-> > + * struct rpmsg_hdr - common header for all rpmsg messages
-> > + * @src: source address
-> > + * @dst: destination address
-> > + * @reserved: reserved for future use
-> > + * @len: length of payload (in bytes)
-> > + * @flags: message flags
-> > + * @data: @len bytes of message payload data
-> > + *
-> > + * Every message sent(/received) on the rpmsg bus begins with this header.
-> > + */
-> > +struct rpmsg_hdr {
-> > +	__virtio32 src;
-> > +	__virtio32 dst;
-> > +	__virtio32 reserved;
-> > +	__virtio16 len;
-> > +	__virtio16 flags;
-> > +	u8 data[];
-> > +} __packed;
-> > +
-> > +/**
-> > + * struct rpmsg_ns_msg - dynamic name service announcement message
-> > + * @name: name of remote service that is published
-> > + * @addr: address of remote service that is published
-> > + * @flags: indicates whether service is created or destroyed
-> > + *
-> > + * This message is sent across to publish a new service, or announce
-> > + * about its removal. When we receive these messages, an appropriate
-> > + * rpmsg channel (i.e device) is created/destroyed. In turn, the ->probe()
-> > + * or ->remove() handler of the appropriate rpmsg driver will be invoked
-> > + * (if/as-soon-as one is registered).
-> > + */
-> > +struct rpmsg_ns_msg {
-> > +	char name[RPMSG_NAME_SIZE];
-> > +	__virtio32 addr;
-> > +	__virtio32 flags;
-> > +} __packed;
-> > +
-> > +/**
-> > + * enum rpmsg_ns_flags - dynamic name service announcement flags
-> > + *
-> > + * @RPMSG_NS_CREATE: a new remote service was just created
-> > + * @RPMSG_NS_DESTROY: a known remote service was just destroyed
-> > + */
-> > +enum rpmsg_ns_flags {
-> > +	RPMSG_NS_CREATE		= 0,
-> > +	RPMSG_NS_DESTROY	= 1,
-> > +};
-> > +
-> > +/*
-> > + * We're allocating buffers of 512 bytes each for communications. The
-> > + * number of buffers will be computed from the number of buffers supported
-> > + * by the vring, upto a maximum of 512 buffers (256 in each direction).
-> > + *
-> > + * Each buffer will have 16 bytes for the msg header and 496 bytes for
-> > + * the payload.
-> > + *
-> > + * This will utilize a maximum total space of 256KB for the buffers.
-> > + *
-> > + * We might also want to add support for user-provided buffers in time.
-> > + * This will allow bigger buffer size flexibility, and can also be used
-> > + * to achieve zero-copy messaging.
-> > + *
-> > + * Note that these numbers are purely a decision of this driver - we
-> > + * can change this without changing anything in the firmware of the remote
-> > + * processor.
-> > + */
-> > +#define MAX_RPMSG_NUM_BUFS	512
-> > +#define MAX_RPMSG_BUF_SIZE	512
-> > +
-> > +/* Address 53 is reserved for advertising remote services */
-> > +#define RPMSG_NS_ADDR		53
-> > +
-> > +#endif
-> > diff --git a/include/uapi/linux/rpmsg.h b/include/uapi/linux/rpmsg.h
-> > index e14c6dab4223..d669c04ef289 100644
-> > --- a/include/uapi/linux/rpmsg.h
-> > +++ b/include/uapi/linux/rpmsg.h
-> > @@ -24,4 +24,7 @@ struct rpmsg_endpoint_info {
-> >  #define RPMSG_CREATE_EPT_IOCTL	_IOW(0xb5, 0x1, struct rpmsg_endpoint_info)
-> >  #define RPMSG_DESTROY_EPT_IOCTL	_IO(0xb5, 0x2)
-> >  
-> > +/* The feature bitmap for virtio rpmsg */
-> > +#define VIRTIO_RPMSG_F_NS	0 /* RP supports name service notifications */
-> > +
-> >  #endif
-> > -- 
-> > 2.28.0
-> > 
+> Clear the ICP of each vCPU with vcpu->mutex held. This ensures that the
+> next time the vCPU resumes execution, it won't be going into the XICS
+> code anymore.
+> 
+> Signed-off-by: Greg Kurz <groug@kaod.org>
+
+Reviewed-by: Cédric Le Goater <clg@kaod.org>
+
+and on a P8 host, 
+
+Tested-by: Cédric Le Goater <clg@kaod.org>
+
+Thanks,
+
+C. 
+
+> ---
+>  arch/powerpc/include/asm/kvm_host.h |    1 
+>  arch/powerpc/kvm/book3s.c           |    4 +-
+>  arch/powerpc/kvm/book3s_xics.c      |   86 ++++++++++++++++++++++++++++-------
+>  3 files changed, 72 insertions(+), 19 deletions(-)
+> 
+> diff --git a/arch/powerpc/include/asm/kvm_host.h b/arch/powerpc/include/asm/kvm_host.h
+> index e020d269416d..974adda2ec94 100644
+> --- a/arch/powerpc/include/asm/kvm_host.h
+> +++ b/arch/powerpc/include/asm/kvm_host.h
+> @@ -325,6 +325,7 @@ struct kvm_arch {
+>  #endif
+>  #ifdef CONFIG_KVM_XICS
+>  	struct kvmppc_xics *xics;
+> +	struct kvmppc_xics *xics_device;
+>  	struct kvmppc_xive *xive;    /* Current XIVE device in use */
+>  	struct {
+>  		struct kvmppc_xive *native;
+> diff --git a/arch/powerpc/kvm/book3s.c b/arch/powerpc/kvm/book3s.c
+> index 41fedec69ac3..56618c2770e1 100644
+> --- a/arch/powerpc/kvm/book3s.c
+> +++ b/arch/powerpc/kvm/book3s.c
+> @@ -878,13 +878,15 @@ void kvmppc_core_destroy_vm(struct kvm *kvm)
+>  
+>  #ifdef CONFIG_KVM_XICS
+>  	/*
+> -	 * Free the XIVE devices which are not directly freed by the
+> +	 * Free the XIVE and XICS devices which are not directly freed by the
+>  	 * device 'release' method
+>  	 */
+>  	kfree(kvm->arch.xive_devices.native);
+>  	kvm->arch.xive_devices.native = NULL;
+>  	kfree(kvm->arch.xive_devices.xics_on_xive);
+>  	kvm->arch.xive_devices.xics_on_xive = NULL;
+> +	kfree(kvm->arch.xics_device);
+> +	kvm->arch.xics_device = NULL;
+>  #endif /* CONFIG_KVM_XICS */
+>  }
+>  
+> diff --git a/arch/powerpc/kvm/book3s_xics.c b/arch/powerpc/kvm/book3s_xics.c
+> index 381bf8dea193..5fee5a11550d 100644
+> --- a/arch/powerpc/kvm/book3s_xics.c
+> +++ b/arch/powerpc/kvm/book3s_xics.c
+> @@ -1334,47 +1334,97 @@ static int xics_has_attr(struct kvm_device *dev, struct kvm_device_attr *attr)
+>  	return -ENXIO;
+>  }
+>  
+> -static void kvmppc_xics_free(struct kvm_device *dev)
+> +/*
+> + * Called when device fd is closed. kvm->lock is held.
+> + */
+> +static void kvmppc_xics_release(struct kvm_device *dev)
+>  {
+>  	struct kvmppc_xics *xics = dev->private;
+>  	int i;
+>  	struct kvm *kvm = xics->kvm;
+> +	struct kvm_vcpu *vcpu;
+> +
+> +	pr_devel("Releasing xics device\n");
+> +
+> +	/*
+> +	 * Since this is the device release function, we know that
+> +	 * userspace does not have any open fd referring to the
+> +	 * device.  Therefore there can not be any of the device
+> +	 * attribute set/get functions being executed concurrently,
+> +	 * and similarly, the connect_vcpu and set/clr_mapped
+> +	 * functions also cannot be being executed.
+> +	 */
+>  
+>  	debugfs_remove(xics->dentry);
+>  
+> +	/*
+> +	 * We should clean up the vCPU interrupt presenters first.
+> +	 */
+> +	kvm_for_each_vcpu(i, vcpu, kvm) {
+> +		/*
+> +		 * Take vcpu->mutex to ensure that no one_reg get/set ioctl
+> +		 * (i.e. kvmppc_xics_[gs]et_icp) can be done concurrently.
+> +		 * Holding the vcpu->mutex also means that execution is
+> +		 * excluded for the vcpu until the ICP was freed. When the vcpu
+> +		 * can execute again, vcpu->arch.icp and vcpu->arch.irq_type
+> +		 * have been cleared and the vcpu will not be going into the
+> +		 * XICS code anymore.
+> +		 */
+> +		mutex_lock(&vcpu->mutex);
+> +		kvmppc_xics_free_icp(vcpu);
+> +		mutex_unlock(&vcpu->mutex);
+> +	}
+> +
+>  	if (kvm)
+>  		kvm->arch.xics = NULL;
+>  
+> -	for (i = 0; i <= xics->max_icsid; i++)
+> +	for (i = 0; i <= xics->max_icsid; i++) {
+>  		kfree(xics->ics[i]);
+> -	kfree(xics);
+> +		xics->ics[i] = NULL;
+> +	}
+> +	/*
+> +	 * A reference of the kvmppc_xics pointer is now kept under
+> +	 * the xics_device pointer of the machine for reuse. It is
+> +	 * freed when the VM is destroyed for now until we fix all the
+> +	 * execution paths.
+> +	 */
+>  	kfree(dev);
+>  }
+>  
+> +static struct kvmppc_xics *kvmppc_xics_get_device(struct kvm *kvm)
+> +{
+> +	struct kvmppc_xics **kvm_xics_device = &kvm->arch.xics_device;
+> +	struct kvmppc_xics *xics = *kvm_xics_device;
+> +
+> +	if (!xics) {
+> +		xics = kzalloc(sizeof(*xics), GFP_KERNEL);
+> +		*kvm_xics_device = xics;
+> +	} else {
+> +		memset(xics, 0, sizeof(*xics));
+> +	}
+> +
+> +	return xics;
+> +}
+> +
+>  static int kvmppc_xics_create(struct kvm_device *dev, u32 type)
+>  {
+>  	struct kvmppc_xics *xics;
+>  	struct kvm *kvm = dev->kvm;
+> -	int ret = 0;
+>  
+> -	xics = kzalloc(sizeof(*xics), GFP_KERNEL);
+> +	pr_devel("Creating xics for partition\n");
+> +
+> +	/* Already there ? */
+> +	if (kvm->arch.xics)
+> +		return -EEXIST;
+> +
+> +	xics = kvmppc_xics_get_device(kvm);
+>  	if (!xics)
+>  		return -ENOMEM;
+>  
+>  	dev->private = xics;
+>  	xics->dev = dev;
+>  	xics->kvm = kvm;
+> -
+> -	/* Already there ? */
+> -	if (kvm->arch.xics)
+> -		ret = -EEXIST;
+> -	else
+> -		kvm->arch.xics = xics;
+> -
+> -	if (ret) {
+> -		kfree(xics);
+> -		return ret;
+> -	}
+> +	kvm->arch.xics = xics;
+>  
+>  #ifdef CONFIG_KVM_BOOK3S_HV_POSSIBLE
+>  	if (cpu_has_feature(CPU_FTR_ARCH_206) &&
+> @@ -1399,7 +1449,7 @@ struct kvm_device_ops kvm_xics_ops = {
+>  	.name = "kvm-xics",
+>  	.create = kvmppc_xics_create,
+>  	.init = kvmppc_xics_init,
+> -	.destroy = kvmppc_xics_free,
+> +	.release = kvmppc_xics_release,
+>  	.set_attr = xics_set_attr,
+>  	.get_attr = xics_get_attr,
+>  	.has_attr = xics_has_attr,
+> @@ -1415,7 +1465,7 @@ int kvmppc_xics_connect_vcpu(struct kvm_device *dev, struct kvm_vcpu *vcpu,
+>  		return -EPERM;
+>  	if (xics->kvm != vcpu->kvm)
+>  		return -EPERM;
+> -	if (vcpu->arch.irq_type)
+> +	if (vcpu->arch.irq_type != KVMPPC_IRQ_DEFAULT)
+>  		return -EBUSY;
+>  
+>  	r = kvmppc_xics_create_icp(vcpu, xcpu);
+> 
+> 
+
