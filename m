@@ -2,131 +2,135 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9531E25B3BC
-	for <lists+kvm@lfdr.de>; Wed,  2 Sep 2020 20:32:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B494525B4B3
+	for <lists+kvm@lfdr.de>; Wed,  2 Sep 2020 21:47:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728027AbgIBSca (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Sep 2020 14:32:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49978 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726882AbgIBScW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 2 Sep 2020 14:32:22 -0400
-Received: from mail-ot1-x342.google.com (mail-ot1-x342.google.com [IPv6:2607:f8b0:4864:20::342])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 52970C061244
-        for <kvm@vger.kernel.org>; Wed,  2 Sep 2020 11:32:22 -0700 (PDT)
-Received: by mail-ot1-x342.google.com with SMTP id g96so125423otb.12
-        for <kvm@vger.kernel.org>; Wed, 02 Sep 2020 11:32:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=GVlNlS2k5mluzHkbh+REDKZGmZjyzZPFj0vaaSFv3+8=;
-        b=oB2TnGM1k26yck6CO7tZVUPBu1aJgr9CU5aRqsnY5enWd9YByRurbRRuj3xsheWdyH
-         wWzG8GHbn7q/fUwCgV7zsqEpG20sgX4ypFqRsiKt83CyqNAYVhvRLZ1kYvcciOXwmD/M
-         B4q0QSljkTKGTHuIt1hiFwS+8e6ct/8G2rBgxp4Otedd/92I+OtwuYoVh72jgwR5UCpg
-         D46scCPp8a0fYralg4n0BP4tlo77WivvJTkNT1GeDS+spvPwVvOSlHoKSIA2KUVJX2hi
-         7hKezmcn/9Y7YH625YATD4DCfro3YkdDT16V8XW03sPmw370l+lSlqXgjbbIuEOVyvYc
-         X+Zw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=GVlNlS2k5mluzHkbh+REDKZGmZjyzZPFj0vaaSFv3+8=;
-        b=lqjYlOLDhZcQrPM0NZdfH+g7SGBU+k78aTChJdeqDttuAPTe+gfIX/OsSKFDoCQMGr
-         cxiI8/Yd3QCbVE/YWyIViWagS30L2kpj2yaIMeezzZKtLHfWa/GBMWyTOSDrM3qmdqb+
-         xG2qDWKBWBv4NoSS8QFuJTUj+5WBPjWuL8Dln98c8VXpAoZZbS00qwq9vGIfIkTRS3o9
-         FI1STMBq07qmohajlzrimrUiCNX7zAsnReDKD3hi6UoizDtz4qEHKKOgj0fGHGFN6ADR
-         nX+Jx5VbpLgWbgP+tkUU0FojDqwXBvn1NWrdzhtnFwrTBBadX5DJKfpUCtw/O5YZnO2R
-         Fn6A==
-X-Gm-Message-State: AOAM531vgxbpdwtnnoTOrae4tIz/8T/BuiSp66wAU2+lfewTAWf6BSY8
-        sIWfM3mqXCxuJrtyMuMAWslzoXi4lQxsF1JGOgFPag==
-X-Google-Smtp-Source: ABdhPJynpOH5BJSLtoU3ji8j/X/Rq6PhCaNm4YZ3b4i9pTummuZCDJ3bPEZ5AKeGREsQNxxcGaRpbxV1aWdjU9H1/Q0=
-X-Received: by 2002:a05:6830:18ca:: with SMTP id v10mr6508725ote.295.1599071541040;
- Wed, 02 Sep 2020 11:32:21 -0700 (PDT)
-MIME-Version: 1.0
-References: <20200828085622.8365-1-chenyi.qiang@intel.com> <20200828085622.8365-4-chenyi.qiang@intel.com>
- <CALMp9eT1makVq46TB-EtTPiz=Z_2DfhudJekrtheSsmwBc4pZA@mail.gmail.com> <20200902181654.GH11695@sjchrist-ice>
-In-Reply-To: <20200902181654.GH11695@sjchrist-ice>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Wed, 2 Sep 2020 11:32:09 -0700
-Message-ID: <CALMp9eSv3SrsJigB6KQg+dyS9GmYYCbC5v6QCx3f09951VZidA@mail.gmail.com>
-Subject: Re: [PATCH 3/5] KVM: nVMX: Update VMX controls MSR according to guest
- CPUID after setting VMX MSRs
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     Chenyi Qiang <chenyi.qiang@intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Xiaoyao Li <xiaoyao.li@intel.com>,
-        kvm list <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+        id S1726794AbgIBTrG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Sep 2020 15:47:06 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:10742 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726594AbgIBTq5 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 2 Sep 2020 15:46:57 -0400
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 082JhIX4136003;
+        Wed, 2 Sep 2020 15:46:50 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id; s=pp1;
+ bh=OwSxU4NAP7jStdtuTC+FUhSDcDea3J45JeuxRMcK9oM=;
+ b=UGLT4W2aihJmJS5eEAlBU8lJHcgRkZbJ5A5XQwEn+Jg7YHZBlrQuO2Hh6aNcL806eB+b
+ 2Hc17+uHeSFnOTHZfde9MPcyeeQZ5wEPFXZ63w2//jJM4qWDdA4nFji0LQFgmWpbRIit
+ 6SziDRAe8KVPqIb4C+Wckx9PLlF+6E5OAkoqC8kloeq7CZzJaqhQONUJX3bVNAi7dhSa
+ 8hzLEizZBaxZFQkf0uh6J+nnYzBn07cAj4N840K1Eh8bIVD7T1z+riO+qXK9nwA/+X6T
+ s8iPzp0/SnQB4lgN8cwP5Qd7bdlJqjYRmOxWuOkgSKu/SVC48sFVHERlOT6iLWnjomri GA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 33ahswg3fr-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 02 Sep 2020 15:46:45 -0400
+Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 082Jhe7L136478;
+        Wed, 2 Sep 2020 15:46:44 -0400
+Received: from ppma01wdc.us.ibm.com (fd.55.37a9.ip4.static.sl-reverse.com [169.55.85.253])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 33ahswg3fd-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 02 Sep 2020 15:46:44 -0400
+Received: from pps.filterd (ppma01wdc.us.ibm.com [127.0.0.1])
+        by ppma01wdc.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 082JfMA8012026;
+        Wed, 2 Sep 2020 19:46:43 GMT
+Received: from b01cxnp22034.gho.pok.ibm.com (b01cxnp22034.gho.pok.ibm.com [9.57.198.24])
+        by ppma01wdc.us.ibm.com with ESMTP id 337en9aejg-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 02 Sep 2020 19:46:43 +0000
+Received: from b01ledav001.gho.pok.ibm.com (b01ledav001.gho.pok.ibm.com [9.57.199.106])
+        by b01cxnp22034.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 082JkhQn42336556
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 2 Sep 2020 19:46:43 GMT
+Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 3E34F2805C;
+        Wed,  2 Sep 2020 19:46:43 +0000 (GMT)
+Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 95BCC2805A;
+        Wed,  2 Sep 2020 19:46:40 +0000 (GMT)
+Received: from oc4221205838.ibm.com (unknown [9.163.10.164])
+        by b01ledav001.gho.pok.ibm.com (Postfix) with ESMTP;
+        Wed,  2 Sep 2020 19:46:40 +0000 (GMT)
+From:   Matthew Rosato <mjrosato@linux.ibm.com>
+To:     alex.williamson@redhat.com, bhelgaas@google.com
+Cc:     schnelle@linux.ibm.com, pmorel@linux.ibm.com, mpe@ellerman.id.au,
+        oohall@gmail.com, cohuck@redhat.com, kevin.tian@intel.com,
+        linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, linux-pci@vger.kernel.org
+Subject: [PATCH v4 0/3] vfio/pci: Restore MMIO access for s390 detached VFs
+Date:   Wed,  2 Sep 2020 15:46:33 -0400
+Message-Id: <1599075996-9826-1-git-send-email-mjrosato@linux.ibm.com>
+X-Mailer: git-send-email 1.8.3.1
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
+ definitions=2020-09-02_14:2020-09-02,2020-09-02 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 adultscore=0
+ phishscore=0 bulkscore=0 suspectscore=0 malwarescore=0 mlxlogscore=845
+ mlxscore=0 lowpriorityscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2006250000 definitions=main-2009020178
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Sep 2, 2020 at 11:16 AM Sean Christopherson
-<sean.j.christopherson@intel.com> wrote:
->
-> On Fri, Aug 28, 2020 at 01:39:39PM -0700, Jim Mattson wrote:
-> > On Fri, Aug 28, 2020 at 1:54 AM Chenyi Qiang <chenyi.qiang@intel.com> wrote:
-> > >
-> > > Update the fields (i.e. VM_{ENTRY_LOAD, EXIT_CLEAR}_BNDCFGS and
-> > > VM_{ENTRY, EXIT}_LOAD_IA32_PERF_GLOBAL_CTRL) in
-> > > nested MSR_IA32_VMX_TRUE_{ENTRY, EXIT}_CTLS according to guest CPUID
-> > > when user space initializes the features MSRs. Regardless of the order
-> > > of SET_CPUID and SET_MSRS from the user space, do the update to avoid
-> > > MSR values overriding.
-> > >
-> > > Signed-off-by: Chenyi Qiang <chenyi.qiang@intel.com>
-> > > ---
-> > >  arch/x86/kvm/vmx/vmx.c | 6 +++++-
-> > >  1 file changed, 5 insertions(+), 1 deletion(-)
-> > >
-> > > diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> > > index 819c185adf09..f9664ccc003b 100644
-> > > --- a/arch/x86/kvm/vmx/vmx.c
-> > > +++ b/arch/x86/kvm/vmx/vmx.c
-> > > @@ -345,6 +345,7 @@ static bool guest_state_valid(struct kvm_vcpu *vcpu);
-> > >  static u32 vmx_segment_access_rights(struct kvm_segment *var);
-> > >  static __always_inline void vmx_disable_intercept_for_msr(unsigned long *msr_bitmap,
-> > >                                                           u32 msr, int type);
-> > > +static void nested_vmx_entry_exit_ctls_update(struct kvm_vcpu *vcpu);
-> > >
-> > >  void vmx_vmexit(void);
-> > >
-> > > @@ -2161,7 +2162,10 @@ static int vmx_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
-> > >                         return 1; /* they are read-only */
-> > >                 if (!nested_vmx_allowed(vcpu))
-> > >                         return 1;
-> > > -               return vmx_set_vmx_msr(vcpu, msr_index, data);
-> > > +               ret = vmx_set_vmx_msr(vcpu, msr_index, data);
-> > > +               nested_vmx_pmu_entry_exit_ctls_update(vcpu);
-> > > +               nested_vmx_entry_exit_ctls_update(vcpu);
-> > > +               break;
-> >
-> > Now I see what you're doing. This commit should probably come before
-> > the previous commit, so that at no point in the series can userspace
-> > set VMX MSR bits that should be cleared based on the guest CPUID.
-> >
-> > There's an ABI change here: userspace may no longer get -EINVAL if it
-> > tries to set an illegal VMX MSR bit. Instead, some illegal bits are
-> > silently cleared. Moreover, these functions will potentially set VMX
-> > MSR bits that userspace has just asked to clear.
->
-> Can we simply remove nested_vmx_entry_exit_ctls_update() and
-> nested_vmx_pmu_entry_exit_ctls_update()?  It's userspace's responsibility
-> to present a valid vCPU model to the guest, I don't see any reason to
-> silently tweak the VMX MSRs unless allowing the bogus config breaks KVM.
-> E.g. there are many more controls that are non-sensical without "native"
-> support for the associated feature.
+Since commit abafbc551fdd ("vfio-pci: Invalidate mmaps and block MMIO
+access on disabled memory") VFIO now rejects guest MMIO access when the
+PCI_COMMAND_MEMORY (MSE) bit is OFF.  This is however not the case for
+VFs (fixed in commit ebfa440ce38b ("vfio/pci: Fix SR-IOV VF handling
+with MMIO blocking")).  Furthermore, on s390 where we always run with at
+least a bare-metal hypervisor (LPAR) PCI_COMMAND_MEMORY, unlike Device/
+Vendor IDs and BARs, is not emulated when VFs are passed-through to the
+OS independently.
 
-We might need a test for kvm_mpx_supported() here:
+Based upon Bjorn's most recent comment [1], I investigated the notion of
+setting is_virtfn=1 for VFs passed-through to Linux and not linked to a
+parent PF (referred to as a 'detached VF' in my prior post).  However,
+we rapidly run into issues on how to treat an is_virtfn device with no
+linked PF. Further complicating the issue is when you consider the guest
+kernel has a passed-through VF but has CONFIG_PCI_IOV=n as in many 
+locations is_virtfn checking is ifdef'd out altogether and the device is
+assumed to be an independent PCI function.
 
-/* If not VM_EXIT_CLEAR_BNDCFGS, the L2 value propagates to L1.  */
-if (vmcs12->vm_exit_controls & VM_EXIT_CLEAR_BNDCFGS)
-        vmcs_write64(GUEST_BNDCFGS, 0);
+The decision made by VFIO whether to require or emulate a PCI feature 
+(in this case PCI_COMMAND_MEMORY) is based upon the knowledge it has 
+about the device, including implicit expectations of what/is not
+emulated below VFIO. (ex: is it safe to read vendor/id from config
+space?) -- Our firmware layer attempts similar behavior by emulating
+things such as vendor/id/BAR access - without these an unlinked VF would
+not be usable. But what is or is not emulated by the layer below may be
+different based upon which entity is providing the emulation (vfio,
+LPAR, some other hypervisor)
 
-BTW, where does the L2 value propagate to L1 if not VM_EXIT_CLEAR_BNDCFGS?
+So, the proposal here aims to fix the immediate issue of s390
+pass-through VFs becoming suddenly unusable by vfio by using a dev_flags
+bit to identify a VF feature that we know is hardwired to 0 for any
+VF (PCI_COMMAND_MEMORY) and de-coupling the need for emulating
+PCI_COMMAND_MEMORY from the is_virtfn flag. The exact scope of is_virtfn
+and physfn for bare-metal vs guest scenarios and identifying what
+features are / are not emulated by the lower-level hypervisors is a much
+bigger discussion independent of this limited proposal.
+
+Changes from v3:
+- Propose a dev_flags model for the MSE bit
+- Set the bit for typical iov linking
+- Also set the bit for s390 VFs (linked and unlinked)
+- Modify vfio-pci to look at the dev_flags bit instead of is_virtfn
+
+[1]: https://marc.info/?l=linux-pci&m=159856041930022&w=2
+
+Matthew Rosato (3):
+  PCI/IOV: Mark VFs as not implementing MSE bit
+  s390/pci: Mark all VFs as not implementing MSE bit
+  vfio/pci: Decouple MSE bit checks from is_virtfn
+
+ arch/s390/pci/pci_bus.c            |  5 +++--
+ drivers/pci/iov.c                  |  1 +
+ drivers/vfio/pci/vfio_pci_config.c | 20 +++++++++++++-------
+ include/linux/pci.h                |  2 ++
+ 4 files changed, 19 insertions(+), 9 deletions(-)
+
+-- 
+1.8.3.1
+
