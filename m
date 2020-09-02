@@ -2,38 +2,38 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9338625AB90
-	for <lists+kvm@lfdr.de>; Wed,  2 Sep 2020 14:59:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CBD1E25AB96
+	for <lists+kvm@lfdr.de>; Wed,  2 Sep 2020 15:00:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726726AbgIBM7y (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Sep 2020 08:59:54 -0400
-Received: from smtp-fw-6002.amazon.com ([52.95.49.90]:24278 "EHLO
-        smtp-fw-6002.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726124AbgIBM7v (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 2 Sep 2020 08:59:51 -0400
+        id S1727080AbgIBNAU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Sep 2020 09:00:20 -0400
+Received: from smtp-fw-9101.amazon.com ([207.171.184.25]:52785 "EHLO
+        smtp-fw-9101.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726966AbgIBNAG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 2 Sep 2020 09:00:06 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1599051590; x=1630587590;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=ICDE6RfR+JH0kcoy+iWotRzmn0cioWZdR6Llakzqiz8=;
-  b=sLBt0oo8A1CcTO7SjlIdeuoranP/re6rFKisLOXWU1btF1t8KhPwTkjH
-   3jemwKRh4HFA/2Nj3ANeGQsVBdWxd33Cdv6+//2Nmemmiukbkct+q3zog
-   e9urpvADwsHqVsdi3o5jyQMgeRctjxIxSqHiz6pFi9/IdHnqir3ad4XG2
-   w=;
+  t=1599051607; x=1630587607;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=6Ha37pneV5eOVZUeuWC7QqFvJ7Q9pmzplIGAkkuelCw=;
+  b=GvCD086USmpxj/EscsuTR0DYmiVSpdsfml9HZXH30QJwgCJL4EbHuHo7
+   7VyLpKt9LRiKugaXtIUpOpwYYd0AobOKig28yCw8h40xOAh66KUkjakiM
+   +wRBd9gARgkH+FFL24qH7a33AjYQJMlZj2Z3ZFTDApg5iebtjNS292TQX
+   I=;
 X-IronPort-AV: E=Sophos;i="5.76,383,1592870400"; 
-   d="scan'208";a="51551893"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-2c-c6afef2e.us-west-2.amazon.com) ([10.43.8.6])
-  by smtp-border-fw-out-6002.iad6.amazon.com with ESMTP; 02 Sep 2020 12:59:48 +0000
-Received: from EX13MTAUWC001.ant.amazon.com (pdx4-ws-svc-p6-lb7-vlan2.pdx.amazon.com [10.170.41.162])
-        by email-inbound-relay-2c-c6afef2e.us-west-2.amazon.com (Postfix) with ESMTPS id 141F6A22A4;
-        Wed,  2 Sep 2020 12:59:47 +0000 (UTC)
+   d="scan'208";a="64794681"
+Received: from sea32-co-svc-lb4-vlan3.sea.corp.amazon.com (HELO email-inbound-relay-2c-397e131e.us-west-2.amazon.com) ([10.47.23.38])
+  by smtp-border-fw-out-9101.sea19.amazon.com with ESMTP; 02 Sep 2020 12:59:55 +0000
+Received: from EX13MTAUWC001.ant.amazon.com (pdx4-ws-svc-p6-lb7-vlan3.pdx.amazon.com [10.170.41.166])
+        by email-inbound-relay-2c-397e131e.us-west-2.amazon.com (Postfix) with ESMTPS id 73480A25F4;
+        Wed,  2 Sep 2020 12:59:53 +0000 (UTC)
 Received: from EX13D20UWC002.ant.amazon.com (10.43.162.163) by
  EX13MTAUWC001.ant.amazon.com (10.43.162.135) with Microsoft SMTP Server (TLS)
- id 15.0.1497.2; Wed, 2 Sep 2020 12:59:46 +0000
+ id 15.0.1497.2; Wed, 2 Sep 2020 12:59:53 +0000
 Received: from u79c5a0a55de558.ant.amazon.com (10.43.161.145) by
  EX13D20UWC002.ant.amazon.com (10.43.162.163) with Microsoft SMTP Server (TLS)
- id 15.0.1497.2; Wed, 2 Sep 2020 12:59:42 +0000
+ id 15.0.1497.2; Wed, 2 Sep 2020 12:59:49 +0000
 From:   Alexander Graf <graf@amazon.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 CC:     Jonathan Corbet <corbet@lwn.net>,
@@ -47,10 +47,12 @@ CC:     Jonathan Corbet <corbet@lwn.net>,
         Dan Carpenter <dan.carpenter@oracle.com>,
         <kvm@vger.kernel.org>, <linux-doc@vger.kernel.org>,
         <linux-kernel@vger.kernel.org>
-Subject: [PATCH v6 0/7] Allow user space to restrict and augment MSR emulation
-Date:   Wed, 2 Sep 2020 14:59:28 +0200
-Message-ID: <20200902125935.20646-1-graf@amazon.com>
+Subject: [PATCH v6 2/7] KVM: x86: Add infrastructure for MSR filtering
+Date:   Wed, 2 Sep 2020 14:59:30 +0200
+Message-ID: <20200902125935.20646-3-graf@amazon.com>
 X-Mailer: git-send-email 2.28.0.394.ge197136389
+In-Reply-To: <20200902125935.20646-1-graf@amazon.com>
+References: <20200902125935.20646-1-graf@amazon.com>
 MIME-Version: 1.0
 X-Originating-IP: [10.43.161.145]
 X-ClientProxiedBy: EX13D08UWB004.ant.amazon.com (10.43.161.232) To
@@ -62,122 +64,71 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-While tying to add support for the MSR_CORE_THREAD_COUNT MSR in KVM,
-I realized that we were still in a world where user space has no control
-over what happens with MSR emulation in KVM.
+In the following commits we will add pieces of MSR filtering.
+To ensure that code compiles even with the feature half-merged, let's add
+a few stubs and struct definitions before the real patches start.
 
-That is bad for multiple reasons. In my case, I wanted to emulate the
-MSR in user space, because it's a CPU specific register that does not
-exist on older CPUs and that really only contains informational data that
-is on the package level, so it's a natural fit for user space to provide
-it.
+Signed-off-by: Alexander Graf <graf@amazon.com>
+---
+ arch/x86/include/asm/kvm_host.h | 1 +
+ arch/x86/include/uapi/asm/kvm.h | 2 ++
+ arch/x86/kvm/x86.c              | 6 ++++++
+ arch/x86/kvm/x86.h              | 1 +
+ 4 files changed, 10 insertions(+)
 
-However, it is also bad on a platform compatibility level. Currrently,
-KVM has no way to expose different MSRs based on the selected target CPU
-type.
-
-This patch set introduces a way for user space to indicate to KVM which
-MSRs should be handled in kernel space. With that, we can solve part of
-the platform compatibility story. Or at least we can not handle AMD specific
-MSRs on an Intel platform and vice versa.
-
-In addition, it introduces a way for user space to get into the loop
-when an MSR access would generate a #GP fault, such as when KVM finds an
-MSR that is not handled by the in-kernel MSR emulation or when the guest
-is trying to access reserved registers.
-
-In combination with filtering, user space trapping allows us to emulate
-arbitrary MSRs in user space, paving the way for target CPU specific MSR
-implementations from user space.
-
-v1 -> v2:
-
-  - s/ETRAP_TO_USER_SPACE/ENOENT/g
-  - deflect all #GP injection events to user space, not just unknown MSRs.
-    That was we can also deflect allowlist errors later
-  - fix emulator case
-  - new patch: KVM: x86: Introduce allow list for MSR emulation
-  - new patch: KVM: selftests: Add test for user space MSR handling
-
-v2 -> v3:
-
-  - return r if r == X86EMUL_IO_NEEDED
-  - s/KVM_EXIT_RDMSR/KVM_EXIT_X86_RDMSR/g
-  - s/KVM_EXIT_WRMSR/KVM_EXIT_X86_WRMSR/g
-  - Use complete_userspace_io logic instead of reply field
-  - Simplify trapping code
-  - document flags for KVM_X86_ADD_MSR_ALLOWLIST
-  - generalize exit path, always unlock when returning
-  - s/KVM_CAP_ADD_MSR_ALLOWLIST/KVM_CAP_X86_MSR_ALLOWLIST/g
-  - Add KVM_X86_CLEAR_MSR_ALLOWLIST
-  - Add test to clear whitelist
-  - Adjust to reply-less API
-  - Fix asserts
-  - Actually trap on MSR_IA32_POWER_CTL writes
-
-v3 -> v4:
-
-  - Mention exit reasons in re-enter mandatory section of API documentation
-  - Clear padding bytes
-  - Generalize get/set deflect functions
-  - Remove redundant pending_user_msr field
-  - lock allow check and clearing
-  - free bitmaps on clear
-
-v4 -> v5:
-
-  - use srcu 
-
-v5 -> v6:
-
-  - Switch from allow list to filtering API with explicit fallback option
-  - Support and test passthrough MSR filtering
-  - Check for filter exit reason
-  - Add .gitignore
-  - send filter change notification
-  - change to atomic set_msr_filter ioctl with fallback flag
-  - use EPERM for filter blocks
-  - add bit for MSR user space deflection
-  - check for overflow of BITS_TO_LONGS (thanks Dan Carpenter!)
-  - s/int i;/u32 i;/
-  - remove overlap check
-  - Introduce exit reason mask to allow for future expansion and filtering
-  - s/emul_to_vcpu(ctxt)/vcpu/
-  - imported patch: KVM: x86: Prepare MSR bitmaps for userspace tracked MSRs
-  - new patch: KVM: x86: Add infrastructure for MSR filtering
-  - new patch: KVM: x86: SVM: Prevent MSR passthrough when MSR access is denied
-  - new patch: KVM: x86: VMX: Prevent MSR passthrough when MSR access is denied
-
-Aaron Lewis (1):
-  KVM: x86: Prepare MSR bitmaps for userspace tracked MSRs
-
-Alexander Graf (6):
-  KVM: x86: Deflect unknown MSR accesses to user space
-  KVM: x86: Add infrastructure for MSR filtering
-  KVM: x86: SVM: Prevent MSR passthrough when MSR access is denied
-  KVM: x86: VMX: Prevent MSR passthrough when MSR access is denied
-  KVM: x86: Introduce MSR filtering
-  KVM: selftests: Add test for user space MSR handling
-
- Documentation/virt/kvm/api.rst                | 176 +++++++++-
- arch/x86/include/asm/kvm_host.h               |  18 ++
- arch/x86/include/uapi/asm/kvm.h               |  19 ++
- arch/x86/kvm/emulate.c                        |  18 +-
- arch/x86/kvm/svm/svm.c                        | 122 +++++--
- arch/x86/kvm/svm/svm.h                        |   7 +
- arch/x86/kvm/vmx/nested.c                     |   2 +-
- arch/x86/kvm/vmx/vmx.c                        | 303 ++++++++++++------
- arch/x86/kvm/vmx/vmx.h                        |   9 +-
- arch/x86/kvm/x86.c                            | 268 +++++++++++++++-
- arch/x86/kvm/x86.h                            |   1 +
- include/trace/events/kvm.h                    |   2 +-
- include/uapi/linux/kvm.h                      |  17 +
- tools/testing/selftests/kvm/.gitignore        |   1 +
- tools/testing/selftests/kvm/Makefile          |   1 +
- .../selftests/kvm/x86_64/user_msr_test.c      | 224 +++++++++++++
- 16 files changed, 1056 insertions(+), 132 deletions(-)
- create mode 100644 tools/testing/selftests/kvm/x86_64/user_msr_test.c
-
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index 6608c8efbfa1..a9e3cc13bca6 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -1272,6 +1272,7 @@ struct kvm_x86_ops {
+ 	int (*enable_direct_tlbflush)(struct kvm_vcpu *vcpu);
+ 
+ 	void (*migrate_timers)(struct kvm_vcpu *vcpu);
++	void (*msr_filter_changed)(struct kvm_vcpu *vcpu);
+ };
+ 
+ struct kvm_x86_nested_ops {
+diff --git a/arch/x86/include/uapi/asm/kvm.h b/arch/x86/include/uapi/asm/kvm.h
+index 0780f97c1850..50650cfd235a 100644
+--- a/arch/x86/include/uapi/asm/kvm.h
++++ b/arch/x86/include/uapi/asm/kvm.h
+@@ -192,6 +192,8 @@ struct kvm_msr_list {
+ 	__u32 indices[0];
+ };
+ 
++#define KVM_MSR_ALLOW_READ  (1 << 0)
++#define KVM_MSR_ALLOW_WRITE (1 << 1)
+ 
+ struct kvm_cpuid_entry {
+ 	__u32 function;
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 4d285bf054fb..6024d1cdea5a 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -1472,6 +1472,12 @@ void kvm_enable_efer_bits(u64 mask)
+ }
+ EXPORT_SYMBOL_GPL(kvm_enable_efer_bits);
+ 
++bool kvm_msr_allowed(struct kvm_vcpu *vcpu, u32 index, u32 type)
++{
++	return true;
++}
++EXPORT_SYMBOL_GPL(kvm_msr_allowed);
++
+ /*
+  * Write @data into the MSR specified by @index.  Select MSR specific fault
+  * checks are bypassed if @host_initiated is %true.
+diff --git a/arch/x86/kvm/x86.h b/arch/x86/kvm/x86.h
+index 6eb62e97e59f..1d67d9168b8c 100644
+--- a/arch/x86/kvm/x86.h
++++ b/arch/x86/kvm/x86.h
+@@ -365,5 +365,6 @@ void kvm_load_guest_xsave_state(struct kvm_vcpu *vcpu);
+ void kvm_load_host_xsave_state(struct kvm_vcpu *vcpu);
+ u64 kvm_spec_ctrl_valid_bits(struct kvm_vcpu *vcpu);
+ bool kvm_vcpu_exit_request(struct kvm_vcpu *vcpu);
++bool kvm_msr_allowed(struct kvm_vcpu *vcpu, u32 index, u32 type);
+ 
+ #endif
 -- 
 2.17.1
 
