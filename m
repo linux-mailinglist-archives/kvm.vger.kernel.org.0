@@ -2,150 +2,174 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id F056225B4B8
-	for <lists+kvm@lfdr.de>; Wed,  2 Sep 2020 21:47:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EF23625B5CC
+	for <lists+kvm@lfdr.de>; Wed,  2 Sep 2020 23:23:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726559AbgIBTrH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Sep 2020 15:47:07 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:64852 "EHLO
-        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726140AbgIBTq7 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 2 Sep 2020 15:46:59 -0400
-Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 082JcWUp140331;
-        Wed, 2 Sep 2020 15:46:53 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references; s=pp1;
- bh=8/C8JQ3wK5JYnjDHq/mtYiEA53PNcTVmNBtBJewdsaA=;
- b=ZgvexCUhDobDdKuX1e1Pl1rTte9uWkNrSMLeH3IdmCERNWlSr3J4ouKWx6zzNMBQ4qoJ
- 8E0SIwo55SJgqS/qM+iWolNs8EVjU3B1aIZ3OTRMM8HpqBIc+eZQkTC/Cn1JJrDmn8a6
- F8peUobEJ3++dMCUY49ANvmOd6e9THLk7dd34d7POROxWt/pqEEjIVaEsJQoCtHvP0FM
- Z5m03mB3k5LlcZ9aVrQYsVuKjiIRMgvfxLtq28hRroHscK7XganHXYYYpX4M6+DdxqXJ
- hCU/Wtgb/MolVY7qC8ZfINkFUM0uU1N5MLCd+hnAgbrXBDDx6nOqoQMC3ygayOZhoee2 XA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 33agm4syr4-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 02 Sep 2020 15:46:53 -0400
-Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 082Jct4e141352;
-        Wed, 2 Sep 2020 15:46:52 -0400
-Received: from ppma01wdc.us.ibm.com (fd.55.37a9.ip4.static.sl-reverse.com [169.55.85.253])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 33agm4syqs-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 02 Sep 2020 15:46:52 -0400
-Received: from pps.filterd (ppma01wdc.us.ibm.com [127.0.0.1])
-        by ppma01wdc.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 082JfMAB012026;
-        Wed, 2 Sep 2020 19:46:51 GMT
-Received: from b01cxnp22034.gho.pok.ibm.com (b01cxnp22034.gho.pok.ibm.com [9.57.198.24])
-        by ppma01wdc.us.ibm.com with ESMTP id 337en9aek1-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 02 Sep 2020 19:46:51 +0000
-Received: from b01ledav001.gho.pok.ibm.com (b01ledav001.gho.pok.ibm.com [9.57.199.106])
-        by b01cxnp22034.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 082JkoJX54722922
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 2 Sep 2020 19:46:51 GMT
-Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id D914F28058;
-        Wed,  2 Sep 2020 19:46:50 +0000 (GMT)
-Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id BDDC928064;
-        Wed,  2 Sep 2020 19:46:48 +0000 (GMT)
-Received: from oc4221205838.ibm.com (unknown [9.163.10.164])
-        by b01ledav001.gho.pok.ibm.com (Postfix) with ESMTP;
-        Wed,  2 Sep 2020 19:46:48 +0000 (GMT)
-From:   Matthew Rosato <mjrosato@linux.ibm.com>
-To:     alex.williamson@redhat.com, bhelgaas@google.com
-Cc:     schnelle@linux.ibm.com, pmorel@linux.ibm.com, mpe@ellerman.id.au,
-        oohall@gmail.com, cohuck@redhat.com, kevin.tian@intel.com,
-        linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, linux-pci@vger.kernel.org
-Subject: [PATCH v4 3/3] vfio/pci: Decouple MSE bit checks from is_virtfn
-Date:   Wed,  2 Sep 2020 15:46:36 -0400
-Message-Id: <1599075996-9826-4-git-send-email-mjrosato@linux.ibm.com>
-X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <1599075996-9826-1-git-send-email-mjrosato@linux.ibm.com>
-References: <1599075996-9826-1-git-send-email-mjrosato@linux.ibm.com>
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
- definitions=2020-09-02_14:2020-09-02,2020-09-02 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 clxscore=1015
- priorityscore=1501 mlxscore=0 phishscore=0 spamscore=0 bulkscore=0
- mlxlogscore=999 malwarescore=0 lowpriorityscore=0 impostorscore=0
- suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2006250000 definitions=main-2009020178
+        id S1726377AbgIBVXa (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Sep 2020 17:23:30 -0400
+Received: from mga14.intel.com ([192.55.52.115]:26025 "EHLO mga14.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726247AbgIBVXa (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 2 Sep 2020 17:23:30 -0400
+IronPort-SDR: bFKwm0HqsozTi9yEWIIcaUaf8hGtDsPKgMx6054xeufmIldLs82COOA39JefObk0jpZBuU2oo0
+ mqGoDn96LmxQ==
+X-IronPort-AV: E=McAfee;i="6000,8403,9732"; a="156750703"
+X-IronPort-AV: E=Sophos;i="5.76,384,1592895600"; 
+   d="scan'208";a="156750703"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Sep 2020 14:23:29 -0700
+IronPort-SDR: h3njZEnVrM/G6HEsrezZGucyQlqHCyY+0jA1glmX9gPb7Uf4/vVFFRXKaMyk6t6tULMtXRHi3m
+ pN1+8+OwSFVg==
+X-IronPort-AV: E=Sophos;i="5.76,384,1592895600"; 
+   d="scan'208";a="477798477"
+Received: from sjchrist-ice.jf.intel.com (HELO sjchrist-ice) ([10.54.31.34])
+  by orsmga005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Sep 2020 14:23:29 -0700
+Date:   Wed, 2 Sep 2020 14:23:28 -0700
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Wanpeng Li <kernellwp@gmail.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>
+Subject: Re: [PATCH] KVM: LAPIC: Reset timer_advance_ns if timer mode switch
+Message-ID: <20200902212328.GI11695@sjchrist-ice>
+References: <1598578508-14134-1-git-send-email-wanpengli@tencent.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1598578508-14134-1-git-send-email-wanpengli@tencent.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-While it is true that devices with is_virtfn=1 will have an
-MSE that is hard-wired to 0, this is not the only case where
-we see this behavior -- For example some bare-metal hypervisors
-lack MSE bit emulation for devices not setting is_virtfn (s390).
-Fix this by instead checking for the newly-added
-PCI_DEV_FLAGS_FORCE_COMMAND_MEM flag which directly denotes the
-need for MSE bit emulation in vfio.
+On Fri, Aug 28, 2020 at 09:35:08AM +0800, Wanpeng Li wrote:
+> From: Wanpeng Li <wanpengli@tencent.com>
+> 
+> per-vCPU timer_advance_ns should be set to 0 if timer mode is not tscdeadline 
+> otherwise we waste cpu cycles in the function lapic_timer_int_injected(), 
+> especially on AMD platform which doesn't support tscdeadline mode. We can 
+> reset timer_advance_ns to the initial value if switch back to tscdealine 
+> timer mode.
+> 
+> Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
+> ---
+>  arch/x86/kvm/lapic.c | 6 ++++++
+>  1 file changed, 6 insertions(+)
+> 
+> diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+> index 654649b..abc296d 100644
+> --- a/arch/x86/kvm/lapic.c
+> +++ b/arch/x86/kvm/lapic.c
+> @@ -1499,10 +1499,16 @@ static void apic_update_lvtt(struct kvm_lapic *apic)
+>  			kvm_lapic_set_reg(apic, APIC_TMICT, 0);
+>  			apic->lapic_timer.period = 0;
+>  			apic->lapic_timer.tscdeadline = 0;
+> +			if (timer_mode == APIC_LVT_TIMER_TSCDEADLINE &&
+> +				lapic_timer_advance_dynamic)
 
-Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
-Reviewed-by: Niklas Schnelle <schnelle@linux.ibm.com>
----
- drivers/vfio/pci/vfio_pci_config.c | 20 +++++++++++++-------
- 1 file changed, 13 insertions(+), 7 deletions(-)
+Bad indentation.
 
-diff --git a/drivers/vfio/pci/vfio_pci_config.c b/drivers/vfio/pci/vfio_pci_config.c
-index d98843f..47fb3c7 100644
---- a/drivers/vfio/pci/vfio_pci_config.c
-+++ b/drivers/vfio/pci/vfio_pci_config.c
-@@ -406,7 +406,8 @@ bool __vfio_pci_memory_enabled(struct vfio_pci_device *vdev)
- 	 * PF SR-IOV capability, there's therefore no need to trigger
- 	 * faults based on the virtual value.
- 	 */
--	return pdev->is_virtfn || (cmd & PCI_COMMAND_MEMORY);
-+	return (pdev->dev_flags & PCI_DEV_FLAGS_FORCE_COMMAND_MEM) ||
-+	       (cmd & PCI_COMMAND_MEMORY);
+> +				apic->lapic_timer.timer_advance_ns = LAPIC_TIMER_ADVANCE_NS_INIT;
+
+Redoing the tuning seems odd.  Doubt it will matter, but it feels weird to
+have to retune the advancement just because the guest toggled between modes.
+
+Rather than clear timer_advance_ns, can we simply move the check against
+apic->lapic_timer.expired_tscdeadline much earlier?  I think that would
+solve this performance hiccup, and IMO would be a logical change in any
+case.  E.g. with some refactoring to avoid more duplication between VMX and
+SVM:
+
+diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+index 35cca2e0c8026..54222f0071547 100644
+--- a/arch/x86/kvm/lapic.c
++++ b/arch/x86/kvm/lapic.c
+@@ -1571,12 +1571,12 @@ static inline void adjust_lapic_timer_advance(struct kvm_vcpu *vcpu,
+        apic->lapic_timer.timer_advance_ns = timer_advance_ns;
  }
- 
- /*
-@@ -520,8 +521,9 @@ static int vfio_basic_config_read(struct vfio_pci_device *vdev, int pos,
- 
- 	count = vfio_default_config_read(vdev, pos, count, perm, offset, val);
- 
--	/* Mask in virtual memory enable for SR-IOV devices */
--	if (offset == PCI_COMMAND && vdev->pdev->is_virtfn) {
-+	/* Mask in virtual memory enable */
-+	if ((offset == PCI_COMMAND) &&
-+	    (vdev->pdev->dev_flags & PCI_DEV_FLAGS_FORCE_COMMAND_MEM)) {
- 		u16 cmd = le16_to_cpu(*(__le16 *)&vdev->vconfig[PCI_COMMAND]);
- 		u32 tmp_val = le32_to_cpu(*val);
- 
-@@ -589,9 +591,11 @@ static int vfio_basic_config_write(struct vfio_pci_device *vdev, int pos,
- 		 * shows it disabled (phys_mem/io, then the device has
- 		 * undergone some kind of backdoor reset and needs to be
- 		 * restored before we allow it to enable the bars.
--		 * SR-IOV devices will trigger this, but we catch them later
-+		 * SR-IOV devices will trigger this - for mem enable let's
-+		 * catch this now and for io enable it will be caught later
- 		 */
--		if ((new_mem && virt_mem && !phys_mem) ||
-+		if ((new_mem && virt_mem && !phys_mem &&
-+		    !(pdev->dev_flags & PCI_DEV_FLAGS_FORCE_COMMAND_MEM)) ||
- 		    (new_io && virt_io && !phys_io) ||
- 		    vfio_need_bar_restore(vdev))
- 			vfio_bar_restore(vdev);
-@@ -1734,9 +1738,11 @@ int vfio_config_init(struct vfio_pci_device *vdev)
- 				 vconfig[PCI_INTERRUPT_PIN]);
- 
- 		vconfig[PCI_INTERRUPT_PIN] = 0; /* Gratuitous for good VFs */
--
-+	}
-+	if (pdev->dev_flags & PCI_DEV_FLAGS_FORCE_COMMAND_MEM) {
- 		/*
--		 * VFs do no implement the memory enable bit of the COMMAND
-+		 * VFs and devices that set PCI_DEV_FLAGS_FORCE_COMMAND_MEM
-+		 * do not implement the memory enable bit of the COMMAND
- 		 * register therefore we'll not have it set in our initial
- 		 * copy of config space after pci_enable_device().  For
- 		 * consistency with PFs, set the virtual enable bit here.
--- 
-1.8.3.1
 
+-static void __kvm_wait_lapic_expire(struct kvm_vcpu *vcpu)
++void __kvm_wait_lapic_expire(struct kvm_vcpu *vcpu)
+ {
+        struct kvm_lapic *apic = vcpu->arch.apic;
+        u64 guest_tsc, tsc_deadline;
+
+-       if (apic->lapic_timer.expired_tscdeadline == 0)
++       if (!lapic_timer_int_injected(vcpu))
+                return;
+
+        tsc_deadline = apic->lapic_timer.expired_tscdeadline;
+@@ -1590,13 +1590,7 @@ static void __kvm_wait_lapic_expire(struct kvm_vcpu *vcpu)
+        if (lapic_timer_advance_dynamic)
+                adjust_lapic_timer_advance(vcpu, apic->lapic_timer.advance_expire_delta);
+ }
+-
+-void kvm_wait_lapic_expire(struct kvm_vcpu *vcpu)
+-{
+-       if (lapic_timer_int_injected(vcpu))
+-               __kvm_wait_lapic_expire(vcpu);
+-}
+-EXPORT_SYMBOL_GPL(kvm_wait_lapic_expire);
++EXPORT_SYMBOL_GPL(__kvm_wait_lapic_expire);
+
+ static void kvm_apic_inject_pending_timer_irqs(struct kvm_lapic *apic)
+ {
+diff --git a/arch/x86/kvm/lapic.h b/arch/x86/kvm/lapic.h
+index 754f29beb83e3..64be9d751196a 100644
+--- a/arch/x86/kvm/lapic.h
++++ b/arch/x86/kvm/lapic.h
+@@ -236,7 +236,14 @@ static inline int kvm_lapic_latched_init(struct kvm_vcpu *vcpu)
+
+ bool kvm_apic_pending_eoi(struct kvm_vcpu *vcpu, int vector);
+
+-void kvm_wait_lapic_expire(struct kvm_vcpu *vcpu);
++void __kvm_wait_lapic_expire(struct kvm_vcpu *vcpu);
++static inline void kvm_wait_lapic_expire(struct kvm_vcpu *vcpu)
++{
++       if (lapic_in_kernel(vcpu) &&
++           vcpu->arch.apic->lapic_timer.expired_tscdeadline &&
++           vcpu->arch.apic->lapic_timer.timer_advance_ns)
++               __kvm_wait_lapic_expire(vcpu);
++}
+
+ void kvm_bitmap_or_dest_vcpus(struct kvm *kvm, struct kvm_lapic_irq *irq,
+                              unsigned long *vcpu_bitmap);
+diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+index eee7edcbe7491..dfe505a7304a3 100644
+--- a/arch/x86/kvm/svm/svm.c
++++ b/arch/x86/kvm/svm/svm.c
+@@ -3456,9 +3456,7 @@ static __no_kcsan fastpath_t svm_vcpu_run(struct kvm_vcpu *vcpu)
+        clgi();
+        kvm_load_guest_xsave_state(vcpu);
+
+-       if (lapic_in_kernel(vcpu) &&
+-               vcpu->arch.apic->lapic_timer.timer_advance_ns)
+-               kvm_wait_lapic_expire(vcpu);
++       kvm_wait_lapic_expire(vcpu);
+
+        /*
+         * If this vCPU has touched SPEC_CTRL, restore the guest's value if
+
+
+>  		}
+>  		apic->lapic_timer.timer_mode = timer_mode;
+>  		limit_periodic_timer_frequency(apic);
+>  	}
+> +	if (timer_mode != APIC_LVT_TIMER_TSCDEADLINE &&
+> +		lapic_timer_advance_dynamic)
+
+Bad indentation.
+
+> +		apic->lapic_timer.timer_advance_ns = 0;
+>  }
+>  
+>  /*
+> -- 
+> 2.7.4
+> 
