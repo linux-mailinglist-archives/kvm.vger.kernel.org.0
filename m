@@ -2,109 +2,70 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id EF89325CC34
-	for <lists+kvm@lfdr.de>; Thu,  3 Sep 2020 23:27:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2973825CDF7
+	for <lists+kvm@lfdr.de>; Fri,  4 Sep 2020 00:44:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728622AbgICV1L (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 3 Sep 2020 17:27:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44092 "EHLO
+        id S1729541AbgICWoh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 3 Sep 2020 18:44:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56186 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728113AbgICV1K (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 3 Sep 2020 17:27:10 -0400
-Received: from mail-ot1-x344.google.com (mail-ot1-x344.google.com [IPv6:2607:f8b0:4864:20::344])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5089BC061245
-        for <kvm@vger.kernel.org>; Thu,  3 Sep 2020 14:27:10 -0700 (PDT)
-Received: by mail-ot1-x344.google.com with SMTP id h17so3271489otr.1
-        for <kvm@vger.kernel.org>; Thu, 03 Sep 2020 14:27:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=aDDCxUq5LYXZ2vWhxqpUhB793LjuCmYKYt240ziQivQ=;
-        b=flXhhVWWhNBcfgPFbSoJ7dRSwbXxNizmHPAIsj23YZlfVwoSOJdwd5cRtKavfCouWo
-         ynjvydUPvgYTL72rYUDSEbEd+Vzau4WHprxZpoQV9g7eFZa1EBIGOQyQ6U2uQnGN5/fS
-         d8tfxntyw2vjR8R+0DZQ5NaSRVjpBg8C0wnKWar0sLTieE9H0IQny3afACakGvDkrBZR
-         PTWaE1JTL3PB3q9pqGZ6lse9sHpU7bwSCKMmjcFNWCLnifratRe2rKUMB7JArDUfOIjk
-         Qx2eU3pbiFUdNndcypC9C4tlblWlaaKEcNsP2EMz9i2ARTFjJRiL7PjzPXeCY+c2IjZE
-         XbMg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=aDDCxUq5LYXZ2vWhxqpUhB793LjuCmYKYt240ziQivQ=;
-        b=TRYPulnmDvnbDB2+CmQyKeJ4XCvKQpglJtLZ2q8u5TEhAulBuxYnryg8EPvoswTVes
-         Q608VbBxZfy5fKcTPgSuO8HIWNiWdWEF6JUB1ekJkVGx9V3IIDFb59Z9nEnVbV1zIwvA
-         u+arbw/AQKXeeApwpHt08koyVSOeoewbmpDvRYH3w5Temb4R6Jih1/SHR2OEEO2DNgFt
-         A/y+SRSKWdvyvOP2yWQvIDcP/R4BiDb4SjE5Da80smfMryGhrIqMjIEGK4vkeAK24yMm
-         dLQIpsmsKviqLSYs1GJ2hSqFbC4vXyGSfNhu3r8ahStTe1DSpd7R1/ZIj32rg8AvtA5N
-         TuWQ==
-X-Gm-Message-State: AOAM533aweql5c/3Bc/ROuGUhhqO2vIhASNCeiv7GJP1fcz2faha9hjS
-        2NGLln4XdmNLrgrOKVQvR0uNsy7meqGKy8HpwRgs/g==
-X-Google-Smtp-Source: ABdhPJwaWdTpa/DNKpDuyca6UfKn2JJFpMZ/65YVZxbQhKEzZqWnrZXd/AB8AvPQ5/gesxUVWpJGeavsVVGS1mZEnVU=
-X-Received: by 2002:a9d:1c8f:: with SMTP id l15mr3111739ota.241.1599168429267;
- Thu, 03 Sep 2020 14:27:09 -0700 (PDT)
+        with ESMTP id S1728697AbgICWoh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 3 Sep 2020 18:44:37 -0400
+Received: from ozlabs.org (ozlabs.org [IPv6:2401:3900:2:1::2])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7A21AC061244;
+        Thu,  3 Sep 2020 15:44:37 -0700 (PDT)
+Received: by ozlabs.org (Postfix, from userid 1003)
+        id 4BjG8H2M5Nz9sTr; Fri,  4 Sep 2020 08:44:31 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ozlabs.org; s=201707;
+        t=1599173071; bh=KRd/t+/UkdW64sjFFWsE/w9PqOrIadpQpj6cLAsh6Hc=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=iaSmwdam3j0i8/vx9I09NdW3jxfgxdeUsYtwv3ki9t5GXsaaTTT6K0KDOI3bRWAaP
+         Fvol7JYgfpH0qVav8kZk0yXXLkC7NZWKQV267qAX39N0hjuNxFJKZ8xcsWy5unK2MG
+         DpxvRieqezgq6/ju7Khmvyu4o+EmFpMEqSKHedfv4n4nk78zh0L5DThf7FSEoPbTkD
+         y4lZWvdtH9N9/sz15nCIg+79REMMj2h0fuRMOML8sZNWCYlVnwgkuqYniTJ1BPnIrG
+         m9Z5IUyJccNZwt86HfXbHymRDm50JoFBvA19rdP0A6J/KJ3rQdcoxvNd7seWmlt64z
+         2Cda1rplY6fFA==
+Date:   Fri, 4 Sep 2020 08:44:26 +1000
+From:   Paul Mackerras <paulus@ozlabs.org>
+To:     Greg Kurz <groug@kaod.org>
+Cc:     David Gibson <david@gibson.dropbear.id.au>,
+        =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>,
+        kvm-ppc@vger.kernel.org, kvm@vger.kernel.org
+Subject: Re: [PATCH] KVM: PPC: Book3S HV: XICS: Replace the 'destroy' method
+ by a 'release' method
+Message-ID: <20200903224426.GJ272502@thinks.paulus.ozlabs.org>
+References: <159705408550.1308430.10165736270896374279.stgit@bahia.lan>
 MIME-Version: 1.0
-References: <20200903141122.72908-1-mgamal@redhat.com> <CALMp9eTrc8_z3pKBtLVmbnMvC+KtzXMYbYTXZPPz5F0UWW8oNQ@mail.gmail.com>
- <00b0f9eb-286b-72e8-40b5-02f9576f2ce3@redhat.com> <CALMp9eS6O18WcEyw8b6npRSazsyKiGtBjV+coZVGxDNU1JEOsQ@mail.gmail.com>
- <208da546-e8e3-ccd5-9686-f260d07b73fd@redhat.com>
-In-Reply-To: <208da546-e8e3-ccd5-9686-f260d07b73fd@redhat.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Thu, 3 Sep 2020 14:26:57 -0700
-Message-ID: <CALMp9eTheeaYcBjx50-JC4_93mxudgOeyNbT6stVMfx3FjXFCQ@mail.gmail.com>
-Subject: Re: [PATCH] KVM: x86: VMX: Make smaller physical guest address space
- support user-configurable
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Mohammed Gamal <mgamal@redhat.com>, kvm list <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Joerg Roedel <joro@8bytes.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <159705408550.1308430.10165736270896374279.stgit@bahia.lan>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Sep 3, 2020 at 1:02 PM Paolo Bonzini <pbonzini@redhat.com> wrote:
->
-> On 03/09/20 20:32, Jim Mattson wrote:
-> >> [Checking writes to CR3] would be way too slow.  Even the current
-> >> trapping of present #PF can introduce some slowdown depending on the
-> >> workload.
-> >
-> > Yes, I was concerned about that...which is why I would not want to
-> > enable pedantic mode. But if you're going to be pedantic, why go
-> > halfway?
->
-> Because I am not sure about any guest, even KVM, caring about setting
-> bits 51:46 in CR3.
->
-> >>> Does the typical guest care about whether or not setting any of the
-> >>> bits 51:46 in a PFN results in a fault?
-> >>
-> >> At least KVM with shadow pages does, which is a bit niche but it shows
-> >> that you cannot really rely on no one doing it.  As you guessed, the
-> >> main usage of the feature is for machines with 5-level page tables where
-> >> there are no reserved bits; emulating smaller MAXPHYADDR allows
-> >> migrating VMs from 4-level page-table hosts.
-> >>
-> >> Enabling per-VM would not be particularly useful IMO because if you want
-> >> to disable this code you can just set host MAXPHYADDR = guest
-> >> MAXPHYADDR, which should be the common case unless you want to do that
-> >> kind of Skylake to Icelake (or similar) migration.
-> >
-> > I expect that it will be quite common to run 46-bit wide legacy VMs on
-> > Ice Lake hardware, as Ice Lake machines start showing up in
-> > heterogeneous data centers.
->
-> If you'll be okay with running _all_ 46-bit wide legacy VMs without
-> MAXPHYADDR emulation, that's what this patch is for.  If you'll be okay
-> with running _only_ 46-bit wide VMs without emulation, you still don't
-> need special enabling per-VM beyond the automatic one based on
-> CPUID[0x8000_0008].  Do you think you'll need to enable it for some
-> special 46-bit VMs?
+On Mon, Aug 10, 2020 at 12:08:05PM +0200, Greg Kurz wrote:
+> Similarly to what was done with XICS-on-XIVE and XIVE native KVM devices
+> with commit 5422e95103cf ("KVM: PPC: Book3S HV: XIVE: Replace the 'destroy'
+> method by a 'release' method"), convert the historical XICS KVM device to
+> implement the 'release' method. This is needed to run nested guests with
+> an in-kernel IRQ chip. A typical POWER9 guest can select XICS or XIVE
+> during boot, which requires to be able to destroy and to re-create the
+> KVM device. Only the historical XICS KVM device is available under pseries
+> at the current time and it still uses the legacy 'destroy' method.
+> 
+> Switching to 'release' means that vCPUs might still be running when the
+> device is destroyed. In order to avoid potential use-after-free, the
+> kvmppc_xics structure is allocated on first usage and kept around until
+> the VM exits. The same pointer is used each time a KVM XICS device is
+> being created, but this is okay since we only have one per VM.
+> 
+> Clear the ICP of each vCPU with vcpu->mutex held. This ensures that the
+> next time the vCPU resumes execution, it won't be going into the XICS
+> code anymore.
+> 
+> Signed-off-by: Greg Kurz <groug@kaod.org>
 
-Yes. From what you've said above, we would only want to enable this
-for the niche case of 46-bit KVM guests using shadow paging. I would
-expect that to be a very small number of VMs. :-)
+Thanks, applied to my kvm-ppc-next branch.
+
+Paul.
