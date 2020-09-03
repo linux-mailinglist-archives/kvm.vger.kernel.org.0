@@ -2,119 +2,282 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BCFDB25C9E4
-	for <lists+kvm@lfdr.de>; Thu,  3 Sep 2020 22:02:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C4C1325CA0C
+	for <lists+kvm@lfdr.de>; Thu,  3 Sep 2020 22:15:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729373AbgICUCp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 3 Sep 2020 16:02:45 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:56066 "EHLO
+        id S1729206AbgICUPn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 3 Sep 2020 16:15:43 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:37896 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1729357AbgICUCm (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 3 Sep 2020 16:02:42 -0400
+        by vger.kernel.org with ESMTP id S1729173AbgICUPm (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 3 Sep 2020 16:15:42 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1599163360;
+        s=mimecast20190719; t=1599164139;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=eTM798jNWSto3aJECGa6KA1td+/NCZqVTNN5qgvcw9E=;
-        b=LltTzNjLfhA4ZKRVqkhZX88Tn76JHpQ3S7w3L0FiYsULyuXua54NfIBT7+O/MLfJLfmiC+
-        3DAYqqATDOorOlQZiFlY5HSaPOGh65E4UJl9Q6ER2MmJGBXroEDopoCsJN0Z1STueMtwhn
-        J6aeobLav57U0MrOlCc19uwC1tnfXs4=
-Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
- [209.85.208.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-302-4dHv7M41MaKwTfmrm75rhA-1; Thu, 03 Sep 2020 16:02:37 -0400
-X-MC-Unique: 4dHv7M41MaKwTfmrm75rhA-1
-Received: by mail-ed1-f72.google.com with SMTP id d13so1741273edz.18
-        for <kvm@vger.kernel.org>; Thu, 03 Sep 2020 13:02:37 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=eTM798jNWSto3aJECGa6KA1td+/NCZqVTNN5qgvcw9E=;
-        b=aVQpC9vhb9nUrSuUvZrMsJc8zzjUSXES6YWVQOw1q6spFrodpro7YhVoF6oqilzZIU
-         NS1peLXYzPMkAPQk4oKg6j2O3/F8C3PQ600/19in/IFYwKj5d/gbTzR8FYFpw9oHTyTT
-         ZzlZN/nFHzikScx/dbQ7m3AJxpSlfyc73bNYq3ikkTtEV1cR6qxe6jaVHZ42ZRfXiA8z
-         hb3lG3WOSUmJJRv640wFe76O4rcHqwFsH3qxYgC672nKK5pbaOB+v6atSk6z7U9IWzqT
-         SZHf07wRGbjL3f+YsXvm7f+LVaft/U2z3i2sH2WtrjWGxpx3HCLIxnNis3lNHdCSg4PE
-         QoMg==
-X-Gm-Message-State: AOAM531BwqiUmZUd3L8btF5R4xSmqFc1B0uLmUdACwjhxLK1O7H7T1sx
-        YB0yoIPzM/kfs8VEQXoPR+112cG3ACW2qDPHiYydWt7xMAonvGddGrRcDaPH8DizJUBjXrcQEfu
-        hG55PztD0riZ9
-X-Received: by 2002:aa7:dc08:: with SMTP id b8mr5097756edu.271.1599163356709;
-        Thu, 03 Sep 2020 13:02:36 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxqAihHLVWx8nsoBhNdHXWJZozf9ULqwWiHS0vDDzSA7zMtyXkYRo+FtNbxhAEz8eRAejJChg==
-X-Received: by 2002:aa7:dc08:: with SMTP id b8mr5097707edu.271.1599163356372;
-        Thu, 03 Sep 2020 13:02:36 -0700 (PDT)
-Received: from [192.168.10.150] ([93.56.170.5])
-        by smtp.gmail.com with ESMTPSA id k16sm4043049ejg.64.2020.09.03.13.02.35
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 03 Sep 2020 13:02:35 -0700 (PDT)
-Subject: Re: [PATCH] KVM: x86: VMX: Make smaller physical guest address space
- support user-configurable
-To:     Jim Mattson <jmattson@google.com>
-Cc:     Mohammed Gamal <mgamal@redhat.com>, kvm list <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Joerg Roedel <joro@8bytes.org>
-References: <20200903141122.72908-1-mgamal@redhat.com>
- <CALMp9eTrc8_z3pKBtLVmbnMvC+KtzXMYbYTXZPPz5F0UWW8oNQ@mail.gmail.com>
- <00b0f9eb-286b-72e8-40b5-02f9576f2ce3@redhat.com>
- <CALMp9eS6O18WcEyw8b6npRSazsyKiGtBjV+coZVGxDNU1JEOsQ@mail.gmail.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <208da546-e8e3-ccd5-9686-f260d07b73fd@redhat.com>
-Date:   Thu, 3 Sep 2020 22:02:34 +0200
+        bh=VqFui9oj1cM5DRlG5bU+EfxWGLYe7oYtwPI4hKaTr4c=;
+        b=akAJRBG5aPBvBB2C81jfK3XkZHI/s8oicvxmTot54LiHoODSXQmOwfIGSVOLmp82i0ESK2
+        IyrW/oHf2xIeoj5Z0eJzFF6XVLLB5Kp4IxXofCE7aJUY7HjyiLpt7Kch7ZG8N2FX0IAZ0L
+        mEM2dkD5oraVnrzq04ooZJ+GI4l3V+0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-217-ZU22fIEkNEGmc00k0RIb2A-1; Thu, 03 Sep 2020 16:15:37 -0400
+X-MC-Unique: ZU22fIEkNEGmc00k0RIb2A-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8DA3D801AEA;
+        Thu,  3 Sep 2020 20:15:36 +0000 (UTC)
+Received: from [10.36.112.51] (ovpn-112-51.ams2.redhat.com [10.36.112.51])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 05EC8702ED;
+        Thu,  3 Sep 2020 20:15:31 +0000 (UTC)
+Subject: Re: [PATCH v4 07/10] vfio/fsl-mc: Add irq infrastructure for fsl-mc
+ devices
+To:     Diana Craciun <diana.craciun@oss.nxp.com>,
+        alex.williamson@redhat.com, kvm@vger.kernel.org
+Cc:     linux-kernel@vger.kernel.org, bharatb.linux@gmail.com,
+        laurentiu.tudor@nxp.com, Bharat Bhushan <Bharat.Bhushan@nxp.com>
+References: <20200826093315.5279-1-diana.craciun@oss.nxp.com>
+ <20200826093315.5279-8-diana.craciun@oss.nxp.com>
+From:   Auger Eric <eric.auger@redhat.com>
+Message-ID: <9dacbfc8-32a6-54c9-ce0c-50538ee588bf@redhat.com>
+Date:   Thu, 3 Sep 2020 22:15:30 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <CALMp9eS6O18WcEyw8b6npRSazsyKiGtBjV+coZVGxDNU1JEOsQ@mail.gmail.com>
+In-Reply-To: <20200826093315.5279-8-diana.craciun@oss.nxp.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 03/09/20 20:32, Jim Mattson wrote:
->> [Checking writes to CR3] would be way too slow.  Even the current
->> trapping of present #PF can introduce some slowdown depending on the
->> workload.
->
-> Yes, I was concerned about that...which is why I would not want to
-> enable pedantic mode. But if you're going to be pedantic, why go
-> halfway?
+Hi Diana,
 
-Because I am not sure about any guest, even KVM, caring about setting
-bits 51:46 in CR3.
-
->>> Does the typical guest care about whether or not setting any of the
->>> bits 51:46 in a PFN results in a fault?
->>
->> At least KVM with shadow pages does, which is a bit niche but it shows
->> that you cannot really rely on no one doing it.  As you guessed, the
->> main usage of the feature is for machines with 5-level page tables where
->> there are no reserved bits; emulating smaller MAXPHYADDR allows
->> migrating VMs from 4-level page-table hosts.
->>
->> Enabling per-VM would not be particularly useful IMO because if you want
->> to disable this code you can just set host MAXPHYADDR = guest
->> MAXPHYADDR, which should be the common case unless you want to do that
->> kind of Skylake to Icelake (or similar) migration.
+On 8/26/20 11:33 AM, Diana Craciun wrote:
+> This patch adds the skeleton for interrupt support
+> for fsl-mc devices. The interrupts are not yet functional,
+> the functionality will be added by subsequent patches.
 > 
-> I expect that it will be quite common to run 46-bit wide legacy VMs on
-> Ice Lake hardware, as Ice Lake machines start showing up in
-> heterogeneous data centers.
+> Signed-off-by: Bharat Bhushan <Bharat.Bhushan@nxp.com>
+> Signed-off-by: Diana Craciun <diana.craciun@oss.nxp.com>
+> ---
+>  drivers/vfio/fsl-mc/Makefile              |  2 +-
+>  drivers/vfio/fsl-mc/vfio_fsl_mc.c         | 75 ++++++++++++++++++++++-
+>  drivers/vfio/fsl-mc/vfio_fsl_mc_intr.c    | 63 +++++++++++++++++++
+>  drivers/vfio/fsl-mc/vfio_fsl_mc_private.h |  7 ++-
+>  4 files changed, 143 insertions(+), 4 deletions(-)
+>  create mode 100644 drivers/vfio/fsl-mc/vfio_fsl_mc_intr.c
+> 
+> diff --git a/drivers/vfio/fsl-mc/Makefile b/drivers/vfio/fsl-mc/Makefile
+> index 0c6e5d2ddaae..cad6dbf0b735 100644
+> --- a/drivers/vfio/fsl-mc/Makefile
+> +++ b/drivers/vfio/fsl-mc/Makefile
+> @@ -1,4 +1,4 @@
+>  # SPDX-License-Identifier: (GPL-2.0+ OR BSD-3-Clause)
+>  
+> -vfio-fsl-mc-y := vfio_fsl_mc.o
+> +vfio-fsl-mc-y := vfio_fsl_mc.o vfio_fsl_mc_intr.o
+>  obj-$(CONFIG_VFIO_FSL_MC) += vfio-fsl-mc.o
+> diff --git a/drivers/vfio/fsl-mc/vfio_fsl_mc.c b/drivers/vfio/fsl-mc/vfio_fsl_mc.c
+> index bbd3365e877e..42014297b484 100644
+> --- a/drivers/vfio/fsl-mc/vfio_fsl_mc.c
+> +++ b/drivers/vfio/fsl-mc/vfio_fsl_mc.c
+> @@ -209,11 +209,79 @@ static long vfio_fsl_mc_ioctl(void *device_data, unsigned int cmd,
+>  	}
+>  	case VFIO_DEVICE_GET_IRQ_INFO:
+>  	{
+> -		return -ENOTTY;
+> +		struct vfio_irq_info info;
+> +
+> +		minsz = offsetofend(struct vfio_irq_info, count);
+> +		if (copy_from_user(&info, (void __user *)arg, minsz))
+> +			return -EFAULT;
+> +
+> +		if (info.argsz < minsz)
+> +			return -EINVAL;
+> +
+> +		if (info.index >= mc_dev->obj_desc.irq_count)
+> +			return -EINVAL;
+> +
+> +		info.flags = VFIO_IRQ_INFO_EVENTFD;
+shouldn't it be MASKABLE as well? I see skeletons for MASK.
+> +		info.count = 1;
+> +
+> +		return copy_to_user((void __user *)arg, &info, minsz);
+>  	}
+>  	case VFIO_DEVICE_SET_IRQS:
+>  	{
+> -		return -ENOTTY;
+> +		struct vfio_irq_set hdr;
+> +		u8 *data = NULL;
+> +		int ret = 0;
+> +
+> +		minsz = offsetofend(struct vfio_irq_set, count);
+> +
+> +		if (copy_from_user(&hdr, (void __user *)arg, minsz))
+> +			return -EFAULT;
+> +
+> +		if (hdr.argsz < minsz)
+> +			return -EINVAL;
+> +
+> +		if (hdr.index >= mc_dev->obj_desc.irq_count)
+> +			return -EINVAL;
+> +
+> +		if (hdr.start != 0 || hdr.count > 1)
+> +			return -EINVAL;
+> +
+> +		if (hdr.count == 0 &&
+> +		    (!(hdr.flags & VFIO_IRQ_SET_DATA_NONE) ||
+> +		    !(hdr.flags & VFIO_IRQ_SET_ACTION_TRIGGER)))
+> +			return -EINVAL;
+> +
+> +		if (hdr.flags & ~(VFIO_IRQ_SET_DATA_TYPE_MASK |
+> +				  VFIO_IRQ_SET_ACTION_TYPE_MASK))
+> +			return -EINVAL;
+> +
+> +		if (!(hdr.flags & VFIO_IRQ_SET_DATA_NONE)) {
+> +			size_t size;
+> +
+> +			if (hdr.flags & VFIO_IRQ_SET_DATA_BOOL)
+> +				size = sizeof(uint8_t);
+> +			else if (hdr.flags & VFIO_IRQ_SET_DATA_EVENTFD)
+> +				size = sizeof(int32_t);
+> +			else
+> +				return -EINVAL;
+> +
+> +			if (hdr.argsz - minsz < hdr.count * size)
+> +				return -EINVAL;
+> +
+> +			data = memdup_user((void __user *)(arg + minsz),
+> +					   hdr.count * size);
+> +			if (IS_ERR(data))
+> +				return PTR_ERR(data);
+> +		}
+can't you reuse vfio_set_irqs_validate_and_prepare()?
+> +
+> +		mutex_lock(&vdev->igate);
+> +		ret = vfio_fsl_mc_set_irqs_ioctl(vdev, hdr.flags,
+> +						 hdr.index, hdr.start,
+> +						 hdr.count, data);
+> +		mutex_unlock(&vdev->igate);
+> +		kfree(data);
+> +
+> +		return ret;
+>  	}
+>  	case VFIO_DEVICE_RESET:
+>  	{
+> @@ -413,6 +481,8 @@ static int vfio_fsl_mc_probe(struct fsl_mc_device *mc_dev)
+>  		return ret;
+>  	}
+>  
+> +	mutex_init(&vdev->igate);
+> +
+>  	return ret;
+>  }
+>  
+> @@ -436,6 +506,7 @@ static int vfio_fsl_mc_remove(struct fsl_mc_device *mc_dev)
+>  	mc_dev->mc_io = NULL;
+>  
+>  	vfio_fsl_mc_reflck_put(vdev->reflck);
+> +	mutex_destroy(&vdev->igate);
+>  
+>  	vfio_iommu_group_put(mc_dev->dev.iommu_group, dev);
+>  
+> diff --git a/drivers/vfio/fsl-mc/vfio_fsl_mc_intr.c b/drivers/vfio/fsl-mc/vfio_fsl_mc_intr.c
+> new file mode 100644
+> index 000000000000..058aa97aa54a
+> --- /dev/null
+> +++ b/drivers/vfio/fsl-mc/vfio_fsl_mc_intr.c
+> @@ -0,0 +1,63 @@
+> +// SPDX-License-Identifier: (GPL-2.0+ OR BSD-3-Clause)
+> +/*
+> + * Copyright 2013-2016 Freescale Semiconductor Inc.
+> + * Copyright 2019 NXP
+> + */
+> +
+> +#include <linux/vfio.h>
+> +#include <linux/slab.h>
+> +#include <linux/types.h>
+> +#include <linux/eventfd.h>
+> +#include <linux/msi.h>
+> +
+> +#include "linux/fsl/mc.h"
+> +#include "vfio_fsl_mc_private.h"
+> +
+> +static int vfio_fsl_mc_irq_mask(struct vfio_fsl_mc_device *vdev,
+> +				unsigned int index, unsigned int start,
+> +				unsigned int count, u32 flags,
+> +				void *data)
+> +{
+> +	return -EINVAL;
+> +}
+> +
+> +static int vfio_fsl_mc_irq_unmask(struct vfio_fsl_mc_device *vdev,
+> +				unsigned int index, unsigned int start,
+> +				unsigned int count, u32 flags,
+> +				void *data)
+> +{
+> +	return -EINVAL;
+> +}
+> +
+> +static int vfio_fsl_mc_set_irq_trigger(struct vfio_fsl_mc_device *vdev,
+> +				       unsigned int index, unsigned int start,
+> +				       unsigned int count, u32 flags,
+> +				       void *data)
+> +{
+> +	return -EINVAL;
+> +}
+> +
+> +int vfio_fsl_mc_set_irqs_ioctl(struct vfio_fsl_mc_device *vdev,
+> +			       u32 flags, unsigned int index,
+> +			       unsigned int start, unsigned int count,
+> +			       void *data)
+> +{
+> +	int ret = -ENOTTY;
+> +
+> +	switch (flags & VFIO_IRQ_SET_ACTION_TYPE_MASK) {
+> +	case VFIO_IRQ_SET_ACTION_MASK:
+> +		ret = vfio_fsl_mc_irq_mask(vdev, index, start, count,
+> +					   flags, data);
+> +		break;
+> +	case VFIO_IRQ_SET_ACTION_UNMASK:
+> +		ret = vfio_fsl_mc_irq_unmask(vdev, index, start, count,
+> +					     flags, data);
+> +		break;
+> +	case VFIO_IRQ_SET_ACTION_TRIGGER:
+> +		ret = vfio_fsl_mc_set_irq_trigger(vdev, index, start,
+> +						  count, flags, data);
+> +		break;
+> +	}
+> +
+> +	return ret;
+> +}
+> diff --git a/drivers/vfio/fsl-mc/vfio_fsl_mc_private.h b/drivers/vfio/fsl-mc/vfio_fsl_mc_private.h
+> index 3b85d930e060..d5b6fe891a48 100644
+> --- a/drivers/vfio/fsl-mc/vfio_fsl_mc_private.h
+> +++ b/drivers/vfio/fsl-mc/vfio_fsl_mc_private.h
+> @@ -34,7 +34,12 @@ struct vfio_fsl_mc_device {
+>  	u32				num_regions;
+>  	struct vfio_fsl_mc_region	*regions;
+>  	struct vfio_fsl_mc_reflck   *reflck;
+> -
+> +	struct mutex         igate;
+>  };
+>  
+> +extern int vfio_fsl_mc_set_irqs_ioctl(struct vfio_fsl_mc_device *vdev,
+> +			       u32 flags, unsigned int index,
+> +			       unsigned int start, unsigned int count,
+> +			       void *data);
+> +
+>  #endif /* VFIO_FSL_MC_PRIVATE_H */
+> 
+Thanks
 
-If you'll be okay with running _all_ 46-bit wide legacy VMs without
-MAXPHYADDR emulation, that's what this patch is for.  If you'll be okay
-with running _only_ 46-bit wide VMs without emulation, you still don't
-need special enabling per-VM beyond the automatic one based on
-CPUID[0x8000_0008].  Do you think you'll need to enable it for some
-special 46-bit VMs?
-
-Paolo
+Eric
 
