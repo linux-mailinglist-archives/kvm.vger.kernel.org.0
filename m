@@ -2,331 +2,125 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C24C425BAA5
-	for <lists+kvm@lfdr.de>; Thu,  3 Sep 2020 07:52:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F19E325BBFC
+	for <lists+kvm@lfdr.de>; Thu,  3 Sep 2020 09:55:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726047AbgICFwY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 3 Sep 2020 01:52:24 -0400
-Received: from mga12.intel.com ([192.55.52.136]:57685 "EHLO mga12.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725851AbgICFwX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 3 Sep 2020 01:52:23 -0400
-IronPort-SDR: ajMthde+HWwCJMwmZ7fVkeXKWukE6W0h5hYKE5iKPNb1PryHQXFYyqbz1iok5Pf+4ejueV2hbp
- OJibOA6ZCY4Q==
-X-IronPort-AV: E=McAfee;i="6000,8403,9732"; a="137042166"
-X-IronPort-AV: E=Sophos;i="5.76,385,1592895600"; 
-   d="scan'208";a="137042166"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Sep 2020 22:51:52 -0700
-IronPort-SDR: mPuXkLFk1WWA/cEIsIVsDzv1uH/WmGbeWjT4VWMoPcNwaJrJF5e8FNwQmIkp9Cr77Yabt2YVsv
- 7d0nquKeB13Q==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.76,385,1592895600"; 
-   d="scan'208";a="283977472"
-Received: from vmabille-mobl1.ger.corp.intel.com (HELO ubuntu) ([10.252.54.65])
-  by fmsmga008.fm.intel.com with ESMTP; 02 Sep 2020 22:51:49 -0700
-Date:   Thu, 3 Sep 2020 07:51:48 +0200
-From:   Guennadi Liakhovetski <guennadi.liakhovetski@linux.intel.com>
-To:     Mathieu Poirier <mathieu.poirier@linaro.org>
-Cc:     kvm@vger.kernel.org, linux-remoteproc@vger.kernel.org,
-        virtualization@lists.linux-foundation.org,
-        sound-open-firmware@alsa-project.org,
-        Pierre-Louis Bossart <pierre-louis.bossart@linux.intel.com>,
-        Liam Girdwood <liam.r.girdwood@linux.intel.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Ohad Ben-Cohen <ohad@wizery.com>,
-        Bjorn Andersson <bjorn.andersson@linaro.org>,
-        Vincent Whitchurch <vincent.whitchurch@axis.com>
-Subject: Re: [PATCH v6 2/4] rpmsg: move common structures and defines to
- headers
-Message-ID: <20200903055148.GA7573@ubuntu>
-References: <20200901151153.28111-1-guennadi.liakhovetski@linux.intel.com>
- <20200901151153.28111-3-guennadi.liakhovetski@linux.intel.com>
- <20200901172321.GC236120@xps15>
- <20200902053527.GA31486@ubuntu>
- <20200902172437.GC280378@xps15>
+        id S1727989AbgICHzs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 3 Sep 2020 03:55:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60014 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725943AbgICHzr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 3 Sep 2020 03:55:47 -0400
+Received: from ozlabs.org (bilbo.ozlabs.org [IPv6:2401:3900:2:1::2])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 30506C061244;
+        Thu,  3 Sep 2020 00:55:47 -0700 (PDT)
+Received: by ozlabs.org (Postfix, from userid 1003)
+        id 4BhtQm5Y36z9sTS; Thu,  3 Sep 2020 17:55:44 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ozlabs.org; s=201707;
+        t=1599119744; bh=jRwtZaqyDLSCz72Xr7M2N9uVo/tZDt0H0qRqtsza/Bc=;
+        h=Date:From:To:Cc:Subject:From;
+        b=pQ/e8HC6ttrrnnRVFDykJdAHgfhg36bjgP6Wg1KB2tP5ohAubzxIR/G0qXcX1xnBt
+         WJikdvk39Hf4BmUy8MLo32+kdDA7l5Qmg0cbh4fDGR25LzGG5qpDF77EzPfe6QUSwO
+         C1J9MO75Ljay2m9y+4t9ez0Hl+S/G570GguS0LaPoRjDyDKPblhakRYPXrRC2kGTUA
+         ZDVU+/NesBfxA6gFh67qGVqGBUXbsqR4yll7ZvcRjRnMmmtiCiuCz+GkvrrwrQi8ld
+         OLaASjb5S4buRUdpkzuLHgjJaT5ZecRtwKDQjfmFOWZQwy/HVDzTYDMn8E8oir5vV2
+         cJr01SGGMO7rA==
+Date:   Thu, 3 Sep 2020 17:55:40 +1000
+From:   Paul Mackerras <paulus@ozlabs.org>
+To:     kvm-ppc@vger.kernel.org, kvm@vger.kernel.org
+Cc:     David Gibson <david@gibson.dropbear.id.au>
+Subject: [PATCH] KVM: PPC: Book3S HV: Set LPCR[HDICE] before writing HDEC
+Message-ID: <20200903075540.GI272502@thinks.paulus.ozlabs.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200902172437.GC280378@xps15>
-User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Mathieu,
+POWER8 and POWER9 machines have a hardware deviation where generation
+of a hypervisor decrementer exception is suppressed if the HDICE bit
+in the LPCR register is 0 at the time when the HDEC register
+decrements from 0 to -1.  When entering a guest, KVM first writes the
+HDEC register with the time until it wants the CPU to exit the guest,
+and then writes the LPCR with the guest value, which includes
+HDICE = 1.  If HDEC decrements from 0 to -1 during the interval
+between those two events, it is possible that we can enter the guest
+with HDEC already negative but no HDEC exception pending, meaning that
+no HDEC interrupt will occur while the CPU is in the guest, or at
+least not until HDEC wraps around.  Thus it is possible for the CPU to
+keep executing in the guest for a long time; up to about 4 seconds on
+POWER8, or about 4.46 years on POWER9 (except that the host kernel
+hard lockup detector will fire first).
 
-On Wed, Sep 02, 2020 at 11:24:37AM -0600, Mathieu Poirier wrote:
-> On Wed, Sep 02, 2020 at 07:35:27AM +0200, Guennadi Liakhovetski wrote:
-> > Hi Mathew,
-> > 
-> > On Tue, Sep 01, 2020 at 11:23:21AM -0600, Mathieu Poirier wrote:
-> > > On Tue, Sep 01, 2020 at 05:11:51PM +0200, Guennadi Liakhovetski wrote:
-> > > > virtio_rpmsg_bus.c keeps RPMsg protocol structure declarations and
-> > > > common defines like the ones, needed for name-space announcements,
-> > > > internal. Move them to common headers instead.
-> > > > 
-> > > > Signed-off-by: Guennadi Liakhovetski <guennadi.liakhovetski@linux.intel.com>
-> > > 
-> > > I already reviewed this patch and added my RB to it.  Please carry it in your
-> > > next revision.
-> > 
-> > But only as long as the patch doesn't change, right? And in fact it did change 
-> > this time - I renamed the header, moving it under include/linux/rpmsg, actually 
-> 
-> Patch 2/4 in V5 was identical to what was submitted in V4 and my RB tag was not
-> added, nor was the entry for virtio_rpmsg.h added to the MAINTAINERS file.
+To fix this, we set the LPCR[HDICE] bit before writing HDEC on guest
+entry.
 
-Right, yes, I forgot about that your request when creating v5, sorry about that, 
-that's why I made a v6 with the header moved to include/linux/rpmsg/.
+Signed-off-by: Paul Mackerras <paulus@ozlabs.org>
+---
+ arch/powerpc/kvm/book3s_hv.c            | 14 ++++++++++++--
+ arch/powerpc/kvm/book3s_hv_interrupts.S |  9 ++++++---
+ 2 files changed, 18 insertions(+), 5 deletions(-)
 
-> > also following your suggestion. Still, formally the patch has changed, so, I 
-> > didn't include your "Reviewed-by" in this version. And you anyway would be 
-> 
-> Reviewed-by: Mathieu Poirier <mathieu.poirier@linaro.org>
-> 
-> > reviewing the other patches in this series to, right?
-> 
-> As much as I'd like to reviewing the other patches in this series won't be
-> possible at this time. 
+diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
+index 4ba06a2..f1d841d 100644
+--- a/arch/powerpc/kvm/book3s_hv.c
++++ b/arch/powerpc/kvm/book3s_hv.c
+@@ -3442,9 +3442,19 @@ static int kvmhv_load_hv_regs_and_go(struct kvm_vcpu *vcpu, u64 time_limit,
+ 	unsigned long host_psscr = mfspr(SPRN_PSSCR);
+ 	unsigned long host_pidr = mfspr(SPRN_PID);
+ 
++	/*
++	 * P8 and P9 suppress the HDEC exception when LPCR[HDICE] = 0,
++	 * so set HDICE before writing HDEC.
++	 */
++	mtspr(SPRN_LPCR, vcpu->kvm->arch.host_lpcr | LPCR_HDICE);
++	isync();
++
+ 	hdec = time_limit - mftb();
+-	if (hdec < 0)
++	if (hdec < 0) {
++		mtspr(SPRN_LPCR, vcpu->kvm->arch.host_lpcr);
++		isync();
+ 		return BOOK3S_INTERRUPT_HV_DECREMENTER;
++	}
+ 	mtspr(SPRN_HDEC, hdec);
+ 
+ 	if (vc->tb_offset) {
+@@ -3572,7 +3582,7 @@ int kvmhv_p9_guest_entry(struct kvm_vcpu *vcpu, u64 time_limit,
+ 
+ 	dec = mfspr(SPRN_DEC);
+ 	tb = mftb();
+-	if (dec < 512)
++	if (dec < 0)
+ 		return BOOK3S_INTERRUPT_HV_DECREMENTER;
+ 	local_paca->kvm_hstate.dec_expires = dec + tb;
+ 	if (local_paca->kvm_hstate.dec_expires < time_limit)
+diff --git a/arch/powerpc/kvm/book3s_hv_interrupts.S b/arch/powerpc/kvm/book3s_hv_interrupts.S
+index 59822cb..327417d 100644
+--- a/arch/powerpc/kvm/book3s_hv_interrupts.S
++++ b/arch/powerpc/kvm/book3s_hv_interrupts.S
+@@ -58,13 +58,16 @@ END_FTR_SECTION_IFCLR(CPU_FTR_ARCH_207S)
+ 	/*
+ 	 * Put whatever is in the decrementer into the
+ 	 * hypervisor decrementer.
++	 * Because of a hardware deviation in P8 and P9,
++	 * we need to set LPCR[HDICE] before writing HDEC.
+ 	 */
+-BEGIN_FTR_SECTION
+ 	ld	r5, HSTATE_KVM_VCORE(r13)
+ 	ld	r6, VCORE_KVM(r5)
+ 	ld	r9, KVM_HOST_LPCR(r6)
+-	andis.	r9, r9, LPCR_LD@h
+-END_FTR_SECTION_IFSET(CPU_FTR_ARCH_300)
++	ori	r8, r9, LPCR_HDICE
++	mtspr	SPRN_LPCR, r8
++	isync
++	andis.	r0, r9, LPCR_LD@h
+ 	mfspr	r8,SPRN_DEC
+ 	mftb	r7
+ BEGIN_FTR_SECTION
+-- 
+2.7.4
 
-Ok, understand, I'm wondering then what the path to upstreaming would be then?
-
-Thanks
-Guennadi
-
-> > > Thanks,
-> > > Mathieu
-> > > 
-> > > > ---
-> > > >  drivers/rpmsg/virtio_rpmsg_bus.c | 78 +-----------------------------
-> > > >  include/linux/rpmsg/virtio.h     | 83 ++++++++++++++++++++++++++++++++
-> > > >  include/uapi/linux/rpmsg.h       |  3 ++
-> > > >  3 files changed, 88 insertions(+), 76 deletions(-)
-> > > >  create mode 100644 include/linux/rpmsg/virtio.h
-> > > > 
-> > > > diff --git a/drivers/rpmsg/virtio_rpmsg_bus.c b/drivers/rpmsg/virtio_rpmsg_bus.c
-> > > > index 9006fc7f73d0..f39c426f9c5e 100644
-> > > > --- a/drivers/rpmsg/virtio_rpmsg_bus.c
-> > > > +++ b/drivers/rpmsg/virtio_rpmsg_bus.c
-> > > > @@ -19,6 +19,7 @@
-> > > >  #include <linux/mutex.h>
-> > > >  #include <linux/of_device.h>
-> > > >  #include <linux/rpmsg.h>
-> > > > +#include <linux/rpmsg/virtio.h>
-> > > >  #include <linux/scatterlist.h>
-> > > >  #include <linux/slab.h>
-> > > >  #include <linux/sched.h>
-> > > > @@ -27,6 +28,7 @@
-> > > >  #include <linux/virtio_ids.h>
-> > > >  #include <linux/virtio_config.h>
-> > > >  #include <linux/wait.h>
-> > > > +#include <uapi/linux/rpmsg.h>
-> > > >  
-> > > >  #include "rpmsg_internal.h"
-> > > >  
-> > > > @@ -70,58 +72,6 @@ struct virtproc_info {
-> > > >  	struct rpmsg_endpoint *ns_ept;
-> > > >  };
-> > > >  
-> > > > -/* The feature bitmap for virtio rpmsg */
-> > > > -#define VIRTIO_RPMSG_F_NS	0 /* RP supports name service notifications */
-> > > > -
-> > > > -/**
-> > > > - * struct rpmsg_hdr - common header for all rpmsg messages
-> > > > - * @src: source address
-> > > > - * @dst: destination address
-> > > > - * @reserved: reserved for future use
-> > > > - * @len: length of payload (in bytes)
-> > > > - * @flags: message flags
-> > > > - * @data: @len bytes of message payload data
-> > > > - *
-> > > > - * Every message sent(/received) on the rpmsg bus begins with this header.
-> > > > - */
-> > > > -struct rpmsg_hdr {
-> > > > -	__virtio32 src;
-> > > > -	__virtio32 dst;
-> > > > -	__virtio32 reserved;
-> > > > -	__virtio16 len;
-> > > > -	__virtio16 flags;
-> > > > -	u8 data[];
-> > > > -} __packed;
-> > > > -
-> > > > -/**
-> > > > - * struct rpmsg_ns_msg - dynamic name service announcement message
-> > > > - * @name: name of remote service that is published
-> > > > - * @addr: address of remote service that is published
-> > > > - * @flags: indicates whether service is created or destroyed
-> > > > - *
-> > > > - * This message is sent across to publish a new service, or announce
-> > > > - * about its removal. When we receive these messages, an appropriate
-> > > > - * rpmsg channel (i.e device) is created/destroyed. In turn, the ->probe()
-> > > > - * or ->remove() handler of the appropriate rpmsg driver will be invoked
-> > > > - * (if/as-soon-as one is registered).
-> > > > - */
-> > > > -struct rpmsg_ns_msg {
-> > > > -	char name[RPMSG_NAME_SIZE];
-> > > > -	__virtio32 addr;
-> > > > -	__virtio32 flags;
-> > > > -} __packed;
-> > > > -
-> > > > -/**
-> > > > - * enum rpmsg_ns_flags - dynamic name service announcement flags
-> > > > - *
-> > > > - * @RPMSG_NS_CREATE: a new remote service was just created
-> > > > - * @RPMSG_NS_DESTROY: a known remote service was just destroyed
-> > > > - */
-> > > > -enum rpmsg_ns_flags {
-> > > > -	RPMSG_NS_CREATE		= 0,
-> > > > -	RPMSG_NS_DESTROY	= 1,
-> > > > -};
-> > > > -
-> > > >  /**
-> > > >   * @vrp: the remote processor this channel belongs to
-> > > >   */
-> > > > @@ -134,27 +84,6 @@ struct virtio_rpmsg_channel {
-> > > >  #define to_virtio_rpmsg_channel(_rpdev) \
-> > > >  	container_of(_rpdev, struct virtio_rpmsg_channel, rpdev)
-> > > >  
-> > > > -/*
-> > > > - * We're allocating buffers of 512 bytes each for communications. The
-> > > > - * number of buffers will be computed from the number of buffers supported
-> > > > - * by the vring, upto a maximum of 512 buffers (256 in each direction).
-> > > > - *
-> > > > - * Each buffer will have 16 bytes for the msg header and 496 bytes for
-> > > > - * the payload.
-> > > > - *
-> > > > - * This will utilize a maximum total space of 256KB for the buffers.
-> > > > - *
-> > > > - * We might also want to add support for user-provided buffers in time.
-> > > > - * This will allow bigger buffer size flexibility, and can also be used
-> > > > - * to achieve zero-copy messaging.
-> > > > - *
-> > > > - * Note that these numbers are purely a decision of this driver - we
-> > > > - * can change this without changing anything in the firmware of the remote
-> > > > - * processor.
-> > > > - */
-> > > > -#define MAX_RPMSG_NUM_BUFS	(512)
-> > > > -#define MAX_RPMSG_BUF_SIZE	(512)
-> > > > -
-> > > >  /*
-> > > >   * Local addresses are dynamically allocated on-demand.
-> > > >   * We do not dynamically assign addresses from the low 1024 range,
-> > > > @@ -162,9 +91,6 @@ struct virtio_rpmsg_channel {
-> > > >   */
-> > > >  #define RPMSG_RESERVED_ADDRESSES	(1024)
-> > > >  
-> > > > -/* Address 53 is reserved for advertising remote services */
-> > > > -#define RPMSG_NS_ADDR			(53)
-> > > > -
-> > > >  static void virtio_rpmsg_destroy_ept(struct rpmsg_endpoint *ept);
-> > > >  static int virtio_rpmsg_send(struct rpmsg_endpoint *ept, void *data, int len);
-> > > >  static int virtio_rpmsg_sendto(struct rpmsg_endpoint *ept, void *data, int len,
-> > > > diff --git a/include/linux/rpmsg/virtio.h b/include/linux/rpmsg/virtio.h
-> > > > new file mode 100644
-> > > > index 000000000000..3ede1a4a68a3
-> > > > --- /dev/null
-> > > > +++ b/include/linux/rpmsg/virtio.h
-> > > > @@ -0,0 +1,83 @@
-> > > > +/* SPDX-License-Identifier: GPL-2.0 */
-> > > > +
-> > > > +#ifndef _LINUX_RPMSG_VIRTIO_H
-> > > > +#define _LINUX_RPMSG_VIRTIO_H
-> > > > +
-> > > > +#include <linux/mod_devicetable.h>
-> > > > +#include <linux/types.h>
-> > > > +#include <linux/virtio_types.h>
-> > > > +
-> > > > +/**
-> > > > + * struct rpmsg_hdr - common header for all rpmsg messages
-> > > > + * @src: source address
-> > > > + * @dst: destination address
-> > > > + * @reserved: reserved for future use
-> > > > + * @len: length of payload (in bytes)
-> > > > + * @flags: message flags
-> > > > + * @data: @len bytes of message payload data
-> > > > + *
-> > > > + * Every message sent(/received) on the rpmsg bus begins with this header.
-> > > > + */
-> > > > +struct rpmsg_hdr {
-> > > > +	__virtio32 src;
-> > > > +	__virtio32 dst;
-> > > > +	__virtio32 reserved;
-> > > > +	__virtio16 len;
-> > > > +	__virtio16 flags;
-> > > > +	u8 data[];
-> > > > +} __packed;
-> > > > +
-> > > > +/**
-> > > > + * struct rpmsg_ns_msg - dynamic name service announcement message
-> > > > + * @name: name of remote service that is published
-> > > > + * @addr: address of remote service that is published
-> > > > + * @flags: indicates whether service is created or destroyed
-> > > > + *
-> > > > + * This message is sent across to publish a new service, or announce
-> > > > + * about its removal. When we receive these messages, an appropriate
-> > > > + * rpmsg channel (i.e device) is created/destroyed. In turn, the ->probe()
-> > > > + * or ->remove() handler of the appropriate rpmsg driver will be invoked
-> > > > + * (if/as-soon-as one is registered).
-> > > > + */
-> > > > +struct rpmsg_ns_msg {
-> > > > +	char name[RPMSG_NAME_SIZE];
-> > > > +	__virtio32 addr;
-> > > > +	__virtio32 flags;
-> > > > +} __packed;
-> > > > +
-> > > > +/**
-> > > > + * enum rpmsg_ns_flags - dynamic name service announcement flags
-> > > > + *
-> > > > + * @RPMSG_NS_CREATE: a new remote service was just created
-> > > > + * @RPMSG_NS_DESTROY: a known remote service was just destroyed
-> > > > + */
-> > > > +enum rpmsg_ns_flags {
-> > > > +	RPMSG_NS_CREATE		= 0,
-> > > > +	RPMSG_NS_DESTROY	= 1,
-> > > > +};
-> > > > +
-> > > > +/*
-> > > > + * We're allocating buffers of 512 bytes each for communications. The
-> > > > + * number of buffers will be computed from the number of buffers supported
-> > > > + * by the vring, upto a maximum of 512 buffers (256 in each direction).
-> > > > + *
-> > > > + * Each buffer will have 16 bytes for the msg header and 496 bytes for
-> > > > + * the payload.
-> > > > + *
-> > > > + * This will utilize a maximum total space of 256KB for the buffers.
-> > > > + *
-> > > > + * We might also want to add support for user-provided buffers in time.
-> > > > + * This will allow bigger buffer size flexibility, and can also be used
-> > > > + * to achieve zero-copy messaging.
-> > > > + *
-> > > > + * Note that these numbers are purely a decision of this driver - we
-> > > > + * can change this without changing anything in the firmware of the remote
-> > > > + * processor.
-> > > > + */
-> > > > +#define MAX_RPMSG_NUM_BUFS	512
-> > > > +#define MAX_RPMSG_BUF_SIZE	512
-> > > > +
-> > > > +/* Address 53 is reserved for advertising remote services */
-> > > > +#define RPMSG_NS_ADDR		53
-> > > > +
-> > > > +#endif
-> > > > diff --git a/include/uapi/linux/rpmsg.h b/include/uapi/linux/rpmsg.h
-> > > > index e14c6dab4223..d669c04ef289 100644
-> > > > --- a/include/uapi/linux/rpmsg.h
-> > > > +++ b/include/uapi/linux/rpmsg.h
-> > > > @@ -24,4 +24,7 @@ struct rpmsg_endpoint_info {
-> > > >  #define RPMSG_CREATE_EPT_IOCTL	_IOW(0xb5, 0x1, struct rpmsg_endpoint_info)
-> > > >  #define RPMSG_DESTROY_EPT_IOCTL	_IO(0xb5, 0x2)
-> > > >  
-> > > > +/* The feature bitmap for virtio rpmsg */
-> > > > +#define VIRTIO_RPMSG_F_NS	0 /* RP supports name service notifications */
-> > > > +
-> > > >  #endif
-> > > > -- 
-> > > > 2.28.0
-> > > > 
