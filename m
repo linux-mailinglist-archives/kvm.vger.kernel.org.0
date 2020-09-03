@@ -2,282 +2,164 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C4C1325CA0C
-	for <lists+kvm@lfdr.de>; Thu,  3 Sep 2020 22:15:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E8D9125CA34
+	for <lists+kvm@lfdr.de>; Thu,  3 Sep 2020 22:27:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729206AbgICUPn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 3 Sep 2020 16:15:43 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:37896 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1729173AbgICUPm (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 3 Sep 2020 16:15:42 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1599164139;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=VqFui9oj1cM5DRlG5bU+EfxWGLYe7oYtwPI4hKaTr4c=;
-        b=akAJRBG5aPBvBB2C81jfK3XkZHI/s8oicvxmTot54LiHoODSXQmOwfIGSVOLmp82i0ESK2
-        IyrW/oHf2xIeoj5Z0eJzFF6XVLLB5Kp4IxXofCE7aJUY7HjyiLpt7Kch7ZG8N2FX0IAZ0L
-        mEM2dkD5oraVnrzq04ooZJ+GI4l3V+0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-217-ZU22fIEkNEGmc00k0RIb2A-1; Thu, 03 Sep 2020 16:15:37 -0400
-X-MC-Unique: ZU22fIEkNEGmc00k0RIb2A-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8DA3D801AEA;
-        Thu,  3 Sep 2020 20:15:36 +0000 (UTC)
-Received: from [10.36.112.51] (ovpn-112-51.ams2.redhat.com [10.36.112.51])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 05EC8702ED;
-        Thu,  3 Sep 2020 20:15:31 +0000 (UTC)
-Subject: Re: [PATCH v4 07/10] vfio/fsl-mc: Add irq infrastructure for fsl-mc
- devices
-To:     Diana Craciun <diana.craciun@oss.nxp.com>,
-        alex.williamson@redhat.com, kvm@vger.kernel.org
-Cc:     linux-kernel@vger.kernel.org, bharatb.linux@gmail.com,
-        laurentiu.tudor@nxp.com, Bharat Bhushan <Bharat.Bhushan@nxp.com>
-References: <20200826093315.5279-1-diana.craciun@oss.nxp.com>
- <20200826093315.5279-8-diana.craciun@oss.nxp.com>
-From:   Auger Eric <eric.auger@redhat.com>
-Message-ID: <9dacbfc8-32a6-54c9-ce0c-50538ee588bf@redhat.com>
-Date:   Thu, 3 Sep 2020 22:15:30 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+        id S1729173AbgICU1R (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 3 Sep 2020 16:27:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34838 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728975AbgICU1L (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 3 Sep 2020 16:27:11 -0400
+Received: from mail-io1-xd42.google.com (mail-io1-xd42.google.com [IPv6:2607:f8b0:4864:20::d42])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4CF2DC061249
+        for <kvm@vger.kernel.org>; Thu,  3 Sep 2020 13:27:10 -0700 (PDT)
+Received: by mail-io1-xd42.google.com with SMTP id u126so4753430iod.12
+        for <kvm@vger.kernel.org>; Thu, 03 Sep 2020 13:27:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=tcd-ie.20150623.gappssmtp.com; s=20150623;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=XHoryAxbdooXqCdzEiDfBNHDRDqVJTRBeWqND7AhQWw=;
+        b=RCNqeDrberJQa8iEXoKdFFmsXmVgm0OJW7eIchkOEab4PeUqCYPXFDpEN7VrPE2Q2r
+         GUQQuiaAGbKydhEJAnnDCPiK90LXur6kCJr5L5sQ2r/ne46TMpiIdcTaCv2fHYoM6yNb
+         n/CznyFIPF9GJUXXveE7AfWdl33o/8t6SBeJ8YB3I8NVC2PqmD4/iWDqPdEI5wN78LVf
+         ncTI5ftXwXoF9V4Ax5mdMwpMg3xer78eQreGPZO8czXhtl772MKmX11X+ribr9UqcF1C
+         urDp6n8FeZvPlJlmjz8S3oOgFUFG1EujxtEbZKlxpUccJF2SFlBjkXHX8U39zQ/QDpq6
+         IUOA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=XHoryAxbdooXqCdzEiDfBNHDRDqVJTRBeWqND7AhQWw=;
+        b=Uv6+nNcCv53/xbSpx8h8LxdDrZ25Hz9QcADd5SWyWsgDx2GYl6/13iZJpVGx38M1Y2
+         TerNf2SIWd5fcQ4LtsV3zkpWxSxsFdjFnD+jNwCzQaItMteHozNmbwSItp13dDsP6YSe
+         UsuxSZ75ySNU8qdEXIcXzhMtvlTY3TOw25lu3ANpwdmZm3LJR3XgjuCe5aAsrJdrd8gz
+         q8DAcRxa22yemdX01OHvpJSpl9VB+Bz4xHZnGZKpl62P1W757yD5bIUpvWdL2jDeHvBb
+         ZSWPd/ouV2Z9csC4KE/FEkGKKDov2erVhy3FJ31FKIlgM27oSiOTHkUD/8uyIMZthr8y
+         PHlg==
+X-Gm-Message-State: AOAM5317fjG3jWEmgqdsLaVMtujhv+4v4qD4FOqEMfihZgOscwPmTHbp
+        1036b0TEpuUBXHxlKu1HU88RjkOci9AhaxUIg+N51Q==
+X-Google-Smtp-Source: ABdhPJwmTrpk85LWcnftpfNTJtQ24c/2yXv/TkIoKUAohLkMn+MLB1sF1W3BqKfqx9SeVWLrNTgZBBPqyFF6pQr5QKA=
+X-Received: by 2002:a02:834a:: with SMTP id w10mr5122585jag.63.1599164828964;
+ Thu, 03 Sep 2020 13:27:08 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200826093315.5279-8-diana.craciun@oss.nxp.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+References: <20191221150402.13868-1-murphyt7@tcd.ie> <465815ae-9292-f37a-59b9-03949cb68460@deltatee.com>
+ <20200529124523.GA11817@infradead.org> <CGME20200529190523eucas1p2c086133e707257c0cdc002f502d4f51d@eucas1p2.samsung.com>
+ <33137cfb-603c-86e8-1091-f36117ecfaf3@deltatee.com> <ef2150d5-7b6a-df25-c10d-e43316fe7812@samsung.com>
+ <b9140772-0370-a858-578c-af503a06d8e9@deltatee.com> <CALQxJuutRaeX89k2o4ffTKYRMizmMu0XbRnzpFuSSrkQR02jKg@mail.gmail.com>
+ <766525c3-4da9-6db7-cd90-fb4b82cd8083@deltatee.com> <CALQxJuuS8KKUX_eWWSE81gsq5ePAETB-FoqRUSWFfqgr+B13gg@mail.gmail.com>
+In-Reply-To: <CALQxJuuS8KKUX_eWWSE81gsq5ePAETB-FoqRUSWFfqgr+B13gg@mail.gmail.com>
+From:   Tom Murphy <murphyt7@tcd.ie>
+Date:   Thu, 3 Sep 2020 21:26:57 +0100
+Message-ID: <CALQxJuuk0YR9dZWkqSmLU-kUKoOuuNj-kSikvQGq0wekijycLA@mail.gmail.com>
+Subject: Re: [PATCH 0/8] Convert the intel iommu driver to the dma-iommu api
+To:     Logan Gunthorpe <logang@deltatee.com>
+Cc:     Marek Szyprowski <m.szyprowski@samsung.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        iommu@lists.linux-foundation.org, kvm@vger.kernel.org,
+        David Airlie <airlied@linux.ie>,
+        dri-devel@lists.freedesktop.org,
+        Bjorn Andersson <bjorn.andersson@linaro.org>,
+        Matthias Brugger <matthias.bgg@gmail.com>,
+        Julien Grall <julien.grall@arm.com>,
+        Thierry Reding <thierry.reding@gmail.com>,
+        Will Deacon <will@kernel.org>,
+        Jean-Philippe Brucker <jean-philippe@linaro.org>,
+        linux-samsung-soc@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
+        Krzysztof Kozlowski <krzk@kernel.org>,
+        Jonathan Hunter <jonathanh@nvidia.com>,
+        linux-rockchip@lists.infradead.org, Andy Gross <agross@kernel.org>,
+        Gerald Schaefer <gerald.schaefer@de.ibm.com>,
+        linux-s390@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+        intel-gfx@lists.freedesktop.org,
+        Alex Williamson <alex.williamson@redhat.com>,
+        linux-mediatek@lists.infradead.org,
+        Rodrigo Vivi <rodrigo.vivi@intel.com>,
+        linux-tegra@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+        virtualization@lists.linux-foundation.org,
+        linux-arm-kernel@lists.infradead.org,
+        Robin Murphy <robin.murphy@arm.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Kukjin Kim <kgene@kernel.org>,
+        David Woodhouse <dwmw2@infradead.org>,
+        Jani Nikula <jani.nikula@linux.intel.com>,
+        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Diana,
+On Fri, 28 Aug 2020 at 00:34, Tom Murphy <murphyt7@tcd.ie> wrote:
+>
+> On Thu, 27 Aug 2020 at 22:36, Logan Gunthorpe <logang@deltatee.com> wrote:
+> >
+> >
+> >
+> > On 2020-08-23 6:04 p.m., Tom Murphy wrote:
+> > > I have added a check for the sg_dma_len == 0 :
+> > > """
+> > >  } __sgt_iter(struct scatterlist *sgl, bool dma) {
+> > >         struct sgt_iter s = { .sgp = sgl };
+> > >
+> > > +       if (sgl && sg_dma_len(sgl) == 0)
+> > > +           s.sgp = NULL;
+> > >
+> > >         if (s.sgp) {
+> > >             .....
+> > > """
+> > > at location [1].
+> > > but it doens't fix the problem.
+> >
+> > Based on my read of the code, it looks like we also need to change usage
+> > of sgl->length... Something like the rough patch below, maybe?
+> >
+> > Also, Tom, do you have an updated version of the patchset to convert the
+> > Intel IOMMU to dma-iommu available? The last one I've found doesn't
+> > apply cleanly (I'm assuming parts of it have been merged in slightly
+> > modified forms).
+> >
+>
+> I'll try and post one in the next 24hours
 
-On 8/26/20 11:33 AM, Diana Craciun wrote:
-> This patch adds the skeleton for interrupt support
-> for fsl-mc devices. The interrupts are not yet functional,
-> the functionality will be added by subsequent patches.
-> 
-> Signed-off-by: Bharat Bhushan <Bharat.Bhushan@nxp.com>
-> Signed-off-by: Diana Craciun <diana.craciun@oss.nxp.com>
-> ---
->  drivers/vfio/fsl-mc/Makefile              |  2 +-
->  drivers/vfio/fsl-mc/vfio_fsl_mc.c         | 75 ++++++++++++++++++++++-
->  drivers/vfio/fsl-mc/vfio_fsl_mc_intr.c    | 63 +++++++++++++++++++
->  drivers/vfio/fsl-mc/vfio_fsl_mc_private.h |  7 ++-
->  4 files changed, 143 insertions(+), 4 deletions(-)
->  create mode 100644 drivers/vfio/fsl-mc/vfio_fsl_mc_intr.c
-> 
-> diff --git a/drivers/vfio/fsl-mc/Makefile b/drivers/vfio/fsl-mc/Makefile
-> index 0c6e5d2ddaae..cad6dbf0b735 100644
-> --- a/drivers/vfio/fsl-mc/Makefile
-> +++ b/drivers/vfio/fsl-mc/Makefile
-> @@ -1,4 +1,4 @@
->  # SPDX-License-Identifier: (GPL-2.0+ OR BSD-3-Clause)
->  
-> -vfio-fsl-mc-y := vfio_fsl_mc.o
-> +vfio-fsl-mc-y := vfio_fsl_mc.o vfio_fsl_mc_intr.o
->  obj-$(CONFIG_VFIO_FSL_MC) += vfio-fsl-mc.o
-> diff --git a/drivers/vfio/fsl-mc/vfio_fsl_mc.c b/drivers/vfio/fsl-mc/vfio_fsl_mc.c
-> index bbd3365e877e..42014297b484 100644
-> --- a/drivers/vfio/fsl-mc/vfio_fsl_mc.c
-> +++ b/drivers/vfio/fsl-mc/vfio_fsl_mc.c
-> @@ -209,11 +209,79 @@ static long vfio_fsl_mc_ioctl(void *device_data, unsigned int cmd,
->  	}
->  	case VFIO_DEVICE_GET_IRQ_INFO:
->  	{
-> -		return -ENOTTY;
-> +		struct vfio_irq_info info;
-> +
-> +		minsz = offsetofend(struct vfio_irq_info, count);
-> +		if (copy_from_user(&info, (void __user *)arg, minsz))
-> +			return -EFAULT;
-> +
-> +		if (info.argsz < minsz)
-> +			return -EINVAL;
-> +
-> +		if (info.index >= mc_dev->obj_desc.irq_count)
-> +			return -EINVAL;
-> +
-> +		info.flags = VFIO_IRQ_INFO_EVENTFD;
-shouldn't it be MASKABLE as well? I see skeletons for MASK.
-> +		info.count = 1;
-> +
-> +		return copy_to_user((void __user *)arg, &info, minsz);
->  	}
->  	case VFIO_DEVICE_SET_IRQS:
->  	{
-> -		return -ENOTTY;
-> +		struct vfio_irq_set hdr;
-> +		u8 *data = NULL;
-> +		int ret = 0;
-> +
-> +		minsz = offsetofend(struct vfio_irq_set, count);
-> +
-> +		if (copy_from_user(&hdr, (void __user *)arg, minsz))
-> +			return -EFAULT;
-> +
-> +		if (hdr.argsz < minsz)
-> +			return -EINVAL;
-> +
-> +		if (hdr.index >= mc_dev->obj_desc.irq_count)
-> +			return -EINVAL;
-> +
-> +		if (hdr.start != 0 || hdr.count > 1)
-> +			return -EINVAL;
-> +
-> +		if (hdr.count == 0 &&
-> +		    (!(hdr.flags & VFIO_IRQ_SET_DATA_NONE) ||
-> +		    !(hdr.flags & VFIO_IRQ_SET_ACTION_TRIGGER)))
-> +			return -EINVAL;
-> +
-> +		if (hdr.flags & ~(VFIO_IRQ_SET_DATA_TYPE_MASK |
-> +				  VFIO_IRQ_SET_ACTION_TYPE_MASK))
-> +			return -EINVAL;
-> +
-> +		if (!(hdr.flags & VFIO_IRQ_SET_DATA_NONE)) {
-> +			size_t size;
-> +
-> +			if (hdr.flags & VFIO_IRQ_SET_DATA_BOOL)
-> +				size = sizeof(uint8_t);
-> +			else if (hdr.flags & VFIO_IRQ_SET_DATA_EVENTFD)
-> +				size = sizeof(int32_t);
-> +			else
-> +				return -EINVAL;
-> +
-> +			if (hdr.argsz - minsz < hdr.count * size)
-> +				return -EINVAL;
-> +
-> +			data = memdup_user((void __user *)(arg + minsz),
-> +					   hdr.count * size);
-> +			if (IS_ERR(data))
-> +				return PTR_ERR(data);
-> +		}
-can't you reuse vfio_set_irqs_validate_and_prepare()?
-> +
-> +		mutex_lock(&vdev->igate);
-> +		ret = vfio_fsl_mc_set_irqs_ioctl(vdev, hdr.flags,
-> +						 hdr.index, hdr.start,
-> +						 hdr.count, data);
-> +		mutex_unlock(&vdev->igate);
-> +		kfree(data);
-> +
-> +		return ret;
->  	}
->  	case VFIO_DEVICE_RESET:
->  	{
-> @@ -413,6 +481,8 @@ static int vfio_fsl_mc_probe(struct fsl_mc_device *mc_dev)
->  		return ret;
->  	}
->  
-> +	mutex_init(&vdev->igate);
-> +
->  	return ret;
->  }
->  
-> @@ -436,6 +506,7 @@ static int vfio_fsl_mc_remove(struct fsl_mc_device *mc_dev)
->  	mc_dev->mc_io = NULL;
->  
->  	vfio_fsl_mc_reflck_put(vdev->reflck);
-> +	mutex_destroy(&vdev->igate);
->  
->  	vfio_iommu_group_put(mc_dev->dev.iommu_group, dev);
->  
-> diff --git a/drivers/vfio/fsl-mc/vfio_fsl_mc_intr.c b/drivers/vfio/fsl-mc/vfio_fsl_mc_intr.c
-> new file mode 100644
-> index 000000000000..058aa97aa54a
-> --- /dev/null
-> +++ b/drivers/vfio/fsl-mc/vfio_fsl_mc_intr.c
-> @@ -0,0 +1,63 @@
-> +// SPDX-License-Identifier: (GPL-2.0+ OR BSD-3-Clause)
-> +/*
-> + * Copyright 2013-2016 Freescale Semiconductor Inc.
-> + * Copyright 2019 NXP
-> + */
-> +
-> +#include <linux/vfio.h>
-> +#include <linux/slab.h>
-> +#include <linux/types.h>
-> +#include <linux/eventfd.h>
-> +#include <linux/msi.h>
-> +
-> +#include "linux/fsl/mc.h"
-> +#include "vfio_fsl_mc_private.h"
-> +
-> +static int vfio_fsl_mc_irq_mask(struct vfio_fsl_mc_device *vdev,
-> +				unsigned int index, unsigned int start,
-> +				unsigned int count, u32 flags,
-> +				void *data)
-> +{
-> +	return -EINVAL;
-> +}
-> +
-> +static int vfio_fsl_mc_irq_unmask(struct vfio_fsl_mc_device *vdev,
-> +				unsigned int index, unsigned int start,
-> +				unsigned int count, u32 flags,
-> +				void *data)
-> +{
-> +	return -EINVAL;
-> +}
-> +
-> +static int vfio_fsl_mc_set_irq_trigger(struct vfio_fsl_mc_device *vdev,
-> +				       unsigned int index, unsigned int start,
-> +				       unsigned int count, u32 flags,
-> +				       void *data)
-> +{
-> +	return -EINVAL;
-> +}
-> +
-> +int vfio_fsl_mc_set_irqs_ioctl(struct vfio_fsl_mc_device *vdev,
-> +			       u32 flags, unsigned int index,
-> +			       unsigned int start, unsigned int count,
-> +			       void *data)
-> +{
-> +	int ret = -ENOTTY;
-> +
-> +	switch (flags & VFIO_IRQ_SET_ACTION_TYPE_MASK) {
-> +	case VFIO_IRQ_SET_ACTION_MASK:
-> +		ret = vfio_fsl_mc_irq_mask(vdev, index, start, count,
-> +					   flags, data);
-> +		break;
-> +	case VFIO_IRQ_SET_ACTION_UNMASK:
-> +		ret = vfio_fsl_mc_irq_unmask(vdev, index, start, count,
-> +					     flags, data);
-> +		break;
-> +	case VFIO_IRQ_SET_ACTION_TRIGGER:
-> +		ret = vfio_fsl_mc_set_irq_trigger(vdev, index, start,
-> +						  count, flags, data);
-> +		break;
-> +	}
-> +
-> +	return ret;
-> +}
-> diff --git a/drivers/vfio/fsl-mc/vfio_fsl_mc_private.h b/drivers/vfio/fsl-mc/vfio_fsl_mc_private.h
-> index 3b85d930e060..d5b6fe891a48 100644
-> --- a/drivers/vfio/fsl-mc/vfio_fsl_mc_private.h
-> +++ b/drivers/vfio/fsl-mc/vfio_fsl_mc_private.h
-> @@ -34,7 +34,12 @@ struct vfio_fsl_mc_device {
->  	u32				num_regions;
->  	struct vfio_fsl_mc_region	*regions;
->  	struct vfio_fsl_mc_reflck   *reflck;
-> -
-> +	struct mutex         igate;
->  };
->  
-> +extern int vfio_fsl_mc_set_irqs_ioctl(struct vfio_fsl_mc_device *vdev,
-> +			       u32 flags, unsigned int index,
-> +			       unsigned int start, unsigned int count,
-> +			       void *data);
-> +
->  #endif /* VFIO_FSL_MC_PRIVATE_H */
-> 
-Thanks
+I have just posted this now:
+The subject of the cover letter is:
+"[PATCH V2 0/5] Convert the intel iommu driver to the dma-iommu api"
 
-Eric
-
+>
+> > Thanks,
+> >
+> > Logan
+> >
+> > --
+> >
+> > diff --git a/drivers/gpu/drm/i915/i915_scatterlist.h
+> > b/drivers/gpu/drm/i915/i915
+> > index b7b59328cb76..9367ac801f0c 100644
+> > --- a/drivers/gpu/drm/i915/i915_scatterlist.h
+> > +++ b/drivers/gpu/drm/i915/i915_scatterlist.h
+> > @@ -27,13 +27,19 @@ static __always_inline struct sgt_iter {
+> >  } __sgt_iter(struct scatterlist *sgl, bool dma) {
+> >         struct sgt_iter s = { .sgp = sgl };
+> >
+> > +       if (sgl && !sg_dma_len(s.sgp))
+> > +               s.sgp = NULL;
+> > +
+> >         if (s.sgp) {
+> >                 s.max = s.curr = s.sgp->offset;
+> > -               s.max += s.sgp->length;
+> > -               if (dma)
+> > +
+> > +               if (dma) {
+> > +                       s.max += sg_dma_len(s.sgp);
+> >                         s.dma = sg_dma_address(s.sgp);
+> > -               else
+> > +               } else {
+> > +                       s.max += s.sgp->length;
+> >                         s.pfn = page_to_pfn(sg_page(s.sgp));
+> > +               }
+> >         }
+> >
+> >         return s;
