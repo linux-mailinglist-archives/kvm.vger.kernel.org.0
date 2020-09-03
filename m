@@ -2,32 +2,32 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4099025C551
-	for <lists+kvm@lfdr.de>; Thu,  3 Sep 2020 17:26:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 832C825C556
+	for <lists+kvm@lfdr.de>; Thu,  3 Sep 2020 17:28:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728503AbgICP0f (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 3 Sep 2020 11:26:35 -0400
-Received: from mail.kernel.org ([198.145.29.99]:42348 "EHLO mail.kernel.org"
+        id S1728711AbgICP07 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 3 Sep 2020 11:26:59 -0400
+Received: from mail.kernel.org ([198.145.29.99]:42372 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728343AbgICP00 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        id S1728344AbgICP00 (ORCPT <rfc822;kvm@vger.kernel.org>);
         Thu, 3 Sep 2020 11:26:26 -0400
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 5C381208CA;
-        Thu,  3 Sep 2020 15:26:24 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 08531208FE;
+        Thu,  3 Sep 2020 15:26:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1599146784;
-        bh=UgL5h2/N4AaKwcBf0Fqm/Wf8W19Iwr6g3G+3eOn1h1g=;
+        s=default; t=1599146785;
+        bh=ceS8NE2MW+txLmS/EWVjLDcRc/17UR1qG/NRs/CDH60=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=U0WuPxRxlpht9j/tIBc1SKbf8RKtMZHQw3Az5TvPyVABskke0c/zO1wH1YgL1iJMx
-         zMZKSzDYidYwGi8a1waBkriX5j2NFn2CwqGMlDu/4HAoFoKkTtJ8umKbOTUob3QT1D
-         edzUoeTYFy9aR9nicWWU/dYsCeLy8wGL22vB+Fv8=
+        b=Uciye53Rz0ao2HSHPhxALTU36xXXtoFDxua7X+zyhfs/RLATZ3OTrvBbYzluD8Xju
+         5AgwZnGRMb/e6YEhsXXUEJz0p9qszaM0xCSa1pJ4vd7CpFj8YOX4RdpeKMDQEW1ABr
+         4m4oHkunthOYOMD+zIBB+hit4TKacp6SLIUOGPus=
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=why.lan)
         by disco-boy.misterjones.org with esmtpsa (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
         (Exim 4.92)
         (envelope-from <maz@kernel.org>)
-        id 1kDr82-008vT9-No; Thu, 03 Sep 2020 16:26:22 +0100
+        id 1kDr83-008vT9-BF; Thu, 03 Sep 2020 16:26:23 +0100
 From:   Marc Zyngier <maz@kernel.org>
 To:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
         linux-arm-kernel@lists.infradead.org
@@ -37,9 +37,9 @@ Cc:     kernel-team@android.com,
         James Morse <james.morse@arm.com>,
         Julien Thierry <julien.thierry.kdev@gmail.com>,
         Suzuki K Poulose <suzuki.poulose@arm.com>
-Subject: [PATCH 03/23] irqchip: Add Reduced Virtual Interrupt Distributor support
-Date:   Thu,  3 Sep 2020 16:25:50 +0100
-Message-Id: <20200903152610.1078827-4-maz@kernel.org>
+Subject: [PATCH 04/23] irqchip/rvid: Add PCI MSI support
+Date:   Thu,  3 Sep 2020 16:25:51 +0100
+Message-Id: <20200903152610.1078827-5-maz@kernel.org>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20200903152610.1078827-1-maz@kernel.org>
 References: <20200903152610.1078827-1-maz@kernel.org>
@@ -56,166 +56,46 @@ X-Mailing-List: kvm@vger.kernel.org
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- drivers/irqchip/Kconfig          |   6 +
- drivers/irqchip/Makefile         |   1 +
- drivers/irqchip/irq-rvid.c       | 259 +++++++++++++++++++++++++++++++
- include/linux/irqchip/irq-rvic.h |  19 +++
- 4 files changed, 285 insertions(+)
- create mode 100644 drivers/irqchip/irq-rvid.c
+ drivers/irqchip/irq-rvid.c | 182 +++++++++++++++++++++++++++++++++++++
+ 1 file changed, 182 insertions(+)
 
-diff --git a/drivers/irqchip/Kconfig b/drivers/irqchip/Kconfig
-index 348ff1d06651..731e8da9ae0c 100644
---- a/drivers/irqchip/Kconfig
-+++ b/drivers/irqchip/Kconfig
-@@ -67,6 +67,12 @@ config ARM_RVIC
- 	select IRQ_DOMAIN_HIERARCHY
- 	select GENERIC_IRQ_EFFECTIVE_AFF_MASK
- 
-+config ARM_RVID
-+	bool
-+	default ARM64
-+	select IRQ_DOMAIN_HIERARCHY
-+	select GENERIC_IRQ_EFFECTIVE_AFF_MASK
-+
- config ARM_VIC
- 	bool
- 	select IRQ_DOMAIN
-diff --git a/drivers/irqchip/Makefile b/drivers/irqchip/Makefile
-index d2b280efd2e0..cbcc23f92d31 100644
---- a/drivers/irqchip/Makefile
-+++ b/drivers/irqchip/Makefile
-@@ -38,6 +38,7 @@ obj-$(CONFIG_PARTITION_PERCPU)		+= irq-partition-percpu.o
- obj-$(CONFIG_HISILICON_IRQ_MBIGEN)	+= irq-mbigen.o
- obj-$(CONFIG_ARM_NVIC)			+= irq-nvic.o
- obj-$(CONFIG_ARM_RVIC)			+= irq-rvic.o
-+obj-$(CONFIG_ARM_RVID)			+= irq-rvid.o
- obj-$(CONFIG_ARM_VIC)			+= irq-vic.o
- obj-$(CONFIG_ARMADA_370_XP_IRQ)		+= irq-armada-370-xp.o
- obj-$(CONFIG_ATMEL_AIC_IRQ)		+= irq-atmel-aic-common.o irq-atmel-aic.o
 diff --git a/drivers/irqchip/irq-rvid.c b/drivers/irqchip/irq-rvid.c
-new file mode 100644
-index 000000000000..953f654e58d4
---- /dev/null
+index 953f654e58d4..250f95ad1a09 100644
+--- a/drivers/irqchip/irq-rvid.c
 +++ b/drivers/irqchip/irq-rvid.c
-@@ -0,0 +1,259 @@
-+// SPDX-License-Identifier: GPL-2.0-only
+@@ -12,12 +12,19 @@
+ #include <linux/irq.h>
+ #include <linux/irqchip.h>
+ #include <linux/irqdomain.h>
++#include <linux/msi.h>
+ 
+ #include <linux/irqchip/irq-rvic.h>
+ 
+ struct rvid_data {
+ 	struct fwnode_handle	*fwnode;
+ 	struct irq_domain	*domain;
++	struct irq_domain	*msi_domain;
++	struct irq_domain	*pci_domain;
++	unsigned long		*msi_map;
++	struct mutex		msi_lock;
++	u32			msi_base;
++	u32			msi_nr;
+ };
+ 
+ static struct rvid_data rvid;
+@@ -209,6 +216,177 @@ static const struct irq_domain_ops rvid_irq_domain_ops = {
+ 	.deactivate	= rvid_irq_domain_deactivate,
+ };
+ 
++#ifdef CONFIG_PCI_MSI
 +/*
-+ * Copyright 2020 Google LLC.
-+ * Author: Marc Zyngier <maz@kernel.org>
++ * The MSI irqchip is completely transparent. The only purpose of the
++ * corresponding irq domain is to provide the MSI allocator, and feed
++ * the allocated inputs to the main rVID irq domain for mapping at the
++ * rVIC level.
 + */
-+
-+#define pr_fmt(fmt)	"rVID: " fmt
-+
-+#include <linux/arm-smccc.h>
-+#include <linux/cpuhotplug.h>
-+#include <linux/interrupt.h>
-+#include <linux/irq.h>
-+#include <linux/irqchip.h>
-+#include <linux/irqdomain.h>
-+
-+#include <linux/irqchip/irq-rvic.h>
-+
-+struct rvid_data {
-+	struct fwnode_handle	*fwnode;
-+	struct irq_domain	*domain;
-+};
-+
-+static struct rvid_data rvid;
-+
-+static inline int rvid_version(unsigned long *version)
-+{
-+	struct arm_smccc_res res;
-+
-+	arm_smccc_1_1_invoke(SMC64_RVID_VERSION, &res);
-+	if (res.a0 == RVID_STATUS_SUCCESS)
-+		*version = res.a1;
-+	return res.a0;
-+}
-+
-+static inline int rvid_map(unsigned long input,
-+			   unsigned long target, unsigned long intid)
-+{
-+	struct arm_smccc_res res;
-+
-+	arm_smccc_1_1_invoke(SMC64_RVID_MAP, input, target, intid, &res);
-+	return res.a0;
-+}
-+
-+static inline int rvid_unmap(unsigned long input)
-+{
-+	struct arm_smccc_res res;
-+
-+	arm_smccc_1_1_invoke(SMC64_RVID_UNMAP, input, &res);
-+	return res.a0;
-+}
-+
-+static int rvid_irq_set_affinity(struct irq_data *data,
-+				 const struct cpumask *mask_val,
-+				 bool force)
-+{
-+	unsigned int old_cpu, cpu;
-+	bool masked, pending;
-+	int err = 0, ret;
-+	u64 mpidr;
-+
-+	if (force)
-+		cpu = cpumask_first(mask_val);
-+	else
-+		cpu = cpumask_any_and(mask_val, cpu_online_mask);
-+
-+	if (cpu >= nr_cpu_ids)
-+		return -EINVAL;
-+
-+	mpidr = cpu_logical_map(cpu) & MPIDR_HWID_BITMASK;
-+	old_cpu = cpumask_first(data->common->effective_affinity);
-+	if (cpu == old_cpu)
-+		return 0;
-+
-+	/* Mask on source */
-+	masked = irqd_irq_masked(data);
-+	if (!masked)
-+		irq_chip_mask_parent(data);
-+
-+	/* Switch to target */
-+	irq_data_update_effective_affinity(data, cpumask_of(cpu));
-+
-+	/* Mask on target */
-+	irq_chip_mask_parent(data);
-+
-+	/* Map the input signal to the new target */
-+	ret = rvid_map(data->hwirq, mpidr, data->parent_data->hwirq);
-+	if (ret != RVID_STATUS_SUCCESS) {
-+		err = -ENXIO;
-+		goto unmask;
-+	}
-+
-+	/* Back to the source */
-+	irq_data_update_effective_affinity(data, cpumask_of(old_cpu));
-+
-+	/* Sample pending state and clear it if necessary */
-+	err = irq_chip_get_parent_state(data, IRQCHIP_STATE_PENDING, &pending);
-+	if (err)
-+		goto unmask;
-+	if (pending)
-+		irq_chip_set_parent_state(data, IRQCHIP_STATE_PENDING, false);
-+
-+	/*
-+	 * To the target again (for good this time), propagating the
-+	 * pending bit if required.
-+	 */
-+	irq_data_update_effective_affinity(data, cpumask_of(cpu));
-+	if (pending)
-+		irq_chip_set_parent_state(data, IRQCHIP_STATE_PENDING, true);
-+unmask:
-+	/* Propagate the masking state */
-+	if (!masked)
-+		irq_chip_unmask_parent(data);
-+
-+	return err;
-+}
-+
-+static struct irq_chip rvid_chip = {
-+	.name			= "rvid",
++static struct irq_chip rvid_msi_chip = {
++	.name			= "rvid-MSI",
 +	.irq_mask		= irq_chip_mask_parent,
 +	.irq_unmask		= irq_chip_unmask_parent,
 +	.irq_eoi		= irq_chip_eoi_parent,
@@ -223,168 +103,175 @@ index 000000000000..953f654e58d4
 +	.irq_set_irqchip_state	= irq_chip_set_parent_state,
 +	.irq_retrigger		= irq_chip_retrigger_hierarchy,
 +	.irq_set_type		= irq_chip_set_type_parent,
-+	.irq_set_affinity	= rvid_irq_set_affinity,
++	.irq_set_affinity	= irq_chip_set_affinity_parent,
 +};
 +
-+static int rvid_irq_domain_alloc(struct irq_domain *domain, unsigned int virq,
++static int rvid_msi_domain_alloc(struct irq_domain *domain, unsigned int virq,
 +				 unsigned int nr_irqs, void *arg)
 +{
-+	struct irq_fwspec *fwspec = arg;
-+	unsigned int type = IRQ_TYPE_NONE;
-+	irq_hw_number_t hwirq;
-+	int i, ret;
++	int ret, hwirq, i;
 +
-+	ret = irq_domain_translate_onecell(domain, fwspec, &hwirq, &type);
-+	if (ret)
-+		return ret;
++	mutex_lock(&rvid.msi_lock);
++	hwirq = bitmap_find_free_region(rvid.msi_map, rvid.msi_nr,
++					get_count_order(nr_irqs));
++	mutex_unlock(&rvid.msi_lock);
++
++	if (hwirq < 0)
++		return -ENOSPC;
 +
 +	for (i = 0; i < nr_irqs; i++) {
-+		unsigned int intid = hwirq + i;
-+		unsigned int irq = virq + i;
++		/* Use the rVID domain to map the input to something */
++		struct irq_fwspec fwspec = (struct irq_fwspec) {
++			.fwnode		= domain->parent->fwnode,
++			.param_count	= 1,
++			.param[0]	= rvid.msi_base + hwirq + i,
++		};
 +
-+		/* Get the rVIC to allocate any untrusted intid */
-+		ret = irq_domain_alloc_irqs_parent(domain, irq, 1, NULL);
++		ret = irq_domain_alloc_irqs_parent(domain, virq + i, 1, &fwspec);
 +		if (WARN_ON(ret))
-+			return ret;
++			goto out;
 +
-+		irq_domain_set_hwirq_and_chip(domain, irq, intid,
-+					      &rvid_chip, &rvid);
-+		irqd_set_affinity_on_activate(irq_get_irq_data(irq));
++		irq_domain_set_hwirq_and_chip(domain, virq + i, hwirq + i,
++					      &rvid_msi_chip, &rvid);
 +	}
 +
 +	return 0;
++
++out:
++	mutex_lock(&rvid.msi_lock);
++	bitmap_release_region(rvid.msi_map, hwirq, get_count_order(nr_irqs));
++	mutex_unlock(&rvid.msi_lock);
++
++	return ret;
 +}
 +
-+static void rvid_irq_domain_free(struct irq_domain *domain, unsigned int virq,
++static void rvid_msi_domain_free(struct irq_domain *domain, unsigned int virq,
 +				 unsigned int nr_irqs)
 +{
-+	int i;
++	struct irq_data *d = irq_domain_get_irq_data(domain, virq);
++	irq_hw_number_t hwirq = d->hwirq;
 +
-+	irq_domain_free_irqs_parent(domain, virq, nr_irqs);
++	/* This is a bit cheeky, but hey, recursion never hurt anyone... */
++	rvid_irq_domain_free(domain, virq, nr_irqs);
 +
-+	for (i = 0; i < nr_irqs; i++) {
-+		struct irq_data *d;
-+
-+		d = irq_domain_get_irq_data(domain, virq + i);
-+		irq_set_handler(virq + i, NULL);
-+		irq_domain_reset_irq_data(d);
-+	}
++	mutex_lock(&rvid.msi_lock);
++	bitmap_release_region(rvid.msi_map, hwirq, get_count_order(nr_irqs));
++	mutex_unlock(&rvid.msi_lock);
 +}
 +
-+static int rvid_irq_domain_activate(struct irq_domain *domain,
-+				    struct irq_data *data, bool reserve)
++static struct irq_domain_ops rvid_msi_domain_ops = {
++	.alloc		= rvid_msi_domain_alloc,
++	.free		= rvid_msi_domain_free,
++};
++
++/*
++ * The PCI irq chip only provides the minimal stuff, as most of the
++ * other methods will be provided as defaults.
++ */
++static void rvid_compose_msi_msg(struct irq_data *data, struct msi_msg *msg)
 +{
-+	unsigned long ret;
-+	int cpu, err = 0;
-+	u64 mpidr;
++	/* Random address, the rVID doesn't really have a doorbell */
++	msg->address_hi = 0;
++	msg->address_lo = 0xba5e0000;
 +
-+	cpu = get_cpu();
-+	mpidr = cpu_logical_map(cpu) & MPIDR_HWID_BITMASK;
++	/*
++	 * We are called from the PCI domain, and what we program in
++	 * the device is the rVID input pin, which is located two
++	 * levels down in the interrupt chain (PCI -> MSI -> rVID).
++	 */
++	msg->data = data->parent_data->parent_data->hwirq;
++}
 +
-+	/* Map the input signal */
-+	ret = rvid_map(data->hwirq, mpidr, data->parent_data->hwirq);
-+	if (ret != RVID_STATUS_SUCCESS) {
-+		err = -ENXIO;
++static void rvid_pci_mask(struct irq_data *d)
++{
++	pci_msi_mask_irq(d);
++	irq_chip_mask_parent(d);
++}
++
++static void rvid_pci_unmask(struct irq_data *d)
++{
++	pci_msi_unmask_irq(d);
++	irq_chip_unmask_parent(d);
++}
++
++static struct irq_chip rvid_pci_chip = {
++	.name			= "PCI-MSI",
++	.irq_mask		= rvid_pci_mask,
++	.irq_unmask		= rvid_pci_unmask,
++	.irq_eoi		= irq_chip_eoi_parent,
++	.irq_compose_msi_msg	= rvid_compose_msi_msg,
++	.irq_write_msi_msg	= pci_msi_domain_write_msg,
++};
++
++static struct msi_domain_info rvid_pci_domain_info = {
++	.flags	= (MSI_FLAG_USE_DEF_DOM_OPS | MSI_FLAG_USE_DEF_CHIP_OPS |
++		   MSI_FLAG_PCI_MSIX | MSI_FLAG_MULTI_PCI_MSI),
++	.chip	= &rvid_pci_chip,
++};
++
++static void __init rvid_msi_setup(struct device_node *np)
++{
++	if (!of_property_read_bool(np, "msi-controller"))
++		return;
++
++	if (of_property_read_u32_index(np, "msi-range", 0, &rvid.msi_base) ||
++	    of_property_read_u32_index(np, "msi-range", 1, &rvid.msi_nr)) {
++		pr_err("Invalid or missing msi-range\n");
++		return;
++	}
++
++	mutex_init(&rvid.msi_lock);
++
++	rvid.msi_map = bitmap_alloc(rvid.msi_nr, GFP_KERNEL | __GFP_ZERO);
++	if (!rvid.msi_map)
++		return;
++
++	rvid.msi_domain = irq_domain_create_hierarchy(rvid.domain, 0, 0,
++						      rvid.fwnode,
++						      &rvid_msi_domain_ops,
++						      &rvid);
++	if (!rvid.msi_domain) {
++		pr_err("Failed to allocate MSI domain\n");
 +		goto out;
 +	}
 +
-+	irq_data_update_effective_affinity(data, cpumask_of(cpu));
++	irq_domain_update_bus_token(rvid.msi_domain, DOMAIN_BUS_NEXUS);
++
++	rvid.pci_domain = pci_msi_create_irq_domain(rvid.domain->fwnode,
++						    &rvid_pci_domain_info,
++						    rvid.msi_domain);
++	if (!rvid.pci_domain) {
++		pr_err("Failed to allocate PCI domain\n");
++		goto out;
++	}
++
++	pr_info("MSIs available as inputs [%d:%d]\n",
++		rvid.msi_base, rvid.msi_base + rvid.msi_nr - 1);
++	return;
 +
 +out:
-+	put_cpu();
-+	return err;
++	if (rvid.msi_domain)
++		irq_domain_remove(rvid.msi_domain);
++	kfree(rvid.msi_map);
 +}
++#else
++static inline void rvid_msi_setup(struct device_node *np) {}
++#endif
 +
-+static void rvid_irq_domain_deactivate(struct irq_domain *domain,
-+				       struct irq_data *data)
-+{
-+	rvid_unmap(data->hwirq);
-+}
-+
-+static const struct irq_domain_ops rvid_irq_domain_ops = {
-+	.translate	= irq_domain_translate_onecell,
-+	.alloc		= rvid_irq_domain_alloc,
-+	.free		= rvid_irq_domain_free,
-+	.activate	= rvid_irq_domain_activate,
-+	.deactivate	= rvid_irq_domain_deactivate,
-+};
-+
-+static int __init rvid_init(struct device_node *node,
-+			    struct device_node *parent)
-+{
-+	struct irq_domain *parent_domain;
-+	unsigned long ret, version;
-+
-+	if (arm_smccc_get_version() < ARM_SMCCC_VERSION_1_1) {
-+		pr_err("SMCCC 1.1 required, aborting\n");
-+		return -EINVAL;
-+	}
-+
-+	if (!parent)
-+		return -ENXIO;
-+
-+	parent_domain = irq_find_host(parent);
-+	if (!parent_domain)
-+		return -ENXIO;
-+
-+	rvid.fwnode = of_node_to_fwnode(node);
-+
-+	ret = rvid_version(&version);
-+	if (ret != RVID_STATUS_SUCCESS) {
-+		pr_err("error retrieving version (%ld, %ld)\n",
-+		       RVID_STATUS_REASON(ret), RVID_STATUS_INDEX(ret));
-+		return -ENXIO;
-+	}
-+
-+	if (version < RVID_VERSION(0, 3)) {
-+		pr_err("version (%ld, %ld) too old, expected min. (%d, %d)\n",
-+		       RVID_VERSION_MAJOR(version), RVID_VERSION_MINOR(version),
-+		       0, 3);
-+		return -ENXIO;
-+	}
-+
-+	pr_info("distributing interrupts to %pOF\n", parent);
-+
-+	rvid.domain = irq_domain_create_hierarchy(parent_domain, 0, 0,
-+						  rvid.fwnode,
-+						  &rvid_irq_domain_ops, &rvid);
-+	if (!rvid.domain) {
-+		pr_warn("Failed to allocate irq domain\n");
-+		return -ENOMEM;
-+	}
-+
-+	return 0;
-+}
-+
-+IRQCHIP_DECLARE(rvic, "arm,rvid", rvid_init);
-diff --git a/include/linux/irqchip/irq-rvic.h b/include/linux/irqchip/irq-rvic.h
-index 0176ca7d3c30..4545c1e89741 100644
---- a/include/linux/irqchip/irq-rvic.h
-+++ b/include/linux/irqchip/irq-rvic.h
-@@ -74,4 +74,23 @@
- #define RVIC_STATUS_DISABLED		RVIx_STATUS_DISABLED
- #define RVIC_STATUS_NO_INTERRUPTS	RVIx_STATUS_NO_INTERRUPTS
+ static int __init rvid_init(struct device_node *node,
+ 			    struct device_node *parent)
+ {
+@@ -253,6 +431,10 @@ static int __init rvid_init(struct device_node *node,
+ 		return -ENOMEM;
+ 	}
  
-+/* rVID functions */
-+#define SMC64_RVID_BASE			0xc5000100
-+#define SMC64_RVID_FN(n)		(SMC64_RVID_BASE + (n))
++	irq_domain_update_bus_token(rvid.domain, DOMAIN_BUS_WIRED);
 +
-+#define SMC64_RVID_VERSION		SMC64_RVID_FN(0)
-+#define SMC64_RVID_MAP			SMC64_RVID_FN(1)
-+#define SMC64_RVID_UNMAP		SMC64_RVID_FN(2)
++	rvid_msi_setup(node);
 +
-+#define RVID_VERSION(M, m)		RVIx_VERSION((M), (m))
-+
-+#define RVID_VERSION_MAJOR(v)		RVIx_VERSION_MAJOR((v))
-+#define RVID_VERSION_MINOR(v)		RVIx_VERSION_MINOR((v))
-+
-+#define RVID_STATUS_REASON(c)		RVIx_STATUS_REASON((c))
-+#define RVID_STATUS_INDEX(c)		RVIx_STATUS_INDEX((c))
-+
-+#define RVID_STATUS_SUCCESS		RVIx_STATUS_SUCCESS
-+#define RVID_STATUS_ERROR_PARAMETER	RVIx_STATUS_ERROR_PARAMETER
-+
- #endif /* __IRQCHIP_IRQ_RVIC_H__ */
+ 	return 0;
+ }
+ 
 -- 
 2.27.0
 
