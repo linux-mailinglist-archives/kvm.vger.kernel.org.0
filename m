@@ -2,32 +2,32 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 832C825C556
-	for <lists+kvm@lfdr.de>; Thu,  3 Sep 2020 17:28:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 17AC125C553
+	for <lists+kvm@lfdr.de>; Thu,  3 Sep 2020 17:27:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728711AbgICP07 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 3 Sep 2020 11:26:59 -0400
-Received: from mail.kernel.org ([198.145.29.99]:42372 "EHLO mail.kernel.org"
+        id S1728480AbgICP06 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 3 Sep 2020 11:26:58 -0400
+Received: from mail.kernel.org ([198.145.29.99]:42426 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728344AbgICP00 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 3 Sep 2020 11:26:26 -0400
+        id S1728397AbgICP01 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 3 Sep 2020 11:26:27 -0400
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 08531208FE;
+        by mail.kernel.org (Postfix) with ESMTPSA id 9244A2098B;
         Thu,  3 Sep 2020 15:26:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
         s=default; t=1599146785;
-        bh=ceS8NE2MW+txLmS/EWVjLDcRc/17UR1qG/NRs/CDH60=;
+        bh=8hk5dvN5QgbcKtLB/YnBZWm60piZDPywsqMa1ZLHOg0=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=Uciye53Rz0ao2HSHPhxALTU36xXXtoFDxua7X+zyhfs/RLATZ3OTrvBbYzluD8Xju
-         5AgwZnGRMb/e6YEhsXXUEJz0p9qszaM0xCSa1pJ4vd7CpFj8YOX4RdpeKMDQEW1ABr
-         4m4oHkunthOYOMD+zIBB+hit4TKacp6SLIUOGPus=
+        b=MqFoI44aTtBOiDxlcpxaLQXprmwYvbATSASgLh2UE49UK8P1sK6oC1JwdaC0GpNzh
+         SZ8iX1gmrohGGUzuIE31eXpjhV2vc6cElJBp1je2JUSs+/X0rB+j7kSEWzBxtsPSHu
+         BZ+8zxaVUd2w98dcmhOTrIRSjMesuWWn/uk/PGzI=
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=why.lan)
         by disco-boy.misterjones.org with esmtpsa (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
         (Exim 4.92)
         (envelope-from <maz@kernel.org>)
-        id 1kDr83-008vT9-BF; Thu, 03 Sep 2020 16:26:23 +0100
+        id 1kDr84-008vT9-08; Thu, 03 Sep 2020 16:26:24 +0100
 From:   Marc Zyngier <maz@kernel.org>
 To:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
         linux-arm-kernel@lists.infradead.org
@@ -37,9 +37,9 @@ Cc:     kernel-team@android.com,
         James Morse <james.morse@arm.com>,
         Julien Thierry <julien.thierry.kdev@gmail.com>,
         Suzuki K Poulose <suzuki.poulose@arm.com>
-Subject: [PATCH 04/23] irqchip/rvid: Add PCI MSI support
-Date:   Thu,  3 Sep 2020 16:25:51 +0100
-Message-Id: <20200903152610.1078827-5-maz@kernel.org>
+Subject: [PATCH 05/23] KVM: arm64: Move GIC model out of the distributor
+Date:   Thu,  3 Sep 2020 16:25:52 +0100
+Message-Id: <20200903152610.1078827-6-maz@kernel.org>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20200903152610.1078827-1-maz@kernel.org>
 References: <20200903152610.1078827-1-maz@kernel.org>
@@ -54,224 +54,391 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+In order to allow more than just GIC implementations in the future,
+let's move the GIC model outside of the distributor. This also
+allows us to back irqchip_in_kernel() with its own irqchip type
+(IRQCHIP_USER), removing another field from the distributor.
+
+New helpers are provided as a convenience.
+
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- drivers/irqchip/irq-rvid.c | 182 +++++++++++++++++++++++++++++++++++++
- 1 file changed, 182 insertions(+)
+ arch/arm64/include/asm/kvm_host.h     |  2 ++
+ arch/arm64/include/asm/kvm_irq.h      | 20 ++++++++++++++++++++
+ arch/arm64/kvm/vgic/vgic-debug.c      |  5 +++--
+ arch/arm64/kvm/vgic/vgic-init.c       | 26 ++++++++++++--------------
+ arch/arm64/kvm/vgic/vgic-kvm-device.c | 16 ++++++++++++----
+ arch/arm64/kvm/vgic/vgic-mmio-v3.c    |  2 +-
+ arch/arm64/kvm/vgic/vgic-mmio.c       | 10 ++++------
+ arch/arm64/kvm/vgic/vgic-v3.c         | 20 ++++++++------------
+ include/kvm/arm_vgic.h                |  5 -----
+ 9 files changed, 62 insertions(+), 44 deletions(-)
+ create mode 100644 arch/arm64/include/asm/kvm_irq.h
 
-diff --git a/drivers/irqchip/irq-rvid.c b/drivers/irqchip/irq-rvid.c
-index 953f654e58d4..250f95ad1a09 100644
---- a/drivers/irqchip/irq-rvid.c
-+++ b/drivers/irqchip/irq-rvid.c
-@@ -12,12 +12,19 @@
- #include <linux/irq.h>
- #include <linux/irqchip.h>
- #include <linux/irqdomain.h>
-+#include <linux/msi.h>
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index e52c927aade5..f0e30e12b523 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -24,6 +24,7 @@
+ #include <asm/fpsimd.h>
+ #include <asm/kvm.h>
+ #include <asm/kvm_asm.h>
++#include <asm/kvm_irq.h>
+ #include <asm/thread_info.h>
  
- #include <linux/irqchip/irq-rvic.h>
+ #define __KVM_HAVE_ARCH_INTC_INITIALIZED
+@@ -98,6 +99,7 @@ struct kvm_arch {
+ 	int max_vcpus;
  
- struct rvid_data {
- 	struct fwnode_handle	*fwnode;
- 	struct irq_domain	*domain;
-+	struct irq_domain	*msi_domain;
-+	struct irq_domain	*pci_domain;
-+	unsigned long		*msi_map;
-+	struct mutex		msi_lock;
-+	u32			msi_base;
-+	u32			msi_nr;
- };
+ 	/* Interrupt controller */
++	enum kvm_irqchip_type	irqchip_type;
+ 	struct vgic_dist	vgic;
  
- static struct rvid_data rvid;
-@@ -209,6 +216,177 @@ static const struct irq_domain_ops rvid_irq_domain_ops = {
- 	.deactivate	= rvid_irq_domain_deactivate,
- };
- 
-+#ifdef CONFIG_PCI_MSI
+ 	/* Mandated version of PSCI */
+diff --git a/arch/arm64/include/asm/kvm_irq.h b/arch/arm64/include/asm/kvm_irq.h
+new file mode 100644
+index 000000000000..46bffb6026f8
+--- /dev/null
++++ b/arch/arm64/include/asm/kvm_irq.h
+@@ -0,0 +1,20 @@
++/* SPDX-License-Identifier: GPL-2.0-only */
 +/*
-+ * The MSI irqchip is completely transparent. The only purpose of the
-+ * corresponding irq domain is to provide the MSI allocator, and feed
-+ * the allocated inputs to the main rVID irq domain for mapping at the
-+ * rVIC level.
++ * Copyright (C) 2020 - Google LLC
++ * Author: Marc Zyngier <maz@kernel.org>
 + */
-+static struct irq_chip rvid_msi_chip = {
-+	.name			= "rvid-MSI",
-+	.irq_mask		= irq_chip_mask_parent,
-+	.irq_unmask		= irq_chip_unmask_parent,
-+	.irq_eoi		= irq_chip_eoi_parent,
-+	.irq_get_irqchip_state	= irq_chip_get_parent_state,
-+	.irq_set_irqchip_state	= irq_chip_set_parent_state,
-+	.irq_retrigger		= irq_chip_retrigger_hierarchy,
-+	.irq_set_type		= irq_chip_set_type_parent,
-+	.irq_set_affinity	= irq_chip_set_affinity_parent,
++
++#ifndef __ARM64_KVM_IRQ_H__
++#define __ARM64_KVM_IRQ_H__
++
++enum kvm_irqchip_type {
++	IRQCHIP_USER,		/* Implemented in userspace */
++	IRQCHIP_GICv2,		/* v2 on v2, or v2 on v3 */
++	IRQCHIP_GICv3,		/* v3 on v3 */
 +};
 +
-+static int rvid_msi_domain_alloc(struct irq_domain *domain, unsigned int virq,
-+				 unsigned int nr_irqs, void *arg)
-+{
-+	int ret, hwirq, i;
++#define irqchip_in_kernel(k)	((k)->arch.irqchip_type != IRQCHIP_USER)
++#define irqchip_is_gic_v2(k)	((k)->arch.irqchip_type == IRQCHIP_GICv2)
++#define irqchip_is_gic_v3(k)	((k)->arch.irqchip_type == IRQCHIP_GICv3)
 +
-+	mutex_lock(&rvid.msi_lock);
-+	hwirq = bitmap_find_free_region(rvid.msi_map, rvid.msi_nr,
-+					get_count_order(nr_irqs));
-+	mutex_unlock(&rvid.msi_lock);
-+
-+	if (hwirq < 0)
-+		return -ENOSPC;
-+
-+	for (i = 0; i < nr_irqs; i++) {
-+		/* Use the rVID domain to map the input to something */
-+		struct irq_fwspec fwspec = (struct irq_fwspec) {
-+			.fwnode		= domain->parent->fwnode,
-+			.param_count	= 1,
-+			.param[0]	= rvid.msi_base + hwirq + i,
-+		};
-+
-+		ret = irq_domain_alloc_irqs_parent(domain, virq + i, 1, &fwspec);
-+		if (WARN_ON(ret))
-+			goto out;
-+
-+		irq_domain_set_hwirq_and_chip(domain, virq + i, hwirq + i,
-+					      &rvid_msi_chip, &rvid);
-+	}
-+
-+	return 0;
-+
-+out:
-+	mutex_lock(&rvid.msi_lock);
-+	bitmap_release_region(rvid.msi_map, hwirq, get_count_order(nr_irqs));
-+	mutex_unlock(&rvid.msi_lock);
-+
-+	return ret;
-+}
-+
-+static void rvid_msi_domain_free(struct irq_domain *domain, unsigned int virq,
-+				 unsigned int nr_irqs)
-+{
-+	struct irq_data *d = irq_domain_get_irq_data(domain, virq);
-+	irq_hw_number_t hwirq = d->hwirq;
-+
-+	/* This is a bit cheeky, but hey, recursion never hurt anyone... */
-+	rvid_irq_domain_free(domain, virq, nr_irqs);
-+
-+	mutex_lock(&rvid.msi_lock);
-+	bitmap_release_region(rvid.msi_map, hwirq, get_count_order(nr_irqs));
-+	mutex_unlock(&rvid.msi_lock);
-+}
-+
-+static struct irq_domain_ops rvid_msi_domain_ops = {
-+	.alloc		= rvid_msi_domain_alloc,
-+	.free		= rvid_msi_domain_free,
-+};
-+
-+/*
-+ * The PCI irq chip only provides the minimal stuff, as most of the
-+ * other methods will be provided as defaults.
-+ */
-+static void rvid_compose_msi_msg(struct irq_data *data, struct msi_msg *msg)
-+{
-+	/* Random address, the rVID doesn't really have a doorbell */
-+	msg->address_hi = 0;
-+	msg->address_lo = 0xba5e0000;
-+
-+	/*
-+	 * We are called from the PCI domain, and what we program in
-+	 * the device is the rVID input pin, which is located two
-+	 * levels down in the interrupt chain (PCI -> MSI -> rVID).
-+	 */
-+	msg->data = data->parent_data->parent_data->hwirq;
-+}
-+
-+static void rvid_pci_mask(struct irq_data *d)
-+{
-+	pci_msi_mask_irq(d);
-+	irq_chip_mask_parent(d);
-+}
-+
-+static void rvid_pci_unmask(struct irq_data *d)
-+{
-+	pci_msi_unmask_irq(d);
-+	irq_chip_unmask_parent(d);
-+}
-+
-+static struct irq_chip rvid_pci_chip = {
-+	.name			= "PCI-MSI",
-+	.irq_mask		= rvid_pci_mask,
-+	.irq_unmask		= rvid_pci_unmask,
-+	.irq_eoi		= irq_chip_eoi_parent,
-+	.irq_compose_msi_msg	= rvid_compose_msi_msg,
-+	.irq_write_msi_msg	= pci_msi_domain_write_msg,
-+};
-+
-+static struct msi_domain_info rvid_pci_domain_info = {
-+	.flags	= (MSI_FLAG_USE_DEF_DOM_OPS | MSI_FLAG_USE_DEF_CHIP_OPS |
-+		   MSI_FLAG_PCI_MSIX | MSI_FLAG_MULTI_PCI_MSI),
-+	.chip	= &rvid_pci_chip,
-+};
-+
-+static void __init rvid_msi_setup(struct device_node *np)
-+{
-+	if (!of_property_read_bool(np, "msi-controller"))
-+		return;
-+
-+	if (of_property_read_u32_index(np, "msi-range", 0, &rvid.msi_base) ||
-+	    of_property_read_u32_index(np, "msi-range", 1, &rvid.msi_nr)) {
-+		pr_err("Invalid or missing msi-range\n");
-+		return;
-+	}
-+
-+	mutex_init(&rvid.msi_lock);
-+
-+	rvid.msi_map = bitmap_alloc(rvid.msi_nr, GFP_KERNEL | __GFP_ZERO);
-+	if (!rvid.msi_map)
-+		return;
-+
-+	rvid.msi_domain = irq_domain_create_hierarchy(rvid.domain, 0, 0,
-+						      rvid.fwnode,
-+						      &rvid_msi_domain_ops,
-+						      &rvid);
-+	if (!rvid.msi_domain) {
-+		pr_err("Failed to allocate MSI domain\n");
-+		goto out;
-+	}
-+
-+	irq_domain_update_bus_token(rvid.msi_domain, DOMAIN_BUS_NEXUS);
-+
-+	rvid.pci_domain = pci_msi_create_irq_domain(rvid.domain->fwnode,
-+						    &rvid_pci_domain_info,
-+						    rvid.msi_domain);
-+	if (!rvid.pci_domain) {
-+		pr_err("Failed to allocate PCI domain\n");
-+		goto out;
-+	}
-+
-+	pr_info("MSIs available as inputs [%d:%d]\n",
-+		rvid.msi_base, rvid.msi_base + rvid.msi_nr - 1);
-+	return;
-+
-+out:
-+	if (rvid.msi_domain)
-+		irq_domain_remove(rvid.msi_domain);
-+	kfree(rvid.msi_map);
-+}
-+#else
-+static inline void rvid_msi_setup(struct device_node *np) {}
 +#endif
-+
- static int __init rvid_init(struct device_node *node,
- 			    struct device_node *parent)
+diff --git a/arch/arm64/kvm/vgic/vgic-debug.c b/arch/arm64/kvm/vgic/vgic-debug.c
+index b13a9e3f99dd..2d19fd55fc7b 100644
+--- a/arch/arm64/kvm/vgic/vgic-debug.c
++++ b/arch/arm64/kvm/vgic/vgic-debug.c
+@@ -61,7 +61,7 @@ static void iter_init(struct kvm *kvm, struct vgic_state_iter *iter,
+ 
+ 	iter->nr_cpus = nr_cpus;
+ 	iter->nr_spis = kvm->arch.vgic.nr_spis;
+-	if (kvm->arch.vgic.vgic_model == KVM_DEV_TYPE_ARM_VGIC_V3) {
++	if (irqchip_is_gic_v3(kvm)) {
+ 		iter->nr_lpis = vgic_copy_lpi_list(kvm, NULL, &iter->lpi_array);
+ 		if (iter->nr_lpis < 0)
+ 			iter->nr_lpis = 0;
+@@ -142,7 +142,8 @@ static void vgic_debug_stop(struct seq_file *s, void *v)
+ 
+ static void print_dist_state(struct seq_file *s, struct vgic_dist *dist)
  {
-@@ -253,6 +431,10 @@ static int __init rvid_init(struct device_node *node,
- 		return -ENOMEM;
+-	bool v3 = dist->vgic_model == KVM_DEV_TYPE_ARM_VGIC_V3;
++	struct kvm *kvm = container_of(dist, struct kvm, arch.vgic);
++	bool v3 = irqchip_is_gic_v3(kvm);
+ 
+ 	seq_printf(s, "Distributor\n");
+ 	seq_printf(s, "===========\n");
+diff --git a/arch/arm64/kvm/vgic/vgic-init.c b/arch/arm64/kvm/vgic/vgic-init.c
+index 32e32d67a127..8157171b8af3 100644
+--- a/arch/arm64/kvm/vgic/vgic-init.c
++++ b/arch/arm64/kvm/vgic/vgic-init.c
+@@ -106,8 +106,8 @@ int kvm_vgic_create(struct kvm *kvm, u32 type)
+ 		goto out_unlock;
  	}
  
-+	irq_domain_update_bus_token(rvid.domain, DOMAIN_BUS_WIRED);
+-	kvm->arch.vgic.in_kernel = true;
+-	kvm->arch.vgic.vgic_model = type;
++	kvm->arch.irqchip_type = (type == KVM_DEV_TYPE_ARM_VGIC_V2 ?
++				  IRQCHIP_GICv2 : IRQCHIP_GICv3);
+ 
+ 	kvm->arch.vgic.vgic_dist_base = VGIC_ADDR_UNDEF;
+ 
+@@ -155,12 +155,12 @@ static int kvm_vgic_dist_init(struct kvm *kvm, unsigned int nr_spis)
+ 		irq->vcpu = NULL;
+ 		irq->target_vcpu = vcpu0;
+ 		kref_init(&irq->refcount);
+-		switch (dist->vgic_model) {
+-		case KVM_DEV_TYPE_ARM_VGIC_V2:
++		switch (kvm->arch.irqchip_type) {
++		case IRQCHIP_GICv2:
+ 			irq->targets = 0;
+ 			irq->group = 0;
+ 			break;
+-		case KVM_DEV_TYPE_ARM_VGIC_V3:
++		case IRQCHIP_GICv3:
+ 			irq->mpidr = 0;
+ 			irq->group = 1;
+ 			break;
+@@ -185,7 +185,6 @@ static int kvm_vgic_dist_init(struct kvm *kvm, unsigned int nr_spis)
+ int kvm_vgic_vcpu_init(struct kvm_vcpu *vcpu)
+ {
+ 	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
+-	struct vgic_dist *dist = &vcpu->kvm->arch.vgic;
+ 	int ret = 0;
+ 	int i;
+ 
+@@ -225,7 +224,7 @@ int kvm_vgic_vcpu_init(struct kvm_vcpu *vcpu)
+ 	 * If we are creating a VCPU with a GICv3 we must also register the
+ 	 * KVM io device for the redistributor that belongs to this VCPU.
+ 	 */
+-	if (dist->vgic_model == KVM_DEV_TYPE_ARM_VGIC_V3) {
++	if (irqchip_is_gic_v3(vcpu->kvm)) {
+ 		mutex_lock(&vcpu->kvm->lock);
+ 		ret = vgic_register_redist_iodev(vcpu);
+ 		mutex_unlock(&vcpu->kvm->lock);
+@@ -278,12 +277,12 @@ int vgic_init(struct kvm *kvm)
+ 
+ 		for (i = 0; i < VGIC_NR_PRIVATE_IRQS; i++) {
+ 			struct vgic_irq *irq = &vgic_cpu->private_irqs[i];
+-			switch (dist->vgic_model) {
+-			case KVM_DEV_TYPE_ARM_VGIC_V3:
++			switch (kvm->arch.irqchip_type) {
++			case IRQCHIP_GICv3:
+ 				irq->group = 1;
+ 				irq->mpidr = kvm_vcpu_get_mpidr_aff(vcpu);
+ 				break;
+-			case KVM_DEV_TYPE_ARM_VGIC_V2:
++			case IRQCHIP_GICv2:
+ 				irq->group = 0;
+ 				irq->targets = 1U << idx;
+ 				break;
+@@ -336,7 +335,7 @@ static void kvm_vgic_dist_destroy(struct kvm *kvm)
+ 	dist->spis = NULL;
+ 	dist->nr_spis = 0;
+ 
+-	if (kvm->arch.vgic.vgic_model == KVM_DEV_TYPE_ARM_VGIC_V3) {
++	if (irqchip_is_gic_v3(kvm)) {
+ 		list_for_each_entry_safe(rdreg, next, &dist->rd_regions, list) {
+ 			list_del(&rdreg->list);
+ 			kfree(rdreg);
+@@ -402,7 +401,7 @@ int vgic_lazy_init(struct kvm *kvm)
+ 		 * be explicitly initialized once setup with the respective
+ 		 * KVM device call.
+ 		 */
+-		if (kvm->arch.vgic.vgic_model != KVM_DEV_TYPE_ARM_VGIC_V2)
++		if (!irqchip_is_gic_v2(kvm))
+ 			return -EBUSY;
+ 
+ 		mutex_lock(&kvm->lock);
+@@ -425,14 +424,13 @@ int vgic_lazy_init(struct kvm *kvm)
+  */
+ int kvm_vgic_map_resources(struct kvm *kvm)
+ {
+-	struct vgic_dist *dist = &kvm->arch.vgic;
+ 	int ret = 0;
+ 
+ 	mutex_lock(&kvm->lock);
+ 	if (!irqchip_in_kernel(kvm))
+ 		goto out;
+ 
+-	if (dist->vgic_model == KVM_DEV_TYPE_ARM_VGIC_V2)
++	if (irqchip_is_gic_v2(kvm))
+ 		ret = vgic_v2_map_resources(kvm);
+ 	else
+ 		ret = vgic_v3_map_resources(kvm);
+diff --git a/arch/arm64/kvm/vgic/vgic-kvm-device.c b/arch/arm64/kvm/vgic/vgic-kvm-device.c
+index 44419679f91a..928afb224540 100644
+--- a/arch/arm64/kvm/vgic/vgic-kvm-device.c
++++ b/arch/arm64/kvm/vgic/vgic-kvm-device.c
+@@ -31,10 +31,18 @@ int vgic_check_ioaddr(struct kvm *kvm, phys_addr_t *ioaddr,
+ 
+ static int vgic_check_type(struct kvm *kvm, int type_needed)
+ {
+-	if (kvm->arch.vgic.vgic_model != type_needed)
+-		return -ENODEV;
+-	else
+-		return 0;
++	switch (type_needed) {
++	case KVM_DEV_TYPE_ARM_VGIC_V2:
++		if (irqchip_is_gic_v2(kvm))
++			return 0;
++		break;
++	case KVM_DEV_TYPE_ARM_VGIC_V3:
++		if (irqchip_is_gic_v3(kvm))
++			return 0;
++		break;
++	}
 +
-+	rvid_msi_setup(node);
-+
- 	return 0;
++	return -ENODEV;
  }
  
+ /**
+diff --git a/arch/arm64/kvm/vgic/vgic-mmio-v3.c b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
+index 5c786b915cd3..6234e1409b4d 100644
+--- a/arch/arm64/kvm/vgic/vgic-mmio-v3.c
++++ b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
+@@ -42,7 +42,7 @@ bool vgic_has_its(struct kvm *kvm)
+ {
+ 	struct vgic_dist *dist = &kvm->arch.vgic;
+ 
+-	if (dist->vgic_model != KVM_DEV_TYPE_ARM_VGIC_V3)
++	if (!irqchip_is_gic_v3(kvm))
+ 		return false;
+ 
+ 	return dist->has_its;
+diff --git a/arch/arm64/kvm/vgic/vgic-mmio.c b/arch/arm64/kvm/vgic/vgic-mmio.c
+index b2d73fc0d1ef..865f12030ab5 100644
+--- a/arch/arm64/kvm/vgic/vgic-mmio.c
++++ b/arch/arm64/kvm/vgic/vgic-mmio.c
+@@ -263,8 +263,7 @@ unsigned long vgic_mmio_read_pending(struct kvm_vcpu *vcpu,
+ 
+ static bool is_vgic_v2_sgi(struct kvm_vcpu *vcpu, struct vgic_irq *irq)
+ {
+-	return (vgic_irq_is_sgi(irq->intid) &&
+-		vcpu->kvm->arch.vgic.vgic_model == KVM_DEV_TYPE_ARM_VGIC_V2);
++	return (vgic_irq_is_sgi(irq->intid) && irqchip_is_gic_v2(vcpu->kvm));
+ }
+ 
+ void vgic_mmio_write_spending(struct kvm_vcpu *vcpu,
+@@ -450,7 +449,7 @@ int vgic_uaccess_write_cpending(struct kvm_vcpu *vcpu,
+  */
+ static void vgic_access_active_prepare(struct kvm_vcpu *vcpu, u32 intid)
+ {
+-	if (vcpu->kvm->arch.vgic.vgic_model == KVM_DEV_TYPE_ARM_VGIC_V3 ||
++	if (irqchip_is_gic_v3(vcpu->kvm) ||
+ 	    intid >= VGIC_NR_PRIVATE_IRQS)
+ 		kvm_arm_halt_guest(vcpu->kvm);
+ }
+@@ -458,7 +457,7 @@ static void vgic_access_active_prepare(struct kvm_vcpu *vcpu, u32 intid)
+ /* See vgic_access_active_prepare */
+ static void vgic_access_active_finish(struct kvm_vcpu *vcpu, u32 intid)
+ {
+-	if (vcpu->kvm->arch.vgic.vgic_model == KVM_DEV_TYPE_ARM_VGIC_V3 ||
++	if (irqchip_is_gic_v3(vcpu->kvm) ||
+ 	    intid >= VGIC_NR_PRIVATE_IRQS)
+ 		kvm_arm_resume_guest(vcpu->kvm);
+ }
+@@ -539,7 +538,6 @@ static void vgic_mmio_change_active(struct kvm_vcpu *vcpu, struct vgic_irq *irq,
+ 		 */
+ 		irq->active = false;
+ 	} else {
+-		u32 model = vcpu->kvm->arch.vgic.vgic_model;
+ 		u8 active_source;
+ 
+ 		irq->active = active;
+@@ -557,7 +555,7 @@ static void vgic_mmio_change_active(struct kvm_vcpu *vcpu, struct vgic_irq *irq,
+ 		 */
+ 		active_source = (requester_vcpu) ? requester_vcpu->vcpu_id : 0;
+ 
+-		if (model == KVM_DEV_TYPE_ARM_VGIC_V2 &&
++		if (irqchip_is_gic_v2(vcpu->kvm) &&
+ 		    active && vgic_irq_is_sgi(irq->intid))
+ 			irq->active_source = active_source;
+ 	}
+diff --git a/arch/arm64/kvm/vgic/vgic-v3.c b/arch/arm64/kvm/vgic/vgic-v3.c
+index 76e2d85789ed..c6fdb1222453 100644
+--- a/arch/arm64/kvm/vgic/vgic-v3.c
++++ b/arch/arm64/kvm/vgic/vgic-v3.c
+@@ -32,7 +32,7 @@ void vgic_v3_fold_lr_state(struct kvm_vcpu *vcpu)
+ {
+ 	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
+ 	struct vgic_v3_cpu_if *cpuif = &vgic_cpu->vgic_v3;
+-	u32 model = vcpu->kvm->arch.vgic.vgic_model;
++	bool is_v3 = irqchip_is_gic_v3(vcpu->kvm);
+ 	int lr;
+ 
+ 	DEBUG_SPINLOCK_BUG_ON(!irqs_disabled());
+@@ -48,7 +48,7 @@ void vgic_v3_fold_lr_state(struct kvm_vcpu *vcpu)
+ 		cpuid = val & GICH_LR_PHYSID_CPUID;
+ 		cpuid >>= GICH_LR_PHYSID_CPUID_SHIFT;
+ 
+-		if (model == KVM_DEV_TYPE_ARM_VGIC_V3) {
++		if (is_v3) {
+ 			intid = val & ICH_LR_VIRTUAL_ID_MASK;
+ 		} else {
+ 			intid = val & GICH_LR_VIRTUALID;
+@@ -117,12 +117,11 @@ void vgic_v3_fold_lr_state(struct kvm_vcpu *vcpu)
+ /* Requires the irq to be locked already */
+ void vgic_v3_populate_lr(struct kvm_vcpu *vcpu, struct vgic_irq *irq, int lr)
+ {
+-	u32 model = vcpu->kvm->arch.vgic.vgic_model;
++	bool is_v2 = irqchip_is_gic_v2(vcpu->kvm);
+ 	u64 val = irq->intid;
+ 	bool allow_pending = true, is_v2_sgi;
+ 
+-	is_v2_sgi = (vgic_irq_is_sgi(irq->intid) &&
+-		     model == KVM_DEV_TYPE_ARM_VGIC_V2);
++	is_v2_sgi = (vgic_irq_is_sgi(irq->intid) && is_v2);
+ 
+ 	if (irq->active) {
+ 		val |= ICH_LR_ACTIVE_BIT;
+@@ -163,8 +162,7 @@ void vgic_v3_populate_lr(struct kvm_vcpu *vcpu, struct vgic_irq *irq, int lr)
+ 		if (irq->config == VGIC_CONFIG_EDGE)
+ 			irq->pending_latch = false;
+ 
+-		if (vgic_irq_is_sgi(irq->intid) &&
+-		    model == KVM_DEV_TYPE_ARM_VGIC_V2) {
++		if (vgic_irq_is_sgi(irq->intid) && is_v2) {
+ 			u32 src = ffs(irq->source);
+ 
+ 			if (WARN_RATELIMIT(!src, "No SGI source for INTID %d\n",
+@@ -205,10 +203,9 @@ void vgic_v3_clear_lr(struct kvm_vcpu *vcpu, int lr)
+ void vgic_v3_set_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcrp)
+ {
+ 	struct vgic_v3_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v3;
+-	u32 model = vcpu->kvm->arch.vgic.vgic_model;
+ 	u32 vmcr;
+ 
+-	if (model == KVM_DEV_TYPE_ARM_VGIC_V2) {
++	if (irqchip_is_gic_v2(vcpu->kvm)) {
+ 		vmcr = (vmcrp->ackctl << ICH_VMCR_ACK_CTL_SHIFT) &
+ 			ICH_VMCR_ACK_CTL_MASK;
+ 		vmcr |= (vmcrp->fiqen << ICH_VMCR_FIQ_EN_SHIFT) &
+@@ -235,12 +232,11 @@ void vgic_v3_set_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcrp)
+ void vgic_v3_get_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcrp)
+ {
+ 	struct vgic_v3_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v3;
+-	u32 model = vcpu->kvm->arch.vgic.vgic_model;
+ 	u32 vmcr;
+ 
+ 	vmcr = cpu_if->vgic_vmcr;
+ 
+-	if (model == KVM_DEV_TYPE_ARM_VGIC_V2) {
++	if (irqchip_is_gic_v2(vcpu->kvm)) {
+ 		vmcrp->ackctl = (vmcr & ICH_VMCR_ACK_CTL_MASK) >>
+ 			ICH_VMCR_ACK_CTL_SHIFT;
+ 		vmcrp->fiqen = (vmcr & ICH_VMCR_FIQ_EN_MASK) >>
+@@ -285,7 +281,7 @@ void vgic_v3_enable(struct kvm_vcpu *vcpu)
+ 	 * Also, we don't support any form of IRQ/FIQ bypass.
+ 	 * This goes with the spec allowing the value to be RAO/WI.
+ 	 */
+-	if (vcpu->kvm->arch.vgic.vgic_model == KVM_DEV_TYPE_ARM_VGIC_V3) {
++	if (irqchip_is_gic_v3(vcpu->kvm)) {
+ 		vgic_v3->vgic_sre = (ICC_SRE_EL1_DIB |
+ 				     ICC_SRE_EL1_DFB |
+ 				     ICC_SRE_EL1_SRE);
+diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
+index a8d8fdcd3723..88461ecfa854 100644
+--- a/include/kvm/arm_vgic.h
++++ b/include/kvm/arm_vgic.h
+@@ -201,13 +201,9 @@ struct vgic_redist_region {
+ };
+ 
+ struct vgic_dist {
+-	bool			in_kernel;
+ 	bool			ready;
+ 	bool			initialized;
+ 
+-	/* vGIC model the kernel emulates for the guest (GICv2 or GICv3) */
+-	u32			vgic_model;
+-
+ 	/* Implementation revision as reported in the GICD_IIDR */
+ 	u32			implementation_rev;
+ 
+@@ -361,7 +357,6 @@ void kvm_vgic_load(struct kvm_vcpu *vcpu);
+ void kvm_vgic_put(struct kvm_vcpu *vcpu);
+ void kvm_vgic_vmcr_sync(struct kvm_vcpu *vcpu);
+ 
+-#define irqchip_in_kernel(k)	(!!((k)->arch.vgic.in_kernel))
+ #define vgic_initialized(k)	((k)->arch.vgic.initialized)
+ #define vgic_ready(k)		((k)->arch.vgic.ready)
+ #define vgic_valid_spi(k, i)	(((i) >= VGIC_NR_PRIVATE_IRQS) && \
 -- 
 2.27.0
 
