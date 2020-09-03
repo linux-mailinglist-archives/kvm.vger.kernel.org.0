@@ -2,179 +2,150 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 75A2425C7D3
-	for <lists+kvm@lfdr.de>; Thu,  3 Sep 2020 19:10:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8824525C7FB
+	for <lists+kvm@lfdr.de>; Thu,  3 Sep 2020 19:21:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728965AbgICRKQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 3 Sep 2020 13:10:16 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:40140 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726327AbgICRKP (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 3 Sep 2020 13:10:15 -0400
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 083H1lKL138973;
-        Thu, 3 Sep 2020 13:10:08 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=++7FG1vvQy4IQVZV74Hxz4Q2iO5xLzsWU+5iC8BgQ/I=;
- b=ccrlz93xGaSI0r82viEIaGk3v5n6gPRGSSws8DK5mKCbN3V6GWDFi0Pveb/7oJ5MVmK1
- DYdiiJb4Jw2aNjPTbO++Q2vJvVPFC8y+bwOmIrNj1GK0gFCsygmU7R6pNlL1m30SQFl9
- 4M9qmKS1SUWXDWx2Olloa1mrt1dIewZL2OGloV8R0p0a5pfXVypXuNxtkst/Rvkd9rp7
- 9jBUCAzEEWm95czZOk1F5/3NYDpsh1+aXMB+by4Bi8KBt5l2AyKAt0Ewc/V4QZnGNh8G
- qQUuYKHXgTjI9o0xU6uof75NiwsFMH5xTmL4EmfU8epqz4BRmXjqg8Hk6hCqu5XRYI9p rQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 33b3dx2h2r-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 03 Sep 2020 13:10:08 -0400
-Received: from m0098396.ppops.net (m0098396.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 083H2bnW145734;
-        Thu, 3 Sep 2020 13:10:07 -0400
-Received: from ppma02wdc.us.ibm.com (aa.5b.37a9.ip4.static.sl-reverse.com [169.55.91.170])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 33b3dx2h1d-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 03 Sep 2020 13:10:07 -0400
-Received: from pps.filterd (ppma02wdc.us.ibm.com [127.0.0.1])
-        by ppma02wdc.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 083H7VBO017133;
-        Thu, 3 Sep 2020 17:10:05 GMT
-Received: from b03cxnp08027.gho.boulder.ibm.com (b03cxnp08027.gho.boulder.ibm.com [9.17.130.19])
-        by ppma02wdc.us.ibm.com with ESMTP id 337ena19uj-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 03 Sep 2020 17:10:05 +0000
-Received: from b03ledav002.gho.boulder.ibm.com (b03ledav002.gho.boulder.ibm.com [9.17.130.233])
-        by b03cxnp08027.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 083HA1wp26739064
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 3 Sep 2020 17:10:01 GMT
-Received: from b03ledav002.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 8499E13604F;
-        Thu,  3 Sep 2020 17:10:04 +0000 (GMT)
-Received: from b03ledav002.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 6ED36136065;
-        Thu,  3 Sep 2020 17:10:03 +0000 (GMT)
-Received: from oc4221205838.ibm.com (unknown [9.163.10.164])
-        by b03ledav002.gho.boulder.ibm.com (Postfix) with ESMTP;
-        Thu,  3 Sep 2020 17:10:03 +0000 (GMT)
-Subject: Re: [PATCH v4 1/3] PCI/IOV: Mark VFs as not implementing MSE bit
-To:     Bjorn Helgaas <helgaas@kernel.org>
-Cc:     alex.williamson@redhat.com, bhelgaas@google.com,
-        schnelle@linux.ibm.com, pmorel@linux.ibm.com, mpe@ellerman.id.au,
-        oohall@gmail.com, cohuck@redhat.com, kevin.tian@intel.com,
-        linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, linux-pci@vger.kernel.org
-References: <20200903164117.GA312152@bjorn-Precision-5520>
-From:   Matthew Rosato <mjrosato@linux.ibm.com>
-Message-ID: <38f95349-237e-34e2-66ef-e626cd4aec25@linux.ibm.com>
-Date:   Thu, 3 Sep 2020 13:10:02 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+        id S1728343AbgICRVg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 3 Sep 2020 13:21:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34520 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726678AbgICRVf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 3 Sep 2020 13:21:35 -0400
+Received: from mail-pf1-x441.google.com (mail-pf1-x441.google.com [IPv6:2607:f8b0:4864:20::441])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CD5E1C061244;
+        Thu,  3 Sep 2020 10:21:35 -0700 (PDT)
+Received: by mail-pf1-x441.google.com with SMTP id w7so2866988pfi.4;
+        Thu, 03 Sep 2020 10:21:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=WashrslN8ZwCXy2QjOJBW4ZEBVnlFGgH8kdTqqVqsKU=;
+        b=Q+OHpDNczlIeDseieuM5+66rQlgCH+Kn5aoq2pyWKSRq/jsvf4wYVv5KXl5eRtYund
+         JZl5WDBcJ0dEFGAqLKtjWEQjMwWHobhbhirlJ4WtWDrUaVMEscMlOMLfXG+JyNpmjzLY
+         oxFSbjOOweW8JzcG9cIzgdnuw+hZPdguo0goAINeDspq+Hd585n+igQho5kjHNKMnFZs
+         d/mhy+7aWYNhesXOkEhE49hGkccq3nb5j4n/I0AdXXF2vt4g1RiB52gu5KSrMws3Qc7k
+         /uYmO9C9UrVb9wYqhcqsE6TsQgnQ7JmOivOcJy8/ZRep26U1/95AKWQ6rEBBingyaXnA
+         bKKA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=WashrslN8ZwCXy2QjOJBW4ZEBVnlFGgH8kdTqqVqsKU=;
+        b=EneCLvDWfyXI9HSRj/AeuuURaOfFckvN7ggREpZudvB8M9zMUWT2gNfhCVTFjkWO+D
+         ah+74SRFr/lcLKNkHRNDvWm1OY27N1pq3c6tUJ1J3LB81LbvFuUzbwYgo3eqlH3wbmG8
+         IFHfOdbdwtMijWmMXbUaBkSxJ/aPevEE0eLX+CboG04dgrkTK2a1ITp2UZtGXjNHKP4Y
+         oLpYNeTHHUw4qoq5v4OYaq0P5rOsLLe+odRaWGkKU3+KXWcAi06RXp0spQonzpN+zevk
+         2ToR7r3hFHpF9zi/kOphe70EdYpWz6OtCvO32aZx55EmJKp5S7dWAAy0B8jrJBoV1rSU
+         qTuQ==
+X-Gm-Message-State: AOAM533FppvqWe83ZrZWAWlJwTflRxgPUXd7grOf+IMns5xJOJWnfpnx
+        x27F9mXODBIfK66PQfE1pgM=
+X-Google-Smtp-Source: ABdhPJxr2WeIZr+RTpBi78RWdVAu+wpXA957uq/QJRrasdDFcpqcc/b8n30BnDD45Q8xs6p/dArHuQ==
+X-Received: by 2002:a62:26c2:: with SMTP id m185mr4764708pfm.115.1599153695177;
+        Thu, 03 Sep 2020 10:21:35 -0700 (PDT)
+Received: from thinkpad ([2605:8d80:4c0:b73f:202a:aafe:118f:5e94])
+        by smtp.gmail.com with ESMTPSA id mp3sm3002804pjb.33.2020.09.03.10.21.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 03 Sep 2020 10:21:34 -0700 (PDT)
+Date:   Thu, 3 Sep 2020 10:22:15 -0700
+From:   Rustam Kovhaev <rkovhaev@gmail.com>
+To:     "Gustavo A. R. Silva" <gustavo@embeddedor.com>
+Cc:     pbonzini@redhat.com, vkuznets@redhat.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, gregkh@linuxfoundation.org
+Subject: Re: [PATCH v2] KVM: fix memory leak in kvm_io_bus_unregister_dev()
+Message-ID: <20200903172215.GA870347@thinkpad>
+References: <20200902225718.675314-1-rkovhaev@gmail.com>
+ <c5990c86-ab01-d748-5505-375f50a4ed7d@embeddedor.com>
 MIME-Version: 1.0
-In-Reply-To: <20200903164117.GA312152@bjorn-Precision-5520>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
- definitions=2020-09-03_10:2020-09-03,2020-09-03 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 impostorscore=0
- priorityscore=1501 bulkscore=0 adultscore=0 clxscore=1015 suspectscore=0
- spamscore=0 lowpriorityscore=0 mlxlogscore=999 malwarescore=0 mlxscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
- definitions=main-2009030155
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <c5990c86-ab01-d748-5505-375f50a4ed7d@embeddedor.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 9/3/20 12:41 PM, Bjorn Helgaas wrote:
-> On Wed, Sep 02, 2020 at 03:46:34PM -0400, Matthew Rosato wrote:
->> Per the PCIe spec, VFs cannot implement the MSE bit
->> AKA PCI_COMMAND_MEMORY, and it must be hard-wired to 0.
->> Use a dev_flags bit to signify this requirement.
+On Wed, Sep 02, 2020 at 06:34:11PM -0500, Gustavo A. R. Silva wrote:
+> Hi,
 > 
-> This approach seems sensible to me, but
+> On 9/2/20 17:57, Rustam Kovhaev wrote:
+> > when kmalloc() fails in kvm_io_bus_unregister_dev(), before removing
+> > the bus, we should iterate over all other devices linked to it and call
+> > kvm_iodevice_destructor() for them
+> > 
+> > Reported-and-tested-by: syzbot+f196caa45793d6374707@syzkaller.appspotmail.com
+> > Link: https://syzkaller.appspot.com/bug?extid=f196caa45793d6374707
+> > Signed-off-by: Rustam Kovhaev <rkovhaev@gmail.com>
+> > Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
 > 
->    - This is confusing because while the spec does not use "MSE" to
->      refer to the Command Register "Memory Space Enable" bit
->      (PCI_COMMAND_MEMORY), it *does* use "MSE" in the context of the
->      "VF MSE" bit, which is in the PF SR-IOV Capability.  But of
->      course, you're not talking about that here.  Maybe something like
->      this?
+> I think it's worthwhile to add a Fixes tag for this, too.
 > 
->        For VFs, the Memory Space Enable bit in the Command Register is
->        hard-wired to 0.
+> Please, see more comments below...
 > 
->        Add a dev_flags bit to signify devices where the Command
->        Register Memory Space Enable bit does not control the device's
->        response to MMIO accesses.
-
-Will do.  I'll change the usage of the MSE acronym in the other patches 
-as well.
-
+> > ---
+> > v2:
+> > - remove redundant whitespace
+> > - remove goto statement and use if/else
+> > ---
+> >  virt/kvm/kvm_main.c | 21 ++++++++++++---------
+> >  1 file changed, 12 insertions(+), 9 deletions(-)
+> > 
+> > diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> > index 67cd0b88a6b6..cf88233b819a 100644
+> > --- a/virt/kvm/kvm_main.c
+> > +++ b/virt/kvm/kvm_main.c
+> > @@ -4332,7 +4332,7 @@ int kvm_io_bus_register_dev(struct kvm *kvm, enum kvm_bus bus_idx, gpa_t addr,
+> >  void kvm_io_bus_unregister_dev(struct kvm *kvm, enum kvm_bus bus_idx,
+> >  			       struct kvm_io_device *dev)
+> >  {
+> > -	int i;
+> > +	int i, j;
+> >  	struct kvm_io_bus *new_bus, *bus;
+> >  
+> >  	bus = kvm_get_bus(kvm, bus_idx);
+> > @@ -4349,17 +4349,20 @@ void kvm_io_bus_unregister_dev(struct kvm *kvm, enum kvm_bus bus_idx,
+> >  
+> >  	new_bus = kmalloc(struct_size(bus, range, bus->dev_count - 1),
+> >  			  GFP_KERNEL_ACCOUNT);
+> > -	if (!new_bus)  {
+> > +	if (new_bus) {
+> > +		memcpy(new_bus, bus, sizeof(*bus) + i * sizeof(struct kvm_io_range));
 > 
->    - "PCI_DEV_FLAGS_FORCE_COMMAND_MEM" says something about how you
->      plan to *use* this, but I'd rather use a term that describes the
->      hardware, e.g., "PCI_DEV_FLAGS_NO_COMMAND_MEMORY".
-
-Sure, I will change.
-
+> 				    ^^^
+> It seems that you can use struct_size() here (see the allocation code above)...
 > 
->    - How do we decide whether to use dev_flags vs a bitfield like
->      dev->is_virtfn?  The latter seems simpler unless there's a reason
->      to use dev_flags.  If there's a reason, maybe we could add a
->      comment at pci_dev_flags for future reference.
+> > +		new_bus->dev_count--;
+> > +		memcpy(new_bus->range + i, bus->range + i + 1,
+> > +		       (new_bus->dev_count - i) * sizeof(struct kvm_io_range));
 > 
-
-Something like:
-
-/*
-  * Device does not implement PCI_COMMAND_MEMORY - this is true for any
-  * device marked is_virtfn, but is also true for any VF passed-through
-  * a lower-level hypervisor where emulation of the Memory Space Enable
-  * bit was not provided.
-  */
-PCI_DEV_FLAGS_NO_COMMAND_MEMORY = (__force pci_dev_flags_t) (1 << 12),
-
-?
-
->    - Wrap the commit log to fill a 75-char line.  It's arbitrary, but
->      that's what I use for consistency.
-
-Sure, will do.  I'll roll up a new version once I have feedback from 
-Alex on the vfio changes.
-
+> 					   ^^^
+> ...and, if possible, you can also use flex_array_size() here.
 > 
->> Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
->> ---
->>   drivers/pci/iov.c   | 1 +
->>   include/linux/pci.h | 2 ++
->>   2 files changed, 3 insertions(+)
->>
->> diff --git a/drivers/pci/iov.c b/drivers/pci/iov.c
->> index b37e08c..2bec77c 100644
->> --- a/drivers/pci/iov.c
->> +++ b/drivers/pci/iov.c
->> @@ -180,6 +180,7 @@ int pci_iov_add_virtfn(struct pci_dev *dev, int id)
->>   	virtfn->device = iov->vf_device;
->>   	virtfn->is_virtfn = 1;
->>   	virtfn->physfn = pci_dev_get(dev);
->> +	virtfn->dev_flags |= PCI_DEV_FLAGS_FORCE_COMMAND_MEM;
->>   
->>   	if (id == 0)
->>   		pci_read_vf_config_common(virtfn);
->> diff --git a/include/linux/pci.h b/include/linux/pci.h
->> index 8355306..9316cce 100644
->> --- a/include/linux/pci.h
->> +++ b/include/linux/pci.h
->> @@ -227,6 +227,8 @@ enum pci_dev_flags {
->>   	PCI_DEV_FLAGS_NO_FLR_RESET = (__force pci_dev_flags_t) (1 << 10),
->>   	/* Don't use Relaxed Ordering for TLPs directed at this device */
->>   	PCI_DEV_FLAGS_NO_RELAXED_ORDERING = (__force pci_dev_flags_t) (1 << 11),
->> +	/* Device does not implement PCI_COMMAND_MEMORY (e.g. a VF) */
->> +	PCI_DEV_FLAGS_FORCE_COMMAND_MEM = (__force pci_dev_flags_t) (1 << 12),
->>   };
->>   
->>   enum pci_irq_reroute_variant {
->> -- 
->> 1.8.3.1
->>
+> Thanks
+> --
+> Gustavo
+> 
+> > +	} else {
+> >  		pr_err("kvm: failed to shrink bus, removing it completely\n");
+> > -		goto broken;
+> > +		for (j = 0; j < bus->dev_count; j++) {
+> > +			if (j == i)
+> > +				continue;
+> > +			kvm_iodevice_destructor(bus->range[j].dev);
+> > +		}
+> >  	}
+> >  
+> > -	memcpy(new_bus, bus, sizeof(*bus) + i * sizeof(struct kvm_io_range));
+> > -	new_bus->dev_count--;
+> > -	memcpy(new_bus->range + i, bus->range + i + 1,
+> > -	       (new_bus->dev_count - i) * sizeof(struct kvm_io_range));
+> > -
+> > -broken:
+> >  	rcu_assign_pointer(kvm->buses[bus_idx], new_bus);
+> >  	synchronize_srcu_expedited(&kvm->srcu);
+> >  	kfree(bus);
+> > 
 
+hi Gustavo, thank you for the review, i'll send the new patch.
+Vitaly, i think i will need to drop your "Reviewed-by", because there is
+going to be a bit more changes
