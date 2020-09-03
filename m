@@ -2,210 +2,123 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id AA38225C54D
-	for <lists+kvm@lfdr.de>; Thu,  3 Sep 2020 17:26:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DD1CF25C524
+	for <lists+kvm@lfdr.de>; Thu,  3 Sep 2020 17:23:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728870AbgICP0k (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 3 Sep 2020 11:26:40 -0400
-Received: from mail.kernel.org ([198.145.29.99]:42524 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728522AbgICP03 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 3 Sep 2020 11:26:29 -0400
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 011C720C09;
-        Thu,  3 Sep 2020 15:26:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1599146788;
-        bh=HBjR8yqpG73ePWO3TJecMmjtceWadFNU+gdwbXpG+SI=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=uoFb6CdyZLtnPLWXFpdfmJZw1Tg/GSjEE+49gDnsyYj1dDONEVOOO9gWFO/X4RBdu
-         L2nKnp4CiwzTNztHbRWuPqDjlDT7nCooNHLAAOts236MPkuqCBfVurtLJVZQwJpgMm
-         AR7y41dXI4Dv20HN7jPrNyYF29q0uEuBi72gAeS4=
-Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=why.lan)
-        by disco-boy.misterjones.org with esmtpsa (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-        (Exim 4.92)
-        (envelope-from <maz@kernel.org>)
-        id 1kDr86-008vT9-DY; Thu, 03 Sep 2020 16:26:26 +0100
-From:   Marc Zyngier <maz@kernel.org>
-To:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
-        linux-arm-kernel@lists.infradead.org
-Cc:     kernel-team@android.com,
-        Christoffer Dall <Christoffer.Dall@arm.com>,
-        Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>,
-        James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>
-Subject: [PATCH 09/23] KVM: arm64: Move kvm_vgic_vcpu_init() to irqchip_flow
-Date:   Thu,  3 Sep 2020 16:25:56 +0100
-Message-Id: <20200903152610.1078827-10-maz@kernel.org>
-X-Mailer: git-send-email 2.27.0
-In-Reply-To: <20200903152610.1078827-1-maz@kernel.org>
-References: <20200903152610.1078827-1-maz@kernel.org>
+        id S1728544AbgICPXF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 3 Sep 2020 11:23:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44352 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728642AbgICPWn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 3 Sep 2020 11:22:43 -0400
+Received: from mail-pj1-x1041.google.com (mail-pj1-x1041.google.com [IPv6:2607:f8b0:4864:20::1041])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0EE35C061249;
+        Thu,  3 Sep 2020 08:22:43 -0700 (PDT)
+Received: by mail-pj1-x1041.google.com with SMTP id gf14so1628174pjb.5;
+        Thu, 03 Sep 2020 08:22:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=lcQkM04dJjt5Getpu5T9KGprYqJgTjrGD05xLf6xlJY=;
+        b=HaXeOZLHfdo/16NXDGDjO2lPxZWwj3Gm71jwz7RJg0LmPWXx1HctW+SxkT+x414sG2
+         Eh/K3t3iCT1WhPoGSaNeeHmBFEpuN35q5PIH2vAYis8yGGEbIQwwqjQWU5ur9Lzt/T84
+         DEXIvfLsHMKOA0hAJUlzU1gvKDt0/NvJbCguB3Oe6EIV9sQe0mVBkAP8/LjcPP3gCzeg
+         wGG60AJRk4vXLW8vEuLltOvZ6C2DM7noqXm6eGzF4XByEbtsXlVixBCFCVMApOTqS0q0
+         fy/fAliMHrRsUpwzzbfH7RVhI+oybNwDZ8sXwg+l39JTGxvS2+SafN9nadJM8n2TEa4k
+         +Bog==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=lcQkM04dJjt5Getpu5T9KGprYqJgTjrGD05xLf6xlJY=;
+        b=ZFdp3p63AD6i64k3GiZP7xbKhXiVWeRDLwsi6q++VEpTeHfA/sS5jFSUBqEWGFhGj7
+         S/rvpiCTA82yuCQnv2xRrzsxMdTvufQ29BUNBCd2TqXgGBFEMhd0kH7DzfuzTcMWoPWx
+         Ws/og+tyWZSgOWL4fWNFVHSmVnCgtiIQf00roQz9Qgp2/qGrwzjQCK37lxn5umP5pqbD
+         ARjeF9ysMD6EifPKmYvF5fVrtN4HBcU1o4Uh4ik4Pk74rt17wpz2r7GvphWVwpB4m/XV
+         SkE1axlyRSOIr44/rExwGZwGbz3Q2a0pfII/KlnsKyZiMS0fVKh7TRSmHEIM8gJ/DKST
+         KxOg==
+X-Gm-Message-State: AOAM530OvLHvvDBtK7JqJovHp7fe5z4krneGqqOjvoXUMoQh5cb7ywF2
+        J8pg4+pIMnmT2AVkO/l2gdLGNd+FY0e87g==
+X-Google-Smtp-Source: ABdhPJzLGpBfCgsWkYgtmAGFFuFFR16B4JeChVvuPseDTtA690faOIHaTtrsUsn6q+I26JJE/5ffTA==
+X-Received: by 2002:a17:90b:4a51:: with SMTP id lb17mr3634586pjb.235.1599146562303;
+        Thu, 03 Sep 2020 08:22:42 -0700 (PDT)
+Received: from localhost ([121.0.29.56])
+        by smtp.gmail.com with ESMTPSA id o15sm3140855pgi.74.2020.09.03.08.22.41
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Thu, 03 Sep 2020 08:22:41 -0700 (PDT)
+From:   Lai Jiangshan <jiangshanlai@gmail.com>
+To:     linux-kernel@vger.kernel.org
+Cc:     Lai Jiangshan <laijs@linux.alibaba.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
+        kvm@vger.kernel.org
+Subject: [PATCH V3] kvm x86/mmu: use KVM_REQ_MMU_SYNC to sync when needed
+Date:   Fri,  4 Sep 2020 00:23:04 +0800
+Message-Id: <20200903162304.19694-1-jiangshanlai@gmail.com>
+X-Mailer: git-send-email 2.19.1.6.gb485710b
+In-Reply-To: <20200903012224.GL11695@sjchrist-ice>
+References: <20200903012224.GL11695@sjchrist-ice>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 62.31.163.78
-X-SA-Exim-Rcpt-To: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kernel-team@android.com, Christoffer.Dall@arm.com, lorenzo.pieralisi@arm.com, james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Abstract kvm_vgic_vcpu_init() by moving it to the irqchip_flow
-structure. This results in a minor change of the way we initialize
-vcpus:
+From: Lai Jiangshan <laijs@linux.alibaba.com>
 
-VCPUs created prior to the creation of the vgic device don't have
-their local view of the vgic initialized. This means that on vgic
-instantiation, we must "catch up" and initialise the CPU interfaces
-for these vcpus. VCPUs created after the vgic device will follow
-the unusual flow. Special care must be taken to accomodate the
-different locking contexts though.
+When kvm_mmu_get_page() gets a page with unsynced children, the spt
+pagetable is unsynchronized with the guest pagetable. But the
+guest might not issue a "flush" operation on it when the pagetable
+entry is changed from zero or other cases. The hypervisor has the 
+responsibility to synchronize the pagetables.
 
-The function can then be made static and the irqchip_in_kernel()
-test dropped, as we only get here if a vgic has been created.
+The linux kernel behaves correctly as above for many years, but a recent
+commit 8c8560b83390 ("KVM: x86/mmu: Use KVM_REQ_TLB_FLUSH_CURRENT for
+MMU specific flushes") inadvertently included a line of code to change it
+without giving any reason in the changelog. It is clear that the commit's
+intention was to change KVM_REQ_TLB_FLUSH -> KVM_REQ_TLB_FLUSH_CURRENT,
+so we don't unneedlesly flush other contexts but one of the hunks changed
+nearby KVM_REQ_MMU_SYNC instead.
 
-Signed-off-by: Marc Zyngier <maz@kernel.org>
+This patch changes it back.
+
+Fixes: 8c8560b83390("KVM: x86/mmu: Use KVM_REQ_TLB_FLUSH_CURRENT for MMU specific flushes)
+Link: https://lore.kernel.org/lkml/20200320212833.3507-26-sean.j.christopherson@intel.com/
+Reviewed-by: Sean Christopherson <sean.j.christopherson@intel.com>
+Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+Signed-off-by: Lai Jiangshan <laijs@linux.alibaba.com>
 ---
- arch/arm64/include/asm/kvm_irq.h |  4 ++++
- arch/arm64/kvm/arm.c             |  2 +-
- arch/arm64/kvm/vgic/vgic-init.c  | 37 +++++++++++++++++++++++++-------
- include/kvm/arm_vgic.h           |  1 -
- 4 files changed, 34 insertions(+), 10 deletions(-)
+Changed from v1:
+	update patch description
 
-diff --git a/arch/arm64/include/asm/kvm_irq.h b/arch/arm64/include/asm/kvm_irq.h
-index f83594257bc4..09df1f46d4de 100644
---- a/arch/arm64/include/asm/kvm_irq.h
-+++ b/arch/arm64/include/asm/kvm_irq.h
-@@ -19,6 +19,7 @@ enum kvm_irqchip_type {
- 
- struct kvm_irqchip_flow {
- 	void (*irqchip_destroy)(struct kvm *);
-+	int  (*irqchip_vcpu_init)(struct kvm_vcpu *);
- };
- 
- /*
-@@ -50,4 +51,7 @@ struct kvm_irqchip_flow {
- #define kvm_irqchip_destroy(k)				\
- 	__kvm_irqchip_action((k), destroy, (k))
- 
-+#define kvm_irqchip_vcpu_init(v)			\
-+	__vcpu_irqchip_action_ret((v), vcpu_init, (v))
-+
- #endif
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 09b4bcb2c805..d82d348a36c3 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -265,7 +265,7 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
- 
- 	vcpu->arch.hw_mmu = &vcpu->kvm->arch.mmu;
- 
--	err = kvm_vgic_vcpu_init(vcpu);
-+	err = kvm_irqchip_vcpu_init(vcpu);
- 	if (err)
- 		return err;
- 
-diff --git a/arch/arm64/kvm/vgic/vgic-init.c b/arch/arm64/kvm/vgic/vgic-init.c
-index 4e2c23a7dab1..d845699c6966 100644
---- a/arch/arm64/kvm/vgic/vgic-init.c
-+++ b/arch/arm64/kvm/vgic/vgic-init.c
-@@ -12,10 +12,12 @@
- #include <asm/kvm_mmu.h>
- #include "vgic.h"
- 
-+static int kvm_vgic_vcpu_init(struct kvm_vcpu *vcpu);
- static void kvm_vgic_destroy(struct kvm *kvm);
- 
- static struct kvm_irqchip_flow vgic_irqchip_flow = {
- 	.irqchip_destroy		= kvm_vgic_destroy,
-+	.irqchip_vcpu_init		= kvm_vgic_vcpu_init,
- };
- 
- /*
-@@ -45,6 +47,8 @@ static struct kvm_irqchip_flow vgic_irqchip_flow = {
-  *   allocation is allowed there.
-  */
- 
-+static int __kvm_vgic_vcpu_init(struct kvm_vcpu *vcpu);
-+
- /* CREATION */
- 
- /**
-@@ -110,6 +114,17 @@ int kvm_vgic_create(struct kvm *kvm, u32 type)
- 	INIT_LIST_HEAD(&dist->lpi_translation_cache);
- 	raw_spin_lock_init(&dist->lpi_list_lock);
- 
-+	/*
-+	 * vcpus may have been created before the GIC. Initialize
-+	 * them. Careful that kvm->lock is held already on the
-+	 * KVM_CREATE_DEVICE path, so use the non-locking version.
-+	 */
-+	kvm_for_each_vcpu(i, vcpu, kvm) {
-+		ret = __kvm_vgic_vcpu_init(vcpu);
-+		if (ret)
-+			break;
-+	}
-+
- out_unlock:
- 	unlock_all_vcpus(kvm);
- 	return ret;
-@@ -176,7 +191,7 @@ static int kvm_vgic_dist_init(struct kvm *kvm, unsigned int nr_spis)
-  * Only do initialization, but do not actually enable the
-  * VGIC CPU interface
-  */
--int kvm_vgic_vcpu_init(struct kvm_vcpu *vcpu)
-+static int __kvm_vgic_vcpu_init(struct kvm_vcpu *vcpu)
- {
- 	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
- 	int ret = 0;
-@@ -211,18 +226,24 @@ int kvm_vgic_vcpu_init(struct kvm_vcpu *vcpu)
+Changed form v2:
+	update patch description
+
+ arch/x86/kvm/mmu/mmu.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index 4e03841f053d..9a93de921f2b 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -2468,7 +2468,7 @@ static struct kvm_mmu_page *kvm_mmu_get_page(struct kvm_vcpu *vcpu,
  		}
- 	}
  
--	if (!irqchip_in_kernel(vcpu->kvm))
--		return 0;
--
- 	/*
- 	 * If we are creating a VCPU with a GICv3 we must also register the
- 	 * KVM io device for the redistributor that belongs to this VCPU.
- 	 */
--	if (irqchip_is_gic_v3(vcpu->kvm)) {
--		mutex_lock(&vcpu->kvm->lock);
-+	if (irqchip_is_gic_v3(vcpu->kvm))
- 		ret = vgic_register_redist_iodev(vcpu);
--		mutex_unlock(&vcpu->kvm->lock);
--	}
-+
-+	return ret;
-+}
-+
-+static int kvm_vgic_vcpu_init(struct kvm_vcpu *vcpu)
-+{
-+	int ret;
-+
-+	mutex_lock(&vcpu->kvm->lock);
-+	ret = __kvm_vgic_vcpu_init(vcpu);
-+	mutex_unlock(&vcpu->kvm->lock);
-+
- 	return ret;
- }
+ 		if (sp->unsync_children)
+-			kvm_make_request(KVM_REQ_TLB_FLUSH_CURRENT, vcpu);
++			kvm_make_request(KVM_REQ_MMU_SYNC, vcpu);
  
-diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
-index e8bdc304ec9b..b2fd0e39af11 100644
---- a/include/kvm/arm_vgic.h
-+++ b/include/kvm/arm_vgic.h
-@@ -335,7 +335,6 @@ extern struct static_key_false vgic_v2_cpuif_trap;
- extern struct static_key_false vgic_v3_cpuif_trap;
+ 		__clear_sp_write_flooding_count(sp);
  
- int kvm_vgic_addr(struct kvm *kvm, unsigned long type, u64 *addr, bool write);
--int kvm_vgic_vcpu_init(struct kvm_vcpu *vcpu);
- int kvm_vgic_create(struct kvm *kvm, u32 type);
- int kvm_vgic_map_resources(struct kvm *kvm);
- int kvm_vgic_hyp_init(void);
 -- 
-2.27.0
+2.19.1.6.gb485710b
 
