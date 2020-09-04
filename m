@@ -2,167 +2,172 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E96C625DF0C
-	for <lists+kvm@lfdr.de>; Fri,  4 Sep 2020 18:06:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 88C2825DF77
+	for <lists+kvm@lfdr.de>; Fri,  4 Sep 2020 18:13:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727990AbgIDQGQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 4 Sep 2020 12:06:16 -0400
-Received: from mga17.intel.com ([192.55.52.151]:40312 "EHLO mga17.intel.com"
+        id S1726776AbgIDQNV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 4 Sep 2020 12:13:21 -0400
+Received: from mail.kernel.org ([198.145.29.99]:56526 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727996AbgIDQGO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 4 Sep 2020 12:06:14 -0400
-IronPort-SDR: mNA65Rc6zvMCnXfR8SNC109C0oDOj6xWs4y9tevo7spgLqZA7wkR+n0JzMQegJWit2UkVt5qnX
- oSn0GROXDLvA==
-X-IronPort-AV: E=McAfee;i="6000,8403,9734"; a="137823625"
-X-IronPort-AV: E=Sophos;i="5.76,390,1592895600"; 
-   d="scan'208";a="137823625"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Sep 2020 09:06:14 -0700
-IronPort-SDR: Fgk+EDJnX2zD5D02DfcnKFc1J2YJBR/3LyrWm797boITeW63Kr6ncWBXYw8LKhg9ftOgHM8o9x
- bIKapkuUfN3A==
-X-IronPort-AV: E=Sophos;i="5.76,390,1592895600"; 
-   d="scan'208";a="284479234"
-Received: from sjchrist-ice.jf.intel.com (HELO sjchrist-ice) ([10.54.31.34])
-  by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Sep 2020 09:06:11 -0700
-Date:   Fri, 4 Sep 2020 09:06:10 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Wanpeng Li <kernellwp@gmail.com>
-Cc:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
+        id S1726184AbgIDQNT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 4 Sep 2020 12:13:19 -0400
+Received: from localhost (83-86-74-64.cable.dynamic.v4.ziggo.nl [83.86.74.64])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id F159E2074D;
+        Fri,  4 Sep 2020 16:13:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1599235998;
+        bh=O3v40fHorMwtnwvbGMybc4FYTYLXBSNyiFd8GU0oUKE=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=tZzZBzTYb7AVqt4XQTysBH9SyYqKPSISkvml+UkoDpHBtxQdZLcoaIYJk2xq/KjUx
+         JSQXERH5uQ+QKf1sPCcM1h7VHoAFiRt1NknPKQI693XF3jb3zkIV51fepbXjqOZqhh
+         KVErXZNVjtwQXdjwy8H1WGY1ZPWaHxyONVD1LTT4=
+Date:   Fri, 4 Sep 2020 18:13:39 +0200
+From:   Greg KH <gregkh@linuxfoundation.org>
+To:     "Paraschiv, Andra-Irina" <andraprs@amazon.com>
+Cc:     linux-kernel <linux-kernel@vger.kernel.org>,
+        Anthony Liguori <aliguori@amazon.com>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Colm MacCarthaigh <colmmacc@amazon.com>,
+        David Duncan <davdunc@amazon.com>,
+        Bjoern Doebel <doebel@amazon.de>,
+        David Woodhouse <dwmw@amazon.co.uk>,
+        Frank van der Linden <fllinden@amazon.com>,
+        Karen Noel <knoel@redhat.com>,
+        Martin Pohlack <mpohlack@amazon.de>,
+        Matt Wilson <msw@amazon.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
+        Balbir Singh <sblbir@amazon.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Stewart Smith <trawets@amazon.com>,
+        Uwe Dannowski <uwed@amazon.de>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>
-Subject: Re: [PATCH] KVM: LAPIC: Reset timer_advance_ns if timer mode switch
-Message-ID: <20200904160609.GD2206@sjchrist-ice>
-References: <1598578508-14134-1-git-send-email-wanpengli@tencent.com>
- <20200902212328.GI11695@sjchrist-ice>
- <CANRm+CzQ00nFoYsxLQ7xhDaAnbi01U4BGkmuS9WLY80Nyt254w@mail.gmail.com>
+        kvm <kvm@vger.kernel.org>,
+        ne-devel-upstream <ne-devel-upstream@amazon.com>,
+        Alexander Graf <graf@amazon.de>
+Subject: Re: [PATCH v7 00/18] Add support for Nitro Enclaves
+Message-ID: <20200904161339.GA3824396@kroah.com>
+References: <20200817131003.56650-1-andraprs@amazon.com>
+ <14477cc7-926e-383d-527b-b53d088ca13d@amazon.de>
+ <20200819112657.GA475121@kroah.com>
+ <7727faf5-1c13-f7f1-ede3-64cf131c7dc7@amazon.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CANRm+CzQ00nFoYsxLQ7xhDaAnbi01U4BGkmuS9WLY80Nyt254w@mail.gmail.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
+In-Reply-To: <7727faf5-1c13-f7f1-ede3-64cf131c7dc7@amazon.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Sep 03, 2020 at 06:57:00PM +0800, Wanpeng Li wrote:
-> On Thu, 3 Sep 2020 at 05:23, Sean Christopherson
-> <sean.j.christopherson@intel.com> wrote:
-> >
-> > On Fri, Aug 28, 2020 at 09:35:08AM +0800, Wanpeng Li wrote:
-> > > From: Wanpeng Li <wanpengli@tencent.com>
-> > >
-> > > per-vCPU timer_advance_ns should be set to 0 if timer mode is not tscdeadline
-> > > otherwise we waste cpu cycles in the function lapic_timer_int_injected(),
-> > > especially on AMD platform which doesn't support tscdeadline mode. We can
-> > > reset timer_advance_ns to the initial value if switch back to tscdealine
-> > > timer mode.
-> > >
-> > > Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
-> > > ---
-> > >  arch/x86/kvm/lapic.c | 6 ++++++
-> > >  1 file changed, 6 insertions(+)
-> > >
-> > > diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-> > > index 654649b..abc296d 100644
-> > > --- a/arch/x86/kvm/lapic.c
-> > > +++ b/arch/x86/kvm/lapic.c
-> > > @@ -1499,10 +1499,16 @@ static void apic_update_lvtt(struct kvm_lapic *apic)
-> > >                       kvm_lapic_set_reg(apic, APIC_TMICT, 0);
-> > >                       apic->lapic_timer.period = 0;
-> > >                       apic->lapic_timer.tscdeadline = 0;
-> > > +                     if (timer_mode == APIC_LVT_TIMER_TSCDEADLINE &&
-> > > +                             lapic_timer_advance_dynamic)
-> >
-> > Bad indentation.
-> >
-> > > +                             apic->lapic_timer.timer_advance_ns = LAPIC_TIMER_ADVANCE_NS_INIT;
-> >
-> > Redoing the tuning seems odd.  Doubt it will matter, but it feels weird to
-> > have to retune the advancement just because the guest toggled between modes.
-> >
-> > Rather than clear timer_advance_ns, can we simply move the check against
-> > apic->lapic_timer.expired_tscdeadline much earlier?  I think that would
-> > solve this performance hiccup, and IMO would be a logical change in any
-> > case.  E.g. with some refactoring to avoid more duplication between VMX and
-> > SVM
+On Mon, Aug 31, 2020 at 11:19:19AM +0300, Paraschiv, Andra-Irina wrote:
 > 
-> How about something like below:
+> 
+> On 19/08/2020 14:26, Greg KH wrote:
+> > 
+> > On Wed, Aug 19, 2020 at 01:15:59PM +0200, Alexander Graf wrote:
+> > > 
+> > > On 17.08.20 15:09, Andra Paraschiv wrote:
+> > > > Nitro Enclaves (NE) is a new Amazon Elastic Compute Cloud (EC2) capability
+> > > > that allows customers to carve out isolated compute environments within EC2
+> > > > instances [1].
+> > > > 
+> > > > For example, an application that processes sensitive data and runs in a VM,
+> > > > can be separated from other applications running in the same VM. This
+> > > > application then runs in a separate VM than the primary VM, namely an enclave.
+> > > > 
+> > > > An enclave runs alongside the VM that spawned it. This setup matches low latency
+> > > > applications needs. The resources that are allocated for the enclave, such as
+> > > > memory and CPUs, are carved out of the primary VM. Each enclave is mapped to a
+> > > > process running in the primary VM, that communicates with the NE driver via an
+> > > > ioctl interface.
+> > > > 
+> > > > In this sense, there are two components:
+> > > > 
+> > > > 1. An enclave abstraction process - a user space process running in the primary
+> > > > VM guest that uses the provided ioctl interface of the NE driver to spawn an
+> > > > enclave VM (that's 2 below).
+> > > > 
+> > > > There is a NE emulated PCI device exposed to the primary VM. The driver for this
+> > > > new PCI device is included in the NE driver.
+> > > > 
+> > > > The ioctl logic is mapped to PCI device commands e.g. the NE_START_ENCLAVE ioctl
+> > > > maps to an enclave start PCI command. The PCI device commands are then
+> > > > translated into  actions taken on the hypervisor side; that's the Nitro
+> > > > hypervisor running on the host where the primary VM is running. The Nitro
+> > > > hypervisor is based on core KVM technology.
+> > > > 
+> > > > 2. The enclave itself - a VM running on the same host as the primary VM that
+> > > > spawned it. Memory and CPUs are carved out of the primary VM and are dedicated
+> > > > for the enclave VM. An enclave does not have persistent storage attached.
+> > > > 
+> > > > The memory regions carved out of the primary VM and given to an enclave need to
+> > > > be aligned 2 MiB / 1 GiB physically contiguous memory regions (or multiple of
+> > > > this size e.g. 8 MiB). The memory can be allocated e.g. by using hugetlbfs from
+> > > > user space [2][3]. The memory size for an enclave needs to be at least 64 MiB.
+> > > > The enclave memory and CPUs need to be from the same NUMA node.
+> > > > 
+> > > > An enclave runs on dedicated cores. CPU 0 and its CPU siblings need to remain
+> > > > available for the primary VM. A CPU pool has to be set for NE purposes by an
+> > > > user with admin capability. See the cpu list section from the kernel
+> > > > documentation [4] for how a CPU pool format looks.
+> > > > 
+> > > > An enclave communicates with the primary VM via a local communication channel,
+> > > > using virtio-vsock [5]. The primary VM has virtio-pci vsock emulated device,
+> > > > while the enclave VM has a virtio-mmio vsock emulated device. The vsock device
+> > > > uses eventfd for signaling. The enclave VM sees the usual interfaces - local
+> > > > APIC and IOAPIC - to get interrupts from virtio-vsock device. The virtio-mmio
+> > > > device is placed in memory below the typical 4 GiB.
+> > > > 
+> > > > The application that runs in the enclave needs to be packaged in an enclave
+> > > > image together with the OS ( e.g. kernel, ramdisk, init ) that will run in the
+> > > > enclave VM. The enclave VM has its own kernel and follows the standard Linux
+> > > > boot protocol.
+> > > > 
+> > > > The kernel bzImage, the kernel command line, the ramdisk(s) are part of the
+> > > > Enclave Image Format (EIF); plus an EIF header including metadata such as magic
+> > > > number, eif version, image size and CRC.
+> > > > 
+> > > > Hash values are computed for the entire enclave image (EIF), the kernel and
+> > > > ramdisk(s). That's used, for example, to check that the enclave image that is
+> > > > loaded in the enclave VM is the one that was intended to be run.
+> > > > 
+> > > > These crypto measurements are included in a signed attestation document
+> > > > generated by the Nitro Hypervisor and further used to prove the identity of the
+> > > > enclave; KMS is an example of service that NE is integrated with and that checks
+> > > > the attestation doc.
+> > > > 
+> > > > The enclave image (EIF) is loaded in the enclave memory at offset 8 MiB. The
+> > > > init process in the enclave connects to the vsock CID of the primary VM and a
+> > > > predefined port - 9000 - to send a heartbeat value - 0xb7. This mechanism is
+> > > > used to check in the primary VM that the enclave has booted.
+> > > > 
+> > > > If the enclave VM crashes or gracefully exits, an interrupt event is received by
+> > > > the NE driver. This event is sent further to the user space enclave process
+> > > > running in the primary VM via a poll notification mechanism. Then the user space
+> > > > enclave process can exit.
+> > > > 
+> > > > Thank you.
+> > > > 
+> > > This version reads very well, thanks a lot Andra!
+> > > 
+> > > Greg, would you mind to have another look over it?
+> > Will do, it's in my to-review queue, behind lots of other patches...
+> > 
+> 
+> I have a set of updates that can be included in a new revision, v8 e.g. new
+> NE custom error codes for invalid flags / enclave CID, "shutdown" function
+> for the NE PCI device driver, a couple more checks wrt invalid flags and
+> enclave vsock CID, documentation and sample updates. There is also the
+> option to have these updates as follow-up patches.
+> 
+> Greg, let me know what would work fine for you with regard to the review of
+> the patch series.
 
-That works too.  The only reason I used the inline shenanigans was to avoid
-the CALL+RET in VM-Enter when the timer hasn't expired.
+A new series is always fine with me...
 
-> diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-> index 3b32d3b..51ed4f0 100644
-> --- a/arch/x86/kvm/lapic.c
-> +++ b/arch/x86/kvm/lapic.c
-> @@ -1582,9 +1582,6 @@ static void __kvm_wait_lapic_expire(struct kvm_vcpu *vcpu)
->      struct kvm_lapic *apic = vcpu->arch.apic;
->      u64 guest_tsc, tsc_deadline;
-> 
-> -    if (apic->lapic_timer.expired_tscdeadline == 0)
-> -        return;
-> -
->      tsc_deadline = apic->lapic_timer.expired_tscdeadline;
->      apic->lapic_timer.expired_tscdeadline = 0;
->      guest_tsc = kvm_read_l1_tsc(vcpu, rdtsc());
-> @@ -1599,7 +1596,10 @@ static void __kvm_wait_lapic_expire(struct
-> kvm_vcpu *vcpu)
-> 
->  void kvm_wait_lapic_expire(struct kvm_vcpu *vcpu)
->  {
-> -    if (lapic_timer_int_injected(vcpu))
-> +    if (lapic_in_kernel(vcpu) &&
-> +        vcpu->arch.apic->lapic_timer.expired_tscdeadline &&
-> +        vcpu->arch.apic->lapic_timer.timer_advance_ns &&
-> +        lapic_timer_int_injected(vcpu))
->          __kvm_wait_lapic_expire(vcpu);
->  }
->  EXPORT_SYMBOL_GPL(kvm_wait_lapic_expire);
-> @@ -1635,8 +1635,7 @@ static void apic_timer_expired(struct kvm_lapic
-> *apic, bool from_timer_fn)
->      }
-> 
->      if (kvm_use_posted_timer_interrupt(apic->vcpu)) {
-> -        if (apic->lapic_timer.timer_advance_ns)
-> -            __kvm_wait_lapic_expire(vcpu);
-> +        kvm_wait_lapic_expire(vcpu);
->          kvm_apic_inject_pending_timer_irqs(apic);
->          return;
->      }
-> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-> index 0194336..19e622a 100644
-> --- a/arch/x86/kvm/svm/svm.c
-> +++ b/arch/x86/kvm/svm/svm.c
-> @@ -3456,9 +3456,7 @@ static __no_kcsan fastpath_t svm_vcpu_run(struct
-> kvm_vcpu *vcpu)
->      clgi();
->      kvm_load_guest_xsave_state(vcpu);
-> 
-> -    if (lapic_in_kernel(vcpu) &&
-> -        vcpu->arch.apic->lapic_timer.timer_advance_ns)
-> -        kvm_wait_lapic_expire(vcpu);
-> +    kvm_wait_lapic_expire(vcpu);
-> 
->      /*
->       * If this vCPU has touched SPEC_CTRL, restore the guest's value if
-> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index a544351..d6e1656 100644
-> --- a/arch/x86/kvm/vmx/vmx.c
-> +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -6800,9 +6800,7 @@ static fastpath_t vmx_vcpu_run(struct kvm_vcpu *vcpu)
->      if (enable_preemption_timer)
->          vmx_update_hv_timer(vcpu);
-> 
-> -    if (lapic_in_kernel(vcpu) &&
-> -        vcpu->arch.apic->lapic_timer.timer_advance_ns)
-> -        kvm_wait_lapic_expire(vcpu);
-> +    kvm_wait_lapic_expire(vcpu);
-> 
->      /*
->       * If this vCPU has touched SPEC_CTRL, restore the guest's value if
+thanks,
+
+greg k-h
