@@ -2,95 +2,104 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id CD57425D6C8
-	for <lists+kvm@lfdr.de>; Fri,  4 Sep 2020 12:48:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0B76525D729
+	for <lists+kvm@lfdr.de>; Fri,  4 Sep 2020 13:27:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730013AbgIDKsF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 4 Sep 2020 06:48:05 -0400
-Received: from mail.kernel.org ([198.145.29.99]:59120 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729923AbgIDKqM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 4 Sep 2020 06:46:12 -0400
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id C5B5820C56;
-        Fri,  4 Sep 2020 10:46:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1599216366;
-        bh=nCc55AZ3IGOEPrvp66HRc9DIbXCNXgxfLuV2k8RKjKk=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=rUoZVg/IjoiVzDx4ku/+fP10lSWGwkW6n/0IGghZaq1Zamg67QAq/IMENy0PZZckW
-         JOGO7ScY01EetEYlUnNOJHCHLkzXXtjX9f2Ba8YASKYcUR9+XHawtuzyodpq7NvZ3G
-         diwah0+HwJcDfuPEbXoLLjrfMHbaqbx0C3l4gU2c=
-Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=why.lan)
-        by disco-boy.misterjones.org with esmtpsa (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-        (Exim 4.92)
-        (envelope-from <maz@kernel.org>)
-        id 1kE9EL-0098oH-6W; Fri, 04 Sep 2020 11:46:05 +0100
-From:   Marc Zyngier <maz@kernel.org>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Alexandru Elisei <alexandru.elisei@arm.com>,
-        Andrew Jones <drjones@redhat.com>,
-        Eric Auger <eric.auger@redhat.com>,
-        Gavin Shan <gshan@redhat.com>,
-        Steven Price <steven.price@arm.com>, kernel-team@android.com,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org
-Subject: [PATCH 9/9] KVM: arm64: Update page shift if stage 2 block mapping not supported
-Date:   Fri,  4 Sep 2020 11:45:30 +0100
-Message-Id: <20200904104530.1082676-10-maz@kernel.org>
-X-Mailer: git-send-email 2.27.0
-In-Reply-To: <20200904104530.1082676-1-maz@kernel.org>
-References: <20200904104530.1082676-1-maz@kernel.org>
+        id S1730163AbgIDL1T (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 4 Sep 2020 07:27:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59624 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730185AbgIDL1I (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 4 Sep 2020 07:27:08 -0400
+Received: from mail-pj1-x1042.google.com (mail-pj1-x1042.google.com [IPv6:2607:f8b0:4864:20::1042])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A19C7C06123F;
+        Fri,  4 Sep 2020 04:25:42 -0700 (PDT)
+Received: by mail-pj1-x1042.google.com with SMTP id kk9so540923pjb.2;
+        Fri, 04 Sep 2020 04:25:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=to:cc:from:subject:message-id:date:user-agent:mime-version
+         :content-language:content-transfer-encoding;
+        bh=4iF/KxJRf6RUN8ireZqNsFjdJniXRQCA0m2V2VdM7aY=;
+        b=rmly/Hi26HxZ+lf1DtFGWTwggsOa+IuyWuUP6RCnfw6k7QWod4onfRB1eQGLonapfA
+         mp48rqLbdh4MERxOKwp7yA5dvcmxZHdG0sLRkO9GHO2eH09WBeQJCj+oXN680YkMT/Vy
+         5BriiWyC1iIlLFf38pw5AlucY1drz+Zn207Z7ywoQrJqIEG4OMwUIVx7VPTWJxxHWUwT
+         TXFldnzkaBvcItl2YAsxsTBs02qrayxmEAil7cGau2+XbuOcPsoNNDUrRBUABJbxoq3j
+         jvzm0OEXspY6rVCxSOvHkOIehW8NR0Jjd9g+bLyPbwTylxLj2rxXnfJ7eM08Oxih6Zi2
+         2X2A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:to:cc:from:subject:message-id:date:user-agent
+         :mime-version:content-language:content-transfer-encoding;
+        bh=4iF/KxJRf6RUN8ireZqNsFjdJniXRQCA0m2V2VdM7aY=;
+        b=TDqo1WvdwwYIH8hK/QbDwfpb5225Mv/mKxO2+KlHieFBZpvO5nx5stcYc/YYfwGSH1
+         K3kVoMVF/ZHDNIlT6Lh1fykBRyrzDcyPMDW0AwbgjlYrb2vgwztS4SAIy0wPIZVfq+7G
+         qVyhplPtk8yZheWz9Xm6ZcCQ0NRaV2lUGPs0BHjpqzMtNgg70he/ZREFig+uFnqHuXoG
+         ZWlMh7gXbo8jsICMK6/B6l6rWPyxyr4j5k3UYXodslSa0+WRnramsNnCw+eSSCfb+BYs
+         yStGYBUFwmTuiWSxvqVuoqL7v84nFtqi8c5RXwydiOGhFfwzCAFnsTjZrGwq7mNXgc4p
+         glOA==
+X-Gm-Message-State: AOAM533iaKG1WmrqCU0KlmE8S44PhSWHIWDA8/JteKXdbv8dwhwBkVKC
+        BsLNEVgH8HKdbFFBPZ8xWw==
+X-Google-Smtp-Source: ABdhPJwA6BUd2QTxpgWoADDjuuNYMmhS0f6lh9N/5x3Gvo3/JYPUwvc7iWOFYYyvAimk0pavjAATMw==
+X-Received: by 2002:a17:90a:9382:: with SMTP id q2mr7622795pjo.118.1599218742271;
+        Fri, 04 Sep 2020 04:25:42 -0700 (PDT)
+Received: from [127.0.0.1] ([103.7.29.7])
+        by smtp.gmail.com with ESMTPSA id 72sm6298793pfx.79.2020.09.04.04.25.36
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 04 Sep 2020 04:25:41 -0700 (PDT)
+To:     "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "x86@kernel.org" <x86@kernel.org>
+Cc:     "hpa@zytor.com" <hpa@zytor.com>, "bp@alien8.de" <bp@alien8.de>,
+        "mingo@redhat.com" <mingo@redhat.com>,
+        "tglx@linutronix.de" <tglx@linutronix.de>, joro@8bytes.org,
+        "jmattson@google.com" <jmattson@google.com>,
+        "wanpengli@tencent.com" <wanpengli@tencent.com>,
+        vkuznets@redhat.com, sean.j.christopherson@intel.com,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>
+From:   Haiwei Li <lihaiwei.kernel@gmail.com>
+Subject: [PATCH] KVM: SVM: Add tracepoint for cr_interception
+Message-ID: <f3031602-db3b-c4fe-b719-d402663b0a2b@gmail.com>
+Date:   Fri, 4 Sep 2020 19:25:29 +0800
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:68.0)
+ Gecko/20100101 Thunderbird/68.12.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 62.31.163.78
-X-SA-Exim-Rcpt-To: pbonzini@redhat.com, alexandru.elisei@arm.com, drjones@redhat.com, eric.auger@redhat.com, gshan@redhat.com, steven.price@arm.com, kernel-team@android.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Alexandru Elisei <alexandru.elisei@arm.com>
+From: Haiwei Li <lihaiwei@tencent.com>
 
-Commit 196f878a7ac2e (" KVM: arm/arm64: Signal SIGBUS when stage2 discovers
-hwpoison memory") modifies user_mem_abort() to send a SIGBUS signal when
-the fault IPA maps to a hwpoisoned page. Commit 1559b7583ff6 ("KVM:
-arm/arm64: Re-check VMA on detecting a poisoned page") changed
-kvm_send_hwpoison_signal() to use the page shift instead of the VMA because
-at that point the code had already released the mmap lock, which means
-userspace could have modified the VMA.
+Add trace_kvm_cr_write and trace_kvm_cr_read for svm.
 
-If userspace uses hugetlbfs for the VM memory, user_mem_abort() tries to
-map the guest fault IPA using block mappings in stage 2. That is not always
-possible, if, for example, userspace uses dirty page logging for the VM.
-Update the page shift appropriately in those cases when we downgrade the
-stage 2 entry from a block mapping to a page.
-
-Fixes: 1559b7583ff6 ("KVM: arm/arm64: Re-check VMA on detecting a poisoned page")
-Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
-Signed-off-by: Marc Zyngier <maz@kernel.org>
-Reviewed-by: Gavin Shan <gshan@redhat.com>
-Link: https://lore.kernel.org/r/20200901133357.52640-2-alexandru.elisei@arm.com
+Signed-off-by: Haiwei Li <lihaiwei@tencent.com>
 ---
- arch/arm64/kvm/mmu.c | 1 +
- 1 file changed, 1 insertion(+)
+  arch/x86/kvm/svm/svm.c | 2 ++
+  1 file changed, 2 insertions(+)
 
-diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index 16b8660ddbcc..f58d657a898d 100644
---- a/arch/arm64/kvm/mmu.c
-+++ b/arch/arm64/kvm/mmu.c
-@@ -1871,6 +1871,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 	    !fault_supports_stage2_huge_mapping(memslot, hva, vma_pagesize)) {
- 		force_pte = true;
- 		vma_pagesize = PAGE_SIZE;
-+		vma_shift = PAGE_SHIFT;
- 	}
- 
- 	/*
--- 
-2.27.0
-
+diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+index 03dd7bac8034..2c6dea48ba62 100644
+--- a/arch/x86/kvm/svm/svm.c
++++ b/arch/x86/kvm/svm/svm.c
+@@ -2261,6 +2261,7 @@ static int cr_interception(struct vcpu_svm *svm)
+  	if (cr >= 16) { /* mov to cr */
+  		cr -= 16;
+  		val = kvm_register_read(&svm->vcpu, reg);
++		trace_kvm_cr_write(cr, val);
+  		switch (cr) {
+  		case 0:
+  			if (!check_selective_cr0_intercepted(svm, val))
+@@ -2306,6 +2307,7 @@ static int cr_interception(struct vcpu_svm *svm)
+  			return 1;
+  		}
+  		kvm_register_write(&svm->vcpu, reg, val);
++		trace_kvm_cr_read(cr, val);
+  	}
+  	return kvm_complete_insn_gp(&svm->vcpu, err);
+  }
+--
+2.18.4
