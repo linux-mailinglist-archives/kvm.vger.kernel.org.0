@@ -2,172 +2,280 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 88C2825DF77
-	for <lists+kvm@lfdr.de>; Fri,  4 Sep 2020 18:13:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 329DE25DF95
+	for <lists+kvm@lfdr.de>; Fri,  4 Sep 2020 18:15:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726776AbgIDQNV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 4 Sep 2020 12:13:21 -0400
-Received: from mail.kernel.org ([198.145.29.99]:56526 "EHLO mail.kernel.org"
+        id S1727797AbgIDQPL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 4 Sep 2020 12:15:11 -0400
+Received: from mail.kernel.org ([198.145.29.99]:57070 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726184AbgIDQNT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 4 Sep 2020 12:13:19 -0400
-Received: from localhost (83-86-74-64.cable.dynamic.v4.ziggo.nl [83.86.74.64])
+        id S1726892AbgIDQPH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 4 Sep 2020 12:15:07 -0400
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id F159E2074D;
-        Fri,  4 Sep 2020 16:13:17 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 9CE6220772;
+        Fri,  4 Sep 2020 16:15:05 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1599235998;
-        bh=O3v40fHorMwtnwvbGMybc4FYTYLXBSNyiFd8GU0oUKE=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=tZzZBzTYb7AVqt4XQTysBH9SyYqKPSISkvml+UkoDpHBtxQdZLcoaIYJk2xq/KjUx
-         JSQXERH5uQ+QKf1sPCcM1h7VHoAFiRt1NknPKQI693XF3jb3zkIV51fepbXjqOZqhh
-         KVErXZNVjtwQXdjwy8H1WGY1ZPWaHxyONVD1LTT4=
-Date:   Fri, 4 Sep 2020 18:13:39 +0200
-From:   Greg KH <gregkh@linuxfoundation.org>
-To:     "Paraschiv, Andra-Irina" <andraprs@amazon.com>
-Cc:     linux-kernel <linux-kernel@vger.kernel.org>,
-        Anthony Liguori <aliguori@amazon.com>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Colm MacCarthaigh <colmmacc@amazon.com>,
-        David Duncan <davdunc@amazon.com>,
-        Bjoern Doebel <doebel@amazon.de>,
-        David Woodhouse <dwmw@amazon.co.uk>,
-        Frank van der Linden <fllinden@amazon.com>,
-        Karen Noel <knoel@redhat.com>,
-        Martin Pohlack <mpohlack@amazon.de>,
-        Matt Wilson <msw@amazon.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Balbir Singh <sblbir@amazon.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Stewart Smith <trawets@amazon.com>,
-        Uwe Dannowski <uwed@amazon.de>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        kvm <kvm@vger.kernel.org>,
-        ne-devel-upstream <ne-devel-upstream@amazon.com>,
-        Alexander Graf <graf@amazon.de>
-Subject: Re: [PATCH v7 00/18] Add support for Nitro Enclaves
-Message-ID: <20200904161339.GA3824396@kroah.com>
-References: <20200817131003.56650-1-andraprs@amazon.com>
- <14477cc7-926e-383d-527b-b53d088ca13d@amazon.de>
- <20200819112657.GA475121@kroah.com>
- <7727faf5-1c13-f7f1-ede3-64cf131c7dc7@amazon.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <7727faf5-1c13-f7f1-ede3-64cf131c7dc7@amazon.com>
+        s=default; t=1599236105;
+        bh=MLCvWs5mMUOuDyA36Cda3ffiqLz/l2nBWOyu6v+gLSI=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=ylfjen9OVhEAldXi2YL5m/SJwvfw2FzkZFvwilNCdh//faS7ZM2l3F7NBZHyuuMOT
+         2tltCwR2Liv05wA0nPm3STMQXq/1gsz1GB65Ha8dkr1Lg/8YBMQLZ0/LAbMqvW4Ck6
+         qBtu3UNBt0zyLCENgs3p6q75rIvyDtJsoqKi9zP4=
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=wait-a-minute.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+        (Exim 4.92)
+        (envelope-from <maz@kernel.org>)
+        id 1kEEMh-009Dk6-W6; Fri, 04 Sep 2020 17:15:04 +0100
+Date:   Fri, 04 Sep 2020 17:15:01 +0100
+Message-ID: <87eenhr01m.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Jianyong Wu <jianyong.wu@arm.com>
+Cc:     netdev@vger.kernel.org, yangbo.lu@nxp.com, john.stultz@linaro.org,
+        tglx@linutronix.de, pbonzini@redhat.com,
+        sean.j.christopherson@intel.com, richardcochran@gmail.com,
+        Mark.Rutland@arm.com, will@kernel.org, suzuki.poulose@arm.com,
+        steven.price@arm.com, linux-kernel@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, Steve.Capper@arm.com, justin.he@arm.com,
+        nd@arm.com
+Subject: Re: [PATCH v14 07/10] arm64/kvm: Add hypercall service for kvm ptp.
+In-Reply-To: <20200904092744.167655-8-jianyong.wu@arm.com>
+References: <20200904092744.167655-1-jianyong.wu@arm.com>
+        <20200904092744.167655-8-jianyong.wu@arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL/10.8 EasyPG/1.0.0 Emacs/26.3
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: jianyong.wu@arm.com, netdev@vger.kernel.org, yangbo.lu@nxp.com, john.stultz@linaro.org, tglx@linutronix.de, pbonzini@redhat.com, sean.j.christopherson@intel.com, richardcochran@gmail.com, Mark.Rutland@arm.com, will@kernel.org, suzuki.poulose@arm.com, steven.price@arm.com, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, Steve.Capper@arm.com, justin.he@arm.com, nd@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Aug 31, 2020 at 11:19:19AM +0300, Paraschiv, Andra-Irina wrote:
+On Fri, 04 Sep 2020 10:27:41 +0100,
+Jianyong Wu <jianyong.wu@arm.com> wrote:
 > 
+> ptp_kvm will get this service through smccc call.
+> The service offers wall time and counter cycle of host for guest.
+> caller must explicitly determines which cycle of virtual counter or
+> physical counter to return if it needs counter cycle.
 > 
-> On 19/08/2020 14:26, Greg KH wrote:
-> > 
-> > On Wed, Aug 19, 2020 at 01:15:59PM +0200, Alexander Graf wrote:
-> > > 
-> > > On 17.08.20 15:09, Andra Paraschiv wrote:
-> > > > Nitro Enclaves (NE) is a new Amazon Elastic Compute Cloud (EC2) capability
-> > > > that allows customers to carve out isolated compute environments within EC2
-> > > > instances [1].
-> > > > 
-> > > > For example, an application that processes sensitive data and runs in a VM,
-> > > > can be separated from other applications running in the same VM. This
-> > > > application then runs in a separate VM than the primary VM, namely an enclave.
-> > > > 
-> > > > An enclave runs alongside the VM that spawned it. This setup matches low latency
-> > > > applications needs. The resources that are allocated for the enclave, such as
-> > > > memory and CPUs, are carved out of the primary VM. Each enclave is mapped to a
-> > > > process running in the primary VM, that communicates with the NE driver via an
-> > > > ioctl interface.
-> > > > 
-> > > > In this sense, there are two components:
-> > > > 
-> > > > 1. An enclave abstraction process - a user space process running in the primary
-> > > > VM guest that uses the provided ioctl interface of the NE driver to spawn an
-> > > > enclave VM (that's 2 below).
-> > > > 
-> > > > There is a NE emulated PCI device exposed to the primary VM. The driver for this
-> > > > new PCI device is included in the NE driver.
-> > > > 
-> > > > The ioctl logic is mapped to PCI device commands e.g. the NE_START_ENCLAVE ioctl
-> > > > maps to an enclave start PCI command. The PCI device commands are then
-> > > > translated into  actions taken on the hypervisor side; that's the Nitro
-> > > > hypervisor running on the host where the primary VM is running. The Nitro
-> > > > hypervisor is based on core KVM technology.
-> > > > 
-> > > > 2. The enclave itself - a VM running on the same host as the primary VM that
-> > > > spawned it. Memory and CPUs are carved out of the primary VM and are dedicated
-> > > > for the enclave VM. An enclave does not have persistent storage attached.
-> > > > 
-> > > > The memory regions carved out of the primary VM and given to an enclave need to
-> > > > be aligned 2 MiB / 1 GiB physically contiguous memory regions (or multiple of
-> > > > this size e.g. 8 MiB). The memory can be allocated e.g. by using hugetlbfs from
-> > > > user space [2][3]. The memory size for an enclave needs to be at least 64 MiB.
-> > > > The enclave memory and CPUs need to be from the same NUMA node.
-> > > > 
-> > > > An enclave runs on dedicated cores. CPU 0 and its CPU siblings need to remain
-> > > > available for the primary VM. A CPU pool has to be set for NE purposes by an
-> > > > user with admin capability. See the cpu list section from the kernel
-> > > > documentation [4] for how a CPU pool format looks.
-> > > > 
-> > > > An enclave communicates with the primary VM via a local communication channel,
-> > > > using virtio-vsock [5]. The primary VM has virtio-pci vsock emulated device,
-> > > > while the enclave VM has a virtio-mmio vsock emulated device. The vsock device
-> > > > uses eventfd for signaling. The enclave VM sees the usual interfaces - local
-> > > > APIC and IOAPIC - to get interrupts from virtio-vsock device. The virtio-mmio
-> > > > device is placed in memory below the typical 4 GiB.
-> > > > 
-> > > > The application that runs in the enclave needs to be packaged in an enclave
-> > > > image together with the OS ( e.g. kernel, ramdisk, init ) that will run in the
-> > > > enclave VM. The enclave VM has its own kernel and follows the standard Linux
-> > > > boot protocol.
-> > > > 
-> > > > The kernel bzImage, the kernel command line, the ramdisk(s) are part of the
-> > > > Enclave Image Format (EIF); plus an EIF header including metadata such as magic
-> > > > number, eif version, image size and CRC.
-> > > > 
-> > > > Hash values are computed for the entire enclave image (EIF), the kernel and
-> > > > ramdisk(s). That's used, for example, to check that the enclave image that is
-> > > > loaded in the enclave VM is the one that was intended to be run.
-> > > > 
-> > > > These crypto measurements are included in a signed attestation document
-> > > > generated by the Nitro Hypervisor and further used to prove the identity of the
-> > > > enclave; KMS is an example of service that NE is integrated with and that checks
-> > > > the attestation doc.
-> > > > 
-> > > > The enclave image (EIF) is loaded in the enclave memory at offset 8 MiB. The
-> > > > init process in the enclave connects to the vsock CID of the primary VM and a
-> > > > predefined port - 9000 - to send a heartbeat value - 0xb7. This mechanism is
-> > > > used to check in the primary VM that the enclave has booted.
-> > > > 
-> > > > If the enclave VM crashes or gracefully exits, an interrupt event is received by
-> > > > the NE driver. This event is sent further to the user space enclave process
-> > > > running in the primary VM via a poll notification mechanism. Then the user space
-> > > > enclave process can exit.
-> > > > 
-> > > > Thank you.
-> > > > 
-> > > This version reads very well, thanks a lot Andra!
-> > > 
-> > > Greg, would you mind to have another look over it?
-> > Will do, it's in my to-review queue, behind lots of other patches...
-> > 
+> Signed-off-by: Jianyong Wu <jianyong.wu@arm.com>
+> ---
+>  arch/arm64/kvm/Kconfig       |  6 +++++
+>  arch/arm64/kvm/arch_timer.c  |  2 +-
+>  arch/arm64/kvm/hypercalls.c  | 49 ++++++++++++++++++++++++++++++++++++
+>  include/kvm/arm_arch_timer.h |  1 +
+>  include/linux/arm-smccc.h    | 16 ++++++++++++
+>  5 files changed, 73 insertions(+), 1 deletion(-)
 > 
-> I have a set of updates that can be included in a new revision, v8 e.g. new
-> NE custom error codes for invalid flags / enclave CID, "shutdown" function
-> for the NE PCI device driver, a couple more checks wrt invalid flags and
-> enclave vsock CID, documentation and sample updates. There is also the
-> option to have these updates as follow-up patches.
-> 
-> Greg, let me know what would work fine for you with regard to the review of
-> the patch series.
+> diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
+> index 318c8f2df245..bbdfacec4813 100644
+> --- a/arch/arm64/kvm/Kconfig
+> +++ b/arch/arm64/kvm/Kconfig
+> @@ -60,6 +60,12 @@ config KVM_ARM_PMU
+>  config KVM_INDIRECT_VECTORS
+>  	def_bool HARDEN_BRANCH_PREDICTOR || RANDOMIZE_BASE
+>  
+> +config ARM64_KVM_PTP_HOST
+> +	bool "KVM PTP clock host service for arm64"
 
-A new series is always fine with me...
+The "for arm64" is not that useful.
 
-thanks,
+> +	default y
+> +	help
+> +	  virtual kvm ptp clock hypercall service for arm64
+> +
 
-greg k-h
+I'm not keen on making this a compile option, because whatever is not
+always on ends up bit-rotting. Please drop the option.
+
+>  endif # KVM
+>  
+>  endif # VIRTUALIZATION
+> diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
+> index 32ba6fbc3814..eb85f6701845 100644
+> --- a/arch/arm64/kvm/arch_timer.c
+> +++ b/arch/arm64/kvm/arch_timer.c
+> @@ -81,7 +81,7 @@ u64 timer_get_cval(struct arch_timer_context *ctxt)
+>  	}
+>  }
+>  
+> -static u64 timer_get_offset(struct arch_timer_context *ctxt)
+> +u64 timer_get_offset(struct arch_timer_context *ctxt)
+>  {
+>  	struct kvm_vcpu *vcpu = ctxt->vcpu;
+>  
+> diff --git a/arch/arm64/kvm/hypercalls.c b/arch/arm64/kvm/hypercalls.c
+> index 901c60f119c2..2628ddc13abd 100644
+> --- a/arch/arm64/kvm/hypercalls.c
+> +++ b/arch/arm64/kvm/hypercalls.c
+> @@ -3,6 +3,7 @@
+>  
+>  #include <linux/arm-smccc.h>
+>  #include <linux/kvm_host.h>
+> +#include <linux/clocksource_ids.h>
+>  
+>  #include <asm/kvm_emulate.h>
+>  
+> @@ -11,6 +12,10 @@
+>  
+>  int kvm_hvc_call_handler(struct kvm_vcpu *vcpu)
+>  {
+> +#ifdef CONFIG_ARM64_KVM_PTP_HOST
+> +	struct system_time_snapshot systime_snapshot;
+> +	u64 cycles = -1;
+> +#endif
+
+Please move all the PTP-related code to its own function, rather than
+keeping it in the main HVC dispatcher. Also assigning a negative value
+to something that is unsigned hurts my eyes. Consider using ~0UL instead.
+See the comment below though.
+
+>  	u32 func_id = smccc_get_function(vcpu);
+>  	u64 val[4] = {SMCCC_RET_NOT_SUPPORTED};
+>  	u32 feature;
+> @@ -21,6 +26,10 @@ int kvm_hvc_call_handler(struct kvm_vcpu *vcpu)
+>  		val[0] = ARM_SMCCC_VERSION_1_1;
+>  		break;
+>  	case ARM_SMCCC_ARCH_FEATURES_FUNC_ID:
+> +		/*
+> +		 * Note: keep in mind that feature is u32 and smccc_get_arg1
+> +		 * will return u64, so need auto cast here.
+> +		 */
+>  		feature = smccc_get_arg1(vcpu);
+>  		switch (feature) {
+>  		case ARM_SMCCC_ARCH_WORKAROUND_1:
+> @@ -70,7 +79,47 @@ int kvm_hvc_call_handler(struct kvm_vcpu *vcpu)
+>  		break;
+>  	case ARM_SMCCC_VENDOR_HYP_KVM_FEATURES_FUNC_ID:
+>  		val[0] = BIT(ARM_SMCCC_KVM_FUNC_FEATURES);
+> +#ifdef CONFIG_ARM64_KVM_PTP_HOST
+> +		val[0] |= BIT(ARM_SMCCC_KVM_FUNC_KVM_PTP);
+> +#endif
+>  		break;
+> +#ifdef CONFIG_ARM64_KVM_PTP_HOST
+> +	/*
+> +	 * This serves virtual kvm_ptp.
+> +	 * Four values will be passed back.
+> +	 * reg0 stores high 32-bit host ktime;
+> +	 * reg1 stores low 32-bit host ktime;
+> +	 * reg2 stores high 32-bit difference of host cycles and cntvoff;
+> +	 * reg3 stores low 32-bit difference of host cycles and cntvoff.
+
+This comment doesn't match what I read below.
+
+> +	 */
+> +	case ARM_SMCCC_VENDOR_HYP_KVM_PTP_FUNC_ID:
+> +		/*
+> +		 * system time and counter value must captured in the same
+> +		 * time to keep consistency and precision.
+> +		 */
+> +		ktime_get_snapshot(&systime_snapshot);
+> +		if (systime_snapshot.cs_id != CSID_ARM_ARCH_COUNTER)
+> +			break;
+> +		val[0] = systime_snapshot.real;
+> +		/*
+> +		 * which of virtual counter or physical counter being
+> +		 * asked for is decided by the r1 value of smccc
+
+nit: s/smccc/SMCCC/
+
+> +		 * call. If no invalid r1 value offered, default cycle
+
+nit: If r1 is an invalid value...
+
+> +		 * value(-1) will return.
+
+nit: will be returned.
+
+> +		 */
+> +		feature = smccc_get_arg1(vcpu);
+> +		switch (feature) {
+> +		case ARM_PTP_VIRT_COUNTER:
+> +			cycles = systime_snapshot.cycles -
+> +				 vcpu_read_sys_reg(vcpu, CNTVOFF_EL2);
+
+nit: On a single line, please.
+
+> +			break;
+> +		case ARM_PTP_PHY_COUNTER:
+> +			cycles = systime_snapshot.cycles;
+> +			break;
+
+It'd be a lot clearer if you had a default: case here, handling the
+invalid case.
+
+> +		}
+> +		val[1] = cycles;
+
+Given that cycles is a 64bit value, how does it work for a 32bit
+guest? Or have you removed support for 32bit guests altogether?
+
+> +		break;
+> +#endif
+>  	default:
+>  		return kvm_psci_call(vcpu);
+>  	}
+> diff --git a/include/kvm/arm_arch_timer.h b/include/kvm/arm_arch_timer.h
+> index 51c19381108c..5a2b6da9be7a 100644
+> --- a/include/kvm/arm_arch_timer.h
+> +++ b/include/kvm/arm_arch_timer.h
+> @@ -105,5 +105,6 @@ void kvm_arm_timer_write_sysreg(struct kvm_vcpu *vcpu,
+>  /* Needed for tracing */
+>  u32 timer_get_ctl(struct arch_timer_context *ctxt);
+>  u64 timer_get_cval(struct arch_timer_context *ctxt);
+> +u64 timer_get_offset(struct arch_timer_context *ctxt);
+>  
+>  #endif
+> diff --git a/include/linux/arm-smccc.h b/include/linux/arm-smccc.h
+> index f7b5dd7dbf9f..0724840eb5f7 100644
+> --- a/include/linux/arm-smccc.h
+> +++ b/include/linux/arm-smccc.h
+> @@ -103,6 +103,7 @@
+>  
+>  /* KVM "vendor specific" services */
+>  #define ARM_SMCCC_KVM_FUNC_FEATURES		0
+> +#define ARM_SMCCC_KVM_FUNC_KVM_PTP		1
+>  #define ARM_SMCCC_KVM_FUNC_FEATURES_2		127
+>  #define ARM_SMCCC_KVM_NUM_FUNCS			128
+>  
+> @@ -112,6 +113,21 @@
+>  			   ARM_SMCCC_OWNER_VENDOR_HYP,			\
+>  			   ARM_SMCCC_KVM_FUNC_FEATURES)
+>  
+> +/*
+> + * ptp_kvm is a feature used for time sync between vm and host.
+> + * ptp_kvm module in guest kernel will get service from host using
+> + * this hypercall ID.
+> + */
+> +#define ARM_SMCCC_VENDOR_HYP_KVM_PTP_FUNC_ID                           \
+> +	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,                         \
+> +			   ARM_SMCCC_SMC_32,                            \
+> +			   ARM_SMCCC_OWNER_VENDOR_HYP,                  \
+> +			   ARM_SMCCC_KVM_FUNC_KVM_PTP)
+> +
+> +/* ptp_kvm counter type ID */
+> +#define ARM_PTP_VIRT_COUNTER			0
+> +#define ARM_PTP_PHY_COUNTER			1
+> +
+>  /* Paravirtualised time calls (defined by ARM DEN0057A) */
+>  #define ARM_SMCCC_HV_PV_TIME_FEATURES				\
+>  	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,			\
+> -- 
+> 2.17.1
+> 
+> 
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
