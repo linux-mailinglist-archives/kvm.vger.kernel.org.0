@@ -2,21 +2,21 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D694025D4FA
-	for <lists+kvm@lfdr.de>; Fri,  4 Sep 2020 11:30:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AE8E725D525
+	for <lists+kvm@lfdr.de>; Fri,  4 Sep 2020 11:32:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730258AbgIDJaG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 4 Sep 2020 05:30:06 -0400
-Received: from foss.arm.com ([217.140.110.172]:46976 "EHLO foss.arm.com"
+        id S1730105AbgIDJ3H (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 4 Sep 2020 05:29:07 -0400
+Received: from foss.arm.com ([217.140.110.172]:46732 "EHLO foss.arm.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730251AbgIDJaA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 4 Sep 2020 05:30:00 -0400
+        id S1729584AbgIDJ3F (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 4 Sep 2020 05:29:05 -0400
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 410CD152F;
-        Fri,  4 Sep 2020 02:30:00 -0700 (PDT)
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 655601063;
+        Fri,  4 Sep 2020 02:29:04 -0700 (PDT)
 Received: from localhost.localdomain (entos-thunderx2-desktop.shanghai.arm.com [10.169.212.215])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 841153F66F;
-        Fri,  4 Sep 2020 02:29:54 -0700 (PDT)
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id B06813F66F;
+        Fri,  4 Sep 2020 02:28:58 -0700 (PDT)
 From:   Jianyong Wu <jianyong.wu@arm.com>
 To:     netdev@vger.kernel.org, yangbo.lu@nxp.com, john.stultz@linaro.org,
         tglx@linutronix.de, pbonzini@redhat.com,
@@ -27,9 +27,9 @@ Cc:     linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
         kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
         Steve.Capper@arm.com, justin.he@arm.com, jianyong.wu@arm.com,
         nd@arm.com
-Subject: [PATCH v14 10/10] arm64: Add kvm capability check extension for ptp_kvm
-Date:   Fri,  4 Sep 2020 17:27:44 +0800
-Message-Id: <20200904092744.167655-11-jianyong.wu@arm.com>
+Subject: [PATCH v14 01/10] arm64: Probe for the presence of KVM hypervisor services during boot
+Date:   Fri,  4 Sep 2020 17:27:35 +0800
+Message-Id: <20200904092744.167655-2-jianyong.wu@arm.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20200904092744.167655-1-jianyong.wu@arm.com>
 References: <20200904092744.167655-1-jianyong.wu@arm.com>
@@ -38,44 +38,161 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Let userspace check if there is kvm ptp service in host.
-Before VMs migrate to another host, VMM may check if this
-cap is available to determine the next behavior.
+From: Will Deacon <will@kernel.org>
 
+Although the SMCCC specification provides some limited functionality for
+describing the presence of hypervisor and firmware services, this is
+generally applicable only to functions designated as "Arm Architecture
+Service Functions" and no portable discovery mechanism is provided for
+standard hypervisor services, despite having a designated range of
+function identifiers reserved by the specification.
+
+In an attempt to avoid the need for additional firmware changes every
+time a new function is added, introduce a UID to identify the service
+provider as being compatible with KVM. Once this has been established,
+additional services can be discovered via a feature bitmap.
+
+Cc: Marc Zyngier <maz@kernel.org>
+Signed-off-by: Will Deacon <will@kernel.org>
 Signed-off-by: Jianyong Wu <jianyong.wu@arm.com>
-Suggested-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/arm.c     | 4 ++++
- include/uapi/linux/kvm.h | 1 +
- 2 files changed, 5 insertions(+)
+ arch/arm64/include/asm/hypervisor.h | 11 +++++++++
+ arch/arm64/kernel/setup.c           | 36 +++++++++++++++++++++++++++++
+ include/linux/arm-smccc.h           | 26 +++++++++++++++++++++
+ 3 files changed, 73 insertions(+)
 
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 691d21e4c717..8e99ad2f0b83 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -178,6 +178,10 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- 	case KVM_CAP_ARM_IRQ_LINE_LAYOUT_2:
- 	case KVM_CAP_ARM_NISV_TO_USER:
- 	case KVM_CAP_ARM_INJECT_EXT_DABT:
+diff --git a/arch/arm64/include/asm/hypervisor.h b/arch/arm64/include/asm/hypervisor.h
+index f9cc1d021791..91e4bd890819 100644
+--- a/arch/arm64/include/asm/hypervisor.h
++++ b/arch/arm64/include/asm/hypervisor.h
+@@ -2,6 +2,17 @@
+ #ifndef _ASM_ARM64_HYPERVISOR_H
+ #define _ASM_ARM64_HYPERVISOR_H
+ 
++#include <linux/arm-smccc.h>
+ #include <asm/xen/hypervisor.h>
+ 
++static inline bool kvm_arm_hyp_service_available(u32 func_id)
++{
++	extern DECLARE_BITMAP(__kvm_arm_hyp_services, ARM_SMCCC_KVM_NUM_FUNCS);
 +
-+#ifdef CONFIG_ARM64_KVM_PTP_HOST
-+	case KVM_CAP_ARM_PTP_KVM:
-+#endif
- 		r = 1;
- 		break;
- 	case KVM_CAP_ARM_SET_DEVICE_ADDR:
-diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-index f6d86033c4fa..dd58ebe0daf5 100644
---- a/include/uapi/linux/kvm.h
-+++ b/include/uapi/linux/kvm.h
-@@ -1035,6 +1035,7 @@ struct kvm_ppc_resize_hpt {
- #define KVM_CAP_LAST_CPU 184
- #define KVM_CAP_SMALLER_MAXPHYADDR 185
- #define KVM_CAP_S390_DIAG318 186
-+#define KVM_CAP_ARM_PTP_KVM 187
++	if (func_id >= ARM_SMCCC_KVM_NUM_FUNCS)
++		return -EINVAL;
++
++	return test_bit(func_id, __kvm_arm_hyp_services);
++}
++
+ #endif
+diff --git a/arch/arm64/kernel/setup.c b/arch/arm64/kernel/setup.c
+index 77c4c9bad1b8..cb4a18fe5ad4 100644
+--- a/arch/arm64/kernel/setup.c
++++ b/arch/arm64/kernel/setup.c
+@@ -7,6 +7,7 @@
+  */
  
- #ifdef KVM_CAP_IRQ_ROUTING
+ #include <linux/acpi.h>
++#include <linux/arm-smccc.h>
+ #include <linux/export.h>
+ #include <linux/kernel.h>
+ #include <linux/stddef.h>
+@@ -276,6 +277,40 @@ arch_initcall(reserve_memblock_reserved_regions);
  
+ u64 __cpu_logical_map[NR_CPUS] = { [0 ... NR_CPUS-1] = INVALID_HWID };
+ 
++DECLARE_BITMAP(__kvm_arm_hyp_services, ARM_SMCCC_KVM_NUM_FUNCS) = { };
++
++static void __init kvm_init_hyp_services(void)
++{
++	int i;
++	struct arm_smccc_res res;
++
++	if (arm_smccc_get_version() == ARM_SMCCC_VERSION_1_0)
++		return;
++
++	arm_smccc_1_1_invoke(ARM_SMCCC_VENDOR_HYP_CALL_UID_FUNC_ID, &res);
++	if (res.a0 != ARM_SMCCC_VENDOR_HYP_UID_KVM_REG_0 ||
++	    res.a1 != ARM_SMCCC_VENDOR_HYP_UID_KVM_REG_1 ||
++	    res.a2 != ARM_SMCCC_VENDOR_HYP_UID_KVM_REG_2 ||
++	    res.a3 != ARM_SMCCC_VENDOR_HYP_UID_KVM_REG_3)
++		return;
++
++	memset(&res, 0, sizeof(res));
++	arm_smccc_1_1_invoke(ARM_SMCCC_VENDOR_HYP_KVM_FEATURES_FUNC_ID, &res);
++	for (i = 0; i < 32; ++i) {
++		if (res.a0 & (i))
++			set_bit(i + (32 * 0), __kvm_arm_hyp_services);
++		if (res.a1 & (i))
++			set_bit(i + (32 * 1), __kvm_arm_hyp_services);
++		if (res.a2 & (i))
++			set_bit(i + (32 * 2), __kvm_arm_hyp_services);
++		if (res.a3 & (i))
++			set_bit(i + (32 * 3), __kvm_arm_hyp_services);
++	}
++
++	pr_info("KVM hypervisor services detected (0x%08lx 0x%08lx 0x%08lx 0x%08lx)\n",
++		 res.a3, res.a2, res.a1, res.a0);
++}
++
+ u64 cpu_logical_map(int cpu)
+ {
+ 	return __cpu_logical_map[cpu];
+@@ -354,6 +389,7 @@ void __init __no_sanitize_address setup_arch(char **cmdline_p)
+ 	else
+ 		psci_acpi_init();
+ 
++	kvm_init_hyp_services();
+ 	init_bootcpu_ops();
+ 	smp_init_cpus();
+ 	smp_build_mpidr_hash();
+diff --git a/include/linux/arm-smccc.h b/include/linux/arm-smccc.h
+index 15c706fb0a37..f7b5dd7dbf9f 100644
+--- a/include/linux/arm-smccc.h
++++ b/include/linux/arm-smccc.h
+@@ -49,11 +49,14 @@
+ #define ARM_SMCCC_OWNER_OEM		3
+ #define ARM_SMCCC_OWNER_STANDARD	4
+ #define ARM_SMCCC_OWNER_STANDARD_HYP	5
++#define ARM_SMCCC_OWNER_VENDOR_HYP	6
+ #define ARM_SMCCC_OWNER_TRUSTED_APP	48
+ #define ARM_SMCCC_OWNER_TRUSTED_APP_END	49
+ #define ARM_SMCCC_OWNER_TRUSTED_OS	50
+ #define ARM_SMCCC_OWNER_TRUSTED_OS_END	63
+ 
++#define ARM_SMCCC_FUNC_QUERY_CALL_UID  0xff01
++
+ #define ARM_SMCCC_QUIRK_NONE		0
+ #define ARM_SMCCC_QUIRK_QCOM_A6		1 /* Save/restore register a6 */
+ 
+@@ -86,6 +89,29 @@
+ 			   ARM_SMCCC_SMC_32,				\
+ 			   0, 0x7fff)
+ 
++#define ARM_SMCCC_VENDOR_HYP_CALL_UID_FUNC_ID				\
++	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,				\
++			   ARM_SMCCC_SMC_32,				\
++			   ARM_SMCCC_OWNER_VENDOR_HYP,			\
++			   ARM_SMCCC_FUNC_QUERY_CALL_UID)
++
++/* KVM UID value: 28b46fb6-2ec5-11e9-a9ca-4b564d003a74 */
++#define ARM_SMCCC_VENDOR_HYP_UID_KVM_REG_0	0xb66fb428U
++#define ARM_SMCCC_VENDOR_HYP_UID_KVM_REG_1	0xe911c52eU
++#define ARM_SMCCC_VENDOR_HYP_UID_KVM_REG_2	0x564bcaa9U
++#define ARM_SMCCC_VENDOR_HYP_UID_KVM_REG_3	0x743a004dU
++
++/* KVM "vendor specific" services */
++#define ARM_SMCCC_KVM_FUNC_FEATURES		0
++#define ARM_SMCCC_KVM_FUNC_FEATURES_2		127
++#define ARM_SMCCC_KVM_NUM_FUNCS			128
++
++#define ARM_SMCCC_VENDOR_HYP_KVM_FEATURES_FUNC_ID			\
++	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,				\
++			   ARM_SMCCC_SMC_32,				\
++			   ARM_SMCCC_OWNER_VENDOR_HYP,			\
++			   ARM_SMCCC_KVM_FUNC_FEATURES)
++
+ /* Paravirtualised time calls (defined by ARM DEN0057A) */
+ #define ARM_SMCCC_HV_PV_TIME_FEATURES				\
+ 	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,			\
 -- 
 2.17.1
 
