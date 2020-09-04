@@ -2,163 +2,90 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 34EF225DCA0
-	for <lists+kvm@lfdr.de>; Fri,  4 Sep 2020 16:59:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BC6A225DECD
+	for <lists+kvm@lfdr.de>; Fri,  4 Sep 2020 18:00:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730495AbgIDO7f (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 4 Sep 2020 10:59:35 -0400
-Received: from lhrrgout.huawei.com ([185.176.76.210]:2770 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1730237AbgIDO7b (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 4 Sep 2020 10:59:31 -0400
-Received: from lhreml710-chm.china.huawei.com (unknown [172.18.7.106])
-        by Forcepoint Email with ESMTP id 5F1A8D0315C00E3B86EB;
-        Fri,  4 Sep 2020 15:59:24 +0100 (IST)
-Received: from localhost (10.52.125.29) by lhreml710-chm.china.huawei.com
- (10.201.108.61) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.1913.5; Fri, 4 Sep 2020
- 15:59:23 +0100
-Date:   Fri, 4 Sep 2020 15:57:50 +0100
-From:   Jonathan Cameron <Jonathan.Cameron@Huawei.com>
-To:     Marc Zyngier <maz@kernel.org>
-CC:     <kvm@vger.kernel.org>, <kvmarm@lists.cs.columbia.edu>,
-        <linux-arm-kernel@lists.infradead.org>,
-        Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Christoffer Dall <Christoffer.Dall@arm.com>,
-        James Morse <james.morse@arm.com>, <kernel-team@android.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>
-Subject: Re: [PATCH 12/23] KVM: arm64: Move kvm_vgic_vcpu_pending_irq() to
- irqchip_flow
-Message-ID: <20200904155750.00000663@Huawei.com>
-In-Reply-To: <20200903152610.1078827-13-maz@kernel.org>
-References: <20200903152610.1078827-1-maz@kernel.org>
-        <20200903152610.1078827-13-maz@kernel.org>
-Organization: Huawei Technologies Research and Development (UK) Ltd.
-X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; i686-w64-mingw32)
+        id S1726657AbgIDQAP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 4 Sep 2020 12:00:15 -0400
+Received: from mga01.intel.com ([192.55.52.88]:29411 "EHLO mga01.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726127AbgIDQAO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 4 Sep 2020 12:00:14 -0400
+IronPort-SDR: p8h0t8mTpBiLdWIa0lCT2hDK/9FmG8zdObq84BgZqMShFEzbEdvKJB6rV0qY74DXuFdaq8iLDI
+ jGaF/agi6LbQ==
+X-IronPort-AV: E=McAfee;i="6000,8403,9734"; a="175822319"
+X-IronPort-AV: E=Sophos;i="5.76,390,1592895600"; 
+   d="scan'208";a="175822319"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Sep 2020 09:00:12 -0700
+IronPort-SDR: B0zfEkIxhDFm2q4frTASRz7FOgl7CEHz9Q72W6CC3ioa5Lv3Tv2kK5vDrwxBrX/5AQR4oq9jq0
+ 7vT+c1KM7zlg==
+X-IronPort-AV: E=Sophos;i="5.76,390,1592895600"; 
+   d="scan'208";a="478552197"
+Received: from sjchrist-ice.jf.intel.com (HELO sjchrist-ice) ([10.54.31.34])
+  by orsmga005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Sep 2020 09:00:12 -0700
+Date:   Fri, 4 Sep 2020 09:00:10 -0700
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Gerd Hoffmann <kraxel@redhat.com>
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Peter Xu <peterx@redhat.com>, kvm@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Michael Tsirkin <mst@redhat.com>,
+        Julia Suvorova <jsuvorov@redhat.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Andrew Jones <drjones@redhat.com>, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 0/3] KVM: x86: KVM_MEM_PCI_HOLE memory
+Message-ID: <20200904160008.GA2206@sjchrist-ice>
+References: <20200807141232.402895-1-vkuznets@redhat.com>
+ <20200825212526.GC8235@xz-x1>
+ <87eenlwoaa.fsf@vitty.brq.redhat.com>
+ <20200901200021.GB3053@xz-x1>
+ <877dtcpn9z.fsf@vitty.brq.redhat.com>
+ <20200904061210.GA22435@sjchrist-ice>
+ <20200904072905.vbkiq3h762fyzds6@sirius.home.kraxel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.52.125.29]
-X-ClientProxiedBy: lhreml743-chm.china.huawei.com (10.201.108.193) To
- lhreml710-chm.china.huawei.com (10.201.108.61)
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200904072905.vbkiq3h762fyzds6@sirius.home.kraxel.org>
+User-Agent: Mutt/1.9.4 (2018-02-28)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 3 Sep 2020 16:25:59 +0100
-Marc Zyngier <maz@kernel.org> wrote:
-
-> Abstract the calls to kvm_vgic_vcpu_pending_irq() via the irqchip_flow
-> structure.
+On Fri, Sep 04, 2020 at 09:29:05AM +0200, Gerd Hoffmann wrote:
+>   Hi,
 > 
-> No functional change.
+> > Unless I'm mistaken, microvm doesn't even support PCI, does it?
 > 
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-
-A couple of stray lines in here that I think should be in patch 14
-
-Jonathan
-
-> ---
->  arch/arm64/include/asm/kvm_irq.h | 4 ++++
->  arch/arm64/kvm/arm.c             | 4 ++--
->  arch/arm64/kvm/vgic/vgic-init.c  | 1 +
->  arch/arm64/kvm/vgic/vgic.h       | 6 ++++++
->  include/kvm/arm_vgic.h           | 3 ---
->  5 files changed, 13 insertions(+), 5 deletions(-)
+> Correct, no pci support right now.
 > 
-> diff --git a/arch/arm64/include/asm/kvm_irq.h b/arch/arm64/include/asm/kvm_irq.h
-> index 50dfd641cd67..e7a244176ade 100644
-> --- a/arch/arm64/include/asm/kvm_irq.h
-> +++ b/arch/arm64/include/asm/kvm_irq.h
-> @@ -24,6 +24,7 @@ struct kvm_irqchip_flow {
->  	void (*irqchip_vcpu_unblocking)(struct kvm_vcpu *);
->  	void (*irqchip_vcpu_load)(struct kvm_vcpu *);
->  	void (*irqchip_vcpu_put)(struct kvm_vcpu *);
-> +	int  (*irqchip_vcpu_pending_irq)(struct kvm_vcpu *);
->  };
->  
->  /*
-> @@ -70,4 +71,7 @@ struct kvm_irqchip_flow {
->  #define kvm_irqchip_vcpu_put(v)				\
->  	__vcpu_irqchip_action((v), vcpu_put, (v))
->  
-> +#define kvm_irqchip_vcpu_pending_irq(v)			\
-> +	__vcpu_irqchip_action_ret((v), vcpu_pending_irq, (v))
-> +
->  #endif
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index 84d48c312b84..3496d200e488 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-> @@ -399,8 +399,8 @@ int kvm_arch_vcpu_ioctl_set_mpstate(struct kvm_vcpu *vcpu,
->  int kvm_arch_vcpu_runnable(struct kvm_vcpu *v)
->  {
->  	bool irq_lines = *vcpu_hcr(v) & (HCR_VI | HCR_VF);
-> -	return ((irq_lines || kvm_vgic_vcpu_pending_irq(v))
-> -		&& !v->arch.power_off && !v->arch.pause);
-> +	return ((irq_lines || kvm_irqchip_vcpu_pending_irq(v)) &&
-> +		!v->arch.power_off && !v->arch.pause);
->  }
->  
->  bool kvm_arch_vcpu_in_kernel(struct kvm_vcpu *vcpu)
-> diff --git a/arch/arm64/kvm/vgic/vgic-init.c b/arch/arm64/kvm/vgic/vgic-init.c
-> index 24b3ed9bae5d..8bb847045ef9 100644
-> --- a/arch/arm64/kvm/vgic/vgic-init.c
-> +++ b/arch/arm64/kvm/vgic/vgic-init.c
-> @@ -22,6 +22,7 @@ static struct kvm_irqchip_flow vgic_irqchip_flow = {
->  	.irqchip_vcpu_unblocking	= kvm_vgic_vcpu_unblocking,
->  	.irqchip_vcpu_load		= kvm_vgic_load,
->  	.irqchip_vcpu_put		= kvm_vgic_put,
-> +	.irqchip_vcpu_pending_irq	= kvm_vgic_vcpu_pending_irq,
->  };
->  
->  /*
-> diff --git a/arch/arm64/kvm/vgic/vgic.h b/arch/arm64/kvm/vgic/vgic.h
-> index 190737402365..c5511823eec5 100644
-> --- a/arch/arm64/kvm/vgic/vgic.h
-> +++ b/arch/arm64/kvm/vgic/vgic.h
-> @@ -321,7 +321,13 @@ int vgic_v4_init(struct kvm *kvm);
->  void vgic_v4_teardown(struct kvm *kvm);
->  void vgic_v4_configure_vsgis(struct kvm *kvm);
->  
-> +int kvm_vgic_vcpu_pending_irq(struct kvm_vcpu *vcpu);
-> +
->  void kvm_vgic_load(struct kvm_vcpu *vcpu);
->  void kvm_vgic_put(struct kvm_vcpu *vcpu);
->  
-> +void kvm_vgic_sync_hwstate(struct kvm_vcpu *vcpu);
-> +void kvm_vgic_flush_hwstate(struct kvm_vcpu *vcpu);
+> We could probably wire up ecam (arm/virt style) for pcie support, once
+> the acpi support for mictovm finally landed (we need acpi for that
+> because otherwise the kernel wouldn't find the pcie bus).
+> 
+> Question is whenever there is a good reason to do so.  Why would someone
+> prefer microvm with pcie support over q35?
+> 
+> > If all of the above is true, this can be handled by adding "pci=lastbus=0"
+> > as a guest kernel param to override its scanning of buses.  And couldn't
+> > that be done by QEMU's microvm_fix_kernel_cmdline() to make it transparent
+> > to the end user?
+> 
+> microvm_fix_kernel_cmdline() is a hack, not a solution.
+> 
+> Beside that I doubt this has much of an effect on microvm because
+> it doesn't support pcie in the first place.
 
-Wrong patch?
+I am so confused.  Vitaly, can you clarify exactly what QEMU VM type this
+series is intended to help?  If this is for microvm, then why is the guest
+doing PCI scanning in the first place?  If it's for q35, why is the
+justification for microvm-like workloads?
 
-> +
-> +
-
-Nitpick. One line is always enough :)
-
->  #endif
-> diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
-> index a06d9483e3a6..b2adf9cca334 100644
-> --- a/include/kvm/arm_vgic.h
-> +++ b/include/kvm/arm_vgic.h
-> @@ -347,14 +347,11 @@ int kvm_vgic_map_phys_irq(struct kvm_vcpu *vcpu, unsigned int host_irq,
->  int kvm_vgic_unmap_phys_irq(struct kvm_vcpu *vcpu, unsigned int vintid);
->  bool kvm_vgic_map_is_active(struct kvm_vcpu *vcpu, unsigned int vintid);
->  
-> -int kvm_vgic_vcpu_pending_irq(struct kvm_vcpu *vcpu);
-> -
->  #define vgic_initialized(k)	((k)->arch.vgic.initialized)
->  #define vgic_ready(k)		((k)->arch.vgic.ready)
->  #define vgic_valid_spi(k, i)	(((i) >= VGIC_NR_PRIVATE_IRQS) && \
->  			((i) < (k)->arch.vgic.nr_spis + VGIC_NR_PRIVATE_IRQS))
->  
-> -bool kvm_vcpu_has_pending_irqs(struct kvm_vcpu *vcpu);
->  void kvm_vgic_sync_hwstate(struct kvm_vcpu *vcpu);
->  void kvm_vgic_flush_hwstate(struct kvm_vcpu *vcpu);
->  void kvm_vgic_reset_mapped_irq(struct kvm_vcpu *vcpu, u32 vintid);
-
-
+Either way, I think it makes sense explore other options before throwing
+something into KVM, e.g. modifying guest command line, adding a KVM hint,
+"fixing" QEMU, etc... 
