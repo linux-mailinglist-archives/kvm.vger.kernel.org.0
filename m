@@ -2,254 +2,116 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 573B225D361
-	for <lists+kvm@lfdr.de>; Fri,  4 Sep 2020 10:19:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D5D2925D363
+	for <lists+kvm@lfdr.de>; Fri,  4 Sep 2020 10:19:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729800AbgIDITL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 4 Sep 2020 04:19:11 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:25418 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1729707AbgIDITJ (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 4 Sep 2020 04:19:09 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1599207547;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=phO9cBpvfpkXU4NPdjyoUela0DTAh6976p8XX9PeDZQ=;
-        b=BAG7F5z5yNN45WC9fIJfueDrbsxqdVYcVE6nLmAeS4pV3pRIWPlxqCnzOpJqnu26BQh96i
-        81844eP9k5IRI/XL/fS9TmL/4iUvxFwUzHRq9L145iOSEev3tGBhL0N1izGSXpBiGMKyEm
-        5e8M6xxajTGcqvGhatc5S4+lM2XSX3g=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-26-wpVnDR64MJ6lLMQmyz9u9Q-1; Fri, 04 Sep 2020 04:19:03 -0400
-X-MC-Unique: wpVnDR64MJ6lLMQmyz9u9Q-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 40121107464E;
-        Fri,  4 Sep 2020 08:19:02 +0000 (UTC)
-Received: from [10.36.112.51] (ovpn-112-51.ams2.redhat.com [10.36.112.51])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 9DD3A1002D64;
-        Fri,  4 Sep 2020 08:18:57 +0000 (UTC)
-Subject: Re: [PATCH v4 09/10] vfio/fsl-mc: Add read/write support for fsl-mc
- devices
-To:     Diana Craciun <diana.craciun@oss.nxp.com>,
-        alex.williamson@redhat.com, kvm@vger.kernel.org
-Cc:     linux-kernel@vger.kernel.org, bharatb.linux@gmail.com,
-        laurentiu.tudor@nxp.com, Bharat Bhushan <Bharat.Bhushan@nxp.com>
-References: <20200826093315.5279-1-diana.craciun@oss.nxp.com>
- <20200826093315.5279-10-diana.craciun@oss.nxp.com>
-From:   Auger Eric <eric.auger@redhat.com>
-Message-ID: <182a6686-a1ca-398b-2ccc-8a5638ffe7aa@redhat.com>
-Date:   Fri, 4 Sep 2020 10:18:56 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+        id S1729871AbgIDITY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 4 Sep 2020 04:19:24 -0400
+Received: from mail-io1-f71.google.com ([209.85.166.71]:51427 "EHLO
+        mail-io1-f71.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729819AbgIDITP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 4 Sep 2020 04:19:15 -0400
+Received: by mail-io1-f71.google.com with SMTP id q12so3850082iob.18
+        for <kvm@vger.kernel.org>; Fri, 04 Sep 2020 01:19:14 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
+        bh=bwSXulhCcQyV7AuhlU82y6Tsm3g1/PCAC2F+fcBSu6k=;
+        b=KVTa1x+vH7xo6Nu6Zq/7JlaWorAVI/z9o5OiCc35PLXuLkY17rqERZjv9APlXSCbG0
+         ZoLCtu4A4iGGL/ae0XXdvmibdLbZKopVBIQ5w3gkT8sn+/LS8ywIkXrfIfAbz+NXfozz
+         /SN3M37i9rwn7tsKg4D+zX1zpPmmHpARKTMdoimVmV1bG6ksfrULvzcpCa0ySFnc+yRV
+         1IpMnGoI2lyFKMdgE6XICPnv3li1LGKRA9NlOoE/ks9e3cMiSp9jNteenFPRLamadxhR
+         gWKaHUv3FdjwHuT2qzkt8hvf9H8TsfCFcHiaewXa7KFJVoW7veFnl704HzR48+cF9gIs
+         UCKw==
+X-Gm-Message-State: AOAM530fiZaZsJmK6GTfLEdv0HmrF2x+ZMRPiFcLoe+8O/xV2wyfbzXF
+        eWZKAjhmB/9rt/yEX9ohSH1ZbVZ8JxPqK1nKO0FTdKNzMxKQ
+X-Google-Smtp-Source: ABdhPJwemv9fiQCfkmqcEXv56wSBlE1yLeO2BIXik60Xhsi2PmbmHJogsvQhAOkU4efkdDLnFjcjfVCH6J9V+SniXgEsDtxHCfiy
 MIME-Version: 1.0
-In-Reply-To: <20200826093315.5279-10-diana.craciun@oss.nxp.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Received: by 2002:a05:6602:48f:: with SMTP id y15mr6717077iov.177.1599207554224;
+ Fri, 04 Sep 2020 01:19:14 -0700 (PDT)
+Date:   Fri, 04 Sep 2020 01:19:14 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <00000000000031163605ae78866f@google.com>
+Subject: WARNING in handle_desc (2)
+From:   syzbot <syzbot+6157aa3cd948b7a811ab@syzkaller.appspotmail.com>
+To:     bp@alien8.de, hpa@zytor.com, jmattson@google.com, joro@8bytes.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        mingo@redhat.com, pbonzini@redhat.com,
+        sean.j.christopherson@intel.com, syzkaller-bugs@googlegroups.com,
+        tglx@linutronix.de, vkuznets@redhat.com, wanpengli@tencent.com,
+        x86@kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Diana,
+Hello,
 
-On 8/26/20 11:33 AM, Diana Craciun wrote:
-> The software uses a memory-mapped I/O command interface (MC portals) to
-> communicate with the MC hardware. This command interface is used to
-> discover, enumerate, configure and remove DPAA2 objects. The DPAA2
-> objects use MSIs, so the command interface needs to be emulated
-> such that the correct MSI is configured in the hardware (the guest
-> has the virtual MSIs).
-What I don't get is all the regions are mmappable too.
-And this patch does not seem to introduce special handling with respect
-to MSIs. Please could you clarify?
-> 
-> This patch is adding read/write support for fsl-mc devices. The mc
-> commands are emulated by the userspace. The host is just passing
-> the correct command to the hardware.
-> 
-> Also the current patch limits userspace to write complete
-> 64byte command once and read 64byte response by one ioctl.
-> 
-> Signed-off-by: Bharat Bhushan <Bharat.Bhushan@nxp.com>
-> Signed-off-by: Diana Craciun <diana.craciun@oss.nxp.com>
-> ---
->  drivers/vfio/fsl-mc/vfio_fsl_mc.c         | 115 +++++++++++++++++++++-
->  drivers/vfio/fsl-mc/vfio_fsl_mc_private.h |   1 +
->  2 files changed, 114 insertions(+), 2 deletions(-)
-> 
-> diff --git a/drivers/vfio/fsl-mc/vfio_fsl_mc.c b/drivers/vfio/fsl-mc/vfio_fsl_mc.c
-> index 73834f488a94..27713aa86878 100644
-> --- a/drivers/vfio/fsl-mc/vfio_fsl_mc.c
-> +++ b/drivers/vfio/fsl-mc/vfio_fsl_mc.c
-> @@ -12,6 +12,7 @@
->  #include <linux/types.h>
->  #include <linux/vfio.h>
->  #include <linux/fsl/mc.h>
-> +#include <linux/delay.h>
->  
->  #include "vfio_fsl_mc_private.h"
->  
-> @@ -106,6 +107,9 @@ static int vfio_fsl_mc_regions_init(struct vfio_fsl_mc_device *vdev)
->  		vdev->regions[i].size = resource_size(res);
->  		vdev->regions[i].flags = VFIO_REGION_INFO_FLAG_MMAP;
->  		vdev->regions[i].type = mc_dev->regions[i].flags & IORESOURCE_BITS;
-> +		vdev->regions[i].flags |= VFIO_REGION_INFO_FLAG_READ;
-> +		if (!(mc_dev->regions[i].flags & IORESOURCE_READONLY))
-> +			vdev->regions[i].flags |= VFIO_REGION_INFO_FLAG_WRITE;
->  	}
->  
->  	vdev->num_regions = mc_dev->obj_desc.region_count;
-> @@ -114,6 +118,11 @@ static int vfio_fsl_mc_regions_init(struct vfio_fsl_mc_device *vdev)
->  
->  static void vfio_fsl_mc_regions_cleanup(struct vfio_fsl_mc_device *vdev)
->  {
-> +	int i;
-> +
-> +	for (i = 0; i < vdev->num_regions; i++)
-> +		iounmap(vdev->regions[i].ioaddr);
-> +
->  	vdev->num_regions = 0;
->  	kfree(vdev->regions);
->  }
-> @@ -311,13 +320,115 @@ static long vfio_fsl_mc_ioctl(void *device_data, unsigned int cmd,
->  static ssize_t vfio_fsl_mc_read(void *device_data, char __user *buf,
->  				size_t count, loff_t *ppos)
->  {
-> -	return -EINVAL;
-> +	struct vfio_fsl_mc_device *vdev = device_data;
-> +	unsigned int index = VFIO_FSL_MC_OFFSET_TO_INDEX(*ppos);
-> +	loff_t off = *ppos & VFIO_FSL_MC_OFFSET_MASK;
-> +	struct vfio_fsl_mc_region *region;
-> +	u64 data[8];
-> +	int i;
-> +
-> +	if (index >= vdev->num_regions)
-> +		return -EINVAL;
-> +
-> +	region = &vdev->regions[index];
-> +
-> +	if (!(region->flags & VFIO_REGION_INFO_FLAG_READ))
-> +		return -EINVAL;
-> +
-> +	if (!region->ioaddr) {
-> +		region->ioaddr = ioremap(region->addr, region->size);
-> +		if (!region->ioaddr)
-> +			return -ENOMEM;
-> +	}
-> +
-> +	if (count != 64 || off != 0)
-> +		return -EINVAL;
-> +
-> +	for (i = 7; i >= 0; i--)
-> +		data[i] = readq(region->ioaddr + i * sizeof(uint64_t));
-> +
-> +	if (copy_to_user(buf, data, 64))
-> +		return -EFAULT;
-> +
-> +	return count;
-> +}
-> +
-> +#define MC_CMD_COMPLETION_TIMEOUT_MS    5000
-> +#define MC_CMD_COMPLETION_POLLING_MAX_SLEEP_USECS    500
-> +
-> +static int vfio_fsl_mc_send_command(void __iomem *ioaddr, uint64_t *cmd_data)
-> +{
-> +	int i;
-> +	enum mc_cmd_status status;
-> +	unsigned long timeout_usecs = MC_CMD_COMPLETION_TIMEOUT_MS * 1000;
-> +
-> +	/* Write at command parameter into portal */
-> +	for (i = 7; i >= 1; i--)
-> +		writeq_relaxed(cmd_data[i], ioaddr + i * sizeof(uint64_t));
-> +
-> +	/* Write command header in the end */
-> +	writeq(cmd_data[0], ioaddr);
-> +
-> +	/* Wait for response before returning to user-space
-> +	 * This can be optimized in future to even prepare response
-> +	 * before returning to user-space and avoid read ioctl.
-> +	 */
-> +	for (;;) {
-> +		u64 header;
-> +		struct mc_cmd_header *resp_hdr;
-> +
-> +		header = cpu_to_le64(readq_relaxed(ioaddr));
-> +
-> +		resp_hdr = (struct mc_cmd_header *)&header;
-> +		status = (enum mc_cmd_status)resp_hdr->status;
-> +		if (status != MC_CMD_STATUS_READY)
-> +			break;
-> +
-> +		udelay(MC_CMD_COMPLETION_POLLING_MAX_SLEEP_USECS);
-> +		timeout_usecs -= MC_CMD_COMPLETION_POLLING_MAX_SLEEP_USECS;
-> +		if (timeout_usecs == 0)
-> +			return -ETIMEDOUT;
-> +	}
-> +
-> +	return 0;
->  }
->  
->  static ssize_t vfio_fsl_mc_write(void *device_data, const char __user *buf,
->  				 size_t count, loff_t *ppos)
->  {
-> -	return -EINVAL;
-> +	struct vfio_fsl_mc_device *vdev = device_data;
-> +	unsigned int index = VFIO_FSL_MC_OFFSET_TO_INDEX(*ppos);
-> +	loff_t off = *ppos & VFIO_FSL_MC_OFFSET_MASK;
-> +	struct vfio_fsl_mc_region *region;
-> +	u64 data[8];
-> +	int ret;
-> +
-> +	if (index >= vdev->num_regions)
-> +		return -EINVAL;
-> +
-> +	region = &vdev->regions[index];
-> +
-> +	if (!(region->flags & VFIO_REGION_INFO_FLAG_WRITE))
-> +		return -EINVAL;
-> +
-> +	if (!region->ioaddr) {
-> +		region->ioaddr = ioremap(region->addr, region->size);
-> +		if (!region->ioaddr)
-> +			return -ENOMEM;
-> +	}
-> +
-> +	if (count != 64 || off != 0)
-> +		return -EINVAL;
-> +
-> +	if (copy_from_user(&data, buf, 64))
-> +		return -EFAULT;
-> +
-> +	ret = vfio_fsl_mc_send_command(region->ioaddr, data);
-> +	if (ret)
-> +		return ret;
-> +
-> +	return count;
-> +
->  }
->  
->  static int vfio_fsl_mc_mmap_mmio(struct vfio_fsl_mc_region region,
-> diff --git a/drivers/vfio/fsl-mc/vfio_fsl_mc_private.h b/drivers/vfio/fsl-mc/vfio_fsl_mc_private.h
-> index bbfca8b55f8a..e6804e516c4a 100644
-> --- a/drivers/vfio/fsl-mc/vfio_fsl_mc_private.h
-> +++ b/drivers/vfio/fsl-mc/vfio_fsl_mc_private.h
-> @@ -32,6 +32,7 @@ struct vfio_fsl_mc_region {
->  	u32			type;
->  	u64			addr;
->  	resource_size_t		size;
-> +	void __iomem		*ioaddr;
->  };
->  
->  struct vfio_fsl_mc_device {
-> 
-Thanks
+syzbot found the following issue on:
 
-Eric
+HEAD commit:    dcc5c6f0 Merge tag 'x86-urgent-2020-08-30' of git://git.ke..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=1483ac85900000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=978db74cb30aa994
+dashboard link: https://syzkaller.appspot.com/bug?extid=6157aa3cd948b7a811ab
+compiler:       gcc (GCC) 10.1.0-syz 20200507
 
+Unfortunately, I don't have any reproducer for this issue yet.
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+6157aa3cd948b7a811ab@syzkaller.appspotmail.com
+
+------------[ cut here ]------------
+WARNING: CPU: 0 PID: 32353 at arch/x86/kvm/vmx/vmx.c:4965 handle_desc+0x5a/0x70 arch/x86/kvm/vmx/vmx.c:4965
+Kernel panic - not syncing: panic_on_warn set ...
+CPU: 0 PID: 32353 Comm: syz-executor.4 Not tainted 5.9.0-rc2-syzkaller #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
+Call Trace:
+ __dump_stack lib/dump_stack.c:77 [inline]
+ dump_stack+0x198/0x1fd lib/dump_stack.c:118
+ panic+0x347/0x7c0 kernel/panic.c:231
+ __warn.cold+0x20/0x46 kernel/panic.c:600
+ report_bug+0x1bd/0x210 lib/bug.c:198
+ handle_bug+0x38/0x90 arch/x86/kernel/traps.c:234
+ exc_invalid_op+0x14/0x40 arch/x86/kernel/traps.c:254
+ asm_exc_invalid_op+0x12/0x20 arch/x86/include/asm/idtentry.h:536
+RIP: 0010:handle_desc+0x5a/0x70 arch/x86/kvm/vmx/vmx.c:4965
+Code: ff 81 e3 00 08 00 00 48 89 de e8 91 c5 59 00 48 85 db 74 11 e8 e7 c8 59 00 48 89 ef 5b 31 f6 5d e9 db 87 f4 ff e8 d6 c8 59 00 <0f> 0b eb e6 e8 1d db 99 00 eb c3 90 66 2e 0f 1f 84 00 00 00 00 00
+RSP: 0018:ffffc90017d67b98 EFLAGS: 00010216
+RAX: 00000000000033f4 RBX: 0000000000000000 RCX: ffffc90010d96000
+RDX: 0000000000040000 RSI: ffffffff811a822a RDI: 0000000000000007
+RBP: ffff8880973d83c0 R08: 0000000000000000 R09: ffffffff8c5f1ac7
+R10: 0000000000000000 R11: 0000000000000000 R12: ffffffff811a81d0
+R13: ffff8880973d83f8 R14: 000000000000002e R15: 0000000000000000
+ vmx_handle_exit+0x293/0x14c0 arch/x86/kvm/vmx/vmx.c:6118
+ vcpu_enter_guest+0x18f4/0x3c20 arch/x86/kvm/x86.c:8638
+ vcpu_run arch/x86/kvm/x86.c:8703 [inline]
+ kvm_arch_vcpu_ioctl_run+0x440/0x1780 arch/x86/kvm/x86.c:8920
+ kvm_vcpu_ioctl+0x467/0xdf0 arch/x86/kvm/../../../virt/kvm/kvm_main.c:3230
+ vfs_ioctl fs/ioctl.c:48 [inline]
+ __do_sys_ioctl fs/ioctl.c:753 [inline]
+ __se_sys_ioctl fs/ioctl.c:739 [inline]
+ __x64_sys_ioctl+0x193/0x200 fs/ioctl.c:739
+ do_syscall_64+0x2d/0x70 arch/x86/entry/common.c:46
+ entry_SYSCALL_64_after_hwframe+0x44/0xa9
+RIP: 0033:0x45d5b9
+Code: 5d b4 fb ff c3 66 2e 0f 1f 84 00 00 00 00 00 66 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 0f 83 2b b4 fb ff c3 66 2e 0f 1f 84 00 00 00 00
+RSP: 002b:00007f925f9c9c78 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
+RAX: ffffffffffffffda RBX: 0000000000011880 RCX: 000000000045d5b9
+RDX: 0000000000000000 RSI: 000000000000ae80 RDI: 0000000000000006
+RBP: 000000000118cf80 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 000000000118cf4c
+R13: 00007ffc7b03146f R14: 00007f925f9ca9c0 R15: 000000000118cf4c
+Kernel Offset: disabled
+Rebooting in 86400 seconds..
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
