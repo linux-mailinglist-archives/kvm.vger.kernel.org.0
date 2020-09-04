@@ -2,35 +2,35 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DF89525E11D
-	for <lists+kvm@lfdr.de>; Fri,  4 Sep 2020 19:42:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6D8B125E110
+	for <lists+kvm@lfdr.de>; Fri,  4 Sep 2020 19:40:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727986AbgIDRmH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 4 Sep 2020 13:42:07 -0400
-Received: from smtp-fw-2101.amazon.com ([72.21.196.25]:3558 "EHLO
-        smtp-fw-2101.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728198AbgIDRkL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 4 Sep 2020 13:40:11 -0400
+        id S1728252AbgIDRka (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 4 Sep 2020 13:40:30 -0400
+Received: from smtp-fw-9102.amazon.com ([207.171.184.29]:31235 "EHLO
+        smtp-fw-9102.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727964AbgIDRk3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 4 Sep 2020 13:40:29 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1599241210; x=1630777210;
+  t=1599241229; x=1630777229;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=uCCUSEPsgK7LpKM7i1LnBPb3b+0b1zudShw68xsNyIE=;
-  b=MwcQkMZ8qIqpRGO5pn7jnTm2WBXX3CbA6U0OJ1N4wd5x1ZDoKmW1T7ns
-   B/NrIG1b1bbGE154vuXvqcrYF21tdC26XOeaaNk39bL0/YywbXqc3c3ND
-   qmiOU6h9Bn/pyWiUgIzCpiwvaKGiTaiFu5u2C1+yag7LJRi3ECbzBwt4a
-   g=;
+  bh=Lm0xp2nyoJ7iwxMrT0gLboEtI9wzxivQfh/SLbvjtB4=;
+  b=EHCRkOUlyHmb+L43osaH5kjMMbCGkFvK4ISAaRhNSbia473/NC/qT8Wf
+   H1o+JkZYSodz4Ld949uzoI4WSOFFM7IGD8gvPw1UCdjat6YDAkzGaH/bM
+   +DGlH9x5tZbNFe7lMfVRSHS2gvQPVdVvnHxRM6LrpyGltHeuG6e4uJdkV
+   A=;
 X-IronPort-AV: E=Sophos;i="5.76,390,1592870400"; 
-   d="scan'208";a="51939252"
-Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO email-inbound-relay-1e-97fdccfd.us-east-1.amazon.com) ([10.43.8.2])
-  by smtp-border-fw-out-2101.iad2.amazon.com with ESMTP; 04 Sep 2020 17:40:10 +0000
+   d="scan'208";a="73692053"
+Received: from sea32-co-svc-lb4-vlan3.sea.corp.amazon.com (HELO email-inbound-relay-1a-67b371d8.us-east-1.amazon.com) ([10.47.23.38])
+  by smtp-border-fw-out-9102.sea19.amazon.com with ESMTP; 04 Sep 2020 17:40:24 +0000
 Received: from EX13D16EUB001.ant.amazon.com (iad55-ws-svc-p15-lb9-vlan2.iad.amazon.com [10.40.159.162])
-        by email-inbound-relay-1e-97fdccfd.us-east-1.amazon.com (Postfix) with ESMTPS id EC7BCA269E;
-        Fri,  4 Sep 2020 17:40:07 +0000 (UTC)
+        by email-inbound-relay-1a-67b371d8.us-east-1.amazon.com (Postfix) with ESMTPS id 167CFA1BD7;
+        Fri,  4 Sep 2020 17:40:23 +0000 (UTC)
 Received: from 38f9d34ed3b1.ant.amazon.com (10.43.161.145) by
  EX13D16EUB001.ant.amazon.com (10.43.166.28) with Microsoft SMTP Server (TLS)
- id 15.0.1497.2; Fri, 4 Sep 2020 17:39:57 +0000
+ id 15.0.1497.2; Fri, 4 Sep 2020 17:40:12 +0000
 From:   Andra Paraschiv <andraprs@amazon.com>
 To:     linux-kernel <linux-kernel@vger.kernel.org>
 CC:     Anthony Liguori <aliguori@amazon.com>,
@@ -55,15 +55,15 @@ CC:     Anthony Liguori <aliguori@amazon.com>,
         kvm <kvm@vger.kernel.org>,
         ne-devel-upstream <ne-devel-upstream@amazon.com>,
         Andra Paraschiv <andraprs@amazon.com>
-Subject: [PATCH v8 14/18] nitro_enclaves: Add Kconfig for the Nitro Enclaves driver
-Date:   Fri, 4 Sep 2020 20:37:14 +0300
-Message-ID: <20200904173718.64857-15-andraprs@amazon.com>
+Subject: [PATCH v8 15/18] nitro_enclaves: Add Makefile for the Nitro Enclaves driver
+Date:   Fri, 4 Sep 2020 20:37:15 +0300
+Message-ID: <20200904173718.64857-16-andraprs@amazon.com>
 X-Mailer: git-send-email 2.20.1 (Apple Git-117)
 In-Reply-To: <20200904173718.64857-1-andraprs@amazon.com>
 References: <20200904173718.64857-1-andraprs@amazon.com>
 MIME-Version: 1.0
 X-Originating-IP: [10.43.161.145]
-X-ClientProxiedBy: EX13D08UWC002.ant.amazon.com (10.43.162.168) To
+X-ClientProxiedBy: EX13D06UWC001.ant.amazon.com (10.43.162.91) To
  EX13D16EUB001.ant.amazon.com (10.43.166.28)
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
@@ -83,9 +83,7 @@ v7 -> v8
 
 v6 -> v7
 
-* Remove, for now, the dependency on ARM64 arch. x86 is currently
-  supported, with Arm to come afterwards. The NE kernel driver can be
-  built for aarch64 arch.
+* No changes.
 
 v5 -> v6
 
@@ -93,11 +91,11 @@ v5 -> v6
 
 v4 -> v5
 
-* Add arch dependency for Arm / x86.
+* No changes.
 
 v3 -> v4
 
-* Add PCI and SMP dependencies.
+* No changes.
 
 v2 -> v3
 
@@ -106,52 +104,41 @@ v2 -> v3
 
 v1 -> v2
 
-* Update path to Kconfig to match the drivers/virt/nitro_enclaves
+* Update path to Makefile to match the drivers/virt/nitro_enclaves
   directory.
-* Update help in Kconfig.
 ---
- drivers/virt/Kconfig                |  2 ++
- drivers/virt/nitro_enclaves/Kconfig | 20 ++++++++++++++++++++
- 2 files changed, 22 insertions(+)
- create mode 100644 drivers/virt/nitro_enclaves/Kconfig
+ drivers/virt/Makefile                |  2 ++
+ drivers/virt/nitro_enclaves/Makefile | 11 +++++++++++
+ 2 files changed, 13 insertions(+)
+ create mode 100644 drivers/virt/nitro_enclaves/Makefile
 
-diff --git a/drivers/virt/Kconfig b/drivers/virt/Kconfig
-index cbc1f25c79ab..80c5f9c16ec1 100644
---- a/drivers/virt/Kconfig
-+++ b/drivers/virt/Kconfig
-@@ -32,4 +32,6 @@ config FSL_HV_MANAGER
- 	     partition shuts down.
+diff --git a/drivers/virt/Makefile b/drivers/virt/Makefile
+index fd331247c27a..f28425ce4b39 100644
+--- a/drivers/virt/Makefile
++++ b/drivers/virt/Makefile
+@@ -5,3 +5,5 @@
  
- source "drivers/virt/vboxguest/Kconfig"
+ obj-$(CONFIG_FSL_HV_MANAGER)	+= fsl_hypervisor.o
+ obj-y				+= vboxguest/
 +
-+source "drivers/virt/nitro_enclaves/Kconfig"
- endif
-diff --git a/drivers/virt/nitro_enclaves/Kconfig b/drivers/virt/nitro_enclaves/Kconfig
++obj-$(CONFIG_NITRO_ENCLAVES)	+= nitro_enclaves/
+diff --git a/drivers/virt/nitro_enclaves/Makefile b/drivers/virt/nitro_enclaves/Makefile
 new file mode 100644
-index 000000000000..8c9387a232df
+index 000000000000..e9f4fcd1591e
 --- /dev/null
-+++ b/drivers/virt/nitro_enclaves/Kconfig
-@@ -0,0 +1,20 @@
++++ b/drivers/virt/nitro_enclaves/Makefile
+@@ -0,0 +1,11 @@
 +# SPDX-License-Identifier: GPL-2.0
 +#
 +# Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 +
-+# Amazon Nitro Enclaves (NE) support.
-+# Nitro is a hypervisor that has been developed by Amazon.
++# Enclave lifetime management support for Nitro Enclaves (NE).
 +
-+# TODO: Add dependency for ARM64 once NE is supported on Arm platforms. For now,
-+# the NE kernel driver can be built for aarch64 arch.
-+# depends on (ARM64 || X86) && HOTPLUG_CPU && PCI && SMP
++obj-$(CONFIG_NITRO_ENCLAVES) += nitro_enclaves.o
 +
-+config NITRO_ENCLAVES
-+	tristate "Nitro Enclaves Support"
-+	depends on X86 && HOTPLUG_CPU && PCI && SMP
-+	help
-+	  This driver consists of support for enclave lifetime management
-+	  for Nitro Enclaves (NE).
++nitro_enclaves-y := ne_pci_dev.o ne_misc_dev.o
 +
-+	  To compile this driver as a module, choose M here.
-+	  The module will be called nitro_enclaves.
++ccflags-y += -Wall
 -- 
 2.20.1 (Apple Git-117)
 
