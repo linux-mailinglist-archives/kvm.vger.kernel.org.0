@@ -2,112 +2,111 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C99EA25D67E
-	for <lists+kvm@lfdr.de>; Fri,  4 Sep 2020 12:40:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C584425D6C0
+	for <lists+kvm@lfdr.de>; Fri,  4 Sep 2020 12:46:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730043AbgIDKkG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 4 Sep 2020 06:40:06 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:37234 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1728118AbgIDKjs (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 4 Sep 2020 06:39:48 -0400
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 084AXARt022868;
-        Fri, 4 Sep 2020 06:39:47 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : references : mime-version : content-type :
- in-reply-to; s=pp1; bh=EKhnpv9wxrvOlJoMiXqzMLcXq/h+4zHfeTIHNE45mGA=;
- b=QiQz4ZsLDIxP2bBftKK+R2Z5YWH3tMqiCwzTiqPSERWZWqeoHaOeAqxEjY4bqrE7dpDv
- aRCGtphZlRABCjuyNJc1zg6xwENoSi+mekx5h4tjmWyP1Lh2AHaeoajtK7kZIUvTV8Z2
- AkUxwrqgGNzfVMX2ZRl4JHbZt9M9TjQCOLgPMopYdohVxzDRyjfs/+gRyBFYXNGvytF5
- gaE7OEiV+sbBn1JULKXgCO1vEEte81+d4j/GR83ml2CzDYrDExOvsU57jBPdqS3WZlix
- ILQzGaayGradP0a1Gnl5gnbHE8D0AWNVvXnvM3YfK7ojAiTswWUifQgpjobcJMpMkO72 HA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 33bj4n3ba0-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 04 Sep 2020 06:39:47 -0400
-Received: from m0098393.ppops.net (m0098393.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 084AXJWY023772;
-        Fri, 4 Sep 2020 06:39:46 -0400
-Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 33bj4n3b8e-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 04 Sep 2020 06:39:46 -0400
-Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
-        by ppma06ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 084AXTUs016433;
-        Fri, 4 Sep 2020 10:39:44 GMT
-Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
-        by ppma06ams.nl.ibm.com with ESMTP id 33b8s60h38-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 04 Sep 2020 10:39:44 +0000
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
-        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 084Adf8O20251080
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 4 Sep 2020 10:39:41 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id B180CA4062;
-        Fri,  4 Sep 2020 10:39:41 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 6111AA406B;
-        Fri,  4 Sep 2020 10:39:41 +0000 (GMT)
-Received: from osiris (unknown [9.171.25.186])
-        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
-        Fri,  4 Sep 2020 10:39:41 +0000 (GMT)
-Date:   Fri, 4 Sep 2020 12:39:39 +0200
-From:   Heiko Carstens <hca@linux.ibm.com>
-To:     Janosch Frank <frankja@linux.ibm.com>
-Cc:     linux-s390@vger.kernel.org, borntraeger@de.ibm.com,
-        gor@linux.ibm.com, imbrenda@linux.ibm.com, kvm@vger.kernel.org,
-        david@redhat.com
-Subject: Re: [PATCH 1/2] s390x: uv: Add destroy page call
-Message-ID: <20200904103939.GE6075@osiris>
-References: <20200903131435.2535-1-frankja@linux.ibm.com>
- <20200903131435.2535-2-frankja@linux.ibm.com>
+        id S1729741AbgIDKqh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 4 Sep 2020 06:46:37 -0400
+Received: from mail.kernel.org ([198.145.29.99]:58750 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726171AbgIDKqC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 4 Sep 2020 06:46:02 -0400
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 8925320770;
+        Fri,  4 Sep 2020 10:46:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1599216361;
+        bh=emfYI5A6yt/uyLK8UfzYiitooNVKksAc8FkL2+qvA7c=;
+        h=From:To:Cc:Subject:Date:From;
+        b=SUl1fEUncq5ywbwQWlGS/ZWBgkfbdJEAjcRUbgtxQSI7GWWZfG/Kk5YwcUYYM7rU1
+         ll/ao5a925iM+qCX2vT6IIXVqcTs+GxWI/Rd8XiJLVob1aGeV96ggS923pKuClssM0
+         bkQSHTFQ2ySdZw7AO8uK7DHTxLKZTZKxP/m15g5g=
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=why.lan)
+        by disco-boy.misterjones.org with esmtpsa (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+        (Exim 4.92)
+        (envelope-from <maz@kernel.org>)
+        id 1kE9EG-0098oH-0a; Fri, 04 Sep 2020 11:46:00 +0100
+From:   Marc Zyngier <maz@kernel.org>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Alexandru Elisei <alexandru.elisei@arm.com>,
+        Andrew Jones <drjones@redhat.com>,
+        Eric Auger <eric.auger@redhat.com>,
+        Gavin Shan <gshan@redhat.com>,
+        Steven Price <steven.price@arm.com>, kernel-team@android.com,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org
+Subject: [GIT PULL] KVM/arm64 fixes for 5.9
+Date:   Fri,  4 Sep 2020 11:45:21 +0100
+Message-Id: <20200904104530.1082676-1-maz@kernel.org>
+X-Mailer: git-send-email 2.27.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200903131435.2535-2-frankja@linux.ibm.com>
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
- definitions=2020-09-04_05:2020-09-04,2020-09-04 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0
- lowpriorityscore=0 mlxscore=0 impostorscore=0 malwarescore=0
- priorityscore=1501 adultscore=0 clxscore=1015 phishscore=0 mlxlogscore=999
- suspectscore=1 spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2006250000 definitions=main-2009040097
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: pbonzini@redhat.com, alexandru.elisei@arm.com, drjones@redhat.com, eric.auger@redhat.com, gshan@redhat.com, steven.price@arm.com, kernel-team@android.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Sep 03, 2020 at 09:14:34AM -0400, Janosch Frank wrote:
-> +int uv_destroy_page(unsigned long paddr)
-> +{
-> +	struct uv_cb_cfs uvcb = {
-> +		.header.cmd = UVC_CMD_DESTR_SEC_STOR,
-> +		.header.len = sizeof(uvcb),
-> +		.paddr = paddr
-> +	};
-> +
-> +	if (uv_call(0, (u64)&uvcb))
-> +		return -EINVAL;
-> +	return 0;
-> +}
-> +
-> +
->  /*
->   * Requests the Ultravisor to encrypt a guest page and make it
->   * accessible to the host for paging (export).
-> diff --git a/arch/s390/mm/gmap.c b/arch/s390/mm/gmap.c
-> index 373542ca1113..cfb0017f33a7 100644
-> --- a/arch/s390/mm/gmap.c
-> +++ b/arch/s390/mm/gmap.c
-> @@ -2679,7 +2679,7 @@ static int __s390_reset_acc(pte_t *ptep, unsigned long addr,
->  	pte_t pte = READ_ONCE(*ptep);
->  
->  	if (pte_present(pte))
-> -		WARN_ON_ONCE(uv_convert_from_secure(pte_val(pte) & PAGE_MASK));
-> +		WARN_ON_ONCE(uv_destroy_page(pte_val(pte) & PAGE_MASK));
+Hi Paolo,
 
-Why not put the WARN_ON_ONCE() into uv_destroy_page() and make that
-function return void?
+Here's a bunch of fixes for 5.9. The gist of it is the stolen time
+rework from Andrew, but we also have a couple of MM fixes that have
+surfaced as people have started to use hugetlbfs in anger.
+
+Please pull,
+
+	M.
+
+The following changes since commit 9123e3a74ec7b934a4a099e98af6a61c2f80bbf5:
+
+  Linux 5.9-rc1 (2020-08-16 13:04:57 -0700)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvmarm-fixes-5.9-1
+
+for you to fetch changes up to 7b75cd5128421c673153efb1236705696a1a9812:
+
+  KVM: arm64: Update page shift if stage 2 block mapping not supported (2020-09-04 10:53:48 +0100)
+
+----------------------------------------------------------------
+KVM/arm64 fixes for Linux 5.9, take #1
+
+- Multiple stolen time fixes, with a new capability to match x86
+- Fix for hugetlbfs mappings when PUD and PMD are the same level
+- Fix for hugetlbfs mappings when PTE mappings are enforced
+  (dirty logging, for example)
+- Fix tracing output of 64bit values
+
+----------------------------------------------------------------
+Alexandru Elisei (1):
+      KVM: arm64: Update page shift if stage 2 block mapping not supported
+
+Andrew Jones (6):
+      KVM: arm64: pvtime: steal-time is only supported when configured
+      KVM: arm64: pvtime: Fix potential loss of stolen time
+      KVM: arm64: Drop type input from kvm_put_guest
+      KVM: arm64: pvtime: Fix stolen time accounting across migration
+      KVM: Documentation: Minor fixups
+      arm64/x86: KVM: Introduce steal-time cap
+
+Marc Zyngier (2):
+      KVM: arm64: Do not try to map PUDs when they are folded into PMD
+      KVM: arm64: Fix address truncation in traces
+
+ Documentation/virt/kvm/api.rst     | 22 ++++++++++++++++++----
+ arch/arm64/include/asm/kvm_host.h  |  2 +-
+ arch/arm64/kvm/arm.c               |  3 +++
+ arch/arm64/kvm/mmu.c               |  8 +++++++-
+ arch/arm64/kvm/pvtime.c            | 29 +++++++++++++----------------
+ arch/arm64/kvm/trace_arm.h         | 16 ++++++++--------
+ arch/arm64/kvm/trace_handle_exit.h |  6 +++---
+ arch/x86/kvm/x86.c                 |  3 +++
+ include/linux/kvm_host.h           | 31 ++++++++++++++++++++++++++-----
+ include/uapi/linux/kvm.h           |  1 +
+ 10 files changed, 83 insertions(+), 38 deletions(-)
