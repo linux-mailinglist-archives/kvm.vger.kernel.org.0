@@ -2,328 +2,167 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id EE0B725DEE5
-	for <lists+kvm@lfdr.de>; Fri,  4 Sep 2020 18:02:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E96C625DF0C
+	for <lists+kvm@lfdr.de>; Fri,  4 Sep 2020 18:06:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726733AbgIDQCO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 4 Sep 2020 12:02:14 -0400
-Received: from lhrrgout.huawei.com ([185.176.76.210]:2771 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726184AbgIDQCO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 4 Sep 2020 12:02:14 -0400
-Received: from lhreml710-chm.china.huawei.com (unknown [172.18.7.107])
-        by Forcepoint Email with ESMTP id CFC6A44256D8BD91718B;
-        Fri,  4 Sep 2020 17:02:10 +0100 (IST)
-Received: from localhost (10.52.125.29) by lhreml710-chm.china.huawei.com
- (10.201.108.61) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.1913.5; Fri, 4 Sep 2020
- 17:02:10 +0100
-Date:   Fri, 4 Sep 2020 17:00:36 +0100
-From:   Jonathan Cameron <Jonathan.Cameron@Huawei.com>
-To:     Marc Zyngier <maz@kernel.org>
-CC:     <kvm@vger.kernel.org>, <kvmarm@lists.cs.columbia.edu>,
-        <linux-arm-kernel@lists.infradead.org>,
-        Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Christoffer Dall <Christoffer.Dall@arm.com>,
-        James Morse <james.morse@arm.com>, <kernel-team@android.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>
-Subject: Re: [PATCH 22/23] KVM: arm64: Add a rVIC/rVID in-kernel
- implementation
-Message-ID: <20200904170036.00003bda@Huawei.com>
-In-Reply-To: <20200903152610.1078827-23-maz@kernel.org>
-References: <20200903152610.1078827-1-maz@kernel.org>
-        <20200903152610.1078827-23-maz@kernel.org>
-Organization: Huawei Technologies Research and Development (UK) Ltd.
-X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; i686-w64-mingw32)
+        id S1727990AbgIDQGQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 4 Sep 2020 12:06:16 -0400
+Received: from mga17.intel.com ([192.55.52.151]:40312 "EHLO mga17.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727996AbgIDQGO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 4 Sep 2020 12:06:14 -0400
+IronPort-SDR: mNA65Rc6zvMCnXfR8SNC109C0oDOj6xWs4y9tevo7spgLqZA7wkR+n0JzMQegJWit2UkVt5qnX
+ oSn0GROXDLvA==
+X-IronPort-AV: E=McAfee;i="6000,8403,9734"; a="137823625"
+X-IronPort-AV: E=Sophos;i="5.76,390,1592895600"; 
+   d="scan'208";a="137823625"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Sep 2020 09:06:14 -0700
+IronPort-SDR: Fgk+EDJnX2zD5D02DfcnKFc1J2YJBR/3LyrWm797boITeW63Kr6ncWBXYw8LKhg9ftOgHM8o9x
+ bIKapkuUfN3A==
+X-IronPort-AV: E=Sophos;i="5.76,390,1592895600"; 
+   d="scan'208";a="284479234"
+Received: from sjchrist-ice.jf.intel.com (HELO sjchrist-ice) ([10.54.31.34])
+  by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Sep 2020 09:06:11 -0700
+Date:   Fri, 4 Sep 2020 09:06:10 -0700
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Wanpeng Li <kernellwp@gmail.com>
+Cc:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>
+Subject: Re: [PATCH] KVM: LAPIC: Reset timer_advance_ns if timer mode switch
+Message-ID: <20200904160609.GD2206@sjchrist-ice>
+References: <1598578508-14134-1-git-send-email-wanpengli@tencent.com>
+ <20200902212328.GI11695@sjchrist-ice>
+ <CANRm+CzQ00nFoYsxLQ7xhDaAnbi01U4BGkmuS9WLY80Nyt254w@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.52.125.29]
-X-ClientProxiedBy: lhreml743-chm.china.huawei.com (10.201.108.193) To
- lhreml710-chm.china.huawei.com (10.201.108.61)
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CANRm+CzQ00nFoYsxLQ7xhDaAnbi01U4BGkmuS9WLY80Nyt254w@mail.gmail.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 3 Sep 2020 16:26:09 +0100
-Marc Zyngier <maz@kernel.org> wrote:
-
-> The rVIC (reduced Virtual Interrupt Controller), and its rVID
-> (reduced Virtual Interrupt Distributor) companion are the two
-> parts of a PV interrupt controller architecture, aiming at supporting
-> VMs with minimal interrupt requirements.
+On Thu, Sep 03, 2020 at 06:57:00PM +0800, Wanpeng Li wrote:
+> On Thu, 3 Sep 2020 at 05:23, Sean Christopherson
+> <sean.j.christopherson@intel.com> wrote:
+> >
+> > On Fri, Aug 28, 2020 at 09:35:08AM +0800, Wanpeng Li wrote:
+> > > From: Wanpeng Li <wanpengli@tencent.com>
+> > >
+> > > per-vCPU timer_advance_ns should be set to 0 if timer mode is not tscdeadline
+> > > otherwise we waste cpu cycles in the function lapic_timer_int_injected(),
+> > > especially on AMD platform which doesn't support tscdeadline mode. We can
+> > > reset timer_advance_ns to the initial value if switch back to tscdealine
+> > > timer mode.
+> > >
+> > > Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
+> > > ---
+> > >  arch/x86/kvm/lapic.c | 6 ++++++
+> > >  1 file changed, 6 insertions(+)
+> > >
+> > > diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+> > > index 654649b..abc296d 100644
+> > > --- a/arch/x86/kvm/lapic.c
+> > > +++ b/arch/x86/kvm/lapic.c
+> > > @@ -1499,10 +1499,16 @@ static void apic_update_lvtt(struct kvm_lapic *apic)
+> > >                       kvm_lapic_set_reg(apic, APIC_TMICT, 0);
+> > >                       apic->lapic_timer.period = 0;
+> > >                       apic->lapic_timer.tscdeadline = 0;
+> > > +                     if (timer_mode == APIC_LVT_TIMER_TSCDEADLINE &&
+> > > +                             lapic_timer_advance_dynamic)
+> >
+> > Bad indentation.
+> >
+> > > +                             apic->lapic_timer.timer_advance_ns = LAPIC_TIMER_ADVANCE_NS_INIT;
+> >
+> > Redoing the tuning seems odd.  Doubt it will matter, but it feels weird to
+> > have to retune the advancement just because the guest toggled between modes.
+> >
+> > Rather than clear timer_advance_ns, can we simply move the check against
+> > apic->lapic_timer.expired_tscdeadline much earlier?  I think that would
+> > solve this performance hiccup, and IMO would be a logical change in any
+> > case.  E.g. with some refactoring to avoid more duplication between VMX and
+> > SVM
 > 
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> How about something like below:
 
-A few trivial things from a first read through.
+That works too.  The only reason I used the inline shenanigans was to avoid
+the CALL+RET in VM-Enter when the timer hasn't expired.
 
-> ---
->  arch/arm64/include/asm/kvm_host.h |    7 +-
->  arch/arm64/include/asm/kvm_irq.h  |    2 +
->  arch/arm64/include/uapi/asm/kvm.h |    9 +
->  arch/arm64/kvm/Makefile           |    2 +-
->  arch/arm64/kvm/arm.c              |    3 +
->  arch/arm64/kvm/hypercalls.c       |    7 +
->  arch/arm64/kvm/rvic-cpu.c         | 1073 +++++++++++++++++++++++++++++
->  include/kvm/arm_rvic.h            |   41 ++
->  include/linux/irqchip/irq-rvic.h  |    4 +
->  include/uapi/linux/kvm.h          |    2 +
->  10 files changed, 1148 insertions(+), 2 deletions(-)
->  create mode 100644 arch/arm64/kvm/rvic-cpu.c
->  create mode 100644 include/kvm/arm_rvic.h
+> diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+> index 3b32d3b..51ed4f0 100644
+> --- a/arch/x86/kvm/lapic.c
+> +++ b/arch/x86/kvm/lapic.c
+> @@ -1582,9 +1582,6 @@ static void __kvm_wait_lapic_expire(struct kvm_vcpu *vcpu)
+>      struct kvm_lapic *apic = vcpu->arch.apic;
+>      u64 guest_tsc, tsc_deadline;
 > 
-
-...
-
-> diff --git a/arch/arm64/kvm/rvic-cpu.c b/arch/arm64/kvm/rvic-cpu.c
-> new file mode 100644
-> index 000000000000..5fb200c637d9
-> --- /dev/null
-> +++ b/arch/arm64/kvm/rvic-cpu.c
-
-...
-
-> +
-> +static int rvic_inject_irq(struct kvm *kvm, unsigned int cpu,
-> +			   unsigned int intid, bool level, void *owner)
-> +{
-> +	struct kvm_vcpu *vcpu = kvm_get_vcpu(kvm, cpu);
-> +	struct rvic *rvic;
-> +
-> +	if (unlikely(!vcpu))
-> +		return -EINVAL;
-> +
-> +	rvic = kvm_vcpu_to_rvic(vcpu);
-> +	if (unlikely(intid >= rvic->nr_total))
-> +		return -EINVAL;
-> +
-> +	/* Ignore interrupt owner for now */
-> +	rvic_vcpu_inject_irq(vcpu, intid, level);
-
-For consistency blank line?
-
-> +	return 0;
-> +}
-> +
-
-...
-
-> +
-> +static int rvic_irqfd_set_irq(struct kvm_kernel_irq_routing_entry *e,
-> +			      struct kvm *kvm, int irq_source_id,
-> +			      int level, bool line_status)
-> +{
-> +	/* Abuse the userspace interface to perform the routing*/
-
-Space before */
-
-> +	return rvic_inject_userspace_irq(kvm, KVM_ARM_IRQ_TYPE_SPI, 0,
-> +					 e->irqchip.pin, level);
-> +}
-> +
-
-...
-
-> +
-> +/* Device management */
-> +static int rvic_device_create(struct kvm_device *dev, u32 type)
-> +{
-> +	struct kvm *kvm = dev->kvm;
-> +	struct kvm_vcpu *vcpu;
-> +	int i, ret;
-
-It's personal preference, but I'd avoid the fiddly
-ret handling in the good path. (up to you though!)
-
-ret = 0;
-> +
-> +	if (irqchip_in_kernel(kvm))
-> +		return -EEXIST;
-> +
-> +	ret = -EBUSY;
-> +	if (!lock_all_vcpus(kvm))
-> +		return ret;
-	if (!lock_all_vcpus(kvm))
-		return -EBUSY;
-> +
-> +	kvm_for_each_vcpu(i, vcpu, kvm) {
-> +		if (vcpu->arch.has_run_once) {
-			ret = -EBUSY;
-> +			goto out_unlock;
-		}
-> +	}
-> +
-> +	ret = 0;
-> +
-> +	/*
-> +	 * The good thing about not having any HW is that you don't
-> +	 * get the limitations of the HW...
-> +	 */
-> +	kvm->arch.max_vcpus		= KVM_MAX_VCPUS;
-> +	kvm->arch.irqchip_type		= IRQCHIP_RVIC;
-> +	kvm->arch.irqchip_flow		= rvic_irqchip_flow;
-> +	kvm->arch.irqchip_data		= NULL;
-> +
-> +out_unlock:
-> +	unlock_all_vcpus(kvm);
-> +	return ret;
-> +}
-> +
-> +static void rvic_device_destroy(struct kvm_device *dev)
-> +{
-> +	kfree(dev->kvm->arch.irqchip_data);
-> +	kfree(dev);
-> +}
-> +
-> +static int rvic_set_attr(struct kvm_device *dev, struct kvm_device_attr *attr)
-> +{
-> +	struct rvic_vm_data *data;
-> +	struct kvm_vcpu *vcpu;
-> +	u32 __user *uaddr, val;
-> +	u16 trusted, total;
-> +	int i, ret = -ENXIO;
-> +
-> +	mutex_lock(&dev->kvm->lock);
-> +
-> +	switch (attr->group) {
-> +	case KVM_DEV_ARM_RVIC_GRP_NR_IRQS:
-> +		if (attr->attr)
-> +			break;
-> +
-> +		if (dev->kvm->arch.irqchip_data) {
-> +			ret = -EBUSY;
-> +			break;
-> +		}
-> +
-> +		uaddr = (u32 __user *)(uintptr_t)attr->addr;
-> +		if (get_user(val, uaddr)) {
-> +			ret = -EFAULT;
-> +			break;
-> +		}
-> +
-> +		trusted = FIELD_GET(KVM_DEV_ARM_RVIC_GRP_NR_TRUSTED_MASK, val);
-> +		total   = FIELD_GET(KVM_DEV_ARM_RVIC_GRP_NR_TOTAL_MASK, val);
-> +		if (total < trusted || trusted < 32 || total < 64 ||
-> +		    trusted % 32 || total % 32 || total > 2048) {
-
-As I read the spec, we need at least 32 untrusted. (R0058) 
-This condition seems to allow that if trusted = 64 and untrusted = 0
-
-
-> +			ret = -EINVAL;
-> +			break;
-> +		}
-> +
-> +		data = kzalloc(struct_size(data, rvid_map, (total - trusted)),
-> +			       GFP_KERNEL);
-> +		if (!data) {
-> +			ret = -ENOMEM;
-> +			break;
-> +		}
-> +
-> +		data->nr_trusted = trusted;
-> +		data->nr_total = total;
-> +		spin_lock_init(&data->lock);
-> +		/* Default to no mapping */
-> +		for (i = 0; i < (total - trusted); i++) {
-> +			/*
-> +			 * an intid < nr_trusted is invalid as the
-> +			 * result of a translation through the rvid,
-> +			 * hence the input in unmapped.
-> +			 */
-> +			data->rvid_map[i].target_vcpu = 0;
-> +			data->rvid_map[i].intid = 0;
-> +		}
-> +
-> +		dev->kvm->arch.irqchip_data = data;
-> +
-> +		ret = 0;
-> +		break;
-> +
-> +	case KVM_DEV_ARM_RVIC_GRP_INIT:
-> +		if (attr->attr)
-> +			break;
-> +
-> +		if (!dev->kvm->arch.irqchip_data)
-> +			break;
-> +
-> +		ret = 0;
-> +
-> +		/* Init the rvic on any already created vcpu */
-> +		kvm_for_each_vcpu(i, vcpu, dev->kvm) {
-> +			ret = rvic_vcpu_init(vcpu);
-> +			if (ret)
-> +				break;
-> +		}
-> +
-> +		if (!ret)
-> +			ret = rvic_setup_default_irq_routing(dev->kvm);
-> +		if (!ret)
-> +			dev->kvm->arch.irqchip_finalized = true;
-
-Personally I'd prefer the more idiomatic 
-
-		if (ret)
-			break;
-
-		ret =...
-		if (ret)
-			break;
-		dev->kvm->arch.....
-
-> +		break;
-> +
-> +	default:
-> +		break;
-> +	}
-> +
-> +	mutex_unlock(&dev->kvm->lock);
-> +
-> +	return ret;
-> +}
-> +
-
-...
-
-> +static int rvic_has_attr(struct kvm_device *dev, struct kvm_device_attr *attr)
-> +{
-> +	int ret = -ENXIO;
-> +
-> +	switch (attr->group) {
-> +	case KVM_DEV_ARM_RVIC_GRP_NR_IRQS:
-> +	case KVM_DEV_ARM_RVIC_GRP_INIT:
-> +		if (attr->attr)
-> +			break;
-> +		ret = 0;
-
-Trivial:
-Early returns?  Bit shorter and easier to read?
-
-> +		break;
-> +
-> +	default:
-> +		break;
-> +	}
-> +
-> +	return ret;
-> +}
-> +
-> +static const struct kvm_device_ops rvic_dev_ops = {
-> +	.name		= "kvm-arm-rvic",
-> +	.create		= rvic_device_create,
-> +	.destroy	= rvic_device_destroy,
-> +	.set_attr	= rvic_set_attr,
-> +	.get_attr	= rvic_get_attr,
-> +	.has_attr	= rvic_has_attr,
-> +};
-> +
-> +int kvm_register_rvic_device(void)
-> +{
-> +	return kvm_register_device_ops(&rvic_dev_ops, KVM_DEV_TYPE_ARM_RVIC);
-> +}
-
-
-
+> -    if (apic->lapic_timer.expired_tscdeadline == 0)
+> -        return;
+> -
+>      tsc_deadline = apic->lapic_timer.expired_tscdeadline;
+>      apic->lapic_timer.expired_tscdeadline = 0;
+>      guest_tsc = kvm_read_l1_tsc(vcpu, rdtsc());
+> @@ -1599,7 +1596,10 @@ static void __kvm_wait_lapic_expire(struct
+> kvm_vcpu *vcpu)
+> 
+>  void kvm_wait_lapic_expire(struct kvm_vcpu *vcpu)
+>  {
+> -    if (lapic_timer_int_injected(vcpu))
+> +    if (lapic_in_kernel(vcpu) &&
+> +        vcpu->arch.apic->lapic_timer.expired_tscdeadline &&
+> +        vcpu->arch.apic->lapic_timer.timer_advance_ns &&
+> +        lapic_timer_int_injected(vcpu))
+>          __kvm_wait_lapic_expire(vcpu);
+>  }
+>  EXPORT_SYMBOL_GPL(kvm_wait_lapic_expire);
+> @@ -1635,8 +1635,7 @@ static void apic_timer_expired(struct kvm_lapic
+> *apic, bool from_timer_fn)
+>      }
+> 
+>      if (kvm_use_posted_timer_interrupt(apic->vcpu)) {
+> -        if (apic->lapic_timer.timer_advance_ns)
+> -            __kvm_wait_lapic_expire(vcpu);
+> +        kvm_wait_lapic_expire(vcpu);
+>          kvm_apic_inject_pending_timer_irqs(apic);
+>          return;
+>      }
+> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+> index 0194336..19e622a 100644
+> --- a/arch/x86/kvm/svm/svm.c
+> +++ b/arch/x86/kvm/svm/svm.c
+> @@ -3456,9 +3456,7 @@ static __no_kcsan fastpath_t svm_vcpu_run(struct
+> kvm_vcpu *vcpu)
+>      clgi();
+>      kvm_load_guest_xsave_state(vcpu);
+> 
+> -    if (lapic_in_kernel(vcpu) &&
+> -        vcpu->arch.apic->lapic_timer.timer_advance_ns)
+> -        kvm_wait_lapic_expire(vcpu);
+> +    kvm_wait_lapic_expire(vcpu);
+> 
+>      /*
+>       * If this vCPU has touched SPEC_CTRL, restore the guest's value if
+> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> index a544351..d6e1656 100644
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -6800,9 +6800,7 @@ static fastpath_t vmx_vcpu_run(struct kvm_vcpu *vcpu)
+>      if (enable_preemption_timer)
+>          vmx_update_hv_timer(vcpu);
+> 
+> -    if (lapic_in_kernel(vcpu) &&
+> -        vcpu->arch.apic->lapic_timer.timer_advance_ns)
+> -        kvm_wait_lapic_expire(vcpu);
+> +    kvm_wait_lapic_expire(vcpu);
+> 
+>      /*
+>       * If this vCPU has touched SPEC_CTRL, restore the guest's value if
