@@ -2,329 +2,112 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9392725D32C
-	for <lists+kvm@lfdr.de>; Fri,  4 Sep 2020 10:03:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1843225D32F
+	for <lists+kvm@lfdr.de>; Fri,  4 Sep 2020 10:04:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729731AbgIDIDE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 4 Sep 2020 04:03:04 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:32994 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1728118AbgIDIDA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 4 Sep 2020 04:03:00 -0400
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-328-6gr_ztSQNMmT-4IQ5EY8PA-1; Fri, 04 Sep 2020 04:02:55 -0400
-X-MC-Unique: 6gr_ztSQNMmT-4IQ5EY8PA-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 44E5F18B9ED1;
-        Fri,  4 Sep 2020 08:02:54 +0000 (UTC)
-Received: from [10.36.112.51] (ovpn-112-51.ams2.redhat.com [10.36.112.51])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id B00F51001B2B;
-        Fri,  4 Sep 2020 08:02:49 +0000 (UTC)
-Subject: Re: [PATCH v4 08/10] vfio/fsl-mc: trigger an interrupt via eventfd
-To:     Diana Craciun <diana.craciun@oss.nxp.com>,
-        alex.williamson@redhat.com, kvm@vger.kernel.org
+        id S1729683AbgIDIDz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 4 Sep 2020 04:03:55 -0400
+Received: from mail-db8eur05on2051.outbound.protection.outlook.com ([40.107.20.51]:28224
+        "EHLO EUR05-DB8-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1728170AbgIDIDx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 4 Sep 2020 04:03:53 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=b0KopomZmm3kuzvl01cewLoMRrMzj26j5fChkX0h84QvxQcPEt5BLyBqG60DZIF35CljgQ+rI4X0WbvkeAc8MdkC9PLQ3ZaRTVZ/qUbX1TqXgDhvKpLeiv3tVc3cPQqaq8yR0VKPg21nMAO9yqmRDEWY/adBqEb48hpE+3zqpaMur+0Z5DQLGseHVG2pUHJvQOktnkVFhUSW51Rmvt/kqT061ejni5LC8tb3JP3gyY44ESEP0UqRY/krIs6CvLaP8+L+olE6ZeV10qKvUuF3lCyGJQLz35pAZxst8xtE+geE9EpXS4IzX1WkMertPriddhuW0e2bib0XuDJbmTZjlw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=N19n63mlBQ7ikIa2ibUOY9oW+ihUmpP9tuCEQKbspos=;
+ b=gJxfv+urUOUomfjX/otGFmF0vTmzqK5AZGz/hdr6oIrbhsgI8NJQ8j6UxnsgGh1gb8lt5OopMttkpRYtpOJ1gb7GaEQeMqClWdVSNAHhk/zrR+U6R0kYlwCIhGEW1VTaVHXVO2Btbi27I+MR14kXBHxKe8Yic8FouvQsJXDaTztTLy7tEwART3axfKouYL5Tm2sjh9Dgitge9QQdEQ0VMEF+xWw+jS9KP4shZ+ZkdjjZUBCG/zAGO6uPq11IhGZjXBB8+8NmpOBGdGxnwukDlfIXx+Q64Mb1Ex9ONX/jsZQwnTm5khLiG0hRF3uHL45LO3oMVmdAXkR5P3iAeuj+IQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=oss.nxp.com; dmarc=pass action=none header.from=oss.nxp.com;
+ dkim=pass header.d=oss.nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=NXP1.onmicrosoft.com;
+ s=selector2-NXP1-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=N19n63mlBQ7ikIa2ibUOY9oW+ihUmpP9tuCEQKbspos=;
+ b=hMeYX6UlfvFomR3oJEftZkplxSgG4+VJVHLb4WQFQuHlDXUiWljB5PptvNRUOnShJKIAh1s73V5IghpPYunaEz0SsNY+RvyEYxcM1EtM5n8wmEVcfLEP+/ezEyPph14W2ThCV6+Y9ytL3YZoHuMU4uGNXtsiftrejHOY3YzkweA=
+Authentication-Results: nxp.com; dkim=none (message not signed)
+ header.d=none;nxp.com; dmarc=none action=none header.from=oss.nxp.com;
+Received: from VI1PR0402MB2815.eurprd04.prod.outlook.com
+ (2603:10a6:800:ae::16) by VI1PR0402MB3583.eurprd04.prod.outlook.com
+ (2603:10a6:803:e::18) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3348.16; Fri, 4 Sep
+ 2020 08:03:49 +0000
+Received: from VI1PR0402MB2815.eurprd04.prod.outlook.com
+ ([fe80::a508:19fb:5b7e:5607]) by VI1PR0402MB2815.eurprd04.prod.outlook.com
+ ([fe80::a508:19fb:5b7e:5607%9]) with mapi id 15.20.3348.016; Fri, 4 Sep 2020
+ 08:03:49 +0000
+Subject: Re: [PATCH v4 00/10] vfio/fsl-mc: VFIO support for FSL-MC device
+To:     Auger Eric <eric.auger@redhat.com>, alex.williamson@redhat.com,
+        kvm@vger.kernel.org
 Cc:     linux-kernel@vger.kernel.org, bharatb.linux@gmail.com,
-        laurentiu.tudor@nxp.com, Bharat Bhushan <Bharat.Bhushan@nxp.com>
+        laurentiu.tudor@nxp.com
 References: <20200826093315.5279-1-diana.craciun@oss.nxp.com>
- <20200826093315.5279-9-diana.craciun@oss.nxp.com>
-From:   Auger Eric <eric.auger@redhat.com>
-Message-ID: <f313b0ed-2cb7-cbb0-18f6-943098ecef9a@redhat.com>
-Date:   Fri, 4 Sep 2020 10:02:48 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
-MIME-Version: 1.0
-In-Reply-To: <20200826093315.5279-9-diana.craciun@oss.nxp.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+ <ae46be70-82d3-6137-6169-beb4bf8ae707@redhat.com>
+From:   Diana Craciun OSS <diana.craciun@oss.nxp.com>
+Message-ID: <084feb8a-3f9b-efc1-e4f8-eb9a3e60b756@oss.nxp.com>
+Date:   Fri, 4 Sep 2020 11:03:44 +0300
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
+In-Reply-To: <ae46be70-82d3-6137-6169-beb4bf8ae707@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Content-Language: en-US
+X-ClientProxiedBy: AM0PR01CA0130.eurprd01.prod.exchangelabs.com
+ (2603:10a6:208:168::35) To VI1PR0402MB2815.eurprd04.prod.outlook.com
+ (2603:10a6:800:ae::16)
+MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from [192.168.1.122] (188.27.189.94) by AM0PR01CA0130.eurprd01.prod.exchangelabs.com (2603:10a6:208:168::35) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3348.15 via Frontend Transport; Fri, 4 Sep 2020 08:03:47 +0000
+X-Originating-IP: [188.27.189.94]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-HT: Tenant
+X-MS-Office365-Filtering-Correlation-Id: d90a27ba-b716-45f1-a94d-08d850a90dee
+X-MS-TrafficTypeDiagnostic: VI1PR0402MB3583:
+X-MS-Exchange-SharedMailbox-RoutingAgent-Processed: True
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <VI1PR0402MB35834D7FA9BAE52471D14F9CBE2D0@VI1PR0402MB3583.eurprd04.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:8882;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: jbsgBcjli9k5NzwZJ7bO/Fc/pZJxzjbV+4xgadkGXuWJMXexcSKlI6NGNhFLZ/nLMpuf2v8cPYA7JHPNuISz0zM93Gpyx+5YviOyFF7Dj3Q0QVjFTn3S2zoSAt4mn/YTV9ITLkCW0Mooz+Mg+WwJEXjmOfgNia9NsKI43PGy/QHTniIEgq9k7J/brKbcA949HW0RA7DLjqUqGgg45RXWYOOm21iBHFNe3jTZP/e/W4qauyM3YsugUVPxLAvAVyasCtBxjGBDiHTOTaIeKEHrJWJGhsD19mjCWWIgQ1pOiMA8rCk5//bH1Dzq/YaUc3YXnyQu7FZwdaD62fA+0eA1vC76sslZynZ9OcwWD+I3aHzWENvy/m+frQSdJwG+IU16E7dsbRXUHsAsVWSHFLnv69AoyjFCLyGbHnLBtSJti3FhDqMBbGZ0VBxtkRfo2Uus9JgKywBp1DGKwE9QcZN1NQ==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:VI1PR0402MB2815.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(396003)(346002)(366004)(376002)(136003)(39860400002)(2906002)(16576012)(52116002)(66556008)(53546011)(86362001)(4326008)(66946007)(31696002)(2616005)(31686004)(5660300002)(66476007)(83380400001)(956004)(186003)(8936002)(6666004)(478600001)(6486002)(8676002)(4744005)(966005)(26005)(316002)(16526019)(43740500002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData: JOhJJtfJ+bWmg/0Y+T1nteiBz1sXEyxnSd21rp5beuycH+oU6wuGCWtSPRzaqi3Jx4k19lDES7ck0YH9C1w/qHk1a5zUtYrM4JWg7q84yDR0VwE9yBVlSDY26kp28PVlpiGOQlFdN3gCwZfSjjc83HXQdNjlYDAPWqWr40lgqo84D7Y12oXGnPeZ83JQ9Uz1aHFt60J2MxGLciIwWPjZcy3Z8twU/RmShE3Dwh/pYaF2w2Lzlalo8n5w3vLrkFhSCmZyMTTAtxTZGQOf9Kv1aC0lIL0pbPXKucoGBqDaNRv3fIxQvN6ORs2RkgCBVaI00pcOg/Xw4KLOsJ1emU/zybZrmtvbpS1bSk8sEziL3LXXfWmNIg81jFZxf6muJmUEmz5YIPVdaZcJSIX9Q+nhCMM80fNSSIKA1RTk/Tzubp/l8DHDfV47OEoyRkJpRetnVXkCp8K/ajWDxggR762e0ETYvgcv2XvXMUXLiAuIg8zN79f5dqPBMutVb5yyEAiTrps4+P7mhRzy9ckWvVE27T3PeQhINOYVWYa/M2x9cFqR1QTK9WtJqpUJOruyvB9xET6HQ04aAFeBbN32hfAlQbm+UNaZbD3L4vPBXScda2QtCEfCmLImLMlu8vukBCsd2+Ng9cRQK6TaSY6mbx0N/Q==
+X-OriginatorOrg: oss.nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: d90a27ba-b716-45f1-a94d-08d850a90dee
+X-MS-Exchange-CrossTenant-AuthSource: VI1PR0402MB2815.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Sep 2020 08:03:48.9153
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: TJenP7JIf5kQ7rI3nlh+w+kBZ1ZO3uZ3nvZ+//KD3WcNTFG8d4V/I7BlAZkxoIR2a5f7xsZRjl+O3YSRFt/LSA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR0402MB3583
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Diana,
+Hi Eric,
 
-On 8/26/20 11:33 AM, Diana Craciun wrote:
-> This patch allows to set an eventfd for fsl-mc device interrupts
-> and also to trigger the interrupt eventfd from userspace for testing.
-> 
-> All fsl-mc device interrupts are MSIs. The MSIs are allocated from
-> the MSI domain only once per DPRC and used by all the DPAA2 objects.
-> The interrupts are managed by the DPRC in a pool of interrupts. Each
-> device requests interrupts from this pool. The pool is allocated
-> when the first virtual device is setting the interrupts.
-> The pool of interrupts is protected by a lock.
-> 
-> The DPRC has an interrupt of its own which indicates if the DPRC
-> contents have changed. However, currently, the contents of a DPRC
-> assigned to the guest cannot be changed at runtime, so this interrupt
-> is not configured.
-> 
-> Signed-off-by: Bharat Bhushan <Bharat.Bhushan@nxp.com>
-> Signed-off-by: Diana Craciun <diana.craciun@oss.nxp.com>
-> ---
->  drivers/vfio/fsl-mc/vfio_fsl_mc.c         |  18 ++-
->  drivers/vfio/fsl-mc/vfio_fsl_mc_intr.c    | 160 +++++++++++++++++++++-
->  drivers/vfio/fsl-mc/vfio_fsl_mc_private.h |  10 ++
->  3 files changed, 186 insertions(+), 2 deletions(-)
-> 
-> diff --git a/drivers/vfio/fsl-mc/vfio_fsl_mc.c b/drivers/vfio/fsl-mc/vfio_fsl_mc.c
-> index 42014297b484..73834f488a94 100644
-> --- a/drivers/vfio/fsl-mc/vfio_fsl_mc.c
-> +++ b/drivers/vfio/fsl-mc/vfio_fsl_mc.c
-> @@ -147,12 +147,28 @@ static int vfio_fsl_mc_open(void *device_data)
->  static void vfio_fsl_mc_release(void *device_data)
->  {
->  	struct vfio_fsl_mc_device *vdev = device_data;
-> +	int ret;
->  
->  	mutex_lock(&vdev->reflck->lock);
->  
-> -	if (!(--vdev->refcnt))
-> +	if (!(--vdev->refcnt)) {
-> +		struct fsl_mc_device *mc_dev = vdev->mc_dev;
-> +		struct device *cont_dev = fsl_mc_cont_dev(&mc_dev->dev);
-> +		struct fsl_mc_device *mc_cont = to_fsl_mc_device(cont_dev);
-> +
->  		vfio_fsl_mc_regions_cleanup(vdev);
->  
-> +		/* reset the device before cleaning up the interrupts */
-> +		ret = dprc_reset_container(mc_cont->mc_io, 0,
-> +		      mc_cont->mc_handle,
-> +			  mc_cont->obj_desc.id,
-> +			  DPRC_RESET_OPTION_NON_RECURSIVE);
-shouldn't you test ret?
-> +
-> +		vfio_fsl_mc_irqs_cleanup(vdev);
-> +
-> +		fsl_mc_cleanup_irq_pool(mc_cont);
-> +	}
-> +
->  	mutex_unlock(&vdev->reflck->lock);
->  
->  	module_put(THIS_MODULE);
-> diff --git a/drivers/vfio/fsl-mc/vfio_fsl_mc_intr.c b/drivers/vfio/fsl-mc/vfio_fsl_mc_intr.c
-> index 058aa97aa54a..409f3507fcf3 100644
-> --- a/drivers/vfio/fsl-mc/vfio_fsl_mc_intr.c
-> +++ b/drivers/vfio/fsl-mc/vfio_fsl_mc_intr.c
-> @@ -29,12 +29,149 @@ static int vfio_fsl_mc_irq_unmask(struct vfio_fsl_mc_device *vdev,
->  	return -EINVAL;
->  }
->  
-> +int vfio_fsl_mc_irqs_allocate(struct vfio_fsl_mc_device *vdev)
-> +{
-> +	struct fsl_mc_device *mc_dev = vdev->mc_dev;
-> +	struct vfio_fsl_mc_irq *mc_irq;
-> +	int irq_count;
-> +	int ret, i;
-> +
-> +    /* Device does not support any interrupt */
-indent needs to be fixed
-> +	if (mc_dev->obj_desc.irq_count == 0)
-> +		return 0;
-> +
-> +	/* interrupts were already allocated for this device */
-> +	if (vdev->mc_irqs)
-> +		return 0;
-> +
-> +	irq_count = mc_dev->obj_desc.irq_count;
-> +
-> +	mc_irq = kcalloc(irq_count, sizeof(*mc_irq), GFP_KERNEL);
-> +	if (!mc_irq)
-> +		return -ENOMEM;
-> +
-> +	/* Allocate IRQs */
-> +	ret = fsl_mc_allocate_irqs(mc_dev);
-> +	if (ret) {
-> +		kfree(mc_irq);
-> +		return ret;
-> +	}
-> +
-> +	for (i = 0; i < irq_count; i++) {
-> +		mc_irq[i].count = 1;
-> +		mc_irq[i].flags = VFIO_IRQ_INFO_EVENTFD;
-> +	}
-> +
-> +	vdev->mc_irqs = mc_irq;
-> +
-> +	return 0;
-> +}
-> +
-> +static irqreturn_t vfio_fsl_mc_irq_handler(int irq_num, void *arg)
-> +{
-> +	struct vfio_fsl_mc_irq *mc_irq = (struct vfio_fsl_mc_irq *)arg;
-> +
-> +	eventfd_signal(mc_irq->trigger, 1);
-> +	return IRQ_HANDLED;
-> +}
-> +
-> +static int vfio_set_trigger(struct vfio_fsl_mc_device *vdev,
-> +						   int index, int fd)
-> +{
-> +	struct vfio_fsl_mc_irq *irq = &vdev->mc_irqs[index];
-> +	struct eventfd_ctx *trigger;
-> +	int hwirq;
-> +	int ret;
-> +
-> +	hwirq = vdev->mc_dev->irqs[index]->msi_desc->irq;
-> +	if (irq->trigger) {
-> +		free_irq(hwirq, irq);
-> +		kfree(irq->name);
-> +		eventfd_ctx_put(irq->trigger);
-> +		irq->trigger = NULL;
-> +	}
-> +
-> +	if (fd < 0) /* Disable only */
-> +		return 0;
-> +
-> +	irq->name = kasprintf(GFP_KERNEL, "vfio-irq[%d](%s)",
-> +			    hwirq, dev_name(&vdev->mc_dev->dev));
-> +	if (!irq->name)
-> +		return -ENOMEM;
-> +
-> +	trigger = eventfd_ctx_fdget(fd);
-> +	if (IS_ERR(trigger)) {
-> +		kfree(irq->name);
-> +		return PTR_ERR(trigger);
-> +	}
-> +
-> +	irq->trigger = trigger;
-> +
-> +	ret = request_irq(hwirq, vfio_fsl_mc_irq_handler, 0,
-> +		  irq->name, irq);
-> +	if (ret) {
-> +		kfree(irq->name);
-> +		eventfd_ctx_put(trigger);
-> +		irq->trigger = NULL;
-> +		return ret;
-> +	}
-> +
-> +	return 0;
-> +}
-> +
->  static int vfio_fsl_mc_set_irq_trigger(struct vfio_fsl_mc_device *vdev,
->  				       unsigned int index, unsigned int start,
->  				       unsigned int count, u32 flags,
->  				       void *data)
->  {
-> -	return -EINVAL;
-> +	struct fsl_mc_device *mc_dev = vdev->mc_dev;
-> +	int ret, hwirq;
-> +	struct vfio_fsl_mc_irq *irq;
-> +	struct device *cont_dev = fsl_mc_cont_dev(&mc_dev->dev);
-> +	struct fsl_mc_device *mc_cont = to_fsl_mc_device(cont_dev);
-> +
-> +	if (start != 0 || count != 1)
-> +		return -EINVAL;
-> +
-> +	mutex_lock(&vdev->reflck->lock);
-> +	ret = fsl_mc_populate_irq_pool(mc_cont,
-> +			FSL_MC_IRQ_POOL_MAX_TOTAL_IRQS);
-> +	if (ret)
-> +		goto unlock;
-> +
-> +	ret = vfio_fsl_mc_irqs_allocate(vdev);
-any reason the init is done in the set_irq() and not in the open() if
-!vdev->refcnt?
-> +	if (ret)
-> +		goto unlock;
-> +	mutex_unlock(&vdev->reflck->lock);
-> +
-> +	if (!count && (flags & VFIO_IRQ_SET_DATA_NONE))
-> +		return vfio_set_trigger(vdev, index, -1);
-> +
-> +	if (flags & VFIO_IRQ_SET_DATA_EVENTFD) {
-> +		s32 fd = *(s32 *)data;
-> +
-> +		return vfio_set_trigger(vdev, index, fd);
-> +	}
-> +
-> +	hwirq = vdev->mc_dev->irqs[index]->msi_desc->irq;
-> +
-> +	irq = &vdev->mc_irqs[index];
-> +
-> +	if (flags & VFIO_IRQ_SET_DATA_NONE) {
-> +		vfio_fsl_mc_irq_handler(hwirq, irq);
-> +
-> +	} else if (flags & VFIO_IRQ_SET_DATA_BOOL) {
-> +		u8 trigger = *(u8 *)data;
-> +
-> +		if (trigger)
-> +			vfio_fsl_mc_irq_handler(hwirq, irq);
-> +	}
-> +
-> +	return 0;
-> +
-> +unlock:
-> +	mutex_unlock(&vdev->reflck->lock);
-> +	return ret;
->  }
->  
->  int vfio_fsl_mc_set_irqs_ioctl(struct vfio_fsl_mc_device *vdev,
-> @@ -61,3 +198,24 @@ int vfio_fsl_mc_set_irqs_ioctl(struct vfio_fsl_mc_device *vdev,
->  
->  	return ret;
->  }
-> +
-> +/* Free All IRQs for the given MC object */
-> +void vfio_fsl_mc_irqs_cleanup(struct vfio_fsl_mc_device *vdev)
-> +{
-> +	struct fsl_mc_device *mc_dev = vdev->mc_dev;
-> +	int irq_count = mc_dev->obj_desc.irq_count;
-> +	int i;
-> +
-> +	/* Device does not support any interrupt or the interrupts
-> +	 * were not configured
-> +	 */
-> +	if (mc_dev->obj_desc.irq_count == 0 || !vdev->mc_irqs)
-> +		return;
-> +
-> +	for (i = 0; i < irq_count; i++)
-> +		vfio_set_trigger(vdev, i, -1);
-> +
-> +	fsl_mc_free_irqs(mc_dev);
-> +	kfree(vdev->mc_irqs);
-> +	vdev->mc_irqs = NULL;
-> +}
-> diff --git a/drivers/vfio/fsl-mc/vfio_fsl_mc_private.h b/drivers/vfio/fsl-mc/vfio_fsl_mc_private.h
-> index d5b6fe891a48..bbfca8b55f8a 100644
-> --- a/drivers/vfio/fsl-mc/vfio_fsl_mc_private.h
-> +++ b/drivers/vfio/fsl-mc/vfio_fsl_mc_private.h
-> @@ -15,6 +15,13 @@
->  #define VFIO_FSL_MC_INDEX_TO_OFFSET(index)	\
->  	((u64)(index) << VFIO_FSL_MC_OFFSET_SHIFT)
->  
-> +struct vfio_fsl_mc_irq {
-> +	u32         flags;
-> +	u32         count;
-> +	struct eventfd_ctx  *trigger;
-> +	char            *name;
-> +};
-> +
->  struct vfio_fsl_mc_reflck {
->  	struct kref		kref;
->  	struct mutex		lock;
-> @@ -35,6 +42,7 @@ struct vfio_fsl_mc_device {
->  	struct vfio_fsl_mc_region	*regions;
->  	struct vfio_fsl_mc_reflck   *reflck;
->  	struct mutex         igate;
-> +	struct vfio_fsl_mc_irq      *mc_irqs;
->  };
->  
->  extern int vfio_fsl_mc_set_irqs_ioctl(struct vfio_fsl_mc_device *vdev,
-> @@ -42,4 +50,6 @@ extern int vfio_fsl_mc_set_irqs_ioctl(struct vfio_fsl_mc_device *vdev,
->  			       unsigned int start, unsigned int count,
->  			       void *data);
->  
-> +void vfio_fsl_mc_irqs_cleanup(struct vfio_fsl_mc_device *vdev);
-> +
->  #endif /* VFIO_FSL_MC_PRIVATE_H */
-> 
-Thanks
+On 9/3/2020 4:40 PM, Auger Eric wrote:
+>> The patches are dependent on some changes in the mc-bus (bus/fsl-mc) 
+>> driver. The changes were needed in order to re-use code and to export 
+>> some more functions that are needed by the VFIO driver. Currenlty the 
+>> mc-bus patches are under review: 
+>> https://www.spinics.net/lists/kernel/msg3639226.html 
+> Could you share a branch with both series? This would help the review. 
+> Thanks Eric 
 
-Eric
+I have pushed both the series here: 
+https://source.codeaurora.org/external/qoriq/qoriq-components/linux-extras/log/?h=dpaa2_direct_assignment 
 
+
+Regards,
+
+Diana
+
+PS: I apologize if you received the message twice, I have sent it by 
+mistake as html first.
