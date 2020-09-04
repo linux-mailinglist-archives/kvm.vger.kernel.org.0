@@ -2,130 +2,85 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 19DEE25D8D6
-	for <lists+kvm@lfdr.de>; Fri,  4 Sep 2020 14:44:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4ADE825DA5D
+	for <lists+kvm@lfdr.de>; Fri,  4 Sep 2020 15:48:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730178AbgIDMoX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 4 Sep 2020 08:44:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43976 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729897AbgIDMoU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 4 Sep 2020 08:44:20 -0400
-Received: from mail-pf1-x441.google.com (mail-pf1-x441.google.com [IPv6:2607:f8b0:4864:20::441])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7E43EC061244;
-        Fri,  4 Sep 2020 05:44:18 -0700 (PDT)
-Received: by mail-pf1-x441.google.com with SMTP id f18so4535495pfa.10;
-        Fri, 04 Sep 2020 05:44:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=7iNfDgkuDEGlftYpwjK5faW+HwOe3OLIUqc26Ik79ck=;
-        b=ZyUdKXPv4L7VlJLBRTfQ1k+AOducABPqvLFELRrc5Os/rsaqYUW9AeQPROvE09jncF
-         kODhQjLAZll+/V3KGaYYCIIZfCcbpIlReF1xsLcZBCZQrHEPz4mIRtXMMK9xAbm3piFB
-         q97PcSvTx2KI3Jab8fyHaaOG1Hmi5oWCxaa9aCmsHbqrayZNxYB+sVkmrudLY81bJv6R
-         6L+S5Ash4yl5e068RtnWtCuVDH8SFoO/45a4nE8XuWJvKuoTHHBxTaL70D/xU08E71zv
-         wdqUcVAbmnC8jgnJZUOSEnXHIb+hDSvOB8Pl6ThrKHNhex4hXOmRWw1yAnPvs+oaTV8q
-         KSCQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=7iNfDgkuDEGlftYpwjK5faW+HwOe3OLIUqc26Ik79ck=;
-        b=QXhRBKPxpRG+BPdorui+fCoaqUNf64aJmzKATtA1y8zg7hVKTr/EdCJIdgJ3aBJ494
-         Iox4zfqRDX+zl1ylrjQd1ctsAeFrAYNT7ixMkED0fIr9O1iFGulT0EUQ9JAEQAjU4iDl
-         G4i266iC6NQ+1R9JqRQdIx6emhOZpPMhlhSCkrwYqERjh9KokCAuxz/FgHzDZ55b0nFW
-         SvK42h/Mj2PQcnKdUmJwXxg23lbA3TS5baGS/4ywP0vrNxlDj1kYNHaykpPKbO3g8Voa
-         YQLHQpoBIIkfZWu7+M6UJnZZkAmIz4LAqMkxQB4bM3Zz0W9YbAGJxUGT1r1Jrqego7Y9
-         hTXw==
-X-Gm-Message-State: AOAM531SGnY+P3ZZzqtD8PO1eo7K/H0Lx4DDRRZttvDxteHsCcbTqdgq
-        Do6YQ8bIWW63K0aDhUiizg==
-X-Google-Smtp-Source: ABdhPJz62AAdK4DRlYo37bxyMRoAXbSGodAX3uLmTR2FE/JhQILygGVywaZ19PyQEH5vs6fOIR6F5g==
-X-Received: by 2002:a62:1888:: with SMTP id 130mr8320050pfy.220.1599223458054;
-        Fri, 04 Sep 2020 05:44:18 -0700 (PDT)
-Received: from [127.0.0.1] ([103.7.29.9])
-        by smtp.gmail.com with ESMTPSA id v4sm5227320pjh.38.2020.09.04.05.44.11
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 04 Sep 2020 05:44:17 -0700 (PDT)
-Subject: Re: [PATCH] KVM: SVM: Add tracepoint for cr_interception
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc:     "hpa@zytor.com" <hpa@zytor.com>, "bp@alien8.de" <bp@alien8.de>,
-        "mingo@redhat.com" <mingo@redhat.com>,
-        "tglx@linutronix.de" <tglx@linutronix.de>, joro@8bytes.org,
-        "jmattson@google.com" <jmattson@google.com>,
-        "wanpengli@tencent.com" <wanpengli@tencent.com>,
-        sean.j.christopherson@intel.com,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "x86@kernel.org" <x86@kernel.org>
-References: <f3031602-db3b-c4fe-b719-d402663b0a2b@gmail.com>
- <87imctoinr.fsf@vitty.brq.redhat.com>
-From:   Haiwei Li <lihaiwei.kernel@gmail.com>
-Message-ID: <5b8d366f-db2d-489d-bb48-5c0287323ec6@gmail.com>
-Date:   Fri, 4 Sep 2020 20:44:04 +0800
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:68.0)
- Gecko/20100101 Thunderbird/68.12.0
+        id S1730535AbgIDNsM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 4 Sep 2020 09:48:12 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:46832 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1730667AbgIDNrv (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 4 Sep 2020 09:47:51 -0400
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-422-LxloLfnDOtyPcAbGDgm41Q-1; Fri, 04 Sep 2020 09:47:48 -0400
+X-MC-Unique: LxloLfnDOtyPcAbGDgm41Q-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C2FB98030CB;
+        Fri,  4 Sep 2020 13:47:47 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-112-159.ams2.redhat.com [10.36.112.159])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 53D135C1DC;
+        Fri,  4 Sep 2020 13:47:46 +0000 (UTC)
+Subject: Re: [kvm-unit-tests PATCH v2 05/10] lib: x86: Use portable format
+ macros for uint32_t
+To:     Roman Bolshakov <r.bolshakov@yadro.com>, kvm@vger.kernel.org
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+        Andrew Jones <drjones@redhat.com>,
+        Cameron Esfahani <dirty@apple.com>
+References: <20200901085056.33391-1-r.bolshakov@yadro.com>
+ <20200901085056.33391-6-r.bolshakov@yadro.com>
+From:   Thomas Huth <thuth@redhat.com>
+Message-ID: <b950ada9-2770-bfcd-ea3d-44acc352ab6a@redhat.com>
+Date:   Fri, 4 Sep 2020 15:47:45 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-In-Reply-To: <87imctoinr.fsf@vitty.brq.redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <20200901085056.33391-6-r.bolshakov@yadro.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On 01/09/2020 10.50, Roman Bolshakov wrote:
+> Compilation of the files fails on ARCH=i386 with i686-elf gcc because
+> they use "%x" or "%d" format specifier that does not match the actual
+> size of uint32_t:
+> 
+> x86/s3.c: In function ‘main’:
+> x86/s3.c:53:35: error: format ‘%x’ expects argument of type ‘unsigned int’, but argument 2 has type ‘u32’ {aka ‘long unsigned int’}
+> [-Werror=format=]
+>    53 |  printf("PM1a event registers at %x\n", fadt->pm1a_evt_blk);
+>       |                                  ~^     ~~~~~~~~~~~~~~~~~~
+>       |                                   |         |
+>       |                                   |         u32 {aka long unsigned int}
+>       |                                   unsigned int
+>       |                                  %lx
+> 
+> Use PRIx32 instead of "x" and PRId32 instead of "d" to take into account
+> u32_long case.
+> 
+> Cc: Alex Bennée <alex.bennee@linaro.org>
+> Cc: Andrew Jones <drjones@redhat.com>
+> Cc: Cameron Esfahani <dirty@apple.com>
+> Cc: Radim Krčmář <rkrcmar@redhat.com>
 
+Radim does not work at redhat.com anymore, so please remove that line in
+case you respin the patch.
 
-On 20/9/4 20:01, Vitaly Kuznetsov wrote:
-> Haiwei Li <lihaiwei.kernel@gmail.com> writes:
-> 
->> From: Haiwei Li <lihaiwei@tencent.com>
->>
->> Add trace_kvm_cr_write and trace_kvm_cr_read for svm.
->>
->> Signed-off-by: Haiwei Li <lihaiwei@tencent.com>
->> ---
->>    arch/x86/kvm/svm/svm.c | 2 ++
->>    1 file changed, 2 insertions(+)
->>
->> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
->> index 03dd7bac8034..2c6dea48ba62 100644
->> --- a/arch/x86/kvm/svm/svm.c
->> +++ b/arch/x86/kvm/svm/svm.c
->> @@ -2261,6 +2261,7 @@ static int cr_interception(struct vcpu_svm *svm)
-> 
-> There are two special cases when we go to emulate_on_interception() and
-> these won't be logged but I don't think this is a must.
-> 
->>    	if (cr >= 16) { /* mov to cr */
->>    		cr -= 16;
->>    		val = kvm_register_read(&svm->vcpu, reg);
->> +		trace_kvm_cr_write(cr, val);
->>    		switch (cr) {
->>    		case 0:
->>    			if (!check_selective_cr0_intercepted(svm, val))
->> @@ -2306,6 +2307,7 @@ static int cr_interception(struct vcpu_svm *svm)
->>    			return 1;
->>    		}
->>    		kvm_register_write(&svm->vcpu, reg, val);
->> +		trace_kvm_cr_read(cr, val);
-> 
-> The 'default:' case above does 'return 1;' so we won't get the trace but
-> I understand you put trace_kvm_cr_read() here so you can log the
-> returned 'val', #UD should be clearly visible.
-> 
->>    	}
->>    	return kvm_complete_insn_gp(&svm->vcpu, err);
->>    }
->> --
->> 2.18.4
->>
-> 
-> Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+> Signed-off-by: Roman Bolshakov <r.bolshakov@yadro.com>
+> ---
+>  lib/pci.c     | 2 +-
+>  x86/asyncpf.c | 2 +-
+>  x86/msr.c     | 3 ++-
+>  x86/s3.c      | 2 +-
+>  4 files changed, 5 insertions(+), 4 deletions(-)
 
-Thanks a lot.
+Reviewed-by: Thomas Huth <thuth@redhat.com>
 
-> 
