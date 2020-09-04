@@ -2,32 +2,32 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C584425D6C0
-	for <lists+kvm@lfdr.de>; Fri,  4 Sep 2020 12:46:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BF0FD25D6CE
+	for <lists+kvm@lfdr.de>; Fri,  4 Sep 2020 12:48:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729741AbgIDKqh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 4 Sep 2020 06:46:37 -0400
-Received: from mail.kernel.org ([198.145.29.99]:58750 "EHLO mail.kernel.org"
+        id S1730100AbgIDKsw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 4 Sep 2020 06:48:52 -0400
+Received: from mail.kernel.org ([198.145.29.99]:58792 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726171AbgIDKqC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        id S1728636AbgIDKqC (ORCPT <rfc822;kvm@vger.kernel.org>);
         Fri, 4 Sep 2020 06:46:02 -0400
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 8925320770;
-        Fri,  4 Sep 2020 10:46:01 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 25CF82084D;
+        Fri,  4 Sep 2020 10:46:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1599216361;
-        bh=emfYI5A6yt/uyLK8UfzYiitooNVKksAc8FkL2+qvA7c=;
-        h=From:To:Cc:Subject:Date:From;
-        b=SUl1fEUncq5ywbwQWlGS/ZWBgkfbdJEAjcRUbgtxQSI7GWWZfG/Kk5YwcUYYM7rU1
-         ll/ao5a925iM+qCX2vT6IIXVqcTs+GxWI/Rd8XiJLVob1aGeV96ggS923pKuClssM0
-         bkQSHTFQ2ySdZw7AO8uK7DHTxLKZTZKxP/m15g5g=
+        s=default; t=1599216362;
+        bh=hwGXasGI3vXuxzwR0fHBe/7NmPWta8DzMPNFt/WIVgM=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=q0FfVPp/FmurwSKrvSZ9N7lthPNpqqJd63RIhw6bd5GelQ0tHuTSdCClt/qF5V6z3
+         4dd+PH2xU0Dw6X7d468qEWIi54HKZXY6srQ5KJmIHXvF5koaSFsjWdcl6EsoRV6mks
+         1Pq7it2Urg/hKH+ZJK+AwolS7Bak52XjNquyEBII=
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=why.lan)
         by disco-boy.misterjones.org with esmtpsa (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
         (Exim 4.92)
         (envelope-from <maz@kernel.org>)
-        id 1kE9EG-0098oH-0a; Fri, 04 Sep 2020 11:46:00 +0100
+        id 1kE9EG-0098oH-Ja; Fri, 04 Sep 2020 11:46:00 +0100
 From:   Marc Zyngier <maz@kernel.org>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Alexandru Elisei <alexandru.elisei@arm.com>,
@@ -37,10 +37,12 @@ Cc:     Alexandru Elisei <alexandru.elisei@arm.com>,
         Steven Price <steven.price@arm.com>, kernel-team@android.com,
         linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
         kvm@vger.kernel.org
-Subject: [GIT PULL] KVM/arm64 fixes for 5.9
-Date:   Fri,  4 Sep 2020 11:45:21 +0100
-Message-Id: <20200904104530.1082676-1-maz@kernel.org>
+Subject: [PATCH 1/9] KVM: arm64: pvtime: steal-time is only supported when configured
+Date:   Fri,  4 Sep 2020 11:45:22 +0100
+Message-Id: <20200904104530.1082676-2-maz@kernel.org>
 X-Mailer: git-send-email 2.27.0
+In-Reply-To: <20200904104530.1082676-1-maz@kernel.org>
+References: <20200904104530.1082676-1-maz@kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 62.31.163.78
@@ -52,61 +54,32 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Paolo,
+From: Andrew Jones <drjones@redhat.com>
 
-Here's a bunch of fixes for 5.9. The gist of it is the stolen time
-rework from Andrew, but we also have a couple of MM fixes that have
-surfaced as people have started to use hugetlbfs in anger.
+Don't confuse the guest by saying steal-time is supported when
+it hasn't been configured by userspace and won't work.
 
-Please pull,
+Signed-off-by: Andrew Jones <drjones@redhat.com>
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+Link: https://lore.kernel.org/r/20200804170604.42662-2-drjones@redhat.com
+---
+ arch/arm64/kvm/pvtime.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-	M.
+diff --git a/arch/arm64/kvm/pvtime.c b/arch/arm64/kvm/pvtime.c
+index f7b52ce1557e..c3ef4ebd6846 100644
+--- a/arch/arm64/kvm/pvtime.c
++++ b/arch/arm64/kvm/pvtime.c
+@@ -43,7 +43,8 @@ long kvm_hypercall_pv_features(struct kvm_vcpu *vcpu)
+ 	switch (feature) {
+ 	case ARM_SMCCC_HV_PV_TIME_FEATURES:
+ 	case ARM_SMCCC_HV_PV_TIME_ST:
+-		val = SMCCC_RET_SUCCESS;
++		if (vcpu->arch.steal.base != GPA_INVALID)
++			val = SMCCC_RET_SUCCESS;
+ 		break;
+ 	}
+ 
+-- 
+2.27.0
 
-The following changes since commit 9123e3a74ec7b934a4a099e98af6a61c2f80bbf5:
-
-  Linux 5.9-rc1 (2020-08-16 13:04:57 -0700)
-
-are available in the Git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvmarm-fixes-5.9-1
-
-for you to fetch changes up to 7b75cd5128421c673153efb1236705696a1a9812:
-
-  KVM: arm64: Update page shift if stage 2 block mapping not supported (2020-09-04 10:53:48 +0100)
-
-----------------------------------------------------------------
-KVM/arm64 fixes for Linux 5.9, take #1
-
-- Multiple stolen time fixes, with a new capability to match x86
-- Fix for hugetlbfs mappings when PUD and PMD are the same level
-- Fix for hugetlbfs mappings when PTE mappings are enforced
-  (dirty logging, for example)
-- Fix tracing output of 64bit values
-
-----------------------------------------------------------------
-Alexandru Elisei (1):
-      KVM: arm64: Update page shift if stage 2 block mapping not supported
-
-Andrew Jones (6):
-      KVM: arm64: pvtime: steal-time is only supported when configured
-      KVM: arm64: pvtime: Fix potential loss of stolen time
-      KVM: arm64: Drop type input from kvm_put_guest
-      KVM: arm64: pvtime: Fix stolen time accounting across migration
-      KVM: Documentation: Minor fixups
-      arm64/x86: KVM: Introduce steal-time cap
-
-Marc Zyngier (2):
-      KVM: arm64: Do not try to map PUDs when they are folded into PMD
-      KVM: arm64: Fix address truncation in traces
-
- Documentation/virt/kvm/api.rst     | 22 ++++++++++++++++++----
- arch/arm64/include/asm/kvm_host.h  |  2 +-
- arch/arm64/kvm/arm.c               |  3 +++
- arch/arm64/kvm/mmu.c               |  8 +++++++-
- arch/arm64/kvm/pvtime.c            | 29 +++++++++++++----------------
- arch/arm64/kvm/trace_arm.h         | 16 ++++++++--------
- arch/arm64/kvm/trace_handle_exit.h |  6 +++---
- arch/x86/kvm/x86.c                 |  3 +++
- include/linux/kvm_host.h           | 31 ++++++++++++++++++++++++++-----
- include/uapi/linux/kvm.h           |  1 +
- 10 files changed, 83 insertions(+), 38 deletions(-)
