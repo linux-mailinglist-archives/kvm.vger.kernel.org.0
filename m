@@ -2,229 +2,143 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7A19625D570
-	for <lists+kvm@lfdr.de>; Fri,  4 Sep 2020 11:53:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2D66625D66E
+	for <lists+kvm@lfdr.de>; Fri,  4 Sep 2020 12:36:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729795AbgIDJxl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 4 Sep 2020 05:53:41 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:42843 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726425AbgIDJxj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 4 Sep 2020 05:53:39 -0400
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-500-feIGm8B6NbuDsV3bhL0Kmg-1; Fri, 04 Sep 2020 05:53:36 -0400
-X-MC-Unique: feIGm8B6NbuDsV3bhL0Kmg-1
-Received: by mail-wr1-f69.google.com with SMTP id b8so2155069wrr.2
-        for <kvm@vger.kernel.org>; Fri, 04 Sep 2020 02:53:36 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=XuQnmthJvDLeG392mDM96epZMMU8GpEeywFOGW3d2iY=;
-        b=VLJHp042cxRlavwIgZns/jjkFlHLW8ndQuYHHiftYOCcQJdFvXKzq3OlaE4lzR2LRQ
-         Q70dZSeDsKmdrgndE7si4Wa45RH5s4rjd3qulH+lZ3Zt6tECl+tRX1ntVAAlhF7qZpYY
-         4tnOy0OeJi16A+XdyTuJoeTipbaEcq9hrn3RVXLi7CkGxYAvASceIebUOe8+lL7aU8pM
-         KgxaubAYv97DeGyv3cNfKXAkPPuEDbHxWqY69MSuv8DAuY7zcTa9FHa0m7EZsKaMD9E8
-         1+1aqeL/PXhr7UHWNrUBWc8pnwtMkfrjNlVy24Av+NSYrgZMMBdL6W6vYDXDy/i5ucCS
-         J+IA==
-X-Gm-Message-State: AOAM532OMwpxckR+e2k4DiPIw4XkrpSBdVFznkWVEwgzreIOdnVzzZ1N
-        z/XIQT38OR7t2YZPuv7/gUgeBiUe0VNSInbWYkNFMIhCPn/T07651dWOxDJnUX5zv/ImpCuzqJ7
-        taAYmnZvlhSNi
-X-Received: by 2002:adf:aad1:: with SMTP id i17mr7201335wrc.360.1599213215534;
-        Fri, 04 Sep 2020 02:53:35 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwSCrthi5wieW53gN2JmiJVsoaNYo7jdb7Y9sDqWukIfC3bkehGBXDXGrjLm3FMXeNdQiCOYA==
-X-Received: by 2002:adf:aad1:: with SMTP id i17mr7201311wrc.360.1599213215277;
-        Fri, 04 Sep 2020 02:53:35 -0700 (PDT)
-Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id i16sm6484337wrq.73.2020.09.04.02.53.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 04 Sep 2020 02:53:34 -0700 (PDT)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Haiwei Li <lihaiwei.kernel@gmail.com>
-Cc:     "pbonzini\@redhat.com" <pbonzini@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        "wanpengli\@tencent.com" <wanpengli@tencent.com>,
-        "jmattson\@google.com" <jmattson@google.com>,
-        "joro\@8bytes.org" <joro@8bytes.org>, tglx@linutronix.de,
-        mingo@redhat.com, "bp\@alien8.de" <bp@alien8.de>,
-        "hpa\@zytor.com" <hpa@zytor.com>,
-        "linux-kernel\@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kvm\@vger.kernel.org" <kvm@vger.kernel.org>,
-        "x86\@kernel.org" <x86@kernel.org>
-Subject: Re: [PATCH v2] KVM: Check the allocation of pv cpu mask
-In-Reply-To: <61e2fd6f-effd-64d7-148a-1b1f9fda1449@gmail.com>
-References: <654d8c60-49f0-e398-be25-24aed352360d@gmail.com> <87y2lrnnyf.fsf@vitty.brq.redhat.com> <61e2fd6f-effd-64d7-148a-1b1f9fda1449@gmail.com>
-Date:   Fri, 04 Sep 2020 11:53:33 +0200
-Message-ID: <87o8mlooki.fsf@vitty.brq.redhat.com>
+        id S1730204AbgIDKgY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 4 Sep 2020 06:36:24 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:42560 "EHLO
+        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1730115AbgIDKfw (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 4 Sep 2020 06:35:52 -0400
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 084AWxCI180628;
+        Fri, 4 Sep 2020 06:35:50 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : references : mime-version : content-type :
+ in-reply-to; s=pp1; bh=pAwGDhty35hiyI6MfQb3Aq7jmdJ+1fWdY6e3Iyx1DuU=;
+ b=dnEd6CoSJyhRL+J6CWK4+6mavm+AeeG1hxU2U50G0LWdBhk9pTN5rezQ0KmCN+QgoyuP
+ CuPwmindKPdPimMwKhAEJOkktC7yBeirJ4t7wOCU/aeAtWRFm6sb0XDTNE4AL0yVcmUx
+ wqEWndqBU+L/REjeKvSfUfTvU4ljFw3grU6UeY0J1gBPcqGU58DS8hL4myWxMZ7nuukW
+ /H9vHYdmR4pCQDBnAzsvXft08Z/rHllIIbJUaXqUYrFALdk8TCGokmPeekLTuhBvuFVD
+ V8iLYDtH/jHGOBG4jTerUGgGRoTnB/6QQUHq5xi0oYZJAdRnsbZi1SFr05qAanHIMQcO wg== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 33beeys4nt-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 04 Sep 2020 06:35:50 -0400
+Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 084AY5Z6185100;
+        Fri, 4 Sep 2020 06:35:49 -0400
+Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 33beeys4n7-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 04 Sep 2020 06:35:49 -0400
+Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
+        by ppma04ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 084AW7Gd028972;
+        Fri, 4 Sep 2020 10:35:48 GMT
+Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
+        by ppma04ams.nl.ibm.com with ESMTP id 337en86s8g-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 04 Sep 2020 10:35:47 +0000
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
+        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 084AZjLi28901684
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 4 Sep 2020 10:35:45 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 06DF0AE05A;
+        Fri,  4 Sep 2020 10:35:45 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id AF538AE04D;
+        Fri,  4 Sep 2020 10:35:44 +0000 (GMT)
+Received: from osiris (unknown [9.171.25.186])
+        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
+        Fri,  4 Sep 2020 10:35:44 +0000 (GMT)
+Date:   Fri, 4 Sep 2020 12:35:43 +0200
+From:   Heiko Carstens <hca@linux.ibm.com>
+To:     Janosch Frank <frankja@linux.ibm.com>
+Cc:     linux-s390@vger.kernel.org, borntraeger@de.ibm.com,
+        gor@linux.ibm.com, imbrenda@linux.ibm.com, kvm@vger.kernel.org,
+        david@redhat.com
+Subject: Re: [PATCH 2/2] s390x: Add 3f program exception handler
+Message-ID: <20200904103543.GD6075@osiris>
+References: <20200903131435.2535-1-frankja@linux.ibm.com>
+ <20200903131435.2535-3-frankja@linux.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200903131435.2535-3-frankja@linux.ibm.com>
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
+ definitions=2020-09-04_05:2020-09-04,2020-09-04 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1011 phishscore=0
+ mlxlogscore=999 lowpriorityscore=0 bulkscore=0 adultscore=0
+ priorityscore=1501 impostorscore=0 suspectscore=1 spamscore=0 mlxscore=0
+ malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2006250000 definitions=main-2009040093
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Haiwei Li <lihaiwei.kernel@gmail.com> writes:
+On Thu, Sep 03, 2020 at 09:14:35AM -0400, Janosch Frank wrote:
+> Program exception 3f (secure storage violation) can only be detected
+> when the CPU is running in SIE with a format 4 state description,
+> e.g. running a protected guest. Because of this and because user
+> space partly controls the guest memory mapping and can trigger this
+> exception, we want to send a SIGSEGV to the process running the guest
+> and not panic the kernel.
+> 
+> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+> CC: <stable@vger.kernel.org> # 5.7+
+> Fixes: 084ea4d611a3 ("s390/mm: add (non)secure page access exceptions handlers")
+> Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+> ---
+>  arch/s390/kernel/pgm_check.S |  2 +-
+>  arch/s390/mm/fault.c         | 23 +++++++++++++++++++++++
+>  2 files changed, 24 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/s390/kernel/pgm_check.S b/arch/s390/kernel/pgm_check.S
+> index 2c27907a5ffc..9a92638360ee 100644
+> --- a/arch/s390/kernel/pgm_check.S
+> +++ b/arch/s390/kernel/pgm_check.S
+> @@ -80,7 +80,7 @@ PGM_CHECK(do_dat_exception)		/* 3b */
+>  PGM_CHECK_DEFAULT			/* 3c */
+>  PGM_CHECK(do_secure_storage_access)	/* 3d */
+>  PGM_CHECK(do_non_secure_storage_access)	/* 3e */
+> -PGM_CHECK_DEFAULT			/* 3f */
+> +PGM_CHECK(do_secure_storage_violation)	/* 3f */
+>  PGM_CHECK(monitor_event_exception)	/* 40 */
+>  PGM_CHECK_DEFAULT			/* 41 */
+>  PGM_CHECK_DEFAULT			/* 42 */
+> diff --git a/arch/s390/mm/fault.c b/arch/s390/mm/fault.c
+> index 4c8c063bce5b..20abb7c5c540 100644
+> --- a/arch/s390/mm/fault.c
+> +++ b/arch/s390/mm/fault.c
+> @@ -859,6 +859,24 @@ void do_non_secure_storage_access(struct pt_regs *regs)
+>  }
+>  NOKPROBE_SYMBOL(do_non_secure_storage_access);
+>  
+> +void do_secure_storage_violation(struct pt_regs *regs)
+> +{
+> +	char buf[TASK_COMM_LEN];
+> +
+> +	/*
+> +	 * Either KVM messed up the secure guest mapping or the same
+> +	 * page is mapped into multiple secure guests.
+> +	 *
+> +	 * This exception is only triggered when a guest 2 is running
+> +	 * and can therefore never occur in kernel context.
+> +	 */
+> +	printk_ratelimited(KERN_WARNING
+> +			   "Secure storage violation in task: %s, pid %d\n",
+> +			   get_task_comm(buf, current), task_pid_nr(current));
 
-> On 20/9/3 18:39, Vitaly Kuznetsov wrote:
->> Haiwei Li <lihaiwei.kernel@gmail.com> writes:
->> 
->>> From: Haiwei Li <lihaiwei@tencent.com>
->>>
->>> check the allocation of per-cpu __pv_cpu_mask. Initialize ops only when
->>> successful.
->>>
->>> Signed-off-by: Haiwei Li <lihaiwei@tencent.com>
->>> ---
->>>    arch/x86/kernel/kvm.c | 24 ++++++++++++++++++++----
->>>    1 file changed, 20 insertions(+), 4 deletions(-)
->>>
->>> diff --git a/arch/x86/kernel/kvm.c b/arch/x86/kernel/kvm.c
->>> index 08320b0b2b27..d3c062e551d7 100644
->>> --- a/arch/x86/kernel/kvm.c
->>> +++ b/arch/x86/kernel/kvm.c
->>> @@ -555,7 +555,6 @@ static void kvm_send_ipi_mask_allbutself(const
->>> struct cpumask *mask, int vector)
->>>    static void kvm_setup_pv_ipi(void)
->>>    {
->>>    	apic->send_IPI_mask = kvm_send_ipi_mask;
->>> -	apic->send_IPI_mask_allbutself = kvm_send_ipi_mask_allbutself;
->>>    	pr_info("setup PV IPIs\n");
->>>    }
->>>
->>> @@ -654,7 +653,6 @@ static void __init kvm_guest_init(void)
->>>    	}
->>>
->>>    	if (pv_tlb_flush_supported()) {
->>> -		pv_ops.mmu.flush_tlb_others = kvm_flush_tlb_others;
->>>    		pv_ops.mmu.tlb_remove_table = tlb_remove_table;
->>>    		pr_info("KVM setup pv remote TLB flush\n");
->>>    	}
->>> @@ -767,6 +765,14 @@ static __init int activate_jump_labels(void)
->>>    }
->>>    arch_initcall(activate_jump_labels);
->>>
->>> +static void kvm_free_pv_cpu_mask(void)
->>> +{
->>> +	unsigned int cpu;
->>> +
->>> +	for_each_possible_cpu(cpu)
->>> +		free_cpumask_var(per_cpu(__pv_cpu_mask, cpu));
->>> +}
->>> +
->>>    static __init int kvm_alloc_cpumask(void)
->>>    {
->>>    	int cpu;
->>> @@ -785,11 +791,21 @@ static __init int kvm_alloc_cpumask(void)
->>>
->>>    	if (alloc)
->>>    		for_each_possible_cpu(cpu) {
->>> -			zalloc_cpumask_var_node(per_cpu_ptr(&__pv_cpu_mask, cpu),
->>> -				GFP_KERNEL, cpu_to_node(cpu));
->>> +			if (!zalloc_cpumask_var_node(
->>> +				per_cpu_ptr(&__pv_cpu_mask, cpu),
->>> +				GFP_KERNEL, cpu_to_node(cpu)))
->>> +				goto zalloc_cpumask_fail;
->>>    		}
->>>
->>> +#if defined(CONFIG_SMP)
->>> +	apic->send_IPI_mask_allbutself = kvm_send_ipi_mask_allbutself;
->>> +#endif
->>> +	pv_ops.mmu.flush_tlb_others = kvm_flush_tlb_others;
->> 
->> This is too late I'm afraid. If I'm not mistaken PV patching happens
->> earlier, so .init.guest_late_init (kvm_guest_init()) is good and
->> arch_initcall() is bad.
->
-> .init.guest_late_init (kvm_guest_init()) is called before 
-> arch_initcall() and kvm_flush_tlb_others && kvm_send_ipi_mask_allbutself 
-> rely on __pv_cpu_mask.  So, i can not put this assign in kvm_guest_init().
->
->> 
->> Have you checked that with this patch kvm_flush_tlb_others() is still
->> being called?
->
-> yes. I add a printk and i get the log.
->
+Why get_task_comm() and task_pid_nr() instead of simply current->comm
+and current->pid?
+Also: is the dmesg message of any value?
 
-This is weird. I do the following on top of your patch:
+> +	send_sig(SIGSEGV, current, 0);
+> +}
+> +NOKPROBE_SYMBOL(do_secure_storage_violation);
 
-diff --git a/arch/x86/kernel/kvm.c b/arch/x86/kernel/kvm.c
-index d3c062e551d7..f441209ff0a4 100644
---- a/arch/x86/kernel/kvm.c
-+++ b/arch/x86/kernel/kvm.c
-@@ -620,6 +620,8 @@ static void kvm_flush_tlb_others(const struct cpumask *cpumask,
-        struct kvm_steal_time *src;
-        struct cpumask *flushmask = this_cpu_cpumask_var_ptr(__pv_cpu_mask);
- 
-+       trace_printk("PV TLB flush %d CPUs\n", cpumask_weight(cpumask));
-+
-        cpumask_copy(flushmask, cpumask);
-        /*
-         * We have to call flush only on online vCPUs. And
-
-With your patch I don't see any calls:
-
-# grep -c -v '^#' /sys/kernel/debug/tracing/trace
-0
-
-with your patch reverted I see them:
-
-# grep -c -v '^#' /sys/kernel/debug/tracing/trace
-4571
-
-
->> 
->> Actually, there is no need to assign kvm_flush_tlb_others() so late. We
->> can always check if __pv_cpu_mask was allocated and revert back to the
->> architectural path if not.
-> I am sorry i don't really understand. Can you explain in more detail? Thx.
->
-
-I mean we can always call e.g. kvm_flush_tlb_others(), even if (very
-unlikely) the mask wasn't allocated. We just need to check for
-that. Something like (completely untested):
-
-diff --git a/arch/x86/kernel/kvm.c b/arch/x86/kernel/kvm.c
-index d3c062e551d7..e3676cdee6a2 100644
---- a/arch/x86/kernel/kvm.c
-+++ b/arch/x86/kernel/kvm.c
-@@ -620,6 +620,11 @@ static void kvm_flush_tlb_others(const struct cpumask *cpumask,
-        struct kvm_steal_time *src;
-        struct cpumask *flushmask = this_cpu_cpumask_var_ptr(__pv_cpu_mask);
- 
-+       if (unlikely(!flushmask)) {
-+               flushmask = cpumask;
-+               goto do_native;
-+       }
-+
-        cpumask_copy(flushmask, cpumask);
-        /*
-         * We have to call flush only on online vCPUs. And
-@@ -635,6 +640,7 @@ static void kvm_flush_tlb_others(const struct cpumask *cpumask,
-                }
-        }
- 
-+do_native:
-        native_flush_tlb_others(flushmask, info);
- }
- 
-
->> 
->>>    	return 0;
->>> +
->>> +zalloc_cpumask_fail:
->>> +	kvm_free_pv_cpu_mask();
->>> +	return -ENOMEM;
->>>    }
->>>    arch_initcall(kvm_alloc_cpumask);
->>>
->>> --
->>> 2.18.4
->>>
->> 
->
-
--- 
-Vitaly
-
+Why is this NOKPROBE? Can this deadlock?
