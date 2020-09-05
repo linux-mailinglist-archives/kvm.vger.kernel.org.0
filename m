@@ -2,34 +2,34 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 84E1125E72D
-	for <lists+kvm@lfdr.de>; Sat,  5 Sep 2020 13:04:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6C49925E74C
+	for <lists+kvm@lfdr.de>; Sat,  5 Sep 2020 13:34:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728494AbgIELEP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 5 Sep 2020 07:04:15 -0400
-Received: from mail.kernel.org ([198.145.29.99]:57778 "EHLO mail.kernel.org"
+        id S1728486AbgIELdj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 5 Sep 2020 07:33:39 -0400
+Received: from mail.kernel.org ([198.145.29.99]:40724 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726597AbgIELEO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 5 Sep 2020 07:04:14 -0400
+        id S1726597AbgIELd0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 5 Sep 2020 07:33:26 -0400
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id BE1932074B;
-        Sat,  5 Sep 2020 11:04:13 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 372082074B;
+        Sat,  5 Sep 2020 11:33:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1599303853;
-        bh=W7V8ZU7QH4bhyjnEuCPx/ysHegXohN29y01K74kjKS8=;
+        s=default; t=1599305605;
+        bh=nkMhL0eOj9pYn7M+50vdhkwtCvET0nh1reybf9oODE8=;
         h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=ZMH/9Dxi3qJfkhd7VLtbaguJfgBtdzMSQCGEujpCfOvhFG2+ePwZNWWEC3jCpJtyO
-         qwWscifFtIwxsOvPw/yUPISHf+t+7GNXTNmFEUmy1Tyu+O9SHMxJ1DRfH9XUkW6mSl
-         ZTCI6cAdDwK2idzR/d2ukgq/nOaU49BF6d4dwUAQ=
+        b=L0KqukYgmLuAblRHiBH8FnIhTLTpryxmse6oKwTmAoR39advkk9fWfWTXV1aLiCUo
+         xbliFRMTXQuYuwbWTsHZrCtUa+UHuch5JLtS7Jh34Gs4ni4dXVQmaQ48p/mvng4voo
+         UsBLOIPloPtQUHUBpfyO8+KUm14ePBzJc9W1t/+w=
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=wait-a-minute.misterjones.org)
         by disco-boy.misterjones.org with esmtpsa (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
         (Exim 4.92)
         (envelope-from <maz@kernel.org>)
-        id 1kEVzP-009M5B-VJ; Sat, 05 Sep 2020 12:04:12 +0100
-Date:   Sat, 05 Sep 2020 12:04:10 +0100
-Message-ID: <87363wmqmt.wl-maz@kernel.org>
+        id 1kEWRf-009MI9-AC; Sat, 05 Sep 2020 12:33:23 +0100
+Date:   Sat, 05 Sep 2020 12:33:22 +0100
+Message-ID: <871rjgmpa5.wl-maz@kernel.org>
 From:   Marc Zyngier <maz@kernel.org>
 To:     Jianyong Wu <jianyong.wu@arm.com>
 Cc:     netdev@vger.kernel.org, yangbo.lu@nxp.com, john.stultz@linaro.org,
@@ -40,10 +40,10 @@ Cc:     netdev@vger.kernel.org, yangbo.lu@nxp.com, john.stultz@linaro.org,
         linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
         kvm@vger.kernel.org, Steve.Capper@arm.com, justin.he@arm.com,
         nd@arm.com
-Subject: Re: [PATCH v14 07/10] arm64/kvm: Add hypercall service for kvm ptp.
-In-Reply-To: <20200904092744.167655-8-jianyong.wu@arm.com>
+Subject: Re: [PATCH v14 08/10] ptp: arm64: Enable ptp_kvm for arm64
+In-Reply-To: <20200904092744.167655-9-jianyong.wu@arm.com>
 References: <20200904092744.167655-1-jianyong.wu@arm.com>
-        <20200904092744.167655-8-jianyong.wu@arm.com>
+        <20200904092744.167655-9-jianyong.wu@arm.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL/10.8 EasyPG/1.0.0 Emacs/26.3
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -58,43 +58,131 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 04 Sep 2020 10:27:41 +0100,
+On Fri, 04 Sep 2020 10:27:42 +0100,
 Jianyong Wu <jianyong.wu@arm.com> wrote:
 > 
-> ptp_kvm will get this service through smccc call.
-> The service offers wall time and counter cycle of host for guest.
-> caller must explicitly determines which cycle of virtual counter or
-> physical counter to return if it needs counter cycle.
+> Currently, there is no mechanism to keep time sync between guest and host
+> in arm64 virtualization environment. Time in guest will drift compared
+> with host after boot up as they may both use third party time sources
+> to correct their time respectively. The time deviation will be in order
+> of milliseconds. But in some scenarios,like in cloud envirenment, we ask
+> for higher time precision.
+> 
+> kvm ptp clock, which choose the host clock source as a reference
+> clock to sync time between guest and host, has been adopted by x86
+> which makes the time sync order from milliseconds to nanoseconds.
+> 
+> This patch enables kvm ptp clock for arm64 and improve clock sync precison
+> significantly.
+> 
+> Test result comparisons between with kvm ptp clock and without it in arm64
+> are as follows. This test derived from the result of command 'chronyc
+> sources'. we should take more care of the last sample column which shows
+> the offset between the local clock and the source at the last measurement.
+> 
+> no kvm ptp in guest:
+> MS Name/IP address   Stratum Poll Reach LastRx Last sample
+> ========================================================================
+> ^* dns1.synet.edu.cn      2   6   377    13  +1040us[+1581us] +/-   21ms
+> ^* dns1.synet.edu.cn      2   6   377    21  +1040us[+1581us] +/-   21ms
+> ^* dns1.synet.edu.cn      2   6   377    29  +1040us[+1581us] +/-   21ms
+> ^* dns1.synet.edu.cn      2   6   377    37  +1040us[+1581us] +/-   21ms
+> ^* dns1.synet.edu.cn      2   6   377    45  +1040us[+1581us] +/-   21ms
+> ^* dns1.synet.edu.cn      2   6   377    53  +1040us[+1581us] +/-   21ms
+> ^* dns1.synet.edu.cn      2   6   377    61  +1040us[+1581us] +/-   21ms
+> ^* dns1.synet.edu.cn      2   6   377     4   -130us[ +796us] +/-   21ms
+> ^* dns1.synet.edu.cn      2   6   377    12   -130us[ +796us] +/-   21ms
+> ^* dns1.synet.edu.cn      2   6   377    20   -130us[ +796us] +/-   21ms
+> 
+> in host:
+> MS Name/IP address   Stratum Poll Reach LastRx Last sample
+> ========================================================================
+> ^* 120.25.115.20          2   7   377    72   -470us[ -603us] +/-   18ms
+> ^* 120.25.115.20          2   7   377    92   -470us[ -603us] +/-   18ms
+> ^* 120.25.115.20          2   7   377   112   -470us[ -603us] +/-   18ms
+> ^* 120.25.115.20          2   7   377     2   +872ns[-6808ns] +/-   17ms
+> ^* 120.25.115.20          2   7   377    22   +872ns[-6808ns] +/-   17ms
+> ^* 120.25.115.20          2   7   377    43   +872ns[-6808ns] +/-   17ms
+> ^* 120.25.115.20          2   7   377    63   +872ns[-6808ns] +/-   17ms
+> ^* 120.25.115.20          2   7   377    83   +872ns[-6808ns] +/-   17ms
+> ^* 120.25.115.20          2   7   377   103   +872ns[-6808ns] +/-   17ms
+> ^* 120.25.115.20          2   7   377   123   +872ns[-6808ns] +/-   17ms
+> 
+> The dns1.synet.edu.cn is the network reference clock for guest and
+> 120.25.115.20 is the network reference clock for host. we can't get the
+> clock error between guest and host directly, but a roughly estimated value
+> will be in order of hundreds of us to ms.
+> 
+> with kvm ptp in guest:
+> chrony has been disabled in host to remove the disturb by network clock.
+> 
+> MS Name/IP address         Stratum Poll Reach LastRx Last sample
+> ========================================================================
+> * PHC0                    0   3   377     8     -7ns[   +1ns] +/-    3ns
+> * PHC0                    0   3   377     8     +1ns[  +16ns] +/-    3ns
+> * PHC0                    0   3   377     6     -4ns[   -0ns] +/-    6ns
+> * PHC0                    0   3   377     6     -8ns[  -12ns] +/-    5ns
+> * PHC0                    0   3   377     5     +2ns[   +4ns] +/-    4ns
+> * PHC0                    0   3   377    13     +2ns[   +4ns] +/-    4ns
+> * PHC0                    0   3   377    12     -4ns[   -6ns] +/-    4ns
+> * PHC0                    0   3   377    11     -8ns[  -11ns] +/-    6ns
+> * PHC0                    0   3   377    10    -14ns[  -20ns] +/-    4ns
+> * PHC0                    0   3   377     8     +4ns[   +5ns] +/-    4ns
+> 
+> The PHC0 is the ptp clock which choose the host clock as its source
+> clock. So we can see that the clock difference between host and guest
+> is in order of ns.
 > 
 > Signed-off-by: Jianyong Wu <jianyong.wu@arm.com>
 > ---
->  arch/arm64/kvm/Kconfig       |  6 +++++
->  arch/arm64/kvm/arch_timer.c  |  2 +-
->  arch/arm64/kvm/hypercalls.c  | 49 ++++++++++++++++++++++++++++++++++++
->  include/kvm/arm_arch_timer.h |  1 +
->  include/linux/arm-smccc.h    | 16 ++++++++++++
->  5 files changed, 73 insertions(+), 1 deletion(-)
->
+>  drivers/clocksource/arm_arch_timer.c | 24 +++++++++++++
+>  drivers/ptp/Kconfig                  |  2 +-
+>  drivers/ptp/ptp_kvm_arm64.c          | 53 ++++++++++++++++++++++++++++
+>  3 files changed, 78 insertions(+), 1 deletion(-)
+>  create mode 100644 drivers/ptp/ptp_kvm_arm64.c
 
-[...]
+And I missed that one earlier:
 
-On top of what I said yesterday:
-
-> index 32ba6fbc3814..eb85f6701845 100644
-> --- a/arch/arm64/kvm/arch_timer.c
-> +++ b/arch/arm64/kvm/arch_timer.c
-> @@ -81,7 +81,7 @@ u64 timer_get_cval(struct arch_timer_context *ctxt)
->  	}
+> diff --git a/drivers/clocksource/arm_arch_timer.c b/drivers/clocksource/arm_arch_timer.c
+> index d55acffb0b90..aaf286e90092 100644
+> --- a/drivers/clocksource/arm_arch_timer.c
+> +++ b/drivers/clocksource/arm_arch_timer.c
+> @@ -1650,3 +1650,27 @@ static int __init arch_timer_acpi_init(struct acpi_table_header *table)
 >  }
->  
-> -static u64 timer_get_offset(struct arch_timer_context *ctxt)
-> +u64 timer_get_offset(struct arch_timer_context *ctxt)
->  {
->  	struct kvm_vcpu *vcpu = ctxt->vcpu;
->
+>  TIMER_ACPI_DECLARE(arch_timer, ACPI_SIG_GTDT, arch_timer_acpi_init);
+>  #endif
+> +
+> +#if IS_ENABLED(CONFIG_PTP_1588_CLOCK_KVM)
+> +#include <linux/arm-smccc.h>
 
-Why has this become global? I can't see a reason why we would want to
-expose this purely KVM internal helper.
+No conditional includes, please.
+
+> +int kvm_arch_ptp_get_crosststamp(unsigned long *cycle, struct timespec64 *ts,
+> +			      struct clocksource **cs)
+> +{
+> +	struct arm_smccc_res hvc_res;
+> +	ktime_t ktime;
+> +
+> +	/* Currently, linux guest will always use the virtual counter */
+> +	arm_smccc_1_1_invoke(ARM_SMCCC_VENDOR_HYP_KVM_PTP_FUNC_ID,
+> +			     ARM_PTP_VIRT_COUNTER, &hvc_res);
+
+You don't need to assume anything. This driver already provides you
+with the information you need to tell the hypervisor which counter to
+use:
+
+	if (arch_timer_uses_ppi == ARCH_TIMER_VIRT_PPI)
+		ptp_counter = ARM_PTP_VIRT_COUNTER;
+	else
+		ptp_counter = ARM_PTP_PHYS_COUNTER;
+	arm_smccc_1_1_invoke(ARM_SMCCC_VENDOR_HYP_KVM_PTP_FUNC_ID,
+			     ptp_counter, &hvc_res);
+
+At least, this is vaguely future proof.
+
+The hypervisor will still have to discriminate between a call between
+a call from vEL1 or vEL2 to decide whether to subtract the offset from
+the counter value, but that's out of scope for now.
 
 	M.
 
