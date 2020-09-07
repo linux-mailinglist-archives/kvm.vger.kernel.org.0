@@ -2,29 +2,32 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7BC462602D4
-	for <lists+kvm@lfdr.de>; Mon,  7 Sep 2020 19:36:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E0E152602CB
+	for <lists+kvm@lfdr.de>; Mon,  7 Sep 2020 19:35:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730717AbgIGRgb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 7 Sep 2020 13:36:31 -0400
-Received: from 8bytes.org ([81.169.241.247]:43636 "EHLO theia.8bytes.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729473AbgIGNSH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 7 Sep 2020 09:18:07 -0400
+        id S1731358AbgIGRd7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 7 Sep 2020 13:33:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60404 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729496AbgIGNS0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 7 Sep 2020 09:18:26 -0400
+Received: from theia.8bytes.org (8bytes.org [IPv6:2a01:238:4383:600:38bc:a715:4b6d:a889])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2CF38C06179E;
+        Mon,  7 Sep 2020 06:18:06 -0700 (PDT)
 Received: from cap.home.8bytes.org (p549add56.dip0.t-ipconnect.de [84.154.221.86])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
         (No client certificate requested)
-        by theia.8bytes.org (Postfix) with ESMTPSA id 634A2FC1;
+        by theia.8bytes.org (Postfix) with ESMTPSA id E4637FC6;
         Mon,  7 Sep 2020 15:16:54 +0200 (CEST)
 From:   Joerg Roedel <joro@8bytes.org>
 To:     x86@kernel.org
 Cc:     Joerg Roedel <joro@8bytes.org>, Joerg Roedel <jroedel@suse.de>,
-        hpa@zytor.com, Andy Lutomirski <luto@kernel.org>,
+        Tom Lendacky <thomas.lendacky@amd.com>, hpa@zytor.com,
+        Andy Lutomirski <luto@kernel.org>,
         Dave Hansen <dave.hansen@linux.intel.com>,
         Peter Zijlstra <peterz@infradead.org>,
         Jiri Slaby <jslaby@suse.cz>,
         Dan Williams <dan.j.williams@intel.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
         Juergen Gross <jgross@suse.com>,
         Kees Cook <keescook@chromium.org>,
         David Rientjes <rientjes@google.com>,
@@ -36,9 +39,9 @@ Cc:     Joerg Roedel <joro@8bytes.org>, Joerg Roedel <jroedel@suse.de>,
         Martin Radev <martin.b.radev@gmail.com>,
         linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         virtualization@lists.linux-foundation.org
-Subject: [PATCH v7 24/72] x86/boot/compressed/64: Unmap GHCB page before booting the kernel
-Date:   Mon,  7 Sep 2020 15:15:25 +0200
-Message-Id: <20200907131613.12703-25-joro@8bytes.org>
+Subject: [PATCH v7 25/72] x86/sev-es: Add support for handling IOIO exceptions
+Date:   Mon,  7 Sep 2020 15:15:26 +0200
+Message-Id: <20200907131613.12703-26-joro@8bytes.org>
 X-Mailer: git-send-email 2.28.0
 In-Reply-To: <20200907131613.12703-1-joro@8bytes.org>
 References: <20200907131613.12703-1-joro@8bytes.org>
@@ -49,112 +52,291 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Joerg Roedel <jroedel@suse.de>
+From: Tom Lendacky <thomas.lendacky@amd.com>
 
-Force a page-fault on any further accesses to the GHCB page when they
-shouldn't happen anymore. This will catch the bugs where a #VC exception
-is raised when no one is expected anymore.
+Add support for decoding and handling #VC exceptions for IOIO events.
 
+Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
+[ jroedel@suse.de: Adapted code to #VC handling framework ]
+Co-developed-by: Joerg Roedel <jroedel@suse.de>
 Signed-off-by: Joerg Roedel <jroedel@suse.de>
 ---
- arch/x86/boot/compressed/ident_map_64.c | 17 +++++++++++++++--
- arch/x86/boot/compressed/misc.h         |  6 ++++++
- arch/x86/boot/compressed/sev-es.c       | 14 ++++++++++++++
- 3 files changed, 35 insertions(+), 2 deletions(-)
+ arch/x86/boot/compressed/sev-es.c |  32 +++++
+ arch/x86/kernel/sev-es-shared.c   | 214 ++++++++++++++++++++++++++++++
+ 2 files changed, 246 insertions(+)
 
-diff --git a/arch/x86/boot/compressed/ident_map_64.c b/arch/x86/boot/compressed/ident_map_64.c
-index 05742f641a06..063a60edcf99 100644
---- a/arch/x86/boot/compressed/ident_map_64.c
-+++ b/arch/x86/boot/compressed/ident_map_64.c
-@@ -298,6 +298,11 @@ int set_page_encrypted(unsigned long address)
- 	return set_clr_page_flags(&mapping_info, address, _PAGE_ENC, 0);
- }
- 
-+int set_page_non_present(unsigned long address)
-+{
-+	return set_clr_page_flags(&mapping_info, address, 0, _PAGE_PRESENT);
-+}
-+
- static void do_pf_error(const char *msg, unsigned long error_code,
- 			unsigned long address, unsigned long ip)
- {
-@@ -316,8 +321,14 @@ static void do_pf_error(const char *msg, unsigned long error_code,
- 
- void do_boot_page_fault(struct pt_regs *regs, unsigned long error_code)
- {
--	unsigned long address = native_read_cr2() & PMD_MASK;
--	unsigned long end = address + PMD_SIZE;
-+	unsigned long address = native_read_cr2();
-+	unsigned long end;
-+	bool ghcb_fault;
-+
-+	ghcb_fault = sev_es_check_ghcb_fault(address);
-+
-+	address   &= PMD_MASK;
-+	end        = address + PMD_SIZE;
- 
- 	/*
- 	 * Check for unexpected error codes. Unexpected are:
-@@ -327,6 +338,8 @@ void do_boot_page_fault(struct pt_regs *regs, unsigned long error_code)
- 	 */
- 	if (error_code & (X86_PF_PROT | X86_PF_USER | X86_PF_RSVD))
- 		do_pf_error("Unexpected page-fault:", error_code, address, regs->ip);
-+	else if (ghcb_fault)
-+		do_pf_error("Page-fault on GHCB page:", error_code, address, regs->ip);
- 
- 	/*
- 	 * Error code is sane - now identity map the 2M region around
-diff --git a/arch/x86/boot/compressed/misc.h b/arch/x86/boot/compressed/misc.h
-index 9995c70ca813..c0e0ffeee50a 100644
---- a/arch/x86/boot/compressed/misc.h
-+++ b/arch/x86/boot/compressed/misc.h
-@@ -100,6 +100,7 @@ static inline void choose_random_location(unsigned long input,
- #ifdef CONFIG_X86_64
- extern int set_page_decrypted(unsigned long address);
- extern int set_page_encrypted(unsigned long address);
-+extern int set_page_non_present(unsigned long address);
- extern unsigned char _pgtable[];
- #endif
- 
-@@ -117,8 +118,13 @@ void set_sev_encryption_mask(void);
- 
- #ifdef CONFIG_AMD_MEM_ENCRYPT
- void sev_es_shutdown_ghcb(void);
-+extern bool sev_es_check_ghcb_fault(unsigned long address);
- #else
- static inline void sev_es_shutdown_ghcb(void) { }
-+static inline bool sev_es_check_ghcb_fault(unsigned long address)
-+{
-+	return false;
-+}
- #endif
- 
- /* acpi.c */
 diff --git a/arch/x86/boot/compressed/sev-es.c b/arch/x86/boot/compressed/sev-es.c
-index 633d47df702f..ea656b22743b 100644
+index ea656b22743b..d7ab212180b6 100644
 --- a/arch/x86/boot/compressed/sev-es.c
 +++ b/arch/x86/boot/compressed/sev-es.c
-@@ -121,6 +121,20 @@ void sev_es_shutdown_ghcb(void)
- 	 */
- 	if (set_page_encrypted((unsigned long)&boot_ghcb_page))
- 		error("Can't map GHCB page encrypted");
+@@ -24,6 +24,35 @@
+ struct ghcb boot_ghcb_page __aligned(PAGE_SIZE);
+ struct ghcb *boot_ghcb;
+ 
++/*
++ * Copy a version of this function here - insn-eval.c can't be used in
++ * pre-decompression code.
++ */
++static bool insn_has_rep_prefix(struct insn *insn)
++{
++	int i;
 +
-+	/*
-+	 * GHCB page is mapped encrypted again and flushed from the cache.
-+	 * Mark it non-present now to catch bugs when #VC exceptions trigger
-+	 * after this point.
-+	 */
-+	if (set_page_non_present((unsigned long)&boot_ghcb_page))
-+		error("Can't unmap GHCB page");
++	insn_get_prefixes(insn);
++
++	for (i = 0; i < insn->prefixes.nbytes; i++) {
++		insn_byte_t p = insn->prefixes.bytes[i];
++
++		if (p == 0xf2 || p == 0xf3)
++			return true;
++	}
++
++	return false;
 +}
 +
-+bool sev_es_check_ghcb_fault(unsigned long address)
++/*
++ * Only a dummy for insn_get_seg_base() - Early boot-code is 64bit only and
++ * doesn't use segments.
++ */
++static unsigned long insn_get_seg_base(struct pt_regs *regs, int seg_reg_idx)
 +{
-+	/* Check whether the fault was on the GHCB page */
-+	return ((address & PAGE_MASK) == (unsigned long)&boot_ghcb_page);
- }
++	return 0UL;
++}
++
+ static inline u64 sev_es_rd_ghcb_msr(void)
+ {
+ 	unsigned long low, high;
+@@ -151,6 +180,9 @@ void do_boot_stage2_vc(struct pt_regs *regs, unsigned long exit_code)
+ 		goto finish;
  
- void do_boot_stage2_vc(struct pt_regs *regs, unsigned long exit_code)
+ 	switch (exit_code) {
++	case SVM_EXIT_IOIO:
++		result = vc_handle_ioio(boot_ghcb, &ctxt);
++		break;
+ 	default:
+ 		result = ES_UNSUPPORTED;
+ 		break;
+diff --git a/arch/x86/kernel/sev-es-shared.c b/arch/x86/kernel/sev-es-shared.c
+index 7ac6e6b0ae57..bae7cf28455b 100644
+--- a/arch/x86/kernel/sev-es-shared.c
++++ b/arch/x86/kernel/sev-es-shared.c
+@@ -218,3 +218,217 @@ static enum es_result vc_insn_string_write(struct es_em_ctxt *ctxt,
+ 
+ 	return ret;
+ }
++
++#define IOIO_TYPE_STR  BIT(2)
++#define IOIO_TYPE_IN   1
++#define IOIO_TYPE_INS  (IOIO_TYPE_IN | IOIO_TYPE_STR)
++#define IOIO_TYPE_OUT  0
++#define IOIO_TYPE_OUTS (IOIO_TYPE_OUT | IOIO_TYPE_STR)
++
++#define IOIO_REP       BIT(3)
++
++#define IOIO_ADDR_64   BIT(9)
++#define IOIO_ADDR_32   BIT(8)
++#define IOIO_ADDR_16   BIT(7)
++
++#define IOIO_DATA_32   BIT(6)
++#define IOIO_DATA_16   BIT(5)
++#define IOIO_DATA_8    BIT(4)
++
++#define IOIO_SEG_ES    (0 << 10)
++#define IOIO_SEG_DS    (3 << 10)
++
++static enum es_result vc_ioio_exitinfo(struct es_em_ctxt *ctxt, u64 *exitinfo)
++{
++	struct insn *insn = &ctxt->insn;
++	*exitinfo = 0;
++
++	switch (insn->opcode.bytes[0]) {
++	/* INS opcodes */
++	case 0x6c:
++	case 0x6d:
++		*exitinfo |= IOIO_TYPE_INS;
++		*exitinfo |= IOIO_SEG_ES;
++		*exitinfo |= (ctxt->regs->dx & 0xffff) << 16;
++		break;
++
++	/* OUTS opcodes */
++	case 0x6e:
++	case 0x6f:
++		*exitinfo |= IOIO_TYPE_OUTS;
++		*exitinfo |= IOIO_SEG_DS;
++		*exitinfo |= (ctxt->regs->dx & 0xffff) << 16;
++		break;
++
++	/* IN immediate opcodes */
++	case 0xe4:
++	case 0xe5:
++		*exitinfo |= IOIO_TYPE_IN;
++		*exitinfo |= (u64)insn->immediate.value << 16;
++		break;
++
++	/* OUT immediate opcodes */
++	case 0xe6:
++	case 0xe7:
++		*exitinfo |= IOIO_TYPE_OUT;
++		*exitinfo |= (u64)insn->immediate.value << 16;
++		break;
++
++	/* IN register opcodes */
++	case 0xec:
++	case 0xed:
++		*exitinfo |= IOIO_TYPE_IN;
++		*exitinfo |= (ctxt->regs->dx & 0xffff) << 16;
++		break;
++
++	/* OUT register opcodes */
++	case 0xee:
++	case 0xef:
++		*exitinfo |= IOIO_TYPE_OUT;
++		*exitinfo |= (ctxt->regs->dx & 0xffff) << 16;
++		break;
++
++	default:
++		return ES_DECODE_FAILED;
++	}
++
++	switch (insn->opcode.bytes[0]) {
++	case 0x6c:
++	case 0x6e:
++	case 0xe4:
++	case 0xe6:
++	case 0xec:
++	case 0xee:
++		/* Single byte opcodes */
++		*exitinfo |= IOIO_DATA_8;
++		break;
++	default:
++		/* Length determined by instruction parsing */
++		*exitinfo |= (insn->opnd_bytes == 2) ? IOIO_DATA_16
++						     : IOIO_DATA_32;
++	}
++	switch (insn->addr_bytes) {
++	case 2:
++		*exitinfo |= IOIO_ADDR_16;
++		break;
++	case 4:
++		*exitinfo |= IOIO_ADDR_32;
++		break;
++	case 8:
++		*exitinfo |= IOIO_ADDR_64;
++		break;
++	}
++
++	if (insn_has_rep_prefix(insn))
++		*exitinfo |= IOIO_REP;
++
++	return ES_OK;
++}
++
++static enum es_result vc_handle_ioio(struct ghcb *ghcb, struct es_em_ctxt *ctxt)
++{
++	struct pt_regs *regs = ctxt->regs;
++	u64 exit_info_1, exit_info_2;
++	enum es_result ret;
++
++	ret = vc_ioio_exitinfo(ctxt, &exit_info_1);
++	if (ret != ES_OK)
++		return ret;
++
++	if (exit_info_1 & IOIO_TYPE_STR) {
++
++		/* (REP) INS/OUTS */
++
++		bool df = ((regs->flags & X86_EFLAGS_DF) == X86_EFLAGS_DF);
++		unsigned int io_bytes, exit_bytes;
++		unsigned int ghcb_count, op_count;
++		unsigned long es_base;
++		u64 sw_scratch;
++
++		/*
++		 * For the string variants with rep prefix the amount of in/out
++		 * operations per #VC exception is limited so that the kernel
++		 * has a chance to take interrupts and re-schedule while the
++		 * instruction is emulated.
++		 */
++		io_bytes   = (exit_info_1 >> 4) & 0x7;
++		ghcb_count = sizeof(ghcb->shared_buffer) / io_bytes;
++
++		op_count    = (exit_info_1 & IOIO_REP) ? regs->cx : 1;
++		exit_info_2 = min(op_count, ghcb_count);
++		exit_bytes  = exit_info_2 * io_bytes;
++
++		es_base = insn_get_seg_base(ctxt->regs, INAT_SEG_REG_ES);
++
++		/* Read bytes of OUTS into the shared buffer */
++		if (!(exit_info_1 & IOIO_TYPE_IN)) {
++			ret = vc_insn_string_read(ctxt,
++					       (void *)(es_base + regs->si),
++					       ghcb->shared_buffer, io_bytes,
++					       exit_info_2, df);
++			if (ret)
++				return ret;
++		}
++
++		/*
++		 * Issue an VMGEXIT to the HV to consume the bytes from the
++		 * shared buffer or to have it write them into the shared buffer
++		 * depending on the instruction: OUTS or INS.
++		 */
++		sw_scratch = __pa(ghcb) + offsetof(struct ghcb, shared_buffer);
++		ghcb_set_sw_scratch(ghcb, sw_scratch);
++		ret = sev_es_ghcb_hv_call(ghcb, ctxt, SVM_EXIT_IOIO,
++					  exit_info_1, exit_info_2);
++		if (ret != ES_OK)
++			return ret;
++
++		/* Read bytes from shared buffer into the guest's destination. */
++		if (exit_info_1 & IOIO_TYPE_IN) {
++			ret = vc_insn_string_write(ctxt,
++						   (void *)(es_base + regs->di),
++						   ghcb->shared_buffer, io_bytes,
++						   exit_info_2, df);
++			if (ret)
++				return ret;
++
++			if (df)
++				regs->di -= exit_bytes;
++			else
++				regs->di += exit_bytes;
++		} else {
++			if (df)
++				regs->si -= exit_bytes;
++			else
++				regs->si += exit_bytes;
++		}
++
++		if (exit_info_1 & IOIO_REP)
++			regs->cx -= exit_info_2;
++
++		ret = regs->cx ? ES_RETRY : ES_OK;
++
++	} else {
++
++		/* IN/OUT into/from rAX */
++
++		int bits = (exit_info_1 & 0x70) >> 1;
++		u64 rax = 0;
++
++		if (!(exit_info_1 & IOIO_TYPE_IN))
++			rax = lower_bits(regs->ax, bits);
++
++		ghcb_set_rax(ghcb, rax);
++
++		ret = sev_es_ghcb_hv_call(ghcb, ctxt, SVM_EXIT_IOIO, exit_info_1, 0);
++		if (ret != ES_OK)
++			return ret;
++
++		if (exit_info_1 & IOIO_TYPE_IN) {
++			if (!ghcb_rax_is_valid(ghcb))
++				return ES_VMM_ERROR;
++			regs->ax = lower_bits(ghcb->save.rax, bits);
++		}
++	}
++
++	return ret;
++}
 -- 
 2.28.0
 
