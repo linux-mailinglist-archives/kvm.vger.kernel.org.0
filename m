@@ -2,31 +2,31 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D4BF525F57E
-	for <lists+kvm@lfdr.de>; Mon,  7 Sep 2020 10:40:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 66D9325F5AE
+	for <lists+kvm@lfdr.de>; Mon,  7 Sep 2020 10:51:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728304AbgIGIkx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 7 Sep 2020 04:40:53 -0400
-Received: from mail-eopbgr80084.outbound.protection.outlook.com ([40.107.8.84]:13796
-        "EHLO EUR04-VI1-obe.outbound.protection.outlook.com"
+        id S1728186AbgIGIvj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 7 Sep 2020 04:51:39 -0400
+Received: from mail-am6eur05on2050.outbound.protection.outlook.com ([40.107.22.50]:31200
+        "EHLO EUR05-AM6-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1728298AbgIGIku (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 7 Sep 2020 04:40:50 -0400
+        id S1727122AbgIGIvj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 7 Sep 2020 04:51:39 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=armh.onmicrosoft.com;
  s=selector2-armh-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=/F46zTBEG7jPqbH0Xek3LbfaBA0a1ttbag9I+ByAH4Y=;
- b=KAXnGL15F6sTuZBaYiNHOz8YA6P8T2xUl1DsUJvLzhmOxY+SwTCQRmiROFUfm1oyz7m14hMLvh2FKPnKzRafWtTvSI1Vsm5wWK78xq3PIMerzf9dqKig0Rhq4Ehu7uXzxnPPXimmlvZZJiIhWuQYKUak1Ppr7aba2cbUHAAMoOk=
-Received: from DB6PR07CA0081.eurprd07.prod.outlook.com (2603:10a6:6:2b::19) by
- VI1PR0801MB1837.eurprd08.prod.outlook.com (2603:10a6:800:5a::8) with
+ bh=yQ7stNXprT8Trh/xBD5j++ObG8jHTUlBy3EPWr4RtUo=;
+ b=1djd4SmD/BKslsEJkZ2R3HiiFO2jvu2Q2S5/LOFxnekczKCROEepFHXBZqpQwdZFtODyx1yAhE5rgZUwgh5m6sApfmHMk3tygIWvEVhIQwvQrtfEMUsIBQRN+LWLo3jOXEQBCygIwjZuTssHV6uOKBQlSPfuV6Vj4lLVuIK2vUQ=
+Received: from AM6P195CA0019.EURP195.PROD.OUTLOOK.COM (2603:10a6:209:81::32)
+ by HE1PR0801MB1980.eurprd08.prod.outlook.com (2603:10a6:3:4f::22) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3348.16; Mon, 7 Sep
- 2020 08:40:42 +0000
-Received: from DB5EUR03FT023.eop-EUR03.prod.protection.outlook.com
- (2603:10a6:6:2b:cafe::fb) by DB6PR07CA0081.outlook.office365.com
- (2603:10a6:6:2b::19) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3370.11 via Frontend
- Transport; Mon, 7 Sep 2020 08:40:42 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3348.15; Mon, 7 Sep
+ 2020 08:51:34 +0000
+Received: from AM5EUR03FT060.eop-EUR03.prod.protection.outlook.com
+ (2603:10a6:209:81:cafe::29) by AM6P195CA0019.outlook.office365.com
+ (2603:10a6:209:81::32) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3348.16 via Frontend
+ Transport; Mon, 7 Sep 2020 08:51:34 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 63.35.35.123)
  smtp.mailfrom=arm.com; vger.kernel.org; dkim=pass (signature was verified)
  header.d=armh.onmicrosoft.com;vger.kernel.org; dmarc=bestguesspass
@@ -35,42 +35,42 @@ Received-SPF: Pass (protection.outlook.com: domain of arm.com designates
  63.35.35.123 as permitted sender) receiver=protection.outlook.com;
  client-ip=63.35.35.123; helo=64aa7808-outbound-1.mta.getcheckrecipient.com;
 Received: from 64aa7808-outbound-1.mta.getcheckrecipient.com (63.35.35.123) by
- DB5EUR03FT023.mail.protection.outlook.com (10.152.20.68) with Microsoft SMTP
+ AM5EUR03FT060.mail.protection.outlook.com (10.152.16.160) with Microsoft SMTP
  Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.3348.16 via Frontend Transport; Mon, 7 Sep 2020 08:40:42 +0000
-Received: ("Tessian outbound 7fc8f57bdedc:v64"); Mon, 07 Sep 2020 08:40:42 +0000
+ 15.20.3348.16 via Frontend Transport; Mon, 7 Sep 2020 08:51:34 +0000
+Received: ("Tessian outbound 34b830c8a0ef:v64"); Mon, 07 Sep 2020 08:51:34 +0000
 X-CR-MTA-TID: 64aa7808
-Received: from a29f4acfd86b.2
-        by 64aa7808-outbound-1.mta.getcheckrecipient.com id E17A232C-7AA1-4B77-A410-2BE4039E7784.1;
-        Mon, 07 Sep 2020 08:40:37 +0000
-Received: from EUR02-HE1-obe.outbound.protection.outlook.com
-    by 64aa7808-outbound-1.mta.getcheckrecipient.com with ESMTPS id a29f4acfd86b.2
+Received: from 8a851988fa69.2
+        by 64aa7808-outbound-1.mta.getcheckrecipient.com id D801B859-B3EF-48A1-BA3A-A87327655408.1;
+        Mon, 07 Sep 2020 08:51:29 +0000
+Received: from EUR04-DB3-obe.outbound.protection.outlook.com
+    by 64aa7808-outbound-1.mta.getcheckrecipient.com with ESMTPS id 8a851988fa69.2
     (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384);
-    Mon, 07 Sep 2020 08:40:37 +0000
+    Mon, 07 Sep 2020 08:51:29 +0000
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=H0eDa7r/gGUI/oad5l1Rqf7EYtATgQ0fsz9NsGOsYL97SHITHfDhxQx4z9xfw/K00BL56G9oLpU3rXoL/FxuSBUb46jTZlKTlfgTGHU7nEOpONSrkOg3WKt7J761mgjFIt6Ga7k9l3aOtQBRwzK47/EvV2NLN6Aujw/aXxi46KpbAaylms/Lm8RySYfixgTmmtE7tvzSF2wMjGarS0drr3h7/hGxlKYEC8cHpx6lX4xtB9amm3rJu/5nydkCNtt+eAoroKC3x+8/NOkEBg4rwpaRWiUQQ4pCGTakGDrEWdrtsE9SoT40zlASFuvlw6tEYYEt0vXkaympiUQoMkRvpw==
+ b=an2nE3ZXn94e62ZFvjVRcxbVloMJEZu/lAi7idgOi6YuiG8YEl3EwaetyuhW7VHzM2amVdVj+s+Z6HnOrYZfDHWue2B7PDfWWxYiq+kN/BVTviWseYPt3wVR0tzEYd207qZ2+BvzXeHrZiM16ntWnxQXo3HVk2Mwra8pYk+T87jnC3vWe/zzLoePCbq4wy2SBqXvDmSK/suUFlZuMwZOQ7P3h8ciMZFOQ2LTXIjjwLw5myoW1M8b1BSUApwustpCAxxCW3MARn8jskUhLKTCQKvnqMOvqSIK4/+FCZSDlTgAyl50W2hlKbAd06mXtZmL/1rhhrGmJshHDyvmgB0RxA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=/F46zTBEG7jPqbH0Xek3LbfaBA0a1ttbag9I+ByAH4Y=;
- b=FhRUQr0pWAa13HCuvH1VQBkln8edeqFttEH/XEvzZBN5NGjl35xq0n5KvrciRitr7rkWvPUPdyxAu6RmztsOOfJPtLYsaesU0Eb0DbECIhLuHzINcMXZXY21rtWccgBp+COXB4exymSdLBagpArkjd/wWz5WVhPBJSxlyZOV1K03nf11Qceey8T/a1g94VFcl4wwdjRCMaca2dsfRiRsfKRuJpg1rGyc6Nb63hmPbE6wWN0FWP/nqpCs6sj3H56glkyqGUYAtVtu5qFr2Z7UsutcGrUJ3D987ICeVppRCHI/jjWKKRHBC/lhRDgwpTmW8xjBU5Bba7J+ol1MNo20cw==
+ bh=yQ7stNXprT8Trh/xBD5j++ObG8jHTUlBy3EPWr4RtUo=;
+ b=m3Bkz+SxmFnzrF/s+DXW7N8Axx/XbY0uBAHfo36mcsTUp7YpD9TUthzlZdVTqWvWM+wOalK5BTDvXffMTmIscdFI/snpyVtkzFqI/JNART+E5q69+Kh6ms9W4F2aOoJpVQp4PsbcKWLAQAS7v/XliY30gE1OfvW3BdOqpOs2gcHcmOi0vS3PQQidd40bcblCzQTNd23DIJpYvZdTo2DNuj+R4XCpe5Do+OoEBcmKXRG1xg4ABWiG+YvK4N2Tav149PLuUNkh5VDQKkOIJLm2XpbxjzWBLZQXir+5o7sERtL7lW7dhiyv+pdMUoxSFR+RiBYuL2+HYeTEZda4e0LRiw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=arm.com; dmarc=pass action=none header.from=arm.com; dkim=pass
  header.d=arm.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=armh.onmicrosoft.com;
  s=selector2-armh-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=/F46zTBEG7jPqbH0Xek3LbfaBA0a1ttbag9I+ByAH4Y=;
- b=KAXnGL15F6sTuZBaYiNHOz8YA6P8T2xUl1DsUJvLzhmOxY+SwTCQRmiROFUfm1oyz7m14hMLvh2FKPnKzRafWtTvSI1Vsm5wWK78xq3PIMerzf9dqKig0Rhq4Ehu7uXzxnPPXimmlvZZJiIhWuQYKUak1Ppr7aba2cbUHAAMoOk=
+ bh=yQ7stNXprT8Trh/xBD5j++ObG8jHTUlBy3EPWr4RtUo=;
+ b=1djd4SmD/BKslsEJkZ2R3HiiFO2jvu2Q2S5/LOFxnekczKCROEepFHXBZqpQwdZFtODyx1yAhE5rgZUwgh5m6sApfmHMk3tygIWvEVhIQwvQrtfEMUsIBQRN+LWLo3jOXEQBCygIwjZuTssHV6uOKBQlSPfuV6Vj4lLVuIK2vUQ=
 Received: from HE1PR0802MB2555.eurprd08.prod.outlook.com (2603:10a6:3:e0::7)
- by HE1PR0801MB1723.eurprd08.prod.outlook.com (2603:10a6:3:7b::18) with
+ by HE1PR08MB2700.eurprd08.prod.outlook.com (2603:10a6:7:39::20) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3348.15; Mon, 7 Sep
- 2020 08:40:35 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3348.19; Mon, 7 Sep
+ 2020 08:51:24 +0000
 Received: from HE1PR0802MB2555.eurprd08.prod.outlook.com
  ([fe80::74f7:5759:4e9e:6e00]) by HE1PR0802MB2555.eurprd08.prod.outlook.com
  ([fe80::74f7:5759:4e9e:6e00%5]) with mapi id 15.20.3348.019; Mon, 7 Sep 2020
- 08:40:35 +0000
+ 08:51:24 +0000
 From:   Jianyong Wu <Jianyong.Wu@arm.com>
 To:     Marc Zyngier <maz@kernel.org>
 CC:     "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
@@ -93,57 +93,57 @@ CC:     "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
         Justin He <Justin.He@arm.com>, nd <nd@arm.com>
 Subject: RE: [PATCH v14 08/10] ptp: arm64: Enable ptp_kvm for arm64
 Thread-Topic: [PATCH v14 08/10] ptp: arm64: Enable ptp_kvm for arm64
-Thread-Index: AQHWgp4Q48WtGxJp4kuFSJTL6o01LqlZ4qMAgAL3/tA=
-Date:   Mon, 7 Sep 2020 08:40:34 +0000
-Message-ID: <HE1PR0802MB2555CC56351616836A95FB19F4280@HE1PR0802MB2555.eurprd08.prod.outlook.com>
+Thread-Index: AQHWgp4Q48WtGxJp4kuFSJTL6o01LqlZ63wAgAL0nPA=
+Date:   Mon, 7 Sep 2020 08:51:23 +0000
+Message-ID: <HE1PR0802MB2555BAE6E8A0EC054258EDC6F4280@HE1PR0802MB2555.eurprd08.prod.outlook.com>
 References: <20200904092744.167655-1-jianyong.wu@arm.com>
-        <20200904092744.167655-9-jianyong.wu@arm.com> <874kocmqqx.wl-maz@kernel.org>
-In-Reply-To: <874kocmqqx.wl-maz@kernel.org>
+        <20200904092744.167655-9-jianyong.wu@arm.com> <871rjgmpa5.wl-maz@kernel.org>
+In-Reply-To: <871rjgmpa5.wl-maz@kernel.org>
 Accept-Language: en-US
 Content-Language: en-US
 X-MS-Has-Attach: 
 X-MS-TNEF-Correlator: 
-x-ts-tracking-id: 05439A53E400A545A8EE379138E1C161.0
+x-ts-tracking-id: A510A2A5DD1BA649A57E134BFC576325.0
 x-checkrecipientchecked: true
 Authentication-Results-Original: kernel.org; dkim=none (message not signed)
  header.d=none;kernel.org; dmarc=none action=none header.from=arm.com;
 x-originating-ip: [203.126.0.111]
 x-ms-publictraffictype: Email
 X-MS-Office365-Filtering-HT: Tenant
-X-MS-Office365-Filtering-Correlation-Id: 9c5f064b-0012-4336-7d28-08d85309b4d3
-x-ms-traffictypediagnostic: HE1PR0801MB1723:|VI1PR0801MB1837:
+X-MS-Office365-Filtering-Correlation-Id: 7b152d41-dc90-4dee-4711-08d8530b395a
+x-ms-traffictypediagnostic: HE1PR08MB2700:|HE1PR0801MB1980:
 x-ms-exchange-transport-forked: True
-X-Microsoft-Antispam-PRVS: <VI1PR0801MB1837308D676A36324B43F5B6F4280@VI1PR0801MB1837.eurprd08.prod.outlook.com>
+X-Microsoft-Antispam-PRVS: <HE1PR0801MB19801D5F33AF26664D2A165CF4280@HE1PR0801MB1980.eurprd08.prod.outlook.com>
 x-checkrecipientrouted: true
 nodisclaimer: true
-x-ms-oob-tlc-oobclassifiers: OLM:4714;OLM:4714;
+x-ms-oob-tlc-oobclassifiers: OLM:10000;OLM:10000;
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam-Untrusted: BCL:0;
-X-Microsoft-Antispam-Message-Info-Original: 8o2ttfJ7g0aB7CFSbNEUOGOB3im5cJZHBfBad4KzMIeHHv7kWO8S6I2LSsxty+HC3cVjjV62ZZWTpaq6vFhyaNXL8zlYgB7QyxAVvDKa9K7lj6f2ECWGGjy+DGacfHfr8V4DiJW1aupVlCgsZN8Vm19PvJw9HDfmOQSJRjCbKjwN/ZKYJ90AywE/OM+J/yM72xT9Gk2s1nvGYaujqWLhURneUcC24RHDrVxsw+MVX3LX+xjlrlJiUC3OQaZmriMYtyskXJMcpzun1S1rkI/jniT0ZbqSXk2O8XJiLqUuskrkSVhCD+eUP3Iq+Ax9WRk4n+yQf0Cy1xNJBNqpw+lrLg==
-X-Forefront-Antispam-Report-Untrusted: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:HE1PR0802MB2555.eurprd08.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(396003)(136003)(366004)(376002)(346002)(39860400002)(53546011)(66476007)(26005)(4326008)(64756008)(66556008)(2906002)(66946007)(66446008)(186003)(54906003)(6916009)(76116006)(83380400001)(9686003)(478600001)(55016002)(86362001)(7696005)(6506007)(316002)(71200400001)(8936002)(8676002)(5660300002)(52536014)(33656002)(7416002);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata: lsOWCE7O0tevz3AhdOuy//g2OGwZjvIcNr5xRD5vrzj9FDDozQUmpGJI5FVk0lNdBpWnzye5SJKIGtI6Gc1Sora/nIxDtf3Kakmm3ufdJ3aCYwMPtddUofPKrRptqwWVwVcL8ki+E05v+AqakQdrL64M1fL0vtoaDSvp9VKMvDO/Qubc1iimMmqptdXcvVtX3tp2sZc6n+Bijf79m33pSLsw44oU/Qae9pPUasPWGMXl6e8SS8NZtlQ5rBxpBSmdkFukBHeg0QGAtNeXze4TAeqsK0Qqd4I1orVXoNmLOXfVm3YG4VAqRQjyP5njuQrdesZ+9ceqUsLDbnSnBltQXk383X7xkE9b+z4cszHT+vfz6xMRZzjHJjENHpfSHeNEAzTu+/loCvJOOJch9UXmWNO+s0gxzSxDSL1eXyCnl9Pa4BiZV2X7tJXsslxk006UvJOZaRq68Na1dFWdLUMhbxKwSsuv/9x/BRDYqrvE6BJZzrc4azDW/39cV9p+j25F66RxoSaVw6hKxoJW7rzsWteqF0xe2dW3es/WWP+FxNV51hWw4ed9AZzzkAoLR98i38+3Sjhfj87j2F+Kbt5ykT4dpImNgXvV8jmg+zvgLXSBh5QnFh4x+inICP+S567qbyOkpcVdo/tWu7hzNIxY2w==
+X-Microsoft-Antispam-Message-Info-Original: CoSRw4dX70UCoKUhaz5EmpGoQqk4KnA79NFQto9YD/SAb5VCv9rByrSXH7lCydKIq9COgNyHKuTAxQUFYIl7SfpUG54TASTUj4pssmcFp+aiiwQvmPlEf6TAJBa83rtEBiaAp8Eo/r9MgIb+xZWU/CpeO7SRELUkARUYT5mJhiif1OrRcgunW4LpfuYD8syy+A/SBOFykPdnETNSsRc2WMjwoMbgE7Tc1Bki8Zep32Kt+WoK3z+GAQVMd6jzw9cGHEvWebIn0gy1YYfFLJq0nUX0cXqxVo1gl0gZASpIuiUPoCwAdDesKKGWQMQsGvyGKsOvP2NhhyLw06P7pngfJg==
+X-Forefront-Antispam-Report-Untrusted: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:HE1PR0802MB2555.eurprd08.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(39860400002)(396003)(346002)(136003)(376002)(316002)(54906003)(9686003)(8676002)(2906002)(5660300002)(53546011)(52536014)(7696005)(186003)(71200400001)(26005)(6916009)(55016002)(86362001)(83380400001)(478600001)(6506007)(66446008)(66556008)(66476007)(7416002)(8936002)(66946007)(64756008)(76116006)(33656002)(4326008);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata: JSSa5tEGjvIxzO393PMtC5jTSS318irIguqwrdFjmNtqAC7BDaC2P09O7JAZGcO/JCQovhvpj7S9Pinake8s5cMW4S7hBEmtWMCBMDLI1oUIpgyRPA0tw76Ebw7wpySZNs5VjPhvqV46v0TlejlXQ2Kq+I4gde+UsB1Q5x+1YoydOzPeLStGRv6ATyhiA92EglBzcAvMdmNwmbcMwUI9G7wSYXU0tWYj1sipu5iq+9ELhLMVgmMdV2e0xQ0+XrzGl2R4I7Eh56WkdG7uxrce/14f+wIDB2wwnvtiBFnbDy404grQ9PwCdNpY2CbgmrTFpsLbzXeJFgj/hSERLXeeRuV56mpcdDr/O52er6pFFK3be0OEADsedr/tYApEc6NO56khZkrlNiyYYi0dt2M198SdD5GsRE4QfxEaL7OmcitCuBMPXRGi8UACCzqjHJtLbvTs7LIWr2Wq1xeq7KFKnEbR4QCSbps1Ip51tqUjSZUZJnxDmkzZeSZr8hvAZOWV8Abkvy+4qMTlNLNBdibraly42tqEATbepVTItrE0BZfdKwYxyL3X3l7POmnK15CTkqnKUJxXZJ/yIV0Dq2F9WMl2M844/JZLx7TIGd2EIY9iMQBGQcgUBe97pPBXmIsG85YFSJ+d4ntdgZO4z0kPng==
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: HE1PR0801MB1723
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: HE1PR08MB2700
 Original-Authentication-Results: kernel.org; dkim=none (message not signed)
  header.d=none;kernel.org; dmarc=none action=none header.from=arm.com;
 X-EOPAttributedMessage: 0
-X-MS-Exchange-Transport-CrossTenantHeadersStripped: DB5EUR03FT023.eop-EUR03.prod.protection.outlook.com
-X-MS-Office365-Filtering-Correlation-Id-Prvs: 9df72dc2-10a0-4b53-b5fb-08d85309b054
+X-MS-Exchange-Transport-CrossTenantHeadersStripped: AM5EUR03FT060.eop-EUR03.prod.protection.outlook.com
+X-MS-Office365-Filtering-Correlation-Id-Prvs: cc190cae-e3bb-4342-8c49-08d8530b3343
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: I7jMWxC0F//NQLf+B0rxPl9ZZkSwXyAhAjoYWxi8rdFwQUc3vpUFAFoBLvTyioiTkO7Edww5D12tvu7+EmESqRZUI+K+n1XQZX2bXUF2iY2pfKDqwauGhIfeWf+dUMO+C3CoeY4Ot0JeiUhUrZSG2YIgVu7zQFwv7GwXijsUwOJNRMb0O5F13r2I5XGecjbwiwy3A60pr059MqDt8ORvE03gJuIOW+s1X+9mouqbh/T1iH3u2aSEZ1X09siQve/OnJe4WLy29fP90S+gU4S+r6uQCQtPqDhdFgh6W+NymMLc3VbsGXsVgDSscpXGrLPBeW9xd0/JopkED+z3/wL96BsMgGMgzq9+E/YcPnBPRmErvRY4MOk8cGE1d+TdOm5o0ZLorVwI/ZKxPrf07XmZwA==
-X-Forefront-Antispam-Report: CIP:63.35.35.123;CTRY:IE;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:64aa7808-outbound-1.mta.getcheckrecipient.com;PTR:ec2-63-35-35-123.eu-west-1.compute.amazonaws.com;CAT:NONE;SFS:(4636009)(39860400002)(396003)(136003)(346002)(376002)(46966005)(82740400003)(186003)(52536014)(336012)(86362001)(2906002)(478600001)(55016002)(70206006)(9686003)(70586007)(54906003)(316002)(6862004)(5660300002)(83380400001)(33656002)(81166007)(47076004)(8936002)(356005)(82310400003)(8676002)(7696005)(4326008)(450100002)(26005)(6506007)(53546011);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: 9SzhGlb14vz0DNV4Jj7pJ+/6JnYoAZdF24d9yuGk7tjm5pRe5T18hbDooAUVADO7x9gFZpEr5ybhD2RDjYiTS8X+uHTt0y3mTmrPfCfO2iJf+2yIBNyeT3Y6mAMQ7daWGMLlDjtjCeRbEJqixkXD1yaZ8KXLV76FvNQwPAFEK+D3PY34FLzSuSeplSJ/iKSN0FYJAXe9kmtO68a6UGmV31h9Q9uX3ImEWejwyRgwj99BA3qvzxqwn11ARkFl1nwMpJAcWFB/SwbWZRLtNyR8c5P2YqwSlwbypH/oEe229/Vd2kEw92+9NLWG1pN8tE1qa3aWgyRwMly8KxS4k+bbx1TQjvEhexwOmhPqP4ZXxKuc8k6EKEXt3ZT17ajj4v9W7eIb+D0J+VuIhehLwy9ivg==
+X-Forefront-Antispam-Report: CIP:63.35.35.123;CTRY:IE;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:64aa7808-outbound-1.mta.getcheckrecipient.com;PTR:ec2-63-35-35-123.eu-west-1.compute.amazonaws.com;CAT:NONE;SFS:(4636009)(136003)(39860400002)(376002)(346002)(396003)(46966005)(7696005)(450100002)(478600001)(5660300002)(70586007)(70206006)(52536014)(82740400003)(47076004)(6862004)(55016002)(83380400001)(81166007)(54906003)(82310400003)(9686003)(356005)(33656002)(4326008)(26005)(8676002)(186003)(86362001)(53546011)(6506007)(316002)(336012)(2906002)(36906005)(8936002);DIR:OUT;SFP:1101;
 X-OriginatorOrg: arm.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Sep 2020 08:40:42.6375
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Sep 2020 08:51:34.3479
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 9c5f064b-0012-4336-7d28-08d85309b4d3
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7b152d41-dc90-4dee-4711-08d8530b395a
 X-MS-Exchange-CrossTenant-Id: f34e5979-57d9-4aaa-ad4d-b122a662184d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=f34e5979-57d9-4aaa-ad4d-b122a662184d;Ip=[63.35.35.123];Helo=[64aa7808-outbound-1.mta.getcheckrecipient.com]
-X-MS-Exchange-CrossTenant-AuthSource: DB5EUR03FT023.eop-EUR03.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthSource: AM5EUR03FT060.eop-EUR03.prod.protection.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR0801MB1837
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: HE1PR0801MB1980
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
@@ -153,7 +153,7 @@ Hi Marc,
 
 > -----Original Message-----
 > From: Marc Zyngier <maz@kernel.org>
-> Sent: Saturday, September 5, 2020 7:02 PM
+> Sent: Saturday, September 5, 2020 7:33 PM
 > To: Jianyong Wu <Jianyong.Wu@arm.com>
 > Cc: netdev@vger.kernel.org; yangbo.lu@nxp.com; john.stultz@linaro.org;
 > tglx@linutronix.de; pbonzini@redhat.com; sean.j.christopherson@intel.com;
@@ -293,7 +293,9 @@ s
 > ++++++++++++++++++++++++++++
 > >  3 files changed, 78 insertions(+), 1 deletion(-)  create mode 100644
 > > drivers/ptp/ptp_kvm_arm64.c
-> >
+>=20
+> And I missed that one earlier:
+>=20
 > > diff --git a/drivers/clocksource/arm_arch_timer.c
 > > b/drivers/clocksource/arm_arch_timer.c
 > > index d55acffb0b90..aaf286e90092 100644
@@ -305,6 +307,11 @@ s
 > > +
 > > +#if IS_ENABLED(CONFIG_PTP_1588_CLOCK_KVM)
 > > +#include <linux/arm-smccc.h>
+>=20
+> No conditional includes, please.
+>=20
+Ok.
+
 > > +int kvm_arch_ptp_get_crosststamp(unsigned long *cycle, struct
 > timespec64 *ts,
 > > +			      struct clocksource **cs)
@@ -317,126 +324,29 @@ s
 > 	arm_smccc_1_1_invoke(ARM_SMCCC_VENDOR_HYP_KVM_PTP_FU
 > NC_ID,
 > > +			     ARM_PTP_VIRT_COUNTER, &hvc_res);
-> > +	if ((long long)(hvc_res.a0) < 0)
-> > +		return -EOPNOTSUPP;
-> > +
-> > +	ktime =3D (long long)hvc_res.a0;
-> > +	*ts =3D ktime_to_timespec64(ktime);
-> > +	*cycle =3D (long long)hvc_res.a1;
-> > +	*cs =3D &clocksource_counter;
-> > +
-> > +	return 0;
-> > +}
-> > +EXPORT_SYMBOL_GPL(kvm_arch_ptp_get_crosststamp);
-> > +#endif
-> > diff --git a/drivers/ptp/Kconfig b/drivers/ptp/Kconfig index
-> > 942f72d8151d..127e96f14f89 100644
-> > --- a/drivers/ptp/Kconfig
-> > +++ b/drivers/ptp/Kconfig
-> > @@ -106,7 +106,7 @@ config PTP_1588_CLOCK_PCH  config
-> > PTP_1588_CLOCK_KVM
-> >  	tristate "KVM virtual PTP clock"
-> >  	depends on PTP_1588_CLOCK
-> > -	depends on KVM_GUEST && X86
-> > +	depends on KVM_GUEST && X86 || ARM64 && ARM_ARCH_TIMER
-> &&
-> > +ARM_PSCI_FW
-> >  	default y
-> >  	help
-> >  	  This driver adds support for using kvm infrastructure as a PTP
-> > diff --git a/drivers/ptp/ptp_kvm_arm64.c b/drivers/ptp/ptp_kvm_arm64.c
-> > new file mode 100644 index 000000000000..961abed93dfd
-> > --- /dev/null
-> > +++ b/drivers/ptp/ptp_kvm_arm64.c
-> > @@ -0,0 +1,53 @@
-> > +// SPDX-License-Identifier: GPL-2.0-only
-> > +/*
-> > + *  Virtual PTP 1588 clock for use with KVM guests
-> > + *  Copyright (C) 2019 ARM Ltd.
-> > + *  All Rights Reserved
-> > + */
-> > +
-> > +#include <linux/kernel.h>
-> > +#include <linux/err.h>
-> > +#include <asm/hypervisor.h>
-> > +#include <linux/module.h>
-> > +#include <linux/psci.h>
-> > +#include <linux/arm-smccc.h>
-> > +#include <linux/timecounter.h>
-> > +#include <linux/sched/clock.h>
-> > +#include <asm/arch_timer.h>
-> > +
-> > +int kvm_arch_ptp_init(void)
-> > +{
-> > +	struct arm_smccc_res hvc_res;
-> > +
-> > +
-> 	arm_smccc_1_1_invoke(ARM_SMCCC_VENDOR_HYP_KVM_FEATUR
-> ES_FUNC_ID,
-> > +			     &hvc_res);
-> > +	if (!(hvc_res.a0 | BIT(ARM_SMCCC_KVM_FUNC_KVM_PTP)))
-> > +		return -EOPNOTSUPP;
-> > +
-> > +	return 0;
 >=20
-> What happens if the
-> ARM_SMCCC_VENDOR_HYP_KVM_FEATURES_FUNC_ID function isn't
-> implemented (on an old kernel or a non-KVM hypervisor)? The expected
-> behaviour is that a0 will contain SMCCC_RET_NOT_SUPPORTED, which is -1.
-> The result is that this function always returns "supported". Not an accep=
-table
-> behaviour.
+> You don't need to assume anything. This driver already provides you with =
+the
+> information you need to tell the hypervisor which counter to
+> use:
 >=20
-Oh!  it's really a stupid mistake, should be "&" not "|".
-
-> > +}
-> > +
-> > +int kvm_arch_ptp_get_clock_generic(struct timespec64 *ts,
-> > +				   struct arm_smccc_res *hvc_res)
->=20
-> Why isn't this static?
->
- yeah, should be static.
-
-> > +{
-> > +	ktime_t ktime;
-> > +
-> > +
+> 	if (arch_timer_uses_ppi =3D=3D ARCH_TIMER_VIRT_PPI)
+> 		ptp_counter =3D ARM_PTP_VIRT_COUNTER;
+> 	else
+> 		ptp_counter =3D ARM_PTP_PHYS_COUNTER;
 > 	arm_smccc_1_1_invoke(ARM_SMCCC_VENDOR_HYP_KVM_PTP_FU
 > NC_ID,
-> > +			     hvc_res);
-> > +	if ((long long)(hvc_res->a0) < 0)
-> > +		return -EOPNOTSUPP;
+> 			     ptp_counter, &hvc_res);
 >=20
-> Really? What if the cycle counter is a full 64 bit value, as it is
-> *mandated* on ARMv8.6? It means that the counter is now invalid for half
-> the lifetime of the system. Not acceptable either.
+> At least, this is vaguely future proof.
 >=20
-> > +
-> > +	ktime =3D (long long)hvc_res->a0;
-> > +	*ts =3D ktime_to_timespec64(ktime);
-> > +
-> > +	return 0;
-> > +}
-> > +
-> > +int kvm_arch_ptp_get_clock(struct timespec64 *ts) {
-> > +	struct arm_smccc_res hvc_res;
-> > +
-> > +	kvm_arch_ptp_get_clock_generic(ts, &hvc_res);
-> > +
-> > +	return 0;
-> > +}
-> > --
-> > 2.17.1
-> >
-> >
->=20
-> It is now obvious that the API between kernel and hypervisor is pretty
-> busted, and it goes beyond the 32bit support. I wish you paid more attent=
-ion
-> to this kind of detail.
+> The hypervisor will still have to discriminate between a call between a c=
+all
+> from vEL1 or vEL2 to decide whether to subtract the offset from the count=
+er
+> value, but that's out of scope for now.
 
-Yeah,  I will.
+Very kind of you!
 
 Thanks
 Jianyong=20
