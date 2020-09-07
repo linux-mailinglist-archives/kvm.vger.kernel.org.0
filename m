@@ -2,274 +2,263 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DED3A26033A
-	for <lists+kvm@lfdr.de>; Mon,  7 Sep 2020 19:46:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0C22826031D
+	for <lists+kvm@lfdr.de>; Mon,  7 Sep 2020 19:44:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730750AbgIGRqM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 7 Sep 2020 13:46:12 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:19478 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1729394AbgIGNO0 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 7 Sep 2020 09:14:26 -0400
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 087D4UNn167875;
-        Mon, 7 Sep 2020 09:14:24 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : mime-version : content-transfer-encoding; s=pp1;
- bh=qAM6XSxtNjfqGEthn7zWqzDo3LY9WO8P+0xYllpgUh8=;
- b=PcYpCD7mhcMlTayQdJaSb50I2Gi7UCBmOD+4dFPd1fpS0n/f8fV7FtjeehFK55+/CNjv
- jSv/XoP8bMGGpEXEEleROj5FW4hlFV3+BVq3A3fIQQkRyQyLedbo4GPaxnlT2P4f1Hzy
- ZWdaly6emoVKSNWRn7dUO8soqfXC5KcmRFGndQ4qm/tfh97labf683d1qMjj4ZKTUNrc
- w16K8p1uwQi4fcqXKJYElv7SmX8WE3suGw9nJRddRYpusgdQuVGSIi3VelW1SH+J/u6j
- eljFVWmiAD2Rg5ecsBLzr9NT6kgVkPqHH1o2Hpy0T7L9mvjQSKvppbFK/3qEnA/zfupD 2Q== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 33dkc4bq76-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 07 Sep 2020 09:14:24 -0400
-Received: from m0098414.ppops.net (m0098414.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 087D53TK170637;
-        Mon, 7 Sep 2020 09:14:24 -0400
-Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 33dkc4bq6s-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 07 Sep 2020 09:14:24 -0400
-Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
-        by ppma04ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 087DCSLF029546;
-        Mon, 7 Sep 2020 13:14:22 GMT
-Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
-        by ppma04ams.nl.ibm.com with ESMTP id 33c2a8adyy-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 07 Sep 2020 13:14:22 +0000
-Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
-        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 087DClrJ29295024
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 7 Sep 2020 13:12:47 GMT
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 6F167A4040;
-        Mon,  7 Sep 2020 13:14:19 +0000 (GMT)
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id C4BEDA405B;
-        Mon,  7 Sep 2020 13:14:18 +0000 (GMT)
-Received: from linux01.pok.stglabs.ibm.com (unknown [9.114.17.81])
-        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Mon,  7 Sep 2020 13:14:18 +0000 (GMT)
-From:   Janosch Frank <frankja@linux.ibm.com>
-To:     kvm@vger.kernel.org
-Cc:     borntraeger@de.ibm.com, imbrenda@linux.ibm.com, david@redhat.com,
-        linux-s390@vger.kernel.org
-Subject: [PATCH] KVM: s390: Introduce storage key removal facility
-Date:   Mon,  7 Sep 2020 09:14:10 -0400
-Message-Id: <20200907131410.11474-1-frankja@linux.ibm.com>
-X-Mailer: git-send-email 2.25.1
+        id S1731444AbgIGRoP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 7 Sep 2020 13:44:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60160 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729439AbgIGNRq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 7 Sep 2020 09:17:46 -0400
+Received: from theia.8bytes.org (8bytes.org [IPv6:2a01:238:4383:600:38bc:a715:4b6d:a889])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B59ABC061574;
+        Mon,  7 Sep 2020 06:16:44 -0700 (PDT)
+Received: from cap.home.8bytes.org (p549add56.dip0.t-ipconnect.de [84.154.221.86])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
+        (No client certificate requested)
+        by theia.8bytes.org (Postfix) with ESMTPSA id 12A591CA;
+        Mon,  7 Sep 2020 15:16:39 +0200 (CEST)
+From:   Joerg Roedel <joro@8bytes.org>
+To:     x86@kernel.org
+Cc:     Joerg Roedel <joro@8bytes.org>, Joerg Roedel <jroedel@suse.de>,
+        hpa@zytor.com, Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Jiri Slaby <jslaby@suse.cz>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Juergen Gross <jgross@suse.com>,
+        Kees Cook <keescook@chromium.org>,
+        David Rientjes <rientjes@google.com>,
+        Cfir Cohen <cfir@google.com>,
+        Erdem Aktas <erdemaktas@google.com>,
+        Masami Hiramatsu <mhiramat@kernel.org>,
+        Mike Stunes <mstunes@vmware.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Martin Radev <martin.b.radev@gmail.com>,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org
+Subject: [PATCH v7 00/72] x86: SEV-ES Guest Support
+Date:   Mon,  7 Sep 2020 15:15:01 +0200
+Message-Id: <20200907131613.12703-1-joro@8bytes.org>
+X-Mailer: git-send-email 2.28.0
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
- definitions=2020-09-07_07:2020-09-07,2020-09-07 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 mlxscore=0
- adultscore=0 suspectscore=1 malwarescore=0 priorityscore=1501
- impostorscore=0 lowpriorityscore=0 mlxlogscore=999 bulkscore=0 spamscore=0
- phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2006250000 definitions=main-2009070128
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The storage key removal facility makes skey related instructions
-result in special operation program exceptions. It is based on the
-Keyless Subset Facility.
+From: Joerg Roedel <jroedel@suse.de>
 
-The usual suspects are iske, sske, rrbe and their respective
-variants. lpsw(e), pfmf and tprot can also specify a key and essa with
-an ORC of 4 will consult the change bit, hence they all result in
-exceptions.
+Hi,
 
-Unfortunately storage keys were so essential to the architecture, that
-there is no facility bit that we could deactivate. That's why the
-removal facility (bit 169) was introduced which makes it necessary,
-that, if active, the skey related facilities 10, 14, 66, 145 and 149
-are zero. Managing this requirement and migratability has to be done
-in userspace, as KVM does not check the facilities it receives to be
-able to easily implement userspace emulation.
+here is a new version of the SEV-ES Guest Support patches for x86. The
+previous versions can be found as a linked list starting here:
 
-Removing storage key support allows us to circumvent complicated
-emulation code and makes huge page support tremendously easier.
+	https://lore.kernel.org/lkml/20200824085511.7553-1-joro@8bytes.org/
 
-Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
----
- arch/s390/kvm/intercept.c | 40 ++++++++++++++++++++++++++++++++++++++-
- arch/s390/kvm/kvm-s390.c  |  5 +++++
- arch/s390/kvm/priv.c      | 26 ++++++++++++++++++++++---
- 3 files changed, 67 insertions(+), 4 deletions(-)
+I updated the patch-set based on ther review comments I got and the
+discussions around it.
 
-diff --git a/arch/s390/kvm/intercept.c b/arch/s390/kvm/intercept.c
-index e7a7c499a73f..99dd042d7dea 100644
---- a/arch/s390/kvm/intercept.c
-+++ b/arch/s390/kvm/intercept.c
-@@ -33,6 +33,7 @@ u8 kvm_s390_get_ilen(struct kvm_vcpu *vcpu)
- 	case ICPT_OPEREXC:
- 	case ICPT_PARTEXEC:
- 	case ICPT_IOINST:
-+	case ICPT_KSS:
- 		/* instruction only stored for these icptcodes */
- 		ilen = insn_length(vcpu->arch.sie_block->ipa >> 8);
- 		/* Use the length of the EXECUTE instruction if necessary */
-@@ -565,7 +566,44 @@ int kvm_handle_sie_intercept(struct kvm_vcpu *vcpu)
- 		rc = handle_partial_execution(vcpu);
- 		break;
- 	case ICPT_KSS:
--		rc = kvm_s390_skey_check_enable(vcpu);
-+		if (likely(!test_kvm_facility(vcpu->kvm, 169))) {
-+			rc = kvm_s390_skey_check_enable(vcpu);
-+		} else {
-+			/*
-+			 * Storage key removal facility emulation.
-+			 *
-+			 * KSS is the same priority as instruction
-+			 * interception. Hence we need handling here
-+			 * and in the instruction emulation code.
-+			 *
-+			 * lpsw(e) needs to store the problematic psw
-+			 * as the program old psw. Calling the
-+			 * handlers directly does that without falsely
-+			 * increasing stat counters.
-+			 */
-+			switch (vcpu->arch.sie_block->ipa) {
-+			case 0xb2b2:
-+				kvm_s390_forward_psw(vcpu, kvm_s390_get_ilen(vcpu));
-+				rc = kvm_s390_handle_b2(vcpu);
-+				break;
-+			case 0x8200:
-+				kvm_s390_forward_psw(vcpu, kvm_s390_get_ilen(vcpu));
-+				rc = kvm_s390_handle_lpsw(vcpu);
-+				break;
-+			case 0:
-+				/* Interception caused by exception new PSW key */
-+				rc = kvm_s390_inject_program_int(vcpu, PGM_SPECIFICATION);
-+				break;
-+			default:
-+				/*
-+				 * KSS is nullifying (no psw forward),
-+				 * SKRF issues suppressing SPECIAL
-+				 * OPS, so we need to forward by hand.
-+				 */
-+				kvm_s390_forward_psw(vcpu, kvm_s390_get_ilen(vcpu));
-+				rc = kvm_s390_inject_program_int(vcpu, PGM_SPECIAL_OPERATION);
-+			}
-+		}
- 		break;
- 	case ICPT_MCHKREQ:
- 	case ICPT_INT_ENABLE:
-diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
-index 6b74b92c1a58..85647f19311d 100644
---- a/arch/s390/kvm/kvm-s390.c
-+++ b/arch/s390/kvm/kvm-s390.c
-@@ -2692,6 +2692,11 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
- 	/* we emulate STHYI in kvm */
- 	set_kvm_facility(kvm->arch.model.fac_mask, 74);
- 	set_kvm_facility(kvm->arch.model.fac_list, 74);
-+	/* we emulate the storage key removal facility only with kss */
-+	if (sclp.has_kss) {
-+		set_kvm_facility(kvm->arch.model.fac_mask, 169);
-+		set_kvm_facility(kvm->arch.model.fac_list, 169);
-+	}
- 	if (MACHINE_HAS_TLB_GUEST) {
- 		set_kvm_facility(kvm->arch.model.fac_mask, 147);
- 		set_kvm_facility(kvm->arch.model.fac_list, 147);
-diff --git a/arch/s390/kvm/priv.c b/arch/s390/kvm/priv.c
-index cd74989ce0b0..d1923fbec341 100644
---- a/arch/s390/kvm/priv.c
-+++ b/arch/s390/kvm/priv.c
-@@ -207,6 +207,13 @@ int kvm_s390_skey_check_enable(struct kvm_vcpu *vcpu)
- 	int rc;
- 
- 	trace_kvm_s390_skey_related_inst(vcpu);
-+
-+	if (test_kvm_facility(vcpu->kvm, 169)) {
-+		rc = kvm_s390_inject_program_int(vcpu, PGM_SPECIAL_OPERATION);
-+		if (!rc)
-+			return -EOPNOTSUPP;
-+	}
-+
- 	/* Already enabled? */
- 	if (vcpu->arch.skey_enabled)
- 		return 0;
-@@ -257,7 +264,7 @@ static int handle_iske(struct kvm_vcpu *vcpu)
- 
- 	rc = try_handle_skey(vcpu);
- 	if (rc)
--		return rc != -EAGAIN ? rc : 0;
-+		return rc != (-EAGAIN || -EOPNOTSUPP) ? rc : 0;
- 
- 	kvm_s390_get_regs_rre(vcpu, &reg1, &reg2);
- 
-@@ -304,7 +311,7 @@ static int handle_rrbe(struct kvm_vcpu *vcpu)
- 
- 	rc = try_handle_skey(vcpu);
- 	if (rc)
--		return rc != -EAGAIN ? rc : 0;
-+		return rc != (-EAGAIN || -EOPNOTSUPP) ? rc : 0;
- 
- 	kvm_s390_get_regs_rre(vcpu, &reg1, &reg2);
- 
-@@ -355,7 +362,7 @@ static int handle_sske(struct kvm_vcpu *vcpu)
- 
- 	rc = try_handle_skey(vcpu);
- 	if (rc)
--		return rc != -EAGAIN ? rc : 0;
-+		return rc != (-EAGAIN || -EOPNOTSUPP) ? rc : 0;
- 
- 	if (!test_kvm_facility(vcpu->kvm, 8))
- 		m3 &= ~SSKE_MB;
-@@ -745,6 +752,8 @@ int kvm_s390_handle_lpsw(struct kvm_vcpu *vcpu)
- 		return kvm_s390_inject_prog_cond(vcpu, rc);
- 	if (!(new_psw.mask & PSW32_MASK_BASE))
- 		return kvm_s390_inject_program_int(vcpu, PGM_SPECIFICATION);
-+	if (new_psw.mask & PSW32_MASK_KEY && test_kvm_facility(vcpu->kvm, 169))
-+		return kvm_s390_inject_program_int(vcpu, PGM_SPECIAL_OPERATION);
- 	gpsw->mask = (new_psw.mask & ~PSW32_MASK_BASE) << 32;
- 	gpsw->mask |= new_psw.addr & PSW32_ADDR_AMODE;
- 	gpsw->addr = new_psw.addr & ~PSW32_ADDR_AMODE;
-@@ -771,6 +780,8 @@ static int handle_lpswe(struct kvm_vcpu *vcpu)
- 	rc = read_guest(vcpu, addr, ar, &new_psw, sizeof(new_psw));
- 	if (rc)
- 		return kvm_s390_inject_prog_cond(vcpu, rc);
-+	if ((new_psw.mask & PSW_MASK_KEY) && test_kvm_facility(vcpu->kvm, 169))
-+		return kvm_s390_inject_program_int(vcpu, PGM_SPECIAL_OPERATION);
- 	vcpu->arch.sie_block->gpsw = new_psw;
- 	if (!is_valid_psw(&vcpu->arch.sie_block->gpsw))
- 		return kvm_s390_inject_program_int(vcpu, PGM_SPECIFICATION);
-@@ -1025,6 +1036,10 @@ static int handle_pfmf(struct kvm_vcpu *vcpu)
- 	if (vcpu->arch.sie_block->gpsw.mask & PSW_MASK_PSTATE)
- 		return kvm_s390_inject_program_int(vcpu, PGM_PRIVILEGED_OP);
- 
-+	if (vcpu->run->s.regs.gprs[reg1] & PFMF_SK &&
-+	    test_kvm_facility(vcpu->kvm, 169))
-+		return kvm_s390_inject_program_int(vcpu, PGM_SPECIAL_OPERATION);
-+
- 	if (vcpu->run->s.regs.gprs[reg1] & PFMF_RESERVED)
- 		return kvm_s390_inject_program_int(vcpu, PGM_SPECIFICATION);
- 
-@@ -1203,6 +1218,8 @@ static int handle_essa(struct kvm_vcpu *vcpu)
- 		return kvm_s390_inject_program_int(vcpu, PGM_PRIVILEGED_OP);
- 	/* Check for invalid operation request code */
- 	orc = (vcpu->arch.sie_block->ipb & 0xf0000000) >> 28;
-+	if (orc == ESSA_SET_POT_VOLATILE && test_kvm_facility(vcpu->kvm, 169))
-+		return kvm_s390_inject_program_int(vcpu, PGM_SPECIAL_OPERATION);
- 	/* ORCs 0-6 are always valid */
- 	if (orc > (test_kvm_facility(vcpu->kvm, 147) ? ESSA_SET_STABLE_NODAT
- 						: ESSA_SET_STABLE_IF_RESIDENT))
-@@ -1451,6 +1468,9 @@ static int handle_tprot(struct kvm_vcpu *vcpu)
- 
- 	kvm_s390_get_base_disp_sse(vcpu, &address1, &address2, &ar, NULL);
- 
-+	if ((address2 & 0xf0) && test_kvm_facility(vcpu->kvm, 169))
-+		return kvm_s390_inject_program_int(vcpu, PGM_SPECIAL_OPERATION);
-+
- 	/* we only handle the Linux memory detection case:
- 	 * access key == 0
- 	 * everything else goes to userspace. */
+Another important change is that the early IDT setup code is now
+completly moved to arch/x86/kernel/head64.c. This makes the whole
+early exception handling setup code more robust for kernels that have
+KASAN and/or Tracing enabled.
+
+A side effect of this change is that secondary CPU now don't use the
+idt_table at early boot, which means that on the secondary CPUs the
+early handler does not use IST or paranoid_entry() anymore. This
+allowed to remove a couple of patches from this series which were only
+needed to setup relevant processor starte early enough for IST
+exceptions. In particular this means that the early FSGSBASE and TSS
+setup is gone now. Also the patch which moved the idt_table to the
+data segement is now removed.
+
+A related change was necessary in the boot path of secondary CPUs,
+because those loaded the runtime IDT before setting up the TSS and the
+getcpu GDT entry. This is now in proper order so that IST exceptions
+will work when the runtime IDT is loaded for the first time. This
+setup is added in patch 67.
+
+The cpu_init() function is untouched so that it still act as the
+intended cpu-state barrier, regardless of what happens before.
+
+The code survived the usual load test of running one x86-selftest loop
+on each core of the guest in parallel with perf (for NMI load). This
+runs for several (4+) hours now without any issues.
+
+Please review.
+
+Thanks,
+
+	Joerg
+
+Borislav Petkov (1):
+  KVM: SVM: Use __packed shorthand
+
+Doug Covelli (1):
+  x86/vmware: Add VMware specific handling for VMMCALL under SEV-ES
+
+Joerg Roedel (50):
+  KVM: SVM: nested: Don't allocate VMCB structures on stack
+  KVM: SVM: Add GHCB Accessor functions
+  x86/traps: Move pf error codes to <asm/trap_pf.h>
+  x86/insn: Make inat-tables.c suitable for pre-decompression code
+  x86/umip: Factor out instruction fetch
+  x86/umip: Factor out instruction decoding
+  x86/insn: Add insn_get_modrm_reg_off()
+  x86/insn: Add insn_has_rep_prefix() helper
+  x86/boot/compressed/64: Disable red-zone usage
+  x86/boot/compressed/64: Add IDT Infrastructure
+  x86/boot/compressed/64: Rename kaslr_64.c to ident_map_64.c
+  x86/boot/compressed/64: Add page-fault handler
+  x86/boot/compressed/64: Always switch to own page-table
+  x86/boot/compressed/64: Don't pre-map memory in KASLR code
+  x86/boot/compressed/64: Change add_identity_map() to take start and
+    end
+  x86/boot/compressed/64: Add stage1 #VC handler
+  x86/boot/compressed/64: Call set_sev_encryption_mask() earlier
+  x86/boot/compressed/64: Check return value of
+    kernel_ident_mapping_init()
+  x86/boot/compressed/64: Add set_page_en/decrypted() helpers
+  x86/boot/compressed/64: Setup GHCB Based VC Exception handler
+  x86/boot/compressed/64: Unmap GHCB page before booting the kernel
+  x86/fpu: Move xgetbv()/xsetbv() into separate header
+  x86/idt: Split idt_data setup out of set_intr_gate()
+  x86/head/64: Install startup GDT
+  x86/head/64: Load GDT after switch to virtual addresses
+  x86/head/64: Load segment registers earlier
+  x86/head/64: Switch to initial stack earlier
+  x86/head/64: Install a CPU bringup IDT
+  x86/idt: Move two function from k/idt.c to i/a/desc.h
+  x86/head/64: Move early exception dispatch to C code
+  x86/sev-es: Add SEV-ES Feature Detection
+  x86/sev-es: Print SEV-ES info into kernel log
+  x86/sev-es: Compile early handler code into kernel image
+  x86/sev-es: Setup early #VC handler
+  x86/sev-es: Setup GHCB based boot #VC handler
+  x86/sev-es: Allocate and Map IST stack for #VC handler
+  x86/sev-es: Adjust #VC IST Stack on entering NMI handler
+  x86/dumpstack/64: Add noinstr version of get_stack_info()
+  x86/entry/64: Add entry code for #VC handler
+  x86/sev-es: Wire up existing #VC exit-code handlers
+  x86/sev-es: Handle instruction fetches from user-space
+  x86/sev-es: Handle MMIO String Instructions
+  x86/sev-es: Handle #AC Events
+  x86/sev-es: Handle #DB Events
+  x86/paravirt: Allow hypervisor specific VMMCALL handling under SEV-ES
+  x86/realmode: Add SEV-ES specific trampoline entry point
+  x86/smpboot: Load TSS and getcpu GDT entry before loading IDT
+  x86/head/64: Don't call verify_cpu() on starting APs
+  x86/sev-es: Support CPU offline/online
+  x86/sev-es: Handle NMI State
+
+Martin Radev (1):
+  x86/sev-es: Check required CPU features for SEV-ES
+
+Tom Lendacky (19):
+  KVM: SVM: Add GHCB definitions
+  x86/cpufeatures: Add SEV-ES CPU feature
+  x86/sev-es: Add support for handling IOIO exceptions
+  x86/sev-es: Add CPUID handling to #VC handler
+  x86/sev-es: Setup per-cpu GHCBs for the runtime handler
+  x86/sev-es: Add Runtime #VC Exception Handler
+  x86/sev-es: Handle MMIO events
+  x86/sev-es: Handle MSR events
+  x86/sev-es: Handle DR7 read/write events
+  x86/sev-es: Handle WBINVD Events
+  x86/sev-es: Handle RDTSC(P) Events
+  x86/sev-es: Handle RDPMC Events
+  x86/sev-es: Handle INVD Events
+  x86/sev-es: Handle MONITOR/MONITORX Events
+  x86/sev-es: Handle MWAIT/MWAITX Events
+  x86/sev-es: Handle VMMCALL Events
+  x86/kvm: Add KVM specific VMMCALL handling under SEV-ES
+  x86/realmode: Setup AP jump table
+  x86/efi: Add GHCB mappings when SEV-ES is active
+
+ arch/x86/Kconfig                           |    1 +
+ arch/x86/boot/compressed/Makefile          |   11 +-
+ arch/x86/boot/compressed/cpuflags.c        |    4 -
+ arch/x86/boot/compressed/head_64.S         |   33 +-
+ arch/x86/boot/compressed/ident_map_64.c    |  349 +++++
+ arch/x86/boot/compressed/idt_64.c          |   54 +
+ arch/x86/boot/compressed/idt_handlers_64.S |   77 ++
+ arch/x86/boot/compressed/kaslr.c           |   36 +-
+ arch/x86/boot/compressed/kaslr_64.c        |  153 ---
+ arch/x86/boot/compressed/misc.c            |    7 +
+ arch/x86/boot/compressed/misc.h            |   50 +-
+ arch/x86/boot/compressed/sev-es.c          |  214 +++
+ arch/x86/entry/entry_64.S                  |   80 ++
+ arch/x86/include/asm/cpu_entry_area.h      |   33 +-
+ arch/x86/include/asm/cpufeatures.h         |    1 +
+ arch/x86/include/asm/desc.h                |   27 +
+ arch/x86/include/asm/desc_defs.h           |   10 +
+ arch/x86/include/asm/fpu/internal.h        |   30 +-
+ arch/x86/include/asm/fpu/xcr.h             |   34 +
+ arch/x86/include/asm/idtentry.h            |   50 +
+ arch/x86/include/asm/insn-eval.h           |    6 +
+ arch/x86/include/asm/mem_encrypt.h         |    5 +
+ arch/x86/include/asm/msr-index.h           |    3 +
+ arch/x86/include/asm/page_64_types.h       |    1 +
+ arch/x86/include/asm/pgtable.h             |    2 +-
+ arch/x86/include/asm/processor.h           |    1 +
+ arch/x86/include/asm/proto.h               |    1 +
+ arch/x86/include/asm/realmode.h            |    7 +
+ arch/x86/include/asm/segment.h             |    2 +-
+ arch/x86/include/asm/setup.h               |    6 +-
+ arch/x86/include/asm/sev-es.h              |  114 ++
+ arch/x86/include/asm/stacktrace.h          |    2 +
+ arch/x86/include/asm/svm.h                 |  106 +-
+ arch/x86/include/asm/trap_pf.h             |   24 +
+ arch/x86/include/asm/trapnr.h              |    1 +
+ arch/x86/include/asm/traps.h               |   20 +-
+ arch/x86/include/asm/x86_init.h            |   16 +-
+ arch/x86/include/uapi/asm/svm.h            |   11 +
+ arch/x86/kernel/Makefile                   |    3 +
+ arch/x86/kernel/cpu/amd.c                  |    3 +-
+ arch/x86/kernel/cpu/common.c               |   25 +
+ arch/x86/kernel/cpu/scattered.c            |    1 +
+ arch/x86/kernel/cpu/vmware.c               |   50 +-
+ arch/x86/kernel/dumpstack.c                |    7 +-
+ arch/x86/kernel/dumpstack_64.c             |   46 +-
+ arch/x86/kernel/head64.c                   |  122 +-
+ arch/x86/kernel/head_64.S                  |  160 ++-
+ arch/x86/kernel/idt.c                      |   41 +-
+ arch/x86/kernel/kvm.c                      |   35 +-
+ arch/x86/kernel/nmi.c                      |   15 +
+ arch/x86/kernel/sev-es-shared.c            |  507 +++++++
+ arch/x86/kernel/sev-es.c                   | 1404 ++++++++++++++++++++
+ arch/x86/kernel/smpboot.c                  |    2 +-
+ arch/x86/kernel/traps.c                    |   48 +
+ arch/x86/kernel/umip.c                     |   49 +-
+ arch/x86/kvm/svm/nested.c                  |   47 +-
+ arch/x86/kvm/svm/svm.c                     |    2 +
+ arch/x86/lib/insn-eval.c                   |  130 ++
+ arch/x86/mm/cpu_entry_area.c               |    3 +-
+ arch/x86/mm/extable.c                      |    1 +
+ arch/x86/mm/mem_encrypt.c                  |   38 +-
+ arch/x86/mm/mem_encrypt_identity.c         |    3 +
+ arch/x86/platform/efi/efi_64.c             |   10 +
+ arch/x86/realmode/init.c                   |   24 +-
+ arch/x86/realmode/rm/header.S              |    3 +
+ arch/x86/realmode/rm/trampoline_64.S       |   20 +
+ arch/x86/tools/gen-insn-attr-x86.awk       |   50 +-
+ tools/arch/x86/tools/gen-insn-attr-x86.awk |   50 +-
+ 68 files changed, 4030 insertions(+), 451 deletions(-)
+ create mode 100644 arch/x86/boot/compressed/ident_map_64.c
+ create mode 100644 arch/x86/boot/compressed/idt_64.c
+ create mode 100644 arch/x86/boot/compressed/idt_handlers_64.S
+ delete mode 100644 arch/x86/boot/compressed/kaslr_64.c
+ create mode 100644 arch/x86/boot/compressed/sev-es.c
+ create mode 100644 arch/x86/include/asm/fpu/xcr.h
+ create mode 100644 arch/x86/include/asm/sev-es.h
+ create mode 100644 arch/x86/include/asm/trap_pf.h
+ create mode 100644 arch/x86/kernel/sev-es-shared.c
+ create mode 100644 arch/x86/kernel/sev-es.c
+
 -- 
-2.25.1
+2.28.0
 
