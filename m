@@ -2,20 +2,20 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2FEB62602E8
-	for <lists+kvm@lfdr.de>; Mon,  7 Sep 2020 19:38:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D17292602D7
+	for <lists+kvm@lfdr.de>; Mon,  7 Sep 2020 19:36:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730914AbgIGRh7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 7 Sep 2020 13:37:59 -0400
-Received: from 8bytes.org ([81.169.241.247]:41692 "EHLO theia.8bytes.org"
+        id S1729473AbgIGRgh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 7 Sep 2020 13:36:37 -0400
+Received: from 8bytes.org ([81.169.241.247]:43622 "EHLO theia.8bytes.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729470AbgIGNSE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 7 Sep 2020 09:18:04 -0400
+        id S1729471AbgIGNSF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 7 Sep 2020 09:18:05 -0400
 Received: from cap.home.8bytes.org (p549add56.dip0.t-ipconnect.de [84.154.221.86])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
         (No client certificate requested)
-        by theia.8bytes.org (Postfix) with ESMTPSA id 7EE22FDC;
-        Mon,  7 Sep 2020 15:16:57 +0200 (CEST)
+        by theia.8bytes.org (Postfix) with ESMTPSA id 077E11CA;
+        Mon,  7 Sep 2020 15:16:58 +0200 (CEST)
 From:   Joerg Roedel <joro@8bytes.org>
 To:     x86@kernel.org
 Cc:     Joerg Roedel <joro@8bytes.org>, Joerg Roedel <jroedel@suse.de>,
@@ -36,9 +36,9 @@ Cc:     Joerg Roedel <joro@8bytes.org>, Joerg Roedel <jroedel@suse.de>,
         Martin Radev <martin.b.radev@gmail.com>,
         linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         virtualization@lists.linux-foundation.org
-Subject: [PATCH v7 30/72] x86/head/64: Load GDT after switch to virtual addresses
-Date:   Mon,  7 Sep 2020 15:15:31 +0200
-Message-Id: <20200907131613.12703-31-joro@8bytes.org>
+Subject: [PATCH v7 31/72] x86/head/64: Load segment registers earlier
+Date:   Mon,  7 Sep 2020 15:15:32 +0200
+Message-Id: <20200907131613.12703-32-joro@8bytes.org>
 X-Mailer: git-send-email 2.28.0
 In-Reply-To: <20200907131613.12703-1-joro@8bytes.org>
 References: <20200907131613.12703-1-joro@8bytes.org>
@@ -51,49 +51,86 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Joerg Roedel <jroedel@suse.de>
 
-Load the GDT right after switching to virtual addresses to make sure
-there is a defined GDT for exception handling.
+Make sure segments are properly set up before setting up an IDT and
+doing anything that might cause a #VC exception. This is later needed
+for early exception handling.
 
 Signed-off-by: Joerg Roedel <jroedel@suse.de>
 Reviewed-by: Kees Cook <keescook@chromium.org>
 ---
- arch/x86/kernel/head_64.S | 16 ++++++++--------
- 1 file changed, 8 insertions(+), 8 deletions(-)
+ arch/x86/kernel/head_64.S | 52 +++++++++++++++++++--------------------
+ 1 file changed, 26 insertions(+), 26 deletions(-)
 
 diff --git a/arch/x86/kernel/head_64.S b/arch/x86/kernel/head_64.S
-index 2b2e91627221..03b03f266dc1 100644
+index 03b03f266dc1..f402087a02ac 100644
 --- a/arch/x86/kernel/head_64.S
 +++ b/arch/x86/kernel/head_64.S
-@@ -158,6 +158,14 @@ SYM_CODE_START(secondary_startup_64)
- 1:
- 	UNWIND_HINT_EMPTY
+@@ -166,6 +166,32 @@ SYM_CODE_START(secondary_startup_64)
+ 	 */
+ 	lgdt	early_gdt_descr(%rip)
  
++	/* set up data segments */
++	xorl %eax,%eax
++	movl %eax,%ds
++	movl %eax,%ss
++	movl %eax,%es
++
 +	/*
-+	 * We must switch to a new descriptor in kernel space for the GDT
-+	 * because soon the kernel won't have access anymore to the userspace
-+	 * addresses where we're currently running on. We have to do that here
-+	 * because in 32bit we couldn't load a 64bit linear address.
++	 * We don't really need to load %fs or %gs, but load them anyway
++	 * to kill any stale realmode selectors.  This allows execution
++	 * under VT hardware.
 +	 */
-+	lgdt	early_gdt_descr(%rip)
++	movl %eax,%fs
++	movl %eax,%gs
++
++	/* Set up %gs.
++	 *
++	 * The base of %gs always points to fixed_percpu_data. If the
++	 * stack protector canary is enabled, it is located at %gs:40.
++	 * Note that, on SMP, the boot cpu uses init data section until
++	 * the per cpu areas are set up.
++	 */
++	movl	$MSR_GS_BASE,%ecx
++	movl	initial_gs(%rip),%eax
++	movl	initial_gs+4(%rip),%edx
++	wrmsr
 +
  	/* Check if nx is implemented */
  	movl	$0x80000001, %eax
  	cpuid
-@@ -185,14 +193,6 @@ SYM_CODE_START(secondary_startup_64)
+@@ -193,32 +219,6 @@ SYM_CODE_START(secondary_startup_64)
  	pushq $0
  	popfq
  
--	/*
--	 * We must switch to a new descriptor in kernel space for the GDT
--	 * because soon the kernel won't have access anymore to the userspace
--	 * addresses where we're currently running on. We have to do that here
--	 * because in 32bit we couldn't load a 64bit linear address.
--	 */
--	lgdt	early_gdt_descr(%rip)
+-	/* set up data segments */
+-	xorl %eax,%eax
+-	movl %eax,%ds
+-	movl %eax,%ss
+-	movl %eax,%es
 -
- 	/* set up data segments */
- 	xorl %eax,%eax
- 	movl %eax,%ds
+-	/*
+-	 * We don't really need to load %fs or %gs, but load them anyway
+-	 * to kill any stale realmode selectors.  This allows execution
+-	 * under VT hardware.
+-	 */
+-	movl %eax,%fs
+-	movl %eax,%gs
+-
+-	/* Set up %gs.
+-	 *
+-	 * The base of %gs always points to fixed_percpu_data. If the
+-	 * stack protector canary is enabled, it is located at %gs:40.
+-	 * Note that, on SMP, the boot cpu uses init data section until
+-	 * the per cpu areas are set up.
+-	 */
+-	movl	$MSR_GS_BASE,%ecx
+-	movl	initial_gs(%rip),%eax
+-	movl	initial_gs+4(%rip),%edx
+-	wrmsr
+-
+ 	/* rsi is pointer to real mode structure with interesting info.
+ 	   pass it to C */
+ 	movq	%rsi, %rdi
 -- 
 2.28.0
 
