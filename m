@@ -2,151 +2,149 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D7A5C25F985
-	for <lists+kvm@lfdr.de>; Mon,  7 Sep 2020 13:33:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 684A625FAAA
+	for <lists+kvm@lfdr.de>; Mon,  7 Sep 2020 14:48:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728666AbgIGLdT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 7 Sep 2020 07:33:19 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:33045 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1729075AbgIGLcm (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 7 Sep 2020 07:32:42 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1599478360;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=xh0jDnNxVb+gfwupJzhZeFoIO1CEsK8pGfyr2cjqVvU=;
-        b=OZVVkJw8kuTqFgBvxTDNYwpSoZmScm8But66DOUgcGmKaYXQZY49r7zfpbWWycxWjOZd3Z
-        aeXie8gKlhvtq9BPd4c54FSDtgKoCJ5b0kRduQpn3tJkAlPQiQBNnhWyz4uKOodUVYmJSQ
-        dTnxWzOw9SiYWCHO2IoHBfj5wEegywY=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-528-ApVzV26VN-KXqJye8FydkQ-1; Mon, 07 Sep 2020 07:32:39 -0400
-X-MC-Unique: ApVzV26VN-KXqJye8FydkQ-1
-Received: by mail-wm1-f71.google.com with SMTP id k12so4851764wmj.1
-        for <kvm@vger.kernel.org>; Mon, 07 Sep 2020 04:32:39 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=xh0jDnNxVb+gfwupJzhZeFoIO1CEsK8pGfyr2cjqVvU=;
-        b=pmNhzj8XA0VJZLtfpKW4PGo8LtW4Gb5OnvhJVI6wrcqLX7toCdFLHE2gZ4VERGe8O+
-         184DLM9BzTnhT5wL6qg0WeX/2Biruh6yArIww1/8bLlfGPlXiCLvLs4BAHirZKd8C18j
-         2r9FLq7sRDOyqv6V2RQppLmgc8Fiuc/2mw7imbAorat2Cbog7mclMs+F0QLLXrp93w0d
-         79qsr9mt9msRtXbE4tI68AO8dFMdEIyF2zIhpcQgjvRk/lYA8sv9EcZWsNiqUT79teWN
-         nrzCFZx+fwY7fHgb40oY/gIKylVlL8OqghKrJUp4ZO94EBvictcCrENSIBQLL9P/nZCy
-         rGpA==
-X-Gm-Message-State: AOAM533Or5mdWzzaOv+hKmmB10AH6aTNV5sjlD0+OKqrV2Ngr3u9PDK2
-        /O33STM50EBo/YWIYDFFC8vUsiflgb+jkLCIDnl2PvTbLqD1M2k086qPSMguCnPzDJSVb4ggr2V
-        Rfur3F68bSzji
-X-Received: by 2002:a5d:680b:: with SMTP id w11mr22519860wru.73.1599478358045;
-        Mon, 07 Sep 2020 04:32:38 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyl1gZsmRJ09H74DIxRgRGxBon6iiq3rf0F1B1g7lolsEq76lgKe1Sng/BGlf4cPxzJJxlFmQ==
-X-Received: by 2002:a5d:680b:: with SMTP id w11mr22519838wru.73.1599478357797;
-        Mon, 07 Sep 2020 04:32:37 -0700 (PDT)
-Received: from redhat.com ([192.117.173.58])
-        by smtp.gmail.com with ESMTPSA id j14sm28032781wrr.66.2020.09.07.04.32.32
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 07 Sep 2020 04:32:36 -0700 (PDT)
-Date:   Mon, 7 Sep 2020 07:32:23 -0400
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        Peter Xu <peterx@redhat.com>, kvm@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Julia Suvorova <jsuvorov@redhat.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Andrew Jones <drjones@redhat.com>,
-        linux-kernel@vger.kernel.org, Gerd Hoffmann <kraxel@redhat.com>
-Subject: Re: [PATCH v2 0/3] KVM: x86: KVM_MEM_PCI_HOLE memory
-Message-ID: <20200907072829-mutt-send-email-mst@kernel.org>
-References: <20200807141232.402895-1-vkuznets@redhat.com>
- <20200825212526.GC8235@xz-x1>
- <87eenlwoaa.fsf@vitty.brq.redhat.com>
- <20200901200021.GB3053@xz-x1>
- <877dtcpn9z.fsf@vitty.brq.redhat.com>
- <20200904061210.GA22435@sjchrist-ice>
- <20200904072905.vbkiq3h762fyzds6@sirius.home.kraxel.org>
- <20200904160008.GA2206@sjchrist-ice>
- <874koanfsc.fsf@vitty.brq.redhat.com>
+        id S1729292AbgIGMrm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 7 Sep 2020 08:47:42 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:40542 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1729236AbgIGMr3 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 7 Sep 2020 08:47:29 -0400
+Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 087CVhaC183380;
+        Mon, 7 Sep 2020 08:47:10 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : in-reply-to : references : mime-version :
+ content-transfer-encoding; s=pp1;
+ bh=b3n95222Gcc1687tCq8ox6Yb8t/K8SYm0AY+BMOX3/w=;
+ b=m5NJJ0YltAqY4EKeHCkjQxahiCQ8XFQ0OQaHwBUeP4qA2/+MS6SBh5g6fGfTJz6CR5/E
+ tq3uRheXYVCnCbTWHdn1Zr9RinmADw371DsnPgaEr6oHfEchz72AZLsfFDptzUheItOY
+ K2bkiSQ0s4kqGkb7KUnzKVSqvGwspkbGgeyJdIyAJ9kfOa6Tx9nKIogLuKF2PlvUbfhs
+ MyUn9fWOuTYbeVtJy82s+sXt2omkzdZJ6WZgF48kutZhnebYBBiqBWV9dxt01nVqINuT
+ ptiupf+kWu59p9me++jyrsuRbgsbwg/I+T5WqWzxfwU5QIY2TNBaPOR1s+KRrqBby96B +Q== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 33dms68mqe-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 07 Sep 2020 08:47:10 -0400
+Received: from m0098413.ppops.net (m0098413.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 087CWTPx186430;
+        Mon, 7 Sep 2020 08:47:10 -0400
+Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 33dms68mpy-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 07 Sep 2020 08:47:10 -0400
+Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
+        by ppma03fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 087Cglec012456;
+        Mon, 7 Sep 2020 12:47:08 GMT
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
+        by ppma03fra.de.ibm.com with ESMTP id 33c2a89f29-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 07 Sep 2020 12:47:08 +0000
+Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
+        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 087Cl5Se25362848
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 7 Sep 2020 12:47:05 GMT
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 967594C040;
+        Mon,  7 Sep 2020 12:47:05 +0000 (GMT)
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id D0FA24C04A;
+        Mon,  7 Sep 2020 12:47:04 +0000 (GMT)
+Received: from linux01.pok.stglabs.ibm.com (unknown [9.114.17.81])
+        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Mon,  7 Sep 2020 12:47:04 +0000 (GMT)
+From:   Janosch Frank <frankja@linux.ibm.com>
+To:     linux-s390@vger.kernel.org
+Cc:     borntraeger@de.ibm.com, gor@linux.ibm.com, imbrenda@linux.ibm.com,
+        kvm@vger.kernel.org, david@redhat.com, hca@linux.ibm.com
+Subject: [PATCH v2 2/2] s390x: Add 3f program exception handler
+Date:   Mon,  7 Sep 2020 08:47:00 -0400
+Message-Id: <20200907124700.10374-3-frankja@linux.ibm.com>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20200907124700.10374-1-frankja@linux.ibm.com>
+References: <20200907124700.10374-1-frankja@linux.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <874koanfsc.fsf@vitty.brq.redhat.com>
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
+ definitions=2020-09-07_06:2020-09-07,2020-09-07 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 phishscore=0
+ adultscore=0 bulkscore=0 malwarescore=0 priorityscore=1501 impostorscore=0
+ clxscore=1015 suspectscore=1 spamscore=0 mlxlogscore=999
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2006250000 definitions=main-2009070120
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Sep 07, 2020 at 10:37:39AM +0200, Vitaly Kuznetsov wrote:
-> Sean Christopherson <sean.j.christopherson@intel.com> writes:
-> 
-> > On Fri, Sep 04, 2020 at 09:29:05AM +0200, Gerd Hoffmann wrote:
-> >>   Hi,
-> >> 
-> >> > Unless I'm mistaken, microvm doesn't even support PCI, does it?
-> >> 
-> >> Correct, no pci support right now.
-> >> 
-> >> We could probably wire up ecam (arm/virt style) for pcie support, once
-> >> the acpi support for mictovm finally landed (we need acpi for that
-> >> because otherwise the kernel wouldn't find the pcie bus).
-> >> 
-> >> Question is whenever there is a good reason to do so.  Why would someone
-> >> prefer microvm with pcie support over q35?
-> >> 
-> >> > If all of the above is true, this can be handled by adding "pci=lastbus=0"
-> >> > as a guest kernel param to override its scanning of buses.  And couldn't
-> >> > that be done by QEMU's microvm_fix_kernel_cmdline() to make it transparent
-> >> > to the end user?
-> >> 
-> >> microvm_fix_kernel_cmdline() is a hack, not a solution.
-> >> 
-> >> Beside that I doubt this has much of an effect on microvm because
-> >> it doesn't support pcie in the first place.
-> >
-> > I am so confused.  Vitaly, can you clarify exactly what QEMU VM type this
-> > series is intended to help?  If this is for microvm, then why is the guest
-> > doing PCI scanning in the first place?  If it's for q35, why is the
-> > justification for microvm-like workloads?
-> 
-> I'm not exactly sure about the plans for particular machine types, the
-> intention was to use this for pcie in QEMU in general so whatever
-> machine type uses pcie will benefit. 
-> 
-> Now, it seems that we have a more sophisticated landscape. The
-> optimization will only make sense to speed up boot so all 'traditional'
-> VM types with 'traditional' firmware are out of
-> question. 'Container-like' VMs seem to avoid PCI for now, I'm not sure
-> if it's because they're in early stages of their development, because
-> they can get away without PCI or, actually, because of slowness at boot
-> (which we're trying to tackle with this feature). I'd definitely like to
-> hear more what people think about this.
+Program exception 3f (secure storage violation) can only be detected
+when the CPU is running in SIE with a format 4 state description,
+e.g. running a protected guest. Because of this and because user
+space partly controls the guest memory mapping and can trigger this
+exception, we want to send a SIGSEGV to the process running the guest
+and not panic the kernel.
 
-I suspect microvms will need pci eventually. I would much rather KVM
-had an exit-less discovery mechanism in place by then because
-learning from history if it doesn't they will do some kind of
-hack on the kernel command line, and everyone will be stuck
-supporting that for years ...
+Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+CC: <stable@vger.kernel.org> # 5.7+
+Fixes: 084ea4d611a3 ("s390/mm: add (non)secure page access exceptions handlers")
+Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+Acked-by: Christian Borntraeger <borntraeger@de.ibm.com>
+---
+ arch/s390/kernel/pgm_check.S |  2 +-
+ arch/s390/mm/fault.c         | 20 ++++++++++++++++++++
+ 2 files changed, 21 insertions(+), 1 deletion(-)
 
-> >
-> > Either way, I think it makes sense explore other options before throwing
-> > something into KVM, e.g. modifying guest command line, adding a KVM hint,
-> > "fixing" QEMU, etc... 
-> >
-> 
-> Initially, this feature looked like a small and straitforward
-> (micro-)optimization to me: memory regions with 'PCI hole' semantics do
-> exist and we can speed up access to them. Ideally, I'd like to find
-> other 'constant memory' regions requiring fast access and come up with
-> an interface to create them in KVM but so far nothing interesting came
-> up...
-
-True, me neither.
-
-> -- 
-> Vitaly
+diff --git a/arch/s390/kernel/pgm_check.S b/arch/s390/kernel/pgm_check.S
+index 2c27907a5ffc..9a92638360ee 100644
+--- a/arch/s390/kernel/pgm_check.S
++++ b/arch/s390/kernel/pgm_check.S
+@@ -80,7 +80,7 @@ PGM_CHECK(do_dat_exception)		/* 3b */
+ PGM_CHECK_DEFAULT			/* 3c */
+ PGM_CHECK(do_secure_storage_access)	/* 3d */
+ PGM_CHECK(do_non_secure_storage_access)	/* 3e */
+-PGM_CHECK_DEFAULT			/* 3f */
++PGM_CHECK(do_secure_storage_violation)	/* 3f */
+ PGM_CHECK(monitor_event_exception)	/* 40 */
+ PGM_CHECK_DEFAULT			/* 41 */
+ PGM_CHECK_DEFAULT			/* 42 */
+diff --git a/arch/s390/mm/fault.c b/arch/s390/mm/fault.c
+index 4c8c063bce5b..996884dcc9fd 100644
+--- a/arch/s390/mm/fault.c
++++ b/arch/s390/mm/fault.c
+@@ -859,6 +859,21 @@ void do_non_secure_storage_access(struct pt_regs *regs)
+ }
+ NOKPROBE_SYMBOL(do_non_secure_storage_access);
+ 
++void do_secure_storage_violation(struct pt_regs *regs)
++{
++	/*
++	 * Either KVM messed up the secure guest mapping or the same
++	 * page is mapped into multiple secure guests.
++	 *
++	 * This exception is only triggered when a guest 2 is running
++	 * and can therefore never occur in kernel context.
++	 */
++	printk_ratelimited(KERN_WARNING
++			   "Secure storage violation in task: %s, pid %d\n",
++			   current->comm, current->pid);
++	send_sig(SIGSEGV, current, 0);
++}
++
+ #else
+ void do_secure_storage_access(struct pt_regs *regs)
+ {
+@@ -869,4 +884,9 @@ void do_non_secure_storage_access(struct pt_regs *regs)
+ {
+ 	default_trap_handler(regs);
+ }
++
++void do_secure_storage_violation(struct pt_regs *regs)
++{
++	default_trap_handler(regs);
++}
+ #endif
+-- 
+2.25.1
 
