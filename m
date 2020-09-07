@@ -2,57 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 74BC425F6B8
-	for <lists+kvm@lfdr.de>; Mon,  7 Sep 2020 11:40:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1893D25F6B4
+	for <lists+kvm@lfdr.de>; Mon,  7 Sep 2020 11:39:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728472AbgIGJja (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 7 Sep 2020 05:39:30 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:59102 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1728300AbgIGJj3 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 7 Sep 2020 05:39:29 -0400
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 0879Vp67008621;
-        Mon, 7 Sep 2020 05:39:16 -0400
+        id S1728503AbgIGJjb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 7 Sep 2020 05:39:31 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:4850 "EHLO
+        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1728333AbgIGJja (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 7 Sep 2020 05:39:30 -0400
+Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 0879WP3j162588;
+        Mon, 7 Sep 2020 05:39:17 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id; s=pp1;
- bh=/zsoqtLlLbEPeX56/5WqT6AsOKEzVbCt1a7Ompwymls=;
- b=WPvQMiZHoj+krc7szVHr3KR8Dth4u7rrk9gmXULVKwKiISKoxDWdeR00fSQ6/wFaWLw3
- y8uX0uio5xDMuMmySUIHW2qtUqGZblyjAZ8AgeNEToC/9q/FMb6wgbalFfMELy3FxInl
- D0yXYsss5nKqlNqiLnuvm4f/MW+M16GYVnVQY3oRuel2bDMRfxYUUBX5ia+ydCwzFEWT
- q29+3TgLu7XBZXMxr676edSqVK/6TKLlIylfCmaFBdLimeUDZKG7K+ixv5QPuO8Pg34p
- 2tHtbQD7hG7hTek66KdO00IxUgiNFhb0y4gCbKFPmYanVAVgip0d7UfYszfIeHMUDW/O 5g== 
+ : date : message-id : in-reply-to : references; s=pp1;
+ bh=5vVyn/VEe6Gx+GNDMxeR+LiTeTBWESsSZ3pi73AegSs=;
+ b=or5Yam2qzYABu+F+Xo1XwJVAVjFKCAiHYupbhgDBVklmpHLTZAYkjwkyzEIHAI7tcLVl
+ 9HT2dR5LwSTOqmGXVxi6SEYjJs6Z8yBzPcoKnRY3S8ruj12Qka1wH9PMgEUP7lBFYcim
+ 9ylpRLNhB7uXoOXQBgWEy0MvlkeQCTtBWCO6aPdTrfW3X4H5m0+mb9V73+NZm7IJpfco
+ ZTCqwb8iaTIIJdGduedhTCrS5pYOEjnOvsDzuT48pP+LcZC9HChKzoTgb0fJ01WBEDRp
+ tg4MFnkqY0FvnUjV/akrBV+lkOMbuIH3LNHrubxDMzKOTOCJ18+fcJgkYIuQM3WNQZTN UA== 
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 33dff85k9c-1
+        by mx0a-001b2d01.pphosted.com with ESMTP id 33dhnrh857-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 07 Sep 2020 05:39:17 -0400
+Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 0879WZ6n163168;
+        Mon, 7 Sep 2020 05:39:16 -0400
+Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 33dhnrh848-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
         Mon, 07 Sep 2020 05:39:16 -0400
-Received: from m0098409.ppops.net (m0098409.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 0879WrP2011545;
-        Mon, 7 Sep 2020 05:39:16 -0400
-Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 33dff85k88-1
+Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
+        by ppma06ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 0879bpuO013779;
+        Mon, 7 Sep 2020 09:39:14 GMT
+Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
+        by ppma06ams.nl.ibm.com with ESMTP id 33cyq50ycb-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 07 Sep 2020 05:39:15 -0400
-Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
-        by ppma03ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 0879bbYJ001949;
-        Mon, 7 Sep 2020 09:39:13 GMT
-Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
-        by ppma03ams.nl.ibm.com with ESMTP id 33c2a827c7-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 07 Sep 2020 09:39:13 +0000
+        Mon, 07 Sep 2020 09:39:14 +0000
 Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
-        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 0879dAIb32244048
+        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 0879dBKj38142398
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 7 Sep 2020 09:39:10 GMT
+        Mon, 7 Sep 2020 09:39:11 GMT
 Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 389B3A4065;
+        by IMSVA (Postfix) with ESMTP id 1E150A4066;
+        Mon,  7 Sep 2020 09:39:11 +0000 (GMT)
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 4D609A4060;
         Mon,  7 Sep 2020 09:39:10 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 62105A4060;
-        Mon,  7 Sep 2020 09:39:09 +0000 (GMT)
 Received: from oc3016276355.ibm.com (unknown [9.145.86.222])
         by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Mon,  7 Sep 2020 09:39:09 +0000 (GMT)
+        Mon,  7 Sep 2020 09:39:10 +0000 (GMT)
 From:   Pierre Morel <pmorel@linux.ibm.com>
 To:     linux-kernel@vger.kernel.org
 Cc:     pasic@linux.ibm.com, borntraeger@de.ibm.com, frankja@linux.ibm.com,
@@ -61,132 +61,107 @@ Cc:     pasic@linux.ibm.com, borntraeger@de.ibm.com, frankja@linux.ibm.com,
         virtualization@lists.linux-foundation.org, thomas.lendacky@amd.com,
         david@gibson.dropbear.id.au, linuxram@us.ibm.com,
         hca@linux.ibm.com, gor@linux.ibm.com
-Subject: [PATCH v11 0/2] s390: virtio: let arch validate VIRTIO features
-Date:   Mon,  7 Sep 2020 11:39:05 +0200
-Message-Id: <1599471547-28631-1-git-send-email-pmorel@linux.ibm.com>
+Subject: [PATCH v11 1/2] virtio: let arch advertise guest's memory access restrictions
+Date:   Mon,  7 Sep 2020 11:39:06 +0200
+Message-Id: <1599471547-28631-2-git-send-email-pmorel@linux.ibm.com>
 X-Mailer: git-send-email 1.8.3.1
+In-Reply-To: <1599471547-28631-1-git-send-email-pmorel@linux.ibm.com>
+References: <1599471547-28631-1-git-send-email-pmorel@linux.ibm.com>
 X-TM-AS-GCONF: 00
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
  definitions=2020-09-07_04:2020-09-07,2020-09-07 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- clxscore=1015 mlxscore=0 malwarescore=0 adultscore=0 spamscore=0
- suspectscore=1 impostorscore=0 bulkscore=0 mlxlogscore=999
- priorityscore=1501 phishscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2006250000 definitions=main-2009070090
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 bulkscore=0
+ mlxlogscore=999 spamscore=0 lowpriorityscore=0 phishscore=0 malwarescore=0
+ adultscore=0 clxscore=1015 mlxscore=0 suspectscore=1 priorityscore=1501
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
+ definitions=main-2009070093
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi all,
+An architecture may restrict host access to guest memory,
+e.g. IBM s390 Secure Execution or AMD SEV.
 
-The goal of the series is to give a chance to the architecture
-to validate VIRTIO device features.
+Provide a new Kconfig entry the architecture can select,
+CONFIG_ARCH_HAS_RESTRICTED_VIRTIO_MEMORY_ACCESS, when it provides
+the arch_has_restricted_virtio_memory_access callback to advertise
+to VIRTIO common code when the architecture restricts memory access
+from the host.
 
-The tests are back to virtio_finalize_features.
+The common code can then fail the probe for any device where
+VIRTIO_F_ACCESS_PLATFORM is required, but not set.
 
-No more argument for the architecture callback which only reports
-if the architecture needs guest memory access restrictions for
-VIRTIO.
-
-I renamed the callback to arch_has_restricted_virtio_memory_access,
-the config option to ARCH_HAS_RESTRICTED_VIRTIO_MEMORY_ACCESS,
-and VIRTIO_F_IOMMU_PLATFORM to VIRTIO_F_ACCESS_PLATFORM.
-
-Regards,
-Pierre
-
-Pierre Morel (2):
-  virtio: let arch advertise guest's memory access restrictions
-  s390: virtio: PV needs VIRTIO I/O device protection
-
- arch/s390/Kconfig             |  1 +
- arch/s390/mm/init.c           | 10 ++++++++++
+Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+---
  drivers/virtio/Kconfig        |  6 ++++++
  drivers/virtio/virtio.c       | 15 +++++++++++++++
  include/linux/virtio_config.h | 10 ++++++++++
- 5 files changed, 42 insertions(+)
+ 3 files changed, 31 insertions(+)
 
+diff --git a/drivers/virtio/Kconfig b/drivers/virtio/Kconfig
+index 5c92e4a50882..3999b411624c 100644
+--- a/drivers/virtio/Kconfig
++++ b/drivers/virtio/Kconfig
+@@ -6,6 +6,12 @@ config VIRTIO
+ 	  bus, such as CONFIG_VIRTIO_PCI, CONFIG_VIRTIO_MMIO, CONFIG_RPMSG
+ 	  or CONFIG_S390_GUEST.
+ 
++config ARCH_HAS_RESTRICTED_VIRTIO_MEMORY_ACCESS
++	bool
++	help
++	  This option is selected if the architecture may need to enforce
++	  VIRTIO_F_IOMMU_PLATFORM.
++
+ menuconfig VIRTIO_MENU
+ 	bool "Virtio drivers"
+ 	default y
+diff --git a/drivers/virtio/virtio.c b/drivers/virtio/virtio.c
+index a977e32a88f2..a2b3f12e10a2 100644
+--- a/drivers/virtio/virtio.c
++++ b/drivers/virtio/virtio.c
+@@ -176,6 +176,21 @@ int virtio_finalize_features(struct virtio_device *dev)
+ 	if (ret)
+ 		return ret;
+ 
++	ret = arch_has_restricted_virtio_memory_access();
++	if (ret) {
++		if (!virtio_has_feature(dev, VIRTIO_F_VERSION_1)) {
++			dev_warn(&dev->dev,
++				 "device must provide VIRTIO_F_VERSION_1\n");
++			return -ENODEV;
++		}
++
++		if (!virtio_has_feature(dev, VIRTIO_F_ACCESS_PLATFORM)) {
++			dev_warn(&dev->dev,
++				 "device must provide VIRTIO_F_ACCESS_PLATFORM\n");
++			return -ENODEV;
++		}
++	}
++
+ 	if (!virtio_has_feature(dev, VIRTIO_F_VERSION_1))
+ 		return 0;
+ 
+diff --git a/include/linux/virtio_config.h b/include/linux/virtio_config.h
+index 8fe857e27ef3..3f697c8c8205 100644
+--- a/include/linux/virtio_config.h
++++ b/include/linux/virtio_config.h
+@@ -540,4 +540,14 @@ static inline void virtio_cwrite64(struct virtio_device *vdev,
+ 			virtio_cread_le((vdev), structname, member, ptr); \
+ 		_r;							\
+ 	})
++
++#ifdef CONFIG_ARCH_HAS_RESTRICTED_VIRTIO_MEMORY_ACCESS
++int arch_has_restricted_virtio_memory_access(void);
++#else
++static inline int arch_has_restricted_virtio_memory_access(void)
++{
++	return 0;
++}
++#endif /* CONFIG_ARCH_HAS_RESTRICTED_VIRTIO_MEMORY_ACCESS */
++
+ #endif /* _LINUX_VIRTIO_CONFIG_H */
 -- 
 2.17.1
-
-Changelog
-
-to v11:
-- replaced VIRTIO_F_IOMMU_PLATFORM with VIRTIO_F_ACCESS_PLATFORM
-
-to v10:
-- removed virtio_config.h unnecessary include
-- wording
-  (Connie)
-
-to v9:
-
-- move virtio tests back to virtio_finalize_features
-  (Connie)
-
-- remove virtio device argument
-
-to v8:
-
-- refactoring by using an optional callback
-  (Connie)
-
-to v7:
-
-- typo in warning message
-  (Connie)
-to v6:
-
-- rewording warning messages
-  (Connie, Halil)
-
-to v5:
-
-- return directly from S390 arch_validate_virtio_features()
-  when the guest is not protected.
-  (Connie)
-
-- Somme rewording
-  (Connie, Michael)
-
-- moved back code from arch/s390/ ...kernel/uv.c to ...mm/init.c
-  (Christian)
-
-to v4:
-
-- separate virtio and arch code
-  (Pierre)
-
-- moved code from arch/s390/mm/init.c to arch/s390/kernel/uv.c
-  (as interpreted from Heiko's comment)
-
-- moved validation inside the arch code
-  (Connie)
-
-- moved the call to arch validation before VIRTIO_F_1 test
-  (Michael)
-
-to v3:
-
-- add warning
-  (Connie, Christian)
-
-- add comment
-  (Connie)
-
-- change hook name
-  (Halil, Connie)
-
-to v2:
-
-- put the test in virtio_finalize_features()
-  (Connie)
-
-- put the test inside VIRTIO core
-  (Jason)
-
-- pass a virtio device as parameter
-  (Halil)
-
 
