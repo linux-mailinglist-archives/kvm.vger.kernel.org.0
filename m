@@ -2,31 +2,31 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6B55926027F
-	for <lists+kvm@lfdr.de>; Mon,  7 Sep 2020 19:27:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 36C81260284
+	for <lists+kvm@lfdr.de>; Mon,  7 Sep 2020 19:28:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729741AbgIGR1r (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 7 Sep 2020 13:27:47 -0400
-Received: from 8bytes.org ([81.169.241.247]:43658 "EHLO theia.8bytes.org"
+        id S1729711AbgIGR2M (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 7 Sep 2020 13:28:12 -0400
+Received: from 8bytes.org ([81.169.241.247]:43666 "EHLO theia.8bytes.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729526AbgIGNTh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        id S1729530AbgIGNTh (ORCPT <rfc822;kvm@vger.kernel.org>);
         Mon, 7 Sep 2020 09:19:37 -0400
 Received: from cap.home.8bytes.org (p549add56.dip0.t-ipconnect.de [84.154.221.86])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
         (No client certificate requested)
-        by theia.8bytes.org (Postfix) with ESMTPSA id C630B3AAA;
-        Mon,  7 Sep 2020 15:17:17 +0200 (CEST)
+        by theia.8bytes.org (Postfix) with ESMTPSA id 612943AAB;
+        Mon,  7 Sep 2020 15:17:18 +0200 (CEST)
 From:   Joerg Roedel <joro@8bytes.org>
 To:     x86@kernel.org
 Cc:     Joerg Roedel <joro@8bytes.org>, Joerg Roedel <jroedel@suse.de>,
-        hpa@zytor.com, Andy Lutomirski <luto@kernel.org>,
+        Kees Cook <keescook@chromium.org>, hpa@zytor.com,
+        Andy Lutomirski <luto@kernel.org>,
         Dave Hansen <dave.hansen@linux.intel.com>,
         Peter Zijlstra <peterz@infradead.org>,
         Jiri Slaby <jslaby@suse.cz>,
         Dan Williams <dan.j.williams@intel.com>,
         Tom Lendacky <thomas.lendacky@amd.com>,
         Juergen Gross <jgross@suse.com>,
-        Kees Cook <keescook@chromium.org>,
         David Rientjes <rientjes@google.com>,
         Cfir Cohen <cfir@google.com>,
         Erdem Aktas <erdemaktas@google.com>,
@@ -36,9 +36,9 @@ Cc:     Joerg Roedel <joro@8bytes.org>, Joerg Roedel <jroedel@suse.de>,
         Martin Radev <martin.b.radev@gmail.com>,
         linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         virtualization@lists.linux-foundation.org
-Subject: [PATCH v7 67/72] x86/smpboot: Load TSS and getcpu GDT entry before loading IDT
-Date:   Mon,  7 Sep 2020 15:16:08 +0200
-Message-Id: <20200907131613.12703-68-joro@8bytes.org>
+Subject: [PATCH v7 68/72] x86/head/64: Don't call verify_cpu() on starting APs
+Date:   Mon,  7 Sep 2020 15:16:09 +0200
+Message-Id: <20200907131613.12703-69-joro@8bytes.org>
 X-Mailer: git-send-email 2.28.0
 In-Reply-To: <20200907131613.12703-1-joro@8bytes.org>
 References: <20200907131613.12703-1-joro@8bytes.org>
@@ -51,76 +51,69 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Joerg Roedel <jroedel@suse.de>
 
-The IDT on 64bit contains vectors which use paranoid_entry() and/or IST
-stacks. To make these vectors work the TSS and the getcpu GDT entry need
-to be set up before the IDT is loaded.
+The APs are not ready to handle exceptions when verify_cpu() is called
+in secondary_startup_64.
 
 Signed-off-by: Joerg Roedel <jroedel@suse.de>
+Reviewed-by: Kees Cook <keescook@chromium.org>
 ---
- arch/x86/include/asm/processor.h |  1 +
- arch/x86/kernel/cpu/common.c     | 23 +++++++++++++++++++++++
- arch/x86/kernel/smpboot.c        |  2 +-
- 3 files changed, 25 insertions(+), 1 deletion(-)
+ arch/x86/include/asm/realmode.h |  1 +
+ arch/x86/kernel/head_64.S       | 12 ++++++++++++
+ arch/x86/realmode/init.c        |  6 ++++++
+ 3 files changed, 19 insertions(+)
 
-diff --git a/arch/x86/include/asm/processor.h b/arch/x86/include/asm/processor.h
-index d8a82e650810..5ac507586769 100644
---- a/arch/x86/include/asm/processor.h
-+++ b/arch/x86/include/asm/processor.h
-@@ -696,6 +696,7 @@ extern void load_direct_gdt(int);
- extern void load_fixmap_gdt(int);
- extern void load_percpu_segment(int);
- extern void cpu_init(void);
-+extern void cpu_init_exception_handling(void);
- extern void cr4_init(void);
- 
- static inline unsigned long get_debugctlmsr(void)
-diff --git a/arch/x86/kernel/cpu/common.c b/arch/x86/kernel/cpu/common.c
-index 1d65365363a1..a9527c0c38fb 100644
---- a/arch/x86/kernel/cpu/common.c
-+++ b/arch/x86/kernel/cpu/common.c
-@@ -1854,6 +1854,29 @@ static inline void tss_setup_io_bitmap(struct tss_struct *tss)
+diff --git a/arch/x86/include/asm/realmode.h b/arch/x86/include/asm/realmode.h
+index 4d4d853f6841..5db5d083c873 100644
+--- a/arch/x86/include/asm/realmode.h
++++ b/arch/x86/include/asm/realmode.h
+@@ -72,6 +72,7 @@ extern unsigned char startup_32_smp[];
+ extern unsigned char boot_gdt[];
+ #else
+ extern unsigned char secondary_startup_64[];
++extern unsigned char secondary_startup_64_no_verify[];
  #endif
- }
  
-+/*
-+ * Setup everything needed to handle exceptions from the IDT, including the IST
-+ * exceptions which use paranoid_entry()
-+ */
-+void cpu_init_exception_handling(void)
-+{
-+	struct tss_struct *tss = this_cpu_ptr(&cpu_tss_rw);
-+	int cpu = raw_smp_processor_id();
+ static inline size_t real_mode_size_needed(void)
+diff --git a/arch/x86/kernel/head_64.S b/arch/x86/kernel/head_64.S
+index 41057ff79284..d976a9e6fcba 100644
+--- a/arch/x86/kernel/head_64.S
++++ b/arch/x86/kernel/head_64.S
+@@ -125,6 +125,18 @@ SYM_CODE_START(secondary_startup_64)
+ 	/* Sanitize CPU configuration */
+ 	call verify_cpu
+ 
++	/*
++	 * The secondary_startup_64_no_verify entry point is only used by
++	 * SEV-ES guests. In those guests the call to verify_cpu() would cause
++	 * #VC exceptions which can not be handled at this stage of secondary
++	 * CPU bringup.
++	 *
++	 * All non SEV-ES systems, especially Intel systems, need to execute
++	 * verify_cpu() above to make sure NX is enabled.
++	 */
++SYM_INNER_LABEL(secondary_startup_64_no_verify, SYM_L_GLOBAL)
++	UNWIND_HINT_EMPTY
 +
-+	/* paranoid_entry() gets the CPU number from the GDT */
-+	setup_getcpu(cpu);
+ 	/*
+ 	 * Retrieve the modifier (SME encryption mask if SME is active) to be
+ 	 * added to the initial pgdir entry that will be programmed into CR3.
+diff --git a/arch/x86/realmode/init.c b/arch/x86/realmode/init.c
+index 3fb9b60be07a..22fda7d99159 100644
+--- a/arch/x86/realmode/init.c
++++ b/arch/x86/realmode/init.c
+@@ -46,6 +46,12 @@ static void sme_sev_setup_real_mode(struct trampoline_header *th)
+ 		th->flags |= TH_FLAGS_SME_ACTIVE;
+ 
+ 	if (sev_es_active()) {
++		/*
++		 * Skip the call to verify_cpu() in secondary_startup_64 as it
++		 * will cause #VC exceptions when the AP can't handle them yet.
++		 */
++		th->start = (u64) secondary_startup_64_no_verify;
 +
-+	/* IST vectors need TSS to be set up. */
-+	tss_setup_ist(tss);
-+	tss_setup_io_bitmap(tss);
-+	set_tss_desc(cpu, &get_cpu_entry_area(cpu)->tss.x86_tss);
-+
-+	load_TR_desc();
-+
-+	/* Finally load the IDT */
-+	load_current_idt();
-+}
-+
- /*
-  * cpu_init() initializes state that is per-CPU. Some data is already
-  * initialized (naturally) in the bootstrap process, such as the GDT
-diff --git a/arch/x86/kernel/smpboot.c b/arch/x86/kernel/smpboot.c
-index f5ef689dd62a..de776b2e6046 100644
---- a/arch/x86/kernel/smpboot.c
-+++ b/arch/x86/kernel/smpboot.c
-@@ -227,7 +227,7 @@ static void notrace start_secondary(void *unused)
- 	load_cr3(swapper_pg_dir);
- 	__flush_tlb_all();
- #endif
--	load_current_idt();
-+	cpu_init_exception_handling();
- 	cpu_init();
- 	x86_cpuinit.early_percpu_clock_init();
- 	preempt_disable();
+ 		if (sev_es_setup_ap_jump_table(real_mode_header))
+ 			panic("Failed to get/update SEV-ES AP Jump Table");
+ 	}
 -- 
 2.28.0
 
