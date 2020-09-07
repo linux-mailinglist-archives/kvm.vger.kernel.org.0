@@ -2,29 +2,29 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0A29626029A
-	for <lists+kvm@lfdr.de>; Mon,  7 Sep 2020 19:30:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E7CC2260293
+	for <lists+kvm@lfdr.de>; Mon,  7 Sep 2020 19:29:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730639AbgIGR1r (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 7 Sep 2020 13:27:47 -0400
-Received: from 8bytes.org ([81.169.241.247]:41838 "EHLO theia.8bytes.org"
+        id S1731244AbgIGR2R (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 7 Sep 2020 13:28:17 -0400
+Received: from 8bytes.org ([81.169.241.247]:43572 "EHLO theia.8bytes.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729529AbgIGNTh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        id S1729520AbgIGNTh (ORCPT <rfc822;kvm@vger.kernel.org>);
         Mon, 7 Sep 2020 09:19:37 -0400
 Received: from cap.home.8bytes.org (p549add56.dip0.t-ipconnect.de [84.154.221.86])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
         (No client certificate requested)
-        by theia.8bytes.org (Postfix) with ESMTPSA id 775FD3AAF;
+        by theia.8bytes.org (Postfix) with ESMTPSA id F1CD33AB0;
         Mon,  7 Sep 2020 15:17:19 +0200 (CEST)
 From:   Joerg Roedel <joro@8bytes.org>
 To:     x86@kernel.org
 Cc:     Joerg Roedel <joro@8bytes.org>, Joerg Roedel <jroedel@suse.de>,
-        hpa@zytor.com, Andy Lutomirski <luto@kernel.org>,
+        Tom Lendacky <thomas.lendacky@amd.com>, hpa@zytor.com,
+        Andy Lutomirski <luto@kernel.org>,
         Dave Hansen <dave.hansen@linux.intel.com>,
         Peter Zijlstra <peterz@infradead.org>,
         Jiri Slaby <jslaby@suse.cz>,
         Dan Williams <dan.j.williams@intel.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
         Juergen Gross <jgross@suse.com>,
         Kees Cook <keescook@chromium.org>,
         David Rientjes <rientjes@google.com>,
@@ -36,9 +36,9 @@ Cc:     Joerg Roedel <joro@8bytes.org>, Joerg Roedel <jroedel@suse.de>,
         Martin Radev <martin.b.radev@gmail.com>,
         linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         virtualization@lists.linux-foundation.org
-Subject: [PATCH v7 70/72] x86/sev-es: Handle NMI State
-Date:   Mon,  7 Sep 2020 15:16:11 +0200
-Message-Id: <20200907131613.12703-71-joro@8bytes.org>
+Subject: [PATCH v7 71/72] x86/efi: Add GHCB mappings when SEV-ES is active
+Date:   Mon,  7 Sep 2020 15:16:12 +0200
+Message-Id: <20200907131613.12703-72-joro@8bytes.org>
 X-Mailer: git-send-email 2.28.0
 In-Reply-To: <20200907131613.12703-1-joro@8bytes.org>
 References: <20200907131613.12703-1-joro@8bytes.org>
@@ -49,103 +49,122 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Joerg Roedel <jroedel@suse.de>
+From: Tom Lendacky <thomas.lendacky@amd.com>
 
-When running under SEV-ES the kernel has to tell the hypervisor when to
-open the NMI window again after an NMI was injected. This is done with
-an NMI-complete message to the hypervisor.
+Calling down to EFI runtime services can result in the firmware performing
+VMGEXIT calls. The firmware is likely to use the GHCB of the OS (e.g., for
+setting EFI variables), so each GHCB in the system needs to be identity
+mapped in the EFI page tables, as unencrypted, to avoid page faults.
 
-Add code to the kernels NMI handler to send this message right at the
-beginning of do_nmi(). This always allows nesting NMIs.
-
+Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
+[ jroedel@suse.de: Moved GHCB mapping loop to sev-es.c ]
 Signed-off-by: Joerg Roedel <jroedel@suse.de>
 ---
- arch/x86/include/asm/sev-es.h   |  7 +++++++
- arch/x86/include/uapi/asm/svm.h |  1 +
- arch/x86/kernel/nmi.c           |  6 ++++++
- arch/x86/kernel/sev-es.c        | 18 ++++++++++++++++++
- 4 files changed, 32 insertions(+)
+ arch/x86/boot/compressed/sev-es.c |  1 +
+ arch/x86/include/asm/sev-es.h     |  2 ++
+ arch/x86/kernel/sev-es.c          | 30 ++++++++++++++++++++++++++++++
+ arch/x86/platform/efi/efi_64.c    | 10 ++++++++++
+ 4 files changed, 43 insertions(+)
 
+diff --git a/arch/x86/boot/compressed/sev-es.c b/arch/x86/boot/compressed/sev-es.c
+index 45702b866c33..0a9a248ca33d 100644
+--- a/arch/x86/boot/compressed/sev-es.c
++++ b/arch/x86/boot/compressed/sev-es.c
+@@ -12,6 +12,7 @@
+  */
+ #include "misc.h"
+ 
++#include <asm/pgtable_types.h>
+ #include <asm/sev-es.h>
+ #include <asm/trapnr.h>
+ #include <asm/trap_pf.h>
 diff --git a/arch/x86/include/asm/sev-es.h b/arch/x86/include/asm/sev-es.h
-index db88e1c3442d..e919f09ae33c 100644
+index e919f09ae33c..cf1d957c7091 100644
 --- a/arch/x86/include/asm/sev-es.h
 +++ b/arch/x86/include/asm/sev-es.h
-@@ -96,10 +96,17 @@ static __always_inline void sev_es_ist_exit(void)
- 		__sev_es_ist_exit();
+@@ -102,11 +102,13 @@ static __always_inline void sev_es_nmi_complete(void)
+ 	if (static_branch_unlikely(&sev_es_enable_key))
+ 		__sev_es_nmi_complete();
  }
- extern int sev_es_setup_ap_jump_table(struct real_mode_header *rmh);
-+extern void __sev_es_nmi_complete(void);
-+static __always_inline void sev_es_nmi_complete(void)
-+{
-+	if (static_branch_unlikely(&sev_es_enable_key))
-+		__sev_es_nmi_complete();
-+}
++extern int __init sev_es_efi_map_ghcbs(pgd_t *pgd);
  #else
  static inline void sev_es_ist_enter(struct pt_regs *regs) { }
  static inline void sev_es_ist_exit(void) { }
  static inline int sev_es_setup_ap_jump_table(struct real_mode_header *rmh) { return 0; }
-+static inline void sev_es_nmi_complete(void) { }
+ static inline void sev_es_nmi_complete(void) { }
++static inline int sev_es_efi_map_ghcbs(pgd_t *pgd) { return 0; }
  #endif
  
  #endif
-diff --git a/arch/x86/include/uapi/asm/svm.h b/arch/x86/include/uapi/asm/svm.h
-index c1dcf3e114e4..a7a3403645e5 100644
---- a/arch/x86/include/uapi/asm/svm.h
-+++ b/arch/x86/include/uapi/asm/svm.h
-@@ -84,6 +84,7 @@
- /* SEV-ES software-defined VMGEXIT events */
- #define SVM_VMGEXIT_MMIO_READ			0x80000001
- #define SVM_VMGEXIT_MMIO_WRITE			0x80000002
-+#define SVM_VMGEXIT_NMI_COMPLETE		0x80000003
- #define SVM_VMGEXIT_AP_HLT_LOOP			0x80000004
- #define SVM_VMGEXIT_AP_JUMP_TABLE		0x80000005
- #define SVM_VMGEXIT_SET_AP_JUMP_TABLE		0
-diff --git a/arch/x86/kernel/nmi.c b/arch/x86/kernel/nmi.c
-index 5859cec774a4..d961f1b3e251 100644
---- a/arch/x86/kernel/nmi.c
-+++ b/arch/x86/kernel/nmi.c
-@@ -478,6 +478,12 @@ DEFINE_IDTENTRY_RAW(exc_nmi)
- {
- 	bool irq_state;
- 
-+	/*
-+	 * Re-enable NMIs right here when running as an SEV-ES guest. This might
-+	 * cause nested NMIs, but those can be handled safely.
-+	 */
-+	sev_es_nmi_complete();
-+
- 	if (IS_ENABLED(CONFIG_SMP) && arch_cpu_is_offline(smp_processor_id()))
- 		return;
- 
 diff --git a/arch/x86/kernel/sev-es.c b/arch/x86/kernel/sev-es.c
-index 0b6c4f46ddfc..9ab3a4dfecd8 100644
+index 9ab3a4dfecd8..4e2b7e4d9b87 100644
 --- a/arch/x86/kernel/sev-es.c
 +++ b/arch/x86/kernel/sev-es.c
-@@ -408,6 +408,24 @@ static bool vc_slow_virt_to_phys(struct ghcb *ghcb, struct es_em_ctxt *ctxt,
- /* Include code shared with pre-decompression boot stage */
- #include "sev-es-shared.c"
+@@ -491,6 +491,36 @@ int sev_es_setup_ap_jump_table(struct real_mode_header *rmh)
+ 	return 0;
+ }
  
-+void __sev_es_nmi_complete(void)
++/*
++ * This is needed by the OVMF UEFI firmware which will use whatever it finds in
++ * the GHCB MSR as its GHCB to talk to the hypervisor. So make sure the per-cpu
++ * runtime GHCBs used by the kernel are also mapped in the EFI page-table.
++ */
++int __init sev_es_efi_map_ghcbs(pgd_t *pgd)
 +{
-+	struct ghcb_state state;
-+	struct ghcb *ghcb;
++	struct sev_es_runtime_data *data;
++	unsigned long address, pflags;
++	int cpu;
++	u64 pfn;
 +
-+	ghcb = sev_es_get_ghcb(&state);
++	if (!sev_es_active())
++		return 0;
 +
-+	vc_ghcb_invalidate(ghcb);
-+	ghcb_set_sw_exit_code(ghcb, SVM_VMGEXIT_NMI_COMPLETE);
-+	ghcb_set_sw_exit_info_1(ghcb, 0);
-+	ghcb_set_sw_exit_info_2(ghcb, 0);
++	pflags = _PAGE_NX | _PAGE_RW;
 +
-+	sev_es_wr_ghcb_msr(__pa(ghcb));
-+	VMGEXIT();
++	for_each_possible_cpu(cpu) {
++		data = per_cpu(runtime_data, cpu);
 +
-+	sev_es_put_ghcb(&state);
++		address = __pa(&data->ghcb_page);
++		pfn = address >> PAGE_SHIFT;
++
++		if (kernel_map_pages_in_pgd(pgd, pfn, address, 1, pflags))
++			return 1;
++	}
++
++	return 0;
 +}
 +
- static u64 get_jump_table_addr(void)
+ static enum es_result vc_handle_msr(struct ghcb *ghcb, struct es_em_ctxt *ctxt)
  {
- 	struct ghcb_state state;
+ 	struct pt_regs *regs = ctxt->regs;
+diff --git a/arch/x86/platform/efi/efi_64.c b/arch/x86/platform/efi/efi_64.c
+index 6af4da1149ba..8f5759df7776 100644
+--- a/arch/x86/platform/efi/efi_64.c
++++ b/arch/x86/platform/efi/efi_64.c
+@@ -47,6 +47,7 @@
+ #include <asm/realmode.h>
+ #include <asm/time.h>
+ #include <asm/pgalloc.h>
++#include <asm/sev-es.h>
+ 
+ /*
+  * We allocate runtime services regions top-down, starting from -4G, i.e.
+@@ -229,6 +230,15 @@ int __init efi_setup_page_tables(unsigned long pa_memmap, unsigned num_pages)
+ 		return 1;
+ 	}
+ 
++	/*
++	 * When SEV-ES is active, the GHCB as set by the kernel will be used
++	 * by firmware. Create a 1:1 unencrypted mapping for each GHCB.
++	 */
++	if (sev_es_efi_map_ghcbs(pgd)) {
++		pr_err("Failed to create 1:1 mapping for the GHCBs!\n");
++		return 1;
++	}
++
+ 	/*
+ 	 * When making calls to the firmware everything needs to be 1:1
+ 	 * mapped and addressable with 32-bit pointers. Map the kernel
 -- 
 2.28.0
 
