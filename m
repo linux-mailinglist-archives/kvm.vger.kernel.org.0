@@ -2,166 +2,124 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 464DB260297
-	for <lists+kvm@lfdr.de>; Mon,  7 Sep 2020 19:30:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 90C9A260252
+	for <lists+kvm@lfdr.de>; Mon,  7 Sep 2020 19:23:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731023AbgIGR14 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 7 Sep 2020 13:27:56 -0400
-Received: from 8bytes.org ([81.169.241.247]:43570 "EHLO theia.8bytes.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729518AbgIGNTh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 7 Sep 2020 09:19:37 -0400
-Received: from cap.home.8bytes.org (p549add56.dip0.t-ipconnect.de [84.154.221.86])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
-        (No client certificate requested)
-        by theia.8bytes.org (Postfix) with ESMTPSA id 793183AB2;
-        Mon,  7 Sep 2020 15:17:20 +0200 (CEST)
-From:   Joerg Roedel <joro@8bytes.org>
-To:     x86@kernel.org
-Cc:     Joerg Roedel <joro@8bytes.org>, Joerg Roedel <jroedel@suse.de>,
-        Martin Radev <martin.b.radev@gmail.com>,
-        Kees Cook <keescook@chromium.org>, hpa@zytor.com,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Jiri Slaby <jslaby@suse.cz>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Juergen Gross <jgross@suse.com>,
-        David Rientjes <rientjes@google.com>,
-        Cfir Cohen <cfir@google.com>,
-        Erdem Aktas <erdemaktas@google.com>,
-        Masami Hiramatsu <mhiramat@kernel.org>,
-        Mike Stunes <mstunes@vmware.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org
-Subject: [PATCH v7 72/72] x86/sev-es: Check required CPU features for SEV-ES
-Date:   Mon,  7 Sep 2020 15:16:13 +0200
-Message-Id: <20200907131613.12703-73-joro@8bytes.org>
-X-Mailer: git-send-email 2.28.0
-In-Reply-To: <20200907131613.12703-1-joro@8bytes.org>
-References: <20200907131613.12703-1-joro@8bytes.org>
+        id S1731134AbgIGRXN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 7 Sep 2020 13:23:13 -0400
+Received: from smtp-fw-9102.amazon.com ([207.171.184.29]:19770 "EHLO
+        smtp-fw-9102.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729514AbgIGNnS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 7 Sep 2020 09:43:18 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1599486198; x=1631022198;
+  h=subject:to:cc:references:from:message-id:date:
+   mime-version:in-reply-to:content-transfer-encoding;
+  bh=6VQbLOy77M7fAKsGR2G82WO7fDDbNA8p2pbqM8zfSyk=;
+  b=TtAf3lFuBU4twdxeJ4WUdiF5hITcEfoTPjkkl9dXcauTowW9w5iJxNH+
+   qXUOkrY+TRDAZOnSi4L5qZ15LQ7qJuQLzzrHvf8VqmvHHKlWVRer3WdE0
+   AeX5rOtfBkuW3LLYxvvA6fSpkZ/MdmAq5TiSB/BhhtPTzvVyz2QGIF8XK
+   E=;
+X-IronPort-AV: E=Sophos;i="5.76,401,1592870400"; 
+   d="scan'208";a="74201643"
+Received: from sea32-co-svc-lb4-vlan3.sea.corp.amazon.com (HELO email-inbound-relay-2a-119b4f96.us-west-2.amazon.com) ([10.47.23.38])
+  by smtp-border-fw-out-9102.sea19.amazon.com with ESMTP; 07 Sep 2020 13:35:42 +0000
+Received: from EX13D16EUB001.ant.amazon.com (pdx4-ws-svc-p6-lb7-vlan2.pdx.amazon.com [10.170.41.162])
+        by email-inbound-relay-2a-119b4f96.us-west-2.amazon.com (Postfix) with ESMTPS id 8709E1A067C;
+        Mon,  7 Sep 2020 13:35:39 +0000 (UTC)
+Received: from 38f9d34ed3b1.ant.amazon.com (10.43.162.38) by
+ EX13D16EUB001.ant.amazon.com (10.43.166.28) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.2; Mon, 7 Sep 2020 13:35:28 +0000
+Subject: Re: [PATCH v8 15/18] nitro_enclaves: Add Makefile for the Nitro
+ Enclaves driver
+To:     Greg KH <gregkh@linuxfoundation.org>
+CC:     linux-kernel <linux-kernel@vger.kernel.org>,
+        Anthony Liguori <aliguori@amazon.com>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Colm MacCarthaigh <colmmacc@amazon.com>,
+        David Duncan <davdunc@amazon.com>,
+        Bjoern Doebel <doebel@amazon.de>,
+        David Woodhouse <dwmw@amazon.co.uk>,
+        "Frank van der Linden" <fllinden@amazon.com>,
+        Alexander Graf <graf@amazon.de>,
+        "Karen Noel" <knoel@redhat.com>,
+        Martin Pohlack <mpohlack@amazon.de>,
+        Matt Wilson <msw@amazon.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Balbir Singh <sblbir@amazon.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        "Stefan Hajnoczi" <stefanha@redhat.com>,
+        Stewart Smith <trawets@amazon.com>,
+        "Uwe Dannowski" <uwed@amazon.de>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        kvm <kvm@vger.kernel.org>,
+        ne-devel-upstream <ne-devel-upstream@amazon.com>
+References: <20200904173718.64857-1-andraprs@amazon.com>
+ <20200904173718.64857-16-andraprs@amazon.com>
+ <20200907090011.GC1101646@kroah.com>
+From:   "Paraschiv, Andra-Irina" <andraprs@amazon.com>
+Message-ID: <f5c0f79c-f581-fab5-9a3b-97380ef7fc2a@amazon.com>
+Date:   Mon, 7 Sep 2020 16:35:23 +0300
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:78.0)
+ Gecko/20100101 Thunderbird/78.2.1
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20200907090011.GC1101646@kroah.com>
+Content-Language: en-US
+X-Originating-IP: [10.43.162.38]
+X-ClientProxiedBy: EX13D20UWA001.ant.amazon.com (10.43.160.34) To
+ EX13D16EUB001.ant.amazon.com (10.43.166.28)
+Content-Type: text/plain; charset="utf-8"; format="flowed"
+Content-Transfer-Encoding: base64
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Martin Radev <martin.b.radev@gmail.com>
-
-Make sure the machine supports RDRAND, otherwise there is no trusted
-source of of randomness in the system.
-
-To also check this in the pre-decompression stage, make has_cpuflag
-not depend on CONFIG_RANDOMIZE_BASE anymore.
-
-Signed-off-by: Martin Radev <martin.b.radev@gmail.com>
-Signed-off-by: Joerg Roedel <jroedel@suse.de>
-Reviewed-by: Kees Cook <keescook@chromium.org>
----
- arch/x86/boot/compressed/cpuflags.c |  4 ----
- arch/x86/boot/compressed/misc.h     |  5 +++--
- arch/x86/boot/compressed/sev-es.c   |  3 +++
- arch/x86/kernel/sev-es-shared.c     | 15 +++++++++++++++
- arch/x86/kernel/sev-es.c            |  3 +++
- 5 files changed, 24 insertions(+), 6 deletions(-)
-
-diff --git a/arch/x86/boot/compressed/cpuflags.c b/arch/x86/boot/compressed/cpuflags.c
-index 6448a8196d32..0cc1323896d1 100644
---- a/arch/x86/boot/compressed/cpuflags.c
-+++ b/arch/x86/boot/compressed/cpuflags.c
-@@ -1,6 +1,4 @@
- // SPDX-License-Identifier: GPL-2.0
--#ifdef CONFIG_RANDOMIZE_BASE
--
- #include "../cpuflags.c"
- 
- bool has_cpuflag(int flag)
-@@ -9,5 +7,3 @@ bool has_cpuflag(int flag)
- 
- 	return test_bit(flag, cpu.flags);
- }
--
--#endif
-diff --git a/arch/x86/boot/compressed/misc.h b/arch/x86/boot/compressed/misc.h
-index c0e0ffeee50a..6d31f1b4c4d1 100644
---- a/arch/x86/boot/compressed/misc.h
-+++ b/arch/x86/boot/compressed/misc.h
-@@ -85,8 +85,6 @@ void choose_random_location(unsigned long input,
- 			    unsigned long *output,
- 			    unsigned long output_size,
- 			    unsigned long *virt_addr);
--/* cpuflags.c */
--bool has_cpuflag(int flag);
- #else
- static inline void choose_random_location(unsigned long input,
- 					  unsigned long input_size,
-@@ -97,6 +95,9 @@ static inline void choose_random_location(unsigned long input,
- }
- #endif
- 
-+/* cpuflags.c */
-+bool has_cpuflag(int flag);
-+
- #ifdef CONFIG_X86_64
- extern int set_page_decrypted(unsigned long address);
- extern int set_page_encrypted(unsigned long address);
-diff --git a/arch/x86/boot/compressed/sev-es.c b/arch/x86/boot/compressed/sev-es.c
-index 0a9a248ca33d..3c66dad4e62e 100644
---- a/arch/x86/boot/compressed/sev-es.c
-+++ b/arch/x86/boot/compressed/sev-es.c
-@@ -145,6 +145,9 @@ void sev_es_shutdown_ghcb(void)
- 	if (!boot_ghcb)
- 		return;
- 
-+	if (!sev_es_check_cpu_features())
-+		error("SEV-ES CPU Features missing.");
-+
- 	/*
- 	 * GHCB Page must be flushed from the cache and mapped encrypted again.
- 	 * Otherwise the running kernel will see strange cache effects when
-diff --git a/arch/x86/kernel/sev-es-shared.c b/arch/x86/kernel/sev-es-shared.c
-index 92d77b725ccb..ce86d2c9ca7b 100644
---- a/arch/x86/kernel/sev-es-shared.c
-+++ b/arch/x86/kernel/sev-es-shared.c
-@@ -9,6 +9,21 @@
-  * and is included directly into both code-bases.
-  */
- 
-+#ifndef __BOOT_COMPRESSED
-+#define error(v)	pr_err(v)
-+#define has_cpuflag(f)	boot_cpu_has(f)
-+#endif
-+
-+static bool __init sev_es_check_cpu_features(void)
-+{
-+	if (!has_cpuflag(X86_FEATURE_RDRAND)) {
-+		error("RDRAND instruction not supported - no trusted source of randomness available\n");
-+		return false;
-+	}
-+
-+	return true;
-+}
-+
- static void sev_es_terminate(unsigned int reason)
- {
- 	u64 val = GHCB_SEV_TERMINATE;
-diff --git a/arch/x86/kernel/sev-es.c b/arch/x86/kernel/sev-es.c
-index 4e2b7e4d9b87..70623bbce062 100644
---- a/arch/x86/kernel/sev-es.c
-+++ b/arch/x86/kernel/sev-es.c
-@@ -665,6 +665,9 @@ void __init sev_es_init_vc_handling(void)
- 	if (!sev_es_active())
- 		return;
- 
-+	if (!sev_es_check_cpu_features())
-+		panic("SEV-ES CPU Features missing");
-+
- 	/* Enable SEV-ES special handling */
- 	static_branch_enable(&sev_es_enable_key);
- 
--- 
-2.28.0
+CgpPbiAwNy8wOS8yMDIwIDEyOjAwLCBHcmVnIEtIIHdyb3RlOgo+Cj4KPiBPbiBGcmksIFNlcCAw
+NCwgMjAyMCBhdCAwODozNzoxNVBNICswMzAwLCBBbmRyYSBQYXJhc2NoaXYgd3JvdGU6Cj4+IFNp
+Z25lZC1vZmYtYnk6IEFuZHJhIFBhcmFzY2hpdiA8YW5kcmFwcnNAYW1hem9uLmNvbT4KPj4gUmV2
+aWV3ZWQtYnk6IEFsZXhhbmRlciBHcmFmIDxncmFmQGFtYXpvbi5jb20+Cj4+IC0tLQo+PiBDaGFu
+Z2Vsb2cKPj4KPj4gdjcgLT4gdjgKPj4KPj4gKiBObyBjaGFuZ2VzLgo+Pgo+PiB2NiAtPiB2Nwo+
+Pgo+PiAqIE5vIGNoYW5nZXMuCj4+Cj4+IHY1IC0+IHY2Cj4+Cj4+ICogTm8gY2hhbmdlcy4KPj4K
+Pj4gdjQgLT4gdjUKPj4KPj4gKiBObyBjaGFuZ2VzLgo+Pgo+PiB2MyAtPiB2NAo+Pgo+PiAqIE5v
+IGNoYW5nZXMuCj4+Cj4+IHYyIC0+IHYzCj4+Cj4+ICogUmVtb3ZlIHRoZSBHUEwgYWRkaXRpb25h
+bCB3b3JkaW5nIGFzIFNQRFgtTGljZW5zZS1JZGVudGlmaWVyIGlzCj4+ICAgIGFscmVhZHkgaW4g
+cGxhY2UuCj4+Cj4+IHYxIC0+IHYyCj4+Cj4+ICogVXBkYXRlIHBhdGggdG8gTWFrZWZpbGUgdG8g
+bWF0Y2ggdGhlIGRyaXZlcnMvdmlydC9uaXRyb19lbmNsYXZlcwo+PiAgICBkaXJlY3RvcnkuCj4+
+IC0tLQo+PiAgIGRyaXZlcnMvdmlydC9NYWtlZmlsZSAgICAgICAgICAgICAgICB8ICAyICsrCj4+
+ICAgZHJpdmVycy92aXJ0L25pdHJvX2VuY2xhdmVzL01ha2VmaWxlIHwgMTEgKysrKysrKysrKysK
+Pj4gICAyIGZpbGVzIGNoYW5nZWQsIDEzIGluc2VydGlvbnMoKykKPj4gICBjcmVhdGUgbW9kZSAx
+MDA2NDQgZHJpdmVycy92aXJ0L25pdHJvX2VuY2xhdmVzL01ha2VmaWxlCj4+Cj4+IGRpZmYgLS1n
+aXQgYS9kcml2ZXJzL3ZpcnQvTWFrZWZpbGUgYi9kcml2ZXJzL3ZpcnQvTWFrZWZpbGUKPj4gaW5k
+ZXggZmQzMzEyNDdjMjdhLi5mMjg0MjVjZTRiMzkgMTAwNjQ0Cj4+IC0tLSBhL2RyaXZlcnMvdmly
+dC9NYWtlZmlsZQo+PiArKysgYi9kcml2ZXJzL3ZpcnQvTWFrZWZpbGUKPj4gQEAgLTUsMyArNSw1
+IEBACj4+Cj4+ICAgb2JqLSQoQ09ORklHX0ZTTF9IVl9NQU5BR0VSKSArPSBmc2xfaHlwZXJ2aXNv
+ci5vCj4+ICAgb2JqLXkgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICs9IHZib3hndWVz
+dC8KPj4gKwo+PiArb2JqLSQoQ09ORklHX05JVFJPX0VOQ0xBVkVTKSArPSBuaXRyb19lbmNsYXZl
+cy8KPj4gZGlmZiAtLWdpdCBhL2RyaXZlcnMvdmlydC9uaXRyb19lbmNsYXZlcy9NYWtlZmlsZSBi
+L2RyaXZlcnMvdmlydC9uaXRyb19lbmNsYXZlcy9NYWtlZmlsZQo+PiBuZXcgZmlsZSBtb2RlIDEw
+MDY0NAo+PiBpbmRleCAwMDAwMDAwMDAwMDAuLmU5ZjRmY2QxNTkxZQo+PiAtLS0gL2Rldi9udWxs
+Cj4+ICsrKyBiL2RyaXZlcnMvdmlydC9uaXRyb19lbmNsYXZlcy9NYWtlZmlsZQo+PiBAQCAtMCww
+ICsxLDExIEBACj4+ICsjIFNQRFgtTGljZW5zZS1JZGVudGlmaWVyOiBHUEwtMi4wCj4+ICsjCj4+
+ICsjIENvcHlyaWdodCAyMDIwIEFtYXpvbi5jb20sIEluYy4gb3IgaXRzIGFmZmlsaWF0ZXMuIEFs
+bCBSaWdodHMgUmVzZXJ2ZWQuCj4+ICsKPj4gKyMgRW5jbGF2ZSBsaWZldGltZSBtYW5hZ2VtZW50
+IHN1cHBvcnQgZm9yIE5pdHJvIEVuY2xhdmVzIChORSkuCj4+ICsKPj4gK29iai0kKENPTkZJR19O
+SVRST19FTkNMQVZFUykgKz0gbml0cm9fZW5jbGF2ZXMubwo+PiArCj4+ICtuaXRyb19lbmNsYXZl
+cy15IDo9IG5lX3BjaV9kZXYubyBuZV9taXNjX2Rldi5vCj4+ICsKPj4gK2NjZmxhZ3MteSArPSAt
+V2FsbAo+IFRoYXQgZmxhZyBpcyBfcmVhbGx5XyByaXNreSBvdmVyIHRpbWUsIGFyZSB5b3UgX1NV
+UkVfIHRoYXQgYWxsIG5ldwo+IHZlcnNpb25zIG9mIGNsYW5nIGFuZCBnY2Mgd2lsbCBuZXZlciBw
+cm9kdWNlIGFueSB3YXJuaW5ncz8gIFBlb3BsZSB3b3JrCj4gdG8gZml4IHVwIGJ1aWxkIHdhcm5p
+bmdzIHF1aXRlIHF1aWNrbHkgZm9yIG5ldyBjb21waWxlcnMsIHlvdSBzaG91bGRuJ3QKPiBwcmV2
+ZW50IHRoZSBjb2RlIGZyb20gYmVpbmcgYnVpbHQgYXQgYWxsIGp1c3QgZm9yIHRoYXQsIHJpZ2h0
+Pwo+CgpUaGF0IHdvdWxkIGFsc28gbmVlZCBXZXJyb3IsIHRvIGhhdmUgd2FybmluZ3MgdHJlYXRl
+ZCBhcyBlcnJvcnMgYW5kIApwcmV2ZW50IGJ1aWxkaW5nIHRoZSBjb2RlYmFzZS4gSWYgaXQncyBh
+Ym91dCBzb21ldGhpbmcgbW9yZSwganVzdCBsZXQgbWUgCmtub3cuCgpXb3VsZCB0aGlzIGFwcGx5
+IHRvIHRoZSBzYW1wbGVzIGRpcmVjdG9yeSBhcyB3ZWxsLCBubz8KCkkgY291bGQgcmVtb3ZlIHRo
+ZSBXYWxsIGZsYWdzIGFuZCBrZWVwIGl0IGZvciBkZXZlbG9wbWVudCB2YWxpZGF0aW9uIApwdXJw
+b3NlcyBvbiBteSBzaWRlIHRvIHNvbHZlIGF0IGxlYXN0IHRoZSB3YXJuaW5ncyB0aGF0IHdvdWxk
+IGZ1cnRoZXIgc2VlLgoKVGhhbmtzLApBbmRyYQoKCgpBbWF6b24gRGV2ZWxvcG1lbnQgQ2VudGVy
+IChSb21hbmlhKSBTLlIuTC4gcmVnaXN0ZXJlZCBvZmZpY2U6IDI3QSBTZi4gTGF6YXIgU3RyZWV0
+LCBVQkM1LCBmbG9vciAyLCBJYXNpLCBJYXNpIENvdW50eSwgNzAwMDQ1LCBSb21hbmlhLiBSZWdp
+c3RlcmVkIGluIFJvbWFuaWEuIFJlZ2lzdHJhdGlvbiBudW1iZXIgSjIyLzI2MjEvMjAwNS4K
 
