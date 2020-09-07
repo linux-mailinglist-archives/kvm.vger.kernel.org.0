@@ -2,19 +2,19 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 572F22602A9
-	for <lists+kvm@lfdr.de>; Mon,  7 Sep 2020 19:32:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 50C482602B5
+	for <lists+kvm@lfdr.de>; Mon,  7 Sep 2020 19:33:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730780AbgIGRb7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 7 Sep 2020 13:31:59 -0400
-Received: from 8bytes.org ([81.169.241.247]:41840 "EHLO theia.8bytes.org"
+        id S1731228AbgIGRcI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 7 Sep 2020 13:32:08 -0400
+Received: from 8bytes.org ([81.169.241.247]:41838 "EHLO theia.8bytes.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729482AbgIGNS1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        id S1729481AbgIGNS1 (ORCPT <rfc822;kvm@vger.kernel.org>);
         Mon, 7 Sep 2020 09:18:27 -0400
 Received: from cap.home.8bytes.org (p549add56.dip0.t-ipconnect.de [84.154.221.86])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
         (No client certificate requested)
-        by theia.8bytes.org (Postfix) with ESMTPSA id 4CE9DCAC;
+        by theia.8bytes.org (Postfix) with ESMTPSA id C8D38D02;
         Mon,  7 Sep 2020 15:16:46 +0200 (CEST)
 From:   Joerg Roedel <joro@8bytes.org>
 To:     x86@kernel.org
@@ -36,9 +36,9 @@ Cc:     Joerg Roedel <joro@8bytes.org>, Joerg Roedel <jroedel@suse.de>,
         Martin Radev <martin.b.radev@gmail.com>,
         linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         virtualization@lists.linux-foundation.org
-Subject: [PATCH v7 08/72] x86/umip: Factor out instruction fetch
-Date:   Mon,  7 Sep 2020 15:15:09 +0200
-Message-Id: <20200907131613.12703-9-joro@8bytes.org>
+Subject: [PATCH v7 09/72] x86/umip: Factor out instruction decoding
+Date:   Mon,  7 Sep 2020 15:15:10 +0200
+Message-Id: <20200907131613.12703-10-joro@8bytes.org>
 X-Mailer: git-send-email 2.28.0
 In-Reply-To: <20200907131613.12703-1-joro@8bytes.org>
 References: <20200907131613.12703-1-joro@8bytes.org>
@@ -51,124 +51,123 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Joerg Roedel <jroedel@suse.de>
 
-Factor out the code to fetch the instruction from user-space to a helper
-function.
+Factor out the code used to decode an instruction with the correct
+address and operand sizes to a helper function.
 
 No functional changes.
 
 Signed-off-by: Joerg Roedel <jroedel@suse.de>
 ---
  arch/x86/include/asm/insn-eval.h |  2 ++
- arch/x86/kernel/umip.c           | 26 +++++-----------------
- arch/x86/lib/insn-eval.c         | 38 ++++++++++++++++++++++++++++++++
- 3 files changed, 46 insertions(+), 20 deletions(-)
+ arch/x86/kernel/umip.c           | 23 +---------------
+ arch/x86/lib/insn-eval.c         | 45 ++++++++++++++++++++++++++++++++
+ 3 files changed, 48 insertions(+), 22 deletions(-)
 
 diff --git a/arch/x86/include/asm/insn-eval.h b/arch/x86/include/asm/insn-eval.h
-index 2b6ccf2c49f1..b8b9ef1bbd06 100644
+index b8b9ef1bbd06..392b4fe377f9 100644
 --- a/arch/x86/include/asm/insn-eval.h
 +++ b/arch/x86/include/asm/insn-eval.h
-@@ -19,5 +19,7 @@ void __user *insn_get_addr_ref(struct insn *insn, struct pt_regs *regs);
- int insn_get_modrm_rm_off(struct insn *insn, struct pt_regs *regs);
- unsigned long insn_get_seg_base(struct pt_regs *regs, int seg_reg_idx);
+@@ -21,5 +21,7 @@ unsigned long insn_get_seg_base(struct pt_regs *regs, int seg_reg_idx);
  int insn_get_code_seg_params(struct pt_regs *regs);
-+int insn_fetch_from_user(struct pt_regs *regs,
-+			 unsigned char buf[MAX_INSN_SIZE]);
+ int insn_fetch_from_user(struct pt_regs *regs,
+ 			 unsigned char buf[MAX_INSN_SIZE]);
++bool insn_decode(struct insn *insn, struct pt_regs *regs,
++		 unsigned char buf[MAX_INSN_SIZE], int buf_size);
  
  #endif /* _ASM_X86_INSN_EVAL_H */
 diff --git a/arch/x86/kernel/umip.c b/arch/x86/kernel/umip.c
-index 2c304fd0bb1a..ad135be4f1f0 100644
+index ad135be4f1f0..f6225bf22c02 100644
 --- a/arch/x86/kernel/umip.c
 +++ b/arch/x86/kernel/umip.c
-@@ -335,11 +335,11 @@ static void force_sig_info_umip_fault(void __user *addr, struct pt_regs *regs)
-  */
- bool fixup_umip_exception(struct pt_regs *regs)
- {
--	int not_copied, nr_copied, reg_offset, dummy_data_size, umip_inst;
--	unsigned long seg_base = 0, *reg_addr;
-+	int nr_copied, reg_offset, dummy_data_size, umip_inst;
- 	/* 10 bytes is the maximum size of the result of UMIP instructions */
- 	unsigned char dummy_data[10] = { 0 };
- 	unsigned char buf[MAX_INSN_SIZE];
-+	unsigned long *reg_addr;
+@@ -342,7 +342,6 @@ bool fixup_umip_exception(struct pt_regs *regs)
+ 	unsigned long *reg_addr;
  	void __user *uaddr;
  	struct insn insn;
- 	int seg_defs;
-@@ -347,26 +347,12 @@ bool fixup_umip_exception(struct pt_regs *regs)
+-	int seg_defs;
+ 
  	if (!regs)
  		return false;
- 
--	/*
--	 * If not in user-space long mode, a custom code segment could be in
--	 * use. This is true in protected mode (if the process defined a local
--	 * descriptor table), or virtual-8086 mode. In most of the cases
--	 * seg_base will be zero as in USER_CS.
--	 */
--	if (!user_64bit_mode(regs))
--		seg_base = insn_get_seg_base(regs, INAT_SEG_REG_CS);
--
--	if (seg_base == -1L)
--		return false;
--
--	not_copied = copy_from_user(buf, (void __user *)(seg_base + regs->ip),
--				    sizeof(buf));
--	nr_copied = sizeof(buf) - not_copied;
-+	nr_copied = insn_fetch_from_user(regs, buf);
- 
- 	/*
--	 * The copy_from_user above could have failed if user code is protected
--	 * by a memory protection key. Give up on emulation in such a case.
--	 * Should we issue a page fault?
-+	 * The insn_fetch_from_user above could have failed if user code
-+	 * is protected by a memory protection key. Give up on emulation
-+	 * in such a case.  Should we issue a page fault?
- 	 */
+@@ -357,27 +356,7 @@ bool fixup_umip_exception(struct pt_regs *regs)
  	if (!nr_copied)
  		return false;
+ 
+-	insn_init(&insn, buf, nr_copied, user_64bit_mode(regs));
+-
+-	/*
+-	 * Override the default operand and address sizes with what is specified
+-	 * in the code segment descriptor. The instruction decoder only sets
+-	 * the address size it to either 4 or 8 address bytes and does nothing
+-	 * for the operand bytes. This OK for most of the cases, but we could
+-	 * have special cases where, for instance, a 16-bit code segment
+-	 * descriptor is used.
+-	 * If there is an address override prefix, the instruction decoder
+-	 * correctly updates these values, even for 16-bit defaults.
+-	 */
+-	seg_defs = insn_get_code_seg_params(regs);
+-	if (seg_defs == -EINVAL)
+-		return false;
+-
+-	insn.addr_bytes = INSN_CODE_SEG_ADDR_SZ(seg_defs);
+-	insn.opnd_bytes = INSN_CODE_SEG_OPND_SZ(seg_defs);
+-
+-	insn_get_length(&insn);
+-	if (nr_copied < insn.length)
++	if (!insn_decode(&insn, regs, buf, nr_copied))
+ 		return false;
+ 
+ 	umip_inst = identify_insn(&insn);
 diff --git a/arch/x86/lib/insn-eval.c b/arch/x86/lib/insn-eval.c
-index 5e69603ff63f..947b7f1a0042 100644
+index 947b7f1a0042..2323c85132cf 100644
 --- a/arch/x86/lib/insn-eval.c
 +++ b/arch/x86/lib/insn-eval.c
-@@ -1367,3 +1367,41 @@ void __user *insn_get_addr_ref(struct insn *insn, struct pt_regs *regs)
- 		return (void __user *)-1L;
- 	}
+@@ -1405,3 +1405,48 @@ int insn_fetch_from_user(struct pt_regs *regs, unsigned char buf[MAX_INSN_SIZE])
+ 
+ 	return MAX_INSN_SIZE - not_copied;
  }
 +
 +/**
-+ * insn_fetch_from_user() - Copy instruction bytes from user-space memory
++ * insn_decode() - Decode an instruction
++ * @insn:	Structure to store decoded instruction
 + * @regs:	Structure with register values as seen when entering kernel mode
-+ * @buf:	Array to store the fetched instruction
++ * @buf:	Buffer containing the instruction bytes
++ * @buf_size:   Number of instruction bytes available in buf
 + *
-+ * Gets the linear address of the instruction and copies the instruction bytes
-+ * to the buf.
++ * Decodes the instruction provided in buf and stores the decoding results in
++ * insn. Also determines the correct address and operand sizes.
 + *
 + * Returns:
 + *
-+ * Number of instruction bytes copied.
-+ *
-+ * 0 if nothing was copied.
++ * True if instruction was decoded, False otherwise.
 + */
-+int insn_fetch_from_user(struct pt_regs *regs, unsigned char buf[MAX_INSN_SIZE])
++bool insn_decode(struct insn *insn, struct pt_regs *regs,
++		 unsigned char buf[MAX_INSN_SIZE], int buf_size)
 +{
-+	unsigned long seg_base = 0;
-+	int not_copied;
++	int seg_defs;
++
++	insn_init(insn, buf, buf_size, user_64bit_mode(regs));
 +
 +	/*
-+	 * If not in user-space long mode, a custom code segment could be in
-+	 * use. This is true in protected mode (if the process defined a local
-+	 * descriptor table), or virtual-8086 mode. In most of the cases
-+	 * seg_base will be zero as in USER_CS.
++	 * Override the default operand and address sizes with what is specified
++	 * in the code segment descriptor. The instruction decoder only sets
++	 * the address size it to either 4 or 8 address bytes and does nothing
++	 * for the operand bytes. This OK for most of the cases, but we could
++	 * have special cases where, for instance, a 16-bit code segment
++	 * descriptor is used.
++	 * If there is an address override prefix, the instruction decoder
++	 * correctly updates these values, even for 16-bit defaults.
 +	 */
-+	if (!user_64bit_mode(regs)) {
-+		seg_base = insn_get_seg_base(regs, INAT_SEG_REG_CS);
-+		if (seg_base == -1L)
-+			return 0;
-+	}
++	seg_defs = insn_get_code_seg_params(regs);
++	if (seg_defs == -EINVAL)
++		return false;
 +
++	insn->addr_bytes = INSN_CODE_SEG_ADDR_SZ(seg_defs);
++	insn->opnd_bytes = INSN_CODE_SEG_OPND_SZ(seg_defs);
 +
-+	not_copied = copy_from_user(buf, (void __user *)(seg_base + regs->ip),
-+				    MAX_INSN_SIZE);
++	insn_get_length(insn);
++	if (buf_size < insn->length)
++		return false;
 +
-+	return MAX_INSN_SIZE - not_copied;
++	return true;
 +}
 -- 
 2.28.0
