@@ -2,331 +2,274 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8C0C426033F
-	for <lists+kvm@lfdr.de>; Mon,  7 Sep 2020 19:46:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DED3A26033A
+	for <lists+kvm@lfdr.de>; Mon,  7 Sep 2020 19:46:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731285AbgIGRqa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 7 Sep 2020 13:46:30 -0400
-Received: from mail-eopbgr00045.outbound.protection.outlook.com ([40.107.0.45]:34478
-        "EHLO EUR02-AM5-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1729336AbgIGNKC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 7 Sep 2020 09:10:02 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=NGfdZPct9XXmIpa174rn8sLLv2R4sIUZg4ObCK+J4+mfwHMuSi/NF5DLCiCBgRBv4TuyVZ9+wn7wS3S++4mSvOzM34GmDXaT68z4PWVULaa4xRzT3ZoKc2XzQuoakpf7tgAPe8CBdCF0qnJIeK0hWpvm9G0o89pjCphr07Z+owH5tYR8gCIilCWdS9erbY7cVQZuuyhsToihjLEdvSaWop20SR11GhozzfyXvkuWJi4TnPvJZ6s7p40JFQLPORpFFjz4iNxauFbbnYJ+rNV4m9SznoI7vz/zi/31U0AxpxNgFvmYKoyz9SWQFSAwIc10LDwuXwnyj8x1AzQyH7gGRg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=5XKWjgJZTJZGvhnNQ9afqQjolLYYjpOoaukTjb0Mi9M=;
- b=HaIPgh26JOnjyYJM+zkb8l2rGxCN/kiU32bmM71Zg508RfsIG4t9AJmw59Ow+qJM+5tis9IxRd7oGmh1N16hWMwng1k2wP53QAJ1jIRx6nD+mXdpMfzzRrVksHDwpT4oVVxST4ziV+RWpzUkV/SGDl6I57dDzmapj/U9zc4MTw4raVRn5l2Be0ZspklA9JDhr4sWa/beAWs0yaOErFJAOrM5ObAViCeKFLiJW/sXCEx4eJlRkEnGsIVodnrD2sPaEn8KxBecg89AwEKYkAKLsRnVdOXc80eS+mdkC1tdao8hzeFVXt7DCu4VPcfh1ztRIab5laNRuJBju6hUjGnYBg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oss.nxp.com; dmarc=pass action=none header.from=oss.nxp.com;
- dkim=pass header.d=oss.nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=NXP1.onmicrosoft.com;
- s=selector2-NXP1-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=5XKWjgJZTJZGvhnNQ9afqQjolLYYjpOoaukTjb0Mi9M=;
- b=a4kJCHxrQX7qapgk5MUYkBKWPihfmPI6JbANVvXtIyMreMeHBBLKpxyOY//UDdcTUoLryQfkrX1si7wsamHat/4hzh2jy9jv0gntoB0tB6zxofr0eRc/dk4TiAtZt2CWQSnUOQXQ+/+U5Gizw0ijBa5UjVTJ14vzDQRPalB9Ug8=
-Authentication-Results: nxp.com; dkim=none (message not signed)
- header.d=none;nxp.com; dmarc=none action=none header.from=oss.nxp.com;
-Received: from VI1PR0402MB2815.eurprd04.prod.outlook.com
- (2603:10a6:800:ae::16) by VI1PR04MB7181.eurprd04.prod.outlook.com
- (2603:10a6:800:12a::24) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3348.15; Mon, 7 Sep
- 2020 13:09:56 +0000
-Received: from VI1PR0402MB2815.eurprd04.prod.outlook.com
- ([fe80::a508:19fb:5b7e:5607]) by VI1PR0402MB2815.eurprd04.prod.outlook.com
- ([fe80::a508:19fb:5b7e:5607%9]) with mapi id 15.20.3348.019; Mon, 7 Sep 2020
- 13:09:56 +0000
-Subject: Re: [PATCH v4 07/10] vfio/fsl-mc: Add irq infrastructure for fsl-mc
- devices
-To:     Auger Eric <eric.auger@redhat.com>, alex.williamson@redhat.com,
-        kvm@vger.kernel.org
-Cc:     linux-kernel@vger.kernel.org, bharatb.linux@gmail.com,
-        laurentiu.tudor@nxp.com, Bharat Bhushan <Bharat.Bhushan@nxp.com>
-References: <20200826093315.5279-1-diana.craciun@oss.nxp.com>
- <20200826093315.5279-8-diana.craciun@oss.nxp.com>
- <9dacbfc8-32a6-54c9-ce0c-50538ee588bf@redhat.com>
-From:   Diana Craciun OSS <diana.craciun@oss.nxp.com>
-Message-ID: <a98038d7-1a37-94b6-e6e5-51ca7b68a904@oss.nxp.com>
-Date:   Mon, 7 Sep 2020 16:09:52 +0300
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
-In-Reply-To: <9dacbfc8-32a6-54c9-ce0c-50538ee588bf@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: AM0PR01CA0112.eurprd01.prod.exchangelabs.com
- (2603:10a6:208:168::17) To VI1PR0402MB2815.eurprd04.prod.outlook.com
- (2603:10a6:800:ae::16)
+        id S1730750AbgIGRqM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 7 Sep 2020 13:46:12 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:19478 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1729394AbgIGNO0 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 7 Sep 2020 09:14:26 -0400
+Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 087D4UNn167875;
+        Mon, 7 Sep 2020 09:14:24 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : mime-version : content-transfer-encoding; s=pp1;
+ bh=qAM6XSxtNjfqGEthn7zWqzDo3LY9WO8P+0xYllpgUh8=;
+ b=PcYpCD7mhcMlTayQdJaSb50I2Gi7UCBmOD+4dFPd1fpS0n/f8fV7FtjeehFK55+/CNjv
+ jSv/XoP8bMGGpEXEEleROj5FW4hlFV3+BVq3A3fIQQkRyQyLedbo4GPaxnlT2P4f1Hzy
+ ZWdaly6emoVKSNWRn7dUO8soqfXC5KcmRFGndQ4qm/tfh97labf683d1qMjj4ZKTUNrc
+ w16K8p1uwQi4fcqXKJYElv7SmX8WE3suGw9nJRddRYpusgdQuVGSIi3VelW1SH+J/u6j
+ eljFVWmiAD2Rg5ecsBLzr9NT6kgVkPqHH1o2Hpy0T7L9mvjQSKvppbFK/3qEnA/zfupD 2Q== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 33dkc4bq76-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 07 Sep 2020 09:14:24 -0400
+Received: from m0098414.ppops.net (m0098414.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 087D53TK170637;
+        Mon, 7 Sep 2020 09:14:24 -0400
+Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 33dkc4bq6s-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 07 Sep 2020 09:14:24 -0400
+Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
+        by ppma04ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 087DCSLF029546;
+        Mon, 7 Sep 2020 13:14:22 GMT
+Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
+        by ppma04ams.nl.ibm.com with ESMTP id 33c2a8adyy-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 07 Sep 2020 13:14:22 +0000
+Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
+        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 087DClrJ29295024
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 7 Sep 2020 13:12:47 GMT
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 6F167A4040;
+        Mon,  7 Sep 2020 13:14:19 +0000 (GMT)
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id C4BEDA405B;
+        Mon,  7 Sep 2020 13:14:18 +0000 (GMT)
+Received: from linux01.pok.stglabs.ibm.com (unknown [9.114.17.81])
+        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Mon,  7 Sep 2020 13:14:18 +0000 (GMT)
+From:   Janosch Frank <frankja@linux.ibm.com>
+To:     kvm@vger.kernel.org
+Cc:     borntraeger@de.ibm.com, imbrenda@linux.ibm.com, david@redhat.com,
+        linux-s390@vger.kernel.org
+Subject: [PATCH] KVM: s390: Introduce storage key removal facility
+Date:   Mon,  7 Sep 2020 09:14:10 -0400
+Message-Id: <20200907131410.11474-1-frankja@linux.ibm.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from [192.168.1.122] (188.27.189.94) by AM0PR01CA0112.eurprd01.prod.exchangelabs.com (2603:10a6:208:168::17) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3348.15 via Frontend Transport; Mon, 7 Sep 2020 13:09:55 +0000
-X-Originating-IP: [188.27.189.94]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-HT: Tenant
-X-MS-Office365-Filtering-Correlation-Id: 11e6e257-c198-4e38-3321-08d8532f50e5
-X-MS-TrafficTypeDiagnostic: VI1PR04MB7181:
-X-MS-Exchange-SharedMailbox-RoutingAgent-Processed: True
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <VI1PR04MB718122AFBE7240CD3B78DE4CBE280@VI1PR04MB7181.eurprd04.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: iwMI61N59+DXhKREU+l5huCt+ZjPrOX4b1c1kKn7smgLsOA6yp0mh22A2/qTlrxL1aFdTHTEK1TM2Wrw4tU/ilFM2CHug5IL6rcwJOaRtIUlaeMDEg21SoyN/N+pd78Fn+aaZit7Ki0OVSdqEUCPR26l55qV3V9N8Jc+Az5sFZAXbAdJFZV+1V3oKsKv8n4aTkIcv9Yu1Fzg9noiWNoG8xKTloLkDEL8HiYndULnu/7yw8SdX7dSMWVlTDW07jRnKjt+qlL47GBhXONHLTf27U/LgFnannKEXrmvmVi5C9/zXY3sD0cQ+rdhiaExu4ZFkkewLSniKvjOFmEeF6GLzkJpBtJdDcDgoTYj7/K+W+5spezWwsHuHWe8tzpEEC6Y
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:VI1PR0402MB2815.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(396003)(136003)(39860400002)(346002)(376002)(86362001)(66556008)(66946007)(66476007)(5660300002)(16576012)(8676002)(2616005)(4326008)(31696002)(316002)(6486002)(956004)(53546011)(16526019)(26005)(186003)(8936002)(6666004)(478600001)(52116002)(31686004)(83380400001)(2906002)(43740500002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData: z0Njcg+ixThwwf2tB+Zhfpr3cuB323Q6GKpGipRsgPQFy3f8/DJfaGT4nOqvX8bhknA+PcAXRHjVxR26WJyzw1/e+Nwe27f6eA6jniCgTm52a++d35BY6QryYynp2fp2FDBKOMQR/SNFyQCmmwatJ5BfSteyCyUqOp5o8lvsZuUSvh50kkeuumaZ0vM254N8K5YBQssoq5jUa9KruCheqEibf6zh/AsoZAvwq+BUQ31Gbk4S2+kJVEc1NrymYSpT5PfOxTgd/Au29UDS1+OO6gp03vrisrEhy3hrXhNXIoCLwy+g41GSHajEqDsT1ePx6H4iLUkB9EphgRTsW4peRr1yJiRtobw7X163zFRmEzSzUYjWG5X1kgix1tuMhwcwrLc0zWNap4UOUFcX9PVBxzQtDGwepghm0FPSWsZp4+h2l7DUfYi1f0Y4N9pOPSbpHKX5J50VFLWiJJ99JycE9PXR1b/arH/8f3tCAAUcaUVtAYyeqx95TeFJdaXi1FwtWoTmi+2WgrETvCDJ3XG5PL+YKOXqjouVTObQeHxdeSD+QGnQfrS3wD/3fFEoEXAE1yRV5L0LwFXI4zLf9Z/V5kNnEAUVoDlIVT6zgX4q1j5eZwCxx2EGDsZuRDbIx35FyO+0RDLyxe9bER7f+90xvw==
-X-OriginatorOrg: oss.nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 11e6e257-c198-4e38-3321-08d8532f50e5
-X-MS-Exchange-CrossTenant-AuthSource: VI1PR0402MB2815.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Sep 2020 13:09:56.2769
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: HqYO7hlrwmt5yB/jxtpz+r9M1ZWkVgP0hvZJ8KJIPmR79WPHHYcNkJYdtA/gQq8FuSv6KOYtNt+hzvvjIe/8QA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR04MB7181
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
+ definitions=2020-09-07_07:2020-09-07,2020-09-07 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 mlxscore=0
+ adultscore=0 suspectscore=1 malwarescore=0 priorityscore=1501
+ impostorscore=0 lowpriorityscore=0 mlxlogscore=999 bulkscore=0 spamscore=0
+ phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2006250000 definitions=main-2009070128
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Eric,
+The storage key removal facility makes skey related instructions
+result in special operation program exceptions. It is based on the
+Keyless Subset Facility.
 
-On 9/3/2020 11:15 PM, Auger Eric wrote:
-> Hi Diana,
-> 
-> On 8/26/20 11:33 AM, Diana Craciun wrote:
->> This patch adds the skeleton for interrupt support
->> for fsl-mc devices. The interrupts are not yet functional,
->> the functionality will be added by subsequent patches.
->>
->> Signed-off-by: Bharat Bhushan <Bharat.Bhushan@nxp.com>
->> Signed-off-by: Diana Craciun <diana.craciun@oss.nxp.com>
->> ---
->>   drivers/vfio/fsl-mc/Makefile              |  2 +-
->>   drivers/vfio/fsl-mc/vfio_fsl_mc.c         | 75 ++++++++++++++++++++++-
->>   drivers/vfio/fsl-mc/vfio_fsl_mc_intr.c    | 63 +++++++++++++++++++
->>   drivers/vfio/fsl-mc/vfio_fsl_mc_private.h |  7 ++-
->>   4 files changed, 143 insertions(+), 4 deletions(-)
->>   create mode 100644 drivers/vfio/fsl-mc/vfio_fsl_mc_intr.c
->>
->> diff --git a/drivers/vfio/fsl-mc/Makefile b/drivers/vfio/fsl-mc/Makefile
->> index 0c6e5d2ddaae..cad6dbf0b735 100644
->> --- a/drivers/vfio/fsl-mc/Makefile
->> +++ b/drivers/vfio/fsl-mc/Makefile
->> @@ -1,4 +1,4 @@
->>   # SPDX-License-Identifier: (GPL-2.0+ OR BSD-3-Clause)
->>   
->> -vfio-fsl-mc-y := vfio_fsl_mc.o
->> +vfio-fsl-mc-y := vfio_fsl_mc.o vfio_fsl_mc_intr.o
->>   obj-$(CONFIG_VFIO_FSL_MC) += vfio-fsl-mc.o
->> diff --git a/drivers/vfio/fsl-mc/vfio_fsl_mc.c b/drivers/vfio/fsl-mc/vfio_fsl_mc.c
->> index bbd3365e877e..42014297b484 100644
->> --- a/drivers/vfio/fsl-mc/vfio_fsl_mc.c
->> +++ b/drivers/vfio/fsl-mc/vfio_fsl_mc.c
->> @@ -209,11 +209,79 @@ static long vfio_fsl_mc_ioctl(void *device_data, unsigned int cmd,
->>   	}
->>   	case VFIO_DEVICE_GET_IRQ_INFO:
->>   	{
->> -		return -ENOTTY;
->> +		struct vfio_irq_info info;
->> +
->> +		minsz = offsetofend(struct vfio_irq_info, count);
->> +		if (copy_from_user(&info, (void __user *)arg, minsz))
->> +			return -EFAULT;
->> +
->> +		if (info.argsz < minsz)
->> +			return -EINVAL;
->> +
->> +		if (info.index >= mc_dev->obj_desc.irq_count)
->> +			return -EINVAL;
->> +
->> +		info.flags = VFIO_IRQ_INFO_EVENTFD;
-> shouldn't it be MASKABLE as well? I see skeletons for MASK.
+The usual suspects are iske, sske, rrbe and their respective
+variants. lpsw(e), pfmf and tprot can also specify a key and essa with
+an ORC of 4 will consult the change bit, hence they all result in
+exceptions.
 
-The skeletons for mask are not implemented. Maybe I should just remove 
-the skeletons.
+Unfortunately storage keys were so essential to the architecture, that
+there is no facility bit that we could deactivate. That's why the
+removal facility (bit 169) was introduced which makes it necessary,
+that, if active, the skey related facilities 10, 14, 66, 145 and 149
+are zero. Managing this requirement and migratability has to be done
+in userspace, as KVM does not check the facilities it receives to be
+able to easily implement userspace emulation.
 
->> +		info.count = 1;
->> +
->> +		return copy_to_user((void __user *)arg, &info, minsz);
->>   	}
->>   	case VFIO_DEVICE_SET_IRQS:
->>   	{
->> -		return -ENOTTY;
->> +		struct vfio_irq_set hdr;
->> +		u8 *data = NULL;
->> +		int ret = 0;
->> +
->> +		minsz = offsetofend(struct vfio_irq_set, count);
->> +
->> +		if (copy_from_user(&hdr, (void __user *)arg, minsz))
->> +			return -EFAULT;
->> +
->> +		if (hdr.argsz < minsz)
->> +			return -EINVAL;
->> +
->> +		if (hdr.index >= mc_dev->obj_desc.irq_count)
->> +			return -EINVAL;
->> +
->> +		if (hdr.start != 0 || hdr.count > 1)
->> +			return -EINVAL;
->> +
->> +		if (hdr.count == 0 &&
->> +		    (!(hdr.flags & VFIO_IRQ_SET_DATA_NONE) ||
->> +		    !(hdr.flags & VFIO_IRQ_SET_ACTION_TRIGGER)))
->> +			return -EINVAL;
->> +
->> +		if (hdr.flags & ~(VFIO_IRQ_SET_DATA_TYPE_MASK |
->> +				  VFIO_IRQ_SET_ACTION_TYPE_MASK))
->> +			return -EINVAL;
->> +
->> +		if (!(hdr.flags & VFIO_IRQ_SET_DATA_NONE)) {
->> +			size_t size;
->> +
->> +			if (hdr.flags & VFIO_IRQ_SET_DATA_BOOL)
->> +				size = sizeof(uint8_t);
->> +			else if (hdr.flags & VFIO_IRQ_SET_DATA_EVENTFD)
->> +				size = sizeof(int32_t);
->> +			else
->> +				return -EINVAL;
->> +
->> +			if (hdr.argsz - minsz < hdr.count * size)
->> +				return -EINVAL;
->> +
->> +			data = memdup_user((void __user *)(arg + minsz),
->> +					   hdr.count * size);
->> +			if (IS_ERR(data))
->> +				return PTR_ERR(data);
->> +		}
-> can't you reuse vfio_set_irqs_validate_and_prepare()?
+Removing storage key support allows us to circumvent complicated
+emulation code and makes huge page support tremendously easier.
 
-Yes, I think I can reuse it.
+Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+---
+ arch/s390/kvm/intercept.c | 40 ++++++++++++++++++++++++++++++++++++++-
+ arch/s390/kvm/kvm-s390.c  |  5 +++++
+ arch/s390/kvm/priv.c      | 26 ++++++++++++++++++++++---
+ 3 files changed, 67 insertions(+), 4 deletions(-)
 
->> +
->> +		mutex_lock(&vdev->igate);
->> +		ret = vfio_fsl_mc_set_irqs_ioctl(vdev, hdr.flags,
->> +						 hdr.index, hdr.start,
->> +						 hdr.count, data);
->> +		mutex_unlock(&vdev->igate);
->> +		kfree(data);
->> +
->> +		return ret;
->>   	}
->>   	case VFIO_DEVICE_RESET:
->>   	{
->> @@ -413,6 +481,8 @@ static int vfio_fsl_mc_probe(struct fsl_mc_device *mc_dev)
->>   		return ret;
->>   	}
->>   
->> +	mutex_init(&vdev->igate);
->> +
->>   	return ret;
->>   }
->>   
->> @@ -436,6 +506,7 @@ static int vfio_fsl_mc_remove(struct fsl_mc_device *mc_dev)
->>   	mc_dev->mc_io = NULL;
->>   
->>   	vfio_fsl_mc_reflck_put(vdev->reflck);
->> +	mutex_destroy(&vdev->igate);
->>   
->>   	vfio_iommu_group_put(mc_dev->dev.iommu_group, dev);
->>   
->> diff --git a/drivers/vfio/fsl-mc/vfio_fsl_mc_intr.c b/drivers/vfio/fsl-mc/vfio_fsl_mc_intr.c
->> new file mode 100644
->> index 000000000000..058aa97aa54a
->> --- /dev/null
->> +++ b/drivers/vfio/fsl-mc/vfio_fsl_mc_intr.c
->> @@ -0,0 +1,63 @@
->> +// SPDX-License-Identifier: (GPL-2.0+ OR BSD-3-Clause)
->> +/*
->> + * Copyright 2013-2016 Freescale Semiconductor Inc.
->> + * Copyright 2019 NXP
->> + */
->> +
->> +#include <linux/vfio.h>
->> +#include <linux/slab.h>
->> +#include <linux/types.h>
->> +#include <linux/eventfd.h>
->> +#include <linux/msi.h>
->> +
->> +#include "linux/fsl/mc.h"
->> +#include "vfio_fsl_mc_private.h"
->> +
->> +static int vfio_fsl_mc_irq_mask(struct vfio_fsl_mc_device *vdev,
->> +				unsigned int index, unsigned int start,
->> +				unsigned int count, u32 flags,
->> +				void *data)
->> +{
->> +	return -EINVAL;
->> +}
->> +
->> +static int vfio_fsl_mc_irq_unmask(struct vfio_fsl_mc_device *vdev,
->> +				unsigned int index, unsigned int start,
->> +				unsigned int count, u32 flags,
->> +				void *data)
->> +{
->> +	return -EINVAL;
->> +}
->> +
->> +static int vfio_fsl_mc_set_irq_trigger(struct vfio_fsl_mc_device *vdev,
->> +				       unsigned int index, unsigned int start,
->> +				       unsigned int count, u32 flags,
->> +				       void *data)
->> +{
->> +	return -EINVAL;
->> +}
->> +
->> +int vfio_fsl_mc_set_irqs_ioctl(struct vfio_fsl_mc_device *vdev,
->> +			       u32 flags, unsigned int index,
->> +			       unsigned int start, unsigned int count,
->> +			       void *data)
->> +{
->> +	int ret = -ENOTTY;
->> +
->> +	switch (flags & VFIO_IRQ_SET_ACTION_TYPE_MASK) {
->> +	case VFIO_IRQ_SET_ACTION_MASK:
->> +		ret = vfio_fsl_mc_irq_mask(vdev, index, start, count,
->> +					   flags, data);
->> +		break;
->> +	case VFIO_IRQ_SET_ACTION_UNMASK:
->> +		ret = vfio_fsl_mc_irq_unmask(vdev, index, start, count,
->> +					     flags, data);
->> +		break;
->> +	case VFIO_IRQ_SET_ACTION_TRIGGER:
->> +		ret = vfio_fsl_mc_set_irq_trigger(vdev, index, start,
->> +						  count, flags, data);
->> +		break;
->> +	}
->> +
->> +	return ret;
->> +}
->> diff --git a/drivers/vfio/fsl-mc/vfio_fsl_mc_private.h b/drivers/vfio/fsl-mc/vfio_fsl_mc_private.h
->> index 3b85d930e060..d5b6fe891a48 100644
->> --- a/drivers/vfio/fsl-mc/vfio_fsl_mc_private.h
->> +++ b/drivers/vfio/fsl-mc/vfio_fsl_mc_private.h
->> @@ -34,7 +34,12 @@ struct vfio_fsl_mc_device {
->>   	u32				num_regions;
->>   	struct vfio_fsl_mc_region	*regions;
->>   	struct vfio_fsl_mc_reflck   *reflck;
->> -
->> +	struct mutex         igate;
->>   };
->>   
->> +extern int vfio_fsl_mc_set_irqs_ioctl(struct vfio_fsl_mc_device *vdev,
->> +			       u32 flags, unsigned int index,
->> +			       unsigned int start, unsigned int count,
->> +			       void *data);
->> +
->>   #endif /* VFIO_FSL_MC_PRIVATE_H */
->>
-> Thanks
-> 
-> Eric
-> 
-
-Regards,
-Diana
+diff --git a/arch/s390/kvm/intercept.c b/arch/s390/kvm/intercept.c
+index e7a7c499a73f..99dd042d7dea 100644
+--- a/arch/s390/kvm/intercept.c
++++ b/arch/s390/kvm/intercept.c
+@@ -33,6 +33,7 @@ u8 kvm_s390_get_ilen(struct kvm_vcpu *vcpu)
+ 	case ICPT_OPEREXC:
+ 	case ICPT_PARTEXEC:
+ 	case ICPT_IOINST:
++	case ICPT_KSS:
+ 		/* instruction only stored for these icptcodes */
+ 		ilen = insn_length(vcpu->arch.sie_block->ipa >> 8);
+ 		/* Use the length of the EXECUTE instruction if necessary */
+@@ -565,7 +566,44 @@ int kvm_handle_sie_intercept(struct kvm_vcpu *vcpu)
+ 		rc = handle_partial_execution(vcpu);
+ 		break;
+ 	case ICPT_KSS:
+-		rc = kvm_s390_skey_check_enable(vcpu);
++		if (likely(!test_kvm_facility(vcpu->kvm, 169))) {
++			rc = kvm_s390_skey_check_enable(vcpu);
++		} else {
++			/*
++			 * Storage key removal facility emulation.
++			 *
++			 * KSS is the same priority as instruction
++			 * interception. Hence we need handling here
++			 * and in the instruction emulation code.
++			 *
++			 * lpsw(e) needs to store the problematic psw
++			 * as the program old psw. Calling the
++			 * handlers directly does that without falsely
++			 * increasing stat counters.
++			 */
++			switch (vcpu->arch.sie_block->ipa) {
++			case 0xb2b2:
++				kvm_s390_forward_psw(vcpu, kvm_s390_get_ilen(vcpu));
++				rc = kvm_s390_handle_b2(vcpu);
++				break;
++			case 0x8200:
++				kvm_s390_forward_psw(vcpu, kvm_s390_get_ilen(vcpu));
++				rc = kvm_s390_handle_lpsw(vcpu);
++				break;
++			case 0:
++				/* Interception caused by exception new PSW key */
++				rc = kvm_s390_inject_program_int(vcpu, PGM_SPECIFICATION);
++				break;
++			default:
++				/*
++				 * KSS is nullifying (no psw forward),
++				 * SKRF issues suppressing SPECIAL
++				 * OPS, so we need to forward by hand.
++				 */
++				kvm_s390_forward_psw(vcpu, kvm_s390_get_ilen(vcpu));
++				rc = kvm_s390_inject_program_int(vcpu, PGM_SPECIAL_OPERATION);
++			}
++		}
+ 		break;
+ 	case ICPT_MCHKREQ:
+ 	case ICPT_INT_ENABLE:
+diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+index 6b74b92c1a58..85647f19311d 100644
+--- a/arch/s390/kvm/kvm-s390.c
++++ b/arch/s390/kvm/kvm-s390.c
+@@ -2692,6 +2692,11 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
+ 	/* we emulate STHYI in kvm */
+ 	set_kvm_facility(kvm->arch.model.fac_mask, 74);
+ 	set_kvm_facility(kvm->arch.model.fac_list, 74);
++	/* we emulate the storage key removal facility only with kss */
++	if (sclp.has_kss) {
++		set_kvm_facility(kvm->arch.model.fac_mask, 169);
++		set_kvm_facility(kvm->arch.model.fac_list, 169);
++	}
+ 	if (MACHINE_HAS_TLB_GUEST) {
+ 		set_kvm_facility(kvm->arch.model.fac_mask, 147);
+ 		set_kvm_facility(kvm->arch.model.fac_list, 147);
+diff --git a/arch/s390/kvm/priv.c b/arch/s390/kvm/priv.c
+index cd74989ce0b0..d1923fbec341 100644
+--- a/arch/s390/kvm/priv.c
++++ b/arch/s390/kvm/priv.c
+@@ -207,6 +207,13 @@ int kvm_s390_skey_check_enable(struct kvm_vcpu *vcpu)
+ 	int rc;
+ 
+ 	trace_kvm_s390_skey_related_inst(vcpu);
++
++	if (test_kvm_facility(vcpu->kvm, 169)) {
++		rc = kvm_s390_inject_program_int(vcpu, PGM_SPECIAL_OPERATION);
++		if (!rc)
++			return -EOPNOTSUPP;
++	}
++
+ 	/* Already enabled? */
+ 	if (vcpu->arch.skey_enabled)
+ 		return 0;
+@@ -257,7 +264,7 @@ static int handle_iske(struct kvm_vcpu *vcpu)
+ 
+ 	rc = try_handle_skey(vcpu);
+ 	if (rc)
+-		return rc != -EAGAIN ? rc : 0;
++		return rc != (-EAGAIN || -EOPNOTSUPP) ? rc : 0;
+ 
+ 	kvm_s390_get_regs_rre(vcpu, &reg1, &reg2);
+ 
+@@ -304,7 +311,7 @@ static int handle_rrbe(struct kvm_vcpu *vcpu)
+ 
+ 	rc = try_handle_skey(vcpu);
+ 	if (rc)
+-		return rc != -EAGAIN ? rc : 0;
++		return rc != (-EAGAIN || -EOPNOTSUPP) ? rc : 0;
+ 
+ 	kvm_s390_get_regs_rre(vcpu, &reg1, &reg2);
+ 
+@@ -355,7 +362,7 @@ static int handle_sske(struct kvm_vcpu *vcpu)
+ 
+ 	rc = try_handle_skey(vcpu);
+ 	if (rc)
+-		return rc != -EAGAIN ? rc : 0;
++		return rc != (-EAGAIN || -EOPNOTSUPP) ? rc : 0;
+ 
+ 	if (!test_kvm_facility(vcpu->kvm, 8))
+ 		m3 &= ~SSKE_MB;
+@@ -745,6 +752,8 @@ int kvm_s390_handle_lpsw(struct kvm_vcpu *vcpu)
+ 		return kvm_s390_inject_prog_cond(vcpu, rc);
+ 	if (!(new_psw.mask & PSW32_MASK_BASE))
+ 		return kvm_s390_inject_program_int(vcpu, PGM_SPECIFICATION);
++	if (new_psw.mask & PSW32_MASK_KEY && test_kvm_facility(vcpu->kvm, 169))
++		return kvm_s390_inject_program_int(vcpu, PGM_SPECIAL_OPERATION);
+ 	gpsw->mask = (new_psw.mask & ~PSW32_MASK_BASE) << 32;
+ 	gpsw->mask |= new_psw.addr & PSW32_ADDR_AMODE;
+ 	gpsw->addr = new_psw.addr & ~PSW32_ADDR_AMODE;
+@@ -771,6 +780,8 @@ static int handle_lpswe(struct kvm_vcpu *vcpu)
+ 	rc = read_guest(vcpu, addr, ar, &new_psw, sizeof(new_psw));
+ 	if (rc)
+ 		return kvm_s390_inject_prog_cond(vcpu, rc);
++	if ((new_psw.mask & PSW_MASK_KEY) && test_kvm_facility(vcpu->kvm, 169))
++		return kvm_s390_inject_program_int(vcpu, PGM_SPECIAL_OPERATION);
+ 	vcpu->arch.sie_block->gpsw = new_psw;
+ 	if (!is_valid_psw(&vcpu->arch.sie_block->gpsw))
+ 		return kvm_s390_inject_program_int(vcpu, PGM_SPECIFICATION);
+@@ -1025,6 +1036,10 @@ static int handle_pfmf(struct kvm_vcpu *vcpu)
+ 	if (vcpu->arch.sie_block->gpsw.mask & PSW_MASK_PSTATE)
+ 		return kvm_s390_inject_program_int(vcpu, PGM_PRIVILEGED_OP);
+ 
++	if (vcpu->run->s.regs.gprs[reg1] & PFMF_SK &&
++	    test_kvm_facility(vcpu->kvm, 169))
++		return kvm_s390_inject_program_int(vcpu, PGM_SPECIAL_OPERATION);
++
+ 	if (vcpu->run->s.regs.gprs[reg1] & PFMF_RESERVED)
+ 		return kvm_s390_inject_program_int(vcpu, PGM_SPECIFICATION);
+ 
+@@ -1203,6 +1218,8 @@ static int handle_essa(struct kvm_vcpu *vcpu)
+ 		return kvm_s390_inject_program_int(vcpu, PGM_PRIVILEGED_OP);
+ 	/* Check for invalid operation request code */
+ 	orc = (vcpu->arch.sie_block->ipb & 0xf0000000) >> 28;
++	if (orc == ESSA_SET_POT_VOLATILE && test_kvm_facility(vcpu->kvm, 169))
++		return kvm_s390_inject_program_int(vcpu, PGM_SPECIAL_OPERATION);
+ 	/* ORCs 0-6 are always valid */
+ 	if (orc > (test_kvm_facility(vcpu->kvm, 147) ? ESSA_SET_STABLE_NODAT
+ 						: ESSA_SET_STABLE_IF_RESIDENT))
+@@ -1451,6 +1468,9 @@ static int handle_tprot(struct kvm_vcpu *vcpu)
+ 
+ 	kvm_s390_get_base_disp_sse(vcpu, &address1, &address2, &ar, NULL);
+ 
++	if ((address2 & 0xf0) && test_kvm_facility(vcpu->kvm, 169))
++		return kvm_s390_inject_program_int(vcpu, PGM_SPECIAL_OPERATION);
++
+ 	/* we only handle the Linux memory detection case:
+ 	 * access key == 0
+ 	 * everything else goes to userspace. */
+-- 
+2.25.1
 
