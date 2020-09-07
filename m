@@ -2,72 +2,103 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5DA90260198
-	for <lists+kvm@lfdr.de>; Mon,  7 Sep 2020 19:10:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3F27C26035C
+	for <lists+kvm@lfdr.de>; Mon,  7 Sep 2020 19:48:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730812AbgIGRKC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 7 Sep 2020 13:10:02 -0400
-Received: from mail.kernel.org ([198.145.29.99]:38244 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729826AbgIGRJN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 7 Sep 2020 13:09:13 -0400
-Received: from localhost (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 5FD98206B8;
-        Mon,  7 Sep 2020 17:09:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1599498552;
-        bh=c+LatMKoM5/1BtRYscz0019UW7w/K1nTQivhKbKM+5A=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=yZUdJ2q+CoFJrKpQif7Uu7/CVm3k0fTvJEpPo2b076qALItHtgWLU8Vlioo9h2dCm
-         n7jtruYdt9WQgX6MMRzzhTaGZMCfSpIxra9rrOY37S+ebdGDJ4PTJCjltfLVt4iruz
-         K5o/ZS2od70QbhK4hxG6TRP5XQsNOyQLo6JUhBew=
-Date:   Mon, 7 Sep 2020 13:09:11 -0400
-From:   Sasha Levin <sashal@kernel.org>
-To:     Ajay Kaher <akaher@vmware.com>
-Cc:     gregkh@linuxfoundation.org, alex.williamson@redhat.com,
-        cohuck@redhat.com, peterx@redhat.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, stable@vger.kernel.org,
-        srivatsab@vmware.com, srivatsa@csail.mit.edu,
-        vsirnapalli@vmware.com
-Subject: Re: [PATCH v5.4.y 0/3] vfio: Fix for CVE-2020-12888
-Message-ID: <20200907170911.GM8670@sasha-vm>
-References: <1599401277-32172-1-git-send-email-akaher@vmware.com>
- <1599401277-32172-4-git-send-email-akaher@vmware.com>
+        id S1729282AbgIGMrk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 7 Sep 2020 08:47:40 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:31622 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1729233AbgIGMr3 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 7 Sep 2020 08:47:29 -0400
+Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 087CXLZP075524;
+        Mon, 7 Sep 2020 08:47:08 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : mime-version : content-transfer-encoding; s=pp1;
+ bh=2RyC8LYAhiLnnCHqOK/2SaSmB1wB57P8mu9LBs+Qtgg=;
+ b=l5z76WXE7cr7A7p3ZL/4riG9e7G1BC9BKaCdQWp4/ZCf5te6NslMqXuU+2DdiIV5UfLx
+ 5YoPCewxvumNa3Sh3B74i+6EfEDl3ZqONqmwWSG5aY8qHt2ctMhnTDsG+2PQ/aastCij
+ hgIQkS1NbXlntYUbwF94H7n8mpU3FO4x0wKnYtTfUPWWkYPgCCCiWbzo0ylLc4epdHl6
+ WEQ1V4HCLxNJPcLMjBHWlFBmFaOO69vm6bKWGYr4uT1ehoFgNc8+3DGtq9mEFYEYzmqX
+ tn0Dz0VbQ8bLgKGC88R05HPtFdxa6J1/n3jBwzEkLak6xEBwHYvsMTMBzNAjNNhVCmK9 HQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 33dkc4axvv-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 07 Sep 2020 08:47:08 -0400
+Received: from m0098414.ppops.net (m0098414.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 087CXMDe075593;
+        Mon, 7 Sep 2020 08:47:08 -0400
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 33dkc4axve-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 07 Sep 2020 08:47:08 -0400
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 087CfamK025350;
+        Mon, 7 Sep 2020 12:47:06 GMT
+Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
+        by ppma03ams.nl.ibm.com with ESMTP id 33c2a82d5t-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 07 Sep 2020 12:47:06 +0000
+Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
+        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 087Cl3W661276656
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 7 Sep 2020 12:47:03 GMT
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id BCA314C058;
+        Mon,  7 Sep 2020 12:47:03 +0000 (GMT)
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id EB62A4C046;
+        Mon,  7 Sep 2020 12:47:02 +0000 (GMT)
+Received: from linux01.pok.stglabs.ibm.com (unknown [9.114.17.81])
+        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Mon,  7 Sep 2020 12:47:02 +0000 (GMT)
+From:   Janosch Frank <frankja@linux.ibm.com>
+To:     linux-s390@vger.kernel.org
+Cc:     borntraeger@de.ibm.com, gor@linux.ibm.com, imbrenda@linux.ibm.com,
+        kvm@vger.kernel.org, david@redhat.com, hca@linux.ibm.com
+Subject: [PATCH v2 0/2] s390x: pv: Fixes and improvements
+Date:   Mon,  7 Sep 2020 08:46:58 -0400
+Message-Id: <20200907124700.10374-1-frankja@linux.ibm.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <1599401277-32172-4-git-send-email-akaher@vmware.com>
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
+ definitions=2020-09-07_07:2020-09-07,2020-09-07 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 mlxscore=0
+ adultscore=0 suspectscore=1 malwarescore=0 priorityscore=1501
+ impostorscore=0 lowpriorityscore=0 mlxlogscore=742 bulkscore=0 spamscore=0
+ phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2006250000 definitions=main-2009070123
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sun, Sep 06, 2020 at 07:37:57PM +0530, Ajay Kaher wrote:
->CVE-2020-12888 Kernel: vfio: access to disabled MMIO space of some
->devices may lead to DoS scenario
->
->The VFIO modules allow users (guest VMs) to enable or disable access to the
->devices' MMIO memory address spaces. If a user attempts to access (read/write)
->the devices' MMIO address space when it is disabled, some h/w devices issue an
->interrupt to the CPU to indicate a fatal error condition, crashing the system.
->This flaw allows a guest user or process to crash the host system resulting in
->a denial of service.
->
->Patch 1/ is to force the user fault if PFNMAP vma might be DMA mapped
->before user access.
->
->Patch 2/ setup a vm_ops handler to support dynamic faulting instead of calling
->remap_pfn_range(). Also provides a list of vmas actively mapping the area which
->can later use to invalidate those mappings.
->
->Patch 3/ block the user from accessing memory spaces which is disabled by using
->new vma list support to zap, or invalidate, those memory mappings in order to
->force them to be faulted back in on access.
+Using the destroy call instead of the export on a VM shutdown, we can
+clear out a protected guest much faster.
 
-I've queued this and the 4.19 backports, thanks!
+The 3f exception can in fact be triggered by userspace and therefore
+should not panic the whole system, but send a SIGSEGV to the culprit
+process.
+
+v2:
+	* Removed whitespace damage
+	* Directly access task struct for pid and comm
+	* Removed NOKPROBE_SYMBOL
+
+Janosch Frank (2):
+  s390x: uv: Add destroy page call
+  s390x: Add 3f program exception handler
+
+ arch/s390/include/asm/uv.h   |  7 +++++++
+ arch/s390/kernel/pgm_check.S |  2 +-
+ arch/s390/kernel/uv.c        | 20 ++++++++++++++++++++
+ arch/s390/mm/fault.c         | 20 ++++++++++++++++++++
+ arch/s390/mm/gmap.c          |  2 +-
+ 5 files changed, 49 insertions(+), 2 deletions(-)
 
 -- 
-Thanks,
-Sasha
+2.25.1
+
