@@ -2,29 +2,29 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6C91D260282
-	for <lists+kvm@lfdr.de>; Mon,  7 Sep 2020 19:27:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 71A44260281
+	for <lists+kvm@lfdr.de>; Mon,  7 Sep 2020 19:27:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730945AbgIGR1z (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 7 Sep 2020 13:27:55 -0400
-Received: from 8bytes.org ([81.169.241.247]:43606 "EHLO theia.8bytes.org"
+        id S1730710AbgIGR1u (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 7 Sep 2020 13:27:50 -0400
+Received: from 8bytes.org ([81.169.241.247]:43636 "EHLO theia.8bytes.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729523AbgIGNTh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        id S1729522AbgIGNTh (ORCPT <rfc822;kvm@vger.kernel.org>);
         Mon, 7 Sep 2020 09:19:37 -0400
 Received: from cap.home.8bytes.org (p549add56.dip0.t-ipconnect.de [84.154.221.86])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
         (No client certificate requested)
-        by theia.8bytes.org (Postfix) with ESMTPSA id DD13A3AA1;
-        Mon,  7 Sep 2020 15:17:14 +0200 (CEST)
+        by theia.8bytes.org (Postfix) with ESMTPSA id 708EA3AA3;
+        Mon,  7 Sep 2020 15:17:15 +0200 (CEST)
 From:   Joerg Roedel <joro@8bytes.org>
 To:     x86@kernel.org
 Cc:     Joerg Roedel <joro@8bytes.org>, Joerg Roedel <jroedel@suse.de>,
-        hpa@zytor.com, Andy Lutomirski <luto@kernel.org>,
+        Tom Lendacky <thomas.lendacky@amd.com>, hpa@zytor.com,
+        Andy Lutomirski <luto@kernel.org>,
         Dave Hansen <dave.hansen@linux.intel.com>,
         Peter Zijlstra <peterz@infradead.org>,
         Jiri Slaby <jslaby@suse.cz>,
         Dan Williams <dan.j.williams@intel.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
         Juergen Gross <jgross@suse.com>,
         Kees Cook <keescook@chromium.org>,
         David Rientjes <rientjes@google.com>,
@@ -36,9 +36,9 @@ Cc:     Joerg Roedel <joro@8bytes.org>, Joerg Roedel <jroedel@suse.de>,
         Martin Radev <martin.b.radev@gmail.com>,
         linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         virtualization@lists.linux-foundation.org
-Subject: [PATCH v7 62/72] x86/paravirt: Allow hypervisor specific VMMCALL handling under SEV-ES
-Date:   Mon,  7 Sep 2020 15:16:03 +0200
-Message-Id: <20200907131613.12703-63-joro@8bytes.org>
+Subject: [PATCH v7 63/72] x86/kvm: Add KVM specific VMMCALL handling under SEV-ES
+Date:   Mon,  7 Sep 2020 15:16:04 +0200
+Message-Id: <20200907131613.12703-64-joro@8bytes.org>
 X-Mailer: git-send-email 2.28.0
 In-Reply-To: <20200907131613.12703-1-joro@8bytes.org>
 References: <20200907131613.12703-1-joro@8bytes.org>
@@ -49,87 +49,74 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Joerg Roedel <jroedel@suse.de>
+From: Tom Lendacky <thomas.lendacky@amd.com>
 
-Add two new paravirt callbacks to provide hypervisor specific processor
-state in the GHCB and to copy state from the hypervisor back to the
-processor.
+Implement the callbacks to copy the processor state required by KVM to
+the GHCB.
 
+Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
+[ jroedel@suse.de: - Split out of a larger patch
+                   - Adapt to different callback functions ]
+Co-developed-by: Joerg Roedel <jroedel@suse.de>
 Signed-off-by: Joerg Roedel <jroedel@suse.de>
 ---
- arch/x86/include/asm/x86_init.h | 16 +++++++++++++++-
- arch/x86/kernel/sev-es.c        | 12 ++++++++++++
- 2 files changed, 27 insertions(+), 1 deletion(-)
+ arch/x86/kernel/kvm.c | 35 +++++++++++++++++++++++++++++------
+ 1 file changed, 29 insertions(+), 6 deletions(-)
 
-diff --git a/arch/x86/include/asm/x86_init.h b/arch/x86/include/asm/x86_init.h
-index 6807153c0410..0304e2931cd3 100644
---- a/arch/x86/include/asm/x86_init.h
-+++ b/arch/x86/include/asm/x86_init.h
-@@ -4,8 +4,10 @@
+diff --git a/arch/x86/kernel/kvm.c b/arch/x86/kernel/kvm.c
+index 08320b0b2b27..0f9597275e9c 100644
+--- a/arch/x86/kernel/kvm.c
++++ b/arch/x86/kernel/kvm.c
+@@ -36,6 +36,8 @@
+ #include <asm/hypervisor.h>
+ #include <asm/tlb.h>
+ #include <asm/cpuidle_haltpoll.h>
++#include <asm/ptrace.h>
++#include <asm/svm.h>
  
- #include <asm/bootparam.h>
+ DEFINE_STATIC_KEY_FALSE(kvm_async_pf_enabled);
  
-+struct ghcb;
- struct mpc_bus;
- struct mpc_cpu;
-+struct pt_regs;
- struct mpc_table;
- struct cpuinfo_x86;
- 
-@@ -236,10 +238,22 @@ struct x86_legacy_features {
- /**
-  * struct x86_hyper_runtime - x86 hypervisor specific runtime callbacks
-  *
-- * @pin_vcpu:		pin current vcpu to specified physical cpu (run rarely)
-+ * @pin_vcpu:			pin current vcpu to specified physical
-+ *				cpu (run rarely)
-+ * @sev_es_hcall_prepare:	Load additional hypervisor-specific
-+ *				state into the GHCB when doing a VMMCALL under
-+ *				SEV-ES. Called from the #VC exception handler.
-+ * @sev_es_hcall_finish:	Copies state from the GHCB back into the
-+ *				processor (or pt_regs). Also runs checks on the
-+ *				state returned from the hypervisor after a
-+ *				VMMCALL under SEV-ES.  Needs to return 'false'
-+ *				if the checks fail.  Called from the #VC
-+ *				exception handler.
-  */
- struct x86_hyper_runtime {
- 	void (*pin_vcpu)(int cpu);
-+	void (*sev_es_hcall_prepare)(struct ghcb *ghcb, struct pt_regs *regs);
-+	bool (*sev_es_hcall_finish)(struct ghcb *ghcb, struct pt_regs *regs);
- };
- 
- /**
-diff --git a/arch/x86/kernel/sev-es.c b/arch/x86/kernel/sev-es.c
-index 3eea4e910fc1..9814ac99aea1 100644
---- a/arch/x86/kernel/sev-es.c
-+++ b/arch/x86/kernel/sev-es.c
-@@ -897,6 +897,9 @@ static enum es_result vc_handle_vmmcall(struct ghcb *ghcb,
- 	ghcb_set_rax(ghcb, ctxt->regs->ax);
- 	ghcb_set_cpl(ghcb, user_mode(ctxt->regs) ? 3 : 0);
- 
-+	if (x86_platform.hyper.sev_es_hcall_prepare)
-+		x86_platform.hyper.sev_es_hcall_prepare(ghcb, ctxt->regs);
-+
- 	ret = sev_es_ghcb_hv_call(ghcb, ctxt, SVM_EXIT_VMMCALL, 0, 0);
- 	if (ret != ES_OK)
- 		return ret;
-@@ -906,6 +909,15 @@ static enum es_result vc_handle_vmmcall(struct ghcb *ghcb,
- 
- 	ctxt->regs->ax = ghcb->save.rax;
- 
-+	/*
-+	 * Call sev_es_hcall_finish() after regs->ax is already set.
-+	 * This allows the hypervisor handler to overwrite it again if
-+	 * necessary.
-+	 */
-+	if (x86_platform.hyper.sev_es_hcall_finish &&
-+	    !x86_platform.hyper.sev_es_hcall_finish(ghcb, ctxt->regs))
-+		return ES_VMM_ERROR;
-+
- 	return ES_OK;
+@@ -746,13 +748,34 @@ static void __init kvm_init_platform(void)
+ 	x86_platform.apic_post_init = kvm_apic_init;
  }
  
++#if defined(CONFIG_AMD_MEM_ENCRYPT)
++static void kvm_sev_es_hcall_prepare(struct ghcb *ghcb, struct pt_regs *regs)
++{
++	/* RAX and CPL are already in the GHCB */
++	ghcb_set_rbx(ghcb, regs->bx);
++	ghcb_set_rcx(ghcb, regs->cx);
++	ghcb_set_rdx(ghcb, regs->dx);
++	ghcb_set_rsi(ghcb, regs->si);
++}
++
++static bool kvm_sev_es_hcall_finish(struct ghcb *ghcb, struct pt_regs *regs)
++{
++	/* No checking of the return state needed */
++	return true;
++}
++#endif
++
+ const __initconst struct hypervisor_x86 x86_hyper_kvm = {
+-	.name			= "KVM",
+-	.detect			= kvm_detect,
+-	.type			= X86_HYPER_KVM,
+-	.init.guest_late_init	= kvm_guest_init,
+-	.init.x2apic_available	= kvm_para_available,
+-	.init.init_platform	= kvm_init_platform,
++	.name				= "KVM",
++	.detect				= kvm_detect,
++	.type				= X86_HYPER_KVM,
++	.init.guest_late_init		= kvm_guest_init,
++	.init.x2apic_available		= kvm_para_available,
++	.init.init_platform		= kvm_init_platform,
++#if defined(CONFIG_AMD_MEM_ENCRYPT)
++	.runtime.sev_es_hcall_prepare	= kvm_sev_es_hcall_prepare,
++	.runtime.sev_es_hcall_finish	= kvm_sev_es_hcall_finish,
++#endif
+ };
+ 
+ static __init int activate_jump_labels(void)
 -- 
 2.28.0
 
