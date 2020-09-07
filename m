@@ -2,20 +2,20 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7CCD4260288
-	for <lists+kvm@lfdr.de>; Mon,  7 Sep 2020 19:28:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B4AEB260299
+	for <lists+kvm@lfdr.de>; Mon,  7 Sep 2020 19:30:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729538AbgIGR2s (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 7 Sep 2020 13:28:48 -0400
-Received: from 8bytes.org ([81.169.241.247]:43586 "EHLO theia.8bytes.org"
+        id S1729799AbgIGR1y (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 7 Sep 2020 13:27:54 -0400
+Received: from 8bytes.org ([81.169.241.247]:43622 "EHLO theia.8bytes.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729517AbgIGNTh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        id S1729519AbgIGNTh (ORCPT <rfc822;kvm@vger.kernel.org>);
         Mon, 7 Sep 2020 09:19:37 -0400
 Received: from cap.home.8bytes.org (p549add56.dip0.t-ipconnect.de [84.154.221.86])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
         (No client certificate requested)
-        by theia.8bytes.org (Postfix) with ESMTPSA id 488B13A53;
-        Mon,  7 Sep 2020 15:17:13 +0200 (CEST)
+        by theia.8bytes.org (Postfix) with ESMTPSA id 5DE823A56;
+        Mon,  7 Sep 2020 15:17:14 +0200 (CEST)
 From:   Joerg Roedel <joro@8bytes.org>
 To:     x86@kernel.org
 Cc:     Joerg Roedel <joro@8bytes.org>, Joerg Roedel <jroedel@suse.de>,
@@ -36,9 +36,9 @@ Cc:     Joerg Roedel <joro@8bytes.org>, Joerg Roedel <jroedel@suse.de>,
         Martin Radev <martin.b.radev@gmail.com>,
         linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         virtualization@lists.linux-foundation.org
-Subject: [PATCH v7 60/72] x86/sev-es: Handle #AC Events
-Date:   Mon,  7 Sep 2020 15:16:01 +0200
-Message-Id: <20200907131613.12703-61-joro@8bytes.org>
+Subject: [PATCH v7 61/72] x86/sev-es: Handle #DB Events
+Date:   Mon,  7 Sep 2020 15:16:02 +0200
+Message-Id: <20200907131613.12703-62-joro@8bytes.org>
 X-Mailer: git-send-email 2.28.0
 In-Reply-To: <20200907131613.12703-1-joro@8bytes.org>
 References: <20200907131613.12703-1-joro@8bytes.org>
@@ -51,60 +51,52 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Joerg Roedel <jroedel@suse.de>
 
-Implement a handler for #VC exceptions caused by #AC exceptions. The #AC
-exception is just forwarded to do_alignment_check() and not pushed down
-to the hypervisor, as requested by the SEV-ES GHCB Standardization
-Specification.
+Handle #VC exceptions caused by #DB exceptions in the guest. Those
+must be handled outside of instrumentation_begin()/end() so that the
+handler will not be raised recursively.
+
+Handle them by calling the kernels debug exception handler.
 
 Signed-off-by: Joerg Roedel <jroedel@suse.de>
 ---
- arch/x86/kernel/sev-es.c | 19 +++++++++++++++++++
- 1 file changed, 19 insertions(+)
+ arch/x86/kernel/sev-es.c | 17 +++++++++++++++++
+ 1 file changed, 17 insertions(+)
 
 diff --git a/arch/x86/kernel/sev-es.c b/arch/x86/kernel/sev-es.c
-index db8e33280f7a..f78ab9369b9c 100644
+index f78ab9369b9c..3eea4e910fc1 100644
 --- a/arch/x86/kernel/sev-es.c
 +++ b/arch/x86/kernel/sev-es.c
-@@ -909,6 +909,19 @@ static enum es_result vc_handle_vmmcall(struct ghcb *ghcb,
- 	return ES_OK;
+@@ -922,6 +922,14 @@ static enum es_result vc_handle_trap_ac(struct ghcb *ghcb,
+ 	return ES_EXCEPTION;
  }
  
-+static enum es_result vc_handle_trap_ac(struct ghcb *ghcb,
-+					struct es_em_ctxt *ctxt)
++static __always_inline void vc_handle_trap_db(struct pt_regs *regs)
 +{
-+	/*
-+	 * Calling ecx_alignment_check() directly does not work, because it
-+	 * enables IRQs and the GHCB is active. Forward the exception and call
-+	 * it later from vc_forward_exception().
-+	 */
-+	ctxt->fi.vector = X86_TRAP_AC;
-+	ctxt->fi.error_code = 0;
-+	return ES_EXCEPTION;
++	if (user_mode(regs))
++		noist_exc_debug(regs);
++	else
++		exc_debug(regs);
 +}
 +
  static enum es_result vc_handle_exitcode(struct es_em_ctxt *ctxt,
  					 struct ghcb *ghcb,
  					 unsigned long exit_code)
-@@ -922,6 +935,9 @@ static enum es_result vc_handle_exitcode(struct es_em_ctxt *ctxt,
- 	case SVM_EXIT_WRITE_DR7:
- 		result = vc_handle_dr7_write(ghcb, ctxt);
- 		break;
-+	case SVM_EXIT_EXCP_BASE + X86_TRAP_AC:
-+		result = vc_handle_trap_ac(ghcb, ctxt);
-+		break;
- 	case SVM_EXIT_RDTSC:
- 	case SVM_EXIT_RDTSCP:
- 		result = vc_handle_rdtsc(ghcb, ctxt, exit_code);
-@@ -981,6 +997,9 @@ static __always_inline void vc_forward_exception(struct es_em_ctxt *ctxt)
- 	case X86_TRAP_UD:
- 		exc_invalid_op(ctxt->regs);
- 		break;
-+	case X86_TRAP_AC:
-+		exc_alignment_check(ctxt->regs, error_code);
-+		break;
- 	default:
- 		pr_emerg("Unsupported exception in #VC instruction emulation - can't continue\n");
- 		BUG();
+@@ -1033,6 +1041,15 @@ DEFINE_IDTENTRY_VC_SAFE_STACK(exc_vmm_communication)
+ 	struct ghcb *ghcb;
+ 
+ 	lockdep_assert_irqs_disabled();
++
++	/*
++	 * Handle #DB before calling into !noinstr code to avoid recursive #DB.
++	 */
++	if (error_code == SVM_EXIT_EXCP_BASE + X86_TRAP_DB) {
++		vc_handle_trap_db(regs);
++		return;
++	}
++
+ 	instrumentation_begin();
+ 
+ 	/*
 -- 
 2.28.0
 
