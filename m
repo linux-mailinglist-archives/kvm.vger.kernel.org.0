@@ -2,29 +2,29 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D52D82602E9
-	for <lists+kvm@lfdr.de>; Mon,  7 Sep 2020 19:38:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6F1BC2602EB
+	for <lists+kvm@lfdr.de>; Mon,  7 Sep 2020 19:39:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729732AbgIGRh6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 7 Sep 2020 13:37:58 -0400
-Received: from 8bytes.org ([81.169.241.247]:43606 "EHLO theia.8bytes.org"
+        id S1731289AbgIGRjC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 7 Sep 2020 13:39:02 -0400
+Received: from 8bytes.org ([81.169.241.247]:43598 "EHLO theia.8bytes.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729466AbgIGNSE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 7 Sep 2020 09:18:04 -0400
+        id S1729459AbgIGNSD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 7 Sep 2020 09:18:03 -0400
 Received: from cap.home.8bytes.org (p549add56.dip0.t-ipconnect.de [84.154.221.86])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
         (No client certificate requested)
-        by theia.8bytes.org (Postfix) with ESMTPSA id 276A31008;
-        Mon,  7 Sep 2020 15:17:02 +0200 (CEST)
+        by theia.8bytes.org (Postfix) with ESMTPSA id 27013100F;
+        Mon,  7 Sep 2020 15:17:03 +0200 (CEST)
 From:   Joerg Roedel <joro@8bytes.org>
 To:     x86@kernel.org
 Cc:     Joerg Roedel <joro@8bytes.org>, Joerg Roedel <jroedel@suse.de>,
-        hpa@zytor.com, Andy Lutomirski <luto@kernel.org>,
+        Tom Lendacky <thomas.lendacky@amd.com>, hpa@zytor.com,
+        Andy Lutomirski <luto@kernel.org>,
         Dave Hansen <dave.hansen@linux.intel.com>,
         Peter Zijlstra <peterz@infradead.org>,
         Jiri Slaby <jslaby@suse.cz>,
         Dan Williams <dan.j.williams@intel.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
         Juergen Gross <jgross@suse.com>,
         Kees Cook <keescook@chromium.org>,
         David Rientjes <rientjes@google.com>,
@@ -36,9 +36,9 @@ Cc:     Joerg Roedel <joro@8bytes.org>, Joerg Roedel <jroedel@suse.de>,
         Martin Radev <martin.b.radev@gmail.com>,
         linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         virtualization@lists.linux-foundation.org
-Subject: [PATCH v7 39/72] x86/sev-es: Setup early #VC handler
-Date:   Mon,  7 Sep 2020 15:15:40 +0200
-Message-Id: <20200907131613.12703-40-joro@8bytes.org>
+Subject: [PATCH v7 41/72] x86/sev-es: Setup per-cpu GHCBs for the runtime handler
+Date:   Mon,  7 Sep 2020 15:15:42 +0200
+Message-Id: <20200907131613.12703-42-joro@8bytes.org>
 X-Mailer: git-send-email 2.28.0
 In-Reply-To: <20200907131613.12703-1-joro@8bytes.org>
 References: <20200907131613.12703-1-joro@8bytes.org>
@@ -49,112 +49,135 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Joerg Roedel <jroedel@suse.de>
+From: Tom Lendacky <thomas.lendacky@amd.com>
 
-Setup an early handler for #VC exceptions. There is no GHCB mapped
-yet, so just re-use the vc_no_ghcb_handler. It can only handle CPUID
-exit-codes, but that should be enough to get the kernel through
-verify_cpu() and __startup_64() until it runs on virtual addresses.
+The runtime handler needs a GHCB per CPU. Set them up and map them
+unencrypted.
 
+Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
 Signed-off-by: Joerg Roedel <jroedel@suse.de>
 ---
- arch/x86/include/asm/sev-es.h |  3 +++
- arch/x86/kernel/head64.c      | 20 ++++++++++++++++++++
- arch/x86/kernel/head_64.S     | 27 +++++++++++++++++++++++++++
- 3 files changed, 50 insertions(+)
+ arch/x86/include/asm/mem_encrypt.h |  2 ++
+ arch/x86/kernel/sev-es.c           | 56 +++++++++++++++++++++++++++++-
+ arch/x86/kernel/traps.c            |  3 ++
+ 3 files changed, 60 insertions(+), 1 deletion(-)
 
-diff --git a/arch/x86/include/asm/sev-es.h b/arch/x86/include/asm/sev-es.h
-index 6dc52440c4b4..7175d432ebfe 100644
---- a/arch/x86/include/asm/sev-es.h
-+++ b/arch/x86/include/asm/sev-es.h
-@@ -73,4 +73,7 @@ static inline u64 lower_bits(u64 val, unsigned int bits)
- 	return (val & mask);
+diff --git a/arch/x86/include/asm/mem_encrypt.h b/arch/x86/include/asm/mem_encrypt.h
+index 4e72b73a9cb5..c9f5df0a1c10 100644
+--- a/arch/x86/include/asm/mem_encrypt.h
++++ b/arch/x86/include/asm/mem_encrypt.h
+@@ -49,6 +49,7 @@ void __init mem_encrypt_free_decrypted_mem(void);
+ /* Architecture __weak replacement functions */
+ void __init mem_encrypt_init(void);
+ 
++void __init sev_es_init_vc_handling(void);
+ bool sme_active(void);
+ bool sev_active(void);
+ bool sev_es_active(void);
+@@ -72,6 +73,7 @@ static inline void __init sme_early_init(void) { }
+ static inline void __init sme_encrypt_kernel(struct boot_params *bp) { }
+ static inline void __init sme_enable(struct boot_params *bp) { }
+ 
++static inline void sev_es_init_vc_handling(void) { }
+ static inline bool sme_active(void) { return false; }
+ static inline bool sev_active(void) { return false; }
+ static inline bool sev_es_active(void) { return false; }
+diff --git a/arch/x86/kernel/sev-es.c b/arch/x86/kernel/sev-es.c
+index bb3e702a71eb..0f28bb1c0022 100644
+--- a/arch/x86/kernel/sev-es.c
++++ b/arch/x86/kernel/sev-es.c
+@@ -8,8 +8,13 @@
+  */
+ 
+ #include <linux/sched/debug.h>	/* For show_regs() */
+-#include <linux/kernel.h>
++#include <linux/percpu-defs.h>
++#include <linux/mem_encrypt.h>
+ #include <linux/printk.h>
++#include <linux/mm_types.h>
++#include <linux/set_memory.h>
++#include <linux/memblock.h>
++#include <linux/kernel.h>
+ #include <linux/mm.h>
+ 
+ #include <asm/sev-es.h>
+@@ -29,6 +34,13 @@ static struct ghcb boot_ghcb_page __bss_decrypted __aligned(PAGE_SIZE);
+  */
+ static struct ghcb __initdata *boot_ghcb;
+ 
++/* #VC handler runtime per-cpu data */
++struct sev_es_runtime_data {
++	struct ghcb ghcb_page;
++};
++
++static DEFINE_PER_CPU(struct sev_es_runtime_data*, runtime_data);
++
+ /* Needed in vc_early_forward_exception */
+ void do_early_exception(struct pt_regs *regs, int trapnr);
+ 
+@@ -198,6 +210,48 @@ static bool __init sev_es_setup_ghcb(void)
+ 	return true;
  }
  
-+/* Early IDT entry points for #VC handler */
-+extern void vc_no_ghcb(void);
-+
- #endif
-diff --git a/arch/x86/kernel/head64.c b/arch/x86/kernel/head64.c
-index 4282dac694c3..621b5e8aef4c 100644
---- a/arch/x86/kernel/head64.c
-+++ b/arch/x86/kernel/head64.c
-@@ -40,6 +40,7 @@
- #include <asm/desc.h>
- #include <asm/extable.h>
- #include <asm/trapnr.h>
-+#include <asm/sev-es.h>
- 
- /*
-  * Manage page tables very early on.
-@@ -540,10 +541,29 @@ static struct desc_ptr bringup_idt_descr = {
- 	.address	= 0, /* Set at runtime */
- };
- 
-+#ifdef CONFIG_AMD_MEM_ENCRYPT
-+static void set_bringup_idt_handler(int n, void *handler)
++static void __init alloc_runtime_data(int cpu)
 +{
-+	struct idt_data data;
-+	gate_desc desc;
++	struct sev_es_runtime_data *data;
 +
-+	init_idt_data(&data, n, handler);
-+	idt_init_desc(&desc, &data);
-+	native_write_idt_entry(bringup_idt_table, n, &desc);
++	data = memblock_alloc(sizeof(*data), PAGE_SIZE);
++	if (!data)
++		panic("Can't allocate SEV-ES runtime data");
++
++	per_cpu(runtime_data, cpu) = data;
 +}
-+#endif
 +
- /* This runs while still in the direct mapping */
- static void startup_64_load_idt(unsigned long physbase)
++static void __init init_ghcb(int cpu)
++{
++	struct sev_es_runtime_data *data;
++	int err;
++
++	data = per_cpu(runtime_data, cpu);
++
++	err = early_set_memory_decrypted((unsigned long)&data->ghcb_page,
++					 sizeof(data->ghcb_page));
++	if (err)
++		panic("Can not map GHCBs unencrypted");
++
++	memset(&data->ghcb_page, 0, sizeof(data->ghcb_page));
++}
++
++void __init sev_es_init_vc_handling(void)
++{
++	int cpu;
++
++	BUILD_BUG_ON((offsetof(struct sev_es_runtime_data, ghcb_page) % PAGE_SIZE) != 0);
++
++	if (!sev_es_active())
++		return;
++
++	/* Initialize per-cpu GHCB pages */
++	for_each_possible_cpu(cpu) {
++		alloc_runtime_data(cpu);
++		init_ghcb(cpu);
++	}
++}
++
+ static void __init vc_early_forward_exception(struct es_em_ctxt *ctxt)
  {
- 	struct desc_ptr *desc = fixup_pointer(&bringup_idt_descr, physbase);
-+	void __maybe_unused *handler;
-+
-+#ifdef CONFIG_AMD_MEM_ENCRYPT
-+	/* VMM Communication Exception */
-+	handler = fixup_pointer(vc_no_ghcb, physbase);
-+	set_bringup_idt_handler(X86_TRAP_VC, handler);
-+#endif
+ 	int trapnr = ctxt->fi.vector;
+diff --git a/arch/x86/kernel/traps.c b/arch/x86/kernel/traps.c
+index df9c6554f83e..e121e7c5f831 100644
+--- a/arch/x86/kernel/traps.c
++++ b/arch/x86/kernel/traps.c
+@@ -1082,6 +1082,9 @@ void __init trap_init(void)
+ 	/* Init cpu_entry_area before IST entries are set up */
+ 	setup_cpu_entry_areas();
  
- 	desc->address = (unsigned long)fixup_pointer(bringup_idt_table, physbase);
- 	native_load_idt(desc);
-diff --git a/arch/x86/kernel/head_64.S b/arch/x86/kernel/head_64.S
-index 3b40ec44a67d..2e5aa03b4321 100644
---- a/arch/x86/kernel/head_64.S
-+++ b/arch/x86/kernel/head_64.S
-@@ -348,6 +348,33 @@ SYM_CODE_START_LOCAL(early_idt_handler_common)
- 	jmp restore_regs_and_return_to_kernel
- SYM_CODE_END(early_idt_handler_common)
++	/* Init GHCB memory pages when running as an SEV-ES guest */
++	sev_es_init_vc_handling();
++
+ 	idt_setup_traps();
  
-+#ifdef CONFIG_AMD_MEM_ENCRYPT
-+/*
-+ * VC Exception handler used during very early boot. The
-+ * early_idt_handler_array can't be used because it returns via the
-+ * paravirtualized INTERRUPT_RETURN and pv-ops don't work that early.
-+ */
-+SYM_CODE_START_NOALIGN(vc_no_ghcb)
-+	UNWIND_HINT_IRET_REGS offset=8
-+
-+	/* Build pt_regs */
-+	PUSH_AND_CLEAR_REGS
-+
-+	/* Call C handler */
-+	movq    %rsp, %rdi
-+	movq	ORIG_RAX(%rsp), %rsi
-+	call    do_vc_no_ghcb
-+
-+	/* Unwind pt_regs */
-+	POP_REGS
-+
-+	/* Remove Error Code */
-+	addq    $8, %rsp
-+
-+	/* Pure iret required here - don't use INTERRUPT_RETURN */
-+	iretq
-+SYM_CODE_END(vc_no_ghcb)
-+#endif
- 
- #define SYM_DATA_START_PAGE_ALIGNED(name)			\
- 	SYM_START(name, SYM_L_GLOBAL, .balign PAGE_SIZE)
+ 	/*
 -- 
 2.28.0
 
