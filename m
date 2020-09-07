@@ -2,29 +2,32 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 550922602DF
-	for <lists+kvm@lfdr.de>; Mon,  7 Sep 2020 19:37:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F03AB2602CF
+	for <lists+kvm@lfdr.de>; Mon,  7 Sep 2020 19:35:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731359AbgIGRgg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 7 Sep 2020 13:36:36 -0400
-Received: from 8bytes.org ([81.169.241.247]:43632 "EHLO theia.8bytes.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729403AbgIGNSF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 7 Sep 2020 09:18:05 -0400
+        id S1731276AbgIGRd5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 7 Sep 2020 13:33:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60396 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729493AbgIGNS0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 7 Sep 2020 09:18:26 -0400
+Received: from theia.8bytes.org (8bytes.org [IPv6:2a01:238:4383:600:38bc:a715:4b6d:a889])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 30702C06179B;
+        Mon,  7 Sep 2020 06:18:05 -0700 (PDT)
 Received: from cap.home.8bytes.org (p549add56.dip0.t-ipconnect.de [84.154.221.86])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
         (No client certificate requested)
-        by theia.8bytes.org (Postfix) with ESMTPSA id 6B709FC8;
+        by theia.8bytes.org (Postfix) with ESMTPSA id EA119FD6;
         Mon,  7 Sep 2020 15:16:55 +0200 (CEST)
 From:   Joerg Roedel <joro@8bytes.org>
 To:     x86@kernel.org
 Cc:     Joerg Roedel <joro@8bytes.org>, Joerg Roedel <jroedel@suse.de>,
-        hpa@zytor.com, Andy Lutomirski <luto@kernel.org>,
+        Tom Lendacky <thomas.lendacky@amd.com>, hpa@zytor.com,
+        Andy Lutomirski <luto@kernel.org>,
         Dave Hansen <dave.hansen@linux.intel.com>,
         Peter Zijlstra <peterz@infradead.org>,
         Jiri Slaby <jslaby@suse.cz>,
         Dan Williams <dan.j.williams@intel.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
         Juergen Gross <jgross@suse.com>,
         Kees Cook <keescook@chromium.org>,
         David Rientjes <rientjes@google.com>,
@@ -36,9 +39,9 @@ Cc:     Joerg Roedel <joro@8bytes.org>, Joerg Roedel <jroedel@suse.de>,
         Martin Radev <martin.b.radev@gmail.com>,
         linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         virtualization@lists.linux-foundation.org
-Subject: [PATCH v7 26/72] x86/fpu: Move xgetbv()/xsetbv() into separate header
-Date:   Mon,  7 Sep 2020 15:15:27 +0200
-Message-Id: <20200907131613.12703-27-joro@8bytes.org>
+Subject: [PATCH v7 27/72] x86/sev-es: Add CPUID handling to #VC handler
+Date:   Mon,  7 Sep 2020 15:15:28 +0200
+Message-Id: <20200907131613.12703-28-joro@8bytes.org>
 X-Mailer: git-send-email 2.28.0
 In-Reply-To: <20200907131613.12703-1-joro@8bytes.org>
 References: <20200907131613.12703-1-joro@8bytes.org>
@@ -49,109 +52,85 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Joerg Roedel <jroedel@suse.de>
+From: Tom Lendacky <thomas.lendacky@amd.com>
 
-The xgetbv() function is needed in pre-decompression boot code, but
-asm/fpu/internal.h can't be included there directly. Doing so opens
-the door to include-hell due to various include-magic in
-boot/compressed/misc.h.
+Handle #VC exceptions caused by CPUID instructions. These happen in
+early boot code when the KASLR code checks for RDTSC.
 
-Avoid that by moving xgetbv()/xsetbv() to a separate header file and
-include this instead.
-
+Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
+[ jroedel@suse.de: Adapt to #VC handling framework ]
+Co-developed-by: Joerg Roedel <jroedel@suse.de>
 Signed-off-by: Joerg Roedel <jroedel@suse.de>
 ---
- arch/x86/include/asm/fpu/internal.h | 30 +------------------------
- arch/x86/include/asm/fpu/xcr.h      | 34 +++++++++++++++++++++++++++++
- 2 files changed, 35 insertions(+), 29 deletions(-)
- create mode 100644 arch/x86/include/asm/fpu/xcr.h
+ arch/x86/boot/compressed/sev-es.c |  4 ++++
+ arch/x86/kernel/sev-es-shared.c   | 35 +++++++++++++++++++++++++++++++
+ 2 files changed, 39 insertions(+)
 
-diff --git a/arch/x86/include/asm/fpu/internal.h b/arch/x86/include/asm/fpu/internal.h
-index 21a8b5259477..ceeba9f63172 100644
---- a/arch/x86/include/asm/fpu/internal.h
-+++ b/arch/x86/include/asm/fpu/internal.h
-@@ -19,6 +19,7 @@
- #include <asm/user.h>
- #include <asm/fpu/api.h>
- #include <asm/fpu/xstate.h>
+diff --git a/arch/x86/boot/compressed/sev-es.c b/arch/x86/boot/compressed/sev-es.c
+index d7ab212180b6..57c41c368681 100644
+--- a/arch/x86/boot/compressed/sev-es.c
++++ b/arch/x86/boot/compressed/sev-es.c
+@@ -16,6 +16,7 @@
+ #include <asm/trapnr.h>
+ #include <asm/trap_pf.h>
+ #include <asm/msr-index.h>
 +#include <asm/fpu/xcr.h>
- #include <asm/cpufeature.h>
- #include <asm/trace/fpu.h>
+ #include <asm/ptrace.h>
+ #include <asm/svm.h>
  
-@@ -585,33 +586,4 @@ static inline void switch_fpu_finish(struct fpu *new_fpu)
- 	__write_pkru(pkru_val);
+@@ -183,6 +184,9 @@ void do_boot_stage2_vc(struct pt_regs *regs, unsigned long exit_code)
+ 	case SVM_EXIT_IOIO:
+ 		result = vc_handle_ioio(boot_ghcb, &ctxt);
+ 		break;
++	case SVM_EXIT_CPUID:
++		result = vc_handle_cpuid(boot_ghcb, &ctxt);
++		break;
+ 	default:
+ 		result = ES_UNSUPPORTED;
+ 		break;
+diff --git a/arch/x86/kernel/sev-es-shared.c b/arch/x86/kernel/sev-es-shared.c
+index bae7cf28455b..a6b41910b8ab 100644
+--- a/arch/x86/kernel/sev-es-shared.c
++++ b/arch/x86/kernel/sev-es-shared.c
+@@ -432,3 +432,38 @@ static enum es_result vc_handle_ioio(struct ghcb *ghcb, struct es_em_ctxt *ctxt)
+ 
+ 	return ret;
  }
- 
--/*
-- * MXCSR and XCR definitions:
-- */
--
--static inline void ldmxcsr(u32 mxcsr)
--{
--	asm volatile("ldmxcsr %0" :: "m" (mxcsr));
--}
--
--extern unsigned int mxcsr_feature_mask;
--
--#define XCR_XFEATURE_ENABLED_MASK	0x00000000
--
--static inline u64 xgetbv(u32 index)
--{
--	u32 eax, edx;
--
--	asm volatile("xgetbv" : "=a" (eax), "=d" (edx) : "c" (index));
--	return eax + ((u64)edx << 32);
--}
--
--static inline void xsetbv(u32 index, u64 value)
--{
--	u32 eax = value;
--	u32 edx = value >> 32;
--
--	asm volatile("xsetbv" :: "a" (eax), "d" (edx), "c" (index));
--}
--
- #endif /* _ASM_X86_FPU_INTERNAL_H */
-diff --git a/arch/x86/include/asm/fpu/xcr.h b/arch/x86/include/asm/fpu/xcr.h
-new file mode 100644
-index 000000000000..1c7ab8d95da5
---- /dev/null
-+++ b/arch/x86/include/asm/fpu/xcr.h
-@@ -0,0 +1,34 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+#ifndef _ASM_X86_FPU_XCR_H
-+#define _ASM_X86_FPU_XCR_H
 +
-+/*
-+ * MXCSR and XCR definitions:
-+ */
-+
-+static inline void ldmxcsr(u32 mxcsr)
++static enum es_result vc_handle_cpuid(struct ghcb *ghcb,
++				      struct es_em_ctxt *ctxt)
 +{
-+	asm volatile("ldmxcsr %0" :: "m" (mxcsr));
++	struct pt_regs *regs = ctxt->regs;
++	u32 cr4 = native_read_cr4();
++	enum es_result ret;
++
++	ghcb_set_rax(ghcb, regs->ax);
++	ghcb_set_rcx(ghcb, regs->cx);
++
++	if (cr4 & X86_CR4_OSXSAVE)
++		/* Safe to read xcr0 */
++		ghcb_set_xcr0(ghcb, xgetbv(XCR_XFEATURE_ENABLED_MASK));
++	else
++		/* xgetbv will cause #GP - use reset value for xcr0 */
++		ghcb_set_xcr0(ghcb, 1);
++
++	ret = sev_es_ghcb_hv_call(ghcb, ctxt, SVM_EXIT_CPUID, 0, 0);
++	if (ret != ES_OK)
++		return ret;
++
++	if (!(ghcb_rax_is_valid(ghcb) &&
++	      ghcb_rbx_is_valid(ghcb) &&
++	      ghcb_rcx_is_valid(ghcb) &&
++	      ghcb_rdx_is_valid(ghcb)))
++		return ES_VMM_ERROR;
++
++	regs->ax = ghcb->save.rax;
++	regs->bx = ghcb->save.rbx;
++	regs->cx = ghcb->save.rcx;
++	regs->dx = ghcb->save.rdx;
++
++	return ES_OK;
 +}
-+
-+extern unsigned int mxcsr_feature_mask;
-+
-+#define XCR_XFEATURE_ENABLED_MASK	0x00000000
-+
-+static inline u64 xgetbv(u32 index)
-+{
-+	u32 eax, edx;
-+
-+	asm volatile("xgetbv" : "=a" (eax), "=d" (edx) : "c" (index));
-+	return eax + ((u64)edx << 32);
-+}
-+
-+static inline void xsetbv(u32 index, u64 value)
-+{
-+	u32 eax = value;
-+	u32 edx = value >> 32;
-+
-+	asm volatile("xsetbv" :: "a" (eax), "d" (edx), "c" (index));
-+}
-+
-+#endif /* _ASM_X86_FPU_XCR_H */
 -- 
 2.28.0
 
