@@ -2,20 +2,20 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 15F1826026E
-	for <lists+kvm@lfdr.de>; Mon,  7 Sep 2020 19:25:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B1FB4260296
+	for <lists+kvm@lfdr.de>; Mon,  7 Sep 2020 19:30:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729581AbgIGNWH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 7 Sep 2020 09:22:07 -0400
-Received: from 8bytes.org ([81.169.241.247]:43596 "EHLO theia.8bytes.org"
+        id S1731063AbgIGR2G (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 7 Sep 2020 13:28:06 -0400
+Received: from 8bytes.org ([81.169.241.247]:41692 "EHLO theia.8bytes.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729508AbgIGNTh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        id S1729511AbgIGNTh (ORCPT <rfc822;kvm@vger.kernel.org>);
         Mon, 7 Sep 2020 09:19:37 -0400
 Received: from cap.home.8bytes.org (p549add56.dip0.t-ipconnect.de [84.154.221.86])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
         (No client certificate requested)
-        by theia.8bytes.org (Postfix) with ESMTPSA id 992521824;
-        Mon,  7 Sep 2020 15:17:11 +0200 (CEST)
+        by theia.8bytes.org (Postfix) with ESMTPSA id 1F7C22CBB;
+        Mon,  7 Sep 2020 15:17:12 +0200 (CEST)
 From:   Joerg Roedel <joro@8bytes.org>
 To:     x86@kernel.org
 Cc:     Joerg Roedel <joro@8bytes.org>, Joerg Roedel <jroedel@suse.de>,
@@ -36,9 +36,9 @@ Cc:     Joerg Roedel <joro@8bytes.org>, Joerg Roedel <jroedel@suse.de>,
         Martin Radev <martin.b.radev@gmail.com>,
         linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         virtualization@lists.linux-foundation.org
-Subject: [PATCH v7 57/72] x86/sev-es: Handle MONITOR/MONITORX Events
-Date:   Mon,  7 Sep 2020 15:15:58 +0200
-Message-Id: <20200907131613.12703-58-joro@8bytes.org>
+Subject: [PATCH v7 58/72] x86/sev-es: Handle MWAIT/MWAITX Events
+Date:   Mon,  7 Sep 2020 15:15:59 +0200
+Message-Id: <20200907131613.12703-59-joro@8bytes.org>
 X-Mailer: git-send-email 2.28.0
 In-Reply-To: <20200907131613.12703-1-joro@8bytes.org>
 References: <20200907131613.12703-1-joro@8bytes.org>
@@ -51,7 +51,7 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Tom Lendacky <thomas.lendacky@amd.com>
 
-Implement a handler for #VC exceptions caused by MONITOR and MONITORX
+Implement a handler for #VC exceptions caused by MWAIT and MWAITX
 instructions.
 
 Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
@@ -59,36 +59,33 @@ Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
 Co-developed-by: Joerg Roedel <jroedel@suse.de>
 Signed-off-by: Joerg Roedel <jroedel@suse.de>
 ---
- arch/x86/kernel/sev-es.c | 13 +++++++++++++
- 1 file changed, 13 insertions(+)
+ arch/x86/kernel/sev-es.c | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
 
 diff --git a/arch/x86/kernel/sev-es.c b/arch/x86/kernel/sev-es.c
-index 7fb17e71ff05..847a578d5158 100644
+index 847a578d5158..0d0b6e15f7d9 100644
 --- a/arch/x86/kernel/sev-es.c
 +++ b/arch/x86/kernel/sev-es.c
-@@ -872,6 +872,16 @@ static enum es_result vc_handle_rdpmc(struct ghcb *ghcb, struct es_em_ctxt *ctxt
+@@ -882,6 +882,13 @@ static enum es_result vc_handle_monitor(struct ghcb *ghcb,
  	return ES_OK;
  }
  
-+static enum es_result vc_handle_monitor(struct ghcb *ghcb,
-+					struct es_em_ctxt *ctxt)
++static enum es_result vc_handle_mwait(struct ghcb *ghcb,
++				      struct es_em_ctxt *ctxt)
 +{
-+	/*
-+	 * Treat it as a NOP and do not leak a physical address to the
-+	 * hypervisor
-+	 */
++	/* Treat the same as MONITOR/MONITORX */
 +	return ES_OK;
 +}
 +
  static enum es_result vc_handle_exitcode(struct es_em_ctxt *ctxt,
  					 struct ghcb *ghcb,
  					 unsigned long exit_code)
-@@ -908,6 +918,9 @@ static enum es_result vc_handle_exitcode(struct es_em_ctxt *ctxt,
- 	case SVM_EXIT_WBINVD:
- 		result = vc_handle_wbinvd(ghcb, ctxt);
+@@ -921,6 +928,9 @@ static enum es_result vc_handle_exitcode(struct es_em_ctxt *ctxt,
+ 	case SVM_EXIT_MONITOR:
+ 		result = vc_handle_monitor(ghcb, ctxt);
  		break;
-+	case SVM_EXIT_MONITOR:
-+		result = vc_handle_monitor(ghcb, ctxt);
++	case SVM_EXIT_MWAIT:
++		result = vc_handle_mwait(ghcb, ctxt);
 +		break;
  	case SVM_EXIT_NPF:
  		result = vc_handle_mmio(ghcb, ctxt);
