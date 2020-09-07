@@ -2,158 +2,225 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2F3FF25F1C4
-	for <lists+kvm@lfdr.de>; Mon,  7 Sep 2020 04:48:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 156E925F463
+	for <lists+kvm@lfdr.de>; Mon,  7 Sep 2020 09:56:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726318AbgIGCsj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 6 Sep 2020 22:48:39 -0400
-Received: from szxga06-in.huawei.com ([45.249.212.32]:60770 "EHLO huawei.com"
+        id S1727797AbgIGHz5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 7 Sep 2020 03:55:57 -0400
+Received: from mail-vi1eur05on2074.outbound.protection.outlook.com ([40.107.21.74]:58112
+        "EHLO EUR05-VI1-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726213AbgIGCsh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 6 Sep 2020 22:48:37 -0400
-Received: from DGGEMS408-HUB.china.huawei.com (unknown [172.30.72.60])
-        by Forcepoint Email with ESMTP id 58D119CDACDCB4858C94;
-        Mon,  7 Sep 2020 10:48:35 +0800 (CST)
-Received: from [10.174.187.22] (10.174.187.22) by
- DGGEMS408-HUB.china.huawei.com (10.3.19.208) with Microsoft SMTP Server id
- 14.3.487.0; Mon, 7 Sep 2020 10:48:29 +0800
-Subject: Re: [RFC PATCH 0/5] KVM: arm64: Add pvtime LPT support
-To:     Steven Price <steven.price@arm.com>, Marc Zyngier <maz@kernel.org>
-References: <20200817084110.2672-1-zhukeqian1@huawei.com>
- <8308f52e4c906cad710575724f9e3855@kernel.org>
- <f14cfd5b-c103-5d56-82fb-59d0371c6f21@arm.com> <87h7svm0o5.wl-maz@kernel.org>
- <75ce4c12-f0e3-32c4-604f-9745980022e0@arm.com>
-CC:     <linux-kernel@vger.kernel.org>,
+        id S1726833AbgIGHzz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 7 Sep 2020 03:55:55 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=armh.onmicrosoft.com;
+ s=selector2-armh-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=BUCzExZOuDqEhfwVv9mY9si80E7JvV5ev8EqUlNFfjY=;
+ b=NR497deyRY2dykWbJtwGH2zU3VeSvY+QQkC2yjS7QYQIdTskBl3vsjvOwHl9yvzlU1ka1LapbkYXe9p2PrIyBItxf3mH3KNPS8IXHXjViPLLToDNWUtRcWRkzEeFtCHI9oU1GIx6scLcZ/CIdJSKx+ekVgxIe3MOUB6TKGle2dM=
+Received: from MR2P264CA0086.FRAP264.PROD.OUTLOOK.COM (2603:10a6:500:32::26)
+ by DB6PR0802MB2150.eurprd08.prod.outlook.com (2603:10a6:4:85::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3348.15; Mon, 7 Sep
+ 2020 07:55:50 +0000
+Received: from VE1EUR03FT047.eop-EUR03.prod.protection.outlook.com
+ (2603:10a6:500:32:cafe::51) by MR2P264CA0086.outlook.office365.com
+ (2603:10a6:500:32::26) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3348.15 via Frontend
+ Transport; Mon, 7 Sep 2020 07:55:50 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 63.35.35.123)
+ smtp.mailfrom=arm.com; vger.kernel.org; dkim=pass (signature was verified)
+ header.d=armh.onmicrosoft.com;vger.kernel.org; dmarc=bestguesspass
+ action=none header.from=arm.com;
+Received-SPF: Pass (protection.outlook.com: domain of arm.com designates
+ 63.35.35.123 as permitted sender) receiver=protection.outlook.com;
+ client-ip=63.35.35.123; helo=64aa7808-outbound-1.mta.getcheckrecipient.com;
+Received: from 64aa7808-outbound-1.mta.getcheckrecipient.com (63.35.35.123) by
+ VE1EUR03FT047.mail.protection.outlook.com (10.152.19.218) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.3348.16 via Frontend Transport; Mon, 7 Sep 2020 07:55:49 +0000
+Received: ("Tessian outbound e8cdb8c6f386:v64"); Mon, 07 Sep 2020 07:55:49 +0000
+X-CR-MTA-TID: 64aa7808
+Received: from 2583122da173.1
+        by 64aa7808-outbound-1.mta.getcheckrecipient.com id 04AA52B7-C53F-485E-81E3-13540371B59B.1;
+        Mon, 07 Sep 2020 07:55:43 +0000
+Received: from EUR04-VI1-obe.outbound.protection.outlook.com
+    by 64aa7808-outbound-1.mta.getcheckrecipient.com with ESMTPS id 2583122da173.1
+    (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384);
+    Mon, 07 Sep 2020 07:55:43 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=grFZ3E145prYxByKA28F0NcW9pNE1ezVlwCtqLie8jZt9xaSYbHW0R1KIdLHqCMdvzFTq8U+zsvyo2ujUhoP0JKMs7ImdIuxS9V04+QjgwnkBilDwNp/dXOZ7lEsOcDgCDgYw/4X6lofABwyfsSzno4V9aAvWSdycUkFboBzO8yK39yaV0cO2vnR3zIHzyGovQ888CrO+ihl9pbtmWiqHYj2ueA/FFSDJj52QgkJj5ZSbOM0k6enLZfjfC/vAgWK/j/3PmChwGMacNtXqARHW6rP0z1Me3j46DXaGJK+6t80zkm3B3RMnbfVQ/xU8qZpdg6upP/ZwC4mHoqunbDV3w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=BUCzExZOuDqEhfwVv9mY9si80E7JvV5ev8EqUlNFfjY=;
+ b=I2LROZdsMBvlJ8H2+jv67o+bmv1pU7/rxitqpm2AGLBEChp3/GblB2Sb6JiQcsVM/RuiyHWQKpvvDIL/ee2+Pa8RQ25x4PFoi2NTJETQGebCG+bOwQpJSu1ZOtPHZK5Z+NtHVt+8S47rga7iXXWPn+kI5GDNoPq9iNz0kTxQ1iY07BBkHjcyT5YqbfNf0SaFxcyhiU5Hti1qxmsr1iRWlFxdFyRkne3Jh0sJs5lW4LTorWAcnIt1NkREWy04GBKhEbN/SbZC482QTkQw0kMzKJo+4xUAOac4x6dQcshVwkh6nhdo6xHWw2HcmuT2zWfZL3FyptuCI+/nMMuMtQZ6Ng==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=arm.com; dmarc=pass action=none header.from=arm.com; dkim=pass
+ header.d=arm.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=armh.onmicrosoft.com;
+ s=selector2-armh-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=BUCzExZOuDqEhfwVv9mY9si80E7JvV5ev8EqUlNFfjY=;
+ b=NR497deyRY2dykWbJtwGH2zU3VeSvY+QQkC2yjS7QYQIdTskBl3vsjvOwHl9yvzlU1ka1LapbkYXe9p2PrIyBItxf3mH3KNPS8IXHXjViPLLToDNWUtRcWRkzEeFtCHI9oU1GIx6scLcZ/CIdJSKx+ekVgxIe3MOUB6TKGle2dM=
+Received: from HE1PR0802MB2555.eurprd08.prod.outlook.com (2603:10a6:3:e0::7)
+ by HE1PR0802MB2249.eurprd08.prod.outlook.com (2603:10a6:3:c2::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3348.16; Mon, 7 Sep
+ 2020 07:55:39 +0000
+Received: from HE1PR0802MB2555.eurprd08.prod.outlook.com
+ ([fe80::74f7:5759:4e9e:6e00]) by HE1PR0802MB2555.eurprd08.prod.outlook.com
+ ([fe80::74f7:5759:4e9e:6e00%5]) with mapi id 15.20.3348.019; Mon, 7 Sep 2020
+ 07:55:39 +0000
+From:   Jianyong Wu <Jianyong.Wu@arm.com>
+To:     Marc Zyngier <maz@kernel.org>
+CC:     "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "yangbo.lu@nxp.com" <yangbo.lu@nxp.com>,
+        "john.stultz@linaro.org" <john.stultz@linaro.org>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "sean.j.christopherson@intel.com" <sean.j.christopherson@intel.com>,
+        "richardcochran@gmail.com" <richardcochran@gmail.com>,
+        Mark Rutland <Mark.Rutland@arm.com>,
+        "will@kernel.org" <will@kernel.org>,
+        Suzuki Poulose <Suzuki.Poulose@arm.com>,
+        Steven Price <Steven.Price@arm.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-arm-kernel@lists.infradead.org" 
         <linux-arm-kernel@lists.infradead.org>,
-        <kvmarm@lists.cs.columbia.edu>, <kvm@vger.kernel.org>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        <wanghaibin.wang@huawei.com>, <mark.rutland@arm.com>
-From:   zhukeqian <zhukeqian1@huawei.com>
-Message-ID: <fcebf287-d920-b917-a90b-a970893b050b@huawei.com>
-Date:   Mon, 7 Sep 2020 10:48:28 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
- Thunderbird/45.7.1
+        "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        Steve Capper <Steve.Capper@arm.com>,
+        Justin He <Justin.He@arm.com>, nd <nd@arm.com>
+Subject: RE: [PATCH v14 09/10] doc: add ptp_kvm introduction for arm64 support
+Thread-Topic: [PATCH v14 09/10] doc: add ptp_kvm introduction for arm64
+ support
+Thread-Index: AQHWgp36kP2WPVfAh0y+53P6AOHZGalYqNOAgAQpW/A=
+Date:   Mon, 7 Sep 2020 07:55:38 +0000
+Message-ID: <HE1PR0802MB2555849BDD0F9185ED3CF5F7F4280@HE1PR0802MB2555.eurprd08.prod.outlook.com>
+References: <20200904092744.167655-1-jianyong.wu@arm.com>
+        <20200904092744.167655-10-jianyong.wu@arm.com> <87d031qzvs.wl-maz@kernel.org>
+In-Reply-To: <87d031qzvs.wl-maz@kernel.org>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ts-tracking-id: 1C61F0A72C975544853C80C6917AE5D5.0
+x-checkrecipientchecked: true
+Authentication-Results-Original: kernel.org; dkim=none (message not signed)
+ header.d=none;kernel.org; dmarc=none action=none header.from=arm.com;
+x-originating-ip: [203.126.0.111]
+x-ms-publictraffictype: Email
+X-MS-Office365-Filtering-HT: Tenant
+X-MS-Office365-Filtering-Correlation-Id: dd990820-90c4-4883-0f52-08d853036fc5
+x-ms-traffictypediagnostic: HE1PR0802MB2249:|DB6PR0802MB2150:
+x-ms-exchange-transport-forked: True
+X-Microsoft-Antispam-PRVS: <DB6PR0802MB2150296B3314C7CE69E187C8F4280@DB6PR0802MB2150.eurprd08.prod.outlook.com>
+x-checkrecipientrouted: true
+nodisclaimer: true
+x-ms-oob-tlc-oobclassifiers: OLM:7219;OLM:7219;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam-Untrusted: BCL:0;
+X-Microsoft-Antispam-Message-Info-Original: 9OSiapGiGdMJnEyCd+EOHTsj0k4vLOh4NEzbZOp7dCzXkjaVtGm5FqLIOjke7D8hTfOyxieyTNOfP4mGHo0xjtgz+xHpTwrP0jxP4+B9qNjQxy/SUxhVWV93r5S9NDN7wMzjlmh4KhFydNp0qy4ZbaxgdN/36NclFK23YNk3fEaeMOmLvraPWA5SmP7XnrlImLXmOjUYFbdK44MZuCNtI6a5WGshcVkgrBuw9pHy6HCoZ/gVtvB9hZbuWkfc9qFAr/3SuB5kxbqVlP29PkERnMVc2NunOnZYFNmuQQCqa/RsWK2KG+BDwYmFVq/9fXd5nANrv/AO3GmVF90ErAv6MQ==
+X-Forefront-Antispam-Report-Untrusted: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:HE1PR0802MB2555.eurprd08.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(396003)(346002)(366004)(39860400002)(376002)(136003)(478600001)(6916009)(54906003)(71200400001)(8676002)(26005)(83380400001)(8936002)(186003)(53546011)(6506007)(33656002)(55016002)(2906002)(7416002)(7696005)(5660300002)(52536014)(86362001)(4326008)(9686003)(66446008)(66556008)(66476007)(66946007)(76116006)(316002)(64756008);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata: GIY+7SUU+IRkRKY8lmvsdBIP0W7pA/phTk4OcMFaaXFVEidjtVhxebfB8qsPWmbu3bF6nnp8tcBXG6BY2Z+f1R/NYeCFiRxoKTNtfVckFUfNCkS+tHC4YsdhQCLXkAyloh0ADJUFJ3Kn63bANSSzRGOQBVlCusL0GjfN0tgLhsFEV+S+HT8NkOTJyYYCZQFnCnCNh3o3Lyg0iUSYNjo90pXcIHVgf57cDSZvxwTe8piQ8dlJgnjPzLAFjdYyKFAfByLkqJonRCTfDVpvBb4fsaaypMAIKppg704VBp0ZvpOd2cn/0FL/YOOlA5u8GURF9UvQacuXFMrJHnhsZ6jkqh3vMRkzSfC7lpPCS7F0VSgBfmOLnh1DM5CGqb0wX8tFjh7RjtbVbWRTkX8bb58kY8YgaWDqtnkm/UaO+32mou7b2koytOiFrSl4k51lAxopdpcfHr7d4FTAKOIWvDDUJ90S9RhP7y3duNRc5q6z8HUjOicY0PCIo77nJE0FnbO7isqwhaY6DP4cVVMiLwn4F7ugXywXeafx6bXgFo+20uWEM8y8L2zQZRJX3MXnafanhbDVTgZJTS0ouPcrGWOLNoh/o41DoxuV6/JyPNa30NfDHwWgH85DGs82xiMUrt5od6Vs73hjhZDuxnz36pqMqQ==
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-In-Reply-To: <75ce4c12-f0e3-32c4-604f-9745980022e0@arm.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.174.187.22]
-X-CFilter-Loop: Reflected
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: HE1PR0802MB2249
+Original-Authentication-Results: kernel.org; dkim=none (message not signed)
+ header.d=none;kernel.org; dmarc=none action=none header.from=arm.com;
+X-EOPAttributedMessage: 0
+X-MS-Exchange-Transport-CrossTenantHeadersStripped: VE1EUR03FT047.eop-EUR03.prod.protection.outlook.com
+X-MS-Office365-Filtering-Correlation-Id-Prvs: 171f5ed5-4f6d-485e-956a-08d853036967
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: xk5goaMF681OO+x4uLKe8y7dVMM2J3F63oyWTiR3ng+Q4e5PLcaBogCisYw9Ho8ez7Q7sq8wBaZD5ZAb1KGMuLtn+K5vZHkc2GY+IJy+jfOw5fEEzZglNRjtJctbVb2s+PdHDmbhdMHypETbLVZcFGJrmhfq/3z7I9bLcrAb+SxaIeDvDHU6CZhmlyJN2JpL+bA5bgQFooVUEE56g4JogRj1hB8JcOOXaLxJEbDvAgMDDdN+xG5W0ixmgE32CfgFSZvIcxOmHwX4hmWzC06Ahxli6k5Durk/swBP9LdaXBFQdgYDjG0jOp7sUn4XmSzRrGFY9pandflNInN/szyqrhyrXMdhCTlvv1Mkgb6mnxxnYvEkCYY6EMTKZUld7quTmuubWVep2+fOrxjt5kOVUw==
+X-Forefront-Antispam-Report: CIP:63.35.35.123;CTRY:IE;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:64aa7808-outbound-1.mta.getcheckrecipient.com;PTR:ec2-63-35-35-123.eu-west-1.compute.amazonaws.com;CAT:NONE;SFS:(4636009)(396003)(136003)(39860400002)(346002)(376002)(46966005)(82310400003)(53546011)(70206006)(186003)(6506007)(336012)(6862004)(81166007)(33656002)(356005)(70586007)(86362001)(52536014)(5660300002)(82740400003)(478600001)(450100002)(4326008)(54906003)(2906002)(316002)(8936002)(7696005)(9686003)(8676002)(83380400001)(55016002)(36906005)(26005)(47076004);DIR:OUT;SFP:1101;
+X-OriginatorOrg: arm.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Sep 2020 07:55:49.6206
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: dd990820-90c4-4883-0f52-08d853036fc5
+X-MS-Exchange-CrossTenant-Id: f34e5979-57d9-4aaa-ad4d-b122a662184d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=f34e5979-57d9-4aaa-ad4d-b122a662184d;Ip=[63.35.35.123];Helo=[64aa7808-outbound-1.mta.getcheckrecipient.com]
+X-MS-Exchange-CrossTenant-AuthSource: VE1EUR03FT047.eop-EUR03.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB6PR0802MB2150
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Marc and Steven,
+Hi Marc,
 
-On 2020/9/2 18:09, Steven Price wrote:
-> Hi Marc,
-> 
-> Sorry for the slow response, I've been on holiday.
-> 
-> On 22/08/2020 11:31, Marc Zyngier wrote:
->> Hi Steven,
->>
->> On Wed, 19 Aug 2020 09:54:40 +0100,
->> Steven Price <steven.price@arm.com> wrote:
->>>
->>> On 18/08/2020 15:41, Marc Zyngier wrote:
->>>> On 2020-08-17 09:41, Keqian Zhu wrote:
-> [...]
->>>>>
->>>>> Things need concern:
->>>>> 1. https://developer.arm.com/docs/den0057/a needs update.
->>>>
->>>> LPT was explicitly removed from the spec because it doesn't really
->>>> solve the problem, specially for the firmware: EFI knows
->>>> nothing about this, for example. How is it going to work?
->>>> Also, nobody was ever able to explain how this would work for
->>>> nested virt.
->>>>
->>>> ARMv8.4 and ARMv8.6 have the feature set that is required to solve
->>>> this problem without adding more PV to the kernel.
->>>
->>> Hi Marc,
->>>
->>> These are good points, however we do still have the situation that
->>> CPUs that don't have ARMv8.4/8.6 clearly cannot implement this. I
->>> presume the use-case Keqian is looking at predates the necessary
->>> support in the CPU - Keqian if you can provide more details on the
->>> architecture(s) involved that would be helpful.
->>
->> My take on this is that it is a fictional use case. In my experience,
->> migration happens across *identical* systems, and *any* difference
->> visible to guests will cause things to go wrong. Errata management
->> gets in the way, as usual (name *one* integration that isn't broken
->> one way or another!).
-> 
-> Keqian appears to have a use case - but obviously I don't know the details. I guess Keqian needs to convince you of that.
-Sure, there is use case, but I'm very sorry that it's inconvenient to show the detail. Maybe cross-chip migration
-will be supported by arm64 eventually, so I think use case is not a key problem.
+> -----Original Message-----
+> From: Marc Zyngier <maz@kernel.org>
+> Sent: Saturday, September 5, 2020 12:19 AM
+> To: Jianyong Wu <Jianyong.Wu@arm.com>
+> Cc: netdev@vger.kernel.org; yangbo.lu@nxp.com; john.stultz@linaro.org;
+> tglx@linutronix.de; pbonzini@redhat.com; sean.j.christopherson@intel.com;
+> richardcochran@gmail.com; Mark Rutland <Mark.Rutland@arm.com>;
+> will@kernel.org; Suzuki Poulose <Suzuki.Poulose@arm.com>; Steven Price
+> <Steven.Price@arm.com>; linux-kernel@vger.kernel.org; linux-arm-
+> kernel@lists.infradead.org; kvmarm@lists.cs.columbia.edu;
+> kvm@vger.kernel.org; Steve Capper <Steve.Capper@arm.com>; Justin He
+> <Justin.He@arm.com>; nd <nd@arm.com>
+> Subject: Re: [PATCH v14 09/10] doc: add ptp_kvm introduction for arm64
+> support
+>=20
+> On Fri, 04 Sep 2020 10:27:43 +0100,
+> Jianyong Wu <jianyong.wu@arm.com> wrote:
+> >
+> > ptp_kvm implementation depends on hypercall using SMCCC. So we
+> > introduce a new SMCCC service ID. This doc explain how we define and
+> > use this new ID.
+> >
+> > Signed-off-by: Jianyong Wu <jianyong.wu@arm.com>
+> > ---
+> >  Documentation/virt/kvm/arm/ptp_kvm.rst | 72
+> > ++++++++++++++++++++++++++
+> >  1 file changed, 72 insertions(+)
+> >  create mode 100644 Documentation/virt/kvm/arm/ptp_kvm.rst
+> >
+> > diff --git a/Documentation/virt/kvm/arm/ptp_kvm.rst
+> > b/Documentation/virt/kvm/arm/ptp_kvm.rst
+> > new file mode 100644
+> > index 000000000000..455591e2587a
+> > --- /dev/null
+> > +++ b/Documentation/virt/kvm/arm/ptp_kvm.rst
+> > @@ -0,0 +1,72 @@
+> > +.. SPDX-License-Identifier: GPL-2.0
+> > +
+> > +PTP_KVM support for arm64
+> > +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D
+> > +
+> > +PTP_KVM is used for time sync between guest and host in a high preciso=
+n.
+> > +It needs get wall time and counter value from host and transfer these
+> > +data to guest via hypercall service. So one more hypercall service
+> > +should be added.
+> > +
+> > +This new SMCCC hypercall will be defined as:
+> > +
+> > +* ARM_SMCCC_HYP_KVM_PTP_FUNC_ID: 0xC6000001
+> > +
+> > +As we only support 64-bits ptp_kvm client, so we choose SMC64/HVC64
+> > +calling convention.
+>=20
+> This isn't what the code does, as it is explicitly set as an SMC32 servic=
+e...
+> Furthermore, we still run 32bit guests, and will do for the foreseeable f=
+uture.
+> Having removed KVM support for 32bit doesn't mean 32bits are gone.
 
-> 
->> Allowing migration across heterogeneous hosts requires a solution to
->> the errata management problem, which everyone (including me) has
->> decided to ignore so far (and I claim that not having a constant timer
->> frequency exposed to guests is an architecture bug).
-> 
-> I agree - errata management needs to be solved before LPT. Between restricted subsets of hosts this doesn't seem impossible, but I guess we should stall LPT until a credible solution is proposed. I'm certainly not proposing one at the moment.
-> 
->>> Nested virt is indeed more of an issue - we did have some ideas around
->>> using SDEI that never made it to the spec.
->>
->> SDEI? Sigh... Why would SDEI be useful for NV and not for !NV?
-> 
-> SDEI provides a way of injecting a synchronous exception on migration - although that certainly isn't the only possible mechanism. For NV we have the problem that a guest-guest may be running at the point of migration. However it's not practical for the host hypervisor to provide the necessary table directly to the guest-guest which means the guest-hypervisor must update the tables before the guest-guest is allowed to run on the new host. The only plausible route I could see for this is injecting a synchronous exception into the guest (per VCPU) to ensure any guest-guests running are exited at migration time.
-> 
-> !NV is easier because we don't have to worry about multiple levels of para-virtualisation.
-> 
->>> However I would argue that the most pragmatic approach would be to
->>> not support the combination of nested virt and LPT. Hopefully that
->>> can wait until the counter scaling support is available and not
->>> require PV.
->>
->> And have yet another set of band aids that paper over the fact that we
->> can't get a consistent story on virtualization? No, thank you.
->>
->> NV is (IMHO) much more important than LPT as it has a chance of
->> getting used. LPT is just another tick box, and the fact that ARM is
->> ready to ignore sideline a decent portion of the architecture is a
->> clear sign that it hasn't been thought out.
-> 
-> Different people have different priorities. NV is definitely important for many people. LPT may also be important if you've already got a bunch of VMs running on machines and you want to be able to (gradually) replace them with newer hosts which happen to have a different clock frequency. Those VMs running now clearly aren't using NV.
-> 
-> However, I have to admit it's not me that has the use-case, so I'll leave it for others who might actually know the specifics to explain the details.
-> 
->>> We are discussing (re-)releasing the spec with the LPT parts added. If
->>> you have fundamental objections then please me know.
->>
->> I do, see above. I'm stating that the use case doesn't really exist
->> given the state of the available HW and the fragmentation of the
->> architecture, and that ignoring the most important innovation in the
->> virtualization architecture since ARMv7 is at best short-sighted.
->>
->> Time scaling is just an instance of the errata management problem, and
->> that is the issue that needs solving. Papering over part of the
->> problem is not helping.
-> 
-> I fully agree - errata management is definitely the first step that needs solving. This is why I abandoned LPT originally because I don't have a generic solution and the testing I did involved really ugly hacks just to make the migration possible.
-> 
-> For now I propose we (again) park LPT until some progress has been made on errata management.
-> 
-> Thanks,
-> 
-> Steve
-> .
-As we have discussed, to support the vtimer part of cross-chip migration, we still face many problems.
-Firstly, we have no complete solution to realize the basic functionality. For PV solution, LPT just handles
-Linux kernel, other SW agents are not involved. For non-PV solution, ARMv8.4 ext and ARMv8.6 ext is not enough.
-Besides the basic functionality, we should concern errata management and NV (I think this is not urgent).
+Sorry to have removed arm32 support. It's worthy to add arm32 support in.
+I will add it next time.
 
-Giving above, I agree with Steven that re-park LPT.
+Thanks
+Jianyong=20
 
-Thanks,
-Keqian
+>=20
+> 	M.
+>=20
+> --
+> Without deviation from the norm, progress is not possible.
