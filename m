@@ -2,90 +2,107 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6F639260CB7
-	for <lists+kvm@lfdr.de>; Tue,  8 Sep 2020 09:58:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id ACA89260CC4
+	for <lists+kvm@lfdr.de>; Tue,  8 Sep 2020 09:59:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729961AbgIHH6N (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 8 Sep 2020 03:58:13 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:39271 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1729921AbgIHH5t (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 8 Sep 2020 03:57:49 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1599551860;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=hjajqtvEuISTBRgRpPMUCH8ji6lbeHsCmX5hSQj+D2Q=;
-        b=HVFVXNTCn0P8hxdzDQkceEZE95e+2L8CyHiJGAdMFWyTELNh0rCS64n0hyDoSvB+uoXlC2
-        as/CK00hPloi+JHHZowUZJFtc47cjpZlZoTF/Q3Touz780mZnTcffk1thObxcy6ig6S2fb
-        O4I/8if0CXHx/UFEovyQOwhgHLa9o+Q=
-Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
- [209.85.218.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-531-5xSxcFoqPhWnPTPJoNt_3g-1; Tue, 08 Sep 2020 03:57:38 -0400
-X-MC-Unique: 5xSxcFoqPhWnPTPJoNt_3g-1
-Received: by mail-ej1-f71.google.com with SMTP id j2so370358ejm.18
-        for <kvm@vger.kernel.org>; Tue, 08 Sep 2020 00:57:38 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=hjajqtvEuISTBRgRpPMUCH8ji6lbeHsCmX5hSQj+D2Q=;
-        b=L1aSfukYRMEDgzQy2FmZIB3F/mq2N0z8TnHQVh5eEizpmrIc6IjASUH6fNRIsplujW
-         R6lcmKNDhLOi6qmxJQxE06jLyj6V+WSgvfiRzCAKMkqvbnKrwKPTv1mdOl1sXPqtPlgK
-         WJrYdreziVgyT/tKFMHTKUBTOqaxrN8JmAnnFn+QrhFGEMM7aOHu0f8Jk02oW49hp70F
-         kBeZQdoPnEZEa0hZ0/FxLkEeEFQ38lN3W3DMnebcD2r7A9Neoxi95LI5YD692OH+RIQT
-         scuCSZ9aTAFMzrMFAox4c3LuREgG68yXQVAzTHcWZQI7jw4sjEh9Ugnj6+1A1sKkWydf
-         D+5g==
-X-Gm-Message-State: AOAM530o8GD6K8AaFIjhsxlSoEPaHgL/ZV6LH7q2yoHmYcRKfhJ2whSB
-        rLf4+BZ1QthywDQFFodFp2LaEQRVPxaffgKvPsVes7Z944dMQbS869IEHi1IxHNVtHaLwHVosW9
-        7GIefjMD+6sGy
-X-Received: by 2002:a17:906:4cc6:: with SMTP id q6mr17306534ejt.201.1599551857520;
-        Tue, 08 Sep 2020 00:57:37 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxpDLRo1CVGFPV8s2mB7FGn6jr+cgUVgJN/ozC0WS4OAeawUnu+/98JbXILSr3J/Bhzu7egLw==
-X-Received: by 2002:a17:906:4cc6:: with SMTP id q6mr17306516ejt.201.1599551857341;
-        Tue, 08 Sep 2020 00:57:37 -0700 (PDT)
-Received: from redhat.com ([147.161.9.118])
-        by smtp.gmail.com with ESMTPSA id e4sm16024501edk.38.2020.09.08.00.57.32
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 08 Sep 2020 00:57:36 -0700 (PDT)
-Date:   Tue, 8 Sep 2020 03:57:30 -0400
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Halil Pasic <pasic@linux.ibm.com>
-Cc:     Pierre Morel <pmorel@linux.ibm.com>, linux-kernel@vger.kernel.org,
-        borntraeger@de.ibm.com, frankja@linux.ibm.com, jasowang@redhat.com,
-        cohuck@redhat.com, kvm@vger.kernel.org, linux-s390@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, thomas.lendacky@amd.com,
-        david@gibson.dropbear.id.au, linuxram@us.ibm.com,
-        hca@linux.ibm.com, gor@linux.ibm.com
-Subject: Re: [PATCH v11 0/2] s390: virtio: let arch validate VIRTIO features
-Message-ID: <20200908035506-mutt-send-email-mst@kernel.org>
-References: <1599471547-28631-1-git-send-email-pmorel@linux.ibm.com>
- <20200908003951.233e47f3.pasic@linux.ibm.com>
+        id S1729831AbgIHH67 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 8 Sep 2020 03:58:59 -0400
+Received: from mail.kernel.org ([198.145.29.99]:38804 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1729552AbgIHH6r (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 8 Sep 2020 03:58:47 -0400
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 7FE312177B;
+        Tue,  8 Sep 2020 07:58:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1599551926;
+        bh=e6KbWIX9OGeN9VN1JOdQtcvcUKxjsb2qiPcRPoyCsHw=;
+        h=From:To:Cc:Subject:Date:From;
+        b=V1GMiEH9/wCXi86KUjxIxMq6EbokUbEMvdMoN9ec2AwdoITqXPXjibb9zdCyFJbRq
+         cWd8wXlxr0/odYmPSOXIFyrc6431tYf+wYKYrSpmoS+O7G0gdPnF3kZp1HEUR11E5E
+         2H/Pf4DZNNsvKJBvFrH6NuWqVf/Uvf9gSjxy5LbQ=
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=why.lan)
+        by disco-boy.misterjones.org with esmtpsa (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+        (Exim 4.92)
+        (envelope-from <maz@kernel.org>)
+        id 1kFYWa-009zhy-Jg; Tue, 08 Sep 2020 08:58:44 +0100
+From:   Marc Zyngier <maz@kernel.org>
+To:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org
+Cc:     James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Eric Auger <eric.auger@redhat.com>, graf@amazon.com,
+        kernel-team@android.com
+Subject: [PATCH v3 0/5] KVM: arm64: Filtering PMU events
+Date:   Tue,  8 Sep 2020 08:58:25 +0100
+Message-Id: <20200908075830.1161921-1-maz@kernel.org>
+X-Mailer: git-send-email 2.28.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200908003951.233e47f3.pasic@linux.ibm.com>
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, robin.murphy@arm.com, mark.rutland@arm.com, eric.auger@redhat.com, graf@amazon.com, kernel-team@android.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Sep 08, 2020 at 12:39:51AM +0200, Halil Pasic wrote:
-> On Mon,  7 Sep 2020 11:39:05 +0200
-> Pierre Morel <pmorel@linux.ibm.com> wrote:
-> 
-> > Hi all,
-> > 
-> > The goal of the series is to give a chance to the architecture
-> > to validate VIRTIO device features.
-> 
-> Michael, is this going in via your tree?
+It is at times necessary to prevent a guest from being able to sample
+certain events if multiple CPUs share resources such as a cache level. In
+this case, it would be interesting if the VMM could simply prevent certain
+events from being counted instead of hiding the PMU.
 
-I guess so. Still not really happy about second-guessing
-the hypervisor, but this got acks from others
-so maybe I'm wrong in this instance. Won't be the first time.
+Given that most events are not architected, there is no easy way to
+designate which events shouldn't be counted other than specifying the raw
+event number.
+
+Since I have no idea whether it is better to use an event whitelist or
+blacklist, the proposed API takes a cue from the x86 version and allows
+either allowing or denying counting of ranges of events. The event space
+being pretty large (16bits on ARMv8.1), the default policy is set by the
+first filter that gets installed (default deny if we first allow, default
+allow if we first deny).
+
+The filter state is global to the guest, despite the PMU being per CPU. I'm
+not sure whether it would be worth it making it CPU-private.
+
+As an example of what can be done in userspace, I have the corresponding
+kvmtool hack here[1].
+
+* From v2:
+  - Split out the error handling refactor for clarity
+  - Added a terrible hack to fish out the PMU version, because BL is great
+  - Update the guest's view of PCMEID{0,1}_EL1
+  - General tidying up
+
+* From v1:
+  - Cleaned up handling of the cycle counter
+  - Documented restrictions on SW_INC, CHAIN and CPU_CYCLES events
+
+[1] https://git.kernel.org/pub/scm/linux/kernel/git/maz/kvmtool.git/commit/?h=pmu-filter
+
+Marc Zyngier (5):
+  KVM: arm64: Refactor PMU attribute error handling
+  KVM: arm64: Use event mask matching architecture revision
+  KVM: arm64: Add PMU event filtering infrastructure
+  KVM: arm64: Mask out filtered events in PCMEID{0,1}_EL1
+  KVM: arm64: Document PMU filtering API
+
+ Documentation/virt/kvm/devices/vcpu.rst |  46 ++++++
+ arch/arm64/include/asm/kvm_host.h       |   7 +
+ arch/arm64/include/uapi/asm/kvm.h       |  16 ++
+ arch/arm64/kvm/arm.c                    |   2 +
+ arch/arm64/kvm/pmu-emul.c               | 199 +++++++++++++++++++++---
+ arch/arm64/kvm/sys_regs.c               |   5 +-
+ include/kvm/arm_pmu.h                   |   5 +
+ 7 files changed, 254 insertions(+), 26 deletions(-)
 
 -- 
-MST
+2.28.0
 
