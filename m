@@ -2,164 +2,87 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 41DE526127C
-	for <lists+kvm@lfdr.de>; Tue,  8 Sep 2020 16:17:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3F678261261
+	for <lists+kvm@lfdr.de>; Tue,  8 Sep 2020 16:09:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730083AbgIHORe (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 8 Sep 2020 10:17:34 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:10952 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1728975AbgIHOQu (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 8 Sep 2020 10:16:50 -0400
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 088D3Olg133343;
-        Tue, 8 Sep 2020 09:05:13 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=pp1;
- bh=rdyzONfAjlQKywvb8PXpfSL9Mb1tE/stNvI+MMrDpDE=;
- b=IOP7gFXWoXksOBcYP2rJa1AZF3ddyycLv23cdx1zvHGrylPNgEz3s188ugQIW4eBEho2
- IXVNm5VaIgTbk3m9vBZLg9qzUoCQzPZaRSat891QIyZbw5hkI0aocNb3XiEoVnfeMf53
- +wVPWW21tIu/79xnAxoPu+85eXCRZKCd6KKZflsBoeuSjIzRB5/NWoHKRu0DDS+5CYn8
- /3Rea0fH6qOEKRZVUbaqkyshpo5ylfF/OtE72cd+y46tKmveaNPhs/35I6NJxEZmbSnM
- cJFD/DRniiws2jXLWzTFUQYb1tEKlLoiNPfZ4zH7v+332UxaHXGWSX0cPcShmLvpeueq 1A== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 33ea0c96st-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 08 Sep 2020 09:05:12 -0400
-Received: from m0098393.ppops.net (m0098393.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 088D4dP2139018;
-        Tue, 8 Sep 2020 09:05:12 -0400
-Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 33ea0c96rb-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 08 Sep 2020 09:05:12 -0400
-Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
-        by ppma03fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 088Cw9al030320;
-        Tue, 8 Sep 2020 13:05:10 GMT
-Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
-        by ppma03fra.de.ibm.com with ESMTP id 33c2a8a468-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 08 Sep 2020 13:05:09 +0000
-Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
-        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 088D57EI62521774
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 8 Sep 2020 13:05:07 GMT
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 2283F11C04C;
-        Tue,  8 Sep 2020 13:05:07 +0000 (GMT)
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 3F9C911C052;
-        Tue,  8 Sep 2020 13:05:06 +0000 (GMT)
-Received: from linux01.pok.stglabs.ibm.com (unknown [9.114.17.81])
-        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Tue,  8 Sep 2020 13:05:06 +0000 (GMT)
-From:   Janosch Frank <frankja@linux.ibm.com>
-To:     linux-s390@vger.kernel.org
-Cc:     borntraeger@de.ibm.com, gor@linux.ibm.com, imbrenda@linux.ibm.com,
-        kvm@vger.kernel.org, david@redhat.com, hca@linux.ibm.com,
-        cohuck@redhat.com, thuth@redhat.com
-Subject: [PATCH v3] s390x: Add 3f program exception handler
-Date:   Tue,  8 Sep 2020 09:05:04 -0400
-Message-Id: <20200908130504.24641-1-frankja@linux.ibm.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20200908075337.GA9170@osiris>
-References: <20200908075337.GA9170@osiris>
+        id S1729635AbgIHOJn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 8 Sep 2020 10:09:43 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:41827 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1729954AbgIHN6e (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 8 Sep 2020 09:58:34 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1599573442;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=V8gJHVVzl/wwJZfOQGNWW8wLM+ZCeRs5gKT/LuNGCcw=;
+        b=OMQSjk72eXgSD5FvYmLtjRHRyXF82GEjzOE6oLSjDI4RIfFn3mwQlnrq/4SJeiacqXOI2N
+        yuuztMu03Ckf16Lv87/tfLHaaByKxZ0Zp0OLCV/E/9XWRKFIwKByCZBoP1JifXK5HpPeDZ
+        cu5NgegDxSQqSZX3HkOebZqkXjOzwAM=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-329-iMmetHogMoyHJc6VOO_2HA-1; Tue, 08 Sep 2020 09:53:57 -0400
+X-MC-Unique: iMmetHogMoyHJc6VOO_2HA-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6827A1017DC1;
+        Tue,  8 Sep 2020 13:53:56 +0000 (UTC)
+Received: from vitty.brq.redhat.com (unknown [10.40.194.93])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 3E4D87D8AC;
+        Tue,  8 Sep 2020 13:53:54 +0000 (UTC)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     kvm@vger.kernel.org, x86@kernel.org
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Andy Lutomirski <luto@kernel.org>
+Subject: [PATCH 1/2] x86/kvm: properly use DEFINE_IDTENTRY_SYSVEC() macro
+Date:   Tue,  8 Sep 2020 15:53:49 +0200
+Message-Id: <20200908135350.355053-2-vkuznets@redhat.com>
+In-Reply-To: <20200908135350.355053-1-vkuznets@redhat.com>
+References: <20200908135350.355053-1-vkuznets@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
- definitions=2020-09-08_06:2020-09-08,2020-09-08 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 spamscore=0
- bulkscore=0 lowpriorityscore=0 malwarescore=0 priorityscore=1501
- suspectscore=1 phishscore=0 impostorscore=0 mlxscore=0 mlxlogscore=999
- clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2006250000 definitions=main-2009080123
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Program exception 3f (secure storage violation) can only be detected
-when the CPU is running in SIE with a format 4 state description,
-e.g. running a protected guest. Because of this and because user
-space partly controls the guest memory mapping and can trigger this
-exception, we want to send a SIGSEGV to the process running the guest
-and not panic the kernel.
+DEFINE_IDTENTRY_SYSVEC() already contains irqentry_enter()/
+irqentry_exit().
 
-Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
-CC: <stable@vger.kernel.org> # 5.7+
-Fixes: 084ea4d611a3 ("s390/mm: add (non)secure page access exceptions handlers")
-Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
-Reviewed-by: Cornelia Huck <cohuck@redhat.com>
-Acked-by: Christian Borntraeger <borntraeger@de.ibm.com>
+Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
 ---
- arch/s390/kernel/entry.h     |  1 +
- arch/s390/kernel/pgm_check.S |  2 +-
- arch/s390/mm/fault.c         | 20 ++++++++++++++++++++
- 3 files changed, 22 insertions(+), 1 deletion(-)
+ arch/x86/kernel/kvm.c | 4 ----
+ 1 file changed, 4 deletions(-)
 
-diff --git a/arch/s390/kernel/entry.h b/arch/s390/kernel/entry.h
-index faca269d5f27..a44ddc2f2dec 100644
---- a/arch/s390/kernel/entry.h
-+++ b/arch/s390/kernel/entry.h
-@@ -26,6 +26,7 @@ void do_protection_exception(struct pt_regs *regs);
- void do_dat_exception(struct pt_regs *regs);
- void do_secure_storage_access(struct pt_regs *regs);
- void do_non_secure_storage_access(struct pt_regs *regs);
-+void do_secure_storage_violation(struct pt_regs *regs);
- 
- void addressing_exception(struct pt_regs *regs);
- void data_exception(struct pt_regs *regs);
-diff --git a/arch/s390/kernel/pgm_check.S b/arch/s390/kernel/pgm_check.S
-index 2c27907a5ffc..9a92638360ee 100644
---- a/arch/s390/kernel/pgm_check.S
-+++ b/arch/s390/kernel/pgm_check.S
-@@ -80,7 +80,7 @@ PGM_CHECK(do_dat_exception)		/* 3b */
- PGM_CHECK_DEFAULT			/* 3c */
- PGM_CHECK(do_secure_storage_access)	/* 3d */
- PGM_CHECK(do_non_secure_storage_access)	/* 3e */
--PGM_CHECK_DEFAULT			/* 3f */
-+PGM_CHECK(do_secure_storage_violation)	/* 3f */
- PGM_CHECK(monitor_event_exception)	/* 40 */
- PGM_CHECK_DEFAULT			/* 41 */
- PGM_CHECK_DEFAULT			/* 42 */
-diff --git a/arch/s390/mm/fault.c b/arch/s390/mm/fault.c
-index 4c8c063bce5b..996884dcc9fd 100644
---- a/arch/s390/mm/fault.c
-+++ b/arch/s390/mm/fault.c
-@@ -859,6 +859,21 @@ void do_non_secure_storage_access(struct pt_regs *regs)
- }
- NOKPROBE_SYMBOL(do_non_secure_storage_access);
- 
-+void do_secure_storage_violation(struct pt_regs *regs)
-+{
-+	/*
-+	 * Either KVM messed up the secure guest mapping or the same
-+	 * page is mapped into multiple secure guests.
-+	 *
-+	 * This exception is only triggered when a guest 2 is running
-+	 * and can therefore never occur in kernel context.
-+	 */
-+	printk_ratelimited(KERN_WARNING
-+			   "Secure storage violation in task: %s, pid %d\n",
-+			   current->comm, current->pid);
-+	send_sig(SIGSEGV, current, 0);
-+}
-+
- #else
- void do_secure_storage_access(struct pt_regs *regs)
+diff --git a/arch/x86/kernel/kvm.c b/arch/x86/kernel/kvm.c
+index 08320b0b2b27..d45f34cbe1ef 100644
+--- a/arch/x86/kernel/kvm.c
++++ b/arch/x86/kernel/kvm.c
+@@ -270,9 +270,6 @@ DEFINE_IDTENTRY_SYSVEC(sysvec_kvm_asyncpf_interrupt)
  {
-@@ -869,4 +884,9 @@ void do_non_secure_storage_access(struct pt_regs *regs)
- {
- 	default_trap_handler(regs);
+ 	struct pt_regs *old_regs = set_irq_regs(regs);
+ 	u32 token;
+-	irqentry_state_t state;
+-
+-	state = irqentry_enter(regs);
+ 
+ 	inc_irq_stat(irq_hv_callback_count);
+ 
+@@ -283,7 +280,6 @@ DEFINE_IDTENTRY_SYSVEC(sysvec_kvm_asyncpf_interrupt)
+ 		wrmsrl(MSR_KVM_ASYNC_PF_ACK, 1);
+ 	}
+ 
+-	irqentry_exit(regs, state);
+ 	set_irq_regs(old_regs);
  }
-+
-+void do_secure_storage_violation(struct pt_regs *regs)
-+{
-+	default_trap_handler(regs);
-+}
- #endif
+ 
 -- 
-2.25.1
+2.25.4
 
