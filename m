@@ -2,134 +2,195 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B53DC261B21
-	for <lists+kvm@lfdr.de>; Tue,  8 Sep 2020 20:56:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 58380261B22
+	for <lists+kvm@lfdr.de>; Tue,  8 Sep 2020 20:56:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731280AbgIHSzb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 8 Sep 2020 14:55:31 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:20110 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1728350AbgIHSyu (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 8 Sep 2020 14:54:50 -0400
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 088IXZZd060588;
-        Tue, 8 Sep 2020 14:54:47 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=YPY+Z8lLZHccuoXJgk288xOmQXMV5vbQugXDWW9wyfA=;
- b=MKo8FGI8UaVB8fVz8LVcnNXD1HBUwimVgyVP22Yp9/7MyX1skYNyAHZRGRzDh0cf4bFT
- igBOGrtVs43YfSjlIJbl7qqdUZjTXQoxo6thNdkC0B66vK1vLpb2tF2yvdd6N5vwdq9U
- ZWuvzYs2wP38AklKx6N7LOLWUqRnWy7XBfugB6FdA40/QbPnpoCu2ppwASHXipIIki+I
- rTy8HsKIpytCHpIbWqyUmI60DtNoLIk3I8L6+6zFDDROaItKGl6Et3T33dy6nvj6puE+
- 0AHFBC9CUQyTxDupoTkeueOuMGucINf4/yT/N98Jgq6kjVp0jYD+ZA0vsQyFixgkc4rz UA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 33edfjcqr0-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 08 Sep 2020 14:54:46 -0400
-Received: from m0098396.ppops.net (m0098396.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 088IY337063620;
-        Tue, 8 Sep 2020 14:54:46 -0400
-Received: from ppma03dal.us.ibm.com (b.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.11])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 33edfjcqqb-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 08 Sep 2020 14:54:46 -0400
-Received: from pps.filterd (ppma03dal.us.ibm.com [127.0.0.1])
-        by ppma03dal.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 088IqGOZ028541;
-        Tue, 8 Sep 2020 18:54:45 GMT
-Received: from b01cxnp22035.gho.pok.ibm.com (b01cxnp22035.gho.pok.ibm.com [9.57.198.25])
-        by ppma03dal.us.ibm.com with ESMTP id 33c2a8ywgq-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 08 Sep 2020 18:54:45 +0000
-Received: from b01ledav003.gho.pok.ibm.com (b01ledav003.gho.pok.ibm.com [9.57.199.108])
-        by b01cxnp22035.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 088Ish9e53870928
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 8 Sep 2020 18:54:43 GMT
-Received: from b01ledav003.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 60D7FB205F;
-        Tue,  8 Sep 2020 18:54:43 +0000 (GMT)
-Received: from b01ledav003.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 917EEB2064;
-        Tue,  8 Sep 2020 18:54:42 +0000 (GMT)
-Received: from localhost.localdomain (unknown [9.85.141.115])
-        by b01ledav003.gho.pok.ibm.com (Postfix) with ESMTP;
-        Tue,  8 Sep 2020 18:54:42 +0000 (GMT)
-Subject: Re: [PATCH v10 02/16] s390/vfio-ap: use new AP bus interface to
- search for queue devices
-To:     Christian Borntraeger <borntraeger@de.ibm.com>,
-        linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Cc:     freude@linux.ibm.com, cohuck@redhat.com, mjrosato@linux.ibm.com,
-        pasic@linux.ibm.com, alex.williamson@redhat.com,
-        kwankhede@nvidia.com, fiuczy@linux.ibm.com, frankja@linux.ibm.com,
-        david@redhat.com, imbrenda@linux.ibm.com, hca@linux.ibm.com,
-        gor@linux.ibm.com, kernel test robot <lkp@intel.com>
-References: <20200821195616.13554-1-akrowiak@linux.ibm.com>
- <20200821195616.13554-3-akrowiak@linux.ibm.com>
- <37cd9b7e-a619-6603-7e47-f5e85814d673@de.ibm.com>
-From:   Tony Krowiak <akrowiak@linux.ibm.com>
-Message-ID: <34c10327-8640-24e8-b882-96962cae5050@linux.ibm.com>
-Date:   Tue, 8 Sep 2020 14:54:42 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+        id S1731124AbgIHSz3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 8 Sep 2020 14:55:29 -0400
+Received: from smtp-fw-9101.amazon.com ([207.171.184.25]:62984 "EHLO
+        smtp-fw-9101.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726272AbgIHSzH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 8 Sep 2020 14:55:07 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1599591308; x=1631127308;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=x5jEF96sYCAIy62XD2CkEvqSoI0X9CvEDr0LQID4QSM=;
+  b=L64aNTEHBgFKOJoGKPJUAnl5WaPuqSpKksJS+9eRL9vbyjF31LnY4KLt
+   g8WQtDm+l7c3t5T6SEBCr1PKda7VCp/7bVDdXm+aObMsAyH6ZnNEDueZ+
+   S3nbX6VZ5gkwtMbmp2v+3tXyveZbO58ns4B8eFX3mt/s0RAasvnLNWdCH
+   Q=;
+X-IronPort-AV: E=Sophos;i="5.76,406,1592870400"; 
+   d="scan'208";a="66374160"
+Received: from sea32-co-svc-lb4-vlan3.sea.corp.amazon.com (HELO email-inbound-relay-2b-c7131dcf.us-west-2.amazon.com) ([10.47.23.38])
+  by smtp-border-fw-out-9101.sea19.amazon.com with ESMTP; 08 Sep 2020 18:55:00 +0000
+Received: from EX13MTAUWC001.ant.amazon.com (pdx4-ws-svc-p6-lb7-vlan2.pdx.amazon.com [10.170.41.162])
+        by email-inbound-relay-2b-c7131dcf.us-west-2.amazon.com (Postfix) with ESMTPS id 8E7E7A2582;
+        Tue,  8 Sep 2020 18:54:58 +0000 (UTC)
+Received: from EX13D20UWC001.ant.amazon.com (10.43.162.244) by
+ EX13MTAUWC001.ant.amazon.com (10.43.162.135) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.2; Tue, 8 Sep 2020 18:54:56 +0000
+Received: from u79c5a0a55de558.ant.amazon.com (10.43.161.85) by
+ EX13D20UWC001.ant.amazon.com (10.43.162.244) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.2; Tue, 8 Sep 2020 18:54:53 +0000
+From:   Alexander Graf <graf@amazon.com>
+To:     <kvmarm@lists.cs.columbia.edu>
+CC:     Marc Zyngier <maz@kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>, <kvm@vger.kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Eric Auger <eric.auger@redhat.com>
+Subject: [PATCH] KVM: arm64: Allow to limit number of PMU counters
+Date:   Tue, 8 Sep 2020 20:54:45 +0200
+Message-ID: <20200908185445.22561-1-graf@amazon.com>
+X-Mailer: git-send-email 2.28.0.394.ge197136389
 MIME-Version: 1.0
-In-Reply-To: <37cd9b7e-a619-6603-7e47-f5e85814d673@de.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+X-Originating-IP: [10.43.161.85]
+X-ClientProxiedBy: EX13D12UWC004.ant.amazon.com (10.43.162.182) To
+ EX13D20UWC001.ant.amazon.com (10.43.162.244)
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
- definitions=2020-09-08_09:2020-09-08,2020-09-08 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0 mlxscore=0
- suspectscore=0 clxscore=1015 impostorscore=0 adultscore=0
- priorityscore=1501 malwarescore=0 bulkscore=0 spamscore=0 mlxlogscore=999
- phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2006250000 definitions=main-2009080171
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+We currently pass through the number of PMU counters that we have available
+in hardware to guests. So if my host supports 10 concurrently active PMU
+counters, my guest will be able to spawn 10 counters as well.
+
+This is undesireable if we also want to use the PMU on the host for
+monitoring. In that case, we want to split the PMU between guest and
+host.
+
+To help that case, let's add a PMU attr that allows us to limit the number
+of PMU counters that we expose. With this patch in place, user space can
+keep some counters free for host use.
+
+Signed-off-by: Alexander Graf <graf@amazon.com>
+
+---
+
+Because this patch touches the same code paths as the vPMU filtering one
+and the vPMU filtering generalized a few conditions in the attr path,
+I've based it on top. Please let me know if you want it independent instead.
+---
+ arch/arm64/include/uapi/asm/kvm.h |  7 ++++---
+ arch/arm64/kvm/pmu-emul.c         | 22 ++++++++++++++++++++++
+ arch/arm64/kvm/sys_regs.c         |  5 +++++
+ include/kvm/arm_pmu.h             |  1 +
+ 4 files changed, 32 insertions(+), 3 deletions(-)
+
+diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
+index 7b1511d6ce44..db025c0b5a40 100644
+--- a/arch/arm64/include/uapi/asm/kvm.h
++++ b/arch/arm64/include/uapi/asm/kvm.h
+@@ -342,9 +342,10 @@ struct kvm_vcpu_events {
+ 
+ /* Device Control API on vcpu fd */
+ #define KVM_ARM_VCPU_PMU_V3_CTRL	0
+-#define   KVM_ARM_VCPU_PMU_V3_IRQ	0
+-#define   KVM_ARM_VCPU_PMU_V3_INIT	1
+-#define   KVM_ARM_VCPU_PMU_V3_FILTER	2
++#define   KVM_ARM_VCPU_PMU_V3_IRQ		0
++#define   KVM_ARM_VCPU_PMU_V3_INIT		1
++#define   KVM_ARM_VCPU_PMU_V3_FILTER		2
++#define   KVM_ARM_VCPU_PMU_V3_NUM_EVENTS	3
+ #define KVM_ARM_VCPU_TIMER_CTRL		1
+ #define   KVM_ARM_VCPU_TIMER_IRQ_VTIMER		0
+ #define   KVM_ARM_VCPU_TIMER_IRQ_PTIMER		1
+diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
+index 9f0fd0224d5b..40848e17d0cb 100644
+--- a/arch/arm64/kvm/pmu-emul.c
++++ b/arch/arm64/kvm/pmu-emul.c
+@@ -238,6 +238,8 @@ void kvm_pmu_vcpu_init(struct kvm_vcpu *vcpu)
+ 
+ 	for (i = 0; i < ARMV8_PMU_MAX_COUNTERS; i++)
+ 		pmu->pmc[i].idx = i;
++
++	pmu->num_events = perf_num_counters() - 1;
+ }
+ 
+ /**
+@@ -875,6 +877,25 @@ int kvm_arm_pmu_v3_set_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
+ 
+ 		return 0;
+ 	}
++	case KVM_ARM_VCPU_PMU_V3_NUM_EVENTS: {
++		u64 mask = ARMV8_PMU_PMCR_N_MASK << ARMV8_PMU_PMCR_N_SHIFT;
++		int __user *uaddr = (int __user *)(long)attr->addr;
++		unsigned int num_events;
++
++		if (get_user(num_events, uaddr))
++			return -EFAULT;
++
++		if (num_events >= perf_num_counters())
++			return -EINVAL;
++
++		vcpu->arch.pmu.num_events = num_events;
++
++		num_events <<= ARMV8_PMU_PMCR_N_SHIFT;
++		__vcpu_sys_reg(vcpu, SYS_PMCR_EL0) &= ~mask;
++		__vcpu_sys_reg(vcpu, SYS_PMCR_EL0) |= num_events;
++
++		return 0;
++	}
+ 	case KVM_ARM_VCPU_PMU_V3_INIT:
+ 		return kvm_arm_pmu_v3_init(vcpu);
+ 	}
+@@ -912,6 +933,7 @@ int kvm_arm_pmu_v3_has_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
+ 	case KVM_ARM_VCPU_PMU_V3_IRQ:
+ 	case KVM_ARM_VCPU_PMU_V3_INIT:
+ 	case KVM_ARM_VCPU_PMU_V3_FILTER:
++	case KVM_ARM_VCPU_PMU_V3_NUM_EVENTS:
+ 		if (kvm_arm_support_pmu_v3() &&
+ 		    test_bit(KVM_ARM_VCPU_PMU_V3, vcpu->arch.features))
+ 			return 0;
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index 077293b5115f..fca0bba6d97b 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -672,6 +672,11 @@ static void reset_pmcr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
+ 	       | (ARMV8_PMU_PMCR_MASK & 0xdecafbad)) & (~ARMV8_PMU_PMCR_E);
+ 	if (!system_supports_32bit_el0())
+ 		val |= ARMV8_PMU_PMCR_LC;
++
++	/* Override number of event selectors */
++	val &= ~(ARMV8_PMU_PMCR_N_MASK << ARMV8_PMU_PMCR_N_SHIFT);
++	val |= (u32)vcpu->arch.pmu.num_events << ARMV8_PMU_PMCR_N_SHIFT;
++
+ 	__vcpu_sys_reg(vcpu, r->reg) = val;
+ }
+ 
+diff --git a/include/kvm/arm_pmu.h b/include/kvm/arm_pmu.h
+index 6db030439e29..5557024edce5 100644
+--- a/include/kvm/arm_pmu.h
++++ b/include/kvm/arm_pmu.h
+@@ -27,6 +27,7 @@ struct kvm_pmu {
+ 	bool ready;
+ 	bool created;
+ 	bool irq_level;
++	u8 num_events;
+ };
+ 
+ #define kvm_arm_pmu_v3_ready(v)		((v)->arch.pmu.ready)
+-- 
+2.16.4
 
 
-On 9/4/20 4:11 AM, Christian Borntraeger wrote:
->
-> On 21.08.20 21:56, Tony Krowiak wrote:
->> This patch refactor's the vfio_ap device driver to use the AP bus's
->> ap_get_qdev() function to retrieve the vfio_ap_queue struct containing
->> information about a queue that is bound to the vfio_ap device driver.
->> The bus's ap_get_qdev() function retrieves the queue device from a
->> hashtable keyed by APQN. This is much more efficient than looping over
->> the list of devices attached to the AP bus by several orders of
->> magnitude.
->>
->> Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
->> Reported-by: kernel test robot <lkp@intel.com>
-> I think this can go. No need to mark that an earlier version of this patch had an issue.
 
-I was just following the instructions in the robot comments. I'll get 
-rid of it.
 
->
->
-> [...]
->
->> diff --git a/drivers/s390/crypto/vfio_ap_private.h b/drivers/s390/crypto/vfio_ap_private.h
->> index f46dde56b464..a2aa05bec718 100644
->> --- a/drivers/s390/crypto/vfio_ap_private.h
->> +++ b/drivers/s390/crypto/vfio_ap_private.h
->> @@ -18,6 +18,7 @@
->>   #include <linux/delay.h>
->>   #include <linux/mutex.h>
->>   #include <linux/kvm_host.h>
->> +#include <linux/hashtable.h>
-> I dont think that this header file needs it. Any user of it will now include this.
-> Can you move this include into the respective C file when the hash stuff is
-> used?
+Amazon Development Center Germany GmbH
+Krausenstr. 38
+10117 Berlin
+Geschaeftsfuehrung: Christian Schlaeger, Jonathan Weiss
+Eingetragen am Amtsgericht Charlottenburg unter HRB 149173 B
+Sitz: Berlin
+Ust-ID: DE 289 237 879
 
-I can.
 
->
->
-> Other than that this looks good.
 
