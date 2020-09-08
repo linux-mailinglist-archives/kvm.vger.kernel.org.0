@@ -2,139 +2,118 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7D4C8261E72
-	for <lists+kvm@lfdr.de>; Tue,  8 Sep 2020 21:52:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9D53F2620D4
+	for <lists+kvm@lfdr.de>; Tue,  8 Sep 2020 22:16:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730790AbgIHTvv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 8 Sep 2020 15:51:51 -0400
-Received: from ale.deltatee.com ([204.191.154.188]:51884 "EHLO
-        ale.deltatee.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730192AbgIHPt5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 8 Sep 2020 11:49:57 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=deltatee.com; s=20200525; h=Subject:Content-Transfer-Encoding:Content-Type:
-        In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Sender:
-        Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender
-        :Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
-        List-Subscribe:List-Post:List-Owner:List-Archive;
-        bh=DvSiEr2JCy+2h9dy7CIecEenG2gQsa0A5OP2d9PI/p0=; b=dbg0PtMPK+HbvI6GMZzh/J5E8Z
-        Q/TWc7UsDFhg1cOVJt/pysWKo3QQRWraF1mqHM6mdRGQ6y0rj+OXqZUSgbgyS5kW1MF22xpb3bm/M
-        J9Rf7mpjgRlZVOcx1SZJ6EJp7lFy55R6nqk8PsS8AEsD0hf0g4vJC65mDtFEAYzf7cE0mQHAAVUlU
-        S7bbDUQqTHtHsrq5f8RHYZU0yCa5rG3lpeqMLTKlNXStV+C6+vhM0UL/8Wjc5CgLnNZYF3jPybjc/
-        ulyb1L7dumDVfTJQeMlSwf7IyaVvWKGWBe0b9ikUV9lDLMezAf5m+fY9DJk+AU+8aTTS01s/mCgwR
-        I5zJe2Ew==;
-Received: from s01060023bee90a7d.cg.shawcable.net ([24.64.145.4] helo=[192.168.0.10])
-        by ale.deltatee.com with esmtpsa (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
-        (Exim 4.92)
-        (envelope-from <logang@deltatee.com>)
-        id 1kFfnI-0008Go-Gj; Tue, 08 Sep 2020 09:44:29 -0600
-To:     Tvrtko Ursulin <tvrtko.ursulin@linux.intel.com>,
-        Tom Murphy <murphyt7@tcd.ie>
-Cc:     kvm@vger.kernel.org, David Airlie <airlied@linux.ie>,
-        dri-devel@lists.freedesktop.org,
-        Bjorn Andersson <bjorn.andersson@linaro.org>,
-        linux-tegra@vger.kernel.org, Julien Grall <julien.grall@arm.com>,
-        Will Deacon <will@kernel.org>,
-        Marek Szyprowski <m.szyprowski@samsung.com>,
-        Jean-Philippe Brucker <jean-philippe@linaro.org>,
-        linux-samsung-soc@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
-        Krzysztof Kozlowski <krzk@kernel.org>,
-        Jonathan Hunter <jonathanh@nvidia.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        linux-rockchip@lists.infradead.org, Andy Gross <agross@kernel.org>,
-        linux-arm-kernel@lists.infradead.org, linux-s390@vger.kernel.org,
-        linux-arm-msm@vger.kernel.org, intel-gfx@lists.freedesktop.org,
-        linux-mediatek@lists.infradead.org,
-        Matthias Brugger <matthias.bgg@gmail.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        virtualization@lists.linux-foundation.org,
-        Gerald Schaefer <gerald.schaefer@de.ibm.com>,
-        David Woodhouse <dwmw2@infradead.org>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        iommu@lists.linux-foundation.org, Kukjin Kim <kgene@kernel.org>,
-        Robin Murphy <robin.murphy@arm.com>
-References: <20191221150402.13868-1-murphyt7@tcd.ie>
- <465815ae-9292-f37a-59b9-03949cb68460@deltatee.com>
- <20200529124523.GA11817@infradead.org>
- <CGME20200529190523eucas1p2c086133e707257c0cdc002f502d4f51d@eucas1p2.samsung.com>
- <33137cfb-603c-86e8-1091-f36117ecfaf3@deltatee.com>
- <ef2150d5-7b6a-df25-c10d-e43316fe7812@samsung.com>
- <b9140772-0370-a858-578c-af503a06d8e9@deltatee.com>
- <CALQxJuutRaeX89k2o4ffTKYRMizmMu0XbRnzpFuSSrkQR02jKg@mail.gmail.com>
- <766525c3-4da9-6db7-cd90-fb4b82cd8083@deltatee.com>
- <60a82319-cbee-4cd1-0d5e-3c407cc51330@linux.intel.com>
-From:   Logan Gunthorpe <logang@deltatee.com>
-Message-ID: <e598fb31-ef7a-c2ee-8a54-bf62d50c480c@deltatee.com>
-Date:   Tue, 8 Sep 2020 09:44:24 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.12.0
+        id S1729529AbgIHUQD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 8 Sep 2020 16:16:03 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:50213 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1730077AbgIHPKD (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 8 Sep 2020 11:10:03 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1599577786;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=FZa+iT6uJluJlrs0f7SlUYi8Jd20qJSgs2ucWw1RdNE=;
+        b=HxmQ0r0PKzARKcyCw4wsuI/PJZcfqXWbGt/4NgW4PH8ccBF04Uu8xvIoTNxbbTKbGDbGXB
+        F0SKTu9d5M+YToYahCUdCwO+ZBWn4ljjPyedOrUmIWQooK54pOoWLpF+dQAGYDHMbw1kLK
+        YDzZtbAKnXXEl+8BvuedaE/xTedN+hs=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-565-COb6RyaJPwm5J6x8ijO5ng-1; Tue, 08 Sep 2020 10:29:17 -0400
+X-MC-Unique: COb6RyaJPwm5J6x8ijO5ng-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6D9021005E5C;
+        Tue,  8 Sep 2020 14:29:15 +0000 (UTC)
+Received: from w520.home (ovpn-112-71.phx2.redhat.com [10.3.112.71])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 3928560C84;
+        Tue,  8 Sep 2020 14:29:05 +0000 (UTC)
+Date:   Tue, 8 Sep 2020 08:29:04 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Ajay Kaher <akaher@vmware.com>
+Cc:     <gregkh@linuxfoundation.org>, <sashal@kernel.org>,
+        <cohuck@redhat.com>, <peterx@redhat.com>, <kvm@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <stable@vger.kernel.org>,
+        <srivatsab@vmware.com>, <srivatsa@csail.mit.edu>,
+        <vsirnapalli@vmware.com>
+Subject: Re: [PATCH v4.14.y 0/3] vfio: Fix for CVE-2020-12888
+Message-ID: <20200908082904.045ff744@w520.home>
+In-Reply-To: <1599509828-23596-4-git-send-email-akaher@vmware.com>
+References: <1599509828-23596-1-git-send-email-akaher@vmware.com>
+        <1599509828-23596-4-git-send-email-akaher@vmware.com>
 MIME-Version: 1.0
-In-Reply-To: <60a82319-cbee-4cd1-0d5e-3c407cc51330@linux.intel.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 24.64.145.4
-X-SA-Exim-Rcpt-To: robin.murphy@arm.com, kgene@kernel.org, iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org, cohuck@redhat.com, dwmw2@infradead.org, gerald.schaefer@de.ibm.com, virtualization@lists.linux-foundation.org, tglx@linutronix.de, matthias.bgg@gmail.com, linux-mediatek@lists.infradead.org, intel-gfx@lists.freedesktop.org, linux-arm-msm@vger.kernel.org, linux-s390@vger.kernel.org, linux-arm-kernel@lists.infradead.org, agross@kernel.org, linux-rockchip@lists.infradead.org, hch@infradead.org, jonathanh@nvidia.com, krzk@kernel.org, maz@kernel.org, linux-samsung-soc@vger.kernel.org, jean-philippe@linaro.org, m.szyprowski@samsung.com, will@kernel.org, julien.grall@arm.com, linux-tegra@vger.kernel.org, bjorn.andersson@linaro.org, dri-devel@lists.freedesktop.org, airlied@linux.ie, kvm@vger.kernel.org, murphyt7@tcd.ie, tvrtko.ursulin@linux.intel.com
-X-SA-Exim-Mail-From: logang@deltatee.com
-X-Spam-Checker-Version: SpamAssassin 3.4.2 (2018-09-13) on ale.deltatee.com
-X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=5.0 tests=ALL_TRUSTED,BAYES_00,
-        NICE_REPLY_A autolearn=ham autolearn_force=no version=3.4.2
-Subject: Re: [Intel-gfx] [PATCH 0/8] Convert the intel iommu driver to the
- dma-iommu api
-X-SA-Exim-Version: 4.2.1 (built Wed, 08 May 2019 21:11:16 +0000)
-X-SA-Exim-Scanned: Yes (on ale.deltatee.com)
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Tue, 8 Sep 2020 01:47:08 +0530
+Ajay Kaher <akaher@vmware.com> wrote:
 
-
-On 2020-09-08 9:28 a.m., Tvrtko Ursulin wrote:
->>
->> diff --git a/drivers/gpu/drm/i915/i915_scatterlist.h
->> b/drivers/gpu/drm/i915/i915
->> index b7b59328cb76..9367ac801f0c 100644
->> --- a/drivers/gpu/drm/i915/i915_scatterlist.h
->> +++ b/drivers/gpu/drm/i915/i915_scatterlist.h
->> @@ -27,13 +27,19 @@ static __always_inline struct sgt_iter {
->>   } __sgt_iter(struct scatterlist *sgl, bool dma) {
->>          struct sgt_iter s = { .sgp = sgl };
->>
->> +       if (sgl && !sg_dma_len(s.sgp))
+> CVE-2020-12888 Kernel: vfio: access to disabled MMIO space of some
+> devices may lead to DoS scenario
+>     
+> The VFIO modules allow users (guest VMs) to enable or disable access to the
+> devices' MMIO memory address spaces. If a user attempts to access (read/write)
+> the devices' MMIO address space when it is disabled, some h/w devices issue an
+> interrupt to the CPU to indicate a fatal error condition, crashing the system.
+> This flaw allows a guest user or process to crash the host system resulting in
+> a denial of service.
+>     
+> Patch 1/ is to force the user fault if PFNMAP vma might be DMA mapped
+> before user access.
+>     
+> Patch 2/ setup a vm_ops handler to support dynamic faulting instead of calling
+> remap_pfn_range(). Also provides a list of vmas actively mapping the area which
+> can later use to invalidate those mappings.
+>     
+> Patch 3/ block the user from accessing memory spaces which is disabled by using
+> new vma list support to zap, or invalidate, those memory mappings in order to
+> force them to be faulted back in on access.
+>     
+> Upstreamed patches link:
+> https://lore.kernel.org/kvm/158871401328.15589.17598154478222071285.stgit@gimli.home
+>         
+> [PATCH v4.14.y 1/3]:
+> Backporting of upsream commit 41311242221e:
+> vfio/type1: Support faulting PFNMAP vmas
+>         
+> [PATCH v4.14.y 2/3]:
+> Backporting of upsream commit 11c4cd07ba11:
+> vfio-pci: Fault mmaps to enable vma tracking
+>         
+> [PATCH v4.14.y 3/3]:
+> Backporting of upsream commit abafbc551fdd:
+> vfio-pci: Invalidate mmaps and block MMIO access on disabled memory
 > 
-> I'd extend the condition to be, just to be safe:
->     if (dma && sgl && !sg_dma_len(s.sgp))
->
 
-Right, good catch, that's definitely necessary.
+I'd recommend also including the following or else SR-IOV VFs will be
+broken for DPDK:
 
->> +               s.sgp = NULL;
->> +
->>          if (s.sgp) {
->>                  s.max = s.curr = s.sgp->offset;
->> -               s.max += s.sgp->length;
->> -               if (dma)
->> +
->> +               if (dma) {
->> +                       s.max += sg_dma_len(s.sgp);
->>                          s.dma = sg_dma_address(s.sgp);
->> -               else
->> +               } else {
->> +                       s.max += s.sgp->length;
->>                          s.pfn = page_to_pfn(sg_page(s.sgp));
->> +               }
-> 
-> Otherwise has this been tested or alternatively how to test it? (How to
-> repro the issue.)
+commit ebfa440ce38b7e2e04c3124aa89c8a9f4094cf21
+Author: Alex Williamson <alex.williamson@redhat.com>
+Date:   Thu Jun 25 11:04:23 2020 -0600
 
-It has not been tested. To test it, you need Tom's patch set without the
-last "DO NOT MERGE" patch:
+    vfio/pci: Fix SR-IOV VF handling with MMIO blocking
+    
+    SR-IOV VFs do not implement the memory enable bit of the command
+    register, therefore this bit is not set in config space after
+    pci_enable_device().  This leads to an unintended difference
+    between PF and VF in hand-off state to the user.  We can correct
+    this by setting the initial value of the memory enable bit in our
+    virtualized config space.  There's really no need however to
+    ever fault a user on a VF though as this would only indicate an
+    error in the user's management of the enable bit, versus a PF
+    where the same access could trigger hardware faults.
+    
+    Fixes: abafbc551fdd ("vfio-pci: Invalidate mmaps and block MMIO access on disabled memory")
+    Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
 
-https://lkml.kernel.org/lkml/20200907070035.GA25114@infradead.org/T/
-
-Thanks,
-
-Logan
