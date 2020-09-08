@@ -2,32 +2,32 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 83702260CC9
-	for <lists+kvm@lfdr.de>; Tue,  8 Sep 2020 09:59:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 755AA260CC7
+	for <lists+kvm@lfdr.de>; Tue,  8 Sep 2020 09:59:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730068AbgIHH7G (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 8 Sep 2020 03:59:06 -0400
-Received: from mail.kernel.org ([198.145.29.99]:38940 "EHLO mail.kernel.org"
+        id S1729843AbgIHH7E (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 8 Sep 2020 03:59:04 -0400
+Received: from mail.kernel.org ([198.145.29.99]:38982 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729993AbgIHH6u (ORCPT <rfc822;kvm@vger.kernel.org>);
+        id S1729799AbgIHH6u (ORCPT <rfc822;kvm@vger.kernel.org>);
         Tue, 8 Sep 2020 03:58:50 -0400
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id B9EB621D6C;
-        Tue,  8 Sep 2020 07:58:48 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 52FBB21D7A;
+        Tue,  8 Sep 2020 07:58:49 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1599551928;
-        bh=4krfchsT8X0gKS7c3hX0W/WHBUA/yypESIUHYByJQVs=;
+        s=default; t=1599551929;
+        bh=OjNspS+jgFhDp5gV44DQ99VuWmNJnN6icx3cBfKv7Nc=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=EsPcdtfAX48Jq0P7tQpHEJqqXjA39iEWqHkm1EOZadTHz3xM7CZciJrBBEmLgNpsS
-         yJkMVPcZYb9llmSKqwi3UOq6K5oevjY7kL2Q45SxLA4XFKqMMPDqEywioopkzYowrc
-         XQKmFXS1d51aRjDy42o2NOarWIXFEB8Z1lh/bXmY=
+        b=E4DJgZ4pt0bv2LiqzimsGwPw4BFiqBVFLMHWKx6hd7GNsdldB2L3P7ssa3TAQVsv4
+         SAtRpJ6ouF9a7OhGSmH8vGpsBcS5/b6IOAIy0TTV74gB/7Uu5+uqyOrgU1AEfB8/OB
+         BVsiqWcjg8Q+oq/aDmzHZTucwz/dqDEIdhsqQ/oI=
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=why.lan)
         by disco-boy.misterjones.org with esmtpsa (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
         (Exim 4.92)
         (envelope-from <maz@kernel.org>)
-        id 1kFYWd-009zhy-9J; Tue, 08 Sep 2020 08:58:47 +0100
+        id 1kFYWd-009zhy-RO; Tue, 08 Sep 2020 08:58:47 +0100
 From:   Marc Zyngier <maz@kernel.org>
 To:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
         kvm@vger.kernel.org
@@ -38,9 +38,9 @@ Cc:     James Morse <james.morse@arm.com>,
         Mark Rutland <mark.rutland@arm.com>,
         Eric Auger <eric.auger@redhat.com>, graf@amazon.com,
         kernel-team@android.com
-Subject: [PATCH v3 4/5] KVM: arm64: Mask out filtered events in PCMEID{0,1}_EL1
-Date:   Tue,  8 Sep 2020 08:58:29 +0100
-Message-Id: <20200908075830.1161921-5-maz@kernel.org>
+Subject: [PATCH v3 5/5] KVM: arm64: Document PMU filtering API
+Date:   Tue,  8 Sep 2020 08:58:30 +0100
+Message-Id: <20200908075830.1161921-6-maz@kernel.org>
 X-Mailer: git-send-email 2.28.0
 In-Reply-To: <20200908075830.1161921-1-maz@kernel.org>
 References: <20200908075830.1161921-1-maz@kernel.org>
@@ -55,99 +55,70 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-As we can now hide events from the guest, let's also adjust its view of
-PCMEID{0,1}_EL1 so that it can figure out why some common events are not
-counting as they should.
-
-The astute user can still look into the TRM for their CPU and find out
-they've been cheated, though. Nobody's perfect.
+Add a small blurb describing how the event filtering API gets used.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/pmu-emul.c | 29 +++++++++++++++++++++++++++++
- arch/arm64/kvm/sys_regs.c |  5 +----
- include/kvm/arm_pmu.h     |  5 +++++
- 3 files changed, 35 insertions(+), 4 deletions(-)
+ Documentation/virt/kvm/devices/vcpu.rst | 46 +++++++++++++++++++++++++
+ 1 file changed, 46 insertions(+)
 
-diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
-index 67a731bafbc9..0458860bade2 100644
---- a/arch/arm64/kvm/pmu-emul.c
-+++ b/arch/arm64/kvm/pmu-emul.c
-@@ -765,6 +765,35 @@ static int kvm_pmu_probe_pmuver(void)
- 	return pmuver;
- }
+diff --git a/Documentation/virt/kvm/devices/vcpu.rst b/Documentation/virt/kvm/devices/vcpu.rst
+index ca374d3fe085..203b91e93151 100644
+--- a/Documentation/virt/kvm/devices/vcpu.rst
++++ b/Documentation/virt/kvm/devices/vcpu.rst
+@@ -55,6 +55,52 @@ Request the initialization of the PMUv3.  If using the PMUv3 with an in-kernel
+ virtual GIC implementation, this must be done after initializing the in-kernel
+ irqchip.
  
-+u64 kvm_pmu_get_pmceid(struct kvm_vcpu *vcpu, bool pmceid1)
-+{
-+	unsigned long *bmap = vcpu->kvm->arch.pmu_filter;
-+	u64 val, mask = 0;
-+	int base, i;
++1.3 ATTRIBUTE: KVM_ARM_VCPU_PMU_V3_FILTER
++---------------------------------------
 +
-+	if (!pmceid1) {
-+		val = read_sysreg(pmceid0_el0);
-+		base = 0;
-+	} else {
-+		val = read_sysreg(pmceid1_el0);
-+		base = 32;
-+	}
++:Parameters: in kvm_device_attr.addr the address for a PMU event filter is a
++             pointer to a struct kvm_pmu_event_filter
 +
-+	if (!bmap)
-+		return val;
++:Returns:
 +
-+	for (i = 0; i < 32; i += 8) {
-+		u64 byte;
++	 =======  ======================================================
++	 -ENODEV: PMUv3 not supported or GIC not initialized
++	 -ENXIO:  PMUv3 not properly configured or in-kernel irqchip not
++	 	  configured as required prior to calling this attribute
++	 -EBUSY:  PMUv3 already initialized
++	 -EINVAL: Invalid filter range
++	 =======  ======================================================
 +
-+		byte = bitmap_get_value8(bmap, base + i);
-+		mask |= byte << i;
-+		byte = bitmap_get_value8(bmap, 0x4000 + base + i);
-+		mask |= byte << (32 + i);
-+	}
++Request the installation of a PMU event filter describe as follows:
 +
-+	return val & mask;
-+}
++struct kvm_pmu_event_filter {
++	__u16	base_event;
++	__u16	nevents;
 +
- bool kvm_arm_support_pmu_v3(void)
- {
- 	/*
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 077293b5115f..20ab2a7d37ca 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -769,10 +769,7 @@ static bool access_pmceid(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
- 	if (pmu_access_el0_disabled(vcpu))
- 		return false;
++#define KVM_PMU_EVENT_ALLOW	0
++#define KVM_PMU_EVENT_DENY	1
++
++	__u8	action;
++	__u8	pad[3];
++};
++
++A filter range is defined as the range [@base_event, @base_event + @nevents[,
++together with an @action (KVM_PMU_EVENT_ALLOW or KVM_PMU_EVENT_DENY). The
++first registered range defines the global policy (global ALLOW if the first
++@action is DENY, global DENY if the first @action is ALLOW). Multiple ranges
++can be programmed, and must fit within the event space defined by the PMU
++architecture (10 bits on ARMv8.0, 16 bits from ARMv8.1 onwards).
++
++Note: "Cancelling" a filter by registering the opposite action for the same
++range doesn't change the default action. For example, installing an ALLOW
++filter for event range [0:10] as the first filter and then applying a DENY
++action for the same range will leave the whole range as disabled.
++
++Restrictions: Event 0 (SW_INCR) is never filtered, as it doesn't count a
++hardware event. Filtering event 0x1E (CHAIN) has no effect either, as it
++isn't strictly speaking an event. Filtering the cycle counter is possible
++using event 0x11 (CPU_CYCLES).
++
  
--	if (!(p->Op2 & 1))
--		pmceid = read_sysreg(pmceid0_el0);
--	else
--		pmceid = read_sysreg(pmceid1_el0);
-+	pmceid = kvm_pmu_get_pmceid(vcpu, (p->Op2 & 1));
- 
- 	p->regval = pmceid;
- 
-diff --git a/include/kvm/arm_pmu.h b/include/kvm/arm_pmu.h
-index 6db030439e29..98cbfe885a53 100644
---- a/include/kvm/arm_pmu.h
-+++ b/include/kvm/arm_pmu.h
-@@ -34,6 +34,7 @@ struct kvm_pmu {
- u64 kvm_pmu_get_counter_value(struct kvm_vcpu *vcpu, u64 select_idx);
- void kvm_pmu_set_counter_value(struct kvm_vcpu *vcpu, u64 select_idx, u64 val);
- u64 kvm_pmu_valid_counter_mask(struct kvm_vcpu *vcpu);
-+u64 kvm_pmu_get_pmceid(struct kvm_vcpu *vcpu, bool pmceid1);
- void kvm_pmu_vcpu_init(struct kvm_vcpu *vcpu);
- void kvm_pmu_vcpu_reset(struct kvm_vcpu *vcpu);
- void kvm_pmu_vcpu_destroy(struct kvm_vcpu *vcpu);
-@@ -108,6 +109,10 @@ static inline int kvm_arm_pmu_v3_enable(struct kvm_vcpu *vcpu)
- {
- 	return 0;
- }
-+static inline u64 kvm_pmu_get_pmceid(struct kvm_vcpu *vcpu, bool pmceid1)
-+{
-+	return 0;
-+}
- #endif
- 
- #endif
+ 2. GROUP: KVM_ARM_VCPU_TIMER_CTRL
+ =================================
 -- 
 2.28.0
 
