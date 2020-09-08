@@ -2,78 +2,114 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A2436261B13
-	for <lists+kvm@lfdr.de>; Tue,  8 Sep 2020 20:54:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D97A0261B3F
+	for <lists+kvm@lfdr.de>; Tue,  8 Sep 2020 21:00:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728264AbgIHSnb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 8 Sep 2020 14:43:31 -0400
-Received: from mx2.suse.de ([195.135.220.15]:45334 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1731306AbgIHSmj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 8 Sep 2020 14:42:39 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.221.27])
-        by mx2.suse.de (Postfix) with ESMTP id E4510AD39;
-        Tue,  8 Sep 2020 18:42:38 +0000 (UTC)
-Date:   Tue, 8 Sep 2020 20:42:34 +0200
-From:   Joerg Roedel <jroedel@suse.de>
-To:     Borislav Petkov <bp@alien8.de>
-Cc:     Joerg Roedel <joro@8bytes.org>, x86@kernel.org, hpa@zytor.com,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Jiri Slaby <jslaby@suse.cz>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Juergen Gross <jgross@suse.com>,
-        Kees Cook <keescook@chromium.org>,
-        David Rientjes <rientjes@google.com>,
-        Cfir Cohen <cfir@google.com>,
-        Erdem Aktas <erdemaktas@google.com>,
-        Masami Hiramatsu <mhiramat@kernel.org>,
-        Mike Stunes <mstunes@vmware.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Martin Radev <martin.b.radev@gmail.com>,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org
-Subject: Re: [PATCH v7 67/72] x86/smpboot: Load TSS and getcpu GDT entry
- before loading IDT
-Message-ID: <20200908184234.GE23826@suse.de>
-References: <20200907131613.12703-1-joro@8bytes.org>
- <20200907131613.12703-68-joro@8bytes.org>
- <20200908172042.GF25236@zn.tnic>
+        id S1731440AbgIHTAH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 8 Sep 2020 15:00:07 -0400
+Received: from ex13-edg-ou-001.vmware.com ([208.91.0.189]:51727 "EHLO
+        EX13-EDG-OU-001.vmware.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1728585AbgIHS63 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 8 Sep 2020 14:58:29 -0400
+Received: from sc9-mailhost3.vmware.com (10.113.161.73) by
+ EX13-EDG-OU-001.vmware.com (10.113.208.155) with Microsoft SMTP Server id
+ 15.0.1156.6; Tue, 8 Sep 2020 11:58:24 -0700
+Received: from akaher-virtual-machine.eng.vmware.com (unknown [10.197.103.239])
+        by sc9-mailhost3.vmware.com (Postfix) with ESMTP id 0EBA140B4E;
+        Tue,  8 Sep 2020 11:58:26 -0700 (PDT)
+From:   Ajay Kaher <akaher@vmware.com>
+To:     <gregkh@linuxfoundation.org>, <sashal@kernel.org>
+CC:     <alex.williamson@redhat.com>, <cohuck@redhat.com>,
+        <peterx@redhat.com>, <kvm@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <stable@vger.kernel.org>,
+        <srivatsab@vmware.com>, <srivatsa@csail.mit.edu>,
+        <vsirnapalli@vmware.com>, <akaher@vmware.com>
+Subject: [PATCH v2 v4.14.y 1/3] vfio/type1: Support faulting PFNMAP vmas
+Date:   Wed, 9 Sep 2020 00:24:20 +0530
+Message-ID: <1599591263-46520-1-git-send-email-akaher@vmware.com>
+X-Mailer: git-send-email 2.7.4
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200908172042.GF25236@zn.tnic>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Content-Type: text/plain
+Received-SPF: None (EX13-EDG-OU-001.vmware.com: akaher@vmware.com does not
+ designate permitted sender hosts)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Sep 08, 2020 at 07:20:42PM +0200, Borislav Petkov wrote:
-> On Mon, Sep 07, 2020 at 03:16:08PM +0200, Joerg Roedel wrote:
-> > +void cpu_init_exception_handling(void)
-> > +{
-> > +	struct tss_struct *tss = this_cpu_ptr(&cpu_tss_rw);
-> > +	int cpu = raw_smp_processor_id();
-> > +
-> > +	/* paranoid_entry() gets the CPU number from the GDT */
-> > +	setup_getcpu(cpu);
-> > +
-> > +	/* IST vectors need TSS to be set up. */
-> > +	tss_setup_ist(tss);
-> > +	tss_setup_io_bitmap(tss);
-> > +	set_tss_desc(cpu, &get_cpu_entry_area(cpu)->tss.x86_tss);
-> > +
-> > +	load_TR_desc();
-> 
-> Aha, this is what you mean here in your 0th message. I'm guessing it is
-> ok to do those things twice in start_secondary...
+From: Alex Williamson <alex.williamson@redhat.com>
 
-Yes, I think its best to do it twice, so that cpu_init() stays the CPU
-state barrier it should be, independent of what happens before.
+commit 41311242221e3482b20bfed10fa4d9db98d87016 upstream.
 
+With conversion to follow_pfn(), DMA mapping a PFNMAP range depends on
+the range being faulted into the vma.  Add support to manually provide
+that, in the same way as done on KVM with hva_to_pfn_remapped().
 
-	Joerg
+Reviewed-by: Peter Xu <peterx@redhat.com>
+Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
+[Ajay: Regenerated the patch for v4.14]
+Signed-off-by: Ajay Kaher <akaher@vmware.com>
+---
+ drivers/vfio/vfio_iommu_type1.c | 36 +++++++++++++++++++++++++++++++++---
+ 1 file changed, 33 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
+index 35a3750..150be10 100644
+--- a/drivers/vfio/vfio_iommu_type1.c
++++ b/drivers/vfio/vfio_iommu_type1.c
+@@ -336,6 +336,32 @@ static int put_pfn(unsigned long pfn, int prot)
+ 	return 0;
+ }
+ 
++static int follow_fault_pfn(struct vm_area_struct *vma, struct mm_struct *mm,
++			    unsigned long vaddr, unsigned long *pfn,
++			    bool write_fault)
++{
++	int ret;
++
++	ret = follow_pfn(vma, vaddr, pfn);
++	if (ret) {
++		bool unlocked = false;
++
++		ret = fixup_user_fault(NULL, mm, vaddr,
++				       FAULT_FLAG_REMOTE |
++				       (write_fault ?  FAULT_FLAG_WRITE : 0),
++				       &unlocked);
++		if (unlocked)
++			return -EAGAIN;
++
++		if (ret)
++			return ret;
++
++		ret = follow_pfn(vma, vaddr, pfn);
++	}
++
++	return ret;
++}
++
+ static int vaddr_get_pfn(struct mm_struct *mm, unsigned long vaddr,
+ 			 int prot, unsigned long *pfn)
+ {
+@@ -375,12 +401,16 @@ static int vaddr_get_pfn(struct mm_struct *mm, unsigned long vaddr,
+ 
+ 	down_read(&mm->mmap_sem);
+ 
++retry:
+ 	vma = find_vma_intersection(mm, vaddr, vaddr + 1);
+ 
+ 	if (vma && vma->vm_flags & VM_PFNMAP) {
+-		if (!follow_pfn(vma, vaddr, pfn) &&
+-		    is_invalid_reserved_pfn(*pfn))
+-			ret = 0;
++		ret = follow_fault_pfn(vma, mm, vaddr, pfn, prot & IOMMU_WRITE);
++		if (ret == -EAGAIN)
++			goto retry;
++
++		if (!ret && !is_invalid_reserved_pfn(*pfn))
++			ret = -EFAULT;
+ 	}
+ 
+ 	up_read(&mm->mmap_sem);
+-- 
+2.7.4
+
