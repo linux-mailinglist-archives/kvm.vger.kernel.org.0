@@ -2,248 +2,285 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4ECF9260F30
-	for <lists+kvm@lfdr.de>; Tue,  8 Sep 2020 12:02:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 95495260F3A
+	for <lists+kvm@lfdr.de>; Tue,  8 Sep 2020 12:03:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729004AbgIHKCr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 8 Sep 2020 06:02:47 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:46126 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1728137AbgIHKCp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 8 Sep 2020 06:02:45 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1599559363;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=4za53sFUMh06AgcFkwaVFQmbkynvBNAtGFBVVHTM9iw=;
-        b=badVRCdsgLEgBldK8LZIVJJlabFr/FdJ/z2i1Du3Isb6aIBfGmaaOV9E1ppi/TAtGfeOtk
-        hfIeSFoNekvAi1cKYJ4pt+rn7U2YN2TbFXLraeuj3JjA2Z64gtIi9rjJAvZ1Rt35pjMG8k
-        1nVI0G9bPkqr2gdESXzvvSjcuSygTzk=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-461-QdfYxqGhPUaeYW82CQQsCQ-1; Tue, 08 Sep 2020 06:02:39 -0400
-X-MC-Unique: QdfYxqGhPUaeYW82CQQsCQ-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4CA3F802B47;
-        Tue,  8 Sep 2020 10:02:38 +0000 (UTC)
-Received: from kamzik.brq.redhat.com (unknown [10.40.192.171])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 21B7C19728;
-        Tue,  8 Sep 2020 10:02:35 +0000 (UTC)
-Date:   Tue, 8 Sep 2020 12:02:33 +0200
-From:   Andrew Jones <drjones@redhat.com>
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org, kernel-team@android.com, graf@amazon.com,
-        Robin Murphy <robin.murphy@arm.com>
-Subject: Re: [PATCH v3 2/5] KVM: arm64: Use event mask matching architecture
- revision
-Message-ID: <20200908100233.6oygr5slgwkgn4ok@kamzik.brq.redhat.com>
-References: <20200908075830.1161921-1-maz@kernel.org>
- <20200908075830.1161921-3-maz@kernel.org>
+        id S1729269AbgIHKDR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 8 Sep 2020 06:03:17 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:59726 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1729248AbgIHKDQ (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 8 Sep 2020 06:03:16 -0400
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 088A14LH135907;
+        Tue, 8 Sep 2020 06:03:14 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : mime-version : content-transfer-encoding; s=pp1;
+ bh=VWNPJ8nrQ3kyrPXv3ORfc0g5VmVXuAU5MlsyPmYGm0k=;
+ b=EqyzS4OJcJ6aOvTgxl8KrcSQF7WumTTNF7Gjn52OEfVGgjfNPT7jKJ0uoW9O3wh/lsy2
+ 2f+iI8NenE5jtksdp7ViF5Yf3dzzjxF3dNf4gImXzrdynCvPXrSMIPUssJGDnQhyRd63
+ NxSK0w/shlbKD/VdwqQNBUpDH1VeiZTCPTcAmvtf7UuWf3o+BtRwei9ynPi5emh+V6Pr
+ S3iVvkufTAn1DmC6aou21Fp+2YputH0C0qlaFotiDYyP+hCuZNBd8CPfy6HQmSopaYG/
+ njxUq8gLE86i2OaBzkRm1giyVElABViegj3eNPspUeIHKa0qCyoVLuDuHMlf9LXxzZzb Zw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 33e5yec118-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 08 Sep 2020 06:03:14 -0400
+Received: from m0098416.ppops.net (m0098416.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 088A1ok8138956;
+        Tue, 8 Sep 2020 06:03:13 -0400
+Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 33e5yec10e-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 08 Sep 2020 06:03:13 -0400
+Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
+        by ppma04ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 088A28LW019729;
+        Tue, 8 Sep 2020 10:03:12 GMT
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
+        by ppma04ams.nl.ibm.com with ESMTP id 33c2a8ba62-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 08 Sep 2020 10:03:11 +0000
+Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
+        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 088A39TV35455368
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 8 Sep 2020 10:03:09 GMT
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 0662CA4051;
+        Tue,  8 Sep 2020 10:03:09 +0000 (GMT)
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 5B963A404D;
+        Tue,  8 Sep 2020 10:03:08 +0000 (GMT)
+Received: from linux01.pok.stglabs.ibm.com (unknown [9.114.17.81])
+        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Tue,  8 Sep 2020 10:03:08 +0000 (GMT)
+From:   Janosch Frank <frankja@linux.ibm.com>
+To:     kvm@vger.kernel.org
+Cc:     borntraeger@de.ibm.com, imbrenda@linux.ibm.com, david@redhat.com,
+        linux-s390@vger.kernel.org
+Subject: [PATCH v3] KVM: s390: Introduce storage key removal facility
+Date:   Tue,  8 Sep 2020 06:02:49 -0400
+Message-Id: <20200908100249.23150-1-frankja@linux.ibm.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200908075830.1161921-3-maz@kernel.org>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
+ definitions=2020-09-08_04:2020-09-08,2020-09-08 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0
+ priorityscore=1501 clxscore=1015 mlxscore=0 phishscore=0 mlxlogscore=999
+ malwarescore=0 suspectscore=1 impostorscore=0 lowpriorityscore=0
+ spamscore=0 adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2006250000 definitions=main-2009080089
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Sep 08, 2020 at 08:58:27AM +0100, Marc Zyngier wrote:
-> The PMU code suffers from a small defect where we assume that the event
-> number provided by the guest is always 16 bit wide, even if the CPU only
-> implements the ARMv8.0 architecture. This isn't really problematic in
-> the sense that the event number ends up in a system register, cropping
-> it to the right width, but still this needs fixing.
-> 
-> In order to make it work, let's probe the version of the PMU that the
-> guest is going to use. This is done by temporarily creating a kernel
-> event and looking at the PMUVer field that has been saved at probe time
-> in the associated arm_pmu structure. This in turn gets saved in the kvm
-> structure, and subsequently used to compute the event mask that gets
-> used throughout the PMU code.
-> 
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->  arch/arm64/include/asm/kvm_host.h |  2 +
->  arch/arm64/kvm/pmu-emul.c         | 81 +++++++++++++++++++++++++++++--
->  2 files changed, 78 insertions(+), 5 deletions(-)
-> 
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index 65568b23868a..6cd60be69c28 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -110,6 +110,8 @@ struct kvm_arch {
->  	 * supported.
->  	 */
->  	bool return_nisv_io_abort_to_user;
-> +
-> +	unsigned int pmuver;
->  };
->  
->  struct kvm_vcpu_fault_info {
-> diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
-> index 93d797df42c6..8a5f65763814 100644
-> --- a/arch/arm64/kvm/pmu-emul.c
-> +++ b/arch/arm64/kvm/pmu-emul.c
-> @@ -20,6 +20,20 @@ static void kvm_pmu_stop_counter(struct kvm_vcpu *vcpu, struct kvm_pmc *pmc);
->  
->  #define PERF_ATTR_CFG1_KVM_PMU_CHAINED 0x1
->  
-> +static u32 kvm_pmu_event_mask(struct kvm *kvm)
-> +{
-> +	switch (kvm->arch.pmuver) {
-> +	case 1:			/* ARMv8.0 */
-> +		return GENMASK(9, 0);
-> +	case 4:			/* ARMv8.1 */
-> +	case 5:			/* ARMv8.4 */
-> +	case 6:			/* ARMv8.5 */
-> +		return GENMASK(15, 0);
-> +	default:		/* Shouldn't be there, just for sanity */
+The storage key removal facility makes skey related instructions
+result in special operation program exceptions. It is based on the
+Keyless Subset Facility.
 
-s/there/here/
+The usual suspects are iske, sske, rrbe and their respective
+variants. lpsw(e), pfmf and tprot can also specify a key and essa with
+an ORC of 4 will consult the change bit, hence they all result in
+exceptions.
 
-I see a warning was added here in a later patch. Wouldn't it make sense to
-add the warning now?
+Unfortunately storage keys were so essential to the architecture, that
+there is no facility bit that we could deactivate. That's why the
+removal facility (bit 169) was introduced which makes it necessary,
+that, if active, the skey related facilities 10, 14, 66, 145 and 149
+are zero. Managing this requirement and migratability has to be done
+in userspace, as KVM does not check the facilities it receives to be
+able to easily implement userspace emulation.
 
-> +		return 0;
-> +	}
-> +}
-> +
->  /**
->   * kvm_pmu_idx_is_64bit - determine if select_idx is a 64bit counter
->   * @vcpu: The vcpu pointer
-> @@ -100,7 +114,7 @@ static bool kvm_pmu_idx_has_chain_evtype(struct kvm_vcpu *vcpu, u64 select_idx)
->  		return false;
->  
->  	reg = PMEVTYPER0_EL0 + select_idx;
-> -	eventsel = __vcpu_sys_reg(vcpu, reg) & ARMV8_PMU_EVTYPE_EVENT;
-> +	eventsel = __vcpu_sys_reg(vcpu, reg) & kvm_pmu_event_mask(vcpu->kvm);
->  
->  	return eventsel == ARMV8_PMUV3_PERFCTR_CHAIN;
->  }
-> @@ -495,7 +509,7 @@ void kvm_pmu_software_increment(struct kvm_vcpu *vcpu, u64 val)
->  
->  		/* PMSWINC only applies to ... SW_INC! */
->  		type = __vcpu_sys_reg(vcpu, PMEVTYPER0_EL0 + i);
-> -		type &= ARMV8_PMU_EVTYPE_EVENT;
-> +		type &= kvm_pmu_event_mask(vcpu->kvm);
->  		if (type != ARMV8_PMUV3_PERFCTR_SW_INCR)
->  			continue;
->  
-> @@ -578,7 +592,7 @@ static void kvm_pmu_create_perf_event(struct kvm_vcpu *vcpu, u64 select_idx)
->  	data = __vcpu_sys_reg(vcpu, reg);
->  
->  	kvm_pmu_stop_counter(vcpu, pmc);
-> -	eventsel = data & ARMV8_PMU_EVTYPE_EVENT;
-> +	eventsel = data & kvm_pmu_event_mask(vcpu->kvm);;
->  
->  	/* Software increment event does't need to be backed by a perf event */
->  	if (eventsel == ARMV8_PMUV3_PERFCTR_SW_INCR &&
-> @@ -679,17 +693,68 @@ static void kvm_pmu_update_pmc_chained(struct kvm_vcpu *vcpu, u64 select_idx)
->  void kvm_pmu_set_counter_event_type(struct kvm_vcpu *vcpu, u64 data,
->  				    u64 select_idx)
->  {
-> -	u64 reg, event_type = data & ARMV8_PMU_EVTYPE_MASK;
-> +	u64 reg, mask;
-> +
-> +	mask  =  ARMV8_PMU_EVTYPE_MASK;
-> +	mask &= ~ARMV8_PMU_EVTYPE_EVENT;
-> +	mask |= kvm_pmu_event_mask(vcpu->kvm);
->  
->  	reg = (select_idx == ARMV8_PMU_CYCLE_IDX)
->  	      ? PMCCFILTR_EL0 : PMEVTYPER0_EL0 + select_idx;
->  
-> -	__vcpu_sys_reg(vcpu, reg) = event_type;
-> +	__vcpu_sys_reg(vcpu, reg) = data & mask;
->  
->  	kvm_pmu_update_pmc_chained(vcpu, select_idx);
->  	kvm_pmu_create_perf_event(vcpu, select_idx);
->  }
->  
-> +static int kvm_pmu_probe_pmuver(void)
-> +{
-> +	struct perf_event_attr attr = { };
-> +	struct perf_event *event;
-> +	struct arm_pmu *pmu;
-> +	int pmuver = 0xf;
-> +
-> +	/*
-> +	 * Create a dummy event that only counts user cycles. As we'll never
-> +	 * leave thing function with the event being live, it will never
+Removing storage key support allows us to circumvent complicated
+emulation code and makes huge page support tremendously easier.
 
-s/thing/this/
+Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+---
 
-> +	 * count anything. But it allows us to probe some of the PMU
-> +	 * details. Yes, this is terrible.
-> +	 */
-> +	attr.type = PERF_TYPE_RAW;
-> +	attr.size = sizeof(attr);
-> +	attr.pinned = 1;
-> +	attr.disabled = 0;
-> +	attr.exclude_user = 0;
-> +	attr.exclude_kernel = 1;
-> +	attr.exclude_hv = 1;
-> +	attr.exclude_host = 1;
-> +	attr.config = ARMV8_PMUV3_PERFCTR_CPU_CYCLES;
-> +	attr.sample_period = GENMASK(63, 0);
-> +
-> +	event = perf_event_create_kernel_counter(&attr, -1, current,
-> +						 kvm_pmu_perf_overflow, &attr);
-> +
-> +	if (IS_ERR(event)) {
-> +		pr_err_once("kvm: pmu event creation failed %ld\n",
-> +			    PTR_ERR(event));
-> +		return 0xf;
-> +	}
-> +
-> +	if (event->pmu) {
-> +		pmu = to_arm_pmu(event->pmu);
-> +		if (pmu->pmuver)
-> +			pmuver = pmu->pmuver;
-> +		pr_debug("PMU on CPUs %*pbl version %x\n",
-> +			 cpumask_pr_args(&pmu->supported_cpus), pmuver);
+v3:
+	* Put kss handling into own function
+	* Removed some unneeded catch statements and converted others to ifs
 
-Can't this potentially produce a super long output line? And should it
-still output the same message when pmuver is 0xf?
+v2:
+	* Removed the likely
+	* Updated and re-shuffeled the comments which had the wrong information
 
-> +	}
-> +
-> +	perf_event_disable(event);
-> +	perf_event_release_kernel(event);
-> +
-> +	return pmuver;
-> +}
-> +
->  bool kvm_arm_support_pmu_v3(void)
->  {
->  	/*
-> @@ -796,6 +861,12 @@ int kvm_arm_pmu_v3_set_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
->  	if (vcpu->arch.pmu.created)
->  		return -EBUSY;
->  
-> +	if (!vcpu->kvm->arch.pmuver)
-> +		vcpu->kvm->arch.pmuver = kvm_pmu_probe_pmuver();
-> +
-> +	if (vcpu->kvm->arch.pmuver == 0xf)
-> +		return -ENODEV;
-> +
->  	switch (attr->attr) {
->  	case KVM_ARM_VCPU_PMU_V3_IRQ: {
->  		int __user *uaddr = (int __user *)(long)attr->addr;
-> -- 
-> 2.28.0
-> 
-> _______________________________________________
-> kvmarm mailing list
-> kvmarm@lists.cs.columbia.edu
-> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
-> 
+---
+ arch/s390/kvm/intercept.c | 34 +++++++++++++++++++++++++++++++++-
+ arch/s390/kvm/kvm-s390.c  |  5 +++++
+ arch/s390/kvm/priv.c      | 26 +++++++++++++++++++++++---
+ 3 files changed, 61 insertions(+), 4 deletions(-)
 
-Thanks,
-drew
+diff --git a/arch/s390/kvm/intercept.c b/arch/s390/kvm/intercept.c
+index e7a7c499a73f..9c699c3fcf84 100644
+--- a/arch/s390/kvm/intercept.c
++++ b/arch/s390/kvm/intercept.c
+@@ -33,6 +33,7 @@ u8 kvm_s390_get_ilen(struct kvm_vcpu *vcpu)
+ 	case ICPT_OPEREXC:
+ 	case ICPT_PARTEXEC:
+ 	case ICPT_IOINST:
++	case ICPT_KSS:
+ 		/* instruction only stored for these icptcodes */
+ 		ilen = insn_length(vcpu->arch.sie_block->ipa >> 8);
+ 		/* Use the length of the EXECUTE instruction if necessary */
+@@ -531,6 +532,37 @@ static int handle_pv_notification(struct kvm_vcpu *vcpu)
+ 	return handle_instruction(vcpu);
+ }
+ 
++static int handle_kss(struct kvm_vcpu *vcpu)
++{
++	if (!test_kvm_facility(vcpu->kvm, 169))
++		return kvm_s390_skey_check_enable(vcpu);
++
++	/*
++	 * Storage key removal facility emulation.
++	 *
++	 * KSS is the same priority as an instruction
++	 * interception. Hence we need handling here
++	 * and in the instruction emulation code.
++	 *
++	 * KSS is nullifying (no psw forward), SKRF
++	 * issues suppressing SPECIAL OPS, so we need
++	 * to forward by hand.
++	 */
++	if  (vcpu->arch.sie_block->ipa == 0) {
++		/*
++		 * Interception caused by a key in a
++		 * exception new PSW mask. The guest
++		 * PSW has already been updated to the
++		 * non-valid PSW so we only need to
++		 * inject a PGM.
++		 */
++		return kvm_s390_inject_program_int(vcpu, PGM_SPECIFICATION);
++	}
++
++	kvm_s390_forward_psw(vcpu, kvm_s390_get_ilen(vcpu));
++	return kvm_s390_inject_program_int(vcpu, PGM_SPECIAL_OPERATION);
++}
++
+ int kvm_handle_sie_intercept(struct kvm_vcpu *vcpu)
+ {
+ 	int rc, per_rc = 0;
+@@ -565,7 +597,7 @@ int kvm_handle_sie_intercept(struct kvm_vcpu *vcpu)
+ 		rc = handle_partial_execution(vcpu);
+ 		break;
+ 	case ICPT_KSS:
+-		rc = kvm_s390_skey_check_enable(vcpu);
++		rc = handle_kss(vcpu);
+ 		break;
+ 	case ICPT_MCHKREQ:
+ 	case ICPT_INT_ENABLE:
+diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+index 6b74b92c1a58..85647f19311d 100644
+--- a/arch/s390/kvm/kvm-s390.c
++++ b/arch/s390/kvm/kvm-s390.c
+@@ -2692,6 +2692,11 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
+ 	/* we emulate STHYI in kvm */
+ 	set_kvm_facility(kvm->arch.model.fac_mask, 74);
+ 	set_kvm_facility(kvm->arch.model.fac_list, 74);
++	/* we emulate the storage key removal facility only with kss */
++	if (sclp.has_kss) {
++		set_kvm_facility(kvm->arch.model.fac_mask, 169);
++		set_kvm_facility(kvm->arch.model.fac_list, 169);
++	}
+ 	if (MACHINE_HAS_TLB_GUEST) {
+ 		set_kvm_facility(kvm->arch.model.fac_mask, 147);
+ 		set_kvm_facility(kvm->arch.model.fac_list, 147);
+diff --git a/arch/s390/kvm/priv.c b/arch/s390/kvm/priv.c
+index cd74989ce0b0..5e3583b8b5e3 100644
+--- a/arch/s390/kvm/priv.c
++++ b/arch/s390/kvm/priv.c
+@@ -207,6 +207,13 @@ int kvm_s390_skey_check_enable(struct kvm_vcpu *vcpu)
+ 	int rc;
+ 
+ 	trace_kvm_s390_skey_related_inst(vcpu);
++
++	if (test_kvm_facility(vcpu->kvm, 169)) {
++		rc = kvm_s390_inject_program_int(vcpu, PGM_SPECIAL_OPERATION);
++		if (!rc)
++			return -EOPNOTSUPP;
++	}
++
+ 	/* Already enabled? */
+ 	if (vcpu->arch.skey_enabled)
+ 		return 0;
+@@ -257,7 +264,7 @@ static int handle_iske(struct kvm_vcpu *vcpu)
+ 
+ 	rc = try_handle_skey(vcpu);
+ 	if (rc)
+-		return rc != -EAGAIN ? rc : 0;
++		return (rc != -EAGAIN || rc != -EOPNOTSUPP) ? rc : 0;
+ 
+ 	kvm_s390_get_regs_rre(vcpu, &reg1, &reg2);
+ 
+@@ -304,7 +311,7 @@ static int handle_rrbe(struct kvm_vcpu *vcpu)
+ 
+ 	rc = try_handle_skey(vcpu);
+ 	if (rc)
+-		return rc != -EAGAIN ? rc : 0;
++		return (rc != -EAGAIN || rc != -EOPNOTSUPP) ? rc : 0;
+ 
+ 	kvm_s390_get_regs_rre(vcpu, &reg1, &reg2);
+ 
+@@ -355,7 +362,7 @@ static int handle_sske(struct kvm_vcpu *vcpu)
+ 
+ 	rc = try_handle_skey(vcpu);
+ 	if (rc)
+-		return rc != -EAGAIN ? rc : 0;
++		return (rc != -EAGAIN || rc != -EOPNOTSUPP) ? rc : 0;
+ 
+ 	if (!test_kvm_facility(vcpu->kvm, 8))
+ 		m3 &= ~SSKE_MB;
+@@ -745,6 +752,8 @@ int kvm_s390_handle_lpsw(struct kvm_vcpu *vcpu)
+ 		return kvm_s390_inject_prog_cond(vcpu, rc);
+ 	if (!(new_psw.mask & PSW32_MASK_BASE))
+ 		return kvm_s390_inject_program_int(vcpu, PGM_SPECIFICATION);
++	if (new_psw.mask & PSW32_MASK_KEY && test_kvm_facility(vcpu->kvm, 169))
++		return kvm_s390_inject_program_int(vcpu, PGM_SPECIAL_OPERATION);
+ 	gpsw->mask = (new_psw.mask & ~PSW32_MASK_BASE) << 32;
+ 	gpsw->mask |= new_psw.addr & PSW32_ADDR_AMODE;
+ 	gpsw->addr = new_psw.addr & ~PSW32_ADDR_AMODE;
+@@ -771,6 +780,8 @@ static int handle_lpswe(struct kvm_vcpu *vcpu)
+ 	rc = read_guest(vcpu, addr, ar, &new_psw, sizeof(new_psw));
+ 	if (rc)
+ 		return kvm_s390_inject_prog_cond(vcpu, rc);
++	if ((new_psw.mask & PSW_MASK_KEY) && test_kvm_facility(vcpu->kvm, 169))
++		return kvm_s390_inject_program_int(vcpu, PGM_SPECIAL_OPERATION);
+ 	vcpu->arch.sie_block->gpsw = new_psw;
+ 	if (!is_valid_psw(&vcpu->arch.sie_block->gpsw))
+ 		return kvm_s390_inject_program_int(vcpu, PGM_SPECIFICATION);
+@@ -1025,6 +1036,10 @@ static int handle_pfmf(struct kvm_vcpu *vcpu)
+ 	if (vcpu->arch.sie_block->gpsw.mask & PSW_MASK_PSTATE)
+ 		return kvm_s390_inject_program_int(vcpu, PGM_PRIVILEGED_OP);
+ 
++	if (vcpu->run->s.regs.gprs[reg1] & PFMF_SK &&
++	    test_kvm_facility(vcpu->kvm, 169))
++		return kvm_s390_inject_program_int(vcpu, PGM_SPECIAL_OPERATION);
++
+ 	if (vcpu->run->s.regs.gprs[reg1] & PFMF_RESERVED)
+ 		return kvm_s390_inject_program_int(vcpu, PGM_SPECIFICATION);
+ 
+@@ -1203,6 +1218,8 @@ static int handle_essa(struct kvm_vcpu *vcpu)
+ 		return kvm_s390_inject_program_int(vcpu, PGM_PRIVILEGED_OP);
+ 	/* Check for invalid operation request code */
+ 	orc = (vcpu->arch.sie_block->ipb & 0xf0000000) >> 28;
++	if (orc == ESSA_SET_POT_VOLATILE && test_kvm_facility(vcpu->kvm, 169))
++		return kvm_s390_inject_program_int(vcpu, PGM_SPECIAL_OPERATION);
+ 	/* ORCs 0-6 are always valid */
+ 	if (orc > (test_kvm_facility(vcpu->kvm, 147) ? ESSA_SET_STABLE_NODAT
+ 						: ESSA_SET_STABLE_IF_RESIDENT))
+@@ -1451,6 +1468,9 @@ static int handle_tprot(struct kvm_vcpu *vcpu)
+ 
+ 	kvm_s390_get_base_disp_sse(vcpu, &address1, &address2, &ar, NULL);
+ 
++	if ((address2 & 0xf0) && test_kvm_facility(vcpu->kvm, 169))
++		return kvm_s390_inject_program_int(vcpu, PGM_SPECIAL_OPERATION);
++
+ 	/* we only handle the Linux memory detection case:
+ 	 * access key == 0
+ 	 * everything else goes to userspace. */
+-- 
+2.25.1
 
