@@ -2,124 +2,112 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5F51C261CFD
-	for <lists+kvm@lfdr.de>; Tue,  8 Sep 2020 21:29:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 046BF261B7A
+	for <lists+kvm@lfdr.de>; Tue,  8 Sep 2020 21:03:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732070AbgIHT3g (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 8 Sep 2020 15:29:36 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:31067 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1730936AbgIHP7y (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 8 Sep 2020 11:59:54 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1599580772;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=qgdTHd8NGowSZwDg6eCJYPhbgoyY002d0TclHThacBE=;
-        b=P4lcb2KIvrq7qYnXr1p6J1zP19V38x+El203SrKaGiGRvP75fo18Wy+gX0eCSaoKoSw547
-        SgVdgPdRBUohMhZE7ZuNGx4ZMzMRk2POmjs+yBilNH4uS0LTKl5+UBnzdvpJmENcAA7tQw
-        NjZhfiSKgUUiq6Mm9956PsYN0qTWwoA=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-39-cdmyatQrMKiTRJWLAAMpJg-1; Tue, 08 Sep 2020 10:41:43 -0400
-X-MC-Unique: cdmyatQrMKiTRJWLAAMpJg-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A5EFB800050;
-        Tue,  8 Sep 2020 14:41:40 +0000 (UTC)
-Received: from gondolin (ovpn-112-243.ams2.redhat.com [10.36.112.243])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id CBF813A40;
-        Tue,  8 Sep 2020 14:41:32 +0000 (UTC)
-Date:   Tue, 8 Sep 2020 16:41:30 +0200
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Yan Zhao <yan.y.zhao@intel.com>
-Cc:     Sean Mooney <smooney@redhat.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        "Daniel =?UTF-8?B?UC5CZXJyYW5nw6k=?=" <berrange@redhat.com>,
-        kvm@vger.kernel.org, libvir-list@redhat.com,
-        Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org,
-        kwankhede@nvidia.com, eauger@redhat.com, xin-ran.wang@intel.com,
-        corbet@lwn.net, openstack-discuss@lists.openstack.org,
-        shaohe.feng@intel.com, kevin.tian@intel.com,
-        Parav Pandit <parav@mellanox.com>, jian-feng.ding@intel.com,
-        dgilbert@redhat.com, zhenyuw@linux.intel.com, hejie.xu@intel.com,
-        bao.yumeng@zte.com.cn, intel-gvt-dev@lists.freedesktop.org,
-        eskultet@redhat.com, Jiri Pirko <jiri@mellanox.com>,
-        dinechin@redhat.com, devel@ovirt.org
-Subject: Re: device compatibility interface for live migration with assigned
- devices
-Message-ID: <20200908164130.2fe0d106.cohuck@redhat.com>
-In-Reply-To: <20200831044344.GB13784@joy-OptiPlex-7040>
-References: <3a073222-dcfe-c02d-198b-29f6a507b2e1@redhat.com>
-        <20200818091628.GC20215@redhat.com>
-        <20200818113652.5d81a392.cohuck@redhat.com>
-        <20200820003922.GE21172@joy-OptiPlex-7040>
-        <20200819212234.223667b3@x1.home>
-        <20200820031621.GA24997@joy-OptiPlex-7040>
-        <20200825163925.1c19b0f0.cohuck@redhat.com>
-        <20200826064117.GA22243@joy-OptiPlex-7040>
-        <20200828154741.30cfc1a3.cohuck@redhat.com>
-        <8f5345be73ebf4f8f7f51d6cdc9c2a0d8e0aa45e.camel@redhat.com>
-        <20200831044344.GB13784@joy-OptiPlex-7040>
-Organization: Red Hat GmbH
+        id S1730572AbgIHTDu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 8 Sep 2020 15:03:50 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:49908 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1731693AbgIHTDn (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 8 Sep 2020 15:03:43 -0400
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 088J1xN1122829;
+        Tue, 8 Sep 2020 15:03:30 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=daDdFQSQ8/ewgAVsdSWJ/UnpLBSx0HFoixMRKkOERnE=;
+ b=Lb6o73OH4N2tzK/ZCJBNoskGrdgjK49+0X/DtRgUpz3mhH8/0LFzQWu8B6PsBh2eWdWs
+ 7lcQbrvxSIrdUnstD5MmiTGwYY5AMkwNZG2AHqyhhH5gHEKnIOgXDCZMEpwl/qqCGvEW
+ I01yG/lA7PGhcUuyy9KNJpxZ/mvHRDHMqC5LRPO1KcOMymxJDop8a40fkWU3CX6mBjTq
+ /32m1IeKzeTm+UicxyVJ5xLnnlmUsqi9qTZJ0W1C4lWTTcDqJyh9mWzkDpbSGZKTOdJl
+ 5ZvHIjsAcFc1uclFl4Pa9pAQ1pkHw3oCJCs9hFgRxNqORSuYjiYi4rSEiBMx9WgxxWFU wQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 33edwdkvt5-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 08 Sep 2020 15:03:30 -0400
+Received: from m0098409.ppops.net (m0098409.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 088J2HE7125254;
+        Tue, 8 Sep 2020 15:03:30 -0400
+Received: from ppma05wdc.us.ibm.com (1b.90.2fa9.ip4.static.sl-reverse.com [169.47.144.27])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 33edwdkvsf-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 08 Sep 2020 15:03:29 -0400
+Received: from pps.filterd (ppma05wdc.us.ibm.com [127.0.0.1])
+        by ppma05wdc.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 088IpV9K023585;
+        Tue, 8 Sep 2020 19:03:28 GMT
+Received: from b01cxnp22036.gho.pok.ibm.com (b01cxnp22036.gho.pok.ibm.com [9.57.198.26])
+        by ppma05wdc.us.ibm.com with ESMTP id 33c2a91hvk-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 08 Sep 2020 19:03:28 +0000
+Received: from b01ledav003.gho.pok.ibm.com (b01ledav003.gho.pok.ibm.com [9.57.199.108])
+        by b01cxnp22036.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 088J3RJE12059580
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 8 Sep 2020 19:03:27 GMT
+Received: from b01ledav003.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 07A05B206A;
+        Tue,  8 Sep 2020 19:03:27 +0000 (GMT)
+Received: from b01ledav003.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 3FA59B2065;
+        Tue,  8 Sep 2020 19:03:26 +0000 (GMT)
+Received: from localhost.localdomain (unknown [9.85.141.115])
+        by b01ledav003.gho.pok.ibm.com (Postfix) with ESMTP;
+        Tue,  8 Sep 2020 19:03:26 +0000 (GMT)
+Subject: Re: [PATCH v10 03/16] s390/vfio-ap: manage link between queue struct
+ and matrix mdev
+To:     Christian Borntraeger <borntraeger@de.ibm.com>,
+        linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+Cc:     freude@linux.ibm.com, cohuck@redhat.com, mjrosato@linux.ibm.com,
+        pasic@linux.ibm.com, alex.williamson@redhat.com,
+        kwankhede@nvidia.com, fiuczy@linux.ibm.com, frankja@linux.ibm.com,
+        david@redhat.com, imbrenda@linux.ibm.com, hca@linux.ibm.com,
+        gor@linux.ibm.com
+References: <20200821195616.13554-1-akrowiak@linux.ibm.com>
+ <20200821195616.13554-4-akrowiak@linux.ibm.com>
+ <99581cee-65fd-a622-ddc9-1a30e4638668@de.ibm.com>
+From:   Tony Krowiak <akrowiak@linux.ibm.com>
+Message-ID: <64ca7c98-4798-35c4-307e-57c4ca4cfdb2@linux.ibm.com>
+Date:   Tue, 8 Sep 2020 15:03:25 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <99581cee-65fd-a622-ddc9-1a30e4638668@de.ibm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Content-Language: en-US
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
+ definitions=2020-09-08_09:2020-09-08,2020-09-08 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0
+ impostorscore=0 mlxlogscore=999 lowpriorityscore=0 bulkscore=0
+ priorityscore=1501 spamscore=0 adultscore=0 malwarescore=0 mlxscore=0
+ clxscore=1015 phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2006250000 definitions=main-2009080174
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 31 Aug 2020 12:43:44 +0800
-Yan Zhao <yan.y.zhao@intel.com> wrote:
 
-> On Fri, Aug 28, 2020 at 03:04:12PM +0100, Sean Mooney wrote:
-> > On Fri, 2020-08-28 at 15:47 +0200, Cornelia Huck wrote:  
-> > > On Wed, 26 Aug 2020 14:41:17 +0800
-> > > Yan Zhao <yan.y.zhao@intel.com> wrote:
-> > >   
-> > > > previously, we want to regard the two mdevs created with dsa-1dwq x 30 and
-> > > > dsa-2dwq x 15 as compatible, because the two mdevs consist equal resources.
-> > > > 
-> > > > But, as it's a burden to upper layer, we agree that if this condition
-> > > > happens, we still treat the two as incompatible.
-> > > > 
-> > > > To fix it, either the driver should expose dsa-1dwq only, or the target
-> > > > dsa-2dwq needs to be destroyed and reallocated via dsa-1dwq x 30.  
-> > > 
-> > > AFAIU, these are mdev types, aren't they? So, basically, any management
-> > > software needs to take care to use the matching mdev type on the target
-> > > system for device creation?  
-> > 
-> > or just do the simple thing of use the same mdev type on the source and dest.
-> > matching mdevtypes is not nessiarly trivial. we could do that but we woudl have
-> > to do that in python rather then sql so it would be slower to do at least today.
-> > 
-> > we dont currently have the ablity to say the resouce provider must have 1 of these
-> > set of traits. just that we must have a specific trait. this is a feature we have
-> > disucssed a couple of times and delayed untill we really really need it but its not out
-> > of the question that we could add it for this usecase. i suspect however we would do exact
-> > match first and explore this later after the inital mdev migration works.  
-> 
-> Yes, I think it's good.
-> 
-> still, I'd like to put it more explicitly to make ensure it's not missed:
-> the reason we want to specify compatible_type as a trait and check
-> whether target compatible_type is the superset of source
-> compatible_type is for the consideration of backward compatibility.
-> e.g.
-> an old generation device may have a mdev type xxx-v4-yyy, while a newer
-> generation  device may be of mdev type xxx-v5-yyy.
-> with the compatible_type traits, the old generation device is still
-> able to be regarded as compatible to newer generation device even their
-> mdev types are not equal.
 
-If you want to support migration from v4 to v5, can't the (presumably
-newer) driver that supports v5 simply register the v4 type as well, so
-that the mdev can be created as v4? (Just like QEMU versioned machine
-types work.)
+On 9/4/20 4:15 AM, Christian Borntraeger wrote:
+> On 21.08.20 21:56, Tony Krowiak wrote:
+>> diff --git a/drivers/s390/crypto/vfio_ap_private.h b/drivers/s390/crypto/vfio_ap_private.h
+>> index a2aa05bec718..57da703b549a 100644
+>> --- a/drivers/s390/crypto/vfio_ap_private.h
+>> +++ b/drivers/s390/crypto/vfio_ap_private.h
+>> @@ -87,6 +87,7 @@ struct ap_matrix_mdev {
+>>   	struct kvm *kvm;
+>>   	struct kvm_s390_module_hook pqap_hook;
+>>   	struct mdev_device *mdev;
+>> +	DECLARE_HASHTABLE(qtable, 8);
+>>   };
+> Ah I think the include should go into this patch. But then you should revisit the patch description
+> of 2 as it talks about hashtables (but doesnt do anything about it).
+
+Got it.
+
+>   
 
