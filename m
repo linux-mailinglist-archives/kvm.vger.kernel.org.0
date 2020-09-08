@@ -2,83 +2,122 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 74A1726164F
-	for <lists+kvm@lfdr.de>; Tue,  8 Sep 2020 19:08:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7D5C22616E3
+	for <lists+kvm@lfdr.de>; Tue,  8 Sep 2020 19:21:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731859AbgIHRIn convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Tue, 8 Sep 2020 13:08:43 -0400
-Received: from mail.kernel.org ([198.145.29.99]:50164 "EHLO mail.kernel.org"
+        id S1731785AbgIHRVm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 8 Sep 2020 13:21:42 -0400
+Received: from mail.skyhub.de ([5.9.137.197]:58316 "EHLO mail.skyhub.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1732119AbgIHRIQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 8 Sep 2020 13:08:16 -0400
-From:   bugzilla-daemon@bugzilla.kernel.org
-Authentication-Results: mail.kernel.org; dkim=permerror (bad message/signature format)
-To:     kvm@vger.kernel.org
-Subject: [Bug 209155] KVM Linux guest with more than 1 CPU panics after
- commit 404d5d7bff0d419fe11c7eaebca9ec8f25258f95 on old CPU (Phenom x4)
-Date:   Tue, 08 Sep 2020 17:08:14 +0000
-X-Bugzilla-Reason: None
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Product: Virtualization
-X-Bugzilla-Component: kvm
-X-Bugzilla-Version: unspecified
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: sean.j.christopherson@intel.com
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: cc
-Message-ID: <bug-209155-28872-1ZSa3F4n9U@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-209155-28872@https.bugzilla.kernel.org/>
-References: <bug-209155-28872@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8BIT
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+        id S1727940AbgIHRUw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 8 Sep 2020 13:20:52 -0400
+Received: from zn.tnic (p200300ec2f10bf0070b09dfd4356f225.dip0.t-ipconnect.de [IPv6:2003:ec:2f10:bf00:70b0:9dfd:4356:f225])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 6016C1EC0493;
+        Tue,  8 Sep 2020 19:20:48 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1599585648;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=LmUlHAGcDfQUhA9DUzYK7oqYD6W3gPvxbkj2WBXLliI=;
+        b=NT+D1hisw4b0wW+6D7Ney6pv8pqgOWkQiIpZMVJFpu03DYUr3koV1ACECWUSItIFaW0klI
+        6lQvPBJz1xfNqiAypVEEPioZLzJhxPHQWnPMBFkqcSx5eFSdpW4Hse7mx++L7Y6j3zJfOv
+        V2b1QESn48gtV8CN2wkTeDHRDEKrGvo=
+Date:   Tue, 8 Sep 2020 19:20:42 +0200
+From:   Borislav Petkov <bp@alien8.de>
+To:     Joerg Roedel <joro@8bytes.org>
+Cc:     x86@kernel.org, Joerg Roedel <jroedel@suse.de>, hpa@zytor.com,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Jiri Slaby <jslaby@suse.cz>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Juergen Gross <jgross@suse.com>,
+        Kees Cook <keescook@chromium.org>,
+        David Rientjes <rientjes@google.com>,
+        Cfir Cohen <cfir@google.com>,
+        Erdem Aktas <erdemaktas@google.com>,
+        Masami Hiramatsu <mhiramat@kernel.org>,
+        Mike Stunes <mstunes@vmware.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Martin Radev <martin.b.radev@gmail.com>,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org
+Subject: Re: [PATCH v7 67/72] x86/smpboot: Load TSS and getcpu GDT entry
+ before loading IDT
+Message-ID: <20200908172042.GF25236@zn.tnic>
+References: <20200907131613.12703-1-joro@8bytes.org>
+ <20200907131613.12703-68-joro@8bytes.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20200907131613.12703-68-joro@8bytes.org>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=209155
+On Mon, Sep 07, 2020 at 03:16:08PM +0200, Joerg Roedel wrote:
+> From: Joerg Roedel <jroedel@suse.de>
+> 
+> The IDT on 64bit contains vectors which use paranoid_entry() and/or IST
+> stacks. To make these vectors work the TSS and the getcpu GDT entry need
+> to be set up before the IDT is loaded.
+> 
+> Signed-off-by: Joerg Roedel <jroedel@suse.de>
+> ---
+>  arch/x86/include/asm/processor.h |  1 +
+>  arch/x86/kernel/cpu/common.c     | 23 +++++++++++++++++++++++
+>  arch/x86/kernel/smpboot.c        |  2 +-
+>  3 files changed, 25 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/x86/include/asm/processor.h b/arch/x86/include/asm/processor.h
+> index d8a82e650810..5ac507586769 100644
+> --- a/arch/x86/include/asm/processor.h
+> +++ b/arch/x86/include/asm/processor.h
+> @@ -696,6 +696,7 @@ extern void load_direct_gdt(int);
+>  extern void load_fixmap_gdt(int);
+>  extern void load_percpu_segment(int);
+>  extern void cpu_init(void);
+> +extern void cpu_init_exception_handling(void);
+>  extern void cr4_init(void);
+>  
+>  static inline unsigned long get_debugctlmsr(void)
+> diff --git a/arch/x86/kernel/cpu/common.c b/arch/x86/kernel/cpu/common.c
+> index 1d65365363a1..a9527c0c38fb 100644
+> --- a/arch/x86/kernel/cpu/common.c
+> +++ b/arch/x86/kernel/cpu/common.c
+> @@ -1854,6 +1854,29 @@ static inline void tss_setup_io_bitmap(struct tss_struct *tss)
+>  #endif
+>  }
+>  
+> +/*
+> + * Setup everything needed to handle exceptions from the IDT, including the IST
+> + * exceptions which use paranoid_entry()
+> + */
+> +void cpu_init_exception_handling(void)
+> +{
+> +	struct tss_struct *tss = this_cpu_ptr(&cpu_tss_rw);
+> +	int cpu = raw_smp_processor_id();
+> +
+> +	/* paranoid_entry() gets the CPU number from the GDT */
+> +	setup_getcpu(cpu);
+> +
+> +	/* IST vectors need TSS to be set up. */
+> +	tss_setup_ist(tss);
+> +	tss_setup_io_bitmap(tss);
+> +	set_tss_desc(cpu, &get_cpu_entry_area(cpu)->tss.x86_tss);
+> +
+> +	load_TR_desc();
 
-Sean Christopherson (sean.j.christopherson@intel.com) changed:
-
-           What    |Removed                     |Added
-----------------------------------------------------------------------------
-                 CC|                            |sean.j.christopherson@intel
-                   |                            |.com
-
---- Comment #8 from Sean Christopherson (sean.j.christopherson@intel.com) ---
-From code inspection, I'm 99% confident the immediate bug is that svm->next_rip
-is reset in svm_vcpu_run() only after calling svm_exit_handlers_fastpath(),
-which will cause SVM's skip_emulated_instruction() to write a stale RIP.  I
-don't have AMD hardware to confirm, but this should be reproducible on modern
-CPUs by loading kvm_amd with nrips=0.
-
-That issue is easy enough to resolve, e.g. simply hoist "svm->next_rip = 0;" up
-above the fastpath handling.  But, there are additional complications with
-advancing rip in the fastpath as svm_complete_interrupts() consumes rip, e.g.
-for NMI unmasking logic and event reinjection.  Odds are that NMI unmasking
-will never "fail" as it would require the new rip to match the last IRET rip,
-which would be very bizarre.  Similarly, event reinjection should also be a
-non-issue in practice as the WRMSR fastpath shouldn't be reachable if KVM was
-injecting an event.
-
-All the being said, IMO, the safest play would be to first yank out the call to
-handle_fastpath_set_msr_irqoff() in svm_exit_handlers_fastpath() to ensure a
-clean base and to provide a safe backport patch, then move
-svm_complete_interrupts() into svm_vcpu_run(), and finally move the call to
-svm_exit_handlers_fastpath() down a ways and reenable
-handle_fastpath_set_msr_irqoff().  Aside from resolving weirdness with rip and
-fastpath, it would also align VMX and SVM with respect to completing
-interrupts.
+Aha, this is what you mean here in your 0th message. I'm guessing it is
+ok to do those things twice in start_secondary...
 
 -- 
-You are receiving this mail because:
-You are watching the assignee of the bug.
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
