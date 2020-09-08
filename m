@@ -2,33 +2,34 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9846E261F09
-	for <lists+kvm@lfdr.de>; Tue,  8 Sep 2020 21:58:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7D4C8261E72
+	for <lists+kvm@lfdr.de>; Tue,  8 Sep 2020 21:52:02 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732547AbgIHT57 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 8 Sep 2020 15:57:59 -0400
-Received: from mga09.intel.com ([134.134.136.24]:44128 "EHLO mga09.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730316AbgIHPfq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 8 Sep 2020 11:35:46 -0400
-IronPort-SDR: Vk1a8Xp01oHqi3a6rxgficaRMRGr8uTq6Dp/08L+148x0hEhYgnTroXXPB0ja9+tz03LOoCo35
- xddhQ16YHyvw==
-X-IronPort-AV: E=McAfee;i="6000,8403,9738"; a="159124946"
-X-IronPort-AV: E=Sophos;i="5.76,406,1592895600"; 
-   d="scan'208";a="159124946"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Sep 2020 08:28:50 -0700
-IronPort-SDR: OqiPE0Cn/mbaoFglvyhAf2rWnLm6JquwW+AKzi6KXAQYqzMCNSFdbI9D+UGi2vd+sJzRv/8Kvj
- Oe6qN0U8cxmQ==
-X-IronPort-AV: E=Sophos;i="5.76,406,1592895600"; 
-   d="scan'208";a="480068519"
-Received: from sderix-mobl1.ger.corp.intel.com (HELO [10.214.213.131]) ([10.214.213.131])
-  by orsmga005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Sep 2020 08:28:38 -0700
-Subject: Re: [Intel-gfx] [PATCH 0/8] Convert the intel iommu driver to the
- dma-iommu api
-To:     Logan Gunthorpe <logang@deltatee.com>, Tom Murphy <murphyt7@tcd.ie>
+        id S1730790AbgIHTvv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 8 Sep 2020 15:51:51 -0400
+Received: from ale.deltatee.com ([204.191.154.188]:51884 "EHLO
+        ale.deltatee.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730192AbgIHPt5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 8 Sep 2020 11:49:57 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=deltatee.com; s=20200525; h=Subject:Content-Transfer-Encoding:Content-Type:
+        In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Sender:
+        Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender
+        :Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
+        List-Subscribe:List-Post:List-Owner:List-Archive;
+        bh=DvSiEr2JCy+2h9dy7CIecEenG2gQsa0A5OP2d9PI/p0=; b=dbg0PtMPK+HbvI6GMZzh/J5E8Z
+        Q/TWc7UsDFhg1cOVJt/pysWKo3QQRWraF1mqHM6mdRGQ6y0rj+OXqZUSgbgyS5kW1MF22xpb3bm/M
+        J9Rf7mpjgRlZVOcx1SZJ6EJp7lFy55R6nqk8PsS8AEsD0hf0g4vJC65mDtFEAYzf7cE0mQHAAVUlU
+        S7bbDUQqTHtHsrq5f8RHYZU0yCa5rG3lpeqMLTKlNXStV+C6+vhM0UL/8Wjc5CgLnNZYF3jPybjc/
+        ulyb1L7dumDVfTJQeMlSwf7IyaVvWKGWBe0b9ikUV9lDLMezAf5m+fY9DJk+AU+8aTTS01s/mCgwR
+        I5zJe2Ew==;
+Received: from s01060023bee90a7d.cg.shawcable.net ([24.64.145.4] helo=[192.168.0.10])
+        by ale.deltatee.com with esmtpsa (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
+        (Exim 4.92)
+        (envelope-from <logang@deltatee.com>)
+        id 1kFfnI-0008Go-Gj; Tue, 08 Sep 2020 09:44:29 -0600
+To:     Tvrtko Ursulin <tvrtko.ursulin@linux.intel.com>,
+        Tom Murphy <murphyt7@tcd.ie>
 Cc:     kvm@vger.kernel.org, David Airlie <airlied@linux.ie>,
         dri-devel@lists.freedesktop.org,
         Bjorn Andersson <bjorn.andersson@linaro.org>,
@@ -62,93 +63,78 @@ References: <20191221150402.13868-1-murphyt7@tcd.ie>
  <b9140772-0370-a858-578c-af503a06d8e9@deltatee.com>
  <CALQxJuutRaeX89k2o4ffTKYRMizmMu0XbRnzpFuSSrkQR02jKg@mail.gmail.com>
  <766525c3-4da9-6db7-cd90-fb4b82cd8083@deltatee.com>
-From:   Tvrtko Ursulin <tvrtko.ursulin@linux.intel.com>
-Organization: Intel Corporation UK Plc
-Message-ID: <60a82319-cbee-4cd1-0d5e-3c407cc51330@linux.intel.com>
-Date:   Tue, 8 Sep 2020 16:28:35 +0100
+ <60a82319-cbee-4cd1-0d5e-3c407cc51330@linux.intel.com>
+From:   Logan Gunthorpe <logang@deltatee.com>
+Message-ID: <e598fb31-ef7a-c2ee-8a54-bf62d50c480c@deltatee.com>
+Date:   Tue, 8 Sep 2020 09:44:24 -0600
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+ Thunderbird/68.12.0
 MIME-Version: 1.0
-In-Reply-To: <766525c3-4da9-6db7-cd90-fb4b82cd8083@deltatee.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <60a82319-cbee-4cd1-0d5e-3c407cc51330@linux.intel.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 24.64.145.4
+X-SA-Exim-Rcpt-To: robin.murphy@arm.com, kgene@kernel.org, iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org, cohuck@redhat.com, dwmw2@infradead.org, gerald.schaefer@de.ibm.com, virtualization@lists.linux-foundation.org, tglx@linutronix.de, matthias.bgg@gmail.com, linux-mediatek@lists.infradead.org, intel-gfx@lists.freedesktop.org, linux-arm-msm@vger.kernel.org, linux-s390@vger.kernel.org, linux-arm-kernel@lists.infradead.org, agross@kernel.org, linux-rockchip@lists.infradead.org, hch@infradead.org, jonathanh@nvidia.com, krzk@kernel.org, maz@kernel.org, linux-samsung-soc@vger.kernel.org, jean-philippe@linaro.org, m.szyprowski@samsung.com, will@kernel.org, julien.grall@arm.com, linux-tegra@vger.kernel.org, bjorn.andersson@linaro.org, dri-devel@lists.freedesktop.org, airlied@linux.ie, kvm@vger.kernel.org, murphyt7@tcd.ie, tvrtko.ursulin@linux.intel.com
+X-SA-Exim-Mail-From: logang@deltatee.com
+X-Spam-Checker-Version: SpamAssassin 3.4.2 (2018-09-13) on ale.deltatee.com
+X-Spam-Level: 
+X-Spam-Status: No, score=-8.5 required=5.0 tests=ALL_TRUSTED,BAYES_00,
+        NICE_REPLY_A autolearn=ham autolearn_force=no version=3.4.2
+Subject: Re: [Intel-gfx] [PATCH 0/8] Convert the intel iommu driver to the
+ dma-iommu api
+X-SA-Exim-Version: 4.2.1 (built Wed, 08 May 2019 21:11:16 +0000)
+X-SA-Exim-Scanned: Yes (on ale.deltatee.com)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
-Hi,
 
-On 27/08/2020 22:36, Logan Gunthorpe wrote:
-> On 2020-08-23 6:04 p.m., Tom Murphy wrote:
->> I have added a check for the sg_dma_len == 0 :
->> """
->>   } __sgt_iter(struct scatterlist *sgl, bool dma) {
->>          struct sgt_iter s = { .sgp = sgl };
+On 2020-09-08 9:28 a.m., Tvrtko Ursulin wrote:
 >>
->> +       if (sgl && sg_dma_len(sgl) == 0)
->> +           s.sgp = NULL;
+>> diff --git a/drivers/gpu/drm/i915/i915_scatterlist.h
+>> b/drivers/gpu/drm/i915/i915
+>> index b7b59328cb76..9367ac801f0c 100644
+>> --- a/drivers/gpu/drm/i915/i915_scatterlist.h
+>> +++ b/drivers/gpu/drm/i915/i915_scatterlist.h
+>> @@ -27,13 +27,19 @@ static __always_inline struct sgt_iter {
+>>   } __sgt_iter(struct scatterlist *sgl, bool dma) {
+>>          struct sgt_iter s = { .sgp = sgl };
 >>
->>          if (s.sgp) {
->>              .....
->> """
->> at location [1].
->> but it doens't fix the problem.
+>> +       if (sgl && !sg_dma_len(s.sgp))
 > 
-> Based on my read of the code, it looks like we also need to change usage
-> of sgl->length... Something like the rough patch below, maybe?
+> I'd extend the condition to be, just to be safe:
+>     if (dma && sgl && !sg_dma_len(s.sgp))
+>
 
-This thread was brought to my attention and I initially missed this 
-reply. Essentially I came to the same conclusion about the need to use 
-sg_dma_len. One small correction below:
+Right, good catch, that's definitely necessary.
 
-> Also, Tom, do you have an updated version of the patchset to convert the
-> Intel IOMMU to dma-iommu available? The last one I've found doesn't
-> apply cleanly (I'm assuming parts of it have been merged in slightly
-> modified forms).
+>> +               s.sgp = NULL;
+>> +
+>>          if (s.sgp) {
+>>                  s.max = s.curr = s.sgp->offset;
+>> -               s.max += s.sgp->length;
+>> -               if (dma)
+>> +
+>> +               if (dma) {
+>> +                       s.max += sg_dma_len(s.sgp);
+>>                          s.dma = sg_dma_address(s.sgp);
+>> -               else
+>> +               } else {
+>> +                       s.max += s.sgp->length;
+>>                          s.pfn = page_to_pfn(sg_page(s.sgp));
+>> +               }
 > 
-> Thanks,
-> 
-> Logan
-> 
-> --
-> 
-> diff --git a/drivers/gpu/drm/i915/i915_scatterlist.h
-> b/drivers/gpu/drm/i915/i915
-> index b7b59328cb76..9367ac801f0c 100644
-> --- a/drivers/gpu/drm/i915/i915_scatterlist.h
-> +++ b/drivers/gpu/drm/i915/i915_scatterlist.h
-> @@ -27,13 +27,19 @@ static __always_inline struct sgt_iter {
->   } __sgt_iter(struct scatterlist *sgl, bool dma) {
->          struct sgt_iter s = { .sgp = sgl };
-> 
-> +       if (sgl && !sg_dma_len(s.sgp))
+> Otherwise has this been tested or alternatively how to test it? (How to
+> repro the issue.)
 
-I'd extend the condition to be, just to be safe:
+It has not been tested. To test it, you need Tom's patch set without the
+last "DO NOT MERGE" patch:
 
-	if (dma && sgl && !sg_dma_len(s.sgp))
+https://lkml.kernel.org/lkml/20200907070035.GA25114@infradead.org/T/
 
-> +               s.sgp = NULL;
-> +
->          if (s.sgp) {
->                  s.max = s.curr = s.sgp->offset;
-> -               s.max += s.sgp->length;
-> -               if (dma)
-> +
-> +               if (dma) {
-> +                       s.max += sg_dma_len(s.sgp);
->                          s.dma = sg_dma_address(s.sgp);
-> -               else
-> +               } else {
-> +                       s.max += s.sgp->length;
->                          s.pfn = page_to_pfn(sg_page(s.sgp));
-> +               }
+Thanks,
 
-Otherwise has this been tested or alternatively how to test it? (How to 
-repro the issue.)
-
-Regards,
-
-Tvrtko
+Logan
