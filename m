@@ -2,146 +2,80 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 04B30260FBF
-	for <lists+kvm@lfdr.de>; Tue,  8 Sep 2020 12:28:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5064C261044
+	for <lists+kvm@lfdr.de>; Tue,  8 Sep 2020 12:52:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729894AbgIHK2X (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 8 Sep 2020 06:28:23 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:57311 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1729873AbgIHK2S (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 8 Sep 2020 06:28:18 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1599560896;
+        id S1729434AbgIHKvy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 8 Sep 2020 06:51:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34822 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729278AbgIHKvl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 8 Sep 2020 06:51:41 -0400
+Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4B54BC061573;
+        Tue,  8 Sep 2020 03:51:39 -0700 (PDT)
+Received: from zn.tnic (p200300ec2f10bf001d9dc88f64877132.dip0.t-ipconnect.de [IPv6:2003:ec:2f10:bf00:1d9d:c88f:6487:7132])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 234F51EC0269;
+        Tue,  8 Sep 2020 12:51:38 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1599562298;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=BognJb/bGGBUr0km+Byb87HBFXxsJycPQ/KwVZJJVBs=;
-        b=gpHysiETpQ4JkDg/SwSVdJnrkP9/mTLMW/NW6zvHYMLsy4RgJKDZWXmmQz5Q6YuxtWj5WY
-        1602hP+GRSDG1eTl78cxlTuYNBe0lbQds+NxejtVlJlOJItLOIXPyvjgVHJ0twPo9klPIr
-        SV5yj2LTpn5ZTbRi2D6U1VE3PMd3sh0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-391-avFPdqsDM22Kl8y2G5QsRA-1; Tue, 08 Sep 2020 06:28:14 -0400
-X-MC-Unique: avFPdqsDM22Kl8y2G5QsRA-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8B23A1074642;
-        Tue,  8 Sep 2020 10:28:12 +0000 (UTC)
-Received: from kamzik.brq.redhat.com (unknown [10.40.192.171])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 933FD10013C4;
-        Tue,  8 Sep 2020 10:28:10 +0000 (UTC)
-Date:   Tue, 8 Sep 2020 12:28:07 +0200
-From:   Andrew Jones <drjones@redhat.com>
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org, kernel-team@android.com, graf@amazon.com,
-        Robin Murphy <robin.murphy@arm.com>
-Subject: Re: [PATCH v3 5/5] KVM: arm64: Document PMU filtering API
-Message-ID: <20200908102807.alzosskf3wre4bmd@kamzik.brq.redhat.com>
-References: <20200908075830.1161921-1-maz@kernel.org>
- <20200908075830.1161921-6-maz@kernel.org>
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=p5bHnx8cr1jLr7984pAVN0Olcl/KEzbBrEmY633CIzE=;
+        b=STOQDTiMjoawmkJLXat74LxWVv6qUr6lSFN99dV4kRHQNz5HwQQ7IBy7ks5aMGAl6tl2zJ
+        da0kmVwIdh40mdToy3UayMhoxc6p3I9C7sFAq9c75Om6vK5Qt+tZ3GDpVfZg/yq6M+ZmJO
+        cbGpWbLe2rcvjhuP662fkZW40CtlXdU=
+Date:   Tue, 8 Sep 2020 12:51:32 +0200
+From:   Borislav Petkov <bp@alien8.de>
+To:     Joerg Roedel <joro@8bytes.org>
+Cc:     x86@kernel.org, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>, hpa@zytor.com,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Jiri Slaby <jslaby@suse.cz>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Juergen Gross <jgross@suse.com>,
+        Kees Cook <keescook@chromium.org>,
+        David Rientjes <rientjes@google.com>,
+        Cfir Cohen <cfir@google.com>,
+        Erdem Aktas <erdemaktas@google.com>,
+        Masami Hiramatsu <mhiramat@kernel.org>,
+        Mike Stunes <mstunes@vmware.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Martin Radev <martin.b.radev@gmail.com>,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org
+Subject: Re: [PATCH v7 41/72] x86/sev-es: Setup per-cpu GHCBs for the runtime
+ handler
+Message-ID: <20200908105132.GD25236@zn.tnic>
+References: <20200907131613.12703-1-joro@8bytes.org>
+ <20200907131613.12703-42-joro@8bytes.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20200908075830.1161921-6-maz@kernel.org>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+In-Reply-To: <20200907131613.12703-42-joro@8bytes.org>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Sep 08, 2020 at 08:58:30AM +0100, Marc Zyngier wrote:
-> Add a small blurb describing how the event filtering API gets used.
-> 
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->  Documentation/virt/kvm/devices/vcpu.rst | 46 +++++++++++++++++++++++++
->  1 file changed, 46 insertions(+)
-> 
-> diff --git a/Documentation/virt/kvm/devices/vcpu.rst b/Documentation/virt/kvm/devices/vcpu.rst
-> index ca374d3fe085..203b91e93151 100644
-> --- a/Documentation/virt/kvm/devices/vcpu.rst
-> +++ b/Documentation/virt/kvm/devices/vcpu.rst
-> @@ -55,6 +55,52 @@ Request the initialization of the PMUv3.  If using the PMUv3 with an in-kernel
->  virtual GIC implementation, this must be done after initializing the in-kernel
->  irqchip.
->  
-> +1.3 ATTRIBUTE: KVM_ARM_VCPU_PMU_V3_FILTER
-> +---------------------------------------
-
-Need a couple more '--'
-
+On Mon, Sep 07, 2020 at 03:15:42PM +0200, Joerg Roedel wrote:
+> +void __init sev_es_init_vc_handling(void)
+> +{
+> +	int cpu;
 > +
-> +:Parameters: in kvm_device_attr.addr the address for a PMU event filter is a
-> +             pointer to a struct kvm_pmu_event_filter
-> +
-> +:Returns:
-> +
-> +	 =======  ======================================================
-> +	 -ENODEV: PMUv3 not supported or GIC not initialized
-> +	 -ENXIO:  PMUv3 not properly configured or in-kernel irqchip not
-> +	 	  configured as required prior to calling this attribute
-> +	 -EBUSY:  PMUv3 already initialized
-> +	 -EINVAL: Invalid filter range
-> +	 =======  ======================================================
-> +
-> +Request the installation of a PMU event filter describe as follows:
+> +	BUILD_BUG_ON((offsetof(struct sev_es_runtime_data, ghcb_page) % PAGE_SIZE) != 0);
 
-described
+Simplified that to:
 
-> +
-> +struct kvm_pmu_event_filter {
-> +	__u16	base_event;
-> +	__u16	nevents;
-> +
-> +#define KVM_PMU_EVENT_ALLOW	0
-> +#define KVM_PMU_EVENT_DENY	1
-> +
-> +	__u8	action;
-> +	__u8	pad[3];
-> +};
-> +
-> +A filter range is defined as the range [@base_event, @base_event + @nevents[,
+	BUILD_BUG_ON(offsetof(struct sev_es_runtime_data, ghcb_page) % PAGE_SIZE);
 
-closing ] is reversed, and should it be [] or [) ?
+-- 
+Regards/Gruss,
+    Boris.
 
-> +together with an @action (KVM_PMU_EVENT_ALLOW or KVM_PMU_EVENT_DENY). The
-> +first registered range defines the global policy (global ALLOW if the first
-> +@action is DENY, global DENY if the first @action is ALLOW). Multiple ranges
-> +can be programmed, and must fit within the event space defined by the PMU
-> +architecture (10 bits on ARMv8.0, 16 bits from ARMv8.1 onwards).
-> +
-> +Note: "Cancelling" a filter by registering the opposite action for the same
-> +range doesn't change the default action. For example, installing an ALLOW
-> +filter for event range [0:10] as the first filter and then applying a DENY
-
-[) ?
-
-> +action for the same range will leave the whole range as disabled.
-> +
-> +Restrictions: Event 0 (SW_INCR) is never filtered, as it doesn't count a
-> +hardware event. Filtering event 0x1E (CHAIN) has no effect either, as it
-> +isn't strictly speaking an event. Filtering the cycle counter is possible
-> +using event 0x11 (CPU_CYCLES).
-> +
->  
->  2. GROUP: KVM_ARM_VCPU_TIMER_CTRL
->  =================================
-> -- 
-> 2.28.0
-> 
-> _______________________________________________
-> kvmarm mailing list
-> kvmarm@lists.cs.columbia.edu
-> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
-> 
-
-Otherwise
-
-Reviewed-by: Andrew Jones <drjones@redhat.com>
-
-Thanks,
-drew
-
+https://people.kernel.org/tglx/notes-about-netiquette
