@@ -2,191 +2,99 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7F21B261816
-	for <lists+kvm@lfdr.de>; Tue,  8 Sep 2020 19:48:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 36EBD261936
+	for <lists+kvm@lfdr.de>; Tue,  8 Sep 2020 20:10:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731720AbgIHRsb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 8 Sep 2020 13:48:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43142 "EHLO
+        id S1732010AbgIHSKl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 8 Sep 2020 14:10:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46736 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731365AbgIHRqS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 8 Sep 2020 13:46:18 -0400
-Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E892EC061573;
-        Tue,  8 Sep 2020 10:46:17 -0700 (PDT)
-Received: from zn.tnic (p200300ec2f10bf0070b09dfd4356f225.dip0.t-ipconnect.de [IPv6:2003:ec:2f10:bf00:70b0:9dfd:4356:f225])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 605F51EC0489;
-        Tue,  8 Sep 2020 19:46:16 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1599587176;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=nPj3+c2dIwhanvH9Blvxwpvfl2eV/3k/Q9aSuFLclYg=;
-        b=RM/Zx8iHBvG5Eti/FNmYaWgJjIMOyQ4VltylfyxY4IdCEIFAfWH60weezPSlACosueFynJ
-        DKlNyhaAe9DDi+Up/33riZE7n2E7K1VUYzWs+AuxGZl1Bzei/yP0kIDcV8JJzVPAf4HdRS
-        QJYbhpttRw4vRmtimjYS+Qynt7kt/ms=
-Date:   Tue, 8 Sep 2020 19:46:16 +0200
-From:   Borislav Petkov <bp@alien8.de>
-To:     Joerg Roedel <joro@8bytes.org>, Ard Biesheuvel <ardb@kernel.org>
-Cc:     x86@kernel.org, Joerg Roedel <jroedel@suse.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>, hpa@zytor.com,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Jiri Slaby <jslaby@suse.cz>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Juergen Gross <jgross@suse.com>,
-        Kees Cook <keescook@chromium.org>,
-        David Rientjes <rientjes@google.com>,
-        Cfir Cohen <cfir@google.com>,
-        Erdem Aktas <erdemaktas@google.com>,
-        Masami Hiramatsu <mhiramat@kernel.org>,
-        Mike Stunes <mstunes@vmware.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Martin Radev <martin.b.radev@gmail.com>,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org
-Subject: Re: [PATCH v7 71/72] x86/efi: Add GHCB mappings when SEV-ES is active
-Message-ID: <20200908174616.GJ25236@zn.tnic>
-References: <20200907131613.12703-1-joro@8bytes.org>
- <20200907131613.12703-72-joro@8bytes.org>
+        with ESMTP id S1731558AbgIHSJw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 8 Sep 2020 14:09:52 -0400
+Received: from mail-wr1-x42c.google.com (mail-wr1-x42c.google.com [IPv6:2a00:1450:4864:20::42c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A783CC061573;
+        Tue,  8 Sep 2020 11:09:45 -0700 (PDT)
+Received: by mail-wr1-x42c.google.com with SMTP id x14so144895wrl.12;
+        Tue, 08 Sep 2020 11:09:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=sender:date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=6JZbDRelE0owW3x0j2stbMNrtJi1xeSDNJV+jIvcxok=;
+        b=gHO+xrMHUUdsCeckLxc7OvhA19uO0YUuTyw14LQYZAw/Mok/Go5mPTZnGc0CmXEh/3
+         LnXzLzY7AoE0qeBn3fuNt3eL0OkYisum5yLi37LrRewcoem9q1TePg13gK85R/LiyP2j
+         KFGY1sjkJ1f8BpKj92K6nHz/xsMFUl3X6GWYs81X3XvdLyWFmXAi279Pesty+FDWEI+7
+         sz0coyljwaKkOU3Ad0eBMOwaKXvkVEp97iUTZK3fTJ3TC3MT5ADLr/nzLqYzq5CrJU8f
+         HRpLJ5jfYu4F7FgwThKMs318mWjTqnSJkmB82svhz6tNXKbdpiNwl8/h0RhD/qayKfkA
+         z+1g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
+         :references:mime-version:content-disposition:in-reply-to;
+        bh=6JZbDRelE0owW3x0j2stbMNrtJi1xeSDNJV+jIvcxok=;
+        b=MqSeRxhdAswLsBiIuMWunWvvlseTD5XNPI6RUnCL7ia7Jl67HsxVgz/jjjEzysiJCK
+         hlyIAm2cJm3FDe32GbOPgfsq/5fxek4L/XmySvB/9I3961R6rlkHxYmwiNiUOp+8b50R
+         geNZR8QZqY2z4Qjojte8uAfNa9OzyMoVvRcN6WbVV2kN68VYxatAS75yi+CghZ5ZiRyJ
+         lqkEiyBbY7/gZkoiyZCYVAdoU7zV7wm3wXsL7R8AuormYorWGsaDnzqbl/4BlnCwCP62
+         l1IIqjWlDLtiQ+H4tYg63xG6FYjXo+9cQXRg/t/N8z62HVDyg6xhjuLiBhJChASxt4E/
+         t74Q==
+X-Gm-Message-State: AOAM530srLg9xZ19ByRhfk40jwdfBD3WpC/ZWXRpByu0gD9426JG+KRV
+        xyheWBfMmMql5879sNzqSEA=
+X-Google-Smtp-Source: ABdhPJyLCwvd4PQUlYNiGnEtDob4p7ltJumxZc9gJTkfDrpGEziRnHnF5z4CtY63hBWnE0JkGbGzZA==
+X-Received: by 2002:a05:6000:151:: with SMTP id r17mr798967wrx.311.1599588581741;
+        Tue, 08 Sep 2020 11:09:41 -0700 (PDT)
+Received: from gmail.com (54007801.dsl.pool.telekom.hu. [84.0.120.1])
+        by smtp.gmail.com with ESMTPSA id f19sm196652wmh.44.2020.09.08.11.09.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 08 Sep 2020 11:09:41 -0700 (PDT)
+Date:   Tue, 8 Sep 2020 20:09:39 +0200
+From:   Ingo Molnar <mingo@kernel.org>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     torvalds@linux-foundation.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, Will Deacon <will@kernel.org>
+Subject: Re: [GIT PULL] First batch of KVM changes for Linux 5.9
+Message-ID: <20200908180939.GA2378263@gmail.com>
+References: <20200805182606.12621-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200907131613.12703-72-joro@8bytes.org>
+In-Reply-To: <20200805182606.12621-1-pbonzini@redhat.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-+ Ard so that he can ack the efi bits.
 
-On Mon, Sep 07, 2020 at 03:16:12PM +0200, Joerg Roedel wrote:
-> From: Tom Lendacky <thomas.lendacky@amd.com>
-> 
-> Calling down to EFI runtime services can result in the firmware performing
-> VMGEXIT calls. The firmware is likely to use the GHCB of the OS (e.g., for
-> setting EFI variables), so each GHCB in the system needs to be identity
-> mapped in the EFI page tables, as unencrypted, to avoid page faults.
-> 
-> Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
-> [ jroedel@suse.de: Moved GHCB mapping loop to sev-es.c ]
-> Signed-off-by: Joerg Roedel <jroedel@suse.de>
-> ---
->  arch/x86/boot/compressed/sev-es.c |  1 +
->  arch/x86/include/asm/sev-es.h     |  2 ++
->  arch/x86/kernel/sev-es.c          | 30 ++++++++++++++++++++++++++++++
->  arch/x86/platform/efi/efi_64.c    | 10 ++++++++++
->  4 files changed, 43 insertions(+)
-> 
-> diff --git a/arch/x86/boot/compressed/sev-es.c b/arch/x86/boot/compressed/sev-es.c
-> index 45702b866c33..0a9a248ca33d 100644
-> --- a/arch/x86/boot/compressed/sev-es.c
-> +++ b/arch/x86/boot/compressed/sev-es.c
-> @@ -12,6 +12,7 @@
->   */
->  #include "misc.h"
->  
-> +#include <asm/pgtable_types.h>
->  #include <asm/sev-es.h>
->  #include <asm/trapnr.h>
->  #include <asm/trap_pf.h>
-> diff --git a/arch/x86/include/asm/sev-es.h b/arch/x86/include/asm/sev-es.h
-> index e919f09ae33c..cf1d957c7091 100644
-> --- a/arch/x86/include/asm/sev-es.h
-> +++ b/arch/x86/include/asm/sev-es.h
-> @@ -102,11 +102,13 @@ static __always_inline void sev_es_nmi_complete(void)
->  	if (static_branch_unlikely(&sev_es_enable_key))
->  		__sev_es_nmi_complete();
->  }
-> +extern int __init sev_es_efi_map_ghcbs(pgd_t *pgd);
->  #else
->  static inline void sev_es_ist_enter(struct pt_regs *regs) { }
->  static inline void sev_es_ist_exit(void) { }
->  static inline int sev_es_setup_ap_jump_table(struct real_mode_header *rmh) { return 0; }
->  static inline void sev_es_nmi_complete(void) { }
-> +static inline int sev_es_efi_map_ghcbs(pgd_t *pgd) { return 0; }
->  #endif
->  
->  #endif
-> diff --git a/arch/x86/kernel/sev-es.c b/arch/x86/kernel/sev-es.c
-> index 9ab3a4dfecd8..4e2b7e4d9b87 100644
-> --- a/arch/x86/kernel/sev-es.c
-> +++ b/arch/x86/kernel/sev-es.c
-> @@ -491,6 +491,36 @@ int sev_es_setup_ap_jump_table(struct real_mode_header *rmh)
->  	return 0;
->  }
->  
-> +/*
-> + * This is needed by the OVMF UEFI firmware which will use whatever it finds in
-> + * the GHCB MSR as its GHCB to talk to the hypervisor. So make sure the per-cpu
-> + * runtime GHCBs used by the kernel are also mapped in the EFI page-table.
-> + */
-> +int __init sev_es_efi_map_ghcbs(pgd_t *pgd)
-> +{
-> +	struct sev_es_runtime_data *data;
-> +	unsigned long address, pflags;
-> +	int cpu;
-> +	u64 pfn;
-> +
-> +	if (!sev_es_active())
-> +		return 0;
-> +
-> +	pflags = _PAGE_NX | _PAGE_RW;
-> +
-> +	for_each_possible_cpu(cpu) {
-> +		data = per_cpu(runtime_data, cpu);
-> +
-> +		address = __pa(&data->ghcb_page);
-> +		pfn = address >> PAGE_SHIFT;
-> +
-> +		if (kernel_map_pages_in_pgd(pgd, pfn, address, 1, pflags))
-> +			return 1;
-> +	}
-> +
-> +	return 0;
-> +}
-> +
->  static enum es_result vc_handle_msr(struct ghcb *ghcb, struct es_em_ctxt *ctxt)
->  {
->  	struct pt_regs *regs = ctxt->regs;
-> diff --git a/arch/x86/platform/efi/efi_64.c b/arch/x86/platform/efi/efi_64.c
-> index 6af4da1149ba..8f5759df7776 100644
-> --- a/arch/x86/platform/efi/efi_64.c
-> +++ b/arch/x86/platform/efi/efi_64.c
-> @@ -47,6 +47,7 @@
->  #include <asm/realmode.h>
->  #include <asm/time.h>
->  #include <asm/pgalloc.h>
-> +#include <asm/sev-es.h>
->  
->  /*
->   * We allocate runtime services regions top-down, starting from -4G, i.e.
-> @@ -229,6 +230,15 @@ int __init efi_setup_page_tables(unsigned long pa_memmap, unsigned num_pages)
->  		return 1;
->  	}
->  
-> +	/*
-> +	 * When SEV-ES is active, the GHCB as set by the kernel will be used
-> +	 * by firmware. Create a 1:1 unencrypted mapping for each GHCB.
-> +	 */
-> +	if (sev_es_efi_map_ghcbs(pgd)) {
-> +		pr_err("Failed to create 1:1 mapping for the GHCBs!\n");
-> +		return 1;
-> +	}
-> +
->  	/*
->  	 * When making calls to the firmware everything needs to be 1:1
->  	 * mapped and addressable with 32-bit pointers. Map the kernel
-> -- 
-> 2.28.0
-> 
+hi,
 
--- 
-Regards/Gruss,
-    Boris.
+* Paolo Bonzini <pbonzini@redhat.com> wrote:
 
-https://people.kernel.org/tglx/notes-about-netiquette
+> Paolo Bonzini (11):
+>       Merge branch 'kvm-async-pf-int' into HEAD
+
+kvmtool broke in this merge window, hanging during bootup right after CPU bringup:
+
+ [    1.289404]  #63
+ [    0.012468] kvm-clock: cpu 63, msr 6ff69fc1, secondary cpu clock
+ [    0.012468] [Firmware Bug]: CPU63: APIC id mismatch. Firmware: 3f APIC: 14
+ [    1.302320] kvm-guest: KVM setup async PF for cpu 63
+ [    1.302320] kvm-guest: stealtime: cpu 63, msr 1379d7600
+
+Eventually trigger an RCU stall warning:
+
+ [   22.302392] rcu: INFO: rcu_sched detected stalls on CPUs/tasks:
+ [   22.302392] rcu: 	1-...!: (68 GPs behind) idle=00c/0/0x0 softirq=0/0 fqs=0  (false positive?)
+
+I've bisected this down to the above merge commit. The individual commit:
+
+   b1d405751cd5: ("KVM: x86: Switch KVM guest to using interrupts for page ready APF delivery")
+
+appears to be working fine standalone.
+
+I'm using x86-64 defconfig+kvmconfig on SVM. Can send more info on request.
+
+The kvmtool.git commit I've tested is 90b2d3adadf2.
+
+Thanks,
+
+	Ingo
