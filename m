@@ -2,38 +2,38 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9D53F2620D4
-	for <lists+kvm@lfdr.de>; Tue,  8 Sep 2020 22:16:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 16E0E2620D5
+	for <lists+kvm@lfdr.de>; Tue,  8 Sep 2020 22:16:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729529AbgIHUQD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 8 Sep 2020 16:16:03 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:50213 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1730077AbgIHPKD (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 8 Sep 2020 11:10:03 -0400
+        id S1732211AbgIHUQE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 8 Sep 2020 16:16:04 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:40135 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1730064AbgIHPKC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 8 Sep 2020 11:10:02 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1599577786;
+        s=mimecast20190719; t=1599577783;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=FZa+iT6uJluJlrs0f7SlUYi8Jd20qJSgs2ucWw1RdNE=;
-        b=HxmQ0r0PKzARKcyCw4wsuI/PJZcfqXWbGt/4NgW4PH8ccBF04Uu8xvIoTNxbbTKbGDbGXB
-        F0SKTu9d5M+YToYahCUdCwO+ZBWn4ljjPyedOrUmIWQooK54pOoWLpF+dQAGYDHMbw1kLK
-        YDzZtbAKnXXEl+8BvuedaE/xTedN+hs=
+        bh=2cueM2qypxC5hhXald83yr234ALXWJo20T0dOc3djUg=;
+        b=LnUUniRSYJBfa8Jyyl9fPZ41sNN+oEDAg7wiDcegXKuHvxCSkUi9u8fD5pRTY1rC5wSIj7
+        CxjCsj+bx9VpO/vBjyi0PXIMUbMm+hG0pjZMXL+mBzXvAGULTQTgwwKPZENcn3Q6phHDZO
+        wG2QTI1LkxsT9pycQZK52Whk3EbIhlI=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-565-COb6RyaJPwm5J6x8ijO5ng-1; Tue, 08 Sep 2020 10:29:17 -0400
-X-MC-Unique: COb6RyaJPwm5J6x8ijO5ng-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+ us-mta-472-dkNnVODiN-qgsJcFfHIZvg-1; Tue, 08 Sep 2020 10:29:33 -0400
+X-MC-Unique: dkNnVODiN-qgsJcFfHIZvg-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6D9021005E5C;
-        Tue,  8 Sep 2020 14:29:15 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3E3E01008552;
+        Tue,  8 Sep 2020 14:29:31 +0000 (UTC)
 Received: from w520.home (ovpn-112-71.phx2.redhat.com [10.3.112.71])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 3928560C84;
-        Tue,  8 Sep 2020 14:29:05 +0000 (UTC)
-Date:   Tue, 8 Sep 2020 08:29:04 -0600
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 73CB510013C4;
+        Tue,  8 Sep 2020 14:29:27 +0000 (UTC)
+Date:   Tue, 8 Sep 2020 08:29:06 -0600
 From:   Alex Williamson <alex.williamson@redhat.com>
 To:     Ajay Kaher <akaher@vmware.com>
 Cc:     <gregkh@linuxfoundation.org>, <sashal@kernel.org>,
@@ -41,21 +41,21 @@ Cc:     <gregkh@linuxfoundation.org>, <sashal@kernel.org>,
         <linux-kernel@vger.kernel.org>, <stable@vger.kernel.org>,
         <srivatsab@vmware.com>, <srivatsa@csail.mit.edu>,
         <vsirnapalli@vmware.com>
-Subject: Re: [PATCH v4.14.y 0/3] vfio: Fix for CVE-2020-12888
-Message-ID: <20200908082904.045ff744@w520.home>
-In-Reply-To: <1599509828-23596-4-git-send-email-akaher@vmware.com>
-References: <1599509828-23596-1-git-send-email-akaher@vmware.com>
-        <1599509828-23596-4-git-send-email-akaher@vmware.com>
+Subject: Re: [PATCH v4.9.y 0/3] vfio: Fix for CVE-2020-12888
+Message-ID: <20200908082906.6ceaa0b9@w520.home>
+In-Reply-To: <1599510917-23734-4-git-send-email-akaher@vmware.com>
+References: <1599510917-23734-1-git-send-email-akaher@vmware.com>
+        <1599510917-23734-4-git-send-email-akaher@vmware.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 8 Sep 2020 01:47:08 +0530
+On Tue, 8 Sep 2020 02:05:17 +0530
 Ajay Kaher <akaher@vmware.com> wrote:
 
 > CVE-2020-12888 Kernel: vfio: access to disabled MMIO space of some
@@ -82,15 +82,15 @@ Ajay Kaher <akaher@vmware.com> wrote:
 > Upstreamed patches link:
 > https://lore.kernel.org/kvm/158871401328.15589.17598154478222071285.stgit@gimli.home
 >         
-> [PATCH v4.14.y 1/3]:
+> [PATCH v4.9.y 1/3]:
 > Backporting of upsream commit 41311242221e:
 > vfio/type1: Support faulting PFNMAP vmas
 >         
-> [PATCH v4.14.y 2/3]:
+> [PATCH v4.9.y 2/3]:
 > Backporting of upsream commit 11c4cd07ba11:
 > vfio-pci: Fault mmaps to enable vma tracking
 >         
-> [PATCH v4.14.y 3/3]:
+> [PATCH v4.9.y 3/3]:
 > Backporting of upsream commit abafbc551fdd:
 > vfio-pci: Invalidate mmaps and block MMIO access on disabled memory
 > 
