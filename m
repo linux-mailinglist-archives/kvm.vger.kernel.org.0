@@ -2,177 +2,164 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8501626106D
-	for <lists+kvm@lfdr.de>; Tue,  8 Sep 2020 13:06:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 41DE526127C
+	for <lists+kvm@lfdr.de>; Tue,  8 Sep 2020 16:17:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729210AbgIHLGE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 8 Sep 2020 07:06:04 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:41568 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1729538AbgIHLBb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 8 Sep 2020 07:01:31 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1599562889;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=j8FrwxyoS3UOPyBBrpb+SxDIPN8JxjKtNQqfng3d1cU=;
-        b=En7u8b6qSZhI0g/rqL/UwJH2875C5eti2iyfIiZu8Z/HhOC7IAef5v0T6FzahwHe30ZyxY
-        PWr/bE6hKMORWGK4F0HcfRHtmjyPlBCAa/YOtiuQEQnmIc6z97ptqpHhHUoFwBqPXUcNXy
-        25ZHPxInLEIwpJfaDJ5lznckqICv4jY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-148-cgHk6IHIN264oiUSOu8L1w-1; Tue, 08 Sep 2020 07:01:27 -0400
-X-MC-Unique: cgHk6IHIN264oiUSOu8L1w-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4A5A110BBECD;
-        Tue,  8 Sep 2020 11:01:26 +0000 (UTC)
-Received: from gondolin (ovpn-112-243.ams2.redhat.com [10.36.112.243])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 6DBBC27CC2;
-        Tue,  8 Sep 2020 11:01:20 +0000 (UTC)
-Date:   Tue, 8 Sep 2020 13:01:17 +0200
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Janosch Frank <frankja@linux.ibm.com>
-Cc:     kvm@vger.kernel.org, borntraeger@de.ibm.com,
-        imbrenda@linux.ibm.com, david@redhat.com,
-        linux-s390@vger.kernel.org
-Subject: Re: [PATCH v3] KVM: s390: Introduce storage key removal facility
-Message-ID: <20200908130117.1a8fd4ea.cohuck@redhat.com>
-In-Reply-To: <20200908100249.23150-1-frankja@linux.ibm.com>
-References: <20200908100249.23150-1-frankja@linux.ibm.com>
-Organization: Red Hat GmbH
+        id S1730083AbgIHORe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 8 Sep 2020 10:17:34 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:10952 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1728975AbgIHOQu (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 8 Sep 2020 10:16:50 -0400
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 088D3Olg133343;
+        Tue, 8 Sep 2020 09:05:13 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : in-reply-to : references : mime-version :
+ content-transfer-encoding; s=pp1;
+ bh=rdyzONfAjlQKywvb8PXpfSL9Mb1tE/stNvI+MMrDpDE=;
+ b=IOP7gFXWoXksOBcYP2rJa1AZF3ddyycLv23cdx1zvHGrylPNgEz3s188ugQIW4eBEho2
+ IXVNm5VaIgTbk3m9vBZLg9qzUoCQzPZaRSat891QIyZbw5hkI0aocNb3XiEoVnfeMf53
+ +wVPWW21tIu/79xnAxoPu+85eXCRZKCd6KKZflsBoeuSjIzRB5/NWoHKRu0DDS+5CYn8
+ /3Rea0fH6qOEKRZVUbaqkyshpo5ylfF/OtE72cd+y46tKmveaNPhs/35I6NJxEZmbSnM
+ cJFD/DRniiws2jXLWzTFUQYb1tEKlLoiNPfZ4zH7v+332UxaHXGWSX0cPcShmLvpeueq 1A== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 33ea0c96st-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 08 Sep 2020 09:05:12 -0400
+Received: from m0098393.ppops.net (m0098393.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 088D4dP2139018;
+        Tue, 8 Sep 2020 09:05:12 -0400
+Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 33ea0c96rb-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 08 Sep 2020 09:05:12 -0400
+Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
+        by ppma03fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 088Cw9al030320;
+        Tue, 8 Sep 2020 13:05:10 GMT
+Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
+        by ppma03fra.de.ibm.com with ESMTP id 33c2a8a468-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 08 Sep 2020 13:05:09 +0000
+Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
+        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 088D57EI62521774
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 8 Sep 2020 13:05:07 GMT
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 2283F11C04C;
+        Tue,  8 Sep 2020 13:05:07 +0000 (GMT)
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 3F9C911C052;
+        Tue,  8 Sep 2020 13:05:06 +0000 (GMT)
+Received: from linux01.pok.stglabs.ibm.com (unknown [9.114.17.81])
+        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Tue,  8 Sep 2020 13:05:06 +0000 (GMT)
+From:   Janosch Frank <frankja@linux.ibm.com>
+To:     linux-s390@vger.kernel.org
+Cc:     borntraeger@de.ibm.com, gor@linux.ibm.com, imbrenda@linux.ibm.com,
+        kvm@vger.kernel.org, david@redhat.com, hca@linux.ibm.com,
+        cohuck@redhat.com, thuth@redhat.com
+Subject: [PATCH v3] s390x: Add 3f program exception handler
+Date:   Tue,  8 Sep 2020 09:05:04 -0400
+Message-Id: <20200908130504.24641-1-frankja@linux.ibm.com>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20200908075337.GA9170@osiris>
+References: <20200908075337.GA9170@osiris>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
+ definitions=2020-09-08_06:2020-09-08,2020-09-08 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 spamscore=0
+ bulkscore=0 lowpriorityscore=0 malwarescore=0 priorityscore=1501
+ suspectscore=1 phishscore=0 impostorscore=0 mlxscore=0 mlxlogscore=999
+ clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2006250000 definitions=main-2009080123
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue,  8 Sep 2020 06:02:49 -0400
-Janosch Frank <frankja@linux.ibm.com> wrote:
+Program exception 3f (secure storage violation) can only be detected
+when the CPU is running in SIE with a format 4 state description,
+e.g. running a protected guest. Because of this and because user
+space partly controls the guest memory mapping and can trigger this
+exception, we want to send a SIGSEGV to the process running the guest
+and not panic the kernel.
 
-> The storage key removal facility makes skey related instructions
-> result in special operation program exceptions. It is based on the
-> Keyless Subset Facility.
-> 
-> The usual suspects are iske, sske, rrbe and their respective
-> variants. lpsw(e), pfmf and tprot can also specify a key and essa with
-> an ORC of 4 will consult the change bit, hence they all result in
-> exceptions.
-> 
-> Unfortunately storage keys were so essential to the architecture, that
-> there is no facility bit that we could deactivate. That's why the
-> removal facility (bit 169) was introduced which makes it necessary,
-> that, if active, the skey related facilities 10, 14, 66, 145 and 149
-> are zero. Managing this requirement and migratability has to be done
-> in userspace, as KVM does not check the facilities it receives to be
-> able to easily implement userspace emulation.
-> 
-> Removing storage key support allows us to circumvent complicated
-> emulation code and makes huge page support tremendously easier.
-> 
-> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
-> ---
-> 
-> v3:
-> 	* Put kss handling into own function
-> 	* Removed some unneeded catch statements and converted others to ifs
-> 
-> v2:
-> 	* Removed the likely
-> 	* Updated and re-shuffeled the comments which had the wrong information
-> 
-> ---
->  arch/s390/kvm/intercept.c | 34 +++++++++++++++++++++++++++++++++-
->  arch/s390/kvm/kvm-s390.c  |  5 +++++
->  arch/s390/kvm/priv.c      | 26 +++++++++++++++++++++++---
->  3 files changed, 61 insertions(+), 4 deletions(-)
-> 
-> diff --git a/arch/s390/kvm/intercept.c b/arch/s390/kvm/intercept.c
-> index e7a7c499a73f..9c699c3fcf84 100644
-> --- a/arch/s390/kvm/intercept.c
-> +++ b/arch/s390/kvm/intercept.c
-> @@ -33,6 +33,7 @@ u8 kvm_s390_get_ilen(struct kvm_vcpu *vcpu)
->  	case ICPT_OPEREXC:
->  	case ICPT_PARTEXEC:
->  	case ICPT_IOINST:
-> +	case ICPT_KSS:
->  		/* instruction only stored for these icptcodes */
->  		ilen = insn_length(vcpu->arch.sie_block->ipa >> 8);
->  		/* Use the length of the EXECUTE instruction if necessary */
-> @@ -531,6 +532,37 @@ static int handle_pv_notification(struct kvm_vcpu *vcpu)
->  	return handle_instruction(vcpu);
->  }
->  
-> +static int handle_kss(struct kvm_vcpu *vcpu)
-> +{
-> +	if (!test_kvm_facility(vcpu->kvm, 169))
-> +		return kvm_s390_skey_check_enable(vcpu);
-> +
-> +	/*
-> +	 * Storage key removal facility emulation.
-> +	 *
-> +	 * KSS is the same priority as an instruction
-> +	 * interception. Hence we need handling here
+Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+CC: <stable@vger.kernel.org> # 5.7+
+Fixes: 084ea4d611a3 ("s390/mm: add (non)secure page access exceptions handlers")
+Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+Acked-by: Christian Borntraeger <borntraeger@de.ibm.com>
+---
+ arch/s390/kernel/entry.h     |  1 +
+ arch/s390/kernel/pgm_check.S |  2 +-
+ arch/s390/mm/fault.c         | 20 ++++++++++++++++++++
+ 3 files changed, 22 insertions(+), 1 deletion(-)
 
-s/here/both here/ ?
-
-(I think you can also format this slightly wider, now that indentation
-is not so deep anymore.)
-
-> +	 * and in the instruction emulation code.
-> +	 *
-> +	 * KSS is nullifying (no psw forward), SKRF
-> +	 * issues suppressing SPECIAL OPS, so we need
-> +	 * to forward by hand.
-> +	 */
-> +	if  (vcpu->arch.sie_block->ipa == 0) {
-> +		/*
-> +		 * Interception caused by a key in a
-> +		 * exception new PSW mask. The guest
-> +		 * PSW has already been updated to the
-> +		 * non-valid PSW so we only need to
-> +		 * inject a PGM.
-> +		 */
-> +		return kvm_s390_inject_program_int(vcpu, PGM_SPECIFICATION);
-> +	}
-> +
-> +	kvm_s390_forward_psw(vcpu, kvm_s390_get_ilen(vcpu));
-> +	return kvm_s390_inject_program_int(vcpu, PGM_SPECIAL_OPERATION);
-> +}
-> +
->  int kvm_handle_sie_intercept(struct kvm_vcpu *vcpu)
->  {
->  	int rc, per_rc = 0;
-> @@ -565,7 +597,7 @@ int kvm_handle_sie_intercept(struct kvm_vcpu *vcpu)
->  		rc = handle_partial_execution(vcpu);
->  		break;
->  	case ICPT_KSS:
-> -		rc = kvm_s390_skey_check_enable(vcpu);
-> +		rc = handle_kss(vcpu);
->  		break;
->  	case ICPT_MCHKREQ:
->  	case ICPT_INT_ENABLE:
-
-(...)
-
-> @@ -257,7 +264,7 @@ static int handle_iske(struct kvm_vcpu *vcpu)
->  
->  	rc = try_handle_skey(vcpu);
->  	if (rc)
-> -		return rc != -EAGAIN ? rc : 0;
-> +		return (rc != -EAGAIN || rc != -EOPNOTSUPP) ? rc : 0;
-
-As noticed by David, this probably needs to be &&, or maybe flipped to
-
-		return (rc == -EAGAIN || rc == -EOPNOTSUPP) ? 0 : rc;
-
->  
->  	kvm_s390_get_regs_rre(vcpu, &reg1, &reg2);
->  
+diff --git a/arch/s390/kernel/entry.h b/arch/s390/kernel/entry.h
+index faca269d5f27..a44ddc2f2dec 100644
+--- a/arch/s390/kernel/entry.h
++++ b/arch/s390/kernel/entry.h
+@@ -26,6 +26,7 @@ void do_protection_exception(struct pt_regs *regs);
+ void do_dat_exception(struct pt_regs *regs);
+ void do_secure_storage_access(struct pt_regs *regs);
+ void do_non_secure_storage_access(struct pt_regs *regs);
++void do_secure_storage_violation(struct pt_regs *regs);
+ 
+ void addressing_exception(struct pt_regs *regs);
+ void data_exception(struct pt_regs *regs);
+diff --git a/arch/s390/kernel/pgm_check.S b/arch/s390/kernel/pgm_check.S
+index 2c27907a5ffc..9a92638360ee 100644
+--- a/arch/s390/kernel/pgm_check.S
++++ b/arch/s390/kernel/pgm_check.S
+@@ -80,7 +80,7 @@ PGM_CHECK(do_dat_exception)		/* 3b */
+ PGM_CHECK_DEFAULT			/* 3c */
+ PGM_CHECK(do_secure_storage_access)	/* 3d */
+ PGM_CHECK(do_non_secure_storage_access)	/* 3e */
+-PGM_CHECK_DEFAULT			/* 3f */
++PGM_CHECK(do_secure_storage_violation)	/* 3f */
+ PGM_CHECK(monitor_event_exception)	/* 40 */
+ PGM_CHECK_DEFAULT			/* 41 */
+ PGM_CHECK_DEFAULT			/* 42 */
+diff --git a/arch/s390/mm/fault.c b/arch/s390/mm/fault.c
+index 4c8c063bce5b..996884dcc9fd 100644
+--- a/arch/s390/mm/fault.c
++++ b/arch/s390/mm/fault.c
+@@ -859,6 +859,21 @@ void do_non_secure_storage_access(struct pt_regs *regs)
+ }
+ NOKPROBE_SYMBOL(do_non_secure_storage_access);
+ 
++void do_secure_storage_violation(struct pt_regs *regs)
++{
++	/*
++	 * Either KVM messed up the secure guest mapping or the same
++	 * page is mapped into multiple secure guests.
++	 *
++	 * This exception is only triggered when a guest 2 is running
++	 * and can therefore never occur in kernel context.
++	 */
++	printk_ratelimited(KERN_WARNING
++			   "Secure storage violation in task: %s, pid %d\n",
++			   current->comm, current->pid);
++	send_sig(SIGSEGV, current, 0);
++}
++
+ #else
+ void do_secure_storage_access(struct pt_regs *regs)
+ {
+@@ -869,4 +884,9 @@ void do_non_secure_storage_access(struct pt_regs *regs)
+ {
+ 	default_trap_handler(regs);
+ }
++
++void do_secure_storage_violation(struct pt_regs *regs)
++{
++	default_trap_handler(regs);
++}
+ #endif
+-- 
+2.25.1
 
