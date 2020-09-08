@@ -2,77 +2,76 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E42CF260B10
-	for <lists+kvm@lfdr.de>; Tue,  8 Sep 2020 08:39:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B10A7260B51
+	for <lists+kvm@lfdr.de>; Tue,  8 Sep 2020 08:55:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728776AbgIHGjx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 8 Sep 2020 02:39:53 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:25740 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1728115AbgIHGjw (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 8 Sep 2020 02:39:52 -0400
+        id S1729139AbgIHGzk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 8 Sep 2020 02:55:40 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:38768 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1728479AbgIHGzi (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 8 Sep 2020 02:55:38 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1599547191;
+        s=mimecast20190719; t=1599548137;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=rsoJDQwHbzc2FzKEG0oCLi6Fz8Nuu83Q3N2T5Y49xnI=;
-        b=cd6Bvypm/lgac278swJD1bRnFeiX9vLA03Cvg2j7VQ0ZfecLTEhnI8ALPqSWz5LpjTBEMo
-        MJV6ts5BVO6yuZ4dQ7OQIWRwtkRHyA5IFqqISn9SCh12l+XGblpsaIhGr09bkSVL+jtbVK
-        7ifY5JcLWhWriZpaukkgivkfBztPENo=
+        bh=ZJLwkK7lK8i/QhLFQOeO0BZqdoTLdZuycajPAvv67h8=;
+        b=W6ntvBrX6manAD/ddopIS6GkzdiEU+uTgCNZNLpeLHkorai7pV3Lcg9HyuyEeJRq8z1owV
+        NsjU0WY4HQisCkc+owfStKebgToIKW9Grvg7WvfK3YXuRCxckaA/qL4dDYGYjLp300VquJ
+        /+9j7mIuUe8MD/E151DGVG6Vzd6dkx8=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-505-x0lSHKwiNkWjOzRbOYRvKg-1; Tue, 08 Sep 2020 02:39:46 -0400
-X-MC-Unique: x0lSHKwiNkWjOzRbOYRvKg-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+ us-mta-256-TwQ8Aw_uOUmrRmno2GWVaA-1; Tue, 08 Sep 2020 02:55:35 -0400
+X-MC-Unique: TwQ8Aw_uOUmrRmno2GWVaA-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B5988800688;
-        Tue,  8 Sep 2020 06:39:44 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5A4F7801AC2;
+        Tue,  8 Sep 2020 06:55:32 +0000 (UTC)
 Received: from gondolin (ovpn-112-243.ams2.redhat.com [10.36.112.243])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 493B927BCD;
-        Tue,  8 Sep 2020 06:39:40 +0000 (UTC)
-Date:   Tue, 8 Sep 2020 08:39:37 +0200
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 93DDC838A6;
+        Tue,  8 Sep 2020 06:55:25 +0000 (UTC)
+Date:   Tue, 8 Sep 2020 08:55:21 +0200
 From:   Cornelia Huck <cohuck@redhat.com>
-To:     Janosch Frank <frankja@linux.ibm.com>
-Cc:     linux-s390@vger.kernel.org, borntraeger@de.ibm.com,
-        gor@linux.ibm.com, imbrenda@linux.ibm.com, kvm@vger.kernel.org,
-        david@redhat.com, hca@linux.ibm.com
-Subject: Re: [PATCH v2 2/2] s390x: Add 3f program exception handler
-Message-ID: <20200908083937.5eae4a4b.cohuck@redhat.com>
-In-Reply-To: <20200907124700.10374-3-frankja@linux.ibm.com>
-References: <20200907124700.10374-1-frankja@linux.ibm.com>
-        <20200907124700.10374-3-frankja@linux.ibm.com>
+To:     Halil Pasic <pasic@linux.ibm.com>
+Cc:     Pierre Morel <pmorel@linux.ibm.com>, linux-kernel@vger.kernel.org,
+        borntraeger@de.ibm.com, frankja@linux.ibm.com, mst@redhat.com,
+        jasowang@redhat.com, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, thomas.lendacky@amd.com,
+        david@gibson.dropbear.id.au, linuxram@us.ibm.com,
+        hca@linux.ibm.com, gor@linux.ibm.com
+Subject: Re: [PATCH v11 0/2] s390: virtio: let arch validate VIRTIO features
+Message-ID: <20200908085521.4db22680.cohuck@redhat.com>
+In-Reply-To: <20200908003951.233e47f3.pasic@linux.ibm.com>
+References: <1599471547-28631-1-git-send-email-pmorel@linux.ibm.com>
+        <20200908003951.233e47f3.pasic@linux.ibm.com>
 Organization: Red Hat GmbH
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon,  7 Sep 2020 08:47:00 -0400
-Janosch Frank <frankja@linux.ibm.com> wrote:
+On Tue, 8 Sep 2020 00:39:51 +0200
+Halil Pasic <pasic@linux.ibm.com> wrote:
 
-> Program exception 3f (secure storage violation) can only be detected
-> when the CPU is running in SIE with a format 4 state description,
-> e.g. running a protected guest. Because of this and because user
-> space partly controls the guest memory mapping and can trigger this
-> exception, we want to send a SIGSEGV to the process running the guest
-> and not panic the kernel.
+> On Mon,  7 Sep 2020 11:39:05 +0200
+> Pierre Morel <pmorel@linux.ibm.com> wrote:
 > 
-> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
-> CC: <stable@vger.kernel.org> # 5.7+
-> Fixes: 084ea4d611a3 ("s390/mm: add (non)secure page access exceptions handlers")
-> Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
-> Acked-by: Christian Borntraeger <borntraeger@de.ibm.com>
-> ---
->  arch/s390/kernel/pgm_check.S |  2 +-
->  arch/s390/mm/fault.c         | 20 ++++++++++++++++++++
->  2 files changed, 21 insertions(+), 1 deletion(-)
+> > Hi all,
+> > 
+> > The goal of the series is to give a chance to the architecture
+> > to validate VIRTIO device features.  
+> 
+> Michael, is this going in via your tree?
+> 
 
-Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+I believe Michael's tree is the right place for this, but I can also
+queue it if I get an ack on patch 1.
 
