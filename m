@@ -2,98 +2,98 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 345DD26346E
-	for <lists+kvm@lfdr.de>; Wed,  9 Sep 2020 19:20:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D4F09263479
+	for <lists+kvm@lfdr.de>; Wed,  9 Sep 2020 19:21:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730287AbgIIRU2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 9 Sep 2020 13:20:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36472 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730889AbgIIRUM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 9 Sep 2020 13:20:12 -0400
-Received: from ms.lwn.net (ms.lwn.net [IPv6:2600:3c01:e000:3a1::42])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EAD02C061573;
-        Wed,  9 Sep 2020 10:20:11 -0700 (PDT)
-Received: from lwn.net (localhost [127.0.0.1])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ms.lwn.net (Postfix) with ESMTPSA id BDBD037C;
-        Wed,  9 Sep 2020 17:20:09 +0000 (UTC)
-Date:   Wed, 9 Sep 2020 11:20:08 -0600
-From:   Jonathan Corbet <corbet@lwn.net>
-To:     Connor Kuehl <ckuehl@redhat.com>
-Cc:     pbonzini@redhat.com, kvm@vger.kernel.org,
-        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] docs: kvm: fix referenced ioctl symbol
-Message-ID: <20200909112008.23859385@lwn.net>
-In-Reply-To: <20200819211952.251984-1-ckuehl@redhat.com>
-References: <20200819211952.251984-1-ckuehl@redhat.com>
-Organization: LWN.net
+        id S1728297AbgIIRVB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 9 Sep 2020 13:21:01 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:31990 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1725772AbgIIRUv (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 9 Sep 2020 13:20:51 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1599672049;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=SQhMq/j8wv9M8NJ35HTtp9bCIMUSj7eRfqejEmxcMqo=;
+        b=cLeWxLFHejbF+RskiKFjQm/8TACiJfE7HL2FSTzU/7GRTmlV3MV+oAB+NQJ9pLAA/+tGzP
+        ydIkRKQ6HxMRE0ClcPVE6bOnqvOpdjN8371zvmnxK4aiW3N8NrEO959vnq8ffnuIVT2GhF
+        utAPRMgXM9mfYz1DexaoRUGycNf0z+Q=
+Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
+ [209.85.208.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-105-XhkHZIIDMxiWou3VSwcqGQ-1; Wed, 09 Sep 2020 13:20:47 -0400
+X-MC-Unique: XhkHZIIDMxiWou3VSwcqGQ-1
+Received: by mail-ed1-f71.google.com with SMTP id d13so1294768edz.18
+        for <kvm@vger.kernel.org>; Wed, 09 Sep 2020 10:20:47 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=SQhMq/j8wv9M8NJ35HTtp9bCIMUSj7eRfqejEmxcMqo=;
+        b=pCUOFmrbDokntcFsArvpA2+Zskbs4Oqpdbnv6cVLBR0lU8DPcFE8SS9Dy1MWQRr5eh
+         yXdkIElibpsdPVz0acli1+qewywxj7OcEhDkkqKK/+8CLU8+TO0pZBA4mWFtJtLDFmRA
+         IP1GhJif2QoBYiPCS4S4iFzNHC3Kj7xSIsS4pH8cGL/SaY2MIp41dHf9bJTUArpgaIsi
+         zAcswsBP0gslQiN2dXpvukk20hAAtckYRCJ0BxmjSLbwJCBekLk84DAwzlTYQ52A8Sk4
+         MYp7gwO6MaJal18OseGHW8ii9UMBKFDXDdZTUn+bToBHfp17gSAAJJ0aotIb2BQHBdkZ
+         ONHg==
+X-Gm-Message-State: AOAM530LVdTIvq6BdF06+AkmFsOHXLetgHlAUOwKQtqQnDvvqGXvYc/2
+        vTRVWPs2JDohE/VSHxNNwg9aCGJJl7YO0YaHAtXJc8lJZZqnbQRmdwVzamjiwMx8eVZlXQXi/Hj
+        KpzEBdSYhr6DG
+X-Received: by 2002:a17:906:341b:: with SMTP id c27mr4649988ejb.286.1599672045702;
+        Wed, 09 Sep 2020 10:20:45 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyR0JhfniAOR3Q+4CaV0GSjjn8Qc/IDCqbAtZUAVgDJOvsx1CXOnPyuh1xtlTC2wLiQ4Me5wg==
+X-Received: by 2002:a17:906:341b:: with SMTP id c27mr4649973ejb.286.1599672045510;
+        Wed, 09 Sep 2020 10:20:45 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:37de:1d96:8ea2:b59a? ([2001:b07:6468:f312:37de:1d96:8ea2:b59a])
+        by smtp.gmail.com with ESMTPSA id b13sm3229274edf.89.2020.09.09.10.20.44
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 09 Sep 2020 10:20:44 -0700 (PDT)
+Subject: Re: [GIT PULL] KVM/arm64 fixes for 5.9
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     Alexandru Elisei <alexandru.elisei@arm.com>,
+        Andrew Jones <drjones@redhat.com>,
+        Eric Auger <eric.auger@redhat.com>,
+        Gavin Shan <gshan@redhat.com>,
+        Steven Price <steven.price@arm.com>, kernel-team@android.com,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org
+References: <20200904104530.1082676-1-maz@kernel.org>
+ <f7afbf0f-2e14-2720-5d23-2cd01982e4d1@redhat.com>
+ <fea2e35a29967075e46d25220044c109@kernel.org>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <8cba9da1-d2f4-efad-358d-92c510e9d05f@redhat.com>
+Date:   Wed, 9 Sep 2020 19:20:48 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <fea2e35a29967075e46d25220044c109@kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 19 Aug 2020 16:19:52 -0500
-Connor Kuehl <ckuehl@redhat.com> wrote:
+On 09/09/20 19:15, Marc Zyngier wrote:
+> On 2020-09-09 16:20, Paolo Bonzini wrote:
+>> On 04/09/20 12:45, Marc Zyngier wrote:
+>>> Hi Paolo,
+>>>
+>>> Here's a bunch of fixes for 5.9. The gist of it is the stolen time
+>>> rework from Andrew, but we also have a couple of MM fixes that have
+>>> surfaced as people have started to use hugetlbfs in anger.
+>>
+>> Hi Marc,
+>>
+>> I'll get to this next Friday.
+> 
+> Thanks. I may have another one for you by then though...
 
-> The actual symbol that is exported and usable is
-> 'KVM_MEMORY_ENCRYPT_OP', not 'KVM_MEM_ENCRYPT_OP'
-> 
-> $ git grep -l KVM_MEM_ENCRYPT_OP
-> Documentation/virt/kvm/amd-memory-encryption.rst
-> 
-> $ git grep -l KVM_MEMORY_ENCRYPT_OP
-> Documentation/virt/kvm/api.rst
-> arch/x86/kvm/x86.c
-> include/uapi/linux/kvm.h
-> tools/include/uapi/linux/kvm.h
-> 
-> While we're in there, update the KVM API category for
-> KVM_MEMORY_ENCRYPT_OP. It is called on a VM file descriptor.
-> 
-> Signed-off-by: Connor Kuehl <ckuehl@redhat.com>
-> ---
->  Documentation/virt/kvm/amd-memory-encryption.rst | 6 +++---
->  Documentation/virt/kvm/api.rst                   | 2 +-
->  2 files changed, 4 insertions(+), 4 deletions(-)
-> 
-> diff --git a/Documentation/virt/kvm/amd-memory-encryption.rst b/Documentation/virt/kvm/amd-memory-encryption.rst
-> index 2d44388438cc..09a8f2a34e39 100644
-> --- a/Documentation/virt/kvm/amd-memory-encryption.rst
-> +++ b/Documentation/virt/kvm/amd-memory-encryption.rst
-> @@ -53,11 +53,11 @@ key management interface to perform common hypervisor activities such as
->  encrypting bootstrap code, snapshot, migrating and debugging the guest. For more
->  information, see the SEV Key Management spec [api-spec]_
->  
-> -The main ioctl to access SEV is KVM_MEM_ENCRYPT_OP.  If the argument
-> -to KVM_MEM_ENCRYPT_OP is NULL, the ioctl returns 0 if SEV is enabled
-> +The main ioctl to access SEV is KVM_MEMORY_ENCRYPT_OP.  If the argument
-> +to KVM_MEMORY_ENCRYPT_OP is NULL, the ioctl returns 0 if SEV is enabled
->  and ``ENOTTY` if it is disabled (on some older versions of Linux,
->  the ioctl runs normally even with a NULL argument, and therefore will
-> -likely return ``EFAULT``).  If non-NULL, the argument to KVM_MEM_ENCRYPT_OP
-> +likely return ``EFAULT``).  If non-NULL, the argument to KVM_MEMORY_ENCRYPT_OP
->  must be a struct kvm_sev_cmd::
->  
->         struct kvm_sev_cmd {
-> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-> index eb3a1316f03e..506c8426c583 100644
-> --- a/Documentation/virt/kvm/api.rst
-> +++ b/Documentation/virt/kvm/api.rst
-> @@ -4211,7 +4211,7 @@ H_GET_CPU_CHARACTERISTICS hypercall.
->  
->  :Capability: basic
->  :Architectures: x86
-> -:Type: system
-> +:Type: vm
->  :Parameters: an opaque platform specific structure (in/out)
->  :Returns: 0 on success; -1 on error
->  
-So this appears to have fallen through the cracks.  It looks correct to
-me, so I've applied it, thanks.
+Sure, you can choose whether to send a separate tag or update this one.
 
-jon
+Paolo
+
