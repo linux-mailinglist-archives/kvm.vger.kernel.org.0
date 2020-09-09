@@ -2,120 +2,142 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8799E262AE4
-	for <lists+kvm@lfdr.de>; Wed,  9 Sep 2020 10:49:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 87356262B47
+	for <lists+kvm@lfdr.de>; Wed,  9 Sep 2020 11:05:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729940AbgIIIto (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 9 Sep 2020 04:49:44 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:42378 "EHLO
+        id S1726535AbgIIJFE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 9 Sep 2020 05:05:04 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:23366 "EHLO
         us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726970AbgIIItk (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 9 Sep 2020 04:49:40 -0400
+        by vger.kernel.org with ESMTP id S1726005AbgIIJFC (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 9 Sep 2020 05:05:02 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1599641372;
+        s=mimecast20190719; t=1599642300;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=RM/LF0srW4X3w0qE/H6ifSe+v4B7qiyXGdZqizH3L+s=;
-        b=H8iGUdYrF3XoUuCTyCUd5SUhnNVv4svnwxK0sIht5Nf8XPa9N70jdzvMFMoTBElW7eHQY3
-        ThzncNTmiAe9JmRPpKNe4/4r/E2+iIc5f/pZlnaZYM8F3IC0ENpgKYWCOmzI9c2MBdHJtf
-        CYg3ngdQJZwuBNTPdevxLkWKnA92cLo=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-451-D5eT25nFPj--u3E4QxV7Bg-1; Wed, 09 Sep 2020 04:49:30 -0400
-X-MC-Unique: D5eT25nFPj--u3E4QxV7Bg-1
-Received: by mail-wr1-f69.google.com with SMTP id l15so709562wro.10
-        for <kvm@vger.kernel.org>; Wed, 09 Sep 2020 01:49:30 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=RM/LF0srW4X3w0qE/H6ifSe+v4B7qiyXGdZqizH3L+s=;
-        b=Tyr0txxbo0s4J6ONH8JF62526+nRzVpISG46l09udwPVvHlEf1RFTpkZJrjpkk1VpM
-         QEMLll7TBPLZrbDrXz02ylV+cLyoywBtYmqUYeCccTGYhUMTKtaUij3jXmwiV9RcbVqv
-         lTFFGrlZCxzm9jQAJy1uFLBD7qf/uQzXpc4ACuAmTJSsjzqqJ1AhWRBhizX807oayMH6
-         9/vS432a5RgXlnaEB0X5m59DgX+joXz8io4d4yUtbvJanyqz9NSoz5sSzN7vfJYeZ1PB
-         2U7OjCk1YzpSdUxCm23Rk/2fgL+qcRb3FZBZxqLsSu8s95mpSslLj7z19H4EFlUmjnxH
-         cxaA==
-X-Gm-Message-State: AOAM5311DpDx2Zga3N8kli1ZzgQj24L1wCDc0EQFab8X2VQgOLDiwi3K
-        D+Kjj29op9eS4CHETiZMVAd+ePAj+DDhuoIfmEGzCol2tMurnMestgCT7TdQfXsTZTNp8Arg63a
-        WjBsCPNReuIa/
-X-Received: by 2002:a1c:4886:: with SMTP id v128mr2482471wma.139.1599641369238;
-        Wed, 09 Sep 2020 01:49:29 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwVrt9E41zVOwgEplo9t65ZeLxuldO4N393d7CEJUl6gRJybBJn8cvLjZG3Ri7WzFS5QyNjBA==
-X-Received: by 2002:a1c:4886:: with SMTP id v128mr2482449wma.139.1599641369042;
-        Wed, 09 Sep 2020 01:49:29 -0700 (PDT)
-Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id f6sm3504275wme.32.2020.09.09.01.49.27
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 09 Sep 2020 01:49:28 -0700 (PDT)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Ingo Molnar <mingo@kernel.org>
-Cc:     kvm@vger.kernel.org, x86@kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Andy Lutomirski <luto@kernel.org>
-Subject: Re: [PATCH 2/2] x86/kvm: don't forget to ACK async PF IRQ
-In-Reply-To: <20200909081613.GB2446260@gmail.com>
-References: <20200908135350.355053-1-vkuznets@redhat.com> <20200908135350.355053-3-vkuznets@redhat.com> <20200909081613.GB2446260@gmail.com>
-Date:   Wed, 09 Sep 2020 10:49:27 +0200
-Message-ID: <878sdjmj1k.fsf@vitty.brq.redhat.com>
+        bh=hF5FRl4+JcryV02oF186NMbYpd31+bm49DOKtjwi4hY=;
+        b=EuKjP4Bik2uY4odDElNYbeGUW0DPbllAAM7UcoMUbUdygvY20FZtZp3Bo22l+aUFX9uS1L
+        jTx5sp310zVYVq+jsnzdAuRFCyLBCxyqWBRiVZjqwLyZ5aP4hvBdInUcDzrIMlz/CoaRTH
+        QCNGu1MaAzFwTX1py7woIZ2o909k+1E=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-288-S9pHHcnKP2GaTHqVUgeIEg-1; Wed, 09 Sep 2020 05:04:56 -0400
+X-MC-Unique: S9pHHcnKP2GaTHqVUgeIEg-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CD4A21DDFF;
+        Wed,  9 Sep 2020 09:04:55 +0000 (UTC)
+Received: from [10.72.12.24] (ovpn-12-24.pek2.redhat.com [10.72.12.24])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id AE09946;
+        Wed,  9 Sep 2020 09:04:47 +0000 (UTC)
+Subject: Re: [PATCH] vhost_vdpa: remove unnecessary spin_lock in
+ vhost_vring_call
+To:     Zhu Lingshan <lingshan.zhu@intel.com>, mst@redhat.com
+Cc:     virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        kvm@vger.kernel.org
+References: <20200909065234.3313-1-lingshan.zhu@intel.com>
+From:   Jason Wang <jasowang@redhat.com>
+Message-ID: <a7035d50-04e4-714a-e4aa-03872b939827@redhat.com>
+Date:   Wed, 9 Sep 2020 17:04:45 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <20200909065234.3313-1-lingshan.zhu@intel.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Ingo Molnar <mingo@kernel.org> writes:
 
-> * Vitaly Kuznetsov <vkuznets@redhat.com> wrote:
+On 2020/9/9 下午2:52, Zhu Lingshan wrote:
+> This commit removed unnecessary spin_locks in vhost_vring_call
+> and related operations. Because we manipulate irq offloading
+> contents in vhost_vdpa ioctl code path which is already
+> protected by dev mutex and vq mutex.
 >
->> Merge commit 26d05b368a5c0 ("Merge branch 'kvm-async-pf-int' into HEAD")
->> tried to adapt the new interrupt based async PF mechanism to the newly
->> introduced IDTENTRY magic but unfortunately it missed the fact that
->> DEFINE_IDTENTRY_SYSVEC() doesn't call ack_APIC_irq() on its own and
->> all DEFINE_IDTENTRY_SYSVEC() users have to call it manually.
->> 
->> As the result all multi-CPU KVM guest hang on boot when
->> KVM_FEATURE_ASYNC_PF_INT is present. The breakage went unnoticed because no
->> KVM userspace (e.g. QEMU) currently set it (and thus async PF mechanism
->> is currently disabled) but we're about to change that.
->> 
->> Fixes: 26d05b368a5c0 ("Merge branch 'kvm-async-pf-int' into HEAD")
->> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
->
-> This also fixes a kvmtool regression, but interestingly it does not set 
-> KVM_FEATURE_ASYNC_PF_INT either AFAICS:
->
->   kepler:~/kvmtool.git> git grep KVM_FEATURE_ASYNC_PF_INT
->   kepler:~/kvmtool.git> 
+> Signed-off-by: Zhu Lingshan <lingshan.zhu@intel.com>
 
-My wild guess would be that kvmtool doesn't manually set any of the KVM
-PV features:
 
-[vitty@vitty kvmtool]$ git grep KVM_FEATURE_
-[vitty@vitty kvmtool]$ 
+Acked-by: Jason Wang <jasowang@redhat.com>
 
-it just blindly passes whatever it gets from KVM via
-KVM_GET_SUPPORTED_CPUID to KVM_SET_CPUID2 and KVM_FEATURE_ASYNC_PF_INT
-among other PV features is set there by default.
 
+> ---
+>   drivers/vhost/vdpa.c  | 8 +-------
+>   drivers/vhost/vhost.c | 3 ---
+>   drivers/vhost/vhost.h | 1 -
+>   3 files changed, 1 insertion(+), 11 deletions(-)
 >
->   kepler:~/kvmtool.git> grep url .git/config
-> 	url = https://git.kernel.org/pub/scm/linux/kernel/git/will/kvmtool.git
->
-> So either I missed the flag-setting in the kvmtools.git source, or maybe 
-> there's some other way to trigger this bug?
->
-> Anyway, please handle this as a v5.9 regression:
->
-> 	Tested-by: Ingo Molnar <mingo@kernel.org>
-
-Thanks!
-
--- 
-Vitaly
+> diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
+> index 3fab94f88894..bc679d0b7b87 100644
+> --- a/drivers/vhost/vdpa.c
+> +++ b/drivers/vhost/vdpa.c
+> @@ -97,26 +97,20 @@ static void vhost_vdpa_setup_vq_irq(struct vhost_vdpa *v, u16 qid)
+>   		return;
+>   
+>   	irq = ops->get_vq_irq(vdpa, qid);
+> -	spin_lock(&vq->call_ctx.ctx_lock);
+>   	irq_bypass_unregister_producer(&vq->call_ctx.producer);
+> -	if (!vq->call_ctx.ctx || irq < 0) {
+> -		spin_unlock(&vq->call_ctx.ctx_lock);
+> +	if (!vq->call_ctx.ctx || irq < 0)
+>   		return;
+> -	}
+>   
+>   	vq->call_ctx.producer.token = vq->call_ctx.ctx;
+>   	vq->call_ctx.producer.irq = irq;
+>   	ret = irq_bypass_register_producer(&vq->call_ctx.producer);
+> -	spin_unlock(&vq->call_ctx.ctx_lock);
+>   }
+>   
+>   static void vhost_vdpa_unsetup_vq_irq(struct vhost_vdpa *v, u16 qid)
+>   {
+>   	struct vhost_virtqueue *vq = &v->vqs[qid];
+>   
+> -	spin_lock(&vq->call_ctx.ctx_lock);
+>   	irq_bypass_unregister_producer(&vq->call_ctx.producer);
+> -	spin_unlock(&vq->call_ctx.ctx_lock);
+>   }
+>   
+>   static void vhost_vdpa_reset(struct vhost_vdpa *v)
+> diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
+> index b45519ca66a7..99f27ce982da 100644
+> --- a/drivers/vhost/vhost.c
+> +++ b/drivers/vhost/vhost.c
+> @@ -302,7 +302,6 @@ static void vhost_vring_call_reset(struct vhost_vring_call *call_ctx)
+>   {
+>   	call_ctx->ctx = NULL;
+>   	memset(&call_ctx->producer, 0x0, sizeof(struct irq_bypass_producer));
+> -	spin_lock_init(&call_ctx->ctx_lock);
+>   }
+>   
+>   static void vhost_vq_reset(struct vhost_dev *dev,
+> @@ -1637,9 +1636,7 @@ long vhost_vring_ioctl(struct vhost_dev *d, unsigned int ioctl, void __user *arg
+>   			break;
+>   		}
+>   
+> -		spin_lock(&vq->call_ctx.ctx_lock);
+>   		swap(ctx, vq->call_ctx.ctx);
+> -		spin_unlock(&vq->call_ctx.ctx_lock);
+>   		break;
+>   	case VHOST_SET_VRING_ERR:
+>   		if (copy_from_user(&f, argp, sizeof f)) {
+> diff --git a/drivers/vhost/vhost.h b/drivers/vhost/vhost.h
+> index 9032d3c2a9f4..486dcf371e06 100644
+> --- a/drivers/vhost/vhost.h
+> +++ b/drivers/vhost/vhost.h
+> @@ -64,7 +64,6 @@ enum vhost_uaddr_type {
+>   struct vhost_vring_call {
+>   	struct eventfd_ctx *ctx;
+>   	struct irq_bypass_producer producer;
+> -	spinlock_t ctx_lock;
+>   };
+>   
+>   /* The virtqueue structure describes a queue attached to a device. */
 
