@@ -2,108 +2,166 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E7DF6263A77
-	for <lists+kvm@lfdr.de>; Thu, 10 Sep 2020 04:30:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D9E8F263A3C
+	for <lists+kvm@lfdr.de>; Thu, 10 Sep 2020 04:24:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730154AbgIJCaD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 9 Sep 2020 22:30:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56440 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730484AbgIJC1a (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 9 Sep 2020 22:27:30 -0400
-Received: from mail-pf1-x444.google.com (mail-pf1-x444.google.com [IPv6:2607:f8b0:4864:20::444])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 488DEC061756
-        for <kvm@vger.kernel.org>; Wed,  9 Sep 2020 15:45:24 -0700 (PDT)
-Received: by mail-pf1-x444.google.com with SMTP id z19so3435267pfn.8
-        for <kvm@vger.kernel.org>; Wed, 09 Sep 2020 15:45:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=c5p8WBq1qtYrMuvvxqfHaHn+LepsJk3lGDjCppOmf40=;
-        b=KkNfWb46nCHMbeFpHEoN0CbeSeqN6bPdBtG/eCBoKkF5xrln8OHsk8sdUVWe6AVc+O
-         AhU2Crlxq9yZYcOelSde58riCYNYgoy/ey+O4+zsy5V2FekMCi7xlgOLeh6A7i/3kr2l
-         xqUYhCHu525mHAIUpJViw0XumMcql9dqFwXxWo4MADUdyyDsbOWvwOsackh9DPWljen3
-         hxO3NZriyaJav3J0+5HfkY3UYYEZv8WYs74R2ovvsgHgMVb2HuT5TKHLuZ6rQE8unlyn
-         ykQBizXIhC3iyqFaW+4RMpfD3u+SlgObF1nUTce/d7F7SFe60IWFX3YHaXRbM/KhPSbf
-         RKRA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=c5p8WBq1qtYrMuvvxqfHaHn+LepsJk3lGDjCppOmf40=;
-        b=iJPkELGeo6q/B0d8wfYt94BMYBYVcqa0pG7UO/zKk7ozN/uOrbAjw3GlCAI0AQe1RR
-         5HSL3JfaKyelBE11Ny5aAJ/mSp8I99xN27S1pUkxrTb5SlNsnYMQH/ADpALmFgPe5ZNT
-         x9NqHQXpS7mUUcYqfNZpSqzvAMAA85T3ChplxCMOmF/yE7Ga99WnOgZnW1OF2OOJdz80
-         xICAdF7SRfMHpC9NgNLYr+rdUbLssMdbMNRHf8SVrlH2W+xkvNSJCEeazEDyfEU06/IN
-         ks7PtB7q2KGdqHthGAXqPq6hVYRt+0Wu1bWbbyJNrkMw/O1I3lSyTdUqS+2lxVy5yYyM
-         As9w==
-X-Gm-Message-State: AOAM530w1Wp+wN/2HxgFU8syvufqMrcJLBstWKku79G7rbHCHeZT7UPw
-        UNLtv31e2Sqpcch6jNiq17Wxpw==
-X-Google-Smtp-Source: ABdhPJyLFnTKMqZCaScZAKIRwTEhSbQsApyF37uNABYJwF5hSOk5cB5ERfNlpt7X7bbBFCi4l+e1yA==
-X-Received: by 2002:a17:902:b686:: with SMTP id c6mr2834249pls.74.1599691523776;
-        Wed, 09 Sep 2020 15:45:23 -0700 (PDT)
-Received: from xps15 (S0106002369de4dac.cg.shawcable.net. [68.147.8.254])
-        by smtp.gmail.com with ESMTPSA id s66sm3668057pfc.159.2020.09.09.15.45.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 09 Sep 2020 15:45:23 -0700 (PDT)
-Date:   Wed, 9 Sep 2020 16:45:21 -0600
-From:   Mathieu Poirier <mathieu.poirier@linaro.org>
-To:     Guennadi Liakhovetski <guennadi.liakhovetski@linux.intel.com>
-Cc:     kvm@vger.kernel.org, linux-remoteproc@vger.kernel.org,
-        virtualization@lists.linux-foundation.org,
-        sound-open-firmware@alsa-project.org,
-        Pierre-Louis Bossart <pierre-louis.bossart@linux.intel.com>,
-        Liam Girdwood <liam.r.girdwood@linux.intel.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Ohad Ben-Cohen <ohad@wizery.com>,
-        Bjorn Andersson <bjorn.andersson@linaro.org>,
-        Vincent Whitchurch <vincent.whitchurch@axis.com>
-Subject: Re: [PATCH v5 3/4] rpmsg: update documentation
-Message-ID: <20200909224521.GC562265@xps15>
-References: <20200826174636.23873-1-guennadi.liakhovetski@linux.intel.com>
- <20200826174636.23873-4-guennadi.liakhovetski@linux.intel.com>
+        id S1730127AbgIJCYg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 9 Sep 2020 22:24:36 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:34188 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1730685AbgIJCIo (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 9 Sep 2020 22:08:44 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1599703717;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=9lUmVHlRg0jPhlantuCk3hiT6WHd/nIzITZFw+wGi90=;
+        b=ATCEs4iarH6CiAeGnelgL9WXp+fL2etKppxLdsXEkK3w42lMmjX0/VCN+huEfWEmHk89Po
+        IECVmvxKpbfW9a8Qm5FmV1BTnUuBABUEoiJCGU5hpUwxGqgRD+O6NOAlHQFB3p+Y/mc5vw
+        kRjxnA1JqRa5L+MaH+6hLuKSCW+bU48=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-381-PdjO5lmxOoqImIc6M2pBzA-1; Wed, 09 Sep 2020 19:07:52 -0400
+X-MC-Unique: PdjO5lmxOoqImIc6M2pBzA-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 97082801F98;
+        Wed,  9 Sep 2020 23:07:50 +0000 (UTC)
+Received: from w520.home (ovpn-112-71.phx2.redhat.com [10.3.112.71])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 209F57EED4;
+        Wed,  9 Sep 2020 23:07:48 +0000 (UTC)
+Date:   Wed, 9 Sep 2020 17:07:46 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Matthew Rosato <mjrosato@linux.ibm.com>
+Cc:     Bjorn Helgaas <helgaas@kernel.org>, bhelgaas@google.com,
+        schnelle@linux.ibm.com, pmorel@linux.ibm.com, mpe@ellerman.id.au,
+        oohall@gmail.com, cohuck@redhat.com, kevin.tian@intel.com,
+        linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, linux-pci@vger.kernel.org
+Subject: Re: [PATCH v4 1/3] PCI/IOV: Mark VFs as not implementing MSE bit
+Message-ID: <20200909170746.2286b83a@w520.home>
+In-Reply-To: <38f95349-237e-34e2-66ef-e626cd4aec25@linux.ibm.com>
+References: <20200903164117.GA312152@bjorn-Precision-5520>
+        <38f95349-237e-34e2-66ef-e626cd4aec25@linux.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200826174636.23873-4-guennadi.liakhovetski@linux.intel.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Aug 26, 2020 at 07:46:35PM +0200, Guennadi Liakhovetski wrote:
-> rpmsg_create_ept() takes struct rpmsg_channel_info chinfo as its last
-> argument, not a u32 value. The first two arguments are also updated.
-> 
-> Signed-off-by: Guennadi Liakhovetski <guennadi.liakhovetski@linux.intel.com>
-> ---
->  Documentation/rpmsg.txt | 6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
-> 
-> diff --git a/Documentation/rpmsg.txt b/Documentation/rpmsg.txt
-> index 24b7a9e1a5f9..1ce353cb232a 100644
-> --- a/Documentation/rpmsg.txt
-> +++ b/Documentation/rpmsg.txt
-> @@ -192,9 +192,9 @@ Returns 0 on success and an appropriate error value on failure.
->  
->  ::
->  
-> -  struct rpmsg_endpoint *rpmsg_create_ept(struct rpmsg_channel *rpdev,
-> -		void (*cb)(struct rpmsg_channel *, void *, int, void *, u32),
-> -		void *priv, u32 addr);
-> +  struct rpmsg_endpoint *rpmsg_create_ept(struct rpmsg_device *rpdev,
-> +					  rpmsg_rx_cb_t cb, void *priv,
-> +					  struct rpmsg_channel_info chinfo);
+On Thu, 3 Sep 2020 13:10:02 -0400
+Matthew Rosato <mjrosato@linux.ibm.com> wrote:
 
-Again I don't see this being used in this set...  It should have been sent on
-its own to the remoteproc and documentation mailing list.  Note that
-Documentation/rpmsg.txt is now Documentation/staging/rpmsg.rst
-
->  
->  every rpmsg address in the system is bound to an rx callback (so when
->  inbound messages arrive, they are dispatched by the rpmsg bus using the
-> -- 
-> 2.28.0
+> On 9/3/20 12:41 PM, Bjorn Helgaas wrote:
+> > On Wed, Sep 02, 2020 at 03:46:34PM -0400, Matthew Rosato wrote:  
+> >> Per the PCIe spec, VFs cannot implement the MSE bit
+> >> AKA PCI_COMMAND_MEMORY, and it must be hard-wired to 0.
+> >> Use a dev_flags bit to signify this requirement.  
+> > 
+> > This approach seems sensible to me, but
+> > 
+> >    - This is confusing because while the spec does not use "MSE" to
+> >      refer to the Command Register "Memory Space Enable" bit
+> >      (PCI_COMMAND_MEMORY), it *does* use "MSE" in the context of the
+> >      "VF MSE" bit, which is in the PF SR-IOV Capability.  But of
+> >      course, you're not talking about that here.  Maybe something like
+> >      this?
+> > 
+> >        For VFs, the Memory Space Enable bit in the Command Register is
+> >        hard-wired to 0.
+> > 
+> >        Add a dev_flags bit to signify devices where the Command
+> >        Register Memory Space Enable bit does not control the device's
+> >        response to MMIO accesses.  
 > 
+> Will do.  I'll change the usage of the MSE acronym in the other patches 
+> as well.
+> 
+> > 
+> >    - "PCI_DEV_FLAGS_FORCE_COMMAND_MEM" says something about how you
+> >      plan to *use* this, but I'd rather use a term that describes the
+> >      hardware, e.g., "PCI_DEV_FLAGS_NO_COMMAND_MEMORY".  
+> 
+> Sure, I will change.
+> 
+> > 
+> >    - How do we decide whether to use dev_flags vs a bitfield like
+> >      dev->is_virtfn?  The latter seems simpler unless there's a reason
+> >      to use dev_flags.  If there's a reason, maybe we could add a
+> >      comment at pci_dev_flags for future reference.
+> >   
+> 
+> Something like:
+> 
+> /*
+>   * Device does not implement PCI_COMMAND_MEMORY - this is true for any
+>   * device marked is_virtfn, but is also true for any VF passed-through
+>   * a lower-level hypervisor where emulation of the Memory Space Enable
+>   * bit was not provided.
+>   */
+> PCI_DEV_FLAGS_NO_COMMAND_MEMORY = (__force pci_dev_flags_t) (1 << 12),
+> 
+> ?
+> 
+> >    - Wrap the commit log to fill a 75-char line.  It's arbitrary, but
+> >      that's what I use for consistency.  
+> 
+> Sure, will do.  I'll roll up a new version once I have feedback from 
+> Alex on the vfio changes.
+
+The usage of MSE threw me a bit too, as Bjorn notes that's specific to
+the SR-IOV capability.  I think this also uncovers a latent bug in our
+calling of vfio_bar_restore(), it really doesn't do a good job of
+determining whether an enable bit is implemented, regardless of whether
+it's a VF or the device simply doesn't use that address space.  For
+example I imagine you could reproduce triggering a reset recovery on
+s390 by trying to write the VF command register to 1 with setpci from a
+guest (since you won't have is_virtfn to bail out of the recovery
+function).  I think we'll still need this dev_flag to differentiate
+unimplmented and enabled versus simply unimplemented to resolve that
+though, so the change looks ok to me. Thanks,
+
+Alex
+
+> >> Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
+> >> ---
+> >>   drivers/pci/iov.c   | 1 +
+> >>   include/linux/pci.h | 2 ++
+> >>   2 files changed, 3 insertions(+)
+> >>
+> >> diff --git a/drivers/pci/iov.c b/drivers/pci/iov.c
+> >> index b37e08c..2bec77c 100644
+> >> --- a/drivers/pci/iov.c
+> >> +++ b/drivers/pci/iov.c
+> >> @@ -180,6 +180,7 @@ int pci_iov_add_virtfn(struct pci_dev *dev, int id)
+> >>   	virtfn->device = iov->vf_device;
+> >>   	virtfn->is_virtfn = 1;
+> >>   	virtfn->physfn = pci_dev_get(dev);
+> >> +	virtfn->dev_flags |= PCI_DEV_FLAGS_FORCE_COMMAND_MEM;
+> >>   
+> >>   	if (id == 0)
+> >>   		pci_read_vf_config_common(virtfn);
+> >> diff --git a/include/linux/pci.h b/include/linux/pci.h
+> >> index 8355306..9316cce 100644
+> >> --- a/include/linux/pci.h
+> >> +++ b/include/linux/pci.h
+> >> @@ -227,6 +227,8 @@ enum pci_dev_flags {
+> >>   	PCI_DEV_FLAGS_NO_FLR_RESET = (__force pci_dev_flags_t) (1 << 10),
+> >>   	/* Don't use Relaxed Ordering for TLPs directed at this device */
+> >>   	PCI_DEV_FLAGS_NO_RELAXED_ORDERING = (__force pci_dev_flags_t) (1 << 11),
+> >> +	/* Device does not implement PCI_COMMAND_MEMORY (e.g. a VF) */
+> >> +	PCI_DEV_FLAGS_FORCE_COMMAND_MEM = (__force pci_dev_flags_t) (1 << 12),
+> >>   };
+> >>   
+> >>   enum pci_irq_reroute_variant {
+> >> -- 
+> >> 1.8.3.1
+> >>  
+> 
+
