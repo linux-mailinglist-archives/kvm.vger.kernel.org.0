@@ -2,100 +2,106 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1A8A4263798
-	for <lists+kvm@lfdr.de>; Wed,  9 Sep 2020 22:41:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0AD1426382D
+	for <lists+kvm@lfdr.de>; Wed,  9 Sep 2020 23:05:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729692AbgIIUlA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 9 Sep 2020 16:41:00 -0400
-Received: from mail.kernel.org ([198.145.29.99]:54012 "EHLO mail.kernel.org"
+        id S1729860AbgIIVFm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 9 Sep 2020 17:05:42 -0400
+Received: from mail.kernel.org ([198.145.29.99]:60592 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726414AbgIIUlA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 9 Sep 2020 16:41:00 -0400
-Received: from localhost (52.sub-72-107-123.myvzw.com [72.107.123.52])
+        id S1727900AbgIIVFk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 9 Sep 2020 17:05:40 -0400
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id E5C4B2064B;
-        Wed,  9 Sep 2020 20:40:58 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 775CE206D4;
+        Wed,  9 Sep 2020 21:05:39 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1599684059;
-        bh=XYTJIX+UX5+9hkTZ1JmQGWBSE1wnXfxEBbc2SLTvbLI=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:From;
-        b=doAj1CwRVbRE50VuDa0NRPzX3puwcNhH10PkIoMJlZ7VDX3J9Cpv7+Xu8Str2rpMp
-         Duyf5ETzvgvpOayzw8I6cdDNzZUgfA5LXZHANt1OAYXDMuRtnJeoYx6BVRCwrzTwl+
-         +gjVdbDN5g3o6OLchOJSLhiZ4czH+k8PKVD1rqk0=
-Date:   Wed, 9 Sep 2020 15:40:57 -0500
-From:   Bjorn Helgaas <helgaas@kernel.org>
-To:     Lukas Wunner <lukas@wunner.de>,
-        Rick Farrington <ricardo.farrington@cavium.com>
-Cc:     kernel test robot <lkp@intel.com>,
-        Bjorn Helgaas <bhelgaas@google.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-        Juergen Gross <jgross@suse.com>,
-        Michael Haeuptle <michael.haeuptle@hpe.com>,
-        Ian May <ian.may@canonical.com>,
-        Keith Busch <kbusch@kernel.org>, linux-pci@vger.kernel.org,
-        Cornelia Huck <cohuck@redhat.com>, kvm@vger.kernel.org,
-        Derek Chickles <dchickles@marvell.com>,
-        Satanand Burla <sburla@marvell.com>,
-        Felix Manlunas <fmanlunas@marvell.com>,
-        Stefano Stabellini <sstabellini@kernel.org>,
-        xen-devel@lists.xenproject.org,
-        Govinda Tatti <govinda.tatti@oracle.com>,
-        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        LKML <linux-kernel@vger.kernel.org>, lkp@lists.01.org
-Subject: Re: [PCI] 3233e41d3e:
- WARNING:at_drivers/pci/pci.c:#pci_reset_hotplug_slot
-Message-ID: <20200909204057.GA724236@bjorn-Precision-5520>
+        s=default; t=1599685539;
+        bh=LunnJpliQgRjiEVetnhJXASncAl1C5s7uWNB3u6DaZc=;
+        h=From:To:Cc:Subject:Date:From;
+        b=yqxa7ehxphXmc1T3J8702keaNZyzLzfHp45qqOxhKoqwabHtfrEUWcq7srxebCNUI
+         I4PrpOwLZw6yf0zYFngGR50EtCphaC86t+43egW+/Ze9bZQgFeAVGFmsGh1roS1WF4
+         b32khP0ng3815bkR56+t2w8Q3+5NKFJK1ub5LxGk=
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=hot-poop.lan)
+        by disco-boy.misterjones.org with esmtpsa (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+        (Exim 4.92)
+        (envelope-from <maz@kernel.org>)
+        id 1kG7Hd-00ATLQ-Ju; Wed, 09 Sep 2020 22:05:37 +0100
+From:   Marc Zyngier <maz@kernel.org>
+To:     kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        kvmarm@lists.cs.columbia.edu
+Cc:     Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        kernel-team@android.com, stable@vger.kernel.org
+Subject: [PATCH] KVM: arm64: Assume write fault on S1PTW permission fault on instruction fetch
+Date:   Wed,  9 Sep 2020 22:05:27 +0100
+Message-Id: <20200909210527.1926996-1-maz@kernel.org>
+X-Mailer: git-send-email 2.28.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200723095152.nf3fmfzrjlpoi35h@wunner.de>
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, will@kernel.org, james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, kernel-team@android.com, stable@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jul 23, 2020 at 11:51:52AM +0200, Lukas Wunner wrote:
-> On Thu, Jul 23, 2020 at 05:13:06PM +0800, kernel test robot wrote:
-> > FYI, we noticed the following commit (built with gcc-9):
-> [...]
-> > commit: 3233e41d3e8ebcd44e92da47ffed97fd49b84278 ("[PATCH] PCI: pciehp: Fix AB-BA deadlock between reset_lock and device_lock")
-> [...]
-> > caused below changes (please refer to attached dmesg/kmsg for entire log/backtrace):
-> > [    0.971752] WARNING: CPU: 0 PID: 1 at drivers/pci/pci.c:4905 pci_reset_hotplug_slot+0x70/0x80
-> 
-> Thank you, trusty robot.
-> 
-> I botched the call to lockdep_assert_held_write(), it should have been
-> conditional on "if (probe)".
-> 
-> Happy to respin the patch, but I'd like to hear opinions on the locking
-> issues surrounding xen and octeon (and the patch in general).
+KVM currently assumes that an instruction abort can never be a write.
+This is in general true, except when the abort is triggered by
+a S1PTW on instruction fetch that tries to update the S1 page tables
+(to set AF, for example).
 
-I wish liquidio/octeon weren't a special case.  Why should that driver
-reset the device when unbinding when no other drivers do?
+This can happen if the page tables have been paged out and brought
+back in without seeing a direct write to them (they are thus marked
+read only), and the fault handling code will make the PT executable(!)
+instead of writable. The guest gets stuck forever.
 
-Looks like this was added by 70535350e26f ("liquidio: with embedded
-f/w, don't reload f/w, issue pf flr at exit").  Maybe Rick will chime
-in.
+In these conditions, the permission fault must be considered as
+a write so that the Stage-1 update can take place. This is essentially
+the I-side equivalent of the problem fixed by 60e21a0ef54c ("arm64: KVM:
+Take S1 walks into account when determining S2 write faults").
 
-> In particular, would a solution be entertained wherein the pci_dev is
-> reset by the PCI core after driver unbinding, contingent on a flag which
-> is set by a PCI driver to indicate that the pci_dev is returned to the
-> core in an unclean state?
+Update both kvm_is_write_fault() to return true on IABT+S1PTW, as well
+as kvm_vcpu_trap_is_iabt() to return false in the same conditions.
 
-How would we do this?  The PCI core isn't called after unbinding, is
-it?  So I guess we'd have to have a queue and a worker thread to
-process it?
+Cc: stable@vger.kernel.org
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+---
+This could do with some cleanup (kvm_vcpu_dabt_iss1tw has nothing to do
+with data aborts), but I've chosen to keep the patch simple in order to
+ease backporting.
 
-Device removal also has nasty locking issues, and a queue might help
-solve those, too.  Might also help in the problematic case of
-40f11adc7cd9 ("PCI: Avoid race while enabling upstream bridges"),
-which we had to revert.
+ arch/arm64/include/asm/kvm_emulate.h | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
-> Also, why does xen require a device reset on bind?
-> 
-> Thanks!
-> 
-> Lukas
+diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+index d21676409a24..33d7e16edaa3 100644
+--- a/arch/arm64/include/asm/kvm_emulate.h
++++ b/arch/arm64/include/asm/kvm_emulate.h
+@@ -480,7 +480,8 @@ static __always_inline u8 kvm_vcpu_trap_get_class(const struct kvm_vcpu *vcpu)
+ 
+ static inline bool kvm_vcpu_trap_is_iabt(const struct kvm_vcpu *vcpu)
+ {
+-	return kvm_vcpu_trap_get_class(vcpu) == ESR_ELx_EC_IABT_LOW;
++	return (kvm_vcpu_trap_get_class(vcpu) == ESR_ELx_EC_IABT_LOW &&
++		!kvm_vcpu_dabt_iss1tw(vcpu));
+ }
+ 
+ static __always_inline u8 kvm_vcpu_trap_get_fault(const struct kvm_vcpu *vcpu)
+@@ -520,6 +521,9 @@ static __always_inline int kvm_vcpu_sys_get_rt(struct kvm_vcpu *vcpu)
+ 
+ static inline bool kvm_is_write_fault(struct kvm_vcpu *vcpu)
+ {
++	if (kvm_vcpu_dabt_iss1tw(vcpu))
++		return true;
++
+ 	if (kvm_vcpu_trap_is_iabt(vcpu))
+ 		return false;
+ 
+-- 
+2.28.0
+
