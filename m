@@ -2,181 +2,241 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C1F55262B95
-	for <lists+kvm@lfdr.de>; Wed,  9 Sep 2020 11:17:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F2F60262C14
+	for <lists+kvm@lfdr.de>; Wed,  9 Sep 2020 11:38:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726970AbgIIJRK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 9 Sep 2020 05:17:10 -0400
-Received: from mga18.intel.com ([134.134.136.126]:62578 "EHLO mga18.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725826AbgIIJRI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 9 Sep 2020 05:17:08 -0400
-IronPort-SDR: 4UfoviER+163ZOfzvllxRS/M+W5Ldi8Ryv0yri+p+qHvLJVmuHgWLSYY5x76tEdwZa0KKFqs3/
- diG40ofYg8CQ==
-X-IronPort-AV: E=McAfee;i="6000,8403,9738"; a="146013094"
-X-IronPort-AV: E=Sophos;i="5.76,409,1592895600"; 
-   d="scan'208";a="146013094"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Sep 2020 02:16:52 -0700
-IronPort-SDR: Eu5LFEF7mQvPvjaKgHiNi+EAI6twzANJVXLRWHJjqt2BIA4DKeAAOOzWigLRgh7pJRkcZk2JZB
- paZ/kvhmY5KQ==
-X-IronPort-AV: E=Sophos;i="5.76,409,1592895600"; 
-   d="scan'208";a="480390735"
-Received: from vdc-station-04.ger.corp.intel.com (HELO [10.251.165.91]) ([10.251.165.91])
-  by orsmga005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Sep 2020 02:16:41 -0700
-Subject: Re: [Intel-gfx] [PATCH 0/8] Convert the intel iommu driver to the
- dma-iommu api
-To:     Tom Murphy <murphyt7@tcd.ie>
-Cc:     Logan Gunthorpe <logang@deltatee.com>, kvm@vger.kernel.org,
-        David Airlie <airlied@linux.ie>,
-        dri-devel@lists.freedesktop.org,
-        Bjorn Andersson <bjorn.andersson@linaro.org>,
-        linux-tegra@vger.kernel.org, Julien Grall <julien.grall@arm.com>,
-        Will Deacon <will@kernel.org>,
-        Marek Szyprowski <m.szyprowski@samsung.com>,
-        Jean-Philippe Brucker <jean-philippe@linaro.org>,
-        linux-samsung-soc@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
-        Krzysztof Kozlowski <krzk@kernel.org>,
-        Jonathan Hunter <jonathanh@nvidia.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        linux-rockchip@lists.infradead.org, Andy Gross <agross@kernel.org>,
-        linux-arm-kernel@lists.infradead.org, linux-s390@vger.kernel.org,
-        linux-arm-msm@vger.kernel.org, intel-gfx@lists.freedesktop.org,
-        linux-mediatek@lists.infradead.org,
-        Matthias Brugger <matthias.bgg@gmail.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        virtualization@lists.linux-foundation.org,
-        Gerald Schaefer <gerald.schaefer@de.ibm.com>,
-        David Woodhouse <dwmw2@infradead.org>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        iommu@lists.linux-foundation.org, Kukjin Kim <kgene@kernel.org>,
-        Robin Murphy <robin.murphy@arm.com>
-References: <20191221150402.13868-1-murphyt7@tcd.ie>
- <465815ae-9292-f37a-59b9-03949cb68460@deltatee.com>
- <20200529124523.GA11817@infradead.org>
- <CGME20200529190523eucas1p2c086133e707257c0cdc002f502d4f51d@eucas1p2.samsung.com>
- <33137cfb-603c-86e8-1091-f36117ecfaf3@deltatee.com>
- <ef2150d5-7b6a-df25-c10d-e43316fe7812@samsung.com>
- <b9140772-0370-a858-578c-af503a06d8e9@deltatee.com>
- <CALQxJuutRaeX89k2o4ffTKYRMizmMu0XbRnzpFuSSrkQR02jKg@mail.gmail.com>
- <766525c3-4da9-6db7-cd90-fb4b82cd8083@deltatee.com>
- <60a82319-cbee-4cd1-0d5e-3c407cc51330@linux.intel.com>
- <e598fb31-ef7a-c2ee-8a54-bf62d50c480c@deltatee.com>
- <b27cae1f-07ff-bef2-f125-a5f0d968016d@linux.intel.com>
- <CALQxJut5c=cWdi+SVkN3JnbkhPSYmLkOyRUhduL-UJ9gyKn9Ow@mail.gmail.com>
-From:   Tvrtko Ursulin <tvrtko.ursulin@linux.intel.com>
-Organization: Intel Corporation UK Plc
-Message-ID: <7106602a-9964-851e-9c4e-d8acf4033b89@linux.intel.com>
-Date:   Wed, 9 Sep 2020 10:16:38 +0100
+        id S1727055AbgIIJic (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 9 Sep 2020 05:38:32 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:25357 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726555AbgIIJib (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 9 Sep 2020 05:38:31 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1599644306;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=CfGnMUjJoh7sRhMMgOXLsH7gXn7nRAow7Pq2RVtX5dw=;
+        b=c9N8z8JKhSfQslFpB5DjL1g/rxkkiSIY2jE/A+VsaUZ4ayr3NuLS4Pz47cRToWLkCm7F+/
+        T8MJRPWxVSV3/9k/M9WxbdkDmvXMFWLESe4RTo2qbNoOOPT3sDvdtepzt5NRJCLC01viIc
+        OBsHiwqmI7y58SQ/aGlLatD8mPZUgz0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-109-dyz_WKQuOEOq8VXCVtofrA-1; Wed, 09 Sep 2020 05:38:24 -0400
+X-MC-Unique: dyz_WKQuOEOq8VXCVtofrA-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 51D57107464F;
+        Wed,  9 Sep 2020 09:38:22 +0000 (UTC)
+Received: from [10.36.115.123] (ovpn-115-123.ams2.redhat.com [10.36.115.123])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 7EFF260C0F;
+        Wed,  9 Sep 2020 09:38:13 +0000 (UTC)
+Subject: Re: [PATCH v3 2/5] KVM: arm64: Use event mask matching architecture
+ revision
+To:     Marc Zyngier <maz@kernel.org>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org
+Cc:     James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Mark Rutland <mark.rutland@arm.com>, graf@amazon.com,
+        kernel-team@android.com
+References: <20200908075830.1161921-1-maz@kernel.org>
+ <20200908075830.1161921-3-maz@kernel.org>
+From:   Auger Eric <eric.auger@redhat.com>
+Message-ID: <2e1257aa-9e8c-89ba-c09b-3cfee38c8486@redhat.com>
+Date:   Wed, 9 Sep 2020 11:38:10 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <CALQxJut5c=cWdi+SVkN3JnbkhPSYmLkOyRUhduL-UJ9gyKn9Ow@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <20200908075830.1161921-3-maz@kernel.org>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Hi Marc,
 
-On 08/09/2020 23:43, Tom Murphy wrote:
-> On Tue, 8 Sep 2020 at 16:56, Tvrtko Ursulin
-> <tvrtko.ursulin@linux.intel.com> wrote:
->>
->>
->> On 08/09/2020 16:44, Logan Gunthorpe wrote:
->>> On 2020-09-08 9:28 a.m., Tvrtko Ursulin wrote:
->>>>>
->>>>> diff --git a/drivers/gpu/drm/i915/i915_scatterlist.h
->>>>> b/drivers/gpu/drm/i915/i915
->>>>> index b7b59328cb76..9367ac801f0c 100644
->>>>> --- a/drivers/gpu/drm/i915/i915_scatterlist.h
->>>>> +++ b/drivers/gpu/drm/i915/i915_scatterlist.h
->>>>> @@ -27,13 +27,19 @@ static __always_inline struct sgt_iter {
->>>>>     } __sgt_iter(struct scatterlist *sgl, bool dma) {
->>>>>            struct sgt_iter s = { .sgp = sgl };
->>>>>
->>>>> +       if (sgl && !sg_dma_len(s.sgp))
->>>>
->>>> I'd extend the condition to be, just to be safe:
->>>>       if (dma && sgl && !sg_dma_len(s.sgp))
->>>>
->>>
->>> Right, good catch, that's definitely necessary.
->>>
->>>>> +               s.sgp = NULL;
->>>>> +
->>>>>            if (s.sgp) {
->>>>>                    s.max = s.curr = s.sgp->offset;
->>>>> -               s.max += s.sgp->length;
->>>>> -               if (dma)
->>>>> +
->>>>> +               if (dma) {
->>>>> +                       s.max += sg_dma_len(s.sgp);
->>>>>                            s.dma = sg_dma_address(s.sgp);
->>>>> -               else
->>>>> +               } else {
->>>>> +                       s.max += s.sgp->length;
->>>>>                            s.pfn = page_to_pfn(sg_page(s.sgp));
->>>>> +               }
->>>>
->>>> Otherwise has this been tested or alternatively how to test it? (How to
->>>> repro the issue.)
->>>
->>> It has not been tested. To test it, you need Tom's patch set without the
->>> last "DO NOT MERGE" patch:
->>>
->>> https://lkml.kernel.org/lkml/20200907070035.GA25114@infradead.org/T/
->>
->> Tom, do you have a branch somewhere I could pull from? (Just being lazy
->> about downloading a bunch of messages from the archives.)
+On 9/8/20 9:58 AM, Marc Zyngier wrote:
+> The PMU code suffers from a small defect where we assume that the event
+> number provided by the guest is always 16 bit wide, even if the CPU only
+> implements the ARMv8.0 architecture. This isn't really problematic in
+> the sense that the event number ends up in a system register, cropping
+> it to the right width, but still this needs fixing.
 > 
-> I don't unfortunately. I'm working locally with poor internet.
+> In order to make it work, let's probe the version of the PMU that the
+> guest is going to use. This is done by temporarily creating a kernel
+> event and looking at the PMUVer field that has been saved at probe time
+> in the associated arm_pmu structure. This in turn gets saved in the kvm
+> structure, and subsequently used to compute the event mask that gets
+> used throughout the PMU code.
 > 
->>
->> What GPU is in your Lenovo x1 carbon 5th generation and what
->> graphical/desktop setup I need to repro?
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  arch/arm64/include/asm/kvm_host.h |  2 +
+>  arch/arm64/kvm/pmu-emul.c         | 81 +++++++++++++++++++++++++++++--
+>  2 files changed, 78 insertions(+), 5 deletions(-)
 > 
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index 65568b23868a..6cd60be69c28 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -110,6 +110,8 @@ struct kvm_arch {
+>  	 * supported.
+>  	 */
+>  	bool return_nisv_io_abort_to_user;
+> +
+> +	unsigned int pmuver;
+>  };
+>  
+>  struct kvm_vcpu_fault_info {
+> diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
+> index 93d797df42c6..8a5f65763814 100644
+> --- a/arch/arm64/kvm/pmu-emul.c
+> +++ b/arch/arm64/kvm/pmu-emul.c
+> @@ -20,6 +20,20 @@ static void kvm_pmu_stop_counter(struct kvm_vcpu *vcpu, struct kvm_pmc *pmc);
+>  
+>  #define PERF_ATTR_CFG1_KVM_PMU_CHAINED 0x1
+>  
+> +static u32 kvm_pmu_event_mask(struct kvm *kvm)
+> +{
+> +	switch (kvm->arch.pmuver) {
+> +	case 1:			/* ARMv8.0 */
+> +		return GENMASK(9, 0);
+> +	case 4:			/* ARMv8.1 */
+> +	case 5:			/* ARMv8.4 */
+> +	case 6:			/* ARMv8.5 */
+> +		return GENMASK(15, 0);
+> +	default:		/* Shouldn't be there, just for sanity */
+> +		return 0;
+> +	}
+> +}
+> +
+>  /**
+>   * kvm_pmu_idx_is_64bit - determine if select_idx is a 64bit counter
+>   * @vcpu: The vcpu pointer
+> @@ -100,7 +114,7 @@ static bool kvm_pmu_idx_has_chain_evtype(struct kvm_vcpu *vcpu, u64 select_idx)
+>  		return false;
+>  
+>  	reg = PMEVTYPER0_EL0 + select_idx;
+> -	eventsel = __vcpu_sys_reg(vcpu, reg) & ARMV8_PMU_EVTYPE_EVENT;
+> +	eventsel = __vcpu_sys_reg(vcpu, reg) & kvm_pmu_event_mask(vcpu->kvm);
+>  
+>  	return eventsel == ARMV8_PMUV3_PERFCTR_CHAIN;
+>  }
+> @@ -495,7 +509,7 @@ void kvm_pmu_software_increment(struct kvm_vcpu *vcpu, u64 val)
+>  
+>  		/* PMSWINC only applies to ... SW_INC! */
+>  		type = __vcpu_sys_reg(vcpu, PMEVTYPER0_EL0 + i);
+> -		type &= ARMV8_PMU_EVTYPE_EVENT;
+> +		type &= kvm_pmu_event_mask(vcpu->kvm);
+>  		if (type != ARMV8_PMUV3_PERFCTR_SW_INCR)
+>  			continue;
+>  
+> @@ -578,7 +592,7 @@ static void kvm_pmu_create_perf_event(struct kvm_vcpu *vcpu, u64 select_idx)
+>  	data = __vcpu_sys_reg(vcpu, reg);
+>  
+>  	kvm_pmu_stop_counter(vcpu, pmc);
+> -	eventsel = data & ARMV8_PMU_EVTYPE_EVENT;
+> +	eventsel = data & kvm_pmu_event_mask(vcpu->kvm);;
+>  
+>  	/* Software increment event does't need to be backed by a perf event */
+>  	if (eventsel == ARMV8_PMUV3_PERFCTR_SW_INCR &&
+> @@ -679,17 +693,68 @@ static void kvm_pmu_update_pmc_chained(struct kvm_vcpu *vcpu, u64 select_idx)
+>  void kvm_pmu_set_counter_event_type(struct kvm_vcpu *vcpu, u64 data,
+>  				    u64 select_idx)
+>  {
+> -	u64 reg, event_type = data & ARMV8_PMU_EVTYPE_MASK;
+> +	u64 reg, mask;
+> +
+> +	mask  =  ARMV8_PMU_EVTYPE_MASK;
+> +	mask &= ~ARMV8_PMU_EVTYPE_EVENT;
+> +	mask |= kvm_pmu_event_mask(vcpu->kvm);
+>  
+>  	reg = (select_idx == ARMV8_PMU_CYCLE_IDX)
+>  	      ? PMCCFILTR_EL0 : PMEVTYPER0_EL0 + select_idx;
+>  
+> -	__vcpu_sys_reg(vcpu, reg) = event_type;
+> +	__vcpu_sys_reg(vcpu, reg) = data & mask;
+>  
+>  	kvm_pmu_update_pmc_chained(vcpu, select_idx);
+>  	kvm_pmu_create_perf_event(vcpu, select_idx);
+>  }
+>  
+> +static int kvm_pmu_probe_pmuver(void)
+> +{
+> +	struct perf_event_attr attr = { };
+> +	struct perf_event *event;
+> +	struct arm_pmu *pmu;
+> +	int pmuver = 0xf;
+> +
+> +	/*
+> +	 * Create a dummy event that only counts user cycles. As we'll never
+> +	 * leave thing function with the event being live, it will never
+> +	 * count anything. But it allows us to probe some of the PMU
+> +	 * details. Yes, this is terrible.
+I fail to understand why we can't directly read ID_DFR0_EL1.PerfMon?
+
+Thanks
+
+Eric
+> +	 */
+> +	attr.type = PERF_TYPE_RAW;
+> +	attr.size = sizeof(attr);
+> +	attr.pinned = 1;
+> +	attr.disabled = 0;
+> +	attr.exclude_user = 0;
+> +	attr.exclude_kernel = 1;
+> +	attr.exclude_hv = 1;
+> +	attr.exclude_host = 1;
+> +	attr.config = ARMV8_PMUV3_PERFCTR_CPU_CYCLES;
+> +	attr.sample_period = GENMASK(63, 0);
+> +
+> +	event = perf_event_create_kernel_counter(&attr, -1, current,
+> +						 kvm_pmu_perf_overflow, &attr);
+> +
+> +	if (IS_ERR(event)) {
+> +		pr_err_once("kvm: pmu event creation failed %ld\n",
+> +			    PTR_ERR(event));
+> +		return 0xf;
+> +	}
+> +
+> +	if (event->pmu) {
+> +		pmu = to_arm_pmu(event->pmu);
+> +		if (pmu->pmuver)
+> +			pmuver = pmu->pmuver;
+> +		pr_debug("PMU on CPUs %*pbl version %x\n",
+> +			 cpumask_pr_args(&pmu->supported_cpus), pmuver);
+> +	}
+> +
+> +	perf_event_disable(event);
+> +	perf_event_release_kernel(event);
+> +
+> +	return pmuver;
+> +}
+> +
+>  bool kvm_arm_support_pmu_v3(void)
+>  {
+>  	/*
+> @@ -796,6 +861,12 @@ int kvm_arm_pmu_v3_set_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
+>  	if (vcpu->arch.pmu.created)
+>  		return -EBUSY;
+>  
+> +	if (!vcpu->kvm->arch.pmuver)
+> +		vcpu->kvm->arch.pmuver = kvm_pmu_probe_pmuver();
+> +
+> +	if (vcpu->kvm->arch.pmuver == 0xf)
+> +		return -ENODEV;
+> +
+>  	switch (attr->attr) {
+>  	case KVM_ARM_VCPU_PMU_V3_IRQ: {
+>  		int __user *uaddr = (int __user *)(long)attr->addr;
 > 
-> Is this enough info?:
-> 
-> $ lspci -vnn | grep VGA -A 12
-> 00:02.0 VGA compatible controller [0300]: Intel Corporation HD
-> Graphics 620 [8086:5916] (rev 02) (prog-if 00 [VGA controller])
->      Subsystem: Lenovo ThinkPad X1 Carbon 5th Gen [17aa:224f]
->      Flags: bus master, fast devsel, latency 0, IRQ 148
->      Memory at eb000000 (64-bit, non-prefetchable) [size=16M]
->      Memory at 60000000 (64-bit, prefetchable) [size=256M]
->      I/O ports at e000 [size=64]
->      [virtual] Expansion ROM at 000c0000 [disabled] [size=128K]
->      Capabilities: [40] Vendor Specific Information: Len=0c <?>
->      Capabilities: [70] Express Root Complex Integrated Endpoint, MSI 00
->      Capabilities: [ac] MSI: Enable+ Count=1/1 Maskable- 64bit-
->      Capabilities: [d0] Power Management version 2
->      Capabilities: [100] Process Address Space ID (PASID)
->      Capabilities: [200] Address Translation Service (ATS)
 
-Works for a start. What about the steps to repro? Any desktop 
-environment and it is just visual corruption, no hangs/stalls or such?
-
-I've submitted a series consisting of what I understood are the patches 
-needed to repro the issue to our automated CI here:
-
-https://patchwork.freedesktop.org/series/81489/
-
-So will see if it will catch something, or more targeted testing will be 
-required. Hopefully it does trip over in which case I can add the patch 
-suggested by Logan on top and see if that fixes it. Or I'll need to 
-write a new test case.
-
-If you could glance over my series to check I identified the patches 
-correctly it would be appreciated.
-
-Regards,
-
-Tvrtko
