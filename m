@@ -2,265 +2,147 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 572842635A0
-	for <lists+kvm@lfdr.de>; Wed,  9 Sep 2020 20:10:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E16FD263597
+	for <lists+kvm@lfdr.de>; Wed,  9 Sep 2020 20:08:02 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728617AbgIISKg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 9 Sep 2020 14:10:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44256 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725772AbgIISKd (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 9 Sep 2020 14:10:33 -0400
-X-Greylist: delayed 379 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Wed, 09 Sep 2020 11:10:32 PDT
-Received: from forward106o.mail.yandex.net (forward106o.mail.yandex.net [IPv6:2a02:6b8:0:1a2d::609])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C61DDC061573
-        for <kvm@vger.kernel.org>; Wed,  9 Sep 2020 11:10:32 -0700 (PDT)
-Received: from forward101q.mail.yandex.net (forward101q.mail.yandex.net [IPv6:2a02:6b8:c0e:4b:0:640:4012:bb98])
-        by forward106o.mail.yandex.net (Yandex) with ESMTP id 49DF7506113E;
-        Wed,  9 Sep 2020 21:04:06 +0300 (MSK)
-Received: from mxback11q.mail.yandex.net (mxback11q.mail.yandex.net [IPv6:2a02:6b8:c0e:1b4:0:640:1f0c:10f2])
-        by forward101q.mail.yandex.net (Yandex) with ESMTP id 44351CF40002;
-        Wed,  9 Sep 2020 21:04:06 +0300 (MSK)
-Received: from vla3-3dd1bd6927b2.qloud-c.yandex.net (vla3-3dd1bd6927b2.qloud-c.yandex.net [2a02:6b8:c15:350f:0:640:3dd1:bd69])
-        by mxback11q.mail.yandex.net (mxback/Yandex) with ESMTP id bgIBNja6DN-465S2L4H;
-        Wed, 09 Sep 2020 21:04:06 +0300
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex.ru; s=mail; t=1599674646;
-        bh=T0j8Q3vuZtATAiCDjEQw13Mr97E2iSSRD8sa7SL2wbE=;
-        h=In-Reply-To:From:To:Subject:Cc:Date:References:Message-ID;
-        b=HJ0FzRAO9Hw7bA/+QrN8gEFLFBan5k/QtiK6ceyuLJbl6YLXvdpcBL5Z5rK2kByDc
-         5LE981l2CO6QpcTk6DjwXl2mMrirVCKAo3M9LOEyFcBikevaLRm5VLnTU3FcWZw2jQ
-         tPIVVTyzt/zxqizK8gHV6bwwnA+AI/FbSYaSD/QI=
-Authentication-Results: mxback11q.mail.yandex.net; dkim=pass header.i=@yandex.ru
-Received: by vla3-3dd1bd6927b2.qloud-c.yandex.net (smtp/Yandex) with ESMTPSA id s05EzP7qon-45IaI471;
-        Wed, 09 Sep 2020 21:04:05 +0300
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
-        (Client certificate not present)
-Subject: Re: KVM_SET_SREGS & cr4.VMXE problems
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     kvm@vger.kernel.org, Andy Lutomirski <luto@amacapital.net>
-References: <8f0d9048-c935-bccf-f7bd-58ba61759a54@yandex.ru>
- <20200909163023.GA11727@sjchrist-ice>
-From:   stsp <stsp2@yandex.ru>
-Message-ID: <fdeb1ecb-abee-2197-4449-88d33480c5fe@yandex.ru>
-Date:   Wed, 9 Sep 2020 21:04:03 +0300
+        id S1727782AbgIISIA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 9 Sep 2020 14:08:00 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:35632 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1725772AbgIISIA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 9 Sep 2020 14:08:00 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1599674878;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=VV6n2P1JqU0YPZMyUbTFLLb1CLWvWgHP/iQgdRcWwfw=;
+        b=h63gNaVtn5xgiE7qUUCPac1UF24hgAAPJ+nyCt1dHnl/wjzzB0yadN8BANSUD1nB4kSGYG
+        dm/93o98Vwf7H2BeBPYjrwpFm7H/ycP4M6JVsoUDkZSTGc6dsxHJMxgcfLt2gtj4WfkRK6
+        QH43FnDO+iAS4pvpUdSiU8t1knITjTw=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-295-CWBp0t5cPr-iJtqldYOYXQ-1; Wed, 09 Sep 2020 14:07:56 -0400
+X-MC-Unique: CWBp0t5cPr-iJtqldYOYXQ-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E646E800683;
+        Wed,  9 Sep 2020 18:07:54 +0000 (UTC)
+Received: from [10.36.115.123] (ovpn-115-123.ams2.redhat.com [10.36.115.123])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 57CF31002D67;
+        Wed,  9 Sep 2020 18:07:52 +0000 (UTC)
+Subject: Re: [PATCH v3 4/5] KVM: arm64: Mask out filtered events in
+ PCMEID{0,1}_EL1
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     Mark Rutland <mark.rutland@arm.com>, kvm@vger.kernel.org,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        kernel-team@android.com, James Morse <james.morse@arm.com>,
+        linux-arm-kernel@lists.infradead.org, graf@amazon.com,
+        Robin Murphy <robin.murphy@arm.com>,
+        kvmarm@lists.cs.columbia.edu,
+        Julien Thierry <julien.thierry.kdev@gmail.com>
+References: <20200908075830.1161921-1-maz@kernel.org>
+ <20200908075830.1161921-5-maz@kernel.org>
+ <735f5464-3a45-8dc0-c330-ac5632bcb4b4@redhat.com>
+ <dde5292adce235bea39bc927c1256bc8@kernel.org>
+From:   Auger Eric <eric.auger@redhat.com>
+Message-ID: <d492cf6d-6572-572e-ceb2-37eec99a9307@redhat.com>
+Date:   Wed, 9 Sep 2020 20:07:50 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.9.0
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <20200909163023.GA11727@sjchrist-ice>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <dde5292adce235bea39bc927c1256bc8@kernel.org>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi, good to see an Intel person
-involved in that. :)
+Hi Marc,
 
-09.09.2020 19:30, Sean Christopherson пишет:
-> On Wed, Sep 09, 2020 at 01:04:45PM +0300, stsp wrote:
->> Hi Guys!
+On 9/9/20 7:50 PM, Marc Zyngier wrote:
+> Hi Eric,
+> 
+> On 2020-09-09 18:43, Auger Eric wrote:
+>> Hi Marc,
 >>
->> I have a kvm-based hypervisor, and also I have problems with how KVM handles
->> cr4.VMXE flag.
+>> On 9/8/20 9:58 AM, Marc Zyngier wrote:
+>>> As we can now hide events from the guest, let's also adjust its view of
+>>> PCMEID{0,1}_EL1 so that it can figure out why some common events are not
+>>> counting as they should.
+>> Referring to my previous comment should we filter the cycle counter out?
+>>>
+>>> The astute user can still look into the TRM for their CPU and find out
+>>> they've been cheated, though. Nobody's perfect.
+>>>
+>>> Signed-off-by: Marc Zyngier <maz@kernel.org>
+>>> ---
+>>>  arch/arm64/kvm/pmu-emul.c | 29 +++++++++++++++++++++++++++++
+>>>  arch/arm64/kvm/sys_regs.c |  5 +----
+>>>  include/kvm/arm_pmu.h     |  5 +++++
+>>>  3 files changed, 35 insertions(+), 4 deletions(-)
+>>>
+>>> diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
+>>> index 67a731bafbc9..0458860bade2 100644
+>>> --- a/arch/arm64/kvm/pmu-emul.c
+>>> +++ b/arch/arm64/kvm/pmu-emul.c
+>>> @@ -765,6 +765,35 @@ static int kvm_pmu_probe_pmuver(void)
+>>>      return pmuver;
+>>>  }
+>>>
+>>> +u64 kvm_pmu_get_pmceid(struct kvm_vcpu *vcpu, bool pmceid1)
+>>> +{
+>>> +    unsigned long *bmap = vcpu->kvm->arch.pmu_filter;
+>>> +    u64 val, mask = 0;
+>>> +    int base, i;
+>>> +
+>>> +    if (!pmceid1) {
+>>> +        val = read_sysreg(pmceid0_el0);
+>>> +        base = 0;
+>>> +    } else {
+>>> +        val = read_sysreg(pmceid1_el0);
+>>> +        base = 32;
+>>> +    }
+>>> +
+>>> +    if (!bmap)
+>>> +        return val;
+>>> +
+>>> +    for (i = 0; i < 32; i += 8) {
+>> s/32/4?
+> 
+> I don't think so, see below.
+> 
 >>
->> Problem 1 can be shown as follows.
+>> Thanks
 >>
->> The below snippet WORKS as expected:
->> ---
->>      sregs.cr4 |= X86_CR4_VMXE;
-> What is the starting value of sregs?  Not that it should matter, but it'd
-> be helpful to reproduce and understand the issue.
+>> Eric
+>>> +        u64 byte;
+>>> +
+>>> +        byte = bitmap_get_value8(bmap, base + i);
+>>> +        mask |= byte << i;
+> 
+> For each iteration of the loop, we read a byte from the bitmap
+> (hence the += 8 above), and orr it into the mask. This makes 4
+> iteration of the loop.
+> 
+> Or am I missing your point entirely?
 
-Just X86_CR4_VME.
-In fact, I do KVM_GET_SREGS first
-and OR with VME, but there are no
-other flags set, so just VME.
-Also I can give you a reference
-where you can see all of the state:
-https://github.com/dosemu2/dosemu2/issues/1274#issuecomment-687900084
+Hum no you're right. Sorry for the noise.
 
+Looks good to me:
 
->>      ret = ioctl(vcpufd, KVM_SET_SREGS, &sregs);
->>      if (ret == -1) {
->>        perror("KVM: KVM_SET_SREGS");
->>        leavedos(99);
->>      }
->> ---
->>
->> The below one doesn't:
->> ---
->>      ret = ioctl(vcpufd, KVM_SET_SREGS, &sregs);
->>      if (ret == -1) {
->>        perror("KVM: KVM_SET_SREGS");
->>        leavedos(99);
->>      }
->>      sregs.cr4 |= X86_CR4_VMXE;
->>      ret = ioctl(vcpufd, KVM_SET_SREGS, &sregs);
->>      if (ret == -1) {
->>        perror("KVM: KVM_SET_SREGS");
->>        leavedos(99);
->>      }
->> ---
->>
->> Basically that example demonstrates that I can set VMXE flag only by the very
->> first call to KVM_SET_SREGS. Any subsequent calls do not allow me to modify
->> VMXE flag, even though no error is returned, and other flags are modified, if
->> needed, as expected, but not this one.  Is there any reason why VMXE flag is
->> "locked" to its very first setting?
-> IIUC, in the above snippet, you observe that "ret == 0" but rereading sregs
-> shows the old CR4 value?
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
 
-Indeed:
----
-
-     ret = ioctl(vcpufd, KVM_SET_SREGS, &sregs);
-     if (ret == -1) {
-       perror("KVM: KVM_SET_SREGS");
-       leavedos(99);
-     }
-     ret = ioctl(vcpufd, KVM_GET_SREGS, &sregs);
-     printf("cr4(init): %llx\n", sregs.cr4);
-     sregs.cr4 |= X86_CR4_VMXE;
-     printf("cr4(want): %llx\n", sregs.cr4);
-     ret = ioctl(vcpufd, KVM_SET_SREGS, &sregs);
-     if (ret == -1) {
-       perror("KVM: KVM_SET_SREGS");
-       leavedos(99);
-     }
-     ret = ioctl(vcpufd, KVM_GET_SREGS, &sregs);
-    printf("cr4(got): %llx\n", sregs.cr4);
----
+Eric
 
 
-With this I get:
-
-cr4(init): 1
-cr4(want): 2001
-cr4(got): 1
-
-So its ignored both on read-back,
-and in the guest state dump:
-https://github.com/dosemu2/dosemu2/issues/1274#issuecomment-689158696
-
-
-> The direct cause of the weirdness is a KVM bug in KVM_SET_SREGS where it
-> doesn't check the return of vendor specific handling (VMX vs. SVM) of setting
-> CR4.
-
-Note that I reproduce that on an AMD CPU.
-Other guy at guthub tried on Intel. Same thing.
-
-
->> Problem 2:
->> If I set both VME and VMXE flags (by the very first invocation of
->> KVM_SET_SREGS, yes), then VME flag does not actually work. My hypervisor then
->> runs in non-VME mode.  Is it KVM that clears the VME flag when VMXE is set,
->> or is it really not a workable combination of flags?
-> What do you mean by "My hypervisor runs in non-VME mode"?  I assume you mean
-> the guest is in non-VME mode?
-
-Yes, of course. Sorry for confusion.
-Hypervisor itself does not need VME
-on host.
-
-
-> If you're referring to the guest, what CPU generation are you running?
-
-Surprisingly, I am reproducing this all
-on AMD FX. So its really something very
-generic. It was initially reported to me
-on github against an Intel CPU, but I can
-reproduce on AMD.
-
-
->> Problem 3.
->> Some older Intel CPUs appear to require the VMXE flag even in non-root VMX.
->> This is vaguely documented in an Intel specs:
->> ---
->> The first processors to support VMX operation require that the
->> following bits be 1 in VMX operation: CR0.PE, CR0.NE, CR0.PG, and CR4.VMXE.
->> ---
->>
->> They are not explicit about a non-root mode, but my experiments show they
->> meant exactly that. On such CPUs, KVM otherwise returns KVM_EXIT_FAIL_ENTRY,
->> "invalid guest state".
-> Do you have emulate_invalid_guest_state disabled?
-
-I asked that on github.
-The guy reports it is enabled:
-https://github.com/dosemu2/dosemu2/issues/1274#issuecomment-689724729
-
-
->> Question: did they really mean non-root, and if so - shouldn't KVM itself
->> work around such quirks?
-> Yes, it really does include non-root.  On CPUs without unrestricted guest,
-> the world switch to non-root is less complete, for lack of a better term.
-> Non-root without unrestricted guest requires the CPU to be in protected mode
-> with paging enabled as the CPU isn't capable of properly virtualizing things
-> if paging is disabled.  CR4.VMXE=1 is always required, even on modern CPUs.
-
-You mean, even in non-root? Why?
-That sounds strange, i.e. at least I
-don't need to set in in sregs, and on
-modern CPUs it works OK without.
-I thought it would only make sense
-in non-root for the nested execution,
-or is this assumption wrong?
-
-
-> However, those are the _hardware_ values of CR4, not the guest value of CR4,
-> i.e. the value visible to the guest is different than the actual value in
-> hardware.  And KVM_SET_SREGS operates on the _guest_ value, KVM always has
-> final say on the hardware value.
-
-Interestingly, as we can see from the
-state dumps (that are on github), the
-sreg's cr4 value goes to "shadow".
-Does "shadow" means "for guest",
-and "actual" means "hardware"?
-I am confused, seems like some inversion
-of terms somewhere. I thought "shadow"
-should mean "hardware", but its not
-what I see in the dumps.
-
-
-> Note, the hardware value when running in the guest (non-root) will be very
-> different than the hardware value when running in the host (root), e.g. MCE
-> is the only CR4 bit that is explicitly propagated to the hardware value for
-> the guest, all other bits (including VME) are recomputed based on CPU
-> capabilities, KVM module params, and guest state.
-
-Why would VME be re-computed?
-Is it not always supported?
-
-
->> I wouldn't mind enabling VMXE myself, if not for the Problem 2 above, that
->> just disables VME then.  Can KVM be somehow "fixed" to not require all these
->> dancing, or is there a better ways of fixing that problem?
-> Can you rewind and describe your original problem?  It sounds like you're
-> trying to do something very specific on old hardware, encountered an error,
-> and then built up a pile of workarounds that led you into more issues that
-> aren't directly related to the original problem.
-
-Its indeed exactly how it was escalating! :)
-I got a report about an older Intel CPUs,
-but was able to reproduce a lot of "crap"
-also on AMD, so now I am completely confused.
-
-As for the original problem: there are at least
-2 problems.
-
-On OLD intel:
-- KVM fails with invalid guest state unless
-you set VMXE in guest's cr4, and do it from
-the very first attempt!
-
-On any CPU:
-- If you set VMXE in guest's cr4, then guest
-works in non-VME mode, as if cr4.VME was
-cleared. But I didn't clear it - KVM did!
-
-Thanks for your help.
+> 
+> Thanks,
+> 
+>         M.
 
