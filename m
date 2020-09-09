@@ -2,106 +2,192 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2F647262508
-	for <lists+kvm@lfdr.de>; Wed,  9 Sep 2020 04:14:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A21CF26252C
+	for <lists+kvm@lfdr.de>; Wed,  9 Sep 2020 04:26:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728363AbgIICOS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 8 Sep 2020 22:14:18 -0400
-Received: from mga12.intel.com ([192.55.52.136]:60482 "EHLO mga12.intel.com"
+        id S1726708AbgIIC0h (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 8 Sep 2020 22:26:37 -0400
+Received: from mga09.intel.com ([134.134.136.24]:40167 "EHLO mga09.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726002AbgIICOP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 8 Sep 2020 22:14:15 -0400
-IronPort-SDR: Te7pCnnQZYYpam+YNYavWIyKjmSKUylpimRIq+li23r8cokUH63pbipOoOHFIWbostYVq+y3gg
- 94MsIXktlu6w==
-X-IronPort-AV: E=McAfee;i="6000,8403,9738"; a="137773504"
+        id S1725997AbgIIC0f (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 8 Sep 2020 22:26:35 -0400
+IronPort-SDR: JqoNHJQkrgldhEPYOn1nUJ4GcrlrlXHA87Gh+99MgZQJeQ5wD3derW64pkW5SyxOQ68yyEJyOE
+ YC9EHye41B4w==
+X-IronPort-AV: E=McAfee;i="6000,8403,9738"; a="159223259"
 X-IronPort-AV: E=Sophos;i="5.76,408,1592895600"; 
-   d="scan'208";a="137773504"
+   d="scan'208";a="159223259"
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Sep 2020 19:14:15 -0700
-IronPort-SDR: oo/ud125TYByVRHHJ5qg2GWa+ZHCBXGAPNIQz7XvqtmJUH6vWTuCkGOrmYvKqirKrVeZj+g829
- JFl8hWPU2hyg==
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Sep 2020 19:26:34 -0700
+IronPort-SDR: GBf2UqYhYYp0JBGU6H3PM87EBjBkQQT77Sf9gref8cx5V8J9in/KyGydAqmqURh8KrQqWMZ3E3
+ edzZkUVu5/+Q==
+X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.76,408,1592895600"; 
-   d="scan'208";a="480286722"
-Received: from joy-optiplex-7040.sh.intel.com (HELO joy-OptiPlex-7040) ([10.239.13.16])
-  by orsmga005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Sep 2020 19:14:09 -0700
-Date:   Wed, 9 Sep 2020 10:13:09 +0800
-From:   Yan Zhao <yan.y.zhao@intel.com>
-To:     Cornelia Huck <cohuck@redhat.com>
-Cc:     Sean Mooney <smooney@redhat.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Daniel =?iso-8859-1?Q?P=2EBerrang=E9?= <berrange@redhat.com>,
-        kvm@vger.kernel.org, libvir-list@redhat.com,
-        Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org,
-        kwankhede@nvidia.com, eauger@redhat.com, xin-ran.wang@intel.com,
-        corbet@lwn.net, openstack-discuss@lists.openstack.org,
-        shaohe.feng@intel.com, kevin.tian@intel.com,
-        Parav Pandit <parav@mellanox.com>, jian-feng.ding@intel.com,
-        dgilbert@redhat.com, zhenyuw@linux.intel.com, hejie.xu@intel.com,
-        bao.yumeng@zte.com.cn, intel-gvt-dev@lists.freedesktop.org,
-        eskultet@redhat.com, Jiri Pirko <jiri@mellanox.com>,
-        dinechin@redhat.com, devel@ovirt.org
-Subject: Re: device compatibility interface for live migration with assigned
- devices
-Message-ID: <20200909021308.GA1277@joy-OptiPlex-7040>
-Reply-To: Yan Zhao <yan.y.zhao@intel.com>
-References: <20200818113652.5d81a392.cohuck@redhat.com>
- <20200820003922.GE21172@joy-OptiPlex-7040>
- <20200819212234.223667b3@x1.home>
- <20200820031621.GA24997@joy-OptiPlex-7040>
- <20200825163925.1c19b0f0.cohuck@redhat.com>
- <20200826064117.GA22243@joy-OptiPlex-7040>
- <20200828154741.30cfc1a3.cohuck@redhat.com>
- <8f5345be73ebf4f8f7f51d6cdc9c2a0d8e0aa45e.camel@redhat.com>
- <20200831044344.GB13784@joy-OptiPlex-7040>
- <20200908164130.2fe0d106.cohuck@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200908164130.2fe0d106.cohuck@redhat.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
+   d="scan'208";a="343745815"
+Received: from unknown (HELO localhost.localdomain.bj.intel.com) ([10.240.192.131])
+  by orsmga007.jf.intel.com with ESMTP; 08 Sep 2020 19:26:32 -0700
+From:   Zhu Lingshan <lingshan.zhu@intel.com>
+To:     jasowang@redhat.com, mst@redhat.com
+Cc:     virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        kvm@vger.kernel.org, Zhu Lingshan <lingshan.zhu@intel.com>
+Subject: [PATCH] vhost: new vhost_vdpa SET/GET_BACKEND_FEATURES handlers
+Date:   Wed,  9 Sep 2020 10:22:33 +0800
+Message-Id: <20200909022233.26559-1-lingshan.zhu@intel.com>
+X-Mailer: git-send-email 2.18.4
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> > still, I'd like to put it more explicitly to make ensure it's not missed:
-> > the reason we want to specify compatible_type as a trait and check
-> > whether target compatible_type is the superset of source
-> > compatible_type is for the consideration of backward compatibility.
-> > e.g.
-> > an old generation device may have a mdev type xxx-v4-yyy, while a newer
-> > generation  device may be of mdev type xxx-v5-yyy.
-> > with the compatible_type traits, the old generation device is still
-> > able to be regarded as compatible to newer generation device even their
-> > mdev types are not equal.
-> 
-> If you want to support migration from v4 to v5, can't the (presumably
-> newer) driver that supports v5 simply register the v4 type as well, so
-> that the mdev can be created as v4? (Just like QEMU versioned machine
-> types work.)
-yes, it should work in some conditions.
-but it may not be that good in some cases when v5 and v4 in the name string
-of mdev type identify hardware generation (e.g. v4 for gen8, and v5 for
-gen9)
+This commit introduced vhost_vdpa_set/get_backend_features() to
+resolve these issues:
+(1)In vhost_vdpa ioctl SET_BACKEND_FEATURES path, currect code
+would try to acquire vhost dev mutex twice
+(first shown in vhost_vdpa_unlocked_ioctl), which can lead
+to a dead lock issue.
+(2)SET_BACKEND_FEATURES was blindly added to vring ioctl instead
+of vdpa device ioctl
 
-e.g.
-(1). when src mdev type is v4 and target mdev type is v5 as
-software does not support it initially, and v4 and v5 identify hardware
-differences.
-then after software upgrade, v5 is now compatible to v4, should the
-software now downgrade mdev type from v5 to v4?
-not sure if moving hardware generation info into a separate attribute
-from mdev type name is better. e.g. remove v4, v5 in mdev type, while use
-compatible_pci_ids to identify compatibility.
+To resolve these issues, this commit (1)removed mutex operations
+in vhost_set_backend_features. (2)Handle ioctl
+SET/GET_BACKEND_FEATURES in vdpa ioctl. (3)introduce a new
+function vhost_net_set_backend_features() for vhost_net,
+which is a wrap of vhost_set_backend_features() with
+necessary mutex lockings.
 
-(2) name string of mdev type is composed by "driver_name + type_name".
-in some devices, e.g. qat, different generations of devices are binding to
-drivers of different names, e.g. "qat-v4", "qat-v5".
-then though type_name is equal, mdev type is not equal. e.g.
-"qat-v4-type1", "qat-v5-type1".
+Signed-off-by: Zhu Lingshan <lingshan.zhu@intel.com>
+---
+ drivers/vhost/net.c   |  9 ++++++++-
+ drivers/vhost/vdpa.c  | 47 ++++++++++++++++++++++++++++++-------------
+ drivers/vhost/vhost.c |  2 --
+ 3 files changed, 41 insertions(+), 17 deletions(-)
 
-Thanks
-Yan
+diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
+index 531a00d703cd..e01da77538c8 100644
+--- a/drivers/vhost/net.c
++++ b/drivers/vhost/net.c
+@@ -1679,6 +1679,13 @@ static long vhost_net_set_owner(struct vhost_net *n)
+ 	return r;
+ }
+ 
++static void vhost_net_set_backend_features(struct vhost_dev *dev, u64 features)
++{
++	mutex_lock(&dev->mutex);
++	vhost_set_backend_features(dev, features);
++	mutex_unlock(&dev->mutex);
++}
++
+ static long vhost_net_ioctl(struct file *f, unsigned int ioctl,
+ 			    unsigned long arg)
+ {
+@@ -1715,7 +1722,7 @@ static long vhost_net_ioctl(struct file *f, unsigned int ioctl,
+ 			return -EFAULT;
+ 		if (features & ~VHOST_NET_BACKEND_FEATURES)
+ 			return -EOPNOTSUPP;
+-		vhost_set_backend_features(&n->dev, features);
++		vhost_net_set_backend_features(&n->dev, features);
+ 		return 0;
+ 	case VHOST_RESET_OWNER:
+ 		return vhost_net_reset_owner(n);
+diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
+index 3fab94f88894..ade33c566a81 100644
+--- a/drivers/vhost/vdpa.c
++++ b/drivers/vhost/vdpa.c
+@@ -344,6 +344,33 @@ static long vhost_vdpa_set_config_call(struct vhost_vdpa *v, u32 __user *argp)
+ 	return 0;
+ }
+ 
++
++static long vhost_vdpa_get_backend_features(void __user *argp)
++{
++	u64 features = VHOST_VDPA_BACKEND_FEATURES;
++	u64 __user *featurep = argp;
++	long r;
++
++	r = copy_to_user(featurep, &features, sizeof(features));
++
++	return r;
++}
++static long vhost_vdpa_set_backend_features(struct vhost_vdpa *v, void __user *argp)
++{
++	u64 __user *featurep = argp;
++	u64 features;
++
++	if (copy_from_user(&features, featurep, sizeof(features)))
++		return -EFAULT;
++
++	if (features & ~VHOST_VDPA_BACKEND_FEATURES)
++		return -EOPNOTSUPP;
++
++	vhost_set_backend_features(&v->vdev, features);
++
++	return 0;
++}
++
+ static long vhost_vdpa_vring_ioctl(struct vhost_vdpa *v, unsigned int cmd,
+ 				   void __user *argp)
+ {
+@@ -353,8 +380,6 @@ static long vhost_vdpa_vring_ioctl(struct vhost_vdpa *v, unsigned int cmd,
+ 	struct vdpa_callback cb;
+ 	struct vhost_virtqueue *vq;
+ 	struct vhost_vring_state s;
+-	u64 __user *featurep = argp;
+-	u64 features;
+ 	u32 idx;
+ 	long r;
+ 
+@@ -381,18 +406,6 @@ static long vhost_vdpa_vring_ioctl(struct vhost_vdpa *v, unsigned int cmd,
+ 
+ 		vq->last_avail_idx = vq_state.avail_index;
+ 		break;
+-	case VHOST_GET_BACKEND_FEATURES:
+-		features = VHOST_VDPA_BACKEND_FEATURES;
+-		if (copy_to_user(featurep, &features, sizeof(features)))
+-			return -EFAULT;
+-		return 0;
+-	case VHOST_SET_BACKEND_FEATURES:
+-		if (copy_from_user(&features, featurep, sizeof(features)))
+-			return -EFAULT;
+-		if (features & ~VHOST_VDPA_BACKEND_FEATURES)
+-			return -EOPNOTSUPP;
+-		vhost_set_backend_features(&v->vdev, features);
+-		return 0;
+ 	}
+ 
+ 	r = vhost_vring_ioctl(&v->vdev, cmd, argp);
+@@ -476,6 +489,12 @@ static long vhost_vdpa_unlocked_ioctl(struct file *filep,
+ 	case VHOST_VDPA_SET_CONFIG_CALL:
+ 		r = vhost_vdpa_set_config_call(v, argp);
+ 		break;
++	case VHOST_SET_BACKEND_FEATURES:
++		r = vhost_vdpa_set_backend_features(v, argp);
++		break;
++	case VHOST_GET_BACKEND_FEATURES:
++		r = vhost_vdpa_get_backend_features(argp);
++		break;
+ 	default:
+ 		r = vhost_dev_ioctl(&v->vdev, cmd, argp);
+ 		if (r == -ENOIOCTLCMD)
+diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
+index b45519ca66a7..e03c9e6f058f 100644
+--- a/drivers/vhost/vhost.c
++++ b/drivers/vhost/vhost.c
+@@ -2591,14 +2591,12 @@ void vhost_set_backend_features(struct vhost_dev *dev, u64 features)
+ 	struct vhost_virtqueue *vq;
+ 	int i;
+ 
+-	mutex_lock(&dev->mutex);
+ 	for (i = 0; i < dev->nvqs; ++i) {
+ 		vq = dev->vqs[i];
+ 		mutex_lock(&vq->mutex);
+ 		vq->acked_backend_features = features;
+ 		mutex_unlock(&vq->mutex);
+ 	}
+-	mutex_unlock(&dev->mutex);
+ }
+ EXPORT_SYMBOL_GPL(vhost_set_backend_features);
+ 
+-- 
+2.18.4
 
