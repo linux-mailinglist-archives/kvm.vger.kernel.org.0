@@ -2,144 +2,81 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2F5F4263093
-	for <lists+kvm@lfdr.de>; Wed,  9 Sep 2020 17:31:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 86B4B263133
+	for <lists+kvm@lfdr.de>; Wed,  9 Sep 2020 18:02:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730187AbgIIPbi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 9 Sep 2020 11:31:38 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:28563 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1730225AbgIIP3U (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 9 Sep 2020 11:29:20 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1599665341;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=nYNO+AKEPgBW6vTBqHGF1fYVln/0uSeBDRwExSc81XY=;
-        b=PAliqYGoha/RSfTw1zMP5g2X9kve15l/euOmQWKbcTd5VVPAsGPa/AH4ez+xl/yFhp+Bfs
-        qhibSPtdaRCI8FV0A+1E20gkThWIlkFG8ztXsFDo6mhN646nhd11j79HVr66CDiMh9fLLz
-        bwcteESidN2Z47zTkQkwpcfAxTsuuuY=
-Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
- [209.85.218.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-155-COr26fmvPkqTC0imphpi6Q-1; Wed, 09 Sep 2020 11:20:33 -0400
-X-MC-Unique: COr26fmvPkqTC0imphpi6Q-1
-Received: by mail-ej1-f69.google.com with SMTP id dc22so1422308ejb.21
-        for <kvm@vger.kernel.org>; Wed, 09 Sep 2020 08:20:33 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=nYNO+AKEPgBW6vTBqHGF1fYVln/0uSeBDRwExSc81XY=;
-        b=ud65tdzBztFS5eXnT07shmqt7iWPlAI0m2ZASzVHL+4lAPHeWCF5PpULAv2murV8t0
-         /DUW2HRoT/EpApCmWLYWMyYOFyQGR5Aegsgc7S9qavkJ1euX5BEbO1XfkM755ddaKtyO
-         HpG4fgxROZV9QgSfqjrTsUWMJFMin0gBuui55uTtwlwRtC6MCJbbUY9TaksMPe6NK3nf
-         HvL2O6I05bNDiUX2KyWxfPckrH10npj9XrwiC2ZGrX6BgRicrrLkeFekf75HYR1TlHop
-         ctCgsXhj0dAAqAxqiD45snqDlwksf8PgysSPKBS2ikNH0U9kXPY8BLgITuihEKqSVfZK
-         VpXg==
-X-Gm-Message-State: AOAM531IpEuC35yFHoikw2PYDopPxiXlDW78gOtnrIPvy9rhkGG6i/cH
-        FZDs5pvzhjUYzT8RcMl7K07R9PZAcM77mOfba+oMFZC8cl5HihV6gVxnyc8zlxO5fPzwg2X74Gx
-        iulNwRXbrxODn
-X-Received: by 2002:aa7:c1c3:: with SMTP id d3mr4712075edp.228.1599664832292;
-        Wed, 09 Sep 2020 08:20:32 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJy/buxcR3k3TYh22ywGq6QmpgD+APHFSZ/u2IydDFW2LmR/OY3181D7GwPj31tu14P28jmFEw==
-X-Received: by 2002:aa7:c1c3:: with SMTP id d3mr4712059edp.228.1599664832099;
-        Wed, 09 Sep 2020 08:20:32 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:4025:be55:3943:81a0? ([2001:b07:6468:f312:4025:be55:3943:81a0])
-        by smtp.gmail.com with ESMTPSA id b10sm2399995eje.65.2020.09.09.08.20.30
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 09 Sep 2020 08:20:31 -0700 (PDT)
-Subject: Re: [GIT PULL] KVM/arm64 fixes for 5.9
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     Alexandru Elisei <alexandru.elisei@arm.com>,
-        Andrew Jones <drjones@redhat.com>,
-        Eric Auger <eric.auger@redhat.com>,
-        Gavin Shan <gshan@redhat.com>,
-        Steven Price <steven.price@arm.com>, kernel-team@android.com,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org
-References: <20200904104530.1082676-1-maz@kernel.org>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <f7afbf0f-2e14-2720-5d23-2cd01982e4d1@redhat.com>
-Date:   Wed, 9 Sep 2020 17:20:35 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+        id S1730791AbgIIQC1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 9 Sep 2020 12:02:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51572 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730572AbgIIP5f (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 9 Sep 2020 11:57:35 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BD524C0617BC;
+        Wed,  9 Sep 2020 06:41:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=BsLnzg0TUWFKkjHB7GFuV9Yd79wQB1MTmZ0FtnYyRyI=; b=GCZKbgAuJ6yV+SQqDvHW+6PyrE
+        ab0uViZ1p2LiP11FDscTtRCp12Q3B340D3uZiwWo/XI8BPPVt287/xUcccpauyP/TaEjVOSS17/fm
+        V9NJyyTEUONuX65JlwAquxfYIYkCKvFz07SWkSVVqFpQh7feNniyj9G/5CsLr2/Sd9YSVIzq4+UnS
+        tVTXUmA6xKojbQLj0CgIhpctFkrSHO0Rc8qmGOUrtqSAQeb06fyDVo7psPozObT2tg0FtAbiwxUWO
+        VM2JK2pz+Zknt3xxLEESLaklHGIjuQQPpqI2FCXR81KI7VExiSojqMf2AJvgJNoN5l8yfOrNm4WX5
+        eK16QwdQ==;
+Received: from willy by casper.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1kG0Lw-0003p4-CD; Wed, 09 Sep 2020 13:41:36 +0000
+Date:   Wed, 9 Sep 2020 14:41:36 +0100
+From:   Matthew Wilcox <willy@infradead.org>
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     Ming Mao <maoming.maoming@huawei.com>,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-mm@kvack.org, alex.williamson@redhat.com,
+        akpm@linux-foundation.org, cohuck@redhat.com,
+        jianjay.zhou@huawei.com, weidong.huang@huawei.com,
+        peterx@redhat.com, aarcange@redhat.com, wangyunjian@huawei.com,
+        jhubbard@nvidia.com
+Subject: Re: [PATCH V4 1/2] vfio dma_map/unmap: optimized for hugetlbfs pages
+Message-ID: <20200909134136.GG6583@casper.infradead.org>
+References: <20200908133204.1338-1-maoming.maoming@huawei.com>
+ <20200908133204.1338-2-maoming.maoming@huawei.com>
+ <20200909080114.GA8321@infradead.org>
 MIME-Version: 1.0
-In-Reply-To: <20200904104530.1082676-1-maz@kernel.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200909080114.GA8321@infradead.org>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 04/09/20 12:45, Marc Zyngier wrote:
-> Hi Paolo,
+On Wed, Sep 09, 2020 at 09:01:14AM +0100, Christoph Hellwig wrote:
+> I really don't think this approach is any good.  You workaround
+> a deficiency in the pin_user_pages API in one particular caller for
+> one particular use case.
 > 
-> Here's a bunch of fixes for 5.9. The gist of it is the stolen time
-> rework from Andrew, but we also have a couple of MM fixes that have
-> surfaced as people have started to use hugetlbfs in anger.
+> I think you'd rather want either:
+> 
+>  (1) a FOLL_HUGEPAGE flag for the pin_user_pages API family that returns
+>      a single struct page for any kind of huge page, which would also
+>      benefit all kinds of other users rather than adding these kinds of
+>      hacks to vfio.
 
-Hi Marc,
+This seems to be similar to a flag I added last week to
+pagecache_get_page() called FGP_HEAD:
 
-I'll get to this next Friday.
++ * * %FGP_HEAD - If the page is present and a THP, return the head page
++ *   rather than the exact page specified by the index.
 
-Paolo
+I think "return the head page" is probably what we want from what I
+understand of this patch.  The caller can figure out the appropriate
+bv_offset / bv_len for a bio_vec, if that's what they want to do with it.
 
-> Please pull,
-> 
-> 	M.
-> 
-> The following changes since commit 9123e3a74ec7b934a4a099e98af6a61c2f80bbf5:
-> 
->   Linux 5.9-rc1 (2020-08-16 13:04:57 -0700)
-> 
-> are available in the Git repository at:
-> 
->   git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvmarm-fixes-5.9-1
-> 
-> for you to fetch changes up to 7b75cd5128421c673153efb1236705696a1a9812:
-> 
->   KVM: arm64: Update page shift if stage 2 block mapping not supported (2020-09-04 10:53:48 +0100)
-> 
-> ----------------------------------------------------------------
-> KVM/arm64 fixes for Linux 5.9, take #1
-> 
-> - Multiple stolen time fixes, with a new capability to match x86
-> - Fix for hugetlbfs mappings when PUD and PMD are the same level
-> - Fix for hugetlbfs mappings when PTE mappings are enforced
->   (dirty logging, for example)
-> - Fix tracing output of 64bit values
-> 
-> ----------------------------------------------------------------
-> Alexandru Elisei (1):
->       KVM: arm64: Update page shift if stage 2 block mapping not supported
-> 
-> Andrew Jones (6):
->       KVM: arm64: pvtime: steal-time is only supported when configured
->       KVM: arm64: pvtime: Fix potential loss of stolen time
->       KVM: arm64: Drop type input from kvm_put_guest
->       KVM: arm64: pvtime: Fix stolen time accounting across migration
->       KVM: Documentation: Minor fixups
->       arm64/x86: KVM: Introduce steal-time cap
-> 
-> Marc Zyngier (2):
->       KVM: arm64: Do not try to map PUDs when they are folded into PMD
->       KVM: arm64: Fix address truncation in traces
-> 
->  Documentation/virt/kvm/api.rst     | 22 ++++++++++++++++++----
->  arch/arm64/include/asm/kvm_host.h  |  2 +-
->  arch/arm64/kvm/arm.c               |  3 +++
->  arch/arm64/kvm/mmu.c               |  8 +++++++-
->  arch/arm64/kvm/pvtime.c            | 29 +++++++++++++----------------
->  arch/arm64/kvm/trace_arm.h         | 16 ++++++++--------
->  arch/arm64/kvm/trace_handle_exit.h |  6 +++---
->  arch/x86/kvm/x86.c                 |  3 +++
->  include/linux/kvm_host.h           | 31 ++++++++++++++++++++++++++-----
->  include/uapi/linux/kvm.h           |  1 +
->  10 files changed, 83 insertions(+), 38 deletions(-)
-> 
+http://git.infradead.org/users/willy/pagecache.git/commitdiff/ee88eeeb6b0f35e95ef82b11dfc24dc04c3dcad8 is the exact commit where I added that, but it depends on a number of other patches in this series:
+http://git.infradead.org/users/willy/pagecache.git/shortlog
+
+I'm going to send out a subset of patches later today which will include
+that one and some others.  I haven't touched the GUP paths at all in
+that series, but it's certainly going to make THPs (of various sizes)
+much more present in the system.
 
