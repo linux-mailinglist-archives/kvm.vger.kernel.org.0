@@ -2,80 +2,234 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0E67E26253B
-	for <lists+kvm@lfdr.de>; Wed,  9 Sep 2020 04:35:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BD662262545
+	for <lists+kvm@lfdr.de>; Wed,  9 Sep 2020 04:39:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728442AbgIICfV convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Tue, 8 Sep 2020 22:35:21 -0400
-Received: from mail.kernel.org ([198.145.29.99]:47516 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726605AbgIICfV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 8 Sep 2020 22:35:21 -0400
-From:   bugzilla-daemon@bugzilla.kernel.org
-Authentication-Results: mail.kernel.org; dkim=permerror (bad message/signature format)
-To:     kvm@vger.kernel.org
-Subject: [Bug 209155] KVM Linux guest with more than 1 CPU panics after
- commit 404d5d7bff0d419fe11c7eaebca9ec8f25258f95 on old CPU (Phenom x4)
-Date:   Wed, 09 Sep 2020 02:35:19 +0000
-X-Bugzilla-Reason: None
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Product: Virtualization
-X-Bugzilla-Component: kvm
-X-Bugzilla-Version: unspecified
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: wanpeng.li@hotmail.com
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-209155-28872-Pj20vXzxD5@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-209155-28872@https.bugzilla.kernel.org/>
-References: <bug-209155-28872@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8BIT
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+        id S1728350AbgIICit (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 8 Sep 2020 22:38:49 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:38645 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1725997AbgIICio (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 8 Sep 2020 22:38:44 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1599619122;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=B8V/E1J+FloLvbRgdM82im9tBAuMNmHArMRMtM0VkOI=;
+        b=idlO/KHXnXCq3h0H0UeulHCcABa0SmRljp9w1JadEiYGZrChUa+1rJbUN2lCsm0uRXkv4v
+        Qy3XTAgWkxfVkxnTVrB63QVdZBvZf+AtgfzqzH31uodMYx8g9LyhpDLlXY1TTl+Gq0oq0r
+        3DGhRnRcJtetKQplDG1hnGi3JmPgHxo=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-452-eUh4UVXXN-StxtVZTGDaIw-1; Tue, 08 Sep 2020 22:38:40 -0400
+X-MC-Unique: eUh4UVXXN-StxtVZTGDaIw-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 08ABF800EBB;
+        Wed,  9 Sep 2020 02:38:39 +0000 (UTC)
+Received: from colo-mx.corp.redhat.com (colo-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.21])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id EEC4C60C0F;
+        Wed,  9 Sep 2020 02:38:38 +0000 (UTC)
+Received: from zmail21.collab.prod.int.phx2.redhat.com (zmail21.collab.prod.int.phx2.redhat.com [10.5.83.24])
+        by colo-mx.corp.redhat.com (Postfix) with ESMTP id E01EA7A00C;
+        Wed,  9 Sep 2020 02:38:38 +0000 (UTC)
+Date:   Tue, 8 Sep 2020 22:38:37 -0400 (EDT)
+From:   Jason Wang <jasowang@redhat.com>
+To:     Zhu Lingshan <lingshan.zhu@intel.com>
+Cc:     mst@redhat.com, virtualization@lists.linux-foundation.org,
+        netdev@vger.kernel.org, kvm@vger.kernel.org
+Message-ID: <2104155542.16285964.1599619117641.JavaMail.zimbra@redhat.com>
+In-Reply-To: <20200909022233.26559-1-lingshan.zhu@intel.com>
+References: <20200909022233.26559-1-lingshan.zhu@intel.com>
+Subject: Re: [PATCH] vhost: new vhost_vdpa SET/GET_BACKEND_FEATURES handlers
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.68.5.20, 10.4.195.10]
+Thread-Topic: vhost: new vhost_vdpa SET/GET_BACKEND_FEATURES handlers
+Thread-Index: 7zVLAssoNeH734drqaqg1blqsRLnOA==
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=209155
 
---- Comment #11 from Wanpeng Li (wanpeng.li@hotmail.com) ---
-(In reply to Sean Christopherson from comment #8)
-> From code inspection, I'm 99% confident the immediate bug is that
-> svm->next_rip is reset in svm_vcpu_run() only after calling
-> svm_exit_handlers_fastpath(), which will cause SVM's
-> skip_emulated_instruction() to write a stale RIP.  I don't have AMD hardware
-> to confirm, but this should be reproducible on modern CPUs by loading
-> kvm_amd with nrips=0.
+
+----- Original Message -----
+> This commit introduced vhost_vdpa_set/get_backend_features() to
+> resolve these issues:
+> (1)In vhost_vdpa ioctl SET_BACKEND_FEATURES path, currect code
+> would try to acquire vhost dev mutex twice
+> (first shown in vhost_vdpa_unlocked_ioctl), which can lead
+> to a dead lock issue.
+> (2)SET_BACKEND_FEATURES was blindly added to vring ioctl instead
+> of vdpa device ioctl
 > 
-> That issue is easy enough to resolve, e.g. simply hoist "svm->next_rip = 0;"
-> up above the fastpath handling.  But, there are additional complications
-> with advancing rip in the fastpath as svm_complete_interrupts() consumes
-> rip, e.g. for NMI unmasking logic and event reinjection.  Odds are that NMI
-> unmasking will never "fail" as it would require the new rip to match the
-> last IRET rip, which would be very bizarre.  Similarly, event reinjection
-> should also be a non-issue in practice as the WRMSR fastpath shouldn't be
-> reachable if KVM was injecting an event.
+> To resolve these issues, this commit (1)removed mutex operations
+> in vhost_set_backend_features. (2)Handle ioctl
+> SET/GET_BACKEND_FEATURES in vdpa ioctl. (3)introduce a new
+> function vhost_net_set_backend_features() for vhost_net,
+> which is a wrap of vhost_set_backend_features() with
+> necessary mutex lockings.
 > 
-> All the being said, IMO, the safest play would be to first yank out the call
-> to handle_fastpath_set_msr_irqoff() in svm_exit_handlers_fastpath() to
-> ensure a clean base and to provide a safe backport patch, then move
-> svm_complete_interrupts() into svm_vcpu_run(), and finally move the call to
-> svm_exit_handlers_fastpath() down a ways and reenable
-> handle_fastpath_set_msr_irqoff().  Aside from resolving weirdness with rip
-> and fastpath, it would also align VMX and SVM with respect to completing
-> interrupts.
+> Signed-off-by: Zhu Lingshan <lingshan.zhu@intel.com>
 
-Hi Sean, thanks for your analyses, I will send out patches to fix it. :)
+So this patch touches not only vhost-vDPA.
 
--- 
-You are receiving this mail because:
-You are watching the assignee of the bug.
+Though the function looks correct, I'd prefer you do cleanup on top of
+my patches which has been tested by Eli.
+
+Note that, vhost generic handlers tend to hold mutex by itself.
+
+So we probably need more thought on this.
+
+Thanks
+
+> ---
+>  drivers/vhost/net.c   |  9 ++++++++-
+>  drivers/vhost/vdpa.c  | 47 ++++++++++++++++++++++++++++++-------------
+>  drivers/vhost/vhost.c |  2 --
+>  3 files changed, 41 insertions(+), 17 deletions(-)
+> 
+> diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
+> index 531a00d703cd..e01da77538c8 100644
+> --- a/drivers/vhost/net.c
+> +++ b/drivers/vhost/net.c
+> @@ -1679,6 +1679,13 @@ static long vhost_net_set_owner(struct vhost_net *n)
+>  	return r;
+>  }
+>  
+> +static void vhost_net_set_backend_features(struct vhost_dev *dev, u64
+> features)
+> +{
+> +	mutex_lock(&dev->mutex);
+> +	vhost_set_backend_features(dev, features);
+> +	mutex_unlock(&dev->mutex);
+> +}
+> +
+>  static long vhost_net_ioctl(struct file *f, unsigned int ioctl,
+>  			    unsigned long arg)
+>  {
+> @@ -1715,7 +1722,7 @@ static long vhost_net_ioctl(struct file *f, unsigned
+> int ioctl,
+>  			return -EFAULT;
+>  		if (features & ~VHOST_NET_BACKEND_FEATURES)
+>  			return -EOPNOTSUPP;
+> -		vhost_set_backend_features(&n->dev, features);
+> +		vhost_net_set_backend_features(&n->dev, features);
+>  		return 0;
+>  	case VHOST_RESET_OWNER:
+>  		return vhost_net_reset_owner(n);
+> diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
+> index 3fab94f88894..ade33c566a81 100644
+> --- a/drivers/vhost/vdpa.c
+> +++ b/drivers/vhost/vdpa.c
+> @@ -344,6 +344,33 @@ static long vhost_vdpa_set_config_call(struct vhost_vdpa
+> *v, u32 __user *argp)
+>  	return 0;
+>  }
+>  
+> +
+> +static long vhost_vdpa_get_backend_features(void __user *argp)
+> +{
+> +	u64 features = VHOST_VDPA_BACKEND_FEATURES;
+> +	u64 __user *featurep = argp;
+> +	long r;
+> +
+> +	r = copy_to_user(featurep, &features, sizeof(features));
+> +
+> +	return r;
+> +}
+> +static long vhost_vdpa_set_backend_features(struct vhost_vdpa *v, void
+> __user *argp)
+> +{
+> +	u64 __user *featurep = argp;
+> +	u64 features;
+> +
+> +	if (copy_from_user(&features, featurep, sizeof(features)))
+> +		return -EFAULT;
+> +
+> +	if (features & ~VHOST_VDPA_BACKEND_FEATURES)
+> +		return -EOPNOTSUPP;
+> +
+> +	vhost_set_backend_features(&v->vdev, features);
+> +
+> +	return 0;
+> +}
+> +
+>  static long vhost_vdpa_vring_ioctl(struct vhost_vdpa *v, unsigned int cmd,
+>  				   void __user *argp)
+>  {
+> @@ -353,8 +380,6 @@ static long vhost_vdpa_vring_ioctl(struct vhost_vdpa *v,
+> unsigned int cmd,
+>  	struct vdpa_callback cb;
+>  	struct vhost_virtqueue *vq;
+>  	struct vhost_vring_state s;
+> -	u64 __user *featurep = argp;
+> -	u64 features;
+>  	u32 idx;
+>  	long r;
+>  
+> @@ -381,18 +406,6 @@ static long vhost_vdpa_vring_ioctl(struct vhost_vdpa *v,
+> unsigned int cmd,
+>  
+>  		vq->last_avail_idx = vq_state.avail_index;
+>  		break;
+> -	case VHOST_GET_BACKEND_FEATURES:
+> -		features = VHOST_VDPA_BACKEND_FEATURES;
+> -		if (copy_to_user(featurep, &features, sizeof(features)))
+> -			return -EFAULT;
+> -		return 0;
+> -	case VHOST_SET_BACKEND_FEATURES:
+> -		if (copy_from_user(&features, featurep, sizeof(features)))
+> -			return -EFAULT;
+> -		if (features & ~VHOST_VDPA_BACKEND_FEATURES)
+> -			return -EOPNOTSUPP;
+> -		vhost_set_backend_features(&v->vdev, features);
+> -		return 0;
+>  	}
+>  
+>  	r = vhost_vring_ioctl(&v->vdev, cmd, argp);
+> @@ -476,6 +489,12 @@ static long vhost_vdpa_unlocked_ioctl(struct file
+> *filep,
+>  	case VHOST_VDPA_SET_CONFIG_CALL:
+>  		r = vhost_vdpa_set_config_call(v, argp);
+>  		break;
+> +	case VHOST_SET_BACKEND_FEATURES:
+> +		r = vhost_vdpa_set_backend_features(v, argp);
+> +		break;
+> +	case VHOST_GET_BACKEND_FEATURES:
+> +		r = vhost_vdpa_get_backend_features(argp);
+> +		break;
+>  	default:
+>  		r = vhost_dev_ioctl(&v->vdev, cmd, argp);
+>  		if (r == -ENOIOCTLCMD)
+> diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
+> index b45519ca66a7..e03c9e6f058f 100644
+> --- a/drivers/vhost/vhost.c
+> +++ b/drivers/vhost/vhost.c
+> @@ -2591,14 +2591,12 @@ void vhost_set_backend_features(struct vhost_dev
+> *dev, u64 features)
+>  	struct vhost_virtqueue *vq;
+>  	int i;
+>  
+> -	mutex_lock(&dev->mutex);
+>  	for (i = 0; i < dev->nvqs; ++i) {
+>  		vq = dev->vqs[i];
+>  		mutex_lock(&vq->mutex);
+>  		vq->acked_backend_features = features;
+>  		mutex_unlock(&vq->mutex);
+>  	}
+> -	mutex_unlock(&dev->mutex);
+>  }
+>  EXPORT_SYMBOL_GPL(vhost_set_backend_features);
+>  
+> --
+> 2.18.4
+> 
+> 
+
