@@ -2,106 +2,162 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5E29A2625FE
-	for <lists+kvm@lfdr.de>; Wed,  9 Sep 2020 05:53:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BC9602626CF
+	for <lists+kvm@lfdr.de>; Wed,  9 Sep 2020 07:39:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726489AbgIIDxh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 8 Sep 2020 23:53:37 -0400
-Received: from mo-csw-fb1114.securemx.jp ([210.130.202.173]:36110 "EHLO
-        mo-csw-fb.securemx.jp" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726005AbgIIDxh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 8 Sep 2020 23:53:37 -0400
-X-Greylist: delayed 1791 seconds by postgrey-1.27 at vger.kernel.org; Tue, 08 Sep 2020 23:53:35 EDT
-Received: by mo-csw-fb.securemx.jp (mx-mo-csw-fb1114) id 0893NguN008293; Wed, 9 Sep 2020 12:23:44 +0900
-Received: by mo-csw.securemx.jp (mx-mo-csw1115) id 0893NC1k019288; Wed, 9 Sep 2020 12:23:12 +0900
-X-Iguazu-Qid: 2wGqu78fjgdqsiLAfO
-X-Iguazu-QSIG: v=2; s=0; t=1599621791; q=2wGqu78fjgdqsiLAfO; m=DYT0UINKyeExPjuDuIYDWKRawt8iW+J/bc7NgKefQbM=
-Received: from imx12.toshiba.co.jp (imx12.toshiba.co.jp [61.202.160.132])
-        by relay.securemx.jp (mx-mr1110) id 0893N9Bd019173;
-        Wed, 9 Sep 2020 12:23:09 +0900
-Received: from enc02.toshiba.co.jp ([61.202.160.51])
-        by imx12.toshiba.co.jp  with ESMTP id 0893N9Ae003824;
-        Wed, 9 Sep 2020 12:23:09 +0900 (JST)
-Received: from hop101.toshiba.co.jp ([133.199.85.107])
-        by enc02.toshiba.co.jp  with ESMTP id 0893N8um023841;
-        Wed, 9 Sep 2020 12:23:08 +0900
-From:   Punit Agrawal <punit1.agrawal@toshiba.co.jp>
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Andrew Jones <drjones@redhat.com>,
-        Eric Auger <eric.auger@redhat.com>,
-        Gavin Shan <gshan@redhat.com>,
-        Steven Price <steven.price@arm.com>, kernel-team@android.com,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org, stable@vger.kernel.org
-Subject: Re: [PATCH 7/9] KVM: arm64: Do not try to map PUDs when they are folded into PMD
-References: <20200904104530.1082676-1-maz@kernel.org>
-        <20200904104530.1082676-8-maz@kernel.org>
-Date:   Wed, 09 Sep 2020 12:23:07 +0900
-In-Reply-To: <20200904104530.1082676-8-maz@kernel.org> (Marc Zyngier's message
-        of "Fri, 4 Sep 2020 11:45:28 +0100")
-X-TSB-HOP: ON
-Message-ID: <874ko7prac.fsf@kokedama.swc.toshiba.co.jp>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
+        id S1725856AbgIIFjG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 9 Sep 2020 01:39:06 -0400
+Received: from mga02.intel.com ([134.134.136.20]:4574 "EHLO mga02.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725807AbgIIFjF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 9 Sep 2020 01:39:05 -0400
+IronPort-SDR: PME2lyxuUZGBBNB3TqNi7XWzEhPWRNGGw5vf5Ajl/SX3Oya3E+60PouAE6ZDFgHKJfitW0iIia
+ 3Cii/GCS5K8Q==
+X-IronPort-AV: E=McAfee;i="6000,8403,9738"; a="145993006"
+X-IronPort-AV: E=Sophos;i="5.76,408,1592895600"; 
+   d="scan'208";a="145993006"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Sep 2020 22:39:02 -0700
+IronPort-SDR: whcmFigUgqLBadZ88oSuQUtx0F6IibdTMz/wnMKxzlk8/zn/jTBg4htIm5EhINSeN1YTLfMt/h
+ Rf+LDUhf4P1Q==
+X-IronPort-AV: E=Sophos;i="5.76,408,1592895600"; 
+   d="scan'208";a="480331663"
+Received: from joy-optiplex-7040.sh.intel.com (HELO joy-OptiPlex-7040) ([10.239.13.16])
+  by orsmga005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Sep 2020 22:38:56 -0700
+Date:   Wed, 9 Sep 2020 13:37:56 +0800
+From:   Yan Zhao <yan.y.zhao@intel.com>
+To:     kvm@vger.kernel.org, libvir-list@redhat.com, qemu-devel@nongnu.org,
+        openstack-discuss@lists.openstack.org,
+        intel-gvt-dev@lists.freedesktop.org
+Cc:     smooney@redhat.com, Cornelia Huck <cohuck@redhat.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Daniel =?iso-8859-1?Q?P=2EBerrang=E9?= <berrange@redhat.com>,
+        Jason Wang <jasowang@redhat.com>, kwankhede@nvidia.com,
+        eauger@redhat.com, xin-ran.wang@intel.com, corbet@lwn.net,
+        shaohe.feng@intel.com, kevin.tian@intel.com,
+        Parav Pandit <parav@mellanox.com>, jian-feng.ding@intel.com,
+        dgilbert@redhat.com, zhenyuw@linux.intel.com, hejie.xu@intel.com,
+        bao.yumeng@zte.com.cn, intel-gvt-dev@lists.freedesktop.org,
+        eskultet@redhat.com, Jiri Pirko <jiri@mellanox.com>,
+        dinechin@redhat.com
+Subject: Re: device compatibility interface for live migration with assigned
+ devices
+Message-ID: <20200909053755.GA721@joy-OptiPlex-7040>
+Reply-To: Yan Zhao <yan.y.zhao@intel.com>
+References: <20200818091628.GC20215@redhat.com>
+ <20200818113652.5d81a392.cohuck@redhat.com>
+ <20200820003922.GE21172@joy-OptiPlex-7040>
+ <20200819212234.223667b3@x1.home>
+ <20200820031621.GA24997@joy-OptiPlex-7040>
+ <20200825163925.1c19b0f0.cohuck@redhat.com>
+ <20200826064117.GA22243@joy-OptiPlex-7040>
+ <20200828154741.30cfc1a3.cohuck@redhat.com>
+ <8f5345be73ebf4f8f7f51d6cdc9c2a0d8e0aa45e.camel@redhat.com>
+ <20200831044344.GB13784@joy-OptiPlex-7040>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200831044344.GB13784@joy-OptiPlex-7040>
+User-Agent: Mutt/1.9.4 (2018-02-28)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Marc,
+hi All,
+Per our previous discussion, there are two main concerns to the previous
+proposal:
+(1) it's currently hard for openstack to match mdev types.
+(2) complicated.
 
-Noticed this patch while catching up with the lists.
+so, we further propose below changes:
+(1) requiring two compatible mdevs to have the same mdev type for now.
+    (though kernel still exposes compatible_type attributes for future use)  
+(2) requiring 1:1 match for other attributes under sysfs type node for now
+    (those attributes are specified via compatible_<attribute name> but
+    with only 1 value in it.)
+(3) do not match attributes under device instance node.
+    rather, they are regarded as part of resource claiming process.
+    so src and dest values are ensured to be 1:1.
+    A dynamic_resources attribute under sysfs <type-id> node is added to
+    list the attributes under device instance that mgt tools need to
+    ensure 1:1 from src and dest.
+    the "aggregator" attribute under device instance node is such one that
+    needs to be listed.
+    Those listed attributes can actually be treated as device state set by
+    vendor driver during live migration. but we still want to ask for them to
+    be set by mgt tools before live migration starts, in oder to reduce the
+    chance of live migration failure.
 
-Marc Zyngier <maz@kernel.org> writes:
+do you like those changes?
 
-> For the obscure cases where PMD and PUD are the same size
-> (64kB pages with 42bit VA, for example, which results in only
-> two levels of page tables), we can't map anything as a PUD,
-> because there is... erm... no PUD to speak of. Everything is
-> either a PMD or a PTE.
->
-> So let's only try and map a PUD when its size is different from
-> that of a PMD.
->
-> Cc: stable@vger.kernel.org
-> Fixes: b8e0ba7c8bea ("KVM: arm64: Add support for creating PUD hugepages at stage 2")
-> Reported-by: Gavin Shan <gshan@redhat.com>
-> Reported-by: Eric Auger <eric.auger@redhat.com>
-> Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
-> Reviewed-by: Gavin Shan <gshan@redhat.com>
-> Tested-by: Gavin Shan <gshan@redhat.com>
-> Tested-by: Eric Auger <eric.auger@redhat.com>
-> Tested-by: Alexandru Elisei <alexandru.elisei@arm.com>
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->  arch/arm64/kvm/mmu.c | 7 ++++++-
->  1 file changed, 6 insertions(+), 1 deletion(-)
->
-> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> index 0121ef2c7c8d..16b8660ddbcc 100644
-> --- a/arch/arm64/kvm/mmu.c
-> +++ b/arch/arm64/kvm/mmu.c
-> @@ -1964,7 +1964,12 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
->  		(fault_status == FSC_PERM &&
->  		 stage2_is_exec(mmu, fault_ipa, vma_pagesize));
->  
-> -	if (vma_pagesize == PUD_SIZE) {
-> +	/*
-> +	 * If PUD_SIZE == PMD_SIZE, there is no real PUD level, and
-> +	 * all we have is a 2-level page table. Trying to map a PUD in
-> +	 * this case would be fatally wrong.
-> +	 */
-> +	if (PUD_SIZE != PMD_SIZE && vma_pagesize == PUD_SIZE) {
->  		pud_t new_pud = kvm_pfn_pud(pfn, mem_type);
->  
->  		new_pud = kvm_pud_mkhuge(new_pud);
+after the changes, the sysfs interface would look like blow:
 
-Good catch!
-Missed the 64kb / 42b VA case while adding the initial support.
+  |- [parent physical device]
+  |--- Vendor-specific-attributes [optional]
+  |--- [mdev_supported_types]
+  |     |--- [<type-id>]
+  |     |   |--- create
+  |     |   |--- name
+  |     |   |--- available_instances
+  |     |   |--- device_api
+  |     |   |--- software_version
+  |     |   |--- compatible_type
+  |     |   |--- compatible_<device_api_specific_field>
+  |     |   |--- compatible_<type_specific_field>
+  |     |   |--- dynamic_resources
+  |     |   |--- description
+  |     |   |--- [devices]
 
-Thanks for fixing it.
+- device_api : exact match between src and dest is required.
+               its value can be one of 
+               "vfio-pci", "vfio-platform", "vfio-amba", "vfio-ccw", "vfio-ap"
+- software_version: version of vendor driver.
+                    in major.minor.bugfix scheme. 
+                    dest major should be equal to src major,
+	            dest minor should be no less than src minor.
+		    once migration stream related code changed, vendor
+		    drivers need to bump the version.
+- compatible_type: not used by mgt tools currently.
+                   vendor drivers can provide this attribute, but need to
+		   know that mgt apps would ignore it.
+		   when in future mgt tools support this attribute, it
+		   would allow migration across different mdev types,
+		   so that devices of older generation may be able to
+		   migrate to newer generations.
 
-Punit
+- compatible_<device_api_specific_field>: for device api specific attributes,
+                  e.g. compatible_subchannel_type,
+                  dest values should be superset of arc values.
+		  vendor drivers can specify only one value in this attribute,
+		  in order to do exact match between src and dest.
+		  It's ok for mgt tools to only read one value in the
+		  attribute so that src:dest values are 1:1.
+
+- compatible_<type_specific_field>: for mdev type specific attributes,
+                  e.g. compatible_pci_ids, compatible_chpid_type
+                  dest values should be superset of arc values.
+		  vendor drivers can specify only one value in the attribute
+		  in order to do exact match between src and dest.
+		  It's ok for mgt tools to only read one value in the
+		  attribute so that src:dest values are 1:1.
+
+- dynamic_resources: though defined statically under <type-id>,
+                  this attribute lists attributes under device instance that
+		  need to be set as part of claiming dest resources.
+		  e.g. $cat dynamic_resources: aggregator, fps,...
+		  then after dest device is created, values of its device
+		  attributes need to be set to that of src device attributes.
+		  Failure in syncing src device values to dest device
+		  values is treated the same as failing to claiming
+		  dest resources.
+		  attributes under device instance that are not listed
+		  in this attribute would not be part of resource checking in
+		  mgt tools.
+
+
+
+Thanks
+Yan
