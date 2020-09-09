@@ -2,210 +2,108 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9110C263A3E
-	for <lists+kvm@lfdr.de>; Thu, 10 Sep 2020 04:24:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CBC2D263AB2
+	for <lists+kvm@lfdr.de>; Thu, 10 Sep 2020 04:41:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730878AbgIJCYr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 9 Sep 2020 22:24:47 -0400
-Received: from userp2120.oracle.com ([156.151.31.85]:34574 "EHLO
-        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730794AbgIJCWg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 9 Sep 2020 22:22:36 -0400
-Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
-        by userp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 08A2K0o9120754;
-        Thu, 10 Sep 2020 02:22:31 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
- subject : date : message-id : in-reply-to : references; s=corp-2020-01-29;
- bh=9Yu0+hVjg349shgtmGEHPIIhGF87WXKFZaup59ONGuE=;
- b=oGy20AHZBsiGauYoT/Jkk5Sg8YCg4T3XRcDv9haSXyhOLHMoZRT5AVnhRGgIaUEhOzq5
- ekqov6BKhPgW1iH/gLtYvOHOJrI7w2gKk2ZpV5krnXACgxZhOJghJk/cPKP4801/Rt/c
- qxx3iDw8DVOTmgm0R70Xzle6mriN/lUjCVGOGNz0UvCs4Qpn4fpzVsUQVsssCf/0utE6
- /1+M6W8FOupVycCuvGRuoXpjtF8TiHCDNDdPgHvPI44LV6iUrMr/dK8tJb/7MM5ji4jU
- PWoywfltL+Am/AwNLHECJZ6eQXznbZ1+ZCqEBfQXORZNZ9v12EMCNTBGKefjs1iWgzjs IQ== 
-Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
-        by userp2120.oracle.com with ESMTP id 33c3an5514-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
-        Thu, 10 Sep 2020 02:22:30 +0000
-Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
-        by aserp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 08A2L6Pf023034;
-        Thu, 10 Sep 2020 02:22:30 GMT
-Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
-        by aserp3020.oracle.com with ESMTP id 33cmk88wee-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 10 Sep 2020 02:22:30 +0000
-Received: from abhmp0013.oracle.com (abhmp0013.oracle.com [141.146.116.19])
-        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 08A2MTDe012667;
-        Thu, 10 Sep 2020 02:22:29 GMT
-Received: from nsvm-sadhukhan-1.osdevelopmeniad.oraclevcn.com (/100.100.230.216)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Wed, 09 Sep 2020 19:22:29 -0700
-From:   Krish Sadhukhan <krish.sadhukhan@oracle.com>
-To:     kvm@vger.kernel.org
-Cc:     pbonzini@redhat.com, jmattson@google.com, thomas.lendacky@amd.com
-Subject: [PATCH 1/3 v2] KVM: SVM: Replace numeric value for SME CPUID leaf with a #define
-Date:   Thu, 10 Sep 2020 02:22:09 +0000
-Message-Id: <20200910022211.5417-2-krish.sadhukhan@oracle.com>
-X-Mailer: git-send-email 2.18.4
-In-Reply-To: <20200910022211.5417-1-krish.sadhukhan@oracle.com>
-References: <20200910022211.5417-1-krish.sadhukhan@oracle.com>
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9739 signatures=668679
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0 malwarescore=0 phishscore=0
- mlxlogscore=936 bulkscore=0 adultscore=0 mlxscore=0 suspectscore=1
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
- definitions=main-2009100020
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9739 signatures=668679
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0 priorityscore=1501
- clxscore=1015 bulkscore=0 malwarescore=0 lowpriorityscore=0
- mlxlogscore=951 suspectscore=1 adultscore=0 mlxscore=0 impostorscore=0
- spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2006250000 definitions=main-2009100020
+        id S1730602AbgIJCHe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 9 Sep 2020 22:07:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52576 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730531AbgIJCCb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 9 Sep 2020 22:02:31 -0400
+Received: from mail-pf1-x442.google.com (mail-pf1-x442.google.com [IPv6:2607:f8b0:4864:20::442])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9202DC0617A2
+        for <kvm@vger.kernel.org>; Wed,  9 Sep 2020 16:23:37 -0700 (PDT)
+Received: by mail-pf1-x442.google.com with SMTP id x123so3513954pfc.7
+        for <kvm@vger.kernel.org>; Wed, 09 Sep 2020 16:23:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=c5p8WBq1qtYrMuvvxqfHaHn+LepsJk3lGDjCppOmf40=;
+        b=KkNfWb46nCHMbeFpHEoN0CbeSeqN6bPdBtG/eCBoKkF5xrln8OHsk8sdUVWe6AVc+O
+         AhU2Crlxq9yZYcOelSde58riCYNYgoy/ey+O4+zsy5V2FekMCi7xlgOLeh6A7i/3kr2l
+         xqUYhCHu525mHAIUpJViw0XumMcql9dqFwXxWo4MADUdyyDsbOWvwOsackh9DPWljen3
+         hxO3NZriyaJav3J0+5HfkY3UYYEZv8WYs74R2ovvsgHgMVb2HuT5TKHLuZ6rQE8unlyn
+         ykQBizXIhC3iyqFaW+4RMpfD3u+SlgObF1nUTce/d7F7SFe60IWFX3YHaXRbM/KhPSbf
+         RKRA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=c5p8WBq1qtYrMuvvxqfHaHn+LepsJk3lGDjCppOmf40=;
+        b=t709eostKxOm+iL63D/kznwhR9C+UvGX2FePrbWj5A4J10SOL1iBJuqHkGeW2XJkVK
+         v6BmG0Eq6bPGTuPgZnGzAz3rU5eyrsBGmjenlOnx5UazU/ZtzeQrY7lCugtQTW171o8I
+         1+CibnhLHybieoFnuLlqgmzkTCI77tQp7vRXDZ/y5Zf04SykduhphTOFkenR+0JYnUIU
+         h9bueulqY2903SJ+4h30JJXRc2jQL8fyOg9ds9PGCoJ+QH0X97+8+uRCoA9foCiqG7jY
+         C608X6u1GboPwtUI50ryjiBqGpnIK21nJelnEt1tTJu9bbyzsLdaxs3kQAGB8dAuFaJF
+         jlBA==
+X-Gm-Message-State: AOAM532//63IXjF+0yRU+7ocXKaa9NiO9Fv/AdJJywDhxvQiJMuAR+TW
+        8p/PURM9K5iPEQsEMikCy0uUBo0rk+iAFw==
+X-Google-Smtp-Source: ABdhPJyLFnTKMqZCaScZAKIRwTEhSbQsApyF37uNABYJwF5hSOk5cB5ERfNlpt7X7bbBFCi4l+e1yA==
+X-Received: by 2002:a17:902:b686:: with SMTP id c6mr2834249pls.74.1599691523776;
+        Wed, 09 Sep 2020 15:45:23 -0700 (PDT)
+Received: from xps15 (S0106002369de4dac.cg.shawcable.net. [68.147.8.254])
+        by smtp.gmail.com with ESMTPSA id s66sm3668057pfc.159.2020.09.09.15.45.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 09 Sep 2020 15:45:23 -0700 (PDT)
+Date:   Wed, 9 Sep 2020 16:45:21 -0600
+From:   Mathieu Poirier <mathieu.poirier@linaro.org>
+To:     Guennadi Liakhovetski <guennadi.liakhovetski@linux.intel.com>
+Cc:     kvm@vger.kernel.org, linux-remoteproc@vger.kernel.org,
+        virtualization@lists.linux-foundation.org,
+        sound-open-firmware@alsa-project.org,
+        Pierre-Louis Bossart <pierre-louis.bossart@linux.intel.com>,
+        Liam Girdwood <liam.r.girdwood@linux.intel.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Ohad Ben-Cohen <ohad@wizery.com>,
+        Bjorn Andersson <bjorn.andersson@linaro.org>,
+        Vincent Whitchurch <vincent.whitchurch@axis.com>
+Subject: Re: [PATCH v5 3/4] rpmsg: update documentation
+Message-ID: <20200909224521.GC562265@xps15>
+References: <20200826174636.23873-1-guennadi.liakhovetski@linux.intel.com>
+ <20200826174636.23873-4-guennadi.liakhovetski@linux.intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200826174636.23873-4-guennadi.liakhovetski@linux.intel.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Signed-off-by: Krish Sadhukhan <krish.sadhukhan@oracle.com>
----
- arch/x86/boot/compressed/mem_encrypt.S | 5 +++--
- arch/x86/include/asm/cpufeatures.h     | 5 +++++
- arch/x86/kernel/cpu/amd.c              | 2 +-
- arch/x86/kernel/cpu/scattered.c        | 4 ++--
- arch/x86/kvm/cpuid.c                   | 2 +-
- arch/x86/kvm/svm/svm.c                 | 4 ++--
- arch/x86/mm/mem_encrypt_identity.c     | 4 ++--
- 7 files changed, 16 insertions(+), 10 deletions(-)
+On Wed, Aug 26, 2020 at 07:46:35PM +0200, Guennadi Liakhovetski wrote:
+> rpmsg_create_ept() takes struct rpmsg_channel_info chinfo as its last
+> argument, not a u32 value. The first two arguments are also updated.
+> 
+> Signed-off-by: Guennadi Liakhovetski <guennadi.liakhovetski@linux.intel.com>
+> ---
+>  Documentation/rpmsg.txt | 6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
+> 
+> diff --git a/Documentation/rpmsg.txt b/Documentation/rpmsg.txt
+> index 24b7a9e1a5f9..1ce353cb232a 100644
+> --- a/Documentation/rpmsg.txt
+> +++ b/Documentation/rpmsg.txt
+> @@ -192,9 +192,9 @@ Returns 0 on success and an appropriate error value on failure.
+>  
+>  ::
+>  
+> -  struct rpmsg_endpoint *rpmsg_create_ept(struct rpmsg_channel *rpdev,
+> -		void (*cb)(struct rpmsg_channel *, void *, int, void *, u32),
+> -		void *priv, u32 addr);
+> +  struct rpmsg_endpoint *rpmsg_create_ept(struct rpmsg_device *rpdev,
+> +					  rpmsg_rx_cb_t cb, void *priv,
+> +					  struct rpmsg_channel_info chinfo);
 
-diff --git a/arch/x86/boot/compressed/mem_encrypt.S b/arch/x86/boot/compressed/mem_encrypt.S
-index dd07e7b41b11..22e30b0c0d19 100644
---- a/arch/x86/boot/compressed/mem_encrypt.S
-+++ b/arch/x86/boot/compressed/mem_encrypt.S
-@@ -12,6 +12,7 @@
- #include <asm/processor-flags.h>
- #include <asm/msr.h>
- #include <asm/asm-offsets.h>
-+#include <asm/cpufeatures.h>
- 
- 	.text
- 	.code32
-@@ -31,7 +32,7 @@ SYM_FUNC_START(get_sev_encryption_bit)
- 
- 	movl	$0x80000000, %eax	/* CPUID to check the highest leaf */
- 	cpuid
--	cmpl	$0x8000001f, %eax	/* See if 0x8000001f is available */
-+	cmpl	$CPUID_AMD_SME, %eax	/* See if 0x8000001f is available */
- 	jb	.Lno_sev
- 
- 	/*
-@@ -40,7 +41,7 @@ SYM_FUNC_START(get_sev_encryption_bit)
- 	 *   CPUID Fn8000_001F[EBX] - Bits 5:0
- 	 *     Pagetable bit position used to indicate encryption
- 	 */
--	movl	$0x8000001f, %eax
-+	movl	$CPUID_AMD_SME, %eax
- 	cpuid
- 	bt	$1, %eax		/* Check if SEV is available */
- 	jnc	.Lno_sev
-diff --git a/arch/x86/include/asm/cpufeatures.h b/arch/x86/include/asm/cpufeatures.h
-index 2901d5df4366..81335e6fe47d 100644
---- a/arch/x86/include/asm/cpufeatures.h
-+++ b/arch/x86/include/asm/cpufeatures.h
-@@ -10,6 +10,11 @@
- #include <asm/disabled-features.h>
- #endif
- 
-+/*
-+ * AMD CPUID functions
-+ */
-+#define CPUID_AMD_SME  0x8000001f	/* Secure Memory Encryption */
-+
- /*
-  * Defines x86 CPU feature bits
-  */
-diff --git a/arch/x86/kernel/cpu/amd.c b/arch/x86/kernel/cpu/amd.c
-index dcc3d943c68f..4507ededb978 100644
---- a/arch/x86/kernel/cpu/amd.c
-+++ b/arch/x86/kernel/cpu/amd.c
-@@ -630,7 +630,7 @@ static void early_detect_mem_encrypt(struct cpuinfo_x86 *c)
- 		 * will be a value above 32-bits this is still done for
- 		 * CONFIG_X86_32 so that accurate values are reported.
- 		 */
--		c->x86_phys_bits -= (cpuid_ebx(0x8000001f) >> 6) & 0x3f;
-+		c->x86_phys_bits -= (cpuid_ebx(CPUID_AMD_SME) >> 6) & 0x3f;
- 
- 		if (IS_ENABLED(CONFIG_X86_32))
- 			goto clear_all;
-diff --git a/arch/x86/kernel/cpu/scattered.c b/arch/x86/kernel/cpu/scattered.c
-index 62b137c3c97a..033c112e03fc 100644
---- a/arch/x86/kernel/cpu/scattered.c
-+++ b/arch/x86/kernel/cpu/scattered.c
-@@ -39,8 +39,8 @@ static const struct cpuid_bit cpuid_bits[] = {
- 	{ X86_FEATURE_CPB,		CPUID_EDX,  9, 0x80000007, 0 },
- 	{ X86_FEATURE_PROC_FEEDBACK,    CPUID_EDX, 11, 0x80000007, 0 },
- 	{ X86_FEATURE_MBA,		CPUID_EBX,  6, 0x80000008, 0 },
--	{ X86_FEATURE_SME,		CPUID_EAX,  0, 0x8000001f, 0 },
--	{ X86_FEATURE_SEV,		CPUID_EAX,  1, 0x8000001f, 0 },
-+	{ X86_FEATURE_SME,		CPUID_EAX,  0, CPUID_AMD_SME, 0 },
-+	{ X86_FEATURE_SEV,		CPUID_EAX,  1, CPUID_AMD_SME, 0 },
- 	{ 0, 0, 0, 0, 0 }
- };
- 
-diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-index 3fd6eec202d7..95863e767d3d 100644
---- a/arch/x86/kvm/cpuid.c
-+++ b/arch/x86/kvm/cpuid.c
-@@ -756,7 +756,7 @@ static inline int __do_cpuid_func(struct kvm_cpuid_array *array, u32 function)
- 		entry->edx = 0;
- 		break;
- 	case 0x80000000:
--		entry->eax = min(entry->eax, 0x8000001f);
-+		entry->eax = min(entry->eax, CPUID_AMD_SME);
- 		break;
- 	case 0x80000001:
- 		cpuid_entry_override(entry, CPUID_8000_0001_EDX);
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index 0194336b64a4..a4e92ae399b4 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -749,7 +749,7 @@ static __init void svm_adjust_mmio_mask(void)
- 	u64 msr, mask;
- 
- 	/* If there is no memory encryption support, use existing mask */
--	if (cpuid_eax(0x80000000) < 0x8000001f)
-+	if (cpuid_eax(0x80000000) < CPUID_AMD_SME)
- 		return;
- 
- 	/* If memory encryption is not enabled, use existing mask */
-@@ -757,7 +757,7 @@ static __init void svm_adjust_mmio_mask(void)
- 	if (!(msr & MSR_K8_SYSCFG_MEM_ENCRYPT))
- 		return;
- 
--	enc_bit = cpuid_ebx(0x8000001f) & 0x3f;
-+	enc_bit = cpuid_ebx(CPUID_AMD_SME) & 0x3f;
- 	mask_bit = boot_cpu_data.x86_phys_bits;
- 
- 	/* Increment the mask bit if it is the same as the encryption bit */
-diff --git a/arch/x86/mm/mem_encrypt_identity.c b/arch/x86/mm/mem_encrypt_identity.c
-index e2b0e2ac07bb..cbe600dd357b 100644
---- a/arch/x86/mm/mem_encrypt_identity.c
-+++ b/arch/x86/mm/mem_encrypt_identity.c
-@@ -498,7 +498,7 @@ void __init sme_enable(struct boot_params *bp)
- 	eax = 0x80000000;
- 	ecx = 0;
- 	native_cpuid(&eax, &ebx, &ecx, &edx);
--	if (eax < 0x8000001f)
-+	if (eax < CPUID_AMD_SME)
- 		return;
- 
- #define AMD_SME_BIT	BIT(0)
-@@ -520,7 +520,7 @@ void __init sme_enable(struct boot_params *bp)
- 	 *   CPUID Fn8000_001F[EBX]
- 	 *   - Bits 5:0 - Pagetable bit position used to indicate encryption
- 	 */
--	eax = 0x8000001f;
-+	eax = CPUID_AMD_SME;
- 	ecx = 0;
- 	native_cpuid(&eax, &ebx, &ecx, &edx);
- 	if (!(eax & feature_mask))
--- 
-2.18.4
+Again I don't see this being used in this set...  It should have been sent on
+its own to the remoteproc and documentation mailing list.  Note that
+Documentation/rpmsg.txt is now Documentation/staging/rpmsg.rst
 
+>  
+>  every rpmsg address in the system is bound to an rx callback (so when
+>  inbound messages arrive, they are dispatched by the rpmsg bus using the
+> -- 
+> 2.28.0
+> 
