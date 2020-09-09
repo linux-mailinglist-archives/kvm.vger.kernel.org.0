@@ -2,122 +2,130 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 28B71262A9B
-	for <lists+kvm@lfdr.de>; Wed,  9 Sep 2020 10:41:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E47BF262AA2
+	for <lists+kvm@lfdr.de>; Wed,  9 Sep 2020 10:42:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727782AbgIIIl4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 9 Sep 2020 04:41:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40556 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725984AbgIIIlz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 9 Sep 2020 04:41:55 -0400
-Received: from mail-ot1-x344.google.com (mail-ot1-x344.google.com [IPv6:2607:f8b0:4864:20::344])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 62399C061573;
-        Wed,  9 Sep 2020 01:41:55 -0700 (PDT)
-Received: by mail-ot1-x344.google.com with SMTP id g10so1614074otq.9;
-        Wed, 09 Sep 2020 01:41:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=VXHXXV715sJGvUd4gjnShEaVrmyYwXRLuNaJb8O8w9Y=;
-        b=GCxfoG85fPs+aC2goM6GRmpl9a0HZJlzmp22qMa6XqflGM2Y6etiGlEODS++mRNXtX
-         mrPSot5h/upKBw5pz6rsf59r90lS9QdsqGEwcdY7s0tZ3UPQ/BIJzwGOivmFhnn2ZG6e
-         RLLczMN++oMR0rlKZD+T4FdM6dU90Cb/DSpdo+JaBk0pp35KSvse1gBwYbYzZ/0pywPv
-         zaGEvnTlAOXirNCtQPgEmxyX52UMGpHtnb+0S1AMBhyZuvl5U7f6Jzf/LLJvfyH4ghFv
-         XNeSo23ecZWs5cHeGLj1JsLt5udTJyCZZWTfkQGrNLjpSzSVGqHOHWBW7l76yKOeRIWy
-         M9iw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=VXHXXV715sJGvUd4gjnShEaVrmyYwXRLuNaJb8O8w9Y=;
-        b=hO0l4HRYWMuQZ5Wyw2Isig8vVmyXtIk3CWaXheF4k+KIhO7FKqrEAm8NdydQwUBS9R
-         iQPYLIX1Cik/M3GHARLFcEngkAjsX8CL2oXAbWHweUyRg+YgrKrDeajLJQyQ+x5Xt36V
-         dqRrh2UhskWvZmRaLxkm1eKHtgj2sB0H8sHiAIX89IknQrT0HoPeWrqyCiPLeoA7CEq1
-         lIhwEvfPsiVSWMYNyThdb3uPJapq3rt2N7X8/vRCleJe2qVXGy6wEh5VZ4Dakfn3ngb4
-         8um3LDI4S0falFDP7C59Yn5glxSIQca1oxIETiWUzadWc00bvF1YS3ZyHe03ggtWurq4
-         0ebA==
-X-Gm-Message-State: AOAM530JHoa/VkkaBNIeK+O9J6eNdRYeqG8UngwuvbtybWWbbn4oA3cP
-        ie2RHszo1rNX6Yx/P3lmkFIHeUBOeng7wASXAhkSQYig
-X-Google-Smtp-Source: ABdhPJy+c9dSxfXe7HdL/2aH0Yvc1jgsVB8kwjUUGri9OvrCGDI+rlRiV1IaX+2rd2CJOx7w/41RZCCN4RzNf8iy06U=
-X-Received: by 2002:a9d:c44:: with SMTP id 62mr2273269otr.185.1599640914398;
- Wed, 09 Sep 2020 01:41:54 -0700 (PDT)
+        id S1729298AbgIIImU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 9 Sep 2020 04:42:20 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:20947 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1728584AbgIIImL (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 9 Sep 2020 04:42:11 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1599640929;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=DtMgeTKjCn17clYv2JEnI3ffDcOPCVRLd/V3CjCE3+4=;
+        b=bHjGmcvqF0tE71baoI3XsazFtb7Y1uRgSepgFwfvZVBUz2TXHY8Z/uH6eebU85ovLLOVAz
+        8Nqr+bGQj37LIpdfjuv1znQF6+mxZvW2ANflJEEkIPlnQsSYLPWcy89D/Y/TxGeQPqjGSH
+        KjlZ03LQQkKXOnZ+4HXNy1MWu3PbLgY=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-23-_Ya4rfJ9P0yaQlRETl-ZPw-1; Wed, 09 Sep 2020 04:42:06 -0400
+X-MC-Unique: _Ya4rfJ9P0yaQlRETl-ZPw-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D592981F02E;
+        Wed,  9 Sep 2020 08:42:03 +0000 (UTC)
+Received: from [10.72.12.24] (ovpn-12-24.pek2.redhat.com [10.72.12.24])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 9D6F760C15;
+        Wed,  9 Sep 2020 08:41:46 +0000 (UTC)
+Subject: Re: [RFC PATCH 00/22] Enhance VHOST to enable SoC-to-SoC
+ communication
+To:     Cornelia Huck <cohuck@redhat.com>
+Cc:     Kishon Vijay Abraham I <kishon@ti.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Ohad Ben-Cohen <ohad@wizery.com>,
+        Bjorn Andersson <bjorn.andersson@linaro.org>,
+        Jon Mason <jdmason@kudzu.us>,
+        Dave Jiang <dave.jiang@intel.com>,
+        Allen Hubbe <allenbh@gmail.com>,
+        Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>,
+        Bjorn Helgaas <bhelgaas@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-remoteproc@vger.kernel.org, linux-ntb@googlegroups.com,
+        linux-pci@vger.kernel.org, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org
+References: <20200702082143.25259-1-kishon@ti.com>
+ <20200702055026-mutt-send-email-mst@kernel.org>
+ <603970f5-3289-cd53-82a9-aa62b292c552@redhat.com>
+ <14c6cad7-9361-7fa4-e1c6-715ccc7e5f6b@ti.com>
+ <59fd6a0b-8566-44b7-3dae-bb52b468219b@redhat.com>
+ <ce9eb6a5-cd3a-a390-5684-525827b30f64@ti.com>
+ <da2b671c-b05d-a57f-7bdf-8b1043a41240@redhat.com>
+ <fee8a0fb-f862-03bd-5ede-8f105b6af529@ti.com>
+ <b2178e1d-2f5c-e8a3-72fb-70f2f8d6aa45@redhat.com>
+ <45a8a97c-2061-13ee-5da8-9877a4a3b8aa@ti.com>
+ <c8739d7f-e12e-f6a2-7018-9eeaf6feb054@redhat.com>
+ <20200828123409.4cd2a812.cohuck@redhat.com>
+ <ac8f7e4f-9f46-919a-f5c2-89b07794f0ab@ti.com>
+ <9cd58cd1-0041-3d98-baf7-6e5bc2e7e317@redhat.com>
+ <20200908183701.60b93441.cohuck@redhat.com>
+From:   Jason Wang <jasowang@redhat.com>
+Message-ID: <d6e4be52-78d8-546c-20a4-23bdaea68ba5@redhat.com>
+Date:   Wed, 9 Sep 2020 16:41:44 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-References: <1597827327-25055-1-git-send-email-wanpengli@tencent.com>
-In-Reply-To: <1597827327-25055-1-git-send-email-wanpengli@tencent.com>
-From:   Wanpeng Li <kernellwp@gmail.com>
-Date:   Wed, 9 Sep 2020 16:41:43 +0800
-Message-ID: <CANRm+Cx=6zc=KTw5XwMQTdOG3m67MCcmthRuFR-VTnOTB06kow@mail.gmail.com>
-Subject: Re: [PATCH 1/2] KVM: LAPIC: Fix updating DFR missing apic map recalculation
-To:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20200908183701.60b93441.cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Any Reviewed-by for these two patches? :)
-On Wed, 19 Aug 2020 at 16:55, Wanpeng Li <kernellwp@gmail.com> wrote:
+
+On 2020/9/9 上午12:37, Cornelia Huck wrote:
+>> Then you need something that is functional equivalent to virtio PCI
+>> which is actually the concept of vDPA (e.g vDPA provides alternatives if
+>> the queue_sel is hard in the EP implementation).
+> It seems I really need to read up on vDPA more... do you have a pointer
+> for diving into this alternatives aspect?
+
+
+See vpda_config_ops in include/linux/vdpa.h
+
+Especially this part:
+
+     int (*set_vq_address)(struct vdpa_device *vdev,
+                   u16 idx, u64 desc_area, u64 driver_area,
+                   u64 device_area);
+
+This means for the devices (e.g endpoint device) that is hard to 
+implement virtio-pci layout, it can use any other register layout or 
+vendor specific way to configure the virtqueue.
+
+
 >
-> From: Wanpeng Li <wanpengli@tencent.com>
+>>> "Virtio Over NTB" should anyways be a new transport.
+>>>> Does that make any sense?
+>>> yeah, in the approach I used the initial features are hard-coded in
+>>> vhost-rpmsg (inherent to the rpmsg) but when we have to use adapter
+>>> layer (vhost only for accessing virtio ring and use virtio drivers on
+>>> both front end and backend), based on the functionality (e.g, rpmsg),
+>>> the vhost should be configured with features (to be presented to the
+>>> virtio) and that's why additional layer or APIs will be required.
+>> A question here, if we go with vhost bus approach, does it mean the
+>> virtio device can only be implemented in EP's userspace?
+> Can we maybe implement an alternative bus as well that would allow us
+> to support different virtio device implementations (in addition to the
+> vhost bus + userspace combination)?
+
+
+That should be fine, but I'm not quite sure that implementing the device 
+in kerne (kthread) is the good approach.
+
+Thanks
+
+
 >
-> There is missing apic map recalculation after updating DFR, if it is
-> INIT RESET, in x2apic mode, local apic is software enabled before.
-> This patch fix it by introducing the function kvm_apic_set_dfr() to
-> be called in INIT RESET handling path.
->
-> Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
-> ---
->  arch/x86/kvm/lapic.c | 15 ++++++++++-----
->  1 file changed, 10 insertions(+), 5 deletions(-)
->
-> diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-> index 5ccbee7..248095a 100644
-> --- a/arch/x86/kvm/lapic.c
-> +++ b/arch/x86/kvm/lapic.c
-> @@ -310,6 +310,12 @@ static inline void kvm_apic_set_ldr(struct kvm_lapic *apic, u32 id)
->         atomic_set_release(&apic->vcpu->kvm->arch.apic_map_dirty, DIRTY);
->  }
->
-> +static inline void kvm_apic_set_dfr(struct kvm_lapic *apic, u32 val)
-> +{
-> +       kvm_lapic_set_reg(apic, APIC_DFR, val);
-> +       atomic_set_release(&apic->vcpu->kvm->arch.apic_map_dirty, DIRTY);
-> +}
-> +
->  static inline u32 kvm_apic_calc_x2apic_ldr(u32 id)
->  {
->         return ((id >> 4) << 16) | (1 << (id & 0xf));
-> @@ -1984,10 +1990,9 @@ int kvm_lapic_reg_write(struct kvm_lapic *apic, u32 reg, u32 val)
->                 break;
->
->         case APIC_DFR:
-> -               if (!apic_x2apic_mode(apic)) {
-> -                       kvm_lapic_set_reg(apic, APIC_DFR, val | 0x0FFFFFFF);
-> -                       atomic_set_release(&apic->vcpu->kvm->arch.apic_map_dirty, DIRTY);
-> -               } else
-> +               if (!apic_x2apic_mode(apic))
-> +                       kvm_apic_set_dfr(apic, val | 0x0FFFFFFF);
-> +               else
->                         ret = 1;
->                 break;
->
-> @@ -2303,7 +2308,7 @@ void kvm_lapic_reset(struct kvm_vcpu *vcpu, bool init_event)
->                              SET_APIC_DELIVERY_MODE(0, APIC_MODE_EXTINT));
->         apic_manage_nmi_watchdog(apic, kvm_lapic_get_reg(apic, APIC_LVT0));
->
-> -       kvm_lapic_set_reg(apic, APIC_DFR, 0xffffffffU);
-> +       kvm_apic_set_dfr(apic, 0xffffffffU);
->         apic_set_spiv(apic, 0xff);
->         kvm_lapic_set_reg(apic, APIC_TASKPRI, 0);
->         if (!apic_x2apic_mode(apic))
-> --
-> 2.7.4
->
+
