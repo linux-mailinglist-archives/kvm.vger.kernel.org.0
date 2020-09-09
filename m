@@ -2,88 +2,122 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 67D33262A88
-	for <lists+kvm@lfdr.de>; Wed,  9 Sep 2020 10:39:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 28B71262A9B
+	for <lists+kvm@lfdr.de>; Wed,  9 Sep 2020 10:41:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729413AbgIIIix (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 9 Sep 2020 04:38:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40080 "EHLO
+        id S1727782AbgIIIl4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 9 Sep 2020 04:41:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40556 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726293AbgIIIit (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 9 Sep 2020 04:38:49 -0400
-Received: from mail-ot1-x341.google.com (mail-ot1-x341.google.com [IPv6:2607:f8b0:4864:20::341])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B0959C061573;
-        Wed,  9 Sep 2020 01:38:49 -0700 (PDT)
-Received: by mail-ot1-x341.google.com with SMTP id y5so1627265otg.5;
-        Wed, 09 Sep 2020 01:38:49 -0700 (PDT)
+        with ESMTP id S1725984AbgIIIlz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 9 Sep 2020 04:41:55 -0400
+Received: from mail-ot1-x344.google.com (mail-ot1-x344.google.com [IPv6:2607:f8b0:4864:20::344])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 62399C061573;
+        Wed,  9 Sep 2020 01:41:55 -0700 (PDT)
+Received: by mail-ot1-x344.google.com with SMTP id g10so1614074otq.9;
+        Wed, 09 Sep 2020 01:41:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=i+MNe+SAiEeqDTi17enw+pfUJJQZGcCa+ssq/JHHPAo=;
-        b=QGyeBrUjnUggrtqnsRg9jhhUV7pJGNTatfaJVeSi694ehw7Zd2N/j0a1G953R8ie+x
-         7NBPE33xIbS7SaxU+VsN78spkC19ZXpl1Rq+pwBm8hKHq710W70wimyUyj/FLWuCOsYe
-         w1hGtSCFdwVcJQNcZVfnUTmTiBXOn8sBdymWch4RRpJp8lR3r2MiQB3ZJQOsP7VFt7y0
-         ceusoL11yPJGLAJhhixx4qmLhDjjWbZ4J+Uh5ShkmDP9x1qRWHmrBQe2Idsk4TkI2ts4
-         l2jI5DDD+P0wUawWuR6XHaMhCKvX8mhcx3rR5kOdxw8wfdIAyfkfQjvt5+KgtgYr0NYu
-         2RGA==
+        bh=VXHXXV715sJGvUd4gjnShEaVrmyYwXRLuNaJb8O8w9Y=;
+        b=GCxfoG85fPs+aC2goM6GRmpl9a0HZJlzmp22qMa6XqflGM2Y6etiGlEODS++mRNXtX
+         mrPSot5h/upKBw5pz6rsf59r90lS9QdsqGEwcdY7s0tZ3UPQ/BIJzwGOivmFhnn2ZG6e
+         RLLczMN++oMR0rlKZD+T4FdM6dU90Cb/DSpdo+JaBk0pp35KSvse1gBwYbYzZ/0pywPv
+         zaGEvnTlAOXirNCtQPgEmxyX52UMGpHtnb+0S1AMBhyZuvl5U7f6Jzf/LLJvfyH4ghFv
+         XNeSo23ecZWs5cHeGLj1JsLt5udTJyCZZWTfkQGrNLjpSzSVGqHOHWBW7l76yKOeRIWy
+         M9iw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=i+MNe+SAiEeqDTi17enw+pfUJJQZGcCa+ssq/JHHPAo=;
-        b=KUVqVXbAwCqJedMchfx7qauWQPOrg5q/WStFcjG2IPoNikeaLy40cap0f42GN4o7+u
-         JhLYOb0MA3qFBQ0QnNqRg+1NU9yY4QAZmCUyR36Is3sq+XkK122fnGArV8Z23AIe50bW
-         BCTGmUE1duVwGvvAQjs9hJK6gFubJqPObMNepYGbeZTp2tU1oz/Bc1+RQCuyitmLf7Is
-         EXQ1LscTGZi+DTBMIH6uDpTrVM6Ee2Og56oiRYm6S3vwXrpYnMmTKQdZPJDacOQoAUIH
-         +lEcsBdyHnZ6Y536Ox1NmA+X+sSGenKhZWOnwc4MAE0H92x1MceOF4709GGdYqp1sRr6
-         PD4w==
-X-Gm-Message-State: AOAM530JnAoWkXTToe43q04Vzxt5Gyo8mW1+Gg0CM+KSVprP1YVHP80j
-        Skj12bw+IEMZtR5pCk3Aq4StrPfbDT1yFdsXtJ0=
-X-Google-Smtp-Source: ABdhPJxam++etckMEJmUW6ODQ/l8UeOTZGbwOU80+ustU7g5jT4kVjK6Le3OfomRhfHwUN1qmxuL1uw5bE9gMIroGEU=
-X-Received: by 2002:a05:6830:10c4:: with SMTP id z4mr2031518oto.254.1599640729110;
- Wed, 09 Sep 2020 01:38:49 -0700 (PDT)
+        bh=VXHXXV715sJGvUd4gjnShEaVrmyYwXRLuNaJb8O8w9Y=;
+        b=hO0l4HRYWMuQZ5Wyw2Isig8vVmyXtIk3CWaXheF4k+KIhO7FKqrEAm8NdydQwUBS9R
+         iQPYLIX1Cik/M3GHARLFcEngkAjsX8CL2oXAbWHweUyRg+YgrKrDeajLJQyQ+x5Xt36V
+         dqRrh2UhskWvZmRaLxkm1eKHtgj2sB0H8sHiAIX89IknQrT0HoPeWrqyCiPLeoA7CEq1
+         lIhwEvfPsiVSWMYNyThdb3uPJapq3rt2N7X8/vRCleJe2qVXGy6wEh5VZ4Dakfn3ngb4
+         8um3LDI4S0falFDP7C59Yn5glxSIQca1oxIETiWUzadWc00bvF1YS3ZyHe03ggtWurq4
+         0ebA==
+X-Gm-Message-State: AOAM530JHoa/VkkaBNIeK+O9J6eNdRYeqG8UngwuvbtybWWbbn4oA3cP
+        ie2RHszo1rNX6Yx/P3lmkFIHeUBOeng7wASXAhkSQYig
+X-Google-Smtp-Source: ABdhPJy+c9dSxfXe7HdL/2aH0Yvc1jgsVB8kwjUUGri9OvrCGDI+rlRiV1IaX+2rd2CJOx7w/41RZCCN4RzNf8iy06U=
+X-Received: by 2002:a9d:c44:: with SMTP id 62mr2273269otr.185.1599640914398;
+ Wed, 09 Sep 2020 01:41:54 -0700 (PDT)
 MIME-Version: 1.0
-References: <1599620043-12908-1-git-send-email-wanpengli@tencent.com> <87h7s7mk93.fsf@vitty.brq.redhat.com>
-In-Reply-To: <87h7s7mk93.fsf@vitty.brq.redhat.com>
+References: <1597827327-25055-1-git-send-email-wanpengli@tencent.com>
+In-Reply-To: <1597827327-25055-1-git-send-email-wanpengli@tencent.com>
 From:   Wanpeng Li <kernellwp@gmail.com>
-Date:   Wed, 9 Sep 2020 16:38:37 +0800
-Message-ID: <CANRm+CxLpGaC66TVUftrxXdfBg+CHJzDMKh4mFvdpm-HTK0QwA@mail.gmail.com>
-Subject: Re: [PATCH 1/3] KVM: SVM: Get rid of handle_fastpath_set_msr_irqoff()
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
+Date:   Wed, 9 Sep 2020 16:41:43 +0800
+Message-ID: <CANRm+Cx=6zc=KTw5XwMQTdOG3m67MCcmthRuFR-VTnOTB06kow@mail.gmail.com>
+Subject: Re: [PATCH 1/2] KVM: LAPIC: Fix updating DFR missing apic map recalculation
+To:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Sean Christopherson <sean.j.christopherson@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        "Paul K ." <kronenpj@kronenpj.dyndns.org>,
-        "# v3 . 10+" <stable@vger.kernel.org>
+        Joerg Roedel <joro@8bytes.org>
 Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 9 Sep 2020 at 16:23, Vitaly Kuznetsov <vkuznets@redhat.com> wrote:
+Any Reviewed-by for these two patches? :)
+On Wed, 19 Aug 2020 at 16:55, Wanpeng Li <kernellwp@gmail.com> wrote:
 >
-> Wanpeng Li <kernellwp@gmail.com> writes:
+> From: Wanpeng Li <wanpengli@tencent.com>
 >
-> > From: Wanpeng Li <wanpengli@tencent.com>
-> >
-> > Analysis from Sean:
-> >
-> >  | svm->next_rip is reset in svm_vcpu_run() only after calling
-> >  | svm_exit_handlers_fastpath(), which will cause SVM's
-> >  | skip_emulated_instruction() to write a stale RIP.
-> >
+> There is missing apic map recalculation after updating DFR, if it is
+> INIT RESET, in x2apic mode, local apic is software enabled before.
+> This patch fix it by introducing the function kvm_apic_set_dfr() to
+> be called in INIT RESET handling path.
 >
-> This should only happen when svm->vmcb->control.next_rip is not set by
-> hardware as skip_emulated_instruction() itself sets 'svm->next_rip'
-> otherwise, right?
-
-The bug is reported here
-https://bugzilla.kernel.org/show_bug.cgi?id=209155 , the old machine
-which the reporter uses doesn't have NRIP save on #VMEXIT support. :)
-
-    Wanpeng
+> Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
+> ---
+>  arch/x86/kvm/lapic.c | 15 ++++++++++-----
+>  1 file changed, 10 insertions(+), 5 deletions(-)
+>
+> diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+> index 5ccbee7..248095a 100644
+> --- a/arch/x86/kvm/lapic.c
+> +++ b/arch/x86/kvm/lapic.c
+> @@ -310,6 +310,12 @@ static inline void kvm_apic_set_ldr(struct kvm_lapic *apic, u32 id)
+>         atomic_set_release(&apic->vcpu->kvm->arch.apic_map_dirty, DIRTY);
+>  }
+>
+> +static inline void kvm_apic_set_dfr(struct kvm_lapic *apic, u32 val)
+> +{
+> +       kvm_lapic_set_reg(apic, APIC_DFR, val);
+> +       atomic_set_release(&apic->vcpu->kvm->arch.apic_map_dirty, DIRTY);
+> +}
+> +
+>  static inline u32 kvm_apic_calc_x2apic_ldr(u32 id)
+>  {
+>         return ((id >> 4) << 16) | (1 << (id & 0xf));
+> @@ -1984,10 +1990,9 @@ int kvm_lapic_reg_write(struct kvm_lapic *apic, u32 reg, u32 val)
+>                 break;
+>
+>         case APIC_DFR:
+> -               if (!apic_x2apic_mode(apic)) {
+> -                       kvm_lapic_set_reg(apic, APIC_DFR, val | 0x0FFFFFFF);
+> -                       atomic_set_release(&apic->vcpu->kvm->arch.apic_map_dirty, DIRTY);
+> -               } else
+> +               if (!apic_x2apic_mode(apic))
+> +                       kvm_apic_set_dfr(apic, val | 0x0FFFFFFF);
+> +               else
+>                         ret = 1;
+>                 break;
+>
+> @@ -2303,7 +2308,7 @@ void kvm_lapic_reset(struct kvm_vcpu *vcpu, bool init_event)
+>                              SET_APIC_DELIVERY_MODE(0, APIC_MODE_EXTINT));
+>         apic_manage_nmi_watchdog(apic, kvm_lapic_get_reg(apic, APIC_LVT0));
+>
+> -       kvm_lapic_set_reg(apic, APIC_DFR, 0xffffffffU);
+> +       kvm_apic_set_dfr(apic, 0xffffffffU);
+>         apic_set_spiv(apic, 0xff);
+>         kvm_lapic_set_reg(apic, APIC_TASKPRI, 0);
+>         if (!apic_x2apic_mode(apic))
+> --
+> 2.7.4
+>
