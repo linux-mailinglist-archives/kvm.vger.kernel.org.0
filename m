@@ -2,106 +2,117 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0AD1426382D
-	for <lists+kvm@lfdr.de>; Wed,  9 Sep 2020 23:05:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8D37B263841
+	for <lists+kvm@lfdr.de>; Wed,  9 Sep 2020 23:14:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729860AbgIIVFm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 9 Sep 2020 17:05:42 -0400
-Received: from mail.kernel.org ([198.145.29.99]:60592 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727900AbgIIVFk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 9 Sep 2020 17:05:40 -0400
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 775CE206D4;
-        Wed,  9 Sep 2020 21:05:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1599685539;
-        bh=LunnJpliQgRjiEVetnhJXASncAl1C5s7uWNB3u6DaZc=;
-        h=From:To:Cc:Subject:Date:From;
-        b=yqxa7ehxphXmc1T3J8702keaNZyzLzfHp45qqOxhKoqwabHtfrEUWcq7srxebCNUI
-         I4PrpOwLZw6yf0zYFngGR50EtCphaC86t+43egW+/Ze9bZQgFeAVGFmsGh1roS1WF4
-         b32khP0ng3815bkR56+t2w8Q3+5NKFJK1ub5LxGk=
-Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=hot-poop.lan)
-        by disco-boy.misterjones.org with esmtpsa (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-        (Exim 4.92)
-        (envelope-from <maz@kernel.org>)
-        id 1kG7Hd-00ATLQ-Ju; Wed, 09 Sep 2020 22:05:37 +0100
-From:   Marc Zyngier <maz@kernel.org>
-To:     kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        kvmarm@lists.cs.columbia.edu
-Cc:     Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        kernel-team@android.com, stable@vger.kernel.org
-Subject: [PATCH] KVM: arm64: Assume write fault on S1PTW permission fault on instruction fetch
-Date:   Wed,  9 Sep 2020 22:05:27 +0100
-Message-Id: <20200909210527.1926996-1-maz@kernel.org>
-X-Mailer: git-send-email 2.28.0
+        id S1730030AbgIIVOS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 9 Sep 2020 17:14:18 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:23210 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1729993AbgIIVOH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 9 Sep 2020 17:14:07 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1599686046;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=flt0vZjtupO4BhZTnrF4cJuXNpxXUArPDdGRHgaQJh8=;
+        b=CzuGjdSUJSLmkTU5b/gRMoxmyOFnCuFpYqJbIHu3sH9Lntn3VQSkfASCgyFmxyoDkbn2eF
+        DoBiMdZVUAo6nRIW+S+Od8+oVdWDAH21OpqSCfLFblhU2dEgbzHYNn5Gb/tuLKKiwJF7wd
+        obpKf/Ga7EB0p+z2WsayNqxuHpVts+Q=
+Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com
+ [209.85.222.198]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-229-NV9lKmkkP5WBLnL--Rkpng-1; Wed, 09 Sep 2020 17:14:05 -0400
+X-MC-Unique: NV9lKmkkP5WBLnL--Rkpng-1
+Received: by mail-qk1-f198.google.com with SMTP id d184so2177810qkf.15
+        for <kvm@vger.kernel.org>; Wed, 09 Sep 2020 14:14:05 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-transfer-encoding
+         :content-language;
+        bh=flt0vZjtupO4BhZTnrF4cJuXNpxXUArPDdGRHgaQJh8=;
+        b=UiQFfbnfSy8LiIyULADKu8ceMBUSOiFCCYZj2Wm/F0l/5CzmmERaiC4yKftbE7GCew
+         LXVzbNmcZv8ZsdOMm8UOvDwSQF9zVQWHddmtHl3GhMtxmBAIuixqOcmY1/O2yfqnP3+f
+         C8Scr8xlOSIaXXAdJftNQDU2A8+z2vFKYNkUs3d3TvPuImhKnIuc1RawC+kRputDL8mT
+         6xgVH7LGFKHMOPmIXif+sM1VPnVClhbU1aDYO07fnCgwb/10NVd14gOwa7zM/EF2T+AC
+         qguHYYzQUguHI7La/+wUwGuUf00rkNuUj7XVDoCxwh46lx+tA2wACEpn+a3B8rgbS8eR
+         llAg==
+X-Gm-Message-State: AOAM531ynPAZHnhTPbwafZQ1Min1sLkravd9Srf7E+POQB4N/K5/WLHo
+        n0CxpPYmsn3BCZW58c8oAWi703mCk/n3M7lgDGS8p+wmoEBu8E8jApM7ihcAexuZDFQCbXZYUsl
+        tLkgzkn3CC4dV
+X-Received: by 2002:a05:620a:567:: with SMTP id p7mr5307796qkp.164.1599686042145;
+        Wed, 09 Sep 2020 14:14:02 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxelahEbXCJiVWCSYD1eRWMhxmTJwjtxCSAXIXQuZh3Dl5ebQkWRsonB1gBL69zicWzPYE1UA==
+X-Received: by 2002:a05:620a:567:: with SMTP id p7mr5307772qkp.164.1599686041865;
+        Wed, 09 Sep 2020 14:14:01 -0700 (PDT)
+Received: from trix.remote.csb (075-142-250-213.res.spectrum.com. [75.142.250.213])
+        by smtp.gmail.com with ESMTPSA id m68sm2009028qkd.105.2020.09.09.14.14.00
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 09 Sep 2020 14:14:01 -0700 (PDT)
+Subject: Re: [PATCH 0/3] add VFIO mdev support for DFL devices
+To:     Xu Yilun <yilun.xu@intel.com>, mdf@kernel.org,
+        alex.williamson@redhat.com, kwankhede@nvidia.com,
+        linux-fpga@vger.kernel.org, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Cc:     lgoncalv@redhat.com
+References: <1599549212-24253-1-git-send-email-yilun.xu@intel.com>
+From:   Tom Rix <trix@redhat.com>
+Message-ID: <93200a4f-55a3-0798-3ef2-e0467288d5ba@redhat.com>
+Date:   Wed, 9 Sep 2020 14:13:59 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
+In-Reply-To: <1599549212-24253-1-git-send-email-yilun.xu@intel.com>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 62.31.163.78
-X-SA-Exim-Rcpt-To: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, will@kernel.org, james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, kernel-team@android.com, stable@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Content-Language: en-US
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-KVM currently assumes that an instruction abort can never be a write.
-This is in general true, except when the abort is triggered by
-a S1PTW on instruction fetch that tries to update the S1 page tables
-(to set AF, for example).
+This is a new interface, the documentation needs to go
 
-This can happen if the page tables have been paged out and brought
-back in without seeing a direct write to them (they are thus marked
-read only), and the fault handling code will make the PT executable(!)
-instead of writable. The guest gets stuck forever.
+into greater detail. I am particularly interested in the user workflow.
 
-In these conditions, the permission fault must be considered as
-a write so that the Stage-1 update can take place. This is essentially
-the I-side equivalent of the problem fixed by 60e21a0ef54c ("arm64: KVM:
-Take S1 walks into account when determining S2 write faults").
+This seems like it would work only for kernel modules. 
 
-Update both kvm_is_write_fault() to return true on IABT+S1PTW, as well
-as kvm_vcpu_trap_is_iabt() to return false in the same conditions.
+Please describe both in the documentation.
 
-Cc: stable@vger.kernel.org
-Signed-off-by: Marc Zyngier <maz@kernel.org>
----
-This could do with some cleanup (kvm_vcpu_dabt_iss1tw has nothing to do
-with data aborts), but I've chosen to keep the patch simple in order to
-ease backporting.
+A sample of a user mode driver would be helpful.
 
- arch/arm64/include/asm/kvm_emulate.h | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+Is putting driver_override using sysfs for each device scalable ? would a list sets of {feature id,files}'s the vfio driver respond to better ? 
 
-diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-index d21676409a24..33d7e16edaa3 100644
---- a/arch/arm64/include/asm/kvm_emulate.h
-+++ b/arch/arm64/include/asm/kvm_emulate.h
-@@ -480,7 +480,8 @@ static __always_inline u8 kvm_vcpu_trap_get_class(const struct kvm_vcpu *vcpu)
- 
- static inline bool kvm_vcpu_trap_is_iabt(const struct kvm_vcpu *vcpu)
- {
--	return kvm_vcpu_trap_get_class(vcpu) == ESR_ELx_EC_IABT_LOW;
-+	return (kvm_vcpu_trap_get_class(vcpu) == ESR_ELx_EC_IABT_LOW &&
-+		!kvm_vcpu_dabt_iss1tw(vcpu));
- }
- 
- static __always_inline u8 kvm_vcpu_trap_get_fault(const struct kvm_vcpu *vcpu)
-@@ -520,6 +521,9 @@ static __always_inline int kvm_vcpu_sys_get_rt(struct kvm_vcpu *vcpu)
- 
- static inline bool kvm_is_write_fault(struct kvm_vcpu *vcpu)
- {
-+	if (kvm_vcpu_dabt_iss1tw(vcpu))
-+		return true;
-+
- 	if (kvm_vcpu_trap_is_iabt(vcpu))
- 		return false;
- 
--- 
-2.28.0
+To be consistent the mdev driver file name should be dfl-vfio-mdev.c
+
+There should be an opt-in flag for drivers being overridden instead of blanket approval of all drivers.
+
+Tom
+
+On 9/8/20 12:13 AM, Xu Yilun wrote:
+> These patches depend on the patchset: "Modularization of DFL private
+> feature drivers" & "add dfl bus support to MODULE_DEVICE_TABLE()"
+>
+> https://lore.kernel.org/linux-fpga/1599488581-16386-1-git-send-email-yilun.xu@intel.com/
+>
+> This patchset provides an VFIO Mdev driver for dfl devices. It makes
+> possible for dfl devices be direct accessed from userspace.
+>
+> Xu Yilun (3):
+>   fpga: dfl: add driver_override support
+>   fpga: dfl: VFIO mdev support for DFL devices
+>   Documentation: fpga: dfl: Add description for VFIO Mdev support
+>
+>  Documentation/ABI/testing/sysfs-bus-dfl |  20 ++
+>  Documentation/fpga/dfl.rst              |  20 ++
+>  drivers/fpga/Kconfig                    |   9 +
+>  drivers/fpga/Makefile                   |   1 +
+>  drivers/fpga/dfl.c                      |  54 ++++-
+>  drivers/fpga/vfio-mdev-dfl.c            | 391 ++++++++++++++++++++++++++++++++
+>  include/linux/fpga/dfl-bus.h            |   2 +
+>  7 files changed, 496 insertions(+), 1 deletion(-)
+>  create mode 100644 drivers/fpga/vfio-mdev-dfl.c
+>
 
