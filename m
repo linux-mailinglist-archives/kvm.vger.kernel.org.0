@@ -2,113 +2,81 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 69000263378
-	for <lists+kvm@lfdr.de>; Wed,  9 Sep 2020 19:04:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0FC4F26339C
+	for <lists+kvm@lfdr.de>; Wed,  9 Sep 2020 19:07:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730475AbgIIPpd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 9 Sep 2020 11:45:33 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:43022 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1730438AbgIIPom (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 9 Sep 2020 11:44:42 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1599666256;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=3Z+yPEMCTmeMzDKoGBf7peDSr8BK2RKJoBhQ4aH3NRo=;
-        b=UkbxbeN1us4Uvyq8uj28efWND51RqtBytxvkuEb+RllQUsBQvLJ9pcZNhOzqvHKVzpSBsQ
-        5DIAfuZpVExU4xrcizJDbF1dQF+2WyjjQVM+2CdkBwDs+T4wi2ydX7NHT/WqALR/BweH2/
-        xhfQJfYZxoKP87bDIU8LpIx245av9Bo=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-535-ek1SMh84NSq0ZRU3QtpJbQ-1; Wed, 09 Sep 2020 09:24:29 -0400
-X-MC-Unique: ek1SMh84NSq0ZRU3QtpJbQ-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1053C100746A;
-        Wed,  9 Sep 2020 13:24:26 +0000 (UTC)
-Received: from lacos-laptop-7.usersys.redhat.com (ovpn-114-82.ams2.redhat.com [10.36.114.82])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id BA0C15D9E8;
-        Wed,  9 Sep 2020 13:24:20 +0000 (UTC)
-Subject: Re: [PATCH v7 71/72] x86/efi: Add GHCB mappings when SEV-ES is active
-From:   Laszlo Ersek <lersek@redhat.com>
-To:     Ard Biesheuvel <ardb@kernel.org>, Borislav Petkov <bp@alien8.de>,
-        brijesh.singh@amd.com
-Cc:     Joerg Roedel <joro@8bytes.org>, X86 ML <x86@kernel.org>,
-        Joerg Roedel <jroedel@suse.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Jiri Slaby <jslaby@suse.cz>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Juergen Gross <jgross@suse.com>,
-        Kees Cook <keescook@chromium.org>,
-        David Rientjes <rientjes@google.com>,
-        Cfir Cohen <cfir@google.com>,
-        Erdem Aktas <erdemaktas@google.com>,
-        Masami Hiramatsu <mhiramat@kernel.org>,
-        Mike Stunes <mstunes@vmware.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Martin Radev <martin.b.radev@gmail.com>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org
-References: <20200907131613.12703-1-joro@8bytes.org>
- <20200907131613.12703-72-joro@8bytes.org> <20200908174616.GJ25236@zn.tnic>
- <CAMj1kXHbePrDYXGbVG0fHfH5=M19ZpCLm9YVTs-yKTuR_jFLDg@mail.gmail.com>
- <e3911fe6-84e8-cb50-d95d-e33f8ae005f8@redhat.com>
-Message-ID: <0524c7fa-2fe2-ab6a-01f9-a04dacf86f6d@redhat.com>
-Date:   Wed, 9 Sep 2020 15:24:19 +0200
+        id S1730381AbgIIRHD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 9 Sep 2020 13:07:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48398 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730401AbgIIPhV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 9 Sep 2020 11:37:21 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 158AAC0612F0;
+        Wed,  9 Sep 2020 07:29:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=SILNQASTuR+wW0V3/KNTHMKzmXU41qOTdycCKqTyf5s=; b=QV1RNWU26OaZHqUhuB7s6WXObX
+        xOIa1bWUz2mrIY0Yfck2v+tJIotfNIkJkMsHN75myEUKgD5U+M3uxkmEMM1igvDfGdE5HwdOSh4o2
+        YMRw22QciNTJ3Q3Lhnb6eLXBrBJk+E8HKeG/IT/Og2CWkGL1O77+FvimPtEhRC3ZSoS5m8TXE/cJh
+        fYG1XfawyPKwTinfUPB7gdW+CUU6w6dTJRgzMXEsYNKLWRdoRNFa59l61Kts2Z/yx4INNAyljHZ9K
+        DGLEQrrdbwA2OBV29fvuXn9VA1Ir5D+xuoBV8NUQD16Py+Kq9sSnkvJYqcYgf82FbsQ9U8FpVssgD
+        fnTigTNQ==;
+Received: from hch by casper.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1kG16T-0006Gg-RY; Wed, 09 Sep 2020 14:29:41 +0000
+Date:   Wed, 9 Sep 2020 15:29:41 +0100
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Jason Gunthorpe <jgg@ziepe.ca>
+Cc:     Christoph Hellwig <hch@infradead.org>,
+        Ming Mao <maoming.maoming@huawei.com>,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-mm@kvack.org, alex.williamson@redhat.com,
+        akpm@linux-foundation.org, cohuck@redhat.com,
+        jianjay.zhou@huawei.com, weidong.huang@huawei.com,
+        peterx@redhat.com, aarcange@redhat.com, wangyunjian@huawei.com,
+        willy@infradead.org, jhubbard@nvidia.com
+Subject: Re: [PATCH V4 1/2] vfio dma_map/unmap: optimized for hugetlbfs pages
+Message-ID: <20200909142941.GA23553@infradead.org>
+References: <20200908133204.1338-1-maoming.maoming@huawei.com>
+ <20200908133204.1338-2-maoming.maoming@huawei.com>
+ <20200909080114.GA8321@infradead.org>
+ <20200909130518.GE87483@ziepe.ca>
 MIME-Version: 1.0
-In-Reply-To: <e3911fe6-84e8-cb50-d95d-e33f8ae005f8@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200909130518.GE87483@ziepe.ca>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 09/09/20 14:44, Laszlo Ersek wrote:
+On Wed, Sep 09, 2020 at 10:05:18AM -0300, Jason Gunthorpe wrote:
+> How to use? The VMAs can have mixed page sizes so the caller would
+> have to somehow switch and call twice? Not sure this is faster.
 
-> To summarize: for QemuFlashFvbServicesRuntimeDxe to allocate UEFI
-> Runtime Services Data type memory, for its own runtime GHCB, two
-> permissions are necessary (together), at OS runtime:
+We can find out the page size based on the page.  Right now it is
+rather cumbersome, but one of willys pending series has a nicer helper
+for that.
+
+> >  (2) add a bvec version of the API that returns a variable size
+> >      "extent"
 > 
-> - QemuFlashFvbServicesRuntimeDxe must be allowed to swap MSR_SEV_ES_GHCB
->   temporarily (before executing VMGEXIT),
+> This is the best one, I think.. The IOMMU setup can have multiple page
+> sizes, so having largest contiguous blocks pre-computed should speed
+> that up.
 > 
-> - QemuFlashFvbServicesRuntimeDxe must be allowed to change the OS-owned
->   PTE temporarily (for remapping the GHCB as plaintext, before writing
->   to it).
+> vfio should be a win to use a sgl rather than a page list?
+> 
+> Especially if we can also reduce the number of pages pinned by only
+> pinning head pages..
 
-Condition#2 gets worse:
+Especially for raw use of the iommu API as in vfio we don't even need
+the scatterlist now, we can call ->map on each chunk.  For the DMA API
+we'd kinda need it, but not for long.
 
-If the firmware-allocated runtime GHCB happens to be virt-mapped by the
-OS using a 2MB page (covering other UEFI runtime data areas, perhaps?),
-then simply flipping the encryption bit in
-QemuFlashFvbServicesRuntimeDxe would mark more runtime memory than just
-the GHCB as "plaintext". (2MB-4KB specifically.)
+> What about some 'pin_user_page_sgl' as a stepping stone?
 
-This could result in:
-- firmware read accesses outside of the GHCB returning garbage
-- firmware write accesses ouside of the GHCB leaking information to the
-hypervisor, and reading back later as garbage
-
-In order to prevent those symptoms, the firmware would have to split the
-2MB page to 4KB pages, and decrypt just the one (GHCB) page.
-
-But page splitting requires additional memory (for the finer granularity
-page table), and fw memory cannot be allocated at OS runtime. So that
-extra memory too would have to be pre-allocated by the firmware. Nasty.
-
-I'd recommend sticking with this kernel patch.
-
-Thanks,
-Laszlo
-
+I'd rather avoid adding new scatterlist based APIs.
