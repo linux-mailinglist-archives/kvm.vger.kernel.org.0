@@ -2,147 +2,81 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E16FD263597
-	for <lists+kvm@lfdr.de>; Wed,  9 Sep 2020 20:08:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5A2B5263638
+	for <lists+kvm@lfdr.de>; Wed,  9 Sep 2020 20:44:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727782AbgIISIA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 9 Sep 2020 14:08:00 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:35632 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1725772AbgIISIA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 9 Sep 2020 14:08:00 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1599674878;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=VV6n2P1JqU0YPZMyUbTFLLb1CLWvWgHP/iQgdRcWwfw=;
-        b=h63gNaVtn5xgiE7qUUCPac1UF24hgAAPJ+nyCt1dHnl/wjzzB0yadN8BANSUD1nB4kSGYG
-        dm/93o98Vwf7H2BeBPYjrwpFm7H/ycP4M6JVsoUDkZSTGc6dsxHJMxgcfLt2gtj4WfkRK6
-        QH43FnDO+iAS4pvpUdSiU8t1knITjTw=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-295-CWBp0t5cPr-iJtqldYOYXQ-1; Wed, 09 Sep 2020 14:07:56 -0400
-X-MC-Unique: CWBp0t5cPr-iJtqldYOYXQ-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E646E800683;
-        Wed,  9 Sep 2020 18:07:54 +0000 (UTC)
-Received: from [10.36.115.123] (ovpn-115-123.ams2.redhat.com [10.36.115.123])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 57CF31002D67;
-        Wed,  9 Sep 2020 18:07:52 +0000 (UTC)
-Subject: Re: [PATCH v3 4/5] KVM: arm64: Mask out filtered events in
- PCMEID{0,1}_EL1
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     Mark Rutland <mark.rutland@arm.com>, kvm@vger.kernel.org,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        kernel-team@android.com, James Morse <james.morse@arm.com>,
-        linux-arm-kernel@lists.infradead.org, graf@amazon.com,
-        Robin Murphy <robin.murphy@arm.com>,
-        kvmarm@lists.cs.columbia.edu,
-        Julien Thierry <julien.thierry.kdev@gmail.com>
-References: <20200908075830.1161921-1-maz@kernel.org>
- <20200908075830.1161921-5-maz@kernel.org>
- <735f5464-3a45-8dc0-c330-ac5632bcb4b4@redhat.com>
- <dde5292adce235bea39bc927c1256bc8@kernel.org>
-From:   Auger Eric <eric.auger@redhat.com>
-Message-ID: <d492cf6d-6572-572e-ceb2-37eec99a9307@redhat.com>
-Date:   Wed, 9 Sep 2020 20:07:50 +0200
+        id S1728442AbgIISop (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 9 Sep 2020 14:44:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49580 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726408AbgIISoo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 9 Sep 2020 14:44:44 -0400
+X-Greylist: delayed 447 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Wed, 09 Sep 2020 11:44:44 PDT
+Received: from forward101j.mail.yandex.net (forward101j.mail.yandex.net [IPv6:2a02:6b8:0:801:2::101])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 88E58C061573
+        for <kvm@vger.kernel.org>; Wed,  9 Sep 2020 11:44:43 -0700 (PDT)
+Received: from mxback22j.mail.yandex.net (mxback22j.mail.yandex.net [IPv6:2a02:6b8:0:1619::222])
+        by forward101j.mail.yandex.net (Yandex) with ESMTP id 27FE71BE0708;
+        Wed,  9 Sep 2020 21:37:11 +0300 (MSK)
+Received: from iva8-6403930b9beb.qloud-c.yandex.net (iva8-6403930b9beb.qloud-c.yandex.net [2a02:6b8:c0c:2c9a:0:640:6403:930b])
+        by mxback22j.mail.yandex.net (mxback/Yandex) with ESMTP id uqoZ0BfNPW-bAfihGPL;
+        Wed, 09 Sep 2020 21:37:10 +0300
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex.ru; s=mail; t=1599676630;
+        bh=qwqt/UpSDFIEXvLC1mjyKgT8ExdvZ07gy2oFqPZQous=;
+        h=In-Reply-To:Cc:To:From:Subject:Date:References:Message-ID;
+        b=TUI5K8zpv+d4PG0fm19zlVzUVbu4R1ZEnx13VfAe9Xe8xNH6hbY028eTChZs9WVmS
+         46U4oLWARY8v1mkw7qp+Q0cj8tPsdM945tvAiy+UASMAt8XsVmLqVk0LRWSxtTyHJm
+         yDivkihn6FzRLpsGvO3+6BEyvaLOZIk4V43FT5xE=
+Authentication-Results: mxback22j.mail.yandex.net; dkim=pass header.i=@yandex.ru
+Received: by iva8-6403930b9beb.qloud-c.yandex.net (smtp/Yandex) with ESMTPSA id 840Z6gnz2C-bAH0HEe7;
+        Wed, 09 Sep 2020 21:37:10 +0300
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
+        (Client certificate not present)
+Subject: Re: KVM_SET_SREGS & cr4.VMXE problems
+From:   stsp <stsp2@yandex.ru>
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     kvm@vger.kernel.org, Andy Lutomirski <luto@amacapital.net>
+References: <8f0d9048-c935-bccf-f7bd-58ba61759a54@yandex.ru>
+ <20200909163023.GA11727@sjchrist-ice>
+ <fdeb1ecb-abee-2197-4449-88d33480c5fe@yandex.ru>
+Message-ID: <4b019c3e-e880-1409-c907-0dc2a3742813@yandex.ru>
+Date:   Wed, 9 Sep 2020 21:37:08 +0300
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ Thunderbird/68.9.0
 MIME-Version: 1.0
-In-Reply-To: <dde5292adce235bea39bc927c1256bc8@kernel.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+In-Reply-To: <fdeb1ecb-abee-2197-4449-88d33480c5fe@yandex.ru>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Content-Language: en-US
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Marc,
+A bit of update.
 
-On 9/9/20 7:50 PM, Marc Zyngier wrote:
-> Hi Eric,
-> 
-> On 2020-09-09 18:43, Auger Eric wrote:
->> Hi Marc,
->>
->> On 9/8/20 9:58 AM, Marc Zyngier wrote:
->>> As we can now hide events from the guest, let's also adjust its view of
->>> PCMEID{0,1}_EL1 so that it can figure out why some common events are not
->>> counting as they should.
->> Referring to my previous comment should we filter the cycle counter out?
->>>
->>> The astute user can still look into the TRM for their CPU and find out
->>> they've been cheated, though. Nobody's perfect.
->>>
->>> Signed-off-by: Marc Zyngier <maz@kernel.org>
->>> ---
->>>  arch/arm64/kvm/pmu-emul.c | 29 +++++++++++++++++++++++++++++
->>>  arch/arm64/kvm/sys_regs.c |  5 +----
->>>  include/kvm/arm_pmu.h     |  5 +++++
->>>  3 files changed, 35 insertions(+), 4 deletions(-)
->>>
->>> diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
->>> index 67a731bafbc9..0458860bade2 100644
->>> --- a/arch/arm64/kvm/pmu-emul.c
->>> +++ b/arch/arm64/kvm/pmu-emul.c
->>> @@ -765,6 +765,35 @@ static int kvm_pmu_probe_pmuver(void)
->>>      return pmuver;
->>>  }
->>>
->>> +u64 kvm_pmu_get_pmceid(struct kvm_vcpu *vcpu, bool pmceid1)
->>> +{
->>> +    unsigned long *bmap = vcpu->kvm->arch.pmu_filter;
->>> +    u64 val, mask = 0;
->>> +    int base, i;
->>> +
->>> +    if (!pmceid1) {
->>> +        val = read_sysreg(pmceid0_el0);
->>> +        base = 0;
->>> +    } else {
->>> +        val = read_sysreg(pmceid1_el0);
->>> +        base = 32;
->>> +    }
->>> +
->>> +    if (!bmap)
->>> +        return val;
->>> +
->>> +    for (i = 0; i < 32; i += 8) {
->> s/32/4?
-> 
-> I don't think so, see below.
-> 
->>
->> Thanks
->>
->> Eric
->>> +        u64 byte;
->>> +
->>> +        byte = bitmap_get_value8(bmap, base + i);
->>> +        mask |= byte << i;
-> 
-> For each iteration of the loop, we read a byte from the bitmap
-> (hence the += 8 above), and orr it into the mask. This makes 4
-> iteration of the loop.
-> 
-> Or am I missing your point entirely?
+09.09.2020 21:04, stsp пишет:
+> As for the original problem: there are at least
+> 2 problems.
+>
+> On OLD intel:
+> - KVM fails with invalid guest state unless
+> you set VMXE in guest's cr4, and do it from
+> the very first attempt!
 
-Hum no you're right. Sorry for the noise.
-
-Looks good to me:
-
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
-
-Eric
+This happens only on nested execution!
+Under qemu/kvm.
 
 
-> 
-> Thanks,
-> 
->         M.
-
+> On any CPU:
+> - If you set VMXE in guest's cr4, then guest
+> works in non-VME mode, as if cr4.VME was
+> cleared. But I didn't clear it - KVM did! 
+I tried to read them back with
+KVM_GET_SREGS.
+So if I initially set VMXE|VME, then I
+indeed read back plain 0.
+If I initially set just VMXE, then I read
+back also 0.
+If I initially set VME, then I read back
+1 (VME - correct)
