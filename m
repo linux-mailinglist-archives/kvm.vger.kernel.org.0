@@ -2,116 +2,115 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D0D09263A94
-	for <lists+kvm@lfdr.de>; Thu, 10 Sep 2020 04:35:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C1D07263DF8
+	for <lists+kvm@lfdr.de>; Thu, 10 Sep 2020 09:05:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730478AbgIJCfM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 9 Sep 2020 22:35:12 -0400
-Received: from userp2130.oracle.com ([156.151.31.86]:54860 "EHLO
-        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730810AbgIJCWk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 9 Sep 2020 22:22:40 -0400
-Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
-        by userp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 08A2KFp9111269;
-        Thu, 10 Sep 2020 02:22:31 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
- subject : date : message-id : in-reply-to : references; s=corp-2020-01-29;
- bh=dH1eyKokPie5jaucSlIsgc7o8VBDFSHCoFdd6+dKlY8=;
- b=aZW0G9Aj7TeUZAZ0TFyaY3OUf619RKxaQeWH5mh8NlXIsumYyCmvYotJ9RFcyON39Ffb
- tzUazpjJT3B/WPsL0f2itTaMKpJBrV+AivdYM3YTnXTKssx8xm8oQoH2pfdrT4kVDGEO
- z4t/WruSDGzOv3iz0B83/RnBfGcDhY56CxLmI8bIVwkDkD6T7D8WPqDqSyfTv4hwwPHU
- hh7SPsc2E2jZrhsiCC9+rLD3NVufTL0tPtFoa+3JGgVSqbL2LjjGuGbbofiraHoX43F+
- /E5HaKXb8sx4kPxyjq5Ckff+BymjcbcrzfNMgr6M7zIWYSwrPpZ9y/3+sj6USXkmptUV mw== 
-Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
-        by userp2130.oracle.com with ESMTP id 33c23r5ap6-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
-        Thu, 10 Sep 2020 02:22:31 +0000
-Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
-        by aserp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 08A2JdoU187250;
-        Thu, 10 Sep 2020 02:22:30 GMT
-Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
-        by aserp3030.oracle.com with ESMTP id 33dacme99k-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 10 Sep 2020 02:22:30 +0000
-Received: from abhmp0013.oracle.com (abhmp0013.oracle.com [141.146.116.19])
-        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 08A2MURI002058;
-        Thu, 10 Sep 2020 02:22:30 GMT
-Received: from nsvm-sadhukhan-1.osdevelopmeniad.oraclevcn.com (/100.100.230.216)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Wed, 09 Sep 2020 19:22:30 -0700
-From:   Krish Sadhukhan <krish.sadhukhan@oracle.com>
-To:     kvm@vger.kernel.org
-Cc:     pbonzini@redhat.com, jmattson@google.com, thomas.lendacky@amd.com
-Subject: [PATCH 3/3 v2] KVM: SVM: Don't flush cache of encrypted pages if hardware enforces cache coherenc
-Date:   Thu, 10 Sep 2020 02:22:11 +0000
-Message-Id: <20200910022211.5417-4-krish.sadhukhan@oracle.com>
-X-Mailer: git-send-email 2.18.4
-In-Reply-To: <20200910022211.5417-1-krish.sadhukhan@oracle.com>
-References: <20200910022211.5417-1-krish.sadhukhan@oracle.com>
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9739 signatures=668679
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999 malwarescore=0
- bulkscore=0 phishscore=0 adultscore=0 suspectscore=1 spamscore=0
- mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2006250000 definitions=main-2009100020
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9739 signatures=668679
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 priorityscore=1501
- mlxlogscore=999 mlxscore=0 bulkscore=0 suspectscore=1 spamscore=0
- malwarescore=0 phishscore=0 lowpriorityscore=0 clxscore=1015
- impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2006250000 definitions=main-2009100020
+        id S1730400AbgIJHFE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 10 Sep 2020 03:05:04 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:43406 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1730225AbgIJHBx (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 10 Sep 2020 03:01:53 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1599721297;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=Y1vGmD/fvsXEOWa6wkRKs3aLydzIceOGg7Tbh5f+UXQ=;
+        b=GWjYsRTrA+NnxLIECRMVdbYv0rX9n/OjSIMEmuL36MAooVd+C2d5d/Mmtc20YCUQh2dHe7
+        uznluxpwZIPTOi4BwtjK7RhVkJ3zwmoGwPkbZO7xGDBqfqJ0ZTZzX53Q4BH1W0hQ2kH9Uy
+        //26XvyVJxHD7EUN7bpJLF09yCgSWwo=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-451-2JdGbL8qNYy-AdHQrg1j7Q-1; Thu, 10 Sep 2020 03:01:35 -0400
+X-MC-Unique: 2JdGbL8qNYy-AdHQrg1j7Q-1
+Received: by mail-wm1-f72.google.com with SMTP id k12so551651wmj.1
+        for <kvm@vger.kernel.org>; Thu, 10 Sep 2020 00:01:35 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=Y1vGmD/fvsXEOWa6wkRKs3aLydzIceOGg7Tbh5f+UXQ=;
+        b=CtKLpr6IFbIVKVR8Vm1to7NuqVhqB9/S89/K0MdorF+FzlnkMoKINPjTeoCgEJ2t/7
+         mFBfPZ1oIZUsYY1iMnzTuT8VtzaPsloabTubz7dImSPorluLO+IS2qojQ9SR2Rwji9rj
+         j4h6FsGrpz0Fj39ClR5+s1hFXns0SC7WhFGAmwKks0dJ5PGQgq6ZTYEJxWUkxNRQXkIx
+         PFz1lyPBXvhJ0DJ1wipAaf0I9wM0oH0M1OHmgg9OpgWF6FyCuBiC5MOsRzz5wMde35qg
+         zkIrMnL1JqcRQQ1Ic1IRQZqykyb2tW50CkNbZJVxjmlkqN6SbU5vG0/Y/G9AnpuLDNco
+         PQeg==
+X-Gm-Message-State: AOAM530uspX5ELhrsm90YeIS4Z2ON99PVSb9UalEKtY8RtqtG3+/NRhZ
+        gAxhCZx25nRmOJsRXpzYInaa1PqTBqo1EYMQOZrAqTMHkzlvc8QL7rArBnjfYb5i3Cm+rJd90k3
+        LmP0PdwwKnixW
+X-Received: by 2002:adf:f2d0:: with SMTP id d16mr7037146wrp.332.1599721294399;
+        Thu, 10 Sep 2020 00:01:34 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxOgVJywoHM/rmr+qzXsusn/6m5n3bTGfi1VzgpHQxefWx1TwErPpn8kQ+0ho5qhfDSLK+sVw==
+X-Received: by 2002:adf:f2d0:: with SMTP id d16mr7037127wrp.332.1599721294215;
+        Thu, 10 Sep 2020 00:01:34 -0700 (PDT)
+Received: from x1w.redhat.com (65.red-83-57-170.dynamicip.rima-tde.net. [83.57.170.65])
+        by smtp.gmail.com with ESMTPSA id c14sm7314726wrv.12.2020.09.10.00.01.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 10 Sep 2020 00:01:33 -0700 (PDT)
+From:   =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+To:     qemu-devel@nongnu.org
+Cc:     =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+        kvm@vger.kernel.org, qemu-arm@nongnu.org,
+        Marcelo Tosatti <mtosatti@redhat.com>,
+        "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        Laurent Vivier <lvivier@redhat.com>,
+        Peter Maydell <peter.maydell@linaro.org>,
+        Andrew Jeffery <andrew@aj.id.au>,
+        Jason Wang <jasowang@redhat.com>,
+        Thomas Huth <thuth@redhat.com>,
+        Alistair Francis <alistair@alistair23.me>,
+        qemu-trivial@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>,
+        Richard Henderson <rth@twiddle.net>,
+        Joel Stanley <joel@jms.id.au>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Subject: [PATCH 0/6] misc: Some inclusive terminology changes
+Date:   Thu, 10 Sep 2020 09:01:25 +0200
+Message-Id: <20200910070131.435543-1-philmd@redhat.com>
+X-Mailer: git-send-email 2.26.2
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Some hardware implementations may enforce cache coherency across encryption
-domains. In such cases, it's not required to flush encrypted pages off
-cache lines.
+We don't have (yet?) inclusive terminology guidelines,
+but the PCI hole memory is not "black", the DMA sources
+don't stream to "slaves", and there isn't really a TSX
+"black" list, we only check for broken fields.
 
-Signed-off-by: Krish Sadhukhan <krish.sadhukhan@oracle.com>
----
- arch/x86/kvm/svm/sev.c       | 3 ++-
- arch/x86/mm/pat/set_memory.c | 6 ++++--
- 2 files changed, 6 insertions(+), 3 deletions(-)
+As this terms can be considered offensive, and changing
+them is a no-brain operation, simply do it.
 
-diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-index 402dc4234e39..8aa2209f2637 100644
---- a/arch/x86/kvm/svm/sev.c
-+++ b/arch/x86/kvm/svm/sev.c
-@@ -384,7 +384,8 @@ static void sev_clflush_pages(struct page *pages[], unsigned long npages)
- 	uint8_t *page_virtual;
- 	unsigned long i;
- 
--	if (npages == 0 || pages == NULL)
-+	if (this_cpu_has(X86_FEATURE_HW_CACHE_COHERENCY) || npages == 0 ||
-+	    pages == NULL)
- 		return;
- 
- 	for (i = 0; i < npages; i++) {
-diff --git a/arch/x86/mm/pat/set_memory.c b/arch/x86/mm/pat/set_memory.c
-index d1b2a889f035..5e2c618cbe84 100644
---- a/arch/x86/mm/pat/set_memory.c
-+++ b/arch/x86/mm/pat/set_memory.c
-@@ -1999,7 +1999,8 @@ static int __set_memory_enc_dec(unsigned long addr, int numpages, bool enc)
- 	/*
- 	 * Before changing the encryption attribute, we need to flush caches.
- 	 */
--	cpa_flush(&cpa, 1);
-+	if (!this_cpu_has(X86_FEATURE_HW_CACHE_COHERENCY))
-+		cpa_flush(&cpa, 1);
- 
- 	ret = __change_page_attr_set_clr(&cpa, 1);
- 
-@@ -2010,7 +2011,8 @@ static int __set_memory_enc_dec(unsigned long addr, int numpages, bool enc)
- 	 * flushing gets optimized in the cpa_flush() path use the same logic
- 	 * as above.
- 	 */
--	cpa_flush(&cpa, 0);
-+	if (!this_cpu_has(X86_FEATURE_HW_CACHE_COHERENCY))
-+		cpa_flush(&cpa, 0);
- 
- 	return ret;
- }
+Philippe Mathieu-Daudé (6):
+  hw/ssi/aspeed_smc: Rename max_slaves as max_devices
+  hw/core/stream: Rename StreamSlave as StreamSink
+  hw/dma/xilinx_axidma: Rename StreamSlave as StreamSink
+  hw/net/xilinx_axienet: Rename StreamSlave as StreamSink
+  hw/pci-host/q35: Rename PCI 'black hole as '(memory) hole'
+  target/i386/kvm: Rename host_tsx_blacklisted() as host_tsx_broken()
+
+ include/hw/pci-host/q35.h     |  4 +--
+ include/hw/ssi/aspeed_smc.h   |  2 +-
+ include/hw/ssi/xilinx_spips.h |  2 +-
+ include/hw/stream.h           | 46 +++++++++++++--------------
+ hw/core/stream.c              | 20 ++++++------
+ hw/dma/xilinx_axidma.c        | 58 +++++++++++++++++------------------
+ hw/net/xilinx_axienet.c       | 44 +++++++++++++-------------
+ hw/pci-host/q35.c             | 38 +++++++++++------------
+ hw/ssi/aspeed_smc.c           | 40 ++++++++++++------------
+ hw/ssi/xilinx_spips.c         |  2 +-
+ target/i386/kvm.c             |  4 +--
+ tests/qtest/q35-test.c        |  2 +-
+ 12 files changed, 131 insertions(+), 131 deletions(-)
+
 -- 
-2.18.4
+2.26.2
 
