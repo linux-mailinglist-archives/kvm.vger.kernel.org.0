@@ -2,166 +2,92 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D9E8F263A3C
-	for <lists+kvm@lfdr.de>; Thu, 10 Sep 2020 04:24:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 16A9E263A40
+	for <lists+kvm@lfdr.de>; Thu, 10 Sep 2020 04:25:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730127AbgIJCYg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 9 Sep 2020 22:24:36 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:34188 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1730685AbgIJCIo (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 9 Sep 2020 22:08:44 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1599703717;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=9lUmVHlRg0jPhlantuCk3hiT6WHd/nIzITZFw+wGi90=;
-        b=ATCEs4iarH6CiAeGnelgL9WXp+fL2etKppxLdsXEkK3w42lMmjX0/VCN+huEfWEmHk89Po
-        IECVmvxKpbfW9a8Qm5FmV1BTnUuBABUEoiJCGU5hpUwxGqgRD+O6NOAlHQFB3p+Y/mc5vw
-        kRjxnA1JqRa5L+MaH+6hLuKSCW+bU48=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-381-PdjO5lmxOoqImIc6M2pBzA-1; Wed, 09 Sep 2020 19:07:52 -0400
-X-MC-Unique: PdjO5lmxOoqImIc6M2pBzA-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 97082801F98;
-        Wed,  9 Sep 2020 23:07:50 +0000 (UTC)
-Received: from w520.home (ovpn-112-71.phx2.redhat.com [10.3.112.71])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 209F57EED4;
-        Wed,  9 Sep 2020 23:07:48 +0000 (UTC)
-Date:   Wed, 9 Sep 2020 17:07:46 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Matthew Rosato <mjrosato@linux.ibm.com>
-Cc:     Bjorn Helgaas <helgaas@kernel.org>, bhelgaas@google.com,
-        schnelle@linux.ibm.com, pmorel@linux.ibm.com, mpe@ellerman.id.au,
-        oohall@gmail.com, cohuck@redhat.com, kevin.tian@intel.com,
-        linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, linux-pci@vger.kernel.org
-Subject: Re: [PATCH v4 1/3] PCI/IOV: Mark VFs as not implementing MSE bit
-Message-ID: <20200909170746.2286b83a@w520.home>
-In-Reply-To: <38f95349-237e-34e2-66ef-e626cd4aec25@linux.ibm.com>
-References: <20200903164117.GA312152@bjorn-Precision-5520>
-        <38f95349-237e-34e2-66ef-e626cd4aec25@linux.ibm.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+        id S1730394AbgIJCYv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 9 Sep 2020 22:24:51 -0400
+Received: from userp2120.oracle.com ([156.151.31.85]:34576 "EHLO
+        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730797AbgIJCWg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 9 Sep 2020 22:22:36 -0400
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+        by userp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 08A2KrMv121139;
+        Thu, 10 Sep 2020 02:22:31 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
+ subject : date : message-id; s=corp-2020-01-29;
+ bh=js32OklEyd2b8i8qMTH9+2LrRCdizS72A7CcGfh2l2k=;
+ b=kIlxF7Dc0PYsg716lm0qgqy6JtbMmtUi+u0sCvPhCf+DxQ3H0e2jkhhzmuM9n9TjT6hX
+ yFJvrPUBZyQEi9D0ERH1xelZ2KXGXjM2C20CwO9iABhm3XA1t9PJzjaSQmJWyxNotIrB
+ 3E0erdgSAfBnCi3OPEKie+autyMDpfkVW8tlbmVFcSWFu48ho+UnO0iY1GV+6lFGihU3
+ 9KWeGpeMNZZ9Vn2iUgUfHniiCK7pgQGvwyxKmpK+Q0ZYSq+XpACgzCjbgY5AksEpXe12
+ VyiopxlXRu9wbnoqmWgPPdTZar9ZV4D5uGjKO3jkab9ykU+3cu/CUY8NsW12/oITu+w1 zQ== 
+Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
+        by userp2120.oracle.com with ESMTP id 33c3an5513-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
+        Thu, 10 Sep 2020 02:22:30 +0000
+Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
+        by aserp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 08A2L6d9023070;
+        Thu, 10 Sep 2020 02:22:30 GMT
+Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
+        by aserp3020.oracle.com with ESMTP id 33cmk88web-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 10 Sep 2020 02:22:30 +0000
+Received: from abhmp0013.oracle.com (abhmp0013.oracle.com [141.146.116.19])
+        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 08A2MTUc012664;
+        Thu, 10 Sep 2020 02:22:29 GMT
+Received: from nsvm-sadhukhan-1.osdevelopmeniad.oraclevcn.com (/100.100.230.216)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Wed, 09 Sep 2020 19:22:29 -0700
+From:   Krish Sadhukhan <krish.sadhukhan@oracle.com>
+To:     kvm@vger.kernel.org
+Cc:     pbonzini@redhat.com, jmattson@google.com, thomas.lendacky@amd.com
+Subject: [PATCH 0/3 v2] KVM: SVM: Don't flush cache of encrypted pages if hardware enforces cache coherency
+Date:   Thu, 10 Sep 2020 02:22:08 +0000
+Message-Id: <20200910022211.5417-1-krish.sadhukhan@oracle.com>
+X-Mailer: git-send-email 2.18.4
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9739 signatures=668679
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0 malwarescore=0 phishscore=0
+ mlxlogscore=752 bulkscore=0 adultscore=0 mlxscore=0 suspectscore=1
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
+ definitions=main-2009100020
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9739 signatures=668679
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0 priorityscore=1501
+ clxscore=1015 bulkscore=0 malwarescore=0 lowpriorityscore=0
+ mlxlogscore=767 suspectscore=1 adultscore=0 mlxscore=0 impostorscore=0
+ spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2006250000 definitions=main-2009100020
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 3 Sep 2020 13:10:02 -0400
-Matthew Rosato <mjrosato@linux.ibm.com> wrote:
+v1 -> v2:
+	1. Patch# 2 is the new addition. It adds the hardware-enforced cache
+	   coherency as a CPUID feature.
+	2. Patch# 3 (which was pach# 2 in v1) also adds the check to
+	   __set_memory_enc_dec() so that cache/TLB is flushed only if
+	   hardware doesn't enforce cache coherency.
 
-> On 9/3/20 12:41 PM, Bjorn Helgaas wrote:
-> > On Wed, Sep 02, 2020 at 03:46:34PM -0400, Matthew Rosato wrote:  
-> >> Per the PCIe spec, VFs cannot implement the MSE bit
-> >> AKA PCI_COMMAND_MEMORY, and it must be hard-wired to 0.
-> >> Use a dev_flags bit to signify this requirement.  
-> > 
-> > This approach seems sensible to me, but
-> > 
-> >    - This is confusing because while the spec does not use "MSE" to
-> >      refer to the Command Register "Memory Space Enable" bit
-> >      (PCI_COMMAND_MEMORY), it *does* use "MSE" in the context of the
-> >      "VF MSE" bit, which is in the PF SR-IOV Capability.  But of
-> >      course, you're not talking about that here.  Maybe something like
-> >      this?
-> > 
-> >        For VFs, the Memory Space Enable bit in the Command Register is
-> >        hard-wired to 0.
-> > 
-> >        Add a dev_flags bit to signify devices where the Command
-> >        Register Memory Space Enable bit does not control the device's
-> >        response to MMIO accesses.  
-> 
-> Will do.  I'll change the usage of the MSE acronym in the other patches 
-> as well.
-> 
-> > 
-> >    - "PCI_DEV_FLAGS_FORCE_COMMAND_MEM" says something about how you
-> >      plan to *use* this, but I'd rather use a term that describes the
-> >      hardware, e.g., "PCI_DEV_FLAGS_NO_COMMAND_MEMORY".  
-> 
-> Sure, I will change.
-> 
-> > 
-> >    - How do we decide whether to use dev_flags vs a bitfield like
-> >      dev->is_virtfn?  The latter seems simpler unless there's a reason
-> >      to use dev_flags.  If there's a reason, maybe we could add a
-> >      comment at pci_dev_flags for future reference.
-> >   
-> 
-> Something like:
-> 
-> /*
->   * Device does not implement PCI_COMMAND_MEMORY - this is true for any
->   * device marked is_virtfn, but is also true for any VF passed-through
->   * a lower-level hypervisor where emulation of the Memory Space Enable
->   * bit was not provided.
->   */
-> PCI_DEV_FLAGS_NO_COMMAND_MEMORY = (__force pci_dev_flags_t) (1 << 12),
-> 
-> ?
-> 
-> >    - Wrap the commit log to fill a 75-char line.  It's arbitrary, but
-> >      that's what I use for consistency.  
-> 
-> Sure, will do.  I'll roll up a new version once I have feedback from 
-> Alex on the vfio changes.
 
-The usage of MSE threw me a bit too, as Bjorn notes that's specific to
-the SR-IOV capability.  I think this also uncovers a latent bug in our
-calling of vfio_bar_restore(), it really doesn't do a good job of
-determining whether an enable bit is implemented, regardless of whether
-it's a VF or the device simply doesn't use that address space.  For
-example I imagine you could reproduce triggering a reset recovery on
-s390 by trying to write the VF command register to 1 with setpci from a
-guest (since you won't have is_virtfn to bail out of the recovery
-function).  I think we'll still need this dev_flag to differentiate
-unimplmented and enabled versus simply unimplemented to resolve that
-though, so the change looks ok to me. Thanks,
+[PATCH 1/3 v2] KVM: SVM: Replace numeric value for SME CPUID leaf with a
+[PATCH 2/3 v2] KVM: SVM: Add hardware-enforced cache coherency as a
+[PATCH 3/3 v2] KVM: SVM: Don't flush cache of encrypted pages if
 
-Alex
+ arch/x86/boot/compressed/mem_encrypt.S | 5 +++--
+ arch/x86/include/asm/cpufeatures.h     | 6 ++++++
+ arch/x86/kernel/cpu/amd.c              | 5 ++++-
+ arch/x86/kernel/cpu/scattered.c        | 4 ++--
+ arch/x86/kvm/cpuid.c                   | 2 +-
+ arch/x86/kvm/svm/sev.c                 | 3 ++-
+ arch/x86/kvm/svm/svm.c                 | 4 ++--
+ arch/x86/mm/mem_encrypt_identity.c     | 4 ++--
+ arch/x86/mm/pat/set_memory.c           | 6 ++++--
+ 9 files changed, 26 insertions(+), 13 deletions(-)
 
-> >> Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
-> >> ---
-> >>   drivers/pci/iov.c   | 1 +
-> >>   include/linux/pci.h | 2 ++
-> >>   2 files changed, 3 insertions(+)
-> >>
-> >> diff --git a/drivers/pci/iov.c b/drivers/pci/iov.c
-> >> index b37e08c..2bec77c 100644
-> >> --- a/drivers/pci/iov.c
-> >> +++ b/drivers/pci/iov.c
-> >> @@ -180,6 +180,7 @@ int pci_iov_add_virtfn(struct pci_dev *dev, int id)
-> >>   	virtfn->device = iov->vf_device;
-> >>   	virtfn->is_virtfn = 1;
-> >>   	virtfn->physfn = pci_dev_get(dev);
-> >> +	virtfn->dev_flags |= PCI_DEV_FLAGS_FORCE_COMMAND_MEM;
-> >>   
-> >>   	if (id == 0)
-> >>   		pci_read_vf_config_common(virtfn);
-> >> diff --git a/include/linux/pci.h b/include/linux/pci.h
-> >> index 8355306..9316cce 100644
-> >> --- a/include/linux/pci.h
-> >> +++ b/include/linux/pci.h
-> >> @@ -227,6 +227,8 @@ enum pci_dev_flags {
-> >>   	PCI_DEV_FLAGS_NO_FLR_RESET = (__force pci_dev_flags_t) (1 << 10),
-> >>   	/* Don't use Relaxed Ordering for TLPs directed at this device */
-> >>   	PCI_DEV_FLAGS_NO_RELAXED_ORDERING = (__force pci_dev_flags_t) (1 << 11),
-> >> +	/* Device does not implement PCI_COMMAND_MEMORY (e.g. a VF) */
-> >> +	PCI_DEV_FLAGS_FORCE_COMMAND_MEM = (__force pci_dev_flags_t) (1 << 12),
-> >>   };
-> >>   
-> >>   enum pci_irq_reroute_variant {
-> >> -- 
-> >> 1.8.3.1
-> >>  
-> 
+Krish Sadhukhan (3):
+      KVM: SVM: Replace numeric value for SME CPUID leaf with a #define
+      KVM: SVM: Add hardware-enforced cache coherency as a CPUID feature
+      KVM: SVM: Don't flush cache of encrypted pages if hardware enforces cache 
+coherenc
 
