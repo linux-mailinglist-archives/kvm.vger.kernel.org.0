@@ -2,76 +2,99 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 121E3263ADA
-	for <lists+kvm@lfdr.de>; Thu, 10 Sep 2020 04:47:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DCB4F263B10
+	for <lists+kvm@lfdr.de>; Thu, 10 Sep 2020 04:54:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730376AbgIJB7y (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 9 Sep 2020 21:59:54 -0400
-Received: from mail.kernel.org ([198.145.29.99]:34244 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730175AbgIJBza (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 9 Sep 2020 21:55:30 -0400
-Received: from localhost (52.sub-72-107-123.myvzw.com [72.107.123.52])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        id S1730021AbgIJCyK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 9 Sep 2020 22:54:10 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:25849 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1730190AbgIJB4h (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 9 Sep 2020 21:56:37 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1599702992;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=0C1QtHwLo5ZP+Ar8+ErpMK60qaWJInbsQRohKM7A1QA=;
+        b=b4zjHySOiKU+WfwFqg08c1d546JSHBRhPhv+QR5crm4IZB0Htw/xPiVmSilit8D//rG9/R
+        6kmt0Ju/ZkRJwpY9A2BZ6yhxwtcSGE1hU8R5Zdf7gr0vgO4hEFeKxXCvkxLtHyZaK0yctQ
+        c5gPBfQ8FXS6w77GRJJPPAk7PUCqA3o=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-369-ZMZwJTTFNGOE9gvdtSDulw-1; Wed, 09 Sep 2020 21:56:28 -0400
+X-MC-Unique: ZMZwJTTFNGOE9gvdtSDulw-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 38D5E22204;
-        Thu, 10 Sep 2020 00:39:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1599698358;
-        bh=DUreE3/B8B60ExKVpkn5deA+5RXtXj3rT/zpM+ipKM8=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:From;
-        b=fxbGvae5PiiQEAyf5ZOsc1H1PIbu/Dtuxhr4F+6DiH4VkMLBe6b8vAQvKMaITSQTk
-         lEZycuYgzorka6kWEpyiTs/w+GnoMbixvkjYtFueggSDVnfjsYIpwv0dMs2CU8jlJ/
-         Sxkfy16axgN5dv42JNKPDgfSrCN+JbHDZlGTfmbI=
-Date:   Wed, 9 Sep 2020 19:39:16 -0500
-From:   Bjorn Helgaas <helgaas@kernel.org>
-To:     Matthew Rosato <mjrosato@linux.ibm.com>
-Cc:     alex.williamson@redhat.com, bhelgaas@google.com,
-        schnelle@linux.ibm.com, pmorel@linux.ibm.com, mpe@ellerman.id.au,
-        oohall@gmail.com, cohuck@redhat.com, kevin.tian@intel.com,
-        linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, linux-pci@vger.kernel.org
-Subject: Re: [PATCH v4 1/3] PCI/IOV: Mark VFs as not implementing MSE bit
-Message-ID: <20200910003916.GA741660@bjorn-Precision-5520>
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A9D6F593B2;
+        Thu, 10 Sep 2020 01:56:24 +0000 (UTC)
+Received: from [10.72.13.124] (ovpn-13-124.pek2.redhat.com [10.72.13.124])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id E0B3B60BF1;
+        Thu, 10 Sep 2020 01:56:06 +0000 (UTC)
+Subject: Re: [PATCH] vhost-vdpa: fix memory leak in error path
+To:     Li Qiang <liq3ea@163.com>, mst@redhat.com
+Cc:     kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+        liq3ea@gmail.com
+References: <20200909154120.363209-1-liq3ea@163.com>
+From:   Jason Wang <jasowang@redhat.com>
+Message-ID: <bfae5c35-355a-8d8a-5057-a970db24ee41@redhat.com>
+Date:   Thu, 10 Sep 2020 09:56:05 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <38f95349-237e-34e2-66ef-e626cd4aec25@linux.ibm.com>
+In-Reply-To: <20200909154120.363209-1-liq3ea@163.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Sep 03, 2020 at 01:10:02PM -0400, Matthew Rosato wrote:
-> On 9/3/20 12:41 PM, Bjorn Helgaas wrote:
 
-> >    - How do we decide whether to use dev_flags vs a bitfield like
-> >      dev->is_virtfn?  The latter seems simpler unless there's a reason
-> >      to use dev_flags.  If there's a reason, maybe we could add a
-> >      comment at pci_dev_flags for future reference.
-> 
-> Something like:
-> 
-> /*
->  * Device does not implement PCI_COMMAND_MEMORY - this is true for any
->  * device marked is_virtfn, but is also true for any VF passed-through
->  * a lower-level hypervisor where emulation of the Memory Space Enable
->  * bit was not provided.
->  */
-> PCI_DEV_FLAGS_NO_COMMAND_MEMORY = (__force pci_dev_flags_t) (1 << 12),
+On 2020/9/9 下午11:41, Li Qiang wrote:
+> Free the 'page_list' when the 'npages' is zero.
+>
+> Signed-off-by: Li Qiang <liq3ea@163.com>
+> ---
+>   drivers/vhost/vdpa.c | 8 ++++++--
+>   1 file changed, 6 insertions(+), 2 deletions(-)
+>
+> diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
+> index 3fab94f88894..6a9fcaf1831d 100644
+> --- a/drivers/vhost/vdpa.c
+> +++ b/drivers/vhost/vdpa.c
+> @@ -609,8 +609,10 @@ static int vhost_vdpa_process_iotlb_update(struct vhost_vdpa *v,
+>   		gup_flags |= FOLL_WRITE;
+>   
+>   	npages = PAGE_ALIGN(msg->size + (iova & ~PAGE_MASK)) >> PAGE_SHIFT;
+> -	if (!npages)
+> -		return -EINVAL;
+> +	if (!npages) {
+> +		ret = -EINVAL;
+> +		goto free_page;
+> +	}
+>   
+>   	mmap_read_lock(dev->mm);
+>   
+> @@ -666,6 +668,8 @@ static int vhost_vdpa_process_iotlb_update(struct vhost_vdpa *v,
+>   		atomic64_sub(npages, &dev->mm->pinned_vm);
+>   	}
+>   	mmap_read_unlock(dev->mm);
+> +
+> +free_page:
+>   	free_page((unsigned long)page_list);
+>   	return ret;
+>   }
 
-Sorry, I wasn't clear about this.  I was trying to suggest that if
-there are some situations where we need to use pci_dev_flags instead
-of a bitfield, it would be useful to have a generic comment to help
-decide between them.
 
-I don't know that there *is* a good reason, and unless somebody can
-think of one, I'd like to get rid of pci_dev_flags completely and
-convert them all to bitfields.
+Cc: stable@vger.kernel.org
 
-Given that, my preference would be to just add a new bitfield,
-something like this:
+Acked-by: Jason Wang <jasowang@redhat.com>
 
-  struct pci_dev {
-    ...
-    unsigned int no_command_memory:1;  /* No PCI_COMMAND_MEMORY */
+
+
