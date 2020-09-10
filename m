@@ -2,493 +2,127 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id CB8C7265437
-	for <lists+kvm@lfdr.de>; Thu, 10 Sep 2020 23:53:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 33782265433
+	for <lists+kvm@lfdr.de>; Thu, 10 Sep 2020 23:53:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728703AbgIJVm7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 10 Sep 2020 17:42:59 -0400
-Received: from mail.kernel.org ([198.145.29.99]:56768 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730179AbgIJMiL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 10 Sep 2020 08:38:11 -0400
-Received: from mail-oi1-f175.google.com (mail-oi1-f175.google.com [209.85.167.175])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        id S1728708AbgIJVnC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 10 Sep 2020 17:43:02 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:51850 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1730788AbgIJMiz (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 10 Sep 2020 08:38:55 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1599741522;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=HWqy6p1smteYWCZ5IYH5/YWc3EdcTl5osmfODBroec8=;
+        b=GpHSrH9Q49k2ZGREyokBmZaBj++VLYmxkEWCQytNSQOyagiuSO/6ITKWN+MOAyFhOGzMo1
+        orKbjh2pHePdIaU2QyVeuB06h9Rg1jT4vLAq22Uq5WWzAMvjUrMzuEC7xtRr7YP0cLkzDb
+        hhyOtrpdBmlAdgClud0T1gLB2BaPLNY=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-443-Gtquf9efMqCTD7-Wz-qIpA-1; Thu, 10 Sep 2020 08:38:38 -0400
+X-MC-Unique: Gtquf9efMqCTD7-Wz-qIpA-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 9429321D81;
-        Thu, 10 Sep 2020 12:38:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1599741487;
-        bh=vUakjrgQS5hHPbnWMvqiy/edW/hs+9nT/9ez/hgXTF4=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=GYy5FoUtJlf1p5wcSgrb+EDQX2I12XN0Gj3qyos1raHxoMktkbuZ4rQ5Hhm7b4FKq
-         uUZybJ8cvLQpewLpPJiyTf7dyJrVfCYtqkH+fWtm1ENxH4zy7t1uuUM0jLvLrEQZyP
-         CE8Kbq8GiSBcdniI5njTvtyw3o49C/4UdolGeb5o=
-Received: by mail-oi1-f175.google.com with SMTP id d189so5715854oig.12;
-        Thu, 10 Sep 2020 05:38:07 -0700 (PDT)
-X-Gm-Message-State: AOAM531NfYO1uBthi/maMGTfF7RLkvLz0hxJMSEs7M+lr1DVIn+bdlri
-        npsEx33tSSb3AX95+0n1zAEq6zzLk94E3v9IVlU=
-X-Google-Smtp-Source: ABdhPJw3qh6R3tek2w/L8V452GluQxc0JDwZjaJkI98zwVnfAHUzQVCH35I5eIBhn4EBmYuvmjwLouHQj/2Z37iwQbg=
-X-Received: by 2002:a05:6808:8e5:: with SMTP id d5mr3563450oic.33.1599741486670;
- Thu, 10 Sep 2020 05:38:06 -0700 (PDT)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E8B87640A6;
+        Thu, 10 Sep 2020 12:38:29 +0000 (UTC)
+Received: from gondolin (ovpn-112-89.ams2.redhat.com [10.36.112.89])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 27A9983562;
+        Thu, 10 Sep 2020 12:38:24 +0000 (UTC)
+Date:   Thu, 10 Sep 2020 14:38:22 +0200
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Yan Zhao <yan.y.zhao@intel.com>
+Cc:     Sean Mooney <smooney@redhat.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        "Daniel =?UTF-8?B?UC5CZXJyYW5nw6k=?=" <berrange@redhat.com>,
+        kvm@vger.kernel.org, libvir-list@redhat.com,
+        Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org,
+        kwankhede@nvidia.com, eauger@redhat.com, xin-ran.wang@intel.com,
+        corbet@lwn.net, openstack-discuss@lists.openstack.org,
+        shaohe.feng@intel.com, kevin.tian@intel.com,
+        Parav Pandit <parav@mellanox.com>, jian-feng.ding@intel.com,
+        dgilbert@redhat.com, zhenyuw@linux.intel.com, hejie.xu@intel.com,
+        bao.yumeng@zte.com.cn, intel-gvt-dev@lists.freedesktop.org,
+        eskultet@redhat.com, Jiri Pirko <jiri@mellanox.com>,
+        dinechin@redhat.com, devel@ovirt.org
+Subject: Re: device compatibility interface for live migration with assigned
+ devices
+Message-ID: <20200910143822.2071eca4.cohuck@redhat.com>
+In-Reply-To: <20200909021308.GA1277@joy-OptiPlex-7040>
+References: <20200818113652.5d81a392.cohuck@redhat.com>
+        <20200820003922.GE21172@joy-OptiPlex-7040>
+        <20200819212234.223667b3@x1.home>
+        <20200820031621.GA24997@joy-OptiPlex-7040>
+        <20200825163925.1c19b0f0.cohuck@redhat.com>
+        <20200826064117.GA22243@joy-OptiPlex-7040>
+        <20200828154741.30cfc1a3.cohuck@redhat.com>
+        <8f5345be73ebf4f8f7f51d6cdc9c2a0d8e0aa45e.camel@redhat.com>
+        <20200831044344.GB13784@joy-OptiPlex-7040>
+        <20200908164130.2fe0d106.cohuck@redhat.com>
+        <20200909021308.GA1277@joy-OptiPlex-7040>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-References: <20200907131613.12703-1-joro@8bytes.org> <20200907131613.12703-72-joro@8bytes.org>
- <20200908174616.GJ25236@zn.tnic> <CAMj1kXHbePrDYXGbVG0fHfH5=M19ZpCLm9YVTs-yKTuR_jFLDg@mail.gmail.com>
- <e3911fe6-84e8-cb50-d95d-e33f8ae005f8@redhat.com> <c31d889b-c0e8-8b3c-74da-40a73f82b09b@amd.com>
-In-Reply-To: <c31d889b-c0e8-8b3c-74da-40a73f82b09b@amd.com>
-From:   Ard Biesheuvel <ardb@kernel.org>
-Date:   Thu, 10 Sep 2020 15:37:54 +0300
-X-Gmail-Original-Message-ID: <CAMj1kXGVT9HK6OTvY4rVWqGahc2NJUrabVV8sg9Ww1b7BN2uOg@mail.gmail.com>
-Message-ID: <CAMj1kXGVT9HK6OTvY4rVWqGahc2NJUrabVV8sg9Ww1b7BN2uOg@mail.gmail.com>
-Subject: Re: [PATCH v7 71/72] x86/efi: Add GHCB mappings when SEV-ES is active
-To:     Tom Lendacky <thomas.lendacky@amd.com>
-Cc:     Laszlo Ersek <lersek@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        brijesh.singh@amd.com, Joerg Roedel <joro@8bytes.org>,
-        X86 ML <x86@kernel.org>, Joerg Roedel <jroedel@suse.de>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Jiri Slaby <jslaby@suse.cz>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Juergen Gross <jgross@suse.com>,
-        Kees Cook <keescook@chromium.org>,
-        David Rientjes <rientjes@google.com>,
-        Cfir Cohen <cfir@google.com>,
-        Erdem Aktas <erdemaktas@google.com>,
-        Masami Hiramatsu <mhiramat@kernel.org>,
-        Mike Stunes <mstunes@vmware.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Martin Radev <martin.b.radev@gmail.com>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 9 Sep 2020 at 16:49, Tom Lendacky <thomas.lendacky@amd.com> wrote:
->
-> On 9/9/20 7:44 AM, Laszlo Ersek wrote:
-> > On 09/09/20 10:27, Ard Biesheuvel wrote:
-> >> (adding Laszlo and Brijesh)
-> >>
-> >> On Tue, 8 Sep 2020 at 20:46, Borislav Petkov <bp@alien8.de> wrote:
-> >>>
-> >>> + Ard so that he can ack the efi bits.
-> >>>
-> >>> On Mon, Sep 07, 2020 at 03:16:12PM +0200, Joerg Roedel wrote:
-> >>>> From: Tom Lendacky <thomas.lendacky@amd.com>
-> >>>>
-> >>>> Calling down to EFI runtime services can result in the firmware
-> >>>> performing VMGEXIT calls. The firmware is likely to use the GHCB of
-> >>>> the OS (e.g., for setting EFI variables),
-> >
-> > I've had to stare at this for a while.
-> >
-> > Because, normally a VMGEXIT is supposed to occur like this:
-> >
-> > - guest does something privileged
-> > - resultant non-automatic exit (NAE) injects a #VC exception
-> > - exception handler figures out what that privileged thing was
-> > - exception handler submits request to hypervisor via GHCB contents plus
-> >    VMGEXIT instruction
-> >
-> > Point being, the agent that "owns" the exception handler is supposed to
-> > pre-allocate or otherwise provide the GHCB too, for information passing.
-> >
-> > So... what is the particular NAE that occurs during the execution of
-> > UEFI runtime services (at OS runtime)?
-> >
-> > And assuming it occurs, I'm unsure if the exception handler (IDT) at
-> > that point is owned (temporarily?) by the firmware.
-> >
-> > - If the #VC handler comes from the firmware, then I don't know why it
-> > would use the OS's GHCB.
-> >
-> > - If the #VC handler comes from the OS, then I don't understand why the
-> > commit message says "firmware performing VMGEXIT", given that in this
-> > case it would be the OS's #VC handler executing VMGEXIT.
-> >
-> > So, I think the above commit message implies a VMGEXIT *without* a NAE /
-> > #VC context. (Because, I fail to interpret the commit message in a NAE /
-> > #VC context in any way; see above.)
->
-> Correct.
->
-> >
-> > OK, so let's see where the firmware performs a VMGEXIT *outside* of an
-> > exception handler, *while* at OS runtime. There seems to be one, in file
-> > "OvmfPkg/QemuFlashFvbServicesRuntimeDxe/QemuFlashDxe.c":
->
-> Again, correct. Basically this is what is invoked when setting UEFI variables.
->
-> >
-> >> VOID
-> >> QemuFlashPtrWrite (
-> >>    IN        volatile UINT8    *Ptr,
-> >>    IN        UINT8             Value
-> >>    )
-> >> {
-> >>    if (MemEncryptSevEsIsEnabled ()) {
-> >>      MSR_SEV_ES_GHCB_REGISTER  Msr;
-> >>      GHCB                      *Ghcb;
-> >>
-> >>      Msr.GhcbPhysicalAddress = AsmReadMsr64 (MSR_SEV_ES_GHCB);
-> >>      Ghcb = Msr.Ghcb;
-> >>
-> >>      //
-> >>      // Writing to flash is emulated by the hypervisor through the use of write
-> >>      // protection. This won't work for an SEV-ES guest because the write won't
-> >>      // be recognized as a true MMIO write, which would result in the required
-> >>      // #VC exception. Instead, use the the VMGEXIT MMIO write support directly
-> >>      // to perform the update.
-> >>      //
-> >>      VmgInit (Ghcb);
-> >>      Ghcb->SharedBuffer[0] = Value;
-> >>      Ghcb->SaveArea.SwScratch = (UINT64) (UINTN) Ghcb->SharedBuffer;
-> >>      VmgExit (Ghcb, SVM_EXIT_MMIO_WRITE, (UINT64) (UINTN) Ptr, 1);
-> >>      VmgDone (Ghcb);
-> >>    } else {
-> >>      *Ptr = Value;
-> >>    }
-> >> }
-> >
-> > This function *does* run at OS runtime (as a part of non-volatile UEFI
-> > variable writes).
-> >
-> > And note that, wherever MSR_SEV_ES_GHCB points to at the moment, is used
-> > as GHCB.
-> >
-> > If the guest kernel allocates its own GHCB and writes the allocation
-> > address to MSR_SEV_ES_GHCB, then indeed the firmware will use the GHCB
-> > of the OS.
-> >
-> > I reviewed edk2 commit 437eb3f7a8db
-> > ("OvmfPkg/QemuFlashFvbServicesRuntimeDxe: Bypass flash detection with
-> > SEV-ES", 2020-08-17), but I admit I never thought of the guest OS
-> > changing MSR_SEV_ES_GHCB. I'm sorry about that.
-> >
-> > As long as this driver is running before OS runtime (i.e., during the
-> > DXE and BDS phases), MSR_SEV_ES_GHCB is supposed to carry the value we
-> > set in "OvmfPkg/PlatformPei/AmdSev.c":
-> >
-> >> STATIC
-> >> VOID
-> >> AmdSevEsInitialize (
-> >>    VOID
-> >>    )
-> >> {
-> >>    VOID              *GhcbBase;
-> >>    PHYSICAL_ADDRESS  GhcbBasePa;
-> >>    UINTN             GhcbPageCount, PageCount;
-> >>    RETURN_STATUS     PcdStatus, DecryptStatus;
-> >>    IA32_DESCRIPTOR   Gdtr;
-> >>    VOID              *Gdt;
-> >>
-> >>    if (!MemEncryptSevEsIsEnabled ()) {
-> >>      return;
-> >>    }
-> >>
-> >>    PcdStatus = PcdSetBoolS (PcdSevEsIsEnabled, TRUE);
-> >>    ASSERT_RETURN_ERROR (PcdStatus);
-> >>
-> >>    //
-> >>    // Allocate GHCB and per-CPU variable pages.
-> >>    //   Since the pages must survive across the UEFI to OS transition
-> >>    //   make them reserved.
-> >>    //
-> >>    GhcbPageCount = mMaxCpuCount * 2;
-> >>    GhcbBase = AllocateReservedPages (GhcbPageCount);
-> >>    ASSERT (GhcbBase != NULL);
-> >>
-> >>    GhcbBasePa = (PHYSICAL_ADDRESS)(UINTN) GhcbBase;
-> >>
-> >>    //
-> >>    // Each vCPU gets two consecutive pages, the first is the GHCB and the
-> >>    // second is the per-CPU variable page. Loop through the allocation and
-> >>    // only clear the encryption mask for the GHCB pages.
-> >>    //
-> >>    for (PageCount = 0; PageCount < GhcbPageCount; PageCount += 2) {
-> >>      DecryptStatus = MemEncryptSevClearPageEncMask (
-> >>        0,
-> >>        GhcbBasePa + EFI_PAGES_TO_SIZE (PageCount),
-> >>        1,
-> >>        TRUE
-> >>        );
-> >>      ASSERT_RETURN_ERROR (DecryptStatus);
-> >>    }
-> >>
-> >>    ZeroMem (GhcbBase, EFI_PAGES_TO_SIZE (GhcbPageCount));
-> >>
-> >>    PcdStatus = PcdSet64S (PcdGhcbBase, GhcbBasePa);
-> >>    ASSERT_RETURN_ERROR (PcdStatus);
-> >>    PcdStatus = PcdSet64S (PcdGhcbSize, EFI_PAGES_TO_SIZE (GhcbPageCount));
-> >>    ASSERT_RETURN_ERROR (PcdStatus);
-> >>
-> >>    DEBUG ((DEBUG_INFO,
-> >>      "SEV-ES is enabled, %lu GHCB pages allocated starting at 0x%p\n",
-> >>      (UINT64)GhcbPageCount, GhcbBase));
-> >>
-> >>    AsmWriteMsr64 (MSR_SEV_ES_GHCB, GhcbBasePa);
-> >
-> > So what is the *actual* problem at OS runtime:
-> >
-> > - Is it that MSR_SEV_ES_GHCB still points at this PEI-phase *reserved*
-> >    memory allocation (and so when QemuFlashPtrWrite() tries to access it
-> >    during OS runtime, it doesn't have a runtime mapping for it)?
->
-> At this point the GHCB MSR points to the OS GHCB, which isn't mapped by
-> the page tables supplied by the OS and used by UEFI.
->
-> >
-> > - Or is it that the OS actively changes MSR_SEV_ES_GHCB, pointing to a
-> >    memory area that the OS owns -- and *that* area is what
-> >    QemuFlashPtrWrite() cannot access at OS runtime?
->
-> Correct.
->
-> >
-> > The first problem statement does *not* seem to apply, given -- again --
-> > that the commit message says, "firmware is likely to use the GHCB of the
-> > OS".
-> >
-> > So I think the second problem statement must apply.
-> >
-> > (I think the "reserved allocation" above is "reserved" only because we
-> > want to keep the OS out of it around the ExitBootServices() transition.)
-> >
-> > Back to the email:
-> >
-> > On 09/09/20 10:27, Ard Biesheuvel wrote:
-> >> On Tue, 8 Sep 2020 at 20:46, Borislav Petkov <bp@alien8.de> wrote:
-> >>> On Mon, Sep 07, 2020 at 03:16:12PM +0200, Joerg Roedel wrote:
-> >>>> so each GHCB in the system needs to be identity
-> >>>> mapped in the EFI page tables, as unencrypted, to avoid page faults.
-> >
-> > Not sure I agree about this, but at least it seems to confirm my
-> > understanding -- apparently the idea is, for the OS, to satisfy
-> > QemuFlashPtrWrite() in the firmware, by putting the "expected" mapping
-> > -- for wherever MSR_SEV_ES_GHCB is going to point to -- in place.
-> >
-> >>>>
-> >>>> Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
-> >>>> [ jroedel@suse.de: Moved GHCB mapping loop to sev-es.c ]
-> >>>> Signed-off-by: Joerg Roedel <jroedel@suse.de>
-> >>
-> >>
-> >> This looks like it is papering over a more fundamental issue: any
-> >> memory region that the firmware itself needs to access during the
-> >> execution of runtime services needs to be described in the UEFI memory
-> >> map, with the appropriate annotations so that the OS knows it should
-> >> include these in the EFI runtime page tables. So why has this been
-> >> omitted in this case?
-> >
-> > So yeah, the issue seems to be that the QemuFlashFvbServicesRuntimeDxe
-> > driver does not *own* the GHCB that it attempts to use at OS runtime. It
-> > doesn't know where MSR_SEV_ES_GHCB is going to point.
-> >
-> > Is QemuFlashFvbServicesRuntimeDxe permitted to change MSR_SEV_ES_GHCB
-> > *temporarily* at OS runtime?
-> >
-> > Because, in that case:
-> >
-> > - QemuFlashFvbServicesRuntimeDxe should allocate a Runtime Services Data
-> >    block for GHCB when it starts up (if SEV-ES is active),
-> >
-> > - QemuFlashFvbServicesRuntimeDxe should register a SetVirtualAddressMap
-> >    handler, and use EfiConvertPointer() from UefiRuntimeLib to convert
-> >    the "runtime GHCB" address to virtual address, in that handler,
-> >
-> > - QemuFlashPtrWrite() should call EfiAtRuntime() from UefiRuntimeLib,
-> >    and if the latter returns TRUE, then (a) use the runtime-converted
-> >    address for populating the GHCB, and (b) temporarily swap
-> >    MSR_SEV_ES_GHCB with the address of the self-allocated GHCB. (The MSR
-> >    needs a *physical* address, so QemuFlashFvbServicesRuntimeDxe would
-> >    have to remember / retain the original (physical) allocation address
-> >    too.)
-> >
-> > If QemuFlashFvbServicesRuntimeDxe is not permitted to change
-> > MSR_SEV_ES_GHCB even temporarily (at OS runtime), then I think the
-> > approach proposed in this (guest kernel) patch is valid.
-> >
-> > Let me skim the code below...
-> >
-> >>
-> >>
-> >>
-> >>>> ---
-> >>>>   arch/x86/boot/compressed/sev-es.c |  1 +
-> >>>>   arch/x86/include/asm/sev-es.h     |  2 ++
-> >>>>   arch/x86/kernel/sev-es.c          | 30 ++++++++++++++++++++++++++++++
-> >>>>   arch/x86/platform/efi/efi_64.c    | 10 ++++++++++
-> >>>>   4 files changed, 43 insertions(+)
-> >>>>
-> >>>> diff --git a/arch/x86/boot/compressed/sev-es.c b/arch/x86/boot/compressed/sev-es.c
-> >>>> index 45702b866c33..0a9a248ca33d 100644
-> >>>> --- a/arch/x86/boot/compressed/sev-es.c
-> >>>> +++ b/arch/x86/boot/compressed/sev-es.c
-> >>>> @@ -12,6 +12,7 @@
-> >>>>    */
-> >>>>   #include "misc.h"
-> >>>>
-> >>>> +#include <asm/pgtable_types.h>
-> >>>>   #include <asm/sev-es.h>
-> >>>>   #include <asm/trapnr.h>
-> >>>>   #include <asm/trap_pf.h>
-> >>>> diff --git a/arch/x86/include/asm/sev-es.h b/arch/x86/include/asm/sev-es.h
-> >>>> index e919f09ae33c..cf1d957c7091 100644
-> >>>> --- a/arch/x86/include/asm/sev-es.h
-> >>>> +++ b/arch/x86/include/asm/sev-es.h
-> >>>> @@ -102,11 +102,13 @@ static __always_inline void sev_es_nmi_complete(void)
-> >>>>        if (static_branch_unlikely(&sev_es_enable_key))
-> >>>>                __sev_es_nmi_complete();
-> >>>>   }
-> >>>> +extern int __init sev_es_efi_map_ghcbs(pgd_t *pgd);
-> >>>>   #else
-> >>>>   static inline void sev_es_ist_enter(struct pt_regs *regs) { }
-> >>>>   static inline void sev_es_ist_exit(void) { }
-> >>>>   static inline int sev_es_setup_ap_jump_table(struct real_mode_header *rmh) { return 0; }
-> >>>>   static inline void sev_es_nmi_complete(void) { }
-> >>>> +static inline int sev_es_efi_map_ghcbs(pgd_t *pgd) { return 0; }
-> >>>>   #endif
-> >>>>
-> >>>>   #endif
-> >>>> diff --git a/arch/x86/kernel/sev-es.c b/arch/x86/kernel/sev-es.c
-> >>>> index 9ab3a4dfecd8..4e2b7e4d9b87 100644
-> >>>> --- a/arch/x86/kernel/sev-es.c
-> >>>> +++ b/arch/x86/kernel/sev-es.c
-> >>>> @@ -491,6 +491,36 @@ int sev_es_setup_ap_jump_table(struct real_mode_header *rmh)
-> >>>>        return 0;
-> >>>>   }
-> >>>>
-> >>>> +/*
-> >>>> + * This is needed by the OVMF UEFI firmware which will use whatever it finds in
-> >>>> + * the GHCB MSR as its GHCB to talk to the hypervisor. So make sure the per-cpu
-> >>>> + * runtime GHCBs used by the kernel are also mapped in the EFI page-table.
-> >
-> > Yup, this pretty much confirms my suspicion that QemuFlashPtrWrite() is
-> > at the center of this.
-> >
-> > (BTW, I don't think that the runtime services data allocation, in
-> > QemuFlashFvbServicesRuntimeDxe, for OS runtime GHCB purposes, would have
-> > to be "per CPU". Refer to "Table 35. Rules for Reentry Into Runtime
-> > Services" in the UEFI spec -- if one processor is executing
-> > SetVariable(), then no other processor must enter SetVariable(). And so
-> > we'll have *at most* one VCPU in QemuFlashPtrWrite(), at any time.)
-> >
-> >>>> + */
-> >>>> +int __init sev_es_efi_map_ghcbs(pgd_t *pgd)
-> >>>> +{
-> >>>> +     struct sev_es_runtime_data *data;
-> >>>> +     unsigned long address, pflags;
-> >>>> +     int cpu;
-> >>>> +     u64 pfn;
-> >>>> +
-> >>>> +     if (!sev_es_active())
-> >>>> +             return 0;
-> >>>> +
-> >>>> +     pflags = _PAGE_NX | _PAGE_RW;
-> >>>> +
-> >>>> +     for_each_possible_cpu(cpu) {
-> >>>> +             data = per_cpu(runtime_data, cpu);
-> >>>> +
-> >>>> +             address = __pa(&data->ghcb_page);
-> >>>> +             pfn = address >> PAGE_SHIFT;
-> >>>> +
-> >>>> +             if (kernel_map_pages_in_pgd(pgd, pfn, address, 1, pflags))
-> >>>> +                     return 1;
-> >>>> +     }
-> >>>> +
-> >>>> +     return 0;
-> >>>> +}
-> >>>> +
-> >>>>   static enum es_result vc_handle_msr(struct ghcb *ghcb, struct es_em_ctxt *ctxt)
-> >>>>   {
-> >>>>        struct pt_regs *regs = ctxt->regs;
-> >>>> diff --git a/arch/x86/platform/efi/efi_64.c b/arch/x86/platform/efi/efi_64.c
-> >>>> index 6af4da1149ba..8f5759df7776 100644
-> >>>> --- a/arch/x86/platform/efi/efi_64.c
-> >>>> +++ b/arch/x86/platform/efi/efi_64.c
-> >>>> @@ -47,6 +47,7 @@
-> >>>>   #include <asm/realmode.h>
-> >>>>   #include <asm/time.h>
-> >>>>   #include <asm/pgalloc.h>
-> >>>> +#include <asm/sev-es.h>
-> >>>>
-> >>>>   /*
-> >>>>    * We allocate runtime services regions top-down, starting from -4G, i.e.
-> >>>> @@ -229,6 +230,15 @@ int __init efi_setup_page_tables(unsigned long pa_memmap, unsigned num_pages)
-> >>>>                return 1;
-> >>>>        }
-> >>>>
-> >>>> +     /*
-> >>>> +      * When SEV-ES is active, the GHCB as set by the kernel will be used
-> >>>> +      * by firmware. Create a 1:1 unencrypted mapping for each GHCB.
-> >>>> +      */
-> >>>> +     if (sev_es_efi_map_ghcbs(pgd)) {
-> >>>> +             pr_err("Failed to create 1:1 mapping for the GHCBs!\n");
-> >>>> +             return 1;
-> >>>> +     }
-> >>>> +
-> >>>>        /*
-> >>>>         * When making calls to the firmware everything needs to be 1:1
-> >>>>         * mapped and addressable with 32-bit pointers. Map the kernel
-> >
-> > Good point!
-> >
-> > And it even makes me wonder if the QemuFlashFvbServicesRuntimeDxe
-> > approach, with the runtime services data type memory allocation, is
-> > feasible at all. Namely, a page's encryption status, under SEV, is
-> > controlled through the PTE.
-> >
-> > And for this particular UEFI runtime area, it would *not* suffice for
-> > the OS to just virt-map it. The OS would also have to *decrypt* the area
-> > (mark the PTE as "plaintext").
-> >
-> > In other words, it would be an "unprecedented" PTE for the OS to set up:
-> > the PTE would not only map the GVA to GPA, but also mark the area as
-> > "plaintext".
-> >
-> > Otherwise -- if the OS covers *just* the virt-mapping --,
-> > QemuFlashFvbServicesRuntimeDxe would populate its own "runtime GHCB"
-> > area just fine, but the actual data hitting the host RAM would be
-> > encrypted. And so the hypervisor could not interpret the GHCB.
-> >
-> > *If* QemuFlashFvbServicesRuntimeDxe should not change the kernel-owned
-> > PTE at runtime, even temporarily, for marking the GHCB as "plaintext",
-> > then the problem is indeed only solvable in the guest kernel, in my
-> > opinion.
-> >
-> > There simply isn't an "architected annotation" for telling the kernel,
-> > "virt-map this runtime services data type memory range, *and* mark it as
-> > plaintext at the same time".
-> >
-> > This would be necessary, as both actions affect the exact same PTE, and
-> > the firmware is not really allowed to touch the PTE at runtime. But we
-> > don't have such a hint.
-> >
-> >
-> > To summarize: for QemuFlashFvbServicesRuntimeDxe to allocate UEFI
-> > Runtime Services Data type memory, for its own runtime GHCB, two
-> > permissions are necessary (together), at OS runtime:
-> >
-> > - QemuFlashFvbServicesRuntimeDxe must be allowed to swap MSR_SEV_ES_GHCB
-> >    temporarily (before executing VMGEXIT),
-> >
-> > - QemuFlashFvbServicesRuntimeDxe must be allowed to change the OS-owned
-> >    PTE temporarily (for remapping the GHCB as plaintext, before writing
-> >    to it).
-> >
->
-> Amazing summarization Laszlo!
->
+On Wed, 9 Sep 2020 10:13:09 +0800
+Yan Zhao <yan.y.zhao@intel.com> wrote:
 
+> > > still, I'd like to put it more explicitly to make ensure it's not missed:
+> > > the reason we want to specify compatible_type as a trait and check
+> > > whether target compatible_type is the superset of source
+> > > compatible_type is for the consideration of backward compatibility.
+> > > e.g.
+> > > an old generation device may have a mdev type xxx-v4-yyy, while a newer
+> > > generation  device may be of mdev type xxx-v5-yyy.
+> > > with the compatible_type traits, the old generation device is still
+> > > able to be regarded as compatible to newer generation device even their
+> > > mdev types are not equal.  
+> > 
+> > If you want to support migration from v4 to v5, can't the (presumably
+> > newer) driver that supports v5 simply register the v4 type as well, so
+> > that the mdev can be created as v4? (Just like QEMU versioned machine
+> > types work.)  
+> yes, it should work in some conditions.
+> but it may not be that good in some cases when v5 and v4 in the name string
+> of mdev type identify hardware generation (e.g. v4 for gen8, and v5 for
+> gen9)
+> 
+> e.g.
+> (1). when src mdev type is v4 and target mdev type is v5 as
+> software does not support it initially, and v4 and v5 identify hardware
+> differences.
 
-Agreed. And thanks a lot for taking the time to do the analysis.
+My first hunch here is: Don't introduce types that may be compatible
+later. Either make them compatible, or make them distinct by design,
+and possibly add a different, compatible type later.
 
-Based on the above,
+> then after software upgrade, v5 is now compatible to v4, should the
+> software now downgrade mdev type from v5 to v4?
+> not sure if moving hardware generation info into a separate attribute
+> from mdev type name is better. e.g. remove v4, v5 in mdev type, while use
+> compatible_pci_ids to identify compatibility.
 
-Acked-by: Ard Biesheuvel <ardb@kernel.org>
+If the generations are compatible, don't mention it in the mdev type.
+If they aren't, use distinct types, so that management software doesn't
+have to guess. At least that would be my naive approach here.
 
-Thanks,
+> 
+> (2) name string of mdev type is composed by "driver_name + type_name".
+> in some devices, e.g. qat, different generations of devices are binding to
+> drivers of different names, e.g. "qat-v4", "qat-v5".
+> then though type_name is equal, mdev type is not equal. e.g.
+> "qat-v4-type1", "qat-v5-type1".
+
+I guess that shows a shortcoming of that "driver_name + type_name"
+approach? Or maybe I'm just confused.
+
