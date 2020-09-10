@@ -2,152 +2,139 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 79AA3264F0B
-	for <lists+kvm@lfdr.de>; Thu, 10 Sep 2020 21:33:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1AC45265042
+	for <lists+kvm@lfdr.de>; Thu, 10 Sep 2020 22:10:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727807AbgIJTdj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 10 Sep 2020 15:33:39 -0400
-Received: from userp2130.oracle.com ([156.151.31.86]:59048 "EHLO
-        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727999AbgIJTcA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 10 Sep 2020 15:32:00 -0400
-Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
-        by userp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 08AJTibK011484;
-        Thu, 10 Sep 2020 19:31:53 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=corp-2020-01-29;
- bh=46NWe0Vb+A8wfIEGsPd+2jvvuf056Sx4VJre0mHCvPI=;
- b=Da8mOq3wtHC9JovtTSqYhytCxRp2+T1Gtq51Pfno7IhZfvvUignBX3cPrzVp44UdQks+
- W35rs3b/FLWWl4eaukkPWCT/TVmrh6AR12wj7EWPhfS0VOpd/3PkKWQRnF5pPghKv9QT
- iYeCD84JHC1N8uMDnLYiUIIhs5B1zaqqhOovW2uIFgGijY8GWxXQkclhEQKO0VOOLxPQ
- HaLEoSCYbCguprZaANAgOZeBYh4yx7drUjks3FT2KZx566dSAwntDbQ3FBVKmHIW5tfI
- 4PzunS/s6jKUdaD1VRyLe7aYtas88R7CEMFMxnYMFU/D/lDe4owhpeLgJ471QHg1jJin zg== 
-Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
-        by userp2130.oracle.com with ESMTP id 33c23ra8ek-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
-        Thu, 10 Sep 2020 19:31:52 +0000
-Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
-        by userp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 08AJTXcL007409;
-        Thu, 10 Sep 2020 19:29:52 GMT
-Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
-        by userp3020.oracle.com with ESMTP id 33cmevjmx6-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 10 Sep 2020 19:29:52 +0000
-Received: from abhmp0020.oracle.com (abhmp0020.oracle.com [141.146.116.26])
-        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 08AJTpXr018053;
-        Thu, 10 Sep 2020 19:29:51 GMT
-Received: from localhost.localdomain (/10.159.235.45)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Thu, 10 Sep 2020 12:29:51 -0700
-Subject: Re: [PATCH 3/3 v2] KVM: SVM: Don't flush cache of encrypted pages if
- hardware enforces cache coherenc
-To:     Tom Lendacky <thomas.lendacky@amd.com>, kvm@vger.kernel.org
-Cc:     pbonzini@redhat.com, jmattson@google.com
-References: <20200910022211.5417-1-krish.sadhukhan@oracle.com>
- <20200910022211.5417-4-krish.sadhukhan@oracle.com>
- <743d5a76-4ae6-7692-70ad-eaae12edac46@amd.com>
-From:   Krish Sadhukhan <krish.sadhukhan@oracle.com>
-Message-ID: <1b3df921-9d98-b6d5-801b-ca8b201f1cad@oracle.com>
-Date:   Thu, 10 Sep 2020 12:29:50 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
-MIME-Version: 1.0
-In-Reply-To: <743d5a76-4ae6-7692-70ad-eaae12edac46@amd.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9740 signatures=668679
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0 suspectscore=0 adultscore=0
- bulkscore=0 phishscore=0 malwarescore=0 mlxlogscore=999 mlxscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
- definitions=main-2009100178
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9740 signatures=668679
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 priorityscore=1501
- mlxlogscore=999 mlxscore=0 bulkscore=0 suspectscore=0 spamscore=0
- malwarescore=0 phishscore=0 lowpriorityscore=0 clxscore=1015
- impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2006250000 definitions=main-2009100178
+        id S1726911AbgIJUIk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 10 Sep 2020 16:08:40 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:61852 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1730859AbgIJPAn (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 10 Sep 2020 11:00:43 -0400
+Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 08AEi4YI192630;
+        Thu, 10 Sep 2020 11:00:07 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id; s=pp1;
+ bh=5VXKsHTc2YlCV3PXBFCbmF1hTMHTSBXPxb9CKodxcuc=;
+ b=lJm0/tYKVnLWLps2+W6cAz1a9vrIWBEiP+kwk1q2U+Ibr3tK9hHfmZoMaZ7sHL4AOzFG
+ U8MF73hxTxtHjYbp0vBLEb92NkHzmKnOhS/u21GYrVf3OdLrsa7h7TQHZKyALnhekAjo
+ nKXwusdMDgbyylGqJ1WSDugrkjpm2fcrQ+t0h8aSm/92l+ZV3JK/cliqzGPxJ4jZlzMZ
+ da2I0XmeJAYCxvHw+l7r2ceDyk78W3+gRRTLx1nHTrEG94Euogl/XhE/by94e7BT5SNn
+ 48fbqOVVb7A3D2xgiKi3CzcaUtJ8k2udWAmivgmg0FDa3PkDt/Z/Kpfc5gNYS1a2gcgF zA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 33fnyv0wgf-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 10 Sep 2020 11:00:07 -0400
+Received: from m0098413.ppops.net (m0098413.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 08AEq17J025485;
+        Thu, 10 Sep 2020 11:00:07 -0400
+Received: from ppma03dal.us.ibm.com (b.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.11])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 33fnyv0wew-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 10 Sep 2020 11:00:06 -0400
+Received: from pps.filterd (ppma03dal.us.ibm.com [127.0.0.1])
+        by ppma03dal.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 08AEqMb2000343;
+        Thu, 10 Sep 2020 15:00:06 GMT
+Received: from b03cxnp08027.gho.boulder.ibm.com (b03cxnp08027.gho.boulder.ibm.com [9.17.130.19])
+        by ppma03dal.us.ibm.com with ESMTP id 33c2a9jbjd-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 10 Sep 2020 15:00:05 +0000
+Received: from b03ledav004.gho.boulder.ibm.com (b03ledav004.gho.boulder.ibm.com [9.17.130.235])
+        by b03cxnp08027.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 08AF00At32702764
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 10 Sep 2020 15:00:00 GMT
+Received: from b03ledav004.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 984DF7806E;
+        Thu, 10 Sep 2020 15:00:02 +0000 (GMT)
+Received: from b03ledav004.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 0909778064;
+        Thu, 10 Sep 2020 15:00:00 +0000 (GMT)
+Received: from oc4221205838.ibm.com (unknown [9.211.91.207])
+        by b03ledav004.gho.boulder.ibm.com (Postfix) with ESMTP;
+        Thu, 10 Sep 2020 15:00:00 +0000 (GMT)
+From:   Matthew Rosato <mjrosato@linux.ibm.com>
+To:     alex.williamson@redhat.com, bhelgaas@google.com
+Cc:     schnelle@linux.ibm.com, pmorel@linux.ibm.com, mpe@ellerman.id.au,
+        oohall@gmail.com, cohuck@redhat.com, kevin.tian@intel.com,
+        hca@linux.ibm.com, gor@linux.ibm.com, borntraeger@de.ibm.com,
+        linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, linux-pci@vger.kernel.org
+Subject: [PATCH v5 0/3] vfio/pci: Restore MMIO access for s390 detached VFs
+Date:   Thu, 10 Sep 2020 10:59:54 -0400
+Message-Id: <1599749997-30489-1-git-send-email-mjrosato@linux.ibm.com>
+X-Mailer: git-send-email 1.8.3.1
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
+ definitions=2020-09-10_03:2020-09-10,2020-09-10 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0
+ lowpriorityscore=0 bulkscore=0 phishscore=0 impostorscore=0 clxscore=1015
+ suspectscore=0 priorityscore=1501 mlxlogscore=864 spamscore=0 mlxscore=0
+ malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2006250000 definitions=main-2009100130
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Changes from v4:
+- Switch from dev_flags to a bitfield
+- Scrubbed improper use of MSE acronym
+- Restored the fixes tag to patch 3 (but the other 2 patches are
+  now pre-reqs -- cc stable 5.8?) 
 
-On 9/10/20 7:43 AM, Tom Lendacky wrote:
-> On 9/9/20 9:22 PM, Krish Sadhukhan wrote:
->> Some hardware implementations may enforce cache coherency across 
->> encryption
->> domains. In such cases, it's not required to flush encrypted pages off
->> cache lines.
->>
->> Signed-off-by: Krish Sadhukhan <krish.sadhukhan@oracle.com>
->> ---
->>   arch/x86/kvm/svm/sev.c       | 3 ++-
->>   arch/x86/mm/pat/set_memory.c | 6 ++++--
->>   2 files changed, 6 insertions(+), 3 deletions(-)
->
-> You should probably split this patch into two patches, one for the KVM 
-> usage and one for the MM usage with appropriate subjects prefixes at 
-> that point. Also, you need to then copy the proper people. Did you run 
-> these patches through get_maintainer.pl?
+Since commit abafbc551fdd ("vfio-pci: Invalidate mmaps and block MMIO
+access on disabled memory") VFIO now rejects guest MMIO access when the
+PCI_COMMAND_MEMORY bit is OFF.  This is however not the case for VFs
+(fixed in commit ebfa440ce38b ("vfio/pci: Fix SR-IOV VF handling with
+MMIO blocking")).  Furthermore, on s390 where we always run with at
+least a bare-metal hypervisor (LPAR) PCI_COMMAND_MEMORY, unlike Device/
+Vendor IDs and BARs, is not emulated when VFs are passed-through to the
+OS independently.
 
-I will split it into two patches and copy the relevant people and 
-distribution lists.
->
->>
->> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
->> index 402dc4234e39..8aa2209f2637 100644
->> --- a/arch/x86/kvm/svm/sev.c
->> +++ b/arch/x86/kvm/svm/sev.c
->> @@ -384,7 +384,8 @@ static void sev_clflush_pages(struct page 
->> *pages[], unsigned long npages)
->>       uint8_t *page_virtual;
->>       unsigned long i;
->>   -    if (npages == 0 || pages == NULL)
->> +    if (this_cpu_has(X86_FEATURE_HW_CACHE_COHERENCY) || npages == 0 ||
->> +        pages == NULL)
->>           return;
->>         for (i = 0; i < npages; i++) {
->> diff --git a/arch/x86/mm/pat/set_memory.c b/arch/x86/mm/pat/set_memory.c
->> index d1b2a889f035..5e2c618cbe84 100644
->> --- a/arch/x86/mm/pat/set_memory.c
->> +++ b/arch/x86/mm/pat/set_memory.c
->> @@ -1999,7 +1999,8 @@ static int __set_memory_enc_dec(unsigned long 
->> addr, int numpages, bool enc)
->>       /*
->>        * Before changing the encryption attribute, we need to flush 
->> caches.
->>        */
->> -    cpa_flush(&cpa, 1);
->> +    if (!this_cpu_has(X86_FEATURE_HW_CACHE_COHERENCY))
->> +        cpa_flush(&cpa, 1);
->
-> This bit is only about cache coherency, so the TLB flush is still 
-> needed, so this should be something like:
->
->     cpa_flush(&cpa, !this_cpu_has(X86_FEATURE_HW_CACHE_COHERENCY));
+Based upon Bjorn's most recent comment [1], I investigated the notion of
+setting is_virtfn=1 for VFs passed-through to Linux and not linked to a
+parent PF (referred to as a 'detached VF' in my prior post).  However,
+we rapidly run into issues on how to treat an is_virtfn device with no
+linked PF. Further complicating the issue is when you consider the guest
+kernel has a passed-through VF but has CONFIG_PCI_IOV=n as in many 
+locations is_virtfn checking is ifdef'd out altogether and the device is
+assumed to be an independent PCI function.
+
+The decision made by VFIO whether to require or emulate a PCI feature 
+(in this case PCI_COMMAND_MEMORY) is based upon the knowledge it has 
+about the device, including implicit expectations of what/is not
+emulated below VFIO. (ex: is it safe to read vendor/id from config
+space?) -- Our firmware layer attempts similar behavior by emulating
+things such as vendor/id/BAR access - without these an unlinked VF would
+not be usable. But what is or is not emulated by the layer below may be
+different based upon which entity is providing the emulation (vfio,
+LPAR, some other hypervisor)
+
+So, the proposal here aims to fix the immediate issue of s390
+pass-through VFs becoming suddenly unusable by vfio by using a new 
+bit to identify a VF feature that we know is hardwired to 0 for any
+VF (PCI_COMMAND_MEMORY) and de-coupling the need for emulating
+PCI_COMMAND_MEMORY from the is_virtfn flag. The exact scope of is_virtfn
+and physfn for bare-metal vs guest scenarios and identifying what
+features are / are not emulated by the lower-level hypervisors is a much
+bigger discussion independent of this limited proposal.
+
+[1]: https://marc.info/?l=linux-pci&m=159856041930022&w=2
 
 
-Agreed. Will fix it.
 
->
->>         ret = __change_page_attr_set_clr(&cpa, 1);
->>   @@ -2010,7 +2011,8 @@ static int __set_memory_enc_dec(unsigned long 
->> addr, int numpages, bool enc)
->>        * flushing gets optimized in the cpa_flush() path use the same 
->> logic
->>        * as above.
->>        */
->> -    cpa_flush(&cpa, 0);
->> +    if (!this_cpu_has(X86_FEATURE_HW_CACHE_COHERENCY))
->> +        cpa_flush(&cpa, 0);
->
-> This should not be changed, still need the call to do the TLB flush.
->
-> Thanks,
-> Tom
->
->>         return ret;
->>   }
->>
+Matthew Rosato (3):
+  PCI/IOV: Mark VFs as not implementing PCI_COMMAND_MEMORY
+  s390/pci: Mark all VFs as not implementing PCI_COMMAND_MEMORY
+  vfio/pci: Decouple PCI_COMMAND_MEMORY bit checks from is_virtfn
+
+ arch/s390/pci/pci_bus.c            |  5 +++--
+ drivers/pci/iov.c                  |  1 +
+ drivers/vfio/pci/vfio_pci_config.c | 24 ++++++++++++++----------
+ include/linux/pci.h                |  1 +
+ 4 files changed, 19 insertions(+), 12 deletions(-)
+
+-- 
+1.8.3.1
+
