@@ -2,157 +2,155 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 60BA426501A
-	for <lists+kvm@lfdr.de>; Thu, 10 Sep 2020 22:03:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 23E0E26514F
+	for <lists+kvm@lfdr.de>; Thu, 10 Sep 2020 22:51:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726683AbgIJUDM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 10 Sep 2020 16:03:12 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:37496 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1730839AbgIJPAo (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 10 Sep 2020 11:00:44 -0400
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 08AEoV17193541;
-        Thu, 10 Sep 2020 11:00:10 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references; s=pp1;
- bh=jqNGQIciDmR7JgvUza3J1lCUoceHki+R182Zm5QX6MA=;
- b=YGQerkI2TvXvCw1fpi9YBvNSSA4Pk34gdLImR//e7JVdlMsCESG0qNoGG/Lb4ccHwbqV
- 17B0WPHU9P+ZUqjJJ18fH47QWT59WuD6D516SpTdLmNk7PGljvva/VMOHHoanfxd5Dgv
- n52y4hHBXZSmM5/7vI7lu2fOKbFT6rArCUCInuUr6I/9gThG1owBneqiJNtGqczkohXE
- 9G2rVw4Bf1M5m5uTvtxMupLD4v72LenTwp7yNhavEZMeumaI+HmxdsEnit6bwX4nn0Co
- zV30YEhM0mzmRZIvI8XmRZGnA92m2K1lvKKSB3oIxYSfj9+15uQgNaIuGHK6AkEsDVAJ gw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 33fp8wg7w6-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 10 Sep 2020 11:00:10 -0400
-Received: from m0098416.ppops.net (m0098416.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 08AEp9mm195235;
-        Thu, 10 Sep 2020 11:00:09 -0400
-Received: from ppma02dal.us.ibm.com (a.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.10])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 33fp8wg7vd-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 10 Sep 2020 11:00:09 -0400
-Received: from pps.filterd (ppma02dal.us.ibm.com [127.0.0.1])
-        by ppma02dal.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 08AEqaYY018164;
-        Thu, 10 Sep 2020 15:00:08 GMT
-Received: from b03cxnp08026.gho.boulder.ibm.com (b03cxnp08026.gho.boulder.ibm.com [9.17.130.18])
-        by ppma02dal.us.ibm.com with ESMTP id 33c2a9t8h6-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 10 Sep 2020 15:00:08 +0000
-Received: from b03ledav004.gho.boulder.ibm.com (b03ledav004.gho.boulder.ibm.com [9.17.130.235])
-        by b03cxnp08026.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 08AF02jo30802286
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 10 Sep 2020 15:00:02 GMT
-Received: from b03ledav004.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 41B1178069;
-        Thu, 10 Sep 2020 15:00:07 +0000 (GMT)
-Received: from b03ledav004.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id ED40778063;
-        Thu, 10 Sep 2020 15:00:05 +0000 (GMT)
-Received: from oc4221205838.ibm.com (unknown [9.211.91.207])
-        by b03ledav004.gho.boulder.ibm.com (Postfix) with ESMTP;
-        Thu, 10 Sep 2020 15:00:05 +0000 (GMT)
-From:   Matthew Rosato <mjrosato@linux.ibm.com>
-To:     alex.williamson@redhat.com, bhelgaas@google.com
-Cc:     schnelle@linux.ibm.com, pmorel@linux.ibm.com, mpe@ellerman.id.au,
-        oohall@gmail.com, cohuck@redhat.com, kevin.tian@intel.com,
-        hca@linux.ibm.com, gor@linux.ibm.com, borntraeger@de.ibm.com,
-        linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, linux-pci@vger.kernel.org
-Subject: [PATCH v5 3/3] vfio/pci: Decouple PCI_COMMAND_MEMORY bit checks from is_virtfn
-Date:   Thu, 10 Sep 2020 10:59:57 -0400
-Message-Id: <1599749997-30489-4-git-send-email-mjrosato@linux.ibm.com>
-X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <1599749997-30489-1-git-send-email-mjrosato@linux.ibm.com>
-References: <1599749997-30489-1-git-send-email-mjrosato@linux.ibm.com>
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
- definitions=2020-09-10_03:2020-09-10,2020-09-10 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 adultscore=0
- bulkscore=0 priorityscore=1501 phishscore=0 clxscore=1015 malwarescore=0
- mlxlogscore=999 lowpriorityscore=0 suspectscore=0 impostorscore=0
- mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2006250000 definitions=main-2009100130
+        id S1727869AbgIJUvV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 10 Sep 2020 16:51:21 -0400
+Received: from mail-co1nam11on2088.outbound.protection.outlook.com ([40.107.220.88]:40032
+        "EHLO NAM11-CO1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1730585AbgIJO6b (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 10 Sep 2020 10:58:31 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=ZAwyfHbvBfT/xss8A5YPE+oQMkAhBWJxPy2Nd1kAu+20TJmpxYtvW8dUx9QqyX4MvaCXv+uUZkrcClBY8nCbHafl/ei1gqh1cxHQoVNJpVx+K1E1GJO66epFHTH5f7T27zDcVcFQ+Ym6q1kxiYbpp/VPxV7w4xFRj3QyIaK5nIusGJ9bKYGfM+tSvIkLa/zShWdeWLzyYEeMzmqhTj0ZczYRdqE6PXNMwQGjUlQcX9A6phOw3PMQ/kpgezouRM5WOjrloKXhMqxFocWX1KOYNX0sQbFWbCqn9FfQ2UvqAJ1v7sZIYoAr9eoPR1C6bHLVcXkY7hJAj/P19Y+MlH10+Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=VatVKnLwZWzZjVGFn++44LU1OqukvqvM2EVWqgCl2/E=;
+ b=OAstNOJmsHpRHhhhHCOeIa1XbcIcqM31rgd1YIhD+jPul+7m2h4jgR/nIAdQBJwfQbMEqrrI6aEuIoKv32ow52ipO5MgixykO1LAxhWNBf8FfOrYl+/AO9oS1r97k/LMSh3t88p8NwT7aE9Sv+0gV7BibsR/7FR6hvc1PLG/jrpeNx3uyl6I7BZLmU3fqzCVb60jQPzY/eP7e/Jcbuk5Xs7w380GVaAvseFgH9bSYt2g2Y3GI5pvDKilDHLEbhG/2lYY5azOxhquoNqlP98XtrAUMvodZYAyj6KktLSNdGY40mlth8Y33zZukbmyJWtUpi7TmTT1AV8hGapKjBjAhw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=VatVKnLwZWzZjVGFn++44LU1OqukvqvM2EVWqgCl2/E=;
+ b=VSqC9dgnCRnw8ROxU6oVH/rJ65FFCRyQVKpFTrDhg/v3ltXgpe0qljp09z2Pdbicpa6r7TiF1tLE8mn/mZktnZn3uxp4UOaRFfVCC23FnY+tBH32lTcAknK+21V2cyZdCuxyR6Mwt7mojQPeghlB3SEEL97VEG2OkFsfCESGqJ8=
+Authentication-Results: google.com; dkim=none (message not signed)
+ header.d=none;google.com; dmarc=none action=none header.from=amd.com;
+Received: from DM5PR12MB1355.namprd12.prod.outlook.com (2603:10b6:3:6e::7) by
+ DM5PR12MB1644.namprd12.prod.outlook.com (2603:10b6:4:f::17) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.3326.19; Thu, 10 Sep 2020 14:43:20 +0000
+Received: from DM5PR12MB1355.namprd12.prod.outlook.com
+ ([fe80::299a:8ed2:23fc:6346]) by DM5PR12MB1355.namprd12.prod.outlook.com
+ ([fe80::299a:8ed2:23fc:6346%3]) with mapi id 15.20.3370.016; Thu, 10 Sep 2020
+ 14:43:20 +0000
+Subject: Re: [PATCH 3/3 v2] KVM: SVM: Don't flush cache of encrypted pages if
+ hardware enforces cache coherenc
+To:     Krish Sadhukhan <krish.sadhukhan@oracle.com>, kvm@vger.kernel.org
+Cc:     pbonzini@redhat.com, jmattson@google.com
+References: <20200910022211.5417-1-krish.sadhukhan@oracle.com>
+ <20200910022211.5417-4-krish.sadhukhan@oracle.com>
+From:   Tom Lendacky <thomas.lendacky@amd.com>
+Message-ID: <743d5a76-4ae6-7692-70ad-eaae12edac46@amd.com>
+Date:   Thu, 10 Sep 2020 09:43:18 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
+In-Reply-To: <20200910022211.5417-4-krish.sadhukhan@oracle.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: SN6PR16CA0038.namprd16.prod.outlook.com
+ (2603:10b6:805:ca::15) To DM5PR12MB1355.namprd12.prod.outlook.com
+ (2603:10b6:3:6e::7)
+MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from office-linux.texastahm.com (67.79.209.213) by SN6PR16CA0038.namprd16.prod.outlook.com (2603:10b6:805:ca::15) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3370.16 via Frontend Transport; Thu, 10 Sep 2020 14:43:20 +0000
+X-Originating-IP: [67.79.209.213]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-HT: Tenant
+X-MS-Office365-Filtering-Correlation-Id: ee70664b-ab8c-493e-9571-08d85597dcb9
+X-MS-TrafficTypeDiagnostic: DM5PR12MB1644:
+X-Microsoft-Antispam-PRVS: <DM5PR12MB16443435FD51615DDD227845EC270@DM5PR12MB1644.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:6430;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: Mbo/UYnAtP2B+/4dxIINrLDABbLJolXTz2rkD7PILj8OHDlyp2xdJ3zDVmT0gmx5kJUIfOTa08xdcBRFNHiWMRluUaeK/mrCW6y6vG+d7QSNKqbi23gWWwOKtSDcOnWp3tqnlVrd2mcoKcJHyf0QoQpHEy2LxZmEvenX9S5riiebU6rBIRd+t0cVRhZAW1mBjbEL0yLcruMEkC5B/eyakzomX5D3HrMZjPR3fufxnn4pbbHFFzzgYjzAhxxuSgRFGrf5uHtAfgzfk0sQ3FTtZpiyaGXe1KrK5PhWebM0+/ZU2FVFqcXXw/8evoxzHQM+qEVUCGcYCK6MS1i+9MQRKVupyjyG4eUPzkHrsUDUYk/d6izf/SleTokxLDRg1q2J
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM5PR12MB1355.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(396003)(346002)(136003)(39860400002)(366004)(376002)(2616005)(52116002)(53546011)(31686004)(86362001)(5660300002)(6512007)(478600001)(6506007)(2906002)(26005)(31696002)(6486002)(66946007)(36756003)(186003)(8936002)(316002)(16526019)(4326008)(83380400001)(8676002)(66556008)(66476007)(956004)(43740500002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData: XWwYQuPCiOrKWCXXYEVuRbI/JFt2sZYNXRXzZkRMNa8IlDxgYcgOKNBAhCxCIOE+dUqi3Bkyi1X0KaGUywFKzV7ZGGVSh+xNCCnJvux5LGihbh5Skc6QOHacfRfmqqB4RZdJd9A80sJdQt7fprJrSif3fPAiwT1E29HtlngEzIu9VeYInIlq/vFcfGHIbewpkB4cZ7biJHj60fXl1gkrSUxLlPelQ3acqe3Vbe8BUb0AeFNeR8lA/8z70xam3JMT2+3Ukl9kqaGfwd7jOYhLib4Y/NXIQN0s+4C8Emm09+SeLQ6ehSwHQjkkD1rO2zLKVrL1Riwt1NbR6Fk+VeCaLSycQS0Coa53OKDat9LCh1HpDAArG4Q/6RbpQhEGEtskj/JW/7YF/1cW57cI1DARvrOqcWjzrqIkXuU7WEiYfNV3Uca4K2c9u450dhXNreAigq9uc9uk4YuYLC2mUTP5KwRDhKJ2pTux2JKnI5tKd/YTizGPY+Wq5SCprdhsnzV+jjUNzW8vHO+m23KbDN/B2oxVexYrhNRJKgz0r6DMu9TtkDBnWxia+5sHGldSN8LfxMMBWpdDZyyzIlI1xUrd17FZyJY8Y1ltQPE125rJPKRmmKRy4hhApfnGjuOQNtKC76BVMMb0gxwVtJjRkhXLFA==
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: ee70664b-ab8c-493e-9571-08d85597dcb9
+X-MS-Exchange-CrossTenant-AuthSource: DM5PR12MB1355.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Sep 2020 14:43:20.7646
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: DaeV6a7IM2WLSkhXfkvBjXxBsx6TuxiCvRenu5n+xMF3/Q0Io5e6CgD0CHdAZ9g3G8MLHKPuUtzjVcwtL2HNqw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM5PR12MB1644
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-While it is true that devices with is_virtfn=1 will have a Memory Space
-Enable bit that is hard-wired to 0, this is not the only case where we
-see this behavior -- For example some bare-metal hypervisors lack
-Memory Space Enable bit emulation for devices not setting is_virtfn
-(s390). Fix this by instead checking for the newly-added
-no_command_memory bit which directly denotes the need for
-PCI_COMMAND_MEMORY emulation in vfio.
+On 9/9/20 9:22 PM, Krish Sadhukhan wrote:
+> Some hardware implementations may enforce cache coherency across encryption
+> domains. In such cases, it's not required to flush encrypted pages off
+> cache lines.
+> 
+> Signed-off-by: Krish Sadhukhan <krish.sadhukhan@oracle.com>
+> ---
+>   arch/x86/kvm/svm/sev.c       | 3 ++-
+>   arch/x86/mm/pat/set_memory.c | 6 ++++--
+>   2 files changed, 6 insertions(+), 3 deletions(-)
 
-Fixes: abafbc551fdd ("vfio-pci: Invalidate mmaps and block MMIO access on disabled memory")
-Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
-Reviewed-by: Niklas Schnelle <schnelle@linux.ibm.com>
-Reviewed-by: Pierre Morel <pmorel@linux.ibm.com>
----
- drivers/vfio/pci/vfio_pci_config.c | 24 ++++++++++++++----------
- 1 file changed, 14 insertions(+), 10 deletions(-)
+You should probably split this patch into two patches, one for the KVM 
+usage and one for the MM usage with appropriate subjects prefixes at that 
+point. Also, you need to then copy the proper people. Did you run these 
+patches through get_maintainer.pl?
 
-diff --git a/drivers/vfio/pci/vfio_pci_config.c b/drivers/vfio/pci/vfio_pci_config.c
-index d98843f..5076d01 100644
---- a/drivers/vfio/pci/vfio_pci_config.c
-+++ b/drivers/vfio/pci/vfio_pci_config.c
-@@ -406,7 +406,7 @@ bool __vfio_pci_memory_enabled(struct vfio_pci_device *vdev)
- 	 * PF SR-IOV capability, there's therefore no need to trigger
- 	 * faults based on the virtual value.
- 	 */
--	return pdev->is_virtfn || (cmd & PCI_COMMAND_MEMORY);
-+	return pdev->no_command_memory || (cmd & PCI_COMMAND_MEMORY);
- }
- 
- /*
-@@ -520,8 +520,8 @@ static int vfio_basic_config_read(struct vfio_pci_device *vdev, int pos,
- 
- 	count = vfio_default_config_read(vdev, pos, count, perm, offset, val);
- 
--	/* Mask in virtual memory enable for SR-IOV devices */
--	if (offset == PCI_COMMAND && vdev->pdev->is_virtfn) {
-+	/* Mask in virtual memory enable */
-+	if (offset == PCI_COMMAND && vdev->pdev->no_command_memory) {
- 		u16 cmd = le16_to_cpu(*(__le16 *)&vdev->vconfig[PCI_COMMAND]);
- 		u32 tmp_val = le32_to_cpu(*val);
- 
-@@ -589,9 +589,11 @@ static int vfio_basic_config_write(struct vfio_pci_device *vdev, int pos,
- 		 * shows it disabled (phys_mem/io, then the device has
- 		 * undergone some kind of backdoor reset and needs to be
- 		 * restored before we allow it to enable the bars.
--		 * SR-IOV devices will trigger this, but we catch them later
-+		 * SR-IOV devices will trigger this - for mem enable let's
-+		 * catch this now and for io enable it will be caught later
- 		 */
--		if ((new_mem && virt_mem && !phys_mem) ||
-+		if ((new_mem && virt_mem && !phys_mem &&
-+		     !pdev->no_command_memory) ||
- 		    (new_io && virt_io && !phys_io) ||
- 		    vfio_need_bar_restore(vdev))
- 			vfio_bar_restore(vdev);
-@@ -1734,12 +1736,14 @@ int vfio_config_init(struct vfio_pci_device *vdev)
- 				 vconfig[PCI_INTERRUPT_PIN]);
- 
- 		vconfig[PCI_INTERRUPT_PIN] = 0; /* Gratuitous for good VFs */
--
-+	}
-+	if (pdev->no_command_memory) {
- 		/*
--		 * VFs do no implement the memory enable bit of the COMMAND
--		 * register therefore we'll not have it set in our initial
--		 * copy of config space after pci_enable_device().  For
--		 * consistency with PFs, set the virtual enable bit here.
-+		 * VFs and devices that set pdev->no_command_memory do not
-+		 * implement the memory enable bit of the COMMAND register
-+		 * therefore we'll not have it set in our initial copy of
-+		 * config space after pci_enable_device().  For consistency
-+		 * with PFs, set the virtual enable bit here.
- 		 */
- 		*(__le16 *)&vconfig[PCI_COMMAND] |=
- 					cpu_to_le16(PCI_COMMAND_MEMORY);
--- 
-1.8.3.1
+> 
+> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+> index 402dc4234e39..8aa2209f2637 100644
+> --- a/arch/x86/kvm/svm/sev.c
+> +++ b/arch/x86/kvm/svm/sev.c
+> @@ -384,7 +384,8 @@ static void sev_clflush_pages(struct page *pages[], unsigned long npages)
+>   	uint8_t *page_virtual;
+>   	unsigned long i;
+>   
+> -	if (npages == 0 || pages == NULL)
+> +	if (this_cpu_has(X86_FEATURE_HW_CACHE_COHERENCY) || npages == 0 ||
+> +	    pages == NULL)
+>   		return;
+>   
+>   	for (i = 0; i < npages; i++) {
+> diff --git a/arch/x86/mm/pat/set_memory.c b/arch/x86/mm/pat/set_memory.c
+> index d1b2a889f035..5e2c618cbe84 100644
+> --- a/arch/x86/mm/pat/set_memory.c
+> +++ b/arch/x86/mm/pat/set_memory.c
+> @@ -1999,7 +1999,8 @@ static int __set_memory_enc_dec(unsigned long addr, int numpages, bool enc)
+>   	/*
+>   	 * Before changing the encryption attribute, we need to flush caches.
+>   	 */
+> -	cpa_flush(&cpa, 1);
+> +	if (!this_cpu_has(X86_FEATURE_HW_CACHE_COHERENCY))
+> +		cpa_flush(&cpa, 1);
 
+This bit is only about cache coherency, so the TLB flush is still needed, 
+so this should be something like:
+
+	cpa_flush(&cpa, !this_cpu_has(X86_FEATURE_HW_CACHE_COHERENCY));
+
+>   
+>   	ret = __change_page_attr_set_clr(&cpa, 1);
+>   
+> @@ -2010,7 +2011,8 @@ static int __set_memory_enc_dec(unsigned long addr, int numpages, bool enc)
+>   	 * flushing gets optimized in the cpa_flush() path use the same logic
+>   	 * as above.
+>   	 */
+> -	cpa_flush(&cpa, 0);
+> +	if (!this_cpu_has(X86_FEATURE_HW_CACHE_COHERENCY))
+> +		cpa_flush(&cpa, 0);
+
+This should not be changed, still need the call to do the TLB flush.
+
+Thanks,
+Tom
+
+>   
+>   	return ret;
+>   }
+> 
