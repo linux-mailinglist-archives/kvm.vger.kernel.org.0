@@ -2,134 +2,88 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 23223264A65
-	for <lists+kvm@lfdr.de>; Thu, 10 Sep 2020 18:55:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 764E0264AE8
+	for <lists+kvm@lfdr.de>; Thu, 10 Sep 2020 19:18:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727081AbgIJQzZ convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Thu, 10 Sep 2020 12:55:25 -0400
-Received: from mail-ej1-f68.google.com ([209.85.218.68]:39054 "EHLO
-        mail-ej1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727001AbgIJQxK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 10 Sep 2020 12:53:10 -0400
-Received: by mail-ej1-f68.google.com with SMTP id p9so9739262ejf.6;
-        Thu, 10 Sep 2020 09:52:48 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=Ns0+fwvubeXR2dgCJl7CUrqaFL9rI3gtmSpPCYooM7w=;
-        b=GwVjNo/HjzCQecgt926hHxFYjQH6uES8NfD1J4xEVKbUKDwrPx3DVAtX1+n++NbVvN
-         ialk7vXkw6L1U0jBjBHSh2co7lJ4kXRZML9FVIhx1TxdHOfcoTFddyIorraT5c+QEiJy
-         8NfK+l04XG9zWdExQOBfSF6RJmwpvdKcIRuaDKntrS6nR0m9BBUdF02gQ180IUsbdfhy
-         pwk8H12/vx1o131B8E18cCjw2wxmK2ncP0d+k8l5MlXgyVkhSRye+bdABMHhvE8Y1JJl
-         IxFpx41oQoTK/XP/PP8r3UlraaFQpd32zxAK/TylGarrGMLowMd+eNTbh01BDTtfQhqt
-         wGTA==
-X-Gm-Message-State: AOAM533O0iWun4zJJ0id73IS3GLDILB7g/415mg58S254TmnxpKHQ8r1
-        oqjOGz1kydnf0UVcMI1tLN0ZkMsaV+TuBpQ0oyc=
-X-Google-Smtp-Source: ABdhPJwWjBLSznSbqH6VN0qlhPnRWyhcPhoLowXCrtx2cKAq7jDbvKLnBqXL/VvULAhgROVYl3ZC1JCAIOX5Ilol460=
-X-Received: by 2002:a17:906:d936:: with SMTP id rn22mr9851468ejb.4.1599756767403;
- Thu, 10 Sep 2020 09:52:47 -0700 (PDT)
-MIME-Version: 1.0
-References: <1599734031-28746-1-git-send-email-chenhc@lemote.com>
-In-Reply-To: <1599734031-28746-1-git-send-email-chenhc@lemote.com>
-From:   =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Date:   Thu, 10 Sep 2020 18:52:36 +0200
-Message-ID: <CAAdtpL5ns9s3Ld=hghRmLeyGcOy3j23NSD54hvvO4dq7_CzJgw@mail.gmail.com>
-Subject: Re: [PATCH] KVM: MIPS: Change the definition of kvm type
+        id S1726968AbgIJRQ6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 10 Sep 2020 13:16:58 -0400
+Received: from mail.kernel.org ([198.145.29.99]:44960 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725820AbgIJQeU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 10 Sep 2020 12:34:20 -0400
+Received: from localhost (unknown [70.37.104.77])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id E0D1421D81;
+        Thu, 10 Sep 2020 16:34:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1599755660;
+        bh=uBnRwLuv38RqJ8K3uYlMUsMCJOCQCkwNTv/0ekTsosM=;
+        h=Date:From:To:To:To:Cc:Cc:Cc:Subject:In-Reply-To:References:From;
+        b=KbPsp8hC/XzdIKmngvcR2OBTU3qh4V99zAKMJnopFaGSBvQBGmwlH5XmIfC7JHnrX
+         ARlIIPIi1SD6hjk27CrCVt7VQoolK4yj3s095efJlJlS57VH32eYrd2NJqe08nGtEV
+         U934xPKfNZrDrnkauSI9aewrVs9sjlL6HCOjtoAM=
+Date:   Thu, 10 Sep 2020 16:34:19 +0000
+From:   Sasha Levin <sashal@kernel.org>
+To:     Sasha Levin <sashal@kernel.org>
 To:     Huacai Chen <chenhc@lemote.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        Thomas Huth <thuth@redhat.com>, kvm <kvm@vger.kernel.org>,
-        "open list:BROADCOM NVRAM DRIVER" <linux-mips@vger.kernel.org>,
-        Fuxin Zhang <zhangfx@lemote.com>,
-        Huacai Chen <chenhuacai@gmail.com>,
-        Jiaxun Yang <jiaxun.yang@flygoat.com>, stable@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8BIT
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-mips@vger.kernel.org
+Cc:     stable@vger.kernel.org
+Cc:     stable@vger.kernel.org
+Subject: Re: [PATCH] KVM: MIPS: Change the definition of kvm type
+In-Reply-To: <1599734031-28746-1-git-send-email-chenhc@lemote.com>
+References: <1599734031-28746-1-git-send-email-chenhc@lemote.com>
+Message-Id: <20200910163419.E0D1421D81@mail.kernel.org>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Sep 10, 2020 at 12:34 PM Huacai Chen <chenhc@lemote.com> wrote:
->
-> MIPS defines two kvm types:
->
->  #define KVM_VM_MIPS_TE          0
->  #define KVM_VM_MIPS_VZ          1
->
-> In Documentation/virt/kvm/api.rst it is said that "You probably want to
-> use 0 as machine type", which implies that type 0 be the "automatic" or
-> "default" type. And, in user-space libvirt use the null-machine (with
-> type 0) to detect the kvm capability, which returns "KVM not supported"
-> on a VZ platform.
->
-> I try to fix it in QEMU but it is ugly:
-> https://lists.nongnu.org/archive/html/qemu-devel/2020-08/msg05629.html
+Hi
 
-I'm not sure this is helpful information to keep in the commit message.
+[This is an automated email]
 
-Otherwise:
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+This commit has been processed because it contains a -stable tag.
+The stable tag indicates that it's relevant for the following trees: all
 
->
-> And Thomas Huth suggests me to change the definition of kvm type:
-> https://lists.nongnu.org/archive/html/qemu-devel/2020-09/msg03281.html
+The bot has tested the following trees: v5.8.7, v5.4.63, v4.19.143, v4.14.196, v4.9.235, v4.4.235.
 
-Suggested-by: Thomas Huth <thuth@redhat.com>
+v5.8.7: Build OK!
+v5.4.63: Build OK!
+v4.19.143: Build OK!
+v4.14.196: Build OK!
+v4.9.235: Failed to apply! Possible dependencies:
+    06c158c96ed8 ("KVM: MIPS/MMU: Convert guest physical map to page table")
+    1534b3964901 ("KVM: MIPS/MMU: Simplify ASID restoration")
+    1581ff3dbf69 ("KVM: MIPS/MMU: Move preempt/ASID handling to implementation")
+    91cdee5710d5 ("KVM: MIPS/T&E: Restore host asid on return to host")
+    a2c046e40ff1 ("KVM: MIPS: Add vcpu_run() & vcpu_reenter() callbacks")
+    a31b50d741bd ("KVM: MIPS/MMU: Invalidate GVA PTs on ASID changes")
+    a60b8438bdba ("KVM: MIPS: Convert get/set_regs -> vcpu_load/put")
+    a7ebb2e410f8 ("KVM: MIPS/T&E: active_mm = init_mm in guest context")
+    a8a3c426772e ("KVM: MIPS: Add VZ & TE capabilities")
+    c550d53934d8 ("KVM: MIPS: Remove duplicated ASIDs from vcpu")
+    c92701322711 ("KVM: PPC: Book3S HV: Add userspace interfaces for POWER9 MMU")
 
->
-> So I define like this:
->
->  #define KVM_VM_MIPS_AUTO        0
->  #define KVM_VM_MIPS_VZ          1
->  #define KVM_VM_MIPS_TE          2
->
-> Since VZ and TE cannot co-exists, using type 0 on a TE platform will
-> still return success (so old user-space tools have no problems on new
-> kernels); the advantage is that using type 0 on a VZ platform will not
-> return failure. So, the only problem is "new user-space tools use type
-> 2 on old kernels", but if we treat this as a kernel bug, we can backport
-> this patch to old stable kernels.
->
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Huacai Chen <chenhc@lemote.com>
-> ---
->  arch/mips/kvm/mips.c     | 2 ++
->  include/uapi/linux/kvm.h | 5 +++--
->  2 files changed, 5 insertions(+), 2 deletions(-)
->
-> diff --git a/arch/mips/kvm/mips.c b/arch/mips/kvm/mips.c
-> index d7ba3f9..9efeb67 100644
-> --- a/arch/mips/kvm/mips.c
-> +++ b/arch/mips/kvm/mips.c
-> @@ -138,6 +138,8 @@ extern void kvm_init_loongson_ipi(struct kvm *kvm);
->  int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
->  {
->         switch (type) {
-> +       case KVM_VM_MIPS_AUTO:
-> +               break;
->  #ifdef CONFIG_KVM_MIPS_VZ
->         case KVM_VM_MIPS_VZ:
->  #else
-> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-> index 29ba8e8..cfc1ae2 100644
-> --- a/include/uapi/linux/kvm.h
-> +++ b/include/uapi/linux/kvm.h
-> @@ -790,9 +790,10 @@ struct kvm_ppc_resize_hpt {
->  #define KVM_VM_PPC_HV 1
->  #define KVM_VM_PPC_PR 2
->
-> -/* on MIPS, 0 forces trap & emulate, 1 forces VZ ASE */
-> -#define KVM_VM_MIPS_TE         0
-> +/* on MIPS, 0 indicates auto, 1 forces VZ ASE, 2 forces trap & emulate */
-> +#define KVM_VM_MIPS_AUTO       0
->  #define KVM_VM_MIPS_VZ         1
-> +#define KVM_VM_MIPS_TE         2
->
->  #define KVM_S390_SIE_PAGE_OFFSET 1
->
-> --
-> 2.7.0
->
+v4.4.235: Failed to apply! Possible dependencies:
+    107d44a2c5bf ("KVM: document KVM_REINJECT_CONTROL ioctl")
+    366baf28ee3f ("KVM: PPC: Use RCU for arch.spapr_tce_tables")
+    462ee11e58c9 ("KVM: PPC: Replace SPAPR_TCE_SHIFT with IOMMU_PAGE_SHIFT_4K")
+    58ded4201ff0 ("KVM: PPC: Add support for 64bit TCE windows")
+    5ee7af18642c ("KVM: PPC: Move reusable bits of H_PUT_TCE handler to helpers")
+    a8a3c426772e ("KVM: MIPS: Add VZ & TE capabilities")
+    c92701322711 ("KVM: PPC: Book3S HV: Add userspace interfaces for POWER9 MMU")
+    d3695aa4f452 ("KVM: PPC: Add support for multiple-TCE hcalls")
+    f8626985c7c2 ("KVM: PPC: Account TCE-containing pages in locked_vm")
+    fcbb2ce67284 ("KVM: PPC: Rework H_PUT_TCE/H_GET_TCE handlers")
+    fe26e52712cc ("KVM: PPC: Add @page_shift to kvmppc_spapr_tce_table")
+
+
+NOTE: The patch will not be queued to stable trees until it is upstream.
+
+How should we proceed with this patch?
+
+-- 
+Thanks
+Sasha
