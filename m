@@ -2,133 +2,85 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id F3454264AA9
-	for <lists+kvm@lfdr.de>; Thu, 10 Sep 2020 19:07:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6C71E264A84
+	for <lists+kvm@lfdr.de>; Thu, 10 Sep 2020 19:01:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726980AbgIJRGu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 10 Sep 2020 13:06:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50796 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726167AbgIJQzE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 10 Sep 2020 12:55:04 -0400
-Received: from mail-pl1-x644.google.com (mail-pl1-x644.google.com [IPv6:2607:f8b0:4864:20::644])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3B1EDC0617AA
-        for <kvm@vger.kernel.org>; Thu, 10 Sep 2020 09:46:47 -0700 (PDT)
-Received: by mail-pl1-x644.google.com with SMTP id x18so1199676pll.6
-        for <kvm@vger.kernel.org>; Thu, 10 Sep 2020 09:46:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=GYaKs8QftCALWrd/sCxpr6wE3DfZJ/m8ISq/bE/sCjY=;
-        b=wjV5Iutzt3GOgNkbzv9kunLWp6wW50/GNnkDMxO/xiLwXQ6bKO1dw3l8aDU+wDLhyg
-         F8/RIUP66nbx+Brqiu4BzA+BG0KEENU77NnarFAuTiLithwLw46ccaSTWVQB4rwbU/ag
-         XFC9/9uqTsc+14qHih9dnsETHtLjXOFUD3chc3iGhNFxtr9pBUA2iacasnaIZhQf4KsZ
-         tWeOpg7iJeGUvTBx7Z+KKpKh6/NB4ehRe5EvhMs0F1vB/HJ3J8F9TRzay1EguU/qLseV
-         m25ZLwd9077hIeD0euIC0vrPCSCP5c1MdliLB1kWQdEm05Es3HRUOCHqdlpsOUAWGz8X
-         W5mg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=GYaKs8QftCALWrd/sCxpr6wE3DfZJ/m8ISq/bE/sCjY=;
-        b=Tj1Ynw1lpdYgaRmVEp/8Okrl6ZMNizYFuRfTXLzXTNtCAfY7090JWnV/hutgnQVpRW
-         yUEvcRDWdX/0P6HNpwh7xjAzaDUF/Q/ON4Z+C7OQO6DBk0mdx3knxb0s6GVllaj3TUqf
-         IlqWn2xUiz3/JSsy8zWgFSkHbpQrkCjuOSPkXOaNRGwvZ8rFxBeAMQHyWAGea/Fq/Yo7
-         /UWLm/M643gS9Ytbb8tmRrkpqjnno4yXCYwy52hRA2BrB5EmrLPBsNncn+84ce2tjyJc
-         UyMPpp6+jFB+mdDhXw9TJQcwqD0f40BSxY6GvX8T+2mOF3vzWPqxm7P0z79UEubnNxj5
-         2T9w==
-X-Gm-Message-State: AOAM532zio8gghxWZQWe+bAyIEDkxNLuZvE/LAiIhDtb/EahHitiTJ7F
-        F45Mfk0/wN7B4tCytQaRhx9xrTbDTDxG7g==
-X-Google-Smtp-Source: ABdhPJwOnUUyLYGcvPlx2R3ZfhXPdQyH/JzSYYBPUjSL0AmjsDwkY/+H59hwDpdXZjTZLUk9zwqqTw==
-X-Received: by 2002:a17:90a:ab91:: with SMTP id n17mr810364pjq.84.1599756406674;
-        Thu, 10 Sep 2020 09:46:46 -0700 (PDT)
-Received: from xps15 (S0106002369de4dac.cg.shawcable.net. [68.147.8.254])
-        by smtp.gmail.com with ESMTPSA id nu14sm2290451pjb.19.2020.09.10.09.46.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 10 Sep 2020 09:46:45 -0700 (PDT)
-Date:   Thu, 10 Sep 2020 10:46:43 -0600
-From:   Mathieu Poirier <mathieu.poirier@linaro.org>
-To:     Guennadi Liakhovetski <guennadi.liakhovetski@linux.intel.com>
-Cc:     kvm@vger.kernel.org, linux-remoteproc@vger.kernel.org,
-        virtualization@lists.linux-foundation.org,
-        sound-open-firmware@alsa-project.org,
-        Pierre-Louis Bossart <pierre-louis.bossart@linux.intel.com>,
-        Liam Girdwood <liam.r.girdwood@linux.intel.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Ohad Ben-Cohen <ohad@wizery.com>,
-        Bjorn Andersson <bjorn.andersson@linaro.org>,
-        Vincent Whitchurch <vincent.whitchurch@axis.com>
-Subject: Re: [PATCH v5 1/4] vhost: convert VHOST_VSOCK_SET_RUNNING to a
- generic ioctl
-Message-ID: <20200910164643.GA579940@xps15>
-References: <20200826174636.23873-1-guennadi.liakhovetski@linux.intel.com>
- <20200826174636.23873-2-guennadi.liakhovetski@linux.intel.com>
- <20200909224214.GB562265@xps15>
- <20200910062144.GA16802@ubuntu>
+        id S1726931AbgIJRB4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 10 Sep 2020 13:01:56 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:21800 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727800AbgIJQ5s (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 10 Sep 2020 12:57:48 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1599757066;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=1N39+l9Ba/WkrqUymZo6lvs+0CWTXq8+9In9bijFEEk=;
+        b=FKpyRZF083iFmSs87VLe1ptwiUnjd/vfBMzLUMdTxEfAEq1NJlcG3Gvkzqwrx/8bkzb9dj
+        b99EXH8RL0qtD8xOWtDBbj44POVRNrwv8BKoVQmE95TXfhWjAAyAYF0RkqBxFHPJh8IIYB
+        6KeLC8e8gLi7YD6AHLxLALPqgRHT6l4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-18-b_SV9j85Oa6bodKfoGhiyA-1; Thu, 10 Sep 2020 12:57:42 -0400
+X-MC-Unique: b_SV9j85Oa6bodKfoGhiyA-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0A74B420E7;
+        Thu, 10 Sep 2020 16:57:41 +0000 (UTC)
+Received: from w520.home (ovpn-112-71.phx2.redhat.com [10.3.112.71])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 48C97100239A;
+        Thu, 10 Sep 2020 16:57:36 +0000 (UTC)
+Date:   Thu, 10 Sep 2020 10:57:35 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Vikas Gupta <vikas.gupta@broadcom.com>
+Cc:     Cornelia Huck <cohuck@redhat.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Vikram Prakash <vikram.prakash@broadcom.com>,
+        Srinath Mannam <srinath.mannam@broadcom.com>,
+        Auger Eric <eric.auger@redhat.com>
+Subject: Re: MSI/MSIX for VFIO platform
+Message-ID: <20200910105735.1e060b95@w520.home>
+In-Reply-To: <c94c36305980f80674aa699e27b9895b@mail.gmail.com>
+References: <c94c36305980f80674aa699e27b9895b@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200910062144.GA16802@ubuntu>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Sep 10, 2020 at 09:15:13AM +0200, Guennadi Liakhovetski wrote:
-> Hi Mathieu,
-> 
-> On Wed, Sep 09, 2020 at 04:42:14PM -0600, Mathieu Poirier wrote:
-> > On Wed, Aug 26, 2020 at 07:46:33PM +0200, Guennadi Liakhovetski wrote:
-> > > VHOST_VSOCK_SET_RUNNING is used by the vhost vsock driver to perform
-> > > crucial VirtQueue initialisation, like assigning .private fields and
-> > > calling vhost_vq_init_access(), and clean up. However, this ioctl is
-> > > actually extremely useful for any vhost driver, that doesn't have a
-> > > side channel to inform it of a status change, e.g. upon a guest
-> > > reboot. This patch makes that ioctl generic, while preserving its
-> > > numeric value and also keeping the original alias.
-> > > 
-> > > Signed-off-by: Guennadi Liakhovetski <guennadi.liakhovetski@linux.intel.com>
-> > > ---
-> > >  include/uapi/linux/vhost.h | 4 +++-
-> > >  1 file changed, 3 insertions(+), 1 deletion(-)
-> > > 
-> > > diff --git a/include/uapi/linux/vhost.h b/include/uapi/linux/vhost.h
-> > > index 75232185324a..11a4948b6216 100644
-> > > --- a/include/uapi/linux/vhost.h
-> > > +++ b/include/uapi/linux/vhost.h
-> > > @@ -97,6 +97,8 @@
-> > >  #define VHOST_SET_BACKEND_FEATURES _IOW(VHOST_VIRTIO, 0x25, __u64)
-> > >  #define VHOST_GET_BACKEND_FEATURES _IOR(VHOST_VIRTIO, 0x26, __u64)
-> > >  
-> > > +#define VHOST_SET_RUNNING _IOW(VHOST_VIRTIO, 0x61, int)
-> > > +
-> > 
-> > I don't see it used in the next patches and as such should be part of another
-> > series.
-> 
-> It isn't used in the next patches, it is used in this patch - see below.
->
+On Thu, 10 Sep 2020 16:15:27 +0530
+Vikas Gupta <vikas.gupta@broadcom.com> wrote:
 
-Right, but why is this part of this set?  What does it bring?  It should be part
-of a patchset where "VHOST_SET_RUNNING" is used.
- 
-> Thanks
-> Guennadi
+> Hi Alex/Cornelia,
 > 
-> > >  /* VHOST_NET specific defines */
-> > >  
-> > >  /* Attach virtio net ring to a raw socket, or tap device.
-> > > @@ -118,7 +120,7 @@
-> > >  /* VHOST_VSOCK specific defines */
-> > >  
-> > >  #define VHOST_VSOCK_SET_GUEST_CID	_IOW(VHOST_VIRTIO, 0x60, __u64)
-> > > -#define VHOST_VSOCK_SET_RUNNING		_IOW(VHOST_VIRTIO, 0x61, int)
-> > > +#define VHOST_VSOCK_SET_RUNNING		VHOST_SET_RUNNING
-> > >  
-> > >  /* VHOST_VDPA specific defines */
-> > >  
-> > > -- 
-> > > 2.28.0
-> > > 
+> We are looking for MSI interrupts for platform devices in user-space
+> applications via event/poll mechanism using VFIO.
+> 
+> Since there is no support for MSI/MSIX handling in VFIO-platform in kernel,
+> it may not possible to get this feature in user-space.
+> 
+> Is there any other way we can get this feature in user-space OR can you
+> please suggest if any patch or feature is in progress for same in VFIO
+> platform?
+> 
+> Any suggestions would be helpful.
+
+Eric (Cc'd) is the maintainer of vfio-platform.
+
+vfio-platform devices don't have IRQ indexes dedicated to MSI and MSI-X
+like vfio-pci devices do (technically these are PCI concepts, but I
+assume we're referring generically to message signaled interrupts), but
+that's simply due to the lack of standardization in platform devices.
+Logically these are simply collections of edge triggered interrupts,
+which the vfio device API supports generically, it's simply a matter
+that the vfio bus driver exposing a vfio-platform device create an IRQ
+index exposing these vectors.  Thanks,
+
+Alex
+
