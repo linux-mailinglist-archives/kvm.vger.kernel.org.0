@@ -2,277 +2,151 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id F169626433C
-	for <lists+kvm@lfdr.de>; Thu, 10 Sep 2020 12:06:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0E511264373
+	for <lists+kvm@lfdr.de>; Thu, 10 Sep 2020 12:14:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730432AbgIJKG3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 10 Sep 2020 06:06:29 -0400
-Received: from mail.kernel.org ([198.145.29.99]:36590 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730233AbgIJKGQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 10 Sep 2020 06:06:16 -0400
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 41DDD2145D;
-        Thu, 10 Sep 2020 10:06:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1599732375;
-        bh=C+snSaZA8ZBO3q0gc3u/ZtSs9A6Zfxe83fdVxOebxeY=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=aexmjgeIlOuf7o8/3vsTxY6s5ghVA4dP4oPjSddZgeEo4OONVkQe/myhLxgJ1tzbV
-         KiuaN+csufQjiaPm5fpwF/tiQ97EeEXINclU22ZfFZ1m8g/1rj6o7LS4O7jMXc6wZU
-         B5u9feq//iW5SBASH+t+o9K8VaPQH/bDeJJKW000=
-Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
-        by disco-boy.misterjones.org with esmtpsa (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
-        (Exim 4.92)
-        (envelope-from <maz@kernel.org>)
-        id 1kGJT3-00Ae10-8R; Thu, 10 Sep 2020 11:06:13 +0100
+        id S1730531AbgIJKOY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 10 Sep 2020 06:14:24 -0400
+Received: from mout.kundenserver.de ([217.72.192.75]:54273 "EHLO
+        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725876AbgIJKOR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 10 Sep 2020 06:14:17 -0400
+Received: from [192.168.100.1] ([82.252.148.206]) by mrelayeu.kundenserver.de
+ (mreue107 [213.165.67.119]) with ESMTPSA (Nemesis) id
+ 1Mnqfc-1ks4FY1yqw-00pNRE; Thu, 10 Sep 2020 12:13:50 +0200
+Subject: Re: [PATCH 6/6] target/i386/kvm: Rename host_tsx_blacklisted() as
+ host_tsx_broken()
+To:     =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+        qemu-devel@nongnu.org
+Cc:     Laurent Vivier <lvivier@redhat.com>,
+        Peter Maydell <peter.maydell@linaro.org>,
+        Thomas Huth <thuth@redhat.com>,
+        Alistair Francis <alistair@alistair23.me>,
+        Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Andrew Jeffery <andrew@aj.id.au>,
+        Jason Wang <jasowang@redhat.com>,
+        Marcelo Tosatti <mtosatti@redhat.com>,
+        Joel Stanley <joel@jms.id.au>, qemu-trivial@nongnu.org,
+        qemu-arm@nongnu.org,
+        =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
+        =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+        Richard Henderson <rth@twiddle.net>
+References: <20200910070131.435543-1-philmd@redhat.com>
+ <20200910070131.435543-7-philmd@redhat.com>
+From:   Laurent Vivier <laurent@vivier.eu>
+Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <495edfec-a372-34fd-17e8-0d55ea1dae0a@vivier.eu>
+Date:   Thu, 10 Sep 2020 12:13:46 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-Date:   Thu, 10 Sep 2020 11:06:13 +0100
-From:   Marc Zyngier <maz@kernel.org>
-To:     Alexander Graf <graf@amazon.com>
-Cc:     kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
-        kvm@vger.kernel.org, James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Eric Auger <eric.auger@redhat.com>
-Subject: Re: [PATCH v2] KVM: arm64: Allow to limit number of PMU counters
-In-Reply-To: <20200908205730.23898-1-graf@amazon.com>
-References: <20200908205730.23898-1-graf@amazon.com>
-User-Agent: Roundcube Webmail/1.4.8
-Message-ID: <9a4279aa9bf0a40bece3930c11c2f7cb@kernel.org>
-X-Sender: maz@kernel.org
-X-SA-Exim-Connect-IP: 51.254.78.96
-X-SA-Exim-Rcpt-To: graf@amazon.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, robin.murphy@arm.com, mark.rutland@arm.com, eric.auger@redhat.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+In-Reply-To: <20200910070131.435543-7-philmd@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: fr
+Content-Transfer-Encoding: 8bit
+X-Provags-ID: V03:K1:XGp5DuYNaH/nAV2W3VvFSDzo1Frn05RQUKvEboRsocfDHUjstLb
+ emdlViaZq2xhlXLcUKhsnBwGc5YWzo0QRnxhZCUltjdu1GnTk3sv9pFUf8i9GhliOARfAoz
+ H62lkq0Fo2L8bwR71Hc1pT0WZKRJyP+tzRx2PlJgy68ZMDuhEpQmikgxT/TA/kkXa6AnSix
+ /hjxZf2sbssdXH21smfeQ==
+X-Spam-Flag: NO
+X-UI-Out-Filterresults: notjunk:1;V03:K0:BeEbZUjj9Rs=:TDtpgIqE+MSeQ+o/TcwB3U
+ piGq0nJO1hA31q4Zj0Q1fESWa/S2q3lg9bnToJhyo3kvePN9Lfd9MH7s4m9RYLxFhpYzaO/VP
+ kFR5oeXNoiYAF21wPjO2LC3ojpCtNUY7ggV/EuLA4A6JjLPJIccMn1KuV9cU/5lz1L0xKG605
+ uZvAc2YS06xY8BXgRUGjTxWfi6I9GHe5/S+oKhsABcn8NvGw61g10U8wS2/+ut8kRgwEpjNbV
+ vSfUxHGUOof5WRZV7O6zLY24tUBBEkUMF94hmK8zceHmblfbuCMcQ+2+FmRDcLn0biXx9tGHf
+ S6Flkfn28PmYUXyyL1EQq+0SwwtXe1vdzUhp3SmAGNmIIbMoGgNNUZfLAvQFX3TXVuOZyGQ0d
+ C+jmly2iSfp/8y+lpcYIzSWm633FHwefoyb1N60+GTgZ64TwlOVPt+M76qII/8cND//fSs/Kw
+ 97LeE47vTBJjC/WKZ2W2FRDyNYZmu2Aq6QUFkGgQaESxHk83uPHb0iVScpi9qV+B47y2LGtfS
+ WAPd/vSOrwhc/sW5Yb52GiDMXSNCQxWFnVhd4BmVoss1EgtN/Vl/xdnogyF7l8DrK6DnqYTxd
+ z54BVlUc4vmTKzPXAnuY8eqtJP8wTvJXiRmi/Qy6hW3+v4AdEw47WfgT6bc5Os8VF1tOvyijR
+ 064Ai+PMYzOar3iW42VzWanSbyhTOxukkeV1i582KPFDDEGPtp6sA8qUKuEJYRsazNmOe5D/a
+ QguA7ij9BGMyjAqetMGiBX5Rnb9Gvk9a0BCiR3z++B0/YoQZJ9LeEgctSMQYpLnvKIF7+8NU+
+ rua9WcTjKQjDoXhZ/i57vmLZR+klxEW7GJTaqA0LLhNDguGeLjDyDSK8Qn0/gxjyrXsKV2L
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2020-09-08 21:57, Alexander Graf wrote:
-> We currently pass through the number of PMU counters that we have 
-> available
-> in hardware to guests. So if my host supports 10 concurrently active 
-> PMU
-> counters, my guest will be able to spawn 10 counters as well.
+Le 10/09/2020 à 09:01, Philippe Mathieu-Daudé a écrit :
+> In order to use inclusive terminology, rename host_tsx_blacklisted()
+> as host_tsx_broken().
 > 
-> This is undesireable if we also want to use the PMU on the host for
-> monitoring. In that case, we want to split the PMU between guest and
-> host.
-> 
-> To help that case, let's add a PMU attr that allows us to limit the 
-> number
-> of PMU counters that we expose. With this patch in place, user space 
-> can
-> keep some counters free for host use.
-> 
-> Signed-off-by: Alexander Graf <graf@amazon.com>
-> 
+> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 > ---
+>  target/i386/kvm.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
 > 
-> Because this patch touches the same code paths as the vPMU filtering 
-> one
-> and the vPMU filtering generalized a few conditions in the attr path,
-> I've based it on top. Please let me know if you want it independent 
-> instead.
-> 
-> v1 -> v2:
-> 
->   - Add documentation
->   - Add read support
-> ---
->  Documentation/virt/kvm/devices/vcpu.rst | 25 +++++++++++++++++++++++++
->  arch/arm64/include/uapi/asm/kvm.h       |  7 ++++---
->  arch/arm64/kvm/pmu-emul.c               | 32 
-> ++++++++++++++++++++++++++++++++
->  arch/arm64/kvm/sys_regs.c               |  5 +++++
->  include/kvm/arm_pmu.h                   |  1 +
->  5 files changed, 67 insertions(+), 3 deletions(-)
-> 
-> diff --git a/Documentation/virt/kvm/devices/vcpu.rst
-> b/Documentation/virt/kvm/devices/vcpu.rst
-> index 203b91e93151..1a1c8d8c8b1d 100644
-> --- a/Documentation/virt/kvm/devices/vcpu.rst
-> +++ b/Documentation/virt/kvm/devices/vcpu.rst
-> @@ -102,6 +102,31 @@ isn't strictly speaking an event. Filtering the
-> cycle counter is possible
->  using event 0x11 (CPU_CYCLES).
-> 
-> 
-> +1.4 ATTRIBUTE: KVM_ARM_VCPU_PMU_V3_NUM_EVENTS
-> +---------------------------------------------
-> +
-> +:Parameters: in kvm_device_attr.addr the address for the limit of 
-> concurrent
-> +             events is a pointer to an int
-> +
-> +:Returns:
-> +
-> +	 =======  ======================================================
-> +	 -ENODEV: PMUv3 not supported
-> +	 -EBUSY:  PMUv3 already initialized
-> +	 -EINVAL: Too large number of events
-> +	 =======  ======================================================
-> +
-> +Reconfigure the limit of concurrent PMU events that the guest can 
-> monitor.
-> +This number is directly exposed as part of the PMCR_EL0 register.
-> +
-> +On vcpu creation, this attribute is set to the hardware limit of the 
-> current
-> +platform. If you need to determine the hardware limit, you can read 
-> this
-> +attribute before setting it.
-> +
-> +Restrictions: The default value for this property is the number of 
-> hardware
-> +supported events. Only values that are smaller than the hardware limit 
-> can
-> +be set.
-> +
->  2. GROUP: KVM_ARM_VCPU_TIMER_CTRL
->  =================================
-> 
-> diff --git a/arch/arm64/include/uapi/asm/kvm.h
-> b/arch/arm64/include/uapi/asm/kvm.h
-> index 7b1511d6ce44..db025c0b5a40 100644
-> --- a/arch/arm64/include/uapi/asm/kvm.h
-> +++ b/arch/arm64/include/uapi/asm/kvm.h
-> @@ -342,9 +342,10 @@ struct kvm_vcpu_events {
-> 
->  /* Device Control API on vcpu fd */
->  #define KVM_ARM_VCPU_PMU_V3_CTRL	0
-> -#define   KVM_ARM_VCPU_PMU_V3_IRQ	0
-> -#define   KVM_ARM_VCPU_PMU_V3_INIT	1
-> -#define   KVM_ARM_VCPU_PMU_V3_FILTER	2
-> +#define   KVM_ARM_VCPU_PMU_V3_IRQ		0
-> +#define   KVM_ARM_VCPU_PMU_V3_INIT		1
-> +#define   KVM_ARM_VCPU_PMU_V3_FILTER		2
-> +#define   KVM_ARM_VCPU_PMU_V3_NUM_EVENTS	3
->  #define KVM_ARM_VCPU_TIMER_CTRL		1
->  #define   KVM_ARM_VCPU_TIMER_IRQ_VTIMER		0
->  #define   KVM_ARM_VCPU_TIMER_IRQ_PTIMER		1
-> diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
-> index 0458860bade2..c7915b95fec0 100644
-> --- a/arch/arm64/kvm/pmu-emul.c
-> +++ b/arch/arm64/kvm/pmu-emul.c
-> @@ -253,6 +253,8 @@ void kvm_pmu_vcpu_init(struct kvm_vcpu *vcpu)
-> 
->  	for (i = 0; i < ARMV8_PMU_MAX_COUNTERS; i++)
->  		pmu->pmc[i].idx = i;
-> +
-> +	pmu->num_events = perf_num_counters() - 1;
+> diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+> index 205b68bc0ce..3d640a8decf 100644
+> --- a/target/i386/kvm.c
+> +++ b/target/i386/kvm.c
+> @@ -302,7 +302,7 @@ static int get_para_features(KVMState *s)
+>      return features;
 >  }
+>  
+> -static bool host_tsx_blacklisted(void)
+> +static bool host_tsx_broken(void)
+>  {
+>      int family, model, stepping;\
+>      char vendor[CPUID_VENDOR_SZ + 1];
+> @@ -408,7 +408,7 @@ uint32_t kvm_arch_get_supported_cpuid(KVMState *s, uint32_t function,
+>      } else if (function == 6 && reg == R_EAX) {
+>          ret |= CPUID_6_EAX_ARAT; /* safe to allow because of emulated APIC */
+>      } else if (function == 7 && index == 0 && reg == R_EBX) {
+> -        if (host_tsx_blacklisted()) {
+> +        if (host_tsx_broken()) {
+>              ret &= ~(CPUID_7_0_EBX_RTM | CPUID_7_0_EBX_HLE);
+>          }
+>      } else if (function == 7 && index == 0 && reg == R_EDX) {
 > 
->  /**
-> @@ -978,6 +980,25 @@ int kvm_arm_pmu_v3_set_attr(struct kvm_vcpu
-> *vcpu, struct kvm_device_attr *attr)
-> 
->  		return 0;
->  	}
-> +	case KVM_ARM_VCPU_PMU_V3_NUM_EVENTS: {
-> +		u64 mask = ARMV8_PMU_PMCR_N_MASK << ARMV8_PMU_PMCR_N_SHIFT;
-> +		int __user *uaddr = (int __user *)(long)attr->addr;
-> +		u32 num_events;
-> +
-> +		if (get_user(num_events, uaddr))
-> +			return -EFAULT;
-> +
-> +		if (num_events >= perf_num_counters())
-> +			return -EINVAL;
-> +
-> +		vcpu->arch.pmu.num_events = num_events;
-> +
-> +		num_events <<= ARMV8_PMU_PMCR_N_SHIFT;
-> +		__vcpu_sys_reg(vcpu, SYS_PMCR_EL0) &= ~mask;
-> +		__vcpu_sys_reg(vcpu, SYS_PMCR_EL0) |= num_events;
-> +
-> +		return 0;
-> +	}
->  	case KVM_ARM_VCPU_PMU_V3_INIT:
->  		return kvm_arm_pmu_v3_init(vcpu);
->  	}
-> @@ -1004,6 +1025,16 @@ int kvm_arm_pmu_v3_get_attr(struct kvm_vcpu
-> *vcpu, struct kvm_device_attr *attr)
->  		irq = vcpu->arch.pmu.irq_num;
->  		return put_user(irq, uaddr);
->  	}
-> +	case KVM_ARM_VCPU_PMU_V3_NUM_EVENTS: {
-> +		int __user *uaddr = (int __user *)(long)attr->addr;
-> +		u32 num_events;
-> +
-> +		if (!test_bit(KVM_ARM_VCPU_PMU_V3, vcpu->arch.features))
-> +			return -ENODEV;
-> +
-> +		num_events = vcpu->arch.pmu.num_events;
-> +		return put_user(num_events, uaddr);
-> +	}
->  	}
-> 
->  	return -ENXIO;
-> @@ -1015,6 +1046,7 @@ int kvm_arm_pmu_v3_has_attr(struct kvm_vcpu
-> *vcpu, struct kvm_device_attr *attr)
->  	case KVM_ARM_VCPU_PMU_V3_IRQ:
->  	case KVM_ARM_VCPU_PMU_V3_INIT:
->  	case KVM_ARM_VCPU_PMU_V3_FILTER:
-> +	case KVM_ARM_VCPU_PMU_V3_NUM_EVENTS:
->  		if (kvm_arm_support_pmu_v3() &&
->  		    test_bit(KVM_ARM_VCPU_PMU_V3, vcpu->arch.features))
->  			return 0;
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index 20ab2a7d37ca..d51e39600bbd 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -672,6 +672,11 @@ static void reset_pmcr(struct kvm_vcpu *vcpu,
-> const struct sys_reg_desc *r)
->  	       | (ARMV8_PMU_PMCR_MASK & 0xdecafbad)) & (~ARMV8_PMU_PMCR_E);
->  	if (!system_supports_32bit_el0())
->  		val |= ARMV8_PMU_PMCR_LC;
-> +
-> +	/* Override number of event selectors */
-> +	val &= ~(ARMV8_PMU_PMCR_N_MASK << ARMV8_PMU_PMCR_N_SHIFT);
-> +	val |= (u32)vcpu->arch.pmu.num_events << ARMV8_PMU_PMCR_N_SHIFT;
-> +
->  	__vcpu_sys_reg(vcpu, r->reg) = val;
->  }
-> 
-> diff --git a/include/kvm/arm_pmu.h b/include/kvm/arm_pmu.h
-> index 98cbfe885a53..ea3fc96a37d9 100644
-> --- a/include/kvm/arm_pmu.h
-> +++ b/include/kvm/arm_pmu.h
-> @@ -27,6 +27,7 @@ struct kvm_pmu {
->  	bool ready;
->  	bool created;
->  	bool irq_level;
-> +	u8 num_events;
->  };
-> 
->  #define kvm_arm_pmu_v3_ready(v)		((v)->arch.pmu.ready)
 
-I see several problems with this approach:
+Applied to my trivial-patches branch.
 
-- userspace doesn't really have a good way to retrieve the number of
-   counters.
+Thanks,
+Laurent
 
-- Limiting the number of counters for the guest doesn't mean anything
-   when it comes to the actual use of the HW counters, given that we
-   don't allocate them ourselves (it's all perf doing the actual work).
-
-- If you want to "pin" counters for the host, why don't you just do
-   that before starting the guest?
-
-I think you need to look at the bigger picture: how to limit the use
-of physical counter usage for a given userspace task. This needs
-to happen in perf itself, and not in KVM.
-
-         M.
--- 
-Jazz is not dead. It just smells funny...
