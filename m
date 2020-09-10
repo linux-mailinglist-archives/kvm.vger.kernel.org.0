@@ -2,151 +2,378 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0E511264373
-	for <lists+kvm@lfdr.de>; Thu, 10 Sep 2020 12:14:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2646E2643AD
+	for <lists+kvm@lfdr.de>; Thu, 10 Sep 2020 12:19:30 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730531AbgIJKOY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 10 Sep 2020 06:14:24 -0400
-Received: from mout.kundenserver.de ([217.72.192.75]:54273 "EHLO
-        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725876AbgIJKOR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 10 Sep 2020 06:14:17 -0400
-Received: from [192.168.100.1] ([82.252.148.206]) by mrelayeu.kundenserver.de
- (mreue107 [213.165.67.119]) with ESMTPSA (Nemesis) id
- 1Mnqfc-1ks4FY1yqw-00pNRE; Thu, 10 Sep 2020 12:13:50 +0200
-Subject: Re: [PATCH 6/6] target/i386/kvm: Rename host_tsx_blacklisted() as
- host_tsx_broken()
-To:     =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
-        qemu-devel@nongnu.org
-Cc:     Laurent Vivier <lvivier@redhat.com>,
-        Peter Maydell <peter.maydell@linaro.org>,
-        Thomas Huth <thuth@redhat.com>,
-        Alistair Francis <alistair@alistair23.me>,
-        Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Andrew Jeffery <andrew@aj.id.au>,
-        Jason Wang <jasowang@redhat.com>,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        Joel Stanley <joel@jms.id.au>, qemu-trivial@nongnu.org,
-        qemu-arm@nongnu.org,
-        =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
-        =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
-        Richard Henderson <rth@twiddle.net>
-References: <20200910070131.435543-1-philmd@redhat.com>
- <20200910070131.435543-7-philmd@redhat.com>
-From:   Laurent Vivier <laurent@vivier.eu>
-Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
- mQINBFYFJhkBEAC2me7w2+RizYOKZM+vZCx69GTewOwqzHrrHSG07MUAxJ6AY29/+HYf6EY2
- WoeuLWDmXE7A3oJoIsRecD6BXHTb0OYS20lS608anr3B0xn5g0BX7es9Mw+hV/pL+63EOCVm
- SUVTEQwbGQN62guOKnJJJfphbbv82glIC/Ei4Ky8BwZkUuXd7d5NFJKC9/GDrbWdj75cDNQx
- UZ9XXbXEKY9MHX83Uy7JFoiFDMOVHn55HnncflUncO0zDzY7CxFeQFwYRbsCXOUL9yBtqLer
- Ky8/yjBskIlNrp0uQSt9LMoMsdSjYLYhvk1StsNPg74+s4u0Q6z45+l8RAsgLw5OLtTa+ePM
- JyS7OIGNYxAX6eZk1+91a6tnqfyPcMbduxyBaYXn94HUG162BeuyBkbNoIDkB7pCByed1A7q
- q9/FbuTDwgVGVLYthYSfTtN0Y60OgNkWCMtFwKxRaXt1WFA5ceqinN/XkgA+vf2Ch72zBkJL
- RBIhfOPFv5f2Hkkj0MvsUXpOWaOjatiu0fpPo6Hw14UEpywke1zN4NKubApQOlNKZZC4hu6/
- 8pv2t4HRi7s0K88jQYBRPObjrN5+owtI51xMaYzvPitHQ2053LmgsOdN9EKOqZeHAYG2SmRW
- LOxYWKX14YkZI5j/TXfKlTpwSMvXho+efN4kgFvFmP6WT+tPnwARAQABtCJMYXVyZW50IFZp
- dmllciA8bGF1cmVudEB2aXZpZXIuZXU+iQI4BBMBAgAiBQJWBTDeAhsDBgsJCAcDAgYVCAIJ
- CgsEFgIDAQIeAQIXgAAKCRDzDDi9Py++PCEdD/oD8LD5UWxhQrMQCsUgLlXCSM7sxGLkwmmF
- ozqSSljEGRhffxZvO35wMFcdX9Z0QOabVoFTKrT04YmvbjsErh/dP5zeM/4EhUByeOS7s6Yl
- HubMXVQTkak9Wa9Eq6irYC6L41QNzz/oTwNEqL1weV1+XC3TNnht9B76lIaELyrJvRfgsp9M
- rE+PzGPo5h7QHWdL/Cmu8yOtPLa8Y6l/ywEJ040IoiAUfzRoaJs2csMXf0eU6gVBhCJ4bs91
- jtWTXhkzdl4tdV+NOwj3j0ukPy+RjqeL2Ej+bomnPTOW8nAZ32dapmu7Fj7VApuQO/BSIHyO
- NkowMMjB46yohEepJaJZkcgseaus0x960c4ua/SUm/Nm6vioRsxyUmWd2nG0m089pp8LPopq
- WfAk1l4GciiMepp1Cxn7cnn1kmG6fhzedXZ/8FzsKjvx/aVeZwoEmucA42uGJ3Vk9TiVdZes
- lqMITkHqDIpHjC79xzlWkXOsDbA2UY/P18AtgJEZQPXbcrRBtdSifCuXdDfHvI+3exIdTpvj
- BfbgZAar8x+lcsQBugvktlQWPfAXZu4Shobi3/mDYMEDOE92dnNRD2ChNXg2IuvAL4OW40wh
- gXlkHC1ZgToNGoYVvGcZFug1NI+vCeCFchX+L3bXyLMg3rAfWMFPAZLzn42plIDMsBs+x2yP
- +bkCDQRWBSYZARAAvFJBFuX9A6eayxUPFaEczlMbGXugs0mazbOYGlyaWsiyfyc3PStHLFPj
- rSTaeJpPCjBJErwpZUN4BbpkBpaJiMuVO6egrC8Xy8/cnJakHPR2JPEvmj7Gm/L9DphTcE15
- 92rxXLesWzGBbuYxKsj8LEnrrvLyi3kNW6B5LY3Id+ZmU8YTQ2zLuGV5tLiWKKxc6s3eMXNq
- wrJTCzdVd6ThXrmUfAHbcFXOycUyf9vD+s+WKpcZzCXwKgm7x1LKsJx3UhuzT8ier1L363RW
- ZaJBZ9CTPiu8R5NCSn9V+BnrP3wlFbtLqXp6imGhazT9nJF86b5BVKpF8Vl3F0/Y+UZ4gUwL
- d9cmDKBcmQU/JaRUSWvvolNu1IewZZu3rFSVgcpdaj7F/1aC0t5vLdx9KQRyEAKvEOtCmP4m
- 38kU/6r33t3JuTJnkigda4+Sfu5kYGsogeYG6dNyjX5wpK5GJIJikEhdkwcLM+BUOOTi+I9u
- tX03BGSZo7FW/J7S9y0l5a8nooDs2gBRGmUgYKqQJHCDQyYut+hmcr+BGpUn9/pp2FTWijrP
- inb/Pc96YDQLQA1q2AeAFv3Rx3XoBTGl0RCY4KZ02c0kX/dm3eKfMX40XMegzlXCrqtzUk+N
- 8LeipEsnOoAQcEONAWWo1HcgUIgCjhJhBEF0AcELOQzitbJGG5UAEQEAAYkCHwQYAQIACQUC
- VgUmGQIbDAAKCRDzDDi9Py++PCD3D/9VCtydWDdOyMTJvEMRQGbx0GacqpydMEWbE3kUW0ha
- US5jz5gyJZHKR3wuf1En/3z+CEAEfP1M3xNGjZvpaKZXrgWaVWfXtGLoWAVTfE231NMQKGoB
- w2Dzx5ivIqxikXB6AanBSVpRpoaHWb06tPNxDL6SVV9lZpUn03DSR6gZEZvyPheNWkvz7bE6
- FcqszV/PNvwm0C5Ju7NlJA8PBAQjkIorGnvN/vonbVh5GsRbhYPOc/JVwNNr63P76rZL8Gk/
- hb3xtcIEi5CCzab45+URG/lzc6OV2nTj9Lg0SNcRhFZ2ILE3txrmI+aXmAu26+EkxLLfqCVT
- ohb2SffQha5KgGlOSBXustQSGH0yzzZVZb+HZPEvx6d/HjQ+t9sO1bCpEgPdZjyMuuMp9N1H
- ctbwGdQM2Qb5zgXO+8ZSzwC+6rHHIdtcB8PH2j+Nd88dVGYlWFKZ36ELeZxD7iJflsE8E8yg
- OpKgu3nD0ahBDqANU/ZmNNarBJEwvM2vfusmNnWm3QMIwxNuJghRyuFfx694Im1js0ZY3LEU
- JGSHFG4ZynA+ZFUPA6Xf0wHeJOxGKCGIyeKORsteIqgnkINW9fnKJw2pgk8qHkwVc3Vu+wGS
- ZiJK0xFusPQehjWTHn9WjMG1zvQ5TQQHxau/2FkP45+nRPco6vVFQe8JmgtRF8WFJA==
-Message-ID: <495edfec-a372-34fd-17e8-0d55ea1dae0a@vivier.eu>
-Date:   Thu, 10 Sep 2020 12:13:46 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+        id S1730411AbgIJKTZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 10 Sep 2020 06:19:25 -0400
+Received: from smtp-fw-9102.amazon.com ([207.171.184.29]:32624 "EHLO
+        smtp-fw-9102.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730324AbgIJKSg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 10 Sep 2020 06:18:36 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1599733114; x=1631269114;
+  h=subject:to:cc:references:from:message-id:date:
+   mime-version:in-reply-to:content-transfer-encoding;
+  bh=SRsVjooROyCRFjNlvBdvzKJ6Tdg8KJ7q2QXauQDDOIA=;
+  b=IGF/97/2WiHbUMfTlOCuu9mVGMJ467PI+9mmwXA28UB6dxDKtY/3OvNx
+   yccyASuticfMIYXVNL48SRRFn2jgh8800hjgl3PtBX3v+/RpkifjDewo/
+   zDI7hHFcp0Bb7ELrqWp09hTjKzdnCsDdvP6qWikn3z2ZqqQ+Y9ieFpglL
+   s=;
+X-IronPort-AV: E=Sophos;i="5.76,412,1592870400"; 
+   d="scan'208";a="75073669"
+Received: from sea32-co-svc-lb4-vlan3.sea.corp.amazon.com (HELO email-inbound-relay-2c-2225282c.us-west-2.amazon.com) ([10.47.23.38])
+  by smtp-border-fw-out-9102.sea19.amazon.com with ESMTP; 10 Sep 2020 10:18:21 +0000
+Received: from EX13MTAUWC001.ant.amazon.com (pdx4-ws-svc-p6-lb7-vlan3.pdx.amazon.com [10.170.41.166])
+        by email-inbound-relay-2c-2225282c.us-west-2.amazon.com (Postfix) with ESMTPS id 35686A02A5;
+        Thu, 10 Sep 2020 10:18:20 +0000 (UTC)
+Received: from EX13D20UWC001.ant.amazon.com (10.43.162.244) by
+ EX13MTAUWC001.ant.amazon.com (10.43.162.135) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.2; Thu, 10 Sep 2020 10:18:19 +0000
+Received: from Alexanders-MacBook-Air.local (10.43.162.38) by
+ EX13D20UWC001.ant.amazon.com (10.43.162.244) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.2; Thu, 10 Sep 2020 10:18:16 +0000
+Subject: Re: [PATCH v2] KVM: arm64: Allow to limit number of PMU counters
+To:     Marc Zyngier <maz@kernel.org>
+CC:     <kvmarm@lists.cs.columbia.edu>,
+        <linux-arm-kernel@lists.infradead.org>, <kvm@vger.kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Eric Auger <eric.auger@redhat.com>,
+        Andrew Jones <drjones@redhat.com>
+References: <20200908205730.23898-1-graf@amazon.com>
+ <9a4279aa9bf0a40bece3930c11c2f7cb@kernel.org>
+From:   Alexander Graf <graf@amazon.com>
+Message-ID: <07255b9e-95d3-94d4-cfb0-6408e8bf7818@amazon.com>
+Date:   Thu, 10 Sep 2020 12:18:13 +0200
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.16; rv:78.0)
+ Gecko/20100101 Thunderbird/78.2.1
 MIME-Version: 1.0
-In-Reply-To: <20200910070131.435543-7-philmd@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: fr
-Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:XGp5DuYNaH/nAV2W3VvFSDzo1Frn05RQUKvEboRsocfDHUjstLb
- emdlViaZq2xhlXLcUKhsnBwGc5YWzo0QRnxhZCUltjdu1GnTk3sv9pFUf8i9GhliOARfAoz
- H62lkq0Fo2L8bwR71Hc1pT0WZKRJyP+tzRx2PlJgy68ZMDuhEpQmikgxT/TA/kkXa6AnSix
- /hjxZf2sbssdXH21smfeQ==
-X-Spam-Flag: NO
-X-UI-Out-Filterresults: notjunk:1;V03:K0:BeEbZUjj9Rs=:TDtpgIqE+MSeQ+o/TcwB3U
- piGq0nJO1hA31q4Zj0Q1fESWa/S2q3lg9bnToJhyo3kvePN9Lfd9MH7s4m9RYLxFhpYzaO/VP
- kFR5oeXNoiYAF21wPjO2LC3ojpCtNUY7ggV/EuLA4A6JjLPJIccMn1KuV9cU/5lz1L0xKG605
- uZvAc2YS06xY8BXgRUGjTxWfi6I9GHe5/S+oKhsABcn8NvGw61g10U8wS2/+ut8kRgwEpjNbV
- vSfUxHGUOof5WRZV7O6zLY24tUBBEkUMF94hmK8zceHmblfbuCMcQ+2+FmRDcLn0biXx9tGHf
- S6Flkfn28PmYUXyyL1EQq+0SwwtXe1vdzUhp3SmAGNmIIbMoGgNNUZfLAvQFX3TXVuOZyGQ0d
- C+jmly2iSfp/8y+lpcYIzSWm633FHwefoyb1N60+GTgZ64TwlOVPt+M76qII/8cND//fSs/Kw
- 97LeE47vTBJjC/WKZ2W2FRDyNYZmu2Aq6QUFkGgQaESxHk83uPHb0iVScpi9qV+B47y2LGtfS
- WAPd/vSOrwhc/sW5Yb52GiDMXSNCQxWFnVhd4BmVoss1EgtN/Vl/xdnogyF7l8DrK6DnqYTxd
- z54BVlUc4vmTKzPXAnuY8eqtJP8wTvJXiRmi/Qy6hW3+v4AdEw47WfgT6bc5Os8VF1tOvyijR
- 064Ai+PMYzOar3iW42VzWanSbyhTOxukkeV1i582KPFDDEGPtp6sA8qUKuEJYRsazNmOe5D/a
- QguA7ij9BGMyjAqetMGiBX5Rnb9Gvk9a0BCiR3z++B0/YoQZJ9LeEgctSMQYpLnvKIF7+8NU+
- rua9WcTjKQjDoXhZ/i57vmLZR+klxEW7GJTaqA0LLhNDguGeLjDyDSK8Qn0/gxjyrXsKV2L
+In-Reply-To: <9a4279aa9bf0a40bece3930c11c2f7cb@kernel.org>
+Content-Language: en-US
+X-Originating-IP: [10.43.162.38]
+X-ClientProxiedBy: EX13D45UWA004.ant.amazon.com (10.43.160.151) To
+ EX13D20UWC001.ant.amazon.com (10.43.162.244)
+Content-Type: text/plain; charset="windows-1252"; format="flowed"
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Le 10/09/2020 à 09:01, Philippe Mathieu-Daudé a écrit :
-> In order to use inclusive terminology, rename host_tsx_blacklisted()
-> as host_tsx_broken().
-> 
-> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-> ---
->  target/i386/kvm.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-> index 205b68bc0ce..3d640a8decf 100644
-> --- a/target/i386/kvm.c
-> +++ b/target/i386/kvm.c
-> @@ -302,7 +302,7 @@ static int get_para_features(KVMState *s)
->      return features;
->  }
->  
-> -static bool host_tsx_blacklisted(void)
-> +static bool host_tsx_broken(void)
->  {
->      int family, model, stepping;\
->      char vendor[CPUID_VENDOR_SZ + 1];
-> @@ -408,7 +408,7 @@ uint32_t kvm_arch_get_supported_cpuid(KVMState *s, uint32_t function,
->      } else if (function == 6 && reg == R_EAX) {
->          ret |= CPUID_6_EAX_ARAT; /* safe to allow because of emulated APIC */
->      } else if (function == 7 && index == 0 && reg == R_EBX) {
-> -        if (host_tsx_blacklisted()) {
-> +        if (host_tsx_broken()) {
->              ret &= ~(CPUID_7_0_EBX_RTM | CPUID_7_0_EBX_HLE);
->          }
->      } else if (function == 7 && index == 0 && reg == R_EDX) {
-> 
 
-Applied to my trivial-patches branch.
 
-Thanks,
-Laurent
+On 10.09.20 12:06, Marc Zyngier wrote:
+> =
+
+> On 2020-09-08 21:57, Alexander Graf wrote:
+>> We currently pass through the number of PMU counters that we have
+>> available
+>> in hardware to guests. So if my host supports 10 concurrently active
+>> PMU
+>> counters, my guest will be able to spawn 10 counters as well.
+>>
+>> This is undesireable if we also want to use the PMU on the host for
+>> monitoring. In that case, we want to split the PMU between guest and
+>> host.
+>>
+>> To help that case, let's add a PMU attr that allows us to limit the
+>> number
+>> of PMU counters that we expose. With this patch in place, user space
+>> can
+>> keep some counters free for host use.
+>>
+>> Signed-off-by: Alexander Graf <graf@amazon.com>
+>>
+>> ---
+>>
+>> Because this patch touches the same code paths as the vPMU filtering
+>> one
+>> and the vPMU filtering generalized a few conditions in the attr path,
+>> I've based it on top. Please let me know if you want it independent
+>> instead.
+>>
+>> v1 -> v2:
+>>
+>> =A0 - Add documentation
+>> =A0 - Add read support
+>> ---
+>> =A0Documentation/virt/kvm/devices/vcpu.rst | 25 +++++++++++++++++++++++++
+>> =A0arch/arm64/include/uapi/asm/kvm.h=A0=A0=A0=A0=A0=A0 |=A0 7 ++++---
+>> =A0arch/arm64/kvm/pmu-emul.c=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 |=
+ 32
+>> ++++++++++++++++++++++++++++++++
+>> =A0arch/arm64/kvm/sys_regs.c=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 |=
+=A0 5 +++++
+>> =A0include/kvm/arm_pmu.h=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
+=A0=A0 |=A0 1 +
+>> =A05 files changed, 67 insertions(+), 3 deletions(-)
+>>
+>> diff --git a/Documentation/virt/kvm/devices/vcpu.rst
+>> b/Documentation/virt/kvm/devices/vcpu.rst
+>> index 203b91e93151..1a1c8d8c8b1d 100644
+>> --- a/Documentation/virt/kvm/devices/vcpu.rst
+>> +++ b/Documentation/virt/kvm/devices/vcpu.rst
+>> @@ -102,6 +102,31 @@ isn't strictly speaking an event. Filtering the
+>> cycle counter is possible
+>> =A0using event 0x11 (CPU_CYCLES).
+>>
+>>
+>> +1.4 ATTRIBUTE: KVM_ARM_VCPU_PMU_V3_NUM_EVENTS
+>> +---------------------------------------------
+>> +
+>> +:Parameters: in kvm_device_attr.addr the address for the limit of
+>> concurrent
+>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 events is a pointer to an int
+>> +
+>> +:Returns:
+>> +
+>> +=A0=A0=A0=A0=A0 =3D=3D=3D=3D=3D=3D=3D=A0 =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+>> +=A0=A0=A0=A0=A0 -ENODEV: PMUv3 not supported
+>> +=A0=A0=A0=A0=A0 -EBUSY:=A0 PMUv3 already initialized
+>> +=A0=A0=A0=A0=A0 -EINVAL: Too large number of events
+>> +=A0=A0=A0=A0=A0 =3D=3D=3D=3D=3D=3D=3D=A0 =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+>> +
+>> +Reconfigure the limit of concurrent PMU events that the guest can
+>> monitor.
+>> +This number is directly exposed as part of the PMCR_EL0 register.
+>> +
+>> +On vcpu creation, this attribute is set to the hardware limit of the
+>> current
+>> +platform. If you need to determine the hardware limit, you can read
+>> this
+>> +attribute before setting it.
+>> +
+>> +Restrictions: The default value for this property is the number of
+>> hardware
+>> +supported events. Only values that are smaller than the hardware limit
+>> can
+>> +be set.
+>> +
+>> =A02. GROUP: KVM_ARM_VCPU_TIMER_CTRL
+>> =A0=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+>>
+>> diff --git a/arch/arm64/include/uapi/asm/kvm.h
+>> b/arch/arm64/include/uapi/asm/kvm.h
+>> index 7b1511d6ce44..db025c0b5a40 100644
+>> --- a/arch/arm64/include/uapi/asm/kvm.h
+>> +++ b/arch/arm64/include/uapi/asm/kvm.h
+>> @@ -342,9 +342,10 @@ struct kvm_vcpu_events {
+>>
+>> =A0/* Device Control API on vcpu fd */
+>> =A0#define KVM_ARM_VCPU_PMU_V3_CTRL=A0=A0=A0=A0 0
+>> -#define=A0=A0 KVM_ARM_VCPU_PMU_V3_IRQ=A0=A0=A0 0
+>> -#define=A0=A0 KVM_ARM_VCPU_PMU_V3_INIT=A0=A0 1
+>> -#define=A0=A0 KVM_ARM_VCPU_PMU_V3_FILTER 2
+>> +#define=A0=A0 KVM_ARM_VCPU_PMU_V3_IRQ=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 0
+>> +#define=A0=A0 KVM_ARM_VCPU_PMU_V3_INIT=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 1
+>> +#define=A0=A0 KVM_ARM_VCPU_PMU_V3_FILTER=A0=A0=A0=A0=A0=A0=A0=A0 2
+>> +#define=A0=A0 KVM_ARM_VCPU_PMU_V3_NUM_EVENTS=A0=A0=A0=A0 3
+>> =A0#define KVM_ARM_VCPU_TIMER_CTRL=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
+=A0 1
+>> =A0#define=A0=A0 KVM_ARM_VCPU_TIMER_IRQ_VTIMER=A0=A0=A0=A0=A0=A0=A0=A0=
+=A0=A0=A0=A0=A0 0
+>> =A0#define=A0=A0 KVM_ARM_VCPU_TIMER_IRQ_PTIMER=A0=A0=A0=A0=A0=A0=A0=A0=
+=A0=A0=A0=A0=A0 1
+>> diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
+>> index 0458860bade2..c7915b95fec0 100644
+>> --- a/arch/arm64/kvm/pmu-emul.c
+>> +++ b/arch/arm64/kvm/pmu-emul.c
+>> @@ -253,6 +253,8 @@ void kvm_pmu_vcpu_init(struct kvm_vcpu *vcpu)
+>>
+>> =A0=A0=A0=A0=A0 for (i =3D 0; i < ARMV8_PMU_MAX_COUNTERS; i++)
+>> =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 pmu->pmc[i].idx =3D i;
+>> +
+>> +=A0=A0=A0=A0 pmu->num_events =3D perf_num_counters() - 1;
+>> =A0}
+>>
+>> =A0/**
+>> @@ -978,6 +980,25 @@ int kvm_arm_pmu_v3_set_attr(struct kvm_vcpu
+>> *vcpu, struct kvm_device_attr *attr)
+>>
+>> =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 return 0;
+>> =A0=A0=A0=A0=A0 }
+>> +=A0=A0=A0=A0 case KVM_ARM_VCPU_PMU_V3_NUM_EVENTS: {
+>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 u64 mask =3D ARMV8_PMU_PMCR_N_MASK=
+ << ARMV8_PMU_PMCR_N_SHIFT;
+>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 int __user *uaddr =3D (int __user =
+*)(long)attr->addr;
+>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 u32 num_events;
+>> +
+>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 if (get_user(num_events, uaddr))
+>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 return -EF=
+AULT;
+>> +
+>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 if (num_events >=3D perf_num_count=
+ers())
+>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 return -EI=
+NVAL;
+>> +
+>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 vcpu->arch.pmu.num_events =3D num_=
+events;
+>> +
+>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 num_events <<=3D ARMV8_PMU_PMCR_N_=
+SHIFT;
+>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 __vcpu_sys_reg(vcpu, SYS_PMCR_EL0)=
+ &=3D ~mask;
+>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 __vcpu_sys_reg(vcpu, SYS_PMCR_EL0)=
+ |=3D num_events;
+>> +
+>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 return 0;
+>> +=A0=A0=A0=A0 }
+>> =A0=A0=A0=A0=A0 case KVM_ARM_VCPU_PMU_V3_INIT:
+>> =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 return kvm_arm_pmu_v3_init(vcpu);
+>> =A0=A0=A0=A0=A0 }
+>> @@ -1004,6 +1025,16 @@ int kvm_arm_pmu_v3_get_attr(struct kvm_vcpu
+>> *vcpu, struct kvm_device_attr *attr)
+>> =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 irq =3D vcpu->arch.pmu.irq_num;
+>> =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 return put_user(irq, uaddr);
+>> =A0=A0=A0=A0=A0 }
+>> +=A0=A0=A0=A0 case KVM_ARM_VCPU_PMU_V3_NUM_EVENTS: {
+>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 int __user *uaddr =3D (int __user =
+*)(long)attr->addr;
+>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 u32 num_events;
+>> +
+>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 if (!test_bit(KVM_ARM_VCPU_PMU_V3,=
+ vcpu->arch.features))
+>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 return -EN=
+ODEV;
+>> +
+>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 num_events =3D vcpu->arch.pmu.num_=
+events;
+>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 return put_user(num_events, uaddr);
+>> +=A0=A0=A0=A0 }
+>> =A0=A0=A0=A0=A0 }
+>>
+>> =A0=A0=A0=A0=A0 return -ENXIO;
+>> @@ -1015,6 +1046,7 @@ int kvm_arm_pmu_v3_has_attr(struct kvm_vcpu
+>> *vcpu, struct kvm_device_attr *attr)
+>> =A0=A0=A0=A0=A0 case KVM_ARM_VCPU_PMU_V3_IRQ:
+>> =A0=A0=A0=A0=A0 case KVM_ARM_VCPU_PMU_V3_INIT:
+>> =A0=A0=A0=A0=A0 case KVM_ARM_VCPU_PMU_V3_FILTER:
+>> +=A0=A0=A0=A0 case KVM_ARM_VCPU_PMU_V3_NUM_EVENTS:
+>> =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 if (kvm_arm_support_pmu_v3() &&
+>> =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 test_bit(KVM_ARM_VCP=
+U_PMU_V3, vcpu->arch.features))
+>> =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 return 0;
+>> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+>> index 20ab2a7d37ca..d51e39600bbd 100644
+>> --- a/arch/arm64/kvm/sys_regs.c
+>> +++ b/arch/arm64/kvm/sys_regs.c
+>> @@ -672,6 +672,11 @@ static void reset_pmcr(struct kvm_vcpu *vcpu,
+>> const struct sys_reg_desc *r)
+>> =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 | (ARMV8_PMU_PMCR_MASK & 0xdecafbad=
+)) & (~ARMV8_PMU_PMCR_E);
+>> =A0=A0=A0=A0=A0 if (!system_supports_32bit_el0())
+>> =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 val |=3D ARMV8_PMU_PMCR_LC;
+>> +
+>> +=A0=A0=A0=A0 /* Override number of event selectors */
+>> +=A0=A0=A0=A0 val &=3D ~(ARMV8_PMU_PMCR_N_MASK << ARMV8_PMU_PMCR_N_SHIFT=
+);
+>> +=A0=A0=A0=A0 val |=3D (u32)vcpu->arch.pmu.num_events << ARMV8_PMU_PMCR_=
+N_SHIFT;
+>> +
+>> =A0=A0=A0=A0=A0 __vcpu_sys_reg(vcpu, r->reg) =3D val;
+>> =A0}
+>>
+>> diff --git a/include/kvm/arm_pmu.h b/include/kvm/arm_pmu.h
+>> index 98cbfe885a53..ea3fc96a37d9 100644
+>> --- a/include/kvm/arm_pmu.h
+>> +++ b/include/kvm/arm_pmu.h
+>> @@ -27,6 +27,7 @@ struct kvm_pmu {
+>> =A0=A0=A0=A0=A0 bool ready;
+>> =A0=A0=A0=A0=A0 bool created;
+>> =A0=A0=A0=A0=A0 bool irq_level;
+>> +=A0=A0=A0=A0 u8 num_events;
+>> =A0};
+>>
+>> =A0#define kvm_arm_pmu_v3_ready(v)=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
+=A0 ((v)->arch.pmu.ready)
+> =
+
+> I see several problems with this approach:
+> =
+
+> - userspace doesn't really have a good way to retrieve the number of
+>  =A0 counters.
+It does with v2, because it can then just read the register ;). I agree =
+
+that it's clunky though.
+
+> =
+
+> - Limiting the number of counters for the guest doesn't mean anything
+>  =A0 when it comes to the actual use of the HW counters, given that we
+>  =A0 don't allocate them ourselves (it's all perf doing the actual work).
+
+We do cap the number of actively requestable counters via perf by the =
+
+PMCR.N limit. So in a way, it does mean something.
+
+> - If you want to "pin" counters for the host, why don't you just do
+>  =A0 that before starting the guest?
+
+You can do that. Imagine I have 10 counters. I pin 4 of them to the =
+
+host. I still tell my guest that it can use 6. That means perf will then =
+
+time slice and juggle 10 guest event counters on those remaining 6 =
+
+hardware counters. That juggling heavily reduces accuracy.
+
+> I think you need to look at the bigger picture: how to limit the use
+> of physical counter usage for a given userspace task. This needs
+> to happen in perf itself, and not in KVM.
+
+That's definitely another way to look at it that I agree with.
+
+What we really want is to expose the number of counters the guest has =
+
+available, not the number of counters hardware can support at maximum.
+
+So in theory it would be enough to ask perf how many counters it does =
+
+have free for me to consume without overcommitting. But that would =
+
+potentially change between multiple invocations of KVM and thus break =
+
+things like live migration, no?
+
+Maybe what we really want is an interface to perf from user space to say =
+
+"how many counters can you dedicate to me?" and "reserve them for me". =
+
+Then user space could reserve them as dedicated counters and KVM would =
+
+just need to either probe for the reservation or get told by user space =
+
+what to expose via ONE_REG as Drew suggested. It'd be up to user space =
+
+to ensure that the reservation matches the number of exposed counters then.
+
+
+Thoughts?
+
+Alex
+
+
+
+Amazon Development Center Germany GmbH
+Krausenstr. 38
+10117 Berlin
+Geschaeftsfuehrung: Christian Schlaeger, Jonathan Weiss
+Eingetragen am Amtsgericht Charlottenburg unter HRB 149173 B
+Sitz: Berlin
+Ust-ID: DE 289 237 879
+
+
 
