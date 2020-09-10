@@ -2,50 +2,50 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3AC092642DE
-	for <lists+kvm@lfdr.de>; Thu, 10 Sep 2020 11:52:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 567CE2642EF
+	for <lists+kvm@lfdr.de>; Thu, 10 Sep 2020 11:54:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730433AbgIJJw2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 10 Sep 2020 05:52:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40722 "EHLO
+        id S1730598AbgIJJyG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 10 Sep 2020 05:54:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40734 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730418AbgIJJvS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 10 Sep 2020 05:51:18 -0400
-Received: from mail-pj1-x1043.google.com (mail-pj1-x1043.google.com [IPv6:2607:f8b0:4864:20::1043])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 83B0AC061573;
-        Thu, 10 Sep 2020 02:51:17 -0700 (PDT)
-Received: by mail-pj1-x1043.google.com with SMTP id a9so2767626pjg.1;
-        Thu, 10 Sep 2020 02:51:17 -0700 (PDT)
+        with ESMTP id S1730487AbgIJJvW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 10 Sep 2020 05:51:22 -0400
+Received: from mail-pg1-x543.google.com (mail-pg1-x543.google.com [IPv6:2607:f8b0:4864:20::543])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7FDB9C061756;
+        Thu, 10 Sep 2020 02:51:20 -0700 (PDT)
+Received: by mail-pg1-x543.google.com with SMTP id 5so3969021pgl.4;
+        Thu, 10 Sep 2020 02:51:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=Blehx/RsCjxhexTNdBAbuV+NrcKDgCDuzEEOkebWnFE=;
-        b=dytL7qehQzztnlbUdBSM8T5hf+VxNOCBpL/24z5fs4Kg5gVwvOyEerh/JykbVMXXv0
-         tn2DODpVzgu0YUGpAWKe8ATUON1qJzdQAui4lTpWUKwofInyzwM38QOuzvw0L6YJg1bP
-         MVrI0CCBWnOJUoHBFq+Spuvz+5ehyQG7A4wbKWIsz5YEgf5weqcwLIy5h9YHj4BIdZte
-         i5HVgsh1Ok4N9OGMMT5k8YDlHj6U/iVS8U1hYWGkuEy0eWkeOzj33blIpajczrVEEflB
-         SyQ54fiGEPRmC7axVm3rWj0itegV1UObql+KQTgHNfDgE4GLUXWzuoPr8RHDCnXd/E3M
-         VAWQ==
+        bh=8zHqH3bYwOpt/fl66BhVTKbXCR1yhQYjhkRrfj5pdDI=;
+        b=VjRprMti9hsYYvaafHw5p2Qte8v6onDPZtBdKHdHzzAIdAWJyU1+vcqBU2Puvh1cf+
+         jdX3EO8F9KxV/y+7+raQO+rn3uOOIWvCGTT7A0kJ+i9+gRg1om9GA8ryjQSbIy+uAjJ9
+         0McDaMrYmxLWIPn8nASuSXlwV0BzTly/jtB2K+x8PwpW+f4tJ26XHenPLEQZ/hdyIvLC
+         BFD7LRxq0MS7jyt9fmoVyjG0yNw+zvDaaq63LGmFSlozXwoMIhJhjN8nbf9IybycEOIH
+         81IxGLMlDxCglfwFvPfmpgApFm8Rn5AJdVVwJQMIM8UiMOyvuthBI/ZwePTxdb+9zTr1
+         0Kag==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references;
-        bh=Blehx/RsCjxhexTNdBAbuV+NrcKDgCDuzEEOkebWnFE=;
-        b=h57be6nbsS8N5yCvInj0Y9rK/HiqpH4Lt0w8RhS1V7MBofeQkdndYJgSWCx8xyogWM
-         XeDEbLhQ17Z/Xhb67lPxtCaVG/dQbN1T70Prxp7qBXTEZ8mIuNW3LWlX556BMwGxaM5Z
-         4S6cuAeYsEDB0BI+QN3QM2wFNVta1ZhasH7h3hFbaB4989ACCa3tqAV5W1OQwLNOt2uX
-         TJAHCzZR8J4jAWq2UlHuIgUmMKR1G6Yz5gEuogDUT5/ReQmRbByJayWpS0zyIjz4sCL/
-         cSK7t8tB9JruwMbAW1ercSwDOWFFSh3qElQqNsLnF9mo9ahkaOxcVT8Wanif+LvuwCTl
-         DMvg==
-X-Gm-Message-State: AOAM5329rHmfJQv0vzx471rdPedvXEnwHFiR2vz+QS17JY0Jc8Q3wcza
-        J/phQJoX2FkGTjxqeTkokyvjYVejYMc=
-X-Google-Smtp-Source: ABdhPJyQezQj+HJONXN4Ke47XI1Q9agwTLjxeb7n5zht75GG9c5NPJXGphDDb74zuOyJ46e84mNGYg==
-X-Received: by 2002:a17:90a:4687:: with SMTP id z7mr4537393pjf.144.1599731476796;
-        Thu, 10 Sep 2020 02:51:16 -0700 (PDT)
+        bh=8zHqH3bYwOpt/fl66BhVTKbXCR1yhQYjhkRrfj5pdDI=;
+        b=RMfJXYLdC8sAHQiQm1wJNV797r4cg+tg/npGNhsVzZcCTrUDPk7IPS0Vij4ZcLIKxB
+         zhD0WP8vXGPOf2F0UhzH6sMGhChqr+LPR7Kd5tO9zlz4M1oz/lt+y2b/TSS6pEOr96Ed
+         Gm9nMA6IqmoIvs2shxZO14S6Tj/mEQiNWqnTO9G3tziNSIe8QOUY4cUuBID1PlgnT+vZ
+         2NhIx9yCniiUisZ9VAbS/iSBd9dQmgIsP74vo55C7HlC3NPd2s5YkqA3UhpOCJYBW8hS
+         GV5S4aNxBB6sIja5lzXNFXiS5faXKCmIGj8GHHHM0/M0EegVBDKB9yOZlsz1AAcqJEUY
+         KSKg==
+X-Gm-Message-State: AOAM533BifNXw/0tOU7elk2iAsHNNMEuIl/zh5p40T2ryW2GWUf6x3tD
+        EdU9k1hrPIp5J+v4z90GC1b6riwqkTA=
+X-Google-Smtp-Source: ABdhPJy+Kw9FZXlSZos28NS770cn0ADEa/un0w+Jc2NoI8ezE6vme1iy/APwXHxMLocPXxAm0Xba5A==
+X-Received: by 2002:aa7:8f0b:0:b029:13e:d13d:a0fb with SMTP id x11-20020aa78f0b0000b029013ed13da0fbmr4566622pfr.23.1599731479685;
+        Thu, 10 Sep 2020 02:51:19 -0700 (PDT)
 Received: from localhost.localdomain ([103.7.29.6])
-        by smtp.googlemail.com with ESMTPSA id e1sm2576534pfl.162.2020.09.10.02.51.14
+        by smtp.googlemail.com with ESMTPSA id e1sm2576534pfl.162.2020.09.10.02.51.17
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 10 Sep 2020 02:51:16 -0700 (PDT)
+        Thu, 10 Sep 2020 02:51:19 -0700 (PDT)
 From:   Wanpeng Li <kernellwp@gmail.com>
 X-Google-Original-From: Wanpeng Li <wanpengli@tencent.com>
 To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
@@ -55,11 +55,10 @@ Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
         Joerg Roedel <joro@8bytes.org>,
-        "Paul K ." <kronenpj@kronenpj.dyndns.org>,
-        "# v5 . 8-rc1+" <stable@vger.kernel.org>
-Subject: [PATCH v2 7/9] KVM: SVM: Get rid of handle_fastpath_set_msr_irqoff()
-Date:   Thu, 10 Sep 2020 17:50:42 +0800
-Message-Id: <1599731444-3525-8-git-send-email-wanpengli@tencent.com>
+        "Paul K ." <kronenpj@kronenpj.dyndns.org>
+Subject: [PATCH v2 8/9] KVM: SVM: Move svm_complete_interrupts() into svm_vcpu_run()
+Date:   Thu, 10 Sep 2020 17:50:43 +0800
+Message-Id: <1599731444-3525-9-git-send-email-wanpengli@tencent.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1599731444-3525-1-git-send-email-wanpengli@tencent.com>
 References: <1599731444-3525-1-git-send-email-wanpengli@tencent.com>
@@ -70,42 +69,38 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Wanpeng Li <wanpengli@tencent.com>
 
-Analysis from Sean:
+Moving svm_complete_interrupts() into svm_vcpu_run() which can align VMX
+and SVM with respect to completing interrupts.
 
- | svm->next_rip is reset in svm_vcpu_run() only after calling
- | svm_exit_handlers_fastpath(), which will cause SVM's
- | skip_emulated_instruction() to write a stale RIP.
-
-Let's get rid of handle_fastpath_set_msr_irqoff() in svm_exit_handlers_fastpath()
-to have a quick fix.
-
-Reported-by: Paul K. <kronenpj@kronenpj.dyndns.org>
 Suggested-by: Sean Christopherson <sean.j.christopherson@intel.com>
 Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
 Cc: Paul K. <kronenpj@kronenpj.dyndns.org>
-Cc: <stable@vger.kernel.org> # v5.8-rc1+
-Fixes: 404d5d7bff0d (KVM: X86: Introduce more exit_fastpath_completion enum values)
 Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
 ---
- arch/x86/kvm/svm/svm.c | 5 -----
- 1 file changed, 5 deletions(-)
+ arch/x86/kvm/svm/svm.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
 diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index 19e622a..c61bc3b 100644
+index c61bc3b..dafc14d 100644
 --- a/arch/x86/kvm/svm/svm.c
 +++ b/arch/x86/kvm/svm/svm.c
-@@ -3349,11 +3349,6 @@ static void svm_cancel_injection(struct kvm_vcpu *vcpu)
+@@ -2938,8 +2938,6 @@ static int handle_exit(struct kvm_vcpu *vcpu, fastpath_t exit_fastpath)
+ 	if (npt_enabled)
+ 		vcpu->arch.cr3 = svm->vmcb->save.cr3;
  
- static fastpath_t svm_exit_handlers_fastpath(struct kvm_vcpu *vcpu)
- {
--	if (!is_guest_mode(vcpu) &&
--	    to_svm(vcpu)->vmcb->control.exit_code == SVM_EXIT_MSR &&
--	    to_svm(vcpu)->vmcb->control.exit_info_1)
--		return handle_fastpath_set_msr_irqoff(vcpu);
+-	svm_complete_interrupts(svm);
 -
- 	return EXIT_FASTPATH_NONE;
- }
+ 	if (is_guest_mode(vcpu)) {
+ 		int vmexit;
  
+@@ -3530,6 +3528,7 @@ static __no_kcsan fastpath_t svm_vcpu_run(struct kvm_vcpu *vcpu)
+ 		     SVM_EXIT_EXCP_BASE + MC_VECTOR))
+ 		svm_handle_mce(svm);
+ 
++	svm_complete_interrupts(svm);
+ 	vmcb_mark_all_clean(svm->vmcb);
+ 	return exit_fastpath;
+ }
 -- 
 2.7.4
 
