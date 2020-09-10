@@ -2,155 +2,205 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B20DE265431
-	for <lists+kvm@lfdr.de>; Thu, 10 Sep 2020 23:53:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3B1E126539A
+	for <lists+kvm@lfdr.de>; Thu, 10 Sep 2020 23:37:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728361AbgIJVnE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 10 Sep 2020 17:43:04 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:31817 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1730383AbgIJMug (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 10 Sep 2020 08:50:36 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1599742215;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=ZXGj6k8riNs9Vj4UP7tEqOTrYQ5CAKfprkP6QZPSeR4=;
-        b=c3mJVdEgnbMVsq7qaHoKPZ8fJGUJiqOTQ9renp8VAlCraP4vzN9NfUH4NHckUuRrpK0ML2
-        p2GfZSOSvX8LjHZBtlkLvNjg3EeQRPNQEWSXvYQ/MxDwMc7d/vLwhnT8rnlwJP66hrpBN4
-        Qxb7jhvuDmg9/a2JF5gZmI3tX/4nWO4=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-397-U04ae9iWPeWU-uZ_AL94hw-1; Thu, 10 Sep 2020 08:50:14 -0400
-X-MC-Unique: U04ae9iWPeWU-uZ_AL94hw-1
-Received: by mail-wm1-f70.google.com with SMTP id b73so2098314wmb.0
-        for <kvm@vger.kernel.org>; Thu, 10 Sep 2020 05:50:13 -0700 (PDT)
+        id S1728329AbgIJVhi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 10 Sep 2020 17:37:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47154 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730911AbgIJNeC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 10 Sep 2020 09:34:02 -0400
+Received: from mail-io1-xd43.google.com (mail-io1-xd43.google.com [IPv6:2607:f8b0:4864:20::d43])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8F7D7C0613ED
+        for <kvm@vger.kernel.org>; Thu, 10 Sep 2020 06:33:55 -0700 (PDT)
+Received: by mail-io1-xd43.google.com with SMTP id d18so7023727iop.13
+        for <kvm@vger.kernel.org>; Thu, 10 Sep 2020 06:33:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=tcd-ie.20150623.gappssmtp.com; s=20150623;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=NA4xq/RvWtw1DoG4R42VuDAYvxbq5gOs0uGkp97do30=;
+        b=fcQ8pRBPaEWiThwI4IpJI/6RvrpktlhqIcuTs8ion57IfAcoLZwMinlg018HPs4g0P
+         PfERQLGzgxTimYY/S16DcluJPa3UrMAv2VeDrvrD2khzMlgcNU3uG+U66xQTcGI4k/PB
+         tyd6Y57erW7Jw7CdoQkzGYnD3z09a+1xAJWCw3ZTA9vq0DdHjCGpzxmBZebxDdyQNZ5o
+         a8n4/aQGMi16zmzKxYbuyXtVYNEIktp6No97ibi4qLI+zDV4g/TXIXD87q5g2S3KNUFg
+         wjgBbIjqjQrEef6DxEeF173z4nhe4RTeiKBDtbYrCu4PSy+IwGvrlXsJFLKINZmU1V2I
+         yoXQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:message-id:subject:from:to:cc:date:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=ZXGj6k8riNs9Vj4UP7tEqOTrYQ5CAKfprkP6QZPSeR4=;
-        b=YHL5OQCmtI9QwpcHf46+p2aqgFLQh4zbPiwZi8s7YSGOf6CapBIWB1ke6KDS0EUPX5
-         IlwGxiQb4Z6sLes4p7zChtFdcAGWAX99MwmhLgeeFZonp3camdIlFE0vicpvTbZdtmcr
-         1H9CnOZyHARNQB75oA3q5x4TB7MVERinhVv1O2+cHqlDhN/nfqMXGhJiPTAHxnmQVA9x
-         gRS3aB4yQcfjbFGvbsrU6v7OzPFXyF0VrJn114owNYaBOdRHvqWWF/6UMRNYNn+XSQv6
-         MkG9RmyzYh5CvIlNsyFBByz+Q/VCFJmGvlSDdpUc/87Szc20RIKCUaKe3omgNvqx5LXx
-         RkWQ==
-X-Gm-Message-State: AOAM5330XvpUv/DGW2D3ZMLOQEmfk9Ja17tycjqexlV883U2jD8+NF9P
-        juX1EEdmKCXW0/K11BIs++zARz5Wce5jXM3tqk3TaD+GM+29K2XI/Jsfgm1wQbFnBO/9f5FpSkO
-        eEEUaACz6zxS+
-X-Received: by 2002:a1c:c910:: with SMTP id f16mr8297049wmb.82.1599742213070;
-        Thu, 10 Sep 2020 05:50:13 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxyXdpf4+Lc20wLIFYpjKwJB8sAx70dr7armMg6ykw8vcU9X+1byflhkDA11+n1XlghezjXOQ==
-X-Received: by 2002:a1c:c910:: with SMTP id f16mr8297020wmb.82.1599742212834;
-        Thu, 10 Sep 2020 05:50:12 -0700 (PDT)
-Received: from pop-os ([109.79.57.111])
-        by smtp.gmail.com with ESMTPSA id v7sm3484718wmj.28.2020.09.10.05.50.11
-        (version=TLS1_2 cipher=ECDHE-ECDSA-CHACHA20-POLY1305 bits=256/256);
-        Thu, 10 Sep 2020 05:50:12 -0700 (PDT)
-Message-ID: <7cebcb6c8d1a1452b43e8358ee6ee18a150a0238.camel@redhat.com>
-Subject: Re: device compatibility interface for live migration with assigned
- devices
-From:   Sean Mooney <smooney@redhat.com>
-To:     Cornelia Huck <cohuck@redhat.com>, Yan Zhao <yan.y.zhao@intel.com>
-Cc:     Alex Williamson <alex.williamson@redhat.com>,
-        Daniel =?ISO-8859-1?Q?P=2EBerrang=E9?= <berrange@redhat.com>,
-        kvm@vger.kernel.org, libvir-list@redhat.com,
-        Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org,
-        kwankhede@nvidia.com, eauger@redhat.com, xin-ran.wang@intel.com,
-        corbet@lwn.net, openstack-discuss@lists.openstack.org,
-        shaohe.feng@intel.com, kevin.tian@intel.com,
-        Parav Pandit <parav@mellanox.com>, jian-feng.ding@intel.com,
-        dgilbert@redhat.com, zhenyuw@linux.intel.com, hejie.xu@intel.com,
-        bao.yumeng@zte.com.cn, intel-gvt-dev@lists.freedesktop.org,
-        eskultet@redhat.com, Jiri Pirko <jiri@mellanox.com>,
-        dinechin@redhat.com, devel@ovirt.org
-Date:   Thu, 10 Sep 2020 13:50:11 +0100
-In-Reply-To: <20200910143822.2071eca4.cohuck@redhat.com>
-References: <20200818113652.5d81a392.cohuck@redhat.com>
-         <20200820003922.GE21172@joy-OptiPlex-7040>
-         <20200819212234.223667b3@x1.home>
-         <20200820031621.GA24997@joy-OptiPlex-7040>
-         <20200825163925.1c19b0f0.cohuck@redhat.com>
-         <20200826064117.GA22243@joy-OptiPlex-7040>
-         <20200828154741.30cfc1a3.cohuck@redhat.com>
-         <8f5345be73ebf4f8f7f51d6cdc9c2a0d8e0aa45e.camel@redhat.com>
-         <20200831044344.GB13784@joy-OptiPlex-7040>
-         <20200908164130.2fe0d106.cohuck@redhat.com>
-         <20200909021308.GA1277@joy-OptiPlex-7040>
-         <20200910143822.2071eca4.cohuck@redhat.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=NA4xq/RvWtw1DoG4R42VuDAYvxbq5gOs0uGkp97do30=;
+        b=Th+JScGjIfjjScPLmUb+ZxuJi/ar9sBEJkraBcKals6bOXKYULLn2cgqIXBy2hRiBl
+         KlSI/DHeH9p/rT3FxlV/BaaRKuODPWd5bHwOByT03VoKKaIzUK6FFe+fHTunOzuwW/xj
+         IpZzRfOSbjz2zBB1bHkXIEPOhhTSZdwsZMLzz7tAwOZUZm0jmmKZd9zd+gyD8eTfgy7D
+         VmwwF/OoBjQyZMGBazQOa8+pCZ2Q5lBmvWb/k9P2cyHAC/cFKeq7YgDV1OASCuC38/34
+         DD78VaVB6MdQxT0hQtbH1HnMKSVI6uYAgOZEM3aFmWmmTAQyl8nEGlijIwSs04YjY8pC
+         ewig==
+X-Gm-Message-State: AOAM531WoLzH6R0lgj8/swIjzmlC+XhjvkNoVCtQVjpbvEIcEErGvpeS
+        nYI4LXD8scxy3EA8BSntBGL5LVQWSdHT+urA+v7fNA==
+X-Google-Smtp-Source: ABdhPJzlID7Qr9FJiMTGq9orpwBT55dMvomyRpqx73nK5lHz5vZjsdxpDDRxLur0/nChDVSeWcISfULGX7CKyavrOhU=
+X-Received: by 2002:a02:834a:: with SMTP id w10mr8873252jag.63.1599744834395;
+ Thu, 10 Sep 2020 06:33:54 -0700 (PDT)
+MIME-Version: 1.0
+References: <20191221150402.13868-1-murphyt7@tcd.ie> <465815ae-9292-f37a-59b9-03949cb68460@deltatee.com>
+ <20200529124523.GA11817@infradead.org> <CGME20200529190523eucas1p2c086133e707257c0cdc002f502d4f51d@eucas1p2.samsung.com>
+ <33137cfb-603c-86e8-1091-f36117ecfaf3@deltatee.com> <ef2150d5-7b6a-df25-c10d-e43316fe7812@samsung.com>
+ <b9140772-0370-a858-578c-af503a06d8e9@deltatee.com> <CALQxJuutRaeX89k2o4ffTKYRMizmMu0XbRnzpFuSSrkQR02jKg@mail.gmail.com>
+ <766525c3-4da9-6db7-cd90-fb4b82cd8083@deltatee.com> <60a82319-cbee-4cd1-0d5e-3c407cc51330@linux.intel.com>
+ <e598fb31-ef7a-c2ee-8a54-bf62d50c480c@deltatee.com> <b27cae1f-07ff-bef2-f125-a5f0d968016d@linux.intel.com>
+ <CALQxJut5c=cWdi+SVkN3JnbkhPSYmLkOyRUhduL-UJ9gyKn9Ow@mail.gmail.com>
+ <7106602a-9964-851e-9c4e-d8acf4033b89@linux.intel.com> <ea24e077-5aa6-dd8e-69a7-d186b606703f@linux.intel.com>
+In-Reply-To: <ea24e077-5aa6-dd8e-69a7-d186b606703f@linux.intel.com>
+From:   Tom Murphy <murphyt7@tcd.ie>
+Date:   Thu, 10 Sep 2020 14:33:43 +0100
+Message-ID: <CALQxJus4prs0T6G9Z4bw5BDgwmkaiynBcoknLsYEY45SNZ6Ukg@mail.gmail.com>
+Subject: Re: [Intel-gfx] [PATCH 0/8] Convert the intel iommu driver to the
+ dma-iommu api
+To:     Tvrtko Ursulin <tvrtko.ursulin@linux.intel.com>
+Cc:     kvm@vger.kernel.org, David Airlie <airlied@linux.ie>,
+        dri-devel@lists.freedesktop.org,
+        Bjorn Andersson <bjorn.andersson@linaro.org>,
+        Matthias Brugger <matthias.bgg@gmail.com>,
+        Julien Grall <julien.grall@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Marek Szyprowski <m.szyprowski@samsung.com>,
+        Jean-Philippe Brucker <jean-philippe@linaro.org>,
+        linux-samsung-soc@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
+        Krzysztof Kozlowski <krzk@kernel.org>,
+        Jonathan Hunter <jonathanh@nvidia.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        linux-rockchip@lists.infradead.org, Andy Gross <agross@kernel.org>,
+        Gerald Schaefer <gerald.schaefer@de.ibm.com>,
+        linux-s390@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+        intel-gfx@lists.freedesktop.org,
+        Robin Murphy <robin.murphy@arm.com>,
+        linux-mediatek@lists.infradead.org, linux-tegra@vger.kernel.org,
+        Thomas Gleixner <tglx@linutronix.de>,
+        virtualization@lists.linux-foundation.org,
+        linux-arm-kernel@lists.infradead.org,
+        David Woodhouse <dwmw2@infradead.org>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        iommu@lists.linux-foundation.org, Kukjin Kim <kgene@kernel.org>,
+        Logan Gunthorpe <logang@deltatee.com>
 Content-Type: text/plain; charset="UTF-8"
-X-Mailer: Evolution 3.28.5-0ubuntu0.18.04.2 
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 2020-09-10 at 14:38 +0200, Cornelia Huck wrote:
-> On Wed, 9 Sep 2020 10:13:09 +0800
-> Yan Zhao <yan.y.zhao@intel.com> wrote:
-> 
-> > > > still, I'd like to put it more explicitly to make ensure it's not missed:
-> > > > the reason we want to specify compatible_type as a trait and check
-> > > > whether target compatible_type is the superset of source
-> > > > compatible_type is for the consideration of backward compatibility.
-> > > > e.g.
-> > > > an old generation device may have a mdev type xxx-v4-yyy, while a newer
-> > > > generation  device may be of mdev type xxx-v5-yyy.
-> > > > with the compatible_type traits, the old generation device is still
-> > > > able to be regarded as compatible to newer generation device even their
-> > > > mdev types are not equal.  
-> > > 
-> > > If you want to support migration from v4 to v5, can't the (presumably
-> > > newer) driver that supports v5 simply register the v4 type as well, so
-> > > that the mdev can be created as v4? (Just like QEMU versioned machine
-> > > types work.)  
-> > 
-> > yes, it should work in some conditions.
-> > but it may not be that good in some cases when v5 and v4 in the name string
-> > of mdev type identify hardware generation (e.g. v4 for gen8, and v5 for
-> > gen9)
-> > 
-> > e.g.
-> > (1). when src mdev type is v4 and target mdev type is v5 as
-> > software does not support it initially, and v4 and v5 identify hardware
-> > differences.
-> 
-> My first hunch here is: Don't introduce types that may be compatible
-> later. Either make them compatible, or make them distinct by design,
-> and possibly add a different, compatible type later.
-> 
-> > then after software upgrade, v5 is now compatible to v4, should the
-> > software now downgrade mdev type from v5 to v4?
-> > not sure if moving hardware generation info into a separate attribute
-> > from mdev type name is better. e.g. remove v4, v5 in mdev type, while use
-> > compatible_pci_ids to identify compatibility.
-> 
-> If the generations are compatible, don't mention it in the mdev type.
-> If they aren't, use distinct types, so that management software doesn't
-> have to guess. At least that would be my naive approach here.
-yep that is what i would prefer to see too.
-> 
-> > 
-> > (2) name string of mdev type is composed by "driver_name + type_name".
-> > in some devices, e.g. qat, different generations of devices are binding to
-> > drivers of different names, e.g. "qat-v4", "qat-v5".
-> > then though type_name is equal, mdev type is not equal. e.g.
-> > "qat-v4-type1", "qat-v5-type1".
-> 
-> I guess that shows a shortcoming of that "driver_name + type_name"
-> approach? Or maybe I'm just confused.
-yes i really dont like haveing the version in the mdev-type name 
-i would stongly perfger just qat-type-1 wehere qat is just there as a way of namespacing.
-although symmetric-cryto, asymmetric-cryto and compression woudl be a better name then type-1, type-2, type-3 if
-that is what they would end up mapping too. e.g. qat-compression or qat-aes is a much better name then type-1
-higher layers of software are unlikely to parse the mdev names but as a human looking at them its much eaiser to
-understand if the names are meaningful. the qat prefix i think is important however to make sure that your mdev-types
-dont colide with other vendeors mdev types. so i woudl encurage all vendors to prefix there mdev types with etiher the
-device name or the vendor.
-> 
+On Wed, 9 Sep 2020 at 13:56, Tvrtko Ursulin
+<tvrtko.ursulin@linux.intel.com> wrote:
+>
+>
+> On 09/09/2020 10:16, Tvrtko Ursulin wrote:
+> > On 08/09/2020 23:43, Tom Murphy wrote:
+> >> On Tue, 8 Sep 2020 at 16:56, Tvrtko Ursulin
+> >> <tvrtko.ursulin@linux.intel.com> wrote:
+> >>> On 08/09/2020 16:44, Logan Gunthorpe wrote:
+> >>>> On 2020-09-08 9:28 a.m., Tvrtko Ursulin wrote:
+> >>>>>>
+> >>>>>> diff --git a/drivers/gpu/drm/i915/i915_scatterlist.h
+> >>>>>> b/drivers/gpu/drm/i915/i915
+> >>>>>> index b7b59328cb76..9367ac801f0c 100644
+> >>>>>> --- a/drivers/gpu/drm/i915/i915_scatterlist.h
+> >>>>>> +++ b/drivers/gpu/drm/i915/i915_scatterlist.h
+> >>>>>> @@ -27,13 +27,19 @@ static __always_inline struct sgt_iter {
+> >>>>>>     } __sgt_iter(struct scatterlist *sgl, bool dma) {
+> >>>>>>            struct sgt_iter s = { .sgp = sgl };
+> >>>>>>
+> >>>>>> +       if (sgl && !sg_dma_len(s.sgp))
+> >>>>>
+> >>>>> I'd extend the condition to be, just to be safe:
+> >>>>>       if (dma && sgl && !sg_dma_len(s.sgp))
+> >>>>>
+> >>>>
+> >>>> Right, good catch, that's definitely necessary.
+> >>>>
+> >>>>>> +               s.sgp = NULL;
+> >>>>>> +
+> >>>>>>            if (s.sgp) {
+> >>>>>>                    s.max = s.curr = s.sgp->offset;
+> >>>>>> -               s.max += s.sgp->length;
+> >>>>>> -               if (dma)
+> >>>>>> +
+> >>>>>> +               if (dma) {
+> >>>>>> +                       s.max += sg_dma_len(s.sgp);
+> >>>>>>                            s.dma = sg_dma_address(s.sgp);
+> >>>>>> -               else
+> >>>>>> +               } else {
+> >>>>>> +                       s.max += s.sgp->length;
+> >>>>>>                            s.pfn = page_to_pfn(sg_page(s.sgp));
+> >>>>>> +               }
+> >>>>>
+> >>>>> Otherwise has this been tested or alternatively how to test it?
+> >>>>> (How to
+> >>>>> repro the issue.)
+> >>>>
+> >>>> It has not been tested. To test it, you need Tom's patch set without
+> >>>> the
+> >>>> last "DO NOT MERGE" patch:
+> >>>>
+> >>>> https://lkml.kernel.org/lkml/20200907070035.GA25114@infradead.org/T/
+> >>>
+> >>> Tom, do you have a branch somewhere I could pull from? (Just being lazy
+> >>> about downloading a bunch of messages from the archives.)
+> >>
+> >> I don't unfortunately. I'm working locally with poor internet.
+> >>
+> >>>
+> >>> What GPU is in your Lenovo x1 carbon 5th generation and what
+> >>> graphical/desktop setup I need to repro?
+> >>
+> >>
+> >> Is this enough info?:
+> >>
+> >> $ lspci -vnn | grep VGA -A 12
+> >> 00:02.0 VGA compatible controller [0300]: Intel Corporation HD
+> >> Graphics 620 [8086:5916] (rev 02) (prog-if 00 [VGA controller])
+> >>      Subsystem: Lenovo ThinkPad X1 Carbon 5th Gen [17aa:224f]
+> >>      Flags: bus master, fast devsel, latency 0, IRQ 148
+> >>      Memory at eb000000 (64-bit, non-prefetchable) [size=16M]
+> >>      Memory at 60000000 (64-bit, prefetchable) [size=256M]
+> >>      I/O ports at e000 [size=64]
+> >>      [virtual] Expansion ROM at 000c0000 [disabled] [size=128K]
+> >>      Capabilities: [40] Vendor Specific Information: Len=0c <?>
+> >>      Capabilities: [70] Express Root Complex Integrated Endpoint, MSI 00
+> >>      Capabilities: [ac] MSI: Enable+ Count=1/1 Maskable- 64bit-
+> >>      Capabilities: [d0] Power Management version 2
+> >>      Capabilities: [100] Process Address Space ID (PASID)
+> >>      Capabilities: [200] Address Translation Service (ATS)
+> >
+> > Works for a start. What about the steps to repro? Any desktop
+> > environment and it is just visual corruption, no hangs/stalls or such?
+> >
+> > I've submitted a series consisting of what I understood are the patches
+> > needed to repro the issue to our automated CI here:
+> >
+> > https://patchwork.freedesktop.org/series/81489/
+> >
+> > So will see if it will catch something, or more targeted testing will be
+> > required. Hopefully it does trip over in which case I can add the patch
+> > suggested by Logan on top and see if that fixes it. Or I'll need to
+> > write a new test case.
+> >
+> > If you could glance over my series to check I identified the patches
+> > correctly it would be appreciated.
+>
+> Our CI was more than capable at catching the breakage so I've copied you
+> on a patch (https://patchwork.freedesktop.org/series/81497/) which has a
+> good potential to fix this. (Or improve the robustness of our sg walks,
+> depends how you look at it.)
+>
+> Would you be able to test it in your environment by any chance? If it
+> works I understand it unblocks your IOMMU work, right?
 
+I tested your latest patch set ([PATCH 1/2] drm/i915: Fix DMA mapped
+scatterlist walks) and it fixes the issue. great work!
+
+>
+> Regards,
+>
+> Tvrtko
