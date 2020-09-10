@@ -2,284 +2,223 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 10A672640ED
-	for <lists+kvm@lfdr.de>; Thu, 10 Sep 2020 11:08:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 114522640F0
+	for <lists+kvm@lfdr.de>; Thu, 10 Sep 2020 11:09:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729298AbgIJJIx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 10 Sep 2020 05:08:53 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:38906 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1728264AbgIJJIv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 10 Sep 2020 05:08:51 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1599728929;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=mVa0T5osyyqVvof03O1uIvNYi/AqP9rH2A9BlQ3d+sw=;
-        b=EZcsCd5l5dVfkaGgJhDanlG1o7fs/6677LN7MVfBdLO0XdszGgZnjw9FgoDDb9eVGcwBCh
-        EZJWKDJGHW0STiJfsi0rwRXzn+9JxOev0yQGCMbcg6ceT7OWmNZWWds6sn1HpbV93FNmLA
-        DjkiDqORN8j7zjiQGhWc2YOVMo0AXuY=
-Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
- [209.85.208.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-318-Ng4hHNEbMbmEPxzCCP53Mg-1; Thu, 10 Sep 2020 05:08:44 -0400
-X-MC-Unique: Ng4hHNEbMbmEPxzCCP53Mg-1
-Received: by mail-ed1-f71.google.com with SMTP id x14so2155256edv.8
-        for <kvm@vger.kernel.org>; Thu, 10 Sep 2020 02:08:43 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=mVa0T5osyyqVvof03O1uIvNYi/AqP9rH2A9BlQ3d+sw=;
-        b=fXLGcVw4yxishtZzK2o6c64G/QYnXxYk1aZFe8RNOD5D4VcPIuYfAUzga1TuiL+iyX
-         K14pZ/KGY/FwjCt8XNwQxByEoJLIUpd1FXFgKGuyrs6peS3nZnxKQWmMLCU6vepHr3pR
-         hQeeLCYjNupo/YqTDZu8qOl/UZixBJ78t2QhTo1a+Q/sdThgRDFeKy2gdfJVTFPm4Wa7
-         UV/+9jFpfJRBU8w7dvJZ2zjBs1n9exUi+y09xJvvvX4e6/+Z6tb8UahLTHaTkR1EMg7Z
-         3TyNm56poE9d1Wdj7gmCu5UcctvH2J1OJfqgTddhqi1CgQgEReMkyftRh+WZwW0ryWXN
-         UKkw==
-X-Gm-Message-State: AOAM532ihHXANtRQ2pQVPgP19R/nLJBoobyPQBGRwyoccozVODF/W+BO
-        NRxmBvQfPiOVJTaq7LPkNJGf0sLSsFN214mD2vsKb2aSUvKcJXrmjagE5egrnGlLnKmnIPbzM0m
-        J9mi0ZVyGAp4j
-X-Received: by 2002:a50:e79c:: with SMTP id b28mr8408099edn.371.1599728922798;
-        Thu, 10 Sep 2020 02:08:42 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJz9eOqrlCECRH6MG50KfAmNafiSMb7Yc+/HffHf28/7mAj1OyLe6oMQieOzo6YU+ROlMiNXbA==
-X-Received: by 2002:a50:e79c:: with SMTP id b28mr8408080edn.371.1599728922550;
-        Thu, 10 Sep 2020 02:08:42 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:2744:1c91:fa55:fa01? ([2001:b07:6468:f312:2744:1c91:fa55:fa01])
-        by smtp.gmail.com with ESMTPSA id m16sm6120969ejl.69.2020.09.10.02.08.41
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 10 Sep 2020 02:08:42 -0700 (PDT)
-Subject: Re: [PATCH 1/6] hw/ssi/aspeed_smc: Rename max_slaves as max_devices
-To:     =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
-        qemu-devel@nongnu.org
-Cc:     =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
-        kvm@vger.kernel.org, qemu-arm@nongnu.org,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        Laurent Vivier <lvivier@redhat.com>,
-        Peter Maydell <peter.maydell@linaro.org>,
-        Andrew Jeffery <andrew@aj.id.au>,
-        Jason Wang <jasowang@redhat.com>,
-        Thomas Huth <thuth@redhat.com>,
-        Alistair Francis <alistair@alistair23.me>,
-        qemu-trivial@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>,
-        Richard Henderson <rth@twiddle.net>,
-        Joel Stanley <joel@jms.id.au>
-References: <20200910070131.435543-1-philmd@redhat.com>
- <20200910070131.435543-2-philmd@redhat.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <34760c71-c6da-4730-2b1a-5c5be0b7ff9f@redhat.com>
-Date:   Thu, 10 Sep 2020 11:08:47 +0200
+        id S1730136AbgIJJJ1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 10 Sep 2020 05:09:27 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:42284 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1729449AbgIJJJH (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 10 Sep 2020 05:09:07 -0400
+Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 08A92hQk016236;
+        Thu, 10 Sep 2020 05:08:57 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=0Xf6ulvf5nlmiqQAG5vurl0uQLrsvKj/yVP3jlzR/Tk=;
+ b=WDw6FTLRHRS2FWOLCzPPwdbjTPjYfe+awpJRBjZT7RHqysm8/5fxodH9DUV9ToPiRyKk
+ bLG6GIUKbPh+qsJL8QgfEZpXfcZdMk6u16v2+qB/g2lbY16fLz7S33xIdM6j9gmuHkuW
+ LSuMJTs+DLqJzOZNHqqJdutV1CvfkvxTKGTU5Le/CYbtaJqMnpJ8vOrG6Mr2s7LRJ6at
+ KwVYcoFXn3iX8uxWewEb74WYd573d1ubKIRlaI8qYna/vS0dUefNN40va0DtL7mL8fm3
+ 6CkPMHcYP+QH7nKOt8/N9BH2hHPY29l6hAp/iwIWXs9YPfetSw3hj2XPSYkH1YlW8nYJ Fw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 33fg9ehxhm-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 10 Sep 2020 05:08:57 -0400
+Received: from m0098413.ppops.net (m0098413.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 08A92mmJ016463;
+        Thu, 10 Sep 2020 05:08:57 -0400
+Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 33fg9ehxh3-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 10 Sep 2020 05:08:57 -0400
+Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
+        by ppma04ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 08A98tNP026417;
+        Thu, 10 Sep 2020 09:08:55 GMT
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
+        by ppma04ams.nl.ibm.com with ESMTP id 33c2a8duxw-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 10 Sep 2020 09:08:55 +0000
+Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
+        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 08A98qJG12976544
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 10 Sep 2020 09:08:52 GMT
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 866F811C04A;
+        Thu, 10 Sep 2020 09:08:52 +0000 (GMT)
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id B0D9411C04C;
+        Thu, 10 Sep 2020 09:08:51 +0000 (GMT)
+Received: from oc7455500831.ibm.com (unknown [9.145.4.97])
+        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Thu, 10 Sep 2020 09:08:51 +0000 (GMT)
+Subject: Re: [PATCH v12 1/2] virtio: let arch advertise guest's memory access
+ restrictions
+To:     Pierre Morel <pmorel@linux.ibm.com>, linux-kernel@vger.kernel.org
+Cc:     pasic@linux.ibm.com, frankja@linux.ibm.com, mst@redhat.com,
+        jasowang@redhat.com, cohuck@redhat.com, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, thomas.lendacky@amd.com,
+        david@gibson.dropbear.id.au, linuxram@us.ibm.com,
+        hca@linux.ibm.com, gor@linux.ibm.com
+References: <1599728030-17085-1-git-send-email-pmorel@linux.ibm.com>
+ <1599728030-17085-2-git-send-email-pmorel@linux.ibm.com>
+From:   Christian Borntraeger <borntraeger@de.ibm.com>
+Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
+ 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
+ nS4h0HDFPrrp1C2EMVYIQrMokWvlFZbCpsdYbBI=
+Message-ID: <bf1da509-be1a-5576-3859-f7e617422ddd@de.ibm.com>
+Date:   Thu, 10 Sep 2020 11:08:51 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <20200910070131.435543-2-philmd@redhat.com>
+In-Reply-To: <1599728030-17085-2-git-send-email-pmorel@linux.ibm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
+ definitions=2020-09-10_01:2020-09-10,2020-09-10 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ malwarescore=0 mlxscore=0 suspectscore=0 clxscore=1011 adultscore=0
+ spamscore=0 phishscore=0 mlxlogscore=999 bulkscore=0 lowpriorityscore=0
+ impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2006250000 definitions=main-2009100080
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 10/09/20 09:01, Philippe Mathieu-Daudé wrote:
-> In order to use inclusive terminology, rename max_slaves
-> as max_devices.
+
+
+On 10.09.20 10:53, Pierre Morel wrote:
+> An architecture may restrict host access to guest memory,
+> e.g. IBM s390 Secure Execution or AMD SEV.
 > 
-> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+> Provide a new Kconfig entry the architecture can select,
+> CONFIG_ARCH_HAS_RESTRICTED_VIRTIO_MEMORY_ACCESS, when it provides
+> the arch_has_restricted_virtio_memory_access callback to advertise
+> to VIRTIO common code when the architecture restricts memory access
+> from the host.
+> 
+> The common code can then fail the probe for any device where
+> VIRTIO_F_ACCESS_PLATFORM is required, but not set.
+> 
+> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+> Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+> Reviewed-by: Halil Pasic <pasic@linux.ibm.com>
 
-I think we should consider a wholesale replacement of SSISlave with
-SSIPeripheral according to the proposal at
-https://www.oshwa.org/a-resolution-to-redefine-spi-signal-names/.
+Acked-by: Christian Borntraeger <borntraeger@de.ibm.com>
 
-Paolo
 
 > ---
->  include/hw/ssi/aspeed_smc.h |  2 +-
->  hw/ssi/aspeed_smc.c         | 40 ++++++++++++++++++-------------------
->  2 files changed, 21 insertions(+), 21 deletions(-)
+>  drivers/virtio/Kconfig        |  6 ++++++
+>  drivers/virtio/virtio.c       | 15 +++++++++++++++
+>  include/linux/virtio_config.h | 10 ++++++++++
+>  3 files changed, 31 insertions(+)
 > 
-> diff --git a/include/hw/ssi/aspeed_smc.h b/include/hw/ssi/aspeed_smc.h
-> index 6fbbb238f15..52ae34e38d1 100644
-> --- a/include/hw/ssi/aspeed_smc.h
-> +++ b/include/hw/ssi/aspeed_smc.h
-> @@ -42,7 +42,7 @@ typedef struct AspeedSMCController {
->      uint8_t r_timings;
->      uint8_t nregs_timings;
->      uint8_t conf_enable_w0;
-> -    uint8_t max_slaves;
-> +    uint8_t max_devices;
->      const AspeedSegments *segments;
->      hwaddr flash_window_base;
->      uint32_t flash_window_size;
-> diff --git a/hw/ssi/aspeed_smc.c b/hw/ssi/aspeed_smc.c
-> index 795784e5f36..8219272016c 100644
-> --- a/hw/ssi/aspeed_smc.c
-> +++ b/hw/ssi/aspeed_smc.c
-> @@ -259,7 +259,7 @@ static const AspeedSMCController controllers[] = {
->          .r_timings         = R_TIMINGS,
->          .nregs_timings     = 1,
->          .conf_enable_w0    = CONF_ENABLE_W0,
-> -        .max_slaves        = 1,
-> +        .max_devices       = 1,
->          .segments          = aspeed_segments_legacy,
->          .flash_window_base = ASPEED_SOC_SMC_FLASH_BASE,
->          .flash_window_size = 0x6000000,
-> @@ -275,7 +275,7 @@ static const AspeedSMCController controllers[] = {
->          .r_timings         = R_TIMINGS,
->          .nregs_timings     = 1,
->          .conf_enable_w0    = CONF_ENABLE_W0,
-> -        .max_slaves        = 5,
-> +        .max_devices       = 5,
->          .segments          = aspeed_segments_fmc,
->          .flash_window_base = ASPEED_SOC_FMC_FLASH_BASE,
->          .flash_window_size = 0x10000000,
-> @@ -293,7 +293,7 @@ static const AspeedSMCController controllers[] = {
->          .r_timings         = R_SPI_TIMINGS,
->          .nregs_timings     = 1,
->          .conf_enable_w0    = SPI_CONF_ENABLE_W0,
-> -        .max_slaves        = 1,
-> +        .max_devices       = 1,
->          .segments          = aspeed_segments_spi,
->          .flash_window_base = ASPEED_SOC_SPI_FLASH_BASE,
->          .flash_window_size = 0x10000000,
-> @@ -309,7 +309,7 @@ static const AspeedSMCController controllers[] = {
->          .r_timings         = R_TIMINGS,
->          .nregs_timings     = 1,
->          .conf_enable_w0    = CONF_ENABLE_W0,
-> -        .max_slaves        = 3,
-> +        .max_devices       = 3,
->          .segments          = aspeed_segments_ast2500_fmc,
->          .flash_window_base = ASPEED_SOC_FMC_FLASH_BASE,
->          .flash_window_size = 0x10000000,
-> @@ -327,7 +327,7 @@ static const AspeedSMCController controllers[] = {
->          .r_timings         = R_TIMINGS,
->          .nregs_timings     = 1,
->          .conf_enable_w0    = CONF_ENABLE_W0,
-> -        .max_slaves        = 2,
-> +        .max_devices       = 2,
->          .segments          = aspeed_segments_ast2500_spi1,
->          .flash_window_base = ASPEED_SOC_SPI_FLASH_BASE,
->          .flash_window_size = 0x8000000,
-> @@ -343,7 +343,7 @@ static const AspeedSMCController controllers[] = {
->          .r_timings         = R_TIMINGS,
->          .nregs_timings     = 1,
->          .conf_enable_w0    = CONF_ENABLE_W0,
-> -        .max_slaves        = 2,
-> +        .max_devices       = 2,
->          .segments          = aspeed_segments_ast2500_spi2,
->          .flash_window_base = ASPEED_SOC_SPI2_FLASH_BASE,
->          .flash_window_size = 0x8000000,
-> @@ -359,7 +359,7 @@ static const AspeedSMCController controllers[] = {
->          .r_timings         = R_TIMINGS,
->          .nregs_timings     = 1,
->          .conf_enable_w0    = CONF_ENABLE_W0,
-> -        .max_slaves        = 3,
-> +        .max_devices       = 3,
->          .segments          = aspeed_segments_ast2600_fmc,
->          .flash_window_base = ASPEED26_SOC_FMC_FLASH_BASE,
->          .flash_window_size = 0x10000000,
-> @@ -377,7 +377,7 @@ static const AspeedSMCController controllers[] = {
->          .r_timings         = R_TIMINGS,
->          .nregs_timings     = 2,
->          .conf_enable_w0    = CONF_ENABLE_W0,
-> -        .max_slaves        = 2,
-> +        .max_devices       = 2,
->          .segments          = aspeed_segments_ast2600_spi1,
->          .flash_window_base = ASPEED26_SOC_SPI_FLASH_BASE,
->          .flash_window_size = 0x10000000,
-> @@ -395,7 +395,7 @@ static const AspeedSMCController controllers[] = {
->          .r_timings         = R_TIMINGS,
->          .nregs_timings     = 3,
->          .conf_enable_w0    = CONF_ENABLE_W0,
-> -        .max_slaves        = 3,
-> +        .max_devices       = 3,
->          .segments          = aspeed_segments_ast2600_spi2,
->          .flash_window_base = ASPEED26_SOC_SPI2_FLASH_BASE,
->          .flash_window_size = 0x10000000,
-> @@ -476,7 +476,7 @@ static bool aspeed_smc_flash_overlap(const AspeedSMCState *s,
->      AspeedSegments seg;
->      int i;
+> diff --git a/drivers/virtio/Kconfig b/drivers/virtio/Kconfig
+> index 5c92e4a50882..ef2d49430800 100644
+> --- a/drivers/virtio/Kconfig
+> +++ b/drivers/virtio/Kconfig
+> @@ -6,6 +6,12 @@ config VIRTIO
+>  	  bus, such as CONFIG_VIRTIO_PCI, CONFIG_VIRTIO_MMIO, CONFIG_RPMSG
+>  	  or CONFIG_S390_GUEST.
 >  
-> -    for (i = 0; i < s->ctrl->max_slaves; i++) {
-> +    for (i = 0; i < s->ctrl->max_devices; i++) {
->          if (i == cs) {
->              continue;
->          }
-> @@ -537,7 +537,7 @@ static void aspeed_smc_flash_set_segment(AspeedSMCState *s, int cs,
->       */
->      if ((s->ctrl->segments == aspeed_segments_ast2500_spi1 ||
->           s->ctrl->segments == aspeed_segments_ast2500_spi2) &&
-> -        cs == s->ctrl->max_slaves &&
-> +        cs == s->ctrl->max_devices &&
->          seg.addr + seg.size != s->ctrl->segments[cs].addr +
->          s->ctrl->segments[cs].size) {
->          qemu_log_mask(LOG_GUEST_ERROR,
-> @@ -948,7 +948,7 @@ static void aspeed_smc_reset(DeviceState *d)
->      }
+> +config ARCH_HAS_RESTRICTED_VIRTIO_MEMORY_ACCESS
+> +	bool
+> +	help
+> +	  This option is selected if the architecture may need to enforce
+> +	  VIRTIO_F_ACCESS_PLATFORM
+> +
+>  menuconfig VIRTIO_MENU
+>  	bool "Virtio drivers"
+>  	default y
+> diff --git a/drivers/virtio/virtio.c b/drivers/virtio/virtio.c
+> index a977e32a88f2..a2b3f12e10a2 100644
+> --- a/drivers/virtio/virtio.c
+> +++ b/drivers/virtio/virtio.c
+> @@ -176,6 +176,21 @@ int virtio_finalize_features(struct virtio_device *dev)
+>  	if (ret)
+>  		return ret;
 >  
->      /* setup the default segment register values and regions for all */
-> -    for (i = 0; i < s->ctrl->max_slaves; ++i) {
-> +    for (i = 0; i < s->ctrl->max_devices; ++i) {
->          aspeed_smc_flash_set_segment_region(s, i,
->                      s->ctrl->segment_to_reg(s, &s->ctrl->segments[i]));
->      }
-> @@ -995,8 +995,8 @@ static uint64_t aspeed_smc_read(void *opaque, hwaddr addr, unsigned int size)
->          (s->ctrl->has_dma && addr == R_DMA_DRAM_ADDR) ||
->          (s->ctrl->has_dma && addr == R_DMA_LEN) ||
->          (s->ctrl->has_dma && addr == R_DMA_CHECKSUM) ||
-> -        (addr >= R_SEG_ADDR0 && addr < R_SEG_ADDR0 + s->ctrl->max_slaves) ||
-> -        (addr >= s->r_ctrl0 && addr < s->r_ctrl0 + s->ctrl->max_slaves)) {
-> +        (addr >= R_SEG_ADDR0 && addr < R_SEG_ADDR0 + s->ctrl->max_devices) ||
-> +        (addr >= s->r_ctrl0 && addr < s->r_ctrl0 + s->ctrl->max_devices)) {
+> +	ret = arch_has_restricted_virtio_memory_access();
+> +	if (ret) {
+> +		if (!virtio_has_feature(dev, VIRTIO_F_VERSION_1)) {
+> +			dev_warn(&dev->dev,
+> +				 "device must provide VIRTIO_F_VERSION_1\n");
+> +			return -ENODEV;
+> +		}
+> +
+> +		if (!virtio_has_feature(dev, VIRTIO_F_ACCESS_PLATFORM)) {
+> +			dev_warn(&dev->dev,
+> +				 "device must provide VIRTIO_F_ACCESS_PLATFORM\n");
+> +			return -ENODEV;
+> +		}
+> +	}
+> +
+>  	if (!virtio_has_feature(dev, VIRTIO_F_VERSION_1))
+>  		return 0;
 >  
->          trace_aspeed_smc_read(addr, size, s->regs[addr]);
->  
-> @@ -1270,7 +1270,7 @@ static void aspeed_smc_write(void *opaque, hwaddr addr, uint64_t data,
->          int cs = addr - s->r_ctrl0;
->          aspeed_smc_flash_update_ctrl(&s->flashes[cs], value);
->      } else if (addr >= R_SEG_ADDR0 &&
-> -               addr < R_SEG_ADDR0 + s->ctrl->max_slaves) {
-> +               addr < R_SEG_ADDR0 + s->ctrl->max_devices) {
->          int cs = addr - R_SEG_ADDR0;
->  
->          if (value != s->regs[R_SEG_ADDR0 + cs]) {
-> @@ -1341,10 +1341,10 @@ static void aspeed_smc_realize(DeviceState *dev, Error **errp)
->      s->conf_enable_w0 = s->ctrl->conf_enable_w0;
->  
->      /* Enforce some real HW limits */
-> -    if (s->num_cs > s->ctrl->max_slaves) {
-> +    if (s->num_cs > s->ctrl->max_devices) {
->          qemu_log_mask(LOG_GUEST_ERROR, "%s: num_cs cannot exceed: %d\n",
-> -                      __func__, s->ctrl->max_slaves);
-> -        s->num_cs = s->ctrl->max_slaves;
-> +                      __func__, s->ctrl->max_devices);
-> +        s->num_cs = s->ctrl->max_devices;
->      }
->  
->      /* DMA irq. Keep it first for the initialization in the SoC */
-> @@ -1376,7 +1376,7 @@ static void aspeed_smc_realize(DeviceState *dev, Error **errp)
->                            s->ctrl->flash_window_size);
->      sysbus_init_mmio(sbd, &s->mmio_flash);
->  
-> -    s->flashes = g_new0(AspeedSMCFlash, s->ctrl->max_slaves);
-> +    s->flashes = g_new0(AspeedSMCFlash, s->ctrl->max_devices);
->  
->      /*
->       * Let's create a sub memory region for each possible slave. All
-> @@ -1385,7 +1385,7 @@ static void aspeed_smc_realize(DeviceState *dev, Error **errp)
->       * module behind to handle the memory accesses. This depends on
->       * the board configuration.
->       */
-> -    for (i = 0; i < s->ctrl->max_slaves; ++i) {
-> +    for (i = 0; i < s->ctrl->max_devices; ++i) {
->          AspeedSMCFlash *fl = &s->flashes[i];
->  
->          snprintf(name, sizeof(name), "%s.%d", s->ctrl->name, i);
+> diff --git a/include/linux/virtio_config.h b/include/linux/virtio_config.h
+> index 8fe857e27ef3..3f697c8c8205 100644
+> --- a/include/linux/virtio_config.h
+> +++ b/include/linux/virtio_config.h
+> @@ -540,4 +540,14 @@ static inline void virtio_cwrite64(struct virtio_device *vdev,
+>  			virtio_cread_le((vdev), structname, member, ptr); \
+>  		_r;							\
+>  	})
+> +
+> +#ifdef CONFIG_ARCH_HAS_RESTRICTED_VIRTIO_MEMORY_ACCESS
+> +int arch_has_restricted_virtio_memory_access(void);
+> +#else
+> +static inline int arch_has_restricted_virtio_memory_access(void)
+> +{
+> +	return 0;
+> +}
+> +#endif /* CONFIG_ARCH_HAS_RESTRICTED_VIRTIO_MEMORY_ACCESS */
+> +
+>  #endif /* _LINUX_VIRTIO_CONFIG_H */
 > 
-
