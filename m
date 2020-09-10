@@ -2,270 +2,105 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7E59F264022
-	for <lists+kvm@lfdr.de>; Thu, 10 Sep 2020 10:35:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5AC46264029
+	for <lists+kvm@lfdr.de>; Thu, 10 Sep 2020 10:37:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730278AbgIJIfn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 10 Sep 2020 04:35:43 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:30797 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1730157AbgIJIfd (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 10 Sep 2020 04:35:33 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1599726931;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=CYmRoWWniFPaHjjXdipbulnXobK8uQf7JpAYrezYUMM=;
-        b=enMTet0e/mZV/BLIMPywYDTARFU62Lk5RxseCHoFWxy7VwYyyOBmHZihWLJyEuCH0b7dSQ
-        uYptcR3bkv93pyuHA0ij2SAglnk2aAPwC1UUDLIEt8zGleN4bO8gTjg1cpyaGNRwNADxyq
-        yJ5P3HlTSXMCDzRYT2+QDlRqbygkzSU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-543-LSHAAh1-MpCiq8ANKZVVcQ-1; Thu, 10 Sep 2020 04:35:29 -0400
-X-MC-Unique: LSHAAh1-MpCiq8ANKZVVcQ-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EB87E1008308;
-        Thu, 10 Sep 2020 08:35:27 +0000 (UTC)
-Received: from [10.36.112.212] (ovpn-112-212.ams2.redhat.com [10.36.112.212])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 2F88E10027A4;
-        Thu, 10 Sep 2020 08:35:25 +0000 (UTC)
-Subject: Re: [PATCH v2] KVM: arm64: Allow to limit number of PMU counters
-From:   Auger Eric <eric.auger@redhat.com>
-To:     Alexander Graf <graf@amazon.com>, kvmarm@lists.cs.columbia.edu
-Cc:     Marc Zyngier <maz@kernel.org>,
-        linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
-        James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Mark Rutland <mark.rutland@arm.com>
-References: <20200908205730.23898-1-graf@amazon.com>
- <79606f01-7638-ed6f-27c8-1183c723cd60@redhat.com>
-Message-ID: <366e640b-eb1e-33a2-7865-2751742cae58@redhat.com>
-Date:   Thu, 10 Sep 2020 10:35:23 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
-MIME-Version: 1.0
-In-Reply-To: <79606f01-7638-ed6f-27c8-1183c723cd60@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+        id S1730206AbgIJIgk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 10 Sep 2020 04:36:40 -0400
+Received: from mga07.intel.com ([134.134.136.100]:48998 "EHLO mga07.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1730346AbgIJIfq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 10 Sep 2020 04:35:46 -0400
+IronPort-SDR: oKWDyBjojvbgK3SNWUf6HyewwVHFW60J/EJcQQk4sRLzRYLO7PgvJLm0NTRnoYVm0Yk4qxqI/d
+ kWVMWKsmm0Bg==
+X-IronPort-AV: E=McAfee;i="6000,8403,9739"; a="222691425"
+X-IronPort-AV: E=Sophos;i="5.76,412,1592895600"; 
+   d="scan'208";a="222691425"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Sep 2020 01:35:43 -0700
+IronPort-SDR: BTIMnXWE+znZbEUeoD4BA2CV+WEJFdC4OUy+ocjqMKI4jNZqnmA2BNleP0I/YjZWV8w5bD7Cg2
+ vf5HoTnDUupg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.76,412,1592895600"; 
+   d="scan'208";a="329255926"
+Received: from chenyi-pc.sh.intel.com ([10.239.159.72])
+  by fmsmga004.fm.intel.com with ESMTP; 10 Sep 2020 01:35:41 -0700
+From:   Chenyi Qiang <chenyi.qiang@intel.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Xiaoyao Li <xiaoyao.li@intel.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [RFC v3 0/2] add bus lock VM exit support
+Date:   Thu, 10 Sep 2020 16:37:49 +0800
+Message-Id: <20200910083751.26686-1-chenyi.qiang@intel.com>
+X-Mailer: git-send-email 2.17.1
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Alex,
+v2->v3 changelogs:
+- use a bitmap to get/set the capability of bus lock detection. we support
+  exit and off mode currently.
+- put the handle of exiting to userspace in vmx.c, thus no need to
+  define a shadow to track vmx->exit_reason.bus_lock_detected.
+- remove the vcpu->stats.bus_locks since every bus lock exits to userspace.
 
-On 9/10/20 9:21 AM, Auger Eric wrote:
-> Hi Alex,
-> 
-> On 9/8/20 10:57 PM, Alexander Graf wrote:
->> We currently pass through the number of PMU counters that we have available
->> in hardware to guests. So if my host supports 10 concurrently active PMU
->> counters, my guest will be able to spawn 10 counters as well.
->>
->> This is undesireable if we also want to use the PMU on the host for
->> monitoring. In that case, we want to split the PMU between guest and
->> host.
-> but don't we have a trap and emulate approach as opposed to current SPE
-> implementation?
+---
 
-Looking again at the switch code (__pmu_switch_to_guest), I see we just
-enable/disable the event counters owned by either the host/guest. I
-thought this was more involved. So now it is clear.
+Add the support for bus lock VM exit in KVM. It is a sub-feature of bus
+lock detection and the detailed info can be found in the patch 2/2.
 
-Thanks
+In this patch series, the first patch applies Sean's refactor to
+vcpu_vmx.exit_reason available at
+https://patchwork.kernel.org/patch/11500659.
+It is necessary as bus lock VM exit adds a new modifier bit(bit 26) in
+exit_reason field in VMCS.
 
-Eric
->>
->> To help that case, let's add a PMU attr that allows us to limit the number
->> of PMU counters that we expose. With this patch in place, user space can
->> keep some counters free for host use.
->>
->> Signed-off-by: Alexander Graf <graf@amazon.com>
->>
->> ---
->>
->> Because this patch touches the same code paths as the vPMU filtering one
->> and the vPMU filtering generalized a few conditions in the attr path,
->> I've based it on top. Please let me know if you want it independent instead.
->>
->> v1 -> v2:
->>
->>   - Add documentation
->>   - Add read support
->> ---
->>  Documentation/virt/kvm/devices/vcpu.rst | 25 +++++++++++++++++++++++++
->>  arch/arm64/include/uapi/asm/kvm.h       |  7 ++++---
->>  arch/arm64/kvm/pmu-emul.c               | 32 ++++++++++++++++++++++++++++++++
->>  arch/arm64/kvm/sys_regs.c               |  5 +++++
->>  include/kvm/arm_pmu.h                   |  1 +
->>  5 files changed, 67 insertions(+), 3 deletions(-)
->>
->> diff --git a/Documentation/virt/kvm/devices/vcpu.rst b/Documentation/virt/kvm/devices/vcpu.rst
->> index 203b91e93151..1a1c8d8c8b1d 100644
->> --- a/Documentation/virt/kvm/devices/vcpu.rst
->> +++ b/Documentation/virt/kvm/devices/vcpu.rst
->> @@ -102,6 +102,31 @@ isn't strictly speaking an event. Filtering the cycle counter is possible
->>  using event 0x11 (CPU_CYCLES).
->>  
->>  
->> +1.4 ATTRIBUTE: KVM_ARM_VCPU_PMU_V3_NUM_EVENTS
->> +---------------------------------------------
->> +
->> +:Parameters: in kvm_device_attr.addr the address for the limit of concurrent
->> +             events is a pointer to an int
->> +
->> +:Returns:
->> +
->> +	 =======  ======================================================
->> +	 -ENODEV: PMUv3 not supported
->> +	 -EBUSY:  PMUv3 already initialized
->> +	 -EINVAL: Too large number of events
-> s/events/event counters
-> 
-> I see that in perf code indeed num_events is used for that but I think
-> for the end-user the event counter terminology is better as it fits the
-> ARM spec.
->> +	 =======  ======================================================
->> +
->> +Reconfigure the limit of concurrent PMU events that the guest can monitor.
-> here also
->> +This number is directly exposed as part of the PMCR_EL0 register.
-> Maybe quote the "N" field
->> +
->> +On vcpu creation, this attribute is set to the hardware limit of the current
->> +platform. If you need to determine the hardware limit, you can read this
->> +attribute before setting it.
->> +
->> +Restrictions: The default value for this property is the number of hardware
->> +supported events. Only values that are smaller than the hardware limit can
-> event counters
->> +be set.
->> +
->>  2. GROUP: KVM_ARM_VCPU_TIMER_CTRL
->>  =================================
->>  
->> diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
->> index 7b1511d6ce44..db025c0b5a40 100644
->> --- a/arch/arm64/include/uapi/asm/kvm.h
->> +++ b/arch/arm64/include/uapi/asm/kvm.h
->> @@ -342,9 +342,10 @@ struct kvm_vcpu_events {
->>  
->>  /* Device Control API on vcpu fd */
->>  #define KVM_ARM_VCPU_PMU_V3_CTRL	0
->> -#define   KVM_ARM_VCPU_PMU_V3_IRQ	0
->> -#define   KVM_ARM_VCPU_PMU_V3_INIT	1
->> -#define   KVM_ARM_VCPU_PMU_V3_FILTER	2
->> +#define   KVM_ARM_VCPU_PMU_V3_IRQ		0
->> +#define   KVM_ARM_VCPU_PMU_V3_INIT		1
->> +#define   KVM_ARM_VCPU_PMU_V3_FILTER		2
->> +#define   KVM_ARM_VCPU_PMU_V3_NUM_EVENTS	3
->>  #define KVM_ARM_VCPU_TIMER_CTRL		1
->>  #define   KVM_ARM_VCPU_TIMER_IRQ_VTIMER		0
->>  #define   KVM_ARM_VCPU_TIMER_IRQ_PTIMER		1
->> diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
->> index 0458860bade2..c7915b95fec0 100644
->> --- a/arch/arm64/kvm/pmu-emul.c
->> +++ b/arch/arm64/kvm/pmu-emul.c
->> @@ -253,6 +253,8 @@ void kvm_pmu_vcpu_init(struct kvm_vcpu *vcpu)
->>  
->>  	for (i = 0; i < ARMV8_PMU_MAX_COUNTERS; i++)
->>  		pmu->pmc[i].idx = i;
->> +
->> +	pmu->num_events = perf_num_counters() - 1;
->>  }
->>  
->>  /**
->> @@ -978,6 +980,25 @@ int kvm_arm_pmu_v3_set_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
->>  
->>  		return 0;
->>  	}
->> +	case KVM_ARM_VCPU_PMU_V3_NUM_EVENTS: {
->> +		u64 mask = ARMV8_PMU_PMCR_N_MASK << ARMV8_PMU_PMCR_N_SHIFT;
->> +		int __user *uaddr = (int __user *)(long)attr->addr;
->> +		u32 num_events;
->> +
->> +		if (get_user(num_events, uaddr))
->> +			return -EFAULT;
->> +
->> +		if (num_events >= perf_num_counters())
->> +			return -EINVAL;
->> +
->> +		vcpu->arch.pmu.num_events = num_events;
->> +
->> +		num_events <<= ARMV8_PMU_PMCR_N_SHIFT;
->> +		__vcpu_sys_reg(vcpu, SYS_PMCR_EL0) &= ~mask;
->> +		__vcpu_sys_reg(vcpu, SYS_PMCR_EL0) |= num_events;
->> +
->> +		return 0;
->> +	}
->>  	case KVM_ARM_VCPU_PMU_V3_INIT:
->>  		return kvm_arm_pmu_v3_init(vcpu);
->>  	}
->> @@ -1004,6 +1025,16 @@ int kvm_arm_pmu_v3_get_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
->>  		irq = vcpu->arch.pmu.irq_num;
->>  		return put_user(irq, uaddr);
->>  	}
->> +	case KVM_ARM_VCPU_PMU_V3_NUM_EVENTS: {
->> +		int __user *uaddr = (int __user *)(long)attr->addr;
->> +		u32 num_events;
->> +
->> +		if (!test_bit(KVM_ARM_VCPU_PMU_V3, vcpu->arch.features))
->> +			return -ENODEV;
->> +
->> +		num_events = vcpu->arch.pmu.num_events;
->> +		return put_user(num_events, uaddr);
->> +	}
->>  	}
->>  
->>  	return -ENXIO;
->> @@ -1015,6 +1046,7 @@ int kvm_arm_pmu_v3_has_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
->>  	case KVM_ARM_VCPU_PMU_V3_IRQ:
->>  	case KVM_ARM_VCPU_PMU_V3_INIT:
->>  	case KVM_ARM_VCPU_PMU_V3_FILTER:
->> +	case KVM_ARM_VCPU_PMU_V3_NUM_EVENTS:
->>  		if (kvm_arm_support_pmu_v3() &&
->>  		    test_bit(KVM_ARM_VCPU_PMU_V3, vcpu->arch.features))
->>  			return 0;
->> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
->> index 20ab2a7d37ca..d51e39600bbd 100644
->> --- a/arch/arm64/kvm/sys_regs.c
->> +++ b/arch/arm64/kvm/sys_regs.c
->> @@ -672,6 +672,11 @@ static void reset_pmcr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
->>  	       | (ARMV8_PMU_PMCR_MASK & 0xdecafbad)) & (~ARMV8_PMU_PMCR_E);
->>  	if (!system_supports_32bit_el0())
->>  		val |= ARMV8_PMU_PMCR_LC;
->> +
->> +	/* Override number of event selectors */
->> +	val &= ~(ARMV8_PMU_PMCR_N_MASK << ARMV8_PMU_PMCR_N_SHIFT);
->> +	val |= (u32)vcpu->arch.pmu.num_events << ARMV8_PMU_PMCR_N_SHIFT;
->> +
->>  	__vcpu_sys_reg(vcpu, r->reg) = val;
->>  }
->>  
->> diff --git a/include/kvm/arm_pmu.h b/include/kvm/arm_pmu.h
->> index 98cbfe885a53..ea3fc96a37d9 100644
->> --- a/include/kvm/arm_pmu.h
->> +++ b/include/kvm/arm_pmu.h
->> @@ -27,6 +27,7 @@ struct kvm_pmu {
->>  	bool ready;
->>  	bool created;
->>  	bool irq_level;
->> +	u8 num_events;
->>  };
->>  
->>  #define kvm_arm_pmu_v3_ready(v)		((v)->arch.pmu.ready)
->>
-> 
-> Thanks
-> 
-> Eric
-> 
+The second patch is the enabling work for bus lock VM exit. Add the
+support to set the capability to enable bus lock vm exit. The current
+implementation just exit to user space when handling the bus lock
+detected in guest.
+
+The concrete throttling policy in user space still needs to be
+discussed. We can enforce ratelimit on bus lock in guest, just inject
+some sleep time, or maybe other ideas.
+
+Document for Bus Lock Detection is now available at the latest "Intel
+Architecture Instruction Set Extensions Programming Reference" (see
+below). Note that the section 9.1 for Bus Lock Debug Exception requires
+modification due to the feedback from kernel community:
+https://lore.kernel.org/lkml/87r1stmi1x.fsf@nanos.tec.linutronix.de/
+
+Document Link:
+https://software.intel.com/content/www/us/en/develop/download/intel-architecture-instruction-set-extensions-programming-reference.html
+
+Chenyi Qiang (1):
+  KVM: VMX: Enable bus lock VM exit
+
+Sean Christopherson (1):
+  KVM: VMX: Convert vcpu_vmx.exit_reason to a union
+
+ arch/x86/include/asm/kvm_host.h    |   5 ++
+ arch/x86/include/asm/vmx.h         |   1 +
+ arch/x86/include/asm/vmxfeatures.h |   1 +
+ arch/x86/include/uapi/asm/kvm.h    |   1 +
+ arch/x86/include/uapi/asm/vmx.h    |   4 +-
+ arch/x86/kvm/vmx/capabilities.h    |   6 ++
+ arch/x86/kvm/vmx/nested.c          |  42 ++++++++----
+ arch/x86/kvm/vmx/vmx.c             | 106 ++++++++++++++++++++---------
+ arch/x86/kvm/vmx/vmx.h             |  25 ++++++-
+ arch/x86/kvm/x86.c                 |  27 +++++++-
+ arch/x86/kvm/x86.h                 |   5 ++
+ include/uapi/linux/kvm.h           |   7 ++
+ 12 files changed, 179 insertions(+), 51 deletions(-)
+
+-- 
+2.17.1
 
