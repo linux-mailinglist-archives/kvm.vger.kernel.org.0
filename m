@@ -2,197 +2,104 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DDA3F2640F7
-	for <lists+kvm@lfdr.de>; Thu, 10 Sep 2020 11:10:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 021A7264100
+	for <lists+kvm@lfdr.de>; Thu, 10 Sep 2020 11:11:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730067AbgIJJKF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 10 Sep 2020 05:10:05 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:26280 "EHLO
-        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726754AbgIJJKE (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 10 Sep 2020 05:10:04 -0400
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 08A95N9j020371;
-        Thu, 10 Sep 2020 05:09:57 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=PIqq9lbHOFSteOQInz6M2g9JTLIQVYKF7y7YPtKHuS0=;
- b=XcSMUAQp2DYNpPQhL4iFX6G0N+421erxfy70TCTT9u+Hj+vcZ5HeO8BDbaNXQ2hyFiyg
- hDQqP3ovcIoxCtn6iJAOLH4ABJJzEuNGxjXxjN+iM7iCqSYZkAt8xCNacRMFXe6vZIvk
- JKVWK7F+Zl9BjtJsS9TaZGK682A6LLOkCEmvMtr4ckiuVRaXk4ljYvboc05BuswhJdCx
- JjtNvY0C1hs1h8w/kv0m+hkvKzw3Vd3XS76t5B7nY1YnBfavhcax8AzRQbtYN6kT37Lo
- cFLWpZGJIRASvGqC8Da+YY13/MHq3r0jiPqZTtxpzEjrOtzW0CsE09ngGMtUwQEyCflq xw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 33fgj4hcv2-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 10 Sep 2020 05:09:57 -0400
-Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 08A97UeF028037;
-        Thu, 10 Sep 2020 05:09:57 -0400
-Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 33fgj4hcu8-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 10 Sep 2020 05:09:56 -0400
-Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
-        by ppma06ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 08A96gGs016020;
-        Thu, 10 Sep 2020 09:09:55 GMT
-Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
-        by ppma06ams.nl.ibm.com with ESMTP id 33dxdr31pm-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 10 Sep 2020 09:09:55 +0000
-Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
-        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 08A99qQh59506986
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 10 Sep 2020 09:09:52 GMT
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 33A4C11C04C;
-        Thu, 10 Sep 2020 09:09:52 +0000 (GMT)
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 64F0111C064;
-        Thu, 10 Sep 2020 09:09:51 +0000 (GMT)
-Received: from oc7455500831.ibm.com (unknown [9.145.4.97])
-        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu, 10 Sep 2020 09:09:51 +0000 (GMT)
-Subject: Re: [PATCH v12 2/2] s390: virtio: PV needs VIRTIO I/O device
- protection
-To:     Pierre Morel <pmorel@linux.ibm.com>, linux-kernel@vger.kernel.org
-Cc:     pasic@linux.ibm.com, frankja@linux.ibm.com, mst@redhat.com,
-        jasowang@redhat.com, cohuck@redhat.com, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, thomas.lendacky@amd.com,
-        david@gibson.dropbear.id.au, linuxram@us.ibm.com,
-        hca@linux.ibm.com, gor@linux.ibm.com
-References: <1599728030-17085-1-git-send-email-pmorel@linux.ibm.com>
- <1599728030-17085-3-git-send-email-pmorel@linux.ibm.com>
-From:   Christian Borntraeger <borntraeger@de.ibm.com>
-Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
- 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
- nS4h0HDFPrrp1C2EMVYIQrMokWvlFZbCpsdYbBI=
-Message-ID: <696a5887-e0d9-dc03-6204-e0f6464f3929@de.ibm.com>
-Date:   Thu, 10 Sep 2020 11:09:51 +0200
+        id S1728936AbgIJJLi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 10 Sep 2020 05:11:38 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:40662 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726848AbgIJJL3 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 10 Sep 2020 05:11:29 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1599729088;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=2S+dASRYX7B6gIlF4p7C2wh2Lfe0xE+w23SHE4uKPDk=;
+        b=TIXXQNnt3q9+qWdGgzezLVDc0PBEqUoZQa2uCbKtvrO3pVewd7YqcIcZoZecVvrIHi6XbH
+        fEL5oByU1NBW7y+l497ozAVshZepQLzwAspOyPmXI0LL9QrCpMvakQ49kj7nn9DajbwtYo
+        sCcokMYUpVbG11rZ3csWWD5+IQlKBcQ=
+Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
+ [209.85.208.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-557-1Z3z--ByN9q94SmjFc9haw-1; Thu, 10 Sep 2020 05:11:26 -0400
+X-MC-Unique: 1Z3z--ByN9q94SmjFc9haw-1
+Received: by mail-ed1-f71.google.com with SMTP id x14so2158305edv.8
+        for <kvm@vger.kernel.org>; Thu, 10 Sep 2020 02:11:26 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=2S+dASRYX7B6gIlF4p7C2wh2Lfe0xE+w23SHE4uKPDk=;
+        b=NLcFf+YX+kwRwAcTmStN7VOqOsCes3gfX8fHIe1tw+7zIYbVIFWzsbsjrr/EAKHsuy
+         sCFf89Z+5bHmNUaVrAQag5omrnSeZNnOx+8P5AdKSE8Kv6F26cWiNR1hN0F/hBhwLiTg
+         ucvnhctTaJv8NgxKhGmszKOp4prWkydiwu+z+nhnCfhF3BmO493l6ik2TnlCXUNKXVF7
+         s8k4becmIEOLnrVCbpAOxi56rMsJeaI+sUHnso+eecHQ7gYi45skJegp33E0miS2daxe
+         Zwscs5kYPt80lLwDuJDfGDLT4tr8fBNRPMzXzSAlYWu+SKZ4afkTxjSfThr5XyEzxNs/
+         gDfg==
+X-Gm-Message-State: AOAM533SoUmnQm3+UrrRfin61HpztHVc1nMe1OlNx2LnK3QBxIMynuuA
+        rvLnZxUMa3WhUI6JsjCzLPHHFf3MSsrTolt/EYRvj5PGjPpB9xNp60WPw6f+32VdPTq3PfMEZ8y
+        61dSVdbAeV2xr
+X-Received: by 2002:a17:906:1542:: with SMTP id c2mr8069327ejd.533.1599729085432;
+        Thu, 10 Sep 2020 02:11:25 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzDlmTUr6fJdtjDWNBypBMs7J2QrRY7INrpq4ulD5kRBc5YH6RHCcQDfHDuKW2yVlaRaNE9kA==
+X-Received: by 2002:a17:906:1542:: with SMTP id c2mr8069317ejd.533.1599729085289;
+        Thu, 10 Sep 2020 02:11:25 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:2744:1c91:fa55:fa01? ([2001:b07:6468:f312:2744:1c91:fa55:fa01])
+        by smtp.gmail.com with ESMTPSA id br7sm6403283ejb.76.2020.09.10.02.11.23
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 10 Sep 2020 02:11:24 -0700 (PDT)
+Subject: Re: [PATCH 5/6] hw/pci-host/q35: Rename PCI 'black hole as '(memory)
+ hole'
+To:     Thomas Huth <thuth@redhat.com>,
+        =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+        qemu-devel@nongnu.org
+Cc:     =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+        kvm@vger.kernel.org, qemu-arm@nongnu.org,
+        Marcelo Tosatti <mtosatti@redhat.com>,
+        "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        Laurent Vivier <lvivier@redhat.com>,
+        Peter Maydell <peter.maydell@linaro.org>,
+        Andrew Jeffery <andrew@aj.id.au>,
+        Jason Wang <jasowang@redhat.com>,
+        Alistair Francis <alistair@alistair23.me>,
+        qemu-trivial@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>,
+        Richard Henderson <rth@twiddle.net>,
+        Joel Stanley <joel@jms.id.au>
+References: <20200910070131.435543-1-philmd@redhat.com>
+ <20200910070131.435543-6-philmd@redhat.com>
+ <7dbdef90-1ca6-bf27-7084-af0c716d01d9@redhat.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <d04610d8-2ba3-4f36-2820-56044324a73d@redhat.com>
+Date:   Thu, 10 Sep 2020 11:11:29 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <1599728030-17085-3-git-send-email-pmorel@linux.ibm.com>
+In-Reply-To: <7dbdef90-1ca6-bf27-7084-af0c716d01d9@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
- definitions=2020-09-10_01:2020-09-10,2020-09-10 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999
- lowpriorityscore=0 phishscore=0 impostorscore=0 suspectscore=0 spamscore=0
- priorityscore=1501 adultscore=0 bulkscore=0 clxscore=1015 mlxscore=0
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2006250000 definitions=main-2009100080
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-
-On 10.09.20 10:53, Pierre Morel wrote:
-> If protected virtualization is active on s390, VIRTIO has only retricted
-> access to the guest memory.
-> Define CONFIG_ARCH_HAS_RESTRICTED_VIRTIO_MEMORY_ACCESS and export
-> arch_has_restricted_virtio_memory_access to advertize VIRTIO if that's
-> the case.
+On 10/09/20 09:15, Thomas Huth wrote:
+> On 10/09/2020 09.01, Philippe Mathieu-Daudé wrote:
+>> In order to use inclusive terminology, rename "blackhole"
+>> as "(memory)hole".
+> A black hole is a well-known astronomical term, which is simply named
+> that way since it absorbes all light. I doubt that anybody could get
+> upset by this term?
 > 
-> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
-> Reviewed-by: Cornelia Huck <cohuck@redhat.com>
-> Reviewed-by: Halil Pasic <pasic@linux.ibm.com>
 
-Acked-by: Christian Borntraeger <borntraeger@de.ibm.com>
+Agreed.  This is a memory region that absorbs all writes and always
+reads as zero, the astronomical reference is obvious.
 
-Michael, I am fine if this patch goes via the virtio tree.
+Paolo
 
-
-> ---
->  arch/s390/Kconfig   |  1 +
->  arch/s390/mm/init.c | 11 +++++++++++
->  2 files changed, 12 insertions(+)
-> 
-> diff --git a/arch/s390/Kconfig b/arch/s390/Kconfig
-> index b29fcc66ec39..938246200d39 100644
-> --- a/arch/s390/Kconfig
-> +++ b/arch/s390/Kconfig
-> @@ -820,6 +820,7 @@ menu "Virtualization"
->  config PROTECTED_VIRTUALIZATION_GUEST
->  	def_bool n
->  	prompt "Protected virtualization guest support"
-> +	select ARCH_HAS_RESTRICTED_VIRTIO_MEMORY_ACCESS
->  	help
->  	  Select this option, if you want to be able to run this
->  	  kernel as a protected virtualization KVM guest.
-> diff --git a/arch/s390/mm/init.c b/arch/s390/mm/init.c
-> index 0d282081dc1f..e27f050cb516 100644
-> --- a/arch/s390/mm/init.c
-> +++ b/arch/s390/mm/init.c
-> @@ -45,6 +45,7 @@
->  #include <asm/kasan.h>
->  #include <asm/dma-mapping.h>
->  #include <asm/uv.h>
-> +#include <linux/virtio_config.h>
->  
->  pgd_t swapper_pg_dir[PTRS_PER_PGD] __section(.bss..swapper_pg_dir);
->  
-> @@ -160,6 +161,16 @@ bool force_dma_unencrypted(struct device *dev)
->  	return is_prot_virt_guest();
->  }
->  
-> +#ifdef CONFIG_ARCH_HAS_RESTRICTED_VIRTIO_MEMORY_ACCESS
-> +
-> +int arch_has_restricted_virtio_memory_access(void)
-> +{
-> +	return is_prot_virt_guest();
-> +}
-> +EXPORT_SYMBOL(arch_has_restricted_virtio_memory_access);
-> +
-> +#endif
-> +
->  /* protected virtualization */
->  static void pv_init(void)
->  {
-> 
