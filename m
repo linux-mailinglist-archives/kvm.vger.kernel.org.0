@@ -2,104 +2,107 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 997C0263E4E
-	for <lists+kvm@lfdr.de>; Thu, 10 Sep 2020 09:15:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 30A7C263E50
+	for <lists+kvm@lfdr.de>; Thu, 10 Sep 2020 09:16:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730261AbgIJHPo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 10 Sep 2020 03:15:44 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:59165 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1730373AbgIJHPV (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 10 Sep 2020 03:15:21 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1599722118;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=NujrVkwgQXomRFqBptCRf8I5qXyjyjT+dpDlxDqalIs=;
-        b=DhUCx5sbS11FicIidga+LdQdZ+Yq/JDl8uk3YjUavRmsY7LZ1uvH+/gGzbWwaLgU4iZ8j+
-        OiDo02K1dBfg7nyK/matjMkjJvSTXYbCnKm7QXh0y48QCic9E8a1xR5kL+5vwvZd0R9ZQ6
-        q8q2NjkPvRI7vg1JSVkJ21sTb3jxe9U=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-18-7ObhZB0GNoSSa78vWCPA5A-1; Thu, 10 Sep 2020 03:15:14 -0400
-X-MC-Unique: 7ObhZB0GNoSSa78vWCPA5A-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 191ECEF4EE;
-        Thu, 10 Sep 2020 07:15:12 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-112-86.ams2.redhat.com [10.36.112.86])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id BDFEC5D9E8;
-        Thu, 10 Sep 2020 07:15:03 +0000 (UTC)
-Subject: Re: [PATCH 5/6] hw/pci-host/q35: Rename PCI 'black hole as '(memory)
- hole'
-To:     =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
-        qemu-devel@nongnu.org
-Cc:     =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
-        kvm@vger.kernel.org, qemu-arm@nongnu.org,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
+        id S1730293AbgIJHPs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 10 Sep 2020 03:15:48 -0400
+Received: from mga04.intel.com ([192.55.52.120]:43531 "EHLO mga04.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1730378AbgIJHPU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 10 Sep 2020 03:15:20 -0400
+IronPort-SDR: ts3/RM3BbAaSZErg9pI8cI18afivj805sKU6FLrJDP5p+xqJf6pT/qdvex0CmqLVXx8uVYjOI6
+ AXdSIl4u5Img==
+X-IronPort-AV: E=McAfee;i="6000,8403,9739"; a="155881189"
+X-IronPort-AV: E=Sophos;i="5.76,412,1592895600"; 
+   d="scan'208";a="155881189"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Sep 2020 00:15:19 -0700
+IronPort-SDR: e6Qaiy2n8PctJP2/CF688WXqm7EvXe1yUUpcy7kkqSeXCMRKgSqQXPf9dioKsgfziB4kkep8yk
+ fbFAIxWN4HPw==
+X-IronPort-AV: E=Sophos;i="5.76,412,1592895600"; 
+   d="scan'208";a="286478970"
+Received: from gliakhov-mobl2.ger.corp.intel.com (HELO ubuntu) ([10.252.39.14])
+  by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Sep 2020 00:15:16 -0700
+Date:   Thu, 10 Sep 2020 09:15:13 +0200
+From:   Guennadi Liakhovetski <guennadi.liakhovetski@linux.intel.com>
+To:     Mathieu Poirier <mathieu.poirier@linaro.org>
+Cc:     kvm@vger.kernel.org, linux-remoteproc@vger.kernel.org,
+        virtualization@lists.linux-foundation.org,
+        sound-open-firmware@alsa-project.org,
+        Pierre-Louis Bossart <pierre-louis.bossart@linux.intel.com>,
+        Liam Girdwood <liam.r.girdwood@linux.intel.com>,
         "Michael S. Tsirkin" <mst@redhat.com>,
-        =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        Laurent Vivier <lvivier@redhat.com>,
-        Peter Maydell <peter.maydell@linaro.org>,
-        Andrew Jeffery <andrew@aj.id.au>,
         Jason Wang <jasowang@redhat.com>,
-        Alistair Francis <alistair@alistair23.me>,
-        qemu-trivial@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>,
-        Richard Henderson <rth@twiddle.net>,
-        Joel Stanley <joel@jms.id.au>,
-        Paolo Bonzini <pbonzini@redhat.com>
-References: <20200910070131.435543-1-philmd@redhat.com>
- <20200910070131.435543-6-philmd@redhat.com>
-From:   Thomas Huth <thuth@redhat.com>
-Message-ID: <7dbdef90-1ca6-bf27-7084-af0c716d01d9@redhat.com>
-Date:   Thu, 10 Sep 2020 09:15:02 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+        Ohad Ben-Cohen <ohad@wizery.com>,
+        Bjorn Andersson <bjorn.andersson@linaro.org>,
+        Vincent Whitchurch <vincent.whitchurch@axis.com>
+Subject: Re: [PATCH v5 1/4] vhost: convert VHOST_VSOCK_SET_RUNNING to a
+ generic ioctl
+Message-ID: <20200910062144.GA16802@ubuntu>
+References: <20200826174636.23873-1-guennadi.liakhovetski@linux.intel.com>
+ <20200826174636.23873-2-guennadi.liakhovetski@linux.intel.com>
+ <20200909224214.GB562265@xps15>
 MIME-Version: 1.0
-In-Reply-To: <20200910070131.435543-6-philmd@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200909224214.GB562265@xps15>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 10/09/2020 09.01, Philippe Mathieu-Daudé wrote:
-> In order to use inclusive terminology, rename "blackhole"
-> as "(memory)hole".
+Hi Mathieu,
 
-A black hole is a well-known astronomical term, which is simply named
-that way since it absorbes all light. I doubt that anybody could get
-upset by this term?
-
-> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-> ---
->  include/hw/pci-host/q35.h |  4 ++--
->  hw/pci-host/q35.c         | 38 +++++++++++++++++++-------------------
->  tests/qtest/q35-test.c    |  2 +-
->  3 files changed, 22 insertions(+), 22 deletions(-)
+On Wed, Sep 09, 2020 at 04:42:14PM -0600, Mathieu Poirier wrote:
+> On Wed, Aug 26, 2020 at 07:46:33PM +0200, Guennadi Liakhovetski wrote:
+> > VHOST_VSOCK_SET_RUNNING is used by the vhost vsock driver to perform
+> > crucial VirtQueue initialisation, like assigning .private fields and
+> > calling vhost_vq_init_access(), and clean up. However, this ioctl is
+> > actually extremely useful for any vhost driver, that doesn't have a
+> > side channel to inform it of a status change, e.g. upon a guest
+> > reboot. This patch makes that ioctl generic, while preserving its
+> > numeric value and also keeping the original alias.
+> > 
+> > Signed-off-by: Guennadi Liakhovetski <guennadi.liakhovetski@linux.intel.com>
+> > ---
+> >  include/uapi/linux/vhost.h | 4 +++-
+> >  1 file changed, 3 insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/include/uapi/linux/vhost.h b/include/uapi/linux/vhost.h
+> > index 75232185324a..11a4948b6216 100644
+> > --- a/include/uapi/linux/vhost.h
+> > +++ b/include/uapi/linux/vhost.h
+> > @@ -97,6 +97,8 @@
+> >  #define VHOST_SET_BACKEND_FEATURES _IOW(VHOST_VIRTIO, 0x25, __u64)
+> >  #define VHOST_GET_BACKEND_FEATURES _IOR(VHOST_VIRTIO, 0x26, __u64)
+> >  
+> > +#define VHOST_SET_RUNNING _IOW(VHOST_VIRTIO, 0x61, int)
+> > +
 > 
-> diff --git a/include/hw/pci-host/q35.h b/include/hw/pci-host/q35.h
-> index 070305f83df..0fb90aca18b 100644
-> --- a/include/hw/pci-host/q35.h
-> +++ b/include/hw/pci-host/q35.h
-> @@ -48,8 +48,8 @@ typedef struct MCHPCIState {
->      PAMMemoryRegion pam_regions[13];
->      MemoryRegion smram_region, open_high_smram;
->      MemoryRegion smram, low_smram, high_smram;
-> -    MemoryRegion tseg_blackhole, tseg_window;
-> -    MemoryRegion smbase_blackhole, smbase_window;
-> +    MemoryRegion tseg_hole, tseg_window;
-> +    MemoryRegion smbase_hole, smbase_window;
+> I don't see it used in the next patches and as such should be part of another
+> series.
 
-Maybe rather use smbase_memhole and tseg_memhole?
+It isn't used in the next patches, it is used in this patch - see below.
 
- Thomas
+Thanks
+Guennadi
 
+> >  /* VHOST_NET specific defines */
+> >  
+> >  /* Attach virtio net ring to a raw socket, or tap device.
+> > @@ -118,7 +120,7 @@
+> >  /* VHOST_VSOCK specific defines */
+> >  
+> >  #define VHOST_VSOCK_SET_GUEST_CID	_IOW(VHOST_VIRTIO, 0x60, __u64)
+> > -#define VHOST_VSOCK_SET_RUNNING		_IOW(VHOST_VIRTIO, 0x61, int)
+> > +#define VHOST_VSOCK_SET_RUNNING		VHOST_SET_RUNNING
+> >  
+> >  /* VHOST_VDPA specific defines */
+> >  
+> > -- 
+> > 2.28.0
+> > 
