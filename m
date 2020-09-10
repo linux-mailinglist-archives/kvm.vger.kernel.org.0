@@ -2,29 +2,29 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1E29D2644ED
-	for <lists+kvm@lfdr.de>; Thu, 10 Sep 2020 13:00:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A59422644E7
+	for <lists+kvm@lfdr.de>; Thu, 10 Sep 2020 12:59:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730755AbgIJK7p (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 10 Sep 2020 06:59:45 -0400
-Received: from mga09.intel.com ([134.134.136.24]:6916 "EHLO mga09.intel.com"
+        id S1730462AbgIJK7j (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 10 Sep 2020 06:59:39 -0400
+Received: from mga09.intel.com ([134.134.136.24]:7227 "EHLO mga09.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730609AbgIJK4k (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 10 Sep 2020 06:56:40 -0400
-IronPort-SDR: joO7FawhN3Ngj0oRA78TXIGCT0bO541ojpg8RSr73TLv2tMwTL1ZGMBXpPiBFAAjTcyjYzDqjt
- pkMKVsHg4TPg==
-X-IronPort-AV: E=McAfee;i="6000,8403,9739"; a="159459147"
+        id S1729521AbgIJK4r (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 10 Sep 2020 06:56:47 -0400
+IronPort-SDR: qrTM5+ym/S+d82pHOY21+g7nSSsYFXb3sgsYB7Fb0TyQO5NvOeu+BEyOu7eTqrUlCWEwi1rwMG
+ h0HEW6eAE+AQ==
+X-IronPort-AV: E=McAfee;i="6000,8403,9739"; a="159459148"
 X-IronPort-AV: E=Sophos;i="5.76,412,1592895600"; 
-   d="scan'208";a="159459147"
+   d="scan'208";a="159459148"
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from orsmga008.jf.intel.com ([10.7.209.65])
   by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Sep 2020 03:54:40 -0700
-IronPort-SDR: 7hvIrgrGnxw8CTd+Mee4bnG82zdBDf73syyEouKcS7uzgKaNmeM1/UJhxMK/q9YPpwihu3GBZn
- 1/TzD9uNXk9g==
+IronPort-SDR: awgJgjM+1XkfwqXBKrDB0Iu8nuDSuJs2USH2TwyXEXMUuDlXJdJ+pPyZq/USKot8tUrfBZaWi+
+ UkUgXqRS5vmA==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.76,412,1592895600"; 
-   d="scan'208";a="334140082"
+   d="scan'208";a="334140088"
 Received: from jacob-builder.jf.intel.com ([10.7.199.155])
   by orsmga008.jf.intel.com with ESMTP; 10 Sep 2020 03:54:40 -0700
 From:   Liu Yi L <yi.l.liu@intel.com>
@@ -35,10 +35,11 @@ Cc:     mst@redhat.com, pbonzini@redhat.com, eric.auger@redhat.com,
         kevin.tian@intel.com, yi.l.liu@intel.com, jun.j.tian@intel.com,
         yi.y.sun@intel.com, hao.wu@intel.com, kvm@vger.kernel.org,
         Jacob Pan <jacob.jun.pan@linux.intel.com>,
-        Yi Sun <yi.y.sun@linux.intel.com>
-Subject: [RFC v10 16/25] vfio: add bind stage-1 page table support
-Date:   Thu, 10 Sep 2020 03:56:29 -0700
-Message-Id: <1599735398-6829-17-git-send-email-yi.l.liu@intel.com>
+        Yi Sun <yi.y.sun@linux.intel.com>,
+        Richard Henderson <rth@twiddle.net>
+Subject: [RFC v10 18/25] intel_iommu: bind/unbind guest page table to host
+Date:   Thu, 10 Sep 2020 03:56:31 -0700
+Message-Id: <1599735398-6829-19-git-send-email-yi.l.liu@intel.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1599735398-6829-1-git-send-email-yi.l.liu@intel.com>
 References: <1599735398-6829-1-git-send-email-yi.l.liu@intel.com>
@@ -47,242 +48,205 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This patch adds bind_stage1_pgtbl() definition in HostIOMMUContextClass,
-also adds corresponding implementation in VFIO. This is to expose a way
-for vIOMMU to setup dual stage DMA translation for passthru devices on
-hardware.
+This patch captures the guest PASID table entry modifications and
+propagates the changes to host to setup dual stage DMA translation.
+The guest page table is configured as 1st level page table (GVA->GPA)
+whose translation result would further go through host VT-d 2nd
+level page table(GPA->HPA) under nested translation mode. This is the
+key part of vSVA support, and also a key to support IOVA over 1st-
+level page table for Intel VT-d in virtualization environment.
 
 Cc: Kevin Tian <kevin.tian@intel.com>
 Cc: Jacob Pan <jacob.jun.pan@linux.intel.com>
 Cc: Peter Xu <peterx@redhat.com>
-Cc: Eric Auger <eric.auger@redhat.com>
 Cc: Yi Sun <yi.y.sun@linux.intel.com>
-Cc: David Gibson <david@gibson.dropbear.id.au>
-Cc: Alex Williamson <alex.williamson@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Richard Henderson <rth@twiddle.net>
 Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
 ---
- hw/iommu/host_iommu_context.c         | 57 +++++++++++++++++++++++++++++++++-
- hw/vfio/common.c                      | 58 ++++++++++++++++++++++++++++++++++-
- include/hw/iommu/host_iommu_context.h | 19 +++++++++++-
- 3 files changed, 131 insertions(+), 3 deletions(-)
+ hw/i386/intel_iommu.c          | 101 +++++++++++++++++++++++++++++++++++++++--
+ hw/i386/intel_iommu_internal.h |  18 ++++++++
+ 2 files changed, 114 insertions(+), 5 deletions(-)
 
-diff --git a/hw/iommu/host_iommu_context.c b/hw/iommu/host_iommu_context.c
-index 5fb2223..c43965c 100644
---- a/hw/iommu/host_iommu_context.c
-+++ b/hw/iommu/host_iommu_context.c
-@@ -69,23 +69,78 @@ int host_iommu_ctx_pasid_free(HostIOMMUContext *iommu_ctx, uint32_t pasid)
-     return hicxc->pasid_free(iommu_ctx, pasid);
+diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
+index af17b36..4f6b80f 100644
+--- a/hw/i386/intel_iommu.c
++++ b/hw/i386/intel_iommu.c
+@@ -41,6 +41,7 @@
+ #include "migration/vmstate.h"
+ #include "trace.h"
+ #include "qemu/jhash.h"
++#include <linux/iommu.h>
+ 
+ /* context entry operations */
+ #define VTD_CE_GET_RID2PASID(ce) \
+@@ -700,6 +701,16 @@ static inline uint32_t vtd_sm_ce_get_pdt_entry_num(VTDContextEntry *ce)
+     return 1U << (VTD_SM_CONTEXT_ENTRY_PDTS(ce->val[0]) + 7);
  }
  
-+int host_iommu_ctx_bind_stage1_pgtbl(HostIOMMUContext *iommu_ctx,
-+                                     struct iommu_gpasid_bind_data *bind)
++static inline uint32_t vtd_pe_get_fl_aw(VTDPASIDEntry *pe)
 +{
-+    HostIOMMUContextClass *hicxc;
-+
-+    if (!iommu_ctx) {
-+        return -EINVAL;
-+    }
-+
-+    hicxc = HOST_IOMMU_CONTEXT_GET_CLASS(iommu_ctx);
-+    if (!hicxc) {
-+        return -EINVAL;
-+    }
-+
-+    if (!(iommu_ctx->flags & HOST_IOMMU_NESTING) ||
-+        !hicxc->bind_stage1_pgtbl) {
-+        return -EINVAL;
-+    }
-+
-+    return hicxc->bind_stage1_pgtbl(iommu_ctx, bind);
++    return 48 + ((pe->val[2] >> 2) & VTD_SM_PASID_ENTRY_FLPM) * 9;
 +}
 +
-+int host_iommu_ctx_unbind_stage1_pgtbl(HostIOMMUContext *iommu_ctx,
-+                                 struct iommu_gpasid_bind_data *unbind)
++static inline dma_addr_t vtd_pe_get_flpt_base(VTDPASIDEntry *pe)
 +{
-+    HostIOMMUContextClass *hicxc;
-+
-+    if (!iommu_ctx) {
-+        return -EINVAL;
-+    }
-+
-+    hicxc = HOST_IOMMU_CONTEXT_GET_CLASS(iommu_ctx);
-+    if (!hicxc) {
-+        return -EINVAL;
-+    }
-+
-+    if (!(iommu_ctx->flags & HOST_IOMMU_NESTING) ||
-+        !hicxc->unbind_stage1_pgtbl) {
-+        return -EINVAL;
-+    }
-+
-+    return hicxc->unbind_stage1_pgtbl(iommu_ctx, unbind);
++    return pe->val[2] & VTD_SM_PASID_ENTRY_FLPTPTR;
 +}
 +
- void host_iommu_ctx_init(void *_iommu_ctx, size_t instance_size,
-                          const char *mrtypename,
--                         uint64_t flags)
-+                         uint64_t flags,
-+                         struct iommu_nesting_info *info)
+ static inline bool vtd_pdire_present(VTDPASIDDirEntry *pdire)
  {
-     HostIOMMUContext *iommu_ctx;
- 
-     object_initialize(_iommu_ctx, instance_size, mrtypename);
-     iommu_ctx = HOST_IOMMU_CONTEXT(_iommu_ctx);
-     iommu_ctx->flags = flags;
-+    iommu_ctx->info = g_malloc0(info->argsz);
-+    memcpy(iommu_ctx->info, info, info->argsz);
-     iommu_ctx->initialized = true;
+     return pdire->val & 1;
+@@ -1861,6 +1872,85 @@ static void vtd_context_global_invalidate(IntelIOMMUState *s)
+     vtd_iommu_replay_all(s);
  }
  
-+static void host_iommu_ctx_finalize_fn(Object *obj)
++/**
++ * Caller should hold iommu_lock.
++ */
++static int vtd_bind_guest_pasid(IntelIOMMUState *s, VTDBus *vtd_bus,
++                                int devfn, int pasid, VTDPASIDEntry *pe,
++                                VTDPASIDOp op)
 +{
-+    HostIOMMUContext *iommu_ctx = HOST_IOMMU_CONTEXT(obj);
++    VTDHostIOMMUContext *vtd_dev_icx;
++    HostIOMMUContext *iommu_ctx;
++    int ret = -1;
 +
-+    g_free(iommu_ctx->info);
-+}
-+
- static const TypeInfo host_iommu_context_info = {
-     .parent             = TYPE_OBJECT,
-     .name               = TYPE_HOST_IOMMU_CONTEXT,
-     .class_size         = sizeof(HostIOMMUContextClass),
-     .instance_size      = sizeof(HostIOMMUContext),
-+    .instance_finalize  = host_iommu_ctx_finalize_fn,
-     .abstract           = true,
- };
- 
-diff --git a/hw/vfio/common.c b/hw/vfio/common.c
-index f41deeb..74dbeaf 100644
---- a/hw/vfio/common.c
-+++ b/hw/vfio/common.c
-@@ -1227,6 +1227,54 @@ static int vfio_host_iommu_ctx_pasid_free(HostIOMMUContext *iommu_ctx,
-     return ret;
- }
- 
-+static int vfio_host_iommu_ctx_bind_stage1_pgtbl(HostIOMMUContext *iommu_ctx,
-+                                         struct iommu_gpasid_bind_data *bind)
-+{
-+    VFIOContainer *container = container_of(iommu_ctx,
-+                                            VFIOContainer, iommu_ctx);
-+    struct vfio_iommu_type1_nesting_op *op;
-+    unsigned long argsz;
-+    int ret = 0;
-+
-+    argsz = sizeof(*op) + sizeof(*bind);
-+    op = g_malloc0(argsz);
-+    op->argsz = argsz;
-+    op->flags = VFIO_IOMMU_NESTING_OP_BIND_PGTBL;
-+    memcpy(&op->data, bind, sizeof(*bind));
-+
-+    if (ioctl(container->fd, VFIO_IOMMU_NESTING_OP, op)) {
-+        ret = -errno;
-+        error_report("%s: pasid (%llu) bind failed: %m",
-+                      __func__, bind->hpasid);
++    vtd_dev_icx = vtd_bus->dev_icx[devfn];
++    if (!vtd_dev_icx) {
++        /* means no need to go further, e.g. for emulated devices */
++        return 0;
 +    }
-+    g_free(op);
++
++    iommu_ctx = vtd_dev_icx->iommu_ctx;
++    if (!iommu_ctx) {
++        return -EINVAL;
++    }
++
++    switch (op) {
++    case VTD_PASID_BIND:
++    {
++        struct iommu_gpasid_bind_data *g_bind_data;
++
++        g_bind_data = g_malloc0(sizeof(*g_bind_data));
++
++        g_bind_data->argsz = sizeof(*g_bind_data);
++        g_bind_data->version = IOMMU_GPASID_BIND_VERSION_1;
++        g_bind_data->format = IOMMU_PASID_FORMAT_INTEL_VTD;
++        g_bind_data->gpgd = vtd_pe_get_flpt_base(pe);
++        g_bind_data->addr_width = vtd_pe_get_fl_aw(pe);
++        g_bind_data->hpasid = pasid;
++        g_bind_data->gpasid = pasid;
++        g_bind_data->flags |= IOMMU_SVA_GPASID_VAL;
++        g_bind_data->vendor.vtd.flags =
++                             (VTD_SM_PASID_ENTRY_SRE_BIT(pe->val[2]) ?
++                                            IOMMU_SVA_VTD_GPASID_SRE : 0)
++                           | (VTD_SM_PASID_ENTRY_EAFE_BIT(pe->val[2]) ?
++                                            IOMMU_SVA_VTD_GPASID_EAFE : 0)
++                           | (VTD_SM_PASID_ENTRY_PCD_BIT(pe->val[1]) ?
++                                            IOMMU_SVA_VTD_GPASID_PCD : 0)
++                           | (VTD_SM_PASID_ENTRY_PWT_BIT(pe->val[1]) ?
++                                            IOMMU_SVA_VTD_GPASID_PWT : 0)
++                           | (VTD_SM_PASID_ENTRY_EMTE_BIT(pe->val[1]) ?
++                                            IOMMU_SVA_VTD_GPASID_EMTE : 0)
++                           | (VTD_SM_PASID_ENTRY_CD_BIT(pe->val[1]) ?
++                                            IOMMU_SVA_VTD_GPASID_CD : 0);
++        g_bind_data->vendor.vtd.pat = VTD_SM_PASID_ENTRY_PAT(pe->val[1]);
++        g_bind_data->vendor.vtd.emt = VTD_SM_PASID_ENTRY_EMT(pe->val[1]);
++        ret = host_iommu_ctx_bind_stage1_pgtbl(iommu_ctx, g_bind_data);
++        g_free(g_bind_data);
++        break;
++    }
++    case VTD_PASID_UNBIND:
++    {
++        struct iommu_gpasid_bind_data *g_unbind_data;
++
++        g_unbind_data = g_malloc0(sizeof(*g_unbind_data));
++
++        g_unbind_data->argsz = sizeof(*g_unbind_data);
++        g_unbind_data->version = IOMMU_GPASID_BIND_VERSION_1;
++        g_unbind_data->format = IOMMU_PASID_FORMAT_INTEL_VTD;
++        g_unbind_data->hpasid = pasid;
++        ret = host_iommu_ctx_unbind_stage1_pgtbl(iommu_ctx, g_unbind_data);
++        g_free(g_unbind_data);
++        break;
++    }
++    default:
++        error_report_once("Unknown VTDPASIDOp!!!\n");
++        break;
++    }
++
++
 +    return ret;
 +}
 +
-+static int vfio_host_iommu_ctx_unbind_stage1_pgtbl(HostIOMMUContext *iommu_ctx,
-+                                         struct iommu_gpasid_bind_data *unbind)
-+{
-+    VFIOContainer *container = container_of(iommu_ctx,
-+                                            VFIOContainer, iommu_ctx);
-+    struct vfio_iommu_type1_nesting_op *op;
-+    unsigned long argsz;
-+    int ret = 0;
-+
-+    argsz = sizeof(*op) + sizeof(*unbind);
-+    op = g_malloc0(argsz);
-+    op->argsz = argsz;
-+    op->flags = VFIO_IOMMU_NESTING_OP_UNBIND_PGTBL;
-+    memcpy(&op->data, unbind, sizeof(*unbind));
-+
-+    if (ioctl(container->fd, VFIO_IOMMU_NESTING_OP, op)) {
-+        ret = -errno;
-+        error_report("%s: pasid (%llu) unbind failed: %m",
-+                      __func__, unbind->hpasid);
-+    }
-+    g_free(op);
-+    return ret;
-+}
-+
- /**
-  * Get iommu info from host. Caller of this funcion should free
-  * the memory pointed by the returned pointer stored in @info
-@@ -1364,10 +1412,16 @@ static int vfio_init_container(VFIOContainer *container, int group_fd,
-         nest_info = (struct iommu_nesting_info *) &nesting->info;
-         flags |= (nest_info->features & IOMMU_NESTING_FEAT_SYSWIDE_PASID) ?
-                  HOST_IOMMU_PASID_REQUEST : 0;
-+        if ((nest_info->features & IOMMU_NESTING_FEAT_BIND_PGTBL) &&
-+            (nest_info->features & IOMMU_NESTING_FEAT_CACHE_INVLD)) {
-+            flags |= HOST_IOMMU_NESTING;
-+        }
-+
-         host_iommu_ctx_init(&container->iommu_ctx,
-                             sizeof(container->iommu_ctx),
-                             TYPE_VFIO_HOST_IOMMU_CONTEXT,
--                            flags);
-+                            flags,
-+                            nest_info);
-         g_free(nesting);
+ /* Do a context-cache device-selective invalidation.
+  * @func_mask: FM field after shifting
+  */
+@@ -2489,10 +2579,10 @@ static void vtd_fill_pe_in_cache(IntelIOMMUState *s,
      }
  
-@@ -1967,6 +2021,8 @@ static void vfio_host_iommu_context_class_init(ObjectClass *klass,
- 
-     hicxc->pasid_alloc = vfio_host_iommu_ctx_pasid_alloc;
-     hicxc->pasid_free = vfio_host_iommu_ctx_pasid_free;
-+    hicxc->bind_stage1_pgtbl = vfio_host_iommu_ctx_bind_stage1_pgtbl;
-+    hicxc->unbind_stage1_pgtbl = vfio_host_iommu_ctx_unbind_stage1_pgtbl;
+     pc_entry->pasid_entry = *pe;
+-    /*
+-     * TODO:
+-     * - send pasid bind to host for passthru devices
+-     */
++    vtd_bind_guest_pasid(s, vtd_pasid_as->vtd_bus,
++                         vtd_pasid_as->devfn,
++                         vtd_pasid_as->pasid,
++                         pe, VTD_PASID_BIND);
  }
  
- static const TypeInfo vfio_host_iommu_context_info = {
-diff --git a/include/hw/iommu/host_iommu_context.h b/include/hw/iommu/host_iommu_context.h
-index 227c433..2883ed8 100644
---- a/include/hw/iommu/host_iommu_context.h
-+++ b/include/hw/iommu/host_iommu_context.h
-@@ -54,6 +54,16 @@ typedef struct HostIOMMUContextClass {
-     /* Reclaim pasid from HostIOMMUContext (a.k.a. host software) */
-     int (*pasid_free)(HostIOMMUContext *iommu_ctx,
-                       uint32_t pasid);
-+    /*
-+     * Bind stage-1 page table to a hostIOMMU w/ dual stage
-+     * DMA translation capability.
-+     * @bind specifies the bind configurations.
-+     */
-+    int (*bind_stage1_pgtbl)(HostIOMMUContext *iommu_ctx,
-+                             struct iommu_gpasid_bind_data *bind);
-+    /* Undo a previous bind. @unbind specifies the unbind info. */
-+    int (*unbind_stage1_pgtbl)(HostIOMMUContext *iommu_ctx,
-+                               struct iommu_gpasid_bind_data *unbind);
- } HostIOMMUContextClass;
+ /**
+@@ -2565,10 +2655,11 @@ static gboolean vtd_flush_pasid(gpointer key, gpointer value,
+ remove:
+     /*
+      * TODO:
+-     * - send pasid bind to host for passthru devices
+      * - when pasid-base-iotlb(piotlb) infrastructure is ready,
+      *   should invalidate QEMU piotlb togehter with this change.
+      */
++    vtd_bind_guest_pasid(s, vtd_bus, devfn,
++                         pasid, NULL, VTD_PASID_UNBIND);
+     return true;
+ }
  
- /*
-@@ -62,17 +72,24 @@ typedef struct HostIOMMUContextClass {
- struct HostIOMMUContext {
-     Object parent_obj;
- #define HOST_IOMMU_PASID_REQUEST (1ULL << 0)
-+#define HOST_IOMMU_NESTING       (1ULL << 1)
-     uint64_t flags;
-+    struct iommu_nesting_info *info;
-     bool initialized;
- };
+diff --git a/hw/i386/intel_iommu_internal.h b/hw/i386/intel_iommu_internal.h
+index a57ef3d..51691d0 100644
+--- a/hw/i386/intel_iommu_internal.h
++++ b/hw/i386/intel_iommu_internal.h
+@@ -536,6 +536,13 @@ typedef struct VTDRootEntry VTDRootEntry;
+ #define VTD_SM_CONTEXT_ENTRY_RSVD_VAL0(aw)  (0x1e0ULL | ~VTD_HAW_MASK(aw))
+ #define VTD_SM_CONTEXT_ENTRY_RSVD_VAL1      0xffffffffffe00000ULL
  
- int host_iommu_ctx_pasid_alloc(HostIOMMUContext *iommu_ctx, uint32_t min,
-                                uint32_t max, uint32_t *pasid);
- int host_iommu_ctx_pasid_free(HostIOMMUContext *iommu_ctx, uint32_t pasid);
-+int host_iommu_ctx_bind_stage1_pgtbl(HostIOMMUContext *iommu_ctx,
-+                                     struct iommu_gpasid_bind_data *bind);
-+int host_iommu_ctx_unbind_stage1_pgtbl(HostIOMMUContext *iommu_ctx,
-+                                 struct iommu_gpasid_bind_data *unbind);
++enum VTDPASIDOp {
++    VTD_PASID_BIND,
++    VTD_PASID_UNBIND,
++    VTD_OP_NUM
++};
++typedef enum VTDPASIDOp VTDPASIDOp;
++
+ typedef enum VTDPCInvType {
+     /* force reset all */
+     VTD_PASID_CACHE_FORCE_RESET = 0,
+@@ -578,6 +585,17 @@ typedef struct VTDPASIDCacheInfo VTDPASIDCacheInfo;
+ #define VTD_SM_PASID_ENTRY_AW          7ULL /* Adjusted guest-address-width */
+ #define VTD_SM_PASID_ENTRY_DID(val)    ((val) & VTD_DOMAIN_ID_MASK)
  
- void host_iommu_ctx_init(void *_iommu_ctx, size_t instance_size,
-                          const char *mrtypename,
--                         uint64_t flags);
-+                         uint64_t flags,
-+                         struct iommu_nesting_info *info);
- void host_iommu_ctx_destroy(HostIOMMUContext *iommu_ctx);
++#define VTD_SM_PASID_ENTRY_FLPM          3ULL
++#define VTD_SM_PASID_ENTRY_FLPTPTR       (~0xfffULL)
++#define VTD_SM_PASID_ENTRY_SRE_BIT(val)  (!!((val) & 1ULL))
++#define VTD_SM_PASID_ENTRY_EAFE_BIT(val) (!!(((val) >> 7) & 1ULL))
++#define VTD_SM_PASID_ENTRY_PCD_BIT(val)  (!!(((val) >> 31) & 1ULL))
++#define VTD_SM_PASID_ENTRY_PWT_BIT(val)  (!!(((val) >> 30) & 1ULL))
++#define VTD_SM_PASID_ENTRY_EMTE_BIT(val) (!!(((val) >> 26) & 1ULL))
++#define VTD_SM_PASID_ENTRY_CD_BIT(val)   (!!(((val) >> 25) & 1ULL))
++#define VTD_SM_PASID_ENTRY_PAT(val)      (((val) >> 32) & 0xFFFFFFFFULL)
++#define VTD_SM_PASID_ENTRY_EMT(val)      (((val) >> 27) & 0x7ULL)
++
+ /* Second Level Page Translation Pointer*/
+ #define VTD_SM_PASID_ENTRY_SLPTPTR     (~0xfffULL)
  
- #endif
 -- 
 2.7.4
 
