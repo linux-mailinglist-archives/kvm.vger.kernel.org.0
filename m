@@ -2,141 +2,270 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C8FAC264033
-	for <lists+kvm@lfdr.de>; Thu, 10 Sep 2020 10:39:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7E59F264022
+	for <lists+kvm@lfdr.de>; Thu, 10 Sep 2020 10:35:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730259AbgIJIiD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 10 Sep 2020 04:38:03 -0400
-Received: from mga07.intel.com ([134.134.136.100]:49071 "EHLO mga07.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730484AbgIJIgu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 10 Sep 2020 04:36:50 -0400
-IronPort-SDR: ouN9a/6yGbXTxQjLQSg/GkEUPnSYOnK7Um7ADTX16sA+mIdLnuQZNmFAPduuoP/sCiSx/eUnOY
- KVca203eCBYA==
-X-IronPort-AV: E=McAfee;i="6000,8403,9739"; a="222691547"
-X-IronPort-AV: E=Sophos;i="5.76,412,1592895600"; 
-   d="scan'208";a="222691547"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga007.fm.intel.com ([10.253.24.52])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Sep 2020 01:36:49 -0700
-IronPort-SDR: +EDDpfCYRTdRoHjNofeNzcJtwlZejqaidJLecIN7n/T5soSPgYxMn5zyqSgciUTeA12obfYezy
- OnMhcyt1owWg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.76,412,1592895600"; 
-   d="scan'208";a="285159045"
-Received: from yilunxu-optiplex-7050.sh.intel.com (HELO localhost) ([10.239.159.141])
-  by fmsmga007.fm.intel.com with ESMTP; 10 Sep 2020 01:36:46 -0700
-Date:   Thu, 10 Sep 2020 16:32:30 +0800
-From:   Xu Yilun <yilun.xu@intel.com>
-To:     Alex Williamson <alex.williamson@redhat.com>
-Cc:     mdf@kernel.org, kwankhede@nvidia.com, linux-fpga@vger.kernel.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org, trix@redhat.com,
-        lgoncalv@redhat.com,
-        Matthew Gerlach <matthew.gerlach@linux.intel.com>,
-        "Raj, Ashok" <ashok.raj@intel.com>, yilun.xu@intel.com
-Subject: Re: [PATCH 3/3] Documentation: fpga: dfl: Add description for VFIO
-  Mdev support
-Message-ID: <20200910083230.GA16318@yilunxu-OptiPlex-7050>
-References: <1599549212-24253-1-git-send-email-yilun.xu@intel.com>
- <1599549212-24253-4-git-send-email-yilun.xu@intel.com>
- <20200908151002.553ed7ae@w520.home>
+        id S1730278AbgIJIfn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 10 Sep 2020 04:35:43 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:30797 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1730157AbgIJIfd (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 10 Sep 2020 04:35:33 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1599726931;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=CYmRoWWniFPaHjjXdipbulnXobK8uQf7JpAYrezYUMM=;
+        b=enMTet0e/mZV/BLIMPywYDTARFU62Lk5RxseCHoFWxy7VwYyyOBmHZihWLJyEuCH0b7dSQ
+        uYptcR3bkv93pyuHA0ij2SAglnk2aAPwC1UUDLIEt8zGleN4bO8gTjg1cpyaGNRwNADxyq
+        yJ5P3HlTSXMCDzRYT2+QDlRqbygkzSU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-543-LSHAAh1-MpCiq8ANKZVVcQ-1; Thu, 10 Sep 2020 04:35:29 -0400
+X-MC-Unique: LSHAAh1-MpCiq8ANKZVVcQ-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EB87E1008308;
+        Thu, 10 Sep 2020 08:35:27 +0000 (UTC)
+Received: from [10.36.112.212] (ovpn-112-212.ams2.redhat.com [10.36.112.212])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 2F88E10027A4;
+        Thu, 10 Sep 2020 08:35:25 +0000 (UTC)
+Subject: Re: [PATCH v2] KVM: arm64: Allow to limit number of PMU counters
+From:   Auger Eric <eric.auger@redhat.com>
+To:     Alexander Graf <graf@amazon.com>, kvmarm@lists.cs.columbia.edu
+Cc:     Marc Zyngier <maz@kernel.org>,
+        linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Mark Rutland <mark.rutland@arm.com>
+References: <20200908205730.23898-1-graf@amazon.com>
+ <79606f01-7638-ed6f-27c8-1183c723cd60@redhat.com>
+Message-ID: <366e640b-eb1e-33a2-7865-2751742cae58@redhat.com>
+Date:   Thu, 10 Sep 2020 10:35:23 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200908151002.553ed7ae@w520.home>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+In-Reply-To: <79606f01-7638-ed6f-27c8-1183c723cd60@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Alex:
+Hi Alex,
 
-Thanks for your quick response and is helpful to me. I did some more
-investigation and some comments inline.
-
-On Tue, Sep 08, 2020 at 03:10:02PM -0600, Alex Williamson wrote:
-> On Tue,  8 Sep 2020 15:13:32 +0800
-> Xu Yilun <yilun.xu@intel.com> wrote:
+On 9/10/20 9:21 AM, Auger Eric wrote:
+> Hi Alex,
 > 
-> > This patch adds description for VFIO Mdev support for dfl devices on
-> > dfl bus.
-> > 
-> > Signed-off-by: Xu Yilun <yilun.xu@intel.com>
-> > Signed-off-by: Matthew Gerlach <matthew.gerlach@linux.intel.com>
-> > ---
-> >  Documentation/fpga/dfl.rst | 20 ++++++++++++++++++++
-> >  1 file changed, 20 insertions(+)
-> > 
-> > diff --git a/Documentation/fpga/dfl.rst b/Documentation/fpga/dfl.rst
-> > index 0404fe6..f077754 100644
-> > --- a/Documentation/fpga/dfl.rst
-> > +++ b/Documentation/fpga/dfl.rst
-> > @@ -502,6 +502,26 @@ FME Partial Reconfiguration Sub Feature driver (see drivers/fpga/dfl-fme-pr.c)
-> >  could be a reference.
-> >  
-> >  
-> > +VFIO Mdev support for DFL devices
-> > +=================================
-> > +As we introduced a dfl bus for private features, they could be added to dfl bus
-> > +as independent dfl devices. There is a requirement to handle these devices
-> > +either by kernel drivers or by direct access from userspace. Usually we bind
-> > +the kernel drivers to devices which provide board management functions, and
-> > +gives user direct access to devices which cooperate closely with user
-> > +controlled Accelerated Function Unit (AFU). We realize this with a VFIO Mdev
-> > +implementation. When we bind the vfio-mdev-dfl driver to a dfl device, it
-> > +realizes a group of callbacks and registers to the Mdev framework as a
-> > +parent (physical) device. It could then create one (available_instances == 1)
-> > +mdev device.
-> > +Since dfl devices are sub devices of FPGA DFL physical devices (e.g. PCIE
-> > +device), which provide no DMA isolation for each sub device, this may leads to
-> > +DMA isolation problem if a private feature is designed to be capable of DMA.
-> > +The AFU user could potentially access the whole device addressing space and
-> > +impact the private feature. So now the general HW design rule is, no DMA
-> > +capability for private features. It eliminates the DMA isolation problem.
+> On 9/8/20 10:57 PM, Alexander Graf wrote:
+>> We currently pass through the number of PMU counters that we have available
+>> in hardware to guests. So if my host supports 10 concurrently active PMU
+>> counters, my guest will be able to spawn 10 counters as well.
+>>
+>> This is undesireable if we also want to use the PMU on the host for
+>> monitoring. In that case, we want to split the PMU between guest and
+>> host.
+> but don't we have a trap and emulate approach as opposed to current SPE
+> implementation?
+
+Looking again at the switch code (__pmu_switch_to_guest), I see we just
+enable/disable the event counters owned by either the host/guest. I
+thought this was more involved. So now it is clear.
+
+Thanks
+
+Eric
+>>
+>> To help that case, let's add a PMU attr that allows us to limit the number
+>> of PMU counters that we expose. With this patch in place, user space can
+>> keep some counters free for host use.
+>>
+>> Signed-off-by: Alexander Graf <graf@amazon.com>
+>>
+>> ---
+>>
+>> Because this patch touches the same code paths as the vPMU filtering one
+>> and the vPMU filtering generalized a few conditions in the attr path,
+>> I've based it on top. Please let me know if you want it independent instead.
+>>
+>> v1 -> v2:
+>>
+>>   - Add documentation
+>>   - Add read support
+>> ---
+>>  Documentation/virt/kvm/devices/vcpu.rst | 25 +++++++++++++++++++++++++
+>>  arch/arm64/include/uapi/asm/kvm.h       |  7 ++++---
+>>  arch/arm64/kvm/pmu-emul.c               | 32 ++++++++++++++++++++++++++++++++
+>>  arch/arm64/kvm/sys_regs.c               |  5 +++++
+>>  include/kvm/arm_pmu.h                   |  1 +
+>>  5 files changed, 67 insertions(+), 3 deletions(-)
+>>
+>> diff --git a/Documentation/virt/kvm/devices/vcpu.rst b/Documentation/virt/kvm/devices/vcpu.rst
+>> index 203b91e93151..1a1c8d8c8b1d 100644
+>> --- a/Documentation/virt/kvm/devices/vcpu.rst
+>> +++ b/Documentation/virt/kvm/devices/vcpu.rst
+>> @@ -102,6 +102,31 @@ isn't strictly speaking an event. Filtering the cycle counter is possible
+>>  using event 0x11 (CPU_CYCLES).
+>>  
+>>  
+>> +1.4 ATTRIBUTE: KVM_ARM_VCPU_PMU_V3_NUM_EVENTS
+>> +---------------------------------------------
+>> +
+>> +:Parameters: in kvm_device_attr.addr the address for the limit of concurrent
+>> +             events is a pointer to an int
+>> +
+>> +:Returns:
+>> +
+>> +	 =======  ======================================================
+>> +	 -ENODEV: PMUv3 not supported
+>> +	 -EBUSY:  PMUv3 already initialized
+>> +	 -EINVAL: Too large number of events
+> s/events/event counters
 > 
-> What's the advantage of entangling mdev/vfio in this approach versus
-> simply exposing the MMIO region of the device via sysfs (similar to a
-> resource file in pci-sysfs)?  This implementation doesn't support
-> interrupts, it doesn't support multiplexing of a device, it doesn't
-> perform any degree of mediation, it seems to simply say "please don't
-> do DMA".  I don't think that's acceptable for an mdev driver.  If you
-> want to play loose with isolation, do it somewhere else.  Thanks,
-
-The intention of the patchset is to enable the userspace drivers for dfl
-devices. The dfl devices are actually different IP blocks integrated in
-FPGA to support different board functionalities. They are sub devices of
-the FPGA PCIe device. Their mmio blocks are in PCIE bar regions. And we
-want some of the dfl devices handled by the userspace drivers.
-
-Some dfl devices are capable of interrupt. I didn't add interrupt code
-in this patch cause now the IRQ capable dfl devices are all handled by
-kernel drivers. But as a generic FPGA platform, IRQ handling for userspace
-drivers should be supported.
-
-And I can see there are several ways to enable the userspace driver.
-
-1. Some specific sysfs like pci do. But seems it is not the common way for
-userspace driver. It does't support interrupt. And potentially users
-operate on the same mmio region together with kernel driver at the same
-time.
-
-2. VFIO driver with NOIOMMU enabled. I think it meets our needs. Do you
-think it is good we implement an VFIO driver for dfl devices?
-
-3. VFIO mdev. I implemented it because it will not block us from lacking
-of valid iommu group. And since the driver didn't perform any mediation,
-I should give up.
-
-4. UIO driver. It should work. I'm wondering if option 2 covers the
-functionalities of UIO and has more enhancement. So option 2 may be
-better?
-
-Thanks again for your time, and I really appreciate you would give some
-guide on it.
-
-Yilun.
-
+> I see that in perf code indeed num_events is used for that but I think
+> for the end-user the event counter terminology is better as it fits the
+> ARM spec.
+>> +	 =======  ======================================================
+>> +
+>> +Reconfigure the limit of concurrent PMU events that the guest can monitor.
+> here also
+>> +This number is directly exposed as part of the PMCR_EL0 register.
+> Maybe quote the "N" field
+>> +
+>> +On vcpu creation, this attribute is set to the hardware limit of the current
+>> +platform. If you need to determine the hardware limit, you can read this
+>> +attribute before setting it.
+>> +
+>> +Restrictions: The default value for this property is the number of hardware
+>> +supported events. Only values that are smaller than the hardware limit can
+> event counters
+>> +be set.
+>> +
+>>  2. GROUP: KVM_ARM_VCPU_TIMER_CTRL
+>>  =================================
+>>  
+>> diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
+>> index 7b1511d6ce44..db025c0b5a40 100644
+>> --- a/arch/arm64/include/uapi/asm/kvm.h
+>> +++ b/arch/arm64/include/uapi/asm/kvm.h
+>> @@ -342,9 +342,10 @@ struct kvm_vcpu_events {
+>>  
+>>  /* Device Control API on vcpu fd */
+>>  #define KVM_ARM_VCPU_PMU_V3_CTRL	0
+>> -#define   KVM_ARM_VCPU_PMU_V3_IRQ	0
+>> -#define   KVM_ARM_VCPU_PMU_V3_INIT	1
+>> -#define   KVM_ARM_VCPU_PMU_V3_FILTER	2
+>> +#define   KVM_ARM_VCPU_PMU_V3_IRQ		0
+>> +#define   KVM_ARM_VCPU_PMU_V3_INIT		1
+>> +#define   KVM_ARM_VCPU_PMU_V3_FILTER		2
+>> +#define   KVM_ARM_VCPU_PMU_V3_NUM_EVENTS	3
+>>  #define KVM_ARM_VCPU_TIMER_CTRL		1
+>>  #define   KVM_ARM_VCPU_TIMER_IRQ_VTIMER		0
+>>  #define   KVM_ARM_VCPU_TIMER_IRQ_PTIMER		1
+>> diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
+>> index 0458860bade2..c7915b95fec0 100644
+>> --- a/arch/arm64/kvm/pmu-emul.c
+>> +++ b/arch/arm64/kvm/pmu-emul.c
+>> @@ -253,6 +253,8 @@ void kvm_pmu_vcpu_init(struct kvm_vcpu *vcpu)
+>>  
+>>  	for (i = 0; i < ARMV8_PMU_MAX_COUNTERS; i++)
+>>  		pmu->pmc[i].idx = i;
+>> +
+>> +	pmu->num_events = perf_num_counters() - 1;
+>>  }
+>>  
+>>  /**
+>> @@ -978,6 +980,25 @@ int kvm_arm_pmu_v3_set_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
+>>  
+>>  		return 0;
+>>  	}
+>> +	case KVM_ARM_VCPU_PMU_V3_NUM_EVENTS: {
+>> +		u64 mask = ARMV8_PMU_PMCR_N_MASK << ARMV8_PMU_PMCR_N_SHIFT;
+>> +		int __user *uaddr = (int __user *)(long)attr->addr;
+>> +		u32 num_events;
+>> +
+>> +		if (get_user(num_events, uaddr))
+>> +			return -EFAULT;
+>> +
+>> +		if (num_events >= perf_num_counters())
+>> +			return -EINVAL;
+>> +
+>> +		vcpu->arch.pmu.num_events = num_events;
+>> +
+>> +		num_events <<= ARMV8_PMU_PMCR_N_SHIFT;
+>> +		__vcpu_sys_reg(vcpu, SYS_PMCR_EL0) &= ~mask;
+>> +		__vcpu_sys_reg(vcpu, SYS_PMCR_EL0) |= num_events;
+>> +
+>> +		return 0;
+>> +	}
+>>  	case KVM_ARM_VCPU_PMU_V3_INIT:
+>>  		return kvm_arm_pmu_v3_init(vcpu);
+>>  	}
+>> @@ -1004,6 +1025,16 @@ int kvm_arm_pmu_v3_get_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
+>>  		irq = vcpu->arch.pmu.irq_num;
+>>  		return put_user(irq, uaddr);
+>>  	}
+>> +	case KVM_ARM_VCPU_PMU_V3_NUM_EVENTS: {
+>> +		int __user *uaddr = (int __user *)(long)attr->addr;
+>> +		u32 num_events;
+>> +
+>> +		if (!test_bit(KVM_ARM_VCPU_PMU_V3, vcpu->arch.features))
+>> +			return -ENODEV;
+>> +
+>> +		num_events = vcpu->arch.pmu.num_events;
+>> +		return put_user(num_events, uaddr);
+>> +	}
+>>  	}
+>>  
+>>  	return -ENXIO;
+>> @@ -1015,6 +1046,7 @@ int kvm_arm_pmu_v3_has_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
+>>  	case KVM_ARM_VCPU_PMU_V3_IRQ:
+>>  	case KVM_ARM_VCPU_PMU_V3_INIT:
+>>  	case KVM_ARM_VCPU_PMU_V3_FILTER:
+>> +	case KVM_ARM_VCPU_PMU_V3_NUM_EVENTS:
+>>  		if (kvm_arm_support_pmu_v3() &&
+>>  		    test_bit(KVM_ARM_VCPU_PMU_V3, vcpu->arch.features))
+>>  			return 0;
+>> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+>> index 20ab2a7d37ca..d51e39600bbd 100644
+>> --- a/arch/arm64/kvm/sys_regs.c
+>> +++ b/arch/arm64/kvm/sys_regs.c
+>> @@ -672,6 +672,11 @@ static void reset_pmcr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
+>>  	       | (ARMV8_PMU_PMCR_MASK & 0xdecafbad)) & (~ARMV8_PMU_PMCR_E);
+>>  	if (!system_supports_32bit_el0())
+>>  		val |= ARMV8_PMU_PMCR_LC;
+>> +
+>> +	/* Override number of event selectors */
+>> +	val &= ~(ARMV8_PMU_PMCR_N_MASK << ARMV8_PMU_PMCR_N_SHIFT);
+>> +	val |= (u32)vcpu->arch.pmu.num_events << ARMV8_PMU_PMCR_N_SHIFT;
+>> +
+>>  	__vcpu_sys_reg(vcpu, r->reg) = val;
+>>  }
+>>  
+>> diff --git a/include/kvm/arm_pmu.h b/include/kvm/arm_pmu.h
+>> index 98cbfe885a53..ea3fc96a37d9 100644
+>> --- a/include/kvm/arm_pmu.h
+>> +++ b/include/kvm/arm_pmu.h
+>> @@ -27,6 +27,7 @@ struct kvm_pmu {
+>>  	bool ready;
+>>  	bool created;
+>>  	bool irq_level;
+>> +	u8 num_events;
+>>  };
+>>  
+>>  #define kvm_arm_pmu_v3_ready(v)		((v)->arch.pmu.ready)
+>>
 > 
-> Alex
+> Thanks
+> 
+> Eric
+> 
+
