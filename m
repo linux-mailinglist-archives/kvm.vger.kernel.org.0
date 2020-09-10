@@ -2,416 +2,652 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A11C126403B
-	for <lists+kvm@lfdr.de>; Thu, 10 Sep 2020 10:40:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 16CFE264035
+	for <lists+kvm@lfdr.de>; Thu, 10 Sep 2020 10:40:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730179AbgIJIko (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 10 Sep 2020 04:40:44 -0400
-Received: from mga07.intel.com ([134.134.136.100]:49004 "EHLO mga07.intel.com"
+        id S1730204AbgIJIkN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 10 Sep 2020 04:40:13 -0400
+Received: from mga02.intel.com ([134.134.136.20]:48051 "EHLO mga02.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729911AbgIJIfu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 10 Sep 2020 04:35:50 -0400
-IronPort-SDR: FwFjbfr3nm/6qI/dztIV318i8h3ztAt64af6eLHmkkF/qt2qyNAsmT+CBTXHkxD/h3Y7UOF9Gx
- eg8YxAxOsy9Q==
-X-IronPort-AV: E=McAfee;i="6000,8403,9739"; a="222691441"
+        id S1730175AbgIJIjd (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 10 Sep 2020 04:39:33 -0400
+IronPort-SDR: g7eo/CHErKNHrIxha8vGnt52FyKXmx65sjR5TNjv+sFmfaMT/BoijTd+sSGVi0HzD5it4f2huA
+ YDZwms4rOYzA==
+X-IronPort-AV: E=McAfee;i="6000,8403,9739"; a="146197780"
 X-IronPort-AV: E=Sophos;i="5.76,412,1592895600"; 
-   d="scan'208";a="222691441"
+   d="scan'208";a="146197780"
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Sep 2020 01:35:49 -0700
-IronPort-SDR: yMANbFdTVbqHN4EGmgPs1W0d40cQTvrKRwdkK7Q0JXLhDxBE8c0fyqje0Hrb/Am2lh3mdlQ9gX
- 8UkPXz+nOupQ==
-X-ExtLoop1: 1
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Sep 2020 01:39:00 -0700
+IronPort-SDR: EFPKhNzngEHQqwsSVOMHlqCe75951nQW/7mJuL//MBVRhoZfhZLO62cLeSbJx1ym21E6j27zAN
+ anQGwspYJ6Gw==
 X-IronPort-AV: E=Sophos;i="5.76,412,1592895600"; 
-   d="scan'208";a="329255947"
-Received: from chenyi-pc.sh.intel.com ([10.239.159.72])
-  by fmsmga004.fm.intel.com with ESMTP; 10 Sep 2020 01:35:46 -0700
-From:   Chenyi Qiang <chenyi.qiang@intel.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Xiaoyao Li <xiaoyao.li@intel.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [RFC v3 2/2] KVM: VMX: Enable bus lock VM exit
-Date:   Thu, 10 Sep 2020 16:37:51 +0800
-Message-Id: <20200910083751.26686-3-chenyi.qiang@intel.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20200910083751.26686-1-chenyi.qiang@intel.com>
-References: <20200910083751.26686-1-chenyi.qiang@intel.com>
+   d="scan'208";a="480806236"
+Received: from gliakhov-mobl2.ger.corp.intel.com (HELO ubuntu) ([10.252.39.14])
+  by orsmga005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Sep 2020 01:38:57 -0700
+Date:   Thu, 10 Sep 2020 10:38:54 +0200
+From:   Guennadi Liakhovetski <guennadi.liakhovetski@linux.intel.com>
+To:     Mathieu Poirier <mathieu.poirier@linaro.org>
+Cc:     kvm@vger.kernel.org, linux-remoteproc@vger.kernel.org,
+        virtualization@lists.linux-foundation.org,
+        sound-open-firmware@alsa-project.org,
+        Pierre-Louis Bossart <pierre-louis.bossart@linux.intel.com>,
+        Liam Girdwood <liam.r.girdwood@linux.intel.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Ohad Ben-Cohen <ohad@wizery.com>,
+        Bjorn Andersson <bjorn.andersson@linaro.org>,
+        Vincent Whitchurch <vincent.whitchurch@axis.com>
+Subject: Re: [PATCH v5 4/4] vhost: add an RPMsg API
+Message-ID: <20200910083853.GB17698@ubuntu>
+References: <20200826174636.23873-1-guennadi.liakhovetski@linux.intel.com>
+ <20200826174636.23873-5-guennadi.liakhovetski@linux.intel.com>
+ <20200909223946.GA562265@xps15>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200909223946.GA562265@xps15>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Virtual Machine can exploit bus locks to degrade the performance of
-system. Bus lock can be caused by split locked access to writeback(WB)
-memory or by using locks on uncacheable(UC) memory. The bus lock is
-typically >1000 cycles slower than an atomic operation within a cache
-line. It also disrupts performance on other cores (which must wait for
-the bus lock to be released before their memory operations can
-complete).
+Hi Mathieu,
 
-To address the threat, bus lock VM exit is introduced to notify the VMM
-when a bus lock was acquired, allowing it to enforce throttling or other
-policy based mitigations.
+On Wed, Sep 09, 2020 at 04:39:46PM -0600, Mathieu Poirier wrote:
+> Good afternoon,
+> 
+> On Wed, Aug 26, 2020 at 07:46:36PM +0200, Guennadi Liakhovetski wrote:
+> > Linux supports running the RPMsg protocol over the VirtIO transport
+> > protocol, but currently there is only support for VirtIO clients and
+> > no support for a VirtIO server. This patch adds a vhost-based RPMsg
+> > server implementation.
+> 
+> This changelog is very confusing...  At this time the name service in the
+> remoteproc space runs as a server on the application processor.  But from the
+> above the remoteproc usecase seems to be considered to be a client
+> configuration.
 
-A VMM can enable VM exit due to bus locks by setting a new "Bus Lock
-Detection" VM-execution control(bit 30 of Secondary Processor-based VM
-execution controls). If delivery of this VM exit was preempted by a
-higher priority VM exit (e.g. EPT misconfiguration, EPT violation, APIC
-access VM exit, APIC write VM exit, exception bitmap exiting), bit 26 of
-exit reason in vmcs field is set to 1.
+I agree that this isn't very obvious. But I think it is common to call the 
+host "a server" and guests "clients." E.g. in vhost.c in the top-of-thefile 
+comment:
 
-In current implementation, the KVM exposes this capability through
-KVM_CAP_X86_BUS_LOCK_EXIT. The user can get the supported mode bitmap
-(i.e. off and exit) and enable it explicitly (disabled by default). If
-bus locks in guest are detected by KVM, exit to user space even when
-current exit reason is handled by KVM internally. Set a new field
-KVM_RUN_BUS_LOCK in vcpu->run->flags to inform the user space that there
-is a bus lock in guest and it is preempted by a higher prioriy VM exit.
+ * Generic code for virtio server in host kernel.
 
-Document for Bus Lock VM exit is now available at the latest "Intel
-Architecture Instruction Set Extensions Programming Reference".
+I think the generic concept behind this notation is, that as guests boot, 
+they send their requests to the host, e.g. VirtIO device drivers on guests 
+send requests over VirtQueues to VirtIO servers on the host, which can run 
+either in the user- or in the kernel-space. And I think you can follow that 
+logic in case of devices or remote processors too: it's the main CPU(s) 
+that boot(s) and start talking to devices and remote processors, so in that 
+sence devices are servers and the CPUs are their clients.
 
-Document Link:
-https://software.intel.com/content/www/us/en/develop/download/intel-architecture-instruction-set-extensions-programming-reference.html
+And yes, the name-space announcement use-case seems confusing to me too - it 
+reverts the relationship in a way: once a guest has booted and established 
+connections to any rpmsg "devices," those send their namespace announcements 
+back. But I think this can be regarded as server identification: you connect 
+to a server and it replies with its identification and capabilities.
 
-Co-developed-by: Xiaoyao Li <xiaoyao.li@intel.com>
-Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
-Signed-off-by: Chenyi Qiang <chenyi.qiang@intel.com>
----
- arch/x86/include/asm/kvm_host.h    |  5 ++++
- arch/x86/include/asm/vmx.h         |  1 +
- arch/x86/include/asm/vmxfeatures.h |  1 +
- arch/x86/include/uapi/asm/kvm.h    |  1 +
- arch/x86/include/uapi/asm/vmx.h    |  4 ++-
- arch/x86/kvm/vmx/capabilities.h    |  6 +++++
- arch/x86/kvm/vmx/vmx.c             | 42 ++++++++++++++++++++++++++++--
- arch/x86/kvm/vmx/vmx.h             |  2 +-
- arch/x86/kvm/x86.c                 | 27 ++++++++++++++++++-
- arch/x86/kvm/x86.h                 |  5 ++++
- include/uapi/linux/kvm.h           |  7 +++++
- 11 files changed, 96 insertions(+), 5 deletions(-)
+> And I don't see a server implementation per se...  It is more like a client
+> implementation since vhost_rpmsg_announce() uses the RESPONSE queue, which sends
+> messages from host to guest.
+> 
+> Perhaps it is my lack of familiarity with vhost terminology.
+> 
+> > 
+> > Signed-off-by: Guennadi Liakhovetski <guennadi.liakhovetski@linux.intel.com>
+> > ---
+> >  drivers/vhost/Kconfig       |   7 +
+> >  drivers/vhost/Makefile      |   3 +
+> >  drivers/vhost/rpmsg.c       | 373 ++++++++++++++++++++++++++++++++++++
+> >  drivers/vhost/vhost_rpmsg.h |  74 +++++++
+> >  4 files changed, 457 insertions(+)
+> >  create mode 100644 drivers/vhost/rpmsg.c
+> >  create mode 100644 drivers/vhost/vhost_rpmsg.h
+> > 
+> > diff --git a/drivers/vhost/Kconfig b/drivers/vhost/Kconfig
+> > index 587fbae06182..046b948fc411 100644
+> > --- a/drivers/vhost/Kconfig
+> > +++ b/drivers/vhost/Kconfig
+> > @@ -38,6 +38,13 @@ config VHOST_NET
+> >  	  To compile this driver as a module, choose M here: the module will
+> >  	  be called vhost_net.
+> >  
+> > +config VHOST_RPMSG
+> > +	tristate
+> > +	select VHOST
+> > +	help
+> > +	  Vhost RPMsg API allows vhost drivers to communicate with VirtIO
+> > +	  drivers, using the RPMsg over VirtIO protocol.
+> 
+> I had to assume vhost drivers are running on the host and virtIO drivers on the
+> guests.  This may be common knowledge for people familiar with vhosts but
+> certainly obscur for commoners  Having a help section that is clear on what is
+> happening would remove any ambiguity.
 
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 5303dbc5c9bc..8059b8b21ecd 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -961,6 +961,9 @@ struct kvm_arch {
- 	bool guest_can_read_msr_platform_info;
- 	bool exception_payload_enabled;
- 
-+	/* Set when bus lock vm exit is enabled by user */
-+	bool bus_lock_exit;
-+
- 	struct kvm_pmu_event_filter *pmu_event_filter;
- 	struct task_struct *nx_lpage_recovery_thread;
- };
-@@ -1347,6 +1350,8 @@ extern u8   kvm_tsc_scaling_ratio_frac_bits;
- extern u64  kvm_max_tsc_scaling_ratio;
- /* 1ull << kvm_tsc_scaling_ratio_frac_bits */
- extern u64  kvm_default_tsc_scaling_ratio;
-+/* bus lock detection supported */
-+extern bool kvm_has_bus_lock_exit;
- 
- extern u64 kvm_mce_cap_supported;
- 
-diff --git a/arch/x86/include/asm/vmx.h b/arch/x86/include/asm/vmx.h
-index cd7de4b401fe..93a880bc31a7 100644
---- a/arch/x86/include/asm/vmx.h
-+++ b/arch/x86/include/asm/vmx.h
-@@ -73,6 +73,7 @@
- #define SECONDARY_EXEC_PT_USE_GPA		VMCS_CONTROL_BIT(PT_USE_GPA)
- #define SECONDARY_EXEC_TSC_SCALING              VMCS_CONTROL_BIT(TSC_SCALING)
- #define SECONDARY_EXEC_ENABLE_USR_WAIT_PAUSE	VMCS_CONTROL_BIT(USR_WAIT_PAUSE)
-+#define SECONDARY_EXEC_BUS_LOCK_DETECTION	VMCS_CONTROL_BIT(BUS_LOCK_DETECTION)
- 
- #define PIN_BASED_EXT_INTR_MASK                 VMCS_CONTROL_BIT(INTR_EXITING)
- #define PIN_BASED_NMI_EXITING                   VMCS_CONTROL_BIT(NMI_EXITING)
-diff --git a/arch/x86/include/asm/vmxfeatures.h b/arch/x86/include/asm/vmxfeatures.h
-index 9915990fd8cf..e80523346274 100644
---- a/arch/x86/include/asm/vmxfeatures.h
-+++ b/arch/x86/include/asm/vmxfeatures.h
-@@ -83,5 +83,6 @@
- #define VMX_FEATURE_TSC_SCALING		( 2*32+ 25) /* Scale hardware TSC when read in guest */
- #define VMX_FEATURE_USR_WAIT_PAUSE	( 2*32+ 26) /* Enable TPAUSE, UMONITOR, UMWAIT in guest */
- #define VMX_FEATURE_ENCLV_EXITING	( 2*32+ 28) /* "" VM-Exit on ENCLV (leaf dependent) */
-+#define VMX_FEATURE_BUS_LOCK_DETECTION	( 2*32+ 30) /* VM-Exit when bus lock caused */
- 
- #endif /* _ASM_X86_VMXFEATURES_H */
-diff --git a/arch/x86/include/uapi/asm/kvm.h b/arch/x86/include/uapi/asm/kvm.h
-index 0780f97c1850..a1471c05f7f9 100644
---- a/arch/x86/include/uapi/asm/kvm.h
-+++ b/arch/x86/include/uapi/asm/kvm.h
-@@ -111,6 +111,7 @@ struct kvm_ioapic_state {
- #define KVM_NR_IRQCHIPS          3
- 
- #define KVM_RUN_X86_SMM		 (1 << 0)
-+#define KVM_RUN_BUS_LOCK         (1 << 1)
- 
- /* for KVM_GET_REGS and KVM_SET_REGS */
- struct kvm_regs {
-diff --git a/arch/x86/include/uapi/asm/vmx.h b/arch/x86/include/uapi/asm/vmx.h
-index b8ff9e8ac0d5..14c177c4afd5 100644
---- a/arch/x86/include/uapi/asm/vmx.h
-+++ b/arch/x86/include/uapi/asm/vmx.h
-@@ -88,6 +88,7 @@
- #define EXIT_REASON_XRSTORS             64
- #define EXIT_REASON_UMWAIT              67
- #define EXIT_REASON_TPAUSE              68
-+#define EXIT_REASON_BUS_LOCK            74
- 
- #define VMX_EXIT_REASONS \
- 	{ EXIT_REASON_EXCEPTION_NMI,         "EXCEPTION_NMI" }, \
-@@ -148,7 +149,8 @@
- 	{ EXIT_REASON_XSAVES,                "XSAVES" }, \
- 	{ EXIT_REASON_XRSTORS,               "XRSTORS" }, \
- 	{ EXIT_REASON_UMWAIT,                "UMWAIT" }, \
--	{ EXIT_REASON_TPAUSE,                "TPAUSE" }
-+	{ EXIT_REASON_TPAUSE,                "TPAUSE" }, \
-+	{ EXIT_REASON_BUS_LOCK,              "BUS_LOCK" }
- 
- #define VMX_EXIT_REASON_FLAGS \
- 	{ VMX_EXIT_REASONS_FAILED_VMENTRY,	"FAILED_VMENTRY" }
-diff --git a/arch/x86/kvm/vmx/capabilities.h b/arch/x86/kvm/vmx/capabilities.h
-index 4bbd8b448d22..aa94535e6705 100644
---- a/arch/x86/kvm/vmx/capabilities.h
-+++ b/arch/x86/kvm/vmx/capabilities.h
-@@ -262,6 +262,12 @@ static inline bool cpu_has_vmx_tsc_scaling(void)
- 		SECONDARY_EXEC_TSC_SCALING;
- }
- 
-+static inline bool cpu_has_vmx_bus_lock_detection(void)
-+{
-+	return vmcs_config.cpu_based_2nd_exec_ctrl &
-+	    SECONDARY_EXEC_BUS_LOCK_DETECTION;
-+}
-+
- static inline bool cpu_has_vmx_apicv(void)
- {
- 	return cpu_has_vmx_apic_register_virt() &&
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index adc59cf9036d..5dbfee639375 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -2461,7 +2461,8 @@ static __init int setup_vmcs_config(struct vmcs_config *vmcs_conf,
- 			SECONDARY_EXEC_ENABLE_USR_WAIT_PAUSE |
- 			SECONDARY_EXEC_PT_USE_GPA |
- 			SECONDARY_EXEC_PT_CONCEAL_VMX |
--			SECONDARY_EXEC_ENABLE_VMFUNC;
-+			SECONDARY_EXEC_ENABLE_VMFUNC |
-+			SECONDARY_EXEC_BUS_LOCK_DETECTION;
- 		if (cpu_has_sgx())
- 			opt2 |= SECONDARY_EXEC_ENCLS_EXITING;
- 		if (adjust_vmx_controls(min2, opt2,
-@@ -4244,6 +4245,9 @@ static void vmx_compute_secondary_exec_control(struct vcpu_vmx *vmx)
- 		}
- 	}
- 
-+	if (!kvm_bus_lock_exit_enabled(vmx->vcpu.kvm))
-+		exec_control &= ~SECONDARY_EXEC_BUS_LOCK_DETECTION;
-+
- 	vmx->secondary_exec_control = exec_control;
- }
- 
-@@ -5685,6 +5689,14 @@ static int handle_encls(struct kvm_vcpu *vcpu)
- 	return 1;
- }
- 
-+static int handle_bus_lock(struct kvm_vcpu *vcpu)
-+{
-+	struct kvm_run *kvm_run = vcpu->run;
-+
-+	kvm_run->exit_reason = KVM_EXIT_BUS_LOCK;
-+	return 0;
-+}
-+
- /*
-  * The exit handlers return 1 if the exit was handled fully and guest execution
-  * may resume.  Otherwise they set the kvm_run parameter to indicate what needs
-@@ -5741,6 +5753,7 @@ static int (*kvm_vmx_exit_handlers[])(struct kvm_vcpu *vcpu) = {
- 	[EXIT_REASON_VMFUNC]		      = handle_vmx_instruction,
- 	[EXIT_REASON_PREEMPTION_TIMER]	      = handle_preemption_timer,
- 	[EXIT_REASON_ENCLS]		      = handle_encls,
-+	[EXIT_REASON_BUS_LOCK]                = handle_bus_lock,
- };
- 
- static const int kvm_vmx_max_exit_handlers =
-@@ -5979,7 +5992,7 @@ void dump_vmcs(void)
-  * The guest has exited.  See if we can fix it or if we need userspace
-  * assistance.
-  */
--static int vmx_handle_exit(struct kvm_vcpu *vcpu, fastpath_t exit_fastpath)
-+static int __vmx_handle_exit(struct kvm_vcpu *vcpu, fastpath_t exit_fastpath)
- {
- 	struct vcpu_vmx *vmx = to_vmx(vcpu);
- 	union vmx_exit_reason exit_reason = vmx->exit_reason;
-@@ -6131,6 +6144,28 @@ static int vmx_handle_exit(struct kvm_vcpu *vcpu, fastpath_t exit_fastpath)
- 	return 0;
- }
- 
-+static int vmx_handle_exit(struct kvm_vcpu *vcpu, fastpath_t exit_fastpath)
-+{
-+	struct vcpu_vmx *vmx = to_vmx(vcpu);
-+	int ret = __vmx_handle_exit(vcpu, exit_fastpath);
-+
-+	/*
-+	 * Even when current exit reason is handled by KVM
-+	 * internally, we still needs to exit to user space
-+	 * when bus lock detected to inform that there is a
-+	 * bus lock in guest.
-+	 */
-+	if (vmx->exit_reason.bus_lock_detected) {
-+		if (ret > 0)
-+			vcpu->run->exit_reason = KVM_EXIT_BUS_LOCK;
-+		else
-+			vcpu->run->flags |= KVM_RUN_BUS_LOCK;
-+		return 0;
-+	}
-+	vcpu->run->flags &= ~KVM_RUN_BUS_LOCK;
-+	return ret;
-+}
-+
- /*
-  * Software based L1D cache flush which is used when microcode providing
-  * the cache control MSR is not loaded.
-@@ -8097,6 +8132,9 @@ static __init int hardware_setup(void)
- 		kvm_tsc_scaling_ratio_frac_bits = 48;
- 	}
- 
-+	if (cpu_has_vmx_bus_lock_detection())
-+		kvm_has_bus_lock_exit = true;
-+
- 	set_bit(0, vmx_vpid_bitmap); /* 0 is reserved for host */
- 
- 	if (enable_ept)
-diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
-index 8bf97a81affd..779ea3b15134 100644
---- a/arch/x86/kvm/vmx/vmx.h
-+++ b/arch/x86/kvm/vmx/vmx.h
-@@ -105,7 +105,7 @@ union vmx_exit_reason {
- 		u32	reserved23		: 1;
- 		u32	reserved24		: 1;
- 		u32	reserved25		: 1;
--		u32	reserved26		: 1;
-+		u32	bus_lock_detected	: 1;
- 		u32	enclave_mode		: 1;
- 		u32	smi_pending_mtf		: 1;
- 		u32	smi_from_vmx_root	: 1;
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index d39d6cf1d473..d96619ce7f66 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -134,6 +134,8 @@ u64  __read_mostly kvm_max_tsc_scaling_ratio;
- EXPORT_SYMBOL_GPL(kvm_max_tsc_scaling_ratio);
- u64 __read_mostly kvm_default_tsc_scaling_ratio;
- EXPORT_SYMBOL_GPL(kvm_default_tsc_scaling_ratio);
-+bool __read_mostly kvm_has_bus_lock_exit;
-+EXPORT_SYMBOL_GPL(kvm_has_bus_lock_exit);
- 
- /* tsc tolerance in parts per million - default to 1/2 of the NTP threshold */
- static u32 __read_mostly tsc_tolerance_ppm = 250;
-@@ -3578,6 +3580,11 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- 	case KVM_CAP_SMALLER_MAXPHYADDR:
- 		r = (int) allow_smaller_maxphyaddr;
- 		break;
-+	case KVM_CAP_X86_BUS_LOCK_EXIT:
-+		r |= KVM_BUS_LOCK_DETECTION_OFF;
-+		if (kvm_has_bus_lock_exit)
-+			r |= KVM_BUS_LOCK_DETECTION_EXIT;
-+		break;
- 	default:
- 		break;
- 	}
-@@ -5030,6 +5037,20 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
- 		kvm->arch.exception_payload_enabled = cap->args[0];
- 		r = 0;
- 		break;
-+	case KVM_CAP_X86_BUS_LOCK_EXIT:
-+		r = -EINVAL;
-+		if (cap->args[0] & ~KVM_BUS_LOCK_DETECTION_VALID_MODE)
-+			break;
-+
-+		if ((cap->args[0] & KVM_BUS_LOCK_DETECTION_OFF) &&
-+		    (cap->args[0] & KVM_BUS_LOCK_DETECTION_EXIT))
-+			break;
-+
-+		if (kvm_has_bus_lock_exit &&
-+		    cap->args[0] & KVM_BUS_LOCK_DETECTION_EXIT)
-+			kvm->arch.bus_lock_exit = true;
-+		r = 0;
-+		break;
- 	default:
- 		r = -EINVAL;
- 		break;
-@@ -7772,12 +7793,16 @@ static void post_kvm_run_save(struct kvm_vcpu *vcpu)
- 	struct kvm_run *kvm_run = vcpu->run;
- 
- 	kvm_run->if_flag = (kvm_get_rflags(vcpu) & X86_EFLAGS_IF) != 0;
--	kvm_run->flags = is_smm(vcpu) ? KVM_RUN_X86_SMM : 0;
- 	kvm_run->cr8 = kvm_get_cr8(vcpu);
- 	kvm_run->apic_base = kvm_get_apic_base(vcpu);
- 	kvm_run->ready_for_interrupt_injection =
- 		pic_in_kernel(vcpu->kvm) ||
- 		kvm_vcpu_ready_for_interrupt_injection(vcpu);
-+
-+	if (is_smm(vcpu))
-+		kvm_run->flags |= KVM_RUN_X86_SMM;
-+	else
-+		kvm_run->flags &= ~KVM_RUN_X86_SMM;
- }
- 
- static void update_cr8_intercept(struct kvm_vcpu *vcpu)
-diff --git a/arch/x86/kvm/x86.h b/arch/x86/kvm/x86.h
-index 995ab696dcf0..54aa7712cb52 100644
---- a/arch/x86/kvm/x86.h
-+++ b/arch/x86/kvm/x86.h
-@@ -335,6 +335,11 @@ static inline bool kvm_cstate_in_guest(struct kvm *kvm)
- 	return kvm->arch.cstate_in_guest;
- }
- 
-+static inline bool kvm_bus_lock_exit_enabled(struct kvm *kvm)
-+{
-+	return kvm->arch.bus_lock_exit;
-+}
-+
- DECLARE_PER_CPU(struct kvm_vcpu *, current_vcpu);
- 
- static inline void kvm_before_interrupt(struct kvm_vcpu *vcpu)
-diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-index f6d86033c4fa..3f0176733622 100644
---- a/include/uapi/linux/kvm.h
-+++ b/include/uapi/linux/kvm.h
-@@ -248,6 +248,7 @@ struct kvm_hyperv_exit {
- #define KVM_EXIT_IOAPIC_EOI       26
- #define KVM_EXIT_HYPERV           27
- #define KVM_EXIT_ARM_NISV         28
-+#define KVM_EXIT_BUS_LOCK         29
- 
- /* For KVM_EXIT_INTERNAL_ERROR */
- /* Emulate instruction failed. */
-@@ -1035,6 +1036,7 @@ struct kvm_ppc_resize_hpt {
- #define KVM_CAP_LAST_CPU 184
- #define KVM_CAP_SMALLER_MAXPHYADDR 185
- #define KVM_CAP_S390_DIAG318 186
-+#define KVM_CAP_X86_BUS_LOCK_EXIT 187
- 
- #ifdef KVM_CAP_IRQ_ROUTING
- 
-@@ -1689,4 +1691,9 @@ struct kvm_hyperv_eventfd {
- #define KVM_DIRTY_LOG_MANUAL_PROTECT_ENABLE    (1 << 0)
- #define KVM_DIRTY_LOG_INITIALLY_SET            (1 << 1)
- 
-+#define KVM_BUS_LOCK_DETECTION_OFF             (1 << 0)
-+#define KVM_BUS_LOCK_DETECTION_EXIT            (1 << 1)
-+#define KVM_BUS_LOCK_DETECTION_VALID_MODE      (KVM_BUS_LOCK_DETECTION_OFF | \
-+						KVM_BUS_LOCK_DETECTION_EXIT)
-+
- #endif /* __LINUX_KVM_H */
--- 
-2.17.1
+It is the terminology, yes, but you're right, the wording isn't very clear, will 
+improve.
 
+> > +
+> >  config VHOST_SCSI
+> >  	tristate "VHOST_SCSI TCM fabric driver"
+> >  	depends on TARGET_CORE && EVENTFD
+> > diff --git a/drivers/vhost/Makefile b/drivers/vhost/Makefile
+> > index f3e1897cce85..9cf459d59f97 100644
+> > --- a/drivers/vhost/Makefile
+> > +++ b/drivers/vhost/Makefile
+> > @@ -2,6 +2,9 @@
+> >  obj-$(CONFIG_VHOST_NET) += vhost_net.o
+> >  vhost_net-y := net.o
+> >  
+> > +obj-$(CONFIG_VHOST_RPMSG) += vhost_rpmsg.o
+> > +vhost_rpmsg-y := rpmsg.o
+> > +
+> >  obj-$(CONFIG_VHOST_SCSI) += vhost_scsi.o
+> >  vhost_scsi-y := scsi.o
+> >  
+> > diff --git a/drivers/vhost/rpmsg.c b/drivers/vhost/rpmsg.c
+> > new file mode 100644
+> > index 000000000000..c26d7a4afc6d
+> > --- /dev/null
+> > +++ b/drivers/vhost/rpmsg.c
+> > @@ -0,0 +1,373 @@
+> > +// SPDX-License-Identifier: GPL-2.0-only
+> > +/*
+> > + * Copyright(c) 2020 Intel Corporation. All rights reserved.
+> > + *
+> > + * Author: Guennadi Liakhovetski <guennadi.liakhovetski@linux.intel.com>
+> > + *
+> > + * Vhost RPMsg VirtIO interface. It provides a set of functions to match the
+> > + * guest side RPMsg VirtIO API, provided by drivers/rpmsg/virtio_rpmsg_bus.c
+> 
+> Again, very confusing.  The changelog refers to a server implementation but to
+> me this refers to a client implementation, especially if rpmsg_recv_single() and
+> rpmsg_ns_cb() are used on the other side of the pipe.  
+
+I think the above is correct. "Vhost" indicates, that this is running on the host. 
+"match the guest side" means, that you can use this API on the host and it is 
+designed to work together with the RPMsg VirtIO drivers running on guests, as 
+implemented *on guests* by virtio_rpmsg_bus.c. Would "to work together" be a better 
+description than "to match?"
+
+> > + * These functions handle creation of 2 virtual queues, handling of endpoint
+> > + * addresses, sending a name-space announcement to the guest as well as any
+> > + * user messages. This API can be used by any vhost driver to handle RPMsg
+> > + * specific processing.
+> > + * Specific vhost drivers, using this API will use their own VirtIO device
+> > + * IDs, that should then also be added to the ID table in virtio_rpmsg_bus.c
+> > + */
+> > +
+> > +#include <linux/compat.h>
+> > +#include <linux/file.h>
+> > +#include <linux/miscdevice.h>
+> > +#include <linux/module.h>
+> > +#include <linux/mutex.h>
+> > +#include <linux/vhost.h>
+> > +#include <linux/virtio_rpmsg.h>
+> > +#include <uapi/linux/rpmsg.h>
+> > +
+> > +#include "vhost.h"
+> > +#include "vhost_rpmsg.h"
+> > +
+> > +/*
+> > + * All virtio-rpmsg virtual queue kicks always come with just one buffer -
+> > + * either input or output, but we can also handle split messages
+> > + */
+> > +static int vhost_rpmsg_get_msg(struct vhost_virtqueue *vq, unsigned int *cnt)
+> > +{
+> > +	struct vhost_rpmsg *vr = container_of(vq->dev, struct vhost_rpmsg, dev);
+> > +	unsigned int out, in;
+> > +	int head = vhost_get_vq_desc(vq, vq->iov, ARRAY_SIZE(vq->iov), &out, &in,
+> > +				     NULL, NULL);
+> > +	if (head < 0) {
+> > +		vq_err(vq, "%s(): error %d getting buffer\n",
+> > +		       __func__, head);
+> > +		return head;
+> > +	}
+> > +
+> > +	/* Nothing new? */
+> > +	if (head == vq->num)
+> > +		return head;
+> > +
+> > +	if (vq == &vr->vq[VIRTIO_RPMSG_RESPONSE]) {
+> > +		if (out) {
+> > +			vq_err(vq, "%s(): invalid %d output in response queue\n",
+> > +			       __func__, out);
+> > +			goto return_buf;
+> > +		}
+> > +
+> > +		*cnt = in;
+> > +	}
+> > +
+> > +	if (vq == &vr->vq[VIRTIO_RPMSG_REQUEST]) {
+> > +		if (in) {
+> > +			vq_err(vq, "%s(): invalid %d input in request queue\n",
+> > +		       __func__, in);
+> > +			goto return_buf;
+> > +		}
+> > +
+> > +		*cnt = out;
+> > +	}
+> > +
+> > +	return head;
+> > +
+> > +return_buf:
+> > +	vhost_add_used(vq, head, 0);
+> > +
+> > +	return -EINVAL;
+> > +}
+> > +
+> > +static const struct vhost_rpmsg_ept *vhost_rpmsg_ept_find(struct vhost_rpmsg *vr, int addr)
+> > +{
+> > +	unsigned int i;
+> > +
+> > +	for (i = 0; i < vr->n_epts; i++)
+> > +		if (vr->ept[i].addr == addr)
+> > +			return vr->ept + i;
+> > +
+> > +	return NULL;
+> > +}
+> > +
+> > +/*
+> > + * if len < 0, then for reading a request, the complete virtual queue buffer
+> > + * size is prepared, for sending a response, the length in the iterator is used
+> > + */
+> > +int vhost_rpmsg_start_lock(struct vhost_rpmsg *vr, struct vhost_rpmsg_iter *iter,
+> > +			   unsigned int qid, ssize_t len)
+> > +	__acquires(vq->mutex)
+> > +{
+> > +	struct vhost_virtqueue *vq = vr->vq + qid;
+> > +	unsigned int cnt;
+> > +	ssize_t ret;
+> > +	size_t tmp;
+> > +
+> > +	if (qid >= VIRTIO_RPMSG_NUM_OF_VQS)
+> > +		return -EINVAL;
+> > +
+> > +	iter->vq = vq;
+> > +
+> > +	mutex_lock(&vq->mutex);
+> > +	vhost_disable_notify(&vr->dev, vq);
+> > +
+> > +	iter->head = vhost_rpmsg_get_msg(vq, &cnt);
+> > +	if (iter->head == vq->num)
+> > +		iter->head = -EAGAIN;
+> > +
+> > +	if (iter->head < 0) {
+> > +		ret = iter->head;
+> > +		goto unlock;
+> > +	}
+> > +
+> > +	tmp = iov_length(vq->iov, cnt);
+> > +	if (tmp < sizeof(iter->rhdr)) {
+> > +		vq_err(vq, "%s(): size %zu too small\n", __func__, tmp);
+> > +		ret = -ENOBUFS;
+> > +		goto return_buf;
+> > +	}
+> > +
+> > +	switch (qid) {
+> > +	case VIRTIO_RPMSG_REQUEST:
+> > +		if (len >= 0) {
+> > +			if (tmp < sizeof(iter->rhdr) + len) {
+> > +				ret = -ENOBUFS;
+> > +				goto return_buf;
+> > +			}
+> > +
+> > +			tmp = len + sizeof(iter->rhdr);
+> > +		}
+> > +
+> > +		/* len is now the size of the payload */
+> > +		iov_iter_init(&iter->iov_iter, WRITE, vq->iov, cnt, tmp);
+> > +
+> > +		/* Read the RPMSG header with endpoint addresses */
+> > +		tmp = copy_from_iter(&iter->rhdr, sizeof(iter->rhdr), &iter->iov_iter);
+> > +		if (tmp != sizeof(iter->rhdr)) {
+> > +			vq_err(vq, "%s(): got %zu instead of %zu\n", __func__,
+> > +			       tmp, sizeof(iter->rhdr));
+> > +			ret = -EIO;
+> > +			goto return_buf;
+> > +		}
+> > +
+> > +		iter->ept = vhost_rpmsg_ept_find(vr, vhost32_to_cpu(vq, iter->rhdr.dst));
+> > +		if (!iter->ept) {
+> > +			vq_err(vq, "%s(): no endpoint with address %d\n",
+> > +			       __func__, vhost32_to_cpu(vq, iter->rhdr.dst));
+> > +			ret = -ENOENT;
+> > +			goto return_buf;
+> > +		}
+> > +
+> > +		/* Let the endpoint read the payload */
+> > +		if (iter->ept->read) {
+> > +			ret = iter->ept->read(vr, iter);
+> > +			if (ret < 0)
+> > +				goto return_buf;
+> > +
+> > +			iter->rhdr.len = cpu_to_vhost16(vq, ret);
+> > +		} else {
+> > +			iter->rhdr.len = 0;
+> > +		}
+> > +
+> > +		/* Prepare for the response phase */
+> > +		iter->rhdr.dst = iter->rhdr.src;
+> > +		iter->rhdr.src = cpu_to_vhost32(vq, iter->ept->addr);
+> > +
+> > +		break;
+> > +	case VIRTIO_RPMSG_RESPONSE:
+> > +		if (!iter->ept && iter->rhdr.dst != cpu_to_vhost32(vq, RPMSG_NS_ADDR)) {
+> > +			/*
+> > +			 * Usually the iterator is configured when processing a
+> > +			 * message on the request queue, but it's also possible
+> > +			 * to send a message on the response queue without a
+> > +			 * preceding request, in that case the iterator must
+> > +			 * contain source and destination addresses.
+> > +			 */
+> > +			iter->ept = vhost_rpmsg_ept_find(vr, vhost32_to_cpu(vq, iter->rhdr.src));
+> > +			if (!iter->ept) {
+> > +				ret = -ENOENT;
+> > +				goto return_buf;
+> > +			}
+> > +		}
+> > +
+> > +		if (len >= 0) {
+> > +			if (tmp < sizeof(iter->rhdr) + len) {
+> > +				ret = -ENOBUFS;
+> > +				goto return_buf;
+> > +			}
+> > +
+> > +			iter->rhdr.len = cpu_to_vhost16(vq, len);
+> > +			tmp = len + sizeof(iter->rhdr);
+> > +		}
+> > +
+> > +		/* len is now the size of the payload */
+> > +		iov_iter_init(&iter->iov_iter, READ, vq->iov, cnt, tmp);
+> > +
+> > +		/* Write the RPMSG header with endpoint addresses */
+> > +		tmp = copy_to_iter(&iter->rhdr, sizeof(iter->rhdr), &iter->iov_iter);
+> > +		if (tmp != sizeof(iter->rhdr)) {
+> > +			ret = -EIO;
+> > +			goto return_buf;
+> > +		}
+> > +
+> > +		/* Let the endpoint write the payload */
+> > +		if (iter->ept && iter->ept->write) {
+> > +			ret = iter->ept->write(vr, iter);
+> > +			if (ret < 0)
+> > +				goto return_buf;
+> > +		}
+> > +
+> > +		break;
+> > +	}
+> > +
+> > +	return 0;
+> > +
+> > +return_buf:
+> > +	vhost_add_used(vq, iter->head, 0);
+> > +unlock:
+> > +	vhost_enable_notify(&vr->dev, vq);
+> > +	mutex_unlock(&vq->mutex);
+> > +
+> > +	return ret;
+> > +}
+> > +EXPORT_SYMBOL_GPL(vhost_rpmsg_start_lock);
+> > +
+> > +size_t vhost_rpmsg_copy(struct vhost_rpmsg *vr, struct vhost_rpmsg_iter *iter,
+> > +			void *data, size_t size)
+> > +{
+> > +	/*
+> > +	 * We could check for excess data, but copy_{to,from}_iter() don't do
+> > +	 * that either
+> > +	 */
+> > +	if (iter->vq == vr->vq + VIRTIO_RPMSG_RESPONSE)
+> > +		return copy_to_iter(data, size, &iter->iov_iter);
+> > +
+> > +	return copy_from_iter(data, size, &iter->iov_iter);
+> > +}
+> > +EXPORT_SYMBOL_GPL(vhost_rpmsg_copy);
+> > +
+> > +int vhost_rpmsg_finish_unlock(struct vhost_rpmsg *vr,
+> > +			      struct vhost_rpmsg_iter *iter)
+> > +	__releases(vq->mutex)
+> > +{
+> > +	if (iter->head >= 0)
+> > +		vhost_add_used_and_signal(iter->vq->dev, iter->vq, iter->head,
+> > +					  vhost16_to_cpu(iter->vq, iter->rhdr.len) +
+> > +					  sizeof(iter->rhdr));
+> > +
+> > +	vhost_enable_notify(&vr->dev, iter->vq);
+> > +	mutex_unlock(&iter->vq->mutex);
+> > +
+> > +	return iter->head;
+> > +}
+> > +EXPORT_SYMBOL_GPL(vhost_rpmsg_finish_unlock);
+> > +
+> > +/*
+> > + * Return false to terminate the external loop only if we fail to obtain either
+> > + * a request or a response buffer
+> > + */
+> > +static bool handle_rpmsg_req_single(struct vhost_rpmsg *vr,
+> > +				    struct vhost_virtqueue *vq)
+> > +{
+> > +	struct vhost_rpmsg_iter iter;
+> > +	int ret = vhost_rpmsg_start_lock(vr, &iter, VIRTIO_RPMSG_REQUEST, -EINVAL);
+> > +	if (!ret)
+> > +		ret = vhost_rpmsg_finish_unlock(vr, &iter);
+> > +	if (ret < 0) {
+> > +		if (ret != -EAGAIN)
+> > +			vq_err(vq, "%s(): RPMSG processing failed %d\n",
+> > +			       __func__, ret);
+> > +		return false;
+> > +	}
+> > +
+> > +	if (!iter.ept->write)
+> > +		return true;
+> > +
+> > +	ret = vhost_rpmsg_start_lock(vr, &iter, VIRTIO_RPMSG_RESPONSE, -EINVAL);
+> > +	if (!ret)
+> > +		ret = vhost_rpmsg_finish_unlock(vr, &iter);
+> > +	if (ret < 0) {
+> > +		vq_err(vq, "%s(): RPMSG finalising failed %d\n", __func__, ret);
+> > +		return false;
+> > +	}
+> > +
+> > +	return true;
+> > +}
+> > +
+> > +static void handle_rpmsg_req_kick(struct vhost_work *work)
+> > +{
+> > +	struct vhost_virtqueue *vq = container_of(work, struct vhost_virtqueue,
+> > +						  poll.work);
+> > +	struct vhost_rpmsg *vr = container_of(vq->dev, struct vhost_rpmsg, dev);
+> > +
+> > +	while (handle_rpmsg_req_single(vr, vq))
+> > +		;
+> > +}
+> > +
+> > +/*
+> > + * initialise two virtqueues with an array of endpoints,
+> > + * request and response callbacks
+> > + */
+> > +void vhost_rpmsg_init(struct vhost_rpmsg *vr, const struct vhost_rpmsg_ept *ept,
+> > +		      unsigned int n_epts)
+> > +{
+> > +	unsigned int i;
+> > +
+> > +	for (i = 0; i < ARRAY_SIZE(vr->vq); i++)
+> > +		vr->vq_p[i] = &vr->vq[i];
+> > +
+> > +	/* vq[0]: host -> guest, vq[1]: host <- guest */
+> > +	vr->vq[VIRTIO_RPMSG_REQUEST].handle_kick = handle_rpmsg_req_kick;
+> > +	vr->vq[VIRTIO_RPMSG_RESPONSE].handle_kick = NULL;
+> > +
+> > +	vr->ept = ept;
+> > +	vr->n_epts = n_epts;
+> > +
+> > +	vhost_dev_init(&vr->dev, vr->vq_p, VIRTIO_RPMSG_NUM_OF_VQS,
+> > +		       UIO_MAXIOV, 0, 0, true, NULL);
+> > +}
+> > +EXPORT_SYMBOL_GPL(vhost_rpmsg_init);
+> > +
+> > +void vhost_rpmsg_destroy(struct vhost_rpmsg *vr)
+> > +{
+> > +	if (vhost_dev_has_owner(&vr->dev))
+> > +		vhost_poll_flush(&vr->vq[VIRTIO_RPMSG_REQUEST].poll);
+> > +
+> > +	vhost_dev_cleanup(&vr->dev);
+> > +}
+> > +EXPORT_SYMBOL_GPL(vhost_rpmsg_destroy);
+> > +
+> > +/* send namespace */
+> > +int vhost_rpmsg_ns_announce(struct vhost_rpmsg *vr, const char *name, unsigned int src)
+> > +{
+> > +	struct vhost_virtqueue *vq = &vr->vq[VIRTIO_RPMSG_RESPONSE];
+> > +	struct vhost_rpmsg_iter iter = {
+> > +		.rhdr = {
+> > +			.src = 0,
+> > +			.dst = cpu_to_vhost32(vq, RPMSG_NS_ADDR),
+> > +			.flags = cpu_to_vhost16(vq, RPMSG_NS_CREATE), /* rpmsg_recv_single() */
+> 
+> Where is the flag used in rpmsg_recv_single()?  It is used for the name space
+> message (as you have below) but not in the header when doing a name space
+> announcement.
+
+I think you're right, it isn't needed here, will remove.
+
+> > +		},
+> > +	};
+> > +	struct rpmsg_ns_msg ns = {
+> > +		.addr = cpu_to_vhost32(vq, src),
+> > +		.flags = cpu_to_vhost32(vq, RPMSG_NS_CREATE), /* for rpmsg_ns_cb() */
+> > +	};
+> > +	int ret = vhost_rpmsg_start_lock(vr, &iter, VIRTIO_RPMSG_RESPONSE, sizeof(ns));
+> > +
+> > +	if (ret < 0)
+> > +		return ret;
+> > +
+> > +	strlcpy(ns.name, name, sizeof(ns.name));
+> > +
+> > +	ret = vhost_rpmsg_copy(vr, &iter, &ns, sizeof(ns));
+> > +	if (ret != sizeof(ns))
+> > +		vq_err(iter.vq, "%s(): added %d instead of %zu bytes\n",
+> > +		       __func__, ret, sizeof(ns));
+> > +
+> > +	ret = vhost_rpmsg_finish_unlock(vr, &iter);
+> > +	if (ret < 0)
+> > +		vq_err(iter.vq, "%s(): namespace announcement failed: %d\n",
+> > +		       __func__, ret);
+> > +
+> > +	return ret;
+> > +}
+> > +EXPORT_SYMBOL_GPL(vhost_rpmsg_ns_announce);
+> > +
+> > +MODULE_LICENSE("GPL v2");
+> > +MODULE_AUTHOR("Intel, Inc.");
+> > +MODULE_DESCRIPTION("Vhost RPMsg API");
+> > diff --git a/drivers/vhost/vhost_rpmsg.h b/drivers/vhost/vhost_rpmsg.h
+> > new file mode 100644
+> > index 000000000000..30072cecb8a0
+> > --- /dev/null
+> > +++ b/drivers/vhost/vhost_rpmsg.h
+> > @@ -0,0 +1,74 @@
+> > +/* SPDX-License-Identifier: GPL-2.0 */
+> > +/*
+> > + * Copyright(c) 2020 Intel Corporation. All rights reserved.
+> > + *
+> > + * Author: Guennadi Liakhovetski <guennadi.liakhovetski@linux.intel.com>
+> > + */
+> > +
+> > +#ifndef VHOST_RPMSG_H
+> > +#define VHOST_RPMSG_H
+> > +
+> > +#include <linux/uio.h>
+> > +#include <linux/virtio_rpmsg.h>
+> > +
+> > +#include "vhost.h"
+> > +
+> > +/* RPMsg uses two VirtQueues: one for each direction */
+> > +enum {
+> > +	VIRTIO_RPMSG_RESPONSE,	/* RPMsg response (host->guest) buffers */
+> > +	VIRTIO_RPMSG_REQUEST,	/* RPMsg request (guest->host) buffers */
+> > +	/* Keep last */
+> > +	VIRTIO_RPMSG_NUM_OF_VQS,
+> > +};
+> > +
+> > +struct vhost_rpmsg_ept;
+> > +
+> > +struct vhost_rpmsg_iter {
+> > +	struct iov_iter iov_iter;
+> > +	struct rpmsg_hdr rhdr;
+> > +	struct vhost_virtqueue *vq;
+> > +	const struct vhost_rpmsg_ept *ept;
+> > +	int head;
+> > +	void *priv;
+> 
+> I don't see @priv being used anywhere.
+
+That's logical: this is a field, private to the API users, so the core shouldn't 
+use it :-) It's used in later patches.
+
+> 
+> > +};
+> > +
+> > +struct vhost_rpmsg {
+> > +	struct vhost_dev dev;
+> > +	struct vhost_virtqueue vq[VIRTIO_RPMSG_NUM_OF_VQS];
+> > +	struct vhost_virtqueue *vq_p[VIRTIO_RPMSG_NUM_OF_VQS];
+> > +	const struct vhost_rpmsg_ept *ept;
+> > +	unsigned int n_epts;
+> > +};
+> > +
+> > +struct vhost_rpmsg_ept {
+> > +	ssize_t (*read)(struct vhost_rpmsg *, struct vhost_rpmsg_iter *);
+> > +	ssize_t (*write)(struct vhost_rpmsg *, struct vhost_rpmsg_iter *);
+> > +	int addr;
+> > +};
+> > +
+> > +static inline size_t vhost_rpmsg_iter_len(const struct vhost_rpmsg_iter *iter)
+> > +{
+> > +	return iter->rhdr.len;
+> > +}
+> 
+> Again, I don't see where this is used.
+
+This is exported API, it's used by users.
+
+> > +
+> > +#define VHOST_RPMSG_ITER(_vq, _src, _dst) {			\
+> > +	.rhdr = {						\
+> > +			.src = cpu_to_vhost32(_vq, _src),	\
+> > +			.dst = cpu_to_vhost32(_vq, _dst),	\
+> > +		},						\
+> > +	}
+> 
+> Same.
+
+ditto.
+
+Thanks
+Guennadi
+
+> Thanks,
+> Mathieu
+> 
+> > +
+> > +void vhost_rpmsg_init(struct vhost_rpmsg *vr, const struct vhost_rpmsg_ept *ept,
+> > +		      unsigned int n_epts);
+> > +void vhost_rpmsg_destroy(struct vhost_rpmsg *vr);
+> > +int vhost_rpmsg_ns_announce(struct vhost_rpmsg *vr, const char *name,
+> > +			    unsigned int src);
+> > +int vhost_rpmsg_start_lock(struct vhost_rpmsg *vr,
+> > +			   struct vhost_rpmsg_iter *iter,
+> > +			   unsigned int qid, ssize_t len);
+> > +size_t vhost_rpmsg_copy(struct vhost_rpmsg *vr, struct vhost_rpmsg_iter *iter,
+> > +			void *data, size_t size);
+> > +int vhost_rpmsg_finish_unlock(struct vhost_rpmsg *vr,
+> > +			      struct vhost_rpmsg_iter *iter);
+> > +
+> > +#endif
+> > -- 
+> > 2.28.0
+> > 
