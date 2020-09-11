@@ -2,149 +2,215 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B614B266870
-	for <lists+kvm@lfdr.de>; Fri, 11 Sep 2020 20:58:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7B4452668BA
+	for <lists+kvm@lfdr.de>; Fri, 11 Sep 2020 21:28:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725849AbgIKS6k (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 11 Sep 2020 14:58:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38770 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725835AbgIKS6e (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 11 Sep 2020 14:58:34 -0400
-Received: from mail-pf1-x443.google.com (mail-pf1-x443.google.com [IPv6:2607:f8b0:4864:20::443])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CD0D8C061757
-        for <kvm@vger.kernel.org>; Fri, 11 Sep 2020 11:58:33 -0700 (PDT)
-Received: by mail-pf1-x443.google.com with SMTP id z19so8069725pfn.8
-        for <kvm@vger.kernel.org>; Fri, 11 Sep 2020 11:58:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=ZXmHidgwtnTnxCDrTuOclLLnDmLj/yLMTWxKoHjkjfQ=;
-        b=ZrOejeHoXLixXlu6m7vIPESK+fObNaFjZbYZb6BuPccGC8RhiVx86JFf69d/MMrQh3
-         c5GLEicnmJy6bM1/V0UBllGrc6/ouavLYqSLeTsNsbiwto675zmuU7WPI4+tQ1SjuaIh
-         xmSrh1si1mjT6qM2CdlptrXbP8DIJUI+A8S8M=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=ZXmHidgwtnTnxCDrTuOclLLnDmLj/yLMTWxKoHjkjfQ=;
-        b=dEexKWMjZq8yKrdwPjEPIGzTEoiFcd+RSILFtqz/2XSaWiZS7NuvK/Sv36Btye0J8W
-         6TuaKnl8j9CyfHoFiJ0747cS+0wdwtz+evS7h0AT7ypw0wxIpLwM2vnGaggZf8UeZTxs
-         zw39d9DncT1l4jWvUWRohTDdq3XU68jSRtDQOGYf5bsIKdhNHi/JdiE5Rs4aOOu2YWYm
-         H34Rk2xIkLfP4JCa7hAQmuoJynGiCsKosmHknKJtvPH9FPO6DBtG35FqNtRwiTCafme0
-         ARjoY2ch7dyF0RcLQtiZ6YuSKCHzMHH+JAV7SDVLQXPTfB4z3y2xgyqaDPGG8mGrCBLW
-         wifQ==
-X-Gm-Message-State: AOAM530sSom0xGkZuus2uBwW8W9xDvGIF7nX56yal5245RYA72tQDmDF
-        7R6PXOCRoEBEZDQu0l5ZXYzJLw==
-X-Google-Smtp-Source: ABdhPJx1HHzPM4LUXPoNomXjYpginIkBVFSvmj1qsqnJ/hNQ+buyCEi68fmII7HiPctkjBg2DoUsgw==
-X-Received: by 2002:a63:fd51:: with SMTP id m17mr2779530pgj.210.1599850713261;
-        Fri, 11 Sep 2020 11:58:33 -0700 (PDT)
-Received: from www.outflux.net (smtp.outflux.net. [198.145.64.163])
-        by smtp.gmail.com with ESMTPSA id 124sm2920285pfd.132.2020.09.11.11.58.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 11 Sep 2020 11:58:31 -0700 (PDT)
-Date:   Fri, 11 Sep 2020 11:58:30 -0700
-From:   Kees Cook <keescook@chromium.org>
-To:     Michael Ellerman <mpe@ellerman.id.au>
-Cc:     Thomas Gleixner <tglx@linutronix.de>,
-        Robert O'Callahan <rocallahan@gmail.com>,
-        LKML <linux-kernel@vger.kernel.org>,
-        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
-        linux-arch@vger.kernel.org, Will Deacon <will@kernel.org>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Keno Fischer <keno@juliacomputing.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        kvm list <kvm@vger.kernel.org>,
-        Gabriel Krisman Bertazi <krisman@collabora.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Kyle Huey <me@kylehuey.com>
-Subject: Re: [REGRESSION] x86/entry: Tracer no longer has opportunity to
- change the syscall number at entry via orig_ax
-Message-ID: <202009111156.660A7C2978@keescook>
-References: <CAP045Arc1Vdh+n2j2ELE3q7XfagLjyqXji9ZD0jqwVB-yuzq-g@mail.gmail.com>
- <87blj6ifo8.fsf@nanos.tec.linutronix.de>
- <87a6xzrr89.fsf@mpe.ellerman.id.au>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87a6xzrr89.fsf@mpe.ellerman.id.au>
+        id S1725892AbgIKT2g (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 11 Sep 2020 15:28:36 -0400
+Received: from aserp2120.oracle.com ([141.146.126.78]:49598 "EHLO
+        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725776AbgIKT14 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 11 Sep 2020 15:27:56 -0400
+Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
+        by aserp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 08BJObPC175106;
+        Fri, 11 Sep 2020 19:26:32 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
+ subject : date : message-id : in-reply-to : references; s=corp-2020-01-29;
+ bh=9Yu0+hVjg349shgtmGEHPIIhGF87WXKFZaup59ONGuE=;
+ b=PxaToik1sSRid0lUYOQlHI5sZyx5JbdMRjbQIZZJGphKCd5YUvxnC5NA3U1UY4HPuTYj
+ crld18ZhN/JEJrYqIMAjpzyVzQ3HD1e1Qznkfvhu4D+5EGv6o46QN3JLs3uOpd95iaqb
+ 5hbK0mIdLPKn9Fnv5m5qpovquPdntqNBu04JTRob4lg442m62GHcsddxHXuHJYylvyL+
+ s43Ozh0Q9eIBFqHEFdreEDE3hMRrl17SZsrOl7D0N4YsfvZtgPWzgy18a1hRcxHm/AAi
+ mdbFa7+ap0KzRiRxk0oE3xkm2SinDRyLR6rd1uY7nJsUj1I2MFosNQJPheyD9capjvfK Iw== 
+Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
+        by aserp2120.oracle.com with ESMTP id 33c2mmg2vn-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
+        Fri, 11 Sep 2020 19:26:32 +0000
+Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
+        by aserp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 08BJPDuf019612;
+        Fri, 11 Sep 2020 19:26:32 GMT
+Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
+        by aserp3020.oracle.com with ESMTP id 33cmkdu77n-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 11 Sep 2020 19:26:31 +0000
+Received: from abhmp0002.oracle.com (abhmp0002.oracle.com [141.146.116.8])
+        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 08BJQPJi009907;
+        Fri, 11 Sep 2020 19:26:26 GMT
+Received: from nsvm-sadhukhan-1.osdevelopmeniad.oraclevcn.com (/100.100.230.216)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Fri, 11 Sep 2020 12:26:24 -0700
+From:   Krish Sadhukhan <krish.sadhukhan@oracle.com>
+To:     kvm@vger.kernel.org
+Cc:     pbonzini@redhat.com, jmattson@google.com, tglx@linutronix.de,
+        mingo@redhat.com, bp@alien8.de, x86@kernel.org,
+        sean.j.christopherson@intel.com, vkuznets@redhat.com,
+        wanpengli@tencent.com, joro@8bytes.org,
+        dave.hansen@linux.intel.com, luto@kernel.org, peterz@infradead.org,
+        linux-kernel@vger.kernel.org, hpa@zytor.com
+Subject: [PATCH 1/4 v3] x86: AMD: Replace numeric value for SME CPUID leaf with a #define
+Date:   Fri, 11 Sep 2020 19:25:58 +0000
+Message-Id: <20200911192601.9591-2-krish.sadhukhan@oracle.com>
+X-Mailer: git-send-email 2.18.4
+In-Reply-To: <20200911192601.9591-1-krish.sadhukhan@oracle.com>
+References: <20200911192601.9591-1-krish.sadhukhan@oracle.com>
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9741 signatures=668679
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0 malwarescore=0 phishscore=0
+ mlxlogscore=999 bulkscore=0 adultscore=0 mlxscore=0 suspectscore=1
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
+ definitions=main-2009110155
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9741 signatures=668679
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxscore=0 priorityscore=1501
+ phishscore=0 adultscore=0 bulkscore=0 clxscore=1015 mlxlogscore=999
+ malwarescore=0 suspectscore=1 lowpriorityscore=0 spamscore=0
+ impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2006250000 definitions=main-2009110155
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Sep 09, 2020 at 11:53:42PM +1000, Michael Ellerman wrote:
-> Hi Thomas,
-> 
-> Sorry if this was discussed already somewhere, but I didn't see anything ...
-> 
-> Thomas Gleixner <tglx@linutronix.de> writes:
-> > On Wed, Aug 19 2020 at 10:14, Kyle Huey wrote:
-> >> tl;dr: after 27d6b4d14f5c3ab21c4aef87dd04055a2d7adf14 ptracer
-> >> modifications to orig_ax in a syscall entry trace stop are not honored
-> >> and this breaks our code.
-> ...
-> > diff --git a/kernel/entry/common.c b/kernel/entry/common.c
-> > index 9852e0d62d95..fcae019158ca 100644
-> > --- a/kernel/entry/common.c
-> > +++ b/kernel/entry/common.c
-> > @@ -65,7 +65,8 @@ static long syscall_trace_enter(struct pt_regs *regs, long syscall,
-> 
-> Adding context:
-> 
-> 	/* Do seccomp after ptrace, to catch any tracer changes. */
-> 	if (ti_work & _TIF_SECCOMP) {
-> 		ret = __secure_computing(NULL);
-> 		if (ret == -1L)
-> 			return ret;
-> 	}
-> 
-> 	if (unlikely(ti_work & _TIF_SYSCALL_TRACEPOINT))
-> 		trace_sys_enter(regs, syscall);
-> 
-> >  	syscall_enter_audit(regs, syscall);
-> >  
-> > -	return ret ? : syscall;
-> > +	/* The above might have changed the syscall number */
-> > +	return ret ? : syscall_get_nr(current, regs);
-> >  }
-> >  
-> >  noinstr long syscall_enter_from_user_mode(struct pt_regs *regs, long syscall)
-> 
-> I noticed if the syscall number is changed by seccomp/ptrace, the
-> original syscall number is still passed to trace_sys_enter() and audit.
-> 
-> The old code used regs->orig_ax, so any change to the syscall number
-> would be seen by the tracepoint and audit.
+Signed-off-by: Krish Sadhukhan <krish.sadhukhan@oracle.com>
+---
+ arch/x86/boot/compressed/mem_encrypt.S | 5 +++--
+ arch/x86/include/asm/cpufeatures.h     | 5 +++++
+ arch/x86/kernel/cpu/amd.c              | 2 +-
+ arch/x86/kernel/cpu/scattered.c        | 4 ++--
+ arch/x86/kvm/cpuid.c                   | 2 +-
+ arch/x86/kvm/svm/svm.c                 | 4 ++--
+ arch/x86/mm/mem_encrypt_identity.c     | 4 ++--
+ 7 files changed, 16 insertions(+), 10 deletions(-)
 
-Ah! That's no good.
-
-> I can observe the difference between v5.8 and mainline, using the
-> raw_syscall trace event and running the seccomp_bpf selftest which turns
-> a getpid (39) into a getppid (110).
-> 
-> With v5.8 we see getppid on entry and exit:
-> 
->      seccomp_bpf-1307  [000] .... 22974.874393: sys_enter: NR 110 (7ffff22c46e0, 40a350, 4, fffffffffffff7ab, 7fa6ee0d4010, 0)
->      seccomp_bpf-1307  [000] .N.. 22974.874401: sys_exit: NR 110 = 1304
-> 
-> Whereas on mainline we see an enter for getpid and an exit for getppid:
-> 
->      seccomp_bpf-1030  [000] ....    21.806766: sys_enter: NR 39 (7ffe2f6d1ad0, 40a350, 7ffe2f6d1ad0, 0, 0, 407299)
->      seccomp_bpf-1030  [000] ....    21.806767: sys_exit: NR 110 = 1027
-> 
-> 
-> I don't know audit that well, but I think it saves the syscall number on
-> entry eg. in __audit_syscall_entry(). So it will record the wrong
-> syscall happening in this case I think.
-> 
-> Seems like we should reload the syscall number before calling
-> trace_sys_enter() & audit ?
-
-Agreed. I wonder what the best way to build a regression test for this
-is... hmmm.
-
+diff --git a/arch/x86/boot/compressed/mem_encrypt.S b/arch/x86/boot/compressed/mem_encrypt.S
+index dd07e7b41b11..22e30b0c0d19 100644
+--- a/arch/x86/boot/compressed/mem_encrypt.S
++++ b/arch/x86/boot/compressed/mem_encrypt.S
+@@ -12,6 +12,7 @@
+ #include <asm/processor-flags.h>
+ #include <asm/msr.h>
+ #include <asm/asm-offsets.h>
++#include <asm/cpufeatures.h>
+ 
+ 	.text
+ 	.code32
+@@ -31,7 +32,7 @@ SYM_FUNC_START(get_sev_encryption_bit)
+ 
+ 	movl	$0x80000000, %eax	/* CPUID to check the highest leaf */
+ 	cpuid
+-	cmpl	$0x8000001f, %eax	/* See if 0x8000001f is available */
++	cmpl	$CPUID_AMD_SME, %eax	/* See if 0x8000001f is available */
+ 	jb	.Lno_sev
+ 
+ 	/*
+@@ -40,7 +41,7 @@ SYM_FUNC_START(get_sev_encryption_bit)
+ 	 *   CPUID Fn8000_001F[EBX] - Bits 5:0
+ 	 *     Pagetable bit position used to indicate encryption
+ 	 */
+-	movl	$0x8000001f, %eax
++	movl	$CPUID_AMD_SME, %eax
+ 	cpuid
+ 	bt	$1, %eax		/* Check if SEV is available */
+ 	jnc	.Lno_sev
+diff --git a/arch/x86/include/asm/cpufeatures.h b/arch/x86/include/asm/cpufeatures.h
+index 2901d5df4366..81335e6fe47d 100644
+--- a/arch/x86/include/asm/cpufeatures.h
++++ b/arch/x86/include/asm/cpufeatures.h
+@@ -10,6 +10,11 @@
+ #include <asm/disabled-features.h>
+ #endif
+ 
++/*
++ * AMD CPUID functions
++ */
++#define CPUID_AMD_SME  0x8000001f	/* Secure Memory Encryption */
++
+ /*
+  * Defines x86 CPU feature bits
+  */
+diff --git a/arch/x86/kernel/cpu/amd.c b/arch/x86/kernel/cpu/amd.c
+index dcc3d943c68f..4507ededb978 100644
+--- a/arch/x86/kernel/cpu/amd.c
++++ b/arch/x86/kernel/cpu/amd.c
+@@ -630,7 +630,7 @@ static void early_detect_mem_encrypt(struct cpuinfo_x86 *c)
+ 		 * will be a value above 32-bits this is still done for
+ 		 * CONFIG_X86_32 so that accurate values are reported.
+ 		 */
+-		c->x86_phys_bits -= (cpuid_ebx(0x8000001f) >> 6) & 0x3f;
++		c->x86_phys_bits -= (cpuid_ebx(CPUID_AMD_SME) >> 6) & 0x3f;
+ 
+ 		if (IS_ENABLED(CONFIG_X86_32))
+ 			goto clear_all;
+diff --git a/arch/x86/kernel/cpu/scattered.c b/arch/x86/kernel/cpu/scattered.c
+index 62b137c3c97a..033c112e03fc 100644
+--- a/arch/x86/kernel/cpu/scattered.c
++++ b/arch/x86/kernel/cpu/scattered.c
+@@ -39,8 +39,8 @@ static const struct cpuid_bit cpuid_bits[] = {
+ 	{ X86_FEATURE_CPB,		CPUID_EDX,  9, 0x80000007, 0 },
+ 	{ X86_FEATURE_PROC_FEEDBACK,    CPUID_EDX, 11, 0x80000007, 0 },
+ 	{ X86_FEATURE_MBA,		CPUID_EBX,  6, 0x80000008, 0 },
+-	{ X86_FEATURE_SME,		CPUID_EAX,  0, 0x8000001f, 0 },
+-	{ X86_FEATURE_SEV,		CPUID_EAX,  1, 0x8000001f, 0 },
++	{ X86_FEATURE_SME,		CPUID_EAX,  0, CPUID_AMD_SME, 0 },
++	{ X86_FEATURE_SEV,		CPUID_EAX,  1, CPUID_AMD_SME, 0 },
+ 	{ 0, 0, 0, 0, 0 }
+ };
+ 
+diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+index 3fd6eec202d7..95863e767d3d 100644
+--- a/arch/x86/kvm/cpuid.c
++++ b/arch/x86/kvm/cpuid.c
+@@ -756,7 +756,7 @@ static inline int __do_cpuid_func(struct kvm_cpuid_array *array, u32 function)
+ 		entry->edx = 0;
+ 		break;
+ 	case 0x80000000:
+-		entry->eax = min(entry->eax, 0x8000001f);
++		entry->eax = min(entry->eax, CPUID_AMD_SME);
+ 		break;
+ 	case 0x80000001:
+ 		cpuid_entry_override(entry, CPUID_8000_0001_EDX);
+diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+index 0194336b64a4..a4e92ae399b4 100644
+--- a/arch/x86/kvm/svm/svm.c
++++ b/arch/x86/kvm/svm/svm.c
+@@ -749,7 +749,7 @@ static __init void svm_adjust_mmio_mask(void)
+ 	u64 msr, mask;
+ 
+ 	/* If there is no memory encryption support, use existing mask */
+-	if (cpuid_eax(0x80000000) < 0x8000001f)
++	if (cpuid_eax(0x80000000) < CPUID_AMD_SME)
+ 		return;
+ 
+ 	/* If memory encryption is not enabled, use existing mask */
+@@ -757,7 +757,7 @@ static __init void svm_adjust_mmio_mask(void)
+ 	if (!(msr & MSR_K8_SYSCFG_MEM_ENCRYPT))
+ 		return;
+ 
+-	enc_bit = cpuid_ebx(0x8000001f) & 0x3f;
++	enc_bit = cpuid_ebx(CPUID_AMD_SME) & 0x3f;
+ 	mask_bit = boot_cpu_data.x86_phys_bits;
+ 
+ 	/* Increment the mask bit if it is the same as the encryption bit */
+diff --git a/arch/x86/mm/mem_encrypt_identity.c b/arch/x86/mm/mem_encrypt_identity.c
+index e2b0e2ac07bb..cbe600dd357b 100644
+--- a/arch/x86/mm/mem_encrypt_identity.c
++++ b/arch/x86/mm/mem_encrypt_identity.c
+@@ -498,7 +498,7 @@ void __init sme_enable(struct boot_params *bp)
+ 	eax = 0x80000000;
+ 	ecx = 0;
+ 	native_cpuid(&eax, &ebx, &ecx, &edx);
+-	if (eax < 0x8000001f)
++	if (eax < CPUID_AMD_SME)
+ 		return;
+ 
+ #define AMD_SME_BIT	BIT(0)
+@@ -520,7 +520,7 @@ void __init sme_enable(struct boot_params *bp)
+ 	 *   CPUID Fn8000_001F[EBX]
+ 	 *   - Bits 5:0 - Pagetable bit position used to indicate encryption
+ 	 */
+-	eax = 0x8000001f;
++	eax = CPUID_AMD_SME;
+ 	ecx = 0;
+ 	native_cpuid(&eax, &ebx, &ecx, &edx);
+ 	if (!(eax & feature_mask))
 -- 
-Kees Cook
+2.18.4
+
