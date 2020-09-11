@@ -2,80 +2,199 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8EA48265D11
-	for <lists+kvm@lfdr.de>; Fri, 11 Sep 2020 11:56:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 07150265D63
+	for <lists+kvm@lfdr.de>; Fri, 11 Sep 2020 12:08:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725794AbgIKJ40 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 11 Sep 2020 05:56:26 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:45306 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1725710AbgIKJ4Z (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 11 Sep 2020 05:56:25 -0400
+        id S1725780AbgIKKId (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 11 Sep 2020 06:08:33 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:29614 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1725554AbgIKKIb (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 11 Sep 2020 06:08:31 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1599818184;
+        s=mimecast20190719; t=1599818908;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=NfohgZAXCNl+PKanfBorLKxCJJnZ1k32hZXabUGOmhw=;
-        b=EWe/07for5I4ZXh55uiUXxsgLoKO8iuu51okJF83gBQW0GBTyXG+P3cCCt7iLwDvc/wmSa
-        oVdDuV8FSITh5Dq5Dlqe7EByhSOtL3MLjzLgCjQ+T8cYswTa6JKmu3P39Eb47mIMLAXmku
-        01AksNeL6lmc/iND5pRgg6VsW2uS4pE=
+        bh=fE3Kf3zYqfJZ/4wsBXRiLimBeYbxjKrLBoaL4yW+RT0=;
+        b=WIURRlee1JbTiNoJzBaCndjCqATyWeK1oNEXbMURSIGewnONmAnsPoV7o2y5LuVJVfr0SC
+        SyrlifTNx2CRkDVU1pdY8JahmdcIe1yJkneNAuizhhvmPysuCahIJebT04jwGOcnt4P3xM
+        ogkvfwcM0ioU3ExhPWC4Se2v15OlIZ4=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-499-mpMRDpoCN86U_l1UVexmDA-1; Fri, 11 Sep 2020 05:56:22 -0400
-X-MC-Unique: mpMRDpoCN86U_l1UVexmDA-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+ us-mta-36-XEbbNeCzOuG9GWbDC9hrmA-1; Fri, 11 Sep 2020 06:08:26 -0400
+X-MC-Unique: XEbbNeCzOuG9GWbDC9hrmA-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E119D81E20C;
-        Fri, 11 Sep 2020 09:56:20 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D0287801AB9;
+        Fri, 11 Sep 2020 10:08:23 +0000 (UTC)
 Received: from gondolin (ovpn-112-170.ams2.redhat.com [10.36.112.170])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id B52135DA74;
-        Fri, 11 Sep 2020 09:55:48 +0000 (UTC)
-Date:   Fri, 11 Sep 2020 11:55:45 +0200
+        by smtp.corp.redhat.com (Postfix) with ESMTP id CDDA57E8F2;
+        Fri, 11 Sep 2020 10:08:09 +0000 (UTC)
+Date:   Fri, 11 Sep 2020 12:08:06 +0200
 From:   Cornelia Huck <cohuck@redhat.com>
-To:     Zenghui Yu <yuzenghui@huawei.com>
-Cc:     <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <alex.williamson@redhat.com>, <kwankhede@nvidia.com>,
-        <wanghaibin.wang@huawei.com>
-Subject: Re: [PATCH] vfio: Fix typo of the device_state
-Message-ID: <20200911115545.5161fa46.cohuck@redhat.com>
-In-Reply-To: <20200910122508.705-1-yuzenghui@huawei.com>
-References: <20200910122508.705-1-yuzenghui@huawei.com>
+To:     Yan Zhao <yan.y.zhao@intel.com>
+Cc:     Alex Williamson <alex.williamson@redhat.com>,
+        Sean Mooney <smooney@redhat.com>,
+        "Daniel =?UTF-8?B?UC5CZXJyYW5nw6k=?=" <berrange@redhat.com>,
+        kvm@vger.kernel.org, libvir-list@redhat.com,
+        Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org,
+        kwankhede@nvidia.com, eauger@redhat.com, xin-ran.wang@intel.com,
+        corbet@lwn.net, openstack-discuss@lists.openstack.org,
+        shaohe.feng@intel.com, kevin.tian@intel.com,
+        Parav Pandit <parav@mellanox.com>, jian-feng.ding@intel.com,
+        dgilbert@redhat.com, zhenyuw@linux.intel.com, hejie.xu@intel.com,
+        bao.yumeng@zte.com.cn, intel-gvt-dev@lists.freedesktop.org,
+        eskultet@redhat.com, Jiri Pirko <jiri@mellanox.com>,
+        dinechin@redhat.com, devel@ovirt.org
+Subject: Re: device compatibility interface for live migration with assigned
+ devices
+Message-ID: <20200911120806.5cfe203c.cohuck@redhat.com>
+In-Reply-To: <20200911005559.GA3932@joy-OptiPlex-7040>
+References: <20200825163925.1c19b0f0.cohuck@redhat.com>
+        <20200826064117.GA22243@joy-OptiPlex-7040>
+        <20200828154741.30cfc1a3.cohuck@redhat.com>
+        <8f5345be73ebf4f8f7f51d6cdc9c2a0d8e0aa45e.camel@redhat.com>
+        <20200831044344.GB13784@joy-OptiPlex-7040>
+        <20200908164130.2fe0d106.cohuck@redhat.com>
+        <20200909021308.GA1277@joy-OptiPlex-7040>
+        <20200910143822.2071eca4.cohuck@redhat.com>
+        <7cebcb6c8d1a1452b43e8358ee6ee18a150a0238.camel@redhat.com>
+        <20200910120244.71e7b630@w520.home>
+        <20200911005559.GA3932@joy-OptiPlex-7040>
 Organization: Red Hat GmbH
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Content-Transfer-Encoding: quoted-printable
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 10 Sep 2020 20:25:08 +0800
-Zenghui Yu <yuzenghui@huawei.com> wrote:
+On Fri, 11 Sep 2020 08:56:00 +0800
+Yan Zhao <yan.y.zhao@intel.com> wrote:
 
-> A typo fix ("_RUNNNG" => "_RUNNING") in comment block of the uapi header.
-> 
-> Signed-off-by: Zenghui Yu <yuzenghui@huawei.com>
-> ---
->  include/uapi/linux/vfio.h | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
-> index 920470502329..d4bd39e124bf 100644
-> --- a/include/uapi/linux/vfio.h
-> +++ b/include/uapi/linux/vfio.h
-> @@ -462,7 +462,7 @@ struct vfio_region_gfx_edid {
->   * 5. Resumed
->   *                  |--------->|
->   *
-> - * 0. Default state of VFIO device is _RUNNNG when the user application starts.
-> + * 0. Default state of VFIO device is _RUNNING when the user application starts.
->   * 1. During normal shutdown of the user application, the user application may
->   *    optionally change the VFIO device state from _RUNNING to _STOP. This
->   *    transition is optional. The vendor driver must support this transition but
+> On Thu, Sep 10, 2020 at 12:02:44PM -0600, Alex Williamson wrote:
+> > On Thu, 10 Sep 2020 13:50:11 +0100
+> > Sean Mooney <smooney@redhat.com> wrote:
+> >  =20
+> > > On Thu, 2020-09-10 at 14:38 +0200, Cornelia Huck wrote: =20
+> > > > On Wed, 9 Sep 2020 10:13:09 +0800
+> > > > Yan Zhao <yan.y.zhao@intel.com> wrote:
+> > > >    =20
+> > > > > > > still, I'd like to put it more explicitly to make ensure it's=
+ not missed:
+> > > > > > > the reason we want to specify compatible_type as a trait and =
+check
+> > > > > > > whether target compatible_type is the superset of source
+> > > > > > > compatible_type is for the consideration of backward compatib=
+ility.
+> > > > > > > e.g.
+> > > > > > > an old generation device may have a mdev type xxx-v4-yyy, whi=
+le a newer
+> > > > > > > generation  device may be of mdev type xxx-v5-yyy.
+> > > > > > > with the compatible_type traits, the old generation device is=
+ still
+> > > > > > > able to be regarded as compatible to newer generation device =
+even their
+> > > > > > > mdev types are not equal.     =20
+> > > > > >=20
+> > > > > > If you want to support migration from v4 to v5, can't the (pres=
+umably
+> > > > > > newer) driver that supports v5 simply register the v4 type as w=
+ell, so
+> > > > > > that the mdev can be created as v4? (Just like QEMU versioned m=
+achine
+> > > > > > types work.)     =20
+> > > > >=20
+> > > > > yes, it should work in some conditions.
+> > > > > but it may not be that good in some cases when v5 and v4 in the n=
+ame string
+> > > > > of mdev type identify hardware generation (e.g. v4 for gen8, and =
+v5 for
+> > > > > gen9)
+> > > > >=20
+> > > > > e.g.
+> > > > > (1). when src mdev type is v4 and target mdev type is v5 as
+> > > > > software does not support it initially, and v4 and v5 identify ha=
+rdware
+> > > > > differences.   =20
+> > > >=20
+> > > > My first hunch here is: Don't introduce types that may be compatible
+> > > > later. Either make them compatible, or make them distinct by design,
+> > > > and possibly add a different, compatible type later.
+> > > >    =20
+> > > > > then after software upgrade, v5 is now compatible to v4, should t=
+he
+> > > > > software now downgrade mdev type from v5 to v4?
+> > > > > not sure if moving hardware generation info into a separate attri=
+bute
+> > > > > from mdev type name is better. e.g. remove v4, v5 in mdev type, w=
+hile use
+> > > > > compatible_pci_ids to identify compatibility.   =20
+> > > >=20
+> > > > If the generations are compatible, don't mention it in the mdev typ=
+e.
+> > > > If they aren't, use distinct types, so that management software doe=
+sn't
+> > > > have to guess. At least that would be my naive approach here. =20
 
-Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+[*]
+ =20
+> > > yep that is what i would prefer to see too. =20
+> > > >    =20
+> > > > >=20
+> > > > > (2) name string of mdev type is composed by "driver_name + type_n=
+ame".
+> > > > > in some devices, e.g. qat, different generations of devices are b=
+inding to
+> > > > > drivers of different names, e.g. "qat-v4", "qat-v5".
+> > > > > then though type_name is equal, mdev type is not equal. e.g.
+> > > > > "qat-v4-type1", "qat-v5-type1".   =20
+> > > >=20
+> > > > I guess that shows a shortcoming of that "driver_name + type_name"
+> > > > approach? Or maybe I'm just confused.   =20
+> > > yes i really dont like haveing the version in the mdev-type name=20
+> > > i would stongly perfger just qat-type-1 wehere qat is just there as a=
+ way of namespacing.
+> > > although symmetric-cryto, asymmetric-cryto and compression woudl be a=
+ better name then type-1, type-2, type-3 if
+> > > that is what they would end up mapping too. e.g. qat-compression or q=
+at-aes is a much better name then type-1
+> > > higher layers of software are unlikely to parse the mdev names but as=
+ a human looking at them its much eaiser to
+> > > understand if the names are meaningful. the qat prefix i think is imp=
+ortant however to make sure that your mdev-types
+> > > dont colide with other vendeors mdev types. so i woudl encurage all v=
+endors to prefix there mdev types with etiher the
+> > > device name or the vendor. =20
+> >=20
+> > +1 to all this, the mdev type is meant to indicate a software
+> > compatible interface, if different hardware versions can be software
+> > compatible, then don't make the job of finding a compatible device
+> > harder.  The full type is a combination of the vendor driver name plus
+> > the vendor provided type name specifically in order to provide a type
+> > namespace per vendor driver.  That's done at the mdev core level.
+> > Thanks, =20
+>=20
+> hi Alex,
+> got it. so do you suggest that vendors use consistent driver name over
+> generations of devices?
+> for qat, they create different modules for each generation. This
+> practice is not good if they want to support migration between devices
+> of different generations, right?
+
+Even if they create different modules, I'd assume that they have some
+kind of core with common functionality. I'd assume that as long they do
+any type registrations satisfying [*] in the core, they should be good.
+
+> and can I understand that we don't want support of migration between
+> different mdev types even in future ?
+
+=46rom my point of view, I don't see anything that migration between
+different mdev types would buy that is worth the complexity in finding
+out which mdev types are actually compatible.
 
