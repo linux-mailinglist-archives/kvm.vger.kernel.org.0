@@ -2,187 +2,117 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5A7FB266514
-	for <lists+kvm@lfdr.de>; Fri, 11 Sep 2020 18:52:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id ED5872665FC
+	for <lists+kvm@lfdr.de>; Fri, 11 Sep 2020 19:19:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726262AbgIKQwf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 11 Sep 2020 12:52:35 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:50848 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1725832AbgIKQwP (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 11 Sep 2020 12:52:15 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1599843131;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=KdqJbrxL/AwxVkgJA8HBG/XJzgdBc1MfdvhlV2cP3Dw=;
-        b=JbyQZ6nFL3tB+ZYirLcB8/NIrYALP0Fx4N7stEtA4gGUVkUzOWXkvhFizL8Ub0D3Y8KrLt
-        wjI/Nv25cqZaDOLiBdg6NEWehLpXxgBsRRbUuYeLdBggts8n4QEh7n5MXz/avD3P4vfGrS
-        MRNakwudCVwul0lNcrmwO3c8XuZQKJg=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-394-lwu8TFuRNAqRRRXD3Uldyg-1; Fri, 11 Sep 2020 12:52:09 -0400
-X-MC-Unique: lwu8TFuRNAqRRRXD3Uldyg-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B7B881074643;
-        Fri, 11 Sep 2020 16:52:06 +0000 (UTC)
-Received: from w520.home (ovpn-112-71.phx2.redhat.com [10.3.112.71])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 1151F1A8AC;
-        Fri, 11 Sep 2020 16:51:57 +0000 (UTC)
-Date:   Fri, 11 Sep 2020 10:51:55 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Yan Zhao <yan.y.zhao@intel.com>
-Cc:     Sean Mooney <smooney@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        "Daniel =?UTF-8?B?UC5CZXJyYW5nw6k=?=" <berrange@redhat.com>,
-        kvm@vger.kernel.org, libvir-list@redhat.com,
-        Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org,
-        kwankhede@nvidia.com, eauger@redhat.com, xin-ran.wang@intel.com,
-        corbet@lwn.net, openstack-discuss@lists.openstack.org,
-        shaohe.feng@intel.com, kevin.tian@intel.com,
-        Parav Pandit <parav@mellanox.com>, jian-feng.ding@intel.com,
-        dgilbert@redhat.com, zhenyuw@linux.intel.com, hejie.xu@intel.com,
-        bao.yumeng@zte.com.cn, intel-gvt-dev@lists.freedesktop.org,
-        eskultet@redhat.com, Jiri Pirko <jiri@mellanox.com>,
-        dinechin@redhat.com, devel@ovirt.org
-Subject: Re: device compatibility interface for live migration with assigned
- devices
-Message-ID: <20200911105155.184e32a0@w520.home>
-In-Reply-To: <20200911005559.GA3932@joy-OptiPlex-7040>
-References: <20200825163925.1c19b0f0.cohuck@redhat.com>
-        <20200826064117.GA22243@joy-OptiPlex-7040>
-        <20200828154741.30cfc1a3.cohuck@redhat.com>
-        <8f5345be73ebf4f8f7f51d6cdc9c2a0d8e0aa45e.camel@redhat.com>
-        <20200831044344.GB13784@joy-OptiPlex-7040>
-        <20200908164130.2fe0d106.cohuck@redhat.com>
-        <20200909021308.GA1277@joy-OptiPlex-7040>
-        <20200910143822.2071eca4.cohuck@redhat.com>
-        <7cebcb6c8d1a1452b43e8358ee6ee18a150a0238.camel@redhat.com>
-        <20200910120244.71e7b630@w520.home>
-        <20200911005559.GA3932@joy-OptiPlex-7040>
+        id S1725937AbgIKRT3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 11 Sep 2020 13:19:29 -0400
+Received: from smtp-fw-9102.amazon.com ([207.171.184.29]:28123 "EHLO
+        smtp-fw-9102.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726138AbgIKO6W (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 11 Sep 2020 10:58:22 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1599836302; x=1631372302;
+  h=subject:from:to:cc:references:message-id:date:
+   mime-version:in-reply-to:content-transfer-encoding;
+  bh=Zo2DwoqnHvBuH56xIWns6eaxEfl/ZPGVsEI+Qq68jw0=;
+  b=Flkd2/CG+0SfTbwDHRRTUWIArXHtEQ5q6UDymdJhml3rrP3zpgQpFJ1q
+   zamRdDIenlUBOjX6cTDJ1J0gDSKkKSc3RTMBexZpWbgjZ7NYQh6JoSHKW
+   6TCih1Zis1jm2MrgJT2QoA3b5bEYvTIxsz8tf2+RJhT+5EgoW3G+pcsgy
+   k=;
+X-IronPort-AV: E=Sophos;i="5.76,415,1592870400"; 
+   d="scan'208";a="75441519"
+Received: from sea32-co-svc-lb4-vlan3.sea.corp.amazon.com (HELO email-inbound-relay-1d-37fd6b3d.us-east-1.amazon.com) ([10.47.23.38])
+  by smtp-border-fw-out-9102.sea19.amazon.com with ESMTP; 11 Sep 2020 14:56:34 +0000
+Received: from EX13D16EUB001.ant.amazon.com (iad12-ws-svc-p26-lb9-vlan3.iad.amazon.com [10.40.163.38])
+        by email-inbound-relay-1d-37fd6b3d.us-east-1.amazon.com (Postfix) with ESMTPS id 1CD94282592;
+        Fri, 11 Sep 2020 14:56:30 +0000 (UTC)
+Received: from 38f9d34ed3b1.ant.amazon.com (10.43.160.244) by
+ EX13D16EUB001.ant.amazon.com (10.43.166.28) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.2; Fri, 11 Sep 2020 14:56:22 +0000
+Subject: Re: [PATCH v8 17/18] nitro_enclaves: Add overview documentation
+From:   "Paraschiv, Andra-Irina" <andraprs@amazon.com>
+To:     Greg KH <gregkh@linuxfoundation.org>
+CC:     linux-kernel <linux-kernel@vger.kernel.org>,
+        Anthony Liguori <aliguori@amazon.com>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Colm MacCarthaigh <colmmacc@amazon.com>,
+        David Duncan <davdunc@amazon.com>,
+        Bjoern Doebel <doebel@amazon.de>,
+        David Woodhouse <dwmw@amazon.co.uk>,
+        "Frank van der Linden" <fllinden@amazon.com>,
+        Alexander Graf <graf@amazon.de>,
+        "Karen Noel" <knoel@redhat.com>,
+        Martin Pohlack <mpohlack@amazon.de>,
+        Matt Wilson <msw@amazon.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Balbir Singh <sblbir@amazon.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        "Stefan Hajnoczi" <stefanha@redhat.com>,
+        Stewart Smith <trawets@amazon.com>,
+        "Uwe Dannowski" <uwed@amazon.de>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        kvm <kvm@vger.kernel.org>,
+        ne-devel-upstream <ne-devel-upstream@amazon.com>
+References: <20200904173718.64857-1-andraprs@amazon.com>
+ <20200904173718.64857-18-andraprs@amazon.com>
+ <20200907090126.GD1101646@kroah.com>
+ <44a8a921-1fb4-87ab-b8f2-c168c615dbbd@amazon.com>
+ <20200907140803.GA3719869@kroah.com>
+ <b8a1e66c-7674-7354-599e-159efd260ba9@amazon.com>
+Message-ID: <310abd0d-60e7-a52c-fcae-cf98ac474e32@amazon.com>
+Date:   Fri, 11 Sep 2020 17:56:10 +0300
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:78.0)
+ Gecko/20100101 Thunderbird/78.2.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+In-Reply-To: <b8a1e66c-7674-7354-599e-159efd260ba9@amazon.com>
+Content-Language: en-US
+X-Originating-IP: [10.43.160.244]
+X-ClientProxiedBy: EX13D42UWA001.ant.amazon.com (10.43.160.153) To
+ EX13D16EUB001.ant.amazon.com (10.43.166.28)
+Content-Type: text/plain; charset="utf-8"; format="flowed"
+Content-Transfer-Encoding: base64
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 11 Sep 2020 08:56:00 +0800
-Yan Zhao <yan.y.zhao@intel.com> wrote:
-
-> On Thu, Sep 10, 2020 at 12:02:44PM -0600, Alex Williamson wrote:
-> > On Thu, 10 Sep 2020 13:50:11 +0100
-> > Sean Mooney <smooney@redhat.com> wrote:
-> >   
-> > > On Thu, 2020-09-10 at 14:38 +0200, Cornelia Huck wrote:  
-> > > > On Wed, 9 Sep 2020 10:13:09 +0800
-> > > > Yan Zhao <yan.y.zhao@intel.com> wrote:
-> > > >     
-> > > > > > > still, I'd like to put it more explicitly to make ensure it's not missed:
-> > > > > > > the reason we want to specify compatible_type as a trait and check
-> > > > > > > whether target compatible_type is the superset of source
-> > > > > > > compatible_type is for the consideration of backward compatibility.
-> > > > > > > e.g.
-> > > > > > > an old generation device may have a mdev type xxx-v4-yyy, while a newer
-> > > > > > > generation  device may be of mdev type xxx-v5-yyy.
-> > > > > > > with the compatible_type traits, the old generation device is still
-> > > > > > > able to be regarded as compatible to newer generation device even their
-> > > > > > > mdev types are not equal.      
-> > > > > > 
-> > > > > > If you want to support migration from v4 to v5, can't the (presumably
-> > > > > > newer) driver that supports v5 simply register the v4 type as well, so
-> > > > > > that the mdev can be created as v4? (Just like QEMU versioned machine
-> > > > > > types work.)      
-> > > > > 
-> > > > > yes, it should work in some conditions.
-> > > > > but it may not be that good in some cases when v5 and v4 in the name string
-> > > > > of mdev type identify hardware generation (e.g. v4 for gen8, and v5 for
-> > > > > gen9)
-> > > > > 
-> > > > > e.g.
-> > > > > (1). when src mdev type is v4 and target mdev type is v5 as
-> > > > > software does not support it initially, and v4 and v5 identify hardware
-> > > > > differences.    
-> > > > 
-> > > > My first hunch here is: Don't introduce types that may be compatible
-> > > > later. Either make them compatible, or make them distinct by design,
-> > > > and possibly add a different, compatible type later.
-> > > >     
-> > > > > then after software upgrade, v5 is now compatible to v4, should the
-> > > > > software now downgrade mdev type from v5 to v4?
-> > > > > not sure if moving hardware generation info into a separate attribute
-> > > > > from mdev type name is better. e.g. remove v4, v5 in mdev type, while use
-> > > > > compatible_pci_ids to identify compatibility.    
-> > > > 
-> > > > If the generations are compatible, don't mention it in the mdev type.
-> > > > If they aren't, use distinct types, so that management software doesn't
-> > > > have to guess. At least that would be my naive approach here.    
-> > > yep that is what i would prefer to see too.  
-> > > >     
-> > > > > 
-> > > > > (2) name string of mdev type is composed by "driver_name + type_name".
-> > > > > in some devices, e.g. qat, different generations of devices are binding to
-> > > > > drivers of different names, e.g. "qat-v4", "qat-v5".
-> > > > > then though type_name is equal, mdev type is not equal. e.g.
-> > > > > "qat-v4-type1", "qat-v5-type1".    
-> > > > 
-> > > > I guess that shows a shortcoming of that "driver_name + type_name"
-> > > > approach? Or maybe I'm just confused.    
-> > > yes i really dont like haveing the version in the mdev-type name 
-> > > i would stongly perfger just qat-type-1 wehere qat is just there as a way of namespacing.
-> > > although symmetric-cryto, asymmetric-cryto and compression woudl be a better name then type-1, type-2, type-3 if
-> > > that is what they would end up mapping too. e.g. qat-compression or qat-aes is a much better name then type-1
-> > > higher layers of software are unlikely to parse the mdev names but as a human looking at them its much eaiser to
-> > > understand if the names are meaningful. the qat prefix i think is important however to make sure that your mdev-types
-> > > dont colide with other vendeors mdev types. so i woudl encurage all vendors to prefix there mdev types with etiher the
-> > > device name or the vendor.  
-> > 
-> > +1 to all this, the mdev type is meant to indicate a software
-> > compatible interface, if different hardware versions can be software
-> > compatible, then don't make the job of finding a compatible device
-> > harder.  The full type is a combination of the vendor driver name plus
-> > the vendor provided type name specifically in order to provide a type
-> > namespace per vendor driver.  That's done at the mdev core level.
-> > Thanks,  
-> 
-> hi Alex,
-> got it. so do you suggest that vendors use consistent driver name over
-> generations of devices?
-> for qat, they create different modules for each generation. This
-> practice is not good if they want to support migration between devices
-> of different generations, right?
-> 
-> and can I understand that we don't want support of migration between
-> different mdev types even in future ?
-
-You need to balance your requirements here.  If you're creating
-different drivers per generation, that suggests different device APIs,
-which is a legitimate use case for different mdev types.  However if
-you're expecting migration compatibility, that must be seamless to the
-guest, therefore the device API must be identical.  That suggests that
-migration between different types doesn't make much sense.  If a new
-generation device wants to expose a new mdev type with new features or
-device API, yet also support migration with an older mdev type, why
-wouldn't it simply expose both the old and the new type?  It seems much
-more supportable to simply instantiate an instance of the older type
-than to create an instance of the new type, which by the contents of
-the migration stream is configured to behave as the older type.  The
-latter sounds very difficult to test.
-
-A challenge when we think about migration between different types,
-particularly across different vendor drivers, is that the migration
-stream is opaque, it's device and vendor specific.  Therefore it's not
-only difficult for userspace to understand the compatibility matrix, but
-also to actually support it in software, maintaining version and bug
-compatibility across different drivers.  It's clearly much, much easier
-when the same code base (and thus the same mdev type) is producing and
-consuming the migration data.  Thanks,
-
-Alex
+CgpPbiAwNy8wOS8yMDIwIDE4OjEzLCBQYXJhc2NoaXYsIEFuZHJhLUlyaW5hIHdyb3RlOgo+Cj4K
+PiBPbiAwNy8wOS8yMDIwIDE3OjA4LCBHcmVnIEtIIHdyb3RlOgo+PiBPbiBNb24sIFNlcCAwNywg
+MjAyMCBhdCAwNDo0MzoxMVBNICswMzAwLCBQYXJhc2NoaXYsIEFuZHJhLUlyaW5hIHdyb3RlOgo+
+Pj4KPj4+IE9uIDA3LzA5LzIwMjAgMTI6MDEsIEdyZWcgS0ggd3JvdGU6Cj4+Pj4gT24gRnJpLCBT
+ZXAgMDQsIDIwMjAgYXQgMDg6Mzc6MTdQTSArMDMwMCwgQW5kcmEgUGFyYXNjaGl2IHdyb3RlOgo+
+Pj4+PiBTaWduZWQtb2ZmLWJ5OiBBbmRyYSBQYXJhc2NoaXYgPGFuZHJhcHJzQGFtYXpvbi5jb20+
+Cj4+Pj4+IFJldmlld2VkLWJ5OiBBbGV4YW5kZXIgR3JhZiA8Z3JhZkBhbWF6b24uY29tPgo+Pj4+
+PiAtLS0KPj4+Pj4gQ2hhbmdlbG9nCj4+Pj4+Cj4+Pj4+IHY3IC0+IHY4Cj4+Pj4+Cj4+Pj4+ICog
+QWRkIGluZm8gYWJvdXQgdGhlIHByaW1hcnkgLyBwYXJlbnQgVk0gQ0lEIHZhbHVlLgo+Pj4+PiAq
+IFVwZGF0ZSByZWZlcmVuY2UgbGluayBmb3IgaHVnZSBwYWdlcy4KPj4+Pj4gKiBBZGQgcmVmZXJl
+bmNlIGxpbmsgZm9yIHRoZSB4ODYgYm9vdCBwcm90b2NvbC4KPj4+Pj4gKiBBZGQgbGljZW5zZSBt
+ZW50aW9uIGFuZCB1cGRhdGUgZG9jIHRpdGxlIC8gY2hhcHRlciBmb3JtYXR0aW5nLgo+Pj4+Pgo+
+Pj4+PiB2NiAtPiB2Nwo+Pj4+Pgo+Pj4+PiAqIE5vIGNoYW5nZXMuCj4+Pj4+Cj4+Pj4+IHY1IC0+
+IHY2Cj4+Pj4+Cj4+Pj4+ICogTm8gY2hhbmdlcy4KPj4+Pj4KPj4+Pj4gdjQgLT4gdjUKPj4+Pj4K
+Pj4+Pj4gKiBObyBjaGFuZ2VzLgo+Pj4+Pgo+Pj4+PiB2MyAtPiB2NAo+Pj4+Pgo+Pj4+PiAqIFVw
+ZGF0ZSBkb2MgdHlwZSBmcm9tIC50eHQgdG8gLnJzdC4KPj4+Pj4gKiBVcGRhdGUgZG9jdW1lbnRh
+dGlvbiBiYXNlZCBvbiB0aGUgY2hhbmdlcyBmcm9tIHY0Lgo+Pj4+Pgo+Pj4+PiB2MiAtPiB2Mwo+
+Pj4+Pgo+Pj4+PiAqIE5vIGNoYW5nZXMuCj4+Pj4+Cj4+Pj4+IHYxIC0+IHYyCj4+Pj4+Cj4+Pj4+
+ICogTmV3IGluIHYyLgo+Pj4+PiAtLS0KPj4+Pj4gwqDCoCBEb2N1bWVudGF0aW9uL25pdHJvX2Vu
+Y2xhdmVzL25lX292ZXJ2aWV3LnJzdCB8IDk1IAo+Pj4+PiArKysrKysrKysrKysrKysrKysrKwo+
+Pj4+PiDCoMKgIDEgZmlsZSBjaGFuZ2VkLCA5NSBpbnNlcnRpb25zKCspCj4+Pj4+IMKgwqAgY3Jl
+YXRlIG1vZGUgMTAwNjQ0IERvY3VtZW50YXRpb24vbml0cm9fZW5jbGF2ZXMvbmVfb3ZlcnZpZXcu
+cnN0Cj4+Pj4gQSB3aG9sZSBuZXcgc3ViZGlyLCBmb3IgYSBzaW5nbGUgZHJpdmVyLCBhbmQgbm90
+IHRpZWQgaW50byB0aGUga2VybmVsCj4+Pj4gZG9jdW1lbnRhdGlvbiBidWlsZCBwcm9jZXNzIGF0
+IGFsbD/CoCBOb3QgZ29vZCA6KAo+Pj4+Cj4+PiBXb3VsZCB0aGUgInZpcnQiIGRpcmVjdG9yeSBi
+ZSBhIGJldHRlciBvcHRpb24gZm9yIHRoaXMgZG9jIGZpbGU/Cj4+IFllcy4KPgo+IEFscmlnaHQs
+IEknbGwgdXBkYXRlIHRoZSBkb2MgZmlsZSBsb2NhdGlvbiwgdGhlIGluZGV4IGZpbGUgYW5kIHRo
+ZSAKPiBNQUlOVEFJTkVSUyBlbnRyeSB0byByZWZsZWN0IHRoZSBuZXcgZG9jIGZpbGUgbG9jYXRp
+b24uCj4KCkkgc2VudCBvdXQgYSBuZXcgcmV2aXNpb24gdGhhdCBpbmNsdWRlcyB0aGUgdXBkYXRl
+cyBiYXNlZCBvbiB5b3VyIApmZWVkYmFjay4gVGhhbmtzIGZvciByZXZpZXcuCgpUbyBiZSBhd2Fy
+ZSBvZiB0aGlzIGJlZm9yZWhhbmQsIHdoYXQgd291bGQgYmUgdGhlIGZ1cnRoZXIgbmVjZXNzYXJ5
+IApzdGVwcyAoZS5nLiBsaW51eC1uZXh0IGJyYW5jaCwgYWRkaXRpb25hbCByZXZpZXcgYW5kIC8g
+b3Igc2FuaXR5IGNoZWNrcykgCnRvIGNvbnNpZGVyIGZvciB0YXJnZXRpbmcgdGhlIG5leHQgbWVy
+Z2Ugd2luZG93PwoKVGhhbmtzLApBbmRyYQoKCgpBbWF6b24gRGV2ZWxvcG1lbnQgQ2VudGVyIChS
+b21hbmlhKSBTLlIuTC4gcmVnaXN0ZXJlZCBvZmZpY2U6IDI3QSBTZi4gTGF6YXIgU3RyZWV0LCBV
+QkM1LCBmbG9vciAyLCBJYXNpLCBJYXNpIENvdW50eSwgNzAwMDQ1LCBSb21hbmlhLiBSZWdpc3Rl
+cmVkIGluIFJvbWFuaWEuIFJlZ2lzdHJhdGlvbiBudW1iZXIgSjIyLzI2MjEvMjAwNS4K
 
