@@ -2,143 +2,120 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E155E265AB8
-	for <lists+kvm@lfdr.de>; Fri, 11 Sep 2020 09:46:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 29A91265AEF
+	for <lists+kvm@lfdr.de>; Fri, 11 Sep 2020 09:57:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725784AbgIKHpy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 11 Sep 2020 03:45:54 -0400
-Received: from smtpout1.mo804.mail-out.ovh.net ([79.137.123.220]:36643 "EHLO
-        smtpout1.mo804.mail-out.ovh.net" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725800AbgIKHpt (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 11 Sep 2020 03:45:49 -0400
-Received: from mxplan5.mail.ovh.net (unknown [10.109.156.13])
-        by mo804.mail-out.ovh.net (Postfix) with ESMTPS id 6BEC660619AB;
-        Fri, 11 Sep 2020 09:45:43 +0200 (CEST)
-Received: from kaod.org (37.59.142.96) by DAG8EX1.mxp5.local (172.16.2.71)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2044.4; Fri, 11 Sep
- 2020 09:45:42 +0200
-Authentication-Results: garm.ovh; auth=pass (GARM-96R001d0b0f908-b7f8-4ded-830f-0b985388e565,
-                    864FBEA0465FE1F0C66A9C6AC37977A76827B8ED) smtp.auth=groug@kaod.org
-Date:   Fri, 11 Sep 2020 09:45:36 +0200
-From:   Greg Kurz <groug@kaod.org>
-To:     Fabiano Rosas <farosas@linux.ibm.com>
-CC:     <kvm-ppc@vger.kernel.org>, <linuxppc-dev@lists.ozlabs.org>,
-        <kvm@vger.kernel.org>, <paulus@ozlabs.org>, <mpe@ellerman.id.au>,
-        <david@gibson.dropbear.id.au>
-Subject: Re: [PATCH] KVM: PPC: Book3S HV: Do not allocate HPT for a nested
- guest
-Message-ID: <20200911094536.72dd700a@bahia.lan>
-In-Reply-To: <20200911041607.198092-1-farosas@linux.ibm.com>
-References: <20200911041607.198092-1-farosas@linux.ibm.com>
-X-Mailer: Claws Mail 3.17.6 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+        id S1725791AbgIKH5n (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 11 Sep 2020 03:57:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48902 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725784AbgIKH5f (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 11 Sep 2020 03:57:35 -0400
+Received: from mail-pj1-x1044.google.com (mail-pj1-x1044.google.com [IPv6:2607:f8b0:4864:20::1044])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CF089C061573
+        for <kvm@vger.kernel.org>; Fri, 11 Sep 2020 00:57:34 -0700 (PDT)
+Received: by mail-pj1-x1044.google.com with SMTP id s2so1310441pjr.4
+        for <kvm@vger.kernel.org>; Fri, 11 Sep 2020 00:57:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:in-reply-to:message-id:references
+         :user-agent:mime-version;
+        bh=D68YRpGe41uJ8+gFVfMwX0RCIFPEEX/t0OhKoAuLKXc=;
+        b=lJTZLEjJEy0HzJ0cIARU4N8+44CV3NNjEz0dKZlMU89mCjRyRRq51QF8nmrKTchrPi
+         pTt8dD+SDsn7OUoRlL1Rr0S1Qq6nPCSpemStoTw3aGTR6Eu2BRbiZUVb+yAJLbTIbqng
+         jj3Qds88FIyOJBmxN+5hh2Fg6vjJpwkd4glIp4G7P9fed5lbJf0bwazJ+NkZRuEDe9Y0
+         UUu5Ja9YVkKAjkNBP4pDmBqoDt5cPW7uSE3yri2/19xLmIylukiUWHukXaaFb5k/PKbZ
+         EPULBUiiFi1SoqUqdnUslSw01ZEhG/DXqV4Z7gaD/NADBFBWtDLGVv0Lcx3TfxDMKKet
+         k1jg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:in-reply-to:message-id
+         :references:user-agent:mime-version;
+        bh=D68YRpGe41uJ8+gFVfMwX0RCIFPEEX/t0OhKoAuLKXc=;
+        b=SVJl6powPOC1bLGCgRaoLck6AmeNu6PJDi+o/WiNhvXJrE4Ek81Ef8hj+Wmrfzxv04
+         +r5mqbs/lE53igk4EZ5Va3RjlyV2eNatU0H5Bo6mdSYugGM0/LjOYLktf8jCKMZ1q+9p
+         a1trS5JTjSb+KzsIzD3M77Sh2xCym+HPVjF6vQ8uLr3utSsEbxZrszwhe4S2pQF0LFSr
+         U6mYsm2uytjk/SHHouAzO17TwBfRwlK1DU5lX8NT8Q810SJuGZWtlHfnVpIqypPbhogf
+         6h1Qpxx0yA72eZFI9Jk3xFhkRRiOSuAyLbaqW9qwAeKyXCmgyURCtHtwYD8CpVgw87gJ
+         o6SQ==
+X-Gm-Message-State: AOAM530zU6XE3XZTDSzjGPINkJKvvWB2L68kA1xvBSNTdyW0wuyrlmuO
+        zf75UK4cUjbJNaxUy2bMN4DP9w==
+X-Google-Smtp-Source: ABdhPJw2e/NDEf8sEec/hL+0GhrxGhLwxTY+Q3W8tV8tDAOo79Alu00023BhM4cVcfk+4/R9Yw+60g==
+X-Received: by 2002:a17:90a:f992:: with SMTP id cq18mr1124575pjb.172.1599811054028;
+        Fri, 11 Sep 2020 00:57:34 -0700 (PDT)
+Received: from [2620:15c:17:3:4a0f:cfff:fe51:6667] ([2620:15c:17:3:4a0f:cfff:fe51:6667])
+        by smtp.gmail.com with ESMTPSA id m5sm1190506pjn.19.2020.09.11.00.57.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 11 Sep 2020 00:57:33 -0700 (PDT)
+Date:   Fri, 11 Sep 2020 00:57:32 -0700 (PDT)
+From:   David Rientjes <rientjes@google.com>
+X-X-Sender: rientjes@chino.kir.corp.google.com
+To:     Tom Lendacky <thomas.lendacky@amd.com>,
+        Brijesh Singh <brijesh.singh@amd.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>
+cc:     Joerg Roedel <joro@8bytes.org>, linux-kernel@vger.kernel.org,
+        x86@kernel.org, kvm@vger.kernel.org
+Subject: Re: [patch] KVM: SVM: Periodically schedule when unregistering
+ regions on destroy
+In-Reply-To: <alpine.DEB.2.23.453.2008251255240.2987727@chino.kir.corp.google.com>
+Message-ID: <alpine.DEB.2.23.453.2009110057300.3797679@chino.kir.corp.google.com>
+References: <alpine.DEB.2.23.453.2008251255240.2987727@chino.kir.corp.google.com>
+User-Agent: Alpine 2.23 (DEB 453 2020-06-18)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [37.59.142.96]
-X-ClientProxiedBy: DAG9EX1.mxp5.local (172.16.2.81) To DAG8EX1.mxp5.local
- (172.16.2.71)
-X-Ovh-Tracer-GUID: dfe5079d-0ecb-41fa-bf33-af55cbc276d2
-X-Ovh-Tracer-Id: 3109454068212603241
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduiedrudehkedguddvhecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpeffhffvuffkjghfofggtgfgihesthejredtredtvdenucfhrhhomhepifhrvghgucfmuhhriicuoehgrhhouhhgsehkrghougdrohhrgheqnecuggftrfgrthhtvghrnhepfedutdeijeejveehkeeileetgfelteekteehtedtieefffevhffflefftdefleejnecukfhppedtrddtrddtrddtpdefjedrheelrddugedvrdelieenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehmgihplhgrnhehrdhmrghilhdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomhepghhrohhugheskhgrohgurdhorhhgpdhrtghpthhtohepuggrvhhiugesghhisghsohhnrdgurhhophgsvggrrhdrihgurdgruh
+Content-Type: text/plain; charset=US-ASCII
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 11 Sep 2020 01:16:07 -0300
-Fabiano Rosas <farosas@linux.ibm.com> wrote:
+Paolo, ping?
 
-> The current nested KVM code does not support HPT guests. This is
-> informed/enforced in some ways:
+On Tue, 25 Aug 2020, David Rientjes wrote:
+
+> There may be many encrypted regions that need to be unregistered when a
+> SEV VM is destroyed.  This can lead to soft lockups.  For example, on a
+> host running 4.15:
 > 
-> - Hosts < P9 will not be able to enable the nested HV feature;
+> watchdog: BUG: soft lockup - CPU#206 stuck for 11s! [t_virtual_machi:194348]
+> CPU: 206 PID: 194348 Comm: t_virtual_machi
+> RIP: 0010:free_unref_page_list+0x105/0x170
+> ...
+> Call Trace:
+>  [<0>] release_pages+0x159/0x3d0
+>  [<0>] sev_unpin_memory+0x2c/0x50 [kvm_amd]
+>  [<0>] __unregister_enc_region_locked+0x2f/0x70 [kvm_amd]
+>  [<0>] svm_vm_destroy+0xa9/0x200 [kvm_amd]
+>  [<0>] kvm_arch_destroy_vm+0x47/0x200
+>  [<0>] kvm_put_kvm+0x1a8/0x2f0
+>  [<0>] kvm_vm_release+0x25/0x30
+>  [<0>] do_exit+0x335/0xc10
+>  [<0>] do_group_exit+0x3f/0xa0
+>  [<0>] get_signal+0x1bc/0x670
+>  [<0>] do_signal+0x31/0x130
 > 
-> - The nested hypervisor MMU capabilities will not contain
->   KVM_CAP_PPC_MMU_HASH_V3;
+> Although the CLFLUSH is no longer issued on every encrypted region to be
+> unregistered, there are no other changes that can prevent soft lockups for
+> very large SEV VMs in the latest kernel.
 > 
-> - QEMU reflects the MMU capabilities in the
->   'ibm,arch-vec-5-platform-support' device-tree property;
+> Periodically schedule if necessary.  This still holds kvm->lock across the
+> resched, but since this only happens when the VM is destroyed this is
+> assumed to be acceptable.
 > 
-> - The nested guest, at 'prom_parse_mmu_model' ignores the
->   'disable_radix' kernel command line option if HPT is not supported;
-> 
-> - The KVM_PPC_CONFIGURE_V3_MMU ioctl will fail if trying to use HPT.
-> 
-> There is, however, still a way to start a HPT guest by using
-> max-compat-cpu=power8 at the QEMU machine options. This leads to the
-> guest being set to use hash after QEMU calls the KVM_PPC_ALLOCATE_HTAB
-> ioctl.
-> 
-> With the guest set to hash, the nested hypervisor goes through the
-> entry path that has no knowledge of nesting (kvmppc_run_vcpu) and
-> crashes when it tries to execute an hypervisor-privileged (mtspr
-> HDEC) instruction at __kvmppc_vcore_entry:
-> 
-> root@L1:~ $ qemu-system-ppc64 -machine pseries,max-cpu-compat=power8 ...
-> 
-> <snip>
-> [  538.543303] CPU: 83 PID: 25185 Comm: CPU 0/KVM Not tainted 5.9.0-rc4 #1
-> [  538.543355] NIP:  c00800000753f388 LR: c00800000753f368 CTR: c0000000001e5ec0
-> [  538.543417] REGS: c0000013e91e33b0 TRAP: 0700   Not tainted  (5.9.0-rc4)
-> [  538.543470] MSR:  8000000002843033 <SF,VEC,VSX,FP,ME,IR,DR,RI,LE>  CR: 22422882  XER: 20040000
-> [  538.543546] CFAR: c00800000753f4b0 IRQMASK: 3
->                GPR00: c0080000075397a0 c0000013e91e3640 c00800000755e600 0000000080000000
->                GPR04: 0000000000000000 c0000013eab19800 c000001394de0000 00000043a054db72
->                GPR08: 00000000003b1652 0000000000000000 0000000000000000 c0080000075502e0
->                GPR12: c0000000001e5ec0 c0000007ffa74200 c0000013eab19800 0000000000000008
->                GPR16: 0000000000000000 c00000139676c6c0 c000000001d23948 c0000013e91e38b8
->                GPR20: 0000000000000053 0000000000000000 0000000000000001 0000000000000000
->                GPR24: 0000000000000001 0000000000000001 0000000000000000 0000000000000001
->                GPR28: 0000000000000001 0000000000000053 c0000013eab19800 0000000000000001
-> [  538.544067] NIP [c00800000753f388] __kvmppc_vcore_entry+0x90/0x104 [kvm_hv]
-> [  538.544121] LR [c00800000753f368] __kvmppc_vcore_entry+0x70/0x104 [kvm_hv]
-> [  538.544173] Call Trace:
-> [  538.544196] [c0000013e91e3640] [c0000013e91e3680] 0xc0000013e91e3680 (unreliable)
-> [  538.544260] [c0000013e91e3820] [c0080000075397a0] kvmppc_run_core+0xbc8/0x19d0 [kvm_hv]
-> [  538.544325] [c0000013e91e39e0] [c00800000753d99c] kvmppc_vcpu_run_hv+0x404/0xc00 [kvm_hv]
-> [  538.544394] [c0000013e91e3ad0] [c0080000072da4fc] kvmppc_vcpu_run+0x34/0x48 [kvm]
-> [  538.544472] [c0000013e91e3af0] [c0080000072d61b8] kvm_arch_vcpu_ioctl_run+0x310/0x420 [kvm]
-> [  538.544539] [c0000013e91e3b80] [c0080000072c7450] kvm_vcpu_ioctl+0x298/0x778 [kvm]
-> [  538.544605] [c0000013e91e3ce0] [c0000000004b8c2c] sys_ioctl+0x1dc/0xc90
-> [  538.544662] [c0000013e91e3dc0] [c00000000002f9a4] system_call_exception+0xe4/0x1c0
-> [  538.544726] [c0000013e91e3e20] [c00000000000d140] system_call_common+0xf0/0x27c
-> [  538.544787] Instruction dump:
-> [  538.544821] f86d1098 60000000 60000000 48000099 e8ad0fe8 e8c500a0 e9264140 75290002
-> [  538.544886] 7d1602a6 7cec42a6 40820008 7d0807b4 <7d164ba6> 7d083a14 f90d10a0 480104fd
-> [  538.544953] ---[ end trace 74423e2b948c2e0c ]---
-> 
-> This patch makes the KVM_PPC_ALLOCATE_HTAB ioctl fail when running in
-> the nested hypervisor, causing QEMU to abort.
-> 
-> Reported-by: Satheesh Rajendran <sathnaga@linux.vnet.ibm.com>
-> Signed-off-by: Fabiano Rosas <farosas@linux.ibm.com>
+> Signed-off-by: David Rientjes <rientjes@google.com>
 > ---
-
-LGTM
-
-Reviewed-by: Greg Kurz <groug@kaod.org>
-
->  arch/powerpc/kvm/book3s_hv.c | 6 ++++++
->  1 file changed, 6 insertions(+)
+>  arch/x86/kvm/svm/sev.c | 1 +
+>  1 file changed, 1 insertion(+)
 > 
-> diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
-> index 4ba06a2a306c..764b6239ef72 100644
-> --- a/arch/powerpc/kvm/book3s_hv.c
-> +++ b/arch/powerpc/kvm/book3s_hv.c
-> @@ -5250,6 +5250,12 @@ static long kvm_arch_vm_ioctl_hv(struct file *filp,
->  	case KVM_PPC_ALLOCATE_HTAB: {
->  		u32 htab_order;
+> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+> --- a/arch/x86/kvm/svm/sev.c
+> +++ b/arch/x86/kvm/svm/sev.c
+> @@ -1106,6 +1106,7 @@ void sev_vm_destroy(struct kvm *kvm)
+>  		list_for_each_safe(pos, q, head) {
+>  			__unregister_enc_region_locked(kvm,
+>  				list_entry(pos, struct enc_region, list));
+> +			cond_resched();
+>  		}
+>  	}
 >  
-> +		/* If we're a nested hypervisor, we currently only support radix */
-> +		if (kvmhv_on_pseries()) {
-> +			r = -EOPNOTSUPP;
-> +			break;
-> +		}
-> +
->  		r = -EFAULT;
->  		if (get_user(htab_order, (u32 __user *)argp))
->  			break;
-
+> 
