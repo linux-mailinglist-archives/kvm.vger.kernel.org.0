@@ -2,239 +2,114 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 99CB02668D6
-	for <lists+kvm@lfdr.de>; Fri, 11 Sep 2020 21:32:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F28992668F0
+	for <lists+kvm@lfdr.de>; Fri, 11 Sep 2020 21:36:30 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725962AbgIKTcy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 11 Sep 2020 15:32:54 -0400
-Received: from mail-dm6nam12on2080.outbound.protection.outlook.com ([40.107.243.80]:23168
-        "EHLO NAM12-DM6-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1725946AbgIKTa1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 11 Sep 2020 15:30:27 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=l/ygOT/nfeocDkE7V5nETQ+DE/+DtQgt1BrQNdS5ItsK9Yf3dlveoxhI4KdhUqmHR0239enxe7yVii786325VLgNXnH6zYxyb3dZs6b8e0ETb2ANG3sjNvb2J/lNt5eAtxVb9zaXnu/CgZ49hqUpDzWZjo2/2y5fN38ISyOToVSmeUCjnF8PrFtNHGTo96NQ4XcmTEUb/MJQd31fwjjASXHZfp+rXkHJkxQweRYH4Z0u7kpzxLcbtXtejIuBq+ZJz6dzfb9Un9la67cwfIPvuJjivt/E1XX8w+dazU1uPn7iS9Z039aXu2G9T7ur9Dp3dOQlRZLufCBmYDO+yhO3uQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=OkAXNOlTrAqAiZAxtVv7rpz3P8AgatFSU4lWiD+EO5o=;
- b=FHFxkqscIu6vih5chvqyqM9P/+/DM3lfFhmRILMuLZtGlN34xSlRcxeu8pso5MLmjDw529AEzVEcjK7BIHtcSa3dE0DB/6lu2lpn/BCE8LqFvkI9KSKMxQb6T66NCWzTv716NGlq64R7CpQeK8XV4jAeYDTTUg/6oAP1Xpom2SmB6a+WzCCR/Prh5GXkv71cqlCN5Az9Nv4a9VzxERJgrkfU35WwNAD65wUhsoPZAX8L9j4w9XZLJuKMlRsmd004iHLMxI8weBDptBeBoj79lMSrGnofthQgCmFq0q6k/HbYxw9otR58oHpejH7HiP7idqzJtCyPGPQnDVHmHt/Izg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=OkAXNOlTrAqAiZAxtVv7rpz3P8AgatFSU4lWiD+EO5o=;
- b=URM/CrWGegNNWYTOnoTnliBmIQ5/38rt5wy5XZfrMhNql8SH5977xiBn1lPYZhKdyKelAAmsRNndNvWCUTd+7+Qq59K96Upw/MDZnHDifgBovMISzzWypeFrqEVKp70k1IQ1z4o2MPao+I13QqoMsjtIuYmrI+AwjeYWdWI5yeM=
-Authentication-Results: tencent.com; dkim=none (message not signed)
- header.d=none;tencent.com; dmarc=none action=none header.from=amd.com;
-Received: from SN1PR12MB2560.namprd12.prod.outlook.com (2603:10b6:802:26::19)
- by SA0PR12MB4543.namprd12.prod.outlook.com (2603:10b6:806:9d::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3370.16; Fri, 11 Sep
- 2020 19:29:21 +0000
-Received: from SN1PR12MB2560.namprd12.prod.outlook.com
- ([fe80::ccd9:728:9577:200d]) by SN1PR12MB2560.namprd12.prod.outlook.com
- ([fe80::ccd9:728:9577:200d%4]) with mapi id 15.20.3370.017; Fri, 11 Sep 2020
- 19:29:21 +0000
-Subject: [PATCH v6 12/12] KVM:SVM: Enable INVPCID feature on AMD
-From:   Babu Moger <babu.moger@amd.com>
-To:     pbonzini@redhat.com, vkuznets@redhat.com,
-        sean.j.christopherson@intel.com, jmattson@google.com
-Cc:     wanpengli@tencent.com, kvm@vger.kernel.org, joro@8bytes.org,
-        x86@kernel.org, linux-kernel@vger.kernel.org, babu.moger@amd.com,
-        mingo@redhat.com, bp@alien8.de, hpa@zytor.com, tglx@linutronix.de
-Date:   Fri, 11 Sep 2020 14:29:19 -0500
-Message-ID: <159985255929.11252.17346684135277453258.stgit@bmoger-ubuntu>
-In-Reply-To: <159985237526.11252.1516487214307300610.stgit@bmoger-ubuntu>
-References: <159985237526.11252.1516487214307300610.stgit@bmoger-ubuntu>
-User-Agent: StGit/0.17.1-dirty
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: DM5PR11CA0015.namprd11.prod.outlook.com
- (2603:10b6:3:115::25) To SN1PR12MB2560.namprd12.prod.outlook.com
- (2603:10b6:802:26::19)
+        id S1725858AbgIKTgX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 11 Sep 2020 15:36:23 -0400
+Received: from mga03.intel.com ([134.134.136.65]:5249 "EHLO mga03.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725803AbgIKTgR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 11 Sep 2020 15:36:17 -0400
+IronPort-SDR: FxDCeZQSqfurveiHpJE8MHpXHjF0bb9lPBXBHggUbVYW7DE2njYB4YJNeDl4cLHbi0bAH6DgXZ
+ juJsRnFdTPoQ==
+X-IronPort-AV: E=McAfee;i="6000,8403,9741"; a="158879103"
+X-IronPort-AV: E=Sophos;i="5.76,416,1592895600"; 
+   d="scan'208";a="158879103"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Sep 2020 12:36:13 -0700
+IronPort-SDR: V6fHlUcfJHX5T/l0hMNkpATX1RNlh/uWKam6k67BOBQZ2yxVBfVK7hyoV5wWPr1JpxQ1Ago1Pd
+ WC2BrWUbX7ow==
+X-IronPort-AV: E=Sophos;i="5.76,416,1592895600"; 
+   d="scan'208";a="286984858"
+Received: from shikherb-mobl.amr.corp.intel.com (HELO [10.212.38.188]) ([10.212.38.188])
+  by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Sep 2020 12:36:12 -0700
+Subject: Re: [PATCH 2/4 v3] x86: AMD: Add hardware-enforced cache coherency as
+ a CPUID feature
+To:     Krish Sadhukhan <krish.sadhukhan@oracle.com>, kvm@vger.kernel.org
+Cc:     pbonzini@redhat.com, jmattson@google.com, tglx@linutronix.de,
+        mingo@redhat.com, bp@alien8.de, x86@kernel.org,
+        sean.j.christopherson@intel.com, vkuznets@redhat.com,
+        wanpengli@tencent.com, joro@8bytes.org,
+        dave.hansen@linux.intel.com, luto@kernel.org, peterz@infradead.org,
+        linux-kernel@vger.kernel.org, hpa@zytor.com
+References: <20200911192601.9591-1-krish.sadhukhan@oracle.com>
+ <20200911192601.9591-3-krish.sadhukhan@oracle.com>
+From:   Dave Hansen <dave.hansen@intel.com>
+Autocrypt: addr=dave.hansen@intel.com; keydata=
+ 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
+ z5cecg==
+Message-ID: <c5cbc91e-f576-5cc7-a40c-c11abaea4ad2@intel.com>
+Date:   Fri, 11 Sep 2020 12:36:12 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from [127.0.1.1] (165.204.77.1) by DM5PR11CA0015.namprd11.prod.outlook.com (2603:10b6:3:115::25) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3370.16 via Frontend Transport; Fri, 11 Sep 2020 19:29:20 +0000
-X-Originating-IP: [165.204.77.1]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-HT: Tenant
-X-MS-Office365-Filtering-Correlation-Id: 09d7cd9f-eb82-4c84-a658-08d85688fbbc
-X-MS-TrafficTypeDiagnostic: SA0PR12MB4543:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <SA0PR12MB454305C98A29BAEE0B54E44995240@SA0PR12MB4543.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 3acOUmEatGSTHR51j9KsduzN0bk8ttazp3uk1mlM/xL8ld7Av5FNjaQD5iEu/ipiuZoq7NlxG9VnDwKlssglnOOi3IWJ58rN9lCdHtEKnVDVd83QLb+IIRXQgFACcgW6IiDdIvjEd9gpS34FgvrIgauCjj+37GVAFSVWpx1ZHzhhSBZKV2E6YIjz0+lap9cUNu55oEA89FxX3JQEWXqWQm3/vHUS0ao0zp1mQFAmRl8EXHI6UEIz+CTWFvKu2rLHqUGtc9uzFsVOi30GqEK5Z+R1PuuIYG3iWUFaBs51DiSVbjBRSFxP6Uc2Ax/HKveXbFjv4B2VG0IifPcasQvaWR/rZtLLbBwZu6MSw4+OEAgh6bElmUgNr/YukkJ7CCFqoKPsQXPwiMqOjQF4pxofMQ==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN1PR12MB2560.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(7916004)(4636009)(376002)(136003)(346002)(366004)(39860400002)(396003)(2906002)(956004)(66946007)(66476007)(103116003)(8676002)(66556008)(52116002)(5660300002)(7416002)(9686003)(4326008)(966005)(8936002)(44832011)(186003)(16526019)(86362001)(33716001)(16576012)(6486002)(316002)(478600001)(26005)(83380400001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData: ftcRtVNGPKezWI4cLqPQq3NBB8sj6GkOuuUCVYOxln8baZlHCx02xDNQYgxUtR28pG/G4eLvaxZHJvIlbokY1xXpfjG8x5GXJAbl5wJWv/XowoFZSw+X2QyODMX37QnMKs0MsA/b5QM0kln09I2ew4qbJe5IFZswQrbr28FG8uqGTa8Pa+6KttvFniI+5GpJb5HyGK00f03/6+AxRfJ4uTCe7apSLe8e+NI6Y7o3d8AIIpuMcOPgrzx5Ne7p9rRk50noj3hQ8ePPV6395mnUCoKF6E9L6vRePsiAkTJYUPFAi2It/4n+a2sjEzyW9ta0PmIf+HQhs6BIofYHBwIYuVcbz1sS8AzR6pIhisXefWzUhWpCUGMpEkxLSRmiEpx/vk0IzoSyPEf1RB3+RWchtf10xkkhyz0YTWXH3WkNXNrtgMiKSaLaidQ23WQy4MNvpp+WAknV9gpTeJn3u1iNSAl/RNYH8RgUNUPCJl0xa/jUt1L06hjqfzvWihz9v/j5RO7698VktOs/K1XHr4RF74/l9c+muDqZxgD//JryE0jmuNJMObabQKUr01+cFg5w7OkmzBGbHwLRsyEpKAd6kgHMDMEOPoORHx94wNeE7dbFL4cDFFOetEY1lS4w13X+/WLC3NjvGK/bEIqGuX3xLw==
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 09d7cd9f-eb82-4c84-a658-08d85688fbbc
-X-MS-Exchange-CrossTenant-AuthSource: SN1PR12MB2560.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Sep 2020 19:29:21.7407
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: KUGa6/K+8lw4oRujfMvwPndjhN6H4foF+C4SnwYCiTXRJRUqZT+vARLIL7BuIgo/
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR12MB4543
+In-Reply-To: <20200911192601.9591-3-krish.sadhukhan@oracle.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The following intercept bit has been added to support VMEXIT
-for INVPCID instruction:
-Code    Name            Cause
-A2h     VMEXIT_INVPCID  INVPCID instruction
+On 9/11/20 12:25 PM, Krish Sadhukhan wrote:
+> 
+> diff --git a/arch/x86/include/asm/cpufeatures.h b/arch/x86/include/asm/cpufeatures.h
+> index 81335e6fe47d..0e5b27ee5931 100644
+> --- a/arch/x86/include/asm/cpufeatures.h
+> +++ b/arch/x86/include/asm/cpufeatures.h
+> @@ -293,6 +293,7 @@
+>  #define X86_FEATURE_FENCE_SWAPGS_USER	(11*32+ 4) /* "" LFENCE in user entry SWAPGS path */
+>  #define X86_FEATURE_FENCE_SWAPGS_KERNEL	(11*32+ 5) /* "" LFENCE in kernel entry SWAPGS path */
+>  #define X86_FEATURE_SPLIT_LOCK_DETECT	(11*32+ 6) /* #AC for split lock */
+> +#define X86_FEATURE_HW_CACHE_COHERENCY (11*32+ 7) /* AMD hardware-enforced cache coherency */
 
-The following bit has been added to the VMCB layout control area
-to control intercept of INVPCID:
-Byte Offset     Bit(s)    Function
-14h             2         intercept INVPCID
+That's an awfully generic name.  We generally have "hardware-enforced
+cache coherency" already everywhere. :)
 
-Enable the interceptions when the the guest is running with shadow
-page table enabled and handle the tlbflush based on the invpcid
-instruction type.
-
-For the guests with nested page table (NPT) support, the INVPCID
-feature works as running it natively. KVM does not need to do any
-special handling in this case.
-
-AMD documentation for INVPCID feature is available at "AMD64
-Architecture Programmer’s Manual Volume 2: System Programming,
-Pub. 24593 Rev. 3.34(or later)"
-
-The documentation can be obtained at the links below:
-Link: https://www.amd.com/system/files/TechDocs/24593.pdf
-Link: https://bugzilla.kernel.org/show_bug.cgi?id=206537
-
-Signed-off-by: Babu Moger <babu.moger@amd.com>
-Reviewed-by: Jim Mattson <jmattson@google.com>
----
- arch/x86/include/uapi/asm/svm.h |    2 ++
- arch/x86/kvm/svm/svm.c          |   51 +++++++++++++++++++++++++++++++++++++++
- 2 files changed, 53 insertions(+)
-
-diff --git a/arch/x86/include/uapi/asm/svm.h b/arch/x86/include/uapi/asm/svm.h
-index 2e8a30f06c74..522d42dfc28c 100644
---- a/arch/x86/include/uapi/asm/svm.h
-+++ b/arch/x86/include/uapi/asm/svm.h
-@@ -76,6 +76,7 @@
- #define SVM_EXIT_MWAIT_COND    0x08c
- #define SVM_EXIT_XSETBV        0x08d
- #define SVM_EXIT_RDPRU         0x08e
-+#define SVM_EXIT_INVPCID       0x0a2
- #define SVM_EXIT_NPF           0x400
- #define SVM_EXIT_AVIC_INCOMPLETE_IPI		0x401
- #define SVM_EXIT_AVIC_UNACCELERATED_ACCESS	0x402
-@@ -171,6 +172,7 @@
- 	{ SVM_EXIT_MONITOR,     "monitor" }, \
- 	{ SVM_EXIT_MWAIT,       "mwait" }, \
- 	{ SVM_EXIT_XSETBV,      "xsetbv" }, \
-+	{ SVM_EXIT_INVPCID,     "invpcid" }, \
- 	{ SVM_EXIT_NPF,         "npf" }, \
- 	{ SVM_EXIT_AVIC_INCOMPLETE_IPI,		"avic_incomplete_ipi" }, \
- 	{ SVM_EXIT_AVIC_UNACCELERATED_ACCESS,   "avic_unaccelerated_access" }, \
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index 96617b61e531..5c6b8d0f7628 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -813,6 +813,9 @@ static __init void svm_set_cpu_caps(void)
- 	if (boot_cpu_has(X86_FEATURE_LS_CFG_SSBD) ||
- 	    boot_cpu_has(X86_FEATURE_AMD_SSBD))
- 		kvm_cpu_cap_set(X86_FEATURE_VIRT_SSBD);
-+
-+	/* Enable INVPCID feature */
-+	kvm_cpu_cap_check_and_set(X86_FEATURE_INVPCID);
- }
- 
- static __init int svm_hardware_setup(void)
-@@ -985,6 +988,21 @@ static u64 svm_write_l1_tsc_offset(struct kvm_vcpu *vcpu, u64 offset)
- 	return svm->vmcb->control.tsc_offset;
- }
- 
-+static void svm_check_invpcid(struct vcpu_svm *svm)
-+{
-+	/*
-+	 * Intercept INVPCID instruction only if shadow page table is
-+	 * enabled. Interception is not required with nested page table
-+	 * enabled.
-+	 */
-+	if (kvm_cpu_cap_has(X86_FEATURE_INVPCID)) {
-+		if (!npt_enabled)
-+			svm_set_intercept(svm, INTERCEPT_INVPCID);
-+		else
-+			svm_clr_intercept(svm, INTERCEPT_INVPCID);
-+	}
-+}
-+
- static void init_vmcb(struct vcpu_svm *svm)
- {
- 	struct vmcb_control_area *control = &svm->vmcb->control;
-@@ -1114,6 +1132,8 @@ static void init_vmcb(struct vcpu_svm *svm)
- 		svm_clr_intercept(svm, INTERCEPT_PAUSE);
- 	}
- 
-+	svm_check_invpcid(svm);
-+
- 	if (kvm_vcpu_apicv_active(&svm->vcpu))
- 		avic_init_vmcb(svm);
- 
-@@ -2730,6 +2750,33 @@ static int mwait_interception(struct vcpu_svm *svm)
- 	return nop_interception(svm);
- }
- 
-+static int invpcid_interception(struct vcpu_svm *svm)
-+{
-+	struct kvm_vcpu *vcpu = &svm->vcpu;
-+	unsigned long type;
-+	gva_t gva;
-+
-+	if (!guest_cpuid_has(vcpu, X86_FEATURE_INVPCID)) {
-+		kvm_queue_exception(vcpu, UD_VECTOR);
-+		return 1;
-+	}
-+
-+	/*
-+	 * For an INVPCID intercept:
-+	 * EXITINFO1 provides the linear address of the memory operand.
-+	 * EXITINFO2 provides the contents of the register operand.
-+	 */
-+	type = svm->vmcb->control.exit_info_2;
-+	gva = svm->vmcb->control.exit_info_1;
-+
-+	if (type > 3) {
-+		kvm_inject_gp(vcpu, 0);
-+		return 1;
-+	}
-+
-+	return kvm_handle_invpcid(vcpu, type, gva);
-+}
-+
- static int (*const svm_exit_handlers[])(struct vcpu_svm *svm) = {
- 	[SVM_EXIT_READ_CR0]			= cr_interception,
- 	[SVM_EXIT_READ_CR3]			= cr_interception,
-@@ -2792,6 +2839,7 @@ static int (*const svm_exit_handlers[])(struct vcpu_svm *svm) = {
- 	[SVM_EXIT_MWAIT]			= mwait_interception,
- 	[SVM_EXIT_XSETBV]			= xsetbv_interception,
- 	[SVM_EXIT_RDPRU]			= rdpru_interception,
-+	[SVM_EXIT_INVPCID]                      = invpcid_interception,
- 	[SVM_EXIT_NPF]				= npf_interception,
- 	[SVM_EXIT_RSM]                          = rsm_interception,
- 	[SVM_EXIT_AVIC_INCOMPLETE_IPI]		= avic_incomplete_ipi_interception,
-@@ -3622,6 +3670,9 @@ static void svm_vcpu_after_set_cpuid(struct kvm_vcpu *vcpu)
- 	svm->nrips_enabled = kvm_cpu_cap_has(X86_FEATURE_NRIPS) &&
- 			     guest_cpuid_has(&svm->vcpu, X86_FEATURE_NRIPS);
- 
-+	/* Check again if INVPCID interception if required */
-+	svm_check_invpcid(svm);
-+
- 	if (!kvm_vcpu_apicv_active(vcpu))
- 		return;
- 
-
+This probably needs to say something about encryption, or even SEV
+specifically.  I also don't see this bit in the "AMD64 Architecture
+Programmer’s Manual".  Did I look in the wrong spot somehow?
