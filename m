@@ -2,101 +2,180 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 856752655F4
-	for <lists+kvm@lfdr.de>; Fri, 11 Sep 2020 02:11:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 828E2265628
+	for <lists+kvm@lfdr.de>; Fri, 11 Sep 2020 02:48:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725306AbgIKALE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 10 Sep 2020 20:11:04 -0400
-Received: from mail-il1-f196.google.com ([209.85.166.196]:41087 "EHLO
-        mail-il1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725283AbgIKALC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 10 Sep 2020 20:11:02 -0400
-Received: by mail-il1-f196.google.com with SMTP id f82so2770205ilh.8;
-        Thu, 10 Sep 2020 17:11:02 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=/ofLdB1ZTDFH7QGV+wOpkPUtE3Hz6n1lrSjhV0ZOygs=;
-        b=lNT7LB47llKqXt4bTUaoV3MHdxxlWx7xBVevo+qyaXYKyhhmb/90rXnN62D32hRM37
-         zl/qJY8tB1o+WSdbZZ+42BZ0jMGaStb+RDR2Cv4kW88tN593yJL3PLjHQ2jtnTzCmDne
-         s2L3seVXx+uv6XybwInILhqD7AqKrSS79prH7Yw14Y0y/AHYBjWjOrwfwO/rISYcFAe/
-         9UeXwy0ey/OVe/8IU5iDtMrNE1lyYetC0nOOEN8sjJFXEMwGFFhjdGkbZ1zAbi3SYFbx
-         pfMquJrJiIAkDyUHcmuodFdxgBVuE9yHotKia3VC+efFYpDr6Xxpi9IxBdfCvll97S6W
-         0C4g==
-X-Gm-Message-State: AOAM5311PWF45st/Igoaps6CWLQxPMrg0tc2Z3jgPzx4nndgTOVthSsY
-        BXEcj4MNx/3IlUGxrkhkXf5pimbkmeh9OFsOJzs=
-X-Google-Smtp-Source: ABdhPJxwo4436m7iJCImQHy6OK9kWHFVqaxlofwYLEz606Ig4xIb4Zd/1AIoKV58P082+l/R9T/RyebyBghhV0Mq3rU=
-X-Received: by 2002:a92:c8c4:: with SMTP id c4mr7970513ilq.287.1599783061593;
- Thu, 10 Sep 2020 17:11:01 -0700 (PDT)
+        id S1725613AbgIKAsq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 10 Sep 2020 20:48:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39730 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725294AbgIKAsp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 10 Sep 2020 20:48:45 -0400
+Received: from ozlabs.org (bilbo.ozlabs.org [IPv6:2401:3900:2:1::2])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3FD8BC061573
+        for <kvm@vger.kernel.org>; Thu, 10 Sep 2020 17:48:44 -0700 (PDT)
+Received: by ozlabs.org (Postfix, from userid 1007)
+        id 4BncZK4ls8z9sVD; Fri, 11 Sep 2020 10:48:41 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+        d=gibson.dropbear.id.au; s=201602; t=1599785321;
+        bh=ecH29wFHn7fDBKuWTIFIR7OnasRWCj9Prh0xecXMRTk=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=MiCHd9SlCXqSnYeoNWJqW+wNvLDa9CeQzk36UP+UshrL0Pq9d/z2e6zv7c9nnIQ6D
+         musbknKQseEZ0syGNn1K79f824cFu9OX69L07eHrfuerTIELlpkv5SP9XDTlpwo8HW
+         Ui7IppjTl8lNkjFjR7Z3IRp45gayu92RHQVRff5I=
+Date:   Fri, 11 Sep 2020 10:07:18 +1000
+From:   David Gibson <david@gibson.dropbear.id.au>
+To:     Halil Pasic <pasic@linux.ibm.com>
+Cc:     Cornelia Huck <cohuck@redhat.com>, dgilbert@redhat.com,
+        frankja@linux.ibm.com, pair@us.ibm.com, qemu-devel@nongnu.org,
+        pbonzini@redhat.com, brijesh.singh@amd.com, ehabkost@redhat.com,
+        marcel.apfelbaum@gmail.com, "Michael S. Tsirkin" <mst@redhat.com>,
+        qemu-ppc@nongnu.org, kvm@vger.kernel.org, qemu-s390x@nongnu.org,
+        David Hildenbrand <david@redhat.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Richard Henderson <rth@twiddle.net>,
+        Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
+        mdroth@linux.vnet.ibm.com, Thomas Huth <thuth@redhat.com>
+Subject: Re: [for-5.2 v4 10/10] s390: Recognize host-trust-limitation option
+Message-ID: <20200911000718.GF66834@yekko.fritz.box>
+References: <20200724025744.69644-1-david@gibson.dropbear.id.au>
+ <20200724025744.69644-11-david@gibson.dropbear.id.au>
+ <20200907172253.0a51f5f7.pasic@linux.ibm.com>
+ <20200910133609.4ac88c25.cohuck@redhat.com>
+ <20200910202924.3616935a.pasic@linux.ibm.com>
 MIME-Version: 1.0
-References: <1599734031-28746-1-git-send-email-chenhc@lemote.com> <20200910163419.E0D1421D81@mail.kernel.org>
-In-Reply-To: <20200910163419.E0D1421D81@mail.kernel.org>
-From:   Huacai Chen <chenhc@lemote.com>
-Date:   Fri, 11 Sep 2020 08:10:50 +0800
-Message-ID: <CAAhV-H52CkenD5AE-4mNs3pC0poOJwbcP+Ey4Z_AfLUSnQ8yZg@mail.gmail.com>
-Subject: Re: [PATCH] KVM: MIPS: Change the definition of kvm type
-To:     Sasha Levin <sashal@kernel.org>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm <kvm@vger.kernel.org>,
-        "open list:MIPS" <linux-mips@vger.kernel.org>,
-        stable <stable@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="/aVve/J9H4Wl5yVO"
+Content-Disposition: inline
+In-Reply-To: <20200910202924.3616935a.pasic@linux.ibm.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi, Sasha,
 
-On Fri, Sep 11, 2020 at 1:18 AM Sasha Levin <sashal@kernel.org> wrote:
->
-> Hi
->
-> [This is an automated email]
->
-> This commit has been processed because it contains a -stable tag.
-> The stable tag indicates that it's relevant for the following trees: all
->
-> The bot has tested the following trees: v5.8.7, v5.4.63, v4.19.143, v4.14.196, v4.9.235, v4.4.235.
->
-> v5.8.7: Build OK!
-> v5.4.63: Build OK!
-> v4.19.143: Build OK!
-> v4.14.196: Build OK!
-> v4.9.235: Failed to apply! Possible dependencies:
->     06c158c96ed8 ("KVM: MIPS/MMU: Convert guest physical map to page table")
->     1534b3964901 ("KVM: MIPS/MMU: Simplify ASID restoration")
->     1581ff3dbf69 ("KVM: MIPS/MMU: Move preempt/ASID handling to implementation")
->     91cdee5710d5 ("KVM: MIPS/T&E: Restore host asid on return to host")
->     a2c046e40ff1 ("KVM: MIPS: Add vcpu_run() & vcpu_reenter() callbacks")
->     a31b50d741bd ("KVM: MIPS/MMU: Invalidate GVA PTs on ASID changes")
->     a60b8438bdba ("KVM: MIPS: Convert get/set_regs -> vcpu_load/put")
->     a7ebb2e410f8 ("KVM: MIPS/T&E: active_mm = init_mm in guest context")
->     a8a3c426772e ("KVM: MIPS: Add VZ & TE capabilities")
->     c550d53934d8 ("KVM: MIPS: Remove duplicated ASIDs from vcpu")
->     c92701322711 ("KVM: PPC: Book3S HV: Add userspace interfaces for POWER9 MMU")
->
-> v4.4.235: Failed to apply! Possible dependencies:
->     107d44a2c5bf ("KVM: document KVM_REINJECT_CONTROL ioctl")
->     366baf28ee3f ("KVM: PPC: Use RCU for arch.spapr_tce_tables")
->     462ee11e58c9 ("KVM: PPC: Replace SPAPR_TCE_SHIFT with IOMMU_PAGE_SHIFT_4K")
->     58ded4201ff0 ("KVM: PPC: Add support for 64bit TCE windows")
->     5ee7af18642c ("KVM: PPC: Move reusable bits of H_PUT_TCE handler to helpers")
->     a8a3c426772e ("KVM: MIPS: Add VZ & TE capabilities")
->     c92701322711 ("KVM: PPC: Book3S HV: Add userspace interfaces for POWER9 MMU")
->     d3695aa4f452 ("KVM: PPC: Add support for multiple-TCE hcalls")
->     f8626985c7c2 ("KVM: PPC: Account TCE-containing pages in locked_vm")
->     fcbb2ce67284 ("KVM: PPC: Rework H_PUT_TCE/H_GET_TCE handlers")
->     fe26e52712cc ("KVM: PPC: Add @page_shift to kvmppc_spapr_tce_table")
->
->
-> NOTE: The patch will not be queued to stable trees until it is upstream.
->
-> How should we proceed with this patch?
-Backport to 4.14+ is enough.
+--/aVve/J9H4Wl5yVO
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Huacai
->
-> --
-> Thanks
-> Sasha
+On Thu, Sep 10, 2020 at 08:29:24PM +0200, Halil Pasic wrote:
+> On Thu, 10 Sep 2020 13:36:09 +0200
+> Cornelia Huck <cohuck@redhat.com> wrote:
+>=20
+> > On Mon, 7 Sep 2020 17:22:53 +0200
+> > Halil Pasic <pasic@linux.ibm.com> wrote:
+> >=20
+> > > On Fri, 24 Jul 2020 12:57:44 +1000
+> > > David Gibson <david@gibson.dropbear.id.au> wrote:
+> > >=20
+> > > > At least some s390 cpu models support "Protected Virtualization" (P=
+V),
+> > > > a mechanism to protect guests from eavesdropping by a compromised
+> > > > hypervisor.
+> > > >=20
+> > > > This is similar in function to other mechanisms like AMD's SEV and
+> > > > POWER's PEF, which are controlled bythe "host-trust-limitation"
+> > > > machine option.  s390 is a slightly special case, because we already
+> > > > supported PV, simply by using a CPU model with the required feature
+> > > > (S390_FEAT_UNPACK).
+> > > >=20
+> > > > To integrate this with the option used by other platforms, we
+> > > > implement the following compromise:
+> > > >=20
+> > > >  - When the host-trust-limitation option is set, s390 will recognize
+> > > >    it, verify that the CPU can support PV (failing if not) and set
+> > > >    virtio default options necessary for encrypted or protected gues=
+ts,
+> > > >    as on other platforms.  i.e. if host-trust-limitation is set, we
+> > > >    will either create a guest capable of entering PV mode, or fail
+> > > >    outright =20
+> > >=20
+> > > Shouldn't we also fail outright if the virtio features are not PV
+> > > compatible (invalid configuration)?
+> > >=20
+> > > I would like to see something like follows as a part of this series.
+> > > ----------------------------8<--------------------------
+> > > From: Halil Pasic <pasic@linux.ibm.com>
+> > > Date: Mon, 7 Sep 2020 15:00:17 +0200
+> > > Subject: [PATCH] virtio: handle host trust limitation
+> > >=20
+> > > If host_trust_limitation_enabled() returns true, then emulated virtio
+> > > devices must offer VIRTIO_F_ACCESS_PLATFORM, because the device is not
+> > > capable of accessing all of the guest memory. Otherwise we are in
+> > > violation of the virtio specification.
+> > >=20
+> > > Let's fail realize if we detect that VIRTIO_F_ACCESS_PLATFORM feature=
+ is
+> > > obligatory but missing.
+> > >=20
+> > > Signed-off-by: Halil Pasic <pasic@linux.ibm.com>
+> > > ---
+> > >  hw/virtio/virtio.c | 7 +++++++
+> > >  1 file changed, 7 insertions(+)
+> > >=20
+> > > diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
+> > > index 5bd2a2f621..19b4b0a37a 100644
+> > > --- a/hw/virtio/virtio.c
+> > > +++ b/hw/virtio/virtio.c
+> > > @@ -27,6 +27,7 @@
+> > >  #include "hw/virtio/virtio-access.h"
+> > >  #include "sysemu/dma.h"
+> > >  #include "sysemu/runstate.h"
+> > > +#include "exec/host-trust-limitation.h"
+> > > =20
+> > >  /*
+> > >   * The alignment to use between consumer and producer parts of vring.
+> > > @@ -3618,6 +3619,12 @@ static void virtio_device_realize(DeviceState =
+*dev, Error **errp)
+> > >      /* Devices should either use vmsd or the load/save methods */
+> > >      assert(!vdc->vmsd || !vdc->load);
+> > > =20
+> > > +    if (host_trust_limitation_enabled(MACHINE(qdev_get_machine()))
+> > > +        && !virtio_host_has_feature(vdev, VIRTIO_F_IOMMU_PLATFORM)) {
+> > > +        error_setg(&err, "devices without VIRTIO_F_ACCESS_PLATFORM a=
+re not compatible with host trust imitation");
+> > > +        error_propagate(errp, err);
+> > > +        return;
+> >=20
+> > How can we get here? I assume only if the user explicitly turned the
+> > feature off while turning HTL on, as otherwise patch 9 should have
+> > taken care of it?
+> >=20
+>=20
+> Yes, we can get here only if iommu_platform is explicitly turned off.
+
+Right.. my assumption was that if you really want to specify
+contradictory options, you get to keep both pieces.  Or, more
+seriously, there might be some weird experimental cases where this
+combination could do something useful if you really know what you're
+doing, and explicitly telling qemu to do this implies you know what
+you're doing.
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--/aVve/J9H4Wl5yVO
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl9av7QACgkQbDjKyiDZ
+s5KUdA//eTOLAq2vCeftME7tezJbgx3MkmP7eAQdwQNSnnlozRafbKEbRqgrnX9h
+5mwHktZAnL085yz/UVaHQ8TM+OdE3qcdZAMbSCPLr+p8WiP81J/Tw8jFt8FjQO/G
+eBJrs/tiaR1EMhmRB40N7cEJL2FPI4l9EZoffESbkoowlOPw9vhlW7SCL/yOicI+
++KwViTJpUtAdTfPifgkbshCUk2Hv87KcueXYpCbMZAc5pt/1nwQqgr+VP/MFpsgU
+lZ3fgj1Zd8hi+VaJzW2ckcZaCPlyGF8df+21sqV9q5XzjWizhyykCwt8XUB2CmTU
+WhWpwrQwYYFRgRCbALT/bp6m8BiQ1J2RKVTXsbqI/TVYzIZRUcoV90iUdYFUGrsK
+TW2h+CvOa2uY1MPuQxxI7VV73B4TQ7rfDpuHjmHdbqF/PmgooZLFcNzJ8j1mHdit
+th6oy9kOoosfMCvoBLWwNM8IY34Ox0q60Ero5TeByToslwgHUOdflzpVyXVHZz55
+UYUx+n84DCsv6fKE49ch5zd1S1AJEYYIoHhsBph9ByDvSKDsaEqdfcad6eq7tD24
+Vgo3uFiuQahG4xX0vWCNVe8Y2KEAGlKaxnxaK8FK5wujBFL5bTsz+z77G9qUTMZs
+ywkTlryy4of0u1murp4lLaM2sBq1XFec+ILMgm3QYTxSpFtStro=
+=QrIg
+-----END PGP SIGNATURE-----
+
+--/aVve/J9H4Wl5yVO--
