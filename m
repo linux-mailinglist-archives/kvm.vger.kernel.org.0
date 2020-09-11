@@ -2,222 +2,464 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BAE3A26596D
-	for <lists+kvm@lfdr.de>; Fri, 11 Sep 2020 08:36:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id ADF14265A82
+	for <lists+kvm@lfdr.de>; Fri, 11 Sep 2020 09:28:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725769AbgIKGgh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 11 Sep 2020 02:36:37 -0400
-Received: from mga18.intel.com ([134.134.136.126]:14213 "EHLO mga18.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725468AbgIKGge (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 11 Sep 2020 02:36:34 -0400
-IronPort-SDR: ffTjqllB86hcw9SeHzkIa0nbPv1cH8BcE3mnZsOw+zebubP7doaOR635FQMZMDyZQj2X3ab83c
- um2Pkkg6W/zA==
-X-IronPort-AV: E=McAfee;i="6000,8403,9740"; a="146427539"
-X-IronPort-AV: E=Sophos;i="5.76,414,1592895600"; 
-   d="scan'208";a="146427539"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Sep 2020 23:36:33 -0700
-IronPort-SDR: MnKTbz1wKUKBSKlcq4a3/jdmnOH/0Ai3/6yFLezlrY3VPNJMjNqoF6J61fRjLKsMRVaxUT5QMY
- gFcETucm4vYg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.76,414,1592895600"; 
-   d="scan'208";a="305150579"
-Received: from yilunxu-optiplex-7050.sh.intel.com (HELO localhost) ([10.239.159.141])
-  by orsmga006.jf.intel.com with ESMTP; 10 Sep 2020 23:36:30 -0700
-Date:   Fri, 11 Sep 2020 14:32:13 +0800
-From:   Xu Yilun <yilun.xu@intel.com>
-To:     Alex Williamson <alex.williamson@redhat.com>
-Cc:     mdf@kernel.org, kwankhede@nvidia.com, linux-fpga@vger.kernel.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org, trix@redhat.com,
-        lgoncalv@redhat.com,
-        Matthew Gerlach <matthew.gerlach@linux.intel.com>,
-        "Raj, Ashok" <ashok.raj@intel.com>, yilun.xu@intel.com
-Subject: Re: [PATCH 3/3] Documentation: fpga: dfl: Add description for VFIO
-   Mdev support
-Message-ID: <20200911063213.GA7802@yilunxu-OptiPlex-7050>
-References: <1599549212-24253-1-git-send-email-yilun.xu@intel.com>
- <1599549212-24253-4-git-send-email-yilun.xu@intel.com>
- <20200908151002.553ed7ae@w520.home>
- <20200910083230.GA16318@yilunxu-OptiPlex-7050>
- <20200910094903.51deb038@x1.home>
+        id S1725562AbgIKH2Z (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 11 Sep 2020 03:28:25 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:59131 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1725535AbgIKH2Y (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 11 Sep 2020 03:28:24 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1599809301;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=JjKafxUPP45f5IT06o5f0VT+vHA02CW8qJlagtnzvDY=;
+        b=Vq0dfp5IOcnBfFeUKHREkWFefYRdCWWOKBUgH+SK6AGKy+M8jB5ov8++MIOXivPUCbUBPV
+        VxOBs5GG3yIBoabvsnRzSsZcHeeSH2r3IQhLKPMON4TjMFWW/w8w3bYEKPDRMI5lYEQ3ra
+        O3Z7MeGnS1tZJdI7VLCXq3GDi5ekp08=
+Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
+ [209.85.208.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-36-Ua02Gw0lNlSZhFFgTJMF0Q-1; Fri, 11 Sep 2020 03:28:19 -0400
+X-MC-Unique: Ua02Gw0lNlSZhFFgTJMF0Q-1
+Received: by mail-ed1-f70.google.com with SMTP id g16so3852552edy.22
+        for <kvm@vger.kernel.org>; Fri, 11 Sep 2020 00:28:19 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=JjKafxUPP45f5IT06o5f0VT+vHA02CW8qJlagtnzvDY=;
+        b=Kpx1SkvfYnxmV1hjcHGftOyV+r87RUoeZtxzyrlJp+Q68nkm9m1boAp2MJaXUMtvYw
+         SfzDB2awlcHRBBtMw5zYqtZYke1CVcWWRxbRx8YVGcao1YJAZ+4H5RxWDazUNuDPrsh3
+         FI1nYJFW62EaoyRJCw2KZ9QT9nzjTrfWHHOeTSucT+3LOmKkRADh8Xiaomz/K9R/1BkR
+         7QGKcJkghNAQpxZ8OcOx0sMHNLgZrzo8dAyqvM3PiiW1vooVRWMY8YcFO8c9VaQpgNed
+         4Iuk4GoB4QIf2BN9helqVLGZcgKesppTvPEiiXfQe7QtpsBIUesI9uLeWhHHZB7k4Vo2
+         oscA==
+X-Gm-Message-State: AOAM531t3Cgz2eA9PCWbovJI2PIR6RK3UhnotDmc9NjS+aQmZVno5TQE
+        XdzvqKwh6DLU22DrLMJTT/4+KfTxF9BtdEV137ED7qhmENgLhLGgTzZvDGIc83E3v5izDexliKE
+        wORxysdL4i6L6
+X-Received: by 2002:a05:6402:1d93:: with SMTP id dk19mr665038edb.198.1599809297932;
+        Fri, 11 Sep 2020 00:28:17 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJybOvGiwAG9mRFsi8+QvQMXQb6gMEHSfqo4oLlVeUIIWocKMrXJyNLqpm4hH0dG+VWdf5A9BA==
+X-Received: by 2002:a05:6402:1d93:: with SMTP id dk19mr665006edb.198.1599809297513;
+        Fri, 11 Sep 2020 00:28:17 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:6689:90a2:a29f:8336? ([2001:b07:6468:f312:6689:90a2:a29f:8336])
+        by smtp.gmail.com with ESMTPSA id m6sm962793ejb.85.2020.09.11.00.28.16
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 11 Sep 2020 00:28:16 -0700 (PDT)
+Subject: Re: [PATCH 2/6] hw/core/stream: Rename StreamSlave as StreamSink
+To:     =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+        qemu-devel@nongnu.org
+Cc:     =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+        kvm@vger.kernel.org, qemu-arm@nongnu.org,
+        Marcelo Tosatti <mtosatti@redhat.com>,
+        "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        Laurent Vivier <lvivier@redhat.com>,
+        Peter Maydell <peter.maydell@linaro.org>,
+        Andrew Jeffery <andrew@aj.id.au>,
+        Jason Wang <jasowang@redhat.com>,
+        Thomas Huth <thuth@redhat.com>,
+        Alistair Francis <alistair@alistair23.me>,
+        qemu-trivial@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>,
+        Richard Henderson <rth@twiddle.net>,
+        Joel Stanley <joel@jms.id.au>
+References: <20200910070131.435543-1-philmd@redhat.com>
+ <20200910070131.435543-3-philmd@redhat.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <cf510052-4059-b53b-fd86-5cfbbd6d95fb@redhat.com>
+Date:   Fri, 11 Sep 2020 09:28:16 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200910094903.51deb038@x1.home>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+In-Reply-To: <20200910070131.435543-3-philmd@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Sep 10, 2020 at 09:49:03AM -0600, Alex Williamson wrote:
-> On Thu, 10 Sep 2020 16:32:30 +0800
-> Xu Yilun <yilun.xu@intel.com> wrote:
+On 10/09/20 09:01, Philippe Mathieu-Daudé wrote:
+> In order to use inclusive terminology, rename 'slave stream'
+> as 'sink stream'.
 > 
-> > Hi Alex:
-> > 
-> > Thanks for your quick response and is helpful to me. I did some more
-> > investigation and some comments inline.
-> > 
-> > On Tue, Sep 08, 2020 at 03:10:02PM -0600, Alex Williamson wrote:
-> > > On Tue,  8 Sep 2020 15:13:32 +0800
-> > > Xu Yilun <yilun.xu@intel.com> wrote:
-> > >   
-> > > > This patch adds description for VFIO Mdev support for dfl devices on
-> > > > dfl bus.
-> > > > 
-> > > > Signed-off-by: Xu Yilun <yilun.xu@intel.com>
-> > > > Signed-off-by: Matthew Gerlach <matthew.gerlach@linux.intel.com>
-> > > > ---
-> > > >  Documentation/fpga/dfl.rst | 20 ++++++++++++++++++++
-> > > >  1 file changed, 20 insertions(+)
-> > > > 
-> > > > diff --git a/Documentation/fpga/dfl.rst b/Documentation/fpga/dfl.rst
-> > > > index 0404fe6..f077754 100644
-> > > > --- a/Documentation/fpga/dfl.rst
-> > > > +++ b/Documentation/fpga/dfl.rst
-> > > > @@ -502,6 +502,26 @@ FME Partial Reconfiguration Sub Feature driver (see drivers/fpga/dfl-fme-pr.c)
-> > > >  could be a reference.
-> > > >  
-> > > >  
-> > > > +VFIO Mdev support for DFL devices
-> > > > +=================================
-> > > > +As we introduced a dfl bus for private features, they could be added to dfl bus
-> > > > +as independent dfl devices. There is a requirement to handle these devices
-> > > > +either by kernel drivers or by direct access from userspace. Usually we bind
-> > > > +the kernel drivers to devices which provide board management functions, and
-> > > > +gives user direct access to devices which cooperate closely with user
-> > > > +controlled Accelerated Function Unit (AFU). We realize this with a VFIO Mdev
-> > > > +implementation. When we bind the vfio-mdev-dfl driver to a dfl device, it
-> > > > +realizes a group of callbacks and registers to the Mdev framework as a
-> > > > +parent (physical) device. It could then create one (available_instances == 1)
-> > > > +mdev device.
-> > > > +Since dfl devices are sub devices of FPGA DFL physical devices (e.g. PCIE
-> > > > +device), which provide no DMA isolation for each sub device, this may leads to
-> > > > +DMA isolation problem if a private feature is designed to be capable of DMA.
-> > > > +The AFU user could potentially access the whole device addressing space and
-> > > > +impact the private feature. So now the general HW design rule is, no DMA
-> > > > +capability for private features. It eliminates the DMA isolation problem.  
-> > > 
-> > > What's the advantage of entangling mdev/vfio in this approach versus
-> > > simply exposing the MMIO region of the device via sysfs (similar to a
-> > > resource file in pci-sysfs)?  This implementation doesn't support
-> > > interrupts, it doesn't support multiplexing of a device, it doesn't
-> > > perform any degree of mediation, it seems to simply say "please don't
-> > > do DMA".  I don't think that's acceptable for an mdev driver.  If you
-> > > want to play loose with isolation, do it somewhere else.  Thanks,  
-> > 
-> > The intention of the patchset is to enable the userspace drivers for dfl
-> > devices. The dfl devices are actually different IP blocks integrated in
-> > FPGA to support different board functionalities. They are sub devices of
-> > the FPGA PCIe device. Their mmio blocks are in PCIE bar regions. And we
-> > want some of the dfl devices handled by the userspace drivers.
-> > 
-> > Some dfl devices are capable of interrupt. I didn't add interrupt code
-> > in this patch cause now the IRQ capable dfl devices are all handled by
-> > kernel drivers. But as a generic FPGA platform, IRQ handling for userspace
-> > drivers should be supported.
-> > 
-> > And I can see there are several ways to enable the userspace driver.
-> > 
-> > 1. Some specific sysfs like pci do. But seems it is not the common way for
-> > userspace driver. It does't support interrupt. And potentially users
-> > operate on the same mmio region together with kernel driver at the same
-> > time.
-> > 
-> > 2. VFIO driver with NOIOMMU enabled. I think it meets our needs. Do you
-> > think it is good we implement an VFIO driver for dfl devices?
-> > 
-> > 3. VFIO mdev. I implemented it because it will not block us from lacking
-> > of valid iommu group. And since the driver didn't perform any mediation,
-> > I should give up.
-> > 
-> > 4. UIO driver. It should work. I'm wondering if option 2 covers the
-> > functionalities of UIO and has more enhancement. So option 2 may be
-> > better?
-> > 
-> > Thanks again for your time, and I really appreciate you would give some
-> > guide on it.
+> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+
+From Edgar Iglesias:
+
+Regarding streams, our stream module can be used to model a stream
+channel such as AXI stream but also other similar stream protocols. We
+actually don't use the AXI stream terminology [in hw/core/stream.c].
+E.g, we use buf instead of DATA, EOP (end-of-packet) instead of LAST and
+have a flow-control mechanism that doesn't refer to valid/ready.  IMO,
+since we're not matching specific protocol names, it would be fine to
+switch to generic terms like Source and Sink.
+
+Therefore,
+
+Acked-by: Paolo Bonzini <pbonzini@redhat.com>
+
+Paolo
+
+> ---
+>  include/hw/ssi/xilinx_spips.h |  2 +-
+>  include/hw/stream.h           | 46 +++++++++++++++++------------------
+>  hw/core/stream.c              | 20 +++++++--------
+>  hw/dma/xilinx_axidma.c        | 32 ++++++++++++------------
+>  hw/net/xilinx_axienet.c       | 20 +++++++--------
+>  hw/ssi/xilinx_spips.c         |  2 +-
+>  6 files changed, 61 insertions(+), 61 deletions(-)
 > 
+> diff --git a/include/hw/ssi/xilinx_spips.h b/include/hw/ssi/xilinx_spips.h
+> index 6a39b55a7bd..fde8a3ebda6 100644
+> --- a/include/hw/ssi/xilinx_spips.h
+> +++ b/include/hw/ssi/xilinx_spips.h
+> @@ -97,7 +97,7 @@ typedef struct {
+>  typedef struct {
+>      XilinxQSPIPS parent_obj;
+>  
+> -    StreamSlave *dma;
+> +    StreamSink *dma;
+>      int gqspi_irqline;
+>  
+>      uint32_t regs[XLNX_ZYNQMP_SPIPS_R_MAX];
+> diff --git a/include/hw/stream.h b/include/hw/stream.h
+> index ed09e83683d..8ca161991ca 100644
+> --- a/include/hw/stream.h
+> +++ b/include/hw/stream.h
+> @@ -3,52 +3,52 @@
+>  
+>  #include "qom/object.h"
+>  
+> -/* stream slave. Used until qdev provides a generic way.  */
+> -#define TYPE_STREAM_SLAVE "stream-slave"
+> +/* stream sink. Used until qdev provides a generic way.  */
+> +#define TYPE_STREAM_SINK "stream-slave"
+>  
+> -#define STREAM_SLAVE_CLASS(klass) \
+> -     OBJECT_CLASS_CHECK(StreamSlaveClass, (klass), TYPE_STREAM_SLAVE)
+> -#define STREAM_SLAVE_GET_CLASS(obj) \
+> -    OBJECT_GET_CLASS(StreamSlaveClass, (obj), TYPE_STREAM_SLAVE)
+> -#define STREAM_SLAVE(obj) \
+> -     INTERFACE_CHECK(StreamSlave, (obj), TYPE_STREAM_SLAVE)
+> +#define STREAM_SINK_CLASS(klass) \
+> +     OBJECT_CLASS_CHECK(StreamSinkClass, (klass), TYPE_STREAM_SINK)
+> +#define STREAM_SINK_GET_CLASS(obj) \
+> +    OBJECT_GET_CLASS(StreamSinkClass, (obj), TYPE_STREAM_SINK)
+> +#define STREAM_SINK(obj) \
+> +     INTERFACE_CHECK(StreamSink, (obj), TYPE_STREAM_SINK)
+>  
+> -typedef struct StreamSlave StreamSlave;
+> +typedef struct StreamSink StreamSink;
+>  
+>  typedef void (*StreamCanPushNotifyFn)(void *opaque);
+>  
+> -typedef struct StreamSlaveClass {
+> +typedef struct StreamSinkClass {
+>      InterfaceClass parent;
+>      /**
+> -     * can push - determine if a stream slave is capable of accepting at least
+> +     * can push - determine if a stream sink is capable of accepting at least
+>       * one byte of data. Returns false if cannot accept. If not implemented, the
+> -     * slave is assumed to always be capable of receiving.
+> -     * @notify: Optional callback that the slave will call when the slave is
+> +     * sink is assumed to always be capable of receiving.
+> +     * @notify: Optional callback that the sink will call when the sink is
+>       * capable of receiving again. Only called if false is returned.
+>       * @notify_opaque: opaque data to pass to notify call.
+>       */
+> -    bool (*can_push)(StreamSlave *obj, StreamCanPushNotifyFn notify,
+> +    bool (*can_push)(StreamSink *obj, StreamCanPushNotifyFn notify,
+>                       void *notify_opaque);
+>      /**
+> -     * push - push data to a Stream slave. The number of bytes pushed is
+> -     * returned. If the slave short returns, the master must wait before trying
+> -     * again, the slave may continue to just return 0 waiting for the vm time to
+> +     * push - push data to a Stream sink. The number of bytes pushed is
+> +     * returned. If the sink short returns, the master must wait before trying
+> +     * again, the sink may continue to just return 0 waiting for the vm time to
+>       * advance. The can_push() function can be used to trap the point in time
+> -     * where the slave is ready to receive again, otherwise polling on a QEMU
+> +     * where the sink is ready to receive again, otherwise polling on a QEMU
+>       * timer will work.
+> -     * @obj: Stream slave to push to
+> +     * @obj: Stream sink to push to
+>       * @buf: Data to write
+>       * @len: Maximum number of bytes to write
+>       * @eop: End of packet flag
+>       */
+> -    size_t (*push)(StreamSlave *obj, unsigned char *buf, size_t len, bool eop);
+> -} StreamSlaveClass;
+> +    size_t (*push)(StreamSink *obj, unsigned char *buf, size_t len, bool eop);
+> +} StreamSinkClass;
+>  
+>  size_t
+> -stream_push(StreamSlave *sink, uint8_t *buf, size_t len, bool eop);
+> +stream_push(StreamSink *sink, uint8_t *buf, size_t len, bool eop);
+>  
+>  bool
+> -stream_can_push(StreamSlave *sink, StreamCanPushNotifyFn notify,
+> +stream_can_push(StreamSink *sink, StreamCanPushNotifyFn notify,
+>                  void *notify_opaque);
+>  
+>  
+> diff --git a/hw/core/stream.c b/hw/core/stream.c
+> index a65ad1208d8..19477d0f2df 100644
+> --- a/hw/core/stream.c
+> +++ b/hw/core/stream.c
+> @@ -3,32 +3,32 @@
+>  #include "qemu/module.h"
+>  
+>  size_t
+> -stream_push(StreamSlave *sink, uint8_t *buf, size_t len, bool eop)
+> +stream_push(StreamSink *sink, uint8_t *buf, size_t len, bool eop)
+>  {
+> -    StreamSlaveClass *k =  STREAM_SLAVE_GET_CLASS(sink);
+> +    StreamSinkClass *k =  STREAM_SINK_GET_CLASS(sink);
+>  
+>      return k->push(sink, buf, len, eop);
+>  }
+>  
+>  bool
+> -stream_can_push(StreamSlave *sink, StreamCanPushNotifyFn notify,
+> +stream_can_push(StreamSink *sink, StreamCanPushNotifyFn notify,
+>                  void *notify_opaque)
+>  {
+> -    StreamSlaveClass *k =  STREAM_SLAVE_GET_CLASS(sink);
+> +    StreamSinkClass *k =  STREAM_SINK_GET_CLASS(sink);
+>  
+>      return k->can_push ? k->can_push(sink, notify, notify_opaque) : true;
+>  }
+>  
+> -static const TypeInfo stream_slave_info = {
+> -    .name          = TYPE_STREAM_SLAVE,
+> +static const TypeInfo stream_sink_info = {
+> +    .name          = TYPE_STREAM_SINK,
+>      .parent        = TYPE_INTERFACE,
+> -    .class_size = sizeof(StreamSlaveClass),
+> +    .class_size = sizeof(StreamSinkClass),
+>  };
+>  
+>  
+> -static void stream_slave_register_types(void)
+> +static void stream_sink_register_types(void)
+>  {
+> -    type_register_static(&stream_slave_info);
+> +    type_register_static(&stream_sink_info);
+>  }
+>  
+> -type_init(stream_slave_register_types)
+> +type_init(stream_sink_register_types)
+> diff --git a/hw/dma/xilinx_axidma.c b/hw/dma/xilinx_axidma.c
+> index a4812e480a0..cf12a852ea1 100644
+> --- a/hw/dma/xilinx_axidma.c
+> +++ b/hw/dma/xilinx_axidma.c
+> @@ -131,8 +131,8 @@ struct XilinxAXIDMA {
+>      AddressSpace as;
+>  
+>      uint32_t freqhz;
+> -    StreamSlave *tx_data_dev;
+> -    StreamSlave *tx_control_dev;
+> +    StreamSink *tx_data_dev;
+> +    StreamSink *tx_control_dev;
+>      XilinxAXIDMAStreamSlave rx_data_dev;
+>      XilinxAXIDMAStreamSlave rx_control_dev;
+>  
+> @@ -264,8 +264,8 @@ static void stream_complete(struct Stream *s)
+>      ptimer_transaction_commit(s->ptimer);
+>  }
+>  
+> -static void stream_process_mem2s(struct Stream *s, StreamSlave *tx_data_dev,
+> -                                 StreamSlave *tx_control_dev)
+> +static void stream_process_mem2s(struct Stream *s, StreamSink *tx_data_dev,
+> +                                 StreamSink *tx_control_dev)
+>  {
+>      uint32_t prev_d;
+>      uint32_t txlen;
+> @@ -387,7 +387,7 @@ static void xilinx_axidma_reset(DeviceState *dev)
+>  }
+>  
+>  static size_t
+> -xilinx_axidma_control_stream_push(StreamSlave *obj, unsigned char *buf,
+> +xilinx_axidma_control_stream_push(StreamSink *obj, unsigned char *buf,
+>                                    size_t len, bool eop)
+>  {
+>      XilinxAXIDMAStreamSlave *cs = XILINX_AXI_DMA_CONTROL_STREAM(obj);
+> @@ -403,7 +403,7 @@ xilinx_axidma_control_stream_push(StreamSlave *obj, unsigned char *buf,
+>  }
+>  
+>  static bool
+> -xilinx_axidma_data_stream_can_push(StreamSlave *obj,
+> +xilinx_axidma_data_stream_can_push(StreamSink *obj,
+>                                     StreamCanPushNotifyFn notify,
+>                                     void *notify_opaque)
+>  {
+> @@ -420,7 +420,7 @@ xilinx_axidma_data_stream_can_push(StreamSlave *obj,
+>  }
+>  
+>  static size_t
+> -xilinx_axidma_data_stream_push(StreamSlave *obj, unsigned char *buf, size_t len,
+> +xilinx_axidma_data_stream_push(StreamSink *obj, unsigned char *buf, size_t len,
+>                                 bool eop)
+>  {
+>      XilinxAXIDMAStreamSlave *ds = XILINX_AXI_DMA_DATA_STREAM(obj);
+> @@ -591,9 +591,9 @@ static void xilinx_axidma_init(Object *obj)
+>  static Property axidma_properties[] = {
+>      DEFINE_PROP_UINT32("freqhz", XilinxAXIDMA, freqhz, 50000000),
+>      DEFINE_PROP_LINK("axistream-connected", XilinxAXIDMA,
+> -                     tx_data_dev, TYPE_STREAM_SLAVE, StreamSlave *),
+> +                     tx_data_dev, TYPE_STREAM_SINK, StreamSink *),
+>      DEFINE_PROP_LINK("axistream-control-connected", XilinxAXIDMA,
+> -                     tx_control_dev, TYPE_STREAM_SLAVE, StreamSlave *),
+> +                     tx_control_dev, TYPE_STREAM_SINK, StreamSink *),
+>      DEFINE_PROP_END_OF_LIST(),
+>  };
+>  
+> @@ -606,21 +606,21 @@ static void axidma_class_init(ObjectClass *klass, void *data)
+>      device_class_set_props(dc, axidma_properties);
+>  }
+>  
+> -static StreamSlaveClass xilinx_axidma_data_stream_class = {
+> +static StreamSinkClass xilinx_axidma_data_stream_class = {
+>      .push = xilinx_axidma_data_stream_push,
+>      .can_push = xilinx_axidma_data_stream_can_push,
+>  };
+>  
+> -static StreamSlaveClass xilinx_axidma_control_stream_class = {
+> +static StreamSinkClass xilinx_axidma_control_stream_class = {
+>      .push = xilinx_axidma_control_stream_push,
+>  };
+>  
+>  static void xilinx_axidma_stream_class_init(ObjectClass *klass, void *data)
+>  {
+> -    StreamSlaveClass *ssc = STREAM_SLAVE_CLASS(klass);
+> +    StreamSinkClass *ssc = STREAM_SINK_CLASS(klass);
+>  
+> -    ssc->push = ((StreamSlaveClass *)data)->push;
+> -    ssc->can_push = ((StreamSlaveClass *)data)->can_push;
+> +    ssc->push = ((StreamSinkClass *)data)->push;
+> +    ssc->can_push = ((StreamSinkClass *)data)->can_push;
+>  }
+>  
+>  static const TypeInfo axidma_info = {
+> @@ -638,7 +638,7 @@ static const TypeInfo xilinx_axidma_data_stream_info = {
+>      .class_init    = xilinx_axidma_stream_class_init,
+>      .class_data    = &xilinx_axidma_data_stream_class,
+>      .interfaces = (InterfaceInfo[]) {
+> -        { TYPE_STREAM_SLAVE },
+> +        { TYPE_STREAM_SINK },
+>          { }
+>      }
+>  };
+> @@ -650,7 +650,7 @@ static const TypeInfo xilinx_axidma_control_stream_info = {
+>      .class_init    = xilinx_axidma_stream_class_init,
+>      .class_data    = &xilinx_axidma_control_stream_class,
+>      .interfaces = (InterfaceInfo[]) {
+> -        { TYPE_STREAM_SLAVE },
+> +        { TYPE_STREAM_SINK },
+>          { }
+>      }
+>  };
+> diff --git a/hw/net/xilinx_axienet.c b/hw/net/xilinx_axienet.c
+> index 2e89f236b4a..0c4ac727207 100644
+> --- a/hw/net/xilinx_axienet.c
+> +++ b/hw/net/xilinx_axienet.c
+> @@ -323,8 +323,8 @@ struct XilinxAXIEnet {
+>      SysBusDevice busdev;
+>      MemoryRegion iomem;
+>      qemu_irq irq;
+> -    StreamSlave *tx_data_dev;
+> -    StreamSlave *tx_control_dev;
+> +    StreamSink *tx_data_dev;
+> +    StreamSink *tx_control_dev;
+>      XilinxAXIEnetStreamSlave rx_data_dev;
+>      XilinxAXIEnetStreamSlave rx_control_dev;
+>      NICState *nic;
+> @@ -855,7 +855,7 @@ static ssize_t eth_rx(NetClientState *nc, const uint8_t *buf, size_t size)
+>  }
+>  
+>  static size_t
+> -xilinx_axienet_control_stream_push(StreamSlave *obj, uint8_t *buf, size_t len,
+> +xilinx_axienet_control_stream_push(StreamSink *obj, uint8_t *buf, size_t len,
+>                                     bool eop)
+>  {
+>      int i;
+> @@ -877,7 +877,7 @@ xilinx_axienet_control_stream_push(StreamSlave *obj, uint8_t *buf, size_t len,
+>  }
+>  
+>  static size_t
+> -xilinx_axienet_data_stream_push(StreamSlave *obj, uint8_t *buf, size_t size,
+> +xilinx_axienet_data_stream_push(StreamSink *obj, uint8_t *buf, size_t size,
+>                                  bool eop)
+>  {
+>      XilinxAXIEnetStreamSlave *ds = XILINX_AXI_ENET_DATA_STREAM(obj);
+> @@ -1005,9 +1005,9 @@ static Property xilinx_enet_properties[] = {
+>      DEFINE_PROP_UINT32("txmem", XilinxAXIEnet, c_txmem, 0x1000),
+>      DEFINE_NIC_PROPERTIES(XilinxAXIEnet, conf),
+>      DEFINE_PROP_LINK("axistream-connected", XilinxAXIEnet,
+> -                     tx_data_dev, TYPE_STREAM_SLAVE, StreamSlave *),
+> +                     tx_data_dev, TYPE_STREAM_SINK, StreamSink *),
+>      DEFINE_PROP_LINK("axistream-control-connected", XilinxAXIEnet,
+> -                     tx_control_dev, TYPE_STREAM_SLAVE, StreamSlave *),
+> +                     tx_control_dev, TYPE_STREAM_SINK, StreamSink *),
+>      DEFINE_PROP_END_OF_LIST(),
+>  };
+>  
+> @@ -1023,14 +1023,14 @@ static void xilinx_enet_class_init(ObjectClass *klass, void *data)
+>  static void xilinx_enet_control_stream_class_init(ObjectClass *klass,
+>                                                    void *data)
+>  {
+> -    StreamSlaveClass *ssc = STREAM_SLAVE_CLASS(klass);
+> +    StreamSinkClass *ssc = STREAM_SINK_CLASS(klass);
+>  
+>      ssc->push = xilinx_axienet_control_stream_push;
+>  }
+>  
+>  static void xilinx_enet_data_stream_class_init(ObjectClass *klass, void *data)
+>  {
+> -    StreamSlaveClass *ssc = STREAM_SLAVE_CLASS(klass);
+> +    StreamSinkClass *ssc = STREAM_SINK_CLASS(klass);
+>  
+>      ssc->push = xilinx_axienet_data_stream_push;
+>  }
+> @@ -1049,7 +1049,7 @@ static const TypeInfo xilinx_enet_data_stream_info = {
+>      .instance_size = sizeof(struct XilinxAXIEnetStreamSlave),
+>      .class_init    = xilinx_enet_data_stream_class_init,
+>      .interfaces = (InterfaceInfo[]) {
+> -            { TYPE_STREAM_SLAVE },
+> +            { TYPE_STREAM_SINK },
+>              { }
+>      }
+>  };
+> @@ -1060,7 +1060,7 @@ static const TypeInfo xilinx_enet_control_stream_info = {
+>      .instance_size = sizeof(struct XilinxAXIEnetStreamSlave),
+>      .class_init    = xilinx_enet_control_stream_class_init,
+>      .interfaces = (InterfaceInfo[]) {
+> -            { TYPE_STREAM_SLAVE },
+> +            { TYPE_STREAM_SINK },
+>              { }
+>      }
+>  };
+> diff --git a/hw/ssi/xilinx_spips.c b/hw/ssi/xilinx_spips.c
+> index b9371dbf8d7..6109ba55107 100644
+> --- a/hw/ssi/xilinx_spips.c
+> +++ b/hw/ssi/xilinx_spips.c
+> @@ -1353,7 +1353,7 @@ static void xlnx_zynqmp_qspips_init(Object *obj)
+>  {
+>      XlnxZynqMPQSPIPS *rq = XLNX_ZYNQMP_QSPIPS(obj);
+>  
+> -    object_property_add_link(obj, "stream-connected-dma", TYPE_STREAM_SLAVE,
+> +    object_property_add_link(obj, "stream-connected-dma", TYPE_STREAM_SINK,
+>                               (Object **)&rq->dma,
+>                               object_property_allow_set_link,
+>                               OBJ_PROP_LINK_STRONG);
 > 
-> VFIO no-iommu was intended as a transition helper for platforms that do
-> not support an IOMMU, particularly running within a VM where we use
-> regular, IOMMU protected devices within the host, but allow no-iommu
-> within the guest such that the host is still protected from the guest
-> sandbox.  There should be no new use cases of no-iommu, it's unsafe, it
-> taints the kernel where it's used (guest in the above intended use
-> case).  If you intend long term distribution support of a solution,
-> VFIO no-iommu should not be considered an option.
-> 
-> VFIO mdev requires that the mdev vendor driver mediates access to the
-> device in order to provide isolation.  In the initial vGPU use cases,
-> we expect that isolation to be provided via devices specific means, ex.
-> GPU GART, but we've since included system level components like IOMMU
-> backing devices and auxiliary domains, the latter to make use of IOMMU
-> PASID support.
-> 
-> As implemented in this proposal, mdev is being used only to subvert the
-> IOMMU grouping requirements of VFIO in order to order to expose a
-> device that is potentially fully capable of DMA to userspace with no
-> isolation whatsoever.  If not for the IOMMU grouping, this driver could
-> simply be a VFIO bus driver making use of the vfio-platform interface.
-> Either way, without isolation, this does not belong in the realm of
-> VFIO.
-> 
-> Given your architecture, the only potentially valid mdev use case I can
-> see would be if the mdev vendor driver binds to the PCIe device,
-> allowing multiplexing of the parent device by carving out fpga
-> functional blocks from MMIO BAR space, and providing isolation by
-> enforcing that the parent device never enables bus master, assuming
-> that would prevent any of the fpga sub-components from performing DMA.
-> 
-> Are there worthwhile use cases of these fpga devices without DMA?
 
-The board (Intel PAC N3000) we want to support is a Smart NIC. The FPGA
-part is responsible for the various MAC layer offloading. The software
-for FPGA usually doesn't touch the network data stream (they are all
-handled by FPGA logic), it does some configurations and link status
-reading so no DMA is required. These configurations are sometimes very
-specific to dynamic RTL logic developed by user, so this is the purpose
-we handle them in userspace.
-
-There are some other usercases, which use FPGA to do some dedicated
-algorithm like for deep learning. They need to perform memory in and
-memory out. For these cases, it seems possible we carving out the
-related part as the mdev, leaving management part in parent device
-driver.
-
-> 
-> If you need DMA (or the device is potentially capable of DMA and
-> cannot be audited to prevent it) and cannot provide isolation then
-> please don't use VFIO or mdev, doing so would violate the notion of
-> secure userspace device access that we've worked to achieve in this
-> ecosystem.
-> 
-> If you choose another route, pci-sysfs already provides full BAR access
-> via the resource files in sysfs, but you could also expose individual
-> sysfs files with the same capabilities per fpga functional unit to
-> resolve the conflict between kernel and userspace "ownership".  UIO
-> might also be a solution.  This proposal to restrict userspace usage to
-> devices that don't perform DMA is akin to uio_pci_generic, where the
-> user is not expected to enable bus master, but nothing prevents them
-
-We are going to exposes these devices not capable of DMA, so seems UIO
-is the right way to go.
-
-> from doing so and as a result it's a gateway for all sorts of
-> unsupportable drivers.  mdev should not be used to follow that example.
-
-
-
-I should thank you again for the detail explanation.
-
-Yilun
-
-
-> Thanks,
-> 
-> Alex
