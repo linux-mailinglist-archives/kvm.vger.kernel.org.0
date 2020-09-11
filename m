@@ -2,117 +2,141 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 728F226646D
-	for <lists+kvm@lfdr.de>; Fri, 11 Sep 2020 18:38:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DA725266474
+	for <lists+kvm@lfdr.de>; Fri, 11 Sep 2020 18:39:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726552AbgIKQiU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 11 Sep 2020 12:38:20 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:57996 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726193AbgIKPMQ (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 11 Sep 2020 11:12:16 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1599837121;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=aiWmHLDD0Ad0LUM9I3Re3J2jS/emquPxE/7QtuwNOPg=;
-        b=gxXCtIupESgbz961KIg5tC4lEmLWzKToPJBqqrL5WIchgdrsdUGifvttRW07oWQtkxCInS
-        rLNv/SsI/azVsJHj2mLVsZ+cGXkEW22ym9M2v4+SkyUAF6rFPdvA9mj758sYLqEx90AtZp
-        Jm+d0g8OSvLNiLA0hOM2YRmH5+4zdE8=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-200-4NT_19gWN0K2miAueSjn9w-1; Fri, 11 Sep 2020 09:53:13 -0400
-X-MC-Unique: 4NT_19gWN0K2miAueSjn9w-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        id S1726631AbgIKQib (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 11 Sep 2020 12:38:31 -0400
+Received: from mail.kernel.org ([198.145.29.99]:51856 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726413AbgIKPMQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 11 Sep 2020 11:12:16 -0400
+Received: from localhost (83-86-74-64.cable.dynamic.v4.ziggo.nl [83.86.74.64])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 62D58CD046;
-        Fri, 11 Sep 2020 13:53:12 +0000 (UTC)
-Received: from [10.36.112.212] (ovpn-112-212.ams2.redhat.com [10.36.112.212])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 1B1135DA2A;
-        Fri, 11 Sep 2020 13:53:00 +0000 (UTC)
-Subject: Re: MSI/MSIX for VFIO platform
-To:     Alex Williamson <alex.williamson@redhat.com>,
-        Vikas Gupta <vikas.gupta@broadcom.com>
-Cc:     Cornelia Huck <cohuck@redhat.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Vikram Prakash <vikram.prakash@broadcom.com>,
-        Srinath Mannam <srinath.mannam@broadcom.com>
-References: <c94c36305980f80674aa699e27b9895b@mail.gmail.com>
- <20200910105735.1e060b95@w520.home>
-From:   Auger Eric <eric.auger@redhat.com>
-Message-ID: <f9b3c805-cd64-3402-ff73-339c35c4c27a@redhat.com>
-Date:   Fri, 11 Sep 2020 15:52:59 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+        by mail.kernel.org (Postfix) with ESMTPSA id D876D20575;
+        Fri, 11 Sep 2020 15:12:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1599837128;
+        bh=boBKEfpq+ALTe5FlCo88gBogFYwgRaTO/3chRAqYMZM=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=E+d9RmiaARzLVRWn9/QD0JaJRV71JJdXd1OpvSR4iePv2I/KwBepMDnoG1iCtzgwV
+         Y0yJR8fr4UTATv1hzAFVYr/CeKK3IE4XkEctzkJyg9CGHGSr64G0lh8RSmSuZucdWX
+         1yOskH/rR4AOn9JAfX2HlImIan/LDbXjsFyexiHM=
+Date:   Fri, 11 Sep 2020 17:12:13 +0200
+From:   Greg KH <gregkh@linuxfoundation.org>
+To:     "Paraschiv, Andra-Irina" <andraprs@amazon.com>
+Cc:     linux-kernel <linux-kernel@vger.kernel.org>,
+        Anthony Liguori <aliguori@amazon.com>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Colm MacCarthaigh <colmmacc@amazon.com>,
+        David Duncan <davdunc@amazon.com>,
+        Bjoern Doebel <doebel@amazon.de>,
+        David Woodhouse <dwmw@amazon.co.uk>,
+        Frank van der Linden <fllinden@amazon.com>,
+        Alexander Graf <graf@amazon.de>, Karen Noel <knoel@redhat.com>,
+        Martin Pohlack <mpohlack@amazon.de>,
+        Matt Wilson <msw@amazon.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Balbir Singh <sblbir@amazon.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Stewart Smith <trawets@amazon.com>,
+        Uwe Dannowski <uwed@amazon.de>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        kvm <kvm@vger.kernel.org>,
+        ne-devel-upstream <ne-devel-upstream@amazon.com>
+Subject: Re: [PATCH v8 17/18] nitro_enclaves: Add overview documentation
+Message-ID: <20200911151213.GB3821769@kroah.com>
+References: <20200904173718.64857-1-andraprs@amazon.com>
+ <20200904173718.64857-18-andraprs@amazon.com>
+ <20200907090126.GD1101646@kroah.com>
+ <44a8a921-1fb4-87ab-b8f2-c168c615dbbd@amazon.com>
+ <20200907140803.GA3719869@kroah.com>
+ <b8a1e66c-7674-7354-599e-159efd260ba9@amazon.com>
+ <310abd0d-60e7-a52c-fcae-cf98ac474e32@amazon.com>
 MIME-Version: 1.0
-In-Reply-To: <20200910105735.1e060b95@w520.home>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <310abd0d-60e7-a52c-fcae-cf98ac474e32@amazon.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Vikas,
-
-On 9/10/20 6:57 PM, Alex Williamson wrote:
-> On Thu, 10 Sep 2020 16:15:27 +0530
-> Vikas Gupta <vikas.gupta@broadcom.com> wrote:
+On Fri, Sep 11, 2020 at 05:56:10PM +0300, Paraschiv, Andra-Irina wrote:
 > 
->> Hi Alex/Cornelia,
->>
->> We are looking for MSI interrupts for platform devices in user-space
->> applications via event/poll mechanism using VFIO.
->>
->> Since there is no support for MSI/MSIX handling in VFIO-platform in kernel,
->> it may not possible to get this feature in user-space.
->>
->> Is there any other way we can get this feature in user-space OR can you
->> please suggest if any patch or feature is in progress for same in VFIO
->> platform?
->>
->> Any suggestions would be helpful.
 > 
-> Eric (Cc'd) is the maintainer of vfio-platform.
+> On 07/09/2020 18:13, Paraschiv, Andra-Irina wrote:
+> > 
+> > 
+> > On 07/09/2020 17:08, Greg KH wrote:
+> > > On Mon, Sep 07, 2020 at 04:43:11PM +0300, Paraschiv, Andra-Irina wrote:
+> > > > 
+> > > > On 07/09/2020 12:01, Greg KH wrote:
+> > > > > On Fri, Sep 04, 2020 at 08:37:17PM +0300, Andra Paraschiv wrote:
+> > > > > > Signed-off-by: Andra Paraschiv <andraprs@amazon.com>
+> > > > > > Reviewed-by: Alexander Graf <graf@amazon.com>
+> > > > > > ---
+> > > > > > Changelog
+> > > > > > 
+> > > > > > v7 -> v8
+> > > > > > 
+> > > > > > * Add info about the primary / parent VM CID value.
+> > > > > > * Update reference link for huge pages.
+> > > > > > * Add reference link for the x86 boot protocol.
+> > > > > > * Add license mention and update doc title / chapter formatting.
+> > > > > > 
+> > > > > > v6 -> v7
+> > > > > > 
+> > > > > > * No changes.
+> > > > > > 
+> > > > > > v5 -> v6
+> > > > > > 
+> > > > > > * No changes.
+> > > > > > 
+> > > > > > v4 -> v5
+> > > > > > 
+> > > > > > * No changes.
+> > > > > > 
+> > > > > > v3 -> v4
+> > > > > > 
+> > > > > > * Update doc type from .txt to .rst.
+> > > > > > * Update documentation based on the changes from v4.
+> > > > > > 
+> > > > > > v2 -> v3
+> > > > > > 
+> > > > > > * No changes.
+> > > > > > 
+> > > > > > v1 -> v2
+> > > > > > 
+> > > > > > * New in v2.
+> > > > > > ---
+> > > > > >    Documentation/nitro_enclaves/ne_overview.rst | 95
+> > > > > > ++++++++++++++++++++
+> > > > > >    1 file changed, 95 insertions(+)
+> > > > > >    create mode 100644 Documentation/nitro_enclaves/ne_overview.rst
+> > > > > A whole new subdir, for a single driver, and not tied into the kernel
+> > > > > documentation build process at all?  Not good :(
+> > > > > 
+> > > > Would the "virt" directory be a better option for this doc file?
+> > > Yes.
+> > 
+> > Alright, I'll update the doc file location, the index file and the
+> > MAINTAINERS entry to reflect the new doc file location.
+> > 
 > 
-> vfio-platform devices don't have IRQ indexes dedicated to MSI and MSI-X
-> like vfio-pci devices do (technically these are PCI concepts, but I
-> assume we're referring generically to message signaled interrupts), but
-> that's simply due to the lack of standardization in platform devices.
-> Logically these are simply collections of edge triggered interrupts,
-> which the vfio device API supports generically, it's simply a matter
-> that the vfio bus driver exposing a vfio-platform device create an IRQ
-> index exposing these vectors.  Thanks,
-
-I have not worked on MSI support and I am not aware of any work
-happening in this area.
-
-First I would recommend to look at IRQ related uapis exposed by VFIO:
-VFIO_DEVICE_GET_IRQ_INFO
-VFIO_DEVICE_SET_IRQS
-
-and try to understand if they can be implemented for MSIs in a generic
-way in the vfio_platform driver using platform-msi helpers.
-
-For instance VFIO_DEVICE_GET_IRQ_INFO would need to return the number of
-requested vectors. On init I guess we should allocate vectors using
-platform_msi_domain_alloc_irqs/ devm_request_irq and in the handler
-trigger the eventfd provided through VFIO_DEVICE_SET_IRQS.
-
-On userspace where you have to trap the MSI setup to call the above
-functions and setup irqfd injection. This would be device specific as
-opposed to PCI. That's just rough ideas at the moment.
-
-Thanks
-
-Eric
-
+> I sent out a new revision that includes the updates based on your feedback.
+> Thanks for review.
 > 
-> Alex
-> 
+> To be aware of this beforehand, what would be the further necessary steps
+> (e.g. linux-next branch, additional review and / or sanity checks) to
+> consider for targeting the next merge window?
 
+If all looks good, I can just suck it into my char-misc branch to get it
+into 5.10-rc1.  I'll look at the series next week, thanks.
+
+thanks,
+
+greg k-h
