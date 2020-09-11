@@ -2,68 +2,69 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 54506266322
-	for <lists+kvm@lfdr.de>; Fri, 11 Sep 2020 18:11:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 406942662D2
+	for <lists+kvm@lfdr.de>; Fri, 11 Sep 2020 18:03:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726594AbgIKQKu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 11 Sep 2020 12:10:50 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:50822 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726158AbgIKPk1 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 11 Sep 2020 11:40:27 -0400
+        id S1726479AbgIKQDI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 11 Sep 2020 12:03:08 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:25785 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1725814AbgIKQCa (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 11 Sep 2020 12:02:30 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1599838825;
+        s=mimecast20190719; t=1599840148;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=Dk+Kgm/gjjYqWQcgUSFQ2I08B4Y+XRe0xG6joXjPX98=;
-        b=gtF3yEhInX8u72BoVwAebbMvjmaDOaT8uXW5ozZoodmWyWDGdiRPobMo+rDb4RGM3oqt5x
-        sndLNFpD3Isz7Q/sfW/50OIEau6Fbn1XnQvnH9Cr2UNYdS3VSlu+rsZfcsN9vrnl9wzhqe
-        eFXyl4RdY3Aei3d9sTFyAC03eNswsZg=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-464-8NFyQUtHMECNS_8Uq1jHkw-1; Fri, 11 Sep 2020 11:40:24 -0400
-X-MC-Unique: 8NFyQUtHMECNS_8Uq1jHkw-1
-Received: by mail-wm1-f71.google.com with SMTP id 189so1511211wme.5
-        for <kvm@vger.kernel.org>; Fri, 11 Sep 2020 08:40:23 -0700 (PDT)
+        bh=UzNqZBAGXS7F5Dy3gzRVUTnuTyaskfH6gaEmCpanmiQ=;
+        b=H2hznv2HzIC6+jC2xylUd1+fbZeHxZ5JexRw5Nz07I1dOMGGysPfc2cGnKbI3cjHLkGqfd
+        SxvK2k2SaqHm5lOB5Bzs/KOth8S9RZntbRDXOHtudY8641Rs8eO4/i7pvOG6oRBYEjsTG2
+        6YtqTIyY+tp6d94/12BYAfXLDEqyAUw=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-3-zxjiuk2BOIWsgI7w2h_qwQ-1; Fri, 11 Sep 2020 12:02:24 -0400
+X-MC-Unique: zxjiuk2BOIWsgI7w2h_qwQ-1
+Received: by mail-wm1-f72.google.com with SMTP id b73so1545481wmb.0
+        for <kvm@vger.kernel.org>; Fri, 11 Sep 2020 09:02:24 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=Dk+Kgm/gjjYqWQcgUSFQ2I08B4Y+XRe0xG6joXjPX98=;
-        b=ZZTAe4LJTwLEs0ztOQwM0bIvT0gIFyol8Xh1P1vjBDZeAA1s83kOo9FlMRojAv2XZV
-         cehzvqUAKT30q+C3kfIDVHufbE2KOGKLzFKNT+LxZEbnoALUypDvOT0KO0nku/VW51mx
-         9O0T/aIFre+FP607sGqeEMWeOXl3LhWWptWnd9O9h2eMyEgRKtnFE5c62GdnXK6j++9r
-         bFChsYJppXtDDKGrXbZnUL1hK5+Zt/Wuh6XOSpBU0tBtn7CGj5jYmDK1ixG2rBD/ogB3
-         rZ8HR3i65NZMD2xkgla+qrv72/BYDBlCLrKTh/dtSJTK9ZhNGAd6xng+bHteqMxYrNVF
-         nHBg==
-X-Gm-Message-State: AOAM532r8rCXOOgE5FcfqZ3Pm5YJV1K97fgWfVlwANwHKXxIdl/vkEi6
-        EMi7upLo8zgTnmoslS804bivk/O8xfEcH4UNCNRzF+VWiFNvE+tdyLGO3AC7O2ONX6U4oPM0s0l
-        idoE499ESlC+Q
-X-Received: by 2002:adf:fe42:: with SMTP id m2mr2569547wrs.367.1599838822707;
-        Fri, 11 Sep 2020 08:40:22 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzB61Hh6R6J7ydHYImNz+B1xFLNiwsBAcXzLMvmMs62Z6hd/ni77KrrH/mVvM0CXjaeUJFWTQ==
-X-Received: by 2002:adf:fe42:: with SMTP id m2mr2569521wrs.367.1599838822491;
-        Fri, 11 Sep 2020 08:40:22 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:5568:7f99:4893:a5b6? ([2001:b07:6468:f312:5568:7f99:4893:a5b6])
-        by smtp.gmail.com with ESMTPSA id 9sm5060186wmf.7.2020.09.11.08.40.21
+        bh=UzNqZBAGXS7F5Dy3gzRVUTnuTyaskfH6gaEmCpanmiQ=;
+        b=KMgSekD+EkrRwq2KqK5ugKUj2c2QbJRvsEASkrlRqbMSse1ZaMsZ/klwa0H4OrabnM
+         yL6drwAyPo4/psPMjj2DAeDK7QuPGuC+gRfXg1PG43CcIEkav0wejNpBMwTlnFNVpVuy
+         FlAmF2uiKbqoBMMfEYidEUsiHTjWWG866eQkhVdZyfnHbq1kNQ5vI9TzQCUpWSfqp0cs
+         TQ12aFZS3T43SczmCZRz8QepSIkSToGLs2Lv1qyqyoudU36FPChdqP1TUR0MkeGzeMDI
+         S/QINyhSNaaMihS+G+NqSF7EIlG321n3HSDk0RDbJzDiw1wGzXERMyIYil6h9rsBcCK+
+         CiLA==
+X-Gm-Message-State: AOAM5328TeLdcCuORQqLxrh7KJDxl9PivVYt+IM+9JWr6sJl7GnzEgMy
+        YB4CbSN+D/yxK/tFF46qsrdtektAsUL4C4zlwhPu2y0DEK562ye1onxr1mhwUwHsJijE4CG0xPM
+        PSDH5OoAwL+sy
+X-Received: by 2002:adf:f70d:: with SMTP id r13mr2807361wrp.317.1599840143600;
+        Fri, 11 Sep 2020 09:02:23 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzlZ/52RedjxDE7fk9zVT8weEe/dNfRBYU1gf7UxBbf9Eg9Ud+Y+MHJJZv6HKemXzFN9Gm3jw==
+X-Received: by 2002:adf:f70d:: with SMTP id r13mr2807329wrp.317.1599840143390;
+        Fri, 11 Sep 2020 09:02:23 -0700 (PDT)
+Received: from [192.168.10.150] ([93.56.170.5])
+        by smtp.gmail.com with ESMTPSA id l10sm4868973wru.59.2020.09.11.09.02.22
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 11 Sep 2020 08:40:22 -0700 (PDT)
-Subject: Re: [PATCH] nSVM: Add a test for the P (present) bit in NPT entry
-To:     Jim Mattson <jmattson@google.com>,
-        Krish Sadhukhan <krish.sadhukhan@oracle.com>
-Cc:     kvm list <kvm@vger.kernel.org>
-References: <20200829005720.5325-1-krish.sadhukhan@oracle.com>
- <CALMp9eSiB=NkuZJV+m-j-KcxqVzkqTf5fUS7r9vBSaY8TyK_Rg@mail.gmail.com>
+        Fri, 11 Sep 2020 09:02:22 -0700 (PDT)
+Subject: Re: [RESEND PATCH v2] KVM: fix memory leak in
+ kvm_io_bus_unregister_dev()
+To:     Rustam Kovhaev <rkovhaev@gmail.com>, vkuznets@redhat.com,
+        gustavoars@kernel.org, kvm@vger.kernel.org
+Cc:     linux-kernel@vger.kernel.org, gregkh@linuxfoundation.org,
+        stable@vger.kernel.org
+References: <20200907185535.233114-1-rkovhaev@gmail.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <4f128dbf-e1bb-76b9-dff7-61bc26b91cf9@redhat.com>
-Date:   Fri, 11 Sep 2020 17:40:21 +0200
+Message-ID: <979a4030-6934-41bd-ee55-a3e301f04cc6@redhat.com>
+Date:   Fri, 11 Sep 2020 18:02:21 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <CALMp9eSiB=NkuZJV+m-j-KcxqVzkqTf5fUS7r9vBSaY8TyK_Rg@mail.gmail.com>
+In-Reply-To: <20200907185535.233114-1-rkovhaev@gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -72,41 +73,75 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 31/08/20 23:55, Jim Mattson wrote:
-> On Fri, Aug 28, 2020 at 5:57 PM Krish Sadhukhan
-> <krish.sadhukhan@oracle.com> wrote:
->>
->> If the P (present) bit in an NPT entry is cleared, VMRUN will fail and the
->> guest will exit to the host with an exit code of 0x400 (#NPF). The following
->> bits of importance in EXITINFO1 will be set/cleared to indicate the failure:
->>
->>         bit# 0: cleared
->>         bit# 32: set
+On 07/09/20 20:55, Rustam Kovhaev wrote:
+> when kmalloc() fails in kvm_io_bus_unregister_dev(), before removing
+> the bus, we should iterate over all other devices linked to it and call
+> kvm_iodevice_destructor() for them
 > 
-> This seems like a terrible commit description. First, the P bit can be
-> cleared in a plethora of NPT entries without having any effect on
-> guest execution. It's only if the guest tries to access a GPA whose
-> translation uses the non-present NPT entry that there is an issue.
-> Second, the VMRUN does not fail. If the VM-exit code is anything other
-> than -1, the VMRUN has succeeded. Third, the bits in EXITINFO that get
-> set/cleared depend very much on the actual access. Yes, if the nested
-> page walk terminates due to a non-present page, bit 0 will be cleared.
-> However, bit 32 will only be set if the non-present page was
-> encountered while translating the final guest physical address (not
-> the guest physical address of a page table page encountered during the
->  walk). Moreover, older AMD hardware never sets bits 32 or 33 at all.
-> Bit 1 will be set if the access was a write (or a page table walk).
-> Bit 2 will be set for a user access. Bit 4 will be set for a code read
-> (while translating the final guest physical address).
+> Fixes: 90db10434b16 ("KVM: kvm_io_bus_unregister_dev() should never fail")
+> Cc: stable@vger.kernel.org
+> Reported-and-tested-by: syzbot+f196caa45793d6374707@syzkaller.appspotmail.com
+> Link: https://syzkaller.appspot.com/bug?extid=f196caa45793d6374707
+> Signed-off-by: Rustam Kovhaev <rkovhaev@gmail.com>
+> Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+> ---
+> v2:
+> - remove redundant whitespace
+> - remove goto statement and use if/else
+> - add Fixes tag
+> ---
+>  virt/kvm/kvm_main.c | 21 ++++++++++++---------
+>  1 file changed, 12 insertions(+), 9 deletions(-)
+> 
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index 67cd0b88a6b6..cf88233b819a 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -4332,7 +4332,7 @@ int kvm_io_bus_register_dev(struct kvm *kvm, enum kvm_bus bus_idx, gpa_t addr,
+>  void kvm_io_bus_unregister_dev(struct kvm *kvm, enum kvm_bus bus_idx,
+>  			       struct kvm_io_device *dev)
+>  {
+> -	int i;
+> +	int i, j;
+>  	struct kvm_io_bus *new_bus, *bus;
+>  
+>  	bus = kvm_get_bus(kvm, bus_idx);
+> @@ -4349,17 +4349,20 @@ void kvm_io_bus_unregister_dev(struct kvm *kvm, enum kvm_bus bus_idx,
+>  
+>  	new_bus = kmalloc(struct_size(bus, range, bus->dev_count - 1),
+>  			  GFP_KERNEL_ACCOUNT);
+> -	if (!new_bus)  {
+> +	if (new_bus) {
+> +		memcpy(new_bus, bus, sizeof(*bus) + i * sizeof(struct kvm_io_range));
+> +		new_bus->dev_count--;
+> +		memcpy(new_bus->range + i, bus->range + i + 1,
+> +		       (new_bus->dev_count - i) * sizeof(struct kvm_io_range));
+> +	} else {
+>  		pr_err("kvm: failed to shrink bus, removing it completely\n");
+> -		goto broken;
+> +		for (j = 0; j < bus->dev_count; j++) {
+> +			if (j == i)
+> +				continue;
+> +			kvm_iodevice_destructor(bus->range[j].dev);
+> +		}
+>  	}
+>  
+> -	memcpy(new_bus, bus, sizeof(*bus) + i * sizeof(struct kvm_io_range));
+> -	new_bus->dev_count--;
+> -	memcpy(new_bus->range + i, bus->range + i + 1,
+> -	       (new_bus->dev_count - i) * sizeof(struct kvm_io_range));
+> -
+> -broken:
+>  	rcu_assign_pointer(kvm->buses[bus_idx], new_bus);
+>  	synchronize_srcu_expedited(&kvm->srcu);
+>  	kfree(bus);
 > 
 
-Queued, with an adjusted commit message.
+Queued, thanks.
 
 I am currently on leave so I am going through the patches and queuing
 them, but I will only push kvm/next and kvm/queue next week.  kvm/master
 patches will be sent to Linus for the next -rc though.
-
-Thanks,
 
 Paolo
 
