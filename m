@@ -2,191 +2,171 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E704B265A8F
-	for <lists+kvm@lfdr.de>; Fri, 11 Sep 2020 09:32:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8E8EA265AA3
+	for <lists+kvm@lfdr.de>; Fri, 11 Sep 2020 09:40:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725776AbgIKHc2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 11 Sep 2020 03:32:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45014 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725783AbgIKHcO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 11 Sep 2020 03:32:14 -0400
-Received: from mail-lf1-x143.google.com (mail-lf1-x143.google.com [IPv6:2a00:1450:4864:20::143])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 20B28C061756
-        for <kvm@vger.kernel.org>; Fri, 11 Sep 2020 00:32:14 -0700 (PDT)
-Received: by mail-lf1-x143.google.com with SMTP id b12so4958804lfp.9
-        for <kvm@vger.kernel.org>; Fri, 11 Sep 2020 00:32:14 -0700 (PDT)
+        id S1725730AbgIKHkR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 11 Sep 2020 03:40:17 -0400
+Received: from smtp-fw-9101.amazon.com ([207.171.184.25]:57808 "EHLO
+        smtp-fw-9101.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725535AbgIKHkN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 11 Sep 2020 03:40:13 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:content-transfer-encoding:in-reply-to;
-        bh=LHK4F2MqWd5dXKy2V+64wHdCsq3BPH6G32kaFVS1Kgg=;
-        b=UNV2LkEjubfC/T5nSdh5SJQEeFEi+/GuTRy/PdeUmphzfexU206EnRai71uF2gRuaA
-         IzvGp1pSIwarpiPgMDh1q8s8jH8rE0hyo3KMsCt68m0uRFNYIKpoTBbEs+gG0gA1Bm7B
-         coX9xzWLNnjUtL1klXrTbpYVZBlCrFnSqCFCnQiY+Xc6vz8amBpGd+V0uQ7LeF256iPo
-         7Hn/qLsgr/Y6sCDJgMyfj5L4Hr5+WwWHkIYK8YUs1TehOZDpoDM/ly3ZvJfFcfSp5Z2V
-         j65gPkHQWFVCq0S2N6MvkqyLUCq5UIoz+tuVlXjfqd3LGBdwxpVhi3UEsx2FrffvdZVn
-         ENNQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=LHK4F2MqWd5dXKy2V+64wHdCsq3BPH6G32kaFVS1Kgg=;
-        b=ckqNd/ze7pbooAzz2TjbQCq7csIYw1vbKeLu4pghCqsPTVfVGWiM+omBTCN+0m9Mg8
-         E5ixBsecu512STsiUNeZWY2R/TQABki9scsmiuBN05btm+u9T7LmvpBQhY9B0wg+mq5K
-         ZLL2mObVVi1yTkgFIcWoZcV8UxO47nTWJda+uxt2dXYeLgNhqDhECe5GKNV+Cr7tfpky
-         +HmzgLPNfVqard47yShN2tFeZqf5NmbMAEtY2TqvAJ2fi8q5cI3c7Tw+lvc4EMQeD7dU
-         rIaV8w79TN8W03Fwed6CnBdzlSOeQbMyxIbV4haihohR2u9TyA+UkJpF9aECs9hGboPo
-         seZg==
-X-Gm-Message-State: AOAM532N+TSv/K7WWBThyImw+FMNIzL7rEdL+pwwWqesNt1ZHAsjesoV
-        YVuUnPSB2wX9N4FlnjksxMY=
-X-Google-Smtp-Source: ABdhPJxyeuqUgihgOc4fwupdHuaN5J/O1r9PTCdHVhBWU7k75LyYISClw14MKQIX4EKOUkT1VwT9LQ==
-X-Received: by 2002:a19:ca48:: with SMTP id h8mr297019lfj.173.1599809532525;
-        Fri, 11 Sep 2020 00:32:12 -0700 (PDT)
-Received: from gmail.com (81-231-232-130-no39.tbcn.telia.com. [81.231.232.130])
-        by smtp.gmail.com with ESMTPSA id j4sm362441ljc.116.2020.09.11.00.32.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 11 Sep 2020 00:32:11 -0700 (PDT)
-Date:   Fri, 11 Sep 2020 09:32:11 +0200
-From:   "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>,
-        qemu-devel@nongnu.org,
-        Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>,
-        kvm@vger.kernel.org, qemu-arm@nongnu.org,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        Laurent Vivier <lvivier@redhat.com>,
-        Peter Maydell <peter.maydell@linaro.org>,
-        Andrew Jeffery <andrew@aj.id.au>,
-        Jason Wang <jasowang@redhat.com>,
-        Thomas Huth <thuth@redhat.com>,
-        Alistair Francis <alistair@alistair23.me>,
-        qemu-trivial@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>,
-        Richard Henderson <rth@twiddle.net>,
-        Joel Stanley <joel@jms.id.au>
-Subject: Re: [PATCH 4/6] hw/net/xilinx_axienet: Rename StreamSlave as
- StreamSink
-Message-ID: <20200911073211.GE2954729@toto>
-References: <20200910070131.435543-1-philmd@redhat.com>
- <20200910070131.435543-5-philmd@redhat.com>
- <9214b56d-59e7-1229-bf01-b6dca0445014@redhat.com>
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1599810013; x=1631346013;
+  h=subject:to:cc:references:from:message-id:date:
+   mime-version:in-reply-to:content-transfer-encoding;
+  bh=UtU8cHk7dC7NJ+X6wTkUmJT4/ZJ7Wx++LRb1OyZmff4=;
+  b=ZywYr5qgbPqRiw+NcwXi6EzvioIoDfI3fxsKtQJk2F/P+BkOxokVjRR2
+   TVlx+3bxVxMqmeeU4euXyeavEFucB6ymn6YRdTYIB1xyakMLkbqXl5L0S
+   9PSu3o0ZimxNNcqesztf+F1O7IvRdIzS3qlvhO6ioYCysVHJO6ncDlwyR
+   w=;
+X-IronPort-AV: E=Sophos;i="5.76,414,1592870400"; 
+   d="scan'208";a="67167348"
+Received: from sea32-co-svc-lb4-vlan3.sea.corp.amazon.com (HELO email-inbound-relay-2a-e7be2041.us-west-2.amazon.com) ([10.47.23.38])
+  by smtp-border-fw-out-9101.sea19.amazon.com with ESMTP; 11 Sep 2020 07:40:11 +0000
+Received: from EX13MTAUWC002.ant.amazon.com (pdx4-ws-svc-p6-lb7-vlan2.pdx.amazon.com [10.170.41.162])
+        by email-inbound-relay-2a-e7be2041.us-west-2.amazon.com (Postfix) with ESMTPS id EAA65A213F;
+        Fri, 11 Sep 2020 07:40:09 +0000 (UTC)
+Received: from EX13D20UWC001.ant.amazon.com (10.43.162.244) by
+ EX13MTAUWC002.ant.amazon.com (10.43.162.240) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.2; Fri, 11 Sep 2020 07:40:09 +0000
+Received: from Alexanders-MacBook-Air.local (10.43.162.73) by
+ EX13D20UWC001.ant.amazon.com (10.43.162.244) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.2; Fri, 11 Sep 2020 07:40:06 +0000
+Subject: Re: [PATCH v3] KVM: arm64: Preserve PMCR immutable values across
+ reset
+To:     Andrew Jones <drjones@redhat.com>
+CC:     <kvmarm@lists.cs.columbia.edu>, Marc Zyngier <maz@kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>, <kvm@vger.kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        "Suzuki K Poulose" <suzuki.poulose@arm.com>,
+        Robin Murphy <robin.murphy@arm.com>,
+        "Mark Rutland" <mark.rutland@arm.com>,
+        Eric Auger <eric.auger@redhat.com>
+References: <20200910164243.29253-1-graf@amazon.com>
+ <20200910173609.niujn2ngnjzvx7ub@kamzik.brq.redhat.com>
+From:   Alexander Graf <graf@amazon.com>
+Message-ID: <2938f7ef-a723-2ee3-0a87-25cbde177d23@amazon.com>
+Date:   Fri, 11 Sep 2020 09:40:04 +0200
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.16; rv:78.0)
+ Gecko/20100101 Thunderbird/78.2.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <9214b56d-59e7-1229-bf01-b6dca0445014@redhat.com>
+In-Reply-To: <20200910173609.niujn2ngnjzvx7ub@kamzik.brq.redhat.com>
+Content-Language: en-US
+X-Originating-IP: [10.43.162.73]
+X-ClientProxiedBy: EX13D49UWB003.ant.amazon.com (10.43.163.121) To
+ EX13D20UWC001.ant.amazon.com (10.43.162.244)
+Content-Type: text/plain; charset="windows-1252"; format="flowed"
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Sep 11, 2020 at 09:28:38AM +0200, Paolo Bonzini wrote:
-> On 10/09/20 09:01, Philippe Mathieu-Daudé wrote:
-> > In order to use inclusive terminology, rename 'slave stream'
-> > as 'sink stream'.
-> > 
-> > Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-> > ---
-> >  hw/net/xilinx_axienet.c | 24 ++++++++++++------------
-> >  1 file changed, 12 insertions(+), 12 deletions(-)
-> > 
-> > diff --git a/hw/net/xilinx_axienet.c b/hw/net/xilinx_axienet.c
-> > index 0c4ac727207..4e48535f373 100644
-> > --- a/hw/net/xilinx_axienet.c
-> > +++ b/hw/net/xilinx_axienet.c
-> > @@ -46,11 +46,11 @@
-> >       OBJECT_CHECK(XilinxAXIEnet, (obj), TYPE_XILINX_AXI_ENET)
-> >  
-> >  #define XILINX_AXI_ENET_DATA_STREAM(obj) \
-> > -     OBJECT_CHECK(XilinxAXIEnetStreamSlave, (obj),\
-> > +     OBJECT_CHECK(XilinxAXIEnetStreamSink, (obj),\
-> >       TYPE_XILINX_AXI_ENET_DATA_STREAM)
-> >  
-> >  #define XILINX_AXI_ENET_CONTROL_STREAM(obj) \
-> > -     OBJECT_CHECK(XilinxAXIEnetStreamSlave, (obj),\
-> > +     OBJECT_CHECK(XilinxAXIEnetStreamSink, (obj),\
-> >       TYPE_XILINX_AXI_ENET_CONTROL_STREAM)
-> >  
-> >  /* Advertisement control register. */
-> > @@ -310,10 +310,10 @@ struct TEMAC  {
-> >      void *parent;
-> >  };
-> >  
-> > -typedef struct XilinxAXIEnetStreamSlave XilinxAXIEnetStreamSlave;
-> > +typedef struct XilinxAXIEnetStreamSink XilinxAXIEnetStreamSink;
-> >  typedef struct XilinxAXIEnet XilinxAXIEnet;
-> >  
-> > -struct XilinxAXIEnetStreamSlave {
-> > +struct XilinxAXIEnetStreamSink {
-> >      Object parent;
-> >  
-> >      struct XilinxAXIEnet *enet;
-> > @@ -325,8 +325,8 @@ struct XilinxAXIEnet {
-> >      qemu_irq irq;
-> >      StreamSink *tx_data_dev;
-> >      StreamSink *tx_control_dev;
-> > -    XilinxAXIEnetStreamSlave rx_data_dev;
-> > -    XilinxAXIEnetStreamSlave rx_control_dev;
-> > +    XilinxAXIEnetStreamSink rx_data_dev;
-> > +    XilinxAXIEnetStreamSink rx_control_dev;
-> >      NICState *nic;
-> >      NICConf conf;
-> >  
-> > @@ -859,7 +859,7 @@ xilinx_axienet_control_stream_push(StreamSink *obj, uint8_t *buf, size_t len,
-> >                                     bool eop)
-> >  {
-> >      int i;
-> > -    XilinxAXIEnetStreamSlave *cs = XILINX_AXI_ENET_CONTROL_STREAM(obj);
-> > +    XilinxAXIEnetStreamSink *cs = XILINX_AXI_ENET_CONTROL_STREAM(obj);
-> >      XilinxAXIEnet *s = cs->enet;
-> >  
-> >      assert(eop);
-> > @@ -880,7 +880,7 @@ static size_t
-> >  xilinx_axienet_data_stream_push(StreamSink *obj, uint8_t *buf, size_t size,
-> >                                  bool eop)
-> >  {
-> > -    XilinxAXIEnetStreamSlave *ds = XILINX_AXI_ENET_DATA_STREAM(obj);
-> > +    XilinxAXIEnetStreamSink *ds = XILINX_AXI_ENET_DATA_STREAM(obj);
-> >      XilinxAXIEnet *s = ds->enet;
-> >  
-> >      /* TX enable ?  */
-> > @@ -954,8 +954,8 @@ static NetClientInfo net_xilinx_enet_info = {
-> >  static void xilinx_enet_realize(DeviceState *dev, Error **errp)
-> >  {
-> >      XilinxAXIEnet *s = XILINX_AXI_ENET(dev);
-> > -    XilinxAXIEnetStreamSlave *ds = XILINX_AXI_ENET_DATA_STREAM(&s->rx_data_dev);
-> > -    XilinxAXIEnetStreamSlave *cs = XILINX_AXI_ENET_CONTROL_STREAM(
-> > +    XilinxAXIEnetStreamSink *ds = XILINX_AXI_ENET_DATA_STREAM(&s->rx_data_dev);
-> > +    XilinxAXIEnetStreamSink *cs = XILINX_AXI_ENET_CONTROL_STREAM(
-> >                                                              &s->rx_control_dev);
-> >  
-> >      object_property_add_link(OBJECT(ds), "enet", "xlnx.axi-ethernet",
-> > @@ -1046,7 +1046,7 @@ static const TypeInfo xilinx_enet_info = {
-> >  static const TypeInfo xilinx_enet_data_stream_info = {
-> >      .name          = TYPE_XILINX_AXI_ENET_DATA_STREAM,
-> >      .parent        = TYPE_OBJECT,
-> > -    .instance_size = sizeof(struct XilinxAXIEnetStreamSlave),
-> > +    .instance_size = sizeof(struct XilinxAXIEnetStreamSink),
-> >      .class_init    = xilinx_enet_data_stream_class_init,
-> >      .interfaces = (InterfaceInfo[]) {
-> >              { TYPE_STREAM_SINK },
-> > @@ -1057,7 +1057,7 @@ static const TypeInfo xilinx_enet_data_stream_info = {
-> >  static const TypeInfo xilinx_enet_control_stream_info = {
-> >      .name          = TYPE_XILINX_AXI_ENET_CONTROL_STREAM,
-> >      .parent        = TYPE_OBJECT,
-> > -    .instance_size = sizeof(struct XilinxAXIEnetStreamSlave),
-> > +    .instance_size = sizeof(struct XilinxAXIEnetStreamSink),
-> >      .class_init    = xilinx_enet_control_stream_class_init,
-> >      .interfaces = (InterfaceInfo[]) {
-> >              { TYPE_STREAM_SINK },
-> > 
-> 
-> Acked-by: Paolo Bonzini <pbonzini@redhat.com>
 
 
-Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+On 10.09.20 19:36, Andrew Jones wrote:
+> =
+
+> On Thu, Sep 10, 2020 at 06:42:43PM +0200, Alexander Graf wrote:
+>> We allow user space to set the PMCR register to any value. However,
+>> when time comes for a vcpu reset (for example on PSCI online), PMCR
+>> is reset to the hardware capabilities.
+>>
+>> I would like to explicitly expose different PMU capabilities (number
+>> of supported event counters) to the guest than hardware supports.
+>> Ideally across vcpu resets.
+>>
+>> So this patch adopts the reset path to only populate the immutable
+>> PMCR register bits from hardware when they were not initialized
+>> previously. This effectively means that on a normal reset, only the
+>> guest settable fields are reset, while on vcpu creation the register
+>> gets populated from hardware like before.
+>>
+>> With this in place and a change in user space to invoke SET_ONE_REG
+>> on the PMCR for every vcpu, I can reliably set the PMU event counter
+>> number to arbitrary values.
+>>
+>> Signed-off-by: Alexander Graf <graf@amazon.com>
+>> ---
+>>   arch/arm64/kvm/sys_regs.c | 9 ++++++++-
+>>   1 file changed, 8 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+>> index 20ab2a7d37ca..28f67550db7f 100644
+>> --- a/arch/arm64/kvm/sys_regs.c
+>> +++ b/arch/arm64/kvm/sys_regs.c
+>> @@ -663,7 +663,14 @@ static void reset_pmcr(struct kvm_vcpu *vcpu, const=
+ struct sys_reg_desc *r)
+>>   {
+>>        u64 pmcr, val;
+>>
+>> -     pmcr =3D read_sysreg(pmcr_el0);
+>> +     /*
+>> +      * If we already received PMCR from a previous ONE_REG call,
+>> +      * maintain its immutable flags
+>> +      */
+>> +     pmcr =3D __vcpu_sys_reg(vcpu, r->reg);
+>> +     if (!__vcpu_sys_reg(vcpu, r->reg))
+>> +             pmcr =3D read_sysreg(pmcr_el0);
+>> +
+>>        /*
+>>         * Writable bits of PMCR_EL0 (ARMV8_PMU_PMCR_MASK) are reset to U=
+NKNOWN
+>>         * except PMCR.E resetting to zero.
+>> --
+>> 2.16.4
+>>
+> =
+
+> Aha, a much simpler patch than I expected. With this approach we don't
+> need a get_user() function, or to use 'val', but don't we still want to
+> add sanity checks with a set_user() function? At least to ensure immutable
+> flags match and that PMCR_EL0.N isn't too big?
+
+We don't check for any flags today, so in a way adding checks would be =
+
+ABI breakage.
+
+And as Marc pointed out, all of the counters are basically virtual =
+
+through perf. So if you report 31 counters, you end up spawning 31 perf =
+
+counters which get multiplexed, so it would work (albeit not be terribly =
+
+accurate).
+
+That leaves identification bits as something we can check for. But do we =
+
+really have to? What's the worst thing that can happen? KVM user space =
+
+can shoot themselves in the foot. Well, they can also set PC to an =
+
+invalid value. If you do bad things you get bad results :). As long as =
+
+it's not a security risk, I'm not sure the benefits of checking outweigh =
+
+the risks.
+
+> Silently changing the user's input, which I see we also do for e.g. MPIDR,
+> isn't super user friendly.
+
+Yes :).
+
+
+Alex
+
+
+
+Amazon Development Center Germany GmbH
+Krausenstr. 38
+10117 Berlin
+Geschaeftsfuehrung: Christian Schlaeger, Jonathan Weiss
+Eingetragen am Amtsgericht Charlottenburg unter HRB 149173 B
+Sitz: Berlin
+Ust-ID: DE 289 237 879
+
+
 
