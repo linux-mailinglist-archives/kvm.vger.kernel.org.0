@@ -2,117 +2,108 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9C0BC266560
-	for <lists+kvm@lfdr.de>; Fri, 11 Sep 2020 19:00:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 74AFD26657A
+	for <lists+kvm@lfdr.de>; Fri, 11 Sep 2020 19:04:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726076AbgIKRAu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 11 Sep 2020 13:00:50 -0400
-Received: from mga18.intel.com ([134.134.136.126]:29787 "EHLO mga18.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725912AbgIKRAd (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 11 Sep 2020 13:00:33 -0400
-IronPort-SDR: xeIfXwOKJ55+S2qfKX6U1GBoK5yYcz1Rf1t0alMD7Mi4IQvWp0uhfsVeg85XOYlvtpv1WRgtW4
- Jpj3FzMyiw2w==
-X-IronPort-AV: E=McAfee;i="6000,8403,9741"; a="146534444"
-X-IronPort-AV: E=Sophos;i="5.76,416,1592895600"; 
-   d="scan'208";a="146534444"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Sep 2020 10:00:32 -0700
-IronPort-SDR: fv+8VPKXryTTqgxLsKuvHI/MEWiTXWPSgzWL0s+XUpDB1I05IjHj1/n5XnRhn/5TiuAjVdvYN2
- t/tYy52AIQlg==
-X-IronPort-AV: E=Sophos;i="5.76,416,1592895600"; 
-   d="scan'208";a="450048714"
-Received: from sjchrist-ice.jf.intel.com (HELO sjchrist-ice) ([10.54.31.34])
-  by orsmga004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Sep 2020 10:00:32 -0700
-Date:   Fri, 11 Sep 2020 10:00:31 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     "Michael S. Tsirkin" <mst@redhat.com>
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Peter Xu <peterx@redhat.com>, kvm@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Julia Suvorova <jsuvorov@redhat.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Andrew Jones <drjones@redhat.com>,
-        linux-kernel@vger.kernel.org, Gerd Hoffmann <kraxel@redhat.com>
-Subject: Re: [PATCH v2 0/3] KVM: x86: KVM_MEM_PCI_HOLE memory
-Message-ID: <20200911170031.GD4344@sjchrist-ice>
-References: <20200807141232.402895-1-vkuznets@redhat.com>
- <20200825212526.GC8235@xz-x1>
- <87eenlwoaa.fsf@vitty.brq.redhat.com>
- <20200901200021.GB3053@xz-x1>
- <877dtcpn9z.fsf@vitty.brq.redhat.com>
- <20200904061210.GA22435@sjchrist-ice>
- <20200904072905.vbkiq3h762fyzds6@sirius.home.kraxel.org>
- <20200904160008.GA2206@sjchrist-ice>
- <874koanfsc.fsf@vitty.brq.redhat.com>
- <20200907072829-mutt-send-email-mst@kernel.org>
+        id S1726330AbgIKRD4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 11 Sep 2020 13:03:56 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:23052 "EHLO
+        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726120AbgIKRDr (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 11 Sep 2020 13:03:47 -0400
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 08BH2K5u031709;
+        Fri, 11 Sep 2020 13:03:45 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : from : to : cc
+ : references : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=P2P6SDqZs3I1gUwsNVWBn5obbiKERcCnL+qPZ5JxI3g=;
+ b=OPmqlLab0fGh2ljWgyK/KzjAzoaVL12XujTMqxVmUvdzZQkrqlkBMh6IQ/CT3hI6wcuZ
+ 0KpR7XP8DGn9N2cWA2SvkWbSPO5IWQK9wzemkX1vZZwmeHMdVjGMUrsl/HagZ2Jrnb8j
+ OlCZZkJyKeMnx7wwfn+KM7rOV4O/LKPu/LZkLWhLbG8p13q9HCXtOYtONfEUW8nzbmAg
+ J9IulW5WJh5qF9x9wjuPg4S7KRU3LXxHdZ6c4jEss+OlkNsJ/1utFIvND+y/xKafBmMO
+ OwvwlQGeTtR5b0c6BsXJ/VrEsM6eOebVPA5ZeV31CbJpZVMdIQcbR29JdNfuprgPu7+Z Jw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 33gbbk3j3b-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 11 Sep 2020 13:03:45 -0400
+Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 08BH3KSs037389;
+        Fri, 11 Sep 2020 13:03:45 -0400
+Received: from ppma03dal.us.ibm.com (b.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.11])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 33gbbk3j31-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 11 Sep 2020 13:03:45 -0400
+Received: from pps.filterd (ppma03dal.us.ibm.com [127.0.0.1])
+        by ppma03dal.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 08BH2NMo023839;
+        Fri, 11 Sep 2020 17:03:44 GMT
+Received: from b03cxnp08026.gho.boulder.ibm.com (b03cxnp08026.gho.boulder.ibm.com [9.17.130.18])
+        by ppma03dal.us.ibm.com with ESMTP id 33c2a9wpy2-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 11 Sep 2020 17:03:44 +0000
+Received: from b03ledav006.gho.boulder.ibm.com (b03ledav006.gho.boulder.ibm.com [9.17.130.237])
+        by b03cxnp08026.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 08BH3bh438601170
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 11 Sep 2020 17:03:37 GMT
+Received: from b03ledav006.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id A2721C6057;
+        Fri, 11 Sep 2020 17:03:42 +0000 (GMT)
+Received: from b03ledav006.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 09D1EC605B;
+        Fri, 11 Sep 2020 17:03:41 +0000 (GMT)
+Received: from oc4221205838.ibm.com (unknown [9.211.91.207])
+        by b03ledav006.gho.boulder.ibm.com (Postfix) with ESMTP;
+        Fri, 11 Sep 2020 17:03:41 +0000 (GMT)
+Subject: Re: [PATCH] vfio iommu: Add dma limit capability
+From:   Matthew Rosato <mjrosato@linux.ibm.com>
+To:     alex.williamson@redhat.com, cohuck@redhat.com
+Cc:     pmorel@linux.ibm.com, schnelle@linux.ibm.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <1599842643-2553-1-git-send-email-mjrosato@linux.ibm.com>
+Message-ID: <01caedea-9cb3-a676-6f0e-2ea872ace84e@linux.ibm.com>
+Date:   Fri, 11 Sep 2020 13:03:41 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200907072829-mutt-send-email-mst@kernel.org>
-User-Agent: Mutt/1.9.4 (2018-02-28)
+In-Reply-To: <1599842643-2553-1-git-send-email-mjrosato@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
+ definitions=2020-09-11_08:2020-09-10,2020-09-11 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 phishscore=0
+ impostorscore=0 clxscore=1015 adultscore=0 mlxlogscore=999
+ priorityscore=1501 mlxscore=0 bulkscore=0 spamscore=0 malwarescore=0
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2006250000 definitions=main-2009110134
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Sep 07, 2020 at 07:32:23AM -0400, Michael S. Tsirkin wrote:
-> On Mon, Sep 07, 2020 at 10:37:39AM +0200, Vitaly Kuznetsov wrote:
-> > Sean Christopherson <sean.j.christopherson@intel.com> writes:
-> > 
-> > > On Fri, Sep 04, 2020 at 09:29:05AM +0200, Gerd Hoffmann wrote:
-> > >>   Hi,
-> > >> 
-> > >> > Unless I'm mistaken, microvm doesn't even support PCI, does it?
-> > >> 
-> > >> Correct, no pci support right now.
-> > >> 
-> > >> We could probably wire up ecam (arm/virt style) for pcie support, once
-> > >> the acpi support for mictovm finally landed (we need acpi for that
-> > >> because otherwise the kernel wouldn't find the pcie bus).
-> > >> 
-> > >> Question is whenever there is a good reason to do so.  Why would someone
-> > >> prefer microvm with pcie support over q35?
-> > >> 
-> > >> > If all of the above is true, this can be handled by adding "pci=lastbus=0"
-> > >> > as a guest kernel param to override its scanning of buses.  And couldn't
-> > >> > that be done by QEMU's microvm_fix_kernel_cmdline() to make it transparent
-> > >> > to the end user?
-> > >> 
-> > >> microvm_fix_kernel_cmdline() is a hack, not a solution.
-> > >> 
-> > >> Beside that I doubt this has much of an effect on microvm because
-> > >> it doesn't support pcie in the first place.
-> > >
-> > > I am so confused.  Vitaly, can you clarify exactly what QEMU VM type this
-> > > series is intended to help?  If this is for microvm, then why is the guest
-> > > doing PCI scanning in the first place?  If it's for q35, why is the
-> > > justification for microvm-like workloads?
-> > 
-> > I'm not exactly sure about the plans for particular machine types, the
-> > intention was to use this for pcie in QEMU in general so whatever
-> > machine type uses pcie will benefit. 
-> > 
-> > Now, it seems that we have a more sophisticated landscape. The
-> > optimization will only make sense to speed up boot so all 'traditional'
-> > VM types with 'traditional' firmware are out of
-> > question. 'Container-like' VMs seem to avoid PCI for now, I'm not sure
-> > if it's because they're in early stages of their development, because
-> > they can get away without PCI or, actually, because of slowness at boot
-> > (which we're trying to tackle with this feature). I'd definitely like to
-> > hear more what people think about this.
+On 9/11/20 12:44 PM, Matthew Rosato wrote:
+> Commit 492855939bdb ("vfio/type1: Limit DMA mappings per container") added
+> a limit to the number of concurrent DMA requests for a vfio container.
+> However, lazy unmapping in s390 can in fact cause quite a large number of
+> outstanding DMA requests to build up prior to being purged, potentially
+> the entire guest DMA space.  This results in unexpected 'VFIO_MAP_DMA
+> failed: No space left on device' conditions seen in QEMU.
 > 
-> I suspect microvms will need pci eventually. I would much rather KVM
-> had an exit-less discovery mechanism in place by then because
-> learning from history if it doesn't they will do some kind of
-> hack on the kernel command line, and everyone will be stuck
-> supporting that for years ...
+> This patch proposes to provide the DMA limit via the VFIO_IOMMU_GET_INFO
+> ioctl as a new capability.  A subsequent patchset to QEMU would collect
+> this information and use it in s390 PCI support to tap the guest on the
+> shoulder before overrunning the vfio limit.
+> 
 
-Is it not an option for the VMM to "accurately" enumerate the number of buses?
-E.g. if the VMM has devices on only bus 0, then enumerate that there is one
-bus so that the guest doesn't try and probe devices that can't possibly exist.
-Or is that completely non-sensical and/or violate PCIe spec?
+Link to the QEMU patchset:
+https://lists.gnu.org/archive/html/qemu-devel/2020-09/msg04322.html
+
+> Matthew Rosato (1):
+>    vfio iommu: Add dma limit capability
+> 
+>   drivers/vfio/vfio_iommu_type1.c | 17 +++++++++++++++++
+>   include/uapi/linux/vfio.h       | 16 ++++++++++++++++
+>   2 files changed, 33 insertions(+)
+> 
+
