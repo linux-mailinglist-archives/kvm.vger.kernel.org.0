@@ -2,117 +2,117 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id ED5872665FC
-	for <lists+kvm@lfdr.de>; Fri, 11 Sep 2020 19:19:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9C0BC266560
+	for <lists+kvm@lfdr.de>; Fri, 11 Sep 2020 19:00:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725937AbgIKRT3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 11 Sep 2020 13:19:29 -0400
-Received: from smtp-fw-9102.amazon.com ([207.171.184.29]:28123 "EHLO
-        smtp-fw-9102.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726138AbgIKO6W (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 11 Sep 2020 10:58:22 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1599836302; x=1631372302;
-  h=subject:from:to:cc:references:message-id:date:
-   mime-version:in-reply-to:content-transfer-encoding;
-  bh=Zo2DwoqnHvBuH56xIWns6eaxEfl/ZPGVsEI+Qq68jw0=;
-  b=Flkd2/CG+0SfTbwDHRRTUWIArXHtEQ5q6UDymdJhml3rrP3zpgQpFJ1q
-   zamRdDIenlUBOjX6cTDJ1J0gDSKkKSc3RTMBexZpWbgjZ7NYQh6JoSHKW
-   6TCih1Zis1jm2MrgJT2QoA3b5bEYvTIxsz8tf2+RJhT+5EgoW3G+pcsgy
-   k=;
-X-IronPort-AV: E=Sophos;i="5.76,415,1592870400"; 
-   d="scan'208";a="75441519"
-Received: from sea32-co-svc-lb4-vlan3.sea.corp.amazon.com (HELO email-inbound-relay-1d-37fd6b3d.us-east-1.amazon.com) ([10.47.23.38])
-  by smtp-border-fw-out-9102.sea19.amazon.com with ESMTP; 11 Sep 2020 14:56:34 +0000
-Received: from EX13D16EUB001.ant.amazon.com (iad12-ws-svc-p26-lb9-vlan3.iad.amazon.com [10.40.163.38])
-        by email-inbound-relay-1d-37fd6b3d.us-east-1.amazon.com (Postfix) with ESMTPS id 1CD94282592;
-        Fri, 11 Sep 2020 14:56:30 +0000 (UTC)
-Received: from 38f9d34ed3b1.ant.amazon.com (10.43.160.244) by
- EX13D16EUB001.ant.amazon.com (10.43.166.28) with Microsoft SMTP Server (TLS)
- id 15.0.1497.2; Fri, 11 Sep 2020 14:56:22 +0000
-Subject: Re: [PATCH v8 17/18] nitro_enclaves: Add overview documentation
-From:   "Paraschiv, Andra-Irina" <andraprs@amazon.com>
-To:     Greg KH <gregkh@linuxfoundation.org>
-CC:     linux-kernel <linux-kernel@vger.kernel.org>,
-        Anthony Liguori <aliguori@amazon.com>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Colm MacCarthaigh <colmmacc@amazon.com>,
-        David Duncan <davdunc@amazon.com>,
-        Bjoern Doebel <doebel@amazon.de>,
-        David Woodhouse <dwmw@amazon.co.uk>,
-        "Frank van der Linden" <fllinden@amazon.com>,
-        Alexander Graf <graf@amazon.de>,
-        "Karen Noel" <knoel@redhat.com>,
-        Martin Pohlack <mpohlack@amazon.de>,
-        Matt Wilson <msw@amazon.com>,
+        id S1726076AbgIKRAu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 11 Sep 2020 13:00:50 -0400
+Received: from mga18.intel.com ([134.134.136.126]:29787 "EHLO mga18.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725912AbgIKRAd (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 11 Sep 2020 13:00:33 -0400
+IronPort-SDR: xeIfXwOKJ55+S2qfKX6U1GBoK5yYcz1Rf1t0alMD7Mi4IQvWp0uhfsVeg85XOYlvtpv1WRgtW4
+ Jpj3FzMyiw2w==
+X-IronPort-AV: E=McAfee;i="6000,8403,9741"; a="146534444"
+X-IronPort-AV: E=Sophos;i="5.76,416,1592895600"; 
+   d="scan'208";a="146534444"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Sep 2020 10:00:32 -0700
+IronPort-SDR: fv+8VPKXryTTqgxLsKuvHI/MEWiTXWPSgzWL0s+XUpDB1I05IjHj1/n5XnRhn/5TiuAjVdvYN2
+ t/tYy52AIQlg==
+X-IronPort-AV: E=Sophos;i="5.76,416,1592895600"; 
+   d="scan'208";a="450048714"
+Received: from sjchrist-ice.jf.intel.com (HELO sjchrist-ice) ([10.54.31.34])
+  by orsmga004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Sep 2020 10:00:32 -0700
+Date:   Fri, 11 Sep 2020 10:00:31 -0700
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     "Michael S. Tsirkin" <mst@redhat.com>
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Peter Xu <peterx@redhat.com>, kvm@vger.kernel.org,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Balbir Singh <sblbir@amazon.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        "Stefan Hajnoczi" <stefanha@redhat.com>,
-        Stewart Smith <trawets@amazon.com>,
-        "Uwe Dannowski" <uwed@amazon.de>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        kvm <kvm@vger.kernel.org>,
-        ne-devel-upstream <ne-devel-upstream@amazon.com>
-References: <20200904173718.64857-1-andraprs@amazon.com>
- <20200904173718.64857-18-andraprs@amazon.com>
- <20200907090126.GD1101646@kroah.com>
- <44a8a921-1fb4-87ab-b8f2-c168c615dbbd@amazon.com>
- <20200907140803.GA3719869@kroah.com>
- <b8a1e66c-7674-7354-599e-159efd260ba9@amazon.com>
-Message-ID: <310abd0d-60e7-a52c-fcae-cf98ac474e32@amazon.com>
-Date:   Fri, 11 Sep 2020 17:56:10 +0300
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:78.0)
- Gecko/20100101 Thunderbird/78.2.1
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Julia Suvorova <jsuvorov@redhat.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Andrew Jones <drjones@redhat.com>,
+        linux-kernel@vger.kernel.org, Gerd Hoffmann <kraxel@redhat.com>
+Subject: Re: [PATCH v2 0/3] KVM: x86: KVM_MEM_PCI_HOLE memory
+Message-ID: <20200911170031.GD4344@sjchrist-ice>
+References: <20200807141232.402895-1-vkuznets@redhat.com>
+ <20200825212526.GC8235@xz-x1>
+ <87eenlwoaa.fsf@vitty.brq.redhat.com>
+ <20200901200021.GB3053@xz-x1>
+ <877dtcpn9z.fsf@vitty.brq.redhat.com>
+ <20200904061210.GA22435@sjchrist-ice>
+ <20200904072905.vbkiq3h762fyzds6@sirius.home.kraxel.org>
+ <20200904160008.GA2206@sjchrist-ice>
+ <874koanfsc.fsf@vitty.brq.redhat.com>
+ <20200907072829-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <b8a1e66c-7674-7354-599e-159efd260ba9@amazon.com>
-Content-Language: en-US
-X-Originating-IP: [10.43.160.244]
-X-ClientProxiedBy: EX13D42UWA001.ant.amazon.com (10.43.160.153) To
- EX13D16EUB001.ant.amazon.com (10.43.166.28)
-Content-Type: text/plain; charset="utf-8"; format="flowed"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200907072829-mutt-send-email-mst@kernel.org>
+User-Agent: Mutt/1.9.4 (2018-02-28)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-CgpPbiAwNy8wOS8yMDIwIDE4OjEzLCBQYXJhc2NoaXYsIEFuZHJhLUlyaW5hIHdyb3RlOgo+Cj4K
-PiBPbiAwNy8wOS8yMDIwIDE3OjA4LCBHcmVnIEtIIHdyb3RlOgo+PiBPbiBNb24sIFNlcCAwNywg
-MjAyMCBhdCAwNDo0MzoxMVBNICswMzAwLCBQYXJhc2NoaXYsIEFuZHJhLUlyaW5hIHdyb3RlOgo+
-Pj4KPj4+IE9uIDA3LzA5LzIwMjAgMTI6MDEsIEdyZWcgS0ggd3JvdGU6Cj4+Pj4gT24gRnJpLCBT
-ZXAgMDQsIDIwMjAgYXQgMDg6Mzc6MTdQTSArMDMwMCwgQW5kcmEgUGFyYXNjaGl2IHdyb3RlOgo+
-Pj4+PiBTaWduZWQtb2ZmLWJ5OiBBbmRyYSBQYXJhc2NoaXYgPGFuZHJhcHJzQGFtYXpvbi5jb20+
-Cj4+Pj4+IFJldmlld2VkLWJ5OiBBbGV4YW5kZXIgR3JhZiA8Z3JhZkBhbWF6b24uY29tPgo+Pj4+
-PiAtLS0KPj4+Pj4gQ2hhbmdlbG9nCj4+Pj4+Cj4+Pj4+IHY3IC0+IHY4Cj4+Pj4+Cj4+Pj4+ICog
-QWRkIGluZm8gYWJvdXQgdGhlIHByaW1hcnkgLyBwYXJlbnQgVk0gQ0lEIHZhbHVlLgo+Pj4+PiAq
-IFVwZGF0ZSByZWZlcmVuY2UgbGluayBmb3IgaHVnZSBwYWdlcy4KPj4+Pj4gKiBBZGQgcmVmZXJl
-bmNlIGxpbmsgZm9yIHRoZSB4ODYgYm9vdCBwcm90b2NvbC4KPj4+Pj4gKiBBZGQgbGljZW5zZSBt
-ZW50aW9uIGFuZCB1cGRhdGUgZG9jIHRpdGxlIC8gY2hhcHRlciBmb3JtYXR0aW5nLgo+Pj4+Pgo+
-Pj4+PiB2NiAtPiB2Nwo+Pj4+Pgo+Pj4+PiAqIE5vIGNoYW5nZXMuCj4+Pj4+Cj4+Pj4+IHY1IC0+
-IHY2Cj4+Pj4+Cj4+Pj4+ICogTm8gY2hhbmdlcy4KPj4+Pj4KPj4+Pj4gdjQgLT4gdjUKPj4+Pj4K
-Pj4+Pj4gKiBObyBjaGFuZ2VzLgo+Pj4+Pgo+Pj4+PiB2MyAtPiB2NAo+Pj4+Pgo+Pj4+PiAqIFVw
-ZGF0ZSBkb2MgdHlwZSBmcm9tIC50eHQgdG8gLnJzdC4KPj4+Pj4gKiBVcGRhdGUgZG9jdW1lbnRh
-dGlvbiBiYXNlZCBvbiB0aGUgY2hhbmdlcyBmcm9tIHY0Lgo+Pj4+Pgo+Pj4+PiB2MiAtPiB2Mwo+
-Pj4+Pgo+Pj4+PiAqIE5vIGNoYW5nZXMuCj4+Pj4+Cj4+Pj4+IHYxIC0+IHYyCj4+Pj4+Cj4+Pj4+
-ICogTmV3IGluIHYyLgo+Pj4+PiAtLS0KPj4+Pj4gwqDCoCBEb2N1bWVudGF0aW9uL25pdHJvX2Vu
-Y2xhdmVzL25lX292ZXJ2aWV3LnJzdCB8IDk1IAo+Pj4+PiArKysrKysrKysrKysrKysrKysrKwo+
-Pj4+PiDCoMKgIDEgZmlsZSBjaGFuZ2VkLCA5NSBpbnNlcnRpb25zKCspCj4+Pj4+IMKgwqAgY3Jl
-YXRlIG1vZGUgMTAwNjQ0IERvY3VtZW50YXRpb24vbml0cm9fZW5jbGF2ZXMvbmVfb3ZlcnZpZXcu
-cnN0Cj4+Pj4gQSB3aG9sZSBuZXcgc3ViZGlyLCBmb3IgYSBzaW5nbGUgZHJpdmVyLCBhbmQgbm90
-IHRpZWQgaW50byB0aGUga2VybmVsCj4+Pj4gZG9jdW1lbnRhdGlvbiBidWlsZCBwcm9jZXNzIGF0
-IGFsbD/CoCBOb3QgZ29vZCA6KAo+Pj4+Cj4+PiBXb3VsZCB0aGUgInZpcnQiIGRpcmVjdG9yeSBi
-ZSBhIGJldHRlciBvcHRpb24gZm9yIHRoaXMgZG9jIGZpbGU/Cj4+IFllcy4KPgo+IEFscmlnaHQs
-IEknbGwgdXBkYXRlIHRoZSBkb2MgZmlsZSBsb2NhdGlvbiwgdGhlIGluZGV4IGZpbGUgYW5kIHRo
-ZSAKPiBNQUlOVEFJTkVSUyBlbnRyeSB0byByZWZsZWN0IHRoZSBuZXcgZG9jIGZpbGUgbG9jYXRp
-b24uCj4KCkkgc2VudCBvdXQgYSBuZXcgcmV2aXNpb24gdGhhdCBpbmNsdWRlcyB0aGUgdXBkYXRl
-cyBiYXNlZCBvbiB5b3VyIApmZWVkYmFjay4gVGhhbmtzIGZvciByZXZpZXcuCgpUbyBiZSBhd2Fy
-ZSBvZiB0aGlzIGJlZm9yZWhhbmQsIHdoYXQgd291bGQgYmUgdGhlIGZ1cnRoZXIgbmVjZXNzYXJ5
-IApzdGVwcyAoZS5nLiBsaW51eC1uZXh0IGJyYW5jaCwgYWRkaXRpb25hbCByZXZpZXcgYW5kIC8g
-b3Igc2FuaXR5IGNoZWNrcykgCnRvIGNvbnNpZGVyIGZvciB0YXJnZXRpbmcgdGhlIG5leHQgbWVy
-Z2Ugd2luZG93PwoKVGhhbmtzLApBbmRyYQoKCgpBbWF6b24gRGV2ZWxvcG1lbnQgQ2VudGVyIChS
-b21hbmlhKSBTLlIuTC4gcmVnaXN0ZXJlZCBvZmZpY2U6IDI3QSBTZi4gTGF6YXIgU3RyZWV0LCBV
-QkM1LCBmbG9vciAyLCBJYXNpLCBJYXNpIENvdW50eSwgNzAwMDQ1LCBSb21hbmlhLiBSZWdpc3Rl
-cmVkIGluIFJvbWFuaWEuIFJlZ2lzdHJhdGlvbiBudW1iZXIgSjIyLzI2MjEvMjAwNS4K
+On Mon, Sep 07, 2020 at 07:32:23AM -0400, Michael S. Tsirkin wrote:
+> On Mon, Sep 07, 2020 at 10:37:39AM +0200, Vitaly Kuznetsov wrote:
+> > Sean Christopherson <sean.j.christopherson@intel.com> writes:
+> > 
+> > > On Fri, Sep 04, 2020 at 09:29:05AM +0200, Gerd Hoffmann wrote:
+> > >>   Hi,
+> > >> 
+> > >> > Unless I'm mistaken, microvm doesn't even support PCI, does it?
+> > >> 
+> > >> Correct, no pci support right now.
+> > >> 
+> > >> We could probably wire up ecam (arm/virt style) for pcie support, once
+> > >> the acpi support for mictovm finally landed (we need acpi for that
+> > >> because otherwise the kernel wouldn't find the pcie bus).
+> > >> 
+> > >> Question is whenever there is a good reason to do so.  Why would someone
+> > >> prefer microvm with pcie support over q35?
+> > >> 
+> > >> > If all of the above is true, this can be handled by adding "pci=lastbus=0"
+> > >> > as a guest kernel param to override its scanning of buses.  And couldn't
+> > >> > that be done by QEMU's microvm_fix_kernel_cmdline() to make it transparent
+> > >> > to the end user?
+> > >> 
+> > >> microvm_fix_kernel_cmdline() is a hack, not a solution.
+> > >> 
+> > >> Beside that I doubt this has much of an effect on microvm because
+> > >> it doesn't support pcie in the first place.
+> > >
+> > > I am so confused.  Vitaly, can you clarify exactly what QEMU VM type this
+> > > series is intended to help?  If this is for microvm, then why is the guest
+> > > doing PCI scanning in the first place?  If it's for q35, why is the
+> > > justification for microvm-like workloads?
+> > 
+> > I'm not exactly sure about the plans for particular machine types, the
+> > intention was to use this for pcie in QEMU in general so whatever
+> > machine type uses pcie will benefit. 
+> > 
+> > Now, it seems that we have a more sophisticated landscape. The
+> > optimization will only make sense to speed up boot so all 'traditional'
+> > VM types with 'traditional' firmware are out of
+> > question. 'Container-like' VMs seem to avoid PCI for now, I'm not sure
+> > if it's because they're in early stages of their development, because
+> > they can get away without PCI or, actually, because of slowness at boot
+> > (which we're trying to tackle with this feature). I'd definitely like to
+> > hear more what people think about this.
+> 
+> I suspect microvms will need pci eventually. I would much rather KVM
+> had an exit-less discovery mechanism in place by then because
+> learning from history if it doesn't they will do some kind of
+> hack on the kernel command line, and everyone will be stuck
+> supporting that for years ...
 
+Is it not an option for the VMM to "accurately" enumerate the number of buses?
+E.g. if the VMM has devices on only bus 0, then enumerate that there is one
+bus so that the guest doesn't try and probe devices that can't possibly exist.
+Or is that completely non-sensical and/or violate PCIe spec?
