@@ -2,149 +2,140 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id ABD042665B0
-	for <lists+kvm@lfdr.de>; Fri, 11 Sep 2020 19:10:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 75EFF2665AE
+	for <lists+kvm@lfdr.de>; Fri, 11 Sep 2020 19:10:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726253AbgIKRKu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 11 Sep 2020 13:10:50 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:21499 "EHLO
+        id S1726339AbgIKRJr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 11 Sep 2020 13:09:47 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:51010 "EHLO
         us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726269AbgIKRJZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 11 Sep 2020 13:09:25 -0400
+        with ESMTP id S1726325AbgIKRJe (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 11 Sep 2020 13:09:34 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1599844161;
+        s=mimecast20190719; t=1599844172;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=IBAi79BCgUQb7x/kKKWXp+YbGm17WGXJqEsuMSZt9FU=;
-        b=YBCLjIGoxtDXAb5rWkZkyZWw1ZCUmMjbJX7Lku6Dq8uM9Pt7+fOlQwFrifvfQOBcvez/Lv
-        Z0r1ATeMe56Oduioe0Pyh4jiyd0hVTFR886HYGWCX7aKVQpeT/lheKHfhug3gjmTYs2vpd
-        BNDjRaIyMkFlsIVE2D0lnrLn351lH/4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-359-iPkZEvIvNi2wiRD5ZAqcvA-1; Fri, 11 Sep 2020 13:09:17 -0400
-X-MC-Unique: iPkZEvIvNi2wiRD5ZAqcvA-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6466C10BBEDF;
-        Fri, 11 Sep 2020 17:09:16 +0000 (UTC)
-Received: from w520.home (ovpn-112-71.phx2.redhat.com [10.3.112.71])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id E63045C1BD;
-        Fri, 11 Sep 2020 17:09:15 +0000 (UTC)
-Date:   Fri, 11 Sep 2020 11:09:15 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Matthew Rosato <mjrosato@linux.ibm.com>
-Cc:     cohuck@redhat.com, pmorel@linux.ibm.com, schnelle@linux.ibm.com,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] vfio iommu: Add dma limit capability
-Message-ID: <20200911110915.13302afa@w520.home>
-In-Reply-To: <1599842643-2553-2-git-send-email-mjrosato@linux.ibm.com>
-References: <1599842643-2553-1-git-send-email-mjrosato@linux.ibm.com>
-        <1599842643-2553-2-git-send-email-mjrosato@linux.ibm.com>
+        bh=T4JkIThZtF0RdLNQoUDiKXmb6/K82XCLQ+U784yJ8XQ=;
+        b=F9ZUZWFUZjo8kEwRxJ8VV35BtpY/mTbRr+mJyFFRjhCrhPYVpkT1pZs+6PFZdlXv4+x3nf
+        3O0vOT2SJgKVmHU0D6IDrNaSG1osUsTpN2VJOqg1QiVJ2C26N92tlnaQhLUGzztkeExV77
+        5bKZ/755wOAw3nqRXdWBpBVXyHw5VHU=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-556-wtvWYRXIOdO4ovj_Pq1a1Q-1; Fri, 11 Sep 2020 13:09:31 -0400
+X-MC-Unique: wtvWYRXIOdO4ovj_Pq1a1Q-1
+Received: by mail-wm1-f69.google.com with SMTP id 189so1603154wme.5
+        for <kvm@vger.kernel.org>; Fri, 11 Sep 2020 10:09:31 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=T4JkIThZtF0RdLNQoUDiKXmb6/K82XCLQ+U784yJ8XQ=;
+        b=cl3luibhKGhgE/8cpcEqrkm5VNMzKiG22VP7LST4T0/WzOP95XSAoC0vmsE12W2/78
+         et+UOYZvoyfBFIcdS29ROcOUQ7N+vK5zOcHNJmY5QvQSpnLE33K7aiab9Akgnjy9VylI
+         gPIg5Rsth1HH2MpBSZwgahWaFrMI9Yj6FI/5h/jBu5Wj+WMTsrpomJ8wZzyL5xE64kW3
+         8wW15h+kOEbP+xuAknCtSX5F2dJzSHQLeq26cHZARyPgG2aFyBkiAsRhS5U9NTUsaB7A
+         osp6BWz4uZOrYJWprlF96a08swebPlZ+bqK6puQAQsSYz++DcvLTGE1lGAdb5zifJjaQ
+         cOJA==
+X-Gm-Message-State: AOAM532cGZWcYUPzPO3iHGRKMyve0E4kzpp7d/+m85XGhvhmM+r+feeC
+        1VMqznzXMQxqjFZ01j3BvmIm09NCpaGGKnSx66TTjhYJyMfmUPsO9JqRbPSxsEO7+cj5ixgCSOJ
+        PALkUVNWcczto
+X-Received: by 2002:adf:dc47:: with SMTP id m7mr3015657wrj.100.1599844169876;
+        Fri, 11 Sep 2020 10:09:29 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwczH9Dx0QGmo22EabGrVoHI/zSCsT2tl8ywMWc8JG8GxewXLpB+lnrqf4g6SwjPrJb6CVimw==
+X-Received: by 2002:adf:dc47:: with SMTP id m7mr3015629wrj.100.1599844169608;
+        Fri, 11 Sep 2020 10:09:29 -0700 (PDT)
+Received: from [192.168.10.150] ([93.56.170.5])
+        by smtp.gmail.com with ESMTPSA id g12sm5838009wro.89.2020.09.11.10.09.28
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 11 Sep 2020 10:09:29 -0700 (PDT)
+Subject: Re: [PATCH 3/5] KVM: nVMX: Update VMX controls MSR according to guest
+ CPUID after setting VMX MSRs
+To:     Jim Mattson <jmattson@google.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     Chenyi Qiang <chenyi.qiang@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Xiaoyao Li <xiaoyao.li@intel.com>,
+        kvm list <kvm@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>
+References: <20200828085622.8365-1-chenyi.qiang@intel.com>
+ <20200828085622.8365-4-chenyi.qiang@intel.com>
+ <CALMp9eT1makVq46TB-EtTPiz=Z_2DfhudJekrtheSsmwBc4pZA@mail.gmail.com>
+ <20200902181654.GH11695@sjchrist-ice>
+ <CALMp9eSv3SrsJigB6KQg+dyS9GmYYCbC5v6QCx3f09951VZidA@mail.gmail.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <48fd0fd9-97b4-471e-d8e8-628f51dcdeff@redhat.com>
+Date:   Fri, 11 Sep 2020 19:09:27 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <CALMp9eSv3SrsJigB6KQg+dyS9GmYYCbC5v6QCx3f09951VZidA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 11 Sep 2020 12:44:03 -0400
-Matthew Rosato <mjrosato@linux.ibm.com> wrote:
-
-> Commit 492855939bdb ("vfio/type1: Limit DMA mappings per container")
-> added the ability to limit the number of memory backed DMA mappings.
-> However on s390x, when lazy mapping is in use, we use a very large
-> number of concurrent mappings.  Let's provide the limitation to
-> userspace via the IOMMU info chain so that userspace can take
-> appropriate mitigation.
+On 02/09/20 20:32, Jim Mattson wrote:
 > 
-> Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
-> ---
->  drivers/vfio/vfio_iommu_type1.c | 17 +++++++++++++++++
->  include/uapi/linux/vfio.h       | 16 ++++++++++++++++
->  2 files changed, 33 insertions(+)
+> /* If not VM_EXIT_CLEAR_BNDCFGS, the L2 value propagates to L1.  */
+> if (vmcs12->vm_exit_controls & VM_EXIT_CLEAR_BNDCFGS)
+>         vmcs_write64(GUEST_BNDCFGS, 0);
 > 
-> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-> index 5fbf0c1..573c2c9 100644
-> --- a/drivers/vfio/vfio_iommu_type1.c
-> +++ b/drivers/vfio/vfio_iommu_type1.c
-> @@ -2609,6 +2609,20 @@ static int vfio_iommu_migration_build_caps(struct vfio_iommu *iommu,
->  	return vfio_info_add_capability(caps, &cap_mig.header, sizeof(cap_mig));
->  }
->  
-> +static int vfio_iommu_dma_limit_build_caps(struct vfio_iommu *iommu,
-> +					   struct vfio_info_cap *caps)
-> +{
-> +	struct vfio_iommu_type1_info_dma_limit cap_dma_limit;
-> +
-> +	cap_dma_limit.header.id = VFIO_IOMMU_TYPE1_INFO_DMA_LIMIT;
-> +	cap_dma_limit.header.version = 1;
-> +
-> +	cap_dma_limit.max = dma_entry_limit;
+> BTW, where does the L2 value propagate to L1 if not VM_EXIT_CLEAR_BNDCFGS?
+
+Hmm, nowhere. :/  Probably something like this (not really thought through):
+
+diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+index 1e903d51912b..aba76aa99465 100644
+--- a/arch/x86/kvm/vmx/nested.c
++++ b/arch/x86/kvm/vmx/nested.c
+@@ -3317,7 +3317,8 @@ enum nvmx_vmentry_status nested_vmx_enter_non_root_mode(struct kvm_vcpu *vcpu,
+ 	if (!(vmcs12->vm_entry_controls & VM_ENTRY_LOAD_DEBUG_CONTROLS))
+ 		vmx->nested.vmcs01_debugctl = vmcs_read64(GUEST_IA32_DEBUGCTL);
+ 	if (kvm_mpx_supported() &&
+-		!(vmcs12->vm_entry_controls & VM_ENTRY_LOAD_BNDCFGS))
++	    (!(vmcs12->vm_entry_controls & VM_ENTRY_LOAD_BNDCFGS) ||
++	     !(vmcs12->vm_exit_controls & VM_EXIT_CLEAR_BNDCFGS)))
+ 		vmx->nested.vmcs01_guest_bndcfgs = vmcs_read64(GUEST_BNDCFGS);
+ 
+ 	/*
+@@ -4186,9 +4187,12 @@ static void load_vmcs12_host_state(struct kvm_vcpu *vcpu,
+ 	vmcs_write32(GUEST_IDTR_LIMIT, 0xFFFF);
+ 	vmcs_write32(GUEST_GDTR_LIMIT, 0xFFFF);
+ 
+-	/* If not VM_EXIT_CLEAR_BNDCFGS, the L2 value propagates to L1.  */
+-	if (vmcs12->vm_exit_controls & VM_EXIT_CLEAR_BNDCFGS)
+-		vmcs_write64(GUEST_BNDCFGS, 0);
++	if (kvm_mpx_supported()) {
++		if (vmcs12->vm_exit_controls & VM_EXIT_CLEAR_BNDCFGS)
++			vmcs_write64(GUEST_BNDCFGS, 0);
++		else
++			vmcs_write64(GUEST_BNDCFGS, vmx->nested.vmcs01_guest_bndcfgs);
++	}
+ 
+ 	if (vmcs12->vm_exit_controls & VM_EXIT_LOAD_IA32_PAT) {
+ 		vmcs_write64(GUEST_IA32_PAT, vmcs12->host_ia32_pat);
+@@ -4466,6 +4470,10 @@ void nested_vmx_vmexit(struct kvm_vcpu *vcpu, u32 vm_exit_reason,
+ 		vmx_set_virtual_apic_mode(vcpu);
+ 	}
+ 
++	/* If not VM_EXIT_CLEAR_BNDCFGS, the L2 value propagates to L1.  */
++	if (!(vmcs12->vm_exit_controls & VM_EXIT_CLEAR_BNDCFGS))
++		vmx->nested.vmcs01_guest_bndcfgs = vmcs12->guest_bndcfgs;
++
+ 	/* Unpin physical memory we referred to in vmcs02 */
+ 	if (vmx->nested.apic_access_page) {
+ 		kvm_release_page_clean(vmx->nested.apic_access_page);
 
 
-I think you want to report iommu->dma_avail, which might change the
-naming and semantics of the capability a bit.  dma_entry_limit is a
-writable module param, so the current value might not be relevant to
-this container at the time that it's read.  When a container is opened
-we set iommu->dma_avail to the current dma_entry_limit, therefore later
-modifications of dma_entry_limit are only relevant to subsequent
-containers.
+which will also work in the failed vmentry case.
 
-It seems like there are additional benefits to reporting available dma
-entries as well, for example on mapping failure userspace could
-reevaluate, perhaps even validate usage counts between kernel and user.
-Thanks,
-
-Alex
-
-> +
-> +	return vfio_info_add_capability(caps, &cap_dma_limit.header,
-> +					sizeof(cap_dma_limit));
-> +}
-> +
->  static int vfio_iommu_type1_get_info(struct vfio_iommu *iommu,
->  				     unsigned long arg)
->  {
-> @@ -2642,6 +2656,9 @@ static int vfio_iommu_type1_get_info(struct vfio_iommu *iommu,
->  	ret = vfio_iommu_migration_build_caps(iommu, &caps);
->  
->  	if (!ret)
-> +		ret = vfio_iommu_dma_limit_build_caps(iommu, &caps);
-> +
-> +	if (!ret)
->  		ret = vfio_iommu_iova_build_caps(iommu, &caps);
->  
->  	mutex_unlock(&iommu->lock);
-> diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
-> index 9204705..c91e471 100644
-> --- a/include/uapi/linux/vfio.h
-> +++ b/include/uapi/linux/vfio.h
-> @@ -1039,6 +1039,22 @@ struct vfio_iommu_type1_info_cap_migration {
->  	__u64	max_dirty_bitmap_size;		/* in bytes */
->  };
->  
-> +/*
-> + * The DMA limit capability allows to report the number of simultaneously
-> + * outstanding DMA mappings are supported.
-> + *
-> + * The structures below define version 1 of this capability.
-> + *
-> + * max: specifies the maximum number of outstanding DMA mappings allowed.
-> + */
-> +#define VFIO_IOMMU_TYPE1_INFO_DMA_LIMIT 3
-> +
-> +struct vfio_iommu_type1_info_dma_limit {
-> +	struct	vfio_info_cap_header header;
-> +	__u32	max;
-> +};
-> +
-> +
->  #define VFIO_IOMMU_GET_INFO _IO(VFIO_TYPE, VFIO_BASE + 12)
->  
->  /**
+Paolo
 
