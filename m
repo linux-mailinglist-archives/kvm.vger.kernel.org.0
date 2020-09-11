@@ -2,114 +2,126 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7253F2662E2
-	for <lists+kvm@lfdr.de>; Fri, 11 Sep 2020 18:06:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F256F26637F
+	for <lists+kvm@lfdr.de>; Fri, 11 Sep 2020 18:18:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726074AbgIKQFk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 11 Sep 2020 12:05:40 -0400
-Received: from mga14.intel.com ([192.55.52.115]:51191 "EHLO mga14.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726184AbgIKQFV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 11 Sep 2020 12:05:21 -0400
-IronPort-SDR: kys1aNcFhmZQPIqPTrk5KaDVrHUYPSrSXKkYEtlyYKFzAq8h38KpklnrtuP71OKO184uPDrl3H
- /7s7Baih+6Gw==
-X-IronPort-AV: E=McAfee;i="6000,8403,9741"; a="158071546"
-X-IronPort-AV: E=Sophos;i="5.76,416,1592895600"; 
-   d="scan'208";a="158071546"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Sep 2020 09:05:01 -0700
-IronPort-SDR: J+uNvfXjsVKPaULLRObScXcXxC0aGVPmjVazhcEikrkeaQMnXn5rWg+TG/LI7fzWiTyQbwEHmM
- 2PCEvdVhi3qg==
-X-IronPort-AV: E=Sophos;i="5.76,416,1592895600"; 
-   d="scan'208";a="300969658"
-Received: from sjchrist-ice.jf.intel.com (HELO sjchrist-ice) ([10.54.31.34])
-  by orsmga003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Sep 2020 09:04:58 -0700
-Date:   Fri, 11 Sep 2020 09:04:56 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] KVM: x86: always allow writing '0' to MSR_KVM_ASYNC_PF_EN
-Message-ID: <20200911160455.GB4344@sjchrist-ice>
-References: <20200911093147.484565-1-vkuznets@redhat.com>
+        id S1726545AbgIKQSA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 11 Sep 2020 12:18:00 -0400
+Received: from smtp-fw-6001.amazon.com ([52.95.48.154]:59807 "EHLO
+        smtp-fw-6001.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726536AbgIKQRt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 11 Sep 2020 12:17:49 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1599841068; x=1631377068;
+  h=subject:to:cc:references:from:message-id:date:
+   mime-version:in-reply-to:content-transfer-encoding;
+  bh=jojQMQdjivPmHtUkXjBK3yH06Ho2uoYNPaYolOiGpmA=;
+  b=RRsJg6VZ6KpKN7hLq43z7iNg44E0l7KwVp7P3jmfgLIVG+Xw8ij0vDb5
+   yi3vx1VtjtS+tlM8cS7KAkNxPI/2ppzzx7Tu425+zWKWRzbICLVizQ5El
+   lIId7OxX8DWnxiPqcITcbFID7/5Ur631gI6KzS2UlzN9fSpvPgNDE/MjA
+   U=;
+X-IronPort-AV: E=Sophos;i="5.76,416,1592870400"; 
+   d="scan'208";a="54864313"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-2b-859fe132.us-west-2.amazon.com) ([10.43.8.6])
+  by smtp-border-fw-out-6001.iad6.amazon.com with ESMTP; 11 Sep 2020 16:17:45 +0000
+Received: from EX13D16EUB001.ant.amazon.com (pdx4-ws-svc-p6-lb7-vlan2.pdx.amazon.com [10.170.41.162])
+        by email-inbound-relay-2b-859fe132.us-west-2.amazon.com (Postfix) with ESMTPS id AA9C92218FA;
+        Fri, 11 Sep 2020 16:17:44 +0000 (UTC)
+Received: from 38f9d34ed3b1.ant.amazon.com (10.43.161.85) by
+ EX13D16EUB001.ant.amazon.com (10.43.166.28) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.2; Fri, 11 Sep 2020 16:17:34 +0000
+Subject: Re: [PATCH v8 17/18] nitro_enclaves: Add overview documentation
+To:     Greg KH <gregkh@linuxfoundation.org>
+CC:     linux-kernel <linux-kernel@vger.kernel.org>,
+        Anthony Liguori <aliguori@amazon.com>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Colm MacCarthaigh <colmmacc@amazon.com>,
+        David Duncan <davdunc@amazon.com>,
+        Bjoern Doebel <doebel@amazon.de>,
+        David Woodhouse <dwmw@amazon.co.uk>,
+        "Frank van der Linden" <fllinden@amazon.com>,
+        Alexander Graf <graf@amazon.de>,
+        "Karen Noel" <knoel@redhat.com>,
+        Martin Pohlack <mpohlack@amazon.de>,
+        Matt Wilson <msw@amazon.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Balbir Singh <sblbir@amazon.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        "Stefan Hajnoczi" <stefanha@redhat.com>,
+        Stewart Smith <trawets@amazon.com>,
+        "Uwe Dannowski" <uwed@amazon.de>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        kvm <kvm@vger.kernel.org>,
+        ne-devel-upstream <ne-devel-upstream@amazon.com>
+References: <20200904173718.64857-1-andraprs@amazon.com>
+ <20200904173718.64857-18-andraprs@amazon.com>
+ <20200907090126.GD1101646@kroah.com>
+ <44a8a921-1fb4-87ab-b8f2-c168c615dbbd@amazon.com>
+ <20200907140803.GA3719869@kroah.com>
+ <b8a1e66c-7674-7354-599e-159efd260ba9@amazon.com>
+ <310abd0d-60e7-a52c-fcae-cf98ac474e32@amazon.com>
+ <20200911151213.GB3821769@kroah.com>
+From:   "Paraschiv, Andra-Irina" <andraprs@amazon.com>
+Message-ID: <b4e00a55-403d-b85c-abfe-3af0aeebe793@amazon.com>
+Date:   Fri, 11 Sep 2020 19:17:24 +0300
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:78.0)
+ Gecko/20100101 Thunderbird/78.2.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200911093147.484565-1-vkuznets@redhat.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
+In-Reply-To: <20200911151213.GB3821769@kroah.com>
+Content-Language: en-US
+X-Originating-IP: [10.43.161.85]
+X-ClientProxiedBy: EX13D41UWB004.ant.amazon.com (10.43.161.135) To
+ EX13D16EUB001.ant.amazon.com (10.43.166.28)
+Content-Type: text/plain; charset="utf-8"; format="flowed"
+Content-Transfer-Encoding: base64
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Sep 11, 2020 at 11:31:47AM +0200, Vitaly Kuznetsov wrote:
-> Even without in-kernel LAPIC we should allow writing '0' to
-> MSR_KVM_ASYNC_PF_EN as we're not enabling the mechanism. In
-> particular, QEMU with 'kernel-irqchip=off' fails to start
-> a guest with
-> 
-> qemu-system-x86_64: error: failed to set MSR 0x4b564d02 to 0x0
-> 
-> Fixes: 9d3c447c72fb2 ("KVM: X86: Fix async pf caused null-ptr-deref")
-> Reported-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
-> ---
->  arch/x86/kvm/x86.c | 6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index d39d6cf1d473..44a86f7f2397 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -2730,9 +2730,6 @@ static int kvm_pv_enable_async_pf(struct kvm_vcpu *vcpu, u64 data)
->  	if (data & 0x30)
->  		return 1;
->  
-> -	if (!lapic_in_kernel(vcpu))
-> -		return 1;
-> -
->  	vcpu->arch.apf.msr_en_val = data;
->  
->  	if (!kvm_pv_async_pf_enabled(vcpu)) {
-> @@ -2741,6 +2738,9 @@ static int kvm_pv_enable_async_pf(struct kvm_vcpu *vcpu, u64 data)
->  		return 0;
->  	}
->  
-> +	if (!lapic_in_kernel(vcpu))
+CgpPbiAxMS8wOS8yMDIwIDE4OjEyLCBHcmVnIEtIIHdyb3RlOgo+Cj4gT24gRnJpLCBTZXAgMTEs
+IDIwMjAgYXQgMDU6NTY6MTBQTSArMDMwMCwgUGFyYXNjaGl2LCBBbmRyYS1JcmluYSB3cm90ZToK
+Pj4KPj4gT24gMDcvMDkvMjAyMCAxODoxMywgUGFyYXNjaGl2LCBBbmRyYS1JcmluYSB3cm90ZToK
+Pj4+Cj4+PiBPbiAwNy8wOS8yMDIwIDE3OjA4LCBHcmVnIEtIIHdyb3RlOgo+Pj4+IE9uIE1vbiwg
+U2VwIDA3LCAyMDIwIGF0IDA0OjQzOjExUE0gKzAzMDAsIFBhcmFzY2hpdiwgQW5kcmEtSXJpbmEg
+d3JvdGU6Cj4+Pj4+IE9uIDA3LzA5LzIwMjAgMTI6MDEsIEdyZWcgS0ggd3JvdGU6Cj4+Pj4+PiBP
+biBGcmksIFNlcCAwNCwgMjAyMCBhdCAwODozNzoxN1BNICswMzAwLCBBbmRyYSBQYXJhc2NoaXYg
+d3JvdGU6Cj4+Pj4+Pj4gU2lnbmVkLW9mZi1ieTogQW5kcmEgUGFyYXNjaGl2IDxhbmRyYXByc0Bh
+bWF6b24uY29tPgo+Pj4+Pj4+IFJldmlld2VkLWJ5OiBBbGV4YW5kZXIgR3JhZiA8Z3JhZkBhbWF6
+b24uY29tPgo+Pj4+Pj4+IC0tLQo+Pj4+Pj4+IENoYW5nZWxvZwo+Pj4+Pj4+Cj4+Pj4+Pj4gdjcg
+LT4gdjgKPj4+Pj4+Pgo+Pj4+Pj4+ICogQWRkIGluZm8gYWJvdXQgdGhlIHByaW1hcnkgLyBwYXJl
+bnQgVk0gQ0lEIHZhbHVlLgo+Pj4+Pj4+ICogVXBkYXRlIHJlZmVyZW5jZSBsaW5rIGZvciBodWdl
+IHBhZ2VzLgo+Pj4+Pj4+ICogQWRkIHJlZmVyZW5jZSBsaW5rIGZvciB0aGUgeDg2IGJvb3QgcHJv
+dG9jb2wuCj4+Pj4+Pj4gKiBBZGQgbGljZW5zZSBtZW50aW9uIGFuZCB1cGRhdGUgZG9jIHRpdGxl
+IC8gY2hhcHRlciBmb3JtYXR0aW5nLgo+Pj4+Pj4+Cj4+Pj4+Pj4gdjYgLT4gdjcKPj4+Pj4+Pgo+
+Pj4+Pj4+ICogTm8gY2hhbmdlcy4KPj4+Pj4+Pgo+Pj4+Pj4+IHY1IC0+IHY2Cj4+Pj4+Pj4KPj4+
+Pj4+PiAqIE5vIGNoYW5nZXMuCj4+Pj4+Pj4KPj4+Pj4+PiB2NCAtPiB2NQo+Pj4+Pj4+Cj4+Pj4+
+Pj4gKiBObyBjaGFuZ2VzLgo+Pj4+Pj4+Cj4+Pj4+Pj4gdjMgLT4gdjQKPj4+Pj4+Pgo+Pj4+Pj4+
+ICogVXBkYXRlIGRvYyB0eXBlIGZyb20gLnR4dCB0byAucnN0Lgo+Pj4+Pj4+ICogVXBkYXRlIGRv
+Y3VtZW50YXRpb24gYmFzZWQgb24gdGhlIGNoYW5nZXMgZnJvbSB2NC4KPj4+Pj4+Pgo+Pj4+Pj4+
+IHYyIC0+IHYzCj4+Pj4+Pj4KPj4+Pj4+PiAqIE5vIGNoYW5nZXMuCj4+Pj4+Pj4KPj4+Pj4+PiB2
+MSAtPiB2Mgo+Pj4+Pj4+Cj4+Pj4+Pj4gKiBOZXcgaW4gdjIuCj4+Pj4+Pj4gLS0tCj4+Pj4+Pj4g
+ICAgIERvY3VtZW50YXRpb24vbml0cm9fZW5jbGF2ZXMvbmVfb3ZlcnZpZXcucnN0IHwgOTUKPj4+
+Pj4+PiArKysrKysrKysrKysrKysrKysrKwo+Pj4+Pj4+ICAgICAxIGZpbGUgY2hhbmdlZCwgOTUg
+aW5zZXJ0aW9ucygrKQo+Pj4+Pj4+ICAgICBjcmVhdGUgbW9kZSAxMDA2NDQgRG9jdW1lbnRhdGlv
+bi9uaXRyb19lbmNsYXZlcy9uZV9vdmVydmlldy5yc3QKPj4+Pj4+IEEgd2hvbGUgbmV3IHN1YmRp
+ciwgZm9yIGEgc2luZ2xlIGRyaXZlciwgYW5kIG5vdCB0aWVkIGludG8gdGhlIGtlcm5lbAo+Pj4+
+Pj4gZG9jdW1lbnRhdGlvbiBidWlsZCBwcm9jZXNzIGF0IGFsbD8gIE5vdCBnb29kIDooCj4+Pj4+
+Pgo+Pj4+PiBXb3VsZCB0aGUgInZpcnQiIGRpcmVjdG9yeSBiZSBhIGJldHRlciBvcHRpb24gZm9y
+IHRoaXMgZG9jIGZpbGU/Cj4+Pj4gWWVzLgo+Pj4gQWxyaWdodCwgSSdsbCB1cGRhdGUgdGhlIGRv
+YyBmaWxlIGxvY2F0aW9uLCB0aGUgaW5kZXggZmlsZSBhbmQgdGhlCj4+PiBNQUlOVEFJTkVSUyBl
+bnRyeSB0byByZWZsZWN0IHRoZSBuZXcgZG9jIGZpbGUgbG9jYXRpb24uCj4+Pgo+PiBJIHNlbnQg
+b3V0IGEgbmV3IHJldmlzaW9uIHRoYXQgaW5jbHVkZXMgdGhlIHVwZGF0ZXMgYmFzZWQgb24geW91
+ciBmZWVkYmFjay4KPj4gVGhhbmtzIGZvciByZXZpZXcuCj4+Cj4+IFRvIGJlIGF3YXJlIG9mIHRo
+aXMgYmVmb3JlaGFuZCwgd2hhdCB3b3VsZCBiZSB0aGUgZnVydGhlciBuZWNlc3Nhcnkgc3RlcHMK
+Pj4gKGUuZy4gbGludXgtbmV4dCBicmFuY2gsIGFkZGl0aW9uYWwgcmV2aWV3IGFuZCAvIG9yIHNh
+bml0eSBjaGVja3MpIHRvCj4+IGNvbnNpZGVyIGZvciB0YXJnZXRpbmcgdGhlIG5leHQgbWVyZ2Ug
+d2luZG93Pwo+IElmIGFsbCBsb29rcyBnb29kLCBJIGNhbiBqdXN0IHN1Y2sgaXQgaW50byBteSBj
+aGFyLW1pc2MgYnJhbmNoIHRvIGdldCBpdAo+IGludG8gNS4xMC1yYzEuICBJJ2xsIGxvb2sgYXQg
+dGhlIHNlcmllcyBuZXh0IHdlZWssIHRoYW5rcy4KPgoKT2ssIGxldCdzIGRvIHRoaXMgd2F5IHRo
+ZW4sIHRoYW5rcyBmb3IgaW5mby4KCkFuZHJhCgoKCkFtYXpvbiBEZXZlbG9wbWVudCBDZW50ZXIg
+KFJvbWFuaWEpIFMuUi5MLiByZWdpc3RlcmVkIG9mZmljZTogMjdBIFNmLiBMYXphciBTdHJlZXQs
+IFVCQzUsIGZsb29yIDIsIElhc2ksIElhc2kgQ291bnR5LCA3MDAwNDUsIFJvbWFuaWEuIFJlZ2lz
+dGVyZWQgaW4gUm9tYW5pYS4gUmVnaXN0cmF0aW9uIG51bWJlciBKMjIvMjYyMS8yMDA1Lgo=
 
-This doesn't actually verify that @data == 0.  kvm_pv_async_pf_enabled()
-returns true iff KVM_ASYNC_PF_ENABLED and KVM_ASYNC_PF_DELIVERY_AS_INT are
-set, e.g. this would allow setting one and not the other.  This also allows
-userspace to set vcpu->arch.apf.msr_en_val to an unsupported value, i.e.
-@data has already been propagated to the vcpu and isn't unwound.
-
-Why not just pivot on @data when lapic_in_kernel() is false?  vcpu->arch.apic
-is immutable so there's no need to update apf.msr_en_val in either direction.
-
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 539ea1cd6020..36969d5ec291 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -2735,7 +2735,7 @@ static int kvm_pv_enable_async_pf(struct kvm_vcpu *vcpu, u64 data)
-                return 1;
-
-        if (!lapic_in_kernel(vcpu))
--               return 1;
-+               return data ? 1 : 0;
-
-        vcpu->arch.apf.msr_en_val = data;
-
-
-> +		return 1;
-> +
->  	if (kvm_gfn_to_hva_cache_init(vcpu->kvm, &vcpu->arch.apf.data, gpa,
->  					sizeof(u64)))
->  		return 1;
-> -- 
-> 2.25.4
-> 
