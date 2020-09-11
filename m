@@ -2,146 +2,114 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 406942662D2
-	for <lists+kvm@lfdr.de>; Fri, 11 Sep 2020 18:03:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7253F2662E2
+	for <lists+kvm@lfdr.de>; Fri, 11 Sep 2020 18:06:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726479AbgIKQDI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 11 Sep 2020 12:03:08 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:25785 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725814AbgIKQCa (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 11 Sep 2020 12:02:30 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1599840148;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=UzNqZBAGXS7F5Dy3gzRVUTnuTyaskfH6gaEmCpanmiQ=;
-        b=H2hznv2HzIC6+jC2xylUd1+fbZeHxZ5JexRw5Nz07I1dOMGGysPfc2cGnKbI3cjHLkGqfd
-        SxvK2k2SaqHm5lOB5Bzs/KOth8S9RZntbRDXOHtudY8641Rs8eO4/i7pvOG6oRBYEjsTG2
-        6YtqTIyY+tp6d94/12BYAfXLDEqyAUw=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-3-zxjiuk2BOIWsgI7w2h_qwQ-1; Fri, 11 Sep 2020 12:02:24 -0400
-X-MC-Unique: zxjiuk2BOIWsgI7w2h_qwQ-1
-Received: by mail-wm1-f72.google.com with SMTP id b73so1545481wmb.0
-        for <kvm@vger.kernel.org>; Fri, 11 Sep 2020 09:02:24 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=UzNqZBAGXS7F5Dy3gzRVUTnuTyaskfH6gaEmCpanmiQ=;
-        b=KMgSekD+EkrRwq2KqK5ugKUj2c2QbJRvsEASkrlRqbMSse1ZaMsZ/klwa0H4OrabnM
-         yL6drwAyPo4/psPMjj2DAeDK7QuPGuC+gRfXg1PG43CcIEkav0wejNpBMwTlnFNVpVuy
-         FlAmF2uiKbqoBMMfEYidEUsiHTjWWG866eQkhVdZyfnHbq1kNQ5vI9TzQCUpWSfqp0cs
-         TQ12aFZS3T43SczmCZRz8QepSIkSToGLs2Lv1qyqyoudU36FPChdqP1TUR0MkeGzeMDI
-         S/QINyhSNaaMihS+G+NqSF7EIlG321n3HSDk0RDbJzDiw1wGzXERMyIYil6h9rsBcCK+
-         CiLA==
-X-Gm-Message-State: AOAM5328TeLdcCuORQqLxrh7KJDxl9PivVYt+IM+9JWr6sJl7GnzEgMy
-        YB4CbSN+D/yxK/tFF46qsrdtektAsUL4C4zlwhPu2y0DEK562ye1onxr1mhwUwHsJijE4CG0xPM
-        PSDH5OoAwL+sy
-X-Received: by 2002:adf:f70d:: with SMTP id r13mr2807361wrp.317.1599840143600;
-        Fri, 11 Sep 2020 09:02:23 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzlZ/52RedjxDE7fk9zVT8weEe/dNfRBYU1gf7UxBbf9Eg9Ud+Y+MHJJZv6HKemXzFN9Gm3jw==
-X-Received: by 2002:adf:f70d:: with SMTP id r13mr2807329wrp.317.1599840143390;
-        Fri, 11 Sep 2020 09:02:23 -0700 (PDT)
-Received: from [192.168.10.150] ([93.56.170.5])
-        by smtp.gmail.com with ESMTPSA id l10sm4868973wru.59.2020.09.11.09.02.22
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 11 Sep 2020 09:02:22 -0700 (PDT)
-Subject: Re: [RESEND PATCH v2] KVM: fix memory leak in
- kvm_io_bus_unregister_dev()
-To:     Rustam Kovhaev <rkovhaev@gmail.com>, vkuznets@redhat.com,
-        gustavoars@kernel.org, kvm@vger.kernel.org
-Cc:     linux-kernel@vger.kernel.org, gregkh@linuxfoundation.org,
-        stable@vger.kernel.org
-References: <20200907185535.233114-1-rkovhaev@gmail.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <979a4030-6934-41bd-ee55-a3e301f04cc6@redhat.com>
-Date:   Fri, 11 Sep 2020 18:02:21 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+        id S1726074AbgIKQFk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 11 Sep 2020 12:05:40 -0400
+Received: from mga14.intel.com ([192.55.52.115]:51191 "EHLO mga14.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726184AbgIKQFV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 11 Sep 2020 12:05:21 -0400
+IronPort-SDR: kys1aNcFhmZQPIqPTrk5KaDVrHUYPSrSXKkYEtlyYKFzAq8h38KpklnrtuP71OKO184uPDrl3H
+ /7s7Baih+6Gw==
+X-IronPort-AV: E=McAfee;i="6000,8403,9741"; a="158071546"
+X-IronPort-AV: E=Sophos;i="5.76,416,1592895600"; 
+   d="scan'208";a="158071546"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Sep 2020 09:05:01 -0700
+IronPort-SDR: J+uNvfXjsVKPaULLRObScXcXxC0aGVPmjVazhcEikrkeaQMnXn5rWg+TG/LI7fzWiTyQbwEHmM
+ 2PCEvdVhi3qg==
+X-IronPort-AV: E=Sophos;i="5.76,416,1592895600"; 
+   d="scan'208";a="300969658"
+Received: from sjchrist-ice.jf.intel.com (HELO sjchrist-ice) ([10.54.31.34])
+  by orsmga003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Sep 2020 09:04:58 -0700
+Date:   Fri, 11 Sep 2020 09:04:56 -0700
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] KVM: x86: always allow writing '0' to MSR_KVM_ASYNC_PF_EN
+Message-ID: <20200911160455.GB4344@sjchrist-ice>
+References: <20200911093147.484565-1-vkuznets@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200907185535.233114-1-rkovhaev@gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200911093147.484565-1-vkuznets@redhat.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 07/09/20 20:55, Rustam Kovhaev wrote:
-> when kmalloc() fails in kvm_io_bus_unregister_dev(), before removing
-> the bus, we should iterate over all other devices linked to it and call
-> kvm_iodevice_destructor() for them
+On Fri, Sep 11, 2020 at 11:31:47AM +0200, Vitaly Kuznetsov wrote:
+> Even without in-kernel LAPIC we should allow writing '0' to
+> MSR_KVM_ASYNC_PF_EN as we're not enabling the mechanism. In
+> particular, QEMU with 'kernel-irqchip=off' fails to start
+> a guest with
 > 
-> Fixes: 90db10434b16 ("KVM: kvm_io_bus_unregister_dev() should never fail")
-> Cc: stable@vger.kernel.org
-> Reported-and-tested-by: syzbot+f196caa45793d6374707@syzkaller.appspotmail.com
-> Link: https://syzkaller.appspot.com/bug?extid=f196caa45793d6374707
-> Signed-off-by: Rustam Kovhaev <rkovhaev@gmail.com>
-> Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
-> ---
-> v2:
-> - remove redundant whitespace
-> - remove goto statement and use if/else
-> - add Fixes tag
-> ---
->  virt/kvm/kvm_main.c | 21 ++++++++++++---------
->  1 file changed, 12 insertions(+), 9 deletions(-)
+> qemu-system-x86_64: error: failed to set MSR 0x4b564d02 to 0x0
 > 
-> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index 67cd0b88a6b6..cf88233b819a 100644
-> --- a/virt/kvm/kvm_main.c
-> +++ b/virt/kvm/kvm_main.c
-> @@ -4332,7 +4332,7 @@ int kvm_io_bus_register_dev(struct kvm *kvm, enum kvm_bus bus_idx, gpa_t addr,
->  void kvm_io_bus_unregister_dev(struct kvm *kvm, enum kvm_bus bus_idx,
->  			       struct kvm_io_device *dev)
->  {
-> -	int i;
-> +	int i, j;
->  	struct kvm_io_bus *new_bus, *bus;
+> Fixes: 9d3c447c72fb2 ("KVM: X86: Fix async pf caused null-ptr-deref")
+> Reported-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+> ---
+>  arch/x86/kvm/x86.c | 6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index d39d6cf1d473..44a86f7f2397 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -2730,9 +2730,6 @@ static int kvm_pv_enable_async_pf(struct kvm_vcpu *vcpu, u64 data)
+>  	if (data & 0x30)
+>  		return 1;
 >  
->  	bus = kvm_get_bus(kvm, bus_idx);
-> @@ -4349,17 +4349,20 @@ void kvm_io_bus_unregister_dev(struct kvm *kvm, enum kvm_bus bus_idx,
+> -	if (!lapic_in_kernel(vcpu))
+> -		return 1;
+> -
+>  	vcpu->arch.apf.msr_en_val = data;
 >  
->  	new_bus = kmalloc(struct_size(bus, range, bus->dev_count - 1),
->  			  GFP_KERNEL_ACCOUNT);
-> -	if (!new_bus)  {
-> +	if (new_bus) {
-> +		memcpy(new_bus, bus, sizeof(*bus) + i * sizeof(struct kvm_io_range));
-> +		new_bus->dev_count--;
-> +		memcpy(new_bus->range + i, bus->range + i + 1,
-> +		       (new_bus->dev_count - i) * sizeof(struct kvm_io_range));
-> +	} else {
->  		pr_err("kvm: failed to shrink bus, removing it completely\n");
-> -		goto broken;
-> +		for (j = 0; j < bus->dev_count; j++) {
-> +			if (j == i)
-> +				continue;
-> +			kvm_iodevice_destructor(bus->range[j].dev);
-> +		}
+>  	if (!kvm_pv_async_pf_enabled(vcpu)) {
+> @@ -2741,6 +2738,9 @@ static int kvm_pv_enable_async_pf(struct kvm_vcpu *vcpu, u64 data)
+>  		return 0;
 >  	}
 >  
-> -	memcpy(new_bus, bus, sizeof(*bus) + i * sizeof(struct kvm_io_range));
-> -	new_bus->dev_count--;
-> -	memcpy(new_bus->range + i, bus->range + i + 1,
-> -	       (new_bus->dev_count - i) * sizeof(struct kvm_io_range));
-> -
-> -broken:
->  	rcu_assign_pointer(kvm->buses[bus_idx], new_bus);
->  	synchronize_srcu_expedited(&kvm->srcu);
->  	kfree(bus);
+> +	if (!lapic_in_kernel(vcpu))
+
+This doesn't actually verify that @data == 0.  kvm_pv_async_pf_enabled()
+returns true iff KVM_ASYNC_PF_ENABLED and KVM_ASYNC_PF_DELIVERY_AS_INT are
+set, e.g. this would allow setting one and not the other.  This also allows
+userspace to set vcpu->arch.apf.msr_en_val to an unsupported value, i.e.
+@data has already been propagated to the vcpu and isn't unwound.
+
+Why not just pivot on @data when lapic_in_kernel() is false?  vcpu->arch.apic
+is immutable so there's no need to update apf.msr_en_val in either direction.
+
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 539ea1cd6020..36969d5ec291 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -2735,7 +2735,7 @@ static int kvm_pv_enable_async_pf(struct kvm_vcpu *vcpu, u64 data)
+                return 1;
+
+        if (!lapic_in_kernel(vcpu))
+-               return 1;
++               return data ? 1 : 0;
+
+        vcpu->arch.apf.msr_en_val = data;
+
+
+> +		return 1;
+> +
+>  	if (kvm_gfn_to_hva_cache_init(vcpu->kvm, &vcpu->arch.apf.data, gpa,
+>  					sizeof(u64)))
+>  		return 1;
+> -- 
+> 2.25.4
 > 
-
-Queued, thanks.
-
-I am currently on leave so I am going through the patches and queuing
-them, but I will only push kvm/next and kvm/queue next week.  kvm/master
-patches will be sent to Linus for the next -rc though.
-
-Paolo
-
