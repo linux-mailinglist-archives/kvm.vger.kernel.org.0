@@ -2,137 +2,117 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C6FB7266403
-	for <lists+kvm@lfdr.de>; Fri, 11 Sep 2020 18:29:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 728F226646D
+	for <lists+kvm@lfdr.de>; Fri, 11 Sep 2020 18:38:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726541AbgIKQ3b (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 11 Sep 2020 12:29:31 -0400
-Received: from mga09.intel.com ([134.134.136.24]:31677 "EHLO mga09.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726306AbgIKQ23 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 11 Sep 2020 12:28:29 -0400
-IronPort-SDR: YREpwWfwOeD0UPOyTTCQF8x61gsF0Jof46jsue7D293q+jsfaPM/ozeCF8rlkTRMWFrxFPUCxl
- VYJtuD78buLA==
-X-IronPort-AV: E=McAfee;i="6000,8403,9741"; a="159738486"
-X-IronPort-AV: E=Sophos;i="5.76,416,1592895600"; 
-   d="scan'208";a="159738486"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Sep 2020 09:28:22 -0700
-IronPort-SDR: MRaDYQOI+Y37b7XzL5ehbRYu0W1Y6xATNgCXz6/+joIgRZb3IlK35VMeSAxF2m26DAwL9nQmAe
- UHXSMxDELuzQ==
-X-IronPort-AV: E=Sophos;i="5.76,416,1592895600"; 
-   d="scan'208";a="481379882"
-Received: from sjchrist-ice.jf.intel.com (HELO sjchrist-ice) ([10.54.31.34])
-  by orsmga005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Sep 2020 09:28:22 -0700
-Date:   Fri, 11 Sep 2020 09:28:20 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Joerg Roedel <joro@8bytes.org>
-Cc:     Colin King <colin.king@canonical.com>,
-        kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "maintainer:X86 ARCHITECTURE" <x86@kernel.org>,
-        "H . Peter Anvin" <hpa@zytor.com>, kvm@vger.kernel.org
-Subject: Re: [PATCH][next] KVM: SVM: nested: fix free of uninitialized
- pointers save and ctl
-Message-ID: <20200911162814.GC4344@sjchrist-ice>
-References: <20200911110730.24238-1-colin.king@canonical.com>
- <87o8mclei1.fsf@vitty.brq.redhat.com>
+        id S1726552AbgIKQiU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 11 Sep 2020 12:38:20 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:57996 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726193AbgIKPMQ (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 11 Sep 2020 11:12:16 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1599837121;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=aiWmHLDD0Ad0LUM9I3Re3J2jS/emquPxE/7QtuwNOPg=;
+        b=gxXCtIupESgbz961KIg5tC4lEmLWzKToPJBqqrL5WIchgdrsdUGifvttRW07oWQtkxCInS
+        rLNv/SsI/azVsJHj2mLVsZ+cGXkEW22ym9M2v4+SkyUAF6rFPdvA9mj758sYLqEx90AtZp
+        Jm+d0g8OSvLNiLA0hOM2YRmH5+4zdE8=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-200-4NT_19gWN0K2miAueSjn9w-1; Fri, 11 Sep 2020 09:53:13 -0400
+X-MC-Unique: 4NT_19gWN0K2miAueSjn9w-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 62D58CD046;
+        Fri, 11 Sep 2020 13:53:12 +0000 (UTC)
+Received: from [10.36.112.212] (ovpn-112-212.ams2.redhat.com [10.36.112.212])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 1B1135DA2A;
+        Fri, 11 Sep 2020 13:53:00 +0000 (UTC)
+Subject: Re: MSI/MSIX for VFIO platform
+To:     Alex Williamson <alex.williamson@redhat.com>,
+        Vikas Gupta <vikas.gupta@broadcom.com>
+Cc:     Cornelia Huck <cohuck@redhat.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Vikram Prakash <vikram.prakash@broadcom.com>,
+        Srinath Mannam <srinath.mannam@broadcom.com>
+References: <c94c36305980f80674aa699e27b9895b@mail.gmail.com>
+ <20200910105735.1e060b95@w520.home>
+From:   Auger Eric <eric.auger@redhat.com>
+Message-ID: <f9b3c805-cd64-3402-ff73-339c35c4c27a@redhat.com>
+Date:   Fri, 11 Sep 2020 15:52:59 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87o8mclei1.fsf@vitty.brq.redhat.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
+In-Reply-To: <20200910105735.1e060b95@w520.home>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-+Joerg
+Hi Vikas,
 
-On Fri, Sep 11, 2020 at 01:49:42PM +0200, Vitaly Kuznetsov wrote:
-> Colin King <colin.king@canonical.com> writes:
+On 9/10/20 6:57 PM, Alex Williamson wrote:
+> On Thu, 10 Sep 2020 16:15:27 +0530
+> Vikas Gupta <vikas.gupta@broadcom.com> wrote:
 > 
-> > From: Colin Ian King <colin.king@canonical.com>
-> >
-> > Currently the error exit path to outt_set_gif will kfree on
-> > uninitialized
+>> Hi Alex/Cornelia,
+>>
+>> We are looking for MSI interrupts for platform devices in user-space
+>> applications via event/poll mechanism using VFIO.
+>>
+>> Since there is no support for MSI/MSIX handling in VFIO-platform in kernel,
+>> it may not possible to get this feature in user-space.
+>>
+>> Is there any other way we can get this feature in user-space OR can you
+>> please suggest if any patch or feature is in progress for same in VFIO
+>> platform?
+>>
+>> Any suggestions would be helpful.
 > 
-> typo: out_set_gif
+> Eric (Cc'd) is the maintainer of vfio-platform.
 > 
-> > pointers save and ctl.  Fix this by ensuring these pointers are
-> > inintialized to NULL to avoid garbage pointer freeing.
-> >
-> > Addresses-Coverity: ("Uninitialized pointer read")
-> > Fixes: 6ccbd29ade0d ("KVM: SVM: nested: Don't allocate VMCB structures
-> > on stack")
-> 
-> Where is this commit id from? I don't see it in Paolo's kvm tree, if
-> it's not yet merged, maybe we should fix it and avoid introducing the
-> issue in the first place?
+> vfio-platform devices don't have IRQ indexes dedicated to MSI and MSI-X
+> like vfio-pci devices do (technically these are PCI concepts, but I
+> assume we're referring generically to message signaled interrupts), but
+> that's simply due to the lack of standardization in platform devices.
+> Logically these are simply collections of edge triggered interrupts,
+> which the vfio device API supports generically, it's simply a matter
+> that the vfio bus driver exposing a vfio-platform device create an IRQ
+> index exposing these vectors.  Thanks,
 
-Ya, AFAIK the series as not been applied.
+I have not worked on MSI support and I am not aware of any work
+happening in this area.
 
-> > Signed-off-by: Colin Ian King <colin.king@canonical.com>
-> > ---
-> >  arch/x86/kvm/svm/nested.c | 4 ++--
-> >  1 file changed, 2 insertions(+), 2 deletions(-)
-> >
-> > diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
-> > index 28036629abf8..2b15f49f9e5a 100644
-> > --- a/arch/x86/kvm/svm/nested.c
-> > +++ b/arch/x86/kvm/svm/nested.c
-> > @@ -1060,8 +1060,8 @@ static int svm_set_nested_state(struct kvm_vcpu *vcpu,
-> >  	struct vmcb *hsave = svm->nested.hsave;
-> >  	struct vmcb __user *user_vmcb = (struct vmcb __user *)
-> >  		&user_kvm_nested_state->data.svm[0];
-> > -	struct vmcb_control_area *ctl;
-> > -	struct vmcb_save_area *save;
-> > +	struct vmcb_control_area *ctl = NULL;
-> > +	struct vmcb_save_area *save = NULL;
-> >  	int ret;
-> >  	u32 cr0;
+First I would recommend to look at IRQ related uapis exposed by VFIO:
+VFIO_DEVICE_GET_IRQ_INFO
+VFIO_DEVICE_SET_IRQS
+
+and try to understand if they can be implemented for MSIs in a generic
+way in the vfio_platform driver using platform-msi helpers.
+
+For instance VFIO_DEVICE_GET_IRQ_INFO would need to return the number of
+requested vectors. On init I guess we should allocate vectors using
+platform_msi_domain_alloc_irqs/ devm_request_irq and in the handler
+trigger the eventfd provided through VFIO_DEVICE_SET_IRQS.
+
+On userspace where you have to trap the MSI setup to call the above
+functions and setup irqfd injection. This would be device specific as
+opposed to PCI. That's just rough ideas at the moment.
+
+Thanks
+
+Eric
+
 > 
-> I think it would be better if we eliminate 'out_set_gif; completely as
-> the 'error path' we have looks a bit weird anyway. Something like
-> (untested):
-
-Ya, I agree that duplicating the single line for this one-off case is
-preferable to creating a convoluted set of labels.
-
-Joerg, can you fold this change into a prep patch for v4 of your "KVM: SVM:
-SEV-ES groundwork" series?
-
-> diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
-> index 28036629abf8..d1ae94f40907 100644
-> --- a/arch/x86/kvm/svm/nested.c
-> +++ b/arch/x86/kvm/svm/nested.c
-> @@ -1092,7 +1092,8 @@ static int svm_set_nested_state(struct kvm_vcpu *vcpu,
->  
->         if (!(kvm_state->flags & KVM_STATE_NESTED_GUEST_MODE)) {
->                 svm_leave_nested(svm);
-> -               goto out_set_gif;
-> +               svm_set_gif(svm, !!(kvm_state->flags & KVM_STATE_NESTED_GIF_SET));
-> +               return 0;
->         }
->  
->         if (!page_address_valid(vcpu, kvm_state->hdr.svm.vmcb_pa))
-> @@ -1145,7 +1146,6 @@ static int svm_set_nested_state(struct kvm_vcpu *vcpu,
->         load_nested_vmcb_control(svm, ctl);
->         nested_prepare_vmcb_control(svm);
->  
-> -out_set_gif:
->         svm_set_gif(svm, !!(kvm_state->flags & KVM_STATE_NESTED_GIF_SET));
->  
->         ret = 0;
+> Alex
 > 
-> -- 
-> Vitaly
-> 
+
