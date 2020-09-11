@@ -2,162 +2,158 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 30C3B265B00
-	for <lists+kvm@lfdr.de>; Fri, 11 Sep 2020 10:01:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 56F8B265B13
+	for <lists+kvm@lfdr.de>; Fri, 11 Sep 2020 10:05:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725778AbgIKIBj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 11 Sep 2020 04:01:39 -0400
-Received: from smtpout1.mo529.mail-out.ovh.net ([178.32.125.2]:38087 "EHLO
-        smtpout1.mo529.mail-out.ovh.net" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725468AbgIKIBj (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 11 Sep 2020 04:01:39 -0400
-Received: from mxplan5.mail.ovh.net (unknown [10.108.16.209])
-        by mo529.mail-out.ovh.net (Postfix) with ESMTPS id BFF3559E6657;
-        Fri, 11 Sep 2020 10:01:34 +0200 (CEST)
-Received: from kaod.org (37.59.142.103) by DAG8EX1.mxp5.local (172.16.2.71)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2044.4; Fri, 11 Sep
- 2020 10:01:34 +0200
-Authentication-Results: garm.ovh; auth=pass (GARM-103G0059850a09e-7007-405e-8c7f-f20101562c7d,
-                    864FBEA0465FE1F0C66A9C6AC37977A76827B8ED) smtp.auth=groug@kaod.org
-Date:   Fri, 11 Sep 2020 10:01:33 +0200
-From:   Greg Kurz <groug@kaod.org>
-To:     Fabiano Rosas <farosas@linux.ibm.com>
-CC:     <kvm-ppc@vger.kernel.org>, <linuxppc-dev@lists.ozlabs.org>,
-        <kvm@vger.kernel.org>, <paulus@ozlabs.org>, <mpe@ellerman.id.au>,
-        <david@gibson.dropbear.id.au>
-Subject: Re: [PATCH] KVM: PPC: Book3S HV: Do not allocate HPT for a nested
- guest
-Message-ID: <20200911100133.49d22e82@bahia.lan>
-In-Reply-To: <20200911094536.72dd700a@bahia.lan>
-References: <20200911041607.198092-1-farosas@linux.ibm.com>
-        <20200911094536.72dd700a@bahia.lan>
-X-Mailer: Claws Mail 3.17.6 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+        id S1725873AbgIKIFi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 11 Sep 2020 04:05:38 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:39695 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1725871AbgIKIFi (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 11 Sep 2020 04:05:38 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1599811536;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=5FVC6JBs5pEyCffka1qMbmQH5dlGqqvYYQ8DzdI2d6I=;
+        b=O6mXhrzhK0zZGHDQHk2nYe0I6E7Tv0VUb3vKuDSBSAlsZ584ujwydFXGPoXfZ8Ufyap6gr
+        2zEl6HbuKzrtyu32TANxU+klUl2MrR46WO0wFknkLz/WaG4qEQc+SPiK5dbddHZDkwsxpL
+        gaJruvTepfZeN9rHa66lICd5lSy5uqE=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-80-IFxqhDBcMVGTXVj5Q8AcUw-1; Fri, 11 Sep 2020 04:05:32 -0400
+X-MC-Unique: IFxqhDBcMVGTXVj5Q8AcUw-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AAF8D10BBECE;
+        Fri, 11 Sep 2020 08:05:30 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (unknown [10.40.192.200])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id CC4E97E8FB;
+        Fri, 11 Sep 2020 08:05:24 +0000 (UTC)
+Date:   Fri, 11 Sep 2020 10:05:21 +0200
+From:   Andrew Jones <drjones@redhat.com>
+To:     Alexander Graf <graf@amazon.com>
+Cc:     kvmarm@lists.cs.columbia.edu, Marc Zyngier <maz@kernel.org>,
+        linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Eric Auger <eric.auger@redhat.com>
+Subject: Re: [PATCH v3] KVM: arm64: Preserve PMCR immutable values across
+ reset
+Message-ID: <20200911080521.nzqbe6o3dwvbkxvp@kamzik.brq.redhat.com>
+References: <20200910164243.29253-1-graf@amazon.com>
+ <20200910173609.niujn2ngnjzvx7ub@kamzik.brq.redhat.com>
+ <2938f7ef-a723-2ee3-0a87-25cbde177d23@amazon.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [37.59.142.103]
-X-ClientProxiedBy: DAG8EX2.mxp5.local (172.16.2.72) To DAG8EX1.mxp5.local
- (172.16.2.71)
-X-Ovh-Tracer-GUID: 278d2c6f-1e7e-4c0a-b85e-463794521461
-X-Ovh-Tracer-Id: 3377136772328429929
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduiedrudehlecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpeffhffvuffkjghfofggtgfgihesthejredtredtvdenucfhrhhomhepifhrvghgucfmuhhriicuoehgrhhouhhgsehkrghougdrohhrgheqnecuggftrfgrthhtvghrnhepueeiieekueffvdeggeehjeeuleeifeejgeevtedugfehheefleegffdukefhfeetnecuffhomhgrihhnpehophgvnhhgrhhouhhprdhorhhgnecukfhppedtrddtrddtrddtpdefjedrheelrddugedvrddutdefnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepmhigphhlrghnhedrmhgrihhlrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpehgrhhouhhgsehkrghougdrohhrghdprhgtphhtthhopegurghvihgusehgihgsshhonhdrughrohhpsggvrghrrdhiugdrrghu
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <2938f7ef-a723-2ee3-0a87-25cbde177d23@amazon.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 11 Sep 2020 09:45:36 +0200
-Greg Kurz <groug@kaod.org> wrote:
-
-> On Fri, 11 Sep 2020 01:16:07 -0300
-> Fabiano Rosas <farosas@linux.ibm.com> wrote:
+On Fri, Sep 11, 2020 at 09:40:04AM +0200, Alexander Graf wrote:
 > 
-> > The current nested KVM code does not support HPT guests. This is
-> > informed/enforced in some ways:
-> > 
-> > - Hosts < P9 will not be able to enable the nested HV feature;
-> > 
-> > - The nested hypervisor MMU capabilities will not contain
-> >   KVM_CAP_PPC_MMU_HASH_V3;
-> > 
-> > - QEMU reflects the MMU capabilities in the
-> >   'ibm,arch-vec-5-platform-support' device-tree property;
-> > 
-> > - The nested guest, at 'prom_parse_mmu_model' ignores the
-> >   'disable_radix' kernel command line option if HPT is not supported;
-> > 
-> > - The KVM_PPC_CONFIGURE_V3_MMU ioctl will fail if trying to use HPT.
-> > 
-> > There is, however, still a way to start a HPT guest by using
-> > max-compat-cpu=power8 at the QEMU machine options. This leads to the
-> > guest being set to use hash after QEMU calls the KVM_PPC_ALLOCATE_HTAB
-> > ioctl.
-> > 
-> > With the guest set to hash, the nested hypervisor goes through the
-> > entry path that has no knowledge of nesting (kvmppc_run_vcpu) and
-> > crashes when it tries to execute an hypervisor-privileged (mtspr
-> > HDEC) instruction at __kvmppc_vcore_entry:
-> > 
-> > root@L1:~ $ qemu-system-ppc64 -machine pseries,max-cpu-compat=power8 ...
-> > 
-> > <snip>
-> > [  538.543303] CPU: 83 PID: 25185 Comm: CPU 0/KVM Not tainted 5.9.0-rc4 #1
-> > [  538.543355] NIP:  c00800000753f388 LR: c00800000753f368 CTR: c0000000001e5ec0
-> > [  538.543417] REGS: c0000013e91e33b0 TRAP: 0700   Not tainted  (5.9.0-rc4)
-> > [  538.543470] MSR:  8000000002843033 <SF,VEC,VSX,FP,ME,IR,DR,RI,LE>  CR: 22422882  XER: 20040000
-> > [  538.543546] CFAR: c00800000753f4b0 IRQMASK: 3
-> >                GPR00: c0080000075397a0 c0000013e91e3640 c00800000755e600 0000000080000000
-> >                GPR04: 0000000000000000 c0000013eab19800 c000001394de0000 00000043a054db72
-> >                GPR08: 00000000003b1652 0000000000000000 0000000000000000 c0080000075502e0
-> >                GPR12: c0000000001e5ec0 c0000007ffa74200 c0000013eab19800 0000000000000008
-> >                GPR16: 0000000000000000 c00000139676c6c0 c000000001d23948 c0000013e91e38b8
-> >                GPR20: 0000000000000053 0000000000000000 0000000000000001 0000000000000000
-> >                GPR24: 0000000000000001 0000000000000001 0000000000000000 0000000000000001
-> >                GPR28: 0000000000000001 0000000000000053 c0000013eab19800 0000000000000001
-> > [  538.544067] NIP [c00800000753f388] __kvmppc_vcore_entry+0x90/0x104 [kvm_hv]
-> > [  538.544121] LR [c00800000753f368] __kvmppc_vcore_entry+0x70/0x104 [kvm_hv]
-> > [  538.544173] Call Trace:
-> > [  538.544196] [c0000013e91e3640] [c0000013e91e3680] 0xc0000013e91e3680 (unreliable)
-> > [  538.544260] [c0000013e91e3820] [c0080000075397a0] kvmppc_run_core+0xbc8/0x19d0 [kvm_hv]
-> > [  538.544325] [c0000013e91e39e0] [c00800000753d99c] kvmppc_vcpu_run_hv+0x404/0xc00 [kvm_hv]
-> > [  538.544394] [c0000013e91e3ad0] [c0080000072da4fc] kvmppc_vcpu_run+0x34/0x48 [kvm]
-> > [  538.544472] [c0000013e91e3af0] [c0080000072d61b8] kvm_arch_vcpu_ioctl_run+0x310/0x420 [kvm]
-> > [  538.544539] [c0000013e91e3b80] [c0080000072c7450] kvm_vcpu_ioctl+0x298/0x778 [kvm]
-> > [  538.544605] [c0000013e91e3ce0] [c0000000004b8c2c] sys_ioctl+0x1dc/0xc90
-> > [  538.544662] [c0000013e91e3dc0] [c00000000002f9a4] system_call_exception+0xe4/0x1c0
-> > [  538.544726] [c0000013e91e3e20] [c00000000000d140] system_call_common+0xf0/0x27c
-> > [  538.544787] Instruction dump:
-> > [  538.544821] f86d1098 60000000 60000000 48000099 e8ad0fe8 e8c500a0 e9264140 75290002
-> > [  538.544886] 7d1602a6 7cec42a6 40820008 7d0807b4 <7d164ba6> 7d083a14 f90d10a0 480104fd
-> > [  538.544953] ---[ end trace 74423e2b948c2e0c ]---
-> > 
-> > This patch makes the KVM_PPC_ALLOCATE_HTAB ioctl fail when running in
-> > the nested hypervisor, causing QEMU to abort.
-> > 
-> > Reported-by: Satheesh Rajendran <sathnaga@linux.vnet.ibm.com>
-> > Signed-off-by: Fabiano Rosas <farosas@linux.ibm.com>
-> > ---
 > 
-> LGTM
-> 
-> Reviewed-by: Greg Kurz <groug@kaod.org>
-> 
-> >  arch/powerpc/kvm/book3s_hv.c | 6 ++++++
-> >  1 file changed, 6 insertions(+)
+> On 10.09.20 19:36, Andrew Jones wrote:
 > > 
-> > diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
-> > index 4ba06a2a306c..764b6239ef72 100644
-> > --- a/arch/powerpc/kvm/book3s_hv.c
-> > +++ b/arch/powerpc/kvm/book3s_hv.c
-> > @@ -5250,6 +5250,12 @@ static long kvm_arch_vm_ioctl_hv(struct file *filp,
-> >  	case KVM_PPC_ALLOCATE_HTAB: {
-> >  		u32 htab_order;
-> >  
-> > +		/* If we're a nested hypervisor, we currently only support radix */
-> > +		if (kvmhv_on_pseries()) {
-> > +			r = -EOPNOTSUPP;
+> > On Thu, Sep 10, 2020 at 06:42:43PM +0200, Alexander Graf wrote:
+> > > We allow user space to set the PMCR register to any value. However,
+> > > when time comes for a vcpu reset (for example on PSCI online), PMCR
+> > > is reset to the hardware capabilities.
+> > > 
+> > > I would like to explicitly expose different PMU capabilities (number
+> > > of supported event counters) to the guest than hardware supports.
+> > > Ideally across vcpu resets.
+> > > 
+> > > So this patch adopts the reset path to only populate the immutable
+> > > PMCR register bits from hardware when they were not initialized
+> > > previously. This effectively means that on a normal reset, only the
+> > > guest settable fields are reset, while on vcpu creation the register
+> > > gets populated from hardware like before.
+> > > 
+> > > With this in place and a change in user space to invoke SET_ONE_REG
+> > > on the PMCR for every vcpu, I can reliably set the PMU event counter
+> > > number to arbitrary values.
+> > > 
+> > > Signed-off-by: Alexander Graf <graf@amazon.com>
+> > > ---
+> > >   arch/arm64/kvm/sys_regs.c | 9 ++++++++-
+> > >   1 file changed, 8 insertions(+), 1 deletion(-)
+> > > 
+> > > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> > > index 20ab2a7d37ca..28f67550db7f 100644
+> > > --- a/arch/arm64/kvm/sys_regs.c
+> > > +++ b/arch/arm64/kvm/sys_regs.c
+> > > @@ -663,7 +663,14 @@ static void reset_pmcr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
+> > >   {
+> > >        u64 pmcr, val;
+> > > 
+> > > -     pmcr = read_sysreg(pmcr_el0);
+> > > +     /*
+> > > +      * If we already received PMCR from a previous ONE_REG call,
+> > > +      * maintain its immutable flags
+> > > +      */
+> > > +     pmcr = __vcpu_sys_reg(vcpu, r->reg);
+> > > +     if (!__vcpu_sys_reg(vcpu, r->reg))
+> > > +             pmcr = read_sysreg(pmcr_el0);
+> > > +
+> > >        /*
+> > >         * Writable bits of PMCR_EL0 (ARMV8_PMU_PMCR_MASK) are reset to UNKNOWN
+> > >         * except PMCR.E resetting to zero.
+> > > --
+> > > 2.16.4
+> > > 
+> > 
+> > Aha, a much simpler patch than I expected. With this approach we don't
+> > need a get_user() function, or to use 'val', but don't we still want to
+> > add sanity checks with a set_user() function? At least to ensure immutable
+> > flags match and that PMCR_EL0.N isn't too big?
+> 
+> We don't check for any flags today, so in a way adding checks would be ABI
+> breakage.
+> 
+> And as Marc pointed out, all of the counters are basically virtual through
+> perf. So if you report 31 counters, you end up spawning 31 perf counters
+> which get multiplexed, so it would work (albeit not be terribly accurate).
+> 
+> That leaves identification bits as something we can check for. But do we
+> really have to? What's the worst thing that can happen? KVM user space can
+> shoot themselves in the foot. Well, they can also set PC to an invalid
+> value. If you do bad things you get bad results :). As long as it's not a
+> security risk, I'm not sure the benefits of checking outweigh the risks.
 
-According to POSIX [1]:
+That's a reasonable justification.
 
-[ENOTSUP]
-Not supported. The implementation does not support the requested feature or value.
+Thanks,
+drew
 
-[EOPNOTSUPP]
-Operation not supported on socket. The type of socket (address family or protocol) does not support the requested operation. A conforming implementation may assign the same values for [EOPNOTSUPP] and [ENOTSUP].
-
-Even if these two happen to be equal in linux, it seems that ENOTSUP, which
-doesn't refer to sockets, is more appropriate.
-
-[1] https://pubs.opengroup.org/onlinepubs/9699919799/functions/V2_chap02.html
-
-> > +			break;
-> > +		}
-> > +
-> >  		r = -EFAULT;
-> >  		if (get_user(htab_order, (u32 __user *)argp))
-> >  			break;
+> 
+> > Silently changing the user's input, which I see we also do for e.g. MPIDR,
+> > isn't super user friendly.
+> 
+> Yes :).
+> 
+> 
+> Alex
+> 
+> 
+> 
+> Amazon Development Center Germany GmbH
+> Krausenstr. 38
+> 10117 Berlin
+> Geschaeftsfuehrung: Christian Schlaeger, Jonathan Weiss
+> Eingetragen am Amtsgericht Charlottenburg unter HRB 149173 B
+> Sitz: Berlin
+> Ust-ID: DE 289 237 879
+> 
+> 
 > 
 
