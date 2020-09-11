@@ -2,202 +2,103 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3DECA2668FC
-	for <lists+kvm@lfdr.de>; Fri, 11 Sep 2020 21:39:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D59F826696A
+	for <lists+kvm@lfdr.de>; Fri, 11 Sep 2020 22:12:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725902AbgIKTjK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 11 Sep 2020 15:39:10 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:21872 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725886AbgIKTjI (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 11 Sep 2020 15:39:08 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1599853146;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=XkONE/g0FLpiBamkrJndr/ZIJkzwsHn+tlSk2RJm3GY=;
-        b=dx0vpN/lMZvssfUSPlJBWlQ4paQwJThQX+5rRkbkY19DSbr108vS7KKBqev9tqoUMd2Frl
-        Fs7D+QCnAfjLAu9j2zMvxTkJee1v1zr3drQF1EM/asH3dQQll8oXf5CD+WX563cHwuV+vg
-        8GbvmPMbZ+PT9SL2ugDZ+3S5Ds5ArnY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-39-ArsGl1IMO6KvtIClzxqg5A-1; Fri, 11 Sep 2020 15:39:04 -0400
-X-MC-Unique: ArsGl1IMO6KvtIClzxqg5A-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2A81181CAFF;
-        Fri, 11 Sep 2020 19:39:02 +0000 (UTC)
-Received: from w520.home (ovpn-112-71.phx2.redhat.com [10.3.112.71])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 3F79E60C04;
-        Fri, 11 Sep 2020 19:38:55 +0000 (UTC)
-Date:   Fri, 11 Sep 2020 13:38:54 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Liu Yi L <yi.l.liu@intel.com>
-Cc:     eric.auger@redhat.com, baolu.lu@linux.intel.com, joro@8bytes.org,
-        kevin.tian@intel.com, jacob.jun.pan@linux.intel.com,
-        ashok.raj@intel.com, jun.j.tian@intel.com, yi.y.sun@intel.com,
-        jean-philippe@linaro.org, peterx@redhat.com, jasowang@redhat.com,
-        hao.wu@intel.com, stefanha@gmail.com,
-        iommu@lists.linux-foundation.org, kvm@vger.kernel.org
-Subject: Re: [PATCH v7 01/16] iommu: Report domain nesting info
-Message-ID: <20200911133854.0e6a919c@w520.home>
-In-Reply-To: <1599734733-6431-2-git-send-email-yi.l.liu@intel.com>
-References: <1599734733-6431-1-git-send-email-yi.l.liu@intel.com>
-        <1599734733-6431-2-git-send-email-yi.l.liu@intel.com>
+        id S1725855AbgIKUM1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 11 Sep 2020 16:12:27 -0400
+Received: from userp2120.oracle.com ([156.151.31.85]:48492 "EHLO
+        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725793AbgIKUMW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 11 Sep 2020 16:12:22 -0400
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+        by userp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 08BKA8Ld014539;
+        Fri, 11 Sep 2020 20:10:45 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2020-01-29;
+ bh=Gxyet+Q4AGUZq8o7VWU9MriC7pNGHg2L68F1Zf76gqc=;
+ b=qNIbM5cINIQeSa9o3Lay0Z8TYaqQVuk87M6h5iR8sQ1iLrB/zzJmAsZVkjGsovSl+0TJ
+ vGx9ToCoVu3xNo8c5WaSjMURwpdxp+IqpWNy6kiFOzfySIcgc4iszbc6l5geZ/DMSJzV
+ HJJtnWtyvbL2exAONO5AIVslkI8oqPftSTPm1BqLwvNulQCJKjVthT0JySVnR8T5JHkX
+ WQyxZJaunA0ViJkYR9My/loqFC/5KpHVXr4zyAUD1NaKF28j3/YZna5Ezfs9cAM9cjvW
+ nY6jBIwligoWkmmUR7bgEvXNaDEGWbUJX/SsVPH2JXnhUAXvhyiAqK9UvE6J4w+QZAlA wg== 
+Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
+        by userp2120.oracle.com with ESMTP id 33c3ang6q4-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
+        Fri, 11 Sep 2020 20:10:45 +0000
+Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
+        by aserp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 08BK5EkN135057;
+        Fri, 11 Sep 2020 20:10:44 GMT
+Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
+        by aserp3020.oracle.com with ESMTP id 33cmkdx6ej-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 11 Sep 2020 20:10:44 +0000
+Received: from abhmp0009.oracle.com (abhmp0009.oracle.com [141.146.116.15])
+        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 08BKAesO001237;
+        Fri, 11 Sep 2020 20:10:40 GMT
+Received: from localhost.localdomain (/10.159.240.141)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Fri, 11 Sep 2020 13:10:40 -0700
+Subject: Re: [PATCH 2/4 v3] x86: AMD: Add hardware-enforced cache coherency as
+ a CPUID feature
+To:     Dave Hansen <dave.hansen@intel.com>, kvm@vger.kernel.org
+Cc:     pbonzini@redhat.com, jmattson@google.com, tglx@linutronix.de,
+        mingo@redhat.com, bp@alien8.de, x86@kernel.org,
+        sean.j.christopherson@intel.com, vkuznets@redhat.com,
+        wanpengli@tencent.com, joro@8bytes.org,
+        dave.hansen@linux.intel.com, luto@kernel.org, peterz@infradead.org,
+        linux-kernel@vger.kernel.org, hpa@zytor.com
+References: <20200911192601.9591-1-krish.sadhukhan@oracle.com>
+ <20200911192601.9591-3-krish.sadhukhan@oracle.com>
+ <c5cbc91e-f576-5cc7-a40c-c11abaea4ad2@intel.com>
+From:   Krish Sadhukhan <krish.sadhukhan@oracle.com>
+Message-ID: <472e71a4-e50e-1d39-3088-cc103c79ddb3@oracle.com>
+Date:   Fri, 11 Sep 2020 13:10:30 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+In-Reply-To: <c5cbc91e-f576-5cc7-a40c-c11abaea4ad2@intel.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9741 signatures=668679
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0 malwarescore=0 phishscore=0
+ mlxlogscore=999 bulkscore=0 adultscore=0 mlxscore=0 suspectscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
+ definitions=main-2009110162
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9741 signatures=668679
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0 priorityscore=1501
+ clxscore=1011 bulkscore=0 malwarescore=0 lowpriorityscore=0
+ mlxlogscore=999 suspectscore=0 adultscore=0 mlxscore=0 impostorscore=0
+ spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2006250000 definitions=main-2009110163
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 10 Sep 2020 03:45:18 -0700
-Liu Yi L <yi.l.liu@intel.com> wrote:
 
-> IOMMUs that support nesting translation needs report the capability info
-> to userspace. It gives information about requirements the userspace needs
-> to implement plus other features characterizing the physical implementation.
-> 
-> This patch introduces a new IOMMU UAPI struct that gives information about
-> the nesting capabilities and features. This struct is supposed to be returned
-> by iommu_domain_get_attr() with DOMAIN_ATTR_NESTING attribute parameter, with
-> one domain whose type has been set to DOMAIN_ATTR_NESTING.
-> 
-> Cc: Kevin Tian <kevin.tian@intel.com>
-> CC: Jacob Pan <jacob.jun.pan@linux.intel.com>
-> Cc: Alex Williamson <alex.williamson@redhat.com>
-> Cc: Eric Auger <eric.auger@redhat.com>
-> Cc: Jean-Philippe Brucker <jean-philippe@linaro.org>
-> Cc: Joerg Roedel <joro@8bytes.org>
-> Cc: Lu Baolu <baolu.lu@linux.intel.com>
-> Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
-> Signed-off-by: Jacob Pan <jacob.jun.pan@linux.intel.com>
-> ---
-> v6 -> v7:
-> *) rephrase the commit message, replace the @data[] field in struct
->    iommu_nesting_info with union per comments from Eric Auger.
-> 
-> v5 -> v6:
-> *) rephrase the feature notes per comments from Eric Auger.
-> *) rename @size of struct iommu_nesting_info to @argsz.
-> 
-> v4 -> v5:
-> *) address comments from Eric Auger.
-> 
-> v3 -> v4:
-> *) split the SMMU driver changes to be a separate patch
-> *) move the @addr_width and @pasid_bits from vendor specific
->    part to generic part.
-> *) tweak the description for the @features field of struct
->    iommu_nesting_info.
-> *) add description on the @data[] field of struct iommu_nesting_info
-> 
-> v2 -> v3:
-> *) remvoe cap/ecap_mask in iommu_nesting_info.
-> *) reuse DOMAIN_ATTR_NESTING to get nesting info.
-> *) return an empty iommu_nesting_info for SMMU drivers per Jean'
->    suggestion.
-> ---
->  include/uapi/linux/iommu.h | 76 ++++++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 76 insertions(+)
-> 
-> diff --git a/include/uapi/linux/iommu.h b/include/uapi/linux/iommu.h
-> index 1ebc23d..ff987e4 100644
-> --- a/include/uapi/linux/iommu.h
-> +++ b/include/uapi/linux/iommu.h
-> @@ -341,4 +341,80 @@ struct iommu_gpasid_bind_data {
->  	} vendor;
->  };
->  
-> +/*
-> + * struct iommu_nesting_info_vtd - Intel VT-d specific nesting info.
-> + *
-> + * @flags:	VT-d specific flags. Currently reserved for future
-> + *		extension. must be set to 0.
-> + * @cap_reg:	Describe basic capabilities as defined in VT-d capability
-> + *		register.
-> + * @ecap_reg:	Describe the extended capabilities as defined in VT-d
-> + *		extended capability register.
-> + */
-> +struct iommu_nesting_info_vtd {
-> +	__u32	flags;
-> +	__u64	cap_reg;
-> +	__u64	ecap_reg;
-> +};
+On 9/11/20 12:36 PM, Dave Hansen wrote:
+> On 9/11/20 12:25 PM, Krish Sadhukhan wrote:
+>> diff --git a/arch/x86/include/asm/cpufeatures.h b/arch/x86/include/asm/cpufeatures.h
+>> index 81335e6fe47d..0e5b27ee5931 100644
+>> --- a/arch/x86/include/asm/cpufeatures.h
+>> +++ b/arch/x86/include/asm/cpufeatures.h
+>> @@ -293,6 +293,7 @@
+>>   #define X86_FEATURE_FENCE_SWAPGS_USER	(11*32+ 4) /* "" LFENCE in user entry SWAPGS path */
+>>   #define X86_FEATURE_FENCE_SWAPGS_KERNEL	(11*32+ 5) /* "" LFENCE in kernel entry SWAPGS path */
+>>   #define X86_FEATURE_SPLIT_LOCK_DETECT	(11*32+ 6) /* #AC for split lock */
+>> +#define X86_FEATURE_HW_CACHE_COHERENCY (11*32+ 7) /* AMD hardware-enforced cache coherency */
+> That's an awfully generic name.  We generally have "hardware-enforced
+> cache coherency" already everywhere. :)
+>
+> This probably needs to say something about encryption, or even SEV
+> specifically.
 
 
-The vendor union has 8-byte alignment, so flags here will be 8-byte
-aligned, followed by a compiler dependent gap before the 8-byte fields.
-We should fill that gap with padding to make it deterministic for
-userspace.  Thanks,
+How about X86_FEATURE_ENC_CACHE_COHERENCY ?
 
-Alex
-
-> +
-> +/*
-> + * struct iommu_nesting_info - Information for nesting-capable IOMMU.
-> + *			       userspace should check it before using
-> + *			       nesting capability.
-> + *
-> + * @argsz:	size of the whole structure.
-> + * @flags:	currently reserved for future extension. must set to 0.
-> + * @format:	PASID table entry format, the same definition as struct
-> + *		iommu_gpasid_bind_data @format.
-> + * @features:	supported nesting features.
-> + * @addr_width:	The output addr width of first level/stage translation
-> + * @pasid_bits:	Maximum supported PASID bits, 0 represents no PASID
-> + *		support.
-> + * @vendor:	vendor specific data, structure type can be deduced from
-> + *		@format field.
-> + *
-> + * +===============+======================================================+
-> + * | feature       |  Notes                                               |
-> + * +===============+======================================================+
-> + * | SYSWIDE_PASID |  IOMMU vendor driver sets it to mandate userspace    |
-> + * |               |  to allocate PASID from kernel. All PASID allocation |
-> + * |               |  free must be mediated through the IOMMU UAPI.       |
-> + * +---------------+------------------------------------------------------+
-> + * | BIND_PGTBL    |  IOMMU vendor driver sets it to mandate userspace to |
-> + * |               |  bind the first level/stage page table to associated |
-> + * |               |  PASID (either the one specified in bind request or  |
-> + * |               |  the default PASID of iommu domain), through IOMMU   |
-> + * |               |  UAPI.                                               |
-> + * +---------------+------------------------------------------------------+
-> + * | CACHE_INVLD   |  IOMMU vendor driver sets it to mandate userspace to |
-> + * |               |  explicitly invalidate the IOMMU cache through IOMMU |
-> + * |               |  UAPI according to vendor-specific requirement when  |
-> + * |               |  changing the 1st level/stage page table.            |
-> + * +---------------+------------------------------------------------------+
-> + *
-> + * data struct types defined for @format:
-> + * +================================+=====================================+
-> + * | @format                        | data struct                         |
-> + * +================================+=====================================+
-> + * | IOMMU_PASID_FORMAT_INTEL_VTD   | struct iommu_nesting_info_vtd       |
-> + * +--------------------------------+-------------------------------------+
-> + *
-> + */
-> +struct iommu_nesting_info {
-> +	__u32	argsz;
-> +	__u32	flags;
-> +	__u32	format;
-> +#define IOMMU_NESTING_FEAT_SYSWIDE_PASID	(1 << 0)
-> +#define IOMMU_NESTING_FEAT_BIND_PGTBL		(1 << 1)
-> +#define IOMMU_NESTING_FEAT_CACHE_INVLD		(1 << 2)
-> +	__u32	features;
-> +	__u16	addr_width;
-> +	__u16	pasid_bits;
-> +	__u8	padding[12];
-> +	/* Vendor specific data */
-> +	union {
-> +		struct iommu_nesting_info_vtd vtd;
-> +	} vendor;
-> +};
-> +
->  #endif /* _UAPI_IOMMU_H */
-
+> I also don't see this bit in the "AMD64 Architecture
+> Programmer’s Manual".  Did I look in the wrong spot somehow?
+Section 7.10.6 in APM mentions this.
