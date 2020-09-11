@@ -2,187 +2,149 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5F21E266810
-	for <lists+kvm@lfdr.de>; Fri, 11 Sep 2020 20:09:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B614B266870
+	for <lists+kvm@lfdr.de>; Fri, 11 Sep 2020 20:58:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725829AbgIKSJR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 11 Sep 2020 14:09:17 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:48620 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725794AbgIKSJP (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 11 Sep 2020 14:09:15 -0400
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 08BI4ija007043;
-        Fri, 11 Sep 2020 14:09:13 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=MIUpt10ZTd/d8+sVytWwb8B8j38fUC83MUE3OWcxIRA=;
- b=q8Tbe8XYG+Wt7GVpMa3bHxBDenaQVN8IXHmagcvdUIR40iKv7BglQFDny9Z6zn+7kGcm
- rpqNKykpC5JR3NqN0QOGKVs6akhqxmXv7zXQwuzj//uV7cLleuEP/pvZrIiDa3dp59IX
- 2qoFfIC0gq7N/+YqYV+FGHzUM0yxXrs4TIQJ8FGnUxwjQIvX9s3H2fXOaMDvLlvDFlIz
- HEs5ehP/Qyjb+zSDzX0lwarG1Se0hMwd4ToeUkwtTNL8FljOmNZ5QvQUx++67FuIbvZw
- QD0i7kH4+YSm+f0kZSjMnICwGYK54kZ0nNpYiao6GymfOY8PYCFQ5gfxpfSC3mlyC/Pr LQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 33gdmjgx8c-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 11 Sep 2020 14:09:13 -0400
-Received: from m0098404.ppops.net (m0098404.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 08BI6lfZ019614;
-        Fri, 11 Sep 2020 14:09:13 -0400
-Received: from ppma01dal.us.ibm.com (83.d6.3fa9.ip4.static.sl-reverse.com [169.63.214.131])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 33gdmjgx81-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 11 Sep 2020 14:09:13 -0400
-Received: from pps.filterd (ppma01dal.us.ibm.com [127.0.0.1])
-        by ppma01dal.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 08BI7x7f017968;
-        Fri, 11 Sep 2020 18:09:12 GMT
-Received: from b03cxnp08025.gho.boulder.ibm.com (b03cxnp08025.gho.boulder.ibm.com [9.17.130.17])
-        by ppma01dal.us.ibm.com with ESMTP id 33d46ngvf4-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 11 Sep 2020 18:09:12 +0000
-Received: from b03ledav006.gho.boulder.ibm.com (b03ledav006.gho.boulder.ibm.com [9.17.130.237])
-        by b03cxnp08025.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 08BI97MI262706
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 11 Sep 2020 18:09:07 GMT
-Received: from b03ledav006.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 9D551C6055;
-        Fri, 11 Sep 2020 18:09:10 +0000 (GMT)
-Received: from b03ledav006.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id DCAFDC6057;
-        Fri, 11 Sep 2020 18:09:09 +0000 (GMT)
-Received: from oc4221205838.ibm.com (unknown [9.211.91.207])
-        by b03ledav006.gho.boulder.ibm.com (Postfix) with ESMTP;
-        Fri, 11 Sep 2020 18:09:09 +0000 (GMT)
-Subject: Re: [PATCH] vfio iommu: Add dma limit capability
-To:     Alex Williamson <alex.williamson@redhat.com>
-Cc:     cohuck@redhat.com, pmorel@linux.ibm.com, schnelle@linux.ibm.com,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <1599842643-2553-1-git-send-email-mjrosato@linux.ibm.com>
- <1599842643-2553-2-git-send-email-mjrosato@linux.ibm.com>
- <20200911110915.13302afa@w520.home>
-From:   Matthew Rosato <mjrosato@linux.ibm.com>
-Message-ID: <ced5c20e-b4a2-ce0f-ceef-b6bb311de607@linux.ibm.com>
-Date:   Fri, 11 Sep 2020 14:09:09 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+        id S1725849AbgIKS6k (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 11 Sep 2020 14:58:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38770 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725835AbgIKS6e (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 11 Sep 2020 14:58:34 -0400
+Received: from mail-pf1-x443.google.com (mail-pf1-x443.google.com [IPv6:2607:f8b0:4864:20::443])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CD0D8C061757
+        for <kvm@vger.kernel.org>; Fri, 11 Sep 2020 11:58:33 -0700 (PDT)
+Received: by mail-pf1-x443.google.com with SMTP id z19so8069725pfn.8
+        for <kvm@vger.kernel.org>; Fri, 11 Sep 2020 11:58:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=ZXmHidgwtnTnxCDrTuOclLLnDmLj/yLMTWxKoHjkjfQ=;
+        b=ZrOejeHoXLixXlu6m7vIPESK+fObNaFjZbYZb6BuPccGC8RhiVx86JFf69d/MMrQh3
+         c5GLEicnmJy6bM1/V0UBllGrc6/ouavLYqSLeTsNsbiwto675zmuU7WPI4+tQ1SjuaIh
+         xmSrh1si1mjT6qM2CdlptrXbP8DIJUI+A8S8M=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=ZXmHidgwtnTnxCDrTuOclLLnDmLj/yLMTWxKoHjkjfQ=;
+        b=dEexKWMjZq8yKrdwPjEPIGzTEoiFcd+RSILFtqz/2XSaWiZS7NuvK/Sv36Btye0J8W
+         6TuaKnl8j9CyfHoFiJ0747cS+0wdwtz+evS7h0AT7ypw0wxIpLwM2vnGaggZf8UeZTxs
+         zw39d9DncT1l4jWvUWRohTDdq3XU68jSRtDQOGYf5bsIKdhNHi/JdiE5Rs4aOOu2YWYm
+         H34Rk2xIkLfP4JCa7hAQmuoJynGiCsKosmHknKJtvPH9FPO6DBtG35FqNtRwiTCafme0
+         ARjoY2ch7dyF0RcLQtiZ6YuSKCHzMHH+JAV7SDVLQXPTfB4z3y2xgyqaDPGG8mGrCBLW
+         wifQ==
+X-Gm-Message-State: AOAM530sSom0xGkZuus2uBwW8W9xDvGIF7nX56yal5245RYA72tQDmDF
+        7R6PXOCRoEBEZDQu0l5ZXYzJLw==
+X-Google-Smtp-Source: ABdhPJx1HHzPM4LUXPoNomXjYpginIkBVFSvmj1qsqnJ/hNQ+buyCEi68fmII7HiPctkjBg2DoUsgw==
+X-Received: by 2002:a63:fd51:: with SMTP id m17mr2779530pgj.210.1599850713261;
+        Fri, 11 Sep 2020 11:58:33 -0700 (PDT)
+Received: from www.outflux.net (smtp.outflux.net. [198.145.64.163])
+        by smtp.gmail.com with ESMTPSA id 124sm2920285pfd.132.2020.09.11.11.58.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 11 Sep 2020 11:58:31 -0700 (PDT)
+Date:   Fri, 11 Sep 2020 11:58:30 -0700
+From:   Kees Cook <keescook@chromium.org>
+To:     Michael Ellerman <mpe@ellerman.id.au>
+Cc:     Thomas Gleixner <tglx@linutronix.de>,
+        Robert O'Callahan <rocallahan@gmail.com>,
+        LKML <linux-kernel@vger.kernel.org>,
+        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
+        linux-arch@vger.kernel.org, Will Deacon <will@kernel.org>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Keno Fischer <keno@juliacomputing.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        kvm list <kvm@vger.kernel.org>,
+        Gabriel Krisman Bertazi <krisman@collabora.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Kyle Huey <me@kylehuey.com>
+Subject: Re: [REGRESSION] x86/entry: Tracer no longer has opportunity to
+ change the syscall number at entry via orig_ax
+Message-ID: <202009111156.660A7C2978@keescook>
+References: <CAP045Arc1Vdh+n2j2ELE3q7XfagLjyqXji9ZD0jqwVB-yuzq-g@mail.gmail.com>
+ <87blj6ifo8.fsf@nanos.tec.linutronix.de>
+ <87a6xzrr89.fsf@mpe.ellerman.id.au>
 MIME-Version: 1.0
-In-Reply-To: <20200911110915.13302afa@w520.home>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
- definitions=2020-09-11_09:2020-09-10,2020-09-11 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 impostorscore=0
- malwarescore=0 bulkscore=0 mlxlogscore=999 mlxscore=0 adultscore=0
- suspectscore=0 phishscore=0 spamscore=0 priorityscore=1501
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2006250000 definitions=main-2009110145
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87a6xzrr89.fsf@mpe.ellerman.id.au>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 9/11/20 1:09 PM, Alex Williamson wrote:
-> On Fri, 11 Sep 2020 12:44:03 -0400
-> Matthew Rosato <mjrosato@linux.ibm.com> wrote:
+On Wed, Sep 09, 2020 at 11:53:42PM +1000, Michael Ellerman wrote:
+> Hi Thomas,
 > 
->> Commit 492855939bdb ("vfio/type1: Limit DMA mappings per container")
->> added the ability to limit the number of memory backed DMA mappings.
->> However on s390x, when lazy mapping is in use, we use a very large
->> number of concurrent mappings.  Let's provide the limitation to
->> userspace via the IOMMU info chain so that userspace can take
->> appropriate mitigation.
->>
->> Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
->> ---
->>   drivers/vfio/vfio_iommu_type1.c | 17 +++++++++++++++++
->>   include/uapi/linux/vfio.h       | 16 ++++++++++++++++
->>   2 files changed, 33 insertions(+)
->>
->> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
->> index 5fbf0c1..573c2c9 100644
->> --- a/drivers/vfio/vfio_iommu_type1.c
->> +++ b/drivers/vfio/vfio_iommu_type1.c
->> @@ -2609,6 +2609,20 @@ static int vfio_iommu_migration_build_caps(struct vfio_iommu *iommu,
->>   	return vfio_info_add_capability(caps, &cap_mig.header, sizeof(cap_mig));
->>   }
->>   
->> +static int vfio_iommu_dma_limit_build_caps(struct vfio_iommu *iommu,
->> +					   struct vfio_info_cap *caps)
->> +{
->> +	struct vfio_iommu_type1_info_dma_limit cap_dma_limit;
->> +
->> +	cap_dma_limit.header.id = VFIO_IOMMU_TYPE1_INFO_DMA_LIMIT;
->> +	cap_dma_limit.header.version = 1;
->> +
->> +	cap_dma_limit.max = dma_entry_limit;
+> Sorry if this was discussed already somewhere, but I didn't see anything ...
 > 
+> Thomas Gleixner <tglx@linutronix.de> writes:
+> > On Wed, Aug 19 2020 at 10:14, Kyle Huey wrote:
+> >> tl;dr: after 27d6b4d14f5c3ab21c4aef87dd04055a2d7adf14 ptracer
+> >> modifications to orig_ax in a syscall entry trace stop are not honored
+> >> and this breaks our code.
+> ...
+> > diff --git a/kernel/entry/common.c b/kernel/entry/common.c
+> > index 9852e0d62d95..fcae019158ca 100644
+> > --- a/kernel/entry/common.c
+> > +++ b/kernel/entry/common.c
+> > @@ -65,7 +65,8 @@ static long syscall_trace_enter(struct pt_regs *regs, long syscall,
 > 
-> I think you want to report iommu->dma_avail, which might change the
-> naming and semantics of the capability a bit.  dma_entry_limit is a
-> writable module param, so the current value might not be relevant to
-> this container at the time that it's read.  When a container is opened
-> we set iommu->dma_avail to the current dma_entry_limit, therefore later
-> modifications of dma_entry_limit are only relevant to subsequent
-> containers.
+> Adding context:
 > 
-> It seems like there are additional benefits to reporting available dma
-> entries as well, for example on mapping failure userspace could
-> reevaluate, perhaps even validate usage counts between kernel and user.
+> 	/* Do seccomp after ptrace, to catch any tracer changes. */
+> 	if (ti_work & _TIF_SECCOMP) {
+> 		ret = __secure_computing(NULL);
+> 		if (ret == -1L)
+> 			return ret;
+> 	}
+> 
+> 	if (unlikely(ti_work & _TIF_SYSCALL_TRACEPOINT))
+> 		trace_sys_enter(regs, syscall);
+> 
+> >  	syscall_enter_audit(regs, syscall);
+> >  
+> > -	return ret ? : syscall;
+> > +	/* The above might have changed the syscall number */
+> > +	return ret ? : syscall_get_nr(current, regs);
+> >  }
+> >  
+> >  noinstr long syscall_enter_from_user_mode(struct pt_regs *regs, long syscall)
+> 
+> I noticed if the syscall number is changed by seccomp/ptrace, the
+> original syscall number is still passed to trace_sys_enter() and audit.
+> 
+> The old code used regs->orig_ax, so any change to the syscall number
+> would be seen by the tracepoint and audit.
 
-Hmm, both good points.  I'll re-work to something that presents the 
-current dma_avail for the container instead.  Thanks!
+Ah! That's no good.
 
-> Thanks,
+> I can observe the difference between v5.8 and mainline, using the
+> raw_syscall trace event and running the seccomp_bpf selftest which turns
+> a getpid (39) into a getppid (110).
 > 
-> Alex
+> With v5.8 we see getppid on entry and exit:
 > 
->> +
->> +	return vfio_info_add_capability(caps, &cap_dma_limit.header,
->> +					sizeof(cap_dma_limit));
->> +}
->> +
->>   static int vfio_iommu_type1_get_info(struct vfio_iommu *iommu,
->>   				     unsigned long arg)
->>   {
->> @@ -2642,6 +2656,9 @@ static int vfio_iommu_type1_get_info(struct vfio_iommu *iommu,
->>   	ret = vfio_iommu_migration_build_caps(iommu, &caps);
->>   
->>   	if (!ret)
->> +		ret = vfio_iommu_dma_limit_build_caps(iommu, &caps);
->> +
->> +	if (!ret)
->>   		ret = vfio_iommu_iova_build_caps(iommu, &caps);
->>   
->>   	mutex_unlock(&iommu->lock);
->> diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
->> index 9204705..c91e471 100644
->> --- a/include/uapi/linux/vfio.h
->> +++ b/include/uapi/linux/vfio.h
->> @@ -1039,6 +1039,22 @@ struct vfio_iommu_type1_info_cap_migration {
->>   	__u64	max_dirty_bitmap_size;		/* in bytes */
->>   };
->>   
->> +/*
->> + * The DMA limit capability allows to report the number of simultaneously
->> + * outstanding DMA mappings are supported.
->> + *
->> + * The structures below define version 1 of this capability.
->> + *
->> + * max: specifies the maximum number of outstanding DMA mappings allowed.
->> + */
->> +#define VFIO_IOMMU_TYPE1_INFO_DMA_LIMIT 3
->> +
->> +struct vfio_iommu_type1_info_dma_limit {
->> +	struct	vfio_info_cap_header header;
->> +	__u32	max;
->> +};
->> +
->> +
->>   #define VFIO_IOMMU_GET_INFO _IO(VFIO_TYPE, VFIO_BASE + 12)
->>   
->>   /**
+>      seccomp_bpf-1307  [000] .... 22974.874393: sys_enter: NR 110 (7ffff22c46e0, 40a350, 4, fffffffffffff7ab, 7fa6ee0d4010, 0)
+>      seccomp_bpf-1307  [000] .N.. 22974.874401: sys_exit: NR 110 = 1304
 > 
+> Whereas on mainline we see an enter for getpid and an exit for getppid:
+> 
+>      seccomp_bpf-1030  [000] ....    21.806766: sys_enter: NR 39 (7ffe2f6d1ad0, 40a350, 7ffe2f6d1ad0, 0, 0, 407299)
+>      seccomp_bpf-1030  [000] ....    21.806767: sys_exit: NR 110 = 1027
+> 
+> 
+> I don't know audit that well, but I think it saves the syscall number on
+> entry eg. in __audit_syscall_entry(). So it will record the wrong
+> syscall happening in this case I think.
+> 
+> Seems like we should reload the syscall number before calling
+> trace_sys_enter() & audit ?
 
+Agreed. I wonder what the best way to build a regression test for this
+is... hmmm.
+
+-- 
+Kees Cook
