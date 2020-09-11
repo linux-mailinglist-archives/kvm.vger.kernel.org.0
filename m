@@ -2,102 +2,123 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A95AA26628A
-	for <lists+kvm@lfdr.de>; Fri, 11 Sep 2020 17:52:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C11422662C0
+	for <lists+kvm@lfdr.de>; Fri, 11 Sep 2020 18:00:02 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726530AbgIKPw2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 11 Sep 2020 11:52:28 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:54933 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726531AbgIKPwL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 11 Sep 2020 11:52:11 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1599839507;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=fCBNxhg4v+PlU/AgCt/3/vpQJvyfun2d3FdEVJq/cDc=;
-        b=ML91t1Lnw6979RerElZkiu9Fj4AwsOyfMaSsXmMSzcAGDd05MMgN4+vFzgefhq3Eku3Prr
-        acvNeofRzyurK7V1QSAUakvjAMVfBbR0I7jcT20dfE8rla/jjAhFtTep3DEcfFCOVHIu0v
-        AsaODXsviu7prqNQklePnjQCkjbm/PQ=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-414-evcznX8cOPSFaXlz2vF3tw-1; Fri, 11 Sep 2020 11:51:45 -0400
-X-MC-Unique: evcznX8cOPSFaXlz2vF3tw-1
-Received: by mail-wm1-f71.google.com with SMTP id m20so770363wmg.6
-        for <kvm@vger.kernel.org>; Fri, 11 Sep 2020 08:51:45 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=fCBNxhg4v+PlU/AgCt/3/vpQJvyfun2d3FdEVJq/cDc=;
-        b=ahMENzEQKi8dKampUFvfmjFEV/XfAShPqRnWDf+Nti/qRAY+DPMLRloeDo26qZ2hGT
-         omzIBXwgApLHsAVoxf6CIN1bihkyPsNE+FJN79IomyWuOtoX8cehMlQmzxQymsyzew/C
-         LqzOeq1mvXDllpyheY8omM3l0renxhc3Q1OC4GPbcWTl9n5NQAGehWb7XCDwYnIusQqM
-         +NzzESi7HurSz5WexS3W6NmLj7q5LsksjXFGKCXpNPzFpStJPjvc2BkITPHn1Qx/dEyp
-         9CxNkjmLXgBxioRH34Udq/bSBXRUSXW5UfKlseTR4u6jNXDX75h6zB6B61ycUU7WELR/
-         2koA==
-X-Gm-Message-State: AOAM530wJRwnBKVaIFy78ruIl0r82a4LfuqenWnZjg/EutaZta2Au0nr
-        43Pw9ro0gpyrh5pXsBBwsiltJskvk6195LavHCi1BTGrs7g9RJTh+I6vBa8krtA9ZnWOAxPc1dF
-        DBZcPGNuN7xks
-X-Received: by 2002:a1c:5906:: with SMTP id n6mr2979461wmb.160.1599839504397;
-        Fri, 11 Sep 2020 08:51:44 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzQCqvimZAE4vluHyVy943ZzCol91kQ2jsAOfVdq1lcxwqpS1hnNIAz54XhxFeFAyaaHXW/AA==
-X-Received: by 2002:a1c:5906:: with SMTP id n6mr2979442wmb.160.1599839504147;
-        Fri, 11 Sep 2020 08:51:44 -0700 (PDT)
-Received: from [192.168.10.150] ([93.56.170.5])
-        by smtp.gmail.com with ESMTPSA id l126sm5052866wmf.39.2020.09.11.08.51.43
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 11 Sep 2020 08:51:43 -0700 (PDT)
-Subject: Re: [PATCH v2] KVM: nVMX: Update VMCS02 when L2 PAE PDPTE updates
- detected
-To:     Peter Shier <pshier@google.com>, kvm@vger.kernel.org
-Cc:     Jim Mattson <jmattson@google.com>
-References: <20200820230545.2411347-1-pshier@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <7c1be323-f7a6-e7da-67e7-942443e57488@redhat.com>
-Date:   Fri, 11 Sep 2020 17:51:42 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+        id S1726530AbgIKP77 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 11 Sep 2020 11:59:59 -0400
+Received: from mail.kernel.org ([198.145.29.99]:44470 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726479AbgIKP7U (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 11 Sep 2020 11:59:20 -0400
+Received: from willie-the-truck (236.31.169.217.in-addr.arpa [217.169.31.236])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 7034021D47;
+        Fri, 11 Sep 2020 15:59:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1599839958;
+        bh=+HimZcClfEp/hB2NLGhAPb0y7aED313uyvMLU7dfEFg=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=NhPZx6zVsZ2jmLqKh5aSqxuCiqEwbWbGXBGpD007JoczFwGCray0iHPNlPAfzLY6i
+         lyEpREPKRv3xhGCfhKUAURVnTlr0f9eCeafHkbjRlcccYtJDUL+2WbF6irqkTzO3bk
+         2cZtQ/rU8Zf+4hLJQWsX7i9YkkEVGWRzVI/2x5hk=
+Date:   Fri, 11 Sep 2020 16:59:13 +0100
+From:   Will Deacon <will@kernel.org>
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        kvmarm@lists.cs.columbia.edu, James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        kernel-team@android.com, stable@vger.kernel.org
+Subject: Re: [PATCH] KVM: arm64: Assume write fault on S1PTW permission fault
+ on instruction fetch
+Message-ID: <20200911155912.GB20527@willie-the-truck>
+References: <20200909210527.1926996-1-maz@kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20200820230545.2411347-1-pshier@google.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200909210527.1926996-1-maz@kernel.org>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 21/08/20 01:05, Peter Shier wrote:
-> After L1 exits, vmx_vcpu_run calls vmx_register_cache_reset which
-> clears VCPU_EXREG_PDPTR in vcpu->arch.regs_dirty.  When L2 next
-> resumes, ept_load_pdptrs finds VCPU_EXREG_PDPTR clear in
-> vcpu->arch.regs_dirty and does not load VMCS02.GUEST_PDPTRn from
-> vcpu->arch.walk_mmu->pdptrs[]. prepare_vmcs02 will then load
-> VMCS02.GUEST_PDPTRn from vmcs12->pdptr0/1/2/3 which contain the stale
-> values stored at last L2 exit. A repro of this bug showed L2 entering
-> triple fault immediately due to the bad VMCS02.GUEST_PDPTRn values.
+On Wed, Sep 09, 2020 at 10:05:27PM +0100, Marc Zyngier wrote:
+> KVM currently assumes that an instruction abort can never be a write.
+> This is in general true, except when the abort is triggered by
+> a S1PTW on instruction fetch that tries to update the S1 page tables
+> (to set AF, for example).
 > 
-> When L2 is in PAE paging mode add a call to ept_load_pdptrs before
-> leaving L2. This will update VMCS02.GUEST_PDPTRn if they are dirty in
-> vcpu->arch.walk_mmu->pdptrs[].
+> This can happen if the page tables have been paged out and brought
+> back in without seeing a direct write to them (they are thus marked
+> read only), and the fault handling code will make the PT executable(!)
+> instead of writable. The guest gets stuck forever.
+> 
+> In these conditions, the permission fault must be considered as
+> a write so that the Stage-1 update can take place. This is essentially
+> the I-side equivalent of the problem fixed by 60e21a0ef54c ("arm64: KVM:
+> Take S1 walks into account when determining S2 write faults").
+> 
+> Update both kvm_is_write_fault() to return true on IABT+S1PTW, as well
+> as kvm_vcpu_trap_is_iabt() to return false in the same conditions.
+> 
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+> This could do with some cleanup (kvm_vcpu_dabt_iss1tw has nothing to do
+> with data aborts), but I've chosen to keep the patch simple in order to
+> ease backporting.
+> 
+>  arch/arm64/include/asm/kvm_emulate.h | 6 +++++-
+>  1 file changed, 5 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+> index d21676409a24..33d7e16edaa3 100644
+> --- a/arch/arm64/include/asm/kvm_emulate.h
+> +++ b/arch/arm64/include/asm/kvm_emulate.h
+> @@ -480,7 +480,8 @@ static __always_inline u8 kvm_vcpu_trap_get_class(const struct kvm_vcpu *vcpu)
+>  
+>  static inline bool kvm_vcpu_trap_is_iabt(const struct kvm_vcpu *vcpu)
+>  {
+> -	return kvm_vcpu_trap_get_class(vcpu) == ESR_ELx_EC_IABT_LOW;
+> +	return (kvm_vcpu_trap_get_class(vcpu) == ESR_ELx_EC_IABT_LOW &&
+> +		!kvm_vcpu_dabt_iss1tw(vcpu));
+>  }
+>  
+>  static __always_inline u8 kvm_vcpu_trap_get_fault(const struct kvm_vcpu *vcpu)
+> @@ -520,6 +521,9 @@ static __always_inline int kvm_vcpu_sys_get_rt(struct kvm_vcpu *vcpu)
+>  
+>  static inline bool kvm_is_write_fault(struct kvm_vcpu *vcpu)
+>  {
+> +	if (kvm_vcpu_dabt_iss1tw(vcpu))
+> +		return true;
+> +
 
-Queued with an improved comment:
+Hmm, I'm a bit uneasy about the interaction of this with
+kvm_handle_guest_abort() if we take an S1PTW fault on instruction fetch
+with our page-tables sitting in a read-only memslot. In this case, I
+think we'll end up injecting a data abort into the guest instead of an
+instruction abort. It hurts my brain thinking about it though.
 
- 	/*
--	 * Ensure that the VMCS02 PDPTR fields are up-to-date before switching
--	 * to L1.
-+	 * VCPU_EXREG_PDPTR will be clobbered in arch/x86/kvm/vmx/vmx.h between
-+	 * now and the new vmentry.  Ensure that the VMCS02 PDPTR fields are
-+	 * up-to-date before switching to L1.
- 	 */
+Overall, I'd be inclined to:
 
-I am currently on leave so I am going through the patches and queuing 
-them, but I will only push kvm/next and kvm/queue next week.  kvm/master
-patches will be sent to Linus for the next -rc though.
+  1. Rename kvm_vcpu_dabt_iss1tw() to kvm_vcpu_abt_iss1tw()
 
-Paolo
+  2. Introduce something like kvm_is_exec_fault() as:
 
+	return kvm_vcpu_trap_is_iabt() && !kvm_vcpu_abt_iss1tw();
+
+  3. Use that new function in user_mem_abort() to assign 'exec_fault'
+
+  4. Hack kvm_is_write_fault() as you have done above.
+
+Which I _think_ should work (famous last words)...
+
+The only nasty bit is that we then duplicate the kvm_vcpu_dabt_iss1tw()
+check in both kvm_is_write_fault() and kvm_vcpu_dabt_iswrite(). Perhaps
+we could remove the latter function in favour of the first? Anyway,
+obviously this sort of cleanup isn't for stable.
+
+Will
