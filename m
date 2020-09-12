@@ -2,112 +2,108 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E01BC2675BA
-	for <lists+kvm@lfdr.de>; Sat, 12 Sep 2020 00:13:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C692F2676B3
+	for <lists+kvm@lfdr.de>; Sat, 12 Sep 2020 02:11:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725863AbgIKWNb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 11 Sep 2020 18:13:31 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:36119 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725835AbgIKWNZ (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 11 Sep 2020 18:13:25 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1599862404;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=bNdqLX/1IsBk9y3zbU1h+vtkVGVurJjrUpeR9luyt7o=;
-        b=iW0G+5WOsIUdkM965TMlU7R/gYFvuLiknK7Cjk2tpypv12/WLh+v2KAT20uGSxLmWLWLLO
-        l7BZadi1EyJPi+y6Ai5coWxKevKFiunW0bnc3YV5IqezspA0cTlyL6eYrWvYuK+qSCGhjo
-        NgARC8xFPoy4Dg5ORT7JGSLGZJkUNpY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-169-LBfx2pWRPzGGg20n5LtlrQ-1; Fri, 11 Sep 2020 18:13:20 -0400
-X-MC-Unique: LBfx2pWRPzGGg20n5LtlrQ-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4BF1D1074640;
-        Fri, 11 Sep 2020 22:13:18 +0000 (UTC)
-Received: from w520.home (ovpn-112-71.phx2.redhat.com [10.3.112.71])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 9CD2F5C5AF;
-        Fri, 11 Sep 2020 22:13:11 +0000 (UTC)
-Date:   Fri, 11 Sep 2020 16:13:11 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Liu Yi L <yi.l.liu@intel.com>
-Cc:     eric.auger@redhat.com, baolu.lu@linux.intel.com, joro@8bytes.org,
-        kevin.tian@intel.com, jacob.jun.pan@linux.intel.com,
-        ashok.raj@intel.com, jun.j.tian@intel.com, yi.y.sun@intel.com,
-        jean-philippe@linaro.org, peterx@redhat.com, jasowang@redhat.com,
-        hao.wu@intel.com, stefanha@gmail.com,
-        iommu@lists.linux-foundation.org, kvm@vger.kernel.org
-Subject: Re: [PATCH v7 13/16] vfio/pci: Expose PCIe PASID capability to
- guest
-Message-ID: <20200911161311.13999a57@w520.home>
-In-Reply-To: <1599734733-6431-14-git-send-email-yi.l.liu@intel.com>
-References: <1599734733-6431-1-git-send-email-yi.l.liu@intel.com>
-        <1599734733-6431-14-git-send-email-yi.l.liu@intel.com>
+        id S1725883AbgILALC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 11 Sep 2020 20:11:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58792 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725824AbgILAK5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 11 Sep 2020 20:10:57 -0400
+Received: from mail-pj1-x1034.google.com (mail-pj1-x1034.google.com [IPv6:2607:f8b0:4864:20::1034])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A868AC061757
+        for <kvm@vger.kernel.org>; Fri, 11 Sep 2020 17:10:56 -0700 (PDT)
+Received: by mail-pj1-x1034.google.com with SMTP id n3so3251429pjq.1
+        for <kvm@vger.kernel.org>; Fri, 11 Sep 2020 17:10:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=ptEAU1Xnng1x4phMWyVZ560k80eHq758Hzhoynkaycc=;
+        b=X9GwGioE/sKlB0N60NGjN7QVepFxUFBUgG8XStPDYy6zg1BVuEqovR/eJ6oHvaTG/6
+         iaHvt0uhANQpifz3K87589CfbzpkWkab4jtrLcxwJ4YXZngIB4byQpCfgPUtJz6wcWio
+         6cE79xeS3xd/Wr+C5QTZg6Oc33JTJ4EaRmDWk=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=ptEAU1Xnng1x4phMWyVZ560k80eHq758Hzhoynkaycc=;
+        b=oQ8jI23jYbOcI2tseXaAiRgrdXIxOsamyoiZlB/7rVFcTETJnc17R8YAJiKvn7tuW8
+         uNTF6Tj66Saq/6JCH0pqvGSJ1f4zmg82758cLwoabQQEhGxcZ/4SAKK1btrpPiD1G0Dd
+         Cl6FOyCHB9rnUQDeZhgPNCsoBU9374mMJN2L1+6ft4+xmi82+IHj0swv4l2hp5eJ1ZFR
+         /DBKfAbiM/x/GU3N7dgDTnBi6FMkqp6E6A4sYf/OZBOOXNduSpgQKjj1S961IeYy936V
+         zx2c0THF3aA+DQh1SQwLCj6Psg/CpFOj7S0R3kUzXTLkfMI3nbXlyKUAjva38ZL1mxy0
+         dpTw==
+X-Gm-Message-State: AOAM530dMtviudtv/hcLgaE7NaVA4svtOO3f2aIU7omQcsqQnc3FsaEM
+        9mahai4TyBB229XDt9uiJ+jgbS55DGgqoide
+X-Google-Smtp-Source: ABdhPJyh4lfB9JNG/vzpZH+PDZ3Lh1qXXu4Qj1pA+d2IYVrAkYtb65TxuiV74KkGkwUeM4NLNt1Kew==
+X-Received: by 2002:a17:90a:46cd:: with SMTP id x13mr4417827pjg.101.1599869454586;
+        Fri, 11 Sep 2020 17:10:54 -0700 (PDT)
+Received: from www.outflux.net (smtp.outflux.net. [198.145.64.163])
+        by smtp.gmail.com with ESMTPSA id b15sm3155923pft.84.2020.09.11.17.10.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 11 Sep 2020 17:10:53 -0700 (PDT)
+Date:   Fri, 11 Sep 2020 17:10:52 -0700
+From:   Kees Cook <keescook@chromium.org>
+To:     Michael Ellerman <mpe@ellerman.id.au>
+Cc:     Thomas Gleixner <tglx@linutronix.de>,
+        Robert O'Callahan <rocallahan@gmail.com>,
+        LKML <linux-kernel@vger.kernel.org>,
+        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
+        linux-arch@vger.kernel.org, Will Deacon <will@kernel.org>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Keno Fischer <keno@juliacomputing.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        kvm list <kvm@vger.kernel.org>,
+        Gabriel Krisman Bertazi <krisman@collabora.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Kyle Huey <me@kylehuey.com>
+Subject: Re: [REGRESSION] x86/entry: Tracer no longer has opportunity to
+ change the syscall number at entry via orig_ax
+Message-ID: <202009111609.61E7875B3@keescook>
+References: <CAP045Arc1Vdh+n2j2ELE3q7XfagLjyqXji9ZD0jqwVB-yuzq-g@mail.gmail.com>
+ <87blj6ifo8.fsf@nanos.tec.linutronix.de>
+ <87a6xzrr89.fsf@mpe.ellerman.id.au>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87a6xzrr89.fsf@mpe.ellerman.id.au>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 10 Sep 2020 03:45:30 -0700
-Liu Yi L <yi.l.liu@intel.com> wrote:
-
-> This patch exposes PCIe PASID capability to guest for assigned devices.
-> Existing vfio_pci driver hides it from guest by setting the capability
-> length as 0 in pci_ext_cap_length[].
-
-This exposes the PASID capability, but it's still read-only, so this
-largely just helps userspace know where to emulate the capability,
-right?  Thanks,
-
-Alex
- 
-> And this patch only exposes PASID capability for devices which has PCIe
-> PASID extended struture in its configuration space. VFs will not expose
-> the PASID capability as they do not implement the PASID extended structure
-> in their config space. It is a TODO in future. Related discussion can be
-> found in below link:
+On Wed, Sep 09, 2020 at 11:53:42PM +1000, Michael Ellerman wrote:
+> I can observe the difference between v5.8 and mainline, using the
+> raw_syscall trace event and running the seccomp_bpf selftest which turns
+> a getpid (39) into a getppid (110).
 > 
-> https://lore.kernel.org/kvm/20200407095801.648b1371@w520.home/
+> With v5.8 we see getppid on entry and exit:
 > 
-> Cc: Kevin Tian <kevin.tian@intel.com>
-> CC: Jacob Pan <jacob.jun.pan@linux.intel.com>
-> Cc: Alex Williamson <alex.williamson@redhat.com>
-> Cc: Eric Auger <eric.auger@redhat.com>
-> Cc: Jean-Philippe Brucker <jean-philippe@linaro.org>
-> Cc: Joerg Roedel <joro@8bytes.org>
-> Cc: Lu Baolu <baolu.lu@linux.intel.com>
-> Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
-> Reviewed-by: Eric Auger <eric.auger@redhat.com>
-> ---
-> v5 -> v6:
-> *) add review-by from Eric Auger.
+>      seccomp_bpf-1307  [000] .... 22974.874393: sys_enter: NR 110 (7ffff22c46e0, 40a350, 4, fffffffffffff7ab, 7fa6ee0d4010, 0)
+>      seccomp_bpf-1307  [000] .N.. 22974.874401: sys_exit: NR 110 = 1304
 > 
-> v1 -> v2:
-> *) added in v2, but it was sent in a separate patchseries before
-> ---
->  drivers/vfio/pci/vfio_pci_config.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+> Whereas on mainline we see an enter for getpid and an exit for getppid:
 > 
-> diff --git a/drivers/vfio/pci/vfio_pci_config.c b/drivers/vfio/pci/vfio_pci_config.c
-> index d98843f..07ff2e6 100644
-> --- a/drivers/vfio/pci/vfio_pci_config.c
-> +++ b/drivers/vfio/pci/vfio_pci_config.c
-> @@ -95,7 +95,7 @@ static const u16 pci_ext_cap_length[PCI_EXT_CAP_ID_MAX + 1] = {
->  	[PCI_EXT_CAP_ID_LTR]	=	PCI_EXT_CAP_LTR_SIZEOF,
->  	[PCI_EXT_CAP_ID_SECPCI]	=	0,	/* not yet */
->  	[PCI_EXT_CAP_ID_PMUX]	=	0,	/* not yet */
-> -	[PCI_EXT_CAP_ID_PASID]	=	0,	/* not yet */
-> +	[PCI_EXT_CAP_ID_PASID]	=	PCI_EXT_CAP_PASID_SIZEOF,
->  };
->  
->  /*
+>      seccomp_bpf-1030  [000] ....    21.806766: sys_enter: NR 39 (7ffe2f6d1ad0, 40a350, 7ffe2f6d1ad0, 0, 0, 407299)
+>      seccomp_bpf-1030  [000] ....    21.806767: sys_exit: NR 110 = 1027
 
+For my own notes, this is how I reproduced it:
+
+# ./perf-$VER record -e raw_syscalls:sys_enter -e raw_syscalls:sys_exit &
+# ./seccomp_bpf
+# fg
+ctrl-c
+# ./perf-$VER script | grep seccomp_bpf | awk '{print $7}' | sort | uniq -c > $VER.log
+*repeat*
+# diff -u old.log new.log
+...
+
+(Is there an easier way to get those results?)
+
+I will go see if I can figure out the best way to correct this.
+
+-- 
+Kees Cook
