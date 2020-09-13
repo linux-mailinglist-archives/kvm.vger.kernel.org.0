@@ -2,61 +2,122 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5B191267BD7
-	for <lists+kvm@lfdr.de>; Sat, 12 Sep 2020 21:03:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D6AD8267E68
+	for <lists+kvm@lfdr.de>; Sun, 13 Sep 2020 09:44:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725873AbgILTDb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 12 Sep 2020 15:03:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34654 "EHLO
+        id S1725926AbgIMHoQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 13 Sep 2020 03:44:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37522 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725838AbgILTDa (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 12 Sep 2020 15:03:30 -0400
-Received: from mail-vs1-xe43.google.com (mail-vs1-xe43.google.com [IPv6:2607:f8b0:4864:20::e43])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 57C1BC061573
-        for <kvm@vger.kernel.org>; Sat, 12 Sep 2020 12:03:28 -0700 (PDT)
-Received: by mail-vs1-xe43.google.com with SMTP id e2so2333614vsr.7
-        for <kvm@vger.kernel.org>; Sat, 12 Sep 2020 12:03:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:reply-to:from:date:message-id:subject:to;
-        bh=d2bz/XmWdiTU6eZ/jpVqEHm+g/DVp5tj8jhj4+/sfXo=;
-        b=NPLXJMLdXAm/dRCFQUdW/2YVX/WWK2ktOnhTppZ30Ax6Z6zj8tIqWEiaOj8gjb+Sj/
-         7tsuQMgB4yMiQQm80Q5ByMPWLB/l95UScHAEsH1CM267JrLwD8ZjNHLSRgjcgx/l7O1M
-         2xSJ+M9PfnWnAf2SluZ9QCcr445B5C+QW+4XQtWVCbZkijjM2xbDriDwq0k9lrRhAd+P
-         94YCYKv2MdD/jyWAW5oK0cEuLCtR0aOpZXL5stXXE/YqStlhUzXfxsxXEOKLpOeOfg7P
-         7pjO+ti7Vc+tCMPKw6U8uFBWMCEqHb/phVyztefQXqG94Nq678XeMtPRoBBaivYtt/4p
-         mZJw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:reply-to:from:date:message-id
-         :subject:to;
-        bh=d2bz/XmWdiTU6eZ/jpVqEHm+g/DVp5tj8jhj4+/sfXo=;
-        b=RLq0tuHySvYA332zlh8MVn57rrXvjBcUlUj5MZhXY03WEUAHg7cE+Zol6sduN9t/YE
-         u+xafU/Dej04BwbPqftGS9r5H6vrc8gyKD8N6i+lCQhmmrk3onmtVRLHv9pN1tO2ouc4
-         /FlY1M8A1HH6P55XcelbssnY0CFvtCAALHSKuMHLCfR9A+TFZsBYSbb6R731I4wf6hrz
-         rdm6JnfufTJDsu57Q8OI6JGNH6P8exDQST/ZaxbNhAQ2jgr0HN99VttN1SCfNm23yDV0
-         CFzxrw05i1pTrjnkvEoeZTyrmzw+flVc3zwQFTRAjq8TWjeneuVn6AY/faDQWdoyKR/M
-         aLNQ==
-X-Gm-Message-State: AOAM532UPNRKtyy4geOP8TZO3njBHQ9pFuuPhrVeFEiMMFTXMWpUM88q
-        pdR+i2OED4P+xbT9ZchFtgtzu4rXO1RsdAU7hfc=
-X-Google-Smtp-Source: ABdhPJwFIrRQPJsc3hXR8W9RbPM7kwnqmbmdQxjLd0PiYUZAjHoDPctVxJzjDzgpiX27ajrOSUH6Eps6HBQA3Iy2mVo=
-X-Received: by 2002:a67:1687:: with SMTP id 129mr4038920vsw.111.1599937408085;
- Sat, 12 Sep 2020 12:03:28 -0700 (PDT)
+        with ESMTP id S1725912AbgIMHoP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 13 Sep 2020 03:44:15 -0400
+Received: from ozlabs.org (bilbo.ozlabs.org [IPv6:2401:3900:2:1::2])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BC729C061573;
+        Sun, 13 Sep 2020 00:44:13 -0700 (PDT)
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (No client certificate requested)
+        by mail.ozlabs.org (Postfix) with ESMTPSA id 4Bq1hp3411z9sTS;
+        Sun, 13 Sep 2020 17:44:10 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ellerman.id.au;
+        s=201909; t=1599983052;
+        bh=czRzqse3LcOYZ30/6LCMJ8nuNlZbjy30OEAHsP1OmHU=;
+        h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
+        b=YFWcemGvYU4YxnGdEwoQv4snJqlwHLH2V/kScnwSVek6LrbZ23UmZRC1NQJHAh/3C
+         0VTCObFzg5Z0SQRWQ5CdFvb8rEiZZ+33WSEvHZwwlh+J13RLx+tV6Um0wZB7qZGEBF
+         qETyK/vhO3DTKXyV3KdzLev30YnMyDmAfAvAxSAVZ9b5VLurhK6AJ9ldS1FMLzZNpR
+         d9IKT7vsjaH+5g14Fk8v+3SG4FYe3nwMjje+7G8TCudb9NYWhPFtNDbpHxTExiE2+i
+         Hl3FC+2HacrKuM/TirIre1WH0ujUH1h3If4gG0Gs3cUG6gKomVQD1agZzW0kuGez1y
+         5hVHV0d6sgHXg==
+From:   Michael Ellerman <mpe@ellerman.id.au>
+To:     Kees Cook <keescook@chromium.org>
+Cc:     Thomas Gleixner <tglx@linutronix.de>,
+        Robert O'Callahan <rocallahan@gmail.com>,
+        LKML <linux-kernel@vger.kernel.org>,
+        "maintainer\:X86 ARCHITECTURE \(32-BIT AND 64-BIT\)" <x86@kernel.org>,
+        linux-arch@vger.kernel.org, Will Deacon <will@kernel.org>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Keno Fischer <keno@juliacomputing.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        kvm list <kvm@vger.kernel.org>,
+        Gabriel Krisman Bertazi <krisman@collabora.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Kyle Huey <me@kylehuey.com>
+Subject: Re: [REGRESSION] x86/entry: Tracer no longer has opportunity to change the syscall number at entry via orig_ax
+In-Reply-To: <202009111609.61E7875B3@keescook>
+References: <CAP045Arc1Vdh+n2j2ELE3q7XfagLjyqXji9ZD0jqwVB-yuzq-g@mail.gmail.com> <87blj6ifo8.fsf@nanos.tec.linutronix.de> <87a6xzrr89.fsf@mpe.ellerman.id.au> <202009111609.61E7875B3@keescook>
+Date:   Sun, 13 Sep 2020 17:44:09 +1000
+Message-ID: <87d02qqfxy.fsf@mpe.ellerman.id.au>
 MIME-Version: 1.0
-Received: by 2002:ab0:640d:0:0:0:0:0 with HTTP; Sat, 12 Sep 2020 12:03:27
- -0700 (PDT)
-Reply-To: cynthiacynthia1977@yahoo.com
-From:   Cynthia Williams <williamscynthia427@gmail.com>
-Date:   Sat, 12 Sep 2020 12:03:27 -0700
-Message-ID: <CA+n3su8LzZjAOtvWaJJ3CEStMKVupjEarO3j-S4o+rYwHQD0FQ@mail.gmail.com>
-Subject: 
-To:     undisclosed-recipients:;
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Please I need to discuss with you?
+Kees Cook <keescook@chromium.org> writes:
+> On Wed, Sep 09, 2020 at 11:53:42PM +1000, Michael Ellerman wrote:
+>> I can observe the difference between v5.8 and mainline, using the
+>> raw_syscall trace event and running the seccomp_bpf selftest which turns
+>> a getpid (39) into a getppid (110).
+>> 
+>> With v5.8 we see getppid on entry and exit:
+>> 
+>>      seccomp_bpf-1307  [000] .... 22974.874393: sys_enter: NR 110 (7ffff22c46e0, 40a350, 4, fffffffffffff7ab, 7fa6ee0d4010, 0)
+>>      seccomp_bpf-1307  [000] .N.. 22974.874401: sys_exit: NR 110 = 1304
+>> 
+>> Whereas on mainline we see an enter for getpid and an exit for getppid:
+>> 
+>>      seccomp_bpf-1030  [000] ....    21.806766: sys_enter: NR 39 (7ffe2f6d1ad0, 40a350, 7ffe2f6d1ad0, 0, 0, 407299)
+>>      seccomp_bpf-1030  [000] ....    21.806767: sys_exit: NR 110 = 1027
+>
+> For my own notes, this is how I reproduced it:
+>
+> # ./perf-$VER record -e raw_syscalls:sys_enter -e raw_syscalls:sys_exit &
+> # ./seccomp_bpf
+> # fg
+> ctrl-c
+> # ./perf-$VER script | grep seccomp_bpf | awk '{print $7}' | sort | uniq -c > $VER.log
+> *repeat*
+> # diff -u old.log new.log
+> ...
+>
+> (Is there an easier way to get those results?)
 
-Miss Cynthia Williams
+I did more or less the same thing, except I ran the trace event manually
+(via debugfs), which is no better really.
+
+I think the right way to test it would be to have a test that modifies
+the syscall via seccomp and also monitors the trace event using perf
+events. But that wouldn't be easier :)
+
+> I will go see if I can figure out the best way to correct this.
+
+I think this works?
+
+diff --git a/kernel/entry/common.c b/kernel/entry/common.c
+index 18683598edbc..901361e2f8ea 100644
+--- a/kernel/entry/common.c
++++ b/kernel/entry/common.c
+@@ -60,13 +60,15 @@ static long syscall_trace_enter(struct pt_regs *regs, long syscall,
+                        return ret;
+        }
+ 
++       syscall = syscall_get_nr(current, regs);
++
+        if (unlikely(ti_work & _TIF_SYSCALL_TRACEPOINT))
+                trace_sys_enter(regs, syscall);
+ 
+        syscall_enter_audit(regs, syscall);
+ 
+        /* The above might have changed the syscall number */
+-       return ret ? : syscall_get_nr(current, regs);
++       return ret ? : syscall;
+ }
+ 
+ static __always_inline long
+
+
+cheers
