@@ -2,122 +2,155 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D6AD8267E68
-	for <lists+kvm@lfdr.de>; Sun, 13 Sep 2020 09:44:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E84E4267E84
+	for <lists+kvm@lfdr.de>; Sun, 13 Sep 2020 10:11:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725926AbgIMHoQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 13 Sep 2020 03:44:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37522 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725912AbgIMHoP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 13 Sep 2020 03:44:15 -0400
-Received: from ozlabs.org (bilbo.ozlabs.org [IPv6:2401:3900:2:1::2])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BC729C061573;
-        Sun, 13 Sep 2020 00:44:13 -0700 (PDT)
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        id S1725955AbgIMILq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 13 Sep 2020 04:11:46 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:31510 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1725918AbgIMILi (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Sun, 13 Sep 2020 04:11:38 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1599984691;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=gBwOgxziVZ4w/s+1bIafcq1Xhk6ZHMrvZV2mu4yFom8=;
+        b=eXzrvVzLkqk7uBevLIznwVBO5eEMLELnN3R73C8D+8ce7HuZmkg0DphX4ptTQ8+R+clu0F
+        nPC0miJLJzeAg9zrcAYpA0oS6blej+OIaw7YApvA+AwNu260H8lH7Ab0BwvcazvkAFl9Le
+        AT4nIcR0MEUKx2YzHBsXksCn2GBJ3wE=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-135-G3EbA4cxNBKxZcJyB-VFeA-1; Sun, 13 Sep 2020 04:11:27 -0400
+X-MC-Unique: G3EbA4cxNBKxZcJyB-VFeA-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mail.ozlabs.org (Postfix) with ESMTPSA id 4Bq1hp3411z9sTS;
-        Sun, 13 Sep 2020 17:44:10 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ellerman.id.au;
-        s=201909; t=1599983052;
-        bh=czRzqse3LcOYZ30/6LCMJ8nuNlZbjy30OEAHsP1OmHU=;
-        h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
-        b=YFWcemGvYU4YxnGdEwoQv4snJqlwHLH2V/kScnwSVek6LrbZ23UmZRC1NQJHAh/3C
-         0VTCObFzg5Z0SQRWQ5CdFvb8rEiZZ+33WSEvHZwwlh+J13RLx+tV6Um0wZB7qZGEBF
-         qETyK/vhO3DTKXyV3KdzLev30YnMyDmAfAvAxSAVZ9b5VLurhK6AJ9ldS1FMLzZNpR
-         d9IKT7vsjaH+5g14Fk8v+3SG4FYe3nwMjje+7G8TCudb9NYWhPFtNDbpHxTExiE2+i
-         Hl3FC+2HacrKuM/TirIre1WH0ujUH1h3If4gG0Gs3cUG6gKomVQD1agZzW0kuGez1y
-         5hVHV0d6sgHXg==
-From:   Michael Ellerman <mpe@ellerman.id.au>
-To:     Kees Cook <keescook@chromium.org>
-Cc:     Thomas Gleixner <tglx@linutronix.de>,
-        Robert O'Callahan <rocallahan@gmail.com>,
-        LKML <linux-kernel@vger.kernel.org>,
-        "maintainer\:X86 ARCHITECTURE \(32-BIT AND 64-BIT\)" <x86@kernel.org>,
-        linux-arch@vger.kernel.org, Will Deacon <will@kernel.org>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Keno Fischer <keno@juliacomputing.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        kvm list <kvm@vger.kernel.org>,
-        Gabriel Krisman Bertazi <krisman@collabora.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Kyle Huey <me@kylehuey.com>
-Subject: Re: [REGRESSION] x86/entry: Tracer no longer has opportunity to change the syscall number at entry via orig_ax
-In-Reply-To: <202009111609.61E7875B3@keescook>
-References: <CAP045Arc1Vdh+n2j2ELE3q7XfagLjyqXji9ZD0jqwVB-yuzq-g@mail.gmail.com> <87blj6ifo8.fsf@nanos.tec.linutronix.de> <87a6xzrr89.fsf@mpe.ellerman.id.au> <202009111609.61E7875B3@keescook>
-Date:   Sun, 13 Sep 2020 17:44:09 +1000
-Message-ID: <87d02qqfxy.fsf@mpe.ellerman.id.au>
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 307A810059A2;
+        Sun, 13 Sep 2020 08:11:26 +0000 (UTC)
+Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id D3B107EB8F;
+        Sun, 13 Sep 2020 08:11:25 +0000 (UTC)
+From:   Paolo Bonzini <pbonzini@redhat.com>
+To:     torvalds@linux-foundation.org
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Subject: [GIT PULL] KVM changes for Linux 5.9-rc5
+Date:   Sun, 13 Sep 2020 04:11:25 -0400
+Message-Id: <20200913081125.28980-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Kees Cook <keescook@chromium.org> writes:
-> On Wed, Sep 09, 2020 at 11:53:42PM +1000, Michael Ellerman wrote:
->> I can observe the difference between v5.8 and mainline, using the
->> raw_syscall trace event and running the seccomp_bpf selftest which turns
->> a getpid (39) into a getppid (110).
->> 
->> With v5.8 we see getppid on entry and exit:
->> 
->>      seccomp_bpf-1307  [000] .... 22974.874393: sys_enter: NR 110 (7ffff22c46e0, 40a350, 4, fffffffffffff7ab, 7fa6ee0d4010, 0)
->>      seccomp_bpf-1307  [000] .N.. 22974.874401: sys_exit: NR 110 = 1304
->> 
->> Whereas on mainline we see an enter for getpid and an exit for getppid:
->> 
->>      seccomp_bpf-1030  [000] ....    21.806766: sys_enter: NR 39 (7ffe2f6d1ad0, 40a350, 7ffe2f6d1ad0, 0, 0, 407299)
->>      seccomp_bpf-1030  [000] ....    21.806767: sys_exit: NR 110 = 1027
->
-> For my own notes, this is how I reproduced it:
->
-> # ./perf-$VER record -e raw_syscalls:sys_enter -e raw_syscalls:sys_exit &
-> # ./seccomp_bpf
-> # fg
-> ctrl-c
-> # ./perf-$VER script | grep seccomp_bpf | awk '{print $7}' | sort | uniq -c > $VER.log
-> *repeat*
-> # diff -u old.log new.log
-> ...
->
-> (Is there an easier way to get those results?)
+Linus,
 
-I did more or less the same thing, except I ran the trace event manually
-(via debugfs), which is no better really.
+The following changes since commit b5331379bc62611d1026173a09c73573384201d9:
 
-I think the right way to test it would be to have a test that modifies
-the syscall via seccomp and also monitors the trace event using perf
-events. But that wouldn't be easier :)
+  KVM: arm64: Only reschedule if MMU_NOTIFIER_RANGE_BLOCKABLE is not set (2020-08-21 18:06:43 -0400)
 
-> I will go see if I can figure out the best way to correct this.
+are available in the Git repository at:
 
-I think this works?
+  https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus
 
-diff --git a/kernel/entry/common.c b/kernel/entry/common.c
-index 18683598edbc..901361e2f8ea 100644
---- a/kernel/entry/common.c
-+++ b/kernel/entry/common.c
-@@ -60,13 +60,15 @@ static long syscall_trace_enter(struct pt_regs *regs, long syscall,
-                        return ret;
-        }
- 
-+       syscall = syscall_get_nr(current, regs);
-+
-        if (unlikely(ti_work & _TIF_SYSCALL_TRACEPOINT))
-                trace_sys_enter(regs, syscall);
- 
-        syscall_enter_audit(regs, syscall);
- 
-        /* The above might have changed the syscall number */
--       return ret ? : syscall_get_nr(current, regs);
-+       return ret ? : syscall;
- }
- 
- static __always_inline long
+for you to fetch changes up to 37f66bbef0920429b8cb5eddba849ec4308a9f8e:
 
+  KVM: emulator: more strict rsm checks. (2020-09-12 12:22:55 -0400)
 
-cheers
+A bit on the bigger side, mostly due to me being on vacation, then busy,
+then on parental leave, but there's nothing worrisome.
+
+----------------------------------------------------------------
+ARM:
+- Multiple stolen time fixes, with a new capability to match x86
+- Fix for hugetlbfs mappings when PUD and PMD are the same level
+- Fix for hugetlbfs mappings when PTE mappings are enforced
+  (dirty logging, for example)
+- Fix tracing output of 64bit values
+
+x86:
+- nSVM state restore fixes
+- Async page fault fixes
+- Lots of small fixes everywhere
+
+----------------------------------------------------------------
+Alexandru Elisei (1):
+      KVM: arm64: Update page shift if stage 2 block mapping not supported
+
+Andrew Jones (6):
+      KVM: arm64: pvtime: steal-time is only supported when configured
+      KVM: arm64: pvtime: Fix potential loss of stolen time
+      KVM: arm64: Drop type input from kvm_put_guest
+      KVM: arm64: pvtime: Fix stolen time accounting across migration
+      KVM: Documentation: Minor fixups
+      arm64/x86: KVM: Introduce steal-time cap
+
+Chenyi Qiang (1):
+      KVM: nVMX: Fix the update value of nested load IA32_PERF_GLOBAL_CTRL control
+
+David Rientjes (1):
+      KVM: SVM: Periodically schedule when unregistering regions on destroy
+
+Haiwei Li (1):
+      KVM: Check the allocation of pv cpu mask
+
+Huacai Chen (1):
+      KVM: MIPS: Change the definition of kvm type
+
+Lai Jiangshan (1):
+      kvm x86/mmu: use KVM_REQ_MMU_SYNC to sync when needed
+
+Marc Zyngier (2):
+      KVM: arm64: Do not try to map PUDs when they are folded into PMD
+      KVM: arm64: Fix address truncation in traces
+
+Maxim Levitsky (4):
+      SVM: nSVM: correctly restore GIF on vmexit from nesting after migration
+      SVM: nSVM: setup nested msr permission bitmap on nested state load
+      KVM: nSVM: more strict SMM checks when returning to nested guest
+      KVM: emulator: more strict rsm checks.
+
+Paolo Bonzini (1):
+      Merge tag 'kvmarm-fixes-5.9-1' of git://git.kernel.org/.../kvmarm/kvmarm into HEAD
+
+Peter Shier (1):
+      KVM: nVMX: Update VMCS02 when L2 PAE PDPTE updates detected
+
+Rustam Kovhaev (1):
+      KVM: fix memory leak in kvm_io_bus_unregister_dev()
+
+Vitaly Kuznetsov (3):
+      KVM: x86: always allow writing '0' to MSR_KVM_ASYNC_PF_EN
+      x86/kvm: properly use DEFINE_IDTENTRY_SYSVEC() macro
+      x86/kvm: don't forget to ACK async PF IRQ
+
+Wanpeng Li (2):
+      KVM: SVM: avoid emulation with stale next_rip
+      KVM: VMX: Don't freeze guest when event delivery causes an APIC-access exit
+
+ Documentation/virt/kvm/api.rst     | 22 ++++++++++++++++++----
+ arch/arm64/include/asm/kvm_host.h  |  2 +-
+ arch/arm64/kvm/arm.c               |  3 +++
+ arch/arm64/kvm/mmu.c               |  8 +++++++-
+ arch/arm64/kvm/pvtime.c            | 29 +++++++++++++----------------
+ arch/arm64/kvm/trace_arm.h         | 16 ++++++++--------
+ arch/arm64/kvm/trace_handle_exit.h |  6 +++---
+ arch/mips/kvm/mips.c               |  2 ++
+ arch/x86/kernel/kvm.c              | 26 ++++++++++++++++++++------
+ arch/x86/kvm/emulate.c             | 22 +++++++++++++++++-----
+ arch/x86/kvm/mmu/mmu.c             |  2 +-
+ arch/x86/kvm/svm/nested.c          |  7 ++++++-
+ arch/x86/kvm/svm/sev.c             |  1 +
+ arch/x86/kvm/svm/svm.c             | 36 +++++++++++++++++++++---------------
+ arch/x86/kvm/vmx/nested.c          | 10 +++++++++-
+ arch/x86/kvm/vmx/vmx.c             |  5 +++--
+ arch/x86/kvm/vmx/vmx.h             |  1 +
+ arch/x86/kvm/x86.c                 |  5 ++++-
+ include/linux/kvm_host.h           | 31 ++++++++++++++++++++++++++-----
+ include/uapi/linux/kvm.h           |  6 ++++--
+ virt/kvm/kvm_main.c                | 21 ++++++++++++---------
+ 21 files changed, 180 insertions(+), 81 deletions(-)
+
