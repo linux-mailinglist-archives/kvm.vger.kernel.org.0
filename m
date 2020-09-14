@@ -2,126 +2,298 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1D1D72682AE
-	for <lists+kvm@lfdr.de>; Mon, 14 Sep 2020 04:42:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BA759268303
+	for <lists+kvm@lfdr.de>; Mon, 14 Sep 2020 05:08:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726008AbgINCmW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 13 Sep 2020 22:42:22 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:40052 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1725972AbgINCmU (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Sun, 13 Sep 2020 22:42:20 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1600051338;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=dAara/ChDatzgfsJw1KVRRZSOmBMiVP7kGi1yosi4Xw=;
-        b=QKmPmz2mk9LGtTwNiSCJr697qCWvo97nbcOwZMfhtlFQGQls4NOS6b2DFOgMi8ihcpOiJf
-        2CsfgtiWZtjyn0XZYvSPXBKdE/XhW4uoQAUl3ikE67Y4dAKqKFmxEh20TkKkOCngjyPlhl
-        LGmcFIY/HQnmTD9NuqwAE6MrTqSJbKE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-417-PMEHTvPYNtivp0j5MCgq1g-1; Sun, 13 Sep 2020 22:42:16 -0400
-X-MC-Unique: PMEHTvPYNtivp0j5MCgq1g-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 729CE1074658;
-        Mon, 14 Sep 2020 02:42:15 +0000 (UTC)
-Received: from colo-mx.corp.redhat.com (colo-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.20])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 674AE60C87;
-        Mon, 14 Sep 2020 02:42:15 +0000 (UTC)
-Received: from zmail21.collab.prod.int.phx2.redhat.com (zmail21.collab.prod.int.phx2.redhat.com [10.5.83.24])
-        by colo-mx.corp.redhat.com (Postfix) with ESMTP id 4CED7180BACB;
-        Mon, 14 Sep 2020 02:42:15 +0000 (UTC)
-Date:   Sun, 13 Sep 2020 22:42:15 -0400 (EDT)
-From:   Jason Wang <jasowang@redhat.com>
-To:     Li Wang <li.wang@windriver.com>
-Cc:     mst@redhat.com, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Message-ID: <1199326218.16921082.1600051335160.JavaMail.zimbra@redhat.com>
-In-Reply-To: <1599836979-4950-1-git-send-email-li.wang@windriver.com>
-References: <1599836979-4950-1-git-send-email-li.wang@windriver.com>
-Subject: Re: [PATCH] vhost: reduce stack usage in log_used
+        id S1726061AbgINDIX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 13 Sep 2020 23:08:23 -0400
+Received: from mga06.intel.com ([134.134.136.31]:14035 "EHLO mga06.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725982AbgINDIW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 13 Sep 2020 23:08:22 -0400
+IronPort-SDR: QNUCvnFEKlUiTHOY4VpZkN12iWKkIIzxBnEFXAK7z4dYjFlCRWcZf37zm6i7Yem6nWr3eyiXy2
+ /4Rkg07k58NQ==
+X-IronPort-AV: E=McAfee;i="6000,8403,9743"; a="220572090"
+X-IronPort-AV: E=Sophos;i="5.76,424,1592895600"; 
+   d="scan'208";a="220572090"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Sep 2020 20:08:19 -0700
+IronPort-SDR: MM5/sFSifKGqGPPL5Uqo4zu6Mz4fdHmevk1+AaGj0Csw64JOdeOSEMSWn24AFq1rwcg9CWswTx
+ e8b1YEkqRZ8w==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.76,424,1592895600"; 
+   d="scan'208";a="408731471"
+Received: from allen-box.sh.intel.com (HELO [10.239.159.139]) ([10.239.159.139])
+  by fmsmga001.fm.intel.com with ESMTP; 13 Sep 2020 20:08:16 -0700
+Cc:     baolu.lu@linux.intel.com, Joerg Roedel <joro@8bytes.org>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Jean-Philippe Brucker <jean-philippe@linaro.org>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Kevin Tian <kevin.tian@intel.com>,
+        Ashok Raj <ashok.raj@intel.com>,
+        Dave Jiang <dave.jiang@intel.com>,
+        Liu Yi L <yi.l.liu@intel.com>, Zeng Xin <xin.zeng@intel.com>,
+        iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+Subject: Re: [PATCH v4 2/5] iommu: Add iommu_at(de)tach_subdev_group()
+To:     Alex Williamson <alex.williamson@redhat.com>
+References: <20200901033422.22249-1-baolu.lu@linux.intel.com>
+ <20200901033422.22249-3-baolu.lu@linux.intel.com>
+ <20200910160547.0a8b9891@w520.home>
+From:   Lu Baolu <baolu.lu@linux.intel.com>
+Message-ID: <01d80e65-c372-4944-753f-454a190a8cd0@linux.intel.com>
+Date:   Mon, 14 Sep 2020 11:02:24 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20200910160547.0a8b9891@w520.home>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.68.5.20, 10.4.195.2]
-Thread-Topic: vhost: reduce stack usage in log_used
-Thread-Index: s9yTJ0ICAZlN+4H+zWFH+IIKdn+BDA==
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Hi Alex,
 
-
------ Original Message -----
-> Fix the warning: [-Werror=-Wframe-larger-than=]
+On 9/11/20 6:05 AM, Alex Williamson wrote:
+> On Tue,  1 Sep 2020 11:34:19 +0800
+> Lu Baolu <baolu.lu@linux.intel.com> wrote:
 > 
-> drivers/vhost/vhost.c: In function log_used:
-> drivers/vhost/vhost.c:1906:1:
-> warning: the frame size of 1040 bytes is larger than 1024 bytes
+>> This adds two new APIs for the use cases like vfio/mdev where subdevices
+>> derived from physical devices are created and put in an iommu_group. The
+>> new IOMMU API interfaces mimic the vfio_mdev_at(de)tach_domain() directly,
+>> testing whether the resulting device supports IOMMU_DEV_FEAT_AUX and using
+>> an aux vs non-aux at(de)tach.
+>>
+>> By doing this we could
+>>
+>> - Set the iommu_group.domain. The iommu_group.domain is private to iommu
+>>    core (therefore vfio code cannot set it), but we need it set in order
+>>    for iommu_get_domain_for_dev() to work with a group attached to an aux
+>>    domain.
+>>
+>> - Prefer to use the _attach_group() interfaces while the _attach_device()
+>>    interfaces are relegated to special cases.
+>>
+>> Link: https://lore.kernel.org/linux-iommu/20200730134658.44c57a67@x1.home/
+>> Link: https://lore.kernel.org/linux-iommu/20200730151703.5daf8ad4@x1.home/
+>> Signed-off-by: Lu Baolu <baolu.lu@linux.intel.com>
+>> ---
+>>   drivers/iommu/iommu.c | 136 ++++++++++++++++++++++++++++++++++++++++++
+>>   include/linux/iommu.h |  20 +++++++
+>>   2 files changed, 156 insertions(+)
+>>
+>> diff --git a/drivers/iommu/iommu.c b/drivers/iommu/iommu.c
+>> index 38cdfeb887e1..fb21c2ff4861 100644
+>> --- a/drivers/iommu/iommu.c
+>> +++ b/drivers/iommu/iommu.c
+>> @@ -2757,6 +2757,142 @@ int iommu_aux_get_pasid(struct iommu_domain *domain, struct device *dev)
+>>   }
+>>   EXPORT_SYMBOL_GPL(iommu_aux_get_pasid);
+>>   
+>> +static int __iommu_aux_attach_device(struct iommu_domain *domain,
+>> +				     struct device *phys_dev,
+>> +				     struct device *sub_dev)
+>> +{
+>> +	int ret;
+>> +
+>> +	if (unlikely(!domain->ops->aux_attach_dev))
+>> +		return -ENODEV;
+>> +
+>> +	ret = domain->ops->aux_attach_dev(domain, phys_dev, sub_dev);
+>> +	if (!ret)
+>> +		trace_attach_device_to_domain(sub_dev);
+>> +
+>> +	return ret;
+>> +}
+>> +
+>> +static void __iommu_aux_detach_device(struct iommu_domain *domain,
+>> +				      struct device *phys_dev,
+>> +				      struct device *sub_dev)
+>> +{
+>> +	if (unlikely(!domain->ops->aux_detach_dev))
+>> +		return;
+>> +
+>> +	domain->ops->aux_detach_dev(domain, phys_dev, sub_dev);
+>> +	trace_detach_device_from_domain(sub_dev);
+>> +}
+>> +
+>> +static int __iommu_attach_subdev_group(struct iommu_domain *domain,
+>> +				       struct iommu_group *group,
+>> +				       iommu_device_lookup_t fn)
+>> +{
+>> +	struct group_device *device;
+>> +	struct device *phys_dev;
+>> +	int ret = -ENODEV;
+>> +
+>> +	list_for_each_entry(device, &group->devices, list) {
+>> +		phys_dev = fn(device->dev);
+>> +		if (!phys_dev) {
+>> +			ret = -ENODEV;
+>> +			break;
+>> +		}
+>> +
+>> +		if (iommu_dev_feature_enabled(phys_dev, IOMMU_DEV_FEAT_AUX))
+>> +			ret = __iommu_aux_attach_device(domain, phys_dev,
+>> +							device->dev);
+>> +		else
+>> +			ret = __iommu_attach_device(domain, phys_dev);
+>> +
+>> +		if (ret)
+>> +			break;
+>> +	}
+>> +
+>> +	return ret;
+>> +}
+>> +
+>> +static void __iommu_detach_subdev_group(struct iommu_domain *domain,
+>> +					struct iommu_group *group,
+>> +					iommu_device_lookup_t fn)
+>> +{
+>> +	struct group_device *device;
+>> +	struct device *phys_dev;
+>> +
+>> +	list_for_each_entry(device, &group->devices, list) {
+>> +		phys_dev = fn(device->dev);
+>> +		if (!phys_dev)
+>> +			break;
 > 
-> Signed-off-by: Li Wang <li.wang@windriver.com>
-> ---
->  drivers/vhost/vhost.c | 14 ++++++++++----
->  1 file changed, 10 insertions(+), 4 deletions(-)
 > 
-> diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
-> index b45519c..41769de 100644
-> --- a/drivers/vhost/vhost.c
-> +++ b/drivers/vhost/vhost.c
-> @@ -1884,25 +1884,31 @@ static int log_write_hva(struct vhost_virtqueue *vq,
-> u64 hva, u64 len)
->  
->  static int log_used(struct vhost_virtqueue *vq, u64 used_offset, u64 len)
->  {
-> -	struct iovec iov[64];
-> +	struct iovec *iov;
->  	int i, ret;
->  
->  	if (!vq->iotlb)
->  		return log_write(vq->log_base, vq->log_addr + used_offset, len);
->  
-> +	iov = kcalloc(64, sizeof(*iov), GFP_KERNEL);
-> +	if (!iov)
-> +		return -ENOMEM;
+> Seems like this should be a continue rather than a break.  On the
+> unwind path maybe we're relying on holding the group mutex and
+> deterministic behavior from the fn() callback to unwind to the same
+> point, but we still have an entirely separate detach interface and I'm
+> not sure we couldn't end up with an inconsistent state if we don't
+> iterate each group device here.  Thanks,
 
-Let's preallocate it in e.g vhost_net_open().
+Yes, agreed.
 
-We don't want to fail the log due to -ENOMEM.
+Best regards,
+baolu
 
-Thanks
-
-> +
->  	ret = translate_desc(vq, (uintptr_t)vq->used + used_offset,
->  			     len, iov, 64, VHOST_ACCESS_WO);
->  	if (ret < 0)
-> -		return ret;
-> +		goto out;
->  
->  	for (i = 0; i < ret; i++) {
->  		ret = log_write_hva(vq,	(uintptr_t)iov[i].iov_base,
->  				    iov[i].iov_len);
->  		if (ret)
-> -			return ret;
-> +			goto out;
->  	}
->  
-> -	return 0;
-> +out:
-> +	kfree(iov);
-> +	return ret;
->  }
->  
->  int vhost_log_write(struct vhost_virtqueue *vq, struct vhost_log *log,
-> --
-> 2.7.4
 > 
+> Alex
 > 
-
+>> +
+>> +		if (iommu_dev_feature_enabled(phys_dev, IOMMU_DEV_FEAT_AUX))
+>> +			__iommu_aux_detach_device(domain, phys_dev, device->dev);
+>> +		else
+>> +			__iommu_detach_device(domain, phys_dev);
+>> +	}
+>> +}
+>> +
+>> +/**
+>> + * iommu_attach_subdev_group - attach domain to an iommu_group which
+>> + *			       contains subdevices.
+>> + *
+>> + * @domain: domain
+>> + * @group:  iommu_group which contains subdevices
+>> + * @fn:     callback for each subdevice in the @iommu_group to retrieve the
+>> + *          physical device where the subdevice was created from.
+>> + *
+>> + * Returns 0 on success, or an error value.
+>> + */
+>> +int iommu_attach_subdev_group(struct iommu_domain *domain,
+>> +			      struct iommu_group *group,
+>> +			      iommu_device_lookup_t fn)
+>> +{
+>> +	int ret = -ENODEV;
+>> +
+>> +	mutex_lock(&group->mutex);
+>> +	if (group->domain) {
+>> +		ret = -EBUSY;
+>> +		goto unlock_out;
+>> +	}
+>> +
+>> +	ret = __iommu_attach_subdev_group(domain, group, fn);
+>> +	if (ret)
+>> +		__iommu_detach_subdev_group(domain, group, fn);
+>> +	else
+>> +		group->domain = domain;
+>> +
+>> +unlock_out:
+>> +	mutex_unlock(&group->mutex);
+>> +	return ret;
+>> +}
+>> +EXPORT_SYMBOL_GPL(iommu_attach_subdev_group);
+>> +
+>> +/**
+>> + * iommu_detach_subdev_group - detach domain from an iommu_group which
+>> + *			       contains subdevices
+>> + *
+>> + * @domain: domain
+>> + * @group:  iommu_group which contains subdevices
+>> + * @fn:     callback for each subdevice in the @iommu_group to retrieve the
+>> + *          physical device where the subdevice was created from.
+>> + *
+>> + * The domain must have been attached to @group via iommu_attach_subdev_group().
+>> + */
+>> +void iommu_detach_subdev_group(struct iommu_domain *domain,
+>> +			       struct iommu_group *group,
+>> +			       iommu_device_lookup_t fn)
+>> +{
+>> +	mutex_lock(&group->mutex);
+>> +	if (!group->domain)
+>> +		goto unlock_out;
+>> +
+>> +	__iommu_detach_subdev_group(domain, group, fn);
+>> +	group->domain = NULL;
+>> +
+>> +unlock_out:
+>> +	mutex_unlock(&group->mutex);
+>> +}
+>> +EXPORT_SYMBOL_GPL(iommu_detach_subdev_group);
+>> +
+>>   /**
+>>    * iommu_sva_bind_device() - Bind a process address space to a device
+>>    * @dev: the device
+>> diff --git a/include/linux/iommu.h b/include/linux/iommu.h
+>> index 871267104915..b9df8b510d4f 100644
+>> --- a/include/linux/iommu.h
+>> +++ b/include/linux/iommu.h
+>> @@ -48,6 +48,7 @@ struct iommu_fault_event;
+>>   typedef int (*iommu_fault_handler_t)(struct iommu_domain *,
+>>   			struct device *, unsigned long, int, void *);
+>>   typedef int (*iommu_dev_fault_handler_t)(struct iommu_fault *, void *);
+>> +typedef struct device *(*iommu_device_lookup_t)(struct device *);
+>>   
+>>   struct iommu_domain_geometry {
+>>   	dma_addr_t aperture_start; /* First address that can be mapped    */
+>> @@ -631,6 +632,12 @@ bool iommu_dev_feature_enabled(struct device *dev, enum iommu_dev_features f);
+>>   int iommu_aux_attach_device(struct iommu_domain *domain, struct device *dev);
+>>   void iommu_aux_detach_device(struct iommu_domain *domain, struct device *dev);
+>>   int iommu_aux_get_pasid(struct iommu_domain *domain, struct device *dev);
+>> +int iommu_attach_subdev_group(struct iommu_domain *domain,
+>> +			      struct iommu_group *group,
+>> +			      iommu_device_lookup_t fn);
+>> +void iommu_detach_subdev_group(struct iommu_domain *domain,
+>> +			       struct iommu_group *group,
+>> +			       iommu_device_lookup_t fn);
+>>   
+>>   struct iommu_sva *iommu_sva_bind_device(struct device *dev,
+>>   					struct mm_struct *mm,
+>> @@ -1019,6 +1026,19 @@ iommu_aux_get_pasid(struct iommu_domain *domain, struct device *dev)
+>>   	return -ENODEV;
+>>   }
+>>   
+>> +static inline int
+>> +iommu_attach_subdev_group(struct iommu_domain *domain, struct iommu_group *group,
+>> +			  iommu_device_lookup_t fn)
+>> +{
+>> +	return -ENODEV;
+>> +}
+>> +
+>> +static inline void
+>> +iommu_detach_subdev_group(struct iommu_domain *domain, struct iommu_group *group,
+>> +			  iommu_device_lookup_t fn)
+>> +{
+>> +}
+>> +
+>>   static inline struct iommu_sva *
+>>   iommu_sva_bind_device(struct device *dev, struct mm_struct *mm, void *drvdata)
+>>   {
+> 
