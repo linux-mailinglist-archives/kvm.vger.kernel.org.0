@@ -2,142 +2,132 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 125792696D1
-	for <lists+kvm@lfdr.de>; Mon, 14 Sep 2020 22:40:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 95A0C2696F0
+	for <lists+kvm@lfdr.de>; Mon, 14 Sep 2020 22:46:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726053AbgINUkh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 14 Sep 2020 16:40:37 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:58736 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725997AbgINUkf (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 14 Sep 2020 16:40:35 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1600116033;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=UBsIQsnyUT0RduIlv4tBtHoJIFfT0hnAJ3Ijxqz8sck=;
-        b=e0yxQfhUcrRarf/94y1lnJZYsvQqlcTRN+F7amxIFsAXbfnJQVZ0eGjJ9GgUd7WHCmDi5e
-        6n9+AzD6EcQB8ydoxcT2yvjQ2gh2t3ZcRByS+nEd7ey24bYYoVxt7fMmMeimEu7BGb9wvp
-        3cubajz3+Fc/uE6NtwSjK39cRnVEO9I=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-117-AghiDWkqO1CS4_cGkY_2TQ-1; Mon, 14 Sep 2020 16:40:32 -0400
-X-MC-Unique: AghiDWkqO1CS4_cGkY_2TQ-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 64EEC1017DC3;
-        Mon, 14 Sep 2020 20:40:29 +0000 (UTC)
-Received: from treble (ovpn-115-26.rdu2.redhat.com [10.10.115.26])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id EFF195DC06;
-        Mon, 14 Sep 2020 20:40:27 +0000 (UTC)
-Date:   Mon, 14 Sep 2020 15:40:24 -0500
-From:   Josh Poimboeuf <jpoimboe@redhat.com>
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
+        id S1726114AbgINUqk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 14 Sep 2020 16:46:40 -0400
+Received: from userp2120.oracle.com ([156.151.31.85]:51672 "EHLO
+        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725989AbgINUqi (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 14 Sep 2020 16:46:38 -0400
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+        by userp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 08EKeG8R111737;
+        Mon, 14 Sep 2020 20:45:19 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2020-01-29;
+ bh=hNuujluzU2RRINi9JfoY0YiABW6y/9GNCHBiA8is/6I=;
+ b=b+Rj8MSRAqqLmix8qstCVU8qsr8XpCSND84wHUFByL4WNjbYd9sTw4QJnR+b6tHEj+b4
+ O2vHXCCMrRbq2VeBfQm+1TCag3h8/0BvFXMJr0r75RM/iUlgd1T3EzbbCY8DNZ0e2zo5
+ 2LSoowSzohvrDXahPaaQXKib3Vfa60ebOnBVuozvyQmtKDCTxTiD+982+IUf+8FlSD8j
+ u6+EFN2i92JpmhyFJ44sbZC1tCl62L+xIvyq8RytvOLa2AoYO/gJywyzX+tA3NAiSGXZ
+ RayYfQXA0h9WFQeRbKxfeo2rvHX2w9HKKWgDl4qYplpfLjQYFHiiT0wiu8Ae4lUwB7b2 0Q== 
+Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
+        by userp2120.oracle.com with ESMTP id 33j91dan7r-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
+        Mon, 14 Sep 2020 20:45:19 +0000
+Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
+        by aserp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 08EKdspO037283;
+        Mon, 14 Sep 2020 20:43:18 GMT
+Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
+        by aserp3030.oracle.com with ESMTP id 33h7wmu0yc-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 14 Sep 2020 20:43:18 +0000
+Received: from abhmp0012.oracle.com (abhmp0012.oracle.com [141.146.116.18])
+        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 08EKhFN2004026;
+        Mon, 14 Sep 2020 20:43:15 GMT
+Received: from localhost.localdomain (/10.159.129.116)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Mon, 14 Sep 2020 20:43:15 +0000
+Subject: Re: [PATCH] KVM: SVM: Analyze is_guest_mode() in svm_vcpu_run()
+To:     Wanpeng Li <kernellwp@gmail.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Uros Bizjak <ubizjak@gmail.com>,
-        Andi Kleen <ak@linux.intel.com>
-Subject: Re: [PATCH 1/2] KVM: VMX: Move IRQ invocation to assembly subroutine
-Message-ID: <20200914204024.w3rpjon64d3fesys@treble>
-References: <20200914195634.12881-1-sean.j.christopherson@intel.com>
- <20200914195634.12881-2-sean.j.christopherson@intel.com>
+        Joerg Roedel <joro@8bytes.org>
+References: <1600066548-4343-1-git-send-email-wanpengli@tencent.com>
+From:   Krish Sadhukhan <krish.sadhukhan@oracle.com>
+Message-ID: <b39b1599-9e1e-8ef6-1b97-a4910d9c3784@oracle.com>
+Date:   Mon, 14 Sep 2020 13:43:07 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20200914195634.12881-2-sean.j.christopherson@intel.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+In-Reply-To: <1600066548-4343-1-git-send-email-wanpengli@tencent.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9744 signatures=668679
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
+ adultscore=0 bulkscore=0 phishscore=0 mlxlogscore=999 mlxscore=0
+ spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2006250000 definitions=main-2009140163
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9744 signatures=668679
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0 impostorscore=0
+ priorityscore=1501 malwarescore=0 suspectscore=0 mlxlogscore=999
+ clxscore=1011 adultscore=0 lowpriorityscore=0 spamscore=0 mlxscore=0
+ bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2006250000 definitions=main-2009140163
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Sep 14, 2020 at 12:56:33PM -0700, Sean Christopherson wrote:
-> Move the asm blob that invokes the appropriate IRQ handler after VM-Exit
-> into a proper subroutine.  Slightly rework the blob so that it plays
-> nice with objtool without any additional hints (existing hints aren't
-> able to handle returning with a seemingly modified stack size).
-> 
-> Suggested-by: Josh Poimboeuf <jpoimboe@redhat.com>
-> Cc: Uros Bizjak <ubizjak@gmail.com>
-> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+
+On 9/13/20 11:55 PM, Wanpeng Li wrote:
+> From: Wanpeng Li <wanpengli@tencent.com>
+>
+> Analyze is_guest_mode() in svm_vcpu_run() instead of svm_exit_handlers_fastpath()
+> in conformity with VMX version.
+>
+> Suggested-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+> Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
 > ---
->  arch/x86/kvm/vmx/vmenter.S | 28 ++++++++++++++++++++++++++++
->  arch/x86/kvm/vmx/vmx.c     | 33 +++------------------------------
->  2 files changed, 31 insertions(+), 30 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/vmx/vmenter.S b/arch/x86/kvm/vmx/vmenter.S
-> index 799db084a336..baec1e0fefc5 100644
-> --- a/arch/x86/kvm/vmx/vmenter.S
-> +++ b/arch/x86/kvm/vmx/vmenter.S
-> @@ -4,6 +4,7 @@
->  #include <asm/bitsperlong.h>
->  #include <asm/kvm_vcpu_regs.h>
->  #include <asm/nospec-branch.h>
-> +#include <asm/segment.h>
->  
->  #define WORD_SIZE (BITS_PER_LONG / 8)
->  
-> @@ -294,3 +295,30 @@ SYM_FUNC_START(vmread_error_trampoline)
->  
->  	ret
->  SYM_FUNC_END(vmread_error_trampoline)
+>   arch/x86/kvm/svm/svm.c | 7 +++++--
+>   1 file changed, 5 insertions(+), 2 deletions(-)
+>
+> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+> index 3da5b2f..009035a 100644
+> --- a/arch/x86/kvm/svm/svm.c
+> +++ b/arch/x86/kvm/svm/svm.c
+> @@ -3393,8 +3393,7 @@ static void svm_cancel_injection(struct kvm_vcpu *vcpu)
+>   
+>   static fastpath_t svm_exit_handlers_fastpath(struct kvm_vcpu *vcpu)
+>   {
+> -	if (!is_guest_mode(vcpu) &&
+> -	    to_svm(vcpu)->vmcb->control.exit_code == SVM_EXIT_MSR &&
+> +	if (to_svm(vcpu)->vmcb->control.exit_code == SVM_EXIT_MSR &&
+>   	    to_svm(vcpu)->vmcb->control.exit_info_1)
+>   		return handle_fastpath_set_msr_irqoff(vcpu);
+>   
+> @@ -3580,6 +3579,10 @@ static __no_kcsan fastpath_t svm_vcpu_run(struct kvm_vcpu *vcpu)
+>   		svm_handle_mce(svm);
+>   
+>   	svm_complete_interrupts(svm);
 > +
-> +SYM_FUNC_START(vmx_do_interrupt_nmi_irqoff)
-> +	/*
-> +	 * Unconditionally create a stack frame.  RSP needs to be aligned for
-> +	 * x86-64, getting the correct RSP on the stack (for x86-64) would take
-> +	 * two instructions anyways, and it helps make objtool happy (see below).
-> +	 */
-> +	push %_ASM_BP
-> +	mov %rsp, %_ASM_BP
-
-RSP needs to be aligned to what?  How would this align the stack, other
-than by accident?
-
+> +	if (is_guest_mode(vcpu))
+> +		return EXIT_FASTPATH_NONE;
 > +
-> +#ifdef CONFIG_X86_64
-> +	push $__KERNEL_DS
-> +	push %_ASM_BP
-> +#endif
-> +	pushf
-> +	push $__KERNEL_CS
-> +	CALL_NOSPEC _ASM_ARG1
-> +
-> +	/*
-> +	 * "Restore" RSP from RBP, even though IRET has already unwound RSP to
-> +	 * the correct value.  objtool doesn't know the target will IRET and so
-> +	 * thinks the stack is getting walloped (without the explicit restore).
-> +	 */
-> +	mov %_ASM_BP, %rsp
-> +	pop %_ASM_BP
-> +	ret
+>   	exit_fastpath = svm_exit_handlers_fastpath(vcpu);
+>   	return exit_fastpath;
 
-BTW, there *is* actually an unwind hint for this situation:
-UNWIND_HINT_RET_OFFSET.
+Not related to your changes, but should we get rid of the variable 
+'exit_fastpath' and just do,
 
-So you might be able to do something like the following (depending on
-what your alignment requirements actually are):
+         return svm_exit_handler_fastpath(vcpu);
 
-SYM_FUNC_START(vmx_do_interrupt_nmi_irqoff)
-#ifdef CONFIG_X86_64
-	push $__KERNEL_DS
-	push %_ASM_BP
-#endif
-	pushf
-	push $__KERNEL_CS
-	CALL_NOSPEC _ASM_ARG1
+It seems the variable isn't used anywhere else and svm_vcpu_run() 
+doesn't return from anywhere else either.
 
-	/* The call popped the pushes */
-	UNWIND_HINT_RET_OFFSET sp_offset=32
+Also, svm_exit_handlers_fastpath() doesn't have any other caller.  
+Should we get rid of it as well ?
 
-	ret
-SYM_FUNC_END(vmx_do_interrupt_nmi_irqoff)
 
--- 
-Josh
+For your changes,
 
+     Reviewed-by: Krish Sadhukhan <krish.sadhukhan@oracle.com>
+
+>   }
