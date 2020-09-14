@@ -2,41 +2,41 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4BB2E26964D
-	for <lists+kvm@lfdr.de>; Mon, 14 Sep 2020 22:21:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3E3EA269654
+	for <lists+kvm@lfdr.de>; Mon, 14 Sep 2020 22:23:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726368AbgINUVs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 14 Sep 2020 16:21:48 -0400
-Received: from mail-dm6nam11on2069.outbound.protection.outlook.com ([40.107.223.69]:56449
-        "EHLO NAM11-DM6-obe.outbound.protection.outlook.com"
+        id S1726330AbgINUXS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 14 Sep 2020 16:23:18 -0400
+Received: from mail-bn8nam12on2078.outbound.protection.outlook.com ([40.107.237.78]:9896
+        "EHLO NAM12-BN8-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726093AbgINUVM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 14 Sep 2020 16:21:12 -0400
+        id S1726131AbgINUVs (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 14 Sep 2020 16:21:48 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=FQ94M5LBAjoQ8VjmXctEV71VgaRgzUtDY7FWAWTVIdtzKocgUKJo3Y7EJDkfK7o0gwA1qILonQykhGBuHqtPJYunwc9TrybiZg16WoBZvho+w1fs2sgBOgosKnhlPO31U4ssCo2KIQXBCZE5LmqUlCvkFatsX5mQO0zAXVF7hYNY6aIuzQ3lrh1+h0DK8BZrd3LBCBJp0pvHDcBaejZlNuKV5T2J8DiRwMtFPy9cazs34VHJ/UoihbUbrdMpw1smwgLRqAryW3o+OSKDWwdV13pvFfKdF3y4KPh4WXUabhoAZsh8F/FlqtXNhl/VXaMxwlSgdiYEs78BjAytFnV1eA==
+ b=f9oP5w6PNAwBsMNEvHPu5FCiheXyejJe/Ta/LJYIi4rKEnUZFeVU4czPlcAIfzdVUKWyfc0wdK0rPpZB9Rwy9/7aBudOB/nnXLWHSD9f+72s6eSfPkvHU6GIZf+TedtA1lPvTcV7Cw4P+2Wpzh6tDeQkVT7eRNgejMl6TPP1DY6wasVip6KwcEne0r7Bm3NBXw/82goadi8+rZ2Rqf2xr4ckni0DO4q0dEDSWnUIgK12bW3w0JuKQg0d429PrHQwe5f1n/CUqQKC9lYMAjn8PwqY41zhrqF/EewTH//v8SEeWOngnWP9kFJG0xS9xntbkw+lX8SjURoXxBOTdxzy3w==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=wjrf2G55w0tPZqwal/5bfG5DbYxgP1yRtNxlPhfX3RA=;
- b=GBtJgEOhoCXX8fT8EadZS1jVNfoRjddba7OSv6rOEtbfDDtZtLJsCW3sNQvaNH1MgiaUc7f+x0Gtev8FSsiu5GyBUrQ03EFx+cLHT6hfnRPXLVkVscR0gPGwVC+MqjCbLwtVcpSGPEyMQQtq09P7zRFUK6nkeMmRvTg70kJ07s3VPR6P6tGkFHeoOrn1/hR4E9GtYsnAFi5Al8nh1rjGVdZA4b4ra07u6obLDQH6gwrNh+EMvUBHC4tpbWwQXpVLxQDItx/eAHkr+E6UEJmRVqP6shMwbGvvrbqeAGO1Pc5Kx7dhBiHiOjMUwbX5tJC7XrCrtWoblyKLICzMSCT1zg==
+ bh=fkopvjtBpI8D16bfJNa+vKVFafoGHkHzSg5T0u5TC68=;
+ b=eiDe8gwSTCE1kGpuL58zHCZvZXkURQJ/13xuBMfbDu82cGq8+yABHtyzubyjxu5Xt/FxKC1wkVITme5gMZf5a/Z+s/dqVcC1X4xUVeklVS3s6s6P9Hv9NOTxnZk5PqiMoPv/ALuC9ALoaHWD6G/d7FPkUIZFvfd2+WvVe0PWYFj7sf/rasd3Tlh+UI3KMGEELk1r2oFa94W3wouMaVMdkvuNDL7MUQGVvimU6tKUsilZ8fQI7AwiMhwkLbfSBpthh31lwMOpYTnw5zDlzRv5pkrgq8cc4eRwJFgDjzzd7IQ18IILxftNPsjVgV2X06wDt8cPJsAjbiLk2ag2KP7N1w==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
  header.d=amd.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=wjrf2G55w0tPZqwal/5bfG5DbYxgP1yRtNxlPhfX3RA=;
- b=OD4ASn+9GdSSj4DyZWzbpWhKUiEZbswOXVoCp5VP2JJUGnvaXuSSwlm8JDQ6NwWdrJx+TjRUUKES4OXOMWfKIOJt05lNqwGeGF0h51CCF1ehuQ5RsTSZHEGwuumcAqmQJQ3rQkaVLsWdiSgBLHGQSU8ZrTVLed+n/4QMtpTVIUo=
+ bh=fkopvjtBpI8D16bfJNa+vKVFafoGHkHzSg5T0u5TC68=;
+ b=OHcgqB0g+ykEKKYsWPy6BftOwN/n43Ih7LmcT7lAWth3A8nr/FDSu92FgTzmO+bM8r/KzMzr6NLJ5mBjGjFeGVdHFgvrMy4zcyv1gqZw1ep3bYVtRU6ZVrNlQFg0Xt5XzlSAVLzGwATLEYuVv6z99xq5TNa0cwYJ4xJo3kOmzv0=
 Authentication-Results: vger.kernel.org; dkim=none (message not signed)
  header.d=none;vger.kernel.org; dmarc=none action=none header.from=amd.com;
 Received: from DM5PR12MB1355.namprd12.prod.outlook.com (2603:10b6:3:6e::7) by
  DM6PR12MB2988.namprd12.prod.outlook.com (2603:10b6:5:3d::23) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.3370.16; Mon, 14 Sep 2020 20:19:44 +0000
+ 15.20.3370.16; Mon, 14 Sep 2020 20:19:52 +0000
 Received: from DM5PR12MB1355.namprd12.prod.outlook.com
  ([fe80::299a:8ed2:23fc:6346]) by DM5PR12MB1355.namprd12.prod.outlook.com
  ([fe80::299a:8ed2:23fc:6346%3]) with mapi id 15.20.3370.019; Mon, 14 Sep 2020
- 20:19:44 +0000
+ 20:19:52 +0000
 From:   Tom Lendacky <thomas.lendacky@amd.com>
 To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org, x86@kernel.org
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
@@ -48,44 +48,44 @@ Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Borislav Petkov <bp@alien8.de>, Ingo Molnar <mingo@redhat.com>,
         Thomas Gleixner <tglx@linutronix.de>,
         Brijesh Singh <brijesh.singh@amd.com>
-Subject: [RFC PATCH 28/35] KVM: X86: Update kvm_skip_emulated_instruction() for an SEV-ES guest
-Date:   Mon, 14 Sep 2020 15:15:42 -0500
-Message-Id: <ff66ee115d05d698813f54e10497698da21d1b73.1600114548.git.thomas.lendacky@amd.com>
+Subject: [RFC PATCH 29/35] KVM: SVM: Add NMI support for an SEV-ES guest
+Date:   Mon, 14 Sep 2020 15:15:43 -0500
+Message-Id: <f9d156fa3860c715eeb9f05a40027b9755ce082b.1600114548.git.thomas.lendacky@amd.com>
 X-Mailer: git-send-email 2.28.0
 In-Reply-To: <cover.1600114548.git.thomas.lendacky@amd.com>
 References: <cover.1600114548.git.thomas.lendacky@amd.com>
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SN1PR12CA0063.namprd12.prod.outlook.com
- (2603:10b6:802:20::34) To DM5PR12MB1355.namprd12.prod.outlook.com
+X-ClientProxiedBy: SN4PR0801CA0009.namprd08.prod.outlook.com
+ (2603:10b6:803:29::19) To DM5PR12MB1355.namprd12.prod.outlook.com
  (2603:10b6:3:6e::7)
 MIME-Version: 1.0
 X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from tlendack-t1.amd.com (165.204.77.1) by SN1PR12CA0063.namprd12.prod.outlook.com (2603:10b6:802:20::34) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3348.15 via Frontend Transport; Mon, 14 Sep 2020 20:19:43 +0000
+Received: from tlendack-t1.amd.com (165.204.77.1) by SN4PR0801CA0009.namprd08.prod.outlook.com (2603:10b6:803:29::19) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3370.16 via Frontend Transport; Mon, 14 Sep 2020 20:19:51 +0000
 X-Mailer: git-send-email 2.28.0
 X-Originating-IP: [165.204.77.1]
 X-MS-PublicTrafficType: Email
 X-MS-Office365-Filtering-HT: Tenant
-X-MS-Office365-Filtering-Correlation-Id: 34bc036d-1e65-4c35-9f38-08d858eb84a3
+X-MS-Office365-Filtering-Correlation-Id: 702eb045-205e-4e3c-b20d-08d858eb89a7
 X-MS-TrafficTypeDiagnostic: DM6PR12MB2988:
 X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <DM6PR12MB2988DCD12B356768E34C8690EC230@DM6PR12MB2988.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:8882;
+X-Microsoft-Antispam-PRVS: <DM6PR12MB29883C999862B8AD88CB72A5EC230@DM6PR12MB2988.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:7691;
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: wFQjlMaGol7e3QuAsJjuipgQbA6Rx13BADAQuv7grtU0oPpXw3eMImxwpA7mXIkpIKmv8yoe1BfB8umC3es31wrTXNDWyo/+pw9pv3sRqzUyT0wP7/IEnWQq79VrXV7XGZVYXVfl5ps43y4LsBCAEm/wRUgqCl2b3dR58I4mXzhdsJbpvNExnCpc2ZUi+PhhfwQfhL/ge4V6gI3l82FZ+3ZsyLv04uzeQwt8D2ITpX/otBrjeFmEQKUwH706qAujaFfXn/bG1i0C69JkuzgVc2/QHGLcgDT9Iis8BOAV9+9lrAS2oGrituaxhvFe9HQE3iKC/+Og1XN6i3tR4/Z/tQ==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM5PR12MB1355.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(376002)(39860400002)(346002)(396003)(136003)(366004)(8936002)(36756003)(316002)(478600001)(5660300002)(2616005)(956004)(66556008)(66946007)(186003)(4326008)(26005)(54906003)(2906002)(16526019)(66476007)(8676002)(83380400001)(86362001)(52116002)(7696005)(7416002)(15650500001)(6486002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData: tknN3+R06CR63Fz4XmzEFwQof/kPY9QpCXrBIyKOXJ+Hp3CDBlKBraDdz9tToZz9nhOxN3B2lz/HqabtazBUc8nCBmkS+TpnNh1ct153xOqCMbtneUTioLaGzss0rMbiJjvlTjmMroAEjg4mAIJIvWOnqBcritwsg82Lb07yuNWT5qvkkrpbvviUpfPb2CUYAwGSuMFDihthz4k5x+pPKQOrrNc1kBwOWIkGTOpOH78KMDOOMBszPlVaj/SyctpiUUArSvN5weXTcRVApUYk+gOjKMARTG5WQk3FDg4/+iI1BV5h+FtcTgF2pcEom30kfmYiGvMuoteaDJHJTq3/IhoPUvtc1h+WALvTgYi1UYPalKDpGwpZ2ElyKOXaTL4fzZ+jOy/jrDFzunmQ4uE6OiLP9i4q/3EuLjSMcTYxe6lPribb3PVcDh5DmyHuKOLDO1IaSLMefEM/iOtc9gm4HapnuI1BXSbLSAPZpyxQya/cNDWQA8g3Z61T+pCs6Tohx13rwlDqA8LKfp4qxEwtZMOyNhW1W58PfsRBcLnBeRENzTSMP19wMUVFbB4uLlLlE/u6DV0roduzuBaMcwY+GtcTsS5FwSPfP8sJXYWhdAanu54sIgNeQjSmTrzzkjB3dfJvEtYQdRjuwiksYNoJrQ==
+X-Microsoft-Antispam-Message-Info: hKMS6/oBc+EsRGkgcKbkwSti0SotRqCbgYoLdn+p4woHy+2MBC2fUJgOSZlZRMCNO0cdJHlYd8SuSfnB4qXd9Y+eM/5KSC74yN/vKDC/mqqLJrIpU1LIaxhzOTbQakjSNEza5tp77nwfK0az38f2ph4asr4RY0H4ETg5yvwbQZVP6EqOezQmgGEf0PE3j92uxUvu7bD8NYXSCNr2FnG/tcru2VxFKbJyuot6VdLkJ+xUAHEk1CmlAwYEMrQXbo6eQyQtcDDYONsjkGc3ybWaYj1KatKQ/Iiy7hdjI5WLiw+dA7GQ3d6J+EMoytYXdd9LVhQXvkOAsp95rhjf7JpB9A==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM5PR12MB1355.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(376002)(39860400002)(346002)(396003)(136003)(366004)(8936002)(36756003)(316002)(478600001)(5660300002)(2616005)(956004)(66556008)(66946007)(186003)(4326008)(26005)(54906003)(2906002)(16526019)(66476007)(6666004)(8676002)(83380400001)(86362001)(52116002)(7696005)(7416002)(6486002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData: u12uy16qJ2gyjgtr9HtlC8TJnDXjCgrCcYoijO1FDynPg8zOKyI5OIeAnpyMyKsQvXOno4himIoGNDiW4qE0I4oC0VqjiUFLKPk1fTeHO7sUY1Fr71MFuKfz1lZIF6UC+mL7qRPrgEXf7scnBCR7zfDhgnIkkCgRm99UPv0Iu5mRok5xEQPPlzciWPlQdnWhN7Oyr7WGszKCj/xx1J+tb477Hvz3b1INJGErGckdfEk9GKQKGiFGRV9bY1e4/MiNg0ImHJyJPxVo6oEOC0ybytevhzMGIOULAvQ5jFRE4ndhS5ReWoNenuTOssT0DBdDWzw+7NCU5YwM2JnazBoxf6aLw1AeJkbMa9Fj4dlxKlOUSqtlL18QIRadZ1EYwp53Z5ps7uKVl/OjPDgkoyObUM9L4CBMv0rBJpLmtrRcDNI3g3GjoOTei1y4vbvhtFI0WsMBHUPFHVmmLZzqQGeCVrelTqq6w+G8STHMRR0OWTDfAW6TyrRz3OzJqkn44Ekp2+/7nIhlZdfD5Z1o9Q78wqVJix9pc345dBECSzP6wbpkaaeLl7CNkUQxd2yJtWSurGsrIz+OlUjkppy9HkCpYUIGPyr/JeUNXYQOzCFg6ejHd1CVQHfH/fGbSG8nAdxH6GV/p1mzhuhnb4sim/96Qg==
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 34bc036d-1e65-4c35-9f38-08d858eb84a3
+X-MS-Exchange-CrossTenant-Network-Message-Id: 702eb045-205e-4e3c-b20d-08d858eb89a7
 X-MS-Exchange-CrossTenant-AuthSource: DM5PR12MB1355.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Sep 2020 20:19:44.1518
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Sep 2020 20:19:52.4991
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: C52H4tXeeQIUj3T/E6sVlyg51W4oJ6vMxARVM+MCjkfsmte5ei/7tkTuh+vG9i7Hf3vL9Wl49ch+wRoEf1oJmQ==
+X-MS-Exchange-CrossTenant-UserPrincipalName: o6nlbwYrXI0ggxc+U9UeSmyeArTS/Lhu67J1iaF05CAdoPfEtnow77csTDx4MHMjIm8WzPzrQAyXGIKJCMpjug==
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB2988
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
@@ -94,42 +94,93 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Tom Lendacky <thomas.lendacky@amd.com>
 
-The register state for an SEV-ES guest is encrypted so the value of the
-RIP cannot be updated. For an automatic exit, the RIP will be advanced
-as necessary. For a non-automatic exit, it is up to the #VC handler in
-the guest to advance the RIP.
+The GHCB specification defines how NMIs are to be handled for an SEV-ES
+guest. To detect the completion of an NMI the hypervisor must not
+intercept the IRET instruction (because a #VC while running the NMI will
+issue an IRET) and, instead, must receive an NMI Complete exit event from
+the guest.
 
-Add support to skip any RIP updates in kvm_skip_emulated_instruction()
-for an SEV-ES guest.
+Update the KVM support for detecting the completion of NMIs in the guest
+to follow the GHCB specification. When an SEV-ES guest is active, the
+IRET instruction will no longer be intercepted. Now, when the NMI Complete
+exit event is received, the iret_interception() function will be called
+to simulate the completion of the NMI.
 
 Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
 ---
- arch/x86/kvm/x86.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+ arch/x86/kvm/svm/sev.c |  3 +++
+ arch/x86/kvm/svm/svm.c | 20 +++++++++++++-------
+ 2 files changed, 16 insertions(+), 7 deletions(-)
 
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 23564d02d158..1dbdca607511 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -6874,13 +6874,17 @@ static int kvm_vcpu_do_singlestep(struct kvm_vcpu *vcpu)
- 
- int kvm_skip_emulated_instruction(struct kvm_vcpu *vcpu)
+diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+index cbb5f1b191bb..9bf7411a4b5d 100644
+--- a/arch/x86/kvm/svm/sev.c
++++ b/arch/x86/kvm/svm/sev.c
+@@ -1474,6 +1474,9 @@ int sev_handle_vmgexit(struct vcpu_svm *svm)
+ 					    control->exit_info_2,
+ 					    svm->ghcb_sa);
+ 		break;
++	case SVM_VMGEXIT_NMI_COMPLETE:
++		ret = svm_invoke_exit_handler(svm, SVM_EXIT_IRET);
++		break;
+ 	case SVM_VMGEXIT_AP_HLT_LOOP:
+ 		svm->ap_hlt_loop = true;
+ 		ret = kvm_emulate_halt(&svm->vcpu);
+diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+index ce1707dc9464..fcd4f0d983e9 100644
+--- a/arch/x86/kvm/svm/svm.c
++++ b/arch/x86/kvm/svm/svm.c
+@@ -2268,9 +2268,11 @@ static int cpuid_interception(struct vcpu_svm *svm)
+ static int iret_interception(struct vcpu_svm *svm)
  {
--	unsigned long rflags = kvm_x86_ops.get_rflags(vcpu);
-+	unsigned long rflags;
- 	int r;
+ 	++svm->vcpu.stat.nmi_window_exits;
+-	svm_clr_intercept(svm, INTERCEPT_IRET);
+ 	svm->vcpu.arch.hflags |= HF_IRET_MASK;
+-	svm->nmi_iret_rip = kvm_rip_read(&svm->vcpu);
++	if (!sev_es_guest(svm->vcpu.kvm)) {
++		svm_clr_intercept(svm, INTERCEPT_IRET);
++		svm->nmi_iret_rip = kvm_rip_read(&svm->vcpu);
++	}
+ 	kvm_make_request(KVM_REQ_EVENT, &svm->vcpu);
+ 	return 1;
+ }
+@@ -3242,7 +3244,8 @@ static void svm_inject_nmi(struct kvm_vcpu *vcpu)
  
- 	r = kvm_x86_ops.skip_emulated_instruction(vcpu);
- 	if (unlikely(!r))
- 		return 0;
+ 	svm->vmcb->control.event_inj = SVM_EVTINJ_VALID | SVM_EVTINJ_TYPE_NMI;
+ 	vcpu->arch.hflags |= HF_NMI_MASK;
+-	svm_set_intercept(svm, INTERCEPT_IRET);
++	if (!sev_es_guest(svm->vcpu.kvm))
++		svm_set_intercept(svm, INTERCEPT_IRET);
+ 	++vcpu->stat.nmi_injections;
+ }
  
-+	if (vcpu->arch.vmsa_encrypted)
-+		return 1;
-+
-+	rflags = kvm_x86_ops.get_rflags(vcpu);
- 	/*
- 	 * rflags is the old, "raw" value of the flags.  The new value has
- 	 * not been saved yet.
+@@ -3326,10 +3329,12 @@ static void svm_set_nmi_mask(struct kvm_vcpu *vcpu, bool masked)
+ 
+ 	if (masked) {
+ 		svm->vcpu.arch.hflags |= HF_NMI_MASK;
+-		svm_set_intercept(svm, INTERCEPT_IRET);
++		if (!sev_es_guest(svm->vcpu.kvm))
++			svm_set_intercept(svm, INTERCEPT_IRET);
+ 	} else {
+ 		svm->vcpu.arch.hflags &= ~HF_NMI_MASK;
+-		svm_clr_intercept(svm, INTERCEPT_IRET);
++		if (!sev_es_guest(svm->vcpu.kvm))
++			svm_clr_intercept(svm, INTERCEPT_IRET);
+ 	}
+ }
+ 
+@@ -3507,8 +3512,9 @@ static void svm_complete_interrupts(struct vcpu_svm *svm)
+ 	 * If we've made progress since setting HF_IRET_MASK, we've
+ 	 * executed an IRET and can allow NMI injection.
+ 	 */
+-	if ((svm->vcpu.arch.hflags & HF_IRET_MASK)
+-	    && kvm_rip_read(&svm->vcpu) != svm->nmi_iret_rip) {
++	if ((svm->vcpu.arch.hflags & HF_IRET_MASK) &&
++	    (sev_es_guest(svm->vcpu.kvm) ||
++	     kvm_rip_read(&svm->vcpu) != svm->nmi_iret_rip)) {
+ 		svm->vcpu.arch.hflags &= ~(HF_NMI_MASK | HF_IRET_MASK);
+ 		kvm_make_request(KVM_REQ_EVENT, &svm->vcpu);
+ 	}
 -- 
 2.28.0
 
