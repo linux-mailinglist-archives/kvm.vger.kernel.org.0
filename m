@@ -2,74 +2,71 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4A453268F0C
-	for <lists+kvm@lfdr.de>; Mon, 14 Sep 2020 17:07:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 019A5268F39
+	for <lists+kvm@lfdr.de>; Mon, 14 Sep 2020 17:11:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726003AbgINPHC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 14 Sep 2020 11:07:02 -0400
-Received: from mga14.intel.com ([192.55.52.115]:6600 "EHLO mga14.intel.com"
+        id S1726047AbgINPLG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 14 Sep 2020 11:11:06 -0400
+Received: from mga12.intel.com ([192.55.52.136]:49958 "EHLO mga12.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725984AbgINPGl (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 14 Sep 2020 11:06:41 -0400
-IronPort-SDR: a3JYADAw7dOZHm9xLUiMF60otfoKHpVWw5nrJVl/k4gmREwadLusNQybSghal663kAQJzDmEkz
- qggkoXAWMlcw==
-X-IronPort-AV: E=McAfee;i="6000,8403,9744"; a="158374193"
+        id S1726196AbgINPKn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 14 Sep 2020 11:10:43 -0400
+IronPort-SDR: miyeDnmuLLeex+Prc1eTQcv9PcF6i4+LBCvjXYVvf5rkp5ziBjwfmXDvdeDhlvRKOlC4T4J4Mf
+ qxs0pmiFZj9Q==
+X-IronPort-AV: E=McAfee;i="6000,8403,9744"; a="138598591"
 X-IronPort-AV: E=Sophos;i="5.76,426,1592895600"; 
-   d="scan'208";a="158374193"
+   d="scan'208";a="138598591"
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Sep 2020 08:06:29 -0700
-IronPort-SDR: Y2MzUY6ahfLD+0dsKg6BuoomGip1QVLnYOd1Gwoq7dZ/ctJ55jXmoc89muI81al/sm0NaC89JR
- ovnObFpHvL/w==
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Sep 2020 08:10:41 -0700
+IronPort-SDR: KkLa6eYD0Q7rxcvdqHWuq1CSPJH4bi5Sw1Sv+VGHkpe2kxGCTHMLroycW1flryiElnZiQyKrht
+ 4GUDwyeMdrXQ==
 X-IronPort-AV: E=Sophos;i="5.76,426,1592895600"; 
-   d="scan'208";a="287648567"
+   d="scan'208";a="287649586"
 Received: from sjchrist-ice.jf.intel.com (HELO sjchrist-ice) ([10.54.31.34])
-  by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Sep 2020 08:06:29 -0700
-Date:   Mon, 14 Sep 2020 08:06:27 -0700
+  by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Sep 2020 08:10:40 -0700
+Date:   Mon, 14 Sep 2020 08:10:39 -0700
 From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Babu Moger <babu.moger@amd.com>, vkuznets@redhat.com,
-        jmattson@google.com, wanpengli@tencent.com, kvm@vger.kernel.org,
-        joro@8bytes.org, x86@kernel.org, linux-kernel@vger.kernel.org,
-        mingo@redhat.com, bp@alien8.de, hpa@zytor.com, tglx@linutronix.de
-Subject: Re: [PATCH v6 04/12] KVM: SVM: Modify intercept_exceptions to
- generic intercepts
-Message-ID: <20200914150627.GB6855@sjchrist-ice>
-References: <159985237526.11252.1516487214307300610.stgit@bmoger-ubuntu>
- <159985250037.11252.1361972528657052410.stgit@bmoger-ubuntu>
- <1654dd89-2f15-62b6-d3a7-53f3ec422dd0@redhat.com>
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc:     x86@kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Borislav Petkov <bp@alien8.de>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <jroedel@suse.de>,
+        Dan Carpenter <dan.carpenter@oracle.com>,
+        Colin King <colin.king@canonical.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>
+Subject: Re: [PATCH tip] KVM: nSVM: avoid freeing uninitialized pointers in
+ svm_set_nested_state()
+Message-ID: <20200914151039.GC6855@sjchrist-ice>
+References: <20200914133725.650221-1-vkuznets@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1654dd89-2f15-62b6-d3a7-53f3ec422dd0@redhat.com>
+In-Reply-To: <20200914133725.650221-1-vkuznets@redhat.com>
 User-Agent: Mutt/1.9.4 (2018-02-28)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, Sep 12, 2020 at 06:52:20PM +0200, Paolo Bonzini wrote:
-> On 11/09/20 21:28, Babu Moger wrote:
-> > diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-> > index 1a5f3908b388..11892e86cb39 100644
-> > --- a/arch/x86/kvm/svm/svm.c
-> > +++ b/arch/x86/kvm/svm/svm.c
-> > @@ -1003,11 +1003,11 @@ static void init_vmcb(struct vcpu_svm *svm)
-> >  
-> >  	set_dr_intercepts(svm);
-> >  
-> > -	set_exception_intercept(svm, PF_VECTOR);
-> > -	set_exception_intercept(svm, UD_VECTOR);
-> > -	set_exception_intercept(svm, MC_VECTOR);
-> > -	set_exception_intercept(svm, AC_VECTOR);
-> > -	set_exception_intercept(svm, DB_VECTOR);
-> > +	set_exception_intercept(svm, INTERCEPT_PF_VECTOR);
-> > +	set_exception_intercept(svm, INTERCEPT_UD_VECTOR);
-> > +	set_exception_intercept(svm, INTERCEPT_MC_VECTOR);
-> > +	set_exception_intercept(svm, INTERCEPT_AC_VECTOR);
-> > +	set_exception_intercept(svm, INTERCEPT_DB_VECTOR);
+On Mon, Sep 14, 2020 at 03:37:25PM +0200, Vitaly Kuznetsov wrote:
+> The save and ctl pointers are passed uninitialized to kfree() when
+> svm_set_nested_state() follows the 'goto out_set_gif' path. While
+> the issue could've been fixed by initializing these on-stack varialbles
+> to NULL, it seems preferable to eliminate 'out_set_gif' label completely
+> as it is not actually a failure path and duplicating a single svm_set_gif()
+> call doesn't look too bad.
 > 
-> I think these should take a vector instead, and add 64 in the functions.
+> Fixes: 6ccbd29ade0d ("KVM: SVM: nested: Don't allocate VMCB structures on stack")
+> Addresses-Coverity: ("Uninitialized pointer read")
+> Reported-by: Dan Carpenter <dan.carpenter@oracle.com>
+> Reported-by: Joerg Roedel <jroedel@suse.de>
+> Reported-by: Colin King <colin.king@canonical.com>
+> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+> ---
 
-And "s/int bit/u32 vector" + BUILD_BUG_ON(vector > 32)?
+Reviewed-by: Sean Christopherson <sean.j.christopherson@intel.com>
