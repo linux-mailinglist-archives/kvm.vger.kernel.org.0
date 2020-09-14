@@ -2,132 +2,99 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 95A0C2696F0
-	for <lists+kvm@lfdr.de>; Mon, 14 Sep 2020 22:46:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A3656269767
+	for <lists+kvm@lfdr.de>; Mon, 14 Sep 2020 23:08:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726114AbgINUqk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 14 Sep 2020 16:46:40 -0400
-Received: from userp2120.oracle.com ([156.151.31.85]:51672 "EHLO
-        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725989AbgINUqi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 14 Sep 2020 16:46:38 -0400
-Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
-        by userp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 08EKeG8R111737;
-        Mon, 14 Sep 2020 20:45:19 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=corp-2020-01-29;
- bh=hNuujluzU2RRINi9JfoY0YiABW6y/9GNCHBiA8is/6I=;
- b=b+Rj8MSRAqqLmix8qstCVU8qsr8XpCSND84wHUFByL4WNjbYd9sTw4QJnR+b6tHEj+b4
- O2vHXCCMrRbq2VeBfQm+1TCag3h8/0BvFXMJr0r75RM/iUlgd1T3EzbbCY8DNZ0e2zo5
- 2LSoowSzohvrDXahPaaQXKib3Vfa60ebOnBVuozvyQmtKDCTxTiD+982+IUf+8FlSD8j
- u6+EFN2i92JpmhyFJ44sbZC1tCl62L+xIvyq8RytvOLa2AoYO/gJywyzX+tA3NAiSGXZ
- RayYfQXA0h9WFQeRbKxfeo2rvHX2w9HKKWgDl4qYplpfLjQYFHiiT0wiu8Ae4lUwB7b2 0Q== 
-Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
-        by userp2120.oracle.com with ESMTP id 33j91dan7r-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
-        Mon, 14 Sep 2020 20:45:19 +0000
-Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
-        by aserp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 08EKdspO037283;
-        Mon, 14 Sep 2020 20:43:18 GMT
-Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
-        by aserp3030.oracle.com with ESMTP id 33h7wmu0yc-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 14 Sep 2020 20:43:18 +0000
-Received: from abhmp0012.oracle.com (abhmp0012.oracle.com [141.146.116.18])
-        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 08EKhFN2004026;
-        Mon, 14 Sep 2020 20:43:15 GMT
-Received: from localhost.localdomain (/10.159.129.116)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Mon, 14 Sep 2020 20:43:15 +0000
-Subject: Re: [PATCH] KVM: SVM: Analyze is_guest_mode() in svm_vcpu_run()
-To:     Wanpeng Li <kernellwp@gmail.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
+        id S1726038AbgINVIM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 14 Sep 2020 17:08:12 -0400
+Received: from mga05.intel.com ([192.55.52.43]:32504 "EHLO mga05.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725978AbgINVIL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 14 Sep 2020 17:08:11 -0400
+IronPort-SDR: aZwxG13IRNdWtKCjMm97HUq6Tw014BYFyH3uZs9nrCCU1TnNG48CTOmNPQ20K3qzxOPRo38yLI
+ jWylPzA2DLKw==
+X-IronPort-AV: E=McAfee;i="6000,8403,9744"; a="243992776"
+X-IronPort-AV: E=Sophos;i="5.76,427,1592895600"; 
+   d="scan'208";a="243992776"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Sep 2020 14:08:10 -0700
+IronPort-SDR: U9N+DKLdMu+ewb++IVuN349jio0EA0DdYQq4BLqyw4wSagQO+4hwxOqBqHnyxlKQT0UkUrqb6L
+ fF1EIgHcCQ5A==
+X-IronPort-AV: E=Sophos;i="5.76,427,1592895600"; 
+   d="scan'208";a="482495517"
+Received: from sjchrist-ice.jf.intel.com (HELO sjchrist-ice) ([10.54.31.34])
+  by orsmga005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Sep 2020 14:08:09 -0700
+Date:   Mon, 14 Sep 2020 14:08:08 -0700
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Uros Bizjak <ubizjak@gmail.com>
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>
-References: <1600066548-4343-1-git-send-email-wanpengli@tencent.com>
-From:   Krish Sadhukhan <krish.sadhukhan@oracle.com>
-Message-ID: <b39b1599-9e1e-8ef6-1b97-a4910d9c3784@oracle.com>
-Date:   Mon, 14 Sep 2020 13:43:07 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        LKML <linux-kernel@vger.kernel.org>,
+        Josh Poimboeuf <jpoimboe@redhat.com>,
+        Andi Kleen <ak@linux.intel.com>
+Subject: Re: [PATCH 1/2] KVM: VMX: Move IRQ invocation to assembly subroutine
+Message-ID: <20200914210808.GC7084@sjchrist-ice>
+References: <20200914195634.12881-1-sean.j.christopherson@intel.com>
+ <20200914195634.12881-2-sean.j.christopherson@intel.com>
+ <CAFULd4aNVW1Wzs=Y9+-wwFw2FyjHZRKe=SPkJ7uBdGmbN6i47A@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <1600066548-4343-1-git-send-email-wanpengli@tencent.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9744 signatures=668679
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
- adultscore=0 bulkscore=0 phishscore=0 mlxlogscore=999 mlxscore=0
- spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2006250000 definitions=main-2009140163
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9744 signatures=668679
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0 impostorscore=0
- priorityscore=1501 malwarescore=0 suspectscore=0 mlxlogscore=999
- clxscore=1011 adultscore=0 lowpriorityscore=0 spamscore=0 mlxscore=0
- bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2006250000 definitions=main-2009140163
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAFULd4aNVW1Wzs=Y9+-wwFw2FyjHZRKe=SPkJ7uBdGmbN6i47A@mail.gmail.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Mon, Sep 14, 2020 at 10:37:25PM +0200, Uros Bizjak wrote:
+> On Mon, Sep 14, 2020 at 9:56 PM Sean Christopherson
+> <sean.j.christopherson@intel.com> wrote:
+> >
+> > Move the asm blob that invokes the appropriate IRQ handler after VM-Exit
+> > into a proper subroutine.  Slightly rework the blob so that it plays
+> > nice with objtool without any additional hints (existing hints aren't
+> > able to handle returning with a seemingly modified stack size).
+> >
+> > Suggested-by: Josh Poimboeuf <jpoimboe@redhat.com>
+> > Cc: Uros Bizjak <ubizjak@gmail.com>
+> > Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+> > ---
+> >  arch/x86/kvm/vmx/vmenter.S | 28 ++++++++++++++++++++++++++++
+> >  arch/x86/kvm/vmx/vmx.c     | 33 +++------------------------------
+> >  2 files changed, 31 insertions(+), 30 deletions(-)
+> >
+> > diff --git a/arch/x86/kvm/vmx/vmenter.S b/arch/x86/kvm/vmx/vmenter.S
+> > index 799db084a336..baec1e0fefc5 100644
+> > --- a/arch/x86/kvm/vmx/vmenter.S
+> > +++ b/arch/x86/kvm/vmx/vmenter.S
+> > @@ -4,6 +4,7 @@
+> >  #include <asm/bitsperlong.h>
+> >  #include <asm/kvm_vcpu_regs.h>
+> >  #include <asm/nospec-branch.h>
+> > +#include <asm/segment.h>
+> >
+> >  #define WORD_SIZE (BITS_PER_LONG / 8)
+> >
+> > @@ -294,3 +295,30 @@ SYM_FUNC_START(vmread_error_trampoline)
+> >
+> >         ret
+> >  SYM_FUNC_END(vmread_error_trampoline)
+> > +
+> > +SYM_FUNC_START(vmx_do_interrupt_nmi_irqoff)
+> > +       /*
+> > +        * Unconditionally create a stack frame.  RSP needs to be aligned for
+> > +        * x86-64, getting the correct RSP on the stack (for x86-64) would take
+> > +        * two instructions anyways, and it helps make objtool happy (see below).
+> > +        */
+> > +       push %_ASM_BP
+> > +       mov %rsp, %_ASM_BP
+> 
+> _ASM_SP instead of %rsp to avoid assembly failure for 32bit targets.
 
-On 9/13/20 11:55 PM, Wanpeng Li wrote:
-> From: Wanpeng Li <wanpengli@tencent.com>
->
-> Analyze is_guest_mode() in svm_vcpu_run() instead of svm_exit_handlers_fastpath()
-> in conformity with VMX version.
->
-> Suggested-by: Vitaly Kuznetsov <vkuznets@redhat.com>
-> Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
-> ---
->   arch/x86/kvm/svm/svm.c | 7 +++++--
->   1 file changed, 5 insertions(+), 2 deletions(-)
->
-> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-> index 3da5b2f..009035a 100644
-> --- a/arch/x86/kvm/svm/svm.c
-> +++ b/arch/x86/kvm/svm/svm.c
-> @@ -3393,8 +3393,7 @@ static void svm_cancel_injection(struct kvm_vcpu *vcpu)
->   
->   static fastpath_t svm_exit_handlers_fastpath(struct kvm_vcpu *vcpu)
->   {
-> -	if (!is_guest_mode(vcpu) &&
-> -	    to_svm(vcpu)->vmcb->control.exit_code == SVM_EXIT_MSR &&
-> +	if (to_svm(vcpu)->vmcb->control.exit_code == SVM_EXIT_MSR &&
->   	    to_svm(vcpu)->vmcb->control.exit_info_1)
->   		return handle_fastpath_set_msr_irqoff(vcpu);
->   
-> @@ -3580,6 +3579,10 @@ static __no_kcsan fastpath_t svm_vcpu_run(struct kvm_vcpu *vcpu)
->   		svm_handle_mce(svm);
->   
->   	svm_complete_interrupts(svm);
-> +
-> +	if (is_guest_mode(vcpu))
-> +		return EXIT_FASTPATH_NONE;
-> +
->   	exit_fastpath = svm_exit_handlers_fastpath(vcpu);
->   	return exit_fastpath;
-
-Not related to your changes, but should we get rid of the variable 
-'exit_fastpath' and just do,
-
-         return svm_exit_handler_fastpath(vcpu);
-
-It seems the variable isn't used anywhere else and svm_vcpu_run() 
-doesn't return from anywhere else either.
-
-Also, svm_exit_handlers_fastpath() doesn't have any other caller.  
-Should we get rid of it as well ?
-
-
-For your changes,
-
-     Reviewed-by: Krish Sadhukhan <krish.sadhukhan@oracle.com>
-
->   }
+*sigh*  Thanks!  I'll build i386 this time...
