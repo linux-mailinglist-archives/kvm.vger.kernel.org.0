@@ -2,41 +2,41 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7BA15269645
-	for <lists+kvm@lfdr.de>; Mon, 14 Sep 2020 22:20:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A5FEF26968B
+	for <lists+kvm@lfdr.de>; Mon, 14 Sep 2020 22:27:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726242AbgINUUO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 14 Sep 2020 16:20:14 -0400
-Received: from mail-dm6nam12on2054.outbound.protection.outlook.com ([40.107.243.54]:16225
-        "EHLO NAM12-DM6-obe.outbound.protection.outlook.com"
+        id S1726243AbgINU1u (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 14 Sep 2020 16:27:50 -0400
+Received: from mail-dm6nam11on2069.outbound.protection.outlook.com ([40.107.223.69]:56449
+        "EHLO NAM11-DM6-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726293AbgINUT1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 14 Sep 2020 16:19:27 -0400
+        id S1726048AbgINUUi (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 14 Sep 2020 16:20:38 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=GPKr/0XsYwc75ivqZBEnAHRHiaZ6UCmCaTuofcT++5j0veFTmPbtKBQKG3F+Eh6LYB0EF2LPPyfcSJbMk3iwM0orHiY1C6kJDOutuUy+/CeNmz9DcE8rkCkwCYuO40lZbD+X64UIlFrfZ/vafZUERI5ZnQ0RzNU9SITlS+eZqjHxKU9EtP137ktYrfwOyYHl3A0F+jZIukaa9TRaTl0SqQ7l0rhr0XBfoxY5gzrcYpnL1EYkrqZ0mha9M59Mc8VQY7v4Bn7g3s5vXfJZBxB5ACc59YCqBfK8FB4qJNkDs6+nNmVotjlga0Az02Qy7ZwKWHVwMzDrkYonsDwg+XZiqA==
+ b=HcWfW7Xxu40/AdSIuMoo5wZQcwNRm1msJzc/gKytm1OqCv7xoBVpOj1Z4aXCCUqVpD3huXP4M2qbcduZs6cuKJbjczfkk57AlWW2bjMIcepyoJY+wLNJFtqBZFWs6RC2P4xUkVBCeRXIsCtEysLwUqM7BgWfSwtn7QLaveiD31HkaenkuLMmglZo5k/aswdm1+QraFrwHK6t+pW/xfupLl4SX6boCojvWhKC7nUoivN6OLy2OttGXWE5cZLAGgpnD0cq3tPGDoEvrd3Ao2lck/l0SWvgx6iYNKD6uEqxvEOX5DnWj2LlBFiDOmIRj+GWVZxg+CbqU1ndIVf3KIW1Mg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=KR65iSw/H1Douj4v4mXpHnY6Z6UJeYg8cdJyUNEbB7c=;
- b=To3XC3w0pkCGZwH6ZyvXELISfDplCtvPR7Wgu+1FmAUYL3dYQoyqXBEyCwam1REERstcRUnbnnNCAhzEtU2V/DlKMNaZmWNfgb6dw72wfN85wMiWghW4nlB2sooD9/Km/C9wvQqDwKlPhMMMQ8/u6Yj0zuNJrVm5yGPnhGGVE7gtUyZg44FEqfCEUOBa+co0+R+pu2IZXxEPlvbA2BlHFeybxJHphbSQ+SMeLnyqUK9TJe8hN9Af5ZQ4ThUptekKezL9ny97iOw1tR1kWmctqv660TUBJgLgJIykY5pBrfk5YXFCus43veaNX+c1UJsu4Y0cirKpBSSUVSOeZIwOHQ==
+ bh=TCFwC7skNF7LPhLoCU8DZb5CDciLp3xPg6AZz+CB/Dg=;
+ b=WbVdsK6+aVS/+RI+4ty3PaFPPsDzjqOE/TR3NUGwq+/SPEedG6Wd/SJ7qozZnhC5JxZVaH16PIjnkzi2rE+nX0UzJVdZBWPYrPRadFedqotR9NGV9bmO2wmqH6y2KlfmTtF/Amgb93QX4/WVjT3/sPGosG5Dzq2ZN5jgR7O1Gz/aJMolChwgZUchUUEHumjZawlnaSlahbplF6nTJF8AYgSKbc7YhzCQL1jYDpN6XSLdjOYJ3e6LEhfLNhMRumn5pglpqKrPRjRaZpiffaOgD7MA65yyX0Xj/bOlnOhbK+GBTd/FhuRw/yc17Wj0H0+p4wsGwfq6q6y4TWMHqb4uTQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
  header.d=amd.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=KR65iSw/H1Douj4v4mXpHnY6Z6UJeYg8cdJyUNEbB7c=;
- b=2Zx/kgLqlueH8C2st7mNe9YTerY1fTP3nbzlE7y60tuI2m6RfD4zhI/AtCE3pbDx+na5KAdRNU11/hEPK7qDGLG5I9E2LiyBFKHlDRxMBXKcaI5a9n6QZubmLFqpCPFYoEUUTc6sjwrZyGQgP3OGLRxwN77bXQ+vANzMZER7ESU=
+ bh=TCFwC7skNF7LPhLoCU8DZb5CDciLp3xPg6AZz+CB/Dg=;
+ b=xbf6cTzm2BqXGwNxchvvL3MwrhsqqvzZRCKKnmO4oMxxML4g6Bj25InQ+GipAdJHPbmOfea6tDcD9ETqtqRpXH5iDG0uznmGrKmPLjU2rtqAHCgEsix5Q9WZYqrbhOoPhpHIVLXzTw8iSkk6CZhjrxwexHXT7VKKQbLa8wLkQyU=
 Authentication-Results: vger.kernel.org; dkim=none (message not signed)
  header.d=none;vger.kernel.org; dmarc=none action=none header.from=amd.com;
 Received: from DM5PR12MB1355.namprd12.prod.outlook.com (2603:10b6:3:6e::7) by
- DM6PR12MB2828.namprd12.prod.outlook.com (2603:10b6:5:77::11) with Microsoft
+ DM6PR12MB2988.namprd12.prod.outlook.com (2603:10b6:5:3d::23) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.3348.15; Mon, 14 Sep 2020 20:19:19 +0000
+ 15.20.3370.16; Mon, 14 Sep 2020 20:19:28 +0000
 Received: from DM5PR12MB1355.namprd12.prod.outlook.com
  ([fe80::299a:8ed2:23fc:6346]) by DM5PR12MB1355.namprd12.prod.outlook.com
  ([fe80::299a:8ed2:23fc:6346%3]) with mapi id 15.20.3370.019; Mon, 14 Sep 2020
- 20:19:19 +0000
+ 20:19:28 +0000
 From:   Tom Lendacky <thomas.lendacky@amd.com>
 To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org, x86@kernel.org
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
@@ -48,45 +48,45 @@ Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Borislav Petkov <bp@alien8.de>, Ingo Molnar <mingo@redhat.com>,
         Thomas Gleixner <tglx@linutronix.de>,
         Brijesh Singh <brijesh.singh@amd.com>
-Subject: [RFC PATCH 25/35] KVM: x86: Update __get_sregs() / __set_sregs() to support SEV-ES
-Date:   Mon, 14 Sep 2020 15:15:39 -0500
-Message-Id: <e08f56496a52a3a974310fbe05bb19100fd6c1d8.1600114548.git.thomas.lendacky@amd.com>
+Subject: [RFC PATCH 26/35] KVM: SVM: Guest FPU state save/restore not needed for SEV-ES guest
+Date:   Mon, 14 Sep 2020 15:15:40 -0500
+Message-Id: <ac35a419e395d355d86f3b44ce219dc63864db00.1600114548.git.thomas.lendacky@amd.com>
 X-Mailer: git-send-email 2.28.0
 In-Reply-To: <cover.1600114548.git.thomas.lendacky@amd.com>
 References: <cover.1600114548.git.thomas.lendacky@amd.com>
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SN4PR0501CA0042.namprd05.prod.outlook.com
- (2603:10b6:803:41::19) To DM5PR12MB1355.namprd12.prod.outlook.com
+X-ClientProxiedBy: SA9PR10CA0017.namprd10.prod.outlook.com
+ (2603:10b6:806:a7::22) To DM5PR12MB1355.namprd12.prod.outlook.com
  (2603:10b6:3:6e::7)
 MIME-Version: 1.0
 X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from tlendack-t1.amd.com (165.204.77.1) by SN4PR0501CA0042.namprd05.prod.outlook.com (2603:10b6:803:41::19) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3391.5 via Frontend Transport; Mon, 14 Sep 2020 20:19:18 +0000
+Received: from tlendack-t1.amd.com (165.204.77.1) by SA9PR10CA0017.namprd10.prod.outlook.com (2603:10b6:806:a7::22) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3370.16 via Frontend Transport; Mon, 14 Sep 2020 20:19:27 +0000
 X-Mailer: git-send-email 2.28.0
 X-Originating-IP: [165.204.77.1]
 X-MS-PublicTrafficType: Email
 X-MS-Office365-Filtering-HT: Tenant
-X-MS-Office365-Filtering-Correlation-Id: 61b11bf1-53a3-4919-bd61-08d858eb760f
-X-MS-TrafficTypeDiagnostic: DM6PR12MB2828:
+X-MS-Office365-Filtering-Correlation-Id: 7ded8d0a-b333-4457-63f6-08d858eb7b0f
+X-MS-TrafficTypeDiagnostic: DM6PR12MB2988:
 X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <DM6PR12MB28284A5F9B068D734854CEFBEC230@DM6PR12MB2828.namprd12.prod.outlook.com>
+X-Microsoft-Antispam-PRVS: <DM6PR12MB2988D7C98586B3DA86EC6395EC230@DM6PR12MB2988.namprd12.prod.outlook.com>
 X-MS-Oob-TLC-OOBClassifiers: OLM:7691;
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: NWa4QGDe97mSUpJjJu8yg9pOLyGz8Z4S5EPvX920OvsuWBaNkcVksUUi9Tfv2960y76ZUeHk7qml9ViZx7C8Be6Kza8sdN9jSS9aiVixy66odSRuYatrjMbID/zeNjo23wWO8XtvYgrgnZSTvyPjsZCnVoo9RPo3aggcErfQwqTaBq7l11QQGyjDK7oL8gtpercj0e3elVoHdthd/QTD742q8OP7msaWxE8XoVEhKitE75KM3tNcAcSdId5JSGLoODx1+YgXTe9heXs0JJYEaLuqQNR8wyEH5fW+3LiFzFdLy5sRkzomzo3TR7RTlAIYl7lTn3Srv6RyXpZLRfknHg==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM5PR12MB1355.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(376002)(136003)(346002)(396003)(366004)(39860400002)(83380400001)(52116002)(6486002)(478600001)(7696005)(956004)(4326008)(2616005)(6666004)(2906002)(316002)(54906003)(16526019)(26005)(186003)(36756003)(66946007)(5660300002)(66556008)(66476007)(8676002)(7416002)(8936002)(86362001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData: zUIzAqucUmoA6ga33H9p7hSuxDYZWZQ1E2IJ0yRrxnIoz63RO7wd6tctwdFGYxi4VXU7XJCm6UUSgrXY6iI12eumdKx7iylIG/W1TEe7DPkAFeLlsa9zTa7cYJJOsUHK3WqNIHRVhTwCbOVsEtXZUPW2Ps32MxrDmJ93jWUMIwWn3QGnSfwRAcZSCM1PXfd2Xp4QsfZ1doVMAMuhXgK1/6DBeUD5PTpVID1f9RRtlwNeRuQ/acMyUk7YpqvshPo03DtlS5Gj+yKM7AY7gZATi8KdrzZdjDz+YIzCV31l7YIG8Erj0o7Ll606PpRfr0G5IUDNUDcigJxjEq04nkAHfDSJlBtWG8lVbDheu0tuideyAs7WNbrEcyr7h7MOqpffgL+WvQRLu5fVlENmmU0vMn4yVF+GxgQVB7btJkUWAncxHIBko10FNIVplkruamIaQ+ySfP6hPCKs1wjbmKqvOI0d2LLeiT9AKmxW1a9/Von7TBfmyc6QZHrUHSl944j5ppmWwDl+2oPQoTG1+rneLagB8sc9bwS7S5pGCrhZRppcisL9drLRRltq4J6zPOC53qmCLw3xo0Z2hBjihDZ5L/L9/KhvVgbGnSM1XKD04VfJMP1zL1gPSy3pJ82gM3GX6kMC8X0bhEc4CvNavkk51Q==
+X-Microsoft-Antispam-Message-Info: zhF0dkFrPocVATIrOgwCjMQ82nA0bYZJjKT4rilJpO4k4r9X9DAdE5bOSuEy6w9eJIDE22m9oeSfr4qgM4LCEbMqUC1FAd6utGBChYwb99piXlFXcNtF7xcA0fU3NaS/OM8lrXgIwysL7+tvGvtPc+flKGZa31ZimzipfGrbFJATp7l9iUwP1pqlQsvTcgljZvtXhUAaNfxLHjJnchnxqUXsGOoNQbitrHgM+/BbClwjCBHHJQYAD9Dk5j+014uHfyl6dtjIMKM328RyhNcHXOMOG9pFIcBCYL0B7rK50FcEPlDFhR1W8MOnqmjMd9VTeyUc/WraRbMMkl8FhS8rlQ==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM5PR12MB1355.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(376002)(39860400002)(346002)(396003)(136003)(366004)(8936002)(36756003)(316002)(478600001)(5660300002)(2616005)(956004)(66556008)(66946007)(186003)(4326008)(26005)(54906003)(2906002)(16526019)(66476007)(6666004)(8676002)(83380400001)(86362001)(52116002)(7696005)(7416002)(6486002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData: cpaFE0+mb6n/mAS3wb7fi3N+VP9eRD23rNR69hwscwPCIdE4bZ6f47aGgu2PlDvLW1fcEBF2Dryy+ysjQnVvvhNITSFkTuwefDMQJ+HrwFzgREECQw7RNvGoy/kRr4+xUHCntSAFuQIcKV4YYCtAQQ2NhiyTU8rmKOitXnR+0c05gJIVRgg43fIn1/do3sDmoa0wRZ/KsfifniOHK/IkdOzNRdVBx292UgulF9neZLwU2BgGUFe9U32x4Ms9RNyYFwPkrrC4HSp2b/redqbHfeGh/+9UHxWLI+EAgxhdhtaU/cnAG0okSOH9kttSei2uQqGmlz5EEXdvqGfn4S8GQXGxF5okwBA33JOi749Y2K4w/lA8xlJn0hcBYG3geJvJd4o7zMBIKW2HceC963URyq5HpywPR2hfLVWvKHnXKNRWbxlsX1x18fASUxpYLY2TIX/LLBSOp+8gxtvpXgrBdkQgYfW+bq7XvoOGErURlXUDW3sshJzmBgtVBIh7h57S/vlaVnwVLioeXUT9BjhHJ5H4LF/ir8sISfxAQ2mzTEWKSJQPgtJsXywJl8/ERzjZgD+UI22tnfiOd+++16plkR0MMUHvhZ8PtRm7x87OYdr1TlYbXtQIzWzJPjzx19dW3e7Tdq8TILU6ivwaqzEzWA==
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 61b11bf1-53a3-4919-bd61-08d858eb760f
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7ded8d0a-b333-4457-63f6-08d858eb7b0f
 X-MS-Exchange-CrossTenant-AuthSource: DM5PR12MB1355.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Sep 2020 20:19:19.5976
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Sep 2020 20:19:27.9829
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: SnFbJYg5K1/q6KBogXXltMJcc0zH6h/6DESUHUQWIZRK8tlNbQ0WWLK69KKvKH5foUmYhtVXyq9wcdu+hJv9iA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB2828
+X-MS-Exchange-CrossTenant-UserPrincipalName: hZzp1oKQwF7PbmDk32jbl6jH/hZRf2R9xahjSEp8XXGpv66ZN6Mv1ebMNXAG5QfIfPTdN9QsJ06a/g9IbQO+RQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB2988
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
@@ -94,130 +94,77 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Tom Lendacky <thomas.lendacky@amd.com>
 
-Since many of the registers used by the SEV-ES are encrypted and cannot
-be read or written, adjust the __get_sregs() / __set_sregs() to only get
-or set the registers being tracked (efer, cr0, cr4 and cr8) once the VMSA
-is encrypted.
-
-For __get_sregs(), return the actual value that is in use by the guest
-as determined by the write trap support of the registers.
-
-For __set_sregs(), set the arch specific value that KVM believes the guest
-to be using. Note, this will not set the guest's actual value so it might
-only be useful for such things as live migration.
+The guest FPU is automatically restored on VMRUN and saved on VMEXIT by
+the hardware, so there is no reason to do this in KVM.
 
 Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
 ---
- arch/x86/kvm/x86.c | 56 +++++++++++++++++++++++++++-------------------
- 1 file changed, 33 insertions(+), 23 deletions(-)
+ arch/x86/kvm/svm/svm.c |  8 ++++++--
+ arch/x86/kvm/x86.c     | 18 ++++++++++++++----
+ 2 files changed, 20 insertions(+), 6 deletions(-)
 
+diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+index b35c2de1130c..48699c41b62a 100644
+--- a/arch/x86/kvm/svm/svm.c
++++ b/arch/x86/kvm/svm/svm.c
+@@ -3682,7 +3682,9 @@ static __no_kcsan fastpath_t svm_vcpu_run(struct kvm_vcpu *vcpu)
+ 		svm_set_dr6(svm, DR6_FIXED_1 | DR6_RTM);
+ 
+ 	clgi();
+-	kvm_load_guest_xsave_state(vcpu);
++
++	if (!sev_es_guest(svm->vcpu.kvm))
++		kvm_load_guest_xsave_state(vcpu);
+ 
+ 	if (lapic_in_kernel(vcpu) &&
+ 		vcpu->arch.apic->lapic_timer.timer_advance_ns)
+@@ -3728,7 +3730,9 @@ static __no_kcsan fastpath_t svm_vcpu_run(struct kvm_vcpu *vcpu)
+ 	if (unlikely(svm->vmcb->control.exit_code == SVM_EXIT_NMI))
+ 		kvm_before_interrupt(&svm->vcpu);
+ 
+-	kvm_load_host_xsave_state(vcpu);
++	if (!sev_es_guest(svm->vcpu.kvm))
++		kvm_load_host_xsave_state(vcpu);
++
+ 	stgi();
+ 
+ 	/* Any pending NMI will happen here */
 diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 6e445a76b691..76efe70cd635 100644
+index 76efe70cd635..a53e24c1c5d1 100644
 --- a/arch/x86/kvm/x86.c
 +++ b/arch/x86/kvm/x86.c
-@@ -9090,6 +9090,9 @@ static void __get_sregs(struct kvm_vcpu *vcpu, struct kvm_sregs *sregs)
+@@ -8896,9 +8896,14 @@ static void kvm_load_guest_fpu(struct kvm_vcpu *vcpu)
+ 
+ 	kvm_save_current_fpu(vcpu->arch.user_fpu);
+ 
+-	/* PKRU is separately restored in kvm_x86_ops.run.  */
+-	__copy_kernel_to_fpregs(&vcpu->arch.guest_fpu->state,
+-				~XFEATURE_MASK_PKRU);
++	/*
++	 * An encrypted save area means that the guest state can't be
++	 * set by the hypervisor, so skip trying to set it.
++	 */
++	if (!vcpu->arch.vmsa_encrypted)
++		/* PKRU is separately restored in kvm_x86_ops.run. */
++		__copy_kernel_to_fpregs(&vcpu->arch.guest_fpu->state,
++					~XFEATURE_MASK_PKRU);
+ 
+ 	fpregs_mark_activate();
+ 	fpregs_unlock();
+@@ -8911,7 +8916,12 @@ static void kvm_put_guest_fpu(struct kvm_vcpu *vcpu)
  {
- 	struct desc_ptr dt;
+ 	fpregs_lock();
  
-+	if (vcpu->arch.vmsa_encrypted)
-+		goto tracking_regs;
-+
- 	kvm_get_segment(vcpu, &sregs->cs, VCPU_SREG_CS);
- 	kvm_get_segment(vcpu, &sregs->ds, VCPU_SREG_DS);
- 	kvm_get_segment(vcpu, &sregs->es, VCPU_SREG_ES);
-@@ -9107,12 +9110,15 @@ static void __get_sregs(struct kvm_vcpu *vcpu, struct kvm_sregs *sregs)
- 	sregs->gdt.limit = dt.size;
- 	sregs->gdt.base = dt.address;
+-	kvm_save_current_fpu(vcpu->arch.guest_fpu);
++	/*
++	 * An encrypted save area means that the guest state can't be
++	 * read/saved by the hypervisor, so skip trying to save it.
++	 */
++	if (!vcpu->arch.vmsa_encrypted)
++		kvm_save_current_fpu(vcpu->arch.guest_fpu);
  
--	sregs->cr0 = kvm_read_cr0(vcpu);
- 	sregs->cr2 = vcpu->arch.cr2;
- 	sregs->cr3 = kvm_read_cr3(vcpu);
-+
-+tracking_regs:
-+	sregs->cr0 = kvm_read_cr0(vcpu);
- 	sregs->cr4 = kvm_read_cr4(vcpu);
- 	sregs->cr8 = kvm_get_cr8(vcpu);
- 	sregs->efer = vcpu->arch.efer;
-+
- 	sregs->apic_base = kvm_get_apic_base(vcpu);
+ 	copy_kernel_to_fpregs(&vcpu->arch.user_fpu->state);
  
- 	memset(sregs->interrupt_bitmap, 0, sizeof(sregs->interrupt_bitmap));
-@@ -9248,18 +9254,6 @@ static int __set_sregs(struct kvm_vcpu *vcpu, struct kvm_sregs *sregs)
- 	if (kvm_set_apic_base(vcpu, &apic_base_msr))
- 		goto out;
- 
--	dt.size = sregs->idt.limit;
--	dt.address = sregs->idt.base;
--	kvm_x86_ops.set_idt(vcpu, &dt);
--	dt.size = sregs->gdt.limit;
--	dt.address = sregs->gdt.base;
--	kvm_x86_ops.set_gdt(vcpu, &dt);
--
--	vcpu->arch.cr2 = sregs->cr2;
--	mmu_reset_needed |= kvm_read_cr3(vcpu) != sregs->cr3;
--	vcpu->arch.cr3 = sregs->cr3;
--	kvm_register_mark_available(vcpu, VCPU_EXREG_CR3);
--
- 	kvm_set_cr8(vcpu, sregs->cr8);
- 
- 	mmu_reset_needed |= vcpu->arch.efer != sregs->efer;
-@@ -9276,6 +9270,14 @@ static int __set_sregs(struct kvm_vcpu *vcpu, struct kvm_sregs *sregs)
- 	if (cpuid_update_needed)
- 		kvm_update_cpuid_runtime(vcpu);
- 
-+	if (vcpu->arch.vmsa_encrypted)
-+		goto tracking_regs;
-+
-+	vcpu->arch.cr2 = sregs->cr2;
-+	mmu_reset_needed |= kvm_read_cr3(vcpu) != sregs->cr3;
-+	vcpu->arch.cr3 = sregs->cr3;
-+	kvm_register_mark_available(vcpu, VCPU_EXREG_CR3);
-+
- 	idx = srcu_read_lock(&vcpu->kvm->srcu);
- 	if (is_pae_paging(vcpu)) {
- 		load_pdptrs(vcpu, vcpu->arch.walk_mmu, kvm_read_cr3(vcpu));
-@@ -9283,16 +9285,12 @@ static int __set_sregs(struct kvm_vcpu *vcpu, struct kvm_sregs *sregs)
- 	}
- 	srcu_read_unlock(&vcpu->kvm->srcu, idx);
- 
--	if (mmu_reset_needed)
--		kvm_mmu_reset_context(vcpu);
--
--	max_bits = KVM_NR_INTERRUPTS;
--	pending_vec = find_first_bit(
--		(const unsigned long *)sregs->interrupt_bitmap, max_bits);
--	if (pending_vec < max_bits) {
--		kvm_queue_interrupt(vcpu, pending_vec, false);
--		pr_debug("Set back pending irq %d\n", pending_vec);
--	}
-+	dt.size = sregs->idt.limit;
-+	dt.address = sregs->idt.base;
-+	kvm_x86_ops.set_idt(vcpu, &dt);
-+	dt.size = sregs->gdt.limit;
-+	dt.address = sregs->gdt.base;
-+	kvm_x86_ops.set_gdt(vcpu, &dt);
- 
- 	kvm_set_segment(vcpu, &sregs->cs, VCPU_SREG_CS);
- 	kvm_set_segment(vcpu, &sregs->ds, VCPU_SREG_DS);
-@@ -9312,6 +9310,18 @@ static int __set_sregs(struct kvm_vcpu *vcpu, struct kvm_sregs *sregs)
- 	    !is_protmode(vcpu))
- 		vcpu->arch.mp_state = KVM_MP_STATE_RUNNABLE;
- 
-+tracking_regs:
-+	if (mmu_reset_needed)
-+		kvm_mmu_reset_context(vcpu);
-+
-+	max_bits = KVM_NR_INTERRUPTS;
-+	pending_vec = find_first_bit(
-+		(const unsigned long *)sregs->interrupt_bitmap, max_bits);
-+	if (pending_vec < max_bits) {
-+		kvm_queue_interrupt(vcpu, pending_vec, false);
-+		pr_debug("Set back pending irq %d\n", pending_vec);
-+	}
-+
- 	kvm_make_request(KVM_REQ_EVENT, vcpu);
- 
- 	ret = 0;
 -- 
 2.28.0
 
