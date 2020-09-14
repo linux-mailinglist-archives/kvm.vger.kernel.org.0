@@ -2,96 +2,121 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C8E36268B55
-	for <lists+kvm@lfdr.de>; Mon, 14 Sep 2020 14:43:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 90702268BBB
+	for <lists+kvm@lfdr.de>; Mon, 14 Sep 2020 15:06:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726588AbgINMng (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 14 Sep 2020 08:43:36 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:40908 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726282AbgINMmy (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 14 Sep 2020 08:42:54 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1600087372;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=T8zmsg/IzMXQyj8cUpKUiHl2M6KcAvulktd+iXwdmgU=;
-        b=QZ9cLYTREcCBxCFLiK3aEyC19dIbTX0/LYhEJ6aTPr5Oc75tYis480yg+srlIg2vWi32Ak
-        1U2SphkDWDwHjqnqQMSENn9APIoYEuwgm1UZMXAnVUybrrv4ife7eNcowl/gmy564uZUFp
-        IvBtc+la+KF9CBkoprHD//7QxxL88Ow=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-317-fL3tJiDlNdaTllNEWhlf4g-1; Mon, 14 Sep 2020 08:42:50 -0400
-X-MC-Unique: fL3tJiDlNdaTllNEWhlf4g-1
-Received: by mail-wm1-f72.google.com with SMTP id 189so3198994wme.5
-        for <kvm@vger.kernel.org>; Mon, 14 Sep 2020 05:42:50 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=T8zmsg/IzMXQyj8cUpKUiHl2M6KcAvulktd+iXwdmgU=;
-        b=Ge5+NuCUewJgeJ9CA7GprZfIcera//BQQa9e53/JXAvyUplEQ4Fl42tWHu6uTh4lB5
-         B/MkeLIVr8+xOM721UF7f1i6EwlBy7c2GlgBP/t/UXG8zB8GUe9vl3+EwjJ6Qb/kRNGj
-         f2/fSpqkSdWf0UFKOSVtc5wz176jiRGnqZzLGCU4EV/8NQPWE4pE6MQ3ROpFj1dIzm1J
-         7MSa2km58cqPryaeuf8mAfvVLsBxGdjUtkviEHF0wACsOXmtgdM+unVv9iAO2dWwzK+L
-         1PFi1J+o7Zj1boVQN+holTsKB5SqkvyieUeO/Z+u5bNBSbiXnjUvj0Xd88CxkOjCr03+
-         eM0Q==
-X-Gm-Message-State: AOAM533rIBj0M4NbBOpHsbRuE2V4NDhJzxpmFZ+bCHKz3971JKMmll+5
-        AUEavHtrEilXpb2rfwbkvdmufTbTxVsDFp5hGHNx/zv/PP5BHD/DznjDqZjiua3qBhkqdJ4K0/m
-        OJdRVOUWl6FzS
-X-Received: by 2002:a1c:7c17:: with SMTP id x23mr15434379wmc.165.1600087369059;
-        Mon, 14 Sep 2020 05:42:49 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzM2KGE27VpiDVo0EKU6XP0gmV9o3FvYQekntQ/j/Jkrdv352DRtXPJ8l/IQ9rcW9PPt8/gmg==
-X-Received: by 2002:a1c:7c17:: with SMTP id x23mr15434355wmc.165.1600087368808;
-        Mon, 14 Sep 2020 05:42:48 -0700 (PDT)
-Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id k6sm17725600wmi.1.2020.09.14.05.42.47
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 14 Sep 2020 05:42:48 -0700 (PDT)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Joerg Roedel <jroedel@suse.de>
-Cc:     Joerg Roedel <joro@8bytes.org>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>, x86@kernel.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Dan Carpenter <dan.carpenter@oracle.com>,
-        Borislav Petkov <bp@alien8.de>,
+        id S1726666AbgINNGD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 14 Sep 2020 09:06:03 -0400
+Received: from mail.kernel.org ([198.145.29.99]:60290 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726616AbgINNF3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 14 Sep 2020 09:05:29 -0400
+Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 20DB32222A;
+        Mon, 14 Sep 2020 13:04:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1600088673;
+        bh=FJGrFZh/wSlG57bHCjvhePW4NhaqITwdnUviTd90E1o=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=IPZ84mhEoyRPga2DH98rhbeTd3HY/6eUSFUdJThfihiGwdYshpOmG2+csdig2XmBX
+         AE21hP3lmmyk6aWqwdX/hoccOSdc2IERQQALwOoizmxdS0ZHtBVb4eaPVcecovi4d+
+         e+sqSsXlkAgLb56hbPvAoJEAwousK/EVzZ3fpK3E=
+From:   Sasha Levin <sashal@kernel.org>
+To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Cc:     Huacai Chen <chenhc@lemote.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Colin King <colin.king@canonical.com>
-Subject: Re: [PATCH -tip] KVM: SVM: nested: Initialize on-stack pointers in svm_set_nested_state()
-In-Reply-To: <20200914121304.GC4414@suse.de>
-References: <20200914115129.10352-1-joro@8bytes.org> <87ft7klg38.fsf@vitty.brq.redhat.com> <20200914121304.GC4414@suse.de>
-Date:   Mon, 14 Sep 2020 14:42:47 +0200
-Message-ID: <87d02olebc.fsf@vitty.brq.redhat.com>
+        Sasha Levin <sashal@kernel.org>, linux-mips@vger.kernel.org,
+        kvm@vger.kernel.org
+Subject: [PATCH AUTOSEL 5.8 29/29] KVM: MIPS: Change the definition of kvm type
+Date:   Mon, 14 Sep 2020 09:03:58 -0400
+Message-Id: <20200914130358.1804194-29-sashal@kernel.org>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20200914130358.1804194-1-sashal@kernel.org>
+References: <20200914130358.1804194-1-sashal@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+X-stable: review
+X-Patchwork-Hint: Ignore
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Joerg Roedel <jroedel@suse.de> writes:
+From: Huacai Chen <chenhc@lemote.com>
 
-> Hi Vitaly,
->
-> On Mon, Sep 14, 2020 at 02:04:27PM +0200, Vitaly Kuznetsov wrote:
->> this was previously reported by Colin:
->> https://lore.kernel.org/kvm/20200911110730.24238-1-colin.king@canonical.com/
->> 
->> the fix itself looks good, however, I had an alternative suggestion on how
->> to fix this:
->> https://lore.kernel.org/kvm/87o8mclei1.fsf@vitty.brq.redhat.com/
->
-> This looks good to me, mind sending your diff as a patch with correct
-> Fixes tag?
->
+[ Upstream commit 15e9e35cd1dec2bc138464de6bf8ef828df19235 ]
 
-Sure, I was under the impression your "KVM: SVM: nested: Don't allocate
-VMCB structures on stack" is not commited yet and it can be fixed but I
-now see that it made it to 'tip' tree. Will send the patch out shortly.
+MIPS defines two kvm types:
 
+ #define KVM_VM_MIPS_TE          0
+ #define KVM_VM_MIPS_VZ          1
+
+In Documentation/virt/kvm/api.rst it is said that "You probably want to
+use 0 as machine type", which implies that type 0 be the "automatic" or
+"default" type. And, in user-space libvirt use the null-machine (with
+type 0) to detect the kvm capability, which returns "KVM not supported"
+on a VZ platform.
+
+I try to fix it in QEMU but it is ugly:
+https://lists.nongnu.org/archive/html/qemu-devel/2020-08/msg05629.html
+
+And Thomas Huth suggests me to change the definition of kvm type:
+https://lists.nongnu.org/archive/html/qemu-devel/2020-09/msg03281.html
+
+So I define like this:
+
+ #define KVM_VM_MIPS_AUTO        0
+ #define KVM_VM_MIPS_VZ          1
+ #define KVM_VM_MIPS_TE          2
+
+Since VZ and TE cannot co-exists, using type 0 on a TE platform will
+still return success (so old user-space tools have no problems on new
+kernels); the advantage is that using type 0 on a VZ platform will not
+return failure. So, the only problem is "new user-space tools use type
+2 on old kernels", but if we treat this as a kernel bug, we can backport
+this patch to old stable kernels.
+
+Signed-off-by: Huacai Chen <chenhc@lemote.com>
+Message-Id: <1599734031-28746-1-git-send-email-chenhc@lemote.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ arch/mips/kvm/mips.c     | 2 ++
+ include/uapi/linux/kvm.h | 5 +++--
+ 2 files changed, 5 insertions(+), 2 deletions(-)
+
+diff --git a/arch/mips/kvm/mips.c b/arch/mips/kvm/mips.c
+index 666d3350b4ac1..6c6836669ce16 100644
+--- a/arch/mips/kvm/mips.c
++++ b/arch/mips/kvm/mips.c
+@@ -137,6 +137,8 @@ extern void kvm_init_loongson_ipi(struct kvm *kvm);
+ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
+ {
+ 	switch (type) {
++	case KVM_VM_MIPS_AUTO:
++		break;
+ #ifdef CONFIG_KVM_MIPS_VZ
+ 	case KVM_VM_MIPS_VZ:
+ #else
+diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+index 4fdf303165827..65fd95f9784ce 100644
+--- a/include/uapi/linux/kvm.h
++++ b/include/uapi/linux/kvm.h
+@@ -789,9 +789,10 @@ struct kvm_ppc_resize_hpt {
+ #define KVM_VM_PPC_HV 1
+ #define KVM_VM_PPC_PR 2
+ 
+-/* on MIPS, 0 forces trap & emulate, 1 forces VZ ASE */
+-#define KVM_VM_MIPS_TE		0
++/* on MIPS, 0 indicates auto, 1 forces VZ ASE, 2 forces trap & emulate */
++#define KVM_VM_MIPS_AUTO	0
+ #define KVM_VM_MIPS_VZ		1
++#define KVM_VM_MIPS_TE		2
+ 
+ #define KVM_S390_SIE_PAGE_OFFSET 1
+ 
 -- 
-Vitaly
+2.25.1
 
