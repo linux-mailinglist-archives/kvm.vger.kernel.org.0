@@ -2,98 +2,74 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B6D0B269165
-	for <lists+kvm@lfdr.de>; Mon, 14 Sep 2020 18:24:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 32234269172
+	for <lists+kvm@lfdr.de>; Mon, 14 Sep 2020 18:25:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726481AbgINQXy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 14 Sep 2020 12:23:54 -0400
-Received: from mga01.intel.com ([192.55.52.88]:22223 "EHLO mga01.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726452AbgINQXJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 14 Sep 2020 12:23:09 -0400
-IronPort-SDR: UDMsmDQLBbUMlqyPsZ0zy6S32IbOSX0ayeDzeEMhyl+V5xzVQAE8PyT0o7jWdr/EOEUWVto2Ci
- qIGJ1tL4mQbg==
-X-IronPort-AV: E=McAfee;i="6000,8403,9744"; a="177167168"
-X-IronPort-AV: E=Sophos;i="5.76,426,1592895600"; 
-   d="scan'208";a="177167168"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Sep 2020 09:22:54 -0700
-IronPort-SDR: 4I677f4bZnFVVaRmbJ3faRKKb7j7nuoM+KQ72oWzlmSaz0A6vgDfXMSeGD288ocFGD6IlUTyDz
- 7iml14FbGuvg==
-X-IronPort-AV: E=Sophos;i="5.76,426,1592895600"; 
-   d="scan'208";a="482406971"
-Received: from otc-nc-03.jf.intel.com (HELO otc-nc-03) ([10.54.39.36])
-  by orsmga005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Sep 2020 09:22:54 -0700
-Date:   Mon, 14 Sep 2020 09:22:47 -0700
-From:   "Raj, Ashok" <ashok.raj@intel.com>
-To:     Jason Gunthorpe <jgg@nvidia.com>
-Cc:     Jean-Philippe Brucker <jean-philippe@linaro.org>,
-        Jason Wang <jasowang@redhat.com>,
-        Liu Yi L <yi.l.liu@intel.com>, alex.williamson@redhat.com,
-        eric.auger@redhat.com, baolu.lu@linux.intel.com, joro@8bytes.org,
-        kevin.tian@intel.com, jacob.jun.pan@linux.intel.com,
-        jun.j.tian@intel.com, yi.y.sun@intel.com, peterx@redhat.com,
-        hao.wu@intel.com, stefanha@gmail.com,
-        iommu@lists.linux-foundation.org, kvm@vger.kernel.org,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Ashok Raj <ashok.raj@intel.com>
-Subject: Re: [PATCH v7 00/16] vfio: expose virtual Shared Virtual Addressing
- to VMs
-Message-ID: <20200914162247.GA63399@otc-nc-03>
-References: <1599734733-6431-1-git-send-email-yi.l.liu@intel.com>
- <411c81c0-f13c-37cc-6c26-cafb42b46b15@redhat.com>
- <20200914133113.GB1375106@myrica>
- <20200914134738.GX904879@nvidia.com>
+        id S1726090AbgINQZh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 14 Sep 2020 12:25:37 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:58243 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726349AbgINQYw (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 14 Sep 2020 12:24:52 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1600100690;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=Xef7Kk4IuwAVAYdz+twwXuQ+WpMqbHkK2OBlguMvPCA=;
+        b=fRJYSnx+9fOtIevIVfyBuVq5QO4wU0NDQDyaJ5IfC+zJ4HFMqz55xATuZRTqyswjPjBgPZ
+        YnfsBkfXe/1LuVVX7Rv4W1jquXn8pNCs3Twfw9zqsohndEvn8sJW8oGHr/xtQuWIMK8U61
+        KEnl1Mw1c17t5y/ZUEq+n5llP5BJiTA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-389-MgC-1ydvMpOSNtuIqUy37w-1; Mon, 14 Sep 2020 12:24:46 -0400
+X-MC-Unique: MgC-1ydvMpOSNtuIqUy37w-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0EE461084D60;
+        Mon, 14 Sep 2020 16:24:45 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-112-134.ams2.redhat.com [10.36.112.134])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id C3C8B34687;
+        Mon, 14 Sep 2020 16:24:37 +0000 (UTC)
+Subject: Re: [kvm-unit-tests GIT PULL 0/3] s390x skrf and ultravisor patches
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Janosch Frank <frankja@linux.ibm.com>
+Cc:     kvm@vger.kernel.org, frankja@linux.vnet.ibm.com, david@redhat.com,
+        borntraeger@de.ibm.com, cohuck@redhat.com,
+        linux-s390@vger.kernel.org, imbrenda@linux.ibm.com
+References: <20200901091823.14477-1-frankja@linux.ibm.com>
+ <34c80837-208f-bb29-cb0b-b9029fdad29d@redhat.com>
+From:   Thomas Huth <thuth@redhat.com>
+Message-ID: <71b38000-70ee-f45a-b80d-95f42dbcc497@redhat.com>
+Date:   Mon, 14 Sep 2020 18:24:36 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200914134738.GX904879@nvidia.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+In-Reply-To: <34c80837-208f-bb29-cb0b-b9029fdad29d@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Jason,
-
-On Mon, Sep 14, 2020 at 10:47:38AM -0300, Jason Gunthorpe wrote:
-> On Mon, Sep 14, 2020 at 03:31:13PM +0200, Jean-Philippe Brucker wrote:
+On 02/09/2020 19.41, Paolo Bonzini wrote:
+> On 01/09/20 11:18, Janosch Frank wrote:
+>>   git@gitlab.com:frankja/kvm-unit-tests.git tags/s390x-2020-01-09
 > 
-> > > Jason suggest something like /dev/sva. There will be a lot of other
-> > > subsystems that could benefit from this (e.g vDPA).
-> > 
-> > Do you have a more precise idea of the interface /dev/sva would provide,
-> > how it would interact with VFIO and others?  vDPA could transport the
-> > generic iommu.h structures via its own uAPI, and call the IOMMU API
-> > directly without going through an intermediate /dev/sva handle.
+> Pulled, thanks.
 > 
-> Prior to PASID IOMMU really only makes sense as part of vfio-pci
-> because the iommu can only key on the BDF. That can't work unless the
-> whole PCI function can be assigned. It is hard to see how a shared PCI
-> device can work with IOMMU like this, so may as well use vfio.
-> 
-> SVA and various vIOMMU models change this, a shared PCI driver can
-> absoultely work with a PASID that is assigned to a VM safely, and
-> actually don't need to know if their PASID maps a mm_struct or
-> something else.
+> (Yes, I am alive).
 
-Well, IOMMU does care if its a native mm_struct or something that belongs
-to guest. Because you need ability to forward page-requests and pickup
-page-responses from guest. Since there is just one PRQ on the IOMMU and
-responses can't be sent directly. You have to depend on vIOMMU type
-interface in guest to make all of this magic work right?
+ Hi Paolo,
 
-> 
-> So, some /dev/sva is another way to allocate a PASID that is not 1:1
-> with mm_struct, as the existing SVA stuff enforces. ie it is a way to
-> program the DMA address map of the PASID.
-> 
-> This new PASID allocator would match the guest memory layout and
+I don't see the patches in the master branch - could you please push
+them to the repo?
 
-Not sure what you mean by "match guest memory layout"? 
-Probably, meaning first level is gVA or gIOVA? 
+ Thanks,
+  Thomas
 
-Cheers,
-Ashok
