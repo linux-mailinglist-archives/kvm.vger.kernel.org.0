@@ -2,403 +2,186 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 504182683F4
-	for <lists+kvm@lfdr.de>; Mon, 14 Sep 2020 07:07:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0B25C26852E
+	for <lists+kvm@lfdr.de>; Mon, 14 Sep 2020 08:56:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726008AbgINFH1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 14 Sep 2020 01:07:27 -0400
-Received: from mga05.intel.com ([192.55.52.43]:35136 "EHLO mga05.intel.com"
+        id S1726106AbgING4i (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 14 Sep 2020 02:56:38 -0400
+Received: from bilbo.ozlabs.org ([203.11.71.1]:34345 "EHLO ozlabs.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725981AbgINFH0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 14 Sep 2020 01:07:26 -0400
-IronPort-SDR: M6RpdmtLaJNiZ/azQsoU+BtcFDLYWoCp/fod+oYRLfkfLTtp53Nbca+plpsLccwizGC6n7Zyxe
- FBwVXSC/m2Jg==
-X-IronPort-AV: E=McAfee;i="6000,8403,9743"; a="243856108"
-X-IronPort-AV: E=Sophos;i="5.76,424,1592895600"; 
-   d="scan'208";a="243856108"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Sep 2020 22:07:20 -0700
-IronPort-SDR: ZvRF2QjnvV0NLOwP+i5EthsmuoK18RpWKyWZYNLez5Vtiafbr8tV5cPsB2ij7c1kqKezq9oCnn
- /H0zr3Zjh5CA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.76,424,1592895600"; 
-   d="scan'208";a="408752246"
-Received: from allen-box.sh.intel.com (HELO [10.239.159.139]) ([10.239.159.139])
-  by fmsmga001.fm.intel.com with ESMTP; 13 Sep 2020 22:07:16 -0700
-Cc:     baolu.lu@linux.intel.com, Joerg Roedel <joro@8bytes.org>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Jean-Philippe Brucker <jean-philippe@linaro.org>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Kevin Tian <kevin.tian@intel.com>,
-        Ashok Raj <ashok.raj@intel.com>,
-        Dave Jiang <dave.jiang@intel.com>,
-        Liu Yi L <yi.l.liu@intel.com>, Zeng Xin <xin.zeng@intel.com>,
-        iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Subject: Re: [PATCH v4 5/5] iommu/vt-d: Add is_aux_domain support
-To:     Alex Williamson <alex.williamson@redhat.com>
-References: <20200901033422.22249-1-baolu.lu@linux.intel.com>
- <20200901033422.22249-6-baolu.lu@linux.intel.com>
- <20200910160556.15fe7acd@w520.home>
-From:   Lu Baolu <baolu.lu@linux.intel.com>
-Message-ID: <5c6a3e0e-f328-9b89-ff83-101cae920aef@linux.intel.com>
-Date:   Mon, 14 Sep 2020 13:01:24 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        id S1726075AbgING4h (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 14 Sep 2020 02:56:37 -0400
+Received: by ozlabs.org (Postfix, from userid 1007)
+        id 4BqcbM2jVCz9sTR; Mon, 14 Sep 2020 16:56:31 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+        d=gibson.dropbear.id.au; s=201602; t=1600066591;
+        bh=SGU/LuMnvZSnkG9vJfLlt+Wvxs5Gak6K2cHY2kAf4SQ=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=FtgfaqrowCuQaTnU+UYe224haTQ7zoC69BD+31ZNH3cghRiE27JxJVtaLvwxY+F1N
+         jK4dNprdG+D0K27cWyLOYaAJ9smFhQiGFHD7Ns2RDC+hFG76/sksgqNmeguHK7KPvE
+         7tpCecFppHo6oT4E1a6l+Dq7iTr42un/GXzBNhz8=
+Date:   Mon, 14 Sep 2020 16:12:33 +1000
+From:   David Gibson <david@gibson.dropbear.id.au>
+To:     Fabiano Rosas <farosas@linux.ibm.com>
+Cc:     kvm-ppc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        kvm@vger.kernel.org, paulus@ozlabs.org, mpe@ellerman.id.au
+Subject: Re: [PATCH] KVM: PPC: Book3S HV: Do not allocate HPT for a nested
+ guest
+Message-ID: <20200914061233.GA5306@yekko.fritz.box>
+References: <20200911041607.198092-1-farosas@linux.ibm.com>
 MIME-Version: 1.0
-In-Reply-To: <20200910160556.15fe7acd@w520.home>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="qMm9M+Fa2AknHoGS"
+Content-Disposition: inline
+In-Reply-To: <20200911041607.198092-1-farosas@linux.ibm.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Alex,
 
-On 9/11/20 6:05 AM, Alex Williamson wrote:
-> On Tue,  1 Sep 2020 11:34:22 +0800
-> Lu Baolu <baolu.lu@linux.intel.com> wrote:
-> 
->> With subdevice information opt-in through iommu_ops.aux_at(de)tach_dev()
->> interfaces, the vendor iommu driver is able to learn the knowledge about
->> the relationships between the subdevices and the aux-domains. Implement
->> is_aux_domain() support based on the relationship knowledges.
->>
->> Signed-off-by: Lu Baolu <baolu.lu@linux.intel.com>
->> ---
->>   drivers/iommu/intel/iommu.c | 125 ++++++++++++++++++++++++++----------
->>   include/linux/intel-iommu.h |  17 +++--
->>   2 files changed, 103 insertions(+), 39 deletions(-)
->>
->> diff --git a/drivers/iommu/intel/iommu.c b/drivers/iommu/intel/iommu.c
->> index 3c12fd06856c..50431c7b2e71 100644
->> --- a/drivers/iommu/intel/iommu.c
->> +++ b/drivers/iommu/intel/iommu.c
->> @@ -334,6 +334,8 @@ static int intel_iommu_attach_device(struct iommu_domain *domain,
->>   				     struct device *dev);
->>   static phys_addr_t intel_iommu_iova_to_phys(struct iommu_domain *domain,
->>   					    dma_addr_t iova);
->> +static bool intel_iommu_dev_feat_enabled(struct device *dev,
->> +					 enum iommu_dev_features feat);
->>   
->>   #ifdef CONFIG_INTEL_IOMMU_DEFAULT_ON
->>   int dmar_disabled = 0;
->> @@ -1832,6 +1834,7 @@ static struct dmar_domain *alloc_domain(int flags)
->>   		domain->flags |= DOMAIN_FLAG_USE_FIRST_LEVEL;
->>   	domain->has_iotlb_device = false;
->>   	INIT_LIST_HEAD(&domain->devices);
->> +	INIT_LIST_HEAD(&domain->subdevices);
->>   
->>   	return domain;
->>   }
->> @@ -2580,7 +2583,7 @@ static struct dmar_domain *dmar_insert_one_dev_info(struct intel_iommu *iommu,
->>   	info->iommu = iommu;
->>   	info->pasid_table = NULL;
->>   	info->auxd_enabled = 0;
->> -	INIT_LIST_HEAD(&info->auxiliary_domains);
->> +	INIT_LIST_HEAD(&info->subdevices);
->>   
->>   	if (dev && dev_is_pci(dev)) {
->>   		struct pci_dev *pdev = to_pci_dev(info->dev);
->> @@ -5137,21 +5140,28 @@ static void intel_iommu_domain_free(struct iommu_domain *domain)
->>   		domain_exit(to_dmar_domain(domain));
->>   }
->>   
->> -/*
->> - * Check whether a @domain could be attached to the @dev through the
->> - * aux-domain attach/detach APIs.
->> - */
->> -static inline bool
->> -is_aux_domain(struct device *dev, struct iommu_domain *domain)
->> +/* Lookup subdev_info in the domain's subdevice siblings. */
->> +static struct subdev_info *
->> +subdev_lookup_domain(struct dmar_domain *domain, struct device *dev,
->> +		     struct device *subdev)
->>   {
->> -	struct device_domain_info *info = get_domain_info(dev);
->> +	struct subdev_info *sinfo = NULL, *tmp;
->>   
->> -	return info && info->auxd_enabled &&
->> -			domain->type == IOMMU_DOMAIN_UNMANAGED;
->> +	assert_spin_locked(&device_domain_lock);
->> +
->> +	list_for_each_entry(tmp, &domain->subdevices, link_domain) {
->> +		if ((!dev || tmp->pdev == dev) && tmp->dev == subdev) {
->> +			sinfo = tmp;
->> +			break;
->> +		}
->> +	}
->> +
->> +	return sinfo;
->>   }
->>   
->> -static void auxiliary_link_device(struct dmar_domain *domain,
->> -				  struct device *dev)
->> +static void
->> +subdev_link_device(struct dmar_domain *domain, struct device *dev,
->> +		   struct subdev_info *sinfo)
->>   {
->>   	struct device_domain_info *info = get_domain_info(dev);
->>   
->> @@ -5159,12 +5169,13 @@ static void auxiliary_link_device(struct dmar_domain *domain,
->>   	if (WARN_ON(!info))
->>   		return;
->>   
->> -	domain->auxd_refcnt++;
->> -	list_add(&domain->auxd, &info->auxiliary_domains);
->> +	list_add(&info->subdevices, &sinfo->link_phys);
->> +	list_add(&domain->subdevices, &sinfo->link_domain);
->>   }
->>   
->> -static void auxiliary_unlink_device(struct dmar_domain *domain,
->> -				    struct device *dev)
->> +static void
->> +subdev_unlink_device(struct dmar_domain *domain, struct device *dev,
->> +		     struct subdev_info *sinfo)
->>   {
->>   	struct device_domain_info *info = get_domain_info(dev);
->>   
->> @@ -5172,24 +5183,30 @@ static void auxiliary_unlink_device(struct dmar_domain *domain,
->>   	if (WARN_ON(!info))
->>   		return;
->>   
->> -	list_del(&domain->auxd);
->> -	domain->auxd_refcnt--;
->> +	list_del(&sinfo->link_phys);
->> +	list_del(&sinfo->link_domain);
->> +	kfree(sinfo);
->>   
->> -	if (!domain->auxd_refcnt && domain->default_pasid > 0)
->> +	if (list_empty(&domain->subdevices) && domain->default_pasid > 0)
->>   		ioasid_free(domain->default_pasid);
->>   }
->>   
->> -static int aux_domain_add_dev(struct dmar_domain *domain,
->> -			      struct device *dev)
->> +static int aux_domain_add_dev(struct dmar_domain *domain, struct device *dev,
->> +			      struct device *subdev)
->>   {
->>   	int ret;
->>   	unsigned long flags;
->>   	struct intel_iommu *iommu;
->> +	struct subdev_info *sinfo;
->>   
->>   	iommu = device_to_iommu(dev, NULL, NULL);
->>   	if (!iommu)
->>   		return -ENODEV;
->>   
->> +	sinfo = kzalloc(sizeof(*sinfo), GFP_KERNEL);
->> +	if (!sinfo)
->> +		return -ENOMEM;
->> +
->>   	if (domain->default_pasid <= 0) {
->>   		int pasid;
->>   
->> @@ -5199,7 +5216,8 @@ static int aux_domain_add_dev(struct dmar_domain *domain,
->>   				     NULL);
->>   		if (pasid == INVALID_IOASID) {
->>   			pr_err("Can't allocate default pasid\n");
->> -			return -ENODEV;
->> +			ret = -ENODEV;
->> +			goto pasid_failed;
->>   		}
->>   		domain->default_pasid = pasid;
->>   	}
->> @@ -5225,7 +5243,10 @@ static int aux_domain_add_dev(struct dmar_domain *domain,
->>   		goto table_failed;
->>   	spin_unlock(&iommu->lock);
->>   
->> -	auxiliary_link_device(domain, dev);
->> +	sinfo->dev = subdev;
->> +	sinfo->domain = domain;
->> +	sinfo->pdev = dev;
->> +	subdev_link_device(domain, dev, sinfo);
-> 
-> 
-> The unlink path frees sinfo, would it make more sense to pass subdev,
-> domain, and dev to the link function and let it allocate the sinfo
-> struct and return it on success?  I'm not sure if you're pre-allocating
-> it to avoid something hard to unwind, but it feels asymmetric between
-> the link and unlink semantics.  Thanks,
+--qMm9M+Fa2AknHoGS
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-You are right. I should make the link and unlink helpers symmetric. I
-will move free() out to the caller.
+On Fri, Sep 11, 2020 at 01:16:07AM -0300, Fabiano Rosas wrote:
+> The current nested KVM code does not support HPT guests. This is
+> informed/enforced in some ways:
+>=20
+> - Hosts < P9 will not be able to enable the nested HV feature;
+>=20
+> - The nested hypervisor MMU capabilities will not contain
+>   KVM_CAP_PPC_MMU_HASH_V3;
+>=20
+> - QEMU reflects the MMU capabilities in the
+>   'ibm,arch-vec-5-platform-support' device-tree property;
+>=20
+> - The nested guest, at 'prom_parse_mmu_model' ignores the
+>   'disable_radix' kernel command line option if HPT is not supported;
+>=20
+> - The KVM_PPC_CONFIGURE_V3_MMU ioctl will fail if trying to use HPT.
+>=20
+> There is, however, still a way to start a HPT guest by using
+> max-compat-cpu=3Dpower8 at the QEMU machine options. This leads to the
+> guest being set to use hash after QEMU calls the KVM_PPC_ALLOCATE_HTAB
+> ioctl.
+>=20
+> With the guest set to hash, the nested hypervisor goes through the
+> entry path that has no knowledge of nesting (kvmppc_run_vcpu) and
+> crashes when it tries to execute an hypervisor-privileged (mtspr
+> HDEC) instruction at __kvmppc_vcore_entry:
+>=20
+> root@L1:~ $ qemu-system-ppc64 -machine pseries,max-cpu-compat=3Dpower8 ...
+>=20
+> <snip>
+> [  538.543303] CPU: 83 PID: 25185 Comm: CPU 0/KVM Not tainted 5.9.0-rc4 #1
+> [  538.543355] NIP:  c00800000753f388 LR: c00800000753f368 CTR: c00000000=
+01e5ec0
+> [  538.543417] REGS: c0000013e91e33b0 TRAP: 0700   Not tainted  (5.9.0-rc=
+4)
+> [  538.543470] MSR:  8000000002843033 <SF,VEC,VSX,FP,ME,IR,DR,RI,LE>  CR:=
+ 22422882  XER: 20040000
+> [  538.543546] CFAR: c00800000753f4b0 IRQMASK: 3
+>                GPR00: c0080000075397a0 c0000013e91e3640 c00800000755e600 =
+0000000080000000
+>                GPR04: 0000000000000000 c0000013eab19800 c000001394de0000 =
+00000043a054db72
+>                GPR08: 00000000003b1652 0000000000000000 0000000000000000 =
+c0080000075502e0
+>                GPR12: c0000000001e5ec0 c0000007ffa74200 c0000013eab19800 =
+0000000000000008
+>                GPR16: 0000000000000000 c00000139676c6c0 c000000001d23948 =
+c0000013e91e38b8
+>                GPR20: 0000000000000053 0000000000000000 0000000000000001 =
+0000000000000000
+>                GPR24: 0000000000000001 0000000000000001 0000000000000000 =
+0000000000000001
+>                GPR28: 0000000000000001 0000000000000053 c0000013eab19800 =
+0000000000000001
+> [  538.544067] NIP [c00800000753f388] __kvmppc_vcore_entry+0x90/0x104 [kv=
+m_hv]
+> [  538.544121] LR [c00800000753f368] __kvmppc_vcore_entry+0x70/0x104 [kvm=
+_hv]
+> [  538.544173] Call Trace:
+> [  538.544196] [c0000013e91e3640] [c0000013e91e3680] 0xc0000013e91e3680 (=
+unreliable)
+> [  538.544260] [c0000013e91e3820] [c0080000075397a0] kvmppc_run_core+0xbc=
+8/0x19d0 [kvm_hv]
+> [  538.544325] [c0000013e91e39e0] [c00800000753d99c] kvmppc_vcpu_run_hv+0=
+x404/0xc00 [kvm_hv]
+> [  538.544394] [c0000013e91e3ad0] [c0080000072da4fc] kvmppc_vcpu_run+0x34=
+/0x48 [kvm]
+> [  538.544472] [c0000013e91e3af0] [c0080000072d61b8] kvm_arch_vcpu_ioctl_=
+run+0x310/0x420 [kvm]
+> [  538.544539] [c0000013e91e3b80] [c0080000072c7450] kvm_vcpu_ioctl+0x298=
+/0x778 [kvm]
+> [  538.544605] [c0000013e91e3ce0] [c0000000004b8c2c] sys_ioctl+0x1dc/0xc90
+> [  538.544662] [c0000013e91e3dc0] [c00000000002f9a4] system_call_exceptio=
+n+0xe4/0x1c0
+> [  538.544726] [c0000013e91e3e20] [c00000000000d140] system_call_common+0=
+xf0/0x27c
+> [  538.544787] Instruction dump:
+> [  538.544821] f86d1098 60000000 60000000 48000099 e8ad0fe8 e8c500a0 e926=
+4140 75290002
+> [  538.544886] 7d1602a6 7cec42a6 40820008 7d0807b4 <7d164ba6> 7d083a14 f9=
+0d10a0 480104fd
+> [  538.544953] ---[ end trace 74423e2b948c2e0c ]---
+>=20
+> This patch makes the KVM_PPC_ALLOCATE_HTAB ioctl fail when running in
+> the nested hypervisor, causing QEMU to abort.
+>=20
+> Reported-by: Satheesh Rajendran <sathnaga@linux.vnet.ibm.com>
+> Signed-off-by: Fabiano Rosas <farosas@linux.ibm.com>
 
-Best regards,
-baolu
+Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
 
-> 
-> Alex
-> 
-> 
->>   
->>   	spin_unlock_irqrestore(&device_domain_lock, flags);
->>   
->> @@ -5236,27 +5257,36 @@ static int aux_domain_add_dev(struct dmar_domain *domain,
->>   attach_failed:
->>   	spin_unlock(&iommu->lock);
->>   	spin_unlock_irqrestore(&device_domain_lock, flags);
->> -	if (!domain->auxd_refcnt && domain->default_pasid > 0)
->> +	if (list_empty(&domain->subdevices) && domain->default_pasid > 0)
->>   		ioasid_free(domain->default_pasid);
->> +pasid_failed:
->> +	kfree(sinfo);
->>   
->>   	return ret;
->>   }
->>   
->> -static void aux_domain_remove_dev(struct dmar_domain *domain,
->> -				  struct device *dev)
->> +static void
->> +aux_domain_remove_dev(struct dmar_domain *domain, struct device *dev,
->> +		      struct device *subdev)
->>   {
->>   	struct device_domain_info *info;
->>   	struct intel_iommu *iommu;
->> +	struct subdev_info *sinfo;
->>   	unsigned long flags;
->>   
->> -	if (!is_aux_domain(dev, &domain->domain))
->> +	if (!intel_iommu_dev_feat_enabled(dev, IOMMU_DEV_FEAT_AUX) ||
->> +	    domain->domain.type != IOMMU_DOMAIN_UNMANAGED)
->>   		return;
->>   
->>   	spin_lock_irqsave(&device_domain_lock, flags);
->>   	info = get_domain_info(dev);
->>   	iommu = info->iommu;
->> -
->> -	auxiliary_unlink_device(domain, dev);
->> +	sinfo = subdev_lookup_domain(domain, dev, subdev);
->> +	if (!sinfo) {
->> +		spin_unlock_irqrestore(&device_domain_lock, flags);
->> +		return;
->> +	}
->> +	subdev_unlink_device(domain, dev, sinfo);
->>   
->>   	spin_lock(&iommu->lock);
->>   	intel_pasid_tear_down_entry(iommu, dev, domain->default_pasid, false);
->> @@ -5319,7 +5349,8 @@ static int intel_iommu_attach_device(struct iommu_domain *domain,
->>   		return -EPERM;
->>   	}
->>   
->> -	if (is_aux_domain(dev, domain))
->> +	if (intel_iommu_dev_feat_enabled(dev, IOMMU_DEV_FEAT_AUX) &&
->> +	    domain->type == IOMMU_DOMAIN_UNMANAGED)
->>   		return -EPERM;
->>   
->>   	/* normally dev is not mapped */
->> @@ -5344,14 +5375,15 @@ intel_iommu_aux_attach_device(struct iommu_domain *domain,
->>   {
->>   	int ret;
->>   
->> -	if (!is_aux_domain(dev, domain))
->> +	if (!intel_iommu_dev_feat_enabled(dev, IOMMU_DEV_FEAT_AUX) ||
->> +	    domain->type != IOMMU_DOMAIN_UNMANAGED)
->>   		return -EPERM;
->>   
->>   	ret = prepare_domain_attach_device(domain, dev);
->>   	if (ret)
->>   		return ret;
->>   
->> -	return aux_domain_add_dev(to_dmar_domain(domain), dev);
->> +	return aux_domain_add_dev(to_dmar_domain(domain), dev, subdev);
->>   }
->>   
->>   static void intel_iommu_detach_device(struct iommu_domain *domain,
->> @@ -5364,7 +5396,7 @@ static void
->>   intel_iommu_aux_detach_device(struct iommu_domain *domain, struct device *dev,
->>   			      struct device *subdev)
->>   {
->> -	aux_domain_remove_dev(to_dmar_domain(domain), dev);
->> +	aux_domain_remove_dev(to_dmar_domain(domain), dev, subdev);
->>   }
->>   
->>   /*
->> @@ -6020,6 +6052,32 @@ static bool intel_iommu_is_attach_deferred(struct iommu_domain *domain,
->>   	return attach_deferred(dev);
->>   }
->>   
->> +static int
->> +intel_iommu_domain_get_attr(struct iommu_domain *domain,
->> +			    enum iommu_attr attr, void *data)
->> +{
->> +	struct dmar_domain *dmar_domain = to_dmar_domain(domain);
->> +	unsigned long flags;
->> +	int ret;
->> +
->> +	if (domain->type != IOMMU_DOMAIN_UNMANAGED)
->> +		return -EINVAL;
->> +
->> +	switch (attr) {
->> +	case DOMAIN_ATTR_IS_AUX:
->> +		spin_lock_irqsave(&device_domain_lock, flags);
->> +		ret = !IS_ERR_OR_NULL(subdev_lookup_domain(dmar_domain,
->> +							   NULL, data));
->> +		spin_unlock_irqrestore(&device_domain_lock, flags);
->> +		break;
->> +	default:
->> +		ret = -EINVAL;
->> +		break;
->> +	}
->> +
->> +	return ret;
->> +}
->> +
->>   static int
->>   intel_iommu_domain_set_attr(struct iommu_domain *domain,
->>   			    enum iommu_attr attr, void *data)
->> @@ -6073,6 +6131,7 @@ const struct iommu_ops intel_iommu_ops = {
->>   	.domain_alloc		= intel_iommu_domain_alloc,
->>   	.domain_free		= intel_iommu_domain_free,
->>   	.domain_set_attr	= intel_iommu_domain_set_attr,
->> +	.domain_get_attr	= intel_iommu_domain_get_attr,
->>   	.attach_dev		= intel_iommu_attach_device,
->>   	.detach_dev		= intel_iommu_detach_device,
->>   	.aux_attach_dev		= intel_iommu_aux_attach_device,
->> diff --git a/include/linux/intel-iommu.h b/include/linux/intel-iommu.h
->> index b1ed2f25f7c0..47ba1904c691 100644
->> --- a/include/linux/intel-iommu.h
->> +++ b/include/linux/intel-iommu.h
->> @@ -526,11 +526,9 @@ struct dmar_domain {
->>   					/* Domain ids per IOMMU. Use u16 since
->>   					 * domain ids are 16 bit wide according
->>   					 * to VT-d spec, section 9.3 */
->> -	unsigned int	auxd_refcnt;	/* Refcount of auxiliary attaching */
->> -
->>   	bool has_iotlb_device;
->>   	struct list_head devices;	/* all devices' list */
->> -	struct list_head auxd;		/* link to device's auxiliary list */
->> +	struct list_head subdevices;	/* all subdevices' list */
->>   	struct iova_domain iovad;	/* iova's that belong to this domain */
->>   
->>   	struct dma_pte	*pgd;		/* virtual address */
->> @@ -603,14 +601,21 @@ struct intel_iommu {
->>   	struct dmar_drhd_unit *drhd;
->>   };
->>   
->> +/* Per subdevice private data */
->> +struct subdev_info {
->> +	struct list_head link_phys;	/* link to phys device siblings */
->> +	struct list_head link_domain;	/* link to domain siblings */
->> +	struct device *pdev;		/* physical device derived from */
->> +	struct device *dev;		/* subdevice node */
->> +	struct dmar_domain *domain;	/* aux-domain */
->> +};
->> +
->>   /* PCI domain-device relationship */
->>   struct device_domain_info {
->>   	struct list_head link;	/* link to domain siblings */
->>   	struct list_head global; /* link to global list */
->>   	struct list_head table;	/* link to pasid table */
->> -	struct list_head auxiliary_domains; /* auxiliary domains
->> -					     * attached to this device
->> -					     */
->> +	struct list_head subdevices; /* subdevices sibling */
->>   	u32 segment;		/* PCI segment number */
->>   	u8 bus;			/* PCI bus number */
->>   	u8 devfn;		/* PCI devfn number */
-> 
+> ---
+>  arch/powerpc/kvm/book3s_hv.c | 6 ++++++
+>  1 file changed, 6 insertions(+)
+>=20
+> diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
+> index 4ba06a2a306c..764b6239ef72 100644
+> --- a/arch/powerpc/kvm/book3s_hv.c
+> +++ b/arch/powerpc/kvm/book3s_hv.c
+> @@ -5250,6 +5250,12 @@ static long kvm_arch_vm_ioctl_hv(struct file *filp,
+>  	case KVM_PPC_ALLOCATE_HTAB: {
+>  		u32 htab_order;
+> =20
+> +		/* If we're a nested hypervisor, we currently only support radix */
+> +		if (kvmhv_on_pseries()) {
+> +			r =3D -EOPNOTSUPP;
+> +			break;
+> +		}
+> +
+>  		r =3D -EFAULT;
+>  		if (get_user(htab_order, (u32 __user *)argp))
+>  			break;
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--qMm9M+Fa2AknHoGS
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl9fCdEACgkQbDjKyiDZ
+s5JvSRAA2vv7fzuSyMEHLqw7yUGIPoACyPfFV8UXheokBWjhwdnjw/gk58iWTBqI
+dY2DSOH/jwyd61fX5SxpLO0lbODpi8hNOSY9EKCFKMPuu27vOJVJx4ionKaqbpJE
+lSF897IJhQ0AXhzOflZOfQsYBFHbS1tCiDzBxXi1IA7bLIUOUM7ocjyv+u6Zyy/7
+lYBOf38wQ4iX9jMBnl6+ANas65fRNEMb+PtnwSEUi9BKSHD+jCbj7Mb/c6xHH+KZ
+CkkPMwlwjHvlyMt6E+fCZT5n8jWb+mdsQzaFoa4H8OOKLrsIgEtAwzPIm/el+doa
+B1ucZSNgnlRrh+1L65ooh1oZha7D/W6P36/DtkT9tXyyHvzWD1+3vPvyZPRgV4H9
+QYYxvKDtPwFuRWR1m0TLgDrANs7IX2GF2KHNcGM4VcZtPFIXXCtCWA9JhVvmcsdK
+LoUlFE12ndKadng/FNYAAs3p2149WTJ7N7T3wORJYvqJLi4irZ7QEyNj9J+/RpFR
+IpxuUrHzZ7AFfPyboMums1//PEK29O/c9Z+t6vZZC6WEiIGiTX57KCh22ClHdcTL
+XyX7r3pHSzP1g9tFTIa5CLoRh2eI6vPUzZ0MzmlEi/SeOtvCdilYYZ2J6Bv4n9Sg
+HxO2+REEvH149GF2xKszzhTU5+Q4gzD/9HtbmtNL5aG2k0sGhbM=
+=Bn/M
+-----END PGP SIGNATURE-----
+
+--qMm9M+Fa2AknHoGS--
