@@ -2,683 +2,187 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9017B2685B9
-	for <lists+kvm@lfdr.de>; Mon, 14 Sep 2020 09:24:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8F8B32686B4
+	for <lists+kvm@lfdr.de>; Mon, 14 Sep 2020 10:01:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726038AbgINHYO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 14 Sep 2020 03:24:14 -0400
-Received: from fllv0016.ext.ti.com ([198.47.19.142]:40612 "EHLO
-        fllv0016.ext.ti.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725944AbgINHYL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 14 Sep 2020 03:24:11 -0400
-Received: from lelv0266.itg.ti.com ([10.180.67.225])
-        by fllv0016.ext.ti.com (8.15.2/8.15.2) with ESMTP id 08E7NvdW038887;
-        Mon, 14 Sep 2020 02:23:57 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-        s=ti-com-17Q1; t=1600068237;
-        bh=D+lYPEQrFiJDaaPV/1vUS6S6TddRl8zjLZe+HU7qefo=;
-        h=Subject:To:CC:References:From:Date:In-Reply-To;
-        b=Ji/IXfwzvuqdn4/g+5YFSK18+xteAP3vDRaRjgXpARRXpxJUmABBeW5Lb8pq0w5HM
-         vqaPh+JGVVSb0dpn1UvA9kkYE5la7peruQh8zzlCe4CZpnXCnsYa0dBsepJhbpo2Ys
-         03AAQ804wLvmYyQAgdy4yZWVLdmXgJPfwRYxivaQ=
-Received: from DLEE103.ent.ti.com (dlee103.ent.ti.com [157.170.170.33])
-        by lelv0266.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 08E7NvFg098803
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-        Mon, 14 Sep 2020 02:23:57 -0500
-Received: from DLEE107.ent.ti.com (157.170.170.37) by DLEE103.ent.ti.com
- (157.170.170.33) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.1979.3; Mon, 14
- Sep 2020 02:23:57 -0500
-Received: from fllv0040.itg.ti.com (10.64.41.20) by DLEE107.ent.ti.com
- (157.170.170.37) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.1979.3 via
- Frontend Transport; Mon, 14 Sep 2020 02:23:57 -0500
-Received: from [10.250.232.147] (ileax41-snat.itg.ti.com [10.172.224.153])
-        by fllv0040.itg.ti.com (8.15.2/8.15.2) with ESMTP id 08E7NoVr094913;
-        Mon, 14 Sep 2020 02:23:51 -0500
-Subject: Re: [RFC PATCH 00/22] Enhance VHOST to enable SoC-to-SoC
- communication
-To:     Jason Wang <jasowang@redhat.com>, Cornelia Huck <cohuck@redhat.com>
-CC:     "Michael S. Tsirkin" <mst@redhat.com>,
-        Ohad Ben-Cohen <ohad@wizery.com>,
-        Bjorn Andersson <bjorn.andersson@linaro.org>,
-        Jon Mason <jdmason@kudzu.us>,
-        Dave Jiang <dave.jiang@intel.com>,
-        Allen Hubbe <allenbh@gmail.com>,
-        Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>,
-        Bjorn Helgaas <bhelgaas@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        <linux-doc@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <linux-remoteproc@vger.kernel.org>, <linux-ntb@googlegroups.com>,
-        <linux-pci@vger.kernel.org>, <kvm@vger.kernel.org>,
-        <virtualization@lists.linux-foundation.org>,
-        <netdev@vger.kernel.org>
-References: <20200702082143.25259-1-kishon@ti.com>
- <20200702055026-mutt-send-email-mst@kernel.org>
- <603970f5-3289-cd53-82a9-aa62b292c552@redhat.com>
- <14c6cad7-9361-7fa4-e1c6-715ccc7e5f6b@ti.com>
- <59fd6a0b-8566-44b7-3dae-bb52b468219b@redhat.com>
- <ce9eb6a5-cd3a-a390-5684-525827b30f64@ti.com>
- <da2b671c-b05d-a57f-7bdf-8b1043a41240@redhat.com>
- <fee8a0fb-f862-03bd-5ede-8f105b6af529@ti.com>
- <b2178e1d-2f5c-e8a3-72fb-70f2f8d6aa45@redhat.com>
- <45a8a97c-2061-13ee-5da8-9877a4a3b8aa@ti.com>
- <c8739d7f-e12e-f6a2-7018-9eeaf6feb054@redhat.com>
- <20200828123409.4cd2a812.cohuck@redhat.com>
- <ac8f7e4f-9f46-919a-f5c2-89b07794f0ab@ti.com>
- <9cd58cd1-0041-3d98-baf7-6e5bc2e7e317@redhat.com>
-From:   Kishon Vijay Abraham I <kishon@ti.com>
-Message-ID: <edf25301-93c0-4ba6-aa85-5f04137d0906@ti.com>
-Date:   Mon, 14 Sep 2020 12:53:49 +0530
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
-MIME-Version: 1.0
-In-Reply-To: <9cd58cd1-0041-3d98-baf7-6e5bc2e7e317@redhat.com>
-Content-Type: text/plain; charset="utf-8"
+        id S1726151AbgINIBS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 14 Sep 2020 04:01:18 -0400
+Received: from mga06.intel.com ([134.134.136.31]:38484 "EHLO mga06.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726024AbgINIBL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 14 Sep 2020 04:01:11 -0400
+IronPort-SDR: RtAj0EsR29MtEJiZ1WN0nQ+9oOhafxAo8Qcdd5AXsbzy578ki1rysO8iR55sammyuwIuVh8pAZ
+ +4TEGx7PRSOg==
+X-IronPort-AV: E=McAfee;i="6000,8403,9743"; a="220594118"
+X-IronPort-AV: E=Sophos;i="5.76,425,1592895600"; 
+   d="scan'208";a="220594118"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Sep 2020 01:01:10 -0700
+IronPort-SDR: KL6k0XJ3Ke0AyfJ8HNnxZK9BZxpoX5elE7LtHRyafL35VEYI/36UugoBAf2C2+N9TDoI4UFn9O
+ ej3ZM3MFagsg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.76,425,1592895600"; 
+   d="scan'208";a="408788314"
+Received: from fmsmsx606.amr.corp.intel.com ([10.18.126.86])
+  by fmsmga001.fm.intel.com with ESMTP; 14 Sep 2020 01:01:10 -0700
+Received: from fmsmsx606.amr.corp.intel.com (10.18.126.86) by
+ fmsmsx606.amr.corp.intel.com (10.18.126.86) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.1713.5; Mon, 14 Sep 2020 01:01:09 -0700
+Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
+ fmsmsx606.amr.corp.intel.com (10.18.126.86) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.1713.5
+ via Frontend Transport; Mon, 14 Sep 2020 01:01:09 -0700
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (104.47.58.168)
+ by edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.1713.5; Mon, 14 Sep 2020 01:01:07 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=oRAqrBnCIE+QUkb4hBXeLxX2srjV5uyjrigRuPH1BxQqx55+G9zJlJuzgjWxsZcpcH52oqDtW0WnK/hg7gUpgMQ4hcyiwJaM/dXL59rmEbEnE6Zcp1baOeNpV6G5i2fUFV5CpAtXKD5HMn4YoquLx7IqymrV2ZOaZMVH+FubB9tdMIrWooNE91Z0fOU71lF4qUxkL83SDQfIokhyXrxLV4dH1Ra6XhAcrKVCP4LlIQf/Z5ezNaGsXB50eFtupLtUhy4sjf6SPujEVSct6Rbcd1eeSM7kDqI3+M7L07Xq2mZG1/EOo3+DzA1qtzUBD0LiBBppIWbDrnUvRKe6MULexw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=gvEGCZ20NHBNljvOq+5hnC3vPGAqQp/hglGVnB8PgC4=;
+ b=C5YwDG2vq7B2/GEP84Bfh8ogKw/T0u4/y+28fR8oxCqYZjiFT/eJNtpVUvJD2mdwf4GqTP1+/9odcWl9YvVQ7zCTaY2BQUJkQ+fgO1hCicp8levnnIj6Lk64tX85CoE4vCXd9vkXLSTf9x/GYxjgiaSo0uf1bSz1nu0Zi9seHIAxmHdw1DtoL63O9gcfO6w4Ddg6R4PToYZyMVADs0O4B1uEnI0jnTPCO79rumCY0qVH41NR/Ihj3Q1bMDVjQEEgirUYkn+0qKpXHD+mtu2+Ga55qeVFl7v3Pt8LpPNdP9xcs5Y7UusbsHcuWwmWdsbG5lHsOy2do/RpBbQQYWV//Q==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=intel.onmicrosoft.com;
+ s=selector2-intel-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=gvEGCZ20NHBNljvOq+5hnC3vPGAqQp/hglGVnB8PgC4=;
+ b=cCpKnCbqWcTfSoBqi0JTmJVLAC8riVLIesMk6hShZ+XRFvJe88PsDvvT2TGn5zxLtR1mpuCFZHQAem/RUeTvwnzzjAuwqs3BTUAag9hv9xm9T0UATjQr7A8Lu0xzXwNTd55V7sYsvrWbKENW4pUeH+krSZaAory6G7Jxx0zoulE=
+Received: from MWHPR11MB1645.namprd11.prod.outlook.com (2603:10b6:301:b::12)
+ by MWHPR1101MB2288.namprd11.prod.outlook.com (2603:10b6:301:53::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3370.16; Mon, 14 Sep
+ 2020 08:01:02 +0000
+Received: from MWHPR11MB1645.namprd11.prod.outlook.com
+ ([fe80::6dfe:feb8:25f1:ac9c]) by MWHPR11MB1645.namprd11.prod.outlook.com
+ ([fe80::6dfe:feb8:25f1:ac9c%7]) with mapi id 15.20.3370.019; Mon, 14 Sep 2020
+ 08:01:02 +0000
+From:   "Tian, Kevin" <kevin.tian@intel.com>
+To:     Jason Wang <jasowang@redhat.com>, "Liu, Yi L" <yi.l.liu@intel.com>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "eric.auger@redhat.com" <eric.auger@redhat.com>,
+        "baolu.lu@linux.intel.com" <baolu.lu@linux.intel.com>,
+        "joro@8bytes.org" <joro@8bytes.org>
+CC:     "jacob.jun.pan@linux.intel.com" <jacob.jun.pan@linux.intel.com>,
+        "Raj, Ashok" <ashok.raj@intel.com>,
+        "Tian, Jun J" <jun.j.tian@intel.com>,
+        "Sun, Yi Y" <yi.y.sun@intel.com>,
+        "jean-philippe@linaro.org" <jean-philippe@linaro.org>,
+        "peterx@redhat.com" <peterx@redhat.com>,
+        "Wu, Hao" <hao.wu@intel.com>,
+        "stefanha@gmail.com" <stefanha@gmail.com>,
+        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        Jason Gunthorpe <jgg@nvidia.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>
+Subject: RE: [PATCH v7 00/16] vfio: expose virtual Shared Virtual Addressing
+ to VMs
+Thread-Topic: [PATCH v7 00/16] vfio: expose virtual Shared Virtual Addressing
+ to VMs
+Thread-Index: AQHWh19AhgenwZ1qREOwvjqrd6cs+KlnjewAgAA1gYA=
+Date:   Mon, 14 Sep 2020 08:01:02 +0000
+Message-ID: <MWHPR11MB164517F15EF2C4831C191CF28C230@MWHPR11MB1645.namprd11.prod.outlook.com>
+References: <1599734733-6431-1-git-send-email-yi.l.liu@intel.com>
+ <411c81c0-f13c-37cc-6c26-cafb42b46b15@redhat.com>
+In-Reply-To: <411c81c0-f13c-37cc-6c26-cafb42b46b15@redhat.com>
+Accept-Language: en-US
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+dlp-version: 11.5.1.3
+dlp-product: dlpe-windows
+dlp-reaction: no-action
+authentication-results: redhat.com; dkim=none (message not signed)
+ header.d=none;redhat.com; dmarc=none action=none header.from=intel.com;
+x-originating-ip: [192.198.147.209]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: fb11a16c-6fb9-4170-75e8-08d85884531c
+x-ms-traffictypediagnostic: MWHPR1101MB2288:
+x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <MWHPR1101MB2288115FB156DB7F2506C6678C230@MWHPR1101MB2288.namprd11.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:10000;
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: DHL6521Aa8jvHAFPb5/PIqpLmZGjJyqc/h5M4I3Lw9B+fB7lU1rFVnjX1SGcNxl/2wlXoAbAlAzb3/5PezpXT0Zm2B1VhosjVZxrPp9vCfgby3LkjJL5cKzUMnqYxv5PyCa/wW+tfalv05Uzh3gjK+rj2IaTna72LwViqPVayjN57n5gxpaI76uaW9/BIVo12ds9Yb1AcCnY7k0RuF7rjuo8cSZep95x+JWdA1mZSu0dgdbgGEk+iFaXGX8gA+W5nFRavR6xT0LbSOR7mDFuII3HhI0G4MOQOwOhAWa/itPKxfkB3aKIbdUDJDVirgBdVF1B4RCMPBP0Yyg+pxJHiw==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MWHPR11MB1645.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(39860400002)(136003)(396003)(346002)(366004)(376002)(7416002)(4326008)(186003)(9686003)(7696005)(52536014)(5660300002)(478600001)(316002)(55016002)(76116006)(66446008)(33656002)(66946007)(71200400001)(66476007)(66556008)(64756008)(110136005)(86362001)(54906003)(2906002)(8676002)(8936002)(83380400001)(26005)(6506007);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata: YW8lRkAJ99SSLXDxWTI0qJGF7gy1guD5ickyopPok43zvW4zz6XINBUGHwtW/2xzDELPb5SjnfcdOgn7ptXdIu57CjPyG9Q4lREhqOgq7/K/j9O9Y4Jm2e/P/1J8S+0kGNpl1YGyH6OgVBkWNcJJYhoyUcag+WCfrlx6tm8lRb6oPSOWqvBQu6CX9OsUdsH7fI6iYzpeGqV7akjgF2k1AvzMozhlqJoomkfv5+tS1R7XpGq89akZt+CHuwl0B1zUBoYDb1MFt/Hx+AgAnWpY7fkTQifXeawfJ8/h8KlKIZxwlEg9o9SnE9buCbvfuVx212SCTOKbKsuI9TVLwdESnxZoi/QXO0whDdY1gcCiwPGtIf8U72IW1uTHM0Xg2uxKq+dpHrIC4Hy3v8Rc+vcV4ilyW8a4WLO6aE1ZDbo4AlBtDZsppurZIo7fBSeGjB/wJehIbBl6raeYaivlYiejFaTOJbxsV85LMWKyxMuScnaVtG10EyRgVTVnc9cLV0RCWbpn3NqMXflr0RKr0pAafrDQ4rV4YYyJiTGUEFgOt7iHLg+qWLAF/VWSHg4IxgMapHUp7PCVz915J0320fQ9CIWXtVrfu0ygeTRs12H4NlnUz7eENNfVUKo5SYkhAsZENurP1OPXAYquYSsvZgB5Eg==
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: MWHPR11MB1645.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: fb11a16c-6fb9-4170-75e8-08d85884531c
+X-MS-Exchange-CrossTenant-originalarrivaltime: 14 Sep 2020 08:01:02.3347
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: Yx8QHkmpK9KzZ/7VAMYRV9wHn7WuFcIJhHhnqrR44yeeDkRTxCYPI5hBSQNGNxHO080ANmGTa0TrTnkDrCj1Xg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MWHPR1101MB2288
+X-OriginatorOrg: intel.com
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Jason,
-
-On 01/09/20 2:20 pm, Jason Wang wrote:
-> 
-> On 2020/9/1 下午1:24, Kishon Vijay Abraham I wrote:
->> Hi,
->>
->> On 28/08/20 4:04 pm, Cornelia Huck wrote:
->>> On Thu, 9 Jul 2020 14:26:53 +0800
->>> Jason Wang <jasowang@redhat.com> wrote:
->>>
->>> [Let me note right at the beginning that I first noted this while
->>> listening to Kishon's talk at LPC on Wednesday. I might be very
->>> confused about the background here, so let me apologize beforehand for
->>> any confusion I might spread.]
->>>
->>>> On 2020/7/8 下午9:13, Kishon Vijay Abraham I wrote:
->>>>> Hi Jason,
->>>>>
->>>>> On 7/8/2020 4:52 PM, Jason Wang wrote:
->>>>>> On 2020/7/7 下午10:45, Kishon Vijay Abraham I wrote:
->>>>>>> Hi Jason,
->>>>>>>
->>>>>>> On 7/7/2020 3:17 PM, Jason Wang wrote:
->>>>>>>> On 2020/7/6 下午5:32, Kishon Vijay Abraham I wrote:
->>>>>>>>> Hi Jason,
->>>>>>>>>
->>>>>>>>> On 7/3/2020 12:46 PM, Jason Wang wrote:
->>>>>>>>>> On 2020/7/2 下午9:35, Kishon Vijay Abraham I wrote:
->>>>>>>>>>> Hi Jason,
->>>>>>>>>>>
->>>>>>>>>>> On 7/2/2020 3:40 PM, Jason Wang wrote:
->>>>>>>>>>>> On 2020/7/2 下午5:51, Michael S. Tsirkin wrote:
->>>>>>>>>>>>> On Thu, Jul 02, 2020 at 01:51:21PM +0530, Kishon Vijay
->>>>>>>>>>>>> Abraham I wrote:
->>>>>>>>>>>>>> This series enhances Linux Vhost support to enable SoC-to-SoC
->>>>>>>>>>>>>> communication over MMIO. This series enables rpmsg
->>>>>>>>>>>>>> communication between
->>>>>>>>>>>>>> two SoCs using both PCIe RC<->EP and HOST1-NTB-HOST2
->>>>>>>>>>>>>>
->>>>>>>>>>>>>> 1) Modify vhost to use standard Linux driver model
->>>>>>>>>>>>>> 2) Add support in vring to access virtqueue over MMIO
->>>>>>>>>>>>>> 3) Add vhost client driver for rpmsg
->>>>>>>>>>>>>> 4) Add PCIe RC driver (uses virtio) and PCIe EP driver
->>>>>>>>>>>>>> (uses vhost) for
->>>>>>>>>>>>>>          rpmsg communication between two SoCs connected to
->>>>>>>>>>>>>> each other
->>>>>>>>>>>>>> 5) Add NTB Virtio driver and NTB Vhost driver for rpmsg
->>>>>>>>>>>>>> communication
->>>>>>>>>>>>>>          between two SoCs connected via NTB
->>>>>>>>>>>>>> 6) Add configfs to configure the components
->>>>>>>>>>>>>>
->>>>>>>>>>>>>> UseCase1 :
->>>>>>>>>>>>>>
->>>>>>>>>>>>>>        VHOST RPMSG VIRTIO RPMSG
->>>>>>>>>>>>>> +                               +
->>>>>>>>>>>>>> |                               |
->>>>>>>>>>>>>> |                               |
->>>>>>>>>>>>>> |                               |
->>>>>>>>>>>>>> |                               |
->>>>>>>>>>>>>> +-----v------+ +------v-------+
->>>>>>>>>>>>>> |   Linux    |                 | Linux    |
->>>>>>>>>>>>>> |  Endpoint  |                 | Root Complex |
->>>>>>>>>>>>>> | <----------------->              |
->>>>>>>>>>>>>> |            | |              |
->>>>>>>>>>>>>> |    SOC1    |                 | SOC2     |
->>>>>>>>>>>>>> +------------+ +--------------+
->>>>>>>>>>>>>>
->>>>>>>>>>>>>> UseCase 2:
->>>>>>>>>>>>>>
->>>>>>>>>>>>>>            VHOST RPMSG VIRTIO RPMSG
->>>>>>>>>>>>>> + +
->>>>>>>>>>>>>> | |
->>>>>>>>>>>>>> | |
->>>>>>>>>>>>>> | |
->>>>>>>>>>>>>> | |
->>>>>>>>>>>>>> +------v------+ +------v------+
->>>>>>>>>>>>>>          | | |             |
->>>>>>>>>>>>>>          |    HOST1 |                                   |
->>>>>>>>>>>>>> HOST2    |
->>>>>>>>>>>>>>          | | |             |
->>>>>>>>>>>>>> +------^------+ +------^------+
->>>>>>>>>>>>>> | |
->>>>>>>>>>>>>> | |
->>>>>>>>>>>>>> +---------------------------------------------------------------------+
->>>>>>>>>>>>>>
->>>>>>>>>>>>>> | +------v------+ +------v------+  |
->>>>>>>>>>>>>> |  | | |             |  |
->>>>>>>>>>>>>> |  |     EP |                                   | EP     
->>>>>>>>>>>>>> |  |
->>>>>>>>>>>>>> |  | CONTROLLER1 |                                   |
->>>>>>>>>>>>>> CONTROLLER2 |  |
->>>>>>>>>>>>>> |  | <-----------------------------------> |  |
->>>>>>>>>>>>>> |  | | |             |  |
->>>>>>>>>>>>>> |  | | |             |  |
->>>>>>>>>>>>>> |  |             |  SoC With Multiple EP Instances  
->>>>>>>>>>>>>> |             |  |
->>>>>>>>>>>>>> |  |             |  (Configured using NTB Function) 
->>>>>>>>>>>>>> |             |  |
->>>>>>>>>>>>>> | +-------------+ +-------------+  |
->>>>>>>>>>>>>> +---------------------------------------------------------------------+
->>>>>>>>>>>>>>
->>>
->>> First of all, to clarify the terminology:
->>> Is "vhost rpmsg" acting as what the virtio standard calls the 'device',
->>> and "virtio rpmsg" as the 'driver'? Or is the "vhost" part mostly just
->>
->> Right, vhost_rpmsg is 'device' and virtio_rpmsg is 'driver'.
->>> virtqueues + the exiting vhost interfaces?
->>
->> It's implemented to provide the full 'device' functionality.
->>>
->>>>>>>>>>>>>>
->>>>>>>>>>>>>> Software Layering:
->>>>>>>>>>>>>>
->>>>>>>>>>>>>> The high-level SW layering should look something like
->>>>>>>>>>>>>> below. This series
->>>>>>>>>>>>>> adds support only for RPMSG VHOST, however something
->>>>>>>>>>>>>> similar should be
->>>>>>>>>>>>>> done for net and scsi. With that any vhost device (PCI,
->>>>>>>>>>>>>> NTB, Platform
->>>>>>>>>>>>>> device, user) can use any of the vhost client driver.
->>>>>>>>>>>>>>
->>>>>>>>>>>>>>
->>>>>>>>>>>>>>           +----------------+ +-----------+  +------------+
->>>>>>>>>>>>>> +----------+
->>>>>>>>>>>>>>           |  RPMSG VHOST   |  | NET VHOST |  | SCSI VHOST
->>>>>>>>>>>>>> |  |    X     |
->>>>>>>>>>>>>>           +-------^--------+ +-----^-----+  +-----^------+
->>>>>>>>>>>>>> +----^-----+
->>>>>>>>>>>>>>                   | |              |              |
->>>>>>>>>>>>>>                   | |              |              |
->>>>>>>>>>>>>>                   | |              |              |
->>>>>>>>>>>>>> +-----------v-----------------v--------------v--------------v----------+
->>>>>>>>>>>>>>
->>>>>>>>>>>>>> |                            VHOST
->>>>>>>>>>>>>> CORE                                |
->>>>>>>>>>>>>> +--------^---------------^--------------------^------------------^-----+
->>>>>>>>>>>>>>
->>>>>>>>>>>>>>                | |                    |                  |
->>>>>>>>>>>>>>                | |                    |                  |
->>>>>>>>>>>>>>                | |                    |                  |
->>>>>>>>>>>>>> +--------v-------+  +----v------+ +----------v----------+ 
->>>>>>>>>>>>>> +----v-----+
->>>>>>>>>>>>>> |  PCI EPF VHOST |  | NTB VHOST | |PLATFORM DEVICE VHOST| 
->>>>>>>>>>>>>> |    X     |
->>>>>>>>>>>>>> +----------------+  +-----------+ +---------------------+ 
->>>>>>>>>>>>>> +----------+
->>>
->>> So, the upper half is basically various functionality types, e.g. a net
->>> device. What is the lower half, a hardware interface? Would it be
->>> equivalent to e.g. a normal PCI device?
->>
->> Right, the upper half should provide the functionality.
->> The bottom layer could be a HW interface (like PCIe device or NTB
->> device) or it could be a SW interface (for accessing virtio ring in
->> userspace) that could be used by Hypervisor.
->>
->> The top half should be transparent to what type of device is actually
->> using it.
->>
->>>
->>>>>>>>>>>>>>
->>>>>>>>>>>>>> This was initially proposed here [1]
->>>>>>>>>>>>>>
->>>>>>>>>>>>>> [1] ->
->>>>>>>>>>>>>> https://lore.kernel.org/r/2cf00ec4-1ed6-f66e-6897-006d1a5b6390@ti.com
->>>>>>>>>>>>>>
->>>>>>>>>>>>> I find this very interesting. A huge patchset so will take
->>>>>>>>>>>>> a bit
->>>>>>>>>>>>> to review, but I certainly plan to do that. Thanks!
->>>>>>>>>>>> Yes, it would be better if there's a git branch for us to
->>>>>>>>>>>> have a look.
->>>>>>>>>>> I've pushed the branch
->>>>>>>>>>> https://github.com/kishon/linux-wip.git vhost_rpmsg_pci_ntb_rfc
->>>>>>>>>> Thanks
->>>>>>>>>>
->>>>>>>>>>>> Btw, I'm not sure I get the big picture, but I vaguely feel
->>>>>>>>>>>> some of the
->>>>>>>>>>>> work is
->>>>>>>>>>>> duplicated with vDPA (e.g the epf transport or vhost bus).
->>>>>>>>>>> This is about connecting two different HW systems both
->>>>>>>>>>> running Linux and
->>>>>>>>>>> doesn't necessarily involve virtualization.
->>>>>>>>>> Right, this is something similar to VOP
->>>>>>>>>> (Documentation/misc-devices/mic/mic_overview.rst). The
->>>>>>>>>> different is the
->>>>>>>>>> hardware I guess and VOP use userspace application to
->>>>>>>>>> implement the device.
->>>>>>>>> I'd also like to point out, this series tries to have
->>>>>>>>> communication between
->>>>>>>>> two
->>>>>>>>> SoCs in vendor agnostic way. Since this series solves for 2
->>>>>>>>> usecases (PCIe
->>>>>>>>> RC<->EP and NTB), for the NTB case it directly plugs into NTB
->>>>>>>>> framework and
->>>>>>>>> any
->>>>>>>>> of the HW in NTB below should be able to use a virtio-vhost
->>>>>>>>> communication
->>>>>>>>>
->>>>>>>>> #ls drivers/ntb/hw/
->>>>>>>>> amd  epf  idt  intel  mscc
->>>>>>>>>
->>>>>>>>> And similarly for the PCIe RC<->EP communication, this adds a
->>>>>>>>> generic endpoint
->>>>>>>>> function driver and hence any SoC that supports configurable
->>>>>>>>> PCIe endpoint can
->>>>>>>>> use virtio-vhost communication
->>>>>>>>>
->>>>>>>>> # ls drivers/pci/controller/dwc/*ep*
->>>>>>>>> drivers/pci/controller/dwc/pcie-designware-ep.c
->>>>>>>>> drivers/pci/controller/dwc/pcie-uniphier-ep.c
->>>>>>>>> drivers/pci/controller/dwc/pci-layerscape-ep.c
->>>>>>>> Thanks for those backgrounds.
->>>>>>>>
->>>>>>>>>>>       So there is no guest or host as in
->>>>>>>>>>> virtualization but two entirely different systems connected
->>>>>>>>>>> via PCIe cable,
->>>>>>>>>>> one
->>>>>>>>>>> acting as guest and one as host. So one system will provide
->>>>>>>>>>> virtio
->>>>>>>>>>> functionality reserving memory for virtqueues and the other
->>>>>>>>>>> provides vhost
->>>>>>>>>>> functionality providing a way to access the virtqueues in
->>>>>>>>>>> virtio memory.
->>>>>>>>>>> One is
->>>>>>>>>>> source and the other is sink and there is no intermediate
->>>>>>>>>>> entity. (vhost was
->>>>>>>>>>> probably intermediate entity in virtualization?)
->>>>>>>>>> (Not a native English speaker) but "vhost" could introduce
->>>>>>>>>> some confusion for
->>>>>>>>>> me since it was use for implementing virtio backend for
->>>>>>>>>> userspace drivers. I
->>>>>>>>>> guess "vringh" could be better.
->>>>>>>>> Initially I had named this vringh but later decided to choose
->>>>>>>>> vhost instead of
->>>>>>>>> vringh. vhost is still a virtio backend (not necessarily
->>>>>>>>> userspace) though it
->>>>>>>>> now resides in an entirely different system. Whatever virtio is
->>>>>>>>> for a frontend
->>>>>>>>> system, vhost can be that for a backend system. vring can be
->>>>>>>>> for accessing
->>>>>>>>> virtqueue and can be used either in frontend or backend.
->>>
->>> I guess that clears up at least some of my questions from above...
->>>
->>>>>>>> Ok.
->>>>>>>>
->>>>>>>>>>>> Have you considered to implement these through vDPA?
->>>>>>>>>>> IIUC vDPA only provides an interface to userspace and an
->>>>>>>>>>> in-kernel rpmsg
->>>>>>>>>>> driver
->>>>>>>>>>> or vhost net driver is not provided.
->>>>>>>>>>>
->>>>>>>>>>> The HW connection looks something like
->>>>>>>>>>> https://pasteboard.co/JfMVVHC.jpg
->>>>>>>>>>> (usecase2 above),
->>>>>>>>>> I see.
->>>>>>>>>>
->>>>>>>>>>>       all the boards run Linux. The middle board provides NTB
->>>>>>>>>>> functionality and board on either side provides virtio/vhost
->>>>>>>>>>> functionality and
->>>>>>>>>>> transfer data using rpmsg.
->>>
->>> This setup looks really interesting (sometimes, it's really hard to
->>> imagine this in the abstract.)
->>>>>>>>>> So I wonder whether it's worthwhile for a new bus. Can we use
->>>>>>>>>> the existed virtio-bus/drivers? It might work as, except for
->>>>>>>>>> the epf transport, we can introduce a epf "vhost" transport
->>>>>>>>>> driver.
->>>>>>>>> IMHO we'll need two buses one for frontend and other for
->>>>>>>>> backend because the two components can then co-operate/interact
->>>>>>>>> with each other to provide a functionality. Though both will
->>>>>>>>> seemingly provide similar callbacks, they are both provide
->>>>>>>>> symmetrical or complimentary funcitonality and need not be same
->>>>>>>>> or identical.
->>>>>>>>>
->>>>>>>>> Having the same bus can also create sequencing issues.
->>>>>>>>>
->>>>>>>>> If you look at virtio_dev_probe() of virtio_bus
->>>>>>>>>
->>>>>>>>> device_features = dev->config->get_features(dev);
->>>>>>>>>
->>>>>>>>> Now if we use same bus for both front-end and back-end, both
->>>>>>>>> will try to get_features when there has been no set_features.
->>>>>>>>> Ideally vhost device should be initialized first with the set
->>>>>>>>> of features it supports. Vhost and virtio should use "status"
->>>>>>>>> and "features" complimentarily and not identically.
->>>>>>>> Yes, but there's no need for doing status/features passthrough
->>>>>>>> in epf vhost drivers.b
->>>>>>>>
->>>>>>>>> virtio device (or frontend) cannot be initialized before vhost
->>>>>>>>> device (or backend) gets initialized with data such as
->>>>>>>>> features. Similarly vhost (backend)
->>>>>>>>> cannot access virqueues or buffers before virtio (frontend) sets
->>>>>>>>> VIRTIO_CONFIG_S_DRIVER_OK whereas that requirement is not there
->>>>>>>>> for virtio as the physical memory for virtqueues are created by
->>>>>>>>> virtio (frontend).
->>>>>>>> epf vhost drivers need to implement two devices: vhost(vringh)
->>>>>>>> device and virtio device (which is a mediated device). The
->>>>>>>> vhost(vringh) device is doing feature negotiation with the
->>>>>>>> virtio device via RC/EP or NTB. The virtio device is doing
->>>>>>>> feature negotiation with local virtio drivers. If there're
->>>>>>>> feature mismatch, epf vhost drivers and do mediation between
->>>>>>>> them.
->>>>>>> Here epf vhost should be initialized with a set of features for
->>>>>>> it to negotiate either as vhost device or virtio device no? Where
->>>>>>> should the initial feature set for epf vhost come from?
->>>>>>
->>>>>> I think it can work as:
->>>>>>
->>>>>> 1) Having an initial features (hard coded in the code) set X in
->>>>>> epf vhost 2) Using this X for both virtio device and vhost(vringh)
->>>>>> device 3) local virtio driver will negotiate with virtio device
->>>>>> with feature set Y 4) remote virtio driver will negotiate with
->>>>>> vringh device with feature set Z 5) mediate between feature Y and
->>>>>> feature Z since both Y and Z are a subset of X
->>>>>>
->>>>> okay. I'm also thinking if we could have configfs for configuring
->>>>> this. Anyways we could find different approaches of configuring
->>>>> this.
->>>>
->>>>
->>>> Yes, and I think some management API is needed even in the design of
->>>> your "Software Layering". In that figure, rpmsg vhost need some
->>>> pre-set or hard-coded features.
->>>
->>> When I saw the plumbers talk, my first idea was "this needs to be a new
->>> transport". You have some hard-coded or pre-configured features, and
->>> then features are negotiated via a transport-specific means in the
->>> usual way. There's basically an extra/extended layer for this (and
->>> status, and whatever).
->>
->> I think for PCIe root complex to PCIe endpoint communication it's
->> still "Virtio Over PCI Bus", though existing layout cannot be used in
->> this context (find virtio capability will fail for modern interface
->> and loading queue status immediately after writing queue number is not
->> possible for root complex to endpoint communication; setup_vq() in
->> virtio_pci_legacy.c).
-> 
-> 
-> Then you need something that is functional equivalent to virtio PCI
-> which is actually the concept of vDPA (e.g vDPA provides alternatives if
-> the queue_sel is hard in the EP implementation).
-
-Okay, I just tried to compare the 'struct vdpa_config_ops' and 'struct
-vhost_config_ops' ( introduced in [RFC PATCH 03/22] vhost: Add ops for
-the VHOST driver to configure VHOST device).
-
-struct vdpa_config_ops {
-	/* Virtqueue ops */
-	int (*set_vq_address)(struct vdpa_device *vdev,
-			      u16 idx, u64 desc_area, u64 driver_area,
-			      u64 device_area);
-	void (*set_vq_num)(struct vdpa_device *vdev, u16 idx, u32 num);
-	void (*kick_vq)(struct vdpa_device *vdev, u16 idx);
-	void (*set_vq_cb)(struct vdpa_device *vdev, u16 idx,
-			  struct vdpa_callback *cb);
-	void (*set_vq_ready)(struct vdpa_device *vdev, u16 idx, bool ready);
-	bool (*get_vq_ready)(struct vdpa_device *vdev, u16 idx);
-	int (*set_vq_state)(struct vdpa_device *vdev, u16 idx,
-			    const struct vdpa_vq_state *state);
-	int (*get_vq_state)(struct vdpa_device *vdev, u16 idx,
-			    struct vdpa_vq_state *state);
-	struct vdpa_notification_area
-	(*get_vq_notification)(struct vdpa_device *vdev, u16 idx);
-	/* vq irq is not expected to be changed once DRIVER_OK is set */
-	int (*get_vq_irq)(struct vdpa_device *vdv, u16 idx);
-
-	/* Device ops */
-	u32 (*get_vq_align)(struct vdpa_device *vdev);
-	u64 (*get_features)(struct vdpa_device *vdev);
-	int (*set_features)(struct vdpa_device *vdev, u64 features);
-	void (*set_config_cb)(struct vdpa_device *vdev,
-			      struct vdpa_callback *cb);
-	u16 (*get_vq_num_max)(struct vdpa_device *vdev);
-	u32 (*get_device_id)(struct vdpa_device *vdev);
-	u32 (*get_vendor_id)(struct vdpa_device *vdev);
-	u8 (*get_status)(struct vdpa_device *vdev);
-	void (*set_status)(struct vdpa_device *vdev, u8 status);
-	void (*get_config)(struct vdpa_device *vdev, unsigned int offset,
-			   void *buf, unsigned int len);
-	void (*set_config)(struct vdpa_device *vdev, unsigned int offset,
-			   const void *buf, unsigned int len);
-	u32 (*get_generation)(struct vdpa_device *vdev);
-
-	/* DMA ops */
-	int (*set_map)(struct vdpa_device *vdev, struct vhost_iotlb *iotlb);
-	int (*dma_map)(struct vdpa_device *vdev, u64 iova, u64 size,
-		       u64 pa, u32 perm);
-	int (*dma_unmap)(struct vdpa_device *vdev, u64 iova, u64 size);
-
-	/* Free device resources */
-	void (*free)(struct vdpa_device *vdev);
-};
-
-+struct vhost_config_ops {
-+	int (*create_vqs)(struct vhost_dev *vdev, unsigned int nvqs,
-+			  unsigned int num_bufs, struct vhost_virtqueue *vqs[],
-+			  vhost_vq_callback_t *callbacks[],
-+			  const char * const names[]);
-+	void (*del_vqs)(struct vhost_dev *vdev);
-+	int (*write)(struct vhost_dev *vdev, u64 vhost_dst, void *src, int len);
-+	int (*read)(struct vhost_dev *vdev, void *dst, u64 vhost_src, int len);
-+	int (*set_features)(struct vhost_dev *vdev, u64 device_features);
-+	int (*set_status)(struct vhost_dev *vdev, u8 status);
-+	u8 (*get_status)(struct vhost_dev *vdev);
-+};
-+
-struct virtio_config_ops
-I think there's some overlap here and some of the ops tries to do the
-same thing.
-
-I think it differs in (*set_vq_address)() and (*create_vqs)().
-[create_vqs() introduced in struct vhost_config_ops provides
-complimentary functionality to (*find_vqs)() in struct
-virtio_config_ops. It seemingly encapsulates the functionality of
-(*set_vq_address)(), (*set_vq_num)(), (*set_vq_cb)(),..].
-
-Back to the difference between (*set_vq_address)() and (*create_vqs)(),
-set_vq_address() directly provides the virtqueue address to the vdpa
-device but create_vqs() only provides the parameters of the virtqueue
-(like the number of virtqueues, number of buffers) but does not directly
-provide the address. IMO the backend client drivers (like net or vhost)
-shouldn't/cannot by itself know how to access the vring created on
-virtio front-end. The vdpa device/vhost device should have logic for
-that. That will help the client drivers to work with different types of
-vdpa device/vhost device and can access the vring created by virtio
-irrespective of whether the vring can be accessed via mmio or kernel
-space or user space.
-
-I think vdpa always works with client drivers in userspace and providing
-userspace address for vring.
-> 
-> 
->>
->> "Virtio Over NTB" should anyways be a new transport.
->>>
->>> Does that make any sense?
->>
->> yeah, in the approach I used the initial features are hard-coded in
->> vhost-rpmsg (inherent to the rpmsg) but when we have to use adapter
->> layer (vhost only for accessing virtio ring and use virtio drivers on
->> both front end and backend), based on the functionality (e.g, rpmsg),
->> the vhost should be configured with features (to be presented to the
->> virtio) and that's why additional layer or APIs will be required.
-> 
-> 
-> A question here, if we go with vhost bus approach, does it mean the
-> virtio device can only be implemented in EP's userspace?
-
-The vhost bus approach doesn't provide any restriction in where the
-virto backend device should be created. This series creates two types of
-virtio backend device (one for PCIe endpoint and the other for NTB) and
-both these devices are created in kernel.
-
-Thanks
-Kishon
-
-> 
-> Thanks
-> 
-> 
->>>
->>>>
->>>>
->>>>>>>>>> It will have virtqueues but only used for the communication
->>>>>>>>>> between itself and
->>>>>>>>>> uppter virtio driver. And it will have vringh queues which
->>>>>>>>>> will be probe by virtio epf transport drivers. And it needs to
->>>>>>>>>> do datacopy between virtqueue and
->>>>>>>>>> vringh queues.
->>>>>>>>>>
->>>>>>>>>> It works like:
->>>>>>>>>>
->>>>>>>>>> virtio drivers <- virtqueue/virtio-bus -> epf vhost drivers <-
->>>>>>>>>> vringh queue/epf>
->>>>>>>>>>
->>>>>>>>>> The advantages is that there's no need for writing new buses
->>>>>>>>>> and drivers.
->>>>>>>>> I think this will work however there is an addtional copy
->>>>>>>>> between vringh queue and virtqueue,
->>>>>>>> I think not? E.g in use case 1), if we stick to virtio bus, we
->>>>>>>> will have:
->>>>>>>>
->>>>>>>> virtio-rpmsg (EP) <- virtio ring(1) -> epf vhost driver (EP) <-
->>>>>>>> virtio ring(2) -> virtio pci (RC) <-> virtio rpmsg (RC)
->>>>>>> IIUC epf vhost driver (EP) will access virtio ring(2) using
->>>>>>> vringh?
->>>>>>
->>>>>> Yes.
->>>>>>
->>>>>>> And virtio
->>>>>>> ring(2) is created by virtio pci (RC).
->>>>>>
->>>>>> Yes.
->>>>>>
->>>>>>>> What epf vhost driver did is to read from virtio ring(1) about
->>>>>>>> the buffer len and addr and them DMA to Linux(RC)?
->>>>>>> okay, I made some optimization here where vhost-rpmsg using a
->>>>>>> helper writes a buffer from rpmsg's upper layer directly to
->>>>>>> remote Linux (RC) as against here were it has to be first written
->>>>>>> to virtio ring (1).
->>>>>>>
->>>>>>> Thinking how this would look for NTB
->>>>>>> virtio-rpmsg (HOST1) <- virtio ring(1) -> NTB(HOST1) <->
->>>>>>> NTB(HOST2)  <- virtio ring(2) -> virtio-rpmsg (HOST2)
->>>>>>>
->>>>>>> Here the NTB(HOST1) will access the virtio ring(2) using vringh?
->>>>>>
->>>>>> Yes, I think so it needs to use vring to access virtio ring (1) as
->>>>>> well.
->>>>> NTB(HOST1) and virtio ring(1) will be in the same system. So it
->>>>> doesn't have to use vring. virtio ring(1) is by the virtio device
->>>>> the NTB(HOST1) creates.
->>>>
->>>>
->>>> Right.
->>>>
->>>>
->>>>>>> Do you also think this will work seamlessly with virtio_net.c,
->>>>>>> virtio_blk.c?
->>>>>>
->>>>>> Yes.
->>>>> okay, I haven't looked at this but the backend of virtio_blk should
->>>>> access an actual storage device no?
->>>>
->>>>
->>>> Good point, for non-peer device like storage. There's probably no
->>>> need for it to be registered on the virtio bus and it might be better
->>>> to behave as you proposed.
->>>
->>> I might be missing something; but if you expose something as a block
->>> device, it should have something it can access with block reads/writes,
->>> shouldn't it? Of course, that can be a variety of things.
->>>
->>>>
->>>> Just to make sure I understand the design, how is VHOST SCSI expected
->>>> to work in your proposal, does it have a device for file as a backend?
->>>>
->>>>
->>>>>>> I'd like to get clarity on two things in the approach you
->>>>>>> suggested, one is features (since epf vhost should ideally be
->>>>>>> transparent to any virtio driver)
->>>>>>
->>>>>> We can have have an array of pre-defined features indexed by
->>>>>> virtio device id in the code.
->>>>>>
->>>>>>> and the other is how certain inputs to virtio device such as
->>>>>>> number of buffers be determined.
->>>>>>
->>>>>> We can start from hard coded the value like 256, or introduce some
->>>>>> API for user to change the value.
->>>>>>
->>>>>>> Thanks again for your suggestions!
->>>>>>
->>>>>> You're welcome.
->>>>>>
->>>>>> Note that I just want to check whether or not we can reuse the
->>>>>> virtio bus/driver. It's something similar to what you proposed in
->>>>>> Software Layering but we just replace "vhost core" with "virtio
->>>>>> bus" and move the vhost core below epf/ntb/platform transport.
->>>>> Got it. My initial design was based on my understanding of your
->>>>> comments [1].
->>>>
->>>>
->>>> Yes, but that's just for a networking device. If we want something
->>>> more generic, it may require more thought (bus etc).
->>>
->>> I believe that we indeed need something bus-like to be able to support
->>> a variety of devices.
->>
->> I think we could still have adapter layers for different types of
->> devices ([1]) and use existing virtio bus for both front end and back
->> end. Using bus-like will however simplify adding support for new types
->> of devices and adding adapters for devices will be slightly more complex.
->>
->> [1] -> Page 13 in
->> https://linuxplumbersconf.org/event/7/contributions/849/attachments/642/1175/Virtio_for_PCIe_RC_EP_NTB.pdf
->>
->>>
->>>>
->>>>
->>>>>
->>>>> I'll try to create something based on your proposed design here.
->>>>
->>>>
->>>> Sure, but for coding, we'd better wait for other's opinion here.
->>>
->>> Please tell me if my thoughts above make any sense... I have just
->>> started looking at that, so I might be completely off.
->>
->> I think your understanding is correct! Thanks for your inputs.
->>
->> Thanks
->> Kishon
-> 
+PiBGcm9tOiBKYXNvbiBXYW5nIDxqYXNvd2FuZ0ByZWRoYXQuY29tPg0KPiBTZW50OiBNb25kYXks
+IFNlcHRlbWJlciAxNCwgMjAyMCAxMjoyMCBQTQ0KPiANCj4gT24gMjAyMC85LzEwIOS4i+WNiDY6
+NDUsIExpdSBZaSBMIHdyb3RlOg0KPiA+IFNoYXJlZCBWaXJ0dWFsIEFkZHJlc3NpbmcgKFNWQSks
+IGEuay5hLCBTaGFyZWQgVmlydHVhbCBNZW1vcnkgKFNWTSkgb24NCj4gPiBJbnRlbCBwbGF0Zm9y
+bXMgYWxsb3dzIGFkZHJlc3Mgc3BhY2Ugc2hhcmluZyBiZXR3ZWVuIGRldmljZSBETUEgYW5kDQo+
+ID4gYXBwbGljYXRpb25zLiBTVkEgY2FuIHJlZHVjZSBwcm9ncmFtbWluZyBjb21wbGV4aXR5IGFu
+ZCBlbmhhbmNlDQo+IHNlY3VyaXR5Lg0KPiA+DQo+ID4gVGhpcyBWRklPIHNlcmllcyBpcyBpbnRl
+bmRlZCB0byBleHBvc2UgU1ZBIHVzYWdlIHRvIFZNcy4gaS5lLiBTaGFyaW5nDQo+ID4gZ3Vlc3Qg
+YXBwbGljYXRpb24gYWRkcmVzcyBzcGFjZSB3aXRoIHBhc3N0aHJ1IGRldmljZXMuIFRoaXMgaXMg
+Y2FsbGVkDQo+ID4gdlNWQSBpbiB0aGlzIHNlcmllcy4gVGhlIHdob2xlIHZTVkEgZW5hYmxpbmcg
+cmVxdWlyZXMgUUVNVS9WRklPL0lPTU1VDQo+ID4gY2hhbmdlcy4gRm9yIElPTU1VIGFuZCBRRU1V
+IGNoYW5nZXMsIHRoZXkgYXJlIGluIHNlcGFyYXRlIHNlcmllcyAobGlzdGVkDQo+ID4gaW4gdGhl
+ICJSZWxhdGVkIHNlcmllcyIpLg0KPiA+DQo+ID4gVGhlIGhpZ2gtbGV2ZWwgYXJjaGl0ZWN0dXJl
+IGZvciBTVkEgdmlydHVhbGl6YXRpb24gaXMgYXMgYmVsb3csIHRoZSBrZXkNCj4gPiBkZXNpZ24g
+b2YgdlNWQSBzdXBwb3J0IGlzIHRvIHV0aWxpemUgdGhlIGR1YWwtc3RhZ2UgSU9NTVUgdHJhbnNs
+YXRpb24gKA0KPiA+IGFsc28ga25vd24gYXMgSU9NTVUgbmVzdGluZyB0cmFuc2xhdGlvbikgY2Fw
+YWJpbGl0eSBpbiBob3N0IElPTU1VLg0KPiA+DQo+ID4NCj4gPiAgICAgIC4tLS0tLS0tLS0tLS0t
+LiAgLi0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS4NCj4gPiAgICAgIHwgICB2SU9NTVUgICAg
+fCAgfCBHdWVzdCBwcm9jZXNzIENSMywgRkwgb25seXwNCj4gPiAgICAgIHwgICAgICAgICAgICAg
+fCAgJy0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLScNCj4gPiAgICAgIC4tLS0tLS0tLS0tLS0t
+LS0tLw0KPiA+ICAgICAgfCBQQVNJRCBFbnRyeSB8LS0tIFBBU0lEIGNhY2hlIGZsdXNoIC0NCj4g
+PiAgICAgICctLS0tLS0tLS0tLS0tJyAgICAgICAgICAgICAgICAgICAgICAgfA0KPiA+ICAgICAg
+fCAgICAgICAgICAgICB8ICAgICAgICAgICAgICAgICAgICAgICBWDQo+ID4gICAgICB8ICAgICAg
+ICAgICAgIHwgICAgICAgICAgICAgICAgQ1IzIGluIEdQQQ0KPiA+ICAgICAgJy0tLS0tLS0tLS0t
+LS0nDQo+ID4gR3Vlc3QNCj4gPiAtLS0tLS18IFNoYWRvdyB8LS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS18LS0tLS0tLS0NCj4gPiAgICAgICAgdiAgICAgICAgdiAgICAgICAgICAgICAgICAgICAg
+ICAgICAgdg0KPiA+IEhvc3QNCj4gPiAgICAgIC4tLS0tLS0tLS0tLS0tLiAgLi0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0uDQo+ID4gICAgICB8ICAgcElPTU1VICAgIHwgIHwgQmluZCBGTCBmb3IgR1ZB
+LUdQQSAgfA0KPiA+ICAgICAgfCAgICAgICAgICAgICB8ICAnLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LScNCj4gPiAgICAgIC4tLS0tLS0tLS0tLS0tLS0tLyAgfA0KPiA+ICAgICAgfCBQQVNJRCBFbnRy
+eSB8ICAgICBWIChOZXN0ZWQgeGxhdGUpDQo+ID4gICAgICAnLS0tLS0tLS0tLS0tLS0tLVwuLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLg0KPiA+ICAgICAgfCAgICAgICAgICAgICB8fFNM
+IGZvciBHUEEtSFBBLCBkZWZhdWx0IGRvbWFpbnwNCj4gPiAgICAgIHwgICAgICAgICAgICAgfCAg
+ICctLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0nDQo+ID4gICAgICAnLS0tLS0tLS0tLS0t
+LScNCj4gPiBXaGVyZToNCj4gPiAgIC0gRkwgPSBGaXJzdCBsZXZlbC9zdGFnZSBvbmUgcGFnZSB0
+YWJsZXMNCj4gPiAgIC0gU0wgPSBTZWNvbmQgbGV2ZWwvc3RhZ2UgdHdvIHBhZ2UgdGFibGVzDQo+
+ID4NCj4gPiBQYXRjaCBPdmVydmlldzoNCj4gPiAgIDEuIHJlcG9ydHMgSU9NTVUgbmVzdGluZyBp
+bmZvIHRvIHVzZXJzcGFjZSAoIHBhdGNoIDAwMDEsIDAwMDIsIDAwMDMsDQo+IDAwMTUgLCAwMDE2
+KQ0KPiA+ICAgMi4gdmZpbyBzdXBwb3J0IGZvciBQQVNJRCBhbGxvY2F0aW9uIGFuZCBmcmVlIGZv
+ciBWTXMgKHBhdGNoIDAwMDQsIDAwMDUsDQo+IDAwMDcpDQo+ID4gICAzLiBhIGZpeCB0byBhIHJl
+dmlzaXQgaW4gaW50ZWwgaW9tbXUgZHJpdmVyIChwYXRjaCAwMDA2KQ0KPiA+ICAgNC4gdmZpbyBz
+dXBwb3J0IGZvciBiaW5kaW5nIGd1ZXN0IHBhZ2UgdGFibGUgdG8gaG9zdCAocGF0Y2ggMDAwOCwg
+MDAwOSwNCj4gMDAxMCkNCj4gPiAgIDUuIHZmaW8gc3VwcG9ydCBmb3IgSU9NTVUgY2FjaGUgaW52
+YWxpZGF0aW9uIGZyb20gVk1zIChwYXRjaCAwMDExKQ0KPiA+ICAgNi4gdmZpbyBzdXBwb3J0IGZv
+ciB2U1ZBIHVzYWdlIG9uIElPTU1VLWJhY2tlZCBtZGV2cyAocGF0Y2ggMDAxMikNCj4gPiAgIDcu
+IGV4cG9zZSBQQVNJRCBjYXBhYmlsaXR5IHRvIFZNIChwYXRjaCAwMDEzKQ0KPiA+ICAgOC4gYWRk
+IGRvYyBmb3IgVkZJTyBkdWFsIHN0YWdlIGNvbnRyb2wgKHBhdGNoIDAwMTQpDQo+IA0KPiANCj4g
+SWYgaXQncyBwb3NzaWJsZSwgSSB3b3VsZCBzdWdnZXN0IGEgZ2VuZXJpYyB1QVBJIGluc3RlYWQg
+b2YgYSBWRklPDQo+IHNwZWNpZmljIG9uZS4NCj4gDQo+IEphc29uIHN1Z2dlc3Qgc29tZXRoaW5n
+IGxpa2UgL2Rldi9zdmEuIFRoZXJlIHdpbGwgYmUgYSBsb3Qgb2Ygb3RoZXINCj4gc3Vic3lzdGVt
+cyB0aGF0IGNvdWxkIGJlbmVmaXQgZnJvbSB0aGlzIChlLmcgdkRQQSkuDQo+IA0KDQpKdXN0IGJl
+IGN1cmlvdXMuIFdoZW4gZG9lcyB2RFBBIHN1YnN5c3RlbSBwbGFuIHRvIHN1cHBvcnQgdlNWQSBh
+bmQgDQp3aGVuIGNvdWxkIG9uZSBleHBlY3QgYSBTVkEtY2FwYWJsZSB2RFBBIGRldmljZSBpbiBt
+YXJrZXQ/DQoNClRoYW5rcw0KS2V2aW4NCg==
