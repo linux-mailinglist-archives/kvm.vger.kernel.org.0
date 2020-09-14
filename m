@@ -2,150 +2,96 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C50AD2697BA
-	for <lists+kvm@lfdr.de>; Mon, 14 Sep 2020 23:31:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AA1192697C4
+	for <lists+kvm@lfdr.de>; Mon, 14 Sep 2020 23:34:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726074AbgINVbl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 14 Sep 2020 17:31:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46970 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725961AbgINVbj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 14 Sep 2020 17:31:39 -0400
-Received: from mail-qk1-x744.google.com (mail-qk1-x744.google.com [IPv6:2607:f8b0:4864:20::744])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6F997C06174A;
-        Mon, 14 Sep 2020 14:31:38 -0700 (PDT)
-Received: by mail-qk1-x744.google.com with SMTP id t138so1993003qka.0;
-        Mon, 14 Sep 2020 14:31:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=mbVYbUwuAgj0gZUzhMIQHhBdT+m+c8C6wWNEnv4NlZs=;
-        b=YD9sRm5yT9owz3HKM14xky8JKTJx+V/EU9RqYee67PL2MQzDF+DC0DdZ1pRB9rONt+
-         5DH5fiypxF2Ip2K1rW4qRMZkDTJxgw3hN8AoSolqiibS/7bHKjZEEHWftNJHwFHSsIun
-         35a0rYoZ1IAxXNmcKzjQA9fLe3D7UGOrwSQnxrAEse4mstg3V1JhBTdzcTl720pPAP/e
-         //AbavDIpMzrt7UO+Gx4JGERovmeTGefEBwlw3xbfasfMi+kQuWtxlbk4BaarGbliWNj
-         rPCGOswv29fhlulzS2w3o0dgvkr5jSAuxQxpwJXHuLu9J28MLkqlBXuYdkSTMcyRCulj
-         VHFQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=mbVYbUwuAgj0gZUzhMIQHhBdT+m+c8C6wWNEnv4NlZs=;
-        b=B+XSXpQnbFSZSp+tKm++fm+IqHKq8MSGicw0/c5Mbu55IyhcDJk0d3uEB5JTrtjZ29
-         +msJL6IHx74AnUi+1U1PE8zJdu84n06mcY01czkqQegXAw1cL4sHPVMO9NjKryW3cC+N
-         YAi9PVL+4Cup7RDNMAnV+xFCHU2TTadgh1X/vXr2AYLF+Ni+QGgtt0Fai6rrc73bj2Im
-         NoS64D2rcOgy/6BUfvug1P8agPfrGTPZhsf+rJ87u4SpbhBEOwquU1t4KZ3CuTbVZs0k
-         XffBNsIlIJMBFPlLYmrpUJ4DymFinU2N0LZg6Rz0/7LFpENHlOzdCnj2hOH82pZySLlu
-         fUtQ==
-X-Gm-Message-State: AOAM532x6GHEj57bxDTUB2jWuckATo7oqRTHIro67EtX7VaDyoDFPXUP
-        4ZX6za7odiAgjmvHG/6oNfukU57w+A+cx+iQskg=
-X-Google-Smtp-Source: ABdhPJwRyAgl+QzcCijWEtni3+p0D9s2SnrN8uISflLGy6Y5Dvyux1wcPbi/mnd3XTTAAJikaARQVmqQAfEik4Gz/bU=
-X-Received: by 2002:a37:9c8:: with SMTP id 191mr14533038qkj.292.1600119097641;
- Mon, 14 Sep 2020 14:31:37 -0700 (PDT)
-MIME-Version: 1.0
-References: <20200914195634.12881-1-sean.j.christopherson@intel.com>
- <20200914195634.12881-2-sean.j.christopherson@intel.com> <20200914204024.w3rpjon64d3fesys@treble>
- <20200914210719.GB7084@sjchrist-ice> <CAFULd4Z9-Btyqo+i=w5Zyr=vJ46FBXzN7ovWGFxpnLiU2JE6eg@mail.gmail.com>
-In-Reply-To: <CAFULd4Z9-Btyqo+i=w5Zyr=vJ46FBXzN7ovWGFxpnLiU2JE6eg@mail.gmail.com>
-From:   Uros Bizjak <ubizjak@gmail.com>
-Date:   Mon, 14 Sep 2020 23:31:26 +0200
-Message-ID: <CAFULd4YrhpPp+MvX5jeSfF54eEeQocs_Z5iY_N3rMGXMzx3RjQ@mail.gmail.com>
-Subject: Re: [PATCH 1/2] KVM: VMX: Move IRQ invocation to assembly subroutine
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     Josh Poimboeuf <jpoimboe@redhat.com>,
+        id S1726119AbgINVd6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 14 Sep 2020 17:33:58 -0400
+Received: from mga09.intel.com ([134.134.136.24]:25021 "EHLO mga09.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726024AbgINVd5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 14 Sep 2020 17:33:57 -0400
+IronPort-SDR: yvfDdULCMdIBRs9KnitROdwEcGY1BoLY1WugX7+jU5UmMI8Kvkn2OMzlsIDg6N6KDejCbbq2DV
+ 6saoYPVod32A==
+X-IronPort-AV: E=McAfee;i="6000,8403,9744"; a="160099522"
+X-IronPort-AV: E=Sophos;i="5.76,427,1592895600"; 
+   d="scan'208";a="160099522"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Sep 2020 14:33:55 -0700
+IronPort-SDR: nGTbaMpiU4wZHuj2i6cMB45vT3BMsCKDALY7iak+RYD4SiLbB/+G66lwRLfjIfiJbMPmw7n0kE
+ YP1Ev94o0aAQ==
+X-IronPort-AV: E=Sophos;i="5.76,427,1592895600"; 
+   d="scan'208";a="507296327"
+Received: from sjchrist-ice.jf.intel.com (HELO sjchrist-ice) ([10.54.31.34])
+  by fmsmga005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Sep 2020 14:33:55 -0700
+Date:   Mon, 14 Sep 2020 14:33:53 -0700
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Tom Lendacky <thomas.lendacky@amd.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org, x86@kernel.org,
         Paolo Bonzini <pbonzini@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        LKML <linux-kernel@vger.kernel.org>,
-        Andi Kleen <ak@linux.intel.com>
-Content-Type: text/plain; charset="UTF-8"
+        Borislav Petkov <bp@alien8.de>, Ingo Molnar <mingo@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Brijesh Singh <brijesh.singh@amd.com>
+Subject: Re: [RFC PATCH 09/35] KVM: SVM: Do not emulate MMIO under SEV-ES
+Message-ID: <20200914213352.GB7192@sjchrist-ice>
+References: <cover.1600114548.git.thomas.lendacky@amd.com>
+ <c4ccb48b41f3996bc9000730309455e449cb1136.1600114548.git.thomas.lendacky@amd.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <c4ccb48b41f3996bc9000730309455e449cb1136.1600114548.git.thomas.lendacky@amd.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Sep 14, 2020 at 11:21 PM Uros Bizjak <ubizjak@gmail.com> wrote:
->
-> On Mon, Sep 14, 2020 at 11:07 PM Sean Christopherson
-> <sean.j.christopherson@intel.com> wrote:
-> >
-> > On Mon, Sep 14, 2020 at 03:40:24PM -0500, Josh Poimboeuf wrote:
-> > > On Mon, Sep 14, 2020 at 12:56:33PM -0700, Sean Christopherson wrote:
-> > > > Move the asm blob that invokes the appropriate IRQ handler after VM-Exit
-> > > > into a proper subroutine.  Slightly rework the blob so that it plays
-> > > > nice with objtool without any additional hints (existing hints aren't
-> > > > able to handle returning with a seemingly modified stack size).
-> > > >
-> > > > Suggested-by: Josh Poimboeuf <jpoimboe@redhat.com>
-> > > > Cc: Uros Bizjak <ubizjak@gmail.com>
-> > > > Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
-> > > > ---
-> > > >  arch/x86/kvm/vmx/vmenter.S | 28 ++++++++++++++++++++++++++++
-> > > >  arch/x86/kvm/vmx/vmx.c     | 33 +++------------------------------
-> > > >  2 files changed, 31 insertions(+), 30 deletions(-)
-> > > >
-> > > > diff --git a/arch/x86/kvm/vmx/vmenter.S b/arch/x86/kvm/vmx/vmenter.S
-> > > > index 799db084a336..baec1e0fefc5 100644
-> > > > --- a/arch/x86/kvm/vmx/vmenter.S
-> > > > +++ b/arch/x86/kvm/vmx/vmenter.S
-> > > > @@ -4,6 +4,7 @@
-> > > >  #include <asm/bitsperlong.h>
-> > > >  #include <asm/kvm_vcpu_regs.h>
-> > > >  #include <asm/nospec-branch.h>
-> > > > +#include <asm/segment.h>
-> > > >
-> > > >  #define WORD_SIZE (BITS_PER_LONG / 8)
-> > > >
-> > > > @@ -294,3 +295,30 @@ SYM_FUNC_START(vmread_error_trampoline)
-> > > >
-> > > >     ret
-> > > >  SYM_FUNC_END(vmread_error_trampoline)
-> > > > +
-> > > > +SYM_FUNC_START(vmx_do_interrupt_nmi_irqoff)
-> > > > +   /*
-> > > > +    * Unconditionally create a stack frame.  RSP needs to be aligned for
-> > > > +    * x86-64, getting the correct RSP on the stack (for x86-64) would take
-> > > > +    * two instructions anyways, and it helps make objtool happy (see below).
-> > > > +    */
-> > > > +   push %_ASM_BP
-> > > > +   mov %rsp, %_ASM_BP
-> > >
-> > > RSP needs to be aligned to what?  How would this align the stack, other
-> > > than by accident?
-> >
-> > Ah, yeah, that's lacking info.
-> >
-> > 16-byte aligned to correctly mimic CPU behavior when vectoring an IRQ/NMI.
-> > When not changing stack, the CPU aligns RSP before pushing the frame.
-> >
-> > The above shenanigans work because the x86-64 ABI also requires RSP to be
-> > 16-byte aligned prior to CALL.  RSP is thus 8-byte aligned due to CALL
-> > pushing the return IP, and so creating the stack frame by pushing RBP makes
-> > it 16-byte aliagned again.
->
-> IIRC, the kernel violates x86_64 ABI and aligns RSP to 8 bytes prior
-> to CALL. Please note -mpreferred-stack-boundary=3 in the compile
-> flags.
+On Mon, Sep 14, 2020 at 03:15:23PM -0500, Tom Lendacky wrote:
+> From: Tom Lendacky <thomas.lendacky@amd.com>
+> 
+> When a guest is running as an SEV-ES guest, it is not possible to emulate
+> MMIO. Add support to prevent trying to perform MMIO emulation.
+> 
+> Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
+> ---
+>  arch/x86/kvm/mmu/mmu.c | 7 +++++++
+>  1 file changed, 7 insertions(+)
+> 
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index a5d0207e7189..2e1b8b876286 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -5485,6 +5485,13 @@ int kvm_mmu_page_fault(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa, u64 error_code,
+>  	if (!mmio_info_in_cache(vcpu, cr2_or_gpa, direct) && !is_guest_mode(vcpu))
+>  		emulation_type |= EMULTYPE_ALLOW_RETRY_PF;
+>  emulate:
+> +	/*
+> +	 * When the guest is an SEV-ES guest, emulation is not possible.  Allow
+> +	 * the guest to handle the MMIO emulation.
+> +	 */
+> +	if (vcpu->arch.vmsa_encrypted)
+> +		return 1;
 
-+       push %_ASM_BP
-+       mov %_ASM_SP, %_ASM_BP
-+
-+#ifdef CONFIG_X86_64
-+       and $-16, %rsp"
-+       push $__KERNEL_DS
-+       push %rbp
-+#endif
-+       pushf
-+       push $__KERNEL_CS
-+       CALL_NOSPEC _ASM_ARG1
-...
-+       mov %_ASM_BP, %_ASM_SP
-+       pop %_ASM_BP
-+       ret
+A better approach is to refactor need_emulation_on_page_fault() (the hook
+that's just out of sight in this patch) into a more generic
+kvm_x86_ops.is_emulatable() so that the latter can be used to kill emulation
+everywhere, and for other reasons.  E.g. TDX obviously shares very similar
+logic, but SGX also adds a case where KVM can theoretically end up in an
+emulator path without the ability to access the necessary guest state.
 
-should work.
+I have exactly such a prep patch (because SGX and TDX...), I'll get it posted
+in the next day or two.
 
-Uros.
+> +
+>  	/*
+>  	 * On AMD platforms, under certain conditions insn_len may be zero on #NPF.
+>  	 * This can happen if a guest gets a page-fault on data access but the HW
+> -- 
+> 2.28.0
+> 
