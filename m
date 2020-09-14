@@ -2,298 +2,125 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BA759268303
-	for <lists+kvm@lfdr.de>; Mon, 14 Sep 2020 05:08:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7514A26836A
+	for <lists+kvm@lfdr.de>; Mon, 14 Sep 2020 06:20:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726061AbgINDIX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 13 Sep 2020 23:08:23 -0400
-Received: from mga06.intel.com ([134.134.136.31]:14035 "EHLO mga06.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725982AbgINDIW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 13 Sep 2020 23:08:22 -0400
-IronPort-SDR: QNUCvnFEKlUiTHOY4VpZkN12iWKkIIzxBnEFXAK7z4dYjFlCRWcZf37zm6i7Yem6nWr3eyiXy2
- /4Rkg07k58NQ==
-X-IronPort-AV: E=McAfee;i="6000,8403,9743"; a="220572090"
-X-IronPort-AV: E=Sophos;i="5.76,424,1592895600"; 
-   d="scan'208";a="220572090"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Sep 2020 20:08:19 -0700
-IronPort-SDR: MM5/sFSifKGqGPPL5Uqo4zu6Mz4fdHmevk1+AaGj0Csw64JOdeOSEMSWn24AFq1rwcg9CWswTx
- e8b1YEkqRZ8w==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.76,424,1592895600"; 
-   d="scan'208";a="408731471"
-Received: from allen-box.sh.intel.com (HELO [10.239.159.139]) ([10.239.159.139])
-  by fmsmga001.fm.intel.com with ESMTP; 13 Sep 2020 20:08:16 -0700
-Cc:     baolu.lu@linux.intel.com, Joerg Roedel <joro@8bytes.org>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Jean-Philippe Brucker <jean-philippe@linaro.org>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Kevin Tian <kevin.tian@intel.com>,
-        Ashok Raj <ashok.raj@intel.com>,
-        Dave Jiang <dave.jiang@intel.com>,
-        Liu Yi L <yi.l.liu@intel.com>, Zeng Xin <xin.zeng@intel.com>,
-        iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Subject: Re: [PATCH v4 2/5] iommu: Add iommu_at(de)tach_subdev_group()
-To:     Alex Williamson <alex.williamson@redhat.com>
-References: <20200901033422.22249-1-baolu.lu@linux.intel.com>
- <20200901033422.22249-3-baolu.lu@linux.intel.com>
- <20200910160547.0a8b9891@w520.home>
-From:   Lu Baolu <baolu.lu@linux.intel.com>
-Message-ID: <01d80e65-c372-4944-753f-454a190a8cd0@linux.intel.com>
-Date:   Mon, 14 Sep 2020 11:02:24 +0800
+        id S1726010AbgINEUy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 14 Sep 2020 00:20:54 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:27560 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1725973AbgINEUy (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 14 Sep 2020 00:20:54 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1600057252;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=ij0YTaF6RiYno0x8sF/D5e5z9gxhF6aamWYdiKjdyYE=;
+        b=YF/bWI2bHnPwArvgwug19uz8Zmd1CC6uYr42rxk+s6oNaQvGzCXDMj9GnBVEIwWzaEjZYZ
+        LvU9mZVxIbH4KupAi2rO+NHkT1t0il/vDqy5UhbO6lfjYAdn8uQBCmCwHKo0rWmmJtQjHb
+        J0v6alqXCEd2OSCXXwHGOCxn3F1RloU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-352-mnW_Qw2FPCe6DtMHLxgtzg-1; Mon, 14 Sep 2020 00:20:50 -0400
+X-MC-Unique: mnW_Qw2FPCe6DtMHLxgtzg-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6A78F1074651;
+        Mon, 14 Sep 2020 04:20:48 +0000 (UTC)
+Received: from [10.72.13.25] (ovpn-13-25.pek2.redhat.com [10.72.13.25])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id DAE371A837;
+        Mon, 14 Sep 2020 04:20:11 +0000 (UTC)
+Subject: Re: [PATCH v7 00/16] vfio: expose virtual Shared Virtual Addressing
+ to VMs
+To:     Liu Yi L <yi.l.liu@intel.com>, alex.williamson@redhat.com,
+        eric.auger@redhat.com, baolu.lu@linux.intel.com, joro@8bytes.org
+Cc:     kevin.tian@intel.com, jacob.jun.pan@linux.intel.com,
+        ashok.raj@intel.com, jun.j.tian@intel.com, yi.y.sun@intel.com,
+        jean-philippe@linaro.org, peterx@redhat.com, hao.wu@intel.com,
+        stefanha@gmail.com, iommu@lists.linux-foundation.org,
+        kvm@vger.kernel.org, Jason Gunthorpe <jgg@nvidia.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>
+References: <1599734733-6431-1-git-send-email-yi.l.liu@intel.com>
+From:   Jason Wang <jasowang@redhat.com>
+Message-ID: <411c81c0-f13c-37cc-6c26-cafb42b46b15@redhat.com>
+Date:   Mon, 14 Sep 2020 12:20:10 +0800
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <20200910160547.0a8b9891@w520.home>
+In-Reply-To: <1599734733-6431-1-git-send-email-yi.l.liu@intel.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Alex,
 
-On 9/11/20 6:05 AM, Alex Williamson wrote:
-> On Tue,  1 Sep 2020 11:34:19 +0800
-> Lu Baolu <baolu.lu@linux.intel.com> wrote:
-> 
->> This adds two new APIs for the use cases like vfio/mdev where subdevices
->> derived from physical devices are created and put in an iommu_group. The
->> new IOMMU API interfaces mimic the vfio_mdev_at(de)tach_domain() directly,
->> testing whether the resulting device supports IOMMU_DEV_FEAT_AUX and using
->> an aux vs non-aux at(de)tach.
->>
->> By doing this we could
->>
->> - Set the iommu_group.domain. The iommu_group.domain is private to iommu
->>    core (therefore vfio code cannot set it), but we need it set in order
->>    for iommu_get_domain_for_dev() to work with a group attached to an aux
->>    domain.
->>
->> - Prefer to use the _attach_group() interfaces while the _attach_device()
->>    interfaces are relegated to special cases.
->>
->> Link: https://lore.kernel.org/linux-iommu/20200730134658.44c57a67@x1.home/
->> Link: https://lore.kernel.org/linux-iommu/20200730151703.5daf8ad4@x1.home/
->> Signed-off-by: Lu Baolu <baolu.lu@linux.intel.com>
->> ---
->>   drivers/iommu/iommu.c | 136 ++++++++++++++++++++++++++++++++++++++++++
->>   include/linux/iommu.h |  20 +++++++
->>   2 files changed, 156 insertions(+)
->>
->> diff --git a/drivers/iommu/iommu.c b/drivers/iommu/iommu.c
->> index 38cdfeb887e1..fb21c2ff4861 100644
->> --- a/drivers/iommu/iommu.c
->> +++ b/drivers/iommu/iommu.c
->> @@ -2757,6 +2757,142 @@ int iommu_aux_get_pasid(struct iommu_domain *domain, struct device *dev)
->>   }
->>   EXPORT_SYMBOL_GPL(iommu_aux_get_pasid);
->>   
->> +static int __iommu_aux_attach_device(struct iommu_domain *domain,
->> +				     struct device *phys_dev,
->> +				     struct device *sub_dev)
->> +{
->> +	int ret;
->> +
->> +	if (unlikely(!domain->ops->aux_attach_dev))
->> +		return -ENODEV;
->> +
->> +	ret = domain->ops->aux_attach_dev(domain, phys_dev, sub_dev);
->> +	if (!ret)
->> +		trace_attach_device_to_domain(sub_dev);
->> +
->> +	return ret;
->> +}
->> +
->> +static void __iommu_aux_detach_device(struct iommu_domain *domain,
->> +				      struct device *phys_dev,
->> +				      struct device *sub_dev)
->> +{
->> +	if (unlikely(!domain->ops->aux_detach_dev))
->> +		return;
->> +
->> +	domain->ops->aux_detach_dev(domain, phys_dev, sub_dev);
->> +	trace_detach_device_from_domain(sub_dev);
->> +}
->> +
->> +static int __iommu_attach_subdev_group(struct iommu_domain *domain,
->> +				       struct iommu_group *group,
->> +				       iommu_device_lookup_t fn)
->> +{
->> +	struct group_device *device;
->> +	struct device *phys_dev;
->> +	int ret = -ENODEV;
->> +
->> +	list_for_each_entry(device, &group->devices, list) {
->> +		phys_dev = fn(device->dev);
->> +		if (!phys_dev) {
->> +			ret = -ENODEV;
->> +			break;
->> +		}
->> +
->> +		if (iommu_dev_feature_enabled(phys_dev, IOMMU_DEV_FEAT_AUX))
->> +			ret = __iommu_aux_attach_device(domain, phys_dev,
->> +							device->dev);
->> +		else
->> +			ret = __iommu_attach_device(domain, phys_dev);
->> +
->> +		if (ret)
->> +			break;
->> +	}
->> +
->> +	return ret;
->> +}
->> +
->> +static void __iommu_detach_subdev_group(struct iommu_domain *domain,
->> +					struct iommu_group *group,
->> +					iommu_device_lookup_t fn)
->> +{
->> +	struct group_device *device;
->> +	struct device *phys_dev;
->> +
->> +	list_for_each_entry(device, &group->devices, list) {
->> +		phys_dev = fn(device->dev);
->> +		if (!phys_dev)
->> +			break;
-> 
-> 
-> Seems like this should be a continue rather than a break.  On the
-> unwind path maybe we're relying on holding the group mutex and
-> deterministic behavior from the fn() callback to unwind to the same
-> point, but we still have an entirely separate detach interface and I'm
-> not sure we couldn't end up with an inconsistent state if we don't
-> iterate each group device here.  Thanks,
+On 2020/9/10 下午6:45, Liu Yi L wrote:
+> Shared Virtual Addressing (SVA), a.k.a, Shared Virtual Memory (SVM) on
+> Intel platforms allows address space sharing between device DMA and
+> applications. SVA can reduce programming complexity and enhance security.
+>
+> This VFIO series is intended to expose SVA usage to VMs. i.e. Sharing
+> guest application address space with passthru devices. This is called
+> vSVA in this series. The whole vSVA enabling requires QEMU/VFIO/IOMMU
+> changes. For IOMMU and QEMU changes, they are in separate series (listed
+> in the "Related series").
+>
+> The high-level architecture for SVA virtualization is as below, the key
+> design of vSVA support is to utilize the dual-stage IOMMU translation (
+> also known as IOMMU nesting translation) capability in host IOMMU.
+>
+>
+>      .-------------.  .---------------------------.
+>      |   vIOMMU    |  | Guest process CR3, FL only|
+>      |             |  '---------------------------'
+>      .----------------/
+>      | PASID Entry |--- PASID cache flush -
+>      '-------------'                       |
+>      |             |                       V
+>      |             |                CR3 in GPA
+>      '-------------'
+> Guest
+> ------| Shadow |--------------------------|--------
+>        v        v                          v
+> Host
+>      .-------------.  .----------------------.
+>      |   pIOMMU    |  | Bind FL for GVA-GPA  |
+>      |             |  '----------------------'
+>      .----------------/  |
+>      | PASID Entry |     V (Nested xlate)
+>      '----------------\.------------------------------.
+>      |             ||SL for GPA-HPA, default domain|
+>      |             |   '------------------------------'
+>      '-------------'
+> Where:
+>   - FL = First level/stage one page tables
+>   - SL = Second level/stage two page tables
+>
+> Patch Overview:
+>   1. reports IOMMU nesting info to userspace ( patch 0001, 0002, 0003, 0015 , 0016)
+>   2. vfio support for PASID allocation and free for VMs (patch 0004, 0005, 0007)
+>   3. a fix to a revisit in intel iommu driver (patch 0006)
+>   4. vfio support for binding guest page table to host (patch 0008, 0009, 0010)
+>   5. vfio support for IOMMU cache invalidation from VMs (patch 0011)
+>   6. vfio support for vSVA usage on IOMMU-backed mdevs (patch 0012)
+>   7. expose PASID capability to VM (patch 0013)
+>   8. add doc for VFIO dual stage control (patch 0014)
 
-Yes, agreed.
 
-Best regards,
-baolu
+If it's possible, I would suggest a generic uAPI instead of a VFIO 
+specific one.
 
-> 
-> Alex
-> 
->> +
->> +		if (iommu_dev_feature_enabled(phys_dev, IOMMU_DEV_FEAT_AUX))
->> +			__iommu_aux_detach_device(domain, phys_dev, device->dev);
->> +		else
->> +			__iommu_detach_device(domain, phys_dev);
->> +	}
->> +}
->> +
->> +/**
->> + * iommu_attach_subdev_group - attach domain to an iommu_group which
->> + *			       contains subdevices.
->> + *
->> + * @domain: domain
->> + * @group:  iommu_group which contains subdevices
->> + * @fn:     callback for each subdevice in the @iommu_group to retrieve the
->> + *          physical device where the subdevice was created from.
->> + *
->> + * Returns 0 on success, or an error value.
->> + */
->> +int iommu_attach_subdev_group(struct iommu_domain *domain,
->> +			      struct iommu_group *group,
->> +			      iommu_device_lookup_t fn)
->> +{
->> +	int ret = -ENODEV;
->> +
->> +	mutex_lock(&group->mutex);
->> +	if (group->domain) {
->> +		ret = -EBUSY;
->> +		goto unlock_out;
->> +	}
->> +
->> +	ret = __iommu_attach_subdev_group(domain, group, fn);
->> +	if (ret)
->> +		__iommu_detach_subdev_group(domain, group, fn);
->> +	else
->> +		group->domain = domain;
->> +
->> +unlock_out:
->> +	mutex_unlock(&group->mutex);
->> +	return ret;
->> +}
->> +EXPORT_SYMBOL_GPL(iommu_attach_subdev_group);
->> +
->> +/**
->> + * iommu_detach_subdev_group - detach domain from an iommu_group which
->> + *			       contains subdevices
->> + *
->> + * @domain: domain
->> + * @group:  iommu_group which contains subdevices
->> + * @fn:     callback for each subdevice in the @iommu_group to retrieve the
->> + *          physical device where the subdevice was created from.
->> + *
->> + * The domain must have been attached to @group via iommu_attach_subdev_group().
->> + */
->> +void iommu_detach_subdev_group(struct iommu_domain *domain,
->> +			       struct iommu_group *group,
->> +			       iommu_device_lookup_t fn)
->> +{
->> +	mutex_lock(&group->mutex);
->> +	if (!group->domain)
->> +		goto unlock_out;
->> +
->> +	__iommu_detach_subdev_group(domain, group, fn);
->> +	group->domain = NULL;
->> +
->> +unlock_out:
->> +	mutex_unlock(&group->mutex);
->> +}
->> +EXPORT_SYMBOL_GPL(iommu_detach_subdev_group);
->> +
->>   /**
->>    * iommu_sva_bind_device() - Bind a process address space to a device
->>    * @dev: the device
->> diff --git a/include/linux/iommu.h b/include/linux/iommu.h
->> index 871267104915..b9df8b510d4f 100644
->> --- a/include/linux/iommu.h
->> +++ b/include/linux/iommu.h
->> @@ -48,6 +48,7 @@ struct iommu_fault_event;
->>   typedef int (*iommu_fault_handler_t)(struct iommu_domain *,
->>   			struct device *, unsigned long, int, void *);
->>   typedef int (*iommu_dev_fault_handler_t)(struct iommu_fault *, void *);
->> +typedef struct device *(*iommu_device_lookup_t)(struct device *);
->>   
->>   struct iommu_domain_geometry {
->>   	dma_addr_t aperture_start; /* First address that can be mapped    */
->> @@ -631,6 +632,12 @@ bool iommu_dev_feature_enabled(struct device *dev, enum iommu_dev_features f);
->>   int iommu_aux_attach_device(struct iommu_domain *domain, struct device *dev);
->>   void iommu_aux_detach_device(struct iommu_domain *domain, struct device *dev);
->>   int iommu_aux_get_pasid(struct iommu_domain *domain, struct device *dev);
->> +int iommu_attach_subdev_group(struct iommu_domain *domain,
->> +			      struct iommu_group *group,
->> +			      iommu_device_lookup_t fn);
->> +void iommu_detach_subdev_group(struct iommu_domain *domain,
->> +			       struct iommu_group *group,
->> +			       iommu_device_lookup_t fn);
->>   
->>   struct iommu_sva *iommu_sva_bind_device(struct device *dev,
->>   					struct mm_struct *mm,
->> @@ -1019,6 +1026,19 @@ iommu_aux_get_pasid(struct iommu_domain *domain, struct device *dev)
->>   	return -ENODEV;
->>   }
->>   
->> +static inline int
->> +iommu_attach_subdev_group(struct iommu_domain *domain, struct iommu_group *group,
->> +			  iommu_device_lookup_t fn)
->> +{
->> +	return -ENODEV;
->> +}
->> +
->> +static inline void
->> +iommu_detach_subdev_group(struct iommu_domain *domain, struct iommu_group *group,
->> +			  iommu_device_lookup_t fn)
->> +{
->> +}
->> +
->>   static inline struct iommu_sva *
->>   iommu_sva_bind_device(struct device *dev, struct mm_struct *mm, void *drvdata)
->>   {
-> 
+Jason suggest something like /dev/sva. There will be a lot of other 
+subsystems that could benefit from this (e.g vDPA).
+
+Have you ever considered this approach?
+
+Thanks
+
