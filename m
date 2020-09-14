@@ -2,132 +2,120 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 59D2A26871D
-	for <lists+kvm@lfdr.de>; Mon, 14 Sep 2020 10:22:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5A887268722
+	for <lists+kvm@lfdr.de>; Mon, 14 Sep 2020 10:23:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726232AbgINIW0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 14 Sep 2020 04:22:26 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:14916 "EHLO
+        id S1726248AbgINIXT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 14 Sep 2020 04:23:19 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:7838 "EHLO
         mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726139AbgINIWX (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 14 Sep 2020 04:22:23 -0400
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 08E82Lr9168862;
-        Mon, 14 Sep 2020 04:22:22 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : content-transfer-encoding
- : mime-version; s=pp1; bh=i+OwX1kg/u3h4oRJPcu0H6VxX72SaJLtZbABQK7m36w=;
- b=BynVaRT1h4Cd3qcVDL9O7Rz81Qq5WHQSyFcfsDxeC3rCHj2dYIbWkLyt/Pg/PUGj5LHK
- vVult16AmkS0szCRuc+l7dar7ejfko9hfqNSzvZZTWdmLiXUiZMu2zQii2Tt/NHY7Hdh
- /cogDdb7aEU4nBWkzGq9ufLqYFBiQ5zCFKexOIE2JL09c+9a5EU9QUQrthGqYCckwP/W
- qRuonKmcgt9tAgUMOhdKeC0Ni9VMvZaT/x3Cny52//UkSggEi2RWsDp6CQZipKIsOm85
- A8vsYt2ybNm+5tee/99JqXjB4K6OsrqnqMMmfaLTd2A61SSBAFaWkW5iS36u6yHvdYE7 3g== 
+        by vger.kernel.org with ESMTP id S1726239AbgINIXT (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 14 Sep 2020 04:23:19 -0400
+Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 08E83gIU182934;
+        Mon, 14 Sep 2020 04:23:18 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=Ia2xoZWuCYpL76lyzhv4kCcuFhG1ZdZJGayL4NCUbTg=;
+ b=n//a407UpuYZylocjDNsyKy7xjwkHkCi29u2eAslqi7ixBdCvhPWU2Qclv7wEmBIe/wP
+ v/mWFIojmOZcLkB7aAfKEePFWX5G5oYho8qvL6homlo58L+4yOQ2x+q7HfF6gojA8k62
+ 0r4cbNpCJhKrL1nxMsjr4D+MXsTx1aa8SDcQkycyq4fyytcMpNTtPXUXwi6sCOeMvCmZ
+ H+y1abDCUhr3NipW7W4b0pGAd6GzYQQEEhp1mAM8R6Kpwmcs8Bx3VMZ/LXoQvfoc+rXc
+ Z7YhE74WA2t8XrxYnazQh5o4zCRWUUdJX1JrM6oxUQmZUkQrZQbk3NvEx1f4Rjnd2Q6U NQ== 
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 33j4g4rvbf-1
+        by mx0a-001b2d01.pphosted.com with ESMTP id 33j21k4bu2-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 14 Sep 2020 04:22:22 -0400
-Received: from m0098396.ppops.net (m0098396.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 08E82uiK171395;
-        Mon, 14 Sep 2020 04:22:22 -0400
-Received: from ppma01fra.de.ibm.com (46.49.7a9f.ip4.static.sl-reverse.com [159.122.73.70])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 33j4g4rvas-1
+        Mon, 14 Sep 2020 04:23:18 -0400
+Received: from m0187473.ppops.net (m0187473.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 08E83jwj183011;
+        Mon, 14 Sep 2020 04:23:18 -0400
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 33j21k4bte-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 14 Sep 2020 04:22:22 -0400
-Received: from pps.filterd (ppma01fra.de.ibm.com [127.0.0.1])
-        by ppma01fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 08E8KvgW028114;
-        Mon, 14 Sep 2020 08:22:20 GMT
+        Mon, 14 Sep 2020 04:23:17 -0400
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 08E8MP73013804;
+        Mon, 14 Sep 2020 08:23:15 GMT
 Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
-        by ppma01fra.de.ibm.com with ESMTP id 33hkfagcfp-1
+        by ppma03ams.nl.ibm.com with ESMTP id 33gny8a1ks-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 14 Sep 2020 08:22:19 +0000
-Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
-        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 08E8MHXu20840938
+        Mon, 14 Sep 2020 08:23:15 +0000
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
+        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 08E8NDDD18350528
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 14 Sep 2020 08:22:17 GMT
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id E92A84C046;
-        Mon, 14 Sep 2020 08:22:16 +0000 (GMT)
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id D5F484C040;
-        Mon, 14 Sep 2020 08:22:16 +0000 (GMT)
-Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
-        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
-        Mon, 14 Sep 2020 08:22:16 +0000 (GMT)
-Received: by tuxmaker.boeblingen.de.ibm.com (Postfix, from userid 25651)
-        id 969DCE235D; Mon, 14 Sep 2020 10:22:16 +0200 (CEST)
-From:   Christian Borntraeger <borntraeger@de.ibm.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     KVM <kvm@vger.kernel.org>, Janosch Frank <frankja@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        linux-s390 <linux-s390@vger.kernel.org>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Collin Walling <walling@linux.ibm.com>
-Subject: [GIT PULL 1/1] docs: kvm: add documentation for KVM_CAP_S390_DIAG318
-Date:   Mon, 14 Sep 2020 10:22:15 +0200
-Message-Id: <20200914082215.6143-2-borntraeger@de.ibm.com>
-X-Mailer: git-send-email 2.25.4
-In-Reply-To: <20200914082215.6143-1-borntraeger@de.ibm.com>
-References: <20200914082215.6143-1-borntraeger@de.ibm.com>
-X-TM-AS-GCONF: 00
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+        Mon, 14 Sep 2020 08:23:13 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 6A006AE04D;
+        Mon, 14 Sep 2020 08:23:13 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 176E6AE045;
+        Mon, 14 Sep 2020 08:23:13 +0000 (GMT)
+Received: from oc3016276355.ibm.com (unknown [9.145.38.148])
+        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Mon, 14 Sep 2020 08:23:13 +0000 (GMT)
+Subject: Re: [PATCH v1 2/3] s390: define UV compatible I/O allocation
+To:     Cornelia Huck <cohuck@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
+        frankja@linux.ibm.com, david@redhat.com, thuth@redhat.com
+References: <1598875533-19947-1-git-send-email-pmorel@linux.ibm.com>
+ <1598875533-19947-3-git-send-email-pmorel@linux.ibm.com>
+ <20200911144058.5fe82f26.cohuck@redhat.com>
+From:   Pierre Morel <pmorel@linux.ibm.com>
+Message-ID: <4e09343a-6eed-7270-2157-dc65f4fb47aa@linux.ibm.com>
+Date:   Mon, 14 Sep 2020 10:23:12 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
+In-Reply-To: <20200911144058.5fe82f26.cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
  definitions=2020-09-13_09:2020-09-10,2020-09-13 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 phishscore=0
- lowpriorityscore=0 malwarescore=0 clxscore=1015 priorityscore=1501
- mlxlogscore=999 mlxscore=0 suspectscore=0 spamscore=0 impostorscore=0
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2006250000 definitions=main-2009140062
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 adultscore=0
+ clxscore=1015 mlxscore=0 mlxlogscore=999 malwarescore=0 spamscore=0
+ suspectscore=2 phishscore=0 lowpriorityscore=0 impostorscore=0
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2006250000 definitions=main-2009140067
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Collin Walling <walling@linux.ibm.com>
 
-Documentation for the s390 DIAGNOSE 0x318 instruction handling.
 
-Signed-off-by: Collin Walling <walling@linux.ibm.com>
-Reviewed-by: Cornelia Huck <cohuck@redhat.com>
-Reviewed-by: David Hildenbrand <david@redhat.com>
-Link: https://lore.kernel.org/kvm/20200625150724.10021-2-walling@linux.ibm.com/
-Message-Id: <20200625150724.10021-2-walling@linux.ibm.com>
-Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
----
- Documentation/virt/kvm/api.rst | 20 ++++++++++++++++++++
- 1 file changed, 20 insertions(+)
+On 2020-09-11 14:40, Cornelia Huck wrote:
+> On Mon, 31 Aug 2020 14:05:32 +0200
+> Pierre Morel <pmorel@linux.ibm.com> wrote:
+> 
+>> To centralize the memory allocation for I/O we define
+>> the alloc/free_io_page() functions which share the I/O
+>> memory with the host in case the guest runs with
+>> protected virtualization.
 
-diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-index d2b733dc7892..51191b56e61c 100644
---- a/Documentation/virt/kvm/api.rst
-+++ b/Documentation/virt/kvm/api.rst
-@@ -6173,3 +6173,23 @@ specific interfaces must be consistent, i.e. if one says the feature
- is supported, than the other should as well and vice versa.  For arm64
- see Documentation/virt/kvm/devices/vcpu.rst "KVM_ARM_VCPU_PVTIME_CTRL".
- For x86 see Documentation/virt/kvm/msr.rst "MSR_KVM_STEAL_TIME".
-+
-+8.25 KVM_CAP_S390_DIAG318
-+-------------------------
-+
-+:Architectures: s390
-+
-+This capability enables a guest to set information about its control program
-+(i.e. guest kernel type and version). The information is helpful during
-+system/firmware service events, providing additional data about the guest
-+environments running on the machine.
-+
-+The information is associated with the DIAGNOSE 0x318 instruction, which sets
-+an 8-byte value consisting of a one-byte Control Program Name Code (CPNC) and
-+a 7-byte Control Program Version Code (CPVC). The CPNC determines what
-+environment the control program is running in (e.g. Linux, z/VM...), and the
-+CPVC is used for information specific to OS (e.g. Linux version, Linux
-+distribution...)
-+
-+If this capability is available, then the CPNC and CPVC can be synchronized
-+between KVM and userspace via the sync regs mechanism (KVM_SYNC_DIAG318).
+...
+
+>> +
+>> +void *alloc_io_page(int size)
+>> +{
+>> +	void *p;
+>> +
+>> +	assert(size <= PAGE_SIZE);
+>> +	p = alloc_page();
+> 
+> I see that you use this for some I/O structures in the next patch. Is
+> this guaranteed to be under 2G all the time?
+> 
+
+Good catch.
+I forgot that I already worked on this problem a while ago, I will 
+rework the allocation.
+
+Thanks,
+Pierre
+
 -- 
-2.25.4
-
+Pierre Morel
+IBM Lab Boeblingen
