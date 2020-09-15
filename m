@@ -2,456 +2,153 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D32B126A58B
-	for <lists+kvm@lfdr.de>; Tue, 15 Sep 2020 14:49:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EBF7426A6AA
+	for <lists+kvm@lfdr.de>; Tue, 15 Sep 2020 16:01:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726444AbgIOMtv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 15 Sep 2020 08:49:51 -0400
-Received: from mga03.intel.com ([134.134.136.65]:54114 "EHLO mga03.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726082AbgIOMtG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 15 Sep 2020 08:49:06 -0400
-IronPort-SDR: GQZ7zBHHHrb38TSQiYAAlPgIEFj5El4hobaPfN4z5OSvPwa5QuCAnkr54QCrIEc9SMDCtU8jKe
- Q2oWfMyPIf5A==
-X-IronPort-AV: E=McAfee;i="6000,8403,9744"; a="159295493"
-X-IronPort-AV: E=Sophos;i="5.76,430,1592895600"; 
-   d="scan'208";a="159295493"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Sep 2020 05:49:05 -0700
-IronPort-SDR: eHAgEodmvdr8a3JbJbRWvjQeXdnBJCebYkaMinunWu7Qf1dGiyWwQq6qiyEUth3MYADEB+uXVX
- 2IZv8IbWtmVg==
-X-IronPort-AV: E=Sophos;i="5.76,430,1592895600"; 
-   d="scan'208";a="331169993"
-Received: from gliakhov-mobl2.ger.corp.intel.com (HELO ubuntu) ([10.252.39.18])
-  by fmsmga004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Sep 2020 05:49:02 -0700
-Date:   Tue, 15 Sep 2020 14:48:53 +0200
-From:   Guennadi Liakhovetski <guennadi.liakhovetski@linux.intel.com>
-To:     Mathieu Poirier <mathieu.poirier@linaro.org>
-Cc:     kvm@vger.kernel.org, linux-remoteproc@vger.kernel.org,
-        virtualization@lists.linux-foundation.org,
-        sound-open-firmware@alsa-project.org,
-        Pierre-Louis Bossart <pierre-louis.bossart@linux.intel.com>,
-        Liam Girdwood <liam.r.girdwood@linux.intel.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Ohad Ben-Cohen <ohad@wizery.com>,
-        Bjorn Andersson <bjorn.andersson@linaro.org>,
-        Vincent Whitchurch <vincent.whitchurch@axis.com>
-Subject: Re: [PATCH v5 4/4] vhost: add an RPMsg API
-Message-ID: <20200915124852.GA12554@ubuntu>
-References: <20200826174636.23873-1-guennadi.liakhovetski@linux.intel.com>
- <20200826174636.23873-5-guennadi.liakhovetski@linux.intel.com>
- <20200909223946.GA562265@xps15>
- <20200910083853.GB17698@ubuntu>
- <20200910172211.GB579940@xps15>
- <20200911074655.GA26801@ubuntu>
- <20200911173313.GA613136@xps15>
+        id S1726772AbgION7q (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 15 Sep 2020 09:59:46 -0400
+Received: from mail-dm6nam08on2053.outbound.protection.outlook.com ([40.107.102.53]:8993
+        "EHLO NAM04-DM6-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726463AbgIONyk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 15 Sep 2020 09:54:40 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=L5LXm4Rn4YbhZCK+p9J+VJwFqui0KeXJ2IX/LI7VqZfWF90cFS0OzPMLGQ2D/LcP495sUovA6ftP9HemXUR8dMyT5R7rG7x2GQqgZiI4VInOdXSPz0q0UjZFdbwK2QN6VvdTMjQZ6vgcQrO37XkYn0h8J0m9bQsbc3i2/405njeHEXxnxl9rNDBDXqMUyyJ/Xj5CS1wJ3K7hm7L63wiM4HYUPJYFIGAH1s4/ydC6bVnAgAAtLdk9lgmsw4p2z8fSn9PlDCSj/VG/CeJVexNDKqKX+vQjYt5zbXqZA4HnvFYD0lxm9CZy22vHmES8T569ebkH3S8oXTVTQ7r+ONEAAg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=GGF/fWX15NAQdjY1qAXjVsARwO5GPINAaDfAUelBiN4=;
+ b=auArcioLqDJUOlkn62Bzg81tD8DKzfydrxeVK533eWoMgHU7Ktp3D48sbvDR6ymRrTz7PZZKXUjppA9Xidu+SDCRs+vj+dnwpFXCaqa+oEYyibw8i6ou9x2HtF4Mc0tq6inVLzbpiaoDXuSHPo0jGC/+Ra4xqODpQ3zmGjgyDS0MSrFD9odsVHxcmw5iZWHEMThEkXRpRsVA7xW1Um6wHC0ruEQLetYuDBSnA68RRdJaljFVCGml0o61Jg1j+6GVuOrTDpYgjljOKJzdi0QtB2jRGqdJ1C+HTQnbwJNn0uywyMAMAZT91YCuRLttT/z8+VOOzgqU0s9qF0skAIBYeg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=GGF/fWX15NAQdjY1qAXjVsARwO5GPINAaDfAUelBiN4=;
+ b=OupnzTjpXDzK9zCMsojslVZ2yIhs1pir+lOuc4Ab7MhuJF2N+n54UgPrCB2GVe5r4PnYxIlMU65L2DojtnrCACHCoxWXenRs89uUVUK1SQeAd2RslawIVE7SujDjtsHn/jv65G9pot11sbgAeVerUSosSO9074xIrlLOvIY0lCc=
+Authentication-Results: amd.com; dkim=none (message not signed)
+ header.d=none;amd.com; dmarc=none action=none header.from=amd.com;
+Received: from CY4PR12MB1352.namprd12.prod.outlook.com (2603:10b6:903:3a::13)
+ by CY4PR12MB1926.namprd12.prod.outlook.com (2603:10b6:903:11b::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3370.17; Tue, 15 Sep
+ 2020 13:37:15 +0000
+Received: from CY4PR12MB1352.namprd12.prod.outlook.com
+ ([fe80::989b:b1b2:464c:443]) by CY4PR12MB1352.namprd12.prod.outlook.com
+ ([fe80::989b:b1b2:464c:443%10]) with mapi id 15.20.3370.019; Tue, 15 Sep 2020
+ 13:37:15 +0000
+Subject: Re: [RFC PATCH 08/35] KVM: SVM: Prevent debugging under SEV-ES
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org, x86@kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Borislav Petkov <bp@alien8.de>, Ingo Molnar <mingo@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Brijesh Singh <brijesh.singh@amd.com>
+References: <cover.1600114548.git.thomas.lendacky@amd.com>
+ <58093c542b5b442b88941828595fb2548706f1bf.1600114548.git.thomas.lendacky@amd.com>
+ <20200914212601.GA7192@sjchrist-ice>
+From:   Tom Lendacky <thomas.lendacky@amd.com>
+Message-ID: <fd790047-4107-b28a-262e-03ed5bc4c421@amd.com>
+Date:   Tue, 15 Sep 2020 08:37:12 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
+In-Reply-To: <20200914212601.GA7192@sjchrist-ice>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: DM5PR1101CA0014.namprd11.prod.outlook.com
+ (2603:10b6:4:4c::24) To CY4PR12MB1352.namprd12.prod.outlook.com
+ (2603:10b6:903:3a::13)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200911173313.GA613136@xps15>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from [10.236.30.118] (165.204.77.1) by DM5PR1101CA0014.namprd11.prod.outlook.com (2603:10b6:4:4c::24) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3370.16 via Frontend Transport; Tue, 15 Sep 2020 13:37:14 +0000
+X-Originating-IP: [165.204.77.1]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-HT: Tenant
+X-MS-Office365-Filtering-Correlation-Id: 80bfdd24-a4dd-4e39-0c97-08d8597c7547
+X-MS-TrafficTypeDiagnostic: CY4PR12MB1926:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <CY4PR12MB1926051DA538BBFD26009750EC200@CY4PR12MB1926.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: li+AsokNHR7Jal67tJQx8PuLMBGN9iUewhhB7Zdg6vhazj57vE+iibCMPvj3zFI+cKLomLYBezAZlRK/tMin3EzhqOKk3BEcHpcjx8DLZF5ps6tl7faH25c33tB2D8w3uLTkBAIWXm1ImkzGQlGl54y5sihqbix+uDwG3FmKxOIWGFGiBbuOgRZ7Zg+dOHHztGEDjAF/dfEbXZMxc5eS5vJ11Smaq3izbJRiIWAn6TrGxuN915RfF5n5Pzr8IjY3cCbI9fUnR7TkClLKjDYYjflqf84M2Lyp7qMUDXMuojCedNY1vffRIOcgwtmfcImrk9I24jB6i0BSfoULhm3Gx2pyq02hPPT059TpRop7Uai+x9adsSGDNJT+ElC7TnMZ
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY4PR12MB1352.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(39860400002)(396003)(376002)(366004)(346002)(136003)(8676002)(6916009)(31696002)(54906003)(31686004)(83380400001)(86362001)(2906002)(5660300002)(66946007)(66476007)(66556008)(478600001)(7416002)(8936002)(26005)(6486002)(36756003)(53546011)(16576012)(4326008)(316002)(16526019)(186003)(52116002)(2616005)(956004)(43740500002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData: lmS4d5YKMidQrJbF+3iNwYgQCdAD+UyA9cDdSmn6PkD3N70lz+jDuZPb00QFyM2qByzYE7QQOC5/XMORHxvfeDE8nReW69fNmj/bVZWV1KADTnfch9HEI6E84CWH+YaiWBPX8V0Ykn0O3jxjFeVdGrRud4hORqOHJqT0Jy28h0XgpziB23m7k7qNVMZDEJA5Vf3pkbPIXEyDsAUiZlv1lHgx3dqKOBc9gz9yk9DMomsaVkZRC4M8e7h8GjPLd01hzZTTq45xidlnwNzpeHyAcUA815qeJAJZ+jF0Uy3ahnuYI1+h3SH3Sc4dR2EtJkt+sKMcpGmqFMeXjReTYMRlMGgU2BCoo3oVkgQG48IAp9S+uNPR0HPwZugWk2cLKDQOEOIdTPYtWvvxrFGiYpebtxsvtw+MWqoeNKKhuXzWXxxkev1vGndITnwqiJYq7w3icpuH6CzIH40cs1tQwnaaPisaOsL2TFKxhTgMVf7IA8y21XBZmmuOmntUCTTlJ+5eCplcQxjKAIuSGMNRHCdEGAw98iQgKj/F+paqPTVRHKyjX6WXBeQnCeQXkVX7GSFMUnGRUWPSSVN66OwDeHTmA9D/t5B265Xu/JsjKEYOPouqD19DUjYLwbJdISKNCou/Ve/54SY+Q79IM5Bff2riyA==
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 80bfdd24-a4dd-4e39-0c97-08d8597c7547
+X-MS-Exchange-CrossTenant-AuthSource: CY4PR12MB1352.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Sep 2020 13:37:15.4231
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: FxmxwrQ+e1KmPs2FnWKOgs+lSpimWXT/rlReGx/3frvEFhq1a+tNHlFNFIS7SKkDyIMMoZb3mIzJMK87lkd+eA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY4PR12MB1926
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Sep 11, 2020 at 11:33:13AM -0600, Mathieu Poirier wrote:
-> On Fri, Sep 11, 2020 at 09:46:56AM +0200, Guennadi Liakhovetski wrote:
-> > Hi Mathieu,
-> > 
-> > On Thu, Sep 10, 2020 at 11:22:11AM -0600, Mathieu Poirier wrote:
-> > > Good morning Guennadi,
-> > > 
-> > > On Thu, Sep 10, 2020 at 10:38:54AM +0200, Guennadi Liakhovetski wrote:
-> > > > Hi Mathieu,
-> > > > 
-> > > > On Wed, Sep 09, 2020 at 04:39:46PM -0600, Mathieu Poirier wrote:
-> > > > > Good afternoon,
-> > > > > 
-> > > > > On Wed, Aug 26, 2020 at 07:46:36PM +0200, Guennadi Liakhovetski wrote:
-> > > > > > Linux supports running the RPMsg protocol over the VirtIO transport
-> > > > > > protocol, but currently there is only support for VirtIO clients and
-> > > > > > no support for a VirtIO server. This patch adds a vhost-based RPMsg
-> > > > > > server implementation.
-> > > > > 
-> > > > > This changelog is very confusing...  At this time the name service in the
-> > > > > remoteproc space runs as a server on the application processor.  But from the
-> > > > > above the remoteproc usecase seems to be considered to be a client
-> > > > > configuration.
-> > > > 
-> > > > I agree that this isn't very obvious. But I think it is common to call the 
-> > > > host "a server" and guests "clients." E.g. in vhost.c in the top-of-thefile 
-> > > > comment:
-> > > 
-> > > Ok - that part we agree on.
-> > > 
-> > > > 
-> > > >  * Generic code for virtio server in host kernel.
-> > > > 
-> > > > I think the generic concept behind this notation is, that as guests boot, 
-> > > > they send their requests to the host, e.g. VirtIO device drivers on guests 
-> > > > send requests over VirtQueues to VirtIO servers on the host, which can run 
-> > > > either in the user- or in the kernel-space. And I think you can follow that 
-> > > 
-> > > I can see that process taking place.  After all virtIO devices on guests are
-> > > only stubs that need host support for access to HW.
-> > > 
-> > > > logic in case of devices or remote processors too: it's the main CPU(s) 
-> > > > that boot(s) and start talking to devices and remote processors, so in that 
-> > > > sence devices are servers and the CPUs are their clients.
-> > > 
-> > > In the remote processor case, the remoteproc core (application processor) sets up
-> > > the name service but does not initiate the communication with a remote
-> > > processor.  It simply waits there for a name space request to come in from the
-> > > remote processor.
-> > 
-> > Hm, I don't see that in two examples, that I looked at: mtk and virtio. In both 
-> > cases the announcement seems to be directly coming from the application processor 
-> > maybe after some initialisation.
->  
-> Can you expand on that part - perhaps point me to the (virtio) code you are
-> referring to? 
-
-Ok, we're both right: it goes both ways.
-
-Here's my understanding of the control flow of virtio_rpmsg_bus.c:
-
-1. The driver registers a VirtIO driver with the VIRTIO_ID_RPMSG ID.
-2. When the driver is probed, if the server / the application processor supports the 
-   VIRTIO_RPMSG_F_NS feature, the driver calls __rpmsg_create_ept() to create an 
-   endpoint with rpmsg_ns_cb() as a callback.
-3. When a namespace announcement arrives from the server, the callback is called, 
-   which then registers a new channel (in case of CREATE). That then created an
-   rpmsg device.
-4. If there's a matching rpmsg driver for that device, it's .probe() method is 
-   called, so it can then add its own rpmsg endpoints, to be used for its proper 
-   communication.
-
-Now there was indeed something in virtio_rpmsg_bus.c that I didn't fully understand: 
-virtio_rpmsg_announce_create() and virtio_rpmsg_announce_destroy() functions. Now I 
-understood, that as the client registers its custom channels, it also then can 
-send name service announcements to the application processor, using those functions. 
-This is also described in [1] as:
-
-<quote>
-Name Service sub-component (optional)
-
-This subcomponent is a minimum implementation of the name service which is present 
-in the Linux Kernel implementation of RPMsg. It allows the communicating node both 
-to send announcements about "named" endpoint (in other words, channel) creation or 
-deletion and to receive these announcement taking any user-defined action in an 
-application callback. 
-</quote>
-
-Also in Documentation/rpmsg.txt
-
-<quote>
-...the remote processor announces the existence of a remote rpmsg service by 
-sending a name service message (which contains the name and rpmsg addr of the 
-remote service, see struct rpmsg_ns_msg).
-</quote>
-
-in [2]:
-
-<quote>
-In the current protocol, at startup, the master sends notification to remote to let 
-it know that it can receive name service announcement.
-</quote>
-
-> > > > And yes, the name-space announcement use-case seems confusing to me too - it 
-> > > > reverts the relationship in a way: once a guest has booted and established 
-> > > > connections to any rpmsg "devices," those send their namespace announcements 
-> > > > back. But I think this can be regarded as server identification: you connect 
-> > > > to a server and it replies with its identification and capabilities.
-> > > 
-> > > Based on the above can I assume vhost_rpmsg_ns_announce() is sent from the
-> > > guest?
-> > 
-> > No, it's "vhost_..." so it's running on the host.
+On 9/14/20 4:26 PM, Sean Christopherson wrote:
+> On Mon, Sep 14, 2020 at 03:15:22PM -0500, Tom Lendacky wrote:
+>> From: Tom Lendacky <thomas.lendacky@amd.com>
+>>
+>> Since the guest register state of an SEV-ES guest is encrypted, debugging
+>> is not supported. Update the code to prevent guest debugging when the
+>> guest is an SEV-ES guest. This includes adding a callable function that
+>> is used to determine if the guest supports being debugged.
+>>
+>> Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
+>> ---
+>>  arch/x86/include/asm/kvm_host.h |  2 ++
+>>  arch/x86/kvm/svm/svm.c          | 16 ++++++++++++++++
+>>  arch/x86/kvm/vmx/vmx.c          |  7 +++++++
+>>  arch/x86/kvm/x86.c              |  3 +++
+>>  4 files changed, 28 insertions(+)
+>>
+>> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+>> index c900992701d6..3e2a3d2a8ba8 100644
+>> --- a/arch/x86/include/asm/kvm_host.h
+>> +++ b/arch/x86/include/asm/kvm_host.h
+>> @@ -1234,6 +1234,8 @@ struct kvm_x86_ops {
+>>  	void (*reg_read_override)(struct kvm_vcpu *vcpu, enum kvm_reg reg);
+>>  	void (*reg_write_override)(struct kvm_vcpu *vcpu, enum kvm_reg reg,
+>>  				   unsigned long val);
+>> +
+>> +	bool (*allow_debug)(struct kvm *kvm);
 > 
-> Ok, that's better and confirms the usage of the VIRTIO_RPMSG_RESPONSE queue.
-> When reading your explanation above, I thought the term "those" referred to the
-> guest.  In light of your explanation I now understand that "those" referred to
-> the rpmgs devices on the host.
+> Why add both allow_debug() and vmsa_encrypted?  I assume there are scenarios
+> where allow_debug() != vmsa_encrypted?  E.g. is there a debug mode for SEV-ES
+> where the VMSA is not encrypted, but KVM (ironically) can't intercept #DBs or
+> something?
+
+No, once the guest has had LAUNCH_UPDATE_VMSA run against the vCPUs, then
+the vCPU states are all encrypted. But that doesn't mean that debugging
+can't be done in the future.
+
 > 
-> In the above paragraph you write:
+> Alternatively, have you explored using a new VM_TYPE for SEV-ES guests?  With
+> a genericized vmsa_encrypted, that would allow something like the following
+> for scenarios where the VMSA is not (yet?) encrypted for an SEV-ES guest.  I
+> don't love bleeding the VM type into x86.c, but for one-off quirks like this
+> I think it'd be preferable to adding a kvm_x86_ops hook.
 > 
-> ... "once a guest has booted and established connections to any rpmsg "devices",
-> those send their namespace announcements back".  
+> int kvm_arch_vcpu_ioctl_set_guest_debug(...)
+> {
+> 	if (vcpu->arch.guest_state_protected ||
+> 	    kvm->arch.vm_type == KVM_X86_SEV_ES_VM)
+> 		return -EINVAL;
+> }
 > 
-> I'd like to unpack a few things about this sentence:
-> 
-> 1) In this context, how is a "connection" established between a guest and a host?
 
-That's handled by the VirtIO / VirtQueues in the case of virtio_rpmsg_bus.c but in 
-general, as mentioned in [2]
+I haven't explored that, I'll look into it.
 
-<quote>
-However, master does not consider the fact that if the remote is ready to handle 
-notification at this point in time.
-</quote>
-
-> 2) How does the guest now about the rpmsg devices it has made a connection to?
-
-Again, that's the same as with all other VirtIO / KVM / Qemu devices: in a common 
-Qemu case, it's the Qemu which emulates the hardware and registers those devices.
-
-> 3) Why is a namespace announcement needed at all when guests are aware of the
-> rpmsg devices instantiated on the host, and have already connected to them?
-
-It is indeed optional according to the protocol, but as described above, without 
-it the virtio_rpmsg_bus.c driver won't create rpmsg channels / devices, so, no 
-probing will take place.
-
-> > The host (the server, an 
-> > analogue of the application processor, IIUC) sends NS announcements to guests.
-> 
-> I think we have just found the source of the confusion - in the remoteproc world
-> the application processor receives name announcements, it doesn't send them.
-
-Interesting, well, we know now that both directions are possible, but I still 
-don't know whether all configurations are valid: only down, only up, none or both.
-
-Thanks
-Guennadi
-
-[1] https://nxpmicro.github.io/rpmsg-lite/
-[2] https://github.com/OpenAMP/open-amp/wiki/RPMsg-Messaging-Protocol
-
-> > > I saw your V7, something I will look into.  In the mean time I need to bring
-> > > your attention to this set [1] from Arnaud.  Please have a look as it will
-> > > impact your work.
-> > > 
-> > > https://patchwork.kernel.org/project/linux-remoteproc/list/?series=338335
-> > 
-> > Yes, I've had a look at that series, thanks for forwarding it to me. TBH I 
-> > don't quite understand some choices there, e.g. creating a separate driver and 
-> > then having to register devices just for the namespace announcement. I don't 
-> > think creating virtual devices is taken easily in Linux. But either way I 
-> > don't think our series conflict a lot, but I do hope that I can merge my 
-> > series first, he'd just have to switch to using the header, that I'm adding. 
-> > Hardly too many changes otherwise.
-> 
-> It is not the conflicts between the series that I wanted to highlight but the
-> fact that name service is in the process of becoming a driver on its own, and
-> with no dependence on the transport mechanism.
-> 
-> > 
-> > > > > And I don't see a server implementation per se...  It is more like a client
-> > > > > implementation since vhost_rpmsg_announce() uses the RESPONSE queue, which sends
-> > > > > messages from host to guest.
-> > > > > 
-> > > > > Perhaps it is my lack of familiarity with vhost terminology.
-> > > > > 
-> > > > > > 
-> > > > > > Signed-off-by: Guennadi Liakhovetski <guennadi.liakhovetski@linux.intel.com>
-> > > > > > ---
-> > > > > >  drivers/vhost/Kconfig       |   7 +
-> > > > > >  drivers/vhost/Makefile      |   3 +
-> > > > > >  drivers/vhost/rpmsg.c       | 373 ++++++++++++++++++++++++++++++++++++
-> > > > > >  drivers/vhost/vhost_rpmsg.h |  74 +++++++
-> > > > > >  4 files changed, 457 insertions(+)
-> > > > > >  create mode 100644 drivers/vhost/rpmsg.c
-> > > > > >  create mode 100644 drivers/vhost/vhost_rpmsg.h
-> > > > > > 
-> > > > > > diff --git a/drivers/vhost/Kconfig b/drivers/vhost/Kconfig
-> > > > > > index 587fbae06182..046b948fc411 100644
-> > > > > > --- a/drivers/vhost/Kconfig
-> > > > > > +++ b/drivers/vhost/Kconfig
-> > > > > > @@ -38,6 +38,13 @@ config VHOST_NET
-> > > > > >  	  To compile this driver as a module, choose M here: the module will
-> > > > > >  	  be called vhost_net.
-> > > > > >  
-> > > > > > +config VHOST_RPMSG
-> > > > > > +	tristate
-> > > > > > +	select VHOST
-> > > > > > +	help
-> > > > > > +	  Vhost RPMsg API allows vhost drivers to communicate with VirtIO
-> > > > > > +	  drivers, using the RPMsg over VirtIO protocol.
-> > > > > 
-> > > > > I had to assume vhost drivers are running on the host and virtIO drivers on the
-> > > > > guests.  This may be common knowledge for people familiar with vhosts but
-> > > > > certainly obscur for commoners  Having a help section that is clear on what is
-> > > > > happening would remove any ambiguity.
-> > > > 
-> > > > It is the terminology, yes, but you're right, the wording isn't very clear, will 
-> > > > improve.
-> > > > 
-> > > > > > +
-> > > > > >  config VHOST_SCSI
-> > > > > >  	tristate "VHOST_SCSI TCM fabric driver"
-> > > > > >  	depends on TARGET_CORE && EVENTFD
-> > > > > > diff --git a/drivers/vhost/Makefile b/drivers/vhost/Makefile
-> > > > > > index f3e1897cce85..9cf459d59f97 100644
-> > > > > > --- a/drivers/vhost/Makefile
-> > > > > > +++ b/drivers/vhost/Makefile
-> > > > > > @@ -2,6 +2,9 @@
-> > > > > >  obj-$(CONFIG_VHOST_NET) += vhost_net.o
-> > > > > >  vhost_net-y := net.o
-> > > > > >  
-> > > > > > +obj-$(CONFIG_VHOST_RPMSG) += vhost_rpmsg.o
-> > > > > > +vhost_rpmsg-y := rpmsg.o
-> > > > > > +
-> > > > > >  obj-$(CONFIG_VHOST_SCSI) += vhost_scsi.o
-> > > > > >  vhost_scsi-y := scsi.o
-> > > > > >  
-> > > > > > diff --git a/drivers/vhost/rpmsg.c b/drivers/vhost/rpmsg.c
-> > > > > > new file mode 100644
-> > > > > > index 000000000000..c26d7a4afc6d
-> > > > > > --- /dev/null
-> > > > > > +++ b/drivers/vhost/rpmsg.c
-> > > > > > @@ -0,0 +1,373 @@
-> > > > > > +// SPDX-License-Identifier: GPL-2.0-only
-> > > > > > +/*
-> > > > > > + * Copyright(c) 2020 Intel Corporation. All rights reserved.
-> > > > > > + *
-> > > > > > + * Author: Guennadi Liakhovetski <guennadi.liakhovetski@linux.intel.com>
-> > > > > > + *
-> > > > > > + * Vhost RPMsg VirtIO interface. It provides a set of functions to match the
-> > > > > > + * guest side RPMsg VirtIO API, provided by drivers/rpmsg/virtio_rpmsg_bus.c
-> > > > > 
-> > > > > Again, very confusing.  The changelog refers to a server implementation but to
-> > > > > me this refers to a client implementation, especially if rpmsg_recv_single() and
-> > > > > rpmsg_ns_cb() are used on the other side of the pipe.  
-> > > > 
-> > > > I think the above is correct. "Vhost" indicates, that this is running on the host. 
-> > > > "match the guest side" means, that you can use this API on the host and it is 
-> > > > designed to work together with the RPMsg VirtIO drivers running on guests, as 
-> > > > implemented *on guests* by virtio_rpmsg_bus.c. Would "to work together" be a better 
-> > > > description than "to match?"
-> > > 
-> > > Lets forget about this part now and concentrate on the above conversation.
-> > > Things will start to make sense at one point.
-> > 
-> > I've improved that description a bit, it was indeed rather clumsy.
-> 
-> Much appreciated - I'll take a look a V7 next week.
-> 
-> > 
-> > [snip]
-> > 
-> > > > > > diff --git a/drivers/vhost/vhost_rpmsg.h b/drivers/vhost/vhost_rpmsg.h
-> > > > > > new file mode 100644
-> > > > > > index 000000000000..30072cecb8a0
-> > > > > > --- /dev/null
-> > > > > > +++ b/drivers/vhost/vhost_rpmsg.h
-> > > > > > @@ -0,0 +1,74 @@
-> > > > > > +/* SPDX-License-Identifier: GPL-2.0 */
-> > > > > > +/*
-> > > > > > + * Copyright(c) 2020 Intel Corporation. All rights reserved.
-> > > > > > + *
-> > > > > > + * Author: Guennadi Liakhovetski <guennadi.liakhovetski@linux.intel.com>
-> > > > > > + */
-> > > > > > +
-> > > > > > +#ifndef VHOST_RPMSG_H
-> > > > > > +#define VHOST_RPMSG_H
-> > > > > > +
-> > > > > > +#include <linux/uio.h>
-> > > > > > +#include <linux/virtio_rpmsg.h>
-> > > > > > +
-> > > > > > +#include "vhost.h"
-> > > > > > +
-> > > > > > +/* RPMsg uses two VirtQueues: one for each direction */
-> > > > > > +enum {
-> > > > > > +	VIRTIO_RPMSG_RESPONSE,	/* RPMsg response (host->guest) buffers */
-> > > > > > +	VIRTIO_RPMSG_REQUEST,	/* RPMsg request (guest->host) buffers */
-> > > > > > +	/* Keep last */
-> > > > > > +	VIRTIO_RPMSG_NUM_OF_VQS,
-> > > > > > +};
-> > > > > > +
-> > > > > > +struct vhost_rpmsg_ept;
-> > > > > > +
-> > > > > > +struct vhost_rpmsg_iter {
-> > > > > > +	struct iov_iter iov_iter;
-> > > > > > +	struct rpmsg_hdr rhdr;
-> > > > > > +	struct vhost_virtqueue *vq;
-> > > > > > +	const struct vhost_rpmsg_ept *ept;
-> > > > > > +	int head;
-> > > > > > +	void *priv;
-> > > > > 
-> > > > > I don't see @priv being used anywhere.
-> > > > 
-> > > > That's logical: this is a field, private to the API users, so the core shouldn't 
-> > > > use it :-) It's used in later patches.
-> > > 
-> > > That is where structure documentation is useful.  I will let Michael decide what
-> > > he wants to do.
-> > 
-> > I can add some kerneldoc documentation there, no problem.
-> > 
-> > > Thanks for the feedback,
-> > 
-> > Thanks for your reviews! I'd very much like to close all the still open points 
-> > and merge the series ASAP.
-> > 
-> > Thanks
-> > Guennadi
-> > 
-> > > Mathieu
-> > > 
-> > > > 
-> > > > > 
-> > > > > > +};
-> > > > > > +
-> > > > > > +struct vhost_rpmsg {
-> > > > > > +	struct vhost_dev dev;
-> > > > > > +	struct vhost_virtqueue vq[VIRTIO_RPMSG_NUM_OF_VQS];
-> > > > > > +	struct vhost_virtqueue *vq_p[VIRTIO_RPMSG_NUM_OF_VQS];
-> > > > > > +	const struct vhost_rpmsg_ept *ept;
-> > > > > > +	unsigned int n_epts;
-> > > > > > +};
-> > > > > > +
-> > > > > > +struct vhost_rpmsg_ept {
-> > > > > > +	ssize_t (*read)(struct vhost_rpmsg *, struct vhost_rpmsg_iter *);
-> > > > > > +	ssize_t (*write)(struct vhost_rpmsg *, struct vhost_rpmsg_iter *);
-> > > > > > +	int addr;
-> > > > > > +};
-> > > > > > +
-> > > > > > +static inline size_t vhost_rpmsg_iter_len(const struct vhost_rpmsg_iter *iter)
-> > > > > > +{
-> > > > > > +	return iter->rhdr.len;
-> > > > > > +}
-> > > > > 
-> > > > > Again, I don't see where this is used.
-> > > > 
-> > > > This is exported API, it's used by users.
-> > > >
-> > > > > > +
-> > > > > > +#define VHOST_RPMSG_ITER(_vq, _src, _dst) {			\
-> > > > > > +	.rhdr = {						\
-> > > > > > +			.src = cpu_to_vhost32(_vq, _src),	\
-> > > > > > +			.dst = cpu_to_vhost32(_vq, _dst),	\
-> > > > > > +		},						\
-> > > > > > +	}
-> > > > > 
-> > > > > Same.
-> > > > 
-> > > > ditto.
-> > > > 
-> > > > Thanks
-> > > > Guennadi
-> > > > 
-> > > > > Thanks,
-> > > > > Mathieu
-> > > > > 
-> > > > > > +
-> > > > > > +void vhost_rpmsg_init(struct vhost_rpmsg *vr, const struct vhost_rpmsg_ept *ept,
-> > > > > > +		      unsigned int n_epts);
-> > > > > > +void vhost_rpmsg_destroy(struct vhost_rpmsg *vr);
-> > > > > > +int vhost_rpmsg_ns_announce(struct vhost_rpmsg *vr, const char *name,
-> > > > > > +			    unsigned int src);
-> > > > > > +int vhost_rpmsg_start_lock(struct vhost_rpmsg *vr,
-> > > > > > +			   struct vhost_rpmsg_iter *iter,
-> > > > > > +			   unsigned int qid, ssize_t len);
-> > > > > > +size_t vhost_rpmsg_copy(struct vhost_rpmsg *vr, struct vhost_rpmsg_iter *iter,
-> > > > > > +			void *data, size_t size);
-> > > > > > +int vhost_rpmsg_finish_unlock(struct vhost_rpmsg *vr,
-> > > > > > +			      struct vhost_rpmsg_iter *iter);
-> > > > > > +
-> > > > > > +#endif
-> > > > > > -- 
-> > > > > > 2.28.0
-> > > > > > 
+Thanks,
+Tom
