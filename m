@@ -2,31 +2,32 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BC31526B4BE
-	for <lists+kvm@lfdr.de>; Wed, 16 Sep 2020 01:31:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D24CF26B4BA
+	for <lists+kvm@lfdr.de>; Wed, 16 Sep 2020 01:30:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727416AbgIOXa5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 15 Sep 2020 19:30:57 -0400
-Received: from mga09.intel.com ([134.134.136.24]:39780 "EHLO mga09.intel.com"
+        id S1727237AbgIOXab (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 15 Sep 2020 19:30:31 -0400
+Received: from mga18.intel.com ([134.134.136.126]:59908 "EHLO mga18.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726818AbgIOX3N (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 15 Sep 2020 19:29:13 -0400
-IronPort-SDR: 1ho4d7MImUHCoKcIFh9Z7dDVeeZMfVkwrdpOsaVUQ+Ac+q5tcoC68SL1UAiJnX1DkB4asPfD/Z
- 8nANsTxNbE2g==
-X-IronPort-AV: E=McAfee;i="6000,8403,9745"; a="160300249"
+        id S1727232AbgIOX31 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 15 Sep 2020 19:29:27 -0400
+IronPort-SDR: 6WUEQ+pPJrTJW16WmztSGy3dbfBg2+goEAFsNm+KF2PDuLZGt5kTxXhHkjSu0HJ5UjkqFmNxNd
+ gPBZtE9wVY2A==
+X-IronPort-AV: E=McAfee;i="6000,8403,9745"; a="147120160"
 X-IronPort-AV: E=Sophos;i="5.76,430,1592895600"; 
-   d="scan'208";a="160300249"
+   d="scan'208";a="147120160"
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Sep 2020 16:29:12 -0700
-IronPort-SDR: k0U9QmM+u6hubZU49zqqGjcsOs5mlYLD6h9iOBwGCj30m+NZRwHRy5OAncHd1aTqWcjta4dYYv
- 1MLSN0h8fZVQ==
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Sep 2020 16:29:26 -0700
+IronPort-SDR: EAu9yNq+VH45IieXXe+oaFmwbky6X7Vd9Y6W2Fb1GLbSz/u9fj/tlipxM08N6PvN9cFwKCRf9e
+ 1pKj0B6TfO1A==
 X-IronPort-AV: E=Sophos;i="5.76,430,1592895600"; 
-   d="scan'208";a="343691342"
+   d="scan'208";a="319642576"
 Received: from djiang5-desk3.ch.intel.com ([143.182.136.137])
-  by fmsmga003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Sep 2020 16:29:11 -0700
-Subject: [PATCH v3 14/18] dmaengine: idxd: add new wq state for mdev
+  by orsmga002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Sep 2020 16:29:24 -0700
+Subject: [PATCH v3 16/18] dmaengine: idxd: add ABI documentation for
+ mediated device support
 From:   Dave Jiang <dave.jiang@intel.com>
 To:     vkoul@kernel.org, megha.dey@intel.com, maz@kernel.org,
         bhelgaas@google.com, tglx@linutronix.de,
@@ -40,8 +41,8 @@ To:     vkoul@kernel.org, megha.dey@intel.com, maz@kernel.org,
         pbonzini@redhat.com, samuel.ortiz@intel.com, mona.hossain@intel.com
 Cc:     dmaengine@vger.kernel.org, linux-kernel@vger.kernel.org,
         x86@kernel.org, linux-pci@vger.kernel.org, kvm@vger.kernel.org
-Date:   Tue, 15 Sep 2020 16:29:11 -0700
-Message-ID: <160021255105.67751.1103109119558046722.stgit@djiang5-desk3.ch.intel.com>
+Date:   Tue, 15 Sep 2020 16:29:24 -0700
+Message-ID: <160021256431.67751.2268297306094926564.stgit@djiang5-desk3.ch.intel.com>
 In-Reply-To: <160021207013.67751.8220471499908137671.stgit@djiang5-desk3.ch.intel.com>
 References: <160021207013.67751.8220471499908137671.stgit@djiang5-desk3.ch.intel.com>
 User-Agent: StGit/unknown-version
@@ -53,60 +54,44 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-When a dedicated wq is enabled as mdev, we must disable the wq on the
-device in order to program the pasid to the wq. Introduce a wq state
-IDXD_WQ_LOCKED that is software state only in order to prevent the user
-from modifying the configuration while mdev wq is in this state. While
-in this state, the wq is not in DISABLED state and will prevent any
-modifications to the configuration. It is also not in the ENABLED state
-and therefore prevents any actions allowed in the ENABLED state.
+From: Jing Lin <jing.lin@intel.com>
 
+Add the sysfs attribute bits in ABI/stable for mediated device and guest
+support.
+
+Signed-off-by: Jing Lin <jing.lin@intel.com>
 Signed-off-by: Dave Jiang <dave.jiang@intel.com>
 ---
- drivers/dma/idxd/idxd.h  |    1 +
- drivers/dma/idxd/mdev.c  |    4 +++-
- drivers/dma/idxd/sysfs.c |    2 ++
- 3 files changed, 6 insertions(+), 1 deletion(-)
+ Documentation/ABI/stable/sysfs-driver-dma-idxd |   11 +++++++++--
+ 1 file changed, 9 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/dma/idxd/idxd.h b/drivers/dma/idxd/idxd.h
-index 23287f8fd19a..f67c0036f968 100644
---- a/drivers/dma/idxd/idxd.h
-+++ b/drivers/dma/idxd/idxd.h
-@@ -55,6 +55,7 @@ struct idxd_group {
- enum idxd_wq_state {
- 	IDXD_WQ_DISABLED = 0,
- 	IDXD_WQ_ENABLED,
-+	IDXD_WQ_LOCKED,
- };
+diff --git a/Documentation/ABI/stable/sysfs-driver-dma-idxd b/Documentation/ABI/stable/sysfs-driver-dma-idxd
+index b44183880935..6bb925b55027 100644
+--- a/Documentation/ABI/stable/sysfs-driver-dma-idxd
++++ b/Documentation/ABI/stable/sysfs-driver-dma-idxd
+@@ -77,6 +77,12 @@ Contact:        dmaengine@vger.kernel.org
+ Description:    The operation capability bit mask specify the operation types
+ 		supported by the this device.
  
- enum idxd_wq_flag {
-diff --git a/drivers/dma/idxd/mdev.c b/drivers/dma/idxd/mdev.c
-index 2d3ff1a50d39..ea07e7c1ba31 100644
---- a/drivers/dma/idxd/mdev.c
-+++ b/drivers/dma/idxd/mdev.c
-@@ -72,8 +72,10 @@ static void idxd_vdcm_init(struct vdcm_idxd *vidxd)
++What:           /sys/bus/dsa/devices/dsa<m>/ims_size
++Date:           Sep 8, 2020
++KernelVersion:  5.10.0
++Contact:        dmaengine@vger.kernel.org
++Description:	Number of entries in the interrupt message storage table.
++
+ What:           /sys/bus/dsa/devices/dsa<m>/state
+ Date:           Oct 25, 2019
+ KernelVersion:  5.6.0
+@@ -139,8 +145,9 @@ Date:           Oct 25, 2019
+ KernelVersion:  5.6.0
+ Contact:        dmaengine@vger.kernel.org
+ Description:    The type of this work queue, it can be "kernel" type for work
+-		queue usages in the kernel space or "user" type for work queue
+-		usages by applications in user space.
++		queue usages in the kernel space, "user" type for work queue
++		usages by applications in user space, or "mdev" type for
++		VFIO mediated devices.
  
- 	vidxd_mmio_init(vidxd);
- 
--	if (wq_dedicated(wq) && wq->state == IDXD_WQ_ENABLED)
-+	if (wq_dedicated(wq) && wq->state == IDXD_WQ_ENABLED) {
- 		idxd_wq_disable(wq, NULL);
-+		wq->state = IDXD_WQ_LOCKED;
-+	}
- }
- 
- static void idxd_vdcm_release(struct mdev_device *mdev)
-diff --git a/drivers/dma/idxd/sysfs.c b/drivers/dma/idxd/sysfs.c
-index 6eb67f744c8e..4cc05392130c 100644
---- a/drivers/dma/idxd/sysfs.c
-+++ b/drivers/dma/idxd/sysfs.c
-@@ -797,6 +797,8 @@ static ssize_t wq_state_show(struct device *dev,
- 		return sprintf(buf, "disabled\n");
- 	case IDXD_WQ_ENABLED:
- 		return sprintf(buf, "enabled\n");
-+	case IDXD_WQ_LOCKED:
-+		return sprintf(buf, "locked\n");
- 	}
- 
- 	return sprintf(buf, "unknown\n");
+ What:           /sys/bus/dsa/devices/wq<m>.<n>/cdev_minor
+ Date:           Oct 25, 2019
 
