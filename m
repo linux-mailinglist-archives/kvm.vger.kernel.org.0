@@ -2,31 +2,31 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7013926B0CE
-	for <lists+kvm@lfdr.de>; Wed, 16 Sep 2020 00:19:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 61F0026B090
+	for <lists+kvm@lfdr.de>; Wed, 16 Sep 2020 00:14:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727935AbgIOWTb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 15 Sep 2020 18:19:31 -0400
-Received: from mga09.intel.com ([134.134.136.24]:63987 "EHLO mga09.intel.com"
+        id S1727971AbgIOWN5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 15 Sep 2020 18:13:57 -0400
+Received: from mga01.intel.com ([192.55.52.88]:36764 "EHLO mga01.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727699AbgIOQ3p (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 15 Sep 2020 12:29:45 -0400
-IronPort-SDR: 8mF6ouKV9hUzyp1Iq1vmJaJsDYQj7WAdYm+BzRur/4557EAx8CKAHa7apmX+spCOnZeqSAKbBw
- 1Ryw9GJtIfRw==
-X-IronPort-AV: E=McAfee;i="6000,8403,9745"; a="160233022"
+        id S1727674AbgIOQiy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 15 Sep 2020 12:38:54 -0400
+IronPort-SDR: 6a2yjuiUcEA9QTSAJMqGvtOw55gSEu5VbyWrbrCyCIGK205wHSfrjHW1LTfQ3PEheZTRTU9Cbt
+ S7djqP73aKBw==
+X-IronPort-AV: E=McAfee;i="6000,8403,9745"; a="177366563"
 X-IronPort-AV: E=Sophos;i="5.76,430,1592895600"; 
-   d="scan'208";a="160233022"
+   d="scan'208";a="177366563"
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Sep 2020 09:28:39 -0700
-IronPort-SDR: jhEI87l6+toBT3WeaitOl5cWTBPVuhw+9DaJ9DgksUoPIT6mJKLJLifxToZk5mICDJackTEutA
- TwoGKt2H8hxA==
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Sep 2020 09:33:44 -0700
+IronPort-SDR: 7k9HOsKnBIpD230s+kK4ULUCDbqylfwCiah/poMJ/8PFsSu0IbQrzbtuIbQzFV8f+C1S7q2b3Y
+ 66JM4ZgWKqVw==
 X-IronPort-AV: E=Sophos;i="5.76,430,1592895600"; 
-   d="scan'208";a="482889995"
+   d="scan'208";a="288054778"
 Received: from sjchrist-ice.jf.intel.com (HELO sjchrist-ice) ([10.54.31.34])
-  by orsmga005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Sep 2020 09:28:38 -0700
-Date:   Tue, 15 Sep 2020 09:28:37 -0700
+  by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Sep 2020 09:33:43 -0700
+Date:   Tue, 15 Sep 2020 09:33:42 -0700
 From:   Sean Christopherson <sean.j.christopherson@intel.com>
 To:     Tom Lendacky <thomas.lendacky@amd.com>
 Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org, x86@kernel.org,
@@ -38,142 +38,45 @@ Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org, x86@kernel.org,
         Borislav Petkov <bp@alien8.de>, Ingo Molnar <mingo@redhat.com>,
         Thomas Gleixner <tglx@linutronix.de>,
         Brijesh Singh <brijesh.singh@amd.com>
-Subject: Re: [RFC PATCH 05/35] KVM: SVM: Add initial support for SEV-ES GHCB
- access to KVM
-Message-ID: <20200915162836.GA8420@sjchrist-ice>
+Subject: Re: [RFC PATCH 25/35] KVM: x86: Update __get_sregs() / __set_sregs()
+ to support SEV-ES
+Message-ID: <20200915163342.GC8420@sjchrist-ice>
 References: <cover.1600114548.git.thomas.lendacky@amd.com>
- <9e52807342691ff0d4b116af6e147021c61a2d71.1600114548.git.thomas.lendacky@amd.com>
- <20200914205801.GA7084@sjchrist-ice>
- <ba417215-530d-98df-5ceb-35b10ee09243@amd.com>
+ <e08f56496a52a3a974310fbe05bb19100fd6c1d8.1600114548.git.thomas.lendacky@amd.com>
+ <20200914213708.GC7192@sjchrist-ice>
+ <7fa6b074-6a62-3f8e-f047-c63851ebf7c9@amd.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ba417215-530d-98df-5ceb-35b10ee09243@amd.com>
+In-Reply-To: <7fa6b074-6a62-3f8e-f047-c63851ebf7c9@amd.com>
 User-Agent: Mutt/1.9.4 (2018-02-28)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Sep 15, 2020 at 08:24:22AM -0500, Tom Lendacky wrote:
-> On 9/14/20 3:58 PM, Sean Christopherson wrote:
-> >> @@ -79,6 +88,9 @@ static inline void kvm_register_write(struct kvm_vcpu *vcpu, int reg,
-> >>  	if (WARN_ON_ONCE((unsigned int)reg >= NR_VCPU_REGS))
-> >>  		return;
-> >>  
-> >> +	if (kvm_x86_ops.reg_write_override)
-> >> +		kvm_x86_ops.reg_write_override(vcpu, reg, val);
+On Tue, Sep 15, 2020 at 09:19:46AM -0500, Tom Lendacky wrote:
+> On 9/14/20 4:37 PM, Sean Christopherson wrote:
+> > On Mon, Sep 14, 2020 at 03:15:39PM -0500, Tom Lendacky wrote:
+> >> From: Tom Lendacky <thomas.lendacky@amd.com>
+> >>
+> >> Since many of the registers used by the SEV-ES are encrypted and cannot
+> >> be read or written, adjust the __get_sregs() / __set_sregs() to only get
+> >> or set the registers being tracked (efer, cr0, cr4 and cr8) once the VMSA
+> >> is encrypted.
 > > 
-> > 
-> > There has to be a more optimal approach for propagating registers between
-> > vcpu->arch.regs and the VMSA than adding a per-GPR hook.  Why not simply
-> > copy the entire set of registers to/from the VMSA on every exit and entry?
-> > AFAICT, valid_bits is only used in the read path, and KVM doesn't do anything
-> > sophistated when it hits a !valid_bits reads.
+> > Is there an actual use case for writing said registers after the VMSA is
+> > encrypted?  Assuming there's a separate "debug mode" and live migration has
+> > special logic, can KVM simply reject the ioctl() if guest state is protected?
 > 
-> That would probably be ok. And actually, the code might be able to just
-> check the GHCB valid bitmap for valid regs on exit, copy them and then
-> clear the bitmap. The write code could check if vmsa_encrypted is set and
-> then set a "valid" bit for the reg that could be used to set regs on entry.
-> 
-> I'm not sure if turning kvm_vcpu_arch.regs into a struct and adding a
-> valid bit would be overkill or not.
+> Yeah, I originally had it that way but one of the folks looking at live
+> migration for SEV-ES thought it would be easier given the way Qemu does
+> things. But I think it's easy enough to batch the tracking registers into
+> the VMSA state that is being transferred during live migration. Let me
+> check that out and likely the SET ioctl() could just skip all the regs.
 
-KVM already has space in regs_avail and regs_dirty for GPRs, they're just not
-used by the get/set helpers because they're always loaded/stored for both SVM
-and VMX.
-
-I assume nothing will break if KVM "writes" random GPRs in the VMSA?  I can't
-see how the guest would achieve any level of security if it wantonly consumes
-GPRs, i.e. it's the guest's responsibility to consume only the relevant GPRs.
-
-If that holds true, than avoiding the copying isn't functionally necessary, and
-is really just a performance optimization.  One potentially crazy idea would be
-to change vcpu->arch.regs to be a pointer (defaults a __regs array), and then
-have SEV-ES switch it to point directly at the VMSA array (I think the layout
-is identical for x86-64?).
-
-> >> @@ -4012,6 +4052,99 @@ static bool svm_apic_init_signal_blocked(struct kvm_vcpu *vcpu)
-> >>  		   (svm->vmcb->control.intercept & (1ULL << INTERCEPT_INIT));
-> >>  }
-> >>  
-> >> +/*
-> >> + * These return values represent the offset in quad words within the VM save
-> >> + * area. This allows them to be accessed by casting the save area to a u64
-> >> + * array.
-> >> + */
-> >> +#define VMSA_REG_ENTRY(_field)	 (offsetof(struct vmcb_save_area, _field) / sizeof(u64))
-> >> +#define VMSA_REG_UNDEF		 VMSA_REG_ENTRY(valid_bitmap)
-> >> +static inline unsigned int vcpu_to_vmsa_entry(enum kvm_reg reg)
-> >> +{
-> >> +	switch (reg) {
-> >> +	case VCPU_REGS_RAX:	return VMSA_REG_ENTRY(rax);
-> >> +	case VCPU_REGS_RBX:	return VMSA_REG_ENTRY(rbx);
-> >> +	case VCPU_REGS_RCX:	return VMSA_REG_ENTRY(rcx);
-> >> +	case VCPU_REGS_RDX:	return VMSA_REG_ENTRY(rdx);
-> >> +	case VCPU_REGS_RSP:	return VMSA_REG_ENTRY(rsp);
-> >> +	case VCPU_REGS_RBP:	return VMSA_REG_ENTRY(rbp);
-> >> +	case VCPU_REGS_RSI:	return VMSA_REG_ENTRY(rsi);
-> >> +	case VCPU_REGS_RDI:	return VMSA_REG_ENTRY(rdi);
-> >> +#ifdef CONFIG_X86_64
-
-Is KVM SEV-ES going to support 32-bit builds?
-
-> >> +	case VCPU_REGS_R8:	return VMSA_REG_ENTRY(r8);
-> >> +	case VCPU_REGS_R9:	return VMSA_REG_ENTRY(r9);
-> >> +	case VCPU_REGS_R10:	return VMSA_REG_ENTRY(r10);
-> >> +	case VCPU_REGS_R11:	return VMSA_REG_ENTRY(r11);
-> >> +	case VCPU_REGS_R12:	return VMSA_REG_ENTRY(r12);
-> >> +	case VCPU_REGS_R13:	return VMSA_REG_ENTRY(r13);
-> >> +	case VCPU_REGS_R14:	return VMSA_REG_ENTRY(r14);
-> >> +	case VCPU_REGS_R15:	return VMSA_REG_ENTRY(r15);
-> >> +#endif
-> >> +	case VCPU_REGS_RIP:	return VMSA_REG_ENTRY(rip);
-> >> +	default:
-> >> +		WARN_ONCE(1, "unsupported VCPU to VMSA register conversion\n");
-> >> +		return VMSA_REG_UNDEF;
-> >> +	}
-> >> +}
-> >> +
-> >> +/* For SEV-ES guests, populate the vCPU register from the appropriate VMSA/GHCB */
-> >> +static void svm_reg_read_override(struct kvm_vcpu *vcpu, enum kvm_reg reg)
-> >> +{
-> >> +	struct vmcb_save_area *vmsa;
-> >> +	struct vcpu_svm *svm;
-> >> +	unsigned int entry;
-> >> +	unsigned long val;
-> >> +	u64 *vmsa_reg;
-> >> +
-> >> +	if (!sev_es_guest(vcpu->kvm))
-> >> +		return;
-> >> +
-> >> +	entry = vcpu_to_vmsa_entry(reg);
-> >> +	if (entry == VMSA_REG_UNDEF)
-> >> +		return;
-> >> +
-> >> +	svm = to_svm(vcpu);
-> >> +	vmsa = get_vmsa(svm);
-> >> +	vmsa_reg = (u64 *)vmsa;
-> >> +	val = (unsigned long)vmsa_reg[entry];
-> >> +
-> >> +	/* If a GHCB is mapped, check the bitmap of valid entries */
-> >> +	if (svm->ghcb) {
-> >> +		if (!test_bit(entry, (unsigned long *)vmsa->valid_bitmap))
-> >> +			val = 0;
-> > 
-> > Is KVM relying on this being 0?  Would it make sense to stuff something like
-> > 0xaaaa... or 0xdeadbeefdeadbeef so that consumption of bogus data is more
-> > noticeable?
-> 
-> No, KVM isn't relying on this being 0. I thought about using something
-> other than 0 here, but settled on just using 0. I'm open to changing that,
-> though. I'm not sure if there's an easy way to short-circuit the intercept
-> and respond back with an error at this point, that would be optimal.
-
-Ya, responding with an error would be ideal.  At this point, we're taking the
-same lazy approach for TDX and effectively consuming garbage if the guest
-requests emulation but doesn't expose the necessary GPRs.  That being said,
-TDX's guest/host ABI is quite rigid, so all the "is this register valid"
-checks could be hardcoded into the higher level "emulation" flows.
-
-Would that also be an option for SEV-ES?
+Hmm, that would be ideal.  How are the tracked registers validated when they're
+loaded at the destination?  It seems odd/dangerous that KVM would have full
+control over efer/cr0/cr4/cr8.  I.e. why is KVM even responsibile for migrating
+that information, e.g. as opposed to migrating an opaque blob that contains
+encrypted versions of those registers?
