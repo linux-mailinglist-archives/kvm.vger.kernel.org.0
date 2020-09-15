@@ -2,120 +2,111 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3FAA626A260
-	for <lists+kvm@lfdr.de>; Tue, 15 Sep 2020 11:38:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B51B426A27A
+	for <lists+kvm@lfdr.de>; Tue, 15 Sep 2020 11:44:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726216AbgIOJiR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 15 Sep 2020 05:38:17 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:58040 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726102AbgIOJiP (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 15 Sep 2020 05:38:15 -0400
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 08F9V8DN078082
-        for <kvm@vger.kernel.org>; Tue, 15 Sep 2020 05:38:14 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : in-reply-to : references : date : message-id : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=gB69IllkKxGIkisaICkNb7Vyio5d6xAjFt+SsmQWeNE=;
- b=Ft2RoYs/kiLGIq+g0rKE8eZwwxJsmKqCtkfsFBhCjNEt99GFMEiV3M9vAUBoua1pdZ4j
- 0UeEq8VefgpWMjkBT9MCHwdL1hmGBD9hylnfHe5VfoAmf4i8v/SOn1GPXYl2qxXncALT
- QJ+uk/wflfT4binWPZbHWHkgEXwE4p3svTb6RUHX851bLzf2vWh/0gbJu1qyFoiaMnQS
- PMXXk/rUwkRoPpOLY3CVxHCV2uhxTDg+X9sy6ehzPv/DZQYzyqn4FIlVwD5TN2PRy8CK
- xkJaTgRlD05f29UNBazPBMZ59tbUlaiB4QF50vTKsDnB1+8UyCrap++Ua7X8DCcbZPos mQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 33jttagjdu-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Tue, 15 Sep 2020 05:38:13 -0400
-Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 08F9V33H077474
-        for <kvm@vger.kernel.org>; Tue, 15 Sep 2020 05:38:13 -0400
-Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com [159.122.73.71])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 33jttagjd0-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 15 Sep 2020 05:38:13 -0400
-Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
-        by ppma02fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 08F9YUF0013503;
-        Tue, 15 Sep 2020 09:38:11 GMT
-Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
-        by ppma02fra.de.ibm.com with ESMTP id 33gny81rrq-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 15 Sep 2020 09:38:11 +0000
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
-        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 08F9c8VR13566268
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 15 Sep 2020 09:38:08 GMT
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 50C28AE053;
-        Tue, 15 Sep 2020 09:38:08 +0000 (GMT)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id E1463AE058;
-        Tue, 15 Sep 2020 09:38:07 +0000 (GMT)
-Received: from marcibm (unknown [9.145.87.76])
-        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
-        Tue, 15 Sep 2020 09:38:07 +0000 (GMT)
-From:   Marc Hartmayer <mhartmay@linux.ibm.com>
-To:     Marc Hartmayer <mhartmay@linux.ibm.com>, kvm@vger.kernel.org
-Cc:     Thomas Huth <thuth@redhat.com>,
-        David Hildenbrand <david@redhat.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Andrew Jones <drjones@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [kvm-unit-tests PATCH v2 0/2] Use same test names in the
- default and the TAP13 output format
-In-Reply-To: <20200825102036.17232-1-mhartmay@linux.ibm.com>
-References: <20200825102036.17232-1-mhartmay@linux.ibm.com>
-Date:   Tue, 15 Sep 2020 11:38:07 +0200
-Message-ID: <87bli7tm68.fsf@linux.ibm.com>
+        id S1726470AbgIOJoU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 15 Sep 2020 05:44:20 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:33868 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726157AbgIOJoP (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 15 Sep 2020 05:44:15 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1600163053;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=lbu0S0cU/fsoJ+GJyj5DcLjuEJa0U3NyiPwssHnVX5Q=;
+        b=MjOfwcCow00rUxLyBzocmXQDf+5S+tYyc80cbaJc2yiN6/oZWaf+5l7nYo6n00qEWsPC8D
+        +Kc20QPUWj71Kpl75oJ2UM1Rq8GFieL7Wrft5m2wnAnAxI0gGTwBweAx9ceRvEwjwG8SWq
+        u3sxavn7uxfPj5OhOYWtZWseptFws6M=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-570-OpyvX78FNlm8c7F0Zm2C2Q-1; Tue, 15 Sep 2020 05:44:12 -0400
+X-MC-Unique: OpyvX78FNlm8c7F0Zm2C2Q-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D996218B9ECB;
+        Tue, 15 Sep 2020 09:44:10 +0000 (UTC)
+Received: from gondolin (ovpn-113-4.ams2.redhat.com [10.36.113.4])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id C667E60BE5;
+        Tue, 15 Sep 2020 09:44:03 +0000 (UTC)
+Date:   Tue, 15 Sep 2020 11:44:01 +0200
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Matthew Rosato <mjrosato@linux.ibm.com>
+Cc:     alex.williamson@redhat.com, pmorel@linux.ibm.com,
+        schnelle@linux.ibm.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2] vfio iommu: Add dma available capability
+Message-ID: <20200915114401.4db5e009.cohuck@redhat.com>
+In-Reply-To: <1600122331-12181-2-git-send-email-mjrosato@linux.ibm.com>
+References: <1600122331-12181-1-git-send-email-mjrosato@linux.ibm.com>
+        <1600122331-12181-2-git-send-email-mjrosato@linux.ibm.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
- definitions=2020-09-15_05:2020-09-15,2020-09-15 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- clxscore=1011 spamscore=0 priorityscore=1501 mlxscore=0 bulkscore=0
- impostorscore=0 malwarescore=0 adultscore=0 mlxlogscore=999 suspectscore=0
- phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2006250000 definitions=main-2009150084
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Aug 25, 2020 at 12:20 PM +0200, Marc Hartmayer <mhartmay@linux.ibm.=
-com> wrote:
-> For everybody's convenience there is a branch:
-> https://gitlab.com/mhartmay/kvm-unit-tests/-/tree/tap_v2
->
-> Changelog:
-> v1 -> v2:
->  + added r-b's to patch 1
->  + patch 2:
->   - I've not added Andrew's r-b since I've worked in the comment from
->     Janosch (don't drop the first prefix)
->
-> Marc Hartmayer (2):
->   runtime.bash: remove outdated comment
->   Use same test names in the default and the TAP13 output format
->
->  run_tests.sh         | 15 +++++++++------
->  scripts/runtime.bash |  9 +++------
->  2 files changed, 12 insertions(+), 12 deletions(-)
->
-> --=20
-> 2.25.4
->
+On Mon, 14 Sep 2020 18:25:31 -0400
+Matthew Rosato <mjrosato@linux.ibm.com> wrote:
 
-Polite ping :) How should we proceed further?
+> Commit 492855939bdb ("vfio/type1: Limit DMA mappings per container")
+> added the ability to limit the number of memory backed DMA mappings.
+> However on s390x, when lazy mapping is in use, we use a very large
+> number of concurrent mappings.  Let's provide the current allowable
+> number of DMA mappings to userspace via the IOMMU info chain so that
+> userspace can take appropriate mitigation.
+> 
+> Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
+> ---
+>  drivers/vfio/vfio_iommu_type1.c | 17 +++++++++++++++++
+>  include/uapi/linux/vfio.h       | 16 ++++++++++++++++
+>  2 files changed, 33 insertions(+)
 
---=20
-Kind regards / Beste Gr=C3=BC=C3=9Fe
-   Marc Hartmayer
+(...)
 
-IBM Deutschland Research & Development GmbH
-Vorsitzender des Aufsichtsrats: Gregor Pillen=20
-Gesch=C3=A4ftsf=C3=BChrung: Dirk Wittkopp
-Sitz der Gesellschaft: B=C3=B6blingen
-Registergericht: Amtsgericht Stuttgart, HRB 243294
+> diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
+> index 9204705..a8cc4a5 100644
+> --- a/include/uapi/linux/vfio.h
+> +++ b/include/uapi/linux/vfio.h
+> @@ -1039,6 +1039,22 @@ struct vfio_iommu_type1_info_cap_migration {
+>  	__u64	max_dirty_bitmap_size;		/* in bytes */
+>  };
+>  
+> +/*
+> + * The DMA available capability allows to report the current number of
+> + * simultaneously outstanding DMA mappings that are allowed.
+> + *
+> + * The structures below define version 1 of this capability.
+
+"The structure below defines..." ?
+
+> + *
+> + * max: specifies the maximum number of outstanding DMA mappings allowed.
+
+I think you forgot to tweak that one:
+
+"avail: specifies the current number of outstanding DMA mappings allowed."
+
+?
+
+> + */
+> +#define VFIO_IOMMU_TYPE1_INFO_DMA_AVAIL 3
+> +
+> +struct vfio_iommu_type1_info_dma_avail {
+> +	struct	vfio_info_cap_header header;
+> +	__u32	avail;
+> +};
+> +
+> +
+>  #define VFIO_IOMMU_GET_INFO _IO(VFIO_TYPE, VFIO_BASE + 12)
+>  
+>  /**
+
