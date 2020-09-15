@@ -2,43 +2,44 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id EBF7426A6AA
-	for <lists+kvm@lfdr.de>; Tue, 15 Sep 2020 16:01:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5364E26A7A8
+	for <lists+kvm@lfdr.de>; Tue, 15 Sep 2020 16:59:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726772AbgION7q (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 15 Sep 2020 09:59:46 -0400
-Received: from mail-dm6nam08on2053.outbound.protection.outlook.com ([40.107.102.53]:8993
-        "EHLO NAM04-DM6-obe.outbound.protection.outlook.com"
+        id S1727320AbgIOO65 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 15 Sep 2020 10:58:57 -0400
+Received: from mail-dm6nam12on2060.outbound.protection.outlook.com ([40.107.243.60]:49793
+        "EHLO NAM12-DM6-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726463AbgIONyk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 15 Sep 2020 09:54:40 -0400
+        id S1727333AbgIOO5a (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 15 Sep 2020 10:57:30 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=L5LXm4Rn4YbhZCK+p9J+VJwFqui0KeXJ2IX/LI7VqZfWF90cFS0OzPMLGQ2D/LcP495sUovA6ftP9HemXUR8dMyT5R7rG7x2GQqgZiI4VInOdXSPz0q0UjZFdbwK2QN6VvdTMjQZ6vgcQrO37XkYn0h8J0m9bQsbc3i2/405njeHEXxnxl9rNDBDXqMUyyJ/Xj5CS1wJ3K7hm7L63wiM4HYUPJYFIGAH1s4/ydC6bVnAgAAtLdk9lgmsw4p2z8fSn9PlDCSj/VG/CeJVexNDKqKX+vQjYt5zbXqZA4HnvFYD0lxm9CZy22vHmES8T569ebkH3S8oXTVTQ7r+ONEAAg==
+ b=hkcYW+JO21IYZ34okPqE+55d7YhvLrlPDuyfTgOnclg4X6xHtkx1BT2peZEIPvcHFrNbjp9sSU4LG3Ju/CjCXO0+pXVEZCLjEa7OojS5xhWHdDRRfoxLrJxqLPAERML8sK6jiQo2DzfGKJDFaGi83S5MNwwPQIQomDvdhyz2BDlKZurqQfsAM5IDqMxA6769yveagBFwZErDtcYzo5QyZNsUcS4lIkdE5u0yNc2juY7tqmDdp9nZTBO+9PeO4WTOg4RY4rM0mIPMuCVNHBf0vguKLKnm2FidQerUZ3EHxd9zM7Xe1IDAGdjw8xCk7Z05xiaFwRQkyRJFmYW7X8Xrew==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=GGF/fWX15NAQdjY1qAXjVsARwO5GPINAaDfAUelBiN4=;
- b=auArcioLqDJUOlkn62Bzg81tD8DKzfydrxeVK533eWoMgHU7Ktp3D48sbvDR6ymRrTz7PZZKXUjppA9Xidu+SDCRs+vj+dnwpFXCaqa+oEYyibw8i6ou9x2HtF4Mc0tq6inVLzbpiaoDXuSHPo0jGC/+Ra4xqODpQ3zmGjgyDS0MSrFD9odsVHxcmw5iZWHEMThEkXRpRsVA7xW1Um6wHC0ruEQLetYuDBSnA68RRdJaljFVCGml0o61Jg1j+6GVuOrTDpYgjljOKJzdi0QtB2jRGqdJ1C+HTQnbwJNn0uywyMAMAZT91YCuRLttT/z8+VOOzgqU0s9qF0skAIBYeg==
+ bh=DZ2uktH0f4mujy/xXGHLvz66vP1ZasbHRPoGlx2723Y=;
+ b=FUAVjn7XMdgIXxanbSwwkQwAOKU47xx1/GAfkSXU6KZlRf7f8EU9/bS+okRNUZzSRNuUnaJBU3F4guTLzdpg16hxh0zZfkbsCjUTcJbfIRt0D5qfS3TgIPWSz0l1Pm8QpDj/bm0g7tLScnzOWQ5cVjZPwY+x4yxlGzni1DNAeslOXMBymEH1nHWop4Hjd3bOEsOSZMskTfZsB2PB7nnrkrPaEXWqYwhRU+Wc4h09yHSvNmJiw3f13l+oq1BSKkYC9L8paJwWVhVpVm0LL/nkxxk59VLTkY2PUmXW/6PfSW3DIwxcrRSsh41xg5s+AmnsATJMyKokqteTGqtQjI55fg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
  header.d=amd.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=GGF/fWX15NAQdjY1qAXjVsARwO5GPINAaDfAUelBiN4=;
- b=OupnzTjpXDzK9zCMsojslVZ2yIhs1pir+lOuc4Ab7MhuJF2N+n54UgPrCB2GVe5r4PnYxIlMU65L2DojtnrCACHCoxWXenRs89uUVUK1SQeAd2RslawIVE7SujDjtsHn/jv65G9pot11sbgAeVerUSosSO9074xIrlLOvIY0lCc=
+ bh=DZ2uktH0f4mujy/xXGHLvz66vP1ZasbHRPoGlx2723Y=;
+ b=hDBdwFqmCGf7DVBypIKYiN73BfZlWbj8az5heP2iJUGJ/4ZICRibqoMOnv/mHQJbGN9k3SblQ33nlcuN68HIMyDSqN8VrXTdtsAWdrGyFS47Z9WJbB7Jdlmu3+3Lpbpwwc8626XOPpf23dMKzDP1pJlJZVXEPYSB45QBktC8RPo=
 Authentication-Results: amd.com; dkim=none (message not signed)
  header.d=none;amd.com; dmarc=none action=none header.from=amd.com;
 Received: from CY4PR12MB1352.namprd12.prod.outlook.com (2603:10b6:903:3a::13)
- by CY4PR12MB1926.namprd12.prod.outlook.com (2603:10b6:903:11b::11) with
+ by CY4PR1201MB0152.namprd12.prod.outlook.com (2603:10b6:910:1b::8) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3370.17; Tue, 15 Sep
- 2020 13:37:15 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3370.16; Tue, 15 Sep
+ 2020 14:57:26 +0000
 Received: from CY4PR12MB1352.namprd12.prod.outlook.com
  ([fe80::989b:b1b2:464c:443]) by CY4PR12MB1352.namprd12.prod.outlook.com
  ([fe80::989b:b1b2:464c:443%10]) with mapi id 15.20.3370.019; Tue, 15 Sep 2020
- 13:37:15 +0000
-Subject: Re: [RFC PATCH 08/35] KVM: SVM: Prevent debugging under SEV-ES
+ 14:57:26 +0000
+Subject: Re: [RFC PATCH 28/35] KVM: X86: Update
+ kvm_skip_emulated_instruction() for an SEV-ES guest
 To:     Sean Christopherson <sean.j.christopherson@intel.com>
 Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org, x86@kernel.org,
         Paolo Bonzini <pbonzini@redhat.com>,
@@ -50,105 +51,106 @@ Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org, x86@kernel.org,
         Thomas Gleixner <tglx@linutronix.de>,
         Brijesh Singh <brijesh.singh@amd.com>
 References: <cover.1600114548.git.thomas.lendacky@amd.com>
- <58093c542b5b442b88941828595fb2548706f1bf.1600114548.git.thomas.lendacky@amd.com>
- <20200914212601.GA7192@sjchrist-ice>
+ <ff66ee115d05d698813f54e10497698da21d1b73.1600114548.git.thomas.lendacky@amd.com>
+ <20200914215144.GE7192@sjchrist-ice>
 From:   Tom Lendacky <thomas.lendacky@amd.com>
-Message-ID: <fd790047-4107-b28a-262e-03ed5bc4c421@amd.com>
-Date:   Tue, 15 Sep 2020 08:37:12 -0500
+Message-ID: <8cbafd62-528d-fc8e-9945-575c2b659247@amd.com>
+Date:   Tue, 15 Sep 2020 09:57:24 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.10.0
-In-Reply-To: <20200914212601.GA7192@sjchrist-ice>
+In-Reply-To: <20200914215144.GE7192@sjchrist-ice>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: DM5PR1101CA0014.namprd11.prod.outlook.com
- (2603:10b6:4:4c::24) To CY4PR12MB1352.namprd12.prod.outlook.com
- (2603:10b6:903:3a::13)
+X-ClientProxiedBy: DM5PR18CA0078.namprd18.prod.outlook.com (2603:10b6:3:3::16)
+ To CY4PR12MB1352.namprd12.prod.outlook.com (2603:10b6:903:3a::13)
 MIME-Version: 1.0
 X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from [10.236.30.118] (165.204.77.1) by DM5PR1101CA0014.namprd11.prod.outlook.com (2603:10b6:4:4c::24) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3370.16 via Frontend Transport; Tue, 15 Sep 2020 13:37:14 +0000
+Received: from [10.236.30.118] (165.204.77.1) by DM5PR18CA0078.namprd18.prod.outlook.com (2603:10b6:3:3::16) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3370.16 via Frontend Transport; Tue, 15 Sep 2020 14:57:25 +0000
 X-Originating-IP: [165.204.77.1]
 X-MS-PublicTrafficType: Email
 X-MS-Office365-Filtering-HT: Tenant
-X-MS-Office365-Filtering-Correlation-Id: 80bfdd24-a4dd-4e39-0c97-08d8597c7547
-X-MS-TrafficTypeDiagnostic: CY4PR12MB1926:
+X-MS-Office365-Filtering-Correlation-Id: 2fdd14bd-4f51-4c8b-2816-08d85987a8c0
+X-MS-TrafficTypeDiagnostic: CY4PR1201MB0152:
 X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <CY4PR12MB1926051DA538BBFD26009750EC200@CY4PR12MB1926.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
+X-Microsoft-Antispam-PRVS: <CY4PR1201MB0152F5FC6D922ED93965E698EC200@CY4PR1201MB0152.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:10000;
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: li+AsokNHR7Jal67tJQx8PuLMBGN9iUewhhB7Zdg6vhazj57vE+iibCMPvj3zFI+cKLomLYBezAZlRK/tMin3EzhqOKk3BEcHpcjx8DLZF5ps6tl7faH25c33tB2D8w3uLTkBAIWXm1ImkzGQlGl54y5sihqbix+uDwG3FmKxOIWGFGiBbuOgRZ7Zg+dOHHztGEDjAF/dfEbXZMxc5eS5vJ11Smaq3izbJRiIWAn6TrGxuN915RfF5n5Pzr8IjY3cCbI9fUnR7TkClLKjDYYjflqf84M2Lyp7qMUDXMuojCedNY1vffRIOcgwtmfcImrk9I24jB6i0BSfoULhm3Gx2pyq02hPPT059TpRop7Uai+x9adsSGDNJT+ElC7TnMZ
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY4PR12MB1352.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(39860400002)(396003)(376002)(366004)(346002)(136003)(8676002)(6916009)(31696002)(54906003)(31686004)(83380400001)(86362001)(2906002)(5660300002)(66946007)(66476007)(66556008)(478600001)(7416002)(8936002)(26005)(6486002)(36756003)(53546011)(16576012)(4326008)(316002)(16526019)(186003)(52116002)(2616005)(956004)(43740500002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData: lmS4d5YKMidQrJbF+3iNwYgQCdAD+UyA9cDdSmn6PkD3N70lz+jDuZPb00QFyM2qByzYE7QQOC5/XMORHxvfeDE8nReW69fNmj/bVZWV1KADTnfch9HEI6E84CWH+YaiWBPX8V0Ykn0O3jxjFeVdGrRud4hORqOHJqT0Jy28h0XgpziB23m7k7qNVMZDEJA5Vf3pkbPIXEyDsAUiZlv1lHgx3dqKOBc9gz9yk9DMomsaVkZRC4M8e7h8GjPLd01hzZTTq45xidlnwNzpeHyAcUA815qeJAJZ+jF0Uy3ahnuYI1+h3SH3Sc4dR2EtJkt+sKMcpGmqFMeXjReTYMRlMGgU2BCoo3oVkgQG48IAp9S+uNPR0HPwZugWk2cLKDQOEOIdTPYtWvvxrFGiYpebtxsvtw+MWqoeNKKhuXzWXxxkev1vGndITnwqiJYq7w3icpuH6CzIH40cs1tQwnaaPisaOsL2TFKxhTgMVf7IA8y21XBZmmuOmntUCTTlJ+5eCplcQxjKAIuSGMNRHCdEGAw98iQgKj/F+paqPTVRHKyjX6WXBeQnCeQXkVX7GSFMUnGRUWPSSVN66OwDeHTmA9D/t5B265Xu/JsjKEYOPouqD19DUjYLwbJdISKNCou/Ve/54SY+Q79IM5Bff2riyA==
+X-Microsoft-Antispam-Message-Info: qmww6d3p505ZtB9oU7fr8OTI8SwJiCoB15PLowFnDE+UjR/9fwgKXR1x1XN7YWrOIkD7HUk//J5YMXinnorm6uwBPKC950A7Jae9e9nipK4FF01pzRqjZP2lJSOCK2muMdmmiiXZgCAdNEZOKFgyPYCAR1xfoF7AKqxP8qi7n1SIubSQr6oBZHpBBqM05QZEfnXoaTcX98NtTZdO05j0XICk1Jo6W+dng6QzIl4tlPuEgyWanpGgidtmlQx5gqiBUgtYUc+tMMtr14UldWfI9xTG6VDqzdXeYb+f+N8qFMC8yjiwjw8xPkRgjMIdwKNQ2Mnr71VxNhzzHNGqNnMj/IlsMw0uzEUEW857TsV2Bb4ZYFBwB92OP87ZA0W1GZlyxe57zZCO3jgQWP0qSvKN6hemhQKILRs8tVH/guY1ONo=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY4PR12MB1352.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(136003)(396003)(346002)(366004)(376002)(39860400002)(15650500001)(66476007)(16526019)(316002)(86362001)(2906002)(66946007)(66556008)(16576012)(26005)(52116002)(6916009)(83380400001)(186003)(53546011)(4326008)(54906003)(8936002)(36756003)(478600001)(7416002)(31696002)(6486002)(5660300002)(8676002)(2616005)(956004)(31686004)(43740500002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData: fIrqqPk7vkzMWFiKKZQ+h7qLhMQbk1zWE1cDf6XRHJwveh4ad3iovDM86j07+8w7Ruj1VYlK/NilG16AHcCLBxe+qajN0S3/LhN554HhGhXqGj7Rjdeelg4RVNyja5l3Qz8l+KUSFvdtCEhnd7eMwwRI6gszpabQXXz+B9vp3EEXSlycOAdr6ZYWJ65Aj6yJCpX099aAkn9VVsOXyZvxowqz4rGKqHVpqc8uff1aCO0qc352oBcUF8WWt11zldIPvQpRwcExwz9VmcCbq0f9935bII9xJ8u9opyBVgnkNvIGoRNNxiF1lWFoDZcnQL2kCnOsWH6Q6//YsREmX9i8/DY7rnwe0Nw0weQT0W+dQfvyAgyEpnfN1qNOFxmYf9lhFBsImtY+rRYX8YTjkveK7djhnM0l5AxuExb9A/9ZsMxPKtnpeSddh+B6+qa56SieaJJdTTvDNYm0apeywqNHUbcj/324uGXSGkL7SrmQsSn6wSb1qXAfPwgKNvUaMDmhcJBAtbvFLrzn4fiSJsMouGWjBC3CBBFyuoLLSMgOyApoZNTzfvhNTTvSRAUHWwoVjV3yy5uenTr78pbQ6uVEAr1RPqGbJ85lPsJC1bka03WaW8HYuA+Krd6UyhR1BpUSGONtLZlwSTM374/L3rmKuw==
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 80bfdd24-a4dd-4e39-0c97-08d8597c7547
+X-MS-Exchange-CrossTenant-Network-Message-Id: 2fdd14bd-4f51-4c8b-2816-08d85987a8c0
 X-MS-Exchange-CrossTenant-AuthSource: CY4PR12MB1352.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Sep 2020 13:37:15.4231
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Sep 2020 14:57:26.2426
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: FxmxwrQ+e1KmPs2FnWKOgs+lSpimWXT/rlReGx/3frvEFhq1a+tNHlFNFIS7SKkDyIMMoZb3mIzJMK87lkd+eA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY4PR12MB1926
+X-MS-Exchange-CrossTenant-UserPrincipalName: Vz0BjgTULaMYwRK1Fz5zEZAgxPqmVA31Rh9icNiXQUU96/sXeLjUIpGLQyb/YglwdkmHJ7MGWB0EyMKuJFvpOA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY4PR1201MB0152
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 9/14/20 4:26 PM, Sean Christopherson wrote:
-> On Mon, Sep 14, 2020 at 03:15:22PM -0500, Tom Lendacky wrote:
+On 9/14/20 4:51 PM, Sean Christopherson wrote:
+> On Mon, Sep 14, 2020 at 03:15:42PM -0500, Tom Lendacky wrote:
 >> From: Tom Lendacky <thomas.lendacky@amd.com>
 >>
->> Since the guest register state of an SEV-ES guest is encrypted, debugging
->> is not supported. Update the code to prevent guest debugging when the
->> guest is an SEV-ES guest. This includes adding a callable function that
->> is used to determine if the guest supports being debugged.
+>> The register state for an SEV-ES guest is encrypted so the value of the
+>> RIP cannot be updated. For an automatic exit, the RIP will be advanced
+>> as necessary. For a non-automatic exit, it is up to the #VC handler in
+>> the guest to advance the RIP.
 >>
->> Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
->> ---
->>  arch/x86/include/asm/kvm_host.h |  2 ++
->>  arch/x86/kvm/svm/svm.c          | 16 ++++++++++++++++
->>  arch/x86/kvm/vmx/vmx.c          |  7 +++++++
->>  arch/x86/kvm/x86.c              |  3 +++
->>  4 files changed, 28 insertions(+)
->>
->> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
->> index c900992701d6..3e2a3d2a8ba8 100644
->> --- a/arch/x86/include/asm/kvm_host.h
->> +++ b/arch/x86/include/asm/kvm_host.h
->> @@ -1234,6 +1234,8 @@ struct kvm_x86_ops {
->>  	void (*reg_read_override)(struct kvm_vcpu *vcpu, enum kvm_reg reg);
->>  	void (*reg_write_override)(struct kvm_vcpu *vcpu, enum kvm_reg reg,
->>  				   unsigned long val);
->> +
->> +	bool (*allow_debug)(struct kvm *kvm);
+>> Add support to skip any RIP updates in kvm_skip_emulated_instruction()
+>> for an SEV-ES guest.
 > 
-> Why add both allow_debug() and vmsa_encrypted?  I assume there are scenarios
-> where allow_debug() != vmsa_encrypted?  E.g. is there a debug mode for SEV-ES
-> where the VMSA is not encrypted, but KVM (ironically) can't intercept #DBs or
-> something?
+> Is there a reason this can't be handled in svm?  E.g. can KVM be reworked
+> to effectively split the emulation logic so that it's a bug for KVM to end
+> up trying to modify RIP?
+> 
+> Also, patch 06 modifies SVM's skip_emulated_instruction() to skip the RIP
+> update, but keeps the "svm_set_interrupt_shadow(vcpu, 0)" logic.  Seems like
+> either that change or this one is wrong.
 
-No, once the guest has had LAUNCH_UPDATE_VMSA run against the vCPUs, then
-the vCPU states are all encrypted. But that doesn't mean that debugging
-can't be done in the future.
-
-> 
-> Alternatively, have you explored using a new VM_TYPE for SEV-ES guests?  With
-> a genericized vmsa_encrypted, that would allow something like the following
-> for scenarios where the VMSA is not (yet?) encrypted for an SEV-ES guest.  I
-> don't love bleeding the VM type into x86.c, but for one-off quirks like this
-> I think it'd be preferable to adding a kvm_x86_ops hook.
-> 
-> int kvm_arch_vcpu_ioctl_set_guest_debug(...)
-> {
-> 	if (vcpu->arch.guest_state_protected ||
-> 	    kvm->arch.vm_type == KVM_X86_SEV_ES_VM)
-> 		return -EINVAL;
-> }
-> 
-
-I haven't explored that, I'll look into it.
+I added this because of the get_rflags() call. But let me look into
+changing get_rflags() in svm.c and see if this patch can go away.
 
 Thanks,
 Tom
+
+> 
+>> Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
+>> ---
+>>  arch/x86/kvm/x86.c | 6 +++++-
+>>  1 file changed, 5 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+>> index 23564d02d158..1dbdca607511 100644
+>> --- a/arch/x86/kvm/x86.c
+>> +++ b/arch/x86/kvm/x86.c
+>> @@ -6874,13 +6874,17 @@ static int kvm_vcpu_do_singlestep(struct kvm_vcpu *vcpu)
+>>  
+>>  int kvm_skip_emulated_instruction(struct kvm_vcpu *vcpu)
+>>  {
+>> -	unsigned long rflags = kvm_x86_ops.get_rflags(vcpu);
+>> +	unsigned long rflags;
+>>  	int r;
+>>  
+>>  	r = kvm_x86_ops.skip_emulated_instruction(vcpu);
+>>  	if (unlikely(!r))
+>>  		return 0;
+>>  
+>> +	if (vcpu->arch.vmsa_encrypted)
+>> +		return 1;
+>> +
+>> +	rflags = kvm_x86_ops.get_rflags(vcpu);
+>>  	/*
+>>  	 * rflags is the old, "raw" value of the flags.  The new value has
+>>  	 * not been saved yet.
+>> -- 
+>> 2.28.0
+>>
