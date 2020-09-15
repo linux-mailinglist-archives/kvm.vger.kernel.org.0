@@ -2,91 +2,71 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0167A26995C
-	for <lists+kvm@lfdr.de>; Tue, 15 Sep 2020 01:00:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 40012269A52
+	for <lists+kvm@lfdr.de>; Tue, 15 Sep 2020 02:18:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726094AbgINW74 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 14 Sep 2020 18:59:56 -0400
-Received: from mga01.intel.com ([192.55.52.88]:1391 "EHLO mga01.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726048AbgINW7z (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 14 Sep 2020 18:59:55 -0400
-IronPort-SDR: rzU3lg1wfIxWQbmEHhheSUnxls/nP7kcFWWzk+15UPP13yO/O9T6bm0HdJ959juTXGNZPsFTcS
- nIYmect9NxHg==
-X-IronPort-AV: E=McAfee;i="6000,8403,9744"; a="177238134"
-X-IronPort-AV: E=Sophos;i="5.76,427,1592895600"; 
-   d="scan'208";a="177238134"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Sep 2020 15:59:54 -0700
-IronPort-SDR: PR9eeCTKRz5/PcwRlMba1YjXAM4vWFwG38MB6Uncr64Vujld/yUU1mW3spssTd5ac9NnYVRwmj
- Sfik+urfVgaQ==
-X-IronPort-AV: E=Sophos;i="5.76,427,1592895600"; 
-   d="scan'208";a="482527697"
-Received: from sjchrist-ice.jf.intel.com (HELO sjchrist-ice) ([10.54.31.34])
-  by orsmga005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Sep 2020 15:59:54 -0700
-Date:   Mon, 14 Sep 2020 15:59:52 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Tom Lendacky <thomas.lendacky@amd.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org, x86@kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Borislav Petkov <bp@alien8.de>, Ingo Molnar <mingo@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Brijesh Singh <brijesh.singh@amd.com>
-Subject: Re: [RFC PATCH 00/35] SEV-ES hypervisor support
-Message-ID: <20200914225951.GM7192@sjchrist-ice>
-References: <cover.1600114548.git.thomas.lendacky@amd.com>
+        id S1726064AbgIOASp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 14 Sep 2020 20:18:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44430 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726028AbgIOASf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 14 Sep 2020 20:18:35 -0400
+Received: from mail-oi1-x230.google.com (mail-oi1-x230.google.com [IPv6:2607:f8b0:4864:20::230])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1941FC061788
+        for <kvm@vger.kernel.org>; Mon, 14 Sep 2020 17:18:34 -0700 (PDT)
+Received: by mail-oi1-x230.google.com with SMTP id m7so1902688oie.0
+        for <kvm@vger.kernel.org>; Mon, 14 Sep 2020 17:18:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=KhgVcsHc94obbDVKUJ+qEP3xCNWjV0/BWSFoFHTkB/8=;
+        b=h7LWvYjhOGcy3EICRanM/5wdiE9GI46hq2Za41F6+EThsb9BvKvctAFwH2T1mVxz8J
+         S3xhDaG5idt/GUhINYBwzl15Lddx49T3qODRmgUVoDZ0meI6LJqwreLrydsBcro1XPQE
+         WT7HAZiWLzQ+EA3DgTVM3naw/DqTSbRQC0pPiXvp/WHACA8Ez5+xIqu4nwQNMtu14Nkl
+         0/SWNkxELjiF7fMRAd17leV3pqHsBGLDbytFzcR7nUrD4yKxYajktndviOOLh5vj+CCu
+         Lkg1jIzjo3XdA4NNJeMinEOJm7M+MPrsFFdpvPHEWE9r0fPOS9TuYirZSQa0hQ/6lvzO
+         mpVA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=KhgVcsHc94obbDVKUJ+qEP3xCNWjV0/BWSFoFHTkB/8=;
+        b=nhx8dXAro6vpckOYwGcTeoNbawf2xUzLb+y5F4XmMya44RWX7AD5rPOk8xtVTzNc2k
+         18RIFjRtQkDSpwACajePCltK6sTgUov/ap+bb49Ntp8Idgb43X5qAGbZ7EpDUNS7Fidj
+         nO3YHMp2bi3ZZ34f8/CkPmDXdAiNIQQrgGGUIPD58uUKE1UFzlETqZ4IG6336uRt12Ov
+         sjS0j7j258u1n95UxCh2Hc6lmrE6I8hkTqdZsIt3MP1QVpURhX43mLsbmDnRc0Fx5UZH
+         A2cek289ts0B8vx1xkjNf67lS2WHcyMO96vuO1iqeDUSVSZvf1AVPJYiuUJCkGip0dCf
+         9iAg==
+X-Gm-Message-State: AOAM5333y0e1UZSNy/0+qpcYMjEIbbhVYhbKeaDVKdeM8gnT+toOYqOt
+        GVwiziRcUZsF11GeWKhia2LU5COYChvtewdGDrbV3g==
+X-Google-Smtp-Source: ABdhPJwI7HlaEKNiJPcVHgyyTKZUO2cKXcEotIgiKgDwqGQovNQyURDUfqZBTWLrwzkw4BfvjDYWk80WP7Bm63A9q7s=
+X-Received: by 2002:aca:4b12:: with SMTP id y18mr1380754oia.28.1600129107145;
+ Mon, 14 Sep 2020 17:18:27 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <cover.1600114548.git.thomas.lendacky@amd.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
+References: <20200829005720.5325-1-krish.sadhukhan@oracle.com>
+ <CALMp9eSiB=NkuZJV+m-j-KcxqVzkqTf5fUS7r9vBSaY8TyK_Rg@mail.gmail.com> <a825c6db-cf50-9189-ceee-e57b2d64d585@redhat.com>
+In-Reply-To: <a825c6db-cf50-9189-ceee-e57b2d64d585@redhat.com>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Mon, 14 Sep 2020 17:18:15 -0700
+Message-ID: <CALMp9eTUT-tsGu0gfVcR8VTcq7aVH87PsegnsbU6TXOoLHkfMA@mail.gmail.com>
+Subject: Re: [PATCH] nSVM: Add a test for the P (present) bit in NPT entry
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Krish Sadhukhan <krish.sadhukhan@oracle.com>,
+        kvm list <kvm@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Sep 14, 2020 at 03:15:14PM -0500, Tom Lendacky wrote:
-> From: Tom Lendacky <thomas.lendacky@amd.com>
-> 
-> This patch series provides support for running SEV-ES guests under KVM.
+On Fri, Sep 11, 2020 at 8:36 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
+>
+> On 31/08/20 23:55, Jim Mattson wrote:
+> > Moreover, older AMD hardware never sets bits 32 or 33 at all.
+>
+> Interesting, I didn't know this.  Is it documented at all?
 
-From the x86/VMX side of things, the GPR hooks are the only changes that I
-strongly dislike.
-
-For the vmsa_encrypted flag and related things like allow_debug(), I'd
-really like to aim for a common implementation between SEV-ES and TDX[*] from
-the get go, within reason obviously.  From a code perspective, I don't think
-it will be too onerous as the basic tenets are quite similar, e.g. guest
-state is off limits, FPU state is autoswitched, etc..., but I suspect (or
-maybe worry?) that there are enough minor differences that we'll want a more
-generic way of marking ioctls() as disallowed to avoid having one-off checks
-all over the place.
-
-That being said, it may also be that there are some ioctls() that should be
-disallowed under SEV-ES, but aren't in this series.  E.g. I assume
-kvm_vcpu_ioctl_smi() should be rejected as KVM can't do the necessary
-emulation (I assume this applies to vanilla SEV as well?).
-
-One thought to try and reconcile the differences between SEV-ES and TDX would
-be expicitly list which ioctls() are and aren't supported and go from there?
-E.g. if there is 95% overlap than we probably don't need to get fancy with
-generic allow/deny.
-
-Given that we don't yet have publicly available KVM code for TDX, what if I
-generate and post a list of ioctls() that are denied by either SEV-ES or TDX,
-organized by the denier(s)?  Then for the ioctls() that are denied by one and
-not the other, we add a brief explanation of why it's denied?
-
-If that sounds ok, I'll get the list and the TDX side of things posted
-tomorrow.
-
-Thanks!
-
-
-[*] https://software.intel.com/content/www/us/en/develop/articles/intel-trust-domain-extensions.html
+You'll have to find an old version of the APM. For example, see page
+56 of http://www.0x04.net/doc/amd/33047.pdf (this was back when SVM
+was a separate document).
