@@ -2,70 +2,120 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7DF7A26A1DD
-	for <lists+kvm@lfdr.de>; Tue, 15 Sep 2020 11:15:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3FAA626A260
+	for <lists+kvm@lfdr.de>; Tue, 15 Sep 2020 11:38:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726369AbgIOJPN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 15 Sep 2020 05:15:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41982 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726208AbgIOJPF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 15 Sep 2020 05:15:05 -0400
-Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5CEA3C06174A;
-        Tue, 15 Sep 2020 02:15:05 -0700 (PDT)
-Received: from zn.tnic (p200300ec2f0e42006449c187a2f3906a.dip0.t-ipconnect.de [IPv6:2003:ec:2f0e:4200:6449:c187:a2f3:906a])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id E63A61EC058B;
-        Tue, 15 Sep 2020 11:15:03 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1600161304;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=FvaJmj45+hZz+9GgbNE3rwJ+H3JIoq7yGSJBBmV2IRo=;
-        b=GkbqEKalSpf/Xzq/JASeaeWNQEP/8z0+XBeu/z41zpb/oajBRyQPsnmV9nPp5Cn3y/yHiq
-        1wgTdXQD4bg9PC43lr17FKwI/WIpxk9jAXzkVJfgBCSaFflk0j7N85rv56YGokZtzHW34f
-        Ol0BJNYiqpqVNIoiJogIv5ktGPF7RGk=
-Date:   Tue, 15 Sep 2020 11:15:02 +0200
-From:   Borislav Petkov <bp@alien8.de>
-To:     Maxim Levitsky <mlevitsk@redhat.com>
-Cc:     Alex Dewar <alex.dewar90@gmail.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, x86@kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] SVM: nSVM: fix resource leak on error path
-Message-ID: <20200915091502.GE14436@zn.tnic>
-References: <20200914194557.10158-1-alex.dewar90@gmail.com>
- <922e825c090892f22d40a469fef229d62f40af5e.camel@redhat.com>
+        id S1726216AbgIOJiR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 15 Sep 2020 05:38:17 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:58040 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726102AbgIOJiP (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 15 Sep 2020 05:38:15 -0400
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 08F9V8DN078082
+        for <kvm@vger.kernel.org>; Tue, 15 Sep 2020 05:38:14 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : in-reply-to : references : date : message-id : mime-version :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=gB69IllkKxGIkisaICkNb7Vyio5d6xAjFt+SsmQWeNE=;
+ b=Ft2RoYs/kiLGIq+g0rKE8eZwwxJsmKqCtkfsFBhCjNEt99GFMEiV3M9vAUBoua1pdZ4j
+ 0UeEq8VefgpWMjkBT9MCHwdL1hmGBD9hylnfHe5VfoAmf4i8v/SOn1GPXYl2qxXncALT
+ QJ+uk/wflfT4binWPZbHWHkgEXwE4p3svTb6RUHX851bLzf2vWh/0gbJu1qyFoiaMnQS
+ PMXXk/rUwkRoPpOLY3CVxHCV2uhxTDg+X9sy6ehzPv/DZQYzyqn4FIlVwD5TN2PRy8CK
+ xkJaTgRlD05f29UNBazPBMZ59tbUlaiB4QF50vTKsDnB1+8UyCrap++Ua7X8DCcbZPos mQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 33jttagjdu-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Tue, 15 Sep 2020 05:38:13 -0400
+Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 08F9V33H077474
+        for <kvm@vger.kernel.org>; Tue, 15 Sep 2020 05:38:13 -0400
+Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com [159.122.73.71])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 33jttagjd0-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 15 Sep 2020 05:38:13 -0400
+Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
+        by ppma02fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 08F9YUF0013503;
+        Tue, 15 Sep 2020 09:38:11 GMT
+Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
+        by ppma02fra.de.ibm.com with ESMTP id 33gny81rrq-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 15 Sep 2020 09:38:11 +0000
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
+        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 08F9c8VR13566268
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 15 Sep 2020 09:38:08 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 50C28AE053;
+        Tue, 15 Sep 2020 09:38:08 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id E1463AE058;
+        Tue, 15 Sep 2020 09:38:07 +0000 (GMT)
+Received: from marcibm (unknown [9.145.87.76])
+        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
+        Tue, 15 Sep 2020 09:38:07 +0000 (GMT)
+From:   Marc Hartmayer <mhartmay@linux.ibm.com>
+To:     Marc Hartmayer <mhartmay@linux.ibm.com>, kvm@vger.kernel.org
+Cc:     Thomas Huth <thuth@redhat.com>,
+        David Hildenbrand <david@redhat.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Andrew Jones <drjones@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [kvm-unit-tests PATCH v2 0/2] Use same test names in the
+ default and the TAP13 output format
+In-Reply-To: <20200825102036.17232-1-mhartmay@linux.ibm.com>
+References: <20200825102036.17232-1-mhartmay@linux.ibm.com>
+Date:   Tue, 15 Sep 2020 11:38:07 +0200
+Message-ID: <87bli7tm68.fsf@linux.ibm.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <922e825c090892f22d40a469fef229d62f40af5e.camel@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
+ definitions=2020-09-15_05:2020-09-15,2020-09-15 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ clxscore=1011 spamscore=0 priorityscore=1501 mlxscore=0 bulkscore=0
+ impostorscore=0 malwarescore=0 adultscore=0 mlxlogscore=999 suspectscore=0
+ phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2006250000 definitions=main-2009150084
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Sep 15, 2020 at 12:07:25PM +0300, Maxim Levitsky wrote:
-> I think that this patch is based on unmerged patch, since I don't see
-> any memory allocation in nested_svm_vmrun_msrpm, nor out_free label.
-> in nether kvm/master, kvm/queue nor in upstream/master
+On Tue, Aug 25, 2020 at 12:20 PM +0200, Marc Hartmayer <mhartmay@linux.ibm.=
+com> wrote:
+> For everybody's convenience there is a branch:
+> https://gitlab.com/mhartmay/kvm-unit-tests/-/tree/tap_v2
+>
+> Changelog:
+> v1 -> v2:
+>  + added r-b's to patch 1
+>  + patch 2:
+>   - I've not added Andrew's r-b since I've worked in the comment from
+>     Janosch (don't drop the first prefix)
+>
+> Marc Hartmayer (2):
+>   runtime.bash: remove outdated comment
+>   Use same test names in the default and the TAP13 output format
+>
+>  run_tests.sh         | 15 +++++++++------
+>  scripts/runtime.bash |  9 +++------
+>  2 files changed, 12 insertions(+), 12 deletions(-)
+>
+> --=20
+> 2.25.4
+>
 
-Paolo and I need to figure out first how to share the SEV-ES enablement
-work and the other patches touching that file and then pile more fixes
-ontop.
+Polite ping :) How should we proceed further?
 
--- 
-Regards/Gruss,
-    Boris.
+--=20
+Kind regards / Beste Gr=C3=BC=C3=9Fe
+   Marc Hartmayer
 
-https://people.kernel.org/tglx/notes-about-netiquette
+IBM Deutschland Research & Development GmbH
+Vorsitzender des Aufsichtsrats: Gregor Pillen=20
+Gesch=C3=A4ftsf=C3=BChrung: Dirk Wittkopp
+Sitz der Gesellschaft: B=C3=B6blingen
+Registergericht: Amtsgericht Stuttgart, HRB 243294
