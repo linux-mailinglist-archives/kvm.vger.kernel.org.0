@@ -2,43 +2,43 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4B6AB26B26D
-	for <lists+kvm@lfdr.de>; Wed, 16 Sep 2020 00:47:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5FD9F26B231
+	for <lists+kvm@lfdr.de>; Wed, 16 Sep 2020 00:43:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727759AbgIOWqy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 15 Sep 2020 18:46:54 -0400
-Received: from mail-dm6nam12on2087.outbound.protection.outlook.com ([40.107.243.87]:64288
-        "EHLO NAM12-DM6-obe.outbound.protection.outlook.com"
+        id S1727595AbgIOWmV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 15 Sep 2020 18:42:21 -0400
+Received: from mail-bn8nam11on2040.outbound.protection.outlook.com ([40.107.236.40]:13984
+        "EHLO NAM11-BN8-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727492AbgIOPpX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 15 Sep 2020 11:45:23 -0400
+        id S1727464AbgIOP4l (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 15 Sep 2020 11:56:41 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=bNP3TnFmi1bgpc0f9mUsBE3hmHlNC9MaVKfAZLpWKv/A09YJ26Gz0iqOkvJSU+0h2DrrVGown+xwhRSbaKQMThS4E0JFNba/2tjePVvkiWx6jX2kKskV/fXUr51EEbPkwylXHa2vCzIi2OXuQyigOmMPiE2i39cSFWLsHXzjHt8MPv76I4BeMb0Ku5/Cv2MhrrZnhv54ewxo1bQje3XEQvwwXiujj2ph4G0ZQReIP9Cwm9ZSqCfFcc1XP7A15kYZ1RnsDol+QLpGB3vv2c/GmAJey0usyvvwnoaGzbAyPl3OM9w4ozTYptaNYG5mVefvJ79L9xdlG+PAlqvoQNxLsg==
+ b=Ldz5ViChDu/cv7ouXilHAh/jr9lpuDYNizKcWmroN/+DalTOipHVgLBesTyr7nervVZN3GWhsJryjmFD0UmObU8YB8dHCLxAPdnzZuFMMXw6EFTmWKKt9gF4s1Oiw+OPOyu9IHyRspIZlOOS8xYasn+stAUalGRW62PWyIQ0xwpWgKOM99//J7oWLVog+oOgM4Q4mgjt2mT/ScRtGkMgL8g6qaKf02iueDwPR76FE6u3jN+3dG5a+qWLk0aFRH6UGl9cVuA6GdrmnyruN5vjFfBh9D01y8GQH+A75zwK26BOmgesYwYpTlnxOQw0/th6XTwvzySea2W51bvoUuKsTw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=WcjiMe2+++PDyCbACMTLxSbh5q8ZcGbHDCLL8v2xAfM=;
- b=HF7YN5vise69bLIOoomwNdq98Q99iLWYfCG2DVV5c88CB6sIThwF1I2c7VAsl3w145a5g7dl1nFZ6itMUVo46TeWC6vc5MoOI0xEM/tN8S04ag0K2uJCCCXd/InyXnXqf5gUvP+Z3a0NJNF2nq6h7jY/FwlO0b5DtokIw3ZNFZ6cj97ODhNZoAJc4MpzlcA7mMcUqn/rvZEweU6ooHmETclN00DSdYDFAxxjlaVEd0G02rwQUaU3nRwMcAaHCYlf1X9vGoEWHuMU+lYUMpcuK0tvHK3IjnR/Ic7prkqMcff1DHMQHKBNKaovccLDscRL2SJevSsHZpeHFkxqHwd0wg==
+ bh=qu4M2+lFOsaFwBfZthQg/qXJ0aJjeMcvSDNYsKheM8Y=;
+ b=EHy9qSBN5qhFQP8N8jHrNWn4O/iN++AMJ/w5eoTQ03rSP54Jyr8l9enJwhP4DVTgiE+1iHWMBjNDFBsAXO1V0mOhDufagEAfLtJMxDQuC/B45tsBT8QRfOqatpSQ6feay44eUDT9sLFgSgG+HqDKVlrhr1/QV0bWNEIJnsULeHiWEtWxR2DObvMGJQcVyJdS14WCFI0BJ8cZh36oLpOjEAKu/n31fLlg2urPBaWbCojIASXW38/zE7yKhCPpzoQeNQK1kHYSiT9jQZifeHlpF9rM+u9tIbBgEjqVIS8zoJ+SGZxbUW0hYiltvzIb+qHzodv8Psd+06pYnlmCzR52vg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
  header.d=amd.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=WcjiMe2+++PDyCbACMTLxSbh5q8ZcGbHDCLL8v2xAfM=;
- b=bCAKQD8Uw6xQy3Gy+XkfFWPWjBAUzVFmHzTJe2K7EZz3C80ynVImEGn4VAHYLA5mMDCQfDpMKjbsplESRj1GeXQeRpWWepMdFLikoY+OgzEX6tke+yQguLvAKSW99lDYBLOSeBsT07W5n+ncdIlrOTBl+ZMy2Tne3q9r9XaABxE=
+ bh=qu4M2+lFOsaFwBfZthQg/qXJ0aJjeMcvSDNYsKheM8Y=;
+ b=3OJpzgIsUU/3uA0/igWDAlA5f4XkwJfUOxNpb1iKSWSchZyEEODVlPnVoTTbTUkqo6DgK0VTGi+Kv/DHiMw76m9xMBbbm8liD78qugGzBC0yCkQgJyCzyHjvGKylEBYYoGL5d7BswJaXSj8cHb2MCM83OOaAtB+8JEaTk8WUmKk=
 Authentication-Results: amd.com; dkim=none (message not signed)
  header.d=none;amd.com; dmarc=none action=none header.from=amd.com;
 Received: from CY4PR12MB1352.namprd12.prod.outlook.com (2603:10b6:903:3a::13)
- by CY4PR1201MB0166.namprd12.prod.outlook.com (2603:10b6:910:24::23) with
+ by CY4PR1201MB0150.namprd12.prod.outlook.com (2603:10b6:910:23::8) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3370.16; Tue, 15 Sep
- 2020 15:45:18 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3370.17; Tue, 15 Sep
+ 2020 15:56:31 +0000
 Received: from CY4PR12MB1352.namprd12.prod.outlook.com
  ([fe80::989b:b1b2:464c:443]) by CY4PR12MB1352.namprd12.prod.outlook.com
  ([fe80::989b:b1b2:464c:443%10]) with mapi id 15.20.3370.019; Tue, 15 Sep 2020
- 15:45:18 +0000
-Subject: Re: [RFC PATCH 21/35] KVM: SVM: Add support for EFER write traps for
+ 15:56:31 +0000
+Subject: Re: [RFC PATCH 22/35] KVM: SVM: Add support for CR0 write traps for
  an SEV-ES guest
 To:     Sean Christopherson <sean.j.christopherson@intel.com>
 Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org, x86@kernel.org,
@@ -51,179 +51,147 @@ Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org, x86@kernel.org,
         Thomas Gleixner <tglx@linutronix.de>,
         Brijesh Singh <brijesh.singh@amd.com>
 References: <cover.1600114548.git.thomas.lendacky@amd.com>
- <240ce8d7c9bd84adf66a4a0625150a1ae215345e.1600114548.git.thomas.lendacky@amd.com>
- <20200914220800.GI7192@sjchrist-ice>
+ <68f885b63b18e5c72eae92c9c681296083c0ccd8.1600114548.git.thomas.lendacky@amd.com>
+ <20200914221353.GJ7192@sjchrist-ice>
 From:   Tom Lendacky <thomas.lendacky@amd.com>
-Message-ID: <c5a57f9a-abbb-d12f-c45a-9d5528562212@amd.com>
-Date:   Tue, 15 Sep 2020 10:45:15 -0500
+Message-ID: <f634cb2d-5464-6e48-2511-b3b0cbde24cf@amd.com>
+Date:   Tue, 15 Sep 2020 10:56:29 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.10.0
-In-Reply-To: <20200914220800.GI7192@sjchrist-ice>
+In-Reply-To: <20200914221353.GJ7192@sjchrist-ice>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: DM6PR01CA0006.prod.exchangelabs.com (2603:10b6:5:296::11)
- To CY4PR12MB1352.namprd12.prod.outlook.com (2603:10b6:903:3a::13)
+X-ClientProxiedBy: DM5PR04CA0041.namprd04.prod.outlook.com
+ (2603:10b6:3:12b::27) To CY4PR12MB1352.namprd12.prod.outlook.com
+ (2603:10b6:903:3a::13)
 MIME-Version: 1.0
 X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from [10.236.30.118] (165.204.77.1) by DM6PR01CA0006.prod.exchangelabs.com (2603:10b6:5:296::11) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3370.16 via Frontend Transport; Tue, 15 Sep 2020 15:45:17 +0000
+Received: from [10.236.30.118] (165.204.77.1) by DM5PR04CA0041.namprd04.prod.outlook.com (2603:10b6:3:12b::27) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3370.16 via Frontend Transport; Tue, 15 Sep 2020 15:56:30 +0000
 X-Originating-IP: [165.204.77.1]
 X-MS-PublicTrafficType: Email
 X-MS-Office365-Filtering-HT: Tenant
-X-MS-Office365-Filtering-Correlation-Id: c74f795f-0886-45cf-6130-08d8598e58ba
-X-MS-TrafficTypeDiagnostic: CY4PR1201MB0166:
+X-MS-Office365-Filtering-Correlation-Id: 36370ae8-aa18-4375-f61e-08d8598fe9d7
+X-MS-TrafficTypeDiagnostic: CY4PR1201MB0150:
 X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <CY4PR1201MB01668A0FE6AF6F13B660B3C3EC200@CY4PR1201MB0166.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
+X-Microsoft-Antispam-PRVS: <CY4PR1201MB015083D6E0826D248DEFCE5EEC200@CY4PR1201MB0150.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:10000;
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: sKvVyOCAIYLV6m/AeNqu3pUXIJypM4ZU4BZXBNvRcKZy+DCIcuBLHm/JSpTxfUB8iswkn0ZXhmxhEjv5HB5ZOr5lDf2bpDgZ0H+vsdgYuMG9vB5z5Y57fUeV1m2qmAJmax+ndO0Tv7n9C1Q469zFq3fP5MHUil89CPDRb13KRb3tazaAd42uxSjYXZPBqexQEE42SwdtI7SnPUIXGhNJeisy1ICjAcP/SFKgCsgZuQnD2xKns5OdnNsr0S7o4VpBADKY3jhzaoxxrKXOEoUaWTIdt/jdw6jm6vJOYOdO7Dy+LiLqZjAWWHKIgXKeQYwf7l9CMjbE3uy4hHseOS5ykyMOn0c65TwfCjPF/WlWk7B3ySV05zwLd8FODiZmfK8o
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY4PR12MB1352.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(39860400002)(346002)(376002)(136003)(366004)(396003)(52116002)(6486002)(2616005)(36756003)(6916009)(956004)(5660300002)(31686004)(54906003)(53546011)(4326008)(66556008)(66476007)(2906002)(16526019)(316002)(16576012)(8676002)(186003)(478600001)(26005)(66946007)(83380400001)(8936002)(86362001)(31696002)(7416002)(43740500002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData: H9rSsVjU1By0TISTO2lMYW19bVsLUhsMek+AN4N4W89FyicKoHHXuJ7Zb5D9fu1Vi4NM+C7i0HZjuO/ciEmeGicK+srlB5qITlViKe95JaPXOos3I+stcXoyxSJflG5/WRYCspaBMxliaXvkSMaYfpeuNjjB5qotWYeZSQYCxluTQ3OwA/8H4rsQyv2QOZeq/7lGuNE0bVNm5wZTNvUKlaig0W4tlQnsiJNYCmXw7CzMOQsXeiLrBXAdmi0RVwFCqpgX8g3sutISoO7ObX3YVYNip6jFy0dbEV/DM7eWI3/5d/IuTy2YGv2tf7JuVegckxjqxHm55fpQHIkQFNDa0Rx8dm9txhr6nkoS1rofJDxp4930pLq+PI813wZySq+jzKh+8XyPBrglcNObNFJkqIu13X0pQirpQAHZtdxIuSZEUbt1l0yVstrY37ostxCCzk2v9cXOOMW1UdToKUhPTuOLBqDeKygofPN1jg8W9S7pxRZ+cw6kSQlUkWsKiK5/16SEKVVyCwHMQYpK/BbWERr9ycRmcWgqdGj859/r/dF4ehhslvLUjpX/eTtg0+BX4k+dakQU/1+9ybN/A+pZY1aJBniKQRoEM3fAPLZiUXVz2ujijDtdIo4O6pCbKI0u1IxrZfDGE50W4Q8BjbddiA==
+X-Microsoft-Antispam-Message-Info: hjalNUVQrND5MDdbLS+53cEdP/SKzl1K6ZsWZrvgXwR/8yfK6hIoeSY8N/KVqrev+eegwfAGXs8ji1bEcCOs0sigOjAxsFtV1IuCm0/GfNe1JkL+OjXWX37Zz/oHvSs64vcujRsFGGsRc79mvAGOUKDVbeiNb+2tihsyDxm4OBXfqebTD7BquTy51O27oJh7LaZ/dRsmyexYa+uqwRoXWO2yEdKzwE/Bau5/xV4Y80+gE4kFBuJ+YIRYjzAibnBGG1/Um78TOXRb4MbYD8qQxm+vvfRs47GA8Wl5WZzIYBFK7lmpS6s5UCRPFEyEwvBwFqXzJ+eD+UKC4QSJdp9lUdDEtG93jXFqW2/Yjls3AFjy7QDZ3VaOQosRULMjNzReal1XIlZIAmcWFaeOJz4ndzJ/Z+HjtmHI5FmQ6mEKQvg=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY4PR12MB1352.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(376002)(39860400002)(346002)(136003)(396003)(366004)(52116002)(66556008)(66476007)(6916009)(26005)(6486002)(86362001)(16526019)(186003)(66946007)(53546011)(83380400001)(4326008)(8676002)(16576012)(31696002)(478600001)(316002)(8936002)(54906003)(31686004)(36756003)(2906002)(7416002)(956004)(2616005)(5660300002)(43740500002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData: bcmC6uVpzgxIqiPtFgjTLutTKcQ2fHbFWGsmjPAVLmEQHxDcuLvsmHYFKcRo1SfQjF2/VFF76ZutfuIktLtwU1TybEte4I4hlB/5CpDtSFW84q3+EQrlajyLiHQ4j75IOEbX364vD9SVy2L9Cz4gLPzBoeLgyja8TKLX2Vc1CscaqpcGixA1MCBSts4Du34aT6dae+Vj4jcuP09NKUv2o+9tus8iwlEO4Qzx/e5EvJFoLFITCHU5SvISostxkPiIFPi8d8SAW9fWaxu5Lz61WLelocws8b3EKQrcUQJBIOthPqsP9t0lPzfl2EDvNm6/C/O+uc9v8D0uEQ6JEGWNavb93fxarbE4PgokpnRjWwWhZOz0KMfJ/WgacTmohbQK9fXogZdAIkLuTsF08E6VZq58ZUUEXyNnuzKUbxHMA5nuGNV1cwMYO77slHcKMKBCvKMhflccvL63F05c1EF4BQD055z8+5mlQqA+bneI3+7Oib0SQqHg2b7UopunxJcxEWC/cjKPPZpMKZNMn1n3zMV/ag6C3VhXMxt1AWNXW8vis2r5i+++douztIxtM5P5zgZSjyiXm5EVL6w3djdIop63E69Qf7LgrVZZHSvUeMeRDS6SmsM9NVwr7q9Hy4tCQ1/EuItImHBHhhFNyhbITw==
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: c74f795f-0886-45cf-6130-08d8598e58ba
+X-MS-Exchange-CrossTenant-Network-Message-Id: 36370ae8-aa18-4375-f61e-08d8598fe9d7
 X-MS-Exchange-CrossTenant-AuthSource: CY4PR12MB1352.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Sep 2020 15:45:18.4531
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Sep 2020 15:56:31.3544
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 2Vgy8Azj9UN+BHcZN6pEuVkJK1BgRkPv+chg4UVWIx+CmZg46SoZsv2PM4GoKgaZtDzxi3vVGE3VQDhsTXoZMg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY4PR1201MB0166
+X-MS-Exchange-CrossTenant-UserPrincipalName: LIRzrE1ngiBkRgLHGybzgwbbILu1acebdcY2VAwaUHVdGm/I/5AszWLq0slOCbAwCv/1GcZYwJ9qQAt8o5mxsw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY4PR1201MB0150
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 9/14/20 5:08 PM, Sean Christopherson wrote:
-> On Mon, Sep 14, 2020 at 03:15:35PM -0500, Tom Lendacky wrote:
+On 9/14/20 5:13 PM, Sean Christopherson wrote:
+> On Mon, Sep 14, 2020 at 03:15:36PM -0500, Tom Lendacky wrote:
 >> From: Tom Lendacky <thomas.lendacky@amd.com>
->>
->> For SEV-ES guests, the interception of EFER write access is not
->> recommended. EFER interception occurs prior to EFER being modified and
->> the hypervisor is unable to modify EFER itself because the register is
->> located in the encrypted register state.
->>
->> SEV-ES guests introduce a new EFER write trap. This trap provides
->> intercept support of an EFER write after it has been modified. The new
->> EFER value is provided in the VMCB EXITINFO1 field, allowing the
->> hypervisor to track the setting of the guest EFER.
->>
->> Add support to track the value of the guest EFER value using the EFER
->> write trap so that the hypervisor understands the guest operating mode.
->>
->> Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
->> ---
->>  arch/x86/include/asm/kvm_host.h |  1 +
->>  arch/x86/include/uapi/asm/svm.h |  2 ++
->>  arch/x86/kvm/svm/svm.c          | 12 ++++++++++++
->>  arch/x86/kvm/x86.c              | 12 ++++++++++++
->>  4 files changed, 27 insertions(+)
->>
->> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
->> index 7320a9c68a5a..b535b690eb66 100644
->> --- a/arch/x86/include/asm/kvm_host.h
->> +++ b/arch/x86/include/asm/kvm_host.h
->> @@ -1427,6 +1427,7 @@ void kvm_vcpu_deliver_sipi_vector(struct kvm_vcpu *vcpu, u8 vector);
->>  int kvm_task_switch(struct kvm_vcpu *vcpu, u16 tss_selector, int idt_index,
->>  		    int reason, bool has_error_code, u32 error_code);
->>  
->> +int kvm_track_efer(struct kvm_vcpu *vcpu, u64 efer);
->>  int kvm_set_cr0(struct kvm_vcpu *vcpu, unsigned long cr0);
->>  int kvm_set_cr3(struct kvm_vcpu *vcpu, unsigned long cr3);
->>  int kvm_set_cr4(struct kvm_vcpu *vcpu, unsigned long cr4);
->> diff --git a/arch/x86/include/uapi/asm/svm.h b/arch/x86/include/uapi/asm/svm.h
->> index 0bc3942ffdd3..ce937a242995 100644
->> --- a/arch/x86/include/uapi/asm/svm.h
->> +++ b/arch/x86/include/uapi/asm/svm.h
->> @@ -77,6 +77,7 @@
->>  #define SVM_EXIT_MWAIT_COND    0x08c
->>  #define SVM_EXIT_XSETBV        0x08d
->>  #define SVM_EXIT_RDPRU         0x08e
->> +#define SVM_EXIT_EFER_WRITE_TRAP		0x08f
->>  #define SVM_EXIT_NPF           0x400
->>  #define SVM_EXIT_AVIC_INCOMPLETE_IPI		0x401
->>  #define SVM_EXIT_AVIC_UNACCELERATED_ACCESS	0x402
->> @@ -183,6 +184,7 @@
->>  	{ SVM_EXIT_MONITOR,     "monitor" }, \
->>  	{ SVM_EXIT_MWAIT,       "mwait" }, \
->>  	{ SVM_EXIT_XSETBV,      "xsetbv" }, \
->> +	{ SVM_EXIT_EFER_WRITE_TRAP,	"write_efer_trap" }, \
->>  	{ SVM_EXIT_NPF,         "npf" }, \
->>  	{ SVM_EXIT_AVIC_INCOMPLETE_IPI,		"avic_incomplete_ipi" }, \
->>  	{ SVM_EXIT_AVIC_UNACCELERATED_ACCESS,   "avic_unaccelerated_access" }, \
->> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
->> index ac64a5b128b2..ac467225a51d 100644
->> --- a/arch/x86/kvm/svm/svm.c
->> +++ b/arch/x86/kvm/svm/svm.c
->> @@ -2466,6 +2466,17 @@ static int cr8_write_interception(struct vcpu_svm *svm)
->>  	return 0;
->>  }
->>  
->> +static int efer_trap(struct vcpu_svm *svm)
->> +{
->> +	int ret;
->> +
->> +	ret = kvm_track_efer(&svm->vcpu, svm->vmcb->control.exit_info_1);
->> +	if (ret)
-> 
-> Shouldn't this be a WARN or something?  E.g. KVM thinks the WRMSR has faulted,
-> while it obviously hasn't, which means KVM's internal model is now out of sync.
-
-Makes sense, I can add something here.
-
-> 
->> +		return ret;
->> +
->> +	return kvm_complete_insn_gp(&svm->vcpu, 0);
->> +}
->> +
->>  static int svm_get_msr_feature(struct kvm_msr_entry *msr)
->>  {
->>  	msr->data = 0;
->> @@ -2944,6 +2955,7 @@ static int (*const svm_exit_handlers[])(struct vcpu_svm *svm) = {
->>  	[SVM_EXIT_MWAIT]			= mwait_interception,
->>  	[SVM_EXIT_XSETBV]			= xsetbv_interception,
->>  	[SVM_EXIT_RDPRU]			= rdpru_interception,
->> +	[SVM_EXIT_EFER_WRITE_TRAP]		= efer_trap,
->>  	[SVM_EXIT_NPF]				= npf_interception,
->>  	[SVM_EXIT_RSM]                          = rsm_interception,
->>  	[SVM_EXIT_AVIC_INCOMPLETE_IPI]		= avic_incomplete_ipi_interception,
 >> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
->> index 674719d801d2..b65bd0c986d4 100644
+>> index b65bd0c986d4..6f5988c305e1 100644
 >> --- a/arch/x86/kvm/x86.c
 >> +++ b/arch/x86/kvm/x86.c
->> @@ -1480,6 +1480,18 @@ static int set_efer(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
->>  	return 0;
+>> @@ -799,11 +799,29 @@ bool pdptrs_changed(struct kvm_vcpu *vcpu)
 >>  }
+>>  EXPORT_SYMBOL_GPL(pdptrs_changed);
 >>  
->> +int kvm_track_efer(struct kvm_vcpu *vcpu, u64 efer)
->> +{
->> +	struct msr_data msr_info;
->> +
->> +	msr_info.host_initiated = false;
->> +	msr_info.index = MSR_EFER;
->> +	msr_info.data = efer;
->> +
->> +	return set_efer(vcpu, &msr_info);
->> +}
->> +EXPORT_SYMBOL_GPL(kvm_track_efer);
+>> +static void kvm_post_set_cr0(struct kvm_vcpu *vcpu, unsigned long old_cr0,
+>> +			     unsigned long cr0)
 > 
-> I don't see any reason to put this in x86.c, just copy-paste the guts into
-> efer_trap() and s/set_efer/kvm_set_msr_common.
+> What about using __kvm_set_cr*() instead of kvm_post_set_cr*()?  That would
+> show that __kvm_set_cr*() is a subordinate of kvm_set_cr*(), and from the
+> SVM side would provide the hint that the code is skipping the front end of
+> kvm_set_cr*().
 
-Ok, I can do that. I'll add a comment to indicate that the result of doing
-that is that set_efer() is ultimately invoked through that path.
+Ok, I'll change this (and the others) to __kvm_set_cr* and export them.
+
+> 
+>> +{
+>> +	unsigned long update_bits = X86_CR0_PG | X86_CR0_WP;
+>> +
+>> +	if ((cr0 ^ old_cr0) & X86_CR0_PG) {
+>> +		kvm_clear_async_pf_completion_queue(vcpu);
+>> +		kvm_async_pf_hash_reset(vcpu);
+>> +	}
+>> +
+>> +	if ((cr0 ^ old_cr0) & update_bits)
+>> +		kvm_mmu_reset_context(vcpu);
+>> +
+>> +	if (((cr0 ^ old_cr0) & X86_CR0_CD) &&
+>> +	    kvm_arch_has_noncoherent_dma(vcpu->kvm) &&
+>> +	    !kvm_check_has_quirk(vcpu->kvm, KVM_X86_QUIRK_CD_NW_CLEARED))
+>> +		kvm_zap_gfn_range(vcpu->kvm, 0, ~0ULL);
+>> +}
+>> +
+>>  int kvm_set_cr0(struct kvm_vcpu *vcpu, unsigned long cr0)
+>>  {
+>>  	unsigned long old_cr0 = kvm_read_cr0(vcpu);
+>>  	unsigned long pdptr_bits = X86_CR0_CD | X86_CR0_NW | X86_CR0_PG;
+>> -	unsigned long update_bits = X86_CR0_PG | X86_CR0_WP;
+>>  
+>>  	cr0 |= X86_CR0_ET;
+>>  
+>> @@ -842,22 +860,23 @@ int kvm_set_cr0(struct kvm_vcpu *vcpu, unsigned long cr0)
+>>  
+>>  	kvm_x86_ops.set_cr0(vcpu, cr0);
+>>  
+>> -	if ((cr0 ^ old_cr0) & X86_CR0_PG) {
+>> -		kvm_clear_async_pf_completion_queue(vcpu);
+>> -		kvm_async_pf_hash_reset(vcpu);
+>> -	}
+>> +	kvm_post_set_cr0(vcpu, old_cr0, cr0);
+>>  
+>> -	if ((cr0 ^ old_cr0) & update_bits)
+>> -		kvm_mmu_reset_context(vcpu);
+>> +	return 0;
+>> +}
+>> +EXPORT_SYMBOL_GPL(kvm_set_cr0);
+>>  
+>> -	if (((cr0 ^ old_cr0) & X86_CR0_CD) &&
+>> -	    kvm_arch_has_noncoherent_dma(vcpu->kvm) &&
+>> -	    !kvm_check_has_quirk(vcpu->kvm, KVM_X86_QUIRK_CD_NW_CLEARED))
+>> -		kvm_zap_gfn_range(vcpu->kvm, 0, ~0ULL);
+>> +int kvm_track_cr0(struct kvm_vcpu *vcpu, unsigned long cr0)
+> 
+> I really dislike the "track" terminology.  For me, using "track" as the verb
+> in a function implies the function activates tracking.  But it's probably a
+> moot point, because similar to EFER, I don't see any reason to put the front
+> end of the emulation into x86.c.  Both getting old_cr0 and setting
+> vcpu->arch.cr0 can be done in svm.c
+
+Yup, I can move that to svm.c.
 
 Thanks,
 Tom
 
 > 
+>> +{
+>> +	unsigned long old_cr0 = kvm_read_cr0(vcpu);
 >> +
->>  void kvm_enable_efer_bits(u64 mask)
+>> +	vcpu->arch.cr0 = cr0;
+>> +
+>> +	kvm_post_set_cr0(vcpu, old_cr0, cr0);
+>>  
+>>  	return 0;
+>>  }
+>> -EXPORT_SYMBOL_GPL(kvm_set_cr0);
+>> +EXPORT_SYMBOL_GPL(kvm_track_cr0);
+>>  
+>>  void kvm_lmsw(struct kvm_vcpu *vcpu, unsigned long msw)
 >>  {
->>         efer_reserved_bits &= ~mask;
 >> -- 
 >> 2.28.0
 >>
