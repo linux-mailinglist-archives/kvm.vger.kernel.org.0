@@ -2,129 +2,101 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 328A126B8FA
-	for <lists+kvm@lfdr.de>; Wed, 16 Sep 2020 02:53:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2397B26B8F3
+	for <lists+kvm@lfdr.de>; Wed, 16 Sep 2020 02:53:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726599AbgIPAxA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 15 Sep 2020 20:53:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34910 "EHLO
+        id S1726584AbgIPAxE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 15 Sep 2020 20:53:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34912 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726353AbgIOLdB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S1726354AbgIOLdB (ORCPT <rfc822;kvm@vger.kernel.org>);
         Tue, 15 Sep 2020 07:33:01 -0400
-Received: from mail-pg1-x541.google.com (mail-pg1-x541.google.com [IPv6:2607:f8b0:4864:20::541])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AB110C0611C2;
-        Tue, 15 Sep 2020 04:29:50 -0700 (PDT)
-Received: by mail-pg1-x541.google.com with SMTP id s65so1860651pgb.0;
-        Tue, 15 Sep 2020 04:29:50 -0700 (PDT)
+Received: from mail-pg1-x542.google.com (mail-pg1-x542.google.com [IPv6:2607:f8b0:4864:20::542])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D32C3C0611C3;
+        Tue, 15 Sep 2020 04:30:42 -0700 (PDT)
+Received: by mail-pg1-x542.google.com with SMTP id 34so1794989pgo.13;
+        Tue, 15 Sep 2020 04:30:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=iZZZ3oSdKZd9z2ofzkCYRtX+OtJdA4mv0c01rJrSths=;
-        b=jv8dD33sRnwy+w6PG//UZu01nl7dRKAtLflNirCAenTBNs0zJWHtuC0XeNZBTjcY9B
-         B3pFVdc52HjZs14t8b3NV/mdEVzXjchN8eO9pNCieA9y6z9kKN/w0x36N743cpwPcY/E
-         Jg4p7UlSe2LjP2wsDHRQX/k/L+LgzFvSjxiHLPb8WOUvmkDKJwhMrv4509UrYQo+92GM
-         Yu27jbA7liZaDr3mCWDn/2NMb2EUxUKE861m1Ev4bHsXhlFsEy8tlJ4wv7MUiQlW3i11
-         l+YekVbPJ7duGiQ3jnZOdTifuMfzx/M0ptzDV2C+SJasUgs6scSBb9R7bhX8VY5jb1ck
-         DT/Q==
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=q/aKCB6Ww7t4Gp9xxyRSUMaEGPTL0wXO3eSVSTDC7m0=;
+        b=d4WhKkECa3SOGw8M71woMrGRb8L3iIpBgHl9yPPQdPZHW2cuQk6yPAfxHwtH4m16AY
+         i8eO1nmHUxz44HalUpWvO/YzlG305829rRK5yPPRGVy90YgDqV/Wan0i5sfeeFE58u3H
+         TOrXdQZS0Gs7bSc6uhvGH95c3XKON35BahEi1zC5ueg3LTPfJLERLSGgpn2CTv1TlFWN
+         Q70DcUUJBwXSvisWdnM7WS29wn1JFmBZ6wCkIqmpn1/aa6SHUNkCBPBNIyDX2x4Fn1um
+         FRuVU4DBwHPe/EKg6nCuxlYfce3oxLUe7QjIq1mKmw5juXB3Y16xaV0oqRqYV19utN1o
+         GA7g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
          :content-transfer-encoding;
-        bh=iZZZ3oSdKZd9z2ofzkCYRtX+OtJdA4mv0c01rJrSths=;
-        b=Lg0X+xx2L//x6BfuhOVxYWk/BAIM24VPw5ROdPTcWsAZKzME6dlibIbSwvPO95si0V
-         WAq650buTjlKsLnzwuNpeL90f03/Tje4Rsnvi5N58GjRf6fQN/k1iyc3OsjgGNgfwJ+6
-         PviROsfTrJICLq5axE9cLHheQnedl+ttjMpnGwaWd1HGcHIZWKYdNhPqHQMePDUfKWrW
-         LoY72/Ix/oZPRvIVx38RSe4l8voWWqMgg1AeGT/pUhC7b+CRY3YSqv8u3ZNR00C/dXp1
-         EbCT1sQlscusXyUno0SA5J+/p+mYFP2r1vm3l01+Av0tLAaXpwj/4gamY3fx8TacMJUE
-         K2CA==
-X-Gm-Message-State: AOAM531J6ijCCupFyoXEGjTsjpS3uSjybpQlnpABjYgZUbvvyVX1Z0xx
-        zIWVwpfToTLCG95bi2YgpQ==
-X-Google-Smtp-Source: ABdhPJyDw2OdAE6/fq5yqY1r/0YtQZmGXQ3gKXOoGZh85/fWlcAMS/VqSw7pIupI6DvbkF5EVmd7OA==
-X-Received: by 2002:a63:594a:: with SMTP id j10mr13332327pgm.402.1600169390285;
-        Tue, 15 Sep 2020 04:29:50 -0700 (PDT)
-Received: from [127.0.0.1] ([103.7.29.7])
-        by smtp.gmail.com with ESMTPSA id q24sm13295090pfs.206.2020.09.15.04.29.46
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 15 Sep 2020 04:29:49 -0700 (PDT)
-Subject: Re: [PATCH] KVM: SVM: Analyze is_guest_mode() in svm_vcpu_run()
-To:     Krish Sadhukhan <krish.sadhukhan@oracle.com>,
-        Wanpeng Li <kernellwp@gmail.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>
-References: <1600066548-4343-1-git-send-email-wanpengli@tencent.com>
- <b39b1599-9e1e-8ef6-1b97-a4910d9c3784@oracle.com>
-From:   Haiwei Li <lihaiwei.kernel@gmail.com>
-Message-ID: <425468c9-15f0-9486-d317-fd25c38a714a@gmail.com>
-Date:   Tue, 15 Sep 2020 19:29:39 +0800
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:68.0)
- Gecko/20100101 Thunderbird/68.12.0
+        bh=q/aKCB6Ww7t4Gp9xxyRSUMaEGPTL0wXO3eSVSTDC7m0=;
+        b=Svv3wdtdBZ/l12yn8SP1j+0dpzJ2ob0LVV1czWosfYnXJmqpyC6ejQDnF5E0KX17Nv
+         yyn3Wn/OVasUlNmrtkE4RvliN93o4Qesq1vce9Z5cQvjbR67n/VIY4YuU/WVMc5mj5Da
+         xNuFvJANn4UyJZS/tuKKsQ3ntrYH1wMGFD5X1g4Ir6jkrtIpBvomfstOZZrs0EjDNFHF
+         bdGT2LaMxMvOVRpqFkN5kgGxYJy1TthruWdF7pdzDc0WhRxR9UB1T+khbhcnoV9XLEoW
+         BxXvo/0H27xCHFAm7DdH754ibimTns9j2UycgeYNtFSm//tuepqyWzwVEYRsFoqz7Wqc
+         Uh3g==
+X-Gm-Message-State: AOAM5308s0UqdymYPFnJosGBWjI54FqaMgqD91LUrLUMmyLGYQe3Vvwc
+        /Jg2ohToQAWfriAytytxyw==
+X-Google-Smtp-Source: ABdhPJzts20bJt3xmsrlELcwAAEof7lLtQ+V7XR8dOoAiPZP+BrYF3HNavyhKQBgmkQHs6aNbkw1eQ==
+X-Received: by 2002:a63:a23:: with SMTP id 35mr14865811pgk.333.1600169442425;
+        Tue, 15 Sep 2020 04:30:42 -0700 (PDT)
+Received: from LiHaiwei.tencent.com ([203.205.141.63])
+        by smtp.gmail.com with ESMTPSA id z129sm11377807pgb.84.2020.09.15.04.30.37
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Tue, 15 Sep 2020 04:30:41 -0700 (PDT)
+From:   lihaiwei.kernel@gmail.com
+To:     x86@kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc:     pbonzini@redhat.com, sean.j.christopherson@intel.com,
+        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
+        joro@8bytes.org, tglx@linutronix.de, hpa@zytor.com,
+        Haiwei Li <lihaiwei@tencent.com>,
+        Krish Sadhukhan <krish.sadhukhan@oracle.com>
+Subject: [PATCH] KVM: SVM: Get rid of the variable 'exit_fastpath'
+Date:   Tue, 15 Sep 2020 19:30:33 +0800
+Message-Id: <20200915113033.61817-1-lihaiwei.kernel@gmail.com>
+X-Mailer: git-send-email 2.28.0
 MIME-Version: 1.0
-In-Reply-To: <b39b1599-9e1e-8ef6-1b97-a4910d9c3784@oracle.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
 Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+From: Haiwei Li <lihaiwei@tencent.com>
 
+'exit_fastpath' isn't used anywhere else, so remove it.
 
-On 20/9/15 04:43, Krish Sadhukhan wrote:
-> 
-> On 9/13/20 11:55 PM, Wanpeng Li wrote:
->> From: Wanpeng Li <wanpengli@tencent.com>
->>
->> Analyze is_guest_mode() in svm_vcpu_run() instead of 
->> svm_exit_handlers_fastpath()
->> in conformity with VMX version.
->>
->> Suggested-by: Vitaly Kuznetsov <vkuznets@redhat.com>
->> Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
->> ---
->>   arch/x86/kvm/svm/svm.c | 7 +++++--
->>   1 file changed, 5 insertions(+), 2 deletions(-)
->>
->> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
->> index 3da5b2f..009035a 100644
->> --- a/arch/x86/kvm/svm/svm.c
->> +++ b/arch/x86/kvm/svm/svm.c
->> @@ -3393,8 +3393,7 @@ static void svm_cancel_injection(struct kvm_vcpu 
->> *vcpu)
->>   static fastpath_t svm_exit_handlers_fastpath(struct kvm_vcpu *vcpu)
->>   {
->> -    if (!is_guest_mode(vcpu) &&
->> -        to_svm(vcpu)->vmcb->control.exit_code == SVM_EXIT_MSR &&
->> +    if (to_svm(vcpu)->vmcb->control.exit_code == SVM_EXIT_MSR &&
->>           to_svm(vcpu)->vmcb->control.exit_info_1)
->>           return handle_fastpath_set_msr_irqoff(vcpu);
->> @@ -3580,6 +3579,10 @@ static __no_kcsan fastpath_t 
->> svm_vcpu_run(struct kvm_vcpu *vcpu)
->>           svm_handle_mce(svm);
->>       svm_complete_interrupts(svm);
->> +
->> +    if (is_guest_mode(vcpu))
->> +        return EXIT_FASTPATH_NONE;
->> +
->>       exit_fastpath = svm_exit_handlers_fastpath(vcpu);
->>       return exit_fastpath;
-> 
-> Not related to your changes, but should we get rid of the variable 
-> 'exit_fastpath' and just do,
-> 
->          return svm_exit_handler_fastpath(vcpu);
-> 
-> It seems the variable isn't used anywhere else and svm_vcpu_run() 
-> doesn't return from anywhere else either.
-> 
-> Also, svm_exit_handlers_fastpath() doesn't have any other caller. Should 
-> we get rid of it as well ?
+Suggested-by: Krish Sadhukhan <krish.sadhukhan@oracle.com>
+Signed-off-by: Haiwei Li <lihaiwei@tencent.com>
+---
+ arch/x86/kvm/svm/svm.c | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
 
-I will do this soon, thanks.
+diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+index c44f3e9..6e88658 100644
+--- a/arch/x86/kvm/svm/svm.c
++++ b/arch/x86/kvm/svm/svm.c
+@@ -3413,7 +3413,6 @@ static noinstr void svm_vcpu_enter_exit(struct kvm_vcpu *vcpu,
+ 
+ static __no_kcsan fastpath_t svm_vcpu_run(struct kvm_vcpu *vcpu)
+ {
+-	fastpath_t exit_fastpath;
+ 	struct vcpu_svm *svm = to_svm(vcpu);
+ 
+ 	svm->vmcb->save.rax = vcpu->arch.regs[VCPU_REGS_RAX];
+@@ -3536,8 +3535,7 @@ static __no_kcsan fastpath_t svm_vcpu_run(struct kvm_vcpu *vcpu)
+ 		svm_handle_mce(svm);
+ 
+ 	svm_complete_interrupts(svm);
+-	exit_fastpath = svm_exit_handlers_fastpath(vcpu);
+-	return exit_fastpath;
++	return svm_exit_handlers_fastpath(vcpu);
+ }
+ 
+ static void svm_load_mmu_pgd(struct kvm_vcpu *vcpu, unsigned long root,
+-- 
+1.8.3.1
+
