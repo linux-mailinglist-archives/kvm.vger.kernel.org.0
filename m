@@ -2,101 +2,157 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2397B26B8F3
-	for <lists+kvm@lfdr.de>; Wed, 16 Sep 2020 02:53:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E59BD26B8E4
+	for <lists+kvm@lfdr.de>; Wed, 16 Sep 2020 02:51:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726584AbgIPAxE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 15 Sep 2020 20:53:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34912 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726354AbgIOLdB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 15 Sep 2020 07:33:01 -0400
-Received: from mail-pg1-x542.google.com (mail-pg1-x542.google.com [IPv6:2607:f8b0:4864:20::542])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D32C3C0611C3;
-        Tue, 15 Sep 2020 04:30:42 -0700 (PDT)
-Received: by mail-pg1-x542.google.com with SMTP id 34so1794989pgo.13;
-        Tue, 15 Sep 2020 04:30:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=q/aKCB6Ww7t4Gp9xxyRSUMaEGPTL0wXO3eSVSTDC7m0=;
-        b=d4WhKkECa3SOGw8M71woMrGRb8L3iIpBgHl9yPPQdPZHW2cuQk6yPAfxHwtH4m16AY
-         i8eO1nmHUxz44HalUpWvO/YzlG305829rRK5yPPRGVy90YgDqV/Wan0i5sfeeFE58u3H
-         TOrXdQZS0Gs7bSc6uhvGH95c3XKON35BahEi1zC5ueg3LTPfJLERLSGgpn2CTv1TlFWN
-         Q70DcUUJBwXSvisWdnM7WS29wn1JFmBZ6wCkIqmpn1/aa6SHUNkCBPBNIyDX2x4Fn1um
-         FRuVU4DBwHPe/EKg6nCuxlYfce3oxLUe7QjIq1mKmw5juXB3Y16xaV0oqRqYV19utN1o
-         GA7g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=q/aKCB6Ww7t4Gp9xxyRSUMaEGPTL0wXO3eSVSTDC7m0=;
-        b=Svv3wdtdBZ/l12yn8SP1j+0dpzJ2ob0LVV1czWosfYnXJmqpyC6ejQDnF5E0KX17Nv
-         yyn3Wn/OVasUlNmrtkE4RvliN93o4Qesq1vce9Z5cQvjbR67n/VIY4YuU/WVMc5mj5Da
-         xNuFvJANn4UyJZS/tuKKsQ3ntrYH1wMGFD5X1g4Ir6jkrtIpBvomfstOZZrs0EjDNFHF
-         bdGT2LaMxMvOVRpqFkN5kgGxYJy1TthruWdF7pdzDc0WhRxR9UB1T+khbhcnoV9XLEoW
-         BxXvo/0H27xCHFAm7DdH754ibimTns9j2UycgeYNtFSm//tuepqyWzwVEYRsFoqz7Wqc
-         Uh3g==
-X-Gm-Message-State: AOAM5308s0UqdymYPFnJosGBWjI54FqaMgqD91LUrLUMmyLGYQe3Vvwc
-        /Jg2ohToQAWfriAytytxyw==
-X-Google-Smtp-Source: ABdhPJzts20bJt3xmsrlELcwAAEof7lLtQ+V7XR8dOoAiPZP+BrYF3HNavyhKQBgmkQHs6aNbkw1eQ==
-X-Received: by 2002:a63:a23:: with SMTP id 35mr14865811pgk.333.1600169442425;
-        Tue, 15 Sep 2020 04:30:42 -0700 (PDT)
-Received: from LiHaiwei.tencent.com ([203.205.141.63])
-        by smtp.gmail.com with ESMTPSA id z129sm11377807pgb.84.2020.09.15.04.30.37
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 15 Sep 2020 04:30:41 -0700 (PDT)
-From:   lihaiwei.kernel@gmail.com
-To:     x86@kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc:     pbonzini@redhat.com, sean.j.christopherson@intel.com,
-        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
-        joro@8bytes.org, tglx@linutronix.de, hpa@zytor.com,
-        Haiwei Li <lihaiwei@tencent.com>,
-        Krish Sadhukhan <krish.sadhukhan@oracle.com>
-Subject: [PATCH] KVM: SVM: Get rid of the variable 'exit_fastpath'
-Date:   Tue, 15 Sep 2020 19:30:33 +0800
-Message-Id: <20200915113033.61817-1-lihaiwei.kernel@gmail.com>
-X-Mailer: git-send-email 2.28.0
+        id S1726678AbgIPAvy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 15 Sep 2020 20:51:54 -0400
+Received: from nat-hk.nvidia.com ([203.18.50.4]:23650 "EHLO nat-hk.nvidia.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726358AbgIOLeT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 15 Sep 2020 07:34:19 -0400
+Received: from hkpgpgate101.nvidia.com (Not Verified[10.18.92.9]) by nat-hk.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
+        id <B5f60a69f0001>; Tue, 15 Sep 2020 19:33:51 +0800
+Received: from HKMAIL104.nvidia.com ([10.18.16.13])
+  by hkpgpgate101.nvidia.com (PGP Universal service);
+  Tue, 15 Sep 2020 04:33:51 -0700
+X-PGP-Universal: processed;
+        by hkpgpgate101.nvidia.com on Tue, 15 Sep 2020 04:33:51 -0700
+Received: from HKMAIL104.nvidia.com (10.18.16.13) by HKMAIL104.nvidia.com
+ (10.18.16.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Tue, 15 Sep
+ 2020 11:33:46 +0000
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (104.47.59.177)
+ by HKMAIL104.nvidia.com (10.18.16.13) with Microsoft SMTP Server (TLS) id
+ 15.0.1473.3 via Frontend Transport; Tue, 15 Sep 2020 11:33:46 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=T1Egy823R5QKf7lG2WDrPNP6llY9u3/BOB9cT8R91WeXk4eke/HeW1VM8fHMG+6MUHtP3m8lok8xY72uDgUsjMK9pmekaZ7QF6Iu2PYOXGU+ssw8CP8guyrNWM4rpi2ssyXnRvT25DqLrjWsSdBayvbgmUhNH2bX7Nksyi1bP1uZvZAbWEdnMRhXDHB7kEjvPYf+jgLyi2ulwIGuX/jhgc3WMkl84pnzjFlxsflPEcdbEMshgsu6l8/+c0bRlf3LZyTXVsU0LXjAg6gDv46sTXeqX4BY41k18FsLaMTLhn6qwdbX6tAQuxdhauLtxmpCBR1za1xWzIMoMEzd0GA6Rw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Lt+prTqc5B+XBf6OgVj3Xkfjo/yTNnSF1EJzMbT7XEY=;
+ b=eizNYhlkDRs9k6b5OgtKGkw11xVxVWASfnFfBpLW5SjxQeUssHOHW4rQOdyN3ul52nz6PSB+MGwWFkTty4sVLRGpGhCL09nFG98+m9jJirz8NAutatQhvXRkQoRuUmYt7TbQA4pBNl+QDwNLAozLSy5xcq9m7vWWWG60KVj/s/C5V8jmcHqSkY+nz2h5g1sztd0TJoPZExMUHDAPLWJT9rlTgfBnK0X5f9z8RIZyaXUVPCrYLKSYUExB/4TqYdNFhx6ZgGIS7S2qXV9PNRqCi5FMmteVxDWIkborYKECydlKP/05547XvwxIF8YRIZ7Q7fadK23F1MYl2XFaSgmxoA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+Authentication-Results: intel.com; dkim=none (message not signed)
+ header.d=none;intel.com; dmarc=none action=none header.from=nvidia.com;
+Received: from DM6PR12MB3834.namprd12.prod.outlook.com (2603:10b6:5:14a::12)
+ by DM6PR12MB4500.namprd12.prod.outlook.com (2603:10b6:5:28f::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3391.11; Tue, 15 Sep
+ 2020 11:33:44 +0000
+Received: from DM6PR12MB3834.namprd12.prod.outlook.com
+ ([fe80::cdbe:f274:ad65:9a78]) by DM6PR12MB3834.namprd12.prod.outlook.com
+ ([fe80::cdbe:f274:ad65:9a78%7]) with mapi id 15.20.3391.011; Tue, 15 Sep 2020
+ 11:33:44 +0000
+Date:   Tue, 15 Sep 2020 08:33:41 -0300
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     "Raj, Ashok" <ashok.raj@intel.com>
+CC:     Alex Williamson <alex.williamson@redhat.com>,
+        Jean-Philippe Brucker <jean-philippe@linaro.org>,
+        Jason Wang <jasowang@redhat.com>,
+        Liu Yi L <yi.l.liu@intel.com>, <eric.auger@redhat.com>,
+        <baolu.lu@linux.intel.com>, <joro@8bytes.org>,
+        <kevin.tian@intel.com>, <jacob.jun.pan@linux.intel.com>,
+        <jun.j.tian@intel.com>, <yi.y.sun@intel.com>, <peterx@redhat.com>,
+        <hao.wu@intel.com>, <stefanha@gmail.com>,
+        <iommu@lists.linux-foundation.org>, <kvm@vger.kernel.org>,
+        "Michael S. Tsirkin" <mst@redhat.com>
+Subject: Re: [PATCH v7 00/16] vfio: expose virtual Shared Virtual Addressing
+ to VMs
+Message-ID: <20200915113341.GW904879@nvidia.com>
+References: <411c81c0-f13c-37cc-6c26-cafb42b46b15@redhat.com>
+ <20200914133113.GB1375106@myrica> <20200914134738.GX904879@nvidia.com>
+ <20200914162247.GA63399@otc-nc-03> <20200914163354.GG904879@nvidia.com>
+ <20200914105857.3f88a271@x1.home> <20200914174121.GI904879@nvidia.com>
+ <20200914122328.0a262a7b@x1.home> <20200914190057.GM904879@nvidia.com>
+ <20200914224438.GA65940@otc-nc-03>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20200914224438.GA65940@otc-nc-03>
+X-ClientProxiedBy: YQBPR01CA0140.CANPRD01.PROD.OUTLOOK.COM
+ (2603:10b6:c01:1::40) To DM6PR12MB3834.namprd12.prod.outlook.com
+ (2603:10b6:5:14a::12)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from mlx.ziepe.ca (206.223.160.26) by YQBPR01CA0140.CANPRD01.PROD.OUTLOOK.COM (2603:10b6:c01:1::40) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3370.16 via Frontend Transport; Tue, 15 Sep 2020 11:33:43 +0000
+Received: from jgg by mlx with local (Exim 4.94)        (envelope-from <jgg@nvidia.com>)        id 1kI9DR-006QFY-Jo; Tue, 15 Sep 2020 08:33:41 -0300
+X-Originating-IP: [206.223.160.26]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: ac39f148-f004-45e7-a68f-08d8596b33bc
+X-MS-TrafficTypeDiagnostic: DM6PR12MB4500:
+X-Microsoft-Antispam-PRVS: <DM6PR12MB45000CBA001049B768983291C2200@DM6PR12MB4500.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: h1PtBACJ8caC50Aw/9OenZ42GMrZ7pORDSrgFLbRgQSrP+p1wJR8yZhxJm/hBEm9QMfAyU43WCNDBX3xMB80LGylHQnH11sb74Axib+fYa0Cw4iQWSDSK3OCKY7wDVBUwk/o5qJy51J+9CDq7ov54RktmiK/X8TylIXWGwVGHk4yUZq6A2CxgMIRsth7At2if122mRbRLVHoqOS/jmQGi2UvgpWoX8bzyi9RQQ2IseghARH3zMMHoaMqGEB3uA+INEehwPa9H+z/Qd7BnJwmca3tzdqZRtbzdI7mWgxKkpIeOsDcYaS4OPuAzF4wmIPm16q0gqY6iwy8pZtVVZQlz5cx68oH+JhC0cSJbIMa1vNjoa0aQ6QzziR7VXef3bgbHd7ahc80qeHY1F8Xz/mYUvVvtLi61ZZvqLbVtk2tYvE=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB3834.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(396003)(366004)(346002)(376002)(136003)(39860400002)(9746002)(7416002)(316002)(426003)(66556008)(66476007)(5660300002)(66946007)(86362001)(1076003)(9786002)(36756003)(186003)(4744005)(54906003)(4326008)(2616005)(33656002)(8936002)(26005)(8676002)(6916009)(478600001)(83380400001)(2906002)(27376004);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData: LInDfIxwJ6f4sICQT5BsDXq0q3WoJmTwlV7wo13KLYtzoJBymjzhRRQWVToOm1DiPKBETn7tQPKs4ALARkBl+meIpJQH9+LIOrXgQ0FPeZcZoAjcvT8zu/ydn/lStUFr9WHzOQQMCSiiJPWc1QMwY6j67BKmaonnwB9RArRPSnLgEBlcEGVECz/EJ7L9FW/YbEwshq0mP/RniW/jJWHk1IwFKrWg2syPvsL0ESPg6hxkJkggwWi8Ufry5X6EUTf4lreNBwV26p3JgAe6b3PupJJK/AxuEAnM8SnVMy9jC5TwE7aKrcC+dDuncK5JqSAvGitr6GSx+bPKwn1CJPoSjUmRhS22ndRqUvFFGcSlLcyu/BIWsjlBpcbAJLc8pFLc98gns0Y08vjAPB4FRYzXkDZ3d8QKW4HytiBPNMdqY1vF1vFoA1msv1TYPwG5UA9tqQpQZBfJwjYqNiVp+xZBj5OmX7dprE47p6nrcLrDLfWtK+/k6LFps/SK8rowBcWBEkfnpPHdy9mSHgBfwklk6KWDQmJYH4waWgDXQOH9AGBfXie8rRVhGXP0Gb25/tpC3soGrGPKmtyG9wpRZacAk/OBxMQbmc7t2qyp1/gFBCbdgLPgBt7eAVxNMVa5YIsGTgUy5KvWVW0qHkw/1ulSOg==
+X-MS-Exchange-CrossTenant-Network-Message-Id: ac39f148-f004-45e7-a68f-08d8596b33bc
+X-MS-Exchange-CrossTenant-AuthSource: DM6PR12MB3834.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Sep 2020 11:33:44.6304
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 9mAXs/moCWbTzTMfAhY9vBYCUeBmQO6sn+nf3ricrI0ts3dNu14d6aOabVvgmIjG
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB4500
+X-OriginatorOrg: Nvidia.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
+        t=1600169631; bh=Lt+prTqc5B+XBf6OgVj3Xkfjo/yTNnSF1EJzMbT7XEY=;
+        h=X-PGP-Universal:ARC-Seal:ARC-Message-Signature:
+         ARC-Authentication-Results:Authentication-Results:Date:From:To:CC:
+         Subject:Message-ID:References:Content-Type:Content-Disposition:
+         In-Reply-To:X-ClientProxiedBy:MIME-Version:
+         X-MS-Exchange-MessageSentRepresentingType:X-Originating-IP:
+         X-MS-PublicTrafficType:X-MS-Office365-Filtering-Correlation-Id:
+         X-MS-TrafficTypeDiagnostic:X-Microsoft-Antispam-PRVS:
+         X-MS-Oob-TLC-OOBClassifiers:X-MS-Exchange-SenderADCheck:
+         X-Microsoft-Antispam:X-Microsoft-Antispam-Message-Info:
+         X-Forefront-Antispam-Report:X-MS-Exchange-AntiSpam-MessageData:
+         X-MS-Exchange-CrossTenant-Network-Message-Id:
+         X-MS-Exchange-CrossTenant-AuthSource:
+         X-MS-Exchange-CrossTenant-AuthAs:
+         X-MS-Exchange-CrossTenant-OriginalArrivalTime:
+         X-MS-Exchange-CrossTenant-FromEntityHeader:
+         X-MS-Exchange-CrossTenant-Id:X-MS-Exchange-CrossTenant-MailboxType:
+         X-MS-Exchange-CrossTenant-UserPrincipalName:
+         X-MS-Exchange-Transport-CrossTenantHeadersStamped:X-OriginatorOrg;
+        b=lEMEVSfhqCIQFoXjtyQ0hsPki5kWG+DHwdAWoSQn157hpFuMRPLA7SSecIWDrbL7c
+         Ow5Z2hXORxzJ+Aih1lglvUr14bfILlhC9hw6aeJxVyiy2d0UIb9zSc1xon8d18tTSq
+         KO4VHE8ObRgXRK17QI83mphx+OoiHk3T299Er8ybqciO7yAFlje0MeBkAkIWN9JuxB
+         xPuuBYjvZvGfvQD2/ED3CYTF00Nqju4LisqAIoJe4UW5FFmh8vExP0Ujgj+IJ1BlU5
+         X3EYjU25qUVU23I8SzcawfJ3BvCdKSUVdo7ZfFeUm40bfwN0dP+o6EQfpFqBeSz76M
+         ZqLdDv9alsIug==
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Haiwei Li <lihaiwei@tencent.com>
+On Mon, Sep 14, 2020 at 03:44:38PM -0700, Raj, Ashok wrote:
+> Hi Jason,
+> 
+> I thought we discussed this at LPC, but still seems to be going in
+> circles :-(.
 
-'exit_fastpath' isn't used anywhere else, so remove it.
+We discused mdev at LPC, not PASID.
 
-Suggested-by: Krish Sadhukhan <krish.sadhukhan@oracle.com>
-Signed-off-by: Haiwei Li <lihaiwei@tencent.com>
----
- arch/x86/kvm/svm/svm.c | 4 +---
- 1 file changed, 1 insertion(+), 3 deletions(-)
+PASID applies widely to many device and needs to be introduced with a
+wide community agreement so all scenarios will be supportable.
 
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index c44f3e9..6e88658 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -3413,7 +3413,6 @@ static noinstr void svm_vcpu_enter_exit(struct kvm_vcpu *vcpu,
- 
- static __no_kcsan fastpath_t svm_vcpu_run(struct kvm_vcpu *vcpu)
- {
--	fastpath_t exit_fastpath;
- 	struct vcpu_svm *svm = to_svm(vcpu);
- 
- 	svm->vmcb->save.rax = vcpu->arch.regs[VCPU_REGS_RAX];
-@@ -3536,8 +3535,7 @@ static __no_kcsan fastpath_t svm_vcpu_run(struct kvm_vcpu *vcpu)
- 		svm_handle_mce(svm);
- 
- 	svm_complete_interrupts(svm);
--	exit_fastpath = svm_exit_handlers_fastpath(vcpu);
--	return exit_fastpath;
-+	return svm_exit_handlers_fastpath(vcpu);
- }
- 
- static void svm_load_mmu_pgd(struct kvm_vcpu *vcpu, unsigned long root,
--- 
-1.8.3.1
+> As you had suggested earlier in the mail thread could Jason Wang maybe
+> build out what it takes to have a full fledged /dev/sva interface for vDPA
+> and figure out how the interfaces should emerge? otherwise it appears
+> everyone is talking very high level and with that limited understanding of
+> how things work at the moment. 
 
+You want Jason Wang to do the work to get Intel PASID support merged?
+Seems a bit of strange request.
+
+> This has to move ahead of these email discussions, hoping somone with the
+> right ideas would help move this forward.
+
+Why not try yourself to come up with a proposal?
+
+Jason 
