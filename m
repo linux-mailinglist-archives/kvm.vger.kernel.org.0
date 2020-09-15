@@ -2,136 +2,199 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 57EAC26B04D
-	for <lists+kvm@lfdr.de>; Wed, 16 Sep 2020 00:07:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0C6DA26B290
+	for <lists+kvm@lfdr.de>; Wed, 16 Sep 2020 00:49:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728071AbgIOWHI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 15 Sep 2020 18:07:08 -0400
-Received: from mga03.intel.com ([134.134.136.65]:48289 "EHLO mga03.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728131AbgIOWG6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 15 Sep 2020 18:06:58 -0400
-IronPort-SDR: S+YXMIwPgmI81wypZUNsFQ/1O3Q9czlRIx4V60mVzWqSBXtvEBXEVd9+gI1pz8S4o4SqFqT5TQ
- iqSu9OswDieA==
-X-IronPort-AV: E=McAfee;i="6000,8403,9745"; a="159408574"
-X-IronPort-AV: E=Sophos;i="5.76,430,1592895600"; 
-   d="scan'208";a="159408574"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Sep 2020 15:06:50 -0700
-IronPort-SDR: EfDWGJzMGmk10dgnAirVuFw17Os1O9V/Z1BF1Y8pAKaT0+yY+JGcISidpqtFqTI4uX9m7sRxzv
- NzGPvFeRi0Xw==
-X-IronPort-AV: E=Sophos;i="5.76,430,1592895600"; 
-   d="scan'208";a="302326059"
-Received: from jacob-builder.jf.intel.com (HELO jacob-builder) ([10.7.199.155])
-  by orsmga003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Sep 2020 15:06:50 -0700
-Date:   Tue, 15 Sep 2020 15:08:51 -0700
-From:   Jacob Pan <jacob.jun.pan@linux.intel.com>
-To:     Jason Gunthorpe <jgg@nvidia.com>
-Cc:     "Raj, Ashok" <ashok.raj@intel.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Jean-Philippe Brucker <jean-philippe@linaro.org>,
-        Jason Wang <jasowang@redhat.com>,
-        Liu Yi L <yi.l.liu@intel.com>, <eric.auger@redhat.com>,
-        <baolu.lu@linux.intel.com>, <joro@8bytes.org>,
-        <kevin.tian@intel.com>, <jun.j.tian@intel.com>,
-        <yi.y.sun@intel.com>, <peterx@redhat.com>, <hao.wu@intel.com>,
-        <stefanha@gmail.com>, <iommu@lists.linux-foundation.org>,
-        <kvm@vger.kernel.org>, "Michael S. Tsirkin" <mst@redhat.com>,
-        Jacon Jun Pan <jacob.jun.pan@intel.com>,
-        jacob.jun.pan@linux.intel.com
-Subject: Re: [PATCH v7 00/16] vfio: expose virtual Shared Virtual Addressing
- to VMs
-Message-ID: <20200915150851.76436ca1@jacob-builder>
-In-Reply-To: <20200915184510.GB1573713@nvidia.com>
-References: <20200914134738.GX904879@nvidia.com>
-        <20200914162247.GA63399@otc-nc-03>
-        <20200914163354.GG904879@nvidia.com>
-        <20200914105857.3f88a271@x1.home>
-        <20200914174121.GI904879@nvidia.com>
-        <20200914122328.0a262a7b@x1.home>
-        <20200914190057.GM904879@nvidia.com>
-        <20200914224438.GA65940@otc-nc-03>
-        <20200915113341.GW904879@nvidia.com>
-        <20200915181154.GA70770@otc-nc-03>
-        <20200915184510.GB1573713@nvidia.com>
-Organization: OTC
-X-Mailer: Claws Mail 3.13.2 (GTK+ 2.24.30; x86_64-pc-linux-gnu)
+        id S1727639AbgIOWtp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 15 Sep 2020 18:49:45 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:29612 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1727459AbgIOPnt (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 15 Sep 2020 11:43:49 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1600184610;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=XXFy/q65vk1jisWRQyxPpPLWskYCS/ybqHocfTlHIhM=;
+        b=il0gFn7FVD2it0uil+cFzYmlpK6yDm4WO5HNfYBnopbt2gikMTNTYSFF8kxlw+im9NEPFJ
+        m3+G+yLl3kMJO8+CclUsP3PQM5z1nqsWB564RpHqiCHSzbfKYdI7dq4SQRq7OkagYamAv0
+        pG+bSIUyp7ebEGOjoyZ5age3Lfyw3ms=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-585-6yHQjql2OuyEZgQS79cm9w-1; Tue, 15 Sep 2020 11:43:25 -0400
+X-MC-Unique: 6yHQjql2OuyEZgQS79cm9w-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6856C1963FE6;
+        Tue, 15 Sep 2020 15:43:13 +0000 (UTC)
+Received: from vitty.brq.redhat.com (unknown [10.40.195.78])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 23E9C1992D;
+        Tue, 15 Sep 2020 15:43:10 +0000 (UTC)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+        Wei Huang <whuang2@amd.com>, linux-kernel@vger.kernel.org
+Subject: [PATCH RFC 1/2] KVM: x86: allocate vcpu->arch.cpuid_entries dynamically
+Date:   Tue, 15 Sep 2020 17:43:05 +0200
+Message-Id: <20200915154306.724953-2-vkuznets@redhat.com>
+In-Reply-To: <20200915154306.724953-1-vkuznets@redhat.com>
+References: <20200915154306.724953-1-vkuznets@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Jason,
+The current limit for guest CPUID leaves (KVM_MAX_CPUID_ENTRIES, 80)
+is reported to be insufficient but before we bump it let's switch to
+allocating vcpu->arch.cpuid_entries dynamically. Currenly,
+'struct kvm_cpuid_entry2' is 40 bytes so vcpu->arch.cpuid_entries is
+3200 bytes which accounts for 1/4 of the whole 'struct kvm_vcpu_arch'
+but having it pre-allocated (for all vCPUs which we also pre-allocate)
+gives us no benefits.
 
-On Tue, 15 Sep 2020 15:45:10 -0300, Jason Gunthorpe <jgg@nvidia.com> wrote:
+Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+---
+ arch/x86/include/asm/kvm_host.h |  2 +-
+ arch/x86/kvm/cpuid.c            | 55 ++++++++++++++++++++++++---------
+ arch/x86/kvm/x86.c              |  1 +
+ 3 files changed, 42 insertions(+), 16 deletions(-)
 
-> On Tue, Sep 15, 2020 at 11:11:54AM -0700, Raj, Ashok wrote:
-> > > PASID applies widely to many device and needs to be introduced with a
-> > > wide community agreement so all scenarios will be supportable.  
-> > 
-> > True, reading some of the earlier replies I was clearly confused as I
-> > thought you were talking about mdev again. But now that you stay it, you
-> > have moved past mdev and its the PASID interfaces correct?  
-> 
-> Yes, we agreed mdev for IDXD at LPC, didn't talk about PASID.
-> 
-> > For the native user applications have just 1 PASID per
-> > process. There is no need for a quota management.  
-> 
-> Yes, there is. There is a limited pool of HW PASID's. If one user fork
-> bombs it can easially claim an unreasonable number from that pool as
-> each process will claim a PASID. That can DOS the rest of the system.
-> 
-> If PASID DOS is a worry then it must be solved at the IOMMU level for
-> all user applications that might trigger a PASID allocation. VFIO is
-> not special.
-> 
-> > IIUC, you are asking that part of the interface to move to a API
-> > interface that potentially the new /dev/sva and VFIO could share? I
-> > think the API's for PASID management themselves are generic (Jean's
-> > patchset + Jacob's ioasid set management).  
-> 
-> Yes, the in kernel APIs are pretty generic now, and can be used by
-> many types of drivers.
-> 
-Right, IOMMU UAPIs are not VFIO specific, we pass user pointer to the IOMMU
-layer to process.
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index 5303dbc5c9bc..0c5f2ca3e838 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -636,7 +636,7 @@ struct kvm_vcpu_arch {
+ 	int halt_request; /* real mode on Intel only */
+ 
+ 	int cpuid_nent;
+-	struct kvm_cpuid_entry2 cpuid_entries[KVM_MAX_CPUID_ENTRIES];
++	struct kvm_cpuid_entry2 *cpuid_entries;
+ 
+ 	int maxphyaddr;
+ 	int max_tdp_level;
+diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+index 3fd6eec202d7..0ce943a8a39a 100644
+--- a/arch/x86/kvm/cpuid.c
++++ b/arch/x86/kvm/cpuid.c
+@@ -195,6 +195,7 @@ int kvm_vcpu_ioctl_set_cpuid(struct kvm_vcpu *vcpu,
+ {
+ 	int r, i;
+ 	struct kvm_cpuid_entry *cpuid_entries = NULL;
++	struct kvm_cpuid_entry2 *cpuid_entries2 = NULL;
+ 
+ 	r = -E2BIG;
+ 	if (cpuid->nent > KVM_MAX_CPUID_ENTRIES)
+@@ -207,31 +208,42 @@ int kvm_vcpu_ioctl_set_cpuid(struct kvm_vcpu *vcpu,
+ 			r = PTR_ERR(cpuid_entries);
+ 			goto out;
+ 		}
++		cpuid_entries2 = kvmalloc_array(cpuid->nent, sizeof(cpuid_entries2[0]),
++						GFP_KERNEL_ACCOUNT);
++		if (!cpuid_entries2) {
++			r = -ENOMEM;
++			goto out_free_cpuid;
++		}
+ 	}
+ 	for (i = 0; i < cpuid->nent; i++) {
+-		vcpu->arch.cpuid_entries[i].function = cpuid_entries[i].function;
+-		vcpu->arch.cpuid_entries[i].eax = cpuid_entries[i].eax;
+-		vcpu->arch.cpuid_entries[i].ebx = cpuid_entries[i].ebx;
+-		vcpu->arch.cpuid_entries[i].ecx = cpuid_entries[i].ecx;
+-		vcpu->arch.cpuid_entries[i].edx = cpuid_entries[i].edx;
+-		vcpu->arch.cpuid_entries[i].index = 0;
+-		vcpu->arch.cpuid_entries[i].flags = 0;
+-		vcpu->arch.cpuid_entries[i].padding[0] = 0;
+-		vcpu->arch.cpuid_entries[i].padding[1] = 0;
+-		vcpu->arch.cpuid_entries[i].padding[2] = 0;
++		cpuid_entries2[i].function = cpuid_entries[i].function;
++		cpuid_entries2[i].eax = cpuid_entries[i].eax;
++		cpuid_entries2[i].ebx = cpuid_entries[i].ebx;
++		cpuid_entries2[i].ecx = cpuid_entries[i].ecx;
++		cpuid_entries2[i].edx = cpuid_entries[i].edx;
++		cpuid_entries2[i].index = 0;
++		cpuid_entries2[i].flags = 0;
++		cpuid_entries2[i].padding[0] = 0;
++		cpuid_entries2[i].padding[1] = 0;
++		cpuid_entries2[i].padding[2] = 0;
+ 	}
++	kvfree(vcpu->arch.cpuid_entries);
++	vcpu->arch.cpuid_entries = cpuid_entries2;
+ 	vcpu->arch.cpuid_nent = cpuid->nent;
++
+ 	r = kvm_check_cpuid(vcpu);
+ 	if (r) {
++		kvfree(vcpu->arch.cpuid_entries);
++		vcpu->arch.cpuid_entries = NULL;
+ 		vcpu->arch.cpuid_nent = 0;
+-		kvfree(cpuid_entries);
+-		goto out;
++		goto out_free_cpuid;
+ 	}
+ 
+ 	cpuid_fix_nx_cap(vcpu);
+ 	kvm_update_cpuid_runtime(vcpu);
+ 	kvm_vcpu_after_set_cpuid(vcpu);
+ 
++out_free_cpuid:
+ 	kvfree(cpuid_entries);
+ out:
+ 	return r;
+@@ -241,18 +253,31 @@ int kvm_vcpu_ioctl_set_cpuid2(struct kvm_vcpu *vcpu,
+ 			      struct kvm_cpuid2 *cpuid,
+ 			      struct kvm_cpuid_entry2 __user *entries)
+ {
++	struct kvm_cpuid_entry2 *cpuid_entries2 = NULL;
+ 	int r;
+ 
+ 	r = -E2BIG;
+ 	if (cpuid->nent > KVM_MAX_CPUID_ENTRIES)
+ 		goto out;
+ 	r = -EFAULT;
+-	if (copy_from_user(&vcpu->arch.cpuid_entries, entries,
+-			   cpuid->nent * sizeof(struct kvm_cpuid_entry2)))
+-		goto out;
++
++	if (cpuid->nent) {
++		cpuid_entries2 = vmemdup_user(entries,
++					      array_size(sizeof(cpuid_entries2[0]),
++							 cpuid->nent));
++		if (IS_ERR(cpuid_entries2)) {
++			r = PTR_ERR(cpuid_entries2);
++			goto out;
++		}
++	}
++	kvfree(vcpu->arch.cpuid_entries);
++	vcpu->arch.cpuid_entries = cpuid_entries2;
+ 	vcpu->arch.cpuid_nent = cpuid->nent;
++
+ 	r = kvm_check_cpuid(vcpu);
+ 	if (r) {
++		kvfree(vcpu->arch.cpuid_entries);
++		vcpu->arch.cpuid_entries = NULL;
+ 		vcpu->arch.cpuid_nent = 0;
+ 		goto out;
+ 	}
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 1994602a0851..42259a6ec1d8 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -9610,6 +9610,7 @@ void kvm_arch_vcpu_destroy(struct kvm_vcpu *vcpu)
+ 	kvm_mmu_destroy(vcpu);
+ 	srcu_read_unlock(&vcpu->kvm->srcu, idx);
+ 	free_page((unsigned long)vcpu->arch.pio_data);
++	kvfree(vcpu->arch.cpuid_entries);
+ 	if (!lapic_in_kernel(vcpu))
+ 		static_key_slow_dec(&kvm_no_apic_vcpu);
+ }
+-- 
+2.25.4
 
-Similarly for PASID management, the IOASID extensions we are proposing
-will handle ioasid_set (groups/pools), quota, permissions, and notifications
-in the IOASID core. There is nothing VFIO specific.
-https://lkml.org/lkml/2020/8/22/12
-
-> As JasonW kicked this off, VDPA will need all this identical stuff
-> too. We already know this, and I think Intel VDPA HW will need it, so
-> it should concern you too :)
-> 
-> A PASID vIOMMU solution sharable with VDPA and VFIO, based on a PASID
-> control char dev (eg /dev/sva, or maybe /dev/iommu) seems like a
-> reasonable starting point for discussion.
-> 
-I am not sure what can really be consolidated in /dev/sva. VFIO and VDPA
-will have their own kerne-user interfaces anyway for their usage models.
-They are just providing the specific transport while sharing generic IOMMU
-UAPIs and IOASID management.
-
-As I mentioned PASID management is already consolidated in the IOASID layer,
-so for VDPA or other users, it just matter of create its own ioasid_set,
-doing allocation.
-
-IOASID is also available to the in-kernel users which does not
-need /dev/sva AFAICT. For bare metal SVA, I don't see a need to create this
-'floating' state of the PASID when created by /dev/sva. PASID allocation
-could happen behind the scene when users need to bind page tables to a
-device DMA stream. Security authorization of the PASID is natively enforced
-when user try to bind page table, there is no need to pass the FD handle of
-the PASID back to the kernel as you suggested earlier.
-
-Thanks,
-
-Jacob
