@@ -2,413 +2,106 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2518426CBAA
-	for <lists+kvm@lfdr.de>; Wed, 16 Sep 2020 22:32:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5B60D26CBE3
+	for <lists+kvm@lfdr.de>; Wed, 16 Sep 2020 22:36:30 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726919AbgIPUb6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 16 Sep 2020 16:31:58 -0400
-Received: from mail-bn8nam12on2080.outbound.protection.outlook.com ([40.107.237.80]:40960
-        "EHLO NAM12-BN8-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727125AbgIPUbv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 16 Sep 2020 16:31:51 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=jXwSQxWcfHqd+eL/+qNS05AGj1vOt3BzNEAgUQk1CNCrjKuQRoASa8lpW5Z9STwi8Cy+Qbj1fIbEewYv8WPIXG/sLof2Q4u4Pj/XrDKCQ0e6hzXZ0eRe5IBLWVo5nu4qU9tPI66xb8T3pnzEQNqTgAzidKx7i66JVF1yFwGPfjkuN88CwGSFZ66D8ZS7q5yDS6CJlMowiYio5Rn/pLlZY4W1Q9uZimy7Mp16OGQP7fRX+Lj9VlCQUQGo7JCM0iHVCuSQjy2mis+p1od1Gyh/LuYw7Qd6uh08bOk7gu8vWoEEOGQocYN5pXQr+Nq6fDy9G733JtgMzuJydIPovHCqvA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=RNqLKZyYmJvrHzKqYEaiGA2zy1EJmgLgDjoTMjp6rdY=;
- b=ZYpBdzKG3aELlHVT2NBNdd5JJxW5t5MuSoCqD5viHZM/xuaYMqfMx5ARfXCLYuAmavMBlNDXgDfr6iNKMGuAniVFH2bZsq8fttXvQC9d0Wguk7f0XEPxhJM584MHsAs7Nk6m7FVa+MhytfdWKi81muZtvxkTNoqk7RWeVxdSHDmQbcI4FIMtiGf9U8+wlSrhnJEGLJevJsCacRzsgc2TTZAFAVp/XrkTMjzMisIe2fqRfxVMGm6X1eDGd2dPFKLg76YqSTcG4cWdN/0nBJ+hhQRlk7IHMKsFSat1snqisPmTYsh1q2NNNPHkN3mJa7lW4e6/0DjKJjOyCVpJCJkGJA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
+        id S1728425AbgIPUgY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 16 Sep 2020 16:36:24 -0400
+Received: from smtp-fw-9101.amazon.com ([207.171.184.25]:13213 "EHLO
+        smtp-fw-9101.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728388AbgIPUgU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 16 Sep 2020 16:36:20 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=RNqLKZyYmJvrHzKqYEaiGA2zy1EJmgLgDjoTMjp6rdY=;
- b=jAciQwC7tutkXo1GJlK7Hk80tifeZnBUPt6lJIZoHQ25MibOAxCX0IozA2XRv5tbFOKBeCLzveTUK1HSgQSSQnOuJz/3XTih3GM52Nu70FXLk9biThjkjzLJ3EPG9fSqiYh0IbFnhCXz+VH8bacz2Bn0NM5CoHbKx8t2zPjmHQo=
-Authentication-Results: twiddle.net; dkim=none (message not signed)
- header.d=none;twiddle.net; dmarc=none action=none header.from=amd.com;
-Received: from DM5PR12MB1355.namprd12.prod.outlook.com (2603:10b6:3:6e::7) by
- DM6PR12MB4484.namprd12.prod.outlook.com (2603:10b6:5:28f::24) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.3370.17; Wed, 16 Sep 2020 20:31:47 +0000
-Received: from DM5PR12MB1355.namprd12.prod.outlook.com
- ([fe80::299a:8ed2:23fc:6346]) by DM5PR12MB1355.namprd12.prod.outlook.com
- ([fe80::299a:8ed2:23fc:6346%3]) with mapi id 15.20.3391.011; Wed, 16 Sep 2020
- 20:31:47 +0000
-Subject: Re: [PATCH v3 3/5] sev/i386: Allow AP booting under SEV-ES
-To:     Laszlo Ersek <lersek@redhat.com>, qemu-devel@nongnu.org,
-        kvm@vger.kernel.org
-Cc:     Brijesh Singh <brijesh.singh@amd.com>,
-        Eduardo Habkost <ehabkost@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Connor Kuehl <ckuehl@redhat.com>,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jiri Slaby <jslaby@suse.cz>,
-        Richard Henderson <rth@twiddle.net>
-References: <cover.1600205384.git.thomas.lendacky@amd.com>
- <9d964b7575471f45c522eea9ea3a7d84ed4d7d2b.1600205384.git.thomas.lendacky@amd.com>
- <24db1bf6-fbb6-c1c7-3018-54cc114c9a96@redhat.com>
-From:   Tom Lendacky <thomas.lendacky@amd.com>
-Message-ID: <a3f9c013-a275-2d65-f94e-6ba055a5c8f0@amd.com>
-Date:   Wed, 16 Sep 2020 15:31:44 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
-In-Reply-To: <24db1bf6-fbb6-c1c7-3018-54cc114c9a96@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SN4PR0201CA0001.namprd02.prod.outlook.com
- (2603:10b6:803:2b::11) To DM5PR12MB1355.namprd12.prod.outlook.com
- (2603:10b6:3:6e::7)
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1600288580; x=1631824580;
+  h=subject:to:cc:references:from:message-id:date:
+   mime-version:in-reply-to:content-transfer-encoding;
+  bh=dGZqVnUoL1EJHSp3OUeSnhcSg8wLbGG2vxHUgbmqNo4=;
+  b=BY1r0hvXKDxFwRfd9tq5GV/+D7P+fyujuuZgrIJ4DIVTMixNrAiC+kRP
+   duqMSg74MW634LBF4yI30NTjqpNtfLP3L3kWgu5HZfkMOvEwPem1zVaia
+   jgK3tP7P5f1gVT5RwBf58hm3GUDETsFLbUJQfYQflRokUaaP61dPyJgB/
+   Q=;
+X-IronPort-AV: E=Sophos;i="5.76,434,1592870400"; 
+   d="scan'208";a="68664417"
+Received: from sea32-co-svc-lb4-vlan3.sea.corp.amazon.com (HELO email-inbound-relay-2a-53356bf6.us-west-2.amazon.com) ([10.47.23.38])
+  by smtp-border-fw-out-9101.sea19.amazon.com with ESMTP; 16 Sep 2020 20:36:15 +0000
+Received: from EX13MTAUWC001.ant.amazon.com (pdx4-ws-svc-p6-lb7-vlan2.pdx.amazon.com [10.170.41.162])
+        by email-inbound-relay-2a-53356bf6.us-west-2.amazon.com (Postfix) with ESMTPS id 929BFA1783;
+        Wed, 16 Sep 2020 20:36:14 +0000 (UTC)
+Received: from EX13D20UWC001.ant.amazon.com (10.43.162.244) by
+ EX13MTAUWC001.ant.amazon.com (10.43.162.135) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.2; Wed, 16 Sep 2020 20:36:14 +0000
+Received: from freeip.amazon.com (10.43.161.237) by
+ EX13D20UWC001.ant.amazon.com (10.43.162.244) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.2; Wed, 16 Sep 2020 20:36:10 +0000
+Subject: Re: [PATCH v6 5/7] KVM: x86: VMX: Prevent MSR passthrough when MSR
+ access is denied
+To:     Aaron Lewis <aaronlewis@google.com>
+CC:     Paolo Bonzini <pbonzini@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        KarimAllah Raslan <karahmed@amazon.de>,
+        Dan Carpenter <dan.carpenter@oracle.com>,
+        kvm list <kvm@vger.kernel.org>, <linux-doc@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>
+References: <20200902125935.20646-1-graf@amazon.com>
+ <20200902125935.20646-6-graf@amazon.com>
+ <CAAAPnDH2D6fANhZzy3fAL2XKO4ROrvbOoqPme2Ww6q5XcVJfog@mail.gmail.com>
+ <c90a705d-8768-efd1-e744-b56cd6ab3c0f@amazon.com>
+ <CAAAPnDEoQhtXuiqHwUtrsL7codcToAVwaR=+qVczZrz6RCWe0A@mail.gmail.com>
+From:   Alexander Graf <graf@amazon.com>
+Message-ID: <e61772b5-4c64-8407-2b52-dbba2d488f90@amazon.com>
+Date:   Wed, 16 Sep 2020 22:36:08 +0200
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.16; rv:78.0)
+ Gecko/20100101 Thunderbird/78.2.2
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from [10.236.30.118] (165.204.77.1) by SN4PR0201CA0001.namprd02.prod.outlook.com (2603:10b6:803:2b::11) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3391.13 via Frontend Transport; Wed, 16 Sep 2020 20:31:46 +0000
-X-Originating-IP: [165.204.77.1]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-HT: Tenant
-X-MS-Office365-Filtering-Correlation-Id: 7561cd0e-f33d-4530-f178-08d85a7f889c
-X-MS-TrafficTypeDiagnostic: DM6PR12MB4484:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <DM6PR12MB44845699194D92709FAB7A73EC210@DM6PR12MB4484.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:374;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: kTXv5PBqbOSf2rYug4GrZXkVde0kPZVIxpLKcPt8IE0s4MOkX2vADqvYcYtiLfGnjUezF9UJq2MYNM/mY7gNXw+7Espzs2POVGGs/L+kxlFkS3vi36ZBHXdCcmhFnfYEl/bBq9BNaokwoRaIN+q5zR7YhvMWPuC3jXg4jJ3iSwxR1cz2JTKoXiss5bl/n0JKR1aAaG9cuVoW/kkAy2D054MhM/2zCNIwRKFijqM/8x7KqTU7jV8K6fOOQLwERTzeQmhP4q26Jxrm2L7OOjm9HmToSqwATRHfMIhMNfZXFaerrli5FjJ3A8XsAL0wKBkc01VzLC7jDzKe2EMMDPg0zLGqm/P/Jt2tz7RbqSu0+x6wWG1Kz78HeJjCNQIxe4QK
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM5PR12MB1355.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(396003)(39850400004)(346002)(366004)(136003)(376002)(66946007)(31686004)(31696002)(66476007)(36756003)(54906003)(7416002)(4326008)(66556008)(52116002)(478600001)(316002)(53546011)(956004)(8676002)(8936002)(16576012)(83380400001)(26005)(186003)(2616005)(5660300002)(2906002)(6486002)(16526019)(86362001)(43740500002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData: HTynLf5Oz+UBAKU2ByejBzur1SMBfPIb5siE1+nO7nqp6yp7CFyCt9MSNwM2AIj94LYTaWiEmDtdShAc83Cim0BOBKzqNdsm75JDU63+0VqLeyeJ2dzds9Sh1+I5H2+vpwmblOUC/BP93eYTZoFg9xNEvux/sGROpsVlhlRCcJUiTgNy4B5GXY4Xp818lqaB9FvtaHDz+YhH9UMOfi3OKTCNTazSMADM44ErGWBdnFNKcFaiaZQvt7w9Z0DbH4csIUNb2IqvP29FSAQpLH1eI1kR/oKySGXMeNGnjVL0DiW8JcYZl+SMee1Tt9hJJUJ7XD04N8ZGYWAc0GksVvUadMKjCEUG8EY8QNrfusQFmH3BNEqDz60FZy/u7uslYqodlJ5VxZtb0IwiVUFYHLWJE4a5CXtqpwiIHgTy2oj2Pv+cfNQAHSc956NuVOcTQNz0pKieZxkE6qXA0AxOdcpno2klQ943g3nkiIHo9eYXPG1TowCO668GAyOVf2ui5onQ+LxXb4+1iO+uuZU4IZ2m8ahXsz3p1NGDRQ91yjh8mxh+F2pTOtdZIfIWSvxWgX/AGbp8cn41nJ7TySH2JTPvTI6W/TsnSVqUKiQljD5F/oLsVrRWDtIwx8VBFYdojs/19qFbm2gZ+2+A9iF23tuCUQ==
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7561cd0e-f33d-4530-f178-08d85a7f889c
-X-MS-Exchange-CrossTenant-AuthSource: DM5PR12MB1355.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Sep 2020 20:31:47.4617
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: W83BxrYpURMIHqbS7LLop6p5W6WGtV6upXPrh5InEtMwXWxbr93M2HuC4NJeMhgpyq6PXcawCkS5AFKVa+zvKg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB4484
+In-Reply-To: <CAAAPnDEoQhtXuiqHwUtrsL7codcToAVwaR=+qVczZrz6RCWe0A@mail.gmail.com>
+Content-Language: en-US
+X-Originating-IP: [10.43.161.237]
+X-ClientProxiedBy: EX13D44UWB001.ant.amazon.com (10.43.161.32) To
+ EX13D20UWC001.ant.amazon.com (10.43.162.244)
+Content-Type: text/plain; charset="utf-8"; format="flowed"
+Content-Transfer-Encoding: base64
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 9/16/20 4:23 AM, Laszlo Ersek wrote:
-> Hi Tom,
+CgpPbiAxNi4wOS4yMCAyMjoxMywgQWFyb24gTGV3aXMgd3JvdGU6Cj4gCj4+Pgo+Pj4+ICsKPj4+
+PiAgICAvKgo+Pj4+ICAgICAqIFRoZXNlIDIgcGFyYW1ldGVycyBhcmUgdXNlZCB0byBjb25maWcg
+dGhlIGNvbnRyb2xzIGZvciBQYXVzZS1Mb29wIEV4aXRpbmc6Cj4+Pj4gICAgICogcGxlX2dhcDog
+ICAgdXBwZXIgYm91bmQgb24gdGhlIGFtb3VudCBvZiB0aW1lIGJldHdlZW4gdHdvIHN1Y2Nlc3Np
+dmUKPj4+PiBAQCAtNjIyLDYgKzY0Miw0MSBAQCBzdGF0aWMgaW5saW5lIGJvb2wgcmVwb3J0X2Zs
+ZXhwcmlvcml0eSh2b2lkKQo+Pj4+ICAgICAgICAgICByZXR1cm4gZmxleHByaW9yaXR5X2VuYWJs
+ZWQ7Cj4+Pj4gICAgfQo+Pj4KPj4+IE9uZSB0aGluZyB0aGF0IHNlZW1zIHRvIGJlIG1pc3Npbmcg
+aXMgcmVtb3ZpbmcgTVNScyBmcm9tIHRoZQo+Pj4gcGVybWlzc2lvbiBiaXRtYXAgb3IgcmVzZXR0
+aW5nIHRoZSBwZXJtaXNzaW9uIGJpdG1hcCB0byBpdHMgb3JpZ2luYWwKPj4+IHN0YXRlIGJlZm9y
+ZSBhZGRpbmcgY2hhbmdlcyBvbiB0b3Agb2YgaXQuICBUaGlzIHdvdWxkIGJlIG5lZWRlZCBvbgo+
+Pj4gc3Vic2VxdWVudCBjYWxscyB0byBrdm1fdm1faW9jdGxfc2V0X21zcl9maWx0ZXIoKS4gIFdo
+ZW4gdGhhdCBoYXBwZW5zCj4+PiB0aGUgb3JpZ2luYWwgY2hhbmdlcyBtYWRlIGJ5IEtWTV9SRVFf
+TVNSX0ZJTFRFUl9DSEFOR0VEIG5lZWQgdG8gYmUKPj4+IGJhY2tlZCBvdXQgYmVmb3JlIGFwcGx5
+aW5nIHRoZSBuZXcgc2V0Lgo+Pgo+PiBJJ20gbm90IHN1cmUgSSBmb2xsb3cuIFN1YnNlcXVlbnQg
+Y2FsbHMgdG8gc2V0X21zcl9maWx0ZXIoKSB3aWxsIGludm9rZQo+PiB0aGUgInBsZWFzZSByZXNl
+dCB0aGUgd2hvbGUgTVNSIHBhc3N0aHJvdWdoIGJpdG1hcCB0byBhIGNvbnNpc3RlbnQKPj4gc3Rh
+dGUiIHdoaWNoIHdpbGwgdGhlbiByZWFwcGx5IHRoZSBpbi1rdm0gZGVzaXJlZCBzdGF0ZSB0aHJv
+dWdoIHRoZQo+PiBiaXRtYXAgYW5kIGZpbHRlciBzdGF0ZSBvbiB0b3Agb24gZWFjaCBvZiB0aG9z
+ZS4KPj4KPiAKPiBZZXMsIHlvdSdyZSBjb3JyZWN0LiAgSSBkaXNjb3ZlcmVkIHRoaXMgYWZ0ZXIg
+dGhlIGZhY3QgYnkgYWRkaW5nIGEKPiB0ZXN0IHRvIHRoZSBzZWxmdGVzdCBJIHdyb3RlIGZvciB0
+aGUgZGVueSBsaXN0IHN5c3RlbSB3aGljaCBJIHJldmFtcGVkCj4gdG8gd29yayBmb3IgeW91ciBm
+aWx0ZXIgc3lzdGVtLiAgSXQgcHJvdmVkIHRoZSBwZXJtaXNzaW9uIGJpdG1hcHMgYXJlCj4gaW4g
+ZmFjdCBzZXQgYXMgZXhwZWN0ZWQgb24gc3Vic2VxdWVudCBjYWxscy4gIFlvdSBjYW4gZGlzcmVn
+YXJkIHRoaXMKPiBjb21tZW50Lgo+IAo+IEFzIGEgc2lkZSBub3RlLCBJJ20gaGFwcHkgdG8gc2hh
+cmUgdGhlIHRlc3QgaWYgeW91J2QgbGlrZS4gSSBhbHNvIHVzZWQKPiBpdCB0byB1bmNvdmVyIGFu
+IGlzc3VlIGluIHRoZSBmaXJzdCBjb21taXQgb2YgdGhpcyBzZXJpZXMuCgpJIHJlYWxseSBlbmpv
+eSB0aGUgdGVzdHMgdGhhdCB5b3Ugc3VibWl0dGVkIGFuZCB3b3VsZCBsb3ZlIHRvIHNlZSB5b3Ug
+CmFkZCB5b3VyIHRlc3QgY292ZXJhZ2UgdG8gdGhlIGZpbHRlcmluZyBwYXRjaCBzZXQgOikKCgpU
+aGFua3MhCgpBbGV4CgoKCgpBbWF6b24gRGV2ZWxvcG1lbnQgQ2VudGVyIEdlcm1hbnkgR21iSApL
+cmF1c2Vuc3RyLiAzOAoxMDExNyBCZXJsaW4KR2VzY2hhZWZ0c2Z1ZWhydW5nOiBDaHJpc3RpYW4g
+U2NobGFlZ2VyLCBKb25hdGhhbiBXZWlzcwpFaW5nZXRyYWdlbiBhbSBBbXRzZ2VyaWNodCBDaGFy
+bG90dGVuYnVyZyB1bnRlciBIUkIgMTQ5MTczIEIKU2l0ejogQmVybGluClVzdC1JRDogREUgMjg5
+IDIzNyA4NzkKCgo=
 
-Hi Laszlo,
-
-> 
-> sorry for the random feedback -- I haven't followed (and don't really
-> intend to follow) the QEMU side of the feature. Just one style idea:
-> 
-> On 09/15/20 23:29, Tom Lendacky wrote:
->> From: Tom Lendacky <thomas.lendacky@amd.com>
->>
->> When SEV-ES is enabled, it is not possible modify the guests register
->> state after it has been initially created, encrypted and measured.
->>
->> Normally, an INIT-SIPI-SIPI request is used to boot the AP. However, the
->> hypervisor cannot emulate this because it cannot update the AP register
->> state. For the very first boot by an AP, the reset vector CS segment
->> value and the EIP value must be programmed before the register has been
->> encrypted and measured.
->>
->> Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
->> ---
->>  accel/kvm/kvm-all.c    | 64 ++++++++++++++++++++++++++++++++++++++++++
->>  accel/stubs/kvm-stub.c |  5 ++++
->>  hw/i386/pc_sysfw.c     | 10 ++++++-
->>  include/sysemu/kvm.h   | 16 +++++++++++
->>  include/sysemu/sev.h   |  3 ++
->>  target/i386/kvm.c      |  2 ++
->>  target/i386/sev.c      | 51 +++++++++++++++++++++++++++++++++
->>  7 files changed, 150 insertions(+), 1 deletion(-)
->>
->> diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
->> index 63ef6af9a1..20725b0368 100644
->> --- a/accel/kvm/kvm-all.c
->> +++ b/accel/kvm/kvm-all.c
->> @@ -39,6 +39,7 @@
->>  #include "qemu/main-loop.h"
->>  #include "trace.h"
->>  #include "hw/irq.h"
->> +#include "sysemu/kvm.h"
->>  #include "sysemu/sev.h"
->>  #include "qapi/visitor.h"
->>  #include "qapi/qapi-types-common.h"
->> @@ -120,6 +121,12 @@ struct KVMState
->>      /* memory encryption */
->>      void *memcrypt_handle;
->>      int (*memcrypt_encrypt_data)(void *handle, uint8_t *ptr, uint64_t len);
->> +    int (*memcrypt_save_reset_vector)(void *handle, void *flash_ptr,
->> +                                      uint64_t flash_size, uint32_t *addr);
->> +
->> +    unsigned int reset_cs;
->> +    unsigned int reset_ip;
->> +    bool reset_valid;
->>  
->>      /* For "info mtree -f" to tell if an MR is registered in KVM */
->>      int nr_as;
->> @@ -239,6 +246,62 @@ int kvm_memcrypt_encrypt_data(uint8_t *ptr, uint64_t len)
->>      return 1;
->>  }
->>  
->> +void kvm_memcrypt_set_reset_vector(CPUState *cpu)
->> +{
->> +    X86CPU *x86;
->> +    CPUX86State *env;
->> +
->> +    /* Only update if we have valid reset information */
->> +    if (!kvm_state->reset_valid) {
->> +        return;
->> +    }
->> +
->> +    /* Do not update the BSP reset state */
->> +    if (cpu->cpu_index == 0) {
->> +        return;
->> +    }
->> +
->> +    x86 = X86_CPU(cpu);
->> +    env = &x86->env;
->> +
->> +    cpu_x86_load_seg_cache(env, R_CS, 0xf000, kvm_state->reset_cs, 0xffff,
->> +                           DESC_P_MASK | DESC_S_MASK | DESC_CS_MASK |
->> +                           DESC_R_MASK | DESC_A_MASK);
->> +
->> +    env->eip = kvm_state->reset_ip;
->> +}
->> +
->> +int kvm_memcrypt_save_reset_vector(void *flash_ptr, uint64_t flash_size)
->> +{
->> +    CPUState *cpu;
->> +    uint32_t addr;
->> +    int ret;
->> +
->> +    if (kvm_memcrypt_enabled() &&
->> +        kvm_state->memcrypt_save_reset_vector) {
->> +
->> +        addr = 0;
->> +        ret = kvm_state->memcrypt_save_reset_vector(kvm_state->memcrypt_handle,
->> +                                                    flash_ptr, flash_size,
->> +                                                    &addr);
->> +        if (ret) {
->> +            return ret;
->> +        }
->> +
->> +        if (addr) {
->> +            kvm_state->reset_cs = addr & 0xffff0000;
->> +            kvm_state->reset_ip = addr & 0x0000ffff;
->> +            kvm_state->reset_valid = true;
->> +
->> +            CPU_FOREACH(cpu) {
->> +                kvm_memcrypt_set_reset_vector(cpu);
->> +            }
->> +        }
->> +    }
->> +
->> +    return 0;
->> +}
->> +
->>  /* Called with KVMMemoryListener.slots_lock held */
->>  static KVMSlot *kvm_get_free_slot(KVMMemoryListener *kml)
->>  {
->> @@ -2193,6 +2256,7 @@ static int kvm_init(MachineState *ms)
->>          }
->>  
->>          kvm_state->memcrypt_encrypt_data = sev_encrypt_data;
->> +        kvm_state->memcrypt_save_reset_vector = sev_es_save_reset_vector;
->>      }
->>  
->>      ret = kvm_arch_init(ms, s);
->> diff --git a/accel/stubs/kvm-stub.c b/accel/stubs/kvm-stub.c
->> index 82f118d2df..3aece9b513 100644
->> --- a/accel/stubs/kvm-stub.c
->> +++ b/accel/stubs/kvm-stub.c
->> @@ -114,6 +114,11 @@ int kvm_memcrypt_encrypt_data(uint8_t *ptr, uint64_t len)
->>    return 1;
->>  }
->>  
->> +int kvm_memcrypt_save_reset_vector(void *flash_ptr, uint64_t flash_size)
->> +{
->> +    return -ENOSYS;
->> +}
->> +
->>  #ifndef CONFIG_USER_ONLY
->>  int kvm_irqchip_add_msi_route(KVMState *s, int vector, PCIDevice *dev)
->>  {
->> diff --git a/hw/i386/pc_sysfw.c b/hw/i386/pc_sysfw.c
->> index b6c0822fe3..321ff94261 100644
->> --- a/hw/i386/pc_sysfw.c
->> +++ b/hw/i386/pc_sysfw.c
->> @@ -156,7 +156,8 @@ static void pc_system_flash_map(PCMachineState *pcms,
->>      PFlashCFI01 *system_flash;
->>      MemoryRegion *flash_mem;
->>      void *flash_ptr;
->> -    int ret, flash_size;
->> +    uint64_t flash_size;
->> +    int ret;
->>  
->>      assert(PC_MACHINE_GET_CLASS(pcms)->pci_enabled);
->>  
->> @@ -204,6 +205,13 @@ static void pc_system_flash_map(PCMachineState *pcms,
->>              if (kvm_memcrypt_enabled()) {
->>                  flash_ptr = memory_region_get_ram_ptr(flash_mem);
->>                  flash_size = memory_region_size(flash_mem);
->> +
->> +                ret = kvm_memcrypt_save_reset_vector(flash_ptr, flash_size);
->> +                if (ret) {
->> +                    error_report("failed to locate and/or save reset vector");
->> +                    exit(1);
->> +                }
->> +
->>                  ret = kvm_memcrypt_encrypt_data(flash_ptr, flash_size);
->>                  if (ret) {
->>                      error_report("failed to encrypt pflash rom");
->> diff --git a/include/sysemu/kvm.h b/include/sysemu/kvm.h
->> index b4174d941c..f74cfa85ab 100644
->> --- a/include/sysemu/kvm.h
->> +++ b/include/sysemu/kvm.h
->> @@ -247,6 +247,22 @@ bool kvm_memcrypt_enabled(void);
->>   */
->>  int kvm_memcrypt_encrypt_data(uint8_t *ptr, uint64_t len);
->>  
->> +/**
->> + * kvm_memcrypt_set_reset_vector - sets the CS/IP value for the AP if SEV-ES
->> + *                                 is active.
->> + */
->> +void kvm_memcrypt_set_reset_vector(CPUState *cpu);
->> +
->> +/**
->> + * kvm_memcrypt_save_reset_vector - locates and saves the reset vector to be
->> + *                                  used as the initial CS/IP value for APs
->> + *                                  if SEV-ES is active.
->> + *
->> + * Return: 1 SEV-ES is active and failed to locate a valid reset vector
->> + *         0 SEV-ES is not active or successfully located and saved the
->> + *           reset vector address
->> + */
->> +int kvm_memcrypt_save_reset_vector(void *flash_prt, uint64_t flash_size);
->>  
->>  #ifdef NEED_CPU_H
->>  #include "cpu.h"
->> diff --git a/include/sysemu/sev.h b/include/sysemu/sev.h
->> index 98c1ec8d38..5198e5a621 100644
->> --- a/include/sysemu/sev.h
->> +++ b/include/sysemu/sev.h
->> @@ -18,4 +18,7 @@
->>  
->>  void *sev_guest_init(const char *id);
->>  int sev_encrypt_data(void *handle, uint8_t *ptr, uint64_t len);
->> +int sev_es_save_reset_vector(void *handle, void *flash_ptr,
->> +                             uint64_t flash_size, uint32_t *addr);
->> +
->>  #endif
->> diff --git a/target/i386/kvm.c b/target/i386/kvm.c
->> index 6f18d940a5..10eaba8943 100644
->> --- a/target/i386/kvm.c
->> +++ b/target/i386/kvm.c
->> @@ -1912,6 +1912,8 @@ void kvm_arch_reset_vcpu(X86CPU *cpu)
->>      }
->>      /* enabled by default */
->>      env->poll_control_msr = 1;
->> +
->> +    kvm_memcrypt_set_reset_vector(CPU(cpu));
->>  }
->>  
->>  void kvm_arch_do_init_vcpu(X86CPU *cpu)
->> diff --git a/target/i386/sev.c b/target/i386/sev.c
->> index 5055b1fe00..6ddefc65fa 100644
->> --- a/target/i386/sev.c
->> +++ b/target/i386/sev.c
->> @@ -70,6 +70,19 @@ struct SevGuestState {
->>  #define DEFAULT_GUEST_POLICY    0x1 /* disable debug */
->>  #define DEFAULT_SEV_DEVICE      "/dev/sev"
->>  
->> +/* SEV Information Block GUID = 00f771de-1a7e-4fcb-890e-68c77e2fb44e */
->> +#define SEV_INFO_BLOCK_GUID \
->> +    "\xde\x71\xf7\x00\x7e\x1a\xcb\x4f\x89\x0e\x68\xc7\x7e\x2f\xb4\x4e"
->> +
->> +typedef struct __attribute__((__packed__)) SevInfoBlock {
->> +    /* SEV-ES Reset Vector Address */
->> +    uint32_t reset_addr;
->> +
->> +    /* SEV Information Block size and GUID */
->> +    uint16_t size;
->> +    char guid[16];
->> +} SevInfoBlock;
->> +
->>  static SevGuestState *sev_guest;
->>  static Error *sev_mig_blocker;
->>  
-> 
-> Can we replace "char guid[16]" with "QemuUUID guid"?
-> 
-> Also, can we replace the SEV_INFO_BLOCK_GUID macro with a static const
-> structure, initialized with UUID_LE()?
-> 
-> Something like
-> 
->   static const QemuUUID sev_info_block_guid_le = {
->       .data = UUID_LE(...)
->   };
-> 
-
-Can do.
-
-Thanks,
-Tom
-
-> Thanks
-> Laszlo
-> 
->> @@ -833,6 +846,44 @@ sev_encrypt_data(void *handle, uint8_t *ptr, uint64_t len)
->>      return 0;
->>  }
->>  
->> +int
->> +sev_es_save_reset_vector(void *handle, void *flash_ptr, uint64_t flash_size,
->> +                         uint32_t *addr)
->> +{
->> +    SevInfoBlock *info;
->> +
->> +    assert(handle);
->> +
->> +    /*
->> +     * Initialize the address to zero. An address of zero with a successful
->> +     * return code indicates that SEV-ES is not active.
->> +     */
->> +    *addr = 0;
->> +    if (!sev_es_enabled()) {
->> +        return 0;
->> +    }
->> +
->> +    /*
->> +     * Extract the AP reset vector for SEV-ES guests by locating the SEV GUID.
->> +     * The SEV GUID is located 32 bytes from the end of the flash. Use this
->> +     * address to base the SEV information block.
->> +     */
->> +    info = flash_ptr + flash_size - 0x20 - sizeof(*info);
->> +    if (memcmp(info->guid, SEV_INFO_BLOCK_GUID, 16)) {
->> +        error_report("SEV information block not found in pflash rom");
->> +        return 1;
->> +    }
->> +
->> +    if (!info->reset_addr) {
->> +        error_report("SEV-ES reset address is zero");
->> +        return 1;
->> +    }
->> +
->> +    *addr = info->reset_addr;
->> +
->> +    return 0;
->> +}
->> +
->>  static void
->>  sev_register_types(void)
->>  {
->>
-> 
