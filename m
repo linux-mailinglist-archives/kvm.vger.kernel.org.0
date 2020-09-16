@@ -2,104 +2,101 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 01FF526CA90
-	for <lists+kvm@lfdr.de>; Wed, 16 Sep 2020 22:08:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C3CAA26CACB
+	for <lists+kvm@lfdr.de>; Wed, 16 Sep 2020 22:15:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728193AbgIPUIO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 16 Sep 2020 16:08:14 -0400
-Received: from mga07.intel.com ([134.134.136.100]:43751 "EHLO mga07.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727037AbgIPReW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 16 Sep 2020 13:34:22 -0400
-IronPort-SDR: wJvEjC+BjzhFI8uWUyngRvUsZ/dLjEp244qng/Ngxn0O1Jz89Cquei7UC5Wey+wFm8PSus9LHB
- BP0P0p9mr/5Q==
-X-IronPort-AV: E=McAfee;i="6000,8403,9746"; a="223711134"
-X-IronPort-AV: E=Sophos;i="5.76,433,1592895600"; 
-   d="scan'208";a="223711134"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Sep 2020 10:34:17 -0700
-IronPort-SDR: Q+U/SATVDiLIBJs3zIb4Ef+MRh0rDH2zZzmKDKEebVhRIscqceOFOXY4n1YErS49/cyV/tFoPO
- dCMhoJ6y1G3w==
-X-IronPort-AV: E=Sophos;i="5.76,433,1592895600"; 
-   d="scan'208";a="451946401"
-Received: from sjchrist-ice.jf.intel.com (HELO sjchrist-ice) ([10.54.31.34])
-  by orsmga004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Sep 2020 10:34:17 -0700
-Date:   Wed, 16 Sep 2020 10:34:16 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Wanpeng Li <kernellwp@gmail.com>
+        id S1728264AbgIPUPF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 16 Sep 2020 16:15:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58434 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726778AbgIPUN3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 16 Sep 2020 16:13:29 -0400
+Received: from mail-ej1-x641.google.com (mail-ej1-x641.google.com [IPv6:2a00:1450:4864:20::641])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6FE0FC061352
+        for <kvm@vger.kernel.org>; Wed, 16 Sep 2020 13:13:13 -0700 (PDT)
+Received: by mail-ej1-x641.google.com with SMTP id j11so12804449ejk.0
+        for <kvm@vger.kernel.org>; Wed, 16 Sep 2020 13:13:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=WTCEXV2u4+i9HL2MMnq/glN2ilMyxl52NR06ee0GgqI=;
+        b=s7OvZ4k0X7Pw/YnFXPKn5Ssxyktso0XlkEWg8Ij8fpLQLTsn54sqNK2C19JaPgH3YT
+         Q6wO5+CpziRHkRIR30K7Fm8GwZ6iYHI+T6Acw4WahChKZ/t7rSDaFJc9Txc3wBm+WIsE
+         gf7L45v47+T6MmK+JdJPaVaykD7W/oAl3ornmLk4a2d+MUBp37OFzc+FuXyQ1T8rHxVB
+         uQUoLkdr1VYohRqnGs7BNUX0dhjNdjcRIA+07PzaKxA/LjFD2UUpcl2tkqCfwRaPKs2/
+         ETUN51b1wV9G2k/ROZlQN3xYXCTrdWJr1uZbFG3PmdICKdnMMdhiPphRVdY8OLGDp5M/
+         dMjQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=WTCEXV2u4+i9HL2MMnq/glN2ilMyxl52NR06ee0GgqI=;
+        b=AZjAQC+ZGWc367am7PBgC0GsFXBpZ/WjEF+t5W+szmv7IzMctK6CRKXcbOQWflYkKu
+         y6oOwp1MCtDA/ne08NOPaWHXSW5fYV0IHHhhHC9M46JC+eWxzyUsFMRczrJVfTpDjVEQ
+         /7MQvz8xSpSyJhG+JuLTQKvtHxjqfIfRMY4BvCZg4N2On4hm+iimtBw4xNsuRmZ6ZhwD
+         8RAjKcBqI5HEqTvSMgInSMuKv9DQSLECSpGmvhkN82hL6TRD/guKXK3onxQ1pAWA6Nuk
+         U1tXqs7lCuu7d1U+RxhB+vtUiAppzViV3cH13soW+dFuLSJzpNWct9v8VY5fgKBeCurw
+         0YJQ==
+X-Gm-Message-State: AOAM532wYNvdUnAaGgJNbyJBvub8fojqhAVa8qe9/cKBKq8/5o2D5x/C
+        c6QOK4Jpu4UplNYI4Xq78UzMavk2p8ZWyiGuKYlp4A==
+X-Google-Smtp-Source: ABdhPJzdmjE+SQI5hqYGTUQLcnf/xhorcpJlukLBjVePzZop6EZ+nDYP/c+zStkGc1zzXydi3cvMrPidltQPbtiLAtw=
+X-Received: by 2002:a17:906:4d97:: with SMTP id s23mr28200879eju.157.1600287191923;
+ Wed, 16 Sep 2020 13:13:11 -0700 (PDT)
+MIME-Version: 1.0
+References: <20200902125935.20646-1-graf@amazon.com> <20200902125935.20646-6-graf@amazon.com>
+ <CAAAPnDH2D6fANhZzy3fAL2XKO4ROrvbOoqPme2Ww6q5XcVJfog@mail.gmail.com> <c90a705d-8768-efd1-e744-b56cd6ab3c0f@amazon.com>
+In-Reply-To: <c90a705d-8768-efd1-e744-b56cd6ab3c0f@amazon.com>
+From:   Aaron Lewis <aaronlewis@google.com>
+Date:   Wed, 16 Sep 2020 13:13:00 -0700
+Message-ID: <CAAAPnDEoQhtXuiqHwUtrsL7codcToAVwaR=+qVczZrz6RCWe0A@mail.gmail.com>
+Subject: Re: [PATCH v6 5/7] KVM: x86: VMX: Prevent MSR passthrough when MSR
+ access is denied
+To:     Alexander Graf <graf@amazon.com>
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Tom Lendacky <thomas.lendacky@amd.com>
-Subject: Re: [PATCH] KVM: x86: Add kvm_x86_ops hook to short circuit emulation
-Message-ID: <20200916173416.GF10227@sjchrist-ice>
-References: <20200915232702.15945-1-sean.j.christopherson@intel.com>
- <CANRm+Cx85NBnL76VoFV+DNrShp_2o+c4dgQCwNARzrAcmX1KAw@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CANRm+Cx85NBnL76VoFV+DNrShp_2o+c4dgQCwNARzrAcmX1KAw@mail.gmail.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
+        Joerg Roedel <joro@8bytes.org>,
+        KarimAllah Raslan <karahmed@amazon.de>,
+        Dan Carpenter <dan.carpenter@oracle.com>,
+        kvm list <kvm@vger.kernel.org>, linux-doc@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Sep 16, 2020 at 09:31:22AM +0800, Wanpeng Li wrote:
-> On Wed, 16 Sep 2020 at 07:29, Sean Christopherson
-> <sean.j.christopherson@intel.com> wrote:
 > >
-> > Replace the existing kvm_x86_ops.need_emulation_on_page_fault() with a
-> > more generic is_emulatable(), and unconditionally call the new function
-> > in x86_emulate_instruction().
+> >> +
+> >>   /*
+> >>    * These 2 parameters are used to config the controls for Pause-Loop Exiting:
+> >>    * ple_gap:    upper bound on the amount of time between two successive
+> >> @@ -622,6 +642,41 @@ static inline bool report_flexpriority(void)
+> >>          return flexpriority_enabled;
+> >>   }
 > >
-> > KVM will use the generic hook to support multiple security related
-> > technologies that prevent emulation in one way or another.  Similar to
-> > the existing AMD #NPF case where emulation of the current instruction is
-> > not possible due to lack of information, AMD's SEV-ES and Intel's SGX
-> > and TDX will introduce scenarios where emulation is impossible due to
-> > the guest's register state being inaccessible.  And again similar to the
-> > existing #NPF case, emulation can be initiated by kvm_mmu_page_fault(),
-> > i.e. outside of the control of vendor-specific code.
-> >
-> > While the cause and architecturally visible behavior of the various
-> > cases are different, e.g. SGX will inject a #UD, AMD #NPF is a clean
-> > resume or complete shutdown, and SEV-ES and TDX "return" an error, the
-> > impact on the common emulation code is identical: KVM must stop
-> > emulation immediately and resume the guest.
-> >
-> > Query is_emulatable() in handle_ud() as well so that the
-> > force_emulation_prefix code doesn't incorrectly modify RIP before
-> > calling emulate_instruction() in the absurdly unlikely scenario that
-> > KVM encounters forced emulation in conjunction with "do not emulate".
+> > One thing that seems to be missing is removing MSRs from the
+> > permission bitmap or resetting the permission bitmap to its original
+> > state before adding changes on top of it.  This would be needed on
+> > subsequent calls to kvm_vm_ioctl_set_msr_filter().  When that happens
+> > the original changes made by KVM_REQ_MSR_FILTER_CHANGED need to be
+> > backed out before applying the new set.
+>
+> I'm not sure I follow. Subsequent calls to set_msr_filter() will invoke
+> the "please reset the whole MSR passthrough bitmap to a consistent
+> state" which will then reapply the in-kvm desired state through the
+> bitmap and filter state on top on each of those.
+>
 
-...
+Yes, you're correct.  I discovered this after the fact by adding a
+test to the selftest I wrote for the deny list system which I revamped
+to work for your filter system.  It proved the permission bitmaps are
+in fact set as expected on subsequent calls.  You can disregard this
+comment.
 
-> > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> > index 539ea1cd6020..5208217049d9 100644
-> > --- a/arch/x86/kvm/x86.c
-> > +++ b/arch/x86/kvm/x86.c
-> > @@ -5707,6 +5707,9 @@ int handle_ud(struct kvm_vcpu *vcpu)
-> >         char sig[5]; /* ud2; .ascii "kvm" */
-> >         struct x86_exception e;
-> >
-> > +       if (unlikely(!kvm_x86_ops.is_emulatable(vcpu, NULL, 0)))
-> > +               return 1;
-> > +
-> 
-> Both VMX and SVM scenarios always fail this check.
-
-Ah, right.  This patch was extracted from my SGX series, in which case there
-would be a follow-up patch to add a VMX scenario where is_emulated() could
-return false.
-
-The intent of posting the patch standalone is so that SGX, SEV-ES, and/or TDX
-have "ready to go" support in upstream, i.e. can change only the VMX/SVM
-implementation of is_emulated().  I'm a-ok dropping the handle_ud() change,
-or even the whole patch, until one of the above three is actually ready for
-inclusion.
+As a side note, I'm happy to share the test if you'd like. I also used
+it to uncover an issue in the first commit of this series.
