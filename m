@@ -2,74 +2,74 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DC1B526BA52
-	for <lists+kvm@lfdr.de>; Wed, 16 Sep 2020 04:48:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 32E7626BA55
+	for <lists+kvm@lfdr.de>; Wed, 16 Sep 2020 04:49:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726281AbgIPCsf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 15 Sep 2020 22:48:35 -0400
-Received: from mga02.intel.com ([134.134.136.20]:2896 "EHLO mga02.intel.com"
+        id S1726336AbgIPCtO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 15 Sep 2020 22:49:14 -0400
+Received: from mga01.intel.com ([192.55.52.88]:28355 "EHLO mga01.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726210AbgIPCsd (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 15 Sep 2020 22:48:33 -0400
-IronPort-SDR: zWFSai//FLqwvbK4zcnyHX3bMikozgDLxaYtsl3t//4c1GGnYs+MslK7Daqh7kUaawx4KPX1zU
- O+sv2HVTU/ew==
-X-IronPort-AV: E=McAfee;i="6000,8403,9745"; a="147080375"
+        id S1726303AbgIPCtM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 15 Sep 2020 22:49:12 -0400
+IronPort-SDR: xgG/nhkpj4Jmxi+OZzRFOPeTW5MeAvR6Oi/phP27sGMj8/mn+dXq7gq4ZzUWGKfoVVfLudyldv
+ u7T+l2fGEinw==
+X-IronPort-AV: E=McAfee;i="6000,8403,9745"; a="177461390"
 X-IronPort-AV: E=Sophos;i="5.76,431,1592895600"; 
-   d="scan'208";a="147080375"
+   d="scan'208";a="177461390"
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Sep 2020 19:48:32 -0700
-IronPort-SDR: uBOb0byliZpJTD2s+egSk+nmACoZs5vHfD96uvAiu9R+FRNjVUSvmt8O5+ceRifFEPlcapu0Wt
- k7Cb3pRXwM4A==
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Sep 2020 19:49:10 -0700
+IronPort-SDR: w0sYBVSvEv+bHfmTysoiFCFjCw7rmZLj8JPZJQOXsGKDwg4yEwl/JOldE3hth9Eoho6npBSSXT
+ PgVlZpLRRqug==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.76,431,1592895600"; 
-   d="scan'208";a="335876270"
+   d="scan'208";a="335876367"
 Received: from joy-optiplex-7040.sh.intel.com ([10.239.13.16])
-  by orsmga008.jf.intel.com with ESMTP; 15 Sep 2020 19:48:31 -0700
+  by orsmga008.jf.intel.com with ESMTP; 15 Sep 2020 19:49:09 -0700
 From:   Yan Zhao <yan.y.zhao@intel.com>
 To:     alex.williamson@redhat.com, cohuck@redhat.com
 Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
         Yan Zhao <yan.y.zhao@intel.com>
-Subject: [PATCH v2] vfio: fix a missed vfio group put in vfio_pin_pages
-Date:   Wed, 16 Sep 2020 10:29:27 +0800
-Message-Id: <20200916022927.26359-1-yan.y.zhao@intel.com>
+Subject: [PATCH v2] vfio/type1: fix dirty bitmap calculation in vfio_dma_rw
+Date:   Wed, 16 Sep 2020 10:30:05 +0800
+Message-Id: <20200916023005.26414-1-yan.y.zhao@intel.com>
 X-Mailer: git-send-email 2.17.1
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-when error occurs, need to put vfio group after a successful get.
+the count of dirtied pages is not only determined by count of copied
+pages, but also by the start offset.
 
-Fixes: 95fc87b44104 ("vfio: Selective dirty page tracking if IOMMU backed device pins pages")
+e.g. if offset = PAGE_SIZE - 1, and *copied=2, the dirty pages count is
+2, instead of 1 or 0.
 
-Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+Fixes: d6a4c185660c ("vfio iommu: Implementation of ioctl for dirty pages tracking")
+
 Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
 
 ---
-v2: updated the format of the Fixes: line. (Cornelia)
+v2: updated the format of the Fixes: line.
 ---
- drivers/vfio/vfio.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+ drivers/vfio/vfio_iommu_type1.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/vfio/vfio.c b/drivers/vfio/vfio.c
-index 262ab0efd06c..5e6e0511b5aa 100644
---- a/drivers/vfio/vfio.c
-+++ b/drivers/vfio/vfio.c
-@@ -1949,8 +1949,10 @@ int vfio_pin_pages(struct device *dev, unsigned long *user_pfn, int npage,
- 	if (!group)
- 		return -ENODEV;
- 
--	if (group->dev_counter > 1)
--		return -EINVAL;
-+	if (group->dev_counter > 1) {
-+		ret = -EINVAL;
-+		goto err_pin_pages;
-+	}
- 
- 	ret = vfio_group_add_container_user(group);
- 	if (ret)
+diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
+index 5fbf0c1f7433..d0438388feeb 100644
+--- a/drivers/vfio/vfio_iommu_type1.c
++++ b/drivers/vfio/vfio_iommu_type1.c
+@@ -2933,7 +2933,8 @@ static int vfio_iommu_type1_dma_rw_chunk(struct vfio_iommu *iommu,
+ 			 * size
+ 			 */
+ 			bitmap_set(dma->bitmap, offset >> pgshift,
+-				   *copied >> pgshift);
++				   ((offset + *copied - 1) >> pgshift) -
++				   (offset >> pgshift) + 1);
+ 		}
+ 	} else
+ 		*copied = copy_from_user(data, (void __user *)vaddr,
 -- 
 2.17.1
 
