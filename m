@@ -2,38 +2,38 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1798F26CBBA
-	for <lists+kvm@lfdr.de>; Wed, 16 Sep 2020 22:33:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 25E4126CBBB
+	for <lists+kvm@lfdr.de>; Wed, 16 Sep 2020 22:33:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727133AbgIPUck (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 16 Sep 2020 16:32:40 -0400
-Received: from smtp-fw-6002.amazon.com ([52.95.49.90]:48544 "EHLO
-        smtp-fw-6002.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726943AbgIPUaI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 16 Sep 2020 16:30:08 -0400
+        id S1727356AbgIPUcj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 16 Sep 2020 16:32:39 -0400
+Received: from smtp-fw-9102.amazon.com ([207.171.184.29]:49984 "EHLO
+        smtp-fw-9102.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727094AbgIPUaP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 16 Sep 2020 16:30:15 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1600288207; x=1631824207;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=4OMtNb83YORhDNCIQPC8PZHNb6sILR2vnYsotDnFmcY=;
-  b=nzqd9VJjBWWXW9MTRoYBhCRF2bp56x5gccM8yk4c1C873HJ8trVqe4Le
-   8IjnBK8bveUtxcwThN+SofhyABEoJ76aiXBaHe9molyy5tiMKCngKTytU
-   yO8nPXE8FpGm4Bp3z+xs/+1lgPB9pPw5BpowLK/If43t+8LzWqPrUCRp4
-   o=;
+  t=1600288212; x=1631824212;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=ND9e1PrYvLU9INALSpxF6Ou/4aOmJHHlmr9WGOCGddI=;
+  b=udjnzadmGdYy2seBwKFm9URgF/VqMe6AfW7q90GYuU5sGQ5YCFCwWNaJ
+   avSh7eRAS+vpmS14RLY/Hx/KCH/1S9Aq3ECPxvH9Q4ml9jBUNd0R8nUxO
+   y8cOgMQzFWfDL7yBeEnjh07mv5EW5G4MAgC7BdAs5hQEpoPt2/2qlk20j
+   s=;
 X-IronPort-AV: E=Sophos;i="5.76,434,1592870400"; 
-   d="scan'208";a="54452033"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-2a-538b0bfb.us-west-2.amazon.com) ([10.43.8.6])
-  by smtp-border-fw-out-6002.iad6.amazon.com with ESMTP; 16 Sep 2020 20:30:04 +0000
-Received: from EX13MTAUWC001.ant.amazon.com (pdx4-ws-svc-p6-lb7-vlan3.pdx.amazon.com [10.170.41.166])
-        by email-inbound-relay-2a-538b0bfb.us-west-2.amazon.com (Postfix) with ESMTPS id C7A69A1BD3;
-        Wed, 16 Sep 2020 20:30:02 +0000 (UTC)
+   d="scan'208";a="76817925"
+Received: from sea32-co-svc-lb4-vlan3.sea.corp.amazon.com (HELO email-inbound-relay-2a-53356bf6.us-west-2.amazon.com) ([10.47.23.38])
+  by smtp-border-fw-out-9102.sea19.amazon.com with ESMTP; 16 Sep 2020 20:30:07 +0000
+Received: from EX13MTAUWC001.ant.amazon.com (pdx4-ws-svc-p6-lb7-vlan2.pdx.amazon.com [10.170.41.162])
+        by email-inbound-relay-2a-53356bf6.us-west-2.amazon.com (Postfix) with ESMTPS id 90302A17D0;
+        Wed, 16 Sep 2020 20:30:06 +0000 (UTC)
 Received: from EX13D20UWC001.ant.amazon.com (10.43.162.244) by
  EX13MTAUWC001.ant.amazon.com (10.43.162.135) with Microsoft SMTP Server (TLS)
- id 15.0.1497.2; Wed, 16 Sep 2020 20:30:02 +0000
+ id 15.0.1497.2; Wed, 16 Sep 2020 20:30:06 +0000
 Received: from u79c5a0a55de558.ant.amazon.com (10.43.162.35) by
  EX13D20UWC001.ant.amazon.com (10.43.162.244) with Microsoft SMTP Server (TLS)
- id 15.0.1497.2; Wed, 16 Sep 2020 20:29:58 +0000
+ id 15.0.1497.2; Wed, 16 Sep 2020 20:30:02 +0000
 From:   Alexander Graf <graf@amazon.com>
 To:     kvm list <kvm@vger.kernel.org>
 CC:     Sean Christopherson <sean.j.christopherson@intel.com>,
@@ -47,10 +47,12 @@ CC:     Sean Christopherson <sean.j.christopherson@intel.com>,
         KarimAllah Raslan <karahmed@amazon.de>,
         Dan Carpenter <dan.carpenter@oracle.com>,
         <linux-doc@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-Subject: [PATCH v7 0/7] Allow user space to restrict and augment MSR emulation
-Date:   Wed, 16 Sep 2020 22:29:44 +0200
-Message-ID: <20200916202951.23760-1-graf@amazon.com>
+Subject: [PATCH v7 1/7] KVM: x86: Deflect unknown MSR accesses to user space
+Date:   Wed, 16 Sep 2020 22:29:45 +0200
+Message-ID: <20200916202951.23760-2-graf@amazon.com>
 X-Mailer: git-send-email 2.28.0.394.ge197136389
+In-Reply-To: <20200916202951.23760-1-graf@amazon.com>
+References: <20200916202951.23760-1-graf@amazon.com>
 MIME-Version: 1.0
 X-Originating-IP: [10.43.162.35]
 X-ClientProxiedBy: EX13D42UWA002.ant.amazon.com (10.43.160.16) To
@@ -62,33 +64,31 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-While tying to add support for the MSR_CORE_THREAD_COUNT MSR in KVM,
-I realized that we were still in a world where user space has no control
-over what happens with MSR emulation in KVM.
+MSRs are weird. Some of them are normal control registers, such as EFER.
+Some however are registers that really are model specific, not very
+interesting to virtualization workloads, and not performance critical.
+Others again are really just windows into package configuration.
 
-That is bad for multiple reasons. In my case, I wanted to emulate the
-MSR in user space, because it's a CPU specific register that does not
-exist on older CPUs and that really only contains informational data that
-is on the package level, so it's a natural fit for user space to provide
-it.
+Out of these MSRs, only the first category is necessary to implement in
+kernel space. Rarely accessed MSRs, MSRs that should be fine tunes against
+certain CPU models and MSRs that contain information on the package level
+are much better suited for user space to process. However, over time we have
+accumulated a lot of MSRs that are not the first category, but still handled
+by in-kernel KVM code.
 
-However, it is also bad on a platform compatibility level. Currrently,
-KVM has no way to expose different MSRs based on the selected target CPU
-type.
+This patch adds a generic interface to handle WRMSR and RDMSR from user
+space. With this, any future MSR that is part of the latter categories can
+be handled in user space.
 
-This patch set introduces a way for user space to indicate to KVM which
-MSRs should be handled in kernel space. With that, we can solve part of
-the platform compatibility story. Or at least we can not handle AMD specific
-MSRs on an Intel platform and vice versa.
+Furthermore, it allows us to replace the existing "ignore_msrs" logic with
+something that applies per-VM rather than on the full system. That way you
+can run productive VMs in parallel to experimental ones where you don't care
+about proper MSR handling.
 
-In addition, it introduces a way for user space to get into the loop
-when an MSR access would generate a #GP fault, such as when KVM finds an
-MSR that is not handled by the in-kernel MSR emulation or when the guest
-is trying to access reserved registers.
+Signed-off-by: Alexander Graf <graf@amazon.com>
+Reviewed-by: Jim Mattson <jmattson@google.com>
 
-In combination with filtering, user space trapping allows us to emulate
-arbitrary MSRs in user space, paving the way for target CPU specific MSR
-implementations from user space.
+---
 
 v1 -> v2:
 
@@ -96,8 +96,6 @@ v1 -> v2:
   - deflect all #GP injection events to user space, not just unknown MSRs.
     That was we can also deflect allowlist errors later
   - fix emulator case
-  - new patch: KVM: x86: Introduce allow list for MSR emulation
-  - new patch: KVM: selftests: Add test for user space MSR handling
 
 v2 -> v3:
 
@@ -106,87 +104,408 @@ v2 -> v3:
   - s/KVM_EXIT_WRMSR/KVM_EXIT_X86_WRMSR/g
   - Use complete_userspace_io logic instead of reply field
   - Simplify trapping code
-  - document flags for KVM_X86_ADD_MSR_ALLOWLIST
-  - generalize exit path, always unlock when returning
-  - s/KVM_CAP_ADD_MSR_ALLOWLIST/KVM_CAP_X86_MSR_ALLOWLIST/g
-  - Add KVM_X86_CLEAR_MSR_ALLOWLIST
-  - Add test to clear whitelist
-  - Adjust to reply-less API
-  - Fix asserts
-  - Actually trap on MSR_IA32_POWER_CTL writes
 
 v3 -> v4:
 
-  - Mention exit reasons in re-enter mandatory section of API documentation
+  - Mention exit reasons in re-inter mandatory section of API documentation
   - Clear padding bytes
   - Generalize get/set deflect functions
   - Remove redundant pending_user_msr field
-  - lock allow check and clearing
-  - free bitmaps on clear
-
-v4 -> v5:
-
-  - use srcu 
 
 v5 -> v6:
 
-  - Switch from allow list to filtering API with explicit fallback option
-  - Support and test passthrough MSR filtering
-  - Check for filter exit reason
-  - Add .gitignore
-  - send filter change notification
-  - change to atomic set_msr_filter ioctl with fallback flag
-  - use EPERM for filter blocks
-  - add bit for MSR user space deflection
-  - check for overflow of BITS_TO_LONGS (thanks Dan Carpenter!)
-  - s/int i;/u32 i;/
-  - remove overlap check
   - Introduce exit reason mask to allow for future expansion and filtering
   - s/emul_to_vcpu(ctxt)/vcpu/
-  - imported patch: KVM: x86: Prepare MSR bitmaps for userspace tracked MSRs
-  - new patch: KVM: x86: Add infrastructure for MSR filtering
-  - new patch: KVM: x86: SVM: Prevent MSR passthrough when MSR access is denied
-  - new patch: KVM: x86: VMX: Prevent MSR passthrough when MSR access is denied
 
 v6 -> v7:
 
-  - s/MAX_POSSIBLE_PASSGHROUGH_MSRS/MAX_POSSIBLE_PASSTHROUGH_MSRS/g
   - Fire #GP without skipping the MSR instruction
-  - uapi: Fix padding
-  - selftest: trap on KVM_MSR_EXIT_REASON_FILTER as well
-  - selftest: fix asserts
-  - selftest: add test for invalid msr handling
+  - Fix padding
+---
+ Documentation/virt/kvm/api.rst  |  73 +++++++++++++++++++-
+ arch/x86/include/asm/kvm_host.h |   3 +
+ arch/x86/kvm/emulate.c          |  18 ++++-
+ arch/x86/kvm/x86.c              | 118 ++++++++++++++++++++++++++++++--
+ include/trace/events/kvm.h      |   2 +-
+ include/uapi/linux/kvm.h        |  12 ++++
+ 6 files changed, 217 insertions(+), 9 deletions(-)
 
-Aaron Lewis (1):
-  KVM: x86: Prepare MSR bitmaps for userspace tracked MSRs
-
-Alexander Graf (6):
-  KVM: x86: Deflect unknown MSR accesses to user space
-  KVM: x86: Add infrastructure for MSR filtering
-  KVM: x86: SVM: Prevent MSR passthrough when MSR access is denied
-  KVM: x86: VMX: Prevent MSR passthrough when MSR access is denied
-  KVM: x86: Introduce MSR filtering
-  KVM: selftests: Add test for user space MSR handling
-
- Documentation/virt/kvm/api.rst                | 176 +++++++++-
- arch/x86/include/asm/kvm_host.h               |  18 ++
- arch/x86/include/uapi/asm/kvm.h               |  19 ++
- arch/x86/kvm/emulate.c                        |  18 +-
- arch/x86/kvm/svm/svm.c                        | 135 ++++++--
- arch/x86/kvm/svm/svm.h                        |   7 +
- arch/x86/kvm/vmx/nested.c                     |   2 +-
- arch/x86/kvm/vmx/vmx.c                        | 303 ++++++++++++------
- arch/x86/kvm/vmx/vmx.h                        |   9 +-
- arch/x86/kvm/x86.c                            | 267 ++++++++++++++-
- arch/x86/kvm/x86.h                            |   1 +
- include/trace/events/kvm.h                    |   2 +-
- include/uapi/linux/kvm.h                      |  17 +
- tools/testing/selftests/kvm/.gitignore        |   1 +
- tools/testing/selftests/kvm/Makefile          |   1 +
- .../selftests/kvm/x86_64/user_msr_test.c      | 247 ++++++++++++++
- 16 files changed, 1088 insertions(+), 135 deletions(-)
- create mode 100644 tools/testing/selftests/kvm/x86_64/user_msr_test.c
-
+diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+index d2b733dc7892..cb998af8b4d9 100644
+--- a/Documentation/virt/kvm/api.rst
++++ b/Documentation/virt/kvm/api.rst
+@@ -4869,8 +4869,8 @@ to the byte array.
+ 
+ .. note::
+ 
+-      For KVM_EXIT_IO, KVM_EXIT_MMIO, KVM_EXIT_OSI, KVM_EXIT_PAPR and
+-      KVM_EXIT_EPR the corresponding
++      For KVM_EXIT_IO, KVM_EXIT_MMIO, KVM_EXIT_OSI, KVM_EXIT_PAPR,
++      KVM_EXIT_EPR, KVM_EXIT_X86_RDMSR and KVM_EXIT_X86_WRMSR the corresponding
+ 
+ operations are complete (and guest state is consistent) only after userspace
+ has re-entered the kernel with KVM_RUN.  The kernel side will first finish
+@@ -5163,6 +5163,42 @@ Note that KVM does not skip the faulting instruction as it does for
+ KVM_EXIT_MMIO, but userspace has to emulate any change to the processing state
+ if it decides to decode and emulate the instruction.
+ 
++::
++
++		/* KVM_EXIT_X86_RDMSR / KVM_EXIT_X86_WRMSR */
++		struct {
++			__u8 error; /* user -> kernel */
++			__u8 pad[7];
++			__u32 reason; /* kernel -> user */
++			__u32 index; /* kernel -> user */
++			__u64 data; /* kernel <-> user */
++		} msr;
++
++Used on x86 systems. When the VM capability KVM_CAP_X86_USER_SPACE_MSR is
++enabled, MSR accesses to registers that would invoke a #GP by KVM kernel code
++will instead trigger a KVM_EXIT_X86_RDMSR exit for reads and KVM_EXIT_X86_WRMSR
++exit for writes.
++
++The "reason" field specifies why the MSR trap occurred. User space will only
++receive MSR exit traps when a particular reason was requested during through
++ENABLE_CAP. Currently valid exit reasons are:
++
++	KVM_MSR_EXIT_REASON_INVAL - access to invalid MSRs or reserved bits
++
++For KVM_EXIT_X86_RDMSR, the "index" field tells user space which MSR the guest
++wants to read. To respond to this request with a successful read, user space
++writes the respective data into the "data" field and must continue guest
++execution to ensure the read data is transferred into guest register state.
++
++If the RDMSR request was unsuccessful, user space indicates that with a "1" in
++the "error" field. This will inject a #GP into the guest when the VCPU is
++executed again.
++
++For KVM_EXIT_X86_WRMSR, the "index" field tells user space which MSR the guest
++wants to write. Once finished processing the event, user space must continue
++vCPU execution. If the MSR write was unsuccessful, user space also sets the
++"error" field to "1".
++
+ ::
+ 
+ 		/* Fix the size of the union. */
+@@ -5852,6 +5888,28 @@ controlled by the kvm module parameter halt_poll_ns. This capability allows
+ the maximum halt time to specified on a per-VM basis, effectively overriding
+ the module parameter for the target VM.
+ 
++7.21 KVM_CAP_X86_USER_SPACE_MSR
++-------------------------------
++
++:Architectures: x86
++:Target: VM
++:Parameters: args[0] contains the mask of KVM_MSR_EXIT_REASON_* events to report
++:Returns: 0 on success; -1 on error
++
++This capability enables trapping of #GP invoking RDMSR and WRMSR instructions
++into user space.
++
++When a guest requests to read or write an MSR, KVM may not implement all MSRs
++that are relevant to a respective system. It also does not differentiate by
++CPU type.
++
++To allow more fine grained control over MSR handling, user space may enable
++this capability. With it enabled, MSR accesses that match the mask specified in
++args[0] and trigger a #GP event inside the guest by KVM will instead trigger
++KVM_EXIT_X86_RDMSR and KVM_EXIT_X86_WRMSR exit notifications which user space
++can then handle to implement model specific MSR handling and/or user notifications
++to inform a user that an MSR was not handled.
++
+ 8. Other capabilities.
+ ======================
+ 
+@@ -6173,3 +6231,14 @@ specific interfaces must be consistent, i.e. if one says the feature
+ is supported, than the other should as well and vice versa.  For arm64
+ see Documentation/virt/kvm/devices/vcpu.rst "KVM_ARM_VCPU_PVTIME_CTRL".
+ For x86 see Documentation/virt/kvm/msr.rst "MSR_KVM_STEAL_TIME".
++
++8.25 KVM_CAP_X86_USER_SPACE_MSR
++----------------------------
++
++:Architectures: x86
++
++This capability indicates that KVM supports deflection of MSR reads and
++writes to user space. It can be enabled on a VM level. If enabled, MSR
++accesses that would usually trigger a #GP by KVM into the guest will
++instead get bounced to user space through the KVM_EXIT_X86_RDMSR and
++KVM_EXIT_X86_WRMSR exit notifications.
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index 5303dbc5c9bc..12c3f048f18b 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -961,6 +961,9 @@ struct kvm_arch {
+ 	bool guest_can_read_msr_platform_info;
+ 	bool exception_payload_enabled;
+ 
++	/* Deflect RDMSR and WRMSR to user space when they trigger a #GP */
++	u32 user_space_msr_mask;
++
+ 	struct kvm_pmu_event_filter *pmu_event_filter;
+ 	struct task_struct *nx_lpage_recovery_thread;
+ };
+diff --git a/arch/x86/kvm/emulate.c b/arch/x86/kvm/emulate.c
+index 1d450d7710d6..1f97037d9190 100644
+--- a/arch/x86/kvm/emulate.c
++++ b/arch/x86/kvm/emulate.c
+@@ -3701,11 +3701,18 @@ static int em_dr_write(struct x86_emulate_ctxt *ctxt)
+ 
+ static int em_wrmsr(struct x86_emulate_ctxt *ctxt)
+ {
++	u64 msr_index = reg_read(ctxt, VCPU_REGS_RCX);
+ 	u64 msr_data;
++	int r;
+ 
+ 	msr_data = (u32)reg_read(ctxt, VCPU_REGS_RAX)
+ 		| ((u64)reg_read(ctxt, VCPU_REGS_RDX) << 32);
+-	if (ctxt->ops->set_msr(ctxt, reg_read(ctxt, VCPU_REGS_RCX), msr_data))
++	r = ctxt->ops->set_msr(ctxt, msr_index, msr_data);
++
++	if (r == X86EMUL_IO_NEEDED)
++		return r;
++
++	if (r)
+ 		return emulate_gp(ctxt, 0);
+ 
+ 	return X86EMUL_CONTINUE;
+@@ -3713,9 +3720,16 @@ static int em_wrmsr(struct x86_emulate_ctxt *ctxt)
+ 
+ static int em_rdmsr(struct x86_emulate_ctxt *ctxt)
+ {
++	u64 msr_index = reg_read(ctxt, VCPU_REGS_RCX);
+ 	u64 msr_data;
++	int r;
++
++	r = ctxt->ops->get_msr(ctxt, msr_index, &msr_data);
++
++	if (r == X86EMUL_IO_NEEDED)
++		return r;
+ 
+-	if (ctxt->ops->get_msr(ctxt, reg_read(ctxt, VCPU_REGS_RCX), &msr_data))
++	if (r)
+ 		return emulate_gp(ctxt, 0);
+ 
+ 	*reg_write(ctxt, VCPU_REGS_RAX) = (u32)msr_data;
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 17f4995e80a7..3aea25fa9f00 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -1589,12 +1589,87 @@ int kvm_set_msr(struct kvm_vcpu *vcpu, u32 index, u64 data)
+ }
+ EXPORT_SYMBOL_GPL(kvm_set_msr);
+ 
++static int complete_emulated_msr(struct kvm_vcpu *vcpu, bool is_read)
++{
++	if (vcpu->run->msr.error) {
++		kvm_inject_gp(vcpu, 0);
++		return 1;
++	} else if (is_read) {
++		kvm_rax_write(vcpu, (u32)vcpu->run->msr.data);
++		kvm_rdx_write(vcpu, vcpu->run->msr.data >> 32);
++	}
++
++	return kvm_skip_emulated_instruction(vcpu);
++}
++
++static int complete_emulated_rdmsr(struct kvm_vcpu *vcpu)
++{
++	return complete_emulated_msr(vcpu, true);
++}
++
++static int complete_emulated_wrmsr(struct kvm_vcpu *vcpu)
++{
++	return complete_emulated_msr(vcpu, false);
++}
++
++static u64 kvm_msr_reason(int r)
++{
++	switch (r) {
++	default:
++		return KVM_MSR_EXIT_REASON_INVAL;
++	}
++}
++
++static int kvm_msr_user_space(struct kvm_vcpu *vcpu, u32 index,
++			      u32 exit_reason, u64 data,
++			      int (*completion)(struct kvm_vcpu *vcpu),
++			      int r)
++{
++	u64 msr_reason = kvm_msr_reason(r);
++
++	/* Check if the user wanted to know about this MSR fault */
++	if (!(vcpu->kvm->arch.user_space_msr_mask & msr_reason))
++		return 0;
++
++	vcpu->run->exit_reason = exit_reason;
++	vcpu->run->msr.error = 0;
++	memset(vcpu->run->msr.pad, 0, sizeof(vcpu->run->msr.pad));
++	vcpu->run->msr.reason = msr_reason;
++	vcpu->run->msr.index = index;
++	vcpu->run->msr.data = data;
++	vcpu->arch.complete_userspace_io = completion;
++
++	return 1;
++}
++
++static int kvm_get_msr_user_space(struct kvm_vcpu *vcpu, u32 index, int r)
++{
++	return kvm_msr_user_space(vcpu, index, KVM_EXIT_X86_RDMSR, 0,
++				   complete_emulated_rdmsr, r);
++}
++
++static int kvm_set_msr_user_space(struct kvm_vcpu *vcpu, u32 index, u64 data, int r)
++{
++	return kvm_msr_user_space(vcpu, index, KVM_EXIT_X86_WRMSR, data,
++				   complete_emulated_wrmsr, r);
++}
++
+ int kvm_emulate_rdmsr(struct kvm_vcpu *vcpu)
+ {
+ 	u32 ecx = kvm_rcx_read(vcpu);
+ 	u64 data;
++	int r;
++
++	r = kvm_get_msr(vcpu, ecx, &data);
+ 
+-	if (kvm_get_msr(vcpu, ecx, &data)) {
++	/* MSR read failed? See if we should ask user space */
++	if (r && kvm_get_msr_user_space(vcpu, ecx, r)) {
++		/* Bounce to user space */
++		return 0;
++	}
++
++	/* MSR read failed? Inject a #GP */
++	if (r) {
+ 		trace_kvm_msr_read_ex(ecx);
+ 		kvm_inject_gp(vcpu, 0);
+ 		return 1;
+@@ -1612,8 +1687,18 @@ int kvm_emulate_wrmsr(struct kvm_vcpu *vcpu)
+ {
+ 	u32 ecx = kvm_rcx_read(vcpu);
+ 	u64 data = kvm_read_edx_eax(vcpu);
++	int r;
+ 
+-	if (kvm_set_msr(vcpu, ecx, data)) {
++	r = kvm_set_msr(vcpu, ecx, data);
++
++	/* MSR write failed? See if we should ask user space */
++	if (r && kvm_set_msr_user_space(vcpu, ecx, data, r)) {
++		/* Bounce to user space */
++		return 0;
++	}
++
++	/* MSR write failed? Inject a #GP */
++	if (r) {
+ 		trace_kvm_msr_write_ex(ecx, data);
+ 		kvm_inject_gp(vcpu, 0);
+ 		return 1;
+@@ -3511,6 +3596,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+ 	case KVM_CAP_EXCEPTION_PAYLOAD:
+ 	case KVM_CAP_SET_GUEST_DEBUG:
+ 	case KVM_CAP_LAST_CPU:
++	case KVM_CAP_X86_USER_SPACE_MSR:
+ 		r = 1;
+ 		break;
+ 	case KVM_CAP_SYNC_REGS:
+@@ -5031,6 +5117,10 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
+ 		kvm->arch.exception_payload_enabled = cap->args[0];
+ 		r = 0;
+ 		break;
++	case KVM_CAP_X86_USER_SPACE_MSR:
++		kvm->arch.user_space_msr_mask = cap->args[0];
++		r = 0;
++		break;
+ 	default:
+ 		r = -EINVAL;
+ 		break;
+@@ -6360,13 +6450,33 @@ static void emulator_set_segment(struct x86_emulate_ctxt *ctxt, u16 selector,
+ static int emulator_get_msr(struct x86_emulate_ctxt *ctxt,
+ 			    u32 msr_index, u64 *pdata)
+ {
+-	return kvm_get_msr(emul_to_vcpu(ctxt), msr_index, pdata);
++	struct kvm_vcpu *vcpu = emul_to_vcpu(ctxt);
++	int r;
++
++	r = kvm_get_msr(vcpu, msr_index, pdata);
++
++	if (r && kvm_get_msr_user_space(vcpu, msr_index, r)) {
++		/* Bounce to user space */
++		return X86EMUL_IO_NEEDED;
++	}
++
++	return r;
+ }
+ 
+ static int emulator_set_msr(struct x86_emulate_ctxt *ctxt,
+ 			    u32 msr_index, u64 data)
+ {
+-	return kvm_set_msr(emul_to_vcpu(ctxt), msr_index, data);
++	struct kvm_vcpu *vcpu = emul_to_vcpu(ctxt);
++	int r;
++
++	r = kvm_set_msr(vcpu, msr_index, data);
++
++	if (r && kvm_set_msr_user_space(vcpu, msr_index, data, r)) {
++		/* Bounce to user space */
++		return X86EMUL_IO_NEEDED;
++	}
++
++	return r;
+ }
+ 
+ static u64 emulator_get_smbase(struct x86_emulate_ctxt *ctxt)
+diff --git a/include/trace/events/kvm.h b/include/trace/events/kvm.h
+index 9417a34aad08..26cfb0fa8e7e 100644
+--- a/include/trace/events/kvm.h
++++ b/include/trace/events/kvm.h
+@@ -17,7 +17,7 @@
+ 	ERSN(NMI), ERSN(INTERNAL_ERROR), ERSN(OSI), ERSN(PAPR_HCALL),	\
+ 	ERSN(S390_UCONTROL), ERSN(WATCHDOG), ERSN(S390_TSCH), ERSN(EPR),\
+ 	ERSN(SYSTEM_EVENT), ERSN(S390_STSI), ERSN(IOAPIC_EOI),          \
+-	ERSN(HYPERV), ERSN(ARM_NISV)
++	ERSN(HYPERV), ERSN(ARM_NISV), ERSN(X86_RDMSR), ERSN(X86_WRMSR)
+ 
+ TRACE_EVENT(kvm_userspace_exit,
+ 	    TP_PROTO(__u32 reason, int errno),
+diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+index 7d8eced6f459..8bd9baaa9eb3 100644
+--- a/include/uapi/linux/kvm.h
++++ b/include/uapi/linux/kvm.h
+@@ -248,6 +248,8 @@ struct kvm_hyperv_exit {
+ #define KVM_EXIT_IOAPIC_EOI       26
+ #define KVM_EXIT_HYPERV           27
+ #define KVM_EXIT_ARM_NISV         28
++#define KVM_EXIT_X86_RDMSR        29
++#define KVM_EXIT_X86_WRMSR        30
+ 
+ /* For KVM_EXIT_INTERNAL_ERROR */
+ /* Emulate instruction failed. */
+@@ -413,6 +415,15 @@ struct kvm_run {
+ 			__u64 esr_iss;
+ 			__u64 fault_ipa;
+ 		} arm_nisv;
++		/* KVM_EXIT_X86_RDMSR / KVM_EXIT_X86_WRMSR */
++		struct {
++			__u8 error; /* user -> kernel */
++			__u8 pad[7];
++#define KVM_MSR_EXIT_REASON_INVAL	(1 << 0)
++			__u32 reason; /* kernel -> user */
++			__u32 index; /* kernel -> user */
++			__u64 data; /* kernel <-> user */
++		} msr;
+ 		/* Fix the size of the union. */
+ 		char padding[256];
+ 	};
+@@ -1037,6 +1048,7 @@ struct kvm_ppc_resize_hpt {
+ #define KVM_CAP_SMALLER_MAXPHYADDR 185
+ #define KVM_CAP_S390_DIAG318 186
+ #define KVM_CAP_STEAL_TIME 187
++#define KVM_CAP_X86_USER_SPACE_MSR 188
+ 
+ #ifdef KVM_CAP_IRQ_ROUTING
+ 
 -- 
 2.28.0.394.ge197136389
 
