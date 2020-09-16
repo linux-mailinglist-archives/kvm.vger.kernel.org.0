@@ -2,197 +2,104 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A968F26C936
-	for <lists+kvm@lfdr.de>; Wed, 16 Sep 2020 21:04:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3552826C915
+	for <lists+kvm@lfdr.de>; Wed, 16 Sep 2020 21:03:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728066AbgIPTE3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 16 Sep 2020 15:04:29 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:32298 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727422AbgIPRqU (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 16 Sep 2020 13:46:20 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1600278367;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=ZLmHQQTvYZ1vyzqk0TBru3JZL4lsKVfVuFbc/jCl0b0=;
-        b=VtIYidXfFA6uvgpsyl6DS7Fw7UHcmMOZXlnFiQ4+gR2qEUYEadf1MwU7wPVpAEN23YQwcs
-        gABbFKoPFUEVIUwPcMZdvgJ0mF23tTFLfcqeIY0zvG1cxPqpw4FxeCp/i52jTCorYMdVxB
-        EagJWQqmXb5n4QCnRfzphjxpDUBtpPs=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-364-XOPxXcRAN1KoDzSHz7IBQQ-1; Wed, 16 Sep 2020 07:05:42 -0400
-X-MC-Unique: XOPxXcRAN1KoDzSHz7IBQQ-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5300080EF84;
-        Wed, 16 Sep 2020 11:05:41 +0000 (UTC)
-Received: from gondolin (ovpn-112-252.ams2.redhat.com [10.36.112.252])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 7815F5FC36;
-        Wed, 16 Sep 2020 11:05:27 +0000 (UTC)
-Date:   Wed, 16 Sep 2020 13:05:24 +0200
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Matthew Rosato <mjrosato@linux.ibm.com>
-Cc:     alex.williamson@redhat.com, pmorel@linux.ibm.com,
-        schnelle@linux.ibm.com, rth@twiddle.net, david@redhat.com,
-        thuth@redhat.com, pasic@linux.ibm.com, borntraeger@de.ibm.com,
-        mst@redhat.com, pbonzini@redhat.com, qemu-s390x@nongnu.org,
-        qemu-devel@nongnu.org, kvm@vger.kernel.org
-Subject: Re: [PATCH v3 5/5] s390x/pci: Honor DMA limits set by vfio
-Message-ID: <20200916130524.48e11b26.cohuck@redhat.com>
-In-Reply-To: <1600197283-25274-6-git-send-email-mjrosato@linux.ibm.com>
-References: <1600197283-25274-1-git-send-email-mjrosato@linux.ibm.com>
-        <1600197283-25274-6-git-send-email-mjrosato@linux.ibm.com>
-Organization: Red Hat GmbH
+        id S1727404AbgIPTDK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 16 Sep 2020 15:03:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35722 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727279AbgIPRsf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 16 Sep 2020 13:48:35 -0400
+Received: from mail-ej1-x642.google.com (mail-ej1-x642.google.com [IPv6:2a00:1450:4864:20::642])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 55826C0698CA;
+        Wed, 16 Sep 2020 04:25:21 -0700 (PDT)
+Received: by mail-ej1-x642.google.com with SMTP id r7so9770983ejs.11;
+        Wed, 16 Sep 2020 04:25:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=+mqCE1Gph5m1yXF7bV6laGDpK9C2HQ1xfAV3LJcGXyk=;
+        b=V0xugFUwP2zKWQ3C6C6Oo6ZRSdKDI6SRacL8HgfrX8iw1MKIHqeTIofH/h6gvBbrOi
+         42G03NGAZdP94ZPBIcGONaBen5QoZ2w/rfCdfJCYNoys0kJx388ZNycBRMGPiRlr67sG
+         KW8lI3PO88QDhLDuY3OJ90X6NJv2GgJ9r6C9CaNvVXnTTDKlcbAdivt5TrcK2tezpxce
+         7/B+rW0/2DkYw6Tsnilr4rxufuCPPL5ntODuTgY3U+jCJJ6JpWVhwkPzWj8tjAw75gFd
+         5CscWNzYtswiu78RmMUw8fEBQ/ez4V/wTNGtwdj/cENKEwLIoINUnat3vAqAqkp3MbdC
+         +QHg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=+mqCE1Gph5m1yXF7bV6laGDpK9C2HQ1xfAV3LJcGXyk=;
+        b=SGHZd6BlsZtGC/nZi3V/zXOEDM89+WavqKWVBJXvR2cbsF8lJ5jJ6AwfBO0p2UdshG
+         zCoWBTSp9MRg84YI3ZdL+SEF+Mo9cbfCRLC/lngOjLE0JKtrJkPNMQDZJN7q9kQ1J5J0
+         qhpNWBu+6n55+Qio91Y/5JMqH0kF1VUQFm54aOtD6OC3EJ/4W3n6U8vTugVkHZ8jROt3
+         aCAre/m6p9qKC6Ziyt7GvbdWlTXkNCwHUETeyveRIzBCRwODaFiWVVBHL5axtqEulgvy
+         RDMip6cUkL/rAU4A+huFxnb4fZHRu22OdYbacsCKfA9boR76zowiW266UJXgQrNa5CTN
+         ub8A==
+X-Gm-Message-State: AOAM532CjqNgaBurz1kS8q8SjaBOOzhYHjrE2S/9cvhklNtNVngfU5KM
+        UkS0mw6cKZTS5sSolR4SEomV9LEIfR7fvavfKg==
+X-Google-Smtp-Source: ABdhPJyixyYti8m5yiACM/A3dKdas+hh45AAS4bMeCuzp5+OiXXkuFr73Ln3baDPyaTPw4glCszAn/R857RwhcaCsng=
+X-Received: by 2002:a17:906:aecb:: with SMTP id me11mr25984406ejb.217.1600255520046;
+ Wed, 16 Sep 2020 04:25:20 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+References: <20200916090342.748452-1-vkuznets@redhat.com> <6c2204ad-590b-025d-f728-0e6e67bf24ba@gmail.com>
+ <87een2htis.fsf@vitty.brq.redhat.com>
+In-Reply-To: <87een2htis.fsf@vitty.brq.redhat.com>
+From:   Haiwei Li <lihaiwei.kernel@gmail.com>
+Date:   Wed, 16 Sep 2020 19:25:08 +0800
+Message-ID: <CAB5KdObJ4_0oJf+rwGXWNk6MsKm1j0dqrcGQkzQ63ek1LY=zMQ@mail.gmail.com>
+Subject: Re: [PATCH] Revert "KVM: Check the allocation of pv cpu mask"
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Haiwei Li <lihaiwei@tencent.com>, linux-kernel@vger.kernel.org,
+        x86@kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 15 Sep 2020 15:14:43 -0400
-Matthew Rosato <mjrosato@linux.ibm.com> wrote:
+Vitaly Kuznetsov <vkuznets@redhat.com> =E4=BA=8E2020=E5=B9=B49=E6=9C=8816=
+=E6=97=A5=E5=91=A8=E4=B8=89 =E4=B8=8B=E5=8D=887:04=E5=86=99=E9=81=93=EF=BC=
+=9A
+>
+> Haiwei Li <lihaiwei.kernel@gmail.com> writes:
+>
+> > On 20/9/16 17:03, Vitaly Kuznetsov wrote:
+> >> The commit 0f990222108d ("KVM: Check the allocation of pv cpu mask") w=
+e
+> >> have in 5.9-rc5 has two issue:
+> >> 1) Compilation fails for !CONFIG_SMP, see:
+> >>     https://bugzilla.kernel.org/show_bug.cgi?id=3D209285
+> >>
+> >> 2) This commit completely disables PV TLB flush, see
+> >>     https://lore.kernel.org/kvm/87y2lrnnyf.fsf@vitty.brq.redhat.com/
+> >>
+> >> The allocation problem is likely a theoretical one, if we don't
+> >> have memory that early in boot process we're likely doomed anyway.
+> >> Let's solve it properly later.
+> >
+> > Hi, i have sent a patchset to fix this commit.
+> >
+> > https://lore.kernel.org/kvm/20200914091148.95654-1-lihaiwei.kernel@gmai=
+l.com/T/#m6c27184012ee5438e5d91c09b1ba1b6a3ee30ee4
+> >
+> > What do you think?
+>
+> Saw it, looks good to me. We are, however, already very, very late in 5.9
+> release cycle and the original issue you were addressing (allocation
+> failure) is likely a theoretical only I suggest we just revert it before
+> 5.9 is released. For 5.9 we can certainly take your PATCH2 merged with
+> 0f99022210.
+>
+> This Paolo's call anyway)
 
-> When an s390 guest is using lazy unmapping, it can result in a very
-> large number of oustanding DMA requests, far beyond the default
-> limit configured for vfio.  Let's track DMA usage similar to vfio
-> in the host, and trigger the guest to flush their DMA mappings
-> before vfio runs out.
-> 
-> Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
-> ---
->  hw/s390x/s390-pci-bus.c  | 56 +++++++++++++++++++++++++++++++++++++++++++-----
->  hw/s390x/s390-pci-bus.h  |  9 ++++++++
->  hw/s390x/s390-pci-inst.c | 34 +++++++++++++++++++++++------
->  hw/s390x/s390-pci-inst.h |  3 +++
->  4 files changed, 91 insertions(+), 11 deletions(-)
+I see.  Thank you.
 
-(...)
-
-> @@ -737,6 +740,41 @@ static void s390_pci_iommu_free(S390pciState *s, PCIBus *bus, int32_t devfn)
->      object_unref(OBJECT(iommu));
->  }
->  
-> +static S390PCIDMACount *s390_start_dma_count(S390pciState *s, VFIODevice *vdev)
-
-Should these go into the new vfio-related file?
-
-> +{
-> +    int id = vdev->group->container->fd;
-> +    S390PCIDMACount *cnt;
-> +    uint32_t avail;
-> +
-> +    if (!s390_pci_update_dma_avail(id, &avail)) {
-> +        return NULL;
-> +    }
-> +
-> +    QTAILQ_FOREACH(cnt, &s->zpci_dma_limit, link) {
-> +        if (cnt->id  == id) {
-> +            cnt->users++;
-> +            return cnt;
-> +        }
-> +    }
-> +
-> +    cnt = g_new0(S390PCIDMACount, 1);
-> +    cnt->id = id;
-> +    cnt->users = 1;
-> +    cnt->avail = avail;
-> +    QTAILQ_INSERT_TAIL(&s->zpci_dma_limit, cnt, link);
-> +    return cnt;
-> +}
-> +
-> +static void s390_end_dma_count(S390pciState *s, S390PCIDMACount *cnt)
-> +{
-> +    assert(cnt);
-> +
-> +    cnt->users--;
-> +    if (cnt->users == 0) {
-> +        QTAILQ_REMOVE(&s->zpci_dma_limit, cnt, link);
-> +    }
-> +}
-> +
->  static void s390_pcihost_realize(DeviceState *dev, Error **errp)
->  {
->      PCIBus *b;
-> @@ -764,6 +802,7 @@ static void s390_pcihost_realize(DeviceState *dev, Error **errp)
->      s->bus_no = 0;
->      QTAILQ_INIT(&s->pending_sei);
->      QTAILQ_INIT(&s->zpci_devs);
-> +    QTAILQ_INIT(&s->zpci_dma_limit);
->  
->      css_register_io_adapters(CSS_IO_ADAPTER_PCI, true, false,
->                               S390_ADAPTER_SUPPRESSIBLE, errp);
-> @@ -902,6 +941,7 @@ static void s390_pcihost_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
->  {
->      S390pciState *s = S390_PCI_HOST_BRIDGE(hotplug_dev);
->      PCIDevice *pdev = NULL;
-> +    VFIOPCIDevice *vpdev = NULL;
->      S390PCIBusDevice *pbdev = NULL;
->  
->      if (object_dynamic_cast(OBJECT(dev), TYPE_PCI_BRIDGE)) {
-> @@ -941,17 +981,20 @@ static void s390_pcihost_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
->              }
->          }
->  
-> +        pbdev->pdev = pdev;
-> +        pbdev->iommu = s390_pci_get_iommu(s, pci_get_bus(pdev), pdev->devfn);
-> +        pbdev->iommu->pbdev = pbdev;
-> +        pbdev->state = ZPCI_FS_DISABLED;
-> +
->          if (object_dynamic_cast(OBJECT(dev), "vfio-pci")) {
->              pbdev->fh |= FH_SHM_VFIO;
-> +            vpdev = container_of(pbdev->pdev, VFIOPCIDevice, pdev);
-> +            pbdev->iommu->dma_limit = s390_start_dma_count(s,
-> +                                                           &vpdev->vbasedev);
-
-I think you can just pass s and pbdev to that function... that would
-move dealing with vfio specifics from this file.
-
->          } else {
->              pbdev->fh |= FH_SHM_EMUL;
->          }
->  
-> -        pbdev->pdev = pdev;
-> -        pbdev->iommu = s390_pci_get_iommu(s, pci_get_bus(pdev), pdev->devfn);
-> -        pbdev->iommu->pbdev = pbdev;
-> -        pbdev->state = ZPCI_FS_DISABLED;
-> -
->          if (s390_pci_msix_init(pbdev)) {
->              error_setg(errp, "MSI-X support is mandatory "
->                         "in the S390 architecture");
-
-(...)
-
-> diff --git a/hw/s390x/s390-pci-inst.c b/hw/s390x/s390-pci-inst.c
-> index 2f7a7d7..cc34b17 100644
-> --- a/hw/s390x/s390-pci-inst.c
-> +++ b/hw/s390x/s390-pci-inst.c
-> @@ -32,6 +32,9 @@
->          }                                                          \
->      } while (0)
->  
-> +#define inc_dma_avail(iommu) if (iommu->dma_limit) iommu->dma_limit->avail++;
-
-I was thinking more of something like
-
-static inline void inc_dma_avail(S390PCIIOMMU *iommu)
-{
-    if (iommu->dma_limit) {
-        iommu->dma_limit->avail++;
-    }
-}
-
-> +#define dec_dma_avail(iommu) if (iommu->dma_limit) iommu->dma_limit->avail--;
-> +
->  static void s390_set_status_code(CPUS390XState *env,
->                                   uint8_t r, uint64_t status_code)
->  {
-
-(...)
-
+Haiwei Li
