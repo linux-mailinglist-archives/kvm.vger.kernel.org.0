@@ -2,148 +2,222 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 39E0026CB72
-	for <lists+kvm@lfdr.de>; Wed, 16 Sep 2020 22:27:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C993226CD68
+	for <lists+kvm@lfdr.de>; Wed, 16 Sep 2020 22:59:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728256AbgIPU1b (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 16 Sep 2020 16:27:31 -0400
-Received: from mail-bn7nam10on2050.outbound.protection.outlook.com ([40.107.92.50]:17632
-        "EHLO NAM10-BN7-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726891AbgIPU1U (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 16 Sep 2020 16:27:20 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Ijh6ZfXB6cD1CH6LIMk5v0KEX0Mz5gTsOa4Yo1JRVkzoBgeqt3pUD2Fuc6ehjVX1SeRBrUUO+k/XFAlqUbh86gzLUG5OUO8koF+9G4GZxUGkXfmrk9Ilcqqx/aaKKaNJbPCAcQox3jNAf1emyXpt/dnAxY/SIs121KZT6GBEwn9MeoSmLxSiJYF4NUhHOohcuxNyAuujD4ERGstg/LVoxjdG+JiJZneAU3SV8f+5vQiGtZ6K8qhHFpyna2YrYaPH8XJuiN5RsUzkfffRn9XvPbytrzMroE56O/ntYdWc0x9WFsrD9buR+lEa8H3vpG2w1qAXgfaqcqGGZg+0hJ9DsQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=vtaYVRLwf3qY5khFcuYh300loHhzck9H/b4rRuHn3O8=;
- b=C30yArODEU3THcqvjW2JyMYZlqHzdl3b9904rQop68IlzOg11pldQo/jyhCoNoAONoshXJ3onhuFRcV52anxnxsQx2xM+rCpY66BB3zJZkuAiAcdwZ09ie76qLgs/prHMOFCFkFfomprQ3Nem7t5Ah20h4P8Kmvjn3GSWgRn+gsxr4Ek2MVGWuMM0cKGU2SMCFJjUrM8etCM1bfPvLItu0N+a3ka7ATZZqBN9Z3m52l8txOhkhe9ox4ZJo0SUTCz9q8X1SinY8/NiNp+uoIj+CskDSjtLwnGrUgQSdJMqphgZczlwmB8FKGcEfDOiog4NYFtSfQfGxjH3b9XxIe8IQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=vtaYVRLwf3qY5khFcuYh300loHhzck9H/b4rRuHn3O8=;
- b=QLwmpEE6g5N6VgEqYNElyF+tKDc+KWug06YtT2ok8R4v4bbgnJHmbITSs52NkvHtZMBBRCulRwLs7j9G7iqgjuUtZrSed3h0k6lecpOoxBDikQinDEIy5UhfFaOBcBSeQQXERrisXVuVSaf+C01YYK5JI1KbAHr/j5Lr02rrLAI=
-Authentication-Results: amd.com; dkim=none (message not signed)
- header.d=none;amd.com; dmarc=none action=none header.from=amd.com;
-Received: from DM5PR12MB1355.namprd12.prod.outlook.com (2603:10b6:3:6e::7) by
- DM5PR12MB1258.namprd12.prod.outlook.com (2603:10b6:3:79::14) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.3391.11; Wed, 16 Sep 2020 20:27:16 +0000
-Received: from DM5PR12MB1355.namprd12.prod.outlook.com
- ([fe80::299a:8ed2:23fc:6346]) by DM5PR12MB1355.namprd12.prod.outlook.com
- ([fe80::299a:8ed2:23fc:6346%3]) with mapi id 15.20.3391.011; Wed, 16 Sep 2020
- 20:27:15 +0000
-Subject: Re: [RFC PATCH 08/35] KVM: SVM: Prevent debugging under SEV-ES
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org, x86@kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Borislav Petkov <bp@alien8.de>, Ingo Molnar <mingo@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Brijesh Singh <brijesh.singh@amd.com>
-References: <cover.1600114548.git.thomas.lendacky@amd.com>
- <58093c542b5b442b88941828595fb2548706f1bf.1600114548.git.thomas.lendacky@amd.com>
- <20200914212601.GA7192@sjchrist-ice>
- <fd790047-4107-b28a-262e-03ed5bc4c421@amd.com>
- <20200915163010.GB8420@sjchrist-ice>
- <aff46d8d-07ff-7d14-3e7f-ffe60f2bd779@amd.com>
- <5e816811-450f-b732-76f7-6130479642e0@amd.com>
- <20200916160210.GA10227@sjchrist-ice>
- <b62e055a-000e-ff7b-00e4-41b5b39b55d5@amd.com>
- <20200916164923.GC10227@sjchrist-ice>
-From:   Tom Lendacky <thomas.lendacky@amd.com>
-Message-ID: <9988f485-ce78-4df4-b294-32cc7743b6b2@amd.com>
-Date:   Wed, 16 Sep 2020 15:27:13 -0500
+        id S1726037AbgIPU7W (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 16 Sep 2020 16:59:22 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:30264 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726410AbgIPQb3 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 16 Sep 2020 12:31:29 -0400
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 08GCWbEs117304;
+        Wed, 16 Sep 2020 08:55:08 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=3ITlY2rzSr0X3crvr2mJz9ylgP54qmuygZyjBqSVzNE=;
+ b=Qn4wwkmFoAH765uJ+9LkqM/GBOSbd4C9ruHyS/FFTaXuzbDRnaOPNlVz5/mm5qT2TFoG
+ 7F0nkpRQPMMyBk5x4H3abGZYSJbBA81/geub3egwDPLDll7+kgRU+E7q1dPQzDRaNTqF
+ 1kk4wdVxgaXHGH1UURLO6O2IMwD/wqYt7HzqSJKezr09g5MMsHxzNU0j9AV0kxLlJRg+
+ dbLsnVLeBfG1Z0u5P35sHrT37PhEHfpmzZKxTl3dO/ArCkt3zhBJqdzTRfbak8/aLlVO
+ 1eq+9uuNIZ2Vv2KhiHi2pLtDc6aW8Hm8lkJVXx8BONLjaDT/zCmzbhoQhcxPdkAcCOO2 jA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 33kgrn4qwe-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 16 Sep 2020 08:55:08 -0400
+Received: from m0098409.ppops.net (m0098409.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 08GCWkiE118271;
+        Wed, 16 Sep 2020 08:55:07 -0400
+Received: from ppma04wdc.us.ibm.com (1a.90.2fa9.ip4.static.sl-reverse.com [169.47.144.26])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 33kgrn4qvv-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 16 Sep 2020 08:55:07 -0400
+Received: from pps.filterd (ppma04wdc.us.ibm.com [127.0.0.1])
+        by ppma04wdc.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 08GClnZx002588;
+        Wed, 16 Sep 2020 12:55:06 GMT
+Received: from b01cxnp22033.gho.pok.ibm.com (b01cxnp22033.gho.pok.ibm.com [9.57.198.23])
+        by ppma04wdc.us.ibm.com with ESMTP id 33k6he4g7m-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 16 Sep 2020 12:55:06 +0000
+Received: from b01ledav001.gho.pok.ibm.com (b01ledav001.gho.pok.ibm.com [9.57.199.106])
+        by b01cxnp22033.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 08GCt54R41091414
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 16 Sep 2020 12:55:05 GMT
+Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id BAB9E28058;
+        Wed, 16 Sep 2020 12:55:05 +0000 (GMT)
+Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 5948628065;
+        Wed, 16 Sep 2020 12:55:02 +0000 (GMT)
+Received: from oc4221205838.ibm.com (unknown [9.163.85.51])
+        by b01ledav001.gho.pok.ibm.com (Postfix) with ESMTP;
+        Wed, 16 Sep 2020 12:55:01 +0000 (GMT)
+Subject: Re: [PATCH v3 4/5] s390x/pci: Add routine to get the vfio dma
+ available count
+To:     Cornelia Huck <cohuck@redhat.com>,
+        =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Cc:     thuth@redhat.com, pmorel@linux.ibm.com, david@redhat.com,
+        qemu-s390x@nongnu.org, schnelle@linux.ibm.com,
+        qemu-devel@nongnu.org, pasic@linux.ibm.com, borntraeger@de.ibm.com,
+        alex.williamson@redhat.com, mst@redhat.com, kvm@vger.kernel.org,
+        pbonzini@redhat.com, rth@twiddle.net
+References: <1600197283-25274-1-git-send-email-mjrosato@linux.ibm.com>
+ <1600197283-25274-5-git-send-email-mjrosato@linux.ibm.com>
+ <0b28ae63-faad-953d-85c2-04bcdefeb7bf@redhat.com>
+ <20200916122720.4c7d8671.cohuck@redhat.com>
+From:   Matthew Rosato <mjrosato@linux.ibm.com>
+Message-ID: <a2599938-d0b8-4436-2cf6-ceed9bba28f3@linux.ibm.com>
+Date:   Wed, 16 Sep 2020 08:55:00 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
-In-Reply-To: <20200916164923.GC10227@sjchrist-ice>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: DM5PR16CA0024.namprd16.prod.outlook.com
- (2603:10b6:3:c0::34) To DM5PR12MB1355.namprd12.prod.outlook.com
- (2603:10b6:3:6e::7)
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from [10.236.30.118] (165.204.77.1) by DM5PR16CA0024.namprd16.prod.outlook.com (2603:10b6:3:c0::34) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3391.13 via Frontend Transport; Wed, 16 Sep 2020 20:27:14 +0000
-X-Originating-IP: [165.204.77.1]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-HT: Tenant
-X-MS-Office365-Filtering-Correlation-Id: 4bb28a5e-ea7d-4fde-bf5e-08d85a7ee649
-X-MS-TrafficTypeDiagnostic: DM5PR12MB1258:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <DM5PR12MB12581B82A9E42DAFBD87C7E0EC210@DM5PR12MB1258.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: L3Ir/EftwSEZkV9dLIjTrvYqK0z36MIRTU+ETJw1JHLA7P8Ik5Z1uSuV+4FsL3+cr4aaEMEV5amyuaMmaIPmRip0XHIpeMLDtFIsaaDPYz6AH+egR+PRRsxIshLs27CYJgm12peZU+g61GFRqcFYsxFp+IfYSJLOBfHRv+3c9xIScsVbdJzfuMlatCOxP05y254jJQnNgmudU32mlj8NuskAtIU4N3+C0J3L0Pzg3CLlO9L7erJLGS5ZaDbczBJAPCqN0WPLip72VfeoHNV8NVs3Tmx1U6fFc1ZsiJ+YAwHcKEsQaQErkSLB15oaSHNNQbBsr7rNyLddKbFz9dNTIFLlYp0pTiiKWe7FkGKMcHJjzdJWSUdUYJndHr7bCmkX
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM5PR12MB1355.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(136003)(366004)(346002)(396003)(39860400002)(376002)(5660300002)(186003)(52116002)(478600001)(66946007)(36756003)(31696002)(16526019)(86362001)(53546011)(16576012)(316002)(4326008)(2906002)(26005)(6486002)(66556008)(8676002)(8936002)(83380400001)(54906003)(6916009)(956004)(2616005)(31686004)(66476007)(7416002)(43740500002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData: m2/wKJuhz4wwkmP+efOhGHypwFm12K2Z1SN+9txrhrhSl+AhrohkSDjGcTQm0N+9r72+SELzvBerl8F6+d4wtiWelb8lJp+fkYnFEF7b5suNffQal5lCQqzVxf4GjvKQROIFWa5YaQWW7luqfrl+A/ee/QUYYi2arhFUK4+429XBpakuxrviRC5lLt9uiytUf6KKZraWNazI9e8l/Plj5OyY7s2pHdXwkrZlLruQacImzxbAGcS65SAa+jd1IfeYYt4r6LnRTEJNZFo/K2XGKFnPCqFXdmjLKTbTQvwDAN7JwpuqbGBvT2HjGONrhqHgdiOoT27ZQim/kkfW2AvmDCpqo9ORWeiazaZLL6CpVlEEOae+g96CPWLxPvMV2DXo3ZU/LoNMmKVhi24WVd4fbuqE2UCt2mvDz9iLMVf7MiPuG2YN9Qcc22DLs5zd0CsYL4AGWvZ7x9scQOmEc3gzsDkxiYXX+GAJVjqqxRaFrw3u6ki0zKOXrFAa7dp6xQ9KBKsELp6Twg9Iu8qgSojoDrMGPKGn9W5m68rFDMKMRh6JTTyyGU2BIhIttmX8LnTYdPayfiirvJAzMHz4NHicTd3wR/Li5ffn5nK8JSmaibF+MG4A9y84XPS8bmDdHFme5n+YqRnLXBwp47/4ZgmkvQ==
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 4bb28a5e-ea7d-4fde-bf5e-08d85a7ee649
-X-MS-Exchange-CrossTenant-AuthSource: DM5PR12MB1355.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Sep 2020 20:27:15.3724
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: EdwraeJKYlzMEKz/Yvz4lmnFhmObOkppvvwtngFruleaNTa+VIyxg8bnXTXOjLsCuIf90amBP6mWLbQy8BVr2Q==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM5PR12MB1258
+In-Reply-To: <20200916122720.4c7d8671.cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
+ definitions=2020-09-16_07:2020-09-16,2020-09-16 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 bulkscore=0
+ clxscore=1015 priorityscore=1501 lowpriorityscore=0 mlxlogscore=999
+ mlxscore=0 suspectscore=2 phishscore=0 spamscore=0 adultscore=0
+ impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2006250000 definitions=main-2009160092
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 9/16/20 11:49 AM, Sean Christopherson wrote:
-> On Wed, Sep 16, 2020 at 11:38:38AM -0500, Tom Lendacky wrote:
->>
->>
->> On 9/16/20 11:02 AM, Sean Christopherson wrote:
->>> On Wed, Sep 16, 2020 at 10:11:10AM -0500, Tom Lendacky wrote:
->>>> On 9/15/20 3:13 PM, Tom Lendacky wrote:
->>>>> On 9/15/20 11:30 AM, Sean Christopherson wrote:
->>>>>> I don't quite follow the "doesn't mean debugging can't be done in the future".
->>>>>> Does that imply that debugging could be supported for SEV-ES guests, even if
->>>>>> they have an encrypted VMSA?
->>>>>
->>>>> Almost anything can be done with software. It would require a lot of
->>>>> hypervisor and guest code and changes to the GHCB spec, etc. So given
->>>>> that, probably just the check for arch.guest_state_protected is enough for
->>>>> now. I'll just need to be sure none of the debugging paths can be taken
->>>>> before the VMSA is encrypted.
->>>>
->>>> So I don't think there's any guarantee that the KVM_SET_GUEST_DEBUG ioctl
->>>> couldn't be called before the VMSA is encrypted, meaning I can't check the
->>>> arch.guest_state_protected bit for that call. So if we really want to get
->>>> rid of the allow_debug() op, I'd need some other way to indicate that this
->>>> is an SEV-ES / protected state guest.
+On 9/16/20 6:27 AM, Cornelia Huck wrote:
+> On Wed, 16 Sep 2020 09:21:39 +0200
+> Philippe Mathieu-Daudé <philmd@redhat.com> wrote:
+> 
+>> On 9/15/20 9:14 PM, Matthew Rosato wrote:
+>>> Create new files for separating out vfio-specific work for s390
+>>> pci. Add the first such routine, which issues VFIO_IOMMU_GET_INFO
+>>> ioctl to collect the current dma available count.
 >>>
->>> Would anything break if KVM "speculatively" set guest_state_protected before
->>> LAUNCH_UPDATE_VMSA?  E.g. does KVM need to emulate before LAUNCH_UPDATE_VMSA?
+>>> Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
+>>> ---
+>>>   hw/s390x/meson.build     |  1 +
+>>>   hw/s390x/s390-pci-vfio.c | 54 ++++++++++++++++++++++++++++++++++++++++++++++++
+>>>   hw/s390x/s390-pci-vfio.h | 17 +++++++++++++++
+>>>   3 files changed, 72 insertions(+)
+>>>   create mode 100644 hw/s390x/s390-pci-vfio.c
+>>>   create mode 100644 hw/s390x/s390-pci-vfio.h
+>>>
+> 
+> (...)
+> 
+>>> diff --git a/hw/s390x/s390-pci-vfio.c b/hw/s390x/s390-pci-vfio.c
+>>> new file mode 100644
+>>> index 0000000..75e3ac1
+>>> --- /dev/null
+>>> +++ b/hw/s390x/s390-pci-vfio.c
+>>> @@ -0,0 +1,54 @@
+>>> +/*
+>>> + * s390 vfio-pci interfaces
+>>> + *
+>>> + * Copyright 2020 IBM Corp.
+>>> + * Author(s): Matthew Rosato <mjrosato@linux.ibm.com>
+>>> + *
+>>> + * This work is licensed under the terms of the GNU GPL, version 2 or (at
+>>> + * your option) any later version. See the COPYING file in the top-level
+>>> + * directory.
+>>> + */
+>>> +
+>>> +#include <sys/ioctl.h>
+>>> +
+>>> +#include "qemu/osdep.h"
+>>> +#include "s390-pci-vfio.h"
+>>> +#include "hw/vfio/vfio-common.h"
+>>> +
+>>> +/*
+>>> + * Get the current DMA available count from vfio.  Returns true if vfio is
+>>> + * limiting DMA requests, false otherwise.  The current available count read
+>>> + * from vfio is returned in avail.
+>>> + */
+>>> +bool s390_pci_update_dma_avail(int fd, unsigned int *avail)
+>>> +{
+>>> +    g_autofree struct vfio_iommu_type1_info *info;
+>>> +    uint32_t argsz;
+>>> +    int ret;
+>>> +
+>>> +    assert(avail);
+>>> +
+>>> +    argsz = sizeof(struct vfio_iommu_type1_info);
+>>> +    info = g_malloc0(argsz);
+>>> +    info->argsz = argsz;
+>>> +    /*
+>>> +     * If the specified argsz is not large enough to contain all
+>>> +     * capabilities it will be updated upon return.  In this case
+>>> +     * use the updated value to get the entire capability chain.
+>>> +     */
+>>> +    ret = ioctl(fd, VFIO_IOMMU_GET_INFO, info);
+>>> +    if (argsz != info->argsz) {
+>>> +        argsz = info->argsz;
+>>> +        info = g_realloc(info, argsz);
 >>
->> Yes, the way the code is set up, the guest state (VMSA) is initialized in
->> the same way it is today (mostly) and that state is encrypted by the
->> LAUNCH_UPDATE_VMSA call. I check the guest_state_protected bit to decide
->> on whether to direct the updates to the real VMSA (before it's encrypted)
->> or the GHCB (that's the get_vmsa() function from patch #5).
+>> Do we need to bzero [sizeof(struct vfio_iommu_type1_info)..argsz[?
 > 
-> Ah, gotcha.  Would it work to set guest_state_protected[*] from time zero,
-> and move vmsa_encrypted to struct vcpu_svm?  I.e. keep vmsa_encrypted, but
-> use it only for guiding get_vmsa() and related behavior.
-
-It is mainly __set_sregs() that needs to know when to allow the register
-writes and when not to. During guest initialization, __set_sregs is how
-some of the VMSA is initialized by Qemu.
-
-Thanks,
-Tom
-
+> If we do, I think we need to do the equivalent in
+> vfio_get_region_info() as well?
 > 
+
+I agree that it would need to be in both places or neither -- I would 
+expect the re-driven ioctl to overwrite the prior contents of info 
+(unless we get a bad ret, but in this case we don't care what is in info)?
+
+Perhaps the fundamental difference between this code and 
+vfio_get_region_info is that the latter checks for only a growing argsz 
+and retries, whereas this code checks for != so it's technically 
+possible for a smaller argsz to trigger the retry here, and we wouldn't 
+know for sure that all bytes from the first ioctl call were overwritten.
+
+What if I adjust this code to look like vfio_get_region_info:
+
+retry:
+	info->argsz = argsz;
+
+	if (ioctl(fd, VFIO_IOMMU_GET_INFO, info)) {
+		// no need to g_free() bc of g_autofree
+		return false;	
+	}
+
+	if (info->argsz > argsz) {
+		argsz = info->argsz;
+		info = g_realloc(info, argsz);
+		goto retry;
+	}
+
+	/* If the capability exists, update with the current value */
+	return vfio_get_info_dma_avail(info, avail);
+
+Now we would only trigger when we are told by the host that the buffer 
+must be larger.
+
+> (Also, shouldn't we check ret before looking at info->argsz?)
+> 
+
+Yes, you are correct.  The above proposal would fix that issue too.
+
+>>
+>>> +        info->argsz = argsz;
+>>> +        ret = ioctl(fd, VFIO_IOMMU_GET_INFO, info);
+>>> +    }
+>>> +
+>>> +    if (ret) {
+>>> +        return false;
+>>> +    }
+>>> +
+>>> +    /* If the capability exists, update with the current value */
+>>> +    return vfio_get_info_dma_avail(info, avail);
+>>> +}
+>>> +
+> 
+> (...)
+> 
+> 
+
