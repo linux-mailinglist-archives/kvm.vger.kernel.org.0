@@ -2,360 +2,139 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8081026BA8D
-	for <lists+kvm@lfdr.de>; Wed, 16 Sep 2020 05:11:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9AF4B26BAEA
+	for <lists+kvm@lfdr.de>; Wed, 16 Sep 2020 05:49:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726333AbgIPDLQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 15 Sep 2020 23:11:16 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:38052 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726305AbgIPDLP (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 15 Sep 2020 23:11:15 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1600225873;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=pUfKtm728JV5HfEPBrNg85FNcQ7Ve2VTddaezZoQ5WY=;
-        b=NTFSBk7Q6S1IZx0LmnarbI8s37XwMNfgF0a242IrTudlhcOSk14kbtTCywzcvbSJwBZBYR
-        t4seOcvTOk5QymsgfLuUugvvFzzysPVOpv4Td5laoqwll9gebSqRQz6sfc5cOmxZdBQMhp
-        Ts1C/me0eJmH75uxkTyJkdvCi5ezGrg=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-165-J5rmrvsYOhil88kP7owOHQ-1; Tue, 15 Sep 2020 23:11:09 -0400
-X-MC-Unique: J5rmrvsYOhil88kP7owOHQ-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6EC658015FD;
-        Wed, 16 Sep 2020 03:11:06 +0000 (UTC)
-Received: from [10.72.13.186] (ovpn-13-186.pek2.redhat.com [10.72.13.186])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id C29ED75124;
-        Wed, 16 Sep 2020 03:10:52 +0000 (UTC)
-Subject: Re: [RFC PATCH 00/22] Enhance VHOST to enable SoC-to-SoC
- communication
-To:     Kishon Vijay Abraham I <kishon@ti.com>,
-        Cornelia Huck <cohuck@redhat.com>
-Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
-        Ohad Ben-Cohen <ohad@wizery.com>,
-        Bjorn Andersson <bjorn.andersson@linaro.org>,
-        Jon Mason <jdmason@kudzu.us>,
-        Dave Jiang <dave.jiang@intel.com>,
-        Allen Hubbe <allenbh@gmail.com>,
-        Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>,
-        Bjorn Helgaas <bhelgaas@google.com>,
+        id S1726543AbgIPDtP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 15 Sep 2020 23:49:15 -0400
+Received: from mail-eopbgr700085.outbound.protection.outlook.com ([40.107.70.85]:21633
+        "EHLO NAM04-SN1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726486AbgIPDtK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 15 Sep 2020 23:49:10 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Nnz8h2XonpjJwQ+91YXLmhi5B5HkqFrJTLjCA3qQdcyvSwCaUPYN6cebgxMJCM8CFh6a+0K5t1tAIXRrMUFbOuczqxE9f9HePTrcd52xBTOZOY6sQBGtqNG3czyvUVNLgwCmWZisq41IaMsp/u2MB9S9mnh559Njv7CLSaoQER1F4GuUx5sRKReNOKA+ZV6faAJr123yDtjiGzqjtcbGmG7BhXlX4ChLbj9KVxbYpNSkX3bM67+xIQdBd4GGrnAwMzW4P5anJKw490cB4jVrn0DMC/T1jjunmZdUe5j0ymitfeiupUa6OyFYgzD2aZK5jOKd2u4/RJzOaXL5PlELsg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=WZ/D+Q/kmxLiYd4w8gULC0EeonEBJFusdeCRLhEqmXk=;
+ b=F29z9NyNSpDtEN0bkYMdeRew8/xSGeX2InDkDWnVirMX6YA5jDOSvmMOEl3XxWwgUr6+sDwWJetk27lydVI6poauE8G+MZKbgYq9SXIB4biCBQPmllffQMguG6nTObUpryWUeudAS3/GanPBU5WH8/E4ufzsy584sOtCmsh742X8Gk21IzNlVFTP1VNWwvE2w717x09+8VD9HWWKXCGtCMI+Kb4+j7eJpdkyv/cqnfGsbdQfm5FwVW8QVqMM3MFIkmYKw0aFXa0DQm8uSdaeTSH6EudNIsuo4FjLdMgw0n+WnuA2xe2r1gnA7mFexXO4pNP1NApV7rvk69FS+Zr8bg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=WZ/D+Q/kmxLiYd4w8gULC0EeonEBJFusdeCRLhEqmXk=;
+ b=OqZ/dV7fOcsbxjo5j8/bcmy4pUw8cXqgNuiUUZclafszmCndf62GJzsoE4h4hYp9DP2asrkBkg3BPoRAt/p2SHhTiVC2yFIS2VcpdwSr1eoShIKMpYSAaYFIZIjujVRBcJuiTP56QL3LPiqnCA5wi9sSL15fOZZ3vQT9cWWoaHk=
+Authentication-Results: redhat.com; dkim=none (message not signed)
+ header.d=none;redhat.com; dmarc=none action=none header.from=amd.com;
+Received: from CY4PR12MB1494.namprd12.prod.outlook.com (2603:10b6:910:f::22)
+ by CY4PR1201MB0215.namprd12.prod.outlook.com (2603:10b6:910:1d::20) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3370.16; Wed, 16 Sep
+ 2020 03:49:08 +0000
+Received: from CY4PR12MB1494.namprd12.prod.outlook.com
+ ([fe80::9067:e60d:5698:51d8]) by CY4PR12MB1494.namprd12.prod.outlook.com
+ ([fe80::9067:e60d:5698:51d8%12]) with mapi id 15.20.3391.011; Wed, 16 Sep
+ 2020 03:49:08 +0000
+Date:   Tue, 15 Sep 2020 22:49:05 -0500
+From:   Wei Huang <wei.huang2@amd.com>
+To:     "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-remoteproc@vger.kernel.org, linux-ntb@googlegroups.com,
-        linux-pci@vger.kernel.org, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org
-References: <20200702082143.25259-1-kishon@ti.com>
- <20200702055026-mutt-send-email-mst@kernel.org>
- <603970f5-3289-cd53-82a9-aa62b292c552@redhat.com>
- <14c6cad7-9361-7fa4-e1c6-715ccc7e5f6b@ti.com>
- <59fd6a0b-8566-44b7-3dae-bb52b468219b@redhat.com>
- <ce9eb6a5-cd3a-a390-5684-525827b30f64@ti.com>
- <da2b671c-b05d-a57f-7bdf-8b1043a41240@redhat.com>
- <fee8a0fb-f862-03bd-5ede-8f105b6af529@ti.com>
- <b2178e1d-2f5c-e8a3-72fb-70f2f8d6aa45@redhat.com>
- <45a8a97c-2061-13ee-5da8-9877a4a3b8aa@ti.com>
- <c8739d7f-e12e-f6a2-7018-9eeaf6feb054@redhat.com>
- <20200828123409.4cd2a812.cohuck@redhat.com>
- <ac8f7e4f-9f46-919a-f5c2-89b07794f0ab@ti.com>
- <9cd58cd1-0041-3d98-baf7-6e5bc2e7e317@redhat.com>
- <edf25301-93c0-4ba6-aa85-5f04137d0906@ti.com>
- <5733dbfc-76c1-45dc-6dce-ef5449eacc73@redhat.com>
- <181ae83d-edeb-9406-27cc-1195fe29ae95@ti.com>
-From:   Jason Wang <jasowang@redhat.com>
-Message-ID: <ee0aa81d-064b-d7a7-86bb-79a3f4d3dd11@redhat.com>
-Date:   Wed, 16 Sep 2020 11:10:50 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>, Wei Huang <whuang2@amd.com>,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH RFC 0/2] KVM: x86: allow for more CPUID entries
+Message-ID: <20200916034905.GA508748@weilap>
+References: <20200915154306.724953-1-vkuznets@redhat.com>
+ <20200915165131.GC2922@work-vm>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200915165131.GC2922@work-vm>
+X-ClientProxiedBy: MN2PR01CA0008.prod.exchangelabs.com (2603:10b6:208:10c::21)
+ To CY4PR12MB1494.namprd12.prod.outlook.com (2603:10b6:910:f::22)
+Importance: high
 MIME-Version: 1.0
-In-Reply-To: <181ae83d-edeb-9406-27cc-1195fe29ae95@ti.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from localhost (24.55.15.93) by MN2PR01CA0008.prod.exchangelabs.com (2603:10b6:208:10c::21) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3391.11 via Frontend Transport; Wed, 16 Sep 2020 03:49:07 +0000
+X-Priority: 1 (Highest)
+X-MSMail-Priority: High
+X-Originating-IP: [24.55.15.93]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-HT: Tenant
+X-MS-Office365-Filtering-Correlation-Id: 3cd52300-2c18-488c-d81d-08d859f376e5
+X-MS-TrafficTypeDiagnostic: CY4PR1201MB0215:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <CY4PR1201MB0215BFD0762A668FE2562808CF210@CY4PR1201MB0215.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:8882;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: nA+gc7Tsuiz3vv5+wFVjSXjDyuZSZ4+wVtiGNF+Xe5vgXZ2QjpZepA3CGVqJi2/BPZawafWhuBJnNlJA1NXwDTgx9S8ZG3l5bnHsamW2oSzp69TRIV1cv8vRJUHnT7purFou1N5tlEVV4yFM8D3DtK3xyw3lzEV3XuxfPXtHN6ZyLYM6oa4srswHWna/LX+tac2gwxZtOMuYQBTMde3r4fruvejRvYNpHTKpW7BpJ1e5vGt954WRn3XRHYF1R96NJqjiSnSVTuqC3AGHVSEmzks+J9Kt9nKc+6vNBeUa+pgB1zHj6/roTeHFEOq0c9WhDiLDE+rVeh26fG1peAUZMCb5UR9n0K8+xGH6tKNcu8kdzF9lKIYnyfDmHAeQZiWh
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY4PR12MB1494.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(7916004)(39860400002)(366004)(396003)(376002)(346002)(136003)(83380400001)(6486002)(16526019)(186003)(66946007)(478600001)(66476007)(66556008)(26005)(52116002)(54906003)(6496006)(33716001)(8676002)(8936002)(4326008)(6916009)(956004)(9686003)(33656002)(2906002)(86362001)(5660300002)(1076003)(316002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData: DduOcOfHhAHGl+yT6reauo6b4Nmq1EYHIpwW2URmjcB/nYvENHtoS+UzGPA1L3Pec/FK1cBDXMjc4RPUyeTfdOkIEAXvKLdeeYEIOW998/SiRZFJWbdDB2YeCuN8QTeGAoi5gHRwxIX4zBpkjaU88ct3zhNC4Go053vZzX5Gz+XiG3ROdM6Lnr1cllZdwC5osafkiTwzgrcigusRzbAqVQaTntHStVuJbaE0ETa0JvsFcpLSWpY0AK2K+dnFC3U/Yef2RPViSwaDQE4vnIpkl80NST+MH+Ku1SilWJSN7Zp2/B0EdKxLMJ9eSpir1j5ylBFVG7Yca6zWD+ba1EQE3wVkKvw2Qf4J+DYc55OrtkdZDz7Ov7mkgaT6HQMWpbs4xbSEoNE33dCvF8Wol4iMHcmM82H6ECeQst1qajMejResr+KcMfFWpZe4HVoGGpnvI6lfCINYUNFAkWxha+jbIrggZkjoG4b9lbe1qk90fsRkYsAknnQ8SQcuKGtIoIDwEoMrFyGwsgR3DFjAfKwR47O7/AQtWc2plojxRoYmOPLbWJgDdcFOdbSeUoVwXXl09Ei2gqvHJF+k1sQ2XNHvblV84WvJu4i+bTX5zC81NHVUXSEW0hm4MM9ySVBl+KVa00b07DtoUX8gPqRhH8x80Q==
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 3cd52300-2c18-488c-d81d-08d859f376e5
+X-MS-Exchange-CrossTenant-AuthSource: CY4PR12MB1494.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Sep 2020 03:49:08.2053
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: Lv6nzlFY2ijUfWwDOhnZhoyAOc67bMpzufQzJYakoeiiX4wt2P+CvU2QAH2+Z2sT
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY4PR1201MB0215
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On 09/15 05:51, Dr. David Alan Gilbert wrote:
+> * Vitaly Kuznetsov (vkuznets@redhat.com) wrote:
+> > With QEMU and newer AMD CPUs (namely: Epyc 'Rome') the current limit for
 
-On 2020/9/15 下午11:47, Kishon Vijay Abraham I wrote:
-> Hi Jason,
->
-> On 15/09/20 1:48 pm, Jason Wang wrote:
->> Hi Kishon:
->>
->> On 2020/9/14 下午3:23, Kishon Vijay Abraham I wrote:
->>>> Then you need something that is functional equivalent to virtio PCI
->>>> which is actually the concept of vDPA (e.g vDPA provides alternatives if
->>>> the queue_sel is hard in the EP implementation).
->>> Okay, I just tried to compare the 'struct vdpa_config_ops' and 'struct
->>> vhost_config_ops' ( introduced in [RFC PATCH 03/22] vhost: Add ops for
->>> the VHOST driver to configure VHOST device).
->>>
->>> struct vdpa_config_ops {
->>>      /* Virtqueue ops */
->>>      int (*set_vq_address)(struct vdpa_device *vdev,
->>>                    u16 idx, u64 desc_area, u64 driver_area,
->>>                    u64 device_area);
->>>      void (*set_vq_num)(struct vdpa_device *vdev, u16 idx, u32 num);
->>>      void (*kick_vq)(struct vdpa_device *vdev, u16 idx);
->>>      void (*set_vq_cb)(struct vdpa_device *vdev, u16 idx,
->>>                struct vdpa_callback *cb);
->>>      void (*set_vq_ready)(struct vdpa_device *vdev, u16 idx, bool ready);
->>>      bool (*get_vq_ready)(struct vdpa_device *vdev, u16 idx);
->>>      int (*set_vq_state)(struct vdpa_device *vdev, u16 idx,
->>>                  const struct vdpa_vq_state *state);
->>>      int (*get_vq_state)(struct vdpa_device *vdev, u16 idx,
->>>                  struct vdpa_vq_state *state);
->>>      struct vdpa_notification_area
->>>      (*get_vq_notification)(struct vdpa_device *vdev, u16 idx);
->>>      /* vq irq is not expected to be changed once DRIVER_OK is set */
->>>      int (*get_vq_irq)(struct vdpa_device *vdv, u16 idx);
->>>
->>>      /* Device ops */
->>>      u32 (*get_vq_align)(struct vdpa_device *vdev);
->>>      u64 (*get_features)(struct vdpa_device *vdev);
->>>      int (*set_features)(struct vdpa_device *vdev, u64 features);
->>>      void (*set_config_cb)(struct vdpa_device *vdev,
->>>                    struct vdpa_callback *cb);
->>>      u16 (*get_vq_num_max)(struct vdpa_device *vdev);
->>>      u32 (*get_device_id)(struct vdpa_device *vdev);
->>>      u32 (*get_vendor_id)(struct vdpa_device *vdev);
->>>      u8 (*get_status)(struct vdpa_device *vdev);
->>>      void (*set_status)(struct vdpa_device *vdev, u8 status);
->>>      void (*get_config)(struct vdpa_device *vdev, unsigned int offset,
->>>                 void *buf, unsigned int len);
->>>      void (*set_config)(struct vdpa_device *vdev, unsigned int offset,
->>>                 const void *buf, unsigned int len);
->>>      u32 (*get_generation)(struct vdpa_device *vdev);
->>>
->>>      /* DMA ops */
->>>      int (*set_map)(struct vdpa_device *vdev, struct vhost_iotlb *iotlb);
->>>      int (*dma_map)(struct vdpa_device *vdev, u64 iova, u64 size,
->>>                 u64 pa, u32 perm);
->>>      int (*dma_unmap)(struct vdpa_device *vdev, u64 iova, u64 size);
->>>
->>>      /* Free device resources */
->>>      void (*free)(struct vdpa_device *vdev);
->>> };
->>>
->>> +struct vhost_config_ops {
->>> +    int (*create_vqs)(struct vhost_dev *vdev, unsigned int nvqs,
->>> +              unsigned int num_bufs, struct vhost_virtqueue *vqs[],
->>> +              vhost_vq_callback_t *callbacks[],
->>> +              const char * const names[]);
->>> +    void (*del_vqs)(struct vhost_dev *vdev);
->>> +    int (*write)(struct vhost_dev *vdev, u64 vhost_dst, void *src,
->>> int len);
->>> +    int (*read)(struct vhost_dev *vdev, void *dst, u64 vhost_src, int
->>> len);
->>> +    int (*set_features)(struct vhost_dev *vdev, u64 device_features);
->>> +    int (*set_status)(struct vhost_dev *vdev, u8 status);
->>> +    u8 (*get_status)(struct vhost_dev *vdev);
->>> +};
->>> +
->>> struct virtio_config_ops
->>> I think there's some overlap here and some of the ops tries to do the
->>> same thing.
->>>
->>> I think it differs in (*set_vq_address)() and (*create_vqs)().
->>> [create_vqs() introduced in struct vhost_config_ops provides
->>> complimentary functionality to (*find_vqs)() in struct
->>> virtio_config_ops. It seemingly encapsulates the functionality of
->>> (*set_vq_address)(), (*set_vq_num)(), (*set_vq_cb)(),..].
->>>
->>> Back to the difference between (*set_vq_address)() and (*create_vqs)(),
->>> set_vq_address() directly provides the virtqueue address to the vdpa
->>> device but create_vqs() only provides the parameters of the virtqueue
->>> (like the number of virtqueues, number of buffers) but does not directly
->>> provide the address. IMO the backend client drivers (like net or vhost)
->>> shouldn't/cannot by itself know how to access the vring created on
->>> virtio front-end. The vdpa device/vhost device should have logic for
->>> that. That will help the client drivers to work with different types of
->>> vdpa device/vhost device and can access the vring created by virtio
->>> irrespective of whether the vring can be accessed via mmio or kernel
->>> space or user space.
->>>
->>> I think vdpa always works with client drivers in userspace and providing
->>> userspace address for vring.
->>
->> Sorry for being unclear. What I meant is not replacing vDPA with the
->> vhost(bus) you proposed but the possibility of replacing virtio-pci-epf
->> with vDPA in:
-> Okay, so the virtio back-end still use vhost and front end should use
-> vDPA. I see. So the host side PCI driver for EPF should populate
-> vdpa_config_ops and invoke vdpa_register_device().
+Could you elaborate on this limit? On Rome, I counted ~35 CPUID functions which
+include Fn0000_xxxx, Fn4000_xxxx and Fn8000_xxxx.
 
+> > KVM_MAX_CPUID_ENTRIES(80) is reported to be hit. Last time it was raised
+> > from '40' in 2010. We can, of course, just bump it a little bit to fix
+> > the immediate issue but the report made me wonder why we need to pre-
+> > allocate vcpu->arch.cpuid_entries array instead of sizing it dynamically.
+> > This RFC is intended to feed my curiosity.
+> > 
+> > Very mildly tested with selftests/kvm-unit-tests and nothing seems to
+> > break. I also don't have access to the system where the original issue
+> > was reported but chances we're fixing it are very good IMO as just the
+> > second patch alone was reported to be sufficient.
+> > 
+> > Reported-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> 
+> Oh nice, I was just going to bump the magic number :-)
+> 
+> Anyway, this seems to work for me, so:
+> 
+> Tested-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> 
 
-Yes.
+I tested on two platforms and the patches worked fine. So no objection on the
+design.
 
+Tested-by: Wei Huang <wei.huang2@amd.com>
 
->> My question is basically for the part of virtio_pci_epf_send_command(),
->> so it looks to me you have a vendor specific API to replace the
->> virtio-pci layout of the BAR:
-> Even when we use vDPA, we have to use some sort of
-> virtio_pci_epf_send_command() to communicate with virtio backend right?
-
-
-Right.
-
-
->
-> Right, the layout is slightly different from the standard layout.
->
-> This is the layout
-> struct epf_vhost_reg_queue {
->          u8 cmd;
->          u8 cmd_status;
->          u16 status;
->          u16 num_buffers;
->          u16 msix_vector;
->          u64 queue_addr;
-
-
-What's the meaning of queue_addr here?
-
-Does not mean the device expects a contiguous memory for avail/desc/used 
-ring?
-
-
-> } __packed;
->
-> struct epf_vhost_reg {
->          u64 host_features;
->          u64 guest_features;
->          u16 msix_config;
->          u16 num_queues;
->          u8 device_status;
->          u8 config_generation;
->          u32 isr;
->          u8 cmd;
->          u8 cmd_status;
->          struct epf_vhost_reg_queue vq[MAX_VQS];
-> } __packed;
->>
->> +static int virtio_pci_epf_send_command(struct virtio_pci_device *vp_dev,
->> +                       u32 command)
->> +{
->> +    struct virtio_pci_epf *pci_epf;
->> +    void __iomem *ioaddr;
->> +    ktime_t timeout;
->> +    bool timedout;
->> +    int ret = 0;
->> +    u8 status;
->> +
->> +    pci_epf = to_virtio_pci_epf(vp_dev);
->> +    ioaddr = vp_dev->ioaddr;
->> +
->> +    mutex_lock(&pci_epf->lock);
->> +    writeb(command, ioaddr + HOST_CMD);
->> +    timeout = ktime_add_ms(ktime_get(), COMMAND_TIMEOUT);
->> +    while (1) {
->> +        timedout = ktime_after(ktime_get(), timeout);
->> +        status = readb(ioaddr + HOST_CMD_STATUS);
->> +
->>
->> Several questions:
->>
->> - It's not clear to me how the synchronization is done between the RC
->> and EP. E.g how and when the value of HOST_CMD_STATUS can be changed.
-> The HOST_CMD (commands sent to the EP) is serialized by using mutex.
-> Once the EP reads the command, it resets the value in HOST_CMD. So
-> HOST_CMD is less likely an issue.
-
-
-Here's my understanding of the protocol:
-
-1) RC write to HOST_CMD
-2) RC wait for HOST_CMD_STATUS to be HOST_CMD_STATUS_OKAY
-
-It looks to me what EP should do is
-
-1) EP reset HOST_CMD after reading new command
-
-And it looks to me EP should also reset HOST_CMD_STATUS here?
-
-(I thought there should be patch to handle stuffs like this but I didn't 
-find it in this series)
-
-
->
-> A sufficiently large time is given for the EP to complete it's operation
-> (1 Sec) where the EP provides the status in HOST_CMD_STATUS. After it
-> expires, HOST_CMD_STATUS_NONE is written to HOST_CMD_STATUS. There could
-> be case where EP updates HOST_CMD_STATUS after RC writes
-> HOST_CMD_STATUS_NONE, but by then HOST has already detected this as
-> failure and error-ed out.
->   
->> If you still want to introduce a new transport, a virtio spec patch
->> would be helpful for us to understand the device API.
-> Okay, that should be on https://github.com/oasis-tcs/virtio-spec.git?
-
-
-Yes.
-
-
->> - You have you vendor specific layout (according to
->> virtio_pci_epb_table()), so I guess you it's better to have a vendor
->> specific vDPA driver instead
-> Okay, with vDPA, we are free to define our own layouts.
-
-
-Right, but vDPA have other requirements. E.g it requires the device have 
-the ability to save/restore the state (e.g the last_avail_idx).
-
-So it actually depends on what you want. If you don't care about 
-userspace drivers and want to have a standard transport, you can still 
-go virtio.
-
-
->> - The advantage of vendor specific vDPA driver is that it can 1) have
->> less codes 2) support userspace drivers through vhost-vDPA (instead of
->> inventing new APIs since we can't use vfio-pci here).
-> I see there's an additional level of indirection from virtio to vDPA and
-> probably no need for spec update but don't exactly see how it'll reduce
-> code.
-
-
-AFAIK you don't need to implement your own setup_vq and del_vq.
-
-
->
-> For 2, Isn't vhost-vdpa supposed to run on virtio backend?
-
-
-Not currently, vDPA is a superset of virtio (e.g it support virtqueue 
-state save/restore). This it should be possible in the future probably.
-
-
->
->  From a high level, I think I should be able to use vDPA for
-> virtio_pci_epf.c. Would you also suggest using vDPA for ntb_virtio.c?
-> ([RFC PATCH 20/22] NTB: Add a new NTB client driver to implement VIRTIO
-> functionality).
-
-
-I think it's your call. If you want
-
-1) a well-defined standard virtio transport
-2) willing to finalize d and maintain the spec
-3) doesn't care about userspace drivers
-
-You can go with virtio, otherwise vDPA.
-
-Thanks
-
-
->
-> Thanks
-> Kishon
->
-
+> > Vitaly Kuznetsov (2):
+> >   KVM: x86: allocate vcpu->arch.cpuid_entries dynamically
+> >   KVM: x86: bump KVM_MAX_CPUID_ENTRIES
+> > 
+> >  arch/x86/include/asm/kvm_host.h |  4 +--
+> >  arch/x86/kvm/cpuid.c            | 55 ++++++++++++++++++++++++---------
+> >  arch/x86/kvm/x86.c              |  1 +
+> >  3 files changed, 43 insertions(+), 17 deletions(-)
+> > 
+> > -- 
+> > 2.25.4
+> > 
+> -- 
+> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> 
