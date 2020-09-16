@@ -2,130 +2,104 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 303D026BF62
-	for <lists+kvm@lfdr.de>; Wed, 16 Sep 2020 10:34:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5777626BF6F
+	for <lists+kvm@lfdr.de>; Wed, 16 Sep 2020 10:36:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726597AbgIPIeL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 16 Sep 2020 04:34:11 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:53587 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726196AbgIPIeD (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 16 Sep 2020 04:34:03 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1600245241;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=DAGiU6tQPn7qIzmXwLxHU7yiPU3YBQ56AcEEwsHRgsA=;
-        b=RsHvEIW70qwD/J2J9zGvn+vVIqu8bR7TNVXNaAYT9TGfgwhdJvKVMsoxkUWrYjwbAhF9qI
-        ZdByYyo70q5ovLwT1SA1obrG8yIHsoflXoTtXXU7awlZ1CSk29VlqMh6ihGtOAy1kwCR9N
-        anTqeXszvkrWMcyh+Hthp/yPtp3RwhI=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-474-4HDCgbP5Okm5jDY_6ZfxHg-1; Wed, 16 Sep 2020 04:33:58 -0400
-X-MC-Unique: 4HDCgbP5Okm5jDY_6ZfxHg-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7B00D1800D4A;
-        Wed, 16 Sep 2020 08:33:56 +0000 (UTC)
-Received: from work-vm (ovpn-114-237.ams2.redhat.com [10.36.114.237])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 1EF9B5DE86;
-        Wed, 16 Sep 2020 08:33:53 +0000 (UTC)
-Date:   Wed, 16 Sep 2020 09:33:51 +0100
-From:   "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To:     Wei Huang <wei.huang2@amd.com>
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>, Wei Huang <whuang2@amd.com>,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH RFC 0/2] KVM: x86: allow for more CPUID entries
-Message-ID: <20200916083351.GA2833@work-vm>
-References: <20200915154306.724953-1-vkuznets@redhat.com>
- <20200915165131.GC2922@work-vm>
- <20200916034905.GA508748@weilap>
+        id S1726507AbgIPIga (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 16 Sep 2020 04:36:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33836 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725840AbgIPIg3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 16 Sep 2020 04:36:29 -0400
+Received: from mail-pf1-x443.google.com (mail-pf1-x443.google.com [IPv6:2607:f8b0:4864:20::443])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9191CC06174A;
+        Wed, 16 Sep 2020 01:36:29 -0700 (PDT)
+Received: by mail-pf1-x443.google.com with SMTP id x123so3547026pfc.7;
+        Wed, 16 Sep 2020 01:36:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=KT47zfJmk0l7JghqVT5ZA5rEy8OCXlg/IWMuynysqoI=;
+        b=I/nL8EJJEdwYLLDbfZjvs/cqVdyYo5txPiN1xZ7rkpBRmJIrn4u3/Hxb/wjG0rehZ4
+         go8mNOFsVCgqGnSnLZmn/UzVoh2xfNa+X3CCDeB3LHXqFStfNJGGepQWWqzMC2fr2SBX
+         jFO7fNse+b7YDJPRBTLT5WU5LurvCTxoxZrUBETu8viXtFAGMS2s+tx1ar7I865v/9OA
+         UgSE00xU6hImInbi57hnzYOEXHz/pljPeYAgf7t3xjpOnOLjdeuTSo09aMewwx40FzQZ
+         kXUm/+RR29oDy8NYBYVxRGgILZWO1Z4grhJrMqZ7/Zkh/+yrNSowDNAPtj/FkJahh6z6
+         9fMg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=KT47zfJmk0l7JghqVT5ZA5rEy8OCXlg/IWMuynysqoI=;
+        b=B71yEVDtW3O/UK5BI54ukkkUoAJ+1LUvnn/qWc0cVLx5p2pCEOnZr3iWBIvhWgpURI
+         Od9HrDkDCH0t5Vt8VPm1IZXxgTl4Xk1lK/0EbsYjxs1wEUA8oaSKSLlPivhqCX+ZoIAM
+         2Fl6vLdHeccVveCRxARZoqjR5QbRjr7QPLqJYfoJsSw0/t2MEhyydswNIIodsIv5aYXP
+         BoaNeZ4KDEgDe4meLSC0UiN+4ZUDjmz78+4I9TPYUuGIr+5NKuaeLaG8WC6sitTv7e9/
+         VOcssN1p4hRwnbA46pkkDSwagSvj7O/8CcacCmyddD7juGFVoU8AgO21/D2NNq1mLg+3
+         xEAg==
+X-Gm-Message-State: AOAM532Zq4caHrn/qcoWk/eq6xc7fRkbFBfp7vWiKvTsIoXdbTo5HdDh
+        0fEEDqWHdZNyLUhnhA2VL3o5/Bvs0ngo
+X-Google-Smtp-Source: ABdhPJxniQ3ds4YHSA2Ue2nrlmMmPPLMCqvXrVwKt7jYep+pX01hfC0BD9DPul4ueTvSoZH0p7Z6ng==
+X-Received: by 2002:a63:8ac8:: with SMTP id y191mr17492646pgd.159.1600245388877;
+        Wed, 16 Sep 2020 01:36:28 -0700 (PDT)
+Received: from LiHaiwei.tencent.com ([203.205.141.64])
+        by smtp.gmail.com with ESMTPSA id w6sm14523417pgf.72.2020.09.16.01.36.24
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Wed, 16 Sep 2020 01:36:28 -0700 (PDT)
+From:   lihaiwei.kernel@gmail.com
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org, x86@kernel.org
+Cc:     pbonzini@redhat.com, sean.j.christopherson@intel.com,
+        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
+        joro@8bytes.org, tglx@linutronix.de, mingo@redhat.com,
+        bp@alien8.de, hpa@zytor.com, Haiwei Li <lihaiwei@tencent.com>
+Subject: [PATCH] KVM: SVM: use __GFP_ZERO instead of clear_page()
+Date:   Wed, 16 Sep 2020 16:36:21 +0800
+Message-Id: <20200916083621.5512-1-lihaiwei.kernel@gmail.com>
+X-Mailer: git-send-email 2.28.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200916034905.GA508748@weilap>
-User-Agent: Mutt/1.14.6 (2020-07-11)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-* Wei Huang (wei.huang2@amd.com) wrote:
-> On 09/15 05:51, Dr. David Alan Gilbert wrote:
-> > * Vitaly Kuznetsov (vkuznets@redhat.com) wrote:
-> > > With QEMU and newer AMD CPUs (namely: Epyc 'Rome') the current limit for
-> 
-> Could you elaborate on this limit? On Rome, I counted ~35 CPUID functions which
-> include Fn0000_xxxx, Fn4000_xxxx and Fn8000_xxxx.
+From: Haiwei Li <lihaiwei@tencent.com>
 
-On my 7302P the output of:
-    cpuid -1 -r | wc -l
+Use __GFP_ZERO while alloc_page().
 
-is 61, there is one line of header in there.
+Signed-off-by: Haiwei Li <lihaiwei@tencent.com>
+---
+ arch/x86/kvm/svm/avic.c | 6 ++----
+ 1 file changed, 2 insertions(+), 4 deletions(-)
 
-However in a guest I see more; and I think that's because KVM  tends to
-list the CPUID entries for a lot of disabled Intel features, even on
-AMD, e.g. 0x11-0x1f which AMD doesn't have, are listed in a KVM guest.
-Then you add the KVM CPUIDs at 4...0 and 4....1.
-
-IMHO we should be filtering those out for at least two reasons:
-  a) They're wrong
-  b) We're probably not keeping the set of visible CPUID fields the same
-    when we move between host kernels, and that can't be good for
-migration.
-
-Still, those are separate problems.
-
-Dave
-
-> > > KVM_MAX_CPUID_ENTRIES(80) is reported to be hit. Last time it was raised
-> > > from '40' in 2010. We can, of course, just bump it a little bit to fix
-> > > the immediate issue but the report made me wonder why we need to pre-
-> > > allocate vcpu->arch.cpuid_entries array instead of sizing it dynamically.
-> > > This RFC is intended to feed my curiosity.
-> > > 
-> > > Very mildly tested with selftests/kvm-unit-tests and nothing seems to
-> > > break. I also don't have access to the system where the original issue
-> > > was reported but chances we're fixing it are very good IMO as just the
-> > > second patch alone was reported to be sufficient.
-> > > 
-> > > Reported-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> > 
-> > Oh nice, I was just going to bump the magic number :-)
-> > 
-> > Anyway, this seems to work for me, so:
-> > 
-> > Tested-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> > 
-> 
-> I tested on two platforms and the patches worked fine. So no objection on the
-> design.
-> 
-> Tested-by: Wei Huang <wei.huang2@amd.com>
-> 
-> > > Vitaly Kuznetsov (2):
-> > >   KVM: x86: allocate vcpu->arch.cpuid_entries dynamically
-> > >   KVM: x86: bump KVM_MAX_CPUID_ENTRIES
-> > > 
-> > >  arch/x86/include/asm/kvm_host.h |  4 +--
-> > >  arch/x86/kvm/cpuid.c            | 55 ++++++++++++++++++++++++---------
-> > >  arch/x86/kvm/x86.c              |  1 +
-> > >  3 files changed, 43 insertions(+), 17 deletions(-)
-> > > 
-> > > -- 
-> > > 2.25.4
-> > > 
-> > -- 
-> > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-> > 
-> 
+diff --git a/arch/x86/kvm/svm/avic.c b/arch/x86/kvm/svm/avic.c
+index ac830cd50830..f73f84d56452 100644
+--- a/arch/x86/kvm/svm/avic.c
++++ b/arch/x86/kvm/svm/avic.c
+@@ -153,20 +153,18 @@ int avic_vm_init(struct kvm *kvm)
+ 		return 0;
+ 
+ 	/* Allocating physical APIC ID table (4KB) */
+-	p_page = alloc_page(GFP_KERNEL_ACCOUNT);
++	p_page = alloc_page(GFP_KERNEL_ACCOUNT | __GFP_ZERO);
+ 	if (!p_page)
+ 		goto free_avic;
+ 
+ 	kvm_svm->avic_physical_id_table_page = p_page;
+-	clear_page(page_address(p_page));
+ 
+ 	/* Allocating logical APIC ID table (4KB) */
+-	l_page = alloc_page(GFP_KERNEL_ACCOUNT);
++	l_page = alloc_page(GFP_KERNEL_ACCOUNT | __GFP_ZERO);
+ 	if (!l_page)
+ 		goto free_avic;
+ 
+ 	kvm_svm->avic_logical_id_table_page = l_page;
+-	clear_page(page_address(l_page));
+ 
+ 	spin_lock_irqsave(&svm_vm_data_hash_lock, flags);
+  again:
 -- 
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+2.18.4
 
