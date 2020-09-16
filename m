@@ -2,114 +2,158 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E76A226CF18
-	for <lists+kvm@lfdr.de>; Thu, 17 Sep 2020 00:50:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6321C26CF3E
+	for <lists+kvm@lfdr.de>; Thu, 17 Sep 2020 01:09:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726473AbgIPWuZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 16 Sep 2020 18:50:25 -0400
-Received: from mga03.intel.com ([134.134.136.65]:54656 "EHLO mga03.intel.com"
+        id S1726419AbgIPXJF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 16 Sep 2020 19:09:05 -0400
+Received: from mga06.intel.com ([134.134.136.31]:47633 "EHLO mga06.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726280AbgIPWuT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 16 Sep 2020 18:50:19 -0400
-IronPort-SDR: th8Eg01hoTrJhw/58i4gwNIpkBPOB8Yp5+ieRBXJmFQI2sM6/UH6+QK8A6ixY3wvgmudRVgvt1
- +mjFgyeffh1A==
-X-IronPort-AV: E=McAfee;i="6000,8403,9746"; a="159631868"
+        id S1726311AbgIPXJF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 16 Sep 2020 19:09:05 -0400
+IronPort-SDR: G13EVxgrWiMUJEvRX1ETlQzgt6Rw2zDqEBfREMZ8mLaSlOku4seoE5FM4jbulolTfVH0JTdA6L
+ zvGyrI+UFPag==
+X-IronPort-AV: E=McAfee;i="6000,8403,9746"; a="221136274"
 X-IronPort-AV: E=Sophos;i="5.76,434,1592895600"; 
-   d="scan'208";a="159631868"
+   d="scan'208";a="221136274"
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Sep 2020 15:50:18 -0700
-IronPort-SDR: Wucms044M2dJy6yu4PwISQysgWFV9TvAzVd3c/iminns7GJTmeX8fH37PW8oLYqE84RcoDX9pf
- kV+strBvDXkw==
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Sep 2020 16:09:04 -0700
+IronPort-SDR: ciXVM4r79l01GczmidIOUSxSTwcXHW230qN0CHY8Ys5imcKc7r+Q3pzICMmWls07BPPAdtV2ag
+ LRtHNHKL76EQ==
 X-IronPort-AV: E=Sophos;i="5.76,434,1592895600"; 
-   d="scan'208";a="508169587"
-Received: from sjchrist-ice.jf.intel.com (HELO sjchrist-ice) ([10.54.31.34])
-  by fmsmga005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Sep 2020 15:50:17 -0700
-Date:   Wed, 16 Sep 2020 15:50:16 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Tom Lendacky <thomas.lendacky@amd.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org, x86@kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Borislav Petkov <bp@alien8.de>, Ingo Molnar <mingo@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Brijesh Singh <brijesh.singh@amd.com>
-Subject: Re: [RFC PATCH 08/35] KVM: SVM: Prevent debugging under SEV-ES
-Message-ID: <20200916225015.GB12355@sjchrist-ice>
-References: <58093c542b5b442b88941828595fb2548706f1bf.1600114548.git.thomas.lendacky@amd.com>
- <20200914212601.GA7192@sjchrist-ice>
- <fd790047-4107-b28a-262e-03ed5bc4c421@amd.com>
- <20200915163010.GB8420@sjchrist-ice>
- <aff46d8d-07ff-7d14-3e7f-ffe60f2bd779@amd.com>
- <5e816811-450f-b732-76f7-6130479642e0@amd.com>
- <20200916160210.GA10227@sjchrist-ice>
- <b62e055a-000e-ff7b-00e4-41b5b39b55d5@amd.com>
- <20200916164923.GC10227@sjchrist-ice>
- <9988f485-ce78-4df4-b294-32cc7743b6b2@amd.com>
+   d="scan'208";a="452047379"
+Received: from jpan9-mobl2.amr.corp.intel.com (HELO localhost) ([10.213.174.80])
+  by orsmga004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Sep 2020 16:09:03 -0700
+Date:   Wed, 16 Sep 2020 16:09:01 -0700
+From:   "Jacob Pan (Jun)" <jacob.jun.pan@intel.com>
+To:     Jason Gunthorpe <jgg@nvidia.com>
+Cc:     "Raj, Ashok" <ashok.raj@intel.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Jean-Philippe Brucker <jean-philippe@linaro.org>,
+        Jason Wang <jasowang@redhat.com>,
+        Liu Yi L <yi.l.liu@intel.com>, <eric.auger@redhat.com>,
+        <baolu.lu@linux.intel.com>, <joro@8bytes.org>,
+        <kevin.tian@intel.com>, <jun.j.tian@intel.com>,
+        <yi.y.sun@intel.com>, <peterx@redhat.com>, <hao.wu@intel.com>,
+        <stefanha@gmail.com>, <iommu@lists.linux-foundation.org>,
+        <kvm@vger.kernel.org>, "Michael S. Tsirkin" <mst@redhat.com>,
+        <jacob.jun.pan@linux.intel.com>, jacob.jun.pan@intel.com
+Subject: Re: [PATCH v7 00/16] vfio: expose virtual Shared Virtual Addressing
+ to VMs
+Message-ID: <20200916160901.000046ec@intel.com>
+In-Reply-To: <20200916183841.GI6199@nvidia.com>
+References: <20200915113341.GW904879@nvidia.com>
+        <20200915181154.GA70770@otc-nc-03>
+        <20200915184510.GB1573713@nvidia.com>
+        <20200915150851.76436ca1@jacob-builder>
+        <20200915235126.GK1573713@nvidia.com>
+        <20200915171319.00003f59@linux.intel.com>
+        <20200916150754.GE6199@nvidia.com>
+        <20200916163343.GA76252@otc-nc-03>
+        <20200916170113.GD3699@nvidia.com>
+        <20200916112110.000024ee@intel.com>
+        <20200916183841.GI6199@nvidia.com>
+Organization: OTC
+X-Mailer: Claws Mail 3.17.3 (GTK+ 2.24.32; i686-w64-mingw32)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <9988f485-ce78-4df4-b294-32cc7743b6b2@amd.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Sep 16, 2020 at 03:27:13PM -0500, Tom Lendacky wrote:
-> On 9/16/20 11:49 AM, Sean Christopherson wrote:
-> > On Wed, Sep 16, 2020 at 11:38:38AM -0500, Tom Lendacky wrote:
-> >>
-> >>
-> >> On 9/16/20 11:02 AM, Sean Christopherson wrote:
-> >>> On Wed, Sep 16, 2020 at 10:11:10AM -0500, Tom Lendacky wrote:
-> >>>> On 9/15/20 3:13 PM, Tom Lendacky wrote:
-> >>>>> On 9/15/20 11:30 AM, Sean Christopherson wrote:
-> >>>>>> I don't quite follow the "doesn't mean debugging can't be done in the future".
-> >>>>>> Does that imply that debugging could be supported for SEV-ES guests, even if
-> >>>>>> they have an encrypted VMSA?
-> >>>>>
-> >>>>> Almost anything can be done with software. It would require a lot of
-> >>>>> hypervisor and guest code and changes to the GHCB spec, etc. So given
-> >>>>> that, probably just the check for arch.guest_state_protected is enough for
-> >>>>> now. I'll just need to be sure none of the debugging paths can be taken
-> >>>>> before the VMSA is encrypted.
-> >>>>
-> >>>> So I don't think there's any guarantee that the KVM_SET_GUEST_DEBUG ioctl
-> >>>> couldn't be called before the VMSA is encrypted, meaning I can't check the
-> >>>> arch.guest_state_protected bit for that call. So if we really want to get
-> >>>> rid of the allow_debug() op, I'd need some other way to indicate that this
-> >>>> is an SEV-ES / protected state guest.
-> >>>
-> >>> Would anything break if KVM "speculatively" set guest_state_protected before
-> >>> LAUNCH_UPDATE_VMSA?  E.g. does KVM need to emulate before LAUNCH_UPDATE_VMSA?
-> >>
-> >> Yes, the way the code is set up, the guest state (VMSA) is initialized in
-> >> the same way it is today (mostly) and that state is encrypted by the
-> >> LAUNCH_UPDATE_VMSA call. I check the guest_state_protected bit to decide
-> >> on whether to direct the updates to the real VMSA (before it's encrypted)
-> >> or the GHCB (that's the get_vmsa() function from patch #5).
+Hi Jason,
+On Wed, 16 Sep 2020 15:38:41 -0300, Jason Gunthorpe <jgg@nvidia.com>
+wrote:
+
+> On Wed, Sep 16, 2020 at 11:21:10AM -0700, Jacob Pan (Jun) wrote:
+> > Hi Jason,
+> > On Wed, 16 Sep 2020 14:01:13 -0300, Jason Gunthorpe <jgg@nvidia.com>
+> > wrote:
+> >   
+> > > On Wed, Sep 16, 2020 at 09:33:43AM -0700, Raj, Ashok wrote:  
+> > > > On Wed, Sep 16, 2020 at 12:07:54PM -0300, Jason Gunthorpe
+> > > > wrote:    
+> > > > > On Tue, Sep 15, 2020 at 05:22:26PM -0700, Jacob Pan (Jun)
+> > > > > wrote:    
+> > > > > > > If user space wants to bind page tables, create the PASID
+> > > > > > > with /dev/sva, use ioctls there to setup the page table
+> > > > > > > the way it wants, then pass the now configured PASID to a
+> > > > > > > driver that can use it.     
+> > > > > > 
+> > > > > > Are we talking about bare metal SVA?     
+> > > > > 
+> > > > > What a weird term.    
+> > > > 
+> > > > Glad you noticed it at v7 :-) 
+> > > > 
+> > > > Any suggestions on something less weird than 
+> > > > Shared Virtual Addressing? There is a reason why we moved from
+> > > > SVM to SVA.    
+> > > 
+> > > SVA is fine, what is "bare metal" supposed to mean?
+> > >   
+> > What I meant here is sharing virtual address between DMA and host
+> > process. This requires devices perform DMA request with PASID and
+> > use IOMMU first level/stage 1 page tables.
+> > This can be further divided into 1) user SVA 2) supervisor SVA
+> > (sharing init_mm)
 > > 
-> > Ah, gotcha.  Would it work to set guest_state_protected[*] from time zero,
-> > and move vmsa_encrypted to struct vcpu_svm?  I.e. keep vmsa_encrypted, but
-> > use it only for guiding get_vmsa() and related behavior.
+> > My point is that /dev/sva is not useful here since the driver can
+> > perform PASID allocation while doing SVA bind.  
 > 
-> It is mainly __set_sregs() that needs to know when to allow the register
-> writes and when not to. During guest initialization, __set_sregs is how
-> some of the VMSA is initialized by Qemu.
+> No, you are thinking too small.
+> 
+> Look at VDPA, it has a SVA uAPI. Some HW might use PASID for the SVA.
+> 
+Could you point to me the SVA UAPI? I couldn't find it in the mainline.
+Seems VDPA uses VHOST interface?
 
-Hmm.  I assume that also means KVM_SET_REGS and KVM_GET_XCRS are also legal
-before the VMSA is encrypted?  If so, then the current behavior of setting
-vmsa_encrypted "late" make sense.  KVM_SET_FPU/XSAVE can be handled by not
-allocating guest_fpu, i.e. they can be disallowed from time zero without
-adding an SEV-ES specific check.
+> When VDPA is used by DPDK it makes sense that the PASID will be SVA
+> and 1:1 with the mm_struct.
+> 
+I still don't see why bare metal DPDK needs to get a handle of the
+PASID. Perhaps the SVA patch would explain. Or are you talking about
+vDPA DPDK process that is used to support virtio-net-pmd in the guest?
 
-Which brings us back to KVM_SET_GUEST_DEBUG.  What would happen if that were
-allowed prior to VMSA encryption?  If LAUNCH_UPDATE_VMSA acts as a sort of
-reset, one thought would be to allow KVM_SET_GUEST_DEBUG and then sanitize
-KVM's state during LAUNCH_UPDATE_VMSA.  Or perhaps even better, disallow
-LAUNCH_UPDATE_VMSA if vcpu->guest_debug!=0.  That would allow using debug
-capabilities up until LAUNCH_UPDATE_VMSA without adding much burden to KVM.
+> When VDPA is used by qemu it makes sense that the PASID will be an
+> arbitary IOVA map constructed to be 1:1 with the guest vCPU physical
+> map. /dev/sva allows a single uAPI to do this kind of setup, and qemu
+> can support it while supporting a range of SVA kernel drivers. VDPA
+> and vfio-mdev are obvious initial targets.
+> 
+> *BOTH* are needed.
+> 
+> In general any uAPI for PASID should have the option to use either the
+> mm_struct SVA PASID *OR* a PASID from /dev/sva. It costs virtually
+> nothing to implement this in the driver as PASID is just a number, and
+> gives so much more flexability.
+> 
+Not really nothing in terms of PASID life cycles. For example, if user
+uses uacce interface to open an accelerator, it gets an FD_acc. Then it
+opens /dev/sva to allocate PASID then get another FD_pasid. Then we
+pass FD_pasid to the driver to bind page tables, perhaps multiple
+drivers. Now we have to worry about If FD_pasid gets closed before
+FD_acc(s) closed and all these race conditions.
+
+If we do not expose FD_pasid to the user, the teardown is much simpler
+and streamlined. Following each FD_acc close, PASID unbind is performed.
+
+> > Yi can correct me but this set is is about VFIO-PCI, VFIO-mdev will
+> > be introduced later.  
+> 
+> Last patch is:
+> 
+>   vfio/type1: Add vSVA support for IOMMU-backed mdevs
+> 
+> So pretty hard to see how this is not about vfio-mdev, at least a
+> little..
+> 
+> Jason
+
+
+Thanks,
+
+Jacob
