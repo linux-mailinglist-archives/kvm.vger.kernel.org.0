@@ -2,125 +2,130 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E753226BF5A
-	for <lists+kvm@lfdr.de>; Wed, 16 Sep 2020 10:32:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 303D026BF62
+	for <lists+kvm@lfdr.de>; Wed, 16 Sep 2020 10:34:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726262AbgIPIcm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 16 Sep 2020 04:32:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33238 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725840AbgIPIci (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 16 Sep 2020 04:32:38 -0400
-Received: from mail-ej1-x641.google.com (mail-ej1-x641.google.com [IPv6:2a00:1450:4864:20::641])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EC075C06174A
-        for <kvm@vger.kernel.org>; Wed, 16 Sep 2020 01:32:37 -0700 (PDT)
-Received: by mail-ej1-x641.google.com with SMTP id o8so9098510ejb.10
-        for <kvm@vger.kernel.org>; Wed, 16 Sep 2020 01:32:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=lsTHEaMa7NWcCiDhQh+LAwtpF5hf7liWYfCO2nfxQUY=;
-        b=Weqz4/aGFFZyyeuPB8AeHDH5MYDjqn1CD5KyBnY3YIxMqGv8uH8zataEVx7IPzu/t5
-         UE6CNn4OHhrAkbP0ygegXzbgzv3tDgzt6VkRCErSvyYCxVJnhuJsOODoh0ZIJUQSTran
-         znXRkdzuyfz+MUTCqc9qrJ7+QBgjP958NJ39KjIZ4kGHc14gnP0uKR26r31mWVmldktZ
-         iuRN3yskbjWuLoecBPenGexvNHb+JjxTdqzgIvj4fRxtrP1P3rhRDYP3mByi08SAlcmC
-         YniViRXWYSvEygaLvfzUc7KaSzn1JvNSR8cMCFz9kM4mlu1uDbRv9A8X/7iVNmB16eXQ
-         2hQQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=lsTHEaMa7NWcCiDhQh+LAwtpF5hf7liWYfCO2nfxQUY=;
-        b=tIY8OYDzST8LAOcSw1SkHB/oirOe6I7pfC6YZylKpPtDGbWD70pEbDrXGBkvMjkYhz
-         PwkCQazeS8ZBf6VyabKcG13kSrzhUdcIeCPWqi8Fm/rJjTLjkfKCrjt/mzMSjSeMSN+X
-         wEX/4vNnt7tKwsUc8lKHIU8Dz0YKwmP4Ug/yYlX/ITXDoDIcJrBTK3C+dcztfBSGS9Sc
-         B/e82MXZUeflGKHKuGifQd8G6buhzq0eLdhDd94L0hJWpQZ1HtHeG1YlyBzsUHVjkipa
-         qz28CXYEvDhRwPBF7VytGHNPi3+ZteAwroe3s9uux8Mz4ClSOObpbl3fywp6TrnN5gIY
-         rtrw==
-X-Gm-Message-State: AOAM5300NW1dFgmrZ5tJl2QtSQrI01PwKdPgosOjVV8AZMP9XMiH3uL8
-        iQ1dYQARkMEFoZENBGzMwJR27Q==
-X-Google-Smtp-Source: ABdhPJxCMjyEvUmXkRyRWGahwWFRcdqvEJJ1mvM4W7oJWaX7Wi/HjXfv84eXyjZEt5oaWl9swiJlzQ==
-X-Received: by 2002:a17:906:4cd6:: with SMTP id q22mr23775429ejt.139.1600245156191;
-        Wed, 16 Sep 2020 01:32:36 -0700 (PDT)
-Received: from myrica ([2001:1715:4e26:a7e0:116c:c27a:3e7f:5eaf])
-        by smtp.gmail.com with ESMTPSA id k19sm12010499ejo.40.2020.09.16.01.32.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 16 Sep 2020 01:32:35 -0700 (PDT)
-Date:   Wed, 16 Sep 2020 10:32:17 +0200
-From:   Jean-Philippe Brucker <jean-philippe@linaro.org>
-To:     "Tian, Kevin" <kevin.tian@intel.com>
-Cc:     Jason Gunthorpe <jgg@nvidia.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        "Raj, Ashok" <ashok.raj@intel.com>,
-        Jason Wang <jasowang@redhat.com>,
-        "Liu, Yi L" <yi.l.liu@intel.com>,
-        "eric.auger@redhat.com" <eric.auger@redhat.com>,
-        "baolu.lu@linux.intel.com" <baolu.lu@linux.intel.com>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "jacob.jun.pan@linux.intel.com" <jacob.jun.pan@linux.intel.com>,
-        "Tian, Jun J" <jun.j.tian@intel.com>,
-        "Sun, Yi Y" <yi.y.sun@intel.com>,
-        "peterx@redhat.com" <peterx@redhat.com>,
-        "Wu, Hao" <hao.wu@intel.com>,
-        "stefanha@gmail.com" <stefanha@gmail.com>,
-        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "Michael S. Tsirkin" <mst@redhat.com>
-Subject: Re: [PATCH v7 00/16] vfio: expose virtual Shared Virtual Addressing
- to VMs
-Message-ID: <20200916083217.GA5316@myrica>
-References: <20200914134738.GX904879@nvidia.com>
- <20200914162247.GA63399@otc-nc-03>
- <20200914163354.GG904879@nvidia.com>
- <20200914105857.3f88a271@x1.home>
- <20200914174121.GI904879@nvidia.com>
- <20200914122328.0a262a7b@x1.home>
- <20200914190057.GM904879@nvidia.com>
- <20200914163310.450c8d6e@x1.home>
- <20200915142906.GX904879@nvidia.com>
- <MWHPR11MB1645934DB27033011316059B8C210@MWHPR11MB1645.namprd11.prod.outlook.com>
+        id S1726597AbgIPIeL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 16 Sep 2020 04:34:11 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:53587 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726196AbgIPIeD (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 16 Sep 2020 04:34:03 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1600245241;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=DAGiU6tQPn7qIzmXwLxHU7yiPU3YBQ56AcEEwsHRgsA=;
+        b=RsHvEIW70qwD/J2J9zGvn+vVIqu8bR7TNVXNaAYT9TGfgwhdJvKVMsoxkUWrYjwbAhF9qI
+        ZdByYyo70q5ovLwT1SA1obrG8yIHsoflXoTtXXU7awlZ1CSk29VlqMh6ihGtOAy1kwCR9N
+        anTqeXszvkrWMcyh+Hthp/yPtp3RwhI=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-474-4HDCgbP5Okm5jDY_6ZfxHg-1; Wed, 16 Sep 2020 04:33:58 -0400
+X-MC-Unique: 4HDCgbP5Okm5jDY_6ZfxHg-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7B00D1800D4A;
+        Wed, 16 Sep 2020 08:33:56 +0000 (UTC)
+Received: from work-vm (ovpn-114-237.ams2.redhat.com [10.36.114.237])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 1EF9B5DE86;
+        Wed, 16 Sep 2020 08:33:53 +0000 (UTC)
+Date:   Wed, 16 Sep 2020 09:33:51 +0100
+From:   "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To:     Wei Huang <wei.huang2@amd.com>
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>, Wei Huang <whuang2@amd.com>,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH RFC 0/2] KVM: x86: allow for more CPUID entries
+Message-ID: <20200916083351.GA2833@work-vm>
+References: <20200915154306.724953-1-vkuznets@redhat.com>
+ <20200915165131.GC2922@work-vm>
+ <20200916034905.GA508748@weilap>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <MWHPR11MB1645934DB27033011316059B8C210@MWHPR11MB1645.namprd11.prod.outlook.com>
+In-Reply-To: <20200916034905.GA508748@weilap>
+User-Agent: Mutt/1.14.6 (2020-07-11)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Sep 16, 2020 at 01:19:18AM +0000, Tian, Kevin wrote:
-> > From: Jason Gunthorpe <jgg@nvidia.com>
-> > Sent: Tuesday, September 15, 2020 10:29 PM
-> >
-> > > Do they need a device at all?  It's not clear to me why RID based
-> > > IOMMU management fits within vfio's scope, but PASID based does not.
-> > 
-> > In RID mode vfio-pci completely owns the PCI function, so it is more
-> > natural that VFIO, as the sole device owner, would own the DMA mapping
-> > machinery. Further, the RID IOMMU mode is rarely used outside of VFIO
-> > so there is not much reason to try and disaggregate the API.
+* Wei Huang (wei.huang2@amd.com) wrote:
+> On 09/15 05:51, Dr. David Alan Gilbert wrote:
+> > * Vitaly Kuznetsov (vkuznets@redhat.com) wrote:
+> > > With QEMU and newer AMD CPUs (namely: Epyc 'Rome') the current limit for
 > 
-> It is also used by vDPA.
-> 
-> > 
-> > PASID on the other hand, is shared. vfio-mdev drivers will share the
-> > device with other kernel drivers. PASID and DMA will be concurrent
-> > with VFIO and other kernel drivers/etc.
-> > 
-> 
-> Looks you are equating PASID to host-side sharing, while ignoring 
-> another valid usage that a PASID-capable device is passed through
-> to the guest through vfio-pci and then PASID is used by the guest 
-> for guest-side sharing. In such case, it is an exclusive usage in host
-> side and then what is the problem for VFIO to manage PASID given
-> that vfio-pci completely owns the function?
+> Could you elaborate on this limit? On Rome, I counted ~35 CPUID functions which
+> include Fn0000_xxxx, Fn4000_xxxx and Fn8000_xxxx.
 
-And this is the only PASID model for Arm SMMU (and AMD IOMMU, I believe):
-the PASID space of a PCI function cannot be shared between host and guest,
-so we assign the whole PASID table along with the RID. Since we need the
-BIND, INVALIDATE, and report APIs introduced here to support nested
-translation, a /dev/sva interface would need to support this mode as well.
+On my 7302P the output of:
+    cpuid -1 -r | wc -l
 
-Thanks,
-Jean
+is 61, there is one line of header in there.
+
+However in a guest I see more; and I think that's because KVM  tends to
+list the CPUID entries for a lot of disabled Intel features, even on
+AMD, e.g. 0x11-0x1f which AMD doesn't have, are listed in a KVM guest.
+Then you add the KVM CPUIDs at 4...0 and 4....1.
+
+IMHO we should be filtering those out for at least two reasons:
+  a) They're wrong
+  b) We're probably not keeping the set of visible CPUID fields the same
+    when we move between host kernels, and that can't be good for
+migration.
+
+Still, those are separate problems.
+
+Dave
+
+> > > KVM_MAX_CPUID_ENTRIES(80) is reported to be hit. Last time it was raised
+> > > from '40' in 2010. We can, of course, just bump it a little bit to fix
+> > > the immediate issue but the report made me wonder why we need to pre-
+> > > allocate vcpu->arch.cpuid_entries array instead of sizing it dynamically.
+> > > This RFC is intended to feed my curiosity.
+> > > 
+> > > Very mildly tested with selftests/kvm-unit-tests and nothing seems to
+> > > break. I also don't have access to the system where the original issue
+> > > was reported but chances we're fixing it are very good IMO as just the
+> > > second patch alone was reported to be sufficient.
+> > > 
+> > > Reported-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> > 
+> > Oh nice, I was just going to bump the magic number :-)
+> > 
+> > Anyway, this seems to work for me, so:
+> > 
+> > Tested-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> > 
+> 
+> I tested on two platforms and the patches worked fine. So no objection on the
+> design.
+> 
+> Tested-by: Wei Huang <wei.huang2@amd.com>
+> 
+> > > Vitaly Kuznetsov (2):
+> > >   KVM: x86: allocate vcpu->arch.cpuid_entries dynamically
+> > >   KVM: x86: bump KVM_MAX_CPUID_ENTRIES
+> > > 
+> > >  arch/x86/include/asm/kvm_host.h |  4 +--
+> > >  arch/x86/kvm/cpuid.c            | 55 ++++++++++++++++++++++++---------
+> > >  arch/x86/kvm/x86.c              |  1 +
+> > >  3 files changed, 43 insertions(+), 17 deletions(-)
+> > > 
+> > > -- 
+> > > 2.25.4
+> > > 
+> > -- 
+> > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> > 
+> 
+-- 
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+
