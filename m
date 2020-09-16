@@ -2,88 +2,114 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1695526CE63
-	for <lists+kvm@lfdr.de>; Thu, 17 Sep 2020 00:10:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E76A226CF18
+	for <lists+kvm@lfdr.de>; Thu, 17 Sep 2020 00:50:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726310AbgIPWKd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 16 Sep 2020 18:10:33 -0400
-Received: from mail.kernel.org ([198.145.29.99]:36840 "EHLO mail.kernel.org"
+        id S1726473AbgIPWuZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 16 Sep 2020 18:50:25 -0400
+Received: from mga03.intel.com ([134.134.136.65]:54656 "EHLO mga03.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725858AbgIPWKa (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 16 Sep 2020 18:10:30 -0400
-Received: from localhost (52.sub-72-107-123.myvzw.com [72.107.123.52])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 7E0FF2220A;
-        Wed, 16 Sep 2020 21:55:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1600293314;
-        bh=5Fpi6OQa8IxjUT2FP7sUxhyFcgPeG9M+tTW+C8SdAFk=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:From;
-        b=1FkSmcTykCL/zqkaPTTTtxzFybHV52zt+7fV2sexve+QjzmljN4s5sh4dV+pzUf9x
-         bvmPikerzuBmKwnWF/aVNQnfnHV1SbcHUZoDhCpydjrkcSC7vDyPsj0D89+RjyeeL0
-         m6l774wtQbVbK+auQSubJ8TeH6i/4GTAHSu8PYRQ=
-Date:   Wed, 16 Sep 2020 16:55:13 -0500
-From:   Bjorn Helgaas <helgaas@kernel.org>
-To:     Matthew Rosato <mjrosato@linux.ibm.com>
-Cc:     alex.williamson@redhat.com, bhelgaas@google.com,
-        schnelle@linux.ibm.com, pmorel@linux.ibm.com, mpe@ellerman.id.au,
-        oohall@gmail.com, cohuck@redhat.com, kevin.tian@intel.com,
-        hca@linux.ibm.com, gor@linux.ibm.com, borntraeger@de.ibm.com,
-        linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, linux-pci@vger.kernel.org
-Subject: Re: [PATCH v5 1/3] PCI/IOV: Mark VFs as not implementing
- PCI_COMMAND_MEMORY
-Message-ID: <20200916215513.GA1588138@bjorn-Precision-5520>
+        id S1726280AbgIPWuT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 16 Sep 2020 18:50:19 -0400
+IronPort-SDR: th8Eg01hoTrJhw/58i4gwNIpkBPOB8Yp5+ieRBXJmFQI2sM6/UH6+QK8A6ixY3wvgmudRVgvt1
+ +mjFgyeffh1A==
+X-IronPort-AV: E=McAfee;i="6000,8403,9746"; a="159631868"
+X-IronPort-AV: E=Sophos;i="5.76,434,1592895600"; 
+   d="scan'208";a="159631868"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Sep 2020 15:50:18 -0700
+IronPort-SDR: Wucms044M2dJy6yu4PwISQysgWFV9TvAzVd3c/iminns7GJTmeX8fH37PW8oLYqE84RcoDX9pf
+ kV+strBvDXkw==
+X-IronPort-AV: E=Sophos;i="5.76,434,1592895600"; 
+   d="scan'208";a="508169587"
+Received: from sjchrist-ice.jf.intel.com (HELO sjchrist-ice) ([10.54.31.34])
+  by fmsmga005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Sep 2020 15:50:17 -0700
+Date:   Wed, 16 Sep 2020 15:50:16 -0700
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Tom Lendacky <thomas.lendacky@amd.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org, x86@kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Borislav Petkov <bp@alien8.de>, Ingo Molnar <mingo@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Brijesh Singh <brijesh.singh@amd.com>
+Subject: Re: [RFC PATCH 08/35] KVM: SVM: Prevent debugging under SEV-ES
+Message-ID: <20200916225015.GB12355@sjchrist-ice>
+References: <58093c542b5b442b88941828595fb2548706f1bf.1600114548.git.thomas.lendacky@amd.com>
+ <20200914212601.GA7192@sjchrist-ice>
+ <fd790047-4107-b28a-262e-03ed5bc4c421@amd.com>
+ <20200915163010.GB8420@sjchrist-ice>
+ <aff46d8d-07ff-7d14-3e7f-ffe60f2bd779@amd.com>
+ <5e816811-450f-b732-76f7-6130479642e0@amd.com>
+ <20200916160210.GA10227@sjchrist-ice>
+ <b62e055a-000e-ff7b-00e4-41b5b39b55d5@amd.com>
+ <20200916164923.GC10227@sjchrist-ice>
+ <9988f485-ce78-4df4-b294-32cc7743b6b2@amd.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1599749997-30489-2-git-send-email-mjrosato@linux.ibm.com>
+In-Reply-To: <9988f485-ce78-4df4-b294-32cc7743b6b2@amd.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Sep 10, 2020 at 10:59:55AM -0400, Matthew Rosato wrote:
-> For VFs, the Memory Space Enable bit in the Command Register is
-> hard-wired to 0.
+On Wed, Sep 16, 2020 at 03:27:13PM -0500, Tom Lendacky wrote:
+> On 9/16/20 11:49 AM, Sean Christopherson wrote:
+> > On Wed, Sep 16, 2020 at 11:38:38AM -0500, Tom Lendacky wrote:
+> >>
+> >>
+> >> On 9/16/20 11:02 AM, Sean Christopherson wrote:
+> >>> On Wed, Sep 16, 2020 at 10:11:10AM -0500, Tom Lendacky wrote:
+> >>>> On 9/15/20 3:13 PM, Tom Lendacky wrote:
+> >>>>> On 9/15/20 11:30 AM, Sean Christopherson wrote:
+> >>>>>> I don't quite follow the "doesn't mean debugging can't be done in the future".
+> >>>>>> Does that imply that debugging could be supported for SEV-ES guests, even if
+> >>>>>> they have an encrypted VMSA?
+> >>>>>
+> >>>>> Almost anything can be done with software. It would require a lot of
+> >>>>> hypervisor and guest code and changes to the GHCB spec, etc. So given
+> >>>>> that, probably just the check for arch.guest_state_protected is enough for
+> >>>>> now. I'll just need to be sure none of the debugging paths can be taken
+> >>>>> before the VMSA is encrypted.
+> >>>>
+> >>>> So I don't think there's any guarantee that the KVM_SET_GUEST_DEBUG ioctl
+> >>>> couldn't be called before the VMSA is encrypted, meaning I can't check the
+> >>>> arch.guest_state_protected bit for that call. So if we really want to get
+> >>>> rid of the allow_debug() op, I'd need some other way to indicate that this
+> >>>> is an SEV-ES / protected state guest.
+> >>>
+> >>> Would anything break if KVM "speculatively" set guest_state_protected before
+> >>> LAUNCH_UPDATE_VMSA?  E.g. does KVM need to emulate before LAUNCH_UPDATE_VMSA?
+> >>
+> >> Yes, the way the code is set up, the guest state (VMSA) is initialized in
+> >> the same way it is today (mostly) and that state is encrypted by the
+> >> LAUNCH_UPDATE_VMSA call. I check the guest_state_protected bit to decide
+> >> on whether to direct the updates to the real VMSA (before it's encrypted)
+> >> or the GHCB (that's the get_vmsa() function from patch #5).
+> > 
+> > Ah, gotcha.  Would it work to set guest_state_protected[*] from time zero,
+> > and move vmsa_encrypted to struct vcpu_svm?  I.e. keep vmsa_encrypted, but
+> > use it only for guiding get_vmsa() and related behavior.
 > 
-> Add a new bit to signify devices where the Command Register Memory
-> Space Enable bit does not control the device's response to MMIO
-> accesses.
-> 
-> Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
+> It is mainly __set_sregs() that needs to know when to allow the register
+> writes and when not to. During guest initialization, __set_sregs is how
+> some of the VMSA is initialized by Qemu.
 
-Acked-by: Bjorn Helgaas <bhelgaas@google.com>
+Hmm.  I assume that also means KVM_SET_REGS and KVM_GET_XCRS are also legal
+before the VMSA is encrypted?  If so, then the current behavior of setting
+vmsa_encrypted "late" make sense.  KVM_SET_FPU/XSAVE can be handled by not
+allocating guest_fpu, i.e. they can be disallowed from time zero without
+adding an SEV-ES specific check.
 
-> ---
->  drivers/pci/iov.c   | 1 +
->  include/linux/pci.h | 1 +
->  2 files changed, 2 insertions(+)
-> 
-> diff --git a/drivers/pci/iov.c b/drivers/pci/iov.c
-> index b37e08c..4afd4ee 100644
-> --- a/drivers/pci/iov.c
-> +++ b/drivers/pci/iov.c
-> @@ -180,6 +180,7 @@ int pci_iov_add_virtfn(struct pci_dev *dev, int id)
->  	virtfn->device = iov->vf_device;
->  	virtfn->is_virtfn = 1;
->  	virtfn->physfn = pci_dev_get(dev);
-> +	virtfn->no_command_memory = 1;
->  
->  	if (id == 0)
->  		pci_read_vf_config_common(virtfn);
-> diff --git a/include/linux/pci.h b/include/linux/pci.h
-> index 8355306..3ff72312 100644
-> --- a/include/linux/pci.h
-> +++ b/include/linux/pci.h
-> @@ -445,6 +445,7 @@ struct pci_dev {
->  	unsigned int	is_probed:1;		/* Device probing in progress */
->  	unsigned int	link_active_reporting:1;/* Device capable of reporting link active */
->  	unsigned int	no_vf_scan:1;		/* Don't scan for VFs after IOV enablement */
-> +	unsigned int	no_command_memory:1;	/* No PCI_COMMAND_MEMORY */
->  	pci_dev_flags_t dev_flags;
->  	atomic_t	enable_cnt;	/* pci_enable_device has been called */
->  
-> -- 
-> 1.8.3.1
-> 
+Which brings us back to KVM_SET_GUEST_DEBUG.  What would happen if that were
+allowed prior to VMSA encryption?  If LAUNCH_UPDATE_VMSA acts as a sort of
+reset, one thought would be to allow KVM_SET_GUEST_DEBUG and then sanitize
+KVM's state during LAUNCH_UPDATE_VMSA.  Or perhaps even better, disallow
+LAUNCH_UPDATE_VMSA if vcpu->guest_debug!=0.  That would allow using debug
+capabilities up until LAUNCH_UPDATE_VMSA without adding much burden to KVM.
