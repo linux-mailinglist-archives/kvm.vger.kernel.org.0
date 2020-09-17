@@ -2,222 +2,149 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6F11E26E4C2
-	for <lists+kvm@lfdr.de>; Thu, 17 Sep 2020 20:57:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DC7A726E543
+	for <lists+kvm@lfdr.de>; Thu, 17 Sep 2020 21:17:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726573AbgIQS47 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 17 Sep 2020 14:56:59 -0400
-Received: from mail-dm6nam11on2079.outbound.protection.outlook.com ([40.107.223.79]:45408
-        "EHLO NAM11-DM6-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726589AbgIQS4c (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 17 Sep 2020 14:56:32 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Az1aIDAZZr7Kq9VaJ9hFBOxARvn86lWH6y14QfXZq8xwy9KvrozF98Q4MdgGi61hV1ItED7uH1BYWsPKXfUTyb/YFfHggXamGNgxiDMM5dlUG2/9JbOv8c2mxZgdmQkCC9ACylEppe3WWxZ4c/KyyCPKKOvWX0ooqS4wTNw8naifTitdbFeMhy55hAe6JKQGXmM4PuYtC0yjoKTKMiUzd71cqzSbSYuhUIMGlj0vPfOLoKl12mKySpZt6rQvEGKrrr5X3ghX1Nv+8v2QNrqt4mOvpzD5GS62MoF+we8kW814Quc3bl0Zc/CL/ncdurjEsjvFdXVdq0C3TOHDeuD9bw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=p6+vN5WkjkKWb52Yf7oLvo87VA6rbdHjTCKbEGppwF0=;
- b=ItxYxEtvlTPm3vgH0cprelzjg93B3U/A4FaxwRbtLaSmvI7ug3GEPfMfLZ9sDe2AvFR+X4Mj9Tjyv3gQHN+pScdkZWET9uiE9vhYq35YmEJwQwJdgSeRnMLD/+u88l3LbJR2on81ILiwZSH5Ll5z0FKh8K90szQZ3kicvZxlQgmd61WiFN+CjizyNE9PElk56n+fwrS+mXVc8XSam9eFqhgrDXgir7Loj+4SLA7zb7GpXXiWR2/xG9+vTf6AK9BC4xhj+SjMp90G9U6+ao++k2Nc7NKhv6t/wO8ODgTx+5OSEcyHN81fr6hexCB4hzmOxiEYkQDt0j3pAK9SXM3z8g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=p6+vN5WkjkKWb52Yf7oLvo87VA6rbdHjTCKbEGppwF0=;
- b=KKs3uGuSHNh9x1O4aPhdsN7WlcMlf5Wbu4gVLq28sypriulqLu4X9m87Hoqz2PEEPNvW5GUOVRdYjtCta5e7GXh63GKXn6UcdDMdY5LIeLdkr/K53staq8W55VSQsWt/iykuA7ylJFlQOjeCuKJU47JrhUtsOFe5dAEOzwCIufw=
-Authentication-Results: redhat.com; dkim=none (message not signed)
- header.d=none;redhat.com; dmarc=none action=none header.from=amd.com;
-Received: from DM5PR12MB1355.namprd12.prod.outlook.com (2603:10b6:3:6e::7) by
- DM6PR12MB4700.namprd12.prod.outlook.com (2603:10b6:5:35::20) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.3391.14; Thu, 17 Sep 2020 18:56:24 +0000
-Received: from DM5PR12MB1355.namprd12.prod.outlook.com
- ([fe80::299a:8ed2:23fc:6346]) by DM5PR12MB1355.namprd12.prod.outlook.com
- ([fe80::299a:8ed2:23fc:6346%3]) with mapi id 15.20.3391.011; Thu, 17 Sep 2020
- 18:56:24 +0000
-Subject: Re: [PATCH v3 0/5] Qemu SEV-ES guest support
-To:     "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc:     qemu-devel@nongnu.org, kvm@vger.kernel.org,
+        id S1726236AbgIQTRP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 17 Sep 2020 15:17:15 -0400
+Received: from mout.kundenserver.de ([212.227.17.24]:42087 "EHLO
+        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726453AbgIQTQm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 17 Sep 2020 15:16:42 -0400
+X-Greylist: delayed 510 seconds by postgrey-1.27 at vger.kernel.org; Thu, 17 Sep 2020 15:16:40 EDT
+Received: from [192.168.100.1] ([82.252.129.222]) by mrelayeu.kundenserver.de
+ (mreue108 [213.165.67.119]) with ESMTPSA (Nemesis) id
+ 1MLR9p-1k0d6T3gRf-00IXZO; Thu, 17 Sep 2020 21:02:07 +0200
+Subject: Re: [PATCH 0/6] misc: Some inclusive terminology changes
+To:     =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+        qemu-devel@nongnu.org
+Cc:     Laurent Vivier <lvivier@redhat.com>,
+        Peter Maydell <peter.maydell@linaro.org>,
+        Thomas Huth <thuth@redhat.com>,
+        Alistair Francis <alistair@alistair23.me>,
+        Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Andrew Jeffery <andrew@aj.id.au>,
+        Jason Wang <jasowang@redhat.com>,
+        Marcelo Tosatti <mtosatti@redhat.com>,
+        Joel Stanley <joel@jms.id.au>, qemu-trivial@nongnu.org,
+        qemu-arm@nongnu.org,
+        =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>,
         Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Eduardo Habkost <ehabkost@redhat.com>,
-        Richard Henderson <rth@twiddle.net>,
-        Connor Kuehl <ckuehl@redhat.com>,
-        Brijesh Singh <brijesh.singh@amd.com>,
-        Jiri Slaby <jslaby@suse.cz>,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>
-References: <cover.1600205384.git.thomas.lendacky@amd.com>
- <20200917172802.GS2793@work-vm>
-From:   Tom Lendacky <thomas.lendacky@amd.com>
-Message-ID: <de0e9c27-8954-3a77-21db-cad84f334277@amd.com>
-Date:   Thu, 17 Sep 2020 13:56:21 -0500
+        "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
+        =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+        Richard Henderson <rth@twiddle.net>
+References: <20200910070131.435543-1-philmd@redhat.com>
+From:   Laurent Vivier <laurent@vivier.eu>
+Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <58370210-1ff8-4ec2-553b-7693a9b85c99@vivier.eu>
+Date:   Thu, 17 Sep 2020 21:02:01 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
-In-Reply-To: <20200917172802.GS2793@work-vm>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SN4PR0201CA0072.namprd02.prod.outlook.com
- (2603:10b6:803:20::34) To DM5PR12MB1355.namprd12.prod.outlook.com
- (2603:10b6:3:6e::7)
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from office-linux.texastahm.com (67.79.209.213) by SN4PR0201CA0072.namprd02.prod.outlook.com (2603:10b6:803:20::34) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3370.16 via Frontend Transport; Thu, 17 Sep 2020 18:56:23 +0000
-X-Originating-IP: [67.79.209.213]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-HT: Tenant
-X-MS-Office365-Filtering-Correlation-Id: ee6e962e-b5ef-40bb-5b5d-08d85b3b5f94
-X-MS-TrafficTypeDiagnostic: DM6PR12MB4700:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <DM6PR12MB4700AE1085883FAFE60774FEEC3E0@DM6PR12MB4700.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:10000;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: fN5+CYh9wNcIQyRqtXj1U/TRdG6kfS3/bGpa/5a+baNPZsIWgy7Tse12X8ylm1x2oHRb8zL19kl0SmMY+oCqXx1wcssGnluxaP8e6k4OpACNoYp8cc4kJSAtyOFiO5ycYtPpEIHNWqcyW74IXdpUkGOW26pzWHxBf5bZscwp1j4sTLEZyjrxQ37XdGiJNdN/ly3TLeyOj9PGrrExPyeQ5Rw+l2LmaoJyGlEF5mYXoHEw4AsA7sFFyI/c4c2yHEq4dTKJb0YFsOaphlDzKWh7ED4D9jZQp5fFTFXyqCTKA1ZqO4TBnpaUZF8borUbl3VEACWqU+T2g7FisRUhC7xKJk3eNXm5K7QYHt3YaNpo1bY6cOzH6dGKp3M+cbtU4FkjF7sfpCRo5ngyW79/LzWv3in9vpBDR/ybCdbi8D8Hrrzhz2/VG1WMERWoM/QPV+9Qoozd4PSsRnBxfM9lZcThWA==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM5PR12MB1355.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(396003)(376002)(39860400002)(366004)(136003)(346002)(66556008)(66946007)(66476007)(6506007)(5660300002)(53546011)(54906003)(45080400002)(8936002)(2616005)(2906002)(83380400001)(956004)(6486002)(7416002)(8676002)(186003)(31686004)(4326008)(52116002)(316002)(31696002)(6916009)(478600001)(26005)(16526019)(36756003)(966005)(86362001)(6512007)(43740500002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData: K7yekP+xFK1ptrpfdLoEZhGzqVheYHGRReVqYMxoVgwu2BzbkfdVeOgSM/X2LfjnJAsaPHdnlMCLmjs1+SibJqEyKz3opbs4/Ausk1jwXNmZc459bdOgz8t8SmHlA+xXZZH0iSeGGDTG0DbAZ/xO8Qvgt26KciTjlvZ0pki/pUaBmuW3fFP8x4W37PNpA64rjJMf/heYX1YzuIvA5kz9aJsS4jUt95ohglyCsA4To5udhhPtLNQNOEuDUQoV/wT5qxnceXqPQn39o0LfZ0SH93XfjENeGNWDGBN68aKVJQkF1L4tmdZHgwhD/ZPZLY6k39bQofNy+1H+ENsMiKvL/HMuw+jb5v0MxFY93qg2WzfxEVSJuYEoAoxIbCYCMWqks0zZQNjiHCl21YRO9J4nFgO2WgfSS6s2COalEPdv4B0vrCS+35BVyK3ydde+vYOcoMid8h1n47ET9+eoD4GJiIqdE1zpv1jZAw3dzkgPSywIXRCA+Mx4BffAmp3yJQOvfSi12UlD8tRFBnupM5Pluifuo6p7TOqZJxjuNzZAHDEYhPy4NG3WVPEY65NQUnZWZgGhSkK7iwWTtyHnZhmznl8qHGhLDm6edUcQI8N1KSMKF3EGO79SO44QWdnObgjoE4N+ifLMeC13VqCfOJR7Fw==
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: ee6e962e-b5ef-40bb-5b5d-08d85b3b5f94
-X-MS-Exchange-CrossTenant-AuthSource: DM5PR12MB1355.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Sep 2020 18:56:23.9820
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: WCzVuwMJ4KzU+isMwLozZSlKoJauxMqyt3A+ZkDFxaRoagHCr/tTpacYTQxhhCnmBuUKpyCh4qLpHtMoowPwcQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB4700
+In-Reply-To: <20200910070131.435543-1-philmd@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: fr
+Content-Transfer-Encoding: 8bit
+X-Provags-ID: V03:K1:vSkFfUIMLAFpwGxD4kzvP0Wh7o/G0mxbO0B+DlLdDBHKRvz3KBg
+ by18GcAinCDBchxvJZiG2Ykd6g3Ry7XjzcakL2FonD/2CSA/TW4LJ38ZjUr7IaP/5/Mn8IZ
+ EI8L+dPqGkqFzeT3VI1Zv1EpZaKk9lf8AAh6UqoJhg29yQTxnWJAzVdtXkIq/rENklDwAMc
+ 1PZk4LpgwNS6tcdOuSOpQ==
+X-Spam-Flag: NO
+X-UI-Out-Filterresults: notjunk:1;V03:K0:Y30/iYU2RuU=:sndiwD5TrHqYZfq5/lHooU
+ zh8GPi9eJb2j+GXwkrljiC2vE9+LxQSq7U0yOQC+CcChlhQaR1DuZjM2ewmzCQ/sCLfYaRC+B
+ YuP7ugrAC6SP95DG4VCs1JeUPBNa6aTfCcq9mORtWqo5SfaGZ//wGkOnE6ROtGiBW+p7zoF1m
+ jRo8jQHfU0GqSseEicigNPZHm5oEBqjQVBm6JQvBG9uROriTrqk4rHzQG/rbw+DwzXkmFwRBE
+ 1rINZ6ls02JqBQa04zQrh0llyUk8F8lljqwzXfFYde/A0uDI2gVWrpMElzE1IFvUrTAWmr+WV
+ /Yhpg0PGyYhtTmJ5YOGrwFeo0kTSpeBcaR816WzVG1cO4cfw9nR7gezdJ87dYRBf546w2W/OB
+ OiHuxKPGCFRrz9DD8kTdyDXo2rnqJGY6x/z9Mw1CjmqDo/1kFDW9TbM/ndUTpG8OJZ+eQG4A9
+ VmrEsYbDvDAjwwO4IOr6Ka9Ylv+ky1lvfj73o41DKnvtJcEmUfgNHyKUfTpyzTeN4CeUupRz+
+ p3RML3O8hmbUQIVr7qWa8VILcncqt04sa52vlbb1piGeSaCTky1uhxpkwmpOIeDVpL1+C+Nvi
+ o3Kf5YeovYqiW/FOzl3sZ+dKlMythcLkXZ7S/QN9l6lVWBI2Fp76ntUKuseslG7bCE8vAJh5h
+ yU8ipCPwge53BK+KT8Fz3rJ67dMsNkc8USzH68sh8/BwnatvXRXOvHWtrj1rYb5XtLILI08T1
+ JSGbXdGxnqU0h74z3nZ1OUHvOknOBCbL6lrzlWj8PAAxPM9Nj1E8uoN5sp5e0RqemopQMVPMP
+ 36ZAbypLJIk4WdoURkIwpZIZvsnMQhaCJ334w/HQBhiRLVWdp8S/3doJBFIMF7oePR2nx1/
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 9/17/20 12:28 PM, Dr. David Alan Gilbert wrote:
-> * Tom Lendacky (thomas.lendacky@amd.com) wrote:
->> From: Tom Lendacky <thomas.lendacky@amd.com>
->>
->> This patch series provides support for launching an SEV-ES guest.
->>
->> Secure Encrypted Virtualization - Encrypted State (SEV-ES) expands on the
->> SEV support to protect the guest register state from the hypervisor. See
->> "AMD64 Architecture Programmer's Manual Volume 2: System Programming",
->> section "15.35 Encrypted State (SEV-ES)" [1].
->>
->> In order to allow a hypervisor to perform functions on behalf of a guest,
->> there is architectural support for notifying a guest's operating system
->> when certain types of VMEXITs are about to occur. This allows the guest to
->> selectively share information with the hypervisor to satisfy the requested
->> function. The notification is performed using a new exception, the VMM
->> Communication exception (#VC). The information is shared through the
->> Guest-Hypervisor Communication Block (GHCB) using the VMGEXIT instruction.
->> The GHCB format and the protocol for using it is documented in "SEV-ES
->> Guest-Hypervisor Communication Block Standardization" [2].
->>
->> The main areas of the Qemu code that are updated to support SEV-ES are
->> around the SEV guest launch process and AP booting in order to support
->> booting multiple vCPUs.
->>
->> There are no new command line switches required. Instead, the desire for
->> SEV-ES is presented using the SEV policy object. Bit 2 of the SEV policy
->> object indicates that SEV-ES is required.
->>
->> The SEV launch process is updated in two ways. The first is that a the
->> KVM_SEV_ES_INIT ioctl is used to initialize the guest instead of the
->> standard KVM_SEV_INIT ioctl. The second is that before the SEV launch
->> measurement is calculated, the LAUNCH_UPDATE_VMSA SEV API is invoked for
->> each vCPU that Qemu has created. Once the LAUNCH_UPDATE_VMSA API has been
->> invoked, no direct changes to the guest register state can be made.
->>
->> AP booting poses some interesting challenges. The INIT-SIPI-SIPI sequence
->> is typically used to boot the APs. However, the hypervisor is not allowed
->> to update the guest registers. For the APs, the reset vector must be known
->> in advance. An OVMF method to provide a known reset vector address exists
->> by providing an SEV information block, identified by UUID, near the end of
->> the firmware [3]. OVMF will program the jump to the actual reset vector in
->> this area of memory. Since the memory location is known in advance, an AP
->> can be created with the known reset vector address as its starting CS:IP.
->> The GHCB document [2] talks about how SMP booting under SEV-ES is
->> performed. SEV-ES also requires the use of the in-kernel irqchip support
->> in order to minimize the changes required to Qemu to support AP booting.
+Le 10/09/2020 à 09:01, Philippe Mathieu-Daudé a écrit :
+> We don't have (yet?) inclusive terminology guidelines,
+> but the PCI hole memory is not "black", the DMA sources
+> don't stream to "slaves", and there isn't really a TSX
+> "black" list, we only check for broken fields.
 > 
-> Some random thoughts:
->    a) Is there something that explicitly disallows SMM?
+> As this terms can be considered offensive, and changing
+> them is a no-brain operation, simply do it.
+> 
+> Philippe Mathieu-Daudé (6):
+>   hw/ssi/aspeed_smc: Rename max_slaves as max_devices
+>   hw/core/stream: Rename StreamSlave as StreamSink
+>   hw/dma/xilinx_axidma: Rename StreamSlave as StreamSink
+>   hw/net/xilinx_axienet: Rename StreamSlave as StreamSink
+>   hw/pci-host/q35: Rename PCI 'black hole as '(memory) hole'
+>   target/i386/kvm: Rename host_tsx_blacklisted() as host_tsx_broken()
+> 
+>  include/hw/pci-host/q35.h     |  4 +--
+>  include/hw/ssi/aspeed_smc.h   |  2 +-
+>  include/hw/ssi/xilinx_spips.h |  2 +-
+>  include/hw/stream.h           | 46 +++++++++++++--------------
+>  hw/core/stream.c              | 20 ++++++------
+>  hw/dma/xilinx_axidma.c        | 58 +++++++++++++++++------------------
+>  hw/net/xilinx_axienet.c       | 44 +++++++++++++-------------
+>  hw/pci-host/q35.c             | 38 +++++++++++------------
+>  hw/ssi/aspeed_smc.c           | 40 ++++++++++++------------
+>  hw/ssi/xilinx_spips.c         |  2 +-
+>  target/i386/kvm.c             |  4 +--
+>  tests/qtest/q35-test.c        |  2 +-
+>  12 files changed, 131 insertions(+), 131 deletions(-)
+> 
 
-There isn't currently. Is there a way to know early on that SMM is 
-enabled? Could I just call x86_machine_is_smm_enabled() to check that?
+Philippe,
 
->    b) I think all the interfaces you're using are already defined in
-> Linux header files - even if the code to implement them isn't actually
-> upstream in the kernel yet (the launch_update in particular) - we
-> normally wait for the kernel interface to be accepted before taking the
-> QEMU patches, but if the constants are in the headers already I'm not
-> sure what the rule is.
-
-Correct, everything was already present from a Linux header perspective.
-
->    c) What happens if QEMU reads the register values from the state if
-> the guest is paused - does it just see junk?  I'm just wondering if you
-> need to add checks in places it might try to.
-
-I thought about what to do about calls to read the registers once the 
-guest state has become encrypted. I think it would take a lot of changes 
-to make Qemu "protected state aware" for what I see as little gain. Qemu 
-is likely to see a lot of zeroes or actual register values from the GHCB 
-protocol for previous VMGEXITs that took place.
+Could you report your series: it doesn't apply cleanly on my branch.
 
 Thanks,
-Tom
-
-> 
-> Dave
-> 
->> [1] https://nam11.safelinks.protection.outlook.com/?url=https%3A%2F%2Fwww.amd.com%2Fsystem%2Ffiles%2FTechDocs%2F24593.pdf&amp;data=02%7C01%7Cthomas.lendacky%40amd.com%7Cb07b788e09054a91143308d85b2f1a89%7C3dd8961fe4884e608e11a82d994e183d%7C0%7C0%7C637359606292398926&amp;sdata=B2naGIEXuhD7a%2Fi4NDsRzeHwvDvNJ%2FP7nf5HmAzk9CU%3D&amp;reserved=0
->> [2] https://nam11.safelinks.protection.outlook.com/?url=https%3A%2F%2Fdeveloper.amd.com%2Fwp-content%2Fresources%2F56421.pdf&amp;data=02%7C01%7Cthomas.lendacky%40amd.com%7Cb07b788e09054a91143308d85b2f1a89%7C3dd8961fe4884e608e11a82d994e183d%7C0%7C0%7C637359606292398926&amp;sdata=0HrHZxdTEK%2FWM1KxxasMAghpzTNGvuKKSlg6nBgPjJY%3D&amp;reserved=0
->> [3] 30937f2f98c4 ("OvmfPkg: Use the SEV-ES work area for the SEV-ES AP reset vector")
->>      https://nam11.safelinks.protection.outlook.com/?url=https%3A%2F%2Fgithub.com%2Ftianocore%2Fedk2%2Fcommit%2F30937f2f98c42496f2f143fe8374ae7f7e684847&amp;data=02%7C01%7Cthomas.lendacky%40amd.com%7Cb07b788e09054a91143308d85b2f1a89%7C3dd8961fe4884e608e11a82d994e183d%7C0%7C0%7C637359606292408916&amp;sdata=ISAjIahZH4izDHnXgdWDX0GK61kwgtTw%2BEE%2BS8FBls0%3D&amp;reserved=0
->>
->> ---
->>
->> These patches are based on commit:
->> d0ed6a69d3 ("Update version for v5.1.0 release")
->>
->> (I tried basing on the latest Qemu commit, but I was having build issues
->> that level)
->>
->> A version of the tree can be found at:
->> https://nam11.safelinks.protection.outlook.com/?url=https%3A%2F%2Fgithub.com%2FAMDESE%2Fqemu%2Ftree%2Fsev-es-v11&amp;data=02%7C01%7Cthomas.lendacky%40amd.com%7Cb07b788e09054a91143308d85b2f1a89%7C3dd8961fe4884e608e11a82d994e183d%7C0%7C0%7C637359606292408916&amp;sdata=pWd8HAZkAILIMRb1i5TNz9XoHyrhCgRu%2Bq%2BXN2NJ4ag%3D&amp;reserved=0
->>
->> Changes since v2:
->> - Add in-kernel irqchip requirement for SEV-ES guests
->>
->> Changes since v1:
->> - Fixed checkpatch.pl errors/warnings
->>
->> Tom Lendacky (5):
->>    sev/i386: Add initial support for SEV-ES
->>    sev/i386: Require in-kernel irqchip support for SEV-ES guests
->>    sev/i386: Allow AP booting under SEV-ES
->>    sev/i386: Don't allow a system reset under an SEV-ES guest
->>    sev/i386: Enable an SEV-ES guest based on SEV policy
->>
->>   accel/kvm/kvm-all.c       |  73 ++++++++++++++++++++++++++
->>   accel/stubs/kvm-stub.c    |   5 ++
->>   hw/i386/pc_sysfw.c        |  10 +++-
->>   include/sysemu/cpus.h     |   2 +
->>   include/sysemu/hw_accel.h |   5 ++
->>   include/sysemu/kvm.h      |  18 +++++++
->>   include/sysemu/sev.h      |   3 ++
->>   softmmu/cpus.c            |   5 ++
->>   softmmu/vl.c              |   5 +-
->>   target/i386/cpu.c         |   1 +
->>   target/i386/kvm.c         |   2 +
->>   target/i386/sev-stub.c    |   5 ++
->>   target/i386/sev.c         | 105 +++++++++++++++++++++++++++++++++++++-
->>   target/i386/sev_i386.h    |   1 +
->>   14 files changed, 236 insertions(+), 4 deletions(-)
->>
->> -- 
->> 2.28.0
->>
+Laurent
