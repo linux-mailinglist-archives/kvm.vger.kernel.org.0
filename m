@@ -2,97 +2,95 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 94D1326D800
-	for <lists+kvm@lfdr.de>; Thu, 17 Sep 2020 11:47:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2C08026D831
+	for <lists+kvm@lfdr.de>; Thu, 17 Sep 2020 11:56:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726380AbgIQJrD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 17 Sep 2020 05:47:03 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:59564 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726185AbgIQJrC (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 17 Sep 2020 05:47:02 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1600336021;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=nI7gqByx+HGjF7uAOxbv2eIXkfB1+ppWt4NPBNuXzwU=;
-        b=BgwxICvuV2o3FcZTLrw0zJ0+prd9xiSin9YP7BmPPmaUUo25fP/oAr12+OC5iZmI2m+y4l
-        NS8fYosBKnk/53JHzd1agNswZ6DUHbT6KQd1VqPSXhggBbwduvGue5B4Gqr/EfBZ6yRalX
-        c44eYg5IAfVHEvgd3644LOrk+2NyfXI=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-466-qBMttKJrPuqY11Olw0jp0Q-1; Thu, 17 Sep 2020 05:45:56 -0400
-X-MC-Unique: qBMttKJrPuqY11Olw0jp0Q-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5EC4B64149;
-        Thu, 17 Sep 2020 09:45:54 +0000 (UTC)
-Received: from starship (unknown [10.35.206.187])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 2E75D7E73E;
-        Thu, 17 Sep 2020 09:45:49 +0000 (UTC)
-Message-ID: <24eaf0bbbc64da013b724adf1d6b2e0d53a6ed99.camel@redhat.com>
-Subject: Re: [PATCH] KVM: SVM: use __GFP_ZERO instead of clear_page()
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     lihaiwei.kernel@gmail.com, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, x86@kernel.org
-Cc:     pbonzini@redhat.com, sean.j.christopherson@intel.com,
-        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
-        joro@8bytes.org, tglx@linutronix.de, mingo@redhat.com,
-        bp@alien8.de, hpa@zytor.com, Haiwei Li <lihaiwei@tencent.com>
-Date:   Thu, 17 Sep 2020 12:45:48 +0300
-In-Reply-To: <20200916083621.5512-1-lihaiwei.kernel@gmail.com>
-References: <20200916083621.5512-1-lihaiwei.kernel@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.3 (3.36.3-1.fc32) 
+        id S1726584AbgIQJzb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 17 Sep 2020 05:55:31 -0400
+Received: from foss.arm.com ([217.140.110.172]:43634 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726200AbgIQJzX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 17 Sep 2020 05:55:23 -0400
+X-Greylist: delayed 534 seconds by postgrey-1.27 at vger.kernel.org; Thu, 17 Sep 2020 05:55:23 EDT
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 43A7711D4;
+        Thu, 17 Sep 2020 02:46:24 -0700 (PDT)
+Received: from [192.168.0.110] (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 08E903F68F;
+        Thu, 17 Sep 2020 02:46:22 -0700 (PDT)
+Subject: Re: [PATCH 2/2] kvm/arm: Add mp_affinity for arm vcpu
+To:     Marc Zyngier <maz@kernel.org>, Andrew Jones <drjones@redhat.com>
+Cc:     Ying Fang <fangying1@huawei.com>, kvm@vger.kernel.org,
+        kvmarm@lists.cs.columbia.edu, james.morse@arm.com,
+        julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com,
+        zhang.zhanghailiang@huawei.com, alex.chen@huawei.com
+References: <20200917023033.1337-1-fangying1@huawei.com>
+ <20200917023033.1337-3-fangying1@huawei.com>
+ <7a924b0fb27505a0d8b00389fe2f02df@kernel.org>
+ <20200917080429.jimidzdtdskwhbdx@kamzik.brq.redhat.com>
+ <198c63d5e9e17ddb4c3848845891301c@kernel.org>
+From:   Alexandru Elisei <alexandru.elisei@arm.com>
+Message-ID: <12a47a99-9857-b86d-6c45-39fdee08613e@arm.com>
+Date:   Thu, 17 Sep 2020 10:47:19 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.12.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+In-Reply-To: <198c63d5e9e17ddb4c3848845891301c@kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 2020-09-16 at 16:36 +0800, lihaiwei.kernel@gmail.com wrote:
-> From: Haiwei Li <lihaiwei@tencent.com>
-> 
-> Use __GFP_ZERO while alloc_page().
-> 
-> Signed-off-by: Haiwei Li <lihaiwei@tencent.com>
-> ---
->  arch/x86/kvm/svm/avic.c | 6 ++----
->  1 file changed, 2 insertions(+), 4 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/svm/avic.c b/arch/x86/kvm/svm/avic.c
-> index ac830cd50830..f73f84d56452 100644
-> --- a/arch/x86/kvm/svm/avic.c
-> +++ b/arch/x86/kvm/svm/avic.c
-> @@ -153,20 +153,18 @@ int avic_vm_init(struct kvm *kvm)
->  		return 0;
->  
->  	/* Allocating physical APIC ID table (4KB) */
-> -	p_page = alloc_page(GFP_KERNEL_ACCOUNT);
-> +	p_page = alloc_page(GFP_KERNEL_ACCOUNT | __GFP_ZERO);
->  	if (!p_page)
->  		goto free_avic;
->  
->  	kvm_svm->avic_physical_id_table_page = p_page;
-> -	clear_page(page_address(p_page));
->  
->  	/* Allocating logical APIC ID table (4KB) */
-> -	l_page = alloc_page(GFP_KERNEL_ACCOUNT);
-> +	l_page = alloc_page(GFP_KERNEL_ACCOUNT | __GFP_ZERO);
->  	if (!l_page)
->  		goto free_avic;
->  
->  	kvm_svm->avic_logical_id_table_page = l_page;
-> -	clear_page(page_address(l_page));
->  
->  	spin_lock_irqsave(&svm_vm_data_hash_lock, flags);
->   again:
-Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
+Hi,
 
-Best regards,
-	Maxim Levitsky
+On 9/17/20 9:42 AM, Marc Zyngier wrote:
+> On 2020-09-17 09:04, Andrew Jones wrote:
+>> On Thu, Sep 17, 2020 at 08:47:42AM +0100, Marc Zyngier wrote:
+>>> On 2020-09-17 03:30, Ying Fang wrote:
+>>> > Allow userspace to set MPIDR using vcpu ioctl KVM_ARM_SET_MP_AFFINITY,
+>>> > so that we can support cpu topology for arm.
+>>>
+>>> MPIDR has *nothing* to do with CPU topology in the ARM architecture.
+>>> I encourage you to have a look at the ARM ARM and find out how often
+>>> the word "topology" is used in conjunction with the MPIDR_EL1 register.
+>>>
+>>
+>> Hi Marc,
+>>
+>> I mostly agree. However, the CPU topology descriptions use MPIDR to
+>> identify PEs. If userspace wants to build topology descriptions then
+>> it either needs to
+>>
+>> 1) build them after instantiating all KVM VCPUs in order to query KVM
+>>    for each MPIDR, or
+>> 2) have a way to ask KVM for an MPIDR of given VCPU ID in advance
+>>    (maybe just a scratch VCPU), or
+>> 3) have control over the MPIDRs so it can choose them when it likes,
+>>    use them for topology descriptions, and then instantiate KVM VCPUs
+>>    with them.
+>>
+>> I think (3) is the most robust approach, and it has the least overhead.
+>
+> I don't disagree with the goal, and not even with the choice of
+> implementation (though I have huge reservations about its quality).
+>
+> But the key word here is *userspace*. Only userspace has a notion of
+> how MPIDR values map to the assumed topology. That's not something
+> that KVM does nor should interpret (aside from the GIC-induced Aff0
+> brain-damage). So talking of "topology" in a KVM kernel patch sends
+> the wrong message, and that's all this remark was about.
 
+There's also a patch queued for next which removes using MPIDR as a source of
+information about CPU topology [1]: "arm64: topology: Stop using MPIDR for
+topology information".
+
+I'm not really sure how useful KVM fiddling with the guest MPIDR will be going
+forward, at least for a Linux guest.
+
+[1]
+https://git.kernel.org/pub/scm/linux/kernel/git/arm64/linux.git/commit/?id=3102bc0e6ac7
+
+Thanks,
+Alex
