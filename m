@@ -2,38 +2,38 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DDE7C26E116
-	for <lists+kvm@lfdr.de>; Thu, 17 Sep 2020 18:48:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9DDB626E19D
+	for <lists+kvm@lfdr.de>; Thu, 17 Sep 2020 19:03:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728650AbgIQQrd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 17 Sep 2020 12:47:33 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:34345 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1728582AbgIQQrN (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 17 Sep 2020 12:47:13 -0400
-X-Greylist: delayed 4295 seconds by postgrey-1.27 at vger.kernel.org; Thu, 17 Sep 2020 12:47:03 EDT
+        id S1728821AbgIQRB5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 17 Sep 2020 13:01:57 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:44274 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1728851AbgIQRBg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 17 Sep 2020 13:01:36 -0400
+X-Greylist: delayed 1490 seconds by postgrey-1.27 at vger.kernel.org; Thu, 17 Sep 2020 13:01:35 EDT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1600361211;
+        s=mimecast20190719; t=1600362092;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=MVBdWjTL0qbbnnHx4Pq910SY+VQTNVPxgmO0+InTW3g=;
-        b=RMfY/5wb3Wus66VLJ3vuYzKc97dOiMIRIahX3QLZZPqaHyb/DY4cBiUGNgQ3EKIigo+9/f
-        2/D9MeZTA8AZfi5IZDoh9grTiJCVPal/OyIQnf44d09ormrs9G/Q5EQ5x67uLSSfCvXvEn
-        8v+reYl1vvp7LBk5rPRghx9/7zWBMcQ=
+        bh=AOcg7erdQiG6t1re3jBjRLL6u+BC9P88PDt8o+CU52k=;
+        b=ez/sMK6MBIRNC4TbsSwUqlbi9k4T8zFbfaYnGVqDVLMcH1JEsC1dC6XybtO0VZkjmJam54
+        qrQTYXCMy2Bq5nlxyMfzFunxe1i5JcWqWcU8cIK+MNULDfFUs/GW6HkcT7B/j09Dnm4+z5
+        k036HCaHAwE3XigljIQLjAPZjc8uRpk=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-266-a-6vknJcOmmUSmp6HQvp-A-1; Thu, 17 Sep 2020 12:46:45 -0400
-X-MC-Unique: a-6vknJcOmmUSmp6HQvp-A-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+ us-mta-567-etVH8VP5NKa1lqdHXXr32w-1; Thu, 17 Sep 2020 13:01:30 -0400
+X-MC-Unique: etVH8VP5NKa1lqdHXXr32w-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BC5B81091066;
-        Thu, 17 Sep 2020 16:46:43 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 618EF800467;
+        Thu, 17 Sep 2020 17:01:28 +0000 (UTC)
 Received: from work-vm (ovpn-114-108.ams2.redhat.com [10.36.114.108])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 5997260BEC;
-        Thu, 17 Sep 2020 16:46:37 +0000 (UTC)
-Date:   Thu, 17 Sep 2020 17:46:35 +0100
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 9306078803;
+        Thu, 17 Sep 2020 17:01:22 +0000 (UTC)
+Date:   Thu, 17 Sep 2020 18:01:19 +0100
 From:   "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 To:     Tom Lendacky <thomas.lendacky@amd.com>
 Cc:     qemu-devel@nongnu.org, kvm@vger.kernel.org,
@@ -46,16 +46,17 @@ Cc:     qemu-devel@nongnu.org, kvm@vger.kernel.org,
         Jiri Slaby <jslaby@suse.cz>,
         Marcelo Tosatti <mtosatti@redhat.com>,
         "Michael S. Tsirkin" <mst@redhat.com>
-Subject: Re: [PATCH v3 3/5] sev/i386: Allow AP booting under SEV-ES
-Message-ID: <20200917164635.GQ2793@work-vm>
+Subject: Re: [PATCH v3 4/5] sev/i386: Don't allow a system reset under an
+ SEV-ES guest
+Message-ID: <20200917170119.GR2793@work-vm>
 References: <cover.1600205384.git.thomas.lendacky@amd.com>
- <9d964b7575471f45c522eea9ea3a7d84ed4d7d2b.1600205384.git.thomas.lendacky@amd.com>
+ <058dcb33a9cc223e3180133d29e7a92bfdc40938.1600205384.git.thomas.lendacky@amd.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <9d964b7575471f45c522eea9ea3a7d84ed4d7d2b.1600205384.git.thomas.lendacky@amd.com>
+In-Reply-To: <058dcb33a9cc223e3180133d29e7a92bfdc40938.1600205384.git.thomas.lendacky@amd.com>
 User-Agent: Mutt/1.14.6 (2020-07-11)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
@@ -63,298 +64,121 @@ X-Mailing-List: kvm@vger.kernel.org
 * Tom Lendacky (thomas.lendacky@amd.com) wrote:
 > From: Tom Lendacky <thomas.lendacky@amd.com>
 > 
-> When SEV-ES is enabled, it is not possible modify the guests register
-> state after it has been initially created, encrypted and measured.
-> 
-> Normally, an INIT-SIPI-SIPI request is used to boot the AP. However, the
-> hypervisor cannot emulate this because it cannot update the AP register
-> state. For the very first boot by an AP, the reset vector CS segment
-> value and the EIP value must be programmed before the register has been
-> encrypted and measured.
+> An SEV-ES guest does not allow register state to be altered once it has
+> been measured. When a SEV-ES guest issues a reboot command, Qemu will
+> reset the vCPU state and resume the guest. This will cause failures under
+> SEV-ES, so prevent that from occurring.
 > 
 > Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
 > ---
->  accel/kvm/kvm-all.c    | 64 ++++++++++++++++++++++++++++++++++++++++++
->  accel/stubs/kvm-stub.c |  5 ++++
->  hw/i386/pc_sysfw.c     | 10 ++++++-
->  include/sysemu/kvm.h   | 16 +++++++++++
->  include/sysemu/sev.h   |  3 ++
->  target/i386/kvm.c      |  2 ++
->  target/i386/sev.c      | 51 +++++++++++++++++++++++++++++++++
->  7 files changed, 150 insertions(+), 1 deletion(-)
+>  accel/kvm/kvm-all.c       | 9 +++++++++
+>  include/sysemu/cpus.h     | 2 ++
+>  include/sysemu/hw_accel.h | 5 +++++
+>  include/sysemu/kvm.h      | 2 ++
+>  softmmu/cpus.c            | 5 +++++
+>  softmmu/vl.c              | 5 ++++-
+>  6 files changed, 27 insertions(+), 1 deletion(-)
 > 
 > diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
-> index 63ef6af9a1..20725b0368 100644
+> index 20725b0368..63153b6e53 100644
 > --- a/accel/kvm/kvm-all.c
 > +++ b/accel/kvm/kvm-all.c
-> @@ -39,6 +39,7 @@
->  #include "qemu/main-loop.h"
->  #include "trace.h"
->  #include "hw/irq.h"
-> +#include "sysemu/kvm.h"
->  #include "sysemu/sev.h"
->  #include "qapi/visitor.h"
->  #include "qapi/qapi-types-common.h"
-> @@ -120,6 +121,12 @@ struct KVMState
->      /* memory encryption */
->      void *memcrypt_handle;
->      int (*memcrypt_encrypt_data)(void *handle, uint8_t *ptr, uint64_t len);
-> +    int (*memcrypt_save_reset_vector)(void *handle, void *flash_ptr,
-> +                                      uint64_t flash_size, uint32_t *addr);
-> +
-> +    unsigned int reset_cs;
-> +    unsigned int reset_ip;
-
-uint32_t's ?
-
-> +    bool reset_valid;
->  
->      /* For "info mtree -f" to tell if an MR is registered in KVM */
->      int nr_as;
-> @@ -239,6 +246,62 @@ int kvm_memcrypt_encrypt_data(uint8_t *ptr, uint64_t len)
->      return 1;
+> @@ -2388,6 +2388,15 @@ void kvm_flush_coalesced_mmio_buffer(void)
+>      s->coalesced_flush_in_progress = false;
 >  }
 >  
-> +void kvm_memcrypt_set_reset_vector(CPUState *cpu)
+> +bool kvm_cpu_check_resettable(void)
 > +{
-> +    X86CPU *x86;
-> +    CPUX86State *env;
-> +
-> +    /* Only update if we have valid reset information */
-> +    if (!kvm_state->reset_valid) {
-> +        return;
-> +    }
-> +
-> +    /* Do not update the BSP reset state */
-> +    if (cpu->cpu_index == 0) {
-> +        return;
-> +    }
-> +
-> +    x86 = X86_CPU(cpu);
-> +    env = &x86->env;
-> +
-> +    cpu_x86_load_seg_cache(env, R_CS, 0xf000, kvm_state->reset_cs, 0xffff,
-> +                           DESC_P_MASK | DESC_S_MASK | DESC_CS_MASK |
-> +                           DESC_R_MASK | DESC_A_MASK);
-> +
-> +    env->eip = kvm_state->reset_ip;
-> +}
-> +
-> +int kvm_memcrypt_save_reset_vector(void *flash_ptr, uint64_t flash_size)
-> +{
-> +    CPUState *cpu;
-> +    uint32_t addr;
-> +    int ret;
-> +
-> +    if (kvm_memcrypt_enabled() &&
-> +        kvm_state->memcrypt_save_reset_vector) {
-> +
-> +        addr = 0;
-> +        ret = kvm_state->memcrypt_save_reset_vector(kvm_state->memcrypt_handle,
-> +                                                    flash_ptr, flash_size,
-> +                                                    &addr);
-> +        if (ret) {
-> +            return ret;
-> +        }
-> +
-> +        if (addr) {
-> +            kvm_state->reset_cs = addr & 0xffff0000;
-> +            kvm_state->reset_ip = addr & 0x0000ffff;
-> +            kvm_state->reset_valid = true;
-> +
-> +            CPU_FOREACH(cpu) {
-> +                kvm_memcrypt_set_reset_vector(cpu);
-> +            }
-> +        }
-> +    }
-> +
-> +    return 0;
-> +}
-> +
->  /* Called with KVMMemoryListener.slots_lock held */
->  static KVMSlot *kvm_get_free_slot(KVMMemoryListener *kml)
->  {
-> @@ -2193,6 +2256,7 @@ static int kvm_init(MachineState *ms)
->          }
->  
->          kvm_state->memcrypt_encrypt_data = sev_encrypt_data;
-> +        kvm_state->memcrypt_save_reset_vector = sev_es_save_reset_vector;
->      }
->  
->      ret = kvm_arch_init(ms, s);
-> diff --git a/accel/stubs/kvm-stub.c b/accel/stubs/kvm-stub.c
-> index 82f118d2df..3aece9b513 100644
-> --- a/accel/stubs/kvm-stub.c
-> +++ b/accel/stubs/kvm-stub.c
-> @@ -114,6 +114,11 @@ int kvm_memcrypt_encrypt_data(uint8_t *ptr, uint64_t len)
->    return 1;
->  }
->  
-> +int kvm_memcrypt_save_reset_vector(void *flash_ptr, uint64_t flash_size)
-> +{
-> +    return -ENOSYS;
-> +}
-> +
->  #ifndef CONFIG_USER_ONLY
->  int kvm_irqchip_add_msi_route(KVMState *s, int vector, PCIDevice *dev)
->  {
-> diff --git a/hw/i386/pc_sysfw.c b/hw/i386/pc_sysfw.c
-> index b6c0822fe3..321ff94261 100644
-> --- a/hw/i386/pc_sysfw.c
-> +++ b/hw/i386/pc_sysfw.c
-> @@ -156,7 +156,8 @@ static void pc_system_flash_map(PCMachineState *pcms,
->      PFlashCFI01 *system_flash;
->      MemoryRegion *flash_mem;
->      void *flash_ptr;
-> -    int ret, flash_size;
-> +    uint64_t flash_size;
-> +    int ret;
->  
->      assert(PC_MACHINE_GET_CLASS(pcms)->pci_enabled);
->  
-> @@ -204,6 +205,13 @@ static void pc_system_flash_map(PCMachineState *pcms,
->              if (kvm_memcrypt_enabled()) {
->                  flash_ptr = memory_region_get_ram_ptr(flash_mem);
->                  flash_size = memory_region_size(flash_mem);
-> +
-> +                ret = kvm_memcrypt_save_reset_vector(flash_ptr, flash_size);
-> +                if (ret) {
-> +                    error_report("failed to locate and/or save reset vector");
-> +                    exit(1);
-> +                }
-> +
->                  ret = kvm_memcrypt_encrypt_data(flash_ptr, flash_size);
->                  if (ret) {
->                      error_report("failed to encrypt pflash rom");
-> diff --git a/include/sysemu/kvm.h b/include/sysemu/kvm.h
-> index b4174d941c..f74cfa85ab 100644
-> --- a/include/sysemu/kvm.h
-> +++ b/include/sysemu/kvm.h
-> @@ -247,6 +247,22 @@ bool kvm_memcrypt_enabled(void);
->   */
->  int kvm_memcrypt_encrypt_data(uint8_t *ptr, uint64_t len);
->  
-> +/**
-> + * kvm_memcrypt_set_reset_vector - sets the CS/IP value for the AP if SEV-ES
-> + *                                 is active.
-> + */
-> +void kvm_memcrypt_set_reset_vector(CPUState *cpu);
-> +
-> +/**
-> + * kvm_memcrypt_save_reset_vector - locates and saves the reset vector to be
-> + *                                  used as the initial CS/IP value for APs
-> + *                                  if SEV-ES is active.
-> + *
-> + * Return: 1 SEV-ES is active and failed to locate a valid reset vector
-> + *         0 SEV-ES is not active or successfully located and saved the
-> + *           reset vector address
-> + */
-> +int kvm_memcrypt_save_reset_vector(void *flash_prt, uint64_t flash_size);
->  
->  #ifdef NEED_CPU_H
->  #include "cpu.h"
-> diff --git a/include/sysemu/sev.h b/include/sysemu/sev.h
-> index 98c1ec8d38..5198e5a621 100644
-> --- a/include/sysemu/sev.h
-> +++ b/include/sysemu/sev.h
-> @@ -18,4 +18,7 @@
->  
->  void *sev_guest_init(const char *id);
->  int sev_encrypt_data(void *handle, uint8_t *ptr, uint64_t len);
-> +int sev_es_save_reset_vector(void *handle, void *flash_ptr,
-> +                             uint64_t flash_size, uint32_t *addr);
-> +
->  #endif
-> diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-> index 6f18d940a5..10eaba8943 100644
-> --- a/target/i386/kvm.c
-> +++ b/target/i386/kvm.c
-> @@ -1912,6 +1912,8 @@ void kvm_arch_reset_vcpu(X86CPU *cpu)
->      }
->      /* enabled by default */
->      env->poll_control_msr = 1;
-> +
-> +    kvm_memcrypt_set_reset_vector(CPU(cpu));
->  }
->  
->  void kvm_arch_do_init_vcpu(X86CPU *cpu)
-> diff --git a/target/i386/sev.c b/target/i386/sev.c
-> index 5055b1fe00..6ddefc65fa 100644
-> --- a/target/i386/sev.c
-> +++ b/target/i386/sev.c
-> @@ -70,6 +70,19 @@ struct SevGuestState {
->  #define DEFAULT_GUEST_POLICY    0x1 /* disable debug */
->  #define DEFAULT_SEV_DEVICE      "/dev/sev"
->  
-> +/* SEV Information Block GUID = 00f771de-1a7e-4fcb-890e-68c77e2fb44e */
-> +#define SEV_INFO_BLOCK_GUID \
-> +    "\xde\x71\xf7\x00\x7e\x1a\xcb\x4f\x89\x0e\x68\xc7\x7e\x2f\xb4\x4e"
-> +
-> +typedef struct __attribute__((__packed__)) SevInfoBlock {
-> +    /* SEV-ES Reset Vector Address */
-> +    uint32_t reset_addr;
-> +
-> +    /* SEV Information Block size and GUID */
-> +    uint16_t size;
-> +    char guid[16];
-> +} SevInfoBlock;
-> +
-
-Is that all signed off and happy from the OVMF guys?
-
->  static SevGuestState *sev_guest;
->  static Error *sev_mig_blocker;
->  
-> @@ -833,6 +846,44 @@ sev_encrypt_data(void *handle, uint8_t *ptr, uint64_t len)
->      return 0;
->  }
->  
-> +int
-> +sev_es_save_reset_vector(void *handle, void *flash_ptr, uint64_t flash_size,
-> +                         uint32_t *addr)
-> +{
-> +    SevInfoBlock *info;
-> +
-> +    assert(handle);
-> +
 > +    /*
-> +     * Initialize the address to zero. An address of zero with a successful
-> +     * return code indicates that SEV-ES is not active.
+> +     * If we have a valid reset vector override, then SEV-ES is active
+> +     * and the CPU can't be reset.
 > +     */
-> +    *addr = 0;
-> +    if (!sev_es_enabled()) {
-> +        return 0;
-> +    }
-> +
-> +    /*
-> +     * Extract the AP reset vector for SEV-ES guests by locating the SEV GUID.
-> +     * The SEV GUID is located 32 bytes from the end of the flash. Use this
-> +     * address to base the SEV information block.
+> +    return !kvm_state->reset_valid;
 
-It surprises me a bit it's at a fixed offset.
+This seems a bit weird since it's in generic rather than x86 specific
+code.
 
 Dave
 
-> +     */
-> +    info = flash_ptr + flash_size - 0x20 - sizeof(*info);
-> +    if (memcmp(info->guid, SEV_INFO_BLOCK_GUID, 16)) {
-> +        error_report("SEV information block not found in pflash rom");
-> +        return 1;
-> +    }
-> +
-> +    if (!info->reset_addr) {
-> +        error_report("SEV-ES reset address is zero");
-> +        return 1;
-> +    }
-> +
-> +    *addr = info->reset_addr;
-> +
-> +    return 0;
 > +}
 > +
->  static void
->  sev_register_types(void)
+>  static void do_kvm_cpu_synchronize_state(CPUState *cpu, run_on_cpu_data arg)
 >  {
+>      if (!cpu->vcpu_dirty) {
+> diff --git a/include/sysemu/cpus.h b/include/sysemu/cpus.h
+> index 3c1da6a018..6d688c757f 100644
+> --- a/include/sysemu/cpus.h
+> +++ b/include/sysemu/cpus.h
+> @@ -24,6 +24,8 @@ void dump_drift_info(void);
+>  void qemu_cpu_kick_self(void);
+>  void qemu_timer_notify_cb(void *opaque, QEMUClockType type);
+>  
+> +bool cpu_is_resettable(void);
+> +
+>  void cpu_synchronize_all_states(void);
+>  void cpu_synchronize_all_post_reset(void);
+>  void cpu_synchronize_all_post_init(void);
+> diff --git a/include/sysemu/hw_accel.h b/include/sysemu/hw_accel.h
+> index e128f8b06b..8b4536e7ae 100644
+> --- a/include/sysemu/hw_accel.h
+> +++ b/include/sysemu/hw_accel.h
+> @@ -17,6 +17,11 @@
+>  #include "sysemu/hvf.h"
+>  #include "sysemu/whpx.h"
+>  
+> +static inline bool cpu_check_resettable(void)
+> +{
+> +    return kvm_enabled() ? kvm_cpu_check_resettable() : true;
+> +}
+> +
+>  static inline void cpu_synchronize_state(CPUState *cpu)
+>  {
+>      if (kvm_enabled()) {
+> diff --git a/include/sysemu/kvm.h b/include/sysemu/kvm.h
+> index f74cfa85ab..eb94bbbff9 100644
+> --- a/include/sysemu/kvm.h
+> +++ b/include/sysemu/kvm.h
+> @@ -494,6 +494,8 @@ int kvm_physical_memory_addr_from_host(KVMState *s, void *ram_addr,
+>  
+>  #endif /* NEED_CPU_H */
+>  
+> +bool kvm_cpu_check_resettable(void);
+> +
+>  void kvm_cpu_synchronize_state(CPUState *cpu);
+>  void kvm_cpu_synchronize_post_reset(CPUState *cpu);
+>  void kvm_cpu_synchronize_post_init(CPUState *cpu);
+> diff --git a/softmmu/cpus.c b/softmmu/cpus.c
+> index a802e899ab..32f286643f 100644
+> --- a/softmmu/cpus.c
+> +++ b/softmmu/cpus.c
+> @@ -927,6 +927,11 @@ void hw_error(const char *fmt, ...)
+>      abort();
+>  }
+>  
+> +bool cpu_is_resettable(void)
+> +{
+> +    return cpu_check_resettable();
+> +}
+> +
+>  void cpu_synchronize_all_states(void)
+>  {
+>      CPUState *cpu;
+> diff --git a/softmmu/vl.c b/softmmu/vl.c
+> index 4eb9d1f7fd..422fbb1650 100644
+> --- a/softmmu/vl.c
+> +++ b/softmmu/vl.c
+> @@ -1475,7 +1475,10 @@ void qemu_system_guest_crashloaded(GuestPanicInformation *info)
+>  
+>  void qemu_system_reset_request(ShutdownCause reason)
+>  {
+> -    if (no_reboot && reason != SHUTDOWN_CAUSE_SUBSYSTEM_RESET) {
+> +    if (!cpu_is_resettable()) {
+> +        error_report("cpus are not resettable, terminating");
+> +        shutdown_requested = reason;
+> +    } else if (no_reboot && reason != SHUTDOWN_CAUSE_SUBSYSTEM_RESET) {
+>          shutdown_requested = reason;
+>      } else {
+>          reset_requested = reason;
 > -- 
 > 2.28.0
 > 
