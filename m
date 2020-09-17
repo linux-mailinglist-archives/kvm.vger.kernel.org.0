@@ -2,98 +2,143 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9653A26D90A
-	for <lists+kvm@lfdr.de>; Thu, 17 Sep 2020 12:29:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8E5DC26D9A9
+	for <lists+kvm@lfdr.de>; Thu, 17 Sep 2020 12:55:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726575AbgIQK3Z (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 17 Sep 2020 06:29:25 -0400
-Received: from mga11.intel.com ([192.55.52.93]:34842 "EHLO mga11.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726217AbgIQK3X (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 17 Sep 2020 06:29:23 -0400
-IronPort-SDR: twmeOVqVFj0DbK2abVT28l8nuFRs5C9HbH3POwljOciphuQJ0jy0yDByE3u2GMZXBAbEDazwXW
- CNsMP2bHo0PA==
-X-IronPort-AV: E=McAfee;i="6000,8403,9746"; a="157072154"
-X-IronPort-AV: E=Sophos;i="5.76,436,1592895600"; 
-   d="scan'208";a="157072154"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Sep 2020 03:29:19 -0700
-IronPort-SDR: Sae5zd9KD3dEUlzr7XHC+ou/WiCIYT/fy4ar77tPms92ndus9S0NHGRtSrZfHv78NzTX/r3Vyg
- wBd0kK2KM1Mg==
-X-IronPort-AV: E=Sophos;i="5.76,436,1592895600"; 
-   d="scan'208";a="483691895"
-Received: from gliakhov-mobl2.ger.corp.intel.com (HELO ubuntu) ([10.249.45.143])
-  by orsmga005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Sep 2020 03:29:15 -0700
-Date:   Thu, 17 Sep 2020 12:29:12 +0200
-From:   Guennadi Liakhovetski <guennadi.liakhovetski@linux.intel.com>
-To:     Vincent Whitchurch <vincent.whitchurch@axis.com>
-Cc:     Arnaud POULIQUEN <arnaud.pouliquen@st.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-remoteproc@vger.kernel.org" <linux-remoteproc@vger.kernel.org>,
-        "virtualization@lists.linux-foundation.org" 
-        <virtualization@lists.linux-foundation.org>,
-        "sound-open-firmware@alsa-project.org" 
-        <sound-open-firmware@alsa-project.org>,
-        Pierre-Louis Bossart <pierre-louis.bossart@linux.intel.com>,
-        Liam Girdwood <liam.r.girdwood@linux.intel.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Ohad Ben-Cohen <ohad@wizery.com>,
-        Bjorn Andersson <bjorn.andersson@linaro.org>,
-        Mathieu Poirier <mathieu.poirier@linaro.org>, kishon@ti.com
-Subject: Re: [PATCH v6 0/4] Add a vhost RPMsg API
-Message-ID: <20200917102911.GB11491@ubuntu>
-References: <20200901151153.28111-1-guennadi.liakhovetski@linux.intel.com>
- <9433695b-5757-db73-bd8a-538fd1375e2a@st.com>
- <20200917054705.GA11491@ubuntu>
- <20200917083644.66yjer4zvoiftrk3@axis.com>
+        id S1726734AbgIQKyR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 17 Sep 2020 06:54:17 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:27917 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726744AbgIQKyC (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 17 Sep 2020 06:54:02 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1600340033;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=S8C7t3NQHq9z3BC6UetbrQdCqNK9g2Cj1ZoGxibjTb0=;
+        b=MGufK8BbyTgAi4fdThDoSYNCmAfPV3bILAiknaux4saEwhERDubYiUWGm7DToorxI0vun2
+        tdyGW3+zfu2ucvRNh9FsXvwhMk0g+q8+fIkqgDwSzEcKCCjh01rHgLcjiPua89c56cSfOR
+        M2xXrvbF2B+IcPodPVpe7kgDwsrSsEo=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-589-iHKfzHgYMma8RN14nP1alA-1; Thu, 17 Sep 2020 06:53:50 -0400
+X-MC-Unique: iHKfzHgYMma8RN14nP1alA-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BFC4518BE168;
+        Thu, 17 Sep 2020 10:53:48 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (unknown [10.40.192.179])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id DBD5F1002D62;
+        Thu, 17 Sep 2020 10:53:45 +0000 (UTC)
+Date:   Thu, 17 Sep 2020 12:53:43 +0200
+From:   Andrew Jones <drjones@redhat.com>
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     Alexandru Elisei <alexandru.elisei@arm.com>,
+        Ying Fang <fangying1@huawei.com>, kvm@vger.kernel.org,
+        kvmarm@lists.cs.columbia.edu, james.morse@arm.com,
+        julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com,
+        zhang.zhanghailiang@huawei.com, alex.chen@huawei.com
+Subject: Re: [PATCH 2/2] kvm/arm: Add mp_affinity for arm vcpu
+Message-ID: <20200917105343.de6z7ajccnx3zrld@kamzik.brq.redhat.com>
+References: <20200917023033.1337-1-fangying1@huawei.com>
+ <20200917023033.1337-3-fangying1@huawei.com>
+ <7a924b0fb27505a0d8b00389fe2f02df@kernel.org>
+ <20200917080429.jimidzdtdskwhbdx@kamzik.brq.redhat.com>
+ <198c63d5e9e17ddb4c3848845891301c@kernel.org>
+ <12a47a99-9857-b86d-6c45-39fdee08613e@arm.com>
+ <b88c7988a00c25a9ae0fdd373ba45227@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <20200917083644.66yjer4zvoiftrk3@axis.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <b88c7988a00c25a9ae0fdd373ba45227@kernel.org>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Vincent,
-
-On Thu, Sep 17, 2020 at 10:36:44AM +0200, Vincent Whitchurch wrote:
-> On Thu, Sep 17, 2020 at 07:47:06AM +0200, Guennadi Liakhovetski wrote:
-> > On Tue, Sep 15, 2020 at 02:13:23PM +0200, Arnaud POULIQUEN wrote:
-> > > So i would be agree with Vincent[2] which proposed to switch on a RPMsg API
-> > > and creating a vhost rpmsg device. This is also proposed in the 
-> > > "Enhance VHOST to enable SoC-to-SoC communication" RFC[3].
-> > > Do you think that this alternative could match with your need?
+On Thu, Sep 17, 2020 at 11:01:39AM +0100, Marc Zyngier wrote:
+> On 2020-09-17 10:47, Alexandru Elisei wrote:
+> > Hi,
 > > 
-> > As I replied to Vincent, I understand his proposal and the approach taken 
-> > in the series [3], but I'm not sure I agree, that adding yet another 
-> > virtual device / driver layer on the vhost side is a good idea. As far as 
-> > I understand adding new completely virtual devices isn't considered to be 
-> > a good practice in the kernel. Currently vhost is just a passive "library" 
-> > and my vhost-rpmsg support keeps it that way. Not sure I'm in favour of 
-> > converting vhost to a virtual device infrastructure.
+> > On 9/17/20 9:42 AM, Marc Zyngier wrote:
+> > > On 2020-09-17 09:04, Andrew Jones wrote:
+> > > > On Thu, Sep 17, 2020 at 08:47:42AM +0100, Marc Zyngier wrote:
+> > > > > On 2020-09-17 03:30, Ying Fang wrote:
+> > > > > > Allow userspace to set MPIDR using vcpu ioctl KVM_ARM_SET_MP_AFFINITY,
+> > > > > > so that we can support cpu topology for arm.
+> > > > > 
+> > > > > MPIDR has *nothing* to do with CPU topology in the ARM architecture.
+> > > > > I encourage you to have a look at the ARM ARM and find out how often
+> > > > > the word "topology" is used in conjunction with the
+> > > > > MPIDR_EL1 register.
+> > > > > 
+> > > > 
+> > > > Hi Marc,
+> > > > 
+> > > > I mostly agree. However, the CPU topology descriptions use MPIDR to
+> > > > identify PEs. If userspace wants to build topology descriptions then
+> > > > it either needs to
+> > > > 
+> > > > 1) build them after instantiating all KVM VCPUs in order to query KVM
+> > > >    for each MPIDR, or
+> > > > 2) have a way to ask KVM for an MPIDR of given VCPU ID in advance
+> > > >    (maybe just a scratch VCPU), or
+> > > > 3) have control over the MPIDRs so it can choose them when it likes,
+> > > >    use them for topology descriptions, and then instantiate KVM VCPUs
+> > > >    with them.
+> > > > 
+> > > > I think (3) is the most robust approach, and it has the least
+> > > > overhead.
+> > > 
+> > > I don't disagree with the goal, and not even with the choice of
+> > > implementation (though I have huge reservations about its quality).
+> > > 
+> > > But the key word here is *userspace*. Only userspace has a notion of
+> > > how MPIDR values map to the assumed topology. That's not something
+> > > that KVM does nor should interpret (aside from the GIC-induced Aff0
+> > > brain-damage). So talking of "topology" in a KVM kernel patch sends
+> > > the wrong message, and that's all this remark was about.
+> > 
+> > There's also a patch queued for next which removes using MPIDR as a
+> > source of
+> > information about CPU topology [1]: "arm64: topology: Stop using MPIDR
+> > for
+> > topology information".
+> > 
+> > I'm not really sure how useful KVM fiddling with the guest MPIDR will be
+> > going
+> > forward, at least for a Linux guest.
 > 
-> I know it wasn't what you meant, but I noticed that the above paragraph
-> could be read as if my suggestion was to convert vhost to a virtual
-> device infrastructure, so I just want to clarify that that those are not
-> related.  The only similarity between what I suggested in the thread in
-> [2] and Kishon's RFC in [3] is that both involve creating a generic
-> vhost-rpmsg driver which would allow the RPMsg API to be used for both
-> sides of the link, instead of introducing a new API just for the server
-> side.  That can be done without rewriting drivers/vhost/.
+> I think these are two orthogonal things. There is value in setting MPIDR
+> to something different as a way to replicate an existing system, for
+> example. But deriving *any* sort of topology information from MPIDR isn't
+> reliable at all, and is better expressed by firmware tables (and even
+> that isn't great).
+> 
 
-Thanks for the clarification. Another flexibility, that I'm trying to preserve 
-with my approach is keeping direct access to iovec style data buffers for 
-cases where that's the structure, that's already used by the respective 
-driver on the host side. Since we already do packing and unpacking on the 
-guest / client side, we don't need the same on the host / server side again.
+Yes, this is my opinion as well and I'm glad to see the patch that
+Alexandru pointed out, since it should stop the MPIDR abuse. Ying Fang
+has also posted a QEMU series that populates DT and ACPI[*] to describe
+CPU topology to the guest. The user controlled MPIDR is being proposed
+in order to support that series.
 
-Thanks
-Guennadi
+[*] https://lists.gnu.org/archive/html/qemu-devel/2020-09/msg06027.html
 
-> > > [1]. https://patchwork.kernel.org/project/linux-remoteproc/list/?series=338335 
-> > > [2]. https://www.spinics.net/lists/linux-virtualization/msg44195.html
-> > > [3]. https://www.spinics.net/lists/linux-remoteproc/msg06634.html  
+Thanks,
+drew
+
+> As far as I am concerned, this patch fits in the "cosmetic" department.
+> It's a "nice to have", but doesn't really solve much. Firmware tables
+> and userspace placement of the vcpus are key.
+> 
+> Thanks,
+> 
+>         M.
+> -- 
+> Jazz is not dead. It just smells funny...
+> 
+
