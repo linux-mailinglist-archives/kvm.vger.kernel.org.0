@@ -2,97 +2,130 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A77EC26D6EC
-	for <lists+kvm@lfdr.de>; Thu, 17 Sep 2020 10:42:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 173FD26D737
+	for <lists+kvm@lfdr.de>; Thu, 17 Sep 2020 10:58:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726298AbgIQImM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 17 Sep 2020 04:42:12 -0400
-Received: from mail.kernel.org ([198.145.29.99]:38808 "EHLO mail.kernel.org"
+        id S1726336AbgIQI4D (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 17 Sep 2020 04:56:03 -0400
+Received: from smtp1.axis.com ([195.60.68.17]:59502 "EHLO smtp1.axis.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726180AbgIQImK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 17 Sep 2020 04:42:10 -0400
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id A4D6320715;
-        Thu, 17 Sep 2020 08:42:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1600332129;
-        bh=xvHmsYi72FfQp7h4dhc9TKL7dDuyhWbbpk0n+L/TqQc=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=mLQJkE7xWGtUGz4ww6BG2HNdY4SI+IylX+3ptQv2/i7icnEc9M3zuBRYI5LOZq/kx
-         We/prQOF/s/elpkwpLclDNJtMMyRPPESBbcJlPRDmcHWbgfhzNXLjfOwYY3IxUf4HR
-         lqcRQhnXUugIeGF8S7s1sr8nUra1X0yBRLipg2VQ=
-Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
-        by disco-boy.misterjones.org with esmtpsa (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
-        (Exim 4.92)
-        (envelope-from <maz@kernel.org>)
-        id 1kIpUV-00Ca1G-9P; Thu, 17 Sep 2020 09:42:07 +0100
+        id S1726153AbgIQI4C (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 17 Sep 2020 04:56:02 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=axis.com; l=2275; q=dns/txt; s=axis-central1;
+  t=1600332961; x=1631868961;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=7NfOGX/GL1UDMwdZ9k07i7ou/GGUBIMx7JAJVjygZ7I=;
+  b=Xb6szjsK8rHIGlEDX/QQulgoUe29IAnOl89ryhoxvWXgQesMajCev6Qy
+   bxfSAfWw7xNGORVfNUXJYflrqtRaSeh+xjPaU95t4De8kw0oZsDPAu/+B
+   e5Nzr0ryWyupZMxsIeCKA0eCMTgfx8HAHZrZJzs8aGM9hKfh0me10sJl4
+   EReO6dxc3j/JjkBS8uBr82fpZN/3UUs899R/NeCMK3+vHNQqQctdROoqE
+   JLYessc8f/ekhu7qLZ9I/6A4+vpLnpjHJBAtKs1sYJxd+WxjDXs0+nNzB
+   b25HrTwvqnaRUPcgNnggnP5LfwVohKyxvmWzexS4RW6E6P6nxZ4HmiMbq
+   w==;
+IronPort-SDR: 6MqQxFg+KYlYJphHffimUhmitKEWQPSswtENyoQ91Ovj6pMX7T6qnNokxLq4K1YYqIKW+8XOXr
+ 8QxFFxVrBt4TANYJEnUU/zc/mxdRg7mGqCOauW90Ho32mryhm8H3Sw595FtOFZ6oJaimDN+N8J
+ /MMYYZq38yqB6MUsXNxl3vZ0hOpba2p7rXyfh8R3zXjBcn8VmYaWDrPOptWGXktOddOp6rPiKd
+ y1daRMgtUItqjCYrg2WJQQYJ0Fya8TEg1mGxkPnANvFXWBSKn3ItgMDLGHghqOeRJc0uwK3AgP
+ Yq0=
+X-IronPort-AV: E=Sophos;i="5.76,436,1592863200"; 
+   d="scan'208";a="13045882"
+Date:   Thu, 17 Sep 2020 10:55:59 +0200
+From:   Vincent Whitchurch <vincent.whitchurch@axis.com>
+To:     Guennadi Liakhovetski <guennadi.liakhovetski@linux.intel.com>
+CC:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-remoteproc@vger.kernel.org" <linux-remoteproc@vger.kernel.org>,
+        "virtualization@lists.linux-foundation.org" 
+        <virtualization@lists.linux-foundation.org>,
+        "sound-open-firmware@alsa-project.org" 
+        <sound-open-firmware@alsa-project.org>,
+        Pierre-Louis Bossart <pierre-louis.bossart@linux.intel.com>,
+        Liam Girdwood <liam.r.girdwood@linux.intel.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Ohad Ben-Cohen <ohad@wizery.com>,
+        Bjorn Andersson <bjorn.andersson@linaro.org>,
+        Mathieu Poirier <mathieu.poirier@linaro.org>
+Subject: Re: [PATCH v7 3/3] vhost: add an RPMsg API
+Message-ID: <20200917085559.kxxjrortmhbwpd22@axis.com>
+References: <20200910111351.20526-1-guennadi.liakhovetski@linux.intel.com>
+ <20200910111351.20526-4-guennadi.liakhovetski@linux.intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-Date:   Thu, 17 Sep 2020 09:42:07 +0100
-From:   Marc Zyngier <maz@kernel.org>
-To:     Andrew Jones <drjones@redhat.com>
-Cc:     Ying Fang <fangying1@huawei.com>, kvm@vger.kernel.org,
-        kvmarm@lists.cs.columbia.edu, james.morse@arm.com,
-        julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com,
-        zhang.zhanghailiang@huawei.com, alex.chen@huawei.com
-Subject: Re: [PATCH 2/2] kvm/arm: Add mp_affinity for arm vcpu
-In-Reply-To: <20200917080429.jimidzdtdskwhbdx@kamzik.brq.redhat.com>
-References: <20200917023033.1337-1-fangying1@huawei.com>
- <20200917023033.1337-3-fangying1@huawei.com>
- <7a924b0fb27505a0d8b00389fe2f02df@kernel.org>
- <20200917080429.jimidzdtdskwhbdx@kamzik.brq.redhat.com>
-User-Agent: Roundcube Webmail/1.4.8
-Message-ID: <198c63d5e9e17ddb4c3848845891301c@kernel.org>
-X-Sender: maz@kernel.org
-X-SA-Exim-Connect-IP: 51.254.78.96
-X-SA-Exim-Rcpt-To: drjones@redhat.com, fangying1@huawei.com, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, zhang.zhanghailiang@huawei.com, alex.chen@huawei.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20200910111351.20526-4-guennadi.liakhovetski@linux.intel.com>
+User-Agent: NeoMutt/20170113 (1.7.2)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2020-09-17 09:04, Andrew Jones wrote:
-> On Thu, Sep 17, 2020 at 08:47:42AM +0100, Marc Zyngier wrote:
->> On 2020-09-17 03:30, Ying Fang wrote:
->> > Allow userspace to set MPIDR using vcpu ioctl KVM_ARM_SET_MP_AFFINITY,
->> > so that we can support cpu topology for arm.
->> 
->> MPIDR has *nothing* to do with CPU topology in the ARM architecture.
->> I encourage you to have a look at the ARM ARM and find out how often
->> the word "topology" is used in conjunction with the MPIDR_EL1 
->> register.
->> 
-> 
-> Hi Marc,
-> 
-> I mostly agree. However, the CPU topology descriptions use MPIDR to
-> identify PEs. If userspace wants to build topology descriptions then
-> it either needs to
-> 
-> 1) build them after instantiating all KVM VCPUs in order to query KVM
->    for each MPIDR, or
-> 2) have a way to ask KVM for an MPIDR of given VCPU ID in advance
->    (maybe just a scratch VCPU), or
-> 3) have control over the MPIDRs so it can choose them when it likes,
->    use them for topology descriptions, and then instantiate KVM VCPUs
->    with them.
-> 
-> I think (3) is the most robust approach, and it has the least overhead.
+On Thu, Sep 10, 2020 at 01:13:51PM +0200, Guennadi Liakhovetski wrote:
+> +int vhost_rpmsg_start_lock(struct vhost_rpmsg *vr, struct vhost_rpmsg_iter *iter,
+> +			   unsigned int qid, ssize_t len)
+> +	__acquires(vq->mutex)
+> +{
+> +	struct vhost_virtqueue *vq = vr->vq + qid;
+> +	unsigned int cnt;
+> +	ssize_t ret;
+> +	size_t tmp;
+> +
+> +	if (qid >= VIRTIO_RPMSG_NUM_OF_VQS)
+> +		return -EINVAL;
+> +
+> +	iter->vq = vq;
+> +
+> +	mutex_lock(&vq->mutex);
+> +	vhost_disable_notify(&vr->dev, vq);
+> +
+> +	iter->head = vhost_rpmsg_get_msg(vq, &cnt);
+> +	if (iter->head == vq->num)
+> +		iter->head = -EAGAIN;
+> +
+> +	if (iter->head < 0) {
+> +		ret = iter->head;
+> +		goto unlock;
+> +	}
+> +
+[...]
+> +
+> +return_buf:
+> +	vhost_add_used(vq, iter->head, 0);
+> +unlock:
+> +	vhost_enable_notify(&vr->dev, vq);
+> +	mutex_unlock(&vq->mutex);
+> +
+> +	return ret;
+> +}
 
-I don't disagree with the goal, and not even with the choice of
-implementation (though I have huge reservations about its quality).
+There is a race condition here.  New buffers could have been added while
+notifications were disabled (between vhost_disable_notify() and
+vhost_enable_notify()), so the other vhost drivers check the return
+value of vhost_enable_notify() and rerun their work loops if it returns
+true.  This driver doesn't do that so it stops processing requests if
+that condition hits.
 
-But the key word here is *userspace*. Only userspace has a notion of
-how MPIDR values map to the assumed topology. That's not something
-that KVM does nor should interpret (aside from the GIC-induced Aff0
-brain-damage). So talking of "topology" in a KVM kernel patch sends
-the wrong message, and that's all this remark was about.
+Something like the below seems to fix it but the correct fix could maybe
+involve changing this API to account for this case so that it looks more
+like the code in other vhost drivers.
 
-         M.
--- 
-Jazz is not dead. It just smells funny...
+diff --git a/drivers/vhost/rpmsg.c b/drivers/vhost/rpmsg.c
+index 7c753258d42..673dd4ec865 100644
+--- a/drivers/vhost/rpmsg.c
++++ b/drivers/vhost/rpmsg.c
+@@ -302,8 +302,14 @@ static void handle_rpmsg_req_kick(struct vhost_work *work)
+ 	struct vhost_virtqueue *vq = container_of(work, struct vhost_virtqueue,
+ 						  poll.work);
+ 	struct vhost_rpmsg *vr = container_of(vq->dev, struct vhost_rpmsg, dev);
++	struct vhost_virtqueue *reqvq = vr->vq + VIRTIO_RPMSG_REQUEST;
+ 
+-	while (handle_rpmsg_req_single(vr, vq))
++	/*
++	 * The !vhost_vq_avail_empty() check is needed since the vhost_rpmsg*
++	 * APIs don't check the return value of vhost_enable_notify() and retry
++	 * if there were buffers added while notifications were disabled.
++	 */
++	while (handle_rpmsg_req_single(vr, vq) || !vhost_vq_avail_empty(reqvq->dev, reqvq))
+ 		;
+ }
+ 
