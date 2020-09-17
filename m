@@ -2,143 +2,126 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8E5DC26D9A9
-	for <lists+kvm@lfdr.de>; Thu, 17 Sep 2020 12:55:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BB8AE26D9DC
+	for <lists+kvm@lfdr.de>; Thu, 17 Sep 2020 13:08:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726734AbgIQKyR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 17 Sep 2020 06:54:17 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:27917 "EHLO
+        id S1726651AbgIQLIR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 17 Sep 2020 07:08:17 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:59548 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726744AbgIQKyC (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 17 Sep 2020 06:54:02 -0400
+        by vger.kernel.org with ESMTP id S1726625AbgIQLHm (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 17 Sep 2020 07:07:42 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1600340033;
+        s=mimecast20190719; t=1600340852;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=S8C7t3NQHq9z3BC6UetbrQdCqNK9g2Cj1ZoGxibjTb0=;
-        b=MGufK8BbyTgAi4fdThDoSYNCmAfPV3bILAiknaux4saEwhERDubYiUWGm7DToorxI0vun2
-        tdyGW3+zfu2ucvRNh9FsXvwhMk0g+q8+fIkqgDwSzEcKCCjh01rHgLcjiPua89c56cSfOR
-        M2xXrvbF2B+IcPodPVpe7kgDwsrSsEo=
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=kkPhCJgbEfe1snOxUIcIHLF53bSNUGZMiNRLxPCaeLg=;
+        b=PiX70Qz38E5lMeqsonbSOM89n+elwJrw0mTqfEHErTTTFkp98SQVFqk2qjsdbClUJ++xav
+        xCoMmT2uh+38EyFG/AbbhhaRx7iqsARdg0NHSI4M7jwldwcg8QAahu1rHKFZtFcp6clHBP
+        1U+IyH1vTtefWj+6KefqZe9jbqqblsM=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-589-iHKfzHgYMma8RN14nP1alA-1; Thu, 17 Sep 2020 06:53:50 -0400
-X-MC-Unique: iHKfzHgYMma8RN14nP1alA-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+ us-mta-410-32wzq0FnPZG_xa7NCuQrnA-1; Thu, 17 Sep 2020 07:07:31 -0400
+X-MC-Unique: 32wzq0FnPZG_xa7NCuQrnA-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BFC4518BE168;
-        Thu, 17 Sep 2020 10:53:48 +0000 (UTC)
-Received: from kamzik.brq.redhat.com (unknown [10.40.192.179])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id DBD5F1002D62;
-        Thu, 17 Sep 2020 10:53:45 +0000 (UTC)
-Date:   Thu, 17 Sep 2020 12:53:43 +0200
-From:   Andrew Jones <drjones@redhat.com>
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     Alexandru Elisei <alexandru.elisei@arm.com>,
-        Ying Fang <fangying1@huawei.com>, kvm@vger.kernel.org,
-        kvmarm@lists.cs.columbia.edu, james.morse@arm.com,
-        julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com,
-        zhang.zhanghailiang@huawei.com, alex.chen@huawei.com
-Subject: Re: [PATCH 2/2] kvm/arm: Add mp_affinity for arm vcpu
-Message-ID: <20200917105343.de6z7ajccnx3zrld@kamzik.brq.redhat.com>
-References: <20200917023033.1337-1-fangying1@huawei.com>
- <20200917023033.1337-3-fangying1@huawei.com>
- <7a924b0fb27505a0d8b00389fe2f02df@kernel.org>
- <20200917080429.jimidzdtdskwhbdx@kamzik.brq.redhat.com>
- <198c63d5e9e17ddb4c3848845891301c@kernel.org>
- <12a47a99-9857-b86d-6c45-39fdee08613e@arm.com>
- <b88c7988a00c25a9ae0fdd373ba45227@kernel.org>
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4A33180EF8A;
+        Thu, 17 Sep 2020 11:07:29 +0000 (UTC)
+Received: from localhost.localdomain (unknown [10.35.206.187])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 4FA0875142;
+        Thu, 17 Sep 2020 11:07:24 +0000 (UTC)
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     kvm@vger.kernel.org
+Cc:     linux-kernel@vger.kernel.org,
+        x86@kernel.org (maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)),
+        Jim Mattson <jmattson@google.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Borislav Petkov <bp@alien8.de>, Joerg Roedel <joro@8bytes.org>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Ingo Molnar <mingo@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Maxim Levitsky <mlevitsk@redhat.com>
+Subject: [PATCH 0/1] KVM: correctly restore the TSC value on nested migration
+Date:   Thu, 17 Sep 2020 14:07:22 +0300
+Message-Id: <20200917110723.820666-1-mlevitsk@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <b88c7988a00c25a9ae0fdd373ba45227@kernel.org>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Content-Transfer-Encoding: quoted-printable
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Sep 17, 2020 at 11:01:39AM +0100, Marc Zyngier wrote:
-> On 2020-09-17 10:47, Alexandru Elisei wrote:
-> > Hi,
-> > 
-> > On 9/17/20 9:42 AM, Marc Zyngier wrote:
-> > > On 2020-09-17 09:04, Andrew Jones wrote:
-> > > > On Thu, Sep 17, 2020 at 08:47:42AM +0100, Marc Zyngier wrote:
-> > > > > On 2020-09-17 03:30, Ying Fang wrote:
-> > > > > > Allow userspace to set MPIDR using vcpu ioctl KVM_ARM_SET_MP_AFFINITY,
-> > > > > > so that we can support cpu topology for arm.
-> > > > > 
-> > > > > MPIDR has *nothing* to do with CPU topology in the ARM architecture.
-> > > > > I encourage you to have a look at the ARM ARM and find out how often
-> > > > > the word "topology" is used in conjunction with the
-> > > > > MPIDR_EL1 register.
-> > > > > 
-> > > > 
-> > > > Hi Marc,
-> > > > 
-> > > > I mostly agree. However, the CPU topology descriptions use MPIDR to
-> > > > identify PEs. If userspace wants to build topology descriptions then
-> > > > it either needs to
-> > > > 
-> > > > 1) build them after instantiating all KVM VCPUs in order to query KVM
-> > > >    for each MPIDR, or
-> > > > 2) have a way to ask KVM for an MPIDR of given VCPU ID in advance
-> > > >    (maybe just a scratch VCPU), or
-> > > > 3) have control over the MPIDRs so it can choose them when it likes,
-> > > >    use them for topology descriptions, and then instantiate KVM VCPUs
-> > > >    with them.
-> > > > 
-> > > > I think (3) is the most robust approach, and it has the least
-> > > > overhead.
-> > > 
-> > > I don't disagree with the goal, and not even with the choice of
-> > > implementation (though I have huge reservations about its quality).
-> > > 
-> > > But the key word here is *userspace*. Only userspace has a notion of
-> > > how MPIDR values map to the assumed topology. That's not something
-> > > that KVM does nor should interpret (aside from the GIC-induced Aff0
-> > > brain-damage). So talking of "topology" in a KVM kernel patch sends
-> > > the wrong message, and that's all this remark was about.
-> > 
-> > There's also a patch queued for next which removes using MPIDR as a
-> > source of
-> > information about CPU topology [1]: "arm64: topology: Stop using MPIDR
-> > for
-> > topology information".
-> > 
-> > I'm not really sure how useful KVM fiddling with the guest MPIDR will be
-> > going
-> > forward, at least for a Linux guest.
-> 
-> I think these are two orthogonal things. There is value in setting MPIDR
-> to something different as a way to replicate an existing system, for
-> example. But deriving *any* sort of topology information from MPIDR isn't
-> reliable at all, and is better expressed by firmware tables (and even
-> that isn't great).
-> 
-
-Yes, this is my opinion as well and I'm glad to see the patch that
-Alexandru pointed out, since it should stop the MPIDR abuse. Ying Fang
-has also posted a QEMU series that populates DT and ACPI[*] to describe
-CPU topology to the guest. The user controlled MPIDR is being proposed
-in order to support that series.
-
-[*] https://lists.gnu.org/archive/html/qemu-devel/2020-09/msg06027.html
-
-Thanks,
-drew
-
-> As far as I am concerned, this patch fits in the "cosmetic" department.
-> It's a "nice to have", but doesn't really solve much. Firmware tables
-> and userspace placement of the vcpus are key.
-> 
-> Thanks,
-> 
->         M.
-> -- 
-> Jazz is not dead. It just smells funny...
-> 
+This patch is a result of a long investigation I made to understand=0D
+why the nested migration more often than not makes the nested guest hang.=0D
+Sometimes the nested guest recovers and sometimes it hangs forever.=0D
+=0D
+The root cause of this is that reading MSR_IA32_TSC while nested guest is=0D
+running returns its TSC value, that is (assuming no tsc scaling)=0D
+host tsc + L1 tsc offset + L2 tsc offset.=0D
+=0D
+This is correct but it is a result of a nice curiosity of X86 VMX=0D
+(and apparently SVM too, according to my tests) implementation:=0D
+=0D
+As a rule MSR reads done by the guest should either trap to host, or just=0D
+return host value, and therefore kvm_get_msr and friends, should basically=
+=0D
+always return the L1 value of any msr.=0D
+=0D
+Well, MSR_IA32_TSC is an exception. Intel's PRM states that when you disabl=
+e=0D
+its interception, then in guest mode the host adds the TSC offset to=0D
+the read value.=0D
+=0D
+I haven't found anything like that in AMD's PRM but according to the few=0D
+tests I made, it behaves the same.=0D
+=0D
+However, there is no such exception when writing MSR_IA32_TSC, and this=0D
+poses a problem for nested migration.=0D
+=0D
+When MSR_IA32_TSC is read, we read L2 value (smaller since L2 is started=0D
+after L1), and when we restore it after migration, the value is interpreted=
+=0D
+as L1 value, thus resulting in huge TSC jump backward which the guest usual=
+ly=0D
+really doesn't like, especially on AMD with APIC deadline timer, which=0D
+usually just doesn't fire afterward sending the guest into endless wait for=
+ it.=0D
+=0D
+The proposed patch fixes this by making read of MSR_IA32_TSC depend on=0D
+'msr_info->host_initiated'=0D
+=0D
+If guest reads the MSR, we add the TSC offset, but when host's qemu reads=0D
+the msr we skip that silly emulation of TSC offset, and return the real val=
+ue=0D
+for the L1 guest which is host tsc + L1 offset.=0D
+=0D
+This patch was tested on both SVM and VMX, and on both it fixes hangs.=0D
+On VMX since it uses VMX preemption timer for APIC deadline, the guest seem=
+s=0D
+to recover after a while without that patch.=0D
+=0D
+To make sure that the nested migration happens I usually used=0D
+-overcommit cpu_pm=3Don but I reproduced this with just running an endless =
+loop=0D
+in L2.=0D
+=0D
+This is tested both with and without -invtsc,tsc-frequency=3D...=0D
+=0D
+The migration was done by saving the migration stream to a file, and then=0D
+loading the qemu with '-incoming'=0D
+=0D
+Maxim Levitsky (1):=0D
+  KVM: x86: fix MSR_IA32_TSC read for nested migration=0D
+=0D
+ arch/x86/kvm/x86.c | 19 ++++++++++++++++++-=0D
+ 1 file changed, 18 insertions(+), 1 deletion(-)=0D
+=0D
+-- =0D
+2.26.2=0D
+=0D
 
