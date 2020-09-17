@@ -2,90 +2,229 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D754526D02E
-	for <lists+kvm@lfdr.de>; Thu, 17 Sep 2020 02:48:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2421C26D126
+	for <lists+kvm@lfdr.de>; Thu, 17 Sep 2020 04:32:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726218AbgIQAsT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 16 Sep 2020 20:48:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44554 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726169AbgIQAsJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 16 Sep 2020 20:48:09 -0400
-X-Greylist: delayed 488 seconds by postgrey-1.27 at vger.kernel.org; Wed, 16 Sep 2020 20:48:00 EDT
-Received: from ozlabs.org (ozlabs.org [IPv6:2401:3900:2:1::2])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1C3CCC061352;
-        Wed, 16 Sep 2020 17:39:52 -0700 (PDT)
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (No client certificate requested)
-        by mail.ozlabs.org (Postfix) with ESMTPSA id 4BsJ5G6swKzB3yN;
-        Thu, 17 Sep 2020 10:39:46 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ellerman.id.au;
-        s=201909; t=1600303188;
-        bh=COHpZK0BD0VqQ7amRyqQpQAYRPxhUDHH36Dg3xKyUzE=;
-        h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
-        b=WtHyNl5RuVAVzBUi6IiSpYd32cWlj/8QiYwHDQkzF5qZ5lH+RSRxUrqR0jJQRNyIB
-         dd+YPElX28UKWhi0pmBGjBXTiZJ7YYjbFN2MBhDFCciTSOUKrmQqbxiLUnjKh7DvgN
-         i6InX4eNbxk9T6r7TkPxK7VSNrEkPvRSBVAHon5vxyAS8kiOBEMFoU+tQ0b3YHfl7S
-         s3hH28Hm82++uC/v9pTrbcKb96vSqVf1I63KROvk1egNk1a8pCET65h3YcuEKSL4AB
-         N/juH6rjcy5WGx/7h/q8qeCjkB68++E1Jc9hNYP9k8OwNI1eqMG89Dm9xYpSNJyzgu
-         aFozBTXoBW4zw==
-From:   Michael Ellerman <mpe@ellerman.id.au>
-To:     Kees Cook <keescook@chromium.org>,
-        Thomas Gleixner <tglx@linutronix.de>
-Cc:     Robert O'Callahan <rocallahan@gmail.com>,
-        LKML <linux-kernel@vger.kernel.org>,
-        "maintainer\:X86 ARCHITECTURE \(32-BIT AND 64-BIT\)" <x86@kernel.org>,
-        linux-arch@vger.kernel.org, Will Deacon <will@kernel.org>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Keno Fischer <keno@juliacomputing.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        kvm list <kvm@vger.kernel.org>,
-        Gabriel Krisman Bertazi <krisman@collabora.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Kyle Huey <me@kylehuey.com>
-Subject: Re: [REGRESSION] x86/entry: Tracer no longer has opportunity to change the syscall number at entry via orig_ax
-In-Reply-To: <202009141303.08B39E5783@keescook>
-References: <CAP045Arc1Vdh+n2j2ELE3q7XfagLjyqXji9ZD0jqwVB-yuzq-g@mail.gmail.com> <87blj6ifo8.fsf@nanos.tec.linutronix.de> <87a6xzrr89.fsf@mpe.ellerman.id.au> <202009111609.61E7875B3@keescook> <87d02qqfxy.fsf@mpe.ellerman.id.au> <87o8m98rck.fsf@nanos.tec.linutronix.de> <202009141303.08B39E5783@keescook>
-Date:   Thu, 17 Sep 2020 10:39:40 +1000
-Message-ID: <875z8dp777.fsf@mpe.ellerman.id.au>
+        id S1726134AbgIQCcW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 16 Sep 2020 22:32:22 -0400
+Received: from mga07.intel.com ([134.134.136.100]:27316 "EHLO mga07.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726115AbgIQCcW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 16 Sep 2020 22:32:22 -0400
+X-Greylist: delayed 428 seconds by postgrey-1.27 at vger.kernel.org; Wed, 16 Sep 2020 22:32:21 EDT
+IronPort-SDR: DoQgVxg+pNPNCyhdfJXCdCnRlpNVgAW0mbZ4f7KYNxwpZC1+M6K7RMCB7U5j9bL3HnmwecFLLT
+ Ylvz5x2Hibpg==
+X-IronPort-AV: E=McAfee;i="6000,8403,9746"; a="223791703"
+X-IronPort-AV: E=Sophos;i="5.76,434,1592895600"; 
+   d="scan'208";a="223791703"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Sep 2020 19:25:12 -0700
+IronPort-SDR: uDz+ipUyDkh+CGmXVhJDknh9smuAUgciSMODoMrBIV48iO92bFx3mHpPjHtumLb4Ioujt/SxTz
+ NXLcOEsJBmZQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.76,434,1592895600"; 
+   d="scan'208";a="339287186"
+Received: from yadong-antec.sh.intel.com ([10.239.158.61])
+  by fmsmga002.fm.intel.com with ESMTP; 16 Sep 2020 19:25:08 -0700
+From:   yadong.qi@intel.com
+To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org, x86@kernel.org
+Cc:     pbonzini@redhat.com, sean.j.christopherson@intel.com,
+        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
+        joro@8bytes.org, tglx@linutronix.de, mingo@redhat.com,
+        bp@alien8.de, hpa@zytor.com, liran.alon@oracle.com,
+        nikita.leshchenko@oracle.com, chao.gao@intel.com,
+        kevin.tian@intel.com, luhai.chen@intel.com, bing.zhu@intel.com,
+        kai.z.wang@intel.com, yadong.qi@intel.com
+Subject: [PATCH RFC] KVM: x86: emulate wait-for-SIPI and SIPI-VMExit
+Date:   Thu, 17 Sep 2020 10:25:01 +0800
+Message-Id: <20200917022501.369121-1-yadong.qi@intel.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Kees Cook <keescook@chromium.org> writes:
-> On Sun, Sep 13, 2020 at 08:27:23PM +0200, Thomas Gleixner wrote:
->> On Sun, Sep 13 2020 at 17:44, Michael Ellerman wrote:
->> > Kees Cook <keescook@chromium.org> writes:
->> > diff --git a/kernel/entry/common.c b/kernel/entry/common.c
->> > index 18683598edbc..901361e2f8ea 100644
->> > --- a/kernel/entry/common.c
->> > +++ b/kernel/entry/common.c
->> > @@ -60,13 +60,15 @@ static long syscall_trace_enter(struct pt_regs *regs, long syscall,
->> >                         return ret;
->> >         }
->> >  
->> > +       syscall = syscall_get_nr(current, regs);
->> > +
->> >         if (unlikely(ti_work & _TIF_SYSCALL_TRACEPOINT))
->> >                 trace_sys_enter(regs, syscall);
->> >  
->> >         syscall_enter_audit(regs, syscall);
->> >  
->> >         /* The above might have changed the syscall number */
->> > -       return ret ? : syscall_get_nr(current, regs);
->> > +       return ret ? : syscall;
->> >  }
->> 
->> Yup, this looks right. Can you please send a proper patch?
->
-> I already did on Friday:
-> https://lore.kernel.org/lkml/20200912005826.586171-1-keescook@chromium.org/
+From: Yadong Qi <yadong.qi@intel.com>
 
-Thanks.
+Background: We have a lightweight HV, it needs INIT-VMExit and
+SIPI-VMExit to wake-up APs for guests since it do not monitoring
+the Local APIC. But currently virtual wait-for-SIPI(WFS) state
+is not supported in KVM, so when running on top of KVM, the L1
+HV cannot receive the INIT-VMExit and SIPI-VMExit which cause
+the L2 guest cannot wake up the APs.
 
-cheers
+This patch is incomplete, it emulated wait-for-SIPI state by halt
+the vCPU and emulated SIPI-VMExit to L1 when trapped SIPI signal
+from L2. I am posting it RFC to gauge whether or not upstream
+KVM is interested in emulating wait-for-SIPI state before
+investing the time to finish the full support.
+
+According to Intel SDM Chapter 25.2 Other Causes of VM Exits,
+SIPIs cause VM exits when a logical processor is in
+wait-for-SIPI state.
+
+In this patch:
+    1. introduce SIPI exit reason,
+    2. introduce wait-for-SIPI state for nVMX,
+    3. advertise wait-for-SIPI support to guest.
+
+When L1 hypervisor is not monitoring Local APIC, L0 need to emulate
+INIT-VMExit and SIPI-VMExit to L1 to emulate INIT-SIPI-SIPI for
+L2. L2 LAPIC write would be traped by L0 Hypervisor(KVM), L0 should
+emulate the INIT/SIPI vmexit to L1 hypervisor to set proper state
+for L2's vcpu state.
+
+Handle procdure:
+Source vCPU:
+    L2 write LAPIC.ICR(INIT).
+    L0 trap LAPIC.ICR write(INIT): inject a latched INIT event to target
+       vCPU.
+Target vCPU:
+    L0 emulate an INIT VMExit to L1 if is guest mode.
+    L1 set guest VMCS, guest_activity_state=WAIT_SIPI, vmresume.
+    L0 halt vCPU if (vmcs12.guest_activity_state == WAIT_SIPI).
+
+Source vCPU:
+    L2 write LAPIC.ICR(SIPI).
+    L0 trap LAPIC.ICR write(INIT): inject a latched SIPI event to traget
+       vCPU.
+Target vCPU:
+    L0 emulate an SIPI VMExit to L1 if (vmcs12.guest_activity_state ==
+       WAIT_SIPI).
+    L1 set CS:IP, guest_activity_state=ACTIVE, vmresume
+    L0 resume to L2
+    L2 start-up
+
+Signed-off-by: Yadong Qi <yadong.qi@intel.com>
+---
+ arch/x86/include/asm/vmx.h      |  1 +
+ arch/x86/include/uapi/asm/vmx.h |  2 ++
+ arch/x86/kvm/lapic.c            |  5 +++--
+ arch/x86/kvm/vmx/nested.c       | 25 +++++++++++++++++++++----
+ 4 files changed, 27 insertions(+), 6 deletions(-)
+
+diff --git a/arch/x86/include/asm/vmx.h b/arch/x86/include/asm/vmx.h
+index cd7de4b401fe..bff06dc64c52 100644
+--- a/arch/x86/include/asm/vmx.h
++++ b/arch/x86/include/asm/vmx.h
+@@ -113,6 +113,7 @@
+ #define VMX_MISC_PREEMPTION_TIMER_RATE_MASK	0x0000001f
+ #define VMX_MISC_SAVE_EFER_LMA			0x00000020
+ #define VMX_MISC_ACTIVITY_HLT			0x00000040
++#define VMX_MISC_ACTIVITY_WAIT_SIPI		0x00000100
+ #define VMX_MISC_ZERO_LEN_INS			0x40000000
+ #define VMX_MISC_MSR_LIST_MULTIPLIER		512
+ 
+diff --git a/arch/x86/include/uapi/asm/vmx.h b/arch/x86/include/uapi/asm/vmx.h
+index b8ff9e8ac0d5..ada955c5ebb6 100644
+--- a/arch/x86/include/uapi/asm/vmx.h
++++ b/arch/x86/include/uapi/asm/vmx.h
+@@ -32,6 +32,7 @@
+ #define EXIT_REASON_EXTERNAL_INTERRUPT  1
+ #define EXIT_REASON_TRIPLE_FAULT        2
+ #define EXIT_REASON_INIT_SIGNAL			3
++#define EXIT_REASON_SIPI_SIGNAL         4
+ 
+ #define EXIT_REASON_INTERRUPT_WINDOW    7
+ #define EXIT_REASON_NMI_WINDOW          8
+@@ -94,6 +95,7 @@
+ 	{ EXIT_REASON_EXTERNAL_INTERRUPT,    "EXTERNAL_INTERRUPT" }, \
+ 	{ EXIT_REASON_TRIPLE_FAULT,          "TRIPLE_FAULT" }, \
+ 	{ EXIT_REASON_INIT_SIGNAL,           "INIT_SIGNAL" }, \
++	{ EXIT_REASON_SIPI_SIGNAL,           "SIPI_SIGNAL" }, \
+ 	{ EXIT_REASON_INTERRUPT_WINDOW,      "INTERRUPT_WINDOW" }, \
+ 	{ EXIT_REASON_NMI_WINDOW,            "NMI_WINDOW" }, \
+ 	{ EXIT_REASON_TASK_SWITCH,           "TASK_SWITCH" }, \
+diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+index 5ccbee7165a2..d04ac7dc6adf 100644
+--- a/arch/x86/kvm/lapic.c
++++ b/arch/x86/kvm/lapic.c
+@@ -2839,7 +2839,7 @@ void kvm_apic_accept_events(struct kvm_vcpu *vcpu)
+ 
+ 	/*
+ 	 * INITs are latched while CPU is in specific states
+-	 * (SMM, VMX non-root mode, SVM with GIF=0).
++	 * (SMM, SVM with GIF=0).
+ 	 * Because a CPU cannot be in these states immediately
+ 	 * after it has processed an INIT signal (and thus in
+ 	 * KVM_MP_STATE_INIT_RECEIVED state), just eat SIPIs
+@@ -2847,7 +2847,8 @@ void kvm_apic_accept_events(struct kvm_vcpu *vcpu)
+ 	 */
+ 	if (kvm_vcpu_latch_init(vcpu)) {
+ 		WARN_ON_ONCE(vcpu->arch.mp_state == KVM_MP_STATE_INIT_RECEIVED);
+-		if (test_bit(KVM_APIC_SIPI, &apic->pending_events))
++		if (test_bit(KVM_APIC_SIPI, &apic->pending_events) &&
++		    !is_guest_mode(vcpu))
+ 			clear_bit(KVM_APIC_SIPI, &apic->pending_events);
+ 		return;
+ 	}
+diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+index 1bb6b31eb646..399933b8ac3a 100644
+--- a/arch/x86/kvm/vmx/nested.c
++++ b/arch/x86/kvm/vmx/nested.c
+@@ -2946,7 +2946,8 @@ static int nested_vmx_check_vmcs_link_ptr(struct kvm_vcpu *vcpu,
+ static int nested_check_guest_non_reg_state(struct vmcs12 *vmcs12)
+ {
+ 	if (CC(vmcs12->guest_activity_state != GUEST_ACTIVITY_ACTIVE &&
+-	       vmcs12->guest_activity_state != GUEST_ACTIVITY_HLT))
++	       vmcs12->guest_activity_state != GUEST_ACTIVITY_HLT &&
++	       vmcs12->guest_activity_state != GUEST_ACTIVITY_WAIT_SIPI))
+ 		return -EINVAL;
+ 
+ 	return 0;
+@@ -3548,7 +3549,8 @@ static int nested_vmx_run(struct kvm_vcpu *vcpu, bool launch)
+ 	 * awakened by event injection or by an NMI-window VM-exit or
+ 	 * by an interrupt-window VM-exit, halt the vcpu.
+ 	 */
+-	if ((vmcs12->guest_activity_state == GUEST_ACTIVITY_HLT) &&
++	if (((vmcs12->guest_activity_state == GUEST_ACTIVITY_HLT) ||
++	    (vmcs12->guest_activity_state == GUEST_ACTIVITY_WAIT_SIPI)) &&
+ 	    !(vmcs12->vm_entry_intr_info_field & INTR_INFO_VALID_MASK) &&
+ 	    !(vmcs12->cpu_based_vm_exec_control & CPU_BASED_NMI_WINDOW_EXITING) &&
+ 	    !((vmcs12->cpu_based_vm_exec_control & CPU_BASED_INTR_WINDOW_EXITING) &&
+@@ -3767,6 +3769,7 @@ static int vmx_check_nested_events(struct kvm_vcpu *vcpu)
+ 	    vmx->nested.nested_run_pending || kvm_event_needs_reinjection(vcpu);
+ 	bool mtf_pending = vmx->nested.mtf_pending;
+ 	struct kvm_lapic *apic = vcpu->arch.apic;
++	struct vmcs12 *vmcs12 = get_vmcs12(vcpu);
+ 
+ 	/*
+ 	 * Clear the MTF state. If a higher priority VM-exit is delivered first,
+@@ -3781,7 +3784,20 @@ static int vmx_check_nested_events(struct kvm_vcpu *vcpu)
+ 			return -EBUSY;
+ 		nested_vmx_update_pending_dbg(vcpu);
+ 		clear_bit(KVM_APIC_INIT, &apic->pending_events);
+-		nested_vmx_vmexit(vcpu, EXIT_REASON_INIT_SIGNAL, 0, 0);
++		if (vmcs12->guest_activity_state != GUEST_ACTIVITY_WAIT_SIPI)
++			nested_vmx_vmexit(vcpu, EXIT_REASON_INIT_SIGNAL, 0, 0);
++		return 0;
++	}
++
++	if (lapic_in_kernel(vcpu) &&
++	    test_bit(KVM_APIC_SIPI, &apic->pending_events)) {
++		if (block_nested_events)
++			return -EBUSY;
++
++		clear_bit(KVM_APIC_SIPI, &apic->pending_events);
++		if (vmcs12->guest_activity_state == GUEST_ACTIVITY_WAIT_SIPI)
++			nested_vmx_vmexit(vcpu, EXIT_REASON_SIPI_SIGNAL, 0,
++						apic->sipi_vector & 0xFFUL);
+ 		return 0;
+ 	}
+ 
+@@ -6471,7 +6487,8 @@ void nested_vmx_setup_ctls_msrs(struct nested_vmx_msrs *msrs, u32 ept_caps)
+ 	msrs->misc_low |=
+ 		MSR_IA32_VMX_MISC_VMWRITE_SHADOW_RO_FIELDS |
+ 		VMX_MISC_EMULATED_PREEMPTION_TIMER_RATE |
+-		VMX_MISC_ACTIVITY_HLT;
++		VMX_MISC_ACTIVITY_HLT |
++		VMX_MISC_ACTIVITY_WAIT_SIPI;
+ 	msrs->misc_high = 0;
+ 
+ 	/*
+-- 
+2.25.1
+
