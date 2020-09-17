@@ -2,186 +2,84 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9DDB626E19D
-	for <lists+kvm@lfdr.de>; Thu, 17 Sep 2020 19:03:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D3EA726E24D
+	for <lists+kvm@lfdr.de>; Thu, 17 Sep 2020 19:25:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728821AbgIQRB5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 17 Sep 2020 13:01:57 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:44274 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1728851AbgIQRBg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 17 Sep 2020 13:01:36 -0400
-X-Greylist: delayed 1490 seconds by postgrey-1.27 at vger.kernel.org; Thu, 17 Sep 2020 13:01:35 EDT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1600362092;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=AOcg7erdQiG6t1re3jBjRLL6u+BC9P88PDt8o+CU52k=;
-        b=ez/sMK6MBIRNC4TbsSwUqlbi9k4T8zFbfaYnGVqDVLMcH1JEsC1dC6XybtO0VZkjmJam54
-        qrQTYXCMy2Bq5nlxyMfzFunxe1i5JcWqWcU8cIK+MNULDfFUs/GW6HkcT7B/j09Dnm4+z5
-        k036HCaHAwE3XigljIQLjAPZjc8uRpk=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-567-etVH8VP5NKa1lqdHXXr32w-1; Thu, 17 Sep 2020 13:01:30 -0400
-X-MC-Unique: etVH8VP5NKa1lqdHXXr32w-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 618EF800467;
-        Thu, 17 Sep 2020 17:01:28 +0000 (UTC)
-Received: from work-vm (ovpn-114-108.ams2.redhat.com [10.36.114.108])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 9306078803;
-        Thu, 17 Sep 2020 17:01:22 +0000 (UTC)
-Date:   Thu, 17 Sep 2020 18:01:19 +0100
-From:   "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To:     Tom Lendacky <thomas.lendacky@amd.com>
-Cc:     qemu-devel@nongnu.org, kvm@vger.kernel.org,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Eduardo Habkost <ehabkost@redhat.com>,
-        Richard Henderson <rth@twiddle.net>,
-        Connor Kuehl <ckuehl@redhat.com>,
-        Brijesh Singh <brijesh.singh@amd.com>,
-        Jiri Slaby <jslaby@suse.cz>,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>
-Subject: Re: [PATCH v3 4/5] sev/i386: Don't allow a system reset under an
- SEV-ES guest
-Message-ID: <20200917170119.GR2793@work-vm>
-References: <cover.1600205384.git.thomas.lendacky@amd.com>
- <058dcb33a9cc223e3180133d29e7a92bfdc40938.1600205384.git.thomas.lendacky@amd.com>
+        id S1726490AbgIQRZq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 17 Sep 2020 13:25:46 -0400
+Received: from mga17.intel.com ([192.55.52.151]:18415 "EHLO mga17.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726192AbgIQRZg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 17 Sep 2020 13:25:36 -0400
+X-Greylist: delayed 531 seconds by postgrey-1.27 at vger.kernel.org; Thu, 17 Sep 2020 13:24:40 EDT
+IronPort-SDR: W8aiqw4mkzlHLXz5QxbMNIN05J7T7inNnDLPY+r2FgFiSMoUcA1Y36/e48I/GNoRaHtMjzoKWa
+ OdSiv3spRsSg==
+X-IronPort-AV: E=McAfee;i="6000,8403,9747"; a="139750307"
+X-IronPort-AV: E=Sophos;i="5.77,271,1596524400"; 
+   d="scan'208";a="139750307"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga007.fm.intel.com ([10.253.24.52])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Sep 2020 10:15:29 -0700
+IronPort-SDR: RA7L5wTJFENSj9aj9zv5UwUQj1QaPo2BOH7baLD4WB+F7Jd8xCbwCzwwWSovervwInN7w1nizZ
+ r8ga1TIhji0Q==
+X-IronPort-AV: E=Sophos;i="5.77,271,1596524400"; 
+   d="scan'208";a="287659895"
+Received: from djiang5-mobl1.amr.corp.intel.com (HELO [10.212.200.158]) ([10.212.200.158])
+  by fmsmga007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Sep 2020 10:15:27 -0700
+Subject: Re: [PATCH v3 00/18] Add VFIO mediated device support and DEV-MSI
+ support for the idxd driver
+To:     Jason Gunthorpe <jgg@nvidia.com>
+Cc:     vkoul@kernel.org, megha.dey@intel.com, maz@kernel.org,
+        bhelgaas@google.com, tglx@linutronix.de,
+        alex.williamson@redhat.com, jacob.jun.pan@intel.com,
+        ashok.raj@intel.com, yi.l.liu@intel.com, baolu.lu@intel.com,
+        kevin.tian@intel.com, sanjay.k.kumar@intel.com,
+        tony.luck@intel.com, jing.lin@intel.com, dan.j.williams@intel.com,
+        kwankhede@nvidia.com, eric.auger@redhat.com, parav@mellanox.com,
+        rafael@kernel.org, netanelg@mellanox.com, shahafs@mellanox.com,
+        yan.y.zhao@linux.intel.com, pbonzini@redhat.com,
+        samuel.ortiz@intel.com, mona.hossain@intel.com,
+        dmaengine@vger.kernel.org, linux-kernel@vger.kernel.org,
+        x86@kernel.org, linux-pci@vger.kernel.org, kvm@vger.kernel.org
+References: <160021207013.67751.8220471499908137671.stgit@djiang5-desk3.ch.intel.com>
+ <20200917150641.GM3699@nvidia.com>
+From:   Dave Jiang <dave.jiang@intel.com>
+Message-ID: <f4a085f1-f6de-2539-12fe-c7308d243a4a@intel.com>
+Date:   Thu, 17 Sep 2020 10:15:24 -0700
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.12.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <058dcb33a9cc223e3180133d29e7a92bfdc40938.1600205384.git.thomas.lendacky@amd.com>
-User-Agent: Mutt/1.14.6 (2020-07-11)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+In-Reply-To: <20200917150641.GM3699@nvidia.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-* Tom Lendacky (thomas.lendacky@amd.com) wrote:
-> From: Tom Lendacky <thomas.lendacky@amd.com>
-> 
-> An SEV-ES guest does not allow register state to be altered once it has
-> been measured. When a SEV-ES guest issues a reboot command, Qemu will
-> reset the vCPU state and resume the guest. This will cause failures under
-> SEV-ES, so prevent that from occurring.
-> 
-> Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
-> ---
->  accel/kvm/kvm-all.c       | 9 +++++++++
->  include/sysemu/cpus.h     | 2 ++
->  include/sysemu/hw_accel.h | 5 +++++
->  include/sysemu/kvm.h      | 2 ++
->  softmmu/cpus.c            | 5 +++++
->  softmmu/vl.c              | 5 ++++-
->  6 files changed, 27 insertions(+), 1 deletion(-)
-> 
-> diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
-> index 20725b0368..63153b6e53 100644
-> --- a/accel/kvm/kvm-all.c
-> +++ b/accel/kvm/kvm-all.c
-> @@ -2388,6 +2388,15 @@ void kvm_flush_coalesced_mmio_buffer(void)
->      s->coalesced_flush_in_progress = false;
->  }
->  
-> +bool kvm_cpu_check_resettable(void)
-> +{
-> +    /*
-> +     * If we have a valid reset vector override, then SEV-ES is active
-> +     * and the CPU can't be reset.
-> +     */
-> +    return !kvm_state->reset_valid;
 
-This seems a bit weird since it's in generic rather than x86 specific
-code.
 
-Dave
-
-> +}
-> +
->  static void do_kvm_cpu_synchronize_state(CPUState *cpu, run_on_cpu_data arg)
->  {
->      if (!cpu->vcpu_dirty) {
-> diff --git a/include/sysemu/cpus.h b/include/sysemu/cpus.h
-> index 3c1da6a018..6d688c757f 100644
-> --- a/include/sysemu/cpus.h
-> +++ b/include/sysemu/cpus.h
-> @@ -24,6 +24,8 @@ void dump_drift_info(void);
->  void qemu_cpu_kick_self(void);
->  void qemu_timer_notify_cb(void *opaque, QEMUClockType type);
->  
-> +bool cpu_is_resettable(void);
-> +
->  void cpu_synchronize_all_states(void);
->  void cpu_synchronize_all_post_reset(void);
->  void cpu_synchronize_all_post_init(void);
-> diff --git a/include/sysemu/hw_accel.h b/include/sysemu/hw_accel.h
-> index e128f8b06b..8b4536e7ae 100644
-> --- a/include/sysemu/hw_accel.h
-> +++ b/include/sysemu/hw_accel.h
-> @@ -17,6 +17,11 @@
->  #include "sysemu/hvf.h"
->  #include "sysemu/whpx.h"
->  
-> +static inline bool cpu_check_resettable(void)
-> +{
-> +    return kvm_enabled() ? kvm_cpu_check_resettable() : true;
-> +}
-> +
->  static inline void cpu_synchronize_state(CPUState *cpu)
->  {
->      if (kvm_enabled()) {
-> diff --git a/include/sysemu/kvm.h b/include/sysemu/kvm.h
-> index f74cfa85ab..eb94bbbff9 100644
-> --- a/include/sysemu/kvm.h
-> +++ b/include/sysemu/kvm.h
-> @@ -494,6 +494,8 @@ int kvm_physical_memory_addr_from_host(KVMState *s, void *ram_addr,
->  
->  #endif /* NEED_CPU_H */
->  
-> +bool kvm_cpu_check_resettable(void);
-> +
->  void kvm_cpu_synchronize_state(CPUState *cpu);
->  void kvm_cpu_synchronize_post_reset(CPUState *cpu);
->  void kvm_cpu_synchronize_post_init(CPUState *cpu);
-> diff --git a/softmmu/cpus.c b/softmmu/cpus.c
-> index a802e899ab..32f286643f 100644
-> --- a/softmmu/cpus.c
-> +++ b/softmmu/cpus.c
-> @@ -927,6 +927,11 @@ void hw_error(const char *fmt, ...)
->      abort();
->  }
->  
-> +bool cpu_is_resettable(void)
-> +{
-> +    return cpu_check_resettable();
-> +}
-> +
->  void cpu_synchronize_all_states(void)
->  {
->      CPUState *cpu;
-> diff --git a/softmmu/vl.c b/softmmu/vl.c
-> index 4eb9d1f7fd..422fbb1650 100644
-> --- a/softmmu/vl.c
-> +++ b/softmmu/vl.c
-> @@ -1475,7 +1475,10 @@ void qemu_system_guest_crashloaded(GuestPanicInformation *info)
->  
->  void qemu_system_reset_request(ShutdownCause reason)
->  {
-> -    if (no_reboot && reason != SHUTDOWN_CAUSE_SUBSYSTEM_RESET) {
-> +    if (!cpu_is_resettable()) {
-> +        error_report("cpus are not resettable, terminating");
-> +        shutdown_requested = reason;
-> +    } else if (no_reboot && reason != SHUTDOWN_CAUSE_SUBSYSTEM_RESET) {
->          shutdown_requested = reason;
->      } else {
->          reset_requested = reason;
-> -- 
-> 2.28.0
+On 9/17/2020 8:06 AM, Jason Gunthorpe wrote:
+> On Tue, Sep 15, 2020 at 04:27:35PM -0700, Dave Jiang wrote:
+>>   drivers/dma/idxd/idxd.h                            |   65 +
+>>   drivers/dma/idxd/init.c                            |  100 ++
+>>   drivers/dma/idxd/irq.c                             |    6
+>>   drivers/dma/idxd/mdev.c                            | 1089 ++++++++++++++++++++
+>>   drivers/dma/idxd/mdev.h                            |  118 ++
 > 
--- 
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> It is common that drivers of a subsystem will be under that
+> subsystem's directory tree. This allows the subsystem community to
+> manage pages related to their subsystem and it's drivers.
+> 
+> Should the mdev parts be moved there?
 
+I personally don't have a preference. I'll defer to Alex or Kirti to provide 
+that guidance. It may make certains things like dealing with dma fault regions 
+and etc easier using vfio calls from vfio_pci_private.h later on for vSVM 
+support. It also may be the better code review and maintenance domain and 
+alleviate Vinod having to deal with that portion since it's not dmaengine domain.
+
+> 
+> Jason
+> 
