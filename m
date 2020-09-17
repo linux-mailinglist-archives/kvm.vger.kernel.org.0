@@ -2,130 +2,112 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 173FD26D737
-	for <lists+kvm@lfdr.de>; Thu, 17 Sep 2020 10:58:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D71A026D73B
+	for <lists+kvm@lfdr.de>; Thu, 17 Sep 2020 10:58:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726336AbgIQI4D (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 17 Sep 2020 04:56:03 -0400
-Received: from smtp1.axis.com ([195.60.68.17]:59502 "EHLO smtp1.axis.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726153AbgIQI4C (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 17 Sep 2020 04:56:02 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=axis.com; l=2275; q=dns/txt; s=axis-central1;
-  t=1600332961; x=1631868961;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=7NfOGX/GL1UDMwdZ9k07i7ou/GGUBIMx7JAJVjygZ7I=;
-  b=Xb6szjsK8rHIGlEDX/QQulgoUe29IAnOl89ryhoxvWXgQesMajCev6Qy
-   bxfSAfWw7xNGORVfNUXJYflrqtRaSeh+xjPaU95t4De8kw0oZsDPAu/+B
-   e5Nzr0ryWyupZMxsIeCKA0eCMTgfx8HAHZrZJzs8aGM9hKfh0me10sJl4
-   EReO6dxc3j/JjkBS8uBr82fpZN/3UUs899R/NeCMK3+vHNQqQctdROoqE
-   JLYessc8f/ekhu7qLZ9I/6A4+vpLnpjHJBAtKs1sYJxd+WxjDXs0+nNzB
-   b25HrTwvqnaRUPcgNnggnP5LfwVohKyxvmWzexS4RW6E6P6nxZ4HmiMbq
-   w==;
-IronPort-SDR: 6MqQxFg+KYlYJphHffimUhmitKEWQPSswtENyoQ91Ovj6pMX7T6qnNokxLq4K1YYqIKW+8XOXr
- 8QxFFxVrBt4TANYJEnUU/zc/mxdRg7mGqCOauW90Ho32mryhm8H3Sw595FtOFZ6oJaimDN+N8J
- /MMYYZq38yqB6MUsXNxl3vZ0hOpba2p7rXyfh8R3zXjBcn8VmYaWDrPOptWGXktOddOp6rPiKd
- y1daRMgtUItqjCYrg2WJQQYJ0Fya8TEg1mGxkPnANvFXWBSKn3ItgMDLGHghqOeRJc0uwK3AgP
- Yq0=
-X-IronPort-AV: E=Sophos;i="5.76,436,1592863200"; 
-   d="scan'208";a="13045882"
-Date:   Thu, 17 Sep 2020 10:55:59 +0200
-From:   Vincent Whitchurch <vincent.whitchurch@axis.com>
-To:     Guennadi Liakhovetski <guennadi.liakhovetski@linux.intel.com>
-CC:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-remoteproc@vger.kernel.org" <linux-remoteproc@vger.kernel.org>,
-        "virtualization@lists.linux-foundation.org" 
-        <virtualization@lists.linux-foundation.org>,
-        "sound-open-firmware@alsa-project.org" 
-        <sound-open-firmware@alsa-project.org>,
-        Pierre-Louis Bossart <pierre-louis.bossart@linux.intel.com>,
-        Liam Girdwood <liam.r.girdwood@linux.intel.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Ohad Ben-Cohen <ohad@wizery.com>,
-        Bjorn Andersson <bjorn.andersson@linaro.org>,
-        Mathieu Poirier <mathieu.poirier@linaro.org>
-Subject: Re: [PATCH v7 3/3] vhost: add an RPMsg API
-Message-ID: <20200917085559.kxxjrortmhbwpd22@axis.com>
-References: <20200910111351.20526-1-guennadi.liakhovetski@linux.intel.com>
- <20200910111351.20526-4-guennadi.liakhovetski@linux.intel.com>
+        id S1726437AbgIQI40 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 17 Sep 2020 04:56:26 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:34078 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726350AbgIQI4Z (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 17 Sep 2020 04:56:25 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1600332983;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=u2Q5W6NAzslAk1ByBm0MYfEGJIT21PziYx8gteQ5Vhs=;
+        b=ZazY5rTciOz5z3PkF74rvLA3KRiEgy/gl27HcF9URyWcDF3bEkd5Vuv0BWp8rVZTvnoGTK
+        Wl/e04/AxEW4Y9PWYbG7/8REHkCrx7GLttUJEAz1rLE3OCxiuDEBrJxchZYGKcx9RKS/Oe
+        oUrCBK3rJ6qhddlLyndC/3S1iImje9A=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-403-Q2F6cQAAPKuOQFGyrvpQCg-1; Thu, 17 Sep 2020 04:56:21 -0400
+X-MC-Unique: Q2F6cQAAPKuOQFGyrvpQCg-1
+Received: by mail-wm1-f71.google.com with SMTP id r10so441914wmh.0
+        for <kvm@vger.kernel.org>; Thu, 17 Sep 2020 01:56:20 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=u2Q5W6NAzslAk1ByBm0MYfEGJIT21PziYx8gteQ5Vhs=;
+        b=QjLdzjyXJCfEm5NocWAEIt/EWFmDNO78Kf32/C0pqKjarn2XfE5ZRARNIm7lOBN3OQ
+         suO7dqXb0MET7SeVb6cVC+5tyqkrhQITA3KT/RQ/mF4NGR3bqzzi3BTQVIEExxv5e4b5
+         2Q62WQfkXo2ycff6rjZPvpBRhBAPZkrFRDb//440wlEbMWnQ+MvRDYW4Xyygjc1LzQJA
+         RwttkklcER6LG+9g7sX6juLfOGpNd3LmJKgxD05d3WLu1XW76RK1SCatYCHAo/nHIPMH
+         vGitMM0FuqvLtEBbBm1JPT4qJmYNOzJ4/tx4eC2WxH6NWR+/D47RE7Vlw2qFZrxFnwY1
+         vVnw==
+X-Gm-Message-State: AOAM5330pgqJ2sdQ37om1nd3pJUz6UTeZI99Aqphuh8foQ18A/AB2G4V
+        nNkm0M43hD0EGutFZxl9p8JX2i3Lb2oYrjTGmN1rRCHMWyxCAHqUC5xxJXYhPPOoEdV5biUc04w
+        rvLC2DlgYD7HU
+X-Received: by 2002:adf:f5c7:: with SMTP id k7mr31978540wrp.246.1600332979873;
+        Thu, 17 Sep 2020 01:56:19 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJx4OF1kdzQGvwv13LuHvoUh2lakQ8Xdk63kyMZtVuSxMDmrRTKIgQMp+gqghXnztKnI07Yygw==
+X-Received: by 2002:adf:f5c7:: with SMTP id k7mr31978509wrp.246.1600332979621;
+        Thu, 17 Sep 2020 01:56:19 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:d003:b94f:6314:4839? ([2001:b07:6468:f312:d003:b94f:6314:4839])
+        by smtp.gmail.com with ESMTPSA id v2sm37283429wrm.16.2020.09.17.01.56.18
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 17 Sep 2020 01:56:19 -0700 (PDT)
+Subject: Re: [PATCH RFC] KVM: x86: emulate wait-for-SIPI and SIPI-VMExit
+To:     yadong.qi@intel.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, x86@kernel.org
+Cc:     sean.j.christopherson@intel.com, vkuznets@redhat.com,
+        wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org,
+        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, hpa@zytor.com,
+        liran.alon@oracle.com, nikita.leshchenko@oracle.com,
+        chao.gao@intel.com, kevin.tian@intel.com, luhai.chen@intel.com,
+        bing.zhu@intel.com, kai.z.wang@intel.com
+References: <20200917022501.369121-1-yadong.qi@intel.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <c3eaf796-67f1-9224-3e16-72d93501b6cf@redhat.com>
+Date:   Thu, 17 Sep 2020 10:56:18 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20200910111351.20526-4-guennadi.liakhovetski@linux.intel.com>
-User-Agent: NeoMutt/20170113 (1.7.2)
+In-Reply-To: <20200917022501.369121-1-yadong.qi@intel.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Sep 10, 2020 at 01:13:51PM +0200, Guennadi Liakhovetski wrote:
-> +int vhost_rpmsg_start_lock(struct vhost_rpmsg *vr, struct vhost_rpmsg_iter *iter,
-> +			   unsigned int qid, ssize_t len)
-> +	__acquires(vq->mutex)
-> +{
-> +	struct vhost_virtqueue *vq = vr->vq + qid;
-> +	unsigned int cnt;
-> +	ssize_t ret;
-> +	size_t tmp;
-> +
-> +	if (qid >= VIRTIO_RPMSG_NUM_OF_VQS)
-> +		return -EINVAL;
-> +
-> +	iter->vq = vq;
-> +
-> +	mutex_lock(&vq->mutex);
-> +	vhost_disable_notify(&vr->dev, vq);
-> +
-> +	iter->head = vhost_rpmsg_get_msg(vq, &cnt);
-> +	if (iter->head == vq->num)
-> +		iter->head = -EAGAIN;
-> +
-> +	if (iter->head < 0) {
-> +		ret = iter->head;
-> +		goto unlock;
-> +	}
-> +
-[...]
-> +
-> +return_buf:
-> +	vhost_add_used(vq, iter->head, 0);
-> +unlock:
-> +	vhost_enable_notify(&vr->dev, vq);
-> +	mutex_unlock(&vq->mutex);
-> +
-> +	return ret;
-> +}
+On 17/09/20 04:25, yadong.qi@intel.com wrote:
+> From: Yadong Qi <yadong.qi@intel.com>
+> 
+> Background: We have a lightweight HV, it needs INIT-VMExit and
+> SIPI-VMExit to wake-up APs for guests since it do not monitoring
+> the Local APIC. But currently virtual wait-for-SIPI(WFS) state
+> is not supported in KVM, so when running on top of KVM, the L1
+> HV cannot receive the INIT-VMExit and SIPI-VMExit which cause
+> the L2 guest cannot wake up the APs.
+> 
+> This patch is incomplete, it emulated wait-for-SIPI state by halt
+> the vCPU and emulated SIPI-VMExit to L1 when trapped SIPI signal
+> from L2. I am posting it RFC to gauge whether or not upstream
+> KVM is interested in emulating wait-for-SIPI state before
+> investing the time to finish the full support.
 
-There is a race condition here.  New buffers could have been added while
-notifications were disabled (between vhost_disable_notify() and
-vhost_enable_notify()), so the other vhost drivers check the return
-value of vhost_enable_notify() and rerun their work loops if it returns
-true.  This driver doesn't do that so it stops processing requests if
-that condition hits.
+Yes, the patch makes sense and is a good addition.  What exactly is
+missing?  (Apart from test cases in kvm-unit-tests!)
 
-Something like the below seems to fix it but the correct fix could maybe
-involve changing this API to account for this case so that it looks more
-like the code in other vhost drivers.
+Paolo
 
-diff --git a/drivers/vhost/rpmsg.c b/drivers/vhost/rpmsg.c
-index 7c753258d42..673dd4ec865 100644
---- a/drivers/vhost/rpmsg.c
-+++ b/drivers/vhost/rpmsg.c
-@@ -302,8 +302,14 @@ static void handle_rpmsg_req_kick(struct vhost_work *work)
- 	struct vhost_virtqueue *vq = container_of(work, struct vhost_virtqueue,
- 						  poll.work);
- 	struct vhost_rpmsg *vr = container_of(vq->dev, struct vhost_rpmsg, dev);
-+	struct vhost_virtqueue *reqvq = vr->vq + VIRTIO_RPMSG_REQUEST;
- 
--	while (handle_rpmsg_req_single(vr, vq))
-+	/*
-+	 * The !vhost_vq_avail_empty() check is needed since the vhost_rpmsg*
-+	 * APIs don't check the return value of vhost_enable_notify() and retry
-+	 * if there were buffers added while notifications were disabled.
-+	 */
-+	while (handle_rpmsg_req_single(vr, vq) || !vhost_vq_avail_empty(reqvq->dev, reqvq))
- 		;
- }
- 
+> According to Intel SDM Chapter 25.2 Other Causes of VM Exits,
+> SIPIs cause VM exits when a logical processor is in
+> wait-for-SIPI state.
+> 
+> In this patch:
+>     1. introduce SIPI exit reason,
+>     2. introduce wait-for-SIPI state for nVMX,
+>     3. advertise wait-for-SIPI support to guest.
+> 
+> When L1 hypervisor is not monitoring Local APIC, L0 need to emulate
+> INIT-VMExit and SIPI-VMExit to L1 to emulate INIT-SIPI-SIPI for
+> L2. L2 LAPIC write would be traped by L0 Hypervisor(KVM), L0 should
+> emulate the INIT/SIPI vmexit to L1 hypervisor to set proper state
+> for L2's vcpu state.
+
