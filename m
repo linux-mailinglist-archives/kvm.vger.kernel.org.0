@@ -2,208 +2,128 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6C3C426D89B
-	for <lists+kvm@lfdr.de>; Thu, 17 Sep 2020 12:15:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7931226D844
+	for <lists+kvm@lfdr.de>; Thu, 17 Sep 2020 12:01:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726505AbgIQKPT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 17 Sep 2020 06:15:19 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:53347 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726241AbgIQKPS (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 17 Sep 2020 06:15:18 -0400
-X-Greylist: delayed 849 seconds by postgrey-1.27 at vger.kernel.org; Thu, 17 Sep 2020 06:15:17 EDT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1600337713;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=LWSgbcBzg4cWtL5b5RCSUatW7JEAI/GyQ80ADBOGhu8=;
-        b=fkmG5brenjIV3CCsKho778Eunykk+DU+MWwuIftbiiGbcS9A8EVQQQxA84IPnDJwnjsNhT
-        1RZga4uXKqYbM1GVRZ+VDIopB3UatfKhp036aClrDJzJTABLfG3ECd6YhZYDTO0Db+VFuU
-        dJUuwCZoQbaYzvb6jc/kzOAxWIm3jYk=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-589-OSzsdZQOOEmwcQHsch3YYQ-1; Thu, 17 Sep 2020 05:59:49 -0400
-X-MC-Unique: OSzsdZQOOEmwcQHsch3YYQ-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        id S1726423AbgIQKBp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 17 Sep 2020 06:01:45 -0400
+Received: from mail.kernel.org ([198.145.29.99]:58084 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726200AbgIQKBm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 17 Sep 2020 06:01:42 -0400
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4436D1019629;
-        Thu, 17 Sep 2020 09:59:48 +0000 (UTC)
-Received: from gondolin (ovpn-113-19.ams2.redhat.com [10.36.113.19])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id EB3C419D6C;
-        Thu, 17 Sep 2020 09:59:36 +0000 (UTC)
-Date:   Thu, 17 Sep 2020 11:59:34 +0200
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Matthew Rosato <mjrosato@linux.ibm.com>
-Cc:     Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>,
-        thuth@redhat.com, pmorel@linux.ibm.com, david@redhat.com,
-        qemu-s390x@nongnu.org, schnelle@linux.ibm.com,
-        qemu-devel@nongnu.org, pasic@linux.ibm.com, borntraeger@de.ibm.com,
-        alex.williamson@redhat.com, mst@redhat.com, kvm@vger.kernel.org,
-        pbonzini@redhat.com, rth@twiddle.net
-Subject: Re: [PATCH v3 4/5] s390x/pci: Add routine to get the vfio dma
- available count
-Message-ID: <20200917115934.4659537a.cohuck@redhat.com>
-In-Reply-To: <a2599938-d0b8-4436-2cf6-ceed9bba28f3@linux.ibm.com>
-References: <1600197283-25274-1-git-send-email-mjrosato@linux.ibm.com>
-        <1600197283-25274-5-git-send-email-mjrosato@linux.ibm.com>
-        <0b28ae63-faad-953d-85c2-04bcdefeb7bf@redhat.com>
-        <20200916122720.4c7d8671.cohuck@redhat.com>
-        <a2599938-d0b8-4436-2cf6-ceed9bba28f3@linux.ibm.com>
-Organization: Red Hat GmbH
+        by mail.kernel.org (Postfix) with ESMTPSA id 9FB0920770;
+        Thu, 17 Sep 2020 10:01:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1600336901;
+        bh=Xh8JuZm4voE70hSUqrNM4+HG+MZSDD3QHPaZ/il5TMU=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=00iQ1HYXyByzkyIHcCOwnOd7Y4T4D/gWgeu6tORKXzRsQL8BecLyON1RF02dWjRlW
+         XKBwCoFYyOvKpLXHIIy2s3o45cOoZtniBqVp720vyGWPjfux1IZYruxVydUwVmsfFm
+         jbp/u3Qb+ht/jQH7T9+42RvAWop6JnjL534R2HMo=
+Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
+        by disco-boy.misterjones.org with esmtpsa (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+        (Exim 4.92)
+        (envelope-from <maz@kernel.org>)
+        id 1kIqjT-00Cb1I-M3; Thu, 17 Sep 2020 11:01:39 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+Content-Type: text/plain; charset=UTF-8;
+ format=flowed
+Content-Transfer-Encoding: 8bit
+Date:   Thu, 17 Sep 2020 11:01:39 +0100
+From:   Marc Zyngier <maz@kernel.org>
+To:     Alexandru Elisei <alexandru.elisei@arm.com>
+Cc:     Andrew Jones <drjones@redhat.com>,
+        Ying Fang <fangying1@huawei.com>, kvm@vger.kernel.org,
+        kvmarm@lists.cs.columbia.edu, james.morse@arm.com,
+        julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com,
+        zhang.zhanghailiang@huawei.com, alex.chen@huawei.com
+Subject: Re: [PATCH 2/2] kvm/arm: Add mp_affinity for arm vcpu
+In-Reply-To: <12a47a99-9857-b86d-6c45-39fdee08613e@arm.com>
+References: <20200917023033.1337-1-fangying1@huawei.com>
+ <20200917023033.1337-3-fangying1@huawei.com>
+ <7a924b0fb27505a0d8b00389fe2f02df@kernel.org>
+ <20200917080429.jimidzdtdskwhbdx@kamzik.brq.redhat.com>
+ <198c63d5e9e17ddb4c3848845891301c@kernel.org>
+ <12a47a99-9857-b86d-6c45-39fdee08613e@arm.com>
+User-Agent: Roundcube Webmail/1.4.8
+Message-ID: <b88c7988a00c25a9ae0fdd373ba45227@kernel.org>
+X-Sender: maz@kernel.org
+X-SA-Exim-Connect-IP: 51.254.78.96
+X-SA-Exim-Rcpt-To: alexandru.elisei@arm.com, drjones@redhat.com, fangying1@huawei.com, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, zhang.zhanghailiang@huawei.com, alex.chen@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 16 Sep 2020 08:55:00 -0400
-Matthew Rosato <mjrosato@linux.ibm.com> wrote:
+On 2020-09-17 10:47, Alexandru Elisei wrote:
+> Hi,
+> 
+> On 9/17/20 9:42 AM, Marc Zyngier wrote:
+>> On 2020-09-17 09:04, Andrew Jones wrote:
+>>> On Thu, Sep 17, 2020 at 08:47:42AM +0100, Marc Zyngier wrote:
+>>>> On 2020-09-17 03:30, Ying Fang wrote:
+>>>> > Allow userspace to set MPIDR using vcpu ioctl KVM_ARM_SET_MP_AFFINITY,
+>>>> > so that we can support cpu topology for arm.
+>>>> 
+>>>> MPIDR has *nothing* to do with CPU topology in the ARM architecture.
+>>>> I encourage you to have a look at the ARM ARM and find out how often
+>>>> the word "topology" is used in conjunction with the MPIDR_EL1 
+>>>> register.
+>>>> 
+>>> 
+>>> Hi Marc,
+>>> 
+>>> I mostly agree. However, the CPU topology descriptions use MPIDR to
+>>> identify PEs. If userspace wants to build topology descriptions then
+>>> it either needs to
+>>> 
+>>> 1) build them after instantiating all KVM VCPUs in order to query KVM
+>>>    for each MPIDR, or
+>>> 2) have a way to ask KVM for an MPIDR of given VCPU ID in advance
+>>>    (maybe just a scratch VCPU), or
+>>> 3) have control over the MPIDRs so it can choose them when it likes,
+>>>    use them for topology descriptions, and then instantiate KVM VCPUs
+>>>    with them.
+>>> 
+>>> I think (3) is the most robust approach, and it has the least 
+>>> overhead.
+>> 
+>> I don't disagree with the goal, and not even with the choice of
+>> implementation (though I have huge reservations about its quality).
+>> 
+>> But the key word here is *userspace*. Only userspace has a notion of
+>> how MPIDR values map to the assumed topology. That's not something
+>> that KVM does nor should interpret (aside from the GIC-induced Aff0
+>> brain-damage). So talking of "topology" in a KVM kernel patch sends
+>> the wrong message, and that's all this remark was about.
+> 
+> There's also a patch queued for next which removes using MPIDR as a 
+> source of
+> information about CPU topology [1]: "arm64: topology: Stop using MPIDR 
+> for
+> topology information".
+> 
+> I'm not really sure how useful KVM fiddling with the guest MPIDR will 
+> be going
+> forward, at least for a Linux guest.
 
-> On 9/16/20 6:27 AM, Cornelia Huck wrote:
-> > On Wed, 16 Sep 2020 09:21:39 +0200
-> > Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> wrote:
-> >  =20
-> >> On 9/15/20 9:14 PM, Matthew Rosato wrote: =20
-> >>> Create new files for separating out vfio-specific work for s390
-> >>> pci. Add the first such routine, which issues VFIO_IOMMU_GET_INFO
-> >>> ioctl to collect the current dma available count.
-> >>>
-> >>> Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
-> >>> ---
-> >>>   hw/s390x/meson.build     |  1 +
-> >>>   hw/s390x/s390-pci-vfio.c | 54 +++++++++++++++++++++++++++++++++++++=
-+++++++++++
-> >>>   hw/s390x/s390-pci-vfio.h | 17 +++++++++++++++
-> >>>   3 files changed, 72 insertions(+)
-> >>>   create mode 100644 hw/s390x/s390-pci-vfio.c
-> >>>   create mode 100644 hw/s390x/s390-pci-vfio.h
-> >>> =20
-> >=20
-> > (...)
-> >  =20
-> >>> diff --git a/hw/s390x/s390-pci-vfio.c b/hw/s390x/s390-pci-vfio.c
-> >>> new file mode 100644
-> >>> index 0000000..75e3ac1
-> >>> --- /dev/null
-> >>> +++ b/hw/s390x/s390-pci-vfio.c
-> >>> @@ -0,0 +1,54 @@
-> >>> +/*
-> >>> + * s390 vfio-pci interfaces
-> >>> + *
-> >>> + * Copyright 2020 IBM Corp.
-> >>> + * Author(s): Matthew Rosato <mjrosato@linux.ibm.com>
-> >>> + *
-> >>> + * This work is licensed under the terms of the GNU GPL, version 2 o=
-r (at
-> >>> + * your option) any later version. See the COPYING file in the top-l=
-evel
-> >>> + * directory.
-> >>> + */
-> >>> +
-> >>> +#include <sys/ioctl.h>
-> >>> +
-> >>> +#include "qemu/osdep.h"
-> >>> +#include "s390-pci-vfio.h"
-> >>> +#include "hw/vfio/vfio-common.h"
-> >>> +
-> >>> +/*
-> >>> + * Get the current DMA available count from vfio.  Returns true if v=
-fio is
-> >>> + * limiting DMA requests, false otherwise.  The current available co=
-unt read
-> >>> + * from vfio is returned in avail.
-> >>> + */
-> >>> +bool s390_pci_update_dma_avail(int fd, unsigned int *avail)
-> >>> +{
-> >>> +    g_autofree struct vfio_iommu_type1_info *info;
-> >>> +    uint32_t argsz;
-> >>> +    int ret;
-> >>> +
-> >>> +    assert(avail);
-> >>> +
-> >>> +    argsz =3D sizeof(struct vfio_iommu_type1_info);
-> >>> +    info =3D g_malloc0(argsz);
-> >>> +    info->argsz =3D argsz;
-> >>> +    /*
-> >>> +     * If the specified argsz is not large enough to contain all
-> >>> +     * capabilities it will be updated upon return.  In this case
-> >>> +     * use the updated value to get the entire capability chain.
-> >>> +     */
-> >>> +    ret =3D ioctl(fd, VFIO_IOMMU_GET_INFO, info);
-> >>> +    if (argsz !=3D info->argsz) {
-> >>> +        argsz =3D info->argsz;
-> >>> +        info =3D g_realloc(info, argsz); =20
-> >>
-> >> Do we need to bzero [sizeof(struct vfio_iommu_type1_info)..argsz[? =20
-> >=20
-> > If we do, I think we need to do the equivalent in
-> > vfio_get_region_info() as well?
-> >  =20
->=20
-> I agree that it would need to be in both places or neither -- I would=20
-> expect the re-driven ioctl to overwrite the prior contents of info=20
-> (unless we get a bad ret, but in this case we don't care what is in info)?
->=20
-> Perhaps the fundamental difference between this code and=20
-> vfio_get_region_info is that the latter checks for only a growing argsz=20
-> and retries, whereas this code checks for !=3D so it's technically=20
-> possible for a smaller argsz to trigger the retry here, and we wouldn't=20
-> know for sure that all bytes from the first ioctl call were overwritten.
+I think these are two orthogonal things. There is value in setting MPIDR
+to something different as a way to replicate an existing system, for
+example. But deriving *any* sort of topology information from MPIDR 
+isn't
+reliable at all, and is better expressed by firmware tables (and even
+that isn't great).
 
-Nod. Relying on overwriting should be fine.
+As far as I am concerned, this patch fits in the "cosmetic" department.
+It's a "nice to have", but doesn't really solve much. Firmware tables
+and userspace placement of the vcpus are key.
 
->=20
-> What if I adjust this code to look like vfio_get_region_info:
->=20
-> retry:
-> 	info->argsz =3D argsz;
->=20
-> 	if (ioctl(fd, VFIO_IOMMU_GET_INFO, info)) {
-> 		// no need to g_free() bc of g_autofree
-> 		return false;=09
-> 	}
->=20
-> 	if (info->argsz > argsz) {
-> 		argsz =3D info->argsz;
-> 		info =3D g_realloc(info, argsz);
-> 		goto retry;
-> 	}
->=20
-> 	/* If the capability exists, update with the current value */
-> 	return vfio_get_info_dma_avail(info, avail);
->=20
-> Now we would only trigger when we are told by the host that the buffer=20
-> must be larger.
+Thanks,
 
-I think that makes sense.
-
->=20
-> > (Also, shouldn't we check ret before looking at info->argsz?)
-> >  =20
->=20
-> Yes, you are correct.  The above proposal would fix that issue too.
->=20
-> >> =20
-> >>> +        info->argsz =3D argsz;
-> >>> +        ret =3D ioctl(fd, VFIO_IOMMU_GET_INFO, info);
-> >>> +    }
-> >>> +
-> >>> +    if (ret) {
-> >>> +        return false;
-> >>> +    }
-> >>> +
-> >>> +    /* If the capability exists, update with the current value */
-> >>> +    return vfio_get_info_dma_avail(info, avail);
-> >>> +}
-> >>> + =20
-> >=20
-> > (...)
-> >=20
-> >  =20
->=20
-
+         M.
+-- 
+Jazz is not dead. It just smells funny...
