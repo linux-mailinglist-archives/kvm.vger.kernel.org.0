@@ -2,221 +2,267 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 826B226D508
-	for <lists+kvm@lfdr.de>; Thu, 17 Sep 2020 09:47:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C9B0A26D568
+	for <lists+kvm@lfdr.de>; Thu, 17 Sep 2020 09:58:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726347AbgIQHr4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 17 Sep 2020 03:47:56 -0400
-Received: from mail.kernel.org ([198.145.29.99]:40852 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726301AbgIQHrp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 17 Sep 2020 03:47:45 -0400
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 668A421D41;
-        Thu, 17 Sep 2020 07:47:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1600328864;
-        bh=AHcC2uC5+PTsZJr+K0lmo8Zm03PStoV6uvu8b/RI32g=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=MyGv89mNdA2r/eaiDomAUde4Bv6w21F/7UbMt6QEMQPvLQLwaYp7QeMx9Nco/TgmY
-         X5rIB6ZyHbqScnG24iUT0s5Uuu7iIsGsDJZJJu7LxnHpC4UkgnOiwC9TYbX6TSMMn3
-         o5bsK7mDRv5e4h/hpE8yRurK5VTVLxQQxM6F2FIA=
-Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
-        by disco-boy.misterjones.org with esmtpsa (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
-        (Exim 4.92)
-        (envelope-from <maz@kernel.org>)
-        id 1kIodq-00CZ7w-IE; Thu, 17 Sep 2020 08:47:42 +0100
+        id S1726200AbgIQH6B (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 17 Sep 2020 03:58:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54492 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726198AbgIQH6B (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 17 Sep 2020 03:58:01 -0400
+Received: from mail-wm1-x343.google.com (mail-wm1-x343.google.com [IPv6:2a00:1450:4864:20::343])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1EC54C06174A
+        for <kvm@vger.kernel.org>; Thu, 17 Sep 2020 00:57:59 -0700 (PDT)
+Received: by mail-wm1-x343.google.com with SMTP id q9so1007850wmj.2
+        for <kvm@vger.kernel.org>; Thu, 17 Sep 2020 00:57:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:reply-to:to:cc:references:in-reply-to:subject:date:message-id
+         :mime-version:content-transfer-encoding:content-language
+         :thread-index;
+        bh=F5tUFeKbpaEUrhow1U7w2I/lFPTZrbFATqkKv3cbFJA=;
+        b=FNSk40xnigWgLlCaL62kHnc+P/yjp8QdcnH0aWaO96WYn0BmXic2joO/YFkThuDp4m
+         gjGwwcqEO0+wPsVkP+Kv78yf9OIjYzMi88kt9zd/WrUMdtldCiDvzcoK4pTIbMfTaurL
+         hjpUAji34/NkrNUAWEKQDPs8/MGafty1jcLdq6ZVTOouX5+NS7gKeW0YkOEdgIUZG7Fh
+         Mmdh3S6nhYIVzKsTbpD3eCHB13hvKV6FRo7HTNrkU2pyGy2weIaKXKxC9vCF2qNpNJQh
+         LtSUJD8k7S9juvysgja6hanFQKMglfE6PTxmx80iyLzWhPZeUndH30FwDZHOLlG9Hc51
+         qQHA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:reply-to:to:cc:references:in-reply-to
+         :subject:date:message-id:mime-version:content-transfer-encoding
+         :content-language:thread-index;
+        bh=F5tUFeKbpaEUrhow1U7w2I/lFPTZrbFATqkKv3cbFJA=;
+        b=i80MV3joBiS+WLCh07usUYOLA3bK747i4EaKMWZHouqpNzW6cwSQfgpohUFDuq1zfc
+         MF2An3y3fTRI9iYJlTTI1IDIQ70TfMMzt+3cxxltfg8XGsyylq53kIj9NCQkaLDRdCkQ
+         4C+m8srY9QbxfsDztuSMBz/MQOxFHyT2UCaweHvJNBt8hgWHiD0h4F63geSR29KzwNwx
+         iKnRIcxt+AtmssUIgsBhcOszr0PPt7DVNhs38nWUJEZCVTykvNkVZv70X5+zh2cKd8pC
+         wxl1ME/FLtSmfc4gbkwolOLlFtZAjndDTTk8AYf/bpun5F1urqK/AoZNwICQrXQvcYgJ
+         Vaog==
+X-Gm-Message-State: AOAM533dYfx+S13ln0t7DNw1yON7/me+vPmgZkeyqAmzvj47uE/MOmWp
+        xbQfCSrCdiXco0zRn+fJAGc=
+X-Google-Smtp-Source: ABdhPJxkLn4nLGdKW7V2mqOMQI69SYGDw7w/jcuyd53OGVblkZrELtEp9tgShRP5K992kz6iGt4boQ==
+X-Received: by 2002:a1c:6a11:: with SMTP id f17mr8064960wmc.143.1600329477743;
+        Thu, 17 Sep 2020 00:57:57 -0700 (PDT)
+Received: from CBGR90WXYV0 (host86-176-94-160.range86-176.btcentralplus.com. [86.176.94.160])
+        by smtp.gmail.com with ESMTPSA id c25sm9433892wml.31.2020.09.17.00.57.54
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Thu, 17 Sep 2020 00:57:57 -0700 (PDT)
+From:   Paul Durrant <xadimgnik@gmail.com>
+X-Google-Original-From: "Paul Durrant" <paul@xen.org>
+Reply-To: <paul@xen.org>
+To:     "'Eduardo Habkost'" <ehabkost@redhat.com>, <qemu-devel@nongnu.org>
+Cc:     "'Paolo Bonzini'" <pbonzini@redhat.com>,
+        "'Daniel P. Berrange'" <berrange@redhat.com>,
+        "'Gonglei \(Arei\)'" <arei.gonglei@huawei.com>,
+        "'Igor Mammedov'" <imammedo@redhat.com>,
+        "'Laurent Vivier'" <lvivier@redhat.com>,
+        "'Amit Shah'" <amit@kernel.org>,
+        "'Stefan Berger'" <stefanb@linux.ibm.com>,
+        "'Michael S. Tsirkin'" <mst@redhat.com>,
+        "'Greg Kurz'" <groug@kaod.org>,
+        "'Christian Schoenebeck'" <qemu_oss@crudebyte.com>,
+        "'Marcel Apfelbaum'" <marcel.apfelbaum@gmail.com>,
+        "'Aleksandar Markovic'" <aleksandar.qemu.devel@gmail.com>,
+        =?utf-8?Q?'Philippe_Mathieu-Daud=C3=A9'?= <f4bug@amsat.org>,
+        "'Aurelien Jarno'" <aurelien@aurel32.net>,
+        "'Richard Henderson'" <rth@twiddle.net>,
+        "'Peter Maydell'" <peter.maydell@linaro.org>,
+        "'Rob Herring'" <robh@kernel.org>,
+        "'Joel Stanley'" <joel@jms.id.au>,
+        "'Jan Kiszka'" <jan.kiszka@web.de>,
+        "'Andrzej Zaborowski'" <balrogg@gmail.com>,
+        "'Radoslaw Biernacki'" <rad@semihalf.com>,
+        "'Leif Lindholm'" <leif@nuviainc.com>,
+        "'Edgar E. Iglesias'" <edgar.iglesias@gmail.com>,
+        "'Alistair Francis'" <alistair@alistair23.me>,
+        "'Gerd Hoffmann'" <kraxel@redhat.com>,
+        "'Michael Walle'" <michael@walle.cc>,
+        "'John Snow'" <jsnow@redhat.com>,
+        "'Kevin Wolf'" <kwolf@redhat.com>,
+        "'Max Reitz'" <mreitz@redhat.com>,
+        =?utf-8?Q?'Marc-Andr=C3=A9_Lureau'?= <marcandre.lureau@redhat.com>,
+        "'Igor Mitsyanko'" <i.mitsyanko@gmail.com>,
+        "'Fabien Chouteau'" <chouteau@adacore.com>,
+        "'KONRAD Frederic'" <frederic.konrad@adacore.com>,
+        "'Alberto Garcia'" <berto@igalia.com>,
+        "'Thomas Huth'" <huth@tuxfamily.org>,
+        "'David Gibson'" <david@gibson.dropbear.id.au>,
+        "'Mark Cave-Ayland'" <mark.cave-ayland@ilande.co.uk>,
+        =?utf-8?Q?'Herv=C3=A9_Poussineau'?= <hpoussin@reactos.org>,
+        "'Aleksandar Rikalo'" <aleksandar.rikalo@syrmia.com>,
+        "'BALATON Zoltan'" <balaton@eik.bme.hu>,
+        "'Guan Xuetao'" <gxt@mprc.pku.edu.cn>,
+        "'Helge Deller'" <deller@gmx.de>,
+        "'Corey Minyard'" <cminyard@mvista.com>,
+        "'Stefano Stabellini'" <sstabellini@kernel.org>,
+        "'Anthony Perard'" <anthony.perard@citrix.com>,
+        "'Chris Wulff'" <crwulff@gmail.com>,
+        "'Marek Vasut'" <marex@denx.de>,
+        "'Huacai Chen'" <chenhc@lemote.com>,
+        "'Jiaxun Yang'" <jiaxun.yang@flygoat.com>,
+        "'Artyom Tarasenko'" <atar4qemu@gmail.com>,
+        "'Jason Wang'" <jasowang@redhat.com>,
+        "'Dmitry Fleytman'" <dmitry.fleytman@gmail.com>,
+        "'Max Filippov'" <jcmvbkbc@gmail.com>,
+        "'Sven Schnelle'" <svens@stackframe.org>,
+        "'Christian Borntraeger'" <borntraeger@de.ibm.com>,
+        "'Cornelia Huck'" <cohuck@redhat.com>,
+        "'Halil Pasic'" <pasic@linux.ibm.com>,
+        "'David Hildenbrand'" <david@redhat.com>,
+        "'Matthew Rosato'" <mjrosato@linux.ibm.com>,
+        "'Fam Zheng'" <fam@euphon.net>,
+        "'Yoshinori Sato'" <ysato@users.sourceforge.jp>,
+        "'Samuel Thibault'" <samuel.thibault@ens-lyon.org>,
+        "'Tony Krowiak'" <akrowiak@linux.ibm.com>,
+        "'Pierre Morel'" <pmorel@linux.ibm.com>,
+        "'Alex Williamson'" <alex.williamson@redhat.com>,
+        "'Ben Warren'" <ben@skyportsystems.com>,
+        "'Beniamino Galvani'" <b.galvani@gmail.com>,
+        "'Niek Linnenbank'" <nieklinnenbank@gmail.com>,
+        "'Andrew Baumann'" <Andrew.Baumann@microsoft.com>,
+        "'Antony Pavlov'" <antonynpavlov@gmail.com>,
+        "'Jean-Christophe Dubois'" <jcd@tribudubois.net>,
+        "'Peter Chubb'" <peter.chubb@nicta.com.au>,
+        "'Andrey Smirnov'" <andrew.smirnov@gmail.com>,
+        "'Subbaraya Sundeep'" <sundeep.lkml@gmail.com>,
+        "'Michael Rolnik'" <mrolnik@gmail.com>,
+        "'Sarah Harris'" <S.E.Harris@kent.ac.uk>,
+        "'Peter Xu'" <peterx@redhat.com>,
+        =?utf-8?Q?'C=C3=A9dric_Le_Goater'?= <clg@kaod.org>,
+        "'Andrew Jeffery'" <andrew@aj.id.au>,
+        "'Laszlo Ersek'" <lersek@redhat.com>,
+        "'Paul Burton'" <paulburton@kernel.org>,
+        "'Palmer Dabbelt'" <palmer@dabbelt.com>,
+        "'Sagar Karandikar'" <sagark@eecs.berkeley.edu>,
+        "'Bastian Koppelmann'" <kbastian@mail.uni-paderborn.de>,
+        "'Anup Patel'" <anup.patel@wdc.com>,
+        "'Eric Farman'" <farman@linux.ibm.com>,
+        "'Raphael Norwitz'" <raphael.norwitz@nutanix.com>,
+        "'Dr. David Alan Gilbert'" <dgilbert@redhat.com>,
+        "'Stefan Hajnoczi'" <stefanha@redhat.com>,
+        "'Eric Auger'" <eric.auger@redhat.com>,
+        "'Juan Quintela'" <quintela@redhat.com>,
+        "'Pavel Dovgalyuk'" <pavel.dovgaluk@ispras.ru>,
+        "'Zhang Chen'" <chen.zhang@intel.com>,
+        "'Li Zhijian'" <lizhijian@cn.fujitsu.com>, <qemu-arm@nongnu.org>,
+        <qemu-block@nongnu.org>, <qemu-ppc@nongnu.org>,
+        <kvm@vger.kernel.org>, <xen-devel@lists.xenproject.org>,
+        <qemu-s390x@nongnu.org>, <qemu-riscv@nongnu.org>
+References: <20200916182519.415636-1-ehabkost@redhat.com> <20200916182519.415636-6-ehabkost@redhat.com>
+In-Reply-To: <20200916182519.415636-6-ehabkost@redhat.com>
+Subject: RE: [PATCH 5/5] [automated] Use OBJECT_DECLARE_SIMPLE_TYPE when possible
+Date:   Thu, 17 Sep 2020 08:57:54 +0100
+Message-ID: <007d01d68cc8$4146b8b0$c3d42a10$@xen.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-Date:   Thu, 17 Sep 2020 08:47:42 +0100
-From:   Marc Zyngier <maz@kernel.org>
-To:     Ying Fang <fangying1@huawei.com>
-Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
-        drjones@redhat.com, james.morse@arm.com,
-        julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com,
-        zhang.zhanghailiang@huawei.com, alex.chen@huawei.com
-Subject: Re: [PATCH 2/2] kvm/arm: Add mp_affinity for arm vcpu
-In-Reply-To: <20200917023033.1337-3-fangying1@huawei.com>
-References: <20200917023033.1337-1-fangying1@huawei.com>
- <20200917023033.1337-3-fangying1@huawei.com>
-User-Agent: Roundcube Webmail/1.4.8
-Message-ID: <7a924b0fb27505a0d8b00389fe2f02df@kernel.org>
-X-Sender: maz@kernel.org
-X-SA-Exim-Connect-IP: 51.254.78.96
-X-SA-Exim-Rcpt-To: fangying1@huawei.com, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, drjones@redhat.com, james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, zhang.zhanghailiang@huawei.com, alex.chen@huawei.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Content-Type: text/plain;
+        charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+X-Mailer: Microsoft Outlook 16.0
+Content-Language: en-gb
+Thread-Index: AQIelPz0+HUIa2jn7mxP/pozU40YBAFKLlCOqNIUBNA=
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2020-09-17 03:30, Ying Fang wrote:
-> Allow userspace to set MPIDR using vcpu ioctl KVM_ARM_SET_MP_AFFINITY,
-> so that we can support cpu topology for arm.
+> -----Original Message-----
+> From: Eduardo Habkost <ehabkost@redhat.com>
+> Sent: 16 September 2020 19:25
+> To: qemu-devel@nongnu.org
+> Cc: Paolo Bonzini <pbonzini@redhat.com>; Daniel P. Berrange =
+<berrange@redhat.com>; Gonglei (Arei)
+> <arei.gonglei@huawei.com>; Igor Mammedov <imammedo@redhat.com>; =
+Laurent Vivier <lvivier@redhat.com>;
+> Amit Shah <amit@kernel.org>; Stefan Berger <stefanb@linux.ibm.com>; =
+Michael S. Tsirkin
+> <mst@redhat.com>; Greg Kurz <groug@kaod.org>; Christian Schoenebeck =
+<qemu_oss@crudebyte.com>; Marcel
+> Apfelbaum <marcel.apfelbaum@gmail.com>; Aleksandar Markovic =
+<aleksandar.qemu.devel@gmail.com>;
+> Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>; Aurelien Jarno =
+<aurelien@aurel32.net>; Richard Henderson
+> <rth@twiddle.net>; Peter Maydell <peter.maydell@linaro.org>; Rob =
+Herring <robh@kernel.org>; Joel
+> Stanley <joel@jms.id.au>; Jan Kiszka <jan.kiszka@web.de>; Andrzej =
+Zaborowski <balrogg@gmail.com>;
+> Radoslaw Biernacki <rad@semihalf.com>; Leif Lindholm =
+<leif@nuviainc.com>; Edgar E. Iglesias
+> <edgar.iglesias@gmail.com>; Alistair Francis <alistair@alistair23.me>; =
+Gerd Hoffmann
+> <kraxel@redhat.com>; Michael Walle <michael@walle.cc>; John Snow =
+<jsnow@redhat.com>; Kevin Wolf
+> <kwolf@redhat.com>; Max Reitz <mreitz@redhat.com>; Marc-Andr=C3=A9 =
+Lureau <marcandre.lureau@redhat.com>;
+> Igor Mitsyanko <i.mitsyanko@gmail.com>; Fabien Chouteau =
+<chouteau@adacore.com>; KONRAD Frederic
+> <frederic.konrad@adacore.com>; Alberto Garcia <berto@igalia.com>; =
+Thomas Huth <huth@tuxfamily.org>;
+> David Gibson <david@gibson.dropbear.id.au>; Mark Cave-Ayland =
+<mark.cave-ayland@ilande.co.uk>; Herv=C3=A9
+> Poussineau <hpoussin@reactos.org>; Aleksandar Rikalo =
+<aleksandar.rikalo@syrmia.com>; BALATON Zoltan
+> <balaton@eik.bme.hu>; Guan Xuetao <gxt@mprc.pku.edu.cn>; Helge Deller =
+<deller@gmx.de>; Corey Minyard
+> <cminyard@mvista.com>; Stefano Stabellini <sstabellini@kernel.org>; =
+Anthony Perard
+> <anthony.perard@citrix.com>; Paul Durrant <paul@xen.org>; Chris Wulff =
+<crwulff@gmail.com>; Marek Vasut
+> <marex@denx.de>; Huacai Chen <chenhc@lemote.com>; Jiaxun Yang =
+<jiaxun.yang@flygoat.com>; Artyom
+> Tarasenko <atar4qemu@gmail.com>; Jason Wang <jasowang@redhat.com>; =
+Dmitry Fleytman
+> <dmitry.fleytman@gmail.com>; Max Filippov <jcmvbkbc@gmail.com>; Sven =
+Schnelle <svens@stackframe.org>;
+> Christian Borntraeger <borntraeger@de.ibm.com>; Cornelia Huck =
+<cohuck@redhat.com>; Halil Pasic
+> <pasic@linux.ibm.com>; David Hildenbrand <david@redhat.com>; Matthew =
+Rosato <mjrosato@linux.ibm.com>;
+> Fam Zheng <fam@euphon.net>; Yoshinori Sato =
+<ysato@users.sourceforge.jp>; Samuel Thibault
+> <samuel.thibault@ens-lyon.org>; Tony Krowiak <akrowiak@linux.ibm.com>; =
+Pierre Morel
+> <pmorel@linux.ibm.com>; Alex Williamson <alex.williamson@redhat.com>; =
+Ben Warren
+> <ben@skyportsystems.com>; Beniamino Galvani <b.galvani@gmail.com>; =
+Niek Linnenbank
+> <nieklinnenbank@gmail.com>; Andrew Baumann =
+<Andrew.Baumann@microsoft.com>; Antony Pavlov
+> <antonynpavlov@gmail.com>; Jean-Christophe Dubois =
+<jcd@tribudubois.net>; Peter Chubb
+> <peter.chubb@nicta.com.au>; Andrey Smirnov <andrew.smirnov@gmail.com>; =
+Subbaraya Sundeep
+> <sundeep.lkml@gmail.com>; Michael Rolnik <mrolnik@gmail.com>; Sarah =
+Harris <S.E.Harris@kent.ac.uk>;
+> Peter Xu <peterx@redhat.com>; C=C3=A9dric Le Goater <clg@kaod.org>; =
+Andrew Jeffery <andrew@aj.id.au>;
+> Laszlo Ersek <lersek@redhat.com>; Paul Burton <paulburton@kernel.org>; =
+Palmer Dabbelt
+> <palmer@dabbelt.com>; Sagar Karandikar <sagark@eecs.berkeley.edu>; =
+Bastian Koppelmann
+> <kbastian@mail.uni-paderborn.de>; Anup Patel <anup.patel@wdc.com>; =
+Eric Farman <farman@linux.ibm.com>;
+> Raphael Norwitz <raphael.norwitz@nutanix.com>; Dr. David Alan Gilbert =
+<dgilbert@redhat.com>; Stefan
+> Hajnoczi <stefanha@redhat.com>; Eric Auger <eric.auger@redhat.com>; =
+Juan Quintela
+> <quintela@redhat.com>; Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>; =
+Zhang Chen <chen.zhang@intel.com>;
+> Li Zhijian <lizhijian@cn.fujitsu.com>; qemu-arm@nongnu.org; =
+qemu-block@nongnu.org; qemu-
+> ppc@nongnu.org; kvm@vger.kernel.org; xen-devel@lists.xenproject.org; =
+qemu-s390x@nongnu.org; qemu-
+> riscv@nongnu.org
+> Subject: [PATCH 5/5] [automated] Use OBJECT_DECLARE_SIMPLE_TYPE when =
+possible
+>=20
+> This converts existing DECLARE_INSTANCE_CHECKER usage to
+> OBJECT_DECLARE_SIMPLE_TYPE when possible.
+>=20
+> $ ./scripts/codeconverter/converter.py -i \
+>   --pattern=3DAddObjectDeclareSimpleType $(git grep -l '' -- '*.[ch]')
+>=20
+> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 
-MPIDR has *nothing* to do with CPU topology in the ARM architecture.
-I encourage you to have a look at the ARM ARM and find out how often
-the word "topology" is used in conjunction with the MPIDR_EL1 register.
+Acked-by: Paul Durrant <paul@xen.org>
 
-> 
-> Signed-off-by: Ying Fang <fangying1@huawei.com>
-> ---
->  arch/arm64/include/asm/kvm_host.h |  5 +++++
->  arch/arm64/kvm/arm.c              |  8 ++++++++
->  arch/arm64/kvm/reset.c            | 11 +++++++++++
->  arch/arm64/kvm/sys_regs.c         | 30 +++++++++++++++++++-----------
->  include/uapi/linux/kvm.h          |  2 ++
->  5 files changed, 45 insertions(+), 11 deletions(-)
-> 
-> diff --git a/arch/arm64/include/asm/kvm_host.h
-> b/arch/arm64/include/asm/kvm_host.h
-> index e52c927aade5..7adc351ee70a 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -372,6 +372,9 @@ struct kvm_vcpu_arch {
->  		u64 last_steal;
->  		gpa_t base;
->  	} steal;
-> +
-> +	/* vCPU MP Affinity */
-> +	u64 mp_affinity;
-
-No. We already have a per-CPU MPIDR_EL1 register, we don't need another
-piece of state.
-
->  };
-> 
->  /* Pointer to the vcpu's SVE FFR for sve_{save,load}_state() */
-> @@ -685,6 +688,8 @@ int kvm_arm_setup_stage2(struct kvm *kvm, unsigned
-> long type);
->  int kvm_arm_vcpu_finalize(struct kvm_vcpu *vcpu, int feature);
->  bool kvm_arm_vcpu_is_finalized(struct kvm_vcpu *vcpu);
-> 
-> +int kvm_arm_vcpu_set_mp_affinity(struct kvm_vcpu *vcpu, uint64_t 
-> mpidr);
-> +
->  #define kvm_arm_vcpu_sve_finalized(vcpu) \
->  	((vcpu)->arch.flags & KVM_ARM64_VCPU_SVE_FINALIZED)
-> 
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index 913c8da539b3..5f1fa625dc11 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-> @@ -1178,6 +1178,14 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
-> 
->  		return kvm_arm_vcpu_finalize(vcpu, what);
->  	}
-> +	case KVM_ARM_SET_MP_AFFINITY: {
-> +		u64 mpidr;
-> +
-> +		if (get_user(mpidr, (const unsigned int __user *)argp))
-> +			return -EFAULT;
-> +
-> +		return kvm_arm_vcpu_set_mp_affinity(vcpu, mpidr);
-> +	}
-
-That's not the way we access system registers from userspace.
-
->  	default:
->  		r = -EINVAL;
->  	}
-> diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
-> index ee33875c5c2a..4918c967b0c9 100644
-> --- a/arch/arm64/kvm/reset.c
-> +++ b/arch/arm64/kvm/reset.c
-> @@ -188,6 +188,17 @@ int kvm_arm_vcpu_finalize(struct kvm_vcpu *vcpu,
-> int feature)
->  	return -EINVAL;
->  }
-> 
-> +int kvm_arm_vcpu_set_mp_affinity(struct kvm_vcpu *vcpu, uint64_t 
-> mpidr)
-> +{
-> +	if (!(mpidr & (1ULL << 31))) {
-> +		pr_warn("invalid mp_affinity format\n");
-> +		return -EINVAL;
-> +	}
-> +
-> +	vcpu->arch.mp_affinity = mpidr;
-
-This doesn't match the definition of the MPIDR_EL1 register. It also
-doesn't take into account any of the existing restrictions for the
-supported affinity levels and number of PEs at the lowest affinity
-level.
-
-> +	return 0;
-> +}
-> +
->  bool kvm_arm_vcpu_is_finalized(struct kvm_vcpu *vcpu)
->  {
->  	if (vcpu_has_sve(vcpu) && !kvm_arm_vcpu_sve_finalized(vcpu))
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index 077293b5115f..e76f483475ad 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -646,17 +646,25 @@ static void reset_mpidr(struct kvm_vcpu *vcpu,
-> const struct sys_reg_desc *r)
->  {
->  	u64 mpidr;
-> 
-> -	/*
-> -	 * Map the vcpu_id into the first three affinity level fields of
-> -	 * the MPIDR. We limit the number of VCPUs in level 0 due to a
-> -	 * limitation to 16 CPUs in that level in the ICC_SGIxR registers
-> -	 * of the GICv3 to be able to address each CPU directly when
-> -	 * sending IPIs.
-> -	 */
-> -	mpidr = (vcpu->vcpu_id & 0x0f) << MPIDR_LEVEL_SHIFT(0);
-> -	mpidr |= ((vcpu->vcpu_id >> 4) & 0xff) << MPIDR_LEVEL_SHIFT(1);
-> -	mpidr |= ((vcpu->vcpu_id >> 12) & 0xff) << MPIDR_LEVEL_SHIFT(2);
-> -	vcpu_write_sys_reg(vcpu, (1ULL << 31) | mpidr, MPIDR_EL1);
-> +	if (vcpu->arch.mp_affinity) {
-> +		/* If mp_affinity is set by userspace, it means an customized cpu
-> +		 * topology is defined. Let it be MPIDR of the vcpu
-> +		 */
-> +		mpidr = vcpu->arch.mp_affinity;
-> +	} else {
-> +		/*
-> +		 * Map the vcpu_id into the first three affinity level fields of
-> +		 * the MPIDR. We limit the number of VCPUs in level 0 due to a
-> +		 * limitation to 16 CPUs in that level in the ICC_SGIxR registers
-> +		 * of the GICv3 to be able to address each CPU directly when
-> +		 * sending IPIs.
-> +		 */
-> +		mpidr = (vcpu->vcpu_id & 0x0f) << MPIDR_LEVEL_SHIFT(0);
-> +		mpidr |= ((vcpu->vcpu_id >> 4) & 0xff) << MPIDR_LEVEL_SHIFT(1);
-> +		mpidr |= ((vcpu->vcpu_id >> 12) & 0xff) << MPIDR_LEVEL_SHIFT(2);
-> +		mpidr |= (1ULL << 31);
-> +	}
-> +	vcpu_write_sys_reg(vcpu, mpidr, MPIDR_EL1);
->  }
-> 
->  static void reset_pmcr(struct kvm_vcpu *vcpu, const struct 
-> sys_reg_desc *r)
-> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-> index c4874905cd9c..ae45876a689d 100644
-> --- a/include/uapi/linux/kvm.h
-> +++ b/include/uapi/linux/kvm.h
-> @@ -1475,6 +1475,8 @@ struct kvm_s390_ucas_mapping {
->  #define KVM_S390_SET_CMMA_BITS      _IOW(KVMIO, 0xb9, struct 
-> kvm_s390_cmma_log)
->  /* Memory Encryption Commands */
->  #define KVM_MEMORY_ENCRYPT_OP      _IOWR(KVMIO, 0xba, unsigned long)
-> +/* Available with KVM_CAP_ARM_MP_AFFINITY */
-> +#define KVM_ARM_SET_MP_AFFINITY    _IOWR(KVMIO, 0xbb, unsigned long)
-> 
->  struct kvm_enc_region {
->  	__u64 addr;
-
-As it is, this patch is unacceptable. It ignores the requirements of the
-architecture, as well as those of imposed by KVM as a platform.
-It also pointlessly creates additional state and invents unnecessary
-userspace interfaces. In short, it requires some *major* rework.
-
-         M.
--- 
-Jazz is not dead. It just smells funny...
