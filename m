@@ -2,39 +2,41 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 025A426EE91
-	for <lists+kvm@lfdr.de>; Fri, 18 Sep 2020 04:29:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 93FCA26EE56
+	for <lists+kvm@lfdr.de>; Fri, 18 Sep 2020 04:27:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729121AbgIRCPG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 17 Sep 2020 22:15:06 -0400
-Received: from mail.kernel.org ([198.145.29.99]:43340 "EHLO mail.kernel.org"
+        id S1728969AbgIRC1m (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 17 Sep 2020 22:27:42 -0400
+Received: from mail.kernel.org ([198.145.29.99]:44514 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726236AbgIRCOx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 17 Sep 2020 22:14:53 -0400
+        id S1729253AbgIRCPf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 17 Sep 2020 22:15:35 -0400
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 1D59223A02;
-        Fri, 18 Sep 2020 02:14:52 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 44C652376F;
+        Fri, 18 Sep 2020 02:15:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1600395292;
-        bh=luOWHiJFrd9K3Kp8d/54e8Ay6zUO8Umkm6z9T/H+89U=;
+        s=default; t=1600395334;
+        bh=cx6RFj6B0y9hjjEdfiYkh/7MgHgTG0dYrNA7PUkhLvY=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=xSi8TDW9V3/NpsO5+qGZnhoi9yxCYK96iByIVk/AMLGNqQRprv3wKRd43MI9GF82K
-         YGMsLssEiI+aOsnOidvRYHTmZxUdi90PFjucGOy0yKdqJUAhX3E165ZzfvxfSzDkBC
-         szgVnHQQTjNkwZ6H5i0nXXSDY7mQvM5DmL2DZCyg=
+        b=ktVz4RjEILnI+lwfIR6CV+7/3EK4dFiY9s9jUwBxjasO7+K6uOgxlDKTf49uUQExh
+         yZlpR1NYGvBngVeXHXl5oD8bwDflMk6Se9Mkg7orz+AF+vMoVCnNYvmmzHCnXGOMsE
+         xb7C76ERQbJAEh9Rb6GJY8m8T5Qk0wEn0rV5K0lw=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Zeng Tao <prime.zeng@hisilicon.com>, Qian Cai <cai@lca.pw>,
-        Alex Williamson <alex.williamson@redhat.com>,
+Cc:     Zhuang Yanying <ann.zhuangyanying@huawei.com>,
+        LinFeng <linfeng23@huawei.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
         Sasha Levin <sashal@kernel.org>, kvm@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.14 126/127] vfio/pci: fix racy on error and request eventfd ctx
-Date:   Thu, 17 Sep 2020 22:12:19 -0400
-Message-Id: <20200918021220.2066485-126-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.9 31/90] KVM: fix overflow of zero page refcount with ksm running
+Date:   Thu, 17 Sep 2020 22:13:56 -0400
+Message-Id: <20200918021455.2067301-31-sashal@kernel.org>
 X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20200918021220.2066485-1-sashal@kernel.org>
-References: <20200918021220.2066485-1-sashal@kernel.org>
+In-Reply-To: <20200918021455.2067301-1-sashal@kernel.org>
+References: <20200918021455.2067301-1-sashal@kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 X-stable: review
 X-Patchwork-Hint: Ignore
 Content-Transfer-Encoding: 8bit
@@ -42,120 +44,113 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Zeng Tao <prime.zeng@hisilicon.com>
+From: Zhuang Yanying <ann.zhuangyanying@huawei.com>
 
-[ Upstream commit b872d0640840018669032b20b6375a478ed1f923 ]
+[ Upstream commit 7df003c85218b5f5b10a7f6418208f31e813f38f ]
 
-The vfio_pci_release call will free and clear the error and request
-eventfd ctx while these ctx could be in use at the same time in the
-function like vfio_pci_request, and it's expected to protect them under
-the vdev->igate mutex, which is missing in vfio_pci_release.
+We are testing Virtual Machine with KSM on v5.4-rc2 kernel,
+and found the zero_page refcount overflow.
+The cause of refcount overflow is increased in try_async_pf
+(get_user_page) without being decreased in mmu_set_spte()
+while handling ept violation.
+In kvm_release_pfn_clean(), only unreserved page will call
+put_page. However, zero page is reserved.
+So, as well as creating and destroy vm, the refcount of
+zero page will continue to increase until it overflows.
 
-This issue is introduced since commit 1518ac272e78 ("vfio/pci: fix memory
-leaks of eventfd ctx"),and since commit 5c5866c593bb ("vfio/pci: Clear
-error and request eventfd ctx after releasing"), it's very easily to
-trigger the kernel panic like this:
+step1:
+echo 10000 > /sys/kernel/pages_to_scan/pages_to_scan
+echo 1 > /sys/kernel/pages_to_scan/run
+echo 1 > /sys/kernel/pages_to_scan/use_zero_pages
 
-[ 9513.904346] Unable to handle kernel NULL pointer dereference at virtual address 0000000000000008
-[ 9513.913091] Mem abort info:
-[ 9513.915871]   ESR = 0x96000006
-[ 9513.918912]   EC = 0x25: DABT (current EL), IL = 32 bits
-[ 9513.924198]   SET = 0, FnV = 0
-[ 9513.927238]   EA = 0, S1PTW = 0
-[ 9513.930364] Data abort info:
-[ 9513.933231]   ISV = 0, ISS = 0x00000006
-[ 9513.937048]   CM = 0, WnR = 0
-[ 9513.940003] user pgtable: 4k pages, 48-bit VAs, pgdp=0000007ec7d12000
-[ 9513.946414] [0000000000000008] pgd=0000007ec7d13003, p4d=0000007ec7d13003, pud=0000007ec728c003, pmd=0000000000000000
-[ 9513.956975] Internal error: Oops: 96000006 [#1] PREEMPT SMP
-[ 9513.962521] Modules linked in: vfio_pci vfio_virqfd vfio_iommu_type1 vfio hclge hns3 hnae3 [last unloaded: vfio_pci]
-[ 9513.972998] CPU: 4 PID: 1327 Comm: bash Tainted: G        W         5.8.0-rc4+ #3
-[ 9513.980443] Hardware name: Huawei TaiShan 2280 V2/BC82AMDC, BIOS 2280-V2 CS V3.B270.01 05/08/2020
-[ 9513.989274] pstate: 80400089 (Nzcv daIf +PAN -UAO BTYPE=--)
-[ 9513.994827] pc : _raw_spin_lock_irqsave+0x48/0x88
-[ 9513.999515] lr : eventfd_signal+0x6c/0x1b0
-[ 9514.003591] sp : ffff800038a0b960
-[ 9514.006889] x29: ffff800038a0b960 x28: ffff007ef7f4da10
-[ 9514.012175] x27: ffff207eefbbfc80 x26: ffffbb7903457000
-[ 9514.017462] x25: ffffbb7912191000 x24: ffff007ef7f4d400
-[ 9514.022747] x23: ffff20be6e0e4c00 x22: 0000000000000008
-[ 9514.028033] x21: 0000000000000000 x20: 0000000000000000
-[ 9514.033321] x19: 0000000000000008 x18: 0000000000000000
-[ 9514.038606] x17: 0000000000000000 x16: ffffbb7910029328
-[ 9514.043893] x15: 0000000000000000 x14: 0000000000000001
-[ 9514.049179] x13: 0000000000000000 x12: 0000000000000002
-[ 9514.054466] x11: 0000000000000000 x10: 0000000000000a00
-[ 9514.059752] x9 : ffff800038a0b840 x8 : ffff007ef7f4de60
-[ 9514.065038] x7 : ffff007fffc96690 x6 : fffffe01faffb748
-[ 9514.070324] x5 : 0000000000000000 x4 : 0000000000000000
-[ 9514.075609] x3 : 0000000000000000 x2 : 0000000000000001
-[ 9514.080895] x1 : ffff007ef7f4d400 x0 : 0000000000000000
-[ 9514.086181] Call trace:
-[ 9514.088618]  _raw_spin_lock_irqsave+0x48/0x88
-[ 9514.092954]  eventfd_signal+0x6c/0x1b0
-[ 9514.096691]  vfio_pci_request+0x84/0xd0 [vfio_pci]
-[ 9514.101464]  vfio_del_group_dev+0x150/0x290 [vfio]
-[ 9514.106234]  vfio_pci_remove+0x30/0x128 [vfio_pci]
-[ 9514.111007]  pci_device_remove+0x48/0x108
-[ 9514.115001]  device_release_driver_internal+0x100/0x1b8
-[ 9514.120200]  device_release_driver+0x28/0x38
-[ 9514.124452]  pci_stop_bus_device+0x68/0xa8
-[ 9514.128528]  pci_stop_and_remove_bus_device+0x20/0x38
-[ 9514.133557]  pci_iov_remove_virtfn+0xb4/0x128
-[ 9514.137893]  sriov_disable+0x3c/0x108
-[ 9514.141538]  pci_disable_sriov+0x28/0x38
-[ 9514.145445]  hns3_pci_sriov_configure+0x48/0xb8 [hns3]
-[ 9514.150558]  sriov_numvfs_store+0x110/0x198
-[ 9514.154724]  dev_attr_store+0x44/0x60
-[ 9514.158373]  sysfs_kf_write+0x5c/0x78
-[ 9514.162018]  kernfs_fop_write+0x104/0x210
-[ 9514.166010]  __vfs_write+0x48/0x90
-[ 9514.169395]  vfs_write+0xbc/0x1c0
-[ 9514.172694]  ksys_write+0x74/0x100
-[ 9514.176079]  __arm64_sys_write+0x24/0x30
-[ 9514.179987]  el0_svc_common.constprop.4+0x110/0x200
-[ 9514.184842]  do_el0_svc+0x34/0x98
-[ 9514.188144]  el0_svc+0x14/0x40
-[ 9514.191185]  el0_sync_handler+0xb0/0x2d0
-[ 9514.195088]  el0_sync+0x140/0x180
-[ 9514.198389] Code: b9001020 d2800000 52800022 f9800271 (885ffe61)
-[ 9514.204455] ---[ end trace 648de00c8406465f ]---
-[ 9514.212308] note: bash[1327] exited with preempt_count 1
+step2:
+just create several normal qemu kvm vms.
+And destroy it after 10s.
+Repeat this action all the time.
 
-Cc: Qian Cai <cai@lca.pw>
-Cc: Alex Williamson <alex.williamson@redhat.com>
-Fixes: 1518ac272e78 ("vfio/pci: fix memory leaks of eventfd ctx")
-Signed-off-by: Zeng Tao <prime.zeng@hisilicon.com>
-Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
+After a long period of time, all domains hang because
+of the refcount of zero page overflow.
+
+Qemu print error log as follow:
+ â€¦
+ error: kvm run failed Bad address
+ EAX=00006cdc EBX=00000008 ECX=80202001 EDX=078bfbfd
+ ESI=ffffffff EDI=00000000 EBP=00000008 ESP=00006cc4
+ EIP=000efd75 EFL=00010002 [-------] CPL=0 II=0 A20=1 SMM=0 HLT=0
+ ES =0010 00000000 ffffffff 00c09300 DPL=0 DS   [-WA]
+ CS =0008 00000000 ffffffff 00c09b00 DPL=0 CS32 [-RA]
+ SS =0010 00000000 ffffffff 00c09300 DPL=0 DS   [-WA]
+ DS =0010 00000000 ffffffff 00c09300 DPL=0 DS   [-WA]
+ FS =0010 00000000 ffffffff 00c09300 DPL=0 DS   [-WA]
+ GS =0010 00000000 ffffffff 00c09300 DPL=0 DS   [-WA]
+ LDT=0000 00000000 0000ffff 00008200 DPL=0 LDT
+ TR =0000 00000000 0000ffff 00008b00 DPL=0 TSS32-busy
+ GDT=     000f7070 00000037
+ IDT=     000f70ae 00000000
+ CR0=00000011 CR2=00000000 CR3=00000000 CR4=00000000
+ DR0=0000000000000000 DR1=0000000000000000 DR2=0000000000000000 DR3=0000000000000000
+ DR6=00000000ffff0ff0 DR7=0000000000000400
+ EFER=0000000000000000
+ Code=00 01 00 00 00 e9 e8 00 00 00 c7 05 4c 55 0f 00 01 00 00 00 <8b> 35 00 00 01 00 8b 3d 04 00 01 00 b8 d8 d3 00 00 c1 e0 08 0c ea a3 00 00 01 00 c7 05 04
+ â€¦
+
+Meanwhile, a kernel warning is departed.
+
+ [40914.836375] WARNING: CPU: 3 PID: 82067 at ./include/linux/mm.h:987 try_get_page+0x1f/0x30
+ [40914.836412] CPU: 3 PID: 82067 Comm: CPU 0/KVM Kdump: loaded Tainted: G           OE     5.2.0-rc2 #5
+ [40914.836415] RIP: 0010:try_get_page+0x1f/0x30
+ [40914.836417] Code: 40 00 c3 0f 1f 84 00 00 00 00 00 48 8b 47 08 a8 01 75 11 8b 47 34 85 c0 7e 10 f0 ff 47 34 b8 01 00 00 00 c3 48 8d 78 ff eb e9 <0f> 0b 31 c0 c3 66 90 66 2e 0f 1f 84 00 0
+ 0 00 00 00 48 8b 47 08 a8
+ [40914.836418] RSP: 0018:ffffb4144e523988 EFLAGS: 00010286
+ [40914.836419] RAX: 0000000080000000 RBX: 0000000000000326 RCX: 0000000000000000
+ [40914.836420] RDX: 0000000000000000 RSI: 00004ffdeba10000 RDI: ffffdf07093f6440
+ [40914.836421] RBP: ffffdf07093f6440 R08: 800000424fd91225 R09: 0000000000000000
+ [40914.836421] R10: ffff9eb41bfeebb8 R11: 0000000000000000 R12: ffffdf06bbd1e8a8
+ [40914.836422] R13: 0000000000000080 R14: 800000424fd91225 R15: ffffdf07093f6440
+ [40914.836423] FS:  00007fb60ffff700(0000) GS:ffff9eb4802c0000(0000) knlGS:0000000000000000
+ [40914.836425] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+ [40914.836426] CR2: 0000000000000000 CR3: 0000002f220e6002 CR4: 00000000003626e0
+ [40914.836427] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+ [40914.836427] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+ [40914.836428] Call Trace:
+ [40914.836433]  follow_page_pte+0x302/0x47b
+ [40914.836437]  __get_user_pages+0xf1/0x7d0
+ [40914.836441]  ? irq_work_queue+0x9/0x70
+ [40914.836443]  get_user_pages_unlocked+0x13f/0x1e0
+ [40914.836469]  __gfn_to_pfn_memslot+0x10e/0x400 [kvm]
+ [40914.836486]  try_async_pf+0x87/0x240 [kvm]
+ [40914.836503]  tdp_page_fault+0x139/0x270 [kvm]
+ [40914.836523]  kvm_mmu_page_fault+0x76/0x5e0 [kvm]
+ [40914.836588]  vcpu_enter_guest+0xb45/0x1570 [kvm]
+ [40914.836632]  kvm_arch_vcpu_ioctl_run+0x35d/0x580 [kvm]
+ [40914.836645]  kvm_vcpu_ioctl+0x26e/0x5d0 [kvm]
+ [40914.836650]  do_vfs_ioctl+0xa9/0x620
+ [40914.836653]  ksys_ioctl+0x60/0x90
+ [40914.836654]  __x64_sys_ioctl+0x16/0x20
+ [40914.836658]  do_syscall_64+0x5b/0x180
+ [40914.836664]  entry_SYSCALL_64_after_hwframe+0x44/0xa9
+ [40914.836666] RIP: 0033:0x7fb61cb6bfc7
+
+Signed-off-by: LinFeng <linfeng23@huawei.com>
+Signed-off-by: Zhuang Yanying <ann.zhuangyanying@huawei.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/vfio/pci/vfio_pci.c | 5 +++++
- 1 file changed, 5 insertions(+)
+ virt/kvm/kvm_main.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/drivers/vfio/pci/vfio_pci.c b/drivers/vfio/pci/vfio_pci.c
-index 4fbc38b955ad8..ac1c54bcfe8fb 100644
---- a/drivers/vfio/pci/vfio_pci.c
-+++ b/drivers/vfio/pci/vfio_pci.c
-@@ -399,14 +399,19 @@ static void vfio_pci_release(void *device_data)
- 	if (!(--vdev->refcnt)) {
- 		vfio_spapr_pci_eeh_release(vdev->pdev);
- 		vfio_pci_disable(vdev);
-+		mutex_lock(&vdev->igate);
- 		if (vdev->err_trigger) {
- 			eventfd_ctx_put(vdev->err_trigger);
- 			vdev->err_trigger = NULL;
- 		}
-+		mutex_unlock(&vdev->igate);
-+
-+		mutex_lock(&vdev->igate);
- 		if (vdev->req_trigger) {
- 			eventfd_ctx_put(vdev->req_trigger);
- 			vdev->req_trigger = NULL;
- 		}
-+		mutex_unlock(&vdev->igate);
- 	}
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index 4e4bb5dd2dcd5..266c9a31b1ba9 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -154,6 +154,7 @@ bool kvm_is_reserved_pfn(kvm_pfn_t pfn)
+ 	 */
+ 	if (pfn_valid(pfn))
+ 		return PageReserved(pfn_to_page(pfn)) &&
++		       !is_zero_pfn(pfn) &&
+ 		       !kvm_is_zone_device_pfn(pfn);
  
- 	mutex_unlock(&driver_lock);
+ 	return true;
 -- 
 2.25.1
 
