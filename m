@@ -2,169 +2,155 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 589B026EAE9
-	for <lists+kvm@lfdr.de>; Fri, 18 Sep 2020 04:02:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6945F26EC0F
+	for <lists+kvm@lfdr.de>; Fri, 18 Sep 2020 04:11:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726588AbgIRCB5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 17 Sep 2020 22:01:57 -0400
-Received: from mga02.intel.com ([134.134.136.20]:9326 "EHLO mga02.intel.com"
+        id S1728293AbgIRCJa (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 17 Sep 2020 22:09:30 -0400
+Received: from mail.kernel.org ([198.145.29.99]:33170 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726559AbgIRCB4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 17 Sep 2020 22:01:56 -0400
-IronPort-SDR: XKg1Bd1Ar6jtsWnp4BRaPbHDQGu3+nPiPQh0mAypDs82pZYqWUABrn+TufnYlO7tPY7GhCXTl8
- kuBGKicq/xaQ==
-X-IronPort-AV: E=McAfee;i="6000,8403,9747"; a="147519848"
-X-IronPort-AV: E=Sophos;i="5.77,273,1596524400"; 
-   d="scan'208";a="147519848"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Sep 2020 19:01:49 -0700
-IronPort-SDR: u0IPqO1dPLyUdcxT5WqP2QBoYoVgOeF0T0HWHG3n7gj0rOpfrbk7o5GkDbKxId3YE/ZWZSZqCz
- mRZ0TsoIfeTg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.77,273,1596524400"; 
-   d="scan'208";a="508672197"
-Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
-  by fmsmga005.fm.intel.com with ESMTP; 17 Sep 2020 19:01:48 -0700
-Received: from fmsmsx609.amr.corp.intel.com (10.18.126.89) by
- fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.1713.5; Thu, 17 Sep 2020 19:01:47 -0700
-Received: from fmsmsx603.amr.corp.intel.com (10.18.126.83) by
- fmsmsx609.amr.corp.intel.com (10.18.126.89) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.1713.5; Thu, 17 Sep 2020 19:01:47 -0700
-Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
- fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.1713.5
- via Frontend Transport; Thu, 17 Sep 2020 19:01:45 -0700
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (104.47.57.175)
- by edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.1713.5; Thu, 17 Sep 2020 19:01:45 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=R1kxscj28EIgGuXZ1hMNHLK/szn7bDIby1Btc3rP5ypctPDupYt9YsG4v2+Po0HhmXFnznt3serFLPKH2jz4ukngr7lcDdIvQOskJrrU2tHNuOv8Bgiy3J+uVBaLQNCZzTRiJm2/Tfx9r96/sO31k/h9+QxYUV5kTZSxSaYdPx4ehCpy9oV4B/lLp1/bVEn7nuZ3ETMQ8zzOxwPUY6Pi/A8TIn9APVxnn4+8GGdF3tpUr20o82R5XUd+Giq03CWn7UxT5Pdgpodq3qA0w+2eEktP3sqAOUckc5OCVvjR7l3VYk4xb+bp4xccEaZEXL15cNE08kdCSoMnPTc96RlpTw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=07PSXNUmtiv6bwz+Tg+9fHcA8h4FAgrkozuYvjymNyo=;
- b=KqwQYXKOoOnC46ciGOosnt2qA4XpstZeReX+qcDRzuADvuaLjeTNCqVwtJ6ua9MHIulo5pOh2FHjIrjTYBj/O1OQL+amESZDPPou85sBZa8uSMgbABbpVbvopbtATQrLf9AVux/WAYhP8hwweixhEL+5BrxGdqqJjAGkCuetTM4nm/UxBEp1uS9ZheErCi+jjBXWA8K8ka8geJCI4NBUuvPWt8VM5CKLLaDe8zL3bbgfWOsfEwoRzFOMJ+wlt78l2PF+Wfmbc/JSdPRrFLhV3c0pqysrindYqUDrP/WXoqmL8fat+K8g/jXZTM/dKsLAtXPIur/wOFHcyQ26uWKLtw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=intel.onmicrosoft.com;
- s=selector2-intel-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=07PSXNUmtiv6bwz+Tg+9fHcA8h4FAgrkozuYvjymNyo=;
- b=QZb4cQcyxLWRn19YVCW7IyMCTFt3w2bwZebHxE9PhVT1fW33PsNMq7h9JqUc7LuFxfLowfMW1WPRZ+3nxb3Ng6+pVdRHf7XtBDUGquqmSvrPcwstzF22TGU4LhTZbSrSvn6Pj/tmmjB59F4U9Me04jRjfNM6/stq0h2ywz60RnM=
-Received: from MWHPR11MB1968.namprd11.prod.outlook.com (2603:10b6:300:113::16)
- by MW3PR11MB4731.namprd11.prod.outlook.com (2603:10b6:303:2f::8) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3391.15; Fri, 18 Sep
- 2020 02:01:42 +0000
-Received: from MWHPR11MB1968.namprd11.prod.outlook.com
- ([fe80::fcf5:948c:28d7:7ee3]) by MWHPR11MB1968.namprd11.prod.outlook.com
- ([fe80::fcf5:948c:28d7:7ee3%8]) with mapi id 15.20.3370.019; Fri, 18 Sep 2020
- 02:01:42 +0000
-From:   "Qi, Yadong" <yadong.qi@intel.com>
-To:     "Christopherson, Sean J" <sean.j.christopherson@intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-CC:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "x86@kernel.org" <x86@kernel.org>,
-        "vkuznets@redhat.com" <vkuznets@redhat.com>,
-        "wanpengli@tencent.com" <wanpengli@tencent.com>,
-        "jmattson@google.com" <jmattson@google.com>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        "mingo@redhat.com" <mingo@redhat.com>,
-        "bp@alien8.de" <bp@alien8.de>, "hpa@zytor.com" <hpa@zytor.com>,
-        "liran.alon@oracle.com" <liran.alon@oracle.com>,
-        "nikita.leshchenko@oracle.com" <nikita.leshchenko@oracle.com>,
-        "Gao, Chao" <chao.gao@intel.com>,
-        "Tian, Kevin" <kevin.tian@intel.com>,
-        "Chen, Luhai" <luhai.chen@intel.com>,
-        "Zhu, Bing" <bing.zhu@intel.com>,
-        "Wang, Kai Z" <kai.z.wang@intel.com>
-Subject: RE: [PATCH RFC] KVM: x86: emulate wait-for-SIPI and SIPI-VMExit
-Thread-Topic: [PATCH RFC] KVM: x86: emulate wait-for-SIPI and SIPI-VMExit
-Thread-Index: AQHWjJnLRj87Fqi/UUSARkmELHUnGqlsh5wAgABmQYCAALUAsA==
-Date:   Fri, 18 Sep 2020 02:01:42 +0000
-Message-ID: <MWHPR11MB1968E9F0BE3745C3D8A9FA2EE33F0@MWHPR11MB1968.namprd11.prod.outlook.com>
-References: <20200917022501.369121-1-yadong.qi@intel.com>
- <c3eaf796-67f1-9224-3e16-72d93501b6cf@redhat.com>
- <20200917150217.GA13522@sjchrist-ice>
-In-Reply-To: <20200917150217.GA13522@sjchrist-ice>
-Accept-Language: zh-CN, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-dlp-product: dlpe-windows
-dlp-reaction: no-action
-dlp-version: 11.5.1.3
-authentication-results: intel.com; dkim=none (message not signed)
- header.d=none;intel.com; dmarc=none action=none header.from=intel.com;
-x-originating-ip: [192.55.46.36]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 98d004e4-43a3-4cde-e058-08d85b76ca2d
-x-ms-traffictypediagnostic: MW3PR11MB4731:
-x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <MW3PR11MB47319BC01E5CA179755BC44DE33F0@MW3PR11MB4731.namprd11.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:8273;
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: XSppooCT01KpzKbDi/Ds79e1A1Cg4VMOYhVQXgmtLw2OcQG6rxovvAMnkwcMTt5f01MVbHw+ujr7QUG6sZTNdKNYP9PS+Q6dcWYCiaTyDf2P5gxBgfhBX/hKpTgWALebdjVWrYkaMoO4s2GZp8iOkZ+vD5XcQ4DmQWrEPdhB7rp1HUyiDRuDo5mw8VhkRAuOT+ZXthbvwr0obcd5IGsC+T/Fwbq/XefESrzCHQPx68mNPnIHoUPLrqDRtOEij0SMgnv9MLbROsc9bVEkq112CLw/HyhyWeix5KCZL5afTKc6PG3BGQ/5e6GPjD0EItRoD2F44OLroUvatg3seZQyDDuU5yiNsOnqRmEQjKsUdp2m88wTb8iDL6pibCkdzvgu
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MWHPR11MB1968.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(39860400002)(396003)(136003)(346002)(376002)(478600001)(6506007)(7696005)(53546011)(2906002)(110136005)(7416002)(316002)(26005)(186003)(9686003)(8936002)(55016002)(52536014)(66946007)(107886003)(76116006)(54906003)(66446008)(64756008)(66556008)(66476007)(8676002)(71200400001)(33656002)(86362001)(5660300002)(4326008);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata: vVwMINO2k26NeQPEEo1eKtagcJC7SVhM+N+bqXtB7coL3dOFEcZrLg2HCAEnHzUKneVzGDkoAdddVXwI7o/f0vI8PAskRDB19QHWKzDOjsNYmyAi9nozQYrbHmmaZ3C4PGgqRP0NOpRZ1es0+AQdvI0VnQN5fAht7Lu7IMKLbRSyHJz6yprDvsXKf6fakGxGNSOHo0D4gnGoN3bFygi9zbZ9FxfCAdDljTEKKYbzSwTGzTB3tbDdIXtKq3A31Mpy9EuvccFOfwMH6C5rLOzFbGb1taHfW2Qym8MJA08BkxC6JASiFmhxn+AH4PyTCURfxTUJTgqSJcFW6Ov62hXcC1xmJ2aKmetSA8+uE/dnJTkvRdckJ8AkwIZCsTCvoQGpfF4KfQuLuCQQ/US6ZFB+XIfXVIX9LP65R6xQQg4c6f/Gw4ouHfNUBinJ3YY2YLfn14ni01Cc5mBuSQwEHdImonokTs92A25OImz4Rk9GVkBLxLOMmze+DUIvRcZz5VdUUQLciXXvOkYFGWVvSHG/CfyNhFwc2EEGQFcs2G6ape85YfGkJMIJC+4coXLLly6gTJXgtUmzVoNvhAFhCmbPqnFdY7JOLxcPDuVJEKJ36ZgbCYNUVlOK0m/NMuffB2zCRdwZr45PVawPROE3r8Td4A==
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        id S1727723AbgIRCJ2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 17 Sep 2020 22:09:28 -0400
+Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 8E2302311A;
+        Fri, 18 Sep 2020 02:09:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1600394967;
+        bh=JdGKnrKgVrS82jelt82RoU0NMX8FAQBMcd6SRp/cdtE=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=2abot1491vavOXMlNZOSCUuF2saJj/g29/Ubw5GKRf7gaRqZoTQuFpcvii/d+lAZM
+         c9Tq1MxFcXm42KG3mn2y/wFxIZCDob1707SOBWpgDbTS4KTEIsySqE8TUptU1ESvZW
+         tbVDa9l5zRp/MsP1GPiVnWnVjHj+Ad1hqcf3VzHc=
+From:   Sasha Levin <sashal@kernel.org>
+To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Cc:     Zhuang Yanying <ann.zhuangyanying@huawei.com>,
+        LinFeng <linfeng23@huawei.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sasha Levin <sashal@kernel.org>, kvm@vger.kernel.org
+Subject: [PATCH AUTOSEL 4.19 069/206] KVM: fix overflow of zero page refcount with ksm running
+Date:   Thu, 17 Sep 2020 22:05:45 -0400
+Message-Id: <20200918020802.2065198-69-sashal@kernel.org>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20200918020802.2065198-1-sashal@kernel.org>
+References: <20200918020802.2065198-1-sashal@kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: MWHPR11MB1968.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 98d004e4-43a3-4cde-e058-08d85b76ca2d
-X-MS-Exchange-CrossTenant-originalarrivaltime: 18 Sep 2020 02:01:42.6978
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 52epRsH5JmKSboZZwBfrZrkFdk79rlqVLJ5/hx1Tz6+XV+0DUq6LgWJztzE1G/3apmPt8we+CecAe2Q+5zpUHg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW3PR11MB4731
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset=UTF-8
+X-stable: review
+X-Patchwork-Hint: Ignore
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> On Thu, Sep 17, 2020 at 10:56:18AM +0200, Paolo Bonzini wrote:
-> > On 17/09/20 04:25, yadong.qi@intel.com wrote:
-> > > From: Yadong Qi <yadong.qi@intel.com>
-> > >
-> > > Background: We have a lightweight HV, it needs INIT-VMExit and
-> > > SIPI-VMExit to wake-up APs for guests since it do not monitoring the
-> > > Local APIC. But currently virtual wait-for-SIPI(WFS) state is not
-> > > supported in KVM, so when running on top of KVM, the L1 HV cannot
-> > > receive the INIT-VMExit and SIPI-VMExit which cause the L2 guest
-> > > cannot wake up the APs.
-> > >
-> > > This patch is incomplete, it emulated wait-for-SIPI state by halt
-> > > the vCPU and emulated SIPI-VMExit to L1 when trapped SIPI signal
-> > > from L2. I am posting it RFC to gauge whether or not upstream KVM is
-> > > interested in emulating wait-for-SIPI state before investing the
-> > > time to finish the full support.
-> >
-> > Yes, the patch makes sense and is a good addition.  What exactly is
-> > missing?  (Apart from test cases in kvm-unit-tests!)
->=20
-> nested_vmx_run() puts the vCPU into KVM_MP_STATE_HALTED instead of
-> properly transitioning to INIT_RECEIVED, e.g. events that arrive while th=
-e vCPU
-> is supposed to be in WFS will be incorrectly recognized.  I suspect there=
- are other
-> gotchas lurking, but that's the big one.
+From: Zhuang Yanying <ann.zhuangyanying@huawei.com>
 
-Thanks, Paolo and Sean.
-We will continue to investigate and submit a formal patch later.
+[ Upstream commit 7df003c85218b5f5b10a7f6418208f31e813f38f ]
 
-Best Regard
-Yadong
+We are testing Virtual Machine with KSM on v5.4-rc2 kernel,
+and found the zero_page refcount overflow.
+The cause of refcount overflow is increased in try_async_pf
+(get_user_page) without being decreased in mmu_set_spte()
+while handling ept violation.
+In kvm_release_pfn_clean(), only unreserved page will call
+put_page. However, zero page is reserved.
+So, as well as creating and destroy vm, the refcount of
+zero page will continue to increase until it overflows.
+
+step1:
+echo 10000 > /sys/kernel/pages_to_scan/pages_to_scan
+echo 1 > /sys/kernel/pages_to_scan/run
+echo 1 > /sys/kernel/pages_to_scan/use_zero_pages
+
+step2:
+just create several normal qemu kvm vms.
+And destroy it after 10s.
+Repeat this action all the time.
+
+After a long period of time, all domains hang because
+of the refcount of zero page overflow.
+
+Qemu print error log as follow:
+ â€¦
+ error: kvm run failed Bad address
+ EAX=00006cdc EBX=00000008 ECX=80202001 EDX=078bfbfd
+ ESI=ffffffff EDI=00000000 EBP=00000008 ESP=00006cc4
+ EIP=000efd75 EFL=00010002 [-------] CPL=0 II=0 A20=1 SMM=0 HLT=0
+ ES =0010 00000000 ffffffff 00c09300 DPL=0 DS   [-WA]
+ CS =0008 00000000 ffffffff 00c09b00 DPL=0 CS32 [-RA]
+ SS =0010 00000000 ffffffff 00c09300 DPL=0 DS   [-WA]
+ DS =0010 00000000 ffffffff 00c09300 DPL=0 DS   [-WA]
+ FS =0010 00000000 ffffffff 00c09300 DPL=0 DS   [-WA]
+ GS =0010 00000000 ffffffff 00c09300 DPL=0 DS   [-WA]
+ LDT=0000 00000000 0000ffff 00008200 DPL=0 LDT
+ TR =0000 00000000 0000ffff 00008b00 DPL=0 TSS32-busy
+ GDT=     000f7070 00000037
+ IDT=     000f70ae 00000000
+ CR0=00000011 CR2=00000000 CR3=00000000 CR4=00000000
+ DR0=0000000000000000 DR1=0000000000000000 DR2=0000000000000000 DR3=0000000000000000
+ DR6=00000000ffff0ff0 DR7=0000000000000400
+ EFER=0000000000000000
+ Code=00 01 00 00 00 e9 e8 00 00 00 c7 05 4c 55 0f 00 01 00 00 00 <8b> 35 00 00 01 00 8b 3d 04 00 01 00 b8 d8 d3 00 00 c1 e0 08 0c ea a3 00 00 01 00 c7 05 04
+ â€¦
+
+Meanwhile, a kernel warning is departed.
+
+ [40914.836375] WARNING: CPU: 3 PID: 82067 at ./include/linux/mm.h:987 try_get_page+0x1f/0x30
+ [40914.836412] CPU: 3 PID: 82067 Comm: CPU 0/KVM Kdump: loaded Tainted: G           OE     5.2.0-rc2 #5
+ [40914.836415] RIP: 0010:try_get_page+0x1f/0x30
+ [40914.836417] Code: 40 00 c3 0f 1f 84 00 00 00 00 00 48 8b 47 08 a8 01 75 11 8b 47 34 85 c0 7e 10 f0 ff 47 34 b8 01 00 00 00 c3 48 8d 78 ff eb e9 <0f> 0b 31 c0 c3 66 90 66 2e 0f 1f 84 00 0
+ 0 00 00 00 48 8b 47 08 a8
+ [40914.836418] RSP: 0018:ffffb4144e523988 EFLAGS: 00010286
+ [40914.836419] RAX: 0000000080000000 RBX: 0000000000000326 RCX: 0000000000000000
+ [40914.836420] RDX: 0000000000000000 RSI: 00004ffdeba10000 RDI: ffffdf07093f6440
+ [40914.836421] RBP: ffffdf07093f6440 R08: 800000424fd91225 R09: 0000000000000000
+ [40914.836421] R10: ffff9eb41bfeebb8 R11: 0000000000000000 R12: ffffdf06bbd1e8a8
+ [40914.836422] R13: 0000000000000080 R14: 800000424fd91225 R15: ffffdf07093f6440
+ [40914.836423] FS:  00007fb60ffff700(0000) GS:ffff9eb4802c0000(0000) knlGS:0000000000000000
+ [40914.836425] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+ [40914.836426] CR2: 0000000000000000 CR3: 0000002f220e6002 CR4: 00000000003626e0
+ [40914.836427] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+ [40914.836427] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+ [40914.836428] Call Trace:
+ [40914.836433]  follow_page_pte+0x302/0x47b
+ [40914.836437]  __get_user_pages+0xf1/0x7d0
+ [40914.836441]  ? irq_work_queue+0x9/0x70
+ [40914.836443]  get_user_pages_unlocked+0x13f/0x1e0
+ [40914.836469]  __gfn_to_pfn_memslot+0x10e/0x400 [kvm]
+ [40914.836486]  try_async_pf+0x87/0x240 [kvm]
+ [40914.836503]  tdp_page_fault+0x139/0x270 [kvm]
+ [40914.836523]  kvm_mmu_page_fault+0x76/0x5e0 [kvm]
+ [40914.836588]  vcpu_enter_guest+0xb45/0x1570 [kvm]
+ [40914.836632]  kvm_arch_vcpu_ioctl_run+0x35d/0x580 [kvm]
+ [40914.836645]  kvm_vcpu_ioctl+0x26e/0x5d0 [kvm]
+ [40914.836650]  do_vfs_ioctl+0xa9/0x620
+ [40914.836653]  ksys_ioctl+0x60/0x90
+ [40914.836654]  __x64_sys_ioctl+0x16/0x20
+ [40914.836658]  do_syscall_64+0x5b/0x180
+ [40914.836664]  entry_SYSCALL_64_after_hwframe+0x44/0xa9
+ [40914.836666] RIP: 0033:0x7fb61cb6bfc7
+
+Signed-off-by: LinFeng <linfeng23@huawei.com>
+Signed-off-by: Zhuang Yanying <ann.zhuangyanying@huawei.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ virt/kvm/kvm_main.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index 2155b52b17eca..595502f8d4a27 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -169,6 +169,7 @@ bool kvm_is_reserved_pfn(kvm_pfn_t pfn)
+ 	 */
+ 	if (pfn_valid(pfn))
+ 		return PageReserved(pfn_to_page(pfn)) &&
++		       !is_zero_pfn(pfn) &&
+ 		       !kvm_is_zone_device_pfn(pfn);
+ 
+ 	return true;
+-- 
+2.25.1
+
