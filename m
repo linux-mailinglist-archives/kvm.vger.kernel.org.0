@@ -2,123 +2,93 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D01E726F93E
-	for <lists+kvm@lfdr.de>; Fri, 18 Sep 2020 11:26:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6586326F95C
+	for <lists+kvm@lfdr.de>; Fri, 18 Sep 2020 11:33:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726586AbgIRJ0p (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 18 Sep 2020 05:26:45 -0400
-Received: from szxga01-in.huawei.com ([45.249.212.187]:3610 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726148AbgIRJ0o (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 18 Sep 2020 05:26:44 -0400
-Received: from DGGEMM404-HUB.china.huawei.com (unknown [172.30.72.56])
-        by Forcepoint Email with ESMTP id 96306FBB3AA04035DFB0;
-        Fri, 18 Sep 2020 17:26:43 +0800 (CST)
-Received: from dggema765-chm.china.huawei.com (10.1.198.207) by
- DGGEMM404-HUB.china.huawei.com (10.3.20.212) with Microsoft SMTP Server (TLS)
- id 14.3.487.0; Fri, 18 Sep 2020 17:26:43 +0800
-Received: from [10.174.185.187] (10.174.185.187) by
- dggema765-chm.china.huawei.com (10.1.198.207) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
- 15.1.1913.5; Fri, 18 Sep 2020 17:26:43 +0800
-Subject: Re: [RFC v2 7/7] kvm: arm64: add KVM_CAP_ARM_CPU_FEATURE extension
-To:     Andrew Jones <drjones@redhat.com>
-CC:     <kvmarm@lists.cs.columbia.edu>, <kvm@vger.kernel.org>,
-        <maz@kernel.org>, <will@kernel.org>,
-        <zhang.zhanghailiang@huawei.com>, <xiexiangyou@huawei.com>
-References: <20200917120101.3438389-1-liangpeng10@huawei.com>
- <20200917120101.3438389-8-liangpeng10@huawei.com>
- <20200918075518.cbpjb3iswyj3lcym@kamzik.brq.redhat.com>
-From:   Peng Liang <liangpeng10@huawei.com>
-Message-ID: <27a8bd74-c85a-81e8-0c9c-1385c246e07a@huawei.com>
-Date:   Fri, 18 Sep 2020 17:26:42 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.2.2
+        id S1726452AbgIRJd3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 18 Sep 2020 05:33:29 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:54294 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726064AbgIRJd3 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 18 Sep 2020 05:33:29 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1600421607;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=YyxvQapKO8cJ+h1msTh4Bn1k/c9vh0JXpNMN+TtY/Sw=;
+        b=hS30hk44dDPtX0/QM1kelRC1xzRMujbBwk3YRPFV5eRDMXNVKZhsPxAWWnCUPrRccJvyme
+        6PRrFe1/Dh5ClFVpxUrZafA1EBkTufJrcRXx8BjPDzfqk5Y6NDrJrbXxpRF91NA+7quxlz
+        OqcQEN5Az+zEXJMwCbic2mlE/l2HaAM=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-585-DO35AFk4Nsq_aFG1fRQDGA-1; Fri, 18 Sep 2020 05:33:22 -0400
+X-MC-Unique: DO35AFk4Nsq_aFG1fRQDGA-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4AB5F1091066;
+        Fri, 18 Sep 2020 09:33:21 +0000 (UTC)
+Received: from sirius.home.kraxel.org (ovpn-112-85.ams2.redhat.com [10.36.112.85])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 672E519D6C;
+        Fri, 18 Sep 2020 09:33:14 +0000 (UTC)
+Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
+        id 943F516E0A; Fri, 18 Sep 2020 11:33:13 +0200 (CEST)
+Date:   Fri, 18 Sep 2020 11:33:13 +0200
+From:   Gerd Hoffmann <kraxel@redhat.com>
+To:     "Michael S. Tsirkin" <mst@redhat.com>
+Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Peter Xu <peterx@redhat.com>, kvm@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Julia Suvorova <jsuvorov@redhat.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Andrew Jones <drjones@redhat.com>, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 0/3] KVM: x86: KVM_MEM_PCI_HOLE memory
+Message-ID: <20200918093313.7qfsgi7o46imqunc@sirius.home.kraxel.org>
+References: <20200807141232.402895-1-vkuznets@redhat.com>
+ <20200825212526.GC8235@xz-x1>
+ <87eenlwoaa.fsf@vitty.brq.redhat.com>
+ <20200901200021.GB3053@xz-x1>
+ <877dtcpn9z.fsf@vitty.brq.redhat.com>
+ <20200904061210.GA22435@sjchrist-ice>
+ <20200904072905.vbkiq3h762fyzds6@sirius.home.kraxel.org>
+ <20200907065054-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20200918075518.cbpjb3iswyj3lcym@kamzik.brq.redhat.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.174.185.187]
-X-ClientProxiedBy: dggeme713-chm.china.huawei.com (10.1.199.109) To
- dggema765-chm.china.huawei.com (10.1.198.207)
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200907065054-mutt-send-email-mst@kernel.org>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 9/18/2020 3:55 PM, Andrew Jones wrote:
-> On Thu, Sep 17, 2020 at 08:01:01PM +0800, Peng Liang wrote:
->> Add KVM_CAP_ARM_CPU_FEATURE extension for userpace to check whether KVM
->> supports to set CPU features in AArch64.
->>
->> Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
->> Signed-off-by: Peng Liang <liangpeng10@huawei.com>
->> ---
->>  Documentation/virt/kvm/api.rst | 8 ++++++++
->>  arch/arm64/kvm/arm.c           | 1 +
->>  include/uapi/linux/kvm.h       | 1 +
->>  3 files changed, 10 insertions(+)
->>
->> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
->> index d2b733dc7892..50214ed8f50e 100644
->> --- a/Documentation/virt/kvm/api.rst
->> +++ b/Documentation/virt/kvm/api.rst
->> @@ -6173,3 +6173,11 @@ specific interfaces must be consistent, i.e. if one says the feature
->>  is supported, than the other should as well and vice versa.  For arm64
->>  see Documentation/virt/kvm/devices/vcpu.rst "KVM_ARM_VCPU_PVTIME_CTRL".
->>  For x86 see Documentation/virt/kvm/msr.rst "MSR_KVM_STEAL_TIME".
->> +
->> +8.25 KVM_CAP_ARM_CPU_FEATURE
->> +-----------------------------------
-> 
-> Too many '----'
-> 
->> +
->> +:Architecture: arm64
->> +
->> +This capability indicates that userspace can modify the ID registers via
->> +KVM_SET_ONE_REG ioctl.
-> 
-> You should say something like "See KVM_SET_ONE_REG:ARM64 ID Registers"
-> here and also extend the "KVM_SET_ONE_REG" section with a "ARM64 ID
-> Register" section that describes the limits and return values.
-> 
->> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
->> index 6d961e192268..918a7a56b224 100644
->> --- a/arch/arm64/kvm/arm.c
->> +++ b/arch/arm64/kvm/arm.c
->> @@ -178,6 +178,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
->>  	case KVM_CAP_ARM_IRQ_LINE_LAYOUT_2:
->>  	case KVM_CAP_ARM_NISV_TO_USER:
->>  	case KVM_CAP_ARM_INJECT_EXT_DABT:
->> +	case KVM_CAP_ARM_CPU_FEATURE:
->>  		r = 1;
->>  		break;
->>  	case KVM_CAP_ARM_SET_DEVICE_ADDR:
->> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
->> index 7d8eced6f459..12356beadd5a 100644
->> --- a/include/uapi/linux/kvm.h
->> +++ b/include/uapi/linux/kvm.h
->> @@ -1037,6 +1037,7 @@ struct kvm_ppc_resize_hpt {
->>  #define KVM_CAP_SMALLER_MAXPHYADDR 185
->>  #define KVM_CAP_S390_DIAG318 186
->>  #define KVM_CAP_STEAL_TIME 187
->> +#define KVM_CAP_ARM_CPU_FEATURE 188
->>  
->>  #ifdef KVM_CAP_IRQ_ROUTING
->>  
->> -- 
->> 2.26.2
->>
-> 
-> Thanks,
-> drew
-> 
-> .
-> 
+  Hi,
 
-Thank you for your advise.  I'll change them in next version.
+> > We could probably wire up ecam (arm/virt style) for pcie support, once
+> > the acpi support for mictovm finally landed (we need acpi for that
+> > because otherwise the kernel wouldn't find the pcie bus).
+> > 
+> > Question is whenever there is a good reason to do so.  Why would someone
+> > prefer microvm with pcie support over q35?
+> 
+> The usual reasons to use pcie apply to microvm just the same.
+> E.g.: pass through of pcie devices?
 
-Thanks,
-Peng
+Playground:
+  https://git.kraxel.org/cgit/qemu/log/?h=sirius/microvm-usb
+
+Adds support for usb and pcie (use -machine microvm,usb=on,pcie=on
+to enable).  Reuses the gpex used on arm/aarch64.  Seems to work ok
+on a quick test.
+
+Not fully sure how to deal correctly with ioports.  The gpex device
+has a mmio window for the io address space.  Will that approach work
+on x86 too?  Anyway, just not having a ioport range seems to be a
+valid configuation, so I've just disabled them for now ...
+
+take care,
+  Gerd
+
