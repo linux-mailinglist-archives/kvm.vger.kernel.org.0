@@ -2,894 +2,600 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 40D1E270210
-	for <lists+kvm@lfdr.de>; Fri, 18 Sep 2020 18:27:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5CC69270286
+	for <lists+kvm@lfdr.de>; Fri, 18 Sep 2020 18:47:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726273AbgIRQ1G (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 18 Sep 2020 12:27:06 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:24610 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725955AbgIRQ1G (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 18 Sep 2020 12:27:06 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1600446421;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=xf2I6AVSrGRq/duV5gv6UTIln0Sg/9kyZt7swxOVAAg=;
-        b=Ms1colo8Po9R17ZJBAM+TyHej4V0w+LHIRbm3/MVrmUpFTgUPl7ITjWps/nY1nE9sZ45WU
-        4nCcHv91gH7GWYX7uK3aBliI2eW0YXjsJWttMP5GG3Wj6NA1akFcSiV139jY0ifmceW1xr
-        GNrVjjcBnzmg8UhUD6rIBGqhGev8ptw=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-452-cfAATchpOsazCehpcA-OqA-1; Fri, 18 Sep 2020 12:20:05 -0400
-X-MC-Unique: cfAATchpOsazCehpcA-OqA-1
-Received: by mail-wm1-f71.google.com with SMTP id b14so1625238wmj.3
-        for <kvm@vger.kernel.org>; Fri, 18 Sep 2020 09:20:04 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=xf2I6AVSrGRq/duV5gv6UTIln0Sg/9kyZt7swxOVAAg=;
-        b=XM2Hg36OpLRQz2vrdPRIQ6yOfK/4qKwjnr0g0jr5iO709kUcvWwUzlzEpZkwTaizr+
-         hgJLwc3SndDAqLFDfbk4ZBfJfNBIapFdRqjgn5kvnvJlM5p4rp9jeMjKSbCNpiF9+IZt
-         d+Gzena8m6HyF+BEhT1MpZQrn84vQUUnI90vUSL3wXEBnA7cdJdd2bbkHBZTi77lf3VL
-         Mk9+xg5CRMFW377tQXdNHcjspppW/9OjN4SC1FC8PEP6S4+96yUzkBY8qPRjNDMfoSY+
-         3ikN51pBxOVYTBtu9OjyNGSkoOZljGz0fUyPOREU4pIcOjZM4XNc2V+3U1741imsapaa
-         e8Qw==
-X-Gm-Message-State: AOAM532E9WZM0+UaPtSGXX5Zc5E2cAHv0emQOETNE/7MOqQcbpNKUOcC
-        ut4/3T8ExoBrdc+yZoxYvAtV74nocg/gUwXP7zD2bGsKiP20EN1/gYc/fK1OjM6wA9VQ+ZPfzAw
-        nn7k2Vv2QH3lU
-X-Received: by 2002:adf:f701:: with SMTP id r1mr39144094wrp.341.1600446002705;
-        Fri, 18 Sep 2020 09:20:02 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyQ4kuYAhAJjbRNsa2h6rVNzRIBo3Ze0sEFReJSsWHGDwE/RL6KpNhyjLkYo9ZxJIxAe7njEA==
-X-Received: by 2002:adf:f701:: with SMTP id r1mr39144036wrp.341.1600446002110;
-        Fri, 18 Sep 2020 09:20:02 -0700 (PDT)
-Received: from redhat.com (bzq-109-65-116-225.red.bezeqint.net. [109.65.116.225])
-        by smtp.gmail.com with ESMTPSA id u8sm5580291wmj.45.2020.09.18.09.20.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 18 Sep 2020 09:20:01 -0700 (PDT)
-Date:   Fri, 18 Sep 2020 12:19:59 -0400
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     qemu-devel@nongnu.org
-Cc:     Peter Maydell <peter.maydell@linaro.org>,
-        Jason Wang <jasowang@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
-Subject: [PULL v2 01/15] linux headers: sync to 5.9-rc4
-Message-ID: <20200918161836.318893-2-mst@redhat.com>
-References: <20200918161836.318893-1-mst@redhat.com>
+        id S1726539AbgIRQrB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 18 Sep 2020 12:47:01 -0400
+Received: from mail-mw2nam10on2082.outbound.protection.outlook.com ([40.107.94.82]:23873
+        "EHLO NAM10-MW2-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726456AbgIRQq6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 18 Sep 2020 12:46:58 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=HrdR7NqkGFFdCI77LW8SUi3QDZwh1GNVKZDAS8SICibDsz0GMIkNGE7RFWlwwlKrRz2Svh2k67RARsktJMdndqgf+zV2Ywm7PK1jXr/kWhF/1F+droFaUM7V9WCNDa3SAckqmYOOK2pwZ+ESIHFQUK0Qr+c7CN4uzjPLja/c7M4hVVlXIvqDfvz2IzH2HvOIcN4I/aROj8ORHpbug7QfmdRogZcyIgZtARfefbfMti2jJ0tqDXeKaKtvYgClrIXGQi5jwQFDxTNl/K5CTkGMO4cQQ7dgx00zpG2yMAGf6sqhG57wFEIjslzS3vp8ZBcEPci3Khz5QvfbyjzHnXWnQw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=IL7undqIEY9AVJGVU3xvrKYeRez4Cx7EcO2qeqwu0B4=;
+ b=RY4U3AfidEY/rVuJQ6rEktbf0GlOehrqI+qVz+xURmKrwWEoq34dgU0bVPQ4nFNqxkg9FKVb7dtj1ZCF9awstdVVXuWhZdf9t4qgYCHxRs/CshmguFq+zJ/RoKK1hzbn8q92Ml2o9K3AhifepKmbDS9jLk1rj2qJXeyQ/WIu/UA8AVbYxq37utyrB85p+sTJmvl3FZeTGUYKJZloKl6G5gxkacoQ9XQJRs7fcelwZrnhgdkehJtU/6Vk3NNGgubQ5KmD6Ja13G23QSL18Nsr6IBjPTTXcogYzKxC1jO0DPBc8Wa9/rwWbPgq5ii4PPxYnWkCJsK1RZthB4Rjr3DM8g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=IL7undqIEY9AVJGVU3xvrKYeRez4Cx7EcO2qeqwu0B4=;
+ b=qePUgv6of4OdeIh/Vm6pGS+cELEwB3/i3tukR3xokSVnpZZwS210y6U/SMKvEWsLGIdgtyOwUl+h1TapBc9ksIFStcWc9gIPwbEpS3phsApwL8DHgYOvEXivS6C2ViH45WMV3Ut1ObCwNwK6dovffzeUo9UT7a20pckvigBlRak=
+Authentication-Results: amd.com; dkim=none (message not signed)
+ header.d=none;amd.com; dmarc=none action=none header.from=amd.com;
+Received: from SN1PR12MB2560.namprd12.prod.outlook.com (2603:10b6:802:26::19)
+ by SN1PR12MB2463.namprd12.prod.outlook.com (2603:10b6:802:22::24) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3391.14; Fri, 18 Sep
+ 2020 16:46:51 +0000
+Received: from SN1PR12MB2560.namprd12.prod.outlook.com
+ ([fe80::ccd9:728:9577:200d]) by SN1PR12MB2560.namprd12.prod.outlook.com
+ ([fe80::ccd9:728:9577:200d%4]) with mapi id 15.20.3370.019; Fri, 18 Sep 2020
+ 16:46:51 +0000
+Subject: RE: [PATCH] KVM: SVM: Use a separate vmcb for the nested L2 guest
+To:     Cathy Avery <cavery@redhat.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>
+Cc:     "vkuznets@redhat.com" <vkuznets@redhat.com>,
+        "Huang2, Wei" <Wei.Huang2@amd.com>
+References: <20200917192306.2080-1-cavery@redhat.com>
+ <dfa82668-65eb-f5ac-56c2-87ae9d007c46@amd.com>
+ <2a83eaa5-ae55-7506-8c02-4b32822cb4fd@redhat.com>
+From:   Babu Moger <babu.moger@amd.com>
+Message-ID: <c9101ab9-da86-e6e3-1b78-af6483c72ae6@amd.com>
+Date:   Fri, 18 Sep 2020 11:46:49 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
+In-Reply-To: <2a83eaa5-ae55-7506-8c02-4b32822cb4fd@redhat.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: DM5PR15CA0066.namprd15.prod.outlook.com
+ (2603:10b6:3:ae::28) To SN1PR12MB2560.namprd12.prod.outlook.com
+ (2603:10b6:802:26::19)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200918161836.318893-1-mst@redhat.com>
-X-Mailer: git-send-email 2.27.0.106.g8ac3dc51b1
-X-Mutt-Fcc: =sent
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from [10.236.31.136] (165.204.77.1) by DM5PR15CA0066.namprd15.prod.outlook.com (2603:10b6:3:ae::28) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3391.11 via Frontend Transport; Fri, 18 Sep 2020 16:46:50 +0000
+X-Originating-IP: [165.204.77.1]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-HT: Tenant
+X-MS-Office365-Filtering-Correlation-Id: 600f63b9-8d88-4a6a-0769-08d85bf27151
+X-MS-TrafficTypeDiagnostic: SN1PR12MB2463:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <SN1PR12MB2463D75A246B720D54FE2323953F0@SN1PR12MB2463.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:6790;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: JjU5YNq4ODTqaYF9lKlz25aYuda54U2a7xQz1EDtYyPxECfYgwn80Ouw/ECeU8/6hj9bCll9DDjdHkjp348Xq/tx5cAmvhjWygPp8OwAzFh1tW3S8sW+qIlGbmmnsszN6ZQ4qWSjzfrnrItkgLcztbcNgUi/lMkDimfwU0Ju/gTQwiPTrexepkc5jTLP+NDkZjp+ex1mYUQjp/EHPqzdF3RDOO3hqr074Ys1COKj4e9h8Rige1ZEt1OynQ7FSGWnNprZno9Pm894TyUnUdOkPFeLHPfc0VFRp6zUtQuaUbeCFTApfYiO7H3yHjDn7BhyMbj2s3pOpRY/wNsKKI9B1uOk48haTKPWM0PclurtPHq0dOtoQQ+JUBtOrt/is1UZ
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN1PR12MB2560.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(346002)(39860400002)(136003)(396003)(376002)(366004)(53546011)(8676002)(4326008)(26005)(52116002)(316002)(8936002)(110136005)(44832011)(31696002)(2906002)(2616005)(86362001)(54906003)(956004)(30864003)(16576012)(6486002)(186003)(16526019)(36756003)(478600001)(83380400001)(31686004)(66476007)(66556008)(66946007)(5660300002)(43740500002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData: D7O/sK4I+rwbzIUJVwVQm6uUMQIh/yior4h8QueXLduJCpuYY6NWmrzxd8H3dc7E1pS7xtYh2881ZlIfzNzGPtuebkLi1gerdI3bpzBfDYx+BILVNQW6kLTg6OLNj+zwDHsDd7Ke7MFrajRLtEojIDSIPIawYxwZK3pYsIFOonUeYWnrDzXQzP5v4gq9ZM2P3YmjVqzMjqR2T9WmTyxwL52meLdi7+bnv7wwuk7zBPPifVBKF7MM9o/hWGCWWr1zHnIiPvHr18ugS14nZandSiSJ6+3ZUwlZsPTH/7gKeh+br7JvrwkgpWBofT2KCrcDcZWEC4G5dzh9CgBp1NEgdvO34Eswk+k4flBcWp5Uw8LzOQVrbulnJjB4/KOsj1bQEtTA0dB+H1zltrzRElYy4L8sVWqTFdTls5mFsOr9auWpy4yuOPhB4x0J6RMJbS4Vt/ACs6hHAm6DhCG2i3F2IcX1BbNyTI7kJUMQXz26iStvDafmwO4R9ZcdrCRBqdz39DMcc467AgbZxG/4KsJJim2HaeEZ1OXknXg+Z0TA/hbFEaitDt/n6jTC2GcK+Q5vRtcU/eIGju6py4t1JGKLWLi0B85Zz52WvUr9N9CofWkFRidu9xrnSAUKAQurZOOGdTeoHC+iX1+dk+qYwXAYCg==
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 600f63b9-8d88-4a6a-0769-08d85bf27151
+X-MS-Exchange-CrossTenant-AuthSource: SN1PR12MB2560.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Sep 2020 16:46:51.7412
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 8Ckfrw9xB/x8AZLLPK25I00bQ0j9KuzVCZc/4g8tLokC37hc42wKpR7dCDl04F8v
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN1PR12MB2463
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Jason Wang <jasowang@redhat.com>
 
-Update against Linux 5.9-rc4.
 
-Cc: Cornelia Huck <cohuck@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Signed-off-by: Jason Wang <jasowang@redhat.com>
-Message-Id: <20200907104903.31551-2-jasowang@redhat.com>
-Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
----
- include/standard-headers/drm/drm_fourcc.h     | 140 ++++++++++++++++++
- include/standard-headers/linux/ethtool.h      |  87 +++++++++++
- .../linux/input-event-codes.h                 |   3 +-
- include/standard-headers/linux/vhost_types.h  |  11 ++
- include/standard-headers/linux/virtio_9p.h    |   4 +-
- include/standard-headers/linux/virtio_blk.h   |  26 ++--
- .../standard-headers/linux/virtio_config.h    |   8 +-
- .../standard-headers/linux/virtio_console.h   |   8 +-
- include/standard-headers/linux/virtio_net.h   |   6 +-
- include/standard-headers/linux/virtio_scsi.h  |  20 +--
- linux-headers/asm-generic/unistd.h            |   6 +-
- linux-headers/asm-mips/unistd_n32.h           |   1 +
- linux-headers/asm-mips/unistd_n64.h           |   1 +
- linux-headers/asm-mips/unistd_o32.h           |   1 +
- linux-headers/asm-powerpc/kvm.h               |   5 +
- linux-headers/asm-powerpc/unistd_32.h         |   1 +
- linux-headers/asm-powerpc/unistd_64.h         |   1 +
- linux-headers/asm-s390/kvm.h                  |   7 +-
- linux-headers/asm-s390/unistd_32.h            |   1 +
- linux-headers/asm-s390/unistd_64.h            |   1 +
- linux-headers/asm-x86/unistd_32.h             |   1 +
- linux-headers/asm-x86/unistd_64.h             |   1 +
- linux-headers/asm-x86/unistd_x32.h            |   1 +
- linux-headers/linux/kvm.h                     |   4 +
- linux-headers/linux/vfio.h                    |   2 +-
- linux-headers/linux/vhost.h                   |   2 +
- 26 files changed, 308 insertions(+), 41 deletions(-)
+> -----Original Message-----
+> From: Cathy Avery <cavery@redhat.com>
+> Sent: Friday, September 18, 2020 10:27 AM
+> To: Moger, Babu <Babu.Moger@amd.com>; linux-kernel@vger.kernel.org;
+> kvm@vger.kernel.org; pbonzini@redhat.com
+> Cc: vkuznets@redhat.com; Huang2, Wei <Wei.Huang2@amd.com>
+> Subject: Re: [PATCH] KVM: SVM: Use a separate vmcb for the nested L2 guest
+> 
+> On 9/18/20 11:16 AM, Babu Moger wrote:
+> > Cathy,
+> > Thanks for the patches. It cleans up the code nicely.
+> > But there are some issues with the patch. I was able to bring the L1
+> > guest with your patch. But when I tried to load L2 guest it crashed. I
+> > am thinking It is mostly due to save/restore part of vmcb. Few comments
+> below.
+> >
+> >> -----Original Message-----
+> >> From: Cathy Avery <cavery@redhat.com>
+> >> Sent: Thursday, September 17, 2020 2:23 PM
+> >> To: linux-kernel@vger.kernel.org; kvm@vger.kernel.org;
+> >> pbonzini@redhat.com
+> >> Cc: vkuznets@redhat.com; Huang2, Wei <Wei.Huang2@amd.com>
+> >> Subject: [PATCH] KVM: SVM: Use a separate vmcb for the nested L2
+> >> guest
+> >>
+> >> svm->vmcb will now point to either a separate vmcb L1 ( not nested )
+> >> svm->or L2 vmcb
+> >> ( nested ).
+> >>
+> >> Issues:
+> >>
+> >> 1) There is some wholesale copying of vmcb.save and vmcb.contol
+> >>     areas which will need to be refined.
+> >>
+> >> 2) There is a workaround in nested_svm_vmexit() where
+> >>
+> >>     if (svm->vmcb01->control.asid == 0)
+> >>         svm->vmcb01->control.asid = svm->nested.vmcb02->control.asid;
+> >>
+> >>     This was done as a result of the kvm selftest 'state_test'. In that
+> >>     test svm_set_nested_state() is called before svm_vcpu_run().
+> >>     The asid is assigned by svm_vcpu_run -> pre_svm_run for the current
+> >>     vmcb which is now vmcb02 as we are in nested mode subsequently
+> >>     vmcb01.control.asid is never set as it should be.
+> >>
+> >> Tested:
+> >> kvm-unit-tests
+> >> kvm self tests
+> >>
+> >> Signed-off-by: Cathy Avery <cavery@redhat.com>
+> >> ---
+> >>   arch/x86/kvm/svm/nested.c | 116 ++++++++++++++++++--------------------
+> >>   arch/x86/kvm/svm/svm.c    |  41 +++++++-------
+> >>   arch/x86/kvm/svm/svm.h    |  10 ++--
+> >>   3 files changed, 81 insertions(+), 86 deletions(-)
+> >>
+> >> diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
+> >> index
+> >> e90bc436f584..0a06e62010d8 100644
+> >> --- a/arch/x86/kvm/svm/nested.c
+> >> +++ b/arch/x86/kvm/svm/nested.c
+> >> @@ -75,12 +75,12 @@ static unsigned long
+> >> nested_svm_get_tdp_cr3(struct kvm_vcpu *vcpu)  static void
+> >> nested_svm_init_mmu_context(struct kvm_vcpu
+> >> *vcpu)  {
+> >>   	struct vcpu_svm *svm = to_svm(vcpu);
+> >> -	struct vmcb *hsave = svm->nested.hsave;
+> >>
+> >>   	WARN_ON(mmu_is_nested(vcpu));
+> >>
+> >>   	vcpu->arch.mmu = &vcpu->arch.guest_mmu;
+> >> -	kvm_init_shadow_npt_mmu(vcpu, X86_CR0_PG, hsave->save.cr4,
+> >> hsave->save.efer,
+> >> +	kvm_init_shadow_npt_mmu(vcpu, X86_CR0_PG, svm->vmcb01-
+> >>> save.cr4,
+> >> +				svm->vmcb01->save.efer,
+> >>   				svm->nested.ctl.nested_cr3);
+> >>   	vcpu->arch.mmu->get_guest_pgd     = nested_svm_get_tdp_cr3;
+> >>   	vcpu->arch.mmu->get_pdptr         = nested_svm_get_tdp_pdptr;
+> >> @@ -105,7 +105,7 @@ void recalc_intercepts(struct vcpu_svm *svm)
+> >>   		return;
+> >>
+> >>   	c = &svm->vmcb->control;
+> >> -	h = &svm->nested.hsave->control;
+> >> +	h = &svm->vmcb01->control;
+> >>   	g = &svm->nested.ctl;
+> >>
+> >>   	svm->nested.host_intercept_exceptions = h->intercept_exceptions;
+> >> @@ -403,7 +403,7 @@ static void nested_prepare_vmcb_control(struct
+> >> vcpu_svm *svm)
+> >>
+> >>   	svm->vmcb->control.int_ctl             =
+> >>   		(svm->nested.ctl.int_ctl & ~mask) |
+> >> -		(svm->nested.hsave->control.int_ctl & mask);
+> >> +		(svm->vmcb01->control.int_ctl & mask);
+> >>
+> >>   	svm->vmcb->control.virt_ext            = svm->nested.ctl.virt_ext;
+> >>   	svm->vmcb->control.int_vector          = svm->nested.ctl.int_vector;
+> >> @@ -432,6 +432,12 @@ int enter_svm_guest_mode(struct vcpu_svm *svm,
+> >> u64 vmcb_gpa,
+> >>   	int ret;
+> >>
+> >>   	svm->nested.vmcb = vmcb_gpa;
+> >> +
+> >> +	WARN_ON(svm->vmcb == svm->nested.vmcb02);
+> >> +
+> >> +	svm->nested.vmcb02->control = svm->vmcb01->control;
+> >> +	svm->vmcb = svm->nested.vmcb02;
+> >> +	svm->vmcb_pa = svm->nested.vmcb02_pa;
+> >>   	load_nested_vmcb_control(svm, &nested_vmcb->control);
+> >>   	nested_prepare_vmcb_save(svm, nested_vmcb);
+> >>   	nested_prepare_vmcb_control(svm);
+> >> @@ -450,8 +456,6 @@ int nested_svm_vmrun(struct vcpu_svm *svm)  {
+> >>   	int ret;
+> >>   	struct vmcb *nested_vmcb;
+> >> -	struct vmcb *hsave = svm->nested.hsave;
+> >> -	struct vmcb *vmcb = svm->vmcb;
+> >>   	struct kvm_host_map map;
+> >>   	u64 vmcb_gpa;
+> >>
+> >> @@ -496,29 +500,17 @@ int nested_svm_vmrun(struct vcpu_svm *svm)
+> >>   	kvm_clear_exception_queue(&svm->vcpu);
+> >>   	kvm_clear_interrupt_queue(&svm->vcpu);
+> >>
+> >> -	/*
+> >> -	 * Save the old vmcb, so we don't need to pick what we save, but can
+> >> -	 * restore everything when a VMEXIT occurs
+> >> -	 */
+> >> -	hsave->save.es     = vmcb->save.es;
+> >> -	hsave->save.cs     = vmcb->save.cs;
+> >> -	hsave->save.ss     = vmcb->save.ss;
+> >> -	hsave->save.ds     = vmcb->save.ds;
+> >> -	hsave->save.gdtr   = vmcb->save.gdtr;
+> >> -	hsave->save.idtr   = vmcb->save.idtr;
+> >> -	hsave->save.efer   = svm->vcpu.arch.efer;
+> >> -	hsave->save.cr0    = kvm_read_cr0(&svm->vcpu);
+> >> -	hsave->save.cr4    = svm->vcpu.arch.cr4;
+> >> -	hsave->save.rflags = kvm_get_rflags(&svm->vcpu);
+> >> -	hsave->save.rip    = kvm_rip_read(&svm->vcpu);
+> >> -	hsave->save.rsp    = vmcb->save.rsp;
+> >> -	hsave->save.rax    = vmcb->save.rax;
+> >> -	if (npt_enabled)
+> >> -		hsave->save.cr3    = vmcb->save.cr3;
+> >> -	else
+> >> -		hsave->save.cr3    = kvm_read_cr3(&svm->vcpu);
+> >> -
+> >> -	copy_vmcb_control_area(&hsave->control, &vmcb->control);
+> > You may have to carefully check the above cleanup.
+> Thanks I'll check it out. I did not see a crash when running the tests. Could you
+> send me more information about your test and test setup, stack trace, etc.
 
-diff --git a/include/standard-headers/drm/drm_fourcc.h b/include/standard-headers/drm/drm_fourcc.h
-index 909a66753c..0de1a552ca 100644
---- a/include/standard-headers/drm/drm_fourcc.h
-+++ b/include/standard-headers/drm/drm_fourcc.h
-@@ -235,6 +235,12 @@ extern "C" {
- #define DRM_FORMAT_NV61		fourcc_code('N', 'V', '6', '1') /* 2x1 subsampled Cb:Cr plane */
- #define DRM_FORMAT_NV24		fourcc_code('N', 'V', '2', '4') /* non-subsampled Cr:Cb plane */
- #define DRM_FORMAT_NV42		fourcc_code('N', 'V', '4', '2') /* non-subsampled Cb:Cr plane */
-+/*
-+ * 2 plane YCbCr
-+ * index 0 = Y plane, [39:0] Y3:Y2:Y1:Y0 little endian
-+ * index 1 = Cr:Cb plane, [39:0] Cr1:Cb1:Cr0:Cb0 little endian
-+ */
-+#define DRM_FORMAT_NV15		fourcc_code('N', 'V', '1', '5') /* 2x2 subsampled Cr:Cb plane */
- 
- /*
-  * 2 plane YCbCr MSB aligned
-@@ -264,6 +270,22 @@ extern "C" {
-  */
- #define DRM_FORMAT_P016		fourcc_code('P', '0', '1', '6') /* 2x2 subsampled Cr:Cb plane 16 bits per channel */
- 
-+/* 3 plane non-subsampled (444) YCbCr
-+ * 16 bits per component, but only 10 bits are used and 6 bits are padded
-+ * index 0: Y plane, [15:0] Y:x [10:6] little endian
-+ * index 1: Cb plane, [15:0] Cb:x [10:6] little endian
-+ * index 2: Cr plane, [15:0] Cr:x [10:6] little endian
-+ */
-+#define DRM_FORMAT_Q410		fourcc_code('Q', '4', '1', '0')
-+
-+/* 3 plane non-subsampled (444) YCrCb
-+ * 16 bits per component, but only 10 bits are used and 6 bits are padded
-+ * index 0: Y plane, [15:0] Y:x [10:6] little endian
-+ * index 1: Cr plane, [15:0] Cr:x [10:6] little endian
-+ * index 2: Cb plane, [15:0] Cb:x [10:6] little endian
-+ */
-+#define DRM_FORMAT_Q401		fourcc_code('Q', '4', '0', '1')
-+
- /*
-  * 3 plane YCbCr
-  * index 0: Y plane, [7:0] Y
-@@ -308,6 +330,7 @@ extern "C" {
- #define DRM_FORMAT_MOD_VENDOR_BROADCOM 0x07
- #define DRM_FORMAT_MOD_VENDOR_ARM     0x08
- #define DRM_FORMAT_MOD_VENDOR_ALLWINNER 0x09
-+#define DRM_FORMAT_MOD_VENDOR_AMLOGIC 0x0a
- 
- /* add more to the end as needed */
- 
-@@ -322,8 +345,33 @@ extern "C" {
-  * When adding a new token please document the layout with a code comment,
-  * similar to the fourcc codes above. drm_fourcc.h is considered the
-  * authoritative source for all of these.
-+ *
-+ * Generic modifier names:
-+ *
-+ * DRM_FORMAT_MOD_GENERIC_* definitions are used to provide vendor-neutral names
-+ * for layouts which are common across multiple vendors. To preserve
-+ * compatibility, in cases where a vendor-specific definition already exists and
-+ * a generic name for it is desired, the common name is a purely symbolic alias
-+ * and must use the same numerical value as the original definition.
-+ *
-+ * Note that generic names should only be used for modifiers which describe
-+ * generic layouts (such as pixel re-ordering), which may have
-+ * independently-developed support across multiple vendors.
-+ *
-+ * In future cases where a generic layout is identified before merging with a
-+ * vendor-specific modifier, a new 'GENERIC' vendor or modifier using vendor
-+ * 'NONE' could be considered. This should only be for obvious, exceptional
-+ * cases to avoid polluting the 'GENERIC' namespace with modifiers which only
-+ * apply to a single vendor.
-+ *
-+ * Generic names should not be used for cases where multiple hardware vendors
-+ * have implementations of the same standardised compression scheme (such as
-+ * AFBC). In those cases, all implementations should use the same format
-+ * modifier(s), reflecting the vendor of the standard.
-  */
- 
-+#define DRM_FORMAT_MOD_GENERIC_16_16_TILE DRM_FORMAT_MOD_SAMSUNG_16_16_TILE
-+
- /*
-  * Invalid Modifier
-  *
-@@ -891,6 +939,18 @@ drm_fourcc_canonicalize_nvidia_format_mod(uint64_t modifier)
-  */
- #define AFBC_FORMAT_MOD_BCH     (1ULL << 11)
- 
-+/* AFBC uncompressed storage mode
-+ *
-+ * Indicates that the buffer is using AFBC uncompressed storage mode.
-+ * In this mode all superblock payloads in the buffer use the uncompressed
-+ * storage mode, which is usually only used for data which cannot be compressed.
-+ * The buffer layout is the same as for AFBC buffers without USM set, this only
-+ * affects the storage mode of the individual superblocks. Note that even a
-+ * buffer without USM set may use uncompressed storage mode for some or all
-+ * superblocks, USM just guarantees it for all.
-+ */
-+#define AFBC_FORMAT_MOD_USM	(1ULL << 12)
-+
- /*
-  * Arm 16x16 Block U-Interleaved modifier
-  *
-@@ -915,6 +975,86 @@ drm_fourcc_canonicalize_nvidia_format_mod(uint64_t modifier)
-  */
- #define DRM_FORMAT_MOD_ALLWINNER_TILED fourcc_mod_code(ALLWINNER, 1)
- 
-+/*
-+ * Amlogic Video Framebuffer Compression modifiers
-+ *
-+ * Amlogic uses a proprietary lossless image compression protocol and format
-+ * for their hardware video codec accelerators, either video decoders or
-+ * video input encoders.
-+ *
-+ * It considerably reduces memory bandwidth while writing and reading
-+ * frames in memory.
-+ *
-+ * The underlying storage is considered to be 3 components, 8bit or 10-bit
-+ * per component YCbCr 420, single plane :
-+ * - DRM_FORMAT_YUV420_8BIT
-+ * - DRM_FORMAT_YUV420_10BIT
-+ *
-+ * The first 8 bits of the mode defines the layout, then the following 8 bits
-+ * defines the options changing the layout.
-+ *
-+ * Not all combinations are valid, and different SoCs may support different
-+ * combinations of layout and options.
-+ */
-+#define __fourcc_mod_amlogic_layout_mask 0xf
-+#define __fourcc_mod_amlogic_options_shift 8
-+#define __fourcc_mod_amlogic_options_mask 0xf
-+
-+#define DRM_FORMAT_MOD_AMLOGIC_FBC(__layout, __options) \
-+	fourcc_mod_code(AMLOGIC, \
-+			((__layout) & __fourcc_mod_amlogic_layout_mask) | \
-+			(((__options) & __fourcc_mod_amlogic_options_mask) \
-+			 << __fourcc_mod_amlogic_options_shift))
-+
-+/* Amlogic FBC Layouts */
-+
-+/*
-+ * Amlogic FBC Basic Layout
-+ *
-+ * The basic layout is composed of:
-+ * - a body content organized in 64x32 superblocks with 4096 bytes per
-+ *   superblock in default mode.
-+ * - a 32 bytes per 128x64 header block
-+ *
-+ * This layout is transferrable between Amlogic SoCs supporting this modifier.
-+ */
-+#define AMLOGIC_FBC_LAYOUT_BASIC		(1ULL)
-+
-+/*
-+ * Amlogic FBC Scatter Memory layout
-+ *
-+ * Indicates the header contains IOMMU references to the compressed
-+ * frames content to optimize memory access and layout.
-+ *
-+ * In this mode, only the header memory address is needed, thus the
-+ * content memory organization is tied to the current producer
-+ * execution and cannot be saved/dumped neither transferrable between
-+ * Amlogic SoCs supporting this modifier.
-+ *
-+ * Due to the nature of the layout, these buffers are not expected to
-+ * be accessible by the user-space clients, but only accessible by the
-+ * hardware producers and consumers.
-+ *
-+ * The user-space clients should expect a failure while trying to mmap
-+ * the DMA-BUF handle returned by the producer.
-+ */
-+#define AMLOGIC_FBC_LAYOUT_SCATTER		(2ULL)
-+
-+/* Amlogic FBC Layout Options Bit Mask */
-+
-+/*
-+ * Amlogic FBC Memory Saving mode
-+ *
-+ * Indicates the storage is packed when pixel size is multiple of word
-+ * boudaries, i.e. 8bit should be stored in this mode to save allocation
-+ * memory.
-+ *
-+ * This mode reduces body layout to 3072 bytes per 64x32 superblock with
-+ * the basic layout and 3200 bytes per 64x32 superblock combined with
-+ * the scatter layout.
-+ */
-+#define AMLOGIC_FBC_OPTION_MEM_SAVING		(1ULL << 0)
-+
- #if defined(__cplusplus)
- }
- #endif
-diff --git a/include/standard-headers/linux/ethtool.h b/include/standard-headers/linux/ethtool.h
-index fd8d2cccfe..e13eff4488 100644
---- a/include/standard-headers/linux/ethtool.h
-+++ b/include/standard-headers/linux/ethtool.h
-@@ -579,6 +579,76 @@ struct ethtool_pauseparam {
- 	uint32_t	tx_pause;
- };
- 
-+/**
-+ * enum ethtool_link_ext_state - link extended state
-+ */
-+enum ethtool_link_ext_state {
-+	ETHTOOL_LINK_EXT_STATE_AUTONEG,
-+	ETHTOOL_LINK_EXT_STATE_LINK_TRAINING_FAILURE,
-+	ETHTOOL_LINK_EXT_STATE_LINK_LOGICAL_MISMATCH,
-+	ETHTOOL_LINK_EXT_STATE_BAD_SIGNAL_INTEGRITY,
-+	ETHTOOL_LINK_EXT_STATE_NO_CABLE,
-+	ETHTOOL_LINK_EXT_STATE_CABLE_ISSUE,
-+	ETHTOOL_LINK_EXT_STATE_EEPROM_ISSUE,
-+	ETHTOOL_LINK_EXT_STATE_CALIBRATION_FAILURE,
-+	ETHTOOL_LINK_EXT_STATE_POWER_BUDGET_EXCEEDED,
-+	ETHTOOL_LINK_EXT_STATE_OVERHEAT,
-+};
-+
-+/**
-+ * enum ethtool_link_ext_substate_autoneg - more information in addition to
-+ * ETHTOOL_LINK_EXT_STATE_AUTONEG.
-+ */
-+enum ethtool_link_ext_substate_autoneg {
-+	ETHTOOL_LINK_EXT_SUBSTATE_AN_NO_PARTNER_DETECTED = 1,
-+	ETHTOOL_LINK_EXT_SUBSTATE_AN_ACK_NOT_RECEIVED,
-+	ETHTOOL_LINK_EXT_SUBSTATE_AN_NEXT_PAGE_EXCHANGE_FAILED,
-+	ETHTOOL_LINK_EXT_SUBSTATE_AN_NO_PARTNER_DETECTED_FORCE_MODE,
-+	ETHTOOL_LINK_EXT_SUBSTATE_AN_FEC_MISMATCH_DURING_OVERRIDE,
-+	ETHTOOL_LINK_EXT_SUBSTATE_AN_NO_HCD,
-+};
-+
-+/**
-+ * enum ethtool_link_ext_substate_link_training - more information in addition to
-+ * ETHTOOL_LINK_EXT_STATE_LINK_TRAINING_FAILURE.
-+ */
-+enum ethtool_link_ext_substate_link_training {
-+	ETHTOOL_LINK_EXT_SUBSTATE_LT_KR_FRAME_LOCK_NOT_ACQUIRED = 1,
-+	ETHTOOL_LINK_EXT_SUBSTATE_LT_KR_LINK_INHIBIT_TIMEOUT,
-+	ETHTOOL_LINK_EXT_SUBSTATE_LT_KR_LINK_PARTNER_DID_NOT_SET_RECEIVER_READY,
-+	ETHTOOL_LINK_EXT_SUBSTATE_LT_REMOTE_FAULT,
-+};
-+
-+/**
-+ * enum ethtool_link_ext_substate_logical_mismatch - more information in addition
-+ * to ETHTOOL_LINK_EXT_STATE_LINK_LOGICAL_MISMATCH.
-+ */
-+enum ethtool_link_ext_substate_link_logical_mismatch {
-+	ETHTOOL_LINK_EXT_SUBSTATE_LLM_PCS_DID_NOT_ACQUIRE_BLOCK_LOCK = 1,
-+	ETHTOOL_LINK_EXT_SUBSTATE_LLM_PCS_DID_NOT_ACQUIRE_AM_LOCK,
-+	ETHTOOL_LINK_EXT_SUBSTATE_LLM_PCS_DID_NOT_GET_ALIGN_STATUS,
-+	ETHTOOL_LINK_EXT_SUBSTATE_LLM_FC_FEC_IS_NOT_LOCKED,
-+	ETHTOOL_LINK_EXT_SUBSTATE_LLM_RS_FEC_IS_NOT_LOCKED,
-+};
-+
-+/**
-+ * enum ethtool_link_ext_substate_bad_signal_integrity - more information in
-+ * addition to ETHTOOL_LINK_EXT_STATE_BAD_SIGNAL_INTEGRITY.
-+ */
-+enum ethtool_link_ext_substate_bad_signal_integrity {
-+	ETHTOOL_LINK_EXT_SUBSTATE_BSI_LARGE_NUMBER_OF_PHYSICAL_ERRORS = 1,
-+	ETHTOOL_LINK_EXT_SUBSTATE_BSI_UNSUPPORTED_RATE,
-+};
-+
-+/**
-+ * enum ethtool_link_ext_substate_cable_issue - more information in
-+ * addition to ETHTOOL_LINK_EXT_STATE_CABLE_ISSUE.
-+ */
-+enum ethtool_link_ext_substate_cable_issue {
-+	ETHTOOL_LINK_EXT_SUBSTATE_CI_UNSUPPORTED_CABLE = 1,
-+	ETHTOOL_LINK_EXT_SUBSTATE_CI_CABLE_TEST_FAILURE,
-+};
-+
- #define ETH_GSTRING_LEN		32
- 
- /**
-@@ -599,6 +669,7 @@ struct ethtool_pauseparam {
-  * @ETH_SS_SOF_TIMESTAMPING: SOF_TIMESTAMPING_* flags
-  * @ETH_SS_TS_TX_TYPES: timestamping Tx types
-  * @ETH_SS_TS_RX_FILTERS: timestamping Rx filters
-+ * @ETH_SS_UDP_TUNNEL_TYPES: UDP tunnel types
-  */
- enum ethtool_stringset {
- 	ETH_SS_TEST		= 0,
-@@ -616,6 +687,7 @@ enum ethtool_stringset {
- 	ETH_SS_SOF_TIMESTAMPING,
- 	ETH_SS_TS_TX_TYPES,
- 	ETH_SS_TS_RX_FILTERS,
-+	ETH_SS_UDP_TUNNEL_TYPES,
- 
- 	/* add new constants above here */
- 	ETH_SS_COUNT
-@@ -1530,6 +1602,21 @@ enum ethtool_link_mode_bit_indices {
- 	ETHTOOL_LINK_MODE_400000baseDR8_Full_BIT	 = 72,
- 	ETHTOOL_LINK_MODE_400000baseCR8_Full_BIT	 = 73,
- 	ETHTOOL_LINK_MODE_FEC_LLRS_BIT			 = 74,
-+	ETHTOOL_LINK_MODE_100000baseKR_Full_BIT		 = 75,
-+	ETHTOOL_LINK_MODE_100000baseSR_Full_BIT		 = 76,
-+	ETHTOOL_LINK_MODE_100000baseLR_ER_FR_Full_BIT	 = 77,
-+	ETHTOOL_LINK_MODE_100000baseCR_Full_BIT		 = 78,
-+	ETHTOOL_LINK_MODE_100000baseDR_Full_BIT		 = 79,
-+	ETHTOOL_LINK_MODE_200000baseKR2_Full_BIT	 = 80,
-+	ETHTOOL_LINK_MODE_200000baseSR2_Full_BIT	 = 81,
-+	ETHTOOL_LINK_MODE_200000baseLR2_ER2_FR2_Full_BIT = 82,
-+	ETHTOOL_LINK_MODE_200000baseDR2_Full_BIT	 = 83,
-+	ETHTOOL_LINK_MODE_200000baseCR2_Full_BIT	 = 84,
-+	ETHTOOL_LINK_MODE_400000baseKR4_Full_BIT	 = 85,
-+	ETHTOOL_LINK_MODE_400000baseSR4_Full_BIT	 = 86,
-+	ETHTOOL_LINK_MODE_400000baseLR4_ER4_FR4_Full_BIT = 87,
-+	ETHTOOL_LINK_MODE_400000baseDR4_Full_BIT	 = 88,
-+	ETHTOOL_LINK_MODE_400000baseCR4_Full_BIT	 = 89,
- 	/* must be last entry */
- 	__ETHTOOL_LINK_MODE_MASK_NBITS
- };
-diff --git a/include/standard-headers/linux/input-event-codes.h b/include/standard-headers/linux/input-event-codes.h
-index ebf72c1031..e740ad9f2e 100644
---- a/include/standard-headers/linux/input-event-codes.h
-+++ b/include/standard-headers/linux/input-event-codes.h
-@@ -888,7 +888,8 @@
- #define SW_LINEIN_INSERT	0x0d  /* set = inserted */
- #define SW_MUTE_DEVICE		0x0e  /* set = device disabled */
- #define SW_PEN_INSERTED		0x0f  /* set = pen inserted */
--#define SW_MAX_			0x0f
-+#define SW_MACHINE_COVER	0x10  /* set = cover closed */
-+#define SW_MAX_			0x10
- #define SW_CNT			(SW_MAX_+1)
- 
- /*
-diff --git a/include/standard-headers/linux/vhost_types.h b/include/standard-headers/linux/vhost_types.h
-index a678d8fbaa..486630b332 100644
---- a/include/standard-headers/linux/vhost_types.h
-+++ b/include/standard-headers/linux/vhost_types.h
-@@ -60,6 +60,17 @@ struct vhost_iotlb_msg {
- #define VHOST_IOTLB_UPDATE         2
- #define VHOST_IOTLB_INVALIDATE     3
- #define VHOST_IOTLB_ACCESS_FAIL    4
-+/*
-+ * VHOST_IOTLB_BATCH_BEGIN and VHOST_IOTLB_BATCH_END allow modifying
-+ * multiple mappings in one go: beginning with
-+ * VHOST_IOTLB_BATCH_BEGIN, followed by any number of
-+ * VHOST_IOTLB_UPDATE messages, and ending with VHOST_IOTLB_BATCH_END.
-+ * When one of these two values is used as the message type, the rest
-+ * of the fields in the message are ignored. There's no guarantee that
-+ * these changes take place automatically in the device.
-+ */
-+#define VHOST_IOTLB_BATCH_BEGIN    5
-+#define VHOST_IOTLB_BATCH_END      6
- 	uint8_t type;
- };
- 
-diff --git a/include/standard-headers/linux/virtio_9p.h b/include/standard-headers/linux/virtio_9p.h
-index e68f71dbe6..f5604fc5fb 100644
---- a/include/standard-headers/linux/virtio_9p.h
-+++ b/include/standard-headers/linux/virtio_9p.h
-@@ -25,7 +25,7 @@
-  * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
-  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
-  * SUCH DAMAGE. */
--#include "standard-headers/linux/types.h"
-+#include "standard-headers/linux/virtio_types.h"
- #include "standard-headers/linux/virtio_ids.h"
- #include "standard-headers/linux/virtio_config.h"
- 
-@@ -36,7 +36,7 @@
- 
- struct virtio_9p_config {
- 	/* length of the tag name */
--	uint16_t tag_len;
-+	__virtio16 tag_len;
- 	/* non-NULL terminated tag name */
- 	uint8_t tag[0];
- } QEMU_PACKED;
-diff --git a/include/standard-headers/linux/virtio_blk.h b/include/standard-headers/linux/virtio_blk.h
-index 0229b0fbe4..2dcc90826a 100644
---- a/include/standard-headers/linux/virtio_blk.h
-+++ b/include/standard-headers/linux/virtio_blk.h
-@@ -55,20 +55,20 @@
- 
- struct virtio_blk_config {
- 	/* The capacity (in 512-byte sectors). */
--	uint64_t capacity;
-+	__virtio64 capacity;
- 	/* The maximum segment size (if VIRTIO_BLK_F_SIZE_MAX) */
--	uint32_t size_max;
-+	__virtio32 size_max;
- 	/* The maximum number of segments (if VIRTIO_BLK_F_SEG_MAX) */
--	uint32_t seg_max;
-+	__virtio32 seg_max;
- 	/* geometry of the device (if VIRTIO_BLK_F_GEOMETRY) */
- 	struct virtio_blk_geometry {
--		uint16_t cylinders;
-+		__virtio16 cylinders;
- 		uint8_t heads;
- 		uint8_t sectors;
- 	} geometry;
- 
- 	/* block size of device (if VIRTIO_BLK_F_BLK_SIZE) */
--	uint32_t blk_size;
-+	__virtio32 blk_size;
- 
- 	/* the next 4 entries are guarded by VIRTIO_BLK_F_TOPOLOGY  */
- 	/* exponent for physical block per logical block. */
-@@ -76,42 +76,42 @@ struct virtio_blk_config {
- 	/* alignment offset in logical blocks. */
- 	uint8_t alignment_offset;
- 	/* minimum I/O size without performance penalty in logical blocks. */
--	uint16_t min_io_size;
-+	__virtio16 min_io_size;
- 	/* optimal sustained I/O size in logical blocks. */
--	uint32_t opt_io_size;
-+	__virtio32 opt_io_size;
- 
- 	/* writeback mode (if VIRTIO_BLK_F_CONFIG_WCE) */
- 	uint8_t wce;
- 	uint8_t unused;
- 
- 	/* number of vqs, only available when VIRTIO_BLK_F_MQ is set */
--	uint16_t num_queues;
-+	__virtio16 num_queues;
- 
- 	/* the next 3 entries are guarded by VIRTIO_BLK_F_DISCARD */
- 	/*
- 	 * The maximum discard sectors (in 512-byte sectors) for
- 	 * one segment.
- 	 */
--	uint32_t max_discard_sectors;
-+	__virtio32 max_discard_sectors;
- 	/*
- 	 * The maximum number of discard segments in a
- 	 * discard command.
- 	 */
--	uint32_t max_discard_seg;
-+	__virtio32 max_discard_seg;
- 	/* Discard commands must be aligned to this number of sectors. */
--	uint32_t discard_sector_alignment;
-+	__virtio32 discard_sector_alignment;
- 
- 	/* the next 3 entries are guarded by VIRTIO_BLK_F_WRITE_ZEROES */
- 	/*
- 	 * The maximum number of write zeroes sectors (in 512-byte sectors) in
- 	 * one segment.
- 	 */
--	uint32_t max_write_zeroes_sectors;
-+	__virtio32 max_write_zeroes_sectors;
- 	/*
- 	 * The maximum number of segments in a write zeroes
- 	 * command.
- 	 */
--	uint32_t max_write_zeroes_seg;
-+	__virtio32 max_write_zeroes_seg;
- 	/*
- 	 * Set if a VIRTIO_BLK_T_WRITE_ZEROES request may result in the
- 	 * deallocation of one or more of the sectors.
-diff --git a/include/standard-headers/linux/virtio_config.h b/include/standard-headers/linux/virtio_config.h
-index 9a69d9e242..22e3a85f67 100644
---- a/include/standard-headers/linux/virtio_config.h
-+++ b/include/standard-headers/linux/virtio_config.h
-@@ -67,13 +67,15 @@
- #define VIRTIO_F_VERSION_1		32
- 
- /*
-- * If clear - device has the IOMMU bypass quirk feature.
-- * If set - use platform tools to detect the IOMMU.
-+ * If clear - device has the platform DMA (e.g. IOMMU) bypass quirk feature.
-+ * If set - use platform DMA tools to access the memory.
-  *
-  * Note the reverse polarity (compared to most other features),
-  * this is for compatibility with legacy systems.
-  */
--#define VIRTIO_F_IOMMU_PLATFORM		33
-+#define VIRTIO_F_ACCESS_PLATFORM	33
-+/* Legacy name for VIRTIO_F_ACCESS_PLATFORM (for compatibility with old userspace) */
-+#define VIRTIO_F_IOMMU_PLATFORM		VIRTIO_F_ACCESS_PLATFORM
- 
- /* This feature indicates support for the packed virtqueue layout. */
- #define VIRTIO_F_RING_PACKED		34
-diff --git a/include/standard-headers/linux/virtio_console.h b/include/standard-headers/linux/virtio_console.h
-index 0dedc9e6f5..71f5f648e3 100644
---- a/include/standard-headers/linux/virtio_console.h
-+++ b/include/standard-headers/linux/virtio_console.h
-@@ -45,13 +45,13 @@
- 
- struct virtio_console_config {
- 	/* colums of the screens */
--	uint16_t cols;
-+	__virtio16 cols;
- 	/* rows of the screens */
--	uint16_t rows;
-+	__virtio16 rows;
- 	/* max. number of ports this device can hold */
--	uint32_t max_nr_ports;
-+	__virtio32 max_nr_ports;
- 	/* emergency write register */
--	uint32_t emerg_wr;
-+	__virtio32 emerg_wr;
- } QEMU_PACKED;
- 
- /*
-diff --git a/include/standard-headers/linux/virtio_net.h b/include/standard-headers/linux/virtio_net.h
-index a90f79e1b1..e0a070518f 100644
---- a/include/standard-headers/linux/virtio_net.h
-+++ b/include/standard-headers/linux/virtio_net.h
-@@ -87,14 +87,14 @@ struct virtio_net_config {
- 	/* The config defining mac address (if VIRTIO_NET_F_MAC) */
- 	uint8_t mac[ETH_ALEN];
- 	/* See VIRTIO_NET_F_STATUS and VIRTIO_NET_S_* above */
--	uint16_t status;
-+	__virtio16 status;
- 	/* Maximum number of each of transmit and receive queues;
- 	 * see VIRTIO_NET_F_MQ and VIRTIO_NET_CTRL_MQ.
- 	 * Legal values are between 1 and 0x8000
- 	 */
--	uint16_t max_virtqueue_pairs;
-+	__virtio16 max_virtqueue_pairs;
- 	/* Default maximum transmit unit advice */
--	uint16_t mtu;
-+	__virtio16 mtu;
- 	/*
- 	 * speed, in units of 1Mb. All values 0 to INT_MAX are legal.
- 	 * Any other value stands for unknown.
-diff --git a/include/standard-headers/linux/virtio_scsi.h b/include/standard-headers/linux/virtio_scsi.h
-index ab66166b6a..663f36cbb7 100644
---- a/include/standard-headers/linux/virtio_scsi.h
-+++ b/include/standard-headers/linux/virtio_scsi.h
-@@ -103,16 +103,16 @@ struct virtio_scsi_event {
- } QEMU_PACKED;
- 
- struct virtio_scsi_config {
--	uint32_t num_queues;
--	uint32_t seg_max;
--	uint32_t max_sectors;
--	uint32_t cmd_per_lun;
--	uint32_t event_info_size;
--	uint32_t sense_size;
--	uint32_t cdb_size;
--	uint16_t max_channel;
--	uint16_t max_target;
--	uint32_t max_lun;
-+	__virtio32 num_queues;
-+	__virtio32 seg_max;
-+	__virtio32 max_sectors;
-+	__virtio32 cmd_per_lun;
-+	__virtio32 event_info_size;
-+	__virtio32 sense_size;
-+	__virtio32 cdb_size;
-+	__virtio16 max_channel;
-+	__virtio16 max_target;
-+	__virtio32 max_lun;
- } QEMU_PACKED;
- 
- /* Feature Bits */
-diff --git a/linux-headers/asm-generic/unistd.h b/linux-headers/asm-generic/unistd.h
-index f4a01305d9..995b36c2ea 100644
---- a/linux-headers/asm-generic/unistd.h
-+++ b/linux-headers/asm-generic/unistd.h
-@@ -606,9 +606,9 @@ __SYSCALL(__NR_sendto, sys_sendto)
- #define __NR_recvfrom 207
- __SC_COMP(__NR_recvfrom, sys_recvfrom, compat_sys_recvfrom)
- #define __NR_setsockopt 208
--__SC_COMP(__NR_setsockopt, sys_setsockopt, compat_sys_setsockopt)
-+__SC_COMP(__NR_setsockopt, sys_setsockopt, sys_setsockopt)
- #define __NR_getsockopt 209
--__SC_COMP(__NR_getsockopt, sys_getsockopt, compat_sys_getsockopt)
-+__SC_COMP(__NR_getsockopt, sys_getsockopt, sys_getsockopt)
- #define __NR_shutdown 210
- __SYSCALL(__NR_shutdown, sys_shutdown)
- #define __NR_sendmsg 211
-@@ -850,6 +850,8 @@ __SYSCALL(__NR_pidfd_open, sys_pidfd_open)
- #define __NR_clone3 435
- __SYSCALL(__NR_clone3, sys_clone3)
- #endif
-+#define __NR_close_range 436
-+__SYSCALL(__NR_close_range, sys_close_range)
- 
- #define __NR_openat2 437
- __SYSCALL(__NR_openat2, sys_openat2)
-diff --git a/linux-headers/asm-mips/unistd_n32.h b/linux-headers/asm-mips/unistd_n32.h
-index 3b9eda7e7d..246fbb6a78 100644
---- a/linux-headers/asm-mips/unistd_n32.h
-+++ b/linux-headers/asm-mips/unistd_n32.h
-@@ -365,6 +365,7 @@
- #define __NR_fspick	(__NR_Linux + 433)
- #define __NR_pidfd_open	(__NR_Linux + 434)
- #define __NR_clone3	(__NR_Linux + 435)
-+#define __NR_close_range	(__NR_Linux + 436)
- #define __NR_openat2	(__NR_Linux + 437)
- #define __NR_pidfd_getfd	(__NR_Linux + 438)
- #define __NR_faccessat2	(__NR_Linux + 439)
-diff --git a/linux-headers/asm-mips/unistd_n64.h b/linux-headers/asm-mips/unistd_n64.h
-index 9cdf9b6c60..194d777dfd 100644
---- a/linux-headers/asm-mips/unistd_n64.h
-+++ b/linux-headers/asm-mips/unistd_n64.h
-@@ -341,6 +341,7 @@
- #define __NR_fspick	(__NR_Linux + 433)
- #define __NR_pidfd_open	(__NR_Linux + 434)
- #define __NR_clone3	(__NR_Linux + 435)
-+#define __NR_close_range	(__NR_Linux + 436)
- #define __NR_openat2	(__NR_Linux + 437)
- #define __NR_pidfd_getfd	(__NR_Linux + 438)
- #define __NR_faccessat2	(__NR_Linux + 439)
-diff --git a/linux-headers/asm-mips/unistd_o32.h b/linux-headers/asm-mips/unistd_o32.h
-index e3e5e238f0..3e093dd913 100644
---- a/linux-headers/asm-mips/unistd_o32.h
-+++ b/linux-headers/asm-mips/unistd_o32.h
-@@ -411,6 +411,7 @@
- #define __NR_fspick	(__NR_Linux + 433)
- #define __NR_pidfd_open	(__NR_Linux + 434)
- #define __NR_clone3	(__NR_Linux + 435)
-+#define __NR_close_range	(__NR_Linux + 436)
- #define __NR_openat2	(__NR_Linux + 437)
- #define __NR_pidfd_getfd	(__NR_Linux + 438)
- #define __NR_faccessat2	(__NR_Linux + 439)
-diff --git a/linux-headers/asm-powerpc/kvm.h b/linux-headers/asm-powerpc/kvm.h
-index 264e266a85..c3af3f324c 100644
---- a/linux-headers/asm-powerpc/kvm.h
-+++ b/linux-headers/asm-powerpc/kvm.h
-@@ -640,6 +640,11 @@ struct kvm_ppc_cpu_char {
- #define KVM_REG_PPC_ONLINE	(KVM_REG_PPC | KVM_REG_SIZE_U32 | 0xbf)
- #define KVM_REG_PPC_PTCR	(KVM_REG_PPC | KVM_REG_SIZE_U64 | 0xc0)
- 
-+/* POWER10 registers */
-+#define KVM_REG_PPC_MMCR3	(KVM_REG_PPC | KVM_REG_SIZE_U64 | 0xc1)
-+#define KVM_REG_PPC_SIER2	(KVM_REG_PPC | KVM_REG_SIZE_U64 | 0xc2)
-+#define KVM_REG_PPC_SIER3	(KVM_REG_PPC | KVM_REG_SIZE_U64 | 0xc3)
-+
- /* Transactional Memory checkpointed state:
-  * This is all GPRs, all VSX regs and a subset of SPRs
-  */
-diff --git a/linux-headers/asm-powerpc/unistd_32.h b/linux-headers/asm-powerpc/unistd_32.h
-index 862edb7448..0db9481d49 100644
---- a/linux-headers/asm-powerpc/unistd_32.h
-+++ b/linux-headers/asm-powerpc/unistd_32.h
-@@ -418,6 +418,7 @@
- #define __NR_fspick	433
- #define __NR_pidfd_open	434
- #define __NR_clone3	435
-+#define __NR_close_range	436
- #define __NR_openat2	437
- #define __NR_pidfd_getfd	438
- #define __NR_faccessat2	439
-diff --git a/linux-headers/asm-powerpc/unistd_64.h b/linux-headers/asm-powerpc/unistd_64.h
-index f553224ce4..9f74310988 100644
---- a/linux-headers/asm-powerpc/unistd_64.h
-+++ b/linux-headers/asm-powerpc/unistd_64.h
-@@ -390,6 +390,7 @@
- #define __NR_fspick	433
- #define __NR_pidfd_open	434
- #define __NR_clone3	435
-+#define __NR_close_range	436
- #define __NR_openat2	437
- #define __NR_pidfd_getfd	438
- #define __NR_faccessat2	439
-diff --git a/linux-headers/asm-s390/kvm.h b/linux-headers/asm-s390/kvm.h
-index 0138ccb0d8..f053b8304a 100644
---- a/linux-headers/asm-s390/kvm.h
-+++ b/linux-headers/asm-s390/kvm.h
-@@ -231,11 +231,13 @@ struct kvm_guest_debug_arch {
- #define KVM_SYNC_GSCB   (1UL << 9)
- #define KVM_SYNC_BPBC   (1UL << 10)
- #define KVM_SYNC_ETOKEN (1UL << 11)
-+#define KVM_SYNC_DIAG318 (1UL << 12)
- 
- #define KVM_SYNC_S390_VALID_FIELDS \
- 	(KVM_SYNC_PREFIX | KVM_SYNC_GPRS | KVM_SYNC_ACRS | KVM_SYNC_CRS | \
- 	 KVM_SYNC_ARCH0 | KVM_SYNC_PFAULT | KVM_SYNC_VRS | KVM_SYNC_RICCB | \
--	 KVM_SYNC_FPRS | KVM_SYNC_GSCB | KVM_SYNC_BPBC | KVM_SYNC_ETOKEN)
-+	 KVM_SYNC_FPRS | KVM_SYNC_GSCB | KVM_SYNC_BPBC | KVM_SYNC_ETOKEN | \
-+	 KVM_SYNC_DIAG318)
- 
- /* length and alignment of the sdnx as a power of two */
- #define SDNXC 8
-@@ -264,7 +266,8 @@ struct kvm_sync_regs {
- 	__u8 reserved2 : 7;
- 	__u8 padding1[51];	/* riccb needs to be 64byte aligned */
- 	__u8 riccb[64];		/* runtime instrumentation controls block */
--	__u8 padding2[192];	/* sdnx needs to be 256byte aligned */
-+	__u64 diag318;		/* diagnose 0x318 info */
-+	__u8 padding2[184];	/* sdnx needs to be 256byte aligned */
- 	union {
- 		__u8 sdnx[SDNXL];  /* state description annex */
- 		struct {
-diff --git a/linux-headers/asm-s390/unistd_32.h b/linux-headers/asm-s390/unistd_32.h
-index e08233c0c3..1803cd0c3b 100644
---- a/linux-headers/asm-s390/unistd_32.h
-+++ b/linux-headers/asm-s390/unistd_32.h
-@@ -408,6 +408,7 @@
- #define __NR_fspick 433
- #define __NR_pidfd_open 434
- #define __NR_clone3 435
-+#define __NR_close_range 436
- #define __NR_openat2 437
- #define __NR_pidfd_getfd 438
- #define __NR_faccessat2 439
-diff --git a/linux-headers/asm-s390/unistd_64.h b/linux-headers/asm-s390/unistd_64.h
-index 560e19ae2b..228d5004e5 100644
---- a/linux-headers/asm-s390/unistd_64.h
-+++ b/linux-headers/asm-s390/unistd_64.h
-@@ -356,6 +356,7 @@
- #define __NR_fspick 433
- #define __NR_pidfd_open 434
- #define __NR_clone3 435
-+#define __NR_close_range 436
- #define __NR_openat2 437
- #define __NR_pidfd_getfd 438
- #define __NR_faccessat2 439
-diff --git a/linux-headers/asm-x86/unistd_32.h b/linux-headers/asm-x86/unistd_32.h
-index c727981d4a..356c12c2db 100644
---- a/linux-headers/asm-x86/unistd_32.h
-+++ b/linux-headers/asm-x86/unistd_32.h
-@@ -426,6 +426,7 @@
- #define __NR_fspick 433
- #define __NR_pidfd_open 434
- #define __NR_clone3 435
-+#define __NR_close_range 436
- #define __NR_openat2 437
- #define __NR_pidfd_getfd 438
- #define __NR_faccessat2 439
-diff --git a/linux-headers/asm-x86/unistd_64.h b/linux-headers/asm-x86/unistd_64.h
-index 843fa62745..ef70e1c7c9 100644
---- a/linux-headers/asm-x86/unistd_64.h
-+++ b/linux-headers/asm-x86/unistd_64.h
-@@ -348,6 +348,7 @@
- #define __NR_fspick 433
- #define __NR_pidfd_open 434
- #define __NR_clone3 435
-+#define __NR_close_range 436
- #define __NR_openat2 437
- #define __NR_pidfd_getfd 438
- #define __NR_faccessat2 439
-diff --git a/linux-headers/asm-x86/unistd_x32.h b/linux-headers/asm-x86/unistd_x32.h
-index 7d63d703ca..84ae8e9f5f 100644
---- a/linux-headers/asm-x86/unistd_x32.h
-+++ b/linux-headers/asm-x86/unistd_x32.h
-@@ -301,6 +301,7 @@
- #define __NR_fspick (__X32_SYSCALL_BIT + 433)
- #define __NR_pidfd_open (__X32_SYSCALL_BIT + 434)
- #define __NR_clone3 (__X32_SYSCALL_BIT + 435)
-+#define __NR_close_range (__X32_SYSCALL_BIT + 436)
- #define __NR_openat2 (__X32_SYSCALL_BIT + 437)
- #define __NR_pidfd_getfd (__X32_SYSCALL_BIT + 438)
- #define __NR_faccessat2 (__X32_SYSCALL_BIT + 439)
-diff --git a/linux-headers/linux/kvm.h b/linux-headers/linux/kvm.h
-index a28c366737..6683e2e1b0 100644
---- a/linux-headers/linux/kvm.h
-+++ b/linux-headers/linux/kvm.h
-@@ -289,6 +289,7 @@ struct kvm_run {
- 		/* KVM_EXIT_FAIL_ENTRY */
- 		struct {
- 			__u64 hardware_entry_failure_reason;
-+			__u32 cpu;
- 		} fail_entry;
- 		/* KVM_EXIT_EXCEPTION */
- 		struct {
-@@ -1031,6 +1032,9 @@ struct kvm_ppc_resize_hpt {
- #define KVM_CAP_PPC_SECURE_GUEST 181
- #define KVM_CAP_HALT_POLL 182
- #define KVM_CAP_ASYNC_PF_INT 183
-+#define KVM_CAP_LAST_CPU 184
-+#define KVM_CAP_SMALLER_MAXPHYADDR 185
-+#define KVM_CAP_S390_DIAG318 186
- 
- #ifdef KVM_CAP_IRQ_ROUTING
- 
-diff --git a/linux-headers/linux/vfio.h b/linux-headers/linux/vfio.h
-index f09df262c4..a90672494d 100644
---- a/linux-headers/linux/vfio.h
-+++ b/linux-headers/linux/vfio.h
-@@ -1030,7 +1030,7 @@ struct vfio_iommu_type1_info_cap_iova_range {
-  * size in bytes that can be used by user applications when getting the dirty
-  * bitmap.
-  */
--#define VFIO_IOMMU_TYPE1_INFO_CAP_MIGRATION  1
-+#define VFIO_IOMMU_TYPE1_INFO_CAP_MIGRATION  2
- 
- struct vfio_iommu_type1_info_cap_migration {
- 	struct	vfio_info_cap_header header;
-diff --git a/linux-headers/linux/vhost.h b/linux-headers/linux/vhost.h
-index 0c2349612e..7523218532 100644
---- a/linux-headers/linux/vhost.h
-+++ b/linux-headers/linux/vhost.h
-@@ -91,6 +91,8 @@
- 
- /* Use message type V2 */
- #define VHOST_BACKEND_F_IOTLB_MSG_V2 0x1
-+/* IOTLB can accept batching hints */
-+#define VHOST_BACKEND_F_IOTLB_BATCH  0x2
- 
- #define VHOST_SET_BACKEND_FEATURES _IOW(VHOST_VIRTIO, 0x25, __u64)
- #define VHOST_GET_BACKEND_FEATURES _IOR(VHOST_VIRTIO, 0x26, __u64)
--- 
-MST
+There is no stack trace. It basically does not load l2 guest.
+
+1. Bare metal setup with RH 8.2(Any AMD EPYC system should be fine).
+   Download the latest kvm tree. Mine is kernel 5.9.0-rc1+your patch
+     # uname -r
+      5.9.0-rc1+
+   (You can actually just unload/load the kvm modules should also work.)
+
+2. Now bring up the L1 guest on  with the following command.
+    #qemu-system-x86_64 -name rhel8 -m 16384 -smp
+cores=16,threads=1,sockets=1 -hda vdisk.qcow2 -enable-kvm -net nic  -net
+bridge,br=virbr0,helper=/usr/libexec/qem
+u-bridge-helper -cpu EPYC -nographic
+
+    Download the latest kvm kernel on L1 guest. Mine is kernel
+5.9.0-rc1+your patch
+   # uname -r
+    5.9.0-rc1+
+
+3. Try to bring with the L2 guest with the following command.
+   #qemu-system-x86_64 -name rhel8 -m 16384 -smp
+cores=16,threads=1,sockets=1 -hda vdisk.qcow2 -enable-kvm -net nic  -net
+bridge,br=virbr0,helper=/usr/libexec/qem
+u-bridge-helper -cpu EPYC -nographic
+
+L2 guest fails to start.
+
+Note that L2 guest comes up fine without your patch.
+
+Let me know if you need any more information. Thanks.
+
+> >
+> >> +
+> >> +	/* Update vmcb0. We will restore everything when a VMEXIT occurs */
+> >> +
+> >> +	svm->vmcb01->save.efer   = svm->vcpu.arch.efer;
+> >> +	svm->vmcb01->save.cr0    = kvm_read_cr0(&svm->vcpu);
+> >> +	svm->vmcb01->save.cr4    = svm->vcpu.arch.cr4;
+> >> +	svm->vmcb01->save.rflags = kvm_get_rflags(&svm->vcpu);
+> >> +	svm->vmcb01->save.rip    = kvm_rip_read(&svm->vcpu);
+> >> +
+> >> +	if (!npt_enabled)
+> >> +		svm->vmcb01->save.cr3 = kvm_read_cr3(&svm->vcpu);
+> >>
+> >>   	svm->nested.nested_run_pending = 1;
+> >>
+> >> @@ -564,7 +556,6 @@ int nested_svm_vmexit(struct vcpu_svm *svm)  {
+> >>   	int rc;
+> >>   	struct vmcb *nested_vmcb;
+> >> -	struct vmcb *hsave = svm->nested.hsave;
+> >>   	struct vmcb *vmcb = svm->vmcb;
+> >>   	struct kvm_host_map map;
+> >>
+> >> @@ -628,8 +619,11 @@ int nested_svm_vmexit(struct vcpu_svm *svm)
+> >>   	nested_vmcb->control.pause_filter_thresh =
+> >>   		svm->vmcb->control.pause_filter_thresh;
+> >>
+> >> -	/* Restore the original control entries */
+> >> -	copy_vmcb_control_area(&vmcb->control, &hsave->control);
+> >> +	if (svm->vmcb01->control.asid == 0)
+> >> +		svm->vmcb01->control.asid = svm->nested.vmcb02-
+> >>> control.asid;
+> >> +
+> >> +	svm->vmcb = svm->vmcb01;
+> >> +	svm->vmcb_pa = svm->nested.vmcb01_pa;
+> >>
+> >>   	/* On vmexit the  GIF is set to false */
+> >>   	svm_set_gif(svm, false);
+> >> @@ -640,19 +634,13 @@ int nested_svm_vmexit(struct vcpu_svm *svm)
+> >>   	svm->nested.ctl.nested_cr3 = 0;
+> >>
+> >>   	/* Restore selected save entries */
+> >> -	svm->vmcb->save.es = hsave->save.es;
+> >> -	svm->vmcb->save.cs = hsave->save.cs;
+> >> -	svm->vmcb->save.ss = hsave->save.ss;
+> >> -	svm->vmcb->save.ds = hsave->save.ds;
+> >> -	svm->vmcb->save.gdtr = hsave->save.gdtr;
+> >> -	svm->vmcb->save.idtr = hsave->save.idtr;
+> >> -	kvm_set_rflags(&svm->vcpu, hsave->save.rflags);
+> >> -	svm_set_efer(&svm->vcpu, hsave->save.efer);
+> >> -	svm_set_cr0(&svm->vcpu, hsave->save.cr0 | X86_CR0_PE);
+> >> -	svm_set_cr4(&svm->vcpu, hsave->save.cr4);
+> >> -	kvm_rax_write(&svm->vcpu, hsave->save.rax);
+> >> -	kvm_rsp_write(&svm->vcpu, hsave->save.rsp);
+> >> -	kvm_rip_write(&svm->vcpu, hsave->save.rip);
+> >> +	kvm_set_rflags(&svm->vcpu, svm->vmcb->save.rflags);
+> >> +	svm_set_efer(&svm->vcpu, svm->vmcb->save.efer);
+> >> +	svm_set_cr0(&svm->vcpu, svm->vmcb->save.cr0 | X86_CR0_PE);
+> >> +	svm_set_cr4(&svm->vcpu, svm->vmcb->save.cr4);
+> >> +	kvm_rax_write(&svm->vcpu, svm->vmcb->save.rax);
+> >> +	kvm_rsp_write(&svm->vcpu, svm->vmcb->save.rsp);
+> >> +	kvm_rip_write(&svm->vcpu, svm->vmcb->save.rip);
+> >>   	svm->vmcb->save.dr7 = 0;
+> >>   	svm->vmcb->save.cpl = 0;
+> >>   	svm->vmcb->control.exit_int_info = 0; @@ -670,12 +658,12 @@ int
+> >> nested_svm_vmexit(struct vcpu_svm *svm)
+> >>
+> >>   	nested_svm_uninit_mmu_context(&svm->vcpu);
+> >>
+> >> -	rc = nested_svm_load_cr3(&svm->vcpu, hsave->save.cr3, false);
+> >> +	rc = nested_svm_load_cr3(&svm->vcpu, svm->vmcb->save.cr3, false);
+> >>   	if (rc)
+> >>   		return 1;
+> >>
+> >> -	if (npt_enabled)
+> >> -		svm->vmcb->save.cr3 = hsave->save.cr3;
+> >> +	if (!npt_enabled)
+> >> +		svm->vmcb01->save.cr3 = kvm_read_cr3(&svm->vcpu);
+> >>
+> >>   	/*
+> >>   	 * Drop what we picked up for L2 via svm_complete_interrupts() so
+> >> it @@ -694,12 +682,10 @@ int nested_svm_vmexit(struct vcpu_svm *svm)
+> >> void svm_leave_nested(struct vcpu_svm *svm)  {
+> >>   	if (is_guest_mode(&svm->vcpu)) {
+> >> -		struct vmcb *hsave = svm->nested.hsave;
+> >> -		struct vmcb *vmcb = svm->vmcb;
+> >> -
+> >>   		svm->nested.nested_run_pending = 0;
+> >>   		leave_guest_mode(&svm->vcpu);
+> >> -		copy_vmcb_control_area(&vmcb->control, &hsave->control);
+> >> +		svm->vmcb = svm->vmcb01;
+> >> +		svm->vmcb_pa = svm->nested.vmcb01_pa;
+> >>   		nested_svm_uninit_mmu_context(&svm->vcpu);
+> >>   	}
+> >>   }
+> >> @@ -1046,10 +1032,9 @@ static int svm_get_nested_state(struct
+> >> kvm_vcpu *vcpu,
+> >>   	if (copy_to_user(&user_vmcb->control, &svm->nested.ctl,
+> >>   			 sizeof(user_vmcb->control)))
+> >>   		return -EFAULT;
+> >> -	if (copy_to_user(&user_vmcb->save, &svm->nested.hsave->save,
+> >> +	if (copy_to_user(&user_vmcb->save, &svm->vmcb01->save,
+> >>   			 sizeof(user_vmcb->save)))
+> >>   		return -EFAULT;
+> >> -
+> >>   out:
+> >>   	return kvm_state.size;
+> >>   }
+> >> @@ -1059,7 +1044,6 @@ static int svm_set_nested_state(struct kvm_vcpu
+> >> *vcpu,
+> >>   				struct kvm_nested_state *kvm_state)  {
+> >>   	struct vcpu_svm *svm = to_svm(vcpu);
+> >> -	struct vmcb *hsave = svm->nested.hsave;
+> >>   	struct vmcb __user *user_vmcb = (struct vmcb __user *)
+> >>   		&user_kvm_nested_state->data.svm[0];
+> >>   	struct vmcb_control_area ctl;
+> >> @@ -1121,16 +1105,24 @@ static int svm_set_nested_state(struct
+> >> kvm_vcpu *vcpu,
+> >>   	if (!(save.cr0 & X86_CR0_PG))
+> >>   		return -EINVAL;
+> >>
+> >> +	svm->nested.vmcb02->control = svm->vmcb01->control;
+> >> +	svm->nested.vmcb02->save = svm->vmcb01->save;
+> >> +	svm->vmcb01->save = save;
+> >> +
+> >> +	WARN_ON(svm->vmcb == svm->nested.vmcb02);
+> >> +
+> >> +	svm->nested.vmcb = kvm_state->hdr.svm.vmcb_pa;
+> >> +
+> >> +	svm->vmcb = svm->nested.vmcb02;
+> >> +	svm->vmcb_pa = svm->nested.vmcb02_pa;
+> >> +
+> >>   	/*
+> >> -	 * All checks done, we can enter guest mode.  L1 control fields
+> >> -	 * come from the nested save state.  Guest state is already
+> >> -	 * in the registers, the save area of the nested state instead
+> >> -	 * contains saved L1 state.
+> >> +	 * All checks done, we can enter guest mode. L2 control fields will
+> >> +	 * be the result of a combination of L1 and userspace indicated
+> >> +	 * L12.control. The save area of L1 vmcb now contains the userspace
+> >> +	 * indicated L1.save.
+> >>   	 */
+> >> -	copy_vmcb_control_area(&hsave->control, &svm->vmcb->control);
+> >> -	hsave->save = save;
+> >>
+> >> -	svm->nested.vmcb = kvm_state->hdr.svm.vmcb_pa;
+> >>   	load_nested_vmcb_control(svm, &ctl);
+> >>   	nested_prepare_vmcb_control(svm);
+> >>
+> >> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c index
+> >> 5764b87379cf..d8022f989ffb 100644
+> >> --- a/arch/x86/kvm/svm/svm.c
+> >> +++ b/arch/x86/kvm/svm/svm.c
+> >> @@ -971,8 +971,8 @@ static u64 svm_write_l1_tsc_offset(struct
+> >> kvm_vcpu *vcpu, u64 offset)
+> >>   	if (is_guest_mode(vcpu)) {
+> >>   		/* Write L1's TSC offset.  */
+> >>   		g_tsc_offset = svm->vmcb->control.tsc_offset -
+> >> -			       svm->nested.hsave->control.tsc_offset;
+> >> -		svm->nested.hsave->control.tsc_offset = offset;
+> >> +			       svm->vmcb01->control.tsc_offset;
+> >> +		svm->vmcb01->control.tsc_offset = offset;
+> >>   	}
+> >>
+> >>   	trace_kvm_write_tsc_offset(vcpu->vcpu_id,
+> >> @@ -1171,9 +1171,9 @@ static void svm_vcpu_reset(struct kvm_vcpu
+> >> *vcpu, bool init_event)  static int svm_create_vcpu(struct kvm_vcpu *vcpu)  {
+> >>   	struct vcpu_svm *svm;
+> >> -	struct page *page;
+> >> +	struct page *vmcb01_page;
+> >> +	struct page *vmcb02_page;
+> >>   	struct page *msrpm_pages;
+> >> -	struct page *hsave_page;
+> >>   	struct page *nested_msrpm_pages;
+> >>   	int err;
+> >>
+> >> @@ -1181,8 +1181,8 @@ static int svm_create_vcpu(struct kvm_vcpu *vcpu)
+> >>   	svm = to_svm(vcpu);
+> >>
+> >>   	err = -ENOMEM;
+> >> -	page = alloc_page(GFP_KERNEL_ACCOUNT);
+> >> -	if (!page)
+> >> +	vmcb01_page = alloc_page(GFP_KERNEL_ACCOUNT);
+> >> +	if (!vmcb01_page)
+> >>   		goto out;
+> >>
+> >>   	msrpm_pages = alloc_pages(GFP_KERNEL_ACCOUNT,
+> MSRPM_ALLOC_ORDER);
+> >> @@ -1193,8 +1193,8 @@ static int svm_create_vcpu(struct kvm_vcpu
+> >> *vcpu)
+> >>   	if (!nested_msrpm_pages)
+> >>   		goto free_page2;
+> >>
+> >> -	hsave_page = alloc_page(GFP_KERNEL_ACCOUNT);
+> >> -	if (!hsave_page)
+> >> +	vmcb02_page = alloc_page(GFP_KERNEL_ACCOUNT);
+> >> +	if (!vmcb02_page)
+> >>   		goto free_page3;
+> >>
+> >>   	err = avic_init_vcpu(svm);
+> >> @@ -1207,8 +1207,9 @@ static int svm_create_vcpu(struct kvm_vcpu *vcpu)
+> >>   	if (irqchip_in_kernel(vcpu->kvm) && kvm_apicv_activated(vcpu->kvm))
+> >>   		svm->avic_is_running = true;
+> >>
+> >> -	svm->nested.hsave = page_address(hsave_page);
+> >> -	clear_page(svm->nested.hsave);
+> >> +	svm->nested.vmcb02 = page_address(vmcb02_page);
+> >> +	clear_page(svm->nested.vmcb02);
+> >> +	svm->nested.vmcb02_pa = __sme_set(page_to_pfn(vmcb02_page) <<
+> >> +PAGE_SHIFT);
+> >>
+> >>   	svm->msrpm = page_address(msrpm_pages);
+> >>   	svm_vcpu_init_msrpm(svm->msrpm);
+> >> @@ -1216,9 +1217,11 @@ static int svm_create_vcpu(struct kvm_vcpu
+> *vcpu)
+> >>   	svm->nested.msrpm = page_address(nested_msrpm_pages);
+> >>   	svm_vcpu_init_msrpm(svm->nested.msrpm);
+> >>
+> >> -	svm->vmcb = page_address(page);
+> >> +	svm->vmcb = svm->vmcb01 = page_address(vmcb01_page);
+> >>   	clear_page(svm->vmcb);
+> >> -	svm->vmcb_pa = __sme_set(page_to_pfn(page) << PAGE_SHIFT);
+> >> +	svm->vmcb_pa = __sme_set(page_to_pfn(vmcb01_page) <<
+> >> PAGE_SHIFT);
+> >> +	svm->nested.vmcb01_pa = svm->vmcb_pa;
+> >> +
+> >>   	svm->asid_generation = 0;
+> >>   	init_vmcb(svm);
+> >>
+> >> @@ -1228,13 +1231,13 @@ static int svm_create_vcpu(struct kvm_vcpu
+> *vcpu)
+> >>   	return 0;
+> >>
+> >>   free_page4:
+> >> -	__free_page(hsave_page);
+> >> +	__free_page(vmcb02_page);
+> >>   free_page3:
+> >>   	__free_pages(nested_msrpm_pages, MSRPM_ALLOC_ORDER);
+> >>   free_page2:
+> >>   	__free_pages(msrpm_pages, MSRPM_ALLOC_ORDER);
+> >>   free_page1:
+> >> -	__free_page(page);
+> >> +	__free_page(vmcb01_page);
+> >>   out:
+> >>   	return err;
+> >>   }
+> >> @@ -1256,11 +1259,11 @@ static void svm_free_vcpu(struct kvm_vcpu
+> *vcpu)
+> >>   	 * svm_vcpu_load(). So, ensure that no logical CPU has this
+> >>   	 * vmcb page recorded as its current vmcb.
+> >>   	 */
+> >> -	svm_clear_current_vmcb(svm->vmcb);
+> >>
+> >> -	__free_page(pfn_to_page(__sme_clr(svm->vmcb_pa) >> PAGE_SHIFT));
+> >> +	svm_clear_current_vmcb(svm->vmcb);
+> >> +	__free_page(pfn_to_page(__sme_clr(svm->nested.vmcb01_pa) >>
+> >> PAGE_SHIFT));
+> >> +	__free_page(pfn_to_page(__sme_clr(svm->nested.vmcb02_pa) >>
+> >> +PAGE_SHIFT));
+> >>   	__free_pages(virt_to_page(svm->msrpm), MSRPM_ALLOC_ORDER);
+> >> -	__free_page(virt_to_page(svm->nested.hsave));
+> >>   	__free_pages(virt_to_page(svm->nested.msrpm),
+> >> MSRPM_ALLOC_ORDER);  }
+> >>
+> >> @@ -1393,7 +1396,7 @@ static void svm_clear_vintr(struct vcpu_svm *svm)
+> >>   	/* Drop int_ctl fields related to VINTR injection.  */
+> >>   	svm->vmcb->control.int_ctl &= mask;
+> >>   	if (is_guest_mode(&svm->vcpu)) {
+> >> -		svm->nested.hsave->control.int_ctl &= mask;
+> >> +		svm->vmcb01->control.int_ctl &= mask;
+> >>
+> >>   		WARN_ON((svm->vmcb->control.int_ctl & V_TPR_MASK) !=
+> >>   			(svm->nested.ctl.int_ctl & V_TPR_MASK)); @@ -3127,7
+> >> +3130,7 @@ bool svm_interrupt_blocked(struct kvm_vcpu *vcpu)
+> >>   	if (is_guest_mode(vcpu)) {
+> >>   		/* As long as interrupts are being delivered...  */
+> >>   		if ((svm->nested.ctl.int_ctl & V_INTR_MASKING_MASK)
+> >> -		    ? !(svm->nested.hsave->save.rflags & X86_EFLAGS_IF)
+> >> +		    ? !(svm->vmcb01->save.rflags & X86_EFLAGS_IF)
+> >>   		    : !(kvm_get_rflags(vcpu) & X86_EFLAGS_IF))
+> >>   			return true;
+> >>
+> >> diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h index
+> >> a798e1731709..e908b83bfa69 100644
+> >> --- a/arch/x86/kvm/svm/svm.h
+> >> +++ b/arch/x86/kvm/svm/svm.h
+> >> @@ -82,7 +82,9 @@ struct kvm_svm {
+> >>   struct kvm_vcpu;
+> >>
+> >>   struct svm_nested_state {
+> >> -	struct vmcb *hsave;
+> >> +	struct vmcb *vmcb02;
+> >> +	unsigned long vmcb01_pa;
+> >> +	unsigned long vmcb02_pa;
+> >>   	u64 hsave_msr;
+> >>   	u64 vm_cr_msr;
+> >>   	u64 vmcb;
+> >> @@ -102,6 +104,7 @@ struct svm_nested_state {  struct vcpu_svm {
+> >>   	struct kvm_vcpu vcpu;
+> >>   	struct vmcb *vmcb;
+> >> +	struct vmcb *vmcb01;
+> >>   	unsigned long vmcb_pa;
+> >>   	struct svm_cpu_data *svm_data;
+> >>   	uint64_t asid_generation;
+> >> @@ -208,10 +211,7 @@ static inline struct vcpu_svm *to_svm(struct
+> >> kvm_vcpu
+> >> *vcpu)
+> >>
+> >>   static inline struct vmcb *get_host_vmcb(struct vcpu_svm *svm)  {
+> >> -	if (is_guest_mode(&svm->vcpu))
+> >> -		return svm->nested.hsave;
+> >> -	else
+> >> -		return svm->vmcb;
+> >> +	return svm->vmcb01;
+> > Shouldn't it return svm->vmcb? That is what your commit message says.
+> I believe this is correct. The function is designed to return the host vmcb which
+> will always be vmcb01.
+> >
+> >>   }
+> >>
+> >>   static inline void set_cr_intercept(struct vcpu_svm *svm, int bit)
+> >> --
+> >> 2.20.1
+> 
 
