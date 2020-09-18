@@ -2,95 +2,147 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6037526FC0B
-	for <lists+kvm@lfdr.de>; Fri, 18 Sep 2020 14:05:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8468A26FC9B
+	for <lists+kvm@lfdr.de>; Fri, 18 Sep 2020 14:35:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726445AbgIRMFM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 18 Sep 2020 08:05:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33530 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726064AbgIRMFM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 18 Sep 2020 08:05:12 -0400
-Received: from mail-pg1-x544.google.com (mail-pg1-x544.google.com [IPv6:2607:f8b0:4864:20::544])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 26B39C06174A;
-        Fri, 18 Sep 2020 05:05:12 -0700 (PDT)
-Received: by mail-pg1-x544.google.com with SMTP id k14so3342998pgi.9;
-        Fri, 18 Sep 2020 05:05:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=DF0IbIRrmgctFIOMM+pP2QIHakaraVxMAyB3OzkI7bk=;
-        b=T9w+PwfLtu9hcKasjN4CLWsdksRHFlp5hTqZ5sYrKXoOOpQdPw3JhaqugmL257radv
-         mkDK4j2QK/OtWBx8TibXQkNhdiTkZNZnoozHhcC5r4XBWWBZcNyqZkwf0xqpnOz+T14o
-         Ytepacm13eQLSq9pl24RjwKsGdni50n4SCSbPG0E0WvvOmrjn3Md0rZrFcpC4dvKv78F
-         8srlpkxOfHY41UHp6GVygbLRCxmJf38s/a5v+F7z6Ge9onhgpqtZsC3wJfV3a0g+rsi8
-         +hTosIqDyDIfZAp0/Xm6FvQYzrST3759GRZ63BHMVEms5dKKyHWLAG9SZh6yBhZqmdCs
-         atHA==
+        id S1726365AbgIRMet (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 18 Sep 2020 08:34:49 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:42410 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726064AbgIRMet (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 18 Sep 2020 08:34:49 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1600432487;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=yFL1J1bN4oghdcZX9EfHyyg2YFZ2DjLqRasYbuBJRkE=;
+        b=Kv6y+iFHFm3oR6ZYrihYZzRl+EIYl8khgqM7ycLyFmkFt7Il/ieUFeUyPUu3JPkQ3F2OAW
+        PnN0DZrYiSWzZU7ixalL+2ArVJ2UM2zP4VnaFOPdXMjHTkhNSx4vntt3o7DVL3xUNs6h+k
+        M8vWgPvzeYkdw6KvLRQ/YJKGgeTQk6M=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-248-wI5H-9JRMWW5j3hxdCOzbw-1; Fri, 18 Sep 2020 08:34:45 -0400
+X-MC-Unique: wI5H-9JRMWW5j3hxdCOzbw-1
+Received: by mail-wr1-f70.google.com with SMTP id 33so2069615wrk.12
+        for <kvm@vger.kernel.org>; Fri, 18 Sep 2020 05:34:45 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=DF0IbIRrmgctFIOMM+pP2QIHakaraVxMAyB3OzkI7bk=;
-        b=cs8VSxSsQrnPkglNyCq/wo89ebqw8znDK7ePtChc6ULmIApNINPky26zpdlAh+0ZYh
-         M3+xkBfR+G4vezmmKt6uEmYN72Pycq7pEQBMdz2vpv8q4vSYGZlCS8Doc0EKVkRClFsv
-         QkvpzJqYKoyfJBFhFNuZCK0OkZOx1UkT+c9+KjObT9edB6uveD0BbFi4+o5HDGHRMK4r
-         3k9Rd1+2bEQG2SRTlQqSf79eVccFzloR4Vz8+VxiJFXMuCKgSKq9Ufja6nHnJ63ODtP+
-         LI5YQmFMtZPjTw8FE5s5N9shEJ4Td+TMBLUa02FIikfKXqYM2q+T0TeZAibGIIPI35VX
-         V3cg==
-X-Gm-Message-State: AOAM532Rb1vFtTVhdM7pOElUhy1mUehxWpZnOO5JZWY0fmHU2Pc4quwS
-        1rclPfYeqIpKNtQ6mAF9nGg=
-X-Google-Smtp-Source: ABdhPJw3o9wEjT4p/RTkWgC91z3MI+qjjXL2Pvo+vpg8VXH//Dt0R2oGB033vcTS7fn9h0S4/V/fKg==
-X-Received: by 2002:a63:4a19:: with SMTP id x25mr25782744pga.56.1600430711617;
-        Fri, 18 Sep 2020 05:05:11 -0700 (PDT)
-Received: from localhost.localdomain (104.36.148.139.aurocloud.com. [104.36.148.139])
-        by smtp.gmail.com with ESMTPSA id n7sm2966274pfq.114.2020.09.18.05.05.07
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=yFL1J1bN4oghdcZX9EfHyyg2YFZ2DjLqRasYbuBJRkE=;
+        b=aFta2w1kPkGARCjltYcPlwrg8LCz6NTzaGIxyLgv8acgG+I7FugO2FjLCcL5fx2VNE
+         xF1/ZbEp66HOhvzAwtVxbHApMJL/9Xa1fY4NG2/HF/Q3wsAD9qA/Y9AnQXEYiTUkaMkS
+         y2i7XZ1I72LOqq+3XCqmv3HFSXOocrBifbmAPMEqUraZijhSRaouMxkbmaZKS+7pzaBu
+         kTCiKS/OMyYKgqYkBVP7cGewIjb5pORdu3rBCsH7tQmmH1deuY4fLBct+gg1gdG9gUrk
+         JAzTe3q6n4k8Tt6nrh5/vmKn+9QKfsU0cIzRRNWiRVMYbn4aobZm5JtVT7IJpA6ScGa+
+         eAcg==
+X-Gm-Message-State: AOAM531GeWL7A5TUqJmLuKR5noaQPLV2IDEW+XWZwJrCzIzAWQ0qjl/Q
+        tizAxUrHGL/LxMviP+bVtBkC6dMnVAh41vDRn+/9mGy3am4rNLaPSKKbv/9j0NvQEqFBqIrC/K0
+        eDZWq5wW4xGvM
+X-Received: by 2002:adf:a29a:: with SMTP id s26mr33384929wra.197.1600432483971;
+        Fri, 18 Sep 2020 05:34:43 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwXdalGS6hlmyjOwZ5A9fIZmHXFJxHQpx7cr8E0X3hkQqD2L8q75gwzUbB84egoCSy/YGe2JA==
+X-Received: by 2002:adf:a29a:: with SMTP id s26mr33384910wra.197.1600432483729;
+        Fri, 18 Sep 2020 05:34:43 -0700 (PDT)
+Received: from redhat.com (bzq-109-65-116-225.red.bezeqint.net. [109.65.116.225])
+        by smtp.gmail.com with ESMTPSA id k12sm5059326wrn.39.2020.09.18.05.34.40
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 18 Sep 2020 05:05:11 -0700 (PDT)
-From:   Rustam Kovhaev <rkovhaev@gmail.com>
-To:     pbonzini@redhat.com, vkuznets@redhat.com, gustavoars@kernel.org,
-        kvm@vger.kernel.org
-Cc:     linux-kernel@vger.kernel.org, gregkh@linuxfoundation.org,
-        stable@vger.kernel.org, Rustam Kovhaev <rkovhaev@gmail.com>
-Subject: [PATCH] KVM: use struct_size() and flex_array_size() helpers in kvm_io_bus_unregister_dev()
-Date:   Fri, 18 Sep 2020 05:05:00 -0700
-Message-Id: <20200918120500.954436-1-rkovhaev@gmail.com>
-X-Mailer: git-send-email 2.28.0
+        Fri, 18 Sep 2020 05:34:41 -0700 (PDT)
+Date:   Fri, 18 Sep 2020 08:34:37 -0400
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Peter Xu <peterx@redhat.com>, kvm@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Julia Suvorova <jsuvorov@redhat.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Andrew Jones <drjones@redhat.com>,
+        linux-kernel@vger.kernel.org, Gerd Hoffmann <kraxel@redhat.com>
+Subject: Re: [PATCH v2 0/3] KVM: x86: KVM_MEM_PCI_HOLE memory
+Message-ID: <20200918083134-mutt-send-email-mst@kernel.org>
+References: <20200825212526.GC8235@xz-x1>
+ <87eenlwoaa.fsf@vitty.brq.redhat.com>
+ <20200901200021.GB3053@xz-x1>
+ <877dtcpn9z.fsf@vitty.brq.redhat.com>
+ <20200904061210.GA22435@sjchrist-ice>
+ <20200904072905.vbkiq3h762fyzds6@sirius.home.kraxel.org>
+ <20200904160008.GA2206@sjchrist-ice>
+ <874koanfsc.fsf@vitty.brq.redhat.com>
+ <20200907072829-mutt-send-email-mst@kernel.org>
+ <20200911170031.GD4344@sjchrist-ice>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200911170031.GD4344@sjchrist-ice>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Make use of the struct_size() helper to avoid any potential type
-mistakes and protect against potential integer overflows
-Make use of the flex_array_size() helper to calculate the size of a
-flexible array member within an enclosing structure
+On Fri, Sep 11, 2020 at 10:00:31AM -0700, Sean Christopherson wrote:
+> On Mon, Sep 07, 2020 at 07:32:23AM -0400, Michael S. Tsirkin wrote:
+> > On Mon, Sep 07, 2020 at 10:37:39AM +0200, Vitaly Kuznetsov wrote:
+> > > Sean Christopherson <sean.j.christopherson@intel.com> writes:
+> > > 
+> > > > On Fri, Sep 04, 2020 at 09:29:05AM +0200, Gerd Hoffmann wrote:
+> > > >>   Hi,
+> > > >> 
+> > > >> > Unless I'm mistaken, microvm doesn't even support PCI, does it?
+> > > >> 
+> > > >> Correct, no pci support right now.
+> > > >> 
+> > > >> We could probably wire up ecam (arm/virt style) for pcie support, once
+> > > >> the acpi support for mictovm finally landed (we need acpi for that
+> > > >> because otherwise the kernel wouldn't find the pcie bus).
+> > > >> 
+> > > >> Question is whenever there is a good reason to do so.  Why would someone
+> > > >> prefer microvm with pcie support over q35?
+> > > >> 
+> > > >> > If all of the above is true, this can be handled by adding "pci=lastbus=0"
+> > > >> > as a guest kernel param to override its scanning of buses.  And couldn't
+> > > >> > that be done by QEMU's microvm_fix_kernel_cmdline() to make it transparent
+> > > >> > to the end user?
+> > > >> 
+> > > >> microvm_fix_kernel_cmdline() is a hack, not a solution.
+> > > >> 
+> > > >> Beside that I doubt this has much of an effect on microvm because
+> > > >> it doesn't support pcie in the first place.
+> > > >
+> > > > I am so confused.  Vitaly, can you clarify exactly what QEMU VM type this
+> > > > series is intended to help?  If this is for microvm, then why is the guest
+> > > > doing PCI scanning in the first place?  If it's for q35, why is the
+> > > > justification for microvm-like workloads?
+> > > 
+> > > I'm not exactly sure about the plans for particular machine types, the
+> > > intention was to use this for pcie in QEMU in general so whatever
+> > > machine type uses pcie will benefit. 
+> > > 
+> > > Now, it seems that we have a more sophisticated landscape. The
+> > > optimization will only make sense to speed up boot so all 'traditional'
+> > > VM types with 'traditional' firmware are out of
+> > > question. 'Container-like' VMs seem to avoid PCI for now, I'm not sure
+> > > if it's because they're in early stages of their development, because
+> > > they can get away without PCI or, actually, because of slowness at boot
+> > > (which we're trying to tackle with this feature). I'd definitely like to
+> > > hear more what people think about this.
+> > 
+> > I suspect microvms will need pci eventually. I would much rather KVM
+> > had an exit-less discovery mechanism in place by then because
+> > learning from history if it doesn't they will do some kind of
+> > hack on the kernel command line, and everyone will be stuck
+> > supporting that for years ...
+> 
+> Is it not an option for the VMM to "accurately" enumerate the number of buses?
+> E.g. if the VMM has devices on only bus 0, then enumerate that there is one
+> bus so that the guest doesn't try and probe devices that can't possibly exist.
+> Or is that completely non-sensical and/or violate PCIe spec?
 
-Cc: stable@vger.kernel.org
-Suggested-by: Gustavo A. R. Silva <gustavoars@kernel.org>
-Signed-off-by: Rustam Kovhaev <rkovhaev@gmail.com>
----
- virt/kvm/kvm_main.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index cf88233b819a..68edd25dcb11 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -4350,10 +4350,10 @@ void kvm_io_bus_unregister_dev(struct kvm *kvm, enum kvm_bus bus_idx,
- 	new_bus = kmalloc(struct_size(bus, range, bus->dev_count - 1),
- 			  GFP_KERNEL_ACCOUNT);
- 	if (new_bus) {
--		memcpy(new_bus, bus, sizeof(*bus) + i * sizeof(struct kvm_io_range));
-+		memcpy(new_bus, bus, struct_size(bus, range, i));
- 		new_bus->dev_count--;
- 		memcpy(new_bus->range + i, bus->range + i + 1,
--		       (new_bus->dev_count - i) * sizeof(struct kvm_io_range));
-+				flex_array_size(new_bus, range, new_bus->dev_count - i));
- 	} else {
- 		pr_err("kvm: failed to shrink bus, removing it completely\n");
- 		for (j = 0; j < bus->dev_count; j++) {
+There is some tension here, in that one way to make guest boot faster
+is to defer hotplug of devices until after it booted.
+
 -- 
-2.28.0
+MST
 
