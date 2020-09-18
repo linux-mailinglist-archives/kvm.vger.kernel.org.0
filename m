@@ -2,37 +2,35 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5F54F26ED70
-	for <lists+kvm@lfdr.de>; Fri, 18 Sep 2020 04:21:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 497F126ED5A
+	for <lists+kvm@lfdr.de>; Fri, 18 Sep 2020 04:21:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729719AbgIRCUz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 17 Sep 2020 22:20:55 -0400
-Received: from mail.kernel.org ([198.145.29.99]:48464 "EHLO mail.kernel.org"
+        id S1729668AbgIRCSq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 17 Sep 2020 22:18:46 -0400
+Received: from mail.kernel.org ([198.145.29.99]:48872 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728952AbgIRCRh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 17 Sep 2020 22:17:37 -0400
+        id S1729611AbgIRCRw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 17 Sep 2020 22:17:52 -0400
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 35FD623772;
-        Fri, 18 Sep 2020 02:17:36 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id AD34023600;
+        Fri, 18 Sep 2020 02:17:51 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1600395457;
-        bh=xdwUc0AGqkQ7lHewx0MNU6XB17lx+iPqEKFLtXmoihk=;
+        s=default; t=1600395472;
+        bh=V0NTd4ZixCZ9X3p6BTB3qeNfiGBGEPMR0MYLRhFcSZs=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=0yjuKSaH52RoIxbdg30XjM4uVGHKBnr4423ed6vlu5pSBscMc4Vbyxpf5CESM6vgY
-         ZE4m+vdVXjdxmBJJahuIiISTgx2HnmWMbaEAFUiDAUv3LKeIDItyAN3G5gmut5l3lG
-         ew1L0fKn0ObeJm+FLHyVCiumUdWljDAkdJCYT8NI=
+        b=pnucrnRH7uID8X2kdP8lpdnsLD7N6o9Uas/94UU50jREKHE7+Lco1Dj8NjN/oeLYq
+         qsbHxpHKgVvDO3rJhSWa18wphdjnDIFuL+WXGNHD+wAnFdlitNhXZ9OQ9rkTOyDfOc
+         ZGhZQ3mr2j94fOjZpYL5dLPqJHC9AnQWGy1JGapU=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Steve Rutherford <srutherford@google.com>,
-        Jon Cargille <jcargill@google.com>,
-        Jim Mattson <jmattson@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
+Cc:     Qian Cai <cai@lca.pw>,
+        Alex Williamson <alex.williamson@redhat.com>,
         Sasha Levin <sashal@kernel.org>, kvm@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.4 43/64] KVM: Remove CREATE_IRQCHIP/SET_PIT2 race
-Date:   Thu, 17 Sep 2020 22:16:22 -0400
-Message-Id: <20200918021643.2067895-43-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.4 57/64] vfio/pci: fix memory leaks of eventfd ctx
+Date:   Thu, 17 Sep 2020 22:16:36 -0400
+Message-Id: <20200918021643.2067895-57-sashal@kernel.org>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20200918021643.2067895-1-sashal@kernel.org>
 References: <20200918021643.2067895-1-sashal@kernel.org>
@@ -44,62 +42,65 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Steve Rutherford <srutherford@google.com>
+From: Qian Cai <cai@lca.pw>
 
-[ Upstream commit 7289fdb5dcdbc5155b5531529c44105868a762f2 ]
+[ Upstream commit 1518ac272e789cae8c555d69951b032a275b7602 ]
 
-Fixes a NULL pointer dereference, caused by the PIT firing an interrupt
-before the interrupt table has been initialized.
+Finished a qemu-kvm (-device vfio-pci,host=0001:01:00.0) triggers a few
+memory leaks after a while because vfio_pci_set_ctx_trigger_single()
+calls eventfd_ctx_fdget() without the matching eventfd_ctx_put() later.
+Fix it by calling eventfd_ctx_put() for those memory in
+vfio_pci_release() before vfio_device_release().
 
-SET_PIT2 can race with the creation of the IRQchip. In particular,
-if SET_PIT2 is called with a low PIT timer period (after the creation of
-the IOAPIC, but before the instantiation of the irq routes), the PIT can
-fire an interrupt at an uninitialized table.
+unreferenced object 0xebff008981cc2b00 (size 128):
+  comm "qemu-kvm", pid 4043, jiffies 4294994816 (age 9796.310s)
+  hex dump (first 32 bytes):
+    01 00 00 00 6b 6b 6b 6b 00 00 00 00 ad 4e ad de  ....kkkk.....N..
+    ff ff ff ff 6b 6b 6b 6b ff ff ff ff ff ff ff ff  ....kkkk........
+  backtrace:
+    [<00000000917e8f8d>] slab_post_alloc_hook+0x74/0x9c
+    [<00000000df0f2aa2>] kmem_cache_alloc_trace+0x2b4/0x3d4
+    [<000000005fcec025>] do_eventfd+0x54/0x1ac
+    [<0000000082791a69>] __arm64_sys_eventfd2+0x34/0x44
+    [<00000000b819758c>] do_el0_svc+0x128/0x1dc
+    [<00000000b244e810>] el0_sync_handler+0xd0/0x268
+    [<00000000d495ef94>] el0_sync+0x164/0x180
+unreferenced object 0x29ff008981cc4180 (size 128):
+  comm "qemu-kvm", pid 4043, jiffies 4294994818 (age 9796.290s)
+  hex dump (first 32 bytes):
+    01 00 00 00 6b 6b 6b 6b 00 00 00 00 ad 4e ad de  ....kkkk.....N..
+    ff ff ff ff 6b 6b 6b 6b ff ff ff ff ff ff ff ff  ....kkkk........
+  backtrace:
+    [<00000000917e8f8d>] slab_post_alloc_hook+0x74/0x9c
+    [<00000000df0f2aa2>] kmem_cache_alloc_trace+0x2b4/0x3d4
+    [<000000005fcec025>] do_eventfd+0x54/0x1ac
+    [<0000000082791a69>] __arm64_sys_eventfd2+0x34/0x44
+    [<00000000b819758c>] do_el0_svc+0x128/0x1dc
+    [<00000000b244e810>] el0_sync_handler+0xd0/0x268
+    [<00000000d495ef94>] el0_sync+0x164/0x180
 
-Signed-off-by: Steve Rutherford <srutherford@google.com>
-Signed-off-by: Jon Cargille <jcargill@google.com>
-Reviewed-by: Jim Mattson <jmattson@google.com>
-Message-Id: <20200416191152.259434-1-jcargill@google.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+Signed-off-by: Qian Cai <cai@lca.pw>
+Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- arch/x86/kvm/x86.c | 10 ++++++++--
- 1 file changed, 8 insertions(+), 2 deletions(-)
+ drivers/vfio/pci/vfio_pci.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 61fc92f92e0a0..ef920da075184 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -4013,10 +4013,13 @@ long kvm_arch_vm_ioctl(struct file *filp,
- 		r = -EFAULT;
- 		if (copy_from_user(&u.ps, argp, sizeof u.ps))
- 			goto out;
-+		mutex_lock(&kvm->lock);
- 		r = -ENXIO;
- 		if (!kvm->arch.vpit)
--			goto out;
-+			goto set_pit_out;
- 		r = kvm_vm_ioctl_set_pit(kvm, &u.ps);
-+set_pit_out:
-+		mutex_unlock(&kvm->lock);
- 		break;
+diff --git a/drivers/vfio/pci/vfio_pci.c b/drivers/vfio/pci/vfio_pci.c
+index 7a82735d53087..ab765770e8dd6 100644
+--- a/drivers/vfio/pci/vfio_pci.c
++++ b/drivers/vfio/pci/vfio_pci.c
+@@ -255,6 +255,10 @@ static void vfio_pci_release(void *device_data)
+ 	if (!(--vdev->refcnt)) {
+ 		vfio_spapr_pci_eeh_release(vdev->pdev);
+ 		vfio_pci_disable(vdev);
++		if (vdev->err_trigger)
++			eventfd_ctx_put(vdev->err_trigger);
++		if (vdev->req_trigger)
++			eventfd_ctx_put(vdev->req_trigger);
  	}
- 	case KVM_GET_PIT2: {
-@@ -4036,10 +4039,13 @@ long kvm_arch_vm_ioctl(struct file *filp,
- 		r = -EFAULT;
- 		if (copy_from_user(&u.ps2, argp, sizeof(u.ps2)))
- 			goto out;
-+		mutex_lock(&kvm->lock);
- 		r = -ENXIO;
- 		if (!kvm->arch.vpit)
--			goto out;
-+			goto set_pit2_out;
- 		r = kvm_vm_ioctl_set_pit2(kvm, &u.ps2);
-+set_pit2_out:
-+		mutex_unlock(&kvm->lock);
- 		break;
- 	}
- 	case KVM_REINJECT_CONTROL: {
+ 
+ 	mutex_unlock(&driver_lock);
 -- 
 2.25.1
 
