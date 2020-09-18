@@ -2,37 +2,34 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7697826F143
-	for <lists+kvm@lfdr.de>; Fri, 18 Sep 2020 04:50:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9B50B26F0E0
+	for <lists+kvm@lfdr.de>; Fri, 18 Sep 2020 04:47:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728108AbgIRCuG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 17 Sep 2020 22:50:06 -0400
-Received: from mail.kernel.org ([198.145.29.99]:60428 "EHLO mail.kernel.org"
+        id S1730189AbgIRCrG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 17 Sep 2020 22:47:06 -0400
+Received: from mail.kernel.org ([198.145.29.99]:33558 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728175AbgIRCIv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 17 Sep 2020 22:08:51 -0400
+        id S1728345AbgIRCJo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 17 Sep 2020 22:09:44 -0400
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 57E7023976;
-        Fri, 18 Sep 2020 02:08:50 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 3A8B023976;
+        Fri, 18 Sep 2020 02:09:43 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1600394931;
-        bh=qYTEDikd5AeadaqGi0riE4D6tb93wc+GLf8ds0bRU20=;
+        s=default; t=1600394983;
+        bh=dQPUNc8vecNZt/Q9TRKBDUuZu+b6RB2o+cXiNyBIscY=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=RwL0RjI2RKZdmNpYfBiegEb1umGWCRW0BCegowiMkAGZWgngIYwYhQaYnm7lTKVXW
-         XVU3SaFIv082hxgyaMqV+pkpY+38lboI8gJXpg992V8p1LPszP+tB1bscAz7A3zIJA
-         My0qQqxiQR9yIQtF+ia9uko2sN8s2IQmKJwXncqU=
+        b=qX+wl6lxYoL3Psea4i5IsZ7OxtQ0qXGFhs0Tdzkn00gukaYzq4FoLldWrvQOeXw5I
+         Oq+rqe4znhR3nIw8HyeS7DzGhINYzI4BEnMQSa74yUgzAQRq/7T/7vr1U/qJqPFE9k
+         bk4h8DFD2+NG2s3LN/lYLXG8aDSlhKKGU50CKNgA=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Miaohe Lin <linmiaohe@huawei.com>, Marc Zyngier <maz@kernel.org>,
-        Eric Auger <eric.auger@redhat.com>,
-        Sasha Levin <sashal@kernel.org>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.19 041/206] KVM: arm/arm64: vgic: Fix potential double free dist->spis in __kvm_vgic_destroy()
-Date:   Thu, 17 Sep 2020 22:05:17 -0400
-Message-Id: <20200918020802.2065198-41-sashal@kernel.org>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sasha Levin <sashal@kernel.org>, kvm@vger.kernel.org
+Subject: [PATCH AUTOSEL 4.19 083/206] KVM: x86: fix incorrect comparison in trace event
+Date:   Thu, 17 Sep 2020 22:05:59 -0400
+Message-Id: <20200918020802.2065198-83-sashal@kernel.org>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20200918020802.2065198-1-sashal@kernel.org>
 References: <20200918020802.2065198-1-sashal@kernel.org>
@@ -44,39 +41,32 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Miaohe Lin <linmiaohe@huawei.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
 
-[ Upstream commit 0bda9498dd45280e334bfe88b815ebf519602cc3 ]
+[ Upstream commit 147f1a1fe5d7e6b01b8df4d0cbd6f9eaf6b6c73b ]
 
-In kvm_vgic_dist_init() called from kvm_vgic_map_resources(), if
-dist->vgic_model is invalid, dist->spis will be freed without set
-dist->spis = NULL. And in vgicv2 resources clean up path,
-__kvm_vgic_destroy() will be called to free allocated resources.
-And dist->spis will be freed again in clean up chain because we
-forget to set dist->spis = NULL in kvm_vgic_dist_init() failed
-path. So double free would happen.
+The "u" field in the event has three states, -1/0/1.  Using u8 however means that
+comparison with -1 will always fail, so change to signed char.
 
-Signed-off-by: Miaohe Lin <linmiaohe@huawei.com>
-Signed-off-by: Marc Zyngier <maz@kernel.org>
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
-Link: https://lore.kernel.org/r/1574923128-19956-1-git-send-email-linmiaohe@huawei.com
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- virt/kvm/arm/vgic/vgic-init.c | 1 +
- 1 file changed, 1 insertion(+)
+ arch/x86/kvm/mmutrace.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/virt/kvm/arm/vgic/vgic-init.c b/virt/kvm/arm/vgic/vgic-init.c
-index cd75df25fe140..2fc1777da50d2 100644
---- a/virt/kvm/arm/vgic/vgic-init.c
-+++ b/virt/kvm/arm/vgic/vgic-init.c
-@@ -187,6 +187,7 @@ static int kvm_vgic_dist_init(struct kvm *kvm, unsigned int nr_spis)
- 			break;
- 		default:
- 			kfree(dist->spis);
-+			dist->spis = NULL;
- 			return -EINVAL;
- 		}
- 	}
+diff --git a/arch/x86/kvm/mmutrace.h b/arch/x86/kvm/mmutrace.h
+index cb41b036eb264..7e0dc8c7da2c0 100644
+--- a/arch/x86/kvm/mmutrace.h
++++ b/arch/x86/kvm/mmutrace.h
+@@ -339,7 +339,7 @@ TRACE_EVENT(
+ 		/* These depend on page entry type, so compute them now.  */
+ 		__field(bool, r)
+ 		__field(bool, x)
+-		__field(u8, u)
++		__field(signed char, u)
+ 	),
+ 
+ 	TP_fast_assign(
 -- 
 2.25.1
 
