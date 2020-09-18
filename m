@@ -2,34 +2,37 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BBFB926EE50
-	for <lists+kvm@lfdr.de>; Fri, 18 Sep 2020 04:27:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1E89726EE09
+	for <lists+kvm@lfdr.de>; Fri, 18 Sep 2020 04:25:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728584AbgIRC1a (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 17 Sep 2020 22:27:30 -0400
-Received: from mail.kernel.org ([198.145.29.99]:44858 "EHLO mail.kernel.org"
+        id S1729492AbgIRCZd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 17 Sep 2020 22:25:33 -0400
+Received: from mail.kernel.org ([198.145.29.99]:45720 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728968AbgIRCPp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 17 Sep 2020 22:15:45 -0400
+        id S1728586AbgIRCQN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 17 Sep 2020 22:16:13 -0400
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 13D9023600;
-        Fri, 18 Sep 2020 02:15:43 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 5B2B3239D2;
+        Fri, 18 Sep 2020 02:16:12 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1600395344;
-        bh=tZIA5kCi1OJs2CUyW7GZi810eovjNZzjiYFeAE6RF00=;
+        s=default; t=1600395373;
+        bh=RkAgZ0llnIywDojBShVlZTmNEJcf13A5yJpo8vi/diU=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=SFW7Y+5M5eQYNP5UYicWYzjYhUqJO7mdGyCayuFGZ3Hm5svqKOdC/0g+0IpryFItB
-         x70A6flXw9oeHBXxwzx8MKkWlxrP5HbAN2U/S1sWyFsiTZtNLjad/zZ0c/Pc0+aOAb
-         Av2l4BTf+s13pGS/8Jevc9EojD8N9EfwWEwSzB/4=
+        b=oiroM6TU/caIrt5UXRQrbsBo+NUzE4sP1WHrUI9MuSKHXWpCT7hNxZZf8mxX2Wt/P
+         F4H3huqhSAqUm/qM1Gq87gnJ1iUYHqOPQh10KAyRUV0Q81B6REihxpbNZil8BLvLRj
+         dB4UhsP8qN02dcriI+tSXyuowIWiSJOQa8anVmo0=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+Cc:     Steve Rutherford <srutherford@google.com>,
+        Jon Cargille <jcargill@google.com>,
+        Jim Mattson <jmattson@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
         Sasha Levin <sashal@kernel.org>, kvm@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.9 40/90] KVM: x86: fix incorrect comparison in trace event
-Date:   Thu, 17 Sep 2020 22:14:05 -0400
-Message-Id: <20200918021455.2067301-40-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.9 65/90] KVM: Remove CREATE_IRQCHIP/SET_PIT2 race
+Date:   Thu, 17 Sep 2020 22:14:30 -0400
+Message-Id: <20200918021455.2067301-65-sashal@kernel.org>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20200918021455.2067301-1-sashal@kernel.org>
 References: <20200918021455.2067301-1-sashal@kernel.org>
@@ -41,32 +44,62 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Paolo Bonzini <pbonzini@redhat.com>
+From: Steve Rutherford <srutherford@google.com>
 
-[ Upstream commit 147f1a1fe5d7e6b01b8df4d0cbd6f9eaf6b6c73b ]
+[ Upstream commit 7289fdb5dcdbc5155b5531529c44105868a762f2 ]
 
-The "u" field in the event has three states, -1/0/1.  Using u8 however means that
-comparison with -1 will always fail, so change to signed char.
+Fixes a NULL pointer dereference, caused by the PIT firing an interrupt
+before the interrupt table has been initialized.
 
+SET_PIT2 can race with the creation of the IRQchip. In particular,
+if SET_PIT2 is called with a low PIT timer period (after the creation of
+the IOAPIC, but before the instantiation of the irq routes), the PIT can
+fire an interrupt at an uninitialized table.
+
+Signed-off-by: Steve Rutherford <srutherford@google.com>
+Signed-off-by: Jon Cargille <jcargill@google.com>
+Reviewed-by: Jim Mattson <jmattson@google.com>
+Message-Id: <20200416191152.259434-1-jcargill@google.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- arch/x86/kvm/mmutrace.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ arch/x86/kvm/x86.c | 10 ++++++++--
+ 1 file changed, 8 insertions(+), 2 deletions(-)
 
-diff --git a/arch/x86/kvm/mmutrace.h b/arch/x86/kvm/mmutrace.h
-index 756b14ecc957a..df1076b0eabf3 100644
---- a/arch/x86/kvm/mmutrace.h
-+++ b/arch/x86/kvm/mmutrace.h
-@@ -336,7 +336,7 @@ TRACE_EVENT(
- 		/* These depend on page entry type, so compute them now.  */
- 		__field(bool, r)
- 		__field(bool, x)
--		__field(u8, u)
-+		__field(signed char, u)
- 	),
- 
- 	TP_fast_assign(
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 6b7faa14c27bb..3c0f9be107e42 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -4263,10 +4263,13 @@ long kvm_arch_vm_ioctl(struct file *filp,
+ 		r = -EFAULT;
+ 		if (copy_from_user(&u.ps, argp, sizeof u.ps))
+ 			goto out;
++		mutex_lock(&kvm->lock);
+ 		r = -ENXIO;
+ 		if (!kvm->arch.vpit)
+-			goto out;
++			goto set_pit_out;
+ 		r = kvm_vm_ioctl_set_pit(kvm, &u.ps);
++set_pit_out:
++		mutex_unlock(&kvm->lock);
+ 		break;
+ 	}
+ 	case KVM_GET_PIT2: {
+@@ -4286,10 +4289,13 @@ long kvm_arch_vm_ioctl(struct file *filp,
+ 		r = -EFAULT;
+ 		if (copy_from_user(&u.ps2, argp, sizeof(u.ps2)))
+ 			goto out;
++		mutex_lock(&kvm->lock);
+ 		r = -ENXIO;
+ 		if (!kvm->arch.vpit)
+-			goto out;
++			goto set_pit2_out;
+ 		r = kvm_vm_ioctl_set_pit2(kvm, &u.ps2);
++set_pit2_out:
++		mutex_unlock(&kvm->lock);
+ 		break;
+ 	}
+ 	case KVM_REINJECT_CONTROL: {
 -- 
 2.25.1
 
