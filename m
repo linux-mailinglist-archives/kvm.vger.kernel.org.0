@@ -2,136 +2,103 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 746A426FA93
-	for <lists+kvm@lfdr.de>; Fri, 18 Sep 2020 12:28:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7D2CE26FABE
+	for <lists+kvm@lfdr.de>; Fri, 18 Sep 2020 12:39:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726494AbgIRK2U (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 18 Sep 2020 06:28:20 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:43355 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726152AbgIRK2U (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 18 Sep 2020 06:28:20 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1600424898;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=hr8z2HiMXzzbN2LrjLF0Nl8J3Aoy3w81O76x25EfTuo=;
-        b=fzK+z1dKhnUpRRaUnKqhF5FZ4sUV/3SjRd0oOfbv2fVuTgF9kn541quMfJX/t5csc0RTI5
-        5y5yxvnkBPgVQ/TD9AEJdAuWMpndX2Hzp5xiGDSiWLfH9yjoGQltwfnPedOY3iI4LzZGTV
-        SuKKG1Wjpq/VkIWOivvXUnZ8y4vT/A4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-374-NZl6CcNMN3KIFgRdDbQgDQ-1; Fri, 18 Sep 2020 06:28:15 -0400
-X-MC-Unique: NZl6CcNMN3KIFgRdDbQgDQ-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8D7666408E;
-        Fri, 18 Sep 2020 10:28:13 +0000 (UTC)
-Received: from kamzik.brq.redhat.com (unknown [10.40.192.125])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 495EE60C53;
-        Fri, 18 Sep 2020 10:28:11 +0000 (UTC)
-Date:   Fri, 18 Sep 2020 12:28:08 +0200
-From:   Andrew Jones <drjones@redhat.com>
-To:     Peng Liang <liangpeng10@huawei.com>
-Cc:     kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, maz@kernel.org,
-        will@kernel.org, zhang.zhanghailiang@huawei.com,
-        xiexiangyou@huawei.com
-Subject: Re: [RFC v2 1/7] arm64: add a helper function to traverse
- arm64_ftr_regs
-Message-ID: <20200918102808.gwpk6ggy36prq7iv@kamzik.brq.redhat.com>
-References: <20200917120101.3438389-1-liangpeng10@huawei.com>
- <20200917120101.3438389-2-liangpeng10@huawei.com>
- <20200918071820.e6hghta4yclio7ca@kamzik.brq.redhat.com>
- <00293b67-e9bb-3ad1-d6db-adb35bcacba6@huawei.com>
+        id S1726221AbgIRKjK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 18 Sep 2020 06:39:10 -0400
+Received: from smtp2.axis.com ([195.60.68.18]:11297 "EHLO smtp2.axis.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725900AbgIRKjK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 18 Sep 2020 06:39:10 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=axis.com; l=2468; q=dns/txt; s=axis-central1;
+  t=1600425549; x=1631961549;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=dfHnCSDcQJsHwmC06UCTmcgXTK9CGBepW1LnH1PWlIk=;
+  b=p6keZAG3gb+Rz7zTgOy/sjTLfDkdYEHRkhfBwJMX/3uTg1WrVXNrbRrd
+   HjmZyxoW7lw3Y4WETJyctOlY0CrHZE5xoeFRMSXcRxelZGBYKpKjxAr/J
+   qiMEqwZnLQbVtMSLE4lC0RFHzoesdoKfzFikknmwFe4XdEMRpmbYC/mbc
+   KHNbmMBLmNDFIsneSDLgj4KVKv17umxLtfEOcXJmz4CnwdRTNB3H6OHpn
+   NmPUJy8HGdK67EhALMYJFnDv1+arkIqvaBVd6XMI1fQxL5o88jkrBr/ZC
+   OaFQSQtaS+2VjXI4k9IYgLBgrXVU+LuIiryF/xk4oXG3UUz86LwHUSKGG
+   w==;
+IronPort-SDR: doNySO46aU7fpJx9Wb/YAZM9E8th1TVYK39QygX4h1SShuVKErS025dPWgD27AIlM77ydSAhwj
+ AnrzCp0kYOml32Cs9FJH4Lt/Vwf+ysIas/4JFaqA6mHr1yDnG9JiX+WygQCK4Kxh/dDdvIHWmI
+ 6Ik0qxLpcA7wl8SjN+o0jduO3uuWxHI+BPhshHZnLZakGN0EWdLzMEJ6pCHWq7TPiQP/DqoOV/
+ p7J/naBBMaHIL362CU6ydYLN+et06Nu1oInTwz5RnBzezJ0+8rKCL8gUFqEtWDVBjTtPBGZ8XS
+ z0c=
+X-IronPort-AV: E=Sophos;i="5.77,274,1596492000"; 
+   d="scan'208";a="12633924"
+Date:   Fri, 18 Sep 2020 12:39:07 +0200
+From:   Vincent Whitchurch <vincent.whitchurch@axis.com>
+To:     Guennadi Liakhovetski <guennadi.liakhovetski@linux.intel.com>
+CC:     Arnaud POULIQUEN <arnaud.pouliquen@st.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-remoteproc@vger.kernel.org" <linux-remoteproc@vger.kernel.org>,
+        "virtualization@lists.linux-foundation.org" 
+        <virtualization@lists.linux-foundation.org>,
+        "sound-open-firmware@alsa-project.org" 
+        <sound-open-firmware@alsa-project.org>,
+        Pierre-Louis Bossart <pierre-louis.bossart@linux.intel.com>,
+        Liam Girdwood <liam.r.girdwood@linux.intel.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Ohad Ben-Cohen <ohad@wizery.com>,
+        Bjorn Andersson <bjorn.andersson@linaro.org>,
+        Mathieu Poirier <mathieu.poirier@linaro.org>
+Subject: Re: [PATCH v6 0/4] Add a vhost RPMsg API
+Message-ID: <20200918103907.2ts4l5xiwm4542rs@axis.com>
+References: <20200901151153.28111-1-guennadi.liakhovetski@linux.intel.com>
+ <9433695b-5757-db73-bd8a-538fd1375e2a@st.com> <20200917054705.GA11491@ubuntu>
+ <47a9ad01-c922-3b1c-84de-433f229ffba3@st.com> <20200918054420.GA19246@ubuntu>
+ <0b7d9004-d71b-8b9a-eaed-f92833ce113f@st.com> <20200918094719.GD19246@ubuntu>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset="us-ascii"
 Content-Disposition: inline
-In-Reply-To: <00293b67-e9bb-3ad1-d6db-adb35bcacba6@huawei.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+In-Reply-To: <20200918094719.GD19246@ubuntu>
+User-Agent: NeoMutt/20170113 (1.7.2)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Sep 18, 2020 at 05:24:27PM +0800, Peng Liang wrote:
-> On 9/18/2020 3:18 PM, Andrew Jones wrote:
-> > On Thu, Sep 17, 2020 at 08:00:55PM +0800, Peng Liang wrote:
-> >> If we want to emulate ID registers, we need to initialize ID registers
-> >> firstly.  This commit is to add a helper function to traverse
-> >> arm64_ftr_regs so that we can initialize ID registers from
-> >> arm64_ftr_regs.
-> >>
-> >> Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
-> >> Signed-off-by: Peng Liang <liangpeng10@huawei.com>
-> >> ---
-> >>  arch/arm64/include/asm/cpufeature.h |  2 ++
-> >>  arch/arm64/kernel/cpufeature.c      | 13 +++++++++++++
-> >>  2 files changed, 15 insertions(+)
-> >>
-> >> diff --git a/arch/arm64/include/asm/cpufeature.h b/arch/arm64/include/asm/cpufeature.h
-> >> index 89b4f0142c28..2ba7c4f11d8a 100644
-> >> --- a/arch/arm64/include/asm/cpufeature.h
-> >> +++ b/arch/arm64/include/asm/cpufeature.h
-> >> @@ -79,6 +79,8 @@ struct arm64_ftr_reg {
-> >>  
-> >>  extern struct arm64_ftr_reg arm64_ftr_reg_ctrel0;
-> >>  
-> >> +int arm64_cpu_ftr_regs_traverse(int (*op)(u32, u64, void *), void *argp);
-> >> +
-> >>  /*
-> >>   * CPU capabilities:
-> >>   *
-> >> diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
-> >> index 6424584be01e..698b32705544 100644
-> >> --- a/arch/arm64/kernel/cpufeature.c
-> >> +++ b/arch/arm64/kernel/cpufeature.c
-> >> @@ -1112,6 +1112,19 @@ u64 read_sanitised_ftr_reg(u32 id)
-> >>  	return regp->sys_val;
-> >>  }
-> >>  
-> >> +int arm64_cpu_ftr_regs_traverse(int (*op)(u32, u64, void *), void *argp)
-> >> +{
-> >> +	int i, ret;
-> >> +
-> >> +	for (i = 0; i <  ARRAY_SIZE(arm64_ftr_regs); i++) {
-> >> +		ret = (*op)(arm64_ftr_regs[i].sys_id,
-> >> +			    arm64_ftr_regs[i].reg->sys_val, argp);
-> >> +		if (ret < 0)
-> >> +			return ret;
-> >> +	}
-> >> +	return 0;
-> >> +}
-> >> +
-> >>  #define read_sysreg_case(r)	\
-> >>  	case r:		return read_sysreg_s(r)
-> >>  
-> >> -- 
-> >> 2.26.2
-> >>
+On Fri, Sep 18, 2020 at 11:47:20AM +0200, Guennadi Liakhovetski wrote:
+> On Fri, Sep 18, 2020 at 09:47:45AM +0200, Arnaud POULIQUEN wrote:
+> > IMO, as this API is defined in the Linux documentation [5] we should respect it, to ensure
+> > one generic implementation. The RPMsg sample client[4] uses this user API, so seems to me
+> > a good candidate to verify this. 
 > > 
-> > Skimming the rest of the patches to see how this is used I only saw a
-> > single callsite. Why wouldn't we just put this simple for-loop right
-> > there at that callsite? Or, IOW, I think this traverse function should
-> > be dropped.
-> > 
-> > Thanks,
-> > drew
-> > 
-> > .
-> > 
+> > That's said, shall we multiple the RPMsg implementations in Linux with several APIs,
+> > With the risk to make the RPMsg clients devices dependent on these implementations?
+> > That could lead to complex code or duplications...
 > 
-> arm64_ftr_regs is defined as a static array in arch/arm64/kernel/cpufeature.c,
-> which is not a virtualization-related file.  Putting this simple for-loop
-> right there will make cpufeature.c depend on kvm_host.h.  Is this a good idea?
+> So, no, in my understanding there aren't two competing alternative APIs, you'd never have 
+> to choose between them. If you're writing a driver for Linux to communicate with remote 
+> processors or to run on VMs, you use the existing API. If you're writing a driver for 
+> Linux to communicate with those VMs, you use the vhost API and whatever help is available 
+> for RPMsg processing.
+> 
+> However, I can in principle imagine a single driver, written to work on both sides. 
+> Something like the rpmsg_char.c or maybe some networking driver. Is that what you're 
+> referring to? I can see that as a fun exercise, but are there any real uses for that? 
 
-Well, the fact that arm64_ftr_regs is static to cpufeature.c is a clue
-that your implementation is likely playing with internal arm64_ftr
-state that it shouldn't be. If there's not an accessor function that
-works for you, then you can try adding one. Providing general functions
-like this, that are effectively just an odd way of removing 'static'
-from arm64_ftr_regs, breaks the encapsulation.
+I hinted at a real use case for this in the previous mail thread[0].
+I'm exploring using rpmsg-char to allow communication between two chips,
+both running Linux.  rpmsg-char can be used pretty much as-is for both
+sides of the userspace-to-userspace communication and (the userspace
+side of the) userspace-to-kernel communication between the two chips.
 
-Thanks,
-drew
+> You could do the same with VirtIO, however, it has been decided to go with two 
+> distinct APIs: virtio for guests and vhost for the host, noone bothered to create a 
+> single API for both and nobody seems to miss one. Why would we want one with RPMsg?
 
+I think I answered this question in the previous mail thread as well[1]:
+| virtio has distinct driver and device roles so the completely different
+| APIs on each side are understandable.  But I don't see that distinction
+| in the rpmsg API which is why it seems like a good idea to me to make it
+| work from both sides of the link and allow the reuse of drivers like
+| rpmsg-char, instead of imposing virtio's distinction on rpmsg.
+
+[0] https://www.spinics.net/lists/linux-virtualization/msg43799.html
+[1] https://www.spinics.net/lists/linux-virtualization/msg43802.html
