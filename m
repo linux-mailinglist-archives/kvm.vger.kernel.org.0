@@ -2,35 +2,36 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C7AEB26EDEB
-	for <lists+kvm@lfdr.de>; Fri, 18 Sep 2020 04:24:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8E48126EDDB
+	for <lists+kvm@lfdr.de>; Fri, 18 Sep 2020 04:24:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727608AbgIRCYk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 17 Sep 2020 22:24:40 -0400
-Received: from mail.kernel.org ([198.145.29.99]:46378 "EHLO mail.kernel.org"
+        id S1727424AbgIRCYJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 17 Sep 2020 22:24:09 -0400
+Received: from mail.kernel.org ([198.145.29.99]:46562 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728749AbgIRCQf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 17 Sep 2020 22:16:35 -0400
+        id S1729426AbgIRCQk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 17 Sep 2020 22:16:40 -0400
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 1F247238A0;
-        Fri, 18 Sep 2020 02:16:29 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 02DA3239D0;
+        Fri, 18 Sep 2020 02:16:37 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1600395389;
-        bh=/A4JDOVvOmocHoeyKei5w3riMNJAwkGTiQ/9Jb6DdiE=;
+        s=default; t=1600395398;
+        bh=j9M/ZVACyoaoos25pViqIw0OqwIayoGBc0LWdds0Jx8=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=bcglZptl8mcf/da67c023IyMENjMLJ6zxdwH9N6N1AVmqQafR/OgJJIAG+uhS1TFT
-         8Ua2RL3Kl2SdbSUh6DmABkBxzHbMaG1hWd2RNbT9JvaMZy8DwCZLWJrnjDL9eg3Pgq
-         JW+nYRB4Iie1PG1TX8KHY9xsdRsb7yiKtz0GULBU=
+        b=zWZqSjkUaoP7EAX7eAnU3Dwb6dhT9v38xWoOUEcqBjJg10Sr67Y2TFC9kO6NA33b5
+         Qzg18SwW43d6B7pIKCEzLfsQafcuNU9x9pnU34/SbdlMJVaPtEv5AbTt9f47jDDpiK
+         hzuYz7BUPFUebn7b/R1ganX1H+nf/7BRPWG4aeWo=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Qian Cai <cai@lca.pw>,
-        Alex Williamson <alex.williamson@redhat.com>,
+Cc:     Alex Williamson <alex.williamson@redhat.com>,
+        Qian Cai <cai@lca.pw>, Daniel Wagner <dwagner@suse.de>,
+        Cornelia Huck <cohuck@redhat.com>,
         Sasha Levin <sashal@kernel.org>, kvm@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.9 80/90] vfio/pci: fix memory leaks of eventfd ctx
-Date:   Thu, 17 Sep 2020 22:14:45 -0400
-Message-Id: <20200918021455.2067301-80-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.9 87/90] vfio/pci: Clear error and request eventfd ctx after releasing
+Date:   Thu, 17 Sep 2020 22:14:52 -0400
+Message-Id: <20200918021455.2067301-87-sashal@kernel.org>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20200918021455.2067301-1-sashal@kernel.org>
 References: <20200918021455.2067301-1-sashal@kernel.org>
@@ -42,62 +43,42 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Qian Cai <cai@lca.pw>
+From: Alex Williamson <alex.williamson@redhat.com>
 
-[ Upstream commit 1518ac272e789cae8c555d69951b032a275b7602 ]
+[ Upstream commit 5c5866c593bbd444d0339ede6a8fb5f14ff66d72 ]
 
-Finished a qemu-kvm (-device vfio-pci,host=0001:01:00.0) triggers a few
-memory leaks after a while because vfio_pci_set_ctx_trigger_single()
-calls eventfd_ctx_fdget() without the matching eventfd_ctx_put() later.
-Fix it by calling eventfd_ctx_put() for those memory in
-vfio_pci_release() before vfio_device_release().
+The next use of the device will generate an underflow from the
+stale reference.
 
-unreferenced object 0xebff008981cc2b00 (size 128):
-  comm "qemu-kvm", pid 4043, jiffies 4294994816 (age 9796.310s)
-  hex dump (first 32 bytes):
-    01 00 00 00 6b 6b 6b 6b 00 00 00 00 ad 4e ad de  ....kkkk.....N..
-    ff ff ff ff 6b 6b 6b 6b ff ff ff ff ff ff ff ff  ....kkkk........
-  backtrace:
-    [<00000000917e8f8d>] slab_post_alloc_hook+0x74/0x9c
-    [<00000000df0f2aa2>] kmem_cache_alloc_trace+0x2b4/0x3d4
-    [<000000005fcec025>] do_eventfd+0x54/0x1ac
-    [<0000000082791a69>] __arm64_sys_eventfd2+0x34/0x44
-    [<00000000b819758c>] do_el0_svc+0x128/0x1dc
-    [<00000000b244e810>] el0_sync_handler+0xd0/0x268
-    [<00000000d495ef94>] el0_sync+0x164/0x180
-unreferenced object 0x29ff008981cc4180 (size 128):
-  comm "qemu-kvm", pid 4043, jiffies 4294994818 (age 9796.290s)
-  hex dump (first 32 bytes):
-    01 00 00 00 6b 6b 6b 6b 00 00 00 00 ad 4e ad de  ....kkkk.....N..
-    ff ff ff ff 6b 6b 6b 6b ff ff ff ff ff ff ff ff  ....kkkk........
-  backtrace:
-    [<00000000917e8f8d>] slab_post_alloc_hook+0x74/0x9c
-    [<00000000df0f2aa2>] kmem_cache_alloc_trace+0x2b4/0x3d4
-    [<000000005fcec025>] do_eventfd+0x54/0x1ac
-    [<0000000082791a69>] __arm64_sys_eventfd2+0x34/0x44
-    [<00000000b819758c>] do_el0_svc+0x128/0x1dc
-    [<00000000b244e810>] el0_sync_handler+0xd0/0x268
-    [<00000000d495ef94>] el0_sync+0x164/0x180
-
-Signed-off-by: Qian Cai <cai@lca.pw>
+Cc: Qian Cai <cai@lca.pw>
+Fixes: 1518ac272e78 ("vfio/pci: fix memory leaks of eventfd ctx")
+Reported-by: Daniel Wagner <dwagner@suse.de>
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+Tested-by: Daniel Wagner <dwagner@suse.de>
 Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/vfio/pci/vfio_pci.c | 4 ++++
- 1 file changed, 4 insertions(+)
+ drivers/vfio/pci/vfio_pci.c | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
 
 diff --git a/drivers/vfio/pci/vfio_pci.c b/drivers/vfio/pci/vfio_pci.c
-index 2254c281cc766..c9c0af9a571f6 100644
+index c9c0af9a571f6..c08cff0ca08df 100644
 --- a/drivers/vfio/pci/vfio_pci.c
 +++ b/drivers/vfio/pci/vfio_pci.c
-@@ -392,6 +392,10 @@ static void vfio_pci_release(void *device_data)
+@@ -392,10 +392,14 @@ static void vfio_pci_release(void *device_data)
  	if (!(--vdev->refcnt)) {
  		vfio_spapr_pci_eeh_release(vdev->pdev);
  		vfio_pci_disable(vdev);
-+		if (vdev->err_trigger)
-+			eventfd_ctx_put(vdev->err_trigger);
-+		if (vdev->req_trigger)
-+			eventfd_ctx_put(vdev->req_trigger);
+-		if (vdev->err_trigger)
++		if (vdev->err_trigger) {
+ 			eventfd_ctx_put(vdev->err_trigger);
+-		if (vdev->req_trigger)
++			vdev->err_trigger = NULL;
++		}
++		if (vdev->req_trigger) {
+ 			eventfd_ctx_put(vdev->req_trigger);
++			vdev->req_trigger = NULL;
++		}
  	}
  
  	mutex_unlock(&driver_lock);
