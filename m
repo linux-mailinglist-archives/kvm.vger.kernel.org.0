@@ -2,144 +2,95 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 98E1C26FBE6
-	for <lists+kvm@lfdr.de>; Fri, 18 Sep 2020 13:58:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6037526FC0B
+	for <lists+kvm@lfdr.de>; Fri, 18 Sep 2020 14:05:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726566AbgIRL6s (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 18 Sep 2020 07:58:48 -0400
-Received: from szxga01-in.huawei.com ([45.249.212.187]:3611 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726130AbgIRL6r (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 18 Sep 2020 07:58:47 -0400
-Received: from DGGEMM404-HUB.china.huawei.com (unknown [172.30.72.56])
-        by Forcepoint Email with ESMTP id D749BC943E32EEFBD62F;
-        Fri, 18 Sep 2020 19:58:44 +0800 (CST)
-Received: from dggema765-chm.china.huawei.com (10.1.198.207) by
- DGGEMM404-HUB.china.huawei.com (10.3.20.212) with Microsoft SMTP Server (TLS)
- id 14.3.487.0; Fri, 18 Sep 2020 19:58:44 +0800
-Received: from [10.174.185.187] (10.174.185.187) by
- dggema765-chm.china.huawei.com (10.1.198.207) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
- 15.1.1913.5; Fri, 18 Sep 2020 19:58:44 +0800
-Subject: Re: [RFC v2 1/7] arm64: add a helper function to traverse
- arm64_ftr_regs
-To:     Andrew Jones <drjones@redhat.com>
-CC:     <kvmarm@lists.cs.columbia.edu>, <kvm@vger.kernel.org>,
-        <maz@kernel.org>, <will@kernel.org>,
-        <zhang.zhanghailiang@huawei.com>, <xiexiangyou@huawei.com>
-References: <20200917120101.3438389-1-liangpeng10@huawei.com>
- <20200917120101.3438389-2-liangpeng10@huawei.com>
- <20200918071820.e6hghta4yclio7ca@kamzik.brq.redhat.com>
- <00293b67-e9bb-3ad1-d6db-adb35bcacba6@huawei.com>
- <20200918102808.gwpk6ggy36prq7iv@kamzik.brq.redhat.com>
-From:   Peng Liang <liangpeng10@huawei.com>
-Message-ID: <a0960559-ff81-cb30-ffa1-4ed1cdae65e7@huawei.com>
-Date:   Fri, 18 Sep 2020 19:58:43 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.2.2
+        id S1726445AbgIRMFM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 18 Sep 2020 08:05:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33530 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726064AbgIRMFM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 18 Sep 2020 08:05:12 -0400
+Received: from mail-pg1-x544.google.com (mail-pg1-x544.google.com [IPv6:2607:f8b0:4864:20::544])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 26B39C06174A;
+        Fri, 18 Sep 2020 05:05:12 -0700 (PDT)
+Received: by mail-pg1-x544.google.com with SMTP id k14so3342998pgi.9;
+        Fri, 18 Sep 2020 05:05:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=DF0IbIRrmgctFIOMM+pP2QIHakaraVxMAyB3OzkI7bk=;
+        b=T9w+PwfLtu9hcKasjN4CLWsdksRHFlp5hTqZ5sYrKXoOOpQdPw3JhaqugmL257radv
+         mkDK4j2QK/OtWBx8TibXQkNhdiTkZNZnoozHhcC5r4XBWWBZcNyqZkwf0xqpnOz+T14o
+         Ytepacm13eQLSq9pl24RjwKsGdni50n4SCSbPG0E0WvvOmrjn3Md0rZrFcpC4dvKv78F
+         8srlpkxOfHY41UHp6GVygbLRCxmJf38s/a5v+F7z6Ge9onhgpqtZsC3wJfV3a0g+rsi8
+         +hTosIqDyDIfZAp0/Xm6FvQYzrST3759GRZ63BHMVEms5dKKyHWLAG9SZh6yBhZqmdCs
+         atHA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=DF0IbIRrmgctFIOMM+pP2QIHakaraVxMAyB3OzkI7bk=;
+        b=cs8VSxSsQrnPkglNyCq/wo89ebqw8znDK7ePtChc6ULmIApNINPky26zpdlAh+0ZYh
+         M3+xkBfR+G4vezmmKt6uEmYN72Pycq7pEQBMdz2vpv8q4vSYGZlCS8Doc0EKVkRClFsv
+         QkvpzJqYKoyfJBFhFNuZCK0OkZOx1UkT+c9+KjObT9edB6uveD0BbFi4+o5HDGHRMK4r
+         3k9Rd1+2bEQG2SRTlQqSf79eVccFzloR4Vz8+VxiJFXMuCKgSKq9Ufja6nHnJ63ODtP+
+         LI5YQmFMtZPjTw8FE5s5N9shEJ4Td+TMBLUa02FIikfKXqYM2q+T0TeZAibGIIPI35VX
+         V3cg==
+X-Gm-Message-State: AOAM532Rb1vFtTVhdM7pOElUhy1mUehxWpZnOO5JZWY0fmHU2Pc4quwS
+        1rclPfYeqIpKNtQ6mAF9nGg=
+X-Google-Smtp-Source: ABdhPJw3o9wEjT4p/RTkWgC91z3MI+qjjXL2Pvo+vpg8VXH//Dt0R2oGB033vcTS7fn9h0S4/V/fKg==
+X-Received: by 2002:a63:4a19:: with SMTP id x25mr25782744pga.56.1600430711617;
+        Fri, 18 Sep 2020 05:05:11 -0700 (PDT)
+Received: from localhost.localdomain (104.36.148.139.aurocloud.com. [104.36.148.139])
+        by smtp.gmail.com with ESMTPSA id n7sm2966274pfq.114.2020.09.18.05.05.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 18 Sep 2020 05:05:11 -0700 (PDT)
+From:   Rustam Kovhaev <rkovhaev@gmail.com>
+To:     pbonzini@redhat.com, vkuznets@redhat.com, gustavoars@kernel.org,
+        kvm@vger.kernel.org
+Cc:     linux-kernel@vger.kernel.org, gregkh@linuxfoundation.org,
+        stable@vger.kernel.org, Rustam Kovhaev <rkovhaev@gmail.com>
+Subject: [PATCH] KVM: use struct_size() and flex_array_size() helpers in kvm_io_bus_unregister_dev()
+Date:   Fri, 18 Sep 2020 05:05:00 -0700
+Message-Id: <20200918120500.954436-1-rkovhaev@gmail.com>
+X-Mailer: git-send-email 2.28.0
 MIME-Version: 1.0
-In-Reply-To: <20200918102808.gwpk6ggy36prq7iv@kamzik.brq.redhat.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.174.185.187]
-X-ClientProxiedBy: dggeme714-chm.china.huawei.com (10.1.199.110) To
- dggema765-chm.china.huawei.com (10.1.198.207)
-X-CFilter-Loop: Reflected
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 9/18/2020 6:28 PM, Andrew Jones wrote:
-> On Fri, Sep 18, 2020 at 05:24:27PM +0800, Peng Liang wrote:
->> On 9/18/2020 3:18 PM, Andrew Jones wrote:
->>> On Thu, Sep 17, 2020 at 08:00:55PM +0800, Peng Liang wrote:
->>>> If we want to emulate ID registers, we need to initialize ID registers
->>>> firstly.  This commit is to add a helper function to traverse
->>>> arm64_ftr_regs so that we can initialize ID registers from
->>>> arm64_ftr_regs.
->>>>
->>>> Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
->>>> Signed-off-by: Peng Liang <liangpeng10@huawei.com>
->>>> ---
->>>>  arch/arm64/include/asm/cpufeature.h |  2 ++
->>>>  arch/arm64/kernel/cpufeature.c      | 13 +++++++++++++
->>>>  2 files changed, 15 insertions(+)
->>>>
->>>> diff --git a/arch/arm64/include/asm/cpufeature.h b/arch/arm64/include/asm/cpufeature.h
->>>> index 89b4f0142c28..2ba7c4f11d8a 100644
->>>> --- a/arch/arm64/include/asm/cpufeature.h
->>>> +++ b/arch/arm64/include/asm/cpufeature.h
->>>> @@ -79,6 +79,8 @@ struct arm64_ftr_reg {
->>>>  
->>>>  extern struct arm64_ftr_reg arm64_ftr_reg_ctrel0;
->>>>  
->>>> +int arm64_cpu_ftr_regs_traverse(int (*op)(u32, u64, void *), void *argp);
->>>> +
->>>>  /*
->>>>   * CPU capabilities:
->>>>   *
->>>> diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
->>>> index 6424584be01e..698b32705544 100644
->>>> --- a/arch/arm64/kernel/cpufeature.c
->>>> +++ b/arch/arm64/kernel/cpufeature.c
->>>> @@ -1112,6 +1112,19 @@ u64 read_sanitised_ftr_reg(u32 id)
->>>>  	return regp->sys_val;
->>>>  }
->>>>  
->>>> +int arm64_cpu_ftr_regs_traverse(int (*op)(u32, u64, void *), void *argp)
->>>> +{
->>>> +	int i, ret;
->>>> +
->>>> +	for (i = 0; i <  ARRAY_SIZE(arm64_ftr_regs); i++) {
->>>> +		ret = (*op)(arm64_ftr_regs[i].sys_id,
->>>> +			    arm64_ftr_regs[i].reg->sys_val, argp);
->>>> +		if (ret < 0)
->>>> +			return ret;
->>>> +	}
->>>> +	return 0;
->>>> +}
->>>> +
->>>>  #define read_sysreg_case(r)	\
->>>>  	case r:		return read_sysreg_s(r)
->>>>  
->>>> -- 
->>>> 2.26.2
->>>>
->>>
->>> Skimming the rest of the patches to see how this is used I only saw a
->>> single callsite. Why wouldn't we just put this simple for-loop right
->>> there at that callsite? Or, IOW, I think this traverse function should
->>> be dropped.
->>>
->>> Thanks,
->>> drew
->>>
->>> .
->>>
->>
->> arm64_ftr_regs is defined as a static array in arch/arm64/kernel/cpufeature.c,
->> which is not a virtualization-related file.  Putting this simple for-loop
->> right there will make cpufeature.c depend on kvm_host.h.  Is this a good idea?
-> 
-> Well, the fact that arm64_ftr_regs is static to cpufeature.c is a clue
-> that your implementation is likely playing with internal arm64_ftr
-> state that it shouldn't be. If there's not an accessor function that
-> works for you, then you can try adding one. Providing general functions
-> like this, that are effectively just an odd way of removing 'static'
-> from arm64_ftr_regs, breaks the encapsulation.
-> 
-> Thanks,
-> drew
-> 
-> .
-> 
+Make use of the struct_size() helper to avoid any potential type
+mistakes and protect against potential integer overflows
+Make use of the flex_array_size() helper to calculate the size of a
+flexible array member within an enclosing structure
 
-I found get_arm64_ftr_reg_nowarn and get_arm64_ftr_reg in cpufeature.c which will
-search and return the arm64_ftr_reg* according to the sys_id.  But they are all
-static.  Hence, I think cpufeature.c don't want other modules to access the
-arm64_ftr_reg*.  So I add arm64_cpu_ftr_regs_traverse to traverse the
-arm64_ftr_regs and pass the id and value to op instead of the arm64_ftr_reg*.
+Cc: stable@vger.kernel.org
+Suggested-by: Gustavo A. R. Silva <gustavoars@kernel.org>
+Signed-off-by: Rustam Kovhaev <rkovhaev@gmail.com>
+---
+ virt/kvm/kvm_main.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-Thanks,
-Peng
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index cf88233b819a..68edd25dcb11 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -4350,10 +4350,10 @@ void kvm_io_bus_unregister_dev(struct kvm *kvm, enum kvm_bus bus_idx,
+ 	new_bus = kmalloc(struct_size(bus, range, bus->dev_count - 1),
+ 			  GFP_KERNEL_ACCOUNT);
+ 	if (new_bus) {
+-		memcpy(new_bus, bus, sizeof(*bus) + i * sizeof(struct kvm_io_range));
++		memcpy(new_bus, bus, struct_size(bus, range, i));
+ 		new_bus->dev_count--;
+ 		memcpy(new_bus->range + i, bus->range + i + 1,
+-		       (new_bus->dev_count - i) * sizeof(struct kvm_io_range));
++				flex_array_size(new_bus, range, new_bus->dev_count - i));
+ 	} else {
+ 		pr_err("kvm: failed to shrink bus, removing it completely\n");
+ 		for (j = 0; j < bus->dev_count; j++) {
+-- 
+2.28.0
+
