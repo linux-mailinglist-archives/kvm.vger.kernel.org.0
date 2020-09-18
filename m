@@ -2,89 +2,98 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2DD4326F786
-	for <lists+kvm@lfdr.de>; Fri, 18 Sep 2020 09:57:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7397D26F791
+	for <lists+kvm@lfdr.de>; Fri, 18 Sep 2020 10:01:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726485AbgIRH46 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 18 Sep 2020 03:56:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51484 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725886AbgIRH4z (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 18 Sep 2020 03:56:55 -0400
-Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7CC15C06174A
-        for <kvm@vger.kernel.org>; Fri, 18 Sep 2020 00:56:55 -0700 (PDT)
-Received: from zn.tnic (p200300ec2f0c2600a65c515d56d1ce56.dip0.t-ipconnect.de [IPv6:2003:ec:2f0c:2600:a65c:515d:56d1:ce56])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id A8EA91EC032C;
-        Fri, 18 Sep 2020 09:56:52 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1600415812;
+        id S1726185AbgIRIBV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 18 Sep 2020 04:01:21 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:41802 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726040AbgIRIBV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 18 Sep 2020 04:01:21 -0400
+X-Greylist: delayed 88276 seconds by postgrey-1.27 at vger.kernel.org; Fri, 18 Sep 2020 04:01:20 EDT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1600416080;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=jnwJikcww71OpZvMfJM4DztBbtdS4UTU0+T1J4/wPs0=;
-        b=OfHLTUb8PkeWMxH4XxG7JJ+Qwg2krzoqTNIENSYVaEi0I7GC8BGXkXRoCppYdQ9yFaaddq
-        +Qb75xXDQhVOYysOe0QbC7KgdnLagOf2h6VIyGfUWAjrZEMRc1zgaPcOVjkn9TLXXSyeQU
-        697UM/9Y+Y/JlmNEU2PQuXIegI2ugb0=
-Date:   Fri, 18 Sep 2020 09:56:51 +0200
-From:   Borislav Petkov <bp@alien8.de>
-To:     Krish Sadhukhan <krish.sadhukhan@oracle.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, jmattson@google.com,
-        tglx@linutronix.de, mingo@redhat.com, x86@kernel.org,
-        sean.j.christopherson@intel.com, vkuznets@redhat.com,
-        wanpengli@tencent.com, joro@8bytes.org,
-        dave.hansen@linux.intel.com, luto@kernel.org, peterz@infradead.org,
-        linux-kernel@vger.kernel.org, hpa@zytor.com
-Subject: Re: [PATCH 3/3 v4] KVM: SVM: Don't flush cache if hardware enforces
- cache coherency across encryption domains
-Message-ID: <20200918075651.GC6585@zn.tnic>
-References: <20200917212038.5090-1-krish.sadhukhan@oracle.com>
- <20200917212038.5090-4-krish.sadhukhan@oracle.com>
+         in-reply-to:in-reply-to:references:references;
+        bh=GVFinjKpebbOcYbTtDAH+8ZTpHrKqsTQijsV2GuanqY=;
+        b=J2teavoTBulbAztF9GxJsHujHLP+VX5x76yNX8FAKqJQl1yk2Lw0tMxZVXWvvx9sxhjUmC
+        t/PwD+tlcpXmH0Gkk6EhGtfUU5ibcHqzgtXDRvPJK/pudU9nL4kXnBYYsTV7A7Pwesi9Vi
+        2SrBSVGu+QaDwIgAgUxbJAibQ6f28i0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-591-3QxO-G4LMpK-m_HA6ew9Aw-1; Fri, 18 Sep 2020 04:01:18 -0400
+X-MC-Unique: 3QxO-G4LMpK-m_HA6ew9Aw-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C2B6A6408F;
+        Fri, 18 Sep 2020 08:01:16 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (unknown [10.40.192.125])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 2CC237881C;
+        Fri, 18 Sep 2020 08:01:08 +0000 (UTC)
+Date:   Fri, 18 Sep 2020 10:01:06 +0200
+From:   Andrew Jones <drjones@redhat.com>
+To:     Peng Liang <liangpeng10@huawei.com>
+Cc:     kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, maz@kernel.org,
+        will@kernel.org, zhang.zhanghailiang@huawei.com,
+        xiexiangyou@huawei.com
+Subject: Re: [RFC v2 0/7] kvm: arm64: emulate ID registers
+Message-ID: <20200918080106.5c6jqarj3mhwi3mv@kamzik.brq.redhat.com>
+References: <20200917120101.3438389-1-liangpeng10@huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200917212038.5090-4-krish.sadhukhan@oracle.com>
+In-Reply-To: <20200917120101.3438389-1-liangpeng10@huawei.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Sep 17, 2020 at 09:20:38PM +0000, Krish Sadhukhan wrote:
-> In some hardware implementations, coherency between the encrypted and
-> unencrypted mappings of the same physical page in a VM is enforced. In such a
-> system, it is not required for software to flush the VM's page from all CPU
-> caches in the system prior to changing the value of the C-bit for the page.
+On Thu, Sep 17, 2020 at 08:00:54PM +0800, Peng Liang wrote:
+> In AArch64, guest will read the same values of the ID regsiters with
+> host.  Both of them read the values from arm64_ftr_regs.  This patch
+> series add support to emulate and configure ID registers so that we can
+> control the value of ID registers that guest read.
 > 
-> Signed-off-by: Krish Sadhukhan <krish.sadhukhan@oracle.com>
-> ---
->  arch/x86/kvm/svm/sev.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
+> v1 -> v2:
+>  - save the ID registers in sysreg file instead of a new struct
+>  - apply a checker before setting the value to the register
+>  - add doc for new KVM_CAP_ARM_CPU_FEATURE
 > 
-> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-> index 7bf7bf734979..3c9a45efdd4d 100644
-> --- a/arch/x86/kvm/svm/sev.c
-> +++ b/arch/x86/kvm/svm/sev.c
-> @@ -384,7 +384,8 @@ static void sev_clflush_pages(struct page *pages[], unsigned long npages)
->  	uint8_t *page_virtual;
->  	unsigned long i;
->  
-> -	if (npages == 0 || pages == NULL)
-> +	if (this_cpu_has(X86_FEATURE_SME_COHERENT) || npages == 0 ||
-> +	    pages == NULL)
->  		return;
->  
->  	for (i = 0; i < npages; i++) {
+> Peng Liang (7):
+>   arm64: add a helper function to traverse arm64_ftr_regs
+>   arm64: introduce check_features
+>   kvm: arm64: save ID registers to sys_regs file
+>   kvm: arm64: introduce check_user
+>   kvm: arm64: implement check_user for ID registers
+>   kvm: arm64: make ID registers configurable
+>   kvm: arm64: add KVM_CAP_ARM_CPU_FEATURE extension
+> 
+>  Documentation/virt/kvm/api.rst      |   8 +
+>  arch/arm64/include/asm/cpufeature.h |   4 +
+>  arch/arm64/include/asm/kvm_coproc.h |   2 +
+>  arch/arm64/include/asm/kvm_host.h   |   3 +
+>  arch/arm64/kernel/cpufeature.c      |  36 +++
+>  arch/arm64/kvm/arm.c                |   3 +
+>  arch/arm64/kvm/sys_regs.c           | 481 +++++++++++++++++++++++++++-
+>  arch/arm64/kvm/sys_regs.h           |   6 +
+>  include/uapi/linux/kvm.h            |   1 +
+>  9 files changed, 532 insertions(+), 12 deletions(-)
+> 
 > -- 
+> 2.26.2
+>
 
-Took the first two, Paolo lemme know if I should route this one through
-tip too.
+Hi Peng,
 
-Thx.
+I'd much rather see a series of patches where each patch converts a single
+ID register from using ID_SANITISED() to having its own table entry, where
+its own set_user() and reset() functions take into account its features
+using high level arm64_ftr* functions. Any ID registers that can still
+share code can certainly do so with some post-conversion refactoring.
 
--- 
-Regards/Gruss,
-    Boris.
+Thanks,
+drew
 
-https://people.kernel.org/tglx/notes-about-netiquette
