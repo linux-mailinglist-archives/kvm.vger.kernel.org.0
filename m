@@ -2,121 +2,130 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6A2BF2702C6
-	for <lists+kvm@lfdr.de>; Fri, 18 Sep 2020 19:02:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0B16F2702D6
+	for <lists+kvm@lfdr.de>; Fri, 18 Sep 2020 19:04:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726200AbgIRRCo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 18 Sep 2020 13:02:44 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:33040 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726126AbgIRRCn (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 18 Sep 2020 13:02:43 -0400
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 08IGh6us040991;
-        Fri, 18 Sep 2020 13:02:43 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : mime-version : content-transfer-encoding; s=pp1;
- bh=uJlQTyDJq/ZC9OYXSXamF5qHhTszIWLOwi4hkKQ8vJM=;
- b=aCdzapvwlWhTvcl/+zR0l4Pkh92kk2d7ENFlMAGpVhTpf3GbJEZyEJDWgD0o90TsdE9m
- if9/5LWP20bGC6dlecfDztYeKyaMsVc2a5FMdN/gqZrdFlsoi8luUZ1Ia6fRy5PCLkPB
- fVrLq9xRmq1pKRY5ITOPSf6OS4AW1FYY0INsBBSS0S8t6LUjUpY/2Bum2qzJ2A2snqa2
- xE7Y3Qq/uVrGsby1e4hS8H6bRCZgd/wmH2fiFGb2RF1UkRcNoffKTE0EG/Eb6ne4imDv
- AkidunNzmT8iD11ZsVXa8KBaxp7pKG8o45PwvnB8hS3zyzoQ60n13w7/nMDUOvrS5knL 8Q== 
+        id S1726384AbgIRREF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 18 Sep 2020 13:04:05 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:34928 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726273AbgIRREE (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 18 Sep 2020 13:04:04 -0400
+Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 08IH0lp8171942;
+        Fri, 18 Sep 2020 13:04:02 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=aYfAfNsZADDse3HgNhHndOnu4LfuAkhcLvK463qpQgg=;
+ b=UvqlHwHdTUhAO2SJP6YobnmQFiORdouvjHj+TAHYotYNofN8/JW8StFG2FyuROAKwp1N
+ JEB/sWkprInwcyjA2CR5aEwPQfzcXRK89SKm6e6t7fL0bZray7ShShkrV0UspwAL0Rza
+ 8K1sGjb+o4OGedbTNUn1Ws/x6CNLVzpJS401fpcdVi6Z0Cl0bzXC4Jrzh2/+7TXwGbDx
+ PPBgW6PcBB7Re0q2YYEMiA1dGvxfGH95qoAuOz6qBk1FvuHUT3VpJdEfroCl+BBA9WA8
+ K+GPe+FU2V4DyNPqIhET2hLNHhmPd9bk/mCPHGHVlIrlIOW8Z3u8UKDFtMJ83lH65atG RQ== 
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 33n0nm0gj9-1
+        by mx0b-001b2d01.pphosted.com with ESMTP id 33myrn25h3-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 18 Sep 2020 13:02:42 -0400
-Received: from m0098409.ppops.net (m0098409.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 08IGhkek041725;
-        Fri, 18 Sep 2020 13:02:42 -0400
-Received: from ppma03wdc.us.ibm.com (ba.79.3fa9.ip4.static.sl-reverse.com [169.63.121.186])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 33n0nm0ghu-1
+        Fri, 18 Sep 2020 13:04:02 -0400
+Received: from m0098413.ppops.net (m0098413.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 08IH0lvg171936;
+        Fri, 18 Sep 2020 13:04:02 -0400
+Received: from ppma05wdc.us.ibm.com (1b.90.2fa9.ip4.static.sl-reverse.com [169.47.144.27])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 33myrn25gq-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 18 Sep 2020 13:02:42 -0400
-Received: from pps.filterd (ppma03wdc.us.ibm.com [127.0.0.1])
-        by ppma03wdc.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 08IGvUjU018423;
-        Fri, 18 Sep 2020 17:02:41 GMT
+        Fri, 18 Sep 2020 13:04:01 -0400
+Received: from pps.filterd (ppma05wdc.us.ibm.com [127.0.0.1])
+        by ppma05wdc.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 08IGvnXt005489;
+        Fri, 18 Sep 2020 17:04:01 GMT
 Received: from b03cxnp07029.gho.boulder.ibm.com (b03cxnp07029.gho.boulder.ibm.com [9.17.130.16])
-        by ppma03wdc.us.ibm.com with ESMTP id 33k5wcwre0-1
+        by ppma05wdc.us.ibm.com with ESMTP id 33k6q1dg8n-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 18 Sep 2020 17:02:41 +0000
-Received: from b03ledav006.gho.boulder.ibm.com (b03ledav006.gho.boulder.ibm.com [9.17.130.237])
-        by b03cxnp07029.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 08IH2eJs61669728
+        Fri, 18 Sep 2020 17:04:01 +0000
+Received: from b03ledav003.gho.boulder.ibm.com (b03ledav003.gho.boulder.ibm.com [9.17.130.234])
+        by b03cxnp07029.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 08IH3wUx45875474
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 18 Sep 2020 17:02:40 GMT
-Received: from b03ledav006.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 1B793C6055;
-        Fri, 18 Sep 2020 17:02:40 +0000 (GMT)
-Received: from b03ledav006.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id E81D3C6059;
-        Fri, 18 Sep 2020 17:02:38 +0000 (GMT)
-Received: from localhost.localdomain.com (unknown [9.85.128.188])
-        by b03ledav006.gho.boulder.ibm.com (Postfix) with ESMTP;
-        Fri, 18 Sep 2020 17:02:38 +0000 (GMT)
+        Fri, 18 Sep 2020 17:03:58 GMT
+Received: from b03ledav003.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 39B0B6A047;
+        Fri, 18 Sep 2020 17:03:58 +0000 (GMT)
+Received: from b03ledav003.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id A6BBA6A057;
+        Fri, 18 Sep 2020 17:03:56 +0000 (GMT)
+Received: from localhost.localdomain (unknown [9.85.128.188])
+        by b03ledav003.gho.boulder.ibm.com (Postfix) with ESMTP;
+        Fri, 18 Sep 2020 17:03:56 +0000 (GMT)
+Subject: Re: [PATCH v10 06/16] s390/vfio-ap: introduce shadow APCB
+To:     Cornelia Huck <cohuck@redhat.com>
+Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, freude@linux.ibm.com, borntraeger@de.ibm.com,
+        mjrosato@linux.ibm.com, pasic@linux.ibm.com,
+        alex.williamson@redhat.com, kwankhede@nvidia.com,
+        fiuczy@linux.ibm.com, frankja@linux.ibm.com, david@redhat.com,
+        imbrenda@linux.ibm.com, hca@linux.ibm.com, gor@linux.ibm.com
+References: <20200821195616.13554-1-akrowiak@linux.ibm.com>
+ <20200821195616.13554-7-akrowiak@linux.ibm.com>
+ <20200917162242.1941772a.cohuck@redhat.com>
 From:   Tony Krowiak <akrowiak@linux.ibm.com>
-To:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Cc:     pmorel@linux.ibm.com, pasic@linux.ibm.com,
-        alex.williamson@redhat.com, cohuck@redhat.com,
-        kwankhede@nvidia.com, borntraeger@de.ibm.com,
-        Tony Krowiak <akrowiak@linux.ibm.com>
-Subject: [PATCH] s390/vfio-ap: fix unregister GISC when KVM is already gone results in OOPS
-Date:   Fri, 18 Sep 2020 13:02:34 -0400
-Message-Id: <20200918170234.5807-1-akrowiak@linux.ibm.com>
-X-Mailer: git-send-email 2.21.1
+Message-ID: <49b0dd56-0c5b-9096-91d1-aacb5ec886d1@linux.ibm.com>
+Date:   Fri, 18 Sep 2020 13:03:55 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20200917162242.1941772a.cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
 X-TM-AS-GCONF: 00
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
  definitions=2020-09-18_15:2020-09-16,2020-09-18 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999
- impostorscore=0 malwarescore=0 adultscore=0 spamscore=0 mlxscore=0
- clxscore=1015 lowpriorityscore=0 bulkscore=0 phishscore=0 suspectscore=2
- priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0
+ impostorscore=0 adultscore=0 clxscore=1015 mlxscore=0 phishscore=0
+ suspectscore=0 priorityscore=1501 lowpriorityscore=0 mlxlogscore=999
+ spamscore=0 bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
  engine=8.12.0-2006250000 definitions=main-2009180135
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Attempting to unregister Guest Interruption Subclass (GISC) when the
-link between the matrix mdev and KVM has been removed results in the
-following:
 
-   "Kernel panic -not syncing: Fatal exception: panic_on_oops"
 
-This patch fixes this bug by verifying the matrix mdev and KVM are still
-linked prior to unregistering the GISC.
+On 9/17/20 10:22 AM, Cornelia Huck wrote:
+> On Fri, 21 Aug 2020 15:56:06 -0400
+> Tony Krowiak <akrowiak@linux.ibm.com> wrote:
+>
+>> The APCB is a field within the CRYCB that provides the AP configuration
+>> to a KVM guest. Let's introduce a shadow copy of the KVM guest's APCB and
+>> maintain it for the lifespan of the guest.
+>>
+>> Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
+>> ---
+>>   drivers/s390/crypto/vfio_ap_ops.c     | 32 ++++++++++++++++++++++-----
+>>   drivers/s390/crypto/vfio_ap_private.h |  2 ++
+>>   2 files changed, 29 insertions(+), 5 deletions(-)
+> (...)
+>
+>> @@ -1202,13 +1223,12 @@ static int vfio_ap_mdev_group_notifier(struct notifier_block *nb,
+>>   	if (ret)
+>>   		return NOTIFY_DONE;
+>>   
+>> -	/* If there is no CRYCB pointer, then we can't copy the masks */
+>> -	if (!matrix_mdev->kvm->arch.crypto.crycbd)
+>> +	if (!vfio_ap_mdev_has_crycb(matrix_mdev))
+>>   		return NOTIFY_DONE;
+>>   
+>> -	kvm_arch_crypto_set_masks(matrix_mdev->kvm, matrix_mdev->matrix.apm,
+>> -				  matrix_mdev->matrix.aqm,
+>> -				  matrix_mdev->matrix.adm);
+>> +	memcpy(&matrix_mdev->shadow_apcb, &matrix_mdev->matrix,
+>> +	       sizeof(matrix_mdev->shadow_apcb));
+>> +	vfio_ap_mdev_commit_crycb(matrix_mdev);
+> We are sure that the shadow APCB always matches up as we are the only
+> ones manipulating the APCB in the CRYCB, right?
 
-Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
----
- drivers/s390/crypto/vfio_ap_ops.c | 14 +++++++++-----
- 1 file changed, 9 insertions(+), 5 deletions(-)
+Yes
 
-diff --git a/drivers/s390/crypto/vfio_ap_ops.c b/drivers/s390/crypto/vfio_ap_ops.c
-index e0bde8518745..847a88642644 100644
---- a/drivers/s390/crypto/vfio_ap_ops.c
-+++ b/drivers/s390/crypto/vfio_ap_ops.c
-@@ -119,11 +119,15 @@ static void vfio_ap_wait_for_irqclear(int apqn)
-  */
- static void vfio_ap_free_aqic_resources(struct vfio_ap_queue *q)
- {
--	if (q->saved_isc != VFIO_AP_ISC_INVALID && q->matrix_mdev)
--		kvm_s390_gisc_unregister(q->matrix_mdev->kvm, q->saved_isc);
--	if (q->saved_pfn && q->matrix_mdev)
--		vfio_unpin_pages(mdev_dev(q->matrix_mdev->mdev),
--				 &q->saved_pfn, 1);
-+	if (q->matrix_mdev) {
-+		if (q->saved_isc != VFIO_AP_ISC_INVALID && q->matrix_mdev->kvm)
-+			kvm_s390_gisc_unregister(q->matrix_mdev->kvm,
-+						 q->saved_isc);
-+		if (q->saved_pfn)
-+			vfio_unpin_pages(mdev_dev(q->matrix_mdev->mdev),
-+					 &q->saved_pfn, 1);
-+	}
-+
- 	q->saved_pfn = 0;
- 	q->saved_isc = VFIO_AP_ISC_INVALID;
- }
--- 
-2.21.1
+>
+>>   
+>>   	return NOTIFY_OK;
+>>   }
 
