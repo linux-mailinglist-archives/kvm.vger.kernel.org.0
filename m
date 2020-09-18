@@ -2,185 +2,90 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 71F002702EE
-	for <lists+kvm@lfdr.de>; Fri, 18 Sep 2020 19:09:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E5DE5270306
+	for <lists+kvm@lfdr.de>; Fri, 18 Sep 2020 19:17:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726304AbgIRRJg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 18 Sep 2020 13:09:36 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:58662 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726174AbgIRRJg (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 18 Sep 2020 13:09:36 -0400
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 08IH2utj037663;
-        Fri, 18 Sep 2020 13:09:33 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=Xrrgn91gXEZjAL29dM2nYrjXuyV5PTrrEQzwPa2zEQI=;
- b=A1CijVR2VyzWGxQEAz35wpP6aD16TkpOF9bY8ZZQVHrYquQApAtOhgNNMgFVZZS7z62C
- 99HzsFUES8LwPXULFAVn+/FOjaDrX0PA1vV+/ih43KCiDGYKW4Qc+PDoe5vC6Iviyt5D
- biWgwnlr1LmqvrIMkGd54tbcEou6mb/nr3Xm/nu3V2wbA0FFUGw29l7Aim73cyzN6RaK
- vcuqI8FtxLbVRV0Ou9jlYAbHrBfu4suyzNfPO0uJX//8qF+5IYkfgxw1NFKWW5wIzmCQ
- cOF/Z76LsDy+XN7ELbyCpSKdWJFleJ6yVfCwIJUzGSQTMzlVQ6oDlI69dJ6LZWMq8Dbg Mg== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 33n0das5qx-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 18 Sep 2020 13:09:32 -0400
-Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 08IH30Tm037990;
-        Fri, 18 Sep 2020 13:09:32 -0400
-Received: from ppma03dal.us.ibm.com (b.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.11])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 33n0das5qk-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 18 Sep 2020 13:09:32 -0400
-Received: from pps.filterd (ppma03dal.us.ibm.com [127.0.0.1])
-        by ppma03dal.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 08IH6exp012136;
-        Fri, 18 Sep 2020 17:09:31 GMT
-Received: from b03cxnp08025.gho.boulder.ibm.com (b03cxnp08025.gho.boulder.ibm.com [9.17.130.17])
-        by ppma03dal.us.ibm.com with ESMTP id 33k5v2cam8-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 18 Sep 2020 17:09:31 +0000
-Received: from b03ledav004.gho.boulder.ibm.com (b03ledav004.gho.boulder.ibm.com [9.17.130.235])
-        by b03cxnp08025.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 08IH9ONX53019068
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 18 Sep 2020 17:09:24 GMT
-Received: from b03ledav004.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 1E98A78060;
-        Fri, 18 Sep 2020 17:09:28 +0000 (GMT)
-Received: from b03ledav004.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 91DB67805C;
-        Fri, 18 Sep 2020 17:09:26 +0000 (GMT)
-Received: from localhost.localdomain (unknown [9.85.128.188])
-        by b03ledav004.gho.boulder.ibm.com (Postfix) with ESMTP;
-        Fri, 18 Sep 2020 17:09:26 +0000 (GMT)
-Subject: Re: [PATCH v10 07/16] s390/vfio-ap: sysfs attribute to display the
- guest's matrix
-To:     Cornelia Huck <cohuck@redhat.com>
-Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, freude@linux.ibm.com, borntraeger@de.ibm.com,
-        mjrosato@linux.ibm.com, pasic@linux.ibm.com,
-        alex.williamson@redhat.com, kwankhede@nvidia.com,
-        fiuczy@linux.ibm.com, frankja@linux.ibm.com, david@redhat.com,
-        imbrenda@linux.ibm.com, hca@linux.ibm.com, gor@linux.ibm.com
-References: <20200821195616.13554-1-akrowiak@linux.ibm.com>
- <20200821195616.13554-8-akrowiak@linux.ibm.com>
- <20200917163448.4db80db3.cohuck@redhat.com>
-From:   Tony Krowiak <akrowiak@linux.ibm.com>
-Message-ID: <d2e623f3-65fa-e764-61ce-b7e8c35fd399@linux.ibm.com>
-Date:   Fri, 18 Sep 2020 13:09:25 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+        id S1726252AbgIRRRY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 18 Sep 2020 13:17:24 -0400
+Received: from mail.kernel.org ([198.145.29.99]:34796 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726139AbgIRRRY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 18 Sep 2020 13:17:24 -0400
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id A805421707;
+        Fri, 18 Sep 2020 17:17:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1600449443;
+        bh=dT/SIIBfk6PdNJR5wifdnUhvj/zHp9ljO8pxvLb8ouI=;
+        h=From:To:Cc:Subject:Date:From;
+        b=sScf8brvcJJZ1OIxlPXSE1vyOhRAJ5bWUdN6HZa64ks2ni7AZwUMHOnkWSDlqXw4e
+         xtXYTKivF9Gu6fe7f3g/dWxh721wKq0KoLRgqv36d8C5Tyt/J9fwZajTktVbkzsjGR
+         POg34ttD0fKp8lZK5OLvELOcV3sNsBevkCMuyI44=
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=why.lan)
+        by disco-boy.misterjones.org with esmtpsa (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+        (Exim 4.92)
+        (envelope-from <maz@kernel.org>)
+        id 1kJK0f-00D4ZN-PC; Fri, 18 Sep 2020 18:17:21 +0100
+From:   Marc Zyngier <maz@kernel.org>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Will Deacon <will@kernel.org>, kernel-team@android.com,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>
+Subject: [GIT PULL] KVM/arm64 fixes for 5.9, take #2
+Date:   Fri, 18 Sep 2020 18:16:49 +0100
+Message-Id: <20200918171651.1340445-1-maz@kernel.org>
+X-Mailer: git-send-email 2.28.0
 MIME-Version: 1.0
-In-Reply-To: <20200917163448.4db80db3.cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
- definitions=2020-09-18_15:2020-09-16,2020-09-18 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 phishscore=0
- clxscore=1015 spamscore=0 priorityscore=1501 adultscore=0
- lowpriorityscore=0 malwarescore=0 impostorscore=0 mlxlogscore=999
- mlxscore=0 suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2006250000 definitions=main-2009180140
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: pbonzini@redhat.com, will@kernel.org, kernel-team@android.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Hi Paolo,
 
+Here's the latest set of fixes for 5.9. The first patch is pretty
+nasty, as a guest hitting this bug will have its vcpu stuck on a
+fault, without any hope of it being resolved. Embarrassing, and
+definitely a stable candidate. The second patch is only a cleanup
+after the first one.
 
-On 9/17/20 10:34 AM, Cornelia Huck wrote:
-> On Fri, 21 Aug 2020 15:56:07 -0400
-> Tony Krowiak <akrowiak@linux.ibm.com> wrote:
->
->> The matrix of adapters and domains configured in a guest's CRYCB may
->> differ from the matrix of adapters and domains assigned to the matrix mdev,
->> so this patch introduces a sysfs attribute to display the matrix of a guest
->> using the matrix mdev. For a matrix mdev denoted by $uuid, the crycb for a
->> guest using the matrix mdev can be displayed as follows:
->>
->>     cat /sys/devices/vfio_ap/matrix/$uuid/guest_matrix
->>
->> If a guest is not using the matrix mdev at the time the crycb is displayed,
->> an error (ENODEV) will be returned.
->>
->> Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
->> ---
->>   drivers/s390/crypto/vfio_ap_ops.c | 58 +++++++++++++++++++++++++++++++
->>   1 file changed, 58 insertions(+)
->>
->> diff --git a/drivers/s390/crypto/vfio_ap_ops.c b/drivers/s390/crypto/vfio_ap_ops.c
->> index efb229033f9e..30bf23734af6 100644
->> --- a/drivers/s390/crypto/vfio_ap_ops.c
->> +++ b/drivers/s390/crypto/vfio_ap_ops.c
->> @@ -1119,6 +1119,63 @@ static ssize_t matrix_show(struct device *dev, struct device_attribute *attr,
->>   }
->>   static DEVICE_ATTR_RO(matrix);
->>   
->> +static ssize_t guest_matrix_show(struct device *dev,
->> +				 struct device_attribute *attr, char *buf)
->> +{
->> +	struct mdev_device *mdev = mdev_from_dev(dev);
->> +	struct ap_matrix_mdev *matrix_mdev = mdev_get_drvdata(mdev);
->> +	char *bufpos = buf;
->> +	unsigned long apid;
->> +	unsigned long apqi;
->> +	unsigned long apid1;
->> +	unsigned long apqi1;
->> +	unsigned long napm_bits = matrix_mdev->shadow_apcb.apm_max + 1;
->> +	unsigned long naqm_bits = matrix_mdev->shadow_apcb.aqm_max + 1;
->> +	int nchars = 0;
->> +	int n;
->> +
->> +	if (!vfio_ap_mdev_has_crycb(matrix_mdev))
->> +		return -ENODEV;
->> +
->> +	apid1 = find_first_bit_inv(matrix_mdev->shadow_apcb.apm, napm_bits);
->> +	apqi1 = find_first_bit_inv(matrix_mdev->shadow_apcb.aqm, naqm_bits);
->> +
->> +	mutex_lock(&matrix_dev->lock);
->> +
->> +	if ((apid1 < napm_bits) && (apqi1 < naqm_bits)) {
->> +		for_each_set_bit_inv(apid, matrix_mdev->shadow_apcb.apm,
->> +				     napm_bits) {
->> +			for_each_set_bit_inv(apqi,
->> +					     matrix_mdev->shadow_apcb.aqm,
->> +					     naqm_bits) {
->> +				n = sprintf(bufpos, "%02lx.%04lx\n", apid,
->> +					    apqi);
->> +				bufpos += n;
->> +				nchars += n;
->> +			}
->> +		}
->> +	} else if (apid1 < napm_bits) {
->> +		for_each_set_bit_inv(apid, matrix_mdev->shadow_apcb.apm,
->> +				     napm_bits) {
->> +			n = sprintf(bufpos, "%02lx.\n", apid);
->> +			bufpos += n;
->> +			nchars += n;
->> +		}
->> +	} else if (apqi1 < naqm_bits) {
->> +		for_each_set_bit_inv(apqi, matrix_mdev->shadow_apcb.aqm,
->> +				     naqm_bits) {
->> +			n = sprintf(bufpos, ".%04lx\n", apqi);
->> +			bufpos += n;
->> +			nchars += n;
->> +		}
->> +	}
->> +
->> +	mutex_unlock(&matrix_dev->lock);
->> +
->> +	return nchars;
->> +}
-> This basically looks like a version of matrix_show() operating on the
-> shadow apcb. I'm wondering if we could consolidate these two functions
-> by passing in the structure to operate on as a parameter? Might not be
-> worth the effort, though.
+Please pull,
 
-We still need the two functions because they back the mdev's
-sysfs matrix and guest_matrix attributes, but we could call a function.
-I'm not sure it buys us much though.
+	M.
 
->
+The following changes since commit 7b75cd5128421c673153efb1236705696a1a9812:
 
+  KVM: arm64: Update page shift if stage 2 block mapping not supported (2020-09-04 10:53:48 +0100)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvmarm-fixes-5.9-2
+
+for you to fetch changes up to 620cf45f7a516bf5fe9e5dce675a652e935c8bde:
+
+  KVM: arm64: Remove S1PTW check from kvm_vcpu_dabt_iswrite() (2020-09-18 18:01:48 +0100)
+
+----------------------------------------------------------------
+KVM/arm64 fixes for 5.9, take #2
+
+- Fix handling of S1 Page Table Walk permission fault at S2
+  on instruction fetch
+- Cleanup kvm_vcpu_dabt_iswrite()
+
+----------------------------------------------------------------
+Marc Zyngier (2):
+      KVM: arm64: Assume write fault on S1PTW permission fault on instruction fetch
+      KVM: arm64: Remove S1PTW check from kvm_vcpu_dabt_iswrite()
+
+ arch/arm64/include/asm/kvm_emulate.h    | 14 +++++++++++---
+ arch/arm64/kvm/hyp/include/hyp/switch.h |  2 +-
+ arch/arm64/kvm/mmu.c                    |  4 ++--
+ 3 files changed, 14 insertions(+), 6 deletions(-)
