@@ -2,104 +2,75 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id EAB6F270C2A
-	for <lists+kvm@lfdr.de>; Sat, 19 Sep 2020 11:18:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1AD11270D8B
+	for <lists+kvm@lfdr.de>; Sat, 19 Sep 2020 13:15:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726192AbgISJSl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 19 Sep 2020 05:18:41 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:31680 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726249AbgISJSl (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Sat, 19 Sep 2020 05:18:41 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1600507119;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=lfetqzo7kRPYXW7uWXLArRB8xjwWDZKQ4lA60FHitpQ=;
-        b=dqyNSFSCLpCSdTjYGHFltmfWpp3RuS9F29helxE0/HzAk9SZ4PCatxIOlgO1twv8thYAVA
-        Vv2EgEMqrEL0O+PWtv18V8sa4SRIiNePR5KEEdgTqBtiyrNkVKzyBdB11OH+ytODGYrIkI
-        YWbbkTYCp179KSSdZdqOWJnQUNa3xPQ=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-151-AhdzIlUmO1e7TAKsLd7wUQ-1; Sat, 19 Sep 2020 05:18:36 -0400
-X-MC-Unique: AhdzIlUmO1e7TAKsLd7wUQ-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4F5801891E81;
-        Sat, 19 Sep 2020 09:18:34 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-112-63.ams2.redhat.com [10.36.112.63])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 9D5DD55771;
-        Sat, 19 Sep 2020 09:18:31 +0000 (UTC)
-Subject: Re: [PATCH] KVM: MIPS: Change the definition of kvm type
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Huacai Chen <chenhc@lemote.com>,
-        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Cc:     kvm@vger.kernel.org, linux-mips@vger.kernel.org,
-        Fuxin Zhang <zhangfx@lemote.com>,
-        Huacai Chen <chenhuacai@gmail.com>,
-        Jiaxun Yang <jiaxun.yang@flygoat.com>, stable@vger.kernel.org
-References: <1599734031-28746-1-git-send-email-chenhc@lemote.com>
- <45a71ce2-42d2-ba49-72a3-155dacede289@redhat.com>
-From:   Thomas Huth <thuth@redhat.com>
-Message-ID: <dc709e46-1daf-98f2-8eb1-436096bb3274@redhat.com>
-Date:   Sat, 19 Sep 2020 11:18:30 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+        id S1726168AbgISLPu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 19 Sep 2020 07:15:50 -0400
+Received: from szxga05-in.huawei.com ([45.249.212.191]:13731 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726041AbgISLPu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 19 Sep 2020 07:15:50 -0400
+Received: from DGGEMS408-HUB.china.huawei.com (unknown [172.30.72.60])
+        by Forcepoint Email with ESMTP id 0BAC450C2E2CAE8B0AC4;
+        Sat, 19 Sep 2020 19:15:49 +0800 (CST)
+Received: from [10.174.185.226] (10.174.185.226) by
+ DGGEMS408-HUB.china.huawei.com (10.3.19.208) with Microsoft SMTP Server id
+ 14.3.487.0; Sat, 19 Sep 2020 19:15:38 +0800
+From:   Zenghui Yu <yuzenghui@huawei.com>
+Subject: KVM_SET_DEVICE_ATTR failed
+To:     <qemu-arm@nongnu.org>, <kvmarm@lists.cs.columbia.edu>,
+        <kvm@vger.kernel.org>
+CC:     Marc Zyngier <maz@kernel.org>, Eric Auger <eric.auger@redhat.com>,
+        "Alex Williamson" <alex.williamson@redhat.com>,
+        <wanghaibin.wang@huawei.com>
+Message-ID: <1f70926e-27dd-9e30-3d0f-770130112777@huawei.com>
+Date:   Sat, 19 Sep 2020 19:15:38 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.9.0
 MIME-Version: 1.0
-In-Reply-To: <45a71ce2-42d2-ba49-72a3-155dacede289@redhat.com>
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset="utf-8"; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.174.185.226]
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 11/09/2020 19.22, Paolo Bonzini wrote:
-> On 10/09/20 12:33, Huacai Chen wrote:
->> MIPS defines two kvm types:
->>
->>  #define KVM_VM_MIPS_TE          0
->>  #define KVM_VM_MIPS_VZ          1
->>
->> In Documentation/virt/kvm/api.rst it is said that "You probably want to
->> use 0 as machine type", which implies that type 0 be the "automatic" or
->> "default" type. And, in user-space libvirt use the null-machine (with
->> type 0) to detect the kvm capability, which returns "KVM not supported"
->> on a VZ platform.
->>
->> I try to fix it in QEMU but it is ugly:
->> https://lists.nongnu.org/archive/html/qemu-devel/2020-08/msg05629.html
->>
->> And Thomas Huth suggests me to change the definition of kvm type:
->> https://lists.nongnu.org/archive/html/qemu-devel/2020-09/msg03281.html
->>
->> So I define like this:
->>
->>  #define KVM_VM_MIPS_AUTO        0
->>  #define KVM_VM_MIPS_VZ          1
->>  #define KVM_VM_MIPS_TE          2
->>
->> Since VZ and TE cannot co-exists, using type 0 on a TE platform will
->> still return success (so old user-space tools have no problems on new
->> kernels); the advantage is that using type 0 on a VZ platform will not
->> return failure. So, the only problem is "new user-space tools use type
->> 2 on old kernels", but if we treat this as a kernel bug, we can backport
->> this patch to old stable kernels.
-> 
-> I'm a bit wary to do that.  However it's not an issue for QEMU since it
-> generally updates the kernel headers.
+Hi folks,
 
-Are there any other userspace programs beside QEMU that use KVM on MIPS?
-If there aren't any other serious userspace programs, I think we should
-go ahead with this patch here. Otherwise, what are the other programs
-that could be affected?
+I had booted a guest with an assigned virtual function, with GICv4
+(direct MSI injection) enabled on my arm64 server. I got the following
+QEMU error message on its shutdown:
 
- Thomas
+"qemu-system-aarch64: KVM_SET_DEVICE_ATTR failed: Group 4 attr 
+0x0000000000000001: Permission denied"
+
+The problem is that the KVM_DEV_ARM_ITS_SAVE_TABLES ioctl failed while
+stopping the VM.
+
+As for the kernel side, it turned out that an LPI with irq->hw=true was
+observed while saving ITT for the device. KVM simply failed the save
+operation by returning -EACCES to user-space. The reason is explained in
+the comment block of vgic_its_save_itt(), though I think the HW bit
+should actually be checked in the KVM_DEV_ARM_VGIC_SAVE_PENDING_TABLES
+ioctl rather than in the ITT saving, well, it isn't much related to this
+problem...
+
+I had noticed that some vectors had been masked by guest VF-driver on
+shutdown, the correspond VLPIs had therefore been unmapped and irq->hw
+was cleared. But some other vectors were un-handled. I *guess* that VFIO
+released these vectors *after* the KVM_DEV_ARM_ITS_SAVE_TABLES ioctl so
+that we end-up trying to save the VLPI's state.
+
+It may not be a big problem as the guest is going to shutdown anyway and
+the whole guest save/restore on the GICv4.x system is not supported for
+the time being... I'll look at how VFIO would release these vectors but
+post it early in case this is an already known issue (and this might be
+one thing need to be considered if one wants to implement migration on
+the GICv4.x system).
 
 
+Thanks,
+Zenghui
