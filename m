@@ -2,75 +2,95 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1AD11270D8B
-	for <lists+kvm@lfdr.de>; Sat, 19 Sep 2020 13:15:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5BB25270EC3
+	for <lists+kvm@lfdr.de>; Sat, 19 Sep 2020 17:09:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726168AbgISLPu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 19 Sep 2020 07:15:50 -0400
-Received: from szxga05-in.huawei.com ([45.249.212.191]:13731 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726041AbgISLPu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 19 Sep 2020 07:15:50 -0400
-Received: from DGGEMS408-HUB.china.huawei.com (unknown [172.30.72.60])
-        by Forcepoint Email with ESMTP id 0BAC450C2E2CAE8B0AC4;
-        Sat, 19 Sep 2020 19:15:49 +0800 (CST)
-Received: from [10.174.185.226] (10.174.185.226) by
- DGGEMS408-HUB.china.huawei.com (10.3.19.208) with Microsoft SMTP Server id
- 14.3.487.0; Sat, 19 Sep 2020 19:15:38 +0800
-From:   Zenghui Yu <yuzenghui@huawei.com>
-Subject: KVM_SET_DEVICE_ATTR failed
-To:     <qemu-arm@nongnu.org>, <kvmarm@lists.cs.columbia.edu>,
-        <kvm@vger.kernel.org>
-CC:     Marc Zyngier <maz@kernel.org>, Eric Auger <eric.auger@redhat.com>,
-        "Alex Williamson" <alex.williamson@redhat.com>,
-        <wanghaibin.wang@huawei.com>
-Message-ID: <1f70926e-27dd-9e30-3d0f-770130112777@huawei.com>
-Date:   Sat, 19 Sep 2020 19:15:38 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.9.0
+        id S1726458AbgISPJQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 19 Sep 2020 11:09:16 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:53636 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726408AbgISPJP (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Sat, 19 Sep 2020 11:09:15 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1600528154;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=W1IebRkP5Qy8CK9eMesBAQ+yjVfyUddrM/ZK4BlJaXY=;
+        b=Qr2V80wBUGO0mkOPywSlxa7ESEHQ/pBeood8ZSoFhArEiJ2zEWmg3Yim0JettfQQI3veyI
+        OSB7GWm9Vl6lr0n4AI9es7PCpRnjumDAwLdgPUgV4dsiGSwy7+kVeIKVxMO/I58SDIDO8R
+        CViVuLc9mhD+jKb1hbwxONaEO02tWxM=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-355-k3t2_6b3NFmcFy4JdjBHeA-1; Sat, 19 Sep 2020 11:09:12 -0400
+X-MC-Unique: k3t2_6b3NFmcFy4JdjBHeA-1
+Received: by mail-wr1-f72.google.com with SMTP id l15so3541159wro.10
+        for <kvm@vger.kernel.org>; Sat, 19 Sep 2020 08:09:12 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=W1IebRkP5Qy8CK9eMesBAQ+yjVfyUddrM/ZK4BlJaXY=;
+        b=tsM0zymkKBdDVwd7S2VhkvHASnqyRw96negN2PkzPMd1iEHWFZU30KYaCauFT5mGE4
+         CnlB+x5HkUFOYqZtGQR7ZPM1sLaPJo2GZEInSfyoBFlxRx9aLiAPFP2OMgF/JqmRiYbd
+         g5Av9yJbD68/tUUL6Qupq5dA+thEKC4BR+p3Lz6mt1sGUQ8S8b77G8lrmhms8eJhZ+b9
+         1OtCZe9y+4nMl0b9AYbhIW7vIQ01nLLi1em9Qmia+bctvKoIcJOc5/MHSkO7QfQCOi9f
+         sIPVEBJ/3DNqke7F/PGnYWzNOdHLJX6dsBM7HdnvoxuI1CtJIdGURyUxDaO0i+v+JgwM
+         ylMg==
+X-Gm-Message-State: AOAM531Pum57PKIJP2ss4l1/Q5z3LrCcd8IN1Go/Ln2tM3aqtso+5m9z
+        wPJkSTYl9OBtAmzWFt+HK892FJYlb26BeWoCwU70QRyM6Ggu/ALlf0PGvy/oYixa42AKzA/Mptc
+        VM6DzEAcRrrTy
+X-Received: by 2002:adf:f784:: with SMTP id q4mr37954888wrp.126.1600528151465;
+        Sat, 19 Sep 2020 08:09:11 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxKpPy0hJAxTQ09zpPWlpplAAHUVUoUjc4Gx4GB2KSdz9X07Qk+YMsfBpsl5LN7ahDONN6ajg==
+X-Received: by 2002:adf:f784:: with SMTP id q4mr37954865wrp.126.1600528151264;
+        Sat, 19 Sep 2020 08:09:11 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:b20a:b600:521c:512d? ([2001:b07:6468:f312:b20a:b600:521c:512d])
+        by smtp.gmail.com with ESMTPSA id f14sm11401536wme.22.2020.09.19.08.09.10
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 19 Sep 2020 08:09:10 -0700 (PDT)
+Subject: Re: [PATCH v4 2/2] KVM: nSVM: implement ondemand allocation of the
+ nested state
+To:     Sean Christopherson <sean.j.christopherson@intel.com>,
+        Maxim Levitsky <mlevitsk@redhat.com>
+Cc:     kvm@vger.kernel.org, Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Ingo Molnar <mingo@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Borislav Petkov <bp@alien8.de>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
+        linux-kernel@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>
+References: <20200917101048.739691-1-mlevitsk@redhat.com>
+ <20200917101048.739691-3-mlevitsk@redhat.com>
+ <20200917162942.GE13522@sjchrist-ice>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <d9c0d190-c6ea-2e21-92ca-2a53efb86a1d@redhat.com>
+Date:   Sat, 19 Sep 2020 17:09:09 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"; format=flowed
+In-Reply-To: <20200917162942.GE13522@sjchrist-ice>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.174.185.226]
-X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi folks,
+On 17/09/20 18:29, Sean Christopherson wrote:
+>> +				vcpu->arch.efer = old_efer;
+>> +				kvm_make_request(KVM_REQ_OUT_OF_MEMORY, vcpu);
+> I really dislike KVM_REQ_OUT_OF_MEMORY.  It's redundant with -ENOMEM and
+> creates a huge discrepancy with respect to existing code, e.g. nVMX returns
+> -ENOMEM in a similar situation.
 
-I had booted a guest with an assigned virtual function, with GICv4
-(direct MSI injection) enabled on my arm64 server. I got the following
-QEMU error message on its shutdown:
+Maxim, your previous version was adding some error handling to
+kvm_x86_ops.set_efer.  I don't remember what was the issue; did you have
+any problems propagating all the errors up to KVM_SET_SREGS (easy),
+kvm_set_msr (harder) etc.?
 
-"qemu-system-aarch64: KVM_SET_DEVICE_ATTR failed: Group 4 attr 
-0x0000000000000001: Permission denied"
+Paolo
 
-The problem is that the KVM_DEV_ARM_ITS_SAVE_TABLES ioctl failed while
-stopping the VM.
-
-As for the kernel side, it turned out that an LPI with irq->hw=true was
-observed while saving ITT for the device. KVM simply failed the save
-operation by returning -EACCES to user-space. The reason is explained in
-the comment block of vgic_its_save_itt(), though I think the HW bit
-should actually be checked in the KVM_DEV_ARM_VGIC_SAVE_PENDING_TABLES
-ioctl rather than in the ITT saving, well, it isn't much related to this
-problem...
-
-I had noticed that some vectors had been masked by guest VF-driver on
-shutdown, the correspond VLPIs had therefore been unmapped and irq->hw
-was cleared. But some other vectors were un-handled. I *guess* that VFIO
-released these vectors *after* the KVM_DEV_ARM_ITS_SAVE_TABLES ioctl so
-that we end-up trying to save the VLPI's state.
-
-It may not be a big problem as the guest is going to shutdown anyway and
-the whole guest save/restore on the GICv4.x system is not supported for
-the time being... I'll look at how VFIO would release these vectors but
-post it early in case this is an already known issue (and this might be
-one thing need to be considered if one wants to implement migration on
-the GICv4.x system).
-
-
-Thanks,
-Zenghui
