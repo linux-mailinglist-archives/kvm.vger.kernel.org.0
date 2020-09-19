@@ -2,95 +2,104 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7E1E4270B63
-	for <lists+kvm@lfdr.de>; Sat, 19 Sep 2020 09:22:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EAB6F270C2A
+	for <lists+kvm@lfdr.de>; Sat, 19 Sep 2020 11:18:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726192AbgISHVS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 19 Sep 2020 03:21:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42234 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726054AbgISHVS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 19 Sep 2020 03:21:18 -0400
-Received: from mail-pf1-x442.google.com (mail-pf1-x442.google.com [IPv6:2607:f8b0:4864:20::442])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F3B64C0613CE;
-        Sat, 19 Sep 2020 00:21:17 -0700 (PDT)
-Received: by mail-pf1-x442.google.com with SMTP id x123so4914556pfc.7;
-        Sat, 19 Sep 2020 00:21:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=4kK+jQKJbbHZJYLj3SecCh6+KVR55OeofhrlQ+EkZss=;
-        b=GA753YAh76vWLQcwOFASJ9BZ7g+zdnQQoMVOQrXZHs/C0Eg4PK6Umrp1ADlo2Vq89g
-         D4Gaa9BGT8T4xTkFUfijllWjJYWyqAW2+U1Cx/J+qeY3Wa1TisVzMbKTY2l7eUSesexs
-         /1iaKaWSLblxm1K6q/DHu0SvVeAJ0DWgXVB6CPQHwy/5wG6AL2CFSR0/PKg0/bgUJYG/
-         1C0T9jynyBItTyggRzDH4+argbTS/ceQpfAyWXfSQCtGn/YQW9QftQgGR+gUpCIu7/6Q
-         ubCSL++9Zmy5f0v51LySeuxHPyqfnh0s66G48yJ2rnAdbnlVNsFNg4Evs3g11puSjaeI
-         JUXw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=4kK+jQKJbbHZJYLj3SecCh6+KVR55OeofhrlQ+EkZss=;
-        b=QRZ6g/N7FpXOv6fIkXgVtOzZWOBdqVGT+EqllpEdbBmftzhZsx8lOJxW/1KkEJJ44Q
-         brHN2TJ9qBeAIMBlZneko427NJLr5brCDJfI+lqttjCqsWR3GAeexuamTTft7arrJFRO
-         Bf5DhqO607pCgd6fnqUmhFJdOgrzGFb/pONBos9bU0cHaTfzwUM2uoD0oHQkvjVY2/u5
-         OXlsESPZMHuPVmkqQKG6G5nXAjy3JVIlnZdYZSat/jJn/h+xvlAmYkmuW7Ugu2Svk+l6
-         pvsSvjLnEepsmW1du2Mvhg7JZeF0bi7uQiUKew84hE2+1U2kUKo9lCC5mVI287KODd/A
-         EZlA==
-X-Gm-Message-State: AOAM5332Veuc7FwxIsRCPYeu122EygVR4XIO6NJzHaO3l6QxvIklkoWd
-        +Z8cd/YUOTSnfXCfsPmSOvE=
-X-Google-Smtp-Source: ABdhPJxmZXahfmIqaEqkFnTtyceIDfSg3X1q7TQ60WFIuTxrN5r9F3pocJ2zeq108Wum7M+297Id8Q==
-X-Received: by 2002:a62:5586:0:b029:13e:d13d:a12c with SMTP id j128-20020a6255860000b029013ed13da12cmr34972311pfb.20.1600500077185;
-        Sat, 19 Sep 2020 00:21:17 -0700 (PDT)
-Received: from localhost.localdomain (104.36.148.139.aurocloud.com. [104.36.148.139])
-        by smtp.gmail.com with ESMTPSA id ge12sm4713261pjb.26.2020.09.19.00.21.13
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 19 Sep 2020 00:21:16 -0700 (PDT)
-From:   Rustam Kovhaev <rkovhaev@gmail.com>
-To:     pbonzini@redhat.com, vkuznets@redhat.com, gustavoars@kernel.org,
-        kvm@vger.kernel.org
-Cc:     linux-kernel@vger.kernel.org, gregkh@linuxfoundation.org,
-        Rustam Kovhaev <rkovhaev@gmail.com>
-Subject: [RESEND PATCH] KVM: use struct_size() and flex_array_size() helpers in kvm_io_bus_unregister_dev()
-Date:   Sat, 19 Sep 2020 00:21:55 -0700
-Message-Id: <20200919072155.1195714-1-rkovhaev@gmail.com>
-X-Mailer: git-send-email 2.28.0
+        id S1726192AbgISJSl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 19 Sep 2020 05:18:41 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:31680 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726249AbgISJSl (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Sat, 19 Sep 2020 05:18:41 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1600507119;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=lfetqzo7kRPYXW7uWXLArRB8xjwWDZKQ4lA60FHitpQ=;
+        b=dqyNSFSCLpCSdTjYGHFltmfWpp3RuS9F29helxE0/HzAk9SZ4PCatxIOlgO1twv8thYAVA
+        Vv2EgEMqrEL0O+PWtv18V8sa4SRIiNePR5KEEdgTqBtiyrNkVKzyBdB11OH+ytODGYrIkI
+        YWbbkTYCp179KSSdZdqOWJnQUNa3xPQ=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-151-AhdzIlUmO1e7TAKsLd7wUQ-1; Sat, 19 Sep 2020 05:18:36 -0400
+X-MC-Unique: AhdzIlUmO1e7TAKsLd7wUQ-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4F5801891E81;
+        Sat, 19 Sep 2020 09:18:34 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-112-63.ams2.redhat.com [10.36.112.63])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 9D5DD55771;
+        Sat, 19 Sep 2020 09:18:31 +0000 (UTC)
+Subject: Re: [PATCH] KVM: MIPS: Change the definition of kvm type
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Huacai Chen <chenhc@lemote.com>,
+        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Cc:     kvm@vger.kernel.org, linux-mips@vger.kernel.org,
+        Fuxin Zhang <zhangfx@lemote.com>,
+        Huacai Chen <chenhuacai@gmail.com>,
+        Jiaxun Yang <jiaxun.yang@flygoat.com>, stable@vger.kernel.org
+References: <1599734031-28746-1-git-send-email-chenhc@lemote.com>
+ <45a71ce2-42d2-ba49-72a3-155dacede289@redhat.com>
+From:   Thomas Huth <thuth@redhat.com>
+Message-ID: <dc709e46-1daf-98f2-8eb1-436096bb3274@redhat.com>
+Date:   Sat, 19 Sep 2020 11:18:30 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
+In-Reply-To: <45a71ce2-42d2-ba49-72a3-155dacede289@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Make use of the struct_size() helper to avoid any potential type
-mistakes and protect against potential integer overflows
-Make use of the flex_array_size() helper to calculate the size of a
-flexible array member within an enclosing structure
+On 11/09/2020 19.22, Paolo Bonzini wrote:
+> On 10/09/20 12:33, Huacai Chen wrote:
+>> MIPS defines two kvm types:
+>>
+>>  #define KVM_VM_MIPS_TE          0
+>>  #define KVM_VM_MIPS_VZ          1
+>>
+>> In Documentation/virt/kvm/api.rst it is said that "You probably want to
+>> use 0 as machine type", which implies that type 0 be the "automatic" or
+>> "default" type. And, in user-space libvirt use the null-machine (with
+>> type 0) to detect the kvm capability, which returns "KVM not supported"
+>> on a VZ platform.
+>>
+>> I try to fix it in QEMU but it is ugly:
+>> https://lists.nongnu.org/archive/html/qemu-devel/2020-08/msg05629.html
+>>
+>> And Thomas Huth suggests me to change the definition of kvm type:
+>> https://lists.nongnu.org/archive/html/qemu-devel/2020-09/msg03281.html
+>>
+>> So I define like this:
+>>
+>>  #define KVM_VM_MIPS_AUTO        0
+>>  #define KVM_VM_MIPS_VZ          1
+>>  #define KVM_VM_MIPS_TE          2
+>>
+>> Since VZ and TE cannot co-exists, using type 0 on a TE platform will
+>> still return success (so old user-space tools have no problems on new
+>> kernels); the advantage is that using type 0 on a VZ platform will not
+>> return failure. So, the only problem is "new user-space tools use type
+>> 2 on old kernels", but if we treat this as a kernel bug, we can backport
+>> this patch to old stable kernels.
+> 
+> I'm a bit wary to do that.  However it's not an issue for QEMU since it
+> generally updates the kernel headers.
 
-Suggested-by: Gustavo A. R. Silva <gustavoars@kernel.org>
-Signed-off-by: Rustam Kovhaev <rkovhaev@gmail.com>
-Reviewed-by: Gustavo A. R. Silva <gustavoars@kernel.org>
----
- virt/kvm/kvm_main.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+Are there any other userspace programs beside QEMU that use KVM on MIPS?
+If there aren't any other serious userspace programs, I think we should
+go ahead with this patch here. Otherwise, what are the other programs
+that could be affected?
 
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index cf88233b819a..68edd25dcb11 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -4350,10 +4350,10 @@ void kvm_io_bus_unregister_dev(struct kvm *kvm, enum kvm_bus bus_idx,
- 	new_bus = kmalloc(struct_size(bus, range, bus->dev_count - 1),
- 			  GFP_KERNEL_ACCOUNT);
- 	if (new_bus) {
--		memcpy(new_bus, bus, sizeof(*bus) + i * sizeof(struct kvm_io_range));
-+		memcpy(new_bus, bus, struct_size(bus, range, i));
- 		new_bus->dev_count--;
- 		memcpy(new_bus->range + i, bus->range + i + 1,
--		       (new_bus->dev_count - i) * sizeof(struct kvm_io_range));
-+				flex_array_size(new_bus, range, new_bus->dev_count - i));
- 	} else {
- 		pr_err("kvm: failed to shrink bus, removing it completely\n");
- 		for (j = 0; j < bus->dev_count; j++) {
--- 
-2.28.0
+ Thomas
+
 
