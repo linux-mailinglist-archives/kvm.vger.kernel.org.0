@@ -2,115 +2,95 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3805C270A1C
-	for <lists+kvm@lfdr.de>; Sat, 19 Sep 2020 04:40:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7E1E4270B63
+	for <lists+kvm@lfdr.de>; Sat, 19 Sep 2020 09:22:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726200AbgISCkC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 18 Sep 2020 22:40:02 -0400
-Received: from szxga04-in.huawei.com ([45.249.212.190]:13317 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726054AbgISCkC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 18 Sep 2020 22:40:02 -0400
-Received: from DGGEMS403-HUB.china.huawei.com (unknown [172.30.72.59])
-        by Forcepoint Email with ESMTP id 076EFCC9CB3F25A70EFE;
-        Sat, 19 Sep 2020 10:40:01 +0800 (CST)
-Received: from [10.174.185.226] (10.174.185.226) by
- DGGEMS403-HUB.china.huawei.com (10.3.19.203) with Microsoft SMTP Server id
- 14.3.487.0; Sat, 19 Sep 2020 10:39:55 +0800
-Subject: Re: [PATCH 2/2] vfio/pci: Remove bardirty from vfio_pci_device
-To:     Alex Williamson <alex.williamson@redhat.com>
-CC:     Cornelia Huck <cohuck@redhat.com>, <kvm@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <wanghaibin.wang@huawei.com>
-References: <20200917033128.872-1-yuzenghui@huawei.com>
- <20200917033128.872-2-yuzenghui@huawei.com>
- <20200917133537.17af2ef3.cohuck@redhat.com> <20200917160742.4e4d6efd@x1.home>
- <3b5214f9-9e17-2bcd-1b92-57bacc1c1b31@huawei.com>
- <20200918201128.16cf0a1c@x1.home>
-From:   Zenghui Yu <yuzenghui@huawei.com>
-Message-ID: <254ac8bf-e912-0d01-0295-8bb54f7a88bf@huawei.com>
-Date:   Sat, 19 Sep 2020 10:39:55 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.9.0
+        id S1726192AbgISHVS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 19 Sep 2020 03:21:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42234 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726054AbgISHVS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 19 Sep 2020 03:21:18 -0400
+Received: from mail-pf1-x442.google.com (mail-pf1-x442.google.com [IPv6:2607:f8b0:4864:20::442])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F3B64C0613CE;
+        Sat, 19 Sep 2020 00:21:17 -0700 (PDT)
+Received: by mail-pf1-x442.google.com with SMTP id x123so4914556pfc.7;
+        Sat, 19 Sep 2020 00:21:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=4kK+jQKJbbHZJYLj3SecCh6+KVR55OeofhrlQ+EkZss=;
+        b=GA753YAh76vWLQcwOFASJ9BZ7g+zdnQQoMVOQrXZHs/C0Eg4PK6Umrp1ADlo2Vq89g
+         D4Gaa9BGT8T4xTkFUfijllWjJYWyqAW2+U1Cx/J+qeY3Wa1TisVzMbKTY2l7eUSesexs
+         /1iaKaWSLblxm1K6q/DHu0SvVeAJ0DWgXVB6CPQHwy/5wG6AL2CFSR0/PKg0/bgUJYG/
+         1C0T9jynyBItTyggRzDH4+argbTS/ceQpfAyWXfSQCtGn/YQW9QftQgGR+gUpCIu7/6Q
+         ubCSL++9Zmy5f0v51LySeuxHPyqfnh0s66G48yJ2rnAdbnlVNsFNg4Evs3g11puSjaeI
+         JUXw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=4kK+jQKJbbHZJYLj3SecCh6+KVR55OeofhrlQ+EkZss=;
+        b=QRZ6g/N7FpXOv6fIkXgVtOzZWOBdqVGT+EqllpEdbBmftzhZsx8lOJxW/1KkEJJ44Q
+         brHN2TJ9qBeAIMBlZneko427NJLr5brCDJfI+lqttjCqsWR3GAeexuamTTft7arrJFRO
+         Bf5DhqO607pCgd6fnqUmhFJdOgrzGFb/pONBos9bU0cHaTfzwUM2uoD0oHQkvjVY2/u5
+         OXlsESPZMHuPVmkqQKG6G5nXAjy3JVIlnZdYZSat/jJn/h+xvlAmYkmuW7Ugu2Svk+l6
+         pvsSvjLnEepsmW1du2Mvhg7JZeF0bi7uQiUKew84hE2+1U2kUKo9lCC5mVI287KODd/A
+         EZlA==
+X-Gm-Message-State: AOAM5332Veuc7FwxIsRCPYeu122EygVR4XIO6NJzHaO3l6QxvIklkoWd
+        +Z8cd/YUOTSnfXCfsPmSOvE=
+X-Google-Smtp-Source: ABdhPJxmZXahfmIqaEqkFnTtyceIDfSg3X1q7TQ60WFIuTxrN5r9F3pocJ2zeq108Wum7M+297Id8Q==
+X-Received: by 2002:a62:5586:0:b029:13e:d13d:a12c with SMTP id j128-20020a6255860000b029013ed13da12cmr34972311pfb.20.1600500077185;
+        Sat, 19 Sep 2020 00:21:17 -0700 (PDT)
+Received: from localhost.localdomain (104.36.148.139.aurocloud.com. [104.36.148.139])
+        by smtp.gmail.com with ESMTPSA id ge12sm4713261pjb.26.2020.09.19.00.21.13
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 19 Sep 2020 00:21:16 -0700 (PDT)
+From:   Rustam Kovhaev <rkovhaev@gmail.com>
+To:     pbonzini@redhat.com, vkuznets@redhat.com, gustavoars@kernel.org,
+        kvm@vger.kernel.org
+Cc:     linux-kernel@vger.kernel.org, gregkh@linuxfoundation.org,
+        Rustam Kovhaev <rkovhaev@gmail.com>
+Subject: [RESEND PATCH] KVM: use struct_size() and flex_array_size() helpers in kvm_io_bus_unregister_dev()
+Date:   Sat, 19 Sep 2020 00:21:55 -0700
+Message-Id: <20200919072155.1195714-1-rkovhaev@gmail.com>
+X-Mailer: git-send-email 2.28.0
 MIME-Version: 1.0
-In-Reply-To: <20200918201128.16cf0a1c@x1.home>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.174.185.226]
-X-CFilter-Loop: Reflected
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2020/9/19 10:11, Alex Williamson wrote:
-> On Sat, 19 Sep 2020 09:54:00 +0800
-> Zenghui Yu <yuzenghui@huawei.com> wrote:
-> 
->> Hi Alex,
->>
->> On 2020/9/18 6:07, Alex Williamson wrote:
->>> On Thu, 17 Sep 2020 13:35:37 +0200
->>> Cornelia Huck <cohuck@redhat.com> wrote:
->>>    
->>>> On Thu, 17 Sep 2020 11:31:28 +0800
->>>> Zenghui Yu <yuzenghui@huawei.com> wrote:
->>>>   
->>>>> It isn't clear what purpose the @bardirty serves. It might be used to avoid
->>>>> the unnecessary vfio_bar_fixup() invoking on a user-space BAR read, which
->>>>> is not required when bardirty is unset.
->>>>>
->>>>> The variable was introduced in commit 89e1f7d4c66d ("vfio: Add PCI device
->>>>> driver") but never actually used, so it shouldn't be that important. Remove
->>>>> it.
->>>>>
->>>>> Signed-off-by: Zenghui Yu <yuzenghui@huawei.com>
->>>>> ---
->>>>>    drivers/vfio/pci/vfio_pci_config.c  | 7 -------
->>>>>    drivers/vfio/pci/vfio_pci_private.h | 1 -
->>>>>    2 files changed, 8 deletions(-)
->>>>
->>>> Yes, it seems to have been write-only all the time.
->>>
->>> I suspect the intent was that vfio_bar_fixup() could test
->>> vdev->bardirty to avoid doing work if no BARs had been written since
->>> they were last read.  As it is now we regenerate vconfig for all the
->>> BARs every time any offset of any of them are read.  BARs aren't
->>> re-read regularly and config space is not a performance path,
->>
->> Yes, it seems that Qemu itself emulates all BAR registers and will read
->> the BAR from the kernel side only at initialization time.
->>
->>> but maybe
->>> we should instead test if we see any regressions from returning without
->>> doing any work in vfio_bar_fixup() if vdev->bardirty is false.  Thanks,
->>
->> I will test it with the following diff. Please let me know which way do
->> you prefer.
->>
->> diff --git a/drivers/vfio/pci/vfio_pci_config.c
->> b/drivers/vfio/pci/vfio_pci_config.c
->> index d98843feddce..77c419d536d0 100644
->> --- a/drivers/vfio/pci/vfio_pci_config.c
->> +++ b/drivers/vfio/pci/vfio_pci_config.c
->> @@ -515,7 +515,7 @@ static int vfio_basic_config_read(struct
->> vfio_pci_device *vdev, int pos,
->>                                     int count, struct perm_bits *perm,
->>                                     int offset, __le32 *val)
->>    {
->> -       if (is_bar(offset)) /* pos == offset for basic config */
->> +       if (is_bar(offset) && vdev->bardirty) /* pos == offset for basic
->> config */
->>                   vfio_bar_fixup(vdev);
->>
->>           count = vfio_default_config_read(vdev, pos, count, perm,
->> offset, val);
-> 
-> 
-> There's only one caller currently, but I'd think it cleaner to put this
-> in vfio_bar_fixup(), ie. return immediately if !bardirty.  Thanks,
+Make use of the struct_size() helper to avoid any potential type
+mistakes and protect against potential integer overflows
+Make use of the flex_array_size() helper to calculate the size of a
+flexible array member within an enclosing structure
 
-OK, I'll do that in the v2.
+Suggested-by: Gustavo A. R. Silva <gustavoars@kernel.org>
+Signed-off-by: Rustam Kovhaev <rkovhaev@gmail.com>
+Reviewed-by: Gustavo A. R. Silva <gustavoars@kernel.org>
+---
+ virt/kvm/kvm_main.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index cf88233b819a..68edd25dcb11 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -4350,10 +4350,10 @@ void kvm_io_bus_unregister_dev(struct kvm *kvm, enum kvm_bus bus_idx,
+ 	new_bus = kmalloc(struct_size(bus, range, bus->dev_count - 1),
+ 			  GFP_KERNEL_ACCOUNT);
+ 	if (new_bus) {
+-		memcpy(new_bus, bus, sizeof(*bus) + i * sizeof(struct kvm_io_range));
++		memcpy(new_bus, bus, struct_size(bus, range, i));
+ 		new_bus->dev_count--;
+ 		memcpy(new_bus->range + i, bus->range + i + 1,
+-		       (new_bus->dev_count - i) * sizeof(struct kvm_io_range));
++				flex_array_size(new_bus, range, new_bus->dev_count - i));
+ 	} else {
+ 		pr_err("kvm: failed to shrink bus, removing it completely\n");
+ 		for (j = 0; j < bus->dev_count; j++) {
+-- 
+2.28.0
 
-Thanks,
-Zenghui
