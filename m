@@ -2,21 +2,21 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E77702712EB
-	for <lists+kvm@lfdr.de>; Sun, 20 Sep 2020 10:38:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7A46C2712EF
+	for <lists+kvm@lfdr.de>; Sun, 20 Sep 2020 10:39:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726326AbgITIiT convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Sun, 20 Sep 2020 04:38:19 -0400
-Received: from mail.kernel.org ([198.145.29.99]:46466 "EHLO mail.kernel.org"
+        id S1726315AbgITIje convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Sun, 20 Sep 2020 04:39:34 -0400
+Received: from mail.kernel.org ([198.145.29.99]:47134 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726262AbgITIiT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 20 Sep 2020 04:38:19 -0400
+        id S1726262AbgITIje (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 20 Sep 2020 04:39:34 -0400
 From:   bugzilla-daemon@bugzilla.kernel.org
 Authentication-Results: mail.kernel.org; dkim=permerror (bad message/signature format)
 To:     kvm@vger.kernel.org
 Subject: [Bug 209333] VM not starting anymore with 5.8.8 - lots of page
  faults
-Date:   Sun, 20 Sep 2020 08:38:18 +0000
+Date:   Sun, 20 Sep 2020 08:39:34 +0000
 X-Bugzilla-Reason: None
 X-Bugzilla-Type: changed
 X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
@@ -31,8 +31,8 @@ X-Bugzilla-Resolution:
 X-Bugzilla-Priority: P1
 X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
 X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: component version product
-Message-ID: <bug-209333-28872-RQgq1xvn9r@https.bugzilla.kernel.org/>
+X-Bugzilla-Changed-Fields: rep_platform
+Message-ID: <bug-209333-28872-tFQDNO3KBX@https.bugzilla.kernel.org/>
 In-Reply-To: <bug-209333-28872@https.bugzilla.kernel.org/>
 References: <bug-209333-28872@https.bugzilla.kernel.org/>
 Content-Type: text/plain; charset="UTF-8"
@@ -50,9 +50,7 @@ Martin Schrodt (kernel@martin.schrodt.org) changed:
 
            What    |Removed                     |Added
 ----------------------------------------------------------------------------
-          Component|kvm                         |IOMMU
-            Version|unspecified                 |2.5
-            Product|Virtualization              |Drivers
+           Hardware|All                         |Intel
 
 -- 
 You are receiving this mail because:
