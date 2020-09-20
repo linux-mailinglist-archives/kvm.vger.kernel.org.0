@@ -2,33 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BD5002715A0
-	for <lists+kvm@lfdr.de>; Sun, 20 Sep 2020 18:16:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6E068271602
+	for <lists+kvm@lfdr.de>; Sun, 20 Sep 2020 18:42:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726360AbgITQQE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 20 Sep 2020 12:16:04 -0400
-Received: from mga02.intel.com ([134.134.136.20]:34883 "EHLO mga02.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726311AbgITQQD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 20 Sep 2020 12:16:03 -0400
-IronPort-SDR: Z/btV2oIZEGEE4OQBmo0xIMclj5hatdZqETj6rkChzv1weMYldD50leviV/xs7ANQWDPZohkAK
- vcowZdJMwHcQ==
-X-IronPort-AV: E=McAfee;i="6000,8403,9750"; a="147907847"
-X-IronPort-AV: E=Sophos;i="5.77,283,1596524400"; 
-   d="scan'208";a="147907847"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Sep 2020 09:16:03 -0700
-IronPort-SDR: 2OiPkCNNx5PxzODqcuEyjmlGwl+i9mA/YoOKObe+NWpf6W3Imv6Rv9aqis8zuAINJgB2P3Fa99
- forf2oD8sLNA==
-X-IronPort-AV: E=Sophos;i="5.77,283,1596524400"; 
-   d="scan'208";a="453615387"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.160])
-  by orsmga004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Sep 2020 09:16:03 -0700
-Date:   Sun, 20 Sep 2020 09:16:02 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
+        id S1726381AbgITQmp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 20 Sep 2020 12:42:45 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:55099 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726305AbgITQmp (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Sun, 20 Sep 2020 12:42:45 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1600620163;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=PQOc5ISffTaehBEuI30FdkiWsdsuqhPzKjSDj5gslrU=;
+        b=cnVAF+a7ERkRfDwimCNrUdJeFTbO3ZRbBWlXKGmiI9kvYeR525V9CGOvMY4/3a+jP5MW1L
+        zu8QOeEi2CjyQDk+hi7rsD/PqfLVusTTFl5jzBcRgtgW3B7SOvNwEz1ptfX7TZR57LQKIs
+        BTt0IJY6OJhhm908FCkNvu6HRb+bwG4=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-248-ASTszgulMt2JHTUNfOp2Qw-1; Sun, 20 Sep 2020 12:42:41 -0400
+X-MC-Unique: ASTszgulMt2JHTUNfOp2Qw-1
+Received: by mail-wr1-f71.google.com with SMTP id h4so4779177wrb.4
+        for <kvm@vger.kernel.org>; Sun, 20 Sep 2020 09:42:41 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=PQOc5ISffTaehBEuI30FdkiWsdsuqhPzKjSDj5gslrU=;
+        b=PytZdU0u9Y8Ei6Eolp9qzY666aK7sv4oVkTvCPlYCBeWOfIdQqeu8gmg8fy4fm1sKH
+         O29L1TdRqyZjmno9fJIBNE3sKO7v+kUnLSiF+rBdYwVCXCeP9tMjlc20llGQ/+1uXLcz
+         gqKLcsNwNdbPGqrwNqjDO+c+yHU3B701Y3I/m0ZVUqFr75SI1F9+E2qk7pg4k8rAKSYM
+         hV7UOB7n6DEG/CbPx0qbDHjFgupk6SbWXH0eY9ClJ5hoDV8bFlGt9PstiEcqR8OGB2BH
+         1Snpj55v97VEbhC/PBPBaueoi8ZEuiAJ/RSDJGPh5u2ws7h4k7nt4fRdf4pGm3eTTVpF
+         q9gA==
+X-Gm-Message-State: AOAM530Lc3V5RzaVSDzxPP2BDaMSpXblDfe0/xl4sPyNMg4QJdQ2PwZX
+        otPhQgSy7wsfTbKWvQyCJkaycsM3DIbZqc4xicPwwGcnruTmkwT4v/TLqV7GxlYGWOH2tVfc09d
+        di4QghtEI2Bl1
+X-Received: by 2002:a7b:c103:: with SMTP id w3mr24627955wmi.24.1600620160110;
+        Sun, 20 Sep 2020 09:42:40 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxcpPDRWHYVnQLTNMlhC8LLSjhM1SI6varUE6ZPjuPraMsccbvNnrlSEoYpg8wkw0TCEmrNbg==
+X-Received: by 2002:a7b:c103:: with SMTP id w3mr24627934wmi.24.1600620159827;
+        Sun, 20 Sep 2020 09:42:39 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:d107:d3ba:83ae:307e? ([2001:b07:6468:f312:d107:d3ba:83ae:307e])
+        by smtp.gmail.com with ESMTPSA id l10sm14977264wru.59.2020.09.20.09.42.38
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 20 Sep 2020 09:42:39 -0700 (PDT)
+Subject: Re: [PATCH v4 2/2] KVM: nSVM: implement ondemand allocation of the
+ nested state
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
 Cc:     Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Ingo Molnar <mingo@redhat.com>,
@@ -38,44 +63,44 @@ Cc:     Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org,
         Joerg Roedel <joro@8bytes.org>,
         "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
         linux-kernel@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>
-Subject: Re: [PATCH v4 2/2] KVM: nSVM: implement ondemand allocation of the
- nested state
-Message-ID: <20200920161602.GA17325@linux.intel.com>
 References: <20200917101048.739691-1-mlevitsk@redhat.com>
  <20200917101048.739691-3-mlevitsk@redhat.com>
  <20200917162942.GE13522@sjchrist-ice>
  <d9c0d190-c6ea-2e21-92ca-2a53efb86a1d@redhat.com>
+ <20200920161602.GA17325@linux.intel.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <c35cbaca-2c34-cd93-b589-d4ab782fc754@redhat.com>
+Date:   Sun, 20 Sep 2020 18:42:37 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <d9c0d190-c6ea-2e21-92ca-2a53efb86a1d@redhat.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+In-Reply-To: <20200920161602.GA17325@linux.intel.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, Sep 19, 2020 at 05:09:09PM +0200, Paolo Bonzini wrote:
-> On 17/09/20 18:29, Sean Christopherson wrote:
-> >> +				vcpu->arch.efer = old_efer;
-> >> +				kvm_make_request(KVM_REQ_OUT_OF_MEMORY, vcpu);
-> > I really dislike KVM_REQ_OUT_OF_MEMORY.  It's redundant with -ENOMEM and
-> > creates a huge discrepancy with respect to existing code, e.g. nVMX returns
-> > -ENOMEM in a similar situation.
-> 
-> Maxim, your previous version was adding some error handling to
-> kvm_x86_ops.set_efer.  I don't remember what was the issue; did you have
-> any problems propagating all the errors up to KVM_SET_SREGS (easy),
-> kvm_set_msr (harder) etc.?
+On 20/09/20 18:16, Sean Christopherson wrote:
+>> Maxim, your previous version was adding some error handling to
+>> kvm_x86_ops.set_efer.  I don't remember what was the issue; did you have
+>> any problems propagating all the errors up to KVM_SET_SREGS (easy),
+>> kvm_set_msr (harder) etc.?
+> I objected to letting .set_efer() return a fault.
 
-I objected to letting .set_efer() return a fault.  A relatively minor issue is
-the code in vmx_set_efer() that handles lack of EFER because technically KVM
-can emulate EFER.SCE+SYSCALL without supporting EFER in hardware.  Returning
-success/'0' would avoid that particular issue.  My primary concern is that I'd
-prefer not to add another case where KVM can potentially ignore a fault
-indicated by a helper, a la vmx_set_cr4().
+So did I, and that's why we get KVM_REQ_OUT_OF_MEMORY.  But it was more
+of an "it's ugly and it ought not to fail" thing than something I could
+pinpoint.
 
-To that end, I'd be ok with adding error handling to .set_efer() if KVM
-enforces, via WARN in one of the .set_efer() call sites, that SVM/VMX can only
-return negative error codes, i.e. let SVM handle the -ENOMEM case but disallow
-fault injection.  It doesn't actually change anything, but it'd give me a warm
-fuzzy feeling.
+It looks like we agree, but still we have to choose the lesser evil?
+
+Paolo
+
+> A relatively minor issue is
+> the code in vmx_set_efer() that handles lack of EFER because technically KVM
+> can emulate EFER.SCE+SYSCALL without supporting EFER in hardware.  Returning
+> success/'0' would avoid that particular issue.  My primary concern is that I'd
+> prefer not to add another case where KVM can potentially ignore a fault
+> indicated by a helper, a la vmx_set_cr4().
+
