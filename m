@@ -2,95 +2,80 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 95C1B271470
-	for <lists+kvm@lfdr.de>; Sun, 20 Sep 2020 15:16:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BD5002715A0
+	for <lists+kvm@lfdr.de>; Sun, 20 Sep 2020 18:16:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726406AbgITNQV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 20 Sep 2020 09:16:21 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:31384 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726380AbgITNQV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 20 Sep 2020 09:16:21 -0400
-X-Greylist: delayed 396 seconds by postgrey-1.27 at vger.kernel.org; Sun, 20 Sep 2020 09:16:20 EDT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1600607780;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=2V15ZxenVAjPKeDIDqr8ZmFP4OT+OuHu0OvG5XzUocc=;
-        b=PKXhxT2M3Z5NtSwCB7VamA8fA9g71AT0pMutgFvPOGhKUe8MDZHaADE6iKbJx7os+hnoFI
-        tSdR5u8ZcOwMF1MQUVNu1nsgDjEZsFxdsRbwC9O2ZzltDSDVaRy/0GCqp1liQ05p4LlgIb
-        RVXlw7BceLDo+1hBYsEanRY5aWvOBvM=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-458-by1IJmrXN8yqDXwjU2Cf5w-1; Sun, 20 Sep 2020 09:16:18 -0400
-X-MC-Unique: by1IJmrXN8yqDXwjU2Cf5w-1
-Received: by mail-wr1-f70.google.com with SMTP id s8so4572225wrb.15
-        for <kvm@vger.kernel.org>; Sun, 20 Sep 2020 06:16:17 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=2V15ZxenVAjPKeDIDqr8ZmFP4OT+OuHu0OvG5XzUocc=;
-        b=G86FfvQRssMJ/iben52qzKfIqw9AYtJp4j3bRPzeep9BfeKXOkVywCQ2+Zq/5slfT5
-         mQ4jgxKZHGOipS/TyHBz5XqG4P0ojCYFcWbvSY8M2Q8uQMQCZGvqJGeLl5vCJPHuRU5b
-         faDihUr5+EulRtAQ1TWjknBy3XAnV5hDBbm7TmMCH0UMqniuA2e2ZfvfOsQeomsSl3YG
-         jFON/cSMzSJ9CMcv93Pn8QN9q6N/0uY1eOWaDMhKNXzPD62Ltr/Yuv7h8W/vv0WAn7PI
-         UI5lEdqBw4k9qXudHrUdSZCrZ/ZYZ13c38IgaSgYPQqPw8M9BiDpQXBrDTlyZv7WPiwW
-         wHYA==
-X-Gm-Message-State: AOAM532VhWOcBp+okOT0+RKOPEyOvFqPYMJNyOfcRwaRQFLLFsoVuIrN
-        PIURnERkGd51elGIU8YoiFiLSjMhQz22aj58CLb8MnjqUGdY0lgeChRmMyi2bCYdAcQaceZJNwR
-        WgAJHZgaPYqTh
-X-Received: by 2002:adf:fd01:: with SMTP id e1mr44636090wrr.44.1600607776769;
-        Sun, 20 Sep 2020 06:16:16 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxGGTEHw/0rbsJt+G5fIJCQ6uEXtHxv2bG0np9KdCndDi4JTg2CnriFtDQLR39C+C5bSERRtQ==
-X-Received: by 2002:adf:fd01:: with SMTP id e1mr44636079wrr.44.1600607776602;
-        Sun, 20 Sep 2020 06:16:16 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:458b:b280:cf0:4acf? ([2001:b07:6468:f312:458b:b280:cf0:4acf])
-        by smtp.gmail.com with ESMTPSA id y1sm14589029wmi.36.2020.09.20.06.16.15
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 20 Sep 2020 06:16:16 -0700 (PDT)
-Subject: Re: [kvm-unit-tests GIT PULL 0/3] s390x skrf and ultravisor patches
-To:     Thomas Huth <thuth@redhat.com>,
-        Janosch Frank <frankja@linux.ibm.com>
-Cc:     kvm@vger.kernel.org, frankja@linux.vnet.ibm.com, david@redhat.com,
-        borntraeger@de.ibm.com, cohuck@redhat.com,
-        linux-s390@vger.kernel.org, imbrenda@linux.ibm.com
-References: <20200901091823.14477-1-frankja@linux.ibm.com>
- <34c80837-208f-bb29-cb0b-b9029fdad29d@redhat.com>
- <71b38000-70ee-f45a-b80d-95f42dbcc497@redhat.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <0c48075c-a922-6155-ff59-8ffa100cd209@redhat.com>
-Date:   Sun, 20 Sep 2020 15:16:15 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+        id S1726360AbgITQQE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 20 Sep 2020 12:16:04 -0400
+Received: from mga02.intel.com ([134.134.136.20]:34883 "EHLO mga02.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726311AbgITQQD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 20 Sep 2020 12:16:03 -0400
+IronPort-SDR: Z/btV2oIZEGEE4OQBmo0xIMclj5hatdZqETj6rkChzv1weMYldD50leviV/xs7ANQWDPZohkAK
+ vcowZdJMwHcQ==
+X-IronPort-AV: E=McAfee;i="6000,8403,9750"; a="147907847"
+X-IronPort-AV: E=Sophos;i="5.77,283,1596524400"; 
+   d="scan'208";a="147907847"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Sep 2020 09:16:03 -0700
+IronPort-SDR: 2OiPkCNNx5PxzODqcuEyjmlGwl+i9mA/YoOKObe+NWpf6W3Imv6Rv9aqis8zuAINJgB2P3Fa99
+ forf2oD8sLNA==
+X-IronPort-AV: E=Sophos;i="5.77,283,1596524400"; 
+   d="scan'208";a="453615387"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.160])
+  by orsmga004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Sep 2020 09:16:03 -0700
+Date:   Sun, 20 Sep 2020 09:16:02 -0700
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Ingo Molnar <mingo@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Borislav Petkov <bp@alien8.de>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
+        linux-kernel@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>
+Subject: Re: [PATCH v4 2/2] KVM: nSVM: implement ondemand allocation of the
+ nested state
+Message-ID: <20200920161602.GA17325@linux.intel.com>
+References: <20200917101048.739691-1-mlevitsk@redhat.com>
+ <20200917101048.739691-3-mlevitsk@redhat.com>
+ <20200917162942.GE13522@sjchrist-ice>
+ <d9c0d190-c6ea-2e21-92ca-2a53efb86a1d@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <71b38000-70ee-f45a-b80d-95f42dbcc497@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <d9c0d190-c6ea-2e21-92ca-2a53efb86a1d@redhat.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 14/09/20 18:24, Thomas Huth wrote:
-> On 02/09/2020 19.41, Paolo Bonzini wrote:
->> On 01/09/20 11:18, Janosch Frank wrote:
->>>   git@gitlab.com:frankja/kvm-unit-tests.git tags/s390x-2020-01-09
->>
->> Pulled, thanks.
->>
->> (Yes, I am alive).
+On Sat, Sep 19, 2020 at 05:09:09PM +0200, Paolo Bonzini wrote:
+> On 17/09/20 18:29, Sean Christopherson wrote:
+> >> +				vcpu->arch.efer = old_efer;
+> >> +				kvm_make_request(KVM_REQ_OUT_OF_MEMORY, vcpu);
+> > I really dislike KVM_REQ_OUT_OF_MEMORY.  It's redundant with -ENOMEM and
+> > creates a huge discrepancy with respect to existing code, e.g. nVMX returns
+> > -ENOMEM in a similar situation.
 > 
->  Hi Paolo,
-> 
-> I don't see the patches in the master branch - could you please push
-> them to the repo?
+> Maxim, your previous version was adding some error handling to
+> kvm_x86_ops.set_efer.  I don't remember what was the issue; did you have
+> any problems propagating all the errors up to KVM_SET_SREGS (easy),
+> kvm_set_msr (harder) etc.?
 
-Oops, pulling had failed because Janosch used an ssh reference to the
-repo.  Fixed and pushed.
+I objected to letting .set_efer() return a fault.  A relatively minor issue is
+the code in vmx_set_efer() that handles lack of EFER because technically KVM
+can emulate EFER.SCE+SYSCALL without supporting EFER in hardware.  Returning
+success/'0' would avoid that particular issue.  My primary concern is that I'd
+prefer not to add another case where KVM can potentially ignore a fault
+indicated by a helper, a la vmx_set_cr4().
 
-Paolo
-
+To that end, I'd be ok with adding error handling to .set_efer() if KVM
+enforces, via WARN in one of the .set_efer() call sites, that SVM/VMX can only
+return negative error codes, i.e. let SVM handle the -ENOMEM case but disallow
+fault injection.  It doesn't actually change anything, but it'd give me a warm
+fuzzy feeling.
