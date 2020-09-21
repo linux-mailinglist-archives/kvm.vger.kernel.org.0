@@ -2,101 +2,60 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 814ED271C57
-	for <lists+kvm@lfdr.de>; Mon, 21 Sep 2020 09:53:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DB98F271C5C
+	for <lists+kvm@lfdr.de>; Mon, 21 Sep 2020 09:54:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726456AbgIUHx1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 21 Sep 2020 03:53:27 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:23016 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726413AbgIUHx1 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 21 Sep 2020 03:53:27 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1600674806;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=2G++eeOF8cxUbk5F9wVp3kaVjonLJ7VVOFgIVwjkZNo=;
-        b=A+A50whxtgL3asuxo+dTEWKMdUOtyx4t8fjmAbMQLh4ZUfCaLHevpCt8sSB7zWwXsa98J5
-        A3hbZ7e8SR+BTMXms4IFSTgj4/vMwoAHLalTxy0SikYiu2lqCOhiR/jpA0tfmXBXMQaCnb
-        FkMIpA9a96R6u9K2knjSG+XFet/xwus=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-346-8gqyXM2SNNKAFXor4CE7Cg-1; Mon, 21 Sep 2020 03:53:24 -0400
-X-MC-Unique: 8gqyXM2SNNKAFXor4CE7Cg-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 82EF810BBECD;
-        Mon, 21 Sep 2020 07:53:22 +0000 (UTC)
-Received: from starship (unknown [10.35.206.28])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 844A57882C;
-        Mon, 21 Sep 2020 07:53:18 +0000 (UTC)
-Message-ID: <5a3538861a65973f9ae6e2d0798ac17f52428ded.camel@redhat.com>
-Subject: Re: [PATCH v4 2/2] KVM: nSVM: implement ondemand allocation of the
- nested state
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     kvm@vger.kernel.org, Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Ingo Molnar <mingo@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Borislav Petkov <bp@alien8.de>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
-        linux-kernel@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>
-Date:   Mon, 21 Sep 2020 10:53:17 +0300
-In-Reply-To: <c35cbaca-2c34-cd93-b589-d4ab782fc754@redhat.com>
-References: <20200917101048.739691-1-mlevitsk@redhat.com>
-         <20200917101048.739691-3-mlevitsk@redhat.com>
-         <20200917162942.GE13522@sjchrist-ice>
-         <d9c0d190-c6ea-2e21-92ca-2a53efb86a1d@redhat.com>
-         <20200920161602.GA17325@linux.intel.com>
-         <c35cbaca-2c34-cd93-b589-d4ab782fc754@redhat.com>
+        id S1726461AbgIUHyl convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Mon, 21 Sep 2020 03:54:41 -0400
+Received: from mail.kernel.org ([198.145.29.99]:43614 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726422AbgIUHyl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 21 Sep 2020 03:54:41 -0400
+From:   bugzilla-daemon@bugzilla.kernel.org
+Authentication-Results: mail.kernel.org; dkim=permerror (bad message/signature format)
+To:     kvm@vger.kernel.org
+Subject: [Bug 209285] compilation fails
+Date:   Mon, 21 Sep 2020 07:54:40 +0000
+X-Bugzilla-Reason: None
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Product: Virtualization
+X-Bugzilla-Component: kvm
+X-Bugzilla-Version: unspecified
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: haiwei-li@outlook.com
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: cc
+Message-ID: <bug-209285-28872-wnI1gydkKd@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-209285-28872@https.bugzilla.kernel.org/>
+References: <bug-209285-28872@https.bugzilla.kernel.org/>
 Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.3 (3.36.3-1.fc32) 
+Content-Transfer-Encoding: 8BIT
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sun, 2020-09-20 at 18:42 +0200, Paolo Bonzini wrote:
-> On 20/09/20 18:16, Sean Christopherson wrote:
-> > > Maxim, your previous version was adding some error handling to
-> > > kvm_x86_ops.set_efer.  I don't remember what was the issue; did you have
-> > > any problems propagating all the errors up to KVM_SET_SREGS (easy),
-> > > kvm_set_msr (harder) etc.?
-> > I objected to letting .set_efer() return a fault.
-> 
-> So did I, and that's why we get KVM_REQ_OUT_OF_MEMORY.  But it was more
-> of an "it's ugly and it ought not to fail" thing than something I could
-> pinpoint.
-> 
-> It looks like we agree, but still we have to choose the lesser evil?
-> 
-> Paolo
-> 
-> > A relatively minor issue is
-> > the code in vmx_set_efer() that handles lack of EFER because technically KVM
-> > can emulate EFER.SCE+SYSCALL without supporting EFER in hardware.  Returning
-> > success/'0' would avoid that particular issue.  My primary concern is that I'd
-> > prefer not to add another case where KVM can potentially ignore a fault
-> > indicated by a helper, a la vmx_set_cr4().
+https://bugzilla.kernel.org/show_bug.cgi?id=209285
 
-The thing is that kvm_emulate_wrmsr injects #GP when kvm_set_msr returns any non zero value,
-and returns 1 which means keep on going if I understand correctly (0 is userspace exit,
-negative value would be a return to userspace with an error)
+Haiwei Li (haiwei-li@outlook.com) changed:
 
-So the question is if we have other wrmsr handlers which return negative value, and would
-be affected by changing kvm_emulate_wrmsr to pass through the error value.
-I am checking the code now.
+           What    |Removed                     |Added
+----------------------------------------------------------------------------
+                 CC|                            |haiwei-li@outlook.com
 
-I do agree now that this is the *correct* solution to this problem.
+--- Comment #3 from Haiwei Li (haiwei-li@outlook.com) ---
+Resolved by Vitaly, 
 
-Best regards,
-	Maxim Levitsky
+https://lore.kernel.org/kvm/CAB5KdObJ4_0oJf+rwGXWNk6MsKm1j0dqrcGQkzQ63ek1LY=zMQ@mail.gmail.com/T/#m613f333dc9d01c463d1037c82a1b99687ffeb789
 
+-- 
+You are receiving this mail because:
+You are watching the assignee of the bug.
