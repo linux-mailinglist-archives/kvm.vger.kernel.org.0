@@ -2,222 +2,106 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id F2B71272556
-	for <lists+kvm@lfdr.de>; Mon, 21 Sep 2020 15:24:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 936AD2725F0
+	for <lists+kvm@lfdr.de>; Mon, 21 Sep 2020 15:43:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727043AbgIUNYD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 21 Sep 2020 09:24:03 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:56363 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726419AbgIUNYA (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 21 Sep 2020 09:24:00 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1600694639;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=J2/FeX5V/ZEFcOQ6qB7LEOuNKAsmu6be+QX5MLdG1mc=;
-        b=S/5jd1gt/dWZ3oe9Xx96Qu7dkLhGntyJnfUcy9QtBw5kFmUgcfSdOjiYrMPZTZbyMjxZWY
-        AdUj4MHrhiHNzm/LKIBp3vmrvNi5MosKcE8vKCbe1avKZv3ebZoksqPWsLSd/M19SNIoWs
-        l9x0xtK5me2wGFrh3Z0xDUGJQ+NRuJ4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-282-CbD6S37cMhSQvyElEobkeg-1; Mon, 21 Sep 2020 09:23:55 -0400
-X-MC-Unique: CbD6S37cMhSQvyElEobkeg-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        id S1727047AbgIUNnL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 21 Sep 2020 09:43:11 -0400
+Received: from mail.kernel.org ([198.145.29.99]:55992 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726471AbgIUNnJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 21 Sep 2020 09:43:09 -0400
+Received: from willie-the-truck (236.31.169.217.in-addr.arpa [217.169.31.236])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C2BEC107464D;
-        Mon, 21 Sep 2020 13:23:53 +0000 (UTC)
-Received: from starship (unknown [10.35.206.238])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 3A6845C1DC;
-        Mon, 21 Sep 2020 13:23:49 +0000 (UTC)
-Message-ID: <badafb14f2b3659e6c5669602511083364e99fb5.camel@redhat.com>
-Subject: Re: [PATCH v4 2/2] KVM: nSVM: implement ondemand allocation of the
- nested state
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     kvm@vger.kernel.org, Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Ingo Molnar <mingo@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Borislav Petkov <bp@alien8.de>,
-        Jim Mattson <jmattson@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
-        linux-kernel@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>
-Date:   Mon, 21 Sep 2020 16:23:47 +0300
-In-Reply-To: <20200917162942.GE13522@sjchrist-ice>
-References: <20200917101048.739691-1-mlevitsk@redhat.com>
-         <20200917101048.739691-3-mlevitsk@redhat.com>
-         <20200917162942.GE13522@sjchrist-ice>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.3 (3.36.3-1.fc32) 
+        by mail.kernel.org (Postfix) with ESMTPSA id 335472084C;
+        Mon, 21 Sep 2020 13:43:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1600695788;
+        bh=ppWgQwIPJFgXvpl5SyaBDqV8l2T0GGovdfeRTgIHCFU=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=WxRp7fNzBJpKQt2ftVmrIe0M00opXLZn+F2d5mDdpSKGn8lUe/l/M4uRs6n6sREdy
+         bW0hA+DLr0AjQqCJBgrHPFgxzbq84ceM4vkef6/Rx84et6Iin19dgiliB/AzP8PonQ
+         4ut8OFK2UunvFo4cAYtKyJOqaJGFdcG9RYMVTRe0=
+Date:   Mon, 21 Sep 2020 14:43:02 +0100
+From:   Will Deacon <will@kernel.org>
+To:     Alexandru Elisei <alexandru.elisei@arm.com>
+Cc:     linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+        mark.rutland@arm.com, maz@kernel.org, catalin.marinas@arm.com,
+        swboyd@chromium.org, sumit.garg@linaro.org,
+        Julien Thierry <julien.thierry@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Marc Zyngier <marc.zyngier@arm.com>,
+        Will Deacon <will.deacon@arm.com>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Pouloze <suzuki.poulose@arm.com>,
+        kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
+Subject: Re: [PATCH v6 5/7] KVM: arm64: pmu: Make overflow handler NMI safe
+Message-ID: <20200921134301.GJ2139@willie-the-truck>
+References: <20200819133419.526889-1-alexandru.elisei@arm.com>
+ <20200819133419.526889-6-alexandru.elisei@arm.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200819133419.526889-6-alexandru.elisei@arm.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 2020-09-17 at 09:29 -0700, Sean Christopherson wrote:
-> On Thu, Sep 17, 2020 at 01:10:48PM +0300, Maxim Levitsky wrote:
-> > This way we don't waste memory on VMs which don't use
-> > nesting virtualization even if it is available to them.
-> > 
-> > If allocation of nested state fails (which should happen,
-> > only when host is about to OOM anyway), use new KVM_REQ_OUT_OF_MEMORY
-> > request to shut down the guest
-> > 
-> > Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
-> > ---
-> >  arch/x86/kvm/svm/nested.c | 42 ++++++++++++++++++++++++++++++
-> >  arch/x86/kvm/svm/svm.c    | 54 ++++++++++++++++++++++-----------------
-> >  arch/x86/kvm/svm/svm.h    |  7 +++++
-> >  3 files changed, 79 insertions(+), 24 deletions(-)
-> > 
-> > diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
-> > index 09417f5197410..fe119da2ef836 100644
-> > --- a/arch/x86/kvm/svm/nested.c
-> > +++ b/arch/x86/kvm/svm/nested.c
-> > @@ -467,6 +467,9 @@ int nested_svm_vmrun(struct vcpu_svm *svm)
-> >  
-> >  	vmcb12 = map.hva;
-> >  
-> > +	if (WARN_ON(!svm->nested.initialized))
-> > +		return 1;
-> > +
-> >  	if (!nested_vmcb_checks(svm, vmcb12)) {
-> >  		vmcb12->control.exit_code    = SVM_EXIT_ERR;
-> >  		vmcb12->control.exit_code_hi = 0;
-> > @@ -684,6 +687,45 @@ int nested_svm_vmexit(struct vcpu_svm *svm)
-> >  	return 0;
-> >  }
-> >  
-> > +int svm_allocate_nested(struct vcpu_svm *svm)
-> > +{
-> > +	struct page *hsave_page;
-> > +
-> > +	if (svm->nested.initialized)
-> > +		return 0;
-> > +
-> > +	hsave_page = alloc_page(GFP_KERNEL_ACCOUNT | __GFP_ZERO);
-> > +	if (!hsave_page)
-> > +		goto error;
+On Wed, Aug 19, 2020 at 02:34:17PM +0100, Alexandru Elisei wrote:
+> From: Julien Thierry <julien.thierry@arm.com>
 > 
-> goto is unnecessary, just do
+> kvm_vcpu_kick() is not NMI safe. When the overflow handler is called from
+> NMI context, defer waking the vcpu to an irq_work queue.
 > 
-> 		return -ENOMEM;
+> Cc: Julien Thierry <julien.thierry.kdev@gmail.com>
+> Cc: Marc Zyngier <marc.zyngier@arm.com>
+> Cc: Will Deacon <will.deacon@arm.com>
+> Cc: Mark Rutland <mark.rutland@arm.com>
+> Cc: Catalin Marinas <catalin.marinas@arm.com>
+> Cc: James Morse <james.morse@arm.com>
+> Cc: Suzuki K Pouloze <suzuki.poulose@arm.com>
+> Cc: kvm@vger.kernel.org
+> Cc: kvmarm@lists.cs.columbia.edu
+> Signed-off-by: Julien Thierry <julien.thierry@arm.com>
+> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+> ---
+>  arch/arm64/kvm/pmu-emul.c | 25 ++++++++++++++++++++++++-
+>  include/kvm/arm_pmu.h     |  1 +
+>  2 files changed, 25 insertions(+), 1 deletion(-)
 
-To be honest this is a philosophical question,
-what way is better, but I don't mind to change this.
+I'd like an Ack from the KVM side on this one, but some minor comments
+inline.
 
-> 
-> > +
-> > +	svm->nested.hsave = page_address(hsave_page);
-> > +
-> > +	svm->nested.msrpm = svm_vcpu_init_msrpm();
-> > +	if (!svm->nested.msrpm)
-> > +		goto err_free_hsave;
-> > +
-> > +	svm->nested.initialized = true;
-> > +	return 0;
-> > +err_free_hsave:
-> > +	__free_page(hsave_page);
-> > +error:
-> > +	return 1;
-> 
-> As above, -ENOMEM would be preferable.
-After the changes to return negative values from msr writes,
-this indeed makes sense and is done now.
-> 
-> > +}
-> > +
-> > +void svm_free_nested(struct vcpu_svm *svm)
-> > +{
-> > +	if (!svm->nested.initialized)
-> > +		return;
-> > +
-> > +	svm_vcpu_free_msrpm(svm->nested.msrpm);
-> > +	svm->nested.msrpm = NULL;
-> > +
-> > +	__free_page(virt_to_page(svm->nested.hsave));
-> > +	svm->nested.hsave = NULL;
-> > +
-> > +	svm->nested.initialized = false;
-> > +}
-> > +
-> >  /*
-> >   * Forcibly leave nested mode in order to be able to reset the VCPU later on.
-> >   */
-> > diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-> > index 3da5b2f1b4a19..57ea4407dcf09 100644
-> > --- a/arch/x86/kvm/svm/svm.c
-> > +++ b/arch/x86/kvm/svm/svm.c
-> > @@ -266,6 +266,7 @@ static int get_max_npt_level(void)
-> >  void svm_set_efer(struct kvm_vcpu *vcpu, u64 efer)
-> >  {
-> >  	struct vcpu_svm *svm = to_svm(vcpu);
-> > +	u64 old_efer = vcpu->arch.efer;
-> >  	vcpu->arch.efer = efer;
-> >  
-> >  	if (!npt_enabled) {
-> > @@ -276,9 +277,26 @@ void svm_set_efer(struct kvm_vcpu *vcpu, u64 efer)
-> >  			efer &= ~EFER_LME;
-> >  	}
-> >  
-> > -	if (!(efer & EFER_SVME)) {
-> > -		svm_leave_nested(svm);
-> > -		svm_set_gif(svm, true);
-> > +	if ((old_efer & EFER_SVME) != (efer & EFER_SVME)) {
-> > +		if (!(efer & EFER_SVME)) {
-> > +			svm_leave_nested(svm);
-> > +			svm_set_gif(svm, true);
-> > +
-> > +			/*
-> > +			 * Free the nested state unless we are in SMM, in which
-> > +			 * case the exit from SVM mode is only for duration of the SMI
-> > +			 * handler
-> > +			 */
-> > +			if (!is_smm(&svm->vcpu))
-> > +				svm_free_nested(svm);
-> > +
-> > +		} else {
-> > +			if (svm_allocate_nested(svm)) {
-> > +				vcpu->arch.efer = old_efer;
-> > +				kvm_make_request(KVM_REQ_OUT_OF_MEMORY, vcpu);
-> 
-> I really dislike KVM_REQ_OUT_OF_MEMORY.  It's redundant with -ENOMEM and
-> creates a huge discrepancy with respect to existing code, e.g. nVMX returns
-> -ENOMEM in a similar situation.
-> 
-> The deferred error handling creates other issues, e.g. vcpu->arch.efer is
-> unwound but the guest's RIP is not.
-> 
-> One thought for handling this without opening a can of worms would be to do:
-> 
-> 	r = kvm_x86_ops.set_efer(vcpu, efer);
-> 	if (r) {
-> 		WARN_ON(r > 0);
-> 		return r;
-> 	}
-> 
-> I.e. go with the original approach, but only for returning errors that will
-> go all the way out to userspace.
+> diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
+> index f0d0312c0a55..30268397ed06 100644
+> --- a/arch/arm64/kvm/pmu-emul.c
+> +++ b/arch/arm64/kvm/pmu-emul.c
+> @@ -433,6 +433,22 @@ void kvm_pmu_sync_hwstate(struct kvm_vcpu *vcpu)
+>  	kvm_pmu_update_state(vcpu);
+>  }
+>  
+> +/**
+> + * When perf interrupt is an NMI, we cannot safely notify the vcpu corresponding
+> + * to the event.
+> + * This is why we need a callback to do it once outside of the NMI context.
+> + */
+> +static void kvm_pmu_perf_overflow_notify_vcpu(struct irq_work *work)
+> +{
+> +	struct kvm_vcpu *vcpu;
+> +	struct kvm_pmu *pmu;
+> +
+> +	pmu = container_of(work, struct kvm_pmu, overflow_work);
+> +	vcpu = kvm_pmc_to_vcpu(&pmu->pmc[0]);
 
-Done as explained in the other reply.
+Can you spell this kvm_pmc_to_vcpu(pmu->pmc); ?
 
-> 
-> > +				return;
-> > +			}
-> > +		}
-> >  	}
-> >  
-> >  	svm->vmcb->save.efer = efer | EFER_SVME;
+> +
+> +	kvm_vcpu_kick(vcpu);
 
+How do we guarantee that the vCPU is still around by the time this runs?
+Sorry to ask such a horrible question, but I don't see anything associating
+the workqueue with the lifetime of the vCPU.
 
-Thanks for the review,
-	Best regards,
-		Maxim Levitsky
-
+Will
