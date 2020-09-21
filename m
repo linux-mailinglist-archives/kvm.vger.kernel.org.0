@@ -2,229 +2,159 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id EFFB5272307
-	for <lists+kvm@lfdr.de>; Mon, 21 Sep 2020 13:49:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A6B28272334
+	for <lists+kvm@lfdr.de>; Mon, 21 Sep 2020 13:57:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726931AbgIULs6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 21 Sep 2020 07:48:58 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:32556 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726886AbgIULsx (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 21 Sep 2020 07:48:53 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1600688930;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=BRw00YmuEbRHSN1ROnNXOewOx2bUIzQU6NfA9OnbIus=;
-        b=U1UJdtDdXnuZi6pRD04ELT0tgzA7D11YhxbFVRa8LvNPGT8GrVuANemIoOtg9Yw9Ct0twc
-        ees3QhIJGY9yXgqI6JGqVkT5m0Oge83ZuQob6u5tDRF4Q4EVnYQ6B67YnYP8lBbATWxB5r
-        QJZQROIBZ6A57Yu5mwcxEVAevz/TZYc=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-518-nx4KeQ8nPx6_egfeA6_FfQ-1; Mon, 21 Sep 2020 07:48:46 -0400
-X-MC-Unique: nx4KeQ8nPx6_egfeA6_FfQ-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BE4461007460;
-        Mon, 21 Sep 2020 11:48:44 +0000 (UTC)
-Received: from work-vm (ovpn-114-207.ams2.redhat.com [10.36.114.207])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 0CD7A78826;
-        Mon, 21 Sep 2020 11:48:38 +0000 (UTC)
-Date:   Mon, 21 Sep 2020 12:48:36 +0100
-From:   "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To:     Tom Lendacky <thomas.lendacky@amd.com>
-Cc:     qemu-devel@nongnu.org, kvm@vger.kernel.org,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Eduardo Habkost <ehabkost@redhat.com>,
-        Richard Henderson <rth@twiddle.net>,
-        Connor Kuehl <ckuehl@redhat.com>,
-        Brijesh Singh <brijesh.singh@amd.com>,
-        Jiri Slaby <jslaby@suse.cz>,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>
-Subject: Re: [PATCH v3 0/5] Qemu SEV-ES guest support
-Message-ID: <20200921114836.GH3221@work-vm>
-References: <cover.1600205384.git.thomas.lendacky@amd.com>
- <20200917172802.GS2793@work-vm>
- <de0e9c27-8954-3a77-21db-cad84f334277@amd.com>
- <20200918100048.GF2816@work-vm>
- <57a939bd-9489-2114-730b-bee9ec040b31@amd.com>
+        id S1726534AbgIUL5z (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 21 Sep 2020 07:57:55 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:53828 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726326AbgIUL5y (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 21 Sep 2020 07:57:54 -0400
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 08LBVcDV112559;
+        Mon, 21 Sep 2020 07:57:52 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : in-reply-to : references : mime-version :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=cv9aYg5ay77N/571CLKcX48/pmMEZzaqBIwgKv0yXdQ=;
+ b=qJk8j16Esfd3v4YioGAqeIwU8F9xPZyGp0O0RtEm0TTpBTP5mjtg+CcHNwrPwkSifuop
+ uvlZtsrTvk5HZHK/WHkTrmt4IS8S/HbrLhTUF2OzK4eO/pbM6zhmRX4kw3XfKaY7AWgV
+ sst9OzVUglkrpZZBlibQ7xjJ6mlaL76LP5S0yZ4KjmwcBLo6k9ZPhnev4vpmt2IdnamI
+ vOMbClXg7pOf9yz/kYZyQT89q8nGiIDkSc7qlEPGUxhYCJyTnOzCcIxhXpRKDeDllA2I
+ SND6/701VTNjAu/rCSJP43iIGXyp9hmqQEFiMPlMd+o2rRgnUPWCSNCLyw/g5bXd5iRk Eg== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 33pt9b2p1x-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 21 Sep 2020 07:57:52 -0400
+Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 08LBVlpw113422;
+        Mon, 21 Sep 2020 07:57:51 -0400
+Received: from ppma06fra.de.ibm.com (48.49.7a9f.ip4.static.sl-reverse.com [159.122.73.72])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 33pt9b2p1g-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 21 Sep 2020 07:57:51 -0400
+Received: from pps.filterd (ppma06fra.de.ibm.com [127.0.0.1])
+        by ppma06fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 08LBvM3p025114;
+        Mon, 21 Sep 2020 11:57:50 GMT
+Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
+        by ppma06fra.de.ibm.com with ESMTP id 33n98gs1pe-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 21 Sep 2020 11:57:49 +0000
+Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
+        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 08LBuCBO33358210
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 21 Sep 2020 11:56:12 GMT
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id F0F04A404D;
+        Mon, 21 Sep 2020 11:57:46 +0000 (GMT)
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 72DA6A4051;
+        Mon, 21 Sep 2020 11:57:46 +0000 (GMT)
+Received: from oc2783563651 (unknown [9.145.8.1])
+        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Mon, 21 Sep 2020 11:57:46 +0000 (GMT)
+Date:   Mon, 21 Sep 2020 13:56:55 +0200
+From:   Halil Pasic <pasic@linux.ibm.com>
+To:     Christian Borntraeger <borntraeger@de.ibm.com>
+Cc:     Tony Krowiak <akrowiak@linux.ibm.com>, linux-s390@vger.kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        pmorel@linux.ibm.com, alex.williamson@redhat.com,
+        cohuck@redhat.com, kwankhede@nvidia.com
+Subject: Re: [PATCH] s390/vfio-ap: fix unregister GISC when KVM is already
+ gone results in OOPS
+Message-ID: <20200921135655.152c77c6.pasic@linux.ibm.com>
+In-Reply-To: <a108cd19-8c4b-908f-844d-5717ca405559@de.ibm.com>
+References: <20200918170234.5807-1-akrowiak@linux.ibm.com>
+        <a108cd19-8c4b-908f-844d-5717ca405559@de.ibm.com>
+Organization: IBM
+X-Mailer: Claws Mail 3.11.1 (GTK+ 2.24.31; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <57a939bd-9489-2114-730b-bee9ec040b31@amd.com>
-User-Agent: Mutt/1.14.6 (2020-07-11)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
+ definitions=2020-09-21_03:2020-09-21,2020-09-21 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 bulkscore=0
+ mlxlogscore=999 suspectscore=2 phishscore=0 lowpriorityscore=0
+ malwarescore=0 clxscore=1011 mlxscore=0 spamscore=0 adultscore=0
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2006250000 definitions=main-2009210082
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-* Tom Lendacky (thomas.lendacky@amd.com) wrote:
-> On 9/18/20 5:00 AM, Dr. David Alan Gilbert wrote:
-> > * Tom Lendacky (thomas.lendacky@amd.com) wrote:
-> > > On 9/17/20 12:28 PM, Dr. David Alan Gilbert wrote:
-> > > > * Tom Lendacky (thomas.lendacky@amd.com) wrote:
-> > > > > From: Tom Lendacky <thomas.lendacky@amd.com>
-> > > > > 
-> > > > > This patch series provides support for launching an SEV-ES guest.
-> > > > > 
-> > > > > Secure Encrypted Virtualization - Encrypted State (SEV-ES) expands on the
-> > > > > SEV support to protect the guest register state from the hypervisor. See
-> > > > > "AMD64 Architecture Programmer's Manual Volume 2: System Programming",
-> > > > > section "15.35 Encrypted State (SEV-ES)" [1].
-> > > > > 
-> > > > > In order to allow a hypervisor to perform functions on behalf of a guest,
-> > > > > there is architectural support for notifying a guest's operating system
-> > > > > when certain types of VMEXITs are about to occur. This allows the guest to
-> > > > > selectively share information with the hypervisor to satisfy the requested
-> > > > > function. The notification is performed using a new exception, the VMM
-> > > > > Communication exception (#VC). The information is shared through the
-> > > > > Guest-Hypervisor Communication Block (GHCB) using the VMGEXIT instruction.
-> > > > > The GHCB format and the protocol for using it is documented in "SEV-ES
-> > > > > Guest-Hypervisor Communication Block Standardization" [2].
-> > > > > 
-> > > > > The main areas of the Qemu code that are updated to support SEV-ES are
-> > > > > around the SEV guest launch process and AP booting in order to support
-> > > > > booting multiple vCPUs.
-> > > > > 
-> > > > > There are no new command line switches required. Instead, the desire for
-> > > > > SEV-ES is presented using the SEV policy object. Bit 2 of the SEV policy
-> > > > > object indicates that SEV-ES is required.
-> > > > > 
-> > > > > The SEV launch process is updated in two ways. The first is that a the
-> > > > > KVM_SEV_ES_INIT ioctl is used to initialize the guest instead of the
-> > > > > standard KVM_SEV_INIT ioctl. The second is that before the SEV launch
-> > > > > measurement is calculated, the LAUNCH_UPDATE_VMSA SEV API is invoked for
-> > > > > each vCPU that Qemu has created. Once the LAUNCH_UPDATE_VMSA API has been
-> > > > > invoked, no direct changes to the guest register state can be made.
-> > > > > 
-> > > > > AP booting poses some interesting challenges. The INIT-SIPI-SIPI sequence
-> > > > > is typically used to boot the APs. However, the hypervisor is not allowed
-> > > > > to update the guest registers. For the APs, the reset vector must be known
-> > > > > in advance. An OVMF method to provide a known reset vector address exists
-> > > > > by providing an SEV information block, identified by UUID, near the end of
-> > > > > the firmware [3]. OVMF will program the jump to the actual reset vector in
-> > > > > this area of memory. Since the memory location is known in advance, an AP
-> > > > > can be created with the known reset vector address as its starting CS:IP.
-> > > > > The GHCB document [2] talks about how SMP booting under SEV-ES is
-> > > > > performed. SEV-ES also requires the use of the in-kernel irqchip support
-> > > > > in order to minimize the changes required to Qemu to support AP booting.
-> > > > 
-> > > > Some random thoughts:
-> > > >     a) Is there something that explicitly disallows SMM?
-> > > 
-> > > There isn't currently. Is there a way to know early on that SMM is enabled?
-> > > Could I just call x86_machine_is_smm_enabled() to check that?
-> > > 
-> > > >     b) I think all the interfaces you're using are already defined in
-> > > > Linux header files - even if the code to implement them isn't actually
-> > > > upstream in the kernel yet (the launch_update in particular) - we
-> > > > normally wait for the kernel interface to be accepted before taking the
-> > > > QEMU patches, but if the constants are in the headers already I'm not
-> > > > sure what the rule is.
-> > > 
-> > > Correct, everything was already present from a Linux header perspective.
-> > > 
-> > > >     c) What happens if QEMU reads the register values from the state if
-> > > > the guest is paused - does it just see junk?  I'm just wondering if you
-> > > > need to add checks in places it might try to.
-> > > 
-> > > I thought about what to do about calls to read the registers once the guest
-> > > state has become encrypted. I think it would take a lot of changes to make
-> > > Qemu "protected state aware" for what I see as little gain. Qemu is likely
-> > > to see a lot of zeroes or actual register values from the GHCB protocol for
-> > > previous VMGEXITs that took place.
-> > 
-> > Yep, that's fair enough - I was curious if we'll hit anything
-> > accidentally still reading it.
-> > 
-> > How does SEV-ES interact with the 'NODBG' flag of the guest policy - if
-> > that's 0, and 'debugging of the guest' is allowed, what can you actually
-> > do?
-> 
-> The SEV-ES KVM patches will disallow debugging of the guest, or at least
-> setting breakpoints using the debug registers. Gdb can still break in, but
-> you wont get anything reasonable with register dumps and memory dumps.
-> 
-> The NODBG policy bit enables or disables the DBG_DECRYPT and DBG_ENCRYPT
-> APIs. So if the guest has allowed debugging, memory dumps could be done
-> using those APIs (for encrypted pages). Registers are a different story
-> because you simply can't update from the hypervisor side under SEV-ES.
-> 
-> Under SEV you could do actual debugging if the support was developed and in
-> place.
+On Mon, 21 Sep 2020 07:48:58 +0200
+Christian Borntraeger <borntraeger@de.ibm.com> wrote:
 
-Thanks for the explanation - it might be interesting to wire the
-DBG_DECRYPT support up to dump/dump.c for doing full guest memory dumps
-- if the policy has it enabled.
-
-Dave
-
-> Thanks,
-> Tom
 > 
-> > 
-> > Dave
-> > 
-> > > Thanks,
-> > > Tom
-> > > 
-> > > > 
-> > > > Dave
-> > > > 
-> > > > > [1] https://nam11.safelinks.protection.outlook.com/?url=https%3A%2F%2Fwww.amd.com%2Fsystem%2Ffiles%2FTechDocs%2F24593.pdf&amp;data=02%7C01%7Cthomas.lendacky%40amd.com%7Cecf88d6f7bd0494d1b0e08d85bb9c19b%7C3dd8961fe4884e608e11a82d994e183d%7C0%7C0%7C637360201727448609&amp;sdata=e6CbpjDDvCUG2q9pk6OSsty0QB5HuhueVAM4t8iygT8%3D&amp;reserved=0
-> > > > > [2] https://nam11.safelinks.protection.outlook.com/?url=https%3A%2F%2Fdeveloper.amd.com%2Fwp-content%2Fresources%2F56421.pdf&amp;data=02%7C01%7Cthomas.lendacky%40amd.com%7Cecf88d6f7bd0494d1b0e08d85bb9c19b%7C3dd8961fe4884e608e11a82d994e183d%7C0%7C0%7C637360201727448609&amp;sdata=%2FUzJB5K%2F8rOMF%2B%2BVPXjg%2BJBLgD4uLW6U82Wvf8pXq%2BA%3D&amp;reserved=0
-> > > > > [3] 30937f2f98c4 ("OvmfPkg: Use the SEV-ES work area for the SEV-ES AP reset vector")
-> > > > >       https://nam11.safelinks.protection.outlook.com/?url=https%3A%2F%2Fgithub.com%2Ftianocore%2Fedk2%2Fcommit%2F30937f2f98c42496f2f143fe8374ae7f7e684847&amp;data=02%7C01%7Cthomas.lendacky%40amd.com%7Cecf88d6f7bd0494d1b0e08d85bb9c19b%7C3dd8961fe4884e608e11a82d994e183d%7C0%7C0%7C637360201727458605&amp;sdata=0FmiYEdIEtDjw1VIGaeeRrto%2FZpvH1esIgE93gXyagM%3D&amp;reserved=0
-> > > > > 
-> > > > > ---
-> > > > > 
-> > > > > These patches are based on commit:
-> > > > > d0ed6a69d3 ("Update version for v5.1.0 release")
-> > > > > 
-> > > > > (I tried basing on the latest Qemu commit, but I was having build issues
-> > > > > that level)
-> > > > > 
-> > > > > A version of the tree can be found at:
-> > > > > https://nam11.safelinks.protection.outlook.com/?url=https%3A%2F%2Fgithub.com%2FAMDESE%2Fqemu%2Ftree%2Fsev-es-v11&amp;data=02%7C01%7Cthomas.lendacky%40amd.com%7Cecf88d6f7bd0494d1b0e08d85bb9c19b%7C3dd8961fe4884e608e11a82d994e183d%7C0%7C0%7C637360201727458605&amp;sdata=w1tfrMDgruZBDxNHgKLhpKtQ50Ua%2FMy9IfkSXfne2xg%3D&amp;reserved=0
-> > > > > 
-> > > > > Changes since v2:
-> > > > > - Add in-kernel irqchip requirement for SEV-ES guests
-> > > > > 
-> > > > > Changes since v1:
-> > > > > - Fixed checkpatch.pl errors/warnings
-> > > > > 
-> > > > > Tom Lendacky (5):
-> > > > >     sev/i386: Add initial support for SEV-ES
-> > > > >     sev/i386: Require in-kernel irqchip support for SEV-ES guests
-> > > > >     sev/i386: Allow AP booting under SEV-ES
-> > > > >     sev/i386: Don't allow a system reset under an SEV-ES guest
-> > > > >     sev/i386: Enable an SEV-ES guest based on SEV policy
-> > > > > 
-> > > > >    accel/kvm/kvm-all.c       |  73 ++++++++++++++++++++++++++
-> > > > >    accel/stubs/kvm-stub.c    |   5 ++
-> > > > >    hw/i386/pc_sysfw.c        |  10 +++-
-> > > > >    include/sysemu/cpus.h     |   2 +
-> > > > >    include/sysemu/hw_accel.h |   5 ++
-> > > > >    include/sysemu/kvm.h      |  18 +++++++
-> > > > >    include/sysemu/sev.h      |   3 ++
-> > > > >    softmmu/cpus.c            |   5 ++
-> > > > >    softmmu/vl.c              |   5 +-
-> > > > >    target/i386/cpu.c         |   1 +
-> > > > >    target/i386/kvm.c         |   2 +
-> > > > >    target/i386/sev-stub.c    |   5 ++
-> > > > >    target/i386/sev.c         | 105 +++++++++++++++++++++++++++++++++++++-
-> > > > >    target/i386/sev_i386.h    |   1 +
-> > > > >    14 files changed, 236 insertions(+), 4 deletions(-)
-> > > > > 
-> > > > > -- 
-> > > > > 2.28.0
-> > > > > 
-> > > 
 > 
--- 
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> On 18.09.20 19:02, Tony Krowiak wrote:
+> > Attempting to unregister Guest Interruption Subclass (GISC) when the
+> > link between the matrix mdev and KVM has been removed results in the
+> > following:
+> > 
+> >    "Kernel panic -not syncing: Fatal exception: panic_on_oops"
+> 
+> I think the full backtrace would be better in case someone runs into this
+> and needs to compare this patch to its oops. This also makes it easier to
+> understand the fix. 
+> > 
+> > This patch fixes this bug by verifying the matrix mdev and KVM are still
+> > linked prior to unregistering the GISC.
+> > 
+> > Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
+> 
+> Do we need a Fixes tag and cc stable?
+> 
+
+I believe we do!
+
+> 
+> > ---
+> >  drivers/s390/crypto/vfio_ap_ops.c | 14 +++++++++-----
+> >  1 file changed, 9 insertions(+), 5 deletions(-)
+> > 
+> > diff --git a/drivers/s390/crypto/vfio_ap_ops.c b/drivers/s390/crypto/vfio_ap_ops.c
+> > index e0bde8518745..847a88642644 100644
+> > --- a/drivers/s390/crypto/vfio_ap_ops.c
+> > +++ b/drivers/s390/crypto/vfio_ap_ops.c
+> > @@ -119,11 +119,15 @@ static void vfio_ap_wait_for_irqclear(int apqn)
+> >   */
+> >  static void vfio_ap_free_aqic_resources(struct vfio_ap_queue *q)
+> >  {
+> > -	if (q->saved_isc != VFIO_AP_ISC_INVALID && q->matrix_mdev)
+> 
+> So we already check for q->matrix_mdev here
+> 
+> > -		kvm_s390_gisc_unregister(q->matrix_mdev->kvm, q->saved_isc);
+> > -	if (q->saved_pfn && q->matrix_mdev)
+> 
+> and here
+> > -		vfio_unpin_pages(mdev_dev(q->matrix_mdev->mdev),
+> > -				 &q->saved_pfn, 1);
+> > +	if (q->matrix_mdev) {
+> > +		if (q->saved_isc != VFIO_AP_ISC_INVALID && q->matrix_mdev->kvm)
+>                                                            ^^^^ and this is the only
+> 		new check? Cant we just add this condition to the first if?
+
+You are technically right, but I'm not comfortable with my level of
+understanding of this logic regardless of the coding style. Will ask
+some questions directly.
+
+Regards,
+Halil
+
+> 
+> > +			kvm_s390_gisc_unregister(q->matrix_mdev->kvm,
+> > +						 q->saved_isc);
+> > +		if (q->saved_pfn)
+> > +			vfio_unpin_pages(mdev_dev(q->matrix_mdev->mdev),
+> > +					 &q->saved_pfn, 1);
+> > +	}
+> > +
+> >  	q->saved_pfn = 0;
+> >  	q->saved_isc = VFIO_AP_ISC_INVALID;
+> >  }
+> > 
 
