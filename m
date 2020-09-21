@@ -2,81 +2,103 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6394D2730CA
-	for <lists+kvm@lfdr.de>; Mon, 21 Sep 2020 19:25:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4E7BA273144
+	for <lists+kvm@lfdr.de>; Mon, 21 Sep 2020 19:55:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727665AbgIURVS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 21 Sep 2020 13:21:18 -0400
-Received: from mga03.intel.com ([134.134.136.65]:47536 "EHLO mga03.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726818AbgIURVS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 21 Sep 2020 13:21:18 -0400
-IronPort-SDR: Rpb66G1XP4cFtnOcTQKyfoQOQ5T6dMphRist8x4Ncr51tlYZjAHJKheGC9ODnMXVhQCj1TS8zm
- kQ3cqCoaHppA==
-X-IronPort-AV: E=McAfee;i="6000,8403,9751"; a="160505400"
-X-IronPort-AV: E=Sophos;i="5.77,287,1596524400"; 
-   d="scan'208";a="160505400"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Sep 2020 10:21:17 -0700
-IronPort-SDR: VY7pyBgmT7sxVYCPzS3B8Hf7CmR/TndJJxV5G8TYir6MY8UbzeWwFmv0bs7O1+1ZIvP+hp6bJk
- lE3+0krGJxbA==
-X-IronPort-AV: E=Sophos;i="5.77,287,1596524400"; 
-   d="scan'208";a="510811785"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.160])
-  by fmsmga005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Sep 2020 10:21:16 -0700
-Date:   Mon, 21 Sep 2020 10:21:14 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     "Michael S. Tsirkin" <mst@redhat.com>
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Peter Xu <peterx@redhat.com>, kvm@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Julia Suvorova <jsuvorov@redhat.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Andrew Jones <drjones@redhat.com>,
-        linux-kernel@vger.kernel.org, Gerd Hoffmann <kraxel@redhat.com>
-Subject: Re: [PATCH v2 0/3] KVM: x86: KVM_MEM_PCI_HOLE memory
-Message-ID: <20200921172114.GA24289@linux.intel.com>
-References: <87eenlwoaa.fsf@vitty.brq.redhat.com>
- <20200901200021.GB3053@xz-x1>
- <877dtcpn9z.fsf@vitty.brq.redhat.com>
- <20200904061210.GA22435@sjchrist-ice>
- <20200904072905.vbkiq3h762fyzds6@sirius.home.kraxel.org>
- <20200904160008.GA2206@sjchrist-ice>
- <874koanfsc.fsf@vitty.brq.redhat.com>
- <20200907072829-mutt-send-email-mst@kernel.org>
- <20200911170031.GD4344@sjchrist-ice>
- <20200918083134-mutt-send-email-mst@kernel.org>
+        id S1727525AbgIURz0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 21 Sep 2020 13:55:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45134 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726436AbgIURz0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 21 Sep 2020 13:55:26 -0400
+Received: from mail-ej1-x62b.google.com (mail-ej1-x62b.google.com [IPv6:2a00:1450:4864:20::62b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 96D30C061755
+        for <kvm@vger.kernel.org>; Mon, 21 Sep 2020 10:55:25 -0700 (PDT)
+Received: by mail-ej1-x62b.google.com with SMTP id i26so18954637ejb.12
+        for <kvm@vger.kernel.org>; Mon, 21 Sep 2020 10:55:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=bCrE34MnbVdDowmPT6kMQGf/vb7ALGieKX82jIu37ZE=;
+        b=U8hh+LRDUImDxn440ZLufEt7EyVObg0TINZQMA3BDQN1SZV/RXz8oRr/+H8hr04Moz
+         j2pol5qC5Qr71y5mtMsIL/kjbkUauvSMJN1RdoveqbAaebahLSBAtl0ospcAk5439Rt+
+         aBJ5cZ10MeDs4kDk3KifjbW/9iUGQdsa8WPGNr/OA4sN1xQ6vLim1UUMyEvavts83GbO
+         E9MmSpVeCu6GWPnZC9d/PJMOmH9bb2L/Ubmh8YolLHdIe327jUQ5hcVGGKAaK8mNprgE
+         /Ut7iUmtmju6ICT0vuhaHm/VI0NcxVwfYE0LSdagzZx+NgqlHgDtq8gDK0CjWN9qXVgw
+         q7oQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=bCrE34MnbVdDowmPT6kMQGf/vb7ALGieKX82jIu37ZE=;
+        b=D+A+nSJjfhJXbSsnzDrgBm0MPNs14+l6KCDUs1wYY1vUhn7WG5AGVqlCq7lpCWlE9s
+         3mSNrAyE7/bBTKAqQutkJXgRVe9haDZ2E2Mx8QFcQxLeLVuJlb91wfAZAp/opgNqI/1X
+         12KJwYltSmHYSRku7UCkLdNMs3o/5Z0n1tHUQjM3mOybcfzanIEFfLd0m+aHgFhe7/tQ
+         7ta1Pxh/8F6Lkxfjkn6sjznkI8YSJ3T+VSqCnlr0jXW+7sRdPxwXsPEFec1hkVTOEwuC
+         ehWwk4kkwcOLcXF/Kpea0Ba1vzkYEBhC5/tDshZZuoHZIMugVoB5wVFpZZ+cur7coZb9
+         Kfng==
+X-Gm-Message-State: AOAM531VamBPGT98+Ts6o0VSceUMW2cUfQw12xIN1KDTMLyF4flQaMWq
+        Q5Ni6JG+ORgKtwX9fiT/o+IDlBM3BaKWv25HYLMBhA==
+X-Google-Smtp-Source: ABdhPJwwjJQ5uCRGyddt+SCfScS2eR9k3t+oeWDdMWf1OnG6OG/W4ekZAx6y8i3tqkzr69o7ZQTNC5UVDBpRW00rc7k=
+X-Received: by 2002:a17:906:24d6:: with SMTP id f22mr627848ejb.85.1600710923790;
+ Mon, 21 Sep 2020 10:55:23 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200918083134-mutt-send-email-mst@kernel.org>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+References: <20200918202750.10358-1-ehabkost@redhat.com>
+In-Reply-To: <20200918202750.10358-1-ehabkost@redhat.com>
+From:   Peter Maydell <peter.maydell@linaro.org>
+Date:   Mon, 21 Sep 2020 18:55:11 +0100
+Message-ID: <CAFEAcA_AJcHaUjXdRH4jc5hkEq63d5ngap9vpp-yx4JsTDiQiA@mail.gmail.com>
+Subject: Re: [PULL 0/4] x86 queue, 2020-09-18
+To:     Eduardo Habkost <ehabkost@redhat.com>
+Cc:     QEMU Developers <qemu-devel@nongnu.org>,
+        Richard Henderson <rth@twiddle.net>,
+        kvm-devel <kvm@vger.kernel.org>,
+        Marcelo Tosatti <mtosatti@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Roman Bolshakov <r.bolshakov@yadro.com>,
+        Cameron Esfahani <dirty@apple.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Sep 18, 2020 at 08:34:37AM -0400, Michael S. Tsirkin wrote:
-> On Fri, Sep 11, 2020 at 10:00:31AM -0700, Sean Christopherson wrote:
-> > On Mon, Sep 07, 2020 at 07:32:23AM -0400, Michael S. Tsirkin wrote:
-> > > I suspect microvms will need pci eventually. I would much rather KVM
-> > > had an exit-less discovery mechanism in place by then because
-> > > learning from history if it doesn't they will do some kind of
-> > > hack on the kernel command line, and everyone will be stuck
-> > > supporting that for years ...
-> > 
-> > Is it not an option for the VMM to "accurately" enumerate the number of buses?
-> > E.g. if the VMM has devices on only bus 0, then enumerate that there is one
-> > bus so that the guest doesn't try and probe devices that can't possibly exist.
-> > Or is that completely non-sensical and/or violate PCIe spec?
-> 
-> 
-> There is some tension here, in that one way to make guest boot faster
-> is to defer hotplug of devices until after it booted.
+On Fri, 18 Sep 2020 at 21:28, Eduardo Habkost <ehabkost@redhat.com> wrote:
+>
+> The following changes since commit 053a4177817db307ec854356e95b5b350800a2=
+16:
+>
+>   Merge remote-tracking branch 'remotes/philmd-gitlab/tags/fw_cfg-2020091=
+8' into staging (2020-09-18 16:34:26 +0100)
+>
+> are available in the Git repository at:
+>
+>   git://github.com/ehabkost/qemu.git tags/x86-next-pull-request
+>
+> for you to fetch changes up to 31ada106d891f56f54d4234ce58c552bc2e734af:
+>
+>   i386: Simplify CPUID_8000_001E for AMD (2020-09-18 13:50:31 -0400)
+>
+> ----------------------------------------------------------------
+> x86 queue, 2020-09-18
+>
+> Cleanups:
+> * Correct the meaning of '0xffffffff' value for hv-spinlocks (Vitaly Kuzn=
+etsov)
+> * vmport: Drop superfluous parenthesis (Philippe Mathieu-Daud=C3=A9)
+>
+> Fixes:
+> * Use generic APIC ID encoding code for EPYC (Babu Moger)
+>
+> ----------------------------------------------------------------
 
-Sorry, I didn't follow that, probably because my PCI knowledge is lacking.
-What does device hotplug have to do with the number of buses enumerated to
-the guest?
+
+Applied, thanks.
+
+Please update the changelog at https://wiki.qemu.org/ChangeLog/5.2
+for any user-visible changes.
+
+-- PMM
