@@ -2,125 +2,245 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9454327346F
-	for <lists+kvm@lfdr.de>; Mon, 21 Sep 2020 22:58:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A690A2734E9
+	for <lists+kvm@lfdr.de>; Mon, 21 Sep 2020 23:29:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726749AbgIUU60 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 21 Sep 2020 16:58:26 -0400
-Received: from sender4-of-o57.zoho.com ([136.143.188.57]:21756 "EHLO
-        sender4-of-o57.zoho.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726467AbgIUU6Z (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 21 Sep 2020 16:58:25 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1600721770; cv=none; 
-        d=zohomail.com; s=zohoarc; 
-        b=Y4gWBlSWg+0yA/gHFZUKbv/aMAk9AUKqn8ASWkrnMSVwHS0GeyNyzgzCexb3E2K2o5ehvvuzsOYYReCGDtDPk/SAS3am04HqItocyU51l7yMP7T6cSS9fbYrLRT8n/VD3rIzcetDKYwbVfXBmLVrbYWrYWTQZyHyseocv8tVWWA=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
-        t=1600721770; h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To; 
-        bh=rh/2U/XNxyoy7UhLIqfqEI+QrbkE8n1oyRx5QDn7yPw=; 
-        b=AEvoK4QvKTNtA2Dhmd8SOhTcxIYiuX9jnIQyDmU6Mf+vXAl+XD9/iL6g2oaUpGaileEIQc23xBhZ7ucl/eqZlC8Q6aXZvPdBPq+kUVB5Cx9HxMAym0aOtxOnlplteFrjYMJyqUDcFvCKJeWj5yYtORNVSPSteOElQw2swJ+mY6U=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
-        spf=pass  smtp.mailfrom=no-reply@patchew.org;
-        dmarc=pass header.from=<no-reply@patchew.org> header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by mx.zohomail.com
-        with SMTPS id 1600721768767227.91629257311638; Mon, 21 Sep 2020 13:56:08 -0700 (PDT)
-Subject: Re: [PATCH] qemu/atomic.h: prefix qemu_ to solve <stdatomic.h> collisions
-Message-ID: <160072176188.21069.7427016597134663502@66eaa9a8a123>
-Reply-To: <qemu-devel@nongnu.org>
-In-Reply-To: <20200921162346.188997-1-stefanha@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From:   no-reply@patchew.org
-To:     stefanha@redhat.com
-Cc:     qemu-devel@nongnu.org, qemu-riscv@nongnu.org, fam@euphon.net,
-        ysato@users.sourceforge.jp, berto@igalia.com, jslaby@suse.cz,
-        rth@twiddle.net, pl@kamp.de, david@redhat.com, pasic@linux.ibm.com,
-        eblake@redhat.com, mreitz@redhat.com, marcandre.lureau@redhat.com,
-        berrange@redhat.com, palmer@dabbelt.com, armbru@redhat.com,
-        kvm@vger.kernel.org, yuval.shaia.ml@gmail.com, mst@redhat.com,
-        cohuck@redhat.com, qemu-block@nongnu.org, sw@weilnetz.de,
-        dgilbert@redhat.com, mdroth@linux.vnet.ibm.com,
-        jiaxun.yang@flygoat.com, jsnow@redhat.com, jcmvbkbc@gmail.com,
-        marcel.apfelbaum@gmail.com, Alistair.Francis@wdc.com,
-        aurelien@aurel32.net, aleksandar.rikalo@syrmia.com,
-        chenhc@lemote.com, aleksandar.qemu.devel@gmail.com,
-        ehabkost@redhat.com, borntraeger@de.ibm.com,
-        sunilmut@microsoft.com, thuth@redhat.com, pbonzini@redhat.com,
-        sstabellini@kernel.org, anthony.perard@citrix.com,
-        kraxel@redhat.com, peter.maydell@linaro.org, namei.unix@gmail.com,
-        paul@xen.org, stefanha@redhat.com, kwolf@redhat.com,
-        kbastian@mail.uni-paderborn.de, sagark@eecs.berkeley.edu,
-        jasowang@redhat.com, laurent@vivier.eu,
-        xen-devel@lists.xenproject.org, mjrosato@linux.ibm.com,
+        id S1726610AbgIUV3u (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 21 Sep 2020 17:29:50 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:27576 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726395AbgIUV3t (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 21 Sep 2020 17:29:49 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1600723787;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=l3O8po8zGnkZ7Hhh9QEdY4yYb/EMIlkVak6tYnjxD78=;
+        b=QfgQ0iibhZLxRuVw3U0MnakUWAkxTFZcwHl0H/6zvHaUC8Q/W6z+Fdj0hZaZPAabFEKAoX
+        dQPG932MjGG866XsdktY3SAXVzNa8PscD5H+kUaN6U/46V+Fun2iUNAnVT8dpfGWXJG4n1
+        opeb9D7As11XQSqCGkB4Bj7lYWaPU+4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-3-nRhULnN0M_uur3-4A9InjA-1; Mon, 21 Sep 2020 17:29:39 -0400
+X-MC-Unique: nRhULnN0M_uur3-4A9InjA-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1ACDE909CAC;
+        Mon, 21 Sep 2020 21:29:34 +0000 (UTC)
+Received: from [10.3.113.127] (ovpn-113-127.phx2.redhat.com [10.3.113.127])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 09B0F10013BD;
+        Mon, 21 Sep 2020 21:29:10 +0000 (UTC)
+Subject: Re: [PATCH] qemu/atomic.h: prefix qemu_ to solve <stdatomic.h>
+ collisions
+To:     Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
+Cc:     qemu-riscv@nongnu.org, Fam Zheng <fam@euphon.net>,
+        Yoshinori Sato <ysato@users.sourceforge.jp>,
+        Alberto Garcia <berto@igalia.com>, Jiri Slaby <jslaby@suse.cz>,
+        Richard Henderson <rth@twiddle.net>, Peter Lieven <pl@kamp.de>,
+        David Hildenbrand <david@redhat.com>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Max Reitz <mreitz@redhat.com>,
+        =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
+        =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Markus Armbruster <armbru@redhat.com>, kvm@vger.kernel.org,
+        Yuval Shaia <yuval.shaia.ml@gmail.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>, qemu-block@nongnu.org,
+        Stefan Weil <sw@weilnetz.de>,
+        "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+        Michael Roth <mdroth@linux.vnet.ibm.com>,
+        Jiaxun Yang <jiaxun.yang@flygoat.com>,
+        John Snow <jsnow@redhat.com>,
+        Max Filippov <jcmvbkbc@gmail.com>,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        Alistair Francis <Alistair.Francis@wdc.com>,
+        Aurelien Jarno <aurelien@aurel32.net>,
+        Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
+        Huacai Chen <chenhc@lemote.com>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        Eduardo Habkost <ehabkost@redhat.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Sunil Muthuswamy <sunilmut@microsoft.com>,
+        Thomas Huth <thuth@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Stefano Stabellini <sstabellini@kernel.org>,
+        Anthony Perard <anthony.perard@citrix.com>,
+        Gerd Hoffmann <kraxel@redhat.com>,
+        Peter Maydell <peter.maydell@linaro.org>,
+        Liu Yuan <namei.unix@gmail.com>, Paul Durrant <paul@xen.org>,
+        Kevin Wolf <kwolf@redhat.com>,
+        Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
+        Sagar Karandikar <sagark@eecs.berkeley.edu>,
+        Jason Wang <jasowang@redhat.com>,
+        Laurent Vivier <laurent@vivier.eu>,
+        xen-devel@lists.xenproject.org,
+        Matthew Rosato <mjrosato@linux.ibm.com>,
         sheepdog@lists.wpkg.org, qemu-s390x@nongnu.org,
-        qemu-arm@nongnu.org, quintela@redhat.com,
-        zhang.zhanghailiang@huawei.com
-Date:   Mon, 21 Sep 2020 13:56:08 -0700 (PDT)
-X-ZohoMailClient: External
+        qemu-arm@nongnu.org, Juan Quintela <quintela@redhat.com>,
+        Hailiang Zhang <zhang.zhanghailiang@huawei.com>
+References: <20200921162346.188997-1-stefanha@redhat.com>
+From:   Eric Blake <eblake@redhat.com>
+Organization: Red Hat, Inc.
+Message-ID: <1ce94412-7a01-9208-31b1-76b7562c3843@redhat.com>
+Date:   Mon, 21 Sep 2020 16:29:10 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
+MIME-Version: 1.0
+In-Reply-To: <20200921162346.188997-1-stefanha@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDkyMTE2MjM0Ni4xODg5
-OTctMS1zdGVmYW5oYUByZWRoYXQuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIHNlZW1zIHRvIGhh
-dmUgc29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cgZm9yCm1vcmUg
-aW5mb3JtYXRpb246CgpUeXBlOiBzZXJpZXMKTWVzc2FnZS1pZDogMjAyMDA5MjExNjIzNDYuMTg4
-OTk3LTEtc3RlZmFuaGFAcmVkaGF0LmNvbQpTdWJqZWN0OiBbUEFUQ0hdIHFlbXUvYXRvbWljLmg6
-IHByZWZpeCBxZW11XyB0byBzb2x2ZSA8c3RkYXRvbWljLmg+IGNvbGxpc2lvbnMKCj09PSBURVNU
-IFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKZ2l0IHJldi1wYXJzZSBiYXNlID4gL2Rldi9u
-dWxsIHx8IGV4aXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBj
-b25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5h
-bGdvcml0aG0gaGlzdG9ncmFtCi4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgYmFz
-ZS4uCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2
-NGQxZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3BhdGNoZXctcHJv
-amVjdC9xZW11CiAtIFt0YWcgdXBkYXRlXSAgICAgIHBhdGNoZXcvMjAyMDA5MTgxMDM0MzAuMjk3
-MTY3LTEtdGh1dGhAcmVkaGF0LmNvbSAtPiBwYXRjaGV3LzIwMjAwOTE4MTAzNDMwLjI5NzE2Ny0x
-LXRodXRoQHJlZGhhdC5jb20KU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0JwoyNWNhNzAy
-IHFlbXUvYXRvbWljLmg6IHByZWZpeCBxZW11XyB0byBzb2x2ZSA8c3RkYXRvbWljLmg+IGNvbGxp
-c2lvbnMKCj09PSBPVVRQVVQgQkVHSU4gPT09CkVSUk9SOiBNYWNyb3Mgd2l0aCBtdWx0aXBsZSBz
-dGF0ZW1lbnRzIHNob3VsZCBiZSBlbmNsb3NlZCBpbiBhIGRvIC0gd2hpbGUgbG9vcAojMjk2ODog
-RklMRTogaW5jbHVkZS9xZW11L2F0b21pYy5oOjE1MjoKKyNkZWZpbmUgcWVtdV9hdG9taWNfcmN1
-X3JlYWRfX25vY2hlY2socHRyLCB2YWxwdHIpICAgICAgXAogICAgIF9fYXRvbWljX2xvYWQocHRy
-LCB2YWxwdHIsIF9fQVRPTUlDX1JFTEFYRUQpOyAgICAgICBcCiAgICAgc21wX3JlYWRfYmFycmll
-cl9kZXBlbmRzKCk7CgpFUlJPUjogc3BhY2UgcmVxdWlyZWQgYmVmb3JlIHRoYXQgJyonIChjdHg6
-VnhCKQojMzEyMzogRklMRTogaW5jbHVkZS9xZW11L2F0b21pYy5oOjM0NzoKKyNkZWZpbmUgcWVt
-dV9hdG9taWNfcmVhZF9fbm9jaGVjayhwKSAoKihfX3R5cGVvZl9fKCoocCkpIHZvbGF0aWxlKikg
-KHApKQogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICBeCgpFUlJPUjogVXNlIG9mIHZvbGF0aWxlIGlzIHVzdWFsbHkgd3Jvbmcs
-IHBsZWFzZSBhZGQgYSBjb21tZW50CiMzMTIzOiBGSUxFOiBpbmNsdWRlL3FlbXUvYXRvbWljLmg6
-MzQ3OgorI2RlZmluZSBxZW11X2F0b21pY19yZWFkX19ub2NoZWNrKHApICgqKF9fdHlwZW9mX18o
-KihwKSkgdm9sYXRpbGUqKSAocCkpCgpFUlJPUjogc3BhY2UgcmVxdWlyZWQgYmVmb3JlIHRoYXQg
-JyonIChjdHg6VnhCKQojMzEyNTogRklMRTogaW5jbHVkZS9xZW11L2F0b21pYy5oOjM0OToKKyAg
-ICAoKCooX190eXBlb2ZfXygqKHApKSB2b2xhdGlsZSopIChwKSkgPSAoaSkpCiAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICBeCgpFUlJPUjogVXNlIG9mIHZvbGF0aWxlIGlzIHVzdWFs
-bHkgd3JvbmcsIHBsZWFzZSBhZGQgYSBjb21tZW50CiMzMTI1OiBGSUxFOiBpbmNsdWRlL3FlbXUv
-YXRvbWljLmg6MzQ5OgorICAgICgoKihfX3R5cGVvZl9fKCoocCkpIHZvbGF0aWxlKikgKHApKSA9
-IChpKSkKCkVSUk9SOiBzcGFjZSByZXF1aXJlZCBhZnRlciB0aGF0ICcsJyAoY3R4OlZ4VikKIzMx
-MzA6IEZJTEU6IGluY2x1ZGUvcWVtdS9hdG9taWMuaDozNTI6CisjZGVmaW5lIHFlbXVfYXRvbWlj
-X3NldChwdHIsIGkpICAgICBxZW11X2F0b21pY19zZXRfX25vY2hlY2socHRyLGkpCiAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-XgoKRVJST1I6IG1lbW9yeSBiYXJyaWVyIHdpdGhvdXQgY29tbWVudAojMzIwNTogRklMRTogaW5j
-bHVkZS9xZW11L2F0b21pYy5oOjQxMDoKKyNkZWZpbmUgcWVtdV9hdG9taWNfeGNoZyhwdHIsIGkp
-IChzbXBfbWIoKSwgX19zeW5jX2xvY2tfdGVzdF9hbmRfc2V0KHB0ciwgaSkpCgpXQVJOSU5HOiBC
-bG9jayBjb21tZW50cyB1c2UgYSBsZWFkaW5nIC8qIG9uIGEgc2VwYXJhdGUgbGluZQojMzI4MDog
-RklMRTogaW5jbHVkZS9xZW11L2F0b21pYy5oOjQ2MjoKKy8qIHFlbXVfYXRvbWljX21iX3JlYWQv
-c2V0IHNlbWFudGljcyBtYXAgSmF2YSB2b2xhdGlsZSB2YXJpYWJsZXMuIFRoZXkgYXJlCgpXQVJO
-SU5HOiBCbG9jayBjb21tZW50cyB1c2UgYSBsZWFkaW5nIC8qIG9uIGEgc2VwYXJhdGUgbGluZQoj
-NjM5NDogRklMRTogdXRpbC9iaXRtYXAuYzoyMTQ6CisgICAgICAgIC8qIElmIHdlIGF2b2lkZWQg
-dGhlIGZ1bGwgYmFycmllciBpbiBxZW11X2F0b21pY19vcigpLCBpc3N1ZSBhCgpXQVJOSU5HOiBC
-bG9jayBjb21tZW50cyB1c2UgYSBsZWFkaW5nIC8qIG9uIGEgc2VwYXJhdGUgbGluZQojNzQzMDog
-RklMRTogdXRpbC9yY3UuYzo4NToKKyAgICAgICAgLyogSW5zdGVhZCBvZiB1c2luZyBxZW11X2F0
-b21pY19tYl9zZXQgZm9yIGluZGV4LT53YWl0aW5nLCBhbmQKCldBUk5JTkc6IEJsb2NrIGNvbW1l
-bnRzIHVzZSBhIGxlYWRpbmcgLyogb24gYSBzZXBhcmF0ZSBsaW5lCiM3NDU2OiBGSUxFOiB1dGls
-L3JjdS5jOjE1NDoKKyAgICAgICAgLyogSW4gZWl0aGVyIGNhc2UsIHRoZSBxZW11X2F0b21pY19t
-Yl9zZXQgYmVsb3cgYmxvY2tzIHN0b3JlcyB0aGF0IGZyZWUKCnRvdGFsOiA3IGVycm9ycywgNCB3
-YXJuaW5ncywgNjUwNyBsaW5lcyBjaGVja2VkCgpDb21taXQgMjVjYTcwMjliMmYyIChxZW11L2F0
-b21pYy5oOiBwcmVmaXggcWVtdV8gdG8gc29sdmUgPHN0ZGF0b21pYy5oPiBjb2xsaXNpb25zKSBo
-YXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3Jz
-CmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpD
-SEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFu
-ZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRw
-Oi8vcGF0Y2hldy5vcmcvbG9ncy8yMDIwMDkyMTE2MjM0Ni4xODg5OTctMS1zdGVmYW5oYUByZWRo
-YXQuY29tL3Rlc3RpbmcuY2hlY2twYXRjaC8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJh
-dGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cHM6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVh
-c2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
+On 9/21/20 11:23 AM, Stefan Hajnoczi wrote:
+> clang's C11 atomic_fetch_*() functions only take a C11 atomic type
+> pointer argument. QEMU uses direct types (int, etc) and this causes a
+> compiler error when a QEMU code calls these functions in a source file
+> that also included <stdatomic.h> via a system header file:
+> 
+>    $ CC=clang CXX=clang++ ./configure ... && make
+>    ../util/async.c:79:17: error: address argument to atomic operation must be a pointer to _Atomic type ('unsigned int *' invalid)
+> 
+> Avoid using atomic_*() names in QEMU's atomic.h since that namespace is
+> used by <stdatomic.h>. Prefix QEMU's APIs with qemu_ so that atomic.h
+> and <stdatomic.h> can co-exist.
+> 
+> This patch was generated using:
+> 
+>    $ git diff | grep -o '\<atomic_[a-z0-9_]\+' | sort -u >/tmp/changed_identifiers
+
+Missing a step in the recipe: namely, you probably modified 
+include/qemu/atomic*.h prior to running 'git diff' (so that you actually 
+had input to feed to grep -o).  But spelling it 'git diff HEAD^ 
+include/qemu/atomic*.h | ...' does indeed give me a sane list of 
+identifiers that looks like what you touched in the rest of the patch.
+
+>    $ for identifier in $(</tmp/changed_identifiers64); do \
+
+Also not quite the right recipe, based on the file name used in the line 
+above.
+
+>         sed -i "s%\<$identifier\>%qemu_$identifier%" $(git grep -l "\<$identifier\>") \
+>      done
+> 
+
+Fortunately, running "git grep -c '\<atomic_[a-z0-9_]\+'" on the 
+pre-patch state of the tree gives me a list that is somewhat close to 
+yours, where the obvious difference in line counts is explained by:
+
+> I manually fixed line-wrap issues and misaligned rST tables.
+> 
+> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+> ---
+
+First, focusing on the change summary:
+
+>   docs/devel/lockcnt.txt                        |  14 +-
+>   docs/devel/rcu.txt                            |  40 +--
+>   accel/tcg/atomic_template.h                   |  20 +-
+>   include/block/aio-wait.h                      |   4 +-
+>   include/block/aio.h                           |   8 +-
+>   include/exec/cpu_ldst.h                       |   2 +-
+>   include/exec/exec-all.h                       |   6 +-
+>   include/exec/log.h                            |   6 +-
+>   include/exec/memory.h                         |   2 +-
+>   include/exec/ram_addr.h                       |  27 +-
+>   include/exec/ramlist.h                        |   2 +-
+>   include/exec/tb-lookup.h                      |   4 +-
+>   include/hw/core/cpu.h                         |   2 +-
+>   include/qemu/atomic.h                         | 258 +++++++-------
+>   include/qemu/atomic128.h                      |   6 +-
+
+These two are the most important for the sake of this patch; perhaps 
+it's worth a temporary override of your git orderfile if you have to 
+respin, to list them first?
+
+>   include/qemu/bitops.h                         |   2 +-
+>   include/qemu/coroutine.h                      |   2 +-
+>   include/qemu/log.h                            |   6 +-
+>   include/qemu/queue.h                          |   8 +-
+>   include/qemu/rcu.h                            |  10 +-
+>   include/qemu/rcu_queue.h                      | 103 +++---
+
+Presumably, this and any other file with an odd number of changes was 
+due to a difference in lines after reformatting long lines.
+
+>   include/qemu/seqlock.h                        |   8 +-
+...
+
+>   util/stats64.c                                |  34 +-
+>   docs/devel/atomics.rst                        | 326 +++++++++---------
+>   .../opensbi-riscv32-generic-fw_dynamic.elf    | Bin 558668 -> 558698 bytes
+>   .../opensbi-riscv64-generic-fw_dynamic.elf    | Bin 620424 -> 620454 bytes
+
+Why are we regenerating .elf files in this patch?  Is your change even 
+correct for those two files?
+
+>   scripts/kernel-doc                            |   2 +-
+>   tcg/aarch64/tcg-target.c.inc                  |   2 +-
+>   tcg/mips/tcg-target.c.inc                     |   2 +-
+>   tcg/ppc/tcg-target.c.inc                      |   6 +-
+>   tcg/sparc/tcg-target.c.inc                    |   5 +-
+>   135 files changed, 1195 insertions(+), 1130 deletions(-)
+
+I don't spot accel/tcg/atomic_common.c.inc in the list (which declares 
+functions such as atomic_trace_rmw_pre) - I guess that's intentional 
+based on how you tried to edit only the identifiers you touched in 
+include/qemu/atomic*.h.
+
+For the rest of this patch, I only spot-checked in places, trusting the 
+mechanical nature of this patch, and not spotting anything wrong in the 
+places I checked.  But the two .elf files worry me enough to withhold 
+R-b.  At the same time, because it's big, it will probably be a source 
+of conflicts if we don't get it in soon, but can also be regenerated (if 
+your recipe is corrected) without too much difficulty.  So I am in favor 
+of the idea.
+
+> diff --git a/pc-bios/opensbi-riscv32-generic-fw_dynamic.elf b/pc-bios/opensbi-riscv32-generic-fw_dynamic.elf
+> index eb9ebf5674d3953ab25de6bf4db134abe904eb20..35b80512446dcf5c49424ae90caacf3c579be1b5 100644
+> GIT binary patch
+> delta 98
+> zcmX@pqx7mrsiB3jg{g(Pg=Gt?!4uZP)ZEhe?LdZ@5QIJ5?Hg+mgxS918!HgAZQt>Y
+> ceSHN~X?i|K5fhYsvykI97nHrFhGPaN0Hp#a^8f$<
+> 
+> delta 62
+> zcmaFWqjaW6siB3jg{g(Pg=Gt?!ISN#Pguo-rU!guEowjhjTMO5wjck-zP@66bv{QC
+> S)Amn=9Jjf)U#j7l!3h9Zj2qGb
+> 
+> diff --git a/pc-bios/opensbi-riscv64-generic-fw_dynamic.elf b/pc-bios/opensbi-riscv64-generic-fw_dynamic.elf
+> index 642a64e240d09b2ddb9fc12c74718ae8d386b9d3..9cf2cf23b747cb5be1d3389a0611d8697609c6f8 100644
+> GIT binary patch
+> delta 102
+> zcmeBpue$8LYC{WS3sVbo3(FSPMGsgDQ*%q>w*wh6LJ;=!eV<s1Ak21y&#XYq2E^>!
+> e4L)<s&w(mGAJ19D1Z6uWaUSP_vN>`&8@K>*RVYvZ
+> 
+> delta 66
+> zcmZ4XUbW-BYC{WS3sVbo3(FSPMGv+wf50juH2uUU)}nU%&#XYq2E^>!?LTwO&)NPs
+> Up0kK)dsGtVajxxZxttAL0Np<vJ^%m!
+> 
+> diff --git a/scripts/kernel-doc b/scripts/kernel-doc
+> index 030b5c8691..9ec38a1bf1 100755
+> --- a/scripts/kernel-doc
+> +++ b/scripts/kernel-doc
+> @@ -1625,7 +1625,7 @@ sub dump_function($$) {
+>       # If you mess with these regexps, it's a good idea to check that
+>       # the following functions' documentation still comes out right:
+>       # - parport_register_device (function pointer parameters)
+> -    # - atomic_set (macro)
+> +    # - qemu_atomic_set (macro)
+>       # - pci_match_device, __copy_to_user (long return type)
+
+Does the result of sphinx still look good, as mentioned in this comment?
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
+
