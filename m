@@ -2,59 +2,60 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C7640271F02
-	for <lists+kvm@lfdr.de>; Mon, 21 Sep 2020 11:38:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 14AC9271F06
+	for <lists+kvm@lfdr.de>; Mon, 21 Sep 2020 11:38:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726422AbgIUJiJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 21 Sep 2020 05:38:09 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:14996 "EHLO
-        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726333AbgIUJiI (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 21 Sep 2020 05:38:08 -0400
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 08L9V8WD021211;
-        Mon, 21 Sep 2020 05:38:07 -0400
+        id S1726496AbgIUJiu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 21 Sep 2020 05:38:50 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:57478 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726333AbgIUJit (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 21 Sep 2020 05:38:49 -0400
+Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 08L9VsPc120506;
+        Mon, 21 Sep 2020 05:38:49 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
  references : from : message-id : date : mime-version : in-reply-to :
  content-type : content-transfer-encoding; s=pp1;
- bh=2NOVFDzcjunGadd6e7uVTGR0M1EULB22GtgMFpYOvME=;
- b=mSU1hSHoRsZbap6voVDo8NSykOE92NMlvcwmMuwd93dkDTIzPaYBIzcEJqdYc4VJz2l9
- 3CnbjqH4nRcTHNXTX7i4BY09LkyzeawM1W2n6uBKnm6AIkH+gBdJcHPtR2uSc45sUR8L
- JIcw911aluWTU/5g6JDykfzlDK3ygpc4TFiD5kewMDWnva/2EOeIKWj2Kq/+wTm1HjdB
- cv+SX36IyYchfcx6feQvPnWql9VGxC6soUFH8XOcy5kYFH0DOv8MK6+9nHeVhT6GLeD6
- wik6iitjbUZAPFZq36+JgJRhkdZIQJWGHUUrQTde9HUuGrJrEKMZh11ZAsdp7m3bTo5n LA== 
+ bh=zC0qbv7mfy7DEhUUZDjhb2qbN4fJPIoQ9h2oF7sKsOM=;
+ b=YeuN4EprRElwxW4K0JIdMT5fGRbqon84/DkgodGMnRU9FESUO9+fFwcTs5cVUFiyqKZu
+ hy+TvABwllopTEWT5jJdqcFtbadihW+IRkpIAcmrnDSfxoUkirQF3kcs2RuzpXcFnclR
+ IretbLVH1wEEAw5dJ3P1gzsDJ9h+dngpI35J6pQLnbwxjdHmNe8XkqAR6+BT1syiKF4R
+ yC1MOXwmS9f9aw4Yc7b/wDr3Di26UphN6c829PcYwBqdrFRwQdcUo7EeWOdpkOmQEo7e
+ Ho8m0jaGjBC1J9le0+kAZ6R/5blVWyNA6vHHwT57pijlGVKrHIwgtIRMKjq4t1jv+kmM IA== 
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 33psavrnna-1
+        by mx0a-001b2d01.pphosted.com with ESMTP id 33ps3r11jy-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 21 Sep 2020 05:38:07 -0400
-Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 08L9VBen021471;
-        Mon, 21 Sep 2020 05:38:07 -0400
-Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 33psavrnmj-1
+        Mon, 21 Sep 2020 05:38:48 -0400
+Received: from m0187473.ppops.net (m0187473.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 08L9WVaD122134;
+        Mon, 21 Sep 2020 05:38:47 -0400
+Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 33ps3r11j5-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 21 Sep 2020 05:38:07 -0400
-Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
-        by ppma03ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 08L9QYqh003813;
-        Mon, 21 Sep 2020 09:38:05 GMT
-Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
-        by ppma03ams.nl.ibm.com with ESMTP id 33n9m89v7y-1
+        Mon, 21 Sep 2020 05:38:47 -0400
+Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
+        by ppma06ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 08L9SRTu019898;
+        Mon, 21 Sep 2020 09:38:44 GMT
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
+        by ppma06ams.nl.ibm.com with ESMTP id 33n98gsw98-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 21 Sep 2020 09:38:04 +0000
+        Mon, 21 Sep 2020 09:38:44 +0000
 Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
-        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 08L9c24L34406678
+        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 08L9cfqD16384464
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 21 Sep 2020 09:38:02 GMT
+        Mon, 21 Sep 2020 09:38:42 GMT
 Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 3D555A4054;
-        Mon, 21 Sep 2020 09:38:02 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id D0F77A4060;
+        Mon, 21 Sep 2020 09:38:41 +0000 (GMT)
 Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id AC617A405C;
-        Mon, 21 Sep 2020 09:38:01 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id 4729CA405C;
+        Mon, 21 Sep 2020 09:38:41 +0000 (GMT)
 Received: from oc7455500831.ibm.com (unknown [9.145.163.1])
         by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Mon, 21 Sep 2020 09:38:01 +0000 (GMT)
-Subject: Re: [PATCH 1/4] s390/pci: stash version in the zpci_dev
+        Mon, 21 Sep 2020 09:38:41 +0000 (GMT)
+Subject: Re: [PATCH 2/4] s390/pci: track whether util_str is valid in the
+ zpci_dev
 To:     Matthew Rosato <mjrosato@linux.ibm.com>,
         alex.williamson@redhat.com, cohuck@redhat.com,
         schnelle@linux.ibm.com
@@ -62,7 +63,7 @@ Cc:     pmorel@linux.ibm.com, hca@linux.ibm.com, gor@linux.ibm.com,
         gerald.schaefer@linux.ibm.com, linux-s390@vger.kernel.org,
         kvm@vger.kernel.org, linux-kernel@vger.kernel.org
 References: <1600529318-8996-1-git-send-email-mjrosato@linux.ibm.com>
- <1600529318-8996-2-git-send-email-mjrosato@linux.ibm.com>
+ <1600529318-8996-3-git-send-email-mjrosato@linux.ibm.com>
 From:   Christian Borntraeger <borntraeger@de.ibm.com>
 Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
  xsFNBE6cPPgBEAC2VpALY0UJjGmgAmavkL/iAdqul2/F9ONz42K6NrwmT+SI9CylKHIX+fdf
@@ -107,63 +108,69 @@ Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
  jaqYefx7yQ7FJXXETd2uVURiDeNEFhVZWb5CiBJM5c6qQMhmkS4VyT7/+raaEGgkEKEgHOWf
  ZDP8BHfXtszHqI3Fo1F4IKFo/AP8GOFFxMRgbvlAs8z/+rEEaQYjxYJqj08raw6P4LFBqozr
  nS4h0HDFPrrp1C2EMVYIQrMokWvlFZbCpsdYbBI=
-Message-ID: <2182380c-44f6-edcb-03a0-2af79a16536c@de.ibm.com>
-Date:   Mon, 21 Sep 2020 11:38:01 +0200
+Message-ID: <72aa9ba3-cb88-c8ab-4cfe-dcd54e7a1426@de.ibm.com>
+Date:   Mon, 21 Sep 2020 11:38:41 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <1600529318-8996-2-git-send-email-mjrosato@linux.ibm.com>
+In-Reply-To: <1600529318-8996-3-git-send-email-mjrosato@linux.ibm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 X-TM-AS-GCONF: 00
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
  definitions=2020-09-21_01:2020-09-21,2020-09-20 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 bulkscore=0
- clxscore=1015 priorityscore=1501 impostorscore=0 mlxscore=0 phishscore=0
- malwarescore=0 adultscore=0 lowpriorityscore=0 spamscore=0 mlxlogscore=999
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
- definitions=main-2009210067
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0
+ priorityscore=1501 adultscore=0 spamscore=0 impostorscore=0 mlxscore=0
+ lowpriorityscore=0 clxscore=1015 bulkscore=0 phishscore=0 mlxlogscore=993
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2006250000 definitions=main-2009210067
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+
+
 On 19.09.20 17:28, Matthew Rosato wrote:
-> In preparation for passing the info on to vfio-pci devices, stash the
-> supported PCI version for the target device in the zpci_dev.
+> We'll need to keep track of whether or not the byte string in util_str is
+> valid and thus needs to be passed to a vfio-pci passthrough device.
 > 
 > Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
 
-In case this will go via the vfio tree, with my s390 kernel maintainer hat on:
+If this goes via the vfio tree, 
 
 Acked-by: Christian Borntraeger <borntraeger@de.ibm.com>
+
+(please wait for an ack from Niklas Schnelle as well)
 > ---
->  arch/s390/include/asm/pci.h | 1 +
+>  arch/s390/include/asm/pci.h | 3 ++-
 >  arch/s390/pci/pci_clp.c     | 1 +
->  2 files changed, 2 insertions(+)
+>  2 files changed, 3 insertions(+), 1 deletion(-)
 > 
 > diff --git a/arch/s390/include/asm/pci.h b/arch/s390/include/asm/pci.h
-> index 99b92c3..882e233 100644
+> index 882e233..32eb975 100644
 > --- a/arch/s390/include/asm/pci.h
 > +++ b/arch/s390/include/asm/pci.h
-> @@ -179,6 +179,7 @@ struct zpci_dev {
->  	atomic64_t mapped_pages;
->  	atomic64_t unmapped_pages;
+> @@ -132,7 +132,8 @@ struct zpci_dev {
+>  	u8		rid_available	: 1;
+>  	u8		has_hp_slot	: 1;
+>  	u8		is_physfn	: 1;
+> -	u8		reserved	: 5;
+> +	u8		util_avail	: 1;
+> +	u8		reserved	: 4;
+>  	unsigned int	devfn;		/* DEVFN part of the RID*/
 >  
-> +	u8		version;
->  	enum pci_bus_speed max_bus_speed;
->  
->  	struct dentry	*debugfs_dev;
+>  	struct mutex lock;
 > diff --git a/arch/s390/pci/pci_clp.c b/arch/s390/pci/pci_clp.c
-> index 7e735f4..48bf316 100644
+> index 48bf316..d011134 100644
 > --- a/arch/s390/pci/pci_clp.c
 > +++ b/arch/s390/pci/pci_clp.c
-> @@ -102,6 +102,7 @@ static void clp_store_query_pci_fngrp(struct zpci_dev *zdev,
->  	zdev->msi_addr = response->msia;
->  	zdev->max_msi = response->noi;
->  	zdev->fmb_update = response->mui;
-> +	zdev->version = response->version;
->  
->  	switch (response->version) {
->  	case 1:
+> @@ -168,6 +168,7 @@ static int clp_store_query_pci_fn(struct zpci_dev *zdev,
+>  	if (response->util_str_avail) {
+>  		memcpy(zdev->util_str, response->util_str,
+>  		       sizeof(zdev->util_str));
+> +		zdev->util_avail = 1;
+>  	}
+>  	zdev->mio_capable = response->mio_addr_avail;
+>  	for (i = 0; i < PCI_STD_NUM_BARS; i++) {
 > 
