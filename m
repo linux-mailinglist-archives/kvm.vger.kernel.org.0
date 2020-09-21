@@ -2,172 +2,59 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0B7D8271D93
-	for <lists+kvm@lfdr.de>; Mon, 21 Sep 2020 10:10:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id ECA72271DB0
+	for <lists+kvm@lfdr.de>; Mon, 21 Sep 2020 10:15:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726681AbgIUIKo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 21 Sep 2020 04:10:44 -0400
-Received: from userp2120.oracle.com ([156.151.31.85]:56470 "EHLO
-        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726571AbgIUIKo (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 21 Sep 2020 04:10:44 -0400
-Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
-        by userp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 08L88c44121738;
-        Mon, 21 Sep 2020 08:10:39 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
- subject : date : message-id : in-reply-to : references; s=corp-2020-01-29;
- bh=DRZWyZnEtFgl+m+sGuHTIN6A1v0HmzpTKH+x+HWb6gA=;
- b=k6X3Xb3Y69Q0refHTqeQXEuU1tX5BvR4fQpcjh2glu1QTQteXUbw8IIbzpu2CRO3feMS
- iNc4J2dh4xjoGBxxByT2+McOXOQKTtQ+5ztSCNHzRvZoiuXaxB02oDNzM5DaFjKQJfMp
- nRTo7aOhBIdJi7y38O1GM+eR9od1PdboUBHjp1YjQTsObcduQvt+SsdnNdOiHuL4nW3m
- RXEc06coScFsZEDXyjd57zywWpcep+LFFhIGYm3VGtwBuwFq/qoTmFr0dLjzn3WdYda7
- GwzF3jqg4fddfW1/agmlsy2iXmBXyinwNntJqnujJ5iIM8g5LgBdRhh+wjyZ8FltjOl2 yw== 
-Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
-        by userp2120.oracle.com with ESMTP id 33ndnu3u90-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
-        Mon, 21 Sep 2020 08:10:39 +0000
-Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
-        by aserp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 08L86HtY143077;
-        Mon, 21 Sep 2020 08:10:38 GMT
-Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
-        by aserp3030.oracle.com with ESMTP id 33nujkb3dp-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 21 Sep 2020 08:10:38 +0000
-Received: from abhmp0016.oracle.com (abhmp0016.oracle.com [141.146.116.22])
-        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 08L8AbfB009303;
-        Mon, 21 Sep 2020 08:10:38 GMT
-Received: from sadhukhan-nvmx.osdevelopmeniad.oraclevcn.com (/100.100.230.226)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Mon, 21 Sep 2020 01:10:37 -0700
-From:   Krish Sadhukhan <krish.sadhukhan@oracle.com>
+        id S1726341AbgIUIPh convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Mon, 21 Sep 2020 04:15:37 -0400
+Received: from mail.kernel.org ([198.145.29.99]:58990 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726324AbgIUIPh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 21 Sep 2020 04:15:37 -0400
+From:   bugzilla-daemon@bugzilla.kernel.org
+Authentication-Results: mail.kernel.org; dkim=permerror (bad message/signature format)
 To:     kvm@vger.kernel.org
-Cc:     pbonzini@redhat.com, jmattson@google.com,
-        sean.j.christopherson@intel.com
-Subject: [PATCH 3/3 v3] nVMX: Test vmentry of unrestricted (unpaged protected) nested guest
-Date:   Mon, 21 Sep 2020 08:10:27 +0000
-Message-Id: <20200921081027.23047-4-krish.sadhukhan@oracle.com>
-X-Mailer: git-send-email 2.18.4
-In-Reply-To: <20200921081027.23047-1-krish.sadhukhan@oracle.com>
-References: <20200921081027.23047-1-krish.sadhukhan@oracle.com>
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9750 signatures=668679
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0 malwarescore=0
- mlxlogscore=999 phishscore=0 adultscore=0 spamscore=0 suspectscore=1
- mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2006250000 definitions=main-2009210059
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9750 signatures=668679
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- lowpriorityscore=0 phishscore=0 adultscore=0 suspectscore=1 bulkscore=0
- clxscore=1015 impostorscore=0 mlxlogscore=999 mlxscore=0 spamscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
- definitions=main-2009210059
+Subject: [Bug 209285] compilation fails
+Date:   Mon, 21 Sep 2020 08:15:36 +0000
+X-Bugzilla-Reason: None
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Product: Virtualization
+X-Bugzilla-Component: kvm
+X-Bugzilla-Version: unspecified
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: attila.jecs@gmail.com
+X-Bugzilla-Status: RESOLVED
+X-Bugzilla-Resolution: PATCH_ALREADY_AVAILABLE
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: bug_status resolution
+Message-ID: <bug-209285-28872-lfICQ1K6xy@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-209285-28872@https.bugzilla.kernel.org/>
+References: <bug-209285-28872@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8BIT
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
+MIME-Version: 1.0
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-According to section "UNRESTRICTED GUESTS" in SDM vol 3c, if the
-"unrestricted guest" secondary VM-execution control is set, guests can run
-in unpaged protected mode or in real mode. This patch tests vmetnry of an
-unrestricted guest in unpaged protected mode.
+https://bugzilla.kernel.org/show_bug.cgi?id=209285
 
-Signed-off-by: Jim Mattson <jmattson@google.com>
-Signed-off-by: Krish Sadhukhan <krish.sadhukhan@oracle.com>
----
- x86/vmx.c       |  2 +-
- x86/vmx.h       |  1 +
- x86/vmx_tests.c | 48 ++++++++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 50 insertions(+), 1 deletion(-)
+Attila Jecs (attila.jecs@gmail.com) changed:
 
-diff --git a/x86/vmx.c b/x86/vmx.c
-index 07415b4..1a84a74 100644
---- a/x86/vmx.c
-+++ b/x86/vmx.c
-@@ -1699,7 +1699,7 @@ static void test_vmx_caps(void)
- }
- 
- /* This function can only be called in guest */
--static void __attribute__((__used__)) hypercall(u32 hypercall_no)
-+void __attribute__((__used__)) hypercall(u32 hypercall_no)
- {
- 	u64 val = 0;
- 	val = (hypercall_no & HYPERCALL_MASK) | HYPERCALL_BIT;
-diff --git a/x86/vmx.h b/x86/vmx.h
-index d1c2436..e29301e 100644
---- a/x86/vmx.h
-+++ b/x86/vmx.h
-@@ -895,6 +895,7 @@ bool ept_ad_bits_supported(void);
- void __enter_guest(u8 abort_flag, struct vmentry_result *result);
- void enter_guest(void);
- void enter_guest_with_bad_controls(void);
-+void hypercall(u32 hypercall_no);
- 
- typedef void (*test_guest_func)(void);
- typedef void (*test_teardown_func)(void *data);
-diff --git a/x86/vmx_tests.c b/x86/vmx_tests.c
-index 22f0c7b..1cadc56 100644
---- a/x86/vmx_tests.c
-+++ b/x86/vmx_tests.c
-@@ -8029,6 +8029,53 @@ static void vmx_guest_state_area_test(void)
- 	enter_guest();
- }
- 
-+extern void unrestricted_guest_main(void);
-+asm (".code32\n"
-+	"unrestricted_guest_main:\n"
-+	"vmcall\n"
-+	"nop\n"
-+	"mov $1, %edi\n"
-+	"call hypercall\n"
-+	".code64\n");
-+
-+static void setup_unrestricted_guest(void)
-+{
-+	vmcs_write(GUEST_CR0, vmcs_read(GUEST_CR0) & ~(X86_CR0_PG));
-+	vmcs_write(ENT_CONTROLS, vmcs_read(ENT_CONTROLS) & ~ENT_GUEST_64);
-+	vmcs_write(GUEST_EFER, vmcs_read(GUEST_EFER) & ~EFER_LMA);
-+	vmcs_write(GUEST_RIP, virt_to_phys(unrestricted_guest_main));
-+}
-+
-+static void unsetup_unrestricted_guest(void)
-+{
-+	vmcs_write(GUEST_CR0, vmcs_read(GUEST_CR0) | X86_CR0_PG);
-+	vmcs_write(ENT_CONTROLS, vmcs_read(ENT_CONTROLS) | ENT_GUEST_64);
-+	vmcs_write(GUEST_EFER, vmcs_read(GUEST_EFER) | EFER_LMA);
-+	vmcs_write(GUEST_RIP, (u64) phys_to_virt(vmcs_read(GUEST_RIP)));
-+	vmcs_write(GUEST_RSP, (u64) phys_to_virt(vmcs_read(GUEST_RSP)));
-+}
-+
-+/*
-+ * If "unrestricted guest" secondary VM-execution control is set, guests
-+ * can run in unpaged protected mode.
-+ */
-+static void vmentry_unrestricted_guest_test(void)
-+{
-+	test_set_guest(unrestricted_guest_main);
-+	setup_unrestricted_guest();
-+	if (setup_ept(false))
-+		test_skip("EPT not supported");
-+       vmcs_write(CPU_EXEC_CTRL1, vmcs_read(CPU_EXEC_CTRL1) | CPU_URG);
-+       test_guest_state("Unrestricted guest test", false, CPU_URG, "CPU_URG");
-+
-+	/*
-+	 * Let the guest finish execution as a regular guest
-+	 */
-+	unsetup_unrestricted_guest();
-+	vmcs_write(CPU_EXEC_CTRL1, vmcs_read(CPU_EXEC_CTRL1) & ~CPU_URG);
-+	enter_guest();
-+}
-+
- static bool valid_vmcs_for_vmentry(void)
- {
- 	struct vmcs *current_vmcs = NULL;
-@@ -10234,6 +10281,7 @@ struct vmx_test vmx_tests[] = {
- 	TEST(vmx_host_state_area_test),
- 	TEST(vmx_guest_state_area_test),
- 	TEST(vmentry_movss_shadow_test),
-+	TEST(vmentry_unrestricted_guest_test),
- 	/* APICv tests */
- 	TEST(vmx_eoi_bitmap_ioapic_scan_test),
- 	TEST(vmx_hlt_with_rvi_test),
+           What    |Removed                     |Added
+----------------------------------------------------------------------------
+             Status|NEW                         |RESOLVED
+         Resolution|---                         |PATCH_ALREADY_AVAILABLE
+
+--- Comment #4 from Attila Jecs (attila.jecs@gmail.com) ---
+okay, thanks
+
 -- 
-2.18.4
-
+You are receiving this mail because:
+You are watching the assignee of the bug.
