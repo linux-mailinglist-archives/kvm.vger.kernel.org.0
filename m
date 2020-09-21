@@ -2,112 +2,1125 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C7CCD2718CF
-	for <lists+kvm@lfdr.de>; Mon, 21 Sep 2020 02:23:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5968027197B
+	for <lists+kvm@lfdr.de>; Mon, 21 Sep 2020 04:50:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726305AbgIUAXV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 20 Sep 2020 20:23:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52180 "EHLO
+        id S1726234AbgIUCuy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 20 Sep 2020 22:50:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46476 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726236AbgIUAXV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 20 Sep 2020 20:23:21 -0400
-Received: from mail-pg1-x544.google.com (mail-pg1-x544.google.com [IPv6:2607:f8b0:4864:20::544])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 81D89C061755;
-        Sun, 20 Sep 2020 17:23:21 -0700 (PDT)
-Received: by mail-pg1-x544.google.com with SMTP id l191so7405319pgd.5;
-        Sun, 20 Sep 2020 17:23:21 -0700 (PDT)
+        with ESMTP id S1726184AbgIUCuy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 20 Sep 2020 22:50:54 -0400
+Received: from mail-yb1-xb29.google.com (mail-yb1-xb29.google.com [IPv6:2607:f8b0:4864:20::b29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E75C9C061755
+        for <kvm@vger.kernel.org>; Sun, 20 Sep 2020 19:50:53 -0700 (PDT)
+Received: by mail-yb1-xb29.google.com with SMTP id k2so9233820ybp.7
+        for <kvm@vger.kernel.org>; Sun, 20 Sep 2020 19:50:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=v3Vp5NrGGMOCiRkdb4Q/Xbdx+HabRr82jxca5q0JC98=;
-        b=jDZKa9cs8Qv6XCzcFWRROK245g3fx/cngkkRLxpRAlCtgAxCX4YzCh//POGD2L6k2d
-         cediQFlT2G+AYqdWE2lSUGD9Sg1d0o7/M2mEjNR8i5dfZ+BgH19Sv/Vv9/TEXWXKTspW
-         4Lyw115+yZ4AS7zqZkr2NxCkyEHthOgtMayhOV7uYPZHlaATPrGXSspM2lMXfZHG0AlH
-         IhhCdgOyI91t7P0FzsZJxBTrde9FbknVtPSWPjvckcgGUsmdU4R9CB/L3oexuL8cC7Jg
-         jDTXHl597byvl9K7dPirdGnAaHU3QUIPW08e1TC6sgbT5V1GapR7hbcAdoATTJT/NAXh
-         GqZA==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=Xh/1WkLN+QwVHru9G2u1WXpJ/NrxFo1W9dAyt56KZlw=;
+        b=EmrxLOnuo6O+RmecpOyjP+xoXZBqrsiKjcYQgxn3nXhOvtIq5/e4TwziOtf4jYQGfE
+         oTstrmTPszP0KQrN339zH+an/FNrGaw8Uempy7x//eqbSRgy48XZGW2+CxNAORTyHEjQ
+         1aeIEOEImuTDAlRYyTLN6UEauUNEipCnkcSqcJYejp7WvNEkGk+FdSUl+0MG34PtHZIk
+         rPKPg1lkO631wTF1jn4OBc5tIzlMs0S3toOjUmEIUUYBAgf8Oj9qEav3vtDXilRy+zxH
+         rCso+DpuYDckpJ+bo7VtFizImRq/NEwxNtqfaMXjzehk8z7HGOBuU+qlaeWnJmSJMMkt
+         24nQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=v3Vp5NrGGMOCiRkdb4Q/Xbdx+HabRr82jxca5q0JC98=;
-        b=YbPxDuuH7iXH6eWRenedAjZpX6/9lqPaa90PZwzWezduzwNLmThhBjIdy7QgUzcSfH
-         uST0yAhjOP1W/o/cxImiFwUmzyC48PGMI7dHDQBtGoPyRVG0ZT+VGy1kmy6l1DpYATAN
-         QccoaHSgxuCNOiqfcr9NsbScRmVyR1rGv41wRgWt9wLpPHd3jCkzgwPI3LDei12ntadr
-         GIz5q2hj7JBSNtlflHj90A/PshF94FKXLAiflDvcrkvCbC/kFcEVCLV0hJNPwJ8qliMy
-         n9lgjA+hlBKO+O3iBWXNZb8yot+GVUROPWxq0JKGOoEaYtVDgcfTR1cuJ48b3whKhgun
-         Fqzg==
-X-Gm-Message-State: AOAM533mDz5qNeeApkVnpKaeABKoBjihZhrg3Nq3UxnNd2fJoxtcBFHx
-        daWbDnFgb3BQKBtytVMgIw==
-X-Google-Smtp-Source: ABdhPJz+Z+eD2TTHxk4lHNb/eZhngZE4UQ9Lj4taKRcybhu6NoaBVoKliHNqfZ53mRETM1X0nEzKQw==
-X-Received: by 2002:a63:63c7:: with SMTP id x190mr34821422pgb.90.1600647800787;
-        Sun, 20 Sep 2020 17:23:20 -0700 (PDT)
-Received: from [127.0.0.1] ([103.7.29.9])
-        by smtp.gmail.com with ESMTPSA id q11sm9403983pgj.92.2020.09.20.17.23.16
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 20 Sep 2020 17:23:20 -0700 (PDT)
-Subject: Re: [PATCH 1/2] KVM: Fix the build error
-To:     Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, x86@kernel.org
-Cc:     sean.j.christopherson@intel.com, vkuznets@redhat.com,
-        wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org,
-        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, hpa@zytor.com,
-        lihaiwei@tencent.com, kernel test robot <lkp@intel.com>
-References: <20200914091148.95654-1-lihaiwei.kernel@gmail.com>
- <20200914091148.95654-2-lihaiwei.kernel@gmail.com>
- <1810e3e5-8286-29e0-ff10-636d6c32df6d@redhat.com>
-From:   Haiwei Li <lihaiwei.kernel@gmail.com>
-Message-ID: <632965cf-e4e9-9c78-9664-df500410401f@gmail.com>
-Date:   Mon, 21 Sep 2020 08:23:09 +0800
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:68.0)
- Gecko/20100101 Thunderbird/68.12.0
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=Xh/1WkLN+QwVHru9G2u1WXpJ/NrxFo1W9dAyt56KZlw=;
+        b=sGnu/GA92QWWhWbM/r2yL+ogEv2Av8AOSCWScaFMLuXWSv0knTrUWTZ3KikHkiFNPI
+         t7GDk34ycTeuPg9B1YTbk10TvTwMVaxm0JUGkMjWpbKf3Vh2ZiLMz7sFK7Mu/QGWEU/g
+         FrtLtk3czgHon5g3UG6TUY0cu+PmLr4G/BceTsur58GMDUzs5/XnoUd9yCNswHVjbnmm
+         t07qrh/W0I/cQP/J1t2PHp+jSjb8sZhW2H8NyNA5O64rLLWw6N6eVNzsFoR4ak3d9qsV
+         BE2lmVzgJOQ31PLRaFFLit75FdrPUXMJn3ws7g+xYgaG2uUpHDIZJXEi5P7v98n5JpFU
+         /0ag==
+X-Gm-Message-State: AOAM533OdYg/tZCnsXkPepyrPbIm08j9vW552SITurnKQnYjYoeFKsj+
+        fPOYsdw5wFfxcsPOtgrBh261OTlhFyeD9A3P+6HhLADd6cS/Og==
+X-Google-Smtp-Source: ABdhPJwgs3diy8rydnGc7cDXCo0OUiih7VkfDPhSV1B5ava3Ej9wPNFVC811nXWFC6u+QzY3kUrlomspsnJVBgCr7/4=
+X-Received: by 2002:a25:488:: with SMTP id 130mr29273258ybe.216.1600656652611;
+ Sun, 20 Sep 2020 19:50:52 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <1810e3e5-8286-29e0-ff10-636d6c32df6d@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+References: <0C23CC2D-B770-43D0-8215-20CE591F2E8F@bytedance.com> <CAAsfjH7KNZTJO+=Hp7em00F6=y0c69B_cekq_xT1GPxdC3a6yw@mail.gmail.com>
+In-Reply-To: <CAAsfjH7KNZTJO+=Hp7em00F6=y0c69B_cekq_xT1GPxdC3a6yw@mail.gmail.com>
+From:   Yang Zhang <yang.zhang.wz@gmail.com>
+Date:   Mon, 21 Sep 2020 10:50:41 +0800
+Message-ID: <CA+3C=r-M=6BNnyCmW8m=AC_39OC4S593vZzc1oYbdS5U8dD0Kg@mail.gmail.com>
+Subject: Re: [RFC] KVM: X86: implement Passthrough IPI
+To:     Qiao Deng <dengqiao.joey@bytedance.com>
+Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        zhouyibo@bytedance.com, zhanghaozhong@bytedance.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Hi Paolo and Radim
 
+Any comments with this patch? From our daily business(including
+TikTok), we observed huge improvement with this patch(especially in
+the condition of heavy futex). The only concern is the security. It is
+ok to us since we are private cloud. But we really want to push it
+back upstream since it really helps a lot. So how about we turn it off
+by default. Is it acceptable to you?
 
-On 20/9/20 21:09, Paolo Bonzini wrote:
-> On 14/09/20 11:11, lihaiwei.kernel@gmail.com wrote:
->> From: Haiwei Li <lihaiwei@tencent.com>
+On Tue, Sep 15, 2020 at 7:51 PM Qiao Deng <dengqiao.joey@bytedance.com> wro=
+te:
+>
+> If we make this passthrough IPI feature be turned off by default, is it p=
+ossible
+> for the community to accept this idea?
+>
+> On Sat, Sep 5, 2020 at 8:21 PM Qiao Deng <dengqiao.joey@bytedance.com> wr=
+ote:
 >>
->> When CONFIG_SMP is not set, an build error occurs with message "error:
->> use of undeclared identifier 'kvm_send_ipi_mask_allbutself'"
+>> This patch paravirtualize the IPI sending process in guest by exposing
+>> posted interrupt capability to guest directly . Since there is no VM Exi=
+t
+>> and VM Entry when sending IPI, the overhead is therefore reduced.
 >>
->> Fixes: 0f990222108d ("KVM: Check the allocation of pv cpu mask", 2020-09-01)
->> Reported-by: kernel test robot <lkp@intel.com>
->> Signed-off-by: Haiwei Li <lihaiwei@tencent.com>
+>> The basic idea is that:
+>> Exposing the PI_DESC  and msr.icr to guest. When sending a IPI, set
+>> the PIR of destination VCPU=E2=80=99s PI_DESC from guest directly and wr=
+ite
+>> the ICR with notification vector and destination PCPU which are got
+>> from hypervisor.
+>>
+>> This mechanism only handle the normal IPI. For SIPI/NMI/INIT, still
+>> goes to legacy way but which write a new msr instead msr.icr.
+>>
+>> The cost is reduced from 7k cycles to 2k cycles, which is 1500 cycles
+>> on the host.
+>>
+>> However it may increase the risk in the system since the guest could
+>> decide to send IPI to any processor.
+>>
+>> This patch is based on Linux-5.0 and we can rebase it on latest tree if =
+the idea
+>> is accepted. We will introduce this idea at KVM Forum 2020.
+>>
+>> Signed-off-by: dengqiao.joey <dengqiao.joey@bytedance.com>
+>> Signed-off-by: Yang Zhang <yang.zhang.wz@gmail.com>
 >> ---
->>   arch/x86/kernel/kvm.c | 2 ++
->>   1 file changed, 2 insertions(+)
+>> arch/x86/include/asm/kvm_host.h      |  28 ++++-
+>> arch/x86/include/asm/kvm_para.h      |   6 ++
+>> arch/x86/include/asm/vmx.h           |   1 +
+>> arch/x86/include/uapi/asm/kvm_para.h |  25 +++++
+>> arch/x86/kernel/apic/apic.c          |   1 +
+>> arch/x86/kernel/kvm.c                | 199 +++++++++++++++++++++++++++++=
++++++-
+>> arch/x86/kvm/cpuid.c                 |  15 ++-
+>> arch/x86/kvm/lapic.c                 |  12 +++
+>> arch/x86/kvm/lapic.h                 |   9 ++
+>> arch/x86/kvm/svm.c                   |   6 ++
+>> arch/x86/kvm/vmx/vmx.c               | 132 ++++++++++++++++++++---
+>> arch/x86/kvm/vmx/vmx.h               |   8 +-
+>> arch/x86/kvm/x86.c                   |  19 ++++
+>> include/uapi/linux/kvm.h             |   1 +
+>> 14 files changed, 434 insertions(+), 28 deletions(-)
 >>
+>> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_=
+host.h
+>> index 1803733..fb148c3 100644
+>> --- a/arch/x86/include/asm/kvm_host.h
+>> +++ b/arch/x86/include/asm/kvm_host.h
+>> @@ -40,9 +40,9 @@
+>> #define KVM_MAX_VCPUS 288
+>> #define KVM_SOFT_MAX_VCPUS 240
+>> #define KVM_MAX_VCPU_ID 1023
+>> -#define KVM_USER_MEM_SLOTS 509
+>> +#define KVM_USER_MEM_SLOTS 508
+>> /* memory slots that are not exposed to userspace */
+>> -#define KVM_PRIVATE_MEM_SLOTS 3
+>> +#define KVM_PRIVATE_MEM_SLOTS 4
+>> #define KVM_MEM_SLOTS_NUM (KVM_USER_MEM_SLOTS + KVM_PRIVATE_MEM_SLOTS)
+>>
+>> #define KVM_HALT_POLL_NS_DEFAULT 200000
+>> @@ -753,6 +753,20 @@ struct kvm_vcpu_arch {
+>>                 struct gfn_to_hva_cache data;
+>>         } pv_eoi;
+>>
+>> +       /* Definition for msr pv ipi:
+>> +        *      Bit 0: pi_desc valid bit.
+>> +        *             Indicate hypervisor has prepared pi_desc address.
+>> +        *      Bit 1: pv_ipi enable bit.
+>> +        *             Guest set 1 to indicate pv_ipi is enabled in gues=
+t.
+>> +        *             Guest read this bit(1) to get whether hypervisor =
+has
+>> +        *             enabled pv_ipi(don=E2=80=99t intercept 0x830).
+>> +        *      Bit 8-11: count of pages for struct pi_desc takes.
+>> +        *      Bit 12-63: base address of pi_desc in gpa.
+>> +        */
+>> +       struct {
+>> +               u64 msr_val;
+>> +       } pv_ipi;
+>> +
+>>         /*
+>>          * Indicate whether the access faults on its page table in guest
+>>          * which is set when fix page fault and used to detect unhandeab=
+le
+>> @@ -780,6 +794,9 @@ struct kvm_vcpu_arch {
+>>
+>>         /* Flush the L1 Data cache for L1TF mitigation on VMENTER */
+>>         bool l1tf_flush_l1d;
+>> +
+>> +       /* Indicate whether PV IPI is enabled on this vcpu */
+>> +       bool pvipi_enabled;
+>> };
+>>
+>> struct kvm_lpage_info {
+>> @@ -926,6 +943,12 @@ struct kvm_arch {
+>>
+>>         bool guest_can_read_msr_platform_info;
+>>         bool exception_payload_enabled;
+>> +
+>> +       /*
+>> +        * `pvipi.enable` is a per-vcpu bit, which is saved in
+>> +        * `struct  kvm_vcpu_arch` rather than here.
+>> +        */
+>> +       union pvipi_msr pvipi;
+>> };
+>>
+>> struct kvm_vm_stat {
+>> @@ -1196,6 +1219,7 @@ struct kvm_x86_ops {
+>>         int (*nested_enable_evmcs)(struct kvm_vcpu *vcpu,
+>>                                    uint16_t *vmcs_version);
+>>         uint16_t (*nested_get_evmcs_version)(struct kvm_vcpu *vcpu);
+>> +       int (*set_pvipi_addr)(struct kvm *kvm, unsigned long addr);
+>> };
+>>
+>> struct kvm_arch_async_pf {
+>> diff --git a/arch/x86/include/asm/kvm_para.h b/arch/x86/include/asm/kvm_=
+para.h
+>> index 5ed3cf1..f7eaf82 100644
+>> --- a/arch/x86/include/asm/kvm_para.h
+>> +++ b/arch/x86/include/asm/kvm_para.h
+>> @@ -93,6 +93,7 @@ void kvm_async_pf_task_wake(u32 token);
+>> u32 kvm_read_and_reset_pf_reason(void);
+>> extern void kvm_disable_steal_time(void);
+>> void do_async_page_fault(struct pt_regs *regs, unsigned long error_code)=
+;
+>> +void kvm_pv_ipi_init(void);
+>>
+>> #ifdef CONFIG_PARAVIRT_SPINLOCKS
+>> void __init kvm_spinlock_init(void);
+>> @@ -130,6 +131,11 @@ static inline void kvm_disable_steal_time(void)
+>> {
+>>         return;
+>> }
+>> +
+>> +static void kvm_pv_ipi_init(void)
+>> +{
+>> +       return;
+>> +}
+>> #endif
+>>
+>> #endif /* _ASM_X86_KVM_PARA_H */
+>> diff --git a/arch/x86/include/asm/vmx.h b/arch/x86/include/asm/vmx.h
+>> index 4e4133e..837a233 100644
+>> --- a/arch/x86/include/asm/vmx.h
+>> +++ b/arch/x86/include/asm/vmx.h
+>> @@ -458,6 +458,7 @@ enum vmcs_field {
+>> #define TSS_PRIVATE_MEMSLOT                     (KVM_USER_MEM_SLOTS + 0)
+>> #define APIC_ACCESS_PAGE_PRIVATE_MEMSLOT        (KVM_USER_MEM_SLOTS + 1)
+>> #define IDENTITY_PAGETABLE_PRIVATE_MEMSLOT      (KVM_USER_MEM_SLOTS + 2)
+>> +#define PVIPI_PAGE_PRIVATE_MEMSLOT             (KVM_USER_MEM_SLOTS + 3)
+>>
+>> #define VMX_NR_VPIDS                            (1 << 16)
+>> #define VMX_VPID_EXTENT_INDIVIDUAL_ADDR         0
+>> diff --git a/arch/x86/include/uapi/asm/kvm_para.h b/arch/x86/include/uap=
+i/asm/kvm_para.h
+>> index 19980ec..cb38abc 100644
+>> --- a/arch/x86/include/uapi/asm/kvm_para.h
+>> +++ b/arch/x86/include/uapi/asm/kvm_para.h
+>> @@ -29,6 +29,7 @@
+>> #define KVM_FEATURE_PV_TLB_FLUSH        9
+>> #define KVM_FEATURE_ASYNC_PF_VMEXIT     10
+>> #define KVM_FEATURE_PV_SEND_IPI 11
+>> +#define KVM_FEATURE_PV_IPI     12
+>>
+>> #define KVM_HINTS_REALTIME      0
+>>
+>> @@ -47,6 +48,8 @@
+>> #define MSR_KVM_ASYNC_PF_EN 0x4b564d02
+>> #define MSR_KVM_STEAL_TIME  0x4b564d03
+>> #define MSR_KVM_PV_EOI_EN      0x4b564d04
+>> +#define MSR_KVM_PV_IPI      0x4b564d05
+>> +#define MSR_KVM_PV_ICR      0x4b564d06
+>>
+>> struct kvm_steal_time {
+>>         __u64 steal;
+>> @@ -119,4 +122,26 @@ struct kvm_vcpu_pv_apf_data {
+>> #define KVM_PV_EOI_ENABLED KVM_PV_EOI_MASK
+>> #define KVM_PV_EOI_DISABLED 0x0
+>>
+>> +union pvipi_msr {
+>> +       u64 msr_val;
+>> +       struct {
+>> +               u64 enable:1;
+>> +               u64 reserved:7;
+>> +               u64 count:4;
+>> +               u64 addr:51;
+>> +               u64 valid:1;
+>> +       };
+>> +};
+>> +
+>> +#define KVM_PV_IPI_ENABLE 0x1UL
+>> +#define KVM_PV_IPI_ADDR_SHIFT 12
+>> +/*
+>> + * To avoild waste memory, only uses two pages as descriptor page which=
+ means
+>> + * only support 128 pi descriptors(64 bytes per descriptor) now.
+>> + */
+>> +#define PI_DESC_PAGES 2
+>> +#define PI_DESC_SIZE 64
+>> +#define PI_DESC_PER_PAGE (PAGE_SIZE / PI_DESC_SIZE)
+>> +#define MAX_PI_DESC (PI_DESC_PAGES * PI_DESC_PER_PAGE)
+>> +
+>> #endif /* _UAPI_ASM_X86_KVM_PARA_H */
+>> diff --git a/arch/x86/kernel/apic/apic.c b/arch/x86/kernel/apic/apic.c
+>> index b7bcdd7..5a699ed 100644
+>> --- a/arch/x86/kernel/apic/apic.c
+>> +++ b/arch/x86/kernel/apic/apic.c
+>> @@ -1635,6 +1635,7 @@ static void end_local_APIC_setup(void)
+>> #endif
+>>
+>>         apic_pm_activate();
+>> +       kvm_pv_ipi_init();
+>> }
+>>
+>> /*
 >> diff --git a/arch/x86/kernel/kvm.c b/arch/x86/kernel/kvm.c
->> index 1b51b727b140..7e8be0421720 100644
+>> index 5c93a65..3e6264d 100644
 >> --- a/arch/x86/kernel/kvm.c
 >> +++ b/arch/x86/kernel/kvm.c
->> @@ -797,7 +797,9 @@ static __init int kvm_alloc_cpumask(void)
->>   			}
->>   		}
->>   
->> +#if defined(CONFIG_SMP)
->>   	apic->send_IPI_mask_allbutself = kvm_send_ipi_mask_allbutself;
->> +#endif
->>   	pv_ops.mmu.flush_tlb_others = kvm_flush_tlb_others;
->>   	return 0;
->>   
+>> @@ -46,6 +46,7 @@
+>> #include <asm/apicdef.h>
+>> #include <asm/hypervisor.h>
+>> #include <asm/tlb.h>
+>> +#include <asm/ipi.h>
 >>
-> 
-> If CONFIG_SMP is not set you don't need kvm_alloc_cpumask or
-> pv_ops.mmu.flush_tlb_others at all.  Can you squash these two into the
-> original patch and re-submit for 5.10?
+>> static int kvmapf =3D 1;
+>>
+>> @@ -253,7 +254,6 @@ u32 kvm_read_and_reset_pf_reason(void)
+>> }
+>> EXPORT_SYMBOL_GPL(kvm_read_and_reset_pf_reason);
+>> NOKPROBE_SYMBOL(kvm_read_and_reset_pf_reason);
+>> -
+>> dotraplinkage void
+>> do_async_page_fault(struct pt_regs *regs, unsigned long error_code)
+>> {
+>> @@ -537,7 +537,194 @@ static void kvm_setup_pv_ipi(void)
+>>         apic->send_IPI_mask_allbutself =3D kvm_send_ipi_mask_allbutself;
+>>         apic->send_IPI_allbutself =3D kvm_send_ipi_allbutself;
+>>         apic->send_IPI_all =3D kvm_send_ipi_all;
+>> -       pr_info("KVM setup pv IPIs\n");
+>> +       pr_info("KVM setup old pv IPIs\n");
+>> +}
+>> +
+>> +/* Posted-Interrupt Descriptor */
+>> +struct pi_desc {
+>> +       u32 pir[8];     /* Posted interrupt requested */
+>> +       union {
+>> +               struct {
+>> +                               /* bit 256 - Outstanding Notification */
+>> +                       u16     on      : 1,
+>> +                               /* bit 257 - Suppress Notification */
+>> +                       sn      : 1,
+>> +                               /* bit 271:258 - Reserved */
+>> +                       rsvd_1  : 14;
+>> +                               /* bit 279:272 - Notification Vector */
+>> +                       u8      nv;
+>> +                               /* bit 287:280 - Reserved */
+>> +                       u8      rsvd_2;
+>> +                               /* bit 319:288 - Notification Destinatio=
+n */
+>> +                       u32     ndst;
+>> +               };
+>> +               u64 control;
+>> +       };
+>> +       u32 rsvd[6];
+>> +} __aligned(64);
+>> +
+>> +#define POSTED_INTR_ON  0
+>> +#define POSTED_INTR_SN  1
+>> +
+>> +static inline bool pi_test_and_set_on(struct pi_desc *pi_desc)
+>> +{
+>> +       return test_and_set_bit(POSTED_INTR_ON,
+>> +                       (unsigned long *)&pi_desc->control);
+>> +}
+>> +
+>> +static inline int pi_test_and_set_pir(int vector, struct pi_desc *pi_de=
+sc)
+>> +{
+>> +       return test_and_set_bit(vector, (unsigned long *)pi_desc->pir);
+>> +}
+>> +
+>> +static struct pi_desc *pi_desc_page;
+>> +
+>> +static void x2apic_send_IPI_dest(unsigned int apicid, int vector, unsig=
+ned int dest)
+>> +{
+>> +       unsigned long cfg =3D __prepare_ICR(0, vector, dest);
+>> +
+>> +       native_x2apic_icr_write(cfg, apicid);
+>> +}
+>> +
+>> +static void kvm_send_ipi(int cpu, int vector)
+>> +{
+>> +       /* In x2apic mode, apicid is equal to vcpu id.*/
+>> +       u32 vcpu_id =3D per_cpu(x86_cpu_to_apicid, cpu);
+>> +       unsigned int nv, dest/* , val */;
+>> +
+>> +       x2apic_wrmsr_fence();
+>> +
+>> +       WARN(vector =3D=3D NMI_VECTOR, "try to deliver NMI");
+>> +
+>> +       /* TODO: rollback to old approach. */
+>> +       if (vcpu_id >=3D MAX_PI_DESC)
+>> +               return;
+>> +
+>> +       if (pi_test_and_set_pir(vector, &pi_desc_page[vcpu_id]))
+>> +               return;
+>> +
+>> +       if (pi_test_and_set_on(&pi_desc_page[vcpu_id]))
+>> +               return;
+>> +
+>> +       nv =3D pi_desc_page[vcpu_id].nv;
+>> +       dest =3D pi_desc_page[vcpu_id].ndst;
+>> +
+>> +       x2apic_send_IPI_dest(dest, nv, APIC_DEST_PHYSICAL);
+>> +
+>> +}
+>> +
+>> +static void __kvm_send_ipi_mask(const struct cpumask *mask, int vector,
+>> +                               int apic_dest)
+>> +{
+>> +       unsigned long query_cpu;
+>> +       unsigned long this_cpu;
+>> +       unsigned long flags;
+>> +
+>> +       local_irq_save(flags);
+>> +
+>> +       this_cpu =3D smp_processor_id();
+>> +       for_each_cpu(query_cpu, mask) {
+>> +               if (apic_dest =3D=3D APIC_DEST_ALLBUT && this_cpu =3D=3D=
+ query_cpu)
+>> +                       continue;
+>> +               kvm_send_ipi(query_cpu, vector);
+>> +       }
+>> +
+>> +       local_irq_restore(flags);
+>> +}
+>> +
+>> +static void kvm_send_ipi_mask2(const struct cpumask *mask, int vector)
+>> +{
+>> +       __kvm_send_ipi_mask(mask, vector, APIC_DEST_ALLINC);
+>> +}
+>> +
+>> +static void kvm_send_ipi_mask_allbutself2(const struct cpumask *mask, i=
+nt vector)
+>> +{
+>> +       __kvm_send_ipi_mask(mask, vector, APIC_DEST_ALLBUT);
+>> +}
+>> +
+>> +static void kvm_send_ipi_allbutself2(int vector)
+>> +{
+>> +       __kvm_send_ipi_mask(cpu_online_mask, vector, APIC_DEST_ALLBUT);
+>> +}
+>> +
+>> +static void kvm_send_ipi_all2(int vector)
+>> +{
+>> +       __kvm_send_ipi_mask(cpu_online_mask, vector, APIC_DEST_ALLINC);
+>> +}
+>> +
+>> +static inline void kvm_icr_write(u32 low, u32 id)
+>> +{
+>> +       wrmsrl(MSR_KVM_PV_ICR, ((__u64) id) << 32 | low);
+>> +}
+>> +
+>> +static inline u64 kvm_icr_read(void)
+>> +{
+>> +       unsigned long val;
+>> +
+>> +       rdmsrl(MSR_KVM_PV_ICR, val);
+>> +       return val;
+>> +}
+>> +
+>> +static int kvm_setup_pv_ipi2(void)
+>> +{
+>> +       union pvipi_msr msr;
+>> +
+>> +       rdmsrl(MSR_KVM_PV_IPI, msr.msr_val);
+>> +
+>> +       if (msr.valid !=3D 1)
+>> +               return -EINVAL;
+>> +
+>> +       if (msr.enable) {
+>> +               /* set enable bit and read back. */
+>> +               wrmsrl(MSR_KVM_PV_IPI, msr.msr_val | KVM_PV_IPI_ENABLE);
+>> +
+>> +               rdmsrl(MSR_KVM_PV_IPI, msr.msr_val);
+>> +
+>> +               if (!(msr.msr_val & KVM_PV_IPI_ENABLE)) {
+>> +                       pr_emerg("pv ipi enable failed\n");
+>> +                       iounmap(pi_desc_page);
+>> +                       return -EINVAL;
+>> +               }
+>> +
+>> +               goto out;
+>> +       } else {
+>> +
+>> +               pi_desc_page =3D ioremap_cache(msr.addr << PAGE_SHIFT,
+>> +                               PAGE_SIZE << msr.count);
+>> +
+>> +               if (!pi_desc_page)
+>> +                       return -ENOMEM;
+>> +
+>> +
+>> +               pr_emerg("pv ipi msr val %lx, pi_desc_page %lx, %lx\n",
+>> +                               (unsigned long)msr.msr_val,
+>> +                               (unsigned long)pi_desc_page,
+>> +                               (unsigned long)&pi_desc_page[1]);
+>> +
+>> +               /* set enable bit and read back. */
+>> +               wrmsrl(MSR_KVM_PV_IPI, msr.msr_val | KVM_PV_IPI_ENABLE);
+>> +
+>> +               rdmsrl(MSR_KVM_PV_IPI, msr.msr_val);
+>> +
+>> +               if (!(msr.msr_val & KVM_PV_IPI_ENABLE)) {
+>> +                       pr_emerg("pv ipi enable failed\n");
+>> +                       iounmap(pi_desc_page);
+>> +                       return -EINVAL;
+>> +               }
+>> +               apic->send_IPI =3D kvm_send_ipi;
+>> +               apic->send_IPI_mask =3D kvm_send_ipi_mask2;
+>> +               apic->send_IPI_mask_allbutself =3D kvm_send_ipi_mask_all=
+butself2;
+>> +               apic->send_IPI_allbutself =3D kvm_send_ipi_allbutself2;
+>> +               apic->send_IPI_all =3D kvm_send_ipi_all2;
+>> +               apic->icr_read =3D kvm_icr_read;
+>> +               apic->icr_write =3D kvm_icr_write;
+>> +               pr_emerg("pv ipi enabled\n");
+>> +       }
+>> +out:
+>> +       pr_emerg("pv ipi KVM setup real PV IPIs for cpu %d\n",
+>> +                       smp_processor_id());
+>> +
+>> +       return 0;
+>> }
+>>
+>> static void __init kvm_smp_prepare_cpus(unsigned int max_cpus)
+>> @@ -709,9 +896,17 @@ static uint32_t __init kvm_detect(void)
+>>         return kvm_cpuid_base();
+>> }
+>>
+>> +void __init kvm_pv_ipi_init(void)
+>> +{
+>> +       if (kvm_para_has_feature(KVM_FEATURE_PV_IPI) && x2apic_enabled()=
+)
+>> +               kvm_setup_pv_ipi2();
+>> +}
+>> +EXPORT_SYMBOL_GPL(kvm_pv_ipi_init);
+>> +
+>> static void __init kvm_apic_init(void)
+>> {
+>> #if defined(CONFIG_SMP)
+>> +
+>>         if (kvm_para_has_feature(KVM_FEATURE_PV_SEND_IPI))
+>>                 kvm_setup_pv_ipi();
+>> #endif
+>> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+>> index c07958b..4641a84 100644
+>> --- a/arch/x86/kvm/cpuid.c
+>> +++ b/arch/x86/kvm/cpuid.c
+>> @@ -133,9 +133,15 @@ int kvm_update_cpuid(struct kvm_vcpu *vcpu)
+>>         }
+>>
+>>         best =3D kvm_find_cpuid_entry(vcpu, KVM_CPUID_FEATURES, 0);
+>> -       if (kvm_hlt_in_guest(vcpu->kvm) && best &&
+>> -               (best->eax & (1 << KVM_FEATURE_PV_UNHALT)))
+>> -               best->eax &=3D ~(1 << KVM_FEATURE_PV_UNHALT);
+>> +       if (best) {
+>> +               if (kvm_hlt_in_guest(vcpu->kvm) &&
+>> +                               (best->eax & (1 << KVM_FEATURE_PV_UNHALT=
+)))
+>> +                       best->eax &=3D ~(1 << KVM_FEATURE_PV_UNHALT);
+>> +               if (!kvm_vcpu_apicv_active(vcpu) || !x2apic_enabled()) {
+>> +                       best->eax &=3D ~(1 << KVM_FEATURE_PV_IPI);
+>> +                       pr_emerg("pv ipi: remove pv ipi from cpuid\n");
+>> +               }
+>> +       }
+>>
+>>         /* Update physical-address width */
+>>         vcpu->arch.maxphyaddr =3D cpuid_query_maxphyaddr(vcpu);
+>> @@ -641,7 +647,8 @@ static inline int __do_cpuid_ent(struct kvm_cpuid_en=
+try2 *entry, u32 function,
+>>                              (1 << KVM_FEATURE_PV_UNHALT) |
+>>                              (1 << KVM_FEATURE_PV_TLB_FLUSH) |
+>>                              (1 << KVM_FEATURE_ASYNC_PF_VMEXIT) |
+>> -                            (1 << KVM_FEATURE_PV_SEND_IPI);
+>> +                            (1 << KVM_FEATURE_PV_SEND_IPI) |
+>> +                            (1 << KVM_FEATURE_PV_IPI);
+>>
+>>                 if (sched_info_on())
+>>                         entry->eax |=3D (1 << KVM_FEATURE_STEAL_TIME);
+>> diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+>> index 4b6c2da..f53eac9 100644
+>> --- a/arch/x86/kvm/lapic.c
+>> +++ b/arch/x86/kvm/lapic.c
+>> @@ -381,6 +381,7 @@ bool __kvm_apic_update_irr(u32 *pir, void *regs, int=
+ *max_irr)
+>>         u32 i, vec;
+>>         u32 pir_val, irr_val, prev_irr_val;
+>>         int max_updated_irr;
+>> +       unsigned long *pir2 =3D (unsigned long *)pir;
+>>
+>>         max_updated_irr =3D -1;
+>>         *max_irr =3D -1;
+>> @@ -2172,6 +2173,7 @@ void kvm_lapic_reset(struct kvm_vcpu *vcpu, bool i=
+nit_event)
+>>                 kvm_lapic_set_base(vcpu,
+>>                                 vcpu->arch.apic_base | MSR_IA32_APICBASE=
+_BSP);
+>>         vcpu->arch.pv_eoi.msr_val =3D 0;
+>> +       //vcpu->arch.pv_eoi.msr_val =3D
+>>         apic_update_ppr(apic);
+>>         if (vcpu->arch.apicv_active) {
+>>                 kvm_x86_ops->apicv_post_state_restore(vcpu);
+>> @@ -2671,6 +2673,16 @@ int kvm_lapic_enable_pv_eoi(struct kvm_vcpu *vcpu=
+, u64 data, unsigned long len)
+>>         return kvm_gfn_to_hva_cache_init(vcpu->kvm, ghc, addr, new_len);
+>> }
+>>
+>> +void kvm_pvipi_init(struct kvm *kvm, u64 pi_desc_gfn)
+>> +{
+>> +       kvm->arch.pvipi.addr =3D pi_desc_gfn;
+>> +       kvm->arch.pvipi.count =3D PI_DESC_PAGES;
+>> +       /* make sure addr and count is visible before set valid bit */
+>> +       smp_wmb();
+>> +       kvm->arch.pvipi.valid =3D 1;
+>> +}
+>> +EXPORT_SYMBOL_GPL(kvm_pvipi_init);
+>> +
+>> void kvm_apic_accept_events(struct kvm_vcpu *vcpu)
+>> {
+>>         struct kvm_lapic *apic =3D vcpu->arch.apic;
+>> diff --git a/arch/x86/kvm/lapic.h b/arch/x86/kvm/lapic.h
+>> index ff6ef9c..2abf16a 100644
+>> --- a/arch/x86/kvm/lapic.h
+>> +++ b/arch/x86/kvm/lapic.h
+>> @@ -16,6 +16,8 @@
+>> #define APIC_BUS_CYCLE_NS       1
+>> #define APIC_BUS_FREQUENCY      (1000000000ULL / APIC_BUS_CYCLE_NS)
+>>
+>> +#define X2APIC_MSR(r) (APIC_BASE_MSR + ((r) >> 4))
+>> +
+>> enum lapic_mode {
+>>         LAPIC_MODE_DISABLED =3D 0,
+>>         LAPIC_MODE_INVALID =3D X2APIC_ENABLE,
+>> @@ -194,6 +196,11 @@ static inline int apic_x2apic_mode(struct kvm_lapic=
+ *apic)
+>>         return apic->vcpu->arch.apic_base & X2APIC_ENABLE;
+>> }
+>>
+>> +static inline int kvm_x2apic_mode(struct kvm_vcpu *vcpu)
+>> +{
+>> +       return apic_x2apic_mode(vcpu->arch.apic);
+>> +}
+>> +
+>> static inline bool kvm_vcpu_apicv_active(struct kvm_vcpu *vcpu)
+>> {
+>>         return vcpu->arch.apic && vcpu->arch.apicv_active;
+>> @@ -234,4 +241,6 @@ static inline enum lapic_mode kvm_apic_mode(u64 apic=
+_base)
+>>         return apic_base & (MSR_IA32_APICBASE_ENABLE | X2APIC_ENABLE);
+>> }
+>>
+>> +void kvm_pvipi_init(struct kvm *kvm, u64 pi_desc_gfn);
+>> +
+>> #endif
+>> diff --git a/arch/x86/kvm/svm.c b/arch/x86/kvm/svm.c
+>> index f13a3a2..cf54968 100644
+>> --- a/arch/x86/kvm/svm.c
+>> +++ b/arch/x86/kvm/svm.c
+>> @@ -5449,6 +5449,11 @@ static void enable_nmi_window(struct kvm_vcpu *vc=
+pu)
+>>         svm->vmcb->save.rflags |=3D (X86_EFLAGS_TF | X86_EFLAGS_RF);
+>> }
+>>
+>> +static int svm_set_pvipi_addr(struct kvm *kvm, unsigned long addr)
+>> +{
+>> +       return 0;
+>> +}
+>> +
+>> static int svm_set_tss_addr(struct kvm *kvm, unsigned int addr)
+>> {
+>>         return 0;
+>> @@ -7182,6 +7187,7 @@ static struct kvm_x86_ops svm_x86_ops __ro_after_i=
+nit =3D {
+>>         .apicv_post_state_restore =3D avic_post_state_restore,
+>>
+>>         .set_tss_addr =3D svm_set_tss_addr,
+>> +       .set_pvipi_addr =3D svm_set_pvipi_addr,
+>>         .set_identity_map_addr =3D svm_set_identity_map_addr,
+>>         .get_tdp_level =3D get_npt_level,
+>>         .get_mt_mask =3D svm_get_mt_mask,
+>> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+>> index 30a6bcd..eab9d6d 100644
+>> --- a/arch/x86/kvm/vmx/vmx.c
+>> +++ b/arch/x86/kvm/vmx/vmx.c
+>> @@ -336,6 +336,8 @@ static bool guest_state_valid(struct kvm_vcpu *vcpu)=
+;
+>> static u32 vmx_segment_access_rights(struct kvm_segment *var);
+>> static __always_inline void vmx_disable_intercept_for_msr(unsigned long =
+*msr_bitmap,
+>>                                                           u32 msr, int t=
+ype);
+>> +static __always_inline void vmx_enable_intercept_for_msr(unsigned long =
+*msr_bitmap,
+>> +                                                        u32 msr, int ty=
+pe);
+>>
+>> void vmx_vmexit(void);
+>>
+>> @@ -1767,6 +1769,11 @@ static int vmx_get_msr(struct kvm_vcpu *vcpu, str=
+uct msr_data *msr_info)
+>>                 else
+>>                         msr_info->data =3D vmx->pt_desc.guest.addr_a[ind=
+ex / 2];
+>>                 break;
+>> +       case MSR_KVM_PV_IPI:
+>> +               msr_info->data =3D
+>> +                       (vcpu->kvm->arch.pvipi.msr_val & ~(u64)0x1) |
+>> +                       vcpu->arch.pvipi_enabled;
+>> +               break;
+>>         case MSR_TSC_AUX:
+>>                 if (!msr_info->host_initiated &&
+>>                     !guest_cpuid_has(vcpu, X86_FEATURE_RDTSCP))
+>> @@ -2005,6 +2012,31 @@ static int vmx_set_msr(struct kvm_vcpu *vcpu, str=
+uct msr_data *msr_info)
+>>                 else
+>>                         vmx->pt_desc.guest.addr_a[index / 2] =3D data;
+>>                 break;
+>> +       case MSR_KVM_PV_IPI:
+>> +               if (!vcpu->kvm->arch.pvipi.valid)
+>> +                       break;
+>> +
+>> +               /* Userspace (e.g., QEMU) initiated disabling PV IPI */
+>> +               if (msr_info->host_initiated && !(data & KVM_PV_IPI_ENAB=
+LE)) {
+>> +                       vmx_enable_intercept_for_msr(vmx->vmcs01.msr_bit=
+map,
+>> +                                                    X2APIC_MSR(APIC_ICR=
+),
+>> +                                                    MSR_TYPE_RW);
+>> +                       vcpu->arch.pvipi_enabled =3D false;
+>> +                       pr_debug("host-initiated disabling PV IPI on vcp=
+u %d\n",
+>> +                              vcpu->vcpu_id);
+>> +                       break;
+>> +               }
+>> +
+>> +               if (!kvm_x2apic_mode(vcpu))
+>> +                       break;
+>> +
+>> +               if (data & KVM_PV_IPI_ENABLE && !vcpu->arch.pvipi_enable=
+d) {
+>> +                       vmx_disable_intercept_for_msr(vmx->vmcs01.msr_bi=
+tmap,
+>> +                                       X2APIC_MSR(APIC_ICR), MSR_TYPE_R=
+W);
+>> +                       vcpu->arch.pvipi_enabled =3D true;
+>> +                       pr_emerg("enable pv ipi for vcpu %d\n", vcpu->vc=
+pu_id);
+>> +               }
+>> +               break;
+>>         case MSR_TSC_AUX:
+>>                 if (!msr_info->host_initiated &&
+>>                     !guest_cpuid_has(vcpu, X86_FEATURE_RDTSCP))
+>> @@ -3548,8 +3580,8 @@ static u8 vmx_msr_bitmap_mode(struct kvm_vcpu *vcp=
+u)
+>>         return mode;
+>> }
+>>
+>> -static void vmx_update_msr_bitmap_x2apic(unsigned long *msr_bitmap,
+>> -                                        u8 mode)
+>> +static void vmx_update_msr_bitmap_x2apic(struct kvm_vcpu *vcpu,
+>> +                                       unsigned long *msr_bitmap, u8 mo=
+de)
+>> {
+>>         int msr;
+>>
+>> @@ -3569,6 +3601,11 @@ static void vmx_update_msr_bitmap_x2apic(unsigned=
+ long *msr_bitmap,
+>>                         vmx_enable_intercept_for_msr(msr_bitmap, X2APIC_=
+MSR(APIC_TMCCT), MSR_TYPE_R);
+>>                         vmx_disable_intercept_for_msr(msr_bitmap, X2APIC=
+_MSR(APIC_EOI), MSR_TYPE_W);
+>>                         vmx_disable_intercept_for_msr(msr_bitmap, X2APIC=
+_MSR(APIC_SELF_IPI), MSR_TYPE_W);
+>> +
+>> +                       vmx_set_intercept_for_msr(msr_bitmap,
+>> +                                                 X2APIC_MSR(APIC_ICR),
+>> +                                                 MSR_TYPE_RW,
+>> +                                                 !vcpu->arch.pvipi_enab=
+led);
+>>                 }
+>>         }
+>> }
+>> @@ -3584,7 +3621,7 @@ void vmx_update_msr_bitmap(struct kvm_vcpu *vcpu)
+>>                 return;
+>>
+>>         if (changed & (MSR_BITMAP_MODE_X2APIC | MSR_BITMAP_MODE_X2APIC_A=
+PICV))
+>> -               vmx_update_msr_bitmap_x2apic(msr_bitmap, mode);
+>> +               vmx_update_msr_bitmap_x2apic(vcpu, msr_bitmap, mode);
+>>
+>>         vmx->msr_bitmap_mode =3D mode;
+>> }
+>> @@ -3712,11 +3749,11 @@ static void vmx_deliver_posted_interrupt(struct =
+kvm_vcpu *vcpu, int vector)
+>>         if (!r)
+>>                 return;
+>>
+>> -       if (pi_test_and_set_pir(vector, &vmx->pi_desc))
+>> +       if (pi_test_and_set_pir(vector, vmx->pi_desc))
+>>                 return;
+>>
+>>         /* If a previous notification has sent the IPI, nothing to do.  =
+*/
+>> -       if (pi_test_and_set_on(&vmx->pi_desc))
+>> +       if (pi_test_and_set_on(vmx->pi_desc))
+>>                 return;
+>>
+>>         if (!kvm_vcpu_trigger_posted_interrupt(vcpu, false))
+>> @@ -3999,6 +4036,30 @@ static void ept_set_mmio_spte_mask(void)
+>>                                    VMX_EPT_MISCONFIG_WX_VALUE);
+>> }
+>>
+>> +static int pi_desc_setup(struct kvm_vcpu *vcpu)
+>> +{
+>> +       struct kvm_vmx *kvm_vmx =3D to_kvm_vmx(vcpu->kvm);
+>> +       struct page *page;
+>> +       int page_index, ret =3D 0;
+>> +
+>> +       page_index =3D vcpu->vcpu_id / PI_DESC_PER_PAGE;
+>> +
+>> +       /* pin pages in memory */
+>> +       /* TODO: allow to move those page to support memory unplug.
+>> +        * See commtnes in kvm_vcpu_reload_apic_access_page for details.
+>> +        */
+>> +       page =3D kvm_vcpu_gfn_to_page(vcpu, kvm_vmx->pvipi_gfn + page_in=
+dex);
+>> +       if (is_error_page(page)) {
+>> +               ret =3D -EFAULT;
+>> +               goto out;
+>> +       }
+>> +
+>> +       to_vmx(vcpu)->pi_desc =3D page_address(page)
+>> +               + vcpu->vcpu_id * PI_DESC_SIZE;
+>> +out:
+>> +       return ret;
+>> +}
+>> +
+>> #define VMX_XSS_EXIT_BITMAP 0
+>>
+>> /*
+>> @@ -4037,7 +4098,7 @@ static void vmx_vcpu_setup(struct vcpu_vmx *vmx)
+>>                 vmcs_write16(GUEST_INTR_STATUS, 0);
+>>
+>>                 vmcs_write16(POSTED_INTR_NV, POSTED_INTR_VECTOR);
+>> -               vmcs_write64(POSTED_INTR_DESC_ADDR, __pa((&vmx->pi_desc)=
+));
+>> +               vmcs_write64(POSTED_INTR_DESC_ADDR, __pa((vmx->pi_desc))=
+);
+>>         }
+>>
+>>         if (!kvm_pause_in_guest(vmx->vcpu.kvm)) {
+>> @@ -4345,6 +4406,30 @@ static int vmx_interrupt_allowed(struct kvm_vcpu =
+*vcpu)
+>>                         (GUEST_INTR_STATE_STI | GUEST_INTR_STATE_MOV_SS)=
+);
+>> }
+>>
+>> +static int vmx_set_pvipi_addr(struct kvm *kvm, unsigned long addr)
+>> +{
+>> +       int ret;
+>> +
+>> +       if (!enable_apicv || !x2apic_enabled())
+>> +               return 0;
+>> +
+>> +       if (!IS_ALIGNED(addr, PAGE_SIZE)) {
+>> +               pr_err("addr is not aligned\n");
+>> +               return 0;
+>> +       }
+>> +
+>> +       ret =3D x86_set_memory_region(kvm, PVIPI_PAGE_PRIVATE_MEMSLOT, a=
+ddr,
+>> +                                   PAGE_SIZE * PI_DESC_PAGES);
+>> +       if (ret)
+>> +               return ret;
+>> +
+>> +       to_kvm_vmx(kvm)->pvipi_gfn =3D addr >> PAGE_SHIFT;
+>> +       kvm_pvipi_init(kvm, to_kvm_vmx(kvm)->pvipi_gfn);
+>> +
+>> +       return ret;
+>> +
+>> +}
+>> +
+>> static int vmx_set_tss_addr(struct kvm *kvm, unsigned int addr)
+>> {
+>>         int ret;
+>> @@ -4833,6 +4918,7 @@ static int handle_cpuid(struct kvm_vcpu *vcpu)
+>>         return kvm_emulate_cpuid(vcpu);
+>> }
+>>
+>> +static unsigned long pvipi[4];
+>> static int handle_rdmsr(struct kvm_vcpu *vcpu)
+>> {
+>>         u32 ecx =3D vcpu->arch.regs[VCPU_REGS_RCX];
+>> @@ -6046,15 +6132,15 @@ static int vmx_sync_pir_to_irr(struct kvm_vcpu *=
+vcpu)
+>>         bool max_irr_updated;
+>>
+>>         WARN_ON(!vcpu->arch.apicv_active);
+>> -       if (pi_test_on(&vmx->pi_desc)) {
+>> -               pi_clear_on(&vmx->pi_desc);
+>> +       if (pi_test_on(vmx->pi_desc)) {
+>> +               pi_clear_on(vmx->pi_desc);
+>>                 /*
+>>                  * IOMMU can write to PIR.ON, so the barrier matters eve=
+n on UP.
+>>                  * But on x86 this is just a compiler barrier anyway.
+>>                  */
+>>                 smp_mb__after_atomic();
+>>                 max_irr_updated =3D
+>> -                       kvm_apic_update_irr(vcpu, vmx->pi_desc.pir, &max=
+_irr);
+>> +                       kvm_apic_update_irr(vcpu, vmx->pi_desc->pir, &ma=
+x_irr);
+>>
+>>                 /*
+>>                  * If we are running L2 and L1 has a new pending interru=
+pt
+>> @@ -6092,8 +6178,8 @@ static void vmx_apicv_post_state_restore(struct kv=
+m_vcpu *vcpu)
+>> {
+>>         struct vcpu_vmx *vmx =3D to_vmx(vcpu);
+>>
+>> -       pi_clear_on(&vmx->pi_desc);
+>> -       memset(vmx->pi_desc.pir, 0, sizeof(vmx->pi_desc.pir));
+>> +       pi_clear_on(vmx->pi_desc);
+>> +       memset(vmx->pi_desc->pir, 0, sizeof(vmx->pi_desc->pir));
+>> }
+>>
+>> static void vmx_complete_atomic_exit(struct vcpu_vmx *vmx)
+>> @@ -6505,6 +6591,7 @@ static void __vmx_vcpu_run(struct kvm_vcpu *vcpu, =
+struct vcpu_vmx *vmx)
+>> }
+>> STACK_FRAME_NON_STANDARD(__vmx_vcpu_run);
+>>
+>> +static bool msr_write_intercepted(struct kvm_vcpu *vcpu, u32 msr);
+>> static void vmx_vcpu_run(struct kvm_vcpu *vcpu)
+>> {
+>>         struct vcpu_vmx *vmx =3D to_vmx(vcpu);
+>> @@ -6707,6 +6794,17 @@ static struct kvm_vcpu *vmx_create_vcpu(struct kv=
+m *kvm, unsigned int id)
+>>
+>>         err =3D -ENOMEM;
+>>
+>> +       if (kvm_vcpu_apicv_active(&vmx->vcpu)) {
+>> +               if (id > MAX_PI_DESC) {
+>> +                       pr_err("kvm: failed to alloc pi descriptor,
+>> +                                       no enough pi descs left\n");
+>> +                       goto free_vcpu;
+>> +               }
+>> +               err =3D pi_desc_setup(&vmx->vcpu);
+>> +               if (err < 0)
+>> +                       goto free_vcpu;
+>> +       }
+>> +
+>>         /*
+>>          * If PML is turned on, failure on enabling PML just results in =
+failure
+>>          * of creating the vcpu, therefore we can simplify PML logic (by
+>> @@ -6775,8 +6873,10 @@ static struct kvm_vcpu *vmx_create_vcpu(struct kv=
+m *kvm, unsigned int id)
+>>          * Enforce invariant: pi_desc.nv is always either POSTED_INTR_VE=
+CTOR
+>>          * or POSTED_INTR_WAKEUP_VECTOR.
+>>          */
+>> -       vmx->pi_desc.nv =3D POSTED_INTR_VECTOR;
+>> -       vmx->pi_desc.sn =3D 1;
+>> +       if (kvm_vcpu_apicv_active(&vmx->vcpu)) {
+>> +               vmx->pi_desc->nv =3D POSTED_INTR_VECTOR;
+>> +               vmx->pi_desc->sn =3D 1;
+>> +       }
+>>
+>>         vmx->ept_pointer =3D INVALID_PAGE;
+>>
+>> @@ -7297,9 +7397,8 @@ static int pi_pre_block(struct kvm_vcpu *vcpu)
+>>         struct pi_desc old, new;
+>>         struct pi_desc *pi_desc =3D vcpu_to_pi_desc(vcpu);
+>>
+>> -       if (!kvm_arch_has_assigned_device(vcpu->kvm) ||
+>> -               !irq_remapping_cap(IRQ_POSTING_CAP)  ||
+>> -               !kvm_vcpu_apicv_active(vcpu))
+>> +
+>> +       if (!kvm_vcpu_apicv_active(vcpu))
+>>                 return 0;
+>>
+>>         WARN_ON(irqs_disabled());
+>> @@ -7766,6 +7865,7 @@ static struct kvm_x86_ops vmx_x86_ops __ro_after_i=
+nit =3D {
+>>         .deliver_posted_interrupt =3D vmx_deliver_posted_interrupt,
+>>
+>>         .set_tss_addr =3D vmx_set_tss_addr,
+>> +       .set_pvipi_addr =3D vmx_set_pvipi_addr,
+>>         .set_identity_map_addr =3D vmx_set_identity_map_addr,
+>>         .get_tdp_level =3D get_ept_level,
+>>         .get_mt_mask =3D vmx_get_mt_mask,
+>> diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
+>> index 0ac0a64..1b55d75 100644
+>> --- a/arch/x86/kvm/vmx/vmx.h
+>> +++ b/arch/x86/kvm/vmx/vmx.h
+>> @@ -18,8 +18,6 @@ extern u64 host_efer;
+>> #define MSR_TYPE_W      2
+>> #define MSR_TYPE_RW     3
+>>
+>> -#define X2APIC_MSR(r) (APIC_BASE_MSR + ((r) >> 4))
+>> -
+>> #define NR_AUTOLOAD_MSRS 8
+>>
+>> struct vmx_msrs {
+>> @@ -235,7 +233,7 @@ struct vcpu_vmx {
+>>         u32 exit_reason;
+>>
+>>         /* Posted interrupt descriptor */
+>> -       struct pi_desc pi_desc;
+>> +       struct pi_desc *pi_desc;
+>>
+>>         /* Support for a guest hypervisor (nested VMX) */
+>>         struct nested_vmx nested;
+>> @@ -286,6 +284,8 @@ struct kvm_vmx {
+>>
+>>         enum ept_pointers_status ept_pointers_match;
+>>         spinlock_t ept_pointer_lock;
+>> +
+>> +       unsigned long pvipi_gfn;
+>> };
+>>
+>> bool nested_vmx_allowed(struct kvm_vcpu *vcpu);
+>> @@ -475,7 +475,7 @@ static inline struct vcpu_vmx *to_vmx(struct kvm_vcp=
+u *vcpu)
+>>
+>> static inline struct pi_desc *vcpu_to_pi_desc(struct kvm_vcpu *vcpu)
+>> {
+>> -       return &(to_vmx(vcpu)->pi_desc);
+>> +       return to_vmx(vcpu)->pi_desc;
+>> }
+>>
+>> struct vmcs *alloc_vmcs_cpu(bool shadow, int cpu);
+>> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+>> index 941f932..c3cca66 100644
+>> --- a/arch/x86/kvm/x86.c
+>> +++ b/arch/x86/kvm/x86.c
+>> @@ -1155,6 +1155,8 @@ static u32 emulated_msrs[] =3D {
+>>
+>>         MSR_KVM_ASYNC_PF_EN, MSR_KVM_STEAL_TIME,
+>>         MSR_KVM_PV_EOI_EN,
+>> +       MSR_KVM_PV_IPI,
+>> +       MSR_KVM_PV_ICR,
+>>
+>>         MSR_IA32_TSC_ADJUST,
+>>         MSR_IA32_TSCDEADLINE,
+>> @@ -2479,6 +2481,8 @@ int kvm_set_msr_common(struct kvm_vcpu *vcpu, stru=
+ct msr_data *msr_info)
+>>                 return kvm_mtrr_set_msr(vcpu, msr, data);
+>>         case MSR_IA32_APICBASE:
+>>                 return kvm_set_apic_base(vcpu, msr_info);
+>> +       case MSR_KVM_PV_ICR:
+>> +               return kvm_x2apic_msr_write(vcpu, X2APIC_MSR(APIC_ICR), =
+data);
+>>         case APIC_BASE_MSR ... APIC_BASE_MSR + 0x3ff:
+>>                 return kvm_x2apic_msr_write(vcpu, msr, data);
+>>         case MSR_IA32_TSCDEADLINE:
+>> @@ -2773,6 +2777,9 @@ int kvm_get_msr_common(struct kvm_vcpu *vcpu, stru=
+ct msr_data *msr_info)
+>>         case MSR_IA32_APICBASE:
+>>                 msr_info->data =3D kvm_get_apic_base(vcpu);
+>>                 break;
+>> +       case MSR_KVM_PV_ICR:
+>> +               return kvm_x2apic_msr_read(vcpu,
+>> +                               X2APIC_MSR(APIC_ICR), &msr_info->data);
+>>         case APIC_BASE_MSR ... APIC_BASE_MSR + 0x3ff:
+>>                 return kvm_x2apic_msr_read(vcpu, msr_info->index, &msr_i=
+nfo->data);
+>>                 break;
+>> @@ -4240,6 +4247,14 @@ vm_fault_t kvm_arch_vcpu_fault(struct kvm_vcpu *v=
+cpu, struct vm_fault *vmf)
+>>         return VM_FAULT_SIGBUS;
+>> }
+>>
+>> +static int kvm_vm_ioctl_set_pvipi_addr(struct kvm *kvm, unsigned long a=
+ddr)
+>> +{
+>> +       int ret;
+>> +
+>> +       ret =3D kvm_x86_ops->set_pvipi_addr(kvm, addr);
+>> +       return ret;
+>> +}
+>> +
+>> static int kvm_vm_ioctl_set_tss_addr(struct kvm *kvm, unsigned long addr=
+)
+>> {
+>>         int ret;
+>> @@ -4866,6 +4881,9 @@ long kvm_arch_vm_ioctl(struct file *filp,
+>>                 r =3D kvm_vm_ioctl_hv_eventfd(kvm, &hvevfd);
+>>                 break;
+>>         }
+>> +       case KVM_SET_PVIPI_ADDR:
+>> +               r =3D kvm_vm_ioctl_set_pvipi_addr(kvm, arg);
+>> +               break;
+>>         default:
+>>                 r =3D -ENOTTY;
+>>         }
+>> @@ -9248,6 +9266,7 @@ void kvm_arch_destroy_vm(struct kvm *kvm)
+>>                 x86_set_memory_region(kvm, APIC_ACCESS_PAGE_PRIVATE_MEMS=
+LOT, 0, 0);
+>>                 x86_set_memory_region(kvm, IDENTITY_PAGETABLE_PRIVATE_ME=
+MSLOT, 0, 0);
+>>                 x86_set_memory_region(kvm, TSS_PRIVATE_MEMSLOT, 0, 0);
+>> +               x86_set_memory_region(kvm, PVIPI_PAGE_PRIVATE_MEMSLOT, 0=
+, 0);
+>>         }
+>>         if (kvm_x86_ops->vm_destroy)
+>>                 kvm_x86_ops->vm_destroy(kvm);
+>> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+>> index 6d4ea4b..db88c4d 100644
+>> --- a/include/uapi/linux/kvm.h
+>> +++ b/include/uapi/linux/kvm.h
+>> @@ -1440,6 +1440,7 @@ struct kvm_enc_region {
+>> /* Available with KVM_CAP_HYPERV_CPUID */
+>> #define KVM_GET_SUPPORTED_HV_CPUID _IOWR(KVMIO, 0xc1, struct kvm_cpuid2)
+>>
+>> +#define KVM_SET_PVIPI_ADDR            _IO(KVMIO, 0xc2)
+>> /* Secure Encrypted Virtualization command */
+>> enum sev_cmd_id {
+>>         /* Guest initialization commands */
+>> --
+>> 2.11.0
 
-I will, thanks.
 
-Haiwei Li
+
+--=20
+best regards
+yang
