@@ -2,167 +2,236 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 00BD8271AD0
-	for <lists+kvm@lfdr.de>; Mon, 21 Sep 2020 08:23:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 91FB3271B08
+	for <lists+kvm@lfdr.de>; Mon, 21 Sep 2020 08:45:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726367AbgIUGXH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 21 Sep 2020 02:23:07 -0400
-Received: from mga18.intel.com ([134.134.136.126]:12786 "EHLO mga18.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726244AbgIUGXH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 21 Sep 2020 02:23:07 -0400
-IronPort-SDR: +Dc4TAoDwkfA2FOkEwKv+4dkxEUoGYDuVpB69LTQsgnkD+ZrZCqZs/pp7DfrswqVp9vUoRL/Ui
- iAy6AYZ0UCRA==
-X-IronPort-AV: E=McAfee;i="6000,8403,9750"; a="148070034"
-X-IronPort-AV: E=Sophos;i="5.77,285,1596524400"; 
-   d="scan'208";a="148070034"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Sep 2020 23:23:04 -0700
-IronPort-SDR: USb2UDAwyWhLJQWxChZgxFvSXc5aD8EZKTgGEeQPUMLqRDIxK9gy3tRuyDpL1OOMSR9aEqeLGv
- UdRLeyUYUhDg==
-X-IronPort-AV: E=Sophos;i="5.77,285,1596524400"; 
-   d="scan'208";a="485292430"
-Received: from fjanoscz-mobl1.ger.corp.intel.com (HELO ubuntu) ([10.249.45.119])
-  by orsmga005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Sep 2020 23:23:01 -0700
-Date:   Mon, 21 Sep 2020 08:22:52 +0200
-From:   Guennadi Liakhovetski <guennadi.liakhovetski@linux.intel.com>
-To:     Mathieu Poirier <mathieu.poirier@linaro.org>
-Cc:     kvm@vger.kernel.org, linux-remoteproc@vger.kernel.org,
-        virtualization@lists.linux-foundation.org,
-        sound-open-firmware@alsa-project.org,
-        Pierre-Louis Bossart <pierre-louis.bossart@linux.intel.com>,
-        Liam Girdwood <liam.r.girdwood@linux.intel.com>,
+        id S1726318AbgIUGph (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 21 Sep 2020 02:45:37 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:27678 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726011AbgIUGpg (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 21 Sep 2020 02:45:36 -0400
+Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 08L6XCpx121323;
+        Mon, 21 Sep 2020 02:45:16 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : subject : to : cc
+ : references : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=Qc+TFvGdxkbzSsv1yg1yWx1oPyx1PkEfeCodzvuGZo4=;
+ b=CYrW6eAShvqWn23QIKnpprhrsJnjI0bqxovMQBHV06uTByjxOv257BQTQsMun2TbWIwY
+ 0YrZWF2YelX4wF+T6AIc4qGTkGjJNd4YcqqRLLwSaN7Jj6YilZ6cEKuAnpg/r0xJSGN7
+ +0b7Q3kCVvLLZJtSjW/u+vw30HWuVdalZr21AY/JV8/jeyF7t1HE0N4m8QuZqCqN7Mq1
+ hsQf8fn7YupstrkxZe5v6rVya9NiEMrBvLcsLrJ4is5BjI4QgElj0Dwb6QcrB0U+4lQB
+ lVkzyvw1VmHUzcXxqCnB9Gth7PCEEoazjevygTqYnKwLV7NoZ+3u2G2ZOApEq1EfqObG aA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 33pprhgjye-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 21 Sep 2020 02:45:16 -0400
+Received: from m0098414.ppops.net (m0098414.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 08L6YMq8124106;
+        Mon, 21 Sep 2020 02:45:15 -0400
+Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com [149.81.74.108])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 33pprhgjwm-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 21 Sep 2020 02:45:13 -0400
+Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
+        by ppma05fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 08L6bEro007577;
+        Mon, 21 Sep 2020 06:45:09 GMT
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
+        by ppma05fra.de.ibm.com with ESMTP id 33n9m7rvfk-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 21 Sep 2020 06:45:09 +0000
+Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
+        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 08L6j7lw26738998
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 21 Sep 2020 06:45:07 GMT
+Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 73A6A5206D;
+        Mon, 21 Sep 2020 06:45:07 +0000 (GMT)
+Received: from [9.65.232.226] (unknown [9.65.232.226])
+        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 13F3852054;
+        Mon, 21 Sep 2020 06:45:03 +0000 (GMT)
+From:   Dov Murik <dovmurik@linux.vnet.ibm.com>
+Subject: Re: [PATCH v3 1/5] sev/i386: Add initial support for SEV-ES
+To:     Tom Lendacky <thomas.lendacky@amd.com>, qemu-devel@nongnu.org,
+        kvm@vger.kernel.org
+Cc:     Brijesh Singh <brijesh.singh@amd.com>,
+        Eduardo Habkost <ehabkost@redhat.com>,
         "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Ohad Ben-Cohen <ohad@wizery.com>,
-        Bjorn Andersson <bjorn.andersson@linaro.org>,
-        Vincent Whitchurch <vincent.whitchurch@axis.com>
-Subject: Re: [PATCH v7 3/3] vhost: add an RPMsg API
-Message-ID: <20200921062251.GA27773@ubuntu>
-References: <20200910111351.20526-1-guennadi.liakhovetski@linux.intel.com>
- <20200910111351.20526-4-guennadi.liakhovetski@linux.intel.com>
- <20200917220138.GA97950@xps15>
- <20200918090229.GC19246@ubuntu>
- <20200918155249.GA200851@xps15>
+        Connor Kuehl <ckuehl@redhat.com>,
+        Marcelo Tosatti <mtosatti@redhat.com>,
+        "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jiri Slaby <jslaby@suse.cz>,
+        Richard Henderson <rth@twiddle.net>
+References: <cover.1600205384.git.thomas.lendacky@amd.com>
+ <e2456cc461f329f52aa6eb3fcd0d0ce9451b8fa7.1600205384.git.thomas.lendacky@amd.com>
+Message-ID: <e8cf44ef-3180-8922-5f0a-2ce532005e51@linux.vnet.ibm.com>
+Date:   Mon, 21 Sep 2020 09:45:02 +0300
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.2.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200918155249.GA200851@xps15>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <e2456cc461f329f52aa6eb3fcd0d0ce9451b8fa7.1600205384.git.thomas.lendacky@amd.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
+ definitions=2020-09-21_01:2020-09-21,2020-09-20 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 adultscore=0
+ clxscore=1011 mlxscore=0 spamscore=0 phishscore=0 mlxlogscore=999
+ bulkscore=0 impostorscore=0 malwarescore=0 lowpriorityscore=0
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2006250000 definitions=main-2009210049
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Mathieu,
-
-On Fri, Sep 18, 2020 at 09:52:49AM -0600, Mathieu Poirier wrote:
-> Good morning,
+On 16/09/2020 0:29, Tom Lendacky wrote:
+> From: Tom Lendacky <thomas.lendacky@amd.com>
 > 
-> On Fri, Sep 18, 2020 at 11:02:29AM +0200, Guennadi Liakhovetski wrote:
-> > Hi Mathieu,
-> > 
-> > On Thu, Sep 17, 2020 at 04:01:38PM -0600, Mathieu Poirier wrote:
-> > > On Thu, Sep 10, 2020 at 01:13:51PM +0200, Guennadi Liakhovetski wrote:
-> > > > Linux supports running the RPMsg protocol over the VirtIO transport
-> > > > protocol, but currently there is only support for VirtIO clients and
-> > > > no support for VirtIO servers. This patch adds a vhost-based RPMsg
-> > > > server implementation, which makes it possible to use RPMsg over
-> > > > VirtIO between guest VMs and the host.
-> > > 
-> > > I now get the client/server concept you are describing above but that happened
-> > > only after a lot of mental gymnastics.  If you drop the whole client/server
-> > > concept and concentrate on what this patch does, things will go better.  I would
-> > > personally go with what you have in the Kconfig: 
-> > > 
-> > > > +	  Vhost RPMsg API allows vhost drivers to communicate with VirtIO
-> > > > +	  drivers on guest VMs, using the RPMsg over VirtIO protocol.
-> > > 
-> > > It is concise but describes exactly what this patch provide.
-> > 
-> > Ok, thanks, will try to improve.
-> > 
-> > > > Signed-off-by: Guennadi Liakhovetski <guennadi.liakhovetski@linux.intel.com>
-> > > > ---
-> > > >  drivers/vhost/Kconfig       |   7 +
-> > > >  drivers/vhost/Makefile      |   3 +
-> > > >  drivers/vhost/rpmsg.c       | 370 ++++++++++++++++++++++++++++++++++++
-> > > >  drivers/vhost/vhost_rpmsg.h |  74 ++++++++
-> > > >  4 files changed, 454 insertions(+)
-> > > >  create mode 100644 drivers/vhost/rpmsg.c
-> > > >  create mode 100644 drivers/vhost/vhost_rpmsg.h
-
-[snip]
-
-> > > > diff --git a/drivers/vhost/rpmsg.c b/drivers/vhost/rpmsg.c
-> > > > new file mode 100644
-> > > > index 000000000000..0ddee5b5f017
-> > > > --- /dev/null
-> > > > +++ b/drivers/vhost/rpmsg.c
-> > > > @@ -0,0 +1,370 @@
-
-[snip]
-
-> > > > +/*
-> > > > + * Return false to terminate the external loop only if we fail to obtain either
-> > > > + * a request or a response buffer
-> > > > + */
-> > > > +static bool handle_rpmsg_req_single(struct vhost_rpmsg *vr,
-> > > > +				    struct vhost_virtqueue *vq)
-> > > > +{
-> > > > +	struct vhost_rpmsg_iter iter;
-> > > > +	int ret = vhost_rpmsg_start_lock(vr, &iter, VIRTIO_RPMSG_REQUEST, -EINVAL);
-> > > > +	if (!ret)
-> > > > +		ret = vhost_rpmsg_finish_unlock(vr, &iter);
-> > > > +	if (ret < 0) {
-> > > > +		if (ret != -EAGAIN)
-> > > > +			vq_err(vq, "%s(): RPMSG processing failed %d\n",
-> > > > +			       __func__, ret);
-> > > > +		return false;
-> > > > +	}
-> > > > +
-> > > > +	if (!iter.ept->write)
-> > > > +		return true;
-> > > > +
-> > > > +	ret = vhost_rpmsg_start_lock(vr, &iter, VIRTIO_RPMSG_RESPONSE, -EINVAL);
-> > > > +	if (!ret)
-> > > > +		ret = vhost_rpmsg_finish_unlock(vr, &iter);
-> > > > +	if (ret < 0) {
-> > > > +		vq_err(vq, "%s(): RPMSG finalising failed %d\n", __func__, ret);
-> > > > +		return false;
-> > > > +	}
-> > > 
-> > > As I said before dealing with the "response" queue here seems to be introducing
-> > > coupling with vhost_rpmsg_start_lock()...  Endpoints should be doing that.
-> > 
-> > Sorry, could you elaborate a bit, what do you mean by coupling?
+> Provide initial support for SEV-ES. This includes creating a function to
+> indicate the guest is an SEV-ES guest (which will return false until all
+> support is in place), performing the proper SEV initialization and
+> ensuring that the guest CPU state is measured as part of the launch.
 > 
-> In function vhost_rpmsg_start_lock() the rpmsg header is prepared for a response
-> at the end of the processing associated with the reception of a
-> VIRTIO_RPMSG_REQUEST.  I assumed (perhaps wrongly) that such as response was
-> sent here.  In that case preparing the response and sending the response should
-> be done at the same place.
+> Co-developed-by: Jiri Slaby <jslaby@suse.cz>
+> Signed-off-by: Jiri Slaby <jslaby@suse.cz>
+> Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
+> ---
+>   target/i386/cpu.c      |  1 +
+>   target/i386/sev-stub.c |  5 +++++
+>   target/i386/sev.c      | 46 ++++++++++++++++++++++++++++++++++++++++--
+>   target/i386/sev_i386.h |  1 +
+>   4 files changed, 51 insertions(+), 2 deletions(-)
+> 
+> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+> index 588f32e136..bbbe581d35 100644
+> --- a/target/i386/cpu.c
+> +++ b/target/i386/cpu.c
+> @@ -5969,6 +5969,7 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
+>           break;
+>       case 0x8000001F:
+>           *eax = sev_enabled() ? 0x2 : 0;
+> +        *eax |= sev_es_enabled() ? 0x8 : 0;
+>           *ebx = sev_get_cbit_position();
+>           *ebx |= sev_get_reduced_phys_bits() << 6;
+>           *ecx = 0;
+> diff --git a/target/i386/sev-stub.c b/target/i386/sev-stub.c
+> index 88e3f39a1e..040ac90563 100644
+> --- a/target/i386/sev-stub.c
+> +++ b/target/i386/sev-stub.c
+> @@ -49,3 +49,8 @@ SevCapability *sev_get_capabilities(Error **errp)
+>       error_setg(errp, "SEV is not available in this QEMU");
+>       return NULL;
+>   }
+> +
+> +bool sev_es_enabled(void)
+> +{
+> +    return false;
+> +}
+> diff --git a/target/i386/sev.c b/target/i386/sev.c
+> index c3ecf86704..6c9cd0854b 100644
+> --- a/target/i386/sev.c
+> +++ b/target/i386/sev.c
+> @@ -359,6 +359,12 @@ sev_enabled(void)
+>       return !!sev_guest;
+>   }
+> 
+> +bool
+> +sev_es_enabled(void)
+> +{
+> +    return false;
+> +}
+> +
+>   uint64_t
+>   sev_get_me_mask(void)
+>   {
+> @@ -578,6 +584,22 @@ sev_launch_update_data(SevGuestState *sev, uint8_t *addr, uint64_t len)
+>       return ret;
+>   }
+> 
+> +static int
+> +sev_launch_update_vmsa(SevGuestState *sev)
+> +{
+> +    int ret, fw_error;
+> +
+> +    ret = sev_ioctl(sev->sev_fd, KVM_SEV_LAUNCH_UPDATE_VMSA, NULL, &fw_error);
+> +    if (ret) {
+> +        error_report("%s: LAUNCH_UPDATE_VMSA ret=%d fw_error=%d '%s'",
+> +                __func__, ret, fw_error, fw_error_to_str(fw_error));
+> +        goto err;
 
-This will change in the next version, in it I'll remove response preparation from 
-request handling.
+goto (and the err: label) is not needed.
 
-> But my assumption may be completely wrong... A better question should probably
-> be why is the VIRTIO_RPMSG_RESPONSE probed in handle_rpmsg_req_single()?
-> Shouldn't this be solely concerned with handling requests from the guest?  If
-> I'm wondering what is going on I expect other people will also do the same,
-> something that could be alleviated with more comments.
+> +    }
+> +
+> +err:
+> +    return ret;
+> +}
+> +
+>   static void
+>   sev_launch_get_measure(Notifier *notifier, void *unused)
+>   {
+> @@ -590,6 +612,14 @@ sev_launch_get_measure(Notifier *notifier, void *unused)
+>           return;
+>       }
+> 
+> +    if (sev_es_enabled()) {
+> +        /* measure all the VM save areas before getting launch_measure */
+> +        ret = sev_launch_update_vmsa(sev);
+> +        if (ret) {
+> +            exit(1);
 
-My RPMsg implementation supports two modes for sending data from the host (in 
-VM terms) to guests: as responses to their requests and as asynchronous 
-messages. If there isn't a strict request-response pattern on a certain endpont, 
-you leave the .write callback NULL and then you send your messages as you please 
-independent of requests. But you can also specify a .write pointer in which case 
-after each request to generate a response.
+Other error cases in this function just return on error. Why quit QEMU here?
 
-In principle this response handling could be removed, but then drivers, that do 
-need to respond to requests would have to schedule an asynchronous action in 
-their .read callbacks to be triggered after request processing has completed.
-
-Thanks
-Guennadi
+> +        }
+> +    }
+> +
+>       measurement = g_new0(struct kvm_sev_launch_measure, 1);
+> 
+>       /* query the measurement blob length */
+> @@ -684,7 +714,7 @@ sev_guest_init(const char *id)
+>   {
+>       SevGuestState *sev;
+>       char *devname;
+> -    int ret, fw_error;
+> +    int ret, fw_error, cmd;
+>       uint32_t ebx;
+>       uint32_t host_cbitpos;
+>       struct sev_user_data_status status = {};
+> @@ -745,8 +775,20 @@ sev_guest_init(const char *id)
+>       sev->api_major = status.api_major;
+>       sev->api_minor = status.api_minor;
+> 
+> +    if (sev_es_enabled()) {
+> +        if (!(status.flags & SEV_STATUS_FLAGS_CONFIG_ES)) {
+> +            error_report("%s: guest policy requires SEV-ES, but "
+> +                         "host SEV-ES support unavailable",
+> +                         __func__);
+> +            goto err;
+> +        }
+> +        cmd = KVM_SEV_ES_INIT;
+> +    } else {
+> +        cmd = KVM_SEV_INIT;
+> +    }
+> +
+>       trace_kvm_sev_init();
+> -    ret = sev_ioctl(sev->sev_fd, KVM_SEV_INIT, NULL, &fw_error);
+> +    ret = sev_ioctl(sev->sev_fd, cmd, NULL, &fw_error);
+>       if (ret) {
+>           error_report("%s: failed to initialize ret=%d fw_error=%d '%s'",
+>                        __func__, ret, fw_error, fw_error_to_str(fw_error));
+> diff --git a/target/i386/sev_i386.h b/target/i386/sev_i386.h
+> index 4db6960f60..4f9a5e9b21 100644
+> --- a/target/i386/sev_i386.h
+> +++ b/target/i386/sev_i386.h
+> @@ -29,6 +29,7 @@
+>   #define SEV_POLICY_SEV          0x20
+> 
+>   extern bool sev_enabled(void);
+> +extern bool sev_es_enabled(void);
+>   extern uint64_t sev_get_me_mask(void);
+>   extern SevInfo *sev_get_info(void);
+>   extern uint32_t sev_get_cbit_position(void);
+> 
