@@ -2,136 +2,171 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 17CB0271DD9
-	for <lists+kvm@lfdr.de>; Mon, 21 Sep 2020 10:25:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D346D271E70
+	for <lists+kvm@lfdr.de>; Mon, 21 Sep 2020 10:57:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726488AbgIUIY5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 21 Sep 2020 04:24:57 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:44666 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726318AbgIUIY5 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 21 Sep 2020 04:24:57 -0400
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 08L82tL5065811;
-        Mon, 21 Sep 2020 04:24:56 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=vS8YPPsrj2iP2hNgx4WZFZGQp+EMbBrT5m6yG9GczQ4=;
- b=mql2vsTWRnCmb/yeVrE3DgIHKSQZmEubCEIHUBanAst7FwsNetXfMVlerxJnVDIUHnl0
- v6+YJ2nuk2nOUF7WdlrkPT25r//a/AO+JSrxkgTvwTyy675H7TQIiyQTH8pPz0N/qzz1
- ifM286C1SXwf5ivLKrCHZYkPx2z7X5e5HphmYM7WJkGVClU0tjpR3ySi2A2XjT6fKRsa
- 3WKoR0RBrCRhkK50/pfHX5+ktAWKxCRxPAZjm1UCCXwjizRXEkMJvbxtfTlDn01+KojG
- k8yI42Zr+bMkreH1HGe5POFmAyPHMgMnRxeXZm0R+SO+W2VfNQkpYwd7yGc7F3uk/1lZ DQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 33pr1k16qu-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 21 Sep 2020 04:24:56 -0400
-Received: from m0098396.ppops.net (m0098396.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 08L83UPG067455;
-        Mon, 21 Sep 2020 04:24:56 -0400
-Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 33pr1k16q4-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 21 Sep 2020 04:24:56 -0400
-Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
-        by ppma04ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 08L8M93E027430;
-        Mon, 21 Sep 2020 08:24:53 GMT
-Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
-        by ppma04ams.nl.ibm.com with ESMTP id 33payu8j67-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 21 Sep 2020 08:24:53 +0000
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
-        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 08L8Ooq722348054
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 21 Sep 2020 08:24:50 GMT
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id C0112AE04D;
-        Mon, 21 Sep 2020 08:24:50 +0000 (GMT)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 4DE46AE045;
-        Mon, 21 Sep 2020 08:24:50 +0000 (GMT)
-Received: from oc3016276355.ibm.com (unknown [9.145.86.99])
-        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Mon, 21 Sep 2020 08:24:50 +0000 (GMT)
-Subject: Re: [PATCH] s390/vfio-ap: fix unregister GISC when KVM is already
- gone results in OOPS
-To:     Tony Krowiak <akrowiak@linux.ibm.com>, linux-s390@vger.kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     pasic@linux.ibm.com, alex.williamson@redhat.com, cohuck@redhat.com,
-        kwankhede@nvidia.com, borntraeger@de.ibm.com
-References: <20200918170234.5807-1-akrowiak@linux.ibm.com>
-From:   Pierre Morel <pmorel@linux.ibm.com>
-Message-ID: <5b7fcfc8-fe8d-c7b4-0174-d1b3ee9de28b@linux.ibm.com>
-Date:   Mon, 21 Sep 2020 10:24:50 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+        id S1726402AbgIUI5i (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 21 Sep 2020 04:57:38 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:57029 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726353AbgIUI5i (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 21 Sep 2020 04:57:38 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1600678656;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=QtDGrtlEykQ6KPjGLzoVNEGTLi0Wn2lMDIF84aVaKUY=;
+        b=WAawBeRFjLfRsbEZ/N70nce8rafjibNTvK1YN9IGb++llZw7DNsD+/ncyLsUatnbnjBkeD
+        YSXXrLhGPl0dW9L2U3Xnhw3dbmVXvRH/NVIFy9e5KTiOqtZOFXEDUfo5aphTs0Q9ue1AN3
+        8Smgd5mRTNsW08z8P4u6U6Y0zfXkNNo=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-349-XYppMNu8OM6FHcbYzkTZzg-1; Mon, 21 Sep 2020 04:57:34 -0400
+X-MC-Unique: XYppMNu8OM6FHcbYzkTZzg-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 50567802B6B;
+        Mon, 21 Sep 2020 08:57:32 +0000 (UTC)
+Received: from starship (unknown [10.35.206.28])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 68D9B61177;
+        Mon, 21 Sep 2020 08:57:28 +0000 (UTC)
+Message-ID: <2b6a4042a0a75cbc5e00b32752afa9965abd697d.camel@redhat.com>
+Subject: Re: [PATCH v4 2/2] KVM: nSVM: implement ondemand allocation of the
+ nested state
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     kvm@vger.kernel.org, Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Ingo Molnar <mingo@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Borislav Petkov <bp@alien8.de>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
+        linux-kernel@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>
+Date:   Mon, 21 Sep 2020 11:57:27 +0300
+In-Reply-To: <5a3538861a65973f9ae6e2d0798ac17f52428ded.camel@redhat.com>
+References: <20200917101048.739691-1-mlevitsk@redhat.com>
+         <20200917101048.739691-3-mlevitsk@redhat.com>
+         <20200917162942.GE13522@sjchrist-ice>
+         <d9c0d190-c6ea-2e21-92ca-2a53efb86a1d@redhat.com>
+         <20200920161602.GA17325@linux.intel.com>
+         <c35cbaca-2c34-cd93-b589-d4ab782fc754@redhat.com>
+         <5a3538861a65973f9ae6e2d0798ac17f52428ded.camel@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.3 (3.36.3-1.fc32) 
 MIME-Version: 1.0
-In-Reply-To: <20200918170234.5807-1-akrowiak@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
- definitions=2020-09-21_01:2020-09-21,2020-09-20 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 mlxscore=0
- mlxlogscore=999 phishscore=0 impostorscore=0 lowpriorityscore=0
- adultscore=0 bulkscore=0 spamscore=0 suspectscore=2 clxscore=1015
- priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2006250000 definitions=main-2009210058
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-
-On 2020-09-18 19:02, Tony Krowiak wrote:
-> Attempting to unregister Guest Interruption Subclass (GISC) when the
-> link between the matrix mdev and KVM has been removed results in the
-> following:
+On Mon, 2020-09-21 at 10:53 +0300, Maxim Levitsky wrote:
+> On Sun, 2020-09-20 at 18:42 +0200, Paolo Bonzini wrote:
+> > On 20/09/20 18:16, Sean Christopherson wrote:
+> > > > Maxim, your previous version was adding some error handling to
+> > > > kvm_x86_ops.set_efer.  I don't remember what was the issue; did you have
+> > > > any problems propagating all the errors up to KVM_SET_SREGS (easy),
+> > > > kvm_set_msr (harder) etc.?
+> > > I objected to letting .set_efer() return a fault.
+> > 
+> > So did I, and that's why we get KVM_REQ_OUT_OF_MEMORY.  But it was more
+> > of an "it's ugly and it ought not to fail" thing than something I could
+> > pinpoint.
+> > 
+> > It looks like we agree, but still we have to choose the lesser evil?
+> > 
+> > Paolo
+> > 
+> > > A relatively minor issue is
+> > > the code in vmx_set_efer() that handles lack of EFER because technically KVM
+> > > can emulate EFER.SCE+SYSCALL without supporting EFER in hardware.  Returning
+> > > success/'0' would avoid that particular issue.  My primary concern is that I'd
+> > > prefer not to add another case where KVM can potentially ignore a fault
+> > > indicated by a helper, a la vmx_set_cr4().
 > 
->     "Kernel panic -not syncing: Fatal exception: panic_on_oops"
+> The thing is that kvm_emulate_wrmsr injects #GP when kvm_set_msr returns any non zero value,
+> and returns 1 which means keep on going if I understand correctly (0 is userspace exit,
+> negative value would be a return to userspace with an error)
 > 
-> This patch fixes this bug by verifying the matrix mdev and KVM are still
-> linked prior to unregistering the GISC.
+> So the question is if we have other wrmsr handlers which return negative value, and would
+> be affected by changing kvm_emulate_wrmsr to pass through the error value.
+> I am checking the code now.
 > 
-> Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
-> ---
->   drivers/s390/crypto/vfio_ap_ops.c | 14 +++++++++-----
->   1 file changed, 9 insertions(+), 5 deletions(-)
+> I do agree now that this is the *correct* solution to this problem.
 > 
-> diff --git a/drivers/s390/crypto/vfio_ap_ops.c b/drivers/s390/crypto/vfio_ap_ops.c
-> index e0bde8518745..847a88642644 100644
-> --- a/drivers/s390/crypto/vfio_ap_ops.c
-> +++ b/drivers/s390/crypto/vfio_ap_ops.c
-> @@ -119,11 +119,15 @@ static void vfio_ap_wait_for_irqclear(int apqn)
->    */
->   static void vfio_ap_free_aqic_resources(struct vfio_ap_queue *q)
->   {
-> -	if (q->saved_isc != VFIO_AP_ISC_INVALID && q->matrix_mdev)
-
-I think you could have make the patch smaller by adding the missing test 
-for kvm here.
+> Best regards,
+> 	Maxim Levitsky
 
 
-> -		kvm_s390_gisc_unregister(q->matrix_mdev->kvm, q->saved_isc);
-> -	if (q->saved_pfn && q->matrix_mdev)
-> -		vfio_unpin_pages(mdev_dev(q->matrix_mdev->mdev),
-> -				 &q->saved_pfn, 1);
-> +	if (q->matrix_mdev) {
-> +		if (q->saved_isc != VFIO_AP_ISC_INVALID && q->matrix_mdev->kvm)
-> +			kvm_s390_gisc_unregister(q->matrix_mdev->kvm,
-> +						 q->saved_isc);
-> +		if (q->saved_pfn)
-> +			vfio_unpin_pages(mdev_dev(q->matrix_mdev->mdev),
-> +					 &q->saved_pfn, 1);
-> +	}
-> +
->   	q->saved_pfn = 0;
->   	q->saved_isc = VFIO_AP_ISC_INVALID;
->   }
-> 
+So those are results of my analysis:
 
--- 
-Pierre Morel
-IBM Lab Boeblingen
+WRMSR called functions that return negative value (I could have missed something,
+but I double checked the wrmsr code in both SVM and VMX, and in the common x86 code):
+
+vmx_set_vmx_msr - this is only called from userspace (msr_info->host_initiated == true),
+so this can be left as is
+
+xen_hvm_config - this code should probably return 1 in some cases, but in one case,
+it legit does memory allocation like I do, and failure should probably kill the guest
+as well (but I can keep it as is if we are afraid that new behavier will not be
+backward compatible)
+
+What do you think about this (only compile tested since I don't have any xen setups):
+
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 36e963dc1da61..66a57c5b14dfd 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -2695,24 +2695,19 @@ static int xen_hvm_config(struct kvm_vcpu *vcpu, u64 data)
+        u32 page_num = data & ~PAGE_MASK;
+        u64 page_addr = data & PAGE_MASK;
+        u8 *page;
+-       int r;
+ 
+-       r = -E2BIG;
+        if (page_num >= blob_size)
+-               goto out;
+-       r = -ENOMEM;
++               return 1;
++
+        page = memdup_user(blob_addr + (page_num * PAGE_SIZE), PAGE_SIZE);
+-       if (IS_ERR(page)) {
+-               r = PTR_ERR(page);
+-               goto out;
++       if (IS_ERR(page))
++               return PTR_ERR(page);
++
++       if (kvm_vcpu_write_guest(vcpu, page_addr, page, PAGE_SIZE)) {
++               kfree(page);
++               return 1;
+        }
+-       if (kvm_vcpu_write_guest(vcpu, page_addr, page, PAGE_SIZE))
+-               goto out_free;
+-       r = 0;
+-out_free:
+-       kfree(page);
+-out:
+-       return r;
++       return 0;
+ }
+
+
+The msr write itself can be reached from the guest through two functions,
+from kvm_emulate_wrmsr which is called in wrmsr interception from both VMX and SVM,
+and from em_wrmsr which is called in unlikely case the emulator needs to emulate a wrmsr.
+
+Both should be changed to inject #GP only on positive return value and pass the error
+otherwise.
+
+Sounds reasonable? If you agree I'll post the patches implementing this.
+
+Best regards,
+	Maxim Levitsky
+
+
+
