@@ -2,107 +2,183 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A0701271EDB
-	for <lists+kvm@lfdr.de>; Mon, 21 Sep 2020 11:23:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0132F271EE2
+	for <lists+kvm@lfdr.de>; Mon, 21 Sep 2020 11:25:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726515AbgIUJXd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 21 Sep 2020 05:23:33 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:52658 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726506AbgIUJXc (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 21 Sep 2020 05:23:32 -0400
+        id S1726474AbgIUJZX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 21 Sep 2020 05:25:23 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:47426 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726428AbgIUJZX (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 21 Sep 2020 05:25:23 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1600680211;
+        s=mimecast20190719; t=1600680321;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=l2BihOhVLQI3Fiuw96ozpY+9Laf0KFEpgF1HeUeh3t8=;
-        b=RixvTCW8PdYU6VoxQgxMGCNngR63waal2Cv0J9x1Hg3TDY5ev4ZE9jLs/dDS+XdGlzHt4C
-        XUyQ6nJQY2UZ69CZchXuEu3KxFYsyR+GvHZeeXlSpSQL8NAdcwic8NS1aTEfpjqvwe9uep
-        3mzvkjERpEc5cy+2W8iRvjeIg1VmwWE=
+        bh=M8WIpxIaKbTBrDqCSL9hr0M6bSj50ULdLvaUzQgidvg=;
+        b=dSiV6637unTNOtjHZEbNQ/TzpoaNxSBEKlauqPP1kPWApFVRWVz7kHa62wKahH0VCtI6Z/
+        ew9tuphZT7Pqhv5kBTmNnYo8JGDO33T955lIwuTWpCrCwE45vsAJtWvP+tk2o60WwpaWp5
+        zFIjFbq6lLfOdSPj9g88hLdcHAWEQA0=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-508-FMgK4nM6PIG6eY0xIurFgQ-1; Mon, 21 Sep 2020 05:23:27 -0400
-X-MC-Unique: FMgK4nM6PIG6eY0xIurFgQ-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+ us-mta-176-GEymDTzhPmm-Jfv7vUs_wQ-1; Mon, 21 Sep 2020 05:25:18 -0400
+X-MC-Unique: GEymDTzhPmm-Jfv7vUs_wQ-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EFE148030A4;
-        Mon, 21 Sep 2020 09:23:25 +0000 (UTC)
-Received: from gondolin (ovpn-112-187.ams2.redhat.com [10.36.112.187])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 15D526115F;
-        Mon, 21 Sep 2020 09:23:20 +0000 (UTC)
-Date:   Mon, 21 Sep 2020 11:23:18 +0200
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Tony Krowiak <akrowiak@linux.ibm.com>
-Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, pmorel@linux.ibm.com, pasic@linux.ibm.com,
-        alex.williamson@redhat.com, kwankhede@nvidia.com,
-        borntraeger@de.ibm.com
-Subject: Re: [PATCH] s390/vfio-ap: fix unregister GISC when KVM is already
- gone results in OOPS
-Message-ID: <20200921112318.0d11a2e5.cohuck@redhat.com>
-In-Reply-To: <20200918170234.5807-1-akrowiak@linux.ibm.com>
-References: <20200918170234.5807-1-akrowiak@linux.ibm.com>
-Organization: Red Hat GmbH
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 42C331868409;
+        Mon, 21 Sep 2020 09:25:17 +0000 (UTC)
+Received: from starship (unknown [10.35.206.28])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 86FA710013D0;
+        Mon, 21 Sep 2020 09:25:13 +0000 (UTC)
+Message-ID: <f936123d4146ae6e2c9ffc8b25e4382c1d98255c.camel@redhat.com>
+Subject: Re: [PATCH 1/1] KVM: x86: fix MSR_IA32_TSC read for nested migration
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
+        Jim Mattson <jmattson@google.com>,
+        Borislav Petkov <bp@alien8.de>, Joerg Roedel <joro@8bytes.org>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Ingo Molnar <mingo@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>
+Date:   Mon, 21 Sep 2020 12:25:12 +0300
+In-Reply-To: <20200917161135.GC13522@sjchrist-ice>
+References: <20200917110723.820666-1-mlevitsk@redhat.com>
+         <20200917110723.820666-2-mlevitsk@redhat.com>
+         <20200917161135.GC13522@sjchrist-ice>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.3 (3.36.3-1.fc32) 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 18 Sep 2020 13:02:34 -0400
-Tony Krowiak <akrowiak@linux.ibm.com> wrote:
-
-> Attempting to unregister Guest Interruption Subclass (GISC) when the
-> link between the matrix mdev and KVM has been removed results in the
-> following:
+On Thu, 2020-09-17 at 09:11 -0700, Sean Christopherson wrote:
+> On Thu, Sep 17, 2020 at 02:07:23PM +0300, Maxim Levitsky wrote:
+> > MSR reads/writes should always access the L1 state, since the (nested)
+> > hypervisor should intercept all the msrs it wants to adjust, and these
+> > that it doesn't should be read by the guest as if the host had read it.
+> > 
+> > However IA32_TSC is an exception.Even when not intercepted, guest still
 > 
->    "Kernel panic -not syncing: Fatal exception: panic_on_oops"
+> Missing a space after the period.
+Fixed
+> 
+> > reads the value + TSC offset.
+> > The write however does not take any TSC offset in the account.
+> 
+> s/in the/into
+Fixed.
+> 
+> > This is documented in Intel's PRM and seems also to happen on AMD as well.
+> 
+> Ideally we'd get confirmation from AMD that this is the correct behavior.
+It would be great. This isn't a blocker for this patch however since I didn't
+change the current emulation behavier which already assumes this.
+Also we don't really trap TSC reads, so this code isn't really executed.
 
-I'm wondering how we get there (why are we unregistering the gisc if
-the mdev and kvm are not yet linked or are already unlinked?), so I
-agree that the actual backchain would be helpful here.
+(I haven't checked what corner cases when we do this. It can happen in theory,
+if MSR read is done from the emulator or something like that).
 
 > 
-> This patch fixes this bug by verifying the matrix mdev and KVM are still
-> linked prior to unregistering the GISC.
+> > This creates a problem when userspace wants to read the IA32_TSC value and then
+> > write it. (e.g for migration)
+> > 
+> > In this case it reads L2 value but write is interpreted as an L1 value.
 > 
-> Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
-> ---
->  drivers/s390/crypto/vfio_ap_ops.c | 14 +++++++++-----
->  1 file changed, 9 insertions(+), 5 deletions(-)
+> It _may_ read the L2 value, e.g. it's not going to read the L2 value if L1
+> is active.
+
+I didn't thought about this this way. I guess I always thought that L2 is,
+L2 if L2 is running, otherwise L1, but now I understand what you mean,
+and I agree.
+
 > 
-> diff --git a/drivers/s390/crypto/vfio_ap_ops.c b/drivers/s390/crypto/vfio_ap_ops.c
-> index e0bde8518745..847a88642644 100644
-> --- a/drivers/s390/crypto/vfio_ap_ops.c
-> +++ b/drivers/s390/crypto/vfio_ap_ops.c
-> @@ -119,11 +119,15 @@ static void vfio_ap_wait_for_irqclear(int apqn)
->   */
->  static void vfio_ap_free_aqic_resources(struct vfio_ap_queue *q)
->  {
-> -	if (q->saved_isc != VFIO_AP_ISC_INVALID && q->matrix_mdev)
+> > To fix this make the userspace initiated reads of IA32_TSC return L1 value
+> > as well.
+> > 
+> > Huge thanks to Dave Gilbert for helping me understand this very confusing
+> > semantic of MSR writes.
+> > 
+> > Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+> > ---
+> >  arch/x86/kvm/x86.c | 19 ++++++++++++++++++-
+> >  1 file changed, 18 insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> > index 17f4995e80a7e..d10d5c6add359 100644
+> > --- a/arch/x86/kvm/x86.c
+> > +++ b/arch/x86/kvm/x86.c
+> > @@ -2025,6 +2025,11 @@ u64 kvm_read_l1_tsc(struct kvm_vcpu *vcpu, u64 host_tsc)
+> >  }
+> >  EXPORT_SYMBOL_GPL(kvm_read_l1_tsc);
+> >  
+> > +static u64 kvm_read_l2_tsc(struct kvm_vcpu *vcpu, u64 host_tsc)
+> 
+> This is definitely not L2 specific.  I would vote to just omit the helper so
+> that we don't need to come up with a name that is correct across the board,
+> e.g. "raw" is also not quite correct.
+Yes, now I see this.
 
-If checking for ->kvm is the right thing to do, I agree that moving the
-check here would be easier to read.
+> 
+> An alternative would be to do:
+> 
+> 	u64 tsc_offset = msr_info->host_initiated ? vcpu->arch.l1_tsc_offset :
+> 						    vcpu->arch.tsc_offset;
+> 
+> 	msr_info->data = kvm_scale_tsc(vcpu, rdtsc()) + tsc_offset;
+> 
+> Which I kind of like because the behavioral difference is a bit more obvious.
+Yep did that. The onl minor downside is that I need a C scope in the switch block.
+I can add kvm_read_tsc but I think that this is not worth it.
 
-> -		kvm_s390_gisc_unregister(q->matrix_mdev->kvm, q->saved_isc);
-> -	if (q->saved_pfn && q->matrix_mdev)
-> -		vfio_unpin_pages(mdev_dev(q->matrix_mdev->mdev),
-> -				 &q->saved_pfn, 1);
-> +	if (q->matrix_mdev) {
-> +		if (q->saved_isc != VFIO_AP_ISC_INVALID && q->matrix_mdev->kvm)
-> +			kvm_s390_gisc_unregister(q->matrix_mdev->kvm,
-> +						 q->saved_isc);
-> +		if (q->saved_pfn)
-> +			vfio_unpin_pages(mdev_dev(q->matrix_mdev->mdev),
-> +					 &q->saved_pfn, 1);
-> +	}
-> +
->  	q->saved_pfn = 0;
->  	q->saved_isc = VFIO_AP_ISC_INVALID;
->  }
+> 
+> > +{
+> > +	return vcpu->arch.tsc_offset + kvm_scale_tsc(vcpu, host_tsc);
+> > +}
+> > +
+> >  static void kvm_vcpu_write_tsc_offset(struct kvm_vcpu *vcpu, u64 offset)
+> >  {
+> >  	vcpu->arch.l1_tsc_offset = offset;
+> > @@ -3220,7 +3225,19 @@ int kvm_get_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+> >  		msr_info->data = vcpu->arch.msr_ia32_power_ctl;
+> >  		break;
+> >  	case MSR_IA32_TSC:
+> > -		msr_info->data = kvm_scale_tsc(vcpu, rdtsc()) + vcpu->arch.tsc_offset;
+> > +		/*
+> > +		 * Intel PRM states that MSR_IA32_TSC read adds the TSC offset
+> > +		 * even when not intercepted. AMD manual doesn't define this
+> > +		 * but appears to behave the same
+> > +		 *
+> > +		 * However when userspace wants to read this MSR, return its
+> > +		 * real L1 value so that its restore will be correct
+> > +		 *
+> 
+> Extra line is unnecessary.
+This is a bit of my OCD :-) I don't mind to remove it.
+> 
+> > +		 */
+> > +		if (msr_info->host_initiated)
+> > +			msr_info->data = kvm_read_l1_tsc(vcpu, rdtsc());
+> > +		else
+> > +			msr_info->data = kvm_read_l2_tsc(vcpu, rdtsc());
+> >  		break;
+> >  	case MSR_MTRRcap:
+> >  	case 0x200 ... 0x2ff:
+> > -- 
+> > 2.26.2
+> > 
+
+Thanks for the review, the V2 is on the way.
+Best regards,
+	Maxim Levitsky
+
 
