@@ -2,260 +2,508 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id EA3E327265B
-	for <lists+kvm@lfdr.de>; Mon, 21 Sep 2020 15:55:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1C72F2726A2
+	for <lists+kvm@lfdr.de>; Mon, 21 Sep 2020 16:08:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727073AbgIUNzl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 21 Sep 2020 09:55:41 -0400
-Received: from mail-co1nam11on2052.outbound.protection.outlook.com ([40.107.220.52]:40318
-        "EHLO NAM11-CO1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726471AbgIUNzj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 21 Sep 2020 09:55:39 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=LiPeA9Y8DC5lFuDPCPioh7veGHlA+prLDlA6Wqa0C+gn/csnurAJaI3Jv+e/lGgiGjjViFa+NcrD/NGybqsakVfQ66ty6pZ9GPZ14oDoOjz+wdZkiiwHTzqHqj2Gn3Ct4i+Moy+iDbILKZNcRSPE8e+/VjLzrgT8mduik0ee9n0MI/PI78z/GUPHxyGL83S8c/9xkVDGx1W0rFn/eDAdMBGJFiExGeBTrgcLoyRY13G7LAlw61RvGjrt6bGf9slAvP+UkqZASHM9E0sufOFV71WY+yKJ609gFXYGD4ouK6jqsSjvloiGDD0mt79WW/KAUwnThGzSJc5WH5SXxYuxCw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=degpsbBo984arjxl2XYhfPiKZ5IRhJ1LWWxCdWq19ig=;
- b=jJmmqineiWxfYj03H9olmjnCnRTLTEz+aWD+ZE6ngcfclN/qQoLjeJBvY5RbfEmv9U7fKVzgLBK2T7CpY8caBf0+ahP4u8iTAqK2rvnHt36YTAhuIhMnHHFfKJQTg++EzCrr33CeBcYz5AL29P1z65MnJA1MeF9kbjUg5KgOd3BV9My2vAcuaIeHyZzBfKhxDyC8xNagGVTz4Zp3TuBhJyFfM4f6Kzwa+N5GlEc8laLt5Ona3hwygfT/kyCQXeBV0oNMj8lUiVNsPmEZZA0OrOsUoOC448dJExkkLgs4548XpllwReaaQGibpBKT8Z+BTRyaXrEUKq40IMdEqw/m+A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=degpsbBo984arjxl2XYhfPiKZ5IRhJ1LWWxCdWq19ig=;
- b=aCm9aaDqGWlr1sgYJERdAO+bwRx2jNwrzN+7NS0aXtv1QyAuoK7yjaoGEkFhB1oZewhIAebSsGvdtvVb3I1kMK3h3qkTpHN7vkMM10abWWXcPRdgXLhumBaQC9D++NPIbVhcL24URen0XJneOsn9wb37xx+/HUwZPlV+0pvZRh0=
-Authentication-Results: twiddle.net; dkim=none (message not signed)
- header.d=none;twiddle.net; dmarc=none action=none header.from=amd.com;
-Received: from DM5PR12MB1355.namprd12.prod.outlook.com (2603:10b6:3:6e::7) by
- DM6PR12MB3273.namprd12.prod.outlook.com (2603:10b6:5:188::17) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.3391.14; Mon, 21 Sep 2020 13:55:36 +0000
-Received: from DM5PR12MB1355.namprd12.prod.outlook.com
- ([fe80::299a:8ed2:23fc:6346]) by DM5PR12MB1355.namprd12.prod.outlook.com
- ([fe80::299a:8ed2:23fc:6346%3]) with mapi id 15.20.3391.024; Mon, 21 Sep 2020
- 13:55:36 +0000
-Subject: Re: [PATCH v3 1/5] sev/i386: Add initial support for SEV-ES
-To:     Dov Murik <dovmurik@linux.vnet.ibm.com>, qemu-devel@nongnu.org,
-        kvm@vger.kernel.org
-Cc:     Brijesh Singh <brijesh.singh@amd.com>,
-        Eduardo Habkost <ehabkost@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Connor Kuehl <ckuehl@redhat.com>,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jiri Slaby <jslaby@suse.cz>,
-        Richard Henderson <rth@twiddle.net>
-References: <cover.1600205384.git.thomas.lendacky@amd.com>
- <e2456cc461f329f52aa6eb3fcd0d0ce9451b8fa7.1600205384.git.thomas.lendacky@amd.com>
- <e8cf44ef-3180-8922-5f0a-2ce532005e51@linux.vnet.ibm.com>
-From:   Tom Lendacky <thomas.lendacky@amd.com>
-Message-ID: <2d1c5321-4c4a-e98c-ca91-7fbea9ae4ba4@amd.com>
-Date:   Mon, 21 Sep 2020 08:55:34 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
-In-Reply-To: <e8cf44ef-3180-8922-5f0a-2ce532005e51@linux.vnet.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: DM5PR16CA0045.namprd16.prod.outlook.com
- (2603:10b6:4:15::31) To DM5PR12MB1355.namprd12.prod.outlook.com
- (2603:10b6:3:6e::7)
+        id S1727222AbgIUOIW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 21 Sep 2020 10:08:22 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:59494 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726496AbgIUOIU (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 21 Sep 2020 10:08:20 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1600697297;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=Nc6ncsk8H8zrriASMgYYRhes+1UGjbcgH6uS1scItCE=;
+        b=g/lFJwsKkRtodyhrrHBPdp1dofiKnyoLSFXdTBUBmaQQOjf3HeHngr1gs/nSr9XmdjLvcS
+        WL23P65fkK2wz430BSMspnhHXkse6NTvTp59QlO4eJVqFVZzWkMfRQrXUeykCZBHTfSJeQ
+        jAqC1xUt2wFYYY1uI5FgFSwNsGcC0Po=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-583-YjYsxfE2P9KJ6lsga-uxUw-1; Mon, 21 Sep 2020 10:07:58 -0400
+X-MC-Unique: YjYsxfE2P9KJ6lsga-uxUw-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9641C186DD24;
+        Mon, 21 Sep 2020 14:07:57 +0000 (UTC)
+Received: from localhost.localdomain (ovpn-112-98.rdu2.redhat.com [10.10.112.98])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 930762635C;
+        Mon, 21 Sep 2020 14:07:54 +0000 (UTC)
+Subject: Re: [PATCH] KVM: SVM: Use a separate vmcb for the nested L2 guest
+To:     Wei Huang <wei.huang2@amd.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        pbonzini@redhat.com, vkuznets@redhat.com
+References: <20200917192306.2080-1-cavery@redhat.com>
+ <20200918211109.GA803484@weilap>
+From:   Cathy Avery <cavery@redhat.com>
+Message-ID: <7549df39-b00b-0b0e-9f25-f64cdf6db366@redhat.com>
+Date:   Mon, 21 Sep 2020 10:07:54 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.4.0
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from [10.236.30.118] (165.204.77.1) by DM5PR16CA0045.namprd16.prod.outlook.com (2603:10b6:4:15::31) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3391.14 via Frontend Transport; Mon, 21 Sep 2020 13:55:35 +0000
-X-Originating-IP: [165.204.77.1]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-HT: Tenant
-X-MS-Office365-Filtering-Correlation-Id: ea9ecd52-6d7e-48c1-341a-08d85e3603c6
-X-MS-TrafficTypeDiagnostic: DM6PR12MB3273:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <DM6PR12MB3273064F310C9F5633E9E762EC3A0@DM6PR12MB3273.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:534;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: hQEDaXrl512eNa5EyInkUXIqDMZ/ZP8+xs6JH9GAdwqe7gINsyVNPO0Gp19bnXgzqvnWke7hUCst4lL0S1KBdEHYESe9OfmxXw0xfREvs5cIIgC+ZfrSj2vn0w7O4wsvxJ+L4g59jL9myM5fx3Bzg3Lf5wfzxSLT/LwE/vkaLQhjcWTV9njcy3i3fWOZgYo7MN6Fj2Iuv9MWpeSTC79dEaUpaK/WQj3BQHCCK4IegIAt3PsZ7bTUefAAvxeG9ThUXP42CFvbhNyy8Ah5807+fs02TL4IvcihuEm4Tgb6VGy2YrI7A0sETawIuekH2oE6++oxO5kSm7sz7/6ZxtbwuKcVaJe4zU822deywTww3QOve8PDLve3enWXLy96B0j+cj6KR1/UlcQRZAZiOppjX+0ek/EE/ZuirkpDK97oehA=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM5PR12MB1355.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(396003)(136003)(366004)(39860400002)(346002)(376002)(478600001)(7416002)(66556008)(8936002)(66946007)(83380400001)(4326008)(86362001)(52116002)(66476007)(8676002)(5660300002)(186003)(316002)(31686004)(956004)(2906002)(26005)(54906003)(6486002)(16526019)(36756003)(31696002)(53546011)(16576012)(2616005)(43740500002)(309714004);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData: JReioS71rsPf25GILv4qTlt72yADdG40BeN6lTCS6VpFn8sAActSkBwiRvIiVC/tAsfWc9jrysQzvnJbKMJVdMnXh/T0m0CrP6DEkCYjdzl8pyZ+soYrDHOwwRzagv+6l52jKUJKI03+BIj+I+vkSpiUfwgh7gavHwf8Rzc9bMGoAZgsb1diuoAdeOvE++5xNJV5x6a5TmeKwYhar8eMts7DOgdT95inbc0JRRhorB5cA251QOmArotEdnYWAPp/3CN+gGfQxvge5a3jn6AB2ttGebx0CfA2Dny9kFBZu9qCfZDD+TsLQcTiLhfTlO1v6Ub0B60dHA239Z9fe5gue7yXHPsa7vPfWrbjIka8rtlLtovGO0pTMPI9afrylZe1cryH7GXqfVyahoJZsWyxPk4HqPcGocEs1cJLNJ+GwLSMpfUOp4EGgwOcEeSLEO0jrUQvhCikAlIEhyPDHWjnCSHjrWRRKtZ7i9g3MF2clkYVSVcuoUShrH7Z0xSi0a9Tl1Y2PZbgZSNe4/gF7UzVzmEZzT/1oneu9D2QqHaQOK+9mfTU0I6vxJcYdGpLjln0XQ3foULga7NVv/NCpe9ecccQBxcTok3724J7O7JFNAFyHIsU6oyVUzzpU8SX2pWrvZkb108clteVnzMTyP02cA==
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: ea9ecd52-6d7e-48c1-341a-08d85e3603c6
-X-MS-Exchange-CrossTenant-AuthSource: DM5PR12MB1355.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Sep 2020 13:55:36.0329
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: PrOdQiAL89/NkLk29fIwgUKZYnrEmdsxphTBfOaKgd5zuGODuBo9Ko37aBAKfboXaUqIL5fRy1dhFXMfR+wUKg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB3273
+In-Reply-To: <20200918211109.GA803484@weilap>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 9/21/20 1:45 AM, Dov Murik wrote:
-> On 16/09/2020 0:29, Tom Lendacky wrote:
->> From: Tom Lendacky <thomas.lendacky@amd.com>
+On 9/18/20 5:11 PM, Wei Huang wrote:
+> On 09/17 03:23, Cathy Avery wrote:
+>> svm->vmcb will now point to either a separate vmcb L1 ( not nested ) or L2 vmcb ( nested ).
 >>
->> Provide initial support for SEV-ES. This includes creating a function to
->> indicate the guest is an SEV-ES guest (which will return false until all
->> support is in place), performing the proper SEV initialization and
->> ensuring that the guest CPU state is measured as part of the launch.
+>> Issues:
 >>
->> Co-developed-by: Jiri Slaby <jslaby@suse.cz>
->> Signed-off-by: Jiri Slaby <jslaby@suse.cz>
->> Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
+>> 1) There is some wholesale copying of vmcb.save and vmcb.contol
+>>     areas which will need to be refined.
+>>
+>> 2) There is a workaround in nested_svm_vmexit() where
+>>
+>>     if (svm->vmcb01->control.asid == 0)
+>>         svm->vmcb01->control.asid = svm->nested.vmcb02->control.asid;
+>>
+>>     This was done as a result of the kvm selftest 'state_test'. In that
+>>     test svm_set_nested_state() is called before svm_vcpu_run().
+>>     The asid is assigned by svm_vcpu_run -> pre_svm_run for the current
+>>     vmcb which is now vmcb02 as we are in nested mode subsequently
+>>     vmcb01.control.asid is never set as it should be.
+>>
+>> Tested:
+>> kvm-unit-tests
+>> kvm self tests
+> I was able to run some basic nested SVM tests using this patch. Full L2 VM
+> (Fedora) had some problem to boot after grub loading kernel.
+Thanks for the feedback and my responses are below.  I am looking into 
+the load issue.
+>
+> Comments below.
+>
+>> Signed-off-by: Cathy Avery <cavery@redhat.com>
 >> ---
->>   target/i386/cpu.c      |  1 +
->>   target/i386/sev-stub.c |  5 +++++
->>   target/i386/sev.c      | 46 ++++++++++++++++++++++++++++++++++++++++--
->>   target/i386/sev_i386.h |  1 +
->>   4 files changed, 51 insertions(+), 2 deletions(-)
+>>   arch/x86/kvm/svm/nested.c | 116 ++++++++++++++++++--------------------
+>>   arch/x86/kvm/svm/svm.c    |  41 +++++++-------
+>>   arch/x86/kvm/svm/svm.h    |  10 ++--
+>>   3 files changed, 81 insertions(+), 86 deletions(-)
 >>
->> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
->> index 588f32e136..bbbe581d35 100644
->> --- a/target/i386/cpu.c
->> +++ b/target/i386/cpu.c
->> @@ -5969,6 +5969,7 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t
->> index, uint32_t count,
->>           break;
->>       case 0x8000001F:
->>           *eax = sev_enabled() ? 0x2 : 0;
->> +        *eax |= sev_es_enabled() ? 0x8 : 0;
->>           *ebx = sev_get_cbit_position();
->>           *ebx |= sev_get_reduced_phys_bits() << 6;
->>           *ecx = 0;
->> diff --git a/target/i386/sev-stub.c b/target/i386/sev-stub.c
->> index 88e3f39a1e..040ac90563 100644
->> --- a/target/i386/sev-stub.c
->> +++ b/target/i386/sev-stub.c
->> @@ -49,3 +49,8 @@ SevCapability *sev_get_capabilities(Error **errp)
->>       error_setg(errp, "SEV is not available in this QEMU");
->>       return NULL;
->>   }
+>> diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
+>> index e90bc436f584..0a06e62010d8 100644
+>> --- a/arch/x86/kvm/svm/nested.c
+>> +++ b/arch/x86/kvm/svm/nested.c
+>> @@ -75,12 +75,12 @@ static unsigned long nested_svm_get_tdp_cr3(struct kvm_vcpu *vcpu)
+>>   static void nested_svm_init_mmu_context(struct kvm_vcpu *vcpu)
+>>   {
+>>   	struct vcpu_svm *svm = to_svm(vcpu);
+>> -	struct vmcb *hsave = svm->nested.hsave;
+>>   
+>>   	WARN_ON(mmu_is_nested(vcpu));
+>>   
+>>   	vcpu->arch.mmu = &vcpu->arch.guest_mmu;
+>> -	kvm_init_shadow_npt_mmu(vcpu, X86_CR0_PG, hsave->save.cr4, hsave->save.efer,
+>> +	kvm_init_shadow_npt_mmu(vcpu, X86_CR0_PG, svm->vmcb01->save.cr4,
+>> +				svm->vmcb01->save.efer,
+>>   				svm->nested.ctl.nested_cr3);
+>>   	vcpu->arch.mmu->get_guest_pgd     = nested_svm_get_tdp_cr3;
+>>   	vcpu->arch.mmu->get_pdptr         = nested_svm_get_tdp_pdptr;
+>> @@ -105,7 +105,7 @@ void recalc_intercepts(struct vcpu_svm *svm)
+>>   		return;
+>>   
+>>   	c = &svm->vmcb->control;
+>> -	h = &svm->nested.hsave->control;
+>> +	h = &svm->vmcb01->control;
+>>   	g = &svm->nested.ctl;
+>>   
+>>   	svm->nested.host_intercept_exceptions = h->intercept_exceptions;
+>> @@ -403,7 +403,7 @@ static void nested_prepare_vmcb_control(struct vcpu_svm *svm)
+>>   
+>>   	svm->vmcb->control.int_ctl             =
+>>   		(svm->nested.ctl.int_ctl & ~mask) |
+>> -		(svm->nested.hsave->control.int_ctl & mask);
+>> +		(svm->vmcb01->control.int_ctl & mask);
+>>   
+>>   	svm->vmcb->control.virt_ext            = svm->nested.ctl.virt_ext;
+>>   	svm->vmcb->control.int_vector          = svm->nested.ctl.int_vector;
+>> @@ -432,6 +432,12 @@ int enter_svm_guest_mode(struct vcpu_svm *svm, u64 vmcb_gpa,
+>>   	int ret;
+>>   
+>>   	svm->nested.vmcb = vmcb_gpa;
 >> +
->> +bool sev_es_enabled(void)
->> +{
->> +    return false;
->> +}
->> diff --git a/target/i386/sev.c b/target/i386/sev.c
->> index c3ecf86704..6c9cd0854b 100644
->> --- a/target/i386/sev.c
->> +++ b/target/i386/sev.c
->> @@ -359,6 +359,12 @@ sev_enabled(void)
->>       return !!sev_guest;
->>   }
+>> +	WARN_ON(svm->vmcb == svm->nested.vmcb02);
+>> +
+>> +	svm->nested.vmcb02->control = svm->vmcb01->control;
+> This part is a bit confusing. svm->vmcb01->control contains the control
+> info from L0 hypervisor to L1 VM. Shouldn't vmcb02->control use the info
+> from the control info contained in nested_vmcb?
+It does during nested_prepare_vmcb_control().  Now that there is a 
+separate vmcb01 and vmcb02 vmcb02.control still relies on the original 
+contents of vmcb01.control so vmcb02.control is initialized by a whole 
+sale copy of vmcb01.control which is admittedly excessive ( patch issues 
+section ) and needs to be refined to just what is needed.
+>
+>> +	svm->vmcb = svm->nested.vmcb02;
+>> +	svm->vmcb_pa = svm->nested.vmcb02_pa;
+>>   	load_nested_vmcb_control(svm, &nested_vmcb->control);
+>>   	nested_prepare_vmcb_save(svm, nested_vmcb);
+>>   	nested_prepare_vmcb_control(svm);
+>> @@ -450,8 +456,6 @@ int nested_svm_vmrun(struct vcpu_svm *svm)
+>>   {
+>>   	int ret;
+>>   	struct vmcb *nested_vmcb;
+>> -	struct vmcb *hsave = svm->nested.hsave;
+>> -	struct vmcb *vmcb = svm->vmcb;
+>>   	struct kvm_host_map map;
+>>   	u64 vmcb_gpa;
+>>   
+>> @@ -496,29 +500,17 @@ int nested_svm_vmrun(struct vcpu_svm *svm)
+>>   	kvm_clear_exception_queue(&svm->vcpu);
+>>   	kvm_clear_interrupt_queue(&svm->vcpu);
+>>   
+>> -	/*
+>> -	 * Save the old vmcb, so we don't need to pick what we save, but can
+>> -	 * restore everything when a VMEXIT occurs
+>> -	 */
+>> -	hsave->save.es     = vmcb->save.es;
+>> -	hsave->save.cs     = vmcb->save.cs;
+>> -	hsave->save.ss     = vmcb->save.ss;
+>> -	hsave->save.ds     = vmcb->save.ds;
+>> -	hsave->save.gdtr   = vmcb->save.gdtr;
+>> -	hsave->save.idtr   = vmcb->save.idtr;
+>> -	hsave->save.efer   = svm->vcpu.arch.efer;
+>> -	hsave->save.cr0    = kvm_read_cr0(&svm->vcpu);
+>> -	hsave->save.cr4    = svm->vcpu.arch.cr4;
+>> -	hsave->save.rflags = kvm_get_rflags(&svm->vcpu);
+>> -	hsave->save.rip    = kvm_rip_read(&svm->vcpu);
+>> -	hsave->save.rsp    = vmcb->save.rsp;
+>> -	hsave->save.rax    = vmcb->save.rax;
+>> -	if (npt_enabled)
+>> -		hsave->save.cr3    = vmcb->save.cr3;
+>> -	else
+>> -		hsave->save.cr3    = kvm_read_cr3(&svm->vcpu);
+>> -
+>> -	copy_vmcb_control_area(&hsave->control, &vmcb->control);
+>> +
+>> +	/* Update vmcb0. We will restore everything when a VMEXIT occurs */
+>> +
+>> +	svm->vmcb01->save.efer   = svm->vcpu.arch.efer;
+>> +	svm->vmcb01->save.cr0    = kvm_read_cr0(&svm->vcpu);
+>> +	svm->vmcb01->save.cr4    = svm->vcpu.arch.cr4;
+>> +	svm->vmcb01->save.rflags = kvm_get_rflags(&svm->vcpu);
+>> +	svm->vmcb01->save.rip    = kvm_rip_read(&svm->vcpu);
+>> +
+>> +	if (!npt_enabled)
+>> +		svm->vmcb01->save.cr3 = kvm_read_cr3(&svm->vcpu);
+> We do save some copying time here, which is always a good thing especially
+> for nested virt.
+>
+>>   	svm->nested.nested_run_pending = 1;
+>>   
+>> @@ -564,7 +556,6 @@ int nested_svm_vmexit(struct vcpu_svm *svm)
+>>   {
+>>   	int rc;
+>>   	struct vmcb *nested_vmcb;
+>> -	struct vmcb *hsave = svm->nested.hsave;
+>>   	struct vmcb *vmcb = svm->vmcb;
+>>   	struct kvm_host_map map;
+>>   
+>> @@ -628,8 +619,11 @@ int nested_svm_vmexit(struct vcpu_svm *svm)
+>>   	nested_vmcb->control.pause_filter_thresh =
+>>   		svm->vmcb->control.pause_filter_thresh;
+>>   
+>> -	/* Restore the original control entries */
+>> -	copy_vmcb_control_area(&vmcb->control, &hsave->control);
+>> +	if (svm->vmcb01->control.asid == 0)
+>> +		svm->vmcb01->control.asid = svm->nested.vmcb02->control.asid;
+>> +
+>> +	svm->vmcb = svm->vmcb01;
+>> +	svm->vmcb_pa = svm->nested.vmcb01_pa;
+>>   
+>>   	/* On vmexit the  GIF is set to false */
+>>   	svm_set_gif(svm, false);
+>> @@ -640,19 +634,13 @@ int nested_svm_vmexit(struct vcpu_svm *svm)
+>>   	svm->nested.ctl.nested_cr3 = 0;
+>>   
+>>   	/* Restore selected save entries */
+>> -	svm->vmcb->save.es = hsave->save.es;
+>> -	svm->vmcb->save.cs = hsave->save.cs;
+>> -	svm->vmcb->save.ss = hsave->save.ss;
+>> -	svm->vmcb->save.ds = hsave->save.ds;
+>> -	svm->vmcb->save.gdtr = hsave->save.gdtr;
+>> -	svm->vmcb->save.idtr = hsave->save.idtr;
+>> -	kvm_set_rflags(&svm->vcpu, hsave->save.rflags);
+>> -	svm_set_efer(&svm->vcpu, hsave->save.efer);
+>> -	svm_set_cr0(&svm->vcpu, hsave->save.cr0 | X86_CR0_PE);
+>> -	svm_set_cr4(&svm->vcpu, hsave->save.cr4);
+>> -	kvm_rax_write(&svm->vcpu, hsave->save.rax);
+>> -	kvm_rsp_write(&svm->vcpu, hsave->save.rsp);
+>> -	kvm_rip_write(&svm->vcpu, hsave->save.rip);
+>> +	kvm_set_rflags(&svm->vcpu, svm->vmcb->save.rflags);
+>> +	svm_set_efer(&svm->vcpu, svm->vmcb->save.efer);
+>> +	svm_set_cr0(&svm->vcpu, svm->vmcb->save.cr0 | X86_CR0_PE);
+>> +	svm_set_cr4(&svm->vcpu, svm->vmcb->save.cr4);
+>> +	kvm_rax_write(&svm->vcpu, svm->vmcb->save.rax);
+>> +	kvm_rsp_write(&svm->vcpu, svm->vmcb->save.rsp);
+>> +	kvm_rip_write(&svm->vcpu, svm->vmcb->save.rip);
+>>   	svm->vmcb->save.dr7 = 0;
+>>   	svm->vmcb->save.cpl = 0;
+>>   	svm->vmcb->control.exit_int_info = 0;
+>> @@ -670,12 +658,12 @@ int nested_svm_vmexit(struct vcpu_svm *svm)
+>>   
+>>   	nested_svm_uninit_mmu_context(&svm->vcpu);
+>>   
+>> -	rc = nested_svm_load_cr3(&svm->vcpu, hsave->save.cr3, false);
+>> +	rc = nested_svm_load_cr3(&svm->vcpu, svm->vmcb->save.cr3, false);
+>>   	if (rc)
+>>   		return 1;
+>>   
+>> -	if (npt_enabled)
+>> -		svm->vmcb->save.cr3 = hsave->save.cr3;
+>> +	if (!npt_enabled)
+>> +		svm->vmcb01->save.cr3 = kvm_read_cr3(&svm->vcpu);
+> Does this mean the original code is missing the following?
+>
+>          else
+> 		svm->vmcb01->save.cr3 = kvm_read_cr3(&svm->vcpu);
+No it means I made an assumption here. I'll look at this again.
+>
+>>   
+>>   	/*
+>>   	 * Drop what we picked up for L2 via svm_complete_interrupts() so it
+>> @@ -694,12 +682,10 @@ int nested_svm_vmexit(struct vcpu_svm *svm)
+>>   void svm_leave_nested(struct vcpu_svm *svm)
+>>   {
+>>   	if (is_guest_mode(&svm->vcpu)) {
+>> -		struct vmcb *hsave = svm->nested.hsave;
+>> -		struct vmcb *vmcb = svm->vmcb;
+>> -
+>>   		svm->nested.nested_run_pending = 0;
+>>   		leave_guest_mode(&svm->vcpu);
+>> -		copy_vmcb_control_area(&vmcb->control, &hsave->control);
+>> +		svm->vmcb = svm->vmcb01;
+>> +		svm->vmcb_pa = svm->nested.vmcb01_pa;
+>>   		nested_svm_uninit_mmu_context(&svm->vcpu);
+>>   	}
+>>   }
+>> @@ -1046,10 +1032,9 @@ static int svm_get_nested_state(struct kvm_vcpu *vcpu,
+>>   	if (copy_to_user(&user_vmcb->control, &svm->nested.ctl,
+>>   			 sizeof(user_vmcb->control)))
+>>   		return -EFAULT;
+>> -	if (copy_to_user(&user_vmcb->save, &svm->nested.hsave->save,
+>> +	if (copy_to_user(&user_vmcb->save, &svm->vmcb01->save,
+>>   			 sizeof(user_vmcb->save)))
+>>   		return -EFAULT;
+>> -
+>>   out:
+>>   	return kvm_state.size;
+>>   }
+>> @@ -1059,7 +1044,6 @@ static int svm_set_nested_state(struct kvm_vcpu *vcpu,
+>>   				struct kvm_nested_state *kvm_state)
+>>   {
+>>   	struct vcpu_svm *svm = to_svm(vcpu);
+>> -	struct vmcb *hsave = svm->nested.hsave;
+>>   	struct vmcb __user *user_vmcb = (struct vmcb __user *)
+>>   		&user_kvm_nested_state->data.svm[0];
+>>   	struct vmcb_control_area ctl;
+>> @@ -1121,16 +1105,24 @@ static int svm_set_nested_state(struct kvm_vcpu *vcpu,
+>>   	if (!(save.cr0 & X86_CR0_PG))
+>>   		return -EINVAL;
+>>   
+>> +	svm->nested.vmcb02->control = svm->vmcb01->control;
+>> +	svm->nested.vmcb02->save = svm->vmcb01->save;
+>> +	svm->vmcb01->save = save;
+>> +
+>> +	WARN_ON(svm->vmcb == svm->nested.vmcb02);
+>> +
+>> +	svm->nested.vmcb = kvm_state->hdr.svm.vmcb_pa;
+>> +
+>> +	svm->vmcb = svm->nested.vmcb02;
+>> +	svm->vmcb_pa = svm->nested.vmcb02_pa;
+>> +
+>>   	/*
+>> -	 * All checks done, we can enter guest mode.  L1 control fields
+>> -	 * come from the nested save state.  Guest state is already
+>> -	 * in the registers, the save area of the nested state instead
+>> -	 * contains saved L1 state.
+>> +	 * All checks done, we can enter guest mode. L2 control fields will
+>> +	 * be the result of a combination of L1 and userspace indicated
+>> +	 * L12.control. The save area of L1 vmcb now contains the userspace
+>> +	 * indicated L1.save.
+>>   	 */
+>> -	copy_vmcb_control_area(&hsave->control, &svm->vmcb->control);
+>> -	hsave->save = save;
+>>   
+>> -	svm->nested.vmcb = kvm_state->hdr.svm.vmcb_pa;
+>>   	load_nested_vmcb_control(svm, &ctl);
+>>   	nested_prepare_vmcb_control(svm);
+>>   
+>> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+>> index 5764b87379cf..d8022f989ffb 100644
+>> --- a/arch/x86/kvm/svm/svm.c
+>> +++ b/arch/x86/kvm/svm/svm.c
+>> @@ -971,8 +971,8 @@ static u64 svm_write_l1_tsc_offset(struct kvm_vcpu *vcpu, u64 offset)
+>>   	if (is_guest_mode(vcpu)) {
+>>   		/* Write L1's TSC offset.  */
+>>   		g_tsc_offset = svm->vmcb->control.tsc_offset -
+>> -			       svm->nested.hsave->control.tsc_offset;
+>> -		svm->nested.hsave->control.tsc_offset = offset;
+>> +			       svm->vmcb01->control.tsc_offset;
+>> +		svm->vmcb01->control.tsc_offset = offset;
+>>   	}
+>>   
+>>   	trace_kvm_write_tsc_offset(vcpu->vcpu_id,
+>> @@ -1171,9 +1171,9 @@ static void svm_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
+>>   static int svm_create_vcpu(struct kvm_vcpu *vcpu)
+>>   {
+>>   	struct vcpu_svm *svm;
+>> -	struct page *page;
+>> +	struct page *vmcb01_page;
+>> +	struct page *vmcb02_page;
+>>   	struct page *msrpm_pages;
+>> -	struct page *hsave_page;
+>>   	struct page *nested_msrpm_pages;
+>>   	int err;
+>>   
+>> @@ -1181,8 +1181,8 @@ static int svm_create_vcpu(struct kvm_vcpu *vcpu)
+>>   	svm = to_svm(vcpu);
+>>   
+>>   	err = -ENOMEM;
+>> -	page = alloc_page(GFP_KERNEL_ACCOUNT);
+>> -	if (!page)
+>> +	vmcb01_page = alloc_page(GFP_KERNEL_ACCOUNT);
+>> +	if (!vmcb01_page)
+>>   		goto out;
+>>   
+>>   	msrpm_pages = alloc_pages(GFP_KERNEL_ACCOUNT, MSRPM_ALLOC_ORDER);
+>> @@ -1193,8 +1193,8 @@ static int svm_create_vcpu(struct kvm_vcpu *vcpu)
+>>   	if (!nested_msrpm_pages)
+>>   		goto free_page2;
+>>   
+>> -	hsave_page = alloc_page(GFP_KERNEL_ACCOUNT);
+>> -	if (!hsave_page)
+>> +	vmcb02_page = alloc_page(GFP_KERNEL_ACCOUNT);
+>> +	if (!vmcb02_page)
+>>   		goto free_page3;
+>>   
+>>   	err = avic_init_vcpu(svm);
+>> @@ -1207,8 +1207,9 @@ static int svm_create_vcpu(struct kvm_vcpu *vcpu)
+>>   	if (irqchip_in_kernel(vcpu->kvm) && kvm_apicv_activated(vcpu->kvm))
+>>   		svm->avic_is_running = true;
+>>   
+>> -	svm->nested.hsave = page_address(hsave_page);
+>> -	clear_page(svm->nested.hsave);
+>> +	svm->nested.vmcb02 = page_address(vmcb02_page);
+>> +	clear_page(svm->nested.vmcb02);
+>> +	svm->nested.vmcb02_pa = __sme_set(page_to_pfn(vmcb02_page) << PAGE_SHIFT);
+>>   
+>>   	svm->msrpm = page_address(msrpm_pages);
+>>   	svm_vcpu_init_msrpm(svm->msrpm);
+>> @@ -1216,9 +1217,11 @@ static int svm_create_vcpu(struct kvm_vcpu *vcpu)
+>>   	svm->nested.msrpm = page_address(nested_msrpm_pages);
+>>   	svm_vcpu_init_msrpm(svm->nested.msrpm);
+>>   
+>> -	svm->vmcb = page_address(page);
+>> +	svm->vmcb = svm->vmcb01 = page_address(vmcb01_page);
+>>   	clear_page(svm->vmcb);
+>> -	svm->vmcb_pa = __sme_set(page_to_pfn(page) << PAGE_SHIFT);
+>> +	svm->vmcb_pa = __sme_set(page_to_pfn(vmcb01_page) << PAGE_SHIFT);
+>> +	svm->nested.vmcb01_pa = svm->vmcb_pa;
+>> +
+>>   	svm->asid_generation = 0;
+>>   	init_vmcb(svm);
+>>   
+>> @@ -1228,13 +1231,13 @@ static int svm_create_vcpu(struct kvm_vcpu *vcpu)
+>>   	return 0;
+>>   
+>>   free_page4:
+>> -	__free_page(hsave_page);
+>> +	__free_page(vmcb02_page);
+>>   free_page3:
+>>   	__free_pages(nested_msrpm_pages, MSRPM_ALLOC_ORDER);
+>>   free_page2:
+>>   	__free_pages(msrpm_pages, MSRPM_ALLOC_ORDER);
+>>   free_page1:
+>> -	__free_page(page);
+>> +	__free_page(vmcb01_page);
+>>   out:
+>>   	return err;
+>>   }
+>> @@ -1256,11 +1259,11 @@ static void svm_free_vcpu(struct kvm_vcpu *vcpu)
+>>   	 * svm_vcpu_load(). So, ensure that no logical CPU has this
+>>   	 * vmcb page recorded as its current vmcb.
+>>   	 */
+>> -	svm_clear_current_vmcb(svm->vmcb);
+>>   
+>> -	__free_page(pfn_to_page(__sme_clr(svm->vmcb_pa) >> PAGE_SHIFT));
+>> +	svm_clear_current_vmcb(svm->vmcb);
+>> +	__free_page(pfn_to_page(__sme_clr(svm->nested.vmcb01_pa) >> PAGE_SHIFT));
+>> +	__free_page(pfn_to_page(__sme_clr(svm->nested.vmcb02_pa) >> PAGE_SHIFT));
+>>   	__free_pages(virt_to_page(svm->msrpm), MSRPM_ALLOC_ORDER);
+>> -	__free_page(virt_to_page(svm->nested.hsave));
+>>   	__free_pages(virt_to_page(svm->nested.msrpm), MSRPM_ALLOC_ORDER);
+>>   }
+>>   
+>> @@ -1393,7 +1396,7 @@ static void svm_clear_vintr(struct vcpu_svm *svm)
+>>   	/* Drop int_ctl fields related to VINTR injection.  */
+>>   	svm->vmcb->control.int_ctl &= mask;
+>>   	if (is_guest_mode(&svm->vcpu)) {
+>> -		svm->nested.hsave->control.int_ctl &= mask;
+>> +		svm->vmcb01->control.int_ctl &= mask;
+>>   
+>>   		WARN_ON((svm->vmcb->control.int_ctl & V_TPR_MASK) !=
+>>   			(svm->nested.ctl.int_ctl & V_TPR_MASK));
+>> @@ -3127,7 +3130,7 @@ bool svm_interrupt_blocked(struct kvm_vcpu *vcpu)
+>>   	if (is_guest_mode(vcpu)) {
+>>   		/* As long as interrupts are being delivered...  */
+>>   		if ((svm->nested.ctl.int_ctl & V_INTR_MASKING_MASK)
+>> -		    ? !(svm->nested.hsave->save.rflags & X86_EFLAGS_IF)
+>> +		    ? !(svm->vmcb01->save.rflags & X86_EFLAGS_IF)
+>>   		    : !(kvm_get_rflags(vcpu) & X86_EFLAGS_IF))
+>>   			return true;
+>>   
+>> diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
+>> index a798e1731709..e908b83bfa69 100644
+>> --- a/arch/x86/kvm/svm/svm.h
+>> +++ b/arch/x86/kvm/svm/svm.h
+>> @@ -82,7 +82,9 @@ struct kvm_svm {
+>>   struct kvm_vcpu;
+>>   
+>>   struct svm_nested_state {
+>> -	struct vmcb *hsave;
+>> +	struct vmcb *vmcb02;
+>> +	unsigned long vmcb01_pa;
+> Any reason that vmcb01_pa can't be placed in "struct vcpu_svm" below, along
+> with vmcb01?
+I just grouped it with the other nesting components. I can move it.
+>
+>> +	unsigned long vmcb02_pa;
+>>   	u64 hsave_msr;
+>>   	u64 vm_cr_msr;
+>>   	u64 vmcb;
+>> @@ -102,6 +104,7 @@ struct svm_nested_state {
+>>   struct vcpu_svm {
+>>   	struct kvm_vcpu vcpu;
+>>   	struct vmcb *vmcb;
+>> +	struct vmcb *vmcb01;
+>>   	unsigned long vmcb_pa;
+>>   	struct svm_cpu_data *svm_data;
+>>   	uint64_t asid_generation;
+>> @@ -208,10 +211,7 @@ static inline struct vcpu_svm *to_svm(struct kvm_vcpu *vcpu)
+>>   
+>>   static inline struct vmcb *get_host_vmcb(struct vcpu_svm *svm)
+>>   {
+>> -	if (is_guest_mode(&svm->vcpu))
+>> -		return svm->nested.hsave;
+>> -	else
+>> -		return svm->vmcb;
+>> +	return svm->vmcb01;
+>>   }
+>>   
+>>   static inline void set_cr_intercept(struct vcpu_svm *svm, int bit)
+>> -- 
+>> 2.20.1
 >>
->> +bool
->> +sev_es_enabled(void)
->> +{
->> +    return false;
->> +}
->> +
->>   uint64_t
->>   sev_get_me_mask(void)
->>   {
->> @@ -578,6 +584,22 @@ sev_launch_update_data(SevGuestState *sev, uint8_t
->> *addr, uint64_t len)
->>       return ret;
->>   }
->>
->> +static int
->> +sev_launch_update_vmsa(SevGuestState *sev)
->> +{
->> +    int ret, fw_error;
->> +
->> +    ret = sev_ioctl(sev->sev_fd, KVM_SEV_LAUNCH_UPDATE_VMSA, NULL,
->> &fw_error);
->> +    if (ret) {
->> +        error_report("%s: LAUNCH_UPDATE_VMSA ret=%d fw_error=%d '%s'",
->> +                __func__, ret, fw_error, fw_error_to_str(fw_error));
->> +        goto err;
-> 
-> goto (and the err: label) is not needed.
 
-Yup, will remove both.
-
-> 
->> +    }
->> +
->> +err:
->> +    return ret;
->> +}
->> +
->>   static void
->>   sev_launch_get_measure(Notifier *notifier, void *unused)
->>   {
->> @@ -590,6 +612,14 @@ sev_launch_get_measure(Notifier *notifier, void
->> *unused)
->>           return;
->>       }
->>
->> +    if (sev_es_enabled()) {
->> +        /* measure all the VM save areas before getting launch_measure */
->> +        ret = sev_launch_update_vmsa(sev);
->> +        if (ret) {
->> +            exit(1);
-> 
-> Other error cases in this function just return on error. Why quit QEMU here?
-
-This is inside an void return function so an error can't be returned. It
-matches what happens if sev_launch_finish() fails. To that end, a
-LAUNCH_MEASURE error should probably exit(), also.
-
-Thanks,
-Tom
-
-> 
->> +        }
->> +    }
->> +
->>       measurement = g_new0(struct kvm_sev_launch_measure, 1);
->>
->>       /* query the measurement blob length */
->> @@ -684,7 +714,7 @@ sev_guest_init(const char *id)
->>   {
->>       SevGuestState *sev;
->>       char *devname;
->> -    int ret, fw_error;
->> +    int ret, fw_error, cmd;
->>       uint32_t ebx;
->>       uint32_t host_cbitpos;
->>       struct sev_user_data_status status = {};
->> @@ -745,8 +775,20 @@ sev_guest_init(const char *id)
->>       sev->api_major = status.api_major;
->>       sev->api_minor = status.api_minor;
->>
->> +    if (sev_es_enabled()) {
->> +        if (!(status.flags & SEV_STATUS_FLAGS_CONFIG_ES)) {
->> +            error_report("%s: guest policy requires SEV-ES, but "
->> +                         "host SEV-ES support unavailable",
->> +                         __func__);
->> +            goto err;
->> +        }
->> +        cmd = KVM_SEV_ES_INIT;
->> +    } else {
->> +        cmd = KVM_SEV_INIT;
->> +    }
->> +
->>       trace_kvm_sev_init();
->> -    ret = sev_ioctl(sev->sev_fd, KVM_SEV_INIT, NULL, &fw_error);
->> +    ret = sev_ioctl(sev->sev_fd, cmd, NULL, &fw_error);
->>       if (ret) {
->>           error_report("%s: failed to initialize ret=%d fw_error=%d '%s'",
->>                        __func__, ret, fw_error, fw_error_to_str(fw_error));
->> diff --git a/target/i386/sev_i386.h b/target/i386/sev_i386.h
->> index 4db6960f60..4f9a5e9b21 100644
->> --- a/target/i386/sev_i386.h
->> +++ b/target/i386/sev_i386.h
->> @@ -29,6 +29,7 @@
->>   #define SEV_POLICY_SEV          0x20
->>
->>   extern bool sev_enabled(void);
->> +extern bool sev_es_enabled(void);
->>   extern uint64_t sev_get_me_mask(void);
->>   extern SevInfo *sev_get_info(void);
->>   extern uint32_t sev_get_cbit_position(void);
->>
