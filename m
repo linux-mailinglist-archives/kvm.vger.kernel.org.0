@@ -2,112 +2,92 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6902E272A90
-	for <lists+kvm@lfdr.de>; Mon, 21 Sep 2020 17:44:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 69D11272AB3
+	for <lists+kvm@lfdr.de>; Mon, 21 Sep 2020 17:50:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727916AbgIUPos (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 21 Sep 2020 11:44:48 -0400
-Received: from foss.arm.com ([217.140.110.172]:45688 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726810AbgIUPor (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 21 Sep 2020 11:44:47 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A864E147A;
-        Mon, 21 Sep 2020 08:44:46 -0700 (PDT)
-Received: from [192.168.0.110] (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id B01013F718;
-        Mon, 21 Sep 2020 08:44:44 -0700 (PDT)
-Subject: Re: [PATCH v6 5/7] KVM: arm64: pmu: Make overflow handler NMI safe
-To:     Will Deacon <will@kernel.org>
-Cc:     linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-        mark.rutland@arm.com, maz@kernel.org, catalin.marinas@arm.com,
-        swboyd@chromium.org, sumit.garg@linaro.org,
-        Julien Thierry <julien.thierry@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Marc Zyngier <marc.zyngier@arm.com>,
-        Will Deacon <will.deacon@arm.com>,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Pouloze <suzuki.poulose@arm.com>,
-        kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
-References: <20200819133419.526889-1-alexandru.elisei@arm.com>
- <20200819133419.526889-6-alexandru.elisei@arm.com>
- <20200921134301.GJ2139@willie-the-truck>
-From:   Alexandru Elisei <alexandru.elisei@arm.com>
-Message-ID: <a8763d49-d105-3920-8acf-c14d3a723b18@arm.com>
-Date:   Mon, 21 Sep 2020 16:45:51 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.12.0
+        id S1727882AbgIUPuG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 21 Sep 2020 11:50:06 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:41913 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726810AbgIUPuG (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 21 Sep 2020 11:50:06 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1600703405;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=CUf1Gg0Y+WlMrDlKmw0q+94Ta9Us++O5H2uXtIQPidc=;
+        b=GKoh61h1kxMuZwqy+oNt2Wj/oDcMbAU4QzJ8xKx8y3B3luF8pIQeu9bUgY3aoPfr870Atr
+        h03r5Z1NqWohH7kRrnyrchVQe7+lVsvY5DeZm6G5xE8bb/+Fb+F9k87hrlW5ozAFsDHtTZ
+        k25N6YBF53PORCkCWX6UrQKpeaNdoGk=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-78-_txek8QTMluRmPAeG7CPBw-1; Mon, 21 Sep 2020 11:50:01 -0400
+X-MC-Unique: _txek8QTMluRmPAeG7CPBw-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9BF311074647;
+        Mon, 21 Sep 2020 15:49:59 +0000 (UTC)
+Received: from gondolin (ovpn-115-117.ams2.redhat.com [10.36.115.117])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 3666755765;
+        Mon, 21 Sep 2020 15:49:54 +0000 (UTC)
+Date:   Mon, 21 Sep 2020 17:49:51 +0200
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Matthew Rosato <mjrosato@linux.ibm.com>
+Cc:     alex.williamson@redhat.com, schnelle@linux.ibm.com,
+        pmorel@linux.ibm.com, borntraeger@de.ibm.com, hca@linux.ibm.com,
+        gor@linux.ibm.com, gerald.schaefer@linux.ibm.com,
+        linux-s390@vger.kernel.org, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 1/4] s390/pci: stash version in the zpci_dev
+Message-ID: <20200921174951.3b660003.cohuck@redhat.com>
+In-Reply-To: <ea53b58a-74f0-2a10-3f08-dbcca512ef86@linux.ibm.com>
+References: <1600529318-8996-1-git-send-email-mjrosato@linux.ibm.com>
+        <1600529318-8996-2-git-send-email-mjrosato@linux.ibm.com>
+        <20200921170158.1080d872.cohuck@redhat.com>
+        <ea53b58a-74f0-2a10-3f08-dbcca512ef86@linux.ibm.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-In-Reply-To: <20200921134301.GJ2139@willie-the-truck>
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Will,
+On Mon, 21 Sep 2020 11:44:20 -0400
+Matthew Rosato <mjrosato@linux.ibm.com> wrote:
 
-On 9/21/20 2:43 PM, Will Deacon wrote:
-> On Wed, Aug 19, 2020 at 02:34:17PM +0100, Alexandru Elisei wrote:
->> From: Julien Thierry <julien.thierry@arm.com>
->>
->> kvm_vcpu_kick() is not NMI safe. When the overflow handler is called from
->> NMI context, defer waking the vcpu to an irq_work queue.
->>
->> Cc: Julien Thierry <julien.thierry.kdev@gmail.com>
->> Cc: Marc Zyngier <marc.zyngier@arm.com>
->> Cc: Will Deacon <will.deacon@arm.com>
->> Cc: Mark Rutland <mark.rutland@arm.com>
->> Cc: Catalin Marinas <catalin.marinas@arm.com>
->> Cc: James Morse <james.morse@arm.com>
->> Cc: Suzuki K Pouloze <suzuki.poulose@arm.com>
->> Cc: kvm@vger.kernel.org
->> Cc: kvmarm@lists.cs.columbia.edu
->> Signed-off-by: Julien Thierry <julien.thierry@arm.com>
->> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
->> ---
->>  arch/arm64/kvm/pmu-emul.c | 25 ++++++++++++++++++++++++-
->>  include/kvm/arm_pmu.h     |  1 +
->>  2 files changed, 25 insertions(+), 1 deletion(-)
-> I'd like an Ack from the KVM side on this one, but some minor comments
-> inline.
->
->> diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
->> index f0d0312c0a55..30268397ed06 100644
->> --- a/arch/arm64/kvm/pmu-emul.c
->> +++ b/arch/arm64/kvm/pmu-emul.c
->> @@ -433,6 +433,22 @@ void kvm_pmu_sync_hwstate(struct kvm_vcpu *vcpu)
->>  	kvm_pmu_update_state(vcpu);
->>  }
->>  
->> +/**
->> + * When perf interrupt is an NMI, we cannot safely notify the vcpu corresponding
->> + * to the event.
->> + * This is why we need a callback to do it once outside of the NMI context.
->> + */
->> +static void kvm_pmu_perf_overflow_notify_vcpu(struct irq_work *work)
->> +{
->> +	struct kvm_vcpu *vcpu;
->> +	struct kvm_pmu *pmu;
->> +
->> +	pmu = container_of(work, struct kvm_pmu, overflow_work);
->> +	vcpu = kvm_pmc_to_vcpu(&pmu->pmc[0]);
-> Can you spell this kvm_pmc_to_vcpu(pmu->pmc); ?
+> On 9/21/20 11:01 AM, Cornelia Huck wrote:
+> > On Sat, 19 Sep 2020 11:28:35 -0400
+> > Matthew Rosato <mjrosato@linux.ibm.com> wrote:
+> >   
+> >> In preparation for passing the info on to vfio-pci devices, stash the
+> >> supported PCI version for the target device in the zpci_dev.  
+> > 
+> > Hm, what kind of version is that? The version of the zPCI interface?
+> > 
+> > Inquiring minds want to know :)
+> >   
+> 
+> Ha :) It's related to PCI-SIG spec versions and which one the zPCI 
+> facility supports for this device.
 
-Of course, that is much better.
+Thanks for the info :)
 
->
->> +
->> +	kvm_vcpu_kick(vcpu);
-> How do we guarantee that the vCPU is still around by the time this runs?
-> Sorry to ask such a horrible question, but I don't see anything associating
-> the workqueue with the lifetime of the vCPU.
+> 
+> >>
+> >> Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
+> >> ---
+> >>   arch/s390/include/asm/pci.h | 1 +
+> >>   arch/s390/pci/pci_clp.c     | 1 +
+> >>   2 files changed, 2 insertions(+)  
+> >   
+> 
 
-That's a very nice catch, indeed the code doesn't guarantee that the VM is still
-around when the work is executed. I will add an irq_work_sync() call to
-kvm_pmu_vcpu_destroy() (which is called by kvm_vcpu_destroy() ->
-kvm_arch_vcpu_destroy()), and to kvm_pmu_vcpu_reset(), similar to how x86 handles it.
+FWIW,
 
-Thanks,
-Alex
+Acked-by: Cornelia Huck <cohuck@redhat.com>
+
