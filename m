@@ -2,141 +2,92 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C33C527244C
-	for <lists+kvm@lfdr.de>; Mon, 21 Sep 2020 14:54:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CE001272542
+	for <lists+kvm@lfdr.de>; Mon, 21 Sep 2020 15:19:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726997AbgIUMyw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 21 Sep 2020 08:54:52 -0400
-Received: from mail.kernel.org ([198.145.29.99]:60206 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726977AbgIUMyv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 21 Sep 2020 08:54:51 -0400
-Received: from localhost (unknown [70.37.104.77])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        id S1727045AbgIUNTf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 21 Sep 2020 09:19:35 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:30752 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726876AbgIUNTf (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 21 Sep 2020 09:19:35 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1600694374;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=2li71nHKDdeIHk4pBYNK/fNmoEg3vB9ERzI+dLskZvo=;
+        b=bPct19gyY+B6+dw+al61BDgFX6fTfSongPZczHIxyTdPdkfPaKY0cQwlso8qkU7JZX7bzT
+        8YryzdWBBKep9nDCg/6FA77TFor3HK1mcvg5KGcfXCIa0CgOHSroLHyrBg0GxCpsz0j1+r
+        urFJCEHkx5tD/ctcG7Q9Zg9LOqm8l8c=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-332-_ZZloquDNz6-Zlg1Un68nQ-1; Mon, 21 Sep 2020 09:19:32 -0400
+X-MC-Unique: _ZZloquDNz6-Zlg1Un68nQ-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 408A521789;
-        Mon, 21 Sep 2020 12:54:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1600692891;
-        bh=6BpQfGWNq5AeSmB8Rcsu/mpwu6St8WiO7qawdNRIpwI=;
-        h=Date:From:To:To:To:Cc:Cc:Cc:Subject:In-Reply-To:References:From;
-        b=bd4CEumbLMYlcCESTe6qemij0oropUhVI8oqyCDTtmaevDJT+2YQI2azPF5tgaJnr
-         Cqz+W8GXioR3y8xnncYH5jKpdznKTRZTtmNTvhpAYmkZC8qLKabULo8uPxgHG5YqZg
-         ArXLdU2UDmqCltboQ6AUnYEeWbwJYKSPOd5gDzyQ=
-Date:   Mon, 21 Sep 2020 12:54:50 +0000
-From:   Sasha Levin <sashal@kernel.org>
-To:     Sasha Levin <sashal@kernel.org>
-To:     Marc Zyngier <maz@kernel.org>
-To:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
-Cc:     kernel-team@android.com, Will Deacon <will@kernel.org>
-Cc:     stable@vger.kernel.org
-Cc:     stable@vger.kernel.org
-Subject: Re: [PATCH v2 1/2] KVM: arm64: Assume write fault on S1PTW permission fault on instruction fetch
-In-Reply-To: <20200915104218.1284701-2-maz@kernel.org>
-References: <20200915104218.1284701-2-maz@kernel.org>
-Message-Id: <20200921125451.408A521789@mail.kernel.org>
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A19F018C89C1;
+        Mon, 21 Sep 2020 13:19:30 +0000 (UTC)
+Received: from localhost.localdomain (unknown [10.35.206.238])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id DBD133782;
+        Mon, 21 Sep 2020 13:19:25 +0000 (UTC)
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     kvm@vger.kernel.org
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Joerg Roedel <joro@8bytes.org>,
+        Ingo Molnar <mingo@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        x86@kernel.org (maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)),
+        Wanpeng Li <wanpengli@tencent.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Jim Mattson <jmattson@google.com>,
+        linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Maxim Levitsky <mlevitsk@redhat.com>
+Subject: [PATCH v5 0/4] KVM: nSVM: ondemand nested state allocation
+Date:   Mon, 21 Sep 2020 16:19:19 +0300
+Message-Id: <20200921131923.120833-1-mlevitsk@redhat.com>
+MIME-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi
+This is yet another version of ondemand nested state allocation.=0D
+=0D
+In this version I adoped the suggestion of Sean Christopherson=0D
+to return make EFER write return a negative error which then should=0D
+propogate to the userspace.=0D
+=0D
+So I fixed the WRMSR code to actually obey this (#GP on positive=0D
+return value, exit to userspace when negative error value,=0D
+and success on 0 error value, and fixed one user (xen)=0D
+that returned negative error code on failures.=0D
+=0D
+The XEN patch is only compile tested. The rest were tested=0D
+by always returning -ENOMEM from svm_allocate_nested.=0D
+=0D
+Best regards,=0D
+	Maxim Levitsky=0D
+=0D
+Maxim Levitsky (4):=0D
+  KVM: x86: xen_hvm_config cleanup return values=0D
+  KVM: x86: report negative values from wrmsr to userspace=0D
+  KVM: x86: allow kvm_x86_ops.set_efer to return a value=0D
+  KVM: nSVM: implement ondemand allocation of the nested state=0D
+=0D
+ arch/x86/include/asm/kvm_host.h |  2 +-=0D
+ arch/x86/kvm/emulate.c          |  7 ++--=0D
+ arch/x86/kvm/svm/nested.c       | 42 ++++++++++++++++++++++++=0D
+ arch/x86/kvm/svm/svm.c          | 58 +++++++++++++++++++--------------=0D
+ arch/x86/kvm/svm/svm.h          |  8 ++++-=0D
+ arch/x86/kvm/vmx/vmx.c          |  9 +++--=0D
+ arch/x86/kvm/x86.c              | 36 ++++++++++----------=0D
+ 7 files changed, 113 insertions(+), 49 deletions(-)=0D
+=0D
+-- =0D
+2.26.2=0D
+=0D
 
-[This is an automated email]
-
-This commit has been processed because it contains a -stable tag.
-The stable tag indicates that it's relevant for the following trees: all
-
-The bot has tested the following trees: v5.8.10, v5.4.66, v4.19.146, v4.14.198, v4.9.236, v4.4.236.
-
-v5.8.10: Failed to apply! Possible dependencies:
-    09cf57eba304 ("KVM: arm64: Split hyp/switch.c to VHE/nVHE")
-    208243c752a7 ("KVM: arm64: Move hyp-init.S to nVHE")
-    3a949f4c9354 ("KVM: arm64: Rename HSR to ESR")
-    7621712918ad ("KVM: arm64: Add build rules for separate VHE/nVHE object files")
-    7b2399ea5640 ("KVM: arm64: Move __smccc_workaround_1_smc to .rodata")
-    b877e9849d41 ("KVM: arm64: Build hyp-entry.S separately for VHE/nVHE")
-    f50b6f6ae131 ("KVM: arm64: Handle calls to prefixed hyp functions")
-
-v5.4.66: Failed to apply! Possible dependencies:
-    0492747c72a3 ("arm64: KVM: Invoke compute_layout() before alternatives are applied")
-    0e20f5e25556 ("KVM: arm/arm64: Cleanup MMIO handling")
-    29eb5a3c57f7 ("KVM: arm64: Handle PtrAuth traps early")
-    3a949f4c9354 ("KVM: arm64: Rename HSR to ESR")
-    5c37f1ae1c33 ("KVM: arm64: Ask the compiler to __always_inline functions used at HYP")
-    8e01d9a396e6 ("KVM: arm64: vgic-v4: Move the GICv4 residency flow to be driven by vcpu_load/put")
-    c726200dd106 ("KVM: arm/arm64: Allow reporting non-ISV data aborts to userspace")
-
-v4.19.146: Failed to apply! Possible dependencies:
-    0e20f5e25556 ("KVM: arm/arm64: Cleanup MMIO handling")
-    3a949f4c9354 ("KVM: arm64: Rename HSR to ESR")
-    5c37f1ae1c33 ("KVM: arm64: Ask the compiler to __always_inline functions used at HYP")
-    5ffdfaedfa0a ("arm64: mm: Support Common Not Private translations")
-    86d0dd34eaff ("arm64: cpufeature: add feature for CRC32 instructions")
-    caab277b1de0 ("treewide: Replace GPLv2 boilerplate/reference with SPDX - rule 234")
-    d94d71cb45fd ("treewide: Replace GPLv2 boilerplate/reference with SPDX - rule 266")
-
-v4.14.198: Failed to apply! Possible dependencies:
-    1fc5dce78ad1 ("arm64/sve: Low-level SVE architectural state manipulation functions")
-    2e0f2478ea37 ("arm64/sve: Probe SVE capabilities and usable vector lengths")
-    3a949f4c9354 ("KVM: arm64: Rename HSR to ESR")
-    43994d824e84 ("arm64/sve: Detect SVE and activate runtime support")
-    5c37f1ae1c33 ("KVM: arm64: Ask the compiler to __always_inline functions used at HYP")
-    611a7bc74ed2 ("arm64: docs: describe ELF hwcaps")
-    746647c75afb ("arm64: entry.S convert el0_sync")
-    7582e22038a2 ("arm64/sve: Backend logic for setting the vector length")
-    79ab047c75d6 ("arm64/sve: Support vector length resetting for new processes")
-    94ef7ecbdf6f ("arm64: fpsimd: Correctly annotate exception helpers called from asm")
-    bc0ee4760364 ("arm64/sve: Core task context handling")
-    ddd25ad1fde8 ("arm64/sve: Kconfig update and conditional compilation support")
-
-v4.9.236: Failed to apply! Possible dependencies:
-    016f98afd050 ("irqchip/gic-v3: Use nops macro for Cavium ThunderX erratum 23154")
-    0e9884fe63c6 ("arm64: sysreg: subsume GICv3 sysreg definitions")
-    328191c05ed7 ("irqchip/gic-v3-its: Specialise flush_dcache operation")
-    38fd94b0275c ("arm64: Work around Falkor erratum 1003")
-    3a949f4c9354 ("KVM: arm64: Rename HSR to ESR")
-    43994d824e84 ("arm64/sve: Detect SVE and activate runtime support")
-    47863d41ecf8 ("arm64: sysreg: sort by encoding")
-    4aa8a472c33f ("arm64: Documentation - Expose CPU feature registers")
-    5c37f1ae1c33 ("KVM: arm64: Ask the compiler to __always_inline functions used at HYP")
-    611a7bc74ed2 ("arm64: docs: describe ELF hwcaps")
-    6e01398fe450 ("arm64: arch_timer: document Hisilicon erratum 161010101")
-    b20d1ba3cf4b ("arm64: cpufeature: allow for version discrepancy in PMU implementations")
-    b389d7997acb ("arm64: cpufeature: treat unknown fields as RES0")
-    bca8f17f57bd ("arm64: Get rid of asm/opcodes.h")
-    c7a3c61fc606 ("arm64: sysreg: add performance monitor registers")
-    cd9e1927a525 ("arm64: Work around broken .inst when defective gas is detected")
-    d9ff80f83ecb ("arm64: Work around Falkor erratum 1009")
-    eab43e88734f ("arm64: cpufeature: Cleanup feature bit tables")
-    eeb1efbcb83c ("arm64: cpu_errata: Add capability to advertise Cortex-A73 erratum 858921")
-    f31deaadff0d ("arm64: cpufeature: Don't enforce system-wide SPE capability")
-    fe4fbdbcddea ("arm64: cpufeature: Track user visible fields")
-
-v4.4.236: Failed to apply! Possible dependencies:
-    06282fd2c2bf ("arm64: KVM: Implement vgic-v2 save/restore")
-    0e9884fe63c6 ("arm64: sysreg: subsume GICv3 sysreg definitions")
-    1b8e83c04ee2 ("arm64: KVM: vgic-v3: Avoid accessing ICH registers")
-    2d81d425b6d5 ("irqchip/gicv3-its: Introduce two helper functions for accessing BASERn")
-    328191c05ed7 ("irqchip/gic-v3-its: Specialise flush_dcache operation")
-    3a949f4c9354 ("KVM: arm64: Rename HSR to ESR")
-    3c13b8f435ac ("KVM: arm/arm64: vgic-v3: Make the LR indexing macro public")
-    3faf24ea894a ("irqchip/gicv3-its: Implement two-level(indirect) device table support")
-    466b7d168881 ("irqchip/gicv3-its: Don't allow devices whose ID is outside range")
-    4b75c4598b5b ("irqchip/gicv3-its: Add a new function for parsing device table BASERn")
-    5c37f1ae1c33 ("KVM: arm64: Ask the compiler to __always_inline functions used at HYP")
-    91ef84428a86 ("irqchip/gic-v3: Reset BPR during initialization")
-    9347359ad0ae ("irqchip/gicv3-its: Split its_alloc_tables() into two functions")
-    b5525ce898eb ("arm64: KVM: Move GIC accessors to arch_gicv3.h")
-    c76a0a6695c6 ("arm64: KVM: Add a HYP-specific header file")
-    d44ffa5ae70a ("irqchip/gic-v3: Convert arm64 GIC accessors to {read,write}_sysreg_s")
-    f68d2b1b73cc ("arm64: KVM: Implement vgic-v3 save/restore")
-    fd451b90e78c ("arm64: KVM: vgic-v3: Restore ICH_APR0Rn_EL2 before ICH_APR1Rn_EL2")
-
-
-NOTE: The patch will not be queued to stable trees until it is upstream.
-
-How should we proceed with this patch?
-
--- 
-Thanks
-Sasha
