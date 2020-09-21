@@ -2,171 +2,114 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D346D271E70
-	for <lists+kvm@lfdr.de>; Mon, 21 Sep 2020 10:57:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CEDA3271E79
+	for <lists+kvm@lfdr.de>; Mon, 21 Sep 2020 11:02:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726402AbgIUI5i (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 21 Sep 2020 04:57:38 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:57029 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726353AbgIUI5i (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 21 Sep 2020 04:57:38 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1600678656;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=QtDGrtlEykQ6KPjGLzoVNEGTLi0Wn2lMDIF84aVaKUY=;
-        b=WAawBeRFjLfRsbEZ/N70nce8rafjibNTvK1YN9IGb++llZw7DNsD+/ncyLsUatnbnjBkeD
-        YSXXrLhGPl0dW9L2U3Xnhw3dbmVXvRH/NVIFy9e5KTiOqtZOFXEDUfo5aphTs0Q9ue1AN3
-        8Smgd5mRTNsW08z8P4u6U6Y0zfXkNNo=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-349-XYppMNu8OM6FHcbYzkTZzg-1; Mon, 21 Sep 2020 04:57:34 -0400
-X-MC-Unique: XYppMNu8OM6FHcbYzkTZzg-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 50567802B6B;
-        Mon, 21 Sep 2020 08:57:32 +0000 (UTC)
-Received: from starship (unknown [10.35.206.28])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 68D9B61177;
-        Mon, 21 Sep 2020 08:57:28 +0000 (UTC)
-Message-ID: <2b6a4042a0a75cbc5e00b32752afa9965abd697d.camel@redhat.com>
-Subject: Re: [PATCH v4 2/2] KVM: nSVM: implement ondemand allocation of the
- nested state
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     kvm@vger.kernel.org, Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Ingo Molnar <mingo@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Borislav Petkov <bp@alien8.de>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
-        linux-kernel@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>
-Date:   Mon, 21 Sep 2020 11:57:27 +0300
-In-Reply-To: <5a3538861a65973f9ae6e2d0798ac17f52428ded.camel@redhat.com>
-References: <20200917101048.739691-1-mlevitsk@redhat.com>
-         <20200917101048.739691-3-mlevitsk@redhat.com>
-         <20200917162942.GE13522@sjchrist-ice>
-         <d9c0d190-c6ea-2e21-92ca-2a53efb86a1d@redhat.com>
-         <20200920161602.GA17325@linux.intel.com>
-         <c35cbaca-2c34-cd93-b589-d4ab782fc754@redhat.com>
-         <5a3538861a65973f9ae6e2d0798ac17f52428ded.camel@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.3 (3.36.3-1.fc32) 
+        id S1726422AbgIUJCW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 21 Sep 2020 05:02:22 -0400
+Received: from mail-il1-f205.google.com ([209.85.166.205]:48097 "EHLO
+        mail-il1-f205.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726355AbgIUJCW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 21 Sep 2020 05:02:22 -0400
+Received: by mail-il1-f205.google.com with SMTP id p10so7297361ilp.14
+        for <kvm@vger.kernel.org>; Mon, 21 Sep 2020 02:02:21 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
+        bh=25Y+FvxN/Mb5eh9wDznBxrs0ksxheuHIjZSbxOFijK0=;
+        b=efGHEHNl2/oTtLKIOKNVtsBuWbFsN6kn/QfBYO2XaScjIKUzDtRvCLM+uvV7AIVxbV
+         CEP6zASX94cLQqRXQ90bi0KrI+RpbLX/Og+eBxuZuTGu2g7tYLOoMDZt82TQfkYypNbx
+         GqZQmO5Zb94kXzt6PAZwsSmDiOcruNwzn5gmnYJKTqnscCwKGTZuO8aa47ZP95L1vHJb
+         L6qPZkQbh7RsRyqBjXAMmgimdXA9eWDSnvO8LgmC0ckCMTEPC8hmSlVrx8+j4JCDrF9b
+         S/ljGUiYh97KHHRnyUCgPCON1yPDU9H44gTa+NRsocomA9Pl2UzLZp0KElhxN5BbwZv8
+         D4Jw==
+X-Gm-Message-State: AOAM532AFHQeZqRChM2aq0oBtP8+9pJeSRYH5o4hOz1TAP+o3/maIgGW
+        9OOkCSMe4WQew5xO2R3dB5DSQqQNuqGc1N51GZ+M9Sa/vjPH
+X-Google-Smtp-Source: ABdhPJyK6A11DIgqEui9yX2KtMi10k/3FxnPcYZ9rmH8F1J2GtGbvc0XeFPToNlRQxoLN6eJtEuGrA2e5NwevoelZmw+hBhSoE5d
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Received: by 2002:a6b:d908:: with SMTP id r8mr35825863ioc.21.1600678941468;
+ Mon, 21 Sep 2020 02:02:21 -0700 (PDT)
+Date:   Mon, 21 Sep 2020 02:02:21 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000b4ac9e05afcf1b13@google.com>
+Subject: WARNING in cleanup_srcu_struct (2)
+From:   syzbot <syzbot+735579fbeb0c09a90cfa@syzkaller.appspotmail.com>
+To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        pbonzini@redhat.com, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 2020-09-21 at 10:53 +0300, Maxim Levitsky wrote:
-> On Sun, 2020-09-20 at 18:42 +0200, Paolo Bonzini wrote:
-> > On 20/09/20 18:16, Sean Christopherson wrote:
-> > > > Maxim, your previous version was adding some error handling to
-> > > > kvm_x86_ops.set_efer.  I don't remember what was the issue; did you have
-> > > > any problems propagating all the errors up to KVM_SET_SREGS (easy),
-> > > > kvm_set_msr (harder) etc.?
-> > > I objected to letting .set_efer() return a fault.
-> > 
-> > So did I, and that's why we get KVM_REQ_OUT_OF_MEMORY.  But it was more
-> > of an "it's ugly and it ought not to fail" thing than something I could
-> > pinpoint.
-> > 
-> > It looks like we agree, but still we have to choose the lesser evil?
-> > 
-> > Paolo
-> > 
-> > > A relatively minor issue is
-> > > the code in vmx_set_efer() that handles lack of EFER because technically KVM
-> > > can emulate EFER.SCE+SYSCALL without supporting EFER in hardware.  Returning
-> > > success/'0' would avoid that particular issue.  My primary concern is that I'd
-> > > prefer not to add another case where KVM can potentially ignore a fault
-> > > indicated by a helper, a la vmx_set_cr4().
-> 
-> The thing is that kvm_emulate_wrmsr injects #GP when kvm_set_msr returns any non zero value,
-> and returns 1 which means keep on going if I understand correctly (0 is userspace exit,
-> negative value would be a return to userspace with an error)
-> 
-> So the question is if we have other wrmsr handlers which return negative value, and would
-> be affected by changing kvm_emulate_wrmsr to pass through the error value.
-> I am checking the code now.
-> 
-> I do agree now that this is the *correct* solution to this problem.
-> 
-> Best regards,
-> 	Maxim Levitsky
+Hello,
+
+syzbot found the following issue on:
+
+HEAD commit:    5925fa68 Merge tag 'perf-tools-fixes-for-v5.9-2020-09-16' ..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=14b72f01900000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=c61f6bd349c981f3
+dashboard link: https://syzkaller.appspot.com/bug?extid=735579fbeb0c09a90cfa
+compiler:       gcc (GCC) 10.1.0-syz 20200507
+
+Unfortunately, I don't have any reproducer for this issue yet.
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+735579fbeb0c09a90cfa@syzkaller.appspotmail.com
+
+------------[ cut here ]------------
+WARNING: CPU: 1 PID: 14586 at kernel/rcu/srcutree.c:389 cleanup_srcu_struct+0x23b/0x2d0 kernel/rcu/srcutree.c:408
+Kernel panic - not syncing: panic_on_warn set ...
+CPU: 1 PID: 14586 Comm: syz-executor.5 Not tainted 5.9.0-rc5-syzkaller #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
+Call Trace:
+ __dump_stack lib/dump_stack.c:77 [inline]
+ dump_stack+0x198/0x1fd lib/dump_stack.c:118
+ panic+0x347/0x7c0 kernel/panic.c:231
+ __warn.cold+0x20/0x46 kernel/panic.c:600
+ report_bug+0x1bd/0x210 lib/bug.c:198
+ handle_bug+0x38/0x90 arch/x86/kernel/traps.c:234
+ exc_invalid_op+0x14/0x40 arch/x86/kernel/traps.c:254
+ asm_exc_invalid_op+0x12/0x20 arch/x86/include/asm/idtentry.h:536
+RIP: 0010:cleanup_srcu_struct+0x23b/0x2d0 kernel/rcu/srcutree.c:389
+Code: 84 24 98 04 00 00 00 00 00 00 48 83 c4 18 5b 5d 41 5c 41 5d 41 5e 41 5f c3 0f 0b 48 83 c4 18 5b 5d 41 5c 41 5d 41 5e 41 5f c3 <0f> 0b e9 36 ff ff ff 48 8b 3c 24 e8 45 88 53 00 e9 b7 fe ff ff 48
+RSP: 0018:ffffc90018f27a18 EFLAGS: 00010202
+RAX: 0000000000000001 RBX: 0000000000000000 RCX: ffffffff839a9211
+RDX: ffff88804f2de100 RSI: ffffffff839a92c3 RDI: 0000000000000006
+RBP: 0000000000000001 R08: 0000000000000040 R09: 0000000000000001
+R10: 0000000000000040 R11: 0000000000000000 R12: ffffc900057b3020
+R13: ffffc900057a9000 R14: ffff88806cfbf000 R15: ffffc900057b2840
+ kvm_destroy_vm+0x777/0xbe0 arch/x86/kvm/../../../virt/kvm/kvm_main.c:882
+ kvm_put_kvm arch/x86/kvm/../../../virt/kvm/kvm_main.c:899 [inline]
+ kvm_vm_release+0xac/0xe0 arch/x86/kvm/../../../virt/kvm/kvm_main.c:922
+ __fput+0x285/0x920 fs/file_table.c:281
+ task_work_run+0xdd/0x190 kernel/task_work.c:141
+ exit_task_work include/linux/task_work.h:25 [inline]
+ do_exit+0xb7d/0x29f0 kernel/exit.c:806
+ do_group_exit+0x125/0x310 kernel/exit.c:903
+ get_signal+0x428/0x1f00 kernel/signal.c:2757
+ arch_do_signal+0x82/0x2520 arch/x86/kernel/signal.c:811
+ exit_to_user_mode_loop kernel/entry/common.c:159 [inline]
+ exit_to_user_mode_prepare+0x1ae/0x200 kernel/entry/common.c:190
+ irqentry_exit_to_user_mode+0x5/0x30 kernel/entry/common.c:278
+ asm_common_interrupt+0x1e/0x40 arch/x86/include/asm/idtentry.h:572
+RIP: 0033:0x41221c
+Code: Bad RIP value.
+RSP: 002b:00007ffe0eb2c660 EFLAGS: 00000202
+RAX: 0000000036b92991 RBX: 000000003787d99d RCX: 0000001b2da20000
+RDX: 0000000036b92991 RSI: 0000000000000991 RDI: ffffffff36b92991
+RBP: 0000000000001914 R08: 0000000036b92991 R09: 0000000036b92995
+R10: 00007ffe0eb2c7d0 R11: 0000000000000246 R12: 000000000118cfc8
+R13: 00007fb1a8045008 R14: 00007fb1a8045000 R15: 000000000003ce98
+Kernel Offset: disabled
+Rebooting in 86400 seconds..
 
 
-So those are results of my analysis:
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-WRMSR called functions that return negative value (I could have missed something,
-but I double checked the wrmsr code in both SVM and VMX, and in the common x86 code):
-
-vmx_set_vmx_msr - this is only called from userspace (msr_info->host_initiated == true),
-so this can be left as is
-
-xen_hvm_config - this code should probably return 1 in some cases, but in one case,
-it legit does memory allocation like I do, and failure should probably kill the guest
-as well (but I can keep it as is if we are afraid that new behavier will not be
-backward compatible)
-
-What do you think about this (only compile tested since I don't have any xen setups):
-
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 36e963dc1da61..66a57c5b14dfd 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -2695,24 +2695,19 @@ static int xen_hvm_config(struct kvm_vcpu *vcpu, u64 data)
-        u32 page_num = data & ~PAGE_MASK;
-        u64 page_addr = data & PAGE_MASK;
-        u8 *page;
--       int r;
- 
--       r = -E2BIG;
-        if (page_num >= blob_size)
--               goto out;
--       r = -ENOMEM;
-+               return 1;
-+
-        page = memdup_user(blob_addr + (page_num * PAGE_SIZE), PAGE_SIZE);
--       if (IS_ERR(page)) {
--               r = PTR_ERR(page);
--               goto out;
-+       if (IS_ERR(page))
-+               return PTR_ERR(page);
-+
-+       if (kvm_vcpu_write_guest(vcpu, page_addr, page, PAGE_SIZE)) {
-+               kfree(page);
-+               return 1;
-        }
--       if (kvm_vcpu_write_guest(vcpu, page_addr, page, PAGE_SIZE))
--               goto out_free;
--       r = 0;
--out_free:
--       kfree(page);
--out:
--       return r;
-+       return 0;
- }
-
-
-The msr write itself can be reached from the guest through two functions,
-from kvm_emulate_wrmsr which is called in wrmsr interception from both VMX and SVM,
-and from em_wrmsr which is called in unlikely case the emulator needs to emulate a wrmsr.
-
-Both should be changed to inject #GP only on positive return value and pass the error
-otherwise.
-
-Sounds reasonable? If you agree I'll post the patches implementing this.
-
-Best regards,
-	Maxim Levitsky
-
-
-
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
