@@ -2,102 +2,101 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BB6CC271C55
-	for <lists+kvm@lfdr.de>; Mon, 21 Sep 2020 09:53:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 814ED271C57
+	for <lists+kvm@lfdr.de>; Mon, 21 Sep 2020 09:53:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726406AbgIUHxX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 21 Sep 2020 03:53:23 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:34916 "EHLO
+        id S1726456AbgIUHx1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 21 Sep 2020 03:53:27 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:23016 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726211AbgIUHxX (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 21 Sep 2020 03:53:23 -0400
+        by vger.kernel.org with ESMTP id S1726413AbgIUHx1 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 21 Sep 2020 03:53:27 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1600674802;
+        s=mimecast20190719; t=1600674806;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=+yU0qD4mrbo+E/JHts5fvuh+XEsnmFdemkkwXFLVy4I=;
-        b=EQpmjzjs81v9fV8L7tAI3Bb6Mb4F4Xl41lldGRZPd2NWFsd9zGS5+vtOiTh1QlFdQF+fD5
-        T91jHsxlCNujL52PkVlHQbKwFHHKkisk/tuP7U2Acg3qkytcIS5brAjFZMfEysCR4dxnxY
-        HNDbq/bGUq8U9Barr+RzuEMByPp6xYg=
+        bh=2G++eeOF8cxUbk5F9wVp3kaVjonLJ7VVOFgIVwjkZNo=;
+        b=A+A50whxtgL3asuxo+dTEWKMdUOtyx4t8fjmAbMQLh4ZUfCaLHevpCt8sSB7zWwXsa98J5
+        A3hbZ7e8SR+BTMXms4IFSTgj4/vMwoAHLalTxy0SikYiu2lqCOhiR/jpA0tfmXBXMQaCnb
+        FkMIpA9a96R6u9K2knjSG+XFet/xwus=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-85-NEEVvtwfM5axLizBzqIYLg-1; Mon, 21 Sep 2020 03:53:18 -0400
-X-MC-Unique: NEEVvtwfM5axLizBzqIYLg-1
+ us-mta-346-8gqyXM2SNNKAFXor4CE7Cg-1; Mon, 21 Sep 2020 03:53:24 -0400
+X-MC-Unique: 8gqyXM2SNNKAFXor4CE7Cg-1
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 32B551018720;
-        Mon, 21 Sep 2020 07:53:17 +0000 (UTC)
-Received: from [10.36.112.29] (ovpn-112-29.ams2.redhat.com [10.36.112.29])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 9A1D87882C;
-        Mon, 21 Sep 2020 07:53:12 +0000 (UTC)
-Subject: Re: KVM_SET_DEVICE_ATTR failed
-To:     Zenghui Yu <yuzenghui@huawei.com>, qemu-arm@nongnu.org,
-        kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
-Cc:     Marc Zyngier <maz@kernel.org>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        wanghaibin.wang@huawei.com
-References: <1f70926e-27dd-9e30-3d0f-770130112777@huawei.com>
-From:   Auger Eric <eric.auger@redhat.com>
-Message-ID: <d0c418f2-07a2-f090-e13d-f5ea299a009b@redhat.com>
-Date:   Mon, 21 Sep 2020 09:53:10 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 82EF810BBECD;
+        Mon, 21 Sep 2020 07:53:22 +0000 (UTC)
+Received: from starship (unknown [10.35.206.28])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 844A57882C;
+        Mon, 21 Sep 2020 07:53:18 +0000 (UTC)
+Message-ID: <5a3538861a65973f9ae6e2d0798ac17f52428ded.camel@redhat.com>
+Subject: Re: [PATCH v4 2/2] KVM: nSVM: implement ondemand allocation of the
+ nested state
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     kvm@vger.kernel.org, Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Ingo Molnar <mingo@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Borislav Petkov <bp@alien8.de>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
+        linux-kernel@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>
+Date:   Mon, 21 Sep 2020 10:53:17 +0300
+In-Reply-To: <c35cbaca-2c34-cd93-b589-d4ab782fc754@redhat.com>
+References: <20200917101048.739691-1-mlevitsk@redhat.com>
+         <20200917101048.739691-3-mlevitsk@redhat.com>
+         <20200917162942.GE13522@sjchrist-ice>
+         <d9c0d190-c6ea-2e21-92ca-2a53efb86a1d@redhat.com>
+         <20200920161602.GA17325@linux.intel.com>
+         <c35cbaca-2c34-cd93-b589-d4ab782fc754@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.3 (3.36.3-1.fc32) 
 MIME-Version: 1.0
-In-Reply-To: <1f70926e-27dd-9e30-3d0f-770130112777@huawei.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Zenghui,
+On Sun, 2020-09-20 at 18:42 +0200, Paolo Bonzini wrote:
+> On 20/09/20 18:16, Sean Christopherson wrote:
+> > > Maxim, your previous version was adding some error handling to
+> > > kvm_x86_ops.set_efer.  I don't remember what was the issue; did you have
+> > > any problems propagating all the errors up to KVM_SET_SREGS (easy),
+> > > kvm_set_msr (harder) etc.?
+> > I objected to letting .set_efer() return a fault.
+> 
+> So did I, and that's why we get KVM_REQ_OUT_OF_MEMORY.  But it was more
+> of an "it's ugly and it ought not to fail" thing than something I could
+> pinpoint.
+> 
+> It looks like we agree, but still we have to choose the lesser evil?
+> 
+> Paolo
+> 
+> > A relatively minor issue is
+> > the code in vmx_set_efer() that handles lack of EFER because technically KVM
+> > can emulate EFER.SCE+SYSCALL without supporting EFER in hardware.  Returning
+> > success/'0' would avoid that particular issue.  My primary concern is that I'd
+> > prefer not to add another case where KVM can potentially ignore a fault
+> > indicated by a helper, a la vmx_set_cr4().
 
-On 9/19/20 1:15 PM, Zenghui Yu wrote:
-> Hi folks,
-> 
-> I had booted a guest with an assigned virtual function, with GICv4
-> (direct MSI injection) enabled on my arm64 server. I got the following
-> QEMU error message on its shutdown:
-> 
-> "qemu-system-aarch64: KVM_SET_DEVICE_ATTR failed: Group 4 attr
-> 0x0000000000000001: Permission denied"
-> 
-> The problem is that the KVM_DEV_ARM_ITS_SAVE_TABLES ioctl failed while
-> stopping the VM.
-> 
-> As for the kernel side, it turned out that an LPI with irq->hw=true was
-> observed while saving ITT for the device. KVM simply failed the save
-> operation by returning -EACCES to user-space. The reason is explained in
-> the comment block of vgic_its_save_itt(), though I think the HW bit
-> should actually be checked in the KVM_DEV_ARM_VGIC_SAVE_PENDING_TABLES
-> ioctl rather than in the ITT saving, well, it isn't much related to this
-> problem...
-> 
-> I had noticed that some vectors had been masked by guest VF-driver on
-> shutdown, the correspond VLPIs had therefore been unmapped and irq->hw
-> was cleared. But some other vectors were un-handled. I *guess* that VFIO
-> released these vectors *after* the KVM_DEV_ARM_ITS_SAVE_TABLES ioctl so
-> that we end-up trying to save the VLPI's state.
-> 
-> It may not be a big problem as the guest is going to shutdown anyway and
-> the whole guest save/restore on the GICv4.x system is not supported for
-> the time being... I'll look at how VFIO would release these vectors but
-> post it early in case this is an already known issue (and this might be
-> one thing need to be considered if one wants to implement migration on
-> the GICv4.x system).
+The thing is that kvm_emulate_wrmsr injects #GP when kvm_set_msr returns any non zero value,
+and returns 1 which means keep on going if I understand correctly (0 is userspace exit,
+negative value would be a return to userspace with an error)
 
-Thanks for reporting the issue. I will have a look at the QEMU sequence too
+So the question is if we have other wrmsr handlers which return negative value, and would
+be affected by changing kvm_emulate_wrmsr to pass through the error value.
+I am checking the code now.
 
+I do agree now that this is the *correct* solution to this problem.
 
-Eric
-> 
-> 
-> Thanks,
-> Zenghui
-> 
+Best regards,
+	Maxim Levitsky
 
