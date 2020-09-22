@@ -2,71 +2,78 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3C6D8274241
-	for <lists+kvm@lfdr.de>; Tue, 22 Sep 2020 14:43:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 74908274262
+	for <lists+kvm@lfdr.de>; Tue, 22 Sep 2020 14:50:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726603AbgIVMnU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 22 Sep 2020 08:43:20 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:45067 "EHLO
+        id S1726614AbgIVMul (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 22 Sep 2020 08:50:41 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:23774 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726563AbgIVMnU (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 22 Sep 2020 08:43:20 -0400
+        by vger.kernel.org with ESMTP id S1726563AbgIVMuk (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 22 Sep 2020 08:50:40 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1600778598;
+        s=mimecast20190719; t=1600779039;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=hdDfIPkszB+oq8MEipfhVAGs4Jc9SzPikPPG+rOa0Eg=;
-        b=JSkgx9PphkqpgyA6nmMrh2I+SHoSyrqb//Y97wHARQ0kdfLzzHyjOhcjyl8hnPxcLxlYbf
-        uoIbmlZkLULQNHhl5WDvBd6tUrTiaRpMzAFHe2Q1xCZFOvbwcg7dXLPaAGXmtRBnCSuiqi
-        ibbL49RonzGG+oxqdQbccj9IY8eACBc=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-523-GUxj34YjMROzR4BSqGCkZg-1; Tue, 22 Sep 2020 08:43:17 -0400
-X-MC-Unique: GUxj34YjMROzR4BSqGCkZg-1
-Received: by mail-wm1-f69.google.com with SMTP id x81so857136wmg.8
-        for <kvm@vger.kernel.org>; Tue, 22 Sep 2020 05:43:17 -0700 (PDT)
+        bh=rBy/ewZFYuHcIeTKmOeoXntrF9t6VS/+90A1J5EVLLs=;
+        b=bmZvDR7YNHYZi11nqmzumm30s44rpA838tlVBrEpoXSKh2l86HO7rsCYPZ/S3hMkHwimd0
+        zYx1vCNKh42d2ffCAwdqaByOdvgJPYJrfXIXjsZ3o3FacQoJCP20gR1pkvhFKf5naM8acO
+        MfrCfoBluEUuqZUmoUTPmFsTDPJz2co=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-227-HUr0jzRPPDWcgHzwt8UI7w-1; Tue, 22 Sep 2020 08:50:37 -0400
+X-MC-Unique: HUr0jzRPPDWcgHzwt8UI7w-1
+Received: by mail-wr1-f69.google.com with SMTP id h4so7409695wrb.4
+        for <kvm@vger.kernel.org>; Tue, 22 Sep 2020 05:50:37 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=hdDfIPkszB+oq8MEipfhVAGs4Jc9SzPikPPG+rOa0Eg=;
-        b=DP8p56XgRQWuK/3DMYfFuVwfoFulCPqwKDB7sH2SEROXpYiD3RCUi+6US18f3Bg8Th
-         sSxcSP2vlgzwB9yObOHfhwGC4R8V/yxZhvSCvCNaJ1x4qwUWu9Xwkxc2tolJZAKjvwSN
-         9thQogCsn5c3OUvfrK/UzIIOrgiQn4bz0YrEoOvzyHk1ROwPCYdfhwVf6gbKw9oSC99Y
-         HgTu/KF65zkuYIl6pB6s1VEShwt2DikmatjSBG3UKU2H0YBRbhVgmaKaDYcqNf5oqwq9
-         wBnBmLSShPjLF6fiF4kR89AAwdI/bvNx4JBfJfUVQ3bqrv5uiH6QvVWeOKVWDc8sLYHf
-         0ntg==
-X-Gm-Message-State: AOAM532CNes5dLgNl9GuEph1TPCx5OCYW134nEe6030oKO7t6oox0cfj
-        4KvIWa248N08SzgbOeCb9OjAlRxvYAmZCH6p3dkqWT+IJqkSwTqu4Lyou6QQ/B6ddGjDV6zJ6mh
-        /UTZjUqkS8DAI
-X-Received: by 2002:adf:ec4f:: with SMTP id w15mr4927382wrn.333.1600778596280;
-        Tue, 22 Sep 2020 05:43:16 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwlYpb5HC1ZqinjgF1NmxdlGBvhDHuzFIdafVpb14tXR6I0O/+xA+GfB5yFf3c1E139RD3CTA==
-X-Received: by 2002:adf:ec4f:: with SMTP id w15mr4927371wrn.333.1600778596103;
-        Tue, 22 Sep 2020 05:43:16 -0700 (PDT)
+        bh=rBy/ewZFYuHcIeTKmOeoXntrF9t6VS/+90A1J5EVLLs=;
+        b=hQz6uMgOnHsrtfbOMItq+KYiUTeaoxYaqQ7JG4yf3t0/cg8g7Kr4FKq4wRb3CCjqDg
+         PMStrtdN2LrIpv+S0yOBCnaS3MtYoVelXa5LNk5CRLUygIc9YAEirsrCA8ANCvsVz8fz
+         UPiDTSJm185u+KclZgjkTnnM5eUeGrdAfYkoQmf2yt/h10nTFk+ITfXi0hJrw7vXCT08
+         MQ89WpAj+39dR3O79gEBzz02KA45l44Ww3N8+4BfSlB+HmdJZnvn8h/SEz3QkgIEB+cs
+         /qcgx+uxbpgOTpgg/9rZ/T0oCEPnNsnk0R5B+NoLgR4hWIWv6yTqqy6I+G10bkDX5h0F
+         UPrA==
+X-Gm-Message-State: AOAM531RKP4P2OGgsD+tIxjiJ6evA/6Lm4D5xDzAzIbqDNRcy6TsOgHy
+        TD+DzzZc8lUTvEuhDTxX7gA2IQ5VItbyLXOpOZeZoCgsoFqWfUxEqV4hBP4JvTDnMOnrGfrTUoy
+        sSsc4u7a/UwZI
+X-Received: by 2002:a5d:570b:: with SMTP id a11mr5367291wrv.139.1600779036412;
+        Tue, 22 Sep 2020 05:50:36 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxaMutgSK9zT2Z/t3qizYV4H60BXFyLtlUFxU1c3gSGzb45WPn7A4MrDiZBlX0euAM5Vo8FYw==
+X-Received: by 2002:a5d:570b:: with SMTP id a11mr5367262wrv.139.1600779036221;
+        Tue, 22 Sep 2020 05:50:36 -0700 (PDT)
 Received: from ?IPv6:2001:b07:6468:f312:ec2c:90a9:1236:ebc6? ([2001:b07:6468:f312:ec2c:90a9:1236:ebc6])
-        by smtp.gmail.com with ESMTPSA id u2sm4411155wre.7.2020.09.22.05.43.15
+        by smtp.gmail.com with ESMTPSA id v17sm27868565wrc.23.2020.09.22.05.50.35
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 22 Sep 2020 05:43:15 -0700 (PDT)
-Subject: Re: [PATCH] KVM: use struct_size() and flex_array_size() helpers in
- kvm_io_bus_unregister_dev()
-To:     "Gustavo A. R. Silva" <gustavoars@kernel.org>,
-        Rustam Kovhaev <rkovhaev@gmail.com>
-Cc:     vkuznets@redhat.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, gregkh@linuxfoundation.org,
-        stable@vger.kernel.org
-References: <20200918120500.954436-1-rkovhaev@gmail.com>
- <20200919000925.GA23967@embeddedor>
+        Tue, 22 Sep 2020 05:50:35 -0700 (PDT)
+Subject: Re: [PATCH v2 1/1] KVM: x86: fix MSR_IA32_TSC read for nested
+ migration
+To:     Sean Christopherson <sean.j.christopherson@intel.com>,
+        Maxim Levitsky <mlevitsk@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Jim Mattson <jmattson@google.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
+        Joerg Roedel <joro@8bytes.org>,
+        "H. Peter Anvin" <hpa@zytor.com>
+References: <20200921103805.9102-1-mlevitsk@redhat.com>
+ <20200921103805.9102-2-mlevitsk@redhat.com>
+ <20200921162326.GB23989@linux.intel.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <65ab660e-fc93-bca5-d320-83b80a8dee59@redhat.com>
-Date:   Tue, 22 Sep 2020 14:43:14 +0200
+Message-ID: <de9411ce-aa83-77c8-b2ae-a3873250a0b1@redhat.com>
+Date:   Tue, 22 Sep 2020 14:50:34 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <20200919000925.GA23967@embeddedor>
+In-Reply-To: <20200921162326.GB23989@linux.intel.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -74,10 +81,34 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 19/09/20 02:09, Gustavo A. R. Silva wrote:
-> Reviewed-by: Gustavo A. R. Silva <gustavoars@kernel.org>
+On 21/09/20 18:23, Sean Christopherson wrote:
+> Avoid "should" in code comments and describe what the code is doing, not what
+> it should be doing.  The only exception for this is when the code has a known
+> flaw/gap, e.g. "KVM should do X, but because of Y, KVM actually does Z".
+> 
+>> +		 * return it's real L1 value so that its restore will be correct.
+> s/it's/its
+> 
+> Perhaps add "unconditionally" somewhere, since arch.tsc_offset can also contain
+> the L1 value.  E.g. 
+> 
+> 		 * Unconditionally return L1's TSC offset on userspace reads
+> 		 * so that userspace reads and writes always operate on L1's
+> 		 * offset, e.g. to ensure deterministic behavior for migration.
+> 		 */
+> 
 
-Queued, without stable.  Thanks.
+Technically the host need not restore MSR_IA32_TSC at all.  This follows
+the idea of the discussion with Oliver Upton about transmitting the
+state of the kvmclock heuristics to userspace, which include a (TSC,
+CLOCK_MONOTONIC) pair to transmit the offset to the destination.  All
+that needs to be an L1 value is then the TSC value in that pair.
+
+I'm a bit torn over this patch.  On one hand it's an easy solution, on
+the other hand it's... just wrong if KVM_GET_MSR is used for e.g.
+debugging the guest.
+
+I'll talk to Maxim and see if he can work on the kvmclock migration stuff.
 
 Paolo
 
