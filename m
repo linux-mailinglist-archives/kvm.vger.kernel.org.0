@@ -2,95 +2,104 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 05922273651
-	for <lists+kvm@lfdr.de>; Tue, 22 Sep 2020 01:11:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9DFF4273791
+	for <lists+kvm@lfdr.de>; Tue, 22 Sep 2020 02:40:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728770AbgIUXLb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 21 Sep 2020 19:11:31 -0400
-Received: from mail.rusoil.net ([188.128.114.25]:57626 "EHLO mail.rusoil.net"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728704AbgIUXLb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 21 Sep 2020 19:11:31 -0400
-X-Greylist: delayed 473 seconds by postgrey-1.27 at vger.kernel.org; Mon, 21 Sep 2020 19:11:29 EDT
-Received: from localhost (localhost.localdomain [127.0.0.1])
-        by mail.rusoil.net (Postfix) with ESMTP id B8A9940D2D;
-        Tue, 22 Sep 2020 04:05:49 +0500 (YEKT)
-Received: from mail.rusoil.net ([127.0.0.1])
-        by localhost (mail.rusoil.net [127.0.0.1]) (amavisd-new, port 10032)
-        with ESMTP id H1MJhkbpXS_b; Tue, 22 Sep 2020 04:05:49 +0500 (YEKT)
-Received: from localhost (localhost.localdomain [127.0.0.1])
-        by mail.rusoil.net (Postfix) with ESMTP id 39A7340C42;
-        Tue, 22 Sep 2020 04:05:48 +0500 (YEKT)
-DKIM-Filter: OpenDKIM Filter v2.10.3 mail.rusoil.net 39A7340C42
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=rusoil.net;
-        s=maildkim; t=1600729548;
-        bh=6R3BgBYiA7fkqGiiNDuwPskBnpH9JXyNAW/l3ZEA+wY=;
-        h=Date:From:Message-ID:MIME-Version;
-        b=m5EkZoLhYRBwb3toMrY+rpm1ysu1L7u1dEVzUBrnNCAOk0kFMe9IddrGJ2TNHbgqe
-         kLks0SQy4a0ZB7SmWYQ6GAjDtukqZm6CRV1kVnJr9eWqBQ0gB7wgldZlZNJYqWnsnr
-         M4HuJffzf+BncNc8lfSeBCv95XRJC5Och549qOcQ=
-X-Virus-Scanned: amavisd-new at mail.rusoil.net
-Received: from mail.rusoil.net ([127.0.0.1])
-        by localhost (mail.rusoil.net [127.0.0.1]) (amavisd-new, port 10026)
-        with ESMTP id YzVo9YzROrP8; Tue, 22 Sep 2020 04:05:48 +0500 (YEKT)
-Received: from mail.rusoil.net (mail.rusoil.net [172.16.7.34])
-        by mail.rusoil.net (Postfix) with ESMTP id 9FC4540CF5;
-        Tue, 22 Sep 2020 04:05:45 +0500 (YEKT)
-Date:   Tue, 22 Sep 2020 04:05:45 +0500 (YEKT)
-From:   Blue Oak Mortgage and Loans <em@rusoil.net>
-Reply-To: Blue Oak Mortgage and Loans <info@bluelmtg.net>
-Message-ID: <2062381732.906924.1600729545587.JavaMail.zimbra@rusoil.net>
-Subject: Wir finanzieren Projekte und Unternehmen
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-Originating-IP: [192.210.183.69]
-X-Mailer: Zimbra 8.8.12_GA_3803 (ZimbraWebClient - FF79 (Win)/8.8.12_GA_3794)
-Thread-Index: +U3nN4hNTa7A210fypObO2kEHHcd5g==
-Thread-Topic: Wir finanzieren Projekte und Unternehmen
-To:     unlisted-recipients:; (no To-header on input)
+        id S1729173AbgIVAko (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 21 Sep 2020 20:40:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51112 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728597AbgIVAko (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 21 Sep 2020 20:40:44 -0400
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 92DE7C061755
+        for <kvm@vger.kernel.org>; Mon, 21 Sep 2020 17:40:44 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id k3so14645263ybk.16
+        for <kvm@vger.kernel.org>; Mon, 21 Sep 2020 17:40:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=sender:date:message-id:mime-version:subject:from:to:cc;
+        bh=V3Xr2zBCrWRdkK+k7x0nVhZayUYo5UZWzWiSfnS90fI=;
+        b=kdyVgyusZNzoXrTJhguQAb+Mx6TJNWHRXlrjar7ZHpeVOaXSPFcnqpBVcrKSj7jdY/
+         Z9S2h73yYxQ9ye0LpN+CnHJtEkvDKrW9dX9pf4gz/5JYMJcccJoedfYoOR8AT6arrG/0
+         ux966VV/bda9j4D3905gY+7QxO5ycI5EIzvDsYywy96gVK8JhFGFJMy2GicwDum9X/7W
+         5AEWANjjafFjdR3tEOf/Btn3rFXzJXaLz1TU4p2opSJylwS9O8Y07YUPXzdI/9WSkVZ9
+         xceQndQbqE8aM4VfKijgA1/KGV6BKYHLXzO7PTdnAOW4uHnL0OrmfA8n9UcoRW9J8H5E
+         Wt1A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:sender:date:message-id:mime-version:subject:from
+         :to:cc;
+        bh=V3Xr2zBCrWRdkK+k7x0nVhZayUYo5UZWzWiSfnS90fI=;
+        b=RzP88snqgNAHjU925Y2qIEEXJRmVQ5RmTNwSN4mNc3MdS4x3N8EeYlKw0USwSiGWiq
+         VKY7N2mo2XyFrrsPX+UGu9v36mIWQDl5ZyXaGn8f5Cxp+Tz1Wx10vz+UV/RZLrV51OWL
+         FQfqqMhqizPwELpHB19CI1Srznj10nvmE6Zc2IVrsd8M48R19CxY6BaylKLn/RXY8WEJ
+         n5eabhuqXTpVagTLMB3ITUV0QWnDioCfLRRMXemoD2IdWm2aTILgzjmgEFGWnHZn46Ea
+         lpRgEiU5n+8DWOSrOWoh/e6od8hiSd18YSDwbpTn9raojtJHJlgnNpCtO//L9QY/7Agx
+         l+nw==
+X-Gm-Message-State: AOAM533JeAu1Yc8yv4AlGpOXwy200UASoHrEs/xFE6yAihwHIJutMru4
+        dac1sGgUqfg1tL/XQc4gYVkecsenr7d0
+X-Google-Smtp-Source: ABdhPJxDC6JLVG11hhZe1uOVPGKcetCubbINqx66dzuSedg2x2A03OBC/7sbWEURwwLPReMPnq569d3iROp7
+Sender: "vipinsh via sendgmr" <vipinsh@vipinsh.kir.corp.google.com>
+X-Received: from vipinsh.kir.corp.google.com ([2620:0:1008:10:1ea0:b8ff:fe75:b885])
+ (user=vipinsh job=sendgmr) by 2002:a25:900b:: with SMTP id
+ s11mr3389263ybl.426.1600735243795; Mon, 21 Sep 2020 17:40:43 -0700 (PDT)
+Date:   Mon, 21 Sep 2020 17:40:22 -0700
+Message-Id: <20200922004024.3699923-1-vipinsh@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.28.0.681.g6f77f65b4e-goog
+Subject: [RFC Patch 0/2] KVM: SVM: Cgroup support for SVM SEV ASIDs
+From:   Vipin Sharma <vipinsh@google.com>
+To:     thomas.lendacky@amd.com, pbonzini@redhat.com,
+        sean.j.christopherson@intel.com, tj@kernel.org, lizefan@huawei.com
+Cc:     joro@8bytes.org, corbet@lwn.net, brijesh.singh@amd.com,
+        jon.grimm@amd.com, eric.vantassell@amd.com, gingell@google.com,
+        rientjes@google.com, kvm@vger.kernel.org, x86@kernel.org,
+        cgroups@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Vipin Sharma <vipinsh@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Hello,
 
+This patch series adds a new SEV controller for tracking and limiting
+the usage of SEV ASIDs on the AMD SVM platform.
 
-Dies ist ein Newsletter von Blue Oak Mortgage and Loans. Bitte melden Sie s=
-ich ab, wenn Sie keine E-Mail mehr von uns erhalten m=C3=B6chten.
+SEV ASIDs are used in creating encrypted VM and lightweight sandboxes
+but this resource is in very limited quantity on a host.
 
+This limited quantity creates issues like SEV ASID starvation and
+unoptimized scheduling in the cloud infrastructure.
 
-Eine kurze Einf=C3=BChrung.
+SEV controller provides SEV ASID tracking and resource control
+mechanisms.
 
-Wir sind ein f=C3=BChrendes Finanzierungsunternehmen in Europa. Wir finanzi=
-eren Startups / etablierte Unternehmen, finanzieren Gro=C3=9Fprojekte (Bau,=
- Landwirtschaft, Immobilien und dergleichen) zu einem niedrigen Zinssatz vo=
-n 2% pro Jahr.
+Patch 1 - Overview, motivation, and implementation details of the SEV
+          controller.
+Patch 2 - Kernel documentation of the SEV controller for both
+	  cgroup v1 and v2.
 
+Thanks
 
-Darlehensverfahren
+Vipin Sharma (2):
+  KVM: SVM: Create SEV cgroup controller.
+  KVM: SVM: SEV cgroup controller documentation
 
-1. Sie m=C3=BCssen das Online-Bewerbungsformular ausf=C3=BCllen und eine or=
-dnungsgem=C3=A4=C3=9F unterschriebene Kopie an uns zur=C3=BCcksenden.
+ Documentation/admin-guide/cgroup-v1/sev.rst |  94 +++++
+ Documentation/admin-guide/cgroup-v2.rst     |  56 ++-
+ arch/x86/kvm/Makefile                       |   1 +
+ arch/x86/kvm/svm/sev.c                      |  16 +-
+ arch/x86/kvm/svm/sev_cgroup.c               | 414 ++++++++++++++++++++
+ arch/x86/kvm/svm/sev_cgroup.h               |  40 ++
+ include/linux/cgroup_subsys.h               |   3 +
+ init/Kconfig                                |  14 +
+ 8 files changed, 634 insertions(+), 4 deletions(-)
+ create mode 100644 Documentation/admin-guide/cgroup-v1/sev.rst
+ create mode 100644 arch/x86/kvm/svm/sev_cgroup.c
+ create mode 100644 arch/x86/kvm/svm/sev_cgroup.h
 
-2. M=C3=B6glicherweise m=C3=BCssen Sie Finanzdokumente als unterst=C3=BCtze=
-nden Nachweis f=C3=BCr die F=C3=A4higkeit zur R=C3=BCckzahlung von Krediten=
- vorlegen.
+-- 
+2.28.0.681.g6f77f65b4e-goog
 
-3. Wenn Ihr Darlehen genehmigt wurde, m=C3=BCssen Sie eine Versicherungsgar=
-antie f=C3=BCr die Darlehenssicherheit vorlegen. Wir empfehlen eine Versich=
-erungsgesellschaft. Sie sind allein verantwortlich f=C3=BCr die Zahlung und=
- den Erwerb der Anleihe, die als Sicherheit dienen. Die H=C3=B6he der Anlei=
-he h=C3=A4ngt von Ihrem Darlehensbetrag ab. Die Versicherungsgesellschaft w=
-ird Sie durch den Prozess f=C3=BChren. (F=C3=BCr Gro=C3=9Fprojekte)
-
-4. Ihr =C3=9Cberweisungsprozess wird eingeleitet, sobald die Versicherungsa=
-nleihe =C3=BCberpr=C3=BCft wurde. Ihr Darlehensr=C3=BCckzahlungsplan wird i=
-m NC-Darlehensvertragsformular aufgef=C3=BChrt.
-
-Wenn die Bedingungen Sie beruhigen, k=C3=B6nnen Sie uns =C3=BCber die Whats=
-App-Nummer / E-Mail kontaktieren und auch unsere Website besuchen, um weite=
-re Informationen zu erhalten. Wir freuen uns darauf, von Ihnen zu h=C3=B6re=
-n.
-
-WhatsApp: + 90-552-365-3483
-E-Mail: info@bluelmtg.net
