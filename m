@@ -2,108 +2,156 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id EA09A2746CB
-	for <lists+kvm@lfdr.de>; Tue, 22 Sep 2020 18:39:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1CAD92746D8
+	for <lists+kvm@lfdr.de>; Tue, 22 Sep 2020 18:40:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726652AbgIVQj0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 22 Sep 2020 12:39:26 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:26828 "EHLO
+        id S1726753AbgIVQkk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 22 Sep 2020 12:40:40 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:57293 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726558AbgIVQjY (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 22 Sep 2020 12:39:24 -0400
+        by vger.kernel.org with ESMTP id S1726739AbgIVQkj (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 22 Sep 2020 12:40:39 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1600792762;
+        s=mimecast20190719; t=1600792837;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=9xBbtaESBNONtl2sEaNAAY6yvG0vlYmdzD4boWs1/M0=;
-        b=Y3dc7ONQFFIXJcHBWfJC4opCifnkwTvlXogaFKiI30lBrXN8u5HWJlGnUMVfOujN3xqDEb
-        YTX1aIaBslUjESHcUw+o/8xHWGXEA0axsT9GTIsYOjdbM+YGgzlldbJfNzxkldSApMlQyj
-        jNjRSYnU9Qi83ttck3Z7hwkBBEB7tD0=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-251-suOyG2fuNqq_TSB0jNXAGQ-1; Tue, 22 Sep 2020 12:39:19 -0400
-X-MC-Unique: suOyG2fuNqq_TSB0jNXAGQ-1
-Received: by mail-wr1-f70.google.com with SMTP id o6so7630845wrp.1
-        for <kvm@vger.kernel.org>; Tue, 22 Sep 2020 09:39:18 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=9xBbtaESBNONtl2sEaNAAY6yvG0vlYmdzD4boWs1/M0=;
-        b=fBB125L7J7H9xpLryluLGek9Yrf0WdzjATBF65YGUWJ1c4Dh76oq/JNLmN+PE/d0DY
-         iC3lmUKT7NdxtORBo11WZwWPF1/zT4UnwYcikrxSCPaKXW0CmSnSq/p3rMlY0dwqPa5R
-         Z5WtEMctKvsvzl9Rmky5y1WPY1n7/bVqZC7DMtGBPNcsdbTSrqjes2vGeike2R6yWHpC
-         RLq9E7Go6nJNdWCLb/JUsKywfrZiweSNKrR3OadvFeDuic73oQhrIm7iWU4irEyHXJjy
-         PHyFFN7YYgV6WiCcNC8w8uetfJAYdWRXhtjskljx8nKC9PoVFg8NWaSaNPOxhf8LEhrl
-         V5sA==
-X-Gm-Message-State: AOAM532KBokWbz9RZpg/Mgf+OyyK1UDcIBLijvkQkVJPpv27qayIIm/X
-        1Bxi+UWtc5RjJy/v/d3tNEjrJdYy5LUpd/HLAxjBnpo4zIwXEtd/6DL6pAWVrOcbMCx265jeqin
-        ilGlNGR5mzQcY
-X-Received: by 2002:a5d:69c9:: with SMTP id s9mr6311127wrw.348.1600792757922;
-        Tue, 22 Sep 2020 09:39:17 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJy55yy1otoo4eP/r/wzYIY/yD2fT568vjN8DvRtJ7I7RnyRbSpv6lMckPNIRrBW7YhJr2SF1Q==
-X-Received: by 2002:a5d:69c9:: with SMTP id s9mr6311107wrw.348.1600792757673;
-        Tue, 22 Sep 2020 09:39:17 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:ec2c:90a9:1236:ebc6? ([2001:b07:6468:f312:ec2c:90a9:1236:ebc6])
-        by smtp.gmail.com with ESMTPSA id r15sm4982205wmn.24.2020.09.22.09.39.16
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 22 Sep 2020 09:39:17 -0700 (PDT)
-Subject: Re: [PATCH v2 1/1] KVM: x86: fix MSR_IA32_TSC read for nested
- migration
-To:     Maxim Levitsky <mlevitsk@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Jim Mattson <jmattson@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
-        Joerg Roedel <joro@8bytes.org>,
-        "H. Peter Anvin" <hpa@zytor.com>
-References: <20200921103805.9102-1-mlevitsk@redhat.com>
- <20200921103805.9102-2-mlevitsk@redhat.com>
- <20200921162326.GB23989@linux.intel.com>
- <de9411ce-aa83-77c8-b2ae-a3873250a0b1@redhat.com>
- <7db1383cc9d40f76a02076c3b86cf832fd7463cc.camel@redhat.com>
- <5d19bbf5bcc4975e4ac6c4aef8b92b4a1ed4bc16.camel@redhat.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <a0821152-19b7-9d46-aefd-759f462902b7@redhat.com>
-Date:   Tue, 22 Sep 2020 18:39:16 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+        bh=g/MCLyHoyvURQHbumQLHytYYwHvt80kkvgPCoRYfLTU=;
+        b=aBCXJdEx6aGQaZ7S/8RsfcCOnYBRhZle49KCRlxgr6J0jb+aXqs4viSls0wB/py2Nx7Qkk
+        La5ZuqT/coVd26Ub1AuInNufop8VqvAyBOWfyumFzW+YKKEKKH/9gp9iEUCw+ofABaZUl9
+        ppqkKlkdC8wnrY0EvNLeU7SkYl3r9u0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-232-EWnkbm9VPH61cn_uCdsxUA-1; Tue, 22 Sep 2020 12:40:33 -0400
+X-MC-Unique: EWnkbm9VPH61cn_uCdsxUA-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E43E7188C12B;
+        Tue, 22 Sep 2020 16:40:31 +0000 (UTC)
+Received: from x1.home (ovpn-112-71.phx2.redhat.com [10.3.112.71])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id D388178825;
+        Tue, 22 Sep 2020 16:40:30 +0000 (UTC)
+Date:   Tue, 22 Sep 2020 10:40:30 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Matthew Rosato <mjrosato@linux.ibm.com>
+Cc:     bhelgaas@google.com, schnelle@linux.ibm.com, pmorel@linux.ibm.com,
+        mpe@ellerman.id.au, oohall@gmail.com, cohuck@redhat.com,
+        kevin.tian@intel.com, hca@linux.ibm.com, gor@linux.ibm.com,
+        borntraeger@de.ibm.com, linux-s390@vger.kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-pci@vger.kernel.org
+Subject: Re: [PATCH v5 3/3] vfio/pci: Decouple PCI_COMMAND_MEMORY bit checks
+ from is_virtfn
+Message-ID: <20200922104030.07e0dfd9@x1.home>
+In-Reply-To: <08afc6b2-7549-5440-a947-af0b598288c2@linux.ibm.com>
+References: <1599749997-30489-1-git-send-email-mjrosato@linux.ibm.com>
+        <1599749997-30489-4-git-send-email-mjrosato@linux.ibm.com>
+        <08afc6b2-7549-5440-a947-af0b598288c2@linux.ibm.com>
+Organization: Red Hat
 MIME-Version: 1.0
-In-Reply-To: <5d19bbf5bcc4975e4ac6c4aef8b92b4a1ed4bc16.camel@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 22/09/20 17:39, Maxim Levitsky wrote:
->>> I'll talk to Maxim and see if he can work on the kvmclock migration stuff.
-> 
-> We talked about this on IRC and now I am also convinced that we should implement
-> proper TSC migration instead, so I guess I'll drop this patch and I will implement it.
-> 
-> Last few weeks I was digging through all the timing code, and I mostly understand it
-> so it shouldn't take me much time to implement it.
-> 
-> There is hope that this will make nested migration fully stable since, with this patch,
-> it still sometimes hangs. While on my AMD machine it takes about half a day of migration
-> cycles to reproduce this, on my Intel's laptop even with this patch I can hang the nested
-> guest after 10-20 cycles. The symptoms look very similar to the issue that this patch
-> tried to fix.
->  
-> Maybe we should keep the *comment* I added to document this funny TSC read behavior. 
-> When I implement the whole thing, maybe I add a comment only version of this patch
-> for that.
+On Mon, 21 Sep 2020 08:43:29 -0400
+Matthew Rosato <mjrosato@linux.ibm.com> wrote:
 
-Sure, that's a good idea.
+> On 9/10/20 10:59 AM, Matthew Rosato wrote:
+> > While it is true that devices with is_virtfn=1 will have a Memory Space
+> > Enable bit that is hard-wired to 0, this is not the only case where we
+> > see this behavior -- For example some bare-metal hypervisors lack
+> > Memory Space Enable bit emulation for devices not setting is_virtfn
+> > (s390). Fix this by instead checking for the newly-added
+> > no_command_memory bit which directly denotes the need for
+> > PCI_COMMAND_MEMORY emulation in vfio.
+> > 
+> > Fixes: abafbc551fdd ("vfio-pci: Invalidate mmaps and block MMIO access on disabled memory")
+> > Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
+> > Reviewed-by: Niklas Schnelle <schnelle@linux.ibm.com>
+> > Reviewed-by: Pierre Morel <pmorel@linux.ibm.com>  
+> 
+> Polite ping on this patch as the other 2 have now received maintainer 
+> ACKs or reviews.  I'm concerned about this popping up in distros as 
+> abafbc551fdd was a CVE fix.  Related, see question from the cover:
+> 
+> - Restored the fixes tag to patch 3 (but the other 2 patches are
+>    now pre-reqs -- cc stable 5.8?)
 
-Paolo
+I've got these queued in my local branch which I'll push to next for
+v5.10.  I'm thinking that perhaps the right thing would be to add the
+fixes tag to all three patches, otherwise I could see that the PCI/VF
+change might get picked as a dependency, but not the s390 specific one.
+Does this sound correct to everyone?  Thanks,
+
+Alex
+
+> > ---
+> >   drivers/vfio/pci/vfio_pci_config.c | 24 ++++++++++++++----------
+> >   1 file changed, 14 insertions(+), 10 deletions(-)
+> > 
+> > diff --git a/drivers/vfio/pci/vfio_pci_config.c b/drivers/vfio/pci/vfio_pci_config.c
+> > index d98843f..5076d01 100644
+> > --- a/drivers/vfio/pci/vfio_pci_config.c
+> > +++ b/drivers/vfio/pci/vfio_pci_config.c
+> > @@ -406,7 +406,7 @@ bool __vfio_pci_memory_enabled(struct vfio_pci_device *vdev)
+> >   	 * PF SR-IOV capability, there's therefore no need to trigger
+> >   	 * faults based on the virtual value.
+> >   	 */
+> > -	return pdev->is_virtfn || (cmd & PCI_COMMAND_MEMORY);
+> > +	return pdev->no_command_memory || (cmd & PCI_COMMAND_MEMORY);
+> >   }
+> >   
+> >   /*
+> > @@ -520,8 +520,8 @@ static int vfio_basic_config_read(struct vfio_pci_device *vdev, int pos,
+> >   
+> >   	count = vfio_default_config_read(vdev, pos, count, perm, offset, val);
+> >   
+> > -	/* Mask in virtual memory enable for SR-IOV devices */
+> > -	if (offset == PCI_COMMAND && vdev->pdev->is_virtfn) {
+> > +	/* Mask in virtual memory enable */
+> > +	if (offset == PCI_COMMAND && vdev->pdev->no_command_memory) {
+> >   		u16 cmd = le16_to_cpu(*(__le16 *)&vdev->vconfig[PCI_COMMAND]);
+> >   		u32 tmp_val = le32_to_cpu(*val);
+> >   
+> > @@ -589,9 +589,11 @@ static int vfio_basic_config_write(struct vfio_pci_device *vdev, int pos,
+> >   		 * shows it disabled (phys_mem/io, then the device has
+> >   		 * undergone some kind of backdoor reset and needs to be
+> >   		 * restored before we allow it to enable the bars.
+> > -		 * SR-IOV devices will trigger this, but we catch them later
+> > +		 * SR-IOV devices will trigger this - for mem enable let's
+> > +		 * catch this now and for io enable it will be caught later
+> >   		 */
+> > -		if ((new_mem && virt_mem && !phys_mem) ||
+> > +		if ((new_mem && virt_mem && !phys_mem &&
+> > +		     !pdev->no_command_memory) ||
+> >   		    (new_io && virt_io && !phys_io) ||
+> >   		    vfio_need_bar_restore(vdev))
+> >   			vfio_bar_restore(vdev);
+> > @@ -1734,12 +1736,14 @@ int vfio_config_init(struct vfio_pci_device *vdev)
+> >   				 vconfig[PCI_INTERRUPT_PIN]);
+> >   
+> >   		vconfig[PCI_INTERRUPT_PIN] = 0; /* Gratuitous for good VFs */
+> > -
+> > +	}
+> > +	if (pdev->no_command_memory) {
+> >   		/*
+> > -		 * VFs do no implement the memory enable bit of the COMMAND
+> > -		 * register therefore we'll not have it set in our initial
+> > -		 * copy of config space after pci_enable_device().  For
+> > -		 * consistency with PFs, set the virtual enable bit here.
+> > +		 * VFs and devices that set pdev->no_command_memory do not
+> > +		 * implement the memory enable bit of the COMMAND register
+> > +		 * therefore we'll not have it set in our initial copy of
+> > +		 * config space after pci_enable_device().  For consistency
+> > +		 * with PFs, set the virtual enable bit here.
+> >   		 */
+> >   		*(__le16 *)&vconfig[PCI_COMMAND] |=
+> >   					cpu_to_le16(PCI_COMMAND_MEMORY);
+> >   
+> 
 
