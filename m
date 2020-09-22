@@ -2,298 +2,135 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3D23F274AE3
-	for <lists+kvm@lfdr.de>; Tue, 22 Sep 2020 23:11:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0E96E274AF2
+	for <lists+kvm@lfdr.de>; Tue, 22 Sep 2020 23:14:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726652AbgIVVLV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 22 Sep 2020 17:11:21 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:46906 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726723AbgIVVLS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 22 Sep 2020 17:11:18 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1600809076;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=Rm1tkxn9mEpl3JIIvGVbcRJQZfcGlR+5EQ+ttQUby1Y=;
-        b=JhdcAqHvt1DQYHzj5ngR+6gRSHtM3pL+vQX0pBQPJSAOXbRn9/Gwuhx9kZNxq3jW04F4Hv
-        4HPQKW+16IuZDCIEf9IwOBN94V0xwMjEHQdmD5clmQ+7ZqoMOVJrcAgZXqeT2Y2CMsJIMp
-        4eCocnGH8Am2DRZdaHh8w8ItNVSu/7U=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-562-HQM4lvvDOa2xv9pEKAEN5Q-1; Tue, 22 Sep 2020 17:11:12 -0400
-X-MC-Unique: HQM4lvvDOa2xv9pEKAEN5Q-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id ECFEE1091061;
-        Tue, 22 Sep 2020 21:11:09 +0000 (UTC)
-Received: from localhost.localdomain (unknown [10.35.206.154])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 4E6A855788;
-        Tue, 22 Sep 2020 21:10:56 +0000 (UTC)
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     kvm@vger.kernel.org
-Cc:     "H. Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        linux-kernel@vger.kernel.org, Jim Mattson <jmattson@google.com>,
-        x86@kernel.org (maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)),
-        Maxim Levitsky <mlevitsk@redhat.com>
-Subject: [PATCH v6 4/4] KVM: nSVM: implement on demand allocation of the nested state
-Date:   Wed, 23 Sep 2020 00:10:25 +0300
-Message-Id: <20200922211025.175547-5-mlevitsk@redhat.com>
-In-Reply-To: <20200922211025.175547-1-mlevitsk@redhat.com>
-References: <20200922211025.175547-1-mlevitsk@redhat.com>
+        id S1726656AbgIVVOL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 22 Sep 2020 17:14:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43558 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726589AbgIVVOK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 22 Sep 2020 17:14:10 -0400
+Received: from mail-pf1-x442.google.com (mail-pf1-x442.google.com [IPv6:2607:f8b0:4864:20::442])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 85897C0613D0
+        for <kvm@vger.kernel.org>; Tue, 22 Sep 2020 14:14:10 -0700 (PDT)
+Received: by mail-pf1-x442.google.com with SMTP id k13so13120413pfg.1
+        for <kvm@vger.kernel.org>; Tue, 22 Sep 2020 14:14:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=jX0oqiM8ZRWUr1y81TApDh2RLCO5qMFygk0a8MYzzVI=;
+        b=B1hYCzRIzXGxf476oO1RyhjC26uBYCDdckWaQTm5Z1XUjvlWEEJN1luX8NvRRESzqy
+         uI37IR6+6MX61y1oGcN8An610Ee2QYGs6VGNllKq9m+zlneUHDzy3UsAGGBHv9DE1E1D
+         qT8GQM4UVAesCA8kLMpRrA9ZeI4cfw8eGjxYKtyE0yjY59irZXh2Dfmz9OjumiYUu/qm
+         yHTO7ctPRUbZ9EigdnrWAIXnwvosn5CW58fpf0+coea0060UfoW1dsYi0nQkVmy0O4VO
+         g81iae2/630fno3kknm7E/zhJn0XhCUt3WhKQcA0ckIX/ElhyihqNT81SRkD23FlxBLs
+         OQcQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=jX0oqiM8ZRWUr1y81TApDh2RLCO5qMFygk0a8MYzzVI=;
+        b=O7E1p/hWWPWrs/n0EQ5xgC6HCbEWph63C4ZW0NBXLnX+IPNghOfKGTMO8yxjU222Gm
+         mQq3z761VpMk98D2QRllOscn1c+MPCpVKJQnoe2leukVZjDgEDytJcIhCFT569B+2r1e
+         UYMV3c2k08qmWYo5eO3jWdxx4bQrXk4w7nzIi+AZwg5xTBUmX97ncIahBd3n19nLs8rS
+         oMcGFBJgsvedN38nxzEeelTT87+ewYjrKWWhBa9WGbWDvCXJCRjDUM3eSUws5+zO7ZVD
+         uGI4Gpuhos4KNRCBfSxG8WgYG5K+/cqQfL/yMfk27zIpzuZGaZVy7mIW12vpaUtFFVyU
+         egJg==
+X-Gm-Message-State: AOAM533GIjFz1s6fgK3DzigYFEAH45iVEy28Rnz2vA3US46Om+6Bv1h8
+        /0fOGTFyfGBQlmGdgg11kJBkVQ==
+X-Google-Smtp-Source: ABdhPJzzrNDDUM06Vr4/E2y5sYnq1wUrhSBwgHDHzOZNGlz/fG05U62zoyb1FdFl0XlVuaTCkIKrPg==
+X-Received: by 2002:a63:516:: with SMTP id 22mr5143414pgf.316.1600809249779;
+        Tue, 22 Sep 2020 14:14:09 -0700 (PDT)
+Received: from google.com ([2620:0:1008:10:1ea0:b8ff:fe75:b885])
+        by smtp.gmail.com with ESMTPSA id r15sm15218636pgg.17.2020.09.22.14.14.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 22 Sep 2020 14:14:09 -0700 (PDT)
+Date:   Tue, 22 Sep 2020 14:14:04 -0700
+From:   Vipin Sharma <vipinsh@google.com>
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     thomas.lendacky@amd.com, pbonzini@redhat.com, tj@kernel.org,
+        lizefan@huawei.com, joro@8bytes.org, corbet@lwn.net,
+        brijesh.singh@amd.com, jon.grimm@amd.com, eric.vantassell@amd.com,
+        gingell@google.com, rientjes@google.com, kvm@vger.kernel.org,
+        x86@kernel.org, cgroups@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [RFC Patch 0/2] KVM: SVM: Cgroup support for SVM SEV ASIDs
+Message-ID: <20200922211404.GA4141897@google.com>
+References: <20200922004024.3699923-1-vipinsh@google.com>
+ <20200922014836.GA26507@linux.intel.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200922014836.GA26507@linux.intel.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This way we don't waste memory on VMs which don't use nesting
-virtualization even when the host enabled it for them.
+On Mon, Sep 21, 2020 at 06:48:38PM -0700, Sean Christopherson wrote:
+> On Mon, Sep 21, 2020 at 05:40:22PM -0700, Vipin Sharma wrote:
+> > Hello,
+> > 
+> > This patch series adds a new SEV controller for tracking and limiting
+> > the usage of SEV ASIDs on the AMD SVM platform.
+> > 
+> > SEV ASIDs are used in creating encrypted VM and lightweight sandboxes
+> > but this resource is in very limited quantity on a host.
+> > 
+> > This limited quantity creates issues like SEV ASID starvation and
+> > unoptimized scheduling in the cloud infrastructure.
+> > 
+> > SEV controller provides SEV ASID tracking and resource control
+> > mechanisms.
+> 
+> This should be genericized to not be SEV specific.  TDX has a similar
+> scarcity issue in the form of key IDs, which IIUC are analogous to SEV ASIDs
+> (gave myself a quick crash course on SEV ASIDs).  Functionally, I doubt it
+> would change anything, I think it'd just be a bunch of renaming.  The hardest
+> part would probably be figuring out a name :-).
+> 
+> Another idea would be to go even more generic and implement a KVM cgroup
+> that accounts the number of VMs of a particular type, e.g. legacy, SEV,
+> SEV-ES?, and TDX.  That has potential future problems though as it falls
+> apart if hardware every supports 1:MANY VMs:KEYS, or if there is a need to
+> account keys outside of KVM, e.g. if MKTME for non-KVM cases ever sees the
+> light of day.
 
-Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
----
- arch/x86/kvm/svm/nested.c | 42 ++++++++++++++++++++++++++++++
- arch/x86/kvm/svm/svm.c    | 55 ++++++++++++++++++++++-----------------
- arch/x86/kvm/svm/svm.h    |  6 +++++
- 3 files changed, 79 insertions(+), 24 deletions(-)
+I read about the TDX and its use of the KeyID for encrypting VMs. TDX
+has two kinds of KeyIDs private and shared.
 
-diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
-index 09417f5197410..dd13856818a03 100644
---- a/arch/x86/kvm/svm/nested.c
-+++ b/arch/x86/kvm/svm/nested.c
-@@ -467,6 +467,9 @@ int nested_svm_vmrun(struct vcpu_svm *svm)
- 
- 	vmcb12 = map.hva;
- 
-+	if (WARN_ON(!svm->nested.initialized))
-+		return 1;
-+
- 	if (!nested_vmcb_checks(svm, vmcb12)) {
- 		vmcb12->control.exit_code    = SVM_EXIT_ERR;
- 		vmcb12->control.exit_code_hi = 0;
-@@ -684,6 +687,45 @@ int nested_svm_vmexit(struct vcpu_svm *svm)
- 	return 0;
- }
- 
-+int svm_allocate_nested(struct vcpu_svm *svm)
-+{
-+	struct page *hsave_page;
-+
-+	if (svm->nested.initialized)
-+		return 0;
-+
-+	hsave_page = alloc_page(GFP_KERNEL_ACCOUNT | __GFP_ZERO);
-+	if (!hsave_page)
-+		return -ENOMEM;
-+
-+	svm->nested.hsave = page_address(hsave_page);
-+
-+	svm->nested.msrpm = svm_vcpu_init_msrpm();
-+	if (!svm->nested.msrpm)
-+		goto err_free_hsave;
-+
-+	svm->nested.initialized = true;
-+	return 0;
-+
-+err_free_hsave:
-+	__free_page(hsave_page);
-+	return -ENOMEM;
-+}
-+
-+void svm_free_nested(struct vcpu_svm *svm)
-+{
-+	if (!svm->nested.initialized)
-+		return;
-+
-+	svm_vcpu_free_msrpm(svm->nested.msrpm);
-+	svm->nested.msrpm = NULL;
-+
-+	__free_page(virt_to_page(svm->nested.hsave));
-+	svm->nested.hsave = NULL;
-+
-+	svm->nested.initialized = false;
-+}
-+
- /*
-  * Forcibly leave nested mode in order to be able to reset the VCPU later on.
-  */
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index 18f8af55e970a..d1265c95e2b0b 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -266,6 +266,7 @@ static int get_max_npt_level(void)
- int svm_set_efer(struct kvm_vcpu *vcpu, u64 efer)
- {
- 	struct vcpu_svm *svm = to_svm(vcpu);
-+	u64 old_efer = vcpu->arch.efer;
- 	vcpu->arch.efer = efer;
- 
- 	if (!npt_enabled) {
-@@ -276,9 +277,27 @@ int svm_set_efer(struct kvm_vcpu *vcpu, u64 efer)
- 			efer &= ~EFER_LME;
- 	}
- 
--	if (!(efer & EFER_SVME)) {
--		svm_leave_nested(svm);
--		svm_set_gif(svm, true);
-+	if ((old_efer & EFER_SVME) != (efer & EFER_SVME)) {
-+		if (!(efer & EFER_SVME)) {
-+			svm_leave_nested(svm);
-+			svm_set_gif(svm, true);
-+
-+			/*
-+			 * Free the nested guest state, unless we are in SMM.
-+			 * In this case we will return to the nested guest
-+			 * as soon as we leave SMM.
-+			 */
-+			if (!is_smm(&svm->vcpu))
-+				svm_free_nested(svm);
-+
-+		} else {
-+			int ret = svm_allocate_nested(svm);
-+
-+			if (ret) {
-+				vcpu->arch.efer = old_efer;
-+				return ret;
-+			}
-+		}
- 	}
- 
- 	svm->vmcb->save.efer = efer | EFER_SVME;
-@@ -610,7 +629,7 @@ static void set_msr_interception(u32 *msrpm, unsigned msr,
- 	msrpm[offset] = tmp;
- }
- 
--static u32 *svm_vcpu_init_msrpm(void)
-+u32 *svm_vcpu_init_msrpm(void)
- {
- 	int i;
- 	u32 *msrpm;
-@@ -630,7 +649,7 @@ static u32 *svm_vcpu_init_msrpm(void)
- 	return msrpm;
- }
- 
--static void svm_vcpu_free_msrpm(u32 *msrpm)
-+void svm_vcpu_free_msrpm(u32 *msrpm)
- {
- 	__free_pages(virt_to_page(msrpm), MSRPM_ALLOC_ORDER);
- }
-@@ -1204,7 +1223,6 @@ static int svm_create_vcpu(struct kvm_vcpu *vcpu)
- {
- 	struct vcpu_svm *svm;
- 	struct page *vmcb_page;
--	struct page *hsave_page;
- 	int err;
- 
- 	BUILD_BUG_ON(offsetof(struct vcpu_svm, vcpu) != 0);
-@@ -1215,13 +1233,9 @@ static int svm_create_vcpu(struct kvm_vcpu *vcpu)
- 	if (!vmcb_page)
- 		goto out;
- 
--	hsave_page = alloc_page(GFP_KERNEL_ACCOUNT | __GFP_ZERO);
--	if (!hsave_page)
--		goto error_free_vmcb_page;
--
- 	err = avic_init_vcpu(svm);
- 	if (err)
--		goto error_free_hsave_page;
-+		goto out;
- 
- 	/* We initialize this flag to true to make sure that the is_running
- 	 * bit would be set the first time the vcpu is loaded.
-@@ -1229,15 +1243,9 @@ static int svm_create_vcpu(struct kvm_vcpu *vcpu)
- 	if (irqchip_in_kernel(vcpu->kvm) && kvm_apicv_activated(vcpu->kvm))
- 		svm->avic_is_running = true;
- 
--	svm->nested.hsave = page_address(hsave_page);
--
- 	svm->msrpm = svm_vcpu_init_msrpm();
- 	if (!svm->msrpm)
--		goto error_free_hsave_page;
--
--	svm->nested.msrpm = svm_vcpu_init_msrpm();
--	if (!svm->nested.msrpm)
--		goto error_free_msrpm;
-+		goto error_free_vmcb_page;
- 
- 	svm->vmcb = page_address(vmcb_page);
- 	svm->vmcb_pa = __sme_set(page_to_pfn(vmcb_page) << PAGE_SHIFT);
-@@ -1249,10 +1257,6 @@ static int svm_create_vcpu(struct kvm_vcpu *vcpu)
- 
- 	return 0;
- 
--error_free_msrpm:
--	svm_vcpu_free_msrpm(svm->msrpm);
--error_free_hsave_page:
--	__free_page(hsave_page);
- error_free_vmcb_page:
- 	__free_page(vmcb_page);
- out:
-@@ -1278,10 +1282,10 @@ static void svm_free_vcpu(struct kvm_vcpu *vcpu)
- 	 */
- 	svm_clear_current_vmcb(svm->vmcb);
- 
-+	svm_free_nested(svm);
-+
- 	__free_page(pfn_to_page(__sme_clr(svm->vmcb_pa) >> PAGE_SHIFT));
- 	__free_pages(virt_to_page(svm->msrpm), MSRPM_ALLOC_ORDER);
--	__free_page(virt_to_page(svm->nested.hsave));
--	__free_pages(virt_to_page(svm->nested.msrpm), MSRPM_ALLOC_ORDER);
- }
- 
- static void svm_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
-@@ -3964,6 +3968,9 @@ static int svm_pre_leave_smm(struct kvm_vcpu *vcpu, const char *smstate)
- 					 gpa_to_gfn(vmcb12_gpa), &map) == -EINVAL)
- 				return 1;
- 
-+			if (svm_allocate_nested(svm))
-+				return 1;
-+
- 			ret = enter_svm_guest_mode(svm, vmcb12_gpa, map.hva);
- 			kvm_vcpu_unmap(&svm->vcpu, &map, true);
- 		}
-diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
-index 1e1842de0efe7..10453abc5bed3 100644
---- a/arch/x86/kvm/svm/svm.h
-+++ b/arch/x86/kvm/svm/svm.h
-@@ -96,6 +96,8 @@ struct svm_nested_state {
- 
- 	/* cache for control fields of the guest */
- 	struct vmcb_control_area ctl;
-+
-+	bool initialized;
- };
- 
- struct vcpu_svm {
-@@ -339,6 +341,8 @@ static inline bool gif_set(struct vcpu_svm *svm)
- 
- u32 svm_msrpm_offset(u32 msr);
- int svm_set_efer(struct kvm_vcpu *vcpu, u64 efer);
-+u32 *svm_vcpu_init_msrpm(void);
-+void svm_vcpu_free_msrpm(u32 *msrpm);
- void svm_set_cr0(struct kvm_vcpu *vcpu, unsigned long cr0);
- int svm_set_cr4(struct kvm_vcpu *vcpu, unsigned long cr4);
- void svm_flush_tlb(struct kvm_vcpu *vcpu);
-@@ -379,6 +383,8 @@ static inline bool nested_exit_on_nmi(struct vcpu_svm *svm)
- int enter_svm_guest_mode(struct vcpu_svm *svm, u64 vmcb_gpa,
- 			 struct vmcb *nested_vmcb);
- void svm_leave_nested(struct vcpu_svm *svm);
-+void svm_free_nested(struct vcpu_svm *svm);
-+int svm_allocate_nested(struct vcpu_svm *svm);
- int nested_svm_vmrun(struct vcpu_svm *svm);
- void nested_svm_vmloadsave(struct vmcb *from_vmcb, struct vmcb *to_vmcb);
- int nested_svm_vmexit(struct vcpu_svm *svm);
--- 
-2.26.2
+On AMD platform there are two types of ASIDs for encryption.
+1. SEV ASID - Normal runtime guest memory encryption.
+2. SEV-ES ASID - Extends SEV ASID by adding register state encryption with
+		 integrity.
 
+Both types of ASIDs have their own maximum value which is provisioned in
+the firmware
+
+So, we are talking about 4 different types of resources:
+1. AMD SEV ASID (implemented in this patch as sev.* files in SEV cgroup)
+2. AMD SEV-ES ASID (in future, adding files like sev_es.*)
+3. Intel TDX private KeyID
+4. Intel TDX shared KeyID
+
+TDX private KeyID is similar to SEV and SEV-ES ASID. I think coming up
+with the same name which can be used by both platforms will not be easy,
+and extensible with the future enhancements. This will get even more
+difficult if Arm also comes up with something similar but with different
+nuances.
+
+I like the idea of the KVM cgroup and when it is mounted it will have
+different files based on the hardware platform.
+
+1. KVM cgroup on AMD will have:
+sev.max & sev.current.
+sev_es.max & sev_es.current.
+
+2. KVM cgroup mounted on Intel:
+tdx_private_keys.max
+tdx_shared_keys.max
+
+The KVM cgroup can be used to have control files which are generic (no
+use case in my mind right now) and hardware platform specific files
+also.
