@@ -2,113 +2,169 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6B3E527461E
-	for <lists+kvm@lfdr.de>; Tue, 22 Sep 2020 18:05:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5B19A274624
+	for <lists+kvm@lfdr.de>; Tue, 22 Sep 2020 18:06:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726680AbgIVQFQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 22 Sep 2020 12:05:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52574 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726673AbgIVQFQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 22 Sep 2020 12:05:16 -0400
-Received: from mail-pg1-x544.google.com (mail-pg1-x544.google.com [IPv6:2607:f8b0:4864:20::544])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E9D8CC061755
-        for <kvm@vger.kernel.org>; Tue, 22 Sep 2020 09:05:14 -0700 (PDT)
-Received: by mail-pg1-x544.google.com with SMTP id k133so7568452pgc.7
-        for <kvm@vger.kernel.org>; Tue, 22 Sep 2020 09:05:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=3cb2ln5okcTwbkZwIHw36/uS8TyOTC34MG+GPkwSrZc=;
-        b=ket6MFsKGgeTKg06rAwU3VDAPgvifvWos8wL/PnPWPRsfN8itIg22pijPAXgFiUxD8
-         Fd7QHl+cLoi+AojYI/uzZLiSnkiKfZrV0aT1MEDwgG5wUcL5BAy0o6ZN9q6zf5x5EzEe
-         +vgACDfDyXI94Lso05jFSaPdPdjsYsl78/DZsmWSL+HdbBnaqlPM35rtfcVt5gLOelRw
-         Yo9TEUDsIhXgyB14PuoaFO8HxUGK2iYlLlmUDF49sNxPlVfj/fCxmT+ONyEa9FVYQg8v
-         qBO57Zf8p6I4kE7DkzGlQqZdpm45ZncnEFrK0CQkrt73NeKcuVR1Km00Fjp55T7bNcux
-         ++6w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=3cb2ln5okcTwbkZwIHw36/uS8TyOTC34MG+GPkwSrZc=;
-        b=mQUrKaNqhDwm6WGXN0MYyYoYo+X/7QVrCtNjclx29hFXxXgPaLScTeHyfy0JyePLUg
-         HPuQsfxwBy6FmU0dZF+xpLYUX1Aqt0Fb90psFI1jU9Ox7DkDvj9YIJiPCKQbsGaXHsCA
-         aWOM8n6siVcFD9DoYlmNB/3HIxGBMYEGhGWHvzJ+HIMa+jwbiNIk0BZGWf7p6yHeAwgC
-         excPwFKOLCByufiXyRg7qS0U4QlSEx9PqRd5B81h9Cd8ZbYjWXzrwS7E8d5iyXIjC8Q7
-         8v1+4Si6Fgo6ijbFKC8iOFUSRkBS1qe9hxaFSs68fapiqLglgB8gqoZwXivILJGGqOd5
-         GBkw==
-X-Gm-Message-State: AOAM533nzkSf7naImWKCq600c51omfrMeBzI9xCk6O+FhY9tGl/mgoo/
-        hpILfRxdnV0KYTM6dXA16OD/iA==
-X-Google-Smtp-Source: ABdhPJwDhQVCK5kMBC//E0Erf3yB57sWYMqIm4wY94GLY8PY9N2Jd3FgOvpyMgKERXA4LDx3m9cFUg==
-X-Received: by 2002:a17:902:bb85:b029:d2:21cf:dc77 with SMTP id m5-20020a170902bb85b02900d221cfdc77mr5483863pls.66.1600790714148;
-        Tue, 22 Sep 2020 09:05:14 -0700 (PDT)
-Received: from google.com ([2620:0:1008:10:1ea0:b8ff:fe75:b885])
-        by smtp.gmail.com with ESMTPSA id i1sm15473209pfk.21.2020.09.22.09.05.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 22 Sep 2020 09:05:13 -0700 (PDT)
-Date:   Tue, 22 Sep 2020 09:05:08 -0700
-From:   Vipin Sharma <vipinsh@google.com>
+        id S1726676AbgIVQGG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 22 Sep 2020 12:06:06 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:25962 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726583AbgIVQGE (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 22 Sep 2020 12:06:04 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1600790763;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=2PxdfcFiZl6sLx0ncb6aNHiRBqDwfAspKHL2qjnrSjE=;
+        b=EEfmJkXyRvLCYhuZAuAvSkxGI89oeoVCaUqk3Ao05Zt5ETNiOIcWKgJlTseK7x3m/Ew8Wf
+        gT8+ROEQ3CRW8PvbWA9iEuBJDS6R6wcFarrB5JBeKsO/iW1avx+rkmAjnDqtdfXtksSfTA
+        ZHjuLqaF1+787eZHgqqC2wXyMlij/bs=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-568-bIY8BwJaOsWby4N7PGD8AQ-1; Tue, 22 Sep 2020 12:05:58 -0400
+X-MC-Unique: bIY8BwJaOsWby4N7PGD8AQ-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BAE56109106B;
+        Tue, 22 Sep 2020 16:05:56 +0000 (UTC)
+Received: from starship (unknown [10.35.206.154])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 242F31001281;
+        Tue, 22 Sep 2020 16:05:52 +0000 (UTC)
+Message-ID: <57ca638581ce6e4db9b7c879f3aa7140cc5915c6.camel@redhat.com>
+Subject: Re: [PATCH v5 3/4] KVM: x86: allow kvm_x86_ops.set_efer to return a
+ value
+From:   Maxim Levitsky <mlevitsk@redhat.com>
 To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     Randy Dunlap <rdunlap@infradead.org>, thomas.lendacky@amd.com,
-        pbonzini@redhat.com, tj@kernel.org, lizefan@huawei.com,
-        joro@8bytes.org, corbet@lwn.net, brijesh.singh@amd.com,
-        jon.grimm@amd.com, eric.vantassell@amd.com, gingell@google.com,
-        rientjes@google.com, kvm@vger.kernel.org, x86@kernel.org,
-        cgroups@vger.kernel.org, linux-doc@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Dionna Glaze <dionnaglaze@google.com>,
-        Erdem Aktas <erdemaktas@google.com>
-Subject: Re: [RFC Patch 1/2] KVM: SVM: Create SEV cgroup controller.
-Message-ID: <20200922160508.GA4017872@google.com>
-References: <20200922004024.3699923-1-vipinsh@google.com>
- <20200922004024.3699923-2-vipinsh@google.com>
- <94c3407d-07ca-8eaf-4073-4a5e2a3fb7b8@infradead.org>
- <20200922012227.GA26483@linux.intel.com>
+Cc:     kvm@vger.kernel.org, Vitaly Kuznetsov <vkuznets@redhat.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Joerg Roedel <joro@8bytes.org>,
+        Ingo Molnar <mingo@redhat.com>,
+        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Jim Mattson <jmattson@google.com>,
+        linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>
+Date:   Tue, 22 Sep 2020 19:05:48 +0300
+In-Reply-To: <20200921154151.GA23807@linux.intel.com>
+References: <20200921131923.120833-1-mlevitsk@redhat.com>
+         <20200921131923.120833-4-mlevitsk@redhat.com>
+         <20200921154151.GA23807@linux.intel.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.3 (3.36.3-1.fc32) 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200922012227.GA26483@linux.intel.com>
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Sep 21, 2020 at 06:22:28PM -0700, Sean Christopherson wrote:
-> On Mon, Sep 21, 2020 at 06:04:04PM -0700, Randy Dunlap wrote:
-> > Hi,
+On Mon, 2020-09-21 at 08:41 -0700, Sean Christopherson wrote:
+> On Mon, Sep 21, 2020 at 04:19:22PM +0300, Maxim Levitsky wrote:
+> > This will be used later to return an error when setting this msr fails.
 > > 
-> > On 9/21/20 5:40 PM, Vipin Sharma wrote:
-> > > diff --git a/init/Kconfig b/init/Kconfig
-> > > index d6a0b31b13dc..1a57c362b803 100644
-> > > --- a/init/Kconfig
-> > > +++ b/init/Kconfig
-> > > @@ -1101,6 +1101,20 @@ config CGROUP_BPF
-> > >  	  BPF_CGROUP_INET_INGRESS will be executed on the ingress path of
-> > >  	  inet sockets.
-> > >  
-> > > +config CGROUP_SEV
-> > > +	bool "SEV ASID controller"
-> > > +	depends on KVM_AMD_SEV
-> > > +	default n
-> > > +	help
-> > > +	  Provides a controller for AMD SEV ASIDs. This controller limits and
-> > > +	  shows the total usage of SEV ASIDs used in encrypted VMs on AMD
-> > > +	  processors. Whenever a new encrypted VM is created using SEV on an
-> > > +	  AMD processor, this controller will check the current limit in the
-> > > +	  cgroup to which the task belongs and will deny the SEV ASID if the
-> > > +	  cgroup has already reached its limit.
-> > > +
-> > > +	  Say N if unsure.
+> > Note that we ignore this return value for qemu initiated writes to
+> > avoid breaking backward compatibility.
 > > 
-> > Something here (either in the bool prompt string or the help text) should
-> > let a reader know w.t.h. SEV means.
-> > 
-> > Without having to look in other places...
+> > Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+> > ---
+> > --- a/arch/x86/kvm/vmx/vmx.c
+> > +++ b/arch/x86/kvm/vmx/vmx.c
+> > @@ -2835,13 +2835,15 @@ static void enter_rmode(struct kvm_vcpu *vcpu)
+> >  	kvm_mmu_reset_context(vcpu);
+> >  }
+> >  
+> > -void vmx_set_efer(struct kvm_vcpu *vcpu, u64 efer)
+> > +int vmx_set_efer(struct kvm_vcpu *vcpu, u64 efer)
+> >  {
+> >  	struct vcpu_vmx *vmx = to_vmx(vcpu);
+> >  	struct shared_msr_entry *msr = find_msr_entry(vmx, MSR_EFER);
+> >  
+> > -	if (!msr)
+> > -		return;
+> > +	if (!msr) {
+> > +		/* Host doen't support EFER, nothing to do */
+> > +		return 0;
+> > +	}
 > 
-> ASIDs too.  I'd also love to see more info in the docs and/or cover letter
-> to explain why ASID management on SEV requires a cgroup.  I know what an
-> ASID is, and have a decent idea of how KVM manages ASIDs for legacy VMs, but
-> I know nothing about why ASIDs are limited for SEV and not legacy VMs.
+> Kernel style is to omit braces, even with a line comment.  Though I would
+> do something like so to avoid the question.
+I didn't knew this, but next time I'll will take this in account!
 
-Thanks for the feedback, I will add more details in the Kconfig and the
-documentation about SEV and ASID.
+> 
+> 	/* Nothing to do if hardware doesn't support EFER. */
+> 	if (!msr)
+> 		return 0
+I'll do this.
+
+> >  
+> >  	vcpu->arch.efer = efer;
+> >  	if (efer & EFER_LMA) {
+> > @@ -2853,6 +2855,7 @@ void vmx_set_efer(struct kvm_vcpu *vcpu, u64 efer)
+> >  		msr->data = efer & ~EFER_LME;
+> >  	}
+> >  	setup_msrs(vmx);
+> > +	return 0;
+> >  }
+> >  
+> >  #ifdef CONFIG_X86_64
+> > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> > index b6c67ab7c4f34..cab189a71cbb7 100644
+> > --- a/arch/x86/kvm/x86.c
+> > +++ b/arch/x86/kvm/x86.c
+> > @@ -1456,6 +1456,7 @@ static int set_efer(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+> >  {
+> >  	u64 old_efer = vcpu->arch.efer;
+> >  	u64 efer = msr_info->data;
+> > +	int r;
+> >  
+> >  	if (efer & efer_reserved_bits)
+> >  		return 1;
+> > @@ -1472,7 +1473,12 @@ static int set_efer(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+> >  	efer &= ~EFER_LMA;
+> >  	efer |= vcpu->arch.efer & EFER_LMA;
+> >  
+> > -	kvm_x86_ops.set_efer(vcpu, efer);
+> > +	r = kvm_x86_ops.set_efer(vcpu, efer);
+> > +
+> > +	if (r && !msr_info->host_initiated) {
+> 
+> I get the desire to not break backwards compatibility, but this feels all
+> kinds of wrong, and potentially dangerous as it will KVM in a mixed state.
+> E.g. vcpu->arch.efer will show that nSVM is enabled, but SVM will not have
+> the necessary tracking state allocated.  That could lead to a userspace
+> triggerable #GP/panic.
+Actually I take care to restore the vcpu->arch.efer to its old value
+if an error happens, so in case of failure everything would indicate
+that nothing happened, and the offending EFER write can even be retried,
+however since we agreed that .set_efer will only fail with negative
+errors like -ENOMEM, I agree that there is no reason to treat userspace
+writes differently. This code is actually a leftover from previous version,
+which I should have removed.
+
+I'll send a new version soon.
+
+Thanks for the review,
+	Best regards,
+		Maxim Levitsky
+
+> 
+> Is ignoring OOM scenario really considered backwards compability?  The VM
+> is probably hosted if KVM returns -ENOMEM, e.g. a sophisticated userspace
+> stack could trigger OOM killer to free memory and resume the VM.  On the
+> other hand, the VM is most definitely hosed if KVM ignores the error and
+> puts itself into an invalid state.
+> 
+> > +		WARN_ON(r > 0);
+> > +		return r;
+> > +	}
+> >  
+> >  	/* Update reserved bits */
+> >  	if ((efer ^ old_efer) & EFER_NX)
+> > -- 
+> > 2.26.2
+> > 
+
+
