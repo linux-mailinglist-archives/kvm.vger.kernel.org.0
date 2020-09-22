@@ -2,90 +2,99 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E7430274357
-	for <lists+kvm@lfdr.de>; Tue, 22 Sep 2020 15:39:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4BF1427436D
+	for <lists+kvm@lfdr.de>; Tue, 22 Sep 2020 15:43:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726746AbgIVNj3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 22 Sep 2020 09:39:29 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:54173 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726662AbgIVNj2 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 22 Sep 2020 09:39:28 -0400
+        id S1726593AbgIVNnm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 22 Sep 2020 09:43:42 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:40183 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726473AbgIVNnl (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 22 Sep 2020 09:43:41 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1600781967;
+        s=mimecast20190719; t=1600782220;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=kOI1WpHi1dirYs0ZwrGaNH1l5VP48PNKICMJarwnWG8=;
-        b=WqYtmV5RuBRi85boOgYHJvZV/Y5orpiljDrTenDK0x79mrtQan9Eu8c5SCM2smVXBKwVma
-        Y7EzyvujnMaIbkq5j+eCKBqecP9YAUmFxV27t50+48hnIljmuBsvgZpZ1FtC3tdrZbIaxa
-        jPcxZYwPOJNX9K0eFCPwcCWPGSz7xwE=
+        bh=+RjqZZpcz133eDPIDFweleVoraiJQPcRg1Z09eullZA=;
+        b=MEBZKWzFW0zKCtOZd/Lu5SIddp+tKAwrRtCEF7MunXV9djDDmn5iIJjD0uue46JnUpySRD
+        nnTZcO24mAAAGhXtSrfgCQo7NKzxnHEaiMfnp/QSgf9FisH3MTz11bQ+yhtxLagTD15Sq+
+        bwiaydZCO+shSVP7F5aW3zPqTHFbC1s=
 Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
  [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-294-AUtZNnGuNmOY28aKml3Yrg-1; Tue, 22 Sep 2020 09:39:25 -0400
-X-MC-Unique: AUtZNnGuNmOY28aKml3Yrg-1
-Received: by mail-wm1-f70.google.com with SMTP id t8so585366wmj.6
-        for <kvm@vger.kernel.org>; Tue, 22 Sep 2020 06:39:24 -0700 (PDT)
+ us-mta-579-XQPWgS5ANNyuJGKuU51UXA-1; Tue, 22 Sep 2020 09:43:38 -0400
+X-MC-Unique: XQPWgS5ANNyuJGKuU51UXA-1
+Received: by mail-wm1-f70.google.com with SMTP id a25so597215wmb.2
+        for <kvm@vger.kernel.org>; Tue, 22 Sep 2020 06:43:38 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=kOI1WpHi1dirYs0ZwrGaNH1l5VP48PNKICMJarwnWG8=;
-        b=H/VPsYbjrNX0gdN52gMAv6lCl7zdqNrwCUKYhNNre6yBqFMEcGwWm8cCjyUn9lkiDJ
-         FVb/yaXGreAsnIqpt28qYD/fyzaM7QvAiScSxXl4FuCxCMISOgXxXCy4u+yfk3XtG7q2
-         qBF8BUyz/Br7uWs697OhrFGgmRVtW/kOkh9jB0SssYd/z2H1HI6twgg/df/ColsMotcI
-         ZmOmjq0i3TzyXOGwmRc8eYcAwwcYS0v+WETYd+Do3m+hHzYOHTNaeEe3YHZv5SvA/Adx
-         pOph6s4kXylpG6srimP67qTig7u7zOvSh64CjVk46nw/a9xBqrUY8zIy/vfh2k3cfnKS
-         fxpA==
-X-Gm-Message-State: AOAM532vDN+YW6CQSF4zCOwOk2t6KNmxrvGk8QQn875ntTA/Lya4zULN
-        LEJZQ/wsbkLU9Ah/dLRuZW4Qb1wRWqwR02PAR1JP6HTJYkRkgUII4aKHp4GKvOMVUV6KUHPxmTs
-        0SDHSIjtL37KN
-X-Received: by 2002:adf:f042:: with SMTP id t2mr5210226wro.385.1600781963809;
-        Tue, 22 Sep 2020 06:39:23 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwr0vCFA8qgUEqKKr5lLX6Qwfl1aK55d38FwPyZh9anbVWG3qPboRxwPNc0l5Hj4TOj9QOH1w==
-X-Received: by 2002:adf:f042:: with SMTP id t2mr5210193wro.385.1600781963572;
-        Tue, 22 Sep 2020 06:39:23 -0700 (PDT)
+        bh=+RjqZZpcz133eDPIDFweleVoraiJQPcRg1Z09eullZA=;
+        b=iJxI7Cj2ob/4PuhgmsM7chaobr5LpcFoVN+sXbmbMSDJ7MMCQUPwYo5HeWA9OjZh6m
+         khMF1chPMa+lS4eCRRJP8oRcsAXcqiw7gkjtZqPyZ0wGWMzlUX1J69VnGUs2NnU5ifBs
+         yNj6O14e3qpOLPTpKAhV5V3v+9dnaJjeCUOTb6evyHS4o1PIXOqLLIbA6O0ObfGie5+B
+         55tw+O5Nml6hf6jOoKwryCKYehhC/zRvvpFtbpAJWPtng9Q+NrRpfafxl0KWKbhK4rKl
+         xzJvxpeIxL0mrSZi1Dyk3v+ZlK6udRT/7vJdtpa3x9WvNfWl2YFswmT993u1jyi6ymMq
+         qFjg==
+X-Gm-Message-State: AOAM530DZDScs3n+izlA+nDtBWxEaiTzRhrYNHc53pLtsJZSBG64WiRi
+        jVoj8heeHUE1o60WiqCkFa23DH2C95qcwO4OUREBd0zCPhjej4CYB8fA6uiMJQ+ZGSBRo6bigVq
+        mhu4CH0KpwoWh
+X-Received: by 2002:a5d:4811:: with SMTP id l17mr3442598wrq.252.1600782217720;
+        Tue, 22 Sep 2020 06:43:37 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyglyepT72u0u8qRUeIVHeaIrPCxmCf6cGs6FlYed7irsbKA367/aa58zjJODiu1leT5jKnpg==
+X-Received: by 2002:a5d:4811:: with SMTP id l17mr3442574wrq.252.1600782217526;
+        Tue, 22 Sep 2020 06:43:37 -0700 (PDT)
 Received: from ?IPv6:2001:b07:6468:f312:ec2c:90a9:1236:ebc6? ([2001:b07:6468:f312:ec2c:90a9:1236:ebc6])
-        by smtp.gmail.com with ESMTPSA id h1sm25477745wrx.33.2020.09.22.06.39.21
+        by smtp.gmail.com with ESMTPSA id l10sm25008213wru.59.2020.09.22.06.43.36
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 22 Sep 2020 06:39:22 -0700 (PDT)
-Subject: Re: [PATCH v6 04/12] KVM: SVM: Modify intercept_exceptions to generic
- intercepts
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     Babu Moger <babu.moger@amd.com>, vkuznets@redhat.com,
-        jmattson@google.com, wanpengli@tencent.com, kvm@vger.kernel.org,
-        joro@8bytes.org, x86@kernel.org, linux-kernel@vger.kernel.org,
-        mingo@redhat.com, bp@alien8.de, hpa@zytor.com, tglx@linutronix.de
-References: <159985237526.11252.1516487214307300610.stgit@bmoger-ubuntu>
- <159985250037.11252.1361972528657052410.stgit@bmoger-ubuntu>
- <1654dd89-2f15-62b6-d3a7-53f3ec422dd0@redhat.com>
- <20200914150627.GB6855@sjchrist-ice>
+        Tue, 22 Sep 2020 06:43:36 -0700 (PDT)
+Subject: Re: [PATCH] KVM: SVM: Analyze is_guest_mode() in svm_vcpu_run()
+To:     Krish Sadhukhan <krish.sadhukhan@oracle.com>,
+        Wanpeng Li <kernellwp@gmail.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>
+References: <1600066548-4343-1-git-send-email-wanpengli@tencent.com>
+ <b39b1599-9e1e-8ef6-1b97-a4910d9c3784@oracle.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <e74fd79c-c3d0-5f9d-c01d-5d6f2c660927@redhat.com>
-Date:   Tue, 22 Sep 2020 15:39:21 +0200
+Message-ID: <91baab6a-3007-655a-5c59-6425473d2e33@redhat.com>
+Date:   Tue, 22 Sep 2020 15:43:35 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <20200914150627.GB6855@sjchrist-ice>
+In-Reply-To: <b39b1599-9e1e-8ef6-1b97-a4910d9c3784@oracle.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 14/09/20 17:06, Sean Christopherson wrote:
->> I think these should take a vector instead, and add 64 in the functions.
+On 14/09/20 22:43, Krish Sadhukhan wrote:
+>>
 > 
-> And "s/int bit/u32 vector" + BUILD_BUG_ON(vector > 32)?
+> Not related to your changes, but should we get rid of the variable
+> 'exit_fastpath' and just do,
+> 
+>         return svm_exit_handler_fastpath(vcpu);
+> 
+> It seems the variable isn't used anywhere else and svm_vcpu_run()
+> doesn't return from anywhere else either.
 
-Not sure if we can assume it to be constant, but WARN_ON_ONCE is good
-enough as far as performance is concerned.  The same int->u32 +
-WARN_ON_ONCE should be done in patch 1.
+Yes (also because vmx will do the same once we can push
+EXIT_FASTPATH_REENTER_GUEST handling up to vcpu_enter_guest)...
 
-Thanks for the review!
+> Also, svm_exit_handlers_fastpath() doesn't have any other caller. 
+> Should we get rid of it as well ?
+
+... and no, because svm_vcpu_run is a very large function and therefore
+it's better to keep its flow streamlined.
 
 Paolo
 
