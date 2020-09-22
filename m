@@ -2,130 +2,90 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 586CB2744B4
-	for <lists+kvm@lfdr.de>; Tue, 22 Sep 2020 16:51:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3F4402744C6
+	for <lists+kvm@lfdr.de>; Tue, 22 Sep 2020 16:55:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726633AbgIVOvg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 22 Sep 2020 10:51:36 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:26582 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726566AbgIVOvf (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 22 Sep 2020 10:51:35 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1600786294;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=T0knrs6tVgaSNV2s60uJYONuqcjbeUZokV4VNtZNMLk=;
-        b=JsyLtEoV37BxridP874nENTSdhpXq+Oidvefdrzom8bxZERyyWd6nepYGa8s0udtufo4pp
-        sMjt+Nmrf78ElzL0hcqs/fAQR10j2k8nDclUMIL8y1cl40SbwMOf2g8xsdVbzZgJF2bADS
-        7OefGNjvGUJkOSVh08ObjOoAKBjinpE=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-28-YlIhTFmHMzazgkR6wdX0gQ-1; Tue, 22 Sep 2020 10:51:21 -0400
-X-MC-Unique: YlIhTFmHMzazgkR6wdX0gQ-1
-Received: by mail-wr1-f71.google.com with SMTP id i10so7500505wrq.5
-        for <kvm@vger.kernel.org>; Tue, 22 Sep 2020 07:51:20 -0700 (PDT)
+        id S1726645AbgIVOzF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 22 Sep 2020 10:55:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41724 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726566AbgIVOzF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 22 Sep 2020 10:55:05 -0400
+Received: from mail-ej1-x641.google.com (mail-ej1-x641.google.com [IPv6:2a00:1450:4864:20::641])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 501BBC061755;
+        Tue, 22 Sep 2020 07:55:05 -0700 (PDT)
+Received: by mail-ej1-x641.google.com with SMTP id u21so23373072eja.2;
+        Tue, 22 Sep 2020 07:55:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=Gl5ZXaZZ9fFMo8zIy0Ez6Sy7ZC3ZaHBolK1ZtfIsQ1M=;
+        b=MITmrFgBfmfYhmnGnMZGY2k0h3KBiqya6FX1qg6lLXkJHFeon70tFYOkIBYQuX/ek0
+         SDdzhd4zicKnUgjB/Pj7uKYWvrf8GP8Jy+IiBTbFZy2t+aW4WaadmFqHhtUGf1Pz/1XU
+         QLsUjySBl5TgDiVlbkzww0qA2NZZtWHMhNNn8eWcc7XgkvIqxxk4ZogpWTOzgbbTHaya
+         kEDsIAaLE9dtmaFpmdYtmXx2l8AtkZ9RyIrl5qw2BXW1bqckbNPEyvE7193IYZO0yzBA
+         xFRRdI63czmhG9GIq7jNRMZ5szFLHkCQR6DyNoAlqo/ddw4N63Mi3daas2BWohMWMKKy
+         a0kA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=T0knrs6tVgaSNV2s60uJYONuqcjbeUZokV4VNtZNMLk=;
-        b=CppkjHkG2ac1UBhhEJ54pdRRn4tq4bSMe4aJ6leVpvNmi9fMfJq7o7D1fS3SP2F5yO
-         Ootn9JwauICq52xPxaFIM1gTql4yOyUwRf6CX8xdDvsyIwMveajnKKjzL0I2ee9Y+N3P
-         EjvSqZxCFwiXhJNKV9HvR5EOjBiFi54U8zSP9Wo/voL+0ILI+ZQyqMLCIxQ8hkHu7u+G
-         G3afq34o1kvIxEsIKMTUJZmWH4jhouH8cMvcfPjJdbCjUXfYukKiXWVLObZvNOipN0cc
-         ukrPD0JVYoZ9uzRRGTDiIlrlt0ZJy8V/iTmZbI02haDBINxDkVKADBHBNVaKmBFZva9p
-         yamg==
-X-Gm-Message-State: AOAM532w8UHhGUHlyERZOjGO3mGYD1uMBzG+PNaAwaFMziDeVaCTMan4
-        tnO5v15VFi+HydjM7tWJgx89DuEUBJJpff6XwZSAMwEZT3NKZwidAvpQAcPu0t42WVm8+Q8GcnF
-        PMN0Ybjr19AAq
-X-Received: by 2002:a5d:69cd:: with SMTP id s13mr5588734wrw.379.1600786279744;
-        Tue, 22 Sep 2020 07:51:19 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzs7WblyEvgj7BVLIvdaiOHYDOg2/vFwXgvs7E6+qd824PKlhWaSBoYJkhPPjST8YhCmThLyg==
-X-Received: by 2002:a5d:69cd:: with SMTP id s13mr5588709wrw.379.1600786279490;
-        Tue, 22 Sep 2020 07:51:19 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:ec2c:90a9:1236:ebc6? ([2001:b07:6468:f312:ec2c:90a9:1236:ebc6])
-        by smtp.gmail.com with ESMTPSA id k22sm28532833wrd.29.2020.09.22.07.51.18
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 22 Sep 2020 07:51:19 -0700 (PDT)
-Subject: Re: [kvm-unit-tests PATCH v2 10/10] travis.yml: Add x86 build with
- clang 10
-To:     Roman Bolshakov <r.bolshakov@yadro.com>,
-        Thomas Huth <thuth@redhat.com>
-Cc:     kvm@vger.kernel.org
-References: <20200901085056.33391-1-r.bolshakov@yadro.com>
- <20200901085056.33391-11-r.bolshakov@yadro.com>
- <fb94aa98-f586-a069-20f8-42852f150c0b@redhat.com>
- <20200914144502.GB52559@SPB-NB-133.local>
- <4d20fbce-d247-abf4-3ceb-da2c0d48fc50@redhat.com>
- <20200915155959.GF52559@SPB-NB-133.local>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <788b7191-6987-9399-f352-2e661255157e@redhat.com>
-Date:   Tue, 22 Sep 2020 16:51:18 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=Gl5ZXaZZ9fFMo8zIy0Ez6Sy7ZC3ZaHBolK1ZtfIsQ1M=;
+        b=SYvHMfdrQxE9Ns/jsz2uvkH/heYrGGvyzezQkDQ7dv8RJQ3lj5+UTvVcOHCaWVuMKt
+         XDENd/ZvZD/BnfxdOuQi6OnK/FGkucTKCv3S03AFQpn2nKQWNBHQYnpHOyhczft+yX9x
+         hL4WR76AdmlmludPzTqdo2n6/1q6IsJM5oggA35TlHC3j/Dk45RsJyLfOtYn1Tbb6jsc
+         DkaVZ330j+nDcDzcLpnBeXF+tNUcaSzcX+2TZV4nPNrdv7sPansRCtTD0gsEXDgW/nJ8
+         2d3aXKjnLxyRymI1PsBRDY6n6LilIdUc6xqqorjFleZSmwXvB+Fu4PoVt4AVHr9+3IyO
+         MCVw==
+X-Gm-Message-State: AOAM530mJx5LIJXjJRyrPKH7NAY8dTN7Nq2AJzuP6VOiUdFS1ktImh8l
+        X/n2oj+sN/7bjBrv5ZM+dEpQZLYUkMOa8CFJmA==
+X-Google-Smtp-Source: ABdhPJz5+TK8TkZ1Q9qcax0p9/fBtRJTu3E2QxTRf+03Q3SU5LceAUYh/1HKxXDiVDlMJY9ngdRSbJMQzs7JQnUf/dk=
+X-Received: by 2002:a17:906:7e42:: with SMTP id z2mr5323385ejr.206.1600786504001;
+ Tue, 22 Sep 2020 07:55:04 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200915155959.GF52559@SPB-NB-133.local>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+References: <1600066548-4343-1-git-send-email-wanpengli@tencent.com>
+ <b39b1599-9e1e-8ef6-1b97-a4910d9c3784@oracle.com> <91baab6a-3007-655a-5c59-6425473d2e33@redhat.com>
+In-Reply-To: <91baab6a-3007-655a-5c59-6425473d2e33@redhat.com>
+From:   Haiwei Li <lihaiwei.kernel@gmail.com>
+Date:   Tue, 22 Sep 2020 22:54:52 +0800
+Message-ID: <CAB5KdOaV81ro=F8BiuFfR_OWrY1+AJ4QngSOXOZt7vH_bXPR5A@mail.gmail.com>
+Subject: Re: [PATCH] KVM: SVM: Analyze is_guest_mode() in svm_vcpu_run()
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Krish Sadhukhan <krish.sadhukhan@oracle.com>,
+        Wanpeng Li <kernellwp@gmail.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 15/09/20 17:59, Roman Bolshakov wrote:
-> So, a workaround for that could be adding '-Wl,--build-id=none' to the
-> makefile rule for realmode.elf. Then multiboot magic is placed properly
-> at 0x4000 instead of 0x4030. Unfortunately it doesn't help with the
-> test :-)
+On 20/9/22 21:43, Paolo Bonzini wrote:
+> On 14/09/20 22:43, Krish Sadhukhan wrote:
+>>>
+>>
+>> Not related to your changes, but should we get rid of the variable
+>> 'exit_fastpath' and just do,
+>>
+>>          return svm_exit_handler_fastpath(vcpu);
+>>
+>> It seems the variable isn't used anywhere else and svm_vcpu_run()
+>> doesn't return from anywhere else either.
+>
+> Yes (also because vmx will do the same once we can push
+> EXIT_FASTPATH_REENTER_GUEST handling up to vcpu_enter_guest)...
 
-Heh, weird.  I also tried adding
+Hi, Paolo
 
-    /DISCARD/ : { *(.note.gnu.build-id) }
+I have sent a patch to do this,
 
-to the linker script and I got a very helpful (not) linker warning:
+https://lore.kernel.org/kvm/20200915113033.61817-1-lihaiwei.kernel@gmail.com/
 
-/usr/bin/ld: warning: .note.gnu.build-id section discarded, --build-id ignored.
+Thanks.
 
-... except that the --build-id was placed not by me but rather by gcc.
-So we should probably simplify things doing this:
-
-diff --git a/x86/Makefile.common b/x86/Makefile.common
-index 090ce22..10c8a42 100644
---- a/x86/Makefile.common
-+++ b/x86/Makefile.common
-@@ -69,8 +69,8 @@ test_cases: $(tests-common) $(tests)
- $(TEST_DIR)/%.o: CFLAGS += -std=gnu99 -ffreestanding -I $(SRCDIR)/lib -I $(SRCDIR)/lib/x86 -I lib
- 
- $(TEST_DIR)/realmode.elf: $(TEST_DIR)/realmode.o
--	$(CC) -m32 -nostdlib -o $@ -Wl,-m,elf_i386 \
--	      -Wl,-T,$(SRCDIR)/$(TEST_DIR)/realmode.lds $^
-+	$(LD) -o $@ -m elf_i386 \
-+	      -T $(SRCDIR)/$(TEST_DIR)/realmode.lds $^
- 
- $(TEST_DIR)/realmode.o: bits = 32
- 
-diff --git a/x86/realmode.lds b/x86/realmode.lds
-index 0ed3063..3220c19 100644
---- a/x86/realmode.lds
-+++ b/x86/realmode.lds
-@@ -1,5 +1,6 @@
- SECTIONS
- {
-+    /DISCARD/ : { *(.note.gnu.build-id) }
-     . = 16K;
-     stext = .;
-     .text : { *(.init) *(.text) }
-
-which I will squash in your patch 3.
-
-But the main issue is that clang does not support .code16gcc so it
-writes 32-bit code that is run in 16-bit mode.  It'd be a start to
-use -m16 instead of -m32, but then I think it still miscompiles the
-(32-bit) code between "start" and the .code16gcc label.
-
-Paolo
-
+     Haiwei
