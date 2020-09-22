@@ -2,158 +2,117 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5247927464E
-	for <lists+kvm@lfdr.de>; Tue, 22 Sep 2020 18:14:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4D06C274675
+	for <lists+kvm@lfdr.de>; Tue, 22 Sep 2020 18:20:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726714AbgIVQOD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 22 Sep 2020 12:14:03 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:23757 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726686AbgIVQOD (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 22 Sep 2020 12:14:03 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1600791241;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=i+fhWxS4Uy1qIr1hOIXhMJfQNFY0bG4QU0yaQGULSxo=;
-        b=idrm1a3Et8FEBd1uNMCxCblhLCzICwODof1v5qXNANsP2s3ZveVM0R1EtOgNKiA5D2j97k
-        +veh+3glVTmOzE6yjCvwbJzB/wXZ2EvuvVNi/D/czDK/BcXvb9R6b541y1YELGqSwy5CmI
-        iPO/RcYi8eKx8IWzyozhTW4/0r2v54A=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-447-tUo3N-E1Nk-u8r_-0JjVoQ-1; Tue, 22 Sep 2020 12:13:56 -0400
-X-MC-Unique: tUo3N-E1Nk-u8r_-0JjVoQ-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        id S1726694AbgIVQUb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 22 Sep 2020 12:20:31 -0400
+Received: from mail.kernel.org ([198.145.29.99]:49832 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726652AbgIVQUb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 22 Sep 2020 12:20:31 -0400
+Received: from localhost (83-86-74-64.cable.dynamic.v4.ziggo.nl [83.86.74.64])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C6367802B45;
-        Tue, 22 Sep 2020 16:13:54 +0000 (UTC)
-Received: from starship (unknown [10.35.206.154])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 5F22A78810;
-        Tue, 22 Sep 2020 16:13:51 +0000 (UTC)
-Message-ID: <83dc0dc731ba7348af05a5124da3435024185594.camel@redhat.com>
-Subject: Re: [PATCH v5 2/4] KVM: x86: report negative values from wrmsr to
- userspace
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     kvm@vger.kernel.org, Vitaly Kuznetsov <vkuznets@redhat.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Joerg Roedel <joro@8bytes.org>,
-        Ingo Molnar <mingo@redhat.com>,
-        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Jim Mattson <jmattson@google.com>,
-        linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>
-Date:   Tue, 22 Sep 2020 19:13:49 +0300
-In-Reply-To: <20200921160812.GA23989@linux.intel.com>
-References: <20200921131923.120833-1-mlevitsk@redhat.com>
-         <20200921131923.120833-3-mlevitsk@redhat.com>
-         <20200921160812.GA23989@linux.intel.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.3 (3.36.3-1.fc32) 
+        by mail.kernel.org (Postfix) with ESMTPSA id 2CF762086A;
+        Tue, 22 Sep 2020 16:20:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1600791630;
+        bh=+Ol2f1a6qqykB0WuAVaSfN9rPddftBcmlZmKsY7qEsM=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=ElzeL8r99SINPN1iYglJvtw8zwPXCnWvUa5AZcw0aXgRqrDmb1gYVtvCIGR7TF+aF
+         ZUd3hlQkVWYKlP83M46eatNhLakip05MWAozoztNe8HkFHhAT7C2b74f+rUboa6KTu
+         oMjdFYMzc5bQYMVaY/i76jH6BWRTHtQrcso7PCVY=
+Date:   Tue, 22 Sep 2020 18:20:49 +0200
+From:   Greg KH <gregkh@linuxfoundation.org>
+To:     "Paraschiv, Andra-Irina" <andraprs@amazon.com>
+Cc:     linux-kernel <linux-kernel@vger.kernel.org>,
+        Anthony Liguori <aliguori@amazon.com>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Colm MacCarthaigh <colmmacc@amazon.com>,
+        David Duncan <davdunc@amazon.com>,
+        Bjoern Doebel <doebel@amazon.de>,
+        David Woodhouse <dwmw@amazon.co.uk>,
+        Frank van der Linden <fllinden@amazon.com>,
+        Alexander Graf <graf@amazon.de>, Karen Noel <knoel@redhat.com>,
+        Martin Pohlack <mpohlack@amazon.de>,
+        Matt Wilson <msw@amazon.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Balbir Singh <sblbir@amazon.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Stewart Smith <trawets@amazon.com>,
+        Uwe Dannowski <uwed@amazon.de>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        kvm <kvm@vger.kernel.org>,
+        ne-devel-upstream <ne-devel-upstream@amazon.com>
+Subject: Re: [PATCH v9 14/18] nitro_enclaves: Add Kconfig for the Nitro
+ Enclaves driver
+Message-ID: <20200922162049.GA2299429@kroah.com>
+References: <20200911141141.33296-1-andraprs@amazon.com>
+ <20200911141141.33296-15-andraprs@amazon.com>
+ <20200914155913.GB3525000@kroah.com>
+ <c3a33dcf-794c-31ef-ced5-4f87ba21dd28@amazon.com>
+ <d7eaac0d-8855-ca83-6b10-ab4f983805a2@amazon.com>
+ <358e7470-b841-52fe-0532-e1154ef0e93b@amazon.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <358e7470-b841-52fe-0532-e1154ef0e93b@amazon.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 2020-09-21 at 09:08 -0700, Sean Christopherson wrote:
-> On Mon, Sep 21, 2020 at 04:19:21PM +0300, Maxim Levitsky wrote:
-> > This will allow us to make some MSR writes fatal to the guest
-> > (e.g when out of memory condition occurs)
+On Tue, Sep 22, 2020 at 05:13:02PM +0300, Paraschiv, Andra-Irina wrote:
+> 
+> 
+> On 21/09/2020 15:34, Paraschiv, Andra-Irina wrote:
 > > 
-> > Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
-> > ---
-> >  arch/x86/kvm/emulate.c | 7 +++++--
-> >  arch/x86/kvm/x86.c     | 5 +++--
-> >  2 files changed, 8 insertions(+), 4 deletions(-)
 > > 
-> > diff --git a/arch/x86/kvm/emulate.c b/arch/x86/kvm/emulate.c
-> > index 1d450d7710d63..d855304f5a509 100644
-> > --- a/arch/x86/kvm/emulate.c
-> > +++ b/arch/x86/kvm/emulate.c
-> > @@ -3702,13 +3702,16 @@ static int em_dr_write(struct x86_emulate_ctxt *ctxt)
-> >  static int em_wrmsr(struct x86_emulate_ctxt *ctxt)
-> >  {
-> >  	u64 msr_data;
-> > +	int ret;
-> >  
-> >  	msr_data = (u32)reg_read(ctxt, VCPU_REGS_RAX)
-> >  		| ((u64)reg_read(ctxt, VCPU_REGS_RDX) << 32);
-> > -	if (ctxt->ops->set_msr(ctxt, reg_read(ctxt, VCPU_REGS_RCX), msr_data))
-> > +
-> > +	ret = ctxt->ops->set_msr(ctxt, reg_read(ctxt, VCPU_REGS_RCX), msr_data);
-> > +	if (ret > 0)
-> >  		return emulate_gp(ctxt, 0);
-> >  
-> > -	return X86EMUL_CONTINUE;
-> > +	return ret < 0 ? X86EMUL_UNHANDLEABLE : X86EMUL_CONTINUE;
-> >  }
-> >  
-> >  static int em_rdmsr(struct x86_emulate_ctxt *ctxt)
-> > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> > index 063d70e736f7f..b6c67ab7c4f34 100644
-> > --- a/arch/x86/kvm/x86.c
-> > +++ b/arch/x86/kvm/x86.c
-> > @@ -1612,15 +1612,16 @@ int kvm_emulate_wrmsr(struct kvm_vcpu *vcpu)
-> >  {
-> >  	u32 ecx = kvm_rcx_read(vcpu);
-> >  	u64 data = kvm_read_edx_eax(vcpu);
-> > +	int ret = kvm_set_msr(vcpu, ecx, data);
-> >  
-> > -	if (kvm_set_msr(vcpu, ecx, data)) {
-> > +	if (ret > 0) {
-> >  		trace_kvm_msr_write_ex(ecx, data);
-> >  		kvm_inject_gp(vcpu, 0);
-> >  		return 1;
-> >  	}
-> >  
-> >  	trace_kvm_msr_write(ecx, data);
-> 
-> Tracing the access as non-faulting feels wrong.  The WRMSR has not completed,
-> e.g. if userspace cleanly handles -ENOMEM and restarts the guest, KVM would
-> trace the WRMSR twice.
-
-I guess you are right. Since in this case we didn't actually executed the
-instruction (exception can also be thought as an execution of an instruction,
-since it leads to the exception handler), but in
-this case we just fail
-and let the userspace do something so we can restart from the same point again.
- 
-So I'll go with your suggestion.
-
-Thanks for the review,
-	Best regards,
-		Maxim Levitsky
-
-> 
-> What about:
-> 
-> 	int ret = kvm_set_msr(vcpu, ecx, data);
-> 
-> 	if (ret < 0)
-> 		return ret;
-> 
-> 	if (ret) {
-> 		trace_kvm_msr_write_ex(ecx, data);
-> 		kvm_inject_gp(vcpu, 0);
-> 		return 1;
-> 	}
-> 
-> 	trace_kvm_msr_write(ecx, data);
-> 	return kvm_skip_emulated_instruction(vcpu);
-> 
-> > -	return kvm_skip_emulated_instruction(vcpu);
-> > +	return ret < 0 ? ret : kvm_skip_emulated_instruction(vcpu);
-> >  }
-> >  EXPORT_SYMBOL_GPL(kvm_emulate_wrmsr);
-> >  
-> > -- 
-> > 2.26.2
+> > On 14/09/2020 20:23, Paraschiv, Andra-Irina wrote:
+> > > 
+> > > 
+> > > On 14/09/2020 18:59, Greg KH wrote:
+> > > > On Fri, Sep 11, 2020 at 05:11:37PM +0300, Andra Paraschiv wrote:
+> > > > > Signed-off-by: Andra Paraschiv <andraprs@amazon.com>
+> > > > > Reviewed-by: Alexander Graf <graf@amazon.com>
+> > > > I can't take patches without any changelog text at all, sorry.
+> > > > 
+> > > > Same for a few other patches in this series :(
+> > > > 
+> > > 
+> > > I can move the changelog text before the Sob tag(s) for all the
+> > > patches. I also can add a summary phrase in the commit message for
+> > > the commits like this one that have only the commit title and Sob &
+> > > Rb tags.
+> > > 
+> > > Would these updates to the commit messages match the expectations?
+> > > 
+> > > Let me know if remaining feedback to discuss and I should include as
+> > > updates in v10. Otherwise, I can send the new revision with the
+> > > updated commit messages.
+> > > 
+> > > Thanks for review.
 > > 
+> > Here we go, I published v10, including the updated commit messages and
+> > rebased on top of v5.9-rc6.
+> > 
+> > https://lore.kernel.org/lkml/20200921121732.44291-1-andraprs@amazon.com/
+> > 
+> > Any additional feedback, open to discuss.
+> > 
+> > If all looks good, we can move forward as we've talked before, to have
+> > the patch series on the char-misc branch and target v5.10-rc1.
+> 
+> Thanks for merging the patch series on the char-misc-testing branch and for
+> the review sessions we've had.
+> 
+> Let's see how all goes next; if anything in the meantime to be done (e.g.
+> and not coming via auto-generated mails), just let me know.
 
+Will do, thanks for sticking with this and cleaning it up to look a lot
+better than the original submission.
 
+Now comes the real work, maintaining it for the next 10 years :)
+
+greg k-h
