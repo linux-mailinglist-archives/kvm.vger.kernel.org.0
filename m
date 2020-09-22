@@ -2,102 +2,106 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BF6ED274A30
-	for <lists+kvm@lfdr.de>; Tue, 22 Sep 2020 22:36:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 97853274AD9
+	for <lists+kvm@lfdr.de>; Tue, 22 Sep 2020 23:10:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726589AbgIVUgV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 22 Sep 2020 16:36:21 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:29068 "EHLO
+        id S1726716AbgIVVKf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 22 Sep 2020 17:10:35 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:27967 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726179AbgIVUgV (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 22 Sep 2020 16:36:21 -0400
+        by vger.kernel.org with ESMTP id S1726625AbgIVVKf (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 22 Sep 2020 17:10:35 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1600806979;
+        s=mimecast20190719; t=1600809034;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding;
-        bh=/uq1ydAD3WSjGkI4P2e9ZsRKctZ5UuVc07zSVeRW7bI=;
-        b=EdgZOUofMcIb4zblp0tXorwxw6qZNEzAbqbzgx2vVEAZCL+BX4A5HD3Xveb4DGnpp08GON
-        9wzQds/XZS3JhaSJwuRb8o8VAzQ6EHmf/x263xi9l2zztb7f8/4egkULUKykOgHlmm4Z91
-        Vpz55HtahnpeMdvmzuJbkh2tnadJOU4=
+        bh=bNjVgWpgtIkPhRa8XVCPnausw2GfEoBb82DdGdZXVvc=;
+        b=ekIwuyE46DrYdAaRR3VUm9LJ6r86ZyXtW9vna51dozcxfWozLSzNT6srwE2a0xuuuUv4XQ
+        AEg5PntS9WxpfXwePKBvt4KyJRAGcL9RvrB036MI35X+RjLHN8wY7TVNG517Fc9UqGOOIU
+        ahdkDAwhtTWQKy7OVlzx6mYY3DHOA3k=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-337-stfvHO0ZOfqDt8Ev0brejQ-1; Tue, 22 Sep 2020 16:36:17 -0400
-X-MC-Unique: stfvHO0ZOfqDt8Ev0brejQ-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+ us-mta-91-EmSHZr1ePa6cO30n87NEuA-1; Tue, 22 Sep 2020 17:10:32 -0400
+X-MC-Unique: EmSHZr1ePa6cO30n87NEuA-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7645C64086;
-        Tue, 22 Sep 2020 20:36:16 +0000 (UTC)
-Received: from localhost (unknown [10.10.67.5])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id B35767367E;
-        Tue, 22 Sep 2020 20:36:12 +0000 (UTC)
-From:   Eduardo Habkost <ehabkost@redhat.com>
-To:     qemu-devel@nongnu.org
-Cc:     kvm@vger.kernel.org, "Michael S. Tsirkin" <mst@redhat.com>,
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E4AE01007B36;
+        Tue, 22 Sep 2020 21:10:30 +0000 (UTC)
+Received: from localhost.localdomain (unknown [10.35.206.154])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id EF02155768;
+        Tue, 22 Sep 2020 21:10:26 +0000 (UTC)
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     kvm@vger.kernel.org
+Cc:     "H. Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>,
+        Borislav Petkov <bp@alien8.de>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Subject: [PATCH] kvm: Correct documentation of kvm_irqchip_*()
-Date:   Tue, 22 Sep 2020 16:36:12 -0400
-Message-Id: <20200922203612.2178370-1-ehabkost@redhat.com>
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        linux-kernel@vger.kernel.org, Jim Mattson <jmattson@google.com>,
+        x86@kernel.org (maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)),
+        Maxim Levitsky <mlevitsk@redhat.com>
+Subject: [PATCH v6 0/4] KVM: nSVM: ondemand nested state allocation
+Date:   Wed, 23 Sep 2020 00:10:21 +0300
+Message-Id: <20200922211025.175547-1-mlevitsk@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+Content-Transfer-Encoding: quoted-printable
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-When split irqchip support was introduced, the meaning of
-kvm_irqchip_in_kernel() changed: now it only means the LAPIC is
-in kernel.  The PIC, IOAPIC, and PIT might be in userspace if
-irqchip=split was set.  Update the doc comment to reflect that.
-
-While at it, remove the "the user asked us" part in
-kvm_irqchip_is_split() doc comment.  That macro has nothing to do
-with existence of explicit user-provided options.
-
-Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
----
- include/sysemu/kvm.h | 19 +++++++++----------
- 1 file changed, 9 insertions(+), 10 deletions(-)
-
-diff --git a/include/sysemu/kvm.h b/include/sysemu/kvm.h
-index 5bbea538830..23fce48b0be 100644
---- a/include/sysemu/kvm.h
-+++ b/include/sysemu/kvm.h
-@@ -51,23 +51,22 @@ extern bool kvm_msi_use_devid;
- /**
-  * kvm_irqchip_in_kernel:
-  *
-- * Returns: true if the user asked us to create an in-kernel
-- * irqchip via the "kernel_irqchip=on" machine option.
-+ * Returns: true if an in-kernel irqchip was created.
-  * What this actually means is architecture and machine model
-- * specific: on PC, for instance, it means that the LAPIC,
-- * IOAPIC and PIT are all in kernel. This function should never
-- * be used from generic target-independent code: use one of the
-- * following functions or some other specific check instead.
-+ * specific: on PC, for instance, it means that the LAPIC
-+ * is in kernel.  This function should never be used from generic
-+ * target-independent code: use one of the following functions or
-+ * some other specific check instead.
-  */
- #define kvm_irqchip_in_kernel() (kvm_kernel_irqchip)
- 
- /**
-  * kvm_irqchip_is_split:
-  *
-- * Returns: true if the user asked us to split the irqchip
-- * implementation between user and kernel space. The details are
-- * architecture and machine specific. On PC, it means that the PIC,
-- * IOAPIC, and PIT are in user space while the LAPIC is in the kernel.
-+ * Returns: true if the irqchip implementation is split between
-+ * user and kernel space.  The details are architecture and
-+ * machine specific.  On PC, it means that the PIC, IOAPIC, and
-+ * PIT are in user space while the LAPIC is in the kernel.
-  */
- #define kvm_irqchip_is_split() (kvm_split_irqchip)
- 
--- 
-2.26.2
+This is the next version of this patch series.=0D
+=0D
+In V5 I adopted Sean Christopherson's suggestion to make .set_efer return=0D
+a negative error (-ENOMEM in this case) which in most cases in kvm=0D
+propagates to the userspace.=0D
+=0D
+I noticed though that wrmsr emulation code doesn't do this and instead=0D
+it injects #GP to the guest on _any_ error.=0D
+=0D
+So I fixed the wrmsr code to behave in a similar way to the rest=0D
+of the kvm code.=0D
+(#GP only on a positive error value, and forward the negative error to=0D
+the userspace)=0D
+=0D
+I had to adjust one wrmsr handler (xen_hvm_config) to stop it from returnin=
+g=0D
+negative values	so that new WRMSR emulation behavior doesn't break it.=0D
+This patch was only compile tested.=0D
+=0D
+The memory allocation failure was tested by always returning -ENOMEM=0D
+from svm_allocate_nested.=0D
+=0D
+The nested allocation itself was tested by countless attempts to run=0D
+nested guests, do nested migration on both my AMD and Intel machines.=0D
+I wasn't able to break it.=0D
+=0D
+Changes from V5: addressed Sean Christopherson's review feedback.=0D
+=0D
+Best regards,=0D
+	Maxim Levitsky=0D
+=0D
+Maxim Levitsky (4):=0D
+  KVM: x86: xen_hvm_config: cleanup return values=0D
+  KVM: x86: report negative values from wrmsr emulation to userspace=0D
+  KVM: x86: allow kvm_x86_ops.set_efer to return an error value=0D
+  KVM: nSVM: implement on demand allocation of the nested state=0D
+=0D
+ arch/x86/include/asm/kvm_host.h |  2 +-=0D
+ arch/x86/kvm/emulate.c          |  7 ++--=0D
+ arch/x86/kvm/svm/nested.c       | 42 ++++++++++++++++++++++++=0D
+ arch/x86/kvm/svm/svm.c          | 58 +++++++++++++++++++--------------=0D
+ arch/x86/kvm/svm/svm.h          |  8 ++++-=0D
+ arch/x86/kvm/vmx/vmx.c          |  6 ++--=0D
+ arch/x86/kvm/x86.c              | 37 ++++++++++++---------=0D
+ 7 files changed, 113 insertions(+), 47 deletions(-)=0D
+=0D
+-- =0D
+2.26.2=0D
+=0D
 
