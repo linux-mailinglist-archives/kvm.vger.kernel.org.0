@@ -2,161 +2,123 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 479F4273D19
-	for <lists+kvm@lfdr.de>; Tue, 22 Sep 2020 10:17:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 28CCF273D1C
+	for <lists+kvm@lfdr.de>; Tue, 22 Sep 2020 10:19:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726699AbgIVIR1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 22 Sep 2020 04:17:27 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:24237 "EHLO
+        id S1726655AbgIVITi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 22 Sep 2020 04:19:38 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:55585 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726483AbgIVIR1 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 22 Sep 2020 04:17:27 -0400
+        by vger.kernel.org with ESMTP id S1726483AbgIVITh (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 22 Sep 2020 04:19:37 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1600762645;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=oakQ8ZvOG/PZHFgINL6qXTOYOkalonDKl4hzXDidq5o=;
-        b=gsHJliB2b1Pf7VoRNrxCZYkpa1Z2X8QeHQU85UPYLdZ7nDtZdb4NfeIW8WQDgNd84aRnBC
-        AJQmSawDU7PyPyrCmPpgKgWWozodUuGFNZKbwY+D89wKPSfg6pyvNu11wM9rlHUiuUwvk2
-        bukRE82rzOYtstinOz9fqZYmjjYiW84=
+        s=mimecast20190719; t=1600762776;
+        h=from:from:reply-to:reply-to:subject:subject:date:date:
+         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+         content-type:content-type:in-reply-to:in-reply-to:  references:references;
+        bh=4YxfviHUp394Z95tLmiMsBjGp7nI/wBJIRQLvk3IHGM=;
+        b=G6yqo5rn/OXcWbNArHhAkvUvGkR21dftZ8YcEO9u/bNEgfiUhjF8z8BUUggLxtzKMrtFi3
+        9o4LHsv9lhQEhovHYIgtBiHqRBSnc44rrNvK2p8MyK00Z3voEq63sF+cXXLW6EyNA11/ak
+        irTH5UNiO+/H/3W7JAM52SSIkQzmnlE=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-580-NmB85ZUzNVuAZQDy8gEBcA-1; Tue, 22 Sep 2020 04:17:23 -0400
-X-MC-Unique: NmB85ZUzNVuAZQDy8gEBcA-1
+ us-mta-581-sAd04_3bMH6jFWidZ6f72A-1; Tue, 22 Sep 2020 04:19:34 -0400
+X-MC-Unique: sAd04_3bMH6jFWidZ6f72A-1
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A8F881868405;
-        Tue, 22 Sep 2020 08:17:18 +0000 (UTC)
-Received: from localhost (ovpn-115-46.ams2.redhat.com [10.36.115.46])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 0E4395C225;
-        Tue, 22 Sep 2020 08:17:05 +0000 (UTC)
-Date:   Tue, 22 Sep 2020 09:17:05 +0100
-From:   Stefan Hajnoczi <stefanha@redhat.com>
-To:     qemu-devel@nongnu.org
-Cc:     qemu-riscv@nongnu.org, fam@euphon.net, ysato@users.sourceforge.jp,
-        berto@igalia.com, jslaby@suse.cz, rth@twiddle.net, pl@kamp.de,
-        david@redhat.com, pasic@linux.ibm.com, eblake@redhat.com,
-        mreitz@redhat.com, marcandre.lureau@redhat.com,
-        berrange@redhat.com, palmer@dabbelt.com, armbru@redhat.com,
-        kvm@vger.kernel.org, yuval.shaia.ml@gmail.com, mst@redhat.com,
-        cohuck@redhat.com, qemu-block@nongnu.org, sw@weilnetz.de,
-        dgilbert@redhat.com, mdroth@linux.vnet.ibm.com,
-        jiaxun.yang@flygoat.com, jsnow@redhat.com, jcmvbkbc@gmail.com,
-        marcel.apfelbaum@gmail.com, Alistair.Francis@wdc.com,
-        aurelien@aurel32.net, aleksandar.rikalo@syrmia.com,
-        chenhc@lemote.com, aleksandar.qemu.devel@gmail.com,
-        ehabkost@redhat.com, borntraeger@de.ibm.com,
-        sunilmut@microsoft.com, thuth@redhat.com, pbonzini@redhat.com,
-        sstabellini@kernel.org, anthony.perard@citrix.com,
-        kraxel@redhat.com, peter.maydell@linaro.org, namei.unix@gmail.com,
-        paul@xen.org, kwolf@redhat.com, kbastian@mail.uni-paderborn.de,
-        sagark@eecs.berkeley.edu, jasowang@redhat.com, laurent@vivier.eu,
-        xen-devel@lists.xenproject.org, mjrosato@linux.ibm.com,
-        sheepdog@lists.wpkg.org, qemu-s390x@nongnu.org,
-        qemu-arm@nongnu.org, quintela@redhat.com,
-        zhang.zhanghailiang@huawei.com
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C107D57053;
+        Tue, 22 Sep 2020 08:19:29 +0000 (UTC)
+Received: from redhat.com (ovpn-114-64.ams2.redhat.com [10.36.114.64])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id D54905C225;
+        Tue, 22 Sep 2020 08:18:52 +0000 (UTC)
+Date:   Tue, 22 Sep 2020 09:18:49 +0100
+From:   Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     David Hildenbrand <david@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org,
+        Fam Zheng <fam@euphon.net>,
+        Peter Maydell <peter.maydell@linaro.org>,
+        sheepdog@lists.wpkg.org, kvm@vger.kernel.org,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Yuval Shaia <yuval.shaia.ml@gmail.com>,
+        Markus Armbruster <armbru@redhat.com>,
+        Max Filippov <jcmvbkbc@gmail.com>,
+        Alistair Francis <Alistair.Francis@wdc.com>,
+        Gerd Hoffmann <kraxel@redhat.com>,
+        Huacai Chen <chenhc@lemote.com>,
+        Stefano Stabellini <sstabellini@kernel.org>,
+        Alberto Garcia <berto@igalia.com>,
+        Sagar Karandikar <sagark@eecs.berkeley.edu>,
+        Yoshinori Sato <ysato@users.sourceforge.jp>,
+        Juan Quintela <quintela@redhat.com>,
+        Jiri Slaby <jslaby@suse.cz>, Paul Durrant <paul@xen.org>,
+        Michael Roth <mdroth@linux.vnet.ibm.com>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        Thomas Huth <thuth@redhat.com>,
+        =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>,
+        Matthew Rosato <mjrosato@linux.ibm.com>,
+        Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
+        Eduardo Habkost <ehabkost@redhat.com>,
+        Stefan Weil <sw@weilnetz.de>, Peter Lieven <pl@kamp.de>,
+        "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+        Anthony Perard <anthony.perard@citrix.com>,
+        qemu-s390x@nongnu.org, qemu-arm@nongnu.org,
+        Liu Yuan <namei.unix@gmail.com>, qemu-riscv@nongnu.org,
+        Sunil Muthuswamy <sunilmut@microsoft.com>,
+        John Snow <jsnow@redhat.com>,
+        Hailiang Zhang <zhang.zhanghailiang@huawei.com>,
+        Richard Henderson <rth@twiddle.net>,
+        Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org,
+        Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Laurent Vivier <laurent@vivier.eu>,
+        Max Reitz <mreitz@redhat.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        xen-devel@lists.xenproject.org,
+        Aurelien Jarno <aurelien@aurel32.net>
 Subject: Re: [PATCH] qemu/atomic.h: prefix qemu_ to solve <stdatomic.h>
  collisions
-Message-ID: <20200922081705.GB201611@stefanha-x1.localdomain>
+Message-ID: <20200922081849.GD1989025@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
 References: <20200921162346.188997-1-stefanha@redhat.com>
- <160072176188.21069.7427016597134663502@66eaa9a8a123>
+ <c8892b73-6cee-9fd3-54b0-289149926041@redhat.com>
+ <52b8a46e-ab9e-1645-163d-497122ece907@redhat.com>
+ <8610ca0e-0b3f-6d95-43b9-e2e49571e311@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <160072176188.21069.7427016597134663502@66eaa9a8a123>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-Authentication-Results: relay.mimecast.com;
-        auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=stefanha@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="eJnRUKwClWJh1Khz"
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
+In-Reply-To: <8610ca0e-0b3f-6d95-43b9-e2e49571e311@redhat.com>
+User-Agent: Mutt/1.14.6 (2020-07-11)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
---eJnRUKwClWJh1Khz
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+On Tue, Sep 22, 2020 at 08:56:06AM +0200, Paolo Bonzini wrote:
+> On 22/09/20 08:45, David Hildenbrand wrote:
+> >> It's certainly a good idea but it's quite verbose.
+> >>
+> >> What about using atomic__* as the prefix?  It is not very common in QEMU
+> >> but there are some cases (and I cannot think of anything better).
+> >
+> > aqomic_*, lol :)
+> 
+> Actually qatomic_ would be a good one, wouldn't it?
 
-On Mon, Sep 21, 2020 at 01:56:08PM -0700, no-reply@patchew.org wrote:
-> ERROR: Macros with multiple statements should be enclosed in a do - while=
- loop
-> #2968: FILE: include/qemu/atomic.h:152:
-> +#define qemu_atomic_rcu_read__nocheck(ptr, valptr)      \
->      __atomic_load(ptr, valptr, __ATOMIC_RELAXED);       \
->      smp_read_barrier_depends();
->=20
-> ERROR: space required before that '*' (ctx:VxB)
-> #3123: FILE: include/qemu/atomic.h:347:
-> +#define qemu_atomic_read__nocheck(p) (*(__typeof__(*(p)) volatile*) (p))
->                                                                   ^
->=20
-> ERROR: Use of volatile is usually wrong, please add a comment
-> #3123: FILE: include/qemu/atomic.h:347:
-> +#define qemu_atomic_read__nocheck(p) (*(__typeof__(*(p)) volatile*) (p))
->=20
-> ERROR: space required before that '*' (ctx:VxB)
-> #3125: FILE: include/qemu/atomic.h:349:
-> +    ((*(__typeof__(*(p)) volatile*) (p)) =3D (i))
->                                   ^
->=20
-> ERROR: Use of volatile is usually wrong, please add a comment
-> #3125: FILE: include/qemu/atomic.h:349:
-> +    ((*(__typeof__(*(p)) volatile*) (p)) =3D (i))
->=20
-> ERROR: space required after that ',' (ctx:VxV)
-> #3130: FILE: include/qemu/atomic.h:352:
-> +#define qemu_atomic_set(ptr, i)     qemu_atomic_set__nocheck(ptr,i)
->                                                                  ^
->=20
-> ERROR: memory barrier without comment
-> #3205: FILE: include/qemu/atomic.h:410:
-> +#define qemu_atomic_xchg(ptr, i) (smp_mb(), __sync_lock_test_and_set(ptr=
-, i))
->=20
-> WARNING: Block comments use a leading /* on a separate line
-> #3280: FILE: include/qemu/atomic.h:462:
-> +/* qemu_atomic_mb_read/set semantics map Java volatile variables. They a=
-re
->=20
-> WARNING: Block comments use a leading /* on a separate line
-> #6394: FILE: util/bitmap.c:214:
-> +        /* If we avoided the full barrier in qemu_atomic_or(), issue a
->=20
-> WARNING: Block comments use a leading /* on a separate line
-> #7430: FILE: util/rcu.c:85:
-> +        /* Instead of using qemu_atomic_mb_set for index->waiting, and
->=20
-> WARNING: Block comments use a leading /* on a separate line
-> #7456: FILE: util/rcu.c:154:
-> +        /* In either case, the qemu_atomic_mb_set below blocks stores th=
-at free
->=20
-> total: 7 errors, 4 warnings, 6507 lines checked
+Yes, I think just adding a 'q' on the front of methods is more than
+sufficient (see also all the qcrypto_*, qio_* APIs I wrote). The
+only think a plain 'q' prefix is likely to clash with is the Qt
+library and that isn't something we're likely to link with (famous
+last words...).
 
-These are pre-existing coding style issues. This is a big patch that
-tries to make as few actual changes as possible so I would rather not
-try to fix them.
-
-Stefan
-
---eJnRUKwClWJh1Khz
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl9pswEACgkQnKSrs4Gr
-c8iYggf/cN1AvmT30HEFnk6TFaWwEK/1uPdJX8OsfFcwI7Y3ubB8wcLWnyXzwsOg
-tRL2aDrOZ1cJcV8pHVtlNuJTcqox1NBFhSC6thYgo4PzXU7O2+LPijF+PrrJBrer
-C/TLImTNNDBL8+IQX8bOBz4kVqyoEoodEvNsRUb05oyhVK0uej9yK0Vf+WOiRDmf
-O4f1cAXTcA0qhhmU5NJO5sNe3cVEbrkHJ9wtK7mFlIRt/RuHLvW5M0UscL0/KF2o
-SyWNVBIVFKBl/o16jkA4J+C1wAM6uPP3s5NYqJgaEUtYUaP7cir42blCMCa3MYz6
-LSmqavtaJ2f531DBpjOq3G5c+fyk5A==
-=nJgj
------END PGP SIGNATURE-----
-
---eJnRUKwClWJh1Khz--
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
 
