@@ -2,122 +2,124 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1890D27470D
-	for <lists+kvm@lfdr.de>; Tue, 22 Sep 2020 18:57:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3BFCD27473E
+	for <lists+kvm@lfdr.de>; Tue, 22 Sep 2020 19:07:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726608AbgIVQ5v (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 22 Sep 2020 12:57:51 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:60172 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726558AbgIVQ5v (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 22 Sep 2020 12:57:51 -0400
-Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 08MGal9w170201;
-        Tue, 22 Sep 2020 12:57:42 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=IynCvLd1jIJZLfDQaEKMgt3CmHMxuUcagJiB0ZYpszE=;
- b=YmggHKmC3kCocOv6ugHJjMTUtybR4c5NqxrRilvmqivLT0BeplKnX/JpV72ZKkouuv0o
- jP/dErX6fNUAYuLklZb/q7NOUYpq7pF0rwLi987Aslud/Jrdb6YxLGkEakGEFz5R7wi+
- j/VU00fXitRHjBbdIlcnHX0gfRrwx0liwcnrmfiPJ4kaxecH7NnwK0Q4Q4p2xU7kWvPp
- gti2yIGx3QsSmmY2VgmjSsbn/HOXcWnVv9XV+FLqOTrxyJ5ZsnNFTzOlop9MitH/NC1s
- MhjvpVe111j0LiskKZ5eG5Vx/X1aWPIqhIeoqp2Xa9Bm2aYY8woe/iurDqWj3WSSIx+4 tQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 33qkyp2frf-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 22 Sep 2020 12:57:42 -0400
-Received: from m0098413.ppops.net (m0098413.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 08MGbFgQ171655;
-        Tue, 22 Sep 2020 12:57:41 -0400
-Received: from ppma05wdc.us.ibm.com (1b.90.2fa9.ip4.static.sl-reverse.com [169.47.144.27])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 33qkyp2fqt-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 22 Sep 2020 12:57:41 -0400
-Received: from pps.filterd (ppma05wdc.us.ibm.com [127.0.0.1])
-        by ppma05wdc.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 08MGs1xp014856;
-        Tue, 22 Sep 2020 16:57:40 GMT
-Received: from b03cxnp07029.gho.boulder.ibm.com (b03cxnp07029.gho.boulder.ibm.com [9.17.130.16])
-        by ppma05wdc.us.ibm.com with ESMTP id 33n9m90e36-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 22 Sep 2020 16:57:40 +0000
-Received: from b03ledav006.gho.boulder.ibm.com (b03ledav006.gho.boulder.ibm.com [9.17.130.237])
-        by b03cxnp07029.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 08MGvdR328377404
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 22 Sep 2020 16:57:39 GMT
-Received: from b03ledav006.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 34903C6057;
-        Tue, 22 Sep 2020 16:57:39 +0000 (GMT)
-Received: from b03ledav006.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id D21B4C6055;
-        Tue, 22 Sep 2020 16:57:37 +0000 (GMT)
-Received: from oc4221205838.ibm.com (unknown [9.163.16.144])
-        by b03ledav006.gho.boulder.ibm.com (Postfix) with ESMTP;
-        Tue, 22 Sep 2020 16:57:37 +0000 (GMT)
-Subject: Re: [PATCH v5 3/3] vfio/pci: Decouple PCI_COMMAND_MEMORY bit checks
- from is_virtfn
-To:     Alex Williamson <alex.williamson@redhat.com>
-Cc:     bhelgaas@google.com, schnelle@linux.ibm.com, pmorel@linux.ibm.com,
-        mpe@ellerman.id.au, oohall@gmail.com, cohuck@redhat.com,
-        kevin.tian@intel.com, hca@linux.ibm.com, gor@linux.ibm.com,
-        borntraeger@de.ibm.com, linux-s390@vger.kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-pci@vger.kernel.org
-References: <1599749997-30489-1-git-send-email-mjrosato@linux.ibm.com>
- <1599749997-30489-4-git-send-email-mjrosato@linux.ibm.com>
- <08afc6b2-7549-5440-a947-af0b598288c2@linux.ibm.com>
- <20200922104030.07e0dfd9@x1.home>
-From:   Matthew Rosato <mjrosato@linux.ibm.com>
-Message-ID: <852ca3a6-6521-a3c4-c70d-383be3c2dc2d@linux.ibm.com>
-Date:   Tue, 22 Sep 2020 12:57:37 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+        id S1726652AbgIVRH1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 22 Sep 2020 13:07:27 -0400
+Received: from smtp-fw-9101.amazon.com ([207.171.184.25]:18910 "EHLO
+        smtp-fw-9101.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726526AbgIVRH0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 22 Sep 2020 13:07:26 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1600794446; x=1632330446;
+  h=subject:to:cc:references:from:message-id:date:
+   mime-version:in-reply-to:content-transfer-encoding;
+  bh=+66RGc6UUVFZ+2+Mk7EQ3yHIFNko439zQH8U23IJGF8=;
+  b=HiSbNEuz4JWneFiZDEH1OZcv0MNkOuBK9h4W/BIUHIhZg7ViLJnVD6RZ
+   rlfzehLPz/f5srG58qrdjXfdDofC1yvFaJMGDIl179FnAj18RaSXWBa63
+   ie/zGix4lumuZaWAMORGOVqa7aFYwMys1yZ81lMoTyxSmjvWuIvXOiZxk
+   c=;
+X-IronPort-AV: E=Sophos;i="5.77,291,1596499200"; 
+   d="scan'208";a="70170606"
+Received: from sea32-co-svc-lb4-vlan3.sea.corp.amazon.com (HELO email-inbound-relay-2c-168cbb73.us-west-2.amazon.com) ([10.47.23.38])
+  by smtp-border-fw-out-9101.sea19.amazon.com with ESMTP; 22 Sep 2020 17:07:18 +0000
+Received: from EX13D16EUB003.ant.amazon.com (pdx4-ws-svc-p6-lb7-vlan2.pdx.amazon.com [10.170.41.162])
+        by email-inbound-relay-2c-168cbb73.us-west-2.amazon.com (Postfix) with ESMTPS id 1951BA1928;
+        Tue, 22 Sep 2020 17:07:17 +0000 (UTC)
+Received: from 38f9d34ed3b1.ant.amazon.com (10.43.160.244) by
+ EX13D16EUB003.ant.amazon.com (10.43.166.99) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.2; Tue, 22 Sep 2020 17:07:07 +0000
+Subject: Re: [PATCH v9 14/18] nitro_enclaves: Add Kconfig for the Nitro
+ Enclaves driver
+To:     Greg KH <gregkh@linuxfoundation.org>
+CC:     linux-kernel <linux-kernel@vger.kernel.org>,
+        Anthony Liguori <aliguori@amazon.com>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Colm MacCarthaigh <colmmacc@amazon.com>,
+        David Duncan <davdunc@amazon.com>,
+        Bjoern Doebel <doebel@amazon.de>,
+        David Woodhouse <dwmw@amazon.co.uk>,
+        "Frank van der Linden" <fllinden@amazon.com>,
+        Alexander Graf <graf@amazon.de>,
+        "Karen Noel" <knoel@redhat.com>,
+        Martin Pohlack <mpohlack@amazon.de>,
+        Matt Wilson <msw@amazon.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Balbir Singh <sblbir@amazon.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        "Stefan Hajnoczi" <stefanha@redhat.com>,
+        Stewart Smith <trawets@amazon.com>,
+        "Uwe Dannowski" <uwed@amazon.de>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        kvm <kvm@vger.kernel.org>,
+        ne-devel-upstream <ne-devel-upstream@amazon.com>
+References: <20200911141141.33296-1-andraprs@amazon.com>
+ <20200911141141.33296-15-andraprs@amazon.com>
+ <20200914155913.GB3525000@kroah.com>
+ <c3a33dcf-794c-31ef-ced5-4f87ba21dd28@amazon.com>
+ <d7eaac0d-8855-ca83-6b10-ab4f983805a2@amazon.com>
+ <358e7470-b841-52fe-0532-e1154ef0e93b@amazon.com>
+ <20200922162049.GA2299429@kroah.com>
+From:   "Paraschiv, Andra-Irina" <andraprs@amazon.com>
+Message-ID: <b6acfeb5-b68f-f949-b737-1e6c859000f2@amazon.com>
+Date:   Tue, 22 Sep 2020 20:06:58 +0300
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:78.0)
+ Gecko/20100101 Thunderbird/78.2.2
 MIME-Version: 1.0
-In-Reply-To: <20200922104030.07e0dfd9@x1.home>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <20200922162049.GA2299429@kroah.com>
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
- definitions=2020-09-22_16:2020-09-21,2020-09-22 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 suspectscore=0 lowpriorityscore=0 mlxscore=0 clxscore=1015
- adultscore=0 bulkscore=0 spamscore=0 mlxlogscore=999 phishscore=0
- impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2006250000 definitions=main-2009220122
+X-Originating-IP: [10.43.160.244]
+X-ClientProxiedBy: EX13D34UWC001.ant.amazon.com (10.43.162.112) To
+ EX13D16EUB003.ant.amazon.com (10.43.166.99)
+Content-Type: text/plain; charset="utf-8"; format="flowed"
+Content-Transfer-Encoding: base64
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 9/22/20 12:40 PM, Alex Williamson wrote:
-> On Mon, 21 Sep 2020 08:43:29 -0400
-> Matthew Rosato <mjrosato@linux.ibm.com> wrote:
-> 
->> On 9/10/20 10:59 AM, Matthew Rosato wrote:
->>> While it is true that devices with is_virtfn=1 will have a Memory Space
->>> Enable bit that is hard-wired to 0, this is not the only case where we
->>> see this behavior -- For example some bare-metal hypervisors lack
->>> Memory Space Enable bit emulation for devices not setting is_virtfn
->>> (s390). Fix this by instead checking for the newly-added
->>> no_command_memory bit which directly denotes the need for
->>> PCI_COMMAND_MEMORY emulation in vfio.
->>>
->>> Fixes: abafbc551fdd ("vfio-pci: Invalidate mmaps and block MMIO access on disabled memory")
->>> Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
->>> Reviewed-by: Niklas Schnelle <schnelle@linux.ibm.com>
->>> Reviewed-by: Pierre Morel <pmorel@linux.ibm.com>
->>
->> Polite ping on this patch as the other 2 have now received maintainer
->> ACKs or reviews.  I'm concerned about this popping up in distros as
->> abafbc551fdd was a CVE fix.  Related, see question from the cover:
->>
->> - Restored the fixes tag to patch 3 (but the other 2 patches are
->>     now pre-reqs -- cc stable 5.8?)
-> 
-> I've got these queued in my local branch which I'll push to next for
-> v5.10.  I'm thinking that perhaps the right thing would be to add the
-> fixes tag to all three patches, otherwise I could see that the PCI/VF
-> change might get picked as a dependency, but not the s390 specific one.
-> Does this sound correct to everyone?  Thanks,
+CgpPbiAyMi8wOS8yMDIwIDE5OjIwLCBHcmVnIEtIIHdyb3RlOgo+IE9uIFR1ZSwgU2VwIDIyLCAy
+MDIwIGF0IDA1OjEzOjAyUE0gKzAzMDAsIFBhcmFzY2hpdiwgQW5kcmEtSXJpbmEgd3JvdGU6Cj4+
+Cj4+IE9uIDIxLzA5LzIwMjAgMTU6MzQsIFBhcmFzY2hpdiwgQW5kcmEtSXJpbmEgd3JvdGU6Cj4+
+Pgo+Pj4gT24gMTQvMDkvMjAyMCAyMDoyMywgUGFyYXNjaGl2LCBBbmRyYS1JcmluYSB3cm90ZToK
+Pj4+Pgo+Pj4+IE9uIDE0LzA5LzIwMjAgMTg6NTksIEdyZWcgS0ggd3JvdGU6Cj4+Pj4+IE9uIEZy
+aSwgU2VwIDExLCAyMDIwIGF0IDA1OjExOjM3UE0gKzAzMDAsIEFuZHJhIFBhcmFzY2hpdiB3cm90
+ZToKPj4+Pj4+IFNpZ25lZC1vZmYtYnk6IEFuZHJhIFBhcmFzY2hpdiA8YW5kcmFwcnNAYW1hem9u
+LmNvbT4KPj4+Pj4+IFJldmlld2VkLWJ5OiBBbGV4YW5kZXIgR3JhZiA8Z3JhZkBhbWF6b24uY29t
+Pgo+Pj4+PiBJIGNhbid0IHRha2UgcGF0Y2hlcyB3aXRob3V0IGFueSBjaGFuZ2Vsb2cgdGV4dCBh
+dCBhbGwsIHNvcnJ5Lgo+Pj4+Pgo+Pj4+PiBTYW1lIGZvciBhIGZldyBvdGhlciBwYXRjaGVzIGlu
+IHRoaXMgc2VyaWVzIDooCj4+Pj4+Cj4+Pj4gSSBjYW4gbW92ZSB0aGUgY2hhbmdlbG9nIHRleHQg
+YmVmb3JlIHRoZSBTb2IgdGFnKHMpIGZvciBhbGwgdGhlCj4+Pj4gcGF0Y2hlcy4gSSBhbHNvIGNh
+biBhZGQgYSBzdW1tYXJ5IHBocmFzZSBpbiB0aGUgY29tbWl0IG1lc3NhZ2UgZm9yCj4+Pj4gdGhl
+IGNvbW1pdHMgbGlrZSB0aGlzIG9uZSB0aGF0IGhhdmUgb25seSB0aGUgY29tbWl0IHRpdGxlIGFu
+ZCBTb2IgJgo+Pj4+IFJiIHRhZ3MuCj4+Pj4KPj4+PiBXb3VsZCB0aGVzZSB1cGRhdGVzIHRvIHRo
+ZSBjb21taXQgbWVzc2FnZXMgbWF0Y2ggdGhlIGV4cGVjdGF0aW9ucz8KPj4+Pgo+Pj4+IExldCBt
+ZSBrbm93IGlmIHJlbWFpbmluZyBmZWVkYmFjayB0byBkaXNjdXNzIGFuZCBJIHNob3VsZCBpbmNs
+dWRlIGFzCj4+Pj4gdXBkYXRlcyBpbiB2MTAuIE90aGVyd2lzZSwgSSBjYW4gc2VuZCB0aGUgbmV3
+IHJldmlzaW9uIHdpdGggdGhlCj4+Pj4gdXBkYXRlZCBjb21taXQgbWVzc2FnZXMuCj4+Pj4KPj4+
+PiBUaGFua3MgZm9yIHJldmlldy4KPj4+IEhlcmUgd2UgZ28sIEkgcHVibGlzaGVkIHYxMCwgaW5j
+bHVkaW5nIHRoZSB1cGRhdGVkIGNvbW1pdCBtZXNzYWdlcyBhbmQKPj4+IHJlYmFzZWQgb24gdG9w
+IG9mIHY1LjktcmM2Lgo+Pj4KPj4+IGh0dHBzOi8vbG9yZS5rZXJuZWwub3JnL2xrbWwvMjAyMDA5
+MjExMjE3MzIuNDQyOTEtMS1hbmRyYXByc0BhbWF6b24uY29tLwo+Pj4KPj4+IEFueSBhZGRpdGlv
+bmFsIGZlZWRiYWNrLCBvcGVuIHRvIGRpc2N1c3MuCj4+Pgo+Pj4gSWYgYWxsIGxvb2tzIGdvb2Qs
+IHdlIGNhbiBtb3ZlIGZvcndhcmQgYXMgd2UndmUgdGFsa2VkIGJlZm9yZSwgdG8gaGF2ZQo+Pj4g
+dGhlIHBhdGNoIHNlcmllcyBvbiB0aGUgY2hhci1taXNjIGJyYW5jaCBhbmQgdGFyZ2V0IHY1LjEw
+LXJjMS4KPj4gVGhhbmtzIGZvciBtZXJnaW5nIHRoZSBwYXRjaCBzZXJpZXMgb24gdGhlIGNoYXIt
+bWlzYy10ZXN0aW5nIGJyYW5jaCBhbmQgZm9yCj4+IHRoZSByZXZpZXcgc2Vzc2lvbnMgd2UndmUg
+aGFkLgo+Pgo+PiBMZXQncyBzZWUgaG93IGFsbCBnb2VzIG5leHQ7IGlmIGFueXRoaW5nIGluIHRo
+ZSBtZWFudGltZSB0byBiZSBkb25lIChlLmcuCj4+IGFuZCBub3QgY29taW5nIHZpYSBhdXRvLWdl
+bmVyYXRlZCBtYWlscyksIGp1c3QgbGV0IG1lIGtub3cuCj4gV2lsbCBkbywgdGhhbmtzIGZvciBz
+dGlja2luZyB3aXRoIHRoaXMgYW5kIGNsZWFuaW5nIGl0IHVwIHRvIGxvb2sgYSBsb3QKPiBiZXR0
+ZXIgdGhhbiB0aGUgb3JpZ2luYWwgc3VibWlzc2lvbi4KCkFuZCB0aGlzIGFsc28gY2FtZSB3aXRo
+IGEgY291cGxlIG9mIGxlc3NvbnMgbGVhcm50IHRoYXQgSSd2ZSBhcHBsaWVkIG9yIAp3aWxsIGFw
+cGx5IGZvciBvdGhlciBwaWVjZXMgb2YgY29kZWJhc2UgYXMgd2VsbCwgZWl0aGVyIGZvciB0aGUg
+TGludXggCmtlcm5lbCBvciBvdGhlciBwcm9qZWN0cy4KCj4KPiBOb3cgY29tZXMgdGhlIHJlYWwg
+d29yaywgbWFpbnRhaW5pbmcgaXQgZm9yIHRoZSBuZXh0IDEwIHllYXJzIDopCgpJIGFncmVlLCBt
+YWludGVuYW5jZSBpcyBlcXVhbGx5IGltcG9ydGFudC4gVGhlcmUgaXMgYW4gb25nb2luZyBwcm9j
+ZXNzIAp0byBtYWtlIHN1cmUgdGhlIHdob2xlIGVjb3N5c3RlbSBjb250aW51ZXMgdG8gd29yay4K
+CkFuZHJhCgoKCkFtYXpvbiBEZXZlbG9wbWVudCBDZW50ZXIgKFJvbWFuaWEpIFMuUi5MLiByZWdp
+c3RlcmVkIG9mZmljZTogMjdBIFNmLiBMYXphciBTdHJlZXQsIFVCQzUsIGZsb29yIDIsIElhc2ks
+IElhc2kgQ291bnR5LCA3MDAwNDUsIFJvbWFuaWEuIFJlZ2lzdGVyZWQgaW4gUm9tYW5pYS4gUmVn
+aXN0cmF0aW9uIG51bWJlciBKMjIvMjYyMS8yMDA1Lgo=
 
-Sounds good to me.  Thanks!
