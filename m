@@ -2,143 +2,145 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 45541273D5A
-	for <lists+kvm@lfdr.de>; Tue, 22 Sep 2020 10:33:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 51E35273D90
+	for <lists+kvm@lfdr.de>; Tue, 22 Sep 2020 10:41:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726830AbgIVIdy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 22 Sep 2020 04:33:54 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:40763 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726756AbgIVIdy (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 22 Sep 2020 04:33:54 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1600763632;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-        bh=qvyUjkv8t4H1ij6w8DYR8/i335Zbxq6HBGLdSo8YFhw=;
-        b=gU+mKxjG9wVGzPG+30pB5c3gluqP3T/cRoNBU5lU4CWr08njdfFQacDILyOLXqpTdk5rRp
-        lQ48ZoDm6Oi7vxjrRZcizA4WqHrPDd0aADRPkYTiEWNptyfYXbfPZ/+2YxyeaMzUVnAXj+
-        lLIE1GPCEMNCIVSQOtBDeMjdCONQlLY=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-229-Pfv7ZJTPMtW4W4VZmcK25A-1; Tue, 22 Sep 2020 04:33:50 -0400
-X-MC-Unique: Pfv7ZJTPMtW4W4VZmcK25A-1
-Received: by mail-wr1-f70.google.com with SMTP id 33so7139089wre.0
-        for <kvm@vger.kernel.org>; Tue, 22 Sep 2020 01:33:50 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:autocrypt
-         :message-id:date:user-agent:mime-version:in-reply-to
-         :content-language:content-transfer-encoding;
-        bh=qvyUjkv8t4H1ij6w8DYR8/i335Zbxq6HBGLdSo8YFhw=;
-        b=OKcEmQ72CeFcoeo94VVcXN4sPzDU4K5eYEStOpPE5ctzpPDNNjN5S5LMkuJJd/OBOG
-         wXC0U46BgEROumtLg0qJwuj7+KUOeKSYoMPLWRKcx6CGrX8/5aq/QQUoPHJ5Oa8FvhqZ
-         A93XsJ3ofofoVo0wsI6u23K5eue0jWNLWAwoA/4t76NtP76mjck9evtoQMMDL51ns+w0
-         QMoEHNXIUN0X5dCEr/aCS4D1AhniqD09vqNBzSZRqmw5Iv30+8GXcxENOWckteHxAJ5C
-         qV3zklc/qz6BaV6EDOYNOMih+Hwy9lpLNaKI6/dE0jiK+7xZxkt0TOREv04PkoxpFcWn
-         yn2g==
-X-Gm-Message-State: AOAM531M3JiGRjaaN4nPmx8FnYWep7kykj0LNLbJK1a47QzhfyorJUGp
-        JJhpss0zX9uzwQb/UNbTOsmwzDzayI1uSpOfKqVSre+nVLPVZTQyzZAqGUhNKtFhk0OW67jgTFe
-        B/95h1btF5CdG
-X-Received: by 2002:a1c:59c2:: with SMTP id n185mr3236256wmb.43.1600763629022;
-        Tue, 22 Sep 2020 01:33:49 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJy6dFnNm36FEIqnuuXGz9nWZ1QUfl3u3gn03+FQFA+/1aED+MOKkBn5JsSaaGBStLCkBvBNiw==
-X-Received: by 2002:a1c:59c2:: with SMTP id n185mr3236220wmb.43.1600763628785;
-        Tue, 22 Sep 2020 01:33:48 -0700 (PDT)
-Received: from [192.168.1.36] (65.red-83-57-170.dynamicip.rima-tde.net. [83.57.170.65])
-        by smtp.gmail.com with ESMTPSA id l17sm3448412wme.11.2020.09.22.01.33.45
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 22 Sep 2020 01:33:47 -0700 (PDT)
-Subject: Re: [PATCH] qemu/atomic.h: prefix qemu_ to solve <stdatomic.h>
- collisions
-To:     Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
-Cc:     fam@euphon.net, peter.maydell@linaro.org, sheepdog@lists.wpkg.org,
-        kvm@vger.kernel.org, david@redhat.com, jasowang@redhat.com,
-        yuval.shaia.ml@gmail.com, mdroth@linux.vnet.ibm.com,
-        jcmvbkbc@gmail.com, Alistair.Francis@wdc.com, kraxel@redhat.com,
-        chenhc@lemote.com, sstabellini@kernel.org, berto@igalia.com,
-        sagark@eecs.berkeley.edu, ysato@users.sourceforge.jp,
-        quintela@redhat.com, jslaby@suse.cz, mst@redhat.com,
-        armbru@redhat.com, pasic@linux.ibm.com, borntraeger@de.ibm.com,
-        aleksandar.qemu.devel@gmail.com, thuth@redhat.com,
-        marcandre.lureau@redhat.com, mjrosato@linux.ibm.com,
-        aleksandar.rikalo@syrmia.com, ehabkost@redhat.com, sw@weilnetz.de,
-        pl@kamp.de, dgilbert@redhat.com, paul@xen.org,
-        anthony.perard@citrix.com, qemu-s390x@nongnu.org,
-        qemu-arm@nongnu.org, namei.unix@gmail.com, qemu-riscv@nongnu.org,
-        sunilmut@microsoft.com, jsnow@redhat.com,
-        zhang.zhanghailiang@huawei.com, rth@twiddle.net, kwolf@redhat.com,
-        berrange@redhat.com, qemu-block@nongnu.org,
-        kbastian@mail.uni-paderborn.de, cohuck@redhat.com,
-        laurent@vivier.eu, mreitz@redhat.com, palmer@dabbelt.com,
-        pbonzini@redhat.com, xen-devel@lists.xenproject.org,
-        aurelien@aurel32.net
-References: <20200921162346.188997-1-stefanha@redhat.com>
- <160072176188.21069.7427016597134663502@66eaa9a8a123>
- <20200922081705.GB201611@stefanha-x1.localdomain>
-From:   =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Autocrypt: addr=philmd@redhat.com; keydata=
- mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
- bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
- GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
- z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
- XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
- CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
- bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
- qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
- MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
- qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
- YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
- CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
- KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
- 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
- JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
- piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
- 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
- gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
- 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
- 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
- RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
- apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
-Message-ID: <f70c3ae8-330f-af43-0005-86b4d3fabb2e@redhat.com>
-Date:   Tue, 22 Sep 2020 10:33:44 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+        id S1726430AbgIVIlh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 22 Sep 2020 04:41:37 -0400
+Received: from mail-dm6nam12on2053.outbound.protection.outlook.com ([40.107.243.53]:30817
+        "EHLO NAM12-DM6-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726341AbgIVIlh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 22 Sep 2020 04:41:37 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Ao77Psl9qOXnJSTRP31KKiBGln2SlqqdOPX2Y8PCYW3TSLGjFOQiX/RUjC4vMSqViCqvKEesJ9TcGvrhyw0xh/Jd2E+y/WCQxQ+e/4HJeALaRIrd7JZ4rWE9PDLp1fuPkmJkDn6xwUwXsTlPvie8AN5OhaS88nIe5Mr8wpPHTAEas3F8WqOYBMxXSn0pkqDoLfnrn/RD2CsDE8B5RgqMpwAEGLbov9T8ZisQodI+7jPggMTKXuuFh2iVNwStABotP/un05xAIT400pFyxNurkCsnCJewk+AbxwEEsw/Vgy9KdYaPYRle4mUQcOgYQubsPcFLrVEx1fGxS0mC5XvsZg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=49tKbKNAIe9+3qh3tvwC+6ucQ5TyssfwUhb9fEpUlf0=;
+ b=WGh9qFVYvMg9fmtQklZi47GVvAMy7xnYOai/JE4jFngSx9PAWD8QIpaJ/izXBMIEXONQGDsqY3BAhzzf/M0ct3TD5QQmewOyk/cFBGghJPN9cZZUl/wH7fMtRPmy+GWMHA3eoMzhJEgUDQkLjh8Y8ERD6ZElDjM99Ln50gMRJQVIduqjfgk+zEZWhMj7TAWcmh17N/a30JaO3+Sfgabb0d+vSPUJscjngZ/zgBjwjNKWNDHSHzxsXGsia3YvS9tOo7j/GxNdaTeXHmVA1FLjjY/sovzV166KnRuSUMfddBjJ/gc7YWFQrUv1Odp+kkoZHvCp/q8sP042d+hbA0o3BA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=49tKbKNAIe9+3qh3tvwC+6ucQ5TyssfwUhb9fEpUlf0=;
+ b=p1Onw3yboKdL0cKxgs5vwRt3uZX+49PD9BooIeFXn2xWEN5LFFyPGJQhJnfTzgn4/QR3xEAcaKrcdbthFPrKjZoGunp21ly90xSY+rIUpSVl84HQzq2TcL0OoQ7Xc/HXdkDrU62aBOrC2NafI1RS3scXQ7OX1bk99/t5FrA72dk=
+Authentication-Results: vger.kernel.org; dkim=none (message not signed)
+ header.d=none;vger.kernel.org; dmarc=none action=none header.from=amd.com;
+Received: from DM5PR12MB1163.namprd12.prod.outlook.com (2603:10b6:3:7a::18) by
+ DM6PR12MB4337.namprd12.prod.outlook.com (2603:10b6:5:2a9::12) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.3412.20; Tue, 22 Sep 2020 08:41:35 +0000
+Received: from DM5PR12MB1163.namprd12.prod.outlook.com
+ ([fe80::48cf:d69:d457:1b1e]) by DM5PR12MB1163.namprd12.prod.outlook.com
+ ([fe80::48cf:d69:d457:1b1e%5]) with mapi id 15.20.3391.026; Tue, 22 Sep 2020
+ 08:41:34 +0000
+From:   Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     pbonzini@redhat.com, joro@8bytes.org,
+        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
+Subject: [PATCH] KVM: SVM: Initialize ir_list and ir_list_lock regardless of AVIC enablement
+Date:   Tue, 22 Sep 2020 08:44:46 +0000
+Message-Id: <20200922084446.7218-1-suravee.suthikulpanit@amd.com>
+X-Mailer: git-send-email 2.17.1
+Content-Type: text/plain
+X-ClientProxiedBy: SA9PR10CA0028.namprd10.prod.outlook.com
+ (2603:10b6:806:a7::33) To DM5PR12MB1163.namprd12.prod.outlook.com
+ (2603:10b6:3:7a::18)
 MIME-Version: 1.0
-In-Reply-To: <20200922081705.GB201611@stefanha-x1.localdomain>
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from ethanolx5673host.amd.com (165.204.78.2) by SA9PR10CA0028.namprd10.prod.outlook.com (2603:10b6:806:a7::33) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3391.11 via Frontend Transport; Tue, 22 Sep 2020 08:41:34 +0000
+X-Mailer: git-send-email 2.17.1
+X-Originating-IP: [165.204.78.2]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-HT: Tenant
+X-MS-Office365-Filtering-Correlation-Id: 17382fb0-992c-43af-6fa8-08d85ed34fea
+X-MS-TrafficTypeDiagnostic: DM6PR12MB4337:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <DM6PR12MB433753394393DE890FFF7E0AF33B0@DM6PR12MB4337.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:3276;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: YOiISf4ksfpVHmg5p+2PS7TVZrS5Rs5oJNzGn8B/E+jIsc3fZRYsheO5OMVuqP1nJF/vrX9L/WDJe2zqIF5nvut4Zu8VunViF2U+E+AooOPDsGVikJ7IXyHUJMjEXeM69xWos16Ex66aQV9Dogl+slQZOSbx9e9TU1ASE3C7OHlqe/SUi3yKznYbpSE8pOxMaGaDwlHH1TgGLD7NaU2EXe9ebjUTlqjW/LbkLaiJCUknoSiXif92Nok0Vxb0aUyYmDf4nGpEQtQlTSJR0k/YM99iK39wZSvequNLuQMzEuy0qXtiIrejRKkA/7OcDWldg2boKkAt451iTrJ7MfpU2AEhnH8OLgCqsRKzdiXZE2IE/ONAP3CtUFyQCQgPKjnv
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM5PR12MB1163.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(396003)(366004)(346002)(376002)(39860400002)(136003)(66946007)(66476007)(52116002)(7696005)(8676002)(66556008)(478600001)(4326008)(6486002)(83380400001)(1076003)(36756003)(6666004)(26005)(2616005)(956004)(44832011)(2906002)(186003)(316002)(86362001)(5660300002)(16526019)(8936002)(26953001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData: 2vIXUfZtWH5RBdtqXczYsbiBf9WUy651QWgbylcXiDmpqfGt4QvMB8CUMtzoTBb3yLGX6m/rSEDQSojtCq0BT4PG6ssEJ+aQCwSpJysGLtaT3L9fou80ALbR3bGEXDwlxGggUHJ6uOatv4DbgFmRB5WUGdXof95esBNCVTQg9FCK5FO6fNIXYFID7Z+Jj+3Z5BnZ2dmixAoqHFyxEoNm6SlfelNwjLIdbj0OkG7FMSrEDlAoJq9qQTgNfTH6Cr573faP5ufDVWFAPyuLfBWtDvNyuOYKinKwTpWjHzIKeaw+uK4/SIfaaKl75Gaxp+iGDPefp8hShlYTUbqyTBRDIMY5Z9dLRXrOw2ZF6kz2nf5awhQxRluZGZ2/M8PMQ+fgKTFDH4P9R/Vi5LCwasBTzpoN3LjHcSk66KB/Tr/DS4JVMR1LzKnNXHZQpPTR4CIGVjgsukaWA1YWr3LXUjFDZWfSi3+so2G28I/Z2KC2UQqjcSCG0u6+YOH5e2t8JoNGCSEWnlotbRbvkqjKcrMHgPCsg6t+FeD2yUGF6y+SyUpD6t2PJlQ3JOx/KB+G+08xfqcZPrjrCcvuHFPR8LjPWBVVt/jC8onpjCWfBlXSCg4PPY576RKZakEkhUASeDvlToe6n0lI9yRQyqD39dwbLg==
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 17382fb0-992c-43af-6fa8-08d85ed34fea
+X-MS-Exchange-CrossTenant-AuthSource: DM5PR12MB1163.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Sep 2020 08:41:34.8218
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: /ulK1U2f9pZyaQ6JfSORleKiwvybqNANJTzH5n+X7ePRVsfmFITtU/j8FGp6eTBCJmIXbNhqskOcRNxu+RuziQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB4337
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 9/22/20 10:17 AM, Stefan Hajnoczi wrote:
-> On Mon, Sep 21, 2020 at 01:56:08PM -0700, no-reply@patchew.org wrote:
->> ERROR: Macros with multiple statements should be enclosed in a do - while loop
->> #2968: FILE: include/qemu/atomic.h:152:
->> +#define qemu_atomic_rcu_read__nocheck(ptr, valptr)      \
->>      __atomic_load(ptr, valptr, __ATOMIC_RELAXED);       \
->>      smp_read_barrier_depends();
->>
-...
->> WARNING: Block comments use a leading /* on a separate line
->> #7456: FILE: util/rcu.c:154:
->> +        /* In either case, the qemu_atomic_mb_set below blocks stores that free
->>
->> total: 7 errors, 4 warnings, 6507 lines checked
-> 
-> These are pre-existing coding style issues. This is a big patch that
-> tries to make as few actual changes as possible so I would rather not
-> try to fix them.
+The struct vcpu_svm.ir_list and ir_list_lock are being accessed even when
+AVIC is not enabled, while current code only initialize the list and
+the lock only when AVIC is enabled. This ended up trigger NULL pointer
+dereference bug in the function vm_ir_list_del with the following
+call trace:
 
-What I do with automated patches triggering checkpatch errors:
+    svm_update_pi_irte+0x3c2/0x550 [kvm_amd]
+    ? proc_create_single_data+0x41/0x50
+    kvm_arch_irq_bypass_add_producer+0x40/0x60 [kvm]
+    __connect+0x5f/0xb0 [irqbypass]
+    irq_bypass_register_producer+0xf8/0x120 [irqbypass]
+    vfio_msi_set_vector_signal+0x1de/0x2d0 [vfio_pci]
+    vfio_msi_set_block+0x77/0xe0 [vfio_pci]
+    vfio_pci_set_msi_trigger+0x25c/0x2f0 [vfio_pci]
+    vfio_pci_set_irqs_ioctl+0x88/0xb0 [vfio_pci]
+    vfio_pci_ioctl+0x2ea/0xed0 [vfio_pci]
+    ? alloc_file_pseudo+0xa5/0x100
+    vfio_device_fops_unl_ioctl+0x26/0x30 [vfio]
+    ? vfio_device_fops_unl_ioctl+0x26/0x30 [vfio]
+    __x64_sys_ioctl+0x96/0xd0
+    do_syscall_64+0x37/0x80
+    entry_SYSCALL_64_after_hwframe+0x44/0xa9
 
-- run automated conversion
-- fix errors until checkpatch is happy
-- run automated conversion inversed
-- result is the checkpatch changes, commit them
-- run automated conversion again, commit
+Therefore, move the initialziation code before checking for AVIC enabled
+so that it is always excuted.
+
+Fixes: dfa20099e26e ("KVM: SVM: Refactor AVIC vcpu initialization into avic_init_vcpu()")
+Signed-off-by: Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
+---
+ arch/x86/kvm/svm/avic.c | 2 --
+ arch/x86/kvm/svm/svm.c  | 3 +++
+ 2 files changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/arch/x86/kvm/svm/avic.c b/arch/x86/kvm/svm/avic.c
+index ac830cd50830..1ccf13783785 100644
+--- a/arch/x86/kvm/svm/avic.c
++++ b/arch/x86/kvm/svm/avic.c
+@@ -572,8 +572,6 @@ int avic_init_vcpu(struct vcpu_svm *svm)
+ 	if (ret)
+ 		return ret;
+ 
+-	INIT_LIST_HEAD(&svm->ir_list);
+-	spin_lock_init(&svm->ir_list_lock);
+ 	svm->dfr_reg = APIC_DFR_FLAT;
+ 
+ 	return ret;
+diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+index c44f3e9140d5..714d791fe5a5 100644
+--- a/arch/x86/kvm/svm/svm.c
++++ b/arch/x86/kvm/svm/svm.c
+@@ -1225,6 +1225,9 @@ static int svm_create_vcpu(struct kvm_vcpu *vcpu)
+ 	svm_init_osvw(vcpu);
+ 	vcpu->arch.microcode_version = 0x01000065;
+ 
++	INIT_LIST_HEAD(&svm->ir_list);
++	spin_lock_init(&svm->ir_list_lock);
++
+ 	return 0;
+ 
+ free_page4:
+-- 
+2.17.1
 
