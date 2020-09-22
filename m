@@ -2,130 +2,113 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B0512274581
-	for <lists+kvm@lfdr.de>; Tue, 22 Sep 2020 17:39:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6B3E527461E
+	for <lists+kvm@lfdr.de>; Tue, 22 Sep 2020 18:05:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726825AbgIVPjq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 22 Sep 2020 11:39:46 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:50478 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726810AbgIVPjp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 22 Sep 2020 11:39:45 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1600789184;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=lmWuOZWC5vEFLn9TZNSK2MRdB7KP5iT7n5gHz6qa7g0=;
-        b=hUGkDRZ5fRx7+8cw41fs8qSWqrOU7e9miMAeGVvhBfgRlf640TCUwX0KDFI1n3mfxEo34S
-        b1c9SYpGiGxJgf74Beo1vsXN4iTNzzBUKnoQ01jv4LITYOh6nNTTZ4DwKNxsHJqTTBk0q0
-        KTGbFK/sxRUgty7B06GYftZl4rEAnA0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-165-073ccWMMNsyOZ4DBoXHx2g-1; Tue, 22 Sep 2020 11:39:42 -0400
-X-MC-Unique: 073ccWMMNsyOZ4DBoXHx2g-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 782188C3360;
-        Tue, 22 Sep 2020 15:39:40 +0000 (UTC)
-Received: from starship (unknown [10.35.206.154])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id E026710013D7;
-        Tue, 22 Sep 2020 15:39:35 +0000 (UTC)
-Message-ID: <5d19bbf5bcc4975e4ac6c4aef8b92b4a1ed4bc16.camel@redhat.com>
-Subject: Re: [PATCH v2 1/1] KVM: x86: fix MSR_IA32_TSC read for nested
- migration
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Jim Mattson <jmattson@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
-        Joerg Roedel <joro@8bytes.org>,
-        "H. Peter Anvin" <hpa@zytor.com>
-Date:   Tue, 22 Sep 2020 18:39:34 +0300
-In-Reply-To: <7db1383cc9d40f76a02076c3b86cf832fd7463cc.camel@redhat.com>
-References: <20200921103805.9102-1-mlevitsk@redhat.com>
-         <20200921103805.9102-2-mlevitsk@redhat.com>
-         <20200921162326.GB23989@linux.intel.com>
-         <de9411ce-aa83-77c8-b2ae-a3873250a0b1@redhat.com>
-         <7db1383cc9d40f76a02076c3b86cf832fd7463cc.camel@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.3 (3.36.3-1.fc32) 
+        id S1726680AbgIVQFQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 22 Sep 2020 12:05:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52574 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726673AbgIVQFQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 22 Sep 2020 12:05:16 -0400
+Received: from mail-pg1-x544.google.com (mail-pg1-x544.google.com [IPv6:2607:f8b0:4864:20::544])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E9D8CC061755
+        for <kvm@vger.kernel.org>; Tue, 22 Sep 2020 09:05:14 -0700 (PDT)
+Received: by mail-pg1-x544.google.com with SMTP id k133so7568452pgc.7
+        for <kvm@vger.kernel.org>; Tue, 22 Sep 2020 09:05:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=3cb2ln5okcTwbkZwIHw36/uS8TyOTC34MG+GPkwSrZc=;
+        b=ket6MFsKGgeTKg06rAwU3VDAPgvifvWos8wL/PnPWPRsfN8itIg22pijPAXgFiUxD8
+         Fd7QHl+cLoi+AojYI/uzZLiSnkiKfZrV0aT1MEDwgG5wUcL5BAy0o6ZN9q6zf5x5EzEe
+         +vgACDfDyXI94Lso05jFSaPdPdjsYsl78/DZsmWSL+HdbBnaqlPM35rtfcVt5gLOelRw
+         Yo9TEUDsIhXgyB14PuoaFO8HxUGK2iYlLlmUDF49sNxPlVfj/fCxmT+ONyEa9FVYQg8v
+         qBO57Zf8p6I4kE7DkzGlQqZdpm45ZncnEFrK0CQkrt73NeKcuVR1Km00Fjp55T7bNcux
+         ++6w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=3cb2ln5okcTwbkZwIHw36/uS8TyOTC34MG+GPkwSrZc=;
+        b=mQUrKaNqhDwm6WGXN0MYyYoYo+X/7QVrCtNjclx29hFXxXgPaLScTeHyfy0JyePLUg
+         HPuQsfxwBy6FmU0dZF+xpLYUX1Aqt0Fb90psFI1jU9Ox7DkDvj9YIJiPCKQbsGaXHsCA
+         aWOM8n6siVcFD9DoYlmNB/3HIxGBMYEGhGWHvzJ+HIMa+jwbiNIk0BZGWf7p6yHeAwgC
+         excPwFKOLCByufiXyRg7qS0U4QlSEx9PqRd5B81h9Cd8ZbYjWXzrwS7E8d5iyXIjC8Q7
+         8v1+4Si6Fgo6ijbFKC8iOFUSRkBS1qe9hxaFSs68fapiqLglgB8gqoZwXivILJGGqOd5
+         GBkw==
+X-Gm-Message-State: AOAM533nzkSf7naImWKCq600c51omfrMeBzI9xCk6O+FhY9tGl/mgoo/
+        hpILfRxdnV0KYTM6dXA16OD/iA==
+X-Google-Smtp-Source: ABdhPJwDhQVCK5kMBC//E0Erf3yB57sWYMqIm4wY94GLY8PY9N2Jd3FgOvpyMgKERXA4LDx3m9cFUg==
+X-Received: by 2002:a17:902:bb85:b029:d2:21cf:dc77 with SMTP id m5-20020a170902bb85b02900d221cfdc77mr5483863pls.66.1600790714148;
+        Tue, 22 Sep 2020 09:05:14 -0700 (PDT)
+Received: from google.com ([2620:0:1008:10:1ea0:b8ff:fe75:b885])
+        by smtp.gmail.com with ESMTPSA id i1sm15473209pfk.21.2020.09.22.09.05.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 22 Sep 2020 09:05:13 -0700 (PDT)
+Date:   Tue, 22 Sep 2020 09:05:08 -0700
+From:   Vipin Sharma <vipinsh@google.com>
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     Randy Dunlap <rdunlap@infradead.org>, thomas.lendacky@amd.com,
+        pbonzini@redhat.com, tj@kernel.org, lizefan@huawei.com,
+        joro@8bytes.org, corbet@lwn.net, brijesh.singh@amd.com,
+        jon.grimm@amd.com, eric.vantassell@amd.com, gingell@google.com,
+        rientjes@google.com, kvm@vger.kernel.org, x86@kernel.org,
+        cgroups@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Dionna Glaze <dionnaglaze@google.com>,
+        Erdem Aktas <erdemaktas@google.com>
+Subject: Re: [RFC Patch 1/2] KVM: SVM: Create SEV cgroup controller.
+Message-ID: <20200922160508.GA4017872@google.com>
+References: <20200922004024.3699923-1-vipinsh@google.com>
+ <20200922004024.3699923-2-vipinsh@google.com>
+ <94c3407d-07ca-8eaf-4073-4a5e2a3fb7b8@infradead.org>
+ <20200922012227.GA26483@linux.intel.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200922012227.GA26483@linux.intel.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 2020-09-22 at 17:50 +0300, Maxim Levitsky wrote:
-> On Tue, 2020-09-22 at 14:50 +0200, Paolo Bonzini wrote:
-> > On 21/09/20 18:23, Sean Christopherson wrote:
-> > > Avoid "should" in code comments and describe what the code is doing, not what
-> > > it should be doing.  The only exception for this is when the code has a known
-> > > flaw/gap, e.g. "KVM should do X, but because of Y, KVM actually does Z".
-> > > 
-> > > > +		 * return it's real L1 value so that its restore will be correct.
-> > > s/it's/its
-> > > 
-> > > Perhaps add "unconditionally" somewhere, since arch.tsc_offset can also contain
-> > > the L1 value.  E.g. 
-> > > 
-> > > 		 * Unconditionally return L1's TSC offset on userspace reads
-> > > 		 * so that userspace reads and writes always operate on L1's
-> > > 		 * offset, e.g. to ensure deterministic behavior for migration.
-> > > 		 */
-> > > 
+On Mon, Sep 21, 2020 at 06:22:28PM -0700, Sean Christopherson wrote:
+> On Mon, Sep 21, 2020 at 06:04:04PM -0700, Randy Dunlap wrote:
+> > Hi,
 > > 
-> > Technically the host need not restore MSR_IA32_TSC at all.  This follows
-> > the idea of the discussion with Oliver Upton about transmitting the
-> > state of the kvmclock heuristics to userspace, which include a (TSC,
-> > CLOCK_MONOTONIC) pair to transmit the offset to the destination.  All
-> > that needs to be an L1 value is then the TSC value in that pair.
+> > On 9/21/20 5:40 PM, Vipin Sharma wrote:
+> > > diff --git a/init/Kconfig b/init/Kconfig
+> > > index d6a0b31b13dc..1a57c362b803 100644
+> > > --- a/init/Kconfig
+> > > +++ b/init/Kconfig
+> > > @@ -1101,6 +1101,20 @@ config CGROUP_BPF
+> > >  	  BPF_CGROUP_INET_INGRESS will be executed on the ingress path of
+> > >  	  inet sockets.
+> > >  
+> > > +config CGROUP_SEV
+> > > +	bool "SEV ASID controller"
+> > > +	depends on KVM_AMD_SEV
+> > > +	default n
+> > > +	help
+> > > +	  Provides a controller for AMD SEV ASIDs. This controller limits and
+> > > +	  shows the total usage of SEV ASIDs used in encrypted VMs on AMD
+> > > +	  processors. Whenever a new encrypted VM is created using SEV on an
+> > > +	  AMD processor, this controller will check the current limit in the
+> > > +	  cgroup to which the task belongs and will deny the SEV ASID if the
+> > > +	  cgroup has already reached its limit.
+> > > +
+> > > +	  Say N if unsure.
 > > 
-> > I'm a bit torn over this patch.  On one hand it's an easy solution, on
-> > the other hand it's... just wrong if KVM_GET_MSR is used for e.g.
-> > debugging the guest.
-> 
-> Could you explain why though? After my patch, the KVM_GET_MSR will consistently
-> read the L1 TSC, just like all other MSRs as I explained. I guess for debugging,
-> this should work?
-> 
-> The fact that TSC reads with the guest offset is a nice exception made for the guests,
-> that insist on reading this msr without inteception and not using rdtsc.
-> 
-> Best regards,
-> 	Maxim Levitsky
-> 
-> > I'll talk to Maxim and see if he can work on the kvmclock migration stuff.
-
-We talked about this on IRC and now I am also convinced that we should implement
-proper TSC migration instead, so I guess I'll drop this patch and I will implement it.
-
-Last few weeks I was digging through all the timing code, and I mostly understand it
-so it shouldn't take me much time to implement it.
-
-There is hope that this will make nested migration fully stable since, with this patch,
-it still sometimes hangs. While on my AMD machine it takes about half a day of migration
-cycles to reproduce this, on my Intel's laptop even with this patch I can hang the nested
-guest after 10-20 cycles. The symptoms look very similar to the issue that this patch
-tried to fix.
- 
-Maybe we should keep the *comment* I added to document this funny TSC read behavior. 
-When I implement the whole thing, maybe I add a comment only version of this patch
-for that.
-
-Best regards,
-	Maxim Levitsky 
-
+> > Something here (either in the bool prompt string or the help text) should
+> > let a reader know w.t.h. SEV means.
 > > 
-> > Paolo
-> > 
+> > Without having to look in other places...
+> 
+> ASIDs too.  I'd also love to see more info in the docs and/or cover letter
+> to explain why ASID management on SEV requires a cgroup.  I know what an
+> ASID is, and have a decent idea of how KVM manages ASIDs for legacy VMs, but
+> I know nothing about why ASIDs are limited for SEV and not legacy VMs.
 
-
+Thanks for the feedback, I will add more details in the Kconfig and the
+documentation about SEV and ASID.
