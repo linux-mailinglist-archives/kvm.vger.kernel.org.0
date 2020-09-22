@@ -2,382 +2,142 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 39D99273AD7
-	for <lists+kvm@lfdr.de>; Tue, 22 Sep 2020 08:27:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9E421273ADC
+	for <lists+kvm@lfdr.de>; Tue, 22 Sep 2020 08:27:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728136AbgIVG05 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 22 Sep 2020 02:26:57 -0400
-Received: from mga12.intel.com ([192.55.52.136]:45992 "EHLO mga12.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728603AbgIVG05 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 22 Sep 2020 02:26:57 -0400
-IronPort-SDR: s9NSJ3VZsGxYOvLDdfoW5QfEoWv5RskMtEZj7/LgN7DakZOaEeESqtc6m3BZp04Wf89U4jERfF
- lLtwAVEm6HEg==
-X-IronPort-AV: E=McAfee;i="6000,8403,9751"; a="140023331"
-X-IronPort-AV: E=Sophos;i="5.77,289,1596524400"; 
-   d="scan'208";a="140023331"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Sep 2020 23:17:10 -0700
-IronPort-SDR: vx0uJLVWEl95aHT1KuxIUA+fg3G/YT09cw/01+8KQGLzGppvXrxrY/Kp+kJQsXKDfbyxXO5VKx
- kdm7kFHcV2Rw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.77,289,1596524400"; 
-   d="scan'208";a="334877518"
-Received: from allen-box.sh.intel.com ([10.239.159.139])
-  by fmsmga004.fm.intel.com with ESMTP; 21 Sep 2020 23:17:06 -0700
-From:   Lu Baolu <baolu.lu@linux.intel.com>
-To:     Joerg Roedel <joro@8bytes.org>,
-        Alex Williamson <alex.williamson@redhat.com>
-Cc:     Robin Murphy <robin.murphy@arm.com>,
-        Jean-Philippe Brucker <jean-philippe@linaro.org>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Kevin Tian <kevin.tian@intel.com>,
-        Ashok Raj <ashok.raj@intel.com>,
-        Dave Jiang <dave.jiang@intel.com>,
-        Liu Yi L <yi.l.liu@intel.com>, Zeng Xin <xin.zeng@intel.com>,
-        iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, Lu Baolu <baolu.lu@linux.intel.com>
-Subject: [PATCH v5 5/5] iommu/vt-d: Add is_aux_domain support
-Date:   Tue, 22 Sep 2020 14:10:42 +0800
-Message-Id: <20200922061042.31633-6-baolu.lu@linux.intel.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20200922061042.31633-1-baolu.lu@linux.intel.com>
-References: <20200922061042.31633-1-baolu.lu@linux.intel.com>
+        id S1729459AbgIVG1T (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 22 Sep 2020 02:27:19 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:52395 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1729445AbgIVG1O (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 22 Sep 2020 02:27:14 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1600756033;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=7G+bCvhy95HPHxeoyKaN/sNOB4HyNxDqXvDdb+Os9oY=;
+        b=CQGa1eoFE7Kp39RsCNs1/Myn5UWyvlV9SoBgoQeQuN6h5AkmG8UvjlSWdq9FnGTyZlKNPN
+        VVlzrA20HWvyyLYTqe0rpEZiZfWxuevp+Ts9CpK1sil0wYbqHmZR/D0ZoyLHfKKRj4W3lK
+        IG7rfM0n+7//QxBjrHLSV43eVS/sSWY=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-308-DicjLTOvM9m9aV8sWCe-4Q-1; Tue, 22 Sep 2020 02:27:11 -0400
+X-MC-Unique: DicjLTOvM9m9aV8sWCe-4Q-1
+Received: by mail-wm1-f72.google.com with SMTP id c200so505972wmd.5
+        for <kvm@vger.kernel.org>; Mon, 21 Sep 2020 23:27:10 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=7G+bCvhy95HPHxeoyKaN/sNOB4HyNxDqXvDdb+Os9oY=;
+        b=V83u6VYwN+uqiKes1gTB5smW9WJnFUO22nEg7QiteLfw0J9Dczz74OpX21LbHOfr/4
+         I+KxRKYPxhtt8qqvsnBxSGgFcOxWoEYv1vD9GkuTA1zJSSc13TTnRpJFheWKmTO0Ac2F
+         Mk7TSR8mSb2RIeEojw2NmMufCRNzP6IGSARHQP2aLMej8EwQscVe/Jp5Ts7JN7E/YW0c
+         XG7VP28l77Ix7OgXk7FahbGxFyHO2r8K6cL7G1HDLwLmwQ3XAv5cmRUdwFaaC4suPUKa
+         bdoX4lQmH63bQE8fawikZ1jHHEFZdvn481yY7AT7Rn/GKXC6sSwXonVM12TonUxkyh0s
+         VkHA==
+X-Gm-Message-State: AOAM531NnuYNlhgT4usxZppk/5IO/ZG9Hypzckz+TdLPPpdFg/Ubf+I8
+        a8fWKhEPowGbQ1WDH3sa8kl7hD/2yuOQrFqxYcBdIRgyM9kl0oE//LSXXn8xFbxbOdpeBQZahIQ
+        A/u7RN3d1ScUM
+X-Received: by 2002:adf:fa0c:: with SMTP id m12mr3417792wrr.406.1600756029759;
+        Mon, 21 Sep 2020 23:27:09 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJx7ORFOE+M4sZ1/hLsOYfDXOsipaSc5O+Pi6m5A0EYwqbK9SJpJMOv6iyB5CnFMJ42wvwz7zg==
+X-Received: by 2002:adf:fa0c:: with SMTP id m12mr3417755wrr.406.1600756029493;
+        Mon, 21 Sep 2020 23:27:09 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:d153:8d0f:94cf:5114? ([2001:b07:6468:f312:d153:8d0f:94cf:5114])
+        by smtp.gmail.com with ESMTPSA id a83sm2892268wmh.48.2020.09.21.23.27.06
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 21 Sep 2020 23:27:08 -0700 (PDT)
+Subject: Re: [PATCH] qemu/atomic.h: prefix qemu_ to solve <stdatomic.h>
+ collisions
+To:     Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
+Cc:     qemu-riscv@nongnu.org, Fam Zheng <fam@euphon.net>,
+        Yoshinori Sato <ysato@users.sourceforge.jp>,
+        Alberto Garcia <berto@igalia.com>, Jiri Slaby <jslaby@suse.cz>,
+        Richard Henderson <rth@twiddle.net>, Peter Lieven <pl@kamp.de>,
+        David Hildenbrand <david@redhat.com>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Eric Blake <eblake@redhat.com>, Max Reitz <mreitz@redhat.com>,
+        =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
+        =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Markus Armbruster <armbru@redhat.com>, kvm@vger.kernel.org,
+        Yuval Shaia <yuval.shaia.ml@gmail.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>, qemu-block@nongnu.org,
+        Stefan Weil <sw@weilnetz.de>,
+        "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+        Michael Roth <mdroth@linux.vnet.ibm.com>,
+        Jiaxun Yang <jiaxun.yang@flygoat.com>,
+        John Snow <jsnow@redhat.com>,
+        Max Filippov <jcmvbkbc@gmail.com>,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        Alistair Francis <Alistair.Francis@wdc.com>,
+        Aurelien Jarno <aurelien@aurel32.net>,
+        Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
+        Huacai Chen <chenhc@lemote.com>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        Eduardo Habkost <ehabkost@redhat.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Sunil Muthuswamy <sunilmut@microsoft.com>,
+        Thomas Huth <thuth@redhat.com>,
+        Stefano Stabellini <sstabellini@kernel.org>,
+        Anthony Perard <anthony.perard@citrix.com>,
+        Gerd Hoffmann <kraxel@redhat.com>,
+        Peter Maydell <peter.maydell@linaro.org>,
+        Liu Yuan <namei.unix@gmail.com>, Paul Durrant <paul@xen.org>,
+        Kevin Wolf <kwolf@redhat.com>,
+        Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
+        Sagar Karandikar <sagark@eecs.berkeley.edu>,
+        Jason Wang <jasowang@redhat.com>,
+        Laurent Vivier <laurent@vivier.eu>,
+        xen-devel@lists.xenproject.org,
+        Matthew Rosato <mjrosato@linux.ibm.com>,
+        sheepdog@lists.wpkg.org, qemu-s390x@nongnu.org,
+        qemu-arm@nongnu.org, Juan Quintela <quintela@redhat.com>,
+        Hailiang Zhang <zhang.zhanghailiang@huawei.com>
+References: <20200921162346.188997-1-stefanha@redhat.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <c8892b73-6cee-9fd3-54b0-289149926041@redhat.com>
+Date:   Tue, 22 Sep 2020 08:27:05 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
+MIME-Version: 1.0
+In-Reply-To: <20200921162346.188997-1-stefanha@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-With subdevice information opt-in through iommu_ops.aux_at(de)tach_dev()
-interfaces, the vendor iommu driver is able to learn the knowledge about
-the relationships between the subdevices and the aux-domains. Implement
-is_aux_domain() support based on the relationship knowledges.
+On 21/09/20 18:23, Stefan Hajnoczi wrote:
+> clang's C11 atomic_fetch_*() functions only take a C11 atomic type
+> pointer argument. QEMU uses direct types (int, etc) and this causes a
+> compiler error when a QEMU code calls these functions in a source file
+> that also included <stdatomic.h> via a system header file:
+> 
+>   $ CC=clang CXX=clang++ ./configure ... && make
+>   ../util/async.c:79:17: error: address argument to atomic operation must be a pointer to _Atomic type ('unsigned int *' invalid)
+> 
+> Avoid using atomic_*() names in QEMU's atomic.h since that namespace is
+> used by <stdatomic.h>. Prefix QEMU's APIs with qemu_ so that atomic.h
+> and <stdatomic.h> can co-exist.
+> 
+> This patch was generated using:
+> 
+>   $ git diff | grep -o '\<atomic_[a-z0-9_]\+' | sort -u >/tmp/changed_identifiers
+>   $ for identifier in $(</tmp/changed_identifiers64); do \
+>        sed -i "s%\<$identifier\>%qemu_$identifier%" $(git grep -l "\<$identifier\>") \
+>     done
 
-Signed-off-by: Lu Baolu <baolu.lu@linux.intel.com>
----
- drivers/iommu/intel/iommu.c | 129 ++++++++++++++++++++++++++----------
- include/linux/intel-iommu.h |  17 +++--
- 2 files changed, 105 insertions(+), 41 deletions(-)
+It's certainly a good idea but it's quite verbose.
 
-diff --git a/drivers/iommu/intel/iommu.c b/drivers/iommu/intel/iommu.c
-index 86142ce32f21..9ba314e2872f 100644
---- a/drivers/iommu/intel/iommu.c
-+++ b/drivers/iommu/intel/iommu.c
-@@ -334,6 +334,8 @@ static int intel_iommu_attach_device(struct iommu_domain *domain,
- 				     struct device *dev);
- static phys_addr_t intel_iommu_iova_to_phys(struct iommu_domain *domain,
- 					    dma_addr_t iova);
-+static bool intel_iommu_dev_feat_enabled(struct device *dev,
-+					 enum iommu_dev_features feat);
- 
- #ifdef CONFIG_INTEL_IOMMU_DEFAULT_ON
- int dmar_disabled = 0;
-@@ -1881,6 +1883,7 @@ static struct dmar_domain *alloc_domain(int flags)
- 		domain->flags |= DOMAIN_FLAG_USE_FIRST_LEVEL;
- 	domain->has_iotlb_device = false;
- 	INIT_LIST_HEAD(&domain->devices);
-+	INIT_LIST_HEAD(&domain->subdevices);
- 
- 	return domain;
- }
-@@ -2629,7 +2632,7 @@ static struct dmar_domain *dmar_insert_one_dev_info(struct intel_iommu *iommu,
- 	info->iommu = iommu;
- 	info->pasid_table = NULL;
- 	info->auxd_enabled = 0;
--	INIT_LIST_HEAD(&info->auxiliary_domains);
-+	INIT_LIST_HEAD(&info->subdevices);
- 
- 	if (dev && dev_is_pci(dev)) {
- 		struct pci_dev *pdev = to_pci_dev(info->dev);
-@@ -5152,21 +5155,28 @@ static void intel_iommu_domain_free(struct iommu_domain *domain)
- 		domain_exit(to_dmar_domain(domain));
- }
- 
--/*
-- * Check whether a @domain could be attached to the @dev through the
-- * aux-domain attach/detach APIs.
-- */
--static inline bool
--is_aux_domain(struct device *dev, struct iommu_domain *domain)
-+/* Lookup subdev_info in the domain's subdevice siblings. */
-+static struct subdev_info *
-+subdev_lookup_domain(struct dmar_domain *domain, struct device *dev,
-+		     struct device *subdev)
- {
--	struct device_domain_info *info = get_domain_info(dev);
-+	struct subdev_info *sinfo = NULL, *tmp;
-+
-+	assert_spin_locked(&device_domain_lock);
-+
-+	list_for_each_entry(tmp, &domain->subdevices, link_domain) {
-+		if ((!dev || tmp->pdev == dev) && tmp->dev == subdev) {
-+			sinfo = tmp;
-+			break;
-+		}
-+	}
- 
--	return info && info->auxd_enabled &&
--			domain->type == IOMMU_DOMAIN_UNMANAGED;
-+	return sinfo;
- }
- 
--static void auxiliary_link_device(struct dmar_domain *domain,
--				  struct device *dev)
-+static void
-+subdev_link_device(struct dmar_domain *domain, struct device *dev,
-+		   struct subdev_info *sinfo)
- {
- 	struct device_domain_info *info = get_domain_info(dev);
- 
-@@ -5174,12 +5184,13 @@ static void auxiliary_link_device(struct dmar_domain *domain,
- 	if (WARN_ON(!info))
- 		return;
- 
--	domain->auxd_refcnt++;
--	list_add(&domain->auxd, &info->auxiliary_domains);
-+	list_add(&sinfo->link_phys, &info->subdevices);
-+	list_add(&sinfo->link_domain, &domain->subdevices);
- }
- 
--static void auxiliary_unlink_device(struct dmar_domain *domain,
--				    struct device *dev)
-+static void
-+subdev_unlink_device(struct dmar_domain *domain, struct device *dev,
-+		     struct subdev_info *sinfo)
- {
- 	struct device_domain_info *info = get_domain_info(dev);
- 
-@@ -5187,24 +5198,26 @@ static void auxiliary_unlink_device(struct dmar_domain *domain,
- 	if (WARN_ON(!info))
- 		return;
- 
--	list_del(&domain->auxd);
--	domain->auxd_refcnt--;
--
--	if (!domain->auxd_refcnt && domain->default_pasid > 0)
--		ioasid_free(domain->default_pasid);
-+	list_del(&sinfo->link_phys);
-+	list_del(&sinfo->link_domain);
- }
- 
--static int aux_domain_add_dev(struct dmar_domain *domain,
--			      struct device *dev)
-+static int aux_domain_add_dev(struct dmar_domain *domain, struct device *dev,
-+			      struct device *subdev)
- {
- 	int ret;
- 	unsigned long flags;
- 	struct intel_iommu *iommu;
-+	struct subdev_info *sinfo;
- 
- 	iommu = device_to_iommu(dev, NULL, NULL);
- 	if (!iommu)
- 		return -ENODEV;
- 
-+	sinfo = kzalloc(sizeof(*sinfo), GFP_KERNEL);
-+	if (!sinfo)
-+		return -ENOMEM;
-+
- 	if (domain->default_pasid <= 0) {
- 		int pasid;
- 
-@@ -5214,7 +5227,8 @@ static int aux_domain_add_dev(struct dmar_domain *domain,
- 				     NULL);
- 		if (pasid == INVALID_IOASID) {
- 			pr_err("Can't allocate default pasid\n");
--			return -ENODEV;
-+			ret = -ENODEV;
-+			goto pasid_failed;
- 		}
- 		domain->default_pasid = pasid;
- 	}
-@@ -5240,7 +5254,10 @@ static int aux_domain_add_dev(struct dmar_domain *domain,
- 		goto table_failed;
- 	spin_unlock(&iommu->lock);
- 
--	auxiliary_link_device(domain, dev);
-+	sinfo->dev = subdev;
-+	sinfo->domain = domain;
-+	sinfo->pdev = dev;
-+	subdev_link_device(domain, dev, sinfo);
- 
- 	spin_unlock_irqrestore(&device_domain_lock, flags);
- 
-@@ -5251,27 +5268,36 @@ static int aux_domain_add_dev(struct dmar_domain *domain,
- attach_failed:
- 	spin_unlock(&iommu->lock);
- 	spin_unlock_irqrestore(&device_domain_lock, flags);
--	if (!domain->auxd_refcnt && domain->default_pasid > 0)
-+	if (list_empty(&domain->subdevices) && domain->default_pasid > 0)
- 		ioasid_free(domain->default_pasid);
-+pasid_failed:
-+	kfree(sinfo);
- 
- 	return ret;
- }
- 
--static void aux_domain_remove_dev(struct dmar_domain *domain,
--				  struct device *dev)
-+static void
-+aux_domain_remove_dev(struct dmar_domain *domain, struct device *dev,
-+		      struct device *subdev)
- {
- 	struct device_domain_info *info;
- 	struct intel_iommu *iommu;
-+	struct subdev_info *sinfo;
- 	unsigned long flags;
- 
--	if (!is_aux_domain(dev, &domain->domain))
-+	if (!intel_iommu_dev_feat_enabled(dev, IOMMU_DEV_FEAT_AUX) ||
-+	    domain->domain.type != IOMMU_DOMAIN_UNMANAGED)
- 		return;
- 
- 	spin_lock_irqsave(&device_domain_lock, flags);
- 	info = get_domain_info(dev);
- 	iommu = info->iommu;
--
--	auxiliary_unlink_device(domain, dev);
-+	sinfo = subdev_lookup_domain(domain, dev, subdev);
-+	if (!sinfo) {
-+		spin_unlock_irqrestore(&device_domain_lock, flags);
-+		return;
-+	}
-+	subdev_unlink_device(domain, dev, sinfo);
- 
- 	spin_lock(&iommu->lock);
- 	intel_pasid_tear_down_entry(iommu, dev, domain->default_pasid, false);
-@@ -5279,6 +5305,10 @@ static void aux_domain_remove_dev(struct dmar_domain *domain,
- 	spin_unlock(&iommu->lock);
- 
- 	spin_unlock_irqrestore(&device_domain_lock, flags);
-+
-+	if (list_empty(&domain->subdevices) && domain->default_pasid > 0)
-+		ioasid_free(domain->default_pasid);
-+	kfree(sinfo);
- }
- 
- static int prepare_domain_attach_device(struct iommu_domain *domain,
-@@ -5334,7 +5364,8 @@ static int intel_iommu_attach_device(struct iommu_domain *domain,
- 		return -EPERM;
- 	}
- 
--	if (is_aux_domain(dev, domain))
-+	if (intel_iommu_dev_feat_enabled(dev, IOMMU_DEV_FEAT_AUX) &&
-+	    domain->type == IOMMU_DOMAIN_UNMANAGED)
- 		return -EPERM;
- 
- 	/* normally dev is not mapped */
-@@ -5359,14 +5390,15 @@ intel_iommu_aux_attach_device(struct iommu_domain *domain,
- {
- 	int ret;
- 
--	if (!is_aux_domain(dev, domain))
-+	if (!intel_iommu_dev_feat_enabled(dev, IOMMU_DEV_FEAT_AUX) ||
-+	    domain->type != IOMMU_DOMAIN_UNMANAGED)
- 		return -EPERM;
- 
- 	ret = prepare_domain_attach_device(domain, dev);
- 	if (ret)
- 		return ret;
- 
--	return aux_domain_add_dev(to_dmar_domain(domain), dev);
-+	return aux_domain_add_dev(to_dmar_domain(domain), dev, subdev);
- }
- 
- static void intel_iommu_detach_device(struct iommu_domain *domain,
-@@ -5379,7 +5411,7 @@ static void
- intel_iommu_aux_detach_device(struct iommu_domain *domain, struct device *dev,
- 			      struct device *subdev)
- {
--	aux_domain_remove_dev(to_dmar_domain(domain), dev);
-+	aux_domain_remove_dev(to_dmar_domain(domain), dev, subdev);
- }
- 
- /*
-@@ -6035,6 +6067,32 @@ static bool intel_iommu_is_attach_deferred(struct iommu_domain *domain,
- 	return attach_deferred(dev);
- }
- 
-+static int
-+intel_iommu_domain_get_attr(struct iommu_domain *domain,
-+			    enum iommu_attr attr, void *data)
-+{
-+	struct dmar_domain *dmar_domain = to_dmar_domain(domain);
-+	unsigned long flags;
-+	int ret;
-+
-+	if (domain->type != IOMMU_DOMAIN_UNMANAGED)
-+		return -EINVAL;
-+
-+	switch (attr) {
-+	case DOMAIN_ATTR_IS_AUX:
-+		spin_lock_irqsave(&device_domain_lock, flags);
-+		ret = !IS_ERR_OR_NULL(subdev_lookup_domain(dmar_domain,
-+							   NULL, data));
-+		spin_unlock_irqrestore(&device_domain_lock, flags);
-+		break;
-+	default:
-+		ret = -EINVAL;
-+		break;
-+	}
-+
-+	return ret;
-+}
-+
- static int
- intel_iommu_domain_set_attr(struct iommu_domain *domain,
- 			    enum iommu_attr attr, void *data)
-@@ -6088,6 +6146,7 @@ const struct iommu_ops intel_iommu_ops = {
- 	.domain_alloc		= intel_iommu_domain_alloc,
- 	.domain_free		= intel_iommu_domain_free,
- 	.domain_set_attr	= intel_iommu_domain_set_attr,
-+	.domain_get_attr	= intel_iommu_domain_get_attr,
- 	.attach_dev		= intel_iommu_attach_device,
- 	.detach_dev		= intel_iommu_detach_device,
- 	.aux_attach_dev		= intel_iommu_aux_attach_device,
-diff --git a/include/linux/intel-iommu.h b/include/linux/intel-iommu.h
-index 6a3ddaabf3f5..3b112356c6ea 100644
---- a/include/linux/intel-iommu.h
-+++ b/include/linux/intel-iommu.h
-@@ -526,11 +526,9 @@ struct dmar_domain {
- 					/* Domain ids per IOMMU. Use u16 since
- 					 * domain ids are 16 bit wide according
- 					 * to VT-d spec, section 9.3 */
--	unsigned int	auxd_refcnt;	/* Refcount of auxiliary attaching */
--
- 	bool has_iotlb_device;
- 	struct list_head devices;	/* all devices' list */
--	struct list_head auxd;		/* link to device's auxiliary list */
-+	struct list_head subdevices;	/* all subdevices' list */
- 	struct iova_domain iovad;	/* iova's that belong to this domain */
- 
- 	struct dma_pte	*pgd;		/* virtual address */
-@@ -603,14 +601,21 @@ struct intel_iommu {
- 	struct dmar_drhd_unit *drhd;
- };
- 
-+/* Per subdevice private data */
-+struct subdev_info {
-+	struct list_head link_phys;	/* link to phys device siblings */
-+	struct list_head link_domain;	/* link to domain siblings */
-+	struct device *pdev;		/* physical device derived from */
-+	struct device *dev;		/* subdevice node */
-+	struct dmar_domain *domain;	/* aux-domain */
-+};
-+
- /* PCI domain-device relationship */
- struct device_domain_info {
- 	struct list_head link;	/* link to domain siblings */
- 	struct list_head global; /* link to global list */
- 	struct list_head table;	/* link to pasid table */
--	struct list_head auxiliary_domains; /* auxiliary domains
--					     * attached to this device
--					     */
-+	struct list_head subdevices; /* subdevices sibling */
- 	u32 segment;		/* PCI segment number */
- 	u8 bus;			/* PCI bus number */
- 	u8 devfn;		/* PCI devfn number */
--- 
-2.17.1
+What about using atomic__* as the prefix?  It is not very common in QEMU
+but there are some cases (and I cannot think of anything better).
+
+Paolo
 
