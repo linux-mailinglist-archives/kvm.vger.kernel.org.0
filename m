@@ -2,98 +2,245 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 24D2827399F
-	for <lists+kvm@lfdr.de>; Tue, 22 Sep 2020 06:19:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 34AFF273A24
+	for <lists+kvm@lfdr.de>; Tue, 22 Sep 2020 07:24:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726577AbgIVETh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 22 Sep 2020 00:19:37 -0400
-Received: from ozlabs.org ([203.11.71.1]:45417 "EHLO ozlabs.org"
+        id S1727724AbgIVFYM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 22 Sep 2020 01:24:12 -0400
+Received: from mga09.intel.com ([134.134.136.24]:52258 "EHLO mga09.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726098AbgIVETh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 22 Sep 2020 00:19:37 -0400
-Received: by ozlabs.org (Postfix, from userid 1003)
-        id 4BwSkb5Dctz9sSC; Tue, 22 Sep 2020 14:19:35 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ozlabs.org; s=201707;
-        t=1600748375; bh=+TyuYYKH3sD47ZT12HOtuNmbIGXXMCkLfW/Ab3VHP3o=;
-        h=Date:From:To:Cc:Subject:From;
-        b=ds7Nn889CarZevU1lze3hhItrff7UpvSc+e2Mg6s+f7E+6qguTliRTIP5Nmp34zEF
-         ehW5vwl5XZyZuz/UrY6g0xkiF6nlDjtFbYqNKwKTsai1NFDOcqUvhi63LJVIqiI6hb
-         ZW/kzIPrNUbFIAwwRuBDLBcYG1oUo6KDRqQI+wmF79VSSDTaFDQArM/t8AD7ZpPAxn
-         EHd9YNdlXIlMewwMvHlqLWJEL/DV03Kb4MKIDU3TuK8wf2rXK5qim7A75mTocky+Xu
-         6/uneDBqqmox7xhf1AomJSbHHuHRyLu3dRrHjHab23UWNFteCmlUe6QptDlJoglQ7l
-         DoVPGJBHBaOTg==
-Date:   Tue, 22 Sep 2020 14:19:30 +1000
-From:   Paul Mackerras <paulus@ozlabs.org>
-To:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
-Cc:     kvm-ppc@vger.kernel.org
-Subject: [GIT PULL] Please pull my kvm-ppc-next-5.10-1 tag
-Message-ID: <20200922041930.GA531519@thinks.paulus.ozlabs.org>
+        id S1726480AbgIVFYM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 22 Sep 2020 01:24:12 -0400
+IronPort-SDR: TI61EL38lSyEmDgLt9vCJ9e4u84QVSV9VmyzU8tzuVK5RbBczKq0jqsZjdTmVHUidfzVSi6Ws0
+ MfYlboYtwLUw==
+X-IronPort-AV: E=McAfee;i="6000,8403,9751"; a="161461361"
+X-IronPort-AV: E=Sophos;i="5.77,289,1596524400"; 
+   d="scan'208";a="161461361"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Sep 2020 22:24:10 -0700
+IronPort-SDR: wSghYfMgeWPRixBTxg/Sc0+nJsYHh64kCSQTy4iRzUezxa5temmtVTVztTaCbhfVvVAGgm7Vzm
+ guejKspY+yDw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.77,289,1596524400"; 
+   d="scan'208";a="334855355"
+Received: from yadong-antec.sh.intel.com ([10.239.158.61])
+  by fmsmga004.fm.intel.com with ESMTP; 21 Sep 2020 22:24:06 -0700
+From:   yadong.qi@intel.com
+To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org, x86@kernel.org
+Cc:     pbonzini@redhat.com, sean.j.christopherson@intel.com,
+        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
+        joro@8bytes.org, tglx@linutronix.de, mingo@redhat.com,
+        bp@alien8.de, hpa@zytor.com, liran.alon@oracle.com,
+        nikita.leshchenko@oracle.com, chao.gao@intel.com,
+        kevin.tian@intel.com, luhai.chen@intel.com, bing.zhu@intel.com,
+        kai.z.wang@intel.com, yadong.qi@intel.com
+Subject: [PATCH] KVM: x86: emulate wait-for-SIPI and SIPI-VMExit
+Date:   Tue, 22 Sep 2020 13:23:43 +0800
+Message-Id: <20200922052343.84388-1-yadong.qi@intel.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Paolo,
+From: Yadong Qi <yadong.qi@intel.com>
 
-Please do a pull from my kvm-ppc-next-5.10-1 tag to get a PPC KVM
-update for 5.10.  This is a small update with just some bug fixes and
-no new features.
+Background: We have a lightweight HV, it needs INIT-VMExit and
+SIPI-VMExit to wake-up APs for guests since it do not monitor
+the Local APIC. But currently virtual wait-for-SIPI(WFS) state
+is not supported in nVMX, so when running on top of KVM, the L1
+HV cannot receive the INIT-VMExit and SIPI-VMExit which cause
+the L2 guest cannot wake up the APs.
 
-Thanks,
-Paul.
+According to Intel SDM Chapter 25.2 Other Causes of VM Exits,
+SIPIs cause VM exits when a logical processor is in
+wait-for-SIPI state.
 
-The following changes since commit d012a7190fc1fd72ed48911e77ca97ba4521bccd:
+In this patch:
+    1. introduce SIPI exit reason,
+    2. introduce wait-for-SIPI state for nVMX,
+    3. advertise wait-for-SIPI support to guest.
 
-  Linux 5.9-rc2 (2020-08-23 14:08:43 -0700)
+When L1 hypervisor is not monitoring Local APIC, L0 need to emulate
+INIT-VMExit and SIPI-VMExit to L1 to emulate INIT-SIPI-SIPI for
+L2. L2 LAPIC write would be traped by L0 Hypervisor(KVM), L0 should
+emulate the INIT/SIPI vmexit to L1 hypervisor to set proper state
+for L2's vcpu state.
 
-are available in the git repository at:
+Handle procdure:
+Source vCPU:
+    L2 write LAPIC.ICR(INIT).
+    L0 trap LAPIC.ICR write(INIT): inject a latched INIT event to target
+       vCPU.
+Target vCPU:
+    L0 emulate an INIT VMExit to L1 if is guest mode.
+    L1 set guest VMCS, guest_activity_state=WAIT_SIPI, vmresume.
+    L0 set vcpu.mp_state to INIT_RECEIVED if (vmcs12.guest_activity_state
+       == WAIT_SIPI).
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/paulus/powerpc tags/kvm-ppc-next-5.10-1
+Source vCPU:
+    L2 write LAPIC.ICR(SIPI).
+    L0 trap LAPIC.ICR write(INIT): inject a latched SIPI event to traget
+       vCPU.
+Target vCPU:
+    L0 emulate an SIPI VMExit to L1 if (vcpu.mp_state == INIT_RECEIVED).
+    L1 set CS:IP, guest_activity_state=ACTIVE, vmresume.
+    L0 resume to L2.
+    L2 start-up.
 
-for you to fetch changes up to cf59eb13e151ef42c37ae31864046c17e481ed8f:
+Signed-off-by: Yadong Qi <yadong.qi@intel.com>
+---
+ arch/x86/include/asm/vmx.h      |  1 +
+ arch/x86/include/uapi/asm/vmx.h |  2 ++
+ arch/x86/kvm/lapic.c            |  5 ++--
+ arch/x86/kvm/vmx/nested.c       | 53 ++++++++++++++++++++++++---------
+ 4 files changed, 45 insertions(+), 16 deletions(-)
 
-  KVM: PPC: Book3S: Fix symbol undeclared warnings (2020-09-22 11:53:55 +1000)
+diff --git a/arch/x86/include/asm/vmx.h b/arch/x86/include/asm/vmx.h
+index cd7de4b401fe..bff06dc64c52 100644
+--- a/arch/x86/include/asm/vmx.h
++++ b/arch/x86/include/asm/vmx.h
+@@ -113,6 +113,7 @@
+ #define VMX_MISC_PREEMPTION_TIMER_RATE_MASK	0x0000001f
+ #define VMX_MISC_SAVE_EFER_LMA			0x00000020
+ #define VMX_MISC_ACTIVITY_HLT			0x00000040
++#define VMX_MISC_ACTIVITY_WAIT_SIPI		0x00000100
+ #define VMX_MISC_ZERO_LEN_INS			0x40000000
+ #define VMX_MISC_MSR_LIST_MULTIPLIER		512
+ 
+diff --git a/arch/x86/include/uapi/asm/vmx.h b/arch/x86/include/uapi/asm/vmx.h
+index b8ff9e8ac0d5..ada955c5ebb6 100644
+--- a/arch/x86/include/uapi/asm/vmx.h
++++ b/arch/x86/include/uapi/asm/vmx.h
+@@ -32,6 +32,7 @@
+ #define EXIT_REASON_EXTERNAL_INTERRUPT  1
+ #define EXIT_REASON_TRIPLE_FAULT        2
+ #define EXIT_REASON_INIT_SIGNAL			3
++#define EXIT_REASON_SIPI_SIGNAL         4
+ 
+ #define EXIT_REASON_INTERRUPT_WINDOW    7
+ #define EXIT_REASON_NMI_WINDOW          8
+@@ -94,6 +95,7 @@
+ 	{ EXIT_REASON_EXTERNAL_INTERRUPT,    "EXTERNAL_INTERRUPT" }, \
+ 	{ EXIT_REASON_TRIPLE_FAULT,          "TRIPLE_FAULT" }, \
+ 	{ EXIT_REASON_INIT_SIGNAL,           "INIT_SIGNAL" }, \
++	{ EXIT_REASON_SIPI_SIGNAL,           "SIPI_SIGNAL" }, \
+ 	{ EXIT_REASON_INTERRUPT_WINDOW,      "INTERRUPT_WINDOW" }, \
+ 	{ EXIT_REASON_NMI_WINDOW,            "NMI_WINDOW" }, \
+ 	{ EXIT_REASON_TASK_SWITCH,           "TASK_SWITCH" }, \
+diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+index 5ccbee7165a2..d04ac7dc6adf 100644
+--- a/arch/x86/kvm/lapic.c
++++ b/arch/x86/kvm/lapic.c
+@@ -2839,7 +2839,7 @@ void kvm_apic_accept_events(struct kvm_vcpu *vcpu)
+ 
+ 	/*
+ 	 * INITs are latched while CPU is in specific states
+-	 * (SMM, VMX non-root mode, SVM with GIF=0).
++	 * (SMM, SVM with GIF=0).
+ 	 * Because a CPU cannot be in these states immediately
+ 	 * after it has processed an INIT signal (and thus in
+ 	 * KVM_MP_STATE_INIT_RECEIVED state), just eat SIPIs
+@@ -2847,7 +2847,8 @@ void kvm_apic_accept_events(struct kvm_vcpu *vcpu)
+ 	 */
+ 	if (kvm_vcpu_latch_init(vcpu)) {
+ 		WARN_ON_ONCE(vcpu->arch.mp_state == KVM_MP_STATE_INIT_RECEIVED);
+-		if (test_bit(KVM_APIC_SIPI, &apic->pending_events))
++		if (test_bit(KVM_APIC_SIPI, &apic->pending_events) &&
++		    !is_guest_mode(vcpu))
+ 			clear_bit(KVM_APIC_SIPI, &apic->pending_events);
+ 		return;
+ 	}
+diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+index 1bb6b31eb646..fe3bb68df987 100644
+--- a/arch/x86/kvm/vmx/nested.c
++++ b/arch/x86/kvm/vmx/nested.c
+@@ -2946,7 +2946,8 @@ static int nested_vmx_check_vmcs_link_ptr(struct kvm_vcpu *vcpu,
+ static int nested_check_guest_non_reg_state(struct vmcs12 *vmcs12)
+ {
+ 	if (CC(vmcs12->guest_activity_state != GUEST_ACTIVITY_ACTIVE &&
+-	       vmcs12->guest_activity_state != GUEST_ACTIVITY_HLT))
++	       vmcs12->guest_activity_state != GUEST_ACTIVITY_HLT &&
++	       vmcs12->guest_activity_state != GUEST_ACTIVITY_WAIT_SIPI))
+ 		return -EINVAL;
+ 
+ 	return 0;
+@@ -3543,19 +3544,29 @@ static int nested_vmx_run(struct kvm_vcpu *vcpu, bool launch)
+ 	 */
+ 	nested_cache_shadow_vmcs12(vcpu, vmcs12);
+ 
+-	/*
+-	 * If we're entering a halted L2 vcpu and the L2 vcpu won't be
+-	 * awakened by event injection or by an NMI-window VM-exit or
+-	 * by an interrupt-window VM-exit, halt the vcpu.
+-	 */
+-	if ((vmcs12->guest_activity_state == GUEST_ACTIVITY_HLT) &&
+-	    !(vmcs12->vm_entry_intr_info_field & INTR_INFO_VALID_MASK) &&
+-	    !(vmcs12->cpu_based_vm_exec_control & CPU_BASED_NMI_WINDOW_EXITING) &&
+-	    !((vmcs12->cpu_based_vm_exec_control & CPU_BASED_INTR_WINDOW_EXITING) &&
+-	      (vmcs12->guest_rflags & X86_EFLAGS_IF))) {
++	switch (vmcs12->guest_activity_state) {
++	case GUEST_ACTIVITY_HLT:
++		/*
++		 * If we're entering a halted L2 vcpu and the L2 vcpu won't be
++		 * awakened by event injection or by an NMI-window VM-exit or
++		 * by an interrupt-window VM-exit, halt the vcpu.
++		 */
++		if (!(vmcs12->vm_entry_intr_info_field & INTR_INFO_VALID_MASK) &&
++		    !nested_cpu_has(vmcs12, CPU_BASED_NMI_WINDOW_EXITING) &&
++		    !(nested_cpu_has(vmcs12, CPU_BASED_INTR_WINDOW_EXITING) &&
++		      (vmcs12->guest_rflags & X86_EFLAGS_IF))) {
++			vmx->nested.nested_run_pending = 0;
++			return kvm_vcpu_halt(vcpu);
++		}
++		break;
++	case GUEST_ACTIVITY_WAIT_SIPI:
+ 		vmx->nested.nested_run_pending = 0;
+-		return kvm_vcpu_halt(vcpu);
++		vcpu->arch.mp_state = KVM_MP_STATE_INIT_RECEIVED;
++		break;
++	default:
++		break;
+ 	}
++
+ 	return 1;
+ 
+ vmentry_failed:
+@@ -3781,7 +3792,20 @@ static int vmx_check_nested_events(struct kvm_vcpu *vcpu)
+ 			return -EBUSY;
+ 		nested_vmx_update_pending_dbg(vcpu);
+ 		clear_bit(KVM_APIC_INIT, &apic->pending_events);
+-		nested_vmx_vmexit(vcpu, EXIT_REASON_INIT_SIGNAL, 0, 0);
++		if (vcpu->arch.mp_state != KVM_MP_STATE_INIT_RECEIVED)
++			nested_vmx_vmexit(vcpu, EXIT_REASON_INIT_SIGNAL, 0, 0);
++		return 0;
++	}
++
++	if (lapic_in_kernel(vcpu) &&
++	    test_bit(KVM_APIC_SIPI, &apic->pending_events)) {
++		if (block_nested_events)
++			return -EBUSY;
++
++		clear_bit(KVM_APIC_SIPI, &apic->pending_events);
++		if (vcpu->arch.mp_state == KVM_MP_STATE_INIT_RECEIVED)
++			nested_vmx_vmexit(vcpu, EXIT_REASON_SIPI_SIGNAL, 0,
++						apic->sipi_vector & 0xFFUL);
+ 		return 0;
+ 	}
+ 
+@@ -6471,7 +6495,8 @@ void nested_vmx_setup_ctls_msrs(struct nested_vmx_msrs *msrs, u32 ept_caps)
+ 	msrs->misc_low |=
+ 		MSR_IA32_VMX_MISC_VMWRITE_SHADOW_RO_FIELDS |
+ 		VMX_MISC_EMULATED_PREEMPTION_TIMER_RATE |
+-		VMX_MISC_ACTIVITY_HLT;
++		VMX_MISC_ACTIVITY_HLT |
++		VMX_MISC_ACTIVITY_WAIT_SIPI;
+ 	msrs->misc_high = 0;
+ 
+ 	/*
+-- 
+2.25.1
 
-----------------------------------------------------------------
-PPC KVM update for 5.10
-
-- Fix for running nested guests with in-kernel IRQ chip
-- Fix race condition causing occasional host hard lockup
-- Minor cleanups and bugfixes
-
-----------------------------------------------------------------
-Fabiano Rosas (1):
-      KVM: PPC: Book3S HV: Do not allocate HPT for a nested guest
-
-Greg Kurz (2):
-      KVM: PPC: Book3S HV: XICS: Replace the 'destroy' method by a 'release' method
-      KVM: PPC: Don't return -ENOTSUPP to userspace in ioctls
-
-Jing Xiangfeng (1):
-      KVM: PPC: Book3S: Remove redundant initialization of variable ret
-
-Paul Mackerras (1):
-      KVM: PPC: Book3S HV: Set LPCR[HDICE] before writing HDEC
-
-Qinglang Miao (1):
-      KVM: PPC: Book3S HV: XIVE: Convert to DEFINE_SHOW_ATTRIBUTE
-
-Wang Wensheng (1):
-      KVM: PPC: Book3S: Fix symbol undeclared warnings
-
- arch/powerpc/include/asm/kvm_host.h     |  1 +
- arch/powerpc/kvm/book3s.c               |  8 +--
- arch/powerpc/kvm/book3s_64_mmu_radix.c  |  2 +-
- arch/powerpc/kvm/book3s_64_vio.c        |  4 +-
- arch/powerpc/kvm/book3s_64_vio_hv.c     |  2 +-
- arch/powerpc/kvm/book3s_hv.c            | 22 +++++++--
- arch/powerpc/kvm/book3s_hv_interrupts.S |  9 ++--
- arch/powerpc/kvm/book3s_hv_nested.c     |  2 +-
- arch/powerpc/kvm/book3s_hv_rm_xics.c    |  2 +-
- arch/powerpc/kvm/book3s_pr.c            |  2 +-
- arch/powerpc/kvm/book3s_xics.c          | 86 ++++++++++++++++++++++++++-------
- arch/powerpc/kvm/book3s_xive_native.c   | 12 +----
- arch/powerpc/kvm/booke.c                |  6 +--
- 13 files changed, 110 insertions(+), 48 deletions(-)
