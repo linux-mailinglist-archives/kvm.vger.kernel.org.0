@@ -2,145 +2,111 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E709C2743D2
-	for <lists+kvm@lfdr.de>; Tue, 22 Sep 2020 16:06:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7CB762743E1
+	for <lists+kvm@lfdr.de>; Tue, 22 Sep 2020 16:13:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726666AbgIVOGS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 22 Sep 2020 10:06:18 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:20080 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726473AbgIVOGS (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 22 Sep 2020 10:06:18 -0400
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 08ME3ZtX090055;
-        Tue, 22 Sep 2020 10:06:17 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=BLWIvwPeufNrsK+EkVjlcC/z474nAfaph4hqeuuJTjg=;
- b=qr1HtbWX2Azt13/WO8ccFRIEbPqQAC9jsoRlg5RKK7/gOkwN2H4oXHNyMp6EemwGTGqZ
- XcrniNC7UHvbD/KCpsRsQVO86WSOu62ciDkNxkC47s2x7yTvxRIwY4jlvX6J8SPf7KEO
- c2UPA96H+4WWRpMEAF8w1W2wAxSOKfoY8B1xPD14Vik9+JqDaG33vCD7vByZZHQAcwnY
- etxmLGd1wMrXki1MvRmWAngE8OxtwAB193ShRyvCgKIhIx7+hOwegfQvC4sOxNVHJjm9
- iDuXWMDfAUOUAPVkesV12CHuSUpMb6mrDJEh6b69afa+oou4RYC8lP3YXBdjkYUDM1LV aA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 33qj5uhcqc-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 22 Sep 2020 10:06:17 -0400
-Received: from m0098409.ppops.net (m0098409.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 08ME5I7K097783;
-        Tue, 22 Sep 2020 10:06:17 -0400
-Received: from ppma03wdc.us.ibm.com (ba.79.3fa9.ip4.static.sl-reverse.com [169.63.121.186])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 33qj5uhcpd-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 22 Sep 2020 10:06:17 -0400
-Received: from pps.filterd (ppma03wdc.us.ibm.com [127.0.0.1])
-        by ppma03wdc.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 08ME1faO018937;
-        Tue, 22 Sep 2020 14:06:16 GMT
-Received: from b03cxnp07028.gho.boulder.ibm.com (b03cxnp07028.gho.boulder.ibm.com [9.17.130.15])
-        by ppma03wdc.us.ibm.com with ESMTP id 33n9m8yb6j-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 22 Sep 2020 14:06:15 +0000
-Received: from b03ledav006.gho.boulder.ibm.com (b03ledav006.gho.boulder.ibm.com [9.17.130.237])
-        by b03cxnp07028.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 08ME6CKF26608036
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 22 Sep 2020 14:06:12 GMT
-Received: from b03ledav006.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id D7932C605D;
-        Tue, 22 Sep 2020 14:06:11 +0000 (GMT)
-Received: from b03ledav006.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id B20BCC6057;
-        Tue, 22 Sep 2020 14:06:10 +0000 (GMT)
-Received: from oc4221205838.ibm.com (unknown [9.163.16.144])
-        by b03ledav006.gho.boulder.ibm.com (Postfix) with ESMTP;
-        Tue, 22 Sep 2020 14:06:10 +0000 (GMT)
-Subject: Re: [PATCH 2/4] s390/pci: track whether util_str is valid in the
- zpci_dev
-To:     Niklas Schnelle <schnelle@linux.ibm.com>,
-        alex.williamson@redhat.com, cohuck@redhat.com
-Cc:     pmorel@linux.ibm.com, borntraeger@de.ibm.com, hca@linux.ibm.com,
-        gor@linux.ibm.com, gerald.schaefer@linux.ibm.com,
-        linux-s390@vger.kernel.org, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <1600529318-8996-1-git-send-email-mjrosato@linux.ibm.com>
- <1600529318-8996-3-git-send-email-mjrosato@linux.ibm.com>
- <d1bc0e6b-2a9b-3de0-4dd6-59e26d6c1da4@linux.ibm.com>
-From:   Matthew Rosato <mjrosato@linux.ibm.com>
-Message-ID: <5ef66994-e085-7d7d-141f-7a68e3915fe3@linux.ibm.com>
-Date:   Tue, 22 Sep 2020 10:06:10 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+        id S1726621AbgIVONr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 22 Sep 2020 10:13:47 -0400
+Received: from smtp-fw-4101.amazon.com ([72.21.198.25]:3748 "EHLO
+        smtp-fw-4101.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726494AbgIVONq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 22 Sep 2020 10:13:46 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1600784026; x=1632320026;
+  h=subject:from:to:cc:references:message-id:date:
+   mime-version:in-reply-to:content-transfer-encoding;
+  bh=pAEmWYUrYsp8ZVXMmaKubbkOjwluAbcABE2/aAmFiRw=;
+  b=ZQN0BTbfr3dEtDjFYXS0bH5mDGSDgu8GziaoLzbpOZrz1Vd+qerccagJ
+   hcjufSIyMGfUj21zOwvbbP++//URQbxG3wweewWCVKjhXYa244smUCUu5
+   8R6yfG12qvNtemclNzyz4GZJZg2K+5lKxFRpUt5nErNCOlkVeSt6sPYdP
+   0=;
+X-IronPort-AV: E=Sophos;i="5.77,291,1596499200"; 
+   d="scan'208";a="55593369"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-2c-168cbb73.us-west-2.amazon.com) ([10.43.8.6])
+  by smtp-border-fw-out-4101.iad4.amazon.com with ESMTP; 22 Sep 2020 14:13:24 +0000
+Received: from EX13D16EUB003.ant.amazon.com (pdx4-ws-svc-p6-lb7-vlan2.pdx.amazon.com [10.170.41.162])
+        by email-inbound-relay-2c-168cbb73.us-west-2.amazon.com (Postfix) with ESMTPS id 8E858A1E02;
+        Tue, 22 Sep 2020 14:13:22 +0000 (UTC)
+Received: from 38f9d34ed3b1.ant.amazon.com (10.43.161.237) by
+ EX13D16EUB003.ant.amazon.com (10.43.166.99) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.2; Tue, 22 Sep 2020 14:13:11 +0000
+Subject: Re: [PATCH v9 14/18] nitro_enclaves: Add Kconfig for the Nitro
+ Enclaves driver
+From:   "Paraschiv, Andra-Irina" <andraprs@amazon.com>
+To:     Greg KH <gregkh@linuxfoundation.org>
+CC:     linux-kernel <linux-kernel@vger.kernel.org>,
+        Anthony Liguori <aliguori@amazon.com>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Colm MacCarthaigh <colmmacc@amazon.com>,
+        David Duncan <davdunc@amazon.com>,
+        Bjoern Doebel <doebel@amazon.de>,
+        David Woodhouse <dwmw@amazon.co.uk>,
+        "Frank van der Linden" <fllinden@amazon.com>,
+        Alexander Graf <graf@amazon.de>,
+        "Karen Noel" <knoel@redhat.com>,
+        Martin Pohlack <mpohlack@amazon.de>,
+        Matt Wilson <msw@amazon.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Balbir Singh <sblbir@amazon.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        "Stefan Hajnoczi" <stefanha@redhat.com>,
+        Stewart Smith <trawets@amazon.com>,
+        "Uwe Dannowski" <uwed@amazon.de>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        kvm <kvm@vger.kernel.org>,
+        ne-devel-upstream <ne-devel-upstream@amazon.com>
+References: <20200911141141.33296-1-andraprs@amazon.com>
+ <20200911141141.33296-15-andraprs@amazon.com>
+ <20200914155913.GB3525000@kroah.com>
+ <c3a33dcf-794c-31ef-ced5-4f87ba21dd28@amazon.com>
+ <d7eaac0d-8855-ca83-6b10-ab4f983805a2@amazon.com>
+Message-ID: <358e7470-b841-52fe-0532-e1154ef0e93b@amazon.com>
+Date:   Tue, 22 Sep 2020 17:13:02 +0300
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:78.0)
+ Gecko/20100101 Thunderbird/78.2.2
 MIME-Version: 1.0
-In-Reply-To: <d1bc0e6b-2a9b-3de0-4dd6-59e26d6c1da4@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <d7eaac0d-8855-ca83-6b10-ab4f983805a2@amazon.com>
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
- definitions=2020-09-22_13:2020-09-21,2020-09-22 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- malwarescore=0 spamscore=0 clxscore=1015 mlxscore=0 mlxlogscore=999
- bulkscore=0 phishscore=0 priorityscore=1501 impostorscore=0 adultscore=0
- suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2006250000 definitions=main-2009220111
+X-Originating-IP: [10.43.161.237]
+X-ClientProxiedBy: EX13D43UWA002.ant.amazon.com (10.43.160.109) To
+ EX13D16EUB003.ant.amazon.com (10.43.166.99)
+Content-Type: text/plain; charset="utf-8"; format="flowed"
+Content-Transfer-Encoding: base64
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 9/21/20 5:41 AM, Niklas Schnelle wrote:
-> Hi Matthew,
-> 
-> On 9/19/20 5:28 PM, Matthew Rosato wrote:
->> We'll need to keep track of whether or not the byte string in util_str is
->> valid and thus needs to be passed to a vfio-pci passthrough device.
->>
->> Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
->> ---
->>   arch/s390/include/asm/pci.h | 3 ++-
->>   arch/s390/pci/pci_clp.c     | 1 +
->>   2 files changed, 3 insertions(+), 1 deletion(-)
->>
->> diff --git a/arch/s390/include/asm/pci.h b/arch/s390/include/asm/pci.h
->> index 882e233..32eb975 100644
->> --- a/arch/s390/include/asm/pci.h
->> +++ b/arch/s390/include/asm/pci.h
->> @@ -132,7 +132,8 @@ struct zpci_dev {
->>   	u8		rid_available	: 1;
->>   	u8		has_hp_slot	: 1;
->>   	u8		is_physfn	: 1;
->> -	u8		reserved	: 5;
->> +	u8		util_avail	: 1;
-> 
-> Any reason you're not matching the util_str_avail name in the response struct? > I think this is currently always an EBCDIC encoded string so the 
-information that
-> even if it looks like binary for anyone with a non-mainframe background
-> it is in fact a string seems quite helpful.
-
-Frankly, the dropping of 'str_' was arbitrary on my part -- I'll go 
-ahead and rename it to util_str_avail with v2.
-
-> Other than that
-> 
-> Acked-by: Niklas Schnelle <schnelle@linux.ibm.com>
-> 
-
-Thanks!
-
->> +	u8		reserved	: 4;
->>   	unsigned int	devfn;		/* DEVFN part of the RID*/
->>   
->>   	struct mutex lock;
->> diff --git a/arch/s390/pci/pci_clp.c b/arch/s390/pci/pci_clp.c
->> index 48bf316..d011134 100644
->> --- a/arch/s390/pci/pci_clp.c
->> +++ b/arch/s390/pci/pci_clp.c
->> @@ -168,6 +168,7 @@ static int clp_store_query_pci_fn(struct zpci_dev *zdev,
->>   	if (response->util_str_avail) {
->>   		memcpy(zdev->util_str, response->util_str,
->>   		       sizeof(zdev->util_str));
->> +		zdev->util_avail = 1;
->>   	}
->>   	zdev->mio_capable = response->mio_addr_avail;
->>   	for (i = 0; i < PCI_STD_NUM_BARS; i++) {
->>
+CgpPbiAyMS8wOS8yMDIwIDE1OjM0LCBQYXJhc2NoaXYsIEFuZHJhLUlyaW5hIHdyb3RlOgo+Cj4K
+PiBPbiAxNC8wOS8yMDIwIDIwOjIzLCBQYXJhc2NoaXYsIEFuZHJhLUlyaW5hIHdyb3RlOgo+Pgo+
+Pgo+PiBPbiAxNC8wOS8yMDIwIDE4OjU5LCBHcmVnIEtIIHdyb3RlOgo+Pj4gT24gRnJpLCBTZXAg
+MTEsIDIwMjAgYXQgMDU6MTE6MzdQTSArMDMwMCwgQW5kcmEgUGFyYXNjaGl2IHdyb3RlOgo+Pj4+
+IFNpZ25lZC1vZmYtYnk6IEFuZHJhIFBhcmFzY2hpdiA8YW5kcmFwcnNAYW1hem9uLmNvbT4KPj4+
+PiBSZXZpZXdlZC1ieTogQWxleGFuZGVyIEdyYWYgPGdyYWZAYW1hem9uLmNvbT4KPj4+IEkgY2Fu
+J3QgdGFrZSBwYXRjaGVzIHdpdGhvdXQgYW55IGNoYW5nZWxvZyB0ZXh0IGF0IGFsbCwgc29ycnku
+Cj4+Pgo+Pj4gU2FtZSBmb3IgYSBmZXcgb3RoZXIgcGF0Y2hlcyBpbiB0aGlzIHNlcmllcyA6KAo+
+Pj4KPj4KPj4gSSBjYW4gbW92ZSB0aGUgY2hhbmdlbG9nIHRleHQgYmVmb3JlIHRoZSBTb2IgdGFn
+KHMpIGZvciBhbGwgdGhlIAo+PiBwYXRjaGVzLiBJIGFsc28gY2FuIGFkZCBhIHN1bW1hcnkgcGhy
+YXNlIGluIHRoZSBjb21taXQgbWVzc2FnZSBmb3IgCj4+IHRoZSBjb21taXRzIGxpa2UgdGhpcyBv
+bmUgdGhhdCBoYXZlIG9ubHkgdGhlIGNvbW1pdCB0aXRsZSBhbmQgU29iICYgCj4+IFJiIHRhZ3Mu
+Cj4+Cj4+IFdvdWxkIHRoZXNlIHVwZGF0ZXMgdG8gdGhlIGNvbW1pdCBtZXNzYWdlcyBtYXRjaCB0
+aGUgZXhwZWN0YXRpb25zPwo+Pgo+PiBMZXQgbWUga25vdyBpZiByZW1haW5pbmcgZmVlZGJhY2sg
+dG8gZGlzY3VzcyBhbmQgSSBzaG91bGQgaW5jbHVkZSBhcyAKPj4gdXBkYXRlcyBpbiB2MTAuIE90
+aGVyd2lzZSwgSSBjYW4gc2VuZCB0aGUgbmV3IHJldmlzaW9uIHdpdGggdGhlIAo+PiB1cGRhdGVk
+IGNvbW1pdCBtZXNzYWdlcy4KPj4KPj4gVGhhbmtzIGZvciByZXZpZXcuCj4KPiBIZXJlIHdlIGdv
+LCBJIHB1Ymxpc2hlZCB2MTAsIGluY2x1ZGluZyB0aGUgdXBkYXRlZCBjb21taXQgbWVzc2FnZXMg
+YW5kIAo+IHJlYmFzZWQgb24gdG9wIG9mIHY1LjktcmM2Lgo+Cj4gaHR0cHM6Ly9sb3JlLmtlcm5l
+bC5vcmcvbGttbC8yMDIwMDkyMTEyMTczMi40NDI5MS0xLWFuZHJhcHJzQGFtYXpvbi5jb20vCj4K
+PiBBbnkgYWRkaXRpb25hbCBmZWVkYmFjaywgb3BlbiB0byBkaXNjdXNzLgo+Cj4gSWYgYWxsIGxv
+b2tzIGdvb2QsIHdlIGNhbiBtb3ZlIGZvcndhcmQgYXMgd2UndmUgdGFsa2VkIGJlZm9yZSwgdG8g
+aGF2ZSAKPiB0aGUgcGF0Y2ggc2VyaWVzIG9uIHRoZSBjaGFyLW1pc2MgYnJhbmNoIGFuZCB0YXJn
+ZXQgdjUuMTAtcmMxLgoKVGhhbmtzIGZvciBtZXJnaW5nIHRoZSBwYXRjaCBzZXJpZXMgb24gdGhl
+IGNoYXItbWlzYy10ZXN0aW5nIGJyYW5jaCBhbmQgCmZvciB0aGUgcmV2aWV3IHNlc3Npb25zIHdl
+J3ZlIGhhZC4KCkxldCdzIHNlZSBob3cgYWxsIGdvZXMgbmV4dDsgaWYgYW55dGhpbmcgaW4gdGhl
+IG1lYW50aW1lIHRvIGJlIGRvbmUgCihlLmcuIGFuZCBub3QgY29taW5nIHZpYSBhdXRvLWdlbmVy
+YXRlZCBtYWlscyksIGp1c3QgbGV0IG1lIGtub3cuCgpBbmRyYQoKCgpBbWF6b24gRGV2ZWxvcG1l
+bnQgQ2VudGVyIChSb21hbmlhKSBTLlIuTC4gcmVnaXN0ZXJlZCBvZmZpY2U6IDI3QSBTZi4gTGF6
+YXIgU3RyZWV0LCBVQkM1LCBmbG9vciAyLCBJYXNpLCBJYXNpIENvdW50eSwgNzAwMDQ1LCBSb21h
+bmlhLiBSZWdpc3RlcmVkIGluIFJvbWFuaWEuIFJlZ2lzdHJhdGlvbiBudW1iZXIgSjIyLzI2MjEv
+MjAwNS4K
 
