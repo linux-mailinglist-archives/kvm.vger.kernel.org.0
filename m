@@ -2,97 +2,133 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5A9C927534C
-	for <lists+kvm@lfdr.de>; Wed, 23 Sep 2020 10:34:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 505C42753AF
+	for <lists+kvm@lfdr.de>; Wed, 23 Sep 2020 10:51:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726485AbgIWIeu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 23 Sep 2020 04:34:50 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:59700 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726184AbgIWIeu (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 23 Sep 2020 04:34:50 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1600850089;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=V9QmIAlLfRDBlkozhSVx32VjLU4/mzcYj/iI28/ylS0=;
-        b=UQM46wlVcDvJCV8OeFDeyT4hKz4g/+XuniUCFaSMWw01b+qLJwu8TZ7hm4ZmJKoZU2SE0x
-        d90LPc87iyhNmmNIy3XIb6nOEIYTnx9x8zMIRUuI6uoFZVKD2cM6d0gYwaHp+HHyosU9nL
-        jpwnbLJdrwqt020cSKRSHfsimhb4xkw=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-121-lNJd7dWYO6Kb0BgEv6WGjw-1; Wed, 23 Sep 2020 04:34:47 -0400
-X-MC-Unique: lNJd7dWYO6Kb0BgEv6WGjw-1
-Received: by mail-wr1-f72.google.com with SMTP id v12so8537436wrm.9
-        for <kvm@vger.kernel.org>; Wed, 23 Sep 2020 01:34:47 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=V9QmIAlLfRDBlkozhSVx32VjLU4/mzcYj/iI28/ylS0=;
-        b=DI1sRQpEuqcSUbE38VXxScpDftzJj8s0wr4bTXmwj24vhVPstmKoKu3PCT/Q8cWkQB
-         n5d8BMNiJc3SsXLY/QfGNB0RUBaJQg3cv+a7MoUh0ZMO4DPFEU0KM0g9rb4SvONwdcGD
-         8thpWZnJAFPApLDM9UiCofJXsEtyl8NArlSBX0AAPp/weHLxQ4dqygUVieP9f9hBpVDb
-         vYNl4MjMyErw8ZI3FycPo+YlZICerezjy0UQjm+cPMgZs5sDfqaI4SBERDWMNcEv8+Au
-         nJw8OWPp9QNmoIqYCoa52B5doDVCnSwOmV309c9rPfUfrN0mc4W0bCqsHWm76NCOU9Xn
-         GsEA==
-X-Gm-Message-State: AOAM530P5beC0t/0vp1q1SXjlwMIf5OvZlFIIz2oqyfWcqUd6xC7+oBI
-        p4EpwPWsxrMGnCvJlqx3PncjwgDtODETbfUUIMf4L6XQIdejHqIqictoE4rNfaxSmWbcY4NNBMw
-        s4aqRTo+Z2F0m
-X-Received: by 2002:a1c:488:: with SMTP id 130mr5047301wme.164.1600850085473;
-        Wed, 23 Sep 2020 01:34:45 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzAXfuw0EMSaPOYeNL03RCVF3KB0m3rbV/oODwjvtwTnvCW++VDx+fdEay881HWfNKFd4bu5A==
-X-Received: by 2002:a1c:488:: with SMTP id 130mr5047286wme.164.1600850085289;
-        Wed, 23 Sep 2020 01:34:45 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:15f1:648d:7de6:bad9? ([2001:b07:6468:f312:15f1:648d:7de6:bad9])
-        by smtp.gmail.com with ESMTPSA id n10sm7760017wmk.7.2020.09.23.01.34.44
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 23 Sep 2020 01:34:44 -0700 (PDT)
-Subject: Re: [kvm-unit-tests PATCH] travis.yml: Fix the getopt problem
-To:     Thomas Huth <thuth@redhat.com>, kvm@vger.kernel.org
-Cc:     Roman Bolshakov <r.bolshakov@yadro.com>
-References: <20200923073931.74769-1-thuth@redhat.com>
- <0bc92d08-a642-32c9-0a73-102f6fd27913@redhat.com>
- <40a4f2f0-5ca2-2a7e-e558-bc35ffdb9b10@redhat.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <765c45b4-86d6-565b-b899-9478b072046a@redhat.com>
-Date:   Wed, 23 Sep 2020 10:34:44 +0200
+        id S1726413AbgIWIvy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 23 Sep 2020 04:51:54 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:59250 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726130AbgIWIvx (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 23 Sep 2020 04:51:53 -0400
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 08N8WW9M145621;
+        Wed, 23 Sep 2020 04:51:43 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=2XXRDnFO/61UBTTV4Z8JpRj9BrTLJ0R2VP3pc0tFfPI=;
+ b=sNMx1ruptdj/TwZ10RigDrrUPiRBSEmrScUoRpdq8pBtZyMKqU5cuMCI359HywyNZrtp
+ QwMnDn1loieWc1+tOfIfK5Vv4SHDIUPmRZFoI9WJkJzo3FkMGUIJXYUxsFdT526Xf1Q+
+ G4rit3F1vT0qp32Oz8IVnFonJv6nw2enKRk8S16uKLN9Avr1Fe4MHxi5NsC69E71uEIT
+ memXtqaz5dUThNQcFPlsd1S8QOZUTZm0x0RY+XgV6x4jmaWjoIvTwegqxwZvlzsr/Ttg
+ +nUpwP5OdaUo/XRDkaE0opWwzGm7etFlbUhpI4yIfAb8TmrtoAw174Kd2D9ICkwP4QM8 zg== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 33r164c1en-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 23 Sep 2020 04:51:42 -0400
+Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 08N8XgL9150134;
+        Wed, 23 Sep 2020 04:51:42 -0400
+Received: from ppma06fra.de.ibm.com (48.49.7a9f.ip4.static.sl-reverse.com [159.122.73.72])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 33r164c1dt-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 23 Sep 2020 04:51:42 -0400
+Received: from pps.filterd (ppma06fra.de.ibm.com [127.0.0.1])
+        by ppma06fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 08N8lNlI021274;
+        Wed, 23 Sep 2020 08:51:40 GMT
+Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
+        by ppma06fra.de.ibm.com with ESMTP id 33n98gt2gr-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 23 Sep 2020 08:51:40 +0000
+Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com [9.149.105.60])
+        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 08N8o2O833751458
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 23 Sep 2020 08:50:02 GMT
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 9225A4204B;
+        Wed, 23 Sep 2020 08:51:37 +0000 (GMT)
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id DAC4942041;
+        Wed, 23 Sep 2020 08:51:36 +0000 (GMT)
+Received: from oc3016276355.ibm.com (unknown [9.145.32.68])
+        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Wed, 23 Sep 2020 08:51:36 +0000 (GMT)
+Subject: Re: [PATCH v5 3/3] vfio/pci: Decouple PCI_COMMAND_MEMORY bit checks
+ from is_virtfn
+To:     Alex Williamson <alex.williamson@redhat.com>,
+        Matthew Rosato <mjrosato@linux.ibm.com>
+Cc:     bhelgaas@google.com, schnelle@linux.ibm.com, mpe@ellerman.id.au,
+        oohall@gmail.com, cohuck@redhat.com, kevin.tian@intel.com,
+        hca@linux.ibm.com, gor@linux.ibm.com, borntraeger@de.ibm.com,
+        linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, linux-pci@vger.kernel.org
+References: <1599749997-30489-1-git-send-email-mjrosato@linux.ibm.com>
+ <1599749997-30489-4-git-send-email-mjrosato@linux.ibm.com>
+ <08afc6b2-7549-5440-a947-af0b598288c2@linux.ibm.com>
+ <20200922104030.07e0dfd9@x1.home>
+From:   Pierre Morel <pmorel@linux.ibm.com>
+Message-ID: <f11cfdd7-c743-b26d-2843-0cb74ef2643e@linux.ibm.com>
+Date:   Wed, 23 Sep 2020 10:51:36 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <40a4f2f0-5ca2-2a7e-e558-bc35ffdb9b10@redhat.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20200922104030.07e0dfd9@x1.home>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
+ definitions=2020-09-23_03:2020-09-23,2020-09-23 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ adultscore=0 impostorscore=0 mlxlogscore=999 malwarescore=0 spamscore=0
+ phishscore=0 suspectscore=0 mlxscore=0 clxscore=1011 bulkscore=0
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2006250000 definitions=main-2009230064
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 23/09/20 10:29, Thomas Huth wrote:
-> On 23/09/2020 10.14, Paolo Bonzini wrote:
->> On 23/09/20 09:39, Thomas Huth wrote:
->>> The enhanced getopt is now not selected with a configure switch
->>> anymore, but by setting the PATH to the right location.
->>>
->>> Signed-off-by: Thomas Huth <thuth@redhat.com>
->>> ---
->>>  This fixes the new macOS build jobs on Travis :
->>>  https://travis-ci.com/github/huth/kvm-unit-tests/builds/186146708
->>>
->>>  .travis.yml | 8 ++++----
->>>  1 file changed, 4 insertions(+), 4 deletions(-)
->>
->> Pushed, and I also linked the gitlab repo to Travis:
->>
->> https://travis-ci.com/gitlab/kvm-unit-tests/KVM-Unit-Tests
+
+
+On 2020-09-22 18:40, Alex Williamson wrote:
+> On Mon, 21 Sep 2020 08:43:29 -0400
+> Matthew Rosato <mjrosato@linux.ibm.com> wrote:
 > 
-> Oh, that's sweet, thanks! I didn't know that Travis can also access
-> gitlab repositories now :-)
+>> On 9/10/20 10:59 AM, Matthew Rosato wrote:
+>>> While it is true that devices with is_virtfn=1 will have a Memory Space
+>>> Enable bit that is hard-wired to 0, this is not the only case where we
+>>> see this behavior -- For example some bare-metal hypervisors lack
+>>> Memory Space Enable bit emulation for devices not setting is_virtfn
+>>> (s390). Fix this by instead checking for the newly-added
+>>> no_command_memory bit which directly denotes the need for
+>>> PCI_COMMAND_MEMORY emulation in vfio.
+>>>
+>>> Fixes: abafbc551fdd ("vfio-pci: Invalidate mmaps and block MMIO access on disabled memory")
+>>> Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
+>>> Reviewed-by: Niklas Schnelle <schnelle@linux.ibm.com>
+>>> Reviewed-by: Pierre Morel <pmorel@linux.ibm.com>
+>>
+>> Polite ping on this patch as the other 2 have now received maintainer
+>> ACKs or reviews.  I'm concerned about this popping up in distros as
+>> abafbc551fdd was a CVE fix.  Related, see question from the cover:
+>>
+>> - Restored the fixes tag to patch 3 (but the other 2 patches are
+>>     now pre-reqs -- cc stable 5.8?)
+> 
+> I've got these queued in my local branch which I'll push to next for
+> v5.10.  I'm thinking that perhaps the right thing would be to add the
+> fixes tag to all three patches, otherwise I could see that the PCI/VF
+> change might get picked as a dependency, but not the s390 specific one.
+> Does this sound correct to everyone?  Thanks,
+> 
+> Alex
+> 
+sound correct for me.
+Thanks.
 
-Silver lining of being shamed :)
+Pierre
 
-Paolo
-
+-- 
+Pierre Morel
+IBM Lab Boeblingen
