@@ -2,168 +2,89 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 21185275B36
-	for <lists+kvm@lfdr.de>; Wed, 23 Sep 2020 17:13:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 74F4B275B7B
+	for <lists+kvm@lfdr.de>; Wed, 23 Sep 2020 17:19:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726460AbgIWPNy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 23 Sep 2020 11:13:54 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:54378 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726130AbgIWPNy (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 23 Sep 2020 11:13:54 -0400
+        id S1726743AbgIWPT6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 23 Sep 2020 11:19:58 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:37018 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726265AbgIWPTz (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 23 Sep 2020 11:19:55 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1600874032;
+        s=mimecast20190719; t=1600874394;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=FlU/OKWGsUcXAWijq0uSnuWl+UgM4drfHtrzAcT8ML8=;
-        b=C/TVv0i8TMYwhy+te31R+kpLGRKrj6/T0wb6B8fNZfnUilxx9QWcCGHcpfN47nVE95Q4Kk
-        6VZ3LnDu6+bYNkjZxdN1PwSx0d74EJdW4tvNsLYzPyuT4oGaab32kfO+CE04lUQpZbnw8f
-        ces3SMmmEP7LBBwuIzP4O1VYy13Vy/I=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-513-BSnw5gicMoaqzycugApOAQ-1; Wed, 23 Sep 2020 11:13:35 -0400
-X-MC-Unique: BSnw5gicMoaqzycugApOAQ-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7C763186DD29;
-        Wed, 23 Sep 2020 15:13:30 +0000 (UTC)
-Received: from localhost (ovpn-113-77.ams2.redhat.com [10.36.113.77])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 48F7F19D7D;
-        Wed, 23 Sep 2020 15:13:18 +0000 (UTC)
-Date:   Wed, 23 Sep 2020 16:13:17 +0100
-From:   Stefan Hajnoczi <stefanha@redhat.com>
-To:     qemu-devel@nongnu.org
-Cc:     Michael Roth <mdroth@linux.vnet.ibm.com>,
-        John Snow <jsnow@redhat.com>,
-        Alistair Francis <Alistair.Francis@wdc.com>,
-        Halil Pasic <pasic@linux.ibm.com>,
-        Matthew Rosato <mjrosato@linux.ibm.com>,
-        Peter Maydell <peter.maydell@linaro.org>,
-        Eric Blake <eblake@redhat.com>,
-        Markus Armbruster <armbru@redhat.com>,
-        Gerd Hoffmann <kraxel@redhat.com>, sheepdog@lists.wpkg.org,
-        Yoshinori Sato <ysato@users.sourceforge.jp>,
-        Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
-        Thomas Huth <thuth@redhat.com>, kvm@vger.kernel.org,
-        Paul Durrant <paul@xen.org>, qemu-s390x@nongnu.org,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
-        Aurelien Jarno <aurelien@aurel32.net>,
-        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        Stefan Weil <sw@weilnetz.de>, qemu-riscv@nongnu.org,
-        qemu-block@nongnu.org,
-        Hailiang Zhang <zhang.zhanghailiang@huawei.com>,
-        Max Filippov <jcmvbkbc@gmail.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Alberto Garcia <berto@igalia.com>,
-        Kevin Wolf <kwolf@redhat.com>, Peter Lieven <pl@kamp.de>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        =?iso-8859-1?Q?Marc-Andr=E9?= Lureau 
-        <marcandre.lureau@redhat.com>,
-        Jiaxun Yang <jiaxun.yang@flygoat.com>,
-        Laurent Vivier <laurent@vivier.eu>,
-        Anthony Perard <anthony.perard@citrix.com>,
-        Yuval Shaia <yuval.shaia.ml@gmail.com>,
-        xen-devel@lists.xenproject.org, Huacai Chen <chenhc@lemote.com>,
-        Sunil Muthuswamy <sunilmut@microsoft.com>,
-        Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
-        Juan Quintela <quintela@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Max Reitz <mreitz@redhat.com>,
-        Richard Henderson <rth@twiddle.net>,
-        Jiri Slaby <jslaby@suse.cz>,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        Sagar Karandikar <sagark@eecs.berkeley.edu>,
-        Liu Yuan <namei.unix@gmail.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
-        Stefano Stabellini <sstabellini@kernel.org>,
-        Fam Zheng <fam@euphon.net>,
-        David Hildenbrand <david@redhat.com>,
-        Eduardo Habkost <ehabkost@redhat.com>, qemu-arm@nongnu.org
-Subject: Re: [PATCH v3] qemu/atomic.h: rename atomic_ to qatomic_
-Message-ID: <20200923151317.GA65166@stefanha-x1.localdomain>
-References: <20200923105646.47864-1-stefanha@redhat.com>
+        bh=VP/uPxlVn+VO8OSs/cXXYD6CRLQQniKKhgRTFTtzIRU=;
+        b=VKIB3DwV1U/21bPVwBpVJp1MHd4yJKSeYNBxnTCjfpoMCc4hNaCz7oq0tA3vjt/HnmOSyw
+        eDVoLHEyyoJuv13fvViym2s5Gfi6nrpAaPzK368/EiJy4CKYPDlCnMu0m6fBjSAg97kcNG
+        Ewr+8SQEgp3Xy5P//41gAfV5cLHfdKQ=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-172-mBGbGZs1Ojqf0Kh5FQAlWw-1; Wed, 23 Sep 2020 11:19:50 -0400
+X-MC-Unique: mBGbGZs1Ojqf0Kh5FQAlWw-1
+Received: by mail-wr1-f70.google.com with SMTP id f18so8961217wrv.19
+        for <kvm@vger.kernel.org>; Wed, 23 Sep 2020 08:19:50 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=VP/uPxlVn+VO8OSs/cXXYD6CRLQQniKKhgRTFTtzIRU=;
+        b=WuQ52zRoEdMEXmlfGBu4CkszFXAfKkWHnoGrF1U4Nz0QJfzMekLcwNdvg/geM8DZZV
+         Uf7JtlqtLW0FhY9x39fcCNejKPzo2Qx3UuTFpeivv2BqCLDUfwxqVi+UckvX5Zb8koys
+         IeHKa5ASd79kmZUY6hIhUCBLsV892+wIxgfXQylVCsErX0DttimKM5J4en2J47+XiXqU
+         ihpLK/QkbAJhj34fEI5TOY4cMYm5Vekq0+16nk9yTYfYi2fgr2X720G3LREINbe1rl7J
+         pDgEkAr/hlG5TCBaX0Oxzv3uBAVjZCMZhvqJn5Ka091884b3HFqB9Q4J1v8gPgG1j1uT
+         aWrg==
+X-Gm-Message-State: AOAM533aRyXa4zSunBnNz0j34GDJjnonaDYPeCPTv1NnoFYAGqIh/Q9f
+        3gORi7iiAngoprIu7DeZueVTgDGkl2K891iJW7+k/IptVehI/cL5bU1LgFy5X8Wgscd+2XvXH3l
+        YB3wi8t/Uh8p3
+X-Received: by 2002:a05:600c:22d2:: with SMTP id 18mr25118wmg.145.1600874389035;
+        Wed, 23 Sep 2020 08:19:49 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzbgMoWwfq+neyAnsK0EaJ4ibs2pkKiG4LrxWCZ5IbM3u5TcuDmjgY1SOIQ3UTsK1K+EpMxkg==
+X-Received: by 2002:a05:600c:22d2:: with SMTP id 18mr25098wmg.145.1600874388795;
+        Wed, 23 Sep 2020 08:19:48 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:15f1:648d:7de6:bad9? ([2001:b07:6468:f312:15f1:648d:7de6:bad9])
+        by smtp.gmail.com with ESMTPSA id c4sm120226wme.27.2020.09.23.08.19.47
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 23 Sep 2020 08:19:48 -0700 (PDT)
+Subject: Re: [PATCH] KVM: x86: VMX: Make smaller physical guest address space
+ support user-configurable
+To:     Jim Mattson <jmattson@google.com>
+Cc:     Mohammed Gamal <mgamal@redhat.com>, joro@8bytes.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        sean.j.christopherson@intel.com, vkuznets@redhat.com,
+        wanpengli@tencent.com
+References: <20200903141122.72908-1-mgamal@redhat.com>
+ <8c7ce8ff-a212-a974-3829-c45eb5335651@redhat.com>
+ <CALMp9eTHbhwfdq4Be=XcUG9z82KK8AapQeVmsdH=mGdQ_Yt2ug@mail.gmail.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <79277092-a5b8-ebb0-8a9f-e41d094ed05b@redhat.com>
+Date:   Wed, 23 Sep 2020 17:19:46 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <20200923105646.47864-1-stefanha@redhat.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-Authentication-Results: relay.mimecast.com;
-        auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=stefanha@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="HlL+5n6rz5pIUxbD"
-Content-Disposition: inline
+In-Reply-To: <CALMp9eTHbhwfdq4Be=XcUG9z82KK8AapQeVmsdH=mGdQ_Yt2ug@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
---HlL+5n6rz5pIUxbD
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+On 23/09/20 16:32, Jim Mattson wrote:
+> You don’t buy my argument that this should be per-VM, then? I’d bet that
+> we have very close to 0 customers who care about emulating the reserved
+> bits properly for 46-but wide VMs, but there may be someone out there
+> using shadow paging in a nested kvm. 
+> 
 
-On Wed, Sep 23, 2020 at 11:56:46AM +0100, Stefan Hajnoczi wrote:
-> clang's C11 atomic_fetch_*() functions only take a C11 atomic type
-> pointer argument. QEMU uses direct types (int, etc) and this causes a
-> compiler error when a QEMU code calls these functions in a source file
-> that also included <stdatomic.h> via a system header file:
->=20
->   $ CC=3Dclang CXX=3Dclang++ ./configure ... && make
->   ../util/async.c:79:17: error: address argument to atomic operation must=
- be a pointer to _Atomic type ('unsigned int *' invalid)
->=20
-> Avoid using atomic_*() names in QEMU's atomic.h since that namespace is
-> used by <stdatomic.h>. Prefix QEMU's APIs with 'q' so that atomic.h
-> and <stdatomic.h> can co-exist. I checked /usr/include on my machine and
-> searched GitHub for existing "qatomic_" users but there seem to be none.
->=20
-> This patch was generated using:
->=20
->   $ git grep -h -o '\<atomic\(64\)\?_[a-z0-9_]\+' include/qemu/atomic.h |=
- \
->     sort -u >/tmp/changed_identifiers
->   $ for identifier in $(</tmp/changed_identifiers); do
->         sed -i "s%\<$identifier\>%q$identifier%g" \
->             $(git grep -I -l "\<$identifier\>")
->     done
->=20
-> I manually fixed line-wrap issues and misaligned rST tables.
->=20
-> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-> ---
-> v3:
->  * Use qatomic_ instead of atomic_ [Paolo]
->  * The diff of my manual fixups is available here:
->    https://vmsplice.net/~stefan/atomic-namespace-pre-fixups-v3.diff
->    - Dropping #ifndef qatomic_fetch_add in atomic.h
->    - atomic_##X(haddr, val) glue macros not caught by grep
->    - Keep atomic_add-bench name
->    - C preprocessor backslash-newline ('\') column alignment
->    - Line wrapping
+I do buy it but I prefer not to have a released version of Linux where
+this is enabled by default.  I procrastinated hoping to cobble something
+together but I didn't have time.
 
-Thanks, applied quickly due to high risk of conflicts:
-https://github.com/stefanha/qemu/commits/block
-
-Stefan
-
---HlL+5n6rz5pIUxbD
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl9rZg0ACgkQnKSrs4Gr
-c8hgKAgAgMxkkgpOvyrKNVjow73folqKA0ZhroVDQHEUsTa2UYiwbbbbNRLcYq0F
-vaMQDzh9lx3hrohttFIS/rehi66qH4XW/k+tD6M4ACJbKA3QpL7N50aGEbrgTIRC
-23cIU2FHbnqNoNraQw9xU3e1A5Ux7m/1hbNaK2uIFguwU6xo9X2CvUfQsEOcSUS6
-afb0Krf0sN5LMMjGGnBuA7b6Fg9rrDNzBZvmZQkoFPkQEBoZWj4BGTyY76OhVnGg
-Po6uwJZYi5xyX9wr4ESopGboCs7ZkDF2uLGNwTbC5kkDYurysefdfclYPotW5Jxr
-kUPXGqzNlp5YT7HHoqpjtPu6bX44Wg==
-=+ZBo
------END PGP SIGNATURE-----
-
---HlL+5n6rz5pIUxbD--
+Paolo
 
