@@ -2,31 +2,31 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8490A2760C9
-	for <lists+kvm@lfdr.de>; Wed, 23 Sep 2020 21:12:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 388A02761C2
+	for <lists+kvm@lfdr.de>; Wed, 23 Sep 2020 22:14:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726638AbgIWTMH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 23 Sep 2020 15:12:07 -0400
-Received: from mga14.intel.com ([192.55.52.115]:12738 "EHLO mga14.intel.com"
+        id S1726599AbgIWUNu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 23 Sep 2020 16:13:50 -0400
+Received: from mga12.intel.com ([192.55.52.136]:49295 "EHLO mga12.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726515AbgIWTMG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 23 Sep 2020 15:12:06 -0400
-IronPort-SDR: bQpuDFpeaUtbVXtIzXjyomjU6HSf44kNzG2S6wf2pFY2qgS6cmLIj+EX9BkC4aheDQpG6UN24D
- 8yrjCukqmibw==
-X-IronPort-AV: E=McAfee;i="6000,8403,9753"; a="160281225"
+        id S1726381AbgIWUNu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 23 Sep 2020 16:13:50 -0400
+IronPort-SDR: wCdSiOs0vQx+K6ecUit0n5dkoIZWUio1IRk5CkYXWQeUe645YCqLRVc53YOq6Yae2BS853GBq3
+ 1ubL57nGuteA==
+X-IronPort-AV: E=McAfee;i="6000,8403,9753"; a="140472231"
 X-IronPort-AV: E=Sophos;i="5.77,293,1596524400"; 
-   d="scan'208";a="160281225"
+   d="scan'208";a="140472231"
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Sep 2020 12:12:06 -0700
-IronPort-SDR: UclwOekwO5FlzgPqU/RilPEY6TTNa3q+D2KirpX+ICPG7WI0atvKS5bbr7dg+bupcbOIdH8JHr
- rK1Z9PYNgdcQ==
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Sep 2020 13:13:50 -0700
+IronPort-SDR: JfVoEbr6rZsBOcmB4MbTv8wPbPNLewwFXo5cbufAx/Tcpkxlz7F6ztJku6Df5R/rIAvnGXEJGg
+ maqhCJcxx9Sg==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.77,293,1596524400"; 
-   d="scan'208";a="382788351"
+   d="scan'208";a="349004933"
 Received: from sjchrist-coffee.jf.intel.com ([10.54.74.160])
-  by orsmga001.jf.intel.com with ESMTP; 23 Sep 2020 12:12:05 -0700
+  by orsmga007.jf.intel.com with ESMTP; 23 Sep 2020 13:13:50 -0700
 From:   Sean Christopherson <sean.j.christopherson@intel.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
@@ -35,9 +35,9 @@ Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
         Jim Mattson <jmattson@google.com>,
         Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Subject: [PATCH] KVM: x86/mmu: Stash 'kvm' in a local variable in kvm_mmu_free_roots()
-Date:   Wed, 23 Sep 2020 12:12:04 -0700
-Message-Id: <20200923191204.8410-1-sean.j.christopherson@intel.com>
+Subject: [PATCH v2 0/7] KVM: x86: Tracepoint improvements and fixes
+Date:   Wed, 23 Sep 2020 13:13:42 -0700
+Message-Id: <20200923201349.16097-1-sean.j.christopherson@intel.com>
 X-Mailer: git-send-email 2.28.0
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
@@ -45,66 +45,55 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-To make kvm_mmu_free_roots() a bit more readable, capture 'kvm' in a
-local variable instead of doing vcpu->kvm over and over (and over).
+Various improvements and fixes for the kvm_entry, kvm_exit and
+kvm_nested_vmexit tracepoints.
 
-No functional change intended.
+  1. Capture the guest's RIP during kvm_entry for obvious reasons.
 
-Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
----
- arch/x86/kvm/mmu/mmu.c | 14 +++++++-------
- 1 file changed, 7 insertions(+), 7 deletions(-)
+  2. Extend kvm_exit to report the same info as kvm_nested_vmexit, and
+     macrofy its definition to reuse it verbatim for nested exits.
 
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 76c5826e29a2..cdc498093450 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -3603,6 +3603,7 @@ static void mmu_free_root_page(struct kvm *kvm, hpa_t *root_hpa,
- void kvm_mmu_free_roots(struct kvm_vcpu *vcpu, struct kvm_mmu *mmu,
- 			ulong roots_to_free)
- {
-+	struct kvm *kvm = vcpu->kvm;
- 	int i;
- 	LIST_HEAD(invalid_list);
- 	bool free_active_root = roots_to_free & KVM_MMU_ROOT_CURRENT;
-@@ -3620,22 +3621,21 @@ void kvm_mmu_free_roots(struct kvm_vcpu *vcpu, struct kvm_mmu *mmu,
- 			return;
- 	}
- 
--	spin_lock(&vcpu->kvm->mmu_lock);
-+	spin_lock(&kvm->mmu_lock);
- 
- 	for (i = 0; i < KVM_MMU_NUM_PREV_ROOTS; i++)
- 		if (roots_to_free & KVM_MMU_ROOT_PREVIOUS(i))
--			mmu_free_root_page(vcpu->kvm, &mmu->prev_roots[i].hpa,
-+			mmu_free_root_page(kvm, &mmu->prev_roots[i].hpa,
- 					   &invalid_list);
- 
- 	if (free_active_root) {
- 		if (mmu->shadow_root_level >= PT64_ROOT_4LEVEL &&
- 		    (mmu->root_level >= PT64_ROOT_4LEVEL || mmu->direct_map)) {
--			mmu_free_root_page(vcpu->kvm, &mmu->root_hpa,
--					   &invalid_list);
-+			mmu_free_root_page(kvm, &mmu->root_hpa, &invalid_list);
- 		} else {
- 			for (i = 0; i < 4; ++i)
- 				if (mmu->pae_root[i] != 0)
--					mmu_free_root_page(vcpu->kvm,
-+					mmu_free_root_page(kvm,
- 							   &mmu->pae_root[i],
- 							   &invalid_list);
- 			mmu->root_hpa = INVALID_PAGE;
-@@ -3643,8 +3643,8 @@ void kvm_mmu_free_roots(struct kvm_vcpu *vcpu, struct kvm_mmu *mmu,
- 		mmu->root_pgd = 0;
- 	}
- 
--	kvm_mmu_commit_zap_page(vcpu->kvm, &invalid_list);
--	spin_unlock(&vcpu->kvm->mmu_lock);
-+	kvm_mmu_commit_zap_page(kvm, &invalid_list);
-+	spin_unlock(&kvm->mmu_lock);
- }
- EXPORT_SYMBOL_GPL(kvm_mmu_free_roots);
- 
+  3. Stop passing in params to kvm_nested_vmexit, and instead use the
+     same approach (and now code) as kvm_exit where the tracepoint uses a
+     dedicated kvm_x86_ops hook to retrieve the info.
+
+  4. Stop reading GUEST_RIP, EXIT_QUAL, INTR_INFO, and ERROR_CODE on
+     every VM-Exit from L2 (some of this comes in #3).  This saves ~100
+     cycles (150+ with retpolines) on VM-Exits from L2 that are handled
+     by L0, e.g. hardware interrupts.
+
+As noted by Vitaly, these changes break trace-cmd[*].  I hereby pinky
+swear that, if this series is merged, I will send patches to update
+trace-cmd.
+
+[*] git://git.kernel.org/pub/scm/utils/trace-cmd/trace-cmd.git
+
+v2:
+  - Fixed some goofs in the changelogs.
+  - Rebased to kvm/queue, commit e1ba1a15af73 ("KVM: SVM: Enable INVPCID
+    feature on AMD").
+
+Sean Christopherson (7):
+  KVM: x86: Add RIP to the kvm_entry, i.e. VM-Enter, tracepoint
+  KVM: x86: Read guest RIP from within the kvm_nested_vmexit tracepoint
+  KVM: VMX: Add a helper to test for a valid error code given an intr
+    info
+  KVM: x86: Add intr/vectoring info and error code to kvm_exit
+    tracepoint
+  KVM: x86: Add macro wrapper for defining kvm_exit tracepoint
+  KVM: x86: Use common definition for kvm_nested_vmexit tracepoint
+  KVM: nVMX: Read EXIT_QUAL and INTR_INFO only when needed for nested
+    exit
+
+ arch/x86/include/asm/kvm_host.h |   7 ++-
+ arch/x86/kvm/svm/svm.c          |  16 ++---
+ arch/x86/kvm/trace.h            | 107 +++++++++++++-------------------
+ arch/x86/kvm/vmx/nested.c       |  14 ++---
+ arch/x86/kvm/vmx/vmcs.h         |   7 +++
+ arch/x86/kvm/vmx/vmx.c          |  18 +++++-
+ arch/x86/kvm/x86.c              |   2 +-
+ 7 files changed, 86 insertions(+), 85 deletions(-)
+
 -- 
 2.28.0
 
