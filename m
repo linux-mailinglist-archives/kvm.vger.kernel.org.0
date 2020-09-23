@@ -2,56 +2,42 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 597A627609E
-	for <lists+kvm@lfdr.de>; Wed, 23 Sep 2020 20:58:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8490A2760C9
+	for <lists+kvm@lfdr.de>; Wed, 23 Sep 2020 21:12:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726820AbgIWS6D (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 23 Sep 2020 14:58:03 -0400
-Received: from mga03.intel.com ([134.134.136.65]:49884 "EHLO mga03.intel.com"
+        id S1726638AbgIWTMH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 23 Sep 2020 15:12:07 -0400
+Received: from mga14.intel.com ([192.55.52.115]:12738 "EHLO mga14.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726703AbgIWS6D (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 23 Sep 2020 14:58:03 -0400
-IronPort-SDR: rmoKL4TAEmrTdEmJfp7uNXhbdy0Fk4yTAu6sdqA0tsRz1StnLsxi6hhA9vE/r/PERcPAcKvQ0j
- i1QvBR5AOL6g==
-X-IronPort-AV: E=McAfee;i="6000,8403,9753"; a="161072561"
+        id S1726515AbgIWTMG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 23 Sep 2020 15:12:06 -0400
+IronPort-SDR: bQpuDFpeaUtbVXtIzXjyomjU6HSf44kNzG2S6wf2pFY2qgS6cmLIj+EX9BkC4aheDQpG6UN24D
+ 8yrjCukqmibw==
+X-IronPort-AV: E=McAfee;i="6000,8403,9753"; a="160281225"
 X-IronPort-AV: E=Sophos;i="5.77,293,1596524400"; 
-   d="scan'208";a="161072561"
+   d="scan'208";a="160281225"
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Sep 2020 11:58:02 -0700
-IronPort-SDR: kz7/UhdqfQR7kPq/UutKfm67dCkSO0dRSAPU6xHrzv6Gh4iZ9RoV4ILoENHljI/FS+ll6XOVeH
- kxkn4Ig0AyyQ==
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Sep 2020 12:12:06 -0700
+IronPort-SDR: UclwOekwO5FlzgPqU/RilPEY6TTNa3q+D2KirpX+ICPG7WI0atvKS5bbr7dg+bupcbOIdH8JHr
+ rK1Z9PYNgdcQ==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.77,293,1596524400"; 
-   d="scan'208";a="338759550"
+   d="scan'208";a="382788351"
 Received: from sjchrist-coffee.jf.intel.com ([10.54.74.160])
-  by orsmga008.jf.intel.com with ESMTP; 23 Sep 2020 11:58:02 -0700
+  by orsmga001.jf.intel.com with ESMTP; 23 Sep 2020 12:12:05 -0700
 From:   Sean Christopherson <sean.j.christopherson@intel.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Marc Zyngier <maz@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        linux-arm-kernel@lists.infradead.org,
-        Huacai Chen <chenhc@lemote.com>,
-        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        linux-mips@vger.kernel.org, Paul Mackerras <paulus@ozlabs.org>,
-        kvm-ppc@vger.kernel.org,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Sean Christopherson <sean.j.christopherson@intel.com>
-Subject: [PATCH] KVM: Enable hardware before doing arch VM initialization
-Date:   Wed, 23 Sep 2020 11:57:57 -0700
-Message-Id: <20200923185757.1806-1-sean.j.christopherson@intel.com>
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH] KVM: x86/mmu: Stash 'kvm' in a local variable in kvm_mmu_free_roots()
+Date:   Wed, 23 Sep 2020 12:12:04 -0700
+Message-Id: <20200923191204.8410-1-sean.j.christopherson@intel.com>
 X-Mailer: git-send-email 2.28.0
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
@@ -59,100 +45,66 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Swap the order of hardware_enable_all() and kvm_arch_init_vm() to
-accommodate Intel's Trust Domain Extension (TDX), which needs VMX to be
-fully enabled during VM init in order to make SEAMCALLs.
+To make kvm_mmu_free_roots() a bit more readable, capture 'kvm' in a
+local variable instead of doing vcpu->kvm over and over (and over).
 
-This also provides consistent ordering between kvm_create_vm() and
-kvm_destroy_vm() with respect to calling kvm_arch_destroy_vm() and
-hardware_disable_all().
+No functional change intended.
 
-Cc: Marc Zyngier <maz@kernel.org>
-Cc: James Morse <james.morse@arm.com>
-Cc: Julien Thierry <julien.thierry.kdev@gmail.com>
-Cc: Suzuki K Poulose <suzuki.poulose@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org
-Cc: Huacai Chen <chenhc@lemote.com>
-Cc: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
-Cc: linux-mips@vger.kernel.org
-Cc: Paul Mackerras <paulus@ozlabs.org>
-Cc: kvm-ppc@vger.kernel.org
-Cc: Christian Borntraeger <borntraeger@de.ibm.com>
-Cc: Janosch Frank <frankja@linux.ibm.com>
-Cc: David Hildenbrand <david@redhat.com>
-Cc: Cornelia Huck <cohuck@redhat.com>
-Cc: Claudio Imbrenda <imbrenda@linux.ibm.com>
-Cc: Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc: Wanpeng Li <wanpengli@tencent.com>
-Cc: Jim Mattson <jmattson@google.com>
-Cc: Joerg Roedel <joro@8bytes.org>
 Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
 ---
+ arch/x86/kvm/mmu/mmu.c | 14 +++++++-------
+ 1 file changed, 7 insertions(+), 7 deletions(-)
 
-Obviously not required until the TDX series comes along, but IMO KVM
-should be consistent with respect to enabling and disabling virt support
-in hardware.
-
-Tested only on Intel hardware.  Unless I missed something, this only
-affects x86, Arm and MIPS as hardware enabling is a nop for s390 and PPC.
-Arm looks safe (based on my mostly clueless reading of the code), but I
-have no idea if this will cause problem for MIPS, which is doing all kinds
-of things in hardware_enable() that I don't pretend to fully understand.
-
- virt/kvm/kvm_main.c | 16 ++++++++--------
- 1 file changed, 8 insertions(+), 8 deletions(-)
-
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index cf88233b819a..58fa19bcfc90 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -766,7 +766,7 @@ static struct kvm *kvm_create_vm(unsigned long type)
- 		struct kvm_memslots *slots = kvm_alloc_memslots();
- 
- 		if (!slots)
--			goto out_err_no_arch_destroy_vm;
-+			goto out_err_no_disable;
- 		/* Generations must be different for each address space. */
- 		slots->generation = i;
- 		rcu_assign_pointer(kvm->memslots[i], slots);
-@@ -776,19 +776,19 @@ static struct kvm *kvm_create_vm(unsigned long type)
- 		rcu_assign_pointer(kvm->buses[i],
- 			kzalloc(sizeof(struct kvm_io_bus), GFP_KERNEL_ACCOUNT));
- 		if (!kvm->buses[i])
--			goto out_err_no_arch_destroy_vm;
-+			goto out_err_no_disable;
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index 76c5826e29a2..cdc498093450 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -3603,6 +3603,7 @@ static void mmu_free_root_page(struct kvm *kvm, hpa_t *root_hpa,
+ void kvm_mmu_free_roots(struct kvm_vcpu *vcpu, struct kvm_mmu *mmu,
+ 			ulong roots_to_free)
+ {
++	struct kvm *kvm = vcpu->kvm;
+ 	int i;
+ 	LIST_HEAD(invalid_list);
+ 	bool free_active_root = roots_to_free & KVM_MMU_ROOT_CURRENT;
+@@ -3620,22 +3621,21 @@ void kvm_mmu_free_roots(struct kvm_vcpu *vcpu, struct kvm_mmu *mmu,
+ 			return;
  	}
  
- 	kvm->max_halt_poll_ns = halt_poll_ns;
+-	spin_lock(&vcpu->kvm->mmu_lock);
++	spin_lock(&kvm->mmu_lock);
  
--	r = kvm_arch_init_vm(kvm, type);
--	if (r)
--		goto out_err_no_arch_destroy_vm;
--
- 	r = hardware_enable_all();
- 	if (r)
- 		goto out_err_no_disable;
+ 	for (i = 0; i < KVM_MMU_NUM_PREV_ROOTS; i++)
+ 		if (roots_to_free & KVM_MMU_ROOT_PREVIOUS(i))
+-			mmu_free_root_page(vcpu->kvm, &mmu->prev_roots[i].hpa,
++			mmu_free_root_page(kvm, &mmu->prev_roots[i].hpa,
+ 					   &invalid_list);
  
-+	r = kvm_arch_init_vm(kvm, type);
-+	if (r)
-+		goto out_err_no_arch_destroy_vm;
-+
- #ifdef CONFIG_HAVE_KVM_IRQFD
- 	INIT_HLIST_HEAD(&kvm->irq_ack_notifier_list);
- #endif
-@@ -815,10 +815,10 @@ static struct kvm *kvm_create_vm(unsigned long type)
- 		mmu_notifier_unregister(&kvm->mmu_notifier, current->mm);
- #endif
- out_err_no_mmu_notifier:
--	hardware_disable_all();
--out_err_no_disable:
- 	kvm_arch_destroy_vm(kvm);
- out_err_no_arch_destroy_vm:
-+	hardware_disable_all();
-+out_err_no_disable:
- 	WARN_ON_ONCE(!refcount_dec_and_test(&kvm->users_count));
- 	for (i = 0; i < KVM_NR_BUSES; i++)
- 		kfree(kvm_get_bus(kvm, i));
+ 	if (free_active_root) {
+ 		if (mmu->shadow_root_level >= PT64_ROOT_4LEVEL &&
+ 		    (mmu->root_level >= PT64_ROOT_4LEVEL || mmu->direct_map)) {
+-			mmu_free_root_page(vcpu->kvm, &mmu->root_hpa,
+-					   &invalid_list);
++			mmu_free_root_page(kvm, &mmu->root_hpa, &invalid_list);
+ 		} else {
+ 			for (i = 0; i < 4; ++i)
+ 				if (mmu->pae_root[i] != 0)
+-					mmu_free_root_page(vcpu->kvm,
++					mmu_free_root_page(kvm,
+ 							   &mmu->pae_root[i],
+ 							   &invalid_list);
+ 			mmu->root_hpa = INVALID_PAGE;
+@@ -3643,8 +3643,8 @@ void kvm_mmu_free_roots(struct kvm_vcpu *vcpu, struct kvm_mmu *mmu,
+ 		mmu->root_pgd = 0;
+ 	}
+ 
+-	kvm_mmu_commit_zap_page(vcpu->kvm, &invalid_list);
+-	spin_unlock(&vcpu->kvm->mmu_lock);
++	kvm_mmu_commit_zap_page(kvm, &invalid_list);
++	spin_unlock(&kvm->mmu_lock);
+ }
+ EXPORT_SYMBOL_GPL(kvm_mmu_free_roots);
+ 
 -- 
 2.28.0
 
