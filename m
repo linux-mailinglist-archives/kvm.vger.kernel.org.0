@@ -2,103 +2,96 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 293A0275E8F
-	for <lists+kvm@lfdr.de>; Wed, 23 Sep 2020 19:25:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 75E23275E94
+	for <lists+kvm@lfdr.de>; Wed, 23 Sep 2020 19:26:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726714AbgIWRZz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 23 Sep 2020 13:25:55 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:55391 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726515AbgIWRZz (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 23 Sep 2020 13:25:55 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1600881953;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=ZuD3/+M0e5AmZWztkEsIZId0b+68cZomfjMUlFnHeY8=;
-        b=hHtdF6nVpT2ufolriYD0zTO/IRLhGGFvcsLSH50Afmh+/1+SJgFGH4Y3LbksZcImSVmF18
-        zpSVKFJf2EeS6SmqM7NgVUJCuw6Z3eCK4HnlSG3ncxld7Mp6qUxligDrZK2HJmw/T7msXx
-        1mwbBGBeCvkDKjdE5kB/F/aqZdlxx6o=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-326-qo5gZZHXO8Gv1by5W8QCSg-1; Wed, 23 Sep 2020 13:25:51 -0400
-X-MC-Unique: qo5gZZHXO8Gv1by5W8QCSg-1
-Received: by mail-wm1-f71.google.com with SMTP id u5so190541wme.3
-        for <kvm@vger.kernel.org>; Wed, 23 Sep 2020 10:25:51 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=ZuD3/+M0e5AmZWztkEsIZId0b+68cZomfjMUlFnHeY8=;
-        b=nYupVvciN3LySLjMKJ84ZEWsE9MKLitAjgRsO2+/GlK+WnGfHVeh+uxhyWfg+F3gBF
-         pNyV+zr4iqSpEEp6eB0b2ngTL5cMzCAfrFuz3UridsRHK0d7i5SUVC9eTZ+D8A1HF0Df
-         WLH4tvT23GPN2Ui7C0a+chtq1yy+pZ3Cek8026OmrEOwWvrsuXwHNS/4N3f9/3xNPbdy
-         HibgWUGWQ2IaD6nijaWADZlfXp1FHxzR/4S5sNp+gMPZBc1w3pTWwY77PmJyS0L/i1Z+
-         4/f5Wn8Ai6/itXN69PM5rf9y+lfzlXWdCoVfcNukplKp66W5oKJO5d7MOaV0oeXA1ZFh
-         ATPQ==
-X-Gm-Message-State: AOAM530gNit7qlqiln63uVSWFNnr6bTAcgFRvY6mj9R9UrMtrXXi4BfC
-        F20y0UiDylLTbct4nQUCWucR9a1LiPfTlqdzxoDCUVxk/pjei78Ruma9Vg0C/XvE3y8QihrqroF
-        wXxWcS666fF68
-X-Received: by 2002:adf:c188:: with SMTP id x8mr768742wre.201.1600881950496;
-        Wed, 23 Sep 2020 10:25:50 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJweA4UIVDqrBa8klaAhnYfCz2jzaYiNy5uleWDnL5Yjd+2tBftjci1mcBnYVbOtL3Z1QEI1qg==
-X-Received: by 2002:adf:c188:: with SMTP id x8mr768727wre.201.1600881950299;
-        Wed, 23 Sep 2020 10:25:50 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:15f1:648d:7de6:bad9? ([2001:b07:6468:f312:15f1:648d:7de6:bad9])
-        by smtp.gmail.com with ESMTPSA id o4sm436030wrv.86.2020.09.23.10.25.48
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 23 Sep 2020 10:25:49 -0700 (PDT)
-Subject: Re: [PATCH 4/4] KVM: VMX: Add a helper and macros to reduce
- boilerplate for sec exec ctls
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+        id S1726634AbgIWR0s (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 23 Sep 2020 13:26:48 -0400
+Received: from mga14.intel.com ([192.55.52.115]:2454 "EHLO mga14.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726413AbgIWR0s (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 23 Sep 2020 13:26:48 -0400
+IronPort-SDR: VH9o6JVYXgLsEneQCkF8j1STLfjAz9xDIjfwFHV4QbB/pm9erjKyXWO5lQG6Wvisqfb6pt0DoC
+ 8GfkS8qieCNw==
+X-IronPort-AV: E=McAfee;i="6000,8403,9753"; a="160251105"
+X-IronPort-AV: E=Sophos;i="5.77,293,1596524400"; 
+   d="scan'208";a="160251105"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Sep 2020 10:26:47 -0700
+IronPort-SDR: ey9SEz/jSNaz0OtMzWULGxth9YBvWEynGLnavUxHtQq2r16MsoeDfOaVHdAf9zM8fjL9NTqBRV
+ uvqiUNKNCA6g==
+X-IronPort-AV: E=Sophos;i="5.77,293,1596524400"; 
+   d="scan'208";a="486522044"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.160])
+  by orsmga005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Sep 2020 10:26:47 -0700
+Date:   Wed, 23 Sep 2020 10:26:46 -0700
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Cfir Cohen <cfir@google.com>,
+        "kvm @ vger . kernel . org" <kvm@vger.kernel.org>,
+        Lendacky Thomas <thomas.lendacky@amd.com>,
+        Singh Brijesh <brijesh.singh@amd.com>,
+        Grimm Jon <Jon.Grimm@amd.com>,
+        David Rientjes <rientjes@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "H . Peter Anvin" <hpa@zytor.com>, x86@kernel.org,
         linux-kernel@vger.kernel.org
-References: <20200923165048.20486-1-sean.j.christopherson@intel.com>
- <20200923165048.20486-5-sean.j.christopherson@intel.com>
- <784480fd-3aeb-6c08-30f9-ac474bb23b6c@redhat.com>
- <20200923172237.GA32044@linux.intel.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <7d7daea0-57be-83be-a0d4-8a481249ef85@redhat.com>
-Date:   Wed, 23 Sep 2020 19:25:48 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+Subject: Re: [PATCH] KVM: SVM: Mark SEV launch secret pages as dirty.
+Message-ID: <20200923172646.GB32044@linux.intel.com>
+References: <20200807012303.3769170-1-cfir@google.com>
+ <20200919045505.GC21189@sjchrist-ice>
+ <5ac77c46-88b4-df45-4f02-72adfb096262@redhat.com>
+ <20200923170444.GA20076@linux.intel.com>
+ <548b7b73-7a13-8267-414e-2b9e1569c7f7@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200923172237.GA32044@linux.intel.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <548b7b73-7a13-8267-414e-2b9e1569c7f7@redhat.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 23/09/20 19:22, Sean Christopherson wrote:
-> On Wed, Sep 23, 2020 at 07:20:17PM +0200, Paolo Bonzini wrote:
->> On 23/09/20 18:50, Sean Christopherson wrote:
->>> Add a helper function and several wrapping macros to consolidate the
->>> copy-paste code in vmx_compute_secondary_exec_control() for adjusting
->>> controls that are dependent on guest CPUID bits.
->>>
->>> No functional change intended.
->>>
->>> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
->>> ---
->>>  arch/x86/kvm/vmx/vmx.c | 128 +++++++++++++----------------------------
->>>  1 file changed, 41 insertions(+), 87 deletions(-)
->>
->> The diffstat is enticing but the code a little less so...  Can you just
->> add documentation above vmx_adjust_secondary_exec_control that explains
->> the how/why?
+On Wed, Sep 23, 2020 at 07:16:08PM +0200, Paolo Bonzini wrote:
+> On 23/09/20 19:04, Sean Christopherson wrote:
+> >> Two of the three instances are a bit different though.  What about this
+> >> which at least shortens the comment to 2 fewer lines:
+> > Any objection to changing those to "Flush (on non-coherent CPUs)"?  I agree
+> > it would be helpful to call out the details, especially for DBG_*, but I
+> > don't like that it reads as if the flush is unconditional.
 > 
-> Ya, I'd be more than happy to add a big comment.
-> 
+> Hmm... It's already fairly long lines so that would wrap to 3 lines, and
 
-Ok, I'll wait for v2 of this patch only.
+Dang, I was hoping it would squeeze into 2.
 
-Paolo
+> the reference to the conditional flush wasn't there before either.
 
+Well, the flush wasn't conditional before (ignoring the NULL check).
+ 
+> sev_clflush_pages could be a better place to mention that (or perhaps
+> it's self-explanatory).
+
+I agree, but with
+
+	/*
+	 * Flush before LAUNCH_UPDATE encrypts pages in place, in case the cache
+	 * contains the data that was written unencrypted.
+ 	 */
+ 	sev_clflush_pages(inpages, npages);
+
+there's nothing in the comment or code that even suggests sev_clflush_pages() is
+conditional, i.e. no reason for the reader to peek at the implemenation.
+
+What about:
+
+	/*
+	 * Flush (on non-coherent CPUs) before LAUNCH_UPDATE encrypts pages in
+	 * place, the cache may contain data that was written unencrypted.
+	 */
