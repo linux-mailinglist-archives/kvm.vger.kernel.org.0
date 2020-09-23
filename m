@@ -2,108 +2,234 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id ECDEF27515E
-	for <lists+kvm@lfdr.de>; Wed, 23 Sep 2020 08:24:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 534E62751A5
+	for <lists+kvm@lfdr.de>; Wed, 23 Sep 2020 08:36:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726710AbgIWGYe (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 23 Sep 2020 02:24:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43620 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726179AbgIWGYe (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 23 Sep 2020 02:24:34 -0400
-Received: from mail-pg1-x542.google.com (mail-pg1-x542.google.com [IPv6:2607:f8b0:4864:20::542])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8C6DEC061755;
-        Tue, 22 Sep 2020 23:24:34 -0700 (PDT)
-Received: by mail-pg1-x542.google.com with SMTP id f2so13749644pgd.3;
-        Tue, 22 Sep 2020 23:24:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=subject:from:to:cc:references:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=ySPedNslPG3dkY7v4dApthW0w3KPGs63C9M/zo9R+Gg=;
-        b=cMkYbqeTFzEMfQlDQXxvdNhcgkd+x2MJ+ysNycqzI1PMJysbspC3q+zJb/7Z+i6B4L
-         s0PIYj2/GyTeYM71Y3PZs73TIhK2W0QWB+4J0Fa7IVXgj9TyIhPIJ1k6lSQV2Bsyg/7f
-         JcDXFglrhj3SvaHcTE53p0CtjZI6f1SjuGGbogPoYWwWRFx3AiiUxTuhr383f/u+P2t1
-         8v2jtIYx/fLi4S/Yd0X+0R9Hy3vpwzzEv+jYabvXSEeviWcNNyKfjPhMjFW8faJ7iPIL
-         IDzyKdVxfcznpe2ScISBSPb/yxW2NS3N7uf7TXEIrRy1V+DbaKExFYNRgpjOIs8NEOaa
-         vbOw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:from:to:cc:references:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=ySPedNslPG3dkY7v4dApthW0w3KPGs63C9M/zo9R+Gg=;
-        b=Fm4/a1M/pRh+Mkk/AWapIiH6HuLGKLQLA0arehUWgZT2PzMq3/imJnufE+JYpZ8EVQ
-         Pqv0AZ2gLtHVmfxrTGhruE58zrFBOGfgcyqWDsndRMqIJ1R7k53MApfjFd9IuIiH0/IX
-         dgu3glOHD5eP7He+asPQPZto2c4HkGy+a3pYQJpjUnpveES289NHiyTooA6M1EV4kd+3
-         33SBHi9LPNLmIxfa1xT+Rz/iPFu7xyP92VzA/uY9Di6tCHOWk5HuSkgNQeLa7fKmFdWi
-         sbsFXdAXfZh14n8E2qnXAiwM1rvN7XmKd0+viwot0Bx/Ps57KV1PzBpXp5zY1HuvjcwJ
-         mKZQ==
-X-Gm-Message-State: AOAM532N2Ct28Pq77BtaOuip9IZxYCKtQ0TdHjiFs7aOJSL3ZA8MBWJL
-        W7NPS70NCrbvue0/GKGHaQ==
-X-Google-Smtp-Source: ABdhPJxwlOdBatq9xkyrZVcqcasAWQbfLaVBMs6AIDYLsAP4MYhJLyl1ZuEtYlOTuK6OTIv5KnqXrQ==
-X-Received: by 2002:a62:7c43:0:b029:139:858b:8033 with SMTP id x64-20020a627c430000b0290139858b8033mr7320759pfc.3.1600842274006;
-        Tue, 22 Sep 2020 23:24:34 -0700 (PDT)
-Received: from [127.0.0.1] ([103.7.29.6])
-        by smtp.gmail.com with ESMTPSA id h31sm14846698pgh.71.2020.09.22.23.24.29
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 22 Sep 2020 23:24:33 -0700 (PDT)
-Subject: Re: [PATCH] KVM: SVM: Add tracepoint for cr_interception
-From:   Haiwei Li <lihaiwei.kernel@gmail.com>
-To:     "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "x86@kernel.org" <x86@kernel.org>
-Cc:     "hpa@zytor.com" <hpa@zytor.com>, "bp@alien8.de" <bp@alien8.de>,
-        "mingo@redhat.com" <mingo@redhat.com>,
-        "tglx@linutronix.de" <tglx@linutronix.de>, joro@8bytes.org,
-        "jmattson@google.com" <jmattson@google.com>,
-        "wanpengli@tencent.com" <wanpengli@tencent.com>,
-        vkuznets@redhat.com, sean.j.christopherson@intel.com,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>
-References: <f3031602-db3b-c4fe-b719-d402663b0a2b@gmail.com>
-Message-ID: <040bf07b-dcc5-df99-d720-a2ed2298a2e3@gmail.com>
-Date:   Wed, 23 Sep 2020 14:24:23 +0800
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
- Gecko/20100101 Thunderbird/78.2.2
+        id S1726723AbgIWGgq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 23 Sep 2020 02:36:46 -0400
+Received: from szxga06-in.huawei.com ([45.249.212.32]:42828 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726179AbgIWGgp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 23 Sep 2020 02:36:45 -0400
+Received: from DGGEMS409-HUB.china.huawei.com (unknown [172.30.72.60])
+        by Forcepoint Email with ESMTP id 0E9B157AA3323F5A97F2;
+        Wed, 23 Sep 2020 14:36:41 +0800 (CST)
+Received: from DESKTOP-7FEPK9S.china.huawei.com (10.174.186.62) by
+ DGGEMS409-HUB.china.huawei.com (10.3.19.209) with Microsoft SMTP Server id
+ 14.3.487.0; Wed, 23 Sep 2020 14:36:33 +0800
+From:   Shenming Lu <lushenming@huawei.com>
+To:     Thomas Gleixner <tglx@linutronix.de>,
+        Jason Cooper <jason@lakedaemon.net>,
+        Marc Zyngier <maz@kernel.org>, <linux-kernel@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>,
+        <kvmarm@lists.cs.columbia.edu>, <kvm@vger.kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Eric Auger <eric.auger@redhat.com>,
+        Christoffer Dall <christoffer.dall@arm.com>
+CC:     <wanghaibin.wang@huawei.com>, <yuzenghui@huawei.com>,
+        <lushenming@huawei.com>
+Subject: [PATCH] irqchip/gic-v4.1: Optimize the wait for the completion of the analysis of the VPT
+Date:   Wed, 23 Sep 2020 14:35:43 +0800
+Message-ID: <20200923063543.1920-1-lushenming@huawei.com>
+X-Mailer: git-send-email 2.27.0.windows.1
 MIME-Version: 1.0
-In-Reply-To: <f3031602-db3b-c4fe-b719-d402663b0a2b@gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7BIT
+Content-Type:   text/plain; charset=US-ASCII
+X-Originating-IP: [10.174.186.62]
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Kindly ping. :)
-On 20/9/4 19:25, Haiwei Li wrote:
-> From: Haiwei Li <lihaiwei@tencent.com>
-> 
-> Add trace_kvm_cr_write and trace_kvm_cr_read for svm.
-> 
-> Signed-off-by: Haiwei Li <lihaiwei@tencent.com>
-> ---
->   arch/x86/kvm/svm/svm.c | 2 ++
->   1 file changed, 2 insertions(+)
-> 
-> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-> index 03dd7bac8034..2c6dea48ba62 100644
-> --- a/arch/x86/kvm/svm/svm.c
-> +++ b/arch/x86/kvm/svm/svm.c
-> @@ -2261,6 +2261,7 @@ static int cr_interception(struct vcpu_svm *svm)
->       if (cr >= 16) { /* mov to cr */
->           cr -= 16;
->           val = kvm_register_read(&svm->vcpu, reg);
-> +        trace_kvm_cr_write(cr, val);
->           switch (cr) {
->           case 0:
->               if (!check_selective_cr0_intercepted(svm, val))
-> @@ -2306,6 +2307,7 @@ static int cr_interception(struct vcpu_svm *svm)
->               return 1;
->           }
->           kvm_register_write(&svm->vcpu, reg, val);
-> +        trace_kvm_cr_read(cr, val);
->       }
->       return kvm_complete_insn_gp(&svm->vcpu, err);
->   }
-> -- 
-> 2.18.4
+Right after a vPE is made resident, the code starts polling the
+GICR_VPENDBASER.Dirty bit until it becomes 0, where the delay_us
+is set to 10. But in our measurement, it takes only hundreds of
+nanoseconds, or 1~2 microseconds, to finish parsing the VPT in most
+cases. And we also measured the time from vcpu_load() (include it)
+to __guest_enter() on Kunpeng 920. On average, it takes 2.55 microseconds
+(not first run && the VPT is empty). So 10 microseconds delay might
+really hurt performance.
+
+To avoid this, we can set the delay_us to 1, which is more appropriate
+in this situation and universal. Besides, we can delay the execution
+of its_wait_vpt_parse_complete() (call it from kvm_vgic_flush_hwstate()
+corresponding to vPE resident), giving the GIC a chance to work in
+parallel with the CPU on the entry path.
+
+Signed-off-by: Shenming Lu <lushenming@huawei.com>
+---
+ arch/arm64/kvm/vgic/vgic-v4.c      | 18 ++++++++++++++++++
+ arch/arm64/kvm/vgic/vgic.c         |  2 ++
+ drivers/irqchip/irq-gic-v3-its.c   | 14 +++++++++++---
+ drivers/irqchip/irq-gic-v4.c       | 11 +++++++++++
+ include/kvm/arm_vgic.h             |  3 +++
+ include/linux/irqchip/arm-gic-v4.h |  4 ++++
+ 6 files changed, 49 insertions(+), 3 deletions(-)
+
+diff --git a/arch/arm64/kvm/vgic/vgic-v4.c b/arch/arm64/kvm/vgic/vgic-v4.c
+index b5fa73c9fd35..1d5d2d6894d3 100644
+--- a/arch/arm64/kvm/vgic/vgic-v4.c
++++ b/arch/arm64/kvm/vgic/vgic-v4.c
+@@ -353,6 +353,24 @@ int vgic_v4_load(struct kvm_vcpu *vcpu)
+ 	return err;
+ }
+ 
++void vgic_v4_wait_vpt(struct kvm_vcpu *vcpu)
++{
++	struct its_vpe *vpe;
++
++	if (kvm_vgic_global_state.type == VGIC_V2 || !vgic_supports_direct_msis(vcpu->kvm))
++		return;
++
++	vpe = &vcpu->arch.vgic_cpu.vgic_v3.its_vpe;
++
++	if (vpe->vpt_ready)
++		return;
++
++	if (its_wait_vpt(vpe))
++		return;
++
++	vpe->vpt_ready = true;
++}
++
+ static struct vgic_its *vgic_get_its(struct kvm *kvm,
+ 				     struct kvm_kernel_irq_routing_entry *irq_entry)
+ {
+diff --git a/arch/arm64/kvm/vgic/vgic.c b/arch/arm64/kvm/vgic/vgic.c
+index c3643b7f101b..ed810a80cda2 100644
+--- a/arch/arm64/kvm/vgic/vgic.c
++++ b/arch/arm64/kvm/vgic/vgic.c
+@@ -915,6 +915,8 @@ void kvm_vgic_flush_hwstate(struct kvm_vcpu *vcpu)
+ 
+ 	if (can_access_vgic_from_kernel())
+ 		vgic_restore_state(vcpu);
++
++	vgic_v4_wait_vpt(vcpu);
+ }
+ 
+ void kvm_vgic_load(struct kvm_vcpu *vcpu)
+diff --git a/drivers/irqchip/irq-gic-v3-its.c b/drivers/irqchip/irq-gic-v3-its.c
+index 548de7538632..b7cbc9bcab9d 100644
+--- a/drivers/irqchip/irq-gic-v3-its.c
++++ b/drivers/irqchip/irq-gic-v3-its.c
+@@ -3803,7 +3803,7 @@ static void its_wait_vpt_parse_complete(void)
+ 	WARN_ON_ONCE(readq_relaxed_poll_timeout_atomic(vlpi_base + GICR_VPENDBASER,
+ 						       val,
+ 						       !(val & GICR_VPENDBASER_Dirty),
+-						       10, 500));
++						       1, 500));
+ }
+ 
+ static void its_vpe_schedule(struct its_vpe *vpe)
+@@ -3837,7 +3837,7 @@ static void its_vpe_schedule(struct its_vpe *vpe)
+ 	val |= GICR_VPENDBASER_Valid;
+ 	gicr_write_vpendbaser(val, vlpi_base + GICR_VPENDBASER);
+ 
+-	its_wait_vpt_parse_complete();
++	vpe->vpt_ready = false;
+ }
+ 
+ static void its_vpe_deschedule(struct its_vpe *vpe)
+@@ -3881,6 +3881,10 @@ static int its_vpe_set_vcpu_affinity(struct irq_data *d, void *vcpu_info)
+ 		its_vpe_schedule(vpe);
+ 		return 0;
+ 
++	case WAIT_VPT:
++		its_wait_vpt_parse_complete();
++		return 0;
++
+ 	case DESCHEDULE_VPE:
+ 		its_vpe_deschedule(vpe);
+ 		return 0;
+@@ -4047,7 +4051,7 @@ static void its_vpe_4_1_schedule(struct its_vpe *vpe,
+ 
+ 	gicr_write_vpendbaser(val, vlpi_base + GICR_VPENDBASER);
+ 
+-	its_wait_vpt_parse_complete();
++	vpe->vpt_ready = false;
+ }
+ 
+ static void its_vpe_4_1_deschedule(struct its_vpe *vpe,
+@@ -4118,6 +4122,10 @@ static int its_vpe_4_1_set_vcpu_affinity(struct irq_data *d, void *vcpu_info)
+ 		its_vpe_4_1_schedule(vpe, info);
+ 		return 0;
+ 
++	case WAIT_VPT:
++		its_wait_vpt_parse_complete();
++		return 0;
++
+ 	case DESCHEDULE_VPE:
+ 		its_vpe_4_1_deschedule(vpe, info);
+ 		return 0;
+diff --git a/drivers/irqchip/irq-gic-v4.c b/drivers/irqchip/irq-gic-v4.c
+index 0c18714ae13e..36be42569872 100644
+--- a/drivers/irqchip/irq-gic-v4.c
++++ b/drivers/irqchip/irq-gic-v4.c
+@@ -258,6 +258,17 @@ int its_make_vpe_resident(struct its_vpe *vpe, bool g0en, bool g1en)
+ 	return ret;
+ }
+ 
++int its_wait_vpt(struct its_vpe *vpe)
++{
++	struct its_cmd_info info = { };
++
++	WARN_ON(preemptible());
++
++	info.cmd_type = WAIT_VPT;
++
++	return its_send_vpe_cmd(vpe, &info);
++}
++
+ int its_invall_vpe(struct its_vpe *vpe)
+ {
+ 	struct its_cmd_info info = {
+diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
+index a8d8fdcd3723..b55a835d28a8 100644
+--- a/include/kvm/arm_vgic.h
++++ b/include/kvm/arm_vgic.h
+@@ -402,6 +402,9 @@ int kvm_vgic_v4_unset_forwarding(struct kvm *kvm, int irq,
+ 				 struct kvm_kernel_irq_routing_entry *irq_entry);
+ 
+ int vgic_v4_load(struct kvm_vcpu *vcpu);
++
++void vgic_v4_wait_vpt(struct kvm_vcpu *vcpu);
++
+ int vgic_v4_put(struct kvm_vcpu *vcpu, bool need_db);
+ 
+ #endif /* __KVM_ARM_VGIC_H */
+diff --git a/include/linux/irqchip/arm-gic-v4.h b/include/linux/irqchip/arm-gic-v4.h
+index 6976b8331b60..68ac2b7b9309 100644
+--- a/include/linux/irqchip/arm-gic-v4.h
++++ b/include/linux/irqchip/arm-gic-v4.h
+@@ -75,6 +75,8 @@ struct its_vpe {
+ 	u16			vpe_id;
+ 	/* Pending VLPIs on schedule out? */
+ 	bool			pending_last;
++	/* VPT parse complete */
++	bool			vpt_ready;
+ };
+ 
+ /*
+@@ -103,6 +105,7 @@ enum its_vcpu_info_cmd_type {
+ 	PROP_UPDATE_VLPI,
+ 	PROP_UPDATE_AND_INV_VLPI,
+ 	SCHEDULE_VPE,
++	WAIT_VPT,
+ 	DESCHEDULE_VPE,
+ 	INVALL_VPE,
+ 	PROP_UPDATE_VSGI,
+@@ -128,6 +131,7 @@ struct its_cmd_info {
+ int its_alloc_vcpu_irqs(struct its_vm *vm);
+ void its_free_vcpu_irqs(struct its_vm *vm);
+ int its_make_vpe_resident(struct its_vpe *vpe, bool g0en, bool g1en);
++int its_wait_vpt(struct its_vpe *vpe);
+ int its_make_vpe_non_resident(struct its_vpe *vpe, bool db);
+ int its_invall_vpe(struct its_vpe *vpe);
+ int its_map_vlpi(int irq, struct its_vlpi_map *map);
+-- 
+2.19.1
+
