@@ -2,103 +2,106 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C97E4275EB8
-	for <lists+kvm@lfdr.de>; Wed, 23 Sep 2020 19:34:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A2A43275F4E
+	for <lists+kvm@lfdr.de>; Wed, 23 Sep 2020 20:04:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726723AbgIWReH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 23 Sep 2020 13:34:07 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:29075 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726360AbgIWReH (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 23 Sep 2020 13:34:07 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1600882447;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=ldfka2JU/8jYBcA7GSDSVnVY22PnP+CZq+UK9hEXQUs=;
-        b=A/P9ypsalSVVr7L7mTSqSfPCFiaoVl1tpzQ6uQu10CZbN0XfzpSYYA6y4XpC1CGOGp103l
-        jKAAN/lpIcgsrJgEuGpYpQyMY6M9zKniTmnXAgXe6KhVDig2GmgsH6dJXmvtf/NCcY5fXB
-        1yLyAWkIJzAbf0t3VAaFJsH/nVS/q/U=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-406--llZzXH6MFadSR-JdG7y4w-1; Wed, 23 Sep 2020 13:34:04 -0400
-X-MC-Unique: -llZzXH6MFadSR-JdG7y4w-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0BCDE1800D42;
-        Wed, 23 Sep 2020 17:34:03 +0000 (UTC)
-Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 9D24D5C230;
-        Wed, 23 Sep 2020 17:34:02 +0000 (UTC)
-From:   Paolo Bonzini <pbonzini@redhat.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     Sean Christopherson <sean.j.christopherson@intel.com>
-Subject: [PATCH] KVM: SEV: shorten comments around sev_clflush_pages
-Date:   Wed, 23 Sep 2020 13:34:01 -0400
-Message-Id: <20200923173401.1632172-1-pbonzini@redhat.com>
+        id S1726766AbgIWSEV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 23 Sep 2020 14:04:21 -0400
+Received: from mga05.intel.com ([192.55.52.43]:39920 "EHLO mga05.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726515AbgIWSEV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 23 Sep 2020 14:04:21 -0400
+IronPort-SDR: Vs5B0MXa0Oo1UaAYS1v20plHBXk9Xtds1fBMM7+MNalEBNjrjsfoqA7ULONvMZrS4yJmbRC1Ot
+ gItbTncnq5+A==
+X-IronPort-AV: E=McAfee;i="6000,8403,9753"; a="245808953"
+X-IronPort-AV: E=Sophos;i="5.77,293,1596524400"; 
+   d="scan'208";a="245808953"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Sep 2020 11:04:11 -0700
+IronPort-SDR: 2viIkAbMaqgxezyhz3M8YAUjBhe6d1JCM8KNzKI9D5/T0YHugyB2geqRkrwbi/iqse+frU5+uZ
+ gZaApIISwT3Q==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.77,293,1596524400"; 
+   d="scan'208";a="322670253"
+Received: from sjchrist-coffee.jf.intel.com ([10.54.74.160])
+  by orsmga002.jf.intel.com with ESMTP; 23 Sep 2020 11:04:10 -0700
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH v2 00/15] KVM: x86: VMX: Fix MSR namespacing
+Date:   Wed, 23 Sep 2020 11:03:54 -0700
+Message-Id: <20200923180409.32255-1-sean.j.christopherson@intel.com>
+X-Mailer: git-send-email 2.28.0
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Very similar content is present in four comments in sev.c.  Unfortunately
-there are small differences that make it harder to place the comment
-in sev_clflush_pages itself, but at least we can make it more concise.
+This series attempts to clean up VMX's MSR namespacing, which is in
+unimitigated disaster (keeping things PG).
 
-Suggested-by: Sean Christopherson <sean.j.christopherson@intel.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- arch/x86/kvm/svm/sev.c | 19 +++++++------------
- 1 file changed, 7 insertions(+), 12 deletions(-)
+There are a variety of ways VMX saves and restores guest MSRs, all with
+unique properties and mechanisms, but with haphazard namespacing (assuming
+there is any namespacing at all).  Some fun collisions:
 
-diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-index bb0e89c79a04..65e15c22bd3c 100644
---- a/arch/x86/kvm/svm/sev.c
-+++ b/arch/x86/kvm/svm/sev.c
-@@ -446,10 +446,8 @@ static int sev_launch_update_data(struct kvm *kvm, struct kvm_sev_cmd *argp)
- 	}
- 
- 	/*
--	 * The LAUNCH_UPDATE command will perform in-place encryption of the
--	 * memory content (i.e it will write the same memory region with C=1).
--	 * It's possible that the cache may contain the data with C=0, i.e.,
--	 * unencrypted so invalidate it first.
-+	 * Flush (on non-coherent CPUs) before LAUNCH_UPDATE encrypts pages in
-+	 * place; the cache may contain the data that was written unencrypted.
- 	 */
- 	sev_clflush_pages(inpages, npages);
- 
-@@ -805,10 +803,9 @@ static int sev_dbg_crypt(struct kvm *kvm, struct kvm_sev_cmd *argp, bool dec)
- 		}
- 
- 		/*
--		 * The DBG_{DE,EN}CRYPT commands will perform {dec,en}cryption of the
--		 * memory content (i.e it will write the same memory region with C=1).
--		 * It's possible that the cache may contain the data with C=0, i.e.,
--		 * unencrypted so invalidate it first.
-+		 * Flush (on non-coherent CPUs) before DBG_{DE,EN}CRYPT read or modify
-+		 * the pages; flush the destination too so that future accesses do not
-+		 * see stale data.
- 		 */
- 		sev_clflush_pages(src_p, 1);
- 		sev_clflush_pages(dst_p, 1);
-@@ -870,10 +867,8 @@ static int sev_launch_secret(struct kvm *kvm, struct kvm_sev_cmd *argp)
- 		return PTR_ERR(pages);
- 
- 	/*
--	 * The LAUNCH_SECRET command will perform in-place encryption of the
--	 * memory content (i.e it will write the same memory region with C=1).
--	 * It's possible that the cache may contain the data with C=0, i.e.,
--	 * unencrypted so invalidate it first.
-+	 * Flush (on non-coherent CPUs) before LAUNCH_SECRET encrypts pages in
-+	 * place; the cache may contain the data that was written unencrypted.
- 	 */
- 	sev_clflush_pages(pages, n);
- 
+  __find_msr_index(), find_msr_entry() and vmx_find_msr_index()
+
+  vmx_set_guest_msr() and vmx_set_msr()
+
+  structs vmx_msrs, vmx_msr_entry, shared_msr_entry, kvm_shared_msrs and
+  kvm_shared_msrs_values
+
+  vcpu_vmx fields guest_msrs, msr_autoload.guest and msr_autostore.guest
+
+Probably the most infurating/confusing nomenclature is "index", which can
+mean MSR's ECX index, index into one of several VMX arrays, or index into
+a common x86 array.  __find_msr_index() even manages to mix at least three
+different meanings in about as many lines of code.
+
+The biggest change is to rename the "shared MSRs" mechanism to "user
+return MSRs" (details in patch 1), most everything else is either derived
+from that rename or is fairly straightforward cleanup.
+
+No true functional changes, although the update_transition_efer() change
+in patch 10 dances pretty close to being a functional change.
+
+v2:
+  - Rebased to kvm/queue, commit e1ba1a15af73 ("KVM: SVM: Enable INVPCID
+    feature on AMD").
+
+Sean Christopherson (15):
+  KVM: x86: Rename "shared_msrs" to "user_return_msrs"
+  KVM: VMX: Prepend "MAX_" to MSR array size defines
+  KVM: VMX: Rename "vmx_find_msr_index" to "vmx_find_loadstore_msr_slot"
+  KVM: VMX: Rename the "shared_msr_entry" struct to "vmx_uret_msr"
+  KVM: VMX: Rename vcpu_vmx's "nmsrs" to "nr_uret_msrs"
+  KVM: VMX: Rename vcpu_vmx's "save_nmsrs" to "nr_active_uret_msrs"
+  KVM: VMX: Rename vcpu_vmx's "guest_msrs_ready" to
+    "guest_uret_msrs_loaded"
+  KVM: VMX: Rename "__find_msr_index" to "__vmx_find_uret_msr"
+  KVM: VMX: Check guest support for RDTSCP before processing MSR_TSC_AUX
+  KVM: VMX: Move uret MSR lookup into update_transition_efer()
+  KVM: VMX: Add vmx_setup_uret_msr() to handle lookup and swap
+  KVM: VMX: Rename "find_msr_entry" to "vmx_find_uret_msr"
+  KVM: VMX: Rename "vmx_set_guest_msr" to "vmx_set_guest_uret_msr"
+  KVM: VMX: Rename "vmx_msr_index" to "vmx_uret_msrs_list"
+  KVM: VMX: Rename vmx_uret_msr's "index" to "slot"
+
+ arch/x86/include/asm/kvm_host.h |   4 +-
+ arch/x86/kvm/vmx/nested.c       |  22 ++--
+ arch/x86/kvm/vmx/vmx.c          | 184 ++++++++++++++++----------------
+ arch/x86/kvm/vmx/vmx.h          |  24 ++---
+ arch/x86/kvm/x86.c              | 101 +++++++++---------
+ 5 files changed, 168 insertions(+), 167 deletions(-)
+
 -- 
-2.26.2
+2.28.0
 
