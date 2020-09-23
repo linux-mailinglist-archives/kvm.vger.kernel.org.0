@@ -2,121 +2,135 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 83C8F2759D6
-	for <lists+kvm@lfdr.de>; Wed, 23 Sep 2020 16:24:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3FB7E2759FA
+	for <lists+kvm@lfdr.de>; Wed, 23 Sep 2020 16:30:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726540AbgIWOYU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 23 Sep 2020 10:24:20 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:20850 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726156AbgIWOYT (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 23 Sep 2020 10:24:19 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1600871058;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=S3+XlwGZbFIsIgBY1zyuOCGqClTJDRCCN2cgr0snetc=;
-        b=VvbyZASBrdU0zXGlVjc7eYboyoSpfj1EUUVncxpH0n/mVNc0wfvr8s6OQTUm4jsqsHEZTw
-        5eJ1Fgjl6XLbMHFwERnIVyePMjQdQz0s1OYt3XivohoQ83NvYUikTi1FIJ2DNsEqdaF7Sn
-        YpjefhGyqk7HPSwU+RGgPABkPIsazL8=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-219-ycdAdgsXMmKiLv2gVPguJQ-1; Wed, 23 Sep 2020 10:24:16 -0400
-X-MC-Unique: ycdAdgsXMmKiLv2gVPguJQ-1
-Received: by mail-wr1-f70.google.com with SMTP id s8so8864277wrb.15
-        for <kvm@vger.kernel.org>; Wed, 23 Sep 2020 07:24:16 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=S3+XlwGZbFIsIgBY1zyuOCGqClTJDRCCN2cgr0snetc=;
-        b=BfbrWq1keS0GPvNqfzewpITxywn/zoepxoXoAhAZZ74Qcv/gn9Q+hgn5h02bvDV4q6
-         GflHDmcSeUazgwUqY18hqhY+FweJwMMAYJ3dm1W3VgLeMf5m+mM0AZix/SRopvAiVl6b
-         WtCG3uMPLebmxzVn1DpMRwlockjfWwzpVDT2dxJWJQ4giW6nA9Rxwml/m7uEqDVlnmus
-         uDJHPRKhLF7CisWhbhvx6fNX15oJ+eiEjbaS3TilKFk3i8IGDEAn07SsJ6/jjqNIKu+D
-         UzIVGGYmVmk6oaEEjQqgm1x7gVEakYYmnJPfEut/WDZZNq3N5QkuEmz68MvK+pPb33ng
-         QYlA==
-X-Gm-Message-State: AOAM532Vr/vNT/QBLThGHsbSm1vrQseJ//R6MlTmdjlmdiu/Y5LxNx17
-        FnnhqAImnZL5o4y3UKn82iHps/9iuAC2LpXUxA0dJrsXWxZiDz2TXKUPpT8H2mxckdRXtNEkx2z
-        aYX3fOS+N4ETN
-X-Received: by 2002:a5d:4fcc:: with SMTP id h12mr1133781wrw.199.1600871055308;
-        Wed, 23 Sep 2020 07:24:15 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzn1rVI+lklZm2YsGtnUhjFXMRZPm38QxJE5ctn6MZ7p3x1GP6nA/zN8TZuSUC3R6UedL5kCg==
-X-Received: by 2002:a5d:4fcc:: with SMTP id h12mr1133757wrw.199.1600871055067;
-        Wed, 23 Sep 2020 07:24:15 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:15f1:648d:7de6:bad9? ([2001:b07:6468:f312:15f1:648d:7de6:bad9])
-        by smtp.gmail.com with ESMTPSA id x2sm31221286wrl.13.2020.09.23.07.24.14
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 23 Sep 2020 07:24:14 -0700 (PDT)
-Subject: Re: [PATCH] selftests: kvm: Fix assert failure in single-step test
-To:     Yang Weijiang <weijiang.yang@intel.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, sean.j.christopherson@intel.com
-References: <20200826015524.13251-1-weijiang.yang@intel.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <076c24ae-948a-48ed-99ec-c7d43753c802@redhat.com>
-Date:   Wed, 23 Sep 2020 16:24:13 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+        id S1726683AbgIWOaD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 23 Sep 2020 10:30:03 -0400
+Received: from userp2120.oracle.com ([156.151.31.85]:44648 "EHLO
+        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726671AbgIWO35 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 23 Sep 2020 10:29:57 -0400
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+        by userp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 08NESmcV187370;
+        Wed, 23 Sep 2020 14:29:51 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
+ : subject : message-id : references : mime-version : content-type :
+ in-reply-to; s=corp-2020-01-29;
+ bh=/kWtsNAomURskr15nxAzY127C11bPsldA6grWXB5iY8=;
+ b=laNs0xaWotINN1VYfODao3FB5L8hJ3O+HXsl1cLuZyOhU5+QgJ7SAHQVzT+W6E6FfqWH
+ Dsvwz6FrbrDU9d/aIoesNI4ctd22of+MHBy9V27Zr4u1ukmkRhCpfBwu/OPJU5g5QodG
+ PbKjSxnobvXRWxnKEPSnKfGDG16r6KSxftwT0cw4aIdD/YvxCFbaNyTsMO0UjdY7JMLN
+ hmPN6ehZsf88VSiJTZviNhEw6io8CmzQLRkxuNFH4jtqBbmerCTzyh0dr+udYF5PVX9K
+ fpQsDo3sfoAPy71I2f9QmCmFRV2aQLrqmeanFSvDc8T3bxUcxoD+QTiF6ft8A6qMLahj Ig== 
+Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
+        by userp2120.oracle.com with ESMTP id 33ndnujufx-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
+        Wed, 23 Sep 2020 14:29:51 +0000
+Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
+        by aserp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 08NEOOa8102540;
+        Wed, 23 Sep 2020 14:29:50 GMT
+Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
+        by aserp3030.oracle.com with ESMTP id 33nujpnv7k-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 23 Sep 2020 14:29:50 +0000
+Received: from abhmp0015.oracle.com (abhmp0015.oracle.com [141.146.116.21])
+        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 08NEToQO023119;
+        Wed, 23 Sep 2020 14:29:50 GMT
+Received: from kadam (/41.57.98.10)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Wed, 23 Sep 2020 07:29:49 -0700
+Date:   Wed, 23 Sep 2020 17:29:44 +0300
+From:   Dan Carpenter <dan.carpenter@oracle.com>
+To:     Maxim Levitsky <mlevitsk@redhat.com>,
+        Joerg Roedel <jroedel@suse.de>
+Cc:     kvm@vger.kernel.org
+Subject: Re: [bug report] SVM: nSVM: setup nested msr permission bitmap on
+ nested state load
+Message-ID: <20200923142943.GL18329@kadam>
+References: <20200923134455.GA1485839@mwanda>
+ <126ab56ea11b435aedc98ca82a112cf83a60eaf8.camel@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200826015524.13251-1-weijiang.yang@intel.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <126ab56ea11b435aedc98ca82a112cf83a60eaf8.camel@redhat.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9752 signatures=668679
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0 malwarescore=0
+ mlxlogscore=909 phishscore=0 adultscore=0 spamscore=0 suspectscore=2
+ mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2006250000 definitions=main-2009230116
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9752 signatures=668679
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ lowpriorityscore=0 phishscore=0 adultscore=0 suspectscore=2 bulkscore=0
+ clxscore=1015 impostorscore=0 mlxlogscore=913 mlxscore=0 spamscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
+ definitions=main-2009230117
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 26/08/20 03:55, Yang Weijiang wrote:
-> This is a follow-up patch to fix an issue left in commit:
-> 98b0bf02738004829d7e26d6cb47b2e469aaba86
-> selftests: kvm: Use a shorter encoding to clear RAX
+On Wed, Sep 23, 2020 at 04:50:58PM +0300, Maxim Levitsky wrote:
+> On Wed, 2020-09-23 at 16:44 +0300, Dan Carpenter wrote:
+> > Hello Maxim Levitsky,
+> > 
+> > The patch 772b81bb2f9b: "SVM: nSVM: setup nested msr permission
+> > bitmap on nested state load" from Aug 27, 2020, leads to the
+> > following static checker warning:
+> > 
+> > 	arch/x86/kvm/svm/nested.c:1161 svm_set_nested_state()
+> > 	warn: 'ctl' not released on lines: 1152.
+> > 
+> > arch/x86/kvm/svm/nested.c
+> >   1135          if (!(save->cr0 & X86_CR0_PG))
+> >   1136                  goto out_free;
+> >   1137  
+> >   1138          /*
+> >   1139           * All checks done, we can enter guest mode.  L1 control fields
+> >   1140           * come from the nested save state.  Guest state is already
+> >   1141           * in the registers, the save area of the nested state instead
+> >   1142           * contains saved L1 state.
+> >   1143           */
+> >   1144          copy_vmcb_control_area(&hsave->control, &svm->vmcb->control);
+> >   1145          hsave->save = *save;
+> >   1146  
+> >   1147          svm->nested.vmcb = kvm_state->hdr.svm.vmcb_pa;
+> >   1148          load_nested_vmcb_control(svm, ctl);
+> >   1149          nested_prepare_vmcb_control(svm);
+> >   1150  
+> >   1151          if (!nested_svm_vmrun_msrpm(svm))
+> >   1152                  return -EINVAL;
+> > 
+> > goto out_free?
+> > 
+> >   1153  
+> >   1154          svm_set_gif(svm, !!(kvm_state->flags & KVM_STATE_NESTED_GIF_SET));
+> >   1155  
+> >   1156          ret = 0;
+> >   1157  out_free:
+> >   1158          kfree(save);
+> >   1159          kfree(ctl);
+> >   1160  
+> >   1161          return ret;
+> >   1162  }
+> > 
+> > regards,
+> > dan carpenter
+> > 
+> Which kernel tree is this? 
 > 
-> With the change in the commit, we also need to modify "xor" instruction
-> length from 3 to 2 in array ss_size accordingly to pass below check:
+> This again seems to be the result of other commit
+> that made save, ctl to be dynamically allocated. I based my patch on the version
+> that allocates both on the stack so no freeing is needed.
 > 
-> for (i = 0; i < (sizeof(ss_size) / sizeof(ss_size[0])); i++) {
->         target_rip += ss_size[i];
->         CLEAR_DEBUG();
->         debug.control = KVM_GUESTDBG_ENABLE | KVM_GUESTDBG_SINGLESTEP;
->         debug.arch.debugreg[7] = 0x00000400;
->         APPLY_DEBUG();
->         vcpu_run(vm, VCPU_ID);
->         TEST_ASSERT(run->exit_reason == KVM_EXIT_DEBUG &&
->                     run->debug.arch.exception == DB_VECTOR &&
->                     run->debug.arch.pc == target_rip &&
->                     run->debug.arch.dr6 == target_dr6,
->                     "SINGLE_STEP[%d]: exit %d exception %d rip 0x%llx "
->                     "(should be 0x%llx) dr6 0x%llx (should be 0x%llx)",
->                     i, run->exit_reason, run->debug.arch.exception,
->                     run->debug.arch.pc, target_rip, run->debug.arch.dr6,
->                     target_dr6);
-> }
-> 
-> Reported-by: kernel test robot <rong.a.chen@intel.com>
-> Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
-> ---
->  tools/testing/selftests/kvm/x86_64/debug_regs.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/tools/testing/selftests/kvm/x86_64/debug_regs.c b/tools/testing/selftests/kvm/x86_64/debug_regs.c
-> index b8d14f9db5f9..2fc6b3af81a1 100644
-> --- a/tools/testing/selftests/kvm/x86_64/debug_regs.c
-> +++ b/tools/testing/selftests/kvm/x86_64/debug_regs.c
-> @@ -73,7 +73,7 @@ int main(void)
->  	int i;
->  	/* Instruction lengths starting at ss_start */
->  	int ss_size[4] = {
-> -		3,		/* xor */
-> +		2,		/* xor */
->  		2,		/* cpuid */
->  		5,		/* mov */
->  		2,		/* rdmsr */
-> 
+> As far as I know from a check I did about week ago, none of branches on 
+> git://git.kernel.org/pub/scm/virt/kvm/kvm.git had that patch (that made save/ctr
+> be allocated dynamically).
 
-Queued, thanks.
+This is from yesterday's linux-next.  Look like a merge issue with
+commit 6ccbd29ade0d ("KVM: SVM: nested: Don't allocate VMCB structures
+on stack").
 
-Paolo
+regards,
+dan carpenter
 
