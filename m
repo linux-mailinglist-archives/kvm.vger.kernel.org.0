@@ -2,29 +2,29 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 58AF32761BF
-	for <lists+kvm@lfdr.de>; Wed, 23 Sep 2020 22:14:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7F4AF2761BA
+	for <lists+kvm@lfdr.de>; Wed, 23 Sep 2020 22:14:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726638AbgIWUNv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 23 Sep 2020 16:13:51 -0400
-Received: from mga12.intel.com ([192.55.52.136]:49295 "EHLO mga12.intel.com"
+        id S1726727AbgIWUNx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 23 Sep 2020 16:13:53 -0400
+Received: from mga12.intel.com ([192.55.52.136]:49297 "EHLO mga12.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726557AbgIWUNu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 23 Sep 2020 16:13:50 -0400
-IronPort-SDR: /OBzYv/O9YrOj3CWG0trck4RZikROSRGaw+l96twlMsNdZhkBJE6swaGCJshRDKwvG6uHgK2Ab
- 5nHsGBrJrJbA==
-X-IronPort-AV: E=McAfee;i="6000,8403,9753"; a="140472232"
+        id S1726557AbgIWUNv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 23 Sep 2020 16:13:51 -0400
+IronPort-SDR: +89lq/b9Hv2OjHct+Qk1bu52pyE7o6tPDxKrLUL1bahSHPHc3ftecg1zmz0Cj08Xgy9v/Nbo7w
+ p6yUZz9/JYRQ==
+X-IronPort-AV: E=McAfee;i="6000,8403,9753"; a="140472235"
 X-IronPort-AV: E=Sophos;i="5.77,293,1596524400"; 
-   d="scan'208";a="140472232"
+   d="scan'208";a="140472235"
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from orsmga007.jf.intel.com ([10.7.209.58])
   by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Sep 2020 13:13:50 -0700
-IronPort-SDR: 90NV0U+DsvdbgCFbgCd0gNO1XvAW9VxnTaukmjX7XMMrMzwn3K3ypTYFi3omi6v3XCPP3hu4PG
- bqnCRJ0O9TXA==
+IronPort-SDR: v/QwJbFb23+1sBeLiIehZoL5qt4L5ipnQKwWDgxz/QtoaDsFGPjQeFDaG9y9Sv3ExPRNjg2cyx
+ 78Ls1pLr2XIA==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.77,293,1596524400"; 
-   d="scan'208";a="349004936"
+   d="scan'208";a="349004941"
 Received: from sjchrist-coffee.jf.intel.com ([10.54.74.160])
   by orsmga007.jf.intel.com with ESMTP; 23 Sep 2020 13:13:50 -0700
 From:   Sean Christopherson <sean.j.christopherson@intel.com>
@@ -35,9 +35,9 @@ Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
         Jim Mattson <jmattson@google.com>,
         Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Subject: [PATCH v2 1/7] KVM: x86: Add RIP to the kvm_entry, i.e. VM-Enter, tracepoint
-Date:   Wed, 23 Sep 2020 13:13:43 -0700
-Message-Id: <20200923201349.16097-2-sean.j.christopherson@intel.com>
+Subject: [PATCH v2 3/7] KVM: VMX: Add a helper to test for a valid error code given an intr info
+Date:   Wed, 23 Sep 2020 13:13:45 -0700
+Message-Id: <20200923201349.16097-4-sean.j.christopherson@intel.com>
 X-Mailer: git-send-email 2.28.0
 In-Reply-To: <20200923201349.16097-1-sean.j.christopherson@intel.com>
 References: <20200923201349.16097-1-sean.j.christopherson@intel.com>
@@ -47,61 +47,50 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add RIP to the kvm_entry tracepoint to help debug if the kvm_exit
-tracepoint is disabled or if VM-Enter fails, in which case the kvm_exit
-tracepoint won't be hit.
-
-Read RIP from within the tracepoint itself to avoid a potential VMREAD
-and retpoline if the guest's RIP isn't available.
+Add a helper, is_exception_with_error_code(), to provide the simple but
+difficult to read code of checking for a valid exception with an error
+code given a vmcs.VM_EXIT_INTR_INFO value.  The helper will gain another
+user, vmx_get_exit_info(), in a future patch.
 
 Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
 ---
- arch/x86/kvm/trace.h | 10 ++++++----
- arch/x86/kvm/x86.c   |  2 +-
- 2 files changed, 7 insertions(+), 5 deletions(-)
+ arch/x86/kvm/vmx/nested.c | 4 +---
+ arch/x86/kvm/vmx/vmcs.h   | 7 +++++++
+ 2 files changed, 8 insertions(+), 3 deletions(-)
 
-diff --git a/arch/x86/kvm/trace.h b/arch/x86/kvm/trace.h
-index 11cb4c070f0c..7e8edc7a1f73 100644
---- a/arch/x86/kvm/trace.h
-+++ b/arch/x86/kvm/trace.h
-@@ -15,18 +15,20 @@
-  * Tracepoint for guest mode entry.
-  */
- TRACE_EVENT(kvm_entry,
--	TP_PROTO(unsigned int vcpu_id),
--	TP_ARGS(vcpu_id),
-+	TP_PROTO(struct kvm_vcpu *vcpu),
-+	TP_ARGS(vcpu),
+diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+index 4c84380ffd88..6f04df1bbf87 100644
+--- a/arch/x86/kvm/vmx/nested.c
++++ b/arch/x86/kvm/vmx/nested.c
+@@ -5940,9 +5940,7 @@ bool nested_vmx_reflect_vmexit(struct kvm_vcpu *vcpu)
+ 	 * need to be synthesized by querying the in-kernel LAPIC, but external
+ 	 * interrupts are never reflected to L1 so it's a non-issue.
+ 	 */
+-	if ((exit_intr_info &
+-	     (INTR_INFO_VALID_MASK | INTR_INFO_DELIVER_CODE_MASK)) ==
+-	    (INTR_INFO_VALID_MASK | INTR_INFO_DELIVER_CODE_MASK)) {
++	if (is_exception_with_error_code(exit_intr_info)) {
+ 		struct vmcs12 *vmcs12 = get_vmcs12(vcpu);
  
- 	TP_STRUCT__entry(
- 		__field(	unsigned int,	vcpu_id		)
-+		__field(	unsigned long,	rip		)
- 	),
+ 		vmcs12->vm_exit_intr_error_code =
+diff --git a/arch/x86/kvm/vmx/vmcs.h b/arch/x86/kvm/vmx/vmcs.h
+index 7a3675fddec2..1472c6c376f7 100644
+--- a/arch/x86/kvm/vmx/vmcs.h
++++ b/arch/x86/kvm/vmx/vmcs.h
+@@ -138,6 +138,13 @@ static inline bool is_external_intr(u32 intr_info)
+ 	return is_intr_type(intr_info, INTR_TYPE_EXT_INTR);
+ }
  
- 	TP_fast_assign(
--		__entry->vcpu_id	= vcpu_id;
-+		__entry->vcpu_id        = vcpu->vcpu_id;
-+		__entry->rip		= kvm_rip_read(vcpu);
- 	),
- 
--	TP_printk("vcpu %u", __entry->vcpu_id)
-+	TP_printk("vcpu %u, rip 0x%lx", __entry->vcpu_id, __entry->rip)
- );
- 
- /*
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 17f4995e80a7..95f8e5685911 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -8546,7 +8546,7 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
- 		kvm_x86_ops.request_immediate_exit(vcpu);
- 	}
- 
--	trace_kvm_entry(vcpu->vcpu_id);
-+	trace_kvm_entry(vcpu);
- 
- 	fpregs_assert_state_consistent();
- 	if (test_thread_flag(TIF_NEED_FPU_LOAD))
++static inline bool is_exception_with_error_code(u32 intr_info)
++{
++	const u32 mask = INTR_INFO_VALID_MASK | INTR_INFO_DELIVER_CODE_MASK;
++
++	return (intr_info & mask) == mask;
++}
++
+ enum vmcs_field_width {
+ 	VMCS_FIELD_WIDTH_U16 = 0,
+ 	VMCS_FIELD_WIDTH_U64 = 1,
 -- 
 2.28.0
 
