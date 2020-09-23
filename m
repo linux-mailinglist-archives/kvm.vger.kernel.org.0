@@ -2,80 +2,71 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BAEE8275E0D
-	for <lists+kvm@lfdr.de>; Wed, 23 Sep 2020 18:59:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 33917275E22
+	for <lists+kvm@lfdr.de>; Wed, 23 Sep 2020 19:02:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726537AbgIWQ7o (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 23 Sep 2020 12:59:44 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:51931 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726413AbgIWQ7n (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 23 Sep 2020 12:59:43 -0400
+        id S1726342AbgIWRCy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 23 Sep 2020 13:02:54 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:38144 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726381AbgIWRCx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 23 Sep 2020 13:02:53 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1600880381;
+        s=mimecast20190719; t=1600880571;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=vmVARHYAsE9tPU6eUJfulnvnl82Jvse1QKnk4N0AG3M=;
-        b=Ez50VuX6Nib6D3yYXHbxafI0WdZd9KXkDmVLyyOks/vRrh53PBoX99qh/TA+yvvsEpE0zm
-        +pKKHmV9ZdZHpFslXZENpzP9j48uHJfLKP7UBLdurVh0XZpV2FybkGs+vWHA2vnTxE+nNT
-        cuG/XFa0dB+SzOwNlDRlV+fqhrKz0Ko=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-278-r1GhsADeMie6c8AaL7uibg-1; Wed, 23 Sep 2020 12:59:40 -0400
-X-MC-Unique: r1GhsADeMie6c8AaL7uibg-1
-Received: by mail-wr1-f70.google.com with SMTP id d9so71413wrv.16
-        for <kvm@vger.kernel.org>; Wed, 23 Sep 2020 09:59:40 -0700 (PDT)
+        bh=wh8ZSulQnN1Zj4DNTEW6JJd0xzaPcYkEfvdxXHeAev8=;
+        b=CvIB/meMokjYBcwbtZoPgPl3kctoTZ7WbTjQYDGu+dRMPXJeWxqHJ6kIBgsG6vSd4XmfGv
+        exbAGhJ0+5RBz53x+01Vux/cDcVYizdkqUclvwN5v91V1RG4xJZezZiN3VEfBgo2SwWSaw
+        5n/iMCtpWTkbV7Ms4OP0x7dIo+o1iU4=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-375-uRgESB4YMBWvuvjGq44uGg-1; Wed, 23 Sep 2020 13:02:49 -0400
+X-MC-Unique: uRgESB4YMBWvuvjGq44uGg-1
+Received: by mail-wr1-f71.google.com with SMTP id d9so77508wrv.16
+        for <kvm@vger.kernel.org>; Wed, 23 Sep 2020 10:02:49 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=vmVARHYAsE9tPU6eUJfulnvnl82Jvse1QKnk4N0AG3M=;
-        b=f6toFHZ8J0tfxR7sBEdOHzW/Zh4UI+Gc9vQ9yRlC+rVgiSDxuZj1TWjTlGAhkoiVB4
-         UtEvxUn1oWF3p0YXAhlkkvyLWoNNaNWDSiiCJZOXwxayqoSNEY0zGRHg3Rq+g21UssK4
-         9E5u4rXaYNkWXvjebULuv8Eos0HcC/y32Bte6aFifv602Yyf6vL/eKOFb7ajFIZgYA09
-         btcxx+5KZIOc+gfISMAZUpTgB/Kl2c94rvNXdsoYDUxR2DD/dTGAq8YCTEoUyniWkOZm
-         YviHFXgwF4kfGVn2j+sbfZ49fUI6d7R2LixchoiRTQ5F2ufkag3Y++k+e0SgGlPHkyjP
-         2ffA==
-X-Gm-Message-State: AOAM531z4mhL2sp6iODeas41sLuRftkcmFvU37om4njbBL34X/cgVRgk
-        iOOf4b+uNvB08Hm9rq9dyUESiZwAJ+T4ep/N1BTlvA3RReY7wAar8PVTMWFw3gbN0rJXFehU8k0
-        LLyyA2iArWcc6
-X-Received: by 2002:adf:dd82:: with SMTP id x2mr609807wrl.419.1600880378590;
-        Wed, 23 Sep 2020 09:59:38 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxCuDHXBEAcHyIB5Vvs3lEyQ6sVJqsATi+lSmVZHEx6qix26/NPEU4yz7D8Ev4AcSVYp4csdA==
-X-Received: by 2002:adf:dd82:: with SMTP id x2mr609777wrl.419.1600880378347;
-        Wed, 23 Sep 2020 09:59:38 -0700 (PDT)
+        bh=wh8ZSulQnN1Zj4DNTEW6JJd0xzaPcYkEfvdxXHeAev8=;
+        b=HXtTRZSS+MIo4mwd/5Tjpn4E3xk+so6wB5jGCAtKnXSBP9/tPrS2qM6fRn3LtFu1VB
+         yig0vXf3HN19aw4cLYJLBuBLhLCryg75DbYBV7XrRfolQMNwkoqgyGd8PqOCW1VpOxBb
+         3bXEnx8H4R/SKchZdMLELl1AjNECJ4EntRJBMPD5flYUIf+xztJuVcQo+X0QyaWl6fWa
+         FwKwWgxFyhYc+eenc2KeLXZXVcgCmOIQLbh/zzkNMdo3Y+dT8+Z8yCNvDSg17qv4ucc4
+         FX0UmcT8CY6fJZlqEPv4KmkUJilq5c4MuhbunpOlRTfHfKkOU9JWDrzorkgb7Sqv1kn2
+         p0+g==
+X-Gm-Message-State: AOAM533/bWatRAXkPaH9BTT2km/G7AotO4EFmjpAYwlYN8kvAqxAUcjc
+        /39ELnN7Lw/l312Ig0Ou2kfIzd1HGTthCRKewlpANb2Cz9k7rcQY4ms8HLK6bdSw+brm97c+ElF
+        u3b2doB2INaBA
+X-Received: by 2002:a7b:c959:: with SMTP id i25mr532799wml.39.1600880567941;
+        Wed, 23 Sep 2020 10:02:47 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzQEms+v2XPzjI+yTDNOtuowwjrFIgRvbOnHL8okDQ1x8MM4BVX6RRR+HIiTftDIxYMCyn7AA==
+X-Received: by 2002:a7b:c959:: with SMTP id i25mr532778wml.39.1600880567699;
+        Wed, 23 Sep 2020 10:02:47 -0700 (PDT)
 Received: from ?IPv6:2001:b07:6468:f312:15f1:648d:7de6:bad9? ([2001:b07:6468:f312:15f1:648d:7de6:bad9])
-        by smtp.gmail.com with ESMTPSA id x10sm401353wmi.37.2020.09.23.09.59.36
+        by smtp.gmail.com with ESMTPSA id z19sm422712wmi.3.2020.09.23.10.02.46
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 23 Sep 2020 09:59:37 -0700 (PDT)
-Subject: Re: [PATCH] KVM: SVM: Mark SEV launch secret pages as dirty.
-To:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        Cfir Cohen <cfir@google.com>
-Cc:     "kvm @ vger . kernel . org" <kvm@vger.kernel.org>,
-        Lendacky Thomas <thomas.lendacky@amd.com>,
-        Singh Brijesh <brijesh.singh@amd.com>,
-        Grimm Jon <Jon.Grimm@amd.com>,
-        David Rientjes <rientjes@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wed, 23 Sep 2020 10:02:47 -0700 (PDT)
+Subject: Re: [PATCH] KVM: x86/mmu: Move individual kvm_mmu initialization into
+ common helper
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "H . Peter Anvin" <hpa@zytor.com>, x86@kernel.org,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org
-References: <20200807012303.3769170-1-cfir@google.com>
- <20200919045505.GC21189@sjchrist-ice>
+References: <20200923163314.8181-1-sean.j.christopherson@intel.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <5ac77c46-88b4-df45-4f02-72adfb096262@redhat.com>
-Date:   Wed, 23 Sep 2020 18:59:36 +0200
+Message-ID: <815dfaef-54e3-f0e8-9641-8a87f8910b74@redhat.com>
+Date:   Wed, 23 Sep 2020 19:02:45 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <20200919045505.GC21189@sjchrist-ice>
+In-Reply-To: <20200923163314.8181-1-sean.j.christopherson@intel.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -83,60 +74,79 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 19/09/20 06:55, Sean Christopherson wrote:
-> Side topic, while I love the comment (I do, honestly) regarding in-place
-> encryption, this is the fourth? instance of the same 4-line comment (6 lines
-> if you count the /* and */.  Maybe it's time to do something like
+On 23/09/20 18:33, Sean Christopherson wrote:
+> Move initialization of 'struct kvm_mmu' fields into alloc_mmu_pages() to
+> consolidate code, and rename the helper to __kvm_mmu_create().
 > 
-> 	/* LAUNCH_SECRET does in-place encryption, see sev_clflush_pages(). */
+> No functional change intended.
 > 
-> and then have the main comment in sev_clflush_pages().  With the addition of
-> X86_FEATURE_SME_COHERENT, there's even a fantastic location for the comment:
+> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+> ---
+>  arch/x86/kvm/mmu/mmu.c | 25 +++++++++----------------
+>  1 file changed, 9 insertions(+), 16 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index 76c5826e29a2..a2c4c71ce5f2 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -5682,11 +5682,17 @@ static void free_mmu_pages(struct kvm_mmu *mmu)
+>  	free_page((unsigned long)mmu->lm_root);
+>  }
+>  
+> -static int alloc_mmu_pages(struct kvm_vcpu *vcpu, struct kvm_mmu *mmu)
+> +static int __kvm_mmu_create(struct kvm_vcpu *vcpu, struct kvm_mmu *mmu)
+>  {
+>  	struct page *page;
+>  	int i;
+>  
+> +	mmu->root_hpa = INVALID_PAGE;
+> +	mmu->root_pgd = 0;
+> +	mmu->translate_gpa = translate_gpa;
+> +	for (i = 0; i < KVM_MMU_NUM_PREV_ROOTS; i++)
+> +		mmu->prev_roots[i] = KVM_MMU_ROOT_INFO_INVALID;
+> +
+>  	/*
+>  	 * When using PAE paging, the four PDPTEs are treated as 'root' pages,
+>  	 * while the PDP table is a per-vCPU construct that's allocated at MMU
+> @@ -5712,7 +5718,6 @@ static int alloc_mmu_pages(struct kvm_vcpu *vcpu, struct kvm_mmu *mmu)
+>  
+>  int kvm_mmu_create(struct kvm_vcpu *vcpu)
+>  {
+> -	uint i;
+>  	int ret;
+>  
+>  	vcpu->arch.mmu_pte_list_desc_cache.kmem_cache = pte_list_desc_cache;
+> @@ -5726,25 +5731,13 @@ int kvm_mmu_create(struct kvm_vcpu *vcpu)
+>  	vcpu->arch.mmu = &vcpu->arch.root_mmu;
+>  	vcpu->arch.walk_mmu = &vcpu->arch.root_mmu;
+>  
+> -	vcpu->arch.root_mmu.root_hpa = INVALID_PAGE;
+> -	vcpu->arch.root_mmu.root_pgd = 0;
+> -	vcpu->arch.root_mmu.translate_gpa = translate_gpa;
+> -	for (i = 0; i < KVM_MMU_NUM_PREV_ROOTS; i++)
+> -		vcpu->arch.root_mmu.prev_roots[i] = KVM_MMU_ROOT_INFO_INVALID;
+> -
+> -	vcpu->arch.guest_mmu.root_hpa = INVALID_PAGE;
+> -	vcpu->arch.guest_mmu.root_pgd = 0;
+> -	vcpu->arch.guest_mmu.translate_gpa = translate_gpa;
+> -	for (i = 0; i < KVM_MMU_NUM_PREV_ROOTS; i++)
+> -		vcpu->arch.guest_mmu.prev_roots[i] = KVM_MMU_ROOT_INFO_INVALID;
+> -
+>  	vcpu->arch.nested_mmu.translate_gpa = translate_nested_gpa;
+>  
+> -	ret = alloc_mmu_pages(vcpu, &vcpu->arch.guest_mmu);
+> +	ret = __kvm_mmu_create(vcpu, &vcpu->arch.guest_mmu);
+>  	if (ret)
+>  		return ret;
+>  
+> -	ret = alloc_mmu_pages(vcpu, &vcpu->arch.root_mmu);
+> +	ret = __kvm_mmu_create(vcpu, &vcpu->arch.root_mmu);
+>  	if (ret)
+>  		goto fail_allocate_root;
+>  
+> 
 
-Two of the three instances are a bit different though.  What about this
-which at least shortens the comment to 2 fewer lines:
+Queued, thanks.
 
-diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-index bb0e89c79a04..7b11546e65ba 100644
---- a/arch/x86/kvm/svm/sev.c
-+++ b/arch/x86/kvm/svm/sev.c
-@@ -446,10 +446,8 @@ static int sev_launch_update_data(struct kvm *kvm, struct kvm_sev_cmd *argp)
- 	}
- 
- 	/*
--	 * The LAUNCH_UPDATE command will perform in-place encryption of the
--	 * memory content (i.e it will write the same memory region with C=1).
--	 * It's possible that the cache may contain the data with C=0, i.e.,
--	 * unencrypted so invalidate it first.
-+	 * Flush before LAUNCH_UPDATE encrypts pages in place, in case the cache
-+	 * contains the data that was written unencrypted.
- 	 */
- 	sev_clflush_pages(inpages, npages);
- 
-@@ -805,10 +803,8 @@ static int sev_dbg_crypt(struct kvm *kvm, struct kvm_sev_cmd *argp, bool dec)
- 		}
- 
- 		/*
--		 * The DBG_{DE,EN}CRYPT commands will perform {dec,en}cryption of the
--		 * memory content (i.e it will write the same memory region with C=1).
--		 * It's possible that the cache may contain the data with C=0, i.e.,
--		 * unencrypted so invalidate it first.
-+		 * Flush before DBG_{DE,EN}CRYPT reads or modifies the pages, flush the
-+		 * destination too in case the cache contains its current data.
- 		 */
- 		sev_clflush_pages(src_p, 1);
- 		sev_clflush_pages(dst_p, 1);
-@@ -870,10 +866,8 @@ static int sev_launch_secret(struct kvm *kvm, struct kvm_sev_cmd *argp)
- 		return PTR_ERR(pages);
- 
- 	/*
--	 * The LAUNCH_SECRET command will perform in-place encryption of the
--	 * memory content (i.e it will write the same memory region with C=1).
--	 * It's possible that the cache may contain the data with C=0, i.e.,
--	 * unencrypted so invalidate it first.
-+	 * Flush before LAUNCH_SECRET encrypts pages in place, in case the cache
-+	 * contains the data that was written unencrypted.
- 	 */
- 	sev_clflush_pages(pages, n);
- 
+Paolo
 
