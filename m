@@ -2,246 +2,113 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2D85F275915
-	for <lists+kvm@lfdr.de>; Wed, 23 Sep 2020 15:48:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C81A4275922
+	for <lists+kvm@lfdr.de>; Wed, 23 Sep 2020 15:51:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726652AbgIWNsU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 23 Sep 2020 09:48:20 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:53358 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726550AbgIWNsQ (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 23 Sep 2020 09:48:16 -0400
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 08NDWNKI178002;
-        Wed, 23 Sep 2020 09:48:14 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=pp1;
- bh=SbE/vsOJaxUSDQXMjtRFfmXi25d37+6rMs0F1MCubSo=;
- b=iu+eZu+7vZ8RMl4dWDACBO9eo1/XhLvE3eIX5JWLVjnlqOImw+LZnuqfGdAHM5M1BJiw
- qbKOdnTle1vtoEnzjEAbImxTzG1qRf1qVkhFeTGF98v/hhuTAVIkvoUPHnfTaxwpS7m1
- osSvPXhRfHM1qEySFL55synasEOONhnebszBF28TB4SbtJSln1XNOfmPwXveC1NnglGB
- Hm+3+0oTVYjll1dXtyUY5S2gg78EtUFtX6WTAlsrBSVy94AHWAIPdcHbbAUYlK9UxPEg
- 07+VjVaeMKMbMO2QDILkUbtlQ1dxCT9+7v00/71X4CIfNMEmFiK9uIOlT5U5XDYOuBIJ +A== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 33r3tgqrxt-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 23 Sep 2020 09:48:14 -0400
-Received: from m0098416.ppops.net (m0098416.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 08NDWf0W179946;
-        Wed, 23 Sep 2020 09:48:14 -0400
-Received: from ppma01fra.de.ibm.com (46.49.7a9f.ip4.static.sl-reverse.com [159.122.73.70])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 33r3tgqrwj-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 23 Sep 2020 09:48:14 -0400
-Received: from pps.filterd (ppma01fra.de.ibm.com [127.0.0.1])
-        by ppma01fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 08NDlowB029285;
-        Wed, 23 Sep 2020 13:48:12 GMT
-Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
-        by ppma01fra.de.ibm.com with ESMTP id 33n9m7t6c6-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 23 Sep 2020 13:48:12 +0000
-Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
-        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 08NDm9LV25493790
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 23 Sep 2020 13:48:10 GMT
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id AC4E34C05C;
-        Wed, 23 Sep 2020 13:48:09 +0000 (GMT)
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 5093B4C050;
-        Wed, 23 Sep 2020 13:48:09 +0000 (GMT)
-Received: from marcibm.ibmuc.com (unknown [9.145.64.218])
-        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Wed, 23 Sep 2020 13:48:09 +0000 (GMT)
-From:   Marc Hartmayer <mhartmay@linux.ibm.com>
-To:     <kvm@vger.kernel.org>
-Cc:     Thomas Huth <thuth@redhat.com>,
-        David Hildenbrand <david@redhat.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Andrew Jones <drjones@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, linux-s390@vger.kernel.org
-Subject: [PATCH kvm-unit-tests v2 4/4] s390x: add Protected VM support
-Date:   Wed, 23 Sep 2020 15:47:58 +0200
-Message-Id: <20200923134758.19354-5-mhartmay@linux.ibm.com>
-X-Mailer: git-send-email 2.26.2
-In-Reply-To: <20200923134758.19354-1-mhartmay@linux.ibm.com>
-References: <20200923134758.19354-1-mhartmay@linux.ibm.com>
+        id S1726640AbgIWNvF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 23 Sep 2020 09:51:05 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:35303 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726572AbgIWNvF (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 23 Sep 2020 09:51:05 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1600869064;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=pGCTwF8go0vEZUmXsGyvz8lI/OeV1VqKy4Zgp1Xxw0Y=;
+        b=Z0K+GpyGw7dpnBZGf4mVz9jtP3FpIsat8wgl/ByrMMCr5Nh+R+RZp2UK+G5JblHzKfcAOq
+        z2n9gizI4JFt1KCNRsRT8O1FdhFDrLx2AdxGZl5+KIYbGPncIzAMwfmhJX3cZuW3/NlVM/
+        a+Q0GPdEybZNupPBVBo/sAzOSyhCgus=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-91-akYQouafNVO338eMB2N0GA-1; Wed, 23 Sep 2020 09:51:01 -0400
+X-MC-Unique: akYQouafNVO338eMB2N0GA-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3794F8ECE51;
+        Wed, 23 Sep 2020 13:51:00 +0000 (UTC)
+Received: from starship (unknown [10.35.206.154])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 4F4085D993;
+        Wed, 23 Sep 2020 13:50:59 +0000 (UTC)
+Message-ID: <126ab56ea11b435aedc98ca82a112cf83a60eaf8.camel@redhat.com>
+Subject: Re: [bug report] SVM: nSVM: setup nested msr permission bitmap on
+ nested state load
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     Dan Carpenter <dan.carpenter@oracle.com>
+Cc:     kvm@vger.kernel.org
+Date:   Wed, 23 Sep 2020 16:50:58 +0300
+In-Reply-To: <20200923134455.GA1485839@mwanda>
+References: <20200923134455.GA1485839@mwanda>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.3 (3.36.3-1.fc32) 
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
- definitions=2020-09-23_09:2020-09-23,2020-09-23 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 mlxscore=0
- spamscore=0 clxscore=1015 impostorscore=0 lowpriorityscore=0
- priorityscore=1501 bulkscore=0 mlxlogscore=999 suspectscore=13
- malwarescore=0 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2006250000 definitions=main-2009230103
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add support for Protected Virtual Machine (PVM) tests. For starting a
-PVM guest we must be able to generate a PVM image by using the
-`genprotimg` tool from the s390-tools collection. This requires the
-ability to pass a machine-specific host-key document, so the option
-`--host-key-document` is added to the configure script.
+On Wed, 2020-09-23 at 16:44 +0300, Dan Carpenter wrote:
+> Hello Maxim Levitsky,
+> 
+> The patch 772b81bb2f9b: "SVM: nSVM: setup nested msr permission
+> bitmap on nested state load" from Aug 27, 2020, leads to the
+> following static checker warning:
+> 
+> 	arch/x86/kvm/svm/nested.c:1161 svm_set_nested_state()
+> 	warn: 'ctl' not released on lines: 1152.
+> 
+> arch/x86/kvm/svm/nested.c
+>   1135          if (!(save->cr0 & X86_CR0_PG))
+>   1136                  goto out_free;
+>   1137  
+>   1138          /*
+>   1139           * All checks done, we can enter guest mode.  L1 control fields
+>   1140           * come from the nested save state.  Guest state is already
+>   1141           * in the registers, the save area of the nested state instead
+>   1142           * contains saved L1 state.
+>   1143           */
+>   1144          copy_vmcb_control_area(&hsave->control, &svm->vmcb->control);
+>   1145          hsave->save = *save;
+>   1146  
+>   1147          svm->nested.vmcb = kvm_state->hdr.svm.vmcb_pa;
+>   1148          load_nested_vmcb_control(svm, ctl);
+>   1149          nested_prepare_vmcb_control(svm);
+>   1150  
+>   1151          if (!nested_svm_vmrun_msrpm(svm))
+>   1152                  return -EINVAL;
+> 
+> goto out_free?
+> 
+>   1153  
+>   1154          svm_set_gif(svm, !!(kvm_state->flags & KVM_STATE_NESTED_GIF_SET));
+>   1155  
+>   1156          ret = 0;
+>   1157  out_free:
+>   1158          kfree(save);
+>   1159          kfree(ctl);
+>   1160  
+>   1161          return ret;
+>   1162  }
+> 
+> regards,
+> dan carpenter
+> 
+Which kernel tree is this? 
 
-Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
-Signed-off-by: Marc Hartmayer <mhartmay@linux.ibm.com>
----
- configure               |  9 +++++++++
- s390x/Makefile          | 17 +++++++++++++++--
- s390x/selftest.parmfile |  1 +
- s390x/unittests.cfg     |  1 +
- scripts/s390x/func.bash | 36 ++++++++++++++++++++++++++++++++++++
- 5 files changed, 62 insertions(+), 2 deletions(-)
- create mode 100644 s390x/selftest.parmfile
- create mode 100644 scripts/s390x/func.bash
+This again seems to be the result of other commit
+that made save, ctl to be dynamically allocated. I based my patch on the version
+that allocates both on the stack so no freeing is needed.
 
-diff --git a/configure b/configure
-index f9305431a9cb..fe319233eb50 100755
---- a/configure
-+++ b/configure
-@@ -19,6 +19,7 @@ wa_divide=
- vmm="qemu"
- errata_force=0
- erratatxt="$srcdir/errata.txt"
-+host_key_document=
- 
- usage() {
-     cat <<-EOF
-@@ -41,6 +42,9 @@ usage() {
- 	                           no environ is provided by the user (enabled by default)
- 	    --erratatxt=FILE       specify a file to use instead of errata.txt. Use
- 	                           '--erratatxt=' to ensure no file is used.
-+	    --host-key-document=HOST_KEY_DOCUMENT
-+	                           Specify the machine-specific host-key document for creating
-+	                           a PVM image with 'genprotimg' (s390x only)
- EOF
-     exit 1
- }
-@@ -93,6 +97,9 @@ while [[ "$1" = -* ]]; do
- 	    erratatxt=
- 	    [ "$arg" ] && erratatxt=$(eval realpath "$arg")
- 	    ;;
-+	--host-key-document)
-+	    host_key_document="$arg"
-+	    ;;
- 	--help)
- 	    usage
- 	    ;;
-@@ -224,6 +231,8 @@ ENVIRON_DEFAULT=$environ_default
- ERRATATXT=$erratatxt
- U32_LONG_FMT=$u32_long
- WA_DIVIDE=$wa_divide
-+GENPROTIMG=${GENPROTIMG-genprotimg}
-+HOST_KEY_DOCUMENT=$host_key_document
- EOF
- 
- cat <<EOF > lib/config.h
-diff --git a/s390x/Makefile b/s390x/Makefile
-index c2213ad92e0d..b079a26dffb7 100644
---- a/s390x/Makefile
-+++ b/s390x/Makefile
-@@ -19,12 +19,19 @@ tests += $(TEST_DIR)/smp.elf
- tests += $(TEST_DIR)/sclp.elf
- tests += $(TEST_DIR)/css.elf
- tests += $(TEST_DIR)/uv-guest.elf
--tests_binary = $(patsubst %.elf,%.bin,$(tests))
- 
--all: directories test_cases test_cases_binary
-+tests_binary = $(patsubst %.elf,%.bin,$(tests))
-+ifneq ($(HOST_KEY_DOCUMENT),)
-+tests_pv_binary = $(patsubst %.bin,%.pv.bin,$(tests_binary))
-+else
-+tests_pv_binary =
-+endif
-+
-+all: directories test_cases test_cases_binary test_cases_pv
- 
- test_cases: $(tests)
- test_cases_binary: $(tests_binary)
-+test_cases_pv: $(tests_pv_binary)
- 
- CFLAGS += -std=gnu99
- CFLAGS += -ffreestanding
-@@ -73,6 +80,12 @@ FLATLIBS = $(libcflat)
- %.bin: %.elf
- 	$(OBJCOPY) -O binary  $< $@
- 
-+%selftest.pv.bin: %selftest.bin $(HOST_KEY_DOCUMENT) $(patsubst %.pv.bin,%.parmfile,$@)
-+	$(GENPROTIMG) --host-key-document $(HOST_KEY_DOCUMENT) --parmfile $(patsubst %.pv.bin,%.parmfile,$@) --no-verify --image $< -o $@
-+
-+%.pv.bin: %.bin $(HOST_KEY_DOCUMENT)
-+	$(GENPROTIMG) --host-key-document $(HOST_KEY_DOCUMENT) --no-verify --image $< -o $@
-+
- arch_clean: asm_offsets_clean
- 	$(RM) $(TEST_DIR)/*.{o,elf,bin} $(TEST_DIR)/.*.d lib/s390x/.*.d
- 
-diff --git a/s390x/selftest.parmfile b/s390x/selftest.parmfile
-new file mode 100644
-index 000000000000..5613931aa5c6
---- /dev/null
-+++ b/s390x/selftest.parmfile
-@@ -0,0 +1 @@
-+test 123
-\ No newline at end of file
-diff --git a/s390x/unittests.cfg b/s390x/unittests.cfg
-index 6d50c634770f..3feb8bcaa13d 100644
---- a/s390x/unittests.cfg
-+++ b/s390x/unittests.cfg
-@@ -21,6 +21,7 @@
- [selftest-setup]
- file = selftest.elf
- groups = selftest
-+# please keep the kernel cmdline in sync with $(TEST_DIR)/selftest.parmfile
- extra_params = -append 'test 123'
- 
- [intercept]
-diff --git a/scripts/s390x/func.bash b/scripts/s390x/func.bash
-new file mode 100644
-index 000000000000..4eae5e916c61
---- /dev/null
-+++ b/scripts/s390x/func.bash
-@@ -0,0 +1,36 @@
-+# The file scripts/common.bash has to be the only file sourcing this
-+# arch helper file
-+source config.mak
-+
-+ARCH_CMD=arch_cmd_s390x
-+
-+function arch_cmd_s390x()
-+{
-+	local cmd=$1
-+	local testname=$2
-+	local groups=$3
-+	local smp=$4
-+	local kernel=$5
-+	local opts=$6
-+	local arch=$7
-+	local check=$8
-+	local accel=$9
-+	local timeout=${10}
-+
-+	# run the normal test case
-+	"$cmd" "$testname" "$groups" "$smp" "$kernel" "$opts" "$arch" "$check" "$accel" "$timeout"
-+
-+	# run PV test case
-+	kernel=${kernel%.elf}.pv.bin
-+	testname=${testname}_PV
-+	if [ ! -f "${kernel}" ]; then
-+		if [ -z "${HOST_KEY_DOCUMENT}" ]; then
-+			print_result 'SKIP' $testname '' 'no host-key document specified'
-+			return 2
-+		fi
-+
-+		print_result 'SKIP' $testname '' 'PVM image was not created'
-+		return 2
-+	fi
-+	"$cmd" "$testname" "$groups pv" "$smp" "$kernel" "$opts" "$arch" "$check" "$accel" "$timeout"
-+}
--- 
-2.25.4
+As far as I know from a check I did about week ago, none of branches on 
+git://git.kernel.org/pub/scm/virt/kvm/kvm.git had that patch (that made save/ctr
+be allocated dynamically).
+
+Best regards,
+	Maxim Levitsky
+
+
 
