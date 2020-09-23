@@ -2,29 +2,29 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DCB06275D8E
+	by mail.lfdr.de (Postfix) with ESMTP id 696B6275D8D
 	for <lists+kvm@lfdr.de>; Wed, 23 Sep 2020 18:36:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726763AbgIWQgj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 23 Sep 2020 12:36:39 -0400
+        id S1726727AbgIWQgd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 23 Sep 2020 12:36:33 -0400
 Received: from mga17.intel.com ([192.55.52.151]:7062 "EHLO mga17.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726687AbgIWQgc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        id S1726701AbgIWQgc (ORCPT <rfc822;kvm@vger.kernel.org>);
         Wed, 23 Sep 2020 12:36:32 -0400
-IronPort-SDR: sZaBEw4TUO7YXQGgQS1cziRgqfOWaEPUKIc3Hz/S6sNAuvPF5d3G1D6idT7JxPRqC6cAIkYaww
- 0CjyUfkH/DAw==
-X-IronPort-AV: E=McAfee;i="6000,8403,9753"; a="140962214"
+IronPort-SDR: KNRwUVmTqNdIS4cK9oal/jhU5lsVuchWpoKahstc+6wqh91WHLcuz0U2w1tk772A4AQuhd6PSv
+ LOcXRL1qdBbQ==
+X-IronPort-AV: E=McAfee;i="6000,8403,9753"; a="140962217"
 X-IronPort-AV: E=Sophos;i="5.77,293,1596524400"; 
-   d="scan'208";a="140962214"
+   d="scan'208";a="140962217"
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Sep 2020 09:36:31 -0700
-IronPort-SDR: Yv13kHX3I8rLsS95qzixWRXkyTNfEnxIkgB1rHIYd4GZkW/U0589udwNYOIg+S9sHaAy03hbf8
- cw1GwkKNGxeg==
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Sep 2020 09:36:32 -0700
+IronPort-SDR: r5/8CJwFBi0iQuWgNQ4QZHZt9N9ErzUU59mvdfOWE9qFHsnf02ERdZ8MWX0uLpCUQGQj7bwGyh
+ JxLRhAeQSdrw==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.77,293,1596524400"; 
-   d="scan'208";a="454981824"
+   d="scan'208";a="454981828"
 Received: from sjchrist-coffee.jf.intel.com ([10.54.74.160])
   by orsmga004.jf.intel.com with ESMTP; 23 Sep 2020 09:36:30 -0700
 From:   Sean Christopherson <sean.j.christopherson@intel.com>
@@ -35,9 +35,9 @@ Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
         Jim Mattson <jmattson@google.com>,
         Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Subject: [PATCH v2 2/3] KVM: VMX: Replace MSR_IA32_RTIT_OUTPUT_BASE_MASK with helper function
-Date:   Wed, 23 Sep 2020 09:36:28 -0700
-Message-Id: <20200923163629.20168-3-sean.j.christopherson@intel.com>
+Subject: [PATCH v2 3/3] KVM: x86: Unexport cpuid_query_maxphyaddr()
+Date:   Wed, 23 Sep 2020 09:36:29 -0700
+Message-Id: <20200923163629.20168-4-sean.j.christopherson@intel.com>
 X-Mailer: git-send-email 2.28.0
 In-Reply-To: <20200923163629.20168-1-sean.j.christopherson@intel.com>
 References: <20200923163629.20168-1-sean.j.christopherson@intel.com>
@@ -47,51 +47,26 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Replace the subtly not-a-constant MSR_IA32_RTIT_OUTPUT_BASE_MASK with a
-proper helper function to check whether or not the specified base is
-valid.  Blindly referencing the local 'vcpu' is especially nasty.
+Stop exporting cpuid_query_maxphyaddr() now that it's not being abused
+by VMX.
 
 Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
 ---
- arch/x86/kvm/vmx/vmx.c | 11 +++++++----
- 1 file changed, 7 insertions(+), 4 deletions(-)
+ arch/x86/kvm/cpuid.c | 1 -
+ 1 file changed, 1 deletion(-)
 
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index be82da055fc4..0d41faf63b57 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -146,9 +146,6 @@ module_param_named(preemption_timer, enable_preemption_timer, bool, S_IRUGO);
- 	RTIT_STATUS_ERROR | RTIT_STATUS_STOPPED | \
- 	RTIT_STATUS_BYTECNT))
- 
--#define MSR_IA32_RTIT_OUTPUT_BASE_MASK \
--	(~((1UL << cpuid_maxphyaddr(vcpu)) - 1) | 0x7f)
--
- /*
-  * These 2 parameters are used to config the controls for Pause-Loop Exiting:
-  * ple_gap:    upper bound on the amount of time between two successive
-@@ -1037,6 +1034,12 @@ static inline bool pt_can_write_msr(struct vcpu_vmx *vmx)
- 	       !(vmx->pt_desc.guest.ctl & RTIT_CTL_TRACEEN);
+diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+index 3fd6eec202d7..dc95b638911e 100644
+--- a/arch/x86/kvm/cpuid.c
++++ b/arch/x86/kvm/cpuid.c
+@@ -186,7 +186,6 @@ int cpuid_query_maxphyaddr(struct kvm_vcpu *vcpu)
+ not_found:
+ 	return 36;
  }
+-EXPORT_SYMBOL_GPL(cpuid_query_maxphyaddr);
  
-+static inline bool pt_output_base_valid(struct kvm_vcpu *vcpu, u64 base)
-+{
-+	/* The base must be 128-byte aligned and a legal physical address. */
-+	return !(base & (~((1UL << cpuid_maxphyaddr(vcpu)) - 1) | 0x7f));
-+}
-+
- static inline void pt_load_msr(struct pt_ctx *ctx, u32 addr_range)
- {
- 	u32 i;
-@@ -2167,7 +2170,7 @@ static int vmx_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
- 		    !intel_pt_validate_cap(vmx->pt_desc.caps,
- 					   PT_CAP_single_range_output))
- 			return 1;
--		if (data & MSR_IA32_RTIT_OUTPUT_BASE_MASK)
-+		if (!pt_output_base_valid(vcpu, data))
- 			return 1;
- 		vmx->pt_desc.guest.output_base = data;
- 		break;
+ /* when an old userspace process fills a new kernel module */
+ int kvm_vcpu_ioctl_set_cpuid(struct kvm_vcpu *vcpu,
 -- 
 2.28.0
 
