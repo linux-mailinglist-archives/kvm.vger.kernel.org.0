@@ -2,119 +2,131 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E017527582E
-	for <lists+kvm@lfdr.de>; Wed, 23 Sep 2020 14:47:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 566762758CA
+	for <lists+kvm@lfdr.de>; Wed, 23 Sep 2020 15:34:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726638AbgIWMrT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 23 Sep 2020 08:47:19 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:33032 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726565AbgIWMrT (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 23 Sep 2020 08:47:19 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1600865237;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=KJsdXhDDqjRHS8t5tnX7yDDdZ5IGSJuOwOp+o1xOXrs=;
-        b=Q/vEisISeC+CyxX1KIvFjqXatYh5MOH+G+qp0ABDOlFzT/y0iuNvKsht1ZEbhKnm1rRvhK
-        32FaRDN5pBGUij2jM3GoPVpLg1/L5fCOPb9Drk+YfB+o2tL/TT/1gz1VVlQ/kDd1WI+8Hd
-        2udwp2CrrNEdhAks+eHQpR4QdF7mfRA=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-594-44D_p_xkM_CdvFV2VqrOGQ-1; Wed, 23 Sep 2020 08:47:16 -0400
-X-MC-Unique: 44D_p_xkM_CdvFV2VqrOGQ-1
-Received: by mail-wr1-f72.google.com with SMTP id s8so8754771wrb.15
-        for <kvm@vger.kernel.org>; Wed, 23 Sep 2020 05:47:16 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=KJsdXhDDqjRHS8t5tnX7yDDdZ5IGSJuOwOp+o1xOXrs=;
-        b=gSvRNJb5PnheV8WSoLzCxRXsDuDkZNm2F/ftkkPytuHAqeN2N2fzMvdo0nq9nf8vOA
-         WfoAOS0LI6tIgoDpIQDWpM9grX5u0WlA4iZx/+nG0Ws8A0YJsTX+XC3R1KF7HT4S+pev
-         v8bN9Cj6whNTTP+hykwQ0FNc70DN9hDWLZmDTX7Rac0XQLc9yzYyU9fStRI/pl+edZxy
-         sH9L1/oSHjPy726UFinyWOye9GNPUDwUjJOEPvOIT8Urb/uTY9vjZ22rGoroCV42EwiE
-         jkVW4oGVPFlo/1kQrIUfAB9PRCefw8BfRV8cbCZ7r9iR+QIX/jv5ZBolf5RYuiBqaS1K
-         tLvQ==
-X-Gm-Message-State: AOAM531wMxf0IwJ2/mC+wW9Qa/y2gD35NU97+bllfPGec36HslMqbn9e
-        s79+jFnOokfT6ZhfTFx7ut/nJAmxewuk0DidmnT+S6B5Ms9dSH+7UesYta7F3eKbKMUYk+Qh8AE
-        BEOLYnh+zaJgX
-X-Received: by 2002:a1c:f008:: with SMTP id a8mr6589347wmb.155.1600865234994;
-        Wed, 23 Sep 2020 05:47:14 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJygMVZid/MgX577mwoVfMTNg9cNIn89ro/qoGlGEac8toW1CeFDKmxTyu+mTjjfoo4HJnuGAg==
-X-Received: by 2002:a1c:f008:: with SMTP id a8mr6589323wmb.155.1600865234757;
-        Wed, 23 Sep 2020 05:47:14 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:15f1:648d:7de6:bad9? ([2001:b07:6468:f312:15f1:648d:7de6:bad9])
-        by smtp.gmail.com with ESMTPSA id z19sm7903333wmi.3.2020.09.23.05.47.13
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 23 Sep 2020 05:47:14 -0700 (PDT)
-Subject: Re: [RFC Patch 0/2] KVM: SVM: Cgroup support for SVM SEV ASIDs
-To:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vipin Sharma <vipinsh@google.com>
-Cc:     thomas.lendacky@amd.com, tj@kernel.org, lizefan@huawei.com,
-        joro@8bytes.org, corbet@lwn.net, brijesh.singh@amd.com,
-        jon.grimm@amd.com, eric.vantassell@amd.com, gingell@google.com,
-        rientjes@google.com, kvm@vger.kernel.org, x86@kernel.org,
-        cgroups@vger.kernel.org, linux-doc@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        "kvm-ppc@vger.kernel.org" <kvm-ppc@vger.kernel.org>,
-        linux-s390 <linux-s390@vger.kernel.org>,
-        Paul Mackerras <paulus@ozlabs.org>,
-        Janosch Frank <frankja@linux.ibm.com>
-References: <20200922004024.3699923-1-vipinsh@google.com>
- <20200922014836.GA26507@linux.intel.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <45117fcc-d6b8-fab9-11dc-79181058ed62@redhat.com>
-Date:   Wed, 23 Sep 2020 14:47:12 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+        id S1726500AbgIWNeC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 23 Sep 2020 09:34:02 -0400
+Received: from sender4-of-o57.zoho.com ([136.143.188.57]:21786 "EHLO
+        sender4-of-o57.zoho.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726130AbgIWNeC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 23 Sep 2020 09:34:02 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1600867869; cv=none; 
+        d=zohomail.com; s=zohoarc; 
+        b=hOPbalz+924nwX7u/fCcnt84gKBxTzhkrkefSivsP/mo1jnzwYNPoIaGIa46vskJ7EU8892fQruLGpIWQTSmUvpcES07aDtswotzw2i7GzxdKZtIi20zlaXs0qHi22Z2k2MB/luqPe7eyUM3b7C/BiqAr4X+KP/VJxOV4J1ZjUk=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
+        t=1600867869; h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To; 
+        bh=wgjEoKKIPW39YLGd7dVSrfRfaSpzJ8Lq/ZB3wp5qV3Y=; 
+        b=aL05O1Ar+5G8z41iXkDKEsTlDsvVEsPZhnWkivsV16g6SKlnwNhQ8kqiMyz2esV5DtNMkSWclB82PpQdPAgOwza0Pv/QnxgmqT0+Fc4rpwC/4O+VozYJzwUdVuiYCBZeh9vuyZlNNiEiKt9Za7CA8rkWyQDe1wHFVWrXdlqi8I8=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+        spf=pass  smtp.mailfrom=no-reply@patchew.org;
+        dmarc=pass header.from=<no-reply@patchew.org> header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by mx.zohomail.com
+        with SMTPS id 1600867867067116.39173813725745; Wed, 23 Sep 2020 06:31:07 -0700 (PDT)
+Subject: Re: [PATCH v3] qemu/atomic.h: rename atomic_ to qatomic_
+Message-ID: <160086786042.23158.9195634797275870291@66eaa9a8a123>
+Reply-To: <qemu-devel@nongnu.org>
+In-Reply-To: <20200923105646.47864-1-stefanha@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200922014836.GA26507@linux.intel.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From:   no-reply@patchew.org
+To:     stefanha@redhat.com
+Cc:     qemu-devel@nongnu.org, mdroth@linux.vnet.ibm.com, jsnow@redhat.com,
+        Alistair.Francis@wdc.com, pasic@linux.ibm.com,
+        mjrosato@linux.ibm.com, peter.maydell@linaro.org,
+        eblake@redhat.com, armbru@redhat.com, kraxel@redhat.com,
+        sheepdog@lists.wpkg.org, ysato@users.sourceforge.jp,
+        berrange@redhat.com, thuth@redhat.com, kvm@vger.kernel.org,
+        paul@xen.org, qemu-s390x@nongnu.org, mst@redhat.com,
+        dgilbert@redhat.com, aurelien@aurel32.net,
+        aleksandar.qemu.devel@gmail.com, sw@weilnetz.de,
+        qemu-riscv@nongnu.org, qemu-block@nongnu.org,
+        zhang.zhanghailiang@huawei.com, jcmvbkbc@gmail.com,
+        borntraeger@de.ibm.com, berto@igalia.com, kwolf@redhat.com,
+        pl@kamp.de, pbonzini@redhat.com, marcandre.lureau@redhat.com,
+        jiaxun.yang@flygoat.com, laurent@vivier.eu,
+        anthony.perard@citrix.com, yuval.shaia.ml@gmail.com,
+        xen-devel@lists.xenproject.org, chenhc@lemote.com,
+        sunilmut@microsoft.com, kbastian@mail.uni-paderborn.de,
+        quintela@redhat.com, cohuck@redhat.com, mreitz@redhat.com,
+        rth@twiddle.net, jslaby@suse.cz, marcel.apfelbaum@gmail.com,
+        sagark@eecs.berkeley.edu, namei.unix@gmail.com,
+        jasowang@redhat.com, palmer@dabbelt.com,
+        aleksandar.rikalo@syrmia.com, sstabellini@kernel.org,
+        fam@euphon.net, david@redhat.com, ehabkost@redhat.com,
+        stefanha@redhat.com, qemu-arm@nongnu.org
+Date:   Wed, 23 Sep 2020 06:31:07 -0700 (PDT)
+X-ZohoMailClient: External
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 22/09/20 03:48, Sean Christopherson wrote:
-> This should be genericized to not be SEV specific.  TDX has a similar
-> scarcity issue in the form of key IDs, which IIUC are analogous to SEV ASIDs
-> (gave myself a quick crash course on SEV ASIDs).  Functionally, I doubt it
-> would change anything, I think it'd just be a bunch of renaming.  The hardest
-> part would probably be figuring out a name :-).
-> 
-> Another idea would be to go even more generic and implement a KVM cgroup
-> that accounts the number of VMs of a particular type, e.g. legacy, SEV,
-> SEV-ES?, and TDX.  That has potential future problems though as it falls
-> apart if hardware every supports 1:MANY VMs:KEYS, or if there is a need to
-> account keys outside of KVM, e.g. if MKTME for non-KVM cases ever sees the
-> light of day.
-
-Or also MANY:1 (we are thinking of having multiple VMs share the same
-SEV ASID).
-
-It might even be the same on s390 and PPC, in which case we probably
-want to implement this in virt/kvm.  Paul, Janosch, do you think this
-would make sense for you?  The original commit message is below.
-
-Paolo
-
-> On Mon, Sep 21, 2020 at 05:40:22PM -0700, Vipin Sharma wrote:
->> Hello,
->>
->> This patch series adds a new SEV controller for tracking and limiting
->> the usage of SEV ASIDs on the AMD SVM platform.
->>
->> SEV ASIDs are used in creating encrypted VM and lightweight sandboxes
->> but this resource is in very limited quantity on a host.
->>
->> This limited quantity creates issues like SEV ASID starvation and
->> unoptimized scheduling in the cloud infrastructure.
->>
->> SEV controller provides SEV ASID tracking and resource control
->> mechanisms.
-
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDkyMzEwNTY0Ni40Nzg2
+NC0xLXN0ZWZhbmhhQHJlZGhhdC5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMgc2VlbXMgdG8gaGF2
+ZSBzb21lIGNvZGluZyBzdHlsZSBwcm9ibGVtcy4gU2VlIG91dHB1dCBiZWxvdyBmb3IKbW9yZSBp
+bmZvcm1hdGlvbjoKClR5cGU6IHNlcmllcwpNZXNzYWdlLWlkOiAyMDIwMDkyMzEwNTY0Ni40Nzg2
+NC0xLXN0ZWZhbmhhQHJlZGhhdC5jb20KU3ViamVjdDogW1BBVENIIHYzXSBxZW11L2F0b21pYy5o
+OiByZW5hbWUgYXRvbWljXyB0byBxYXRvbWljXwoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQoj
+IS9iaW4vYmFzaApnaXQgcmV2LXBhcnNlIGJhc2UgPiAvZGV2L251bGwgfHwgZXhpdCAwCmdpdCBj
+b25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYu
+cmVuYW1lcyBUcnVlCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLmFsZ29yaXRobSBoaXN0b2dyYW0K
+Li9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayBiYXNlLi4KPT09IFRFU1QgU0NSSVBU
+IEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMz
+ODQKRnJvbSBodHRwczovL2dpdGh1Yi5jb20vcGF0Y2hldy1wcm9qZWN0L3FlbXUKIC0gW3RhZyB1
+cGRhdGVdICAgICAgcGF0Y2hldy8yMDIwMDkyMjIxMDEwMS40MDgxMDczLTEtanNub3dAcmVkaGF0
+LmNvbSAtPiBwYXRjaGV3LzIwMjAwOTIyMjEwMTAxLjQwODEwNzMtMS1qc25vd0ByZWRoYXQuY29t
+CiAqIFtuZXcgdGFnXSAgICAgICAgIHBhdGNoZXcvMjAyMDA5MjMxMTM5MDAuNzI3MTgtMS1kYXZp
+ZEByZWRoYXQuY29tIC0+IHBhdGNoZXcvMjAyMDA5MjMxMTM5MDAuNzI3MTgtMS1kYXZpZEByZWRo
+YXQuY29tCiAqIFtuZXcgdGFnXSAgICAgICAgIHBhdGNoZXcvMjAyMDA5MjMxMzE4MjkuMzg0OS0x
+LWVyaWNoLm1jbWlsbGFuQGhwLmNvbSAtPiBwYXRjaGV3LzIwMjAwOTIzMTMxODI5LjM4NDktMS1l
+cmljaC5tY21pbGxhbkBocC5jb20KU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0JwowN2Fi
+YjhlIHFlbXUvYXRvbWljLmg6IHJlbmFtZSBhdG9taWNfIHRvIHFhdG9taWNfCgo9PT0gT1VUUFVU
+IEJFR0lOID09PQpFUlJPUjogTWFjcm9zIHdpdGggbXVsdGlwbGUgc3RhdGVtZW50cyBzaG91bGQg
+YmUgZW5jbG9zZWQgaW4gYSBkbyAtIHdoaWxlIGxvb3AKIzI3OTc6IEZJTEU6IGluY2x1ZGUvcWVt
+dS9hdG9taWMuaDoxNTI6CisjZGVmaW5lIHFhdG9taWNfcmN1X3JlYWRfX25vY2hlY2socHRyLCB2
+YWxwdHIpICAgICAgICAgICBcCisgICAgX19hdG9taWNfbG9hZChwdHIsIHZhbHB0ciwgX19BVE9N
+SUNfUkVMQVhFRCk7ICAgICAgICBcCiAgICAgc21wX3JlYWRfYmFycmllcl9kZXBlbmRzKCk7CgpF
+UlJPUjogc3BhY2UgcmVxdWlyZWQgYmVmb3JlIHRoYXQgJyonIChjdHg6VnhCKQojMjk0MjogRklM
+RTogaW5jbHVkZS9xZW11L2F0b21pYy5oOjMzMzoKKyNkZWZpbmUgcWF0b21pY19yZWFkX19ub2No
+ZWNrKHApICAgKCooX190eXBlb2ZfXygqKHApKSB2b2xhdGlsZSopIChwKSkKICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIF4KCkVS
+Uk9SOiBVc2Ugb2Ygdm9sYXRpbGUgaXMgdXN1YWxseSB3cm9uZywgcGxlYXNlIGFkZCBhIGNvbW1l
+bnQKIzI5NDI6IEZJTEU6IGluY2x1ZGUvcWVtdS9hdG9taWMuaDozMzM6CisjZGVmaW5lIHFhdG9t
+aWNfcmVhZF9fbm9jaGVjayhwKSAgICgqKF9fdHlwZW9mX18oKihwKSkgdm9sYXRpbGUqKSAocCkp
+CgpFUlJPUjogc3BhY2UgcmVxdWlyZWQgYmVmb3JlIHRoYXQgJyonIChjdHg6VnhCKQojMjk0Mzog
+RklMRTogaW5jbHVkZS9xZW11L2F0b21pYy5oOjMzNDoKKyNkZWZpbmUgcWF0b21pY19zZXRfX25v
+Y2hlY2socCwgaSkgKCgqKF9fdHlwZW9mX18oKihwKSkgdm9sYXRpbGUqKSAocCkpID0gKGkpKQog
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgIF4KCkVSUk9SOiBVc2Ugb2Ygdm9sYXRpbGUgaXMgdXN1YWxseSB3cm9uZywgcGxlYXNl
+IGFkZCBhIGNvbW1lbnQKIzI5NDM6IEZJTEU6IGluY2x1ZGUvcWVtdS9hdG9taWMuaDozMzQ6Cisj
+ZGVmaW5lIHFhdG9taWNfc2V0X19ub2NoZWNrKHAsIGkpICgoKihfX3R5cGVvZl9fKCoocCkpIHZv
+bGF0aWxlKikgKHApKSA9IChpKSkKCkVSUk9SOiBzcGFjZSByZXF1aXJlZCBhZnRlciB0aGF0ICcs
+JyAoY3R4OlZ4VikKIzI5NDg6IEZJTEU6IGluY2x1ZGUvcWVtdS9hdG9taWMuaDozMzc6CisjZGVm
+aW5lIHFhdG9taWNfc2V0KHB0ciwgaSkgICAgIHFhdG9taWNfc2V0X19ub2NoZWNrKHB0cixpKQog
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBe
+CgpFUlJPUjogbWVtb3J5IGJhcnJpZXIgd2l0aG91dCBjb21tZW50CiMzMDIwOiBGSUxFOiBpbmNs
+dWRlL3FlbXUvYXRvbWljLmg6Mzk1OgorI2RlZmluZSBxYXRvbWljX3hjaGcocHRyLCBpKSAgICAo
+c21wX21iKCksIF9fc3luY19sb2NrX3Rlc3RfYW5kX3NldChwdHIsIGkpKQoKV0FSTklORzogQmxv
+Y2sgY29tbWVudHMgdXNlIGEgbGVhZGluZyAvKiBvbiBhIHNlcGFyYXRlIGxpbmUKIzMwOTQ6IEZJ
+TEU6IGluY2x1ZGUvcWVtdS9hdG9taWMuaDo0NDc6CisvKiBxYXRvbWljX21iX3JlYWQvc2V0IHNl
+bWFudGljcyBtYXAgSmF2YSB2b2xhdGlsZSB2YXJpYWJsZXMuIFRoZXkgYXJlCgpXQVJOSU5HOiBC
+bG9jayBjb21tZW50cyB1c2UgYSBsZWFkaW5nIC8qIG9uIGEgc2VwYXJhdGUgbGluZQojNjE3Nzog
+RklMRTogdXRpbC9iaXRtYXAuYzoyMTQ6CisgICAgICAgIC8qIElmIHdlIGF2b2lkZWQgdGhlIGZ1
+bGwgYmFycmllciBpbiBxYXRvbWljX29yKCksIGlzc3VlIGEKCldBUk5JTkc6IEJsb2NrIGNvbW1l
+bnRzIHVzZSBhIGxlYWRpbmcgLyogb24gYSBzZXBhcmF0ZSBsaW5lCiM3MTkyOiBGSUxFOiB1dGls
+L3JjdS5jOjg1OgorICAgICAgICAvKiBJbnN0ZWFkIG9mIHVzaW5nIHFhdG9taWNfbWJfc2V0IGZv
+ciBpbmRleC0+d2FpdGluZywgYW5kCgpXQVJOSU5HOiBCbG9jayBjb21tZW50cyB1c2UgYSBsZWFk
+aW5nIC8qIG9uIGEgc2VwYXJhdGUgbGluZQojNzIxODogRklMRTogdXRpbC9yY3UuYzoxNTQ6Cisg
+ICAgICAgIC8qIEluIGVpdGhlciBjYXNlLCB0aGUgcWF0b21pY19tYl9zZXQgYmVsb3cgYmxvY2tz
+IHN0b3JlcyB0aGF0IGZyZWUKCnRvdGFsOiA3IGVycm9ycywgNCB3YXJuaW5ncywgNjI2NyBsaW5l
+cyBjaGVja2VkCgpDb21taXQgMDdhYmI4ZTc5ZGJlIChxZW11L2F0b21pYy5oOiByZW5hbWUgYXRv
+bWljXyB0byBxYXRvbWljXykgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYg
+YW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRo
+ZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KPT09IE9VVFBVVCBF
+TkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKClRoZSBmdWxsIGxvZyBp
+cyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAyMDA5MjMxMDU2NDYuNDc4
+NjQtMS1zdGVmYW5oYUByZWRoYXQuY29tL3Rlc3RpbmcuY2hlY2twYXRjaC8/dHlwZT1tZXNzYWdl
+LgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cHM6Ly9w
+YXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxA
+cmVkaGF0LmNvbQ==
