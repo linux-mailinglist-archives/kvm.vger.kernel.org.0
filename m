@@ -2,184 +2,149 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id CA54F27640A
-	for <lists+kvm@lfdr.de>; Thu, 24 Sep 2020 00:45:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3F0EF276466
+	for <lists+kvm@lfdr.de>; Thu, 24 Sep 2020 01:19:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726779AbgIWWpj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 23 Sep 2020 18:45:39 -0400
-Received: from mga02.intel.com ([134.134.136.20]:41185 "EHLO mga02.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726696AbgIWWpe (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 23 Sep 2020 18:45:34 -0400
-IronPort-SDR: rd4dRM8i0Op1CTJECvVk73v+o5m1aHDNTpQl4LenNGJnEOREkknCzkHQ5bN/ptl1k8aq6wt2Qu
- Rrpv8fL5EbFg==
-X-IronPort-AV: E=McAfee;i="6000,8403,9753"; a="148698570"
-X-IronPort-AV: E=Sophos;i="5.77,295,1596524400"; 
-   d="scan'208";a="148698570"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Sep 2020 15:45:33 -0700
-IronPort-SDR: Fr2JxZMxsomuX02zVQNCadcnQn8OG4+lUnDKf9BKljc31q3oeEAJran7O1u3QsqFtB5ZxEhbOZ
- XohwXf3KsMRQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.77,295,1596524400"; 
-   d="scan'208";a="335660071"
-Received: from sjchrist-coffee.jf.intel.com ([10.54.74.160])
-  by fmsmga004.fm.intel.com with ESMTP; 23 Sep 2020 15:45:33 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
+        id S1726691AbgIWXT2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 23 Sep 2020 19:19:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58760 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726466AbgIWXT2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 23 Sep 2020 19:19:28 -0400
+Received: from mail-io1-xd41.google.com (mail-io1-xd41.google.com [IPv6:2607:f8b0:4864:20::d41])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 42271C0613D1
+        for <kvm@vger.kernel.org>; Wed, 23 Sep 2020 16:19:28 -0700 (PDT)
+Received: by mail-io1-xd41.google.com with SMTP id g128so1286926iof.11
+        for <kvm@vger.kernel.org>; Wed, 23 Sep 2020 16:19:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=iZOApGC20HnhhJiLh+fQ5O3fgDHPiGbwUwpUBeQPkwI=;
+        b=hmTl02N9oaSnCdbp3B9syLLDD4VuLhaBuXkhB5WOWMpHR7b9ZnhC5mvkT/TSH2UN6r
+         el8RTasDbtfFRWEMxhJHv4MRGcv4wrw4Snb5rHDWZHzr34CTWW31F13iuiyeNGQ43o31
+         Z0dtQs4SonnQU3g77d6uU6tO5xyEr4gypmze1MIM+FR4VrnKRnX8zKIDkCdj7BKfR6tS
+         EBclxE+Rd6VD4IgvF1WuhkcV7Cs6byEAbJF3UgqIN7icRmHbSiKTSLJ0TnxLbBe0eJmN
+         eMBvbm5tYjrjCZFfpec+aXv1Lf1GMwnZr3yq9e8bwKemM9XvOt8fM+y76sFn+3e4Cq6K
+         v94Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=iZOApGC20HnhhJiLh+fQ5O3fgDHPiGbwUwpUBeQPkwI=;
+        b=t1aw5BPAjh1OFcdhoP0HUfYyj8edoBTyivwpcclhkwbIRr/ocMtNP73T7j5UBKeQXA
+         kbh1zhJ7dVGO/kviz9zde5fCpe/sF9UZuK7GlyZIQfLwhGjm6x8S8ViO82pdeKsoAshi
+         jFho9C96+76vDE4MmsQJOePe4CaUUd4aYr1aKUCCiw8FcT/PpZdtTp3/6YWd/1BZeng7
+         DwwUiaYaXYnHO9ny7WyQRt0Afe9As5rWVU7CX0/diflTJONJzgFA5PArUrfwdh0gnYX2
+         VnyrquoBA9Ldwp52pLrHEzt9HMdzq9o6OutHWyrpUjEAuKXYYjTTphP5rCrA9IhgmYO+
+         pwVg==
+X-Gm-Message-State: AOAM532W3Bu+4IeOQ9XD6alBDnPd3vcSM1xiv6Lde7eV7NO4IjZEMXkl
+        OYQ/EDYcziM6X2UwjfceUF0K7QWM0Jg2Ns4Yb90pWg==
+X-Google-Smtp-Source: ABdhPJyywv0N4Sq5HyrTKpf0BLx0dTf1f8TFMfzwSd2vInPWcEQ9MrdKCg8lPTlShY6kT8gRRslHqFCB7XozbyzyvFM=
+X-Received: by 2002:a05:6638:611:: with SMTP id g17mr1452858jar.40.1600903167128;
+ Wed, 23 Sep 2020 16:19:27 -0700 (PDT)
+MIME-Version: 1.0
+References: <20200923221406.16297-1-sean.j.christopherson@intel.com> <20200923221406.16297-2-sean.j.christopherson@intel.com>
+In-Reply-To: <20200923221406.16297-2-sean.j.christopherson@intel.com>
+From:   Ben Gardon <bgardon@google.com>
+Date:   Wed, 23 Sep 2020 16:19:15 -0700
+Message-ID: <CANgfPd_POgKeMNa+PbtGvCMyzNi0YY=4E9w8LzgWhLwGSqX-OQ@mail.gmail.com>
+Subject: Re: [PATCH v3 1/2] KVM: x86/mmu: Move flush logic from
+ mmu_page_zap_pte() to FNAME(invlpg)
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
         Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        linux-arm-kernel@lists.infradead.org,
-        Huacai Chen <chenhc@lemote.com>,
-        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        linux-mips@vger.kernel.org, Paul Mackerras <paulus@ozlabs.org>,
-        kvm-ppc@vger.kernel.org,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>
-Subject: [RFC PATCH 3/3] KVM: x86: Use KVM_BUG/KVM_BUG_ON to handle bugs that are fatal to the VM
-Date:   Wed, 23 Sep 2020 15:45:30 -0700
-Message-Id: <20200923224530.17735-4-sean.j.christopherson@intel.com>
-X-Mailer: git-send-email 2.28.0
-In-Reply-To: <20200923224530.17735-1-sean.j.christopherson@intel.com>
-References: <20200923224530.17735-1-sean.j.christopherson@intel.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+        linux-kernel@vger.kernel.org, Peter Shier <pshier@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add support for KVM_REQ_VM_BUGG in x86, and replace a variety of WARNs
-with KVM_BUG() and KVM_BUG_ON().  Return -EIO if a KVM_BUG is hit to
-align with the common KVM behavior of rejecting iocts() with -EIO if the
-VM is bugged.
+On Wed, Sep 23, 2020 at 3:14 PM Sean Christopherson
+<sean.j.christopherson@intel.com> wrote:
+>
+> Move the logic that controls whether or not FNAME(invlpg) needs to flush
+> fully into FNAME(invlpg) so that mmu_page_zap_pte() doesn't return a
+> value.  This allows a future patch to redefine the return semantics for
+> mmu_page_zap_pte() so that it can recursively zap orphaned child shadow
+> pages for nested TDP MMUs.
+>
+> No functional change intended.
+>
+> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
 
-Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
----
- arch/x86/kvm/svm/svm.c |  2 +-
- arch/x86/kvm/vmx/vmx.c | 23 ++++++++++++++---------
- arch/x86/kvm/x86.c     |  4 ++++
- 3 files changed, 19 insertions(+), 10 deletions(-)
+Reviewed-by: Ben Gardon <bgardon@google.com>
 
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index 3da5b2f1b4a1..e684794c6249 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -1380,7 +1380,7 @@ static void svm_cache_reg(struct kvm_vcpu *vcpu, enum kvm_reg reg)
- 		load_pdptrs(vcpu, vcpu->arch.walk_mmu, kvm_read_cr3(vcpu));
- 		break;
- 	default:
--		WARN_ON_ONCE(1);
-+		KVM_BUG_ON(1, vcpu->kvm);
- 	}
- }
- 
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 6f9a0c6d5dc5..810d46ab0a47 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -2250,7 +2250,7 @@ static void vmx_cache_reg(struct kvm_vcpu *vcpu, enum kvm_reg reg)
- 		vcpu->arch.cr4 |= vmcs_readl(GUEST_CR4) & guest_owned_bits;
- 		break;
- 	default:
--		WARN_ON_ONCE(1);
-+		KVM_BUG_ON(1, vcpu->kvm);
- 		break;
- 	}
- }
-@@ -4960,6 +4960,7 @@ static int handle_cr(struct kvm_vcpu *vcpu)
- 			return kvm_complete_insn_gp(vcpu, err);
- 		case 3:
- 			WARN_ON_ONCE(enable_unrestricted_guest);
-+
- 			err = kvm_set_cr3(vcpu, val);
- 			return kvm_complete_insn_gp(vcpu, err);
- 		case 4:
-@@ -4985,14 +4986,13 @@ static int handle_cr(struct kvm_vcpu *vcpu)
- 		}
- 		break;
- 	case 2: /* clts */
--		WARN_ONCE(1, "Guest should always own CR0.TS");
--		vmx_set_cr0(vcpu, kvm_read_cr0_bits(vcpu, ~X86_CR0_TS));
--		trace_kvm_cr_write(0, kvm_read_cr0(vcpu));
--		return kvm_skip_emulated_instruction(vcpu);
-+		KVM_BUG(1, vcpu->kvm, "Guest always owns CR0.TS");
-+		return -EIO;
- 	case 1: /*mov from cr*/
- 		switch (cr) {
- 		case 3:
- 			WARN_ON_ONCE(enable_unrestricted_guest);
-+
- 			val = kvm_read_cr3(vcpu);
- 			kvm_register_write(vcpu, reg, val);
- 			trace_kvm_cr_read(cr, val);
-@@ -5330,7 +5330,9 @@ static int handle_ept_misconfig(struct kvm_vcpu *vcpu)
- 
- static int handle_nmi_window(struct kvm_vcpu *vcpu)
- {
--	WARN_ON_ONCE(!enable_vnmi);
-+	if (KVM_BUG_ON(!enable_vnmi, vcpu->kvm))
-+		return -EIO;
-+
- 	exec_controls_clearbit(to_vmx(vcpu), CPU_BASED_NMI_WINDOW_EXITING);
- 	++vcpu->stat.nmi_window_exits;
- 	kvm_make_request(KVM_REQ_EVENT, vcpu);
-@@ -5908,7 +5910,8 @@ static int vmx_handle_exit(struct kvm_vcpu *vcpu, fastpath_t exit_fastpath)
- 	 * below) should never happen as that means we incorrectly allowed a
- 	 * nested VM-Enter with an invalid vmcs12.
- 	 */
--	WARN_ON_ONCE(vmx->nested.nested_run_pending);
-+	if (KVM_BUG_ON(vmx->nested.nested_run_pending, vcpu->kvm))
-+		return -EIO;
- 
- 	/* If guest state is invalid, start emulating */
- 	if (vmx->emulation_required)
-@@ -6258,7 +6261,9 @@ static int vmx_sync_pir_to_irr(struct kvm_vcpu *vcpu)
- 	int max_irr;
- 	bool max_irr_updated;
- 
--	WARN_ON(!vcpu->arch.apicv_active);
-+	if (KVM_BUG_ON(!vcpu->arch.apicv_active, vcpu->kvm))
-+		return -EIO;
-+
- 	if (pi_test_on(&vmx->pi_desc)) {
- 		pi_clear_on(&vmx->pi_desc);
- 		/*
-@@ -6345,7 +6350,7 @@ static void handle_external_interrupt_irqoff(struct kvm_vcpu *vcpu)
- 	gate_desc *desc;
- 	u32 intr_info = vmx_get_intr_info(vcpu);
- 
--	if (WARN_ONCE(!is_external_intr(intr_info),
-+	if (KVM_BUG(!is_external_intr(intr_info), vcpu->kvm,
- 	    "KVM: unexpected VM-Exit interrupt info: 0x%x", intr_info))
- 		return;
- 
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 17f4995e80a7..672eb5142b34 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -8363,6 +8363,10 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
- 	bool req_immediate_exit = false;
- 
- 	if (kvm_request_pending(vcpu)) {
-+		if (kvm_check_request(KVM_REQ_VM_BUGGED, vcpu)) {
-+			r = -EIO;
-+			goto out;
-+		}
- 		if (kvm_check_request(KVM_REQ_GET_VMCS12_PAGES, vcpu)) {
- 			if (unlikely(!kvm_x86_ops.nested_ops->get_vmcs12_pages(vcpu))) {
- 				r = 0;
--- 
-2.28.0
-
+>
+> ---
+>  arch/x86/kvm/mmu/mmu.c         | 10 +++-------
+>  arch/x86/kvm/mmu/paging_tmpl.h |  7 +++++--
+>  2 files changed, 8 insertions(+), 9 deletions(-)
+>
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index 76c5826e29a2..a91e8601594d 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -2615,7 +2615,7 @@ static void validate_direct_spte(struct kvm_vcpu *vcpu, u64 *sptep,
+>         }
+>  }
+>
+> -static bool mmu_page_zap_pte(struct kvm *kvm, struct kvm_mmu_page *sp,
+> +static void mmu_page_zap_pte(struct kvm *kvm, struct kvm_mmu_page *sp,
+>                              u64 *spte)
+>  {
+>         u64 pte;
+> @@ -2631,13 +2631,9 @@ static bool mmu_page_zap_pte(struct kvm *kvm, struct kvm_mmu_page *sp,
+>                         child = to_shadow_page(pte & PT64_BASE_ADDR_MASK);
+>                         drop_parent_pte(child, spte);
+>                 }
+> -               return true;
+> -       }
+> -
+> -       if (is_mmio_spte(pte))
+> +       } else if (is_mmio_spte(pte)) {
+>                 mmu_spte_clear_no_track(spte);
+> -
+> -       return false;
+> +       }
+>  }
+>
+>  static void kvm_mmu_page_unlink_children(struct kvm *kvm,
+> diff --git a/arch/x86/kvm/mmu/paging_tmpl.h b/arch/x86/kvm/mmu/paging_tmpl.h
+> index 4dd6b1e5b8cf..3bb624a3dda9 100644
+> --- a/arch/x86/kvm/mmu/paging_tmpl.h
+> +++ b/arch/x86/kvm/mmu/paging_tmpl.h
+> @@ -895,6 +895,7 @@ static void FNAME(invlpg)(struct kvm_vcpu *vcpu, gva_t gva, hpa_t root_hpa)
+>  {
+>         struct kvm_shadow_walk_iterator iterator;
+>         struct kvm_mmu_page *sp;
+> +       u64 old_spte;
+>         int level;
+>         u64 *sptep;
+>
+> @@ -917,7 +918,8 @@ static void FNAME(invlpg)(struct kvm_vcpu *vcpu, gva_t gva, hpa_t root_hpa)
+>                 sptep = iterator.sptep;
+>
+>                 sp = sptep_to_sp(sptep);
+> -               if (is_last_spte(*sptep, level)) {
+> +               old_spte = *sptep;
+> +               if (is_last_spte(old_spte, level)) {
+>                         pt_element_t gpte;
+>                         gpa_t pte_gpa;
+>
+> @@ -927,7 +929,8 @@ static void FNAME(invlpg)(struct kvm_vcpu *vcpu, gva_t gva, hpa_t root_hpa)
+>                         pte_gpa = FNAME(get_level1_sp_gpa)(sp);
+>                         pte_gpa += (sptep - sp->spt) * sizeof(pt_element_t);
+>
+> -                       if (mmu_page_zap_pte(vcpu->kvm, sp, sptep))
+> +                       mmu_page_zap_pte(vcpu->kvm, sp, sptep);
+> +                       if (is_shadow_present_pte(old_spte))
+>                                 kvm_flush_remote_tlbs_with_address(vcpu->kvm,
+>                                         sp->gfn, KVM_PAGES_PER_HPAGE(sp->role.level));
+>
+> --
+> 2.28.0
+>
