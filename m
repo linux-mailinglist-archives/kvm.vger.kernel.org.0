@@ -2,92 +2,74 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D5843275E41
-	for <lists+kvm@lfdr.de>; Wed, 23 Sep 2020 19:07:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4B830275E5E
+	for <lists+kvm@lfdr.de>; Wed, 23 Sep 2020 19:11:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726460AbgIWRH2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 23 Sep 2020 13:07:28 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:58123 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726130AbgIWRH2 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 23 Sep 2020 13:07:28 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1600880847;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=lCCKD50VB6ysGiusHqpWTIv/KmfW8J9HjWEMiCZ49xs=;
-        b=JKu/cKpudogF92POa1HicZLcpbtbiE+KM7Sf6foGD2pVNrCpXXg+TEUop4Z1jJcSlhXgmq
-        DMpDE68QjAKwy+6WCpzBmi4A1GLKDKm6DUOkeu7RMHpC3a7SsIn7L2AxTZAslP6kQMViiG
-        ZQ9NQNp/VB9MFbjP91fk2jjUYUeqUbs=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-166-2mHh4Ey0PkGwHbRYw6C18g-1; Wed, 23 Sep 2020 13:07:25 -0400
-X-MC-Unique: 2mHh4Ey0PkGwHbRYw6C18g-1
-Received: by mail-wm1-f70.google.com with SMTP id a7so174895wmc.2
-        for <kvm@vger.kernel.org>; Wed, 23 Sep 2020 10:07:25 -0700 (PDT)
+        id S1726674AbgIWRLK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 23 Sep 2020 13:11:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58340 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726184AbgIWRLJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 23 Sep 2020 13:11:09 -0400
+Received: from mail-ot1-x341.google.com (mail-ot1-x341.google.com [IPv6:2607:f8b0:4864:20::341])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 58E03C0613D1
+        for <kvm@vger.kernel.org>; Wed, 23 Sep 2020 10:11:09 -0700 (PDT)
+Received: by mail-ot1-x341.google.com with SMTP id a2so402658otr.11
+        for <kvm@vger.kernel.org>; Wed, 23 Sep 2020 10:11:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=FeiiwT7dy9vr47NT7pjgw3junlFoaewgeW3zaJFROxc=;
+        b=MOOek79ve9vzTaguN5u3sFjj6RpzMp50NMX7QWqg0Lk4d8RcOjM6RaMKlzDHuRABH3
+         MUhXP6bhNQdR92GEz3GpiYSEqov/Oqio2do2XMDvZRGxhYAa1hxaeYCLpiVjyYEmWXr4
+         nUEfZZbtO9aA3xwO8E7fqw5wQ4cXpt9PZQaUiYobNhx+8FuVSzeAAJ1O9QyI8fXYrXRE
+         IkpSnZSR0CMZecb4RxN7bQxlwWTMFIxBX6g3gJiXZCw3hiSJE+gM1fIVWRCEuLCZf6jI
+         FgEiq9pBdMyYG2I8qeh0hP3XwWPgeodZWALYweUhN61lWPNDpk2sHb3pxxqmfGYfJ6qF
+         vEmQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=lCCKD50VB6ysGiusHqpWTIv/KmfW8J9HjWEMiCZ49xs=;
-        b=YSe5dEkbUmK38ehYu3CWRTWZizm4PQGPrLeqZZxApWODc1/+k6Xrr4etnvcw9CdbGO
-         u2rhMimP95tlqi+o1T7AIzKcHrLse9QP7l1baNb4GWe113eel1/6JYghgTDp6wNqbdE8
-         yb5kHizkOZhacRxrsNajv6TA6fO3/7Nyyq5sopawYPFCKOrGdMHnmAUfHQ83fJCpLaSu
-         +qPORcCUmthzMRGv2p6+ULddq1h4eNe4rWCuPLiRs6PVZGkkTznPqG7DHz03TJ/o+U2E
-         1k0sYqHr+7fgqLQazH7DINvs/J/ps6Gno2PfLCzsn4rR3RNGbzlOYd9LvhLp4tu9BDgh
-         1+pg==
-X-Gm-Message-State: AOAM533ZJid2juMq/wKStDbCjLal3em2lZfnSoNRdBulTq5YvTmi3Bzy
-        33rRZH1lhpEFAJYwiDXockB+6KlbQqC4D1llLnN8TeBoOmbUauFu2lyulM01jj6lsrTf7xLNnQe
-        EOI/8bYdOqIBx
-X-Received: by 2002:a1c:4886:: with SMTP id v128mr510598wma.139.1600880844310;
-        Wed, 23 Sep 2020 10:07:24 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyCTnefL3+7phQEIxiRq7WpGLt9gBwjnmt9g3u/ONU7vVvcSqUmmyhcncSU48t9tHwhf48huw==
-X-Received: by 2002:a1c:4886:: with SMTP id v128mr510585wma.139.1600880844128;
-        Wed, 23 Sep 2020 10:07:24 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:15f1:648d:7de6:bad9? ([2001:b07:6468:f312:15f1:648d:7de6:bad9])
-        by smtp.gmail.com with ESMTPSA id c14sm400588wrm.64.2020.09.23.10.07.23
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 23 Sep 2020 10:07:23 -0700 (PDT)
-Subject: Re: [PATCH v2 2/3] KVM: VMX: Replace MSR_IA32_RTIT_OUTPUT_BASE_MASK
- with helper function
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20200923163629.20168-1-sean.j.christopherson@intel.com>
- <20200923163629.20168-3-sean.j.christopherson@intel.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <0a215e25-798d-3f17-0fcb-885806f2351b@redhat.com>
-Date:   Wed, 23 Sep 2020 19:07:22 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=FeiiwT7dy9vr47NT7pjgw3junlFoaewgeW3zaJFROxc=;
+        b=Gb87mRIT60biiyePQxuZlwzedLo0LQEQ12Zi1U5DCRiO443nGIKwUHcSZKDKDTDU7M
+         UZV7y0AnjAyAOtGyT4PJIWfGfNi1DtiWGohbaI3NOyXw5nKH1NyACl61eJ9eQFE3dhgM
+         E8DiEQbaiHV6bdQ9LQFplxWqtNYSs24NG3zYkQFqvsS/KU29H5E7OEc1dAaqlfWPlA3Z
+         KCuLd1c/ctK98z6w8wnAK4E6otLzraPl0xAV2Jf/6sQf+Y6OZKTIJ7kb9nMhUFV7afUU
+         naIJUxxPjhc/R0673n6h/Z1o8kW8aRAKgaDWdA+5ihgfplb/JstqPBJTSNx5YDDJGp1o
+         TXNg==
+X-Gm-Message-State: AOAM533lzZz1B0AenWlQYc7E/VSdzs0Ame9jYcMQA/se3RX4m0NX27wH
+        Fj4rJRtHjLUFpOBVNKyHoFrdS6a8ExGB64wXHh6ioA==
+X-Google-Smtp-Source: ABdhPJx5OR2uQx762PlhO9GISWKgmk9r5adzY/TBnwRBxompVlbmsXEaVkIVD5Jof3LIYLoh6MZ1+WHFU0pzsbOmBcU=
+X-Received: by 2002:a9d:1c8f:: with SMTP id l15mr435591ota.241.1600881068463;
+ Wed, 23 Sep 2020 10:11:08 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200923163629.20168-3-sean.j.christopherson@intel.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+References: <20200923165048.20486-1-sean.j.christopherson@intel.com> <20200923165048.20486-4-sean.j.christopherson@intel.com>
+In-Reply-To: <20200923165048.20486-4-sean.j.christopherson@intel.com>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Wed, 23 Sep 2020 10:10:57 -0700
+Message-ID: <CALMp9eR78C_3eYshQmHLJ8_RZuaP0MXCkYCNdVbxNfSW=ZN08g@mail.gmail.com>
+Subject: Re: [PATCH 3/4] KVM: VMX: Rename RDTSCP secondary exec control name
+ to insert "ENABLE"
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm list <kvm@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 23/09/20 18:36, Sean Christopherson wrote:
-> +static inline bool pt_output_base_valid(struct kvm_vcpu *vcpu, u64 base)
-> +{
-> +	/* The base must be 128-byte aligned and a legal physical address. */
-> +	return !(base & (~((1UL << cpuid_maxphyaddr(vcpu)) - 1) | 0x7f));
-> +}
-
-The fact that you deemed a comment necessary says something already. :)
-What about:
-
-        return !kvm_mmu_is_illegal_gpa(vcpu, base) && !(base & 0x7f);
-
-(where this new usage makes it obvious that mmu should have been vcpu).
-
-Paolo
-
+On Wed, Sep 23, 2020 at 9:51 AM Sean Christopherson
+<sean.j.christopherson@intel.com> wrote:
+>
+> Rename SECONDARY_EXEC_RDTSCP to SECONDARY_EXEC_ENABLE_RDTSCP in
+> preparation for consolidating the logic for adjusting secondary exec
+> controls based on the guest CPUID model.
+>
+> No functional change intended.
+>
+> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+Reviewed-by: Jim Mattson <jmattson@google.com>
