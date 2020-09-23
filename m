@@ -2,133 +2,156 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 505C42753AF
-	for <lists+kvm@lfdr.de>; Wed, 23 Sep 2020 10:51:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 402E5275425
+	for <lists+kvm@lfdr.de>; Wed, 23 Sep 2020 11:14:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726413AbgIWIvy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 23 Sep 2020 04:51:54 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:59250 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726130AbgIWIvx (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 23 Sep 2020 04:51:53 -0400
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 08N8WW9M145621;
-        Wed, 23 Sep 2020 04:51:43 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=2XXRDnFO/61UBTTV4Z8JpRj9BrTLJ0R2VP3pc0tFfPI=;
- b=sNMx1ruptdj/TwZ10RigDrrUPiRBSEmrScUoRpdq8pBtZyMKqU5cuMCI359HywyNZrtp
- QwMnDn1loieWc1+tOfIfK5Vv4SHDIUPmRZFoI9WJkJzo3FkMGUIJXYUxsFdT526Xf1Q+
- G4rit3F1vT0qp32Oz8IVnFonJv6nw2enKRk8S16uKLN9Avr1Fe4MHxi5NsC69E71uEIT
- memXtqaz5dUThNQcFPlsd1S8QOZUTZm0x0RY+XgV6x4jmaWjoIvTwegqxwZvlzsr/Ttg
- +nUpwP5OdaUo/XRDkaE0opWwzGm7etFlbUhpI4yIfAb8TmrtoAw174Kd2D9ICkwP4QM8 zg== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 33r164c1en-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 23 Sep 2020 04:51:42 -0400
-Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 08N8XgL9150134;
-        Wed, 23 Sep 2020 04:51:42 -0400
-Received: from ppma06fra.de.ibm.com (48.49.7a9f.ip4.static.sl-reverse.com [159.122.73.72])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 33r164c1dt-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 23 Sep 2020 04:51:42 -0400
-Received: from pps.filterd (ppma06fra.de.ibm.com [127.0.0.1])
-        by ppma06fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 08N8lNlI021274;
-        Wed, 23 Sep 2020 08:51:40 GMT
-Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
-        by ppma06fra.de.ibm.com with ESMTP id 33n98gt2gr-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 23 Sep 2020 08:51:40 +0000
-Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com [9.149.105.60])
-        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 08N8o2O833751458
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 23 Sep 2020 08:50:02 GMT
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 9225A4204B;
-        Wed, 23 Sep 2020 08:51:37 +0000 (GMT)
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id DAC4942041;
-        Wed, 23 Sep 2020 08:51:36 +0000 (GMT)
-Received: from oc3016276355.ibm.com (unknown [9.145.32.68])
-        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Wed, 23 Sep 2020 08:51:36 +0000 (GMT)
-Subject: Re: [PATCH v5 3/3] vfio/pci: Decouple PCI_COMMAND_MEMORY bit checks
- from is_virtfn
-To:     Alex Williamson <alex.williamson@redhat.com>,
-        Matthew Rosato <mjrosato@linux.ibm.com>
-Cc:     bhelgaas@google.com, schnelle@linux.ibm.com, mpe@ellerman.id.au,
-        oohall@gmail.com, cohuck@redhat.com, kevin.tian@intel.com,
-        hca@linux.ibm.com, gor@linux.ibm.com, borntraeger@de.ibm.com,
-        linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, linux-pci@vger.kernel.org
-References: <1599749997-30489-1-git-send-email-mjrosato@linux.ibm.com>
- <1599749997-30489-4-git-send-email-mjrosato@linux.ibm.com>
- <08afc6b2-7549-5440-a947-af0b598288c2@linux.ibm.com>
- <20200922104030.07e0dfd9@x1.home>
-From:   Pierre Morel <pmorel@linux.ibm.com>
-Message-ID: <f11cfdd7-c743-b26d-2843-0cb74ef2643e@linux.ibm.com>
-Date:   Wed, 23 Sep 2020 10:51:36 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+        id S1726267AbgIWJOc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 23 Sep 2020 05:14:32 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:36630 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726242AbgIWJOb (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 23 Sep 2020 05:14:31 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1600852470;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=wHsRYwC30JIrbWlzcK3Pgf3/G4Enl84VFctA9JFCc0g=;
+        b=MC9yNib0oTSI3F4y1z7sUiUaMaOEfYx3v84p4gIZjdoYpcQIAM7x2lDmoltGQY2G3RXgWv
+        /222ouZXKmCSB7oVSWR3eTMwHBRPyEI9OCkckjoW5JbnDASnDPSqfRRaQB0SYBTRcA3rzn
+        0OvqgYdivvI4VmlLec7A30Na9LO+zE4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-492-_PqHLbaiMC6IfjTHJ7cS1A-1; Wed, 23 Sep 2020 05:14:28 -0400
+X-MC-Unique: _PqHLbaiMC6IfjTHJ7cS1A-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A8E191891E83;
+        Wed, 23 Sep 2020 09:14:23 +0000 (UTC)
+Received: from localhost (ovpn-114-98.ams2.redhat.com [10.36.114.98])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id BFE345577A;
+        Wed, 23 Sep 2020 09:14:08 +0000 (UTC)
+Date:   Wed, 23 Sep 2020 10:14:07 +0100
+From:   Stefan Hajnoczi <stefanha@redhat.com>
+To:     Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org,
+        Fam Zheng <fam@euphon.net>,
+        Peter Maydell <peter.maydell@linaro.org>,
+        sheepdog@lists.wpkg.org, kvm@vger.kernel.org,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Yuval Shaia <yuval.shaia.ml@gmail.com>,
+        Markus Armbruster <armbru@redhat.com>,
+        Max Filippov <jcmvbkbc@gmail.com>,
+        Alistair Francis <Alistair.Francis@wdc.com>,
+        Gerd Hoffmann <kraxel@redhat.com>,
+        Huacai Chen <chenhc@lemote.com>,
+        Stefano Stabellini <sstabellini@kernel.org>,
+        Alberto Garcia <berto@igalia.com>,
+        Sagar Karandikar <sagark@eecs.berkeley.edu>,
+        Yoshinori Sato <ysato@users.sourceforge.jp>,
+        Juan Quintela <quintela@redhat.com>,
+        Jiri Slaby <jslaby@suse.cz>, Paul Durrant <paul@xen.org>,
+        Michael Roth <mdroth@linux.vnet.ibm.com>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        Thomas Huth <thuth@redhat.com>,
+        =?iso-8859-1?Q?Marc-Andr=E9?= Lureau 
+        <marcandre.lureau@redhat.com>,
+        Matthew Rosato <mjrosato@linux.ibm.com>,
+        Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
+        Eduardo Habkost <ehabkost@redhat.com>,
+        Stefan Weil <sw@weilnetz.de>, Peter Lieven <pl@kamp.de>,
+        "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+        Anthony Perard <anthony.perard@citrix.com>,
+        qemu-s390x@nongnu.org, qemu-arm@nongnu.org,
+        Liu Yuan <namei.unix@gmail.com>, qemu-riscv@nongnu.org,
+        Sunil Muthuswamy <sunilmut@microsoft.com>,
+        John Snow <jsnow@redhat.com>,
+        Hailiang Zhang <zhang.zhanghailiang@huawei.com>,
+        Richard Henderson <rth@twiddle.net>,
+        Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org,
+        Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Laurent Vivier <laurent@vivier.eu>,
+        Max Reitz <mreitz@redhat.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        xen-devel@lists.xenproject.org,
+        Aurelien Jarno <aurelien@aurel32.net>
+Subject: Re: [PATCH] qemu/atomic.h: prefix qemu_ to solve <stdatomic.h>
+ collisions
+Message-ID: <20200923091407.GC16268@stefanha-x1.localdomain>
+References: <20200921162346.188997-1-stefanha@redhat.com>
+ <c8892b73-6cee-9fd3-54b0-289149926041@redhat.com>
+ <52b8a46e-ab9e-1645-163d-497122ece907@redhat.com>
+ <8610ca0e-0b3f-6d95-43b9-e2e49571e311@redhat.com>
+ <20200922081849.GD1989025@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200922104030.07e0dfd9@x1.home>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
- definitions=2020-09-23_03:2020-09-23,2020-09-23 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- adultscore=0 impostorscore=0 mlxlogscore=999 malwarescore=0 spamscore=0
- phishscore=0 suspectscore=0 mlxscore=0 clxscore=1011 bulkscore=0
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2006250000 definitions=main-2009230064
+In-Reply-To: <20200922081849.GD1989025@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Authentication-Results: relay.mimecast.com;
+        auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=stefanha@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="/Uq4LBwYP4y1W6pO"
+Content-Disposition: inline
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+--/Uq4LBwYP4y1W6pO
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
+On Tue, Sep 22, 2020 at 09:18:49AM +0100, Daniel P. Berrang=E9 wrote:
+> On Tue, Sep 22, 2020 at 08:56:06AM +0200, Paolo Bonzini wrote:
+> > On 22/09/20 08:45, David Hildenbrand wrote:
+> > >> It's certainly a good idea but it's quite verbose.
+> > >>
+> > >> What about using atomic__* as the prefix?  It is not very common in =
+QEMU
+> > >> but there are some cases (and I cannot think of anything better).
+> > >
+> > > aqomic_*, lol :)
+> >=20
+> > Actually qatomic_ would be a good one, wouldn't it?
+>=20
+> Yes, I think just adding a 'q' on the front of methods is more than
+> sufficient (see also all the qcrypto_*, qio_* APIs I wrote). The
+> only think a plain 'q' prefix is likely to clash with is the Qt
+> library and that isn't something we're likely to link with (famous
+> last words...).
 
-On 2020-09-22 18:40, Alex Williamson wrote:
-> On Mon, 21 Sep 2020 08:43:29 -0400
-> Matthew Rosato <mjrosato@linux.ibm.com> wrote:
-> 
->> On 9/10/20 10:59 AM, Matthew Rosato wrote:
->>> While it is true that devices with is_virtfn=1 will have a Memory Space
->>> Enable bit that is hard-wired to 0, this is not the only case where we
->>> see this behavior -- For example some bare-metal hypervisors lack
->>> Memory Space Enable bit emulation for devices not setting is_virtfn
->>> (s390). Fix this by instead checking for the newly-added
->>> no_command_memory bit which directly denotes the need for
->>> PCI_COMMAND_MEMORY emulation in vfio.
->>>
->>> Fixes: abafbc551fdd ("vfio-pci: Invalidate mmaps and block MMIO access on disabled memory")
->>> Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
->>> Reviewed-by: Niklas Schnelle <schnelle@linux.ibm.com>
->>> Reviewed-by: Pierre Morel <pmorel@linux.ibm.com>
->>
->> Polite ping on this patch as the other 2 have now received maintainer
->> ACKs or reviews.  I'm concerned about this popping up in distros as
->> abafbc551fdd was a CVE fix.  Related, see question from the cover:
->>
->> - Restored the fixes tag to patch 3 (but the other 2 patches are
->>     now pre-reqs -- cc stable 5.8?)
-> 
-> I've got these queued in my local branch which I'll push to next for
-> v5.10.  I'm thinking that perhaps the right thing would be to add the
-> fixes tag to all three patches, otherwise I could see that the PCI/VF
-> change might get picked as a dependency, but not the s390 specific one.
-> Does this sound correct to everyone?  Thanks,
-> 
-> Alex
-> 
-sound correct for me.
-Thanks.
+This is why I didn't use "qatomic". "atomic" feels too common to prefix
+with just a single letter.
 
-Pierre
+But I grepped /usr/include and code searched GitHub. I can't find any
+uses of "qatomic_" so it looks safe. FWIW Qt does have qatomic.h but
+doesn't use the name for identifiers in the code.
 
--- 
-Pierre Morel
-IBM Lab Boeblingen
+Let's do it!
+
+Stefan
+
+--/Uq4LBwYP4y1W6pO
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl9rEd8ACgkQnKSrs4Gr
+c8hx6QgAmcq3iyL/5X+5ylXdiawWVoC4zV4zxgyO20rzguAaBuIPYnGrzO9/5k7b
+rFywg6HbM8SPy+iaRqL1fbemPxvySlHdd3zOIrMQYrTk1HJoijxenSMZpnBWxIWx
+sN3WONGXmgL54kx8RC6nTmmzXOtz9OLX4koU9c3YwNGWyQchI6+1yEuw0HjqMZmS
+DfBOC/syGd7IbE9PoqGcLZMHujPpvCVK+y2CS3WLZZiZXDvqLwiyB8ZX1Bjp0qUG
+MKOZYfE3t+SaqkHIF7lswCwQt+3gZf2zj2KUxOKFGcRgEOKekklzST8yHA1kYR4u
+EfnQANnly2evsXyGBwQBzh15Isi/RA==
+=jOfu
+-----END PGP SIGNATURE-----
+
+--/Uq4LBwYP4y1W6pO--
+
