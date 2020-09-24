@@ -2,82 +2,81 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D4CC8276ABE
-	for <lists+kvm@lfdr.de>; Thu, 24 Sep 2020 09:26:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C0D68276AF6
+	for <lists+kvm@lfdr.de>; Thu, 24 Sep 2020 09:38:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727130AbgIXH0a (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 24 Sep 2020 03:26:30 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:30198 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727121AbgIXH03 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 24 Sep 2020 03:26:29 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1600932388;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=K3pWzi6XBSxvJ/VWL3fyEt5ORCYjFGoEK4Nlb2X8zSM=;
-        b=VLnnEKPDupyXUk1qvUQmVTa1qNw6SyhYZTfJYNcvG0uQdJ5rKul+aHMTwMorN9t8fgzHP4
-        6WldMnAASIThjln4lhcYbbo7++63mvbjlNB1X4IM0TQWNaRIruZSb0AzJHdCVRTk4tLG2i
-        2AWEMrO0kEiEFYZzsZaTIToeZ8bRNuE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-57-KhdlLsU5M-qlpT4HD7pE3w-1; Thu, 24 Sep 2020 03:26:26 -0400
-X-MC-Unique: KhdlLsU5M-qlpT4HD7pE3w-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DC2AD186DD33;
-        Thu, 24 Sep 2020 07:26:24 +0000 (UTC)
-Received: from [10.72.13.193] (ovpn-13-193.pek2.redhat.com [10.72.13.193])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id CD64A60C15;
-        Thu, 24 Sep 2020 07:26:10 +0000 (UTC)
+        id S1727199AbgIXHif (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 24 Sep 2020 03:38:35 -0400
+Received: from hqnvemgate24.nvidia.com ([216.228.121.143]:17935 "EHLO
+        hqnvemgate24.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727109AbgIXHie (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 24 Sep 2020 03:38:34 -0400
+Received: from hqmail.nvidia.com (Not Verified[216.228.121.13]) by hqnvemgate24.nvidia.com (using TLS: TLSv1.2, AES256-SHA)
+        id <B5f6c4c9a0000>; Thu, 24 Sep 2020 00:36:58 -0700
+Received: from mtl-vdi-166.wap.labs.mlnx (10.124.1.5) by HQMAIL107.nvidia.com
+ (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Thu, 24 Sep
+ 2020 07:38:14 +0000
+Date:   Thu, 24 Sep 2020 10:38:10 +0300
+From:   Eli Cohen <elic@nvidia.com>
+To:     Jason Wang <jasowang@redhat.com>
+CC:     <mst@redhat.com>, <lulu@redhat.com>, <kvm@vger.kernel.org>,
+        <virtualization@lists.linux-foundation.org>,
+        <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <rob.miller@broadcom.com>, <lingshan.zhu@intel.com>,
+        <eperezma@redhat.com>, <hanand@xilinx.com>,
+        <mhabets@solarflare.com>, <eli@mellanox.com>,
+        <amorenoz@redhat.com>, <maxime.coquelin@redhat.com>,
+        <stefanha@redhat.com>, <sgarzare@redhat.com>
 Subject: Re: [RFC PATCH 01/24] vhost-vdpa: fix backend feature ioctls
-To:     Eli Cohen <elic@nvidia.com>
-Cc:     mst@redhat.com, lulu@redhat.com, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, rob.miller@broadcom.com,
-        lingshan.zhu@intel.com, eperezma@redhat.com, hanand@xilinx.com,
-        mhabets@solarflare.com, eli@mellanox.com, amorenoz@redhat.com,
-        maxime.coquelin@redhat.com, stefanha@redhat.com,
-        sgarzare@redhat.com
+Message-ID: <20200924073810.GB170403@mtl-vdi-166.wap.labs.mlnx>
 References: <20200924032125.18619-1-jasowang@redhat.com>
  <20200924032125.18619-2-jasowang@redhat.com>
  <20200924071609.GA170403@mtl-vdi-166.wap.labs.mlnx>
-From:   Jason Wang <jasowang@redhat.com>
-Message-ID: <042dc3f9-40f0-f740-7ffc-611d315bc150@redhat.com>
-Date:   Thu, 24 Sep 2020 15:26:08 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+ <042dc3f9-40f0-f740-7ffc-611d315bc150@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200924071609.GA170403@mtl-vdi-166.wap.labs.mlnx>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Content-Type: text/plain; charset="utf-8"
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <042dc3f9-40f0-f740-7ffc-611d315bc150@redhat.com>
+User-Agent: Mutt/1.9.5 (bf161cf53efb) (2018-04-13)
+X-Originating-IP: [10.124.1.5]
+X-ClientProxiedBy: HQMAIL105.nvidia.com (172.20.187.12) To
+ HQMAIL107.nvidia.com (172.20.187.13)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
+        t=1600933019; bh=+eY8+fXvngYj7XnYGCkUG8jrRpVijqI96ZMj1LGmxWE=;
+        h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+         Content-Type:Content-Disposition:Content-Transfer-Encoding:
+         In-Reply-To:User-Agent:X-Originating-IP:X-ClientProxiedBy;
+        b=WnvFZcXfAFVVIByiIYbR+uKmdmmTlMOmyJvEJc7hCQzIVGcGXGJpD+Dr8/YQNWcGg
+         LOq+tR9i0Kn2gD+iaqawryJBcoNJcj0c+vW76jzqg3upQD2YeqCQTbXCK4MIWhA3PI
+         lDpNIHqe+WIjBtzCHb/k1rKcunqeiKFw/mXkCAjFuMITzH1bgwKpaDH79HQmpfXH7q
+         Pn93V4GsDH+6iYuiV3nRBeysiY2jNruBumG9wFHncs53dFH1sCAH3WhFhyjlvn6U8D
+         RayV6/I9+AKyi4lgpDVV1YdjlCyRr+DTl2/pLDiZ4Y3TIj+SiMJrf2EHOamqFvw+0w
+         biH0TccDh6mQA==
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Thu, Sep 24, 2020 at 03:26:08PM +0800, Jason Wang wrote:
+>=20
+> On 2020/9/24 =E4=B8=8B=E5=8D=883:16, Eli Cohen wrote:
+> > On Thu, Sep 24, 2020 at 11:21:02AM +0800, Jason Wang wrote:
+> > > Commit 653055b9acd4 ("vhost-vdpa: support get/set backend features")
+> > > introduces two malfunction backend features ioctls:
+> > >=20
+> > > 1) the ioctls was blindly added to vring ioctl instead of vdpa device
+> > >     ioctl
+> > > 2) vhost_set_backend_features() was called when dev mutex has already
+> > >     been held which will lead a deadlock
+> > >=20
+> > I assume this patch requires some patch in qemu as well. Do you have
+> > such patch?
+> >=20
+>=20
+> It's this series: [PATCH 0/3] Vhost-vDPA: batch IOTLB updating.
+>=20
+> You were copied.
+>=20
 
-On 2020/9/24 下午3:16, Eli Cohen wrote:
-> On Thu, Sep 24, 2020 at 11:21:02AM +0800, Jason Wang wrote:
->> Commit 653055b9acd4 ("vhost-vdpa: support get/set backend features")
->> introduces two malfunction backend features ioctls:
->>
->> 1) the ioctls was blindly added to vring ioctl instead of vdpa device
->>     ioctl
->> 2) vhost_set_backend_features() was called when dev mutex has already
->>     been held which will lead a deadlock
->>
-> I assume this patch requires some patch in qemu as well. Do you have
-> such patch?
->
-
-It's this series: [PATCH 0/3] Vhost-vDPA: batch IOTLB updating.
-
-You were copied.
-
-Thanks
-
+Right, I miss those.
+Thanks.
