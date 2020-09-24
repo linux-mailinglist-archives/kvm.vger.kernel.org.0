@@ -2,181 +2,216 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4BFE6277093
-	for <lists+kvm@lfdr.de>; Thu, 24 Sep 2020 14:07:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D357A27711B
+	for <lists+kvm@lfdr.de>; Thu, 24 Sep 2020 14:34:30 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727702AbgIXMHJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 24 Sep 2020 08:07:09 -0400
-Received: from mta-02.yadro.com ([89.207.88.252]:45496 "EHLO mta-01.yadro.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727494AbgIXMHH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 24 Sep 2020 08:07:07 -0400
-Received: from localhost (unknown [127.0.0.1])
-        by mta-01.yadro.com (Postfix) with ESMTP id 1AFFA579F2;
-        Thu, 24 Sep 2020 12:07:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=yadro.com; h=
-        content-type:content-type:content-transfer-encoding:mime-version
-        :x-mailer:message-id:date:date:subject:subject:from:from
-        :received:received:received; s=mta-01; t=1600949222; x=
-        1602763623; bh=cprXYP/GN+1p2Jw7sjgIsH/PpPAVv1sAHLGBkanaBwU=; b=n
-        A7yfGOfsJwMceoqQq5584S7Qzz5X79lI9DNAuiXloyL1t2DskkD5c/LeFAzkuhQr
-        Kr50oy0HP+wXpCo5pywvSM0hmeiDsHC7FZ6Z4OL9GBbGLY2FMmENhqaImjnx9VPX
-        7iEwaxmwLKxf+4IB6gQjtlXIEa5Fb7M68vZ3vrdsA8=
-X-Virus-Scanned: amavisd-new at yadro.com
-Received: from mta-01.yadro.com ([127.0.0.1])
-        by localhost (mta-01.yadro.com [127.0.0.1]) (amavisd-new, port 10024)
-        with ESMTP id h8O6d-hiukJw; Thu, 24 Sep 2020 15:07:02 +0300 (MSK)
-Received: from T-EXCH-02.corp.yadro.com (t-exch-02.corp.yadro.com [172.17.10.102])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mta-01.yadro.com (Postfix) with ESMTPS id 3A82E579D6;
-        Thu, 24 Sep 2020 15:07:02 +0300 (MSK)
-Received: from localhost (172.17.204.212) by T-EXCH-02.corp.yadro.com
- (172.17.10.102) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384_P384) id 15.1.669.32; Thu, 24
- Sep 2020 15:07:02 +0300
-From:   Roman Bolshakov <r.bolshakov@yadro.com>
-To:     <kvm@vger.kernel.org>
-CC:     Roman Bolshakov <r.bolshakov@yadro.com>,
-        Thomas Huth <thuth@redhat.com>,
+        id S1727821AbgIXMeX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 24 Sep 2020 08:34:23 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:53208 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727815AbgIXMeX (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 24 Sep 2020 08:34:23 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1600950861;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=XJM2zsAmjHPtnBVFf6cltcdoLV4SPiJ7BDBnMHvxMEQ=;
+        b=Ht4zUUcFI8NnJDTQiaXdh/3X6CUlFV5a65Vtih95kXxjxrUXkrCsZ2YdbvB06E1ZlJ7WOp
+        F6lC+Mg4PX7wjy04WC0IECqsUscQ4aOCGfgPlkKFONkYna8xJacEj1fzJgKXpBwXQktNlY
+        60fbBUQSjKIAVvBPJmmkW2w3l5KgCjs=
+Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
+ [209.85.218.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-1-yFCZwm6RPBWqkAKSSjQuGg-1; Thu, 24 Sep 2020 08:34:19 -0400
+X-MC-Unique: yFCZwm6RPBWqkAKSSjQuGg-1
+Received: by mail-ej1-f69.google.com with SMTP id r14so1246290ejb.3
+        for <kvm@vger.kernel.org>; Thu, 24 Sep 2020 05:34:18 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=XJM2zsAmjHPtnBVFf6cltcdoLV4SPiJ7BDBnMHvxMEQ=;
+        b=nNahWxhab8kqAi2X9TdkJ5nAUaSX4YI3jagPVlJdyi/fr8SnG72zN3V8ks7+zDNKHX
+         dw3c/Gb0kBqqIXxq2+GuXzojg2wxeHPkqKLM49s/4VAoJc+9jmb0kXFFNPl6LhEBhmPp
+         4ALk3DRE2qjaQZ1t74piWuDNqFfbWTaFdO8uyyQ/J4WOnT1/+yqLzSErqdGhDoXfxWQ6
+         zGLZILv4QuP2pImZaIQrqoQLI0/yHluuvXa8OSy7u8PCcEVgGtLZ76T8phPGgnMaO58M
+         q3ojiXguq5/iyJ/nuNdKB4ID1GY+zE31PN6VoELGS58GHo3WGR1WrUdkATkpQSZow5Zt
+         89uw==
+X-Gm-Message-State: AOAM530Rt83wFjDBXDu8CRU3xrC7b4vBaj58j3WrJrJ5tBKcSdHsmTwg
+        AIAr3SvR7HyXGUw6RQ+qLwEqCUCDTTkNaC8zKsU9gqFa+c3WLgrWZY294WvJgznEgxTRDgIpFCN
+        FvWvnF7jcwk43
+X-Received: by 2002:a05:6402:1148:: with SMTP id g8mr775011edw.271.1600950857413;
+        Thu, 24 Sep 2020 05:34:17 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJz9aag4YDAgIGYQ9EHrDOFNyx4QU0hniTeVNf02iQ7RJLkNK/cPK0RyizBQjwquCkPtgxllpw==
+X-Received: by 2002:a05:6402:1148:: with SMTP id g8mr774981edw.271.1600950857170;
+        Thu, 24 Sep 2020 05:34:17 -0700 (PDT)
+Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
+        by smtp.gmail.com with ESMTPSA id t3sm2383180edv.59.2020.09.24.05.34.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 24 Sep 2020 05:34:15 -0700 (PDT)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     Sean Christopherson <sean.j.christopherson@intel.com>,
         Paolo Bonzini <pbonzini@redhat.com>
-Subject: [kvm-unit-tests PATCH] x86: realmode: Workaround clang issues
-Date:   Thu, 24 Sep 2020 15:05:17 +0300
-Message-ID: <20200924120516.77299-1-r.bolshakov@yadro.com>
-X-Mailer: git-send-email 2.28.0
+Cc:     Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        linux-arm-kernel@lists.infradead.org,
+        Huacai Chen <chenhc@lemote.com>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        linux-mips@vger.kernel.org, Paul Mackerras <paulus@ozlabs.org>,
+        kvm-ppc@vger.kernel.org,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>
+Subject: Re: [RFC PATCH 3/3] KVM: x86: Use KVM_BUG/KVM_BUG_ON to handle bugs that are fatal to the VM
+In-Reply-To: <20200923224530.17735-4-sean.j.christopherson@intel.com>
+References: <20200923224530.17735-1-sean.j.christopherson@intel.com> <20200923224530.17735-4-sean.j.christopherson@intel.com>
+Date:   Thu, 24 Sep 2020 14:34:14 +0200
+Message-ID: <878scze4l5.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-Originating-IP: [172.17.204.212]
-X-ClientProxiedBy: T-EXCH-01.corp.yadro.com (172.17.10.101) To
- T-EXCH-02.corp.yadro.com (172.17.10.102)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-clang doesn't properly support .code16gcc and generates wrong machine
-code [1][2][3][4]. But the test works if object file is compiled with -m16 and
-explicit suffixes are added for instructions.
+Sean Christopherson <sean.j.christopherson@intel.com> writes:
 
-1. https://lore.kernel.org/kvm/4d20fbce-d247-abf4-3ceb-da2c0d48fc50@redhat.com/
-2. https://lore.kernel.org/kvm/20200915155959.GF52559@SPB-NB-133.local/
-3. https://lore.kernel.org/kvm/788b7191-6987-9399-f352-2e661255157e@redhat.com/
-4. https://lore.kernel.org/kvm/20200922212507.GA11460@SPB-NB-133.local/
+> Add support for KVM_REQ_VM_BUGG in x86, and replace a variety of WARNs
+> with KVM_BUG() and KVM_BUG_ON().  Return -EIO if a KVM_BUG is hit to
+> align with the common KVM behavior of rejecting iocts() with -EIO if the
+> VM is bugged.
+>
+> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+> ---
+>  arch/x86/kvm/svm/svm.c |  2 +-
+>  arch/x86/kvm/vmx/vmx.c | 23 ++++++++++++++---------
+>  arch/x86/kvm/x86.c     |  4 ++++
+>  3 files changed, 19 insertions(+), 10 deletions(-)
+>
+> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+> index 3da5b2f1b4a1..e684794c6249 100644
+> --- a/arch/x86/kvm/svm/svm.c
+> +++ b/arch/x86/kvm/svm/svm.c
+> @@ -1380,7 +1380,7 @@ static void svm_cache_reg(struct kvm_vcpu *vcpu, enum kvm_reg reg)
+>  		load_pdptrs(vcpu, vcpu->arch.walk_mmu, kvm_read_cr3(vcpu));
+>  		break;
+>  	default:
+> -		WARN_ON_ONCE(1);
+> +		KVM_BUG_ON(1, vcpu->kvm);
+>  	}
+>  }
+>  
+> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> index 6f9a0c6d5dc5..810d46ab0a47 100644
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -2250,7 +2250,7 @@ static void vmx_cache_reg(struct kvm_vcpu *vcpu, enum kvm_reg reg)
+>  		vcpu->arch.cr4 |= vmcs_readl(GUEST_CR4) & guest_owned_bits;
+>  		break;
+>  	default:
+> -		WARN_ON_ONCE(1);
+> +		KVM_BUG_ON(1, vcpu->kvm);
+>  		break;
+>  	}
+>  }
+> @@ -4960,6 +4960,7 @@ static int handle_cr(struct kvm_vcpu *vcpu)
+>  			return kvm_complete_insn_gp(vcpu, err);
+>  		case 3:
+>  			WARN_ON_ONCE(enable_unrestricted_guest);
+> +
+>  			err = kvm_set_cr3(vcpu, val);
+>  			return kvm_complete_insn_gp(vcpu, err);
+>  		case 4:
+> @@ -4985,14 +4986,13 @@ static int handle_cr(struct kvm_vcpu *vcpu)
+>  		}
+>  		break;
+>  	case 2: /* clts */
+> -		WARN_ONCE(1, "Guest should always own CR0.TS");
+> -		vmx_set_cr0(vcpu, kvm_read_cr0_bits(vcpu, ~X86_CR0_TS));
+> -		trace_kvm_cr_write(0, kvm_read_cr0(vcpu));
+> -		return kvm_skip_emulated_instruction(vcpu);
+> +		KVM_BUG(1, vcpu->kvm, "Guest always owns CR0.TS");
+> +		return -EIO;
+>  	case 1: /*mov from cr*/
+>  		switch (cr) {
+>  		case 3:
+>  			WARN_ON_ONCE(enable_unrestricted_guest);
+> +
 
-Suggested-by: Thomas Huth <thuth@redhat.com>
-Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
-Signed-off-by: Roman Bolshakov <r.bolshakov@yadro.com>
----
- .travis.yml         |  2 +-
- x86/Makefile.common |  2 +-
- x86/realmode.c      | 44 ++++++++++++++++++++++----------------------
- 3 files changed, 24 insertions(+), 24 deletions(-)
+Here, were you intended to replace WARN_ON_ONCE() with KVM_BUG_ON() or
+this is just a stray newline added?
 
-diff --git a/.travis.yml b/.travis.yml
-index 2e5ae41..bd62190 100644
---- a/.travis.yml
-+++ b/.travis.yml
-@@ -24,7 +24,7 @@ jobs:
-       - BUILD_DIR="."
-       - TESTS="access asyncpf debug emulator ept hypercall hyperv_stimer
-                hyperv_synic idt_test intel_iommu ioapic ioapic-split
--               kvmclock_test msr pcid rdpru rmap_chain s3 setjmp umip"
-+               kvmclock_test msr pcid rdpru realmode rmap_chain s3 setjmp umip"
-       - ACCEL="kvm"
- 
-     - addons:
-diff --git a/x86/Makefile.common b/x86/Makefile.common
-index 090ce22..5567d66 100644
---- a/x86/Makefile.common
-+++ b/x86/Makefile.common
-@@ -72,7 +72,7 @@ $(TEST_DIR)/realmode.elf: $(TEST_DIR)/realmode.o
- 	$(CC) -m32 -nostdlib -o $@ -Wl,-m,elf_i386 \
- 	      -Wl,-T,$(SRCDIR)/$(TEST_DIR)/realmode.lds $^
- 
--$(TEST_DIR)/realmode.o: bits = 32
-+$(TEST_DIR)/realmode.o: bits = 16
- 
- $(TEST_DIR)/kvmclock_test.elf: $(TEST_DIR)/kvmclock.o
- 
-diff --git a/x86/realmode.c b/x86/realmode.c
-index 7c2d776..c8a6ae0 100644
---- a/x86/realmode.c
-+++ b/x86/realmode.c
-@@ -639,7 +639,7 @@ static void test_jcc_near(void)
- 
- static void test_long_jmp(void)
- {
--	MK_INSN(long_jmp, "call 1f\n\t"
-+	MK_INSN(long_jmp, "calll 1f\n\t"
- 			  "jmp 2f\n\t"
- 			  "1: jmp $0, $test_function\n\t"
- 		          "2:\n\t");
-@@ -728,26 +728,26 @@ static void test_null(void)
- 
- static void test_pusha_popa(void)
- {
--	MK_INSN(pusha, "pusha\n\t"
--		       "pop %edi\n\t"
--		       "pop %esi\n\t"
--		       "pop %ebp\n\t"
--		       "add $4, %esp\n\t"
--		       "pop %ebx\n\t"
--		       "pop %edx\n\t"
--		       "pop %ecx\n\t"
--		       "pop %eax\n\t"
-+	MK_INSN(pusha, "pushal\n\t"
-+		       "popl %edi\n\t"
-+		       "popl %esi\n\t"
-+		       "popl %ebp\n\t"
-+		       "addl $4, %esp\n\t"
-+		       "popl %ebx\n\t"
-+		       "popl %edx\n\t"
-+		       "popl %ecx\n\t"
-+		       "popl %eax\n\t"
- 		       );
- 
--	MK_INSN(popa, "push %eax\n\t"
--		      "push %ecx\n\t"
--		      "push %edx\n\t"
--		      "push %ebx\n\t"
--		      "push %esp\n\t"
--		      "push %ebp\n\t"
--		      "push %esi\n\t"
--		      "push %edi\n\t"
--		      "popa\n\t"
-+	MK_INSN(popa, "pushl %eax\n\t"
-+		      "pushl %ecx\n\t"
-+		      "pushl %edx\n\t"
-+		      "pushl %ebx\n\t"
-+		      "pushl %esp\n\t"
-+		      "pushl %ebp\n\t"
-+		      "pushl %esi\n\t"
-+		      "pushl %edi\n\t"
-+		      "popal\n\t"
- 		      );
- 
- 	init_inregs(&(struct regs){ .eax = 0, .ebx = 1, .ecx = 2, .edx = 3, .esi = 4, .edi = 5, .ebp = 6 });
-@@ -761,9 +761,9 @@ static void test_pusha_popa(void)
- 
- static void test_iret(void)
- {
--	MK_INSN(iret32, "pushf\n\t"
-+	MK_INSN(iret32, "pushfl\n\t"
- 			"pushl %cs\n\t"
--			"call 1f\n\t" /* a near call will push eip onto the stack */
-+			"calll 1f\n\t" /* a near call will push eip onto the stack */
- 			"jmp 2f\n\t"
- 			"1: iretl\n\t"
- 			"2:\n\t"
-@@ -782,7 +782,7 @@ static void test_iret(void)
- 			      "orl $0xffc18028, %eax\n\t"
- 			      "pushl %eax\n\t"
- 			      "pushl %cs\n\t"
--			      "call 1f\n\t"
-+			      "calll 1f\n\t"
- 			      "jmp 2f\n\t"
- 			      "1: iretl\n\t"
- 			      "2:\n\t");
+>  			val = kvm_read_cr3(vcpu);
+>  			kvm_register_write(vcpu, reg, val);
+>  			trace_kvm_cr_read(cr, val);
+> @@ -5330,7 +5330,9 @@ static int handle_ept_misconfig(struct kvm_vcpu *vcpu)
+>  
+>  static int handle_nmi_window(struct kvm_vcpu *vcpu)
+>  {
+> -	WARN_ON_ONCE(!enable_vnmi);
+> +	if (KVM_BUG_ON(!enable_vnmi, vcpu->kvm))
+> +		return -EIO;
+> +
+>  	exec_controls_clearbit(to_vmx(vcpu), CPU_BASED_NMI_WINDOW_EXITING);
+>  	++vcpu->stat.nmi_window_exits;
+>  	kvm_make_request(KVM_REQ_EVENT, vcpu);
+> @@ -5908,7 +5910,8 @@ static int vmx_handle_exit(struct kvm_vcpu *vcpu, fastpath_t exit_fastpath)
+>  	 * below) should never happen as that means we incorrectly allowed a
+>  	 * nested VM-Enter with an invalid vmcs12.
+>  	 */
+> -	WARN_ON_ONCE(vmx->nested.nested_run_pending);
+> +	if (KVM_BUG_ON(vmx->nested.nested_run_pending, vcpu->kvm))
+> +		return -EIO;
+>  
+>  	/* If guest state is invalid, start emulating */
+>  	if (vmx->emulation_required)
+> @@ -6258,7 +6261,9 @@ static int vmx_sync_pir_to_irr(struct kvm_vcpu *vcpu)
+>  	int max_irr;
+>  	bool max_irr_updated;
+>  
+> -	WARN_ON(!vcpu->arch.apicv_active);
+> +	if (KVM_BUG_ON(!vcpu->arch.apicv_active, vcpu->kvm))
+> +		return -EIO;
+> +
+>  	if (pi_test_on(&vmx->pi_desc)) {
+>  		pi_clear_on(&vmx->pi_desc);
+>  		/*
+> @@ -6345,7 +6350,7 @@ static void handle_external_interrupt_irqoff(struct kvm_vcpu *vcpu)
+>  	gate_desc *desc;
+>  	u32 intr_info = vmx_get_intr_info(vcpu);
+>  
+> -	if (WARN_ONCE(!is_external_intr(intr_info),
+> +	if (KVM_BUG(!is_external_intr(intr_info), vcpu->kvm,
+>  	    "KVM: unexpected VM-Exit interrupt info: 0x%x", intr_info))
+>  		return;
+>  
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 17f4995e80a7..672eb5142b34 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -8363,6 +8363,10 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
+>  	bool req_immediate_exit = false;
+>  
+>  	if (kvm_request_pending(vcpu)) {
+> +		if (kvm_check_request(KVM_REQ_VM_BUGGED, vcpu)) {
+
+Do we want to allow userspace to continue executing the guest or should
+we make KVM_REQ_VM_BUGGED permanent by replacing kvm_check_request()
+with kvm_test_request()?
+
+> +			r = -EIO;
+> +			goto out;
+> +		}
+>  		if (kvm_check_request(KVM_REQ_GET_VMCS12_PAGES, vcpu)) {
+>  			if (unlikely(!kvm_x86_ops.nested_ops->get_vmcs12_pages(vcpu))) {
+>  				r = 0;
+
 -- 
-2.28.0
+Vitaly
 
