@@ -2,89 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DBDF727738E
-	for <lists+kvm@lfdr.de>; Thu, 24 Sep 2020 16:06:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D6DBF277430
+	for <lists+kvm@lfdr.de>; Thu, 24 Sep 2020 16:39:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728141AbgIXOGw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 24 Sep 2020 10:06:52 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:20885 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1728064AbgIXOGk (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 24 Sep 2020 10:06:40 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1600956399;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=WITCXHzAwksVt5Yjl1chINGWSfzTuBNvZDW5n9bgc5c=;
-        b=aOynq9XUp7hDHjXc4ugUwCpLrr0ecd9XP6+CNlao3VGVxc0nauP6sNWZUVFcrfQScg81I5
-        eq5UyXW1RTqOypFQSJre03air55Tfnnxe2FXB1JHmORhkOklFUod0mmevqUkv15vYw9Khs
-        /B0jQj26Amy35uaSORk5gE4IJ+ncOiM=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-16-aZbKGl-dNsyIhIfdacSfag-1; Thu, 24 Sep 2020 10:06:35 -0400
-X-MC-Unique: aZbKGl-dNsyIhIfdacSfag-1
-Received: by mail-wm1-f72.google.com with SMTP id m10so907478wmf.5
-        for <kvm@vger.kernel.org>; Thu, 24 Sep 2020 07:06:35 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=WITCXHzAwksVt5Yjl1chINGWSfzTuBNvZDW5n9bgc5c=;
-        b=bxiImLsYtL6351j0SCc0xnhhyXhv6tNoqQmu3xKAkhnvGMG6DM3tm6VJ4pjXa6tZgA
-         m119+a7s9YEaVjIYcdJHYPJrOaDQ/NsGjzeZ9FJyFhS8lLID0zfsMRsBE97NZPao8GN3
-         BQ3JOqCtl4e02mzBVJvFthOWBIyC1Rhg7b7/mpqmi/m/fIiALT3ZoaiMStRPTFoNtXXj
-         edjYEcXfqyX7jX8dkbOgF2B4dEKQphypj36ljpjdG+icAWNwywmJxEsd726nNFoU1IAY
-         Js87tGgwTZ9PwtjCb5DfnK/Up6zpaVi6P2ZLqPuqAJDhFx38HvtJBW0CBys7fODIDS/H
-         xk3w==
-X-Gm-Message-State: AOAM531rIFzODZ0CT/yxRrbRKHsP8nHRH/gFtqgjFBGS41VBNqe226Zg
-        qmcMAuQuVX0iXNZhcODTf+QJ395RQOgZ+WDGGGh3BeIsQskSHWr0O1qUdNowCp+Ig5y4q/73vWz
-        BjYJj/yHXkUWu
-X-Received: by 2002:adf:f6cd:: with SMTP id y13mr5248540wrp.161.1600956394237;
-        Thu, 24 Sep 2020 07:06:34 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzeFLtutxlfK0jUKd+nIPQGS+H9/NyYapLhwS0/o3lRPWfvF4hf0K/D4Lm+zt0QfImtD4gXLw==
-X-Received: by 2002:adf:f6cd:: with SMTP id y13mr5248511wrp.161.1600956394020;
-        Thu, 24 Sep 2020 07:06:34 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:d80e:a78:c27b:93ed? ([2001:b07:6468:f312:d80e:a78:c27b:93ed])
-        by smtp.gmail.com with ESMTPSA id a10sm3586835wmb.23.2020.09.24.07.06.31
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 24 Sep 2020 07:06:32 -0700 (PDT)
-Subject: Re: [PATCH] KVM: SVM: Add a dedicated INVD intercept routine
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>
-Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
+        id S1728234AbgIXOj0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 24 Sep 2020 10:39:26 -0400
+Received: from mga07.intel.com ([134.134.136.100]:52514 "EHLO mga07.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727859AbgIXOj0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 24 Sep 2020 10:39:26 -0400
+IronPort-SDR: lYxwhl60KN6YQKEWJLRVb4subtGPKhodt6KGimpn+y0dX4ffBEBxA893xy6y55t3TniFGn9fJI
+ uJggyDxNaLZw==
+X-IronPort-AV: E=McAfee;i="6000,8403,9753"; a="225363025"
+X-IronPort-AV: E=Sophos;i="5.77,298,1596524400"; 
+   d="scan'208";a="225363025"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Sep 2020 07:39:25 -0700
+IronPort-SDR: aw/mqSt0VD6UBmHQwsU0wYx6f6DwfujzsoTj23//ldTuw5Nx0Xxgh9c4y3m5b78/1u0mHirB4M
+ Sm0/LN52yJcQ==
+X-IronPort-AV: E=Sophos;i="5.77,298,1596524400"; 
+   d="scan'208";a="486924110"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.160])
+  by orsmga005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Sep 2020 07:39:25 -0700
+Date:   Thu, 24 Sep 2020 07:39:24 -0700
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Brijesh Singh <brijesh.singh@amd.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "H. Peter Anvin" <hpa@zytor.com>, kvm@vger.kernel.org,
-        x86@kernel.org, linux-kernel@vger.kernel.org
-References: <16f36f9a51608758211c54564cd17c8b909372f1.1600892859.git.thomas.lendacky@amd.com>
- <87zh5fcm4f.fsf@vitty.brq.redhat.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <26425c1b-a56d-bb52-109a-ab92eeb2c084@redhat.com>
-Date:   Thu, 24 Sep 2020 16:06:31 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] KVM: x86/mmu: Stash 'kvm' in a local variable in
+ kvm_mmu_free_roots()
+Message-ID: <20200924143922.GA22539@linux.intel.com>
+References: <20200923191204.8410-1-sean.j.christopherson@intel.com>
+ <875z83e47o.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <87zh5fcm4f.fsf@vitty.brq.redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <875z83e47o.fsf@vitty.brq.redhat.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 24/09/20 15:58, Vitaly Kuznetsov wrote:
-> does it sill make sense to intercept INVD when we just skip it? Would it
-> rather make sense to disable INVD intercept for SEV guests completely?
+On Thu, Sep 24, 2020 at 02:42:19PM +0200, Vitaly Kuznetsov wrote:
+> What about kvm_mmu_get_page(), make_mmu_pages_available(),
+> mmu_alloc_root(), kvm_mmu_sync_roots(), direct_page_fault(),
+> kvm_mmu_pte_write() which seem to be using the same ugly pattern? :-)
 
-If we don't intercept the processor would really invalidate the cache,
-that is certainly not what we want.
-
-Paolo
-
+Heh, good question.  I guess only kvm_mmu_free_roots() managed to cross over
+the threshold from "that's ugly" to "this is ridiculous".
